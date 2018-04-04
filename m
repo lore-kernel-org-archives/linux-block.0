@@ -1,46 +1,43 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
-	Stefan Haberland <sth@linux.vnet.ibm.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 0/8] blk-mq: fix and improve queue mapping
-Date: Sun,  8 Apr 2018 17:48:06 +0800
-Message-Id: <20180408094814.28953-1-ming.lei@redhat.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: jglisse@redhat.com
+To: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>
+Subject: [RFC PATCH 74/79] mm/page_ronly: add config option for generic read only page framework.
+Date: Wed,  4 Apr 2018 15:18:26 -0400
+Message-Id: <20180404191831.5378-37-jglisse@redhat.com>
+In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
+References: <20180404191831.5378-1-jglisse@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+From: Jérôme Glisse <jglisse@redhat.com>
 
-The first two patches fix issues about queue mapping.
+It's really just a config option patch.
 
-The other 6 patches improve queue mapping for blk-mq.
+Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
+Cc: Andrea Arcangeli <aarcange@redhat.com>
+---
+ mm/Kconfig | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Christian, this patches should fix your issue, so please give
-a test, and the patches can be found in the following tree:
-
-	https://github.com/ming1/linux/commits/v4.17-rc-blk-fix_mapping_v1
-
-Thanks,
-Ming
-
-Ming Lei (8):
-  blk-mq: make sure that correct hctx->next_cpu is set
-  blk-mq: don't keep offline CPUs mapped to hctx 0
-  blk-mq: avoid to write intermediate result to hctx->next_cpu
-  blk-mq: introduce blk_mq_hw_queue_first_cpu() to figure out first cpu
-  blk-mq: remove blk_mq_delay_queue()
-  blk-mq: don't check queue mapped in __blk_mq_delay_run_hw_queue()
-  blk-mq: reimplement blk_mq_hw_queue_mapped
-  blk-mq: remove code for dealing with remapping queue
-
- block/blk-mq-cpumap.c  |   5 ---
- block/blk-mq-debugfs.c |   1 -
- block/blk-mq.c         | 101 +++++++++++--------------------------------------
- block/blk-mq.h         |   2 +-
- include/linux/blk-mq.h |   2 -
- 5 files changed, 24 insertions(+), 87 deletions(-)
-
+diff --git a/mm/Kconfig b/mm/Kconfig
+index c782e8fb7235..aeffb6e8dd21 100644
+--- a/mm/Kconfig
++++ b/mm/Kconfig
+@@ -149,6 +149,9 @@ config NO_BOOTMEM
+ config MEMORY_ISOLATION
+ 	bool
+ 
++config PAGE_RONLY
++	bool
++
+ #
+ # Only be set on architectures that have completely implemented memory hotplug
+ # feature. If you are not sure, don't touch it.
 -- 
-2.9.5
+2.14.3
