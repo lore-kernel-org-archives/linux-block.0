@@ -1,72 +1,123 @@
-Return-Path: <zhangweiping@didichuxing.com>
-Date: Thu, 5 Apr 2018 18:10:15 +0800
-From: Weiping Zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>, <cohuck@redhat.com>, <mst@redhat.com>,
-	<jasowang@redhat.com>
-CC: <linux-block@vger.kernel.org>, <virtualization@lists.linux-foundation.org>
-Subject: [RFC PATCH 1/2] blk-setting: add new helper
- blk_queue_max_hw_sectors_no_limit
-Message-ID: <d3e3f9e5554498d6f529bea1c3f2de5b91789d30.1522922101.git.zhangweiping@didichuxing.com>
-References: <cover.1522922101.git.zhangweiping@didichuxing.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: jglisse@redhat.com
+To: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        "Theodore Ts'o" <tytso@mit.edu>, Jan Kara <jack@suse.com>,
+        linux-ext4@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Subject: [RFC PATCH 34/79] fs/journal: add struct inode to jbd2_journal_revoke() arguments.
+Date: Wed,  4 Apr 2018 15:18:08 -0400
+Message-Id: <20180404191831.5378-19-jglisse@redhat.com>
+In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
+References: <20180404191831.5378-1-jglisse@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <cover.1522922101.git.zhangweiping@didichuxing.com>
-Return-Path: zhangweiping@didichuxing.com
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-There is a default upper limitation BLK_DEF_MAX_SECTORS, but for
-some virtual block device driver there is no such limitation. So
-add a new help to set max request size.
+From: Jérôme Glisse <jglisse@redhat.com>
 
-Signed-off-by: Weiping Zhang <zhangweiping@didichuxing.com>
+For the holy crusade to stop relying on struct page mapping field, add
+struct super_block to jbd2_journal_revoke() arguments.
+
+spatch --sp-file zemantic-011a.spatch --in-place --dir fs/
+----------------------------------------------------------------------
+@exists@
+expression E1, E2, E3;
+identifier I;
+@@
+struct super_block *I;
+...
+-jbd2_journal_revoke(E1, E2, E3)
++jbd2_journal_revoke(E1, E2, I, E3)
+
+@exists@
+expression E1, E2, E3;
+identifier F, I;
+@@
+F(..., struct super_block *I, ...) {
+...
+-jbd2_journal_revoke(E1, E2, E3)
++jbd2_journal_revoke(E1, E2, I, E3)
+...
+}
+
+@exists@
+expression E1, E2, E3;
+identifier I;
+@@
+struct inode *I;
+...
+-jbd2_journal_revoke(E1, E2, E3)
++jbd2_journal_revoke(E1, E2, I->i_sb, E3)
+
+@exists@
+expression E1, E2, E3;
+identifier F, I;
+@@
+F(..., struct inode *I, ...) {
+...
+-jbd2_journal_revoke(E1, E2, E3)
++jbd2_journal_revoke(E1, E2, I->i_sb, E3)
+...
+}
+----------------------------------------------------------------------
+
+Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
+Cc: "Theodore Ts'o" <tytso@mit.edu>
+Cc: Jan Kara <jack@suse.com>
+Cc: linux-ext4@vger.kernel.org
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-fsdevel@vger.kernel.org
+
+Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
 ---
- block/blk-settings.c   | 20 ++++++++++++++++++++
- include/linux/blkdev.h |  2 ++
- 2 files changed, 22 insertions(+)
+ fs/ext4/ext4_jbd2.c  | 2 +-
+ fs/jbd2/revoke.c     | 2 +-
+ include/linux/jbd2.h | 3 ++-
+ 3 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 48ebe6b..685c30c 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -253,6 +253,26 @@ void blk_queue_max_hw_sectors(struct request_queue *q, unsigned int max_hw_secto
- }
- EXPORT_SYMBOL(blk_queue_max_hw_sectors);
+diff --git a/fs/ext4/ext4_jbd2.c b/fs/ext4/ext4_jbd2.c
+index 0804d564b529..5529badca994 100644
+--- a/fs/ext4/ext4_jbd2.c
++++ b/fs/ext4/ext4_jbd2.c
+@@ -237,7 +237,7 @@ int __ext4_forget(const char *where, unsigned int line, handle_t *handle,
+ 	 * data!=journal && (is_metadata || should_journal_data(inode))
+ 	 */
+ 	BUFFER_TRACE(bh, "call jbd2_journal_revoke");
+-	err = jbd2_journal_revoke(handle, blocknr, bh);
++	err = jbd2_journal_revoke(handle, blocknr, inode->i_sb, bh);
+ 	if (err) {
+ 		ext4_journal_abort_handle(where, line, __func__,
+ 					  bh, handle, err);
+diff --git a/fs/jbd2/revoke.c b/fs/jbd2/revoke.c
+index b6e2fd52acd6..71e690ad9d44 100644
+--- a/fs/jbd2/revoke.c
++++ b/fs/jbd2/revoke.c
+@@ -320,7 +320,7 @@ void jbd2_journal_destroy_revoke(journal_t *journal)
+  */
  
-+/* same as blk_queue_max_hw_sectors but without default upper limitation */
-+void blk_queue_max_hw_sectors_no_limit(struct request_queue *q,
-+		unsigned int max_hw_sectors)
-+{
-+	struct queue_limits *limits = &q->limits;
-+	unsigned int max_sectors;
-+
-+	if ((max_hw_sectors << 9) < PAGE_SIZE) {
-+		max_hw_sectors = 1 << (PAGE_SHIFT - 9);
-+		printk(KERN_INFO "%s: set to minimum %d\n",
-+		       __func__, max_hw_sectors);
-+	}
-+
-+	limits->max_hw_sectors = max_hw_sectors;
-+	max_sectors = min_not_zero(max_hw_sectors, limits->max_dev_sectors);
-+	limits->max_sectors = max_sectors;
-+	q->backing_dev_info->io_pages = max_sectors >> (PAGE_SHIFT - 9);
-+}
-+EXPORT_SYMBOL(blk_queue_max_hw_sectors_no_limit);
-+
- /**
-  * blk_queue_chunk_sectors - set size of the chunk for this queue
-  * @q:  the request queue for the device
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index ed63f3b..2250709 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1243,6 +1243,8 @@ extern void blk_cleanup_queue(struct request_queue *);
- extern void blk_queue_make_request(struct request_queue *, make_request_fn *);
- extern void blk_queue_bounce_limit(struct request_queue *, u64);
- extern void blk_queue_max_hw_sectors(struct request_queue *, unsigned int);
-+extern void blk_queue_max_hw_sectors_no_limit(struct request_queue *,
-+						unsigned int);
- extern void blk_queue_chunk_sectors(struct request_queue *, unsigned int);
- extern void blk_queue_max_segments(struct request_queue *, unsigned short);
- extern void blk_queue_max_discard_segments(struct request_queue *,
+ int jbd2_journal_revoke(handle_t *handle, unsigned long long blocknr,
+-		   struct buffer_head *bh_in)
++			struct super_block *sb, struct buffer_head *bh_in)
+ {
+ 	struct buffer_head *bh = NULL;
+ 	journal_t *journal;
+diff --git a/include/linux/jbd2.h b/include/linux/jbd2.h
+index d89749a179eb..c5133df80fd4 100644
+--- a/include/linux/jbd2.h
++++ b/include/linux/jbd2.h
+@@ -1450,7 +1450,8 @@ extern void	   jbd2_journal_destroy_revoke_caches(void);
+ extern int	   jbd2_journal_init_revoke_caches(void);
+ 
+ extern void	   jbd2_journal_destroy_revoke(journal_t *);
+-extern int	   jbd2_journal_revoke (handle_t *, unsigned long long, struct buffer_head *);
++extern int	   jbd2_journal_revoke (handle_t *, unsigned long long,
++				struct super_block *, struct buffer_head *);
+ extern int	   jbd2_journal_cancel_revoke(handle_t *, struct journal_head *);
+ extern void	   jbd2_journal_write_revoke_records(transaction_t *transaction,
+ 						     struct list_head *log_bufs);
 -- 
-2.9.4
+2.14.3
