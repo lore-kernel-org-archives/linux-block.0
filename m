@@ -1,40 +1,104 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] blk-mq: order getting budget and driver tag
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
- Christoph Hellwig <hch@infradead.org>
-Cc: stable@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Bart Van Assche <bart.vanassche@wdc.com>, Omar Sandoval <osandov@fb.com>
-References: <20180404163521.11346-1-ming.lei@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <cfbb9751-ce1b-6265-f259-983f403f8500@kernel.dk>
-Date: Wed, 4 Apr 2018 14:56:26 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180404163521.11346-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <ming.lei@redhat.com>,
+	stable@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Omar Sandoval <osandov@fb.com>
+Subject: [PATCH] blk-mq: order getting budget and driver tag
+Date: Thu,  5 Apr 2018 00:35:21 +0800
+Message-Id: <20180404163521.11346-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 4/4/18 10:35 AM, Ming Lei wrote:
-> This patch orders getting budget and driver tag by making sure to acquire
-> driver tag after budget is got, this way can help to avoid the following
-> race:
-> 
-> 1) before dispatch request from scheduler queue, get one budget first, then
-> dequeue a request, call it request A.
-> 
-> 2) in another IO path for dispatching request B which is from hctx->dispatch,
-> driver tag is got, then try to get budget in blk_mq_dispatch_rq_list(),
-> unfortunately the budget is held by request A.
-> 
-> 3) meantime blk_mq_dispatch_rq_list() is called for dispatching request
-> A, and try to get driver tag first, unfortunately no driver tag is
-> available because the driver tag is held by request B
-> 
-> 4) both two IO pathes can't move on, and IO stall is caused.
-> 
-> This issue can be observed when running dbench on USB storage.
+This patch orders getting budget and driver tag by making sure to acquire
+driver tag after budget is got, this way can help to avoid the following
+race:
 
-Good catch, this can trigger on anything potentially, but of course more
-likely with limited budget and/or tag space. Classic ABBA deadlock.
+1) before dispatch request from scheduler queue, get one budget first, then
+dequeue a request, call it request A.
 
+2) in another IO path for dispatching request B which is from hctx->dispatch,
+driver tag is got, then try to get budget in blk_mq_dispatch_rq_list(),
+unfortunately the budget is held by request A.
+
+3) meantime blk_mq_dispatch_rq_list() is called for dispatching request
+A, and try to get driver tag first, unfortunately no driver tag is
+available because the driver tag is held by request B
+
+4) both two IO pathes can't move on, and IO stall is caused.
+
+This issue can be observed when running dbench on USB storage.
+
+This patch fixes this issue by always getting budget before getting
+driver tag.
+
+Cc: stable@vger.kernel.org
+Fixes: de1482974080ec9e ("blk-mq: introduce .get_budget and .put_budget in blk_mq_ops")
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 21 ++++++++++-----------
+ 1 file changed, 10 insertions(+), 11 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 16e83e6df404..90838e998f66 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1188,7 +1188,12 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 		struct blk_mq_queue_data bd;
+ 
+ 		rq = list_first_entry(list, struct request, queuelist);
+-		if (!blk_mq_get_driver_tag(rq, &hctx, false)) {
++
++		hctx = blk_mq_map_queue(rq->q, rq->mq_ctx->cpu);
++		if (!got_budget && !blk_mq_get_dispatch_budget(hctx))
++			break;
++
++		if (!blk_mq_get_driver_tag(rq, NULL, false)) {
+ 			/*
+ 			 * The initial allocation attempt failed, so we need to
+ 			 * rerun the hardware queue when a tag is freed. The
+@@ -1197,8 +1202,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 			 * we'll re-run it below.
+ 			 */
+ 			if (!blk_mq_mark_tag_wait(&hctx, rq)) {
+-				if (got_budget)
+-					blk_mq_put_dispatch_budget(hctx);
++				blk_mq_put_dispatch_budget(hctx);
+ 				/*
+ 				 * For non-shared tags, the RESTART check
+ 				 * will suffice.
+@@ -1209,11 +1213,6 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 			}
+ 		}
+ 
+-		if (!got_budget && !blk_mq_get_dispatch_budget(hctx)) {
+-			blk_mq_put_driver_tag(rq);
+-			break;
+-		}
+-
+ 		list_del_init(&rq->queuelist);
+ 
+ 		bd.rq = rq;
+@@ -1812,11 +1811,11 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	if (q->elevator && !bypass_insert)
+ 		goto insert;
+ 
+-	if (!blk_mq_get_driver_tag(rq, NULL, false))
++	if (!blk_mq_get_dispatch_budget(hctx))
+ 		goto insert;
+ 
+-	if (!blk_mq_get_dispatch_budget(hctx)) {
+-		blk_mq_put_driver_tag(rq);
++	if (!blk_mq_get_driver_tag(rq, NULL, false)) {
++		blk_mq_put_dispatch_budget(hctx);
+ 		goto insert;
+ 	}
+ 
 -- 
-Jens Axboe
+2.9.5
