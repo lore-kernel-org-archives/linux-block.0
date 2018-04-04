@@ -1,214 +1,77 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:40493 "EHLO
-        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752946AbeDPKVM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Apr 2018 06:21:12 -0400
-Received: by mail-wr0-f194.google.com with SMTP id v60so20500728wrc.7
-        for <linux-block@vger.kernel.org>; Mon, 16 Apr 2018 03:21:11 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH] lightnvm: pblk: take bitmap alloc. out of critical section
-Date: Mon, 16 Apr 2018 12:21:06 +0200
-Message-Id: <1523874066-4459-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: jglisse@redhat.com
+To: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>
+Subject: [RFC PATCH 79/79] mm/ksm: set page->mapping to page_ronly struct instead of stable_node.
+Date: Wed,  4 Apr 2018 15:18:31 -0400
+Message-Id: <20180404191831.5378-42-jglisse@redhat.com>
+In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
+References: <20180404191831.5378-1-jglisse@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Allocate line bitmaps outside of the line lock on line preparation.
+From: Jérôme Glisse <jglisse@redhat.com>
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+Set page->mapping to the page_ronly struct instead of stable_node
+struct. There is no functional change as page_ronly is just a field
+of stable_node.
+
+Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
+Cc: Andrea Arcangeli <aarcange@redhat.com>
 ---
- drivers/lightnvm/pblk-core.c | 96 +++++++++++++++++++++++++-------------------
- 1 file changed, 55 insertions(+), 41 deletions(-)
+ mm/ksm.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 5f960a6609c8..7762e89984ee 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1058,6 +1058,25 @@ static int pblk_line_init_metadata(struct pblk *pblk, struct pblk_line *line,
- 	return 1;
- }
+diff --git a/mm/ksm.c b/mm/ksm.c
+index 6085068fb8b3..52b0ae291d23 100644
+--- a/mm/ksm.c
++++ b/mm/ksm.c
+@@ -39,6 +39,7 @@
+ #include <linux/freezer.h>
+ #include <linux/oom.h>
+ #include <linux/numa.h>
++#include <linux/page_ronly.h>
  
-+static int pblk_line_alloc_bitmaps(struct pblk *pblk, struct pblk_line *line)
-+{
-+	struct pblk_line_meta *lm = &pblk->lm;
-+
-+	line->map_bitmap = kzalloc(lm->sec_bitmap_len, GFP_KERNEL);
-+	if (!line->map_bitmap)
-+		return -ENOMEM;
-+
-+	/* will be initialized using bb info from map_bitmap */
-+	line->invalid_bitmap = kmalloc(lm->sec_bitmap_len, GFP_KERNEL);
-+	if (!line->invalid_bitmap) {
-+		kfree(line->map_bitmap);
-+		line->map_bitmap = NULL;
-+		return -ENOMEM;
-+	}
-+
-+	return 0;
-+}
-+
- /* For now lines are always assumed full lines. Thus, smeta former and current
-  * lun bitmaps are omitted.
+ #include <asm/tlbflush.h>
+ #include "internal.h"
+@@ -126,6 +127,7 @@ struct ksm_scan {
+ 
+ /**
+  * struct stable_node - node of the stable rbtree
++ * @ronly: Page read only struct wrapper (see include/linux/page_ronly.h).
+  * @node: rb node of this ksm page in the stable tree
+  * @head: (overlaying parent) &migrate_nodes indicates temporarily on that list
+  * @hlist_dup: linked into the stable_node->hlist with a stable_node chain
+@@ -137,6 +139,7 @@ struct ksm_scan {
+  * @nid: NUMA node id of stable tree in which linked (may not match kpfn)
   */
-@@ -1162,18 +1181,7 @@ static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
+ struct stable_node {
++	struct page_ronly ronly;
+ 	union {
+ 		struct rb_node node;	/* when node of stable tree */
+ 		struct {		/* when listed for migration */
+@@ -318,13 +321,15 @@ static void __init ksm_slab_free(void)
+ 
+ static inline struct stable_node *page_stable_node(struct page *page)
  {
- 	struct pblk_line_meta *lm = &pblk->lm;
- 	int blk_in_line = atomic_read(&line->blk_in_line);
--	int blk_to_erase, ret;
--
--	line->map_bitmap = kzalloc(lm->sec_bitmap_len, GFP_ATOMIC);
--	if (!line->map_bitmap)
--		return -ENOMEM;
--
--	/* will be initialized using bb info from map_bitmap */
--	line->invalid_bitmap = kmalloc(lm->sec_bitmap_len, GFP_ATOMIC);
--	if (!line->invalid_bitmap) {
--		ret = -ENOMEM;
--		goto fail_free_map_bitmap;
--	}
-+	int blk_to_erase;
- 
- 	/* Bad blocks do not need to be erased */
- 	bitmap_copy(line->erase_bitmap, line->blk_bitmap, lm->blk_per_line);
-@@ -1191,15 +1199,15 @@ static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
- 	}
- 
- 	if (blk_in_line < lm->min_blk_line) {
--		ret = -EAGAIN;
--		goto fail_free_invalid_bitmap;
-+		spin_unlock(&line->lock);
-+		return -EAGAIN;
- 	}
- 
- 	if (line->state != PBLK_LINESTATE_FREE) {
- 		WARN(1, "pblk: corrupted line %d, state %d\n",
- 							line->id, line->state);
--		ret = -EINTR;
--		goto fail_free_invalid_bitmap;
-+		spin_unlock(&line->lock);
-+		return -EINTR;
- 	}
- 
- 	line->state = PBLK_LINESTATE_OPEN;
-@@ -1213,16 +1221,6 @@ static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
- 	kref_init(&line->ref);
- 
- 	return 0;
--
--fail_free_invalid_bitmap:
--	spin_unlock(&line->lock);
--	kfree(line->invalid_bitmap);
--	line->invalid_bitmap = NULL;
--fail_free_map_bitmap:
--	kfree(line->map_bitmap);
--	line->map_bitmap = NULL;
--
--	return ret;
+-	return PageReadOnly(page) ? page_rmapping(page) : NULL;
++	struct page_ronly *ronly = page_ronly(page);
++
++	return ronly ? container_of(ronly, struct stable_node, ronly) : NULL;
  }
  
- int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line)
-@@ -1242,13 +1240,15 @@ int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line)
- 	}
- 	spin_unlock(&l_mg->free_lock);
- 
--	pblk_rl_free_lines_dec(&pblk->rl, line, true);
-+	if (pblk_line_alloc_bitmaps(pblk, line))
-+		return -EINTR;
- 
- 	if (!pblk_line_init_bb(pblk, line, 0)) {
- 		list_add(&line->list, &l_mg->free_list);
- 		return -EINTR;
- 	}
- 
-+	pblk_rl_free_lines_dec(&pblk->rl, line, true);
- 	return 0;
- }
- 
-@@ -1260,6 +1260,24 @@ void pblk_line_recov_close(struct pblk *pblk, struct pblk_line *line)
- 	line->emeta = NULL;
- }
- 
-+static void pblk_line_clear(struct pblk_line *line)
-+{
-+	*line->vsc = cpu_to_le32(EMPTY_ENTRY);
-+
-+	line->map_bitmap = NULL;
-+	line->invalid_bitmap = NULL;
-+	line->smeta = NULL;
-+	line->emeta = NULL;
-+}
-+
-+void pblk_line_free(struct pblk_line *line)
-+{
-+	kfree(line->map_bitmap);
-+	kfree(line->invalid_bitmap);
-+
-+	pblk_line_clear(line);
-+}
-+
- struct pblk_line *pblk_line_get(struct pblk *pblk)
+ static inline void set_page_stable_node(struct page *page,
+ 					struct stable_node *stable_node)
  {
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
-@@ -1326,11 +1344,14 @@ static struct pblk_line *pblk_line_retry(struct pblk *pblk,
- 		return NULL;
- 	}
- 
-+	retry_line->map_bitmap = line->map_bitmap;
-+	retry_line->invalid_bitmap = line->invalid_bitmap;
- 	retry_line->smeta = line->smeta;
- 	retry_line->emeta = line->emeta;
- 	retry_line->meta_line = line->meta_line;
- 
--	pblk_line_free(line);
-+	pblk_line_clear(line);
-+
- 	l_mg->data_line = retry_line;
- 	spin_unlock(&l_mg->free_lock);
- 
-@@ -1383,6 +1404,9 @@ struct pblk_line *pblk_line_get_first_data(struct pblk *pblk)
- 	}
- 	spin_unlock(&l_mg->free_lock);
- 
-+	if (pblk_line_alloc_bitmaps(pblk, line))
-+		return NULL;
-+
- 	if (pblk_line_erase(pblk, line)) {
- 		line = pblk_line_retry(pblk, line);
- 		if (!line)
-@@ -1527,6 +1551,9 @@ struct pblk_line *pblk_line_replace_data(struct pblk *pblk)
- 		goto retry_erase;
- 	}
- 
-+	if (pblk_line_alloc_bitmaps(pblk, new))
-+		return NULL;
-+
- retry_setup:
- 	if (!pblk_line_init_metadata(pblk, new, cur)) {
- 		new = pblk_line_retry(pblk, new);
-@@ -1566,19 +1593,6 @@ struct pblk_line *pblk_line_replace_data(struct pblk *pblk)
- 	return new;
+-	page->mapping = (void *)((unsigned long)stable_node | PAGE_MAPPING_RONLY);
++	page_ronly_set(page, stable_node ? &stable_node->ronly : NULL);
  }
  
--void pblk_line_free(struct pblk_line *line)
--{
--	kfree(line->map_bitmap);
--	kfree(line->invalid_bitmap);
--
--	*line->vsc = cpu_to_le32(EMPTY_ENTRY);
--
--	line->map_bitmap = NULL;
--	line->invalid_bitmap = NULL;
--	line->smeta = NULL;
--	line->emeta = NULL;
--}
--
- static void __pblk_line_put(struct pblk *pblk, struct pblk_line *line)
- {
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+ static __always_inline bool is_stable_node_chain(struct stable_node *chain)
 -- 
-2.7.4
+2.14.3
