@@ -1,113 +1,31 @@
-Return-Path: <linux-arch-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-scsi@vger.kernel.org, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH 05/12] sata_nv: don't use block layer bounce buffers
-Date: Mon, 16 Apr 2018 10:50:25 +0200
-Message-Id: <20180416085032.7367-6-hch@lst.de>
-In-Reply-To: <20180416085032.7367-1-hch@lst.de>
-References: <20180416085032.7367-1-hch@lst.de>
-Sender: linux-arch-owner@vger.kernel.org
+Return-Path: <prvs=626873699=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tytso@mit.edu" <tytso@mit.edu>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: BUG: KASAN: use-after-free in bt_for_each+0x1ea/0x29f
+Date: Thu, 5 Apr 2018 16:25:25 +0000
+Message-ID: <610fe6871f69610388690b7f23b3baa3ac0bd295.camel@wdc.com>
+References: <20180404232808.GB12299@ming.t460p>
+	 <6c6c1fc0-09c1-cc8c-9dc0-3d8b9b36925b@kernel.dk>
+In-Reply-To: <6c6c1fc0-09c1-cc8c-9dc0-3d8b9b36925b@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-sata_nv sets the block bounce limit to the reduce dma mask for ATAPI
-devices, which means that the iommu or swiotlb already take care of
-the bounce buffering, and the block bouncing can be removed.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/ata/sata_nv.c | 62 +++++++++++++++++--------------------------
- 1 file changed, 24 insertions(+), 38 deletions(-)
-
-diff --git a/drivers/ata/sata_nv.c b/drivers/ata/sata_nv.c
-index 8c683ddd0f58..b6e9ad6d33c9 100644
---- a/drivers/ata/sata_nv.c
-+++ b/drivers/ata/sata_nv.c
-@@ -740,32 +740,16 @@ static int nv_adma_slave_config(struct scsi_device *sdev)
- 	sdev1 = ap->host->ports[1]->link.device[0].sdev;
- 	if ((port0->flags & NV_ADMA_ATAPI_SETUP_COMPLETE) ||
- 	    (port1->flags & NV_ADMA_ATAPI_SETUP_COMPLETE)) {
--		/** We have to set the DMA mask to 32-bit if either port is in
--		    ATAPI mode, since they are on the same PCI device which is
--		    used for DMA mapping. If we set the mask we also need to set
--		    the bounce limit on both ports to ensure that the block
--		    layer doesn't feed addresses that cause DMA mapping to
--		    choke. If either SCSI device is not allocated yet, it's OK
--		    since that port will discover its correct setting when it
--		    does get allocated.
--		    Note: Setting 32-bit mask should not fail. */
--		if (sdev0)
--			blk_queue_bounce_limit(sdev0->request_queue,
--					       ATA_DMA_MASK);
--		if (sdev1)
--			blk_queue_bounce_limit(sdev1->request_queue,
--					       ATA_DMA_MASK);
--
--		dma_set_mask(&pdev->dev, ATA_DMA_MASK);
-+		/*
-+		 * We have to set the DMA mask to 32-bit if either port is in
-+		 * ATAPI mode, since they are on the same PCI device which is
-+		 * used for DMA mapping.  If either SCSI device is not allocated
-+		 * yet, it's OK since that port will discover its correct
-+		 * setting when it does get allocated.
-+		 */
-+		rc = dma_set_mask(&pdev->dev, ATA_DMA_MASK);
- 	} else {
--		/** This shouldn't fail as it was set to this value before */
--		dma_set_mask(&pdev->dev, pp->adma_dma_mask);
--		if (sdev0)
--			blk_queue_bounce_limit(sdev0->request_queue,
--					       pp->adma_dma_mask);
--		if (sdev1)
--			blk_queue_bounce_limit(sdev1->request_queue,
--					       pp->adma_dma_mask);
-+		rc = dma_set_mask(&pdev->dev, pp->adma_dma_mask);
- 	}
- 
- 	blk_queue_segment_boundary(sdev->request_queue, segment_boundary);
-@@ -1131,12 +1115,11 @@ static int nv_adma_port_start(struct ata_port *ap)
- 
- 	VPRINTK("ENTER\n");
- 
--	/* Ensure DMA mask is set to 32-bit before allocating legacy PRD and
--	   pad buffers */
--	rc = dma_set_mask(&pdev->dev, DMA_BIT_MASK(32));
--	if (rc)
--		return rc;
--	rc = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(32));
-+	/*
-+	 * Ensure DMA mask is set to 32-bit before allocating legacy PRD and
-+	 * pad buffers.
-+	 */
-+	rc = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
- 	if (rc)
- 		return rc;
- 
-@@ -1156,13 +1139,16 @@ static int nv_adma_port_start(struct ata_port *ap)
- 	pp->notifier_clear_block = pp->gen_block +
- 	       NV_ADMA_NOTIFIER_CLEAR + (4 * ap->port_no);
- 
--	/* Now that the legacy PRD and padding buffer are allocated we can
--	   safely raise the DMA mask to allocate the CPB/APRD table.
--	   These are allowed to fail since we store the value that ends up
--	   being used to set as the bounce limit in slave_config later if
--	   needed. */
--	dma_set_mask(&pdev->dev, DMA_BIT_MASK(64));
--	dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(64));
-+	/*
-+	 * Now that the legacy PRD and padding buffer are allocated we can
-+	 * try to raise the DMA mask to allocate the CPB/APRD table.
-+	 */
-+	rc = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
-+	if (rc) {
-+		rc = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
-+		if (rc)
-+			return rc;
-+	}
- 	pp->adma_dma_mask = *dev->dma_mask;
- 
- 	mem = dmam_alloc_coherent(dev, NV_ADMA_PORT_PRIV_DMA_SZ,
--- 
-2.17.0
+T24gV2VkLCAyMDE4LTA0LTA0IGF0IDE5OjI2IC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBM
+ZWF2aW5nIHRoZSB3aG9sZSB0cmFjZSBoZXJlLCBidXQgSSdtIGhhdmluZyBhIGhhcmQgdGltZSBt
+YWtpbmcgc2Vuc2Ugb2YgaXQuDQo+IEl0IGNvbXBsYWlucyBhYm91dCBhIHVzZXItYWZ0ZXItZnJl
+ZSBpbiB0aGUgaW5mbGlnaHQgaXRlcmF0aW9uLCB3aGljaCBpcyBvbmx5DQo+IHdvcmtpbmcgb24g
+dGhlIHF1ZXVlLCByZXF1ZXN0LCBhbmQgb24tc3RhY2sgbWkgZGF0YS4gTm9uZSBvZiB0aGVzZSB3
+b3VsZCBiZQ0KPiBmcmVlZC4gVGhlIGJlbG93IHRyYWNlIG9uIGFsbG9jYXRpb24gYW5kIGZyZWUg
+aW5kaWNhdGVzIGEgYmlvLCBidXQgdGhhdCBpc24ndA0KPiB1c2VkIGluIHRoZSBpbmZsaWdodCBw
+YXRoIGF0IGFsbC4gSXMgaXQgcG9zc2libGUgdGhhdCBrYXNhbiBnZXRzIGNvbmZ1c2VkIGhlcmU/
+DQo+IE5vdCBzdXJlIHdoYXQgdG8gbWFrZSBvZiBpdCBzbyBmYXIuDQoNCkhlbGxvIEplbnMsDQoN
+CkluIHRoZSBtYW55IGJsb2NrIGxheWVyIHRlc3RzIEkgcmFuIHdpdGggS0FTQU4gZW5hYmxlZCBJ
+IGhhdmUgbmV2ZXIgc2Vlbg0KYW55dGhpbmcgbGlrZSB0aGlzIG5vciBoYXZlIEkgc2VlbiBhbnl0
+aGluZyB0aGF0IG1hZGUgbWUgd29uZGVyIGFib3V0IHRoZQ0KcmVsaWFiaWxpdHkgb2YgS0FTQU4u
+IE1heWJlIHNvbWUgY29kZSBvdXRzaWRlIHRoZSBibG9jayBsYXllciBjb3JlIGNvcnJ1cHRlZA0K
+YSByZXF1ZXN0IHF1ZXVlIGRhdGEgc3RydWN0dXJlIGFuZCB0cmlnZ2VyZWQgdGhpcyB3ZWlyZCBy
+ZXBvcnQ/DQoNCkJhcnQuDQoNCg0KDQo=
