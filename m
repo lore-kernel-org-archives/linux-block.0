@@ -1,33 +1,78 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Dave Chinner <david@fromorbit.com>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        hch@lst.de, rdorr@microsoft.com
-Subject: [PATCH 0/4 V2] iomap: Use FUA for O_DSYNC DIO writes
-Date: Wed, 18 Apr 2018 14:08:24 +1000
-Message-Id: <20180418040828.18165-1-david@fromorbit.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <zhangweiping@didichuxing.com>
+Date: Thu, 5 Apr 2018 18:10:33 +0800
+From: Weiping Zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>, <cohuck@redhat.com>, <mst@redhat.com>,
+	<jasowang@redhat.com>
+CC: <linux-block@vger.kernel.org>, <virtualization@lists.linux-foundation.org>
+Subject: [RFC PATCH 2/2] virtio_blk: add new module parameter to set max
+ request size
+Message-ID: <7bdaaeb8fb56acb4ace1987b6819868c73350cbe.1522922101.git.zhangweiping@didichuxing.com>
+References: <cover.1522922101.git.zhangweiping@didichuxing.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <cover.1522922101.git.zhangweiping@didichuxing.com>
+Return-Path: zhangweiping@didichuxing.com
 List-ID: <linux-block@vger.kernel.org>
 
-Hi folks,
+Actually there is no upper limitation, so add new module parameter
+to provide a way to set a proper max request size for virtio block.
+Using a larger request size can improve sequence performance in theory,
+and reduce the interaction between guest and hypervisor.
 
-This is the latest version of the "use FUA for DIO writes" patchset
-that was last posted here:
+Signed-off-by: Weiping Zhang <zhangweiping@didichuxing.com>
+---
+ drivers/block/virtio_blk.c | 32 ++++++++++++++++++++++++++++++--
+ 1 file changed, 30 insertions(+), 2 deletions(-)
 
-https://marc.info/?l=linux-xfs&m=152213446528167&w=2
-
-Functionality and performance is the same as the previous version.
-Changes in this version address Christoph's review comments.
-
-Version 2:
-- Fixed comment typos in first patch
-- simplified iomap_dio_complete_work()
-- changed IOMAP_DIO_WRITE_SYNC to IOMAP_DIO_NEED_SYNC
-- split blk_queue_fua() into it's own patch
-- fixed formatting issue in last patch
-- update bio->io_opf directly rather than use bio_set_op_attrs()
-- Updated comment to mention we try to use FUA optimistically.
-
-Cheers,
-
-Dave.
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 4a07593c..5ac6d59 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -64,6 +64,34 @@ struct virtblk_req {
+ 	struct scatterlist sg[];
+ };
+ 
++
++static int max_request_size_set(const char *val, const struct kernel_param *kp);
++
++static const struct kernel_param_ops max_request_size_ops = {
++	.set = max_request_size_set,
++	.get = param_get_uint,
++};
++
++static unsigned long max_request_size = 4096; /* in unit of KiB */
++module_param_cb(max_request_size, &max_request_size_ops, &max_request_size,
++		0444);
++MODULE_PARM_DESC(max_request_size, "set max request size, in unit of KiB");
++
++static int max_request_size_set(const char *val, const struct kernel_param *kp)
++{
++	int ret;
++	unsigned int size_kb, page_kb = 1 << (PAGE_SHIFT - 10);
++
++	ret = kstrtouint(val, 10, &size_kb);
++	if (ret != 0)
++		return -EINVAL;
++
++	if (size_kb < page_kb)
++		return -EINVAL;
++
++	return param_set_uint(val, kp);
++}
++
+ static inline blk_status_t virtblk_result(struct virtblk_req *vbr)
+ {
+ 	switch (vbr->status) {
+@@ -730,8 +758,8 @@ static int virtblk_probe(struct virtio_device *vdev)
+ 	/* We can handle whatever the host told us to handle. */
+ 	blk_queue_max_segments(q, vblk->sg_elems-2);
+ 
+-	/* No real sector limit. */
+-	blk_queue_max_hw_sectors(q, -1U);
++	/* No real sector limit, use 512b (max_request_size << 10) >> 9 */
++	blk_queue_max_hw_sectors_no_limit(q, max_request_size << 1);
+ 
+ 	/* Host can optionally specify maximum segment size and number of
+ 	 * segments. */
+-- 
+2.9.4
