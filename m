@@ -1,53 +1,39 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Thu, 5 Apr 2018 07:42:03 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Sitsofe Wheeler <sitsofe@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
 	Stefan Haberland <sth@linux.vnet.ibm.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 6/8] blk-mq: don't check queue mapped in __blk_mq_delay_run_hw_queue()
-Date: Sun,  8 Apr 2018 17:48:12 +0800
-Message-Id: <20180408094814.28953-7-ming.lei@redhat.com>
-In-Reply-To: <20180408094814.28953-1-ming.lei@redhat.com>
-References: <20180408094814.28953-1-ming.lei@redhat.com>
+	Jan Hoeppner <hoeppner@linux.vnet.ibm.com>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: Re: [BISECTED][REGRESSION] Hang while booting EeePC 900
+Message-ID: <20180405144203.GC3126663@devbig577.frc2.facebook.com>
+References: <CALjAwxh-PVYFnYFCJpGOja+m5SzZ8Sa4J7ohxdK=r8NyOF-EMA@mail.gmail.com>
+ <de102067-b589-af05-ae71-496e948000f0@kernel.dk>
+ <CALjAwxgtuEv=d1TfvH3EdXqZs=_6F7TinyVhbPdUmTsdK_5ghw@mail.gmail.com>
+ <20180402202951.GE388343@devbig577.frc2.facebook.com>
+ <CALjAwxhofAEa1Nr8d1+KpB3jimYL9nODf4Fu38oTe7ptgM_+cQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CALjAwxhofAEa1Nr8d1+KpB3jimYL9nODf4Fu38oTe7ptgM_+cQ@mail.gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-There are several reasons for removing the check:
+Hello,
 
-1) blk_mq_hw_queue_mapped() returns true always now since each hctx
-may be mapped by one CPU at least
+On Thu, Apr 05, 2018 at 09:14:15AM +0100, Sitsofe Wheeler wrote:
+> Just out of interest, does the fact that an abort occurs mean that the
+> hardware is somehow broken or badly behaved?
 
-2) when there isn't any online CPU mapped to this hctx, there won't
-be any IO queued to this CPU, blk_mq_run_hw_queue() only runs queue
-if there is IO queued to this hctx
+Not really.  For example, ATAPI devices depend on exception handling
+to fetch sense data as a part of normal operation which is handled by
+libata exception handler which is invoked by aborting the original
+command.  So, exception handling can often be a part of normal
+operation.
 
-3) If __blk_mq_delay_run_hw_queue() is called by blk_mq_delay_run_hw_queue(),
-which is run from blk_mq_dispatch_rq_list() or scsi_mq_get_budget(), and
-the hctx to be handled has to be mapped.
+Thanks.
 
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Stefan Haberland <sth@linux.vnet.ibm.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 3 ---
- 1 file changed, 3 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8743e9105612..3b4ce83a0ba2 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1394,9 +1394,6 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
- 					unsigned long msecs)
- {
--	if (WARN_ON_ONCE(!blk_mq_hw_queue_mapped(hctx)))
--		return;
--
- 	if (unlikely(blk_mq_hctx_stopped(hctx)))
- 		return;
- 
 -- 
-2.9.5
+tejun
