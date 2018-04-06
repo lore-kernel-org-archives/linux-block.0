@@ -1,43 +1,98 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:36001 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751298AbeDFRBp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Apr 2018 13:01:45 -0400
-Received: by mail-pf0-f193.google.com with SMTP id g14so1176005pfh.3
-        for <linux-block@vger.kernel.org>; Fri, 06 Apr 2018 10:01:45 -0700 (PDT)
-Date: Fri, 6 Apr 2018 10:01:42 -0700
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:34740 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750962AbeDFQ5M (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Apr 2018 12:57:12 -0400
+Received: by mail-pl0-f67.google.com with SMTP id y12-v6so882369plt.1
+        for <linux-block@vger.kernel.org>; Fri, 06 Apr 2018 09:57:12 -0700 (PDT)
 From: Omar Sandoval <osandov@osandov.com>
 To: linux-block@vger.kernel.org
 Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com,
         Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
         Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: [PATCH] loop: fix LOOP_GET_STATUS lock imbalance
-Message-ID: <20180406170142.GB11697@vader>
-References: <6bee3eddc24ef5525ca12efb023e66b2503cb178.1523033157.git.osandov@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <6bee3eddc24ef5525ca12efb023e66b2503cb178.1523033157.git.osandov@fb.com>
+Subject: [PATCH] loop: fix LOOP_GET_STATUS lock imbalance
+Date: Fri,  6 Apr 2018 09:57:03 -0700
+Message-Id: <6bee3eddc24ef5525ca12efb023e66b2503cb178.1523033157.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Apr 06, 2018 at 09:57:03AM -0700, Omar Sandoval wrote:
-> From: Omar Sandoval <osandov@fb.com>
-> 
-> Commit 2d1d4c1e591f made loop_get_status() drop lo_ctx_mutex before
-> returning, but the loop_get_status_old(), loop_get_status64(), and
-> loop_get_status_compat() wrappers don't call loop_get_status() if the
-> passed argument is NULL. The callers expect that the lock is dropped, so
-> make sure we drop it in that case, too.
-> 
-> Reported-by: syzbot+31e8daa8b3fc129e75f2@syzkaller.appspotmail.com
-> Fixes: 2d1d4c1e591f ("loop: don't call into filesystem while holding lo_ctl_mutex")
-> Signed-off-by: Omar Sandoval <osandov@fb.com>
-> ---
-> Based on Linus' tree.
-> 
->  drivers/block/loop.c | 33 ++++++++++++++++++---------------
->  1 file changed, 18 insertions(+), 15 deletions(-)
+From: Omar Sandoval <osandov@fb.com>
 
-Also just pushed a regression test to blktests:
+Commit 2d1d4c1e591f made loop_get_status() drop lo_ctx_mutex before
+returning, but the loop_get_status_old(), loop_get_status64(), and
+loop_get_status_compat() wrappers don't call loop_get_status() if the
+passed argument is NULL. The callers expect that the lock is dropped, so
+make sure we drop it in that case, too.
 
-140ee15de9f3 ("loop: add ioctl lock imbalance regression test")
+Reported-by: syzbot+31e8daa8b3fc129e75f2@syzkaller.appspotmail.com
+Fixes: 2d1d4c1e591f ("loop: don't call into filesystem while holding lo_ctl_mutex")
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+---
+Based on Linus' tree.
+
+ drivers/block/loop.c | 33 ++++++++++++++++++---------------
+ 1 file changed, 18 insertions(+), 15 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 264abaaff662..9b476fd2bc41 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1283,12 +1283,13 @@ static int
+ loop_get_status_old(struct loop_device *lo, struct loop_info __user *arg) {
+ 	struct loop_info info;
+ 	struct loop_info64 info64;
+-	int err = 0;
++	int err;
+ 
+-	if (!arg)
+-		err = -EINVAL;
+-	if (!err)
+-		err = loop_get_status(lo, &info64);
++	if (!arg) {
++		mutex_unlock(&lo->lo_ctl_mutex);
++		return -EINVAL;
++	}
++	err = loop_get_status(lo, &info64);
+ 	if (!err)
+ 		err = loop_info64_to_old(&info64, &info);
+ 	if (!err && copy_to_user(arg, &info, sizeof(info)))
+@@ -1300,12 +1301,13 @@ loop_get_status_old(struct loop_device *lo, struct loop_info __user *arg) {
+ static int
+ loop_get_status64(struct loop_device *lo, struct loop_info64 __user *arg) {
+ 	struct loop_info64 info64;
+-	int err = 0;
++	int err;
+ 
+-	if (!arg)
+-		err = -EINVAL;
+-	if (!err)
+-		err = loop_get_status(lo, &info64);
++	if (!arg) {
++		mutex_unlock(&lo->lo_ctl_mutex);
++		return -EINVAL;
++	}
++	err = loop_get_status(lo, &info64);
+ 	if (!err && copy_to_user(arg, &info64, sizeof(info64)))
+ 		err = -EFAULT;
+ 
+@@ -1529,12 +1531,13 @@ loop_get_status_compat(struct loop_device *lo,
+ 		       struct compat_loop_info __user *arg)
+ {
+ 	struct loop_info64 info64;
+-	int err = 0;
++	int err;
+ 
+-	if (!arg)
+-		err = -EINVAL;
+-	if (!err)
+-		err = loop_get_status(lo, &info64);
++	if (!arg) {
++		mutex_unlock(&lo->lo_ctl_mutex);
++		return -EINVAL;
++	}
++	err = loop_get_status(lo, &info64);
+ 	if (!err)
+ 		err = loop_info64_to_compat(&info64, arg);
+ 	return err;
+-- 
+2.17.0
