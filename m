@@ -1,184 +1,136 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ipmail06.adl2.internode.on.net ([150.101.137.129]:60813 "EHLO
-        ipmail06.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752128AbeC0HHc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Mar 2018 03:07:32 -0400
-From: Dave Chinner <david@fromorbit.com>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        hch@lst.de, rdorr@microsoft.com
-Subject: [PATCH 3/3] iomap: Use FUA for pure data O_DSYNC DIO writes
-Date: Tue, 27 Mar 2018 18:07:17 +1100
-Message-Id: <20180327070717.7107-4-david@fromorbit.com>
-In-Reply-To: <20180327070717.7107-1-david@fromorbit.com>
-References: <20180327070717.7107-1-david@fromorbit.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <khazhy@google.com>
+Return-Path: <khazhy@google.com>
+From: Khazhismel Kumykov <khazhy@google.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Khazhismel Kumykov <khazhy@google.com>
+Subject: [PATCH] block/compat_ioctl: fix range check in BLKGETSIZE
+Date: Fri,  6 Apr 2018 15:23:50 -0700
+Message-Id: <20180406222350.174104-1-khazhy@google.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000008325d00569358740"
+List-ID: <linux-block@vger.kernel.org>
 
-From: Dave Chinner <dchinner@redhat.com>
+--0000000000008325d00569358740
 
-If we are doing direct IO writes with datasync semantics, we often
-have to flush metadata changes along with the data write. However,
-if we are overwriting existing data, there are no metadata changes
-that we need to flush. In this case, optimising the IO by using
-FUA write makes sense.
+kernel ulong and compat_ulong_t may not be same width. Use type directly
+to eliminate mismatches.
 
-We know from teh IOMAP_F_DIRTY flag as to whether a specific inode
-requires a metadata flush - this is currently used by DAX to ensure
-extent modification as stable in page fault operations. For direct
-IO writes, we can use it to determine if we need to flush metadata
-or not once the data is on disk.
+This would result in truncation rather than EFBIG for 32bit mode for
+large disks.
 
-Hence if we have been returned a mapped extent that is not new and
-the IO mapping is not dirty, then we can use a FUA write to provide
-datasync semantics. This allows us to short-cut the
-generic_write_sync() call in IO completion and hence avoid
-unnecessary operations. This makes pure direct IO data write
-behaviour identical to the way block devices use REQ_FUA to provide
-datasync semantics.
-
-Now that iomap_dio_rw() is determining if REQ_FUA can be used, we
-have to stop issuing generic_write_sync() calls from the XFS code
-when REQ_FUA is issued, otherwise it will still throw a cache flush
-to the device via xfs_file_fsync(). To do this, we need to make
-iomap_dio_rw() always responsible for issuing generic_write_sync()
-when necessary, not just for AIO calls. This means the filesystem
-doesn't have to guess when cache flushes are necessary now.
-
-On a FUA enabled device, a synchronous direct IO write workload
-(sequential 4k overwrites in 32MB file) had the following results:
-
-# xfs_io -fd -c "pwrite -V 1 -D 0 32m" /mnt/scratch/boo
-
-kernel		time	write()s	write iops	Write b/w
-------		----	--------	----------	---------
-(no dsync)	 4s	2173/s		2173		8.5MB/s
-vanilla		22s	 370/s		 750		1.4MB/s
-patched		19s	 420/s		 420		1.6MB/s
-
-The patched code clearly doesn't send cache flushes anymore, but
-instead uses FUA (confirmed via blktrace), and performance improves
-a bit as a result. However, the benefits will be higher on workloads
-that mix O_DSYNC overwrites with other write IO as we won't be
-flushing the entire device cache on every DSYNC overwrite IO
-anymore.
-
-Signed-Off-By: Dave Chinner <dchinner@redhat.com>
+Signed-off-by: Khazhismel Kumykov <khazhy@google.com>
 ---
- fs/iomap.c             | 44 +++++++++++++++++++++++++++++++++++++++++---
- include/linux/blkdev.h |  1 +
- 2 files changed, 42 insertions(+), 3 deletions(-)
+ block/compat_ioctl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/iomap.c b/fs/iomap.c
-index f5d4e348bc9b..92f88ce8e2d4 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -685,6 +685,7 @@ EXPORT_SYMBOL_GPL(iomap_seek_data);
-  * Private flags for iomap_dio, must not overlap with the public ones in
-  * iomap.h:
-  */
-+#define IOMAP_DIO_WRITE_FUA	(1 << 28)
- #define IOMAP_DIO_WRITE_SYNC	(1 << 29)
- #define IOMAP_DIO_WRITE		(1 << 30)
- #define IOMAP_DIO_DIRTY		(1 << 31)
-@@ -863,6 +864,7 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
- 	struct iov_iter iter;
- 	struct bio *bio;
- 	bool need_zeroout = false;
-+	bool use_fua = false;
- 	int nr_pages, ret;
- 	size_t copied = 0;
+diff --git a/block/compat_ioctl.c b/block/compat_ioctl.c
+index 6ca015f92766..3a2c77f07da8 100644
+--- a/block/compat_ioctl.c
++++ b/block/compat_ioctl.c
+@@ -388,7 +388,7 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
+ 		return 0;
+ 	case BLKGETSIZE:
+ 		size = i_size_read(bdev->bd_inode);
+-		if ((size >> 9) > ~0UL)
++		if ((size >> 9) > ~((compat_ulong_t)0UL))
+ 			return -EFBIG;
+ 		return compat_put_ulong(arg, size >> 9);
  
-@@ -888,6 +890,18 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
- 			dio->flags |= IOMAP_DIO_COW;
- 		if (iomap->flags & IOMAP_F_NEW)
- 			need_zeroout = true;
-+		else {
-+			/*
-+			 * Use a FUA write if we need datasync semantics, this
-+			 * is a pure data IO that doesn't require any metadata
-+			 * updates and the underlying device supports FUA. This
-+			 * allows us to avoid cache flushes on IO completion.
-+			 */
-+			if (!(iomap->flags & (IOMAP_F_SHARED|IOMAP_F_DIRTY)) &&
-+			    (dio->flags & IOMAP_DIO_WRITE_FUA) &&
-+			    blk_queue_fua(bdev_get_queue(iomap->bdev)))
-+				use_fua = true;
-+		}
- 		break;
- 	default:
- 		WARN_ON_ONCE(1);
-@@ -935,7 +949,13 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
- 
- 		n = bio->bi_iter.bi_size;
- 		if (dio->flags & IOMAP_DIO_WRITE) {
--			bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC | REQ_IDLE);
-+			int op_flags = REQ_SYNC | REQ_IDLE;
-+
-+			if (use_fua)
-+				op_flags |= REQ_FUA;
-+			else
-+				dio->flags &= ~IOMAP_DIO_WRITE_FUA;
-+			bio_set_op_attrs(bio, REQ_OP_WRITE, op_flags);
- 			task_io_account_write(n);
- 		} else {
- 			bio_set_op_attrs(bio, REQ_OP_READ, 0);
-@@ -968,7 +988,12 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
- 
- /*
-  * iomap_dio_rw() always completes O_[D]SYNC writes regardless of whether the IO
-- * is being issued as AIO or not.
-+ * is being issued as AIO or not.  This allows us to optimise pure data writes
-+ * to use REQ_FUA rather than requiring generic_write_sync() to issue a
-+ * REQ_FLUSH post write. This is slightly tricky because a single request here
-+ * can be mapped into multiple disjoint IOs and only a subset of the IOs issued
-+ * may be pure data writes. In that case, we still need to do a full data sync
-+ * completion.
-  */
- ssize_t
- iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
-@@ -1015,8 +1040,14 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 			dio->flags |= IOMAP_DIO_DIRTY;
- 	} else {
- 		dio->flags |= IOMAP_DIO_WRITE;
--		if (iocb->ki_flags & IOCB_DSYNC)
-+		if (iocb->ki_flags & IOCB_DSYNC) {
- 			dio->flags |= IOMAP_DIO_WRITE_SYNC;
-+			/*
-+			 * Any non-FUA write will clear this flag, hence we know
-+			 * before completion whether a cache flush is necessary.
-+			 */
-+			dio->flags |= IOMAP_DIO_WRITE_FUA;
-+		}
- 		flags |= IOMAP_WRITE;
- 	}
- 
-@@ -1073,6 +1104,13 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 	if (ret < 0)
- 		iomap_dio_set_error(dio, ret);
- 
-+	/*
-+	 * If all the writes we issued were FUA, we don't need to flush the
-+	 * cache on IO completion. Clear the sync flag for this case.
-+	 */
-+	if (dio->flags & IOMAP_DIO_WRITE_FUA)
-+		dio->flags &= ~IOMAP_DIO_WRITE_SYNC;
-+
- 	if (!atomic_dec_and_test(&dio->ref)) {
- 		if (!is_sync_kiocb(iocb))
- 			return -EIOCBQUEUED;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index ed63f3b69c12..e853f1748a4b 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -800,6 +800,7 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- #define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
- #define blk_queue_preempt_only(q)				\
- 	test_bit(QUEUE_FLAG_PREEMPT_ONLY, &(q)->queue_flags)
-+#define blk_queue_fua(q)	test_bit(QUEUE_FLAG_FUA, &(q)->queue_flags)
- 
- extern int blk_set_preempt_only(struct request_queue *q);
- extern void blk_clear_preempt_only(struct request_queue *q);
 -- 
-2.16.1
+2.17.0.484.g0c8726318c-goog
+
+
+--0000000000008325d00569358740
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIIS5wYJKoZIhvcNAQcCoIIS2DCCEtQCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+ghBNMIIEXDCCA0SgAwIBAgIOSBtqDm4P/739RPqw/wcwDQYJKoZIhvcNAQELBQAwZDELMAkGA1UE
+BhMCQkUxGTAXBgNVBAoTEEdsb2JhbFNpZ24gbnYtc2ExOjA4BgNVBAMTMUdsb2JhbFNpZ24gUGVy
+c29uYWxTaWduIFBhcnRuZXJzIENBIC0gU0hBMjU2IC0gRzIwHhcNMTYwNjE1MDAwMDAwWhcNMjEw
+NjE1MDAwMDAwWjBMMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTEiMCAG
+A1UEAxMZR2xvYmFsU2lnbiBIViBTL01JTUUgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+AQoCggEBALR23lKtjlZW/17kthzYcMHHKFgywfc4vLIjfq42NmMWbXkNUabIgS8KX4PnIFsTlD6F
+GO2fqnsTygvYPFBSMX4OCFtJXoikP2CQlEvO7WooyE94tqmqD+w0YtyP2IB5j4KvOIeNv1Gbnnes
+BIUWLFxs1ERvYDhmk+OrvW7Vd8ZfpRJj71Rb+QQsUpkyTySaqALXnyztTDp1L5d1bABJN/bJbEU3
+Hf5FLrANmognIu+Npty6GrA6p3yKELzTsilOFmYNWg7L838NS2JbFOndl+ce89gM36CW7vyhszi6
+6LqqzJL8MsmkP53GGhf11YMP9EkmawYouMDP/PwQYhIiUO0CAwEAAaOCASIwggEeMA4GA1UdDwEB
+/wQEAwIBBjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwEgYDVR0TAQH/BAgwBgEB/wIB
+ADAdBgNVHQ4EFgQUyzgSsMeZwHiSjLMhleb0JmLA4D8wHwYDVR0jBBgwFoAUJiSSix/TRK+xsBtt
+r+500ox4AAMwSwYDVR0fBEQwQjBAoD6gPIY6aHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9ncy9n
+c3BlcnNvbmFsc2lnbnB0bnJzc2hhMmcyLmNybDBMBgNVHSAERTBDMEEGCSsGAQQBoDIBKDA0MDIG
+CCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzANBgkqhkiG
+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
+BQUHMAKGNGh0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5jb20vY2FjZXJ0L2dzaHZzbWltZWNhMS5j
+cnQwHQYDVR0OBBYEFDNntFDpJlP5hZfZPq3fmoQ/ClRPMB8GA1UdIwQYMBaAFMs4ErDHmcB4koyz
+IZXm9CZiwOA/MEwGA1UdIARFMEMwQQYJKwYBBAGgMgEoMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8v
+d3d3Lmdsb2JhbHNpZ24uY29tL3JlcG9zaXRvcnkvMDsGA1UdHwQ0MDIwMKAuoCyGKmh0dHA6Ly9j
+cmwuZ2xvYmFsc2lnbi5jb20vZ3NodnNtaW1lY2ExLmNybDAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0l
+BBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMA0GCSqGSIb3DQEBCwUAA4IBAQCcYsdtDsMPCsiWtxWK
+v0I9QkCnTCRmIAxfU099lmAl6HJIb6EZAYXhG51MDl9iaGIuH+GO5oxO7mt6QXjZkJJRP2vReyw5
+vi5ViuNmepeIV0P683cromlJaDnnrTIV8cqxomNphwiRQiX+abmRlZ2+Har0cE2a0g47zpdg/Hby
+MERF/SR21AUHupZvBsu6329K3W2rg7YbCPX+MnvEgpZKqCyulTjxFyxJ8a8pjBtznVnMrRrTfYRz
+HfgjoeGEt0kUqvCtVFjEU1tpoYLSys6rl1qk+jX/YW09XZsd18ie8uWVRxG+9KtevbtWe5UPBQ37
+UMq8z8vtmD3G2k6o6TQMMYICXjCCAloCAQEwXDBMMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xv
+YmFsU2lnbiBudi1zYTEiMCAGA1UEAxMZR2xvYmFsU2lnbiBIViBTL01JTUUgQ0EgMQIMD/ndhZX/
+YOFoMzvgMA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEiBCAwlqit7S9IuE7j6L+45YGx
+ByGQkkVoOiDWX1Pxv2eh7zAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
+Fw0xODA0MDYyMjI1MTFaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQB
+FjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEKMAsGCSqGSIb3DQEBBzALBglg
+hkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEARQzhh/3ImQwIG2YldGqpPBaRnssLdGKAG/E0WuHo
+mYKyuG7P2PVhvfQyoaJzyX4/vW2njDI3atWUyOhUpcW9vexHsvhwqTuj8LZPpmbD20pi+uAkRajQ
+3L8IttkEVn5lar1+d9NMhCI9vaZCOybnRh6R6rC3CXdPDpzUq0+ebKWcHc29+64RE5Jk4mdihCBP
+2DssBdmSAZ7j8e9p7MUdV7MFZT5LyDNSZ7L4ZHJVAnQH8VA3U4e8dB63SEGmOn5E+1HNIKYVmnbd
+03Tw7A0rWXGYKh2/XI694Dsvrt96mGszKeuwI19cGuCwakdcbNASSUYjK6wi0RX3Ryl+5ODLog==
+--0000000000008325d00569358740--
