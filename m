@@ -1,36 +1,145 @@
-Return-Path: <tglx@linutronix.de>
-Date: Tue, 3 Apr 2018 14:55:07 +0200 (CEST)
-From: Thomas Gleixner <tglx@linutronix.de>
-To: Ming Lei <ming.lei@redhat.com>
-cc: Artem Bityutskiy <dedekind1@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-    Christoph Hellwig <hch@infradead.org>, linux-kernel@vger.kernel.org,
-    linux-block@vger.kernel.org, Laurence Oberman <loberman@redhat.com>
-Subject: Re: [PATCH V3 0/4] genirq/affinity: irq vector spread among online
- CPUs as far as possible
-In-Reply-To: <20180330031554.GC12412@ming.t460p>
-Message-ID: <alpine.DEB.2.21.1804031435450.2511@nanos.tec.linutronix.de>
-References: <20180308105358.1506-1-ming.lei@redhat.com> <1520515113.20980.31.camel@gmail.com> <20180308133440.GA2713@ming.t460p> <alpine.DEB.2.21.1803090011150.1454@nanos.tec.linutronix.de> <20180309012458.GD5228@ming.t460p> <alpine.DEB.2.21.1803091107520.1364@nanos.tec.linutronix.de>
- <20180309120833.GB30257@ming.t460p> <alpine.DEB.2.21.1803091531000.1364@nanos.tec.linutronix.de> <20180330031554.GC12412@ming.t460p>
+Return-Path: <ming.lei@redhat.com>
+Date: Fri, 6 Apr 2018 23:40:31 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Stefan Haberland <sth@linux.vnet.ibm.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] blk-mq: only run mapped hw queues in
+ blk_mq_run_hw_queues()
+Message-ID: <20180406154022.GA13354@ming.t460p>
+References: <20180405161142.GA20972@ming.t460p>
+ <3a72f42f-db90-6092-5e1b-0579d2095daa@de.ibm.com>
+ <20180406084106.GA8940@ming.t460p>
+ <e3701f81-8616-31b5-cf29-2f788f06aa64@de.ibm.com>
+ <20180406092309.GB9605@ming.t460p>
+ <e2dbf168-8583-2011-6520-02bf17051cd2@de.ibm.com>
+ <20180406134133.GA10791@ming.t460p>
+ <42716ec6-480d-4c73-a02c-1795873aaa79@de.ibm.com>
+ <20180406145822.GA12198@ming.t460p>
+ <03a62bea-ac13-8d39-2c7d-995547b32be7@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <03a62bea-ac13-8d39-2c7d-995547b32be7@de.ibm.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Ming,
-
-On Fri, 30 Mar 2018, Ming Lei wrote:
-> On Fri, Mar 09, 2018 at 04:08:19PM +0100, Thomas Gleixner wrote:
-> > Thoughts?
+On Fri, Apr 06, 2018 at 05:11:53PM +0200, Christian Borntraeger wrote:
 > 
-> Given this patchset doesn't have effect on normal machines without
-> supporting physical CPU hotplug, it can fix performance regression on
-> machines which might support physical CPU hotplug(cpu_present_mask !=
-> cpu_possible_mask) with some extra memory allocation cost.
->
-> So is there any chance to make it in v4.17?
+> 
+> On 04/06/2018 04:58 PM, Ming Lei wrote:
+> > On Fri, Apr 06, 2018 at 04:26:49PM +0200, Christian Borntraeger wrote:
+> >>
+> >>
+> >> On 04/06/2018 03:41 PM, Ming Lei wrote:
+> >>> On Fri, Apr 06, 2018 at 12:19:19PM +0200, Christian Borntraeger wrote:
+> >>>>
+> >>>>
+> >>>> On 04/06/2018 11:23 AM, Ming Lei wrote:
+> >>>>> On Fri, Apr 06, 2018 at 10:51:28AM +0200, Christian Borntraeger wrote:
+> >>>>>>
+> >>>>>>
+> >>>>>> On 04/06/2018 10:41 AM, Ming Lei wrote:
+> >>>>>>> On Thu, Apr 05, 2018 at 07:39:56PM +0200, Christian Borntraeger wrote:
+> >>>>>>>>
+> >>>>>>>>
+> >>>>>>>> On 04/05/2018 06:11 PM, Ming Lei wrote:
+> >>>>>>>>>>
+> >>>>>>>>>> Could you please apply the following patch and provide the dmesg boot log?
+> >>>>>>>>>
+> >>>>>>>>> And please post out the 'lscpu' log together from the test machine too.
+> >>>>>>>>
+> >>>>>>>> attached.
+> >>>>>>>>
+> >>>>>>>> As I said before this seems to go way with CONFIG_NR_CPUS=64 or smaller.
+> >>>>>>>> We have 282 nr_cpu_ids here (max 141CPUs on that z13 with SMT2) but only 8 Cores
+> >>>>>>>> == 16 threads.
+> >>>>>>>
+> >>>>>>> OK, thanks!
+> >>>>>>>
+> >>>>>>> The most weird thing is that hctx->next_cpu is computed as 512 since
+> >>>>>>> nr_cpu_id is 282, and hctx->next_cpu should have pointed to one of
+> >>>>>>> possible CPU.
+> >>>>>>>
+> >>>>>>> Looks like it is a s390 specific issue, since I can setup one queue
+> >>>>>>> which has same mapping with yours:
+> >>>>>>>
+> >>>>>>> 	- nr_cpu_id is 282
+> >>>>>>> 	- CPU 0~15 is online
+> >>>>>>> 	- 64 queues null_blk
+> >>>>>>> 	- still run all hw queues in .complete handler
+> >>>>>>>
+> >>>>>>> But can't reproduce this issue at all.
+> >>>>>>>
+> >>>>>>> So please test the following patch, which may tell us why hctx->next_cpu
+> >>>>>>> is computed wrong:
+> >>>>>>
+> >>>>>> I see things like
+> >>>>>>
+> >>>>>> [    8.196907] wrong next_cpu 512, blk_mq_map_swqueue, first_and
+> >>>>>> [    8.196910] wrong next_cpu 512, blk_mq_map_swqueue, first_and
+> >>>>>> [    8.196912] wrong next_cpu 512, blk_mq_map_swqueue, first_and
+> >>>>>> [    8.196913] wrong next_cpu 512, blk_mq_map_swqueue, first_and
+> >>>>>> [    8.196914] wrong next_cpu 512, blk_mq_map_swqueue, first_and
+> >>>>>> [    8.196915] wrong next_cpu 512, blk_mq_map_swqueue, first_and
+> >>>>>> [    8.196916] wrong next_cpu 512, blk_mq_map_swqueue, first_and
+> >>>>>> [    8.196916] wrong next_cpu 512, blk_mq_map_swqueue, first_and
+> >>>>>> [    8.196917] wrong next_cpu 512, blk_mq_map_swqueue, first_and
+> >>>>>> [    8.196918] wrong next_cpu 512, blk_mq_map_swqueue, first_and
+> >>>>>>
+> >>>>>> which is exactly what happens if the find and and operation fails (returns size of bitmap).
+> >>>>>
+> >>>>> Given both 'cpu_online_mask' and 'hctx->cpumask' are shown as correct
+> >>>>> in your previous debug log, it means the following function returns
+> >>>>> totally wrong result on S390.
+> >>>>>
+> >>>>> 	cpumask_first_and(hctx->cpumask, cpu_online_mask);
+> >>>>>
+> >>>>> The debugfs log shows that each hctx->cpumask includes one online
+> >>>>> CPU(0~15).
+> >>>>
+> >>>> Really? the last log (with the latest patch applied  shows a lot of contexts
+> >>>> that do not have CPUs in 0-15:
+> >>>>
+> >>>> e.g. 
+> >>>> [    4.049828] dump CPUs mapped to this hctx:
+> >>>> [    4.049829] 18 
+> >>>> [    4.049829] 82 
+> >>>> [    4.049830] 146 
+> >>>> [    4.049830] 210 
+> >>>> [    4.049831] 274 
+> >>>
+> >>> That won't be an issue, since no IO can be submitted from these offline
+> >>> CPUs, then these hctx shouldn't have been run at all.
+> >>>
+> >>> But hctx->next_cpu can be set as 512 for these inactive hctx in
+> >>> blk_mq_map_swqueue(), then please test the attached patch, and if
+> >>> hctx->next_cpu is still set as 512, something is still wrong.
+> >>
+> >>
+> >> WIth this patch I no longer see the "run queue from wrong CPU x, hctx active" messages.
+> >> your debug code still triggers, though.
+> >>
+> >> wrong next_cpu 512, blk_mq_hctx_next_cpu, first_and
+> >> wrong next_cpu 512, blk_mq_hctx_next_cpu, next_and
+> >>
+> >> If we would remove the debug code then dmesg would be clean it seems.
+> > 
+> > That is still a bit strange, since for any inactive hctx(without online
+> > CPU mapped), blk_mq_run_hw_queue() will check blk_mq_hctx_has_pending()
+> 
+> I think for next_and it is reasonable to see this, as the next_and will return
+> 512 after we have used the last one. In fact the code does call first_and in
+> that case for a reason, no?
 
-Sorry, that thing fell through the cracks. I'll queue it now and try to do
-a pull request late in the merge window.
+It is possible for dumping 'first_and' when there isn't any online CPUs mapped
+to this hctx.
+
+But my question is that for this case, there shouldn't be any IO queued
+for this hctx, and blk_mq_hctx_has_pending() has been called to check
+that, so blk_mq_hctx_next_cpu() should have only be called when
+blk_mq_hctx_has_pending() in blk_mq_run_hw_queue() is true.
+
 
 Thanks,
-
-	tglx
+Ming
