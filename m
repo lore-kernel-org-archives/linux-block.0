@@ -1,126 +1,51 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out1.zte.com.cn ([202.103.147.172]:47276 "EHLO mxct.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752041AbeDLGih (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Apr 2018 02:38:37 -0400
-From: tang.junhui@zte.com.cn
-To: kent.overstreet@gmail.com, colyli@suse.de, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: [PATCH 1/4] bcache: finish incremental GC
-Date: Thu, 12 Apr 2018 14:38:41 +0800
-Message-Id: <1523515124-2021-2-git-send-email-tang.junhui@zte.com.cn>
-In-Reply-To: <1523515124-2021-1-git-send-email-tang.junhui@zte.com.cn>
-References: <1523515124-2021-1-git-send-email-tang.junhui@zte.com.cn>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <zwp10758@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <04280c25-aecb-3d79-e589-5fafa974d9e0@kernel.dk>
+References: <cover.1522922101.git.zhangweiping@didichuxing.com> <04280c25-aecb-3d79-e589-5fafa974d9e0@kernel.dk>
+From: Weiping Zhang <zwp10758@gmail.com>
+Date: Sat, 7 Apr 2018 16:30:53 +0800
+Message-ID: <CAA70yB6_W_xHWaph4CT3-h91fSX_9EBG94bp6gafoTPys8KhzQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/2] use larger max_request_size for virtio_blk
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Cornelia Huck <cohuck@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, jasowang@redhat.com,
+	linux-block@vger.kernel.org, virtualization@lists.linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+2018-04-05 22:29 GMT+08:00 Jens Axboe <axboe@kernel.dk>:
+> On 4/5/18 4:09 AM, Weiping Zhang wrote:
+>> Hi,
+>>
+>> For virtio block device, actually there is no a hard limit for max request
+>> size, and virtio_blk driver set -1 to blk_queue_max_hw_sectors(q, -1U);.
+>> But it doesn't work, because there is a default upper limitation
+>> BLK_DEF_MAX_SECTORS (1280 sectors). So this series want to add a new helper
+>> blk_queue_max_hw_sectors_no_limit to set a proper max reqeust size.
+>>
+>> Weiping Zhang (2):
+>>   blk-setting: add new helper blk_queue_max_hw_sectors_no_limit
+>>   virtio_blk: add new module parameter to set max request size
+>>
+>>  block/blk-settings.c       | 20 ++++++++++++++++++++
+>>  drivers/block/virtio_blk.c | 32 ++++++++++++++++++++++++++++++--
+>>  include/linux/blkdev.h     |  2 ++
+>>  3 files changed, 52 insertions(+), 2 deletions(-)
+>
+> The driver should just use blk_queue_max_hw_sectors() to set the limit,
+> and then the soft limit can be modified by a udev rule. Technically the
+> driver doesn't own the software limit, it's imposed to ensure that we
+> don't introduce too much latency per request.
+>
+> Your situation is no different from many other setups, where the
+> hw limit is much higher than the default 1280k.
+>
+Hi Martin, Jens,
 
-In GC thread, we record the latest GC key in gc_done, which is expected
-to be used for incremental GC, but in currently code, we didn't realize
-it. When GC runs, front side IO would be blocked until the GC over, it
-would be a long time if there is a lot of btree nodes.
+It seems more reasonable to change software limitation by udev rule,
+thanks you.
 
-This patch realizes incremental GC, the main ideal is that, when there
-are front side I/Os, after GC some nodes (100), we stop GC, release locker
-of the btree node, and go to process the front side I/Os for some times
-(100 ms), then go back to GC again.
-
-By this patch, when we doing GC, I/Os are not blocked all the time, and
-there is no obvious I/Os zero jump problem any more.
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/bcache.h  |  5 +++++
- drivers/md/bcache/btree.c   | 15 ++++++++++++++-
- drivers/md/bcache/request.c |  3 +++
- 3 files changed, 22 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 843877e..ab4c9ca 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -445,6 +445,7 @@ struct cache {
- 
- struct gc_stat {
- 	size_t			nodes;
-+	size_t			nodes_pre;
- 	size_t			key_bytes;
- 
- 	size_t			nkeys;
-@@ -568,6 +569,10 @@ struct cache_set {
- 	 */
- 	atomic_t		rescale;
- 	/*
-+	 * used for GC, identify if any front side I/Os is inflight
-+	 */
-+	atomic_t		io_inflight;
-+	/*
- 	 * When we invalidate buckets, we use both the priority and the amount
- 	 * of good data to determine which buckets to reuse first - to weight
- 	 * those together consistently we keep track of the smallest nonzero
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 81e8dc3..b36d276 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -90,6 +90,9 @@
- 
- #define MAX_NEED_GC		64
- #define MAX_SAVE_PRIO		72
-+#define MIN_GC_NODES		100
-+#define GC_SLEEP_TIME		100
-+
- 
- #define PTR_DIRTY_BIT		(((uint64_t) 1 << 36))
- 
-@@ -1581,6 +1584,13 @@ static int btree_gc_recurse(struct btree *b, struct btree_op *op,
- 		memmove(r + 1, r, sizeof(r[0]) * (GC_MERGE_NODES - 1));
- 		r->b = NULL;
- 
-+		if (atomic_read(&b->c->io_inflight) &&
-+		    gc->nodes >= gc->nodes_pre + MIN_GC_NODES) {
-+			gc->nodes_pre =  gc->nodes;
-+			ret = -EAGAIN;
-+			break;
-+		}
-+
- 		if (need_resched()) {
- 			ret = -EAGAIN;
- 			break;
-@@ -1748,7 +1758,10 @@ static void bch_btree_gc(struct cache_set *c)
- 		closure_sync(&writes);
- 		cond_resched();
- 
--		if (ret && ret != -EAGAIN)
-+		if (ret == -EAGAIN)
-+			schedule_timeout_interruptible(msecs_to_jiffies
-+						       (GC_SLEEP_TIME));
-+		else if (ret)
- 			pr_warn("gc failed!");
- 	} while (ret);
- 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 643c3021..26750a9 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -637,7 +637,9 @@ static void do_bio_hook(struct search *s, struct bio *orig_bio)
- static void search_free(struct closure *cl)
- {
- 	struct search *s = container_of(cl, struct search, cl);
-+
- 	bio_complete(s);
-+	atomic_dec(&s->d->c->io_inflight);
- 
- 	if (s->iop.bio)
- 		bio_put(s->iop.bio);
-@@ -655,6 +657,7 @@ static inline struct search *search_alloc(struct bio *bio,
- 
- 	closure_init(&s->cl, NULL);
- 	do_bio_hook(s, bio);
-+	atomic_inc(&d->c->io_inflight);
- 
- 	s->orig_bio		= bio;
- 	s->cache_miss		= NULL;
--- 
-1.8.3.1
+>
+> _______________________________________________
+> Virtualization mailing list
+> Virtualization@lists.linux-foundation.org
+> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
