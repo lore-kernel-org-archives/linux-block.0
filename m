@@ -1,73 +1,53 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:44810 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754359AbeDPIvO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Apr 2018 04:51:14 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-scsi@vger.kernel.org, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH 07/12] scsi: reduce use of block bounce buffers
-Date: Mon, 16 Apr 2018 10:50:27 +0200
-Message-Id: <20180416085032.7367-8-hch@lst.de>
-In-Reply-To: <20180416085032.7367-1-hch@lst.de>
-References: <20180416085032.7367-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <dvyukov@google.com>
+MIME-Version: 1.0
+In-Reply-To: <201804071627.IIG65113.FSHOFMtOVOFJLQ@I-love.SAKURA.ne.jp>
+References: <6bee3eddc24ef5525ca12efb023e66b2503cb178.1523033157.git.osandov@fb.com>
+ <201804071627.IIG65113.FSHOFMtOVOFJLQ@I-love.SAKURA.ne.jp>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Sat, 7 Apr 2018 12:55:48 +0200
+Message-ID: <CACT4Y+Zt7F65mTV6sbuAOoqtvtiPD3Rurg=1nhVfOSZCtk6_pQ@mail.gmail.com>
+Subject: Re: [PATCH] loop: fix LOOP_GET_STATUS lock imbalance
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@fb.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, kernel-team@fb.com,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+List-ID: <linux-block@vger.kernel.org>
 
-We can rely on the dma-mapping code to handle any DMA limits that is
-bigger than the ISA DMA mask for us (either using an iommu or swiotlb),
-so remove setting the block layer bounce limit for anything but the
-unchecked_isa_dma case, or the bouncing for highmem pages.
+On Sat, Apr 7, 2018 at 9:27 AM, Tetsuo Handa
+<penguin-kernel@i-love.sakura.ne.jp> wrote:
+> Omar Sandoval wrote:
+>> From: Omar Sandoval <osandov@fb.com>
+>>
+>> Commit 2d1d4c1e591f made loop_get_status() drop lo_ctx_mutex before
+>> returning, but the loop_get_status_old(), loop_get_status64(), and
+>> loop_get_status_compat() wrappers don't call loop_get_status() if the
+>> passed argument is NULL. The callers expect that the lock is dropped, so
+>> make sure we drop it in that case, too.
+>>
+>> Reported-by: syzbot+31e8daa8b3fc129e75f2@syzkaller.appspotmail.com
+>
+> Well, it is me who reported this bug before syzbot reports it. ;-)
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/scsi_lib.c | 24 ++----------------------
- 1 file changed, 2 insertions(+), 22 deletions(-)
+Robots are taking our jobs! :)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 0dfec0dedd5e..ebe2cbb48b80 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2142,27 +2142,6 @@ static int scsi_map_queues(struct blk_mq_tag_set *set)
- 	return blk_mq_map_queues(set);
- }
- 
--static u64 scsi_calculate_bounce_limit(struct Scsi_Host *shost)
--{
--	struct device *host_dev;
--	u64 bounce_limit = 0xffffffff;
--
--	if (shost->unchecked_isa_dma)
--		return BLK_BOUNCE_ISA;
--	/*
--	 * Platforms with virtual-DMA translation
--	 * hardware have no practical limit.
--	 */
--	if (!PCI_DMA_BUS_IS_PHYS)
--		return BLK_BOUNCE_ANY;
--
--	host_dev = scsi_get_device(shost);
--	if (host_dev && host_dev->dma_mask)
--		bounce_limit = (u64)dma_max_pfn(host_dev) << PAGE_SHIFT;
--
--	return bounce_limit;
--}
--
- void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
- {
- 	struct device *dev = shost->dma_dev;
-@@ -2182,7 +2161,8 @@ void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
- 	}
- 
- 	blk_queue_max_hw_sectors(q, shost->max_sectors);
--	blk_queue_bounce_limit(q, scsi_calculate_bounce_limit(shost));
-+	if (shost->unchecked_isa_dma)
-+		blk_queue_bounce_limit(q, BLK_BOUNCE_ISA);
- 	blk_queue_segment_boundary(q, shost->dma_boundary);
- 	dma_set_seg_boundary(dev, shost->dma_boundary);
- 
--- 
-2.17.0
+We could notify syzbot with just "#syz fix" tag in the report email,
+rather than putting it into Reported-by.
+
+
+>> Fixes: 2d1d4c1e591f ("loop: don't call into filesystem while holding lo_ctl_mutex")
+>
+> But I feel we should revert 2d1d4c1e591f rather than applying this patch.
+>
+>> Signed-off-by: Omar Sandoval <osandov@fb.com>
+>
+> If the reason of dropping the lock is to avoid deadlock caused by recursing
+> into the same lock from vfs_getattr(), it is correct thing to drop the lock.
+>
+> But when the reason is that vfs_getattr() cannot return when NFS server is
+> dead, there is no point with dropping the lock. Anybody who tries to call
+> loop_get_status() will get stuck. It is commit 3148ffbdb9162baa ("loop:
+> use killable lock in ioctls") which actually helps minimizing number of
+> stuck processes when NFS server is dead if we didn't drop the lock.
+> If we drop the lock before calling vfs_getattr(), all threads who called
+> loop_get_status() will reach vfs_getattr() and get stuck, won't it?
