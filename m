@@ -1,24 +1,78 @@
-Return-Path: <hch@lst.de>
-Date: Mon, 9 Apr 2018 12:06:11 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christian Borntraeger <borntraeger@de.ibm.com>,
-	Stefan Haberland <sth@linux.vnet.ibm.com>
-Subject: Re: [PATCH 4/8] blk-mq: introduce blk_mq_hw_queue_first_cpu() to
-	figure out first cpu
-Message-ID: <20180409100611.GD11144@lst.de>
-References: <20180408094814.28953-1-ming.lei@redhat.com> <20180408094814.28953-5-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180408094814.28953-5-ming.lei@redhat.com>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
+	Stefan Haberland <sth@linux.vnet.ibm.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 4/8] blk-mq: introduce blk_mq_hw_queue_first_cpu() to figure out first cpu
+Date: Sun,  8 Apr 2018 17:48:10 +0800
+Message-Id: <20180408094814.28953-5-ming.lei@redhat.com>
+In-Reply-To: <20180408094814.28953-1-ming.lei@redhat.com>
+References: <20180408094814.28953-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Sun, Apr 08, 2018 at 05:48:10PM +0800, Ming Lei wrote:
-> This patch introduces helper of blk_mq_hw_queue_first_cpu() for
-> figuring out the hctx's first cpu, and code duplication can be
-> avoided.
+This patch introduces helper of blk_mq_hw_queue_first_cpu() for
+figuring out the hctx's first cpu, and code duplication can be
+avoided.
 
-Looks good,
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Stefan Haberland <sth@linux.vnet.ibm.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 23 +++++++++++------------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a16efa6f2e7f..e3d02af79010 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1336,6 +1336,15 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+ 	hctx_unlock(hctx, srcu_idx);
+ }
+ 
++static inline int blk_mq_first_mapped_cpu(struct blk_mq_hw_ctx *hctx)
++{
++	int cpu = cpumask_first_and(hctx->cpumask, cpu_online_mask);
++
++	if (cpu >= nr_cpu_ids)
++		cpu = cpumask_first(hctx->cpumask);
++	return cpu;
++}
++
+ /*
+  * It'd be great if the workqueue API had a way to pass
+  * in a mask and had some smarts for more clever placement.
+@@ -1355,14 +1364,7 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ 		next_cpu = cpumask_next_and(next_cpu, hctx->cpumask,
+ 				cpu_online_mask);
+ 		if (next_cpu >= nr_cpu_ids)
+-			next_cpu = cpumask_first_and(hctx->cpumask, cpu_online_mask);
+-
+-		/*
+-		 * No online CPU is found, so have to make sure hctx->next_cpu
+-		 * is set correctly for not breaking workqueue.
+-		 */
+-		if (next_cpu >= nr_cpu_ids)
+-			next_cpu = cpumask_first(hctx->cpumask);
++			next_cpu = blk_mq_first_mapped_cpu(hctx);
+ 		hctx->next_cpu_batch = BLK_MQ_CPU_WORK_BATCH;
+ 	}
+ 
+@@ -2431,10 +2433,7 @@ static void blk_mq_map_swqueue(struct request_queue *q)
+ 		/*
+ 		 * Initialize batch roundrobin counts
+ 		 */
+-		hctx->next_cpu = cpumask_first_and(hctx->cpumask,
+-				cpu_online_mask);
+-		if (hctx->next_cpu >= nr_cpu_ids)
+-			hctx->next_cpu = cpumask_first(hctx->cpumask);
++		hctx->next_cpu = blk_mq_first_mapped_cpu(hctx);
+ 		hctx->next_cpu_batch = BLK_MQ_CPU_WORK_BATCH;
+ 	}
+ }
+-- 
+2.9.5
