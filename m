@@ -1,24 +1,89 @@
-Return-Path: <hch@lst.de>
-Date: Mon, 9 Apr 2018 12:05:17 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christian Borntraeger <borntraeger@de.ibm.com>,
-	Stefan Haberland <sth@linux.vnet.ibm.com>
-Subject: Re: [PATCH 3/8] blk-mq: avoid to write intermediate result to
-	hctx->next_cpu
-Message-ID: <20180409100517.GC11144@lst.de>
-References: <20180408094814.28953-1-ming.lei@redhat.com> <20180408094814.28953-4-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180408094814.28953-4-ming.lei@redhat.com>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
+	Stefan Haberland <sth@linux.vnet.ibm.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 3/8] blk-mq: avoid to write intermediate result to hctx->next_cpu
+Date: Sun,  8 Apr 2018 17:48:09 +0800
+Message-Id: <20180408094814.28953-4-ming.lei@redhat.com>
+In-Reply-To: <20180408094814.28953-1-ming.lei@redhat.com>
+References: <20180408094814.28953-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Sun, Apr 08, 2018 at 05:48:09PM +0800, Ming Lei wrote:
-> This patch figures out the final selected CPU, then writes
-> it to hctx->next_cpu once, then we can avoid to intermediate
-> next cpu observed from other dispatch paths.
+This patch figures out the final selected CPU, then writes
+it to hctx->next_cpu once, then we can avoid to intermediate
+next cpu observed from other dispatch paths.
 
-Looks good,
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Stefan Haberland <sth@linux.vnet.ibm.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 9b220dc415ac..a16efa6f2e7f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1345,26 +1345,24 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ {
+ 	bool tried = false;
++	int next_cpu = hctx->next_cpu;
+ 
+ 	if (hctx->queue->nr_hw_queues == 1)
+ 		return WORK_CPU_UNBOUND;
+ 
+ 	if (--hctx->next_cpu_batch <= 0) {
+-		int next_cpu;
+ select_cpu:
+-		next_cpu = cpumask_next_and(hctx->next_cpu, hctx->cpumask,
++		next_cpu = cpumask_next_and(next_cpu, hctx->cpumask,
+ 				cpu_online_mask);
+ 		if (next_cpu >= nr_cpu_ids)
+-			next_cpu = cpumask_first_and(hctx->cpumask,cpu_online_mask);
++			next_cpu = cpumask_first_and(hctx->cpumask, cpu_online_mask);
+ 
+ 		/*
+ 		 * No online CPU is found, so have to make sure hctx->next_cpu
+ 		 * is set correctly for not breaking workqueue.
+ 		 */
+ 		if (next_cpu >= nr_cpu_ids)
+-			hctx->next_cpu = cpumask_first(hctx->cpumask);
+-		else
+-			hctx->next_cpu = next_cpu;
++			next_cpu = cpumask_first(hctx->cpumask);
+ 		hctx->next_cpu_batch = BLK_MQ_CPU_WORK_BATCH;
+ 	}
+ 
+@@ -1372,7 +1370,7 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ 	 * Do unbound schedule if we can't find a online CPU for this hctx,
+ 	 * and it should only happen in the path of handling CPU DEAD.
+ 	 */
+-	if (!cpu_online(hctx->next_cpu)) {
++	if (!cpu_online(next_cpu)) {
+ 		if (!tried) {
+ 			tried = true;
+ 			goto select_cpu;
+@@ -1382,10 +1380,13 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ 		 * Make sure to re-select CPU next time once after CPUs
+ 		 * in hctx->cpumask become online again.
+ 		 */
++		hctx->next_cpu = next_cpu;
+ 		hctx->next_cpu_batch = 1;
+ 		return WORK_CPU_UNBOUND;
+ 	}
+-	return hctx->next_cpu;
++
++	hctx->next_cpu = next_cpu;
++	return next_cpu;
+ }
+ 
+ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+-- 
+2.9.5
