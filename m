@@ -1,64 +1,30 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: jglisse@redhat.com
-To: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Tejun Heo <tj@kernel.org>, Jan Kara <jack@suse.cz>,
-        Josef Bacik <jbacik@fb.com>,
-        Mel Gorman <mgorman@techsingularity.net>
-Subject: [RFC PATCH 07/79] mm/page: add helpers to find mapping give a page and buffer head
-Date: Wed,  4 Apr 2018 15:17:54 -0400
-Message-Id: <20180404191831.5378-5-jglisse@redhat.com>
-In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
-References: <20180404191831.5378-1-jglisse@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <joseph.qi@linux.alibaba.com>
+From: Joseph Qi <joseph.qi@linux.alibaba.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Caspar Zhang <caspar@linux.alibaba.com>,
+	linux-block@vger.kernel.org
+Subject: [PATCH] blk-throttle: fix typo in blkg_print_stat_ios() comments
+Date: Sun,  8 Apr 2018 17:01:47 +0800
+Message-Id: <1523178107-31076-1-git-send-email-joseph.qi@linux.alibaba.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jérôme Glisse <jglisse@redhat.com>
-
-For now this simply use exist page_mapping() inline. Latter it will
-use buffer head pointer as a key to lookup mapping for write protected
-page.
-
-Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
-Cc: linux-mm@kvack.org
-CC: Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-fsdevel@vger.kernel.org
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Josef Bacik <jbacik@fb.com>
-Cc: Mel Gorman <mgorman@techsingularity.net>
+Signed-off-by: Joseph Qi <joseph.qi@linux.alibaba.com>
 ---
- include/linux/mm-page.h | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ block/blk-cgroup.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/mm-page.h b/include/linux/mm-page.h
-index 2981db45eeef..647a8a8cf9ba 100644
---- a/include/linux/mm-page.h
-+++ b/include/linux/mm-page.h
-@@ -132,5 +132,17 @@ static inline unsigned long _page_file_offset(struct page *page,
- 	return page->index << PAGE_SHIFT;
- }
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 1c16694..87367d4 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -640,7 +640,7 @@ int blkg_print_stat_bytes(struct seq_file *sf, void *v)
+ EXPORT_SYMBOL_GPL(blkg_print_stat_bytes);
  
-+/*
-+ * fs_page_mapping_get_with_bh() - page mapping knowing buffer_head
-+ * @page: page struct pointer for which we want the mapping
-+ * @bh: buffer_head associated with the page for the mapping
-+ * Returns: page mapping for the given buffer head
-+ */
-+static inline struct address_space *fs_page_mapping_get_with_bh(
-+		struct page *page, struct buffer_head *bh)
-+{
-+	return page_mapping(page);
-+}
-+
- #endif /* MM_PAGE_H */
- #endif /* DOT_NOT_INCLUDE___INSIDE_MM */
+ /**
+- * blkg_print_stat_bytes - seq_show callback for blkg->stat_ios
++ * blkg_print_stat_ios - seq_show callback for blkg->stat_ios
+  * @sf: seq_file to print to
+  * @v: unused
+  *
 -- 
-2.14.3
+1.8.3.1
