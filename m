@@ -1,21 +1,43 @@
-Return-Path: <hch@lst.de>
-Date: Mon, 9 Apr 2018 12:08:02 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christian Borntraeger <borntraeger@de.ibm.com>,
-	Stefan Haberland <sth@linux.vnet.ibm.com>
-Subject: Re: [PATCH 7/8] blk-mq: reimplement blk_mq_hw_queue_mapped
-Message-ID: <20180409100802.GG11144@lst.de>
-References: <20180408094814.28953-1-ming.lei@redhat.com> <20180408094814.28953-8-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180408094814.28953-8-ming.lei@redhat.com>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
+	Stefan Haberland <sth@linux.vnet.ibm.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 7/8] blk-mq: reimplement blk_mq_hw_queue_mapped
+Date: Sun,  8 Apr 2018 17:48:13 +0800
+Message-Id: <20180408094814.28953-8-ming.lei@redhat.com>
+In-Reply-To: <20180408094814.28953-1-ming.lei@redhat.com>
+References: <20180408094814.28953-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Sun, Apr 08, 2018 at 05:48:13PM +0800, Ming Lei wrote:
-> Now the actual meaning of queue mapped is that if there is any online
-> CPU mapped to this hctx, so implement blk_mq_hw_queue_mapped() in this
-> way.
+Now the actual meaning of queue mapped is that if there is any online
+CPU mapped to this hctx, so implement blk_mq_hw_queue_mapped() in this
+way.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Stefan Haberland <sth@linux.vnet.ibm.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 88c558f71819..502af371b83b 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -181,7 +181,7 @@ static inline bool blk_mq_hctx_stopped(struct blk_mq_hw_ctx *hctx)
+ 
+ static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
+ {
+-	return hctx->nr_ctx && hctx->tags;
++	return cpumask_first_and(hctx->cpumask, cpu_online_mask) < nr_cpu_ids;
+ }
+ 
+ void blk_mq_in_flight(struct request_queue *q, struct hd_struct *part,
+-- 
+2.9.5
