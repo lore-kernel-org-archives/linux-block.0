@@ -1,63 +1,95 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:54344 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751505AbeDIVaN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Apr 2018 17:30:13 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+Received: from tn-76-7-174-50.sta.embarqhsd.net ([76.7.174.50]:56934 "EHLO
+        animx.eu.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752340AbeDHQP6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 8 Apr 2018 12:15:58 -0400
+Date: Sun, 8 Apr 2018 12:15:56 -0400
+From: Wakko Warner <wakko@animx.eu.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "richard.weinberger@gmail.com" <richard.weinberger@gmail.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "wakko@animx.eu.org" <wakko@animx.eu.org>
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: 4.15.14 crash with iscsi target and dvd
-Date: Mon, 9 Apr 2018 21:30:11 +0000
-Message-ID: <f9467e78ce05446e7a89f06713c36fb638d1b6ad.camel@wdc.com>
-References: <b68bf187c9cde1c36489fc5ab2187ca8750a1292.camel@wdc.com>
-         <20180401113721.GA8471@animx.eu.org> <20180401163604.GB25011@animx.eu.org>
-         <20180401182723.GA31755@animx.eu.org>
-         <595a10cfb387e6b2ab4d2053b84fed9b3da9e079.camel@wdc.com>
-         <20180406014644.GA16112@animx.eu.org> <20180406020651.GB16112@animx.eu.org>
-         <fb0640c203409a84ab1bfbbc41078a5416138ad2.camel@wdc.com>
-         <20180407165335.GA2515@animx.eu.org>
-         <1ff8d234cc565ba9701ce31899fca5faa597e050.camel@wdc.com>
-         <20180408160254.GA22869@animx.eu.org>
-In-Reply-To: <20180408160254.GA22869@animx.eu.org>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <20180408161556.GB22869@animx.eu.org>
+References: <20180401113721.GA8471@animx.eu.org>
+ <20180401163604.GB25011@animx.eu.org>
+ <20180401182723.GA31755@animx.eu.org>
+ <595a10cfb387e6b2ab4d2053b84fed9b3da9e079.camel@wdc.com>
+ <20180406014644.GA16112@animx.eu.org>
+ <20180406020651.GB16112@animx.eu.org>
+ <fb0640c203409a84ab1bfbbc41078a5416138ad2.camel@wdc.com>
+ <20180407165335.GA2515@animx.eu.org>
+ <1ff8d234cc565ba9701ce31899fca5faa597e050.camel@wdc.com>
+ <20180408160254.GA22869@animx.eu.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180408160254.GA22869@animx.eu.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gU3VuLCAyMDE4LTA0LTA4IGF0IDEyOjAyIC0wNDAwLCBXYWtrbyBXYXJuZXIgd3JvdGU6DQo+
-IEkgZmluaXNoZWQgd2l0aCBnaXQgYmlzZWN0LiAgSGVyZSdzIHRoZSBvdXRwdXQ6DQo+IDg0Yzg1
-OTA2NDZkNWIzNTgwNGJhYzYwZWI1OGIxNDU4MzliNTg5M2UgaXMgdGhlIGZpcnN0IGJhZCBjb21t
-aXQNCj4gY29tbWl0IDg0Yzg1OTA2NDZkNWIzNTgwNGJhYzYwZWI1OGIxNDU4MzliNTg5M2UNCj4g
-QXV0aG9yOiBNaW5nIExlaSA8dG9tLmxlaW1pbmdAZ21haWwuY29tPg0KPiBEYXRlOiAgIEZyaSBO
-b3YgMTEgMjA6MDU6MzIgMjAxNiArMDgwMA0KPiANCj4gICAgIHRhcmdldDogYXZvaWQgYWNjZXNz
-aW5nIC5iaV92Y250IGRpcmVjdGx5DQo+ICAgICANCj4gICAgIFdoZW4gdGhlIGJpbyBpcyBmdWxs
-LCBiaW9fYWRkX3BjX3BhZ2UoKSB3aWxsIHJldHVybiB6ZXJvLA0KPiAgICAgc28gdXNlIHRoaXMg
-aW5mb3JtYXRpb24gdGVsbCB3aGVuIHRoZSBiaW8gaXMgZnVsbC4NCj4gICAgIA0KPiAgICAgQWxz
-byByZXBsYWNlIGFjY2VzcyB0byAuYmlfdmNudCBmb3IgcHJfZGVidWcoKSB3aXRoIGJpb19zZWdt
-ZW50cygpLg0KPiAgICAgDQo+ICAgICBSZXZpZXdlZC1ieTogQ2hyaXN0b3BoIEhlbGx3aWcgPGhj
-aEBsc3QuZGU+DQo+ICAgICBTaWduZWQtb2ZmLWJ5OiBNaW5nIExlaSA8dG9tLmxlaW1pbmdAZ21h
-aWwuY29tPg0KPiAgICAgUmV2aWV3ZWQtYnk6IFNhZ2kgR3JpbWJlcmcgPHNhZ2lAZ3JpbWJlcmcu
-bWU+DQo+ICAgICBTaWduZWQtb2ZmLWJ5OiBKZW5zIEF4Ym9lIDxheGJvZUBmYi5jb20+DQo+IA0K
-PiA6MDQwMDAwIDA0MDAwMCBhM2ViYmI3MWM1MmVlNGViOGMzYmU0ZDAzM2I4MTE3OTIxMWJmNzA0
-IGRlMzlhMzI4ZGJkMWIxODUxOTk0NmIzYWQ0NmQ5MzAyODg2ZTBkZDAgTSAgICAgIGRyaXZlcnMN
-Cj4gDQo+IEkgZGlkIGEgZGlmZiBiZXR3ZWVuIEhFQUReIGFuZCBIRUFEIGFuZCBtYW51YWxseSBw
-YXRjaGVkIHRoZSBmaWxlIGZyb20NCj4gNC4xNS4xNC4gIEl0J3Mgbm90IGFuIGV4YWN0IHJldmVy
-dC4gIEknbSBydW5uaW5nIGl0IG5vdyBhbmQgaXQncyB3b3JraW5nLg0KPiBJJ2xsIGRvIGEgYmV0
-dGVyIHRlc3QgbGF0ZXIgb24uICBIZXJlJ3MgdGhlIHBhdGNoOg0KPiANCj4gLS0tIGEvZHJpdmVy
-cy90YXJnZXQvdGFyZ2V0X2NvcmVfcHNjc2kuYwkyMDE4LTAyLTA0IDE0OjMxOjMxLjA3NzMxNjYx
-NyAtMDUwMA0KPiArKysgYi9kcml2ZXJzL3RhcmdldC90YXJnZXRfY29yZV9wc2NzaS5jCTIwMTgt
-MDQtMDggMTE6NDM6NDkuNTg4NjQxMzc0IC0wNDAwDQo+IEBAIC05MTUsNyArOTE1LDkgQEANCj4g
-IAkJCQkJYmlvLCBwYWdlLCBieXRlcywgb2ZmKTsNCj4gIAkJCXByX2RlYnVnKCJQU0NTSTogYmlv
-LT5iaV92Y250OiAlZCBucl92ZWNzOiAlZFxuIiwNCj4gIAkJCQliaW9fc2VnbWVudHMoYmlvKSwg
-bnJfdmVjcyk7DQo+IC0JCQlpZiAocmMgIT0gYnl0ZXMpIHsNCj4gKwkJCWlmIChyYyAhPSBieXRl
-cykNCj4gKwkJCQlnb3RvIGZhaWw7DQo+ICsJCQlpZiAoYmlvLT5iaV92Y250ID4gbnJfdmVjcykg
-ew0KPiAgCQkJCXByX2RlYnVnKCJQU0NTSTogUmVhY2hlZCBiaW8tPmJpX3ZjbnQgbWF4OiINCj4g
-IAkJCQkJIiAlZCBpOiAlZCBiaW86ICVwLCBhbGxvY2F0aW5nIGFub3RoZXIiDQo+ICAJCQkJCSIg
-YmlvXG4iLCBiaW8tPmJpX3ZjbnQsIGksIGJpbyk7DQoNCkhlbGxvIE1pbmcsDQoNCkNhbiB5b3Ug
-aGF2ZSBhIGxvb2sgYXQgdGhpcz8gVGhlIHN0YXJ0IG9mIHRoaXMgZS1tYWlsIHRocmVhZCBpcyBh
-dmFpbGFibGUgYXQNCmh0dHBzOi8vd3d3Lm1haWwtYXJjaGl2ZS5jb20vbGludXgtc2NzaUB2Z2Vy
-Lmtlcm5lbC5vcmcvbXNnNzI1NzQuaHRtbC4NCg0KVGhhbmtzLA0KDQpCYXJ0Lg0KDQoNCg0K
+Wakko Warner wrote:
+> Bart Van Assche wrote:
+> > Have you tried to modify the kernel Makefile as indicated in the following
+> > e-mail? This should make the kernel build:
+> > 
+> > https://lists.ubuntu.com/archives/kernel-team/2016-May/077178.html
+> 
+> Thanks.  That helped.
+> 
+> I finished with git bisect.  Here's the output:
+> 84c8590646d5b35804bac60eb58b145839b5893e is the first bad commit
+> commit 84c8590646d5b35804bac60eb58b145839b5893e
+> Author: Ming Lei <tom.leiming@gmail.com>
+> Date:   Fri Nov 11 20:05:32 2016 +0800
+> 
+>     target: avoid accessing .bi_vcnt directly
+>     
+>     When the bio is full, bio_add_pc_page() will return zero,
+>     so use this information tell when the bio is full.
+>     
+>     Also replace access to .bi_vcnt for pr_debug() with bio_segments().
+>     
+>     Reviewed-by: Christoph Hellwig <hch@lst.de>
+>     Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+>     Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+>     Signed-off-by: Jens Axboe <axboe@fb.com>
+> 
+> :040000 040000 a3ebbb71c52ee4eb8c3be4d033b81179211bf704 de39a328dbd1b18519946b3ad46d9302886e0dd0 M      drivers
+> 
+> I did a diff between HEAD^ and HEAD and manually patched the file from
+> 4.15.14.  It's not an exact revert.  I'm running it now and it's working.
+> I'll do a better test later on.  Here's the patch:
+> 
+> --- a/drivers/target/target_core_pscsi.c	2018-02-04 14:31:31.077316617 -0500
+> +++ b/drivers/target/target_core_pscsi.c	2018-04-08 11:43:49.588641374 -0400
+> @@ -915,7 +915,9 @@
+>  					bio, page, bytes, off);
+>  			pr_debug("PSCSI: bio->bi_vcnt: %d nr_vecs: %d\n",
+>  				bio_segments(bio), nr_vecs);
+> -			if (rc != bytes) {
+> +			if (rc != bytes)
+> +				goto fail;
+> +			if (bio->bi_vcnt > nr_vecs) {
+>  				pr_debug("PSCSI: Reached bio->bi_vcnt max:"
+>  					" %d i: %d bio: %p, allocating another"
+>  					" bio\n", bio->bi_vcnt, i, bio);
+> 
+> I really appreciate your time and assistance with this.
+
+One thing I noticed after doing this is errors in the kernel log on the
+initiator:
+[9072625.181744] sr 26:0:0:0: [sr1] tag#0 UNKNOWN(0x2003) Result: hostbyte=0x00 driverbyte=0x08
+[9072625.181802] sr 26:0:0:0: [sr1] tag#0 Sense Key : 0x2 [current] 
+[9072625.181835] sr 26:0:0:0: [sr1] tag#0 ASC=0x8 ASCQ=0x0 
+[9072625.181866] sr 26:0:0:0: [sr1] tag#0 CDB: opcode=0x28 28 00 00 0a 81 22 00 00 80 00
+[9072625.181919] blk_update_request: I/O error, dev sr1, sector 2753672
+
+When doing the exact same thing on the target, no mention.  My patch may not
+be right, but it doesn't cause an oops.
+
+I'm going to try 4.16.1 and see what happens.
+
+-- 
+ Microsoft has beaten Volkswagen's world record.  Volkswagen only created 22
+ million bugs.
