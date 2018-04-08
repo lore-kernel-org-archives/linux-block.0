@@ -1,21 +1,109 @@
-Return-Path: <hch@lst.de>
-Date: Mon, 9 Apr 2018 12:06:39 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christian Borntraeger <borntraeger@de.ibm.com>,
-	Stefan Haberland <sth@linux.vnet.ibm.com>
-Subject: Re: [PATCH 5/8] blk-mq: remove blk_mq_delay_queue()
-Message-ID: <20180409100639.GE11144@lst.de>
-References: <20180408094814.28953-1-ming.lei@redhat.com> <20180408094814.28953-6-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180408094814.28953-6-ming.lei@redhat.com>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
+	Stefan Haberland <sth@linux.vnet.ibm.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 5/8] blk-mq: remove blk_mq_delay_queue()
+Date: Sun,  8 Apr 2018 17:48:11 +0800
+Message-Id: <20180408094814.28953-6-ming.lei@redhat.com>
+In-Reply-To: <20180408094814.28953-1-ming.lei@redhat.com>
+References: <20180408094814.28953-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Sun, Apr 08, 2018 at 05:48:11PM +0800, Ming Lei wrote:
-> No driver uses this interface any more, so remove it.
+No driver uses this interface any more, so remove it.
 
-Looks good,
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Stefan Haberland <sth@linux.vnet.ibm.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-debugfs.c |  1 -
+ block/blk-mq.c         | 30 ++----------------------------
+ include/linux/blk-mq.h |  2 --
+ 3 files changed, 2 insertions(+), 31 deletions(-)
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 58b3b79cbe83..3080e18cb859 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -235,7 +235,6 @@ static const char *const hctx_state_name[] = {
+ 	HCTX_STATE_NAME(STOPPED),
+ 	HCTX_STATE_NAME(TAG_ACTIVE),
+ 	HCTX_STATE_NAME(SCHED_RESTART),
+-	HCTX_STATE_NAME(START_ON_RUN),
+ };
+ #undef HCTX_STATE_NAME
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e3d02af79010..8743e9105612 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1563,40 +1563,14 @@ static void blk_mq_run_work_fn(struct work_struct *work)
+ 	hctx = container_of(work, struct blk_mq_hw_ctx, run_work.work);
+ 
+ 	/*
+-	 * If we are stopped, don't run the queue. The exception is if
+-	 * BLK_MQ_S_START_ON_RUN is set. For that case, we auto-clear
+-	 * the STOPPED bit and run it.
++	 * If we are stopped, don't run the queue.
+ 	 */
+-	if (test_bit(BLK_MQ_S_STOPPED, &hctx->state)) {
+-		if (!test_bit(BLK_MQ_S_START_ON_RUN, &hctx->state))
+-			return;
+-
+-		clear_bit(BLK_MQ_S_START_ON_RUN, &hctx->state);
++	if (test_bit(BLK_MQ_S_STOPPED, &hctx->state))
+ 		clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
+-	}
+ 
+ 	__blk_mq_run_hw_queue(hctx);
+ }
+ 
+-
+-void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
+-{
+-	if (WARN_ON_ONCE(!blk_mq_hw_queue_mapped(hctx)))
+-		return;
+-
+-	/*
+-	 * Stop the hw queue, then modify currently delayed work.
+-	 * This should prevent us from running the queue prematurely.
+-	 * Mark the queue as auto-clearing STOPPED when it runs.
+-	 */
+-	blk_mq_stop_hw_queue(hctx);
+-	set_bit(BLK_MQ_S_START_ON_RUN, &hctx->state);
+-	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx),
+-					&hctx->run_work,
+-					msecs_to_jiffies(msecs));
+-}
+-EXPORT_SYMBOL(blk_mq_delay_queue);
+-
+ static inline void __blk_mq_insert_req_list(struct blk_mq_hw_ctx *hctx,
+ 					    struct request *rq,
+ 					    bool at_head)
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 8efcf49796a3..e3986f4b3461 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -183,7 +183,6 @@ enum {
+ 	BLK_MQ_S_STOPPED	= 0,
+ 	BLK_MQ_S_TAG_ACTIVE	= 1,
+ 	BLK_MQ_S_SCHED_RESTART	= 2,
+-	BLK_MQ_S_START_ON_RUN	= 3,
+ 
+ 	BLK_MQ_MAX_DEPTH	= 10240,
+ 
+@@ -270,7 +269,6 @@ void blk_mq_unquiesce_queue(struct request_queue *q);
+ void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
+ bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+ void blk_mq_run_hw_queues(struct request_queue *q, bool async);
+-void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
+ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ 		busy_tag_iter_fn *fn, void *priv);
+ void blk_mq_freeze_queue(struct request_queue *q);
+-- 
+2.9.5
