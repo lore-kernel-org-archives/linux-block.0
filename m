@@ -1,29 +1,53 @@
-Return-Path: <hch@lst.de>
-Date: Mon, 9 Apr 2018 12:07:32 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Christian Borntraeger <borntraeger@de.ibm.com>,
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
 	Stefan Haberland <sth@linux.vnet.ibm.com>,
+	Ming Lei <ming.lei@redhat.com>,
 	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 6/8] blk-mq: don't check queue mapped in
-	__blk_mq_delay_run_hw_queue()
-Message-ID: <20180409100732.GF11144@lst.de>
-References: <20180408094814.28953-1-ming.lei@redhat.com> <20180408094814.28953-7-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180408094814.28953-7-ming.lei@redhat.com>
+Subject: [PATCH 6/8] blk-mq: don't check queue mapped in __blk_mq_delay_run_hw_queue()
+Date: Sun,  8 Apr 2018 17:48:12 +0800
+Message-Id: <20180408094814.28953-7-ming.lei@redhat.com>
+In-Reply-To: <20180408094814.28953-1-ming.lei@redhat.com>
+References: <20180408094814.28953-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Sun, Apr 08, 2018 at 05:48:12PM +0800, Ming Lei wrote:
-> There are several reasons for removing the check:
-> 
-> 1) blk_mq_hw_queue_mapped() returns true always now since each hctx
-> may be mapped by one CPU at least
+There are several reasons for removing the check:
 
-Sounds like we should remove it, then..
+1) blk_mq_hw_queue_mapped() returns true always now since each hctx
+may be mapped by one CPU at least
 
-The patch looks good:
+2) when there isn't any online CPU mapped to this hctx, there won't
+be any IO queued to this CPU, blk_mq_run_hw_queue() only runs queue
+if there is IO queued to this hctx
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+3) If __blk_mq_delay_run_hw_queue() is called by blk_mq_delay_run_hw_queue(),
+which is run from blk_mq_dispatch_rq_list() or scsi_mq_get_budget(), and
+the hctx to be handled has to be mapped.
+
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Stefan Haberland <sth@linux.vnet.ibm.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 8743e9105612..3b4ce83a0ba2 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1394,9 +1394,6 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 					unsigned long msecs)
+ {
+-	if (WARN_ON_ONCE(!blk_mq_hw_queue_mapped(hctx)))
+-		return;
+-
+ 	if (unlikely(blk_mq_hctx_stopped(hctx)))
+ 		return;
+ 
+-- 
+2.9.5
