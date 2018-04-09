@@ -1,50 +1,54 @@
-Return-Path: <prvs=630dc1010=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "tj@kernel.org" <tj@kernel.org>
-CC: "hch@lst.de" <hch@lst.de>, "maxg@mellanox.com" <maxg@mellanox.com>,
-	"israelr@mellanox.com" <israelr@mellanox.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"sagi@grimberg.me" <sagi@grimberg.me>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Mon, 9 Apr 2018 09:49:12 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+	Israel Rukshin <israelr@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>, stable@vger.kernel.org
 Subject: Re: [PATCH] blk-mq: Fix recently introduced races in the timeout
  handling code
-Date: Mon, 9 Apr 2018 17:03:05 +0000
-Message-ID: <4e32290f8d5901fbd16116d1623d37dbfdc1e1b8.camel@wdc.com>
+Message-ID: <20180409164912.GF3126663@devbig577.frc2.facebook.com>
 References: <20180409052038.5391-1-bart.vanassche@wdc.com>
-	 <20180409164737.GE3126663@devbig577.frc2.facebook.com>
-In-Reply-To: <20180409164737.GE3126663@devbig577.frc2.facebook.com>
-Content-Type: text/plain; charset="utf-8"
+ <3f0d4950-4ef1-a24f-0ad1-b274aa885f73@grimberg.me>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <3f0d4950-4ef1-a24f-0ad1-b274aa885f73@grimberg.me>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE4LTA0LTA5IGF0IDA5OjQ3IC0wNzAwLCBUZWp1biBIZW8gd3JvdGU6DQo+IE9u
-IFN1biwgQXByIDA4LCAyMDE4IGF0IDEwOjIwOjM4UE0gLTA3MDAsIEJhcnQgVmFuIEFzc2NoZSB3
-cm90ZToNCj4gPiBJZiBhIGNvbXBsZXRpb24gb2NjdXJzIGFmdGVyIGJsa19tcV9ycV90aW1lZF9v
-dXQoKSBoYXMgcmVzZXQNCj4gPiBycS0+YWJvcnRlZF9nc3RhdGUgYW5kIHRoZSByZXF1ZXN0IGlz
-IGFnYWluIGluIGZsaWdodCB3aGVuIHRoZSB0aW1lb3V0DQo+ID4gZXhwaXJlcyB0aGVuIGEgcmVx
-dWVzdCB3aWxsIGJlIGNvbXBsZXRlZCB0d2ljZTogYSBmaXJzdCB0aW1lIGJ5IHRoZQ0KPiA+IHRp
-bWVvdXQgaGFuZGxlciBhbmQgYSBzZWNvbmQgdGltZSB3aGVuIHRoZSByZWd1bGFyIGNvbXBsZXRp
-b24gb2NjdXJzLg0KPiANCj4gQXJlIHdlIHN0aWxsIHRhbGtpbmcgYWJvdXQgdGhlIHNhbWUgQkxL
-X0VIX1JFU0VUX1RJTUVSIGNhc2U/ICBUaGlzIGNhbg0KPiBiZSBzb2x2ZWQgYnkgdGhlIHR3byBw
-YXRjaGVzIHdoaWNoIHJjdS1zeW5jaHJvbml6ZXMgdGhlIGhhbmQtb3ZlciB0bw0KPiBub3JtYWwg
-Y29tcGxldGlvbiBwYXRoLCByaWdodD8NCg0KSGVsbG8gVGVqdW4sDQoNCk15IG9waW5pb24gaXMg
-bm90IG9ubHkgdGhhdCB0aGUgdHdvIHBhdGNoZXMgdGhhdCB5b3UgcG9zdGVkIHJlY2VudGx5IGRv
-IG5vdA0KZml4IGFsbCB0aGUgcmFjZXMgdGhhdCBhcmUgZml4ZWQgYnkgdGhpcyBwYXRjaCBidXQg
-YWxzbyB0aGF0IHRoZSByYWNlcyB0aGF0DQpleGlzdCB0b2RheSBpbiB0aGUgYmxrLW1xIHRpbWVv
-dXQgaGFuZGxpbmcgY29kZSBjYW5ub3QgYmUgZml4ZWQgY29tcGxldGVseQ0KdXNpbmcgUkNVIG9u
-bHkuDQoNCj4gPiBBZGRpdGlvbmFsbHksIHRoZSBibGstbXEgdGltZW91dCBoYW5kbGluZyBjb2Rl
-IGlnbm9yZXMgY29tcGxldGlvbnMgdGhhdA0KPiA+IG9jY3VyIGFmdGVyIGJsa19tcV9jaGVja19l
-eHBpcmVkKCkgaGFzIGJlZW4gY2FsbGVkIGFuZCBiZWZvcmUNCj4gPiBibGtfbXFfcnFfdGltZWRf
-b3V0KCkgaGFzIHJlc2V0IHJxLT5hYm9ydGVkX2dzdGF0ZS4gSWYgYSBibG9jayBkcml2ZXINCj4g
-PiB0aW1lb3V0IGhhbmRsZXIgYWx3YXlzIHJldHVybnMgQkxLX0VIX1JFU0VUX1RJTUVSIHRoZW4g
-dGhlIHJlc3VsdCB3aWxsDQo+ID4gYmUgdGhhdCB0aGUgcmVxdWVzdCBuZXZlciB0ZXJtaW5hdGVz
-Lg0KPiANCj4gQW5kIHRoaXMgaXMgdGhlIHNhbWUgcmFjZSB3aW5kb3cgd2hpY2ggd2FzIGFsd2F5
-cyB0aGVyZSwgcmlnaHQ/ICBJDQo+IHJlYWxseSBkb24ndCB0aGluayByZWR1Y2luZyBvciBjbG9z
-aW5nIHRoaXMgd2luZG93IHJlcXVpcmVzIGZ1bGwNCj4gc3luY2hyb25pemF0aW9uLg0KDQpUaGF0
-IHJhY2Ugd2luZG93IGRpZCBub3QgZXhpc3QgaW4gdGhlIGxlZ2FjeSBibG9jayBsYXllci4gSSBk
-b24ndCB0aGluaw0Kd2Ugc2hvdWxkIHRvbGVyYXRlIHN1Y2ggYSByYWNlIHdpbmRvdyBpbiB0aGUg
-YmxrLW1xIGNvZGUgZWl0aGVyLiBJZiBhIHJlcXVlc3QNCmRvZXMgbm90IGdldCBjb21wbGV0ZWQg
-dGhhdCBsZWFkcyB0byB1bmtpbGxhYmxlIHByb2Nlc3NlcyBvciBoYW5naW5nIGtlcm5lbA0KY29k
-ZS4gU3VjaCBpc3N1ZXMgYXJlIGhhcmQgdG8gaWRlbnRpZnkgd2hlbiByZXBvcnRlZCBieSB1c2Vy
-cy4gSSB0aGluayB3ZQ0Kc2hvdWxkIGZpeCB0aGVzZSByYWNlcyBiZWZvcmUgdGhlc2UgY2F1c2Ug
-bW9yZSB0cm91YmxlIHRvIExpbnV4IHVzZXJzLg0KDQpUaGFua3MsDQoNCkJhcnQuDQoNCg0K
+Hello, Sagi.
+
+On Mon, Apr 09, 2018 at 11:37:15AM +0300, Sagi Grimberg wrote:
+> 
+> >If a completion occurs after blk_mq_rq_timed_out() has reset
+> >rq->aborted_gstate and the request is again in flight when the timeout
+> >expires then a request will be completed twice: a first time by the
+> >timeout handler and a second time when the regular completion occurs.
+> >
+> >Additionally, the blk-mq timeout handling code ignores completions that
+> >occur after blk_mq_check_expired() has been called and before
+> >blk_mq_rq_timed_out() has reset rq->aborted_gstate. If a block driver
+> >timeout handler always returns BLK_EH_RESET_TIMER then the result will
+> >be that the request never terminates.
+> 
+> OK, now I understand how we can complete twice. Israel, can you verify
+> this patch solves your double completion problem?
+> 
+> Given that it is, the change log of your patches should be modified to
+> the original bug report it solves.
+> 
+> Thread starts here:
+> http://lists.infradead.org/pipermail/linux-nvme/2018-February/015848.html
+
+Can you please see whether the following two patches fix the problem
+you've been seeing?
+
+ http://lkml.kernel.org/r/20180402190053.GC388343@devbig577.frc2.facebook.com
+ http://lkml.kernel.org/r/20180402190120.GD388343@devbig577.frc2.facebook.com
+
+Thanks.
+
+-- 
+tejun
