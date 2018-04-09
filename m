@@ -1,52 +1,43 @@
 Return-Path: <htejun@gmail.com>
 Return-Path: <htejun@gmail.com>
 Sender: Tejun Heo <htejun@gmail.com>
-Date: Mon, 9 Apr 2018 09:49:12 -0700
+Date: Mon, 9 Apr 2018 09:47:37 -0700
 From: Tejun Heo <tj@kernel.org>
-To: Sagi Grimberg <sagi@grimberg.me>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
 	Israel Rukshin <israelr@mellanox.com>,
 	Max Gurtovoy <maxg@mellanox.com>, stable@vger.kernel.org
 Subject: Re: [PATCH] blk-mq: Fix recently introduced races in the timeout
  handling code
-Message-ID: <20180409164912.GF3126663@devbig577.frc2.facebook.com>
+Message-ID: <20180409164737.GE3126663@devbig577.frc2.facebook.com>
 References: <20180409052038.5391-1-bart.vanassche@wdc.com>
- <3f0d4950-4ef1-a24f-0ad1-b274aa885f73@grimberg.me>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <3f0d4950-4ef1-a24f-0ad1-b274aa885f73@grimberg.me>
+In-Reply-To: <20180409052038.5391-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello, Sagi.
+Hey, Bart.
 
-On Mon, Apr 09, 2018 at 11:37:15AM +0300, Sagi Grimberg wrote:
-> 
-> >If a completion occurs after blk_mq_rq_timed_out() has reset
-> >rq->aborted_gstate and the request is again in flight when the timeout
-> >expires then a request will be completed twice: a first time by the
-> >timeout handler and a second time when the regular completion occurs.
-> >
-> >Additionally, the blk-mq timeout handling code ignores completions that
-> >occur after blk_mq_check_expired() has been called and before
-> >blk_mq_rq_timed_out() has reset rq->aborted_gstate. If a block driver
-> >timeout handler always returns BLK_EH_RESET_TIMER then the result will
-> >be that the request never terminates.
-> 
-> OK, now I understand how we can complete twice. Israel, can you verify
-> this patch solves your double completion problem?
-> 
-> Given that it is, the change log of your patches should be modified to
-> the original bug report it solves.
-> 
-> Thread starts here:
-> http://lists.infradead.org/pipermail/linux-nvme/2018-February/015848.html
+On Sun, Apr 08, 2018 at 10:20:38PM -0700, Bart Van Assche wrote:
+> If a completion occurs after blk_mq_rq_timed_out() has reset
+> rq->aborted_gstate and the request is again in flight when the timeout
+> expires then a request will be completed twice: a first time by the
+> timeout handler and a second time when the regular completion occurs.
 
-Can you please see whether the following two patches fix the problem
-you've been seeing?
+Are we still talking about the same BLK_EH_RESET_TIMER case?  This can
+be solved by the two patches which rcu-synchronizes the hand-over to
+normal completion path, right?
 
- http://lkml.kernel.org/r/20180402190053.GC388343@devbig577.frc2.facebook.com
- http://lkml.kernel.org/r/20180402190120.GD388343@devbig577.frc2.facebook.com
+> Additionally, the blk-mq timeout handling code ignores completions that
+> occur after blk_mq_check_expired() has been called and before
+> blk_mq_rq_timed_out() has reset rq->aborted_gstate. If a block driver
+> timeout handler always returns BLK_EH_RESET_TIMER then the result will
+> be that the request never terminates.
+
+And this is the same race window which was always there, right?  I
+really don't think reducing or closing this window requires full
+synchronization.
 
 Thanks.
 
