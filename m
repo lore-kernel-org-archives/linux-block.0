@@ -1,41 +1,21 @@
-Return-Path: <prvs=630dc1010=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "sagi@grimberg.me" <sagi@grimberg.me>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>, "tj@kernel.org" <tj@kernel.org>,
-	"israelr@mellanox.com" <israelr@mellanox.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "maxg@mellanox.com" <maxg@mellanox.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Return-Path: <hch@lst.de>
+Date: Mon, 9 Apr 2018 11:37:44 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Israel Rukshin <israelr@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>, stable@vger.kernel.org
 Subject: Re: [PATCH] blk-mq: Fix recently introduced races in the timeout
- handling code
-Date: Mon, 9 Apr 2018 14:37:39 +0000
-Message-ID: <f9842feb144badf4220114425864d09f0c496788.camel@wdc.com>
+	handling code
+Message-ID: <20180409093744.GC10405@lst.de>
 References: <20180409052038.5391-1-bart.vanassche@wdc.com>
-	 <3f0d4950-4ef1-a24f-0ad1-b274aa885f73@grimberg.me>
-In-Reply-To: <3f0d4950-4ef1-a24f-0ad1-b274aa885f73@grimberg.me>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180409052038.5391-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE4LTA0LTA5IGF0IDExOjM3ICswMzAwLCBTYWdpIEdyaW1iZXJnIHdyb3RlOg0K
-PiA+IElmIGEgY29tcGxldGlvbiBvY2N1cnMgYWZ0ZXIgYmxrX21xX3JxX3RpbWVkX291dCgpIGhh
-cyByZXNldA0KPiA+IHJxLT5hYm9ydGVkX2dzdGF0ZSBhbmQgdGhlIHJlcXVlc3QgaXMgYWdhaW4g
-aW4gZmxpZ2h0IHdoZW4gdGhlIHRpbWVvdXQNCj4gPiBleHBpcmVzIHRoZW4gYSByZXF1ZXN0IHdp
-bGwgYmUgY29tcGxldGVkIHR3aWNlOiBhIGZpcnN0IHRpbWUgYnkgdGhlDQo+ID4gdGltZW91dCBo
-YW5kbGVyIGFuZCBhIHNlY29uZCB0aW1lIHdoZW4gdGhlIHJlZ3VsYXIgY29tcGxldGlvbiBvY2N1
-cnMuDQo+ID4gDQo+ID4gQWRkaXRpb25hbGx5LCB0aGUgYmxrLW1xIHRpbWVvdXQgaGFuZGxpbmcg
-Y29kZSBpZ25vcmVzIGNvbXBsZXRpb25zIHRoYXQNCj4gPiBvY2N1ciBhZnRlciBibGtfbXFfY2hl
-Y2tfZXhwaXJlZCgpIGhhcyBiZWVuIGNhbGxlZCBhbmQgYmVmb3JlDQo+ID4gYmxrX21xX3JxX3Rp
-bWVkX291dCgpIGhhcyByZXNldCBycS0+YWJvcnRlZF9nc3RhdGUuIElmIGEgYmxvY2sgZHJpdmVy
-DQo+ID4gdGltZW91dCBoYW5kbGVyIGFsd2F5cyByZXR1cm5zIEJMS19FSF9SRVNFVF9USU1FUiB0
-aGVuIHRoZSByZXN1bHQgd2lsbA0KPiA+IGJlIHRoYXQgdGhlIHJlcXVlc3QgbmV2ZXIgdGVybWlu
-YXRlcy4NCj4gDQo+IE9LLCBub3cgSSB1bmRlcnN0YW5kIGhvdyB3ZSBjYW4gY29tcGxldGUgdHdp
-Y2UuIElzcmFlbCwgY2FuIHlvdSB2ZXJpZnkNCj4gdGhpcyBwYXRjaCBzb2x2ZXMgeW91ciBkb3Vi
-bGUgY29tcGxldGlvbiBwcm9ibGVtPw0KPiANCj4gR2l2ZW4gdGhhdCBpdCBpcywgdGhlIGNoYW5n
-ZSBsb2cgb2YgeW91ciBwYXRjaGVzIHNob3VsZCBiZSBtb2RpZmllZCB0bw0KPiB0aGUgb3JpZ2lu
-YWwgYnVnIHJlcG9ydCBpdCBzb2x2ZXMuDQo+IA0KPiBUaHJlYWQgc3RhcnRzIGhlcmU6DQo+IGh0
-dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL3BpcGVybWFpbC9saW51eC1udm1lLzIwMTgtRmVicnVh
-cnkvMDE1ODQ4Lmh0bWwNCg0KSGVsbG8gU2FnaSwNCg0KSSB3aWxsIHdhaXQgdW50aWwgaXQgaGFz
-IGJlZW4gdmVyaWZpZWQgd2hldGhlciBvciBub3QgdGhpcyBwYXRjaCBmaXhlcyB0aGUNCiJudm1l
-LXJkbWEgY29ycnVwdHMgbWVtb3J5IHVwb24gdGltZW91dCIgaXNzdWUgYmVmb3JlIGFkZGluZyBh
-IHJlZmVyZW5jZSB0bw0KdGhhdCBpc3N1ZSBpbiB0aGUgZGVzY3JpcHRpb24gb2YgdGhpcyBwYXRj
-aC4NCg0KVGhhbmtzLA0KDQpCYXJ0Lg0KDQoNCg==
+This looks sensible, but I'm worried about taking a whole spinlock
+for every request completion, including irq disabling.  However it seems
+like your new updated pattern would fit use of cmpxchg() very nicely.
