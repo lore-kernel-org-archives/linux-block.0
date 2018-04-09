@@ -1,20 +1,21 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
+Return-Path: <hch@lst.de>
+Date: Mon, 9 Apr 2018 12:06:39 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	Stefan Haberland <sth@linux.vnet.ibm.com>
 Subject: Re: [PATCH 5/8] blk-mq: remove blk_mq_delay_queue()
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
- Stefan Haberland <sth@linux.vnet.ibm.com>, Christoph Hellwig <hch@lst.de>
-References: <20180408094814.28953-1-ming.lei@redhat.com>
- <20180408094814.28953-6-ming.lei@redhat.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <a9625eb0-67ed-bbbc-b5bb-b18de9f0bc4c@grimberg.me>
-Date: Mon, 9 Apr 2018 14:03:01 +0300
+Message-ID: <20180409100639.GE11144@lst.de>
+References: <20180408094814.28953-1-ming.lei@redhat.com> <20180408094814.28953-6-ming.lei@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180408094814.28953-6-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
+
+On Sun, Apr 08, 2018 at 05:48:11PM +0800, Ming Lei wrote:
+> No driver uses this interface any more, so remove it.
 
 Looks good,
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
