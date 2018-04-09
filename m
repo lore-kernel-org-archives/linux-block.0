@@ -1,30 +1,21 @@
-Return-Path: <joseph.qi@linux.alibaba.com>
-From: Joseph Qi <joseph.qi@linux.alibaba.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Caspar Zhang <caspar@linux.alibaba.com>,
-	linux-block@vger.kernel.org
-Subject: [PATCH] blk-throttle: fix typo in blkg_print_stat_ios() comments
-Date: Sun,  8 Apr 2018 17:01:47 +0800
-Message-Id: <1523178107-31076-1-git-send-email-joseph.qi@linux.alibaba.com>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: [PATCH 6/8] blk-mq: don't check queue mapped in
+ __blk_mq_delay_run_hw_queue()
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
+ Stefan Haberland <sth@linux.vnet.ibm.com>, Christoph Hellwig <hch@lst.de>
+References: <20180408094814.28953-1-ming.lei@redhat.com>
+ <20180408094814.28953-7-ming.lei@redhat.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <0ea730bf-46c8-230a-bea9-565d99652f27@grimberg.me>
+Date: Mon, 9 Apr 2018 14:03:10 +0300
+MIME-Version: 1.0
+In-Reply-To: <20180408094814.28953-7-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Joseph Qi <joseph.qi@linux.alibaba.com>
----
- block/blk-cgroup.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Looks good,
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 1c16694..87367d4 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -640,7 +640,7 @@ int blkg_print_stat_bytes(struct seq_file *sf, void *v)
- EXPORT_SYMBOL_GPL(blkg_print_stat_bytes);
- 
- /**
-- * blkg_print_stat_bytes - seq_show callback for blkg->stat_ios
-+ * blkg_print_stat_ios - seq_show callback for blkg->stat_ios
-  * @sf: seq_file to print to
-  * @v: unused
-  *
--- 
-1.8.3.1
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
