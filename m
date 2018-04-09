@@ -1,21 +1,31 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
+Return-Path: <hch@lst.de>
+Date: Mon, 9 Apr 2018 12:04:53 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	Stefan Haberland <sth@linux.vnet.ibm.com>,
+	Keith Busch <keith.busch@intel.com>, stable@vger.kernel.org
 Subject: Re: [PATCH 2/8] blk-mq: don't keep offline CPUs mapped to hctx 0
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
- Stefan Haberland <sth@linux.vnet.ibm.com>, Christoph Hellwig <hch@lst.de>,
- Keith Busch <keith.busch@intel.com>, stable@vger.kernel.org
-References: <20180408094814.28953-1-ming.lei@redhat.com>
- <20180408094814.28953-3-ming.lei@redhat.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <2c052f73-de78-18e3-aec2-a6785742e4b4@grimberg.me>
-Date: Mon, 9 Apr 2018 14:02:31 +0300
+Message-ID: <20180409100452.GB11144@lst.de>
+References: <20180408094814.28953-1-ming.lei@redhat.com> <20180408094814.28953-3-ming.lei@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180408094814.28953-3-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
+On Sun, Apr 08, 2018 at 05:48:08PM +0800, Ming Lei wrote:
+> >From commit 4b855ad37194 ("blk-mq: Create hctx for each present CPU),
+> blk-mq doesn't remap queue after CPU topo is changed, that said when
+> some of these offline CPUs become online, they are still mapped to
+> hctx 0, then hctx 0 may become the bottleneck of IO dispatch and
+> completion.
+> 
+> This patch sets up the mapping from the beginning, and aligns to
+> queue mapping for PCI device (blk_mq_pci_map_queues()).
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Please kill the now pointless cpu_to_queue_index function.
+
+Otherwise looks good:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
