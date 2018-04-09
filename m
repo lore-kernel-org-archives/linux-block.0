@@ -1,21 +1,24 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
+Return-Path: <hch@lst.de>
+Date: Mon, 9 Apr 2018 12:06:11 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	Stefan Haberland <sth@linux.vnet.ibm.com>
 Subject: Re: [PATCH 4/8] blk-mq: introduce blk_mq_hw_queue_first_cpu() to
- figure out first cpu
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
- Stefan Haberland <sth@linux.vnet.ibm.com>, Christoph Hellwig <hch@lst.de>
-References: <20180408094814.28953-1-ming.lei@redhat.com>
- <20180408094814.28953-5-ming.lei@redhat.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <6931b1b6-92c3-db91-a97b-8555d69146b9@grimberg.me>
-Date: Mon, 9 Apr 2018 14:02:53 +0300
+	figure out first cpu
+Message-ID: <20180409100611.GD11144@lst.de>
+References: <20180408094814.28953-1-ming.lei@redhat.com> <20180408094814.28953-5-ming.lei@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180408094814.28953-5-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
+
+On Sun, Apr 08, 2018 at 05:48:10PM +0800, Ming Lei wrote:
+> This patch introduces helper of blk_mq_hw_queue_first_cpu() for
+> figuring out the hctx's first cpu, and code duplication can be
+> avoided.
 
 Looks good,
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
