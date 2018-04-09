@@ -1,129 +1,225 @@
-Return-Path: <axboe@kernel.dk>
-To: Jan Kara <jack@suse.cz>, Bart Van Assche <bart.vanassche@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: Hotplug
-Cc: linux-scsi <linux-scsi@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Message-ID: <d74ccb4d-512d-ab58-c4c6-22b6c6a3da2a@kernel.dk>
-Date: Tue, 10 Apr 2018 11:17:46 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <BATV+d9901c46b23ecc19815a+5342+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: Bart.VanAssche@wdc.com,
+	willy@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: [PATCH 1/7] scsi/osd: remove the gfp argument to osd_start_request
+Date: Mon,  9 Apr 2018 17:39:10 +0200
+Message-Id: <20180409153916.23901-2-hch@lst.de>
+In-Reply-To: <20180409153916.23901-1-hch@lst.de>
+References: <20180409153916.23901-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+Always GFP_KERNEL, and keeping it would cause serious complications for
+the next change.
 
-Been running some tests and I keep running into issues with hotplug.
-This looks similar to what Bart posted the other day, but it looks
-more deeply rooted than just having to protect the queue in
-generic_make_request_checks(). The test run is blktests,
-block/001. Current -git doesn't survive it. I've seen at least two
-different oopses, pasted below.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/scsi/osd/osd_initiator.c | 24 +++++++++++-------------
+ fs/exofs/ore.c                   | 10 +++++-----
+ fs/exofs/super.c                 |  2 +-
+ include/scsi/osd_initiator.h     |  6 +-----
+ 4 files changed, 18 insertions(+), 24 deletions(-)
 
-[  102.163442] NULL pointer dereference at 0000000000000010
-[  102.163444] PGD 0 P4D 0 
-[  102.163447] Oops: 0000 [#1] PREEMPT SMP
-[  102.163449] Modules linked in:
-[  102.175540] sr 12:0:0:0: [sr2] scsi-1 drive
-[  102.180112]  scsi_debug crc_t10dif crct10dif_generic crct10dif_common nvme nvme_core sb_edac xl
-[  102.186934] sr 12:0:0:0: Attached scsi CD-ROM sr2
-[  102.191896]  sr_mod cdrom btrfs xor zstd_decompress zstd_compress xxhash lzo_compress zlib_defc
-[  102.197169] sr 12:0:0:0: Attached scsi generic sg7 type 5
-[  102.203475]  igb ahci libahci i2c_algo_bit libata dca [last unloaded: crc_t10dif]
-[  102.203484] CPU: 43 PID: 4629 Comm: systemd-udevd Not tainted 4.16.0+ #650
-[  102.203487] Hardware name: Dell Inc. PowerEdge T630/0NT78X, BIOS 2.3.4 11/09/2016
-[  102.350882] RIP: 0010:sr_block_revalidate_disk+0x23/0x190 [sr_mod]
-[  102.358299] RSP: 0018:ffff883ff357bb58 EFLAGS: 00010292
-[  102.364734] RAX: ffffffffa00b07d0 RBX: ffff883ff3058000 RCX: ffff883ff357bb66
-[  102.373220] RDX: 0000000000000003 RSI: 0000000000007530 RDI: ffff881fea631000
-[  102.381705] RBP: 0000000000000000 R08: ffff881fe4d38400 R09: 0000000000000000
-[  102.390185] R10: 0000000000000000 R11: 00000000000001b6 R12: 000000000800005d
-[  102.398671] R13: 000000000800005d R14: ffff883ffd9b3790 R15: 0000000000000000
-[  102.407156] FS:  00007f7dc8e6d8c0(0000) GS:ffff883fff340000(0000) knlGS:0000000000000000
-[  102.417138] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  102.424066] CR2: 0000000000000010 CR3: 0000003ffda98005 CR4: 00000000003606e0
-[  102.432545] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  102.441024] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  102.449502] Call Trace:
-[  102.452744]  ? __invalidate_device+0x48/0x60
-[  102.458022]  check_disk_change+0x4c/0x60
-[  102.462900]  sr_block_open+0x16/0xd0 [sr_mod]
-[  102.468270]  __blkdev_get+0xb9/0x450
-[  102.472774]  ? iget5_locked+0x1c0/0x1e0
-[  102.477568]  blkdev_get+0x11e/0x320
-[  102.481969]  ? bdget+0x11d/0x150
-[  102.486083]  ? _raw_spin_unlock+0xa/0x20
-[  102.490968]  ? bd_acquire+0xc0/0xc0
-[  102.495368]  do_dentry_open+0x1b0/0x320
-[  102.500159]  ? inode_permission+0x24/0xc0
-[  102.505140]  path_openat+0x4e6/0x1420
-[  102.509741]  ? cpumask_any_but+0x1f/0x40
-[  102.514630]  ? flush_tlb_mm_range+0xa0/0x120
-[  102.519903]  do_filp_open+0x8c/0xf0
-[  102.524305]  ? __seccomp_filter+0x28/0x230
-[  102.529389]  ? _raw_spin_unlock+0xa/0x20
-[  102.534283]  ? __handle_mm_fault+0x7d6/0x9b0
-[  102.539559]  ? list_lru_add+0xa8/0xc0
-[  102.544157]  ? _raw_spin_unlock+0xa/0x20
-[  102.549047]  ? __alloc_fd+0xaf/0x160
-[  102.553549]  ? do_sys_open+0x1a6/0x230
-[  102.558244]  do_sys_open+0x1a6/0x230
-[  102.562742]  do_syscall_64+0x5a/0x100
-[  102.567336]  entry_SYSCALL_64_after_hwframe+0x3d/0xa2
-
-and this one, similar to Barts:
-
-[ 4676.738069] NULL pointer dereference at 0000000000000154
-[ 4676.738071] PGD 0 P4D 0 
-[ 4676.738073] Oops: 0000 [#1] PREEMPT SMP
-[ 4676.738075] Modules linked in: scsi_debug crc_t10dif nvme nvme_core loop configfs crct10dif_ge]
-[ 4676.859272] CPU: 10 PID: 16598 Comm: systemd-udevd Not tainted 4.16.0+ #651
-[ 4676.867525] Hardware name: Dell Inc. PowerEdge T630/0NT78X, BIOS 2.3.4 11/09/2016
-[ 4676.876765] RIP: 0010:blk_throtl_bio+0x45/0x9b0
-[ 4676.882296] RSP: 0018:ffff881ff0c8bb38 EFLAGS: 00010246
-[ 4676.888610] RAX: 0000000000000000 RBX: ffff881ffa273a40 RCX: 0000000000000000
-[ 4676.897059] RDX: ffff881ffa273a40 RSI: 0000000000000000 RDI: 0000000000000000
-[ 4676.905507] RBP: 0000000000000000 R08: ffff881ffa273ac0 R09: ffff881ff123f458
-[ 4676.913955] R10: ffff881ff0c8bc70 R11: 0000000000001000 R12: 0000000000000000
-[ 4676.922402] R13: ffffffff82600980 R14: ffff882081130000 R15: 0000000000000000
-[ 4676.930856] FS:  00007fe63e5228c0(0000) GS:ffff881fff740000(0000) knlGS:0000000000000000
-[ 4676.940773] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 4676.947667] CR2: 0000000000000154 CR3: 0000001fed2a0003 CR4: 00000000003606e0
-[ 4676.956116] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[ 4676.964568] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[ 4676.973021] Call Trace:
-[ 4676.976229]  generic_make_request_checks+0x640/0x660
-[ 4676.982245]  ? kmem_cache_alloc+0x37/0x190
-[ 4676.987295]  generic_make_request+0x29/0x2f0
-[ 4676.992534]  ? submit_bio+0x5c/0x110
-[ 4676.996998]  ? bio_alloc_bioset+0x99/0x1c0
-[ 4677.002050]  submit_bio+0x5c/0x110
-[ 4677.006317]  ? guard_bio_eod+0x42/0x120
-[ 4677.011074]  submit_bh_wbc.isra.49+0x132/0x160
-[ 4677.016517]  ? bh_uptodate_or_lock+0x90/0x90
-[ 4677.021757]  block_read_full_page+0x216/0x330
-[ 4677.027095]  ? check_disk_change+0x60/0x60
-[ 4677.032144]  ? __atime_needs_update+0x7f/0x190
-[ 4677.037576]  ? find_get_entry+0x98/0xf0
-[ 4677.042329]  ? pagecache_get_page+0x30/0x220
-[ 4677.047567]  ? touch_atime+0x27/0xb0
-[ 4677.052029]  generic_file_read_iter+0x60b/0x970
-[ 4677.057561]  ? _copy_to_user+0x56/0x70
-[ 4677.062221]  ? __seccomp_filter+0x28/0x230
-[ 4677.067269]  __vfs_read+0xd1/0x120
-[ 4677.071539]  vfs_read+0x9b/0x140
-[ 4677.075614]  ksys_read+0x45/0xa0
-[ 4677.079686]  do_syscall_64+0x5a/0x100
-[ 4677.084241]  entry_SYSCALL_64_after_hwframe+0x3d/0xa2
-[ 4677.090345] RIP: 0033:0x7fe63d6741f0
-[ 4677.094808] RSP: 002b:00007ffcb901f918 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
-[ 4677.104143] RAX: ffffffffffffffda RBX: 000055b1645c33c0 RCX: 00007fe63d6741f0
-[ 4677.112584] RDX: 0000000000000400 RSI: 000055b1645c33e8 RDI: 000000000000000f
-[ 4677.121037] RBP: 000055b1645c32b0 R08: 00007fe63d65f008 R09: 0000000000000430
-[ 4677.129489] R10: 000055b1645c33d8 R11: 0000000000000246 R12: 0000000000000000
-[ 4677.137934] R13: 0000000000000400 R14: 000055b1645c3300 R15: 0000000000000400
-[ 4677.146385] Code: 85 f6 74 4e 48 63 05 ab 33 d6 00 4c 8b bc c6 c8 02 00 00 0f b7 43 14 f6 c4 0 
-[ 4677.168785] RIP: blk_throtl_bio+0x45/0x9b0 RSP: ffff881ff0c8bb38
-
-
+diff --git a/drivers/scsi/osd/osd_initiator.c b/drivers/scsi/osd/osd_initiator.c
+index e18877177f1b..f48bae267dc2 100644
+--- a/drivers/scsi/osd/osd_initiator.c
++++ b/drivers/scsi/osd/osd_initiator.c
+@@ -99,7 +99,7 @@ static int _osd_get_print_system_info(struct osd_dev *od,
+ 	int nelem = ARRAY_SIZE(get_attrs), a = 0;
+ 	int ret;
+ 
+-	or = osd_start_request(od, GFP_KERNEL);
++	or = osd_start_request(od);
+ 	if (!or)
+ 		return -ENOMEM;
+ 
+@@ -409,16 +409,15 @@ static void _osd_request_free(struct osd_request *or)
+ 	kfree(or);
+ }
+ 
+-struct osd_request *osd_start_request(struct osd_dev *dev, gfp_t gfp)
++struct osd_request *osd_start_request(struct osd_dev *dev)
+ {
+ 	struct osd_request *or;
+ 
+-	or = _osd_request_alloc(gfp);
++	or = _osd_request_alloc(GFP_KERNEL);
+ 	if (!or)
+ 		return NULL;
+ 
+ 	or->osd_dev = dev;
+-	or->alloc_flags = gfp;
+ 	or->timeout = dev->def_timeout;
+ 	or->retries = OSD_REQ_RETRIES;
+ 
+@@ -546,7 +545,7 @@ static int _osd_realloc_seg(struct osd_request *or,
+ 	if (seg->alloc_size >= max_bytes)
+ 		return 0;
+ 
+-	buff = krealloc(seg->buff, max_bytes, or->alloc_flags);
++	buff = krealloc(seg->buff, max_bytes, GFP_KERNEL);
+ 	if (!buff) {
+ 		OSD_ERR("Failed to Realloc %d-bytes was-%d\n", max_bytes,
+ 			seg->alloc_size);
+@@ -728,7 +727,7 @@ static int _osd_req_list_objects(struct osd_request *or,
+ 		_osd_req_encode_olist(or, list);
+ 
+ 	WARN_ON(or->in.bio);
+-	bio = bio_map_kern(q, list, len, or->alloc_flags);
++	bio = bio_map_kern(q, list, len, GFP_KERNEL);
+ 	if (IS_ERR(bio)) {
+ 		OSD_ERR("!!! Failed to allocate list_objects BIO\n");
+ 		return PTR_ERR(bio);
+@@ -1190,14 +1189,14 @@ static int _req_append_segment(struct osd_request *or,
+ 			pad_buff = io->pad_buff;
+ 
+ 		ret = blk_rq_map_kern(io->req->q, io->req, pad_buff, padding,
+-				       or->alloc_flags);
++				       GFP_KERNEL);
+ 		if (ret)
+ 			return ret;
+ 		io->total_bytes += padding;
+ 	}
+ 
+ 	ret = blk_rq_map_kern(io->req->q, io->req, seg->buff, seg->total_bytes,
+-			       or->alloc_flags);
++			       GFP_KERNEL);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -1564,14 +1563,14 @@ static int _osd_req_finalize_data_integrity(struct osd_request *or,
+  * osd_finalize_request and helpers
+  */
+ static struct request *_make_request(struct request_queue *q, bool has_write,
+-			      struct _osd_io_info *oii, gfp_t flags)
++			      struct _osd_io_info *oii)
+ {
+ 	struct request *req;
+ 	struct bio *bio = oii->bio;
+ 	int ret;
+ 
+ 	req = blk_get_request(q, has_write ? REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN,
+-			flags);
++			GFP_KERNEL);
+ 	if (IS_ERR(req))
+ 		return req;
+ 
+@@ -1589,13 +1588,12 @@ static struct request *_make_request(struct request_queue *q, bool has_write,
+ static int _init_blk_request(struct osd_request *or,
+ 	bool has_in, bool has_out)
+ {
+-	gfp_t flags = or->alloc_flags;
+ 	struct scsi_device *scsi_device = or->osd_dev->scsi_device;
+ 	struct request_queue *q = scsi_device->request_queue;
+ 	struct request *req;
+ 	int ret;
+ 
+-	req = _make_request(q, has_out, has_out ? &or->out : &or->in, flags);
++	req = _make_request(q, has_out, has_out ? &or->out : &or->in);
+ 	if (IS_ERR(req)) {
+ 		ret = PTR_ERR(req);
+ 		goto out;
+@@ -1611,7 +1609,7 @@ static int _init_blk_request(struct osd_request *or,
+ 		or->out.req = req;
+ 		if (has_in) {
+ 			/* allocate bidi request */
+-			req = _make_request(q, false, &or->in, flags);
++			req = _make_request(q, false, &or->in);
+ 			if (IS_ERR(req)) {
+ 				OSD_DEBUG("blk_get_request for bidi failed\n");
+ 				ret = PTR_ERR(req);
+diff --git a/fs/exofs/ore.c b/fs/exofs/ore.c
+index 3c6a9c156b7a..ddbf87246898 100644
+--- a/fs/exofs/ore.c
++++ b/fs/exofs/ore.c
+@@ -790,7 +790,7 @@ int ore_create(struct ore_io_state *ios)
+ 	for (i = 0; i < ios->oc->numdevs; i++) {
+ 		struct osd_request *or;
+ 
+-		or = osd_start_request(_ios_od(ios, i), GFP_KERNEL);
++		or = osd_start_request(_ios_od(ios, i));
+ 		if (unlikely(!or)) {
+ 			ORE_ERR("%s: osd_start_request failed\n", __func__);
+ 			ret = -ENOMEM;
+@@ -815,7 +815,7 @@ int ore_remove(struct ore_io_state *ios)
+ 	for (i = 0; i < ios->oc->numdevs; i++) {
+ 		struct osd_request *or;
+ 
+-		or = osd_start_request(_ios_od(ios, i), GFP_KERNEL);
++		or = osd_start_request(_ios_od(ios, i));
+ 		if (unlikely(!or)) {
+ 			ORE_ERR("%s: osd_start_request failed\n", __func__);
+ 			ret = -ENOMEM;
+@@ -847,7 +847,7 @@ static int _write_mirror(struct ore_io_state *ios, int cur_comp)
+ 		struct ore_per_dev_state *per_dev = &ios->per_dev[cur_comp];
+ 		struct osd_request *or;
+ 
+-		or = osd_start_request(_ios_od(ios, dev), GFP_KERNEL);
++		or = osd_start_request(_ios_od(ios, dev));
+ 		if (unlikely(!or)) {
+ 			ORE_ERR("%s: osd_start_request failed\n", __func__);
+ 			ret = -ENOMEM;
+@@ -966,7 +966,7 @@ int _ore_read_mirror(struct ore_io_state *ios, unsigned cur_comp)
+ 		return 0; /* Just an empty slot */
+ 
+ 	first_dev = per_dev->dev + first_dev % ios->layout->mirrors_p1;
+-	or = osd_start_request(_ios_od(ios, first_dev), GFP_KERNEL);
++	or = osd_start_request(_ios_od(ios, first_dev));
+ 	if (unlikely(!or)) {
+ 		ORE_ERR("%s: osd_start_request failed\n", __func__);
+ 		return -ENOMEM;
+@@ -1060,7 +1060,7 @@ static int _truncate_mirrors(struct ore_io_state *ios, unsigned cur_comp,
+ 		struct ore_per_dev_state *per_dev = &ios->per_dev[cur_comp];
+ 		struct osd_request *or;
+ 
+-		or = osd_start_request(_ios_od(ios, cur_comp), GFP_KERNEL);
++		or = osd_start_request(_ios_od(ios, cur_comp));
+ 		if (unlikely(!or)) {
+ 			ORE_ERR("%s: osd_start_request failed\n", __func__);
+ 			return -ENOMEM;
+diff --git a/fs/exofs/super.c b/fs/exofs/super.c
+index 179cd5c2f52a..719a3152da80 100644
+--- a/fs/exofs/super.c
++++ b/fs/exofs/super.c
+@@ -229,7 +229,7 @@ void exofs_make_credential(u8 cred_a[OSD_CAP_LEN], const struct osd_obj_id *obj)
+ static int exofs_read_kern(struct osd_dev *od, u8 *cred, struct osd_obj_id *obj,
+ 		    u64 offset, void *p, unsigned length)
+ {
+-	struct osd_request *or = osd_start_request(od, GFP_KERNEL);
++	struct osd_request *or = osd_start_request(od);
+ /*	struct osd_sense_info osi = {.key = 0};*/
+ 	int ret;
+ 
+diff --git a/include/scsi/osd_initiator.h b/include/scsi/osd_initiator.h
+index a29d3086eb56..86a569d008b2 100644
+--- a/include/scsi/osd_initiator.h
++++ b/include/scsi/osd_initiator.h
+@@ -148,7 +148,6 @@ struct osd_request {
+ 		u8 *pad_buff;
+ 	} out, in;
+ 
+-	gfp_t alloc_flags;
+ 	unsigned timeout;
+ 	unsigned retries;
+ 	unsigned sense_len;
+@@ -202,14 +201,11 @@ static inline bool osd_req_is_ver1(struct osd_request *or)
+  *
+  * @osd_dev:    OSD device that holds the scsi-device and default values
+  *              that the request is associated with.
+- * @gfp:        The allocation flags to use for request allocation, and all
+- *              subsequent allocations. This will be stored at
+- *              osd_request->alloc_flags, can be changed by user later
+  *
+  * Allocate osd_request and initialize all members to the
+  * default/initial state.
+  */
+-struct osd_request *osd_start_request(struct osd_dev *od, gfp_t gfp);
++struct osd_request *osd_start_request(struct osd_dev *od);
+ 
+ enum osd_req_options {
+ 	OSD_REQ_FUA = 0x08,	/* Force Unit Access */
 -- 
-Jens Axboe
+2.16.3
