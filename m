@@ -1,150 +1,86 @@
-Return-Path: <joseph.qi@linux.alibaba.com>
+Return-Path: <prvs=630dc1010=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"joseph.qi@linux.alibaba.com" <joseph.qi@linux.alibaba.com>
 Subject: Re: [block regression] kernel oops triggered by removing scsi device
  dring IO
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
- "ming.lei@redhat.com" <ming.lei@redhat.com>,
- "axboe@kernel.dk" <axboe@kernel.dk>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Date: Mon, 9 Apr 2018 04:47:41 +0000
+Message-ID: <678220c26fa1677ab162006620b345ea4f38c86b.camel@wdc.com>
 References: <20180408042112.GB19128@ming.t460p>
- <678220c26fa1677ab162006620b345ea4f38c86b.camel@wdc.com>
-From: Joseph Qi <joseph.qi@linux.alibaba.com>
-Message-ID: <44abf88a-ded4-bbf5-8410-6692ee5ebabb@linux.alibaba.com>
-Date: Mon, 9 Apr 2018 14:54:10 +0800
+In-Reply-To: <20180408042112.GB19128@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <678220c26fa1677ab162006620b345ea4f38c86b.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Bart,
-
-On 18/4/9 12:47, Bart Van Assche wrote:
-> On Sun, 2018-04-08 at 12:21 +0800, Ming Lei wrote:
->> The following kernel oops is triggered by 'removing scsi device' during
->> heavy IO.
-> 
-> Is the below patch sufficient to fix this?
-> 
-> Thanks,
-> 
-> Bart.
-> 
-> 
-> Subject: blk-mq: Avoid that submitting a bio concurrently with device removal triggers a crash
-> 
-> Because blkcg_exit_queue() is now called from inside blk_cleanup_queue()
-> it is no longer safe to access cgroup information during or after the
-> blk_cleanup_queue() call. Hence check earlier in generic_make_request()
-> whether the queue has been marked as "dying".
-
-The oops happens during generic_make_request_checks(), in
-blk_throtl_bio() exactly.
-So if we want to bypass dying queue, we have to check this before
-generic_make_request_checks(), I think.
-
-Thanks,
-Joseph
-
-> ---
->  block/blk-core.c | 72 +++++++++++++++++++++++++++++---------------------------
->  1 file changed, 37 insertions(+), 35 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index aa8c99fae527..3ac9dd25e04e 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -2385,10 +2385,21 @@ blk_qc_t generic_make_request(struct bio *bio)
->  	 * yet.
->  	 */
->  	struct bio_list bio_list_on_stack[2];
-> +	blk_mq_req_flags_t flags = bio->bi_opf & REQ_NOWAIT ?
-> +		BLK_MQ_REQ_NOWAIT : 0;
-> +	struct request_queue *q = bio->bi_disk->queue;
->  	blk_qc_t ret = BLK_QC_T_NONE;
->  
->  	if (!generic_make_request_checks(bio))
-> -		goto out;
-> +		return ret;
-> +
-> +	if (blk_queue_enter(q, flags) < 0) {
-> +		if (unlikely(!blk_queue_dying(q) && (bio->bi_opf & REQ_NOWAIT)))
-> +			bio_wouldblock_error(bio);
-> +		else
-> +			bio_io_error(bio);
-> +		return ret;
-> +	}
->  
->  	/*
->  	 * We only want one ->make_request_fn to be active at a time, else
-> @@ -2423,46 +2434,37 @@ blk_qc_t generic_make_request(struct bio *bio)
->  	bio_list_init(&bio_list_on_stack[0]);
->  	current->bio_list = bio_list_on_stack;
->  	do {
-> -		struct request_queue *q = bio->bi_disk->queue;
-> -		blk_mq_req_flags_t flags = bio->bi_opf & REQ_NOWAIT ?
-> -			BLK_MQ_REQ_NOWAIT : 0;
-> -
-> -		if (likely(blk_queue_enter(q, flags) == 0)) {
-> -			struct bio_list lower, same;
-> -
-> -			/* Create a fresh bio_list for all subordinate requests */
-> -			bio_list_on_stack[1] = bio_list_on_stack[0];
-> -			bio_list_init(&bio_list_on_stack[0]);
-> -			ret = q->make_request_fn(q, bio);
-> -
-> -			blk_queue_exit(q);
-> -
-> -			/* sort new bios into those for a lower level
-> -			 * and those for the same level
-> -			 */
-> -			bio_list_init(&lower);
-> -			bio_list_init(&same);
-> -			while ((bio = bio_list_pop(&bio_list_on_stack[0])) != NULL)
-> -				if (q == bio->bi_disk->queue)
-> -					bio_list_add(&same, bio);
-> -				else
-> -					bio_list_add(&lower, bio);
-> -			/* now assemble so we handle the lowest level first */
-> -			bio_list_merge(&bio_list_on_stack[0], &lower);
-> -			bio_list_merge(&bio_list_on_stack[0], &same);
-> -			bio_list_merge(&bio_list_on_stack[0], &bio_list_on_stack[1]);
-> -		} else {
-> -			if (unlikely(!blk_queue_dying(q) &&
-> -					(bio->bi_opf & REQ_NOWAIT)))
-> -				bio_wouldblock_error(bio);
-> +		struct bio_list lower, same;
-> +
-> +		WARN_ON_ONCE(!(flags & BLK_MQ_REQ_NOWAIT) &&
-> +			     (bio->bi_opf & REQ_NOWAIT));
-> +		WARN_ON_ONCE(q != bio->bi_disk->queue);
-> +		q = bio->bi_disk->queue;
-> +		/* Create a fresh bio_list for all subordinate requests */
-> +		bio_list_on_stack[1] = bio_list_on_stack[0];
-> +		bio_list_init(&bio_list_on_stack[0]);
-> +		ret = q->make_request_fn(q, bio);
-> +
-> +		/* sort new bios into those for a lower level
-> +		 * and those for the same level
-> +		 */
-> +		bio_list_init(&lower);
-> +		bio_list_init(&same);
-> +		while ((bio = bio_list_pop(&bio_list_on_stack[0])) != NULL)
-> +			if (q == bio->bi_disk->queue)
-> +				bio_list_add(&same, bio);
->  			else
-> -				bio_io_error(bio);
-> -		}
-> +				bio_list_add(&lower, bio);
-> +		/* now assemble so we handle the lowest level first */
-> +		bio_list_merge(&bio_list_on_stack[0], &lower);
-> +		bio_list_merge(&bio_list_on_stack[0], &same);
-> +		bio_list_merge(&bio_list_on_stack[0], &bio_list_on_stack[1]);
->  		bio = bio_list_pop(&bio_list_on_stack[0]);
->  	} while (bio);
->  	current->bio_list = NULL; /* deactivate */
->  
->  out:
-> +	blk_queue_exit(q);
->  	return ret;
->  }
->  EXPORT_SYMBOL(generic_make_request);
-> 
+T24gU3VuLCAyMDE4LTA0LTA4IGF0IDEyOjIxICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gVGhl
+IGZvbGxvd2luZyBrZXJuZWwgb29wcyBpcyB0cmlnZ2VyZWQgYnkgJ3JlbW92aW5nIHNjc2kgZGV2
+aWNlJyBkdXJpbmcNCj4gaGVhdnkgSU8uDQoNCklzIHRoZSBiZWxvdyBwYXRjaCBzdWZmaWNpZW50
+IHRvIGZpeCB0aGlzPw0KDQpUaGFua3MsDQoNCkJhcnQuDQoNCg0KU3ViamVjdDogYmxrLW1xOiBB
+dm9pZCB0aGF0IHN1Ym1pdHRpbmcgYSBiaW8gY29uY3VycmVudGx5IHdpdGggZGV2aWNlIHJlbW92
+YWwgdHJpZ2dlcnMgYSBjcmFzaA0KDQpCZWNhdXNlIGJsa2NnX2V4aXRfcXVldWUoKSBpcyBub3cg
+Y2FsbGVkIGZyb20gaW5zaWRlIGJsa19jbGVhbnVwX3F1ZXVlKCkNCml0IGlzIG5vIGxvbmdlciBz
+YWZlIHRvIGFjY2VzcyBjZ3JvdXAgaW5mb3JtYXRpb24gZHVyaW5nIG9yIGFmdGVyIHRoZQ0KYmxr
+X2NsZWFudXBfcXVldWUoKSBjYWxsLiBIZW5jZSBjaGVjayBlYXJsaWVyIGluIGdlbmVyaWNfbWFr
+ZV9yZXF1ZXN0KCkNCndoZXRoZXIgdGhlIHF1ZXVlIGhhcyBiZWVuIG1hcmtlZCBhcyAiZHlpbmci
+Lg0KLS0tDQogYmxvY2svYmxrLWNvcmUuYyB8IDcyICsrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQogMSBmaWxlIGNoYW5nZWQsIDM3IGluc2Vy
+dGlvbnMoKyksIDM1IGRlbGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0IGEvYmxvY2svYmxrLWNvcmUu
+YyBiL2Jsb2NrL2Jsay1jb3JlLmMNCmluZGV4IGFhOGM5OWZhZTUyNy4uM2FjOWRkMjVlMDRlIDEw
+MDY0NA0KLS0tIGEvYmxvY2svYmxrLWNvcmUuYw0KKysrIGIvYmxvY2svYmxrLWNvcmUuYw0KQEAg
+LTIzODUsMTAgKzIzODUsMjEgQEAgYmxrX3FjX3QgZ2VuZXJpY19tYWtlX3JlcXVlc3Qoc3RydWN0
+IGJpbyAqYmlvKQ0KIAkgKiB5ZXQuDQogCSAqLw0KIAlzdHJ1Y3QgYmlvX2xpc3QgYmlvX2xpc3Rf
+b25fc3RhY2tbMl07DQorCWJsa19tcV9yZXFfZmxhZ3NfdCBmbGFncyA9IGJpby0+Ymlfb3BmICYg
+UkVRX05PV0FJVCA/DQorCQlCTEtfTVFfUkVRX05PV0FJVCA6IDA7DQorCXN0cnVjdCByZXF1ZXN0
+X3F1ZXVlICpxID0gYmlvLT5iaV9kaXNrLT5xdWV1ZTsNCiAJYmxrX3FjX3QgcmV0ID0gQkxLX1FD
+X1RfTk9ORTsNCiANCiAJaWYgKCFnZW5lcmljX21ha2VfcmVxdWVzdF9jaGVja3MoYmlvKSkNCi0J
+CWdvdG8gb3V0Ow0KKwkJcmV0dXJuIHJldDsNCisNCisJaWYgKGJsa19xdWV1ZV9lbnRlcihxLCBm
+bGFncykgPCAwKSB7DQorCQlpZiAodW5saWtlbHkoIWJsa19xdWV1ZV9keWluZyhxKSAmJiAoYmlv
+LT5iaV9vcGYgJiBSRVFfTk9XQUlUKSkpDQorCQkJYmlvX3dvdWxkYmxvY2tfZXJyb3IoYmlvKTsN
+CisJCWVsc2UNCisJCQliaW9faW9fZXJyb3IoYmlvKTsNCisJCXJldHVybiByZXQ7DQorCX0NCiAN
+CiAJLyoNCiAJICogV2Ugb25seSB3YW50IG9uZSAtPm1ha2VfcmVxdWVzdF9mbiB0byBiZSBhY3Rp
+dmUgYXQgYSB0aW1lLCBlbHNlDQpAQCAtMjQyMyw0NiArMjQzNCwzNyBAQCBibGtfcWNfdCBnZW5l
+cmljX21ha2VfcmVxdWVzdChzdHJ1Y3QgYmlvICpiaW8pDQogCWJpb19saXN0X2luaXQoJmJpb19s
+aXN0X29uX3N0YWNrWzBdKTsNCiAJY3VycmVudC0+YmlvX2xpc3QgPSBiaW9fbGlzdF9vbl9zdGFj
+azsNCiAJZG8gew0KLQkJc3RydWN0IHJlcXVlc3RfcXVldWUgKnEgPSBiaW8tPmJpX2Rpc2stPnF1
+ZXVlOw0KLQkJYmxrX21xX3JlcV9mbGFnc190IGZsYWdzID0gYmlvLT5iaV9vcGYgJiBSRVFfTk9X
+QUlUID8NCi0JCQlCTEtfTVFfUkVRX05PV0FJVCA6IDA7DQotDQotCQlpZiAobGlrZWx5KGJsa19x
+dWV1ZV9lbnRlcihxLCBmbGFncykgPT0gMCkpIHsNCi0JCQlzdHJ1Y3QgYmlvX2xpc3QgbG93ZXIs
+IHNhbWU7DQotDQotCQkJLyogQ3JlYXRlIGEgZnJlc2ggYmlvX2xpc3QgZm9yIGFsbCBzdWJvcmRp
+bmF0ZSByZXF1ZXN0cyAqLw0KLQkJCWJpb19saXN0X29uX3N0YWNrWzFdID0gYmlvX2xpc3Rfb25f
+c3RhY2tbMF07DQotCQkJYmlvX2xpc3RfaW5pdCgmYmlvX2xpc3Rfb25fc3RhY2tbMF0pOw0KLQkJ
+CXJldCA9IHEtPm1ha2VfcmVxdWVzdF9mbihxLCBiaW8pOw0KLQ0KLQkJCWJsa19xdWV1ZV9leGl0
+KHEpOw0KLQ0KLQkJCS8qIHNvcnQgbmV3IGJpb3MgaW50byB0aG9zZSBmb3IgYSBsb3dlciBsZXZl
+bA0KLQkJCSAqIGFuZCB0aG9zZSBmb3IgdGhlIHNhbWUgbGV2ZWwNCi0JCQkgKi8NCi0JCQliaW9f
+bGlzdF9pbml0KCZsb3dlcik7DQotCQkJYmlvX2xpc3RfaW5pdCgmc2FtZSk7DQotCQkJd2hpbGUg
+KChiaW8gPSBiaW9fbGlzdF9wb3AoJmJpb19saXN0X29uX3N0YWNrWzBdKSkgIT0gTlVMTCkNCi0J
+CQkJaWYgKHEgPT0gYmlvLT5iaV9kaXNrLT5xdWV1ZSkNCi0JCQkJCWJpb19saXN0X2FkZCgmc2Ft
+ZSwgYmlvKTsNCi0JCQkJZWxzZQ0KLQkJCQkJYmlvX2xpc3RfYWRkKCZsb3dlciwgYmlvKTsNCi0J
+CQkvKiBub3cgYXNzZW1ibGUgc28gd2UgaGFuZGxlIHRoZSBsb3dlc3QgbGV2ZWwgZmlyc3QgKi8N
+Ci0JCQliaW9fbGlzdF9tZXJnZSgmYmlvX2xpc3Rfb25fc3RhY2tbMF0sICZsb3dlcik7DQotCQkJ
+YmlvX2xpc3RfbWVyZ2UoJmJpb19saXN0X29uX3N0YWNrWzBdLCAmc2FtZSk7DQotCQkJYmlvX2xp
+c3RfbWVyZ2UoJmJpb19saXN0X29uX3N0YWNrWzBdLCAmYmlvX2xpc3Rfb25fc3RhY2tbMV0pOw0K
+LQkJfSBlbHNlIHsNCi0JCQlpZiAodW5saWtlbHkoIWJsa19xdWV1ZV9keWluZyhxKSAmJg0KLQkJ
+CQkJKGJpby0+Ymlfb3BmICYgUkVRX05PV0FJVCkpKQ0KLQkJCQliaW9fd291bGRibG9ja19lcnJv
+cihiaW8pOw0KKwkJc3RydWN0IGJpb19saXN0IGxvd2VyLCBzYW1lOw0KKw0KKwkJV0FSTl9PTl9P
+TkNFKCEoZmxhZ3MgJiBCTEtfTVFfUkVRX05PV0FJVCkgJiYNCisJCQkgICAgIChiaW8tPmJpX29w
+ZiAmIFJFUV9OT1dBSVQpKTsNCisJCVdBUk5fT05fT05DRShxICE9IGJpby0+YmlfZGlzay0+cXVl
+dWUpOw0KKwkJcSA9IGJpby0+YmlfZGlzay0+cXVldWU7DQorCQkvKiBDcmVhdGUgYSBmcmVzaCBi
+aW9fbGlzdCBmb3IgYWxsIHN1Ym9yZGluYXRlIHJlcXVlc3RzICovDQorCQliaW9fbGlzdF9vbl9z
+dGFja1sxXSA9IGJpb19saXN0X29uX3N0YWNrWzBdOw0KKwkJYmlvX2xpc3RfaW5pdCgmYmlvX2xp
+c3Rfb25fc3RhY2tbMF0pOw0KKwkJcmV0ID0gcS0+bWFrZV9yZXF1ZXN0X2ZuKHEsIGJpbyk7DQor
+DQorCQkvKiBzb3J0IG5ldyBiaW9zIGludG8gdGhvc2UgZm9yIGEgbG93ZXIgbGV2ZWwNCisJCSAq
+IGFuZCB0aG9zZSBmb3IgdGhlIHNhbWUgbGV2ZWwNCisJCSAqLw0KKwkJYmlvX2xpc3RfaW5pdCgm
+bG93ZXIpOw0KKwkJYmlvX2xpc3RfaW5pdCgmc2FtZSk7DQorCQl3aGlsZSAoKGJpbyA9IGJpb19s
+aXN0X3BvcCgmYmlvX2xpc3Rfb25fc3RhY2tbMF0pKSAhPSBOVUxMKQ0KKwkJCWlmIChxID09IGJp
+by0+YmlfZGlzay0+cXVldWUpDQorCQkJCWJpb19saXN0X2FkZCgmc2FtZSwgYmlvKTsNCiAJCQll
+bHNlDQotCQkJCWJpb19pb19lcnJvcihiaW8pOw0KLQkJfQ0KKwkJCQliaW9fbGlzdF9hZGQoJmxv
+d2VyLCBiaW8pOw0KKwkJLyogbm93IGFzc2VtYmxlIHNvIHdlIGhhbmRsZSB0aGUgbG93ZXN0IGxl
+dmVsIGZpcnN0ICovDQorCQliaW9fbGlzdF9tZXJnZSgmYmlvX2xpc3Rfb25fc3RhY2tbMF0sICZs
+b3dlcik7DQorCQliaW9fbGlzdF9tZXJnZSgmYmlvX2xpc3Rfb25fc3RhY2tbMF0sICZzYW1lKTsN
+CisJCWJpb19saXN0X21lcmdlKCZiaW9fbGlzdF9vbl9zdGFja1swXSwgJmJpb19saXN0X29uX3N0
+YWNrWzFdKTsNCiAJCWJpbyA9IGJpb19saXN0X3BvcCgmYmlvX2xpc3Rfb25fc3RhY2tbMF0pOw0K
+IAl9IHdoaWxlIChiaW8pOw0KIAljdXJyZW50LT5iaW9fbGlzdCA9IE5VTEw7IC8qIGRlYWN0aXZh
+dGUgKi8NCiANCiBvdXQ6DQorCWJsa19xdWV1ZV9leGl0KHEpOw0KIAlyZXR1cm4gcmV0Ow0KIH0N
+CiBFWFBPUlRfU1lNQk9MKGdlbmVyaWNfbWFrZV9yZXF1ZXN0KTsNCi0tIA0KMi4xNi4yDQo=
