@@ -1,127 +1,21 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Dave Chinner <david@fromorbit.com>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        hch@lst.de, rdorr@microsoft.com
-Subject: [PATCH 1/4] xfs: move generic_write_sync calls inwards
-Date: Wed, 18 Apr 2018 14:08:25 +1000
-Message-Id: <20180418040828.18165-2-david@fromorbit.com>
-In-Reply-To: <20180418040828.18165-1-david@fromorbit.com>
-References: <20180418040828.18165-1-david@fromorbit.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: [PATCH 2/8] blk-mq: don't keep offline CPUs mapped to hctx 0
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
+ Stefan Haberland <sth@linux.vnet.ibm.com>, Christoph Hellwig <hch@lst.de>,
+ Keith Busch <keith.busch@intel.com>, stable@vger.kernel.org
+References: <20180408094814.28953-1-ming.lei@redhat.com>
+ <20180408094814.28953-3-ming.lei@redhat.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <2c052f73-de78-18e3-aec2-a6785742e4b4@grimberg.me>
+Date: Mon, 9 Apr 2018 14:02:31 +0300
+MIME-Version: 1.0
+In-Reply-To: <20180408094814.28953-3-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-From: Dave Chinner <dchinner@redhat.com>
+Looks good,
 
-To prepare for iomap iinfrastructure based DSYNC optimisations.
-
-While moving the code araound, move the XFS write bytes metric
-update for direct IO into xfs_dio_write_end_io callback so that we
-always capture the amount of data written via AIO+DIO. This fixes
-the problem where queued AIO+DIO writes are not accounted to this
-metric.
-
-Signed-Off-By: Dave Chinner <dchinner@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/xfs_file.c | 48 +++++++++++++++++++++++++++++++++---------------
- 1 file changed, 33 insertions(+), 15 deletions(-)
-
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index a5b6973bf15a..6f15027661b6 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -416,6 +416,12 @@ xfs_dio_write_end_io(
- 	if (size <= 0)
- 		return size;
- 
-+	/*
-+	 * Capture amount written on completion as we can't reliably account
-+	 * for it on submission.
-+	 */
-+	XFS_STATS_ADD(ip->i_mount, xs_write_bytes, size);
-+
- 	if (flags & IOMAP_DIO_COW) {
- 		error = xfs_reflink_end_cow(ip, offset, size);
- 		if (error)
-@@ -564,6 +570,11 @@ xfs_file_dio_aio_write(
- 	 * complete fully or fail.
- 	 */
- 	ASSERT(ret < 0 || ret == count);
-+
-+	if (ret > 0) {
-+		/* Handle various SYNC-type writes */
-+		ret = generic_write_sync(iocb, ret);
-+	}
- 	return ret;
- }
- 
-@@ -601,7 +612,16 @@ xfs_file_dax_write(
- 	}
- out:
- 	xfs_iunlock(ip, iolock);
--	return error ? error : ret;
-+	if (error)
-+		return error;
-+
-+	if (ret > 0) {
-+		XFS_STATS_ADD(ip->i_mount, xs_write_bytes, ret);
-+
-+		/* Handle various SYNC-type writes */
-+		ret = generic_write_sync(iocb, ret);
-+	}
-+	return ret;
- }
- 
- STATIC ssize_t
-@@ -671,6 +691,12 @@ xfs_file_buffered_aio_write(
- out:
- 	if (iolock)
- 		xfs_iunlock(ip, iolock);
-+
-+	if (ret > 0) {
-+		XFS_STATS_ADD(ip->i_mount, xs_write_bytes, ret);
-+		/* Handle various SYNC-type writes */
-+		ret = generic_write_sync(iocb, ret);
-+	}
- 	return ret;
- }
- 
-@@ -695,8 +721,9 @@ xfs_file_write_iter(
- 		return -EIO;
- 
- 	if (IS_DAX(inode))
--		ret = xfs_file_dax_write(iocb, from);
--	else if (iocb->ki_flags & IOCB_DIRECT) {
-+		return xfs_file_dax_write(iocb, from);
-+
-+	if (iocb->ki_flags & IOCB_DIRECT) {
- 		/*
- 		 * Allow a directio write to fall back to a buffered
- 		 * write *only* in the case that we're doing a reflink
-@@ -704,20 +731,11 @@ xfs_file_write_iter(
- 		 * allow an operation to fall back to buffered mode.
- 		 */
- 		ret = xfs_file_dio_aio_write(iocb, from);
--		if (ret == -EREMCHG)
--			goto buffered;
--	} else {
--buffered:
--		ret = xfs_file_buffered_aio_write(iocb, from);
-+		if (ret != -EREMCHG)
-+			return ret;
- 	}
- 
--	if (ret > 0) {
--		XFS_STATS_ADD(ip->i_mount, xs_write_bytes, ret);
--
--		/* Handle various SYNC-type writes */
--		ret = generic_write_sync(iocb, ret);
--	}
--	return ret;
-+	return xfs_file_buffered_aio_write(iocb, from);
- }
- 
- #define	XFS_FALLOC_FL_SUPPORTED						\
--- 
-2.16.1
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
