@@ -1,46 +1,150 @@
-Return-Path: <prvs=630dc1010=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "axboe@kernel.dk" <axboe@kernel.dk>, "joseph.qi@linux.alibaba.com"
-	<joseph.qi@linux.alibaba.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Return-Path: <joseph.qi@linux.alibaba.com>
 Subject: Re: [block regression] kernel oops triggered by removing scsi device
  dring IO
-Date: Mon, 9 Apr 2018 22:54:57 +0000
-Message-ID: <f7dd2dceb3767a0f1fad571b57f5f8e09afb3c3e.camel@wdc.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>,
+ "ming.lei@redhat.com" <ming.lei@redhat.com>,
+ "axboe@kernel.dk" <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 References: <20180408042112.GB19128@ming.t460p>
-	 <678220c26fa1677ab162006620b345ea4f38c86b.camel@wdc.com>
-	 <44abf88a-ded4-bbf5-8410-6692ee5ebabb@linux.alibaba.com>
-In-Reply-To: <44abf88a-ded4-bbf5-8410-6692ee5ebabb@linux.alibaba.com>
-Content-Type: text/plain; charset="utf-8"
+ <678220c26fa1677ab162006620b345ea4f38c86b.camel@wdc.com>
+From: Joseph Qi <joseph.qi@linux.alibaba.com>
+Message-ID: <44abf88a-ded4-bbf5-8410-6692ee5ebabb@linux.alibaba.com>
+Date: Mon, 9 Apr 2018 14:54:10 +0800
 MIME-Version: 1.0
+In-Reply-To: <678220c26fa1677ab162006620b345ea4f38c86b.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE4LTA0LTA5IGF0IDE0OjU0ICswODAwLCBKb3NlcGggUWkgd3JvdGU6DQo+IFRo
-ZSBvb3BzIGhhcHBlbnMgZHVyaW5nIGdlbmVyaWNfbWFrZV9yZXF1ZXN0X2NoZWNrcygpLCBpbg0K
-PiBibGtfdGhyb3RsX2JpbygpIGV4YWN0bHkuDQo+IFNvIGlmIHdlIHdhbnQgdG8gYnlwYXNzIGR5
-aW5nIHF1ZXVlLCB3ZSBoYXZlIHRvIGNoZWNrIHRoaXMgYmVmb3JlDQo+IGdlbmVyaWNfbWFrZV9y
-ZXF1ZXN0X2NoZWNrcygpLCBJIHRoaW5rLg0KDQpIb3cgYWJvdXQgc29tZXRoaW5nIGxpa2UgdGhl
-IHBhdGNoIGJlbG93Pw0KDQpUaGFua3MsDQoNCkJhcnQuDQoNClN1YmplY3Q6IFtQQVRDSF0gYmxr
-LW1xOiBBdm9pZCB0aGF0IHN1Ym1pdHRpbmcgYSBiaW8gY29uY3VycmVudGx5IHdpdGggZGV2aWNl
-DQogcmVtb3ZhbCB0cmlnZ2VycyBhIGNyYXNoDQoNCkJlY2F1c2UgYmxrY2dfZXhpdF9xdWV1ZSgp
-IGlzIG5vdyBjYWxsZWQgZnJvbSBpbnNpZGUgYmxrX2NsZWFudXBfcXVldWUoKQ0KaXQgaXMgbm8g
-bG9uZ2VyIHNhZmUgdG8gYWNjZXNzIGNncm91cCBpbmZvcm1hdGlvbiBkdXJpbmcgb3IgYWZ0ZXIg
-dGhlDQpibGtfY2xlYW51cF9xdWV1ZSgpIGNhbGwuIEhlbmNlIHByb3RlY3QgdGhlIGdlbmVyaWNf
-bWFrZV9yZXF1ZXN0X2NoZWNrcygpDQpjYWxsIHdpdGggYSBibGtfcXVldWVfZW50ZXIoKSAvIGJs
-a19xdWV1ZV9leGl0KCkgcGFpci4NCg0KLS0tDQogYmxvY2svYmxrLWNvcmUuYyB8IDE3ICsrKysr
-KysrKysrKysrKystDQogMSBmaWxlIGNoYW5nZWQsIDE2IGluc2VydGlvbnMoKyksIDEgZGVsZXRp
-b24oLSkNCg0KZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1jb3JlLmMgYi9ibG9jay9ibGstY29yZS5j
-DQppbmRleCBkNjk4ODhmZjUyZjAuLjBjNDhiZWY4NDkwZiAxMDA2NDQNCi0tLSBhL2Jsb2NrL2Js
-ay1jb3JlLmMNCisrKyBiL2Jsb2NrL2Jsay1jb3JlLmMNCkBAIC0yMzg4LDkgKzIzODgsMjQgQEAg
-YmxrX3FjX3QgZ2VuZXJpY19tYWtlX3JlcXVlc3Qoc3RydWN0IGJpbyAqYmlvKQ0KIAkgKiB5ZXQu
-DQogCSAqLw0KIAlzdHJ1Y3QgYmlvX2xpc3QgYmlvX2xpc3Rfb25fc3RhY2tbMl07DQorCWJsa19t
-cV9yZXFfZmxhZ3NfdCBmbGFncyA9IGJpby0+Ymlfb3BmICYgUkVRX05PV0FJVCA/DQorCQlCTEtf
-TVFfUkVRX05PV0FJVCA6IDA7DQorCXN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxID0gYmlvLT5iaV9k
-aXNrLT5xdWV1ZTsNCisJYm9vbCBjaGVja19yZXN1bHQ7DQogCWJsa19xY190IHJldCA9IEJMS19R
-Q19UX05PTkU7DQogDQotCWlmICghZ2VuZXJpY19tYWtlX3JlcXVlc3RfY2hlY2tzKGJpbykpDQor
-CWlmIChibGtfcXVldWVfZW50ZXIocSwgZmxhZ3MpIDwgMCkgew0KKwkJaWYgKCFibGtfcXVldWVf
-ZHlpbmcocSkgJiYgKGJpby0+Ymlfb3BmICYgUkVRX05PV0FJVCkpDQorCQkJYmlvX3dvdWxkYmxv
-Y2tfZXJyb3IoYmlvKTsNCisJCWVsc2UNCisJCQliaW9faW9fZXJyb3IoYmlvKTsNCisJCXJldHVy
-biByZXQ7DQorCX0NCisNCisJY2hlY2tfcmVzdWx0ID0gZ2VuZXJpY19tYWtlX3JlcXVlc3RfY2hl
-Y2tzKGJpbyk7DQorCWJsa19xdWV1ZV9leGl0KHEpOw0KKw0KKwlpZiAoIWNoZWNrX3Jlc3VsdCkN
-CiAJCWdvdG8gb3V0Ow0KIA0KIAkvKg0KLS0gDQoyLjE2LjINCg==
+Hi Bart,
+
+On 18/4/9 12:47, Bart Van Assche wrote:
+> On Sun, 2018-04-08 at 12:21 +0800, Ming Lei wrote:
+>> The following kernel oops is triggered by 'removing scsi device' during
+>> heavy IO.
+> 
+> Is the below patch sufficient to fix this?
+> 
+> Thanks,
+> 
+> Bart.
+> 
+> 
+> Subject: blk-mq: Avoid that submitting a bio concurrently with device removal triggers a crash
+> 
+> Because blkcg_exit_queue() is now called from inside blk_cleanup_queue()
+> it is no longer safe to access cgroup information during or after the
+> blk_cleanup_queue() call. Hence check earlier in generic_make_request()
+> whether the queue has been marked as "dying".
+
+The oops happens during generic_make_request_checks(), in
+blk_throtl_bio() exactly.
+So if we want to bypass dying queue, we have to check this before
+generic_make_request_checks(), I think.
+
+Thanks,
+Joseph
+
+> ---
+>  block/blk-core.c | 72 +++++++++++++++++++++++++++++---------------------------
+>  1 file changed, 37 insertions(+), 35 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index aa8c99fae527..3ac9dd25e04e 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -2385,10 +2385,21 @@ blk_qc_t generic_make_request(struct bio *bio)
+>  	 * yet.
+>  	 */
+>  	struct bio_list bio_list_on_stack[2];
+> +	blk_mq_req_flags_t flags = bio->bi_opf & REQ_NOWAIT ?
+> +		BLK_MQ_REQ_NOWAIT : 0;
+> +	struct request_queue *q = bio->bi_disk->queue;
+>  	blk_qc_t ret = BLK_QC_T_NONE;
+>  
+>  	if (!generic_make_request_checks(bio))
+> -		goto out;
+> +		return ret;
+> +
+> +	if (blk_queue_enter(q, flags) < 0) {
+> +		if (unlikely(!blk_queue_dying(q) && (bio->bi_opf & REQ_NOWAIT)))
+> +			bio_wouldblock_error(bio);
+> +		else
+> +			bio_io_error(bio);
+> +		return ret;
+> +	}
+>  
+>  	/*
+>  	 * We only want one ->make_request_fn to be active at a time, else
+> @@ -2423,46 +2434,37 @@ blk_qc_t generic_make_request(struct bio *bio)
+>  	bio_list_init(&bio_list_on_stack[0]);
+>  	current->bio_list = bio_list_on_stack;
+>  	do {
+> -		struct request_queue *q = bio->bi_disk->queue;
+> -		blk_mq_req_flags_t flags = bio->bi_opf & REQ_NOWAIT ?
+> -			BLK_MQ_REQ_NOWAIT : 0;
+> -
+> -		if (likely(blk_queue_enter(q, flags) == 0)) {
+> -			struct bio_list lower, same;
+> -
+> -			/* Create a fresh bio_list for all subordinate requests */
+> -			bio_list_on_stack[1] = bio_list_on_stack[0];
+> -			bio_list_init(&bio_list_on_stack[0]);
+> -			ret = q->make_request_fn(q, bio);
+> -
+> -			blk_queue_exit(q);
+> -
+> -			/* sort new bios into those for a lower level
+> -			 * and those for the same level
+> -			 */
+> -			bio_list_init(&lower);
+> -			bio_list_init(&same);
+> -			while ((bio = bio_list_pop(&bio_list_on_stack[0])) != NULL)
+> -				if (q == bio->bi_disk->queue)
+> -					bio_list_add(&same, bio);
+> -				else
+> -					bio_list_add(&lower, bio);
+> -			/* now assemble so we handle the lowest level first */
+> -			bio_list_merge(&bio_list_on_stack[0], &lower);
+> -			bio_list_merge(&bio_list_on_stack[0], &same);
+> -			bio_list_merge(&bio_list_on_stack[0], &bio_list_on_stack[1]);
+> -		} else {
+> -			if (unlikely(!blk_queue_dying(q) &&
+> -					(bio->bi_opf & REQ_NOWAIT)))
+> -				bio_wouldblock_error(bio);
+> +		struct bio_list lower, same;
+> +
+> +		WARN_ON_ONCE(!(flags & BLK_MQ_REQ_NOWAIT) &&
+> +			     (bio->bi_opf & REQ_NOWAIT));
+> +		WARN_ON_ONCE(q != bio->bi_disk->queue);
+> +		q = bio->bi_disk->queue;
+> +		/* Create a fresh bio_list for all subordinate requests */
+> +		bio_list_on_stack[1] = bio_list_on_stack[0];
+> +		bio_list_init(&bio_list_on_stack[0]);
+> +		ret = q->make_request_fn(q, bio);
+> +
+> +		/* sort new bios into those for a lower level
+> +		 * and those for the same level
+> +		 */
+> +		bio_list_init(&lower);
+> +		bio_list_init(&same);
+> +		while ((bio = bio_list_pop(&bio_list_on_stack[0])) != NULL)
+> +			if (q == bio->bi_disk->queue)
+> +				bio_list_add(&same, bio);
+>  			else
+> -				bio_io_error(bio);
+> -		}
+> +				bio_list_add(&lower, bio);
+> +		/* now assemble so we handle the lowest level first */
+> +		bio_list_merge(&bio_list_on_stack[0], &lower);
+> +		bio_list_merge(&bio_list_on_stack[0], &same);
+> +		bio_list_merge(&bio_list_on_stack[0], &bio_list_on_stack[1]);
+>  		bio = bio_list_pop(&bio_list_on_stack[0]);
+>  	} while (bio);
+>  	current->bio_list = NULL; /* deactivate */
+>  
+>  out:
+> +	blk_queue_exit(q);
+>  	return ret;
+>  }
+>  EXPORT_SYMBOL(generic_make_request);
+> 
