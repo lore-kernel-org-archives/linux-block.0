@@ -1,20 +1,21 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
+Return-Path: <hch@lst.de>
+Date: Mon, 9 Apr 2018 12:08:02 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	Stefan Haberland <sth@linux.vnet.ibm.com>
 Subject: Re: [PATCH 7/8] blk-mq: reimplement blk_mq_hw_queue_mapped
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
- Stefan Haberland <sth@linux.vnet.ibm.com>, Christoph Hellwig <hch@lst.de>
-References: <20180408094814.28953-1-ming.lei@redhat.com>
- <20180408094814.28953-8-ming.lei@redhat.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <bfed2550-3eac-9dbb-f2c2-c84c7fb7693f@grimberg.me>
-Date: Mon, 9 Apr 2018 14:03:32 +0300
+Message-ID: <20180409100802.GG11144@lst.de>
+References: <20180408094814.28953-1-ming.lei@redhat.com> <20180408094814.28953-8-ming.lei@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180408094814.28953-8-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
+On Sun, Apr 08, 2018 at 05:48:13PM +0800, Ming Lei wrote:
+> Now the actual meaning of queue mapped is that if there is any online
+> CPU mapped to this hctx, so implement blk_mq_hw_queue_mapped() in this
+> way.
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
