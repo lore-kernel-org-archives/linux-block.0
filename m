@@ -1,44 +1,50 @@
-Return-Path: <israelr@mellanox.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH] blk-mq: Fix recently introduced races in the timeout
  handling code
-To: Sagi Grimberg <sagi@grimberg.me>, Bart Van Assche
- <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Tejun Heo <tj@kernel.org>, Max Gurtovoy <maxg@mellanox.com>,
- stable@vger.kernel.org
+To: Bart Van Assche <Bart.VanAssche@wdc.com>, "hch@lst.de" <hch@lst.de>
+Cc: "tj@kernel.org" <tj@kernel.org>,
+ "israelr@mellanox.com" <israelr@mellanox.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "maxg@mellanox.com" <maxg@mellanox.com>,
+ "stable@vger.kernel.org" <stable@vger.kernel.org>,
+ "sagi@grimberg.me" <sagi@grimberg.me>
 References: <20180409052038.5391-1-bart.vanassche@wdc.com>
- <3f0d4950-4ef1-a24f-0ad1-b274aa885f73@grimberg.me>
-From: Israel Rukshin <israelr@mellanox.com>
-Message-ID: <0cb767fc-bd10-2e34-7b51-4b6b762349d4@mellanox.com>
-Date: Mon, 9 Apr 2018 18:42:24 +0300
+ <20180409093744.GC10405@lst.de>
+ <a7972bb84efa3313b87ecbaf37112b360346bdfe.camel@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <548aa0f5-2e7d-e659-4b25-a7dc69352025@kernel.dk>
+Date: Mon, 9 Apr 2018 09:03:05 -0600
 MIME-Version: 1.0
-In-Reply-To: <3f0d4950-4ef1-a24f-0ad1-b274aa885f73@grimberg.me>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Return-Path: israelr@mellanox.com
+In-Reply-To: <a7972bb84efa3313b87ecbaf37112b360346bdfe.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 4/9/2018 11:37 AM, Sagi Grimberg wrote:
->
->> If a completion occurs after blk_mq_rq_timed_out() has reset
->> rq->aborted_gstate and the request is again in flight when the timeout
->> expires then a request will be completed twice: a first time by the
->> timeout handler and a second time when the regular completion occurs.
->>
->> Additionally, the blk-mq timeout handling code ignores completions that
->> occur after blk_mq_check_expired() has been called and before
->> blk_mq_rq_timed_out() has reset rq->aborted_gstate. If a block driver
->> timeout handler always returns BLK_EH_RESET_TIMER then the result will
->> be that the request never terminates.
->
-> OK, now I understand how we can complete twice. Israel, can you verify
-> this patch solves your double completion problem?
+On 4/9/18 8:58 AM, Bart Van Assche wrote:
+> On Mon, 2018-04-09 at 11:37 +0200, Christoph Hellwig wrote:
+>> This looks sensible, but I'm worried about taking a whole spinlock
+>> for every request completion, including irq disabling.  However it seems
+>> like your new updated pattern would fit use of cmpxchg() very nicely.
+> 
+> Hello Christoph,
+> 
+> Thanks for the review. I had a look at the spin lock implementation on
+> x86 and apparently on x86 spin locks are implemented as qspinlocks
+> (include/asm-generic/qspinlock.h). queued_spin_lock() already uses
+> atomic_cmpxchg_acquire(). Are you sure that replacing the spin lock
+> by cmpxchg() will yield a performance improvement?
 
-I just verified that this commit fix the double completion problem.
-We still need my patches to fix the original bug report.
+It's definitely worth a shot, especially since this looks like a clear
+cut case for cmpxchg(). Additionally, it also kills the local irq
+disable.
 
->
-> Given that it is, the change log of your patches should be modified to
-> the original bug report it solves.
->
-> Thread starts here:
-> http://lists.infradead.org/pipermail/linux-nvme/2018-February/015848.html
+Conversion should be trivial and we can do some perf testing around
+that.
+
+Neither solution really makes me happy though, the prospect of
+either kind of synchronization cost isn't appealing at all. I'll
+have to ponder this a lot more, but it would be ideal if we could
+shift that cost to the extremely unlikely case of a timeout
+triggering rather than add the cost upfront to EVERY request.
+
+-- 
+Jens Axboe
