@@ -1,77 +1,46 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <prvs=630dc1010=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>, "joseph.qi@linux.alibaba.com"
+	<joseph.qi@linux.alibaba.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: [block regression] kernel oops triggered by removing scsi device
  dring IO
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
- "joseph.qi@linux.alibaba.com" <joseph.qi@linux.alibaba.com>,
- "ming.lei@redhat.com" <ming.lei@redhat.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Date: Mon, 9 Apr 2018 22:54:57 +0000
+Message-ID: <f7dd2dceb3767a0f1fad571b57f5f8e09afb3c3e.camel@wdc.com>
 References: <20180408042112.GB19128@ming.t460p>
- <678220c26fa1677ab162006620b345ea4f38c86b.camel@wdc.com>
- <44abf88a-ded4-bbf5-8410-6692ee5ebabb@linux.alibaba.com>
- <f7dd2dceb3767a0f1fad571b57f5f8e09afb3c3e.camel@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <d31f4b4f-5f8f-a247-7c4b-a88d9895681d@kernel.dk>
-Date: Mon, 9 Apr 2018 16:58:18 -0600
+	 <678220c26fa1677ab162006620b345ea4f38c86b.camel@wdc.com>
+	 <44abf88a-ded4-bbf5-8410-6692ee5ebabb@linux.alibaba.com>
+In-Reply-To: <44abf88a-ded4-bbf5-8410-6692ee5ebabb@linux.alibaba.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <f7dd2dceb3767a0f1fad571b57f5f8e09afb3c3e.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 4/9/18 4:54 PM, Bart Van Assche wrote:
-> On Mon, 2018-04-09 at 14:54 +0800, Joseph Qi wrote:
->> The oops happens during generic_make_request_checks(), in
->> blk_throtl_bio() exactly.
->> So if we want to bypass dying queue, we have to check this before
->> generic_make_request_checks(), I think.
-> 
-> How about something like the patch below?
-> 
-> Thanks,
-> 
-> Bart.
-> 
-> Subject: [PATCH] blk-mq: Avoid that submitting a bio concurrently with device
->  removal triggers a crash
-> 
-> Because blkcg_exit_queue() is now called from inside blk_cleanup_queue()
-> it is no longer safe to access cgroup information during or after the
-> blk_cleanup_queue() call. Hence protect the generic_make_request_checks()
-> call with a blk_queue_enter() / blk_queue_exit() pair.
-> 
-> ---
->  block/blk-core.c | 17 ++++++++++++++++-
->  1 file changed, 16 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index d69888ff52f0..0c48bef8490f 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -2388,9 +2388,24 @@ blk_qc_t generic_make_request(struct bio *bio)
->  	 * yet.
->  	 */
->  	struct bio_list bio_list_on_stack[2];
-> +	blk_mq_req_flags_t flags = bio->bi_opf & REQ_NOWAIT ?
-> +		BLK_MQ_REQ_NOWAIT : 0;
-> +	struct request_queue *q = bio->bi_disk->queue;
-> +	bool check_result;
->  	blk_qc_t ret = BLK_QC_T_NONE;
->  
-> -	if (!generic_make_request_checks(bio))
-> +	if (blk_queue_enter(q, flags) < 0) {
-> +		if (!blk_queue_dying(q) && (bio->bi_opf & REQ_NOWAIT))
-> +			bio_wouldblock_error(bio);
-> +		else
-> +			bio_io_error(bio);
-> +		return ret;
-> +	}
-> +
-> +	check_result = generic_make_request_checks(bio);
-> +	blk_queue_exit(q);
-
-This ends up being nutty in the generic_make_request() case, where we
-do the exact same enter/exit logic right after. That needs to get unified.
-Maybe move the queue enter into generic_make_request_checks(), and exit
-in the caller?
-
--- 
-Jens Axboe
+T24gTW9uLCAyMDE4LTA0LTA5IGF0IDE0OjU0ICswODAwLCBKb3NlcGggUWkgd3JvdGU6DQo+IFRo
+ZSBvb3BzIGhhcHBlbnMgZHVyaW5nIGdlbmVyaWNfbWFrZV9yZXF1ZXN0X2NoZWNrcygpLCBpbg0K
+PiBibGtfdGhyb3RsX2JpbygpIGV4YWN0bHkuDQo+IFNvIGlmIHdlIHdhbnQgdG8gYnlwYXNzIGR5
+aW5nIHF1ZXVlLCB3ZSBoYXZlIHRvIGNoZWNrIHRoaXMgYmVmb3JlDQo+IGdlbmVyaWNfbWFrZV9y
+ZXF1ZXN0X2NoZWNrcygpLCBJIHRoaW5rLg0KDQpIb3cgYWJvdXQgc29tZXRoaW5nIGxpa2UgdGhl
+IHBhdGNoIGJlbG93Pw0KDQpUaGFua3MsDQoNCkJhcnQuDQoNClN1YmplY3Q6IFtQQVRDSF0gYmxr
+LW1xOiBBdm9pZCB0aGF0IHN1Ym1pdHRpbmcgYSBiaW8gY29uY3VycmVudGx5IHdpdGggZGV2aWNl
+DQogcmVtb3ZhbCB0cmlnZ2VycyBhIGNyYXNoDQoNCkJlY2F1c2UgYmxrY2dfZXhpdF9xdWV1ZSgp
+IGlzIG5vdyBjYWxsZWQgZnJvbSBpbnNpZGUgYmxrX2NsZWFudXBfcXVldWUoKQ0KaXQgaXMgbm8g
+bG9uZ2VyIHNhZmUgdG8gYWNjZXNzIGNncm91cCBpbmZvcm1hdGlvbiBkdXJpbmcgb3IgYWZ0ZXIg
+dGhlDQpibGtfY2xlYW51cF9xdWV1ZSgpIGNhbGwuIEhlbmNlIHByb3RlY3QgdGhlIGdlbmVyaWNf
+bWFrZV9yZXF1ZXN0X2NoZWNrcygpDQpjYWxsIHdpdGggYSBibGtfcXVldWVfZW50ZXIoKSAvIGJs
+a19xdWV1ZV9leGl0KCkgcGFpci4NCg0KLS0tDQogYmxvY2svYmxrLWNvcmUuYyB8IDE3ICsrKysr
+KysrKysrKysrKystDQogMSBmaWxlIGNoYW5nZWQsIDE2IGluc2VydGlvbnMoKyksIDEgZGVsZXRp
+b24oLSkNCg0KZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1jb3JlLmMgYi9ibG9jay9ibGstY29yZS5j
+DQppbmRleCBkNjk4ODhmZjUyZjAuLjBjNDhiZWY4NDkwZiAxMDA2NDQNCi0tLSBhL2Jsb2NrL2Js
+ay1jb3JlLmMNCisrKyBiL2Jsb2NrL2Jsay1jb3JlLmMNCkBAIC0yMzg4LDkgKzIzODgsMjQgQEAg
+YmxrX3FjX3QgZ2VuZXJpY19tYWtlX3JlcXVlc3Qoc3RydWN0IGJpbyAqYmlvKQ0KIAkgKiB5ZXQu
+DQogCSAqLw0KIAlzdHJ1Y3QgYmlvX2xpc3QgYmlvX2xpc3Rfb25fc3RhY2tbMl07DQorCWJsa19t
+cV9yZXFfZmxhZ3NfdCBmbGFncyA9IGJpby0+Ymlfb3BmICYgUkVRX05PV0FJVCA/DQorCQlCTEtf
+TVFfUkVRX05PV0FJVCA6IDA7DQorCXN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxID0gYmlvLT5iaV9k
+aXNrLT5xdWV1ZTsNCisJYm9vbCBjaGVja19yZXN1bHQ7DQogCWJsa19xY190IHJldCA9IEJMS19R
+Q19UX05PTkU7DQogDQotCWlmICghZ2VuZXJpY19tYWtlX3JlcXVlc3RfY2hlY2tzKGJpbykpDQor
+CWlmIChibGtfcXVldWVfZW50ZXIocSwgZmxhZ3MpIDwgMCkgew0KKwkJaWYgKCFibGtfcXVldWVf
+ZHlpbmcocSkgJiYgKGJpby0+Ymlfb3BmICYgUkVRX05PV0FJVCkpDQorCQkJYmlvX3dvdWxkYmxv
+Y2tfZXJyb3IoYmlvKTsNCisJCWVsc2UNCisJCQliaW9faW9fZXJyb3IoYmlvKTsNCisJCXJldHVy
+biByZXQ7DQorCX0NCisNCisJY2hlY2tfcmVzdWx0ID0gZ2VuZXJpY19tYWtlX3JlcXVlc3RfY2hl
+Y2tzKGJpbyk7DQorCWJsa19xdWV1ZV9leGl0KHEpOw0KKw0KKwlpZiAoIWNoZWNrX3Jlc3VsdCkN
+CiAJCWdvdG8gb3V0Ow0KIA0KIAkvKg0KLS0gDQoyLjE2LjINCg==
