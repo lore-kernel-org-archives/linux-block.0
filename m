@@ -1,31 +1,41 @@
 Return-Path: <prvs=630dc1010=Bart.VanAssche@wdc.com>
 From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@lst.de" <hch@lst.de>
-CC: "tj@kernel.org" <tj@kernel.org>, "israelr@mellanox.com"
-	<israelr@mellanox.com>, "linux-block@vger.kernel.org"
+To: "sagi@grimberg.me" <sagi@grimberg.me>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>, "tj@kernel.org" <tj@kernel.org>,
+	"israelr@mellanox.com" <israelr@mellanox.com>, "linux-block@vger.kernel.org"
 	<linux-block@vger.kernel.org>, "maxg@mellanox.com" <maxg@mellanox.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "sagi@grimberg.me" <sagi@grimberg.me>
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
 Subject: Re: [PATCH] blk-mq: Fix recently introduced races in the timeout
  handling code
-Date: Mon, 9 Apr 2018 14:58:22 +0000
-Message-ID: <a7972bb84efa3313b87ecbaf37112b360346bdfe.camel@wdc.com>
+Date: Mon, 9 Apr 2018 14:37:39 +0000
+Message-ID: <f9842feb144badf4220114425864d09f0c496788.camel@wdc.com>
 References: <20180409052038.5391-1-bart.vanassche@wdc.com>
-	 <20180409093744.GC10405@lst.de>
-In-Reply-To: <20180409093744.GC10405@lst.de>
+	 <3f0d4950-4ef1-a24f-0ad1-b274aa885f73@grimberg.me>
+In-Reply-To: <3f0d4950-4ef1-a24f-0ad1-b274aa885f73@grimberg.me>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE4LTA0LTA5IGF0IDExOjM3ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
-ZToNCj4gVGhpcyBsb29rcyBzZW5zaWJsZSwgYnV0IEknbSB3b3JyaWVkIGFib3V0IHRha2luZyBh
-IHdob2xlIHNwaW5sb2NrDQo+IGZvciBldmVyeSByZXF1ZXN0IGNvbXBsZXRpb24sIGluY2x1ZGlu
-ZyBpcnEgZGlzYWJsaW5nLiAgSG93ZXZlciBpdCBzZWVtcw0KPiBsaWtlIHlvdXIgbmV3IHVwZGF0
-ZWQgcGF0dGVybiB3b3VsZCBmaXQgdXNlIG9mIGNtcHhjaGcoKSB2ZXJ5IG5pY2VseS4NCg0KSGVs
-bG8gQ2hyaXN0b3BoLA0KDQpUaGFua3MgZm9yIHRoZSByZXZpZXcuIEkgaGFkIGEgbG9vayBhdCB0
-aGUgc3BpbiBsb2NrIGltcGxlbWVudGF0aW9uIG9uDQp4ODYgYW5kIGFwcGFyZW50bHkgb24geDg2
-IHNwaW4gbG9ja3MgYXJlIGltcGxlbWVudGVkIGFzIHFzcGlubG9ja3MNCihpbmNsdWRlL2FzbS1n
-ZW5lcmljL3FzcGlubG9jay5oKS4gcXVldWVkX3NwaW5fbG9jaygpIGFscmVhZHkgdXNlcw0KYXRv
-bWljX2NtcHhjaGdfYWNxdWlyZSgpLiBBcmUgeW91IHN1cmUgdGhhdCByZXBsYWNpbmcgdGhlIHNw
-aW4gbG9jaw0KYnkgY21weGNoZygpIHdpbGwgeWllbGQgYSBwZXJmb3JtYW5jZSBpbXByb3ZlbWVu
-dD8NCg0KVGhhbmtzLA0KDQpCYXJ0Lg0K
+T24gTW9uLCAyMDE4LTA0LTA5IGF0IDExOjM3ICswMzAwLCBTYWdpIEdyaW1iZXJnIHdyb3RlOg0K
+PiA+IElmIGEgY29tcGxldGlvbiBvY2N1cnMgYWZ0ZXIgYmxrX21xX3JxX3RpbWVkX291dCgpIGhh
+cyByZXNldA0KPiA+IHJxLT5hYm9ydGVkX2dzdGF0ZSBhbmQgdGhlIHJlcXVlc3QgaXMgYWdhaW4g
+aW4gZmxpZ2h0IHdoZW4gdGhlIHRpbWVvdXQNCj4gPiBleHBpcmVzIHRoZW4gYSByZXF1ZXN0IHdp
+bGwgYmUgY29tcGxldGVkIHR3aWNlOiBhIGZpcnN0IHRpbWUgYnkgdGhlDQo+ID4gdGltZW91dCBo
+YW5kbGVyIGFuZCBhIHNlY29uZCB0aW1lIHdoZW4gdGhlIHJlZ3VsYXIgY29tcGxldGlvbiBvY2N1
+cnMuDQo+ID4gDQo+ID4gQWRkaXRpb25hbGx5LCB0aGUgYmxrLW1xIHRpbWVvdXQgaGFuZGxpbmcg
+Y29kZSBpZ25vcmVzIGNvbXBsZXRpb25zIHRoYXQNCj4gPiBvY2N1ciBhZnRlciBibGtfbXFfY2hl
+Y2tfZXhwaXJlZCgpIGhhcyBiZWVuIGNhbGxlZCBhbmQgYmVmb3JlDQo+ID4gYmxrX21xX3JxX3Rp
+bWVkX291dCgpIGhhcyByZXNldCBycS0+YWJvcnRlZF9nc3RhdGUuIElmIGEgYmxvY2sgZHJpdmVy
+DQo+ID4gdGltZW91dCBoYW5kbGVyIGFsd2F5cyByZXR1cm5zIEJMS19FSF9SRVNFVF9USU1FUiB0
+aGVuIHRoZSByZXN1bHQgd2lsbA0KPiA+IGJlIHRoYXQgdGhlIHJlcXVlc3QgbmV2ZXIgdGVybWlu
+YXRlcy4NCj4gDQo+IE9LLCBub3cgSSB1bmRlcnN0YW5kIGhvdyB3ZSBjYW4gY29tcGxldGUgdHdp
+Y2UuIElzcmFlbCwgY2FuIHlvdSB2ZXJpZnkNCj4gdGhpcyBwYXRjaCBzb2x2ZXMgeW91ciBkb3Vi
+bGUgY29tcGxldGlvbiBwcm9ibGVtPw0KPiANCj4gR2l2ZW4gdGhhdCBpdCBpcywgdGhlIGNoYW5n
+ZSBsb2cgb2YgeW91ciBwYXRjaGVzIHNob3VsZCBiZSBtb2RpZmllZCB0bw0KPiB0aGUgb3JpZ2lu
+YWwgYnVnIHJlcG9ydCBpdCBzb2x2ZXMuDQo+IA0KPiBUaHJlYWQgc3RhcnRzIGhlcmU6DQo+IGh0
+dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL3BpcGVybWFpbC9saW51eC1udm1lLzIwMTgtRmVicnVh
+cnkvMDE1ODQ4Lmh0bWwNCg0KSGVsbG8gU2FnaSwNCg0KSSB3aWxsIHdhaXQgdW50aWwgaXQgaGFz
+IGJlZW4gdmVyaWZpZWQgd2hldGhlciBvciBub3QgdGhpcyBwYXRjaCBmaXhlcyB0aGUNCiJudm1l
+LXJkbWEgY29ycnVwdHMgbWVtb3J5IHVwb24gdGltZW91dCIgaXNzdWUgYmVmb3JlIGFkZGluZyBh
+IHJlZmVyZW5jZSB0bw0KdGhhdCBpc3N1ZSBpbiB0aGUgZGVzY3JpcHRpb24gb2YgdGhpcyBwYXRj
+aC4NCg0KVGhhbmtzLA0KDQpCYXJ0Lg0KDQoNCg==
