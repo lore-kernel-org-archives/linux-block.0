@@ -1,48 +1,50 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Mon, 9 Apr 2018 11:56:16 -0700
-From: "tj@kernel.org" <tj@kernel.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>, "maxg@mellanox.com" <maxg@mellanox.com>,
-	"israelr@mellanox.com" <israelr@mellanox.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
+Return-Path: <prvs=630dc1010=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tj@kernel.org" <tj@kernel.org>
+CC: "hch@lst.de" <hch@lst.de>, "maxg@mellanox.com" <maxg@mellanox.com>,
+	"israelr@mellanox.com" <israelr@mellanox.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
 	"sagi@grimberg.me" <sagi@grimberg.me>
 Subject: Re: [PATCH] blk-mq: Fix recently introduced races in the timeout
  handling code
-Message-ID: <20180409185616.GG3126663@devbig577.frc2.facebook.com>
+Date: Mon, 9 Apr 2018 17:03:05 +0000
+Message-ID: <4e32290f8d5901fbd16116d1623d37dbfdc1e1b8.camel@wdc.com>
 References: <20180409052038.5391-1-bart.vanassche@wdc.com>
- <20180409164737.GE3126663@devbig577.frc2.facebook.com>
- <4e32290f8d5901fbd16116d1623d37dbfdc1e1b8.camel@wdc.com>
+	 <20180409164737.GE3126663@devbig577.frc2.facebook.com>
+In-Reply-To: <20180409164737.GE3126663@devbig577.frc2.facebook.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4e32290f8d5901fbd16116d1623d37dbfdc1e1b8.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
-
-On Mon, Apr 09, 2018 at 05:03:05PM +0000, Bart Van Assche wrote:
-> My opinion is not only that the two patches that you posted recently do not
-> fix all the races that are fixed by this patch but also that the races that
-
-The race was with the path where the ownership of a timed out request
-is passed back to normal completion path and those two patches fix
-that, right?
-
-> exist today in the blk-mq timeout handling code cannot be fixed completely
-> using RCU only.
-
-I really don't think that is that complicated.  Let's first confirm
-the race fix and get to narrowing / closing that window.
-
-> That race window did not exist in the legacy block layer. I don't think
-
-IIRC, it did.  It was there when I first started working on libata EH
-years ago.
-
-Thanks.
-
--- 
-tejun
+T24gTW9uLCAyMDE4LTA0LTA5IGF0IDA5OjQ3IC0wNzAwLCBUZWp1biBIZW8gd3JvdGU6DQo+IE9u
+IFN1biwgQXByIDA4LCAyMDE4IGF0IDEwOjIwOjM4UE0gLTA3MDAsIEJhcnQgVmFuIEFzc2NoZSB3
+cm90ZToNCj4gPiBJZiBhIGNvbXBsZXRpb24gb2NjdXJzIGFmdGVyIGJsa19tcV9ycV90aW1lZF9v
+dXQoKSBoYXMgcmVzZXQNCj4gPiBycS0+YWJvcnRlZF9nc3RhdGUgYW5kIHRoZSByZXF1ZXN0IGlz
+IGFnYWluIGluIGZsaWdodCB3aGVuIHRoZSB0aW1lb3V0DQo+ID4gZXhwaXJlcyB0aGVuIGEgcmVx
+dWVzdCB3aWxsIGJlIGNvbXBsZXRlZCB0d2ljZTogYSBmaXJzdCB0aW1lIGJ5IHRoZQ0KPiA+IHRp
+bWVvdXQgaGFuZGxlciBhbmQgYSBzZWNvbmQgdGltZSB3aGVuIHRoZSByZWd1bGFyIGNvbXBsZXRp
+b24gb2NjdXJzLg0KPiANCj4gQXJlIHdlIHN0aWxsIHRhbGtpbmcgYWJvdXQgdGhlIHNhbWUgQkxL
+X0VIX1JFU0VUX1RJTUVSIGNhc2U/ICBUaGlzIGNhbg0KPiBiZSBzb2x2ZWQgYnkgdGhlIHR3byBw
+YXRjaGVzIHdoaWNoIHJjdS1zeW5jaHJvbml6ZXMgdGhlIGhhbmQtb3ZlciB0bw0KPiBub3JtYWwg
+Y29tcGxldGlvbiBwYXRoLCByaWdodD8NCg0KSGVsbG8gVGVqdW4sDQoNCk15IG9waW5pb24gaXMg
+bm90IG9ubHkgdGhhdCB0aGUgdHdvIHBhdGNoZXMgdGhhdCB5b3UgcG9zdGVkIHJlY2VudGx5IGRv
+IG5vdA0KZml4IGFsbCB0aGUgcmFjZXMgdGhhdCBhcmUgZml4ZWQgYnkgdGhpcyBwYXRjaCBidXQg
+YWxzbyB0aGF0IHRoZSByYWNlcyB0aGF0DQpleGlzdCB0b2RheSBpbiB0aGUgYmxrLW1xIHRpbWVv
+dXQgaGFuZGxpbmcgY29kZSBjYW5ub3QgYmUgZml4ZWQgY29tcGxldGVseQ0KdXNpbmcgUkNVIG9u
+bHkuDQoNCj4gPiBBZGRpdGlvbmFsbHksIHRoZSBibGstbXEgdGltZW91dCBoYW5kbGluZyBjb2Rl
+IGlnbm9yZXMgY29tcGxldGlvbnMgdGhhdA0KPiA+IG9jY3VyIGFmdGVyIGJsa19tcV9jaGVja19l
+eHBpcmVkKCkgaGFzIGJlZW4gY2FsbGVkIGFuZCBiZWZvcmUNCj4gPiBibGtfbXFfcnFfdGltZWRf
+b3V0KCkgaGFzIHJlc2V0IHJxLT5hYm9ydGVkX2dzdGF0ZS4gSWYgYSBibG9jayBkcml2ZXINCj4g
+PiB0aW1lb3V0IGhhbmRsZXIgYWx3YXlzIHJldHVybnMgQkxLX0VIX1JFU0VUX1RJTUVSIHRoZW4g
+dGhlIHJlc3VsdCB3aWxsDQo+ID4gYmUgdGhhdCB0aGUgcmVxdWVzdCBuZXZlciB0ZXJtaW5hdGVz
+Lg0KPiANCj4gQW5kIHRoaXMgaXMgdGhlIHNhbWUgcmFjZSB3aW5kb3cgd2hpY2ggd2FzIGFsd2F5
+cyB0aGVyZSwgcmlnaHQ/ICBJDQo+IHJlYWxseSBkb24ndCB0aGluayByZWR1Y2luZyBvciBjbG9z
+aW5nIHRoaXMgd2luZG93IHJlcXVpcmVzIGZ1bGwNCj4gc3luY2hyb25pemF0aW9uLg0KDQpUaGF0
+IHJhY2Ugd2luZG93IGRpZCBub3QgZXhpc3QgaW4gdGhlIGxlZ2FjeSBibG9jayBsYXllci4gSSBk
+b24ndCB0aGluaw0Kd2Ugc2hvdWxkIHRvbGVyYXRlIHN1Y2ggYSByYWNlIHdpbmRvdyBpbiB0aGUg
+YmxrLW1xIGNvZGUgZWl0aGVyLiBJZiBhIHJlcXVlc3QNCmRvZXMgbm90IGdldCBjb21wbGV0ZWQg
+dGhhdCBsZWFkcyB0byB1bmtpbGxhYmxlIHByb2Nlc3NlcyBvciBoYW5naW5nIGtlcm5lbA0KY29k
+ZS4gU3VjaCBpc3N1ZXMgYXJlIGhhcmQgdG8gaWRlbnRpZnkgd2hlbiByZXBvcnRlZCBieSB1c2Vy
+cy4gSSB0aGluayB3ZQ0Kc2hvdWxkIGZpeCB0aGVzZSByYWNlcyBiZWZvcmUgdGhlc2UgY2F1c2Ug
+bW9yZSB0cm91YmxlIHRvIExpbnV4IHVzZXJzLg0KDQpUaGFua3MsDQoNCkJhcnQuDQoNCg0K
