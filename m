@@ -1,109 +1,49 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Tue, 10 Apr 2018 21:55:47 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"israelr@mellanox.com" <israelr@mellanox.com>,
-	"sagi@grimberg.me" <sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"maxg@mellanox.com" <maxg@mellanox.com>,
-	"tj@kernel.org" <tj@kernel.org>
+Return-Path: <prvs=63144aee1=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>
+CC: "tj@kernel.org" <tj@kernel.org>, "israelr@mellanox.com"
+	<israelr@mellanox.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "maxg@mellanox.com" <maxg@mellanox.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "sagi@grimberg.me" <sagi@grimberg.me>
 Subject: Re: [PATCH v4] blk-mq: Fix race conditions in request timeout
  handling
-Message-ID: <20180410135541.GA22340@ming.t460p>
+Date: Tue, 10 Apr 2018 13:26:39 +0000
+Message-ID: <f4bb15dff9dca995a9965204124caf2742798801.camel@wdc.com>
 References: <20180410013455.7448-1-bart.vanassche@wdc.com>
- <20180410084133.GB9133@ming.t460p>
- <b36ea1107be4f32fb04fffdde3ee45a2e0fcc36c.camel@wdc.com>
+	 <20180410095537.GA19266@lst.de>
+In-Reply-To: <20180410095537.GA19266@lst.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <b36ea1107be4f32fb04fffdde3ee45a2e0fcc36c.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Apr 10, 2018 at 12:58:04PM +0000, Bart Van Assche wrote:
-> On Tue, 2018-04-10 at 16:41 +0800, Ming Lei wrote:
-> > On Mon, Apr 09, 2018 at 06:34:55PM -0700, Bart Van Assche wrote:
-> > > If a completion occurs after blk_mq_rq_timed_out() has reset
-> > > rq->aborted_gstate and the request is again in flight when the timeout
-> > 
-> > Given rq->aborted_gstate is reset only for BLK_EH_RESET_TIMER, I
-> > think you are addressing the race between normal completion and
-> > the timeout of BLK_EH_RESET_TIMER.
-> 
-> Yes, that's correct. I will make this more explicit.
-> 
-> > > expires then a request will be completed twice: a first time by the
-> > > timeout handler and a second time when the regular completion occurs.
-> > 
-> > This patch looks simpler, and more like the previous model of
-> > using blk_mark_rq_complete().
-> 
-> That's also correct.
-> 
-> > I have one question:
-> > 
-> > - with this patch, rq's state is updated atomically as cmpxchg. Suppose
-> > one rq is timed out, the rq's state is updated as MQ_RQ_COMPLETE by
-> > blk_mq_check_expired(), then ops->timeout() is run and
-> > BLK_EH_RESET_TIMER is returned, so blk_mq_add_timer(req, MQ_RQ_COMPLETE,
-> > MQ_RQ_IN_FLIGHT) is called to update rq's state into MQ_RQ_IN_FLIGHT.
-> > 
-> > Now the original normal completion still may occur after rq's state
-> > becomes MQ_RQ_IN_FLIGHT, and seems there is still the double completion
-> > with this patch? Maybe I am wrong, please explain a bit.
-> 
-> That scenario won't result in a double completion. After the timer has
-> been reset the block driver blk_mq_complete_request() call will change
-> the request state from MQ_RQ_IN_FLIGHT into MQ_RQ_COMPLETE. The next
-> time blk_mq_check_expired() is called it will execute the following code:
-> 
-> 	blk_mq_change_rq_state(rq, MQ_RQ_IN_FLIGHT, MQ_RQ_COMPLETE);
-> 
-> That function call only changes the request state if the current state is
-> IN_FLIGHT. However, the blk_mq_complete_request() call changed the request
-> state into COMPLETE. Hence, the above blk_mq_change_rq_state() call will
-> return false and the blk-mq timeout code will skip this request. If the
-> request would already have been reused and would have been marked again as
-> IN_FLIGHT then its deadline will also have been updated and the request
-> will be skipped by the timeout code because its deadline has not yet
-> expired.
-
-OK.
-
-Then I have same question with Jianchao, what is the actual double
-complete in linus tree between BLK_EH_RESET_TIMER and normal completion?
-
-Follows my understanding:
-
-1) when timeout is detected on one request, its aborted_gstate is
-updated in blk_mq_check_expired().
-
-2) run synchronize_rcu(), and make sure all pending completion is done
-
-3) run blk_mq_rq_timed_out()
-- ret = ops->timeout
-- blk_mq_rq_update_aborted_gstate(req, 0)
-- blk_add_timer(req);
-
-If normal completion is done between 1) and reset aborted_gstate in 3),
-blk_mq_complete_request() will be called, and found that aborted_gstate
-is set, then the rq won't be completed really.
-
-If normal completion is done after reset aborted_gstate in 3), it should
-be same with applying this patch.
-
-> 
-> > And synchronize_rcu() is needed by Tejun's approach between marking
-> > COMPLETE and handling this rq's timeout, and the time can be quite long,
-> > I guess it might be easier to trigger?
-> 
-> I have done what I could to trigger races between the regular completion
-> path and the timeout code in my tests. Without this patch if I run the
-> srp-test software I see crashes being reported in the rdma_rxe driver but
-> with this patch applied I don't see any crashes with my tests.
-
-I believe this patch may fix this issue, but I think the idea behind
-should be understood.
-
-Thanks,
-Ming
+T24gVHVlLCAyMDE4LTA0LTEwIGF0IDExOjU1ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
+ZToNCj4gSSBkb24ndCB0aGluayB3ZSBuZWVkIHRoZSBhdG9taWNfbG9uZ19jbXB4Y2hnLCBhbmQg
+Y2FuIGRvIHdpdGggYSBwbGFpbg0KPiBjbXB4aGcuICBBbHNvIHVudGVybWluYXRlZCBjbXB4Y2hn
+IGxvb3BzIGFyZSBhIGJhZCBpZGVhLCBidXQgSSB0aGluaw0KPiBib3RoIGNhbGxlcnMgYXJlIHBy
+b3RlY3RlZCBmcm9tIG90aGVyIGNoYW5nZXMgc28gd2UgY2FuIHR1cm4gdGhhdA0KPiBpbnRvIGEg
+V0FSTl9PTigpLg0KDQpIZWxsbyBDaHJpc3RvcGgsDQoNCkkgd2lsbCByZW1vdmUgdGhlIGJsa19t
+cV9ycV91cGRhdGVfc3RhdGUoKSBmdW5jdGlvbiBzbyB0aGF0J3Mgb25lIHdoaWxlDQpsb29wIGxl
+c3MuDQoNCkNhbiB5b3UgZXhwbGFpbiB3aHkgeW91IHRoaW5rIHRoYXQgdXNpbmcgY21weGNoZygp
+IGlzIHNhZmUgaW4gdGhpcyBjb250ZXh0Pw0KVGhlIHJlZ3VsYXIgY29tcGxldGlvbiBwYXRoIGFu
+ZCB0aGUgdGltZW91dCBjb2RlIGNhbiBib3RoIGV4ZWN1dGUgZS5nLiB0aGUNCmZvbGxvd2luZyBj
+b2RlIGNvbmN1cnJlbnRseToNCg0KCWJsa19tcV9jaGFuZ2VfcnFfc3RhdGUocnEsIE1RX1JRX0lO
+X0ZMSUdIVCwgTVFfUlFfQ09NUExFVEUpOw0KDQpUaGF0J3Mgd2h5IEkgdGhpbmsgdGhhdCB3ZSBu
+ZWVkIGFuIGF0b21pYyBjb21wYXJlIGFuZCBleGNoYW5nZSBpbnN0ZWFkIG9mDQpjbXB4Y2hnKCku
+IFdoYXQgSSBmb3VuZCBpbiB0aGUgSW50ZWwgU29mdHdhcmUgRGV2ZWxvcGVyIE1hbnVhbCBzZWVt
+cyB0bw0KY29uZmlybSB0aGF0Og0KDQpEZXNjcmlwdGlvbg0KDQpDb21wYXJlcyB0aGUgdmFsdWUg
+aW4gdGhlIEFMLCBBWCwgRUFYLCBvciBSQVggcmVnaXN0ZXIgd2l0aCB0aGUgZmlyc3QNCm9wZXJh
+bmQgKGRlc3RpbmF0aW9uIG9wZXJhbmQpLiBJZiB0aGUgdHdvIHZhbHVlcyBhcmUgZXF1YWwsIHRo
+ZSBzZWNvbmQNCm9wZXJhbmQgKHNvdXJjZSBvcGVyYW5kKSBpcyBsb2FkZWQgaW50byB0aGUgZGVz
+dGluYXRpb24gb3BlcmFuZC4gT3RoZXJ3aXNlLA0KdGhlIGRlc3RpbmF0aW9uIG9wZXJhbmQgaXMg
+bG9hZGVkIGludG8gdGhlIEFMLCBBWCwgRUFYIG9yIFJBWCByZWdpc3Rlci4gUkFYDQpyZWdpc3Rl
+ciBpcyBhdmFpbGFibGUgb25seSBpbiA2NC1iaXQgbW9kZS4gVGhpcyBpbnN0cnVjdGlvbiBjYW4g
+YmUgdXNlZA0Kd2l0aCBhIExPQ0sgcHJlZml4IHRvIGFsbG93IHRoZSBpbnN0cnVjdGlvbiB0byBi
+ZSBleGVjdXRlZCBhdG9taWNhbGx5LiBUbw0Kc2ltcGxpZnkgdGhlIGludGVyZmFjZSB0byB0aGUg
+cHJvY2Vzc29y4oCZcyBidXMsIHRoZSBkZXN0aW5hdGlvbiBvcGVyYW5kDQpyZWNlaXZlcyBhIHdy
+aXRlIGN5Y2xlIHdpdGhvdXQgcmVnYXJkIHRvIHRoZSByZXN1bHQgb2YgdGhlIGNvbXBhcmlzb24u
+IFRoZQ0KZGVzdGluYXRpb24gb3BlcmFuZCBpcyB3cml0dGVuIGJhY2sgaWYgdGhlIGNvbXBhcmlz
+b24gZmFpbHM7IG90aGVyd2lzZSwgdGhlDQpzb3VyY2Ugb3BlcmFuZCBpcyB3cml0dGVuIGludG8g
+dGhlIGRlc3RpbmF0aW9uLiAoVGhlIHByb2Nlc3NvciBuZXZlcg0KcHJvZHVjZXMgYSBsb2NrZWQg
+cmVhZCB3aXRob3V0IGFsc28gcHJvZHVjaW5nIGEgbG9ja2VkIHdyaXRlLikNCg0KVGhhbmtzLA0K
+DQpCYXJ0Lg0KDQoNCg0K
