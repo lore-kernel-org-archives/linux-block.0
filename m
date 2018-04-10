@@ -1,127 +1,47 @@
-Return-Path: <jglisse@redhat.com>
-From: jglisse@redhat.com
-To: linux-mm@kvack.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Tejun Heo <tj@kernel.org>,
-	Jan Kara <jack@suse.cz>,
-	Josef Bacik <jbacik@fb.com>,
-	Mel Gorman <mgorman@techsingularity.net>
-Subject: [RFC PATCH 29/79] fs/block: add struct address_space to bdev_write_page() arguments
-Date: Wed,  4 Apr 2018 15:18:03 -0400
-Message-Id: <20180404191831.5378-14-jglisse@redhat.com>
-In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
-References: <20180404191831.5378-1-jglisse@redhat.com>
+Return-Path: <hare@suse.de>
+Date: Tue, 10 Apr 2018 08:29:13 +0200
+From: Hannes Reinecke <hare@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, Bart.VanAssche@wdc.com, willy@infradead.org,
+ linux-block@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH 7/7] block: use GFP_KERNEL for allocations from
+ blk_get_request
+Message-ID: <20180410082913.475c8ca3@pentland.suse.de>
+In-Reply-To: <20180409153916.23901-8-hch@lst.de>
+References: <20180409153916.23901-1-hch@lst.de>
+	<20180409153916.23901-8-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jérôme Glisse <jglisse@redhat.com>
+On Mon,  9 Apr 2018 17:39:16 +0200
+Christoph Hellwig <hch@lst.de> wrote:
 
-Add struct address_space to bdev_write_page() arguments.
+> blk_get_request is used for pass-through style I/O and thus doesn't
+> need GFP_NOIO.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 432923751551..253a869558f9 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1578,7 +1578,7 @@ static struct request
+> *blk_old_get_request(struct request_queue *q, unsigned int op,
+> blk_mq_req_flags_t flags) {
+>  	struct request *rq;
+> -	gfp_t gfp_mask = flags & BLK_MQ_REQ_NOWAIT ? GFP_ATOMIC :
+> GFP_NOIO;
+> +	gfp_t gfp_mask = flags & BLK_MQ_REQ_NOWAIT ? GFP_ATOMIC :
+> GFP_KERNEL; int ret = 0;
+>  
+>  	WARN_ON_ONCE(q->mq_ops);
 
-One step toward dropping reliance on page->mapping.
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-CC: Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-fsdevel@vger.kernel.org
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Josef Bacik <jbacik@fb.com>
-Cc: Mel Gorman <mgorman@techsingularity.net>
----
- fs/block_dev.c         | 4 +++-
- fs/mpage.c             | 2 +-
- include/linux/blkdev.h | 5 +++--
- mm/page_io.c           | 7 ++++---
- 4 files changed, 11 insertions(+), 7 deletions(-)
+Cheers,
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 9ac6bf760272..502b6643bc74 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -678,6 +678,7 @@ EXPORT_SYMBOL_GPL(bdev_read_page);
-  * bdev_write_page() - Start writing a page to a block device
-  * @bdev: The device to write the page to
-  * @sector: The offset on the device to write the page to (need not be aligned)
-+ * @mapping: The address space the page belongs to
-  * @page: The page to write
-  * @wbc: The writeback_control for the write
-  *
-@@ -694,7 +695,8 @@ EXPORT_SYMBOL_GPL(bdev_read_page);
-  * Return: negative errno if an error occurs, 0 if submission was successful.
-  */
- int bdev_write_page(struct block_device *bdev, sector_t sector,
--			struct page *page, struct writeback_control *wbc)
-+			struct address_space *mapping, struct page *page,
-+			struct writeback_control *wbc)
- {
- 	int result;
- 	const struct block_device_operations *ops = bdev->bd_disk->fops;
-diff --git a/fs/mpage.c b/fs/mpage.c
-index 52a6028e2066..a75cea232f1a 100644
---- a/fs/mpage.c
-+++ b/fs/mpage.c
-@@ -619,7 +619,7 @@ static int __mpage_writepage(struct page *page, struct address_space *_mapping,
- 	if (bio == NULL) {
- 		if (first_unmapped == blocks_per_page) {
- 			if (!bdev_write_page(bdev, blocks[0] << (blkbits - 9),
--								page, wbc))
-+						mapping, page, wbc))
- 				goto out;
- 		}
- 		bio = mpage_alloc(bdev, blocks[0] << (blkbits - 9),
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index ed63f3b69c12..0cf66b6993f4 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -2053,8 +2053,9 @@ struct block_device_operations {
- extern int __blkdev_driver_ioctl(struct block_device *, fmode_t, unsigned int,
- 				 unsigned long);
- extern int bdev_read_page(struct block_device *, sector_t, struct page *);
--extern int bdev_write_page(struct block_device *, sector_t, struct page *,
--						struct writeback_control *);
-+extern int bdev_write_page(struct block_device *bdev, sector_t sector,
-+			struct address_space *mapping, struct page *page,
-+			struct writeback_control *wbc);
- 
- #ifdef CONFIG_BLK_DEV_ZONED
- bool blk_req_needs_zone_write_lock(struct request *rq);
-diff --git a/mm/page_io.c b/mm/page_io.c
-index 402231dd1286..6e548b588490 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -282,12 +282,12 @@ int __swap_writepage(struct page *page, struct writeback_control *wbc,
- 	struct bio *bio;
- 	int ret;
- 	struct swap_info_struct *sis = page_swap_info(page);
-+	struct file *swap_file = sis->swap_file;
-+	struct address_space *mapping = swap_file->f_mapping;
- 
- 	VM_BUG_ON_PAGE(!PageSwapCache(page), page);
- 	if (sis->flags & SWP_FILE) {
- 		struct kiocb kiocb;
--		struct file *swap_file = sis->swap_file;
--		struct address_space *mapping = swap_file->f_mapping;
- 		struct bio_vec bv = {
- 			.bv_page = page,
- 			.bv_len  = PAGE_SIZE,
-@@ -325,7 +325,8 @@ int __swap_writepage(struct page *page, struct writeback_control *wbc,
- 		return ret;
- 	}
- 
--	ret = bdev_write_page(sis->bdev, swap_page_sector(page), page, wbc);
-+	ret = bdev_write_page(sis->bdev, swap_page_sector(page),
-+			      mapping, page, wbc);
- 	if (!ret) {
- 		count_swpout_vm_event(page);
- 		return 0;
--- 
-2.14.3
+Hannes
