@@ -1,37 +1,45 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Tue, 10 Apr 2018 07:20:28 -0700
-From: Tejun Heo <tj@kernel.org>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Israel Rukshin <israelr@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>, stable@vger.kernel.org
+Return-Path: <prvs=63144aee1=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"israelr@mellanox.com" <israelr@mellanox.com>, "sagi@grimberg.me"
+	<sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"maxg@mellanox.com" <maxg@mellanox.com>, "tj@kernel.org" <tj@kernel.org>
 Subject: Re: [PATCH v4] blk-mq: Fix race conditions in request timeout
  handling
-Message-ID: <20180410142028.GM3126663@devbig577.frc2.facebook.com>
+Date: Tue, 10 Apr 2018 14:09:33 +0000
+Message-ID: <7c4a8b019182d5a9259ef20e6462b3f6a533abed.camel@wdc.com>
 References: <20180410013455.7448-1-bart.vanassche@wdc.com>
+	 <20180410084133.GB9133@ming.t460p>
+	 <b36ea1107be4f32fb04fffdde3ee45a2e0fcc36c.camel@wdc.com>
+	 <20180410135541.GA22340@ming.t460p>
+In-Reply-To: <20180410135541.GA22340@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180410013455.7448-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello, Bart.
-
-On Mon, Apr 09, 2018 at 06:34:55PM -0700, Bart Van Assche wrote:
-> Since the request state can be updated from two different contexts,
-> namely regular completion and request timeout, this race cannot be
-> fixed with RCU synchronization only. Fix this race as follows:
-
-Well, it can be and the patches have been posted months ago.  It just
-needed a repro case to confirm the fix, which we now seem to have.
-
-Switching to another model might be better but let's please do that
-with the right rationales.  A good portion of this seems to be built
-on misunderstandings.
-
-Thanks.
-
--- 
-tejun
+T24gVHVlLCAyMDE4LTA0LTEwIGF0IDIxOjU1ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gVGhl
+biBJIGhhdmUgc2FtZSBxdWVzdGlvbiB3aXRoIEppYW5jaGFvLCB3aGF0IGlzIHRoZSBhY3R1YWwg
+ZG91YmxlDQo+IGNvbXBsZXRlIGluIGxpbnVzIHRyZWUgYmV0d2VlbiBCTEtfRUhfUkVTRVRfVElN
+RVIgYW5kIG5vcm1hbCBjb21wbGV0aW9uPw0KPiANCj4gRm9sbG93cyBteSB1bmRlcnN0YW5kaW5n
+Og0KPiANCj4gMSkgd2hlbiB0aW1lb3V0IGlzIGRldGVjdGVkIG9uIG9uZSByZXF1ZXN0LCBpdHMg
+YWJvcnRlZF9nc3RhdGUgaXMNCj4gdXBkYXRlZCBpbiBibGtfbXFfY2hlY2tfZXhwaXJlZCgpLg0K
+PiANCj4gMikgcnVuIHN5bmNocm9uaXplX3JjdSgpLCBhbmQgbWFrZSBzdXJlIGFsbCBwZW5kaW5n
+IGNvbXBsZXRpb24gaXMgZG9uZQ0KPiANCj4gMykgcnVuIGJsa19tcV9ycV90aW1lZF9vdXQoKQ0K
+PiAtIHJldCA9IG9wcy0+dGltZW91dA0KPiAtIGJsa19tcV9ycV91cGRhdGVfYWJvcnRlZF9nc3Rh
+dGUocmVxLCAwKQ0KPiAtIGJsa19hZGRfdGltZXIocmVxKTsNCj4gDQo+IElmIG5vcm1hbCBjb21w
+bGV0aW9uIGlzIGRvbmUgYmV0d2VlbiAxKSBhbmQgcmVzZXQgYWJvcnRlZF9nc3RhdGUgaW4gMyks
+DQo+IGJsa19tcV9jb21wbGV0ZV9yZXF1ZXN0KCkgd2lsbCBiZSBjYWxsZWQsIGFuZCBmb3VuZCB0
+aGF0IGFib3J0ZWRfZ3N0YXRlDQo+IGlzIHNldCwgdGhlbiB0aGUgcnEgd29uJ3QgYmUgY29tcGxl
+dGVkIHJlYWxseS4NCj4gDQo+IElmIG5vcm1hbCBjb21wbGV0aW9uIGlzIGRvbmUgYWZ0ZXIgcmVz
+ZXQgYWJvcnRlZF9nc3RhdGUgaW4gMyksIGl0IHNob3VsZA0KPiBiZSBzYW1lIHdpdGggYXBwbHlp
+bmcgdGhpcyBwYXRjaC4NCg0KSGVsbG8gTWluZywNCg0KUGxlYXNlIGtlZXAgaW4gbWluZCB0aGF0
+IGFsbCBzeW5jaHJvbml6ZV9yY3UoKSBkb2VzIGlzIHRvIHdhaXQgZm9yIHByZS0NCmV4aXN0aW5n
+IFJDVSByZWFkZXJzIHRvIGZpbmlzaC4gc3luY2hyb25pemVfcmN1KCkgZG9lcyBub3QgcHJldmVu
+dCB0aGF0IG5ldw0KcmN1X3JlYWRfbG9jaygpIGNhbGxzIGhhcHBlbi4gSXQgaXMgZS5nLiBwb3Nz
+aWJsZSB0aGF0IGFmdGVyDQpibGtfbXFfcnFfdXBkYXRlX2Fib3J0ZWRfZ3N0YXRlKHJlcSwgMCkg
+aGFzIGJlZW4gZXhlY3V0ZWQgdGhhdCBhIHJlZ3VsYXINCmNvbXBsZXRpb24gb2NjdXJzLiBJZiB0
+aGF0IHJlcXVlc3QgaXMgbm90IHJldXNlZCBiZWZvcmUgdGhlIHRpbWVyIHRoYXQgd2FzDQpyZXN0
+YXJ0ZWQgYnkgdGhlIHRpbWVvdXQgY29kZSBleHBpcmVzLCB0aGF0IHJlcXVlc3Qgd2lsbCBiZSBj
+b21wbGV0ZWQgdHdpY2UuDQoNCkJhcnQuDQoNCg0KDQo=
