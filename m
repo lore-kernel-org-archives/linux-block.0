@@ -1,33 +1,103 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH v2] blk-mq: Avoid that submitting a bio concurrently with
- device removal triggers a crash
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Ming Lei <ming.lei@redhat.com>, Joseph Qi <joseph.qi@linux.alibaba.com>
-References: <20180410204554.28914-1-bart.vanassche@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <038bad34-0cdc-b97a-adff-c07e5fb4b98a@kernel.dk>
-Date: Tue, 10 Apr 2018 16:35:38 -0600
+Return-Path: <prvs=63144aee1=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>
+Subject: [PATCH v2] blk-mq: Avoid that submitting a bio concurrently with device removal triggers a crash
+Date: Tue, 10 Apr 2018 14:45:54 -0600
+Message-Id: <20180410204554.28914-1-bart.vanassche@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <20180410204554.28914-1-bart.vanassche@wdc.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
+Return-Path: bart.vanassche@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 4/10/18 2:45 PM, Bart Van Assche wrote:
-> Because blkcg_exit_queue() is now called from inside blk_cleanup_queue()
-> it is no longer safe to access cgroup information during or after the
-> blk_cleanup_queue() call. Hence protect the generic_make_request_checks()
-> call with blk_queue_enter() / blk_queue_exit().
+Because blkcg_exit_queue() is now called from inside blk_cleanup_queue()
+it is no longer safe to access cgroup information during or after the
+blk_cleanup_queue() call. Hence protect the generic_make_request_checks()
+call with blk_queue_enter() / blk_queue_exit().
 
-This looks better. But can we please get rid of the ternary? I hate it
-with a vengeance, especially when it ends up spanning multiple lines.
-This:
+Reported-by: Ming Lei <ming.lei@redhat.com>
+Fixes: a063057d7c73 ("block: Fix a race between request queue removal and the block cgroup controller")
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
+---
 
-flags = 0;
-if (bio->bi_opf & REQ_NOWAIT)
-	flags = BLK_MQ_REQ_NOWAIT;
+Changes compared to v1: changed the blk_queue_exit() inside the loop with "if (q)".
 
-is so much more readable.
+ block/blk-core.c | 33 +++++++++++++++++++++++++++------
+ 1 file changed, 27 insertions(+), 6 deletions(-)
 
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 34e2f2227fd9..181b1a688a5b 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2386,8 +2386,19 @@ blk_qc_t generic_make_request(struct bio *bio)
+ 	 * yet.
+ 	 */
+ 	struct bio_list bio_list_on_stack[2];
++	blk_mq_req_flags_t flags = bio->bi_opf & REQ_NOWAIT ?
++		BLK_MQ_REQ_NOWAIT : 0;
++	struct request_queue *q = bio->bi_disk->queue;
+ 	blk_qc_t ret = BLK_QC_T_NONE;
+ 
++	if (blk_queue_enter(q, flags) < 0) {
++		if (!blk_queue_dying(q) && (bio->bi_opf & REQ_NOWAIT))
++			bio_wouldblock_error(bio);
++		else
++			bio_io_error(bio);
++		return ret;
++	}
++
+ 	if (!generic_make_request_checks(bio))
+ 		goto out;
+ 
+@@ -2424,11 +2435,21 @@ blk_qc_t generic_make_request(struct bio *bio)
+ 	bio_list_init(&bio_list_on_stack[0]);
+ 	current->bio_list = bio_list_on_stack;
+ 	do {
+-		struct request_queue *q = bio->bi_disk->queue;
+-		blk_mq_req_flags_t flags = bio->bi_opf & REQ_NOWAIT ?
+-			BLK_MQ_REQ_NOWAIT : 0;
++		bool enter_succeeded = true;
++
++		if (unlikely(q != bio->bi_disk->queue)) {
++			if (q)
++				blk_queue_exit(q);
++			q = bio->bi_disk->queue;
++			flags = bio->bi_opf & REQ_NOWAIT ? BLK_MQ_REQ_NOWAIT :
++				0;
++			if (blk_queue_enter(q, flags) < 0) {
++				enter_succeeded = false;
++				q = NULL;
++			}
++		}
+ 
+-		if (likely(blk_queue_enter(q, flags) == 0)) {
++		if (enter_succeeded) {
+ 			struct bio_list lower, same;
+ 
+ 			/* Create a fresh bio_list for all subordinate requests */
+@@ -2436,8 +2457,6 @@ blk_qc_t generic_make_request(struct bio *bio)
+ 			bio_list_init(&bio_list_on_stack[0]);
+ 			ret = q->make_request_fn(q, bio);
+ 
+-			blk_queue_exit(q);
+-
+ 			/* sort new bios into those for a lower level
+ 			 * and those for the same level
+ 			 */
+@@ -2464,6 +2483,8 @@ blk_qc_t generic_make_request(struct bio *bio)
+ 	current->bio_list = NULL; /* deactivate */
+ 
+ out:
++	if (q)
++		blk_queue_exit(q);
+ 	return ret;
+ }
+ EXPORT_SYMBOL(generic_make_request);
 -- 
-Jens Axboe
+2.16.2
