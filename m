@@ -1,68 +1,91 @@
-Return-Path: <prvs=63144aee1=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"israelr@mellanox.com" <israelr@mellanox.com>, "sagi@grimberg.me"
-	<sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"maxg@mellanox.com" <maxg@mellanox.com>, "tj@kernel.org" <tj@kernel.org>
+Return-Path: <shan.hai@oracle.com>
 Subject: Re: [PATCH v4] blk-mq: Fix race conditions in request timeout
  handling
-Date: Tue, 10 Apr 2018 12:58:04 +0000
-Message-ID: <b36ea1107be4f32fb04fffdde3ee45a2e0fcc36c.camel@wdc.com>
+To: Ming Lei <ming.lei@redhat.com>,
+        "jianchao.wang"
+ <jianchao.w.wang@oracle.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Tejun Heo <tj@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+        Israel Rukshin <israelr@mellanox.com>,
+        Max Gurtovoy <maxg@mellanox.com>, stable@vger.kernel.org
 References: <20180410013455.7448-1-bart.vanassche@wdc.com>
-	 <20180410084133.GB9133@ming.t460p>
-In-Reply-To: <20180410084133.GB9133@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+ <f6fcc94b-412c-1552-477e-ba0b0927006c@oracle.com>
+ <20180410100422.GA14432@ming.t460p>
+From: Shan Hai <shan.hai@oracle.com>
+Message-ID: <f246c624-09f5-4a37-7e83-8e4fd27ee23a@oracle.com>
+Date: Tue, 10 Apr 2018 20:04:10 +0800
 MIME-Version: 1.0
+In-Reply-To: <20180410100422.GA14432@ming.t460p>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTA0LTEwIGF0IDE2OjQxICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
-TW9uLCBBcHIgMDksIDIwMTggYXQgMDY6MzQ6NTVQTSAtMDcwMCwgQmFydCBWYW4gQXNzY2hlIHdy
-b3RlOg0KPiA+IElmIGEgY29tcGxldGlvbiBvY2N1cnMgYWZ0ZXIgYmxrX21xX3JxX3RpbWVkX291
-dCgpIGhhcyByZXNldA0KPiA+IHJxLT5hYm9ydGVkX2dzdGF0ZSBhbmQgdGhlIHJlcXVlc3QgaXMg
-YWdhaW4gaW4gZmxpZ2h0IHdoZW4gdGhlIHRpbWVvdXQNCj4gDQo+IEdpdmVuIHJxLT5hYm9ydGVk
-X2dzdGF0ZSBpcyByZXNldCBvbmx5IGZvciBCTEtfRUhfUkVTRVRfVElNRVIsIEkNCj4gdGhpbmsg
-eW91IGFyZSBhZGRyZXNzaW5nIHRoZSByYWNlIGJldHdlZW4gbm9ybWFsIGNvbXBsZXRpb24gYW5k
-DQo+IHRoZSB0aW1lb3V0IG9mIEJMS19FSF9SRVNFVF9USU1FUi4NCg0KWWVzLCB0aGF0J3MgY29y
-cmVjdC4gSSB3aWxsIG1ha2UgdGhpcyBtb3JlIGV4cGxpY2l0Lg0KDQo+ID4gZXhwaXJlcyB0aGVu
-IGEgcmVxdWVzdCB3aWxsIGJlIGNvbXBsZXRlZCB0d2ljZTogYSBmaXJzdCB0aW1lIGJ5IHRoZQ0K
-PiA+IHRpbWVvdXQgaGFuZGxlciBhbmQgYSBzZWNvbmQgdGltZSB3aGVuIHRoZSByZWd1bGFyIGNv
-bXBsZXRpb24gb2NjdXJzLg0KPiANCj4gVGhpcyBwYXRjaCBsb29rcyBzaW1wbGVyLCBhbmQgbW9y
-ZSBsaWtlIHRoZSBwcmV2aW91cyBtb2RlbCBvZg0KPiB1c2luZyBibGtfbWFya19ycV9jb21wbGV0
-ZSgpLg0KDQpUaGF0J3MgYWxzbyBjb3JyZWN0Lg0KDQo+IEkgaGF2ZSBvbmUgcXVlc3Rpb246DQo+
-IA0KPiAtIHdpdGggdGhpcyBwYXRjaCwgcnEncyBzdGF0ZSBpcyB1cGRhdGVkIGF0b21pY2FsbHkg
-YXMgY21weGNoZy4gU3VwcG9zZQ0KPiBvbmUgcnEgaXMgdGltZWQgb3V0LCB0aGUgcnEncyBzdGF0
-ZSBpcyB1cGRhdGVkIGFzIE1RX1JRX0NPTVBMRVRFIGJ5DQo+IGJsa19tcV9jaGVja19leHBpcmVk
-KCksIHRoZW4gb3BzLT50aW1lb3V0KCkgaXMgcnVuIGFuZA0KPiBCTEtfRUhfUkVTRVRfVElNRVIg
-aXMgcmV0dXJuZWQsIHNvIGJsa19tcV9hZGRfdGltZXIocmVxLCBNUV9SUV9DT01QTEVURSwNCj4g
-TVFfUlFfSU5fRkxJR0hUKSBpcyBjYWxsZWQgdG8gdXBkYXRlIHJxJ3Mgc3RhdGUgaW50byBNUV9S
-UV9JTl9GTElHSFQuDQo+IA0KPiBOb3cgdGhlIG9yaWdpbmFsIG5vcm1hbCBjb21wbGV0aW9uIHN0
-aWxsIG1heSBvY2N1ciBhZnRlciBycSdzIHN0YXRlDQo+IGJlY29tZXMgTVFfUlFfSU5fRkxJR0hU
-LCBhbmQgc2VlbXMgdGhlcmUgaXMgc3RpbGwgdGhlIGRvdWJsZSBjb21wbGV0aW9uDQo+IHdpdGgg
-dGhpcyBwYXRjaD8gTWF5YmUgSSBhbSB3cm9uZywgcGxlYXNlIGV4cGxhaW4gYSBiaXQuDQoNClRo
-YXQgc2NlbmFyaW8gd29uJ3QgcmVzdWx0IGluIGEgZG91YmxlIGNvbXBsZXRpb24uIEFmdGVyIHRo
-ZSB0aW1lciBoYXMNCmJlZW4gcmVzZXQgdGhlIGJsb2NrIGRyaXZlciBibGtfbXFfY29tcGxldGVf
-cmVxdWVzdCgpIGNhbGwgd2lsbCBjaGFuZ2UNCnRoZSByZXF1ZXN0IHN0YXRlIGZyb20gTVFfUlFf
-SU5fRkxJR0hUIGludG8gTVFfUlFfQ09NUExFVEUuIFRoZSBuZXh0DQp0aW1lIGJsa19tcV9jaGVj
-a19leHBpcmVkKCkgaXMgY2FsbGVkIGl0IHdpbGwgZXhlY3V0ZSB0aGUgZm9sbG93aW5nIGNvZGU6
-DQoNCglibGtfbXFfY2hhbmdlX3JxX3N0YXRlKHJxLCBNUV9SUV9JTl9GTElHSFQsIE1RX1JRX0NP
-TVBMRVRFKTsNCg0KVGhhdCBmdW5jdGlvbiBjYWxsIG9ubHkgY2hhbmdlcyB0aGUgcmVxdWVzdCBz
-dGF0ZSBpZiB0aGUgY3VycmVudCBzdGF0ZSBpcw0KSU5fRkxJR0hULiBIb3dldmVyLCB0aGUgYmxr
-X21xX2NvbXBsZXRlX3JlcXVlc3QoKSBjYWxsIGNoYW5nZWQgdGhlIHJlcXVlc3QNCnN0YXRlIGlu
-dG8gQ09NUExFVEUuIEhlbmNlLCB0aGUgYWJvdmUgYmxrX21xX2NoYW5nZV9ycV9zdGF0ZSgpIGNh
-bGwgd2lsbA0KcmV0dXJuIGZhbHNlIGFuZCB0aGUgYmxrLW1xIHRpbWVvdXQgY29kZSB3aWxsIHNr
-aXAgdGhpcyByZXF1ZXN0LiBJZiB0aGUNCnJlcXVlc3Qgd291bGQgYWxyZWFkeSBoYXZlIGJlZW4g
-cmV1c2VkIGFuZCB3b3VsZCBoYXZlIGJlZW4gbWFya2VkIGFnYWluIGFzDQpJTl9GTElHSFQgdGhl
-biBpdHMgZGVhZGxpbmUgd2lsbCBhbHNvIGhhdmUgYmVlbiB1cGRhdGVkIGFuZCB0aGUgcmVxdWVz
-dA0Kd2lsbCBiZSBza2lwcGVkIGJ5IHRoZSB0aW1lb3V0IGNvZGUgYmVjYXVzZSBpdHMgZGVhZGxp
-bmUgaGFzIG5vdCB5ZXQNCmV4cGlyZWQuDQoNCj4gQW5kIHN5bmNocm9uaXplX3JjdSgpIGlzIG5l
-ZWRlZCBieSBUZWp1bidzIGFwcHJvYWNoIGJldHdlZW4gbWFya2luZw0KPiBDT01QTEVURSBhbmQg
-aGFuZGxpbmcgdGhpcyBycSdzIHRpbWVvdXQsIGFuZCB0aGUgdGltZSBjYW4gYmUgcXVpdGUgbG9u
-ZywNCj4gSSBndWVzcyBpdCBtaWdodCBiZSBlYXNpZXIgdG8gdHJpZ2dlcj8NCg0KSSBoYXZlIGRv
-bmUgd2hhdCBJIGNvdWxkIHRvIHRyaWdnZXIgcmFjZXMgYmV0d2VlbiB0aGUgcmVndWxhciBjb21w
-bGV0aW9uDQpwYXRoIGFuZCB0aGUgdGltZW91dCBjb2RlIGluIG15IHRlc3RzLiBXaXRob3V0IHRo
-aXMgcGF0Y2ggaWYgSSBydW4gdGhlDQpzcnAtdGVzdCBzb2Z0d2FyZSBJIHNlZSBjcmFzaGVzIGJl
-aW5nIHJlcG9ydGVkIGluIHRoZSByZG1hX3J4ZSBkcml2ZXIgYnV0DQp3aXRoIHRoaXMgcGF0Y2gg
-YXBwbGllZCBJIGRvbid0IHNlZSBhbnkgY3Jhc2hlcyB3aXRoIG15IHRlc3RzLg0KDQpCYXJ0Lg0K
-DQoNCg==
+
+
+On 2018年04月10日 18:04, Ming Lei wrote:
+> On Tue, Apr 10, 2018 at 03:59:30PM +0800, jianchao.wang wrote:
+>> Hi Bart
+>>
+>> On 04/10/2018 09:34 AM, Bart Van Assche wrote:
+>>> If a completion occurs after blk_mq_rq_timed_out() has reset
+>>> rq->aborted_gstate and the request is again in flight when the timeout
+>>> expires then a request will be completed twice: a first time by the
+>>> timeout handler and a second time when the regular completion occurs
+>> Would you please detail more here about why the request could be completed twice ?
+>>
+>> Is it the scenario you described as below in https://marc.info/?l=linux-block&m=151796816127318
+>>
+>> The following race can occur between the code that resets the timer
+>> and completion handling:
+>> - The code that handles BLK_EH_RESET_TIMER resets aborted_gstate.
+>> - A completion occurs and blk_mq_complete_request() calls
+>>    __blk_mq_complete_request().
+>> - The timeout code calls blk_add_timer() and that function sets the
+>>    request deadline and adjusts the timer.
+>> - __blk_mq_complete_request() frees the request tag.
+>> - The timer fires and the timeout handler gets called for a freed
+>>    request.
+>> If yes, how does the timeout handler get the freed request when the tag has been freed ?
+> Thinking of this patch further.
+>
+> The issue may not be a double completion issue, and it may be the
+> following behaviour which breaks NVMe or other drivers easily:
+>
+> 1) there is long delay(synchronize_rcu()) between setting rq->aborted_gstate
+> and handling the timeout by blk_mq_rq_timed_out().
+>
+> 2) during the long delay, the rq may be completed by hardware, then
+> if the following timeout is handled as BLK_EH_RESET_TIMER, it is
+> driver's bug, and driver's .timeout() may be confused about this
+> behaviour, I guess.
+>
+> In theory this behaviour should exist in all these approaches,
+> but just easier to trigger if long delay is introduced before handling
+> timeout.
+
+Or think it as below?
+
+
+                    C                           C                C
++-----------------------------+---------------+-----------+
+S                                   T F              E
+
+Request life time line:
+S: start
+T: timed out
+F: found (by timer), inflight but timed out because of a long delay
+E: completed by timeout handler
+C: regular completion
+
+normal request completion time range: (S, T)
+completion in (T, F) is fine since it's not inflight anymore
+race window time range: (F, E)
+
+if the delayed request is completed in (F, E) range then it could be 
+completed
+twice by the regular completion first and then the timeout handler.
+
+Thanks
+Shan Hai
+> Thanks,
+> Ming
