@@ -1,53 +1,83 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Tejun Heo <tj@kernel.org>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Martin Steigerwald <Martin@Lichtvoll.de>,
-	Israel Rukshin <israelr@mellanox.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 0/2] blk-mq: fix race between completion and BLK_EH_RESET_TIMER
-Date: Sun, 15 Apr 2018 23:43:55 +0800
-Message-Id: <20180415154357.19788-1-ming.lei@redhat.com>
+Return-Path: <martin@lichtvoll.de>
+From: Martin Steigerwald <martin@lichtvoll.de>
+To: Martin Steigerwald <martin@lichtvoll.de>
+Cc: Tejun Heo <tj@kernel.org>, Sitsofe Wheeler <sitsofe@gmail.com>, Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, Stefan Haberland <sth@linux.vnet.ibm.com>, Jan Hoeppner <hoeppner@linux.vnet.ibm.com>, Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: Re: [PATCH] blk-mq: Directly schedule q->timeout_work when aborting a request
+Date: Tue, 10 Apr 2018 22:46:07 +0200
+Message-ID: <2410059.9M3ptFeZvf@merkaba>
+In-Reply-To: <2699418.6CV4rbzP8d@merkaba>
+References: <CALjAwxh-PVYFnYFCJpGOja+m5SzZ8Sa4J7ohxdK=r8NyOF-EMA@mail.gmail.com> <20180402220458.GJ388343@devbig577.frc2.facebook.com> <2699418.6CV4rbzP8d@merkaba>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+Martin Steigerwald - 10.04.18, 20:43:
+> Tejun Heo - 03.04.18, 00:04:
+> > Request abortion is performed by overriding deadline to now and
+> > scheduling timeout handling immediately.  For the latter part, the
+> > code was using mod_timer(timeout, 0) which can't guarantee that the
+> > timer runs afterwards.  Let's schedule the underlying work item
+> > directly instead.
+> > 
+> > This fixes the hangs during probing reported by Sitsofe but it isn't
+> > yet clear to me how the failure can happen reliably if it's just the
+> > above described race condition.
+> 
+> Compiling a 4.16.1 kernel with that patch to test whether this fixes
+> the boot hang I reported in:
+> 
+> [Possible REGRESSION, 4.16-rc4] Error updating SMART data during
+> runtime and boot failures with blk_mq_terminate_expired in backtrace
+> https://bugzilla.kernel.org/show_bug.cgi?id=199077
 
-This two patches fixes the recently discussed race between completion
-and BLK_EH_RESET_TIMER.
+Fails as well, see
 
-Israel & Martin, this one is a simpler fix on this issue and can
-cover the potencial hang of MQ_RQ_COMPLETE_IN_TIMEOUT request, could
-you test V4 and see if your issue can be fixed?
+https://bugzilla.kernel.org/show_bug.cgi?id=199077#c8
 
-Thanks,
+for photo with (part of) backtrace.
 
-V4:
-	- run synchronize_rcu() once for handling all timed out request
-	between .timeout() and the following handling
-	- address tj's concern about reorder between blk_add_timer() and
-    blk_mq_rq_update_aborted_gstate(req, 0)
+> The "Error updating SMART data during runtime" thing I reported there
+> as well may still be another (independent) issue.
+> 
+> > Signed-off-by: Tejun Heo <tj@kernel.org>
+> > Reported-by: Sitsofe Wheeler <sitsofe@gmail.com>
+> > Reported-by: Meelis Roos <mroos@linux.ee>
+> > Fixes: 358f70da49d7 ("blk-mq: make blk_abort_request() trigger
+> > timeout path") Cc: stable@vger.kernel.org # v4.16
+> > Link:
+> > http://lkml.kernel.org/r/CALjAwxh-PVYFnYFCJpGOja+m5SzZ8Sa4J7ohxdK=r8
+> > NyOF-EM A@mail.gmail.com Link:
+> > http://lkml.kernel.org/r/alpine.LRH.2.21.1802261049140.4893@math.ut.
+> > ee --- Hello,
+> > 
+> > I don't have the full explanation yet but here's a preliminary
+> > patch.
+> > 
+> > Thanks.
+> > 
+> >  block/blk-timeout.c |    2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+> > index a05e367..f0e6e41 100644
+> > --- a/block/blk-timeout.c
+> > +++ b/block/blk-timeout.c
+> > @@ -165,7 +165,7 @@ void blk_abort_request(struct request *req)
+> > 
+> >  		 * No need for fancy synchronizations.
+> >  		 */
+> >  		
+> >  		blk_rq_set_deadline(req, jiffies);
+> > 
+> > -		mod_timer(&req->q->timeout, 0);
+> > +		kblockd_schedule_work(&req->q->timeout_work);
+> > 
+> >  	} else {
+> >  	
+> >  		if (blk_mark_rq_complete(req))
+> >  		
+> >  			return;
 
-V3:
-	- before completing rq for BLK_EH_HANDLED, sync with normal completion path
-	- make sure rq's state updated as MQ_RQ_IN_FLIGHT before completing
-V2:
-	- rename the new flag as MQ_RQ_COMPLETE_IN_TIMEOUT
-	- fix lock uses in blk_mq_rq_timed_out
-	- document re-order between blk_add_timer() and
-	blk_mq_rq_update_aborted_gstate(req, 0)
-
-
-Ming Lei (2):
-  blk-mq: set RQF_MQ_TIMEOUT_EXPIRED when the rq's timeout isn't handled
-  blk-mq: fix race between complete and BLK_EH_RESET_TIMER
-
- block/blk-mq.c         | 120 +++++++++++++++++++++++++++++++++++++++----------
- block/blk-mq.h         |   1 +
- block/blk-timeout.c    |   1 -
- include/linux/blkdev.h |   6 +++
- 4 files changed, 104 insertions(+), 24 deletions(-)
 
 -- 
-2.9.5
+Martin
