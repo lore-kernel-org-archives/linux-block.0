@@ -1,45 +1,49 @@
-Return-Path: <jianchao.w.wang@oracle.com>
+Return-Path: <prvs=63144aee1=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tj@kernel.org" <tj@kernel.org>
+CC: "hch@lst.de" <hch@lst.de>, "maxg@mellanox.com" <maxg@mellanox.com>,
+	"israelr@mellanox.com" <israelr@mellanox.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"sagi@grimberg.me" <sagi@grimberg.me>
 Subject: Re: [PATCH v4] blk-mq: Fix race conditions in request timeout
  handling
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-Cc: "hch@lst.de" <hch@lst.de>, "tj@kernel.org" <tj@kernel.org>,
-        "israelr@mellanox.com" <israelr@mellanox.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "maxg@mellanox.com" <maxg@mellanox.com>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        "sagi@grimberg.me" <sagi@grimberg.me>
+Date: Tue, 10 Apr 2018 14:30:26 +0000
+Message-ID: <82f1fa6aba4bd5c7684eac6b375776b43b66f8c3.camel@wdc.com>
 References: <20180410013455.7448-1-bart.vanassche@wdc.com>
- <f6fcc94b-412c-1552-477e-ba0b0927006c@oracle.com>
- <1131f89179501c54c04d61d81bc46a83ba87df27.camel@wdc.com>
-From: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <a073fa7a-d23e-dafa-0d7d-e5caababe7b0@oracle.com>
-Date: Tue, 10 Apr 2018 22:32:20 +0800
+	 <20180410142028.GM3126663@devbig577.frc2.facebook.com>
+In-Reply-To: <20180410142028.GM3126663@devbig577.frc2.facebook.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1131f89179501c54c04d61d81bc46a83ba87df27.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Bart
-
-Thanks for your kindly response.
-
-On 04/10/2018 09:01 PM, Bart Van Assche wrote:
-> On Tue, 2018-04-10 at 15:59 +0800, jianchao.wang wrote:
->> If yes, how does the timeout handler get the freed request when the tag has been freed ?
-> 
-> Hello Jianchao,
-> 
-> Have you noticed that the timeout handler does not check whether or not the request
-> tag is freed? Additionally, I don't think it would be possible to add such a check
-> to the timeout code without introducing a new race condition.
-
-Doesn't blk_mq_queue_tag_busy_iter only iterate the tags that has been allocated/set ?
-When the request is freed, the tag will be cleared through blk_mq_put_tag->sbitmap_queue_clear
-Do I miss something else ?
-
-Thanks
-Jianchao
-
-> 
-> 
+T24gVHVlLCAyMDE4LTA0LTEwIGF0IDA3OjIwIC0wNzAwLCBUZWp1biBIZW8gd3JvdGU6DQo+IE9u
+IE1vbiwgQXByIDA5LCAyMDE4IGF0IDA2OjM0OjU1UE0gLTA3MDAsIEJhcnQgVmFuIEFzc2NoZSB3
+cm90ZToNCj4gPiBTaW5jZSB0aGUgcmVxdWVzdCBzdGF0ZSBjYW4gYmUgdXBkYXRlZCBmcm9tIHR3
+byBkaWZmZXJlbnQgY29udGV4dHMsDQo+ID4gbmFtZWx5IHJlZ3VsYXIgY29tcGxldGlvbiBhbmQg
+cmVxdWVzdCB0aW1lb3V0LCB0aGlzIHJhY2UgY2Fubm90IGJlDQo+ID4gZml4ZWQgd2l0aCBSQ1Ug
+c3luY2hyb25pemF0aW9uIG9ubHkuIEZpeCB0aGlzIHJhY2UgYXMgZm9sbG93czoNCj4gDQo+IFdl
+bGwsIGl0IGNhbiBiZSBhbmQgdGhlIHBhdGNoZXMgaGF2ZSBiZWVuIHBvc3RlZCBtb250aHMgYWdv
+Lg0KDQpUaGF0J3Mgbm90IGNvcnJlY3QuIEkgaGF2ZSBleHBsYWluZWQgeW91IGluIGRldGFpbCB0
+aGF0IHRoZSB0d28gcGF0Y2hlcyB5b3UNCnBvc3RlZCBkbyBub3QgZml4IGFsbCB0aGUgcmFjZXMg
+Zml4ZWQgYnkgdGhlIHBhdGNoIGF0IHRoZSBzdGFydCBvZiB0aGlzDQplLW1haWwgdGhyZWFkLg0K
+DQo+IFN3aXRjaGluZyB0byBhbm90aGVyIG1vZGVsIG1pZ2h0IGJlIGJldHRlciBidXQgbGV0J3Mg
+cGxlYXNlIGRvIHRoYXQNCj4gd2l0aCB0aGUgcmlnaHQgcmF0aW9uYWxlcy4gIEEgZ29vZCBwb3J0
+aW9uIG9mIHRoaXMgc2VlbXMgdG8gYmUgYnVpbHQNCj4gb24gbWlzdW5kZXJzdGFuZGluZ3MuDQoN
+CldoaWNoIG1pc3VuZGVyc3RhbmRpbmdzPyBJJ20gbm90IGF3YXJlIG9mIGFueSBtaXN1bmRlcnN0
+YW5kaW5ncyBhdCBteSBzaWRlLg0KQWRkaXRpb25hbGx5LCB0ZXN0cyB3aXRoIHR3byBkaWZmZXJl
+bnQgYmxvY2sgZHJpdmVycyAoTlZNZU9GIGluaXRpYXRvciBhbmQNCnRoZSBTUlAgaW5pdGlhdG9y
+IGRyaXZlcikgaGF2ZSBzaG93biB0aGF0IHRoZSBjdXJyZW50IGJsay1tcSB0aW1lb3V0DQppbXBs
+ZW1lbnRhdGlvbiB3aXRoIG9yIHdpdGhvdXQgeW91ciB0d28gcGF0Y2hlcyBhcHBsaWVkIHJlc3Vs
+dCBpbiBzdWJ0bGUgYW5kDQpoYXJkIHRvIGRlYnVnIGNyYXNoZXMgYW5kL29yIG1lbW9yeSBjb3Jy
+dXB0aW9uLiBUaGF0IGlzIG5vdCB0aGUgY2FzZSBmb3IgdGhlDQpwYXRjaCBhdCB0aGUgc3RhcnQg
+b2YgdGhpcyB0aHJlYWQuIFRoZSBsYXRlc3QgcmVwb3J0IG9mIGEgY3Jhc2ggSSByYW4gaW50bw0K
+bXlzZWxmIGFuZCB0aGF0IGlzIGZpeGVkIGJ5IHRoZSBwYXRjaCBhdCB0aGUgc3RhcnQgb2YgdGhp
+cyB0aHJlYWQgaXMNCmF2YWlsYWJsZSBoZXJlOiBodHRwczovL3d3dy5zcGluaWNzLm5ldC9saXN0
+cy9saW51eC1yZG1hL21zZzYzMjQwLmh0bWwuDQoNClBsZWFzZSBhbHNvIGtlZXAgaW4gbWluZCB0
+aGF0IGlmIHRoaXMgcGF0Y2ggd291bGQgYmUgYWNjZXB0ZWQgdGhhdCB0aGF0IGRvZXMNCm5vdCBw
+cmV2ZW50IHRoaXMgcGF0Y2ggdG8gYmUgcmVwbGFjZWQgd2l0aCBhbiBSQ1UtYmFzZWQgc29sdXRp
+b24gbGF0ZXIgb24uDQpJZiBhbnlvbmUgY29tZXMgdXAgYW55IHRpbWUgd2l0aCBhIHJlbGlhYmx5
+IHdvcmtpbmcgUkNVLWJhc2VkIHNvbHV0aW9uIEkNCndpbGwgYmUgaGFwcHkgdG8gYWNjZXB0IGEg
+cmV2ZXJ0IG9mIHRoaXMgcGF0Y2ggYW5kIEkgd2lsbCBoZWxwIHJldmlld2luZyB0aGF0DQpSQ1Ut
+YmFzZWQgc29sdXRpb24uDQoNCkJhcnQuDQoNCg0K
