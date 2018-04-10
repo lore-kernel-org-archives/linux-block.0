@@ -1,8 +1,8 @@
 Return-Path: <oleksandr@natalenko.name>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
+Content-Type: text/plain; charset=UTF-8;
  format=flowed
-Date: Tue, 10 Apr 2018 19:16:49 +0200
+Date: Tue, 10 Apr 2018 15:47:41 +0200
 From: Oleksandr Natalenko <oleksandr@natalenko.name>
 To: Kees Cook <keescook@chromium.org>
 Cc: David Windsor <dave@nullcore.net>, "James E.J. Bottomley"
@@ -13,7 +13,7 @@ Cc: David Windsor <dave@nullcore.net>, "James E.J. Bottomley"
  <jthumshirn@suse.de>, linux-block@vger.kernel.org, paolo.valente@linaro.org,
  keescook@google.com
 Subject: Re: usercopy whitelist woe in scsi_sense_cache
-In-Reply-To: <CAGXu5j+9BJcR63bsqQpqaKrvcgOpWyDzgpD-zRrf1qq7v=Z2CA@mail.gmail.com>
+In-Reply-To: <3d7b5a707e216e19eb3defe0586bfbc8@natalenko.name>
 References: <10360653.ov98egbaqx@natalenko.name>
  <CAGXu5jL8oLV2xvjBVYv_SNXr74LdgpXEmU7K+cLYpD7jh2chgw@mail.gmail.com>
  <CAGXu5j+mVc6O_=GOF3YQmS4QZxeFgVPQtMxNH8sjBAhpJLjm9w@mail.gmail.com>
@@ -22,64 +22,35 @@ References: <10360653.ov98egbaqx@natalenko.name>
  <51a7e805058ef7f35b226cbbf0ccc4ff@natalenko.name>
  <CAGXu5jKRrdYjuyLSvc4k4mqttkM7zw-96poQ1GYqRRgPqZFOYQ@mail.gmail.com>
  <3d7b5a707e216e19eb3defe0586bfbc8@natalenko.name>
- <CAGXu5j+9BJcR63bsqQpqaKrvcgOpWyDzgpD-zRrf1qq7v=Z2CA@mail.gmail.com>
-Message-ID: <d53af006c314eb9d326bfb19b08e189b@natalenko.name>
+Message-ID: <d31189fc94392eb733c1e310ac1ec498@natalenko.name>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi, Kees, Paolo et al.
+Hi.
 
-10.04.2018 08:53, Kees Cook wrote:
-> Unfortunately I only had a single hang with no dumps. I haven't been
-> able to reproduce it since. :(
+10.04.2018 08:35, Oleksandr Natalenko wrote:
+>> - does it reproduce _without_ hardened usercopy? (I would assume yes,
+>> but you'd just not get any warning until the hangs started.) If it
+>> does reproduce without hardened usercopy, then a new bisect run could
+>> narrow the search even more.
+> 
+> Looks like it cannot be disabled via kernel cmdline, so I have to
+> re-compile the kernel, right? I can certainly do that anyway.
 
-For your convenience I've prepared a VM that contains a reproducer.
+Okay, I've recompiled the kernel without hardened usercopy:
 
-It consists of 3 disk images (sda.img is for the system, it is 
-Arch-based, sdb/sdc.img are for RAID). They are available (in a 
-compressed form) to download here [1].
+[root@archlinux ~]# zgrep USERCOPY /proc/config.gz
+CONFIG_X86_INTEL_USERCOPY=y
+CONFIG_HAVE_HARDENED_USERCOPY_ALLOCATOR=y
+# CONFIG_HARDENED_USERCOPY is not set
 
-RAID is built as RAID10 with far2 layout, on top of it there is a LUKS 
-container (can be opened either with keyfile under the /root or using 
-"qwerty" password). There's one LVM PV, one VG and one volume on top of 
-LUKS containing XFS. RAID is automatically assembled during the boot, so 
-you don't have to worry about it.
+and I cannot reproduce the issue anymore. I/O doesn't hang regardless of 
+how long I hammer it.
 
-I run the VM like this:
+Eeeh? Maybe, this is a matter of some cleanup code path once the 
+warn/bug condition is hit with hardening enabled? I'm just guessing here 
+again.
 
-$ qemu-system-x86_64 -display gtk,gl=on -machine q35,accel=kvm -cpu 
-host,+vmx -enable-kvm -netdev user,id=user.0 -device 
-virtio-net,netdev=user.0 -usb -device nec-usb-xhci,id=xhci -device 
-usb-tablet,bus=xhci.0 -serial stdio -smp 4 -m 512 -hda sda.img -hdb 
-sdb.img -hdc sdc.img
-
-The system is accessible via both VGA and serial console. The user is 
-"root", the password is "qwerty".
-
-Under the /root folder there is a reproducer script (reproducer.sh). It 
-does trivial things like enabling sysrq, opening LUKS device, mounting a 
-volume, running a background I/O (this is an important part, actually, 
-since I wasn't able to trigger the issue without the background I/O) 
-and, finally, running the smartctl in a loop. If you are lucky, within a 
-minute or two you'll get the first warning followed shortly by 
-subsequent bugs and I/O stall (htop is pre-installed for your 
-convenience too).
-
-Notable changes in this VM comparing to generic defaults:
-
-1) blk-mq is enabled via kernel cmdline (scsi_mod.use_blk_mq=1 is in 
-/etc/default/grub)
-2) BFQ is set via udev (check /etc/udev/rules.d/10-io-scheduler.rules 
-file)
-
-Again, I wasn't able to reproduce the usercopy warning/bug and I/O hang 
-without all these components being involved.
-
-Hope you enjoy it.
-
-P.S. I haven't tested Linus' master branch yet. For now, this VM runs 
-v4.16 kernel.
+Will work towards checking Linus' master branch now…
 
 Regards,
    Oleksandr
-
-[1] https://natalenko.name/myfiles/usercopy_bfq_woe/
