@@ -1,9 +1,7 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Tue, 10 Apr 2018 08:40:43 -0700
-From: "tj@kernel.org" <tj@kernel.org>
-To: Ming Lei <ming.lei@redhat.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 10 Apr 2018 23:38:18 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: "tj@kernel.org" <tj@kernel.org>
 Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"israelr@mellanox.com" <israelr@mellanox.com>,
@@ -13,7 +11,7 @@ Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
 	"maxg@mellanox.com" <maxg@mellanox.com>
 Subject: Re: [PATCH v4] blk-mq: Fix race conditions in request timeout
  handling
-Message-ID: <20180410154043.GP3126663@devbig577.frc2.facebook.com>
+Message-ID: <20180410153812.GA3219@ming.t460p>
 References: <20180410013455.7448-1-bart.vanassche@wdc.com>
  <20180410084133.GB9133@ming.t460p>
  <b36ea1107be4f32fb04fffdde3ee45a2e0fcc36c.camel@wdc.com>
@@ -23,27 +21,37 @@ References: <20180410013455.7448-1-bart.vanassche@wdc.com>
  <e2762e359649946543ee22cf6ebf0c08410f7963.camel@wdc.com>
  <20180410152553.GC22340@ming.t460p>
  <20180410153031.GO3126663@devbig577.frc2.facebook.com>
- <20180410153812.GA3219@ming.t460p>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180410153812.GA3219@ming.t460p>
+In-Reply-To: <20180410153031.GO3126663@devbig577.frc2.facebook.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
+Hi Tejun,
 
-On Tue, Apr 10, 2018 at 11:38:18PM +0800, Ming Lei wrote:
-> I agree, the issue should be in driver's irq handler and .timeout in
-> theory.
+On Tue, Apr 10, 2018 at 08:30:31AM -0700, tj@kernel.org wrote:
+> Hello, Ming.
 > 
-> For example, even though one request has been done by irq handler, .timeout
-> still may return RESET_TIMER.
+> On Tue, Apr 10, 2018 at 11:25:54PM +0800, Ming Lei wrote:
+> > +   if (time_after_eq(jiffies, deadline) &&
+> > +       blk_mq_change_rq_state(rq, MQ_RQ_IN_FLIGHT, MQ_RQ_COMPLETE)) {
+> > +       blk_mq_rq_timed_out(rq, reserved);
+> > 
+> > Normal completion still can happen between blk_mq_change_rq_state()
+> > and blk_mq_rq_timed_out().
+> > 
+> > In tj's approach, there is synchronize_rcu() between writing aborted_gstate
+> > and blk_mq_rq_timed_out, it is easier for normal completion to happen during
+> > the big window.
+> 
+> I don't think plugging this hole is all that difficult, but this
+> shouldn't lead to any critical failures.  If so, that'd be a driver
+> bug.
 
-blk-mq can use a separate flag to track normal completions during
-timeout and complete the request normally on RESET_TIMER if the flag
-is set while EH was in progress.  With a bit of care, we'd be able to
-plug the race completely.
+I agree, the issue should be in driver's irq handler and .timeout in
+theory.
 
-Thanks.
+For example, even though one request has been done by irq handler, .timeout
+still may return RESET_TIMER.
 
--- 
-tejun
+Thanks,
+Ming
