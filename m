@@ -1,48 +1,55 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Tue, 10 Apr 2018 07:33:56 -0700
+From: "tj@kernel.org" <tj@kernel.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>, "maxg@mellanox.com" <maxg@mellanox.com>,
+	"israelr@mellanox.com" <israelr@mellanox.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"sagi@grimberg.me" <sagi@grimberg.me>
 Subject: Re: [PATCH v4] blk-mq: Fix race conditions in request timeout
  handling
-To: Christoph Hellwig <hch@lst.de>, Bart Van Assche <bart.vanassche@wdc.com>
-Cc: linux-block@vger.kernel.org, Tejun Heo <tj@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>, Israel Rukshin <israelr@mellanox.com>,
- Max Gurtovoy <maxg@mellanox.com>, stable@vger.kernel.org
+Message-ID: <20180410143356.GN3126663@devbig577.frc2.facebook.com>
 References: <20180410013455.7448-1-bart.vanassche@wdc.com>
- <20180410095537.GA19266@lst.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <a34de069-2df9-177b-918c-cdbf747ebd79@kernel.dk>
-Date: Tue, 10 Apr 2018 08:41:57 -0600
+ <20180410142028.GM3126663@devbig577.frc2.facebook.com>
+ <82f1fa6aba4bd5c7684eac6b375776b43b66f8c3.camel@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <20180410095537.GA19266@lst.de>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <82f1fa6aba4bd5c7684eac6b375776b43b66f8c3.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 4/10/18 3:55 AM, Christoph Hellwig wrote:
-> On Mon, Apr 09, 2018 at 06:34:55PM -0700, Bart Van Assche wrote:
->> If a completion occurs after blk_mq_rq_timed_out() has reset
->> rq->aborted_gstate and the request is again in flight when the timeout
->> expires then a request will be completed twice: a first time by the
->> timeout handler and a second time when the regular completion occurs.
->>
->> Additionally, the blk-mq timeout handling code ignores completions that
->> occur after blk_mq_check_expired() has been called and before
->> blk_mq_rq_timed_out() has reset rq->aborted_gstate. If a block driver
->> timeout handler always returns BLK_EH_RESET_TIMER then the result will
->> be that the request never terminates.
->>
->> Since the request state can be updated from two different contexts,
->> namely regular completion and request timeout, this race cannot be
->> fixed with RCU synchronization only. Fix this race as follows:
->> - Split __deadline in two variables, namely lq_deadline for legacy
->>   request queues and mq_deadline for blk-mq request queues. Use atomic
->>   operations to update mq_deadline.
-> 
-> I don't think we need the atomic_long_cmpxchg, and can do with a plain
-> cmpxhg.  Also unterminated cmpxchg loops are a bad idea, but I think
-> both callers are protected from other changes so we can turn that
-> into a WARN_ON().  That plus some minor cleanups in the version below,
-> only boot tested:
+Hello,
 
-This version looks reasonable, let me throw it through the testing
-machinery.
+On Tue, Apr 10, 2018 at 02:30:26PM +0000, Bart Van Assche wrote:
+> > Switching to another model might be better but let's please do that
+> > with the right rationales.  A good portion of this seems to be built
+> > on misunderstandings.
+> 
+> Which misunderstandings? I'm not aware of any misunderstandings at my side.
+> Additionally, tests with two different block drivers (NVMeOF initiator and
+> the SRP initiator driver) have shown that the current blk-mq timeout
+> implementation with or without your two patches applied result in subtle and
+> hard to debug crashes and/or memory corruption. That is not the case for the
+
+I must have missed that part.  Which tests were they?
+
+> patch at the start of this thread. The latest report of a crash I ran into
+> myself and that is fixed by the patch at the start of this thread is
+> available here: https://www.spinics.net/lists/linux-rdma/msg63240.html.
+> 
+> Please also keep in mind that if this patch would be accepted that that does
+> not prevent this patch to be replaced with an RCU-based solution later on.
+> If anyone comes up any time with a reliably working RCU-based solution I
+> will be happy to accept a revert of this patch and I will help reviewing that
+> RCU-based solution.
+
+Oh, switching is fine but let's get in sync first.  Who have the repro
+cases and what were tested?
+
+Thanks.
 
 -- 
-Jens Axboe
+tejun
