@@ -1,39 +1,32 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: jglisse@redhat.com
-To: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>
-Subject: [RFC PATCH 76/79] mm/ksm: have ksm select PAGE_RONLY config.
-Date: Wed,  4 Apr 2018 15:18:28 -0400
-Message-Id: <20180404191831.5378-39-jglisse@redhat.com>
-In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
-References: <20180404191831.5378-1-jglisse@redhat.com>
+Return-Path: <hare@suse.de>
+Date: Tue, 10 Apr 2018 08:27:10 +0200
+From: Hannes Reinecke <hare@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, Bart.VanAssche@wdc.com, willy@infradead.org,
+ linux-block@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH 4/7] block: pass explicit gfp_t to get_request
+Message-ID: <20180410082710.7a9ddeb9@pentland.suse.de>
+In-Reply-To: <20180409153916.23901-5-hch@lst.de>
+References: <20180409153916.23901-1-hch@lst.de>
+	<20180409153916.23901-5-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-fsdevel-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jérôme Glisse <jglisse@redhat.com>
+On Mon,  9 Apr 2018 17:39:13 +0200
+Christoph Hellwig <hch@lst.de> wrote:
 
-Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
-Cc: Andrea Arcangeli <aarcange@redhat.com>
----
- mm/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+> blk_old_get_request already has it at hand, and in blk_queue_bio,
+> which is the fast path, it is constant.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-core.c          | 14 +++++++-------
+>  drivers/scsi/scsi_error.c |  4 ----
+>  2 files changed, 7 insertions(+), 11 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-diff --git a/mm/Kconfig b/mm/Kconfig
-index aeffb6e8dd21..6994a1fdf847 100644
---- a/mm/Kconfig
-+++ b/mm/Kconfig
-@@ -308,6 +308,7 @@ config MMU_NOTIFIER
- config KSM
- 	bool "Enable KSM for page merging"
- 	depends on MMU
-+	select PAGE_RONLY
- 	help
- 	  Enable Kernel Samepage Merging: KSM periodically scans those areas
- 	  of an application's address space that an app has advised may be
--- 
-2.14.3
+Cheers,
+
+Hannes
