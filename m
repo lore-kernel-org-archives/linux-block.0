@@ -1,105 +1,43 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: jglisse@redhat.com
-To: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Tejun Heo <tj@kernel.org>, Jan Kara <jack@suse.cz>,
-        Josef Bacik <jbacik@fb.com>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Jeff Layton <jlayton@redhat.com>
-Subject: [RFC PATCH 24/79] fs: add struct inode to nobh_writepage() arguments
-Date: Wed,  4 Apr 2018 15:17:59 -0400
-Message-Id: <20180404191831.5378-10-jglisse@redhat.com>
-In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
-References: <20180404191831.5378-1-jglisse@redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: limits->max_sectors is getting set to 0, why/where? [was: Re: dm:
+ kernel oops by divide error on v4.16+]
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Ming Lei <ming.lei@redhat.com>, Kees Cook <keescook@chromium.org>,
+ Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+ linux-block <linux-block@vger.kernel.org>, Chris Mason <clm@fb.com>
+References: <20180408040005.GA19128@ming.t460p>
+ <20180409155120.GA10990@redhat.com> <20180409183836.GA11256@redhat.com>
+ <db4499d6-05b8-73f3-76d0-a91af91430b0@kernel.dk>
+ <70f1d349-f091-19a2-9ec6-978ac1e7dda0@kernel.dk>
+ <78732cb7-3666-e1b0-e6d3-2a3409a0d4ca@kernel.dk>
+ <CAGXu5j+81yUffU4=7h4goQYx_pWwvv6wtwrLy4sx6H=AGmK3ZQ@mail.gmail.com>
+ <ddc93069-1ccd-d867-6c8d-6fd429bc2080@kernel.dk>
+ <20180409222716.GA6450@ming.t460p>
+ <911ff78b-5b60-e05c-de88-8077d502290a@kernel.dk>
+ <CA+55aFyRyL0WbEvXKSdRyFnYW6KKYr0vartCeK3pkkcLeV3mMA@mail.gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <19ce840a-2466-2af0-394c-eb19c4c10ee4@kernel.dk>
+Date: Mon, 9 Apr 2018 18:31:22 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-fsdevel-owner@vger.kernel.org
+In-Reply-To: <CA+55aFyRyL0WbEvXKSdRyFnYW6KKYr0vartCeK3pkkcLeV3mMA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jérôme Glisse <jglisse@redhat.com>
+On 4/9/18 5:54 PM, Linus Torvalds wrote:
+> On Mon, Apr 9, 2018 at 3:32 PM, Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> The resulting min/max and friends would have been trivial to test, but
+>> clearly they weren't.
+> 
+> Well, the min/max macros themselves actually were tested in user space by me.
+> 
+> It was the interaction with the unrelated "min_not_zero()" that wasn't ;)
+> 
+> It's easy in hind-sight to say "that's not at all unrelated", but
+> within the context of doing min/max, it was.
 
-Add struct inode to nobh_writepage(). Note this patch only add arguments
-and modify call site conservatily using page->mapping and thus the end
-result is as before this patch.
+I guess we should just be thankful that it didn't cause bigger issues
+than an oops.
 
-One step toward dropping reliance on page->mapping.
-
-Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-fsdevel@vger.kernel.org
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Josef Bacik <jbacik@fb.com>
-Cc: Mel Gorman <mgorman@techsingularity.net>
-Cc: Jeff Layton <jlayton@redhat.com>
----
- fs/buffer.c                 | 5 ++---
- fs/ext2/inode.c             | 2 +-
- fs/gfs2/aops.c              | 3 ++-
- include/linux/buffer_head.h | 4 ++--
- 4 files changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/fs/buffer.c b/fs/buffer.c
-index aa7d9be68581..31298f4f0300 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -2730,10 +2730,9 @@ EXPORT_SYMBOL(nobh_write_end);
-  * that it tries to operate without attaching bufferheads to
-  * the page.
-  */
--int nobh_writepage(struct page *page, get_block_t *get_block,
--			struct writeback_control *wbc)
-+int nobh_writepage(struct inode *inode, struct page *page,
-+		get_block_t *get_block, struct writeback_control *wbc)
- {
--	struct inode * const inode = page->mapping->host;
- 	loff_t i_size = i_size_read(inode);
- 	const pgoff_t end_index = i_size >> PAGE_SHIFT;
- 	unsigned offset;
-diff --git a/fs/ext2/inode.c b/fs/ext2/inode.c
-index 37439d1e544c..11b3c3e7ea65 100644
---- a/fs/ext2/inode.c
-+++ b/fs/ext2/inode.c
-@@ -926,7 +926,7 @@ static int ext2_nobh_writepage(struct address_space *mapping,
- 			struct page *page,
- 			struct writeback_control *wbc)
- {
--	return nobh_writepage(page, ext2_get_block, wbc);
-+	return nobh_writepage(page->mapping->host, page, ext2_get_block, wbc);
- }
- 
- static sector_t ext2_bmap(struct address_space *mapping, sector_t block)
-diff --git a/fs/gfs2/aops.c b/fs/gfs2/aops.c
-index 8cfd4c7d884c..ff02313b86e6 100644
---- a/fs/gfs2/aops.c
-+++ b/fs/gfs2/aops.c
-@@ -142,7 +142,8 @@ static int gfs2_writepage(struct address_space *mapping, struct page *page,
- 	if (ret <= 0)
- 		return ret;
- 
--	return nobh_writepage(page, gfs2_get_block_noalloc, wbc);
-+	return nobh_writepage(page->mapping->host, page,
-+			      gfs2_get_block_noalloc, wbc);
- }
- 
- /* This is the same as calling block_write_full_page, but it also
-diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
-index cab143668834..fb68a3358330 100644
---- a/include/linux/buffer_head.h
-+++ b/include/linux/buffer_head.h
-@@ -265,8 +265,8 @@ int nobh_write_end(struct file *, struct address_space *,
- 				loff_t, unsigned, unsigned,
- 				struct page *, void *);
- int nobh_truncate_page(struct address_space *, loff_t, get_block_t *);
--int nobh_writepage(struct page *page, get_block_t *get_block,
--                        struct writeback_control *wbc);
-+int nobh_writepage(struct inode *inode, struct page *page,
-+		get_block_t *get_block, struct writeback_control *wbc);
- 
- void buffer_init(void);
- 
 -- 
-2.14.3
+Jens Axboe
