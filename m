@@ -1,45 +1,109 @@
-Return-Path: <prvs=63144aee1=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"israelr@mellanox.com" <israelr@mellanox.com>, "sagi@grimberg.me"
-	<sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"maxg@mellanox.com" <maxg@mellanox.com>, "tj@kernel.org" <tj@kernel.org>
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 10 Apr 2018 21:55:47 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"israelr@mellanox.com" <israelr@mellanox.com>,
+	"sagi@grimberg.me" <sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"maxg@mellanox.com" <maxg@mellanox.com>,
+	"tj@kernel.org" <tj@kernel.org>
 Subject: Re: [PATCH v4] blk-mq: Fix race conditions in request timeout
  handling
-Date: Tue, 10 Apr 2018 14:09:33 +0000
-Message-ID: <7c4a8b019182d5a9259ef20e6462b3f6a533abed.camel@wdc.com>
+Message-ID: <20180410135541.GA22340@ming.t460p>
 References: <20180410013455.7448-1-bart.vanassche@wdc.com>
-	 <20180410084133.GB9133@ming.t460p>
-	 <b36ea1107be4f32fb04fffdde3ee45a2e0fcc36c.camel@wdc.com>
-	 <20180410135541.GA22340@ming.t460p>
-In-Reply-To: <20180410135541.GA22340@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+ <20180410084133.GB9133@ming.t460p>
+ <b36ea1107be4f32fb04fffdde3ee45a2e0fcc36c.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <b36ea1107be4f32fb04fffdde3ee45a2e0fcc36c.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTA0LTEwIGF0IDIxOjU1ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gVGhl
-biBJIGhhdmUgc2FtZSBxdWVzdGlvbiB3aXRoIEppYW5jaGFvLCB3aGF0IGlzIHRoZSBhY3R1YWwg
-ZG91YmxlDQo+IGNvbXBsZXRlIGluIGxpbnVzIHRyZWUgYmV0d2VlbiBCTEtfRUhfUkVTRVRfVElN
-RVIgYW5kIG5vcm1hbCBjb21wbGV0aW9uPw0KPiANCj4gRm9sbG93cyBteSB1bmRlcnN0YW5kaW5n
-Og0KPiANCj4gMSkgd2hlbiB0aW1lb3V0IGlzIGRldGVjdGVkIG9uIG9uZSByZXF1ZXN0LCBpdHMg
-YWJvcnRlZF9nc3RhdGUgaXMNCj4gdXBkYXRlZCBpbiBibGtfbXFfY2hlY2tfZXhwaXJlZCgpLg0K
-PiANCj4gMikgcnVuIHN5bmNocm9uaXplX3JjdSgpLCBhbmQgbWFrZSBzdXJlIGFsbCBwZW5kaW5n
-IGNvbXBsZXRpb24gaXMgZG9uZQ0KPiANCj4gMykgcnVuIGJsa19tcV9ycV90aW1lZF9vdXQoKQ0K
-PiAtIHJldCA9IG9wcy0+dGltZW91dA0KPiAtIGJsa19tcV9ycV91cGRhdGVfYWJvcnRlZF9nc3Rh
-dGUocmVxLCAwKQ0KPiAtIGJsa19hZGRfdGltZXIocmVxKTsNCj4gDQo+IElmIG5vcm1hbCBjb21w
-bGV0aW9uIGlzIGRvbmUgYmV0d2VlbiAxKSBhbmQgcmVzZXQgYWJvcnRlZF9nc3RhdGUgaW4gMyks
-DQo+IGJsa19tcV9jb21wbGV0ZV9yZXF1ZXN0KCkgd2lsbCBiZSBjYWxsZWQsIGFuZCBmb3VuZCB0
-aGF0IGFib3J0ZWRfZ3N0YXRlDQo+IGlzIHNldCwgdGhlbiB0aGUgcnEgd29uJ3QgYmUgY29tcGxl
-dGVkIHJlYWxseS4NCj4gDQo+IElmIG5vcm1hbCBjb21wbGV0aW9uIGlzIGRvbmUgYWZ0ZXIgcmVz
-ZXQgYWJvcnRlZF9nc3RhdGUgaW4gMyksIGl0IHNob3VsZA0KPiBiZSBzYW1lIHdpdGggYXBwbHlp
-bmcgdGhpcyBwYXRjaC4NCg0KSGVsbG8gTWluZywNCg0KUGxlYXNlIGtlZXAgaW4gbWluZCB0aGF0
-IGFsbCBzeW5jaHJvbml6ZV9yY3UoKSBkb2VzIGlzIHRvIHdhaXQgZm9yIHByZS0NCmV4aXN0aW5n
-IFJDVSByZWFkZXJzIHRvIGZpbmlzaC4gc3luY2hyb25pemVfcmN1KCkgZG9lcyBub3QgcHJldmVu
-dCB0aGF0IG5ldw0KcmN1X3JlYWRfbG9jaygpIGNhbGxzIGhhcHBlbi4gSXQgaXMgZS5nLiBwb3Nz
-aWJsZSB0aGF0IGFmdGVyDQpibGtfbXFfcnFfdXBkYXRlX2Fib3J0ZWRfZ3N0YXRlKHJlcSwgMCkg
-aGFzIGJlZW4gZXhlY3V0ZWQgdGhhdCBhIHJlZ3VsYXINCmNvbXBsZXRpb24gb2NjdXJzLiBJZiB0
-aGF0IHJlcXVlc3QgaXMgbm90IHJldXNlZCBiZWZvcmUgdGhlIHRpbWVyIHRoYXQgd2FzDQpyZXN0
-YXJ0ZWQgYnkgdGhlIHRpbWVvdXQgY29kZSBleHBpcmVzLCB0aGF0IHJlcXVlc3Qgd2lsbCBiZSBj
-b21wbGV0ZWQgdHdpY2UuDQoNCkJhcnQuDQoNCg0KDQo=
+On Tue, Apr 10, 2018 at 12:58:04PM +0000, Bart Van Assche wrote:
+> On Tue, 2018-04-10 at 16:41 +0800, Ming Lei wrote:
+> > On Mon, Apr 09, 2018 at 06:34:55PM -0700, Bart Van Assche wrote:
+> > > If a completion occurs after blk_mq_rq_timed_out() has reset
+> > > rq->aborted_gstate and the request is again in flight when the timeout
+> > 
+> > Given rq->aborted_gstate is reset only for BLK_EH_RESET_TIMER, I
+> > think you are addressing the race between normal completion and
+> > the timeout of BLK_EH_RESET_TIMER.
+> 
+> Yes, that's correct. I will make this more explicit.
+> 
+> > > expires then a request will be completed twice: a first time by the
+> > > timeout handler and a second time when the regular completion occurs.
+> > 
+> > This patch looks simpler, and more like the previous model of
+> > using blk_mark_rq_complete().
+> 
+> That's also correct.
+> 
+> > I have one question:
+> > 
+> > - with this patch, rq's state is updated atomically as cmpxchg. Suppose
+> > one rq is timed out, the rq's state is updated as MQ_RQ_COMPLETE by
+> > blk_mq_check_expired(), then ops->timeout() is run and
+> > BLK_EH_RESET_TIMER is returned, so blk_mq_add_timer(req, MQ_RQ_COMPLETE,
+> > MQ_RQ_IN_FLIGHT) is called to update rq's state into MQ_RQ_IN_FLIGHT.
+> > 
+> > Now the original normal completion still may occur after rq's state
+> > becomes MQ_RQ_IN_FLIGHT, and seems there is still the double completion
+> > with this patch? Maybe I am wrong, please explain a bit.
+> 
+> That scenario won't result in a double completion. After the timer has
+> been reset the block driver blk_mq_complete_request() call will change
+> the request state from MQ_RQ_IN_FLIGHT into MQ_RQ_COMPLETE. The next
+> time blk_mq_check_expired() is called it will execute the following code:
+> 
+> 	blk_mq_change_rq_state(rq, MQ_RQ_IN_FLIGHT, MQ_RQ_COMPLETE);
+> 
+> That function call only changes the request state if the current state is
+> IN_FLIGHT. However, the blk_mq_complete_request() call changed the request
+> state into COMPLETE. Hence, the above blk_mq_change_rq_state() call will
+> return false and the blk-mq timeout code will skip this request. If the
+> request would already have been reused and would have been marked again as
+> IN_FLIGHT then its deadline will also have been updated and the request
+> will be skipped by the timeout code because its deadline has not yet
+> expired.
+
+OK.
+
+Then I have same question with Jianchao, what is the actual double
+complete in linus tree between BLK_EH_RESET_TIMER and normal completion?
+
+Follows my understanding:
+
+1) when timeout is detected on one request, its aborted_gstate is
+updated in blk_mq_check_expired().
+
+2) run synchronize_rcu(), and make sure all pending completion is done
+
+3) run blk_mq_rq_timed_out()
+- ret = ops->timeout
+- blk_mq_rq_update_aborted_gstate(req, 0)
+- blk_add_timer(req);
+
+If normal completion is done between 1) and reset aborted_gstate in 3),
+blk_mq_complete_request() will be called, and found that aborted_gstate
+is set, then the rq won't be completed really.
+
+If normal completion is done after reset aborted_gstate in 3), it should
+be same with applying this patch.
+
+> 
+> > And synchronize_rcu() is needed by Tejun's approach between marking
+> > COMPLETE and handling this rq's timeout, and the time can be quite long,
+> > I guess it might be easier to trigger?
+> 
+> I have done what I could to trigger races between the regular completion
+> path and the timeout code in my tests. Without this patch if I run the
+> srp-test software I see crashes being reported in the rdma_rxe driver but
+> with this patch applied I don't see any crashes with my tests.
+
+I believe this patch may fix this issue, but I think the idea behind
+should be understood.
+
+Thanks,
+Ming
