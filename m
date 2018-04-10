@@ -1,49 +1,28 @@
 Return-Path: <prvs=63144aee1=Bart.VanAssche@wdc.com>
 From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@lst.de" <hch@lst.de>
-CC: "tj@kernel.org" <tj@kernel.org>, "israelr@mellanox.com"
-	<israelr@mellanox.com>, "linux-block@vger.kernel.org"
+To: "jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>, "tj@kernel.org" <tj@kernel.org>,
+	"israelr@mellanox.com" <israelr@mellanox.com>, "linux-block@vger.kernel.org"
 	<linux-block@vger.kernel.org>, "maxg@mellanox.com" <maxg@mellanox.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "sagi@grimberg.me" <sagi@grimberg.me>
+	"stable@vger.kernel.org" <stable@vger.kernel.org>, "sagi@grimberg.me"
+	<sagi@grimberg.me>
 Subject: Re: [PATCH v4] blk-mq: Fix race conditions in request timeout
  handling
-Date: Tue, 10 Apr 2018 13:26:39 +0000
-Message-ID: <f4bb15dff9dca995a9965204124caf2742798801.camel@wdc.com>
+Date: Tue, 10 Apr 2018 13:01:01 +0000
+Message-ID: <1131f89179501c54c04d61d81bc46a83ba87df27.camel@wdc.com>
 References: <20180410013455.7448-1-bart.vanassche@wdc.com>
-	 <20180410095537.GA19266@lst.de>
-In-Reply-To: <20180410095537.GA19266@lst.de>
+	 <f6fcc94b-412c-1552-477e-ba0b0927006c@oracle.com>
+In-Reply-To: <f6fcc94b-412c-1552-477e-ba0b0927006c@oracle.com>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTA0LTEwIGF0IDExOjU1ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
-ZToNCj4gSSBkb24ndCB0aGluayB3ZSBuZWVkIHRoZSBhdG9taWNfbG9uZ19jbXB4Y2hnLCBhbmQg
-Y2FuIGRvIHdpdGggYSBwbGFpbg0KPiBjbXB4aGcuICBBbHNvIHVudGVybWluYXRlZCBjbXB4Y2hn
-IGxvb3BzIGFyZSBhIGJhZCBpZGVhLCBidXQgSSB0aGluaw0KPiBib3RoIGNhbGxlcnMgYXJlIHBy
-b3RlY3RlZCBmcm9tIG90aGVyIGNoYW5nZXMgc28gd2UgY2FuIHR1cm4gdGhhdA0KPiBpbnRvIGEg
-V0FSTl9PTigpLg0KDQpIZWxsbyBDaHJpc3RvcGgsDQoNCkkgd2lsbCByZW1vdmUgdGhlIGJsa19t
-cV9ycV91cGRhdGVfc3RhdGUoKSBmdW5jdGlvbiBzbyB0aGF0J3Mgb25lIHdoaWxlDQpsb29wIGxl
-c3MuDQoNCkNhbiB5b3UgZXhwbGFpbiB3aHkgeW91IHRoaW5rIHRoYXQgdXNpbmcgY21weGNoZygp
-IGlzIHNhZmUgaW4gdGhpcyBjb250ZXh0Pw0KVGhlIHJlZ3VsYXIgY29tcGxldGlvbiBwYXRoIGFu
-ZCB0aGUgdGltZW91dCBjb2RlIGNhbiBib3RoIGV4ZWN1dGUgZS5nLiB0aGUNCmZvbGxvd2luZyBj
-b2RlIGNvbmN1cnJlbnRseToNCg0KCWJsa19tcV9jaGFuZ2VfcnFfc3RhdGUocnEsIE1RX1JRX0lO
-X0ZMSUdIVCwgTVFfUlFfQ09NUExFVEUpOw0KDQpUaGF0J3Mgd2h5IEkgdGhpbmsgdGhhdCB3ZSBu
-ZWVkIGFuIGF0b21pYyBjb21wYXJlIGFuZCBleGNoYW5nZSBpbnN0ZWFkIG9mDQpjbXB4Y2hnKCku
-IFdoYXQgSSBmb3VuZCBpbiB0aGUgSW50ZWwgU29mdHdhcmUgRGV2ZWxvcGVyIE1hbnVhbCBzZWVt
-cyB0bw0KY29uZmlybSB0aGF0Og0KDQpEZXNjcmlwdGlvbg0KDQpDb21wYXJlcyB0aGUgdmFsdWUg
-aW4gdGhlIEFMLCBBWCwgRUFYLCBvciBSQVggcmVnaXN0ZXIgd2l0aCB0aGUgZmlyc3QNCm9wZXJh
-bmQgKGRlc3RpbmF0aW9uIG9wZXJhbmQpLiBJZiB0aGUgdHdvIHZhbHVlcyBhcmUgZXF1YWwsIHRo
-ZSBzZWNvbmQNCm9wZXJhbmQgKHNvdXJjZSBvcGVyYW5kKSBpcyBsb2FkZWQgaW50byB0aGUgZGVz
-dGluYXRpb24gb3BlcmFuZC4gT3RoZXJ3aXNlLA0KdGhlIGRlc3RpbmF0aW9uIG9wZXJhbmQgaXMg
-bG9hZGVkIGludG8gdGhlIEFMLCBBWCwgRUFYIG9yIFJBWCByZWdpc3Rlci4gUkFYDQpyZWdpc3Rl
-ciBpcyBhdmFpbGFibGUgb25seSBpbiA2NC1iaXQgbW9kZS4gVGhpcyBpbnN0cnVjdGlvbiBjYW4g
-YmUgdXNlZA0Kd2l0aCBhIExPQ0sgcHJlZml4IHRvIGFsbG93IHRoZSBpbnN0cnVjdGlvbiB0byBi
-ZSBleGVjdXRlZCBhdG9taWNhbGx5LiBUbw0Kc2ltcGxpZnkgdGhlIGludGVyZmFjZSB0byB0aGUg
-cHJvY2Vzc29y4oCZcyBidXMsIHRoZSBkZXN0aW5hdGlvbiBvcGVyYW5kDQpyZWNlaXZlcyBhIHdy
-aXRlIGN5Y2xlIHdpdGhvdXQgcmVnYXJkIHRvIHRoZSByZXN1bHQgb2YgdGhlIGNvbXBhcmlzb24u
-IFRoZQ0KZGVzdGluYXRpb24gb3BlcmFuZCBpcyB3cml0dGVuIGJhY2sgaWYgdGhlIGNvbXBhcmlz
-b24gZmFpbHM7IG90aGVyd2lzZSwgdGhlDQpzb3VyY2Ugb3BlcmFuZCBpcyB3cml0dGVuIGludG8g
-dGhlIGRlc3RpbmF0aW9uLiAoVGhlIHByb2Nlc3NvciBuZXZlcg0KcHJvZHVjZXMgYSBsb2NrZWQg
-cmVhZCB3aXRob3V0IGFsc28gcHJvZHVjaW5nIGEgbG9ja2VkIHdyaXRlLikNCg0KVGhhbmtzLA0K
-DQpCYXJ0Lg0KDQoNCg0K
+T24gVHVlLCAyMDE4LTA0LTEwIGF0IDE1OjU5ICswODAwLCBqaWFuY2hhby53YW5nIHdyb3RlOg0K
+PiBJZiB5ZXMsIGhvdyBkb2VzIHRoZSB0aW1lb3V0IGhhbmRsZXIgZ2V0IHRoZSBmcmVlZCByZXF1
+ZXN0IHdoZW4gdGhlIHRhZyBoYXMgYmVlbiBmcmVlZCA/DQoNCkhlbGxvIEppYW5jaGFvLA0KDQpI
+YXZlIHlvdSBub3RpY2VkIHRoYXQgdGhlIHRpbWVvdXQgaGFuZGxlciBkb2VzIG5vdCBjaGVjayB3
+aGV0aGVyIG9yIG5vdCB0aGUgcmVxdWVzdA0KdGFnIGlzIGZyZWVkPyBBZGRpdGlvbmFsbHksIEkg
+ZG9uJ3QgdGhpbmsgaXQgd291bGQgYmUgcG9zc2libGUgdG8gYWRkIHN1Y2ggYSBjaGVjaw0KdG8g
+dGhlIHRpbWVvdXQgY29kZSB3aXRob3V0IGludHJvZHVjaW5nIGEgbmV3IHJhY2UgY29uZGl0aW9u
+Lg0KDQpCYXJ0Lg0KDQoNCg==
