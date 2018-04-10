@@ -6,9 +6,9 @@ Cc: linux-block@vger.kernel.org,
 	Bart Van Assche <bart.vanassche@wdc.com>,
 	Ming Lei <ming.lei@redhat.com>,
 	Joseph Qi <joseph.qi@linux.alibaba.com>
-Subject: [PATCH v2] blk-mq: Avoid that submitting a bio concurrently with device removal triggers a crash
-Date: Tue, 10 Apr 2018 14:45:54 -0600
-Message-Id: <20180410204554.28914-1-bart.vanassche@wdc.com>
+Subject: [PATCH] blk-mq: Avoid that submitting a bio concurrently with device removal triggers a crash
+Date: Tue, 10 Apr 2018 14:30:35 -0600
+Message-Id: <20180410203035.26167-1-bart.vanassche@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Return-Path: bart.vanassche@wdc.com
@@ -25,14 +25,11 @@ Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 Cc: Ming Lei <ming.lei@redhat.com>
 Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
 ---
-
-Changes compared to v1: changed the blk_queue_exit() inside the loop with "if (q)".
-
- block/blk-core.c | 33 +++++++++++++++++++++++++++------
- 1 file changed, 27 insertions(+), 6 deletions(-)
+ block/blk-core.c | 32 ++++++++++++++++++++++++++------
+ 1 file changed, 26 insertions(+), 6 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 34e2f2227fd9..181b1a688a5b 100644
+index 34e2f2227fd9..a330cd2829e1 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
 @@ -2386,8 +2386,19 @@ blk_qc_t generic_make_request(struct bio *bio)
@@ -55,7 +52,7 @@ index 34e2f2227fd9..181b1a688a5b 100644
  	if (!generic_make_request_checks(bio))
  		goto out;
  
-@@ -2424,11 +2435,21 @@ blk_qc_t generic_make_request(struct bio *bio)
+@@ -2424,11 +2435,20 @@ blk_qc_t generic_make_request(struct bio *bio)
  	bio_list_init(&bio_list_on_stack[0]);
  	current->bio_list = bio_list_on_stack;
  	do {
@@ -63,25 +60,24 @@ index 34e2f2227fd9..181b1a688a5b 100644
 -		blk_mq_req_flags_t flags = bio->bi_opf & REQ_NOWAIT ?
 -			BLK_MQ_REQ_NOWAIT : 0;
 +		bool enter_succeeded = true;
-+
+ 
+-		if (likely(blk_queue_enter(q, flags) == 0)) {
 +		if (unlikely(q != bio->bi_disk->queue)) {
-+			if (q)
-+				blk_queue_exit(q);
-+			q = bio->bi_disk->queue;
 +			flags = bio->bi_opf & REQ_NOWAIT ? BLK_MQ_REQ_NOWAIT :
 +				0;
++			blk_queue_exit(q);
++			q = bio->bi_disk->queue;
 +			if (blk_queue_enter(q, flags) < 0) {
 +				enter_succeeded = false;
 +				q = NULL;
 +			}
 +		}
- 
--		if (likely(blk_queue_enter(q, flags) == 0)) {
++
 +		if (enter_succeeded) {
  			struct bio_list lower, same;
  
  			/* Create a fresh bio_list for all subordinate requests */
-@@ -2436,8 +2457,6 @@ blk_qc_t generic_make_request(struct bio *bio)
+@@ -2436,8 +2456,6 @@ blk_qc_t generic_make_request(struct bio *bio)
  			bio_list_init(&bio_list_on_stack[0]);
  			ret = q->make_request_fn(q, bio);
  
@@ -90,7 +86,7 @@ index 34e2f2227fd9..181b1a688a5b 100644
  			/* sort new bios into those for a lower level
  			 * and those for the same level
  			 */
-@@ -2464,6 +2483,8 @@ blk_qc_t generic_make_request(struct bio *bio)
+@@ -2464,6 +2482,8 @@ blk_qc_t generic_make_request(struct bio *bio)
  	current->bio_list = NULL; /* deactivate */
  
  out:
