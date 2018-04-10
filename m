@@ -1,69 +1,37 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Tue, 10 Apr 2018 22:30:08 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"israelr@mellanox.com" <israelr@mellanox.com>,
-	"sagi@grimberg.me" <sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"maxg@mellanox.com" <maxg@mellanox.com>,
-	"tj@kernel.org" <tj@kernel.org>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Tue, 10 Apr 2018 07:20:28 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Israel Rukshin <israelr@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>, stable@vger.kernel.org
 Subject: Re: [PATCH v4] blk-mq: Fix race conditions in request timeout
  handling
-Message-ID: <20180410143007.GB22340@ming.t460p>
+Message-ID: <20180410142028.GM3126663@devbig577.frc2.facebook.com>
 References: <20180410013455.7448-1-bart.vanassche@wdc.com>
- <20180410084133.GB9133@ming.t460p>
- <b36ea1107be4f32fb04fffdde3ee45a2e0fcc36c.camel@wdc.com>
- <20180410135541.GA22340@ming.t460p>
- <7c4a8b019182d5a9259ef20e6462b3f6a533abed.camel@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <7c4a8b019182d5a9259ef20e6462b3f6a533abed.camel@wdc.com>
+In-Reply-To: <20180410013455.7448-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Apr 10, 2018 at 02:09:33PM +0000, Bart Van Assche wrote:
-> On Tue, 2018-04-10 at 21:55 +0800, Ming Lei wrote:
-> > Then I have same question with Jianchao, what is the actual double
-> > complete in linus tree between BLK_EH_RESET_TIMER and normal completion?
-> > 
-> > Follows my understanding:
-> > 
-> > 1) when timeout is detected on one request, its aborted_gstate is
-> > updated in blk_mq_check_expired().
-> > 
-> > 2) run synchronize_rcu(), and make sure all pending completion is done
-> > 
-> > 3) run blk_mq_rq_timed_out()
-> > - ret = ops->timeout
-> > - blk_mq_rq_update_aborted_gstate(req, 0)
-> > - blk_add_timer(req);
-> > 
-> > If normal completion is done between 1) and reset aborted_gstate in 3),
-> > blk_mq_complete_request() will be called, and found that aborted_gstate
-> > is set, then the rq won't be completed really.
-> > 
-> > If normal completion is done after reset aborted_gstate in 3), it should
-> > be same with applying this patch.
-> 
-> Hello Ming,
-> 
-> Please keep in mind that all synchronize_rcu() does is to wait for pre-
-> existing RCU readers to finish. synchronize_rcu() does not prevent that new
-> rcu_read_lock() calls happen. It is e.g. possible that after
+Hello, Bart.
 
-That is right, and I also mentioned normal completion can be done between
-1) and reset aborted_gstate in 3).
+On Mon, Apr 09, 2018 at 06:34:55PM -0700, Bart Van Assche wrote:
+> Since the request state can be updated from two different contexts,
+> namely regular completion and request timeout, this race cannot be
+> fixed with RCU synchronization only. Fix this race as follows:
 
-> blk_mq_rq_update_aborted_gstate(req, 0) has been executed that a regular
-> completion occurs. If that request is not reused before the timer that was
-> restarted by the timeout code expires, that request will be completed twice.
+Well, it can be and the patches have been posted months ago.  It just
+needed a repro case to confirm the fix, which we now seem to have.
 
-In this patch, blk_mq_add_timer(req, MQ_RQ_COMPLETE, MQ_RQ_IN_FLIGHT) is
-called for handling BLK_EH_RESET_TIMER. And after rq's state is changed
-to MQ_RQ_IN_FLIGHT, normal completion still can come and complete this rq,
-just like the above you described, right?
+Switching to another model might be better but let's please do that
+with the right rationales.  A good portion of this seems to be built
+on misunderstandings.
 
+Thanks.
 
-Thanks,
-Ming
+-- 
+tejun
