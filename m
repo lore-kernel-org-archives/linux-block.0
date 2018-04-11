@@ -1,68 +1,58 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 11 Apr 2018 07:16:43 -0700
-From: "tj@kernel.org" <tj@kernel.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"israelr@mellanox.com" <israelr@mellanox.com>,
-	"sagi@grimberg.me" <sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>,
-	"martin@lichtvoll.de" <martin@lichtvoll.de>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>,
-	"maxg@mellanox.com" <maxg@mellanox.com>
+Return-Path: <prvs=63297c413=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tj@kernel.org" <tj@kernel.org>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"israelr@mellanox.com" <israelr@mellanox.com>, "sagi@grimberg.me"
+	<sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>, "martin@lichtvoll.de"
+	<martin@lichtvoll.de>, "stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "ming.lei@redhat.com"
+	<ming.lei@redhat.com>, "maxg@mellanox.com" <maxg@mellanox.com>
 Subject: Re: [PATCH v4] blk-mq: Fix race conditions in request timeout
  handling
-Message-ID: <20180411141643.GF793541@devbig577.frc2.facebook.com>
-References: <20180410143007.GB22340@ming.t460p>
- <e2762e359649946543ee22cf6ebf0c08410f7963.camel@wdc.com>
- <20180410152553.GC22340@ming.t460p>
- <20180410153031.GO3126663@devbig577.frc2.facebook.com>
- <20180410153812.GA3219@ming.t460p>
- <20180410154043.GP3126663@devbig577.frc2.facebook.com>
- <20180410213323.GC793541@devbig577.frc2.facebook.com>
- <d88becef654cde4b5382c1ebddb0aeba963c0578.camel@wdc.com>
- <20180410215456.GD793541@devbig577.frc2.facebook.com>
- <ac0d5904dbcd55e190df318a66a9d7d51c56f3ae.camel@wdc.com>
+Date: Wed, 11 Apr 2018 12:50:51 +0000
+Message-ID: <ac0d5904dbcd55e190df318a66a9d7d51c56f3ae.camel@wdc.com>
+References: <20180410135541.GA22340@ming.t460p>
+	 <7c4a8b019182d5a9259ef20e6462b3f6a533abed.camel@wdc.com>
+	 <20180410143007.GB22340@ming.t460p>
+	 <e2762e359649946543ee22cf6ebf0c08410f7963.camel@wdc.com>
+	 <20180410152553.GC22340@ming.t460p>
+	 <20180410153031.GO3126663@devbig577.frc2.facebook.com>
+	 <20180410153812.GA3219@ming.t460p>
+	 <20180410154043.GP3126663@devbig577.frc2.facebook.com>
+	 <20180410213323.GC793541@devbig577.frc2.facebook.com>
+	 <d88becef654cde4b5382c1ebddb0aeba963c0578.camel@wdc.com>
+	 <20180410215456.GD793541@devbig577.frc2.facebook.com>
+In-Reply-To: <20180410215456.GD793541@devbig577.frc2.facebook.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <ac0d5904dbcd55e190df318a66a9d7d51c56f3ae.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello, Bart.
-
-On Wed, Apr 11, 2018 at 12:50:51PM +0000, Bart Van Assche wrote:
-> Thank you for having shared this patch. It looks interesting to me. What I
-> know about the blk-mq timeout handling is as follows:
-> * Nobody who has reviewed the blk-mq timeout handling code with this patch
->   applied has reported any shortcomings for that code.
-> * However, several people have reported kernel crashes that disappear when
->   the blk-mq timeout code is reworked. I'm referring to "nvme-rdma corrupts
->   memory upon timeout"
->   (http://lists.infradead.org/pipermail/linux-nvme/2018-February/015848.html)
->   and also to a "RIP: scsi_times_out+0x17" crash during boot
->   (https://bugzilla.kernel.org/show_bug.cgi?id=199077).
-> 
-> So we have the choice between two approaches:
-> (1) apply the patch from your previous e-mail and root-cause and fix the
->     crashes referred to above.
-> (2) apply a patch that makes the crashes reported against v4.16 disappear and
->     remove the atomic instructions introduced by such a patch at a later time.
-> 
-> Since crashes have been reported for kernel v4.16 I think we should follow
-> approach (2). That will remove the time pressure from root-causing and fixing
-> the crashes reported for the NVMeOF initiator and SCSI initiator drivers.
-
-So, it really bothers me how blind we're going about this.  It isn't
-an insurmountable emergency that we have to adopt whatever solution
-which passed a couple tests this minute.  We can debug and root cause
-this properly and pick the right solution.  We even have two most
-likely causes already analysed and patches proposed, one of them
-months ago.  If we wanna change the handover model, let's do that
-because the new one is better, not because of vague fear.
-
-Thanks.
-
--- 
-tejun
+T24gVHVlLCAyMDE4LTA0LTEwIGF0IDE0OjU0IC0wNzAwLCB0akBrZXJuZWwub3JnIHdyb3RlOg0K
+PiBBaCwgeWVhaCwgSSB3YXMgbW92aW5nIGl0IG91dCBvZiBhZGRfdGltZXIgYnV0IGZvcmdvdCB0
+byBhY3R1bGx5IGFkZA0KPiBpdCB0byB0aGUgaXNzdWUgcGF0aC4gIEZpeGVkIHBhdGNoIGJlbG93
+Lg0KPiANCj4gQlRXLCBubyBtYXR0ZXIgd2hhdCB3ZSBkbyB3LyB0aGUgcmVxdWVzdCBoYW5kb3Zl
+ciBiZXR3ZWVuIG5vcm1hbCBhbmQNCj4gdGltZW91dCBwYXRocywgd2UnZCBuZWVkIHNvbWV0aGlu
+ZyBzaW1pbGFyLiAgT3RoZXJ3aXNlLCB3aGlsZSB3ZSBjYW4NCj4gcmVkdWNlIHRoZSB3aW5kb3cs
+IHdlIGNhbid0IGdldCByaWQgb2YgaXQuDQoNCigrTWFydGluIFN0ZWlnZXJ3YWxkKQ0KDQpIZWxs
+byBUZWp1biwNCg0KVGhhbmsgeW91IGZvciBoYXZpbmcgc2hhcmVkIHRoaXMgcGF0Y2guIEl0IGxv
+b2tzIGludGVyZXN0aW5nIHRvIG1lLiBXaGF0IEkNCmtub3cgYWJvdXQgdGhlIGJsay1tcSB0aW1l
+b3V0IGhhbmRsaW5nIGlzIGFzIGZvbGxvd3M6DQoqIE5vYm9keSB3aG8gaGFzIHJldmlld2VkIHRo
+ZSBibGstbXEgdGltZW91dCBoYW5kbGluZyBjb2RlIHdpdGggdGhpcyBwYXRjaA0KICBhcHBsaWVk
+IGhhcyByZXBvcnRlZCBhbnkgc2hvcnRjb21pbmdzIGZvciB0aGF0IGNvZGUuDQoqIEhvd2V2ZXIs
+IHNldmVyYWwgcGVvcGxlIGhhdmUgcmVwb3J0ZWQga2VybmVsIGNyYXNoZXMgdGhhdCBkaXNhcHBl
+YXIgd2hlbg0KICB0aGUgYmxrLW1xIHRpbWVvdXQgY29kZSBpcyByZXdvcmtlZC4gSSdtIHJlZmVy
+cmluZyB0byAibnZtZS1yZG1hIGNvcnJ1cHRzDQogIG1lbW9yeSB1cG9uIHRpbWVvdXQiDQogICho
+dHRwOi8vbGlzdHMuaW5mcmFkZWFkLm9yZy9waXBlcm1haWwvbGludXgtbnZtZS8yMDE4LUZlYnJ1
+YXJ5LzAxNTg0OC5odG1sKQ0KICBhbmQgYWxzbyB0byBhICJSSVA6IHNjc2lfdGltZXNfb3V0KzB4
+MTciIGNyYXNoIGR1cmluZyBib290DQogIChodHRwczovL2J1Z3ppbGxhLmtlcm5lbC5vcmcvc2hv
+d19idWcuY2dpP2lkPTE5OTA3NykuDQoNClNvIHdlIGhhdmUgdGhlIGNob2ljZSBiZXR3ZWVuIHR3
+byBhcHByb2FjaGVzOg0KKDEpIGFwcGx5IHRoZSBwYXRjaCBmcm9tIHlvdXIgcHJldmlvdXMgZS1t
+YWlsIGFuZCByb290LWNhdXNlIGFuZCBmaXggdGhlDQogICAgY3Jhc2hlcyByZWZlcnJlZCB0byBh
+Ym92ZS4NCigyKSBhcHBseSBhIHBhdGNoIHRoYXQgbWFrZXMgdGhlIGNyYXNoZXMgcmVwb3J0ZWQg
+YWdhaW5zdCB2NC4xNiBkaXNhcHBlYXIgYW5kDQogICAgcmVtb3ZlIHRoZSBhdG9taWMgaW5zdHJ1
+Y3Rpb25zIGludHJvZHVjZWQgYnkgc3VjaCBhIHBhdGNoIGF0IGEgbGF0ZXIgdGltZS4NCg0KU2lu
+Y2UgY3Jhc2hlcyBoYXZlIGJlZW4gcmVwb3J0ZWQgZm9yIGtlcm5lbCB2NC4xNiBJIHRoaW5rIHdl
+IHNob3VsZCBmb2xsb3cNCmFwcHJvYWNoICgyKS4gVGhhdCB3aWxsIHJlbW92ZSB0aGUgdGltZSBw
+cmVzc3VyZSBmcm9tIHJvb3QtY2F1c2luZyBhbmQgZml4aW5nDQp0aGUgY3Jhc2hlcyByZXBvcnRl
+ZCBmb3IgdGhlIE5WTWVPRiBpbml0aWF0b3IgYW5kIFNDU0kgaW5pdGlhdG9yIGRyaXZlcnMuDQoN
+ClRoYW5rcywNCg0KQmFydC4NCg0KDQoNCg==
