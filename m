@@ -1,19 +1,18 @@
-Return-Path: <jack@suse.cz>
-Date: Wed, 11 Apr 2018 19:24:31 +0200
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-scsi <linux-scsi@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	Jan Kara <jack@suse.cz>
+Return-Path: <lduncan@suse.com>
 Subject: Re: sr: get/drop reference to device in revalidate and check_events
-Message-ID: <20180411172431.alp64csaew6o764h@quack2.suse.cz>
+To: Jens Axboe <axboe@kernel.dk>, linux-scsi <linux-scsi@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc: Jan Kara <jack@suse.cz>
 References: <a76164e7-8d9f-37d5-8c2e-6733778d20da@kernel.dk>
+From: Lee Duncan <lduncan@suse.com>
+Message-ID: <964596fe-4e33-a905-b34e-3e148d7ac215@suse.com>
+Date: Wed, 11 Apr 2018 10:10:07 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <a76164e7-8d9f-37d5-8c2e-6733778d20da@kernel.dk>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed 11-04-18 10:23:30, Jens Axboe wrote:
+On 04/11/2018 09:23 AM, Jens Axboe wrote:
 > We can't just use scsi_cd() to get the scsi_cd structure, we have
 > to grab a live reference to the device. For both callbacks, we're
 > not inside an open where we already hold a reference to the device.
@@ -73,13 +72,6 @@ On Wed 11-04-18 10:23:30, Jens Axboe wrote:
 >  entry_SYSCALL_64_after_hwframe+0x3d/0xa2
 > 
 > Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
-Looks good to me. You can add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
 > 
 > ---
 > 
@@ -129,9 +121,5 @@ Reviewed-by: Jan Kara <jack@suse.cz>
 >  }
 >  
 > 
-> -- 
-> Jens Axboe
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+
+Reviewed-by: Lee Duncan <lduncan@suse.com>
