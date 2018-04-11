@@ -1,60 +1,56 @@
-Return-Path: <prvs=63297c413=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "tj@kernel.org" <tj@kernel.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 11 Apr 2018 10:15:38 -0700
+From: "tj@kernel.org" <tj@kernel.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"nborisov@suse.com" <nborisov@suse.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"shli@fb.com" <shli@fb.com>, "gregkh@linuxfoundation.org"
-	<gregkh@linuxfoundation.org>, "00moses.alexander00@gmail.com"
-	<00moses.alexander00@gmail.com>, "arnd@arndb.de" <arnd@arndb.de>,
+	"nborisov@suse.com" <nborisov@suse.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "shli@fb.com" <shli@fb.com>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"00moses.alexander00@gmail.com" <00moses.alexander00@gmail.com>,
+	"arnd@arndb.de" <arnd@arndb.de>,
 	"joseph.qi@linux.alibaba.com" <joseph.qi@linux.alibaba.com>
 Subject: Re: [PATCH v2] blk-cgroup: remove entries in blkg_tree before queue
  release
-Date: Wed, 11 Apr 2018 17:26:12 +0000
-Message-ID: <6cd1d285f726f81186dbab57c3308cc0b257ff99.camel@wdc.com>
+Message-ID: <20180411171538.GN793541@devbig577.frc2.facebook.com>
 References: <20180409220938.GI3126663@devbig577.frc2.facebook.com>
-	 <20180411101242.GA2322@gmail.com>
-	 <20180411142019.GG793541@devbig577.frc2.facebook.com>
-	 <20180411142859.GB2322@gmail.com>
-	 <20180411144616.GI793541@devbig577.frc2.facebook.com>
-	 <20180411145123.GJ793541@devbig577.frc2.facebook.com>
-	 <20180411145632.GK793541@devbig577.frc2.facebook.com>
-	 <bd60302129cb89bdc3b4f402ce4e061f41851729.camel@wdc.com>
-	 <20180411170018.GL793541@devbig577.frc2.facebook.com>
-	 <398bad36e2f01e37645a36d052d62136766ee88d.camel@wdc.com>
-	 <20180411171538.GN793541@devbig577.frc2.facebook.com>
-In-Reply-To: <20180411171538.GN793541@devbig577.frc2.facebook.com>
-Content-Type: text/plain; charset="utf-8"
+ <20180411101242.GA2322@gmail.com>
+ <20180411142019.GG793541@devbig577.frc2.facebook.com>
+ <20180411142859.GB2322@gmail.com>
+ <20180411144616.GI793541@devbig577.frc2.facebook.com>
+ <20180411145123.GJ793541@devbig577.frc2.facebook.com>
+ <20180411145632.GK793541@devbig577.frc2.facebook.com>
+ <bd60302129cb89bdc3b4f402ce4e061f41851729.camel@wdc.com>
+ <20180411170018.GL793541@devbig577.frc2.facebook.com>
+ <398bad36e2f01e37645a36d052d62136766ee88d.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <398bad36e2f01e37645a36d052d62136766ee88d.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE4LTA0LTExIGF0IDEwOjE1IC0wNzAwLCB0akBrZXJuZWwub3JnIHdyb3RlOg0K
-PiBPbiBXZWQsIEFwciAxMSwgMjAxOCBhdCAwNTowNjo0MVBNICswMDAwLCBCYXJ0IFZhbiBBc3Nj
-aGUgd3JvdGU6DQo+ID4gQSBzaW1wbGUgYW5kIGVmZmVjdGl2ZSBzb2x1dGlvbiBpcyB0byBkaXNz
-b2NpYXRlIGEgcmVxdWVzdCBxdWV1ZSBmcm9tIHRoZQ0KPiA+IGJsb2NrIGNncm91cCBjb250cm9s
-bGVyIGJlZm9yZSBibGtfY2xlYW51cF9xdWV1ZSgpIHJldHVybnMuIFRoaXMgaXMgd2h5IGNvbW1p
-dA0KPiA+IGEwNjMwNTdkN2M3MyAoImJsb2NrOiBGaXggYSByYWNlIGJldHdlZW4gcmVxdWVzdCBx
-dWV1ZSByZW1vdmFsIGFuZCB0aGUgYmxvY2sNCj4gPiBjZ3JvdXAgY29udHJvbGxlciIpIG1vdmVk
-IHRoZSBibGtjZ19leGl0X3F1ZXVlKCkgY2FsbCBmcm9tIF9fYmxrX3JlbGVhc2VfcXVldWUoKQ0K
-PiA+IGludG8gYmxrX2NsZWFudXBfcXVldWUoKS4NCj4gDQo+IHdoaWNoIGlzIGJyb2tlbi4gIFdl
-IGNhbiB0cnkgdG8gc3dpdGNoIHRoZSBsaWZldGltZSBtb2RlbCB0byByZXZva2luZw0KPiBhbGwg
-bGl2ZSBvYmplY3RzIGJ1dCB0aGF0IGxpa2VseSBpcyBhIGxvdCBtb3JlIGludm9sdmluZyB0aGFu
-IGJsaW5kbHkNCj4gbW92aW5nIGJsa2cgc2hvb3Rkb3duIGZyb20gcmVsZWFzZSB0byBjbGVhbnVw
-LiAgSW1wbGVtZW50aW5nIHNldmVyDQo+IHNlbWFudGljcyBpcyB1c3VhbGx5IGEgbG90IG1vcmUg
-aW52b2x2ZWQgLyBmcmFnaWxlIGJlY2F1c2UgaXQgcmVxdWlyZXMNCj4gZXhwbGljaXQgcGFydGlj
-aXBhdGlvbiBmcm9tIGFsbCB1c2VycyAoZXhhY3RseSB0aGUgc2FtZSB3YXkgcmV2b2tpbmcNCj4g
-LT5xdWV1ZV9sb2NrIGlzIGRpZmZpY3VsdCkuDQo+IA0KPiBJJ20gbm90IG5lY2Vzc2FyaWx5IGFn
-YWluc3Qgc3dpdGNoaW5nIHRvIHNldmVyIG1vZGVsLCBidXQgd2hhdCB0aGUNCj4gcGF0Y2ggZGlk
-IGlzbid0IHRoYXQuICBJdCBqdXN0IG1vdmVkIHNvbWUgY29kZSB3aXRob3V0IGFjdHVhbGx5DQo+
-IHVuZGVyc3RhbmRpbmcgb3IgYXVkaXRpbmcgd2hhdCB0aGUgaW1wbGljYXRpb25zIGFyZS4NCg0K
-SGVsbG8gVGVqdW4sDQoNClBsZWFzZSBleHBsYWluIHdoYXQgeW91IHdyb3RlIGZ1cnRoZXIuIEl0
-J3Mgbm90IGNsZWFyIHRvIG1lIHdoeSB5b3UgdGhpbmsNCnRoYXQgYW55dGhpbmcgaXMgYnJva2Vu
-IG5vciB3aGF0IGEgInNldmVyIG1vZGVsIiBpcy4NCg0KSSB0aGluayB3ZSByZWFsbHkgbmVlZCB0
-aGUgYmxrY2dfZXhpdF9xdWV1ZSgpIGNhbGwgaW4gYmxrX2NsZWFudXBfcXVldWUoKQ0KdG8gYXZv
-aWQgcmFjZSBjb25kaXRpb25zIGJldHdlZW4gcmVxdWVzdCBxdWV1ZSBjbGVhbnVwIGFuZCB0aGUg
-YmxvY2sgY2dyb3VwDQpjb250cm9sbGVyLiBBZGRpdGlvbmFsbHksIHNpbmNlIGl0IGlzIGd1YXJh
-bnRlZWQgdGhhdCBubyBuZXcgcmVxdWVzdHMgd2lsbA0KYmUgc3VibWl0dGVkIHRvIGEgcXVldWUg
-YWZ0ZXIgaXQgaGFzIGJlZW4gbWFya2VkIGRlYWQgSSBkb24ndCBzZWUgd2h5IGl0DQp3b3VsZCBt
-YWtlIHNlbnNlIHRvIGtlZXAgdGhlIGFzc29jaWF0aW9uIGJldHdlZW4gYSByZXF1ZXN0IHF1ZXVl
-IGFuZCB0aGUNCmJsa2NnIGNvbnRyb2xsZXIgdW50aWwgdGhlIGxhc3QgcmVmZXJlbmNlIG9uIGEg
-cXVldWUgaXMgZHJvcHBlZC4NCg0KQmFydC4NCg0KDQoNCg==
+Hello,
+
+On Wed, Apr 11, 2018 at 05:06:41PM +0000, Bart Van Assche wrote:
+> A simple and effective solution is to dissociate a request queue from the
+> block cgroup controller before blk_cleanup_queue() returns. This is why commit
+> a063057d7c73 ("block: Fix a race between request queue removal and the block
+> cgroup controller") moved the blkcg_exit_queue() call from __blk_release_queue()
+> into blk_cleanup_queue().
+
+which is broken.  We can try to switch the lifetime model to revoking
+all live objects but that likely is a lot more involving than blindly
+moving blkg shootdown from release to cleanup.  Implementing sever
+semantics is usually a lot more involved / fragile because it requires
+explicit participation from all users (exactly the same way revoking
+->queue_lock is difficult).
+
+I'm not necessarily against switching to sever model, but what the
+patch did isn't that.  It just moved some code without actually
+understanding or auditing what the implications are.
+
+Thanks.
+
+-- 
+tejun
