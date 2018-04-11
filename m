@@ -1,51 +1,75 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 11 Apr 2018 14:31:46 -0700
-From: "tj@kernel.org" <tj@kernel.org>
-To: Israel Rukshin <israelr@mellanox.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>,
-	"hch@lst.de" <hch@lst.de>, "maxg@mellanox.com" <maxg@mellanox.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH v4] blk-mq: Fix race conditions in request timeout
- handling
-Message-ID: <20180411213146.GS793541@devbig577.frc2.facebook.com>
-References: <20180410152553.GC22340@ming.t460p>
- <20180410153031.GO3126663@devbig577.frc2.facebook.com>
- <20180410153812.GA3219@ming.t460p>
- <20180410154043.GP3126663@devbig577.frc2.facebook.com>
- <20180410213323.GC793541@devbig577.frc2.facebook.com>
- <d88becef654cde4b5382c1ebddb0aeba963c0578.camel@wdc.com>
- <20180410215456.GD793541@devbig577.frc2.facebook.com>
- <7a586854-33a5-fe3b-6d94-24d305696126@grimberg.me>
- <0da96ded-7bfc-e6a8-428c-1ce1e3db0378@mellanox.com>
- <20180411170733.GM793541@devbig577.frc2.facebook.com>
+Return-Path: <martin@lichtvoll.de>
+From: Martin Steigerwald <martin@lichtvoll.de>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "tj@kernel.org" <tj@kernel.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "israelr@mellanox.com" <israelr@mellanox.com>, "sagi@grimberg.me" <sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>, "stable@vger.kernel.org" <stable@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>, "ming.lei@redhat.com" <ming.lei@redhat.com>, "maxg@mellanox.com" <maxg@mellanox.com>
+Subject: Re: [PATCH v4] blk-mq: Fix race conditions in request timeout handling
+Date: Wed, 11 Apr 2018 20:38:48 +0200
+Message-ID: <11544331.gmjPRolTO7@merkaba>
+In-Reply-To: <ac0d5904dbcd55e190df318a66a9d7d51c56f3ae.camel@wdc.com>
+References: <20180410135541.GA22340@ming.t460p> <20180410215456.GD793541@devbig577.frc2.facebook.com> <ac0d5904dbcd55e190df318a66a9d7d51c56f3ae.camel@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180411170733.GM793541@devbig577.frc2.facebook.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Hey, again.
+Bart Van Assche - 11.04.18, 14:50:
+> On Tue, 2018-04-10 at 14:54 -0700, tj@kernel.org wrote:
+> > Ah, yeah, I was moving it out of add_timer but forgot to actully add
+> > it to the issue path.  Fixed patch below.
+> >=20
+> > BTW, no matter what we do w/ the request handover between normal and
+> > timeout paths, we'd need something similar.  Otherwise, while we can
+> > reduce the window, we can't get rid of it.
+>=20
+> (+Martin Steigerwald)
+[=E2=80=A6]
+> Thank you for having shared this patch. It looks interesting to me.
+> What I know about the blk-mq timeout handling is as follows:
+> * Nobody who has reviewed the blk-mq timeout handling code with this
+> patch applied has reported any shortcomings for that code.
+> * However, several people have reported kernel crashes that disappear
+> when the blk-mq timeout code is reworked. I'm referring to "nvme-rdma
+> corrupts memory upon timeout"
+> =20
+> (http://lists.infradead.org/pipermail/linux-nvme/2018-February/015848
+> .html) and also to a "RIP: scsi_times_out+0x17" crash during boot
+> (https://bugzilla.kernel.org/show_bug.cgi?id=3D199077).
 
-On Wed, Apr 11, 2018 at 10:07:33AM -0700, tj@kernel.org wrote:
-> Hello, Israel.
-> 
-> On Wed, Apr 11, 2018 at 07:16:14PM +0300, Israel Rukshin wrote:
-> > >Just noticed this one, this looks interesting to me as well. Israel,
-> > >can you run your test with this patch?
-> > 
-> > Yes, I just did and it looks good.
-> 
-> Awesome.
+Yes, with the three patches:
 
-Just to be sure, you tested the combined patch and saw the XXX debug
-messages, right?
+=2D '[PATCH] blk-mq_Directly schedule q->timeout_work when aborting a=20
+request.mbox'
 
-Thanks.
+=2D '[PATCH v2] block: Change a rcu_read_{lock,unlock}_sched() pair into=20
+rcu_read_{lock,unlock}().mbox'
 
--- 
-tejun
+=2D '[PATCH v4] blk-mq_Fix race conditions in request timeout=20
+handling.mbox'
+
+the occasional hangs on some boots / resumes from hibernation appear to=20
+be gone.
+
+Also it appears that the error loading SMART data issue is gone as well=20
+(see my bug report). However it is still to early to say for sure. I=20
+think I need at least 2-3 days of additional testing with this kernel to=20
+be sufficiently sure about it.
+
+However=E2=80=A6 I could also test another patch, but from reading the rest=
+ of=20
+this thread so far I have no clear on whether to try one of the new=20
+patches and if so which one and whether adding it on top of some of the=20
+patches I already applied or using it as a replacement of it.
+
+So while doing a training this and next week I can apply a patch here=20
+and then, but I won=C2=B4t have much time to read the complete discussion t=
+o=20
+figure out what to apply.
+
+Personally as a stable kernel has been released with those issues, I=20
+think its good to fix it up soon. On the other hand it may take quite=20
+some time til popular distros carry 4.16 for regular users. And I have=20
+no idea how frequent the reported issues are, i.e. how many users would=20
+be affected.
+
+Thanks,
+=2D-=20
+Martin
