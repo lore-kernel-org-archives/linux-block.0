@@ -1,259 +1,81 @@
-Return-Path: <linux-ide-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        iommu@lists.linux-foundation.org
-Cc: x86@kernel.org, linux-block@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-mm@kvack.org,
-        linux-ide@vger.kernel.org, linux-mips@linux-mips.org,
-        sparclinux@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 03/12] iommu-helper: mark iommu_is_span_boundary as inline
-Date: Sun, 15 Apr 2018 16:59:38 +0200
-Message-Id: <20180415145947.1248-4-hch@lst.de>
-In-Reply-To: <20180415145947.1248-1-hch@lst.de>
-References: <20180415145947.1248-1-hch@lst.de>
-Sender: linux-ide-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: Hang with blk-mq map series (block/008)
+To: Ming Lei <ming.lei@redhat.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <d4cafa94-919c-e83d-eb91-d10dc06fc515@kernel.dk>
+ <20180411020252.GA4494@ming.t460p>
+ <6e1d9201-e0f6-cdf4-9572-c67bf5a7e06e@kernel.dk>
+ <20180411023059.GE4494@ming.t460p>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <51ebd44f-d6b2-3657-a94c-fb22350bfaa6@kernel.dk>
+Date: Tue, 10 Apr 2018 20:33:04 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180411023059.GE4494@ming.t460p>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This avoids selecting IOMMU_HELPER just for this function.  And we only
-use it once or twice in normal builds so this often even is a size
-reduction.
+On 4/10/18 8:30 PM, Ming Lei wrote:
+> On Tue, Apr 10, 2018 at 08:08:43PM -0600, Jens Axboe wrote:
+>> On 4/10/18 8:02 PM, Ming Lei wrote:
+>>> On Tue, Apr 10, 2018 at 09:51:41AM -0600, Jens Axboe wrote:
+>>>> Hi Ming,
+>>>>
+>>>> Ran the above blktests on the current tree, and we end up getting
+>>>> a hang that we never recover from. There's on request perpetually
+>>>> stuck:
+>>>>
+>>>> root@dell:/sys/kernel/debug/block/nvme0n1/hctx2# cat busy 
+>>>> 000000005e2b09fe {.op=READ, .cmd_flags=, .rq_flags=DONTPREP|IO_STAT|STATS, .state=in_flight, .tag=313, .internal_tag=-1}
+>>>>
+>>>> and no amount of manual running or kicking the queue will bring it
+>>>> back to life. If I run it on 'master', it works fine.
+>>>>
+>>>> Did you run blktests on your series?
+>>>
+>>> Not yet.
+>>>
+>>> Will take a look at it, but this seems related with driver, since
+>>> the request has been submitted to hardware already.
+>>
+>> It might be, but it repeatedly failed for me on for-linus, and not on
+>> master. I can try doing some more runs just to gain more confidence.
+> 
+> Looks it is one IO vs CPU hotplug test, which was done before posting.
+> Not reproduce it on NVMe inside KVM.
+> 
+> Will install a kernel and run it on real HW.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- arch/alpha/Kconfig              |  3 ---
- arch/arm/Kconfig                |  3 ---
- arch/arm64/Kconfig              |  3 ---
- arch/ia64/Kconfig               |  3 ---
- arch/mips/cavium-octeon/Kconfig |  4 ----
- arch/mips/loongson64/Kconfig    |  4 ----
- arch/mips/netlogic/Kconfig      |  3 ---
- arch/powerpc/Kconfig            |  1 -
- arch/unicore32/mm/Kconfig       |  3 ---
- arch/x86/Kconfig                |  2 +-
- drivers/parisc/Kconfig          |  5 -----
- include/linux/iommu-helper.h    | 13 ++++++++++---
- lib/iommu-helper.c              | 12 +-----------
- 13 files changed, 12 insertions(+), 47 deletions(-)
+Sounds good. I'll do some more testing tomorrow to ensure that my
+report was sound.
 
-diff --git a/arch/alpha/Kconfig b/arch/alpha/Kconfig
-index b2022885ced8..3ff735a722af 100644
---- a/arch/alpha/Kconfig
-+++ b/arch/alpha/Kconfig
-@@ -345,9 +345,6 @@ config PCI_DOMAINS
- config PCI_SYSCALL
- 	def_bool PCI
- 
--config IOMMU_HELPER
--	def_bool PCI
--
- config ALPHA_NONAME
- 	bool
- 	depends on ALPHA_BOOK1 || ALPHA_NONAME_CH
-diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index a7f8e7f4b88f..2f79222c5c02 100644
---- a/arch/arm/Kconfig
-+++ b/arch/arm/Kconfig
-@@ -1781,9 +1781,6 @@ config SECCOMP
- config SWIOTLB
- 	def_bool y
- 
--config IOMMU_HELPER
--	def_bool SWIOTLB
--
- config PARAVIRT
- 	bool "Enable paravirtualization code"
- 	help
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index eb2cf4938f6d..fbef5d3de83f 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -252,9 +252,6 @@ config SMP
- config SWIOTLB
- 	def_bool y
- 
--config IOMMU_HELPER
--	def_bool SWIOTLB
--
- config KERNEL_MODE_NEON
- 	def_bool y
- 
-diff --git a/arch/ia64/Kconfig b/arch/ia64/Kconfig
-index bbe12a038d21..862c5160c09d 100644
---- a/arch/ia64/Kconfig
-+++ b/arch/ia64/Kconfig
-@@ -613,6 +613,3 @@ source "security/Kconfig"
- source "crypto/Kconfig"
- 
- source "lib/Kconfig"
--
--config IOMMU_HELPER
--	def_bool (IA64_HP_ZX1 || IA64_HP_ZX1_SWIOTLB || IA64_GENERIC || SWIOTLB)
-diff --git a/arch/mips/cavium-octeon/Kconfig b/arch/mips/cavium-octeon/Kconfig
-index b5eee1a57d6c..647ed158ac98 100644
---- a/arch/mips/cavium-octeon/Kconfig
-+++ b/arch/mips/cavium-octeon/Kconfig
-@@ -67,16 +67,12 @@ config CAVIUM_OCTEON_LOCK_L2_MEMCPY
- 	help
- 	  Lock the kernel's implementation of memcpy() into L2.
- 
--config IOMMU_HELPER
--	bool
--
- config NEED_SG_DMA_LENGTH
- 	bool
- 
- config SWIOTLB
- 	def_bool y
- 	select DMA_DIRECT_OPS
--	select IOMMU_HELPER
- 	select NEED_SG_DMA_LENGTH
- 
- config OCTEON_ILM
-diff --git a/arch/mips/loongson64/Kconfig b/arch/mips/loongson64/Kconfig
-index 72af0c183969..5efb2e63878e 100644
---- a/arch/mips/loongson64/Kconfig
-+++ b/arch/mips/loongson64/Kconfig
-@@ -130,9 +130,6 @@ config LOONGSON_UART_BASE
- 	default y
- 	depends on EARLY_PRINTK || SERIAL_8250
- 
--config IOMMU_HELPER
--	bool
--
- config NEED_SG_DMA_LENGTH
- 	bool
- 
-@@ -141,7 +138,6 @@ config SWIOTLB
- 	default y
- 	depends on CPU_LOONGSON3
- 	select DMA_DIRECT_OPS
--	select IOMMU_HELPER
- 	select NEED_SG_DMA_LENGTH
- 	select NEED_DMA_MAP_STATE
- 
-diff --git a/arch/mips/netlogic/Kconfig b/arch/mips/netlogic/Kconfig
-index 7fcfc7fe9f14..5c5ee0e05a17 100644
---- a/arch/mips/netlogic/Kconfig
-+++ b/arch/mips/netlogic/Kconfig
-@@ -83,9 +83,6 @@ endif
- config NLM_COMMON
- 	bool
- 
--config IOMMU_HELPER
--	bool
--
- config NEED_SG_DMA_LENGTH
- 	bool
- 
-diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-index 73ce5dd07642..eb23f2949bf6 100644
---- a/arch/powerpc/Kconfig
-+++ b/arch/powerpc/Kconfig
-@@ -484,7 +484,6 @@ config IOMMU_HELPER
- config SWIOTLB
- 	bool "SWIOTLB support"
- 	default n
--	select IOMMU_HELPER
- 	---help---
- 	  Support for IO bounce buffering for systems without an IOMMU.
- 	  This allows us to DMA to the full physical address space on
-diff --git a/arch/unicore32/mm/Kconfig b/arch/unicore32/mm/Kconfig
-index e9154a59d561..3f105e00c432 100644
---- a/arch/unicore32/mm/Kconfig
-+++ b/arch/unicore32/mm/Kconfig
-@@ -44,9 +44,6 @@ config SWIOTLB
- 	def_bool y
- 	select DMA_DIRECT_OPS
- 
--config IOMMU_HELPER
--	def_bool SWIOTLB
--
- config NEED_SG_DMA_LENGTH
- 	def_bool SWIOTLB
- 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index d234cca296db..336b1378ee62 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -930,7 +930,7 @@ config SWIOTLB
- 
- config IOMMU_HELPER
- 	def_bool y
--	depends on CALGARY_IOMMU || GART_IOMMU || SWIOTLB || AMD_IOMMU
-+	depends on CALGARY_IOMMU || GART_IOMMU
- 
- config MAXSMP
- 	bool "Enable Maximum number of SMP Processors and NUMA Nodes"
-diff --git a/drivers/parisc/Kconfig b/drivers/parisc/Kconfig
-index 3a102a84d637..5a48b5606110 100644
---- a/drivers/parisc/Kconfig
-+++ b/drivers/parisc/Kconfig
-@@ -103,11 +103,6 @@ config IOMMU_SBA
- 	depends on PCI_LBA
- 	default PCI_LBA
- 
--config IOMMU_HELPER
--	bool
--	depends on IOMMU_SBA || IOMMU_CCIO
--	default y
--
- source "drivers/pcmcia/Kconfig"
- 
- endmenu
-diff --git a/include/linux/iommu-helper.h b/include/linux/iommu-helper.h
-index cb9a9248c8c0..70d01edcbf8b 100644
---- a/include/linux/iommu-helper.h
-+++ b/include/linux/iommu-helper.h
-@@ -2,6 +2,7 @@
- #ifndef _LINUX_IOMMU_HELPER_H
- #define _LINUX_IOMMU_HELPER_H
- 
-+#include <linux/bug.h>
- #include <linux/kernel.h>
- 
- static inline unsigned long iommu_device_max_index(unsigned long size,
-@@ -14,9 +15,15 @@ static inline unsigned long iommu_device_max_index(unsigned long size,
- 		return size;
- }
- 
--extern int iommu_is_span_boundary(unsigned int index, unsigned int nr,
--				  unsigned long shift,
--				  unsigned long boundary_size);
-+static inline int iommu_is_span_boundary(unsigned int index, unsigned int nr,
-+		unsigned long shift, unsigned long boundary_size)
-+{
-+	BUG_ON(!is_power_of_2(boundary_size));
-+
-+	shift = (shift + index) & (boundary_size - 1);
-+	return shift + nr > boundary_size;
-+}
-+
- extern unsigned long iommu_area_alloc(unsigned long *map, unsigned long size,
- 				      unsigned long start, unsigned int nr,
- 				      unsigned long shift,
-diff --git a/lib/iommu-helper.c b/lib/iommu-helper.c
-index ded1703e7e64..92a9f243c0e2 100644
---- a/lib/iommu-helper.c
-+++ b/lib/iommu-helper.c
-@@ -4,17 +4,7 @@
-  */
- 
- #include <linux/bitmap.h>
--#include <linux/bug.h>
--
--int iommu_is_span_boundary(unsigned int index, unsigned int nr,
--			   unsigned long shift,
--			   unsigned long boundary_size)
--{
--	BUG_ON(!is_power_of_2(boundary_size));
--
--	shift = (shift + index) & (boundary_size - 1);
--	return shift + nr > boundary_size;
--}
-+#include <linux/iommu-helper.h>
- 
- unsigned long iommu_area_alloc(unsigned long *map, unsigned long size,
- 			       unsigned long start, unsigned int nr,
+> BTW, could you share your lscpu inf
+Architecture:          x86_64
+CPU op-mode(s):        32-bit, 64-bit
+Byte Order:            Little Endian
+CPU(s):                48
+On-line CPU(s) list:   0-47
+Thread(s) per core:    2
+Core(s) per socket:    12
+Socket(s):             2
+NUMA node(s):          2
+Vendor ID:             GenuineIntel
+CPU family:            6
+Model:                 79
+Model name:            Intel(R) Xeon(R) CPU E5-2650 v4 @ 2.20GHz
+Stepping:              1
+CPU MHz:               1201.251
+CPU max MHz:           2900.0000
+CPU min MHz:           1200.0000
+BogoMIPS:              4394.61
+Virtualization:        VT-x
+L1d cache:             32K
+L1i cache:             32K
+L2 cache:              256K
+L3 cache:              30720K
+NUMA node0 CPU(s):     0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46
+NUMA node1 CPU(s):     1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39,41,43,45,47
+Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3 cdp_l3 invpcid_single tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm rdt_a rdseed adx smap intel_pt xsaveopt cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts
+
+
 -- 
-2.17.0
-
+Jens Axboe
