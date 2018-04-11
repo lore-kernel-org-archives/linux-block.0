@@ -1,146 +1,48 @@
 Return-Path: <ming.lei@redhat.com>
+Date: Thu, 12 Apr 2018 07:06:48 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Tejun Heo <tj@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Israel Rukshin <israelr@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	stable@vger.kernel.org
-Subject: [PATCH V2] blk-mq: fix race between complete and BLK_EH_RESET_TIMER
-Date: Thu, 12 Apr 2018 07:38:12 +0800
-Message-Id: <20180411233812.18003-1-ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
+	"tj@kernel.org" <tj@kernel.org>,
+	"israelr@mellanox.com" <israelr@mellanox.com>,
+	"maxg@mellanox.com" <maxg@mellanox.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"sagi@grimberg.me" <sagi@grimberg.me>
+Subject: Re: [PATCH] blk-mq: fix race between complete and BLK_EH_RESET_TIMER
+Message-ID: <20180411230647.GC31433@ming.t460p>
+References: <20180411205529.31145-1-ming.lei@redhat.com>
+ <2ed5dc7a4d1553c7ba3f9bbe43aac313eba29dc8.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <2ed5dc7a4d1553c7ba3f9bbe43aac313eba29dc8.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The normal request completion can be done before or during handling
-BLK_EH_RESET_TIMER, and this race may cause the request to never
-be completed since driver's .timeout() may always return
-BLK_EH_RESET_TIMER.
+On Wed, Apr 11, 2018 at 10:49:51PM +0000, Bart Van Assche wrote:
+> On Thu, 2018-04-12 at 04:55 +0800, Ming Lei wrote:
+> > +again:
+> >  	switch (ret) {
+> >  	case BLK_EH_HANDLED:
+> >  		__blk_mq_complete_request(req);
+> >  		break;
+> >  	case BLK_EH_RESET_TIMER:
+> >  		[ ... ]
+> > +		spin_lock_irqsave(req->q->queue_lock, flags);
+> > +		if (blk_mq_rq_state(req) != MQ_RQ_COMPLETE_IN_RESET) {
+> > +			blk_mq_rq_update_aborted_gstate(req, 0);
+> > +			blk_add_timer(req);
+> > +		} else {
+> > +			blk_mq_rq_update_state(req, MQ_RQ_IN_FLIGHT);
+> > +			ret = BLK_EH_HANDLED;
+> > +			goto again;
+> > +		}
+> > +		spin_unlock_irqrestore(req->q->queue_lock, flags);
+> 
+> Does the above chunk introduce a backwards goto from inside a region around
+> which a spinlock is held to outside that region? Can such a goto result in
+> anything else than a deadlock?
 
-This issue can't be fixed completely by driver, since the normal
-completion can be done between returning .timeout() and handing
-BLK_EH_RESET_TIMER.
+Yes, it is being fixed in my local V2, :-)
 
-This patch fixes this race by introducing rq state of MQ_RQ_COMPLETE_IN_RESET,
-and reading/writing rq's state by holding queue lock, which can be
-per-request actually, but just not necessary to introduce one lock for
-so unusual event.
-
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: Israel Rukshin <israelr@mellanox.com>,
-Cc: Max Gurtovoy <maxg@mellanox.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-
-V2:
-	- rename the new flag as MQ_RQ_COMPLETE_IN_TIMEOUT
-	- fix lock uses in blk_mq_rq_timed_out
-	- document re-order between blk_add_timer() and
-	blk_mq_rq_update_aborted_gstate(req, 0)
-
-
- block/blk-mq.c | 49 ++++++++++++++++++++++++++++++++++++++++++++-----
- block/blk-mq.h |  1 +
- 2 files changed, 45 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0dc9e341c2a7..db1c84b2bb5e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -630,10 +630,27 @@ void blk_mq_complete_request(struct request *rq)
- 	 * However, that would complicate paths which want to synchronize
- 	 * against us.  Let stay in sync with the issue path so that
- 	 * hctx_lock() covers both issue and completion paths.
-+	 *
-+	 * Cover complete vs BLK_EH_RESET_TIMER race in slow path with
-+	 * helding queue lock.
- 	 */
- 	hctx_lock(hctx, &srcu_idx);
- 	if (blk_mq_rq_aborted_gstate(rq) != rq->gstate)
- 		__blk_mq_complete_request(rq);
-+	else {
-+		unsigned long flags;
-+		bool need_complete = false;
-+
-+		spin_lock_irqsave(q->queue_lock, flags);
-+		if (!blk_mq_rq_aborted_gstate(rq))
-+			need_complete = true;
-+		else
-+			blk_mq_rq_update_state(rq, MQ_RQ_COMPLETE_IN_TIMEOUT);
-+		spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+		if (need_complete)
-+			__blk_mq_complete_request(rq);
-+	}
- 	hctx_unlock(hctx, srcu_idx);
- }
- EXPORT_SYMBOL(blk_mq_complete_request);
-@@ -814,6 +831,7 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
- {
- 	const struct blk_mq_ops *ops = req->q->mq_ops;
- 	enum blk_eh_timer_return ret = BLK_EH_RESET_TIMER;
-+	unsigned long flags;
- 
- 	req->rq_flags |= RQF_MQ_TIMEOUT_EXPIRED;
- 
-@@ -826,12 +844,33 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
- 		break;
- 	case BLK_EH_RESET_TIMER:
- 		/*
--		 * As nothing prevents from completion happening while
--		 * ->aborted_gstate is set, this may lead to ignored
--		 * completions and further spurious timeouts.
-+		 * The normal completion may happen during handling the
-+		 * timeout, or even after returning from .timeout(), so
-+		 * once the request has been completed, we can't reset
-+		 * timer any more since this request may be handled as
-+		 * BLK_EH_RESET_TIMER in next timeout handling too, and
-+		 * it has to be completed in this situation.
-+		 *
-+		 * Holding the queue lock to cover read/write rq's
-+		 * aborted_gstate and normal state, so the race can be
-+		 * avoided completely.
-+		 *
-+		 * blk_add_timer() may be re-ordered with resetting
-+		 * aborted_gstate, and the only side-effec is that if this
-+		 * request is recycled after aborted_gstate is cleared, it
-+		 * may be timed out a bit late, that is what we can survive
-+		 * given timeout event is so unusual.
- 		 */
--		blk_mq_rq_update_aborted_gstate(req, 0);
--		blk_add_timer(req);
-+		spin_lock_irqsave(req->q->queue_lock, flags);
-+		if (blk_mq_rq_state(req) != MQ_RQ_COMPLETE_IN_TIMEOUT) {
-+			blk_add_timer(req);
-+			blk_mq_rq_update_aborted_gstate(req, 0);
-+			spin_unlock_irqrestore(req->q->queue_lock, flags);
-+		} else {
-+			blk_mq_rq_update_state(req, MQ_RQ_IN_FLIGHT);
-+			spin_unlock_irqrestore(req->q->queue_lock, flags);
-+			__blk_mq_complete_request(req);
-+		}
- 		break;
- 	case BLK_EH_NOT_HANDLED:
- 		break;
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 88c558f71819..0426d048743d 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -35,6 +35,7 @@ enum mq_rq_state {
- 	MQ_RQ_IDLE		= 0,
- 	MQ_RQ_IN_FLIGHT		= 1,
- 	MQ_RQ_COMPLETE		= 2,
-+	MQ_RQ_COMPLETE_IN_TIMEOUT	= 3,
- 
- 	MQ_RQ_STATE_BITS	= 2,
- 	MQ_RQ_STATE_MASK	= (1 << MQ_RQ_STATE_BITS) - 1,
 -- 
-2.9.5
+Ming
