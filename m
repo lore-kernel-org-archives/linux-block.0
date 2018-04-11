@@ -1,80 +1,38 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
+Return-Path: <prvs=63297c413=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"israelr@mellanox.com" <israelr@mellanox.com>, "sagi@grimberg.me"
+	<sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"maxg@mellanox.com" <maxg@mellanox.com>, "tj@kernel.org" <tj@kernel.org>
 Subject: Re: [PATCH v5] blk-mq: Avoid that a completion can be ignored for
  BLK_EH_RESET_TIMER
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
- "axboe@kernel.dk" <axboe@kernel.dk>
-Cc: "hch@lst.de" <hch@lst.de>, "tj@kernel.org" <tj@kernel.org>,
- "israelr@mellanox.com" <israelr@mellanox.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "maxg@mellanox.com" <maxg@mellanox.com>,
- "stable@vger.kernel.org" <stable@vger.kernel.org>,
- "ming.lei@redhat.com" <ming.lei@redhat.com>
+Date: Wed, 11 Apr 2018 13:36:43 +0000
+Message-ID: <56f31e573cdd0d17cce5108d7e722d63519c8a40.camel@wdc.com>
 References: <20180410210157.30477-1-bart.vanassche@wdc.com>
- <255b84ff-3fe5-1269-70a8-3ab5cc89c1ef@grimberg.me>
- <6684d4b3049397cbbabbee3008f96d80b48c0a17.camel@wdc.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <34fcf710-5e0a-9830-bc60-71c4086a0df5@grimberg.me>
-Date: Wed, 11 Apr 2018 17:32:36 +0300
+	 <20180411021104.GC4494@ming.t460p>
+In-Reply-To: <20180411021104.GC4494@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <6684d4b3049397cbbabbee3008f96d80b48c0a17.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-
->>>    static void __blk_mq_requeue_request(struct request *rq)
->>>    {
->>>    	struct request_queue *q = rq->q;
->>> +	enum mq_rq_state old_state = blk_mq_rq_state(rq);
->>>    
->>>    	blk_mq_put_driver_tag(rq);
->>>    
->>>    	trace_block_rq_requeue(q, rq);
->>>    	wbt_requeue(q->rq_wb, &rq->issue_stat);
->>>    
->>> -	if (blk_mq_rq_state(rq) != MQ_RQ_IDLE) {
->>> -		blk_mq_rq_update_state(rq, MQ_RQ_IDLE);
->>> +	if (old_state != MQ_RQ_IDLE) {
->>> +		if (!blk_mq_change_rq_state(rq, old_state, MQ_RQ_IDLE))
->>> +			WARN_ON_ONCE(true);
->>>    		if (q->dma_drain_size && blk_rq_bytes(rq))
->>>    			rq->nr_phys_segments--;
->>>    	}
->>
->> Can you explain why was old_state kept as a local variable?
-> 
-> Hello Sagi,
-> 
-> Since blk_mq_requeue_request() must be called after a request has completed
-> the timeout handler will ignore requests that are being requeued. Hence it
-> is safe in this function to cache the request state in a local variable.
-
-I understand why it is safe, I just didn't understand why it is needed.
-
->>> +static inline bool blk_mq_change_rq_state(struct request *rq,
->>> +					  enum mq_rq_state old_state,
->>> +					  enum mq_rq_state new_state)
->>>    {
->>> -	u64 old_val = READ_ONCE(rq->gstate);
->>> -	u64 new_val = (old_val & ~MQ_RQ_STATE_MASK) | state;
->>> -
->>> -	if (state == MQ_RQ_IN_FLIGHT) {
->>> -		WARN_ON_ONCE((old_val & MQ_RQ_STATE_MASK) != MQ_RQ_IDLE);
->>> -		new_val += MQ_RQ_GEN_INC;
->>> -	}
->>> +	unsigned long old_val = (READ_ONCE(rq->__deadline) & ~RQ_STATE_MASK) |
->>> +				old_state;
->>> +	unsigned long new_val = (old_val & ~RQ_STATE_MASK) | new_state;
->>>    
->>> -	/* avoid exposing interim values */
->>> -	WRITE_ONCE(rq->gstate, new_val);
->>> +	return cmpxchg(&rq->__deadline, old_val, new_val) == old_val;
->>>    }
->>
->> Can you explain why this takes the old_state of the request?
-> 
-> Can you clarify your question? The purpose of this function is to change
-> the request state only into @new_state if it matches @old_state. I think
-> that is also what the implementation of this function does.
-
-I misread the documentation of this. never mind. thanks.
+T24gV2VkLCAyMDE4LTA0LTExIGF0IDEwOjExICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
+VHVlLCBBcHIgMTAsIDIwMTggYXQgMDM6MDE6NTdQTSAtMDYwMCwgQmFydCBWYW4gQXNzY2hlIHdy
+b3RlOg0KPiA+IFRoZSBibGstbXEgdGltZW91dCBoYW5kbGluZyBjb2RlIGlnbm9yZXMgY29tcGxl
+dGlvbnMgdGhhdCBvY2N1ciBhZnRlcg0KPiA+IGJsa19tcV9jaGVja19leHBpcmVkKCkgaGFzIGJl
+ZW4gY2FsbGVkIGFuZCBiZWZvcmUgYmxrX21xX3JxX3RpbWVkX291dCgpDQo+ID4gaGFzIHJlc2V0
+IHJxLT5hYm9ydGVkX2dzdGF0ZS4gSWYgYSBibG9jayBkcml2ZXIgdGltZW91dCBoYW5kbGVyIGFs
+d2F5cw0KPiA+IHJldHVybnMgQkxLX0VIX1JFU0VUX1RJTUVSIHRoZW4gdGhlIHJlc3VsdCB3aWxs
+IGJlIHRoYXQgdGhlIHJlcXVlc3QNCj4gPiBuZXZlciB0ZXJtaW5hdGVzLg0KPiANCj4gVW5kZXIg
+dGhpcyBzaXR1YXRpb246DQo+IA0KPiBJTU8sIGlmIHRoaXMgcmVxdWVzdCBoYXMgYmVlbiBoYW5k
+bGVkIGJ5IGRyaXZlcidzIGlycSBoYW5kbGVyLCBhbmQgaWYNCj4gZHJpdmVyJ3MgLnRpbWVvdXQg
+c3RpbGwgcmV0dXJucyBCTEtfRUhfUkVTRVRfVElNRVIsIGl0IGlzIGRyaXZlcidzIGJ1ZywNCj4g
+YW5kIHRoZSBjb3JyZWN0IHJldHVybiB2YWx1ZSBzaG91bGQgYmUgQkxLX0VIX0hBTkRMRUQuDQoN
+Ck1heWJlLiBJbiB0aGUgdmlydGlvLXNjc2kgZHJpdmVyIEkgZm91bmQgdGhlIGZvbGxvd2luZzoN
+Cg0KLyoNCiAqIFRoZSBob3N0IGd1YXJhbnRlZXMgdG8gcmVzcG9uZCB0byBlYWNoIGNvbW1hbmQs
+IGFsdGhvdWdoIEkvTw0KICogbGF0ZW5jaWVzIG1pZ2h0IGJlIGhpZ2hlciB0aGFuIG9uIGJhcmUg
+bWV0YWwuICBSZXNldCB0aGUgdGltZXINCiAqIHVuY29uZGl0aW9uYWxseSB0byBnaXZlIHRoZSBo
+b3N0IGEgY2hhbmNlIHRvIHBlcmZvcm0gRUguDQogKi8NCnN0YXRpYyBlbnVtIGJsa19laF90aW1l
+cl9yZXR1cm4gdmlydHNjc2lfZWhfdGltZWRfb3V0KHN0cnVjdCBzY3NpX2NtbmQgKnNjbW5kKQ0K
+ew0KCXJldHVybiBCTEtfRUhfUkVTRVRfVElNRVI7DQp9DQoNCkJhcnQuDQoNCg0KDQo=
