@@ -1,56 +1,66 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 11 Apr 2018 10:15:38 -0700
-From: "tj@kernel.org" <tj@kernel.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+Return-Path: <prvs=63297c413=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tj@kernel.org" <tj@kernel.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"nborisov@suse.com" <nborisov@suse.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "shli@fb.com" <shli@fb.com>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"00moses.alexander00@gmail.com" <00moses.alexander00@gmail.com>,
-	"arnd@arndb.de" <arnd@arndb.de>,
+	"nborisov@suse.com" <nborisov@suse.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"shli@fb.com" <shli@fb.com>, "gregkh@linuxfoundation.org"
+	<gregkh@linuxfoundation.org>, "00moses.alexander00@gmail.com"
+	<00moses.alexander00@gmail.com>, "arnd@arndb.de" <arnd@arndb.de>,
 	"joseph.qi@linux.alibaba.com" <joseph.qi@linux.alibaba.com>
 Subject: Re: [PATCH v2] blk-cgroup: remove entries in blkg_tree before queue
  release
-Message-ID: <20180411171538.GN793541@devbig577.frc2.facebook.com>
-References: <20180409220938.GI3126663@devbig577.frc2.facebook.com>
- <20180411101242.GA2322@gmail.com>
- <20180411142019.GG793541@devbig577.frc2.facebook.com>
- <20180411142859.GB2322@gmail.com>
- <20180411144616.GI793541@devbig577.frc2.facebook.com>
- <20180411145123.GJ793541@devbig577.frc2.facebook.com>
- <20180411145632.GK793541@devbig577.frc2.facebook.com>
- <bd60302129cb89bdc3b4f402ce4e061f41851729.camel@wdc.com>
- <20180411170018.GL793541@devbig577.frc2.facebook.com>
- <398bad36e2f01e37645a36d052d62136766ee88d.camel@wdc.com>
+Date: Wed, 11 Apr 2018 17:06:41 +0000
+Message-ID: <398bad36e2f01e37645a36d052d62136766ee88d.camel@wdc.com>
+References: <20180407102148.GA9729@gmail.com>
+	 <20180409220938.GI3126663@devbig577.frc2.facebook.com>
+	 <20180411101242.GA2322@gmail.com>
+	 <20180411142019.GG793541@devbig577.frc2.facebook.com>
+	 <20180411142859.GB2322@gmail.com>
+	 <20180411144616.GI793541@devbig577.frc2.facebook.com>
+	 <20180411145123.GJ793541@devbig577.frc2.facebook.com>
+	 <20180411145632.GK793541@devbig577.frc2.facebook.com>
+	 <bd60302129cb89bdc3b4f402ce4e061f41851729.camel@wdc.com>
+	 <20180411170018.GL793541@devbig577.frc2.facebook.com>
+In-Reply-To: <20180411170018.GL793541@devbig577.frc2.facebook.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <398bad36e2f01e37645a36d052d62136766ee88d.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
-
-On Wed, Apr 11, 2018 at 05:06:41PM +0000, Bart Van Assche wrote:
-> A simple and effective solution is to dissociate a request queue from the
-> block cgroup controller before blk_cleanup_queue() returns. This is why commit
-> a063057d7c73 ("block: Fix a race between request queue removal and the block
-> cgroup controller") moved the blkcg_exit_queue() call from __blk_release_queue()
-> into blk_cleanup_queue().
-
-which is broken.  We can try to switch the lifetime model to revoking
-all live objects but that likely is a lot more involving than blindly
-moving blkg shootdown from release to cleanup.  Implementing sever
-semantics is usually a lot more involved / fragile because it requires
-explicit participation from all users (exactly the same way revoking
-->queue_lock is difficult).
-
-I'm not necessarily against switching to sever model, but what the
-patch did isn't that.  It just moved some code without actually
-understanding or auditing what the implications are.
-
-Thanks.
-
--- 
-tejun
+T24gV2VkLCAyMDE4LTA0LTExIGF0IDEwOjAwIC0wNzAwLCB0akBrZXJuZWwub3JnIHdyb3RlOg0K
+PiBPbiBXZWQsIEFwciAxMSwgMjAxOCBhdCAwNDo0Mjo1NVBNICswMDAwLCBCYXJ0IFZhbiBBc3Nj
+aGUgd3JvdGU6DQo+ID4gT24gV2VkLCAyMDE4LTA0LTExIGF0IDA3OjU2IC0wNzAwLCBUZWp1biBI
+ZW8gd3JvdGU6DQo+ID4gPiBBbmQgbG9va2luZyBhdCB0aGUgY2hhbmdlLCBpdCBsb29rcyBsaWtl
+IHRoZSByaWdodCB0aGluZyB3ZSBzaG91bGQNCj4gPiA+IGhhdmUgZG9uZSBpcyBjYWNoaW5nIEBs
+b2NrIG9uIHRoZSBwcmludF9ibGtnIHNpZGUgYW5kIHdoZW4gc3dpdGNoaW5nDQo+ID4gPiBsb2Nr
+cyBtYWtlIHN1cmUgYm90aCBsb2NrcyBhcmUgaGVsZC4gIElPVywgZG8gdGhlIGZvbGxvd2luZyBp
+bg0KPiA+ID4gYmxrX2NsZWFudXBfcXVldWUoKQ0KPiA+ID4gDQo+ID4gPiAJc3Bpbl9sb2NrX2ly
+cShsb2NrKTsNCj4gPiA+IAlpZiAocS0+cXVldWVfbG9jayAhPSAmcS0+X19xdWV1ZV9sb2NrKSB7
+DQo+ID4gPiAJCXNwaW5fbG9jaygmcS0+X19xdWV1ZV9sb2NrKTsNCj4gPiA+IAkJcS0+cXVldWVf
+bG9jayA9ICZxLT5fX3F1ZXVlX2xvY2s7DQo+ID4gPiAJCXNwaW5fdW5sb2NrKCZxLT5fX3F1ZXVl
+X2xvY2spOw0KPiA+ID4gCX0NCj4gPiA+IAlzcGluX3VubG9ja19pcnEobG9jayk7DQo+ID4gPiAN
+Cj4gPiA+IE90aGVyd2lzZSwgdGhlcmUgY2FuIGJlIHR3byBsb2NrIGhvbGRlcnMgdGhpbmtpbmcg
+dGhleSBoYXZlIGV4Y2x1c2l2ZQ0KPiA+ID4gYWNjZXNzIHRvIHRoZSByZXF1ZXN0X3F1ZXVlLg0K
+PiA+IA0KPiA+IEkgdGhpbmsgdGhhdCdzIGEgYmFkIGlkZWEuIEEgYmxvY2sgZHJpdmVyIGlzIGFs
+bG93ZWQgdG8gZGVzdHJveSB0aGUNCj4gPiBzcGlubG9jayBpdCBhc3NvY2lhdGVkIHdpdGggdGhl
+IHJlcXVlc3QgcXVldWUgYXMgc29vbiBhcyBibGtfY2xlYW51cF9xdWV1ZSgpDQo+ID4gaGFzIGZp
+bmlzaGVkLiBJZiB0aGUgYmxvY2sgY2dyb3VwIGNvbnRyb2xsZXIgd291bGQgY2FjaGUgYSBwb2lu
+dGVyIHRvIHRoZQ0KPiA+IGJsb2NrIGRyaXZlciBzcGlubG9jayB0aGVuIHRoYXQgY291bGQgY2F1
+c2UgdGhlIGNncm91cCBjb2RlIHRvIGF0dGVtcHQgdG8NCj4gPiBsb2NrIGEgc3BpbmxvY2sgYWZ0
+ZXIgaXQgaGFzIGJlZW4gZGVzdHJveWVkLiBJIGRvbid0IHRoaW5rIHdlIG5lZWQgdGhhdCBraW5k
+DQo+ID4gb2YgcmFjZSBjb25kaXRpb25zLg0KPiANCj4gSSBzZWUsIGJ1dCB0aGF0IHByb2JsZW0g
+aXMgdGhlcmUgd2l0aCBvciB3aXRob3V0IGNhY2hpbmcgYXMgbG9uZyBhcyB3ZQ0KPiBoYXZlIHF1
+ZXVfbG9jayB1c2FnZSB3aGljaCByZWFjaCBiZXlvbmQgY2xlYW51cF9xdWV1ZSwgcmlnaHQ/ICBX
+aGV0aGVyDQo+IHRoYXQgdXNlciBjYWNoZXMgdGhlIGxvY2sgZm9yIG1hdGNoaW5nIHVubG9ja2lu
+ZyBvciBub3QgZG9lc24ndCByZWFsbHkNCj4gY2hhbmdlIHRoZSBzaXR1YXRpb24uDQo+IA0KPiBT
+aG9ydCBvZiBhZGRpbmcgcHJvdGVjdGlvbiBhcm91bmQgcXVldWVfbG9jayBzd2l0Y2hpbmcsIEkg
+Y2FuJ3QgdGhpbmsNCj4gb2YgYSBzb2x1dGlvbiB0aG8uICBQcm9iYWJseSB0aGUgcmlnaHQgdGhp
+bmcgdG8gZG8gaXMgYWRkaW5nIHF1ZXVlDQo+IGxvY2svdW5sb2NrIGhlbHBlcnMgd2hpY2ggYXJl
+IHNhZmUgdG8gdXNlIGJleW9uZCBjbGVhbnVwX3F1ZXVlLg0KDQpIZWxsbyBUZWp1biwNCg0KQSBz
+aW1wbGUgYW5kIGVmZmVjdGl2ZSBzb2x1dGlvbiBpcyB0byBkaXNzb2NpYXRlIGEgcmVxdWVzdCBx
+dWV1ZSBmcm9tIHRoZQ0KYmxvY2sgY2dyb3VwIGNvbnRyb2xsZXIgYmVmb3JlIGJsa19jbGVhbnVw
+X3F1ZXVlKCkgcmV0dXJucy4gVGhpcyBpcyB3aHkgY29tbWl0DQphMDYzMDU3ZDdjNzMgKCJibG9j
+azogRml4IGEgcmFjZSBiZXR3ZWVuIHJlcXVlc3QgcXVldWUgcmVtb3ZhbCBhbmQgdGhlIGJsb2Nr
+DQpjZ3JvdXAgY29udHJvbGxlciIpIG1vdmVkIHRoZSBibGtjZ19leGl0X3F1ZXVlKCkgY2FsbCBm
+cm9tIF9fYmxrX3JlbGVhc2VfcXVldWUoKQ0KaW50byBibGtfY2xlYW51cF9xdWV1ZSgpLg0KDQpU
+aGFua3MsDQoNCkJhcnQuDQoNCg0KDQoNCg==
