@@ -1,69 +1,57 @@
-Return-Path: <prvs=63297c413=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "tj@kernel.org" <tj@kernel.org>, "00moses.alexander00@gmail.com"
-	<00moses.alexander00@gmail.com>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"nborisov@suse.com" <nborisov@suse.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"shli@fb.com" <shli@fb.com>, "gregkh@linuxfoundation.org"
-	<gregkh@linuxfoundation.org>, "joseph.qi@linux.alibaba.com"
-	<joseph.qi@linux.alibaba.com>, "arnd@arndb.de" <arnd@arndb.de>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 11 Apr 2018 07:56:32 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Alexandru Moise <00moses.alexander00@gmail.com>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Cc: axboe@kernel.dk, shli@fb.com, nborisov@suse.com, arnd@arndb.de,
+	gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH v2] blk-cgroup: remove entries in blkg_tree before queue
  release
-Date: Wed, 11 Apr 2018 15:54:53 +0000
-Message-ID: <5fafe1cbf6b0111448a81005c1c16feee24a99ad.camel@wdc.com>
+Message-ID: <20180411145632.GK793541@devbig577.frc2.facebook.com>
 References: <20180407102148.GA9729@gmail.com>
-	 <20180409220938.GI3126663@devbig577.frc2.facebook.com>
-	 <20180411101242.GA2322@gmail.com>
-	 <20180411142019.GG793541@devbig577.frc2.facebook.com>
-	 <20180411142859.GB2322@gmail.com>
-In-Reply-To: <20180411142859.GB2322@gmail.com>
-Content-Type: text/plain; charset="utf-8"
+ <20180409220938.GI3126663@devbig577.frc2.facebook.com>
+ <20180411101242.GA2322@gmail.com>
+ <20180411142019.GG793541@devbig577.frc2.facebook.com>
+ <20180411142859.GB2322@gmail.com>
+ <20180411144616.GI793541@devbig577.frc2.facebook.com>
+ <20180411145123.GJ793541@devbig577.frc2.facebook.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180411145123.GJ793541@devbig577.frc2.facebook.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE4LTA0LTExIGF0IDE2OjI4ICswMjAwLCBBbGV4YW5kcnUgTW9pc2Ugd3JvdGU6
-DQo+IFsgICAgMC43NjY2NjZdIEJVRzogdW5hYmxlIHRvIGhhbmRsZSBrZXJuZWwgTlVMTCBwb2lu
-dGVyIGRlcmVmZXJlbmNlIGF0IDAwMDAwMDAwMDAwMDAxYjQNCj4gWyAgICAwLjc2MzM1MF0gS2Vy
-bmVsIHBhbmljIC0gbm90IHN5bmNpbmc6IEF0dGVtcHRlZCB0byBraWxsIGluaXQhIGV4aXRjb2Rl
-PTB4MDAwMDAwMDkNCj4gWyAgICAwLjc2MzM1MF0NCj4gWyAgICAwLjc2NjY2Nl0gUEdEIDAgUDRE
-IDANCj4gWyAgICAwLjc2NjY2Nl0gT29wczogMDAwMCBbIzJdIFBSRUVNUFQgU01QDQo+IFsgICAg
-MC43NjY2NjZdIENQVTogMCBQSUQ6IDYgQ29tbToga3dvcmtlci91MTI6MCBUYWludGVkOiBHICAg
-ICAgRCAgICAgICAgICA0LjE2LjAtQVJDSCsgIzgxDQo+IFsgICAgMC43NjY2NjZdIEhhcmR3YXJl
-IG5hbWU6IFFFTVUgU3RhbmRhcmQgUEMgKGk0NDBGWCArIFBJSVgsIDE5OTYpLCBCSU9TIDEuMTEu
-MC0yMDE3MTExMF8xMDAwMTUtYW5hdG9sIDA0LzAxLzIwJA0KPiBbICAgIDAuNzY2NjY2XSBXb3Jr
-cXVldWU6IG52bWUtcmVzZXQtd3EgbnZtZV9yZXNldF93b3JrDQo+IFsgICAgMC43NjY2NjZdIFJJ
-UDogMDAxMDpibGtfcXVldWVfZmxhZ19zZXQrMHhmLzB4NDANCj4gWyAgICAwLjc2NjY2Nl0gUlNQ
-OiAwMDAwOmZmZmZjOTAwMDAxYmZjYjAgRUZMQUdTOiAwMDAxMDI0Ng0KPiBbICAgIDAuNzY2NjY2
-XSBSQVg6IGZmZmY4ODAwM2I2OTgwMDAgUkJYOiAwMDAwMDAwMDAwMDAwMDAwIFJDWDogMDAwMDAw
-MDAwMDAwMDAwMA0KPiBbICAgIDAuNzY2NjY2XSBSRFg6IGZmZmY4ODAwM2I2OTgwMDAgUlNJOiBm
-ZmZmZmZmZmZmZmZmZmY0IFJESTogMDAwMDAwMDAwMDAwMDAxYw0KPiBbICAgIDAuNzY2NjY2XSBS
-QlA6IGZmZmZjOTAwMDAxYmZjYzAgUjA4OiAwMDAwMDAwMDAwMDAwMDAwIFIwOTogMDAwMDAwMDAw
-MDAwMDAwMA0KPiBbICAgIDAuNzY2NjY2XSBSMTA6IGZmZmZlYTAwMDBlYWE5ODAgUjExOiBmZmZm
-ZmZmZjgxNGUwOTcwIFIxMjogMDAwMDAwMDAwMDAwMDAxYw0KPiBbICAgIDAuNzY2NjY2XSBSMTM6
-IDAwMDAwMDAwMDAwMDAwMDAgUjE0OiAwMDAwMDAwMDAwMDAwMDAwIFIxNTogZmZmZjg4MDAzYWFk
-ODAxMA0KPiBbICAgIDAuNzY2NjY2XSBGUzogIDAwMDAwMDAwMDAwMDAwMDAoMDAwMCkgR1M6ZmZm
-Zjg4MDAzZTQwMDAwMCgwMDAwKSBrbmxHUzowMDAwMDAwMDAwMDAwMDAwDQo+IFsgICAgMC43NjY2
-NjZdIENTOiAgMDAxMCBEUzogMDAwMCBFUzogMDAwMCBDUjA6IDAwMDAwMDAwODAwNTAwMzMNCj4g
-WyAgICAwLjc2NjY2Nl0gQ1IyOiAwMDAwMDAwMDAwMDAwMWI0IENSMzogMDAwMDAwMDAwMjIwOTAw
-MSBDUjQ6IDAwMDAwMDAwMDAwNjA2ZjANCj4gWyAgICAwLjc2NjY2Nl0gQ2FsbCBUcmFjZToNCj4g
-WyAgICAwLjc2NjY2Nl0gIGJsa19tcV9xdWllc2NlX3F1ZXVlKzB4MjMvMHg4MA0KPiBbICAgIDAu
-NzY2NjY2XSAgbnZtZV9kZXZfZGlzYWJsZSsweDM0Zi8weDQ4MA0KPiBbICAgIDAuNzY2NjY2XSAg
-PyBudm1lX2lycSsweDUwLzB4NTANCj4gWyAgICAwLjc2NjY2Nl0gID8gZGV2X3dhcm4rMHg2NC8w
-eDgwDQo+IFsgICAgMC43NjY2NjZdICBudm1lX3Jlc2V0X3dvcmsrMHgxM2RlLzB4MTU3MA0KPiBb
-ICAgIDAuNzY2NjY2XSAgPyBfX3N3aXRjaF90b19hc20rMHgzNC8weDcwDQo+IFsgICAgMC43NjY2
-NjZdICA/IF9fc3dpdGNoX3RvX2FzbSsweDQwLzB4NzANCj4gWyAgICAwLjc2NjY2Nl0gID8gX3Jh
-d19zcGluX3VubG9ja19pcnErMHgxNS8weDMwDQo+IFsgICAgMC43NjY2NjZdICA/IGZpbmlzaF90
-YXNrX3N3aXRjaCsweDE1Ni8weDIxMA0KPiBbICAgIDAuNzY2NjY2XSAgcHJvY2Vzc19vbmVfd29y
-aysweDIwYy8weDNkMA0KPiBbICAgIDAuNzY2NjY2XSAgd29ya2VyX3RocmVhZCsweDIxNi8weDQw
-MA0KPiBbICAgIDAuNzY2NjY2XSAga3RocmVhZCsweDEyNS8weDEzMA0KPiBbICAgIDAuNzY2NjY2
-XSAgPyBwcm9jZXNzX29uZV93b3JrKzB4M2QwLzB4M2QwDQo+IFsgICAgMC43NjY2NjZdICA/IF9f
-a3RocmVhZF9iaW5kX21hc2srMHg2MC8weDYwDQo+IFsgICAgMC43NjY2NjZdICByZXRfZnJvbV9m
-b3JrKzB4M2EvMHg1MA0KDQpIZWxsbyBBbGV4YW5kcnUsDQoNCldoYXQgbWFkZSB5b3UgbG9vayBh
-dCBjZ3JvdXBzPyBJbiB0aGUgYWJvdmUgcmVnaXN0ZXIgZHVtcCBJIHNlZSB0aGF0ICVyYnggPT0g
-TlVMTC4NCkkgdGhpbmsgdGhhdCBtZWFucyB0aGF0IHRoZSBxdWV1ZSBwb2ludGVyIGFyZ3VtZW50
-IG9mIGJsa19xdWV1ZV9mbGFnX3NldCgpIGlzIE5VTEwuDQpUaGUgTlZNZSBpbml0aWF0b3IgZHJp
-dmVyIHNob3VsZCBuZXZlciBwYXNzIGEgTlVMTCBwb2ludGVyIHRvIGJsa19tcV9xdWllc2NlX3F1
-ZXVlKCkuDQpQbGVhc2UgYXNrIHRoZSBOVk1lIGRyaXZlciBtYWludGFpbmVycyBmb3IgdGhlaXIg
-b3BpbmlvbiBvbiB0aGUgbGludXgtbnZtZSBtYWlsaW5nDQpsaXN0Lg0KDQpUaGFua3MsDQoNCkJh
-cnQuDQoNCg0KDQo=
+Hello, again.
+
+On Wed, Apr 11, 2018 at 07:51:23AM -0700, Tejun Heo wrote:
+> Oh, it wasn't Joseph's change.  It was Bart's fix for a problem
+> reported by Joseph.  Bart, a063057d7c73 ("block: Fix a race between
+> request queue removal and the block cgroup controller") created a
+> regression where a request_queue can be destroyed with blkgs still
+> attached.  The original report is..
+> 
+>  http://lkml.kernel.org/r/20180407102148.GA9729@gmail.com
+
+And looking at the change, it looks like the right thing we should
+have done is caching @lock on the print_blkg side and when switching
+locks make sure both locks are held.  IOW, do the following in
+blk_cleanup_queue()
+
+	spin_lock_irq(lock);
+	if (q->queue_lock != &q->__queue_lock) {
+		spin_lock(&q->__queue_lock);
+		q->queue_lock = &q->__queue_lock;
+		spin_unlock(&q->__queue_lock);
+	}
+	spin_unlock_irq(lock);
+
+Otherwise, there can be two lock holders thinking they have exclusive
+access to the request_queue.
+
+Thanks.
+
+-- 
+tejun
