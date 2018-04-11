@@ -1,54 +1,26 @@
 Return-Path: <prvs=63297c413=Bart.VanAssche@wdc.com>
 From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "axboe@kernel.dk" <axboe@kernel.dk>, "ming.lei@redhat.com"
-	<ming.lei@redhat.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
 CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "joseph.qi@linux.alibaba.com"
-	<joseph.qi@linux.alibaba.com>
-Subject: Re: [PATCH] blk-mq: Avoid that submitting a bio concurrently with
+	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"joseph.qi@linux.alibaba.com" <joseph.qi@linux.alibaba.com>
+Subject: Re: [PATCH v2] blk-mq: Avoid that submitting a bio concurrently with
  device removal triggers a crash
-Date: Wed, 11 Apr 2018 02:26:00 +0000
-Message-ID: <e31d687af909e0d581b0be2c21838db77aa93df0.camel@wdc.com>
-References: <20180410203035.26167-1-bart.vanassche@wdc.com>
-	 <20180411020541.GB4494@ming.t460p>
-	 <81efe671-59ef-3a4b-b941-f1c5d2c18915@kernel.dk>
-In-Reply-To: <81efe671-59ef-3a4b-b941-f1c5d2c18915@kernel.dk>
+Date: Wed, 11 Apr 2018 02:22:18 +0000
+Message-ID: <f97e1ce5ceaa1195114b6813907033e36b591447.camel@wdc.com>
+References: <20180410204554.28914-1-bart.vanassche@wdc.com>
+	 <20180411021222.GD4494@ming.t460p>
+In-Reply-To: <20180411021222.GD4494@ming.t460p>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTA0LTEwIGF0IDIwOjEwIC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
-biA0LzEwLzE4IDg6MDUgUE0sIE1pbmcgTGVpIHdyb3RlOg0KPiA+IE9uIFR1ZSwgQXByIDEwLCAy
-MDE4IGF0IDAyOjMwOjM1UE0gLTA2MDAsIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gPiA+IEJl
-Y2F1c2UgYmxrY2dfZXhpdF9xdWV1ZSgpIGlzIG5vdyBjYWxsZWQgZnJvbSBpbnNpZGUgYmxrX2Ns
-ZWFudXBfcXVldWUoKQ0KPiA+ID4gaXQgaXMgbm8gbG9uZ2VyIHNhZmUgdG8gYWNjZXNzIGNncm91
-cCBpbmZvcm1hdGlvbiBkdXJpbmcgb3IgYWZ0ZXIgdGhlDQo+ID4gPiBibGtfY2xlYW51cF9xdWV1
-ZSgpIGNhbGwuIEhlbmNlIHByb3RlY3QgdGhlIGdlbmVyaWNfbWFrZV9yZXF1ZXN0X2NoZWNrcygp
-DQo+ID4gPiBjYWxsIHdpdGggYmxrX3F1ZXVlX2VudGVyKCkgLyBibGtfcXVldWVfZXhpdCgpLg0K
-PiA+ID4gDQo+ID4gPiBSZXBvcnRlZC1ieTogTWluZyBMZWkgPG1pbmcubGVpQHJlZGhhdC5jb20+
-DQo+ID4gPiBGaXhlczogYTA2MzA1N2Q3YzczICgiYmxvY2s6IEZpeCBhIHJhY2UgYmV0d2VlbiBy
-ZXF1ZXN0IHF1ZXVlIHJlbW92YWwgYW5kIHRoZSBibG9jayBjZ3JvdXAgY29udHJvbGxlciIpDQo+
-ID4gPiBTaWduZWQtb2ZmLWJ5OiBCYXJ0IFZhbiBBc3NjaGUgPGJhcnQudmFuYXNzY2hlQHdkYy5j
-b20+DQo+ID4gPiBDYzogTWluZyBMZWkgPG1pbmcubGVpQHJlZGhhdC5jb20+DQo+ID4gPiBDYzog
-Sm9zZXBoIFFpIDxqb3NlcGgucWlAbGludXguYWxpYmFiYS5jb20+DQo+ID4gPiAtLS0NCj4gPiA+
-ICBibG9jay9ibGstY29yZS5jIHwgMzIgKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0N
-Cj4gPiA+ICAxIGZpbGUgY2hhbmdlZCwgMjYgaW5zZXJ0aW9ucygrKSwgNiBkZWxldGlvbnMoLSkN
-Cj4gPiA+IA0KPiA+ID4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1jb3JlLmMgYi9ibG9jay9ibGst
-Y29yZS5jDQo+ID4gPiBpbmRleCAzNGUyZjIyMjdmZDkuLmEzMzBjZDI4MjllMSAxMDA2NDQNCj4g
-PiA+IC0tLSBhL2Jsb2NrL2Jsay1jb3JlLmMNCj4gPiA+ICsrKyBiL2Jsb2NrL2Jsay1jb3JlLmMN
-Cj4gPiA+IEBAIC0yMzg2LDggKzIzODYsMTkgQEAgYmxrX3FjX3QgZ2VuZXJpY19tYWtlX3JlcXVl
-c3Qoc3RydWN0IGJpbyAqYmlvKQ0KPiA+ID4gIAkgKiB5ZXQuDQo+ID4gPiAgCSAqLw0KPiA+ID4g
-IAlzdHJ1Y3QgYmlvX2xpc3QgYmlvX2xpc3Rfb25fc3RhY2tbMl07DQo+ID4gPiArCWJsa19tcV9y
-ZXFfZmxhZ3NfdCBmbGFncyA9IGJpby0+Ymlfb3BmICYgUkVRX05PV0FJVCA/DQo+ID4gPiArCQlC
-TEtfTVFfUkVRX05PV0FJVCA6IDA7DQo+ID4gPiArCXN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxID0g
-YmlvLT5iaV9kaXNrLT5xdWV1ZTsNCj4gPiA+ICAJYmxrX3FjX3QgcmV0ID0gQkxLX1FDX1RfTk9O
-RTsNCj4gPiA+ICANCj4gPiA+ICsJaWYgKGJsa19xdWV1ZV9lbnRlcihxLCBmbGFncykgPCAwKSB7
-DQo+ID4gDQo+ID4gQXMgSSBtZW50aW9uZWQgbGFzdCB0aW1lLCB0aGUgcXVldWUgcG9pbnRlciBo
-YXMgdG8gYmUgY2hlY2tlZCBiZWZvcmUNCj4gPiBjYWxsaW5nIGJsa19xdWV1ZV9lbnRlcigpLCBz
-aW5jZSBpdCBpc24ndCBkaWZmaWN1bHQgdG8gdHJpZ2dlciB0aGUNCj4gPiBmYWlsdXJlIGxvZyBv
-ZiAnZ2VuZXJpY19tYWtlX3JlcXVlc3Q6IFRyeWluZyB0byBhY2Nlc3Mgbm9uZXhpc3RlbnQNCj4g
-PiBibG9jay1kZXZpY2UnLg0KPiANCj4gVGhhdCdzIGEgZ29vZCBwb2ludCwgdGhlIE5VTEwgY2hl
-Y2sgbmVlZHMgdG8gYmUgaW5jbHVkZWQgZmlyc3QuIEJhcnQsDQo+IGRvIHlvdSB3YW50IHRvIHNl
-bmQgYW4gdXBkYXRlPyBJIGNhbiBqdXN0IHJlYmFzZSB0aGUgZm9yLWxpbnVzIGJyYW5jaC4NCg0K
-QnV0IGhvdyBjb3VsZCB0aGUgcmVxdWVzdCBwb2ludGVyIGJlIE5VTEw/IFdoaWNoIGNvZGUgY2xl
-YXJzIHRoYXQgcG9pbnRlcj8NCg0KVGhhbmtzLA0KDQpCYXJ0Lg0KDQoNCg0K
+T24gV2VkLCAyMDE4LTA0LTExIGF0IDEwOjEyICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
+VHVlLCBBcHIgMTAsIDIwMTggYXQgMDI6NDU6NTRQTSAtMDYwMCwgQmFydCBWYW4gQXNzY2hlIHdy
+b3RlOg0KPiA+ICsJc3RydWN0IHJlcXVlc3RfcXVldWUgKnEgPSBiaW8tPmJpX2Rpc2stPnF1ZXVl
+Ow0KPiA+ICAJYmxrX3FjX3QgcmV0ID0gQkxLX1FDX1RfTk9ORTsNCj4gPiAgDQo+ID4gKwlpZiAo
+YmxrX3F1ZXVlX2VudGVyKHEsIGZsYWdzKSA8IDApIHsNCj4gDQo+IFNhbWUgaXNzdWUgd2l0aCBW
+MSwgdGhlIHF1ZXVlIHBvaW50ZXIgaGFzIHRvIGJlIGNoZWNrZWQgYmVmb3JlIGNhbGxpbmcNCj4g
+YmxrX3F1ZXVlX2VudGVyKCkuDQoNCkkgdGhpbmsgaXQncyB0aGUgcmVzcG9uc2liaWxpdHkgb2Yg
+dGhlIGNhbGxlciB0byBrZWVwIGEgcmVmZXJlbmNlIG9uIHRoZQ0KcmVxdWVzdCBxdWV1ZS4NCg0K
+QmFydC4NCg0KDQo=
