@@ -1,49 +1,46 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 12 Apr 2018 11:11:21 -0700
-From: "tj@kernel.org" <tj@kernel.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"00moses.alexander00@gmail.com" <00moses.alexander00@gmail.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <prvs=6335d9f7e=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tj@kernel.org" <tj@kernel.org>
+CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "00moses.alexander00@gmail.com"
+	<00moses.alexander00@gmail.com>, "axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH] block: Ensure that a request queue is dissociated from
  the cgroup controller
-Message-ID: <20180412181121.GA1911913@devbig577.frc2.facebook.com>
+Date: Thu, 12 Apr 2018 16:29:09 +0000
+Message-ID: <f98af37ea6755119177c26fbb73b0071ddef90b8.camel@wdc.com>
 References: <20180412015852.26014-1-bart.vanassche@wdc.com>
- <20180412135149.GX793541@devbig577.frc2.facebook.com>
- <af6dafea-d754-8a0d-b96b-81716f2ea24d@wdc.com>
- <20180412153748.GB793541@devbig577.frc2.facebook.com>
- <beafd7bc4f2fdb7e672ad97e57ff4f82464182da.camel@wdc.com>
- <20180412161247.GD793541@devbig577.frc2.facebook.com>
- <f98af37ea6755119177c26fbb73b0071ddef90b8.camel@wdc.com>
+	 <20180412135149.GX793541@devbig577.frc2.facebook.com>
+	 <af6dafea-d754-8a0d-b96b-81716f2ea24d@wdc.com>
+	 <20180412153748.GB793541@devbig577.frc2.facebook.com>
+	 <beafd7bc4f2fdb7e672ad97e57ff4f82464182da.camel@wdc.com>
+	 <20180412161247.GD793541@devbig577.frc2.facebook.com>
+In-Reply-To: <20180412161247.GD793541@devbig577.frc2.facebook.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <f98af37ea6755119177c26fbb73b0071ddef90b8.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
-
-On Thu, Apr 12, 2018 at 04:29:09PM +0000, Bart Van Assche wrote:
-> Any code that submits a bio or request needs blk_queue_enter() /
-> blk_queue_exit() anyway. Please have a look at the following commit - you will
-> see that that commit reduces the number of blk_queue_enter() / blk_queue_exit()
-> calls in the hot path:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-linus&id=37f9579f4c31a6d698dbf3016d7bf132f9288d30
-
-So, this can work, but it's still pretty fragile.
-
-* Lock switching is fragile and we really should get rid of it.  This
-  is very likely to come back and bite us.
-
-* Right now, blk_queue_enter/exit() doesn't have any annotations.
-  IOW, there's no way for paths which need enter locked to actually
-  assert that.  If we're gonna protect more things with queue
-  enter/exit, it gotta be annotated.
-
-Thanks.
-
--- 
-tejun
+T24gVGh1LCAyMDE4LTA0LTEyIGF0IDA5OjEyIC0wNzAwLCB0akBrZXJuZWwub3JnIHdyb3RlOg0K
+PiA+IERpZCB5b3UgcGVyaGFwcyBtZWFuIGJsa2dfbG9va3VwX2NyZWF0ZSgpPyBUaGF0IGZ1bmN0
+aW9uIGhhcyBvbmUgY2FsbGVyLA0KPiA+IG5hbWVseSBibGtjZ19iaW9faXNzdWVfY2hlY2soKS4g
+VGhlIG9ubHkgY2FsbGVyIG9mIHRoYXQgZnVuY3Rpb24gaXMNCj4gPiBnZW5lcmljX21ha2VfcmVx
+dWVzdF9jaGVja3MoKS4gQSBwYXRjaCB3YXMgcG9zdGVkIG9uIHRoZSBsaW51eC1ibG9jayBtYWls
+aW5nDQo+ID4gbGlzdCByZWNlbnRseSB0aGF0IHN1cnJvdW5kcyB0aGF0IGNhbGwgd2l0aCBibGtf
+cXVldWVfZW50ZXIoKSAvIGJsa19xdWV1ZV9leGl0KCkuDQo+ID4gSSB0aGluayB0aGF0IHByZXZl
+bnRzIHRoYXQgYmxrY2dfZXhpdF9xdWV1ZSgpIGlzIGNhbGxlZCBjb25jdXJyZW50bHkgd2l0aA0K
+PiA+IGJsa2dfbG9va3VwX2NyZWF0ZSgpLg0KPiANCj4gWWVhaCwgdGhhdCdkIHNvbHZlIHRoZSBw
+cm9ibGVtIGZvciB0aGF0IHBhcnRpY3VsYXIgcGF0aCwgYnV0IHdoYXQNCj4gdGhhdCdzIGRvaW5n
+IGlzIGFkZGluZyBhbm90aGVyIGxheWVyIG9mIHJlZmNudGluZyB3aGljaCBpcyB1c2VkIHRvDQo+
+IGltcGxlbWVudCB0aGUgcmV2b2tlIChvciBzZXZlcikgc2VtYW50aWNzLiAgVGhpcyBpcyBhIGZy
+YWdpbGUgYXBwcm9hY2gNCj4gdGhvIGJlY2F1c2UgaXQgaXNuJ3QgY2xlYXIgd2hvJ3MgcHJvdGVj
+dGluZyB3aGF0IGFuZCB0aGVyZSdzIG5vdGhpbmcNCj4gaW4gYmxrZydzIHVzYWdlIHdoaWNoIHN1
+Z2dlc3RzIGl0J2QgYmUgcHJvdGVjdGVkIHRoYXQgd2F5IGFuZCB3ZSdyZQ0KPiBiYXNpY2FsbHkg
+d29ya2luZyBhcm91bmQgYSBkaWZmZXJlbnQgdW5kZXJseWluZyBwcm9ibGVtIChsb2NrDQo+IHN3
+aXRjaGluZykgYnkgZXhwYW5kaW5nIHRoZSBjb3ZlcmFnZSBvZiBhIGRpZmZlcmVudCBsb2NrLg0K
+DQpIZWxsbyBUZWp1biwNCg0KQW55IGNvZGUgdGhhdCBzdWJtaXRzIGEgYmlvIG9yIHJlcXVlc3Qg
+bmVlZHMgYmxrX3F1ZXVlX2VudGVyKCkgLw0KYmxrX3F1ZXVlX2V4aXQoKSBhbnl3YXkuIFBsZWFz
+ZSBoYXZlIGEgbG9vayBhdCB0aGUgZm9sbG93aW5nIGNvbW1pdCAtIHlvdSB3aWxsDQpzZWUgdGhh
+dCB0aGF0IGNvbW1pdCByZWR1Y2VzIHRoZSBudW1iZXIgb2YgYmxrX3F1ZXVlX2VudGVyKCkgLyBi
+bGtfcXVldWVfZXhpdCgpDQpjYWxscyBpbiB0aGUgaG90IHBhdGg6DQoNCmh0dHBzOi8vZ2l0Lmtl
+cm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L2F4Ym9lL2xpbnV4LWJsb2NrLmdpdC9j
+b21taXQvP2g9Zm9yLWxpbnVzJmlkPTM3Zjk1NzlmNGMzMWE2ZDY5OGRiZjMwMTZkN2JmMTMyZjky
+ODhkMzANCg0KVGhhbmtzLA0KDQpCYXJ0Lg0KDQoNCg==
