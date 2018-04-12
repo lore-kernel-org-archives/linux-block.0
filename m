@@ -1,50 +1,30 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from lucky1.263xmail.com ([211.157.147.132]:52675 "EHLO
-        lucky1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752095AbeDLJFP (ORCPT
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:51392 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751633AbeDLBzF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Apr 2018 05:05:15 -0400
-Cc: shawn.lin@rock-chips.com
-Subject: Re: System hung in I/O when booting with sd card
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        Wed, 11 Apr 2018 21:55:05 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "shawn.lin@rock-chips.com" <shawn.lin@rock-chips.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: System hung in I/O when booting with sd card
+Date: Thu, 12 Apr 2018 01:54:55 +0000
+Message-ID: <5496fc576b733fd7a77eb78ef938bc661d3b11af.camel@wdc.com>
 References: <3ba451a8-ac7b-429a-4a1b-703ea38136ce@rock-chips.com>
- <5496fc576b733fd7a77eb78ef938bc661d3b11af.camel@wdc.com>
-From: Shawn Lin <shawn.lin@rock-chips.com>
-Message-ID: <6ac49021-644b-edc1-4c8a-82edbeaad0bd@rock-chips.com>
-Date: Thu, 12 Apr 2018 17:05:18 +0800
+In-Reply-To: <3ba451a8-ac7b-429a-4a1b-703ea38136ce@rock-chips.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <5496fc576b733fd7a77eb78ef938bc661d3b11af.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Bart,
-
-On 2018/4/12 9:54, Bart Van Assche wrote:
-> On Thu, 2018-04-12 at 09:48 +0800, Shawn Lin wrote:
->> I ran into 2 times that my system hung here when booting with a ext4 sd
->> card. No sure how to reproduce it but it seems doesn't matter with the
->> ext4 as I see it again with a vfat sd card, this morning with Linus'
->> master branch. Is it a known issue or any idea how to debug this?
-> 
-> Please verify whether the following patch resolves this:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-linus&id=37f9579f4c31a6d698dbf3016d7bf132f9288d30
-
-Thanks for your patch! I set up some devices to test reboot this morning
-against Linus' master branch. Two devices out of 5, were already hang
-for that without your patch, but the other 5 are still work with your
-patch.
-
-Will update the result tomorrow morning.
-
-> 
-> Thanks,
-> 
-> Bart.
-> 
-> 
-> 
-> 
+T24gVGh1LCAyMDE4LTA0LTEyIGF0IDA5OjQ4ICswODAwLCBTaGF3biBMaW4gd3JvdGU6DQo+IEkg
+cmFuIGludG8gMiB0aW1lcyB0aGF0IG15IHN5c3RlbSBodW5nIGhlcmUgd2hlbiBib290aW5nIHdp
+dGggYSBleHQ0IHNkDQo+IGNhcmQuIE5vIHN1cmUgaG93IHRvIHJlcHJvZHVjZSBpdCBidXQgaXQg
+c2VlbXMgZG9lc24ndCBtYXR0ZXIgd2l0aCB0aGUNCj4gZXh0NCBhcyBJIHNlZSBpdCBhZ2FpbiB3
+aXRoIGEgdmZhdCBzZCBjYXJkLCB0aGlzIG1vcm5pbmcgd2l0aCBMaW51cycNCj4gbWFzdGVyIGJy
+YW5jaC4gSXMgaXQgYSBrbm93biBpc3N1ZSBvciBhbnkgaWRlYSBob3cgdG8gZGVidWcgdGhpcz8N
+Cg0KUGxlYXNlIHZlcmlmeSB3aGV0aGVyIHRoZSBmb2xsb3dpbmcgcGF0Y2ggcmVzb2x2ZXMgdGhp
+czoNCg0KaHR0cHM6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9naXQvYXhi
+b2UvbGludXgtYmxvY2suZ2l0L2NvbW1pdC8/aD1mb3ItbGludXMmaWQ9MzdmOTU3OWY0YzMxYTZk
+Njk4ZGJmMzAxNmQ3YmYxMzJmOTI4OGQzMA0KDQpUaGFua3MsDQoNCkJhcnQuDQoNCg0KDQoNCg==
