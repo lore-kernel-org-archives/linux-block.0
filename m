@@ -1,122 +1,35 @@
-Return-Path: <axboe@kernel.dk>
-To: linux-scsi <linux-scsi@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: Jan Kara <jack@suse.cz>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: sr: get/drop reference to device in revalidate and check_events
-Message-ID: <a76164e7-8d9f-37d5-8c2e-6733778d20da@kernel.dk>
-Date: Wed, 11 Apr 2018 10:23:30 -0600
+Return-Path: <geert.uytterhoeven@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Sender: geert.uytterhoeven@gmail.com
+In-Reply-To: <5aceb51e.1c69fb81.c6613.d3e4SMTPIN_ADDED_MISSING@mx.google.com>
+References: <5aceb51e.1c69fb81.c6613.d3e4SMTPIN_ADDED_MISSING@mx.google.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 12 Apr 2018 10:18:14 +0200
+Message-ID: <CAMuHMdVELjqx_B7MUsPFHLTVFjLuEy5Z6sB-bafbZTk+V6+vcQ@mail.gmail.com>
+Subject: Re: [PATCH] block/amiflop: Don't log an error message for an invalid ioctl
+To: Finn Thain <fthain@telegraphics.com.au>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-m68k <linux-m68k@lists.linux-m68k.org>,
+	linux-block@vger.kernel.org,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-We can't just use scsi_cd() to get the scsi_cd structure, we have
-to grab a live reference to the device. For both callbacks, we're
-not inside an open where we already hold a reference to the device.
+On Thu, Apr 12, 2018 at 3:23 AM, Finn Thain <fthain@telegraphics.com.au> wrote:
+> Do as the swim3 driver does and just return -ENOTTY.
+>
+> Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+> Cc: linux-m68k@lists.linux-m68k.org
+> Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
 
-This fixes device removal/addition under concurrent device access,
-which otherwise could result in the below oops.
+Reviewed-by:  Geert Uytterhoeven <geert@linux-m68k.org>
 
-NULL pointer dereference at 0000000000000010
-PGD 0 P4D 0 
-Oops: 0000 [#1] PREEMPT SMP
-Modules linked in:
-sr 12:0:0:0: [sr2] scsi-1 drive
- scsi_debug crc_t10dif crct10dif_generic crct10dif_common nvme nvme_core sb_edac xl
-sr 12:0:0:0: Attached scsi CD-ROM sr2
- sr_mod cdrom btrfs xor zstd_decompress zstd_compress xxhash lzo_compress zlib_defc
-sr 12:0:0:0: Attached scsi generic sg7 type 5
- igb ahci libahci i2c_algo_bit libata dca [last unloaded: crc_t10dif]
-CPU: 43 PID: 4629 Comm: systemd-udevd Not tainted 4.16.0+ #650
-Hardware name: Dell Inc. PowerEdge T630/0NT78X, BIOS 2.3.4 11/09/2016
-RIP: 0010:sr_block_revalidate_disk+0x23/0x190 [sr_mod]
-RSP: 0018:ffff883ff357bb58 EFLAGS: 00010292
-RAX: ffffffffa00b07d0 RBX: ffff883ff3058000 RCX: ffff883ff357bb66
-RDX: 0000000000000003 RSI: 0000000000007530 RDI: ffff881fea631000
-RBP: 0000000000000000 R08: ffff881fe4d38400 R09: 0000000000000000
-R10: 0000000000000000 R11: 00000000000001b6 R12: 000000000800005d
-R13: 000000000800005d R14: ffff883ffd9b3790 R15: 0000000000000000
-FS:  00007f7dc8e6d8c0(0000) GS:ffff883fff340000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000010 CR3: 0000003ffda98005 CR4: 00000000003606e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- ? __invalidate_device+0x48/0x60
- check_disk_change+0x4c/0x60
- sr_block_open+0x16/0xd0 [sr_mod]
- __blkdev_get+0xb9/0x450
- ? iget5_locked+0x1c0/0x1e0
- blkdev_get+0x11e/0x320
- ? bdget+0x11d/0x150
- ? _raw_spin_unlock+0xa/0x20
- ? bd_acquire+0xc0/0xc0
- do_dentry_open+0x1b0/0x320
- ? inode_permission+0x24/0xc0
- path_openat+0x4e6/0x1420
- ? cpumask_any_but+0x1f/0x40
- ? flush_tlb_mm_range+0xa0/0x120
- do_filp_open+0x8c/0xf0
- ? __seccomp_filter+0x28/0x230
- ? _raw_spin_unlock+0xa/0x20
- ? __handle_mm_fault+0x7d6/0x9b0
- ? list_lru_add+0xa8/0xc0
- ? _raw_spin_unlock+0xa/0x20
- ? __alloc_fd+0xaf/0x160
- ? do_sys_open+0x1a6/0x230
- do_sys_open+0x1a6/0x230
- do_syscall_64+0x5a/0x100
- entry_SYSCALL_64_after_hwframe+0x3d/0xa2
+Gr{oetje,eeting}s,
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
----
-
-diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
-index 0cf25d789d05..3f3cb72e0c0c 100644
---- a/drivers/scsi/sr.c
-+++ b/drivers/scsi/sr.c
-@@ -587,18 +587,28 @@ static int sr_block_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
- static unsigned int sr_block_check_events(struct gendisk *disk,
- 					  unsigned int clearing)
- {
--	struct scsi_cd *cd = scsi_cd(disk);
-+	unsigned int ret = 0;
-+	struct scsi_cd *cd;
- 
--	if (atomic_read(&cd->device->disk_events_disable_depth))
-+	cd = scsi_cd_get(disk);
-+	if (!cd)
- 		return 0;
- 
--	return cdrom_check_events(&cd->cdi, clearing);
-+	if (!atomic_read(&cd->device->disk_events_disable_depth))
-+		ret = cdrom_check_events(&cd->cdi, clearing);
-+
-+	scsi_cd_put(cd);
-+	return ret;
- }
- 
- static int sr_block_revalidate_disk(struct gendisk *disk)
- {
--	struct scsi_cd *cd = scsi_cd(disk);
- 	struct scsi_sense_hdr sshdr;
-+	struct scsi_cd *cd;
-+
-+	cd = scsi_cd_get(disk);
-+	if (!cd)
-+		return -ENXIO;
- 
- 	/* if the unit is not ready, nothing more to do */
- 	if (scsi_test_unit_ready(cd->device, SR_TIMEOUT, MAX_RETRIES, &sshdr))
-@@ -607,6 +617,7 @@ static int sr_block_revalidate_disk(struct gendisk *disk)
- 	sr_cd_check(&cd->cdi);
- 	get_sectorsize(cd);
- out:
-+	scsi_cd_put(cd);
- 	return 0;
- }
- 
+                        Geert
 
 -- 
-Jens Axboe
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
