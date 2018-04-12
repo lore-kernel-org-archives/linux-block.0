@@ -1,96 +1,51 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
-	Stefan Haberland <sth@linux.vnet.ibm.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 8/8] blk-mq: remove code for dealing with remapping queue
-Date: Sun,  8 Apr 2018 17:48:14 +0800
-Message-Id: <20180408094814.28953-9-ming.lei@redhat.com>
-In-Reply-To: <20180408094814.28953-1-ming.lei@redhat.com>
-References: <20180408094814.28953-1-ming.lei@redhat.com>
+Return-Path: <fthain@telegraphics.com.au>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Jens Axboe <axboe@kernel.dk>,
+    Laurent Vivier <lvivier@redhat.com>,
+    linux-m68k@lists.linux-m68k.org,
+    linux-kernel@vger.kernel.org,
+    linux-block@vger.kernel.org,
+    stable@vger.kernel.org
+Message-Id: <bd4e42a4e661ced92849d33bdc3ebf8d4f283dc8.1523493475.git.fthain@telegraphics.com.au>
+In-Reply-To: <cover.1523493475.git.fthain@telegraphics.com.au>
+References: <cover.1523493475.git.fthain@telegraphics.com.au>
+From: Finn Thain <fthain@telegraphics.com.au>
+Subject: [PATCH v2 08/10] block/swim: Check drive type
+Date: Wed, 11 Apr 2018 20:50:14 -0400 (EDT)
 List-ID: <linux-block@vger.kernel.org>
 
-Firstly, from commit 4b855ad37194 ("blk-mq: Create hctx for each present CPU),
-blk-mq doesn't remap queue any more after CPU topo is changed.
+The SWIM chip is compatible with GCR-mode Sony 400K/800K drives but
+this driver only supports MFM mode. Therefore only Sony FDHD drives
+are supported. Skip incompatible drives.
 
-Secondly, set->nr_hw_queues can't be bigger than nr_cpu_ids, and now we map
-all possible CPUs to hw queues, so at least one CPU is mapped to each hctx.
-
-So queue mapping has became static and fixed just like percpu variable, and
-we don't need to handle queue remapping any more.
-
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Stefan Haberland <sth@linux.vnet.ibm.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: stable@vger.kernel.org # v4.14+
+Tested-by: Stan Johnson <userm57@yahoo.com>
+Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
+Acked-by: Laurent Vivier <lvivier@redhat.com>
 ---
- block/blk-mq.c | 34 +++-------------------------------
- 1 file changed, 3 insertions(+), 31 deletions(-)
+ drivers/block/swim.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3b4ce83a0ba2..c3964a79638e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2330,7 +2330,7 @@ static void blk_mq_free_map_and_requests(struct blk_mq_tag_set *set,
+diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+index d1ee4670666a..c8c8b9da3edd 100644
+--- a/drivers/block/swim.c
++++ b/drivers/block/swim.c
+@@ -829,10 +829,12 @@ static int swim_floppy_init(struct swim_priv *swd)
+ 	/* scan floppy drives */
  
- static void blk_mq_map_swqueue(struct request_queue *q)
- {
--	unsigned int i, hctx_idx;
-+	unsigned int i;
- 	struct blk_mq_hw_ctx *hctx;
- 	struct blk_mq_ctx *ctx;
- 	struct blk_mq_tag_set *set = q->tag_set;
-@@ -2347,23 +2347,8 @@ static void blk_mq_map_swqueue(struct request_queue *q)
+ 	swim_drive(base, INTERNAL_DRIVE);
+-	if (swim_readbit(base, DRIVE_PRESENT))
++	if (swim_readbit(base, DRIVE_PRESENT) &&
++	    !swim_readbit(base, ONEMEG_DRIVE))
+ 		swim_add_floppy(swd, INTERNAL_DRIVE);
+ 	swim_drive(base, EXTERNAL_DRIVE);
+-	if (swim_readbit(base, DRIVE_PRESENT))
++	if (swim_readbit(base, DRIVE_PRESENT) &&
++	    !swim_readbit(base, ONEMEG_DRIVE))
+ 		swim_add_floppy(swd, EXTERNAL_DRIVE);
  
- 	/*
- 	 * Map software to hardware queues.
--	 *
--	 * If the cpu isn't present, the cpu is mapped to first hctx.
- 	 */
- 	for_each_possible_cpu(i) {
--		hctx_idx = q->mq_map[i];
--		/* unmapped hw queue can be remapped after CPU topo changed */
--		if (!set->tags[hctx_idx] &&
--		    !__blk_mq_alloc_rq_map(set, hctx_idx)) {
--			/*
--			 * If tags initialization fail for some hctx,
--			 * that hctx won't be brought online.  In this
--			 * case, remap the current ctx to hctx[0] which
--			 * is guaranteed to always have tags allocated
--			 */
--			q->mq_map[i] = 0;
--		}
--
- 		ctx = per_cpu_ptr(q->queue_ctx, i);
- 		hctx = blk_mq_map_queue(q, i);
- 
-@@ -2375,21 +2360,8 @@ static void blk_mq_map_swqueue(struct request_queue *q)
- 	mutex_unlock(&q->sysfs_lock);
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
--		/*
--		 * If no software queues are mapped to this hardware queue,
--		 * disable it and free the request entries.
--		 */
--		if (!hctx->nr_ctx) {
--			/* Never unmap queue 0.  We need it as a
--			 * fallback in case of a new remap fails
--			 * allocation
--			 */
--			if (i && set->tags[i])
--				blk_mq_free_map_and_requests(set, i);
--
--			hctx->tags = NULL;
--			continue;
--		}
-+		/* every hctx should get mapped by at least one CPU */
-+		WARN_ON(!hctx->nr_ctx);
- 
- 		hctx->tags = set->tags[i];
- 		WARN_ON(!hctx->tags);
+ 	/* register floppy drives */
 -- 
-2.9.5
+2.16.1
