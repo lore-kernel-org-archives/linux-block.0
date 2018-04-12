@@ -1,20 +1,16 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from kvm5.telegraphics.com.au ([98.124.60.144]:40970 "EHLO
-        kvm5.telegraphics.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751633AbeDLBXj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Apr 2018 21:23:39 -0400
+Return-Path: <fthain@telegraphics.com.au>
+Message-Id: <5aceb51a.1c69fb81.faceb.eaf8SMTPIN_ADDED_MISSING@mx.google.com>
 Date: Thu, 12 Apr 2018 11:23:38 +1000
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
-        linux-m68k@lists.linux-m68k.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+    linux-m68k@lists.linux-m68k.org,
+    linux-block@vger.kernel.org,
+    linux-kernel@vger.kernel.org
 From: Finn Thain <fthain@telegraphics.com.au>
 Subject: [PATCH] block/amiflop: Don't log an error message for an invalid
  ioctl
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
-Message-Id: <S1751972AbeDLBXj/20180412012339Z+540@vger.kernel.org>
+ReSent-Message-ID: <alpine.LNX.2.21.1804121123240.14@nippy.intranet>
+List-ID: <linux-block@vger.kernel.org>
 
 Do as the swim3 driver does and just return -ENOTTY.
 
