@@ -1,37 +1,84 @@
-Return-Path: <jthumshirn@suse.de>
-Message-ID: <1523608284.7787.3.camel@suse.de>
-Subject: Re: [PATCH v2] block: do not use interruptible wait anywhere
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Alan Jenkins <alan.christopher.jenkins@gmail.com>, Jens Axboe
-	 <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc: Bart Van Assche <Bart.VanAssche@wdc.com>, linux-kernel@vger.kernel.org,
+Return-Path: <alan.christopher.jenkins@gmail.com>
+Return-Path: <alan.christopher.jenkins@gmail.com>
+From: Alan Jenkins <alan.christopher.jenkins@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
+	linux-kernel@vger.kernel.org,
+	Alan Jenkins <alan.christopher.jenkins@gmail.com>,
 	stable@vger.kernel.org
-Date: Fri, 13 Apr 2018 10:31:24 +0200
-In-Reply-To: <20180412181158.8884-1-alan.christopher.jenkins@gmail.com>
+Subject: [PATCH v2] block: do not use interruptible wait anywhere
+Date: Thu, 12 Apr 2018 19:11:58 +0100
+Message-Id: <20180412181158.8884-1-alan.christopher.jenkins@gmail.com>
+In-Reply-To: <13e67e1243ebd96f3f56a150d47444ada47ebde0.camel@wdc.com>
 References: <13e67e1243ebd96f3f56a150d47444ada47ebde0.camel@wdc.com>
-	 <20180412181158.8884-1-alan.christopher.jenkins@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Alan,
+When blk_queue_enter() waits for a queue to unfreeze, or unset the
+PREEMPT_ONLY flag, do not allow it to be interrupted by a signal.
 
-On Thu, 2018-04-12 at 19:11 +0100, Alan Jenkins wrote:
-> # dd if=/dev/sda of=/dev/null iflag=direct & \
->   while killall -SIGUSR1 dd; do sleep 0.1; done & \
->   echo mem > /sys/power/state ; \
->   sleep 5; killall dd  # stop after 5 seconds
+The PREEMPT_ONLY flag was introduced later in commit 3a0a529971ec
+("block, scsi: Make SCSI quiesce and resume work reliably").  Note the SCSI
+device is resumed asynchronously, i.e. after un-freezing userspace tasks.
 
-Can you please also add a regression test to blktests[1] for this?
+So that commit exposed the bug as a regression in v4.15.  A mysterious
+SIGBUS (or -EIO) sometimes happened during the time the device was being
+resumed.  Most frequently, there was no kernel log message, and we saw Xorg
+or Xwayland killed by SIGBUS.[1]
 
-[1] https://github.com/osandov/blktests
+[1] E.g. https://bugzilla.redhat.com/show_bug.cgi?id=1553979
 
-Thanks,
-	Johannes
+Without this fix, I get an IO error in this test:
+
+# dd if=/dev/sda of=/dev/null iflag=direct & \
+  while killall -SIGUSR1 dd; do sleep 0.1; done & \
+  echo mem > /sys/power/state ; \
+  sleep 5; killall dd  # stop after 5 seconds
+
+The interruptible wait was added to blk_queue_enter in
+commit 3ef28e83ab15 ("block: generic request_queue reference counting").
+Before then, the interruptible wait was only in blk-mq, but I don't think
+it could ever have been correct.
+
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Alan Jenkins <alan.christopher.jenkins@gmail.com>
+---
+v2: fix indentation
+
+ block/blk-core.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index abcb8684ba67..1a762f3980f2 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -915,7 +915,6 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
+ 
+ 	while (true) {
+ 		bool success = false;
+-		int ret;
+ 
+ 		rcu_read_lock();
+ 		if (percpu_ref_tryget_live(&q->q_usage_counter)) {
+@@ -947,14 +946,12 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
+ 		 */
+ 		smp_rmb();
+ 
+-		ret = wait_event_interruptible(q->mq_freeze_wq,
+-				(atomic_read(&q->mq_freeze_depth) == 0 &&
+-				 (preempt || !blk_queue_preempt_only(q))) ||
+-				blk_queue_dying(q));
++		wait_event(q->mq_freeze_wq,
++			   (atomic_read(&q->mq_freeze_depth) == 0 &&
++			    (preempt || !blk_queue_preempt_only(q))) ||
++			   blk_queue_dying(q));
+ 		if (blk_queue_dying(q))
+ 			return -ENODEV;
+-		if (ret)
+-			return ret;
+ 	}
+ }
+ 
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.14.3
