@@ -1,35 +1,44 @@
-Return-Path: <geert.uytterhoeven@gmail.com>
-MIME-Version: 1.0
-Sender: geert.uytterhoeven@gmail.com
-In-Reply-To: <5aceb51e.1c69fb81.c6613.d3e4SMTPIN_ADDED_MISSING@mx.google.com>
-References: <5aceb51e.1c69fb81.c6613.d3e4SMTPIN_ADDED_MISSING@mx.google.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 12 Apr 2018 10:18:14 +0200
-Message-ID: <CAMuHMdVELjqx_B7MUsPFHLTVFjLuEy5Z6sB-bafbZTk+V6+vcQ@mail.gmail.com>
-Subject: Re: [PATCH] block/amiflop: Don't log an error message for an invalid ioctl
-To: Finn Thain <fthain@telegraphics.com.au>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-m68k <linux-m68k@lists.linux-m68k.org>,
-	linux-block@vger.kernel.org,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from kvm5.telegraphics.com.au ([98.124.60.144]:40970 "EHLO
+        kvm5.telegraphics.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751633AbeDLBXj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Apr 2018 21:23:39 -0400
+Date: Thu, 12 Apr 2018 11:23:38 +1000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
+        linux-m68k@lists.linux-m68k.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+From: Finn Thain <fthain@telegraphics.com.au>
+Subject: [PATCH] block/amiflop: Don't log an error message for an invalid
+ ioctl
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
+Message-Id: <S1751972AbeDLBXj/20180412012339Z+540@vger.kernel.org>
 
-On Thu, Apr 12, 2018 at 3:23 AM, Finn Thain <fthain@telegraphics.com.au> wrote:
-> Do as the swim3 driver does and just return -ENOTTY.
->
-> Cc: Geert Uytterhoeven <geert@linux-m68k.org>
-> Cc: linux-m68k@lists.linux-m68k.org
-> Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
+Do as the swim3 driver does and just return -ENOTTY.
 
-Reviewed-by:  Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-m68k@lists.linux-m68k.org
+Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
+---
+ drivers/block/amiflop.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
+diff --git a/drivers/block/amiflop.c b/drivers/block/amiflop.c
+index 3aaf6af3ec23..b9fb794c1255 100644
+--- a/drivers/block/amiflop.c
++++ b/drivers/block/amiflop.c
+@@ -1533,9 +1533,7 @@ static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode,
+ 			return p->type->read_size;
+ #endif
+ 	default:
+-		printk(KERN_DEBUG "fd_ioctl: unknown cmd %d for drive %d.",
+-		       cmd, drive);
+-		return -ENOSYS;
++		return -ENOTTY;
+ 	}
+ 	return 0;
+ }
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+2.16.1
