@@ -1,46 +1,43 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out1.zte.com.cn ([202.103.147.172]:42520 "EHLO mxct.zte.com.cn"
+Received: from mx2.suse.de ([195.135.220.15]:51463 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751755AbeDLH1X (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Apr 2018 03:27:23 -0400
-From: tang.junhui@zte.com.cn
-To: colyli@suse.de
-Cc: kent.overstreet@gmail.com, mlyle@lyle.org,
-        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
+        id S1751837AbeDLGpg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Apr 2018 02:45:36 -0400
 Subject: Re: [PATCH 0/4] bcache: incremental GC and dirty data init
-Date: Thu, 12 Apr 2018 15:27:28 +0800
-Message-Id: <1523518048-16115-1-git-send-email-tang.junhui@zte.com.cn>
+To: tang.junhui@zte.com.cn, kent.overstreet@gmail.com, mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <1523515124-2021-1-git-send-email-tang.junhui@zte.com.cn>
+From: Coly Li <colyli@suse.de>
+Message-ID: <9830b04f-7f62-9867-26ab-1b424456367e@suse.de>
+Date: Thu, 12 Apr 2018 14:45:25 +0800
+MIME-Version: 1.0
+In-Reply-To: <1523515124-2021-1-git-send-email-tang.junhui@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Coly,
-
-> On 2018/4/12 2:38 PM, tang.junhui@zte.com.cn wrote:
-> > Hi maintainers and folks,
-> > 
-> > Some patches of this patch set have been sent before, they are not merged
-> > yet, and I add two new patches to solve some issues I found while testing.
-> > since They are interdependent, so I make a patch set and resend them.
-> > 
-> > [PATCH 1/4] bcache: finish incremental GC
-> > [PATCH 2/4] bcache: calculate the number of incremental GC nodes according to
-> >             the total of btree nodes
-> > [PATCH 3/4] bcache: notify allocator to prepare for GC
-> > [PATCH 4/4] bcache: fix I/O significant decline while backend devices registering
-> > 
-> > These patches are useful to prevent I/O fluctuations or even jump 0 while GC or
-> > cached devices registering. I have test them for some times, I hope somebody could
-> > have a review for these patch, any comment would be welcome.
-> > 
+On 2018/4/12 2:38 PM, tang.junhui@zte.com.cn wrote:
+> Hi maintainers and folks,
 > 
-> Hi Junhui,
+> Some patches of this patch set have been sent before, they are not merged
+> yet, and I add two new patches to solve some issues I found while testing.
+> since They are interdependent, so I make a patch set and resend them.
 > 
-> Copied, these patches are in my to-review list :-)
+> [PATCH 1/4] bcache: finish incremental GC
+> [PATCH 2/4] bcache: calculate the number of incremental GC nodes according to
+> 			the total of btree nodes
+> [PATCH 3/4] bcache: notify allocator to prepare for GC
+> [PATCH 4/4] bcache: fix I/O significant decline while backend devices registering
+> 
+> These patches are useful to prevent I/O fluctuations or even jump 0 while GC or
+> cached devices registering. I have test them for some times, I hope somebody could
+> have a review for these patch, any comment would be welcome.
+> 
 
-Thanks for your quick response, you are always so warm to me.
-I am looking forward to your comments.
+Hi Junhui,
+
+Copied, these patches are in my to-review list :-)
 
 Thanks.
 
-Tang Junhui
+Coly Li
