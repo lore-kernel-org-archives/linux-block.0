@@ -1,64 +1,37 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 12 Apr 2018 09:12:47 -0700
-From: "tj@kernel.org" <tj@kernel.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"00moses.alexander00@gmail.com" <00moses.alexander00@gmail.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <prvs=6335d9f7e=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tj@kernel.org" <tj@kernel.org>
+CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "00moses.alexander00@gmail.com"
+	<00moses.alexander00@gmail.com>, "axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH] block: Ensure that a request queue is dissociated from
  the cgroup controller
-Message-ID: <20180412161247.GD793541@devbig577.frc2.facebook.com>
+Date: Thu, 12 Apr 2018 16:03:52 +0000
+Message-ID: <beafd7bc4f2fdb7e672ad97e57ff4f82464182da.camel@wdc.com>
 References: <20180412015852.26014-1-bart.vanassche@wdc.com>
- <20180412135149.GX793541@devbig577.frc2.facebook.com>
- <af6dafea-d754-8a0d-b96b-81716f2ea24d@wdc.com>
- <20180412153748.GB793541@devbig577.frc2.facebook.com>
- <beafd7bc4f2fdb7e672ad97e57ff4f82464182da.camel@wdc.com>
+	 <20180412135149.GX793541@devbig577.frc2.facebook.com>
+	 <af6dafea-d754-8a0d-b96b-81716f2ea24d@wdc.com>
+	 <20180412153748.GB793541@devbig577.frc2.facebook.com>
+In-Reply-To: <20180412153748.GB793541@devbig577.frc2.facebook.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <beafd7bc4f2fdb7e672ad97e57ff4f82464182da.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
-
-On Thu, Apr 12, 2018 at 04:03:52PM +0000, Bart Van Assche wrote:
-> On Thu, 2018-04-12 at 08:37 -0700, Tejun Heo wrote:
-> > On Thu, Apr 12, 2018 at 08:09:17AM -0600, Bart Van Assche wrote:
-> > > I have retested hotunplugging by rerunning the srp-test software. It
-> > > seems like you overlooked that this patch does not remove the
-> > > blkcg_exit_queue() call from blk_cleanup_queue()? If a device is
-> > > hotunplugged it is up to the block driver to call
-> > > blk_cleanup_queue(). And blk_cleanup_queue() will call
-> > > blkcg_exit_queue().
-> > 
-> > Hmm... what'd prevent blg_lookup_and_create() racing against that?
-> 
-> Hello Tejun,
-> 
-> Did you perhaps mean blkg_lookup_create()? That function has one caller,
-
-Ah yeah, sorry about the sloppiness.
-
-> namely blkcg_bio_issue_check(). The only caller of that function is
-> generic_make_request_checks(). A patch was posted on the linux-block mailing
-> list recently that surrounds that call with blk_queue_enter() / blk_queue_exit().
-> I think that prevents that blkcg_exit_queue() is called concurrently with
-> blkg_lookup_create().
-
-Yeah, that'd solve the problem for that particular path, but what
-that's doing is adding another layer of refcnting which is used to
-implement the revoke (or sever) semantics.  This is a fragile approach
-tho because it isn't clear who's protecting what and there's nothing
-in blkg's usage which suggests it'd be protected that way and we're
-basically working around a different underlying problem (lock
-switching) by expanding the coverage of a different lock.
-
-I'd much prefer fixing the lock switching problem properly than
-working around that shortcoming this way.
-
-Thans.
-
--- 
-tejun
+T24gVGh1LCAyMDE4LTA0LTEyIGF0IDA4OjM3IC0wNzAwLCBUZWp1biBIZW8gd3JvdGU6DQo+IE9u
+IFRodSwgQXByIDEyLCAyMDE4IGF0IDA4OjA5OjE3QU0gLTA2MDAsIEJhcnQgVmFuIEFzc2NoZSB3
+cm90ZToNCj4gPiBJIGhhdmUgcmV0ZXN0ZWQgaG90dW5wbHVnZ2luZyBieSByZXJ1bm5pbmcgdGhl
+IHNycC10ZXN0IHNvZnR3YXJlLiBJdA0KPiA+IHNlZW1zIGxpa2UgeW91IG92ZXJsb29rZWQgdGhh
+dCB0aGlzIHBhdGNoIGRvZXMgbm90IHJlbW92ZSB0aGUNCj4gPiBibGtjZ19leGl0X3F1ZXVlKCkg
+Y2FsbCBmcm9tIGJsa19jbGVhbnVwX3F1ZXVlKCk/IElmIGEgZGV2aWNlIGlzDQo+ID4gaG90dW5w
+bHVnZ2VkIGl0IGlzIHVwIHRvIHRoZSBibG9jayBkcml2ZXIgdG8gY2FsbA0KPiA+IGJsa19jbGVh
+bnVwX3F1ZXVlKCkuIEFuZCBibGtfY2xlYW51cF9xdWV1ZSgpIHdpbGwgY2FsbA0KPiA+IGJsa2Nn
+X2V4aXRfcXVldWUoKS4NCj4gDQo+IEhtbS4uLiB3aGF0J2QgcHJldmVudCBibGdfbG9va3VwX2Fu
+ZF9jcmVhdGUoKSByYWNpbmcgYWdhaW5zdCB0aGF0Pw0KDQpIZWxsbyBUZWp1biwNCg0KRGlkIHlv
+dSBwZXJoYXBzIG1lYW4gYmxrZ19sb29rdXBfY3JlYXRlKCk/IFRoYXQgZnVuY3Rpb24gaGFzIG9u
+ZSBjYWxsZXIsDQpuYW1lbHkgYmxrY2dfYmlvX2lzc3VlX2NoZWNrKCkuIFRoZSBvbmx5IGNhbGxl
+ciBvZiB0aGF0IGZ1bmN0aW9uIGlzDQpnZW5lcmljX21ha2VfcmVxdWVzdF9jaGVja3MoKS4gQSBw
+YXRjaCB3YXMgcG9zdGVkIG9uIHRoZSBsaW51eC1ibG9jayBtYWlsaW5nDQpsaXN0IHJlY2VudGx5
+IHRoYXQgc3Vycm91bmRzIHRoYXQgY2FsbCB3aXRoIGJsa19xdWV1ZV9lbnRlcigpIC8gYmxrX3F1
+ZXVlX2V4aXQoKS4NCkkgdGhpbmsgdGhhdCBwcmV2ZW50cyB0aGF0IGJsa2NnX2V4aXRfcXVldWUo
+KSBpcyBjYWxsZWQgY29uY3VycmVudGx5IHdpdGgNCmJsa2dfbG9va3VwX2NyZWF0ZSgpLg0KDQpC
+YXJ0Lg0KDQoNCg0K
