@@ -1,43 +1,46 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	nbd@other.debian.org,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com,
-	alex@iss-integration.com
-Cc: Josef Bacik <jbacik@fb.com>,
-	stable@vger.kernel.org
-Subject: [PATCH 1/3] nbd: del_gendisk after we cleanup the queue
-Date: Fri, 13 Apr 2018 12:03:32 -0400
-Message-Id: <20180413160334.5496-1-josef@toxicpanda.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from out1.zte.com.cn ([202.103.147.172]:42520 "EHLO mxct.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751755AbeDLH1X (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Apr 2018 03:27:23 -0400
+From: tang.junhui@zte.com.cn
+To: colyli@suse.de
+Cc: kent.overstreet@gmail.com, mlyle@lyle.org,
+        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
+Subject: Re: [PATCH 0/4] bcache: incremental GC and dirty data init
+Date: Thu, 12 Apr 2018 15:27:28 +0800
+Message-Id: <1523518048-16115-1-git-send-email-tang.junhui@zte.com.cn>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Josef Bacik <jbacik@fb.com>
+Hi Coly,
 
-This fixes a use after free bug, we need to do the del_gendisk after we
-cleanup the queue on the device.
+> On 2018/4/12 2:38 PM, tang.junhui@zte.com.cn wrote:
+> > Hi maintainers and folks,
+> > 
+> > Some patches of this patch set have been sent before, they are not merged
+> > yet, and I add two new patches to solve some issues I found while testing.
+> > since They are interdependent, so I make a patch set and resend them.
+> > 
+> > [PATCH 1/4] bcache: finish incremental GC
+> > [PATCH 2/4] bcache: calculate the number of incremental GC nodes according to
+> >             the total of btree nodes
+> > [PATCH 3/4] bcache: notify allocator to prepare for GC
+> > [PATCH 4/4] bcache: fix I/O significant decline while backend devices registering
+> > 
+> > These patches are useful to prevent I/O fluctuations or even jump 0 while GC or
+> > cached devices registering. I have test them for some times, I hope somebody could
+> > have a review for these patch, any comment would be welcome.
+> > 
+> 
+> Hi Junhui,
+> 
+> Copied, these patches are in my to-review list :-)
 
-Fixes: c6a4759ea0c9 ("nbd: add device refcounting")
-cc: stable@vger.kernel.org
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- drivers/block/nbd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks for your quick response, you are always so warm to me.
+I am looking forward to your comments.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 86258b00a1d4..e33da3e6aa20 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -174,8 +174,8 @@ static void nbd_dev_remove(struct nbd_device *nbd)
- {
- 	struct gendisk *disk = nbd->disk;
- 	if (disk) {
--		del_gendisk(disk);
- 		blk_cleanup_queue(disk->queue);
-+		del_gendisk(disk);
- 		blk_mq_free_tag_set(&nbd->tag_set);
- 		disk->private_data = NULL;
- 		put_disk(disk);
--- 
-2.14.3
+Thanks.
+
+Tang Junhui
