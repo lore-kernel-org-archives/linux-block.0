@@ -1,142 +1,109 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Tejun Heo <tj@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Israel Rukshin <israelr@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] blk-mq: fix race between complete and BLK_EH_RESET_TIMER
-Date: Thu, 12 Apr 2018 04:55:29 +0800
-Message-Id: <20180411205529.31145-1-ming.lei@redhat.com>
+Return-Path: <fthain@telegraphics.com.au>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Jens Axboe <axboe@kernel.dk>,
+    Laurent Vivier <lvivier@redhat.com>,
+    linux-m68k@lists.linux-m68k.org,
+    linux-kernel@vger.kernel.org,
+    linux-block@vger.kernel.org,
+    stable@vger.kernel.org
+Message-Id: <0785f312c30dd54f8fd1cb492fa7957758ef03e9.1523493475.git.fthain@telegraphics.com.au>
+In-Reply-To: <cover.1523493475.git.fthain@telegraphics.com.au>
+References: <cover.1523493475.git.fthain@telegraphics.com.au>
+From: Finn Thain <fthain@telegraphics.com.au>
+Subject: [PATCH v2 04/10] block/swim: Fix array bounds check
+Date: Wed, 11 Apr 2018 20:50:14 -0400 (EDT)
 List-ID: <linux-block@vger.kernel.org>
 
-The normal request completion can be done before or during handling
-BLK_EH_RESET_TIMER, and this race may cause the request to never
-be completed since driver's .timeout() may always return
-BLK_EH_RESET_TIMER.
+In the floppy_find() function in swim.c is a call to
+get_disk(swd->unit[drive].disk). The actual parameter to this call
+can be a NULL pointer when drive == swd->floppy_count. This causes
+an oops in get_disk().
 
-This issue can't be fixed completely by driver, since the normal
-completion can be done between returning .timeout() and handing
-BLK_EH_RESET_TIMER.
+Data read fault at 0x00000198 in Super Data (pc=0x1be5b6)
+BAD KERNEL BUSERR
+Oops: 00000000
+Modules linked in: swim_mod ipv6 mac8390
+PC: [<001be5b6>] get_disk+0xc/0x76
+SR: 2004  SP: 9a078bc1  a2: 0213ed90
+d0: 00000000    d1: 00000000    d2: 00000000    d3: 000000ff
+d4: 00000002    d5: 02983590    a0: 02332e00    a1: 022dfd64
+Process dd (pid: 285, task=020ab25b)
+Frame format=B ssw=074d isc=4a88 isb=6732 daddr=00000198 dobuf=00000000
+baddr=001be5bc dibuf=bfffffff ver=f
+Stack from 022dfca4:
+        00000000 0203fc00 0213ed90 022dfcc0 02982936 00000000 00200000 022dfd08
+        0020f85a 00200000 022dfd64 02332e00 004040fc 00000014 001be77e 022dfd64
+        00334e4a 001be3f8 0800001d 022dfd64 01c04b60 01c04b70 022aba80 029828f8
+        02332e00 022dfd2c 001be7ac 0203fc00 00200000 022dfd64 02103a00 01c04b60
+        01c04b60 0200e400 022dfd68 000e191a 00200000 022dfd64 02103a00 0800001d
+        00000000 00000003 000b89de 00500000 02103a00 01c04b60 02103a08 01c04c2e
+Call Trace: [<02982936>] floppy_find+0x3e/0x4a [swim_mod]
+ [<00200000>] uart_remove_one_port+0x1a2/0x260
+ [<0020f85a>] kobj_lookup+0xde/0x132
+ [<00200000>] uart_remove_one_port+0x1a2/0x260
+ [<001be77e>] get_gendisk+0x0/0x130
+ [<00334e4a>] mutex_lock+0x0/0x2e
+ [<001be3f8>] disk_block_events+0x0/0x6c
+ [<029828f8>] floppy_find+0x0/0x4a [swim_mod]
+ [<001be7ac>] get_gendisk+0x2e/0x130
+ [<00200000>] uart_remove_one_port+0x1a2/0x260
+ [<000e191a>] __blkdev_get+0x32/0x45a
+ [<00200000>] uart_remove_one_port+0x1a2/0x260
+ [<000b89de>] complete_walk+0x0/0x8a
+ [<000e1e22>] blkdev_get+0xe0/0x29a
+ [<000e1fdc>] blkdev_open+0x0/0xb0
+ [<000b89de>] complete_walk+0x0/0x8a
+ [<000e1fdc>] blkdev_open+0x0/0xb0
+ [<000e01cc>] bd_acquire+0x74/0x8a
+ [<000e205c>] blkdev_open+0x80/0xb0
+ [<000e1fdc>] blkdev_open+0x0/0xb0
+ [<000abf24>] do_dentry_open+0x1a4/0x322
+ [<00020000>] __do_proc_douintvec+0x22/0x27e
+ [<000b89de>] complete_walk+0x0/0x8a
+ [<000baa62>] link_path_walk+0x0/0x48e
+ [<000ba3f8>] inode_permission+0x20/0x54
+ [<000ac0e4>] vfs_open+0x42/0x78
+ [<000bc372>] path_openat+0x2b2/0xeaa
+ [<000bc0c0>] path_openat+0x0/0xeaa
+ [<0004463e>] __irq_wake_thread+0x0/0x4e
+ [<0003a45a>] task_tick_fair+0x18/0xc8
+ [<000bd00a>] do_filp_open+0xa0/0xea
+ [<000abae0>] do_sys_open+0x11a/0x1ee
+ [<00020000>] __do_proc_douintvec+0x22/0x27e
+ [<000abbf4>] SyS_open+0x1e/0x22
+ [<00020000>] __do_proc_douintvec+0x22/0x27e
+ [<00002b40>] syscall+0x8/0xc
+ [<00020000>] __do_proc_douintvec+0x22/0x27e
+ [<0000c00b>] dyadic+0x1/0x28
+Code: 4e5e 4e75 4e56 fffc 2f0b 2f02 266e 0008 <206b> 0198 4a88 6732 2428 002c 661e 486b 0058 4eb9 0032 0b96 588f 4a88 672c 2008
+Disabling lock debugging due to kernel taint
 
-This patch fixes this race by introducing rq state of MQ_RQ_COMPLETE_IN_RESET,
-and reading/writing rq's state by holding queue lock, which can be
-per-request actually, but just not necessary to introduce one lock for
-so unusual event.
+Fix the array index bounds check to avoid this.
 
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: Israel Rukshin <israelr@mellanox.com>,
-Cc: Max Gurtovoy <maxg@mellanox.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: stable@vger.kernel.org # v4.14+
+Fixes: 8852ecd97488 ("[PATCH] m68k: mac - Add SWIM floppy support")
+Tested-by: Stan Johnson <userm57@yahoo.com>
+Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
+Acked-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
 ---
+ drivers/block/swim.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This is another way to fix this long-time issue, and turns out this
-solution is much simpler.
-
- block/blk-mq.c | 44 +++++++++++++++++++++++++++++++++++++++-----
- block/blk-mq.h |  1 +
- 2 files changed, 40 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0dc9e341c2a7..12e8850e3905 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -630,10 +630,27 @@ void blk_mq_complete_request(struct request *rq)
- 	 * However, that would complicate paths which want to synchronize
- 	 * against us.  Let stay in sync with the issue path so that
- 	 * hctx_lock() covers both issue and completion paths.
-+	 *
-+	 * Cover complete vs BLK_EH_RESET_TIMER race in slow path with
-+	 * helding queue lock.
- 	 */
- 	hctx_lock(hctx, &srcu_idx);
- 	if (blk_mq_rq_aborted_gstate(rq) != rq->gstate)
- 		__blk_mq_complete_request(rq);
-+	else {
-+		unsigned long flags;
-+		bool need_complete = false;
-+
-+		spin_lock_irqsave(q->queue_lock, flags);
-+		if (!blk_mq_rq_aborted_gstate(rq))
-+			need_complete = true;
-+		else
-+			blk_mq_rq_update_state(rq, MQ_RQ_COMPLETE_IN_RESET);
-+		spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+		if (need_complete)
-+			__blk_mq_complete_request(rq);
-+	}
- 	hctx_unlock(hctx, srcu_idx);
- }
- EXPORT_SYMBOL(blk_mq_complete_request);
-@@ -814,24 +831,41 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
- {
- 	const struct blk_mq_ops *ops = req->q->mq_ops;
- 	enum blk_eh_timer_return ret = BLK_EH_RESET_TIMER;
-+	unsigned long flags;
+diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+index 92f0cddc597e..2cdfc0db5966 100644
+--- a/drivers/block/swim.c
++++ b/drivers/block/swim.c
+@@ -795,7 +795,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
+ 	struct swim_priv *swd = data;
+ 	int drive = (*part & 3);
  
- 	req->rq_flags |= RQF_MQ_TIMEOUT_EXPIRED;
+-	if (drive > swd->floppy_count)
++	if (drive >= swd->floppy_count)
+ 		return NULL;
  
- 	if (ops->timeout)
- 		ret = ops->timeout(req, reserved);
- 
-+again:
- 	switch (ret) {
- 	case BLK_EH_HANDLED:
- 		__blk_mq_complete_request(req);
- 		break;
- 	case BLK_EH_RESET_TIMER:
- 		/*
--		 * As nothing prevents from completion happening while
--		 * ->aborted_gstate is set, this may lead to ignored
--		 * completions and further spurious timeouts.
-+		 * The normal completion may happen during handling the
-+		 * timeout, or even after returning from .timeout(), so
-+		 * once the request has been completed, we can't reset
-+		 * timer any more since this request may be handled as
-+		 * BLK_EH_RESET_TIMER in next timeout handling too, and
-+		 * it has to be completed in this situation.
-+		 *
-+		 * Holding the queue lock to cover read/write rq's
-+		 * aborted_gstate and normal state, so the race can be
-+		 * avoided completely.
- 		 */
--		blk_mq_rq_update_aborted_gstate(req, 0);
--		blk_add_timer(req);
-+		spin_lock_irqsave(req->q->queue_lock, flags);
-+		if (blk_mq_rq_state(req) != MQ_RQ_COMPLETE_IN_RESET) {
-+			blk_mq_rq_update_aborted_gstate(req, 0);
-+			blk_add_timer(req);
-+		} else {
-+			blk_mq_rq_update_state(req, MQ_RQ_IN_FLIGHT);
-+			ret = BLK_EH_HANDLED;
-+			goto again;
-+		}
-+		spin_unlock_irqrestore(req->q->queue_lock, flags);
- 		break;
- 	case BLK_EH_NOT_HANDLED:
- 		break;
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 88c558f71819..6dc242fc785a 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -35,6 +35,7 @@ enum mq_rq_state {
- 	MQ_RQ_IDLE		= 0,
- 	MQ_RQ_IN_FLIGHT		= 1,
- 	MQ_RQ_COMPLETE		= 2,
-+	MQ_RQ_COMPLETE_IN_RESET	= 3,
- 
- 	MQ_RQ_STATE_BITS	= 2,
- 	MQ_RQ_STATE_MASK	= (1 << MQ_RQ_STATE_BITS) - 1,
+ 	*part = 0;
 -- 
-2.9.5
+2.16.1
