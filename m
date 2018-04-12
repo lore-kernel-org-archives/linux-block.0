@@ -1,5 +1,5 @@
 Return-Path: <ming.lei@redhat.com>
-Date: Thu, 12 Apr 2018 17:49:33 +0800
+Date: Thu, 12 Apr 2018 15:03:56 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: "jianchao.wang" <jianchao.w.wang@oracle.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
@@ -9,13 +9,15 @@ Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	Max Gurtovoy <maxg@mellanox.com>, stable@vger.kernel.org
 Subject: Re: [PATCH V2] blk-mq: fix race between complete and
  BLK_EH_RESET_TIMER
-Message-ID: <20180412094928.GA4697@ming.t460p>
+Message-ID: <20180412070347.GA18524@ming.t460p>
 References: <20180411233812.18003-1-ming.lei@redhat.com>
  <f63c9def-4fef-5032-814c-5dc142d5be5a@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <f63c9def-4fef-5032-814c-5dc142d5be5a@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
+
+Hi Jianchao,
 
 On Thu, Apr 12, 2018 at 10:38:56AM +0800, jianchao.wang wrote:
 > Hi Ming
@@ -47,14 +49,17 @@ On Thu, Apr 12, 2018 at 10:38:56AM +0800, jianchao.wang wrote:
 >   __blk_mq_complete_request
 >     WARN_ON_ONCE(blk_mq_rq_state(rq) 
 >      != MQ_RQ_IN_FLIGHT);
+> 
+> If further upon blk_mq_free_request, the final freed request maybe changed to MQ_RQ_COMPLETE_IN_TIMEOUT
+> instead of MQ_RQ_IDLE.
 
-Thinking of it further, if the normal completion from irq context can
-happen after BLK_EH_HANDLED is returned from .timeout, this request may 
-be recycled immediately after __blk_mq_complete_request(), then
-blk_mq_complete_request() can complete the new instance early, so that
-can be another race between old normal completion and new dispatch.
+Good catch, so this patch has to deal with race between complete and
+BLK_EH_HANDLED too.
 
-I guess .timeout should make sure this thing won't happen.
+Given both the above handling are in slow path, the queue lock can be used
+to cover them all atomically just as done for EH_RESET_TIMER.
 
---
+Will will it in V3.
+
+Thanks,
 Ming
