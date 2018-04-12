@@ -1,178 +1,165 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mxhk.zte.com.cn ([63.217.80.70]:39954 "EHLO mxhk.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752401AbeDLGik (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Apr 2018 02:38:40 -0400
-From: tang.junhui@zte.com.cn
-To: kent.overstreet@gmail.com, colyli@suse.de, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: [PATCH 3/4] bcache: notify allocator to prepare for GC
-Date: Thu, 12 Apr 2018 14:38:43 +0800
-Message-Id: <1523515124-2021-4-git-send-email-tang.junhui@zte.com.cn>
-In-Reply-To: <1523515124-2021-1-git-send-email-tang.junhui@zte.com.cn>
-References: <1523515124-2021-1-git-send-email-tang.junhui@zte.com.cn>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <fthain@telegraphics.com.au>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Jens Axboe <axboe@kernel.dk>,
+    Laurent Vivier <lvivier@redhat.com>,
+    linux-m68k@lists.linux-m68k.org,
+    linux-kernel@vger.kernel.org,
+    linux-block@vger.kernel.org,
+    stable@vger.kernel.org
+Message-Id: <d51df9ec57959b04f93ae1e40ed8c61fc3155cb0.1523493475.git.fthain@telegraphics.com.au>
+In-Reply-To: <cover.1523493475.git.fthain@telegraphics.com.au>
+References: <cover.1523493475.git.fthain@telegraphics.com.au>
+From: Finn Thain <fthain@telegraphics.com.au>
+Subject: [PATCH v2 03/10] m68k/mac: Don't remap SWIM MMIO region
+Date: Wed, 11 Apr 2018 20:50:14 -0400 (EDT)
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+For reasons I don't understand, calling ioremap() then iounmap() on
+the SWIM MMIO region causes a hang on 68030 (but not on 68040).
 
-Since no new bucket can be allocated during GC, and front side I/Os would
-run out of all the buckets, so notify allocator to pack the free_inc queue
-full of buckets before GC, then we could have enough buckets for front side
-I/Os during GC period.
+~# modprobe swim_mod
+SWIM floppy driver Version 0.2 (2008-10-30)
+SWIM device not found !
+watchdog: BUG: soft lockup - CPU#0 stuck for 23s! [modprobe:285]
+Modules linked in: swim_mod(+)
+Format 00  Vector: 0064  PC: 000075aa  Status: 2000    Not tainted
+ORIG_D0: ffffffff  D0: d00c0000  A2: 007c2370  A1: 003f810c
+A0: 00040000  D5: d0096800  D4: d0097e00
+D3: 00000001  D2: 00000003  D1: 00000000
+Non-Maskable Interrupt
+Modules linked in: swim_mod(+)
+PC: [<000075ba>] __iounmap+0x24/0x10e
+SR: 2000  SP: 007abc48  a2: 007c2370
+d0: d00c0000    d1: 000001a0    d2: 00000019    d3: 00000001
+d4: d0097e00    d5: d0096800    a0: 00040000    a1: 003f810c
+Process modprobe (pid: 285, task=007c2370)
+Frame format=0
+Stack from 007abc7c:
+        ffffffed 00000000 006a4060 004712e0 007abca0 000076ea d0080000 00080000
+        010bb4b8 007abcd8 010ba542 d0096000 00000000 00000000 00000001 010bb59c
+        00000000 007abf30 010bb4b8 0047760a 0047763c 00477612 00616540 007abcec
+        0020a91a 00477600 0047760a 010bb4cc 007abd18 002092f2 0047760a 00333b06
+        007abd5c 00000000 0047760a 010bb4cc 00404f90 004776b8 00000001 007abd38
+        00209446 010bb4cc 0047760a 010bb4cc 0020938e 0031f8be 00616540 007abd64
+Call Trace: [<000076ea>] iounmap+0x46/0x5a
+ [<00080000>] shrink_page_list+0x7f6/0xe06
+ [<010ba542>] swim_probe+0xe4/0x496 [swim_mod]
+ [<0020a91a>] platform_drv_probe+0x20/0x5e
+ [<002092f2>] driver_probe_device+0x21c/0x2b8
+ [<00333b06>] mutex_lock+0x0/0x2e
+ [<00209446>] __driver_attach+0xb8/0xce
+ [<0020938e>] __driver_attach+0x0/0xce
+ [<0031f8be>] klist_next+0x0/0xa0
+ [<00207562>] bus_for_each_dev+0x74/0xba
+ [<000344c0>] blocking_notifier_call_chain+0x0/0x20
+ [<00333b06>] mutex_lock+0x0/0x2e
+ [<00208e44>] driver_attach+0x1a/0x1e
+ [<0020938e>] __driver_attach+0x0/0xce
+ [<00207e26>] bus_add_driver+0x188/0x234
+ [<000344c0>] blocking_notifier_call_chain+0x0/0x20
+ [<00209894>] driver_register+0x58/0x104
+ [<000344c0>] blocking_notifier_call_chain+0x0/0x20
+ [<010bd000>] swim_init+0x0/0x2c [swim_mod]
+ [<0020a7be>] __platform_driver_register+0x38/0x3c
+ [<010bd028>] swim_init+0x28/0x2c [swim_mod]
+ [<000020dc>] do_one_initcall+0x38/0x196
+ [<000344c0>] blocking_notifier_call_chain+0x0/0x20
+ [<003331cc>] mutex_unlock+0x0/0x3e
+ [<00333b06>] mutex_lock+0x0/0x2e
+ [<003331cc>] mutex_unlock+0x0/0x3e
+ [<00333b06>] mutex_lock+0x0/0x2e
+ [<003331cc>] mutex_unlock+0x0/0x3e
+ [<00333b06>] mutex_lock+0x0/0x2e
+ [<003331cc>] mutex_unlock+0x0/0x3e
+ [<00333b06>] mutex_lock+0x0/0x2e
+ [<00075008>] __free_pages+0x0/0x38
+ [<000045c0>] mangle_kernel_stack+0x30/0xda
+ [<000344c0>] blocking_notifier_call_chain+0x0/0x20
+ [<003331cc>] mutex_unlock+0x0/0x3e
+ [<00333b06>] mutex_lock+0x0/0x2e
+ [<0005ced4>] do_init_module+0x42/0x266
+ [<010bd000>] swim_init+0x0/0x2c [swim_mod]
+ [<000344c0>] blocking_notifier_call_chain+0x0/0x20
+ [<0005eda0>] load_module+0x1a30/0x1e70
+ [<0000465d>] mangle_kernel_stack+0xcd/0xda
+ [<00331c64>] __generic_copy_from_user+0x0/0x46
+ [<0033256e>] _cond_resched+0x0/0x32
+ [<00331b9c>] memset+0x0/0x98
+ [<0033256e>] _cond_resched+0x0/0x32
+ [<0005f25c>] SyS_init_module+0x7c/0x112
+ [<00002000>] _start+0x0/0x8
+ [<00002000>] _start+0x0/0x8
+ [<00331c82>] __generic_copy_from_user+0x1e/0x46
+ [<0005f2b2>] SyS_init_module+0xd2/0x112
+ [<0000465d>] mangle_kernel_stack+0xcd/0xda
+ [<00002b40>] syscall+0x8/0xc
+ [<0000465d>] mangle_kernel_stack+0xcd/0xda
+ [<0008c00c>] pcpu_balance_workfn+0xb2/0x40e
+Code: 2200 7419 e4a9 e589 2841 d9fc 0000 1000 <2414> 7203 c282 7602 b681 6600 0096 0242 fe00 0482 0000 0000 e9c0 11c3 ed89 2642
 
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+There's no need to call ioremap() for the SWIM address range, as it lies
+within the usual IO device region at 0x5000 0000, which has already been
+mapped by head.S.
+
+Remove the redundant ioremap() and iounmap() calls to fix the hang.
+
+Cc: Laurent Vivier <lvivier@redhat.com>
+Cc: stable@vger.kernel.org # v4.14+
+Tested-by: Stan Johnson <userm57@yahoo.com>
+Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
+Acked-by: Laurent Vivier <lvivier@redhat.com>
 ---
- drivers/md/bcache/alloc.c  | 11 +++++++-
- drivers/md/bcache/bcache.h |  2 ++
- drivers/md/bcache/btree.c  | 69 ++++++++++++++++++++++++++++++++++++++++++++--
- drivers/md/bcache/btree.h  |  4 +++
- 4 files changed, 83 insertions(+), 3 deletions(-)
+ drivers/block/swim.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-index a0cc1bc..85020cc 100644
---- a/drivers/md/bcache/alloc.c
-+++ b/drivers/md/bcache/alloc.c
-@@ -323,7 +323,8 @@ static int bch_allocator_thread(void *arg)
- 		 * possibly issue discards to them, then we add the bucket to
- 		 * the free list:
- 		 */
--		while (!fifo_empty(&ca->free_inc)) {
-+		while (!fifo_empty(&ca->free_inc) &&
-+		       ca->prepare_gc != GC_PREPARING) {
- 			long bucket;
+diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+index 64e066eba72e..92f0cddc597e 100644
+--- a/drivers/block/swim.c
++++ b/drivers/block/swim.c
+@@ -911,7 +911,7 @@ static int swim_probe(struct platform_device *dev)
+ 		goto out;
+ 	}
  
- 			fifo_pop(&ca->free_inc, bucket);
-@@ -353,6 +354,14 @@ static int bch_allocator_thread(void *arg)
- 		invalidate_buckets(ca);
+-	swim_base = ioremap(res->start, resource_size(res));
++	swim_base = (struct swim __iomem *)res->start;
+ 	if (!swim_base) {
+ 		ret = -ENOMEM;
+ 		goto out_release_io;
+@@ -923,7 +923,7 @@ static int swim_probe(struct platform_device *dev)
+ 	if (!get_swim_mode(swim_base)) {
+ 		printk(KERN_INFO "SWIM device not found !\n");
+ 		ret = -ENODEV;
+-		goto out_iounmap;
++		goto out_release_io;
+ 	}
  
- 		/*
-+		 * Let GC continue
-+		 */
-+		if (ca->prepare_gc == GC_PREPARING) {
-+			ca->prepare_gc = GC_PREPARED;
-+			wake_up_gc(ca->set);
-+		}
-+
-+		/*
- 		 * Now, we write their new gens to disk so we can start writing
- 		 * new stuff to them:
- 		 */
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index ab4c9ca..61a6ff2 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -428,6 +428,8 @@ struct cache {
- 	 * cpu
- 	 */
- 	unsigned		invalidate_needs_gc;
-+	/* used to notify allocator to prepare GC*/
-+	unsigned int		prepare_gc;
+ 	/* set platform driver data */
+@@ -931,7 +931,7 @@ static int swim_probe(struct platform_device *dev)
+ 	swd = kzalloc(sizeof(struct swim_priv), GFP_KERNEL);
+ 	if (!swd) {
+ 		ret = -ENOMEM;
+-		goto out_iounmap;
++		goto out_release_io;
+ 	}
+ 	platform_set_drvdata(dev, swd);
  
- 	bool			discard; /* Get rid of? */
+@@ -945,8 +945,6 @@ static int swim_probe(struct platform_device *dev)
  
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 10f967e..aba0700 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -1805,6 +1805,46 @@ static void bch_btree_gc(struct cache_set *c)
- 	bch_moving_gc(c);
- }
+ out_kfree:
+ 	kfree(swd);
+-out_iounmap:
+-	iounmap(swim_base);
+ out_release_io:
+ 	release_mem_region(res->start, resource_size(res));
+ out:
+@@ -974,8 +972,6 @@ static int swim_remove(struct platform_device *dev)
+ 	for (drive = 0; drive < swd->floppy_count; drive++)
+ 		floppy_eject(&swd->unit[drive]);
  
-+static bool cache_gc_prepare_none(struct cache_set *c)
-+{
-+	struct cache *ca;
-+	unsigned int i;
-+
-+	for_each_cache(ca, c, i)
-+		if (ca->prepare_gc != GC_PREPARE_NONE)
-+			return false;
-+	return true;
-+}
-+
-+static bool cache_gc_prepare_ok(struct cache_set *c)
-+{
-+	struct cache *ca;
-+	unsigned int i;
-+
-+	for_each_cache(ca, c, i)
-+		if (ca->prepare_gc != GC_PREPARED)
-+			return false;
-+	return true;
-+}
-+
-+static void set_cache_gc_prepare_none(struct cache_set *c)
-+{
-+	struct cache *ca;
-+	unsigned int i;
-+
-+	for_each_cache(ca, c, i)
-+		ca->prepare_gc = GC_PREPARE_NONE;
-+}
-+
-+static void set_cache_gc_preparing(struct cache_set *c)
-+{
-+	struct cache *ca;
-+	unsigned int i;
-+
-+	for_each_cache(ca, c, i)
-+		ca->prepare_gc = GC_PREPARING;
-+}
-+
- static bool gc_should_run(struct cache_set *c)
- {
- 	struct cache *ca;
-@@ -1814,8 +1854,33 @@ static bool gc_should_run(struct cache_set *c)
- 		if (ca->invalidate_needs_gc)
- 			return true;
- 
--	if (atomic_read(&c->sectors_to_gc) < 0)
--		return true;
-+	if (atomic_read(&c->sectors_to_gc) < 0) {
-+		mutex_lock(&c->bucket_lock);
-+		if (cache_gc_prepare_none(c)) {
-+			/*
-+			 * notify allocator thread to prepare for GC
-+			 */
-+			set_cache_gc_preparing(c);
-+			mutex_unlock(&c->bucket_lock);
-+			pr_info("gc preparing");
-+			return false;
-+		} else if (cache_gc_prepare_ok(c)) {
-+			/*
-+			 * alloc thread finished preparing,
-+			 * and continue to GC
-+			 */
-+			set_cache_gc_prepare_none(c);
-+			mutex_unlock(&c->bucket_lock);
-+			pr_info("gc prepared ok");
-+			return true;
-+		} else {
-+			/*
-+			 * waitting allocator finishing prepareing
-+			 */
-+			mutex_unlock(&c->bucket_lock);
-+			return false;
-+		}
-+	}
- 
- 	return false;
- }
-diff --git a/drivers/md/bcache/btree.h b/drivers/md/bcache/btree.h
-index d211e2c..e60bd7a 100644
---- a/drivers/md/bcache/btree.h
-+++ b/drivers/md/bcache/btree.h
-@@ -102,6 +102,10 @@
- #include "bset.h"
- #include "debug.h"
- 
-+#define GC_PREPARE_NONE		0
-+#define GC_PREPARING		1
-+#define GC_PREPARED		2
-+
- struct btree_write {
- 	atomic_t		*journal;
- 
+-	iounmap(swd->base);
+-
+ 	res = platform_get_resource(dev, IORESOURCE_MEM, 0);
+ 	if (res)
+ 		release_mem_region(res->start, resource_size(res));
 -- 
-1.8.3.1
+2.16.1
