@@ -1,18 +1,14 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59934 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751854AbeDLKII (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Apr 2018 06:08:08 -0400
-Date: Thu, 12 Apr 2018 18:07:52 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Wakko Warner <wakko@animx.eu.org>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Wed, 11 Apr 2018 20:52:18 -0400
+From: Wakko Warner <wakko@animx.eu.org>
+To: Ming Lei <ming.lei@redhat.com>
 Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "richard.weinberger@gmail.com" <richard.weinberger@gmail.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: 4.15.14 crash with iscsi target and dvd
-Message-ID: <20180412100751.GB4697@ming.t460p>
+Message-ID: <20180412005218.GA12237@animx.eu.org>
 References: <595a10cfb387e6b2ab4d2053b84fed9b3da9e079.camel@wdc.com>
  <20180406014644.GA16112@animx.eu.org>
  <20180406020651.GB16112@animx.eu.org>
@@ -26,10 +22,10 @@ References: <595a10cfb387e6b2ab4d2053b84fed9b3da9e079.camel@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180411004525.GA9107@animx.eu.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Apr 10, 2018 at 08:45:25PM -0400, Wakko Warner wrote:
+Wakko Warner wrote:
 > Ming Lei wrote:
 > > Sure, thanks for your sharing.
 > > 
@@ -78,56 +74,15 @@ On Tue, Apr 10, 2018 at 08:45:25PM -0400, Wakko Warner wrote:
 > [9273875.864801] sr 26:0:0:0: [sr1] tag#1 ASC=0x8 ASCQ=0x0 
 > [9273875.864890] sr 26:0:0:0: [sr1] tag#1 CDB: opcode=0x28 28 00 00 22 f7 16 00 00 80 00
 > [9273875.864971] blk_update_request: I/O error, dev sr1, sector 9165912
-> 
-> To cause this, I mounted the dvd as seen in the first line and ran this
-> command: find /cdrom2 -type f | xargs -tn1 cat > /dev/null
-> I did some various tests.  Each test was done after umount and mount to
-> clear the cache.
-> cat <file> > /dev/null causes the message.
-> dd if=<file> of=/dev/null bs=2048 doesn't
-> 	using bs=4096 doesn't
-> 	using bs=64k doesn't
-> 	using bs=128k does
-> cat uses a blocksize of 128k.
-> 
-> The following was done without being mounted.
-> ddrescue -f -f /dev/sr1 /dev/null 
-> 	doesn't cause the message
-> dd if=/dev/sr1 of=/dev/null bs=128k
-> 	doesn't cause the message
-> using bs=256k causes the message once:
-> [9275916.857409] sr 27:0:0:0: [sr1] tag#0 UNKNOWN(0x2003) Result: hostbyte=0x00 driverbyte=0x08
-> [9275916.857482] sr 27:0:0:0: [sr1] tag#0 Sense Key : 0x2 [current] 
-> [9275916.857520] sr 27:0:0:0: [sr1] tag#0 ASC=0x8 ASCQ=0x0 
-> [9275916.857556] sr 27:0:0:0: [sr1] tag#0 CDB: opcode=0x28 28 00 00 00 00 00 00 00 80 00
-> [9275916.857614] blk_update_request: I/O error, dev sr1, sector 0
-> 
-> If I access the disc from the target natively either by mounting and
-> accessing files or working with the device directly (ie dd) no errors are
-> logged on the target.
 
-OK, thanks for your test.
+Just FYI: The jobs that I do that uses the disc over iscsi didn't cause any
+kernel messages on either system (except for the informational when the disc
+was mounted)
 
-Could you test the following patch and see if there is still the failure
-message?
-
-diff --git a/drivers/target/target_core_pscsi.c b/drivers/target/target_core_pscsi.c
-index 0d99b242e82e..6137287b52fb 100644
---- a/drivers/target/target_core_pscsi.c
-+++ b/drivers/target/target_core_pscsi.c
-@@ -913,9 +913,11 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
- 
- 			rc = bio_add_pc_page(pdv->pdv_sd->request_queue,
- 					bio, page, bytes, off);
-+			if (rc != bytes)
-+				goto fail;
- 			pr_debug("PSCSI: bio->bi_vcnt: %d nr_vecs: %d\n",
- 				bio_segments(bio), nr_vecs);
--			if (rc != bytes) {
-+			if (/*rc != bytes*/0) {
- 				pr_debug("PSCSI: Reached bio->bi_vcnt max:"
- 					" %d i: %d bio: %p, allocating another"
- 					" bio\n", bio->bi_vcnt, i, bio);
+I have a dumb question though.  Could the label be placed just after the
+'if' statement instead of before it?  bio is set to null and the 'if'
+statement checks if it's null, which it always would be after the goto.
 
 -- 
-Ming
+ Microsoft has beaten Volkswagen's world record.  Volkswagen only created 22
+ million bugs.
