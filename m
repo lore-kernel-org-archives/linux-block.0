@@ -1,50 +1,42 @@
-Return-Path: <hch@lst.de>
-Date: Thu, 12 Apr 2018 15:14:40 +0200
-From: "hch@lst.de" <hch@lst.de>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>, "tj@kernel.org" <tj@kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"00moses.alexander00@gmail.com" <00moses.alexander00@gmail.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <prvs=6335d9f7e=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>
+CC: "tj@kernel.org" <tj@kernel.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "00moses.alexander00@gmail.com"
+	<00moses.alexander00@gmail.com>, "axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH] block: Ensure that a request queue is dissociated from
-	the cgroup controller
-Message-ID: <20180412131440.GA5476@lst.de>
-References: <20180412015852.26014-1-bart.vanassche@wdc.com> <20180412053431.GB29881@lst.de> <e96f485e61db6a3f9f62ee4f50ff8c469a53bed9.camel@wdc.com>
+ the cgroup controller
+Date: Thu, 12 Apr 2018 11:52:11 +0000
+Message-ID: <e96f485e61db6a3f9f62ee4f50ff8c469a53bed9.camel@wdc.com>
+References: <20180412015852.26014-1-bart.vanassche@wdc.com>
+	 <20180412053431.GB29881@lst.de>
+In-Reply-To: <20180412053431.GB29881@lst.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <e96f485e61db6a3f9f62ee4f50ff8c469a53bed9.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Apr 12, 2018 at 11:52:11AM +0000, Bart Van Assche wrote:
-> On Thu, 2018-04-12 at 07:34 +0200, Christoph Hellwig wrote:
-> > On Wed, Apr 11, 2018 at 07:58:52PM -0600, Bart Van Assche wrote:
-> > > Several block drivers call alloc_disk() followed by put_disk() if
-> > > something fails before device_add_disk() is called without calling
-> > > blk_cleanup_queue(). Make sure that also for this scenario a request
-> > > queue is dissociated from the cgroup controller. This patch avoids
-> > > that loading the parport_pc, paride and pf drivers triggers the
-> > > following kernel crash:
-> > 
-> > Can we move the cleanup to put_disk in general and not just for
-> > this case?  Having alloc/free routines pair up generally avoids
-> > a lot of confusion.
-> 
-> Hello Christoph,
-> 
-> At least the SCSI ULP drivers drop the last reference to a disk after
-> the blk_cleanup_queue() call. As explained in the description of commit
-> a063057d7c73, removing a request queue from blkcg must happen before
-> blk_cleanup_queue() finishes because a block driver may free the
-> request queue spinlock immediately after blk_cleanup_queue() returns.
-> So I don't think that we can move the code that removes a request
-> queue from blkcg into put_disk(). Another challenge is that some block
-> drivers (e.g. skd) clear the disk->queue pointer if device_add_disk()
-> has not been called to avoid that put_disk() causes a request queue
-> reference count imbalance.
-
-Which sounds like a very good reason not to use a driver controller
-lock for internals like blkcq.
-
-In fact splitting the lock used for synchronizing access to queue
-fields from the driver controller lock used to synchronize I/O
-in the legacy path in long overdue.
+T24gVGh1LCAyMDE4LTA0LTEyIGF0IDA3OjM0ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
+ZToNCj4gT24gV2VkLCBBcHIgMTEsIDIwMTggYXQgMDc6NTg6NTJQTSAtMDYwMCwgQmFydCBWYW4g
+QXNzY2hlIHdyb3RlOg0KPiA+IFNldmVyYWwgYmxvY2sgZHJpdmVycyBjYWxsIGFsbG9jX2Rpc2so
+KSBmb2xsb3dlZCBieSBwdXRfZGlzaygpIGlmDQo+ID4gc29tZXRoaW5nIGZhaWxzIGJlZm9yZSBk
+ZXZpY2VfYWRkX2Rpc2soKSBpcyBjYWxsZWQgd2l0aG91dCBjYWxsaW5nDQo+ID4gYmxrX2NsZWFu
+dXBfcXVldWUoKS4gTWFrZSBzdXJlIHRoYXQgYWxzbyBmb3IgdGhpcyBzY2VuYXJpbyBhIHJlcXVl
+c3QNCj4gPiBxdWV1ZSBpcyBkaXNzb2NpYXRlZCBmcm9tIHRoZSBjZ3JvdXAgY29udHJvbGxlci4g
+VGhpcyBwYXRjaCBhdm9pZHMNCj4gPiB0aGF0IGxvYWRpbmcgdGhlIHBhcnBvcnRfcGMsIHBhcmlk
+ZSBhbmQgcGYgZHJpdmVycyB0cmlnZ2VycyB0aGUNCj4gPiBmb2xsb3dpbmcga2VybmVsIGNyYXNo
+Og0KPiANCj4gQ2FuIHdlIG1vdmUgdGhlIGNsZWFudXAgdG8gcHV0X2Rpc2sgaW4gZ2VuZXJhbCBh
+bmQgbm90IGp1c3QgZm9yDQo+IHRoaXMgY2FzZT8gIEhhdmluZyBhbGxvYy9mcmVlIHJvdXRpbmVz
+IHBhaXIgdXAgZ2VuZXJhbGx5IGF2b2lkcw0KPiBhIGxvdCBvZiBjb25mdXNpb24uDQoNCkhlbGxv
+IENocmlzdG9waCwNCg0KQXQgbGVhc3QgdGhlIFNDU0kgVUxQIGRyaXZlcnMgZHJvcCB0aGUgbGFz
+dCByZWZlcmVuY2UgdG8gYSBkaXNrIGFmdGVyDQp0aGUgYmxrX2NsZWFudXBfcXVldWUoKSBjYWxs
+LiBBcyBleHBsYWluZWQgaW4gdGhlIGRlc2NyaXB0aW9uIG9mIGNvbW1pdA0KYTA2MzA1N2Q3Yzcz
+LCByZW1vdmluZyBhIHJlcXVlc3QgcXVldWUgZnJvbSBibGtjZyBtdXN0IGhhcHBlbiBiZWZvcmUN
+CmJsa19jbGVhbnVwX3F1ZXVlKCkgZmluaXNoZXMgYmVjYXVzZSBhIGJsb2NrIGRyaXZlciBtYXkg
+ZnJlZSB0aGUNCnJlcXVlc3QgcXVldWUgc3BpbmxvY2sgaW1tZWRpYXRlbHkgYWZ0ZXIgYmxrX2Ns
+ZWFudXBfcXVldWUoKSByZXR1cm5zLg0KU28gSSBkb24ndCB0aGluayB0aGF0IHdlIGNhbiBtb3Zl
+IHRoZSBjb2RlIHRoYXQgcmVtb3ZlcyBhIHJlcXVlc3QNCnF1ZXVlIGZyb20gYmxrY2cgaW50byBw
+dXRfZGlzaygpLiBBbm90aGVyIGNoYWxsZW5nZSBpcyB0aGF0IHNvbWUgYmxvY2sNCmRyaXZlcnMg
+KGUuZy4gc2tkKSBjbGVhciB0aGUgZGlzay0+cXVldWUgcG9pbnRlciBpZiBkZXZpY2VfYWRkX2Rp
+c2soKQ0KaGFzIG5vdCBiZWVuIGNhbGxlZCB0byBhdm9pZCB0aGF0IHB1dF9kaXNrKCkgY2F1c2Vz
+IGEgcmVxdWVzdCBxdWV1ZQ0KcmVmZXJlbmNlIGNvdW50IGltYmFsYW5jZS4NCg0KQmFydC4NCg0K
+DQoNCg==
