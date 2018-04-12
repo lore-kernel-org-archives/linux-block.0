@@ -1,119 +1,106 @@
-Return-Path: <linux-ide-owner@vger.kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: Christoph Hellwig <hch@lst.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Felipe Balbi <balbi@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mark Brown <broonie@kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
-        Wolfram Sang <wsa@the-dreams.de>,
-        Jonathan Cameron <jic23@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Matias Bjorling <mb@lightnvm.io>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Marek Vasut <marek.vasut@gmail.com>,
-        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Richard Weinberger <richard@nod.at>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Eric Anholt <eric@anholt.net>,
-        Stefan Wahren <stefan.wahren@i2se.com>
-Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
-        alsa-devel@alsa-project.org, linux-ide@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux1394-devel@lists.sourceforge.net, linux-fpga@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
-        netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
-        devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH v3 17/20] serial: Remove depends on HAS_DMA in case of platform dependency
-Date: Tue, 17 Apr 2018 19:49:17 +0200
-Message-Id: <1523987360-18760-18-git-send-email-geert@linux-m68k.org>
-In-Reply-To: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
-References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
-Sender: linux-ide-owner@vger.kernel.org
+Return-Path: <00moses.alexander00@gmail.com>
+Return-Path: <00moses.alexander00@gmail.com>
+Date: Thu, 12 Apr 2018 22:27:28 +0200
+From: Alexandru Moise <00moses.alexander00@gmail.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>
+Subject: Re: [PATCH v2] block: Ensure that a request queue is dissociated
+ from the cgroup controller
+Message-ID: <20180412202728.GA2430@gmail.com>
+References: <20180412191111.11882-1-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180412191111.11882-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
-symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
-In most cases this other symbol is an architecture or platform specific
-symbol, or PCI.
+On Thu, Apr 12, 2018 at 01:11:11PM -0600, Bart Van Assche wrote:
+> Several block drivers call alloc_disk() followed by put_disk() if
+> something fails before device_add_disk() is called without calling
+> blk_cleanup_queue(). Make sure that also for this scenario a request
+> queue is dissociated from the cgroup controller. This patch avoids
+> that loading the parport_pc, paride and pf drivers triggers the
+> following kernel crash:
+> 
+> BUG: KASAN: null-ptr-deref in pi_init+0x42e/0x580 [paride]
+> Read of size 4 at addr 0000000000000008 by task modprobe/744
+> Call Trace:
+> dump_stack+0x9a/0xeb
+> kasan_report+0x139/0x350
+> pi_init+0x42e/0x580 [paride]
+> pf_init+0x2bb/0x1000 [pf]
+> do_one_initcall+0x8e/0x405
+> do_init_module+0xd9/0x2f2
+> load_module+0x3ab4/0x4700
+> SYSC_finit_module+0x176/0x1a0
+> do_syscall_64+0xee/0x2b0
+> entry_SYSCALL_64_after_hwframe+0x42/0xb7
+> 
+> Reported-by: Alexandru Moise <00moses.alexander00@gmail.com>
+> Fixes: a063057d7c73 ("block: Fix a race between request queue removal and the block cgroup controller")
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Tested-by: Alexandru Moise <00moses.alexander00@gmail.com>
+> Cc: Tejun Heo <tj@kernel.org>
+> Cc: Alexandru Moise <00moses.alexander00@gmail.com>
+> Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
+> ---
+> 
+> Changes compared to v1:
+> - Surrounded use of blkcg_root with #ifdef CONFIG_BLK_CGROUP / #endif.
+> - Added Alex' Tested-by.
+> 
+>  block/blk-sysfs.c | 31 +++++++++++++++++++++++++++++++
+>  1 file changed, 31 insertions(+)
+> 
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index f8457d6f0190..46bb932721dc 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -793,6 +793,37 @@ static void __blk_release_queue(struct work_struct *work)
+>  		blk_stat_remove_callback(q, q->poll_cb);
+>  	blk_stat_free_callback(q->poll_cb);
+>  
+> +	if (!blk_queue_dead(q)) {
+> +		/*
+> +		 * Last reference was dropped without having called
+> +		 * blk_cleanup_queue().
+> +		 */
+> +		WARN_ONCE(blk_queue_init_done(q),
+> +			  "request queue %p has been registered but blk_cleanup_queue() has not been called for that queue\n",
+> +			  q);
+> +		bdi_put(q->backing_dev_info);
+> +		blkcg_exit_queue(q);
+> +
+> +		if (q->elevator) {
+> +			ioc_clear_queue(q);
+> +			elevator_exit(q, q->elevator);
+> +		}
+> +	}
+> +
+> +#ifdef CONFIG_BLK_CGROUP
+> +	{
+> +		struct blkcg_gq *blkg;
+> +
+> +		rcu_read_lock();
+> +		blkg = blkg_lookup(&blkcg_root, q);
+> +		rcu_read_unlock();
+> +
+> +		WARN(blkg,
+> +		     "request queue %p is being released but it has not yet been removed from the blkcg controller\n",
+> +		     q);
+> +	}
+> +#endif
+> +
+>  	blk_free_queue_stats(q->stats);
+>  
+>  	blk_exit_rl(q, &q->root_rl);
+I'm not qualified enough to review it but build and boot are good.
 
-Generic symbols and drivers without platform dependencies keep their
-dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
-cannot work anyway.
+Tested-by: Alexandru Moise <00moses.alexander00@gmail.com>
 
-This simplifies the dependencies, and allows to improve compile-testing.
-
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Acked-by: Robin Murphy <robin.murphy@arm.com>
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
-v3:
-  - Add Acked-by,
-  - Rebase to v4.17-rc1,
-
-v2:
-  - Add Reviewed-by, Acked-by,
-  - Drop RFC state,
-  - Split per subsystem.
----
- drivers/tty/serial/Kconfig | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/drivers/tty/serial/Kconfig b/drivers/tty/serial/Kconfig
-index 0f058df0b0701fe2..25b8c0a8a50397d6 100644
---- a/drivers/tty/serial/Kconfig
-+++ b/drivers/tty/serial/Kconfig
-@@ -115,7 +115,6 @@ config SERIAL_SB1250_DUART_CONSOLE
- 
- config SERIAL_ATMEL
- 	bool "AT91 on-chip serial port support"
--	depends on HAS_DMA
- 	depends on ARCH_AT91 || COMPILE_TEST
- 	select SERIAL_CORE
- 	select SERIAL_MCTRL_GPIO if GPIOLIB
-@@ -500,7 +499,6 @@ config SERIAL_SA1100_CONSOLE
- 
- config SERIAL_IMX
- 	tristate "IMX serial port support"
--	depends on HAS_DMA
- 	depends on ARCH_MXC || COMPILE_TEST
- 	select SERIAL_CORE
- 	select RATIONAL
-@@ -1262,7 +1260,6 @@ config SERIAL_PCH_UART_CONSOLE
- 
- config SERIAL_MXS_AUART
- 	tristate "MXS AUART support"
--	depends on HAS_DMA
- 	depends on ARCH_MXS || MACH_ASM9260 || COMPILE_TEST
- 	select SERIAL_CORE
- 	select SERIAL_MCTRL_GPIO if GPIOLIB
-@@ -1473,7 +1470,6 @@ config SERIAL_SPRD_CONSOLE
- config SERIAL_STM32
- 	tristate "STMicroelectronics STM32 serial port support"
- 	select SERIAL_CORE
--	depends on HAS_DMA
- 	depends on ARCH_STM32 || COMPILE_TEST
- 	help
- 	  This driver is for the on-chip Serial Controller on
--- 
-2.7.4
-
+Thanks,
+../Alex
+> -- 
+> 2.16.2
+> 
