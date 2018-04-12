@@ -1,121 +1,83 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: jglisse@redhat.com
-To: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        "Theodore Ts'o" <tytso@mit.edu>, Jan Kara <jack@suse.com>,
-        linux-ext4@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Subject: [RFC PATCH 69/79] fs/journal: add struct address_space to jbd2_journal_try_to_free_buffers() arguments
-Date: Wed,  4 Apr 2018 15:18:21 -0400
-Message-Id: <20180404191831.5378-32-jglisse@redhat.com>
-In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
-References: <20180404191831.5378-1-jglisse@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <fthain@telegraphics.com.au>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Jens Axboe <axboe@kernel.dk>,
+    Laurent Vivier <lvivier@redhat.com>,
+    linux-m68k@lists.linux-m68k.org,
+    linux-kernel@vger.kernel.org,
+    linux-block@vger.kernel.org,
+    stable@vger.kernel.org
+Message-Id: <8f7474079aab3a47a4534bec7463ed52d0e5a652.1523493475.git.fthain@telegraphics.com.au>
+In-Reply-To: <cover.1523493475.git.fthain@telegraphics.com.au>
+References: <cover.1523493475.git.fthain@telegraphics.com.au>
+From: Finn Thain <fthain@telegraphics.com.au>
+Subject: [PATCH v2 09/10] block/swim: Fix IO error at end of medium
+Date: Wed, 11 Apr 2018 20:50:14 -0400 (EDT)
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jérôme Glisse <jglisse@redhat.com>
+Reading to the end of a 720K disk results in an IO error instead of EOF
+because the block layer thinks the disk has 2880 sectors. (Partly this
+is a result of inverted logic of the ONEMEG_MEDIA bit that's now fixed.)
 
-For the holy crusade to stop relying on struct page mapping field, add
-struct address_space to jbd2_journal_try_to_free_buffers() arguments.
+Initialize the density and head count in swim_add_floppy() to agree
+with the device size passed to set_capacity() during drive probe.
 
-<---------------------------------------------------------------------
-@@
-type T1, T2, T3;
-@@
-int
--jbd2_journal_try_to_free_buffers(T1 journal, T2 page, T3 gfp_mask)
-+jbd2_journal_try_to_free_buffers(T1 journal, struct address_space *mapping, T2 page, T3 gfp_mask)
-{...}
+Call set_capacity() again upon device open, after refreshing the density
+and head count values.
 
-@@
-type T1, T2, T3;
-@@
-int
--jbd2_journal_try_to_free_buffers(T1, T2, T3)
-+jbd2_journal_try_to_free_buffers(T1, struct address_space *, T2, T3)
-;
-
-@@
-expression E1, E2, E3;
-@@
--jbd2_journal_try_to_free_buffers(E1, E2, E3)
-+jbd2_journal_try_to_free_buffers(E1, NULL, E2, E3)
---------------------------------------------------------------------->
-
-Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
-Cc: "Theodore Ts'o" <tytso@mit.edu>
-Cc: Jan Kara <jack@suse.com>
-Cc: linux-ext4@vger.kernel.org
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-fsdevel@vger.kernel.org
+Cc: Laurent Vivier <lvivier@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: stable@vger.kernel.org # v4.14+
+Tested-by: Stan Johnson <userm57@yahoo.com>
+Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
+Acked-by: Laurent Vivier <lvivier@redhat.com>
 ---
- fs/ext4/inode.c       | 3 ++-
- fs/ext4/super.c       | 4 ++--
- fs/jbd2/transaction.c | 3 ++-
- include/linux/jbd2.h  | 4 +++-
- 4 files changed, 9 insertions(+), 5 deletions(-)
+ drivers/block/swim.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index 1a44d9acde53..ef53a57d9768 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -3413,7 +3413,8 @@ static int ext4_releasepage(struct address_space *mapping,
- 	if (PageChecked(page))
- 		return 0;
- 	if (journal)
--		return jbd2_journal_try_to_free_buffers(journal, page, wait);
-+		return jbd2_journal_try_to_free_buffers(journal, NULL, page,
-+						        wait);
- 	else
- 		return try_to_free_buffers(mapping, page);
- }
-diff --git a/fs/ext4/super.c b/fs/ext4/super.c
-index 8f98bc886569..cf2b74137fb2 100644
---- a/fs/ext4/super.c
-+++ b/fs/ext4/super.c
-@@ -1138,8 +1138,8 @@ static int bdev_try_to_free_page(struct super_block *sb, struct page *page,
- 	if (!_page_has_buffers(page, mapping))
- 		return 0;
- 	if (journal)
--		return jbd2_journal_try_to_free_buffers(journal, page,
--						wait & ~__GFP_DIRECT_RECLAIM);
-+		return jbd2_journal_try_to_free_buffers(journal, NULL, page,
-+							wait & ~__GFP_DIRECT_RECLAIM);
- 	return try_to_free_buffers(mapping, page);
- }
+diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+index c8c8b9da3edd..2c75761b61e8 100644
+--- a/drivers/block/swim.c
++++ b/drivers/block/swim.c
+@@ -612,7 +612,6 @@ static void setup_medium(struct floppy_state *fs)
+ 		struct floppy_struct *g;
+ 		fs->disk_in = 1;
+ 		fs->write_protected = swim_readbit(base, WRITE_PROT);
+-		fs->type = swim_readbit(base, TWOMEG_MEDIA);
  
-diff --git a/fs/jbd2/transaction.c b/fs/jbd2/transaction.c
-index bf673b33d436..6899e7b4036d 100644
---- a/fs/jbd2/transaction.c
-+++ b/fs/jbd2/transaction.c
-@@ -1984,7 +1984,8 @@ __journal_try_to_free_buffer(journal_t *journal, struct buffer_head *bh)
-  * Return 0 on failure, 1 on success
-  */
- int jbd2_journal_try_to_free_buffers(journal_t *journal,
--				struct page *page, gfp_t gfp_mask)
-+				     struct address_space *mapping,
-+				     struct page *page, gfp_t gfp_mask)
- {
- 	struct buffer_head *head;
- 	struct buffer_head *bh;
-diff --git a/include/linux/jbd2.h b/include/linux/jbd2.h
-index c5133df80fd4..658a0d2f758f 100644
---- a/include/linux/jbd2.h
-+++ b/include/linux/jbd2.h
-@@ -1363,7 +1363,9 @@ extern int	 jbd2_journal_forget (handle_t *, struct super_block *sb,
- extern void	 journal_sync_buffer (struct buffer_head *);
- extern int	 jbd2_journal_invalidatepage(journal_t *,
- 				struct page *, unsigned int, unsigned int);
--extern int	 jbd2_journal_try_to_free_buffers(journal_t *, struct page *, gfp_t);
-+extern int	 jbd2_journal_try_to_free_buffers(journal_t *,
-+						    struct address_space *,
-+						    struct page *, gfp_t);
- extern int	 jbd2_journal_stop(handle_t *);
- extern int	 jbd2_journal_flush (journal_t *);
- extern void	 jbd2_journal_lock_updates (journal_t *);
+ 		if (swim_track00(base))
+ 			printk(KERN_ERR
+@@ -620,6 +619,9 @@ static void setup_medium(struct floppy_state *fs)
+ 
+ 		swim_track00(base);
+ 
++		fs->type = swim_readbit(base, TWOMEG_MEDIA) ?
++			HD_MEDIA : DD_MEDIA;
++		fs->head_number = swim_readbit(base, SINGLE_SIDED) ? 1 : 2;
+ 		get_floppy_geometry(fs, 0, &g);
+ 		fs->total_secs = g->size;
+ 		fs->secpercyl = g->head * g->sect;
+@@ -656,6 +658,8 @@ static int floppy_open(struct block_device *bdev, fmode_t mode)
+ 		goto out;
+ 	}
+ 
++	set_capacity(fs->disk, fs->total_secs);
++
+ 	if (mode & FMODE_NDELAY)
+ 		return 0;
+ 
+@@ -808,10 +812,9 @@ static int swim_add_floppy(struct swim_priv *swd, enum drive_location location)
+ 
+ 	swim_motor(base, OFF);
+ 
+-	if (swim_readbit(base, SINGLE_SIDED))
+-		fs->head_number = 1;
+-	else
+-		fs->head_number = 2;
++	fs->type = HD_MEDIA;
++	fs->head_number = 2;
++
+ 	fs->ref_count = 0;
+ 	fs->ejected = 1;
+ 
 -- 
-2.14.3
+2.16.1
