@@ -1,7 +1,7 @@
 Return-Path: <htejun@gmail.com>
 Return-Path: <htejun@gmail.com>
 Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 12 Apr 2018 07:07:15 -0700
+Date: Thu, 12 Apr 2018 06:58:21 -0700
 From: "tj@kernel.org" <tj@kernel.org>
 To: "hch@lst.de" <hch@lst.de>
 Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
@@ -10,28 +10,43 @@ Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
 	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH] block: Ensure that a request queue is dissociated from
  the cgroup controller
-Message-ID: <20180412140715.GA793541@devbig577.frc2.facebook.com>
+Message-ID: <20180412135821.GZ793541@devbig577.frc2.facebook.com>
 References: <20180412015852.26014-1-bart.vanassche@wdc.com>
  <20180412053431.GB29881@lst.de>
  <e96f485e61db6a3f9f62ee4f50ff8c469a53bed9.camel@wdc.com>
  <20180412131440.GA5476@lst.de>
  <20180412134812.GW793541@devbig577.frc2.facebook.com>
  <20180412135651.GA6181@lst.de>
- <20180412135821.GZ793541@devbig577.frc2.facebook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180412135821.GZ793541@devbig577.frc2.facebook.com>
+In-Reply-To: <20180412135651.GA6181@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Apr 12, 2018 at 06:58:21AM -0700, tj@kernel.org wrote:
-> Cool, can we just factor out the queue lock from those drivers?  It's
-> just really messy to be switching locks like we do in the cleanup
-> path.
+Hello,
 
-So, looking at a couple drivers, it looks like all we'd need is a
-struct which contains a spinlock and a refcnt.  Switching the drivers
-to use that is a bit tedious but straight-forward and the block layer
-can simply put that struct on queue release.
+On Thu, Apr 12, 2018 at 03:56:51PM +0200, hch@lst.de wrote:
+> On Thu, Apr 12, 2018 at 06:48:12AM -0700, tj@kernel.org wrote:
+> > > Which sounds like a very good reason not to use a driver controller
+> > > lock for internals like blkcq.
+> > > 
+> > > In fact splitting the lock used for synchronizing access to queue
+> > > fields from the driver controller lock used to synchronize I/O
+> > > in the legacy path in long overdue.
+> > 
+> > It'd be probably a lot easier to make sure the shared lock doesn't go
+> > away till all the request_queues using it go away.  The choice is
+> > between refcnting something which carries the lock and double locking
+> > in hot paths.  Can't think of many downsides of the former approach.
+> 
+> We've stopped sharing request_queues between different devices a while
+> ago.  The problem is just that for legacy devices the driver still controls
+> the lock life time, and it might be shorter than the queue lifetime.
+> Note that for blk-mq we basically don't use the queue_lock at all,
+> and certainly not in the hot path.
+
+Cool, can we just factor out the queue lock from those drivers?  It's
+just really messy to be switching locks like we do in the cleanup
+path.
 
 Thanks.
 
