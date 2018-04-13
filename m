@@ -1,46 +1,64 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH V3] blk-mq: fix race between complete and
- BLK_EH_RESET_TIMER
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-Cc: "jianchao.wang" <jianchao.w.wang@oracle.com>,
- Bart Van Assche <bart.vanassche@wdc.com>, Tejun Heo <tj@kernel.org>,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
- Israel Rukshin <israelr@mellanox.com>, Max Gurtovoy <maxg@mellanox.com>,
- stable@vger.kernel.org
-References: <20180412115956.16207-1-ming.lei@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <4008f36d-c2c4-25b9-4af5-8efbe9d452c0@kernel.dk>
-Date: Fri, 13 Apr 2018 21:06:07 -0600
+Return-Path: <ming.lei@redhat.com>
+Date: Fri, 13 Apr 2018 23:38:44 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Tejun Heo <tj@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Israel Rukshin <israelr@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] blk-mq: fix race between complete and BLK_EH_RESET_TIMER
+Message-ID: <20180413153838.GA3114@ming.t460p>
+References: <20180411205529.31145-1-ming.lei@redhat.com>
+ <20180411213007.GR793541@devbig577.frc2.facebook.com>
+ <20180411224344.GA31433@ming.t460p>
+ <20180411224712.GT793541@devbig577.frc2.facebook.com>
+ <20180411230504.GB31433@ming.t460p>
+ <20180412135712.GY793541@devbig577.frc2.facebook.com>
 MIME-Version: 1.0
-In-Reply-To: <20180412115956.16207-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180412135712.GY793541@devbig577.frc2.facebook.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 4/12/18 5:59 AM, Ming Lei wrote:
-> The normal request completion can be done before or during handling
-> BLK_EH_RESET_TIMER, and this race may cause the request to never be
-> completed since driver's .timeout() may always return
-> BLK_EH_RESET_TIMER.
+On Thu, Apr 12, 2018 at 06:57:12AM -0700, Tejun Heo wrote:
+> On Thu, Apr 12, 2018 at 07:05:13AM +0800, Ming Lei wrote:
+> > > Not really because aborted_gstate right now doesn't have any memory
+> > > barrier around it, so nothing ensures blk_add_timer() actually appears
+> > > before.  We can either add the matching barriers in aborted_gstate
+> > > update and when it's read in the normal completion path, or we can
+> > > wait for the update to be visible everywhere by waiting for rcu grace
+> > > period (because the reader is rcu protected).
+> > 
+> > Seems not necessary.
+> > 
+> > Suppose it is out of order, the only side-effect is that the new
+> > recycled request is timed out as a bit late, I think that is what
+> > we can survive, right?
 > 
-> This issue can't be fixed completely by driver, since the normal
-> completion can be done between returning .timeout() and handling
-> BLK_EH_RESET_TIMER.
-> 
-> This patch fixes the race by introducing rq state of
-> MQ_RQ_COMPLETE_IN_RESET, and reading/writing rq's state by holding
-> queue lock, which can be per-request actually, but just not necessary
-> to introduce one lock for so unusual event.
-> 
-> Also when .timeout() returns BLK_EH_HANDLED, sync with normal
-> completion path before completing this timed-out rq finally for
-> avoiding this rq's state touched by normal completion.
+> It at least can mess up the timeout duration for the next recycle
+> instance because there can be two competing blk_add_timer() instances.
+> I'm not sure whether there can be other consequences.  When ownership
+> isn't clear, it becomes really difficult to reason about these things
+> and can lead to subtle failures.  I think it'd be best to always
+> establish who owns what.
 
-I like this approach since it keeps the cost outside of the fast
-path. And it's fine to reuse the queue lock for this, instead of
-adding a special lock for something we consider a rare occurrence.
+Please see the code of blk_add_timer() for blk-mq:
 
->From a quick look this looks sane, but I'll take a closer look
-tomrrow and add some testing too.
+	blk_rq_set_deadline(req, jiffies + req->timeout);
+	req->rq_flags &= ~RQF_MQ_TIMEOUT_EXPIRED;
 
--- 
-Jens Axboe
+	if (!timer_pending(&q->timeout) ||
+	    time_before(expiry, q->timeout.expires))
+			mod_timer(&q->timeout, expiry);
+
+If this rq is recycled, blk_add_timer() only touches rq->deadline
+and the EXPIRED flags, and the only effect is that the timeout
+may be handled a bit late, but the timeout monitor won't be lost.
+
+And this thing shouldn't be difficult to avoid, as you mentioned,
+synchronize_rcu() can be added between blk_add_timer() and
+resetting aborted gstate for avoiding it.
+
+
+thanks,
+Ming
