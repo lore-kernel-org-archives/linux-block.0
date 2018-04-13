@@ -1,71 +1,70 @@
-Return-Path: <00moses.alexander00@gmail.com>
-Return-Path: <00moses.alexander00@gmail.com>
-Date: Fri, 6 Apr 2018 17:06:50 +0200
-From: Alexandru Moise <00moses.alexander00@gmail.com>
-To: axboe@kernel.dk, tj@kernel.org, shli@fb.com, pombredanne@nexb.com,
-	gregkh@linuxfoundation.org, joseph.qi@linux.alibaba.com,
-	nborisov@suse.com, arnd@arndb.de, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] blk-cgroup: remove entries in blkg_tree before queue release
-Message-ID: <20180406150648.GA6378@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <maier@linux.ibm.com>
+From: Steffen Maier <maier@linux.ibm.com>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, Li Zefan <lizefan@huawei.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Steffen Maier <maier@linux.ibm.com>
+Subject: [RFC v2] tracing/events: block: also try to get dev_t via driver core for some events
+Date: Fri, 13 Apr 2018 18:36:23 +0200
+In-Reply-To: <20180413163623.11282-1-maier@linux.ibm.com>
+References: <20180413163623.11282-1-maier@linux.ibm.com>
+Message-Id: <20180413163623.11282-4-maier@linux.ibm.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The q->id is used as an index within the blkg_tree radix tree.
+Complements v2.6.31 commit 55782138e47d ("tracing/events: convert block
+trace points to TRACE_EVENT()") for cases where rq->rq_disk == NULL:
+  block_rq_requeue, block_rq_insert, block_rq_issue;
+and for cases where bio == NULL:
+  block_getrq, block_sleeprq.
 
-If the entry is not released before reclaiming the blk_queue_ida's id
-blkcg_init_queue() within a different driver from which this id
-was originally for can fail due to the entry at that index within
-the radix tree already existing.
+NB: The NULL pointer check for q->kobj.parent is certainly racy and
+I don't have enough experience if it's good enough for a trace event.
 
-Signed-off-by: Alexandru Moise <00moses.alexander00@gmail.com>
+Since I don't know when above cases would occur,
+I'm not sure this is worth it.
+
+Signed-off-by: Steffen Maier <maier@linux.ibm.com>
 ---
- block/blk-cgroup.c         | 2 +-
- block/blk-sysfs.c          | 4 ++++
- include/linux/blk-cgroup.h | 2 ++
- 3 files changed, 7 insertions(+), 1 deletion(-)
+ include/trace/events/block.h | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 1c16694ae145..224e937dbb59 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -369,7 +369,7 @@ static void blkg_destroy(struct blkcg_gq *blkg)
-  *
-  * Destroy all blkgs associated with @q.
-  */
--static void blkg_destroy_all(struct request_queue *q)
-+void blkg_destroy_all(struct request_queue *q)
- {
- 	struct blkcg_gq *blkg, *n;
+diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+index 6ea5a3899c2e..001e4f369df9 100644
+--- a/include/trace/events/block.h
++++ b/include/trace/events/block.h
+@@ -86,7 +86,9 @@ TRACE_EVENT(block_rq_requeue,
+ 	),
  
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index d00d1b0ec109..a72866458f22 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -816,6 +816,10 @@ static void __blk_release_queue(struct work_struct *work)
- 	if (q->bio_split)
- 		bioset_free(q->bio_split);
+ 	TP_fast_assign(
+-		__entry->dev	   = rq->rq_disk ? disk_devt(rq->rq_disk) : 0;
++		__entry->dev	   = rq->rq_disk ? disk_devt(rq->rq_disk) :
++		(q->kobj.parent ?
++		 container_of(q->kobj.parent, struct device, kobj)->devt : 0);
+ 		__entry->sector    = blk_rq_trace_sector(rq);
+ 		__entry->nr_sector = blk_rq_trace_nr_sectors(rq);
  
-+	spin_lock_irq(q->queue_lock);
-+	blkg_destroy_all(q);
-+	spin_unlock_irq(q->queue_lock);
-+
- 	ida_simple_remove(&blk_queue_ida, q->id);
- 	call_rcu(&q->rcu_head, blk_free_queue_rcu);
- }
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 6c666fd7de3c..4470fdb6ea8f 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -179,6 +179,8 @@ struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
- int blkcg_init_queue(struct request_queue *q);
- void blkcg_drain_queue(struct request_queue *q);
- void blkcg_exit_queue(struct request_queue *q);
-+void blkg_destroy_all(struct request_queue *q);
-+
+@@ -162,7 +164,9 @@ DECLARE_EVENT_CLASS(block_rq,
+ 	),
  
- /* Blkio controller policy registration */
- int blkcg_policy_register(struct blkcg_policy *pol);
+ 	TP_fast_assign(
+-		__entry->dev	   = rq->rq_disk ? disk_devt(rq->rq_disk) : 0;
++		__entry->dev	   = rq->rq_disk ? disk_devt(rq->rq_disk) :
++		(q->kobj.parent ?
++		 container_of(q->kobj.parent, struct device, kobj)->devt : 0);
+ 		__entry->sector    = blk_rq_trace_sector(rq);
+ 		__entry->nr_sector = blk_rq_trace_nr_sectors(rq);
+ 		__entry->bytes     = blk_rq_bytes(rq);
+@@ -397,7 +401,9 @@ DECLARE_EVENT_CLASS(block_get_rq,
+         ),
+ 
+ 	TP_fast_assign(
+-		__entry->dev		= bio ? bio_dev(bio) : 0;
++		__entry->dev		= bio ? bio_dev(bio) :
++		(q->kobj.parent ?
++		 container_of(q->kobj.parent, struct device, kobj)->devt : 0);
+ 		__entry->sector		= bio ? bio->bi_iter.bi_sector : 0;
+ 		__entry->nr_sector	= bio ? bio_sectors(bio) : 0;
+ 		blk_fill_rwbs(__entry->rwbs,
 -- 
-2.16.3
+2.13.5
