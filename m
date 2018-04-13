@@ -1,106 +1,71 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out1.zte.com.cn ([202.103.147.172]:57920 "EHLO mxct.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750735AbeDPGds (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Apr 2018 02:33:48 -0400
-From: tang.junhui@zte.com.cn
-To: kent.overstreet@gmail.com, colyli@suse.de, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: [PATCH v2 4/4] bcache: fix I/O significant decline while backend devices registering
-Date: Mon, 16 Apr 2018 14:33:50 +0800
-Message-Id: <1523860430-31331-5-git-send-email-tang.junhui@zte.com.cn>
-In-Reply-To: <1523860430-31331-1-git-send-email-tang.junhui@zte.com.cn>
-References: <1523860430-31331-1-git-send-email-tang.junhui@zte.com.cn>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <maier@linux.ibm.com>
+From: Steffen Maier <maier@linux.ibm.com>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, Li Zefan <lizefan@huawei.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Steffen Maier <maier@linux.ibm.com>
+Subject: [PATCH v2 1/2] tracing/events: block: track and print if unplug was explicit or schedule
+Date: Fri, 13 Apr 2018 18:36:21 +0200
+In-Reply-To: <20180413163623.11282-1-maier@linux.ibm.com>
+References: <20180413163623.11282-1-maier@linux.ibm.com>
+Message-Id: <20180413163623.11282-2-maier@linux.ibm.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+Just like blktrace distinguishes explicit and schedule by means of
+BLK_TA_UNPLUG_IO and BLK_TA_UNPLUG_TIMER, actually make use of the
+existing argument "explicit" to distinguish the two cases in the one
+common tracepoint block_unplug.
 
-I attached several backend devices in the same cache set, and produced lots
-of dirty data by running small rand I/O writes in a long time, then I
-continue run I/O in the others cached devices, and stopped a cached device,
-after a mean while, I register the stopped device again, I see the running
-I/O in the others cached devices dropped significantly, sometimes even
-jumps to zero.
+Complements v2.6.39 commit 49cac01e1fa7 ("block: make unplug timer trace
+event correspond to the schedule() unplug") and commit d9c978331790
+("block: remove block_unplug_timer() trace point").
 
-In currently code, bcache would traverse each keys and btree node to count
-the dirty data under read locker, and the writes threads can not get the
-btree write locker, and when there is a lot of keys and btree node in the
-registering device, it would last several seconds, so the write I/Os in
-others cached device are blocked and declined significantly.
-
-In this patch, when a device registering to a ache set, which exist others
-cached devices with running I/Os, we get the amount of dirty data of the
-device in an incremental way, and do not block other cached devices all the
-time.
-
-Patch v2: Rename some variables and macros name as Coly suggested.
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Coly Li <colyli@suse.de>
+Signed-off-by: Steffen Maier <maier@linux.ibm.com>
 ---
- drivers/md/bcache/writeback.c | 26 +++++++++++++++++++++++++-
- 1 file changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 56a3788..71ba861 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -488,10 +488,14 @@ static int bch_writeback_thread(void *arg)
- }
+Changes since v1:
+Use 0 and 1 instead of false and true for __print_symbolic table.
+Now "trace-cmd report" can decode it. [Steven Rostedt]
+
+ include/trace/events/block.h | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+index 81b43f5bdf23..e90bb6eb8097 100644
+--- a/include/trace/events/block.h
++++ b/include/trace/events/block.h
+@@ -470,6 +470,11 @@ TRACE_EVENT(block_plug,
+ 	TP_printk("[%s]", __entry->comm)
+ );
  
- /* Init */
-+#define INIT_KEYS_EACH_TIME		500000
-+#define INIT_KEYS_SLEEP_MS			100
- 
- struct sectors_dirty_init {
- 	struct btree_op	op;
- 	unsigned	inode;
-+	size_t		count;
-+	struct bkey	start;
- };
- 
- static int sectors_dirty_init_fn(struct btree_op *_op, struct btree *b,
-@@ -506,18 +510,38 @@ static int sectors_dirty_init_fn(struct btree_op *_op, struct btree *b,
- 		bcache_dev_sectors_dirty_add(b->c, KEY_INODE(k),
- 					     KEY_START(k), KEY_SIZE(k));
- 
-+	op->count++;
-+	if (atomic_read(&b->c->search_inflight) &&
-+	   !(op->count % INIT_KEYS_EACH_TIME)) {
-+		bkey_copy_key(&op->start, k);
-+		return -EAGAIN;
-+	}
++#define show_block_unplug_explicit(val)		\
++	__print_symbolic(val,			\
++			 {0, "schedule"},	\
++			 {1, "explicit"})
 +
- 	return MAP_CONTINUE;
- }
+ DECLARE_EVENT_CLASS(block_unplug,
  
- void bch_sectors_dirty_init(struct bcache_device *d)
- {
- 	struct sectors_dirty_init op;
-+	int ret;
+ 	TP_PROTO(struct request_queue *q, unsigned int depth, bool explicit),
+@@ -478,15 +483,18 @@ DECLARE_EVENT_CLASS(block_unplug,
  
- 	bch_btree_op_init(&op.op, -1);
- 	op.inode = d->id;
-+	op.count = 0;
-+	op.start = KEY(op.inode, 0, 0);
+ 	TP_STRUCT__entry(
+ 		__field( int,		nr_rq			)
++		__field( bool,		explicit		)
+ 		__array( char,		comm,	TASK_COMM_LEN	)
+ 	),
  
--	bch_btree_map_keys(&op.op, d->c, &KEY(op.inode, 0, 0),
-+	do {
-+		ret = bch_btree_map_keys(&op.op, d->c, &op.start,
- 			   sectors_dirty_init_fn, 0);
-+		if (ret == -EAGAIN)
-+			schedule_timeout_interruptible(
-+				msecs_to_jiffies(INIT_KEYS_SLEEP_MS));
-+		else if (ret < 0) {
-+			pr_warn("sectors dirty init failed, ret=%d!", ret);
-+			break;
-+		}
-+	} while (ret == -EAGAIN);
-+
- }
+ 	TP_fast_assign(
+ 		__entry->nr_rq = depth;
++		__entry->explicit = explicit;
+ 		memcpy(__entry->comm, current->comm, TASK_COMM_LEN);
+ 	),
  
- void bch_cached_dev_writeback_init(struct cached_dev *dc)
+-	TP_printk("[%s] %d", __entry->comm, __entry->nr_rq)
++	TP_printk("[%s] %d %s", __entry->comm, __entry->nr_rq,
++		  show_block_unplug_explicit(__entry->explicit))
+ );
+ 
+ /**
 -- 
-1.8.3.1
+2.13.5
