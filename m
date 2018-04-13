@@ -2,12 +2,12 @@ Return-Path: <maier@linux.ibm.com>
 From: Steffen Maier <maier@linux.ibm.com>
 To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
 Cc: Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, Li Zefan <lizefan@huawei.com>,
+        Jens Axboe <axboe@kernel.dk>, Li Zefan <lizf@cn.fujitsu.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Steffen Maier <maier@linux.ibm.com>
-Subject: [PATCH v2 0/2] tracing/events: block: bring more on a par with blktrace
-Date: Fri, 13 Apr 2018 18:36:20 +0200
-Message-Id: <20180413163623.11282-1-maier@linux.ibm.com>
+Subject: [PATCH 0/2] tracing/events: block: bring more on a par with blktrace
+Date: Fri, 13 Apr 2018 15:07:16 +0200
+Message-Id: <20180413130719.22921-1-maier@linux.ibm.com>
 List-ID: <linux-block@vger.kernel.org>
 
 I had the need to understand I/O request processing in detail.
@@ -22,11 +22,6 @@ counterpart in blktrace tooling.
 
 The last patch is just an RFC. I still kept it in this patch set because
 it is inspired by PATCH 2/2.
-
-Changes since v1:
-[PATCH v2 1/2]
-Use 0 and 1 instead of false and true for __print_symbolic table.
-Now "trace-cmd report" can decode it. [Steven Rostedt]
 
 Steffen Maier (3):
   tracing/events: block: track and print if unplug was explicit or
