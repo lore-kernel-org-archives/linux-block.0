@@ -1,99 +1,31 @@
-Return-Path: <prvs=63144aee1=Bart.VanAssche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:37145 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753050AbeDMCc6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Apr 2018 22:32:58 -0400
+Subject: Re: System hung in I/O when booting with sd card
+To: Shawn Lin <shawn.lin@rock-chips.com>
+Cc: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <3ba451a8-ac7b-429a-4a1b-703ea38136ce@rock-chips.com>
+ <5496fc576b733fd7a77eb78ef938bc661d3b11af.camel@wdc.com>
+ <6ac49021-644b-edc1-4c8a-82edbeaad0bd@rock-chips.com>
+ <4993d486-0970-bf41-ab8d-c02925361d41@rock-chips.com>
 From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>
-Subject: [PATCH] blk-mq: Avoid that submitting a bio concurrently with device removal triggers a crash
-Date: Tue, 10 Apr 2018 14:30:35 -0600
-Message-Id: <20180410203035.26167-1-bart.vanassche@wdc.com>
+Message-ID: <8c3b9272-2326-9995-94c2-386c552e47b1@wdc.com>
+Date: Thu, 12 Apr 2018 20:32:49 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <4993d486-0970-bf41-ab8d-c02925361d41@rock-chips.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Because blkcg_exit_queue() is now called from inside blk_cleanup_queue()
-it is no longer safe to access cgroup information during or after the
-blk_cleanup_queue() call. Hence protect the generic_make_request_checks()
-call with blk_queue_enter() / blk_queue_exit().
+On 04/12/18 18:38, Shawn Lin wrote:
+> I think your patch solve this. Thanks.
+> 
+> Tested-by: Shawn Lin <shawn.lin@rock-chips.com>
 
-Reported-by: Ming Lei <ming.lei@redhat.com>
-Fixes: a063057d7c73 ("block: Fix a race between request queue removal and the block cgroup controller")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
----
- block/blk-core.c | 32 ++++++++++++++++++++++++++------
- 1 file changed, 26 insertions(+), 6 deletions(-)
+Thanks for the testing!
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 34e2f2227fd9..a330cd2829e1 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2386,8 +2386,19 @@ blk_qc_t generic_make_request(struct bio *bio)
- 	 * yet.
- 	 */
- 	struct bio_list bio_list_on_stack[2];
-+	blk_mq_req_flags_t flags = bio->bi_opf & REQ_NOWAIT ?
-+		BLK_MQ_REQ_NOWAIT : 0;
-+	struct request_queue *q = bio->bi_disk->queue;
- 	blk_qc_t ret = BLK_QC_T_NONE;
- 
-+	if (blk_queue_enter(q, flags) < 0) {
-+		if (!blk_queue_dying(q) && (bio->bi_opf & REQ_NOWAIT))
-+			bio_wouldblock_error(bio);
-+		else
-+			bio_io_error(bio);
-+		return ret;
-+	}
-+
- 	if (!generic_make_request_checks(bio))
- 		goto out;
- 
-@@ -2424,11 +2435,20 @@ blk_qc_t generic_make_request(struct bio *bio)
- 	bio_list_init(&bio_list_on_stack[0]);
- 	current->bio_list = bio_list_on_stack;
- 	do {
--		struct request_queue *q = bio->bi_disk->queue;
--		blk_mq_req_flags_t flags = bio->bi_opf & REQ_NOWAIT ?
--			BLK_MQ_REQ_NOWAIT : 0;
-+		bool enter_succeeded = true;
- 
--		if (likely(blk_queue_enter(q, flags) == 0)) {
-+		if (unlikely(q != bio->bi_disk->queue)) {
-+			flags = bio->bi_opf & REQ_NOWAIT ? BLK_MQ_REQ_NOWAIT :
-+				0;
-+			blk_queue_exit(q);
-+			q = bio->bi_disk->queue;
-+			if (blk_queue_enter(q, flags) < 0) {
-+				enter_succeeded = false;
-+				q = NULL;
-+			}
-+		}
-+
-+		if (enter_succeeded) {
- 			struct bio_list lower, same;
- 
- 			/* Create a fresh bio_list for all subordinate requests */
-@@ -2436,8 +2456,6 @@ blk_qc_t generic_make_request(struct bio *bio)
- 			bio_list_init(&bio_list_on_stack[0]);
- 			ret = q->make_request_fn(q, bio);
- 
--			blk_queue_exit(q);
--
- 			/* sort new bios into those for a lower level
- 			 * and those for the same level
- 			 */
-@@ -2464,6 +2482,8 @@ blk_qc_t generic_make_request(struct bio *bio)
- 	current->bio_list = NULL; /* deactivate */
- 
- out:
-+	if (q)
-+		blk_queue_exit(q);
- 	return ret;
- }
- EXPORT_SYMBOL(generic_make_request);
--- 
-2.16.2
+Bart.
