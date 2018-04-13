@@ -1,75 +1,125 @@
-Return-Path: <jinpu.wang@profitbricks.com>
-Return-Path: <jinpu.wang@profitbricks.com>
-From: Jack Wang <jinpu.wang@profitbricks.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jack Wang <jinpu.wang@profitbricks.com>
-Subject: [PATCH] block: ratelimite pr_err on IO path
-Date: Wed, 11 Apr 2018 15:21:29 +0200
-Message-Id: <1523452889-16331-1-git-send-email-jinpu.wangl@profitbricks.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from out1.zte.com.cn ([202.103.147.172]:39508 "EHLO mxct.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753112AbeDMCBT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Apr 2018 22:01:19 -0400
+From: tang.junhui@zte.com.cn
+To: colyli@suse.de
+Cc: kent.overstreet@gmail.com, mlyle@lyle.org,
+        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
+Subject: Re: [PATCH 4/4] bcache: fix I/O significant decline while backenddevices registering
+Date: Fri, 13 Apr 2018 10:01:17 +0800
+Message-Id: <1523584877-32293-1-git-send-email-tang.junhui@zte.com.cn>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Jack Wang <jinpu.wang@profitbricks.com>
+Hi Coly,
 
-This avoid soft lockup below:
-[ 2328.328429] Call Trace:
-[ 2328.328433]  vprintk_emit+0x229/0x2e0
-[ 2328.328436]  ? t10_pi_type3_verify_ip+0x20/0x20
-[ 2328.328437]  printk+0x52/0x6e
-[ 2328.328439]  t10_pi_verify+0x9e/0xf0
-[ 2328.328441]  bio_integrity_process+0x12e/0x220
-[ 2328.328442]  ? t10_pi_type1_verify_crc+0x20/0x20
-[ 2328.328443]  bio_integrity_verify_fn+0xde/0x140
-[ 2328.328447]  process_one_work+0x13f/0x370
-[ 2328.328449]  worker_thread+0x62/0x3d0
-[ 2328.328450]  ? rescuer_thread+0x2f0/0x2f0
-[ 2328.328452]  kthread+0x116/0x150
-[ 2328.328454]  ? __kthread_parkme+0x70/0x70
-[ 2328.328457]  ret_from_fork+0x35/0x40
+> On 2018/4/12 2:38 PM, tang.junhui@zte.com.cn wrote:
+> > From: Tang Junhui <tang.junhui@zte.com.cn>
+> > 
+> > I attached several backend devices in the same cache set, and produced lots
+> > of dirty data by running small rand I/O writes in a long time, then I
+> > continue run I/O in the others cached devices, and stopped a cached device,
+> > after a mean while, I register the stopped device again, I see the running
+> > I/O in the others cached devices dropped significantly, sometimes even
+> > jumps to zero.
+> > 
+> > In currently code, bcache would traverse each keys and btree node to count
+> > the dirty data under read locker, and the writes threads can not get the
+> > btree write locker, and when there is a lot of keys and btree node in the
+> > registering device, it would last several seconds, so the write I/Os in
+> > others cached device are blocked and declined significantly.
+> > 
+> > In this patch, when a device registering to a ache set, which exist others
+> > cached devices with running I/Os, we get the amount of dirty data of the
+> > device in an incremental way, and do not block other cached devices all the
+> > time.
+> > 
+> > Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+> > ---
+> >  drivers/md/bcache/writeback.c | 26 +++++++++++++++++++++++++-
+> >  1 file changed, 25 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+> > index 56a3788..2467d3a 100644
+> > --- a/drivers/md/bcache/writeback.c
+> > +++ b/drivers/md/bcache/writeback.c
+> > @@ -488,10 +488,14 @@ static int bch_writeback_thread(void *arg)
+> >  }
+> >  
+> 
+> Hi Junhui,
+> 
+> >  /* Init */
+> > +#define INIT_KEYS_MIN            500000
+> > +#define INIT_KEYS_SLEEP_TIME        100
+> >  
+> 
+> How about renaming the above macros to something like
+> INIT_KEYS_WAIT_COUNTER and INIT_KEYS_SLEEP_MS ?
+> 
+> Also I suggested to rename io_inflight in previous patch review comments.
+> 
+> For rested part of this patch looks good to me.
+> 
+> Reviewed-by: Coly Li <colyli@suse.de>
+> 
 
-Signed-off-by: Jack Wang <jinpu.wang@profitbricks.com>
----
- block/t10-pi.c | 20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+Tanks for your reveiw, I will modify the issue you mentioned 
+and send a V2 patch later.
 
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index a98db38..35967d5 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -84,10 +84,12 @@ static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
- 
- 			if (be32_to_cpu(pi->ref_tag) !=
- 			    lower_32_bits(iter->seed)) {
--				pr_err("%s: ref tag error at location %llu " \
--				       "(rcvd %u)\n", iter->disk_name,
--				       (unsigned long long)
--				       iter->seed, be32_to_cpu(pi->ref_tag));
-+				pr_err_ratelimited("%s: ref tag error at "
-+						   "location %llu (rcvd %u)\n",
-+						   iter->disk_name,
-+						   (unsigned long long)
-+						   iter->seed,
-+						   be32_to_cpu(pi->ref_tag));
- 				return BLK_STS_PROTECTION;
- 			}
- 			break;
-@@ -101,10 +103,12 @@ static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
- 		csum = fn(iter->data_buf, iter->interval);
- 
- 		if (pi->guard_tag != csum) {
--			pr_err("%s: guard tag error at sector %llu " \
--			       "(rcvd %04x, want %04x)\n", iter->disk_name,
--			       (unsigned long long)iter->seed,
--			       be16_to_cpu(pi->guard_tag), be16_to_cpu(csum));
-+			pr_err_ratelimited("%s: guard tag error at sector %llu "
-+					   "(rcvd %04x, want %04x)\n",
-+					   iter->disk_name,
-+					   (unsigned long long)iter->seed,
-+					   be16_to_cpu(pi->guard_tag),
-+					   be16_to_cpu(csum));
- 			return BLK_STS_PROTECTION;
- 		}
- 
--- 
-2.7.4
+> 
+> >  struct sectors_dirty_init {
+> >      struct btree_op    op;
+> >      unsigned    inode;
+> > +    size_t        count;
+> > +    struct bkey    start;
+> >  };
+> >  
+> >  static int sectors_dirty_init_fn(struct btree_op *_op, struct btree *b,
+> > @@ -506,18 +510,38 @@ static int sectors_dirty_init_fn(struct btree_op *_op, struct btree *b,
+> >          bcache_dev_sectors_dirty_add(b->c, KEY_INODE(k),
+> >                           KEY_START(k), KEY_SIZE(k));
+> >  
+> > +    op->count++;
+> > +    if (atomic_read(&b->c->io_inflight) &&
+> > +       !(op->count % INIT_KEYS_MIN)) {
+> > +        bkey_copy_key(&op->start, k);
+> > +        return -EAGAIN;
+> > +    }
+> > +
+> >      return MAP_CONTINUE;
+> >  }
+> >  
+> >  void bch_sectors_dirty_init(struct bcache_device *d)
+> >  {
+> >      struct sectors_dirty_init op;
+> > +    int ret;
+> >  
+> >      bch_btree_op_init(&op.op, -1);
+> >      op.inode = d->id;
+> > +    op.count = 0;
+> > +    op.start = KEY(op.inode, 0, 0);
+> >  
+> > -    bch_btree_map_keys(&op.op, d->c, &KEY(op.inode, 0, 0),
+> > +    do {
+> > +        ret = bch_btree_map_keys(&op.op, d->c, &op.start,
+> >                 sectors_dirty_init_fn, 0);
+> > +        if (ret == -EAGAIN)
+> > +            schedule_timeout_interruptible(
+> > +                msecs_to_jiffies(INIT_KEYS_SLEEP_TIME));
+> > +        else if (ret < 0) {
+> > +            pr_warn("sectors dirty init failed, ret=%d!", ret);
+> > +            break;
+> > +        }
+> > +    } while (ret == -EAGAIN);
+> > +
+> >  }
+> >  
+> >  void bch_cached_dev_writeback_init(struct cached_dev *dc)
+> > 
+
+Thanks.
+Tang Junhui
