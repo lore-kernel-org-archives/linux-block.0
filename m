@@ -1,84 +1,84 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Tejun Heo <tj@kernel.org>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Martin Steigerwald <Martin@Lichtvoll.de>,
-	Israel Rukshin <israelr@mellanox.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	"jianchao.wang" <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH V4 1/2] blk-mq: set RQF_MQ_TIMEOUT_EXPIRED when the rq's timeout isn't handled
-Date: Sun, 15 Apr 2018 23:43:56 +0800
-Message-Id: <20180415154357.19788-2-ming.lei@redhat.com>
-In-Reply-To: <20180415154357.19788-1-ming.lei@redhat.com>
-References: <20180415154357.19788-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mxhk.zte.com.cn ([63.217.80.70]:38616 "EHLO mxhk.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752446AbeDMJEo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Apr 2018 05:04:44 -0400
+From: tang.junhui@zte.com.cn
+To: colyli@suse.de
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
+Subject: Re: [PATCH 1/2] bcache: remove unncessary code in bch_btree_keys_init()
+Date: Fri, 13 Apr 2018 17:04:52 +0800
+Message-Id: <1523610292-8800-1-git-send-email-tang.junhui@zte.com.cn>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Firstly blk_mq_timeout_work() is always run exclusivley for each queue.
+Hi Coly,
 
-Secondly if .timeout() returns BLK_EH_RESET_TIMER or BLK_EH_HANDLED,
-the flag of RQF_MQ_TIMEOUT_EXPIRED will be cleared for this request,
-because the request will be requeued or freed for BLK_EH_HANDLED, and
-for BLK_EH_RESET_TIMER, new timer has to be started for this req.
+>Function bch_btree_keys_init() initializes b->set[].size and
+>b->set[].data to zero. As the code comments indicates, these code indeed
+>is unncessary, because both struct btree_keys and struct bset_tree are
+>nested embedded into struct btree, when struct btree is filled with 0
+>bits by kzalloc() in mca_bucket_alloc(), b->set[].size and
+>b->set[].data are initialized to 0 (a.k.a NULL) already.
+>
+Eh, you need to pay attention to mca_alloc()==>mca_reap(),
+which get btree node memory from list btree_cache_freeable
+or btree_cache_freed, that merory were used as btree node before,
+and may be not fill with 0.
+>This patch removes the redundant code, and add comments in
+>bch_btree_keys_init() and mca_bucket_alloc() to explain why it's safe.
+>
+>Signed-off-by: Coly Li <colyli@suse.de>
+>---
+> drivers/md/bcache/bset.c  | 13 ++++++-------
+> drivers/md/bcache/btree.c |  4 ++++
+> 2 files changed, 10 insertions(+), 7 deletions(-)
+>
+>diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
+>index 579c696a5fe0..343f4e9428e0 100644
+>--- a/drivers/md/bcache/bset.c
+>+++ b/drivers/md/bcache/bset.c
+>@@ -352,15 +352,14 @@ void bch_btree_keys_init(struct btree_keys *b, const struct btree_keys_ops *ops,
+>     b->nsets = 0;
+>     b->last_set_unwritten = 0;
+> 
+>-    /* XXX: shouldn't be needed */
+>-    for (i = 0; i < MAX_BSETS; i++)
+>-        b->set[i].size = 0;
+>     /*
+>-     * Second loop starts at 1 because b->keys[0]->data is the memory we
+>-     * allocated
+>+     * struct btree_keys in embedded in struct btree, and struct
+>+     * bset_tree is embedded into struct btree_keys. They are all
+>+     * initialized as 0 by kzalloc() in mca_bucket_alloc(), and
+>+     * b->set[0].data is allocated in bch_btree_keys_alloc(), so we
+>+     * don't have to initiate b->set[].size and b->set[].data here
+>+     * any more.
+>      */
+>-    for (i = 1; i < MAX_BSETS; i++)
+>-        b->set[i].data = NULL;
+> }
+> EXPORT_SYMBOL(bch_btree_keys_init);
+> 
+>diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+>index 17936b2dc7d6..344641e23415 100644
+>--- a/drivers/md/bcache/btree.c
+>+++ b/drivers/md/bcache/btree.c
+>@@ -600,6 +600,10 @@ static void mca_data_alloc(struct btree *b, struct bkey *k, gfp_t gfp)
+> static struct btree *mca_bucket_alloc(struct cache_set *c,
+>                       struct bkey *k, gfp_t gfp)
+> {
+>+    /*
+>+     * kzalloc() is necessary here for initialization,
+>+     * see code comments in bch_btree_keys_init().
+>+     */
+>     struct btree *b = kzalloc(sizeof(struct btree), gfp);
+>     if (!b)
+>         return NULL;
+>-- 
+>2.16.2
 
-So this patch only sets the flag of RQF_MQ_TIMEOUT_EXPIRED when .timeout
-returns neither BLK_EH_RESET_TIMER nor BLK_EH_HANDLED.
 
-Cc: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: Israel Rukshin <israelr@mellanox.com>,
-Cc: Max Gurtovoy <maxg@mellanox.com>
-Cc: Martin Steigerwald <Martin@Lichtvoll.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c      | 4 ++--
- block/blk-timeout.c | 1 -
- 2 files changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0dc9e341c2a7..d6a21898933d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -815,8 +815,6 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
- 	const struct blk_mq_ops *ops = req->q->mq_ops;
- 	enum blk_eh_timer_return ret = BLK_EH_RESET_TIMER;
- 
--	req->rq_flags |= RQF_MQ_TIMEOUT_EXPIRED;
--
- 	if (ops->timeout)
- 		ret = ops->timeout(req, reserved);
- 
-@@ -834,9 +832,11 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
- 		blk_add_timer(req);
- 		break;
- 	case BLK_EH_NOT_HANDLED:
-+		req->rq_flags |= RQF_MQ_TIMEOUT_EXPIRED;
- 		break;
- 	default:
- 		printk(KERN_ERR "block: bad eh return: %d\n", ret);
-+		req->rq_flags |= RQF_MQ_TIMEOUT_EXPIRED;
- 		break;
- 	}
- }
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index 652d4d4d3e97..f95d6e6cbc96 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -214,7 +214,6 @@ void blk_add_timer(struct request *req)
- 		req->timeout = q->rq_timeout;
- 
- 	blk_rq_set_deadline(req, jiffies + req->timeout);
--	req->rq_flags &= ~RQF_MQ_TIMEOUT_EXPIRED;
- 
- 	/*
- 	 * Only the non-mq case needs to add the request to a protected list.
--- 
-2.9.5
+Thanks.
+Tang Junhui
