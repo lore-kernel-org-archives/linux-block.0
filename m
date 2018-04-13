@@ -1,13 +1,12 @@
 Return-Path: <axboe@kernel.dk>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc: Ming Lei <ming.lei@redhat.com>
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: ming.lei@redhat.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/2] loop: handle short DIO reads
-Date: Fri, 13 Apr 2018 16:30:36 -0600
-Message-Id: <1523658636-2212-3-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1523658636-2212-1-git-send-email-axboe@kernel.dk>
-References: <1523658636-2212-1-git-send-email-axboe@kernel.dk>
+Subject: loop: handle short DIO reads
+Message-ID: <e6ce722c-56d0-3519-a22b-0e40967425f5@kernel.dk>
+Date: Fri, 13 Apr 2018 12:39:16 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
 We ran into an issue with loop and btrfs, where btrfs would complain about
@@ -21,28 +20,27 @@ Handle short reads appropriately, by simply retrying at the new correct
 offset. End the remainder of the request with EIO, if we get a 0 read.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
 ---
- drivers/block/loop.c | 34 +++++++++++++++++++++++++++-------
- 1 file changed, 27 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 8b2fde2109fc..5d4e31655d96 100644
+index c9d04497a415..66975c4fb6f1 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -451,16 +451,36 @@ static int lo_req_flush(struct loop_device *lo, struct request *rq)
+@@ -451,16 +451,28 @@ static int lo_req_flush(struct loop_device *lo, struct request *rq)
  static void lo_complete_rq(struct request *rq)
  {
  	struct loop_cmd *cmd = blk_mq_rq_to_pdu(rq);
 +	blk_status_t ret = BLK_STS_OK;
  
--	if (unlikely(req_op(rq) == REQ_OP_READ && cmd->use_aio &&
--		     cmd->ret >= 0 && cmd->ret < blk_rq_bytes(rq))) {
--		struct bio *bio = rq->bio;
+-	if (unlikely(req_op(cmd->rq) == REQ_OP_READ && cmd->use_aio &&
+-		     cmd->ret >= 0 && cmd->ret < blk_rq_bytes(cmd->rq))) {
+-		struct bio *bio = cmd->rq->bio;
 -
 -		bio_advance(bio, cmd->ret);
 -		zero_fill_bio(bio);
 +	if (!cmd->use_aio || cmd->ret < 0 || cmd->ret == blk_rq_bytes(rq) ||
-+	    req_op(rq) != REQ_OP_READ) {
++	    req_op(cmd->rq) != REQ_OP_READ) {
 +		if (cmd->ret < 0)
 +			ret = BLK_STS_IOERR;
 +		goto end_io;
@@ -54,18 +52,10 @@ index 8b2fde2109fc..5d4e31655d96 100644
 +	 * retry it. If we got no data, end the rest with EIO.
 +	 */
 +	if (cmd->ret) {
-+		blk_update_request(rq, BLK_STS_OK, cmd->ret);
++		blk_update_request(cmd->rq, BLK_STS_OK, cmd->ret);
 +		cmd->ret = 0;
-+		blk_mq_requeue_request(rq, true);
++		blk_mq_requeue_request(cmd->rq, true);
 +	} else {
-+		if (cmd->use_aio) {
-+			struct bio *bio = rq->bio;
-+
-+			while (bio) {
-+				zero_fill_bio(bio);
-+				bio = bio->bi_next;
-+			}
-+		}
 +		ret = BLK_STS_IOERR;
 +end_io:
 +		blk_mq_end_request(rq, ret);
@@ -73,5 +63,6 @@ index 8b2fde2109fc..5d4e31655d96 100644
  }
  
  static void lo_rw_aio_do_completion(struct loop_cmd *cmd)
+
 -- 
-2.7.4
+Jens Axboe
