@@ -1,111 +1,132 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.17-rc2
-Message-ID: <4af49398-d746-f9a9-a9bc-ca2007b39a00@kernel.dk>
-Date: Wed, 25 Apr 2018 10:50:36 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from out1.zte.com.cn ([202.103.147.172]:41340 "EHLO mxct.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751963AbeDMBBL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Apr 2018 21:01:11 -0400
+From: tang.junhui@zte.com.cn
+To: colyli@suse.de
+Cc: kent.overstreet@gmail.com, mlyle@lyle.org,
+        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
+Subject: Re: [PATCH] bcache: simplify the calculation of the total amount of flash dirty data
+Date: Fri, 13 Apr 2018 09:01:08 +0800
+Message-Id: <1523581268-17311-1-git-send-email-tang.junhui@zte.com.cn>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Linus,
+Hi Coly,
 
-I ended up sitting on this about a week longer than I wanted to,
-since we were hashing out details with a timeout change. I've now
-killed that patch, so we can flush the existing queue in due time.
+> On 2018/4/12 3:21 PM, tang.junhui@zte.com.cn wrote:
+> > From: Tang Junhui <tang.junhui@zte.com.cn>
+> > 
+> > Currently we calculate the total amount of flash only devices dirty data
+> > by adding the dirty data of each flash only device under registering
+> > locker. It is very inefficient.
+> > 
+> > In this patch, we add a member flash_dev_dirty_sectors in struct cache_set
+> > to record the total amount of flash only devices dirty data in real time,
+> > so we didn't need to calculate the total amount of dirty data any more.
+> > 
+> > Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+> 
+> Hi Junhui,
+> 
+> The patch looks good to me, you have my
+>     Reviewed-by: Coly Li <colyli@suse.de>
+> 
 
-This pull request contains:
+Thanks for your review.
 
-- Fix for an old regression, where entering the queue can be disturbed
-  by a signal to the process. This can cause spurious EIO. Fix from Alan
-  Jenkins.
+> Thanks.
+> 
+> Coly Li
+> 
+> > ---
+> >  drivers/md/bcache/bcache.h    |  1 +
+> >  drivers/md/bcache/super.c     |  2 ++
+> >  drivers/md/bcache/writeback.c |  5 ++++-
+> >  drivers/md/bcache/writeback.h | 19 -------------------
+> >  4 files changed, 7 insertions(+), 20 deletions(-)
+> > 
+> > diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+> > index 843877e..cdbd596 100644
+> > --- a/drivers/md/bcache/bcache.h
+> > +++ b/drivers/md/bcache/bcache.h
+> > @@ -490,6 +490,7 @@ struct cache_set {
+> >      struct bcache_device    **devices;
+> >      struct list_head    cached_devs;
+> >      uint64_t        cached_dev_sectors;
+> > +    atomic_long_t        flash_dev_dirty_sectors;
+> >      struct closure        caching;
+> >  
+> >      struct closure        sb_write;
+> > diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> > index b4d2892..772520e 100644
+> > --- a/drivers/md/bcache/super.c
+> > +++ b/drivers/md/bcache/super.c
+> > @@ -1208,6 +1208,8 @@ static void flash_dev_free(struct closure *cl)
+> >  {
+> >      struct bcache_device *d = container_of(cl, struct bcache_device, cl);
+> >      mutex_lock(&bch_register_lock);
+> > +    atomic_long_sub(bcache_dev_sectors_dirty(d),
+> > +            &d->c->flash_dev_dirty_sectors);
+> >      bcache_device_free(d);
+> >      mutex_unlock(&bch_register_lock);
+> >      kobject_put(&d->kobj);
+> > diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+> > index 56a3788..ec50d76 100644
+> > --- a/drivers/md/bcache/writeback.c
+> > +++ b/drivers/md/bcache/writeback.c
+> > @@ -23,7 +23,7 @@ static void __update_writeback_rate(struct cached_dev *dc)
+> >  {
+> >      struct cache_set *c = dc->disk.c;
+> >      uint64_t cache_sectors = c->nbuckets * c->sb.bucket_size -
+> > -                bcache_flash_devs_sectors_dirty(c);
+> > +                atomic_long_read(&c->flash_dev_dirty_sectors);
+> >      uint64_t cache_dirty_target =
+> >          div_u64(cache_sectors * dc->writeback_percent, 100);
+> >      int64_t target = div64_u64(cache_dirty_target * bdev_sectors(dc->bdev),
+> > @@ -314,6 +314,9 @@ void bcache_dev_sectors_dirty_add(struct cache_set *c, unsigned inode,
+> >      if (!d)
+> >          return;
+> >  
+> > +    if (UUID_FLASH_ONLY(&c->uuids[inode]))
+> > +        atomic_long_add(nr_sectors, &c->flash_dev_dirty_sectors);
+> > +
+> >      stripe = offset_to_stripe(d, offset);
+> >      stripe_offset = offset & (d->stripe_size - 1);
+> >  
+> > diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
+> > index a9e3ffb..1a7eacf 100644
+> > --- a/drivers/md/bcache/writeback.h
+> > +++ b/drivers/md/bcache/writeback.h
+> > @@ -15,25 +15,6 @@ static inline uint64_t bcache_dev_sectors_dirty(struct bcache_device *d)
+> >      return ret;
+> >  }
+> >  
+> > -static inline uint64_t  bcache_flash_devs_sectors_dirty(struct cache_set *c)
+> > -{
+> > -    uint64_t i, ret = 0;
+> > -
+> > -    mutex_lock(&bch_register_lock);
+> > -
+> > -    for (i = 0; i < c->nr_uuids; i++) {
+> > -        struct bcache_device *d = c->devices[i];
+> > -
+> > -        if (!d || !UUID_FLASH_ONLY(&c->uuids[i]))
+> > -            continue;
+> > -       ret += bcache_dev_sectors_dirty(d);
+> > -    }
+> > -
+> > -    mutex_unlock(&bch_register_lock);
+> > -
+> > -    return ret;
+> > -}
+> > -
+> >  static inline unsigned offset_to_stripe(struct bcache_device *d,
+> >                      uint64_t offset)
+> >  {
+> > 
 
-- cdrom information leak fix from Dan.
-
-- Trivial helper for testing queue FUA from Dave Chinner, part of his
-  O_DIRECT FUA series.
-
-- Series of swim fixes from Finn that actually makes it work again.
-
-- Loop O_DIRECT corruption fix, which caused data corruption in
-  production for us. From me.
-
-- BFQ crash fix from me.
-
-- bcache maintainer update. Michael no longer has the time to do it,
-  Coly has stepped up to serve as the new maintainer.
-
-- blkcg locking fixes from Jiang Biao.
-
-- Revert of a change from this merge window from Ming, that causes an
-  issue on some hardware.
-
-- Minor clarification doc addition from Linus Walleij.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20180425
-
-
-----------------------------------------------------------------
-Alan Jenkins (1):
-      block: do not use interruptible wait anywhere
-
-Dan Carpenter (1):
-      cdrom: information leak in cdrom_ioctl_media_changed()
-
-Dave Chinner (1):
-      block: add blk_queue_fua() helper function
-
-Finn Thain (8):
-      m68k/mac: Don't remap SWIM MMIO region
-      block/swim: Fix array bounds check
-      block/swim: Remove extra put_disk() call from error path
-      block/swim: Don't log an error message for an invalid ioctl
-      block/swim: Rename macros to avoid inconsistent inverted logic
-      block/swim: Check drive type
-      block/swim: Fix IO error at end of medium
-      block/swim: Select appropriate drive on device open
-
-Jens Axboe (4):
-      loop: remove cmd->rq member
-      loop: handle short DIO reads
-      bfq-iosched: ensure to clear bic/bfqq pointers when preparing request
-      bcache: mark Coly Li as bcache maintainer
-
-Jianchao Wang (1):
-      blk-mq: start request gstate with gen 1
-
-Jiang Biao (3):
-      blkcg: don't hold blkcg lock when deactivating policy
-      blkcg: small fix on comment in blkcg_init_queue
-      blkcg: init root blkcg_gq under lock
-
-Linus Walleij (1):
-      block: mq: Add some minor doc for core structs
-
-Michael Lyle (1):
-      MAINTAINERS: Remove me as maintainer of bcache
-
-Ming Lei (1):
-      Revert "blk-mq: remove code for dealing with remapping queue"
-
- MAINTAINERS            |  2 +-
- block/bfq-iosched.c    | 10 +++++++-
- block/blk-cgroup.c     | 28 ++++++++++------------
- block/blk-core.c       | 15 ++++++------
- block/blk-mq.c         | 41 +++++++++++++++++++++++++++++---
- block/blk-mq.h         |  3 +++
- drivers/block/loop.c   | 64 +++++++++++++++++++++++++++++++++-----------------
- drivers/block/loop.h   |  1 -
- drivers/block/swim.c   | 49 +++++++++++++++++---------------------
- drivers/block/swim3.c  |  6 ++---
- drivers/cdrom/cdrom.c  |  2 +-
- include/linux/blk-mq.h |  3 +++
- include/linux/blkdev.h |  1 +
- 13 files changed, 144 insertions(+), 81 deletions(-)
-
--- 
-Jens Axboe
+Thanks.
+Tang Junhui
