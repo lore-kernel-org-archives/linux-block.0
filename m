@@ -2,14 +2,14 @@ Return-Path: <maier@linux.ibm.com>
 From: Steffen Maier <maier@linux.ibm.com>
 To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
 Cc: Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, Li Zefan <lizefan@huawei.com>,
+        Jens Axboe <axboe@kernel.dk>, Li Zefan <lizf@cn.fujitsu.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Steffen Maier <maier@linux.ibm.com>
-Subject: [RFC v2] tracing/events: block: also try to get dev_t via driver core for some events
-Date: Fri, 13 Apr 2018 18:36:23 +0200
-In-Reply-To: <20180413163623.11282-1-maier@linux.ibm.com>
-References: <20180413163623.11282-1-maier@linux.ibm.com>
-Message-Id: <20180413163623.11282-4-maier@linux.ibm.com>
+Subject: [RFC] tracing/events: block: also try to get dev_t via driver core for some events
+Date: Fri, 13 Apr 2018 15:07:19 +0200
+In-Reply-To: <20180413130719.22921-1-maier@linux.ibm.com>
+References: <20180413130719.22921-1-maier@linux.ibm.com>
+Message-Id: <20180413130719.22921-4-maier@linux.ibm.com>
 List-ID: <linux-block@vger.kernel.org>
 
 Complements v2.6.31 commit 55782138e47d ("tracing/events: convert block
@@ -30,7 +30,7 @@ Signed-off-by: Steffen Maier <maier@linux.ibm.com>
  1 file changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index 6ea5a3899c2e..001e4f369df9 100644
+index cffedc26e8a3..c476b7af404b 100644
 --- a/include/trace/events/block.h
 +++ b/include/trace/events/block.h
 @@ -86,7 +86,9 @@ TRACE_EVENT(block_rq_requeue,
