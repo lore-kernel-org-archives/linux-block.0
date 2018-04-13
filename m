@@ -1,68 +1,48 @@
-Return-Path: <axboe@kernel.dk>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: Ming Lei <ming.lei@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: loop: handle short DIO reads
-Message-ID: <e6ce722c-56d0-3519-a22b-0e40967425f5@kernel.dk>
-Date: Fri, 13 Apr 2018 12:39:16 -0600
+Return-Path: <sbates@raithlin.com>
+From: "Stephen  Bates" <sbates@raithlin.com>
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>, Logan Gunthorpe
+	<logang@deltatee.com>
+CC: Bjorn Helgaas <helgaas@kernel.org>, Sinan Kaya <okaya@codeaurora.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "Christoph
+ Hellwig" <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Keith Busch
+	<keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>, Bjorn Helgaas
+	<bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>, Max Gurtovoy
+	<maxg@mellanox.com>, Dan Williams <dan.j.williams@intel.com>,
+	=?utf-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>, Benjamin Herrenschmidt
+	<benh@kernel.crashing.org>, Alex Williamson <alex.williamson@redhat.com>,
+	Eric Wehage <Eric.Wehage@huawei.com>
+Subject: Re: [PATCH v3 01/11] PCI/P2PDMA: Support peer-to-peer memory
+Date: Fri, 13 Apr 2018 21:56:06 +0000
+Message-ID: <178FD8FA-53BA-49DA-807F-F8736157F179@raithlin.com>
+References: <20180312193525.2855-1-logang@deltatee.com>
+ <20180312193525.2855-2-logang@deltatee.com>
+ <59fd2f5d-177f-334a-a9c4-0f8a6ec7c303@codeaurora.org>
+ <24d8e5c2-065d-8bde-3f5d-7f158be9c578@deltatee.com>
+ <20180326121138.00005e30@huawei.com>
+ <20180326140118.GA221690@bhelgaas-glaptop.roam.corp.google.com>
+ <c717eb06-1e83-f0f3-4d6c-15531aa808e0@deltatee.com>
+ <20180327094701.0000300d@huawei.com>
+In-Reply-To: <20180327094701.0000300d@huawei.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-We ran into an issue with loop and btrfs, where btrfs would complain about
-checksum errors. It turns out that is because we don't handle short reads
-at all, we just zero fill the remainder. Worse than that, we don't handle
-the filling properly, which results in loop trying to advance a single
-bio by much more than its size, since it doesn't take chaining into
-account.
-
-Handle short reads appropriately, by simply retrying at the new correct
-offset. End the remainder of the request with EIO, if we get a 0 read.
-
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
----
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index c9d04497a415..66975c4fb6f1 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -451,16 +451,28 @@ static int lo_req_flush(struct loop_device *lo, struct request *rq)
- static void lo_complete_rq(struct request *rq)
- {
- 	struct loop_cmd *cmd = blk_mq_rq_to_pdu(rq);
-+	blk_status_t ret = BLK_STS_OK;
- 
--	if (unlikely(req_op(cmd->rq) == REQ_OP_READ && cmd->use_aio &&
--		     cmd->ret >= 0 && cmd->ret < blk_rq_bytes(cmd->rq))) {
--		struct bio *bio = cmd->rq->bio;
--
--		bio_advance(bio, cmd->ret);
--		zero_fill_bio(bio);
-+	if (!cmd->use_aio || cmd->ret < 0 || cmd->ret == blk_rq_bytes(rq) ||
-+	    req_op(cmd->rq) != REQ_OP_READ) {
-+		if (cmd->ret < 0)
-+			ret = BLK_STS_IOERR;
-+		goto end_io;
- 	}
- 
--	blk_mq_end_request(rq, cmd->ret < 0 ? BLK_STS_IOERR : BLK_STS_OK);
-+	/*
-+	 * Short READ - if we got some data, advance our request and
-+	 * retry it. If we got no data, end the rest with EIO.
-+	 */
-+	if (cmd->ret) {
-+		blk_update_request(cmd->rq, BLK_STS_OK, cmd->ret);
-+		cmd->ret = 0;
-+		blk_mq_requeue_request(cmd->rq, true);
-+	} else {
-+		ret = BLK_STS_IOERR;
-+end_io:
-+		blk_mq_end_request(rq, ret);
-+	}
- }
- 
- static void lo_rw_aio_do_completion(struct loop_cmd *cmd)
-
--- 
-Jens Axboe
+IA0KPiAgSSdsbCBzZWUgaWYgSSBjYW4gZ2V0IG91ciBQQ0kgU0lHIHBlb3BsZSB0byBmb2xsb3cg
+dGhpcyB0aHJvdWdoIA0KDQpIaSBKb25hdGhhbg0KDQpDYW4geW91IGxldCBtZSBrbm93IGlmIHRo
+aXMgbW92ZXMgZm9yd2FyZCB3aXRoaW4gUENJLVNJRz8gSSB3b3VsZCBsaWtlIHRvIHRyYWNrIGl0
+LiBJIGNhbiBzZWUgdGhpcyBiZWluZyBkb2FibGUgYmV0d2VlbiBSb290IFBvcnRzIHRoYXQgcmVz
+aWRlIGluIHRoZSBzYW1lIFJvb3QgQ29tcGxleCBidXQgbWlnaHQgYmVjb21lIG1vcmUgY2hhbGxl
+bmdpbmcgdG8gc3RhbmRhcmRpemUgZm9yIFJQcyB0aGF0IHJlc2lkZSBpbiBkaWZmZXJlbnQgUkNz
+IGluIHRoZSBzYW1lIChwb3RlbnRpYWxseSBtdWx0aS1zb2NrZXQpIHN5c3RlbS4gSSBrbm93IGlu
+IHRoZSBwYXN0IHdlIGhhdmUgc2VlbSBNZW1XciBUTFBTIGNyb3NzIHRoZSBRUEkgYnVzIGluIElu
+dGVsIHN5c3RlbXMgYnV0IEkgYW0gc3VyZSB0aGF0IGlzIG5vdCBzb21ldGhpbmcgdGhhdCB3b3Vs
+ZCB3b3JrIGluIGFsbCBzeXN0ZW1zIGFuZCBtdXN0IGZhbGwgb3V0c2lkZSB0aGUgcmVtaXQgb2Yg
+UENJLVNJRyA7LSkuDQoNCkkgYWdyZWUgc3VjaCBhIGNhcGFiaWxpdHkgYml0IHdvdWxkIGJlIHZl
+cnkgdXNlZnVsIGJ1dCBpdCdzIGdvaW5nIHRvIGJlIHF1aXRlIHNvbWUgdGltZSBiZWZvcmUgd2Ug
+Y2FuIHJlbHkgb24gaGFyZHdhcmUgYmVpbmcgYXZhaWxhYmxlIHRoYXQgc3VwcG9ydHMgaXQuDQoN
+ClN0ZXBoZW4NCiAgICANCg0K
