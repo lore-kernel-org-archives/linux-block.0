@@ -2,14 +2,14 @@ Return-Path: <maier@linux.ibm.com>
 From: Steffen Maier <maier@linux.ibm.com>
 To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
 Cc: Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, Li Zefan <lizefan@huawei.com>,
+        Jens Axboe <axboe@kernel.dk>, Li Zefan <lizf@cn.fujitsu.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Steffen Maier <maier@linux.ibm.com>
-Subject: [PATCH v2 2/2] tracing/events: block: dev_t via driver core for plug and unplug events
-Date: Fri, 13 Apr 2018 18:36:22 +0200
-In-Reply-To: <20180413163623.11282-1-maier@linux.ibm.com>
-References: <20180413163623.11282-1-maier@linux.ibm.com>
-Message-Id: <20180413163623.11282-3-maier@linux.ibm.com>
+Subject: [PATCH 2/2] tracing/events: block: dev_t via driver core for plug and unplug events
+Date: Fri, 13 Apr 2018 15:07:18 +0200
+In-Reply-To: <20180413130719.22921-1-maier@linux.ibm.com>
+References: <20180413130719.22921-1-maier@linux.ibm.com>
+Message-Id: <20180413130719.22921-3-maier@linux.ibm.com>
 List-ID: <linux-block@vger.kernel.org>
 
 Complements v2.6.31 commit 55782138e47d ("tracing/events: convert block
@@ -105,7 +105,7 @@ Signed-off-by: Steffen Maier <maier@linux.ibm.com>
  1 file changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index e90bb6eb8097..6ea5a3899c2e 100644
+index a13613d27cee..cffedc26e8a3 100644
 --- a/include/trace/events/block.h
 +++ b/include/trace/events/block.h
 @@ -460,14 +460,18 @@ TRACE_EVENT(block_plug,
