@@ -1,34 +1,40 @@
-Return-Path: <BATV+d9901c46b23ecc19815a+5342+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: Bart.VanAssche@wdc.com,
-	willy@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: [PATCH 2/7] block: fix __get_request documentation
-Date: Mon,  9 Apr 2018 17:39:11 +0200
-Message-Id: <20180409153916.23901-3-hch@lst.de>
-In-Reply-To: <20180409153916.23901-1-hch@lst.de>
-References: <20180409153916.23901-1-hch@lst.de>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 13 Apr 2018 08:18:42 -0700
+From: "tj@kernel.org" <tj@kernel.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"00moses.alexander00@gmail.com" <00moses.alexander00@gmail.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH] block: Ensure that a request queue is dissociated from
+ the cgroup controller
+Message-ID: <20180413151842.GC1911913@devbig577.frc2.facebook.com>
+References: <20180412135149.GX793541@devbig577.frc2.facebook.com>
+ <af6dafea-d754-8a0d-b96b-81716f2ea24d@wdc.com>
+ <20180412153748.GB793541@devbig577.frc2.facebook.com>
+ <beafd7bc4f2fdb7e672ad97e57ff4f82464182da.camel@wdc.com>
+ <20180412161247.GD793541@devbig577.frc2.facebook.com>
+ <f98af37ea6755119177c26fbb73b0071ddef90b8.camel@wdc.com>
+ <20180412181121.GA1911913@devbig577.frc2.facebook.com>
+ <22e0bba319877407a0abccf292ef0b22454db04d.camel@wdc.com>
+ <20180412190915.GB1911913@devbig577.frc2.facebook.com>
+ <ee8defd68976a607c03ee6c0ad4e14217f328db3.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <ee8defd68976a607c03ee6c0ad4e14217f328db3.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hello, Bart.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index abcb8684ba67..abde22c755ab 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1517,7 +1517,7 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
-  * @bio: bio to allocate request for (can be %NULL)
-  * @flags: BLK_MQ_REQ_* flags.
-  *
-- * Get a free request from @q.  If %__GFP_DIRECT_RECLAIM is set in @gfp_mask,
-+ * Get a free request from @q.  If %BLK_MQ_REQ_NOWAIT is set in @flags,
-  * this function keeps retrying under memory pressure and fails iff @q is dead.
-  *
-  * Must be called with @q->queue_lock held and,
+On Thu, Apr 12, 2018 at 10:40:52PM +0000, Bart Van Assche wrote:
+> Is something like the patch below perhaps what you had in mind?
+
+Yeah, exactly.  It'd be really great to have the lockdep asserts add
+to the right places.
+
+Thanks.
+
 -- 
-2.16.3
+tejun
