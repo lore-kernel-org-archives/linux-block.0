@@ -1,165 +1,203 @@
-Return-Path: <fthain@telegraphics.com.au>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Jens Axboe <axboe@kernel.dk>,
-    Laurent Vivier <lvivier@redhat.com>,
-    linux-m68k@lists.linux-m68k.org,
-    linux-kernel@vger.kernel.org,
-    linux-block@vger.kernel.org,
-    stable@vger.kernel.org
-Message-Id: <d51df9ec57959b04f93ae1e40ed8c61fc3155cb0.1523493475.git.fthain@telegraphics.com.au>
-In-Reply-To: <cover.1523493475.git.fthain@telegraphics.com.au>
-References: <cover.1523493475.git.fthain@telegraphics.com.au>
-From: Finn Thain <fthain@telegraphics.com.au>
-Subject: [PATCH v2 03/10] m68k/mac: Don't remap SWIM MMIO region
-Date: Wed, 11 Apr 2018 20:50:14 -0400 (EDT)
+Return-Path: <alex@iss-integration.com>
+MIME-Version: 1.0
+In-Reply-To: <20180413160334.5496-1-josef@toxicpanda.com>
+References: <20180413160334.5496-1-josef@toxicpanda.com>
+From: Alex Gorbachev <alex@iss-integration.com>
+Date: Fri, 13 Apr 2018 23:03:12 -0400
+Message-ID: <CAM1qzF5DOT1-RwpkwtG4X4MHtTgttz1mLLmXvhg_qyvN_h5=2Q@mail.gmail.com>
+Subject: Re: [PATCH 1/3] nbd: del_gendisk after we cleanup the queue
+To: Josef Bacik <josef@toxicpanda.com>
+Cc: axboe@kernel.dk, nbd@other.debian.org, linux-block@vger.kernel.org,
+	kernel-team@fb.com, Josef Bacik <jbacik@fb.com>, stable@vger.kernel.org
+Content-Type: multipart/alternative; boundary="f4f5e80ecc14bbd6470569c63aa4"
 List-ID: <linux-block@vger.kernel.org>
 
-For reasons I don't understand, calling ioremap() then iounmap() on
-the SWIM MMIO region causes a hang on 68030 (but not on 68040).
+--f4f5e80ecc14bbd6470569c63aa4
+Content-Type: text/plain; charset="UTF-8"
 
-~# modprobe swim_mod
-SWIM floppy driver Version 0.2 (2008-10-30)
-SWIM device not found !
-watchdog: BUG: soft lockup - CPU#0 stuck for 23s! [modprobe:285]
-Modules linked in: swim_mod(+)
-Format 00  Vector: 0064  PC: 000075aa  Status: 2000    Not tainted
-ORIG_D0: ffffffff  D0: d00c0000  A2: 007c2370  A1: 003f810c
-A0: 00040000  D5: d0096800  D4: d0097e00
-D3: 00000001  D2: 00000003  D1: 00000000
-Non-Maskable Interrupt
-Modules linked in: swim_mod(+)
-PC: [<000075ba>] __iounmap+0x24/0x10e
-SR: 2000  SP: 007abc48  a2: 007c2370
-d0: d00c0000    d1: 000001a0    d2: 00000019    d3: 00000001
-d4: d0097e00    d5: d0096800    a0: 00040000    a1: 003f810c
-Process modprobe (pid: 285, task=007c2370)
-Frame format=0
-Stack from 007abc7c:
-        ffffffed 00000000 006a4060 004712e0 007abca0 000076ea d0080000 00080000
-        010bb4b8 007abcd8 010ba542 d0096000 00000000 00000000 00000001 010bb59c
-        00000000 007abf30 010bb4b8 0047760a 0047763c 00477612 00616540 007abcec
-        0020a91a 00477600 0047760a 010bb4cc 007abd18 002092f2 0047760a 00333b06
-        007abd5c 00000000 0047760a 010bb4cc 00404f90 004776b8 00000001 007abd38
-        00209446 010bb4cc 0047760a 010bb4cc 0020938e 0031f8be 00616540 007abd64
-Call Trace: [<000076ea>] iounmap+0x46/0x5a
- [<00080000>] shrink_page_list+0x7f6/0xe06
- [<010ba542>] swim_probe+0xe4/0x496 [swim_mod]
- [<0020a91a>] platform_drv_probe+0x20/0x5e
- [<002092f2>] driver_probe_device+0x21c/0x2b8
- [<00333b06>] mutex_lock+0x0/0x2e
- [<00209446>] __driver_attach+0xb8/0xce
- [<0020938e>] __driver_attach+0x0/0xce
- [<0031f8be>] klist_next+0x0/0xa0
- [<00207562>] bus_for_each_dev+0x74/0xba
- [<000344c0>] blocking_notifier_call_chain+0x0/0x20
- [<00333b06>] mutex_lock+0x0/0x2e
- [<00208e44>] driver_attach+0x1a/0x1e
- [<0020938e>] __driver_attach+0x0/0xce
- [<00207e26>] bus_add_driver+0x188/0x234
- [<000344c0>] blocking_notifier_call_chain+0x0/0x20
- [<00209894>] driver_register+0x58/0x104
- [<000344c0>] blocking_notifier_call_chain+0x0/0x20
- [<010bd000>] swim_init+0x0/0x2c [swim_mod]
- [<0020a7be>] __platform_driver_register+0x38/0x3c
- [<010bd028>] swim_init+0x28/0x2c [swim_mod]
- [<000020dc>] do_one_initcall+0x38/0x196
- [<000344c0>] blocking_notifier_call_chain+0x0/0x20
- [<003331cc>] mutex_unlock+0x0/0x3e
- [<00333b06>] mutex_lock+0x0/0x2e
- [<003331cc>] mutex_unlock+0x0/0x3e
- [<00333b06>] mutex_lock+0x0/0x2e
- [<003331cc>] mutex_unlock+0x0/0x3e
- [<00333b06>] mutex_lock+0x0/0x2e
- [<003331cc>] mutex_unlock+0x0/0x3e
- [<00333b06>] mutex_lock+0x0/0x2e
- [<00075008>] __free_pages+0x0/0x38
- [<000045c0>] mangle_kernel_stack+0x30/0xda
- [<000344c0>] blocking_notifier_call_chain+0x0/0x20
- [<003331cc>] mutex_unlock+0x0/0x3e
- [<00333b06>] mutex_lock+0x0/0x2e
- [<0005ced4>] do_init_module+0x42/0x266
- [<010bd000>] swim_init+0x0/0x2c [swim_mod]
- [<000344c0>] blocking_notifier_call_chain+0x0/0x20
- [<0005eda0>] load_module+0x1a30/0x1e70
- [<0000465d>] mangle_kernel_stack+0xcd/0xda
- [<00331c64>] __generic_copy_from_user+0x0/0x46
- [<0033256e>] _cond_resched+0x0/0x32
- [<00331b9c>] memset+0x0/0x98
- [<0033256e>] _cond_resched+0x0/0x32
- [<0005f25c>] SyS_init_module+0x7c/0x112
- [<00002000>] _start+0x0/0x8
- [<00002000>] _start+0x0/0x8
- [<00331c82>] __generic_copy_from_user+0x1e/0x46
- [<0005f2b2>] SyS_init_module+0xd2/0x112
- [<0000465d>] mangle_kernel_stack+0xcd/0xda
- [<00002b40>] syscall+0x8/0xc
- [<0000465d>] mangle_kernel_stack+0xcd/0xda
- [<0008c00c>] pcpu_balance_workfn+0xb2/0x40e
-Code: 2200 7419 e4a9 e589 2841 d9fc 0000 1000 <2414> 7203 c282 7602 b681 6600 0096 0242 fe00 0482 0000 0000 e9c0 11c3 ed89 2642
+On Fri, Apr 13, 2018 at 12:03 PM, Josef Bacik <josef@toxicpanda.com> wrote:
 
-There's no need to call ioremap() for the SWIM address range, as it lies
-within the usual IO device region at 0x5000 0000, which has already been
-mapped by head.S.
+> From: Josef Bacik <jbacik@fb.com>
+>
+> This fixes a use after free bug, we need to do the del_gendisk after we
+> cleanup the queue on the device.
+>
 
-Remove the redundant ioremap() and iounmap() calls to fix the hang.
+The three patches Josef submitted today fix the problem with the online
+rbd-nbd expansion completely.
 
-Cc: Laurent Vivier <lvivier@redhat.com>
-Cc: stable@vger.kernel.org # v4.14+
-Tested-by: Stan Johnson <userm57@yahoo.com>
-Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
-Acked-by: Laurent Vivier <lvivier@redhat.com>
----
- drivers/block/swim.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+Fixes: c6a4759ea0c9 ("nbd: add device refcounting")
 
-diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index 64e066eba72e..92f0cddc597e 100644
---- a/drivers/block/swim.c
-+++ b/drivers/block/swim.c
-@@ -911,7 +911,7 @@ static int swim_probe(struct platform_device *dev)
- 		goto out;
- 	}
- 
--	swim_base = ioremap(res->start, resource_size(res));
-+	swim_base = (struct swim __iomem *)res->start;
- 	if (!swim_base) {
- 		ret = -ENOMEM;
- 		goto out_release_io;
-@@ -923,7 +923,7 @@ static int swim_probe(struct platform_device *dev)
- 	if (!get_swim_mode(swim_base)) {
- 		printk(KERN_INFO "SWIM device not found !\n");
- 		ret = -ENODEV;
--		goto out_iounmap;
-+		goto out_release_io;
- 	}
- 
- 	/* set platform driver data */
-@@ -931,7 +931,7 @@ static int swim_probe(struct platform_device *dev)
- 	swd = kzalloc(sizeof(struct swim_priv), GFP_KERNEL);
- 	if (!swd) {
- 		ret = -ENOMEM;
--		goto out_iounmap;
-+		goto out_release_io;
- 	}
- 	platform_set_drvdata(dev, swd);
- 
-@@ -945,8 +945,6 @@ static int swim_probe(struct platform_device *dev)
- 
- out_kfree:
- 	kfree(swd);
--out_iounmap:
--	iounmap(swim_base);
- out_release_io:
- 	release_mem_region(res->start, resource_size(res));
- out:
-@@ -974,8 +972,6 @@ static int swim_remove(struct platform_device *dev)
- 	for (drive = 0; drive < swd->floppy_count; drive++)
- 		floppy_eject(&swd->unit[drive]);
- 
--	iounmap(swd->base);
--
- 	res = platform_get_resource(dev, IORESOURCE_MEM, 0);
- 	if (res)
- 		release_mem_region(res->start, resource_size(res));
--- 
-2.16.1
+> cc: stable@vger.kernel.org
+
+> Signed-off-by: Josef Bacik <jbacik@fb.com>
+Tested-by: Alex Gorbachev <ag@iss-integration.com>
+
+> ---
+
+>  drivers/block/nbd.c | 2 +-
+
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+>
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+
+> index 86258b00a1d4..e33da3e6aa20 100644
+
+> --- a/drivers/block/nbd.c
+
+> +++ b/drivers/block/nbd.c
+
+> @@ -174,8 +174,8 @@ static void nbd_dev_remove(struct nbd_device *nbd)
+
+>  {
+
+>         struct gendisk *disk = nbd->disk;
+
+>         if (disk) {
+
+> -               del_gendisk(disk);
+
+>                 blk_cleanup_queue(disk->queue);
+
+> +               del_gendisk(disk);
+
+>                 blk_mq_free_tag_set(&nbd->tag_set);
+
+>                 disk->private_data = NULL;
+
+>                 put_disk(disk);
+
+> --
+
+> 2.14.3
+
+>
+>
+
+--f4f5e80ecc14bbd6470569c63aa4
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div class=3D"gmail_extra"><div><div class=3D"gmail_signat=
+ure" data-smartmail=3D"gmail_signature"><div dir=3D"ltr"><div dir=3D"ltr"><=
+div dir=3D"ltr"><div dir=3D"ltr"><div dir=3D"ltr"><div dir=3D"ltr"><div dir=
+=3D"ltr"><div dir=3D"ltr"><div dir=3D"ltr"><div dir=3D"ltr"><div dir=3D"ltr=
+"><div dir=3D"ltr">On Fri, Apr 13, 2018 at 12:03 PM, Josef Bacik <span dir=
+=3D"ltr">&lt;<a href=3D"mailto:josef@toxicpanda.com" target=3D"_blank">jose=
+f@toxicpanda.com</a>&gt;</span> wrote:<br></div></div></div></div></div></d=
+iv></div></div></div></div></div></div></div></div><div class=3D"gmail_quot=
+e"><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left=
+:1px #ccc solid;padding-left:1ex">From: Josef Bacik &lt;<a href=3D"mailto:j=
+bacik@fb.com">jbacik@fb.com</a>&gt;<br>
+<br>
+This fixes a use after free bug, we need to do the del_gendisk after we<br>
+cleanup the queue on the device.<br></blockquote><div><br></div><div>
+
+<span style=3D"color:rgb(34,34,34);font-family:arial,sans-serif;font-size:1=
+2.8px;font-style:normal;font-variant-ligatures:normal;font-variant-caps:nor=
+mal;font-weight:400;letter-spacing:normal;text-align:start;text-indent:0px;=
+text-transform:none;white-space:normal;word-spacing:0px;background-color:rg=
+b(255,255,255);text-decoration-style:initial;text-decoration-color:initial;=
+float:none;display:inline">The three patches Josef submitted today fix the =
+problem with the online rbd-nbd expansion completely.</span>=C2=A0</div><di=
+v>=C2=A0
+=C2=A0</div>Fixes: c6a4759ea0c9 (&quot;nbd: add device refcounting&quot;)<b=
+r><blockquote class=3D"gmail_quote" style=3D"margin:0px 0.8ex;border-left:1=
+px solid rgb(204,204,204);border-right:1px solid rgb(204,204,204);padding-l=
+eft:1ex;padding-right:1ex"></blockquote>cc: <a href=3D"mailto:stable@vger.k=
+ernel.org">stable@vger.kernel.org</a><br><blockquote class=3D"gmail_quote" =
+style=3D"margin:0px 0.8ex;border-left:1px solid rgb(204,204,204);border-rig=
+ht:1px solid rgb(204,204,204);padding-left:1ex;padding-right:1ex"></blockqu=
+ote>Signed-off-by: Josef Bacik &lt;<a href=3D"mailto:jbacik@fb.com">jbacik@=
+fb.com</a>&gt;</div><div class=3D"gmail_quote">
+
+<span style=3D"color:rgb(34,34,34);font-family:arial,sans-serif;font-size:1=
+2.8px;font-style:normal;font-variant-ligatures:normal;font-variant-caps:nor=
+mal;font-weight:400;letter-spacing:normal;text-align:start;text-indent:0px;=
+text-transform:none;white-space:normal;word-spacing:0px;background-color:rg=
+b(255,255,255);text-decoration-style:initial;text-decoration-color:initial;=
+float:none;display:inline">Tested-by: Alex Gorbachev &lt;</span><a href=3D"=
+mailto:ag@iss-integration.com" target=3D"_blank" style=3D"color:rgb(17,85,2=
+04);font-family:arial,sans-serif;font-size:12.8px;font-style:normal;font-va=
+riant-ligatures:normal;font-variant-caps:normal;font-weight:400;letter-spac=
+ing:normal;text-align:start;text-indent:0px;text-transform:none;white-space=
+:normal;word-spacing:0px;background-color:rgb(255,255,255)">ag@iss-integrat=
+ion.com</a><span style=3D"color:rgb(34,34,34);font-family:arial,sans-serif;=
+font-size:12.8px;font-style:normal;font-variant-ligatures:normal;font-varia=
+nt-caps:normal;font-weight:400;letter-spacing:normal;text-align:start;text-=
+indent:0px;text-transform:none;white-space:normal;word-spacing:0px;backgrou=
+nd-color:rgb(255,255,255);text-decoration-style:initial;text-decoration-col=
+or:initial;float:none;display:inline">&gt;</span>
+
+<br><blockquote class=3D"gmail_quote" style=3D"margin:0px 0.8ex;border-left=
+:1px solid rgb(204,204,204);border-right:1px solid rgb(204,204,204);padding=
+-left:1ex;padding-right:1ex"></blockquote>---<br><blockquote class=3D"gmail=
+_quote" style=3D"margin:0px 0.8ex;border-left:1px solid rgb(204,204,204);bo=
+rder-right:1px solid rgb(204,204,204);padding-left:1ex;padding-right:1ex"><=
+/blockquote>=C2=A0drivers/block/nbd.c | 2 +-<br><blockquote class=3D"gmail_=
+quote" style=3D"margin:0px 0.8ex;border-left:1px solid rgb(204,204,204);bor=
+der-right:1px solid rgb(204,204,204);padding-left:1ex;padding-right:1ex"></=
+blockquote>=C2=A01 file changed, 1 insertion(+), 1 deletion(-)<br><blockquo=
+te class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px =
+solid rgb(204,204,204);padding-left:1ex">
+</blockquote><br><blockquote class=3D"gmail_quote" style=3D"margin:0px 0.8e=
+x;border-left:1px solid rgb(204,204,204);border-right:1px solid rgb(204,204=
+,204);padding-left:1ex;padding-right:1ex"></blockquote>diff --git a/drivers=
+/block/nbd.c b/drivers/block/nbd.c<br><blockquote class=3D"gmail_quote" sty=
+le=3D"margin:0px 0.8ex;border-left:1px solid rgb(204,204,204);border-right:=
+1px solid rgb(204,204,204);padding-left:1ex;padding-right:1ex"></blockquote=
+>index 86258b00a1d4..e33da3e6aa20 100644<br><blockquote class=3D"gmail_quot=
+e" style=3D"margin:0px 0.8ex;border-left:1px solid rgb(204,204,204);border-=
+right:1px solid rgb(204,204,204);padding-left:1ex;padding-right:1ex"></bloc=
+kquote>--- a/drivers/block/nbd.c<br><blockquote class=3D"gmail_quote" style=
+=3D"margin:0px 0.8ex;border-left:1px solid rgb(204,204,204);border-right:1p=
+x solid rgb(204,204,204);padding-left:1ex;padding-right:1ex"></blockquote>+=
+++ b/drivers/block/nbd.c<br><blockquote class=3D"gmail_quote" style=3D"marg=
+in:0px 0.8ex;border-left:1px solid rgb(204,204,204);border-right:1px solid =
+rgb(204,204,204);padding-left:1ex;padding-right:1ex"></blockquote>@@ -174,8=
+ +174,8 @@ static void nbd_dev_remove(struct nbd_device *nbd)<br><blockquot=
+e class=3D"gmail_quote" style=3D"margin:0px 0.8ex;border-left:1px solid rgb=
+(204,204,204);border-right:1px solid rgb(204,204,204);padding-left:1ex;padd=
+ing-right:1ex"></blockquote>=C2=A0{<br><blockquote class=3D"gmail_quote" st=
+yle=3D"margin:0px 0.8ex;border-left:1px solid rgb(204,204,204);border-right=
+:1px solid rgb(204,204,204);padding-left:1ex;padding-right:1ex"></blockquot=
+e>=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct gendisk *disk =3D nbd-&gt;disk;<br><bl=
+ockquote class=3D"gmail_quote" style=3D"margin:0px 0.8ex;border-left:1px so=
+lid rgb(204,204,204);border-right:1px solid rgb(204,204,204);padding-left:1=
+ex;padding-right:1ex"></blockquote>=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (disk) {<=
+br><blockquote class=3D"gmail_quote" style=3D"margin:0px 0.8ex;border-left:=
+1px solid rgb(204,204,204);border-right:1px solid rgb(204,204,204);padding-=
+left:1ex;padding-right:1ex"></blockquote>-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0del_gendisk(disk);<br><blockquote class=3D"gmail_qu=
+ote" style=3D"margin:0px 0.8ex;border-left:1px solid rgb(204,204,204);borde=
+r-right:1px solid rgb(204,204,204);padding-left:1ex;padding-right:1ex"></bl=
+ockquote>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 blk_cleanu=
+p_queue(disk-&gt;queue)<wbr>;<br><blockquote class=3D"gmail_quote" style=3D=
+"margin:0px 0.8ex;border-left:1px solid rgb(204,204,204);border-right:1px s=
+olid rgb(204,204,204);padding-left:1ex;padding-right:1ex"></blockquote>+=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0del_gendisk(disk);<br><=
+blockquote class=3D"gmail_quote" style=3D"margin:0px 0.8ex;border-left:1px =
+solid rgb(204,204,204);border-right:1px solid rgb(204,204,204);padding-left=
+:1ex;padding-right:1ex"></blockquote>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 blk_mq_free_tag_set(&amp;nbd-&gt;tag_<wbr>set);<br><block=
+quote class=3D"gmail_quote" style=3D"margin:0px 0.8ex;border-left:1px solid=
+ rgb(204,204,204);border-right:1px solid rgb(204,204,204);padding-left:1ex;=
+padding-right:1ex"></blockquote>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 disk-&gt;private_data =3D NULL;<br><blockquote class=3D"gmail=
+_quote" style=3D"margin:0px 0.8ex;border-left:1px solid rgb(204,204,204);bo=
+rder-right:1px solid rgb(204,204,204);padding-left:1ex;padding-right:1ex"><=
+/blockquote>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 put_dis=
+k(disk);<br><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0=
+.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+</blockquote><span style=3D"color:rgb(136,136,136)">--=C2=A0</span><br><blo=
+ckquote class=3D"gmail_quote" style=3D"margin:0px 0.8ex;border-left:1px sol=
+id rgb(204,204,204);border-right:1px solid rgb(204,204,204);padding-left:1e=
+x;padding-right:1ex"></blockquote><span style=3D"color:rgb(136,136,136)">2.=
+14.3</span><br><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0p=
+x 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><span clas=
+s=3D"HOEnZb"><font color=3D"#888888">
+<br>
+</font></span></blockquote></div><br></div></div>
+
+--f4f5e80ecc14bbd6470569c63aa4--
