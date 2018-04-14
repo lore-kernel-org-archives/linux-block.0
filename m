@@ -1,43 +1,31 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Sun, 15 Apr 2018 23:15:39 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
-	"tj@kernel.org" <tj@kernel.org>,
-	"israelr@mellanox.com" <israelr@mellanox.com>,
-	"maxg@mellanox.com" <maxg@mellanox.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
-	"sagi@grimberg.me" <sagi@grimberg.me>
+Return-Path: <prvs=635ed6ddf=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "ming.lei@redhat.com"
+	<ming.lei@redhat.com>
+CC: "hch@lst.de" <hch@lst.de>, "tj@kernel.org" <tj@kernel.org>,
+	"israelr@mellanox.com" <israelr@mellanox.com>, "maxg@mellanox.com"
+	<maxg@mellanox.com>, "stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>, "sagi@grimberg.me"
+	<sagi@grimberg.me>
 Subject: Re: [PATCH V3] blk-mq: fix race between complete and
  BLK_EH_RESET_TIMER
-Message-ID: <20180415151537.GA2406@ming.t460p>
+Date: Sat, 14 Apr 2018 15:22:07 +0000
+Message-ID: <60846d0eea47181049fe77a0b303d7e04348b951.camel@wdc.com>
 References: <20180412115956.16207-1-ming.lei@redhat.com>
- <4008f36d-c2c4-25b9-4af5-8efbe9d452c0@kernel.dk>
- <60846d0eea47181049fe77a0b303d7e04348b951.camel@wdc.com>
+	 <4008f36d-c2c4-25b9-4af5-8efbe9d452c0@kernel.dk>
+In-Reply-To: <4008f36d-c2c4-25b9-4af5-8efbe9d452c0@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <60846d0eea47181049fe77a0b303d7e04348b951.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Sat, Apr 14, 2018 at 03:22:07PM +0000, Bart Van Assche wrote:
-> On Fri, 2018-04-13 at 21:06 -0600, Jens Axboe wrote:
-> > I like this approach since it keeps the cost outside of the fast
-> > path. And it's fine to reuse the queue lock for this, instead of
-> > adding a special lock for something we consider a rare occurrence.
-> > 
-> > From a quick look this looks sane, but I'll take a closer look
-> > tomrrow and add some testing too.
-
-Jens, please hold on, I will post out V4 soon, which will improve V3 a bit.
-
-> 
-> Shouldn't we know the root cause of the "RIP: scsi_times_out+0x17" crash reported in
-> https://bugzilla.kernel.org/show_bug.cgi?id=199077 before we decide how to proceed?
-
-I will ask Martin to test the V4 once it is posted out.
-
-
-Thanks,
-Ming
+T24gRnJpLCAyMDE4LTA0LTEzIGF0IDIxOjA2IC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBJ
+IGxpa2UgdGhpcyBhcHByb2FjaCBzaW5jZSBpdCBrZWVwcyB0aGUgY29zdCBvdXRzaWRlIG9mIHRo
+ZSBmYXN0DQo+IHBhdGguIEFuZCBpdCdzIGZpbmUgdG8gcmV1c2UgdGhlIHF1ZXVlIGxvY2sgZm9y
+IHRoaXMsIGluc3RlYWQgb2YNCj4gYWRkaW5nIGEgc3BlY2lhbCBsb2NrIGZvciBzb21ldGhpbmcg
+d2UgY29uc2lkZXIgYSByYXJlIG9jY3VycmVuY2UuDQo+IA0KPiBGcm9tIGEgcXVpY2sgbG9vayB0
+aGlzIGxvb2tzIHNhbmUsIGJ1dCBJJ2xsIHRha2UgYSBjbG9zZXIgbG9vaw0KPiB0b21ycm93IGFu
+ZCBhZGQgc29tZSB0ZXN0aW5nIHRvby4NCg0KU2hvdWxkbid0IHdlIGtub3cgdGhlIHJvb3QgY2F1
+c2Ugb2YgdGhlICJSSVA6IHNjc2lfdGltZXNfb3V0KzB4MTciIGNyYXNoIHJlcG9ydGVkIGluDQpo
+dHRwczovL2J1Z3ppbGxhLmtlcm5lbC5vcmcvc2hvd19idWcuY2dpP2lkPTE5OTA3NyBiZWZvcmUg
+d2UgZGVjaWRlIGhvdyB0byBwcm9jZWVkPw0KDQpUaGFua3MsDQoNCkJhcnQuDQoNCg0KDQo=
