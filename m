@@ -1,91 +1,57 @@
-Return-Path: <m.tretter@pengutronix.de>
-Date: Tue, 17 Apr 2018 11:15:43 +0200
-From: Michael Tretter <m.tretter@pengutronix.de>
-To: Josef Bacik <jbacik@fb.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Jens Axboe
- <axboe@kernel.dk>, "kernel@pengutronix.de" <kernel@pengutronix.de>
+Return-Path: <prvs=7642becddd=jbacik@fb.com>
+From: Josef Bacik <jbacik@fb.com>
+To: Michael Tretter <m.tretter@pengutronix.de>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe
+	<axboe@kernel.dk>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>
 Subject: Re: [PATCH] nbd: do not update block size if file system is mounted
-Message-ID: <20180417111543.65a4617b@litschi.hi.pengutronix.de>
-In-Reply-To: <3A32B506-71AE-48AF-A44A-B60F054ED40D@fb.com>
+Date: Sat, 14 Apr 2018 01:10:27 +0000
+Message-ID: <3A32B506-71AE-48AF-A44A-B60F054ED40D@fb.com>
 References: <20180228095456.31472-1-m.tretter@pengutronix.de>
  <20180315110057.13eecda6@litschi.hi.pengutronix.de>
  <6c862ddf-b352-6ef4-06f8-516680e9f19f@kernel.dk>
  <20180413162518.47840e6f@litschi.hi.pengutronix.de>
- <3A32B506-71AE-48AF-A44A-B60F054ED40D@fb.com>
+In-Reply-To: <20180413162518.47840e6f@litschi.hi.pengutronix.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Josef,
-
-On Sat, 14 Apr 2018 01:10:27 +0000, Josef Bacik wrote:
-> Yeah sorry I screwed that up again.  I=E2=80=99m wondering if we can just
-> drop this altogether and leave the zero setting in the config put
-> that we already have.
-
-I'm not sure if I understand you correctly. The nbd_config_put()
-function does not touch the bdev at all. How should config put take
-care of setting the size to 0?
-
-Dropping the bd_set_size to 0 from nbd_start_device_ioctl should be
-fine, because usually reset takes care of that. However, if there is
-an opener during nbd_bdev_reset(), the size won't be changed to 0
-either. This would still be the same behavior as with my patch.
-
-Michael
-
-
-> Does doing that fix it for you?  Thanks,
->=20
-> Josef
->=20
-> Sent from my iPhone
->=20
-> > On Apr 13, 2018, at 10:26 AM, Michael Tretter
-> > <m.tretter@pengutronix.de> wrote:=20
-> >> On Fri, 16 Mar 2018 09:36:45 -0700, Jens Axboe wrote: =20
-> >>> On 3/15/18 3:00 AM, Michael Tretter wrote: =20
-> >>>> On Wed, 28 Feb 2018 10:54:56 +0100, Michael Tretter wrote: =20
-> >>>> If a file system is mounted on the nbd during a disconnect,
-> >>>> resetting the size to 0, might change the block size and destroy
-> >>>> the buffer_head mappings. This will cause a infinite loop when
-> >>>> the file system looks for the buffer_heads for flushing.
-> >>>>=20
-> >>>> Only set the file size to 0, if we are the only opener of the
-> >>>> nbd.
-> >>>>=20
-> >>>> Signed-off-by: Michael Tretter <m.tretter@pengutronix.de>
-> >>>> ---
-> >>>> drivers/block/nbd.c | 3 ++-
-> >>>> 1 file changed, 2 insertions(+), 1 deletion(-)
-> >>>>=20
-> >>>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> >>>> index 5f2a4240a204..0d1dbb60430b 100644
-> >>>> --- a/drivers/block/nbd.c
-> >>>> +++ b/drivers/block/nbd.c
-> >>>> @@ -1118,7 +1118,8 @@ static int nbd_start_device_ioctl(struct
-> >>>> nbd_device *nbd, struct block_device *b if (ret)
-> >>>>        sock_shutdown(nbd);
-> >>>>    mutex_lock(&nbd->config_lock);
-> >>>> -    bd_set_size(bdev, 0);
-> >>>> +    if (bdev->bd_openers <=3D 1)
-> >>>> +        bd_set_size(bdev, 0);
-> >>>>    /* user requested, ignore socket errors */
-> >>>>    if (test_bit(NBD_DISCONNECT_REQUESTED,
-> >>>> &config->runtime_flags)) ret =3D 0;   =20
-> >>>=20
-> >>> Are there any comments on this patch?   =20
-> >>=20
-> >> Josef?
-> >>  =20
-> >=20
-> > Maybe some history helps for reviewing the patch:
-> >=20
-> > Commit abbbdf12497d ("nbd: replace kill_bdev() with
-> > __invalidate_device()") already fixed this issue once by changing
-> > nbd_size_clear() to only set the size to 0 if the device is only
-> > opened once. The line was moved several times during the rework for
-> > the netlink interface and the check for the number of openers was
-> > dropped, reintroducing the issue.
-> >=20
-> > Michael =20
+WWVhaCBzb3JyeSBJIHNjcmV3ZWQgdGhhdCB1cCBhZ2Fpbi4gIEnigJltIHdvbmRlcmluZyBpZiB3
+ZSBjYW4ganVzdCBkcm9wIHRoaXMgYWx0b2dldGhlciBhbmQgbGVhdmUgdGhlIHplcm8gc2V0dGlu
+ZyBpbiB0aGUgY29uZmlnIHB1dCB0aGF0IHdlIGFscmVhZHkgaGF2ZS4gIERvZXMgZG9pbmcgdGhh
+dCBmaXggaXQgZm9yIHlvdT8gIFRoYW5rcywNCg0KSm9zZWYNCg0KU2VudCBmcm9tIG15IGlQaG9u
+ZQ0KDQo+IE9uIEFwciAxMywgMjAxOCwgYXQgMTA6MjYgQU0sIE1pY2hhZWwgVHJldHRlciA8bS50
+cmV0dGVyQHBlbmd1dHJvbml4LmRlPiB3cm90ZToNCj4gDQo+PiBPbiBGcmksIDE2IE1hciAyMDE4
+IDA5OjM2OjQ1IC0wNzAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPj4+IE9uIDMvMTUvMTggMzowMCBB
+TSwgTWljaGFlbCBUcmV0dGVyIHdyb3RlOg0KPj4+PiBPbiBXZWQsIDI4IEZlYiAyMDE4IDEwOjU0
+OjU2ICswMTAwLCBNaWNoYWVsIFRyZXR0ZXIgd3JvdGU6ICANCj4+Pj4gSWYgYSBmaWxlIHN5c3Rl
+bSBpcyBtb3VudGVkIG9uIHRoZSBuYmQgZHVyaW5nIGEgZGlzY29ubmVjdCwgcmVzZXR0aW5nDQo+
+Pj4+IHRoZSBzaXplIHRvIDAsIG1pZ2h0IGNoYW5nZSB0aGUgYmxvY2sgc2l6ZSBhbmQgZGVzdHJv
+eSB0aGUgYnVmZmVyX2hlYWQNCj4+Pj4gbWFwcGluZ3MuIFRoaXMgd2lsbCBjYXVzZSBhIGluZmlu
+aXRlIGxvb3Agd2hlbiB0aGUgZmlsZSBzeXN0ZW0gbG9va3MgZm9yDQo+Pj4+IHRoZSBidWZmZXJf
+aGVhZHMgZm9yIGZsdXNoaW5nLg0KPj4+PiANCj4+Pj4gT25seSBzZXQgdGhlIGZpbGUgc2l6ZSB0
+byAwLCBpZiB3ZSBhcmUgdGhlIG9ubHkgb3BlbmVyIG9mIHRoZSBuYmQuDQo+Pj4+IA0KPj4+PiBT
+aWduZWQtb2ZmLWJ5OiBNaWNoYWVsIFRyZXR0ZXIgPG0udHJldHRlckBwZW5ndXRyb25peC5kZT4N
+Cj4+Pj4gLS0tDQo+Pj4+IGRyaXZlcnMvYmxvY2svbmJkLmMgfCAzICsrLQ0KPj4+PiAxIGZpbGUg
+Y2hhbmdlZCwgMiBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+Pj4+IA0KPj4+PiBkaWZm
+IC0tZ2l0IGEvZHJpdmVycy9ibG9jay9uYmQuYyBiL2RyaXZlcnMvYmxvY2svbmJkLmMNCj4+Pj4g
+aW5kZXggNWYyYTQyNDBhMjA0Li4wZDFkYmI2MDQzMGIgMTAwNjQ0DQo+Pj4+IC0tLSBhL2RyaXZl
+cnMvYmxvY2svbmJkLmMNCj4+Pj4gKysrIGIvZHJpdmVycy9ibG9jay9uYmQuYw0KPj4+PiBAQCAt
+MTExOCw3ICsxMTE4LDggQEAgc3RhdGljIGludCBuYmRfc3RhcnRfZGV2aWNlX2lvY3RsKHN0cnVj
+dCBuYmRfZGV2aWNlICpuYmQsIHN0cnVjdCBibG9ja19kZXZpY2UgKmINCj4+Pj4gICAgaWYgKHJl
+dCkNCj4+Pj4gICAgICAgIHNvY2tfc2h1dGRvd24obmJkKTsNCj4+Pj4gICAgbXV0ZXhfbG9jaygm
+bmJkLT5jb25maWdfbG9jayk7DQo+Pj4+IC0gICAgYmRfc2V0X3NpemUoYmRldiwgMCk7DQo+Pj4+
+ICsgICAgaWYgKGJkZXYtPmJkX29wZW5lcnMgPD0gMSkNCj4+Pj4gKyAgICAgICAgYmRfc2V0X3Np
+emUoYmRldiwgMCk7DQo+Pj4+ICAgIC8qIHVzZXIgcmVxdWVzdGVkLCBpZ25vcmUgc29ja2V0IGVy
+cm9ycyAqLw0KPj4+PiAgICBpZiAodGVzdF9iaXQoTkJEX0RJU0NPTk5FQ1RfUkVRVUVTVEVELCAm
+Y29uZmlnLT5ydW50aW1lX2ZsYWdzKSkNCj4+Pj4gICAgICAgIHJldCA9IDA7ICANCj4+PiANCj4+
+PiBBcmUgdGhlcmUgYW55IGNvbW1lbnRzIG9uIHRoaXMgcGF0Y2g/ICANCj4+IA0KPj4gSm9zZWY/
+DQo+PiANCj4gDQo+IE1heWJlIHNvbWUgaGlzdG9yeSBoZWxwcyBmb3IgcmV2aWV3aW5nIHRoZSBw
+YXRjaDoNCj4gDQo+IENvbW1pdCBhYmJiZGYxMjQ5N2QgKCJuYmQ6IHJlcGxhY2Uga2lsbF9iZGV2
+KCkgd2l0aA0KPiBfX2ludmFsaWRhdGVfZGV2aWNlKCkiKSBhbHJlYWR5IGZpeGVkIHRoaXMgaXNz
+dWUgb25jZSBieSBjaGFuZ2luZw0KPiBuYmRfc2l6ZV9jbGVhcigpIHRvIG9ubHkgc2V0IHRoZSBz
+aXplIHRvIDAgaWYgdGhlIGRldmljZSBpcyBvbmx5IG9wZW5lZA0KPiBvbmNlLiBUaGUgbGluZSB3
+YXMgbW92ZWQgc2V2ZXJhbCB0aW1lcyBkdXJpbmcgdGhlIHJld29yayBmb3IgdGhlDQo+IG5ldGxp
+bmsgaW50ZXJmYWNlIGFuZCB0aGUgY2hlY2sgZm9yIHRoZSBudW1iZXIgb2Ygb3BlbmVycyB3YXMg
+ZHJvcHBlZCwNCj4gcmVpbnRyb2R1Y2luZyB0aGUgaXNzdWUuDQo+IA0KPiBNaWNoYWVsDQo=
