@@ -1,31 +1,46 @@
-Return-Path: <prvs=635ed6ddf=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "ming.lei@redhat.com"
-	<ming.lei@redhat.com>
-CC: "hch@lst.de" <hch@lst.de>, "tj@kernel.org" <tj@kernel.org>,
-	"israelr@mellanox.com" <israelr@mellanox.com>, "maxg@mellanox.com"
-	<maxg@mellanox.com>, "stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>, "sagi@grimberg.me"
-	<sagi@grimberg.me>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH V3] blk-mq: fix race between complete and
  BLK_EH_RESET_TIMER
-Date: Sat, 14 Apr 2018 15:22:07 +0000
-Message-ID: <60846d0eea47181049fe77a0b303d7e04348b951.camel@wdc.com>
+To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
+Cc: "jianchao.wang" <jianchao.w.wang@oracle.com>,
+ Bart Van Assche <bart.vanassche@wdc.com>, Tejun Heo <tj@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+ Israel Rukshin <israelr@mellanox.com>, Max Gurtovoy <maxg@mellanox.com>,
+ stable@vger.kernel.org
 References: <20180412115956.16207-1-ming.lei@redhat.com>
-	 <4008f36d-c2c4-25b9-4af5-8efbe9d452c0@kernel.dk>
-In-Reply-To: <4008f36d-c2c4-25b9-4af5-8efbe9d452c0@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <4008f36d-c2c4-25b9-4af5-8efbe9d452c0@kernel.dk>
+Date: Fri, 13 Apr 2018 21:06:07 -0600
 MIME-Version: 1.0
+In-Reply-To: <20180412115956.16207-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE4LTA0LTEzIGF0IDIxOjA2IC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBJ
-IGxpa2UgdGhpcyBhcHByb2FjaCBzaW5jZSBpdCBrZWVwcyB0aGUgY29zdCBvdXRzaWRlIG9mIHRo
-ZSBmYXN0DQo+IHBhdGguIEFuZCBpdCdzIGZpbmUgdG8gcmV1c2UgdGhlIHF1ZXVlIGxvY2sgZm9y
-IHRoaXMsIGluc3RlYWQgb2YNCj4gYWRkaW5nIGEgc3BlY2lhbCBsb2NrIGZvciBzb21ldGhpbmcg
-d2UgY29uc2lkZXIgYSByYXJlIG9jY3VycmVuY2UuDQo+IA0KPiBGcm9tIGEgcXVpY2sgbG9vayB0
-aGlzIGxvb2tzIHNhbmUsIGJ1dCBJJ2xsIHRha2UgYSBjbG9zZXIgbG9vaw0KPiB0b21ycm93IGFu
-ZCBhZGQgc29tZSB0ZXN0aW5nIHRvby4NCg0KU2hvdWxkbid0IHdlIGtub3cgdGhlIHJvb3QgY2F1
-c2Ugb2YgdGhlICJSSVA6IHNjc2lfdGltZXNfb3V0KzB4MTciIGNyYXNoIHJlcG9ydGVkIGluDQpo
-dHRwczovL2J1Z3ppbGxhLmtlcm5lbC5vcmcvc2hvd19idWcuY2dpP2lkPTE5OTA3NyBiZWZvcmUg
-d2UgZGVjaWRlIGhvdyB0byBwcm9jZWVkPw0KDQpUaGFua3MsDQoNCkJhcnQuDQoNCg0KDQo=
+On 4/12/18 5:59 AM, Ming Lei wrote:
+> The normal request completion can be done before or during handling
+> BLK_EH_RESET_TIMER, and this race may cause the request to never be
+> completed since driver's .timeout() may always return
+> BLK_EH_RESET_TIMER.
+> 
+> This issue can't be fixed completely by driver, since the normal
+> completion can be done between returning .timeout() and handling
+> BLK_EH_RESET_TIMER.
+> 
+> This patch fixes the race by introducing rq state of
+> MQ_RQ_COMPLETE_IN_RESET, and reading/writing rq's state by holding
+> queue lock, which can be per-request actually, but just not necessary
+> to introduce one lock for so unusual event.
+> 
+> Also when .timeout() returns BLK_EH_HANDLED, sync with normal
+> completion path before completing this timed-out rq finally for
+> avoiding this rq's state touched by normal completion.
+
+I like this approach since it keeps the cost outside of the fast
+path. And it's fine to reuse the queue lock for this, instead of
+adding a special lock for something we consider a rare occurrence.
+
+>From a quick look this looks sane, but I'll take a closer look
+tomrrow and add some testing too.
+
+-- 
+Jens Axboe
