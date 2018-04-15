@@ -1,27 +1,43 @@
 Return-Path: <linux-ide-owner@vger.kernel.org>
-Date: Sun, 15 Apr 2018 23:52:54 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        iommu@lists.linux-foundation.org, x86@kernel.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, linux-ide@vger.kernel.org,
-        linux-mips@linux-mips.org, sparclinux@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 02/12] iommu-helper: unexport iommu_area_alloc
-Message-ID: <20180415215254.GA32231@ravnborg.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        iommu@lists.linux-foundation.org
+Cc: x86@kernel.org, linux-block@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-mm@kvack.org,
+        linux-ide@vger.kernel.org, linux-mips@linux-mips.org,
+        sparclinux@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 02/12] iommu-helper: unexport iommu_area_alloc
+Date: Sun, 15 Apr 2018 16:59:37 +0200
+Message-Id: <20180415145947.1248-3-hch@lst.de>
+In-Reply-To: <20180415145947.1248-1-hch@lst.de>
 References: <20180415145947.1248-1-hch@lst.de>
- <20180415145947.1248-3-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180415145947.1248-3-hch@lst.de>
 Sender: linux-ide-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On Sun, Apr 15, 2018 at 04:59:37PM +0200, Christoph Hellwig wrote:
-> This function is only used by built-in code.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by:....
+This function is only used by built-in code.
 
-	Sam
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ lib/iommu-helper.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/lib/iommu-helper.c b/lib/iommu-helper.c
+index 23633c0fda4a..ded1703e7e64 100644
+--- a/lib/iommu-helper.c
++++ b/lib/iommu-helper.c
+@@ -3,7 +3,6 @@
+  * IOMMU helper functions for the free area management
+  */
+ 
+-#include <linux/export.h>
+ #include <linux/bitmap.h>
+ #include <linux/bug.h>
+ 
+@@ -38,4 +37,3 @@ unsigned long iommu_area_alloc(unsigned long *map, unsigned long size,
+ 	}
+ 	return -1;
+ }
+-EXPORT_SYMBOL(iommu_area_alloc);
+-- 
+2.17.0
+
