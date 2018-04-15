@@ -1,112 +1,60 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:41920 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932652AbeDWXbF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Apr 2018 19:31:05 -0400
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-Date: Mon, 23 Apr 2018 17:30:43 -0600
-Message-Id: <20180423233046.21476-12-logang@deltatee.com>
-In-Reply-To: <20180423233046.21476-1-logang@deltatee.com>
-References: <20180423233046.21476-1-logang@deltatee.com>
-Subject: [PATCH v4 11/14] nvme-pci: Add a quirk for a pseudo CMB
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-ide-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        iommu@lists.linux-foundation.org
+Cc: x86@kernel.org, linux-block@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-mm@kvack.org,
+        linux-ide@vger.kernel.org, linux-mips@linux-mips.org,
+        sparclinux@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 12/12] swiotlb: remove the CONFIG_DMA_DIRECT_OPS ifdefs
+Date: Sun, 15 Apr 2018 16:59:47 +0200
+Message-Id: <20180415145947.1248-13-hch@lst.de>
+In-Reply-To: <20180415145947.1248-1-hch@lst.de>
+References: <20180415145947.1248-1-hch@lst.de>
+Sender: linux-ide-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Introduce a quirk to use CMB-like memory on older devices that have
-an exposed BAR but do not advertise support for using CMBLOC and
-CMBSIZE.
+swiotlb now selects the DMA_DIRECT_OPS config symbol, so this will
+always be true.
 
-We'd like to use some of these older cards to test P2P memory.
-
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/nvme.h |  7 +++++++
- drivers/nvme/host/pci.c  | 24 ++++++++++++++++++++----
- 2 files changed, 27 insertions(+), 4 deletions(-)
+ lib/swiotlb.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 9a689c13998f..885e9ec9b889 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -84,6 +84,13 @@ enum nvme_quirks {
- 	 * Supports the LighNVM command set if indicated in vs[1].
- 	 */
- 	NVME_QUIRK_LIGHTNVM			= (1 << 6),
-+
-+	/*
-+	 * Pseudo CMB Support on BAR 4. For adapters like the Microsemi
-+	 * NVRAM that have CMB-like memory on a BAR but does not set
-+	 * CMBLOC or CMBSZ.
-+	 */
-+	NVME_QUIRK_PSEUDO_CMB_BAR4		= (1 << 7),
- };
- 
- /*
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 09b6aba6ed28..e526e969680a 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1685,6 +1685,13 @@ static ssize_t nvme_cmb_show(struct device *dev,
+diff --git a/lib/swiotlb.c b/lib/swiotlb.c
+index 47aeb04c1997..07f260319b82 100644
+--- a/lib/swiotlb.c
++++ b/lib/swiotlb.c
+@@ -692,7 +692,6 @@ void swiotlb_tbl_sync_single(struct device *hwdev, phys_addr_t tlb_addr,
+ 	}
  }
- static DEVICE_ATTR(cmb, S_IRUGO, nvme_cmb_show, NULL);
  
-+static u32 nvme_pseudo_cmbsz(struct pci_dev *pdev, int bar)
-+{
-+	return NVME_CMBSZ_WDS | NVME_CMBSZ_RDS |
-+		(((ilog2(SZ_16M) - 12) / 4) << NVME_CMBSZ_SZU_SHIFT) |
-+		((pci_resource_len(pdev, bar) / SZ_16M) << NVME_CMBSZ_SZ_SHIFT);
-+}
-+
- static u64 nvme_cmb_size_unit(struct nvme_dev *dev)
+-#ifdef CONFIG_DMA_DIRECT_OPS
+ static inline bool dma_coherent_ok(struct device *dev, dma_addr_t addr,
+ 		size_t size)
  {
- 	u8 szu = (dev->cmbsz >> NVME_CMBSZ_SZU_SHIFT) & NVME_CMBSZ_SZU_MASK;
-@@ -1704,10 +1711,15 @@ static void nvme_map_cmb(struct nvme_dev *dev)
- 	struct pci_dev *pdev = to_pci_dev(dev->dev);
- 	int bar;
+@@ -764,7 +763,6 @@ static bool swiotlb_free_buffer(struct device *dev, size_t size,
+ 				 DMA_ATTR_SKIP_CPU_SYNC);
+ 	return true;
+ }
+-#endif
  
--	dev->cmbsz = readl(dev->bar + NVME_REG_CMBSZ);
--	if (!dev->cmbsz)
--		return;
--	dev->cmbloc = readl(dev->bar + NVME_REG_CMBLOC);
-+	if (dev->ctrl.quirks & NVME_QUIRK_PSEUDO_CMB_BAR4) {
-+		dev->cmbsz = nvme_pseudo_cmbsz(pdev, 4);
-+		dev->cmbloc = 4;
-+	} else {
-+		dev->cmbsz = readl(dev->bar + NVME_REG_CMBSZ);
-+		if (!dev->cmbsz)
-+			return;
-+		dev->cmbloc = readl(dev->bar + NVME_REG_CMBLOC);
-+	}
+ static void
+ swiotlb_full(struct device *dev, size_t size, enum dma_data_direction dir,
+@@ -1045,7 +1043,6 @@ swiotlb_dma_supported(struct device *hwdev, u64 mask)
+ 	return __phys_to_dma(hwdev, io_tlb_end - 1) <= mask;
+ }
  
- 	size = nvme_cmb_size_unit(dev) * nvme_cmb_size(dev);
- 	offset = nvme_cmb_size_unit(dev) * NVME_CMB_OFST(dev->cmbloc);
-@@ -2736,6 +2748,10 @@ static const struct pci_device_id nvme_id_table[] = {
- 		.driver_data = NVME_QUIRK_LIGHTNVM, },
- 	{ PCI_DEVICE(0x1d1d, 0x2807),	/* CNEX WL */
- 		.driver_data = NVME_QUIRK_LIGHTNVM, },
-+	{ PCI_DEVICE(0x11f8, 0xf117),	/* Microsemi NVRAM adaptor */
-+		.driver_data = NVME_QUIRK_PSEUDO_CMB_BAR4, },
-+	{ PCI_DEVICE(0x1db1, 0x0002),	/* Everspin nvNitro adaptor */
-+		.driver_data = NVME_QUIRK_PSEUDO_CMB_BAR4,  },
- 	{ PCI_DEVICE_CLASS(PCI_CLASS_STORAGE_EXPRESS, 0xffffff) },
- 	{ PCI_DEVICE(PCI_VENDOR_ID_APPLE, 0x2001) },
- 	{ PCI_DEVICE(PCI_VENDOR_ID_APPLE, 0x2003) },
+-#ifdef CONFIG_DMA_DIRECT_OPS
+ void *swiotlb_alloc(struct device *dev, size_t size, dma_addr_t *dma_handle,
+ 		gfp_t gfp, unsigned long attrs)
+ {
+@@ -1089,4 +1086,3 @@ const struct dma_map_ops swiotlb_dma_ops = {
+ 	.unmap_page		= swiotlb_unmap_page,
+ 	.dma_supported		= swiotlb_dma_supported,
+ };
+-#endif /* CONFIG_DMA_DIRECT_OPS */
 -- 
-2.11.0
+2.17.0
+
