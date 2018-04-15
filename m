@@ -1,292 +1,261 @@
-Return-Path: <alan.christopher.jenkins@gmail.com>
-Return-Path: <alan.christopher.jenkins@gmail.com>
-From: Alan Jenkins <alan.christopher.jenkins@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-block@vger.kernel.org
-Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
-	Alan Jenkins <alan.christopher.jenkins@gmail.com>
-Subject: [PATCH] blktests: regression test "block: do not use interruptible wait anywhere"
-Date: Mon, 16 Apr 2018 22:23:11 +0100
-Message-Id: <20180416212311.19326-1-alan.christopher.jenkins@gmail.com>
-In-Reply-To: <891e334c-cf19-032c-b996-59ac166fcde1@gmail.com>
-References: <891e334c-cf19-032c-b996-59ac166fcde1@gmail.com>
+Return-Path: <linux-ide-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        iommu@lists.linux-foundation.org
+Cc: x86@kernel.org, linux-block@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-mm@kvack.org,
+        linux-ide@vger.kernel.org, linux-mips@linux-mips.org,
+        sparclinux@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 07/12] arch: remove the ARCH_PHYS_ADDR_T_64BIT config symbol
+Date: Sun, 15 Apr 2018 16:59:42 +0200
+Message-Id: <20180415145947.1248-8-hch@lst.de>
+In-Reply-To: <20180415145947.1248-1-hch@lst.de>
+References: <20180415145947.1248-1-hch@lst.de>
+Sender: linux-ide-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-> Without this fix, I get an IO error in this test:
->
-> # dd if=/dev/sda of=/dev/null iflag=direct & \
->   while killall -SIGUSR1 dd; do sleep 0.1; done & \
->   echo mem > /sys/power/state ; \
->   sleep 5; killall dd  # stop after 5 seconds
+Instead select the PHYS_ADDR_T_64BIT for 32-bit architectures that need a
+64-bit phys_addr_t type directly.
 
-linux-block insisted they wanted this, based on my reproducer above.
-If you start wondering why you wouldn't base it on scsi_debug with a new
-"quiesce" option, that makes two of us.
-
-Thread: http://lkml.kernel.org/r/891e334c-cf19-032c-b996-59ac166fcde1@gmail.com
-
-Signed-off-by: Alan Jenkins <alan.christopher.jenkins@gmail.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- tests/scsi/004     | 235 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/scsi/004.out |   7 ++
- 2 files changed, 242 insertions(+)
- create mode 100755 tests/scsi/004
- create mode 100644 tests/scsi/004.out
+ arch/arc/Kconfig                       |  4 +---
+ arch/arm/kernel/setup.c                |  2 +-
+ arch/arm/mm/Kconfig                    |  4 +---
+ arch/arm64/Kconfig                     |  3 ---
+ arch/mips/Kconfig                      | 15 ++++++---------
+ arch/powerpc/Kconfig                   |  5 +----
+ arch/powerpc/platforms/Kconfig.cputype |  1 +
+ arch/riscv/Kconfig                     |  6 ++----
+ arch/x86/Kconfig                       |  5 +----
+ mm/Kconfig                             |  2 +-
+ 10 files changed, 15 insertions(+), 32 deletions(-)
 
-diff --git a/tests/scsi/004 b/tests/scsi/004
-new file mode 100755
-index 0000000..791c76a
---- /dev/null
-+++ b/tests/scsi/004
-@@ -0,0 +1,235 @@
-+#!/bin/bash
-+#
-+# Regression test for patch "block: do not use interruptible wait anywhere".
-+#
-+# > Without this fix, I get an IO error in this test:
-+# >
-+# > # dd if=/dev/sda of=/dev/null iflag=direct & \
-+# >   while killall -SIGUSR1 dd; do sleep 0.1; done & \
-+# >   echo mem > /sys/power/state ; \
-+# >   sleep 5; killall dd  # stop after 5 seconds
-+#
-+# AJ: linux-block insisted they wanted this, based on my reproducer above.
-+# If you start wondering why you wouldn't base it on scsi_debug with a new
-+# "quiesce" option, that makes two of us.
-+# Thread: http://lkml.kernel.org/r/891e334c-cf19-032c-b996-59ac166fcde1@gmail.com
-+#
-+#
-+# RATIONALE for a suspend test:
-+#
-+# The original root cause issue was the behaviour around blk_queue_freeze().
-+# It put tasks into an interruptible wait, which is wrong for block devices.
-+#
-+# The freeze feature is not directly exposed to userspace, so I can not test
-+# it directly :(.  (It's used to "guarantee no request is in use, so we can
-+# change any data structure of the queue afterward".  I.e. freeze, modify the
-+# queue structure, unfreeze).
-+#
-+# However, this lead to a regression with a decent reproducer.  In v4.15 the
-+# same interruptible wait was also used for SCSI suspend/resume.  SCSI resume
-+# can take a second or so... hence we like to do it asynchronously.  This
-+# means we can observe the wait at resume time, and we can test if it is
-+# interruptible.
-+#
-+# Note `echo quiesce > /sys/class/scsi_device/*/device/state` can *not*
-+# trigger the specific wait in the block layer.  That code path only
-+# sets the SCSI device state; it does not set any block device state.
-+# (It does not call into blk_queue_freeze() or blk_set_preempt_only();
-+#  it literally just sets sdev->sdev_state to SDEV_QUIESCE).
-+#
-+#
-+# Copyright (C) 2018 Alan Jenkins
-+#
-+# This program is free software: you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation, either version 3 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+
-+DESCRIPTION="check SCSI blockdev suspend is not interruptible"
-+
-+QUICK=1
-+
-+requires() {
-+	# I can't expect to hit the window using bash, if the device is
-+	# emulated by cpu.
-+	#
-+	# Maybe annoying for Xen dom0, but I'm guessing it's not common.
-+	if grep -q ^flags.*\ hypervisor /proc/cpuinfo &&
-+	   ! [[ -e "$HAVE_BARE_METAL_SCSI" ]]; then
-+		SKIP_REASON=\
-+"Hypervisor detected, but this test wants bare-metal SCSI timings.
-+If you have a pass-through device, you may set HAVE_BARE_METAL_SCSI=1."
-+		return 1
-+	fi
-+
-+	# "If a user has disabled async probing a likely reason
-+	#  is due to a storage enclosure that does not inject
-+	#  staggered spin-ups. For safety, make resume
-+	#  synchronous as well in that case."
-+	if ! scan="$(cat /sys/module/scsi_mod/parameters/scan)"; then
-+		SKIP_REASON="Could not read '/sys/module/scsi_mod/parameters/scan'"
-+		return 1
-+	fi
-+	if [[ "$scan" != async ]]; then
-+		SKIP_REASON="This test does not work if you have set 'scsi_mod.scan=sync'"
-+		return 1
-+	fi
-+
-+	if ! cat /sys/power/pm_test > /dev/null; then
-+		SKIP_REASON="Error reading pm_test.  Maybe kernel lacks CONFIG_PM_TEST?"
-+		return 1
-+	fi
-+
-+	_have_fio
-+}
-+
-+do_test_device() ( # run whole function in a subshell
-+
-+	sysfs_pm_test_delay=/sys/module/suspend/parameters/pm_test_delay
-+	saved_pm_test_delay=
-+	dd_pid=
-+	subshell_pid=
-+
-+	fail() {
-+		echo "$*"
-+		exit 1
-+	}
-+
-+	cleanup_pid() {
-+		local pid="$1"
-+
-+		# Suppress shell messages, about killed process
-+		exec 3>&1 4>&2
-+		exec >>"$FULL" 2>&1
-+
-+		kill "$pid" >&3 2>&4
-+
-+		# Don't try to re-redirect output from `wait` just in case,
-+		# if `wait` is executed in a subshell then it cannot work.
-+		wait "$pid"
-+
-+		# Restore stdout/stderr
-+		exec >&3 2>&4
-+		exec 3>&- 4>&-
-+	}
-+
-+	cleanup() {
-+		if [ -n "$subshell_pid" ]; then
-+			echo "Killing sub-shell..."
-+			cleanup_pid "$subshell_pid"
-+		fi
-+		if [ -n "$dd_pid" ]; then
-+			echo "Killing dd..."
-+			cleanup_pid "$dd_pid"
-+		fi
-+
-+		echo "Resetting pm_test"
-+		echo none > /sys/power/pm_test
-+
-+		echo "Resetting pm_test_delay"
-+		if [ -n "$saved_pm_test_delay" ]; then
-+			echo "$saved_pm_test_delay" > "$sysfs_pm_test_delay"
-+		fi
-+	}
-+	trap cleanup EXIT
-+
-+	# Have not tested on devices which require larger IO,
-+	# but let's not die if we see one.
-+	bs="$(_test_dev_queue_get hw_sector_size)"
-+
-+	# Start dd, as a background process which submits IOs
-+	# and yells when one fails.  We want to test the block
-+	# layer, so we use direct IO to avoid being served
-+	# from page cache.
-+	#
-+	# I tried using fio with the exact same IO pattern,
-+	# sadly it was not 100% reliable at reproducing this
-+	# issue.
-+	#
-+	dd iflag=direct if="$TEST_DEV" of=/dev/null bs=$bs status=none &
-+	dd_pid=$!
-+
-+# 	fio --output="$FULL" --loops=65535 \
-+# 	    --thread --exitall_on_error \
-+# 	    --direct=1 \
-+# 	    --bs=$bs --rw=read --name=reads \
-+# 	    --filename="$TEST_DEV" &
-+# 	fio_pid=$!
-+
-+	# Keep sending signals to 'dd'.  Give it 1ms between
-+	# signals so it gets a chance to actually submit IOs.
-+	#
-+	# In theory this script is probably subject to various
-+	# pid re-use races.  But I started in sh... so far
-+	# blktests does not depend on python... also direct IO
-+	# is best to reproduce this, which is not built in to
-+	# python.
-+	(
-+		while kill -STOP $dd_pid 2>/dev/null &&
-+		      kill -CONT $dd_pid 2>/dev/null; do
-+
-+			sleep 0.001
-+		done
-+
-+		# Wait to be killed. Simplifies cleanup.
-+		while true; do
-+			sleep 1
-+		done
-+	) &
-+	subshell_pid=$!
-+
-+	if ! echo devices > /sys/power/pm_test; then
-+		fail "error setting pm_test"
-+	fi
-+
-+	if ! saved_pm_test_delay="$(cat "$sysfs_pm_test_delay")"; then
-+		fail "error reading pm_test_delay"
-+	fi
-+	if ! echo 0 > "$sysfs_pm_test_delay"; then
-+		fail "error setting pm_test_delay"
-+	fi
-+
-+	# Log that we're suspending.  User might not have guessed,
-+	# or maybe suspend (or pm_test suspend) is broken on this system.
-+	echo "Simulating suspend/resume now"
-+	echo mem > /sys/power/state
-+
-+	# Now wait for TEST_DEV to resume asynchronously
-+	dd iflag=direct if="$TEST_DEV" of=/dev/null count=1 status=none
-+
-+	# Wait another second.  This might be useful in the case dd got blocked on a
-+	# page fault during the suspend; it will have a second to get sorted out,
-+	# so it can potentially receive an IO error and exit.
-+	sleep 1
-+
-+	if ! kill -0 $dd_pid 2>/dev/null; then
-+		# dd exited before we entered cleanup.
-+		# Read its exit status
-+		wait $dd_pid
-+		ret=$?
-+		dd_pid=
-+
-+		if [[ $ret == 0 ]]; then
-+			echo "'dd' exited early, without error."
-+			echo "Is your scsi device implausibly fast or small?"
-+		else
-+			# Test should already fail at this point due to
-+			# error messages, but let's log it while we're here.
-+			echo "'dd' exited with error $ret"
-+		fi
-+	fi
-+) # end subshell function
-+
-+test_device() {
-+	echo "Running ${TEST_NAME}"
-+	do_test_device
-+	echo "Test complete"
-+}
-diff --git a/tests/scsi/004.out b/tests/scsi/004.out
-new file mode 100644
-index 0000000..4085f62
---- /dev/null
-+++ b/tests/scsi/004.out
-@@ -0,0 +1,7 @@
-+Running scsi/004
-+Simulating suspend/resume now
-+Killing sub-shell...
-+Killing dd...
-+Resetting pm_test
-+Resetting pm_test_delay
-+Test complete
+diff --git a/arch/arc/Kconfig b/arch/arc/Kconfig
+index d76bf4a83740..f94c61da682a 100644
+--- a/arch/arc/Kconfig
++++ b/arch/arc/Kconfig
+@@ -453,13 +453,11 @@ config ARC_HAS_PAE40
+ 	default n
+ 	depends on ISA_ARCV2
+ 	select HIGHMEM
++	select PHYS_ADDR_T_64BIT
+ 	help
+ 	  Enable access to physical memory beyond 4G, only supported on
+ 	  ARC cores with 40 bit Physical Addressing support
+ 
+-config ARCH_PHYS_ADDR_T_64BIT
+-	def_bool ARC_HAS_PAE40
+-
+ config ARCH_DMA_ADDR_T_64BIT
+ 	bool
+ 
+diff --git a/arch/arm/kernel/setup.c b/arch/arm/kernel/setup.c
+index fc40a2b40595..35ca494c028c 100644
+--- a/arch/arm/kernel/setup.c
++++ b/arch/arm/kernel/setup.c
+@@ -754,7 +754,7 @@ int __init arm_add_memory(u64 start, u64 size)
+ 	else
+ 		size -= aligned_start - start;
+ 
+-#ifndef CONFIG_ARCH_PHYS_ADDR_T_64BIT
++#ifndef CONFIG_PHYS_ADDR_T_64BIT
+ 	if (aligned_start > ULONG_MAX) {
+ 		pr_crit("Ignoring memory at 0x%08llx outside 32-bit physical address space\n",
+ 			(long long)start);
+diff --git a/arch/arm/mm/Kconfig b/arch/arm/mm/Kconfig
+index 7f14acf67caf..2f77c6344ef1 100644
+--- a/arch/arm/mm/Kconfig
++++ b/arch/arm/mm/Kconfig
+@@ -661,6 +661,7 @@ config ARM_LPAE
+ 	bool "Support for the Large Physical Address Extension"
+ 	depends on MMU && CPU_32v7 && !CPU_32v6 && !CPU_32v5 && \
+ 		!CPU_32v4 && !CPU_32v3
++	select PHYS_ADDR_T_64BIT
+ 	help
+ 	  Say Y if you have an ARMv7 processor supporting the LPAE page
+ 	  table format and you would like to access memory beyond the
+@@ -673,9 +674,6 @@ config ARM_PV_FIXUP
+ 	def_bool y
+ 	depends on ARM_LPAE && ARM_PATCH_PHYS_VIRT && ARCH_KEYSTONE
+ 
+-config ARCH_PHYS_ADDR_T_64BIT
+-	def_bool ARM_LPAE
+-
+ config ARCH_DMA_ADDR_T_64BIT
+ 	bool
+ 
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 940adfb9a2bc..b6aa33e642cc 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -152,9 +152,6 @@ config ARM64
+ config 64BIT
+ 	def_bool y
+ 
+-config ARCH_PHYS_ADDR_T_64BIT
+-	def_bool y
+-
+ config MMU
+ 	def_bool y
+ 
+diff --git a/arch/mips/Kconfig b/arch/mips/Kconfig
+index 47d72c64d687..985388078872 100644
+--- a/arch/mips/Kconfig
++++ b/arch/mips/Kconfig
+@@ -132,7 +132,7 @@ config MIPS_GENERIC
+ 
+ config MIPS_ALCHEMY
+ 	bool "Alchemy processor based machines"
+-	select ARCH_PHYS_ADDR_T_64BIT
++	select PHYS_ADDR_T_64BIT
+ 	select CEVT_R4K
+ 	select CSRC_R4K
+ 	select IRQ_MIPS_CPU
+@@ -890,7 +890,7 @@ config CAVIUM_OCTEON_SOC
+ 	bool "Cavium Networks Octeon SoC based boards"
+ 	select CEVT_R4K
+ 	select ARCH_HAS_PHYS_TO_DMA
+-	select ARCH_PHYS_ADDR_T_64BIT
++	select PHYS_ADDR_T_64BIT
+ 	select DMA_COHERENT
+ 	select SYS_SUPPORTS_64BIT_KERNEL
+ 	select SYS_SUPPORTS_BIG_ENDIAN
+@@ -936,7 +936,7 @@ config NLM_XLR_BOARD
+ 	select SWAP_IO_SPACE
+ 	select SYS_SUPPORTS_32BIT_KERNEL
+ 	select SYS_SUPPORTS_64BIT_KERNEL
+-	select ARCH_PHYS_ADDR_T_64BIT
++	select PHYS_ADDR_T_64BIT
+ 	select SYS_SUPPORTS_BIG_ENDIAN
+ 	select SYS_SUPPORTS_HIGHMEM
+ 	select DMA_COHERENT
+@@ -962,7 +962,7 @@ config NLM_XLP_BOARD
+ 	select HW_HAS_PCI
+ 	select SYS_SUPPORTS_32BIT_KERNEL
+ 	select SYS_SUPPORTS_64BIT_KERNEL
+-	select ARCH_PHYS_ADDR_T_64BIT
++	select PHYS_ADDR_T_64BIT
+ 	select GPIOLIB
+ 	select SYS_SUPPORTS_BIG_ENDIAN
+ 	select SYS_SUPPORTS_LITTLE_ENDIAN
+@@ -1102,7 +1102,7 @@ config FW_CFE
+ 	bool
+ 
+ config ARCH_DMA_ADDR_T_64BIT
+-	def_bool (HIGHMEM && ARCH_PHYS_ADDR_T_64BIT) || 64BIT
++	def_bool (HIGHMEM && PHYS_ADDR_T_64BIT) || 64BIT
+ 
+ config ARCH_SUPPORTS_UPROBES
+ 	bool
+@@ -1767,7 +1767,7 @@ config CPU_MIPS32_R5_XPA
+ 	depends on SYS_SUPPORTS_HIGHMEM
+ 	select XPA
+ 	select HIGHMEM
+-	select ARCH_PHYS_ADDR_T_64BIT
++	select PHYS_ADDR_T_64BIT
+ 	default n
+ 	help
+ 	  Choose this option if you want to enable the Extended Physical
+@@ -2399,9 +2399,6 @@ config SB1_PASS_2_1_WORKAROUNDS
+ 	default y
+ 
+ 
+-config ARCH_PHYS_ADDR_T_64BIT
+-       bool
+-
+ choice
+ 	prompt "SmartMIPS or microMIPS ASE support"
+ 
+diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+index 39c5377a5460..8bdcd7e44838 100644
+--- a/arch/powerpc/Kconfig
++++ b/arch/powerpc/Kconfig
+@@ -13,11 +13,8 @@ config 64BIT
+ 	bool
+ 	default y if PPC64
+ 
+-config ARCH_PHYS_ADDR_T_64BIT
+-       def_bool PPC64 || PHYS_64BIT
+-
+ config ARCH_DMA_ADDR_T_64BIT
+-	def_bool ARCH_PHYS_ADDR_T_64BIT
++	def_bool PHYS_ADDR_T_64BIT
+ 
+ config MMU
+ 	bool
+diff --git a/arch/powerpc/platforms/Kconfig.cputype b/arch/powerpc/platforms/Kconfig.cputype
+index 67d3125d0610..84b58abc08ee 100644
+--- a/arch/powerpc/platforms/Kconfig.cputype
++++ b/arch/powerpc/platforms/Kconfig.cputype
+@@ -222,6 +222,7 @@ config PTE_64BIT
+ config PHYS_64BIT
+ 	bool 'Large physical address support' if E500 || PPC_86xx
+ 	depends on (44x || E500 || PPC_86xx) && !PPC_83xx && !PPC_82xx
++	select PHYS_ADDR_T_64BIT
+ 	---help---
+ 	  This option enables kernel support for larger than 32-bit physical
+ 	  addresses.  This feature may not be available on all cores.
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index 23d8acca5c90..f52f86f43a4b 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -5,6 +5,8 @@
+ 
+ config RISCV
+ 	def_bool y
++	# even on 32-bit, physical (and DMA) addresses are > 32-bits
++	select PHYS_ADDR_T_64BIT
+ 	select OF
+ 	select OF_EARLY_FLATTREE
+ 	select OF_IRQ
+@@ -38,10 +40,6 @@ config RISCV
+ config MMU
+ 	def_bool y
+ 
+-# even on 32-bit, physical (and DMA) addresses are > 32-bits
+-config ARCH_PHYS_ADDR_T_64BIT
+-	def_bool y
+-
+ config ZONE_DMA32
+ 	bool
+ 	default y
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 414043303ea1..15f228984e70 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -1447,6 +1447,7 @@ config HIGHMEM
+ config X86_PAE
+ 	bool "PAE (Physical Address Extension) Support"
+ 	depends on X86_32 && !HIGHMEM4G
++	select PHYS_ADDR_T_64BIT
+ 	select SWIOTLB
+ 	---help---
+ 	  PAE is required for NX support, and furthermore enables
+@@ -1474,10 +1475,6 @@ config X86_5LEVEL
+ 
+ 	  Say N if unsure.
+ 
+-config ARCH_PHYS_ADDR_T_64BIT
+-	def_bool y
+-	depends on X86_64 || X86_PAE
+-
+ config ARCH_DMA_ADDR_T_64BIT
+ 	def_bool y
+ 	depends on X86_64 || HIGHMEM64G
+diff --git a/mm/Kconfig b/mm/Kconfig
+index d5004d82a1d6..a3f0005ac212 100644
+--- a/mm/Kconfig
++++ b/mm/Kconfig
+@@ -266,7 +266,7 @@ config ARCH_ENABLE_THP_MIGRATION
+ 	bool
+ 
+ config PHYS_ADDR_T_64BIT
+-	def_bool 64BIT || ARCH_PHYS_ADDR_T_64BIT
++	def_bool 64BIT
+ 
+ config BOUNCE
+ 	bool "Enable bounce buffers"
 -- 
-2.14.3
+2.17.0
+
