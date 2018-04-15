@@ -1,109 +1,154 @@
-Return-Path: <fthain@telegraphics.com.au>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Jens Axboe <axboe@kernel.dk>,
-    Laurent Vivier <lvivier@redhat.com>,
-    linux-m68k@lists.linux-m68k.org,
-    linux-kernel@vger.kernel.org,
-    linux-block@vger.kernel.org,
-    stable@vger.kernel.org
-Message-Id: <0785f312c30dd54f8fd1cb492fa7957758ef03e9.1523493475.git.fthain@telegraphics.com.au>
-In-Reply-To: <cover.1523493475.git.fthain@telegraphics.com.au>
-References: <cover.1523493475.git.fthain@telegraphics.com.au>
-From: Finn Thain <fthain@telegraphics.com.au>
-Subject: [PATCH v2 04/10] block/swim: Fix array bounds check
-Date: Wed, 11 Apr 2018 20:50:14 -0400 (EDT)
+Return-Path: <ming.lei@redhat.com>
+Date: Sun, 15 Apr 2018 10:14:10 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/2] loop: remove cmd->rq member
+Message-ID: <20180415021404.GA11030@ming.t460p>
+References: <1523658636-2212-1-git-send-email-axboe@kernel.dk>
+ <1523658636-2212-2-git-send-email-axboe@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1523658636-2212-2-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-In the floppy_find() function in swim.c is a call to
-get_disk(swd->unit[drive].disk). The actual parameter to this call
-can be a NULL pointer when drive == swd->floppy_count. This causes
-an oops in get_disk().
+On Fri, Apr 13, 2018 at 04:30:35PM -0600, Jens Axboe wrote:
+> We can always get at the request from the payload, no need to store
+> a pointer to it.
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  drivers/block/loop.c | 36 +++++++++++++++++++-----------------
+>  drivers/block/loop.h |  1 -
+>  2 files changed, 19 insertions(+), 18 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index c9d04497a415..8b2fde2109fc 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -452,9 +452,9 @@ static void lo_complete_rq(struct request *rq)
+>  {
+>  	struct loop_cmd *cmd = blk_mq_rq_to_pdu(rq);
+>  
+> -	if (unlikely(req_op(cmd->rq) == REQ_OP_READ && cmd->use_aio &&
+> -		     cmd->ret >= 0 && cmd->ret < blk_rq_bytes(cmd->rq))) {
+> -		struct bio *bio = cmd->rq->bio;
+> +	if (unlikely(req_op(rq) == REQ_OP_READ && cmd->use_aio &&
+> +		     cmd->ret >= 0 && cmd->ret < blk_rq_bytes(rq))) {
+> +		struct bio *bio = rq->bio;
+>  
+>  		bio_advance(bio, cmd->ret);
+>  		zero_fill_bio(bio);
+> @@ -465,11 +465,13 @@ static void lo_complete_rq(struct request *rq)
+>  
+>  static void lo_rw_aio_do_completion(struct loop_cmd *cmd)
+>  {
+> +	struct request *rq = blk_mq_rq_from_pdu(cmd);
+> +
+>  	if (!atomic_dec_and_test(&cmd->ref))
+>  		return;
+>  	kfree(cmd->bvec);
+>  	cmd->bvec = NULL;
+> -	blk_mq_complete_request(cmd->rq);
+> +	blk_mq_complete_request(rq);
+>  }
+>  
+>  static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
+> @@ -487,7 +489,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+>  {
+>  	struct iov_iter iter;
+>  	struct bio_vec *bvec;
+> -	struct request *rq = cmd->rq;
+> +	struct request *rq = blk_mq_rq_from_pdu(cmd);
+>  	struct bio *bio = rq->bio;
+>  	struct file *file = lo->lo_backing_file;
+>  	unsigned int offset;
+> @@ -1702,15 +1704,16 @@ EXPORT_SYMBOL(loop_unregister_transfer);
+>  static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
+>  		const struct blk_mq_queue_data *bd)
+>  {
+> -	struct loop_cmd *cmd = blk_mq_rq_to_pdu(bd->rq);
+> -	struct loop_device *lo = cmd->rq->q->queuedata;
+> +	struct request *rq = bd->rq;
+> +	struct loop_cmd *cmd = blk_mq_rq_to_pdu(rq);
+> +	struct loop_device *lo = rq->q->queuedata;
+>  
+> -	blk_mq_start_request(bd->rq);
+> +	blk_mq_start_request(rq);
+>  
+>  	if (lo->lo_state != Lo_bound)
+>  		return BLK_STS_IOERR;
+>  
+> -	switch (req_op(cmd->rq)) {
+> +	switch (req_op(rq)) {
+>  	case REQ_OP_FLUSH:
+>  	case REQ_OP_DISCARD:
+>  	case REQ_OP_WRITE_ZEROES:
+> @@ -1723,8 +1726,8 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
+>  
+>  	/* always use the first bio's css */
+>  #ifdef CONFIG_BLK_CGROUP
+> -	if (cmd->use_aio && cmd->rq->bio && cmd->rq->bio->bi_css) {
+> -		cmd->css = cmd->rq->bio->bi_css;
+> +	if (cmd->use_aio && rq->bio && rq->bio->bi_css) {
+> +		cmd->css = rq->bio->bi_css;
+>  		css_get(cmd->css);
+>  	} else
+>  #endif
+> @@ -1736,8 +1739,9 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
+>  
+>  static void loop_handle_cmd(struct loop_cmd *cmd)
+>  {
+> -	const bool write = op_is_write(req_op(cmd->rq));
+> -	struct loop_device *lo = cmd->rq->q->queuedata;
+> +	struct request *rq = blk_mq_rq_from_pdu(cmd);
+> +	const bool write = op_is_write(req_op(rq));
+> +	struct loop_device *lo = rq->q->queuedata;
+>  	int ret = 0;
+>  
+>  	if (write && (lo->lo_flags & LO_FLAGS_READ_ONLY)) {
+> @@ -1745,12 +1749,12 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
+>  		goto failed;
+>  	}
+>  
+> -	ret = do_req_filebacked(lo, cmd->rq);
+> +	ret = do_req_filebacked(lo, rq);
+>   failed:
+>  	/* complete non-aio request */
+>  	if (!cmd->use_aio || ret) {
+>  		cmd->ret = ret ? -EIO : 0;
+> -		blk_mq_complete_request(cmd->rq);
+> +		blk_mq_complete_request(rq);
+>  	}
+>  }
+>  
+> @@ -1767,9 +1771,7 @@ static int loop_init_request(struct blk_mq_tag_set *set, struct request *rq,
+>  {
+>  	struct loop_cmd *cmd = blk_mq_rq_to_pdu(rq);
+>  
+> -	cmd->rq = rq;
+>  	kthread_init_work(&cmd->work, loop_queue_work);
+> -
+>  	return 0;
+>  }
+>  
+> diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+> index 0f45416e4fcf..b78de9879f4f 100644
+> --- a/drivers/block/loop.h
+> +++ b/drivers/block/loop.h
+> @@ -66,7 +66,6 @@ struct loop_device {
+>  
+>  struct loop_cmd {
+>  	struct kthread_work work;
+> -	struct request *rq;
+>  	bool use_aio; /* use AIO interface to handle I/O */
+>  	atomic_t ref; /* only for aio */
+>  	long ret;
+> -- 
+> 2.7.4
+> 
 
-Data read fault at 0x00000198 in Super Data (pc=0x1be5b6)
-BAD KERNEL BUSERR
-Oops: 00000000
-Modules linked in: swim_mod ipv6 mac8390
-PC: [<001be5b6>] get_disk+0xc/0x76
-SR: 2004  SP: 9a078bc1  a2: 0213ed90
-d0: 00000000    d1: 00000000    d2: 00000000    d3: 000000ff
-d4: 00000002    d5: 02983590    a0: 02332e00    a1: 022dfd64
-Process dd (pid: 285, task=020ab25b)
-Frame format=B ssw=074d isc=4a88 isb=6732 daddr=00000198 dobuf=00000000
-baddr=001be5bc dibuf=bfffffff ver=f
-Stack from 022dfca4:
-        00000000 0203fc00 0213ed90 022dfcc0 02982936 00000000 00200000 022dfd08
-        0020f85a 00200000 022dfd64 02332e00 004040fc 00000014 001be77e 022dfd64
-        00334e4a 001be3f8 0800001d 022dfd64 01c04b60 01c04b70 022aba80 029828f8
-        02332e00 022dfd2c 001be7ac 0203fc00 00200000 022dfd64 02103a00 01c04b60
-        01c04b60 0200e400 022dfd68 000e191a 00200000 022dfd64 02103a00 0800001d
-        00000000 00000003 000b89de 00500000 02103a00 01c04b60 02103a08 01c04c2e
-Call Trace: [<02982936>] floppy_find+0x3e/0x4a [swim_mod]
- [<00200000>] uart_remove_one_port+0x1a2/0x260
- [<0020f85a>] kobj_lookup+0xde/0x132
- [<00200000>] uart_remove_one_port+0x1a2/0x260
- [<001be77e>] get_gendisk+0x0/0x130
- [<00334e4a>] mutex_lock+0x0/0x2e
- [<001be3f8>] disk_block_events+0x0/0x6c
- [<029828f8>] floppy_find+0x0/0x4a [swim_mod]
- [<001be7ac>] get_gendisk+0x2e/0x130
- [<00200000>] uart_remove_one_port+0x1a2/0x260
- [<000e191a>] __blkdev_get+0x32/0x45a
- [<00200000>] uart_remove_one_port+0x1a2/0x260
- [<000b89de>] complete_walk+0x0/0x8a
- [<000e1e22>] blkdev_get+0xe0/0x29a
- [<000e1fdc>] blkdev_open+0x0/0xb0
- [<000b89de>] complete_walk+0x0/0x8a
- [<000e1fdc>] blkdev_open+0x0/0xb0
- [<000e01cc>] bd_acquire+0x74/0x8a
- [<000e205c>] blkdev_open+0x80/0xb0
- [<000e1fdc>] blkdev_open+0x0/0xb0
- [<000abf24>] do_dentry_open+0x1a4/0x322
- [<00020000>] __do_proc_douintvec+0x22/0x27e
- [<000b89de>] complete_walk+0x0/0x8a
- [<000baa62>] link_path_walk+0x0/0x48e
- [<000ba3f8>] inode_permission+0x20/0x54
- [<000ac0e4>] vfs_open+0x42/0x78
- [<000bc372>] path_openat+0x2b2/0xeaa
- [<000bc0c0>] path_openat+0x0/0xeaa
- [<0004463e>] __irq_wake_thread+0x0/0x4e
- [<0003a45a>] task_tick_fair+0x18/0xc8
- [<000bd00a>] do_filp_open+0xa0/0xea
- [<000abae0>] do_sys_open+0x11a/0x1ee
- [<00020000>] __do_proc_douintvec+0x22/0x27e
- [<000abbf4>] SyS_open+0x1e/0x22
- [<00020000>] __do_proc_douintvec+0x22/0x27e
- [<00002b40>] syscall+0x8/0xc
- [<00020000>] __do_proc_douintvec+0x22/0x27e
- [<0000c00b>] dyadic+0x1/0x28
-Code: 4e5e 4e75 4e56 fffc 2f0b 2f02 266e 0008 <206b> 0198 4a88 6732 2428 002c 661e 486b 0058 4eb9 0032 0b96 588f 4a88 672c 2008
-Disabling lock debugging due to kernel taint
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Fix the array index bounds check to avoid this.
-
-Cc: Laurent Vivier <lvivier@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: stable@vger.kernel.org # v4.14+
-Fixes: 8852ecd97488 ("[PATCH] m68k: mac - Add SWIM floppy support")
-Tested-by: Stan Johnson <userm57@yahoo.com>
-Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
-Acked-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
----
- drivers/block/swim.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index 92f0cddc597e..2cdfc0db5966 100644
---- a/drivers/block/swim.c
-+++ b/drivers/block/swim.c
-@@ -795,7 +795,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
- 	struct swim_priv *swd = data;
- 	int drive = (*part & 3);
- 
--	if (drive > swd->floppy_count)
-+	if (drive >= swd->floppy_count)
- 		return NULL;
- 
- 	*part = 0;
 -- 
-2.16.1
+Ming
