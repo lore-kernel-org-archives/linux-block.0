@@ -1,52 +1,89 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:40356 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932085AbeDWRF1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Apr 2018 13:05:27 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        iommu@lists.linux-foundation.org
-Cc: x86@kernel.org, linux-block@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-mm@kvack.org,
-        linux-mips@linux-mips.org, sparclinux@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 10/12] arm: don't build swiotlb by default
-Date: Mon, 23 Apr 2018 19:04:17 +0200
-Message-Id: <20180423170419.20330-11-hch@lst.de>
-In-Reply-To: <20180423170419.20330-1-hch@lst.de>
-References: <20180423170419.20330-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+Date: Sun, 15 Apr 2018 10:16:44 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/2] loop: handle short DIO reads
+Message-ID: <20180415021643.GB11030@ming.t460p>
+References: <1523658636-2212-1-git-send-email-axboe@kernel.dk>
+ <1523658636-2212-3-git-send-email-axboe@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1523658636-2212-3-git-send-email-axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-swiotlb is only used as a library of helper for xen-swiotlb if Xen support
-is enabled on arm, so don't build it by default.
+On Fri, Apr 13, 2018 at 04:30:36PM -0600, Jens Axboe wrote:
+> We ran into an issue with loop and btrfs, where btrfs would complain about
+> checksum errors. It turns out that is because we don't handle short reads
+> at all, we just zero fill the remainder. Worse than that, we don't handle
+> the filling properly, which results in loop trying to advance a single
+> bio by much more than its size, since it doesn't take chaining into
+> account.
+> 
+> Handle short reads appropriately, by simply retrying at the new correct
+> offset. End the remainder of the request with EIO, if we get a 0 read.
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  drivers/block/loop.c | 34 +++++++++++++++++++++++++++-------
+>  1 file changed, 27 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 8b2fde2109fc..5d4e31655d96 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -451,16 +451,36 @@ static int lo_req_flush(struct loop_device *lo, struct request *rq)
+>  static void lo_complete_rq(struct request *rq)
+>  {
+>  	struct loop_cmd *cmd = blk_mq_rq_to_pdu(rq);
+> +	blk_status_t ret = BLK_STS_OK;
+>  
+> -	if (unlikely(req_op(rq) == REQ_OP_READ && cmd->use_aio &&
+> -		     cmd->ret >= 0 && cmd->ret < blk_rq_bytes(rq))) {
+> -		struct bio *bio = rq->bio;
+> -
+> -		bio_advance(bio, cmd->ret);
+> -		zero_fill_bio(bio);
+> +	if (!cmd->use_aio || cmd->ret < 0 || cmd->ret == blk_rq_bytes(rq) ||
+> +	    req_op(rq) != REQ_OP_READ) {
+> +		if (cmd->ret < 0)
+> +			ret = BLK_STS_IOERR;
+> +		goto end_io;
+>  	}
+>  
+> -	blk_mq_end_request(rq, cmd->ret < 0 ? BLK_STS_IOERR : BLK_STS_OK);
+> +	/*
+> +	 * Short READ - if we got some data, advance our request and
+> +	 * retry it. If we got no data, end the rest with EIO.
+> +	 */
+> +	if (cmd->ret) {
+> +		blk_update_request(rq, BLK_STS_OK, cmd->ret);
+> +		cmd->ret = 0;
+> +		blk_mq_requeue_request(rq, true);
+> +	} else {
+> +		if (cmd->use_aio) {
+> +			struct bio *bio = rq->bio;
+> +
+> +			while (bio) {
+> +				zero_fill_bio(bio);
+> +				bio = bio->bi_next;
+> +			}
+> +		}
+> +		ret = BLK_STS_IOERR;
+> +end_io:
+> +		blk_mq_end_request(rq, ret);
+> +	}
+>  }
+>  
+>  static void lo_rw_aio_do_completion(struct loop_cmd *cmd)
+> -- 
+> 2.7.4
+> 
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- arch/arm/Kconfig | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Looks fine, short read will be guaranteed to complete when zero read
+is triggered.
 
-diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index aa1c187d756d..90b81a3a28a7 100644
---- a/arch/arm/Kconfig
-+++ b/arch/arm/Kconfig
-@@ -1774,7 +1774,7 @@ config SECCOMP
- 	  defined by each seccomp mode.
- 
- config SWIOTLB
--	def_bool y
-+	bool
- 
- config PARAVIRT
- 	bool "Enable paravirtualization code"
-@@ -1807,6 +1807,7 @@ config XEN
- 	depends on MMU
- 	select ARCH_DMA_ADDR_T_64BIT
- 	select ARM_PSCI
-+	select SWIOTLB
- 	select SWIOTLB_XEN
- 	select PARAVIRT
- 	help
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
 -- 
-2.17.0
+Ming
