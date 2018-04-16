@@ -1,82 +1,64 @@
-Return-Path: <linux-arch-owner@vger.kernel.org>
-Date: Mon, 16 Apr 2018 21:11:46 +0200 (CEST)
-From: Julia Lawall <julia.lawall@lip6.fr>
-To: Christoph Hellwig <hch@lst.de>
-cc: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-scsi@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kbuild-all@01.org
-Subject: Re: [PATCH 08/12] mmc: reduce use of block bounce buffers (fwd)
-Message-ID: <alpine.DEB.2.20.1804162110510.3044@hadrien>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-arch-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
-
-There is a duplicated test on line 360.
-
-julia
-
----------- Forwarded message ----------
-Date: Mon, 16 Apr 2018 23:04:18 +0800
-From: kbuild test robot <lkp@intel.com>
-To: kbuild@01.org
-Cc: Julia Lawall <julia.lawall@lip6.fr>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:58046 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753359AbeDPKv0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Apr 2018 06:51:26 -0400
 Subject: Re: [PATCH 08/12] mmc: reduce use of block bounce buffers
-
-CC: kbuild-all@01.org
+To: Christoph Hellwig <hch@lst.de>, iommu@lists.linux-foundation.org,
+        linux-arch@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+        netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+References: <20180416085032.7367-1-hch@lst.de>
+ <20180416085032.7367-9-hch@lst.de>
+From: Robin Murphy <robin.murphy@arm.com>
+Message-ID: <2067b808-65b3-e4d9-e376-1062abc1542f@arm.com>
+Date: Mon, 16 Apr 2018 11:51:23 +0100
+MIME-Version: 1.0
 In-Reply-To: <20180416085032.7367-9-hch@lst.de>
-References: <20180416085032.7367-9-hch@lst.de>
-TO: Christoph Hellwig <hch@lst.de>
-CC: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org, linux-block@vger.kernel.org, linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org, netdev@vger.kernel.org
-CC: linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Christoph,
+On 16/04/18 09:50, Christoph Hellwig wrote:
+> We can rely on the dma-mapping code to handle any DMA limits that is
+> bigger than the ISA DMA mask for us (either using an iommu or swiotlb),
+> so remove setting the block layer bounce limit for anything but bouncing
+> for highmem pages.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   drivers/mmc/core/queue.c | 7 ++-----
+>   1 file changed, 2 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+> index 56e9a803db21..60a02a763d01 100644
+> --- a/drivers/mmc/core/queue.c
+> +++ b/drivers/mmc/core/queue.c
+> @@ -351,17 +351,14 @@ static const struct blk_mq_ops mmc_mq_ops = {
+>   static void mmc_setup_queue(struct mmc_queue *mq, struct mmc_card *card)
+>   {
+>   	struct mmc_host *host = card->host;
+> -	u64 limit = BLK_BOUNCE_HIGH;
+> -
+> -	if (mmc_dev(host)->dma_mask && *mmc_dev(host)->dma_mask)
+> -		limit = (u64)dma_max_pfn(mmc_dev(host)) << PAGE_SHIFT;
+>   
+>   	blk_queue_flag_set(QUEUE_FLAG_NONROT, mq->queue);
+>   	blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, mq->queue);
+>   	if (mmc_can_erase(card))
+>   		mmc_queue_setup_discard(mq->queue, card);
+>   
+> -	blk_queue_bounce_limit(mq->queue, limit);
+> +	if (!mmc_dev(host)->dma_mask || !mmc_dev(host)->dma_mask)
 
-I love your patch! Perhaps something to improve:
+I'm almost surprised that GCC doesn't warn about "x || x", but 
+nevertheless I think you've lost a "*" here...
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v4.17-rc1 next-20180416]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+Robin.
 
-url:    https://github.com/0day-ci/linux/commits/Christoph-Hellwig/iscsi_tcp-don-t-set-a-bounce-limit/20180416-172618
-:::::: branch date: 6 hours ago
-:::::: commit date: 6 hours ago
-
->> drivers/mmc/core/queue.c:360:5-29: duplicated argument to && or ||
-
-# https://github.com/0day-ci/linux/commit/6620a69f0eea8e8b7586f08f721c95a336022497
-git remote add linux-review https://github.com/0day-ci/linux
-git remote update linux-review
-git checkout 6620a69f0eea8e8b7586f08f721c95a336022497
-vim +360 drivers/mmc/core/queue.c
-
-81196976 Adrian Hunter     2017-11-29  350
-c8b5fd03 Adrian Hunter     2017-09-22  351  static void mmc_setup_queue(struct mmc_queue *mq, struct mmc_card *card)
-c8b5fd03 Adrian Hunter     2017-09-22  352  {
-c8b5fd03 Adrian Hunter     2017-09-22  353  	struct mmc_host *host = card->host;
-c8b5fd03 Adrian Hunter     2017-09-22  354
-8b904b5b Bart Van Assche   2018-03-07  355  	blk_queue_flag_set(QUEUE_FLAG_NONROT, mq->queue);
-8b904b5b Bart Van Assche   2018-03-07  356  	blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, mq->queue);
-c8b5fd03 Adrian Hunter     2017-09-22  357  	if (mmc_can_erase(card))
-c8b5fd03 Adrian Hunter     2017-09-22  358  		mmc_queue_setup_discard(mq->queue, card);
-c8b5fd03 Adrian Hunter     2017-09-22  359
-6620a69f Christoph Hellwig 2018-04-16 @360  	if (!mmc_dev(host)->dma_mask || !mmc_dev(host)->dma_mask)
-6620a69f Christoph Hellwig 2018-04-16  361  		blk_queue_bounce_limit(mq->queue, BLK_BOUNCE_HIGH);
-c8b5fd03 Adrian Hunter     2017-09-22  362  	blk_queue_max_hw_sectors(mq->queue,
-c8b5fd03 Adrian Hunter     2017-09-22  363  		min(host->max_blk_count, host->max_req_size / 512));
-c8b5fd03 Adrian Hunter     2017-09-22  364  	blk_queue_max_segments(mq->queue, host->max_segs);
-c8b5fd03 Adrian Hunter     2017-09-22  365  	blk_queue_max_segment_size(mq->queue, host->max_seg_size);
-c8b5fd03 Adrian Hunter     2017-09-22  366
-1e8e55b6 Adrian Hunter     2017-11-29  367  	INIT_WORK(&mq->recovery_work, mmc_mq_recovery_handler);
-81196976 Adrian Hunter     2017-11-29  368  	INIT_WORK(&mq->complete_work, mmc_blk_mq_complete_work);
-81196976 Adrian Hunter     2017-11-29  369
-81196976 Adrian Hunter     2017-11-29  370  	mutex_init(&mq->complete_lock);
-81196976 Adrian Hunter     2017-11-29  371
-81196976 Adrian Hunter     2017-11-29  372  	init_waitqueue_head(&mq->wait);
-81196976 Adrian Hunter     2017-11-29  373  }
-81196976 Adrian Hunter     2017-11-29  374
-
----
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+> +		blk_queue_bounce_limit(mq->queue, BLK_BOUNCE_HIGH);
+>   	blk_queue_max_hw_sectors(mq->queue,
+>   		min(host->max_blk_count, host->max_req_size / 512));
+>   	blk_queue_max_segments(mq->queue, host->max_segs);
+> 
