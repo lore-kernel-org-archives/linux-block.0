@@ -1,42 +1,44 @@
-Return-Path: <jiang.biao2@zte.com.cn>
-From: Jiang Biao <jiang.biao2@zte.com.cn>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, tj@kernel.org,
-        jiang.biao2@zte.com.cn, zhong.weidong@zte.com.cn,
-        wen.yang99@zte.com.cn
-Subject: [PATCH 1/2] blkcg: small fix on comment in blkcg_init_queue
-Date: Thu, 19 Apr 2018 12:04:26 +0800
-Message-Id: <1524110666-106945-1-git-send-email-jiang.biao2@zte.com.cn>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41196 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1753271AbeDPJyW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Apr 2018 05:54:22 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id w3G9nmdw121162
+        for <linux-block@vger.kernel.org>; Mon, 16 Apr 2018 05:54:22 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2hcqfned4f-1
+        (version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Mon, 16 Apr 2018 05:54:21 -0400
+Received: from localhost
+        by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-block@vger.kernel.org> from <khandual@linux.vnet.ibm.com>;
+        Mon, 16 Apr 2018 10:54:20 +0100
+Subject: Re: [PATCH 05/12] scatterlist: move the NEED_SG_DMA_LENGTH config
+ symbol to lib/Kconfig
+To: Christoph Hellwig <hch@lst.de>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        iommu@lists.linux-foundation.org
+References: <20180415145947.1248-1-hch@lst.de>
+ <20180415145947.1248-6-hch@lst.de>
+Cc: x86@kernel.org, linux-block@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-mm@kvack.org,
+        linux-ide@vger.kernel.org, linux-mips@linux-mips.org,
+        sparclinux@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+From: Anshuman Khandual <khandual@linux.vnet.ibm.com>
+Date: Mon, 16 Apr 2018 15:24:12 +0530
+MIME-Version: 1.0
+In-Reply-To: <20180415145947.1248-6-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252
+Message-Id: <5c1bd095-96f0-8038-4685-492761123be6@linux.vnet.ibm.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The comment before blkg_create() in blkcg_init_queue() was moved
-from blkcg_activate_policy() by commit ec13b1d6f0a0457312e615, but
-it does not suit for the new context.
+On 04/15/2018 08:29 PM, Christoph Hellwig wrote:
+> This way we have one central definition of it, and user can select it as
+> needed.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Signed-off-by: Jiang Biao <jiang.biao2@zte.com.cn>
-Signed-off-by: Wen Yang <wen.yang99@zte.com.cn>
-CC: Tejun Heo <tj@kernel.org>
-CC: Jens Axboe <axboe@kernel.dk>
----
- block/blk-cgroup.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 2b7f8d0..07e3359 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1134,11 +1134,7 @@ int blkcg_init_queue(struct request_queue *q)
- 
- 	preloaded = !radix_tree_preload(GFP_KERNEL);
- 
--	/*
--	 * Make sure the root blkg exists and count the existing blkgs.  As
--	 * @q is bypassing at this point, blkg_lookup_create() can't be
--	 * used.  Open code insertion.
--	 */
-+	/* Make sure the root blkg exists. */
- 	rcu_read_lock();
- 	spin_lock_irq(q->queue_lock);
- 	blkg = blkg_create(&blkcg_root, q, new_blkg);
--- 
-2.7.4
+Reviewed-by: Anshuman Khandual <khandual@linux.vnet.ibm.com>
