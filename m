@@ -1,51 +1,37 @@
-Return-Path: <prvs=637eb2c04=Bart.VanAssche@wdc.com>
+Return-Path: <beanhuo@micron.com>
+From: "Bean Huo (beanhuo)" <beanhuo@micron.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>,
+        "rostedt@goodmis.org"
+	<rostedt@goodmis.org>,
+        "rajatja@google.com" <rajatja@google.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "axboe@kernel.dk"
+	<axboe@kernel.dk>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "mingo@redhad.com" <mingo@redhad.com>,
+        "jejb@linux.vnet.ibm.com"
+	<jejb@linux.vnet.ibm.com>
 Subject: Re: [RESEND PATCH v1 1/2] trace: events: scsi: Add tag in SCSI trace
  events
-To: "Bean Huo (beanhuo)" <beanhuo@micron.com>,
- "rostedt@goodmis.org" <rostedt@goodmis.org>,
- "rajatja@google.com" <rajatja@google.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
- "axboe@kernel.dk" <axboe@kernel.dk>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "mingo@redhad.com" <mingo@redhad.com>,
- "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>
-References: <b46de00ee67e4ec9955bb3f09faa36c4@SIWEX5A.sing.micron.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-Message-ID: <9a095abe-c016-0c2e-11e2-7253dbad3a6c@wdc.com>
-Date: Mon, 16 Apr 2018 10:11:33 -0700
+Date: Mon, 16 Apr 2018 17:05:59 +0000
+Message-ID: <b46de00ee67e4ec9955bb3f09faa36c4@SIWEX5A.sing.micron.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <b46de00ee67e4ec9955bb3f09faa36c4@SIWEX5A.sing.micron.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Return-Path: bart.vanassche@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 04/16/18 10:05, Bean Huo (beanhuo) wrote:
->> On Mon, 2018-04-16 at 09:41 -0700, Rajat Jain wrote:
->>> On Mon, Apr 16, 2018 at 8:28 AM, Steven Rostedt <rostedt@goodmis.org>
->> wrote:
->>>> On Mon, 16 Apr 2018 14:31:49 +0000
->>>> "Bean Huo (beanhuo)" <beanhuo@micron.com> wrote:
->>>>
->>>>> Print the request tag along with other information while tracing a
->>>>> command.
->>>>>
->>>>> Signed-off-by: Bean Huo <beanhuo@micron.com>
->>>
->>> Acked-by: Rajat Jain <rajatja@google.com>
->>
->> This patch is not acceptable because it adds support for tag tracing to the
->> legacy block layer only. Any patch that adds a new feature to the legacy block
->> layer must also add it to blk-mq.
->>
-> To be honest, I don't understand your point, can you give me more explanation?
-
-The legacy block layer will be removed as soon as blk-mq provides all 
-the functionality of the legacy block layer and as soon as it performs 
-at least as well as the legacy block layer for all use cases. If new 
-features are added to the legacy block layer but not to blk-mq that 
-prevents removal of the legacy block layer. Hence the requirement I 
-explained in my previous e-mail.
-
-Bart.
+SGksIEJhcnQNCg0KPk9uIE1vbiwgMjAxOC0wNC0xNiBhdCAwOTo0MSAtMDcwMCwgUmFqYXQgSmFp
+biB3cm90ZToNCj4+IE9uIE1vbiwgQXByIDE2LCAyMDE4IGF0IDg6MjggQU0sIFN0ZXZlbiBSb3N0
+ZWR0IDxyb3N0ZWR0QGdvb2RtaXMub3JnPg0KPndyb3RlOg0KPj4gPiBPbiBNb24sIDE2IEFwciAy
+MDE4IDE0OjMxOjQ5ICswMDAwDQo+PiA+ICJCZWFuIEh1byAoYmVhbmh1bykiIDxiZWFuaHVvQG1p
+Y3Jvbi5jb20+IHdyb3RlOg0KPj4gPg0KPj4gPiA+IFByaW50IHRoZSByZXF1ZXN0IHRhZyBhbG9u
+ZyB3aXRoIG90aGVyIGluZm9ybWF0aW9uIHdoaWxlIHRyYWNpbmcgYQ0KPj4gPiA+IGNvbW1hbmQu
+DQo+PiA+ID4NCj4+ID4gPiBTaWduZWQtb2ZmLWJ5OiBCZWFuIEh1byA8YmVhbmh1b0BtaWNyb24u
+Y29tPg0KPj4NCj4+IEFja2VkLWJ5OiBSYWphdCBKYWluIDxyYWphdGphQGdvb2dsZS5jb20+DQo+
+DQo+VGhpcyBwYXRjaCBpcyBub3QgYWNjZXB0YWJsZSBiZWNhdXNlIGl0IGFkZHMgc3VwcG9ydCBm
+b3IgdGFnIHRyYWNpbmcgdG8gdGhlDQo+bGVnYWN5IGJsb2NrIGxheWVyIG9ubHkuIEFueSBwYXRj
+aCB0aGF0IGFkZHMgYSBuZXcgZmVhdHVyZSB0byB0aGUgbGVnYWN5IGJsb2NrDQo+bGF5ZXIgbXVz
+dCBhbHNvIGFkZCBpdCB0byBibGstbXEuDQo+DQpUbyBiZSBob25lc3QsIEkgZG9uJ3QgdW5kZXJz
+dGFuZCB5b3VyIHBvaW50LCBjYW4geW91IGdpdmUgbWUgbW9yZSBleHBsYW5hdGlvbj8NCg0KPkJh
+cnQuDQo+DQo+DQoNCg==
