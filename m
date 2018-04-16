@@ -1,42 +1,73 @@
-Return-Path: <marmarek@invisiblethingslab.com>
-From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
-To: xen-devel@lists.xenproject.org
-Cc: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Juergen Gross <jgross@suse.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	linux-block@vger.kernel.org (open list:BLOCK LAYER),
-	linux-kernel@vger.kernel.org (open list),
-	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	stable@vger.kernel.org
-Subject: [PATCH 0/6] Fix XSA-155-like bugs in frontend drivers
-Date: Mon, 30 Apr 2018 23:01:44 +0200
-Message-Id: <cover.7ee732ab822b728ec486a3118ec12e9c06f0f325.1525122026.git-series.marmarek@invisiblethingslab.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:44810 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754359AbeDPIvO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Apr 2018 04:51:14 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-scsi@vger.kernel.org, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Subject: [PATCH 07/12] scsi: reduce use of block bounce buffers
+Date: Mon, 16 Apr 2018 10:50:27 +0200
+Message-Id: <20180416085032.7367-8-hch@lst.de>
+In-Reply-To: <20180416085032.7367-1-hch@lst.de>
+References: <20180416085032.7367-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Patches in original Xen Security Advisory 155 cared only about backend drivers
-while leaving frontend patches to be "developed and released (publicly) after
-the embargo date". This is said series.
+We can rely on the dma-mapping code to handle any DMA limits that is
+bigger than the ISA DMA mask for us (either using an iommu or swiotlb),
+so remove setting the block layer bounce limit for anything but the
+unchecked_isa_dma case, or the bouncing for highmem pages.
 
-Marek Marczykowski-Górecki (6):
-  xen: Add RING_COPY_RESPONSE()
-  xen-netfront: copy response out of shared buffer before accessing it
-  xen-netfront: do not use data already exposed to backend
-  xen-netfront: add range check for Tx response id
-  xen-blkfront: make local copy of response before using it
-  xen-blkfront: prepare request locally, only then put it on the shared ring
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/scsi/scsi_lib.c | 24 ++----------------------
+ 1 file changed, 2 insertions(+), 22 deletions(-)
 
- drivers/block/xen-blkfront.c    | 110 ++++++++++++++++++---------------
- drivers/net/xen-netfront.c      |  61 +++++++++---------
- include/xen/interface/io/ring.h |  14 ++++-
- 3 files changed, 106 insertions(+), 79 deletions(-)
-
-base-commit: 6d08b06e67cd117f6992c46611dfb4ce267cd71e
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 0dfec0dedd5e..ebe2cbb48b80 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -2142,27 +2142,6 @@ static int scsi_map_queues(struct blk_mq_tag_set *set)
+ 	return blk_mq_map_queues(set);
+ }
+ 
+-static u64 scsi_calculate_bounce_limit(struct Scsi_Host *shost)
+-{
+-	struct device *host_dev;
+-	u64 bounce_limit = 0xffffffff;
+-
+-	if (shost->unchecked_isa_dma)
+-		return BLK_BOUNCE_ISA;
+-	/*
+-	 * Platforms with virtual-DMA translation
+-	 * hardware have no practical limit.
+-	 */
+-	if (!PCI_DMA_BUS_IS_PHYS)
+-		return BLK_BOUNCE_ANY;
+-
+-	host_dev = scsi_get_device(shost);
+-	if (host_dev && host_dev->dma_mask)
+-		bounce_limit = (u64)dma_max_pfn(host_dev) << PAGE_SHIFT;
+-
+-	return bounce_limit;
+-}
+-
+ void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
+ {
+ 	struct device *dev = shost->dma_dev;
+@@ -2182,7 +2161,8 @@ void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
+ 	}
+ 
+ 	blk_queue_max_hw_sectors(q, shost->max_sectors);
+-	blk_queue_bounce_limit(q, scsi_calculate_bounce_limit(shost));
++	if (shost->unchecked_isa_dma)
++		blk_queue_bounce_limit(q, BLK_BOUNCE_ISA);
+ 	blk_queue_segment_boundary(q, shost->dma_boundary);
+ 	dma_set_seg_boundary(dev, shost->dma_boundary);
+ 
 -- 
-git-series 0.9.1
+2.17.0
