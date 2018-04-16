@@ -7,10 +7,10 @@ To: Jens Axboe <axboe@kernel.dk>,
 Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
 	Alan Jenkins <alan.christopher.jenkins@gmail.com>
 Subject: [PATCH] blktests: regression test "block: do not use interruptible wait anywhere"
-Date: Mon, 16 Apr 2018 22:52:47 +0100
-Message-Id: <20180416215247.27290-1-alan.christopher.jenkins@gmail.com>
-In-Reply-To: <20180416212311.19326-1-alan.christopher.jenkins@gmail.com>
-References: <20180416212311.19326-1-alan.christopher.jenkins@gmail.com>
+Date: Mon, 16 Apr 2018 22:23:11 +0100
+Message-Id: <20180416212311.19326-1-alan.christopher.jenkins@gmail.com>
+In-Reply-To: <891e334c-cf19-032c-b996-59ac166fcde1@gmail.com>
+References: <891e334c-cf19-032c-b996-59ac166fcde1@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
 > Without this fix, I get an IO error in this test:
@@ -28,10 +28,6 @@ Thread: http://lkml.kernel.org/r/891e334c-cf19-032c-b996-59ac166fcde1@gmail.com
 
 Signed-off-by: Alan Jenkins <alan.christopher.jenkins@gmail.com>
 ---
-v2: fix sense of conditional test for HAVE_BARE_METAL_SCSI.
-    Also I had a few single-bracket tests, which wanted to be replaced
-    with double-brackets to match the coding style.
-
  tests/scsi/004     | 235 +++++++++++++++++++++++++++++++++++++++++++++++++++++
  tests/scsi/004.out |   7 ++
  2 files changed, 242 insertions(+)
@@ -40,7 +36,7 @@ v2: fix sense of conditional test for HAVE_BARE_METAL_SCSI.
 
 diff --git a/tests/scsi/004 b/tests/scsi/004
 new file mode 100755
-index 0000000..ef42033
+index 0000000..791c76a
 --- /dev/null
 +++ b/tests/scsi/004
 @@ -0,0 +1,235 @@
@@ -109,7 +105,7 @@ index 0000000..ef42033
 +	#
 +	# Maybe annoying for Xen dom0, but I'm guessing it's not common.
 +	if grep -q ^flags.*\ hypervisor /proc/cpuinfo &&
-+	   (( !HAVE_BARE_METAL_SCSI )); then
++	   ! [[ -e "$HAVE_BARE_METAL_SCSI" ]]; then
 +		SKIP_REASON=\
 +"Hypervisor detected, but this test wants bare-metal SCSI timings.
 +If you have a pass-through device, you may set HAVE_BARE_METAL_SCSI=1."
@@ -168,11 +164,11 @@ index 0000000..ef42033
 +	}
 +
 +	cleanup() {
-+		if [[ -n "$subshell_pid" ]]; then
++		if [ -n "$subshell_pid" ]; then
 +			echo "Killing sub-shell..."
 +			cleanup_pid "$subshell_pid"
 +		fi
-+		if [[ -n "$dd_pid" ]]; then
++		if [ -n "$dd_pid" ]; then
 +			echo "Killing dd..."
 +			cleanup_pid "$dd_pid"
 +		fi
@@ -181,7 +177,7 @@ index 0000000..ef42033
 +		echo none > /sys/power/pm_test
 +
 +		echo "Resetting pm_test_delay"
-+		if [[ -n "$saved_pm_test_delay" ]]; then
++		if [ -n "$saved_pm_test_delay" ]; then
 +			echo "$saved_pm_test_delay" > "$sysfs_pm_test_delay"
 +		fi
 +	}
