@@ -1,77 +1,54 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: jglisse@redhat.com
-To: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>
-Subject: [RFC PATCH 79/79] mm/ksm: set page->mapping to page_ronly struct instead of stable_node.
-Date: Wed,  4 Apr 2018 15:18:31 -0400
-Message-Id: <20180404191831.5378-42-jglisse@redhat.com>
-In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
-References: <20180404191831.5378-1-jglisse@redhat.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:34654 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752978AbeDPSra (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Apr 2018 14:47:30 -0400
+Received: by mail-lf0-f65.google.com with SMTP id r7-v6so16525149lfr.1
+        for <linux-block@vger.kernel.org>; Mon, 16 Apr 2018 11:47:29 -0700 (PDT)
+Subject: Re: [PATCH] lightnvm: pblk: add CNEX Granby to the pblk device list
+To: Wei Xu <wxu@cnexlabs.com>
+Cc: javier@cnexlabs.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1523870357-2118-1-git-send-email-wxu@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <e595a844-8879-5919-6fc6-8563da666af4@lightnvm.io>
+Date: Mon, 16 Apr 2018 20:47:26 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <1523870357-2118-1-git-send-email-wxu@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Jérôme Glisse <jglisse@redhat.com>
+On 4/16/18 11:19 AM, Wei Xu wrote:
 
-Set page->mapping to the page_ronly struct instead of stable_node
-struct. There is no functional change as page_ronly is just a field
-of stable_node.
+> Add a new lightnvm quirk to identify CNEX’s Granby controller.
+>
+> Signed-off-by: Wei Xu <wxu@cnexlabs.com>
+> ---
+>   drivers/nvme/host/pci.c | 2 ++
+>   1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+> index cb73bc8..9419e88 100644
+> --- a/drivers/nvme/host/pci.c
+> +++ b/drivers/nvme/host/pci.c
+> @@ -2529,6 +2529,8 @@ static const struct pci_device_id nvme_id_table[] = {
+>   		.driver_data = NVME_QUIRK_LIGHTNVM, },
+>   	{ PCI_DEVICE(0x1d1d, 0x2807),	/* CNEX WL */
+>   		.driver_data = NVME_QUIRK_LIGHTNVM, },
+> +	{ PCI_DEVICE(0x1d1d, 0x2601),	/* CNEX Granby */
+> +		.driver_data = NVME_QUIRK_LIGHTNVM, },
+>   	{ PCI_DEVICE_CLASS(PCI_CLASS_STORAGE_EXPRESS, 0xffffff) },
+>   	{ PCI_DEVICE(PCI_VENDOR_ID_APPLE, 0x2001) },
+>   	{ PCI_DEVICE(PCI_VENDOR_ID_APPLE, 0x2003) },
+Hi Wei,
 
-Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
-Cc: Andrea Arcangeli <aarcange@redhat.com>
----
- mm/ksm.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+The patch looks good, but the title is not description of the change.
 
-diff --git a/mm/ksm.c b/mm/ksm.c
-index 6085068fb8b3..52b0ae291d23 100644
---- a/mm/ksm.c
-+++ b/mm/ksm.c
-@@ -39,6 +39,7 @@
- #include <linux/freezer.h>
- #include <linux/oom.h>
- #include <linux/numa.h>
-+#include <linux/page_ronly.h>
- 
- #include <asm/tlbflush.h>
- #include "internal.h"
-@@ -126,6 +127,7 @@ struct ksm_scan {
- 
- /**
-  * struct stable_node - node of the stable rbtree
-+ * @ronly: Page read only struct wrapper (see include/linux/page_ronly.h).
-  * @node: rb node of this ksm page in the stable tree
-  * @head: (overlaying parent) &migrate_nodes indicates temporarily on that list
-  * @hlist_dup: linked into the stable_node->hlist with a stable_node chain
-@@ -137,6 +139,7 @@ struct ksm_scan {
-  * @nid: NUMA node id of stable tree in which linked (may not match kpfn)
-  */
- struct stable_node {
-+	struct page_ronly ronly;
- 	union {
- 		struct rb_node node;	/* when node of stable tree */
- 		struct {		/* when listed for migration */
-@@ -318,13 +321,15 @@ static void __init ksm_slab_free(void)
- 
- static inline struct stable_node *page_stable_node(struct page *page)
- {
--	return PageReadOnly(page) ? page_rmapping(page) : NULL;
-+	struct page_ronly *ronly = page_ronly(page);
-+
-+	return ronly ? container_of(ronly, struct stable_node, ronly) : NULL;
- }
- 
- static inline void set_page_stable_node(struct page *page,
- 					struct stable_node *stable_node)
- {
--	page->mapping = (void *)((unsigned long)stable_node | PAGE_MAPPING_RONLY);
-+	page_ronly_set(page, stable_node ? &stable_node->ronly : NULL);
- }
- 
- static __always_inline bool is_stable_node_chain(struct stable_node *chain)
--- 
-2.14.3
+Could the title be changed to "nvme: lightnvm: add granby support". 
+Also, please send it to the nvme mailing list and CC Keith Busch. It is 
+a pure NVMe device driver change, and can go directly up through the 
+NVMe maintainers. I'll add a Reviewed-by: when you've sent it.
+
+-Matias
