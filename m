@@ -1,42 +1,199 @@
-Return-Path: <SRS0=bVZU=HF=goodmis.org=rostedt@kernel.org>
-Date: Mon, 16 Apr 2018 11:29:26 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: "Bean Huo (beanhuo)" <beanhuo@micron.com>
-Cc: "axboe@kernel.dk" <axboe@kernel.dk>, "jejb@linux.vnet.ibm.com"
- <jejb@linux.vnet.ibm.com>, "martin.petersen@oracle.com"
- <martin.petersen@oracle.com>, "linux-block@vger.kernel.org"
- <linux-block@vger.kernel.org>, "linux-scsi@vger.kernel.org"
- <linux-scsi@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "mingo@redhad.com" <mingo@redhad.com>,
- "Bart.VanAssche@sandisk.com" <Bart.VanAssche@sandisk.com>,
- "rajatja@google.com" <rajatja@google.com>
-Subject: Re: [RESEND PATCH v1 2/2] trace: events: block: Add tag in block
- trace events
-Message-ID: <20180416112926.7b44d03f@gandalf.local.home>
-In-Reply-To: <64d6073b28b140cda3e5870a54e0a7bc@SIWEX5A.sing.micron.com>
-References: <64d6073b28b140cda3e5870a54e0a7bc@SIWEX5A.sing.micron.com>
+Return-Path: <beanhuo@micron.com>
+From: "Bean Huo (beanhuo)" <beanhuo@micron.com>
+To: Steven Rostedt <rostedt@goodmis.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
+        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "mingo@redhad.com" <mingo@redhad.com>,
+        "Bart.VanAssche@sandisk.com"
+	<Bart.VanAssche@sandisk.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "Bean Huo (beanhuo)" <beanhuo@micron.com>,
+        "rajatja@google.com" <rajatja@google.com>
+Subject: [RESEND PATCH v1 2/2] trace: events: block: Add tag in block trace
+ events
+Date: Mon, 16 Apr 2018 14:33:29 +0000
+Message-ID: <64d6073b28b140cda3e5870a54e0a7bc@SIWEX5A.sing.micron.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, 16 Apr 2018 14:33:29 +0000
-"Bean Huo (beanhuo)" <beanhuo@micron.com> wrote:
+Print the request tag along with other information in block trace events
+when tracing request , and unplug type (Sync / Async).
 
-> Print the request tag along with other information in block trace events
-> when tracing request , and unplug type (Sync / Async).
-> 
-> Signed-off-by: Bean Huo <beanhuo@micron.com>
+Signed-off-by: Bean Huo <beanhuo@micron.com>
+---
+ include/trace/events/block.h | 36 +++++++++++++++++++++++++-----------
+ 1 file changed, 25 insertions(+), 11 deletions(-)
 
-I don't see any issue with the tracing part.
-
-Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
-
-Others need to check the content.
-
--- Steve
-
-
-> ---
->  include/trace/events/block.h | 36 +++++++++++++++++++++++++-----------
->  1 file changed, 25 insertions(+), 11 deletions(-)
-> 
+diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+index 81b43f5..f8c0b9e 100644
+--- a/include/trace/events/block.h
++++ b/include/trace/events/block.h
+@@ -81,6 +81,7 @@ TRACE_EVENT(block_rq_requeue,
+ 		__field(  dev_t,	dev			)
+ 		__field(  sector_t,	sector			)
+ 		__field(  unsigned int,	nr_sector		)
++		__field(  int,		tag			)
+ 		__array(  char,		rwbs,	RWBS_LEN	)
+ 		__dynamic_array( char,	cmd,	1		)
+ 	),
+@@ -89,16 +90,17 @@ TRACE_EVENT(block_rq_requeue,
+ 		__entry->dev	   =3D rq->rq_disk ? disk_devt(rq->rq_disk) : 0;
+ 		__entry->sector    =3D blk_rq_trace_sector(rq);
+ 		__entry->nr_sector =3D blk_rq_trace_nr_sectors(rq);
++		__entry->tag	   =3D rq->tag;
+=20
+ 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags, blk_rq_bytes(rq));
+ 		__get_str(cmd)[0] =3D '\0';
+ 	),
+=20
+-	TP_printk("%d,%d %s (%s) %llu + %u [%d]",
++	TP_printk("%d,%d %s (%s) %llu + %u tag=3D%d [%d]",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev),
+ 		  __entry->rwbs, __get_str(cmd),
+ 		  (unsigned long long)__entry->sector,
+-		  __entry->nr_sector, 0)
++		  __entry->nr_sector, __entry->tag, 0)
+ );
+=20
+ /**
+@@ -124,6 +126,7 @@ TRACE_EVENT(block_rq_complete,
+ 		__field(  sector_t,	sector			)
+ 		__field(  unsigned int,	nr_sector		)
+ 		__field(  int,		error			)
++		__field(  int,		tag			)
+ 		__array(  char,		rwbs,	RWBS_LEN	)
+ 		__dynamic_array( char,	cmd,	1		)
+ 	),
+@@ -133,16 +136,17 @@ TRACE_EVENT(block_rq_complete,
+ 		__entry->sector    =3D blk_rq_pos(rq);
+ 		__entry->nr_sector =3D nr_bytes >> 9;
+ 		__entry->error     =3D error;
++		__entry->tag	   =3D rq->tag;
+=20
+ 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags, nr_bytes);
+ 		__get_str(cmd)[0] =3D '\0';
+ 	),
+=20
+-	TP_printk("%d,%d %s (%s) %llu + %u [%d]",
++	TP_printk("%d,%d %s (%s) %llu + %u tag=3D%d [%d]",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev),
+ 		  __entry->rwbs, __get_str(cmd),
+ 		  (unsigned long long)__entry->sector,
+-		  __entry->nr_sector, __entry->error)
++		  __entry->nr_sector, __entry->tag, __entry->error)
+ );
+=20
+ DECLARE_EVENT_CLASS(block_rq,
+@@ -156,6 +160,7 @@ DECLARE_EVENT_CLASS(block_rq,
+ 		__field(  sector_t,	sector			)
+ 		__field(  unsigned int,	nr_sector		)
+ 		__field(  unsigned int,	bytes			)
++		__field(  int,		tag			)
+ 		__array(  char,		rwbs,	RWBS_LEN	)
+ 		__array(  char,         comm,   TASK_COMM_LEN   )
+ 		__dynamic_array( char,	cmd,	1		)
+@@ -166,17 +171,18 @@ DECLARE_EVENT_CLASS(block_rq,
+ 		__entry->sector    =3D blk_rq_trace_sector(rq);
+ 		__entry->nr_sector =3D blk_rq_trace_nr_sectors(rq);
+ 		__entry->bytes     =3D blk_rq_bytes(rq);
++		__entry->tag	   =3D rq->tag;
+=20
+ 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags, blk_rq_bytes(rq));
+ 		__get_str(cmd)[0] =3D '\0';
+ 		memcpy(__entry->comm, current->comm, TASK_COMM_LEN);
+ 	),
+=20
+-	TP_printk("%d,%d %s %u (%s) %llu + %u [%s]",
++	TP_printk("%d,%d %s %u (%s) %llu + %u tag=3D%d [%s]",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev),
+ 		  __entry->rwbs, __entry->bytes, __get_str(cmd),
+ 		  (unsigned long long)__entry->sector,
+-		  __entry->nr_sector, __entry->comm)
++		  __entry->nr_sector, __entry->tag, __entry->comm)
+ );
+=20
+ /**
+@@ -297,6 +303,7 @@ DECLARE_EVENT_CLASS(block_bio_merge,
+ 		__field( dev_t,		dev			)
+ 		__field( sector_t,	sector			)
+ 		__field( unsigned int,	nr_sector		)
++		__field( int,		tag			)
+ 		__array( char,		rwbs,	RWBS_LEN	)
+ 		__array( char,		comm,	TASK_COMM_LEN	)
+ 	),
+@@ -305,14 +312,15 @@ DECLARE_EVENT_CLASS(block_bio_merge,
+ 		__entry->dev		=3D bio_dev(bio);
+ 		__entry->sector		=3D bio->bi_iter.bi_sector;
+ 		__entry->nr_sector	=3D bio_sectors(bio);
++		__entry->tag		=3D rq->tag;
+ 		blk_fill_rwbs(__entry->rwbs, bio->bi_opf, bio->bi_iter.bi_size);
+ 		memcpy(__entry->comm, current->comm, TASK_COMM_LEN);
+ 	),
+=20
+-	TP_printk("%d,%d %s %llu + %u [%s]",
++	TP_printk("%d,%d %s %llu + %u tag=3D%d [%s]",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev), __entry->rwbs,
+ 		  (unsigned long long)__entry->sector,
+-		  __entry->nr_sector, __entry->comm)
++		  __entry->nr_sector, __entry->tag, __entry->comm)
+ );
+=20
+ /**
+@@ -478,15 +486,18 @@ DECLARE_EVENT_CLASS(block_unplug,
+=20
+ 	TP_STRUCT__entry(
+ 		__field( int,		nr_rq			)
++		__field( bool,		explicit		)
+ 		__array( char,		comm,	TASK_COMM_LEN	)
+ 	),
+=20
+ 	TP_fast_assign(
+ 		__entry->nr_rq =3D depth;
++		__entry->explicit =3D explicit;
+ 		memcpy(__entry->comm, current->comm, TASK_COMM_LEN);
+ 	),
+=20
+-	TP_printk("[%s] %d", __entry->comm, __entry->nr_rq)
++	TP_printk("[%s] %d %s", __entry->comm, __entry->nr_rq,
++		   __entry->explicit ? "Sync" : "Async")
+ );
+=20
+ /**
+@@ -611,6 +622,7 @@ TRACE_EVENT(block_rq_remap,
+ 		__field( dev_t,		dev		)
+ 		__field( sector_t,	sector		)
+ 		__field( unsigned int,	nr_sector	)
++		__field( int,		tag		)
+ 		__field( dev_t,		old_dev		)
+ 		__field( sector_t,	old_sector	)
+ 		__field( unsigned int,	nr_bios		)
+@@ -621,18 +633,20 @@ TRACE_EVENT(block_rq_remap,
+ 		__entry->dev		=3D disk_devt(rq->rq_disk);
+ 		__entry->sector		=3D blk_rq_pos(rq);
+ 		__entry->nr_sector	=3D blk_rq_sectors(rq);
++		__entry->tag		=3D rq->tag;
+ 		__entry->old_dev	=3D dev;
+ 		__entry->old_sector	=3D from;
+ 		__entry->nr_bios	=3D blk_rq_count_bios(rq);
+ 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags, blk_rq_bytes(rq));
+ 	),
+=20
+-	TP_printk("%d,%d %s %llu + %u <- (%d,%d) %llu %u",
++	TP_printk("%d,%d %s %llu + %u <- (%d,%d) %llu %u, tag=3D%d",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev), __entry->rwbs,
+ 		  (unsigned long long)__entry->sector,
+ 		  __entry->nr_sector,
+ 		  MAJOR(__entry->old_dev), MINOR(__entry->old_dev),
+-		  (unsigned long long)__entry->old_sector, __entry->nr_bios)
++		  (unsigned long long)__entry->old_sector, __entry->nr_bios,
++		  __entry->tag)
+ );
+=20
+ #endif /* _TRACE_BLOCK_H */
+--=20
+2.7.4
