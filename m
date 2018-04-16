@@ -1,236 +1,115 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: jglisse@redhat.com
-To: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        David Howells <dhowells@redhat.com>, linux-cachefs@redhat.com,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Tejun Heo <tj@kernel.org>, Jan Kara <jack@suse.cz>,
-        Josef Bacik <jbacik@fb.com>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Jeff Layton <jlayton@redhat.com>
-Subject: [RFC PATCH 27/79] fs: add struct address_space to fscache_read*() callback arguments
-Date: Wed,  4 Apr 2018 15:18:01 -0400
-Message-Id: <20180404191831.5378-12-jglisse@redhat.com>
-In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
-References: <20180404191831.5378-1-jglisse@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-scsi@vger.kernel.org, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Subject: [PATCH 09/12] ide: kill ide_toggle_bounce
+Date: Mon, 16 Apr 2018 10:50:29 +0200
+Message-Id: <20180416085032.7367-10-hch@lst.de>
+In-Reply-To: <20180416085032.7367-1-hch@lst.de>
+References: <20180416085032.7367-1-hch@lst.de>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jérôme Glisse <jglisse@redhat.com>
+ide_toggle_bounce did select various strange block bounce limits, including
+not bouncing at all as soon as an iommu is present in the system.  Given
+that the dma_map routines now handle any required bounce buffering except
+for ISA DMA, and the ide code already must handle either ISA DMA or highmem
+at least for iommu equipped systems we can get rid of the block layer
+bounce limit setting entirely.
 
-Add struct address_space to fscache_read*() callback argument. Note
-this patch only add arguments and modify call site conservatily using
-page->mapping and thus the end result is as before this patch.
-
-One step toward dropping reliance on page->mapping.
-
-Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
-Cc: David Howells <dhowells@redhat.com>
-Cc: linux-cachefs@redhat.com
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-fsdevel@vger.kernel.org
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Josef Bacik <jbacik@fb.com>
-Cc: Mel Gorman <mgorman@techsingularity.net>
-Cc: Jeff Layton <jlayton@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/9p/cache.c                 |  4 +++-
- fs/afs/file.c                 |  4 +++-
- fs/ceph/cache.c               | 10 ++++++----
- fs/cifs/fscache.c             |  6 ++++--
- fs/fscache/page.c             |  1 +
- fs/nfs/fscache.c              |  4 +++-
- include/linux/fscache-cache.h |  2 +-
- include/linux/fscache.h       |  9 ++++++---
- 8 files changed, 27 insertions(+), 13 deletions(-)
+ drivers/ide/ide-dma.c   |  2 --
+ drivers/ide/ide-lib.c   | 26 --------------------------
+ drivers/ide/ide-probe.c |  3 ---
+ include/linux/ide.h     |  2 --
+ 4 files changed, 33 deletions(-)
 
-diff --git a/fs/9p/cache.c b/fs/9p/cache.c
-index 8185bfe4492f..3f122d35c54d 100644
---- a/fs/9p/cache.c
-+++ b/fs/9p/cache.c
-@@ -273,7 +273,8 @@ void __v9fs_fscache_invalidate_page(struct address_space *mapping,
- 	}
+diff --git a/drivers/ide/ide-dma.c b/drivers/ide/ide-dma.c
+index 54d4d78ca46a..6f344654ef22 100644
+--- a/drivers/ide/ide-dma.c
++++ b/drivers/ide/ide-dma.c
+@@ -180,7 +180,6 @@ EXPORT_SYMBOL_GPL(ide_dma_unmap_sg);
+ void ide_dma_off_quietly(ide_drive_t *drive)
+ {
+ 	drive->dev_flags &= ~IDE_DFLAG_USING_DMA;
+-	ide_toggle_bounce(drive, 0);
+ 
+ 	drive->hwif->dma_ops->dma_host_set(drive, 0);
+ }
+@@ -211,7 +210,6 @@ EXPORT_SYMBOL(ide_dma_off);
+ void ide_dma_on(ide_drive_t *drive)
+ {
+ 	drive->dev_flags |= IDE_DFLAG_USING_DMA;
+-	ide_toggle_bounce(drive, 1);
+ 
+ 	drive->hwif->dma_ops->dma_host_set(drive, 1);
+ }
+diff --git a/drivers/ide/ide-lib.c b/drivers/ide/ide-lib.c
+index e1180fa46196..78cb79eddc8b 100644
+--- a/drivers/ide/ide-lib.c
++++ b/drivers/ide/ide-lib.c
+@@ -6,32 +6,6 @@
+ #include <linux/ide.h>
+ #include <linux/bitops.h>
+ 
+-/**
+- *	ide_toggle_bounce	-	handle bounce buffering
+- *	@drive: drive to update
+- *	@on: on/off boolean
+- *
+- *	Enable or disable bounce buffering for the device. Drives move
+- *	between PIO and DMA and that changes the rules we need.
+- */
+-
+-void ide_toggle_bounce(ide_drive_t *drive, int on)
+-{
+-	u64 addr = BLK_BOUNCE_HIGH;	/* dma64_addr_t */
+-
+-	if (!PCI_DMA_BUS_IS_PHYS) {
+-		addr = BLK_BOUNCE_ANY;
+-	} else if (on && drive->media == ide_disk) {
+-		struct device *dev = drive->hwif->dev;
+-
+-		if (dev && dev->dma_mask)
+-			addr = *dev->dma_mask;
+-	}
+-
+-	if (drive->queue)
+-		blk_queue_bounce_limit(drive->queue, addr);
+-}
+-
+ u64 ide_get_lba_addr(struct ide_cmd *cmd, int lba48)
+ {
+ 	struct ide_taskfile *tf = &cmd->tf;
+diff --git a/drivers/ide/ide-probe.c b/drivers/ide/ide-probe.c
+index 2019e66eada7..8d8ed036ca0a 100644
+--- a/drivers/ide/ide-probe.c
++++ b/drivers/ide/ide-probe.c
+@@ -805,9 +805,6 @@ static int ide_init_queue(ide_drive_t *drive)
+ 	/* assign drive queue */
+ 	drive->queue = q;
+ 
+-	/* needs drive->queue to be set */
+-	ide_toggle_bounce(drive, 1);
+-
+ 	return 0;
  }
  
--static void v9fs_vfs_readpage_complete(struct page *page, void *data,
-+static void v9fs_vfs_readpage_complete(struct address_space *mapping,
-+				       struct page *page, void *data,
- 				       int error)
- {
- 	if (!error)
-@@ -299,6 +300,7 @@ int __v9fs_readpage_from_fscache(struct inode *inode, struct page *page)
- 		return -ENOBUFS;
- 
- 	ret = fscache_read_or_alloc_page(v9inode->fscache,
-+					 page->mapping,
- 					 page,
- 					 v9fs_vfs_readpage_complete,
- 					 NULL,
-diff --git a/fs/afs/file.c b/fs/afs/file.c
-index f87e997b9df9..23ff51343dd3 100644
---- a/fs/afs/file.c
-+++ b/fs/afs/file.c
-@@ -203,7 +203,8 @@ void afs_put_read(struct afs_read *req)
- /*
-  * deal with notification that a page was read from the cache
-  */
--static void afs_file_readpage_read_complete(struct page *page,
-+static void afs_file_readpage_read_complete(struct address_space *mapping,
-+					    struct page *page,
- 					    void *data,
- 					    int error)
- {
-@@ -271,6 +272,7 @@ int afs_page_filler(void *data, struct address_space *mapping,
- 	/* is it cached? */
- #ifdef CONFIG_AFS_FSCACHE
- 	ret = fscache_read_or_alloc_page(vnode->cache,
-+					 page->mapping,
- 					 page,
- 					 afs_file_readpage_read_complete,
- 					 NULL,
-diff --git a/fs/ceph/cache.c b/fs/ceph/cache.c
-index a3ab265d3215..14438f1ed7e0 100644
---- a/fs/ceph/cache.c
-+++ b/fs/ceph/cache.c
-@@ -266,7 +266,9 @@ void ceph_fscache_file_set_cookie(struct inode *inode, struct file *filp)
- 	}
+diff --git a/include/linux/ide.h b/include/linux/ide.h
+index ca9d34feb572..11f0dd03a4b4 100644
+--- a/include/linux/ide.h
++++ b/include/linux/ide.h
+@@ -1508,8 +1508,6 @@ static inline void ide_set_hwifdata (ide_hwif_t * hwif, void *data)
+ 	hwif->hwif_data = data;
  }
  
--static void ceph_readpage_from_fscache_complete(struct page *page, void *data, int error)
-+static void ceph_readpage_from_fscache_complete(struct address_space *mapping,
-+						struct page *page, void *data,
-+						int error)
- {
- 	if (!error)
- 		SetPageUptodate(page);
-@@ -293,9 +295,9 @@ int ceph_readpage_from_fscache(struct inode *inode, struct page *page)
- 	if (!cache_valid(ci))
- 		return -ENOBUFS;
+-extern void ide_toggle_bounce(ide_drive_t *drive, int on);
+-
+ u64 ide_get_lba_addr(struct ide_cmd *, int);
+ u8 ide_dump_status(ide_drive_t *, const char *, u8);
  
--	ret = fscache_read_or_alloc_page(ci->fscache, page,
--					 ceph_readpage_from_fscache_complete, NULL,
--					 GFP_KERNEL);
-+	ret = fscache_read_or_alloc_page(ci->fscache, page->mapping, page,
-+					 ceph_readpage_from_fscache_complete,
-+					 NULL, GFP_KERNEL);
- 
- 	switch (ret) {
- 		case 0: /* Page found */
-diff --git a/fs/cifs/fscache.c b/fs/cifs/fscache.c
-index 8d4b7bc8ae91..25f259a83fe0 100644
---- a/fs/cifs/fscache.c
-+++ b/fs/cifs/fscache.c
-@@ -140,7 +140,8 @@ int cifs_fscache_release_page(struct page *page, gfp_t gfp)
- 	return 1;
- }
- 
--static void cifs_readpage_from_fscache_complete(struct page *page, void *ctx,
-+static void cifs_readpage_from_fscache_complete(struct address_space *mapping,
-+						struct page *page, void *ctx,
- 						int error)
- {
- 	cifs_dbg(FYI, "%s: (0x%p/%d)\n", __func__, page, error);
-@@ -158,7 +159,8 @@ int __cifs_readpage_from_fscache(struct inode *inode, struct page *page)
- 
- 	cifs_dbg(FYI, "%s: (fsc:%p, p:%p, i:0x%p\n",
- 		 __func__, CIFS_I(inode)->fscache, page, inode);
--	ret = fscache_read_or_alloc_page(CIFS_I(inode)->fscache, page,
-+	ret = fscache_read_or_alloc_page(CIFS_I(inode)->fscache,
-+					 page->mapping, page,
- 					 cifs_readpage_from_fscache_complete,
- 					 NULL,
- 					 GFP_KERNEL);
-diff --git a/fs/fscache/page.c b/fs/fscache/page.c
-index 7112b42ad8c5..0c3d322a7b52 100644
---- a/fs/fscache/page.c
-+++ b/fs/fscache/page.c
-@@ -408,6 +408,7 @@ int fscache_wait_for_operation_activation(struct fscache_object *object,
-  *   0		- dispatched a read - it'll call end_io_func() when finished
-  */
- int __fscache_read_or_alloc_page(struct fscache_cookie *cookie,
-+				 struct address_space *mapping,
- 				 struct page *page,
- 				 fscache_rw_complete_t end_io_func,
- 				 void *context,
-diff --git a/fs/nfs/fscache.c b/fs/nfs/fscache.c
-index d63bea8bbfbb..e1cf607f8959 100644
---- a/fs/nfs/fscache.c
-+++ b/fs/nfs/fscache.c
-@@ -301,7 +301,8 @@ void __nfs_fscache_invalidate_page(struct page *page, struct inode *inode)
-  * Handle completion of a page being read from the cache.
-  * - Called in process (keventd) context.
-  */
--static void nfs_readpage_from_fscache_complete(struct page *page,
-+static void nfs_readpage_from_fscache_complete(struct address_space *mapping,
-+					       struct page *page,
- 					       void *context,
- 					       int error)
- {
-@@ -334,6 +335,7 @@ int __nfs_readpage_from_fscache(struct nfs_open_context *ctx,
- 		 nfs_i_fscache(inode), page, page->index, page->flags, inode);
- 
- 	ret = fscache_read_or_alloc_page(nfs_i_fscache(inode),
-+					 page->mapping,
- 					 page,
- 					 nfs_readpage_from_fscache_complete,
- 					 ctx,
-diff --git a/include/linux/fscache-cache.h b/include/linux/fscache-cache.h
-index 4c467ef50159..7ae49d0306d5 100644
---- a/include/linux/fscache-cache.h
-+++ b/include/linux/fscache-cache.h
-@@ -468,7 +468,7 @@ void fscache_set_store_limit(struct fscache_object *object, loff_t i_size)
- static inline void fscache_end_io(struct fscache_retrieval *op,
- 				  struct page *page, int error)
- {
--	op->end_io_func(page, op->context, error);
-+	op->end_io_func(op->mapping, page, op->context, error);
- }
- 
- static inline void __fscache_use_cookie(struct fscache_cookie *cookie)
-diff --git a/include/linux/fscache.h b/include/linux/fscache.h
-index 13db0098d3a9..f62df8c68e7a 100644
---- a/include/linux/fscache.h
-+++ b/include/linux/fscache.h
-@@ -50,7 +50,8 @@ struct fscache_cache_tag;
- struct fscache_cookie;
- struct fscache_netfs;
- 
--typedef void (*fscache_rw_complete_t)(struct page *page,
-+typedef void (*fscache_rw_complete_t)(struct address_space *mapping,
-+				      struct page *page,
- 				      void *context,
- 				      int error);
- 
-@@ -216,6 +217,7 @@ extern int __fscache_attr_changed(struct fscache_cookie *);
- extern void __fscache_invalidate(struct fscache_cookie *);
- extern void __fscache_wait_on_invalidate(struct fscache_cookie *);
- extern int __fscache_read_or_alloc_page(struct fscache_cookie *,
-+					struct address_space *mapping,
- 					struct page *,
- 					fscache_rw_complete_t,
- 					void *,
-@@ -530,14 +532,15 @@ int fscache_reserve_space(struct fscache_cookie *cookie, loff_t size)
-  */
- static inline
- int fscache_read_or_alloc_page(struct fscache_cookie *cookie,
-+			       struct address_space *mapping,
- 			       struct page *page,
- 			       fscache_rw_complete_t end_io_func,
- 			       void *context,
- 			       gfp_t gfp)
- {
- 	if (fscache_cookie_valid(cookie) && fscache_cookie_enabled(cookie))
--		return __fscache_read_or_alloc_page(cookie, page, end_io_func,
--						    context, gfp);
-+		return __fscache_read_or_alloc_page(cookie, mapping, page,
-+						    end_io_func, context, gfp);
- 	else
- 		return -ENOBUFS;
- }
 -- 
-2.14.3
+2.17.0
