@@ -1,49 +1,51 @@
-Return-Path: <beanhuo@micron.com>
-From: "Bean Huo (beanhuo)" <beanhuo@micron.com>
-To: Bart Van Assche <bart.vanassche@wdc.com>,
-        "rostedt@goodmis.org"
-	<rostedt@goodmis.org>,
-        "rajatja@google.com" <rajatja@google.com>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "axboe@kernel.dk"
-	<axboe@kernel.dk>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "mingo@redhad.com" <mingo@redhad.com>,
-        "jejb@linux.vnet.ibm.com"
-	<jejb@linux.vnet.ibm.com>
+Return-Path: <prvs=637eb2c04=Bart.VanAssche@wdc.com>
 Subject: Re: [RESEND PATCH v1 1/2] trace: events: scsi: Add tag in SCSI trace
  events
-Date: Mon, 16 Apr 2018 20:27:13 +0000
-Message-ID: <5b2fdd1b29b54590889194eba90debfb@SIWEX5A.sing.micron.com>
-Content-Type: text/plain; charset="utf-8"
+To: "Bean Huo (beanhuo)" <beanhuo@micron.com>,
+ "rostedt@goodmis.org" <rostedt@goodmis.org>,
+ "rajatja@google.com" <rajatja@google.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+ "axboe@kernel.dk" <axboe@kernel.dk>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "mingo@redhad.com" <mingo@redhad.com>,
+ "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>
+References: <b46de00ee67e4ec9955bb3f09faa36c4@SIWEX5A.sing.micron.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+Message-ID: <9a095abe-c016-0c2e-11e2-7253dbad3a6c@wdc.com>
+Date: Mon, 16 Apr 2018 10:11:33 -0700
 MIME-Version: 1.0
+In-Reply-To: <b46de00ee67e4ec9955bb3f09faa36c4@SIWEX5A.sing.micron.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: bart.vanassche@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-Pj4+IFRoaXMgcGF0Y2ggaXMgbm90IGFjY2VwdGFibGUgYmVjYXVzZSBpdCBhZGRzIHN1cHBvcnQg
-Zm9yIHRhZyB0cmFjaW5nDQo+Pj4gdG8gdGhlIGxlZ2FjeSBibG9jayBsYXllciBvbmx5LiBBbnkg
-cGF0Y2ggdGhhdCBhZGRzIGEgbmV3IGZlYXR1cmUgdG8NCj4+PiB0aGUgbGVnYWN5IGJsb2NrIGxh
-eWVyIG11c3QgYWxzbyBhZGQgaXQgdG8gYmxrLW1xLg0KPj4+DQo+PiBUbyBiZSBob25lc3QsIEkg
-ZG9uJ3QgdW5kZXJzdGFuZCB5b3VyIHBvaW50LCBjYW4geW91IGdpdmUgbWUgbW9yZQ0KPmV4cGxh
-bmF0aW9uPw0KPg0KPlRoZSBsZWdhY3kgYmxvY2sgbGF5ZXIgd2lsbCBiZSByZW1vdmVkIGFzIHNv
-b24gYXMgYmxrLW1xIHByb3ZpZGVzIGFsbCB0aGUNCj5mdW5jdGlvbmFsaXR5IG9mIHRoZSBsZWdh
-Y3kgYmxvY2sgbGF5ZXIgYW5kIGFzIHNvb24gYXMgaXQgcGVyZm9ybXMgYXQgbGVhc3QgYXMNCj53
-ZWxsIGFzIHRoZSBsZWdhY3kgYmxvY2sgbGF5ZXIgZm9yIGFsbCB1c2UgY2FzZXMuIElmIG5ldyBm
-ZWF0dXJlcyBhcmUgYWRkZWQgdG8NCj50aGUgbGVnYWN5IGJsb2NrIGxheWVyIGJ1dCBub3QgdG8g
-YmxrLW1xIHRoYXQgcHJldmVudHMgcmVtb3ZhbCBvZiB0aGUgbGVnYWN5DQo+YmxvY2sgbGF5ZXIu
-IEhlbmNlIHRoZSByZXF1aXJlbWVudCBJIGV4cGxhaW5lZCBpbiBteSBwcmV2aW91cyBlLW1haWwu
-DQo+DQo+QmFydC4NCg0KVGhhbmtzIGZvciB5b3VyIGluZm9ybWF0aW9uLg0KSSBoYXZlIHNldmVy
-YWwgcXVlc3Rpb25zIGFnYWluLg0KV2hlbiB0aGUgbGVnYWN5IGJsb2NrIGxheWVyIHdpbGwgYmUg
-cmVwbGFjZWQgYnkgYmxrLW1xPyANCkFuZCAiaW5jbHVkZS90cmVjZS9ldmVudC9ibG9jay5oIC4u
-IHNjc2kuaCIgd2lsbCBhbHNvIGJlIGNoYW5nZWQ/IA0KRG8geW91IGhhdmUgdGhlIHJlbGF0ZWQg
-Z2l0IHJlcCBvciBtYWlsIGxpc3QgYWJvdXQgdGhpcyB0b3BpYz8NCk1heWJlIHRoaXMgaXMgZ3Jl
-YXQgYmlnIGNoYW5nZSwgSSBhbSB2ZXJ5IGludGVyZXN0ZWQgaW4gdGhhdC4gQW5kIHdhbnQgdG8g
-aGF2ZSBhIGxvb2sgYXQuDQoNCkJ5IHRoZSB3YXksIHRoZXNlIHBhdGNoZXMgYXJlIG5vdCB0byBh
-ZGQgbmV3IGZlYXR1cmUsIHRoZXkgYXJlIGp1c3QgdG8gYWRkIHByaW50IHRhZyBhbG9uZyB3aXRo
-IHRoZSBvdGhlciBleGlzdA0KUHJpbnRlZCByZXF1ZXN0IHBhcmFtZXRlcnMuICBUaGUgYmxrLW1x
-IGlzIG5vdyBzdGlsbCB1c2luZyAiaW5jbHVkZS90cmFjZS9ldmV0L2Jsb2NrLmgiIGRlZmluZWQg
-dHJhY2UgZXZlbnRzLg0KDQpGb3IgZXhhbXBsZTogDQp2b2lkIGJsa19tcV9zdGFydF9yZXF1ZXN0
-KHN0cnVjdCByZXF1ZXN0ICpycSkgIA0Kew0KLi4uDQouLi4NCnRyYWNlX2Jsb2NrX3JxX2lzc3Vl
-KHEsIHJxKTsNCi4uLg0KLi4uDQp9DQpEbyB5b3UgbWVhbiB0aGF0IHRoaXMgd2lsbCBhbHNvIGJl
-IHJlbW92ZWQvcmVwbGFjZWQgYnkgc29tZW9uZSBlbHNlPw0KDQpCZWFuIEh1bw0K
+On 04/16/18 10:05, Bean Huo (beanhuo) wrote:
+>> On Mon, 2018-04-16 at 09:41 -0700, Rajat Jain wrote:
+>>> On Mon, Apr 16, 2018 at 8:28 AM, Steven Rostedt <rostedt@goodmis.org>
+>> wrote:
+>>>> On Mon, 16 Apr 2018 14:31:49 +0000
+>>>> "Bean Huo (beanhuo)" <beanhuo@micron.com> wrote:
+>>>>
+>>>>> Print the request tag along with other information while tracing a
+>>>>> command.
+>>>>>
+>>>>> Signed-off-by: Bean Huo <beanhuo@micron.com>
+>>>
+>>> Acked-by: Rajat Jain <rajatja@google.com>
+>>
+>> This patch is not acceptable because it adds support for tag tracing to the
+>> legacy block layer only. Any patch that adds a new feature to the legacy block
+>> layer must also add it to blk-mq.
+>>
+> To be honest, I don't understand your point, can you give me more explanation?
+
+The legacy block layer will be removed as soon as blk-mq provides all 
+the functionality of the legacy block layer and as soon as it performs 
+at least as well as the legacy block layer for all use cases. If new 
+features are added to the legacy block layer but not to blk-mq that 
+prevents removal of the legacy block layer. Hence the requirement I 
+explained in my previous e-mail.
+
+Bart.
