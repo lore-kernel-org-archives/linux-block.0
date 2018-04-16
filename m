@@ -1,117 +1,77 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from albert.telenet-ops.be ([195.130.137.90]:33242 "EHLO
-        albert.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752981AbeDQRuM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Apr 2018 13:50:12 -0400
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: Christoph Hellwig <hch@lst.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Felipe Balbi <balbi@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mark Brown <broonie@kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
-        Wolfram Sang <wsa@the-dreams.de>,
-        Jonathan Cameron <jic23@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Matias Bjorling <mb@lightnvm.io>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Marek Vasut <marek.vasut@gmail.com>,
-        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Richard Weinberger <richard@nod.at>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Eric Anholt <eric@anholt.net>,
-        Stefan Wahren <stefan.wahren@i2se.com>
-Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
-        alsa-devel@alsa-project.org, linux-ide@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux1394-devel@lists.sourceforge.net, linux-fpga@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
-        netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
-        devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH v3 09/20] iommu: Remove depends on HAS_DMA in case of platform dependency
-Date: Tue, 17 Apr 2018 19:49:09 +0200
-Message-Id: <1523987360-18760-10-git-send-email-geert@linux-m68k.org>
-In-Reply-To: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
-References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-ide-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-scsi@vger.kernel.org, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Subject: [PATCH 06/12] memstick: don't call blk_queue_bounce_limit
+Date: Mon, 16 Apr 2018 10:50:26 +0200
+Message-Id: <20180416085032.7367-7-hch@lst.de>
+In-Reply-To: <20180416085032.7367-1-hch@lst.de>
+References: <20180416085032.7367-1-hch@lst.de>
+Sender: linux-ide-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
-symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
-In most cases this other symbol is an architecture or platform specific
-symbol, or PCI.
+All in-tree host drivers set up a proper dma mask and use the dma-mapping
+helpers.  This means they will be able to deal with any address that we
+are throwing at them.
 
-Generic symbols and drivers without platform dependencies keep their
-dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
-cannot work anyway.
-
-This simplifies the dependencies, and allows to improve compile-testing.
-
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Acked-by: Robin Murphy <robin.murphy@arm.com>
-Acked-by: Joerg Roedel <jroedel@suse.de>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
-v3:
-  - Add Acked-by,
-  - Rebase to v4.17-rc1,
+ drivers/memstick/core/ms_block.c    | 5 -----
+ drivers/memstick/core/mspro_block.c | 5 -----
+ 2 files changed, 10 deletions(-)
 
-v2:
-  - Add Reviewed-by, Acked-by,
-  - Drop RFC state,
-  - Split per subsystem.
----
- drivers/iommu/Kconfig | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
-index df171cb8582296b9..c76157e57f6ba4ba 100644
---- a/drivers/iommu/Kconfig
-+++ b/drivers/iommu/Kconfig
-@@ -23,7 +23,7 @@ config IOMMU_IO_PGTABLE
- config IOMMU_IO_PGTABLE_LPAE
- 	bool "ARMv7/v8 Long Descriptor Format"
- 	select IOMMU_IO_PGTABLE
--	depends on HAS_DMA && (ARM || ARM64 || (COMPILE_TEST && !GENERIC_ATOMIC64))
-+	depends on ARM || ARM64 || (COMPILE_TEST && !GENERIC_ATOMIC64)
- 	help
- 	  Enable support for the ARM long descriptor pagetable format.
- 	  This allocator supports 4K/2M/1G, 16K/32M and 64K/512M page
-@@ -42,7 +42,7 @@ config IOMMU_IO_PGTABLE_LPAE_SELFTEST
- config IOMMU_IO_PGTABLE_ARMV7S
- 	bool "ARMv7/v8 Short Descriptor Format"
- 	select IOMMU_IO_PGTABLE
--	depends on HAS_DMA && (ARM || ARM64 || COMPILE_TEST)
-+	depends on ARM || ARM64 || COMPILE_TEST
- 	help
- 	  Enable support for the ARM Short-descriptor pagetable format.
- 	  This supports 32-bit virtual and physical addresses mapped using
-@@ -376,7 +376,6 @@ config QCOM_IOMMU
- 	# Note: iommu drivers cannot (yet?) be built as modules
- 	bool "Qualcomm IOMMU Support"
- 	depends on ARCH_QCOM || (COMPILE_TEST && !GENERIC_ATOMIC64)
--	depends on HAS_DMA
- 	select IOMMU_API
- 	select IOMMU_IO_PGTABLE_LPAE
- 	select ARM_DMA_USE_IOMMU
+diff --git a/drivers/memstick/core/ms_block.c b/drivers/memstick/core/ms_block.c
+index 57b13dfbd21e..b2d025f42d14 100644
+--- a/drivers/memstick/core/ms_block.c
++++ b/drivers/memstick/core/ms_block.c
+@@ -2096,12 +2096,8 @@ static int msb_init_disk(struct memstick_dev *card)
+ 	struct msb_data *msb = memstick_get_drvdata(card);
+ 	struct memstick_host *host = card->host;
+ 	int rc;
+-	u64 limit = BLK_BOUNCE_HIGH;
+ 	unsigned long capacity;
+ 
+-	if (host->dev.dma_mask && *(host->dev.dma_mask))
+-		limit = *(host->dev.dma_mask);
+-
+ 	mutex_lock(&msb_disk_lock);
+ 	msb->disk_id = idr_alloc(&msb_disk_idr, card, 0, 256, GFP_KERNEL);
+ 	mutex_unlock(&msb_disk_lock);
+@@ -2123,7 +2119,6 @@ static int msb_init_disk(struct memstick_dev *card)
+ 
+ 	msb->queue->queuedata = card;
+ 
+-	blk_queue_bounce_limit(msb->queue, limit);
+ 	blk_queue_max_hw_sectors(msb->queue, MS_BLOCK_MAX_PAGES);
+ 	blk_queue_max_segments(msb->queue, MS_BLOCK_MAX_SEGS);
+ 	blk_queue_max_segment_size(msb->queue,
+diff --git a/drivers/memstick/core/mspro_block.c b/drivers/memstick/core/mspro_block.c
+index 8897962781bb..a2fadc605750 100644
+--- a/drivers/memstick/core/mspro_block.c
++++ b/drivers/memstick/core/mspro_block.c
+@@ -1175,12 +1175,8 @@ static int mspro_block_init_disk(struct memstick_dev *card)
+ 	struct mspro_sys_info *sys_info = NULL;
+ 	struct mspro_sys_attr *s_attr = NULL;
+ 	int rc, disk_id;
+-	u64 limit = BLK_BOUNCE_HIGH;
+ 	unsigned long capacity;
+ 
+-	if (host->dev.dma_mask && *(host->dev.dma_mask))
+-		limit = *(host->dev.dma_mask);
+-
+ 	for (rc = 0; msb->attr_group.attrs[rc]; ++rc) {
+ 		s_attr = mspro_from_sysfs_attr(msb->attr_group.attrs[rc]);
+ 
+@@ -1219,7 +1215,6 @@ static int mspro_block_init_disk(struct memstick_dev *card)
+ 
+ 	msb->queue->queuedata = card;
+ 
+-	blk_queue_bounce_limit(msb->queue, limit);
+ 	blk_queue_max_hw_sectors(msb->queue, MSPRO_BLOCK_MAX_PAGES);
+ 	blk_queue_max_segments(msb->queue, MSPRO_BLOCK_MAX_SEGS);
+ 	blk_queue_max_segment_size(msb->queue,
 -- 
-2.7.4
+2.17.0
+
