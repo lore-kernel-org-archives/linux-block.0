@@ -1,109 +1,110 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org
-Subject: [PATCH V2 4/5] nvme: fix race between freeze queues and unfreeze queues
-Date: Sun, 29 Apr 2018 23:41:51 +0800
-Message-Id: <20180429154152.16656-5-ming.lei@redhat.com>
-In-Reply-To: <20180429154152.16656-1-ming.lei@redhat.com>
-References: <20180429154152.16656-1-ming.lei@redhat.com>
+Return-Path: <sreekanth.reddy@broadcom.com>
+MIME-Version: 1.0
+In-Reply-To: <CAMGffEkbXORH+baoVRD4fOLk=hV6P-oXRpobM6A+o_fCADkbdQ@mail.gmail.com>
+References: <1523524915-25170-1-git-send-email-jinpu.wangl@profitbricks.com>
+ <yq1y3hsunnt.fsf@oracle.com> <CAMGffEkaTLLEs+i-EWUmo-Y8KSNBeyth63L1hXxP++PBcPPXbg@mail.gmail.com>
+ <yq1bment539.fsf@oracle.com> <CAMGffEkbXORH+baoVRD4fOLk=hV6P-oXRpobM6A+o_fCADkbdQ@mail.gmail.com>
+From: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
+Date: Mon, 16 Apr 2018 14:36:31 +0530
+Message-ID: <CAK=zhgrT7UA8h84cCOcbkdH-wsL32_H=WLawNMgW89Vtmcu5WA@mail.gmail.com>
+Subject: Re: [PATCH v2] block: ratelimite pr_err on IO path
+To: Jinpu Wang <jinpu.wang@profitbricks.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Elliott, Robert (Persistent Memory)" <elliott@hpe.com>,
+	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+	Chaitra P B <chaitra.basappa@broadcom.com>, linux-scsi <linux-scsi@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-nvme_dev_disable() and resetting controller are required for recovering
-controller, but the two are run from different contexts.
+On Mon, Apr 16, 2018 at 1:46 PM, Jinpu Wang <jinpu.wang@profitbricks.com> wrote:
+> On Fri, Apr 13, 2018 at 6:59 PM, Martin K. Petersen
+> <martin.petersen@oracle.com> wrote:
+>>
+>> Jinpu,
+>>
+>> [CC:ed the mpt3sas maintainers]
+>>
+>> The ratelimit patch is just an attempt to treat the symptom, not the
+>> cause.
+> Agree. If we can fix the root cause, it will be great.
+>>
+>>> Thanks for asking, we updated mpt3sas driver which enables DIX support
+>>> (prot_mask=0x7f), all disks are SATA SSDs, no DIF support.
+>>> After reboot, kernel reports the IO errors from all the drives behind
+>>> HBA, seems for almost every read IO, which turns the system unusable:
+>>> [   13.079375] sda: ref tag error at location 0 (rcvd 143196159)
+>>> [   13.079989] sda: ref tag error at location 937702912 (rcvd 143196159)
+>>> [   13.080233] sda: ref tag error at location 937703072 (rcvd 143196159)
+>>> [   13.080407] sda: ref tag error at location 0 (rcvd 143196159)
+>>> [   13.080594] sda: ref tag error at location 8 (rcvd 143196159)
+>>
+>> That sounds like a bug in the mpt3sas driver or firmware. I guess the
+>> HBA could conceivably be operating a SATA device as DIX Type 0 and strip
+>> the PI on the drive side. But that doesn't seem to be a particularly
+>> useful mode of operation.
+>>
+>> Jinpu: Which firmware are you running? Also, please send us the output
+>> of:
+>>
+>>         sg_readcap -l /dev/sda
+>>         sg_inq -x /dev/sda
+>>         sg_vpd /dev/sda
+>>
+> Disks are INTEL SSDSC2BX48, directly attached to HBA.
+> LSISAS3008: FWVersion(13.00.00.00), ChipRevision(0x02), BiosVersion(08.11.00.00)
+> mpt3sas_cm2: Protocol=(Initiator,Target),
+> Capabilities=(TLR,EEDP,Snapshot Buffer,Diag Trace Buffer,Task Set
+> Full,NCQ)
+>
+> jwang@x:~$ sudo sg_vpd /dev/sdz
+> Supported VPD pages VPD page:
+>   Supported VPD pages [sv]
+>   Unit serial number [sn]
+>   Device identification [di]
+>   Mode page policy [mpp]
+>   ATA information (SAT) [ai]
+>   Block limits (SBC) [bl]
+>   Block device characteristics (SBC) [bdc]
+>   Logical block provisioning (SBC) [lbpv]
+> jwang@x:~$ sudo sg_inq -x /dev/sdz
+> VPD INQUIRY: extended INQUIRY data page
+>     inquiry: field in cdb illegal (page not supported)
+> jwang@x:~$ sudo sg_readcap -l /dev/sdz
+> Read Capacity results:
+>    Protection: prot_en=0, p_type=0, p_i_exponent=0
+>    Logical block provisioning: lbpme=1, lbprz=1
+>    Last logical block address=937703087 (0x37e436af), Number of
+> logical blocks=937703088
+>    Logical block length=512 bytes
+>    Logical blocks per physical block exponent=3 [so physical block
+> length=4096 bytes]
+>    Lowest aligned logical block address=0
+> Hence:
+>    Device size: 480103981056 bytes, 457862.8 MiB, 480.10 GB
+>
+>
+>> Broadcom: How is DIX supposed to work for SATA drives behind an mpt3sas
+>> controller?
 
-nvme_start_freeze() is run from nvme_dev_disable(), and nvme_unfreeze()
-is run from resetting context. Unfortunatley timeout may be triggered
-when draining IO from resetting controller, so nvme_start_freeze() may
-be run several times.
+[Sreekanth] Current Upstream mpt3sas driver doesn't have DIX support
+capabilities,
+it supports only DIF feature.
 
-This patch fixes the race between nvme_start_freeze() and
-nvme_unfreeze() by introducing flags of 'queues_freezed' and the lock
-of 'freeze_mutex'.
 
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/nvme/host/core.c | 29 +++++++++++++++++++++--------
- drivers/nvme/host/nvme.h |  3 +++
- 2 files changed, 24 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 9df4f71e58ca..f9028873298e 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -3447,6 +3447,9 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
- 	INIT_WORK(&ctrl->fw_act_work, nvme_fw_act_work);
- 	INIT_WORK(&ctrl->delete_work, nvme_delete_ctrl_work);
- 
-+	ctrl->queues_freezed = false;
-+	mutex_init(&ctrl->freeze_mutex);
-+
- 	ret = ida_simple_get(&nvme_instance_ida, 0, 0, GFP_KERNEL);
- 	if (ret < 0)
- 		goto out;
-@@ -3526,10 +3529,15 @@ void nvme_unfreeze(struct nvme_ctrl *ctrl)
- {
- 	struct nvme_ns *ns;
- 
--	down_read(&ctrl->namespaces_rwsem);
--	list_for_each_entry(ns, &ctrl->namespaces, list)
--		blk_mq_unfreeze_queue(ns->queue);
--	up_read(&ctrl->namespaces_rwsem);
-+	mutex_lock(&ctrl->freeze_mutex);
-+	if (ctrl->queues_freezed) {
-+		down_read(&ctrl->namespaces_rwsem);
-+		list_for_each_entry(ns, &ctrl->namespaces, list)
-+			blk_mq_unfreeze_queue(ns->queue);
-+		up_read(&ctrl->namespaces_rwsem);
-+		ctrl->queues_freezed = false;
-+	}
-+	mutex_unlock(&ctrl->freeze_mutex);
- }
- EXPORT_SYMBOL_GPL(nvme_unfreeze);
- 
-@@ -3562,10 +3570,15 @@ void nvme_start_freeze(struct nvme_ctrl *ctrl)
- {
- 	struct nvme_ns *ns;
- 
--	down_read(&ctrl->namespaces_rwsem);
--	list_for_each_entry(ns, &ctrl->namespaces, list)
--		blk_freeze_queue_start(ns->queue);
--	up_read(&ctrl->namespaces_rwsem);
-+	mutex_lock(&ctrl->freeze_mutex);
-+	if (!ctrl->queues_freezed) {
-+		down_read(&ctrl->namespaces_rwsem);
-+		list_for_each_entry(ns, &ctrl->namespaces, list)
-+			blk_freeze_queue_start(ns->queue);
-+		up_read(&ctrl->namespaces_rwsem);
-+		ctrl->queues_freezed = true;
-+	}
-+	mutex_unlock(&ctrl->freeze_mutex);
- }
- EXPORT_SYMBOL_GPL(nvme_start_freeze);
- 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 061fecfd44f5..a19b7f04ac24 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -149,6 +149,9 @@ struct nvme_ctrl {
- 	struct work_struct reset_work;
- 	struct work_struct delete_work;
- 
-+	bool queues_freezed;
-+	struct mutex freeze_mutex;
-+
- 	struct nvme_subsystem *subsys;
- 	struct list_head subsys_entry;
- 
--- 
-2.9.5
+Thanks,
+Sreekanth
+>>
+>> --
+>> Martin K. Petersen      Oracle Linux Engineering
+>
+>
+> Thanks!
+>
+> --
+> Jack Wang
+> Linux Kernel Developer
+>
+> ProfitBricks GmbH
+> Greifswalder Str. 207
+> D - 10405 Berlin
