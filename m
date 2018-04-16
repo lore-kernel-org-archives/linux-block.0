@@ -1,161 +1,123 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:58308 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752470AbeDOO77 (ORCPT
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:38548 "EHLO
+        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752776AbeDPKZm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 Apr 2018 10:59:59 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        iommu@lists.linux-foundation.org
-Cc: x86@kernel.org, linux-block@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-mm@kvack.org,
-        linux-ide@vger.kernel.org, linux-mips@linux-mips.org,
-        sparclinux@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 01/12] iommu-common: move to arch/sparc
-Date: Sun, 15 Apr 2018 16:59:36 +0200
-Message-Id: <20180415145947.1248-2-hch@lst.de>
-In-Reply-To: <20180415145947.1248-1-hch@lst.de>
-References: <20180415145947.1248-1-hch@lst.de>
+        Mon, 16 Apr 2018 06:25:42 -0400
+Received: by mail-wr0-f193.google.com with SMTP id h3so11814875wrh.5
+        for <linux-block@vger.kernel.org>; Mon, 16 Apr 2018 03:25:42 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 01/11] lightnvm: pblk: fail gracefully on line alloc. failure
+Date: Mon, 16 Apr 2018 12:25:22 +0200
+Message-Id: <1523874332-6272-2-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1523874332-6272-1-git-send-email-javier@cnexlabs.com>
+References: <1523874332-6272-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This code is only used by sparc, and all new iommu drivers should use the
-drivers/iommu/ framework.  Also remove the unused exports.
+In the event of a line failing to allocate, fail gracefully and stop the
+pipeline to avoid more write failing in the same place.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- {include/linux => arch/sparc/include/asm}/iommu-common.h | 0
- arch/sparc/include/asm/iommu_64.h                        | 2 +-
- arch/sparc/kernel/Makefile                               | 2 +-
- {lib => arch/sparc/kernel}/iommu-common.c                | 5 +----
- arch/sparc/kernel/iommu.c                                | 2 +-
- arch/sparc/kernel/ldc.c                                  | 2 +-
- arch/sparc/kernel/pci_sun4v.c                            | 2 +-
- lib/Makefile                                             | 2 +-
- 8 files changed, 7 insertions(+), 10 deletions(-)
- rename {include/linux => arch/sparc/include/asm}/iommu-common.h (100%)
- rename {lib => arch/sparc/kernel}/iommu-common.c (98%)
+ drivers/lightnvm/pblk-init.c |  5 +++++
+ drivers/lightnvm/pblk-map.c  | 33 ++++++++++++++++++++++++---------
+ 2 files changed, 29 insertions(+), 9 deletions(-)
 
-diff --git a/include/linux/iommu-common.h b/arch/sparc/include/asm/iommu-common.h
-similarity index 100%
-rename from include/linux/iommu-common.h
-rename to arch/sparc/include/asm/iommu-common.h
-diff --git a/arch/sparc/include/asm/iommu_64.h b/arch/sparc/include/asm/iommu_64.h
-index 9ed6b54caa4b..0ef6dedf747e 100644
---- a/arch/sparc/include/asm/iommu_64.h
-+++ b/arch/sparc/include/asm/iommu_64.h
-@@ -17,7 +17,7 @@
- #define IOPTE_WRITE   0x0000000000000002UL
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 91a5bc2556a3..dee64f91227d 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -1047,6 +1047,11 @@ static int pblk_lines_init(struct pblk *pblk)
+ 		nr_free_chks += pblk_setup_line_meta(pblk, line, chunk_meta, i);
+ 	}
  
- #define IOMMU_NUM_CTXS	4096
--#include <linux/iommu-common.h>
-+#include <asm/iommu-common.h>
++	if (!nr_free_chks) {
++		pr_err("pblk: too many bad blocks prevent for sane instance\n");
++		return -EINTR;
++	}
++
+ 	pblk_set_provision(pblk, nr_free_chks);
  
- struct iommu_arena {
- 	unsigned long	*map;
-diff --git a/arch/sparc/kernel/Makefile b/arch/sparc/kernel/Makefile
-index 76cb57750dda..a284662b0e4c 100644
---- a/arch/sparc/kernel/Makefile
-+++ b/arch/sparc/kernel/Makefile
-@@ -59,7 +59,7 @@ obj-$(CONFIG_SPARC32)   += leon_pmc.o
+ 	kfree(chunk_meta);
+diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
+index 20dbaa89c9df..953ca31dda68 100644
+--- a/drivers/lightnvm/pblk-map.c
++++ b/drivers/lightnvm/pblk-map.c
+@@ -18,11 +18,11 @@
  
- obj-$(CONFIG_SPARC64)   += reboot.o
- obj-$(CONFIG_SPARC64)   += sysfs.o
--obj-$(CONFIG_SPARC64)   += iommu.o
-+obj-$(CONFIG_SPARC64)   += iommu.o iommu-common.o
- obj-$(CONFIG_SPARC64)   += central.o
- obj-$(CONFIG_SPARC64)   += starfire.o
- obj-$(CONFIG_SPARC64)   += power.o
-diff --git a/lib/iommu-common.c b/arch/sparc/kernel/iommu-common.c
-similarity index 98%
-rename from lib/iommu-common.c
-rename to arch/sparc/kernel/iommu-common.c
-index 55b00de106b5..59cb16691322 100644
---- a/lib/iommu-common.c
-+++ b/arch/sparc/kernel/iommu-common.c
-@@ -8,9 +8,9 @@
- #include <linux/bitmap.h>
- #include <linux/bug.h>
- #include <linux/iommu-helper.h>
--#include <linux/iommu-common.h>
- #include <linux/dma-mapping.h>
- #include <linux/hash.h>
-+#include <asm/iommu-common.h>
+ #include "pblk.h"
  
- static unsigned long iommu_large_alloc = 15;
+-static void pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
+-			       struct ppa_addr *ppa_list,
+-			       unsigned long *lun_bitmap,
+-			       struct pblk_sec_meta *meta_list,
+-			       unsigned int valid_secs)
++static int pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
++			      struct ppa_addr *ppa_list,
++			      unsigned long *lun_bitmap,
++			      struct pblk_sec_meta *meta_list,
++			      unsigned int valid_secs)
+ {
+ 	struct pblk_line *line = pblk_line_get_data(pblk);
+ 	struct pblk_emeta *emeta;
+@@ -35,8 +35,14 @@ static void pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
+ 	if (pblk_line_is_full(line)) {
+ 		struct pblk_line *prev_line = line;
  
-@@ -93,7 +93,6 @@ void iommu_tbl_pool_init(struct iommu_map_table *iommu,
- 	p->hint = p->start;
- 	p->end = num_entries;
++		/* If we cannot allocate a new line, make sure to store metadata
++		 * on current line and then fail
++		 */
+ 		line = pblk_line_replace_data(pblk);
+ 		pblk_line_close_meta(pblk, prev_line);
++
++		if (!line)
++			return -EINTR;
+ 	}
+ 
+ 	emeta = line->emeta;
+@@ -74,6 +80,7 @@ static void pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
+ 	}
+ 
+ 	pblk_down_rq(pblk, ppa_list, nr_secs, lun_bitmap);
++	return 0;
  }
--EXPORT_SYMBOL(iommu_tbl_pool_init);
  
- unsigned long iommu_tbl_range_alloc(struct device *dev,
- 				struct iommu_map_table *iommu,
-@@ -224,7 +223,6 @@ unsigned long iommu_tbl_range_alloc(struct device *dev,
+ void pblk_map_rq(struct pblk *pblk, struct nvm_rq *rqd, unsigned int sentry,
+@@ -87,8 +94,12 @@ void pblk_map_rq(struct pblk *pblk, struct nvm_rq *rqd, unsigned int sentry,
  
- 	return n;
+ 	for (i = off; i < rqd->nr_ppas; i += min) {
+ 		map_secs = (i + min > valid_secs) ? (valid_secs % min) : min;
+-		pblk_map_page_data(pblk, sentry + i, &rqd->ppa_list[i],
+-					lun_bitmap, &meta_list[i], map_secs);
++		if (pblk_map_page_data(pblk, sentry + i, &rqd->ppa_list[i],
++					lun_bitmap, &meta_list[i], map_secs)) {
++			bio_put(rqd->bio);
++			pblk_free_rqd(pblk, rqd, PBLK_WRITE);
++			pblk_pipeline_stop(pblk);
++		}
+ 	}
  }
--EXPORT_SYMBOL(iommu_tbl_range_alloc);
  
- static struct iommu_pool *get_pool(struct iommu_map_table *tbl,
- 				   unsigned long entry)
-@@ -264,4 +262,3 @@ void iommu_tbl_range_free(struct iommu_map_table *iommu, u64 dma_addr,
- 	bitmap_clear(iommu->map, entry, npages);
- 	spin_unlock_irqrestore(&(pool->lock), flags);
- }
--EXPORT_SYMBOL(iommu_tbl_range_free);
-diff --git a/arch/sparc/kernel/iommu.c b/arch/sparc/kernel/iommu.c
-index b08dc3416f06..40d008b0bd3e 100644
---- a/arch/sparc/kernel/iommu.c
-+++ b/arch/sparc/kernel/iommu.c
-@@ -14,7 +14,7 @@
- #include <linux/errno.h>
- #include <linux/iommu-helper.h>
- #include <linux/bitmap.h>
--#include <linux/iommu-common.h>
-+#include <asm/iommu-common.h>
+@@ -108,8 +119,12 @@ void pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
  
- #ifdef CONFIG_PCI
- #include <linux/pci.h>
-diff --git a/arch/sparc/kernel/ldc.c b/arch/sparc/kernel/ldc.c
-index 86b625f9d8dc..c0fa3ef6cf01 100644
---- a/arch/sparc/kernel/ldc.c
-+++ b/arch/sparc/kernel/ldc.c
-@@ -16,7 +16,7 @@
- #include <linux/list.h>
- #include <linux/init.h>
- #include <linux/bitmap.h>
--#include <linux/iommu-common.h>
-+#include <asm/iommu-common.h>
+ 	for (i = 0; i < rqd->nr_ppas; i += min) {
+ 		map_secs = (i + min > valid_secs) ? (valid_secs % min) : min;
+-		pblk_map_page_data(pblk, sentry + i, &rqd->ppa_list[i],
+-					lun_bitmap, &meta_list[i], map_secs);
++		if (pblk_map_page_data(pblk, sentry + i, &rqd->ppa_list[i],
++					lun_bitmap, &meta_list[i], map_secs)) {
++			bio_put(rqd->bio);
++			pblk_free_rqd(pblk, rqd, PBLK_WRITE);
++			pblk_pipeline_stop(pblk);
++		}
  
- #include <asm/hypervisor.h>
- #include <asm/iommu.h>
-diff --git a/arch/sparc/kernel/pci_sun4v.c b/arch/sparc/kernel/pci_sun4v.c
-index 249367228c33..565d9ac883d0 100644
---- a/arch/sparc/kernel/pci_sun4v.c
-+++ b/arch/sparc/kernel/pci_sun4v.c
-@@ -16,7 +16,7 @@
- #include <linux/export.h>
- #include <linux/log2.h>
- #include <linux/of_device.h>
--#include <linux/iommu-common.h>
-+#include <asm/iommu-common.h>
+ 		erase_lun = pblk_ppa_to_pos(geo, rqd->ppa_list[i]);
  
- #include <asm/iommu.h>
- #include <asm/irq.h>
-diff --git a/lib/Makefile b/lib/Makefile
-index ce20696d5a92..94203b5eecd4 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -147,7 +147,7 @@ obj-$(CONFIG_AUDIT_GENERIC) += audit.o
- obj-$(CONFIG_AUDIT_COMPAT_GENERIC) += compat_audit.o
- 
- obj-$(CONFIG_SWIOTLB) += swiotlb.o
--obj-$(CONFIG_IOMMU_HELPER) += iommu-helper.o iommu-common.o
-+obj-$(CONFIG_IOMMU_HELPER) += iommu-helper.o
- obj-$(CONFIG_FAULT_INJECTION) += fault-inject.o
- obj-$(CONFIG_NOTIFIER_ERROR_INJECTION) += notifier-error-inject.o
- obj-$(CONFIG_PM_NOTIFIER_ERROR_INJECT) += pm-notifier-error-inject.o
 -- 
-2.17.0
+2.7.4
