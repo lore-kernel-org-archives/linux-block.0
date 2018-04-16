@@ -1,129 +1,42 @@
-Return-Path: <beanhuo@micron.com>
-From: "Bean Huo (beanhuo)" <beanhuo@micron.com>
-To: Steven Rostedt <rostedt@goodmis.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "mingo@redhad.com" <mingo@redhad.com>,
-        "Bart.VanAssche@sandisk.com"
-	<Bart.VanAssche@sandisk.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "Bean Huo (beanhuo)" <beanhuo@micron.com>,
-        "rajatja@google.com" <rajatja@google.com>
-Subject: [RESEND PATCH v1 1/2] trace: events: scsi: Add tag in SCSI trace
- events
-Date: Mon, 16 Apr 2018 14:31:49 +0000
-Message-ID: <4650cbf668fd4853ad98dba834141e08@SIWEX5A.sing.micron.com>
-Content-Type: text/plain; charset="us-ascii"
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47958 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1754480AbeDPJHI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Apr 2018 05:07:08 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id w3G961Gj004898
+        for <linux-block@vger.kernel.org>; Mon, 16 Apr 2018 05:07:08 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2hcqq1kas9-1
+        (version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Mon, 16 Apr 2018 05:07:07 -0400
+Received: from localhost
+        by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-block@vger.kernel.org> from <khandual@linux.vnet.ibm.com>;
+        Mon, 16 Apr 2018 10:07:05 +0100
+Subject: Re: [PATCH 02/12] iommu-helper: unexport iommu_area_alloc
+To: Christoph Hellwig <hch@lst.de>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        iommu@lists.linux-foundation.org
+References: <20180415145947.1248-1-hch@lst.de>
+ <20180415145947.1248-3-hch@lst.de>
+Cc: x86@kernel.org, linux-block@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-mm@kvack.org,
+        linux-ide@vger.kernel.org, linux-mips@linux-mips.org,
+        sparclinux@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+From: Anshuman Khandual <khandual@linux.vnet.ibm.com>
+Date: Mon, 16 Apr 2018 14:36:56 +0530
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20180415145947.1248-3-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252
+Message-Id: <1cedfc7e-9168-47bd-cc6a-0557b92eb37b@linux.vnet.ibm.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Print the request tag along with other information
-while tracing a command.
+On 04/15/2018 08:29 PM, Christoph Hellwig wrote:
+> This function is only used by built-in code.
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-Signed-off-by: Bean Huo <beanhuo@micron.com>
----
- include/trace/events/scsi.h | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
-
-diff --git a/include/trace/events/scsi.h b/include/trace/events/scsi.h
-index f624969..a4ada90 100644
---- a/include/trace/events/scsi.h
-+++ b/include/trace/events/scsi.h
-@@ -210,6 +210,7 @@ TRACE_EVENT(scsi_dispatch_cmd_start,
- 		__field( unsigned int,	lun	)
- 		__field( unsigned int,	opcode	)
- 		__field( unsigned int,	cmd_len )
-+		__field( int,		tag )
- 		__field( unsigned int,	data_sglen )
- 		__field( unsigned int,	prot_sglen )
- 		__field( unsigned char,	prot_op )
-@@ -223,6 +224,7 @@ TRACE_EVENT(scsi_dispatch_cmd_start,
- 		__entry->lun		=3D cmd->device->lun;
- 		__entry->opcode		=3D cmd->cmnd[0];
- 		__entry->cmd_len	=3D cmd->cmd_len;
-+		__entry->tag		=3D cmd->request->tag;
- 		__entry->data_sglen	=3D scsi_sg_count(cmd);
- 		__entry->prot_sglen	=3D scsi_prot_sg_count(cmd);
- 		__entry->prot_op	=3D scsi_get_prot_op(cmd);
-@@ -230,10 +232,10 @@ TRACE_EVENT(scsi_dispatch_cmd_start,
- 	),
-=20
- 	TP_printk("host_no=3D%u channel=3D%u id=3D%u lun=3D%u data_sgl=3D%u prot_=
-sgl=3D%u" \
--		  " prot_op=3D%s cmnd=3D(%s %s raw=3D%s)",
-+		  " prot_op=3D%s tag=3D%d cmnd=3D(%s %s raw=3D%s)",
- 		  __entry->host_no, __entry->channel, __entry->id,
- 		  __entry->lun, __entry->data_sglen, __entry->prot_sglen,
--		  show_prot_op_name(__entry->prot_op),
-+		  show_prot_op_name(__entry->prot_op), __entry->tag,
- 		  show_opcode_name(__entry->opcode),
- 		  __parse_cdb(__get_dynamic_array(cmnd), __entry->cmd_len),
- 		  __print_hex(__get_dynamic_array(cmnd), __entry->cmd_len))
-@@ -253,6 +255,7 @@ TRACE_EVENT(scsi_dispatch_cmd_error,
- 		__field( int,		rtn	)
- 		__field( unsigned int,	opcode	)
- 		__field( unsigned int,	cmd_len )
-+		__field( int,		tag )
- 		__field( unsigned int,	data_sglen )
- 		__field( unsigned int,	prot_sglen )
- 		__field( unsigned char,	prot_op )
-@@ -267,6 +270,7 @@ TRACE_EVENT(scsi_dispatch_cmd_error,
- 		__entry->rtn		=3D rtn;
- 		__entry->opcode		=3D cmd->cmnd[0];
- 		__entry->cmd_len	=3D cmd->cmd_len;
-+		__entry->tag		=3D cmd->request->tag;
- 		__entry->data_sglen	=3D scsi_sg_count(cmd);
- 		__entry->prot_sglen	=3D scsi_prot_sg_count(cmd);
- 		__entry->prot_op	=3D scsi_get_prot_op(cmd);
-@@ -274,10 +278,10 @@ TRACE_EVENT(scsi_dispatch_cmd_error,
- 	),
-=20
- 	TP_printk("host_no=3D%u channel=3D%u id=3D%u lun=3D%u data_sgl=3D%u prot_=
-sgl=3D%u" \
--		  " prot_op=3D%s cmnd=3D(%s %s raw=3D%s) rtn=3D%d",
-+		  " prot_op=3D%s tag=3D%d cmnd=3D(%s %s raw=3D%s) rtn=3D%d",
- 		  __entry->host_no, __entry->channel, __entry->id,
- 		  __entry->lun, __entry->data_sglen, __entry->prot_sglen,
--		  show_prot_op_name(__entry->prot_op),
-+		  show_prot_op_name(__entry->prot_op), __entry->tag,
- 		  show_opcode_name(__entry->opcode),
- 		  __parse_cdb(__get_dynamic_array(cmnd), __entry->cmd_len),
- 		  __print_hex(__get_dynamic_array(cmnd), __entry->cmd_len),
-@@ -298,6 +302,7 @@ DECLARE_EVENT_CLASS(scsi_cmd_done_timeout_template,
- 		__field( int,		result	)
- 		__field( unsigned int,	opcode	)
- 		__field( unsigned int,	cmd_len )
-+		__field( int,		tag )
- 		__field( unsigned int,	data_sglen )
- 		__field( unsigned int,	prot_sglen )
- 		__field( unsigned char,	prot_op )
-@@ -312,6 +317,7 @@ DECLARE_EVENT_CLASS(scsi_cmd_done_timeout_template,
- 		__entry->result		=3D cmd->result;
- 		__entry->opcode		=3D cmd->cmnd[0];
- 		__entry->cmd_len	=3D cmd->cmd_len;
-+		__entry->tag		=3D cmd->request->tag;
- 		__entry->data_sglen	=3D scsi_sg_count(cmd);
- 		__entry->prot_sglen	=3D scsi_prot_sg_count(cmd);
- 		__entry->prot_op	=3D scsi_get_prot_op(cmd);
-@@ -319,11 +325,11 @@ DECLARE_EVENT_CLASS(scsi_cmd_done_timeout_template,
- 	),
-=20
- 	TP_printk("host_no=3D%u channel=3D%u id=3D%u lun=3D%u data_sgl=3D%u " \
--		  "prot_sgl=3D%u prot_op=3D%s cmnd=3D(%s %s raw=3D%s) result=3D(driver=
-=3D" \
--		  "%s host=3D%s message=3D%s status=3D%s)",
-+		  "prot_sgl=3D%u prot_op=3D%s tag=3D%d cmnd=3D(%s %s raw=3D%s) " \
-+		  "result=3D(driver=3D%s host=3D%s message=3D%s status=3D%s)",
- 		  __entry->host_no, __entry->channel, __entry->id,
- 		  __entry->lun, __entry->data_sglen, __entry->prot_sglen,
--		  show_prot_op_name(__entry->prot_op),
-+		  show_prot_op_name(__entry->prot_op), __entry->tag,
- 		  show_opcode_name(__entry->opcode),
- 		  __parse_cdb(__get_dynamic_array(cmnd), __entry->cmd_len),
- 		  __print_hex(__get_dynamic_array(cmnd), __entry->cmd_len),
---=20
-2.7.4
+Reviewed-by: Anshuman Khandual <khandual@linux.vnet.ibm.com>
