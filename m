@@ -1,42 +1,52 @@
-Return-Path: <scott.bauer@intel.com>
-From: Scott Bauer <scott.bauer@intel.com>
-To: axboe@kernel.dk
-Cc: hch@infradead.org,
-	dan.carpenter@oracle.com,
-	linux-block@vger.kernel.org,
-	Scott Bauer <scott.bauer@intel.com>,
-	Scott Bauer <sbauer@plzdonthack.me>,
-	stable@vger.kernel.org
-Subject: [PATCH] cdrom: Fix info leak/OOB read in cdrom_ioctl_drive_status
-Date: Thu, 26 Apr 2018 11:51:08 -0600
-Message-Id: <20180426175108.29280-1-scott.bauer@intel.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wr0-f196.google.com ([209.85.128.196]:38543 "EHLO
+        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752201AbeDPKZl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Apr 2018 06:25:41 -0400
+Received: by mail-wr0-f196.google.com with SMTP id h3so11814703wrh.5
+        for <linux-block@vger.kernel.org>; Mon, 16 Apr 2018 03:25:41 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 00/11] lightnvm: pblk: small fixes
+Date: Mon, 16 Apr 2018 12:25:21 +0200
+Message-Id: <1523874332-6272-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Like d88b6d04: "cdrom: information leak in cdrom_ioctl_media_changed()"
+A bunch of small fixes and extra checks for pblk. Non is critical, though
+("lightnvm: pblk: check for chunk size before allocating it") might be nice to
+get into 4.17 as it is a fix for the 2.0 pblk patches.
 
-There is another cast from unsigned long to int which causes
-a bounds check to fail with specially crafted input. The value is
-then used as an index in the slot array in cdrom_slot_status().
+Javier
 
-Signed-off-by: Scott Bauer <scott.bauer@intel.com>
-Signed-off-by: Scott Bauer <sbauer@plzdonthack.me>
-Cc: stable@vger.kernel.org
----
- drivers/cdrom/cdrom.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Javier González (11):
+  lightnvm: pblk: fail gracefully on line alloc. failure
+  lightnvm: pblk: recheck for bad lines at runtime
+  lightnvm: pblk: check read lba on gc path
+  lightnvn: pblk: improve error msg on corrupted LBAs
+  lightnvm: pblk: warn in case of corrupted write buffer
+  lightnvm: pblk: return NVM_ error on failed submission
+  lightnvm: pblk: remove unnecessary indirection
+  lightnvm: pblk: remove unnecessary argument
+  lightnvm: pblk: check for chunk size before allocating it
+  lightnvn: pass flag on graceful teardown to targets
+  lightnvm: pblk: remove dead function
 
-diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
-index bfc566d3f31a..8cfa10ab7abc 100644
---- a/drivers/cdrom/cdrom.c
-+++ b/drivers/cdrom/cdrom.c
-@@ -2542,7 +2542,7 @@ static int cdrom_ioctl_drive_status(struct cdrom_device_info *cdi,
- 	if (!CDROM_CAN(CDC_SELECT_DISC) ||
- 	    (arg == CDSL_CURRENT || arg == CDSL_NONE))
- 		return cdi->ops->drive_status(cdi, CDSL_CURRENT);
--	if (((int)arg >= cdi->capacity))
-+	if (arg >= cdi->capacity)
- 		return -EINVAL;
- 	return cdrom_slot_status(cdi, arg);
- }
+ drivers/lightnvm/core.c      | 10 +++---
+ drivers/lightnvm/pblk-core.c | 86 ++++++++++++++++++++++++++------------------
+ drivers/lightnvm/pblk-gc.c   | 10 +++---
+ drivers/lightnvm/pblk-init.c | 38 ++++++++++++--------
+ drivers/lightnvm/pblk-map.c  | 33 ++++++++++++-----
+ drivers/lightnvm/pblk-rb.c   |  5 ++-
+ drivers/lightnvm/pblk-read.c | 73 ++++++++++++++++++++++++++++---------
+ drivers/lightnvm/pblk.h      |  7 ++--
+ include/linux/lightnvm.h     |  2 +-
+ 9 files changed, 173 insertions(+), 91 deletions(-)
+
 -- 
-2.14.1
+2.7.4
