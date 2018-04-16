@@ -1,55 +1,37 @@
-Return-Path: <beanhuo@micron.com>
-From: "Bean Huo (beanhuo)" <beanhuo@micron.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "jejb@linux.vnet.ibm.com"
-	<jejb@linux.vnet.ibm.com>,
-        "rostedt@goodmis.org" <rostedt@goodmis.org>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "axboe@kernel.dk"
+Return-Path: <prvs=637eb2c04=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "beanhuo@micron.com" <beanhuo@micron.com>, "jejb@linux.vnet.ibm.com"
+	<jejb@linux.vnet.ibm.com>, "rostedt@goodmis.org" <rostedt@goodmis.org>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
 	<axboe@kernel.dk>
 CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "mingo@redhad.com" <mingo@redhad.com>,
-        "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>,
-        "rajatja@google.com" <rajatja@google.com>
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"mingo@redhad.com" <mingo@redhad.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "rajatja@google.com" <rajatja@google.com>
 Subject: Re: [RESEND PATCH v1 1/2] trace: events: scsi: Add tag in SCSI trace
  events
-Date: Mon, 16 Apr 2018 21:10:57 +0000
-Message-ID: <97d36126b86443f680aacfac23b0a04e@SIWEX5A.sing.micron.com>
+Date: Mon, 16 Apr 2018 20:49:12 +0000
+Message-ID: <bee7c8b15b7cec3d4b1442f414e766539fac2491.camel@wdc.com>
+References: <4650cbf668fd4853ad98dba834141e08@SIWEX5A.sing.micron.com>
+In-Reply-To: <4650cbf668fd4853ad98dba834141e08@SIWEX5A.sing.micron.com>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-SGksIEJhcnQNCg0KPm1pbmdvQHJlZGhhZC5jb207IGxpbnV4LWJsb2NrQHZnZXIua2VybmVsLm9y
-ZzsgcmFqYXRqYUBnb29nbGUuY29tDQo+U3ViamVjdDogW0VYVF0gUmU6IFtSRVNFTkQgUEFUQ0gg
-djEgMS8yXSB0cmFjZTogZXZlbnRzOiBzY3NpOiBBZGQgdGFnIGluIFNDU0kNCj50cmFjZSBldmVu
-dHMNCj4NCj5PbiBNb24sIDIwMTgtMDQtMTYgYXQgMTQ6MzEgKzAwMDAsIEJlYW4gSHVvIChiZWFu
-aHVvKSB3cm90ZToNCj4+ICAJVFBfcHJpbnRrKCJob3N0X25vPSV1IGNoYW5uZWw9JXUgaWQ9JXUg
-bHVuPSV1IGRhdGFfc2dsPSV1DQo+cHJvdF9zZ2w9JXUiIFwNCj4+IC0JCSAgIiBwcm90X29wPSVz
-IGNtbmQ9KCVzICVzIHJhdz0lcykiLA0KPj4gKwkJICAiIHByb3Rfb3A9JXMgdGFnPSVkIGNtbmQ9
-KCVzICVzIHJhdz0lcykiLA0KPj4NCj4+IFsgLi4uIF0NCj4+ICAJVFBfcHJpbnRrKCJob3N0X25v
-PSV1IGNoYW5uZWw9JXUgaWQ9JXUgbHVuPSV1IGRhdGFfc2dsPSV1DQo+cHJvdF9zZ2w9JXUiIFwN
-Cj4+IC0JCSAgIiBwcm90X29wPSVzIGNtbmQ9KCVzICVzIHJhdz0lcykgcnRuPSVkIiwNCj4+ICsJ
-CSAgIiBwcm90X29wPSVzIHRhZz0lZCBjbW5kPSglcyAlcyByYXc9JXMpIHJ0bj0lZCIsDQo+PiBb
-IC4uLiBdDQo+PiAgCVRQX3ByaW50aygiaG9zdF9ubz0ldSBjaGFubmVsPSV1IGlkPSV1IGx1bj0l
-dSBkYXRhX3NnbD0ldSAiIFwNCj4+IC0JCSAgInByb3Rfc2dsPSV1IHByb3Rfb3A9JXMgY21uZD0o
-JXMgJXMgcmF3PSVzKQ0KPnJlc3VsdD0oZHJpdmVyPSIgXA0KPj4gLQkJICAiJXMgaG9zdD0lcyBt
-ZXNzYWdlPSVzIHN0YXR1cz0lcykiLA0KPj4gKwkJICAicHJvdF9zZ2w9JXUgcHJvdF9vcD0lcyB0
-YWc9JWQgY21uZD0oJXMgJXMgcmF3PSVzKSAiIFwNCj4+ICsJCSAgInJlc3VsdD0oZHJpdmVyPSVz
-IGhvc3Q9JXMgbWVzc2FnZT0lcyBzdGF0dXM9JXMpIiwNCj4NCj5XaGljaCB0b29scyBwcm9jZXNz
-IHRoZXNlIHN0cmluZ3M/IEhhcyBpdCBiZWVuIHZlcmlmaWVkIHdoZXRoZXIgb3Igbm90IHRoZQ0K
-PnRvb2xzIHRoYXQgcHJvY2VzcyB0aGVzZSBzdHJpbmdzIHN0aWxsIHdvcmsgZmluZSB3aXRoIHRo
-aXMgcGF0Y2ggYXBwbGllZD8NCj4gDQoNCkkgZG9uJ3QgdXNlIG9uZSBjZXJ0YWluIHNwZWNpYWwg
-dG9vbCB0byBhbmFseXplIHRoaXMgc3RyaW5nLCBJIGFtIHVzaW5nIGZ0cmFjZSB3aXRoIGV2ZW50
-Lg0KV2l0aCB0YWcgaW5mb3JtYXRpb24sIEkgY2FuIHNlZSBob3cgbWFueSB0YXNrcyBpbiBzdG9y
-YWdlIGRldmljZSBhbmQgZWFzaWx5IHRvIHRyYWNlIGVhY2ggcmVxdWVzdA0KdW5kZXIgbXVsdGlw
-bGUgdGhyZWFkIHdvcmtsb2FkLiANCkV2ZW50IHRoZXJlIGlzIHNvbWVvbmUgd2hvIHVzaW5nIGNl
-cnRhaW4gdG9vbCB0byBhbmFseXplIHRoaXMgc3RyaW5nLCBhZnRlciBhZGRpbmcgYWRkaXRpb25h
-bA0KdGFnIHByaW50b3V0LCBpbiBteSBvcGluaW9uLCB0aGV5IGFyZSBoYXBweSB0byBzZWUgaXQg
-dGhlcmUuIA0KDQpBZ2FpbiwgeW91IHNhaWQgaWYgd2UgYWRkIG5ldyBmZWF0dXJlIGluIGxlZ2Fj
-eSBibG9jaywgd2Ugd2lsbCBhbHNvIGFkZCBuZXcgZmVhdHVyZSBpbiBibGstbXEuDQpJIHN0aWxs
-IGRvbid0IHVuZGVyc3RhbmQgaGVyZS4gICJpbmNsdWRlL3RyYWNlL2V2ZW50L2Jsb2NrLmggLi4u
-IHNjc2kuaCIgd2lsbCBiZSBjaGFuZ2VkPw0KSWYgeWVzLCBob3c/IEJlY2F1c2UgYmxrLW1xIGlz
-IHN0aWxsIHVzaW5nIHRoZSBldmVudHMgZGVmaW5lZCBpbiBpbmNsdWRlL3RyYWNlL2V2ZW50L2Js
-b2NrLmguDQoNCkJlYW4gSHVvDQoNCj5UaGFua3MsDQo+DQo+QmFydC4NCj4NCg0K
+T24gTW9uLCAyMDE4LTA0LTE2IGF0IDE0OjMxICswMDAwLCBCZWFuIEh1byAoYmVhbmh1bykgd3Jv
+dGU6DQo+ICAJVFBfcHJpbnRrKCJob3N0X25vPSV1IGNoYW5uZWw9JXUgaWQ9JXUgbHVuPSV1IGRh
+dGFfc2dsPSV1IHByb3Rfc2dsPSV1IiBcDQo+IC0JCSAgIiBwcm90X29wPSVzIGNtbmQ9KCVzICVz
+IHJhdz0lcykiLA0KPiArCQkgICIgcHJvdF9vcD0lcyB0YWc9JWQgY21uZD0oJXMgJXMgcmF3PSVz
+KSIsDQo+IA0KPiBbIC4uLiBdDQo+ICAJVFBfcHJpbnRrKCJob3N0X25vPSV1IGNoYW5uZWw9JXUg
+aWQ9JXUgbHVuPSV1IGRhdGFfc2dsPSV1IHByb3Rfc2dsPSV1IiBcDQo+IC0JCSAgIiBwcm90X29w
+PSVzIGNtbmQ9KCVzICVzIHJhdz0lcykgcnRuPSVkIiwNCj4gKwkJICAiIHByb3Rfb3A9JXMgdGFn
+PSVkIGNtbmQ9KCVzICVzIHJhdz0lcykgcnRuPSVkIiwNCj4gWyAuLi4gXQ0KPiAgCVRQX3ByaW50
+aygiaG9zdF9ubz0ldSBjaGFubmVsPSV1IGlkPSV1IGx1bj0ldSBkYXRhX3NnbD0ldSAiIFwNCj4g
+LQkJICAicHJvdF9zZ2w9JXUgcHJvdF9vcD0lcyBjbW5kPSglcyAlcyByYXc9JXMpIHJlc3VsdD0o
+ZHJpdmVyPSIgXA0KPiAtCQkgICIlcyBob3N0PSVzIG1lc3NhZ2U9JXMgc3RhdHVzPSVzKSIsDQo+
+ICsJCSAgInByb3Rfc2dsPSV1IHByb3Rfb3A9JXMgdGFnPSVkIGNtbmQ9KCVzICVzIHJhdz0lcykg
+IiBcDQo+ICsJCSAgInJlc3VsdD0oZHJpdmVyPSVzIGhvc3Q9JXMgbWVzc2FnZT0lcyBzdGF0dXM9
+JXMpIiwNCg0KV2hpY2ggdG9vbHMgcHJvY2VzcyB0aGVzZSBzdHJpbmdzPyBIYXMgaXQgYmVlbiB2
+ZXJpZmllZCB3aGV0aGVyIG9yIG5vdA0KdGhlIHRvb2xzIHRoYXQgcHJvY2VzcyB0aGVzZSBzdHJp
+bmdzIHN0aWxsIHdvcmsgZmluZSB3aXRoIHRoaXMgcGF0Y2gNCmFwcGxpZWQ/DQoNClRoYW5rcywN
+Cg0KQmFydC4NCg0KDQo=
