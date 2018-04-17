@@ -1,46 +1,37 @@
-Return-Path: <prvs=638457c25=Damien.LeMoal@wdc.com>
-From: Damien Le Moal <Damien.LeMoal@wdc.com>
-To: Christoph Hellwig <hch@lst.de>, Bart Van Assche <Bart.VanAssche@wdc.com>
-CC: Jens Axboe <axboe@kernel.dk>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "Martin K . Petersen"
-	<martin.petersen@oracle.com>, Hannes Reinecke <hare@suse.com>, Shaun Tancheff
-	<shaun@tancheff.com>, "stable@vger.kernel.org" <stable@vger.kernel.org>
+Return-Path: <prvs=63851e16a=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>
+CC: "shaun@tancheff.com" <shaun@tancheff.com>, "hare@suse.com"
+	<hare@suse.com>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
 Subject: Re: [PATCH] block: Avoid executing a report or reset zones while a
  queue is frozen
-Date: Tue, 17 Apr 2018 22:58:19 +0000
-Message-ID: <77b8bd84-7a36-b0c3-ecf1-3ecfd91f68de@wdc.com>
+Date: Tue, 17 Apr 2018 17:35:07 +0000
+Message-ID: <f966e56f3c2c9add48d0a93fb56321f7eb7ee33e.camel@wdc.com>
 References: <20180417010034.28676-1-bart.vanassche@wdc.com>
- <20180417151857.GA25646@lst.de>
+	 <20180417151857.GA25646@lst.de>
 In-Reply-To: <20180417151857.GA25646@lst.de>
-Reply-To: Damien Le Moal <Damien.LeMoal@wdc.com>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Q2hyaXN0b3BoLA0KDQpPbiAyMDE4LzA0LzE3IDg6MTgsIENocmlzdG9waCBIZWxsd2lnIHdyb3Rl
-Og0KPiBPbiBNb24sIEFwciAxNiwgMjAxOCBhdCAwNjowMDozNFBNIC0wNzAwLCBCYXJ0IFZhbiBB
-c3NjaGUgd3JvdGU6DQo+PiBUaGlzIHBhdGNoIG9uIGl0c2VsZiBkb2VzIG5vdCBjaGFuZ2UgdGhl
-IGJlaGF2aW9yIG9mIGVpdGhlciBpb2N0bC4NCj4+IEhvd2V2ZXIsIHRoaXMgcGF0Y2ggaXMgbmVj
-ZXNzYXJ5IHRvIGF2b2lkIHRoYXQgdGhlc2UgaW9jdGxzIGZhaWwNCj4+IHdpdGggLUVJTyBpZiBz
-ZF9yZXZhbGlkYXRlX2Rpc2soKSBpcyBjYWxsZWQgd2hpbGUgdGhlc2UgaW9jdGxzIGFyZQ0KPj4g
-aW4gcHJvZ3Jlc3MgYmVjYXVzZSB0aGUgY3VycmVudCB6b25lZCBibG9jayBjb21tYW5kIGNvZGUg
-dGVtcG9yYXJpbHkNCj4+IGNsZWFycyBkYXRhIHRoYXQgaXMgbmVlZGVkIGJ5IHRoZXNlIGlvY3Rs
-cy4gU2VlIGFsc28gY29tbWl0DQo+PiAzZWQwNWE5ODdlMGYgKCJibGstem9uZWQ6IGltcGxlbWVu
-dCBpb2N0bHMiKS4NCj4gDQo+IEhtbS4gIEkgdGhpbmsgd2UgbmVlZCB0byBhdm9pZCBjbGVhcmlu
-ZyB0aGF0IGRhdGEgYW5kIHVwZGF0ZSBpdCB1c2luZw0KPiBSQ1UgaW5zdGVhZC4gIENhbGxpbmcg
-YmxrX3F1ZXVlX2VudGVyIGJlZm9yZSBzdWJtaXR0aW5nIGJpb3MgaXMNCj4gc29tZXRoaW5nIHRo
-YXQgd291bGQgbWFrZSB6b25lIHJlcG9ydGluZyB2ZXJ5IGRpZmZlcmVudCBmcm9tIGFueQ0KPiBv
-dGhlciBibG9jayBsYXllciB1c2VyLg0KPiANCg0KV2l0aCB0aGUgc2NzaSBwYXRjaGVzIHRoYXQg
-QmFydCBzZW50LCB0aGUgZGF0YSBpcyBub3QgY2xlYXJlZCBhbnltb3JlIHVudGlsIGl0DQppcyBy
-ZWFkeSB0byBiZSB1cGRhdGVkIGFsbCBhdCBvbmNlLCBpbiBiZXR3ZWVuIGNhbGxzIHRvIGJsa19t
-cV9mcmVlemVfcXVldWUoKQ0KYW5kIGJsa19tcV91bmZyZWV6ZV9xdWV1ZSgpLiBUaGlzIHByZXZl
-bnRzIHRoZSBzY2hlZHVsZXIgKGRlYWRsaW5lIGFuZA0KbXEtZGVhZGxpbmUpIGZyb20gdXNpbmcg
-cGFydGlhbGx5IGluY29ycmVjdCBkYXRhIHNpbmNlIHRoZSBxdWV1ZSBmcmVlemUNCmd1YXJhbnRl
-ZXMgbm8gYWN0aXZpdHkgb24gdGhlIHNjaGVkdWxlciBzaWRlIGR1cmluZyB0aGUgZGF0YSBzd2Fw
-Lg0KQnV0IGZvciB0aGUgQklPIGlzc3Vpbmcgc2lkZSwgdGhlIGNhbGxzIHRvIGJsa19xdWV1ZV9l
-bnRlcigpIGVuc3VyZXMgdGhlIHNhbWUuDQoNClRoaXMgYWxsIGFsbG93cyB0byBsZWF2ZSB1bm1v
-ZGlmaWVkIGFsbCB0aGUgYmxrLXpvbmVkLmMgaGVscGVyIGZ1bmN0aW9ucyB0aGF0DQp1c2UgdGhl
-IHJlcXVlc3QgcXVldWUgaW5mb3JtYXRpb24gKGJpdG1hcHMgYW5kIG51bWJlciBvZiB6b25lcyks
-IHdpdGhvdXQgYW55DQpuZWVkIGZvciByY3UgbG9jayBjYWxscy4gSSB0aGluayB0aGlzIGlzIGEg
-c2ltcGxlciBhcHByb2FjaC4NCg0KQmVzdCByZWdhcmRzLg0KDQotLSANCkRhbWllbiBMZSBNb2Fs
-DQpXZXN0ZXJuIERpZ2l0YWwgUmVzZWFyY2g=
+T24gVHVlLCAyMDE4LTA0LTE3IGF0IDE3OjE4ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
+ZToNCj4gT24gTW9uLCBBcHIgMTYsIDIwMTggYXQgMDY6MDA6MzRQTSAtMDcwMCwgQmFydCBWYW4g
+QXNzY2hlIHdyb3RlOg0KPiA+IFRoaXMgcGF0Y2ggb24gaXRzZWxmIGRvZXMgbm90IGNoYW5nZSB0
+aGUgYmVoYXZpb3Igb2YgZWl0aGVyIGlvY3RsLg0KPiA+IEhvd2V2ZXIsIHRoaXMgcGF0Y2ggaXMg
+bmVjZXNzYXJ5IHRvIGF2b2lkIHRoYXQgdGhlc2UgaW9jdGxzIGZhaWwNCj4gPiB3aXRoIC1FSU8g
+aWYgc2RfcmV2YWxpZGF0ZV9kaXNrKCkgaXMgY2FsbGVkIHdoaWxlIHRoZXNlIGlvY3RscyBhcmUN
+Cj4gPiBpbiBwcm9ncmVzcyBiZWNhdXNlIHRoZSBjdXJyZW50IHpvbmVkIGJsb2NrIGNvbW1hbmQg
+Y29kZSB0ZW1wb3JhcmlseQ0KPiA+IGNsZWFycyBkYXRhIHRoYXQgaXMgbmVlZGVkIGJ5IHRoZXNl
+IGlvY3Rscy4gU2VlIGFsc28gY29tbWl0DQo+ID4gM2VkMDVhOTg3ZTBmICgiYmxrLXpvbmVkOiBp
+bXBsZW1lbnQgaW9jdGxzIikuDQo+IA0KPiBIbW0uICBJIHRoaW5rIHdlIG5lZWQgdG8gYXZvaWQg
+Y2xlYXJpbmcgdGhhdCBkYXRhIGFuZCB1cGRhdGUgaXQgdXNpbmcNCj4gUkNVIGluc3RlYWQuICBD
+YWxsaW5nIGJsa19xdWV1ZV9lbnRlciBiZWZvcmUgc3VibWl0dGluZyBiaW9zIGlzDQo+IHNvbWV0
+aGluZyB0aGF0IHdvdWxkIG1ha2Ugem9uZSByZXBvcnRpbmcgdmVyeSBkaWZmZXJlbnQgZnJvbSBh
+bnkNCj4gb3RoZXIgYmxvY2sgbGF5ZXIgdXNlci4NCg0KSGVsbG8gQ2hyaXN0b3BoLA0KDQpQbGVh
+c2UgaGF2ZSBhIGxvb2sgYXQgZ2VuZXJpY19tYWtlX3JlcXVlc3QoKS4gSSB0aGluayB0aGF0IGZ1
+bmN0aW9uIHNob3dzDQp0aGF0IGJsa19xdWV1ZV9lbnRlcigpIGlzIGNhbGxlZCBhbnl3YXkgYmVm
+b3JlIC5tYWtlX3JlcXVlc3RfZm4oKSBpcyBjYWxsZWQuDQoNClRoYW5rcywNCg0KQmFydC4NCg0K
+DQo=
