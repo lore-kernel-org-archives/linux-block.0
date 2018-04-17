@@ -1,47 +1,49 @@
-Return-Path: <keescook@google.com>
-MIME-Version: 1.0
-Sender: keescook@google.com
-In-Reply-To: <7d192394-568c-53e0-4359-723769c3ed7d@kernel.dk>
-References: <20180417214218.GA44753@beast> <7d192394-568c-53e0-4359-723769c3ed7d@kernel.dk>
-From: Kees Cook <keescook@chromium.org>
-Date: Tue, 17 Apr 2018 15:57:00 -0700
-Message-ID: <CAGXu5jLLn9HxkR0G6=-Qqjr__=ya_NM3zCLsZwa1V5m7fisQ5A@mail.gmail.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH] blk-mq: Clear out elevator private data
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Oleksandr Natalenko <oleksandr@natalenko.name>, LKML <linux-kernel@vger.kernel.org>,
-	Paolo Valente <paolo.valente@linaro.org>, Bart Van Assche <bart.vanassche@wdc.com>,
-	David Windsor <dave@nullcore.net>, "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>, linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>, Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To: Kees Cook <keescook@chromium.org>
+Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
+ linux-kernel@vger.kernel.org, Paolo Valente <paolo.valente@linaro.org>,
+ Bart Van Assche <bart.vanassche@wdc.com>, David Windsor <dave@nullcore.net>,
+ "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ linux-scsi@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Hannes Reinecke <hare@suse.com>, Johannes Thumshirn <jthumshirn@suse.de>,
+ linux-block@vger.kernel.org
+References: <20180417214218.GA44753@beast>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <7d192394-568c-53e0-4359-723769c3ed7d@kernel.dk>
+Date: Tue, 17 Apr 2018 15:45:38 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180417214218.GA44753@beast>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Apr 17, 2018 at 2:45 PM, Jens Axboe <axboe@kernel.dk> wrote:
-> On 4/17/18 3:42 PM, Kees Cook wrote:
->> Some elevators may not correctly check rq->rq_flags & RQF_ELVPRIV, and
->> may attempt to read rq->elv fields. When requests got reused, this
->> caused BFQ to think it already had a bfqq (rq->elv.priv[1]) allocated.
->> This could lead to odd behaviors like having the sense buffer address
->> slowly start incrementing. This eventually tripped HARDENED_USERCOPY
->> and KASAN.
->>
->> This patch wipes all of rq->elv instead of just rq->elv.icq. While
->> it shouldn't technically be needed, this ends up being a robustness
->> improvement that should lead to at least finding bugs in elevators faster.
->
-> Comments from the other email still apply, we should not need to do this
-> full memset() for every request. From a quick look, BFQ needs to straighten
-> out its usage of prepare request and interactions with insert_request.
+On 4/17/18 3:42 PM, Kees Cook wrote:
+> Some elevators may not correctly check rq->rq_flags & RQF_ELVPRIV, and
+> may attempt to read rq->elv fields. When requests got reused, this
+> caused BFQ to think it already had a bfqq (rq->elv.priv[1]) allocated.
+> This could lead to odd behaviors like having the sense buffer address
+> slowly start incrementing. This eventually tripped HARDENED_USERCOPY
+> and KASAN.
+> 
+> This patch wipes all of rq->elv instead of just rq->elv.icq. While
+> it shouldn't technically be needed, this ends up being a robustness
+> improvement that should lead to at least finding bugs in elevators faster.
 
-Sure, understood. I would point out, FWIW, that memset() gets unrolled
-by the compiler and this is just two more XORs in the same cacheline
-(the two words following icq). (And there is SO much more being
-cleared during alloc, it didn't seem like hardly any extra cost vs the
-robustness it provided.)
+Comments from the other email still apply, we should not need to do this
+full memset() for every request. From a quick look, BFQ needs to straighten
+out its usage of prepare request and interactions with insert_request.
 
--Kees
+> Reported-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+> Fixes: bd166ef183c26 ("blk-mq-sched: add framework for MQ capable IO schedulers")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+> In theory, BFQ needs to also check the RQF_ELVPRIV flag, but I'll leave that
+> to Paolo to figure out. Also, my Fixes line is kind of a best-guess. This
+> is where icq was originally wiped, so it seemed as good a commit as any.
+
+Yeah, that's probably a bit too broad for fixes :-)
 
 -- 
-Kees Cook
-Pixel Security
+Jens Axboe
