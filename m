@@ -1,19 +1,19 @@
-Return-Path: <martin@lichtvoll.de>
-From: Martin Steigerwald <martin@lichtvoll.de>
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 17 Apr 2018 12:46:08 +0800
+From: Ming Lei <ming.lei@redhat.com>
 To: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: axboe@kernel.dk, bart.vanassche@wdc.com, tj@kernel.org, ming.lei@redhat.com, stable@vger.kernel.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: axboe@kernel.dk, bart.vanassche@wdc.com, tj@kernel.org,
+	Martin@Lichtvoll.de, stable@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] blk-mq: start request gstate with gen 1
-Date: Tue, 17 Apr 2018 14:10:08 +0200
-Message-ID: <2612135.Ur0PZolWSD@merkaba>
-In-Reply-To: <1523936780-1589-1-git-send-email-jianchao.w.wang@oracle.com>
+Message-ID: <20180417044603.GA16286@ming.t460p>
 References: <1523936780-1589-1-git-send-email-jianchao.w.wang@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1523936780-1589-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jianchao,
-
-Jianchao Wang - 17.04.18, 05:46:
+On Tue, Apr 17, 2018 at 11:46:20AM +0800, Jianchao Wang wrote:
 > rq->gstate and rq->aborted_gstate both are zero before rqs are
 > allocated. If we have a small timeout, when the timer fires,
 > there could be rqs that are never allocated, and also there could
@@ -21,21 +21,7 @@ Jianchao Wang - 17.04.18, 05:46:
 > the moment, the rq->gstate and rq->aborted_gstate both are 0, thus
 > the blk_mq_terminate_expired will identify the rq is timed out and
 > invoke .timeout early.
-
-For testing it I add it to 4.16.2 with the patches I have already?
-
-- '[PATCH] blk-mq_Directly schedule q->timeout_work when aborting a 
-request.mbox'
-
-- '[PATCH v2] block: Change a rcu_read_{lock,unlock}_sched() pair into 
-rcu_read_{lock,unlock}().mbox'
-
-- '[PATCH V4 1_2] blk-mq_set RQF_MQ_TIMEOUT_EXPIRED when the rq'\''s 
-timeout isn'\''t handled.mbox'
-
-- '[PATCH V4 2_2] blk-mq_fix race between complete and 
-BLK_EH_RESET_TIMER.mbox'
-
+> 
 > For scsi, this will cause scsi_times_out to be invoked before the
 > scsi_cmnd is not initialized, scsi_cmnd->device is still NULL at
 > the moment, then we will get crash.
@@ -55,8 +41,8 @@ BLK_EH_RESET_TIMER.mbox'
 > index abcb868..ce62681 100644
 > --- a/block/blk-core.c
 > +++ b/block/blk-core.c
-> @@ -201,6 +201,10 @@ void blk_rq_init(struct request_queue *q, struct
-> request *rq) rq->part = NULL;
+> @@ -201,6 +201,10 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
+>  	rq->part = NULL;
 >  	seqcount_init(&rq->gstate_seq);
 >  	u64_stats_init(&rq->aborted_gstate_sync);
 > +	/*
@@ -65,14 +51,13 @@ BLK_EH_RESET_TIMER.mbox'
 > +	WRITE_ONCE(rq->gstate, MQ_RQ_GEN_INC);
 >  }
 >  EXPORT_SYMBOL(blk_rq_init);
-> 
+>  
 > diff --git a/block/blk-mq.c b/block/blk-mq.c
 > index f5c7dbc..d62030a 100644
 > --- a/block/blk-mq.c
 > +++ b/block/blk-mq.c
-> @@ -2069,6 +2069,13 @@ static int blk_mq_init_request(struct
-> blk_mq_tag_set *set, struct request *rq,
-> 
+> @@ -2069,6 +2069,13 @@ static int blk_mq_init_request(struct blk_mq_tag_set *set, struct request *rq,
+>  
 >  	seqcount_init(&rq->gstate_seq);
 >  	u64_stats_init(&rq->aborted_gstate_sync);
 > +	/*
@@ -85,6 +70,10 @@ BLK_EH_RESET_TIMER.mbox'
 >  	return 0;
 >  }
 
+Good catch, blk_mq_check_expired() is bypassed, but it is still hit
+by blk_mq_terminate_expired().
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
 -- 
-Martin
+Ming
