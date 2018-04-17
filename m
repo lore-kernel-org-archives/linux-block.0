@@ -1,50 +1,31 @@
-Return-Path: <prvs=63851e16a=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@lst.de" <hch@lst.de>
-CC: "shaun@tancheff.com" <shaun@tancheff.com>, "hare@suse.com"
-	<hare@suse.com>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Return-Path: <hch@lst.de>
+Date: Tue, 17 Apr 2018 17:18:57 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Damien Le Moal <damien.lemoal@wdc.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Shaun Tancheff <shaun@tancheff.com>, stable@vger.kernel.org
 Subject: Re: [PATCH] block: Avoid executing a report or reset zones while a
- queue is frozen
-Date: Tue, 17 Apr 2018 15:32:01 +0000
-Message-ID: <1a3010a986d9c582726355cd24453df1541382b1.camel@wdc.com>
+	queue is frozen
+Message-ID: <20180417151857.GA25646@lst.de>
 References: <20180417010034.28676-1-bart.vanassche@wdc.com>
-	 <20180417151857.GA25646@lst.de>
-In-Reply-To: <20180417151857.GA25646@lst.de>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180417010034.28676-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTA0LTE3IGF0IDE3OjE4ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
-ZToNCj4gT24gTW9uLCBBcHIgMTYsIDIwMTggYXQgMDY6MDA6MzRQTSAtMDcwMCwgQmFydCBWYW4g
-QXNzY2hlIHdyb3RlOg0KPiA+IFRoaXMgcGF0Y2ggb24gaXRzZWxmIGRvZXMgbm90IGNoYW5nZSB0
-aGUgYmVoYXZpb3Igb2YgZWl0aGVyIGlvY3RsLg0KPiA+IEhvd2V2ZXIsIHRoaXMgcGF0Y2ggaXMg
-bmVjZXNzYXJ5IHRvIGF2b2lkIHRoYXQgdGhlc2UgaW9jdGxzIGZhaWwNCj4gPiB3aXRoIC1FSU8g
-aWYgc2RfcmV2YWxpZGF0ZV9kaXNrKCkgaXMgY2FsbGVkIHdoaWxlIHRoZXNlIGlvY3RscyBhcmUN
-Cj4gPiBpbiBwcm9ncmVzcyBiZWNhdXNlIHRoZSBjdXJyZW50IHpvbmVkIGJsb2NrIGNvbW1hbmQg
-Y29kZSB0ZW1wb3JhcmlseQ0KPiA+IGNsZWFycyBkYXRhIHRoYXQgaXMgbmVlZGVkIGJ5IHRoZXNl
-IGlvY3Rscy4gU2VlIGFsc28gY29tbWl0DQo+ID4gM2VkMDVhOTg3ZTBmICgiYmxrLXpvbmVkOiBp
-bXBsZW1lbnQgaW9jdGxzIikuDQo+IA0KPiBIbW0uICBJIHRoaW5rIHdlIG5lZWQgdG8gYXZvaWQg
-Y2xlYXJpbmcgdGhhdCBkYXRhIGFuZCB1cGRhdGUgaXQgdXNpbmcNCj4gUkNVIGluc3RlYWQuICBD
-YWxsaW5nIGJsa19xdWV1ZV9lbnRlciBiZWZvcmUgc3VibWl0dGluZyBiaW9zIGlzDQo+IHNvbWV0
-aGluZyB0aGF0IHdvdWxkIG1ha2Ugem9uZSByZXBvcnRpbmcgdmVyeSBkaWZmZXJlbnQgZnJvbSBh
-bnkNCj4gb3RoZXIgYmxvY2sgbGF5ZXIgdXNlci4NCg0KSGVsbG8gQ2hyaXN0b3BoLA0KDQpBcyB5
-b3Uga25vdyBzb21lIHN0cnVjdCBtZW1iZXJzIHRoYXQgY29udGFpbiB6b25lZCBibG9jayBkZXZp
-Y2UgaW5mb3JtYXRpb24NCmFyZSBpbiBzdHJ1Y3QgcmVxdWVzdCBxdWV1ZSBhbmQgb3RoZXJzIGFy
-ZSBpbiBzdHJ1Y3Qgc2NzaV9kaXNrOg0KDQpzdHJ1Y3Qgc2NzaV9kaXNrIHsNCglbIC4uLiBdDQoj
-aWZkZWYgQ09ORklHX0JMS19ERVZfWk9ORUQNCgl1MzIJCW5yX3pvbmVzOw0KCXUzMgkJem9uZV9i
-bG9ja3M7DQoJdTMyCQl6b25lX3NoaWZ0Ow0KCXUzMgkJem9uZXNfb3B0aW1hbF9vcGVuOw0KCXUz
-MgkJem9uZXNfb3B0aW1hbF9ub25zZXE7DQoJdTMyCQl6b25lc19tYXhfb3BlbjsNCiNlbmRpZg0K
-CVsgLi4uIF0NCn07DQoNCnN0cnVjdCByZXF1ZXN0X3F1ZXVlIHsNCglbIC4uLiBdDQoJdW5zaWdu
-ZWQgaW50CQlucl96b25lczsNCgl1bnNpZ25lZCBsb25nCQkqc2VxX3pvbmVzX2JpdG1hcDsNCgl1
-bnNpZ25lZCBsb25nCQkqc2VxX3pvbmVzX3dsb2NrOw0KCVsgLi4uIF0NCn07DQoNCkRpZCB5b3Ug
-cGVyaGFwcyBtZWFuIHRvIG1vdmUgdGhlc2UgbWVtYmVycyBpbnRvIHR3byBuZXcgc3RydWN0dXJl
-cywgdG8gdXNlDQpSQ1UgdG8gdXBkYXRlIHRoZSBwb2ludGVycyB0byB0aGVzZSBzdHJ1Y3R1cmVz
-IGFuZCBhbHNvIHRvIHByb3RlY3QgY29kZSB0aGF0DQpyZWFkcyB0aGVzZSBwb2ludGVycyB3aXRo
-IHJjdV9yZWFkX2xvY2soKSAvIHJjdV9yZWFkX3VubG9jaygpPyBJZiBzbywgaG93IHRvDQptYWtl
-IHN1cmUgdGhhdCBib3RoIHBvaW50ZXJzIGdldCB1cGRhdGVkIHNpbXVsdGFuZW91c2x5IHN1Y2gg
-dGhhdCBubyBjb2RlDQpldmVyIHNlZXMgYSBwb2ludGVyIHRvIHRoZSBvbGQgaW5mb3JtYXRpb24g
-aW4gZS5nLiBzdHJ1Y3Qgc2NzaV9kaXNrIGFuZCBhDQpwb2ludGVyIHRvIHRoZSBuZXcgaW5mb3Jt
-YXRpb24gaW4gc3RydWN0IHJlcXVlc3RfcXVldWU/DQoNClRoYW5rcywNCg0KQmFydC4NCg0KDQo=
+On Mon, Apr 16, 2018 at 06:00:34PM -0700, Bart Van Assche wrote:
+> This patch on itself does not change the behavior of either ioctl.
+> However, this patch is necessary to avoid that these ioctls fail
+> with -EIO if sd_revalidate_disk() is called while these ioctls are
+> in progress because the current zoned block command code temporarily
+> clears data that is needed by these ioctls. See also commit
+> 3ed05a987e0f ("blk-zoned: implement ioctls").
+
+Hmm.  I think we need to avoid clearing that data and update it using
+RCU instead.  Calling blk_queue_enter before submitting bios is
+something that would make zone reporting very different from any
+other block layer user.
