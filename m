@@ -1,40 +1,157 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-scsi@vger.kernel.org, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH 10/12] ide: remove the PCI_DMA_BUS_IS_PHYS check
-Date: Mon, 16 Apr 2018 10:50:30 +0200
-Message-Id: <20180416085032.7367-11-hch@lst.de>
-In-Reply-To: <20180416085032.7367-1-hch@lst.de>
-References: <20180416085032.7367-1-hch@lst.de>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from xavier.telenet-ops.be ([195.130.132.52]:41554 "EHLO
+        xavier.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753151AbeDQS6E (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Apr 2018 14:58:04 -0400
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: Christoph Hellwig <hch@lst.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Felipe Balbi <balbi@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mark Brown <broonie@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
+        Wolfram Sang <wsa@the-dreams.de>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Matias Bjorling <mb@lightnvm.io>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Brian Norris <computersforpeace@gmail.com>,
+        Marek Vasut <marek.vasut@gmail.com>,
+        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Richard Weinberger <richard@nod.at>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Eric Anholt <eric@anholt.net>,
+        Stefan Wahren <stefan.wahren@i2se.com>
+Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
+        alsa-devel@alsa-project.org, linux-ide@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux-fpga@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
+        netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
+        devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
+        Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH v3 13/20] mmc: Remove depends on HAS_DMA in case of platform dependency
+Date: Tue, 17 Apr 2018 19:49:13 +0200
+Message-Id: <1523987360-18760-14-git-send-email-geert@linux-m68k.org>
+In-Reply-To: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
+References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We now have ways to deal with drainage in the block layer, and libata has
-been using it for ages.  We also want to get rid of PCI_DMA_BUS_IS_PHYS
-now, so just reduce the PCI transfer size for ide - anyone who cares for
-performance on PCI controllers should have switched to libata long ago.
+Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
+symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
+In most cases this other symbol is an architecture or platform specific
+symbol, or PCI.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Generic symbols and drivers without platform dependencies keep their
+dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
+cannot work anyway.
+
+This simplifies the dependencies, and allows to improve compile-testing.
+
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Reviewed-by: Mark Brown <broonie@kernel.org>
+Acked-by: Robin Murphy <robin.murphy@arm.com>
+Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
 ---
- drivers/ide/ide-probe.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+v3:
+  - Add Acked-by,
+  - Rebase to v4.17-rc1,
 
-diff --git a/drivers/ide/ide-probe.c b/drivers/ide/ide-probe.c
-index 8d8ed036ca0a..56d7bc228cb3 100644
---- a/drivers/ide/ide-probe.c
-+++ b/drivers/ide/ide-probe.c
-@@ -796,8 +796,7 @@ static int ide_init_queue(ide_drive_t *drive)
- 	 * This will be fixed once we teach pci_map_sg() about our boundary
- 	 * requirements, hopefully soon. *FIXME*
- 	 */
--	if (!PCI_DMA_BUS_IS_PHYS)
--		max_sg_entries >>= 1;
-+	max_sg_entries >>= 1;
- #endif /* CONFIG_PCI */
+v2:
+  - Add Reviewed-by, Acked-by,
+  - Drop RFC state,
+  - Split per subsystem.
+---
+ drivers/mmc/host/Kconfig | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/mmc/host/Kconfig b/drivers/mmc/host/Kconfig
+index 9589f9c9046f14b1..3978d0418958bf6b 100644
+--- a/drivers/mmc/host/Kconfig
++++ b/drivers/mmc/host/Kconfig
+@@ -358,7 +358,6 @@ config MMC_MESON_MX_SDIO
+ 	tristate "Amlogic Meson6/Meson8/Meson8b SD/MMC Host Controller support"
+ 	depends on ARCH_MESON || COMPILE_TEST
+ 	depends on COMMON_CLK
+-	depends on HAS_DMA
+ 	depends on OF
+ 	help
+ 	  This selects support for the SD/MMC Host Controller on
+@@ -401,7 +400,6 @@ config MMC_OMAP
  
- 	blk_queue_max_segments(q, max_sg_entries);
+ config MMC_OMAP_HS
+ 	tristate "TI OMAP High Speed Multimedia Card Interface support"
+-	depends on HAS_DMA
+ 	depends on ARCH_OMAP2PLUS || ARCH_KEYSTONE || COMPILE_TEST
+ 	help
+ 	  This selects the TI OMAP High Speed Multimedia card Interface.
+@@ -511,7 +509,6 @@ config MMC_DAVINCI
+ 
+ config MMC_GOLDFISH
+ 	tristate "goldfish qemu Multimedia Card Interface support"
+-	depends on HAS_DMA
+ 	depends on GOLDFISH || COMPILE_TEST
+ 	help
+ 	  This selects the Goldfish Multimedia card Interface emulation
+@@ -605,7 +602,7 @@ config MMC_SDHI
+ 
+ config MMC_SDHI_SYS_DMAC
+ 	tristate "DMA for SDHI SD/SDIO controllers using SYS-DMAC"
+-	depends on MMC_SDHI && HAS_DMA
++	depends on MMC_SDHI
+ 	default MMC_SDHI if (SUPERH || ARM)
+ 	help
+ 	  This provides DMA support for SDHI SD/SDIO controllers
+@@ -615,7 +612,7 @@ config MMC_SDHI_SYS_DMAC
+ config MMC_SDHI_INTERNAL_DMAC
+ 	tristate "DMA for SDHI SD/SDIO controllers using on-chip bus mastering"
+ 	depends on ARM64 || COMPILE_TEST
+-	depends on MMC_SDHI && HAS_DMA
++	depends on MMC_SDHI
+ 	default MMC_SDHI if ARM64
+ 	help
+ 	  This provides DMA support for SDHI SD/SDIO controllers
+@@ -669,7 +666,6 @@ config MMC_CAVIUM_THUNDERX
+ 
+ config MMC_DW
+ 	tristate "Synopsys DesignWare Memory Card Interface"
+-	depends on HAS_DMA
+ 	depends on ARC || ARM || ARM64 || MIPS || COMPILE_TEST
+ 	help
+ 	  This selects support for the Synopsys DesignWare Mobile Storage IP
+@@ -748,7 +744,6 @@ config MMC_DW_ZX
+ 
+ config MMC_SH_MMCIF
+ 	tristate "SuperH Internal MMCIF support"
+-	depends on HAS_DMA
+ 	depends on SUPERH || ARCH_RENESAS || COMPILE_TEST
+ 	help
+ 	  This selects the MMC Host Interface controller (MMCIF) found in various
+@@ -868,7 +863,6 @@ config MMC_TOSHIBA_PCI
+ config MMC_BCM2835
+ 	tristate "Broadcom BCM2835 SDHOST MMC Controller support"
+ 	depends on ARCH_BCM2835 || COMPILE_TEST
+-	depends on HAS_DMA
+ 	help
+ 	  This selects the BCM2835 SDHOST MMC controller. If you have
+ 	  a BCM2835 platform with SD or MMC devices, say Y or M here.
 -- 
-2.17.0
+2.7.4
