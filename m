@@ -1,56 +1,99 @@
-Return-Path: <axboe@kernel.dk>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: Ming Lei <ming.lei@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] loop: fix aio/dio end of request clearing
-Message-ID: <64287b95-4e2d-9220-acd5-6528954e8b60@kernel.dk>
-Date: Thu, 12 Apr 2018 12:52:45 -0600
+Return-Path: <linux-ide-owner@vger.kernel.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: Christoph Hellwig <hch@lst.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Felipe Balbi <balbi@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mark Brown <broonie@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
+        Wolfram Sang <wsa@the-dreams.de>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Matias Bjorling <mb@lightnvm.io>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Brian Norris <computersforpeace@gmail.com>,
+        Marek Vasut <marek.vasut@gmail.com>,
+        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Richard Weinberger <richard@nod.at>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Eric Anholt <eric@anholt.net>,
+        Stefan Wahren <stefan.wahren@i2se.com>
+Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
+        alsa-devel@alsa-project.org, linux-ide@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux-fpga@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
+        netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
+        devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
+        Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH v3 10/20] lightnvm: Remove depends on HAS_DMA in case of platform dependency
+Date: Tue, 17 Apr 2018 19:49:10 +0200
+Message-Id: <1523987360-18760-11-git-send-email-geert@linux-m68k.org>
+In-Reply-To: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
+References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-ide-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-If we read more than the user asked for, we zero fill the last
-part. But the current code assumes that the request has just
-one bio, and since that's not guaranteed to be true, we can
-run into a situation where we attempt to advance a bio by
-a bigger amount than its size.
+Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
+symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
+In most cases this other symbol is an architecture or platform specific
+symbol, or PCI.
 
-Handle the zero filling appropriately, regardless of what bio
-ends up needing to be cleared.
+Generic symbols and drivers without platform dependencies keep their
+dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
+cannot work anyway.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+This simplifies the dependencies, and allows to improve compile-testing.
 
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Reviewed-by: Mark Brown <broonie@kernel.org>
+Acked-by: Robin Murphy <robin.murphy@arm.com>
+Reviewed-by: Matias Bjørling <mb@lightnvm.io>
 ---
+v3:
+  - Add Reviewed-by,
+  - Rebase to v4.17-rc1,
+  - Removed bogus notes,
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index c9d04497a415..d3aa96a2f369 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -455,9 +455,22 @@ static void lo_complete_rq(struct request *rq)
- 	if (unlikely(req_op(cmd->rq) == REQ_OP_READ && cmd->use_aio &&
- 		     cmd->ret >= 0 && cmd->ret < blk_rq_bytes(cmd->rq))) {
- 		struct bio *bio = cmd->rq->bio;
-+		long left = cmd->ret;
- 
--		bio_advance(bio, cmd->ret);
--		zero_fill_bio(bio);
-+		while (left >= bio->bi_iter.bi_size) {
-+			left -= bio->bi_iter.bi_size;
-+			bio = bio->bi_next;
-+			if (WARN_ON_ONCE(!bio))
-+				break;
-+		}
-+		while (bio) {
-+			if (left) {
-+				bio_advance(bio, left);
-+				left = 0;
-+			}
-+			zero_fill_bio(bio);
-+			bio = bio->bi_next;
-+		}
- 	}
- 
- 	blk_mq_end_request(rq, cmd->ret < 0 ? BLK_STS_IOERR : BLK_STS_OK);
+v2:
+  - Add Reviewed-by, Acked-by,
+  - Drop RFC state,
+  - Split per subsystem.
+---
+ drivers/lightnvm/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/lightnvm/Kconfig b/drivers/lightnvm/Kconfig
+index 10c08982185a572f..9c03f35d9df113c6 100644
+--- a/drivers/lightnvm/Kconfig
++++ b/drivers/lightnvm/Kconfig
+@@ -4,7 +4,7 @@
+ 
+ menuconfig NVM
+ 	bool "Open-Channel SSD target support"
+-	depends on BLOCK && HAS_DMA && PCI
++	depends on BLOCK && PCI
+ 	select BLK_DEV_NVME
+ 	help
+ 	  Say Y here to get to enable Open-channel SSDs.
 -- 
-Jens Axboe
+2.7.4
+
