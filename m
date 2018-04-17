@@ -1,123 +1,184 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f193.google.com ([209.85.128.193]:38548 "EHLO
-        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752776AbeDPKZm (ORCPT
+Received: from xavier.telenet-ops.be ([195.130.132.52]:59880 "EHLO
+        xavier.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753046AbeDQSQH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Apr 2018 06:25:42 -0400
-Received: by mail-wr0-f193.google.com with SMTP id h3so11814875wrh.5
-        for <linux-block@vger.kernel.org>; Mon, 16 Apr 2018 03:25:42 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 01/11] lightnvm: pblk: fail gracefully on line alloc. failure
-Date: Mon, 16 Apr 2018 12:25:22 +0200
-Message-Id: <1523874332-6272-2-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1523874332-6272-1-git-send-email-javier@cnexlabs.com>
-References: <1523874332-6272-1-git-send-email-javier@cnexlabs.com>
+        Tue, 17 Apr 2018 14:16:07 -0400
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: Christoph Hellwig <hch@lst.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Felipe Balbi <balbi@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mark Brown <broonie@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
+        Wolfram Sang <wsa@the-dreams.de>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Matias Bjorling <mb@lightnvm.io>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Brian Norris <computersforpeace@gmail.com>,
+        Marek Vasut <marek.vasut@gmail.com>,
+        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Richard Weinberger <richard@nod.at>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Eric Anholt <eric@anholt.net>,
+        Stefan Wahren <stefan.wahren@i2se.com>
+Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
+        alsa-devel@alsa-project.org, linux-ide@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux-fpga@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
+        netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
+        devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
+        Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH v3 00/20] Allow compile-testing NO_DMA (drivers)
+Date: Tue, 17 Apr 2018 19:49:00 +0200
+Message-Id: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-In the event of a line failing to allocate, fail gracefully and stop the
-pipeline to avoid more write failing in the same place.
+        Hi all,
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-init.c |  5 +++++
- drivers/lightnvm/pblk-map.c  | 33 ++++++++++++++++++++++++---------
- 2 files changed, 29 insertions(+), 9 deletions(-)
+As of v4.17-rc1, patch series "[PATCH v2 0/5] Allow compile-testing
+NO_DMA (core)" (https://lkml.org/lkml/2018/3/16/435) has been included
+upstream, and drivers using the DMA API can be compile-tested on
+platforms selecting NO_DMA.
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 91a5bc2556a3..dee64f91227d 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -1047,6 +1047,11 @@ static int pblk_lines_init(struct pblk *pblk)
- 		nr_free_chks += pblk_setup_line_meta(pblk, line, chunk_meta, i);
- 	}
- 
-+	if (!nr_free_chks) {
-+		pr_err("pblk: too many bad blocks prevent for sane instance\n");
-+		return -EINTR;
-+	}
-+
- 	pblk_set_provision(pblk, nr_free_chks);
- 
- 	kfree(chunk_meta);
-diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
-index 20dbaa89c9df..953ca31dda68 100644
---- a/drivers/lightnvm/pblk-map.c
-+++ b/drivers/lightnvm/pblk-map.c
-@@ -18,11 +18,11 @@
- 
- #include "pblk.h"
- 
--static void pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
--			       struct ppa_addr *ppa_list,
--			       unsigned long *lun_bitmap,
--			       struct pblk_sec_meta *meta_list,
--			       unsigned int valid_secs)
-+static int pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
-+			      struct ppa_addr *ppa_list,
-+			      unsigned long *lun_bitmap,
-+			      struct pblk_sec_meta *meta_list,
-+			      unsigned int valid_secs)
- {
- 	struct pblk_line *line = pblk_line_get_data(pblk);
- 	struct pblk_emeta *emeta;
-@@ -35,8 +35,14 @@ static void pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
- 	if (pblk_line_is_full(line)) {
- 		struct pblk_line *prev_line = line;
- 
-+		/* If we cannot allocate a new line, make sure to store metadata
-+		 * on current line and then fail
-+		 */
- 		line = pblk_line_replace_data(pblk);
- 		pblk_line_close_meta(pblk, prev_line);
-+
-+		if (!line)
-+			return -EINTR;
- 	}
- 
- 	emeta = line->emeta;
-@@ -74,6 +80,7 @@ static void pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
- 	}
- 
- 	pblk_down_rq(pblk, ppa_list, nr_secs, lun_bitmap);
-+	return 0;
- }
- 
- void pblk_map_rq(struct pblk *pblk, struct nvm_rq *rqd, unsigned int sentry,
-@@ -87,8 +94,12 @@ void pblk_map_rq(struct pblk *pblk, struct nvm_rq *rqd, unsigned int sentry,
- 
- 	for (i = off; i < rqd->nr_ppas; i += min) {
- 		map_secs = (i + min > valid_secs) ? (valid_secs % min) : min;
--		pblk_map_page_data(pblk, sentry + i, &rqd->ppa_list[i],
--					lun_bitmap, &meta_list[i], map_secs);
-+		if (pblk_map_page_data(pblk, sentry + i, &rqd->ppa_list[i],
-+					lun_bitmap, &meta_list[i], map_secs)) {
-+			bio_put(rqd->bio);
-+			pblk_free_rqd(pblk, rqd, PBLK_WRITE);
-+			pblk_pipeline_stop(pblk);
-+		}
- 	}
- }
- 
-@@ -108,8 +119,12 @@ void pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 
- 	for (i = 0; i < rqd->nr_ppas; i += min) {
- 		map_secs = (i + min > valid_secs) ? (valid_secs % min) : min;
--		pblk_map_page_data(pblk, sentry + i, &rqd->ppa_list[i],
--					lun_bitmap, &meta_list[i], map_secs);
-+		if (pblk_map_page_data(pblk, sentry + i, &rqd->ppa_list[i],
-+					lun_bitmap, &meta_list[i], map_secs)) {
-+			bio_put(rqd->bio);
-+			pblk_free_rqd(pblk, rqd, PBLK_WRITE);
-+			pblk_pipeline_stop(pblk);
-+		}
- 
- 		erase_lun = pblk_ppa_to_pos(geo, rqd->ppa_list[i]);
- 
+This follow-up patch series removes dependencies on HAS_DMA for symbols
+that already have platform dependencies implying HAS_DMA, which increases
+compile-coverage.
+
+Please apply to your tree if appropriate.
+
+Changes compared to v2:
+  - Add Acked-by,
+  - Rebased to v4.17-rc1, dropping applied patch for scsi/hisi_sas,
+  - Handle new VIDEO_RENESAS_CEU symbol,
+  - Drop obsolete note about FSL_FMAN.
+
+Changes compared to v1:
+  - Add Reviewed-by, Acked-by,
+  - Drop dependency of SND_SOC_LPASS_IPQ806X on HAS_DMA,
+  - Drop dependency of VIDEOBUF{,2}_DMA_{CONTIG,SG} on HAS_DMA,
+  - Drop new dependencies of VIDEO_IPU3_CIO2, DVB_C8SECTPFE, and
+    MTD_NAND_MARVELL on HAS_DMA,
+  - Split in per-subsystem patches,
+  - Split-off the core part in a separate series.
+
+This series is against v4.17-rc1. It can also be found at
+https://git.kernel.org/pub/scm/linux/kernel/git/geert/linux-m68k.git/log/?h=no-dma-compile-testing-v3
+
+It has been compile-tested with allmodconfig and allyesconfig for
+m68k/sun3, and has received attention from the kbuild test robot.
+
+Thanks for applying!
+
+Geert Uytterhoeven (20):
+  ASoC: Remove depends on HAS_DMA in case of platform dependency
+  ata: Remove depends on HAS_DMA in case of platform dependency
+  crypto: Remove depends on HAS_DMA in case of platform dependency
+  fbdev: Remove depends on HAS_DMA in case of platform dependency
+  firewire: Remove depends on HAS_DMA in case of platform dependency
+  fpga: Remove depends on HAS_DMA in case of platform dependency
+  i2c: Remove depends on HAS_DMA in case of platform dependency
+  iio: adc: Remove depends on HAS_DMA in case of platform dependency
+  iommu: Remove depends on HAS_DMA in case of platform dependency
+  lightnvm: Remove depends on HAS_DMA in case of platform dependency
+  mailbox: Remove depends on HAS_DMA in case of platform dependency
+  media: Remove depends on HAS_DMA in case of platform dependency
+  mmc: Remove depends on HAS_DMA in case of platform dependency
+  mtd: Remove depends on HAS_DMA in case of platform dependency
+  net: Remove depends on HAS_DMA in case of platform dependency
+  remoteproc: Remove depends on HAS_DMA in case of platform dependency
+  serial: Remove depends on HAS_DMA in case of platform dependency
+  spi: Remove depends on HAS_DMA in case of platform dependency
+  staging: vc04_services: Remove depends on HAS_DMA in case of platform
+    dependency
+  usb: Remove depends on HAS_DMA in case of platform dependency
+
+ drivers/ata/Kconfig                             |  2 --
+ drivers/crypto/Kconfig                          | 14 +++------
+ drivers/firewire/Kconfig                        |  1 -
+ drivers/fpga/Kconfig                            |  1 -
+ drivers/i2c/busses/Kconfig                      |  3 --
+ drivers/iio/adc/Kconfig                         |  2 --
+ drivers/iommu/Kconfig                           |  5 ++-
+ drivers/lightnvm/Kconfig                        |  2 +-
+ drivers/mailbox/Kconfig                         |  2 --
+ drivers/media/common/videobuf2/Kconfig          |  2 --
+ drivers/media/pci/dt3155/Kconfig                |  1 -
+ drivers/media/pci/intel/ipu3/Kconfig            |  1 -
+ drivers/media/pci/solo6x10/Kconfig              |  1 -
+ drivers/media/pci/sta2x11/Kconfig               |  1 -
+ drivers/media/pci/tw5864/Kconfig                |  1 -
+ drivers/media/pci/tw686x/Kconfig                |  1 -
+ drivers/media/platform/Kconfig                  | 42 +++++++++----------------
+ drivers/media/platform/am437x/Kconfig           |  2 +-
+ drivers/media/platform/atmel/Kconfig            |  4 +--
+ drivers/media/platform/davinci/Kconfig          |  6 ----
+ drivers/media/platform/marvell-ccic/Kconfig     |  3 +-
+ drivers/media/platform/rcar-vin/Kconfig         |  2 +-
+ drivers/media/platform/soc_camera/Kconfig       |  3 +-
+ drivers/media/platform/sti/c8sectpfe/Kconfig    |  2 +-
+ drivers/media/v4l2-core/Kconfig                 |  2 --
+ drivers/mmc/host/Kconfig                        | 10 ++----
+ drivers/mtd/nand/raw/Kconfig                    |  8 ++---
+ drivers/mtd/spi-nor/Kconfig                     |  2 +-
+ drivers/net/ethernet/amd/Kconfig                |  2 +-
+ drivers/net/ethernet/apm/xgene-v2/Kconfig       |  1 -
+ drivers/net/ethernet/apm/xgene/Kconfig          |  1 -
+ drivers/net/ethernet/arc/Kconfig                |  6 ++--
+ drivers/net/ethernet/broadcom/Kconfig           |  2 --
+ drivers/net/ethernet/calxeda/Kconfig            |  2 +-
+ drivers/net/ethernet/hisilicon/Kconfig          |  2 +-
+ drivers/net/ethernet/marvell/Kconfig            |  8 ++---
+ drivers/net/ethernet/mellanox/mlxsw/Kconfig     |  2 +-
+ drivers/net/ethernet/renesas/Kconfig            |  2 --
+ drivers/net/wireless/broadcom/brcm80211/Kconfig |  1 -
+ drivers/net/wireless/quantenna/qtnfmac/Kconfig  |  2 +-
+ drivers/remoteproc/Kconfig                      |  1 -
+ drivers/spi/Kconfig                             | 12 ++-----
+ drivers/staging/media/davinci_vpfe/Kconfig      |  1 -
+ drivers/staging/media/omap4iss/Kconfig          |  1 -
+ drivers/staging/vc04_services/Kconfig           |  1 -
+ drivers/tty/serial/Kconfig                      |  4 ---
+ drivers/usb/gadget/udc/Kconfig                  |  4 +--
+ drivers/usb/mtu3/Kconfig                        |  2 +-
+ drivers/video/fbdev/Kconfig                     |  3 +-
+ sound/soc/bcm/Kconfig                           |  3 +-
+ sound/soc/kirkwood/Kconfig                      |  1 -
+ sound/soc/pxa/Kconfig                           |  1 -
+ sound/soc/qcom/Kconfig                          |  7 ++---
+ 53 files changed, 56 insertions(+), 142 deletions(-)
+
 -- 
 2.7.4
+
+Gr{oetje,eeting}s,
+
+						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
