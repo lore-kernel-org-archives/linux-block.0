@@ -1,175 +1,91 @@
-Return-Path: <prvs=6401ab460=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Tejun Heo <tj@kernel.org>
-Subject: [PATCH] block: Verify whether blk_queue_enter() is used when necessary
-Date: Wed, 18 Apr 2018 17:53:15 -0700
-Message-Id: <20180419005315.15908-1-bart.vanassche@wdc.com>
+Return-Path: <m.tretter@pengutronix.de>
+Date: Tue, 17 Apr 2018 11:15:43 +0200
+From: Michael Tretter <m.tretter@pengutronix.de>
+To: Josef Bacik <jbacik@fb.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Jens Axboe
+ <axboe@kernel.dk>, "kernel@pengutronix.de" <kernel@pengutronix.de>
+Subject: Re: [PATCH] nbd: do not update block size if file system is mounted
+Message-ID: <20180417111543.65a4617b@litschi.hi.pengutronix.de>
+In-Reply-To: <3A32B506-71AE-48AF-A44A-B60F054ED40D@fb.com>
+References: <20180228095456.31472-1-m.tretter@pengutronix.de>
+ <20180315110057.13eecda6@litschi.hi.pengutronix.de>
+ <6c862ddf-b352-6ef4-06f8-516680e9f19f@kernel.dk>
+ <20180413162518.47840e6f@litschi.hi.pengutronix.de>
+ <3A32B506-71AE-48AF-A44A-B60F054ED40D@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-It is required to protect blkg_lookup() calls with a blk_queue_enter() /
-blk_queue_exit() pair. Since it is nontrivial to verify whether this is
-the case, verify this at runtime. Only perform this verification if
-CONFIG_LOCKDEP=y to avoid that unnecessary runtime overhead is added.
-Introduce percpu_ref_is_positive() to avoid having to introduce a new
-counter to make this verification possible.
+Hi Josef,
 
-Note: using lockdep to verify whether blkg_lookup() is protected
-correctly is not possible since lock_acquire() and lock_release()
-must be called from the same task and since blk_queue_enter() and
-blk_queue_exit() can be called from different tasks.
+On Sat, 14 Apr 2018 01:10:27 +0000, Josef Bacik wrote:
+> Yeah sorry I screwed that up again.  I=E2=80=99m wondering if we can just
+> drop this altogether and leave the zero setting in the config put
+> that we already have.
 
-Suggested-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Tejun Heo <tj@kernel.org>
----
- block/blk-cgroup.c              |  2 ++
- block/blk-core.c                | 23 +++++++++++++++++++++++
- include/linux/blk-cgroup.h      |  2 ++
- include/linux/blkdev.h          | 11 +++++++++++
- include/linux/percpu-refcount.h | 26 ++++++++++++++++++++++++++
- 5 files changed, 64 insertions(+)
+I'm not sure if I understand you correctly. The nbd_config_put()
+function does not touch the bdev at all. How should config put take
+care of setting the size to 0?
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 21bc449d01c0..82025728337c 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -145,6 +145,8 @@ struct blkcg_gq *blkg_lookup_slowpath(struct blkcg *blkcg,
- {
- 	struct blkcg_gq *blkg;
- 
-+	WARN_ON_ONCE(!blk_entered_queue(q));
-+
- 	/*
- 	 * Hint didn't match.  Look up from the radix tree.  Note that the
- 	 * hint can only be updated under queue_lock as otherwise @blkg
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 11882b509611..de90ecab61cd 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -695,6 +695,9 @@ EXPORT_SYMBOL_GPL(blk_queue_bypass_end);
- 
- void blk_set_queue_dying(struct request_queue *q)
- {
-+#ifdef CONFIG_PROVE_LOCKING
-+	q->cleanup_queue_task = current;
-+#endif
- 	blk_queue_flag_set(QUEUE_FLAG_DYING, q);
- 
- 	/*
-@@ -909,6 +912,24 @@ struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
- }
- EXPORT_SYMBOL(blk_alloc_queue);
- 
-+#ifdef CONFIG_PROVE_LOCKING
-+/**
-+ * blk_entered_queue() - whether or not it is safe to access cgroup information
-+ * @q: request queue pointer
-+ *
-+ * In order to avoid races between accessing cgroup information and the cgroup
-+ * information removal from inside blk_cleanup_queue(), any code that accesses
-+ * cgroup information must be protected by blk_queue_enter() and/or
-+ * blk_queue_enter_live().
-+ */
-+bool blk_entered_queue(struct request_queue *q)
-+{
-+	return (blk_queue_dying(q) && current == q->cleanup_queue_task) ||
-+		percpu_ref_is_positive(&q->q_usage_counter);
-+}
-+EXPORT_SYMBOL(blk_entered_queue);
-+#endif
-+
- /**
-  * blk_queue_enter() - try to increase q->q_usage_counter
-  * @q: request queue pointer
-@@ -2267,6 +2288,8 @@ generic_make_request_checks(struct bio *bio)
- 		goto end_io;
- 	}
- 
-+	WARN_ON_ONCE(!blk_entered_queue(q));
-+
- 	/*
- 	 * For a REQ_NOWAIT based request, return -EOPNOTSUPP
- 	 * if queue is not a request based queue.
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 6c666fd7de3c..3b8512c259aa 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -266,6 +266,8 @@ static inline struct blkcg_gq *__blkg_lookup(struct blkcg *blkcg,
- {
- 	struct blkcg_gq *blkg;
- 
-+	WARN_ON_ONCE(!blk_entered_queue(q));
-+
- 	if (blkcg == &blkcg_root)
- 		return q->root_blkg;
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index f486a984426d..b7681f3ee793 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -633,6 +633,9 @@ struct request_queue {
- 
- 	int			bypass_depth;
- 	atomic_t		mq_freeze_depth;
-+#ifdef CONFIG_PROVE_LOCKING
-+	struct task_struct	*cleanup_queue_task;
-+#endif
- 
- #if defined(CONFIG_BLK_DEV_BSG)
- 	bsg_job_fn		*bsg_job_fn;
-@@ -988,6 +991,14 @@ extern int sg_scsi_ioctl(struct request_queue *, struct gendisk *, fmode_t,
- 
- extern int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags);
- extern void blk_queue_exit(struct request_queue *q);
-+#ifdef CONFIG_PROVE_LOCKING
-+extern bool blk_entered_queue(struct request_queue *q);
-+#else
-+static inline bool blk_entered_queue(struct request_queue *q)
-+{
-+	return true;
-+}
-+#endif
- extern void blk_start_queue(struct request_queue *q);
- extern void blk_start_queue_async(struct request_queue *q);
- extern void blk_stop_queue(struct request_queue *q);
-diff --git a/include/linux/percpu-refcount.h b/include/linux/percpu-refcount.h
-index 009cdf3d65b6..acbc68cb0c54 100644
---- a/include/linux/percpu-refcount.h
-+++ b/include/linux/percpu-refcount.h
-@@ -331,4 +331,30 @@ static inline bool percpu_ref_is_zero(struct percpu_ref *ref)
- 	return !atomic_long_read(&ref->count);
- }
- 
-+/**
-+ * percpu_ref_is_positive - test whether a percpu refcount is strictly positive
-+ * @ref: percpu_ref to test
-+ *
-+ * Returns %true if @ref > 0.
-+ *
-+ * This function is safe to call as long as @ref is between init and exit.
-+ */
-+static inline bool percpu_ref_is_positive(struct percpu_ref *ref)
-+{
-+	unsigned long __percpu *percpu_count;
-+	unsigned long sum = 0;
-+	int cpu;
-+
-+	rcu_read_lock_sched();
-+	if (__ref_is_percpu(ref, &percpu_count)) {
-+		for_each_possible_cpu(cpu)
-+			sum += *per_cpu_ptr(percpu_count, cpu);
-+	} else {
-+		sum = atomic_long_read(&ref->count);
-+	}
-+	rcu_read_unlock_sched();
-+
-+	return sum > 0;
-+}
-+
- #endif
--- 
-2.16.3
+Dropping the bd_set_size to 0 from nbd_start_device_ioctl should be
+fine, because usually reset takes care of that. However, if there is
+an opener during nbd_bdev_reset(), the size won't be changed to 0
+either. This would still be the same behavior as with my patch.
+
+Michael
+
+
+> Does doing that fix it for you?  Thanks,
+>=20
+> Josef
+>=20
+> Sent from my iPhone
+>=20
+> > On Apr 13, 2018, at 10:26 AM, Michael Tretter
+> > <m.tretter@pengutronix.de> wrote:=20
+> >> On Fri, 16 Mar 2018 09:36:45 -0700, Jens Axboe wrote: =20
+> >>> On 3/15/18 3:00 AM, Michael Tretter wrote: =20
+> >>>> On Wed, 28 Feb 2018 10:54:56 +0100, Michael Tretter wrote: =20
+> >>>> If a file system is mounted on the nbd during a disconnect,
+> >>>> resetting the size to 0, might change the block size and destroy
+> >>>> the buffer_head mappings. This will cause a infinite loop when
+> >>>> the file system looks for the buffer_heads for flushing.
+> >>>>=20
+> >>>> Only set the file size to 0, if we are the only opener of the
+> >>>> nbd.
+> >>>>=20
+> >>>> Signed-off-by: Michael Tretter <m.tretter@pengutronix.de>
+> >>>> ---
+> >>>> drivers/block/nbd.c | 3 ++-
+> >>>> 1 file changed, 2 insertions(+), 1 deletion(-)
+> >>>>=20
+> >>>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> >>>> index 5f2a4240a204..0d1dbb60430b 100644
+> >>>> --- a/drivers/block/nbd.c
+> >>>> +++ b/drivers/block/nbd.c
+> >>>> @@ -1118,7 +1118,8 @@ static int nbd_start_device_ioctl(struct
+> >>>> nbd_device *nbd, struct block_device *b if (ret)
+> >>>>        sock_shutdown(nbd);
+> >>>>    mutex_lock(&nbd->config_lock);
+> >>>> -    bd_set_size(bdev, 0);
+> >>>> +    if (bdev->bd_openers <=3D 1)
+> >>>> +        bd_set_size(bdev, 0);
+> >>>>    /* user requested, ignore socket errors */
+> >>>>    if (test_bit(NBD_DISCONNECT_REQUESTED,
+> >>>> &config->runtime_flags)) ret =3D 0;   =20
+> >>>=20
+> >>> Are there any comments on this patch?   =20
+> >>=20
+> >> Josef?
+> >>  =20
+> >=20
+> > Maybe some history helps for reviewing the patch:
+> >=20
+> > Commit abbbdf12497d ("nbd: replace kill_bdev() with
+> > __invalidate_device()") already fixed this issue once by changing
+> > nbd_size_clear() to only set the size to 0 if the device is only
+> > opened once. The line was moved several times during the rework for
+> > the netlink interface and the check for the number of openers was
+> > dropped, reintroducing the issue.
+> >=20
+> > Michael =20
