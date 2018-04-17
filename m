@@ -1,62 +1,113 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:38272 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751027AbeD3JK1 (ORCPT
+Received: from xavier.telenet-ops.be ([195.130.132.52]:41568 "EHLO
+        xavier.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752992AbeDQSzL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Apr 2018 05:10:27 -0400
-Received: by mail-wm0-f67.google.com with SMTP id i3so13015408wmf.3
-        for <linux-block@vger.kernel.org>; Mon, 30 Apr 2018 02:10:26 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 11/11] lightnvm: pblk: remove dead function
-Date: Mon, 30 Apr 2018 11:10:09 +0200
-Message-Id: <1525079409-6588-12-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1525079409-6588-1-git-send-email-javier@cnexlabs.com>
-References: <1525079409-6588-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+        Tue, 17 Apr 2018 14:55:11 -0400
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: Christoph Hellwig <hch@lst.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Felipe Balbi <balbi@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mark Brown <broonie@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
+        Wolfram Sang <wsa@the-dreams.de>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Matias Bjorling <mb@lightnvm.io>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Brian Norris <computersforpeace@gmail.com>,
+        Marek Vasut <marek.vasut@gmail.com>,
+        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Richard Weinberger <richard@nod.at>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Eric Anholt <eric@anholt.net>,
+        Stefan Wahren <stefan.wahren@i2se.com>
+Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
+        alsa-devel@alsa-project.org, linux-ide@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux-fpga@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
+        netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
+        devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
+        Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH v3 07/20] i2c: Remove depends on HAS_DMA in case of platform dependency
+Date: Tue, 17 Apr 2018 19:49:07 +0200
+Message-Id: <1523987360-18760-8-git-send-email-geert@linux-m68k.org>
+In-Reply-To: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
+References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Remove dead function for manual sync. I/O
+Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
+symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
+In most cases this other symbol is an architecture or platform specific
+symbol, or PCI.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+Generic symbols and drivers without platform dependencies keep their
+dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
+cannot work anyway.
+
+This simplifies the dependencies, and allows to improve compile-testing.
+
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Reviewed-by: Mark Brown <broonie@kernel.org>
+Acked-by: Robin Murphy <robin.murphy@arm.com>
 ---
- drivers/lightnvm/pblk-core.c | 7 -------
- drivers/lightnvm/pblk.h      | 1 -
- 2 files changed, 8 deletions(-)
+v3:
+  - Rebase to v4.17-rc1,
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index cc34d5d9652d..5f960a6609c8 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -342,13 +342,6 @@ void pblk_write_should_kick(struct pblk *pblk)
- 		pblk_write_kick(pblk);
- }
+v2:
+  - Add Reviewed-by, Acked-by,
+  - Drop RFC state,
+  - Split per subsystem.
+---
+ drivers/i2c/busses/Kconfig | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/drivers/i2c/busses/Kconfig b/drivers/i2c/busses/Kconfig
+index c4865b08d7fb9e3b..8d21b9825d71764d 100644
+--- a/drivers/i2c/busses/Kconfig
++++ b/drivers/i2c/busses/Kconfig
+@@ -707,7 +707,6 @@ config I2C_MPC
+ config I2C_MT65XX
+ 	tristate "MediaTek I2C adapter"
+ 	depends on ARCH_MEDIATEK || COMPILE_TEST
+-	depends on HAS_DMA
+ 	help
+ 	  This selects the MediaTek(R) Integrated Inter Circuit bus driver
+ 	  for MT65xx and MT81xx.
+@@ -885,7 +884,6 @@ config I2C_SH7760
  
--void pblk_end_io_sync(struct nvm_rq *rqd)
--{
--	struct completion *waiting = rqd->private;
--
--	complete(waiting);
--}
--
- static void pblk_wait_for_meta(struct pblk *pblk)
- {
- 	do {
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 4b725bedc36a..9838d03e1f21 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -796,7 +796,6 @@ void pblk_down_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
- void pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas);
- void pblk_up_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
- 		unsigned long *lun_bitmap);
--void pblk_end_io_sync(struct nvm_rq *rqd);
- int pblk_bio_add_pages(struct pblk *pblk, struct bio *bio, gfp_t flags,
- 		       int nr_pages);
- void pblk_bio_free_pages(struct pblk *pblk, struct bio *bio, int off,
+ config I2C_SH_MOBILE
+ 	tristate "SuperH Mobile I2C Controller"
+-	depends on HAS_DMA
+ 	depends on ARCH_SHMOBILE || ARCH_RENESAS || COMPILE_TEST
+ 	help
+ 	  If you say yes to this option, support will be included for the
+@@ -1098,7 +1096,6 @@ config I2C_XLP9XX
+ 
+ config I2C_RCAR
+ 	tristate "Renesas R-Car I2C Controller"
+-	depends on HAS_DMA
+ 	depends on ARCH_RENESAS || COMPILE_TEST
+ 	select I2C_SLAVE
+ 	help
 -- 
 2.7.4
