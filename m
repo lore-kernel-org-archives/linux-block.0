@@ -42,9 +42,9 @@ Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
         linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
         devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
         Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH v3 14/20] mtd: Remove depends on HAS_DMA in case of platform dependency
-Date: Tue, 17 Apr 2018 19:49:14 +0200
-Message-Id: <1523987360-18760-15-git-send-email-geert@linux-m68k.org>
+Subject: [PATCH v3 18/20] spi: Remove depends on HAS_DMA in case of platform dependency
+Date: Tue, 17 Apr 2018 19:49:18 +0200
+Message-Id: <1523987360-18760-19-git-send-email-geert@linux-m68k.org>
 In-Reply-To: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
 References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
 Sender: linux-ide-owner@vger.kernel.org
@@ -64,86 +64,98 @@ This simplifies the dependencies, and allows to improve compile-testing.
 Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
 Reviewed-by: Mark Brown <broonie@kernel.org>
 Acked-by: Robin Murphy <robin.murphy@arm.com>
+Acked-by: Mark Brown <broonie@kernel.org>
 ---
 v3:
+  - Add Acked-by,
   - Rebase to v4.17-rc1,
 
 v2:
   - Add Reviewed-by, Acked-by,
   - Drop RFC state,
-  - Drop new dependency of MTD_NAND_MARVELL on HAS_DMA,
   - Split per subsystem.
 ---
- drivers/mtd/nand/raw/Kconfig | 8 ++------
- drivers/mtd/spi-nor/Kconfig  | 2 +-
- 2 files changed, 3 insertions(+), 7 deletions(-)
+ drivers/spi/Kconfig | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/mtd/nand/raw/Kconfig b/drivers/mtd/nand/raw/Kconfig
-index 19a2b283fbbe627e..6871ff0fd300bb81 100644
---- a/drivers/mtd/nand/raw/Kconfig
-+++ b/drivers/mtd/nand/raw/Kconfig
-@@ -46,7 +46,7 @@ config MTD_NAND_DENALI
- config MTD_NAND_DENALI_PCI
-         tristate "Support Denali NAND controller on Intel Moorestown"
- 	select MTD_NAND_DENALI
--	depends on HAS_DMA && PCI
-+	depends on PCI
-         help
-           Enable the driver for NAND flash on Intel Moorestown, using the
-           Denali NAND controller core.
-@@ -152,7 +152,6 @@ config MTD_NAND_S3C2410_CLKSTOP
- config MTD_NAND_TANGO
- 	tristate "NAND Flash support for Tango chips"
- 	depends on ARCH_TANGO || COMPILE_TEST
--	depends on HAS_DMA
- 	help
- 	  Enables the NAND Flash controller on Tango chips.
+diff --git a/drivers/spi/Kconfig b/drivers/spi/Kconfig
+index 2d4146ce2f1be49d..5a8524a3bc13f92d 100644
+--- a/drivers/spi/Kconfig
++++ b/drivers/spi/Kconfig
+@@ -71,7 +71,6 @@ config SPI_ARMADA_3700
  
-@@ -285,7 +284,7 @@ config MTD_NAND_MARVELL
- 	tristate "NAND controller support on Marvell boards"
- 	depends on PXA3xx || ARCH_MMP || PLAT_ORION || ARCH_MVEBU || \
- 		   COMPILE_TEST
--	depends on HAS_IOMEM && HAS_DMA
-+	depends on HAS_IOMEM
- 	help
- 	  This enables the NAND flash controller driver for Marvell boards,
- 	  including:
-@@ -447,7 +446,6 @@ config MTD_NAND_SH_FLCTL
- 	tristate "Support for NAND on Renesas SuperH FLCTL"
- 	depends on SUPERH || COMPILE_TEST
- 	depends on HAS_IOMEM
+ config SPI_ATMEL
+ 	tristate "Atmel SPI Controller"
 -	depends on HAS_DMA
+ 	depends on ARCH_AT91 || COMPILE_TEST
  	help
- 	  Several Renesas SuperH CPU has FLCTL. This option enables support
- 	  for NAND Flash using FLCTL.
-@@ -515,7 +513,6 @@ config MTD_NAND_SUNXI
- config MTD_NAND_HISI504
- 	tristate "Support for NAND controller on Hisilicon SoC Hip04"
- 	depends on ARCH_HISI || COMPILE_TEST
--	depends on HAS_DMA
- 	help
- 	  Enables support for NAND controller on Hisilicon SoC Hip04.
+ 	  This selects a driver for the Atmel SPI Controller, present on
+@@ -233,7 +232,6 @@ config SPI_EFM32
  
-@@ -529,7 +526,6 @@ config MTD_NAND_QCOM
- config MTD_NAND_MTK
- 	tristate "Support for NAND controller on MTK SoCs"
- 	depends on ARCH_MEDIATEK || COMPILE_TEST
+ config SPI_EP93XX
+ 	tristate "Cirrus Logic EP93xx SPI controller"
+-	depends on HAS_DMA
+ 	depends on ARCH_EP93XX || COMPILE_TEST
+ 	help
+ 	  This enables using the Cirrus EP93xx SPI controller in master
+@@ -355,7 +353,6 @@ config SPI_FSL_SPI
+ config SPI_FSL_DSPI
+ 	tristate "Freescale DSPI controller"
+ 	select REGMAP_MMIO
+-	depends on HAS_DMA
+ 	depends on SOC_VF610 || SOC_LS1021A || ARCH_LAYERSCAPE || M5441x || COMPILE_TEST
+ 	help
+ 	  This enables support for the Freescale DSPI controller in master
+@@ -431,7 +428,6 @@ config SPI_OMAP_UWIRE
+ 
+ config SPI_OMAP24XX
+ 	tristate "McSPI driver for OMAP"
+-	depends on HAS_DMA
+ 	depends on ARCH_OMAP2PLUS || COMPILE_TEST
+ 	select SG_SPLIT
+ 	help
+@@ -440,7 +436,6 @@ config SPI_OMAP24XX
+ 
+ config SPI_TI_QSPI
+ 	tristate "DRA7xxx QSPI controller support"
+-	depends on HAS_DMA
+ 	depends on ARCH_OMAP2PLUS || COMPILE_TEST
+ 	help
+ 	  QSPI master controller for DRA7xxx used for flash devices.
+@@ -469,7 +464,6 @@ config SPI_PIC32
+ config SPI_PIC32_SQI
+ 	tristate "Microchip PIC32 Quad SPI driver"
+ 	depends on MACH_PIC32 || COMPILE_TEST
 -	depends on HAS_DMA
  	help
- 	  Enables support for NAND controller on MTK SoCs.
- 	  This controller is found on mt27xx, mt81xx, mt65xx SoCs.
-diff --git a/drivers/mtd/spi-nor/Kconfig b/drivers/mtd/spi-nor/Kconfig
-index 89da88e591215db1..c493b8230a38c059 100644
---- a/drivers/mtd/spi-nor/Kconfig
-+++ b/drivers/mtd/spi-nor/Kconfig
-@@ -71,7 +71,7 @@ config SPI_FSL_QUADSPI
- config SPI_HISI_SFC
- 	tristate "Hisilicon SPI-NOR Flash Controller(SFC)"
- 	depends on ARCH_HISI || COMPILE_TEST
--	depends on HAS_IOMEM && HAS_DMA
-+	depends on HAS_IOMEM
+ 	  SPI driver for PIC32 Quad SPI controller.
+ 
+@@ -572,7 +566,7 @@ config SPI_SC18IS602
+ 
+ config SPI_SH_MSIOF
+ 	tristate "SuperH MSIOF SPI controller"
+-	depends on HAVE_CLK && HAS_DMA
++	depends on HAVE_CLK
+ 	depends on ARCH_SHMOBILE || ARCH_RENESAS || COMPILE_TEST
  	help
- 	  This enables support for hisilicon SPI-NOR flash controller.
+ 	  SPI driver for SuperH and SH Mobile MSIOF blocks.
+@@ -650,7 +644,7 @@ config SPI_MXS
+ config SPI_TEGRA114
+ 	tristate "NVIDIA Tegra114 SPI Controller"
+ 	depends on (ARCH_TEGRA && TEGRA20_APB_DMA) || COMPILE_TEST
+-	depends on RESET_CONTROLLER && HAS_DMA
++	depends on RESET_CONTROLLER
+ 	help
+ 	  SPI driver for NVIDIA Tegra114 SPI Controller interface. This controller
+ 	  is different than the older SoCs SPI controller and also register interface
+@@ -668,7 +662,7 @@ config SPI_TEGRA20_SFLASH
+ config SPI_TEGRA20_SLINK
+ 	tristate "Nvidia Tegra20/Tegra30 SLINK Controller"
+ 	depends on (ARCH_TEGRA && TEGRA20_APB_DMA) || COMPILE_TEST
+-	depends on RESET_CONTROLLER && HAS_DMA
++	depends on RESET_CONTROLLER
+ 	help
+ 	  SPI driver for Nvidia Tegra20/Tegra30 SLINK Controller interface.
  
 -- 
 2.7.4
