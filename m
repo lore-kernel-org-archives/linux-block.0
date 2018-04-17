@@ -1,4 +1,12 @@
-Return-Path: <linux-ide-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from leibniz.telenet-ops.be ([195.130.137.77]:33988 "EHLO
+        leibniz.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753197AbeDQRuT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Apr 2018 13:50:19 -0400
+Received: from albert.telenet-ops.be (albert.telenet-ops.be [IPv6:2a02:1800:110:4::f00:1a])
+        by leibniz.telenet-ops.be (Postfix) with ESMTPS id 40QXpC37qXzMqjYR
+        for <linux-block@vger.kernel.org>; Tue, 17 Apr 2018 19:50:11 +0200 (CEST)
 From: Geert Uytterhoeven <geert@linux-m68k.org>
 To: Christoph Hellwig <hch@lst.de>,
         Marek Szyprowski <m.szyprowski@samsung.com>,
@@ -42,13 +50,13 @@ Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
         linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
         devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
         Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH v3 18/20] spi: Remove depends on HAS_DMA in case of platform dependency
-Date: Tue, 17 Apr 2018 19:49:18 +0200
-Message-Id: <1523987360-18760-19-git-send-email-geert@linux-m68k.org>
+Subject: [PATCH v3 01/20] ASoC: Remove depends on HAS_DMA in case of platform dependency
+Date: Tue, 17 Apr 2018 19:49:01 +0200
+Message-Id: <1523987360-18760-2-git-send-email-geert@linux-m68k.org>
 In-Reply-To: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
 References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
-Sender: linux-ide-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
 symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
@@ -60,6 +68,11 @@ dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
 cannot work anyway.
 
 This simplifies the dependencies, and allows to improve compile-testing.
+
+Note:
+  - The various SND_SOC_LPASS_* symbols had to loose their dependencies
+    on HAS_DMA, as they are selected by SND_SOC_STORM and/or
+    SND_SOC_APQ8016_SBC.
 
 Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
 Reviewed-by: Mark Brown <broonie@kernel.org>
@@ -73,90 +86,93 @@ v3:
 v2:
   - Add Reviewed-by, Acked-by,
   - Drop RFC state,
+  - Drop dependency of SND_SOC_LPASS_IPQ806X on HAS_DMA,
   - Split per subsystem.
 ---
- drivers/spi/Kconfig | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+ sound/soc/bcm/Kconfig      | 3 +--
+ sound/soc/kirkwood/Kconfig | 1 -
+ sound/soc/pxa/Kconfig      | 1 -
+ sound/soc/qcom/Kconfig     | 7 ++-----
+ 4 files changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/spi/Kconfig b/drivers/spi/Kconfig
-index 2d4146ce2f1be49d..5a8524a3bc13f92d 100644
---- a/drivers/spi/Kconfig
-+++ b/drivers/spi/Kconfig
-@@ -71,7 +71,6 @@ config SPI_ARMADA_3700
- 
- config SPI_ATMEL
- 	tristate "Atmel SPI Controller"
+diff --git a/sound/soc/bcm/Kconfig b/sound/soc/bcm/Kconfig
+index edf367100ebd2f17..02f50b7a966ff262 100644
+--- a/sound/soc/bcm/Kconfig
++++ b/sound/soc/bcm/Kconfig
+@@ -11,9 +11,8 @@ config SND_BCM2835_SOC_I2S
+ config SND_SOC_CYGNUS
+ 	tristate "SoC platform audio for Broadcom Cygnus chips"
+ 	depends on ARCH_BCM_CYGNUS || COMPILE_TEST
 -	depends on HAS_DMA
- 	depends on ARCH_AT91 || COMPILE_TEST
  	help
- 	  This selects a driver for the Atmel SPI Controller, present on
-@@ -233,7 +232,6 @@ config SPI_EFM32
+ 	  Say Y if you want to add support for ASoC audio on Broadcom
+ 	  Cygnus chips (bcm958300, bcm958305, bcm911360)
  
- config SPI_EP93XX
- 	tristate "Cirrus Logic EP93xx SPI controller"
+-	  If you don't know what to do here, say N.
+\ No newline at end of file
++	  If you don't know what to do here, say N.
+diff --git a/sound/soc/kirkwood/Kconfig b/sound/soc/kirkwood/Kconfig
+index bc3c7b5ac752e471..132bb83f8e99aff3 100644
+--- a/sound/soc/kirkwood/Kconfig
++++ b/sound/soc/kirkwood/Kconfig
+@@ -1,7 +1,6 @@
+ config SND_KIRKWOOD_SOC
+ 	tristate "SoC Audio for the Marvell Kirkwood and Dove chips"
+ 	depends on ARCH_DOVE || ARCH_MVEBU || COMPILE_TEST
 -	depends on HAS_DMA
- 	depends on ARCH_EP93XX || COMPILE_TEST
  	help
- 	  This enables using the Cirrus EP93xx SPI controller in master
-@@ -355,7 +353,6 @@ config SPI_FSL_SPI
- config SPI_FSL_DSPI
- 	tristate "Freescale DSPI controller"
+ 	  Say Y or M if you want to add support for codecs attached to
+ 	  the Kirkwood I2S interface. You will also need to select the
+diff --git a/sound/soc/pxa/Kconfig b/sound/soc/pxa/Kconfig
+index 484ab3c2ad672fc8..960744e46edc0549 100644
+--- a/sound/soc/pxa/Kconfig
++++ b/sound/soc/pxa/Kconfig
+@@ -1,7 +1,6 @@
+ config SND_PXA2XX_SOC
+ 	tristate "SoC Audio for the Intel PXA2xx chip"
+ 	depends on ARCH_PXA || COMPILE_TEST
+-	depends on HAS_DMA
+ 	select SND_PXA2XX_LIB
+ 	help
+ 	  Say Y or M if you want to add support for codecs attached to
+diff --git a/sound/soc/qcom/Kconfig b/sound/soc/qcom/Kconfig
+index 8ec9a074b38bd702..3cc252e55468eaab 100644
+--- a/sound/soc/qcom/Kconfig
++++ b/sound/soc/qcom/Kconfig
+@@ -11,24 +11,21 @@ config SND_SOC_LPASS_CPU
+ 
+ config SND_SOC_LPASS_PLATFORM
+ 	tristate
+-	depends on HAS_DMA
  	select REGMAP_MMIO
+ 
+ config SND_SOC_LPASS_IPQ806X
+ 	tristate
 -	depends on HAS_DMA
- 	depends on SOC_VF610 || SOC_LS1021A || ARCH_LAYERSCAPE || M5441x || COMPILE_TEST
- 	help
- 	  This enables support for the Freescale DSPI controller in master
-@@ -431,7 +428,6 @@ config SPI_OMAP_UWIRE
+ 	select SND_SOC_LPASS_CPU
+ 	select SND_SOC_LPASS_PLATFORM
  
- config SPI_OMAP24XX
- 	tristate "McSPI driver for OMAP"
+ config SND_SOC_LPASS_APQ8016
+ 	tristate
 -	depends on HAS_DMA
- 	depends on ARCH_OMAP2PLUS || COMPILE_TEST
- 	select SG_SPLIT
- 	help
-@@ -440,7 +436,6 @@ config SPI_OMAP24XX
+ 	select SND_SOC_LPASS_CPU
+ 	select SND_SOC_LPASS_PLATFORM
  
- config SPI_TI_QSPI
- 	tristate "DRA7xxx QSPI controller support"
--	depends on HAS_DMA
- 	depends on ARCH_OMAP2PLUS || COMPILE_TEST
+ config SND_SOC_STORM
+ 	tristate "ASoC I2S support for Storm boards"
+-	depends on SND_SOC_QCOM && HAS_DMA
++	depends on SND_SOC_QCOM
+ 	select SND_SOC_LPASS_IPQ806X
+ 	select SND_SOC_MAX98357A
  	help
- 	  QSPI master controller for DRA7xxx used for flash devices.
-@@ -469,7 +464,6 @@ config SPI_PIC32
- config SPI_PIC32_SQI
- 	tristate "Microchip PIC32 Quad SPI driver"
- 	depends on MACH_PIC32 || COMPILE_TEST
--	depends on HAS_DMA
- 	help
- 	  SPI driver for PIC32 Quad SPI controller.
+@@ -37,7 +34,7 @@ config SND_SOC_STORM
  
-@@ -572,7 +566,7 @@ config SPI_SC18IS602
- 
- config SPI_SH_MSIOF
- 	tristate "SuperH MSIOF SPI controller"
--	depends on HAVE_CLK && HAS_DMA
-+	depends on HAVE_CLK
- 	depends on ARCH_SHMOBILE || ARCH_RENESAS || COMPILE_TEST
+ config SND_SOC_APQ8016_SBC
+ 	tristate "SoC Audio support for APQ8016 SBC platforms"
+-	depends on SND_SOC_QCOM && HAS_DMA
++	depends on SND_SOC_QCOM
+ 	select SND_SOC_LPASS_APQ8016
  	help
- 	  SPI driver for SuperH and SH Mobile MSIOF blocks.
-@@ -650,7 +644,7 @@ config SPI_MXS
- config SPI_TEGRA114
- 	tristate "NVIDIA Tegra114 SPI Controller"
- 	depends on (ARCH_TEGRA && TEGRA20_APB_DMA) || COMPILE_TEST
--	depends on RESET_CONTROLLER && HAS_DMA
-+	depends on RESET_CONTROLLER
- 	help
- 	  SPI driver for NVIDIA Tegra114 SPI Controller interface. This controller
- 	  is different than the older SoCs SPI controller and also register interface
-@@ -668,7 +662,7 @@ config SPI_TEGRA20_SFLASH
- config SPI_TEGRA20_SLINK
- 	tristate "Nvidia Tegra20/Tegra30 SLINK Controller"
- 	depends on (ARCH_TEGRA && TEGRA20_APB_DMA) || COMPILE_TEST
--	depends on RESET_CONTROLLER && HAS_DMA
-+	depends on RESET_CONTROLLER
- 	help
- 	  SPI driver for Nvidia Tegra20/Tegra30 SLINK Controller interface.
- 
+           Support for Qualcomm Technologies LPASS audio block in
 -- 
 2.7.4
-
