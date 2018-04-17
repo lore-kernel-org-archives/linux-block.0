@@ -1,74 +1,105 @@
-Return-Path: <keescook@chromium.org>
-Return-Path: <keescook@chromium.org>
-Date: Tue, 17 Apr 2018 14:42:18 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
-	linux-kernel@vger.kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	David Windsor <dave@nullcore.net>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-block@vger.kernel.org
-Subject: [PATCH] blk-mq: Clear out elevator private data
-Message-ID: <20180417214218.GA44753@beast>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from xavier.telenet-ops.be ([195.130.132.52]:58630 "EHLO
+        xavier.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753114AbeDQSQv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Apr 2018 14:16:51 -0400
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: Christoph Hellwig <hch@lst.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Felipe Balbi <balbi@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mark Brown <broonie@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
+        Wolfram Sang <wsa@the-dreams.de>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Matias Bjorling <mb@lightnvm.io>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Brian Norris <computersforpeace@gmail.com>,
+        Marek Vasut <marek.vasut@gmail.com>,
+        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Richard Weinberger <richard@nod.at>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Eric Anholt <eric@anholt.net>,
+        Stefan Wahren <stefan.wahren@i2se.com>
+Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
+        alsa-devel@alsa-project.org, linux-ide@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux-fpga@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
+        netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
+        devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
+        Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH v3 02/20] ata: Remove depends on HAS_DMA in case of platform dependency
+Date: Tue, 17 Apr 2018 19:49:02 +0200
+Message-Id: <1523987360-18760-3-git-send-email-geert@linux-m68k.org>
+In-Reply-To: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
+References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Some elevators may not correctly check rq->rq_flags & RQF_ELVPRIV, and
-may attempt to read rq->elv fields. When requests got reused, this
-caused BFQ to think it already had a bfqq (rq->elv.priv[1]) allocated.
-This could lead to odd behaviors like having the sense buffer address
-slowly start incrementing. This eventually tripped HARDENED_USERCOPY
-and KASAN.
+Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
+symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
+In most cases this other symbol is an architecture or platform specific
+symbol, or PCI.
 
-This patch wipes all of rq->elv instead of just rq->elv.icq. While
-it shouldn't technically be needed, this ends up being a robustness
-improvement that should lead to at least finding bugs in elevators faster.
+Generic symbols and drivers without platform dependencies keep their
+dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
+cannot work anyway.
 
-Reported-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Fixes: bd166ef183c26 ("blk-mq-sched: add framework for MQ capable IO schedulers")
-Cc: stable@vger.kernel.org
-Signed-off-by: Kees Cook <keescook@chromium.org>
+This simplifies the dependencies, and allows to improve compile-testing.
+
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Reviewed-by: Mark Brown <broonie@kernel.org>
+Acked-by: Robin Murphy <robin.murphy@arm.com>
 ---
-In theory, BFQ needs to also check the RQF_ELVPRIV flag, but I'll leave that
-to Paolo to figure out. Also, my Fixes line is kind of a best-guess. This
-is where icq was originally wiped, so it seemed as good a commit as any.
----
- block/blk-mq.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+v3:
+  - Rebase to v4.17-rc1,
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0dc9e341c2a7..859df3160303 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -363,7 +363,7 @@ static struct request *blk_mq_get_request(struct request_queue *q,
+v2:
+  - Add Reviewed-by, Acked-by,
+  - Drop RFC state,
+  - Split per subsystem.
+---
+ drivers/ata/Kconfig | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/drivers/ata/Kconfig b/drivers/ata/Kconfig
+index 2b16e7c8fff35764..39b181d6bd0d8cf2 100644
+--- a/drivers/ata/Kconfig
++++ b/drivers/ata/Kconfig
+@@ -398,7 +398,6 @@ config SATA_DWC_VDEBUG
  
- 	rq = blk_mq_rq_ctx_init(data, tag, op);
- 	if (!op_is_flush(op)) {
--		rq->elv.icq = NULL;
-+		memset(&rq->elv, 0, sizeof(rq->elv));
- 		if (e && e->type->ops.mq.prepare_request) {
- 			if (e->type->icq_cache && rq_ioc(bio))
- 				blk_mq_sched_assign_ioc(rq, bio);
-@@ -461,7 +461,7 @@ void blk_mq_free_request(struct request *rq)
- 			e->type->ops.mq.finish_request(rq);
- 		if (rq->elv.icq) {
- 			put_io_context(rq->elv.icq->ioc);
--			rq->elv.icq = NULL;
-+			memset(&rq->elv, 0, sizeof(rq->elv));
- 		}
- 	}
+ config SATA_HIGHBANK
+ 	tristate "Calxeda Highbank SATA support"
+-	depends on HAS_DMA
+ 	depends on ARCH_HIGHBANK || COMPILE_TEST
+ 	help
+ 	  This option enables support for the Calxeda Highbank SoC's
+@@ -408,7 +407,6 @@ config SATA_HIGHBANK
  
+ config SATA_MV
+ 	tristate "Marvell SATA support"
+-	depends on HAS_DMA
+ 	depends on PCI || ARCH_DOVE || ARCH_MV78XX0 || \
+ 		   ARCH_MVEBU || ARCH_ORION5X || COMPILE_TEST
+ 	select GENERIC_PHY
 -- 
 2.7.4
-
-
--- 
-Kees Cook
-Pixel Security
