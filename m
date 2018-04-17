@@ -1,72 +1,178 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-scsi@vger.kernel.org, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH 04/12] DAC960: don't use block layer bounce buffers
-Date: Mon, 16 Apr 2018 10:50:24 +0200
-Message-Id: <20180416085032.7367-5-hch@lst.de>
-In-Reply-To: <20180416085032.7367-1-hch@lst.de>
-References: <20180416085032.7367-1-hch@lst.de>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from newton.telenet-ops.be ([195.130.132.45]:59226 "EHLO
+        newton.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753013AbeDQRuQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Apr 2018 13:50:16 -0400
+Received: from albert.telenet-ops.be (albert.telenet-ops.be [IPv6:2a02:1800:110:4::f00:1a])
+        by newton.telenet-ops.be (Postfix) with ESMTPS id 40QXpC2tvXzMr6th
+        for <linux-block@vger.kernel.org>; Tue, 17 Apr 2018 19:50:11 +0200 (CEST)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: Christoph Hellwig <hch@lst.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Felipe Balbi <balbi@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mark Brown <broonie@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
+        Wolfram Sang <wsa@the-dreams.de>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Matias Bjorling <mb@lightnvm.io>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Brian Norris <computersforpeace@gmail.com>,
+        Marek Vasut <marek.vasut@gmail.com>,
+        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Richard Weinberger <richard@nod.at>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Eric Anholt <eric@anholt.net>,
+        Stefan Wahren <stefan.wahren@i2se.com>
+Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
+        alsa-devel@alsa-project.org, linux-ide@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux-fpga@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
+        netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
+        devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
+        Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH v3 03/20] crypto: Remove depends on HAS_DMA in case of platform dependency
+Date: Tue, 17 Apr 2018 19:49:03 +0200
+Message-Id: <1523987360-18760-4-git-send-email-geert@linux-m68k.org>
+In-Reply-To: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
+References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-DAC960 just sets the block bounce limit to the dma mask, which means
-that the iommu or swiotlb already take care of the bounce buffering,
-and the block bouncing can be removed.
+Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
+symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
+In most cases this other symbol is an architecture or platform specific
+symbol, or PCI.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Generic symbols and drivers without platform dependencies keep their
+dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
+cannot work anyway.
+
+This simplifies the dependencies, and allows to improve compile-testing.
+
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Reviewed-by: Mark Brown <broonie@kernel.org>
+Acked-by: Robin Murphy <robin.murphy@arm.com>
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- drivers/block/DAC960.c | 9 ++-------
- drivers/block/DAC960.h | 1 -
- 2 files changed, 2 insertions(+), 8 deletions(-)
+v3:
+  - Add Acked-by,
+  - Rebase to v4.17-rc1,
 
-diff --git a/drivers/block/DAC960.c b/drivers/block/DAC960.c
-index f781eff7d23e..c9ba48519d0f 100644
---- a/drivers/block/DAC960.c
-+++ b/drivers/block/DAC960.c
-@@ -1179,7 +1179,6 @@ static bool DAC960_V1_EnableMemoryMailboxInterface(DAC960_Controller_T
+v2:
+  - Add Reviewed-by, Acked-by,
+  - Drop RFC state,
+  - Split per subsystem.
+---
+ drivers/crypto/Kconfig | 14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index d1ea1a07cecbb36c..3dbc47528667b77c 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -419,7 +419,7 @@ config CRYPTO_DEV_EXYNOS_RNG
+ config CRYPTO_DEV_S5P
+ 	tristate "Support for Samsung S5PV210/Exynos crypto accelerator"
+ 	depends on ARCH_S5PV210 || ARCH_EXYNOS || COMPILE_TEST
+-	depends on HAS_IOMEM && HAS_DMA
++	depends on HAS_IOMEM
+ 	select CRYPTO_AES
+ 	select CRYPTO_BLKCIPHER
+ 	help
+@@ -466,7 +466,6 @@ endif # if CRYPTO_DEV_UX500
  
-   if (pci_set_dma_mask(Controller->PCIDevice, DMA_BIT_MASK(32)))
- 	return DAC960_Failure(Controller, "DMA mask out of range");
--  Controller->BounceBufferLimit = DMA_BIT_MASK(32);
+ config CRYPTO_DEV_ATMEL_AUTHENC
+ 	tristate "Support for Atmel IPSEC/SSL hw accelerator"
+-	depends on HAS_DMA
+ 	depends on ARCH_AT91 || COMPILE_TEST
+ 	select CRYPTO_AUTHENC
+ 	select CRYPTO_DEV_ATMEL_AES
+@@ -479,7 +478,6 @@ config CRYPTO_DEV_ATMEL_AUTHENC
  
-   if ((hw_type == DAC960_PD_Controller) || (hw_type == DAC960_P_Controller)) {
-     CommandMailboxesSize =  0;
-@@ -1380,11 +1379,8 @@ static bool DAC960_V2_EnableMemoryMailboxInterface(DAC960_Controller_T
-   dma_addr_t	CommandMailboxDMA;
-   DAC960_V2_CommandStatus_T CommandStatus;
+ config CRYPTO_DEV_ATMEL_AES
+ 	tristate "Support for Atmel AES hw accelerator"
+-	depends on HAS_DMA
+ 	depends on ARCH_AT91 || COMPILE_TEST
+ 	select CRYPTO_AES
+ 	select CRYPTO_AEAD
+@@ -494,7 +492,6 @@ config CRYPTO_DEV_ATMEL_AES
  
--	if (!pci_set_dma_mask(Controller->PCIDevice, DMA_BIT_MASK(64)))
--		Controller->BounceBufferLimit = DMA_BIT_MASK(64);
--	else if (!pci_set_dma_mask(Controller->PCIDevice, DMA_BIT_MASK(32)))
--		Controller->BounceBufferLimit = DMA_BIT_MASK(32);
--	else
-+	if (pci_set_dma_mask(Controller->PCIDevice, DMA_BIT_MASK(64)) &&
-+	    pci_set_dma_mask(Controller->PCIDevice, DMA_BIT_MASK(32)))
- 		return DAC960_Failure(Controller, "DMA mask out of range");
+ config CRYPTO_DEV_ATMEL_TDES
+ 	tristate "Support for Atmel DES/TDES hw accelerator"
+-	depends on HAS_DMA
+ 	depends on ARCH_AT91 || COMPILE_TEST
+ 	select CRYPTO_DES
+ 	select CRYPTO_BLKCIPHER
+@@ -508,7 +505,6 @@ config CRYPTO_DEV_ATMEL_TDES
  
-   /* This is a temporary dma mapping, used only in the scope of this function */
-@@ -2540,7 +2536,6 @@ static bool DAC960_RegisterBlockDevice(DAC960_Controller_T *Controller)
- 		continue;
-   	}
-   	Controller->RequestQueue[n] = RequestQueue;
--  	blk_queue_bounce_limit(RequestQueue, Controller->BounceBufferLimit);
-   	RequestQueue->queuedata = Controller;
- 	blk_queue_max_segments(RequestQueue, Controller->DriverScatterGatherLimit);
- 	blk_queue_max_hw_sectors(RequestQueue, Controller->MaxBlocksPerCommand);
-diff --git a/drivers/block/DAC960.h b/drivers/block/DAC960.h
-index 21aff470d268..1439e651928b 100644
---- a/drivers/block/DAC960.h
-+++ b/drivers/block/DAC960.h
-@@ -2295,7 +2295,6 @@ typedef struct DAC960_Controller
-   unsigned short MaxBlocksPerCommand;
-   unsigned short ControllerScatterGatherLimit;
-   unsigned short DriverScatterGatherLimit;
--  u64		BounceBufferLimit;
-   unsigned int CombinedStatusBufferLength;
-   unsigned int InitialStatusLength;
-   unsigned int CurrentStatusLength;
+ config CRYPTO_DEV_ATMEL_SHA
+ 	tristate "Support for Atmel SHA hw accelerator"
+-	depends on HAS_DMA
+ 	depends on ARCH_AT91 || COMPILE_TEST
+ 	select CRYPTO_HASH
+ 	help
+@@ -574,7 +570,8 @@ config CRYPTO_DEV_CAVIUM_ZIP
+ 
+ config CRYPTO_DEV_QCE
+ 	tristate "Qualcomm crypto engine accelerator"
+-	depends on (ARCH_QCOM || COMPILE_TEST) && HAS_DMA && HAS_IOMEM
++	depends on ARCH_QCOM || COMPILE_TEST
++	depends on HAS_IOMEM
+ 	select CRYPTO_AES
+ 	select CRYPTO_DES
+ 	select CRYPTO_ECB
+@@ -598,7 +595,6 @@ source "drivers/crypto/vmx/Kconfig"
+ config CRYPTO_DEV_IMGTEC_HASH
+ 	tristate "Imagination Technologies hardware hash accelerator"
+ 	depends on MIPS || COMPILE_TEST
+-	depends on HAS_DMA
+ 	select CRYPTO_MD5
+ 	select CRYPTO_SHA1
+ 	select CRYPTO_SHA256
+@@ -650,7 +646,6 @@ config CRYPTO_DEV_ROCKCHIP
+ 
+ config CRYPTO_DEV_MEDIATEK
+ 	tristate "MediaTek's EIP97 Cryptographic Engine driver"
+-	depends on HAS_DMA
+ 	depends on (ARM && ARCH_MEDIATEK) || COMPILE_TEST
+ 	select CRYPTO_AES
+ 	select CRYPTO_AEAD
+@@ -688,7 +683,7 @@ source "drivers/crypto/stm32/Kconfig"
+ 
+ config CRYPTO_DEV_SAFEXCEL
+ 	tristate "Inside Secure's SafeXcel cryptographic engine driver"
+-	depends on HAS_DMA && OF
++	depends on OF
+ 	depends on (ARM64 && ARCH_MVEBU) || (COMPILE_TEST && 64BIT)
+ 	select CRYPTO_AES
+ 	select CRYPTO_BLKCIPHER
+@@ -706,7 +701,6 @@ config CRYPTO_DEV_SAFEXCEL
+ config CRYPTO_DEV_ARTPEC6
+ 	tristate "Support for Axis ARTPEC-6/7 hardware crypto acceleration."
+ 	depends on ARM && (ARCH_ARTPEC || COMPILE_TEST)
+-	depends on HAS_DMA
+ 	depends on OF
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_AES
 -- 
-2.17.0
+2.7.4
