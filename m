@@ -6,11 +6,11 @@ To: Johannes Thumshirn <jthumshirn@suse.de>,
 	linux-block@vger.kernel.org
 Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
 	Alan Jenkins <alan.christopher.jenkins@gmail.com>
-Subject: [PATCH v4] blktests: regression test "block: do not use interruptible wait anywhere"
-Date: Tue, 17 Apr 2018 16:21:36 +0100
-Message-Id: <20180417152136.16546-1-alan.christopher.jenkins@gmail.com>
-In-Reply-To: <20180417151000.9931-1-alan.christopher.jenkins@gmail.com>
-References: <20180417151000.9931-1-alan.christopher.jenkins@gmail.com>
+Subject: [PATCH v3] blktests: regression test "block: do not use interruptible wait anywhere"
+Date: Tue, 17 Apr 2018 16:10:00 +0100
+Message-Id: <20180417151000.9931-1-alan.christopher.jenkins@gmail.com>
+In-Reply-To: <78254510-5ba0-1bba-dd4a-87fdc88e55ee@gmail.com>
+References: <78254510-5ba0-1bba-dd4a-87fdc88e55ee@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
 > Without this fix, I get an IO error in this test:
@@ -26,8 +26,6 @@ They didn't come up with any suggestion for testing the code more directly
 
 Signed-off-by: Alan Jenkins <alan.christopher.jenkins@gmail.com>
 ---
-v4: Fix use of $FULL introduced in v3
-
 v3: Switch from dd to fio, clarify some comment.
     The HAVE_BARE_METAL_SCSI check is left unchanged,
     waiting for further discussion.
@@ -40,7 +38,7 @@ v3: Switch from dd to fio, clarify some comment.
 
 diff --git a/tests/scsi/004 b/tests/scsi/004
 new file mode 100755
-index 0000000..cea1475
+index 0000000..2a7f794
 --- /dev/null
 +++ b/tests/scsi/004
 @@ -0,0 +1,255 @@
@@ -158,7 +156,7 @@ index 0000000..cea1475
 +		# Suppress shell messages about killed process.
 +		# The messages would vary, causing the test to fail.
 +		exec 3>&1 4>&2
-+		exec >/dev/null 2>&1
++		exec >>"$FULL" 2>&1
 +
 +		# Send terminate signal.  Also send the continue signal,
 +		# in case the process was currently stopped.
@@ -200,7 +198,7 @@ index 0000000..cea1475
 +	# This is the same behaviour as dd, except that we loop in case the
 +	# device is tiny. (Strictly speaking, the block size is different too).
 +	#
-+	fio --output="${FULL}" --filename="$TEST_DEV" \
++	fio --output="${FULL}.fio" --filename="$TEST_DEV" \
 +	    --thread --exitall_on_error --loops=1G \
 +	    --direct=1 --rw=read --name=reads &
 +	fio_pid=$!
@@ -214,8 +212,8 @@ index 0000000..cea1475
 +	# is best to reproduce this, which is not built in to
 +	# python.
 +	(
-+		while kill -STOP $fio_pid 2>/dev/null &&
-+		      kill -CONT $fio_pid 2>/dev/null; do
++		while kill -STOP $fio_pid 2>>"$FULL" &&
++		      kill -CONT $fio_pid 2>>"$FULL"; do
 +
 +			sleep 0.001
 +		done
@@ -273,7 +271,7 @@ index 0000000..cea1475
 +	dd iflag=direct if="$TEST_DEV" of=/dev/null count=1 status=none
 +
 +	if ! kill -0 $fio_pid 2>/dev/null; then
-+		# fio exited before we entered cleanup.
++		# dd exited before we entered cleanup.
 +		# Read its exit status
 +		wait $fio_pid
 +		ret=$?
