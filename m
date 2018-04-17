@@ -1,12 +1,10 @@
 Return-Path: <jianchao.w.wang@oracle.com>
 From: Jianchao Wang <jianchao.w.wang@oracle.com>
 To: axboe@kernel.dk
-Cc: bart.vanassche@wdc.com, tj@kernel.org, ming.lei@redhat.com,
-        Martin@Lichtvoll.de, stable@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: [PATCH] blk-mq: start request gstate with gen 1
-Date: Tue, 17 Apr 2018 11:46:20 +0800
-Message-Id: <1523936780-1589-1-git-send-email-jianchao.w.wang@oracle.com>
+Date: Tue, 17 Apr 2018 11:44:43 +0800
+Message-Id: <1523936683-1522-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
 rq->gstate and rq->aborted_gstate both are zero before rqs are
