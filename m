@@ -1,24 +1,23 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] cdrom: information leak in cdrom_ioctl_media_changed()
+Return-Path: <BATV+bb0560cae33c7ec78627+5351+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Wed, 18 Apr 2018 03:35:39 -0700
+From: Christoph Hellwig <hch@infradead.org>
 To: Dan Carpenter <dan.carpenter@oracle.com>
-Cc: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH] cdrom: information leak in cdrom_ioctl_media_changed()
+Message-ID: <20180418103539.GA27207@infradead.org>
 References: <20180418095130.GA26904@mwanda>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <b2f8739b-d93d-e89c-ec70-a96299f47a0c@kernel.dk>
-Date: Wed, 18 Apr 2018 08:21:44 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180418095130.GA26904@mwanda>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 4/18/18 3:51 AM, Dan Carpenter wrote:
+On Wed, Apr 18, 2018 at 12:51:31PM +0300, Dan Carpenter wrote:
 > This cast is wrong.  "cdi->capacity" is an int and "arg" is an unsigned
 > long.  The way the check is written now, if one of the high 32 bits is
 > set then we could read outside the info->slots[] array.
 > 
 > This bug is pretty old and it predates git.
 
-Thanks Dan, applied.
+Looks good,
 
--- 
-Jens Axboe
+Reviewed-by: Christoph Hellwig <hch@lst.de>
