@@ -1,81 +1,69 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: "Bryant G. Ly" <bryantly@linux.vnet.ibm.com>
-To: hch@lst.de, nab@linux-iscsi.org, martin.petersen@oracle.com
-Cc: seroyer@linux.vnet.ibm.com, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-block@vger.kernel.org,
-        "Bryant G. Ly" <bryantly@linux.vnet.ibm.com>,
-        stable@vger.kernel.org
-Subject: [PATCH v2] target: Fix Fortify_panic kernel exception
-Date: Tue, 17 Apr 2018 10:33:21 -0500
-Message-Id: <1523979202-61407-1-git-send-email-bryantly@linux.vnet.ibm.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0b-00003501.pphosted.com ([67.231.152.68]:42032 "EHLO
+        mx0b-00003501.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752514AbeDRQZ5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Apr 2018 12:25:57 -0400
+Received: from pps.filterd (m0075029.ppops.net [127.0.0.1])
+        by mx0b-00003501.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id w3IGJBP1033622
+        for <linux-block@vger.kernel.org>; Wed, 18 Apr 2018 12:25:57 -0400
+Received: from mail-ot0-f200.google.com (mail-ot0-f200.google.com [74.125.82.200])
+        by mx0b-00003501.pphosted.com with ESMTP id 2he8bj0a23-3
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Wed, 18 Apr 2018 12:25:56 -0400
+Received: by mail-ot0-f200.google.com with SMTP id d5-v6so1360457oth.2
+        for <linux-block@vger.kernel.org>; Wed, 18 Apr 2018 09:25:56 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1bfc9e21ebc0591ae24bd0c67e3a4c1bde94dc81.camel@wdc.com>
+References: <CANo=J14FGXJO4O6pwRpKTceE6RgmiKn2Bp16UxP0SDCbJDiqnQ@mail.gmail.com>
+ <20180326170840.0130f366@pentland.suse.de> <1c800f70-0d50-bc5b-3b73-e36a1cea0eec@interlog.com>
+ <CANo=J149RC8eYDecihdUdOsxNsaz0jMxCo==whbwEUOkAu-yPg@mail.gmail.com>
+ <f1957da6-04af-d336-e4c9-440dbed1c1a9@suse.de> <20180403074637.GB13259@infradead.org>
+ <CANo=J15RFeMiqudiS_+dAuyVsgoPYn2U=iJZh3EhamtX56atWw@mail.gmail.com>
+ <20180406082418.127a0ec6@pentland.suse.de> <20180406064236.GA17456@infradead.org>
+ <361c204d-f9be-978a-5778-81ecaeb143e0@interlog.com> <CANo=J176w+NiskEDU_-dZ0CmmHCp-ZquPqKgY7_3oyMED_r3Zg@mail.gmail.com>
+ <c5bf0358-ba24-1196-7cfd-8bfec558c514@suse.de> <236addea-463c-3802-29c2-c8df9a31c285@interlog.com>
+ <CANo=J14RnmVWuw+5jRukwbptVnHNRYbhPiwhYv+RZTQ6nGuHGw@mail.gmail.com>
+ <2fc74a844eaff408c8e5aac563f31145682aeed2.camel@wdc.com> <CANo=J16sS6VCAy5Q4oXfOUYdvchpwAXPAeRU0OdJrTSA0zuJ0Q@mail.gmail.com>
+ <1bfc9e21ebc0591ae24bd0c67e3a4c1bde94dc81.camel@wdc.com>
+From: Tim Walker <tim.t.walker@seagate.com>
+Date: Wed, 18 Apr 2018 10:25:34 -0600
+Message-ID: <CANo=J1561DtaB=1iw-xXn+c-56Nh0iFzg_SvWEWuoxnaDk5GcA@mail.gmail.com>
+Subject: Re: Multi-Actuator SAS HDD First Look
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "dgilbert@interlog.com" <dgilbert@interlog.com>,
+        "hare@suse.de" <hare@suse.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The bug exists in the memcmp in which the length passed in must
-be guaranteed to be 1. This bug currently exists because
-the second pointer passed in, can be smaller than the
-cmd->data_length, which causes a fortify_panic.
+On Wed, Apr 18, 2018 at 10:20 AM, Bart Van Assche
+<Bart.VanAssche@wdc.com> wrote:
+> On Wed, 2018-04-18 at 05:16 -0600, Tim Walker wrote:
+>> It would be good if we could set up an informal meeting time and
+>> location at LSFMM to discuss these dual actuator topics. so far you,
+>> Doug, Hannes, and Christoph have expressed the most interest, plus
+>> Damien. Can we set an hour aside one afternoon?
+>
+> Hello Tim,
+>
+> Had you noticed that the official LSF/MM agenda mentions the following:
+> Tuesday, 11 - 11:30 AM: James Borden, Multi-actuator disk drives.
+>
+> Thanks,
+>
+> Bart.
+>
+>
+>
 
-The fix is to use memchr_inv instead to find whether or not
-a 0 exists instead of using memcmp. This way you dont have to
-worry about buffer overflow which is the reason for the
-fortify_panic.
+No, I hadn't checked that, yet. James probably won't be there. I guess
+that solves my problem. Thanks.
 
-The bug was found by running a block backstore via LIO.
-
-[  496.212958] Call Trace:
-[  496.212960] [c0000007e58e3800] [c000000000cbbefc] fortify_panic+0x24/0x38 (unreliable)
-[  496.212965] [c0000007e58e3860] [d00000000f150c28] iblock_execute_write_same+0x3b8/0x3c0 [target_core_iblock]
-[  496.212976] [c0000007e58e3910] [d000000006c737d4] __target_execute_cmd+0x54/0x150 [target_core_mod]
-[  496.212982] [c0000007e58e3940] [d000000006d32ce4] ibmvscsis_write_pending+0x74/0xe0 [ibmvscsis]
-[  496.212991] [c0000007e58e39b0] [d000000006c74fc8] transport_generic_new_cmd+0x318/0x370 [target_core_mod]
-[  496.213001] [c0000007e58e3a30] [d000000006c75084] transport_handle_cdb_direct+0x64/0xd0 [target_core_mod]
-[  496.213011] [c0000007e58e3aa0] [d000000006c75298] target_submit_cmd_map_sgls+0x1a8/0x320 [target_core_mod]
-[  496.213021] [c0000007e58e3b30] [d000000006c75458] target_submit_cmd+0x48/0x60 [target_core_mod]
-[  496.213026] [c0000007e58e3bd0] [d000000006d34c20] ibmvscsis_scheduler+0x370/0x600 [ibmvscsis]
-[  496.213031] [c0000007e58e3c90] [c00000000013135c] process_one_work+0x1ec/0x580
-[  496.213035] [c0000007e58e3d20] [c000000000131798] worker_thread+0xa8/0x600
-[  496.213039] [c0000007e58e3dc0] [c00000000013a468] kthread+0x168/0x1b0
-[  496.213044] [c0000007e58e3e30] [c00000000000b528] ret_from_kernel_thread+0x5c/0xb4
-
-Fixes: 2237498f0b5c ("target/iblock: Convert WRITE_SAME to blkdev_issue_zeroout")
-Signed-off-by: Bryant G. Ly <bryantly@linux.vnet.ibm.com>
-Reviewed-by: Steven Royer <seroyer@linux.vnet.ibm.com>
-Tested-by: Taylor Jakobson <tjakobs@us.ibm.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Nicholas Bellinger <nab@linux-iscsi.org>
-Cc: <stable@vger.kernel.org>
----
- drivers/target/target_core_iblock.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
-index 07c814c..6042901 100644
---- a/drivers/target/target_core_iblock.c
-+++ b/drivers/target/target_core_iblock.c
-@@ -427,8 +427,8 @@ iblock_execute_zero_out(struct block_device *bdev, struct se_cmd *cmd)
- {
- 	struct se_device *dev = cmd->se_dev;
- 	struct scatterlist *sg = &cmd->t_data_sg[0];
--	unsigned char *buf, zero = 0x00, *p = &zero;
--	int rc, ret;
-+	unsigned char *buf, *not_zero;
-+	int ret;
- 
- 	buf = kmap(sg_page(sg)) + sg->offset;
- 	if (!buf)
-@@ -437,10 +437,10 @@ iblock_execute_zero_out(struct block_device *bdev, struct se_cmd *cmd)
- 	 * Fall back to block_execute_write_same() slow-path if
- 	 * incoming WRITE_SAME payload does not contain zeros.
- 	 */
--	rc = memcmp(buf, p, cmd->data_length);
-+	not_zero = memchr_inv(buf, 0x00, cmd->data_length);
- 	kunmap(sg_page(sg));
- 
--	if (rc)
-+	if (not_zero)
- 		return TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
- 
- 	ret = blkdev_issue_zeroout(bdev,
 -- 
-2.7.2
+Tim Walker
+Product Design Systems Engineering, Seagate Technology
+(303) 775-3770
