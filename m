@@ -1,199 +1,69 @@
-Return-Path: <beanhuo@micron.com>
-From: "Bean Huo (beanhuo)" <beanhuo@micron.com>
-To: Steven Rostedt <rostedt@goodmis.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-dm3nam03on0089.outbound.protection.outlook.com ([104.47.41.89]:47872
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752027AbeDRMIv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Apr 2018 08:08:51 -0400
+From: Javier Gonzalez <javier@cnexlabs.com>
+To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
 CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "mingo@redhad.com" <mingo@redhad.com>,
-        "Bart.VanAssche@sandisk.com"
-	<Bart.VanAssche@sandisk.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "Bean Huo (beanhuo)" <beanhuo@micron.com>,
-        "rajatja@google.com" <rajatja@google.com>
-Subject: [RESEND PATCH v1 2/2] trace: events: block: Add tag in block trace
- events
-Date: Mon, 16 Apr 2018 14:33:29 +0000
-Message-ID: <64d6073b28b140cda3e5870a54e0a7bc@SIWEX5A.sing.micron.com>
-Content-Type: text/plain; charset="us-ascii"
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 07/11] lightnvm: pblk: remove unnecessary indirection
+Date: Wed, 18 Apr 2018 12:08:47 +0000
+Message-ID: <B2B2C448-938C-49FD-ADA6-D35C8E9F66F1@cnexlabs.com>
+References: <1523874332-6272-1-git-send-email-javier@cnexlabs.com>
+ <1523874332-6272-8-git-send-email-javier@cnexlabs.com>
+ <62002f4f-bfca-03be-c54f-23b15223446b@lightnvm.io>
+In-Reply-To: <62002f4f-bfca-03be-c54f-23b15223446b@lightnvm.io>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_457CFC07-E92E-4168-9173-8AEE28253AF5";
+        protocol="application/pgp-signature"; micalg=pgp-sha512
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Print the request tag along with other information in block trace events
-when tracing request , and unplug type (Sync / Async).
+--Apple-Mail=_457CFC07-E92E-4168-9173-8AEE28253AF5
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-Signed-off-by: Bean Huo <beanhuo@micron.com>
----
- include/trace/events/block.h | 36 +++++++++++++++++++++++++-----------
- 1 file changed, 25 insertions(+), 11 deletions(-)
+> On 17 Apr 2018, at 05.11, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
+>=20
+> On 4/16/18 12:25 PM, Javier Gonz=C3=A1lez wrote:
+>> Remove unnecessary indirection on the read path.
+>=20
+> Title and description are the same. Can you elaborate what changed
+> since pblk_submit_io now directly can be returned, and doesn't have
+> its return value rewritten to NVM_IO_ERR?
+>=20
 
-diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index 81b43f5..f8c0b9e 100644
---- a/include/trace/events/block.h
-+++ b/include/trace/events/block.h
-@@ -81,6 +81,7 @@ TRACE_EVENT(block_rq_requeue,
- 		__field(  dev_t,	dev			)
- 		__field(  sector_t,	sector			)
- 		__field(  unsigned int,	nr_sector		)
-+		__field(  int,		tag			)
- 		__array(  char,		rwbs,	RWBS_LEN	)
- 		__dynamic_array( char,	cmd,	1		)
- 	),
-@@ -89,16 +90,17 @@ TRACE_EVENT(block_rq_requeue,
- 		__entry->dev	   =3D rq->rq_disk ? disk_devt(rq->rq_disk) : 0;
- 		__entry->sector    =3D blk_rq_trace_sector(rq);
- 		__entry->nr_sector =3D blk_rq_trace_nr_sectors(rq);
-+		__entry->tag	   =3D rq->tag;
-=20
- 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags, blk_rq_bytes(rq));
- 		__get_str(cmd)[0] =3D '\0';
- 	),
-=20
--	TP_printk("%d,%d %s (%s) %llu + %u [%d]",
-+	TP_printk("%d,%d %s (%s) %llu + %u tag=3D%d [%d]",
- 		  MAJOR(__entry->dev), MINOR(__entry->dev),
- 		  __entry->rwbs, __get_str(cmd),
- 		  (unsigned long long)__entry->sector,
--		  __entry->nr_sector, 0)
-+		  __entry->nr_sector, __entry->tag, 0)
- );
-=20
- /**
-@@ -124,6 +126,7 @@ TRACE_EVENT(block_rq_complete,
- 		__field(  sector_t,	sector			)
- 		__field(  unsigned int,	nr_sector		)
- 		__field(  int,		error			)
-+		__field(  int,		tag			)
- 		__array(  char,		rwbs,	RWBS_LEN	)
- 		__dynamic_array( char,	cmd,	1		)
- 	),
-@@ -133,16 +136,17 @@ TRACE_EVENT(block_rq_complete,
- 		__entry->sector    =3D blk_rq_pos(rq);
- 		__entry->nr_sector =3D nr_bytes >> 9;
- 		__entry->error     =3D error;
-+		__entry->tag	   =3D rq->tag;
-=20
- 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags, nr_bytes);
- 		__get_str(cmd)[0] =3D '\0';
- 	),
-=20
--	TP_printk("%d,%d %s (%s) %llu + %u [%d]",
-+	TP_printk("%d,%d %s (%s) %llu + %u tag=3D%d [%d]",
- 		  MAJOR(__entry->dev), MINOR(__entry->dev),
- 		  __entry->rwbs, __get_str(cmd),
- 		  (unsigned long long)__entry->sector,
--		  __entry->nr_sector, __entry->error)
-+		  __entry->nr_sector, __entry->tag, __entry->error)
- );
-=20
- DECLARE_EVENT_CLASS(block_rq,
-@@ -156,6 +160,7 @@ DECLARE_EVENT_CLASS(block_rq,
- 		__field(  sector_t,	sector			)
- 		__field(  unsigned int,	nr_sector		)
- 		__field(  unsigned int,	bytes			)
-+		__field(  int,		tag			)
- 		__array(  char,		rwbs,	RWBS_LEN	)
- 		__array(  char,         comm,   TASK_COMM_LEN   )
- 		__dynamic_array( char,	cmd,	1		)
-@@ -166,17 +171,18 @@ DECLARE_EVENT_CLASS(block_rq,
- 		__entry->sector    =3D blk_rq_trace_sector(rq);
- 		__entry->nr_sector =3D blk_rq_trace_nr_sectors(rq);
- 		__entry->bytes     =3D blk_rq_bytes(rq);
-+		__entry->tag	   =3D rq->tag;
-=20
- 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags, blk_rq_bytes(rq));
- 		__get_str(cmd)[0] =3D '\0';
- 		memcpy(__entry->comm, current->comm, TASK_COMM_LEN);
- 	),
-=20
--	TP_printk("%d,%d %s %u (%s) %llu + %u [%s]",
-+	TP_printk("%d,%d %s %u (%s) %llu + %u tag=3D%d [%s]",
- 		  MAJOR(__entry->dev), MINOR(__entry->dev),
- 		  __entry->rwbs, __entry->bytes, __get_str(cmd),
- 		  (unsigned long long)__entry->sector,
--		  __entry->nr_sector, __entry->comm)
-+		  __entry->nr_sector, __entry->tag, __entry->comm)
- );
-=20
- /**
-@@ -297,6 +303,7 @@ DECLARE_EVENT_CLASS(block_bio_merge,
- 		__field( dev_t,		dev			)
- 		__field( sector_t,	sector			)
- 		__field( unsigned int,	nr_sector		)
-+		__field( int,		tag			)
- 		__array( char,		rwbs,	RWBS_LEN	)
- 		__array( char,		comm,	TASK_COMM_LEN	)
- 	),
-@@ -305,14 +312,15 @@ DECLARE_EVENT_CLASS(block_bio_merge,
- 		__entry->dev		=3D bio_dev(bio);
- 		__entry->sector		=3D bio->bi_iter.bi_sector;
- 		__entry->nr_sector	=3D bio_sectors(bio);
-+		__entry->tag		=3D rq->tag;
- 		blk_fill_rwbs(__entry->rwbs, bio->bi_opf, bio->bi_iter.bi_size);
- 		memcpy(__entry->comm, current->comm, TASK_COMM_LEN);
- 	),
-=20
--	TP_printk("%d,%d %s %llu + %u [%s]",
-+	TP_printk("%d,%d %s %llu + %u tag=3D%d [%s]",
- 		  MAJOR(__entry->dev), MINOR(__entry->dev), __entry->rwbs,
- 		  (unsigned long long)__entry->sector,
--		  __entry->nr_sector, __entry->comm)
-+		  __entry->nr_sector, __entry->tag, __entry->comm)
- );
-=20
- /**
-@@ -478,15 +486,18 @@ DECLARE_EVENT_CLASS(block_unplug,
-=20
- 	TP_STRUCT__entry(
- 		__field( int,		nr_rq			)
-+		__field( bool,		explicit		)
- 		__array( char,		comm,	TASK_COMM_LEN	)
- 	),
-=20
- 	TP_fast_assign(
- 		__entry->nr_rq =3D depth;
-+		__entry->explicit =3D explicit;
- 		memcpy(__entry->comm, current->comm, TASK_COMM_LEN);
- 	),
-=20
--	TP_printk("[%s] %d", __entry->comm, __entry->nr_rq)
-+	TP_printk("[%s] %d %s", __entry->comm, __entry->nr_rq,
-+		   __entry->explicit ? "Sync" : "Async")
- );
-=20
- /**
-@@ -611,6 +622,7 @@ TRACE_EVENT(block_rq_remap,
- 		__field( dev_t,		dev		)
- 		__field( sector_t,	sector		)
- 		__field( unsigned int,	nr_sector	)
-+		__field( int,		tag		)
- 		__field( dev_t,		old_dev		)
- 		__field( sector_t,	old_sector	)
- 		__field( unsigned int,	nr_bios		)
-@@ -621,18 +633,20 @@ TRACE_EVENT(block_rq_remap,
- 		__entry->dev		=3D disk_devt(rq->rq_disk);
- 		__entry->sector		=3D blk_rq_pos(rq);
- 		__entry->nr_sector	=3D blk_rq_sectors(rq);
-+		__entry->tag		=3D rq->tag;
- 		__entry->old_dev	=3D dev;
- 		__entry->old_sector	=3D from;
- 		__entry->nr_bios	=3D blk_rq_count_bios(rq);
- 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags, blk_rq_bytes(rq));
- 	),
-=20
--	TP_printk("%d,%d %s %llu + %u <- (%d,%d) %llu %u",
-+	TP_printk("%d,%d %s %llu + %u <- (%d,%d) %llu %u, tag=3D%d",
- 		  MAJOR(__entry->dev), MINOR(__entry->dev), __entry->rwbs,
- 		  (unsigned long long)__entry->sector,
- 		  __entry->nr_sector,
- 		  MAJOR(__entry->old_dev), MINOR(__entry->old_dev),
--		  (unsigned long long)__entry->old_sector, __entry->nr_bios)
-+		  (unsigned long long)__entry->old_sector, __entry->nr_bios,
-+		  __entry->tag)
- );
-=20
- #endif /* _TRACE_BLOCK_H */
---=20
-2.7.4
+My bad - I assumed submit_io was giving NVM_ errors. I'll resend
+returning NVM_IO_ERR - the indirection is still unnecessary (and it's
+not used anywhere else in the code).
+
+Javier
+
+--Apple-Mail=_457CFC07-E92E-4168-9173-8AEE28253AF5
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="signature.asc"
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAlrXNU0ACgkQIX4xUKFR
+nnSKUA/+OTbeU+76Le3pvzM5zNIAsNhUY58fu9jPBVpYEbYgZX2C4ieY94K395az
+dKAlSYF8aJ4ZQRKvgctyjXDHBJAj10c98n8cbz/i01Is3pw5uNsQWD3lnsFPUffe
+Usrzt+mOXqkejATGDcpsYsL9vv9Hdjs8NweFsKDTkjc0SCEUnQBEy6Zd5QVyvYeB
+A2z8OHrOJJ3i8c5wuAjpTO9zYaX88ZkSVNZJidj7wLa0bWtIrwoolClJg76rLth+
+EHOa1mkvay5QhW/XeQa1sWbhcNuKl/L7X4wz9FXAphga92sFIYuWxT9Zdrm1qGGC
+Q4ZTlSH7AjECNOxiLB77TedIz7ahwOiu5wfW8dS5Mk4VyjK7lxgMuPU0PdkVz8Oy
+kJnIoqO/tyUFWXWfEGVj0CiQsN9sUaKHhz5hV4TtBP1S/DQH2bJVwUMrKX/goHuu
+rXGas1/caijA4L6T5NECH92PI9Y9aQoHRCnYsm7slxuJSyrTpkMTqHDUJIV6lAZb
+uyIBy+EqMrMTzpq+nLahZ9ZfKiudwi3Sp+4ouqypypCQhcrptA4n3gBvr/TmMxHa
+ZloIbdj+I+zSPeyBW4LHozwzwkE7Z663uBi7h4rwiQpTZ34DsavQS7BbH+zBVO0L
+MAz+xp32e6DOlksvQsc4aPl5f6vXnnQTMgOMnPLJUjbPKuxgHFA=
+=H3sQ
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_457CFC07-E92E-4168-9173-8AEE28253AF5--
