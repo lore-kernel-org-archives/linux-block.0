@@ -1,103 +1,33 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mxhk.zte.com.cn ([63.217.80.70]:38456 "EHLO mxhk.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752396AbeDLGik (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Apr 2018 02:38:40 -0400
-From: tang.junhui@zte.com.cn
-To: kent.overstreet@gmail.com, colyli@suse.de, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: [PATCH 4/4] bcache: fix I/O significant decline while backend devices registering
-Date: Thu, 12 Apr 2018 14:38:44 +0800
-Message-Id: <1523515124-2021-5-git-send-email-tang.junhui@zte.com.cn>
-In-Reply-To: <1523515124-2021-1-git-send-email-tang.junhui@zte.com.cn>
-References: <1523515124-2021-1-git-send-email-tang.junhui@zte.com.cn>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Dave Chinner <david@fromorbit.com>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        hch@lst.de, rdorr@microsoft.com
+Subject: [PATCH 0/4 V2] iomap: Use FUA for O_DSYNC DIO writes
+Date: Wed, 18 Apr 2018 14:08:24 +1000
+Message-Id: <20180418040828.18165-1-david@fromorbit.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+Hi folks,
 
-I attached several backend devices in the same cache set, and produced lots
-of dirty data by running small rand I/O writes in a long time, then I
-continue run I/O in the others cached devices, and stopped a cached device,
-after a mean while, I register the stopped device again, I see the running
-I/O in the others cached devices dropped significantly, sometimes even
-jumps to zero.
+This is the latest version of the "use FUA for DIO writes" patchset
+that was last posted here:
 
-In currently code, bcache would traverse each keys and btree node to count
-the dirty data under read locker, and the writes threads can not get the
-btree write locker, and when there is a lot of keys and btree node in the
-registering device, it would last several seconds, so the write I/Os in
-others cached device are blocked and declined significantly.
+https://marc.info/?l=linux-xfs&m=152213446528167&w=2
 
-In this patch, when a device registering to a ache set, which exist others
-cached devices with running I/Os, we get the amount of dirty data of the
-device in an incremental way, and do not block other cached devices all the
-time.
+Functionality and performance is the same as the previous version.
+Changes in this version address Christoph's review comments.
 
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/writeback.c | 26 +++++++++++++++++++++++++-
- 1 file changed, 25 insertions(+), 1 deletion(-)
+Version 2:
+- Fixed comment typos in first patch
+- simplified iomap_dio_complete_work()
+- changed IOMAP_DIO_WRITE_SYNC to IOMAP_DIO_NEED_SYNC
+- split blk_queue_fua() into it's own patch
+- fixed formatting issue in last patch
+- update bio->io_opf directly rather than use bio_set_op_attrs()
+- Updated comment to mention we try to use FUA optimistically.
 
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 56a3788..2467d3a 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -488,10 +488,14 @@ static int bch_writeback_thread(void *arg)
- }
- 
- /* Init */
-+#define INIT_KEYS_MIN			500000
-+#define INIT_KEYS_SLEEP_TIME		100
- 
- struct sectors_dirty_init {
- 	struct btree_op	op;
- 	unsigned	inode;
-+	size_t		count;
-+	struct bkey	start;
- };
- 
- static int sectors_dirty_init_fn(struct btree_op *_op, struct btree *b,
-@@ -506,18 +510,38 @@ static int sectors_dirty_init_fn(struct btree_op *_op, struct btree *b,
- 		bcache_dev_sectors_dirty_add(b->c, KEY_INODE(k),
- 					     KEY_START(k), KEY_SIZE(k));
- 
-+	op->count++;
-+	if (atomic_read(&b->c->io_inflight) &&
-+	   !(op->count % INIT_KEYS_MIN)) {
-+		bkey_copy_key(&op->start, k);
-+		return -EAGAIN;
-+	}
-+
- 	return MAP_CONTINUE;
- }
- 
- void bch_sectors_dirty_init(struct bcache_device *d)
- {
- 	struct sectors_dirty_init op;
-+	int ret;
- 
- 	bch_btree_op_init(&op.op, -1);
- 	op.inode = d->id;
-+	op.count = 0;
-+	op.start = KEY(op.inode, 0, 0);
- 
--	bch_btree_map_keys(&op.op, d->c, &KEY(op.inode, 0, 0),
-+	do {
-+		ret = bch_btree_map_keys(&op.op, d->c, &op.start,
- 			   sectors_dirty_init_fn, 0);
-+		if (ret == -EAGAIN)
-+			schedule_timeout_interruptible(
-+				msecs_to_jiffies(INIT_KEYS_SLEEP_TIME));
-+		else if (ret < 0) {
-+			pr_warn("sectors dirty init failed, ret=%d!", ret);
-+			break;
-+		}
-+	} while (ret == -EAGAIN);
-+
- }
- 
- void bch_cached_dev_writeback_init(struct cached_dev *dc)
--- 
-1.8.3.1
+Cheers,
+
+Dave.
