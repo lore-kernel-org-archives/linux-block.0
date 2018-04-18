@@ -1,98 +1,53 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f67.google.com ([209.85.160.67]:34740 "EHLO
-        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750962AbeDFQ5M (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Apr 2018 12:57:12 -0400
-Received: by mail-pl0-f67.google.com with SMTP id y12-v6so882369plt.1
-        for <linux-block@vger.kernel.org>; Fri, 06 Apr 2018 09:57:12 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        Dmitry Vyukov <dvyukov@google.com>
-Subject: [PATCH] loop: fix LOOP_GET_STATUS lock imbalance
-Date: Fri,  6 Apr 2018 09:57:03 -0700
-Message-Id: <6bee3eddc24ef5525ca12efb023e66b2503cb178.1523033157.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <geert.uytterhoeven@gmail.com>
+MIME-Version: 1.0
+Sender: geert.uytterhoeven@gmail.com
+In-Reply-To: <ed5a2015ecd360746ab52e8d3f5e8b6f5e1568fa.1523493475.git.fthain@telegraphics.com.au>
+References: <cover.1523493475.git.fthain@telegraphics.com.au> <ed5a2015ecd360746ab52e8d3f5e8b6f5e1568fa.1523493475.git.fthain@telegraphics.com.au>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 18 Apr 2018 10:08:27 +0200
+Message-ID: <CAMuHMdUHFdjk-XMRDn7rx6iDjJYaxYDGAwfn8u-zKiBdCX+Jww@mail.gmail.com>
+Subject: Re: [PATCH v2 02/10] m68k/mac: Fix SWIM memory resource end address
+To: Finn Thain <fthain@telegraphics.com.au>
+Cc: Jens Axboe <axboe@kernel.dk>, Laurent Vivier <lvivier@redhat.com>,
+	linux-m68k <linux-m68k@lists.linux-m68k.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
+	stable <stable@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+Hi Finn,
 
-Commit 2d1d4c1e591f made loop_get_status() drop lo_ctx_mutex before
-returning, but the loop_get_status_old(), loop_get_status64(), and
-loop_get_status_compat() wrappers don't call loop_get_status() if the
-passed argument is NULL. The callers expect that the lock is dropped, so
-make sure we drop it in that case, too.
+On Thu, Apr 12, 2018 at 2:50 AM, Finn Thain <fthain@telegraphics.com.au> wrote:
+> The resource size is 0x2000 == end - start + 1.
+> Therefore end == start + 0x2000 - 1.
+>
+> Cc: Laurent Vivier <lvivier@redhat.com>
+> Cc: stable@vger.kernel.org # v4.14+
+> Tested-by: Stan Johnson <userm57@yahoo.com>
+> Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
+> Acked-by: Laurent Vivier <lvivier@redhat.com>
+> Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-Reported-by: syzbot+31e8daa8b3fc129e75f2@syzkaller.appspotmail.com
-Fixes: 2d1d4c1e591f ("loop: don't call into filesystem while holding lo_ctl_mutex")
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
-Based on Linus' tree.
+Thanks, applied and queued for v4.18.
 
- drivers/block/loop.c | 33 ++++++++++++++++++---------------
- 1 file changed, 18 insertions(+), 15 deletions(-)
+> --- a/arch/m68k/mac/config.c
+> +++ b/arch/m68k/mac/config.c
+> @@ -1011,7 +1011,7 @@ int __init mac_platform_init(void)
+>                 struct resource swim_rsrc = {
+>                         .flags = IORESOURCE_MEM,
+>                         .start = (resource_size_t)swim_base,
+> -                       .end   = (resource_size_t)swim_base + 0x2000,
+> +                       .end   = (resource_size_t)swim_base + 0x1FFF,
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 264abaaff662..9b476fd2bc41 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1283,12 +1283,13 @@ static int
- loop_get_status_old(struct loop_device *lo, struct loop_info __user *arg) {
- 	struct loop_info info;
- 	struct loop_info64 info64;
--	int err = 0;
-+	int err;
- 
--	if (!arg)
--		err = -EINVAL;
--	if (!err)
--		err = loop_get_status(lo, &info64);
-+	if (!arg) {
-+		mutex_unlock(&lo->lo_ctl_mutex);
-+		return -EINVAL;
-+	}
-+	err = loop_get_status(lo, &info64);
- 	if (!err)
- 		err = loop_info64_to_old(&info64, &info);
- 	if (!err && copy_to_user(arg, &info, sizeof(info)))
-@@ -1300,12 +1301,13 @@ loop_get_status_old(struct loop_device *lo, struct loop_info __user *arg) {
- static int
- loop_get_status64(struct loop_device *lo, struct loop_info64 __user *arg) {
- 	struct loop_info64 info64;
--	int err = 0;
-+	int err;
- 
--	if (!arg)
--		err = -EINVAL;
--	if (!err)
--		err = loop_get_status(lo, &info64);
-+	if (!arg) {
-+		mutex_unlock(&lo->lo_ctl_mutex);
-+		return -EINVAL;
-+	}
-+	err = loop_get_status(lo, &info64);
- 	if (!err && copy_to_user(arg, &info64, sizeof(info64)))
- 		err = -EFAULT;
- 
-@@ -1529,12 +1531,13 @@ loop_get_status_compat(struct loop_device *lo,
- 		       struct compat_loop_info __user *arg)
- {
- 	struct loop_info64 info64;
--	int err = 0;
-+	int err;
- 
--	if (!arg)
--		err = -EINVAL;
--	if (!err)
--		err = loop_get_status(lo, &info64);
-+	if (!arg) {
-+		mutex_unlock(&lo->lo_ctl_mutex);
-+		return -EINVAL;
-+	}
-+	err = loop_get_status(lo, &info64);
- 	if (!err)
- 		err = loop_info64_to_compat(&info64, arg);
- 	return err;
+BTW, probably you want to change swim_base from u8 * to phys_addr_t, one day.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
 -- 
-2.17.0
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
