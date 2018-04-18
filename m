@@ -1,44 +1,127 @@
-Return-Path: <fthain@telegraphics.com.au>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Jens Axboe <axboe@kernel.dk>,
-    Laurent Vivier <lvivier@redhat.com>,
-    linux-m68k@lists.linux-m68k.org,
-    linux-kernel@vger.kernel.org,
-    linux-block@vger.kernel.org,
-    stable@vger.kernel.org
-Message-Id: <ed5a2015ecd360746ab52e8d3f5e8b6f5e1568fa.1523493475.git.fthain@telegraphics.com.au>
-In-Reply-To: <cover.1523493475.git.fthain@telegraphics.com.au>
-References: <cover.1523493475.git.fthain@telegraphics.com.au>
-From: Finn Thain <fthain@telegraphics.com.au>
-Subject: [PATCH v2 02/10] m68k/mac: Fix SWIM memory resource end address
-Date: Wed, 11 Apr 2018 20:50:14 -0400 (EDT)
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Dave Chinner <david@fromorbit.com>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        hch@lst.de, rdorr@microsoft.com
+Subject: [PATCH 1/4] xfs: move generic_write_sync calls inwards
+Date: Wed, 18 Apr 2018 14:08:25 +1000
+Message-Id: <20180418040828.18165-2-david@fromorbit.com>
+In-Reply-To: <20180418040828.18165-1-david@fromorbit.com>
+References: <20180418040828.18165-1-david@fromorbit.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-The resource size is 0x2000 == end - start + 1.
-Therefore end == start + 0x2000 - 1.
+From: Dave Chinner <dchinner@redhat.com>
 
-Cc: Laurent Vivier <lvivier@redhat.com>
-Cc: stable@vger.kernel.org # v4.14+
-Tested-by: Stan Johnson <userm57@yahoo.com>
-Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
-Acked-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+To prepare for iomap iinfrastructure based DSYNC optimisations.
+
+While moving the code araound, move the XFS write bytes metric
+update for direct IO into xfs_dio_write_end_io callback so that we
+always capture the amount of data written via AIO+DIO. This fixes
+the problem where queued AIO+DIO writes are not accounted to this
+metric.
+
+Signed-Off-By: Dave Chinner <dchinner@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- arch/m68k/mac/config.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/xfs/xfs_file.c | 48 +++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 33 insertions(+), 15 deletions(-)
 
-diff --git a/arch/m68k/mac/config.c b/arch/m68k/mac/config.c
-index 84bd9161bf23..4a544a6c72dd 100644
---- a/arch/m68k/mac/config.c
-+++ b/arch/m68k/mac/config.c
-@@ -1011,7 +1011,7 @@ int __init mac_platform_init(void)
- 		struct resource swim_rsrc = {
- 			.flags = IORESOURCE_MEM,
- 			.start = (resource_size_t)swim_base,
--			.end   = (resource_size_t)swim_base + 0x2000,
-+			.end   = (resource_size_t)swim_base + 0x1FFF,
- 		};
+diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+index a5b6973bf15a..6f15027661b6 100644
+--- a/fs/xfs/xfs_file.c
++++ b/fs/xfs/xfs_file.c
+@@ -416,6 +416,12 @@ xfs_dio_write_end_io(
+ 	if (size <= 0)
+ 		return size;
  
- 		platform_device_register_simple("swim", -1, &swim_rsrc, 1);
++	/*
++	 * Capture amount written on completion as we can't reliably account
++	 * for it on submission.
++	 */
++	XFS_STATS_ADD(ip->i_mount, xs_write_bytes, size);
++
+ 	if (flags & IOMAP_DIO_COW) {
+ 		error = xfs_reflink_end_cow(ip, offset, size);
+ 		if (error)
+@@ -564,6 +570,11 @@ xfs_file_dio_aio_write(
+ 	 * complete fully or fail.
+ 	 */
+ 	ASSERT(ret < 0 || ret == count);
++
++	if (ret > 0) {
++		/* Handle various SYNC-type writes */
++		ret = generic_write_sync(iocb, ret);
++	}
+ 	return ret;
+ }
+ 
+@@ -601,7 +612,16 @@ xfs_file_dax_write(
+ 	}
+ out:
+ 	xfs_iunlock(ip, iolock);
+-	return error ? error : ret;
++	if (error)
++		return error;
++
++	if (ret > 0) {
++		XFS_STATS_ADD(ip->i_mount, xs_write_bytes, ret);
++
++		/* Handle various SYNC-type writes */
++		ret = generic_write_sync(iocb, ret);
++	}
++	return ret;
+ }
+ 
+ STATIC ssize_t
+@@ -671,6 +691,12 @@ xfs_file_buffered_aio_write(
+ out:
+ 	if (iolock)
+ 		xfs_iunlock(ip, iolock);
++
++	if (ret > 0) {
++		XFS_STATS_ADD(ip->i_mount, xs_write_bytes, ret);
++		/* Handle various SYNC-type writes */
++		ret = generic_write_sync(iocb, ret);
++	}
+ 	return ret;
+ }
+ 
+@@ -695,8 +721,9 @@ xfs_file_write_iter(
+ 		return -EIO;
+ 
+ 	if (IS_DAX(inode))
+-		ret = xfs_file_dax_write(iocb, from);
+-	else if (iocb->ki_flags & IOCB_DIRECT) {
++		return xfs_file_dax_write(iocb, from);
++
++	if (iocb->ki_flags & IOCB_DIRECT) {
+ 		/*
+ 		 * Allow a directio write to fall back to a buffered
+ 		 * write *only* in the case that we're doing a reflink
+@@ -704,20 +731,11 @@ xfs_file_write_iter(
+ 		 * allow an operation to fall back to buffered mode.
+ 		 */
+ 		ret = xfs_file_dio_aio_write(iocb, from);
+-		if (ret == -EREMCHG)
+-			goto buffered;
+-	} else {
+-buffered:
+-		ret = xfs_file_buffered_aio_write(iocb, from);
++		if (ret != -EREMCHG)
++			return ret;
+ 	}
+ 
+-	if (ret > 0) {
+-		XFS_STATS_ADD(ip->i_mount, xs_write_bytes, ret);
+-
+-		/* Handle various SYNC-type writes */
+-		ret = generic_write_sync(iocb, ret);
+-	}
+-	return ret;
++	return xfs_file_buffered_aio_write(iocb, from);
+ }
+ 
+ #define	XFS_FALLOC_FL_SUPPORTED						\
 -- 
 2.16.1
