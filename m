@@ -1,67 +1,24 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] blk-mq: start request gstate with gen 1
-Date: Tue, 17 Apr 2018 11:44:43 +0800
-Message-Id: <1523936683-1522-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 3/4] blk: add blk_queue_fua() helper function
+To: Dave Chinner <david@fromorbit.com>, linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, hch@lst.de,
+ rdorr@microsoft.com
+References: <20180418040828.18165-1-david@fromorbit.com>
+ <20180418040828.18165-4-david@fromorbit.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <7f399e07-b0e6-4f6e-9d3c-2eeac3d070ec@kernel.dk>
+Date: Wed, 18 Apr 2018 08:23:40 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180418040828.18165-4-david@fromorbit.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-rq->gstate and rq->aborted_gstate both are zero before rqs are
-allocated. If we have a small timeout, when the timer fires,
-there could be rqs that are never allocated, and also there could
-be rq that has been allocated but not initialized and started. At
-the moment, the rq->gstate and rq->aborted_gstate both are 0, thus
-the blk_mq_terminate_expired will identify the rq is timed out and
-invoke .timeout early.
+On 4/17/18 10:08 PM, Dave Chinner wrote:
+> From: Dave Chinner <dchinner@redhat.com>
+> 
+> So we can check FUA support status from the iomap direct IO code.
 
-For scsi, this will cause scsi_times_out to be invoked before the
-scsi_cmnd is not initialized, scsi_cmnd->device is still NULL at
-the moment, then we will get crash.
+Applied, thanks.
 
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Martin Steigerwald <Martin@Lichtvoll.de>
-Cc: stable@vger.kernel.org
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
----
- block/blk-core.c | 4 ++++
- block/blk-mq.c   | 7 +++++++
- 2 files changed, 11 insertions(+)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index abcb868..ce62681 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -201,6 +201,10 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
- 	rq->part = NULL;
- 	seqcount_init(&rq->gstate_seq);
- 	u64_stats_init(&rq->aborted_gstate_sync);
-+	/*
-+	 * See comment of blk_mq_init_request
-+	 */
-+	WRITE_ONCE(rq->gstate, MQ_RQ_GEN_INC);
- }
- EXPORT_SYMBOL(blk_rq_init);
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f5c7dbc..d62030a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2069,6 +2069,13 @@ static int blk_mq_init_request(struct blk_mq_tag_set *set, struct request *rq,
- 
- 	seqcount_init(&rq->gstate_seq);
- 	u64_stats_init(&rq->aborted_gstate_sync);
-+	/*
-+	 * start gstate with gen 1 instead of 0, otherwise it will be equal
-+	 * to aborted_gstate, and be identified timed out by
-+	 * blk_mq_terminate_expired.
-+	 */
-+	WRITE_ONCE(rq->gstate, MQ_RQ_GEN_INC);
-+
- 	return 0;
- }
- 
 -- 
-2.7.4
+Jens Axboe
