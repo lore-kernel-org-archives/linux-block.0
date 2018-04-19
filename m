@@ -1,64 +1,51 @@
-Return-Path: <prvs=6414f13c5=staskins@amazon.de>
-Subject: [PATCH 0/3] Introduce Xen fault injection facility
-From: Stanislav Kinsburskii <staskins@amazon.com>
-CC: <jakub.kicinski@netronome.com>, <hpa@zytor.com>, <mcroce@redhat.com>,
-        <staskins@amazon.com>, <tglx@linutronix.de>, <ggarcia@abra.uab.cat>,
-        <daniel@iogearbox.net>, <x86@kernel.org>, <mingo@redhat.com>,
-        <xen-devel@lists.xenproject.org>, <axboe@kernel.dk>,
-        <konrad.wilk@oracle.com>, <amir.jer.levy@intel.com>,
-        <paul.durrant@citrix.com>, <stefanha@redhat.com>,
-        <dsa@cumulusnetworks.com>, <boris.ostrovsky@oracle.com>,
-        <jgross@suse.com>, <linux-block@vger.kernel.org>,
-        <wei.liu2@citrix.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <davem@davemloft.net>,
-        <dwmw@amazon.co.uk>, <roger.pau@citrix.com>
-Date: Fri, 20 Apr 2018 10:47:20 +0000
-Message-ID: <20180420104603.17823.31095.stgit@dev-dsk-staskins-1a-ca5afbf2.eu-west-1.amazon.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:43503 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753944AbeDSQkK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 19 Apr 2018 12:40:10 -0400
+Received: by mail-lf0-f68.google.com with SMTP id v207-v6so1079218lfa.10
+        for <linux-block@vger.kernel.org>; Thu, 19 Apr 2018 09:40:10 -0700 (PDT)
+From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
+To: Matias Bjorling <mb@lightnvm.io>
+Cc: linux-block@vger.kernel.org, Javier Gonzales <javier@cnexlabs.com>,
+        linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>
+Subject: [PATCH 0/3] Rework write error handling in pblk
+Date: Thu, 19 Apr 2018 18:39:21 +0200
+Message-Id: <1524155964-3743-1-git-send-email-hans.ml.holmberg@owltronix.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-VGhpcyBzZXJpZXMgYWRkcyBhIGZhY2lsaXR5LCB3aGljaCBjYW4gYmUgdXNlZCB0byBpbnN0cnVt
-ZW50IFhlbiBjb2RlIHdpdGgKZmF1bHQgaW5qZWN0aW9ucy4KSXQgaXMgYmFzZWQgIkZhdWx0IGlu
-amVjdGlvbiBjYXBhYmlsaXRpZXMgaW5mcmFzdHJ1Y3R1cmUiIGRlc2NyaWJlZCBoZXJlOgotIERv
-Y3VtZW50YXRpb24vZmF1bHQtaW5qZWN0aW9uL2ZhdWx0LWluamVjdGlvbi50eHQKCkZpcnN0IHBh
-dGNoIGFkZHMgYSBnZW5lcmljIGZhY2lsaXR5IHRvIHVzZSBhbnl3aGVyZSBpbiBYZW4uCldoZW4g
-dXNpbmcgaXQgYWxsIHRoZSBmYXVsdCBpbmplY3Rpb24gdXNlciBsYW5kIGNvbnRyb2wgZGlyZWN0
-b3JpZXMgKGlmCmFueSkgd2lsbCBhcHBlYXIgaGVyZToKLSAvc3lzL2tlcm5lbC9kZWJ1Zy94ZW4v
-ZmF1bHRfaW5qZWN0LwoKVG8gZGlzdGluZ3Vpc2ggd2l0aCBnZW5lcmljIChvciBjb3JlKSBYZW4g
-ZmF1bHQgaW5qZWN0aW9ucywgbmV4dCB0d28KcGF0Y2hlcyBhZGQgYWRkaXRpb25hbCBkaXJlY3Rv
-cmllcyB0byB0aGUgcm9vdCBwYXRoIGFib3ZlIGZvciBibGtiYWNrIGFuZApuZXRiYWNrIGRyaXZl
-cnMgcmVzcGVjdGl2ZWx5OgotIC9zeXMva2VybmVsL2RlYnVnL3hlbi9mYXVsdF9pbmplY3QveGVu
-LWJsa2JhY2svCi0gL3N5cy9rZXJuZWwvZGVidWcveGVuL2ZhdWx0X2luamVjdC94ZW4tbmV0YmFj
-ay8KCi0tLQoKU3RhbmlzbGF2IEtpbnNidXJza2lpICgzKToKICAgICAgeGVuOiBhZGQgZ2VuZXJp
-YyBmYXVsdCBpbmplY3Rpb24gZmFjaWxpdHkKICAgICAgeGVuIG5ldGJhY2s6IGFkZCBmYXVsdCBp
-bmplY3Rpb24gZmFjaWxpdHkKICAgICAgeGVuIGJsa2JhY2s6IGFkZCBmYXVsdCBpbmplY3Rpb24g
-ZmFjaWxpdHkKCgogYXJjaC94ODYveGVuL0tjb25maWcgICAgICAgICAgICAgICAgICAgfCAgICA3
-ICsrCiBhcmNoL3g4Ni94ZW4vTWFrZWZpbGUgICAgICAgICAgICAgICAgICB8ICAgIDEgCiBhcmNo
-L3g4Ni94ZW4vZmF1bHRfaW5qZWN0LmMgICAgICAgICAgICB8ICAxMDkgKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysKIGRyaXZlcnMvYmxvY2svS2NvbmZpZyAgICAgICAgICAgICAgICAgIHwg
-ICAgNyArKwogZHJpdmVycy9ibG9jay94ZW4tYmxrYmFjay9NYWtlZmlsZSAgICAgfCAgICAxIAog
-ZHJpdmVycy9ibG9jay94ZW4tYmxrYmFjay9ibGtiYWNrLmMgICAgfCAgICA5ICsrCiBkcml2ZXJz
-L2Jsb2NrL3hlbi1ibGtiYWNrL2Jsa2JhY2tfZmkuYyB8ICAxMTYgKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKwogZHJpdmVycy9ibG9jay94ZW4tYmxrYmFjay9ibGtiYWNrX2ZpLmggfCAg
-IDM3ICsrKysrKysrKysKIGRyaXZlcnMvYmxvY2sveGVuLWJsa2JhY2svY29tbW9uLmggICAgIHwg
-ICAgMyArCiBkcml2ZXJzL2Jsb2NrL3hlbi1ibGtiYWNrL3hlbmJ1cy5jICAgICB8ICAgIDUgKwog
-ZHJpdmVycy9uZXQvS2NvbmZpZyAgICAgICAgICAgICAgICAgICAgfCAgICA4ICsrCiBkcml2ZXJz
-L25ldC94ZW4tbmV0YmFjay9NYWtlZmlsZSAgICAgICB8ICAgIDEgCiBkcml2ZXJzL25ldC94ZW4t
-bmV0YmFjay9jb21tb24uaCAgICAgICB8ICAgIDMgKwogZHJpdmVycy9uZXQveGVuLW5ldGJhY2sv
-bmV0YmFjay5jICAgICAgfCAgICAzICsKIGRyaXZlcnMvbmV0L3hlbi1uZXRiYWNrL25ldGJhY2tf
-ZmkuYyAgIHwgIDExOSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwogZHJpdmVycy9u
-ZXQveGVuLW5ldGJhY2svbmV0YmFja19maS5oICAgfCAgIDM1ICsrKysrKysrKwogZHJpdmVycy9u
-ZXQveGVuLW5ldGJhY2sveGVuYnVzLmMgICAgICAgfCAgICA2ICsrCiBpbmNsdWRlL3hlbi9mYXVs
-dF9pbmplY3QuaCAgICAgICAgICAgICB8ICAgNDUgKysrKysrKysrKysrCiAxOCBmaWxlcyBjaGFu
-Z2VkLCA1MTUgaW5zZXJ0aW9ucygrKQogY3JlYXRlIG1vZGUgMTAwNjQ0IGFyY2gveDg2L3hlbi9m
-YXVsdF9pbmplY3QuYwogY3JlYXRlIG1vZGUgMTAwNjQ0IGRyaXZlcnMvYmxvY2sveGVuLWJsa2Jh
-Y2svYmxrYmFja19maS5jCiBjcmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy9ibG9jay94ZW4tYmxr
-YmFjay9ibGtiYWNrX2ZpLmgKIGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL25ldC94ZW4tbmV0
-YmFjay9uZXRiYWNrX2ZpLmMKIGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL25ldC94ZW4tbmV0
-YmFjay9uZXRiYWNrX2ZpLmgKIGNyZWF0ZSBtb2RlIDEwMDY0NCBpbmNsdWRlL3hlbi9mYXVsdF9p
-bmplY3QuaApBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApCZXJsaW4gLSBE
-cmVzZGVuIC0gQWFjaGVuCm1haW4gb2ZmaWNlOiBLcmF1c2Vuc3RyLiAzOCwgMTAxMTcgQmVybGlu
-Ckdlc2NoYWVmdHNmdWVocmVyOiBEci4gUmFsZiBIZXJicmljaCwgQ2hyaXN0aWFuIFNjaGxhZWdl
-cgpVc3QtSUQ6IERFMjg5MjM3ODc5CkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJsb3R0
-ZW5idXJnIEhSQiAxNDkxNzMgQgo=
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+
+This patch series fixes the(currently incomplete) write error handling 
+in pblk by:
+
+ * queuing and re-submitting failed writes in the write buffer
+ * evacuating valid data data in lines with write failures, so the
+   chunk(s) with write failures can be reset to a known state by the fw
+
+Lines with failures in smeta are put back on the free list.
+Failed chunks will be reset on the next use.
+
+If a write failes in emeta, the lba list is cached so the line can be 
+garbage collected without scanning the out-of-band area.
+
+Hans Holmberg (3):
+  lightnvm: pblk: rework write error recovery path
+  lightnvm: pblk: garbage collect lines with failed writes
+  lightnvm: pblk: fix smeta write error path
+
+ drivers/lightnvm/pblk-core.c     |  50 +++++++-
+ drivers/lightnvm/pblk-gc.c       |  79 ++++++++-----
+ drivers/lightnvm/pblk-init.c     |  41 +++++--
+ drivers/lightnvm/pblk-recovery.c |  91 ---------------
+ drivers/lightnvm/pblk-rl.c       |  29 ++++-
+ drivers/lightnvm/pblk-sysfs.c    |  15 ++-
+ drivers/lightnvm/pblk-write.c    | 243 ++++++++++++++++++++++++++++-----------
+ drivers/lightnvm/pblk.h          |  33 ++++--
+ 8 files changed, 362 insertions(+), 219 deletions(-)
+
+-- 
+2.7.4
