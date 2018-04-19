@@ -1,43 +1,87 @@
-Return-Path: <prvs=6401ab460=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "maier@linux.ibm.com" <maier@linux.ibm.com>, "osandov@osandov.com"
-	<osandov@osandov.com>
-CC: "lizefan@huawei.com" <lizefan@huawei.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "rostedt@goodmis.org" <rostedt@goodmis.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "mingo@redhat.com" <mingo@redhat.com>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"lizf@cn.fujitsu.com" <lizf@cn.fujitsu.com>
-Subject: Re: [PATCH 2/2] tracing/events: block: dev_t via driver core for plug
- and unplug events
-Date: Thu, 19 Apr 2018 20:56:47 +0000
-Message-ID: <8624e2bec853f0bb195966ab54bc42bf15eda0ec.camel@wdc.com>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Thu, 19 Apr 2018 12:24:39 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Steffen Maier <maier@linux.ibm.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ingo Molnar <mingo@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Li Zefan <lizf@cn.fujitsu.com>, Li Zefan <lizefan@huawei.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: Re: [PATCH 2/2] tracing/events: block: dev_t via driver core for
+ plug and unplug events
+Message-ID: <20180419192341.GC20941@vader>
 References: <20180413130719.22921-1-maier@linux.ibm.com>
-	 <20180413130719.22921-3-maier@linux.ibm.com>
-	 <20180415083154.GA12254@kroah.com>
-	 <59186bf6-abf1-87b0-914d-eed1b40ef4a8@linux.ibm.com>
-	 <20180419192341.GC20941@vader>
-In-Reply-To: <20180419192341.GC20941@vader>
-Content-Type: text/plain; charset="utf-8"
+ <20180413130719.22921-3-maier@linux.ibm.com>
+ <20180415083154.GA12254@kroah.com>
+ <59186bf6-abf1-87b0-914d-eed1b40ef4a8@linux.ibm.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <59186bf6-abf1-87b0-914d-eed1b40ef4a8@linux.ibm.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVGh1LCAyMDE4LTA0LTE5IGF0IDEyOjI0IC0wNzAwLCBPbWFyIFNhbmRvdmFsIHdyb3RlOg0K
-PiBXZSBxdWllc2NlIGFuZCBmcmVlemUgdGhlIHF1ZXVlIGJlZm9yZSB0ZWFyaW5nIGl0IGRvd24s
-IHNvIGl0IHdvbid0IGJlDQo+IE5VTEwgd2hpbGUgd2UncmUgc3RpbGwgZG9pbmcgSS9PLiBDYydp
-bmcgQmFydCBpbiBjYXNlIEknbSBseWluZyB0byB5b3UsDQo+IHRob3VnaCA7KQ0KDQpibGtfY2xl
-YW51cF9xdWV1ZSgpIHdhaXRzIHVudGlsIGFsbCBJL08gcmVxdWVzdHMgaGF2ZSBmaW5pc2hlZC4g
-U2luY2UgdGhlDQpibG9jayBsYXllciB0cmFjaW5nIGNvZGUgaXMgdHJpZ2dlcmVkIGZyb20gaW5z
-aWRlIHRoZSBjb2RlIHRoYXQgcHJvY2Vzc2VzIGENCnJlcXVlc3QgaXQgaXMgc2FmZSB0byBhY2Nl
-c3MgdGhlIHJlcXVlc3QgcG9pbnRlciBmcm9tIGluc2lkZSB0aGUgdHJhY2luZyBjb2RlLg0KQnV0
-IEkgdGhpbmsgdGhlIHF1ZXN0aW9uIHdhcyBhYm91dCB0aGUgcGFyZW50IG9mIHRoZSByZXF1ZXN0
-IHF1ZXVlIGtvYmoNCmluc3RlYWQgb2YgYWJvdXQgdGhlIHJlcXVlc3QgcXVldWUgcG9pbnRlciwg
-dGhlIGRldmljZSBzdHJ1Y3R1cmUgdGhhdCBpcw0KZW1iZWRkZWQgaW4gc3RydWN0IGdlbmRpc2s/
-IEkgdGhpbmsgdGhhdCBwYXJlbnQgY2FuIGRpc2FwcGVhciBhdCBhbnkgdGltZS4NCk1vc3QgYmxv
-Y2sgZHJpdmVycyBjYWxsIGRlbF9nZW5kaXNrKCkgYmVmb3JlIHRoZXkgY2FsbCBibGtfY2xlYW51
-cF9xdWV1ZSgpLg0KVW5sZXNzIEknbSBvdmVybG9va2luZyBzb21ldGhpbmcgSSB0aGluayB0aGUg
-cmVxdWVzdCBxdWV1ZSB3aWxsIG5lZWQgdG8NCm9idGFpbiBhIHJlZmVyZW5jZSB0byB0aGUgZ2Vu
-ZGlzayBkZXZpY2UgZnJvbSBpbnNpZGUgYmxrX3JlZ2lzdGVyX3F1ZXVlKCkNCmFuZCBkcm9wIHRo
-YXQgcmVmZXJlbmNlIGZyb20gaW5zaWRlIGJsa19jbGVhbnVwX3F1ZXVlKCkgdG8gbWFrZSBpdCBz
-YWZlIGZvcg0KdGhlIHRyYWNpbmcgY29kZSB0byBhY2Nlc3Mgc3RydWN0IGdlbmRpc2suDQoNCkJh
-cnQuDQoNCg0KDQo=
+On Mon, Apr 16, 2018 at 06:33:27PM +0200, Steffen Maier wrote:
+> Hi Greg,
+> 
+> On 04/15/2018 10:31 AM, Greg Kroah-Hartman wrote:
+> > On Fri, Apr 13, 2018 at 03:07:18PM +0200, Steffen Maier wrote:
+> > > diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+> > > index a13613d27cee..cffedc26e8a3 100644
+> > > --- a/include/trace/events/block.h
+> > > +++ b/include/trace/events/block.h
+> > > @@ -460,14 +460,18 @@ TRACE_EVENT(block_plug,
+> > >   	TP_ARGS(q),
+> > >   	TP_STRUCT__entry(
+> > > +		__field( dev_t,		dev			)
+> > >   		__array( char,		comm,	TASK_COMM_LEN	)
+> > >   	),
+> > >   	TP_fast_assign(
+> > > +		__entry->dev = q->kobj.parent ?
+> > > +		container_of(q->kobj.parent, struct device, kobj)->devt : 0;
+> > 
+> > That really really really scares me.  It feels very fragile and messing
+> > with parent pointers is ripe for things breaking in the future in odd
+> > and unexplainable ways.
+> > 
+> > And how can the parent be NULL?
+> 
+> I'm hoping for help by block layer experts.
+> 
+> I suppose block device unplug/removal could be a case. But I don't know the
+> details how this works and if object release is protected while I/O is
+> pending and new I/O is rejected beforehand. That might make my approach safe
+> as it would not call the trace functions while the parent pointer changes.
+
+We quiesce and freeze the queue before tearing it down, so it won't be
+NULL while we're still doing I/O. Cc'ing Bart in case I'm lying to you,
+though ;)
+
+> > I don't know the block layer but this feels very wrong to me.  Are you
+> > sure there isn't some other way to get this info?
+> 
+> No, I'm not sure at all. But I'm no block layer expert either. This is just
+> an idea I had which did work for my cases and I'm looking for confirmation
+> or denial by the experts. So if it's not safe from a block layer point of
+> view either, then I have to ditch it.
+
+There's not a pretty way to do this, but using the proper helpers would
+be preferred:
+
+disk_devt(dev_to_disk(kobj_to_dev(q->kobj.parent)))
+
+The parent of a request_queue is always a gendisk, so this should always
+work.
+
+> -- 
+> Mit freundlichen Gr��en / Kind regards
+> Steffen Maier
+> 
+> Linux on z Systems Development
+> 
+> IBM Deutschland Research & Development GmbH
+> Vorsitzende des Aufsichtsrats: Martina Koederitz
+> Geschaeftsfuehrung: Dirk Wittkopp
+> Sitz der Gesellschaft: Boeblingen
+> Registergericht: Amtsgericht Stuttgart, HRB 243294
+> 
