@@ -1,51 +1,47 @@
-Return-Path: <jianchao.w.wang@oracle.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH v6] blk-mq: Avoid that a completion can be ignored for
  BLK_EH_RESET_TIMER
-To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+To: Bart Van Assche <bart.vanassche@wdc.com>
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@redhat.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Israel Rukshin <israelr@mellanox.com>,
-        Max Gurtovoy <maxg@mellanox.com>, stable@vger.kernel.org
+ Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@redhat.com>,
+ Sagi Grimberg <sagi@grimberg.me>, Israel Rukshin <israelr@mellanox.com>,
+ Max Gurtovoy <maxg@mellanox.com>, stable@vger.kernel.org
 References: <20180419164353.13561-1-bart.vanassche@wdc.com>
-From: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <18cd85bb-ee41-ce6f-e8c8-dcf6e7fd0504@oracle.com>
-Date: Fri, 20 Apr 2018 14:55:02 +0800
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <bbac4047-d806-d670-4363-ea70ad9b8aa4@kernel.dk>
+Date: Thu, 19 Apr 2018 13:06:31 -0600
 MIME-Version: 1.0
 In-Reply-To: <20180419164353.13561-1-bart.vanassche@wdc.com>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Bart
+On 4/19/18 10:43 AM, Bart Van Assche wrote:
+> The blk-mq timeout handling code ignores completions that occur after
+> blk_mq_check_expired() has been called and before blk_mq_rq_timed_out()
+> has reset rq->aborted_gstate. If a block driver timeout handler always
+> returns BLK_EH_RESET_TIMER then the result will be that the request
+> never terminates.
+> 
+> Fix this race as follows:
+> - Use the deadline instead of the request generation to detect whether
+>   or not a request timer fired after reinitialization of a request.
+> - Store the request state in the lowest two bits of the deadline instead
+>   of the lowest two bits of 'gstate'.
+> - Rename MQ_RQ_STATE_MASK into RQ_STATE_MASK and change it from an
+>   enumeration member into a #define such that its type can be changed
+>   into unsigned long. That allows to write & ~RQ_STATE_MASK instead of
+>   ~(unsigned long)RQ_STATE_MASK.
+> - Remove all request member variables that became superfluous due to
+>   this change: gstate, gstate_seq and aborted_gstate_sync.
+> - Remove the request state information that became superfluous due to this
+>   patch, namely RQF_MQ_TIMEOUT_EXPIRED.
+> - Remove the code that became superfluous due to this change, namely
+>   the RCU lock and unlock statements in blk_mq_complete_request() and
+>   also the synchronize_rcu() call in the timeout handler.
 
-On 04/20/2018 12:43 AM, Bart Van Assche wrote:
-> Use the deadline instead of the request generation to detect whether
->   or not a request timer fired after reinitialization of a request
+I like this approach, it's simpler and easier to understand. Net
+reduction in code is nice too. I've run it through the testing and it
+passes. Unless people holler loudly, I'd like to include this in 4.17.
 
-Maybe use deadline to do this is not suitable.
-
-Let's think of the following scenario.
-
-T1/T2 times in nano seconds
-J1/J2 times in jiffies
-
-rq is started at T1,J1
-blk_mq_timeout_work
-  -> blk_mq_check_expired
-    -> save rq->__deadline (J1 + MQ_RQ_IN_FLIGHT)
-
-                                             rq is completed and freed 
-                                             rq is allocated and started again on T2
-                                             rq->__deadline = J2 + MQ_RQ_IN_FLIGHT
-  -> synchronize srcu/rcu
-  -> blk_mq_terminate_expired
-    -> rq->__deadline (J2 + MQ_RQ_IN_FLIGHT)
-
-1. deadline = rq->__deadline & ~RQ_STATE_MASK (0x3)
-   if J2-J1 < 4 jiffies, we will get the same deadline value.
-
-2. even if we do some bit shift when save and get deadline
-   if T2 - T1 < time of 1 jiffies, we sill get the same deadline.
-
-Thanks
-Jianchao
+-- 
+Jens Axboe
