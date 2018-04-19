@@ -1,109 +1,52 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
-	Stefan Haberland <sth@linux.vnet.ibm.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 5/8] blk-mq: remove blk_mq_delay_queue()
-Date: Sun,  8 Apr 2018 17:48:11 +0800
-Message-Id: <20180408094814.28953-6-ming.lei@redhat.com>
-In-Reply-To: <20180408094814.28953-1-ming.lei@redhat.com>
-References: <20180408094814.28953-1-ming.lei@redhat.com>
+Return-Path: <jiang.biao2@zte.com.cn>
+Date: Thu, 19 Apr 2018 10:37:29 +0800 (CST)
+Message-ID: <201804191037299600932@zte.com.cn>
+In-Reply-To: <bb119bf0-b7f2-cb25-8de4-6016a3dd7a9e@kernel.dk>
+References: 201804190854343346115@zte.com.cn,bb119bf0-b7f2-cb25-8de4-6016a3dd7a9e@kernel.dk
+Mime-Version: 1.0
+From: <jiang.biao2@zte.com.cn>
+To: <axboe@kernel.dk>
+Cc: <paolo.valente@linaro.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <tj@kernel.org>,
+        <zhong.weidong@zte.com.cn>, <wen.yang99@zte.com.cn>,
+        <ulf.hansson@linaro.org>, <linus.walleij@linaro.org>,
+        <broonie@kernel.org>
+Subject: =?UTF-8?B?UmU6IFtQQVRDSF0gYmxrY2c6IG5vdCBob2xkIGJsa2NnIGxvY2sgd2hlbiBkZWFjdGl2YXRpbmcgcG9saWN5Lg==?=
+Content-Type: multipart/mixed;
+	boundary="=====_001_next====="
 List-ID: <linux-block@vger.kernel.org>
 
-No driver uses this interface any more, so remove it.
 
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Stefan Haberland <sth@linux.vnet.ibm.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-debugfs.c |  1 -
- block/blk-mq.c         | 30 ++----------------------------
- include/linux/blk-mq.h |  2 --
- 3 files changed, 2 insertions(+), 31 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 58b3b79cbe83..3080e18cb859 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -235,7 +235,6 @@ static const char *const hctx_state_name[] = {
- 	HCTX_STATE_NAME(STOPPED),
- 	HCTX_STATE_NAME(TAG_ACTIVE),
- 	HCTX_STATE_NAME(SCHED_RESTART),
--	HCTX_STATE_NAME(START_ON_RUN),
- };
- #undef HCTX_STATE_NAME
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e3d02af79010..8743e9105612 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1563,40 +1563,14 @@ static void blk_mq_run_work_fn(struct work_struct *work)
- 	hctx = container_of(work, struct blk_mq_hw_ctx, run_work.work);
- 
- 	/*
--	 * If we are stopped, don't run the queue. The exception is if
--	 * BLK_MQ_S_START_ON_RUN is set. For that case, we auto-clear
--	 * the STOPPED bit and run it.
-+	 * If we are stopped, don't run the queue.
- 	 */
--	if (test_bit(BLK_MQ_S_STOPPED, &hctx->state)) {
--		if (!test_bit(BLK_MQ_S_START_ON_RUN, &hctx->state))
--			return;
--
--		clear_bit(BLK_MQ_S_START_ON_RUN, &hctx->state);
-+	if (test_bit(BLK_MQ_S_STOPPED, &hctx->state))
- 		clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
--	}
- 
- 	__blk_mq_run_hw_queue(hctx);
- }
- 
--
--void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
--{
--	if (WARN_ON_ONCE(!blk_mq_hw_queue_mapped(hctx)))
--		return;
--
--	/*
--	 * Stop the hw queue, then modify currently delayed work.
--	 * This should prevent us from running the queue prematurely.
--	 * Mark the queue as auto-clearing STOPPED when it runs.
--	 */
--	blk_mq_stop_hw_queue(hctx);
--	set_bit(BLK_MQ_S_START_ON_RUN, &hctx->state);
--	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx),
--					&hctx->run_work,
--					msecs_to_jiffies(msecs));
--}
--EXPORT_SYMBOL(blk_mq_delay_queue);
--
- static inline void __blk_mq_insert_req_list(struct blk_mq_hw_ctx *hctx,
- 					    struct request *rq,
- 					    bool at_head)
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 8efcf49796a3..e3986f4b3461 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -183,7 +183,6 @@ enum {
- 	BLK_MQ_S_STOPPED	= 0,
- 	BLK_MQ_S_TAG_ACTIVE	= 1,
- 	BLK_MQ_S_SCHED_RESTART	= 2,
--	BLK_MQ_S_START_ON_RUN	= 3,
- 
- 	BLK_MQ_MAX_DEPTH	= 10240,
- 
-@@ -270,7 +269,6 @@ void blk_mq_unquiesce_queue(struct request_queue *q);
- void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
- bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_run_hw_queues(struct request_queue *q, bool async);
--void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
- void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- 		busy_tag_iter_fn *fn, void *priv);
- void blk_mq_freeze_queue(struct request_queue *q);
--- 
-2.9.5
+--=====_001_next=====
+Content-Type: multipart/alternative;
+	boundary="=====_003_next====="
+
+
+--=====_003_next=====
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+Pj4+IEl0IG1pZ2h0IG1ha2Ugc2Vuc2UgdG8gbG9jayBpdCBzZXBhcmF0ZWx5LCBidXQgSSB3b3Vs
+ZCBub3Qgd29ycnkKPj4+IGFib3V0IGl0IHVubGVzcyBpdCBzaG93cyB1cCBhcyBob3QgaW4geW91
+ciB0ZXN0aW5nLgo+PiBBY3R1YWxseSwgd2UndmUgbWV0IGEgdHJpZ2dlcmluZyBvZiBubWlfd2F0
+Y2hkb2csIGJsb2NrZWQgYXQgdGhlIHF1ZXVlIGxvY2sKPj4gaW4gYmxrY2dfcHJpbnRfYmxrZ3Mo
+KSwgY2F1c2VkIGJ5IHRoZSBzbG93IHNlcmlhbCBjb25zb2xlIGFuZCB0b28gbWFueSBwcmludGtz
+Lgo+PiBSZWxhdGVkIGRpc2N1c3Npb24gaXMgaGVyZSwKPj4gaHR0cHM6Ly9idWd6aWxsYS5rZXJu
+ZWwub3JnL3Nob3dfYnVnLmNnaT9pZD0xOTkwMDMKPj4gRXZlbiB0aG91Z2ggaXQncyBub3QgY2F1
+c2VkIGJ5IHRoZSBxdWV1ZSBsb2NrIGRpcmVjdGx5LCBpdCB3b3VsZCBub3QgaGFwcGVuCj4+IHdp
+dGhvdXQgdXNpbmcgcXVldWUgbG9jay4gVGhlIHF1ZXVlIGxvY2sgaXMgYmlnIGFuZCB1c2VkIHRv
+byB3aWRlbHksIHVzaW5nIGl0Cj4+IHdvdWxkIGludGVuc2lmeSB0aGUgcmFjZSwgc28gd2UncmUg
+dHJ5aW5nIHRvIHVuZGVyc3RhbmQgdGhlIGxvY2tzIHVzaW5nIGluIGJsa2csCj4+IGFuZCBtYXli
+ZSBjb3VsZCBpbXByb3ZlIHRoZSBzaXR1YXRpb24uCj4gCj4gVGhlIHF1ZXVlIGxvY2sgaXMgb25s
+eSB1c2VkIHdpZGVseSBvbiBub24gYmxrLW1xLCB3aGVyZSBpdCBpcyB0aGUgb25seQo+IGxvY2sg
+cmVhbGx5LiBEb2luZyBzZXJpYWwgSU8gdW5kZXIgYSBzcGlubG9jayBpcyBhbHdheXMgZ29pbmcg
+dG8gc3VjaywKPiByZWdhcmRsZXNzIG9mIGhvdyBjb250ZW5kZWQgaXQgaXMuCgpJdCdzIG5vdCBh
+IHByb2JsZW0gb2YgcXVldWUgbG9jayBpbmRlZWQsIGp1c3Qgd2FudCB0byBkaWcgZGVlcGVyLiA6
+KSAKVGhhbmtzIGZvciB0aGUgcmVwbHkuCgpKaWFuZywKUmVnYXJkcw==
+
+
+--=====_003_next=====--
+
+--=====_001_next=====--
