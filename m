@@ -1,186 +1,78 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qk0-f193.google.com ([209.85.220.193]:40911 "EHLO
-        mail-qk0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753594AbeDSRHX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Apr 2018 13:07:23 -0400
+Return-Path: <lsf-pc-bounces@lists.linux-foundation.org>
+Date: Thu, 19 Apr 2018 23:13:50 +0100
+From: Al Viro <viro@ZenIV.linux.org.uk>
+To: Jerome Glisse <jglisse@redhat.com>
+Message-ID: <20180419221350.GN30522@ZenIV.linux.org.uk>
+References: <20180419015508.GJ27893@dastard> <20180419143825.GA3519@redhat.com>
+	<20180419144356.GC25406@bombadil.infradead.org>
+	<20180419163036.GC3519@redhat.com>
+	<1524157119.2943.6.camel@kernel.org>
+	<20180419172609.GD3519@redhat.com>
+	<20180419203307.GJ30522@ZenIV.linux.org.uk>
+	<20180419205820.GB4981@redhat.com>
+	<20180419212137.GM30522@ZenIV.linux.org.uk>
+	<20180419214751.GD4981@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CANFzKepsGq0EHX4GPtC0RZOWqVf2fTJ6uA2WH-SZNsBuwMJ5KA@mail.gmail.com>
-References: <CANFzKepsGq0EHX4GPtC0RZOWqVf2fTJ6uA2WH-SZNsBuwMJ5KA@mail.gmail.com>
-From: Anatoliy Glagolev <glagolig@gmail.com>
-Date: Thu, 19 Apr 2018 10:07:21 -0700
-Message-ID: <CANFzKer6QDaJALX3LKPF2DV6LgczTh-efQe9+zeK8BuxTWFt1A@mail.gmail.com>
-Subject: Re: [PATCH] bsg referencing bus driver module
-To: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180419214751.GD4981@redhat.com>
+Cc: Jeff Layton <jlayton@kernel.org>, Dave Chinner <david@fromorbit.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Michal Hocko <mhocko@kernel.org>, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, Johannes Weiner <hannes@cmpxchg.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	lsf-pc@lists.linux-foundation.org
+Subject: Re: [Lsf-pc] [LSF/MM] schedule suggestion
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/lsf-pc>,
+	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <https://lists.linuxfoundation.org/mailman/private/lsf-pc/>
+List-Post: <mailto:lsf-pc@lists.linux-foundation.org>
+List-Help: <mailto:lsf-pc-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/lsf-pc>,
+	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: lsf-pc-bounces@lists.linux-foundation.org
+Errors-To: lsf-pc-bounces@lists.linux-foundation.org
+List-ID: <linux-block@vger.kernel.org>
 
-+linux-block
+On Thu, Apr 19, 2018 at 05:47:51PM -0400, Jerome Glisse wrote:
+> On Thu, Apr 19, 2018 at 10:21:37PM +0100, Al Viro wrote:
+> > On Thu, Apr 19, 2018 at 04:58:20PM -0400, Jerome Glisse wrote:
+> > 
+> > > I need a struct to link part of device context with mm struct for a
+> > > process. Most of device context is link to the struct file of the
+> > > device file (ie process open has a file descriptor for the device
+> > > file).
+> > 
+> > Er...  You do realize that
+> > 	fd = open(...)
+> > 	mmap(fd, ...)
+> > 	close(fd)
+> > is absolutely legitimate, right?  IOW, existence/stability/etc. of
+> > a file descriptor is absolutely *not* guaranteed - in fact, there might
+> > be not a single file descriptor referring to a given openen and mmaped
+> > file.
+> 
+> Yes and that's fine, on close(fd) the device driver is tear down
 
-On Tue, Apr 17, 2018 at 1:05 PM, Anatoliy Glagolev <glagolig@gmail.com> wrote:
-> Description: bsg_release may crash while decrementing reference to the
-> parent device with the following stack:
->
-> [16834.636216,07] Call Trace:
->                              ...   scsi_proc_hostdir_rm
-> [16834.641944,07]  [<ffffffff8141723f>] scsi_host_dev_release+0x3f/0x130
-> [16834.647740,07]  [<ffffffff813e4f82>] device_release+0x32/0xa0
-> [16834.653423,07]  [<ffffffff812dc6c7>] kobject_cleanup+0x77/0x190
-> [16834.659002,07]  [<ffffffff812dc585>] kobject_put+0x25/0x50
-> [16834.664430,07]  [<ffffffff813e5277>] put_device+0x17/0x20
-> [16834.669740,07]  [<ffffffff812d0334>] bsg_kref_release_function+0x24/0x30
-> [16834.675007,07]  [<ffffffff812d14a6>] bsg_release+0x166/0x1d0
-> [16834.680148,07]  [<ffffffff8119ba2b>] __fput+0xcb/0x1d0
-> [16834.685156,07]  [<ffffffff8119bb6e>] ____fput+0xe/0x10
-> [16834.690017,07]  [<ffffffff81077476>] task_work_run+0x86/0xb0
-> [16834.694781,07]  [<ffffffff81057043>] exit_to_usermode_loop+0x6b/0x9a
-> [16834.699466,07]  [<ffffffff81002875>] syscall_return_slowpath+0x55/0x60
-> [16834.704110,07]  [<ffffffff8172d615>] int_ret_from_sys_call+0x25/0x9f
->
-> if the parent driver implementing the device has unloaded. To address
-> the problem, taking a reference to the parent driver module.
->
-> Note: this is a follow-up to earlier discussion "[PATCH] Waiting for
-> scsi_host_template release".
->
-> ---
->  block/bsg.c                      | 31 +++++++++++++++++++++++++++----
->  drivers/scsi/scsi_transport_fc.c |  3 ++-
->  include/linux/bsg.h              |  5 +++++
->  3 files changed, 34 insertions(+), 5 deletions(-)
->
-> diff --git a/block/bsg.c b/block/bsg.c
-> index b9a5361..0aa7d74 100644
-> --- a/block/bsg.c
-> +++ b/block/bsg.c
-> @@ -798,7 +798,8 @@ found:
->   return bd;
->  }
->
-> -static struct bsg_device *bsg_get_device(struct inode *inode, struct
-> file *file)
-> +static struct bsg_device *bsg_get_device(struct inode *inode, struct
-> file *file,
-> + struct bsg_class_device **pbcd)
->  {
->   struct bsg_device *bd;
->   struct bsg_class_device *bcd;
-> @@ -814,6 +815,7 @@ static struct bsg_device *bsg_get_device(struct
-> inode *inode, struct file *file)
->
->   if (!bcd)
->   return ERR_PTR(-ENODEV);
-> + *pbcd = bcd;
->
->   bd = __bsg_get_device(iminor(inode), bcd->queue);
->   if (bd)
-> @@ -829,22 +831,34 @@ static struct bsg_device *bsg_get_device(struct
-> inode *inode, struct file *file)
->  static int bsg_open(struct inode *inode, struct file *file)
->  {
->   struct bsg_device *bd;
-> + struct bsg_class_device *bcd;
->
-> - bd = bsg_get_device(inode, file);
-> + bd = bsg_get_device(inode, file, &bcd);
->
->   if (IS_ERR(bd))
->   return PTR_ERR(bd);
->
->   file->private_data = bd;
-> + if (bcd->parent_module) {
-> + if (!try_module_get(bcd->parent_module)) {
-> + bsg_put_device(bd);
-> + return -ENODEV;
-> + }
-> + }
->   return 0;
->  }
->
->  static int bsg_release(struct inode *inode, struct file *file)
->  {
-> + int ret;
->   struct bsg_device *bd = file->private_data;
-> + struct module *parent_module = bd->queue->bsg_dev.parent_module;
->
->   file->private_data = NULL;
-> - return bsg_put_device(bd);
-> + ret = bsg_put_device(bd);
-> + if (parent_module)
-> + module_put(parent_module);
-> + return ret;
->  }
->
->  static unsigned int bsg_poll(struct file *file, poll_table *wait)
-> @@ -977,6 +991,14 @@ EXPORT_SYMBOL_GPL(bsg_unregister_queue);
->  int bsg_register_queue(struct request_queue *q, struct device *parent,
->         const char *name, void (*release)(struct device *))
->  {
-> + return bsg_register_queue_ex(q, parent, name, release, NULL);
-> +}
-> +EXPORT_SYMBOL_GPL(bsg_register_queue);
-> +
-> +int bsg_register_queue_ex(struct request_queue *q, struct device *parent,
-> +          const char *name, void (*release)(struct device *),
-> +          struct module *parent_module)
-> +{
->   struct bsg_class_device *bcd;
->   dev_t dev;
->   int ret;
-> @@ -1012,6 +1034,7 @@ int bsg_register_queue(struct request_queue *q,
-> struct device *parent,
->   bcd->queue = q;
->   bcd->parent = get_device(parent);
->   bcd->release = release;
-> + bcd->parent_module = parent_module;
->   kref_init(&bcd->ref);
->   dev = MKDEV(bsg_major, bcd->minor);
->   class_dev = device_create(bsg_class, parent, dev, NULL, "%s", devname);
-> @@ -1039,7 +1062,7 @@ unlock:
->   mutex_unlock(&bsg_mutex);
->   return ret;
->  }
-> -EXPORT_SYMBOL_GPL(bsg_register_queue);
-> +EXPORT_SYMBOL_GPL(bsg_register_queue_ex);
->
->  static struct cdev bsg_cdev;
->
-> diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
-> index 24eaaf6..c153f80 100644
-> --- a/drivers/scsi/scsi_transport_fc.c
-> +++ b/drivers/scsi/scsi_transport_fc.c
-> @@ -4064,7 +4064,8 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct
-> fc_host_attrs *fc_host)
->   blk_queue_rq_timed_out(q, fc_bsg_job_timeout);
->   blk_queue_rq_timeout(q, FC_DEFAULT_BSG_TIMEOUT);
->
-> - err = bsg_register_queue(q, dev, bsg_name, NULL);
-> + err = bsg_register_queue_ex(q, dev, bsg_name, NULL,
-> + shost->hostt->module);
->   if (err) {
->   printk(KERN_ERR "fc_host%d: bsg interface failed to "
->   "initialize - register queue\n",
-> diff --git a/include/linux/bsg.h b/include/linux/bsg.h
-> index 7173f6e..fe41e83 100644
-> --- a/include/linux/bsg.h
-> +++ b/include/linux/bsg.h
-> @@ -12,11 +12,16 @@ struct bsg_class_device {
->   struct request_queue *queue;
->   struct kref ref;
->   void (*release)(struct device *);
-> + struct module *parent_module;
->  };
->
->  extern int bsg_register_queue(struct request_queue *q,
->        struct device *parent, const char *name,
->        void (*release)(struct device *));
-> +extern int bsg_register_queue_ex(struct request_queue *q,
-> +         struct device *parent, const char *name,
-> +         void (*release)(struct device *),
-> +         struct module *parent_module);
->  extern void bsg_unregister_queue(struct request_queue *);
->  #else
->  static inline int bsg_register_queue(struct request_queue *q,
-> --
-> 1.9.1
+No, it is not.  _NOTHING_ is done on that close(fd), other than removing
+a reference from descriptor table.  In this case struct file is still
+open and remains such until munmap().
+
+That's why descriptor table is a very bad place for sticking that kind of
+information.  Besides, as soon as your syscall (ioctl, write, whatever)
+has looked struct file up, the mapping from descriptors to struct file
+can change.  Literally before fdget() has returned to caller.  Another
+thread could do dup() and close() of the original descriptor.  Or
+just plain close(), for that matter - struct file will remain open until
+fdput().
+
+> and
+> struct i want to store is tear down too and free.
+
+So do a hash table indexed by pair (void *, struct mm_struct *) and
+do lookups there...  And use radeon_device as the first half of the
+key.  Or struct file *, or pointer to whatever private data you maintain
+for an opened file...
+_______________________________________________
+Lsf-pc mailing list
+Lsf-pc@lists.linux-foundation.org
+https://lists.linuxfoundation.org/mailman/listinfo/lsf-pc
