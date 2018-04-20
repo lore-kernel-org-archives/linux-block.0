@@ -1,50 +1,57 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-scsi@vger.kernel.org, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH 08/12] mmc: reduce use of block bounce buffers
-Date: Mon, 16 Apr 2018 10:50:28 +0200
-Message-Id: <20180416085032.7367-9-hch@lst.de>
-In-Reply-To: <20180416085032.7367-1-hch@lst.de>
-References: <20180416085032.7367-1-hch@lst.de>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH] MAINTAINERS: Remove me as maintainer of bcache
+To: Jens Axboe <axboe@kernel.dk>, Michael Lyle <mlyle@lyle.org>,
+ linux-block@vger.kernel.org, linux-bcache@vger.kernel.org
+Cc: tang.junhui@zte.com.cn, Coly Li <colyli@suse.de>
+References: <20180419175931.32366-1-mlyle@lyle.org>
+ <3d37ff09-23bb-8d95-db86-3930f0c5dea3@kernel.dk>
+ <0569f943-7926-dcef-bd38-0736709eb675@lyle.org>
+ <197e237e-0eee-30b7-6c6c-14e7727e0080@kernel.dk>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <99afa971-89bf-250f-04b1-a6580917ec30@suse.de>
+Date: Fri, 20 Apr 2018 07:45:49 +0200
+MIME-Version: 1.0
+In-Reply-To: <197e237e-0eee-30b7-6c6c-14e7727e0080@kernel.dk>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-We can rely on the dma-mapping code to handle any DMA limits that is
-bigger than the ISA DMA mask for us (either using an iommu or swiotlb),
-so remove setting the block layer bounce limit for anything but bouncing
-for highmem pages.
+On 04/19/2018 09:17 PM, Jens Axboe wrote:
+> On 4/19/18 1:11 PM, Michael Lyle wrote:
+>> On 04/19/2018 11:10 AM, Jens Axboe wrote:
+>>> On 4/19/18 11:59 AM, Michael Lyle wrote:
+>>>> Too much to do with other projects.  I've enjoyed working with everyone
+>>>> here, and hope to occasionally contribute on bcache.
+>>
+>> Jens---
+>>
+>>> It's been a pleasure having someone maintain it upstream, so this is
+>>> pretty sad.
+>>
+>> I've really enjoyed working with everyone here.  The queue keeps
+>> stacking up and I feel pretty bad when people need to wait a couple
+>> weeks for reviews and assistance.
+> 
+> I don't blame you, and I think it is better to step down if the time
+> just isn't there.
+> 
+>>> Do you have anyone in mind for taking over the upstream part? The
+>>> community seems fairly active, and there are regular contributors.
+>>>
+>>> Coly and Tang Junhui come to mind.
+>>
+>> I think Coly would be a great maintainer.
+> 
+> I concur. Coly?
+> 
+Indeed, that would be perfect.
+But I don't want to put any pressure on you, Coly :-)
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/mmc/core/queue.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+Cheers,
 
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index 56e9a803db21..60a02a763d01 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -351,17 +351,14 @@ static const struct blk_mq_ops mmc_mq_ops = {
- static void mmc_setup_queue(struct mmc_queue *mq, struct mmc_card *card)
- {
- 	struct mmc_host *host = card->host;
--	u64 limit = BLK_BOUNCE_HIGH;
--
--	if (mmc_dev(host)->dma_mask && *mmc_dev(host)->dma_mask)
--		limit = (u64)dma_max_pfn(mmc_dev(host)) << PAGE_SHIFT;
- 
- 	blk_queue_flag_set(QUEUE_FLAG_NONROT, mq->queue);
- 	blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, mq->queue);
- 	if (mmc_can_erase(card))
- 		mmc_queue_setup_discard(mq->queue, card);
- 
--	blk_queue_bounce_limit(mq->queue, limit);
-+	if (!mmc_dev(host)->dma_mask || !mmc_dev(host)->dma_mask)
-+		blk_queue_bounce_limit(mq->queue, BLK_BOUNCE_HIGH);
- 	blk_queue_max_hw_sectors(mq->queue,
- 		min(host->max_blk_count, host->max_req_size / 512));
- 	blk_queue_max_segments(mq->queue, host->max_segs);
+Hannes
 -- 
-2.17.0
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
