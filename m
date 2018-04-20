@@ -1,356 +1,187 @@
-Return-Path: <jgross@suse.com>
-Subject: Re: [PATCH 2/3] xen netback: add fault injection facility
-To: Stanislav Kinsburskii <staskins@amazon.com>
-Cc: jakub.kicinski@netronome.com, hpa@zytor.com, mcroce@redhat.com,
- tglx@linutronix.de, ggarcia@abra.uab.cat, daniel@iogearbox.net,
- x86@kernel.org, mingo@redhat.com, xen-devel@lists.xenproject.org,
- axboe@kernel.dk, konrad.wilk@oracle.com, amir.jer.levy@intel.com,
- paul.durrant@citrix.com, stefanha@redhat.com, dsa@cumulusnetworks.com,
- boris.ostrovsky@oracle.com, linux-block@vger.kernel.org,
- wei.liu2@citrix.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- davem@davemloft.net, dwmw@amazon.co.uk, roger.pau@citrix.com
+Return-Path: <prvs=6414f13c5=staskins@amazon.de>
+Subject: [PATCH 2/3] xen netback: add fault injection facility
+From: Stanislav Kinsburskii <staskins@amazon.com>
+CC: <jakub.kicinski@netronome.com>, <hpa@zytor.com>, <mcroce@redhat.com>,
+        <staskins@amazon.com>, <tglx@linutronix.de>, <ggarcia@abra.uab.cat>,
+        <daniel@iogearbox.net>, <x86@kernel.org>, <mingo@redhat.com>,
+        <xen-devel@lists.xenproject.org>, <axboe@kernel.dk>,
+        <konrad.wilk@oracle.com>, <amir.jer.levy@intel.com>,
+        <paul.durrant@citrix.com>, <stefanha@redhat.com>,
+        <dsa@cumulusnetworks.com>, <boris.ostrovsky@oracle.com>,
+        <jgross@suse.com>, <linux-block@vger.kernel.org>,
+        <wei.liu2@citrix.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <davem@davemloft.net>,
+        <dwmw@amazon.co.uk>, <roger.pau@citrix.com>
+Date: Fri, 20 Apr 2018 10:47:31 +0000
+Message-ID: <20180420104731.17823.97617.stgit@dev-dsk-staskins-1a-ca5afbf2.eu-west-1.amazon.com>
+In-Reply-To: <20180420104603.17823.31095.stgit@dev-dsk-staskins-1a-ca5afbf2.eu-west-1.amazon.com>
 References: <20180420104603.17823.31095.stgit@dev-dsk-staskins-1a-ca5afbf2.eu-west-1.amazon.com>
- <20180420104731.17823.97617.stgit@dev-dsk-staskins-1a-ca5afbf2.eu-west-1.amazon.com>
-From: Juergen Gross <jgross@suse.com>
-Message-ID: <e33c055c-5a5a-2329-7a2e-faf715bb95fc@suse.com>
-Date: Fri, 20 Apr 2018 13:25:46 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180420104731.17823.97617.stgit@dev-dsk-staskins-1a-ca5afbf2.eu-west-1.amazon.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On 20/04/18 12:47, Stanislav Kinsburskii wrote:
-> This patch adds wrapper helpers around generic Xen fault inject facility.
-> The major reason is to keep all the module fault injection directories
-> in a dedicated subdirectory instead of Xen fault inject root.
-> 
-> IOW, when using these helpers, per-device and named by device name fault
-> injection control directories will appear under the following directory:
-> - /sys/kernel/debug/xen/fault_inject/xen-netback/
-> instead of:
-> - /sys/kernel/debug/xen/fault_inject/
-> 
-> Signed-off-by: Stanislav Kinsburskii <staskins@amazon.com>
-> CC: Wei Liu <wei.liu2@citrix.com>
-> CC: Paul Durrant <paul.durrant@citrix.com>
-> CC: "David S. Miller" <davem@davemloft.net>
-> CC: Matteo Croce <mcroce@redhat.com>
-> CC: Stefan Hajnoczi <stefanha@redhat.com>
-> CC: Daniel Borkmann <daniel@iogearbox.net>
-> CC: Gerard Garcia <ggarcia@deic.uab.cat>
-> CC: David Ahern <dsa@cumulusnetworks.com>
-> CC: Juergen Gross <jgross@suse.com>
-> CC: Amir Levy <amir.jer.levy@intel.com>
-> CC: Jakub Kicinski <jakub.kicinski@netronome.com>
-> CC: linux-kernel@vger.kernel.org
-> CC: netdev@vger.kernel.org
-> CC: xen-devel@lists.xenproject.org
-> CC: Stanislav Kinsburskii <staskins@amazon.com>
-> CC: David Woodhouse <dwmw@amazon.co.uk>
-> ---
->  drivers/net/Kconfig                  |    8 ++
->  drivers/net/xen-netback/Makefile     |    1 
->  drivers/net/xen-netback/common.h     |    3 +
->  drivers/net/xen-netback/netback.c    |    3 +
->  drivers/net/xen-netback/netback_fi.c |  119 ++++++++++++++++++++++++++++++++++
->  drivers/net/xen-netback/netback_fi.h |   35 ++++++++++
->  drivers/net/xen-netback/xenbus.c     |    6 ++
->  7 files changed, 175 insertions(+)
->  create mode 100644 drivers/net/xen-netback/netback_fi.c
->  create mode 100644 drivers/net/xen-netback/netback_fi.h
-> 
-> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-> index 8918466..5cc9acd 100644
-> --- a/drivers/net/Kconfig
-> +++ b/drivers/net/Kconfig
-> @@ -465,6 +465,14 @@ config XEN_NETDEV_BACKEND
->  	  compile this driver as a module, chose M here: the module
->  	  will be called xen-netback.
->  
-> +config XEN_NETDEV_BACKEND_FAULT_INJECTION
-> +	  bool "Xen net-device backend driver fault injection"
-> +	  depends on XEN_NETDEV_BACKEND
-> +	  depends on XEN_FAULT_INJECTION
-> +	  default n
-> +	  help
-> +	    Allow to inject errors to Xen backend network driver
-> +
->  config VMXNET3
->  	tristate "VMware VMXNET3 ethernet driver"
->  	depends on PCI && INET
-> diff --git a/drivers/net/xen-netback/Makefile b/drivers/net/xen-netback/Makefile
-> index d49798a..28abcdc 100644
-> --- a/drivers/net/xen-netback/Makefile
-> +++ b/drivers/net/xen-netback/Makefile
-> @@ -1,3 +1,4 @@
->  obj-$(CONFIG_XEN_NETDEV_BACKEND) := xen-netback.o
->  
->  xen-netback-y := netback.o xenbus.o interface.o hash.o rx.o
-> +xen-netback-$(CONFIG_XEN_NETDEV_BACKEND_FAULT_INJECTION) += netback_fi.o
-> diff --git a/drivers/net/xen-netback/common.h b/drivers/net/xen-netback/common.h
-> index a46a1e9..30d676d 100644
-> --- a/drivers/net/xen-netback/common.h
-> +++ b/drivers/net/xen-netback/common.h
-> @@ -286,6 +286,9 @@ struct xenvif {
->  
->  #ifdef CONFIG_DEBUG_FS
->  	struct dentry *xenvif_dbg_root;
-> +#ifdef CONFIG_XEN_NETDEV_BACKEND_FAULT_INJECTION
-> +	void *fi_info;
-> +#endif
->  #endif
->  
->  	struct xen_netif_ctrl_back_ring ctrl;
-> diff --git a/drivers/net/xen-netback/netback.c b/drivers/net/xen-netback/netback.c
-> index a27daa2..ecc416e 100644
-> --- a/drivers/net/xen-netback/netback.c
-> +++ b/drivers/net/xen-netback/netback.c
-> @@ -33,6 +33,7 @@
->   */
->  
->  #include "common.h"
-> +#include "netback_fi.h"
->  
->  #include <linux/kthread.h>
->  #include <linux/if_vlan.h>
-> @@ -1649,6 +1650,7 @@ static int __init netback_init(void)
->  			PTR_ERR(xen_netback_dbg_root));
->  #endif /* CONFIG_DEBUG_FS */
->  
-> +	(void) xen_netbk_fi_init();
-
-This is the only usage of xen_netbk_fi_init(). Why don't you make it
-return void from the beginning?
-
->  	return 0;
->  
->  failed_init:
-> @@ -1659,6 +1661,7 @@ module_init(netback_init);
->  
->  static void __exit netback_fini(void)
->  {
-> +	xen_netbk_fi_fini();
->  #ifdef CONFIG_DEBUG_FS
->  	if (!IS_ERR_OR_NULL(xen_netback_dbg_root))
->  		debugfs_remove_recursive(xen_netback_dbg_root);
-> diff --git a/drivers/net/xen-netback/netback_fi.c b/drivers/net/xen-netback/netback_fi.c
-> new file mode 100644
-> index 0000000..47541d0
-> --- /dev/null
-> +++ b/drivers/net/xen-netback/netback_fi.c
-> @@ -0,0 +1,119 @@
-> +/*
-> + * Fault injection interface for Xen backend network driver
-> + *
-> + * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-> + *
-> + * This program is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU General Public License version 2
-> + * as published by the Free Software Foundation; or, when distributed
-> + * separately from the Linux kernel or incorporated into other
-> + * software packages, subject to the following license:
-
-SPDX again.
-
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this source file (the "Software"), to deal in the Software without
-> + * restriction, including without limitation the rights to use, copy, modify,
-> + * merge, publish, distribute, sublicense, and/or sell copies of the Software,
-> + * and to permit persons to whom the Software is furnished to do so, subject to
-> + * the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-> + * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-> + * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-> + * IN THE SOFTWARE.
-> + */
-> +
-> +#include "common.h"
-> +
-> +#include <linux/debugfs.h>
-> +
-> +#include <xen/fault_inject.h>
-> +#include "netback_fi.h"
-> +
-> +static struct dentry *vif_fi_dir;
-> +
-> +static const char *xenvif_fi_names[] = {
-> +};
-> +
-> +struct xenvif_fi {
-> +	struct dentry *dir;
-> +	struct xen_fi *faults[XENVIF_FI_MAX];
-> +};
-> +
-> +int xen_netbk_fi_init(void)
-> +{
-> +	vif_fi_dir = xen_fi_dir_create("xen-netback");
-> +	if (!vif_fi_dir)
-> +		return -ENOMEM;
-> +	return 0;
-> +}
-> +
-> +void xen_netbk_fi_fini(void)
-> +{
-> +	debugfs_remove_recursive(vif_fi_dir);
-> +}
-> +
-> +void xenvif_fi_fini(struct xenvif *vif)
-> +{
-> +	struct xenvif_fi *vfi = vif->fi_info;
-> +	int fi;
-> +
-> +	if (!vif->fi_info)
-> +		return;
-> +
-> +	vif->fi_info = NULL;
-> +
-> +	for (fi = 0; fi < XENVIF_FI_MAX; fi++)
-> +		xen_fi_del(vfi->faults[fi]);
-> +	debugfs_remove_recursive(vfi->dir);
-> +	kfree(vfi);
-> +}
-> +
-> +int xenvif_fi_init(struct xenvif *vif)
-> +{
-> +	struct dentry *parent;
-> +	struct xenvif_fi *vfi;
-> +	int fi, err = -ENOMEM;
-> +
-> +	parent = vif_fi_dir;
-> +	if (!parent)
-> +		return -ENOMEM;
-> +
-> +	vfi = kmalloc(sizeof(*vfi), GFP_KERNEL);
-> +	if (!vfi)
-> +		return -ENOMEM;
-> +
-> +	vfi->dir = debugfs_create_dir(vif->dev->name, parent);
-> +	if (!vfi->dir)
-> +		goto err_dir;
-> +
-> +	for (fi = 0; fi < XENVIF_FI_MAX; fi++) {
-> +		vfi->faults[fi] = xen_fi_dir_add(vfi->dir,
-> +				xenvif_fi_names[fi]);
-
-How does this work? xenvif_fi_names[] is an empty array and this is the
-only reference to it. Who is allocating the memory for that array?
-
-> +		if (!vfi->faults[fi])
-> +			goto err_fault;
-> +	}
-> +
-> +	vif->fi_info = vfi;
-> +	return 0;
-> +
-> +err_fault:
-> +	for (; fi > 0; fi--)
-> +		xen_fi_del(vfi->faults[fi]);
-
-What about vfi->faults[0] ?
-
-> +	debugfs_remove_recursive(vfi->dir);
-> +err_dir:
-> +	kfree(vfi);
-> +	return err;
-> +}
-> +
-> +bool xenvif_should_fail(struct xenvif *vif, xenvif_fi_t type)
-> +{
-> +	struct xenvif_fi *vfi = vif->fi_info;
-> +
-> +	return xen_should_fail(vfi->faults[type]);
-> +}
-> diff --git a/drivers/net/xen-netback/netback_fi.h b/drivers/net/xen-netback/netback_fi.h
-> new file mode 100644
-> index 0000000..895c6a6
-> --- /dev/null
-> +++ b/drivers/net/xen-netback/netback_fi.h
-> @@ -0,0 +1,35 @@
-> +#ifndef _XEN_NETBACK_FI_H
-> +#define _XEN_NETBACK_FI_H
-> +
-> +struct xen_fi;
-
-Why?
-
-> +
-> +typedef enum {
-> +	XENVIF_FI_MAX
-> +} xenvif_fi_t;
-
-It would have helped if you had added some users of the stuff you are
-adding here. This enum just looks weird this way.
-
-> +
-> +#ifdef CONFIG_XEN_NETDEV_BACKEND_FAULT_INJECTION
-> +
-> +int xen_netbk_fi_init(void);
-> +void xen_netbk_fi_fini(void);
-> +
-> +void xenvif_fi_fini(struct xenvif *vif);
-> +int xenvif_fi_init(struct xenvif *vif);
-> +
-> +bool xenvif_should_fail(struct xenvif *vif, xenvif_fi_t type);
-> +
-> +#else
-> +
-> +static inline int xen_netbk_fi_init(void) { return 0; }
-> +static inline void xen_netbk_fi_fini(void) { }
-> +
-> +static inline void xenvif_fi_fini(struct xenvif *vif) { }
-> +static inline int xenvif_fi_init(struct xenvif *vif) { return 0; }
-> +
-> +static inline bool xenvif_should_fail(struct xenvif *vif, xenvif_fi_t type)
-> +{
-> +	return false;
-> +}
-> +
-> +#endif /* CONFIG_XEN_NETDEV_BACKEND_FAULT_INJECTION */
-> +
-> +#endif /* _XEN_NETBACK_FI_H */
-> diff --git a/drivers/net/xen-netback/xenbus.c b/drivers/net/xen-netback/xenbus.c
-> index e1aef25..c775ee0 100644
-> --- a/drivers/net/xen-netback/xenbus.c
-> +++ b/drivers/net/xen-netback/xenbus.c
-> @@ -21,6 +21,7 @@
->  #include "common.h"
->  #include <linux/vmalloc.h>
->  #include <linux/rtnetlink.h>
-> +#include "netback_fi.h"
->  
->  struct backend_info {
->  	struct xenbus_device *dev;
-> @@ -502,6 +503,7 @@ static void backend_disconnect(struct backend_info *be)
->  #ifdef CONFIG_DEBUG_FS
->  		xenvif_debugfs_delif(vif);
->  #endif /* CONFIG_DEBUG_FS */
-> +		xenvif_fi_fini(vif);
->  		xenvif_disconnect_data(vif);
->  
->  		/* At this point some of the handlers may still be active
-> @@ -1024,6 +1026,10 @@ static void connect(struct backend_info *be)
->  		}
->  	}
->  
-> +	err = xenvif_fi_init(be->vif);
-> +	if (err)
-> +		goto err;
-> +
->  #ifdef CONFIG_DEBUG_FS
->  	xenvif_debugfs_addif(be->vif);
->  #endif /* CONFIG_DEBUG_FS */
->
-
-Without any user of that infrastructure I really can't say whether I
-want this.
-
-
-Juergen
+VGhpcyBwYXRjaCBhZGRzIHdyYXBwZXIgaGVscGVycyBhcm91bmQgZ2VuZXJpYyBYZW4gZmF1bHQg
+aW5qZWN0IGZhY2lsaXR5LgpUaGUgbWFqb3IgcmVhc29uIGlzIHRvIGtlZXAgYWxsIHRoZSBtb2R1
+bGUgZmF1bHQgaW5qZWN0aW9uIGRpcmVjdG9yaWVzCmluIGEgZGVkaWNhdGVkIHN1YmRpcmVjdG9y
+eSBpbnN0ZWFkIG9mIFhlbiBmYXVsdCBpbmplY3Qgcm9vdC4KCklPVywgd2hlbiB1c2luZyB0aGVz
+ZSBoZWxwZXJzLCBwZXItZGV2aWNlIGFuZCBuYW1lZCBieSBkZXZpY2UgbmFtZSBmYXVsdAppbmpl
+Y3Rpb24gY29udHJvbCBkaXJlY3RvcmllcyB3aWxsIGFwcGVhciB1bmRlciB0aGUgZm9sbG93aW5n
+IGRpcmVjdG9yeToKLSAvc3lzL2tlcm5lbC9kZWJ1Zy94ZW4vZmF1bHRfaW5qZWN0L3hlbi1uZXRi
+YWNrLwppbnN0ZWFkIG9mOgotIC9zeXMva2VybmVsL2RlYnVnL3hlbi9mYXVsdF9pbmplY3QvCgpT
+aWduZWQtb2ZmLWJ5OiBTdGFuaXNsYXYgS2luc2J1cnNraWkgPHN0YXNraW5zQGFtYXpvbi5jb20+
+CkNDOiBXZWkgTGl1IDx3ZWkubGl1MkBjaXRyaXguY29tPgpDQzogUGF1bCBEdXJyYW50IDxwYXVs
+LmR1cnJhbnRAY2l0cml4LmNvbT4KQ0M6ICJEYXZpZCBTLiBNaWxsZXIiIDxkYXZlbUBkYXZlbWxv
+ZnQubmV0PgpDQzogTWF0dGVvIENyb2NlIDxtY3JvY2VAcmVkaGF0LmNvbT4KQ0M6IFN0ZWZhbiBI
+YWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4KQ0M6IERhbmllbCBCb3JrbWFubiA8ZGFuaWVs
+QGlvZ2VhcmJveC5uZXQ+CkNDOiBHZXJhcmQgR2FyY2lhIDxnZ2FyY2lhQGRlaWMudWFiLmNhdD4K
+Q0M6IERhdmlkIEFoZXJuIDxkc2FAY3VtdWx1c25ldHdvcmtzLmNvbT4KQ0M6IEp1ZXJnZW4gR3Jv
+c3MgPGpncm9zc0BzdXNlLmNvbT4KQ0M6IEFtaXIgTGV2eSA8YW1pci5qZXIubGV2eUBpbnRlbC5j
+b20+CkNDOiBKYWt1YiBLaWNpbnNraSA8amFrdWIua2ljaW5za2lAbmV0cm9ub21lLmNvbT4KQ0M6
+IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcKQ0M6IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmcK
+Q0M6IHhlbi1kZXZlbEBsaXN0cy54ZW5wcm9qZWN0Lm9yZwpDQzogU3RhbmlzbGF2IEtpbnNidXJz
+a2lpIDxzdGFza2luc0BhbWF6b24uY29tPgpDQzogRGF2aWQgV29vZGhvdXNlIDxkd213QGFtYXpv
+bi5jby51az4KLS0tCiBkcml2ZXJzL25ldC9LY29uZmlnICAgICAgICAgICAgICAgICAgfCAgICA4
+ICsrCiBkcml2ZXJzL25ldC94ZW4tbmV0YmFjay9NYWtlZmlsZSAgICAgfCAgICAxIAogZHJpdmVy
+cy9uZXQveGVuLW5ldGJhY2svY29tbW9uLmggICAgIHwgICAgMyArCiBkcml2ZXJzL25ldC94ZW4t
+bmV0YmFjay9uZXRiYWNrLmMgICAgfCAgICAzICsKIGRyaXZlcnMvbmV0L3hlbi1uZXRiYWNrL25l
+dGJhY2tfZmkuYyB8ICAxMTkgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwogZHJp
+dmVycy9uZXQveGVuLW5ldGJhY2svbmV0YmFja19maS5oIHwgICAzNSArKysrKysrKysrCiBkcml2
+ZXJzL25ldC94ZW4tbmV0YmFjay94ZW5idXMuYyAgICAgfCAgICA2ICsrCiA3IGZpbGVzIGNoYW5n
+ZWQsIDE3NSBpbnNlcnRpb25zKCspCiBjcmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy9uZXQveGVu
+LW5ldGJhY2svbmV0YmFja19maS5jCiBjcmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy9uZXQveGVu
+LW5ldGJhY2svbmV0YmFja19maS5oCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvS2NvbmZpZyBi
+L2RyaXZlcnMvbmV0L0tjb25maWcKaW5kZXggODkxODQ2Ni4uNWNjOWFjZCAxMDA2NDQKLS0tIGEv
+ZHJpdmVycy9uZXQvS2NvbmZpZworKysgYi9kcml2ZXJzL25ldC9LY29uZmlnCkBAIC00NjUsNiAr
+NDY1LDE0IEBAIGNvbmZpZyBYRU5fTkVUREVWX0JBQ0tFTkQKIAkgIGNvbXBpbGUgdGhpcyBkcml2
+ZXIgYXMgYSBtb2R1bGUsIGNob3NlIE0gaGVyZTogdGhlIG1vZHVsZQogCSAgd2lsbCBiZSBjYWxs
+ZWQgeGVuLW5ldGJhY2suCiAKK2NvbmZpZyBYRU5fTkVUREVWX0JBQ0tFTkRfRkFVTFRfSU5KRUNU
+SU9OCisJICBib29sICJYZW4gbmV0LWRldmljZSBiYWNrZW5kIGRyaXZlciBmYXVsdCBpbmplY3Rp
+b24iCisJICBkZXBlbmRzIG9uIFhFTl9ORVRERVZfQkFDS0VORAorCSAgZGVwZW5kcyBvbiBYRU5f
+RkFVTFRfSU5KRUNUSU9OCisJICBkZWZhdWx0IG4KKwkgIGhlbHAKKwkgICAgQWxsb3cgdG8gaW5q
+ZWN0IGVycm9ycyB0byBYZW4gYmFja2VuZCBuZXR3b3JrIGRyaXZlcgorCiBjb25maWcgVk1YTkVU
+MwogCXRyaXN0YXRlICJWTXdhcmUgVk1YTkVUMyBldGhlcm5ldCBkcml2ZXIiCiAJZGVwZW5kcyBv
+biBQQ0kgJiYgSU5FVApkaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQveGVuLW5ldGJhY2svTWFrZWZp
+bGUgYi9kcml2ZXJzL25ldC94ZW4tbmV0YmFjay9NYWtlZmlsZQppbmRleCBkNDk3OThhLi4yOGFi
+Y2RjIDEwMDY0NAotLS0gYS9kcml2ZXJzL25ldC94ZW4tbmV0YmFjay9NYWtlZmlsZQorKysgYi9k
+cml2ZXJzL25ldC94ZW4tbmV0YmFjay9NYWtlZmlsZQpAQCAtMSwzICsxLDQgQEAKIG9iai0kKENP
+TkZJR19YRU5fTkVUREVWX0JBQ0tFTkQpIDo9IHhlbi1uZXRiYWNrLm8KIAogeGVuLW5ldGJhY2st
+eSA6PSBuZXRiYWNrLm8geGVuYnVzLm8gaW50ZXJmYWNlLm8gaGFzaC5vIHJ4Lm8KK3hlbi1uZXRi
+YWNrLSQoQ09ORklHX1hFTl9ORVRERVZfQkFDS0VORF9GQVVMVF9JTkpFQ1RJT04pICs9IG5ldGJh
+Y2tfZmkubwpkaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQveGVuLW5ldGJhY2svY29tbW9uLmggYi9k
+cml2ZXJzL25ldC94ZW4tbmV0YmFjay9jb21tb24uaAppbmRleCBhNDZhMWU5Li4zMGQ2NzZkIDEw
+MDY0NAotLS0gYS9kcml2ZXJzL25ldC94ZW4tbmV0YmFjay9jb21tb24uaAorKysgYi9kcml2ZXJz
+L25ldC94ZW4tbmV0YmFjay9jb21tb24uaApAQCAtMjg2LDYgKzI4Niw5IEBAIHN0cnVjdCB4ZW52
+aWYgewogCiAjaWZkZWYgQ09ORklHX0RFQlVHX0ZTCiAJc3RydWN0IGRlbnRyeSAqeGVudmlmX2Ri
+Z19yb290OworI2lmZGVmIENPTkZJR19YRU5fTkVUREVWX0JBQ0tFTkRfRkFVTFRfSU5KRUNUSU9O
+CisJdm9pZCAqZmlfaW5mbzsKKyNlbmRpZgogI2VuZGlmCiAKIAlzdHJ1Y3QgeGVuX25ldGlmX2N0
+cmxfYmFja19yaW5nIGN0cmw7CmRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC94ZW4tbmV0YmFjay9u
+ZXRiYWNrLmMgYi9kcml2ZXJzL25ldC94ZW4tbmV0YmFjay9uZXRiYWNrLmMKaW5kZXggYTI3ZGFh
+Mi4uZWNjNDE2ZSAxMDA2NDQKLS0tIGEvZHJpdmVycy9uZXQveGVuLW5ldGJhY2svbmV0YmFjay5j
+CisrKyBiL2RyaXZlcnMvbmV0L3hlbi1uZXRiYWNrL25ldGJhY2suYwpAQCAtMzMsNiArMzMsNyBA
+QAogICovCiAKICNpbmNsdWRlICJjb21tb24uaCIKKyNpbmNsdWRlICJuZXRiYWNrX2ZpLmgiCiAK
+ICNpbmNsdWRlIDxsaW51eC9rdGhyZWFkLmg+CiAjaW5jbHVkZSA8bGludXgvaWZfdmxhbi5oPgpA
+QCAtMTY0OSw2ICsxNjUwLDcgQEAgc3RhdGljIGludCBfX2luaXQgbmV0YmFja19pbml0KHZvaWQp
+CiAJCQlQVFJfRVJSKHhlbl9uZXRiYWNrX2RiZ19yb290KSk7CiAjZW5kaWYgLyogQ09ORklHX0RF
+QlVHX0ZTICovCiAKKwkodm9pZCkgeGVuX25ldGJrX2ZpX2luaXQoKTsKIAlyZXR1cm4gMDsKIAog
+ZmFpbGVkX2luaXQ6CkBAIC0xNjU5LDYgKzE2NjEsNyBAQCBtb2R1bGVfaW5pdChuZXRiYWNrX2lu
+aXQpOwogCiBzdGF0aWMgdm9pZCBfX2V4aXQgbmV0YmFja19maW5pKHZvaWQpCiB7CisJeGVuX25l
+dGJrX2ZpX2ZpbmkoKTsKICNpZmRlZiBDT05GSUdfREVCVUdfRlMKIAlpZiAoIUlTX0VSUl9PUl9O
+VUxMKHhlbl9uZXRiYWNrX2RiZ19yb290KSkKIAkJZGVidWdmc19yZW1vdmVfcmVjdXJzaXZlKHhl
+bl9uZXRiYWNrX2RiZ19yb290KTsKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L3hlbi1uZXRiYWNr
+L25ldGJhY2tfZmkuYyBiL2RyaXZlcnMvbmV0L3hlbi1uZXRiYWNrL25ldGJhY2tfZmkuYwpuZXcg
+ZmlsZSBtb2RlIDEwMDY0NAppbmRleCAwMDAwMDAwLi40NzU0MWQwCi0tLSAvZGV2L251bGwKKysr
+IGIvZHJpdmVycy9uZXQveGVuLW5ldGJhY2svbmV0YmFja19maS5jCkBAIC0wLDAgKzEsMTE5IEBA
+CisvKgorICogRmF1bHQgaW5qZWN0aW9uIGludGVyZmFjZSBmb3IgWGVuIGJhY2tlbmQgbmV0d29y
+ayBkcml2ZXIKKyAqCisgKiBDb3B5cmlnaHQgMjAxOCBBbWF6b24uY29tLCBJbmMuIG9yIGl0cyBh
+ZmZpbGlhdGVzLiBBbGwgUmlnaHRzIFJlc2VydmVkLgorICoKKyAqIFRoaXMgcHJvZ3JhbSBpcyBm
+cmVlIHNvZnR3YXJlOyB5b3UgY2FuIHJlZGlzdHJpYnV0ZSBpdCBhbmQvb3IKKyAqIG1vZGlmeSBp
+dCB1bmRlciB0aGUgdGVybXMgb2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIHZlcnNp
+b24gMgorICogYXMgcHVibGlzaGVkIGJ5IHRoZSBGcmVlIFNvZnR3YXJlIEZvdW5kYXRpb247IG9y
+LCB3aGVuIGRpc3RyaWJ1dGVkCisgKiBzZXBhcmF0ZWx5IGZyb20gdGhlIExpbnV4IGtlcm5lbCBv
+ciBpbmNvcnBvcmF0ZWQgaW50byBvdGhlcgorICogc29mdHdhcmUgcGFja2FnZXMsIHN1YmplY3Qg
+dG8gdGhlIGZvbGxvd2luZyBsaWNlbnNlOgorICoKKyAqIFBlcm1pc3Npb24gaXMgaGVyZWJ5IGdy
+YW50ZWQsIGZyZWUgb2YgY2hhcmdlLCB0byBhbnkgcGVyc29uIG9idGFpbmluZyBhIGNvcHkKKyAq
+IG9mIHRoaXMgc291cmNlIGZpbGUgKHRoZSAiU29mdHdhcmUiKSwgdG8gZGVhbCBpbiB0aGUgU29m
+dHdhcmUgd2l0aG91dAorICogcmVzdHJpY3Rpb24sIGluY2x1ZGluZyB3aXRob3V0IGxpbWl0YXRp
+b24gdGhlIHJpZ2h0cyB0byB1c2UsIGNvcHksIG1vZGlmeSwKKyAqIG1lcmdlLCBwdWJsaXNoLCBk
+aXN0cmlidXRlLCBzdWJsaWNlbnNlLCBhbmQvb3Igc2VsbCBjb3BpZXMgb2YgdGhlIFNvZnR3YXJl
+LAorICogYW5kIHRvIHBlcm1pdCBwZXJzb25zIHRvIHdob20gdGhlIFNvZnR3YXJlIGlzIGZ1cm5p
+c2hlZCB0byBkbyBzbywgc3ViamVjdCB0bworICogdGhlIGZvbGxvd2luZyBjb25kaXRpb25zOgor
+ICoKKyAqIFRoZSBhYm92ZSBjb3B5cmlnaHQgbm90aWNlIGFuZCB0aGlzIHBlcm1pc3Npb24gbm90
+aWNlIHNoYWxsIGJlIGluY2x1ZGVkIGluCisgKiBhbGwgY29waWVzIG9yIHN1YnN0YW50aWFsIHBv
+cnRpb25zIG9mIHRoZSBTb2Z0d2FyZS4KKyAqCisgKiBUSEUgU09GVFdBUkUgSVMgUFJPVklERUQg
+IkFTIElTIiwgV0lUSE9VVCBXQVJSQU5UWSBPRiBBTlkgS0lORCwgRVhQUkVTUyBPUgorICogSU1Q
+TElFRCwgSU5DTFVESU5HIEJVVCBOT1QgTElNSVRFRCBUTyBUSEUgV0FSUkFOVElFUyBPRiBNRVJD
+SEFOVEFCSUxJVFksCisgKiBGSVRORVNTIEZPUiBBIFBBUlRJQ1VMQVIgUFVSUE9TRSBBTkQgTk9O
+SU5GUklOR0VNRU5ULiBJTiBOTyBFVkVOVCBTSEFMTCBUSEUKKyAqIEFVVEhPUlMgT1IgQ09QWVJJ
+R0hUIEhPTERFUlMgQkUgTElBQkxFIEZPUiBBTlkgQ0xBSU0sIERBTUFHRVMgT1IgT1RIRVIKKyAq
+IExJQUJJTElUWSwgV0hFVEhFUiBJTiBBTiBBQ1RJT04gT0YgQ09OVFJBQ1QsIFRPUlQgT1IgT1RI
+RVJXSVNFLCBBUklTSU5HCisgKiBGUk9NLCBPVVQgT0YgT1IgSU4gQ09OTkVDVElPTiBXSVRIIFRI
+RSBTT0ZUV0FSRSBPUiBUSEUgVVNFIE9SIE9USEVSIERFQUxJTkdTCisgKiBJTiBUSEUgU09GVFdB
+UkUuCisgKi8KKworI2luY2x1ZGUgImNvbW1vbi5oIgorCisjaW5jbHVkZSA8bGludXgvZGVidWdm
+cy5oPgorCisjaW5jbHVkZSA8eGVuL2ZhdWx0X2luamVjdC5oPgorI2luY2x1ZGUgIm5ldGJhY2tf
+ZmkuaCIKKworc3RhdGljIHN0cnVjdCBkZW50cnkgKnZpZl9maV9kaXI7CisKK3N0YXRpYyBjb25z
+dCBjaGFyICp4ZW52aWZfZmlfbmFtZXNbXSA9IHsKK307CisKK3N0cnVjdCB4ZW52aWZfZmkgewor
+CXN0cnVjdCBkZW50cnkgKmRpcjsKKwlzdHJ1Y3QgeGVuX2ZpICpmYXVsdHNbWEVOVklGX0ZJX01B
+WF07Cit9OworCitpbnQgeGVuX25ldGJrX2ZpX2luaXQodm9pZCkKK3sKKwl2aWZfZmlfZGlyID0g
+eGVuX2ZpX2Rpcl9jcmVhdGUoInhlbi1uZXRiYWNrIik7CisJaWYgKCF2aWZfZmlfZGlyKQorCQly
+ZXR1cm4gLUVOT01FTTsKKwlyZXR1cm4gMDsKK30KKwordm9pZCB4ZW5fbmV0YmtfZmlfZmluaSh2
+b2lkKQoreworCWRlYnVnZnNfcmVtb3ZlX3JlY3Vyc2l2ZSh2aWZfZmlfZGlyKTsKK30KKwordm9p
+ZCB4ZW52aWZfZmlfZmluaShzdHJ1Y3QgeGVudmlmICp2aWYpCit7CisJc3RydWN0IHhlbnZpZl9m
+aSAqdmZpID0gdmlmLT5maV9pbmZvOworCWludCBmaTsKKworCWlmICghdmlmLT5maV9pbmZvKQor
+CQlyZXR1cm47CisKKwl2aWYtPmZpX2luZm8gPSBOVUxMOworCisJZm9yIChmaSA9IDA7IGZpIDwg
+WEVOVklGX0ZJX01BWDsgZmkrKykKKwkJeGVuX2ZpX2RlbCh2ZmktPmZhdWx0c1tmaV0pOworCWRl
+YnVnZnNfcmVtb3ZlX3JlY3Vyc2l2ZSh2ZmktPmRpcik7CisJa2ZyZWUodmZpKTsKK30KKworaW50
+IHhlbnZpZl9maV9pbml0KHN0cnVjdCB4ZW52aWYgKnZpZikKK3sKKwlzdHJ1Y3QgZGVudHJ5ICpw
+YXJlbnQ7CisJc3RydWN0IHhlbnZpZl9maSAqdmZpOworCWludCBmaSwgZXJyID0gLUVOT01FTTsK
+KworCXBhcmVudCA9IHZpZl9maV9kaXI7CisJaWYgKCFwYXJlbnQpCisJCXJldHVybiAtRU5PTUVN
+OworCisJdmZpID0ga21hbGxvYyhzaXplb2YoKnZmaSksIEdGUF9LRVJORUwpOworCWlmICghdmZp
+KQorCQlyZXR1cm4gLUVOT01FTTsKKworCXZmaS0+ZGlyID0gZGVidWdmc19jcmVhdGVfZGlyKHZp
+Zi0+ZGV2LT5uYW1lLCBwYXJlbnQpOworCWlmICghdmZpLT5kaXIpCisJCWdvdG8gZXJyX2RpcjsK
+KworCWZvciAoZmkgPSAwOyBmaSA8IFhFTlZJRl9GSV9NQVg7IGZpKyspIHsKKwkJdmZpLT5mYXVs
+dHNbZmldID0geGVuX2ZpX2Rpcl9hZGQodmZpLT5kaXIsCisJCQkJeGVudmlmX2ZpX25hbWVzW2Zp
+XSk7CisJCWlmICghdmZpLT5mYXVsdHNbZmldKQorCQkJZ290byBlcnJfZmF1bHQ7CisJfQorCisJ
+dmlmLT5maV9pbmZvID0gdmZpOworCXJldHVybiAwOworCitlcnJfZmF1bHQ6CisJZm9yICg7IGZp
+ID4gMDsgZmktLSkKKwkJeGVuX2ZpX2RlbCh2ZmktPmZhdWx0c1tmaV0pOworCWRlYnVnZnNfcmVt
+b3ZlX3JlY3Vyc2l2ZSh2ZmktPmRpcik7CitlcnJfZGlyOgorCWtmcmVlKHZmaSk7CisJcmV0dXJu
+IGVycjsKK30KKworYm9vbCB4ZW52aWZfc2hvdWxkX2ZhaWwoc3RydWN0IHhlbnZpZiAqdmlmLCB4
+ZW52aWZfZmlfdCB0eXBlKQoreworCXN0cnVjdCB4ZW52aWZfZmkgKnZmaSA9IHZpZi0+ZmlfaW5m
+bzsKKworCXJldHVybiB4ZW5fc2hvdWxkX2ZhaWwodmZpLT5mYXVsdHNbdHlwZV0pOworfQpkaWZm
+IC0tZ2l0IGEvZHJpdmVycy9uZXQveGVuLW5ldGJhY2svbmV0YmFja19maS5oIGIvZHJpdmVycy9u
+ZXQveGVuLW5ldGJhY2svbmV0YmFja19maS5oCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CmluZGV4IDAw
+MDAwMDAuLjg5NWM2YTYKLS0tIC9kZXYvbnVsbAorKysgYi9kcml2ZXJzL25ldC94ZW4tbmV0YmFj
+ay9uZXRiYWNrX2ZpLmgKQEAgLTAsMCArMSwzNSBAQAorI2lmbmRlZiBfWEVOX05FVEJBQ0tfRklf
+SAorI2RlZmluZSBfWEVOX05FVEJBQ0tfRklfSAorCitzdHJ1Y3QgeGVuX2ZpOworCit0eXBlZGVm
+IGVudW0geworCVhFTlZJRl9GSV9NQVgKK30geGVudmlmX2ZpX3Q7CisKKyNpZmRlZiBDT05GSUdf
+WEVOX05FVERFVl9CQUNLRU5EX0ZBVUxUX0lOSkVDVElPTgorCitpbnQgeGVuX25ldGJrX2ZpX2lu
+aXQodm9pZCk7Cit2b2lkIHhlbl9uZXRia19maV9maW5pKHZvaWQpOworCit2b2lkIHhlbnZpZl9m
+aV9maW5pKHN0cnVjdCB4ZW52aWYgKnZpZik7CitpbnQgeGVudmlmX2ZpX2luaXQoc3RydWN0IHhl
+bnZpZiAqdmlmKTsKKworYm9vbCB4ZW52aWZfc2hvdWxkX2ZhaWwoc3RydWN0IHhlbnZpZiAqdmlm
+LCB4ZW52aWZfZmlfdCB0eXBlKTsKKworI2Vsc2UKKworc3RhdGljIGlubGluZSBpbnQgeGVuX25l
+dGJrX2ZpX2luaXQodm9pZCkgeyByZXR1cm4gMDsgfQorc3RhdGljIGlubGluZSB2b2lkIHhlbl9u
+ZXRia19maV9maW5pKHZvaWQpIHsgfQorCitzdGF0aWMgaW5saW5lIHZvaWQgeGVudmlmX2ZpX2Zp
+bmkoc3RydWN0IHhlbnZpZiAqdmlmKSB7IH0KK3N0YXRpYyBpbmxpbmUgaW50IHhlbnZpZl9maV9p
+bml0KHN0cnVjdCB4ZW52aWYgKnZpZikgeyByZXR1cm4gMDsgfQorCitzdGF0aWMgaW5saW5lIGJv
+b2wgeGVudmlmX3Nob3VsZF9mYWlsKHN0cnVjdCB4ZW52aWYgKnZpZiwgeGVudmlmX2ZpX3QgdHlw
+ZSkKK3sKKwlyZXR1cm4gZmFsc2U7Cit9CisKKyNlbmRpZiAvKiBDT05GSUdfWEVOX05FVERFVl9C
+QUNLRU5EX0ZBVUxUX0lOSkVDVElPTiAqLworCisjZW5kaWYgLyogX1hFTl9ORVRCQUNLX0ZJX0gg
+Ki8KZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L3hlbi1uZXRiYWNrL3hlbmJ1cy5jIGIvZHJpdmVy
+cy9uZXQveGVuLW5ldGJhY2sveGVuYnVzLmMKaW5kZXggZTFhZWYyNS4uYzc3NWVlMCAxMDA2NDQK
+LS0tIGEvZHJpdmVycy9uZXQveGVuLW5ldGJhY2sveGVuYnVzLmMKKysrIGIvZHJpdmVycy9uZXQv
+eGVuLW5ldGJhY2sveGVuYnVzLmMKQEAgLTIxLDYgKzIxLDcgQEAKICNpbmNsdWRlICJjb21tb24u
+aCIKICNpbmNsdWRlIDxsaW51eC92bWFsbG9jLmg+CiAjaW5jbHVkZSA8bGludXgvcnRuZXRsaW5r
+Lmg+CisjaW5jbHVkZSAibmV0YmFja19maS5oIgogCiBzdHJ1Y3QgYmFja2VuZF9pbmZvIHsKIAlz
+dHJ1Y3QgeGVuYnVzX2RldmljZSAqZGV2OwpAQCAtNTAyLDYgKzUwMyw3IEBAIHN0YXRpYyB2b2lk
+IGJhY2tlbmRfZGlzY29ubmVjdChzdHJ1Y3QgYmFja2VuZF9pbmZvICpiZSkKICNpZmRlZiBDT05G
+SUdfREVCVUdfRlMKIAkJeGVudmlmX2RlYnVnZnNfZGVsaWYodmlmKTsKICNlbmRpZiAvKiBDT05G
+SUdfREVCVUdfRlMgKi8KKwkJeGVudmlmX2ZpX2ZpbmkodmlmKTsKIAkJeGVudmlmX2Rpc2Nvbm5l
+Y3RfZGF0YSh2aWYpOwogCiAJCS8qIEF0IHRoaXMgcG9pbnQgc29tZSBvZiB0aGUgaGFuZGxlcnMg
+bWF5IHN0aWxsIGJlIGFjdGl2ZQpAQCAtMTAyNCw2ICsxMDI2LDEwIEBAIHN0YXRpYyB2b2lkIGNv
+bm5lY3Qoc3RydWN0IGJhY2tlbmRfaW5mbyAqYmUpCiAJCX0KIAl9CiAKKwllcnIgPSB4ZW52aWZf
+ZmlfaW5pdChiZS0+dmlmKTsKKwlpZiAoZXJyKQorCQlnb3RvIGVycjsKKwogI2lmZGVmIENPTkZJ
+R19ERUJVR19GUwogCXhlbnZpZl9kZWJ1Z2ZzX2FkZGlmKGJlLT52aWYpOwogI2VuZGlmIC8qIENP
+TkZJR19ERUJVR19GUyAqLwoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgK
+QmVybGluIC0gRHJlc2RlbiAtIEFhY2hlbgptYWluIG9mZmljZTogS3JhdXNlbnN0ci4gMzgsIDEw
+MTE3IEJlcmxpbgpHZXNjaGFlZnRzZnVlaHJlcjogRHIuIFJhbGYgSGVyYnJpY2gsIENocmlzdGlh
+biBTY2hsYWVnZXIKVXN0LUlEOiBERTI4OTIzNzg3OQpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNo
+dCBDaGFybG90dGVuYnVyZyBIUkIgMTQ5MTczIEIK
