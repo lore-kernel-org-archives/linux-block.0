@@ -1,40 +1,37 @@
-Return-Path: <liuzhengyuan@kylinos.cn>
-From: "=?utf-8?B?Wmhlbmd5dWFuIExpdQ==?=" <liuzhengyuan@kylinos.cn>
-To: "=?utf-8?B?SmVucyBBeGJvZQ==?=" <axboe@kernel.dk>
-Cc: "=?utf-8?B?bGludXgtYmxvY2s=?=" <linux-block@vger.kernel.org>, "=?utf-8?B?c2hsaQ==?=" <shli@fb.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: question about request merge
-Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Date: Sat, 21 Apr 2018 22:07:53 +0800
-Message-ID: <tencent_3EE363D56CC01F783CB5D300@qq.com>
+To: Zhengyuan Liu <liuzhengyuan@kylinos.cn>, shli <shli@fb.com>
+Cc: linux-block <linux-block@vger.kernel.org>
+References: <tencent_2DB1C4E822C7BE2363B8A451@qq.com>
+ <tencent_4B199E7C402C9C6F6664BDE6@qq.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <b00cefb6-d267-57f5-442c-1105ce15d39a@kernel.dk>
+Date: Fri, 20 Apr 2018 08:34:11 -0600
+MIME-Version: 1.0
+In-Reply-To: <tencent_4B199E7C402C9C6F6664BDE6@qq.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-MjAxOC0wNC0yMCAyMjozNCBHTVQrMDg6MDAgSmVucyBBeGJvZSA8YXhib2VAa2VybmVsLmRr
-PjoNCj4gT24gNC8xOS8xOCA5OjUxIFBNLCBaaGVuZ3l1YW4gTGl1IHdyb3RlOg0KPj4gSGks
-IFNoYW9odWENCj4+DQo+PiBJIGZvdW5kIGl0IGluZGVlZCBkb2Vzbid0IGRvIGZyb250IG1l
-cmdlIHdoZW4gdHdvIHRocmVhZHMgZmx1c2ggcGx1ZyBsaXN0ICBjb25jdXJyZW50bHkuICAg
-VG8NCj4+IHJlYXBwZWFyICwgSSBwcmVwYXJlZCB0d28gSU8gdGhyZWFkcyAsIG5hbWVkIGEw
-LmlvIGFuZCBhMS5pbyAuDQo+PiBUaHJlYWQgYTEuaW8gIHVzZXMgbGliYWlvIHRvIHdyaXRl
-IDUgcmVxdWVzdHMgOg0KPj4gICAgIHNlY3RvcnM6IDE2ICsgOCwgNDAgKyA4LCA2NCArIDgs
-IDg4ICsgOCwgMTEyICsgOA0KPj4gVGhyZWFkIGEwLmlvICB1c2VzIGxpYmFpbyB0byB3cml0
-ZSBvdGhlciA1IHJlcXVlc3RzIDoNCj4+ICAgICBzZWN0b3JzOiA4KyA4LCAzMiArIDgsIDU2
-ICsgOCwgODAgKyA4LCAxMDQgKyA4DQo+DQo+IEknbSBjdXR0aW5nIHNvbWUgb2YgdGhlIGJl
-bG93Lg0KPg0KPiBUaGFua3MgZm9yIHRoZSBkZXRhaWxlZCBlbWFpbC4gSXQncyBtb3N0bHkg
-b24gcHVycG9zZSB0aGF0IHdlIGRvbid0DQo+IHNwZW5kIGN5Y2xlcyBhbmQgbWVtb3J5IG9u
-IG1haW50YWluaW5nIGEgc2VwYXJhdGUgZnJvbnQgbWVyZ2UgaGFzaCwNCj4gc2luY2UgaXQn
-cyBnZW5lcmFsbHkgbm90IHNvbWV0aGluZyB0aGF0IGhhcHBlbnMgdmVyeSBvZnRlbi4gSWYg
-eW91IGhhdmUNCj4gYSB0aHJlYWQgcG9vbCBkb2luZyBJTyBhbmQgc3BsaXQgc2VxdWVudGlh
-bCBJTyBzdWNoIHRoYXQgeW91IHdvdWxkDQo+IGJlbmVmaXQgYSBsb3QgZnJvbSBmcm9udCBt
-ZXJnaW5nLCB0aGVuIEkgd291bGQgZ2VuZXJhbGx5IGNsYWltIHRoYXQNCj4geW91J3JlIG5v
-dCB3cml0aW5nIHlvdXIgYXBwIGluIHRoZSBtb3N0IG9wdGltYWwgbWFubmVyLg0KPg0KDQpU
-aGFua3MgZm9yIGV4cGxhbmF0aW9uLCBJIG9ubHkgY29uc2lkZXIgdGhlIHByb2JsZW0gdGhy
-b3VnaCB0aGUgY29kZSdzIA0KcGVyc3BlY3RpdmUgYW5kIGlnbm9yZSB0aGUgcmVhbGl0eSBz
-aXR1YXRpb24gb2YgYXBwLiANCg0KPiBTbyBJJ20gY3VyaW91cywgd2hhdCdzIHRoZSBiaWcg
-aW50ZXJlc3QgaW4gZnJvbnQgbWVyZ2luZz8NCg0KSWYgaXQncyBub3Qgc29tZXRoaW5nIHRo
-YXQgaGFwcGVucyBzbyBtdWNoIG9mdGVuLCBJIHRoaW5rIGl0J3Mgbm90IHdvcnRoIHRvIA0K
-c3VwcG9ydCBmcm9udCBtZXJnaW5nIHRvby4NCg0KQnkgdGhlIHdheSwgSSBnb3QgYW5vdGhl
-ciBxdWVzdGlvbiB0aGF0IHdoeSBub3QgIGJsa3RyYWNlIHRyYWNpbmcgdGhlIGJhY2sNCm1l
-cmdpbmcgb2YgcmVxdWVzdHMgd2hpbGUgZmx1c2hpbmcgcGx1Z2dlZCByZXF1ZXN0cyB0byBx
-dWV1ZSwgIGlmIGl0IGRvZXMNCndlIG1heSBnZXQgYSBtb3JlIGNsZWFyIHZpZXcgYWJvdXQg
-SU8gbWVyZ2luZy4NCg0KPg0KPiAtLQ0KPiBKZW5zIEF4Ym9lDQo+
+On 4/19/18 9:51 PM, Zhengyuan Liu wrote:
+> Hi, Shaohua
+> 
+> I found it indeed doesn't do front merge when two threads flush plug list  concurrently.   To 
+> reappear , I prepared two IO threads , named a0.io and a1.io .
+> Thread a1.io  uses libaio to write 5 requests : 
+>     sectors: 16 + 8, 40 + 8, 64 + 8, 88 + 8, 112 + 8
+> Thread a0.io  uses libaio to write other 5 requests : 
+>     sectors: 8+ 8, 32 + 8, 56 + 8, 80 + 8, 104 + 8
+
+I'm cutting some of the below.
+
+Thanks for the detailed email. It's mostly on purpose that we don't
+spend cycles and memory on maintaining a separate front merge hash,
+since it's generally not something that happens very often. If you have
+a thread pool doing IO and split sequential IO such that you would
+benefit a lot from front merging, then I would generally claim that
+you're not writing your app in the most optimal manner.
+
+So I'm curious, what's the big interest in front merging?
+
+-- 
+Jens Axboe
