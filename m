@@ -1,55 +1,90 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f176.google.com ([209.85.128.176]:45199 "EHLO
-        mail-wr0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752201AbeDPKZH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Apr 2018 06:25:07 -0400
-Received: by mail-wr0-f176.google.com with SMTP id u11so24430828wri.12
-        for <linux-block@vger.kernel.org>; Mon, 16 Apr 2018 03:25:06 -0700 (PDT)
+Return-Path: <linux-ide-owner@vger.kernel.org>
+Date: Fri, 20 Apr 2018 13:42:14 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        iommu@lists.linux-foundation.org, x86@kernel.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, linux-ide@vger.kernel.org,
+        linux-mips@linux-mips.org, sparclinux@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 09/12] PCI: remove CONFIG_PCI_BUS_ADDR_T_64BIT
+Message-ID: <20180420184214.GT28657@bhelgaas-glaptop.roam.corp.google.com>
+References: <20180415145947.1248-1-hch@lst.de>
+ <20180415145947.1248-10-hch@lst.de>
 MIME-Version: 1.0
-From: Manuel Lauss <manuel.lauss@gmail.com>
-Date: Mon, 16 Apr 2018 12:24:24 +0200
-Message-ID: <CAOLZvyFA8Dm1L1Dc0dJAVL8pZ9z3SwiLGvyxDNQ-Gkp40fbhJw@mail.gmail.com>
-Subject: Change device block count from userspace?
-To: linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180415145947.1248-10-hch@lst.de>
+Sender: linux-ide-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Hello,
+On Sun, Apr 15, 2018 at 04:59:44PM +0200, Christoph Hellwig wrote:
+> This symbol is now always identical to CONFIG_ARCH_DMA_ADDR_T_64BIT, so
+> remove it.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-I have a SATA SSD which suddenly reports its size as 2.2TB, 0xFFFFFFFF
-block count:
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
 
-[   30.620086] sd 10:0:0:0: [sdc] 4294967295 512-byte logical blocks:
-(2.20 TB/2.00 TiB)
-[   30.620327] sd 10:0:0:0: [sdc] Write Protect is off
-[   30.620329] sd 10:0:0:0: [sdc] Mode Sense: 43 00 00 00
-[   30.620771] sd 10:0:0:0: [sdc] Write cache: enabled, read cache:
-enabled, doesn't support DPO or FUA
-[   34.170412] GPT:Primary header thinks Alt. header is not at the end
-of the disk.
-[   34.170413] GPT:4004704367 != 4294967294
-[   34.170414] GPT:Alternate GPT header not at the end of the disk.
-[   34.170414] GPT:4004704367 != 4294967294
-[   34.170414] GPT: Use GNU Parted to correct GPT errors.
-[   34.170419]  sdc: sdc1
-[   34.172408] sd 10:0:0:0: [sdc] Attached SCSI disk
-[   64.293698] sd 10:0:0:0: [sdc] tag#15 uas_eh_abort_handler 0
-uas-tag 1 inflight: CMD IN
-[   64.293702] sd 10:0:0:0: [sdc] tag#15 CDB: Read(10) 28 00 ff ff ff
-00 00 00 08 00
+Please merge this along with the rest of the series; let me know if you
+need anything more from me.
 
-It's impossible to access this device with either dd or any other
-tools because apparently
-the kernel tries to access higher blocks which, one after the other,
-time out after around 5 minutes.  It's possible to access the disk on
-Windows with an Ext4 driver, data seems fine but retrieval is very
-slow.
-
-Is there a way from userspace to tell the block layer that this device
-has only 4004704368 blocks, and that it should not touch the higher
-ones?
-
-Thanks!
-      Manuel
+> ---
+>  drivers/pci/Kconfig | 4 ----
+>  drivers/pci/bus.c   | 4 ++--
+>  include/linux/pci.h | 2 +-
+>  3 files changed, 3 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
+> index 34b56a8f8480..29a487f31dae 100644
+> --- a/drivers/pci/Kconfig
+> +++ b/drivers/pci/Kconfig
+> @@ -5,10 +5,6 @@
+>  
+>  source "drivers/pci/pcie/Kconfig"
+>  
+> -config PCI_BUS_ADDR_T_64BIT
+> -	def_bool y if (ARCH_DMA_ADDR_T_64BIT || 64BIT)
+> -	depends on PCI
+> -
+>  config PCI_MSI
+>  	bool "Message Signaled Interrupts (MSI and MSI-X)"
+>  	depends on PCI
+> diff --git a/drivers/pci/bus.c b/drivers/pci/bus.c
+> index bc2ded4c451f..35b7fc87eac5 100644
+> --- a/drivers/pci/bus.c
+> +++ b/drivers/pci/bus.c
+> @@ -120,7 +120,7 @@ int devm_request_pci_bus_resources(struct device *dev,
+>  EXPORT_SYMBOL_GPL(devm_request_pci_bus_resources);
+>  
+>  static struct pci_bus_region pci_32_bit = {0, 0xffffffffULL};
+> -#ifdef CONFIG_PCI_BUS_ADDR_T_64BIT
+> +#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+>  static struct pci_bus_region pci_64_bit = {0,
+>  				(pci_bus_addr_t) 0xffffffffffffffffULL};
+>  static struct pci_bus_region pci_high = {(pci_bus_addr_t) 0x100000000ULL,
+> @@ -230,7 +230,7 @@ int pci_bus_alloc_resource(struct pci_bus *bus, struct resource *res,
+>  					  resource_size_t),
+>  		void *alignf_data)
+>  {
+> -#ifdef CONFIG_PCI_BUS_ADDR_T_64BIT
+> +#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+>  	int rc;
+>  
+>  	if (res->flags & IORESOURCE_MEM_64) {
+> diff --git a/include/linux/pci.h b/include/linux/pci.h
+> index 73178a2fcee0..55371cb827ad 100644
+> --- a/include/linux/pci.h
+> +++ b/include/linux/pci.h
+> @@ -670,7 +670,7 @@ int raw_pci_read(unsigned int domain, unsigned int bus, unsigned int devfn,
+>  int raw_pci_write(unsigned int domain, unsigned int bus, unsigned int devfn,
+>  		  int reg, int len, u32 val);
+>  
+> -#ifdef CONFIG_PCI_BUS_ADDR_T_64BIT
+> +#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+>  typedef u64 pci_bus_addr_t;
+>  #else
+>  typedef u32 pci_bus_addr_t;
+> -- 
+> 2.17.0
+> 
