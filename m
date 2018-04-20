@@ -1,126 +1,64 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	Logan Gunthorpe <logang@deltatee.com>
-Date: Mon, 23 Apr 2018 17:30:39 -0600
-Message-Id: <20180423233046.21476-8-logang@deltatee.com>
-In-Reply-To: <20180423233046.21476-1-logang@deltatee.com>
-References: <20180423233046.21476-1-logang@deltatee.com>
-Subject: [PATCH v4 07/14] block: Introduce PCI P2P flags for request and request queue
+Return-Path: <prvs=6414f13c5=staskins@amazon.de>
+Subject: [PATCH 0/3] Introduce Xen fault injection facility
+From: Stanislav Kinsburskii <staskins@amazon.com>
+CC: <jakub.kicinski@netronome.com>, <hpa@zytor.com>, <mcroce@redhat.com>,
+        <staskins@amazon.com>, <tglx@linutronix.de>, <ggarcia@abra.uab.cat>,
+        <daniel@iogearbox.net>, <x86@kernel.org>, <mingo@redhat.com>,
+        <xen-devel@lists.xenproject.org>, <axboe@kernel.dk>,
+        <konrad.wilk@oracle.com>, <amir.jer.levy@intel.com>,
+        <paul.durrant@citrix.com>, <stefanha@redhat.com>,
+        <dsa@cumulusnetworks.com>, <boris.ostrovsky@oracle.com>,
+        <jgross@suse.com>, <linux-block@vger.kernel.org>,
+        <wei.liu2@citrix.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <davem@davemloft.net>,
+        <dwmw@amazon.co.uk>, <roger.pau@citrix.com>
+Date: Fri, 20 Apr 2018 10:47:20 +0000
+Message-ID: <20180420104603.17823.31095.stgit@dev-dsk-staskins-1a-ca5afbf2.eu-west-1.amazon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-block@vger.kernel.org>
 
-QUEUE_FLAG_PCI_P2P is introduced meaning a driver's request queue
-supports targeting P2P memory.
-
-REQ_PCI_P2P is introduced to indicate a particular bio request is
-directed to/from PCI P2P memory. A request with this flag is not
-accepted unless the corresponding queues have the QUEUE_FLAG_PCI_P2P
-flag set.
-
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-core.c          |  3 +++
- include/linux/blk_types.h | 18 +++++++++++++++++-
- include/linux/blkdev.h    |  3 +++
- 3 files changed, 23 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 806ce2442819..35680cbebaf4 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2270,6 +2270,9 @@ generic_make_request_checks(struct bio *bio)
- 	if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_rq_based(q))
- 		goto not_supported;
- 
-+	if ((bio->bi_opf & REQ_PCI_P2PDMA) && !blk_queue_pci_p2pdma(q))
-+		goto not_supported;
-+
- 	if (should_fail_bio(bio))
- 		goto end_io;
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 17b18b91ebac..41194d54c45a 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -279,6 +279,10 @@ enum req_flag_bits {
- 	__REQ_BACKGROUND,	/* background IO */
- 	__REQ_NOWAIT,           /* Don't wait if request will block */
- 
-+#ifdef CONFIG_PCI_P2PDMA
-+	__REQ_PCI_P2PDMA,	/* request is to/from P2P memory */
-+#endif
-+
- 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
- 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
- 
-@@ -303,6 +307,18 @@ enum req_flag_bits {
- #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
- #define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
- 
-+#ifdef CONFIG_PCI_P2PDMA
-+/*
-+ * Currently SGLs do not support mixed P2P and regular memory so
-+ * requests with P2P memory must not be merged.
-+ */
-+#define REQ_PCI_P2PDMA		(1ULL << __REQ_PCI_P2PDMA)
-+#define REQ_IS_PCI_P2PDMA(req)	((req)->cmd_flags & REQ_PCI_P2PDMA)
-+#else
-+#define REQ_PCI_P2PDMA		0
-+#define REQ_IS_PCI_P2PDMA(req)	0
-+#endif /* CONFIG_PCI_P2PDMA */
-+
- #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
- 
- #define REQ_DRV			(1ULL << __REQ_DRV)
-@@ -311,7 +327,7 @@ enum req_flag_bits {
- 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
- 
- #define REQ_NOMERGE_FLAGS \
--	(REQ_NOMERGE | REQ_PREFLUSH | REQ_FUA)
-+	(REQ_NOMERGE | REQ_PREFLUSH | REQ_FUA | REQ_PCI_P2PDMA)
- 
- #define bio_op(bio) \
- 	((bio)->bi_opf & REQ_OP_MASK)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 9af3e0f430bc..116367babb39 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -698,6 +698,7 @@ struct request_queue {
- #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
- #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
- #define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
-+#define QUEUE_FLAG_PCI_P2PDMA  30	/* device supports pci p2p requests */
- 
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
-@@ -730,6 +731,8 @@ bool blk_queue_flag_test_and_clear(unsigned int flag, struct request_queue *q);
- #define blk_queue_dax(q)	test_bit(QUEUE_FLAG_DAX, &(q)->queue_flags)
- #define blk_queue_scsi_passthrough(q)	\
- 	test_bit(QUEUE_FLAG_SCSI_PASSTHROUGH, &(q)->queue_flags)
-+#define blk_queue_pci_p2pdma(q)	\
-+	test_bit(QUEUE_FLAG_PCI_P2PDMA, &(q)->queue_flags)
- 
- #define blk_noretry_request(rq) \
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
--- 
-2.11.0
+VGhpcyBzZXJpZXMgYWRkcyBhIGZhY2lsaXR5LCB3aGljaCBjYW4gYmUgdXNlZCB0byBpbnN0cnVt
+ZW50IFhlbiBjb2RlIHdpdGgKZmF1bHQgaW5qZWN0aW9ucy4KSXQgaXMgYmFzZWQgIkZhdWx0IGlu
+amVjdGlvbiBjYXBhYmlsaXRpZXMgaW5mcmFzdHJ1Y3R1cmUiIGRlc2NyaWJlZCBoZXJlOgotIERv
+Y3VtZW50YXRpb24vZmF1bHQtaW5qZWN0aW9uL2ZhdWx0LWluamVjdGlvbi50eHQKCkZpcnN0IHBh
+dGNoIGFkZHMgYSBnZW5lcmljIGZhY2lsaXR5IHRvIHVzZSBhbnl3aGVyZSBpbiBYZW4uCldoZW4g
+dXNpbmcgaXQgYWxsIHRoZSBmYXVsdCBpbmplY3Rpb24gdXNlciBsYW5kIGNvbnRyb2wgZGlyZWN0
+b3JpZXMgKGlmCmFueSkgd2lsbCBhcHBlYXIgaGVyZToKLSAvc3lzL2tlcm5lbC9kZWJ1Zy94ZW4v
+ZmF1bHRfaW5qZWN0LwoKVG8gZGlzdGluZ3Vpc2ggd2l0aCBnZW5lcmljIChvciBjb3JlKSBYZW4g
+ZmF1bHQgaW5qZWN0aW9ucywgbmV4dCB0d28KcGF0Y2hlcyBhZGQgYWRkaXRpb25hbCBkaXJlY3Rv
+cmllcyB0byB0aGUgcm9vdCBwYXRoIGFib3ZlIGZvciBibGtiYWNrIGFuZApuZXRiYWNrIGRyaXZl
+cnMgcmVzcGVjdGl2ZWx5OgotIC9zeXMva2VybmVsL2RlYnVnL3hlbi9mYXVsdF9pbmplY3QveGVu
+LWJsa2JhY2svCi0gL3N5cy9rZXJuZWwvZGVidWcveGVuL2ZhdWx0X2luamVjdC94ZW4tbmV0YmFj
+ay8KCi0tLQoKU3RhbmlzbGF2IEtpbnNidXJza2lpICgzKToKICAgICAgeGVuOiBhZGQgZ2VuZXJp
+YyBmYXVsdCBpbmplY3Rpb24gZmFjaWxpdHkKICAgICAgeGVuIG5ldGJhY2s6IGFkZCBmYXVsdCBp
+bmplY3Rpb24gZmFjaWxpdHkKICAgICAgeGVuIGJsa2JhY2s6IGFkZCBmYXVsdCBpbmplY3Rpb24g
+ZmFjaWxpdHkKCgogYXJjaC94ODYveGVuL0tjb25maWcgICAgICAgICAgICAgICAgICAgfCAgICA3
+ICsrCiBhcmNoL3g4Ni94ZW4vTWFrZWZpbGUgICAgICAgICAgICAgICAgICB8ICAgIDEgCiBhcmNo
+L3g4Ni94ZW4vZmF1bHRfaW5qZWN0LmMgICAgICAgICAgICB8ICAxMDkgKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysKIGRyaXZlcnMvYmxvY2svS2NvbmZpZyAgICAgICAgICAgICAgICAgIHwg
+ICAgNyArKwogZHJpdmVycy9ibG9jay94ZW4tYmxrYmFjay9NYWtlZmlsZSAgICAgfCAgICAxIAog
+ZHJpdmVycy9ibG9jay94ZW4tYmxrYmFjay9ibGtiYWNrLmMgICAgfCAgICA5ICsrCiBkcml2ZXJz
+L2Jsb2NrL3hlbi1ibGtiYWNrL2Jsa2JhY2tfZmkuYyB8ICAxMTYgKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKwogZHJpdmVycy9ibG9jay94ZW4tYmxrYmFjay9ibGtiYWNrX2ZpLmggfCAg
+IDM3ICsrKysrKysrKysKIGRyaXZlcnMvYmxvY2sveGVuLWJsa2JhY2svY29tbW9uLmggICAgIHwg
+ICAgMyArCiBkcml2ZXJzL2Jsb2NrL3hlbi1ibGtiYWNrL3hlbmJ1cy5jICAgICB8ICAgIDUgKwog
+ZHJpdmVycy9uZXQvS2NvbmZpZyAgICAgICAgICAgICAgICAgICAgfCAgICA4ICsrCiBkcml2ZXJz
+L25ldC94ZW4tbmV0YmFjay9NYWtlZmlsZSAgICAgICB8ICAgIDEgCiBkcml2ZXJzL25ldC94ZW4t
+bmV0YmFjay9jb21tb24uaCAgICAgICB8ICAgIDMgKwogZHJpdmVycy9uZXQveGVuLW5ldGJhY2sv
+bmV0YmFjay5jICAgICAgfCAgICAzICsKIGRyaXZlcnMvbmV0L3hlbi1uZXRiYWNrL25ldGJhY2tf
+ZmkuYyAgIHwgIDExOSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwogZHJpdmVycy9u
+ZXQveGVuLW5ldGJhY2svbmV0YmFja19maS5oICAgfCAgIDM1ICsrKysrKysrKwogZHJpdmVycy9u
+ZXQveGVuLW5ldGJhY2sveGVuYnVzLmMgICAgICAgfCAgICA2ICsrCiBpbmNsdWRlL3hlbi9mYXVs
+dF9pbmplY3QuaCAgICAgICAgICAgICB8ICAgNDUgKysrKysrKysrKysrCiAxOCBmaWxlcyBjaGFu
+Z2VkLCA1MTUgaW5zZXJ0aW9ucygrKQogY3JlYXRlIG1vZGUgMTAwNjQ0IGFyY2gveDg2L3hlbi9m
+YXVsdF9pbmplY3QuYwogY3JlYXRlIG1vZGUgMTAwNjQ0IGRyaXZlcnMvYmxvY2sveGVuLWJsa2Jh
+Y2svYmxrYmFja19maS5jCiBjcmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy9ibG9jay94ZW4tYmxr
+YmFjay9ibGtiYWNrX2ZpLmgKIGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL25ldC94ZW4tbmV0
+YmFjay9uZXRiYWNrX2ZpLmMKIGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL25ldC94ZW4tbmV0
+YmFjay9uZXRiYWNrX2ZpLmgKIGNyZWF0ZSBtb2RlIDEwMDY0NCBpbmNsdWRlL3hlbi9mYXVsdF9p
+bmplY3QuaApBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApCZXJsaW4gLSBE
+cmVzZGVuIC0gQWFjaGVuCm1haW4gb2ZmaWNlOiBLcmF1c2Vuc3RyLiAzOCwgMTAxMTcgQmVybGlu
+Ckdlc2NoYWVmdHNmdWVocmVyOiBEci4gUmFsZiBIZXJicmljaCwgQ2hyaXN0aWFuIFNjaGxhZWdl
+cgpVc3QtSUQ6IERFMjg5MjM3ODc5CkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJsb3R0
+ZW5idXJnIEhSQiAxNDkxNzMgQgo=
