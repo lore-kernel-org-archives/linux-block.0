@@ -1,6 +1,11 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Sun, 22 Apr 2018 01:53:23 +0200
-From: Jan Kara <jack@suse.cz>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:41714 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750745AbeDTSth (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Apr 2018 14:49:37 -0400
+Date: Fri, 20 Apr 2018 11:49:32 -0700
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
 To: "Luis R. Rodriguez" <mcgrof@kernel.org>
 Cc: Jan Kara <jack@suse.cz>, viro@zeniv.linux.org.uk,
         bart.vanassche@wdc.com, ming.lei@redhat.com, tytso@mit.edu,
@@ -15,7 +20,7 @@ Cc: Jan Kara <jack@suse.cz>, viro@zeniv.linux.org.uk,
         linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
         jlayton@redhat.com
 Subject: Re: [PATCH 03/11] fs: add frozen sb state helpers
-Message-ID: <20180421235323.ndj3gx65n7kmv5ta@quack2.suse.cz>
+Message-ID: <20180420184932.57as7jup75nx463v@garbanzo.do-not-panic.com>
 References: <20171129232356.28296-1-mcgrof@kernel.org>
  <20171129232356.28296-4-mcgrof@kernel.org>
  <20171130171310.GG28180@quack2.suse.cz>
@@ -24,68 +29,67 @@ References: <20171129232356.28296-1-mcgrof@kernel.org>
  <20171201211327.GQ729@wotan.suse.de>
  <20171221110329.GG31584@quack2.suse.cz>
  <20180418005936.j3fa5rogfm353clf@garbanzo.do-not-panic.com>
- <20180420184932.57as7jup75nx463v@garbanzo.do-not-panic.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180420184932.57as7jup75nx463v@garbanzo.do-not-panic.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20180418005936.j3fa5rogfm353clf@garbanzo.do-not-panic.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Fri 20-04-18 11:49:32, Luis R. Rodriguez wrote:
-> On Tue, Apr 17, 2018 at 05:59:36PM -0700, Luis R. Rodriguez wrote:
-> > On Thu, Dec 21, 2017 at 12:03:29PM +0100, Jan Kara wrote:
-> > > Hello,
-> > > 
-> > > I think I owe you a reply here... Sorry that it took so long.
+On Tue, Apr 17, 2018 at 05:59:36PM -0700, Luis R. Rodriguez wrote:
+> On Thu, Dec 21, 2017 at 12:03:29PM +0100, Jan Kara wrote:
+> > Hello,
 > > 
-> > Took me just as long :)
+> > I think I owe you a reply here... Sorry that it took so long.
+> 
+> Took me just as long :)
+> 
+> > On Fri 01-12-17 22:13:27, Luis R. Rodriguez wrote:
+> > > 
+> > > I'll note that its still not perfectly clear if really the semantics behind
+> > > freeze_bdev() match what I described above fully. That still needs to be
+> > > vetted for. For instance, does thaw_bdev() keep a superblock frozen if we
+> > > an ioctl initiated freeze had occurred before? If so then great. Otherwise
+> > > I think we'll need to distinguish the ioctl interface. Worst possible case
+> > > is that bdev semantics and in-kernel semantics differ somehow, then that
+> > > will really create a holy fucking mess.
 > > 
-> > > On Fri 01-12-17 22:13:27, Luis R. Rodriguez wrote:
-> > > > 
-> > > > I'll note that its still not perfectly clear if really the semantics behind
-> > > > freeze_bdev() match what I described above fully. That still needs to be
-> > > > vetted for. For instance, does thaw_bdev() keep a superblock frozen if we
-> > > > an ioctl initiated freeze had occurred before? If so then great. Otherwise
-> > > > I think we'll need to distinguish the ioctl interface. Worst possible case
-> > > > is that bdev semantics and in-kernel semantics differ somehow, then that
-> > > > will really create a holy fucking mess.
-> > > 
-> > > I believe nobody really thought about mixing those two interfaces to fs
-> > > freezing and so the behavior is basically defined by the implementation.
-> > > That is:
-> > > 
-> > > freeze_bdev() on sb frozen by ioctl_fsfreeze() -> EBUSY
-> > > freeze_bdev() on sb frozen by freeze_bdev() -> success
-> > > ioctl_fsfreeze() on sb frozen by freeze_bdev() -> EBUSY
-> > > ioctl_fsfreeze() on sb frozen by ioctl_fsfreeze() -> EBUSY
-> > > 
-> > > thaw_bdev() on sb frozen by ioctl_fsfreeze() -> EINVAL
+> > I believe nobody really thought about mixing those two interfaces to fs
+> > freezing and so the behavior is basically defined by the implementation.
+> > That is:
 > > 
-> > Phew, so this is what we want for the in-kernel freezing so we're good
-> > and *can* combine these then.
+> > freeze_bdev() on sb frozen by ioctl_fsfreeze() -> EBUSY
+> > freeze_bdev() on sb frozen by freeze_bdev() -> success
+> > ioctl_fsfreeze() on sb frozen by freeze_bdev() -> EBUSY
+> > ioctl_fsfreeze() on sb frozen by ioctl_fsfreeze() -> EBUSY
+> > 
+> > thaw_bdev() on sb frozen by ioctl_fsfreeze() -> EINVAL
 > 
-> I double checked, and I don't see where you get EINVAL for this case.
-> We *do* keep the sb frozen though, which is good, and the worst fear
-> I had was that we did not. However we return 0 if there was already
-> a prior freeze_bdev() or ioctl_fsfreeze() other than the context that
-> started the prior freeze (--bdev->bd_fsfreeze_count > 0).
-> 
-> The -EINVAL is only returned currently if there were no freezers.
-> 
-> int thaw_bdev(struct block_device *bdev, struct super_block *sb)
-> {
-> 	int error = -EINVAL;
-> 
-> 	mutex_lock(&bdev->bd_fsfreeze_mutex);
-> 	if (!bdev->bd_fsfreeze_count)
-> 		goto out;
+> Phew, so this is what we want for the in-kernel freezing so we're good
+> and *can* combine these then.
 
-But this is precisely where we'd bail if we freeze sb by ioctl_fsfreeze()
-but try to thaw by thaw_bdev(). ioctl_fsfreeze() does not touch
-bd_fsfreeze_count...
+I double checked, and I don't see where you get EINVAL for this case.
+We *do* keep the sb frozen though, which is good, and the worst fear
+I had was that we did not. However we return 0 if there was already
+a prior freeze_bdev() or ioctl_fsfreeze() other than the context that
+started the prior freeze (--bdev->bd_fsfreeze_count > 0).
 
-								Honza
+The -EINVAL is only returned currently if there were no freezers.
 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+int thaw_bdev(struct block_device *bdev, struct super_block *sb)
+{
+	int error = -EINVAL;
+
+	mutex_lock(&bdev->bd_fsfreeze_mutex);
+	if (!bdev->bd_fsfreeze_count)
+		goto out;
+
+	error = 0;
+	if (--bdev->bd_fsfreeze_count > 0)
+		goto out;
+	...
+out:
+	mutex_unlock(&bdev->bd_fsfreeze_mutex);
+	return error;
+}
+
+  Luis
