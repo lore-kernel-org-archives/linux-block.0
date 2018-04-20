@@ -1,40 +1,46 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 26 Apr 2018 12:01:18 -0700
-From: Tejun Heo <tj@kernel.org>
-To: Benlong Zhang <zhangbenlong@didichuxing.com>
-Cc: axboe@kernel.dk, shli@kernel.org, david@fromorbit.com,
-	bfoster@redhat.com, linux-block@vger.kernel.org,
-	Josef Bacik <jbacik@fb.com>
-Subject: Re: [PATCH] A tentative patch to bypass REQ_META in blk throttle
-Message-ID: <20180426190118.GP1911913@devbig577.frc2.facebook.com>
-References: <20180420100554.GA23471@localhost>
+Return-Path: <zhangbenlong@didichuxing.com>
+Date: Fri, 20 Apr 2018 18:06:01 +0800
+From: Benlong Zhang <zhangbenlong@didichuxing.com>
+To: <axboe@kernel.dk>
+CC: <tj@kernel.org>, <shli@kernel.org>, <david@fromorbit.com>,
+	<bfoster@redhat.com>, <linux-block@vger.kernel.org>
+Subject: [PATCH] A tentative patch to bypass REQ_META in blk throttle
+Message-ID: <20180420100554.GA23471@localhost>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180420100554.GA23471@localhost>
+Content-Type: text/plain; charset="us-ascii"
+Return-Path: zhangbenlong@didichuxing.com
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
+One problem with cgwb is how fs should treat metadata bios.
+For example in xfs, the log might be partially stuck in one
+group, leaving threads in other groups waiting for too long.
+Please refer to the linux-xfs discussion:
+"[PATCH V2] xfs: implement cgroup writeback support"
 
-On Fri, Apr 20, 2018 at 06:06:01PM +0800, Benlong Zhang wrote:
-> One problem with cgwb is how fs should treat metadata bios.
-> For example in xfs, the log might be partially stuck in one
-> group, leaving threads in other groups waiting for too long.
-> Please refer to the linux-xfs discussion:
-> "[PATCH V2] xfs: implement cgroup writeback support"
-> 
-> One approach is to correctly tag bio->bi_css from within the
-> filesystems (for xfs log should be blkcg_root), and the other
-> is to skip them, but relies on REQ_META being set.
-> 
-> It works with xfs on a cgwb porting implementation to 3.10.0.
-> But really not sure about other filesystems...
+One approach is to correctly tag bio->bi_css from within the
+filesystems (for xfs log should be blkcg_root), and the other
+is to skip them, but relies on REQ_META being set.
 
-Yeah, Josef (cc'd) is working on a similar approach but in a more
-generic way.
+It works with xfs on a cgwb porting implementation to 3.10.0.
+But really not sure about other filesystems...
+---
+ block/blk-throttle.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Thanks.
-
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index c5a1316..e2abf6e 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -2159,6 +2159,10 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 	if (bio_flagged(bio, BIO_THROTTLED) || !tg->has_rules[rw])
+ 		goto out;
+ 
++	/* bypass REQ_META for fs global resource */
++	if (bio->bi_opf & REQ_META)
++		goto out;
++
+ 	spin_lock_irq(q->queue_lock);
+ 
+ 	throtl_update_latency_buckets(td);
 -- 
-tejun
+1.8.3.1
