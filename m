@@ -1,125 +1,150 @@
-Return-Path: <jgross@suse.com>
-Subject: Re: [PATCH 1/3] xen: add generic fault injection facility
-To: Stanislav Kinsburskii <staskins@amazon.com>
-Cc: jakub.kicinski@netronome.com, hpa@zytor.com, mcroce@redhat.com,
- tglx@linutronix.de, ggarcia@abra.uab.cat, daniel@iogearbox.net,
- x86@kernel.org, mingo@redhat.com, xen-devel@lists.xenproject.org,
- axboe@kernel.dk, konrad.wilk@oracle.com, amir.jer.levy@intel.com,
- paul.durrant@citrix.com, stefanha@redhat.com, dsa@cumulusnetworks.com,
- boris.ostrovsky@oracle.com, linux-block@vger.kernel.org,
- wei.liu2@citrix.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- davem@davemloft.net, dwmw@amazon.co.uk, roger.pau@citrix.com
+Return-Path: <prvs=6414f13c5=staskins@amazon.de>
+Subject: [PATCH 1/3] xen: add generic fault injection facility
+From: Stanislav Kinsburskii <staskins@amazon.com>
+CC: <jakub.kicinski@netronome.com>, <hpa@zytor.com>, <mcroce@redhat.com>,
+        <staskins@amazon.com>, <tglx@linutronix.de>, <ggarcia@abra.uab.cat>,
+        <daniel@iogearbox.net>, <x86@kernel.org>, <mingo@redhat.com>,
+        <xen-devel@lists.xenproject.org>, <axboe@kernel.dk>,
+        <konrad.wilk@oracle.com>, <amir.jer.levy@intel.com>,
+        <paul.durrant@citrix.com>, <stefanha@redhat.com>,
+        <dsa@cumulusnetworks.com>, <boris.ostrovsky@oracle.com>,
+        <jgross@suse.com>, <linux-block@vger.kernel.org>,
+        <wei.liu2@citrix.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <davem@davemloft.net>,
+        <dwmw@amazon.co.uk>, <roger.pau@citrix.com>
+Date: Fri, 20 Apr 2018 10:47:26 +0000
+Message-ID: <20180420104726.17823.40147.stgit@dev-dsk-staskins-1a-ca5afbf2.eu-west-1.amazon.com>
+In-Reply-To: <20180420104603.17823.31095.stgit@dev-dsk-staskins-1a-ca5afbf2.eu-west-1.amazon.com>
 References: <20180420104603.17823.31095.stgit@dev-dsk-staskins-1a-ca5afbf2.eu-west-1.amazon.com>
- <20180420104726.17823.40147.stgit@dev-dsk-staskins-1a-ca5afbf2.eu-west-1.amazon.com>
-From: Juergen Gross <jgross@suse.com>
-Message-ID: <03a333dc-e505-e254-f39d-e68b1453a6f3@suse.com>
-Date: Fri, 20 Apr 2018 12:59:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180420104726.17823.40147.stgit@dev-dsk-staskins-1a-ca5afbf2.eu-west-1.amazon.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On 20/04/18 12:47, Stanislav Kinsburskii wrote:
-> The overall idea of this patch is to add a generic fault injection facility
-> to Xen, which later can be used in various places by different Xen parts.
-> 
-> Core implementation ideas:
-> 
-> - The facility build is controlled by boolean config
->   CONFIG_XEN_FAULT_INJECTION option ("N" by default).
-> 
-> - All fault injection logic is located in an optionally compiled separated
->   file.
-> 
-> - Fault injection attribute and control directory creation and destruction
->   are wrapped with helpers, producing and accepting a pointer to an opaque
->   object thus making all the rest of code independent on fault injection
->   engine.
-> 
-> When enabled Xen root fault injection directory appears:
-> 
-> - /sys/kernel/debug/xen/fault_inject/
-> 
-> The falicity provides the following helpers (exported to be accessible in
-> modules):
-> 
-> - xen_fi_add(name) - adds fault injection control directory "name" to Xen
->   root fault injection directory
-> 
-> - xen_fi_dir_create(name) - allows to create a subdirectory "name" in Xen
->   root fault injection directory.
-> 
-> - xen_fi_dir_add(dir, name) - adds fault injection control directory "name"
->   to directory "dir"
-> 
-> - xen_should_fail(fi) - check whether fi hav to fail.
-> 
-> Signed-off-by: Stanislav Kinsburskii <staskins@amazon.com>
-> CC: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-> CC: Juergen Gross <jgross@suse.com>
-> CC: Thomas Gleixner <tglx@linutronix.de>
-> CC: Ingo Molnar <mingo@redhat.com>
-> CC: "H. Peter Anvin" <hpa@zytor.com>
-> CC: x86@kernel.org
-> CC: xen-devel@lists.xenproject.org
-> CC: linux-kernel@vger.kernel.org
-> CC: Stanislav Kinsburskii <staskins@amazon.com>
-> CC: David Woodhouse <dwmw@amazon.co.uk>
-> ---
->  arch/x86/xen/Kconfig        |    7 +++
->  arch/x86/xen/Makefile       |    1 
->  arch/x86/xen/fault_inject.c |  109 +++++++++++++++++++++++++++++++++++++++++++
->  include/xen/fault_inject.h  |   45 ++++++++++++++++++
->  4 files changed, 162 insertions(+)
->  create mode 100644 arch/x86/xen/fault_inject.c
->  create mode 100644 include/xen/fault_inject.h
-> 
-> diff --git a/arch/x86/xen/Kconfig b/arch/x86/xen/Kconfig
-> index c1f98f3..483fc16 100644
-> --- a/arch/x86/xen/Kconfig
-> +++ b/arch/x86/xen/Kconfig
-> @@ -77,3 +77,10 @@ config XEN_PVH
->  	bool "Support for running as a PVH guest"
->  	depends on XEN && XEN_PVHVM && ACPI
->  	def_bool n
-> +
-> +config XEN_FAULT_INJECTION
-> +	bool "Enable Xen fault injection"
-> +	depends on FAULT_INJECTION_DEBUG_FS
-> +	default n
-> +	help
-> +	  Enable Xen fault injection facility
-
-Why for x86 only? I'd rather add this under drivers/xen
-
-> diff --git a/arch/x86/xen/Makefile b/arch/x86/xen/Makefile
-> index d83cb54..3158fe1 100644
-> --- a/arch/x86/xen/Makefile
-> +++ b/arch/x86/xen/Makefile
-> @@ -34,3 +34,4 @@ obj-$(CONFIG_XEN_DOM0)		+= vga.o
->  obj-$(CONFIG_SWIOTLB_XEN)	+= pci-swiotlb-xen.o
->  obj-$(CONFIG_XEN_EFI)		+= efi.o
->  obj-$(CONFIG_XEN_PVH)	 	+= xen-pvh.o
-> +obj-$(CONFIG_XEN_FAULT_INJECTION)	+= fault_inject.o
-> diff --git a/arch/x86/xen/fault_inject.c b/arch/x86/xen/fault_inject.c
-> new file mode 100644
-> index 0000000..ecf0f7c
-> --- /dev/null
-> +++ b/arch/x86/xen/fault_inject.c
-> @@ -0,0 +1,109 @@
-> +/*
-> + * Fauit injection interface for Xen virtual block devices
-> + *
-> + * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-> + *
-> + * This program is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU General Public License version 2
-> + * as published by the Free Software Foundation; or, when distributed
-> + * separately from the Linux kernel or incorporated into other
-> + * software packages, subject to the following license:
-
-Please use the appropriate SPDX header instead of the full GPL2
-boilerplate.
-
-
-Juergen
+VGhlIG92ZXJhbGwgaWRlYSBvZiB0aGlzIHBhdGNoIGlzIHRvIGFkZCBhIGdlbmVyaWMgZmF1bHQg
+aW5qZWN0aW9uIGZhY2lsaXR5CnRvIFhlbiwgd2hpY2ggbGF0ZXIgY2FuIGJlIHVzZWQgaW4gdmFy
+aW91cyBwbGFjZXMgYnkgZGlmZmVyZW50IFhlbiBwYXJ0cy4KCkNvcmUgaW1wbGVtZW50YXRpb24g
+aWRlYXM6CgotIFRoZSBmYWNpbGl0eSBidWlsZCBpcyBjb250cm9sbGVkIGJ5IGJvb2xlYW4gY29u
+ZmlnCiAgQ09ORklHX1hFTl9GQVVMVF9JTkpFQ1RJT04gb3B0aW9uICgiTiIgYnkgZGVmYXVsdCku
+CgotIEFsbCBmYXVsdCBpbmplY3Rpb24gbG9naWMgaXMgbG9jYXRlZCBpbiBhbiBvcHRpb25hbGx5
+IGNvbXBpbGVkIHNlcGFyYXRlZAogIGZpbGUuCgotIEZhdWx0IGluamVjdGlvbiBhdHRyaWJ1dGUg
+YW5kIGNvbnRyb2wgZGlyZWN0b3J5IGNyZWF0aW9uIGFuZCBkZXN0cnVjdGlvbgogIGFyZSB3cmFw
+cGVkIHdpdGggaGVscGVycywgcHJvZHVjaW5nIGFuZCBhY2NlcHRpbmcgYSBwb2ludGVyIHRvIGFu
+IG9wYXF1ZQogIG9iamVjdCB0aHVzIG1ha2luZyBhbGwgdGhlIHJlc3Qgb2YgY29kZSBpbmRlcGVu
+ZGVudCBvbiBmYXVsdCBpbmplY3Rpb24KICBlbmdpbmUuCgpXaGVuIGVuYWJsZWQgWGVuIHJvb3Qg
+ZmF1bHQgaW5qZWN0aW9uIGRpcmVjdG9yeSBhcHBlYXJzOgoKLSAvc3lzL2tlcm5lbC9kZWJ1Zy94
+ZW4vZmF1bHRfaW5qZWN0LwoKVGhlIGZhbGljaXR5IHByb3ZpZGVzIHRoZSBmb2xsb3dpbmcgaGVs
+cGVycyAoZXhwb3J0ZWQgdG8gYmUgYWNjZXNzaWJsZSBpbgptb2R1bGVzKToKCi0geGVuX2ZpX2Fk
+ZChuYW1lKSAtIGFkZHMgZmF1bHQgaW5qZWN0aW9uIGNvbnRyb2wgZGlyZWN0b3J5ICJuYW1lIiB0
+byBYZW4KICByb290IGZhdWx0IGluamVjdGlvbiBkaXJlY3RvcnkKCi0geGVuX2ZpX2Rpcl9jcmVh
+dGUobmFtZSkgLSBhbGxvd3MgdG8gY3JlYXRlIGEgc3ViZGlyZWN0b3J5ICJuYW1lIiBpbiBYZW4K
+ICByb290IGZhdWx0IGluamVjdGlvbiBkaXJlY3RvcnkuCgotIHhlbl9maV9kaXJfYWRkKGRpciwg
+bmFtZSkgLSBhZGRzIGZhdWx0IGluamVjdGlvbiBjb250cm9sIGRpcmVjdG9yeSAibmFtZSIKICB0
+byBkaXJlY3RvcnkgImRpciIKCi0geGVuX3Nob3VsZF9mYWlsKGZpKSAtIGNoZWNrIHdoZXRoZXIg
+ZmkgaGF2IHRvIGZhaWwuCgpTaWduZWQtb2ZmLWJ5OiBTdGFuaXNsYXYgS2luc2J1cnNraWkgPHN0
+YXNraW5zQGFtYXpvbi5jb20+CkNDOiBCb3JpcyBPc3Ryb3Zza3kgPGJvcmlzLm9zdHJvdnNreUBv
+cmFjbGUuY29tPgpDQzogSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuY29tPgpDQzogVGhvbWFz
+IEdsZWl4bmVyIDx0Z2x4QGxpbnV0cm9uaXguZGU+CkNDOiBJbmdvIE1vbG5hciA8bWluZ29AcmVk
+aGF0LmNvbT4KQ0M6ICJILiBQZXRlciBBbnZpbiIgPGhwYUB6eXRvci5jb20+CkNDOiB4ODZAa2Vy
+bmVsLm9yZwpDQzogeGVuLWRldmVsQGxpc3RzLnhlbnByb2plY3Qub3JnCkNDOiBsaW51eC1rZXJu
+ZWxAdmdlci5rZXJuZWwub3JnCkNDOiBTdGFuaXNsYXYgS2luc2J1cnNraWkgPHN0YXNraW5zQGFt
+YXpvbi5jb20+CkNDOiBEYXZpZCBXb29kaG91c2UgPGR3bXdAYW1hem9uLmNvLnVrPgotLS0KIGFy
+Y2gveDg2L3hlbi9LY29uZmlnICAgICAgICB8ICAgIDcgKysrCiBhcmNoL3g4Ni94ZW4vTWFrZWZp
+bGUgICAgICAgfCAgICAxIAogYXJjaC94ODYveGVuL2ZhdWx0X2luamVjdC5jIHwgIDEwOSArKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrCiBpbmNsdWRlL3hlbi9mYXVs
+dF9pbmplY3QuaCAgfCAgIDQ1ICsrKysrKysrKysrKysrKysrKwogNCBmaWxlcyBjaGFuZ2VkLCAx
+NjIgaW5zZXJ0aW9ucygrKQogY3JlYXRlIG1vZGUgMTAwNjQ0IGFyY2gveDg2L3hlbi9mYXVsdF9p
+bmplY3QuYwogY3JlYXRlIG1vZGUgMTAwNjQ0IGluY2x1ZGUveGVuL2ZhdWx0X2luamVjdC5oCgpk
+aWZmIC0tZ2l0IGEvYXJjaC94ODYveGVuL0tjb25maWcgYi9hcmNoL3g4Ni94ZW4vS2NvbmZpZwpp
+bmRleCBjMWY5OGYzLi40ODNmYzE2IDEwMDY0NAotLS0gYS9hcmNoL3g4Ni94ZW4vS2NvbmZpZwor
+KysgYi9hcmNoL3g4Ni94ZW4vS2NvbmZpZwpAQCAtNzcsMyArNzcsMTAgQEAgY29uZmlnIFhFTl9Q
+VkgKIAlib29sICJTdXBwb3J0IGZvciBydW5uaW5nIGFzIGEgUFZIIGd1ZXN0IgogCWRlcGVuZHMg
+b24gWEVOICYmIFhFTl9QVkhWTSAmJiBBQ1BJCiAJZGVmX2Jvb2wgbgorCitjb25maWcgWEVOX0ZB
+VUxUX0lOSkVDVElPTgorCWJvb2wgIkVuYWJsZSBYZW4gZmF1bHQgaW5qZWN0aW9uIgorCWRlcGVu
+ZHMgb24gRkFVTFRfSU5KRUNUSU9OX0RFQlVHX0ZTCisJZGVmYXVsdCBuCisJaGVscAorCSAgRW5h
+YmxlIFhlbiBmYXVsdCBpbmplY3Rpb24gZmFjaWxpdHkKZGlmZiAtLWdpdCBhL2FyY2gveDg2L3hl
+bi9NYWtlZmlsZSBiL2FyY2gveDg2L3hlbi9NYWtlZmlsZQppbmRleCBkODNjYjU0Li4zMTU4ZmUx
+IDEwMDY0NAotLS0gYS9hcmNoL3g4Ni94ZW4vTWFrZWZpbGUKKysrIGIvYXJjaC94ODYveGVuL01h
+a2VmaWxlCkBAIC0zNCwzICszNCw0IEBAIG9iai0kKENPTkZJR19YRU5fRE9NMCkJCSs9IHZnYS5v
+CiBvYmotJChDT05GSUdfU1dJT1RMQl9YRU4pCSs9IHBjaS1zd2lvdGxiLXhlbi5vCiBvYmotJChD
+T05GSUdfWEVOX0VGSSkJCSs9IGVmaS5vCiBvYmotJChDT05GSUdfWEVOX1BWSCkJIAkrPSB4ZW4t
+cHZoLm8KK29iai0kKENPTkZJR19YRU5fRkFVTFRfSU5KRUNUSU9OKQkrPSBmYXVsdF9pbmplY3Qu
+bwpkaWZmIC0tZ2l0IGEvYXJjaC94ODYveGVuL2ZhdWx0X2luamVjdC5jIGIvYXJjaC94ODYveGVu
+L2ZhdWx0X2luamVjdC5jCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CmluZGV4IDAwMDAwMDAuLmVjZjBm
+N2MKLS0tIC9kZXYvbnVsbAorKysgYi9hcmNoL3g4Ni94ZW4vZmF1bHRfaW5qZWN0LmMKQEAgLTAs
+MCArMSwxMDkgQEAKKy8qCisgKiBGYXVpdCBpbmplY3Rpb24gaW50ZXJmYWNlIGZvciBYZW4gdmly
+dHVhbCBibG9jayBkZXZpY2VzCisgKgorICogQ29weXJpZ2h0IDIwMTggQW1hem9uLmNvbSwgSW5j
+LiBvciBpdHMgYWZmaWxpYXRlcy4gQWxsIFJpZ2h0cyBSZXNlcnZlZC4KKyAqCisgKiBUaGlzIHBy
+b2dyYW0gaXMgZnJlZSBzb2Z0d2FyZTsgeW91IGNhbiByZWRpc3RyaWJ1dGUgaXQgYW5kL29yCisg
+KiBtb2RpZnkgaXQgdW5kZXIgdGhlIHRlcm1zIG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGlj
+ZW5zZSB2ZXJzaW9uIDIKKyAqIGFzIHB1Ymxpc2hlZCBieSB0aGUgRnJlZSBTb2Z0d2FyZSBGb3Vu
+ZGF0aW9uOyBvciwgd2hlbiBkaXN0cmlidXRlZAorICogc2VwYXJhdGVseSBmcm9tIHRoZSBMaW51
+eCBrZXJuZWwgb3IgaW5jb3Jwb3JhdGVkIGludG8gb3RoZXIKKyAqIHNvZnR3YXJlIHBhY2thZ2Vz
+LCBzdWJqZWN0IHRvIHRoZSBmb2xsb3dpbmcgbGljZW5zZToKKyAqCisgKiBQZXJtaXNzaW9uIGlz
+IGhlcmVieSBncmFudGVkLCBmcmVlIG9mIGNoYXJnZSwgdG8gYW55IHBlcnNvbiBvYnRhaW5pbmcg
+YSBjb3B5CisgKiBvZiB0aGlzIHNvdXJjZSBmaWxlICh0aGUgIlNvZnR3YXJlIiksIHRvIGRlYWwg
+aW4gdGhlIFNvZnR3YXJlIHdpdGhvdXQKKyAqIHJlc3RyaWN0aW9uLCBpbmNsdWRpbmcgd2l0aG91
+dCBsaW1pdGF0aW9uIHRoZSByaWdodHMgdG8gdXNlLCBjb3B5LCBtb2RpZnksCisgKiBtZXJnZSwg
+cHVibGlzaCwgZGlzdHJpYnV0ZSwgc3VibGljZW5zZSwgYW5kL29yIHNlbGwgY29waWVzIG9mIHRo
+ZSBTb2Z0d2FyZSwKKyAqIGFuZCB0byBwZXJtaXQgcGVyc29ucyB0byB3aG9tIHRoZSBTb2Z0d2Fy
+ZSBpcyBmdXJuaXNoZWQgdG8gZG8gc28sIHN1YmplY3QgdG8KKyAqIHRoZSBmb2xsb3dpbmcgY29u
+ZGl0aW9uczoKKyAqCisgKiBUaGUgYWJvdmUgY29weXJpZ2h0IG5vdGljZSBhbmQgdGhpcyBwZXJt
+aXNzaW9uIG5vdGljZSBzaGFsbCBiZSBpbmNsdWRlZCBpbgorICogYWxsIGNvcGllcyBvciBzdWJz
+dGFudGlhbCBwb3J0aW9ucyBvZiB0aGUgU29mdHdhcmUuCisgKgorICogVEhFIFNPRlRXQVJFIElT
+IFBST1ZJREVEICJBUyBJUyIsIFdJVEhPVVQgV0FSUkFOVFkgT0YgQU5ZIEtJTkQsIEVYUFJFU1Mg
+T1IKKyAqIElNUExJRUQsIElOQ0xVRElORyBCVVQgTk9UIExJTUlURUQgVE8gVEhFIFdBUlJBTlRJ
+RVMgT0YgTUVSQ0hBTlRBQklMSVRZLAorICogRklUTkVTUyBGT1IgQSBQQVJUSUNVTEFSIFBVUlBP
+U0UgQU5EIE5PTklORlJJTkdFTUVOVC4gSU4gTk8gRVZFTlQgU0hBTEwgVEhFCisgKiBBVVRIT1JT
+IE9SIENPUFlSSUdIVCBIT0xERVJTIEJFIExJQUJMRSBGT1IgQU5ZIENMQUlNLCBEQU1BR0VTIE9S
+IE9USEVSCisgKiBMSUFCSUxJVFksIFdIRVRIRVIgSU4gQU4gQUNUSU9OIE9GIENPTlRSQUNULCBU
+T1JUIE9SIE9USEVSV0lTRSwgQVJJU0lORworICogRlJPTSwgT1VUIE9GIE9SIElOIENPTk5FQ1RJ
+T04gV0lUSCBUSEUgU09GVFdBUkUgT1IgVEhFIFVTRSBPUiBPVEhFUiBERUFMSU5HUworICogSU4g
+VEhFIFNPRlRXQVJFLgorICovCisKKyNpbmNsdWRlIDxsaW51eC9zbGFiLmg+CisjaW5jbHVkZSA8
+bGludXgvZmF1bHQtaW5qZWN0Lmg+CisKKyNpbmNsdWRlIDx4ZW4vZmF1bHRfaW5qZWN0Lmg+CisK
+KyNpbmNsdWRlICJkZWJ1Z2ZzLmgiCisKK3N0YXRpYyBzdHJ1Y3QgZGVudHJ5ICpkX2ZpX2RlYnVn
+OworCitzdGF0aWMgREVDTEFSRV9GQVVMVF9BVFRSKHRlbXBsYXRlX2F0dHIpOworCitzdHJ1Y3Qg
+eGVuX2ZpIHsKKwlzdHJ1Y3QgZGVudHJ5CQkqZGlyOworCXN0cnVjdCBmYXVsdF9hdHRyCWF0dHI7
+Cit9OworCitzdHJ1Y3QgeGVuX2ZpICp4ZW5fZmlfZGlyX2FkZChzdHJ1Y3QgZGVudHJ5ICpwYXJl
+bnQsIGNvbnN0IGNoYXIgKm5hbWUpCit7CisJc3RydWN0IHhlbl9maSAqZmk7CisJc3RydWN0IGRl
+bnRyeSAqZGlyOworCisJZmkgPSBremFsbG9jKHNpemVvZigqZmkpLCBHRlBfS0VSTkVMKTsKKwlp
+ZiAoIWZpKQorCQlyZXR1cm4gRVJSX1BUUigtRU5PTUVNKTsKKworCW1lbWNweSgmZmktPmF0dHIs
+ICZ0ZW1wbGF0ZV9hdHRyLCBzaXplb2YodGVtcGxhdGVfYXR0cikpOworCisJZGlyID0gZmF1bHRf
+Y3JlYXRlX2RlYnVnZnNfYXR0cihuYW1lLCBwYXJlbnQsICZmaS0+YXR0cik7CisJaWYgKElTX0VS
+UihkaXIpKSB7CisJCWtmcmVlKGZpKTsKKwkJcmV0dXJuIChzdHJ1Y3QgeGVuX2ZpICopZGlyOwor
+CX0KKworCWZpLT5kaXIgPSBkaXI7CisKKwlyZXR1cm4gZmk7Cit9CitFWFBPUlRfU1lNQk9MKHhl
+bl9maV9kaXJfYWRkKTsKKworc3RydWN0IHhlbl9maSAqeGVuX2ZpX2FkZChjb25zdCBjaGFyICpu
+YW1lKQoreworCXJldHVybiB4ZW5fZmlfZGlyX2FkZChkX2ZpX2RlYnVnLCBuYW1lKTsKK30KKwor
+dm9pZCB4ZW5fZmlfZGVsKHN0cnVjdCB4ZW5fZmkgKmZpKQoreworCWRlYnVnZnNfcmVtb3ZlX3Jl
+Y3Vyc2l2ZShmaS0+ZGlyKTsKKwlrZnJlZShmaSk7Cit9CitFWFBPUlRfU1lNQk9MKHhlbl9maV9k
+ZWwpOworCitib29sIHhlbl9zaG91bGRfZmFpbChzdHJ1Y3QgeGVuX2ZpICpmaSkKK3sKKwlyZXR1
+cm4gc2hvdWxkX2ZhaWwoJmZpLT5hdHRyLCAwKTsKK30KK0VYUE9SVF9TWU1CT0woeGVuX3Nob3Vs
+ZF9mYWlsKTsKKworc3RydWN0IGRlbnRyeSAqeGVuX2ZpX2Rpcl9jcmVhdGUoY29uc3QgY2hhciAq
+bmFtZSkKK3sKKwlyZXR1cm4gZGVidWdmc19jcmVhdGVfZGlyKG5hbWUsIGRfZmlfZGVidWcpOwor
+fQorRVhQT1JUX1NZTUJPTCh4ZW5fZmlfZGlyX2NyZWF0ZSk7CisKK3N0YXRpYyBpbnQgX19pbml0
+IHhlbl9maV9pbml0KHZvaWQpCit7CisJc3RydWN0IGRlbnRyeSAqZF94ZW47CisKKwlkX3hlbiA9
+IHhlbl9pbml0X2RlYnVnZnMoKTsKKwlpZiAoIWRfeGVuKQorCQlyZXR1cm4gLUVOT01FTTsKKwor
+CWRfZmlfZGVidWcgPSBkZWJ1Z2ZzX2NyZWF0ZV9kaXIoImZhdWx0X2luamVjdCIsIGRfeGVuKTsK
+KwlpZiAoZF9maV9kZWJ1ZyA9PSBOVUxMKQorCQlyZXR1cm4gLUVOT01FTTsKKworCXJldHVybiAw
+OworfQorCitmc19pbml0Y2FsbCh4ZW5fZmlfaW5pdCk7CmRpZmYgLS1naXQgYS9pbmNsdWRlL3hl
+bi9mYXVsdF9pbmplY3QuaCBiL2luY2x1ZGUveGVuL2ZhdWx0X2luamVjdC5oCm5ldyBmaWxlIG1v
+ZGUgMTAwNjQ0CmluZGV4IDAwMDAwMDAuLmUyYmYxNGEKLS0tIC9kZXYvbnVsbAorKysgYi9pbmNs
+dWRlL3hlbi9mYXVsdF9pbmplY3QuaApAQCAtMCwwICsxLDQ1IEBACisjaWZuZGVmIF9YRU5fRkFV
+TFRfSU5KRUNUX0gKKyNkZWZpbmUgX1hFTl9GQVVMVF9JTkpFQ1RfSAorCitzdHJ1Y3QgZGVudHJ5
+Oworc3RydWN0IHhlbl9maTsKKworI2lmZGVmIENPTkZJR19GQVVMVF9JTkpFQ1RJT05fREVCVUdf
+RlMKKworc3RydWN0IGRlbnRyeSAqeGVuX2ZpX2Rpcl9jcmVhdGUoY29uc3QgY2hhciAqbmFtZSk7
+CisKK3N0cnVjdCB4ZW5fZmkgKnhlbl9maV9kaXJfYWRkKHN0cnVjdCBkZW50cnkgKnBhcmVudCwg
+Y29uc3QgY2hhciAqbmFtZSk7CitzdHJ1Y3QgeGVuX2ZpICp4ZW5fZmlfYWRkKGNvbnN0IGNoYXIg
+Km5hbWUpOwordm9pZCB4ZW5fZmlfZGVsKHN0cnVjdCB4ZW5fZmkgKmZpKTsKKworYm9vbCB4ZW5f
+c2hvdWxkX2ZhaWwoc3RydWN0IHhlbl9maSAqZmkpOworCisjZWxzZQorCitzdGF0aWMgaW5saW5l
+IHN0cnVjdCBkZW50cnkgKnhlbl9maV9kaXJfY3JlYXRlKGNvbnN0IGNoYXIgKm5hbWUpCit7CisJ
+cmV0dXJuIE5VTEw7Cit9CisKK3N0YXRpYyBpbmxpbmUgc3RydWN0IHhlbl9maSAqeGVuX2ZpX2Rp
+cl9hZGQoc3RydWN0IGRlbnRyeSAqcGFyZW50LCBjb25zdCBjaGFyICpuYW1lKQoreworCXJldHVy
+biBOVUxMOworfQorCitzdGF0aWMgaW5saW5lIHN0cnVjdCB4ZW5fZmkgKnhlbl9maV9hZGQoY29u
+c3QgY2hhciAqbmFtZSkKK3sKKwlyZXR1cm4gTlVMTDsKK30KKworc3RhdGljIGlubGluZSB2b2lk
+IHhlbl9maV9kZWwoc3RydWN0IHhlbl9maSAqZmkpIHsgfQorCitzdGF0aWMgaW5saW5lIGJvb2wg
+eGVuX3Nob3VsZF9mYWlsKHN0cnVjdCB4ZW5fZmkgKmZpKQoreworCXJldHVybiBmYWxzZTsKK30K
+KworI2VuZGlmIC8qIENPTkZJR19GQVVMVF9JTkpFQ1RJT05fREVCVUdfRlMgKi8KKworI2VuZGlm
+IC8qIF9YRU5fRkFVTFRfSU5KRUNUX0ggKi8KKworCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVy
+IEdlcm1hbnkgR21iSApCZXJsaW4gLSBEcmVzZGVuIC0gQWFjaGVuCm1haW4gb2ZmaWNlOiBLcmF1
+c2Vuc3RyLiAzOCwgMTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVocmVyOiBEci4gUmFsZiBIZXJi
+cmljaCwgQ2hyaXN0aWFuIFNjaGxhZWdlcgpVc3QtSUQ6IERFMjg5MjM3ODc5CkVpbmdldHJhZ2Vu
+IGFtIEFtdHNnZXJpY2h0IENoYXJsb3R0ZW5idXJnIEhSQiAxNDkxNzMgQgo=
