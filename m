@@ -1,61 +1,161 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:58073 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757457AbeD0QQ7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Apr 2018 12:16:59 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "hare@suse.de" <hare@suse.de>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "don.brace@microsemi.com" <don.brace@microsemi.com>,
-        "james.bottomley@hansenpartnership.com"
-        <james.bottomley@hansenpartnership.com>,
-        "osandov@fb.com" <osandov@fb.com>,
-        "loberman@redhat.com" <loberman@redhat.com>,
-        "kashyap.desai@broadcom.com" <kashyap.desai@broadcom.com>
-Subject: Re: [PATCH 3/3] scsi: avoid to hold host-wide counter of host_busy
- for scsi_mq
-Date: Fri, 27 Apr 2018 16:16:48 +0000
-Message-ID: <cf84baf9bd61fd1a3ab34aa956d496d164aef44f.camel@wdc.com>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46370 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753700AbeDTG7s (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Apr 2018 02:59:48 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Don Brace <don.brace@microsemi.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Laurence Oberman <loberman@redhat.com>
+Subject: [PATCH 3/3] scsi: avoid to hold host-wide counter of host_busy for scsi_mq
+Date: Fri, 20 Apr 2018 14:57:42 +0800
+Message-Id: <20180420065742.8043-4-ming.lei@redhat.com>
+In-Reply-To: <20180420065742.8043-1-ming.lei@redhat.com>
 References: <20180420065742.8043-1-ming.lei@redhat.com>
-         <20180420065742.8043-4-ming.lei@redhat.com>
-In-Reply-To: <20180420065742.8043-4-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gRnJpLCAyMDE4LTA0LTIwIGF0IDE0OjU3ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gK3N0
-cnVjdCBzY3NpX2hvc3RfbXFfaW5fZmxpZ2h0IHsNCj4gKwlpbnQgY250Ow0KPiArfTsNCj4gKw0K
-PiArc3RhdGljIHZvaWQgc2NzaV9ob3N0X2NoZWNrX2luX2ZsaWdodChzdHJ1Y3QgcmVxdWVzdCAq
-cnEsIHZvaWQgKmRhdGEsDQo+ICsJCWJvb2wgcmVzZXJ2ZWQpDQo+ICt7DQo+ICsJc3RydWN0IHNj
-c2lfaG9zdF9tcV9pbl9mbGlnaHQgKmluX2ZsaWdodCA9IGRhdGE7DQo+ICsNCj4gKwlpZiAoYmxr
-X21xX3JlcXVlc3Rfc3RhcnRlZChycSkpDQo+ICsJCWluX2ZsaWdodC0+Y250Kys7DQo+ICt9DQo+
-ICsNCj4gIC8qKg0KPiAgICogc2NzaV9ob3N0X2J1c3kgLSBSZXR1cm4gdGhlIGhvc3QgYnVzeSBj
-b3VudGVyDQo+ICAgKiBAc2hvc3Q6CVBvaW50ZXIgdG8gU2NzaV9Ib3N0IHRvIGluYy4NCj4gICAq
-Ki8NCj4gIGludCBzY3NpX2hvc3RfYnVzeShzdHJ1Y3QgU2NzaV9Ib3N0ICpzaG9zdCkNCj4gIHsN
-Cj4gLQlyZXR1cm4gYXRvbWljX3JlYWQoJnNob3N0LT5ob3N0X2J1c3kpOw0KPiArCXN0cnVjdCBz
-Y3NpX2hvc3RfbXFfaW5fZmxpZ2h0IGluX2ZsaWdodCA9IHsNCj4gKwkJLmNudCA9IDAsDQo+ICsJ
-fTsNCj4gKw0KPiArCWlmICghc2hvc3QtPnVzZV9ibGtfbXEpDQo+ICsJCXJldHVybiBhdG9taWNf
-cmVhZCgmc2hvc3QtPmhvc3RfYnVzeSk7DQo+ICsNCj4gKwlibGtfbXFfdGFnc2V0X2J1c3lfaXRl
-cigmc2hvc3QtPnRhZ19zZXQsIHNjc2lfaG9zdF9jaGVja19pbl9mbGlnaHQsDQo+ICsJCQkmaW5f
-ZmxpZ2h0KTsNCj4gKwlyZXR1cm4gaW5fZmxpZ2h0LmNudDsNCj4gIH0NCj4gIEVYUE9SVF9TWU1C
-T0woc2NzaV9ob3N0X2J1c3kpOw0KDQpUaGlzIHBhdGNoIGludHJvZHVjZXMgYSBzdWJ0bGUgYmVo
-YXZpb3IgY2hhbmdlIHRoYXQgaGFzIG5vdCBiZWVuIGV4cGxhaW5lZA0KaW4gdGhlIGNvbW1pdCBt
-ZXNzYWdlLiBJZiBhIFNDU0kgcmVxdWVzdCBnZXRzIHJlcXVldWVkIHRoYXQgcmVzdWx0cyBpbiBh
-DQpkZWNyZWFzZSBvZiB0aGUgLmhvc3RfYnVzeSBjb3VudGVyIGJ5IHNjc2lfZGV2aWNlX3VuYnVz
-eSgpIGJlZm9yZSB0aGUgcmVxdWVzdA0KaXMgcmVxdWV1ZWQgYW5kIGFuIGluY3JlYXNlIG9mIHRo
-ZSBob3N0X2J1c3kgY291bnRlciB3aGVuIHNjc2lfcXVldWVfcnEoKSBpcw0KY2FsbGVkIGFnYWlu
-LiBEdXJpbmcgdGhhdCB0aW1lIHN1Y2ggcmVxdWVzdHMgaGF2ZSB0aGUgc3RhdGUgTVFfUlFfQ09N
-UExFVEUgYW5kDQpoZW5jZSBibGtfbXFfcmVxdWVzdF9zdGFydGVkKCkgd2lsbCByZXR1cm4gdHJ1
-ZSBhbmQgc2NzaV9ob3N0X2NoZWNrX2luX2ZsaWdodCgpDQp3aWxsIGluY2x1ZGUgdGhlc2UgcmVx
-dWVzdHMuIEluIG90aGVyIHdvcmRzLCB0aGlzIHBhdGNoIGludHJvZHVjZXMgYSBzdWJ0bGUNCmJl
-aGF2aW9yIGNoYW5nZSB0aGF0IGhhcyBub3QgYmVlbiBleHBsYWluZWQgaW4gdGhlIGNvbW1pdCBt
-ZXNzYWdlLiBIZW5jZSBJJ20NCmRvdWJ0IHRoYXQgdGhpcyBjaGFuZ2UgaXMgY29ycmVjdC4NCg0K
-QmFydC4NCg0KDQoNCg==
+It isn't necessary to check the host depth in scsi_queue_rq() any more
+since it has been respected by blk-mq before calling scsi_queue_rq() via
+getting driver tag.
+
+Lots of LUNs may attach to same host, and per-host IOPS may reach millions
+level, so we should avoid to this expensive atomic operations on the
+hostwide counter in IO path.
+
+This patch implemens scsi_host_busy() via blk_mq_tagset_busy_iter() for
+reading the count of busy IOs for scsi_mq.
+
+It is observed that IOPS is increased by 15% in IO test on scsi_debug
+(32 LUNs, 32 submit queues, 1024 can_queue, libaio/dio) in one
+dual-socket system.
+
+Cc: Omar Sandoval <osandov@fb.com>,
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
+Cc: Christoph Hellwig <hch@lst.de>,
+Cc: Don Brace <don.brace@microsemi.com>
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Laurence Oberman <loberman@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/scsi/hosts.c    | 24 +++++++++++++++++++++++-
+ drivers/scsi/scsi_lib.c | 23 +++++++++++++++++------
+ 2 files changed, 40 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
+index 69beb30205f1..ad56e2b10ac8 100644
+--- a/drivers/scsi/hosts.c
++++ b/drivers/scsi/hosts.c
+@@ -564,13 +564,35 @@ struct Scsi_Host *scsi_host_get(struct Scsi_Host *shost)
+ }
+ EXPORT_SYMBOL(scsi_host_get);
+ 
++struct scsi_host_mq_in_flight {
++	int cnt;
++};
++
++static void scsi_host_check_in_flight(struct request *rq, void *data,
++		bool reserved)
++{
++	struct scsi_host_mq_in_flight *in_flight = data;
++
++	if (blk_mq_request_started(rq))
++		in_flight->cnt++;
++}
++
+ /**
+  * scsi_host_busy - Return the host busy counter
+  * @shost:	Pointer to Scsi_Host to inc.
+  **/
+ int scsi_host_busy(struct Scsi_Host *shost)
+ {
+-	return atomic_read(&shost->host_busy);
++	struct scsi_host_mq_in_flight in_flight = {
++		.cnt = 0,
++	};
++
++	if (!shost->use_blk_mq)
++		return atomic_read(&shost->host_busy);
++
++	blk_mq_tagset_busy_iter(&shost->tag_set, scsi_host_check_in_flight,
++			&in_flight);
++	return in_flight.cnt;
+ }
+ EXPORT_SYMBOL(scsi_host_busy);
+ 
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 0dfec0dedd5e..dc437c642934 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -345,7 +345,8 @@ static void scsi_dec_host_busy(struct Scsi_Host *shost)
+ 	unsigned long flags;
+ 
+ 	rcu_read_lock();
+-	atomic_dec(&shost->host_busy);
++	if (!shost->use_blk_mq)
++		atomic_dec(&shost->host_busy);
+ 	if (unlikely(scsi_host_in_recovery(shost))) {
+ 		spin_lock_irqsave(shost->host_lock, flags);
+ 		if (shost->host_failed || shost->host_eh_scheduled)
+@@ -444,7 +445,12 @@ static inline bool scsi_target_is_busy(struct scsi_target *starget)
+ 
+ static inline bool scsi_host_is_busy(struct Scsi_Host *shost)
+ {
+-	if (shost->can_queue > 0 &&
++	/*
++	 * blk-mq can handle host queue busy efficiently via host-wide driver
++	 * tag allocation
++	 */
++
++	if (!shost->use_blk_mq && shost->can_queue > 0 &&
+ 	    atomic_read(&shost->host_busy) >= shost->can_queue)
+ 		return true;
+ 	if (atomic_read(&shost->host_blocked) > 0)
+@@ -1539,9 +1545,12 @@ static inline int scsi_host_queue_ready(struct request_queue *q,
+ 	if (scsi_host_in_recovery(shost))
+ 		return 0;
+ 
+-	busy = atomic_inc_return(&shost->host_busy) - 1;
++	if (!shost->use_blk_mq)
++		busy = atomic_inc_return(&shost->host_busy) - 1;
++	else
++		busy = 0;
+ 	if (atomic_read(&shost->host_blocked) > 0) {
+-		if (busy)
++		if (busy || scsi_host_busy(shost))
+ 			goto starved;
+ 
+ 		/*
+@@ -1555,7 +1564,7 @@ static inline int scsi_host_queue_ready(struct request_queue *q,
+ 				     "unblocking host at zero depth\n"));
+ 	}
+ 
+-	if (shost->can_queue > 0 && busy >= shost->can_queue)
++	if (!shost->use_blk_mq && shost->can_queue > 0 && busy >= shost->can_queue)
+ 		goto starved;
+ 	if (shost->host_self_blocked)
+ 		goto starved;
+@@ -1641,7 +1650,9 @@ static void scsi_kill_request(struct request *req, struct request_queue *q)
+ 	 * with the locks as normal issue path does.
+ 	 */
+ 	atomic_inc(&sdev->device_busy);
+-	atomic_inc(&shost->host_busy);
++
++	if (!shost->use_blk_mq)
++		atomic_inc(&shost->host_busy);
+ 	if (starget->can_queue > 0)
+ 		atomic_inc(&starget->target_busy);
+ 
+-- 
+2.9.5
