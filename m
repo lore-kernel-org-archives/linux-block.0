@@ -1,39 +1,78 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:40857 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758513AbeD0Pra (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Apr 2018 11:47:30 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "hare@suse.de" <hare@suse.de>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "don.brace@microsemi.com" <don.brace@microsemi.com>,
-        "james.bottomley@hansenpartnership.com"
-        <james.bottomley@hansenpartnership.com>,
-        "osandov@fb.com" <osandov@fb.com>,
-        "loberman@redhat.com" <loberman@redhat.com>,
-        "kashyap.desai@broadcom.com" <kashyap.desai@broadcom.com>
-Subject: Re: [PATCH 1/3] scsi: introduce scsi_host_busy()
-Date: Fri, 27 Apr 2018 15:47:25 +0000
-Message-ID: <0da9676e432e393562f24b09f233012c7fdd7943.camel@wdc.com>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51926 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753904AbeDTG7X (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Apr 2018 02:59:23 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Don Brace <don.brace@microsemi.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Laurence Oberman <loberman@redhat.com>
+Subject: [PATCH 1/3] scsi: introduce scsi_host_busy()
+Date: Fri, 20 Apr 2018 14:57:40 +0800
+Message-Id: <20180420065742.8043-2-ming.lei@redhat.com>
+In-Reply-To: <20180420065742.8043-1-ming.lei@redhat.com>
 References: <20180420065742.8043-1-ming.lei@redhat.com>
-         <20180420065742.8043-2-ming.lei@redhat.com>
-In-Reply-To: <20180420065742.8043-2-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gRnJpLCAyMDE4LTA0LTIwIGF0IDE0OjU3ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gVGhp
-cyBwYXRjaCBpbnRyb2R1Y2VzIFNDU0kgbWlkZGxlIGxheWVyIEFQSSBvZiBzY3NpX2hvc3RfYnVz
-eSgpIGZvcg0KPiBkcml2ZXJzIHRvIHJlYWQgdGhlIGhvc3Qtd2lkZSBjb3VudGVyIG9mIHNjc2lf
-aG9zdC0+aG9zdF9idXN5Lg0KDQpUaGlzIHBhdGNoIGludHJvZHVjZXMgYSBmdW5jdGlvbiB0aGF0
-IGhhcyBubyBjYWxsZXJzIHNvIEkgdGhpbmsgdGhpcyBwYXRjaA0Kc2hvdWxkIGJlIGNvbWJpbmVk
-IHdpdGggcGF0Y2ggMi8zIGZyb20gdGhpcyBzZXJpZXMgaW50byBhIHNpbmdsZSBwYXRjaC4NCg0K
-QmFydC4NCg0KDQo=
+This patch introduces SCSI middle layer API of scsi_host_busy() for
+drivers to read the host-wide counter of scsi_host->host_busy.
+
+Cc: Omar Sandoval <osandov@fb.com>,
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
+Cc: Christoph Hellwig <hch@lst.de>,
+Cc: Don Brace <don.brace@microsemi.com>
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Laurence Oberman <loberman@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/scsi/hosts.c     | 10 ++++++++++
+ include/scsi/scsi_host.h |  1 +
+ 2 files changed, 11 insertions(+)
+
+diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
+index 7649d63a1b8d..69beb30205f1 100644
+--- a/drivers/scsi/hosts.c
++++ b/drivers/scsi/hosts.c
+@@ -565,6 +565,16 @@ struct Scsi_Host *scsi_host_get(struct Scsi_Host *shost)
+ EXPORT_SYMBOL(scsi_host_get);
+ 
+ /**
++ * scsi_host_busy - Return the host busy counter
++ * @shost:	Pointer to Scsi_Host to inc.
++ **/
++int scsi_host_busy(struct Scsi_Host *shost)
++{
++	return atomic_read(&shost->host_busy);
++}
++EXPORT_SYMBOL(scsi_host_busy);
++
++/**
+  * scsi_host_put - dec a Scsi_Host ref count
+  * @shost:	Pointer to Scsi_Host to dec.
+  **/
+diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
+index 12f454cb6f61..44ab89268f30 100644
+--- a/include/scsi/scsi_host.h
++++ b/include/scsi/scsi_host.h
+@@ -758,6 +758,7 @@ extern void scsi_scan_host(struct Scsi_Host *);
+ extern void scsi_rescan_device(struct device *);
+ extern void scsi_remove_host(struct Scsi_Host *);
+ extern struct Scsi_Host *scsi_host_get(struct Scsi_Host *);
++extern int scsi_host_busy(struct Scsi_Host *shost);
+ extern void scsi_host_put(struct Scsi_Host *t);
+ extern struct Scsi_Host *scsi_host_lookup(unsigned short);
+ extern const char *scsi_host_state_name(enum scsi_host_state);
+-- 
+2.9.5
