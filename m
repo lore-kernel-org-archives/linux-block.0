@@ -1,75 +1,46 @@
-Return-Path: <jianchao.w.wang@oracle.com>
+Return-Path: <prvs=641c6dbd3=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"israelr@mellanox.com" <israelr@mellanox.com>, "sagi@grimberg.me"
+	<sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"maxg@mellanox.com" <maxg@mellanox.com>, "tj@kernel.org" <tj@kernel.org>
 Subject: Re: [PATCH v6] blk-mq: Avoid that a completion can be ignored for
  BLK_EH_RESET_TIMER
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "israelr@mellanox.com" <israelr@mellanox.com>,
-        "sagi@grimberg.me" <sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "maxg@mellanox.com" <maxg@mellanox.com>,
-        "tj@kernel.org" <tj@kernel.org>
+Date: Fri, 20 Apr 2018 14:11:35 +0000
+Message-ID: <a47209f74d52d19464f993c11c4a4811271e6348.camel@wdc.com>
 References: <20180419164353.13561-1-bart.vanassche@wdc.com>
- <18cd85bb-ee41-ce6f-e8c8-dcf6e7fd0504@oracle.com>
- <a47209f74d52d19464f993c11c4a4811271e6348.camel@wdc.com>
-From: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <389cc1a6-6c2a-db08-fec1-1e103a6a9c9e@oracle.com>
-Date: Sat, 21 Apr 2018 21:34:56 +0800
+	 <18cd85bb-ee41-ce6f-e8c8-dcf6e7fd0504@oracle.com>
+In-Reply-To: <18cd85bb-ee41-ce6f-e8c8-dcf6e7fd0504@oracle.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <a47209f74d52d19464f993c11c4a4811271e6348.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Bart
-
-Thanks for your kindly response.
-
-On 04/20/2018 10:11 PM, Bart Van Assche wrote:
-> On Fri, 2018-04-20 at 14:55 +0800, jianchao.wang wrote:
->> Hi Bart
->>
->> On 04/20/2018 12:43 AM, Bart Van Assche wrote:
->>> Use the deadline instead of the request generation to detect whether
->>>   or not a request timer fired after reinitialization of a request
->>
->> Maybe use deadline to do this is not suitable.
->>
->> Let's think of the following scenario.
->>
->> T1/T2 times in nano seconds
->> J1/J2 times in jiffies
->>
->> rq is started at T1,J1
->> blk_mq_timeout_work
->>   -> blk_mq_check_expired
->>     -> save rq->__deadline (J1 + MQ_RQ_IN_FLIGHT)
->>
->>                                              rq is completed and freed 
->>                                              rq is allocated and started again on T2
->>                                              rq->__deadline = J2 + MQ_RQ_IN_FLIGHT
->>   -> synchronize srcu/rcu
->>   -> blk_mq_terminate_expired
->>     -> rq->__deadline (J2 + MQ_RQ_IN_FLIGHT)
->>
->> 1. deadline = rq->__deadline & ~RQ_STATE_MASK (0x3)
->>    if J2-J1 < 4 jiffies, we will get the same deadline value.
->>
->> 2. even if we do some bit shift when save and get deadline
->>    if T2 - T1 < time of 1 jiffies, we sill get the same deadline.
-> 
-> Hello Jianchao,
-> 
-> How about using the upper 16 or 32 bits of rq->__deadline to store a generation
-> number? I don't know any block driver for which the product of (deadline in
-> seconds) and HZ exceeds (1 << 32).
-> 
-yes, we don't need so long timeout value.
-However, req->__deadline is an absolute time, not a relative one, 
-its type is unsigned long variable which is same with jiffies.
-If we reserve some bits (not just 1 or 2 bits) of req->__deadline for generation number,
-how to handle it when mod_timer ?
-
-Thanks
-Jianchao
- 
+T24gRnJpLCAyMDE4LTA0LTIwIGF0IDE0OjU1ICswODAwLCBqaWFuY2hhby53YW5nIHdyb3RlOg0K
+PiBIaSBCYXJ0DQo+IA0KPiBPbiAwNC8yMC8yMDE4IDEyOjQzIEFNLCBCYXJ0IFZhbiBBc3NjaGUg
+d3JvdGU6DQo+ID4gVXNlIHRoZSBkZWFkbGluZSBpbnN0ZWFkIG9mIHRoZSByZXF1ZXN0IGdlbmVy
+YXRpb24gdG8gZGV0ZWN0IHdoZXRoZXINCj4gPiAgIG9yIG5vdCBhIHJlcXVlc3QgdGltZXIgZmly
+ZWQgYWZ0ZXIgcmVpbml0aWFsaXphdGlvbiBvZiBhIHJlcXVlc3QNCj4gDQo+IE1heWJlIHVzZSBk
+ZWFkbGluZSB0byBkbyB0aGlzIGlzIG5vdCBzdWl0YWJsZS4NCj4gDQo+IExldCdzIHRoaW5rIG9m
+IHRoZSBmb2xsb3dpbmcgc2NlbmFyaW8uDQo+IA0KPiBUMS9UMiB0aW1lcyBpbiBuYW5vIHNlY29u
+ZHMNCj4gSjEvSjIgdGltZXMgaW4gamlmZmllcw0KPiANCj4gcnEgaXMgc3RhcnRlZCBhdCBUMSxK
+MQ0KPiBibGtfbXFfdGltZW91dF93b3JrDQo+ICAgLT4gYmxrX21xX2NoZWNrX2V4cGlyZWQNCj4g
+ICAgIC0+IHNhdmUgcnEtPl9fZGVhZGxpbmUgKEoxICsgTVFfUlFfSU5fRkxJR0hUKQ0KPiANCj4g
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcnEgaXMgY29tcGxl
+dGVkIGFuZCBmcmVlZCANCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgcnEgaXMgYWxsb2NhdGVkIGFuZCBzdGFydGVkIGFnYWluIG9uIFQyDQo+ICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJxLT5fX2RlYWRsaW5lID0gSjIg
+KyBNUV9SUV9JTl9GTElHSFQNCj4gICAtPiBzeW5jaHJvbml6ZSBzcmN1L3JjdQ0KPiAgIC0+IGJs
+a19tcV90ZXJtaW5hdGVfZXhwaXJlZA0KPiAgICAgLT4gcnEtPl9fZGVhZGxpbmUgKEoyICsgTVFf
+UlFfSU5fRkxJR0hUKQ0KPiANCj4gMS4gZGVhZGxpbmUgPSBycS0+X19kZWFkbGluZSAmIH5SUV9T
+VEFURV9NQVNLICgweDMpDQo+ICAgIGlmIEoyLUoxIDwgNCBqaWZmaWVzLCB3ZSB3aWxsIGdldCB0
+aGUgc2FtZSBkZWFkbGluZSB2YWx1ZS4NCj4gDQo+IDIuIGV2ZW4gaWYgd2UgZG8gc29tZSBiaXQg
+c2hpZnQgd2hlbiBzYXZlIGFuZCBnZXQgZGVhZGxpbmUNCj4gICAgaWYgVDIgLSBUMSA8IHRpbWUg
+b2YgMSBqaWZmaWVzLCB3ZSBzaWxsIGdldCB0aGUgc2FtZSBkZWFkbGluZS4NCg0KSGVsbG8gSmlh
+bmNoYW8sDQoNCkhvdyBhYm91dCB1c2luZyB0aGUgdXBwZXIgMTYgb3IgMzIgYml0cyBvZiBycS0+
+X19kZWFkbGluZSB0byBzdG9yZSBhIGdlbmVyYXRpb24NCm51bWJlcj8gSSBkb24ndCBrbm93IGFu
+eSBibG9jayBkcml2ZXIgZm9yIHdoaWNoIHRoZSBwcm9kdWN0IG9mIChkZWFkbGluZSBpbg0Kc2Vj
+b25kcykgYW5kIEhaIGV4Y2VlZHMgKDEgPDwgMzIpLg0KDQpUaGFua3MsDQoNCkJhcnQuDQoNCg0K
+DQo=
