@@ -1,78 +1,38 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51926 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753904AbeDTG7X (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Apr 2018 02:59:23 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Don Brace <don.brace@microsemi.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH 1/3] scsi: introduce scsi_host_busy()
-Date: Fri, 20 Apr 2018 14:57:40 +0800
-Message-Id: <20180420065742.8043-2-ming.lei@redhat.com>
-In-Reply-To: <20180420065742.8043-1-ming.lei@redhat.com>
-References: <20180420065742.8043-1-ming.lei@redhat.com>
+Received: from aserp2130.oracle.com ([141.146.126.79]:53082 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753710AbeDTBhv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 19 Apr 2018 21:37:51 -0400
+To: Manuel Lauss <manuel.lauss@gmail.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org
+Subject: Re: Change device block count from userspace?
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <CAOLZvyFA8Dm1L1Dc0dJAVL8pZ9z3SwiLGvyxDNQ-Gkp40fbhJw@mail.gmail.com>
+        <yq1y3hlpi7y.fsf@oracle.com>
+        <CAOLZvyEQH+8nvqyf492ikCui0C=5CR2utDi_ZE7nrD4MOBVZKQ@mail.gmail.com>
+Date: Thu, 19 Apr 2018 21:37:47 -0400
+In-Reply-To: <CAOLZvyEQH+8nvqyf492ikCui0C=5CR2utDi_ZE7nrD4MOBVZKQ@mail.gmail.com>
+        (Manuel Lauss's message of "Wed, 18 Apr 2018 07:17:33 +0200")
+Message-ID: <yq1vacmiro4.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This patch introduces SCSI middle layer API of scsi_host_busy() for
-drivers to read the host-wide counter of scsi_host->host_busy.
 
-Cc: Omar Sandoval <osandov@fb.com>,
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Don Brace <don.brace@microsemi.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/hosts.c     | 10 ++++++++++
- include/scsi/scsi_host.h |  1 +
- 2 files changed, 11 insertions(+)
+Manuel,
 
-diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
-index 7649d63a1b8d..69beb30205f1 100644
---- a/drivers/scsi/hosts.c
-+++ b/drivers/scsi/hosts.c
-@@ -565,6 +565,16 @@ struct Scsi_Host *scsi_host_get(struct Scsi_Host *shost)
- EXPORT_SYMBOL(scsi_host_get);
- 
- /**
-+ * scsi_host_busy - Return the host busy counter
-+ * @shost:	Pointer to Scsi_Host to inc.
-+ **/
-+int scsi_host_busy(struct Scsi_Host *shost)
-+{
-+	return atomic_read(&shost->host_busy);
-+}
-+EXPORT_SYMBOL(scsi_host_busy);
-+
-+/**
-  * scsi_host_put - dec a Scsi_Host ref count
-  * @shost:	Pointer to Scsi_Host to dec.
-  **/
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index 12f454cb6f61..44ab89268f30 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -758,6 +758,7 @@ extern void scsi_scan_host(struct Scsi_Host *);
- extern void scsi_rescan_device(struct device *);
- extern void scsi_remove_host(struct Scsi_Host *);
- extern struct Scsi_Host *scsi_host_get(struct Scsi_Host *);
-+extern int scsi_host_busy(struct Scsi_Host *shost);
- extern void scsi_host_put(struct Scsi_Host *t);
- extern struct Scsi_Host *scsi_host_lookup(unsigned short);
- extern const char *scsi_host_state_name(enum scsi_host_state);
+> It's not a kernel fault, the drive is broken.
+
+Interesting, OK. Just wanted to make sure we didn't have a regression. I
+tweaked the capacity reading code recently.
+
+> Still, is there a userspace option (sysfs attribute perhaps) to limit
+> disk capacity to a certain block count?
+
+I'm afraid not.
+
 -- 
-2.9.5
+Martin K. Petersen	Oracle Linux Engineering
