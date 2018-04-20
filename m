@@ -1,22 +1,52 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] block: mq: Add some minor doc for core structs
-To: Linus Walleij <linus.walleij@linaro.org>, linux-block@vger.kernel.org
-References: <20180420082951.10481-1-linus.walleij@linaro.org>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <23353082-7114-7b56-9bbf-fdfbf456f5f0@kernel.dk>
-Date: Fri, 20 Apr 2018 09:19:37 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180420082951.10481-1-linus.walleij@linaro.org>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <linus.walleij@linaro.org>
+Return-Path: <linus.walleij@linaro.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH] block: mq: Add some minor doc for core structs
+Date: Fri, 20 Apr 2018 10:29:51 +0200
+Message-Id: <20180420082951.10481-1-linus.walleij@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-On 4/20/18 2:29 AM, Linus Walleij wrote:
-> As it came up in discussion on the mailing list that the semantic
-> meaning of 'blk_mq_ctx' and 'blk_mq_hw_ctx' isn't completely
-> obvious to everyone, let's add some minimal kerneldoc for a
-> starter.
+As it came up in discussion on the mailing list that the semantic
+meaning of 'blk_mq_ctx' and 'blk_mq_hw_ctx' isn't completely
+obvious to everyone, let's add some minimal kerneldoc for a
+starter.
 
-Thanks Linus, applied.
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+ block/blk-mq.h         | 3 +++
+ include/linux/blk-mq.h | 3 +++
+ 2 files changed, 6 insertions(+)
 
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 88c558f71819..89b5cd3a6c70 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -7,6 +7,9 @@
+ 
+ struct blk_mq_tag_set;
+ 
++/**
++ * struct blk_mq_ctx - State for a software queue facing the submitting CPUs
++ */
+ struct blk_mq_ctx {
+ 	struct {
+ 		spinlock_t		lock;
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index e3986f4b3461..ebc34a5686dc 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -9,6 +9,9 @@
+ struct blk_mq_tags;
+ struct blk_flush_queue;
+ 
++/**
++ * struct blk_mq_hw_ctx - State for a hardware queue facing the hardware block device
++ */
+ struct blk_mq_hw_ctx {
+ 	struct {
+ 		spinlock_t		lock;
 -- 
-Jens Axboe
+2.14.3
