@@ -1,60 +1,115 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:50645 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753237AbeD3JKS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Apr 2018 05:10:18 -0400
-Received: by mail-wm0-f65.google.com with SMTP id t11so11930345wmt.0
-        for <linux-block@vger.kernel.org>; Mon, 30 Apr 2018 02:10:17 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [V2 PATCH 00/11] lightnvm: pblk: small fixes
-Date: Mon, 30 Apr 2018 11:09:58 +0200
-Message-Id: <1525079409-6588-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mail.kernel.org ([198.145.29.99]:47232 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752775AbeDTX7L (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Apr 2018 19:59:11 -0400
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+To: viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org
+Cc: jack@suse.cz, bart.vanassche@wdc.com, ming.lei@redhat.com,
+        rjw@rjwysocki.net, mguzik@redhat.com, linux-pm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Luis R. Rodriguez" <mcgrof@kernel.org>
+Subject: [PATCH 2/3] fs: make thaw_super_locked() really just a helper
+Date: Fri, 20 Apr 2018 16:59:03 -0700
+Message-Id: <20180420235904.27496-3-mcgrof@kernel.org>
+In-Reply-To: <20180420235904.27496-1-mcgrof@kernel.org>
+References: <20180420235904.27496-1-mcgrof@kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Changes since V1 (from Matias):
- - Improve commit messages
- - Fix error code on read path refactoring
+thaw_super_locked() was added via commit 08fdc8a0138a ("buffer.c: call
+thaw_super during emergency thaw") merged on v4.17 to help with the
+ability so that the caller can take charge of handling the s_umount lock,
+however, it has left all* of the failure handling including unlocking
+lock of s_umount inside thaw_super_locked().
 
-Changes can be found at. This includes this series, the 2 extra patches I sent
-for pblk and Hans' write recovery on top.
-	https://github.com/OpenChannelSSD/linux/tree/for-4.18/pblk
+This does not make thaw_super_locked() flexible. For instance we may
+later want to use it with the abilty to handle unfolding of the locks
+ourselves.
 
-A bunch of small fixes and extra checks for pblk. Non is critical, though
-("lightnvm: pblk: check for chunk size before allocating it") might be nice to
-get into 4.17 as it is a fix for the 2.0 pblk patches.
+Change thaw_super_locked() to really just be a helper, and let the
+callers deal with all the error handling.
 
-Javier
+This commit introeuces no functional changes.
 
-Javier González (11):
-  lightnvm: pblk: fail gracefully on line alloc. failure
-  lightnvm: pblk: recheck for bad lines at runtime
-  lightnvm: pblk: check read lba on gc path
-  lightnvn: pblk: improve error msg on corrupted LBAs
-  lightnvm: pblk: warn in case of corrupted write buffer
-  lightnvm: pblk: return NVM_ error on failed submission
-  lightnvm: pblk: remove unnecessary indirection
-  lightnvm: pblk: remove unnecessary argument
-  lightnvm: pblk: check for chunk size before allocating it
-  lightnvn: pass flag on graceful teardown to targets
-  lightnvm: pblk: remove dead function
+Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
+---
+ fs/super.c | 27 ++++++++++++++++++++-------
+ 1 file changed, 20 insertions(+), 7 deletions(-)
 
- drivers/lightnvm/core.c      | 10 +++---
- drivers/lightnvm/pblk-core.c | 86 ++++++++++++++++++++++++++------------------
- drivers/lightnvm/pblk-gc.c   | 10 +++---
- drivers/lightnvm/pblk-init.c | 38 ++++++++++++--------
- drivers/lightnvm/pblk-map.c  | 33 ++++++++++++-----
- drivers/lightnvm/pblk-rb.c   |  5 ++-
- drivers/lightnvm/pblk-read.c | 75 ++++++++++++++++++++++++++++----------
- drivers/lightnvm/pblk.h      |  7 ++--
- include/linux/lightnvm.h     |  2 +-
- 9 files changed, 174 insertions(+), 92 deletions(-)
-
+diff --git a/fs/super.c b/fs/super.c
+index 9d0eb5e20a1f..82bc74a16f06 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -937,10 +937,15 @@ void emergency_remount(void)
+ 
+ static void do_thaw_all_callback(struct super_block *sb)
+ {
++	int error;
++
+ 	down_write(&sb->s_umount);
+ 	if (sb->s_root && sb->s_flags & MS_BORN) {
+ 		emergency_thaw_bdev(sb);
+-		thaw_super_locked(sb);
++		error = thaw_super_locked(sb);
++		if (error)
++			up_write(&sb->s_umount);
++		deactivate_locked_super(sb);
+ 	} else {
+ 		up_write(&sb->s_umount);
+ 	}
+@@ -1532,14 +1537,13 @@ int freeze_super(struct super_block *sb)
+ }
+ EXPORT_SYMBOL(freeze_super);
+ 
++/* Caller takes the sb->s_umount rw_semaphore lock and handles active count */
+ static int thaw_super_locked(struct super_block *sb)
+ {
+ 	int error;
+ 
+-	if (sb->s_writers.frozen != SB_FREEZE_COMPLETE) {
+-		up_write(&sb->s_umount);
++	if (sb->s_writers.frozen != SB_FREEZE_COMPLETE)
+ 		return -EINVAL;
+-	}
+ 
+ 	if (sb_rdonly(sb)) {
+ 		sb->s_writers.frozen = SB_UNFROZEN;
+@@ -1554,7 +1558,6 @@ static int thaw_super_locked(struct super_block *sb)
+ 			printk(KERN_ERR
+ 				"VFS:Filesystem thaw failed\n");
+ 			lockdep_sb_freeze_release(sb);
+-			up_write(&sb->s_umount);
+ 			return error;
+ 		}
+ 	}
+@@ -1563,7 +1566,6 @@ static int thaw_super_locked(struct super_block *sb)
+ 	sb_freeze_unlock(sb);
+ out:
+ 	wake_up(&sb->s_writers.wait_unfrozen);
+-	deactivate_locked_super(sb);
+ 	return 0;
+ }
+ 
+@@ -1575,7 +1577,18 @@ static int thaw_super_locked(struct super_block *sb)
+  */
+ int thaw_super(struct super_block *sb)
+ {
++	int error;
++
+ 	down_write(&sb->s_umount);
+-	return thaw_super_locked(sb);
++	error = thaw_super_locked(sb);
++	if (error) {
++		up_write(&sb->s_umount);
++		goto out;
++	}
++
++	deactivate_locked_super(sb);
++
++out:
++	return error;
+ }
+ EXPORT_SYMBOL(thaw_super);
 -- 
-2.7.4
+2.16.3
