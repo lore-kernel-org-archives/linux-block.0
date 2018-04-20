@@ -1,28 +1,21 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Return-Path: <oleksandr@natalenko.name>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Date: Fri, 20 Apr 2018 22:41:33 +0200
+From: Oleksandr Natalenko <oleksandr@natalenko.name>
+To: Kees Cook <keescook@chromium.org>
+Cc: Paolo Valente <paolo.valente@linaro.org>, Jens Axboe <axboe@kernel.dk>,
+ Bart Van Assche <bart.vanassche@wdc.com>, David Windsor <dave@nullcore.net>,
+ "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, linux-scsi@vger.kernel.org, LKML
+ <linux-kernel@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, Hannes
+ Reinecke <hare@suse.com>, Johannes Thumshirn <jthumshirn@suse.de>,
+ linux-block <linux-block@vger.kernel.org>, Ulf Hansson
+ <ulf.hansson@linaro.org>, Mark Brown <broonie@kernel.org>, Linus Walleij
+ <linus.walleij@linaro.org>, keescook@google.com
 Subject: Re: usercopy whitelist woe in scsi_sense_cache
-From: Paolo Valente <paolo.valente@linaro.org>
 In-Reply-To: <CAGXu5j+8WUgr1y=JYhCkUqUWE0SJ+ymkM9DPEQwY8UoqPmoPSw@mail.gmail.com>
-Date: Sat, 21 Apr 2018 10:43:52 +0200
-Cc: Jens Axboe <axboe@kernel.dk>,
- Oleksandr Natalenko <oleksandr@natalenko.name>,
- Bart Van Assche <bart.vanassche@wdc.com>,
- David Windsor <dave@nullcore.net>,
- "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- linux-scsi@vger.kernel.org,
- LKML <linux-kernel@vger.kernel.org>,
- Christoph Hellwig <hch@lst.de>,
- Hannes Reinecke <hare@suse.com>,
- Johannes Thumshirn <jthumshirn@suse.de>,
- linux-block <linux-block@vger.kernel.org>,
- Ulf Hansson <ulf.hansson@linaro.org>,
- Mark Brown <broonie@kernel.org>,
- Linus Walleij <linus.walleij@linaro.org>
-Message-Id: <F1C69B77-2807-446E-85B9-BEC511928B14@linaro.org>
 References: <10360653.ov98egbaqx@natalenko.name>
  <CAGXu5j+dh1zm32iBjRVh0s+3gLJYgjwt+z1aBJmrK2Cr8XPWnA@mail.gmail.com>
  <CAGXu5jLhnWnUiscP9B=kTEFNyRw9jgFn7Zr5FxhZrO20553+1Q@mail.gmail.com>
@@ -42,64 +35,18 @@ References: <10360653.ov98egbaqx@natalenko.name>
  <c30400f9-50e6-b5cf-d06b-a5e971e98546@kernel.dk>
  <13DBFC76-4849-4DDA-AC44-B2C1257912E7@linaro.org>
  <CAGXu5j+8WUgr1y=JYhCkUqUWE0SJ+ymkM9DPEQwY8UoqPmoPSw@mail.gmail.com>
-To: Kees Cook <keescook@chromium.org>
+Message-ID: <bd69860bb48eedc4908e055ff869c5a5@natalenko.name>
 List-ID: <linux-block@vger.kernel.org>
 
+Hi.
 
-
-> Il giorno 20 apr 2018, alle ore 22:23, Kees Cook =
-<keescook@chromium.org> ha scritto:
->=20
-> On Thu, Apr 19, 2018 at 2:32 AM, Paolo Valente =
-<paolo.valente@linaro.org> wrote:
->> I'm missing something here.  When the request gets completed in the
->> first place, the hook bfq_finish_requeue_request gets called, and =
-that
->> hook clears both ->elv.priv elements (as the request has a non-null
->> elv.icq).  So, when bfq gets the same request again, those elements
->> must be NULL.  What am I getting wrong?
->>=20
->> I have some more concern on this point, but I'll stick to this for =
-the
->> moment, to not create more confusion.
->=20
-> I don't know the "how", I only found the "what". :)
-
-Got it, although I think you did much more than that ;)
-
-Anyway, my reply was exactly to a (Jens') detailed description of the
-how.  And my concern is that there seems to be an inconsistency in
-that description.  In addition, Jens is proposing a patch basing on
-that description.  But, if this inconsistency is not solved, that
-patch may eliminate the symptom at hand, but it may not fix the real
-cause, or may even contribute to bury it deeper.
-
-> If you want, grab
+On 20.04.2018 22:23, Kees Cook wrote:
+> I don't know the "how", I only found the "what". :) If you want, grab
 > the reproducer VM linked to earlier in this thread; it'll hit the
 > problem within about 30 seconds of running the reproducer.
->=20
 
-Yep.  Actually, I've been investigating this kind of failure, in
-different incarnations, for months now.  In this respect, other
-examples are the srp-test failures reported by Bart, e.g., here [1].
-According to my analysis, the cause of the problem is somewhere in
-blk-mq, outside bfq.  Unfortunately, I didn't make it to find where it
-exactly is, mainly because of my limited expertise on blk-mq
-internals.  So I have asked for any kind of help and suggestions to
-Jens, Mike and any other knowledgeable guy.  Probably those help
-requests got somehow lost on those threads, but your results, Kees,
-and the analysis that followed from Jens seems now to be carrying us
-to the solution of the not-so-recent issue.  Time will tell.
+Just to avoid a possible confusion I should note that I've removed the 
+reproducer from my server, but I can re-upload it if needed.
 
-
-Thanks,
-Paolo
-
-[1] https://www.spinics.net/lists/linux-block/msg22760.html
-
-
-> -Kees
->=20
-> --=20
-> Kees Cook
-> Pixel Security
+-- 
+   Oleksandr Natalenko (post-factum)
