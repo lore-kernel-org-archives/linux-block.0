@@ -1,59 +1,131 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:45127 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752110AbeDXFpr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Apr 2018 01:45:47 -0400
-Received: by mail-wr0-f196.google.com with SMTP id p5-v6so19273322wre.12
-        for <linux-block@vger.kernel.org>; Mon, 23 Apr 2018 22:45:46 -0700 (PDT)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, Javier Gonzales <javier@cnexlabs.com>,
-        linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH v2 0/3] Rework write error handling in pblk
-Date: Tue, 24 Apr 2018 08:45:29 +0300
-Message-Id: <1524548732-4326-1-git-send-email-hans.ml.holmberg@owltronix.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Sat, 21 Apr 2018 15:03:09 +0200
+From: Jan Kara <jack@suse.cz>
+To: Dave Chinner <david@fromorbit.com>
+Cc: linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, hch@lst.de, rdorr@microsoft.com
+Subject: Re: [PATCH 2/4] iomap: iomap_dio_rw() handles all sync writes
+Message-ID: <20180421130309.efivmjo5ald2jchv@quack2.suse.cz>
+References: <20180418040828.18165-1-david@fromorbit.com>
+ <20180418040828.18165-3-david@fromorbit.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180418040828.18165-3-david@fromorbit.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+On Wed 18-04-18 14:08:26, Dave Chinner wrote:
+> From: Dave Chinner <dchinner@redhat.com>
+> 
+> Currently iomap_dio_rw() only handles (data)sync write completions
+> for AIO. This means we can't optimised non-AIO IO to minimise device
+> flushes as we can't tell the caller whether a flush is required or
+> not.
+> 
+> To solve this problem and enable further optimisations, make
+> iomap_dio_rw responsible for data sync behaviour for all IO, not
+> just AIO.
+> 
+> In doing so, the sync operation is now accounted as part of the DIO
+> IO by inode_dio_end(), hence post-IO data stability updates will no
+> long race against operations that serialise via inode_dio_wait()
+> such as truncate or hole punch.
+> 
+> Signed-Off-By: Dave Chinner <dchinner@redhat.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-This patch series fixes the(currently incomplete) write error handling 
-in pblk by:
+Looks good to me. You can add:
 
- * queuing and re-submitting failed writes in the write buffer
- * evacuating valid data data in lines with write failures, so the
-   chunk(s) with write failures can be reset to a known state by the fw
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-Lines with failures in smeta are put back on the free list.
-Failed chunks will be reset on the next use.
+								Honza
 
-If a write failes in emeta, the lba list is cached so the line can be 
-garbage collected without scanning the out-of-band area.
-
-Changes in V2:
-- Added the recov_writes counter increase to the new path
-- Moved lba list emeta reading during gc to a separate function
-- Allocating the saved lba list with pblk_malloc instead of kmalloc
-- Fixed formatting issues
-- Removed dead code
-
-Hans Holmberg (3):
-  lightnvm: pblk: rework write error recovery path
-  lightnvm: pblk: garbage collect lines with failed writes
-  lightnvm: pblk: fix smeta write error path
-
- drivers/lightnvm/pblk-core.c     |  52 +++++++-
- drivers/lightnvm/pblk-gc.c       | 102 +++++++++------
- drivers/lightnvm/pblk-init.c     |  47 ++++---
- drivers/lightnvm/pblk-rb.c       |  39 ------
- drivers/lightnvm/pblk-recovery.c |  91 -------------
- drivers/lightnvm/pblk-rl.c       |  29 ++++-
- drivers/lightnvm/pblk-sysfs.c    |  15 ++-
- drivers/lightnvm/pblk-write.c    | 269 ++++++++++++++++++++++++++-------------
- drivers/lightnvm/pblk.h          |  36 ++++--
- 9 files changed, 384 insertions(+), 296 deletions(-)
-
+> ---
+>  fs/iomap.c        | 22 +++++++++++++++-------
+>  fs/xfs/xfs_file.c |  5 -----
+>  2 files changed, 15 insertions(+), 12 deletions(-)
+> 
+> diff --git a/fs/iomap.c b/fs/iomap.c
+> index afd163586aa0..1f59c2d9ade6 100644
+> --- a/fs/iomap.c
+> +++ b/fs/iomap.c
+> @@ -685,6 +685,7 @@ EXPORT_SYMBOL_GPL(iomap_seek_data);
+>   * Private flags for iomap_dio, must not overlap with the public ones in
+>   * iomap.h:
+>   */
+> +#define IOMAP_DIO_NEED_SYNC	(1 << 29)
+>  #define IOMAP_DIO_WRITE		(1 << 30)
+>  #define IOMAP_DIO_DIRTY		(1 << 31)
+>  
+> @@ -759,6 +760,13 @@ static ssize_t iomap_dio_complete(struct iomap_dio *dio)
+>  			dio_warn_stale_pagecache(iocb->ki_filp);
+>  	}
+>  
+> +	/*
+> +	 * If this is a DSYNC write, make sure we push it to stable storage now
+> +	 * that we've written data.
+> +	 */
+> +	if (ret > 0 && (dio->flags & IOMAP_DIO_NEED_SYNC))
+> +		ret = generic_write_sync(iocb, ret);
+> +
+>  	inode_dio_end(file_inode(iocb->ki_filp));
+>  	kfree(dio);
+>  
+> @@ -768,14 +776,8 @@ static ssize_t iomap_dio_complete(struct iomap_dio *dio)
+>  static void iomap_dio_complete_work(struct work_struct *work)
+>  {
+>  	struct iomap_dio *dio = container_of(work, struct iomap_dio, aio.work);
+> -	struct kiocb *iocb = dio->iocb;
+> -	bool is_write = (dio->flags & IOMAP_DIO_WRITE);
+> -	ssize_t ret;
+>  
+> -	ret = iomap_dio_complete(dio);
+> -	if (is_write && ret > 0)
+> -		ret = generic_write_sync(iocb, ret);
+> -	iocb->ki_complete(iocb, ret, 0);
+> +	dio->iocb->ki_complete(dio->iocb, iomap_dio_complete(dio), 0);
+>  }
+>  
+>  /*
+> @@ -961,6 +963,10 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
+>  	return copied;
+>  }
+>  
+> +/*
+> + * iomap_dio_rw() always completes O_[D]SYNC writes regardless of whether the IO
+> + * is being issued as AIO or not.
+> + */
+>  ssize_t
+>  iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+>  		const struct iomap_ops *ops, iomap_dio_end_io_t end_io)
+> @@ -1006,6 +1012,8 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+>  			dio->flags |= IOMAP_DIO_DIRTY;
+>  	} else {
+>  		dio->flags |= IOMAP_DIO_WRITE;
+> +		if (iocb->ki_flags & IOCB_DSYNC)
+> +			dio->flags |= IOMAP_DIO_NEED_SYNC;
+>  		flags |= IOMAP_WRITE;
+>  	}
+>  
+> diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+> index 6f15027661b6..0c4b8313d544 100644
+> --- a/fs/xfs/xfs_file.c
+> +++ b/fs/xfs/xfs_file.c
+> @@ -570,11 +570,6 @@ xfs_file_dio_aio_write(
+>  	 * complete fully or fail.
+>  	 */
+>  	ASSERT(ret < 0 || ret == count);
+> -
+> -	if (ret > 0) {
+> -		/* Handle various SYNC-type writes */
+> -		ret = generic_write_sync(iocb, ret);
+> -	}
+>  	return ret;
+>  }
+>  
+> -- 
+> 2.16.1
+> 
 -- 
-2.7.4
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
