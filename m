@@ -1,90 +1,53 @@
-Return-Path: <liuzhengyuan@kylinos.cn>
-From: "=?utf-8?B?Wmhlbmd5dWFuIExpdQ==?=" <liuzhengyuan@kylinos.cn>
-To: "=?utf-8?B?SmVucyBBeGJvZQ==?=" <axboe@kernel.dk>
-Cc: "=?utf-8?B?bGludXgtYmxvY2s=?=" <linux-block@vger.kernel.org>, "=?utf-8?B?c2hsaQ==?=" <shli@fb.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: question about request merge
-Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Date: Mon, 23 Apr 2018 11:13:38 +0800
-Message-ID: <tencent_37CD4862561D044369120DE0@qq.com>
+To: Zhengyuan Liu <liuzhengyuan@kylinos.cn>
+Cc: linux-block <linux-block@vger.kernel.org>, shli <shli@fb.com>
 References: <tencent_3EE363D56CC01F783CB5D300@qq.com>
-	<1b30a9a0-fffe-4a02-e9f7-95b28501dbb4@kernel.dk>
-In-Reply-To: <1b30a9a0-fffe-4a02-e9f7-95b28501dbb4@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <1b30a9a0-fffe-4a02-e9f7-95b28501dbb4@kernel.dk>
+Date: Sat, 21 Apr 2018 10:23:17 -0600
+MIME-Version: 1.0
+In-Reply-To: <tencent_3EE363D56CC01F783CB5D300@qq.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-MjAxOC0wNC0yMiAwOjIzIEdNVCswODowMCBKZW5zIEF4Ym9lIDxheGJvZUBrZXJuZWwuZGs+
-Og0KPiBPbiA0LzIxLzE4IDg6MDcgQU0sIFpoZW5neXVhbiBMaXUgd3JvdGU6DQo+PiAyMDE4
-LTA0LTIwIDIyOjM0IEdNVCswODowMCBKZW5zIEF4Ym9lIDxheGJvZUBrZXJuZWwuZGs+Og0K
-Pj4+IE9uIDQvMTkvMTggOTo1MSBQTSwgWmhlbmd5dWFuIExpdSB3cm90ZToNCj4+Pj4gSGks
-IFNoYW9odWENCj4+Pj4NCj4+Pj4gSSBmb3VuZCBpdCBpbmRlZWQgZG9lc24ndCBkbyBmcm9u
-dCBtZXJnZSB3aGVuIHR3byB0aHJlYWRzIGZsdXNoIHBsdWcgbGlzdCAgY29uY3VycmVudGx5
-LiAgIFRvDQo+Pj4+IHJlYXBwZWFyICwgSSBwcmVwYXJlZCB0d28gSU8gdGhyZWFkcyAsIG5h
-bWVkIGEwLmlvIGFuZCBhMS5pbyAuDQo+Pj4+IFRocmVhZCBhMS5pbyAgdXNlcyBsaWJhaW8g
-dG8gd3JpdGUgNSByZXF1ZXN0cyA6DQo+Pj4+ICAgICBzZWN0b3JzOiAxNiArIDgsIDQwICsg
-OCwgNjQgKyA4LCA4OCArIDgsIDExMiArIDgNCj4+Pj4gVGhyZWFkIGEwLmlvICB1c2VzIGxp
-YmFpbyB0byB3cml0ZSBvdGhlciA1IHJlcXVlc3RzIDoNCj4+Pj4gICAgIHNlY3RvcnM6IDgr
-IDgsIDMyICsgOCwgNTYgKyA4LCA4MCArIDgsIDEwNCArIDgNCj4+Pg0KPj4+IEknbSBjdXR0
-aW5nIHNvbWUgb2YgdGhlIGJlbG93Lg0KPj4+DQo+Pj4gVGhhbmtzIGZvciB0aGUgZGV0YWls
-ZWQgZW1haWwuIEl0J3MgbW9zdGx5IG9uIHB1cnBvc2UgdGhhdCB3ZSBkb24ndA0KPj4+IHNw
-ZW5kIGN5Y2xlcyBhbmQgbWVtb3J5IG9uIG1haW50YWluaW5nIGEgc2VwYXJhdGUgZnJvbnQg
-bWVyZ2UgaGFzaCwNCj4+PiBzaW5jZSBpdCdzIGdlbmVyYWxseSBub3Qgc29tZXRoaW5nIHRo
-YXQgaGFwcGVucyB2ZXJ5IG9mdGVuLiBJZiB5b3UgaGF2ZQ0KPj4+IGEgdGhyZWFkIHBvb2wg
-ZG9pbmcgSU8gYW5kIHNwbGl0IHNlcXVlbnRpYWwgSU8gc3VjaCB0aGF0IHlvdSB3b3VsZA0K
-Pj4+IGJlbmVmaXQgYSBsb3QgZnJvbSBmcm9udCBtZXJnaW5nLCB0aGVuIEkgd291bGQgZ2Vu
-ZXJhbGx5IGNsYWltIHRoYXQNCj4+PiB5b3UncmUgbm90IHdyaXRpbmcgeW91ciBhcHAgaW4g
-dGhlIG1vc3Qgb3B0aW1hbCBtYW5uZXIuDQo+Pj4NCj4+DQo+PiBUaGFua3MgZm9yIGV4cGxh
-bmF0aW9uLCBJIG9ubHkgY29uc2lkZXIgdGhlIHByb2JsZW0gdGhyb3VnaCB0aGUgY29kZSdz
-DQo+PiBwZXJzcGVjdGl2ZSBhbmQgaWdub3JlIHRoZSByZWFsaXR5IHNpdHVhdGlvbiBvZiBh
-cHAuDQo+DQo+IFRoYXQncyBxdWl0ZSBieSBkZXNpZ24gYW5kIG5vdCBhY2NpZGVudGFsLg0K
-Pg0KPj4+IFNvIEknbSBjdXJpb3VzLCB3aGF0J3MgdGhlIGJpZyBpbnRlcmVzdCBpbiBmcm9u
-dCBtZXJnaW5nPw0KPj4NCj4+IElmIGl0J3Mgbm90IHNvbWV0aGluZyB0aGF0IGhhcHBlbnMg
-c28gbXVjaCBvZnRlbiwgSSB0aGluayBpdCdzIG5vdCB3b3J0aCB0bw0KPj4gc3VwcG9ydCBm
-cm9udCBtZXJnaW5nIHRvby4NCj4+DQo+PiBCeSB0aGUgd2F5LCBJIGdvdCBhbm90aGVyIHF1
-ZXN0aW9uIHRoYXQgd2h5IG5vdCAgYmxrdHJhY2UgdHJhY2luZyB0aGUgYmFjaw0KPj4gbWVy
-Z2luZyBvZiByZXF1ZXN0cyB3aGlsZSBmbHVzaGluZyBwbHVnZ2VkIHJlcXVlc3RzIHRvIHF1
-ZXVlLCAgaWYgaXQgZG9lcw0KPj4gd2UgbWF5IGdldCBhIG1vcmUgY2xlYXIgdmlldyBhYm91
-dCBJTyBtZXJnaW5nLg0KPg0KPiBOb3Qgc3VyZSBJIGZvbGxvdywgZXhhY3RseSB3aGVyZSBp
-cyBhIGJhY2sgbWVyZ2UgdHJhY2UgbWlzc2luZz8NCj4NCg0KSSBtZWFuIGJsa3RyYWNlIG9u
-bHkgdHJhY2VzIGJpbyBtZXJnaW5nICwgbm90IHRyYWNlcyByZXF1ZXN0IG1lcmdpbmc7IExl
-dA0KbWUgZ2l2ZSBhIGV4YW1wbGUsIEkgdXNlIHRocmVhZCBhLm91dCB0byB3cml0ZSB0aHJl
-ZSBiaW9zLCBzZWVpbmcgYmVsbG93Og0KDQogICAgYS5vdXQ6ICAwICsgOCwgMTYgKyA4LCA4
-ICsgOA0KDQpUaGUgcmVzdWx0IG9mIGJsa3RyYWNlIHdhcyBzaG93ZWQgYXMgYmVsbG93Og0K
-DQogICAgICA4LDE2ICAgMSAgICAgICAgNyAgICAgMC4yOTIwNjkxODAgIDEyMjIgIFEgIFdT
-IDAgKyA4IFthLm91dF0NCiAgICAgIDgsMTYgICAxICAgICAgICA4ICAgICAwLjI5MjA3Mzk2
-MCAgMTIyMiAgRyAgV1MgMCArIDggW2Eub3V0XQ0KICAgICAgOCwxNiAgIDEgICAgICAgIDkg
-ICAgIDAuMjkyMDc0NDQwICAxMjIyICBQICAgTiBbYS5vdXRdDQogICAgICA4LDE2ICAgMSAg
-ICAgICAxMCAgICAgMC4yOTIwNzkzODAgIDEyMjIgIFEgIFdTIDE2ICsgOCBbYS5vdXRdDQog
-ICAgICA4LDE2ICAgMSAgICAgICAxMSAgICAgMC4yOTIwODE4NDAgIDEyMjIgIEcgIFdTIDE2
-ICsgOCBbYS5vdXRdDQogICAgICA4LDE2ICAgMSAgICAgICAxMiAgICAgMC4yOTIwODU4NjAg
-IDEyMjIgIFEgIFdTIDggKyA4IFthLm91dF0NCiAgICAgIDgsMTYgICAxICAgICAgIDEzICAg
-ICAwLjI5MjA4NzI0MCAgMTIyMiAgRiAgV1MgOCArIDggW2Eub3V0XQ0KICAgICAgOCwxNiAg
-IDEgICAgICAgMTQgICAgIDAuMjkyMDg5MTAwICAxMjIyICBJICBXUyAwICsgOCBbYS5vdXRd
-DQogICAgICA4LDE2ICAgMSAgICAgICAxNSAgICAgMC4yOTIwOTUyMDAgIDEyMjIgIEkgIFdT
-IDggKyAxNiBbYS5vdXRdDQogICAgICA4LDE2ICAgMSAgICAgICAxNiAgICAgMC4yOTU5MzE5
-MjAgIDEyMjIgIFUgICBOIFthLm91dF0gMg0KICAgICAgOCwxNiAgIDEgICAgICAgMTcgICAg
-IDAuMjk4NTI4OTgwICAxMjIyICBEICBXUyAwICsgMjQgW2Eub3V0XQ0KICAgICAgOCwxNiAg
-IDAgICAgICAgIDMgICAgIDAuMzAyNjE3MzYwICAgICAzICBDICBXUyAwICsgMjQgWzBdDQog
-ICAgICANCiAgICAgIFRvdGFsICg4LDE2KToNCiAgICAgUmVhZHMgUXVldWVkOiAgICAgICAg
-ICAgMCwgICAgICAgIDBLaUIJICAgICAgICAgV3JpdGVzIFF1ZXVlZDogICAgICAgICAgIDMs
-ICAgICAgIDEyS2lCDQogICAgIFJlYWQgRGlzcGF0Y2hlczogICAgICAgIDAsICAgICAgICAw
-S2lCCSAgICAgICAgV3JpdGUgRGlzcGF0Y2hlczogICAgICAgIDEsICAgICAgIDEyS2lCDQog
-ICAgIFJlYWRzIFJlcXVldWVkOiAgICAgICAgIDAJCSAgICAgICAgICAgICAgIFdyaXRlcyBS
-ZXF1ZXVlZDogICAgICAgICAwDQogICAgIFJlYWRzIENvbXBsZXRlZDogICAgICAgIDAsICAg
-ICAgICAwS2lCICAgICAgV3JpdGVzIENvbXBsZXRlZDogICAgICAgIDEsICAgICAgIDEyS2lC
-DQogICAgIFJlYWQgTWVyZ2VzOiAgICAgICAgICAgIDAsICAgICAgICAwS2lCCSAgICAgICAg
-ICAgICBXcml0ZSBNZXJnZXM6ICAgICAgICAgICAgMSwgICAgICAgIDRLaUINCiAgICAgUEMg
-UmVhZHMgUXVldWVkOiAgICAgICAgMCwgICAgICAgIDBLaUIgICAgICBQQyBXcml0ZXMgUXVl
-dWVkOiAgICAgICAgMCwgICAgICAgIDBLaUINCiAgICAgUEMgUmVhZCBEaXNwLjogICAgICAg
-ICAgMywgICAgICAgIDBLaUIJICAgICAgICAgICAgIFBDIFdyaXRlIERpc3AuOiAgICAgICAg
-ICAwLCAgICAgICAgMEtpQg0KICAgICBQQyBSZWFkcyBSZXEuOiAgICAgICAgICAwCQkgUEMg
-V3JpdGVzIFJlcS46ICAgICAgICAgIDANCiAgICAgUEMgUmVhZHMgQ29tcGwuOiAgICAgICAg
-MwkJIFBDIFdyaXRlcyBDb21wbC46ICAgICAgICAwDQogICAgIElPIHVucGx1Z3M6ICAgICAg
-ICAgICAgIDEgICAgICAgIAkgVGltZXIgdW5wbHVnczogICAgICAgICAgIDANCg0Kd2UgbWVy
-Z2UgYmlvKDggKyA4KSBpbnRvIHJlcXVlc3QoMTYgKyA4KSBhdCBwbHVnIHN0YWdlIGFuZCB0
-aGF0J3Mgd2VsbCB0cmFjZWQNCmFzIEYsIHdoZW4gY29tZXMgdG8gdW5wbHVnIHN0YWdlIHJl
-cXVlc3QoMCArIDgpIGFuZCByZXF1ZXN0KDggKyAxNikgbWVyZ2UNCmludG8gb25seSBvbmUg
-cmVxdWVzdCgwICsgMjQpLCAgYnV0IHRoZXJlIGlzbid0IHRyYWNpbmcgaW5mb3JtYXRpb24g
-YWJvdXQgdGhhdA0Kb3BlcmF0aW9uLg0KDQogU28gSSdtIGp1c3QgYSBiaXQgY3VyaW91cyBh
-bmQgcGxlYXNlIGZvcmdpdmUgbXkgaWdub3JhbmNlLg0KDQpUaGFua3MuDQo+IC0tDQo+IEpl
-bnMgQXhib2UNCj4=
+On 4/21/18 8:07 AM, Zhengyuan Liu wrote:
+> 2018-04-20 22:34 GMT+08:00 Jens Axboe <axboe@kernel.dk>:
+>> On 4/19/18 9:51 PM, Zhengyuan Liu wrote:
+>>> Hi, Shaohua
+>>>
+>>> I found it indeed doesn't do front merge when two threads flush plug list  concurrently.   To
+>>> reappear , I prepared two IO threads , named a0.io and a1.io .
+>>> Thread a1.io  uses libaio to write 5 requests :
+>>>     sectors: 16 + 8, 40 + 8, 64 + 8, 88 + 8, 112 + 8
+>>> Thread a0.io  uses libaio to write other 5 requests :
+>>>     sectors: 8+ 8, 32 + 8, 56 + 8, 80 + 8, 104 + 8
+>>
+>> I'm cutting some of the below.
+>>
+>> Thanks for the detailed email. It's mostly on purpose that we don't
+>> spend cycles and memory on maintaining a separate front merge hash,
+>> since it's generally not something that happens very often. If you have
+>> a thread pool doing IO and split sequential IO such that you would
+>> benefit a lot from front merging, then I would generally claim that
+>> you're not writing your app in the most optimal manner.
+>>
+> 
+> Thanks for explanation, I only consider the problem through the code's 
+> perspective and ignore the reality situation of app. 
+
+That's quite by design and not accidental.
+
+>> So I'm curious, what's the big interest in front merging?
+> 
+> If it's not something that happens so much often, I think it's not worth to 
+> support front merging too.
+> 
+> By the way, I got another question that why not  blktrace tracing the back
+> merging of requests while flushing plugged requests to queue,  if it does
+> we may get a more clear view about IO merging.
+
+Not sure I follow, exactly where is a back merge trace missing?
+
+-- 
+Jens Axboe
