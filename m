@@ -1,115 +1,58 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-scsi@vger.kernel.org, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH 09/12] ide: kill ide_toggle_bounce
-Date: Mon, 16 Apr 2018 10:50:29 +0200
-Message-Id: <20180416085032.7367-10-hch@lst.de>
-In-Reply-To: <20180416085032.7367-1-hch@lst.de>
-References: <20180416085032.7367-1-hch@lst.de>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from aserp2120.oracle.com ([141.146.126.78]:41316 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932396AbeDWUKH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Apr 2018 16:10:07 -0400
+Date: Mon, 23 Apr 2018 16:09:30 -0400
+From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To: Christoph Hellwig <hch@lst.de>, sstabellini@kernel.org
+Cc: iommu@lists.linux-foundation.org, x86@kernel.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, linux-mips@linux-mips.org,
+        sparclinux@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 10/12] arm: don't build swiotlb by default
+Message-ID: <20180423200930.GB5215@char.us.oracle.com>
+References: <20180423170419.20330-1-hch@lst.de>
+ <20180423170419.20330-11-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180423170419.20330-11-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-ide_toggle_bounce did select various strange block bounce limits, including
-not bouncing at all as soon as an iommu is present in the system.  Given
-that the dma_map routines now handle any required bounce buffering except
-for ISA DMA, and the ide code already must handle either ISA DMA or highmem
-at least for iommu equipped systems we can get rid of the block layer
-bounce limit setting entirely.
+On Mon, Apr 23, 2018 at 07:04:17PM +0200, Christoph Hellwig wrote:
+> swiotlb is only used as a library of helper for xen-swiotlb if Xen support
+> is enabled on arm, so don't build it by default.
+> 
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/ide/ide-dma.c   |  2 --
- drivers/ide/ide-lib.c   | 26 --------------------------
- drivers/ide/ide-probe.c |  3 ---
- include/linux/ide.h     |  2 --
- 4 files changed, 33 deletions(-)
-
-diff --git a/drivers/ide/ide-dma.c b/drivers/ide/ide-dma.c
-index 54d4d78ca46a..6f344654ef22 100644
---- a/drivers/ide/ide-dma.c
-+++ b/drivers/ide/ide-dma.c
-@@ -180,7 +180,6 @@ EXPORT_SYMBOL_GPL(ide_dma_unmap_sg);
- void ide_dma_off_quietly(ide_drive_t *drive)
- {
- 	drive->dev_flags &= ~IDE_DFLAG_USING_DMA;
--	ide_toggle_bounce(drive, 0);
- 
- 	drive->hwif->dma_ops->dma_host_set(drive, 0);
- }
-@@ -211,7 +210,6 @@ EXPORT_SYMBOL(ide_dma_off);
- void ide_dma_on(ide_drive_t *drive)
- {
- 	drive->dev_flags |= IDE_DFLAG_USING_DMA;
--	ide_toggle_bounce(drive, 1);
- 
- 	drive->hwif->dma_ops->dma_host_set(drive, 1);
- }
-diff --git a/drivers/ide/ide-lib.c b/drivers/ide/ide-lib.c
-index e1180fa46196..78cb79eddc8b 100644
---- a/drivers/ide/ide-lib.c
-+++ b/drivers/ide/ide-lib.c
-@@ -6,32 +6,6 @@
- #include <linux/ide.h>
- #include <linux/bitops.h>
- 
--/**
-- *	ide_toggle_bounce	-	handle bounce buffering
-- *	@drive: drive to update
-- *	@on: on/off boolean
-- *
-- *	Enable or disable bounce buffering for the device. Drives move
-- *	between PIO and DMA and that changes the rules we need.
-- */
--
--void ide_toggle_bounce(ide_drive_t *drive, int on)
--{
--	u64 addr = BLK_BOUNCE_HIGH;	/* dma64_addr_t */
--
--	if (!PCI_DMA_BUS_IS_PHYS) {
--		addr = BLK_BOUNCE_ANY;
--	} else if (on && drive->media == ide_disk) {
--		struct device *dev = drive->hwif->dev;
--
--		if (dev && dev->dma_mask)
--			addr = *dev->dma_mask;
--	}
--
--	if (drive->queue)
--		blk_queue_bounce_limit(drive->queue, addr);
--}
--
- u64 ide_get_lba_addr(struct ide_cmd *cmd, int lba48)
- {
- 	struct ide_taskfile *tf = &cmd->tf;
-diff --git a/drivers/ide/ide-probe.c b/drivers/ide/ide-probe.c
-index 2019e66eada7..8d8ed036ca0a 100644
---- a/drivers/ide/ide-probe.c
-+++ b/drivers/ide/ide-probe.c
-@@ -805,9 +805,6 @@ static int ide_init_queue(ide_drive_t *drive)
- 	/* assign drive queue */
- 	drive->queue = q;
- 
--	/* needs drive->queue to be set */
--	ide_toggle_bounce(drive, 1);
--
- 	return 0;
- }
- 
-diff --git a/include/linux/ide.h b/include/linux/ide.h
-index ca9d34feb572..11f0dd03a4b4 100644
---- a/include/linux/ide.h
-+++ b/include/linux/ide.h
-@@ -1508,8 +1508,6 @@ static inline void ide_set_hwifdata (ide_hwif_t * hwif, void *data)
- 	hwif->hwif_data = data;
- }
- 
--extern void ide_toggle_bounce(ide_drive_t *drive, int on);
--
- u64 ide_get_lba_addr(struct ide_cmd *, int);
- u8 ide_dump_status(ide_drive_t *, const char *, u8);
- 
--- 
-2.17.0
+CCing Stefano
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  arch/arm/Kconfig | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+> index aa1c187d756d..90b81a3a28a7 100644
+> --- a/arch/arm/Kconfig
+> +++ b/arch/arm/Kconfig
+> @@ -1774,7 +1774,7 @@ config SECCOMP
+>  	  defined by each seccomp mode.
+>  
+>  config SWIOTLB
+> -	def_bool y
+> +	bool
+>  
+>  config PARAVIRT
+>  	bool "Enable paravirtualization code"
+> @@ -1807,6 +1807,7 @@ config XEN
+>  	depends on MMU
+>  	select ARCH_DMA_ADDR_T_64BIT
+>  	select ARM_PSCI
+> +	select SWIOTLB
+>  	select SWIOTLB_XEN
+>  	select PARAVIRT
+>  	help
+> -- 
+> 2.17.0
+> 
