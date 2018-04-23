@@ -1,69 +1,106 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:2069 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751092AbeDSSOT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Apr 2018 14:14:19 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: [LSF/MM TOPIC] Extended copy
-Date: Thu, 19 Apr 2018 18:13:59 +0000
-Message-ID: <e044c73b5287f0a2a72378573a91c6e8d111706f.camel@wdc.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Received: from ale.deltatee.com ([207.54.116.67]:41954 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932629AbeDWXbF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Apr 2018 19:31:05 -0400
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Vinod Koul <vinod.koul@intel.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Thierry Reding <treding@nvidia.com>,
+        Sanyog Kale <sanyog.r.kale@intel.com>,
+        Sagar Dharia <sdharia@codeaurora.org>
+Date: Mon, 23 Apr 2018 17:30:37 -0600
+Message-Id: <20180423233046.21476-6-logang@deltatee.com>
+In-Reply-To: <20180423233046.21476-1-logang@deltatee.com>
+References: <20180423233046.21476-1-logang@deltatee.com>
+Subject: [PATCH v4 05/14] docs-rst: Add a new directory for PCI documentation
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-RHVyaW5nIGEgcmVjZW50IGRpc2N1c3Npb24gYWJvdXQgcGVlci10by1wZWVyIFBDSWUgdHJhbnNm
-ZXJzIGl0IHdhcyBicm91Z2h0DQp1cCB0aGF0IGl0IHdvdWxkIGJlIGRlc2lyYWJsZSB0byBpbnZv
-a2UgdGhpcyBmdW5jdGlvbmFsaXR5IGZyb20gdXNlciBzcGFjZS4NCk9uZSBwb3NzaWJsZSBhcHBy
-b2FjaCBpcyB0byBhZGQgc3VwcG9ydCBmb3IgYW4gImV4dGVuZGVkIGNvcHkiIG9wZXJhdGlvbiB0
-bw0KdGhlIGJsb2NrIGxheWVyIGFuZCB0byBtYWtlIGl0IHBvc3NpYmxlIHRvIHVzZSB0aGF0IGZ1
-bmN0aW9uYWxpdHkgZnJvbSB1c2VyDQpzcGFjZS4gU28gZmFyIHR3byBkaWZmZXJlbnQgYXBwcm9h
-Y2hlcyBoYXZlIGJlZW4gcHJvcG9zZWQgdG8gYWRkIHN1Y2gNCmZ1bmN0aW9uYWxpdHkgdG8gdGhl
-IGJsb2NrIGxheWVyOg0KMS4gSW1wbGVtZW50IGV4dGVuZGVkIGNvcHkgYXMgYSBzaW5nbGUgYmxv
-Y2sgbGF5ZXIgb3BlcmF0aW9uLiBUaGlzIGlzIG5vdA0KICAgY29tcGF0aWJsZSB3aXRoIHRoZSBj
-dXJyZW50IGRldmljZSBtYXBwZXIgZGVzaWduLg0KMi4gSW1wbGVtZW50IGV4dGVuZGVkIGNvcHkg
-YXMgdHdvIHNlcGFyYXRlIGJsb2NrIGxheWVyIG9wZXJhdGlvbnMgKHJlYWQgKw0KICAgd3JpdGUp
-LiBXaXRoIHRoaXMgYXBwcm9hY2ggdGhlcmUgaXMgYSByaXNrIG9mIHN0YXJ2YXRpb24sIG5hbWVs
-eSBpZg0KICAgcmVzb3VyY2VzIGFyZSBsb3cgYW5kIG9ubHkgb25lIG9mIHRoZSB0d28gb3BlcmF0
-aW9ucyBpcyBwcm9wYWdhdGVkIGRvd24NCiAgIHRvIGxvd2VyIGxheWVycy4NCg0KSSBwcm9wb3Nl
-IHRvIGRpc2N1c3MgdGhpcyBmdXJ0aGVyIGR1cmluZyB0aGUgTFNGL01NLCBlLmcuIHdoZXRoZXIg
-b3Igbm90IHdlDQpzaG91bGQgbW9kaWZ5IHRoZSBkZXZpY2UgbWFwcGVyIHN1Y2ggdGhhdCBhcHBy
-b2FjaCAoMSkgY2FuIGJlIGZvbGxvd2VkLg0KDQpNb3JlIGluZm9ybWF0aW9uIGlzIGF2YWlsYWJs
-ZSBhdDoNCiogSmFrZSBFZGdlLCBDb3B5IE9mZmxvYWQsIExXTi5uZXQsIDI0IEFwcmlsIDIwMTMN
-CiAgKGh0dHBzOi8vbHduLm5ldC9BcnRpY2xlcy81NDgzNDcvKS4NCiogSmFrZSBFZGdlLCBDb3B5
-IE9mZmxvYWQsIExXTi5uZXQsIDIgQXByaWwgMjAxNA0KICAoaHR0cHM6Ly9sd24ubmV0L0FydGlj
-bGVzLzU5MjA5NC8pLg0KKiBNYXJ0aW4gUGV0ZXJzZW4sIENvcHkgT2ZmbG9hZCwgbGludXgtc2Nz
-aSwgMjggTWF5IDIwMTQNCiAgKGh0dHBzOi8vd3d3Lm1haWwtYXJjaGl2ZS5jb20vbGludXgtc2Nz
-aUB2Z2VyLmtlcm5lbC5vcmcvbXNnMjg5OTguaHRtbCkuDQoqIE1pa3VsYXMgUGF0b2NrYSwgQU5O
-T1VOQ0U6IFNDU0kgWENPUFkgc3VwcG9ydCBmb3IgdGhlIGtlcm5lbCBhbmQgZGV2aWNlDQogIG1h
-cHBlciwgMTUgSnVseSAyMDE0DQogIChodHRwczovL3d3dy5tYWlsLWFyY2hpdmUuY29tL2xpbnV4
-LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcvbXNnNjg2MTExLmh0bWwpLg0KKiBNaWt1bGFzIFBhdG9j
-a2EsIFNDU0kgWENPUFkgc3VwcG9ydCBmb3IgdGhlIGtlcm5lbCBhbmQgZGV2aWNlIG1hcHBlciwN
-CiAgbGludXgtc2NzaSBtYWlsaW5nIGxpc3QsIDIyIE9jdG9iZXIgMjAxNA0KICAoaHR0cHM6Ly93
-d3cubWFpbC1hcmNoaXZlLmNvbS9saW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnL21zZzc0OTEx
-My5odG1sIC8NCiAgIGh0dHBzOi8vbGttbC5vcmcvbGttbC8yMDE0LzEwLzIyLzMxNyAvDQogICBo
-dHRwOi8vdGhyZWFkLmdtYW5lLm9yZy9nbWFuZS5saW51eC5rZXJuZWwvMTgxMTE1MSAvDQogICBo
-dHRwOi8vcGVvcGxlLnJlZGhhdC5jb20vfm1wYXRvY2thL3BhdGNoZXMva2VybmVsL3hjb3B5L2N1
-cnJlbnQvKS4NCiogSmFrZSBFZGdlLCBDb3B5IE9mZmxvYWQsIDI1IE1hcmNoIDIwMTUgKGh0dHBz
-Oi8vbHduLm5ldC9BcnRpY2xlcy82Mzc0MzYvKS4NCiogTWlrdWxhcyBQYXRvY2thLCBbUEFUQ0gg
-MC8xNV0gY29weSBvZmZsb2FkIHBhdGNoZXMsIDEwIERlY2VtYmVyIDIwMTUNCiAgKGh0dHBzOi8v
-d3d3Lm1haWwtYXJjaGl2ZS5jb20vbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZy9tc2cxMDM5
-ODkwLmh0bWwgLw0KICAgaHR0cHM6Ly9sa21sLm9yZy9sa21sLzIwMTUvMTIvMTAvNTE3IC8NCiAg
-IGh0dHBzOi8vd3d3LnJlZGhhdC5jb20vYXJjaGl2ZXMvZG0tZGV2ZWwvMjAxNS1EZWNlbWJlci9t
-c2cwMDExNy5odG1sKS4NCiogTG9nYW4gR3VudGhvcnBlLCBbUkZDIDAvOF0gQ29weSBPZmZsb2Fk
-IHdpdGggUGVlci10by1QZWVyIFBDSSBNZW1vcnksIDMwDQogIE1hcmNoIDIwMTcgKGh0dHBzOi8v
-d3d3Lm1haWwtYXJjaGl2ZS5jb20vbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZy9tc2cxMzY3
-MDk3Lmh0bWwpLg0KKiBMb2dhbiBHdW50aG9ycGUsIFtQQVRDSCB2MiAwMC8xMF0gQ29weSBPZmZs
-b2FkIGluIE5WTWUgRmFicmljcyB3aXRoIFAyUCBQQ0kNCiAgTWVtb3J5LCAyOCBGZWJydWFyeSAy
-MDE4DQogIChodHRwczovL3d3dy5tYWlsLWFyY2hpdmUuY29tL2xpbnV4LWtlcm5lbEB2Z2VyLmtl
-cm5lbC5vcmcvbXNnMTYyMzIzMS5odG1sKS4NCiogTG9nYW4gR3VudGhvcnBlLCBbUEFUQ0ggdjMg
-MDAvMTFdIENvcHkgT2ZmbG9hZCBpbiBOVk1lIEZhYnJpY3Mgd2l0aCBQMlAgUENJDQogIE1lbW9y
-eSwgMTIgTWFyY2ggMjAxOA0KICAoaHR0cHM6Ly93d3cubWFpbC1hcmNoaXZlLmNvbS9saW51eC1r
-ZXJuZWxAdmdlci5rZXJuZWwub3JnL21zZzE2MzQ1NDUuaHRtbCkuDQoNCg0KDQo=
+Add a new directory in the driver API guide for PCI specific
+documentation.
+
+This is in preparation for adding a new PCI P2P DMA driver writers
+guide which will go in this directory.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Vinod Koul <vinod.koul@intel.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>
+Cc: Logan Gunthorpe <logang@deltatee.com>
+Cc: Thierry Reding <treding@nvidia.com>
+Cc: Sanyog Kale <sanyog.r.kale@intel.com>
+Cc: Sagar Dharia <sdharia@codeaurora.org>
+---
+ Documentation/driver-api/index.rst         |  2 +-
+ Documentation/driver-api/pci/index.rst     | 19 +++++++++++++++++++
+ Documentation/driver-api/{ => pci}/pci.rst |  0
+ 3 files changed, 20 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/driver-api/pci/index.rst
+ rename Documentation/driver-api/{ => pci}/pci.rst (100%)
+
+diff --git a/Documentation/driver-api/index.rst b/Documentation/driver-api/index.rst
+index 6d8352c0f354..9e4cd4e91a49 100644
+--- a/Documentation/driver-api/index.rst
++++ b/Documentation/driver-api/index.rst
+@@ -27,7 +27,7 @@ available subsections can be seen below.
+    iio/index
+    input
+    usb/index
+-   pci
++   pci/index
+    spi
+    i2c
+    hsi
+diff --git a/Documentation/driver-api/pci/index.rst b/Documentation/driver-api/pci/index.rst
+new file mode 100644
+index 000000000000..03b57cbf8cc2
+--- /dev/null
++++ b/Documentation/driver-api/pci/index.rst
+@@ -0,0 +1,19 @@
++============================================
++The Linux PCI driver implementer's API guide
++============================================
++
++.. class:: toc-title
++
++	   Table of contents
++
++.. toctree::
++   :maxdepth: 2
++
++   pci
++
++.. only::  subproject and html
++
++   Indices
++   =======
++
++   * :ref:`genindex`
+diff --git a/Documentation/driver-api/pci.rst b/Documentation/driver-api/pci/pci.rst
+similarity index 100%
+rename from Documentation/driver-api/pci.rst
+rename to Documentation/driver-api/pci/pci.rst
+-- 
+2.11.0
