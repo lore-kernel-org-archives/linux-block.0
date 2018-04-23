@@ -1,192 +1,102 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mxhk.zte.com.cn ([63.217.80.70]:39408 "EHLO mxhk.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750735AbeDPGdp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Apr 2018 02:33:45 -0400
-From: tang.junhui@zte.com.cn
-To: kent.overstreet@gmail.com, colyli@suse.de, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: [PATCH v2 3/4] bcache: notify allocator to prepare for GC
-Date: Mon, 16 Apr 2018 14:33:49 +0800
-Message-Id: <1523860430-31331-4-git-send-email-tang.junhui@zte.com.cn>
-In-Reply-To: <1523860430-31331-1-git-send-email-tang.junhui@zte.com.cn>
-References: <1523860430-31331-1-git-send-email-tang.junhui@zte.com.cn>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <maier@linux.ibm.com>
+Subject: Re: [RESEND PATCH v1 1/2] trace: events: scsi: Add tag in SCSI trace
+ events
+To: "Bean Huo (beanhuo)" <beanhuo@micron.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "mingo@redhad.com" <mingo@redhad.com>,
+        "rajatja@google.com" <rajatja@google.com>,
+        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <89ca9f7d20c24a3d9c743c7f5ca2d108@SIWEX5A.sing.micron.com>
+From: Steffen Maier <maier@linux.ibm.com>
+Date: Mon, 23 Apr 2018 14:58:24 +0200
+MIME-Version: 1.0
+In-Reply-To: <89ca9f7d20c24a3d9c743c7f5ca2d108@SIWEX5A.sing.micron.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <3298b85a-6a64-3b12-93c6-989c166bfb53@linux.ibm.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Since no new bucket can be allocated during GC, and front side I/Os would
-run out of all the buckets, so notify allocator to pack the free_inc queue
-full of buckets before GC, then we could have enough buckets for front side
-I/Os during GC period.
+On 04/17/2018 12:00 PM, Bean Huo (beanhuo) wrote:
 
-The main idea of this patch is:
+> #Cat trace
+> iozone-4055  [000] ....   665.039276: block_unplug: [iozone] 1 Sync
+> iozone-4055  [000] ...1   665.039278: block_rq_insert: 8,48 WS 0 () 396=
+04352 + 128 tag=3D18 [iozone]
+> iozone-4055  [000] ...1   665.039280: block_rq_issue: 8,48 WS 0 () 3960=
+4352 + 128 tag=3D18 [iozone]
+> iozone-4055  [000] ...1   665.039284: scsi_dispatch_cmd_start: host_no=3D=
+0 channel=3D0 id=3D0 lun=3D3 data_sgl=3D16 prot_sgl=3D0 prot_op=3DSCSI_PR=
+OT_NORMAL tag=3D18 cmnd=3D(WRITE_10 lba=3D4950544 txlen=3D16 protect=3D0 =
+raw=3D2a 00 00 4b 8a 10 00 00 10 00)
+> iozone-4056  [002] ....   665.039284: block_dirty_buffer: 8,62 sector=3D=
+44375 size=3D4096
+> <idle>-0     [000] d.h2   665.039319: scsi_dispatch_cmd_done: host_no=3D=
+0 channel=3D0 id=3D0 lun=3D3 data_sgl=3D16 prot_sgl=3D0 prot_op=3DSCSI_PR=
+OT_NORMAL tag=3D24 cmnd=3D(WRITE_10 lba=3D4944016 txlen=3D16 protect=3D0 =
+raw=3D2a 00 00 4b 70 90 00 00 10 00) result=3D(driver=3DDRIVER_OK host=3D=
+DID_OK message=3DCOMMAND_COMPLETE status=3DSAM_STAT_GOOD)
+> <idle>-0     [000] d.h3   665.039321: block_rq_complete: 8,48 WS () 395=
+52128 + 128 tag=3D24 [0]
 
-		GC thread						|		allocator thread
-==>triggered by sectors_to_gc			|
-	set ca->prepare_gc to GC_PREPARING	|
-	to notify allocator thread to		|
-	prepare for GC						|==>detect ca->prepare_gc is 
-										|	GC_PREPARING,
-										|	do invalidate_buckets(),
-==>waiting for allocator				|	and fill free_inc queue with
-	thread to prepare over				|	reclaimable buckets, after
-										|	that, set ca->prepare_gc to
-										|	GC_PREPARED to notify GC
-										|	thread being prepared
-==>detect ca->prepare_gc is				|
-	prepared, set						|
-	ca->prepare_gc back to				|
-	GC_PREPARE_NONE, and continue GC	|
+> iozone-4058  [003] ....   665.039362: block_bio_remap: 8,48 WS 39568768=
+ + 128 <- (8,62) 337280
+> iozone-4058  [003] ....   665.039364: block_bio_queue: 8,48 WS 39568768=
+ + 128 [iozone]
+> iozone-4058  [003] ...1   665.039366: block_getrq: 8,48 WS 39568768 + 1=
+28 [iozone]
 
-Patch v2: Refactoring code
+I'm not familiar with block/scsi command tagging.
 
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/alloc.c  | 11 ++++++++-
- drivers/md/bcache/bcache.h |  2 ++
- drivers/md/bcache/btree.c  | 59 +++++++++++++++++++++++++++++++++++++++++++---
- drivers/md/bcache/btree.h  |  4 ++++
- 4 files changed, 72 insertions(+), 4 deletions(-)
+Some block events now would get a tag field.
+Some block events would not get a tag field (maybe because for some the=20
+tag is not (yet) known).
 
-diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-index a0cc1bc..85020cc 100644
---- a/drivers/md/bcache/alloc.c
-+++ b/drivers/md/bcache/alloc.c
-@@ -323,7 +323,8 @@ static int bch_allocator_thread(void *arg)
- 		 * possibly issue discards to them, then we add the bucket to
- 		 * the free list:
- 		 */
--		while (!fifo_empty(&ca->free_inc)) {
-+		while (!fifo_empty(&ca->free_inc) &&
-+		       ca->prepare_gc != GC_PREPARING) {
- 			long bucket;
- 
- 			fifo_pop(&ca->free_inc, bucket);
-@@ -353,6 +354,14 @@ static int bch_allocator_thread(void *arg)
- 		invalidate_buckets(ca);
- 
- 		/*
-+		 * Let GC continue
-+		 */
-+		if (ca->prepare_gc == GC_PREPARING) {
-+			ca->prepare_gc = GC_PREPARED;
-+			wake_up_gc(ca->set);
-+		}
-+
-+		/*
- 		 * Now, we write their new gens to disk so we can start writing
- 		 * new stuff to them:
- 		 */
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 5d52be8..e6d5391 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -428,6 +428,8 @@ struct cache {
- 	 * cpu
- 	 */
- 	unsigned		invalidate_needs_gc;
-+	/* used to notify allocator to prepare GC*/
-+	unsigned int		prepare_gc;
- 
- 	bool			discard; /* Get rid of? */
- 
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 2ad0731e..0478821 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -1805,19 +1805,72 @@ static void bch_btree_gc(struct cache_set *c)
- 	bch_moving_gc(c);
- }
- 
-+unsigned int get_cache_gc_prepare_status(struct cache_set *c)
-+{
-+	struct cache *ca;
-+	unsigned int i;
-+	unsigned int status = GC_PREPARE_NONE;
-+
-+	for_each_cache(ca, c, i) {
-+		if (ca->prepare_gc == GC_PREPARING)
-+			return GC_PREPARING;
-+
-+		status = ca->prepare_gc;
-+	}
-+
-+	return status;
-+}
-+
-+static void set_cache_gc_prepare_status(struct cache_set *c,
-+					unsigned int status)
-+{
-+	struct cache *ca;
-+	unsigned int i;
-+
-+	for_each_cache(ca, c, i)
-+		ca->prepare_gc = status;
-+}
-+
- static bool gc_should_run(struct cache_set *c)
- {
- 	struct cache *ca;
- 	unsigned i;
-+	bool ret = false;
- 
- 	for_each_cache(ca, c, i)
- 		if (ca->invalidate_needs_gc)
- 			return true;
- 
--	if (atomic_read(&c->sectors_to_gc) < 0)
--		return true;
-+	if (atomic_read(&c->sectors_to_gc) < 0) {
-+		unsigned int status;
- 
--	return false;
-+		mutex_lock(&c->bucket_lock);
-+		status = get_cache_gc_prepare_status(c);
-+		switch (status) {
-+		case GC_PREPARE_NONE:
-+			/*
-+			 * notify allocator thread to prepare for GC
-+			 */
-+			set_cache_gc_prepare_status(c, GC_PREPARING);
-+			break;
-+		case GC_PREPARED:
-+			/*
-+			 * alloc thread finished preparing,
-+			 * and continue to GC
-+			 */
-+			set_cache_gc_prepare_status(c, GC_PREPARE_NONE);
-+			ret = true;
-+			break;
-+		default:
-+			/*
-+			 * waitting allocator finishing prepareing
-+			 */
-+			break;
-+		}
-+		mutex_unlock(&c->bucket_lock);
-+	}
-+
-+	return ret;
- }
- 
- static int bch_gc_thread(void *arg)
-diff --git a/drivers/md/bcache/btree.h b/drivers/md/bcache/btree.h
-index d211e2c..e60bd7a 100644
---- a/drivers/md/bcache/btree.h
-+++ b/drivers/md/bcache/btree.h
-@@ -102,6 +102,10 @@
- #include "bset.h"
- #include "debug.h"
- 
-+#define GC_PREPARE_NONE		0
-+#define GC_PREPARING		1
-+#define GC_PREPARED		2
-+
- struct btree_write {
- 	atomic_t		*journal;
- 
--- 
-1.8.3.1
+So all block events that belong to the same request would still need to=20
+be correlated by something like (devt, RWBS, LBA, length) because not=20
+all have a tag field.
+
+> Especially, the ftrace log with tag information, I can easily figure ou=
+t one I/O request between block layer and SCSI.
+
+Provided this is done correctly, I would be in favor of a solution.
+Since
+v4.11 commit 48b77ad60844 (``block: cleanup tracing'')\newline
+v4.11 commit 82ed4db499b8 (``block: split scsi\_request out of struct=20
+request'')
+we don't have the SCSI CDB in block traces (nor in blktrace traditional=20
+relayfs trace format, nor in ftrace 'blk' tracer binary synthesized=20
+output [1]) any more (empty Packet Command payload).
+Being able to correlate block events with scsi events would indeed be=20
+very helpful for some cases.
+
+Is a correlation between block and scsi only necessary for these pairs?:
+
+block_rq_issue causes scsi_dispatch_cmd_start, and
+scsi_dispatch_cmd_done causes block_rq_complete.
+
+If so, only those two block trace events would need to get a new field?
+
+
+[1] v2.6.30 commit 08a06b83ff8b (``blkftrace: binary tracing,=20
+synthesizing old format'')
+     v2.6.31 commit f3948f8857ef (``blktrace: fix context-info when=20
+mixed-using blk tracer and trace events'')
+
+--=20
+Mit freundlichen Gr=C3=BC=C3=9Fen / Kind regards
+Steffen Maier
+
+Linux on z Systems Development
+
+IBM Deutschland Research & Development GmbH
+Vorsitzende des Aufsichtsrats: Martina Koederitz
+Geschaeftsfuehrung: Dirk Wittkopp
+Sitz der Gesellschaft: Boeblingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
