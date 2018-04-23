@@ -1,89 +1,102 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:46908 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752308AbeDPQqu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Apr 2018 12:46:50 -0400
-Received: by mail-lf0-f65.google.com with SMTP id j68-v6so23077319lfg.13
-        for <linux-block@vger.kernel.org>; Mon, 16 Apr 2018 09:46:49 -0700 (PDT)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, Javier Gonzales <javier@cnexlabs.com>,
-        linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH 1/2] lightnvm: pblk: only try to recover lines with written smeta
-Date: Mon, 16 Apr 2018 18:46:15 +0200
-Message-Id: <1523897176-6241-2-git-send-email-hans.ml.holmberg@owltronix.com>
-In-Reply-To: <1523897176-6241-1-git-send-email-hans.ml.holmberg@owltronix.com>
-References: <1523897176-6241-1-git-send-email-hans.ml.holmberg@owltronix.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
+	linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	Logan Gunthorpe <logang@deltatee.com>
+Date: Mon, 23 Apr 2018 17:30:45 -0600
+Message-Id: <20180423233046.21476-14-logang@deltatee.com>
+In-Reply-To: <20180423233046.21476-1-logang@deltatee.com>
+References: <20180423233046.21476-1-logang@deltatee.com>
+Subject: [PATCH v4 13/14] nvmet-rdma: Use new SGL alloc/free helper for requests
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Use the new helpers introduced in the previous patch to allocate
+the SGLs for the request.
 
-When switching between different lun configurations, there is no
-guarantee that all lines that contain closed/open chunks have some
-valid data to recover.
+Seeing we use req.transfer_len as the length of the SGL it is
+set earlier and cleared on any error. It also seems to be unnecessary
+to accumulate the length as the map_sgl functions should only ever
+be called once.
 
-Check that the smeta chunk has been written to instead. Also
-skip bad lines (that does not have enough good chunks).
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
 ---
- drivers/lightnvm/pblk-recovery.c | 30 +++++++++++++++++++++---------
- 1 file changed, 21 insertions(+), 9 deletions(-)
+ drivers/nvme/target/rdma.c | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 3e079c2..9cb6d5d 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -865,18 +865,30 @@ static void pblk_recov_wa_counters(struct pblk *pblk,
- }
+diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
+index 52e0c5d579a7..f7a3459d618f 100644
+--- a/drivers/nvme/target/rdma.c
++++ b/drivers/nvme/target/rdma.c
+@@ -430,7 +430,7 @@ static void nvmet_rdma_release_rsp(struct nvmet_rdma_rsp *rsp)
+ 	}
  
- static int pblk_line_was_written(struct pblk_line *line,
--			    struct pblk_line_meta *lm)
-+			    struct pblk *pblk)
+ 	if (rsp->req.sg != &rsp->cmd->inline_sg)
+-		sgl_free(rsp->req.sg);
++		nvmet_req_free_sgl(&rsp->req);
+ 
+ 	if (unlikely(!list_empty_careful(&queue->rsp_wr_wait_list)))
+ 		nvmet_rdma_process_wr_wait_list(queue);
+@@ -564,24 +564,24 @@ static u16 nvmet_rdma_map_sgl_keyed(struct nvmet_rdma_rsp *rsp,
  {
+ 	struct rdma_cm_id *cm_id = rsp->queue->cm_id;
+ 	u64 addr = le64_to_cpu(sgl->addr);
+-	u32 len = get_unaligned_le24(sgl->length);
+ 	u32 key = get_unaligned_le32(sgl->key);
+ 	int ret;
  
--	int i;
--	int state_mask = NVM_CHK_ST_OFFLINE | NVM_CHK_ST_FREE;
-+	struct pblk_line_meta *lm = &pblk->lm;
-+	struct nvm_tgt_dev *dev = pblk->dev;
-+	struct nvm_geo *geo = &dev->geo;
-+	struct nvm_chk_meta *chunk;
-+	struct ppa_addr bppa;
-+	int smeta_blk;
++	rsp->req.transfer_len = get_unaligned_le24(sgl->length);
++
+ 	/* no data command? */
+-	if (!len)
++	if (!rsp->req.transfer_len)
+ 		return 0;
  
--	for (i = 0; i < lm->blk_per_line; i++) {
--		if (!(line->chks[i].state & state_mask))
--			return 1;
--	}
-+	if (line->state == PBLK_LINESTATE_BAD)
-+		return 0;
+-	rsp->req.sg = sgl_alloc(len, GFP_KERNEL, &rsp->req.sg_cnt);
+-	if (!rsp->req.sg)
+-		return NVME_SC_INTERNAL;
++	ret = nvmet_req_alloc_sgl(&rsp->req, &rsp->queue->nvme_sq);
++	if (ret < 0)
++		goto error_out;
  
--	return 0;
-+	smeta_blk = find_first_zero_bit(line->blk_bitmap, lm->blk_per_line);
-+	if (smeta_blk >= lm->blk_per_line)
-+		return 0;
+ 	ret = rdma_rw_ctx_init(&rsp->rw, cm_id->qp, cm_id->port_num,
+ 			rsp->req.sg, rsp->req.sg_cnt, 0, addr, key,
+ 			nvmet_data_dir(&rsp->req));
+ 	if (ret < 0)
+-		return NVME_SC_INTERNAL;
+-	rsp->req.transfer_len += len;
++		goto error_out;
+ 	rsp->n_rdma += ret;
+ 
+ 	if (invalidate) {
+@@ -590,6 +590,10 @@ static u16 nvmet_rdma_map_sgl_keyed(struct nvmet_rdma_rsp *rsp,
+ 	}
+ 
+ 	return 0;
 +
-+	bppa = pblk->luns[smeta_blk].bppa;
-+	chunk = &line->chks[pblk_ppa_to_pos(geo, bppa)];
-+
-+	if (chunk->state & NVM_CHK_ST_FREE)
-+		return 0;
-+
-+	return 1;
++error_out:
++	rsp->req.transfer_len = 0;
++	return NVME_SC_INTERNAL;
  }
  
- struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
-@@ -915,7 +927,7 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
- 		line->lun_bitmap = ((void *)(smeta_buf)) +
- 						sizeof(struct line_smeta);
- 
--		if (!pblk_line_was_written(line, lm))
-+		if (!pblk_line_was_written(line, pblk))
- 			continue;
- 
- 		/* Lines that cannot be read are assumed as not written here */
+ static u16 nvmet_rdma_map_sgl(struct nvmet_rdma_rsp *rsp)
 -- 
-2.7.4
+2.11.0
