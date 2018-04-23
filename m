@@ -1,47 +1,30 @@
-Return-Path: <BATV+d9901c46b23ecc19815a+5342+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: Bart.VanAssche@wdc.com,
-	willy@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: [PATCH 5/7] block: use GFP_NOIO instead of __GFP_DIRECT_RECLAIM
-Date: Mon,  9 Apr 2018 17:39:14 +0200
-Message-Id: <20180409153916.23901-6-hch@lst.de>
-In-Reply-To: <20180409153916.23901-1-hch@lst.de>
-References: <20180409153916.23901-1-hch@lst.de>
+Return-Path: <martin@lichtvoll.de>
+From: Martin Steigerwald <martin@lichtvoll.de>
+To: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Cc: axboe@kernel.dk, bart.vanassche@wdc.com, tj@kernel.org, ming.lei@redhat.com, stable@vger.kernel.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blk-mq: start request gstate with gen 1
+Date: Mon, 23 Apr 2018 10:39:27 +0200
+Message-ID: <2502316.XbMSM6V44W@merkaba>
+In-Reply-To: <3737bdcd-f04b-4510-2673-baa6dcdcb557@oracle.com>
+References: <1523936780-1589-1-git-send-email-jianchao.w.wang@oracle.com> <2612135.Ur0PZolWSD@merkaba> <3737bdcd-f04b-4510-2673-baa6dcdcb557@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-block@vger.kernel.org>
 
-We just can't do I/O when doing block layer requests allocations,
-so use GFP_NOIO instead of the even more limited __GFP_DIRECT_RECLAIM.
+Hi Jianchao.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-core.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+jianchao.wang - 17.04.18, 16:34:
+> On 04/17/2018 08:10 PM, Martin Steigerwald wrote:
+> > For testing it I add it to 4.16.2 with the patches I have already?
+> 
+> You could try to only apply this patch to have a test. :)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 16ff472233ba..432923751551 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1578,8 +1578,7 @@ static struct request *blk_old_get_request(struct request_queue *q,
- 				unsigned int op, blk_mq_req_flags_t flags)
- {
- 	struct request *rq;
--	gfp_t gfp_mask = flags & BLK_MQ_REQ_NOWAIT ? GFP_ATOMIC :
--			 __GFP_DIRECT_RECLAIM;
-+	gfp_t gfp_mask = flags & BLK_MQ_REQ_NOWAIT ? GFP_ATOMIC : GFP_NOIO;
- 	int ret = 0;
- 
- 	WARN_ON_ONCE(q->mq_ops);
-@@ -2057,7 +2056,7 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- 	 * Returns with the queue unlocked.
- 	 */
- 	blk_queue_enter_live(q);
--	req = get_request(q, bio->bi_opf, bio, 0, __GFP_DIRECT_RECLAIM);
-+	req = get_request(q, bio->bi_opf, bio, 0, GFP_NOIO);
- 	if (IS_ERR(req)) {
- 		blk_queue_exit(q);
- 		__wbt_done(q->rq_wb, wb_acct);
+I tested 4.16.3 with just your patch (+ the unrelated btrfs trimming fix 
+I carry for a long time already) and it did at least 15 boots 
+successfully (without hanging). So far also no "error loading smart data 
+mail", but it takes a few days with suspend/hibernation + resume cycles 
+in order to know for sure.
+
+Thanks,
 -- 
-2.16.3
+Martin
