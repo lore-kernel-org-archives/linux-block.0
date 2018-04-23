@@ -1,62 +1,162 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:40454 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750853AbeDDNWP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Apr 2018 09:22:15 -0400
-Received: by mail-wr0-f196.google.com with SMTP id n2so19307877wrj.7
-        for <linux-block@vger.kernel.org>; Wed, 04 Apr 2018 06:22:15 -0700 (PDT)
-Subject: Re: BUG at IP: blk_mq_get_request+0x23e/0x390 on 4.16.0-rc7
-To: Yi Zhang <yi.zhang@redhat.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>
-References: <10632862.17524551.1522402353418.JavaMail.zimbra@redhat.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <682acdbe-7624-14d6-36e0-e2dd4c6b771f@grimberg.me>
-Date: Wed, 4 Apr 2018 16:22:12 +0300
-MIME-Version: 1.0
-In-Reply-To: <10632862.17524551.1522402353418.JavaMail.zimbra@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Received: from bombadil.infradead.org ([198.137.202.133]:39034 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932129AbeDWREh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Apr 2018 13:04:37 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        iommu@lists.linux-foundation.org
+Cc: x86@kernel.org, linux-block@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-mm@kvack.org,
+        linux-mips@linux-mips.org, sparclinux@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 01/12] iommu-common: move to arch/sparc
+Date: Mon, 23 Apr 2018 19:04:08 +0200
+Message-Id: <20180423170419.20330-2-hch@lst.de>
+In-Reply-To: <20180423170419.20330-1-hch@lst.de>
+References: <20180423170419.20330-1-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+This code is only used by sparc, and all new iommu drivers should use the
+drivers/iommu/ framework.  Also remove the unused exports.
 
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Anshuman Khandual <khandual@linux.vnet.ibm.com>
+---
+ {include/linux => arch/sparc/include/asm}/iommu-common.h | 0
+ arch/sparc/include/asm/iommu_64.h                        | 2 +-
+ arch/sparc/kernel/Makefile                               | 2 +-
+ {lib => arch/sparc/kernel}/iommu-common.c                | 5 +----
+ arch/sparc/kernel/iommu.c                                | 2 +-
+ arch/sparc/kernel/ldc.c                                  | 2 +-
+ arch/sparc/kernel/pci_sun4v.c                            | 2 +-
+ lib/Makefile                                             | 2 +-
+ 8 files changed, 7 insertions(+), 10 deletions(-)
+ rename {include/linux => arch/sparc/include/asm}/iommu-common.h (100%)
+ rename {lib => arch/sparc/kernel}/iommu-common.c (98%)
 
-On 03/30/2018 12:32 PM, Yi Zhang wrote:
-> Hello
-> I got this kernel BUG on 4.16.0-rc7, here is the reproducer and log, let me know if you need more info, thanks.
-> 
-> Reproducer:
-> 1. setup target
-> #nvmetcli restore /etc/rdma.json
-> 2. connect target on host
-> #nvme connect-all -t rdma -a $IP -s 4420during my NVMeoF RDMA testing
-> 3. do fio background on host
-> #fio -filename=/dev/nvme0n1 -iodepth=1 -thread -rw=randwrite -ioengine=psync -bssplit=5k/10:9k/10:13k/10:17k/10:21k/10:25k/10:29k/10:33k/10:37k/10:41k/10 -bs_unaligned -runtime=180 -size=-group_reporting -name=mytest -numjobs=60 &
-> 4. offline cpu on host
-> #echo 0 > /sys/devices/system/cpu/cpu1/online
-> #echo 0 > /sys/devices/system/cpu/cpu2/online
-> #echo 0 > /sys/devices/system/cpu/cpu3/online
-> 5. clear target
-> #nvmetcli clear
-> 6. restore target
-> #nvmetcli restore /etc/rdma.json
-> 7. check console log on host
-
-Hi Yi,
-
-Does this happen with this applied?
---
-diff --git a/block/blk-mq-rdma.c b/block/blk-mq-rdma.c
-index 996167f1de18..b89da55e8aaa 100644
---- a/block/blk-mq-rdma.c
-+++ b/block/blk-mq-rdma.c
-@@ -35,6 +35,8 @@ int blk_mq_rdma_map_queues(struct blk_mq_tag_set *set,
-         const struct cpumask *mask;
-         unsigned int queue, cpu;
-
-+       goto fallback;
-+
-         for (queue = 0; queue < set->nr_hw_queues; queue++) {
-                 mask = ib_get_vector_affinity(dev, first_vec + queue);
-                 if (!mask)
---
+diff --git a/include/linux/iommu-common.h b/arch/sparc/include/asm/iommu-common.h
+similarity index 100%
+rename from include/linux/iommu-common.h
+rename to arch/sparc/include/asm/iommu-common.h
+diff --git a/arch/sparc/include/asm/iommu_64.h b/arch/sparc/include/asm/iommu_64.h
+index 9ed6b54caa4b..0ef6dedf747e 100644
+--- a/arch/sparc/include/asm/iommu_64.h
++++ b/arch/sparc/include/asm/iommu_64.h
+@@ -17,7 +17,7 @@
+ #define IOPTE_WRITE   0x0000000000000002UL
+ 
+ #define IOMMU_NUM_CTXS	4096
+-#include <linux/iommu-common.h>
++#include <asm/iommu-common.h>
+ 
+ struct iommu_arena {
+ 	unsigned long	*map;
+diff --git a/arch/sparc/kernel/Makefile b/arch/sparc/kernel/Makefile
+index 76cb57750dda..a284662b0e4c 100644
+--- a/arch/sparc/kernel/Makefile
++++ b/arch/sparc/kernel/Makefile
+@@ -59,7 +59,7 @@ obj-$(CONFIG_SPARC32)   += leon_pmc.o
+ 
+ obj-$(CONFIG_SPARC64)   += reboot.o
+ obj-$(CONFIG_SPARC64)   += sysfs.o
+-obj-$(CONFIG_SPARC64)   += iommu.o
++obj-$(CONFIG_SPARC64)   += iommu.o iommu-common.o
+ obj-$(CONFIG_SPARC64)   += central.o
+ obj-$(CONFIG_SPARC64)   += starfire.o
+ obj-$(CONFIG_SPARC64)   += power.o
+diff --git a/lib/iommu-common.c b/arch/sparc/kernel/iommu-common.c
+similarity index 98%
+rename from lib/iommu-common.c
+rename to arch/sparc/kernel/iommu-common.c
+index 55b00de106b5..59cb16691322 100644
+--- a/lib/iommu-common.c
++++ b/arch/sparc/kernel/iommu-common.c
+@@ -8,9 +8,9 @@
+ #include <linux/bitmap.h>
+ #include <linux/bug.h>
+ #include <linux/iommu-helper.h>
+-#include <linux/iommu-common.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/hash.h>
++#include <asm/iommu-common.h>
+ 
+ static unsigned long iommu_large_alloc = 15;
+ 
+@@ -93,7 +93,6 @@ void iommu_tbl_pool_init(struct iommu_map_table *iommu,
+ 	p->hint = p->start;
+ 	p->end = num_entries;
+ }
+-EXPORT_SYMBOL(iommu_tbl_pool_init);
+ 
+ unsigned long iommu_tbl_range_alloc(struct device *dev,
+ 				struct iommu_map_table *iommu,
+@@ -224,7 +223,6 @@ unsigned long iommu_tbl_range_alloc(struct device *dev,
+ 
+ 	return n;
+ }
+-EXPORT_SYMBOL(iommu_tbl_range_alloc);
+ 
+ static struct iommu_pool *get_pool(struct iommu_map_table *tbl,
+ 				   unsigned long entry)
+@@ -264,4 +262,3 @@ void iommu_tbl_range_free(struct iommu_map_table *iommu, u64 dma_addr,
+ 	bitmap_clear(iommu->map, entry, npages);
+ 	spin_unlock_irqrestore(&(pool->lock), flags);
+ }
+-EXPORT_SYMBOL(iommu_tbl_range_free);
+diff --git a/arch/sparc/kernel/iommu.c b/arch/sparc/kernel/iommu.c
+index b08dc3416f06..40d008b0bd3e 100644
+--- a/arch/sparc/kernel/iommu.c
++++ b/arch/sparc/kernel/iommu.c
+@@ -14,7 +14,7 @@
+ #include <linux/errno.h>
+ #include <linux/iommu-helper.h>
+ #include <linux/bitmap.h>
+-#include <linux/iommu-common.h>
++#include <asm/iommu-common.h>
+ 
+ #ifdef CONFIG_PCI
+ #include <linux/pci.h>
+diff --git a/arch/sparc/kernel/ldc.c b/arch/sparc/kernel/ldc.c
+index 86b625f9d8dc..c0fa3ef6cf01 100644
+--- a/arch/sparc/kernel/ldc.c
++++ b/arch/sparc/kernel/ldc.c
+@@ -16,7 +16,7 @@
+ #include <linux/list.h>
+ #include <linux/init.h>
+ #include <linux/bitmap.h>
+-#include <linux/iommu-common.h>
++#include <asm/iommu-common.h>
+ 
+ #include <asm/hypervisor.h>
+ #include <asm/iommu.h>
+diff --git a/arch/sparc/kernel/pci_sun4v.c b/arch/sparc/kernel/pci_sun4v.c
+index 249367228c33..565d9ac883d0 100644
+--- a/arch/sparc/kernel/pci_sun4v.c
++++ b/arch/sparc/kernel/pci_sun4v.c
+@@ -16,7 +16,7 @@
+ #include <linux/export.h>
+ #include <linux/log2.h>
+ #include <linux/of_device.h>
+-#include <linux/iommu-common.h>
++#include <asm/iommu-common.h>
+ 
+ #include <asm/iommu.h>
+ #include <asm/irq.h>
+diff --git a/lib/Makefile b/lib/Makefile
+index ce20696d5a92..94203b5eecd4 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -147,7 +147,7 @@ obj-$(CONFIG_AUDIT_GENERIC) += audit.o
+ obj-$(CONFIG_AUDIT_COMPAT_GENERIC) += compat_audit.o
+ 
+ obj-$(CONFIG_SWIOTLB) += swiotlb.o
+-obj-$(CONFIG_IOMMU_HELPER) += iommu-helper.o iommu-common.o
++obj-$(CONFIG_IOMMU_HELPER) += iommu-helper.o
+ obj-$(CONFIG_FAULT_INJECTION) += fault-inject.o
+ obj-$(CONFIG_NOTIFIER_ERROR_INJECTION) += notifier-error-inject.o
+ obj-$(CONFIG_PM_NOTIFIER_ERROR_INJECT) += pm-notifier-error-inject.o
+-- 
+2.17.0
