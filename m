@@ -1,40 +1,48 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0070.outbound.protection.outlook.com ([104.47.32.70]:39859
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752934AbeDPJTq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Apr 2018 05:19:46 -0400
-From: Wei Xu <wxu@cnexlabs.com>
-To: mb@lightnvm.io
-Cc: javier@cnexlabs.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Wei Xu <wxu@cnexlabs.com>
-Subject: [PATCH] lightnvm: pblk: add CNEX Granby to the pblk device list
-Date: Mon, 16 Apr 2018 17:19:17 +0800
-Message-Id: <1523870357-2118-1-git-send-email-wxu@cnexlabs.com>
+Return-Path: <SRS0=XJYy=HM=goodmis.org=rostedt@kernel.org>
+Date: Mon, 23 Apr 2018 09:34:01 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Steffen Maier <maier@linux.ibm.com>
+Cc: "Bean Huo (beanhuo)" <beanhuo@micron.com>, "axboe@kernel.dk"
+ <axboe@kernel.dk>, "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+ "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "mingo@redhad.com" <mingo@redhad.com>, "Bart.VanAssche@sandisk.com"
+ <Bart.VanAssche@sandisk.com>, "rajatja@google.com" <rajatja@google.com>
+Subject: Re: [RESEND PATCH v1 2/2] trace: events: block: Add tag in block
+ trace events
+Message-ID: <20180423093401.30839625@gandalf.local.home>
+In-Reply-To: <f28ab517-9172-e585-718c-8a54adbfc3bc@linux.ibm.com>
+References: <64d6073b28b140cda3e5870a54e0a7bc@SIWEX5A.sing.micron.com>
+	<f28ab517-9172-e585-718c-8a54adbfc3bc@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+List-ID: <linux-block@vger.kernel.org>
 
-Add a new lightnvm quirk to identify CNEX’s Granby controller.
+On Mon, 23 Apr 2018 14:43:13 +0200
+Steffen Maier <maier@linux.ibm.com> wrote:
 
-Signed-off-by: Wei Xu <wxu@cnexlabs.com>
----
- drivers/nvme/host/pci.c | 2 ++
- 1 file changed, 2 insertions(+)
+> > -	TP_printk("[%s] %d", __entry->comm, __entry->nr_rq)
+> > +	TP_printk("[%s] %d %s", __entry->comm, __entry->nr_rq,
+> > +		   __entry->explicit ? "Sync" : "Async")
+> >   );
+> > 
+> >   /**  
+> 
+> This entire hunk does not seem related to this patch description.
+> Also, I'm not sure trace-cmd and perf et al. could format it accordingly.
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index cb73bc8..9419e88 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2529,6 +2529,8 @@ static const struct pci_device_id nvme_id_table[] = {
- 		.driver_data = NVME_QUIRK_LIGHTNVM, },
- 	{ PCI_DEVICE(0x1d1d, 0x2807),	/* CNEX WL */
- 		.driver_data = NVME_QUIRK_LIGHTNVM, },
-+	{ PCI_DEVICE(0x1d1d, 0x2601),	/* CNEX Granby */
-+		.driver_data = NVME_QUIRK_LIGHTNVM, },
- 	{ PCI_DEVICE_CLASS(PCI_CLASS_STORAGE_EXPRESS, 0xffffff) },
- 	{ PCI_DEVICE(PCI_VENDOR_ID_APPLE, 0x2001) },
- 	{ PCI_DEVICE(PCI_VENDOR_ID_APPLE, 0x2003) },
--- 
-2.7.4
+You mean the "?:" operation? trace-cmd and perf can handle it fine.
+Just look at the trace event irq_handler_exit:
+
+ print fmt: "irq=%d ret=%s", REC->irq, REC->ret ? "handled" : "unhandled"
+
+# trace-cmd record -e irq_handler_exit
+# trace-cmd report
+          <idle>-0     [001] 856960.382767: irq_handler_exit:     irq=29 ret=handled
+          <idle>-0     [001] 856961.745640: irq_handler_exit:     irq=29 ret=handled
+          <idle>-0     [001] 856961.865762: irq_handler_exit:     irq=29 ret=handled
+
+
+-- Steve
