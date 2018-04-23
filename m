@@ -1,168 +1,263 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org
-Subject: [PATCH V2 1/5] block: introduce blk_quiesce_timeout() and blk_unquiesce_timeout()
-Date: Sun, 29 Apr 2018 23:41:48 +0800
-Message-Id: <20180429154152.16656-2-ming.lei@redhat.com>
-In-Reply-To: <20180429154152.16656-1-ming.lei@redhat.com>
-References: <20180429154152.16656-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:39408 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932136AbeDWREs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Apr 2018 13:04:48 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        iommu@lists.linux-foundation.org
+Cc: x86@kernel.org, linux-block@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-mm@kvack.org,
+        linux-mips@linux-mips.org, sparclinux@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 03/12] iommu-helper: mark iommu_is_span_boundary as inline
+Date: Mon, 23 Apr 2018 19:04:10 +0200
+Message-Id: <20180423170419.20330-4-hch@lst.de>
+In-Reply-To: <20180423170419.20330-1-hch@lst.de>
+References: <20180423170419.20330-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Turns out the current way can't drain timout completely because mod_timer()
-can be triggered in the work func, which can be just run inside the synced
-timeout work:
+This avoids selecting IOMMU_HELPER just for this function.  And we only
+use it once or twice in normal builds so this often even is a size
+reduction.
 
-        del_timer_sync(&q->timeout);
-        cancel_work_sync(&q->timeout_work);
-
-This patch introduces one flag of 'timeout_off' for fixing this issue, turns
-out this simple way does work.
-
-Also blk_quiesce_timeout() and blk_unquiesce_timeout() are introduced for
-draining timeout, which is needed by NVMe.
-
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-core.c       | 34 ++++++++++++++++++++++++++++++++--
- block/blk-mq.c         |  9 +++++++++
- block/blk-timeout.c    |  5 ++++-
- include/linux/blkdev.h |  4 ++++
- 4 files changed, 49 insertions(+), 3 deletions(-)
+ arch/alpha/Kconfig              |  3 ---
+ arch/arm/Kconfig                |  3 ---
+ arch/arm64/Kconfig              |  3 ---
+ arch/ia64/Kconfig               |  3 ---
+ arch/mips/cavium-octeon/Kconfig |  4 ----
+ arch/mips/loongson64/Kconfig    |  4 ----
+ arch/mips/netlogic/Kconfig      |  3 ---
+ arch/powerpc/Kconfig            |  1 -
+ arch/unicore32/mm/Kconfig       |  3 ---
+ arch/x86/Kconfig                |  2 +-
+ drivers/parisc/Kconfig          |  5 -----
+ include/linux/iommu-helper.h    | 13 ++++++++++---
+ lib/iommu-helper.c              | 12 +-----------
+ 13 files changed, 12 insertions(+), 47 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 806ce2442819..1288a0673ed1 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -388,6 +388,35 @@ void blk_stop_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_stop_queue);
+diff --git a/arch/alpha/Kconfig b/arch/alpha/Kconfig
+index b2022885ced8..3ff735a722af 100644
+--- a/arch/alpha/Kconfig
++++ b/arch/alpha/Kconfig
+@@ -345,9 +345,6 @@ config PCI_DOMAINS
+ config PCI_SYSCALL
+ 	def_bool PCI
  
-+static void __blk_unquiesce_timeout(struct request_queue *q)
-+{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	q->timeout_off = false;
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+}
-+
-+void blk_unquiesce_timeout(struct request_queue *q)
-+{
-+	__blk_unquiesce_timeout(q);
-+	mod_timer(&q->timeout, jiffies + q->rq_timeout);
-+}
-+EXPORT_SYMBOL(blk_unquiesce_timeout);
-+
-+void blk_quiesce_timeout(struct request_queue *q)
-+{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	q->timeout_off = true;
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+	del_timer_sync(&q->timeout);
-+	cancel_work_sync(&q->timeout_work);
-+}
-+EXPORT_SYMBOL(blk_quiesce_timeout);
-+
- /**
-  * blk_sync_queue - cancel any pending callbacks on a queue
-  * @q: the queue
-@@ -408,8 +437,7 @@ EXPORT_SYMBOL(blk_stop_queue);
-  */
- void blk_sync_queue(struct request_queue *q)
- {
--	del_timer_sync(&q->timeout);
--	cancel_work_sync(&q->timeout_work);
-+	blk_quiesce_timeout(q);
- 
- 	if (q->mq_ops) {
- 		struct blk_mq_hw_ctx *hctx;
-@@ -421,6 +449,8 @@ void blk_sync_queue(struct request_queue *q)
- 	} else {
- 		cancel_delayed_work_sync(&q->delay_work);
- 	}
-+
-+	__blk_unquiesce_timeout(q);
- }
- EXPORT_SYMBOL(blk_sync_queue);
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0dc9e341c2a7..890dd3b3e3e1 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -901,6 +901,15 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 	};
- 	struct blk_mq_hw_ctx *hctx;
- 	int i;
-+	bool timeout_off;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	timeout_off = q->timeout_off;
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+	if (timeout_off)
-+		return;
- 
- 	/* A deadlock might occur if a request is stuck requiring a
- 	 * timeout at the same time a queue freeze is waiting
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index 652d4d4d3e97..ffd0b609091e 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -136,12 +136,15 @@ void blk_timeout_work(struct work_struct *work)
- 
- 	spin_lock_irqsave(q->queue_lock, flags);
- 
-+	if (q->timeout_off)
-+		goto exit;
-+
- 	list_for_each_entry_safe(rq, tmp, &q->timeout_list, timeout_list)
- 		blk_rq_check_expired(rq, &next, &next_set);
- 
- 	if (next_set)
- 		mod_timer(&q->timeout, round_jiffies_up(next));
+-config IOMMU_HELPER
+-	def_bool PCI
 -
-+exit:
- 	spin_unlock_irqrestore(q->queue_lock, flags);
+ config ALPHA_NONAME
+ 	bool
+ 	depends on ALPHA_BOOK1 || ALPHA_NONAME_CH
+diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+index a7f8e7f4b88f..2f79222c5c02 100644
+--- a/arch/arm/Kconfig
++++ b/arch/arm/Kconfig
+@@ -1781,9 +1781,6 @@ config SECCOMP
+ config SWIOTLB
+ 	def_bool y
+ 
+-config IOMMU_HELPER
+-	def_bool SWIOTLB
+-
+ config PARAVIRT
+ 	bool "Enable paravirtualization code"
+ 	help
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index eb2cf4938f6d..fbef5d3de83f 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -252,9 +252,6 @@ config SMP
+ config SWIOTLB
+ 	def_bool y
+ 
+-config IOMMU_HELPER
+-	def_bool SWIOTLB
+-
+ config KERNEL_MODE_NEON
+ 	def_bool y
+ 
+diff --git a/arch/ia64/Kconfig b/arch/ia64/Kconfig
+index bbe12a038d21..862c5160c09d 100644
+--- a/arch/ia64/Kconfig
++++ b/arch/ia64/Kconfig
+@@ -613,6 +613,3 @@ source "security/Kconfig"
+ source "crypto/Kconfig"
+ 
+ source "lib/Kconfig"
+-
+-config IOMMU_HELPER
+-	def_bool (IA64_HP_ZX1 || IA64_HP_ZX1_SWIOTLB || IA64_GENERIC || SWIOTLB)
+diff --git a/arch/mips/cavium-octeon/Kconfig b/arch/mips/cavium-octeon/Kconfig
+index b5eee1a57d6c..647ed158ac98 100644
+--- a/arch/mips/cavium-octeon/Kconfig
++++ b/arch/mips/cavium-octeon/Kconfig
+@@ -67,16 +67,12 @@ config CAVIUM_OCTEON_LOCK_L2_MEMCPY
+ 	help
+ 	  Lock the kernel's implementation of memcpy() into L2.
+ 
+-config IOMMU_HELPER
+-	bool
+-
+ config NEED_SG_DMA_LENGTH
+ 	bool
+ 
+ config SWIOTLB
+ 	def_bool y
+ 	select DMA_DIRECT_OPS
+-	select IOMMU_HELPER
+ 	select NEED_SG_DMA_LENGTH
+ 
+ config OCTEON_ILM
+diff --git a/arch/mips/loongson64/Kconfig b/arch/mips/loongson64/Kconfig
+index 72af0c183969..5efb2e63878e 100644
+--- a/arch/mips/loongson64/Kconfig
++++ b/arch/mips/loongson64/Kconfig
+@@ -130,9 +130,6 @@ config LOONGSON_UART_BASE
+ 	default y
+ 	depends on EARLY_PRINTK || SERIAL_8250
+ 
+-config IOMMU_HELPER
+-	bool
+-
+ config NEED_SG_DMA_LENGTH
+ 	bool
+ 
+@@ -141,7 +138,6 @@ config SWIOTLB
+ 	default y
+ 	depends on CPU_LOONGSON3
+ 	select DMA_DIRECT_OPS
+-	select IOMMU_HELPER
+ 	select NEED_SG_DMA_LENGTH
+ 	select NEED_DMA_MAP_STATE
+ 
+diff --git a/arch/mips/netlogic/Kconfig b/arch/mips/netlogic/Kconfig
+index 7fcfc7fe9f14..5c5ee0e05a17 100644
+--- a/arch/mips/netlogic/Kconfig
++++ b/arch/mips/netlogic/Kconfig
+@@ -83,9 +83,6 @@ endif
+ config NLM_COMMON
+ 	bool
+ 
+-config IOMMU_HELPER
+-	bool
+-
+ config NEED_SG_DMA_LENGTH
+ 	bool
+ 
+diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+index c32a181a7cbb..43e3c8e4e7f4 100644
+--- a/arch/powerpc/Kconfig
++++ b/arch/powerpc/Kconfig
+@@ -484,7 +484,6 @@ config IOMMU_HELPER
+ config SWIOTLB
+ 	bool "SWIOTLB support"
+ 	default n
+-	select IOMMU_HELPER
+ 	---help---
+ 	  Support for IO bounce buffering for systems without an IOMMU.
+ 	  This allows us to DMA to the full physical address space on
+diff --git a/arch/unicore32/mm/Kconfig b/arch/unicore32/mm/Kconfig
+index e9154a59d561..3f105e00c432 100644
+--- a/arch/unicore32/mm/Kconfig
++++ b/arch/unicore32/mm/Kconfig
+@@ -44,9 +44,6 @@ config SWIOTLB
+ 	def_bool y
+ 	select DMA_DIRECT_OPS
+ 
+-config IOMMU_HELPER
+-	def_bool SWIOTLB
+-
+ config NEED_SG_DMA_LENGTH
+ 	def_bool SWIOTLB
+ 
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 00fcf81f2c56..cb2c7ecc1fea 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -931,7 +931,7 @@ config SWIOTLB
+ 
+ config IOMMU_HELPER
+ 	def_bool y
+-	depends on CALGARY_IOMMU || GART_IOMMU || SWIOTLB || AMD_IOMMU
++	depends on CALGARY_IOMMU || GART_IOMMU
+ 
+ config MAXSMP
+ 	bool "Enable Maximum number of SMP Processors and NUMA Nodes"
+diff --git a/drivers/parisc/Kconfig b/drivers/parisc/Kconfig
+index 3a102a84d637..5a48b5606110 100644
+--- a/drivers/parisc/Kconfig
++++ b/drivers/parisc/Kconfig
+@@ -103,11 +103,6 @@ config IOMMU_SBA
+ 	depends on PCI_LBA
+ 	default PCI_LBA
+ 
+-config IOMMU_HELPER
+-	bool
+-	depends on IOMMU_SBA || IOMMU_CCIO
+-	default y
+-
+ source "drivers/pcmcia/Kconfig"
+ 
+ endmenu
+diff --git a/include/linux/iommu-helper.h b/include/linux/iommu-helper.h
+index cb9a9248c8c0..70d01edcbf8b 100644
+--- a/include/linux/iommu-helper.h
++++ b/include/linux/iommu-helper.h
+@@ -2,6 +2,7 @@
+ #ifndef _LINUX_IOMMU_HELPER_H
+ #define _LINUX_IOMMU_HELPER_H
+ 
++#include <linux/bug.h>
+ #include <linux/kernel.h>
+ 
+ static inline unsigned long iommu_device_max_index(unsigned long size,
+@@ -14,9 +15,15 @@ static inline unsigned long iommu_device_max_index(unsigned long size,
+ 		return size;
  }
  
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 9af3e0f430bc..99488a5c7d34 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -584,6 +584,7 @@ struct request_queue {
- 	struct timer_list	timeout;
- 	struct work_struct	timeout_work;
- 	struct list_head	timeout_list;
-+	bool			timeout_off;
- 
- 	struct list_head	icq_list;
- #ifdef CONFIG_BLK_CGROUP
-@@ -1011,6 +1012,9 @@ extern void blk_execute_rq(struct request_queue *, struct gendisk *,
- extern void blk_execute_rq_nowait(struct request_queue *, struct gendisk *,
- 				  struct request *, int, rq_end_io_fn *);
- 
-+extern void blk_quiesce_timeout(struct request_queue *q);
-+extern void blk_unquiesce_timeout(struct request_queue *q);
+-extern int iommu_is_span_boundary(unsigned int index, unsigned int nr,
+-				  unsigned long shift,
+-				  unsigned long boundary_size);
++static inline int iommu_is_span_boundary(unsigned int index, unsigned int nr,
++		unsigned long shift, unsigned long boundary_size)
++{
++	BUG_ON(!is_power_of_2(boundary_size));
 +
- int blk_status_to_errno(blk_status_t status);
- blk_status_t errno_to_blk_status(int errno);
++	shift = (shift + index) & (boundary_size - 1);
++	return shift + nr > boundary_size;
++}
++
+ extern unsigned long iommu_area_alloc(unsigned long *map, unsigned long size,
+ 				      unsigned long start, unsigned int nr,
+ 				      unsigned long shift,
+diff --git a/lib/iommu-helper.c b/lib/iommu-helper.c
+index ded1703e7e64..92a9f243c0e2 100644
+--- a/lib/iommu-helper.c
++++ b/lib/iommu-helper.c
+@@ -4,17 +4,7 @@
+  */
  
+ #include <linux/bitmap.h>
+-#include <linux/bug.h>
+-
+-int iommu_is_span_boundary(unsigned int index, unsigned int nr,
+-			   unsigned long shift,
+-			   unsigned long boundary_size)
+-{
+-	BUG_ON(!is_power_of_2(boundary_size));
+-
+-	shift = (shift + index) & (boundary_size - 1);
+-	return shift + nr > boundary_size;
+-}
++#include <linux/iommu-helper.h>
+ 
+ unsigned long iommu_area_alloc(unsigned long *map, unsigned long size,
+ 			       unsigned long start, unsigned int nr,
 -- 
-2.9.5
+2.17.0
