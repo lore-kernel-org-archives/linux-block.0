@@ -1,113 +1,112 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mxhk.zte.com.cn ([63.217.80.70]:38402 "EHLO mxhk.zte.com.cn"
+Received: from ale.deltatee.com ([207.54.116.67]:41920 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752381AbeDLGik (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Apr 2018 02:38:40 -0400
-From: tang.junhui@zte.com.cn
-To: kent.overstreet@gmail.com, colyli@suse.de, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: [PATCH 2/4] bcache: calculate the number of incremental GC nodes according to the total of btree nodes
-Date: Thu, 12 Apr 2018 14:38:42 +0800
-Message-Id: <1523515124-2021-3-git-send-email-tang.junhui@zte.com.cn>
-In-Reply-To: <1523515124-2021-1-git-send-email-tang.junhui@zte.com.cn>
-References: <1523515124-2021-1-git-send-email-tang.junhui@zte.com.cn>
+        id S932652AbeDWXbF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Apr 2018 19:31:05 -0400
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+Date: Mon, 23 Apr 2018 17:30:43 -0600
+Message-Id: <20180423233046.21476-12-logang@deltatee.com>
+In-Reply-To: <20180423233046.21476-1-logang@deltatee.com>
+References: <20180423233046.21476-1-logang@deltatee.com>
+Subject: [PATCH v4 11/14] nvme-pci: Add a quirk for a pseudo CMB
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+Introduce a quirk to use CMB-like memory on older devices that have
+an exposed BAR but do not advertise support for using CMBLOC and
+CMBSIZE.
 
-This patch base on "[PATCH] bcache: finish incremental GC".
+We'd like to use some of these older cards to test P2P memory.
 
-Since incremental GC would stop 100ms when front side I/O comes, so when
-there are many btree nodes, if GC only processes constant (100) nodes each
-time, GC would last a long time, and the front I/Os would run out of the
-buckets (since no new bucket can be allocated during GC), and I/Os be
-blocked again.
-
-So GC should not process constant nodes, but varied nodes according to the
-number of btree nodes. In this patch, GC is divided into constant (100)
-times, so when there are many btree nodes, GC can process more nodes each
-time, otherwise GC will process less nodes each time (but no less than
-MIN_GC_NODES).
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- drivers/md/bcache/btree.c | 37 ++++++++++++++++++++++++++++++++++---
- 1 file changed, 34 insertions(+), 3 deletions(-)
+ drivers/nvme/host/nvme.h |  7 +++++++
+ drivers/nvme/host/pci.c  | 24 ++++++++++++++++++++----
+ 2 files changed, 27 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index b36d276..10f967e 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -90,10 +90,10 @@
- 
- #define MAX_NEED_GC		64
- #define MAX_SAVE_PRIO		72
-+#define MAX_GC_TIMES		100
- #define MIN_GC_NODES		100
- #define GC_SLEEP_TIME		100
- 
--
- #define PTR_DIRTY_BIT		(((uint64_t) 1 << 36))
- 
- #define PTR_HASH(c, k)							\
-@@ -1519,6 +1519,31 @@ static unsigned btree_gc_count_keys(struct btree *b)
- 	return ret;
- }
- 
-+static size_t btree_gc_min_nodes(struct cache_set *c)
-+{
-+	size_t			min_nodes;
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 9a689c13998f..885e9ec9b889 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -84,6 +84,13 @@ enum nvme_quirks {
+ 	 * Supports the LighNVM command set if indicated in vs[1].
+ 	 */
+ 	NVME_QUIRK_LIGHTNVM			= (1 << 6),
 +
 +	/*
-+	 * Since incremental GC would stop 100ms when front
-+	 * side I/O comes, so when there are many btree nodes,
-+	 * if GC only processes constant (100) nodes each time,
-+	 * GC would last a long time, and the front side I/Os
-+	 * would run out of the buckets (since no new bucket
-+	 * can be allocated during GC), and be blocked again.
-+	 * So GC should not process constant nodes, but varied
-+	 * nodes according to the number of btree nodes, which
-+	 * realized by dividing GC into constant(100) times,
-+	 * so when there are many btree nodes, GC can process
-+	 * more nodes each time, otherwise, GC will process less
-+	 * nodes each time (but no less than MIN_GC_NODES)
++	 * Pseudo CMB Support on BAR 4. For adapters like the Microsemi
++	 * NVRAM that have CMB-like memory on a BAR but does not set
++	 * CMBLOC or CMBSZ.
 +	 */
-+	min_nodes = c->gc_stats.nodes / MAX_GC_TIMES;
-+	if (min_nodes < MIN_GC_NODES)
-+		min_nodes = MIN_GC_NODES;
-+
-+	return min_nodes;
++	NVME_QUIRK_PSEUDO_CMB_BAR4		= (1 << 7),
+ };
+ 
+ /*
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 09b6aba6ed28..e526e969680a 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -1685,6 +1685,13 @@ static ssize_t nvme_cmb_show(struct device *dev,
+ }
+ static DEVICE_ATTR(cmb, S_IRUGO, nvme_cmb_show, NULL);
+ 
++static u32 nvme_pseudo_cmbsz(struct pci_dev *pdev, int bar)
++{
++	return NVME_CMBSZ_WDS | NVME_CMBSZ_RDS |
++		(((ilog2(SZ_16M) - 12) / 4) << NVME_CMBSZ_SZU_SHIFT) |
++		((pci_resource_len(pdev, bar) / SZ_16M) << NVME_CMBSZ_SZ_SHIFT);
 +}
 +
- static int btree_gc_recurse(struct btree *b, struct btree_op *op,
- 			    struct closure *writes, struct gc_stat *gc)
+ static u64 nvme_cmb_size_unit(struct nvme_dev *dev)
  {
-@@ -1585,7 +1610,7 @@ static int btree_gc_recurse(struct btree *b, struct btree_op *op,
- 		r->b = NULL;
+ 	u8 szu = (dev->cmbsz >> NVME_CMBSZ_SZU_SHIFT) & NVME_CMBSZ_SZU_MASK;
+@@ -1704,10 +1711,15 @@ static void nvme_map_cmb(struct nvme_dev *dev)
+ 	struct pci_dev *pdev = to_pci_dev(dev->dev);
+ 	int bar;
  
- 		if (atomic_read(&b->c->io_inflight) &&
--		    gc->nodes >= gc->nodes_pre + MIN_GC_NODES) {
-+		    gc->nodes >= gc->nodes_pre + btree_gc_min_nodes(b->c)) {
- 			gc->nodes_pre =  gc->nodes;
- 			ret = -EAGAIN;
- 			break;
-@@ -1841,8 +1866,14 @@ static int bch_btree_check_recurse(struct btree *b, struct btree_op *op)
- 		do {
- 			k = bch_btree_iter_next_filter(&iter, &b->keys,
- 						       bch_ptr_bad);
--			if (k)
-+			if (k) {
- 				btree_node_prefetch(b, k);
-+				/*
-+				 * initiallize c->gc_stats.nodes
-+				 * for incremental GC
-+				 */
-+				b->c->gc_stats.nodes++;
-+			}
+-	dev->cmbsz = readl(dev->bar + NVME_REG_CMBSZ);
+-	if (!dev->cmbsz)
+-		return;
+-	dev->cmbloc = readl(dev->bar + NVME_REG_CMBLOC);
++	if (dev->ctrl.quirks & NVME_QUIRK_PSEUDO_CMB_BAR4) {
++		dev->cmbsz = nvme_pseudo_cmbsz(pdev, 4);
++		dev->cmbloc = 4;
++	} else {
++		dev->cmbsz = readl(dev->bar + NVME_REG_CMBSZ);
++		if (!dev->cmbsz)
++			return;
++		dev->cmbloc = readl(dev->bar + NVME_REG_CMBLOC);
++	}
  
- 			if (p)
- 				ret = btree(check_recurse, p, b, op);
+ 	size = nvme_cmb_size_unit(dev) * nvme_cmb_size(dev);
+ 	offset = nvme_cmb_size_unit(dev) * NVME_CMB_OFST(dev->cmbloc);
+@@ -2736,6 +2748,10 @@ static const struct pci_device_id nvme_id_table[] = {
+ 		.driver_data = NVME_QUIRK_LIGHTNVM, },
+ 	{ PCI_DEVICE(0x1d1d, 0x2807),	/* CNEX WL */
+ 		.driver_data = NVME_QUIRK_LIGHTNVM, },
++	{ PCI_DEVICE(0x11f8, 0xf117),	/* Microsemi NVRAM adaptor */
++		.driver_data = NVME_QUIRK_PSEUDO_CMB_BAR4, },
++	{ PCI_DEVICE(0x1db1, 0x0002),	/* Everspin nvNitro adaptor */
++		.driver_data = NVME_QUIRK_PSEUDO_CMB_BAR4,  },
+ 	{ PCI_DEVICE_CLASS(PCI_CLASS_STORAGE_EXPRESS, 0xffffff) },
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_APPLE, 0x2001) },
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_APPLE, 0x2003) },
 -- 
-1.8.3.1
+2.11.0
