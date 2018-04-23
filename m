@@ -1,265 +1,285 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:39976 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755663AbeDWRFK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Apr 2018 13:05:10 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        iommu@lists.linux-foundation.org
-Cc: x86@kernel.org, linux-block@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-mm@kvack.org,
-        linux-mips@linux-mips.org, sparclinux@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 07/12] arch: remove the ARCH_PHYS_ADDR_T_64BIT config symbol
-Date: Mon, 23 Apr 2018 19:04:14 +0200
-Message-Id: <20180423170419.20330-8-hch@lst.de>
-In-Reply-To: <20180423170419.20330-1-hch@lst.de>
-References: <20180423170419.20330-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+ linux-nvdimm@lists.01.org, linux-block@vger.kernel.org
+Date: Mon, 23 Apr 2018 17:30:38 -0600
+Message-Id: <20180423233046.21476-7-logang@deltatee.com>
+In-Reply-To: <20180423233046.21476-1-logang@deltatee.com>
+References: <20180423233046.21476-1-logang@deltatee.com>
+Subject: [PATCH v4 06/14] PCI/P2PDMA: Add P2P DMA driver writer's documentation
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+ =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Jonathan Corbet <corbet@lwn.net>, Alex Williamson <alex.williamson@redhat.com>,
+ Stephen Bates <sbates@raithlin.com>, Keith Busch <keith.busch@intel.com>,
+ =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+ Jason Gunthorpe <jgg@mellanox.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ Max Gurtovoy <maxg@mellanox.com>, Dan Williams <dan.j.williams@intel.com>,
+ Logan Gunthorpe <logang@deltatee.com>, Christoph Hellwig <hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-Instead select the PHYS_ADDR_T_64BIT for 32-bit architectures that need a
-64-bit phys_addr_t type directly.
+Add a restructured text file describing how to write drivers
+with support for P2P DMA transactions. The document describes
+how to use the APIs that were added in the previous few
+commits.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Also adds an index for the PCI documentation tree even though this
+is the only PCI document that has been converted to restructured text
+at this time.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Cc: Jonathan Corbet <corbet@lwn.net>
 ---
- arch/arc/Kconfig                       |  4 +---
- arch/arm/kernel/setup.c                |  2 +-
- arch/arm/mm/Kconfig                    |  4 +---
- arch/arm64/Kconfig                     |  3 ---
- arch/mips/Kconfig                      | 15 ++++++---------
- arch/powerpc/Kconfig                   |  5 +----
- arch/powerpc/platforms/Kconfig.cputype |  1 +
- arch/riscv/Kconfig                     |  6 ++----
- arch/x86/Kconfig                       |  5 +----
- mm/Kconfig                             |  2 +-
- 10 files changed, 15 insertions(+), 32 deletions(-)
+ Documentation/PCI/index.rst             |  14 +++
+ Documentation/driver-api/pci/index.rst  |   1 +
+ Documentation/driver-api/pci/p2pdma.rst | 166 ++++++++++++++++++++++++++++++++
+ Documentation/index.rst                 |   3 +-
+ 4 files changed, 183 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/PCI/index.rst
+ create mode 100644 Documentation/driver-api/pci/p2pdma.rst
 
-diff --git a/arch/arc/Kconfig b/arch/arc/Kconfig
-index d76bf4a83740..f94c61da682a 100644
---- a/arch/arc/Kconfig
-+++ b/arch/arc/Kconfig
-@@ -453,13 +453,11 @@ config ARC_HAS_PAE40
- 	default n
- 	depends on ISA_ARCV2
- 	select HIGHMEM
-+	select PHYS_ADDR_T_64BIT
- 	help
- 	  Enable access to physical memory beyond 4G, only supported on
- 	  ARC cores with 40 bit Physical Addressing support
+diff --git a/Documentation/PCI/index.rst b/Documentation/PCI/index.rst
+new file mode 100644
+index 000000000000..2fdc4b3c291d
+--- /dev/null
++++ b/Documentation/PCI/index.rst
+@@ -0,0 +1,14 @@
++==================================
++Linux PCI Driver Developer's Guide
++==================================
++
++.. toctree::
++
++   p2pdma
++
++.. only::  subproject and html
++
++   Indices
++   =======
++
++   * :ref:`genindex`
+diff --git a/Documentation/driver-api/pci/index.rst b/Documentation/driver-api/pci/index.rst
+index 03b57cbf8cc2..d12eeafbfc90 100644
+--- a/Documentation/driver-api/pci/index.rst
++++ b/Documentation/driver-api/pci/index.rst
+@@ -10,6 +10,7 @@ The Linux PCI driver implementer's API guide
+    :maxdepth: 2
  
--config ARCH_PHYS_ADDR_T_64BIT
--	def_bool ARC_HAS_PAE40
--
- config ARCH_DMA_ADDR_T_64BIT
- 	bool
+    pci
++   p2pdma
  
-diff --git a/arch/arm/kernel/setup.c b/arch/arm/kernel/setup.c
-index fc40a2b40595..35ca494c028c 100644
---- a/arch/arm/kernel/setup.c
-+++ b/arch/arm/kernel/setup.c
-@@ -754,7 +754,7 @@ int __init arm_add_memory(u64 start, u64 size)
- 	else
- 		size -= aligned_start - start;
+ .. only::  subproject and html
  
--#ifndef CONFIG_ARCH_PHYS_ADDR_T_64BIT
-+#ifndef CONFIG_PHYS_ADDR_T_64BIT
- 	if (aligned_start > ULONG_MAX) {
- 		pr_crit("Ignoring memory at 0x%08llx outside 32-bit physical address space\n",
- 			(long long)start);
-diff --git a/arch/arm/mm/Kconfig b/arch/arm/mm/Kconfig
-index 7f14acf67caf..2f77c6344ef1 100644
---- a/arch/arm/mm/Kconfig
-+++ b/arch/arm/mm/Kconfig
-@@ -661,6 +661,7 @@ config ARM_LPAE
- 	bool "Support for the Large Physical Address Extension"
- 	depends on MMU && CPU_32v7 && !CPU_32v6 && !CPU_32v5 && \
- 		!CPU_32v4 && !CPU_32v3
-+	select PHYS_ADDR_T_64BIT
- 	help
- 	  Say Y if you have an ARMv7 processor supporting the LPAE page
- 	  table format and you would like to access memory beyond the
-@@ -673,9 +674,6 @@ config ARM_PV_FIXUP
- 	def_bool y
- 	depends on ARM_LPAE && ARM_PATCH_PHYS_VIRT && ARCH_KEYSTONE
+diff --git a/Documentation/driver-api/pci/p2pdma.rst b/Documentation/driver-api/pci/p2pdma.rst
+new file mode 100644
+index 000000000000..49a512c405b2
+--- /dev/null
++++ b/Documentation/driver-api/pci/p2pdma.rst
+@@ -0,0 +1,166 @@
++============================
++PCI Peer-to-Peer DMA Support
++============================
++
++The PCI bus has pretty decent support for performing DMA transfers
++between two endpoints on the bus. This type of transaction is
++henceforth called Peer-to-Peer (or P2P). However, there are a number of
++issues that make P2P transactions tricky to do in a perfectly safe way.
++
++One of the biggest issues is that PCI Root Complexes are not required
++to support forwarding packets between Root Ports. To make things worse,
++there is no simple way to determine if a given Root Complex supports
++this or not. (See PCIe r4.0, sec 1.3.1). Therefore, as of this writing,
++the kernel only supports doing P2P when the endpoints involved are all
++behind the same PCIe root port as the spec guarantees that all
++packets will always be routable but does not require routing between
++root ports.
++
++The second issue is that to make use of existing interfaces in Linux,
++memory that is used for P2P transactions needs to be backed by struct
++pages. However, PCI BARs are not typically cache coherent so there are
++a few corner case gotchas with these pages so developers need to
++be careful about what they do with them.
++
++
++Driver Writer's Guide
++=====================
++
++In a given P2P implementation there may be three or more different
++types of kernel drivers in play:
++
++* Providers - A driver which provides or publishes P2P resources like
++  memory or doorbell registers to other drivers.
++* Clients - A driver which makes use of a resource by setting up a
++  DMA transaction to or from it.
++* Orchestrators - A driver which orchestrates the flow of data between
++  clients and providers
++
++In many cases there could be overlap between these three types (ie.
++it may be typical for a driver to be both a provider and a client).
++
++For example, in the NVMe Target Copy Offload implementation:
++
++* The NVMe PCI driver is both a client, provider and orchestrator
++  in that it exposes any CMB (Controller Memory Buffer) as a P2P memory
++  resource (provider), it accepts P2P memory pages as buffers in requests
++  to be used directly (client) and it can also make use the CMB as
++  submission queue entries.
++* The RDMA driver is a client in this arrangement so that an RNIC
++  can DMA directly to the memory exposed by the NVMe device.
++* The NVMe Target driver (nvmet) can orchestrate the data from the RNIC
++  to the P2P memory (CMB) and then to the NVMe device (and vice versa).
++
++This is currently the only arrangement supported by the kernel but
++one could imagine slight tweaks to this that would allow for the same
++functionality. For example, if a specific RNIC added a BAR with some
++memory behind it, its driver could add support as a P2P provider and
++then the NVMe Target could use the RNIC's memory instead of the CMB
++in cases where the NVMe cards in use do not have CMB support.
++
++
++Provider Drivers
++----------------
++
++A provider simply needs to register a BAR (or a portion of a BAR)
++as a P2P DMA resource using :c:func:`pci_p2pdma_add_resource()`.
++This will register struct pages for all the specified memory.
++
++After that it may optionally publish all of its resources as
++P2P memory using :c:func:`pci_p2pmem_publish()`. This will allow
++any orchestrator drivers to find and use the memory. When marked in
++this way, the resource must be regular memory with no side effects.
++
++For the time being this is fairly rudimentary in that all resources
++are typically going to be P2P memory. Future work will likely expand
++this to include other types of resources like doorbells.
++
++
++Client Drivers
++--------------
++
++A client driver typically only has to conditionally change its DMA map
++routine to use the mapping functions :c:func:`pci_p2pdma_map_sg()` and
++:c:func:`pci_p2pdma_unmap_sg()` instead of the usual :c:func:`dma_map_sg()`
++functions.
++
++The client may also, optionally, make use of
++:c:func:`is_pci_p2pdma_page()` to determine when to use the P2P mapping
++functions and when to use the regular mapping functions. In some
++situations, it may be more appropriate to use a flag to indicate a
++given request is P2P memory and map appropriately (for example the
++block layer uses a flag to keep P2P memory out of queues that do not
++have P2P client support). It is important to ensure that struct pages that
++back P2P memory stay out of code that does not have support for them.
++
++
++Orchestrator Drivers
++--------------------
++
++The first task an orchestrator driver must do is compile a list of
++all client drivers that will be involved in a given transaction. For
++example, the NVMe Target driver creates a list including all NVMe drives
++and the RNIC in use. The list is stored as an anonymous struct
++list_head which must be initialized with the usual INIT_LIST_HEAD.
++The following functions may then be used to add to, remove from and free
++the list of clients with the functions :c:func:`pci_p2pdma_add_client()`,
++:c:func:`pci_p2pdma_remove_client()` and
++:c:func:`pci_p2pdma_client_list_free()`.
++
++With the client list in hand, the orchestrator may then call
++:c:func:`pci_p2pmem_find()` to obtain a published P2P memory provider
++that is supported (behind the same root port) as all the clients. If more
++than one provider is supported, the one nearest to all the clients will
++be chosen first. If there are more than one provider is an equal distance
++away, the one returned will be chosen at random. This function returns the PCI
++device to use for the provider with a reference taken and therefore
++when it's no longer needed it should be returned with pci_dev_put().
++
++Alternatively, if the orchestrator knows (via some other means)
++which provider it wants to use it may use :c:func:`pci_has_p2pmem()`
++to determine if it has P2P memory and :c:func:`pci_p2pdma_distance()`
++to determine the cumulative distance between it and a potential
++list of clients.
++
++With a supported provider in hand, the driver can then call
++:c:func:`pci_p2pdma_assign_provider()` to assign the provider
++to the client list. This function returns false if any of the
++clients are unsupported by the provider.
++
++Once a provider is assigned to a client list via either
++:c:func:`pci_p2pmem_find()` or :c:func:`pci_p2pdma_assign_provider()`,
++the list is permanently bound to the provider such that any new clients
++added to the list must be supported by the already selected provider.
++If they are not supported, :c:func:`pci_p2pdma_add_client()` will return
++an error. In this way, orchestrators are free to add and remove devices
++without having to recheck support or tear down existing transfers to
++change P2P providers.
++
++Once a provider is selected, the orchestrator can then use
++:c:func:`pci_alloc_p2pmem()` and :c:func:`pci_free_p2pmem()` to
++allocate P2P memory from the provider. :c:func:`pci_p2pmem_alloc_sgl()`
++and :c:func:`pci_p2pmem_free_sgl()` are convenience functions for
++allocating scatter-gather lists with P2P memory.
++
++Struct Page Caveats
++-------------------
++
++Driver writers should be very careful about not passing these special
++struct pages to code that isn't prepared for it. At this time, the kernel
++interfaces do not have any checks for ensuring this. This obviously
++precludes passing these pages to userspace.
++
++P2P memory is also technically IO memory but should never have any side
++effects behind it. Thus, the order of loads and stores should not be important
++and ioreadX(), iowriteX() and friends should not be necessary.
++However, as the memory is not cache coherent, if access ever needs to
++be protected by a spinlock then :c:func:`mmiowb()` must be used before
++unlocking the lock. (See ACQUIRES VS I/O ACCESSES in
++Documentation/memory-barriers.txt)
++
++
++P2P DMA Support Library
++=====================
++
++.. kernel-doc:: drivers/pci/p2pdma.c
++   :export:
+diff --git a/Documentation/index.rst b/Documentation/index.rst
+index 3b99ab931d41..e7938b507df3 100644
+--- a/Documentation/index.rst
++++ b/Documentation/index.rst
+@@ -45,7 +45,7 @@ the kernel interface as seen by application developers.
+ .. toctree::
+    :maxdepth: 2
  
--config ARCH_PHYS_ADDR_T_64BIT
--	def_bool ARM_LPAE
--
- config ARCH_DMA_ADDR_T_64BIT
- 	bool
- 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 940adfb9a2bc..b6aa33e642cc 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -152,9 +152,6 @@ config ARM64
- config 64BIT
- 	def_bool y
- 
--config ARCH_PHYS_ADDR_T_64BIT
--	def_bool y
--
- config MMU
- 	def_bool y
- 
-diff --git a/arch/mips/Kconfig b/arch/mips/Kconfig
-index 47d72c64d687..985388078872 100644
---- a/arch/mips/Kconfig
-+++ b/arch/mips/Kconfig
-@@ -132,7 +132,7 @@ config MIPS_GENERIC
- 
- config MIPS_ALCHEMY
- 	bool "Alchemy processor based machines"
--	select ARCH_PHYS_ADDR_T_64BIT
-+	select PHYS_ADDR_T_64BIT
- 	select CEVT_R4K
- 	select CSRC_R4K
- 	select IRQ_MIPS_CPU
-@@ -890,7 +890,7 @@ config CAVIUM_OCTEON_SOC
- 	bool "Cavium Networks Octeon SoC based boards"
- 	select CEVT_R4K
- 	select ARCH_HAS_PHYS_TO_DMA
--	select ARCH_PHYS_ADDR_T_64BIT
-+	select PHYS_ADDR_T_64BIT
- 	select DMA_COHERENT
- 	select SYS_SUPPORTS_64BIT_KERNEL
- 	select SYS_SUPPORTS_BIG_ENDIAN
-@@ -936,7 +936,7 @@ config NLM_XLR_BOARD
- 	select SWAP_IO_SPACE
- 	select SYS_SUPPORTS_32BIT_KERNEL
- 	select SYS_SUPPORTS_64BIT_KERNEL
--	select ARCH_PHYS_ADDR_T_64BIT
-+	select PHYS_ADDR_T_64BIT
- 	select SYS_SUPPORTS_BIG_ENDIAN
- 	select SYS_SUPPORTS_HIGHMEM
- 	select DMA_COHERENT
-@@ -962,7 +962,7 @@ config NLM_XLP_BOARD
- 	select HW_HAS_PCI
- 	select SYS_SUPPORTS_32BIT_KERNEL
- 	select SYS_SUPPORTS_64BIT_KERNEL
--	select ARCH_PHYS_ADDR_T_64BIT
-+	select PHYS_ADDR_T_64BIT
- 	select GPIOLIB
- 	select SYS_SUPPORTS_BIG_ENDIAN
- 	select SYS_SUPPORTS_LITTLE_ENDIAN
-@@ -1102,7 +1102,7 @@ config FW_CFE
- 	bool
- 
- config ARCH_DMA_ADDR_T_64BIT
--	def_bool (HIGHMEM && ARCH_PHYS_ADDR_T_64BIT) || 64BIT
-+	def_bool (HIGHMEM && PHYS_ADDR_T_64BIT) || 64BIT
- 
- config ARCH_SUPPORTS_UPROBES
- 	bool
-@@ -1767,7 +1767,7 @@ config CPU_MIPS32_R5_XPA
- 	depends on SYS_SUPPORTS_HIGHMEM
- 	select XPA
- 	select HIGHMEM
--	select ARCH_PHYS_ADDR_T_64BIT
-+	select PHYS_ADDR_T_64BIT
- 	default n
- 	help
- 	  Choose this option if you want to enable the Extended Physical
-@@ -2399,9 +2399,6 @@ config SB1_PASS_2_1_WORKAROUNDS
- 	default y
+-   userspace-api/index	      
++   userspace-api/index
  
  
--config ARCH_PHYS_ADDR_T_64BIT
--       bool
--
- choice
- 	prompt "SmartMIPS or microMIPS ASE support"
+ Introduction to kernel development
+@@ -89,6 +89,7 @@ needed).
+    sound/index
+    crypto/index
+    filesystems/index
++   PCI/index
  
-diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-index cc9a616d8934..b3d091d65e05 100644
---- a/arch/powerpc/Kconfig
-+++ b/arch/powerpc/Kconfig
-@@ -13,11 +13,8 @@ config 64BIT
- 	bool
- 	default y if PPC64
- 
--config ARCH_PHYS_ADDR_T_64BIT
--       def_bool PPC64 || PHYS_64BIT
--
- config ARCH_DMA_ADDR_T_64BIT
--	def_bool ARCH_PHYS_ADDR_T_64BIT
-+	def_bool PHYS_ADDR_T_64BIT
- 
- config MMU
- 	bool
-diff --git a/arch/powerpc/platforms/Kconfig.cputype b/arch/powerpc/platforms/Kconfig.cputype
-index 67d3125d0610..84b58abc08ee 100644
---- a/arch/powerpc/platforms/Kconfig.cputype
-+++ b/arch/powerpc/platforms/Kconfig.cputype
-@@ -222,6 +222,7 @@ config PTE_64BIT
- config PHYS_64BIT
- 	bool 'Large physical address support' if E500 || PPC_86xx
- 	depends on (44x || E500 || PPC_86xx) && !PPC_83xx && !PPC_82xx
-+	select PHYS_ADDR_T_64BIT
- 	---help---
- 	  This option enables kernel support for larger than 32-bit physical
- 	  addresses.  This feature may not be available on all cores.
-diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-index 23d8acca5c90..f52f86f43a4b 100644
---- a/arch/riscv/Kconfig
-+++ b/arch/riscv/Kconfig
-@@ -5,6 +5,8 @@
- 
- config RISCV
- 	def_bool y
-+	# even on 32-bit, physical (and DMA) addresses are > 32-bits
-+	select PHYS_ADDR_T_64BIT
- 	select OF
- 	select OF_EARLY_FLATTREE
- 	select OF_IRQ
-@@ -38,10 +40,6 @@ config RISCV
- config MMU
- 	def_bool y
- 
--# even on 32-bit, physical (and DMA) addresses are > 32-bits
--config ARCH_PHYS_ADDR_T_64BIT
--	def_bool y
--
- config ZONE_DMA32
- 	bool
- 	default y
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index a98a9b14fda2..8fccdaf02bb0 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -1448,6 +1448,7 @@ config HIGHMEM
- config X86_PAE
- 	bool "PAE (Physical Address Extension) Support"
- 	depends on X86_32 && !HIGHMEM4G
-+	select PHYS_ADDR_T_64BIT
- 	select SWIOTLB
- 	---help---
- 	  PAE is required for NX support, and furthermore enables
-@@ -1475,10 +1476,6 @@ config X86_5LEVEL
- 
- 	  Say N if unsure.
- 
--config ARCH_PHYS_ADDR_T_64BIT
--	def_bool y
--	depends on X86_64 || X86_PAE
--
- config ARCH_DMA_ADDR_T_64BIT
- 	def_bool y
- 	depends on X86_64 || HIGHMEM64G
-diff --git a/mm/Kconfig b/mm/Kconfig
-index d5004d82a1d6..a3f0005ac212 100644
---- a/mm/Kconfig
-+++ b/mm/Kconfig
-@@ -266,7 +266,7 @@ config ARCH_ENABLE_THP_MIGRATION
- 	bool
- 
- config PHYS_ADDR_T_64BIT
--	def_bool 64BIT || ARCH_PHYS_ADDR_T_64BIT
-+	def_bool 64BIT
- 
- config BOUNCE
- 	bool "Enable bounce buffers"
+ Architecture-specific documentation
+ -----------------------------------
 -- 
-2.17.0
+2.11.0
+
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
