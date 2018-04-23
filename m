@@ -1,56 +1,84 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org
-Subject: [PATCH V2 0/5] nvme: pci: fix & improve timeout handling
-Date: Sun, 29 Apr 2018 23:41:47 +0800
-Message-Id: <20180429154152.16656-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:40236 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932257AbeDWRFW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Apr 2018 13:05:22 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        iommu@lists.linux-foundation.org
+Cc: x86@kernel.org, linux-block@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-mm@kvack.org,
+        linux-mips@linux-mips.org, sparclinux@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 09/12] PCI: remove CONFIG_PCI_BUS_ADDR_T_64BIT
+Date: Mon, 23 Apr 2018 19:04:16 +0200
+Message-Id: <20180423170419.20330-10-hch@lst.de>
+In-Reply-To: <20180423170419.20330-1-hch@lst.de>
+References: <20180423170419.20330-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi,
+This symbol is now always identical to CONFIG_ARCH_DMA_ADDR_T_64BIT, so
+remove it.
 
-The 1st patch introduces blk_quiesce_timeout() and blk_unquiesce_timeout()
-for NVMe, meantime fixes blk_sync_queue().
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+---
+ drivers/pci/Kconfig | 4 ----
+ drivers/pci/bus.c   | 4 ++--
+ include/linux/pci.h | 2 +-
+ 3 files changed, 3 insertions(+), 7 deletions(-)
 
-The 2nd patch covers timeout for admin commands for recovering controller
-for avoiding possible deadlock.
-
-The other 3 patches fixes several races wrt. NVMe timeout handler, and
-finally can make blktests block/011 passed.
-
-
-Ming Lei (5):
-  block: introduce blk_quiesce_timeout() and blk_unquiesce_timeout()
-  nvme: pci: cover timeout for admin commands running in EH
-  nvme: pci: only wait freezing if queue is frozen
-  nvme: fix race between freeze queues and unfreeze queues
-  nvme: pci: simplify timeout handling
-
-V2:
-	- fix draining timeout work, so no need to change return value from
-	.timeout()
-	- fix race between nvme_start_freeze() and nvme_unfreeze()
-	- cover timeout for admin commands running in EH
-
- block/blk-core.c         |  34 +++++++-
- block/blk-mq.c           |   9 ++
- block/blk-timeout.c      |   5 +-
- drivers/nvme/host/core.c |  47 ++++++++--
- drivers/nvme/host/nvme.h |   6 ++
- drivers/nvme/host/pci.c  | 222 ++++++++++++++++++++++++++++++++++++++++++-----
- include/linux/blkdev.h   |   4 +
- 7 files changed, 296 insertions(+), 31 deletions(-)
-
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-
+diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
+index 34b56a8f8480..29a487f31dae 100644
+--- a/drivers/pci/Kconfig
++++ b/drivers/pci/Kconfig
+@@ -5,10 +5,6 @@
+ 
+ source "drivers/pci/pcie/Kconfig"
+ 
+-config PCI_BUS_ADDR_T_64BIT
+-	def_bool y if (ARCH_DMA_ADDR_T_64BIT || 64BIT)
+-	depends on PCI
+-
+ config PCI_MSI
+ 	bool "Message Signaled Interrupts (MSI and MSI-X)"
+ 	depends on PCI
+diff --git a/drivers/pci/bus.c b/drivers/pci/bus.c
+index bc2ded4c451f..35b7fc87eac5 100644
+--- a/drivers/pci/bus.c
++++ b/drivers/pci/bus.c
+@@ -120,7 +120,7 @@ int devm_request_pci_bus_resources(struct device *dev,
+ EXPORT_SYMBOL_GPL(devm_request_pci_bus_resources);
+ 
+ static struct pci_bus_region pci_32_bit = {0, 0xffffffffULL};
+-#ifdef CONFIG_PCI_BUS_ADDR_T_64BIT
++#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+ static struct pci_bus_region pci_64_bit = {0,
+ 				(pci_bus_addr_t) 0xffffffffffffffffULL};
+ static struct pci_bus_region pci_high = {(pci_bus_addr_t) 0x100000000ULL,
+@@ -230,7 +230,7 @@ int pci_bus_alloc_resource(struct pci_bus *bus, struct resource *res,
+ 					  resource_size_t),
+ 		void *alignf_data)
+ {
+-#ifdef CONFIG_PCI_BUS_ADDR_T_64BIT
++#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+ 	int rc;
+ 
+ 	if (res->flags & IORESOURCE_MEM_64) {
+diff --git a/include/linux/pci.h b/include/linux/pci.h
+index 73178a2fcee0..55371cb827ad 100644
+--- a/include/linux/pci.h
++++ b/include/linux/pci.h
+@@ -670,7 +670,7 @@ int raw_pci_read(unsigned int domain, unsigned int bus, unsigned int devfn,
+ int raw_pci_write(unsigned int domain, unsigned int bus, unsigned int devfn,
+ 		  int reg, int len, u32 val);
+ 
+-#ifdef CONFIG_PCI_BUS_ADDR_T_64BIT
++#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+ typedef u64 pci_bus_addr_t;
+ #else
+ typedef u32 pci_bus_addr_t;
 -- 
-2.9.5
+2.17.0
