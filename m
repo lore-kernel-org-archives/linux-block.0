@@ -1,102 +1,41 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:46243 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752523AbeDOPwQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 Apr 2018 11:52:16 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH] bcache: not access dc->bdev when backing device is offline
-Date: Sun, 15 Apr 2018 23:52:05 +0800
-Message-Id: <20180415155205.90136-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-arch-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-scsi@vger.kernel.org, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 3/5] ide: remove the PCI_DMA_BUS_IS_PHYS check
+Date: Tue, 24 Apr 2018 20:16:23 +0200
+Message-Id: <20180424181625.22410-4-hch@lst.de>
+In-Reply-To: <20180424181625.22410-1-hch@lst.de>
+References: <20180424181625.22410-1-hch@lst.de>
+Sender: linux-arch-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-When backing device is offline, memory object pointed by dc->bdev might be
-released in some condititions. I have bug report that bdevname() triggers
-a NULL pointer deference panic inside bch_cached_dev_error(), where
-dc->bdev is NULL.
+We now have ways to deal with drainage in the block layer, and libata has
+been using it for ages.  We also want to get rid of PCI_DMA_BUS_IS_PHYS
+now, so just reduce the PCI transfer size for ide - anyone who cares for
+performance on PCI controllers should have switched to libata long ago.
 
-This patch adds char backing_dev_name[BDEVNAME_SIZE] in struct cached_dev,
-and stored backing device name in backing_dev_nmae during backing device
-registration. Then when backing device is offline, pr_err() can still
-print message with backing device name without calling bdevname(). And
-backing_dev_name is also helpful when debugging crash code.
-
-Fixes: c7b7bd07404c ("bcache: add io_disable to struct cached_dev")
-Signed-off-by: Coly Li <colyli@suse.de>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/md/bcache/bcache.h |  2 ++
- drivers/md/bcache/super.c  | 10 ++++------
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ drivers/ide/ide-probe.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index d338b7086013..9af0ad7f6243 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -392,6 +392,8 @@ struct cached_dev {
- #define DEFAULT_CACHED_DEV_ERROR_LIMIT	64
- 	atomic_t		io_errors;
- 	unsigned		error_limit;
-+
-+	char			backing_dev_name[BDEVNAME_SIZE];
- };
+diff --git a/drivers/ide/ide-probe.c b/drivers/ide/ide-probe.c
+index 8d8ed036ca0a..56d7bc228cb3 100644
+--- a/drivers/ide/ide-probe.c
++++ b/drivers/ide/ide-probe.c
+@@ -796,8 +796,7 @@ static int ide_init_queue(ide_drive_t *drive)
+ 	 * This will be fixed once we teach pci_map_sg() about our boundary
+ 	 * requirements, hopefully soon. *FIXME*
+ 	 */
+-	if (!PCI_DMA_BUS_IS_PHYS)
+-		max_sg_entries >>= 1;
++	max_sg_entries >>= 1;
+ #endif /* CONFIG_PCI */
  
- enum alloc_reserve {
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index d90d9e59ca00..f2512e3e67e6 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1225,13 +1225,13 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
- 				 struct block_device *bdev,
- 				 struct cached_dev *dc)
- {
--	char name[BDEVNAME_SIZE];
- 	const char *err = "cannot allocate memory";
- 	struct cache_set *c;
- 
- 	memcpy(&dc->sb, sb, sizeof(struct cache_sb));
- 	dc->bdev = bdev;
- 	dc->bdev->bd_holder = dc;
-+	bdevname(bdev, dc->backing_dev_name);
- 
- 	bio_init(&dc->sb_bio, dc->sb_bio.bi_inline_vecs, 1);
- 	bio_first_bvec_all(&dc->sb_bio)->bv_page = sb_page;
-@@ -1247,7 +1247,7 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
- 	if (bch_cache_accounting_add_kobjs(&dc->accounting, &dc->disk.kobj))
- 		goto err;
- 
--	pr_info("registered backing device %s", bdevname(bdev, name));
-+	pr_info("registered backing device %s", dc->backing_dev_name);
- 
- 	list_add(&dc->list, &uncached_devices);
- 	list_for_each_entry(c, &bch_cache_sets, list)
-@@ -1259,7 +1259,7 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
- 
- 	return;
- err:
--	pr_notice("error %s: %s", bdevname(bdev, name), err);
-+	pr_notice("error %s: %s", dc->backing_dev_name, err);
- 	bcache_device_stop(&dc->disk);
- }
- 
-@@ -1367,8 +1367,6 @@ int bch_flash_dev_create(struct cache_set *c, uint64_t size)
- 
- bool bch_cached_dev_error(struct cached_dev *dc)
- {
--	char name[BDEVNAME_SIZE];
--
- 	if (!dc || test_bit(BCACHE_DEV_CLOSING, &dc->disk.flags))
- 		return false;
- 
-@@ -1377,7 +1375,7 @@ bool bch_cached_dev_error(struct cached_dev *dc)
- 	smp_mb();
- 
- 	pr_err("stop %s: too many IO errors on backing device %s\n",
--		dc->disk.disk->disk_name, bdevname(dc->bdev, name));
-+		dc->disk.disk->disk_name, dc->backing_dev_name);
- 
- 	bcache_device_stop(&dc->disk);
- 	return true;
+ 	blk_queue_max_segments(q, max_sg_entries);
 -- 
-2.16.2
+2.17.0
