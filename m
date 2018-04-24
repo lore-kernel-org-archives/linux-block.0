@@ -1,52 +1,315 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:60276 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751622AbeDOPAn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 Apr 2018 11:00:43 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        iommu@lists.linux-foundation.org
-Cc: x86@kernel.org, linux-block@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-mm@kvack.org,
-        linux-ide@vger.kernel.org, linux-mips@linux-mips.org,
-        sparclinux@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 10/12] arm: don't build swiotlb by default
-Date: Sun, 15 Apr 2018 16:59:45 +0200
-Message-Id: <20180415145947.1248-11-hch@lst.de>
-In-Reply-To: <20180415145947.1248-1-hch@lst.de>
-References: <20180415145947.1248-1-hch@lst.de>
+Received: from mx2.suse.de ([195.135.220.15]:44967 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1757584AbeDXMPE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Apr 2018 08:15:04 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH 1/6] bcache: store disk name in struct cache and struct cached_dev
+Date: Tue, 24 Apr 2018 20:14:41 +0800
+Message-Id: <20180424121446.130552-2-colyli@suse.de>
+In-Reply-To: <20180424121446.130552-1-colyli@suse.de>
+References: <20180424121446.130552-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-swiotlb is only used as a library of helper for xen-swiotlb if Xen support
-is enabled on arm, so don't build it by default.
+Current code uses bdevname() or bio_devname() to reference gendisk
+disk name when bcache needs to display the disk names in kernel message.
+It was safe before bcache device failure handling patch set merged in,
+because when devices are failed, there was deadlock to prevent bcache
+printing error messages with gendisk disk name. But after the failure
+handling patch set merged, the deadlock is fixed, so it is possible
+that the gendisk structure bdev->hd_disk is released when bdevname() is
+called to reference bdev->bd_disk->disk_name[]. This is why I receive
+bug report of NULL pointers deference panic.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+This patch stores gendisk disk name in a buffer inside struct cache and
+struct cached_dev, then print out the offline device name won't reference
+bdev->hd_disk anymore. And this patch also avoids extra function calls
+of bdevname() and bio_devnmae().
+
+Fixes: c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev")
+Fixes: 5138ac6748e38 ("bcache: fix misleading error message in bch_count_io_errors()")
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
- arch/arm/Kconfig | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/md/bcache/bcache.h  |  4 ++++
+ drivers/md/bcache/debug.c   |  3 +--
+ drivers/md/bcache/io.c      |  8 +++-----
+ drivers/md/bcache/request.c |  5 +----
+ drivers/md/bcache/super.c   | 42 ++++++++++++++++++++----------------------
+ 5 files changed, 29 insertions(+), 33 deletions(-)
 
-diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index aa1c187d756d..90b81a3a28a7 100644
---- a/arch/arm/Kconfig
-+++ b/arch/arm/Kconfig
-@@ -1774,7 +1774,7 @@ config SECCOMP
- 	  defined by each seccomp mode.
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index d338b7086013..3a0cfb237af9 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -392,6 +392,8 @@ struct cached_dev {
+ #define DEFAULT_CACHED_DEV_ERROR_LIMIT	64
+ 	atomic_t		io_errors;
+ 	unsigned		error_limit;
++
++	char			backing_dev_name[BDEVNAME_SIZE];
+ };
  
- config SWIOTLB
--	def_bool y
-+	bool
+ enum alloc_reserve {
+@@ -464,6 +466,8 @@ struct cache {
+ 	atomic_long_t		meta_sectors_written;
+ 	atomic_long_t		btree_sectors_written;
+ 	atomic_long_t		sectors_written;
++
++	char			cache_dev_name[BDEVNAME_SIZE];
+ };
  
- config PARAVIRT
- 	bool "Enable paravirtualization code"
-@@ -1807,6 +1807,7 @@ config XEN
- 	depends on MMU
- 	select ARCH_DMA_ADDR_T_64BIT
- 	select ARM_PSCI
-+	select SWIOTLB
- 	select SWIOTLB_XEN
- 	select PARAVIRT
- 	help
+ struct gc_stat {
+diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
+index 028f7b386e01..4e63c6f6c04d 100644
+--- a/drivers/md/bcache/debug.c
++++ b/drivers/md/bcache/debug.c
+@@ -106,7 +106,6 @@ void bch_btree_verify(struct btree *b)
+ 
+ void bch_data_verify(struct cached_dev *dc, struct bio *bio)
+ {
+-	char name[BDEVNAME_SIZE];
+ 	struct bio *check;
+ 	struct bio_vec bv, cbv;
+ 	struct bvec_iter iter, citer = { 0 };
+@@ -134,7 +133,7 @@ void bch_data_verify(struct cached_dev *dc, struct bio *bio)
+ 					bv.bv_len),
+ 				 dc->disk.c,
+ 				 "verify failed at dev %s sector %llu",
+-				 bdevname(dc->bdev, name),
++				 dc->backing_dev_name,
+ 				 (uint64_t) bio->bi_iter.bi_sector);
+ 
+ 		kunmap_atomic(p1);
+diff --git a/drivers/md/bcache/io.c b/drivers/md/bcache/io.c
+index 7fac97ae036e..2ddf8515e6a5 100644
+--- a/drivers/md/bcache/io.c
++++ b/drivers/md/bcache/io.c
+@@ -52,7 +52,6 @@ void bch_submit_bbio(struct bio *bio, struct cache_set *c,
+ /* IO errors */
+ void bch_count_backing_io_errors(struct cached_dev *dc, struct bio *bio)
+ {
+-	char buf[BDEVNAME_SIZE];
+ 	unsigned errors;
+ 
+ 	WARN_ONCE(!dc, "NULL pointer of struct cached_dev");
+@@ -60,7 +59,7 @@ void bch_count_backing_io_errors(struct cached_dev *dc, struct bio *bio)
+ 	errors = atomic_add_return(1, &dc->io_errors);
+ 	if (errors < dc->error_limit)
+ 		pr_err("%s: IO error on backing device, unrecoverable",
+-			bio_devname(bio, buf));
++			dc->backing_dev_name);
+ 	else
+ 		bch_cached_dev_error(dc);
+ }
+@@ -105,19 +104,18 @@ void bch_count_io_errors(struct cache *ca,
+ 	}
+ 
+ 	if (error) {
+-		char buf[BDEVNAME_SIZE];
+ 		unsigned errors = atomic_add_return(1 << IO_ERROR_SHIFT,
+ 						    &ca->io_errors);
+ 		errors >>= IO_ERROR_SHIFT;
+ 
+ 		if (errors < ca->set->error_limit)
+ 			pr_err("%s: IO error on %s%s",
+-			       bdevname(ca->bdev, buf), m,
++			       ca->cache_dev_name, m,
+ 			       is_read ? ", recovering." : ".");
+ 		else
+ 			bch_cache_set_error(ca->set,
+ 					    "%s: too many IO errors %s",
+-					    bdevname(ca->bdev, buf), m);
++					    ca->cache_dev_name, m);
+ 	}
+ }
+ 
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index a65e3365eeb9..8e3e8655ed63 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -649,11 +649,8 @@ static void backing_request_endio(struct bio *bio)
+ 		 */
+ 		if (unlikely(s->iop.writeback &&
+ 			     bio->bi_opf & REQ_PREFLUSH)) {
+-			char buf[BDEVNAME_SIZE];
+-
+-			bio_devname(bio, buf);
+ 			pr_err("Can't flush %s: returned bi_status %i",
+-				buf, bio->bi_status);
++				dc->backing_dev_name, bio->bi_status);
+ 		} else {
+ 			/* set to orig_bio->bi_status in bio_complete() */
+ 			s->iop.status = bio->bi_status;
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index d90d9e59ca00..06433fab8ece 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -936,7 +936,6 @@ static void cancel_writeback_rate_update_dwork(struct cached_dev *dc)
+ static void cached_dev_detach_finish(struct work_struct *w)
+ {
+ 	struct cached_dev *dc = container_of(w, struct cached_dev, detach);
+-	char buf[BDEVNAME_SIZE];
+ 	struct closure cl;
+ 	closure_init_stack(&cl);
+ 
+@@ -967,7 +966,7 @@ static void cached_dev_detach_finish(struct work_struct *w)
+ 
+ 	mutex_unlock(&bch_register_lock);
+ 
+-	pr_info("Caching disabled for %s", bdevname(dc->bdev, buf));
++	pr_info("Caching disabled for %s", dc->backing_dev_name);
+ 
+ 	/* Drop ref we took in cached_dev_detach() */
+ 	closure_put(&dc->disk.cl);
+@@ -999,29 +998,28 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
+ {
+ 	uint32_t rtime = cpu_to_le32(get_seconds());
+ 	struct uuid_entry *u;
+-	char buf[BDEVNAME_SIZE];
+ 	struct cached_dev *exist_dc, *t;
+ 
+-	bdevname(dc->bdev, buf);
+-
+ 	if ((set_uuid && memcmp(set_uuid, c->sb.set_uuid, 16)) ||
+ 	    (!set_uuid && memcmp(dc->sb.set_uuid, c->sb.set_uuid, 16)))
+ 		return -ENOENT;
+ 
+ 	if (dc->disk.c) {
+-		pr_err("Can't attach %s: already attached", buf);
++		pr_err("Can't attach %s: already attached",
++		       dc->backing_dev_name);
+ 		return -EINVAL;
+ 	}
+ 
+ 	if (test_bit(CACHE_SET_STOPPING, &c->flags)) {
+-		pr_err("Can't attach %s: shutting down", buf);
++		pr_err("Can't attach %s: shutting down",
++		       dc->backing_dev_name);
+ 		return -EINVAL;
+ 	}
+ 
+ 	if (dc->sb.block_size < c->sb.block_size) {
+ 		/* Will die */
+ 		pr_err("Couldn't attach %s: block size less than set's block size",
+-		       buf);
++		       dc->backing_dev_name);
+ 		return -EINVAL;
+ 	}
+ 
+@@ -1029,7 +1027,7 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
+ 	list_for_each_entry_safe(exist_dc, t, &c->cached_devs, list) {
+ 		if (!memcmp(dc->sb.uuid, exist_dc->sb.uuid, 16)) {
+ 			pr_err("Tried to attach %s but duplicate UUID already attached",
+-				buf);
++				dc->backing_dev_name);
+ 
+ 			return -EINVAL;
+ 		}
+@@ -1047,13 +1045,15 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
+ 
+ 	if (!u) {
+ 		if (BDEV_STATE(&dc->sb) == BDEV_STATE_DIRTY) {
+-			pr_err("Couldn't find uuid for %s in set", buf);
++			pr_err("Couldn't find uuid for %s in set",
++			       dc->backing_dev_name);
+ 			return -ENOENT;
+ 		}
+ 
+ 		u = uuid_find_empty(c);
+ 		if (!u) {
+-			pr_err("Not caching %s, no room for UUID", buf);
++			pr_err("Not caching %s, no room for UUID",
++			       dc->backing_dev_name);
+ 			return -EINVAL;
+ 		}
+ 	}
+@@ -1112,7 +1112,8 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
+ 	up_write(&dc->writeback_lock);
+ 
+ 	pr_info("Caching %s as %s on set %pU",
+-		bdevname(dc->bdev, buf), dc->disk.disk->disk_name,
++		dc->backing_dev_name,
++		dc->disk.disk->disk_name,
+ 		dc->disk.c->sb.set_uuid);
+ 	return 0;
+ }
+@@ -1225,7 +1226,6 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
+ 				 struct block_device *bdev,
+ 				 struct cached_dev *dc)
+ {
+-	char name[BDEVNAME_SIZE];
+ 	const char *err = "cannot allocate memory";
+ 	struct cache_set *c;
+ 
+@@ -1247,7 +1247,8 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
+ 	if (bch_cache_accounting_add_kobjs(&dc->accounting, &dc->disk.kobj))
+ 		goto err;
+ 
+-	pr_info("registered backing device %s", bdevname(bdev, name));
++	bdevname(bdev, dc->backing_dev_name);
++	pr_info("registered backing device %s", dc->backing_dev_name);
+ 
+ 	list_add(&dc->list, &uncached_devices);
+ 	list_for_each_entry(c, &bch_cache_sets, list)
+@@ -1259,7 +1260,7 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
+ 
+ 	return;
+ err:
+-	pr_notice("error %s: %s", bdevname(bdev, name), err);
++	pr_notice("error %s: %s", dc->backing_dev_name, err);
+ 	bcache_device_stop(&dc->disk);
+ }
+ 
+@@ -1367,8 +1368,6 @@ int bch_flash_dev_create(struct cache_set *c, uint64_t size)
+ 
+ bool bch_cached_dev_error(struct cached_dev *dc)
+ {
+-	char name[BDEVNAME_SIZE];
+-
+ 	if (!dc || test_bit(BCACHE_DEV_CLOSING, &dc->disk.flags))
+ 		return false;
+ 
+@@ -1377,7 +1376,7 @@ bool bch_cached_dev_error(struct cached_dev *dc)
+ 	smp_mb();
+ 
+ 	pr_err("stop %s: too many IO errors on backing device %s\n",
+-		dc->disk.disk->disk_name, bdevname(dc->bdev, name));
++		dc->disk.disk->disk_name, dc->backing_dev_name);
+ 
+ 	bcache_device_stop(&dc->disk);
+ 	return true;
+@@ -2003,11 +2002,10 @@ static int cache_alloc(struct cache *ca)
+ static int register_cache(struct cache_sb *sb, struct page *sb_page,
+ 				struct block_device *bdev, struct cache *ca)
+ {
+-	char name[BDEVNAME_SIZE];
+ 	const char *err = NULL; /* must be set for any error case */
+ 	int ret = 0;
+ 
+-	bdevname(bdev, name);
++	bdevname(bdev, ca->cache_dev_name);
+ 
+ 	memcpy(&ca->sb, sb, sizeof(struct cache_sb));
+ 	ca->bdev = bdev;
+@@ -2045,14 +2043,14 @@ static int register_cache(struct cache_sb *sb, struct page *sb_page,
+ 		goto out;
+ 	}
+ 
+-	pr_info("registered cache device %s", name);
++	pr_info("registered cache device %s", ca->cache_dev_name);
+ 
+ out:
+ 	kobject_put(&ca->kobj);
+ 
+ err:
+ 	if (err)
+-		pr_notice("error %s: %s", name, err);
++		pr_notice("error %s: %s", ca->cache_dev_name, err);
+ 
+ 	return ret;
+ }
 -- 
-2.17.0
+2.16.2
