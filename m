@@ -1,90 +1,46 @@
-Return-Path: <jglisse@redhat.com>
-From: jglisse@redhat.com
-To: linux-mm@kvack.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Tejun Heo <tj@kernel.org>,
-	Jan Kara <jack@suse.cz>,
-	Josef Bacik <jbacik@fb.com>,
-	Mel Gorman <mgorman@techsingularity.net>
-Subject: [RFC PATCH 31/79] fs/block: add struct address_space to __block_write_begin_int() args
-Date: Wed,  4 Apr 2018 15:18:05 -0400
-Message-Id: <20180404191831.5378-16-jglisse@redhat.com>
-In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
-References: <20180404191831.5378-1-jglisse@redhat.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from verein.lst.de ([213.95.11.211]:57674 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1756632AbeDXHzS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Apr 2018 03:55:18 -0400
+Date: Tue, 24 Apr 2018 09:56:45 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: Christoph Hellwig <hch@lst.de>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        iommu@lists.linux-foundation.org, linux-mips@linux-mips.org,
+        linux-pci@vger.kernel.org, x86@kernel.org,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        sparclinux@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 11/12] swiotlb: move the SWIOTLB config symbol to
+        lib/Kconfig
+Message-ID: <20180424075645.GA19379@lst.de>
+References: <20180423170419.20330-1-hch@lst.de> <20180423170419.20330-12-hch@lst.de> <20180423235205.GH16141@n2100.armlinux.org.uk> <20180424065549.GA18468@lst.de> <20180424074726.GI16141@n2100.armlinux.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180424074726.GI16141@n2100.armlinux.org.uk>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Jérôme Glisse <jglisse@redhat.com>
+On Tue, Apr 24, 2018 at 08:47:27AM +0100, Russell King - ARM Linux wrote:
+> Therefore, the default state for SWIOTLB and hence NEED_SG_DMA_LENGTH
+> becomes 'y' on ARM, and any defconfig file that does not mention SWIOTLB
+> explicitly ends up with both these enabled.
 
-Add struct address_space to __block_write_begin_int() arguments.
+Indeed, sorry.
 
-One step toward dropping reliance on page->mapping.
+> It does look a bit weird though - patch 10 arranged stuff so that we
+> didn't end up with SWIOTLB always enabled, but this patch reintroduces
+> that with the allowance that the user can disable if so desired.
 
-----------------------------------------------------------------------
-@exists@
-identifier M;
-expression E1, E2, E3, E4, E5;
-@@
-struct address_space *M;
-...
--__block_write_begin_int(E1, E2, E3, E4, E5)
-+__block_write_begin_int(M, E1, E2, E3, E4, E5)
+I am not very happy with that patch, but I have a hard time coming
+up with something saner.
 
-@exists@
-identifier M, F;
-expression E1, E2, E3, E4, E5;
-@@
-F(..., struct address_space *M, ...) {...
--__block_write_begin_int(E1, E2, E3, E4, E5)
-+__block_write_begin_int(M, E1, E2, E3, E4, E5)
-...}
-----------------------------------------------------------------------
+Bascially x86_64 and mips/loongson default to SWIOTLB=y but allow to
+deselect it, powerpc has it optional without any real dependency
+and defaults to n and everyone just selects it otherwise.
 
-Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-CC: Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-fsdevel@vger.kernel.org
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Josef Bacik <jbacik@fb.com>
-Cc: Mel Gorman <mgorman@techsingularity.net>
----
- fs/buffer.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/fs/buffer.c b/fs/buffer.c
-index de16588d7f7f..c83878d0a4c0 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -1943,8 +1943,9 @@ iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
- 	}
- }
- 
--int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
--		get_block_t *get_block, struct iomap *iomap)
-+int __block_write_begin_int(struct address_space *mapping, struct page *page,
-+		loff_t pos, unsigned len, get_block_t *get_block,
-+		struct iomap *iomap)
- {
- 	unsigned from = pos & (PAGE_SIZE - 1);
- 	unsigned to = from + len;
-@@ -2031,7 +2032,8 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
- int __block_write_begin(struct address_space *mapping, struct page *page,
- 		loff_t pos, unsigned len, get_block_t *get_block)
- {
--	return __block_write_begin_int(page, pos, len, get_block, NULL);
-+	return __block_write_begin_int(mapping, page, pos, len, get_block,
-+				       NULL);
- }
- EXPORT_SYMBOL(__block_write_begin);
- 
--- 
-2.14.3
+I suspect the right thing is to just have it always one for x86_64
+and loongson and have a ppc-specific option to enable it on powerpc
+so that we can always use select statements.  I'll do that for the
+next round.
