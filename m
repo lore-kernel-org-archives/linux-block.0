@@ -1,139 +1,43 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org
-Subject: [PATCH V2 2/5] nvme: pci: cover timeout for admin commands running in EH
-Date: Sun, 29 Apr 2018 23:41:49 +0800
-Message-Id: <20180429154152.16656-3-ming.lei@redhat.com>
-In-Reply-To: <20180429154152.16656-1-ming.lei@redhat.com>
-References: <20180429154152.16656-1-ming.lei@redhat.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Tue, 24 Apr 2018 11:23:16 -0700 (PDT)
+Subject: Re: [PATCH 5/5] PCI: remove PCI_DMA_BUS_IS_PHYS
+In-Reply-To: <20180424181625.22410-6-hch@lst.de>
+CC: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-scsi@vger.kernel.org, netdev@vger.kernel.org,
+        davem@davemloft.net, linux-kernel@vger.kernel.org
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Christoph Hellwig <hch@lst.de>
+Message-ID: <mhng-1f7fdc5e-bbef-409b-80cb-6a6bbb76eca4@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-When admin commands are used in EH for recovering controller, we have to
-cover their timeout and can't depend on block's timeout since deadlock may
-be caused when these commands are timed-out by block layer again.
+On Tue, 24 Apr 2018 11:16:25 PDT (-0700), Christoph Hellwig wrote:
+> This was used by the ide, scsi and networking code in the past to
+> determine if they should bounce payloads.  Now that the dma mapping
+> always have to support dma to all physical memory (thanks to swiotlb
+> for non-iommu systems) there is no need to this crude hack any more.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+> [...]
+> diff --git a/arch/riscv/include/asm/pci.h b/arch/riscv/include/asm/pci.h
+> index 0f2fc9ef20fc..b3638c505728 100644
+> --- a/arch/riscv/include/asm/pci.h
+> +++ b/arch/riscv/include/asm/pci.h
+> @@ -26,9 +26,6 @@
+>  /* RISC-V shim does not initialize PCI bus */
+>  #define pcibios_assign_all_busses() 1
+>
+> -/* We do not have an IOMMU */
+> -#define PCI_DMA_BUS_IS_PHYS 1
+> -
+>  extern int isa_dma_bridge_buggy;
+>
+>  #ifdef CONFIG_PCI
 
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/nvme/host/pci.c | 77 ++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 66 insertions(+), 11 deletions(-)
+Thanks!
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index fbc71fac6f1e..0e6cd605164a 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1733,21 +1733,28 @@ static inline void nvme_release_cmb(struct nvme_dev *dev)
- 	}
- }
- 
--static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
-+static void nvme_init_set_host_mem_cmd(struct nvme_dev *dev,
-+		struct nvme_command *c, u32 bits)
- {
- 	u64 dma_addr = dev->host_mem_descs_dma;
-+
-+	memset(c, 0, sizeof(*c));
-+	c->features.opcode	= nvme_admin_set_features;
-+	c->features.fid		= cpu_to_le32(NVME_FEAT_HOST_MEM_BUF);
-+	c->features.dword11	= cpu_to_le32(bits);
-+	c->features.dword12	= cpu_to_le32(dev->host_mem_size >>
-+					      ilog2(dev->ctrl.page_size));
-+	c->features.dword13	= cpu_to_le32(lower_32_bits(dma_addr));
-+	c->features.dword14	= cpu_to_le32(upper_32_bits(dma_addr));
-+	c->features.dword15	= cpu_to_le32(dev->nr_host_mem_descs);
-+}
-+
-+static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
-+{
- 	struct nvme_command c;
- 	int ret;
- 
--	memset(&c, 0, sizeof(c));
--	c.features.opcode	= nvme_admin_set_features;
--	c.features.fid		= cpu_to_le32(NVME_FEAT_HOST_MEM_BUF);
--	c.features.dword11	= cpu_to_le32(bits);
--	c.features.dword12	= cpu_to_le32(dev->host_mem_size >>
--					      ilog2(dev->ctrl.page_size));
--	c.features.dword13	= cpu_to_le32(lower_32_bits(dma_addr));
--	c.features.dword14	= cpu_to_le32(upper_32_bits(dma_addr));
--	c.features.dword15	= cpu_to_le32(dev->nr_host_mem_descs);
-+	nvme_init_set_host_mem_cmd(dev, &c, bits);
- 
- 	ret = nvme_submit_sync_cmd(dev->ctrl.admin_q, &c, NULL, 0);
- 	if (ret) {
-@@ -1758,6 +1765,54 @@ static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
- 	return ret;
- }
- 
-+static void nvme_set_host_mem_end_io(struct request *rq, blk_status_t sts)
-+{
-+	struct completion *waiting = rq->end_io_data;
-+
-+	rq->end_io_data = NULL;
-+
-+	/*
-+	 * complete last, if this is a stack request the process (and thus
-+	 * the rq pointer) could be invalid right after this complete()
-+	 */
-+	complete(waiting);
-+}
-+
-+/*
-+ * This function can be used inside timeout handler, when the block layer
-+ * timeout may not work, so this function has to cover the timeout by itself.
-+ */
-+static int nvme_set_host_mem_timeout(struct nvme_dev *dev, u32 bits)
-+{
-+	DECLARE_COMPLETION_ONSTACK(wait);
-+	struct nvme_command c;
-+	struct request_queue *q = dev->ctrl.admin_q;
-+	struct request *req;
-+	int ret;
-+
-+	nvme_init_set_host_mem_cmd(dev, &c, bits);
-+
-+	req = nvme_alloc_request(q, &c, 0, NVME_QID_ANY);
-+	if (IS_ERR(req))
-+		return PTR_ERR(req);
-+
-+	req->timeout = ADMIN_TIMEOUT;
-+	req->end_io_data = &wait;
-+
-+	blk_execute_rq_nowait(q, NULL, req, false,
-+			nvme_set_host_mem_end_io);
-+	wait_for_completion_io_timeout(&wait, ADMIN_TIMEOUT);
-+
-+	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
-+		ret = -EINTR;
-+	else
-+		ret = nvme_req(req)->status;
-+
-+	blk_mq_free_request(req);
-+
-+	return ret;
-+}
-+
- static void nvme_free_host_mem(struct nvme_dev *dev)
- {
- 	int i;
-@@ -2216,7 +2271,7 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
- 		 * but I'd rather be safe than sorry..
- 		 */
- 		if (dev->host_mem_descs)
--			nvme_set_host_mem(dev, 0);
-+			nvme_set_host_mem_timeout(dev, 0);
- 		nvme_disable_io_queues(dev);
- 		nvme_disable_admin_queue(dev, shutdown);
- 	}
--- 
-2.9.5
+Acked-by: Palmer Dabbelt <palmer@sifive.com> (For the RISC-V change)
