@@ -1,77 +1,102 @@
-Return-Path: <linux-ide-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-scsi@vger.kernel.org, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH 06/12] memstick: don't call blk_queue_bounce_limit
-Date: Mon, 16 Apr 2018 10:50:26 +0200
-Message-Id: <20180416085032.7367-7-hch@lst.de>
-In-Reply-To: <20180416085032.7367-1-hch@lst.de>
-References: <20180416085032.7367-1-hch@lst.de>
-Sender: linux-ide-owner@vger.kernel.org
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Tue, 24 Apr 2018 16:14:58 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Steffen Maier <maier@linux.ibm.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <Bart.VanAssche@wdc.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"jthumshirn@suse.de" <jthumshirn@suse.de>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	"dgilbert@interlog.com" <dgilbert@interlog.com>,
+	"hch@lst.de" <hch@lst.de>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"hare@suse.com" <hare@suse.com>,
+	"lduncan@suse.com" <lduncan@suse.com>,
+	"osandov@fb.com" <osandov@fb.com>
+Subject: Re: [PATCH blktests] scsi/004: add regression test for false
+ BLK_STS_OK with non good SAM status
+Message-ID: <20180424231458.GA29369@vader>
+References: <1523955817-15790-1-git-send-email-maier@linux.ibm.com>
+ <20180419185330.GA20941@vader>
+ <20180419191320.GB20941@vader>
+ <18799c58a6ce27142b46ba6ec471e09f1eefedcf.camel@wdc.com>
+ <55fb164b-e4a4-95c8-2382-f7251c4973df@kernel.dk>
+ <20180419201855.GD20941@vader>
+ <b812247d-2d5f-0ae6-7c02-e3b3c052965e@linux.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <b812247d-2d5f-0ae6-7c02-e3b3c052965e@linux.ibm.com>
 List-ID: <linux-block@vger.kernel.org>
 
-All in-tree host drivers set up a proper dma mask and use the dma-mapping
-helpers.  This means they will be able to deal with any address that we
-are throwing at them.
+On Mon, Apr 23, 2018 at 02:25:03PM +0200, Steffen Maier wrote:
+> 
+> On 04/19/2018 10:18 PM, Omar Sandoval wrote:
+> > On Thu, Apr 19, 2018 at 01:44:41PM -0600, Jens Axboe wrote:
+> >> On 4/19/18 1:41 PM, Bart Van Assche wrote:
+> >>> On Thu, 2018-04-19 at 12:13 -0700, Omar Sandoval wrote:
+> >>>> On Thu, Apr 19, 2018 at 11:53:30AM -0700, Omar Sandoval wrote:
+> >>>>> Thanks for the test! Applied.
+> >>>>
+> >>>> Side note, it's unfortunate that this test takes 180 seconds to run only
+> >>>> because we have to wait for the command timeout. We should be able to
+> >>>> export request_queue->rq_timeout writeable in sysfs. Would you be
+> >>>> interested in doing that?
+> >>>
+> >>> Hello Omar,
+> >>>
+> >>> Is this perhaps what you are looking for?
+> >>> # ls -l /sys/class/scsi_device/*/*/timeout
+> >>> -rw-r--r-- 1 root root 4096 Apr 19 08:52 /sys/class/scsi_device/2:0:0:0/device/timeout
+> >>> -rw-r--r-- 1 root root 4096 Apr 19 12:39 /sys/class/scsi_device/8:0:0:1/device/timeout
+> >>
+> >> We should have it generically available though, not just for SCSI. In
+> >> retrospect, it should have been under queue/ from the start, now we'll
+> >> end up with duplicate entries for SCSI.
+> > 
+> > For the sake of this test, I just decreased the timeout through SCSI.
+> 
+> Great idea.
+> 
+> > 	echo 5 > "/sys/block/${SCSI_DEBUG_DEVICES[0]}/device/timeout"
+> 
+> However, the timeout should be sufficiently larger than scsi_debug/delay,
+> in order not to run into the command timeout.
+> It may be unfortunate that scsi_debug/delay uses jiffies as unit and
+> can thus differ in a range of an order of magnitude for different kernel configs.
+> 
+> > 	# delay to reduce response repetition: around 1..10sec depending on HZ
+> > 	echo 1000 > /sys/bus/pseudo/drivers/scsi_debug/delay
+> 
+> On s390, we typically have HZ=100, so 1000 jiffies are 10 seconds.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/memstick/core/ms_block.c    | 5 -----
- drivers/memstick/core/mspro_block.c | 5 -----
- 2 files changed, 10 deletions(-)
+Good catch, I just switched this to use ndelay in nanoseconds instead of
+delay.
 
-diff --git a/drivers/memstick/core/ms_block.c b/drivers/memstick/core/ms_block.c
-index 57b13dfbd21e..b2d025f42d14 100644
---- a/drivers/memstick/core/ms_block.c
-+++ b/drivers/memstick/core/ms_block.c
-@@ -2096,12 +2096,8 @@ static int msb_init_disk(struct memstick_dev *card)
- 	struct msb_data *msb = memstick_get_drvdata(card);
- 	struct memstick_host *host = card->host;
- 	int rc;
--	u64 limit = BLK_BOUNCE_HIGH;
- 	unsigned long capacity;
- 
--	if (host->dev.dma_mask && *(host->dev.dma_mask))
--		limit = *(host->dev.dma_mask);
--
- 	mutex_lock(&msb_disk_lock);
- 	msb->disk_id = idr_alloc(&msb_disk_idr, card, 0, 256, GFP_KERNEL);
- 	mutex_unlock(&msb_disk_lock);
-@@ -2123,7 +2119,6 @@ static int msb_init_disk(struct memstick_dev *card)
- 
- 	msb->queue->queuedata = card;
- 
--	blk_queue_bounce_limit(msb->queue, limit);
- 	blk_queue_max_hw_sectors(msb->queue, MS_BLOCK_MAX_PAGES);
- 	blk_queue_max_segments(msb->queue, MS_BLOCK_MAX_SEGS);
- 	blk_queue_max_segment_size(msb->queue,
-diff --git a/drivers/memstick/core/mspro_block.c b/drivers/memstick/core/mspro_block.c
-index 8897962781bb..a2fadc605750 100644
---- a/drivers/memstick/core/mspro_block.c
-+++ b/drivers/memstick/core/mspro_block.c
-@@ -1175,12 +1175,8 @@ static int mspro_block_init_disk(struct memstick_dev *card)
- 	struct mspro_sys_info *sys_info = NULL;
- 	struct mspro_sys_attr *s_attr = NULL;
- 	int rc, disk_id;
--	u64 limit = BLK_BOUNCE_HIGH;
- 	unsigned long capacity;
- 
--	if (host->dev.dma_mask && *(host->dev.dma_mask))
--		limit = *(host->dev.dma_mask);
--
- 	for (rc = 0; msb->attr_group.attrs[rc]; ++rc) {
- 		s_attr = mspro_from_sysfs_attr(msb->attr_group.attrs[rc]);
- 
-@@ -1219,7 +1215,6 @@ static int mspro_block_init_disk(struct memstick_dev *card)
- 
- 	msb->queue->queuedata = card;
- 
--	blk_queue_bounce_limit(msb->queue, limit);
- 	blk_queue_max_hw_sectors(msb->queue, MSPRO_BLOCK_MAX_PAGES);
- 	blk_queue_max_segments(msb->queue, MSPRO_BLOCK_MAX_SEGS);
- 	blk_queue_max_segment_size(msb->queue,
--- 
-2.17.0
+> We can increase the sdev cmd timeout or decrease the scsi_debug/delay.
+> 100 instead of 1000 for scsi_debug/delay worked for me;
+> but for some reason the loop checking for busy did not work (any more?)
+> causing an unexpected test case error:
+> 
+> > # ./check scsi/004
+> > scsi/004 (ensure repeated TASK SET FULL results in EIO on timing out command) [failed]
+> > runtime  31.892s  ...  31.720s
+> >     --- tests/scsi/004.out	2018-04-16 11:47:19.105931872 +0200
+> >     +++ results/nodev/scsi/004.out.bad	2018-04-23 14:07:33.615445253 +0200
+> >     @@ -1,3 +1,3 @@
+> >      Running scsi/004
+> >     -Input/output error
+> >     +modprobe: FATAL: Module scsi_debug is in use.
+> >      Test complete
+> 
+> so I added another sleep hack:
+> 
+>          # dd closing SCSI disk causes implicit TUR also being delayed once
+> +        # sleep over time window where READ was done and TUR not yet queued
+> +        sleep 2
+>          while grep -q -F "in_use_bm BUSY:" "/proc/scsi/scsi_debug/${SCSI_DEBUG_HOSTS[0]}"; do
+> 
+> What do you think?
 
+I've been hitting this on and off on all of the scsi-debug tests for
+awhile, and I can't figure out where the lingering reference comes from.
+I don't think it's related, but I'll look into it.
