@@ -1,213 +1,86 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	Logan Gunthorpe <logang@deltatee.com>
-Date: Mon, 23 Apr 2018 17:30:41 -0600
-Message-Id: <20180423233046.21476-10-logang@deltatee.com>
-In-Reply-To: <20180423233046.21476-1-logang@deltatee.com>
-References: <20180423233046.21476-1-logang@deltatee.com>
-Subject: [PATCH v4 09/14] nvme-pci: Use PCI p2pmem subsystem to manage the CMB
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:44976 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1757525AbeDXMPH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Apr 2018 08:15:07 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH 2/6] bcache: set CACHE_SET_IO_DISABLE in bch_cached_dev_error()
+Date: Tue, 24 Apr 2018 20:14:42 +0800
+Message-Id: <20180424121446.130552-3-colyli@suse.de>
+In-Reply-To: <20180424121446.130552-1-colyli@suse.de>
+References: <20180424121446.130552-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Register the CMB buffer as p2pmem and use the appropriate allocation
-functions to create and destroy the IO submission queues.
+Commit c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev") tries
+to stop bcache device by calling bcache_device_stop() when too many I/O
+errors happened on backing device. But if there is internal I/O happening
+on cache device (writeback scan, garbage collection, etc), a regular I/O
+request triggers the internal I/Os may still holds a refcount of dc->count,
+and the refcount may only be dropped after the internal I/O stopped.
 
-If the CMB supports WDS and RDS, publish it for use as P2P memory
-by other devices.
+By this patch, bch_cached_dev_error() will check if the backing device is
+attached to a cache set, if yes that CACHE_SET_IO_DISABLE will be set to
+flags of this cache set. Then internal I/Os on cache device will be
+rejected and stopped immediately, and the bcache device can be stopped.
 
-We can now drop the __iomem safety on the buffer seeing that, by
-convention, devm_memremap_pages() allocates regular memory without
-side effects that's accessible without the iomem accessors.
+For people who are not familiar with the interesting refcount dependance,
+let me explain a bit more how the fix works. Example the writeback thread
+will scan cache device for dirty data writeback purpose. Before it stopps,
+it holds a refcount of dc->count. When CACHE_SET_IO_DISABLE bit is set,
+the internal I/O will stopped and the while-loop in bch_writeback_thread()
+quits and calls cached_dev_put() to drop dc->count. If this is the last
+refcount to drop, then cached_dev_detach_finish() will be called. In this
+call back function, in turn closure_put(dc->disk.cl) is called to drop a
+refcount of closure dc->disk.cl. If this is the last refcount of this
+closure to drop, then cached_dev_flush() will be called. Then the cached
+device is freed. So if CACHE_SET_IO_DISABLE is not set, the bache device
+can not be stopped until all inernal cache device I/O stopped. For large
+size cache device, and writeback thread competes locks with gc thread,
+there might be a quite long time to wait.
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Fixes: c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev")
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/nvme/host/pci.c | 75 +++++++++++++++++++++++++++----------------------
- 1 file changed, 41 insertions(+), 34 deletions(-)
+ drivers/md/bcache/super.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index fbc71fac6f1e..514da4de3c85 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -29,6 +29,7 @@
- #include <linux/types.h>
- #include <linux/io-64-nonatomic-lo-hi.h>
- #include <linux/sed-opal.h>
-+#include <linux/pci-p2pdma.h>
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 06433fab8ece..85b22a7a2366 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1368,6 +1368,8 @@ int bch_flash_dev_create(struct cache_set *c, uint64_t size)
  
- #include "nvme.h"
- 
-@@ -92,9 +93,8 @@ struct nvme_dev {
- 	struct work_struct remove_work;
- 	struct mutex shutdown_lock;
- 	bool subsystem;
--	void __iomem *cmb;
--	pci_bus_addr_t cmb_bus_addr;
- 	u64 cmb_size;
-+	bool cmb_use_sqes;
- 	u32 cmbsz;
- 	u32 cmbloc;
- 	struct nvme_ctrl ctrl;
-@@ -149,7 +149,7 @@ struct nvme_queue {
- 	struct nvme_dev *dev;
- 	spinlock_t q_lock;
- 	struct nvme_command *sq_cmds;
--	struct nvme_command __iomem *sq_cmds_io;
-+	bool sq_cmds_is_io;
- 	volatile struct nvme_completion *cqes;
- 	struct blk_mq_tags **tags;
- 	dma_addr_t sq_dma_addr;
-@@ -431,10 +431,7 @@ static void __nvme_submit_cmd(struct nvme_queue *nvmeq,
+ bool bch_cached_dev_error(struct cached_dev *dc)
  {
- 	u16 tail = nvmeq->sq_tail;
- 
--	if (nvmeq->sq_cmds_io)
--		memcpy_toio(&nvmeq->sq_cmds_io[tail], cmd, sizeof(*cmd));
--	else
--		memcpy(&nvmeq->sq_cmds[tail], cmd, sizeof(*cmd));
-+	memcpy(&nvmeq->sq_cmds[tail], cmd, sizeof(*cmd));
- 
- 	if (++tail == nvmeq->q_depth)
- 		tail = 0;
-@@ -1289,9 +1286,18 @@ static void nvme_free_queue(struct nvme_queue *nvmeq)
- {
- 	dma_free_coherent(nvmeq->q_dmadev, CQ_SIZE(nvmeq->q_depth),
- 				(void *)nvmeq->cqes, nvmeq->cq_dma_addr);
--	if (nvmeq->sq_cmds)
--		dma_free_coherent(nvmeq->q_dmadev, SQ_SIZE(nvmeq->q_depth),
--					nvmeq->sq_cmds, nvmeq->sq_dma_addr);
++	struct cache_set *c;
 +
-+	if (nvmeq->sq_cmds) {
-+		if (nvmeq->sq_cmds_is_io)
-+			pci_free_p2pmem(to_pci_dev(nvmeq->q_dmadev),
-+					nvmeq->sq_cmds,
-+					SQ_SIZE(nvmeq->q_depth));
-+		else
-+			dma_free_coherent(nvmeq->q_dmadev,
-+					  SQ_SIZE(nvmeq->q_depth),
-+					  nvmeq->sq_cmds,
-+					  nvmeq->sq_dma_addr);
-+	}
+ 	if (!dc || test_bit(BCACHE_DEV_CLOSING, &dc->disk.flags))
+ 		return false;
+ 
+@@ -1378,6 +1380,21 @@ bool bch_cached_dev_error(struct cached_dev *dc)
+ 	pr_err("stop %s: too many IO errors on backing device %s\n",
+ 		dc->disk.disk->disk_name, dc->backing_dev_name);
+ 
++	/*
++	 * If the cached device is still attached to a cache set,
++	 * even dc->io_disable is true and no more I/O requests
++	 * accepted, cache device internal I/O (writeback scan or
++	 * garbage collection) may still prevent bcache device from
++	 * being stopped. So here CACHE_SET_IO_DISABLE should be
++	 * set to c->flags too, to make the internal I/O to cache
++	 * device rejected and stopped immediately.
++	 * If c is NULL, that means the bcache device is not attached
++	 * to any cache set, then no CACHE_SET_IO_DISABLE bit to set.
++	 */
++	c = dc->disk.c;
++	if (c && test_and_set_bit(CACHE_SET_IO_DISABLE, &c->flags))
++		pr_warn("CACHE_SET_IO_DISABLE already set");
++
+ 	bcache_device_stop(&dc->disk);
+ 	return true;
  }
- 
- static void nvme_free_queues(struct nvme_dev *dev, int lowest)
-@@ -1371,12 +1377,21 @@ static int nvme_cmb_qdepth(struct nvme_dev *dev, int nr_io_queues,
- static int nvme_alloc_sq_cmds(struct nvme_dev *dev, struct nvme_queue *nvmeq,
- 				int qid, int depth)
- {
--	/* CMB SQEs will be mapped before creation */
--	if (qid && dev->cmb && use_cmb_sqes && (dev->cmbsz & NVME_CMBSZ_SQS))
--		return 0;
-+	struct pci_dev *pdev = to_pci_dev(dev->dev);
-+
-+	if (qid && dev->cmb_use_sqes && (dev->cmbsz & NVME_CMBSZ_SQS)) {
-+		nvmeq->sq_cmds = pci_alloc_p2pmem(pdev, SQ_SIZE(depth));
-+		nvmeq->sq_dma_addr = pci_p2pmem_virt_to_bus(pdev,
-+						nvmeq->sq_cmds);
-+		nvmeq->sq_cmds_is_io = true;
-+	}
-+
-+	if (!nvmeq->sq_cmds) {
-+		nvmeq->sq_cmds = dma_alloc_coherent(dev->dev, SQ_SIZE(depth),
-+					&nvmeq->sq_dma_addr, GFP_KERNEL);
-+		nvmeq->sq_cmds_is_io = false;
-+	}
- 
--	nvmeq->sq_cmds = dma_alloc_coherent(dev->dev, SQ_SIZE(depth),
--					    &nvmeq->sq_dma_addr, GFP_KERNEL);
- 	if (!nvmeq->sq_cmds)
- 		return -ENOMEM;
- 	return 0;
-@@ -1451,13 +1466,6 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
- 	struct nvme_dev *dev = nvmeq->dev;
- 	int result;
- 
--	if (dev->cmb && use_cmb_sqes && (dev->cmbsz & NVME_CMBSZ_SQS)) {
--		unsigned offset = (qid - 1) * roundup(SQ_SIZE(nvmeq->q_depth),
--						      dev->ctrl.page_size);
--		nvmeq->sq_dma_addr = dev->cmb_bus_addr + offset;
--		nvmeq->sq_cmds_io = dev->cmb + offset;
--	}
--
- 	/*
- 	 * A queue's vector matches the queue identifier unless the controller
- 	 * has only one vector available.
-@@ -1691,9 +1699,6 @@ static void nvme_map_cmb(struct nvme_dev *dev)
- 		return;
- 	dev->cmbloc = readl(dev->bar + NVME_REG_CMBLOC);
- 
--	if (!use_cmb_sqes)
--		return;
--
- 	size = nvme_cmb_size_unit(dev) * nvme_cmb_size(dev);
- 	offset = nvme_cmb_size_unit(dev) * NVME_CMB_OFST(dev->cmbloc);
- 	bar = NVME_CMB_BIR(dev->cmbloc);
-@@ -1710,11 +1715,15 @@ static void nvme_map_cmb(struct nvme_dev *dev)
- 	if (size > bar_size - offset)
- 		size = bar_size - offset;
- 
--	dev->cmb = ioremap_wc(pci_resource_start(pdev, bar) + offset, size);
--	if (!dev->cmb)
-+	if (pci_p2pdma_add_resource(pdev, bar, size, offset))
- 		return;
--	dev->cmb_bus_addr = pci_bus_address(pdev, bar) + offset;
-+
- 	dev->cmb_size = size;
-+	dev->cmb_use_sqes = use_cmb_sqes && (dev->cmbsz & NVME_CMBSZ_SQS);
-+
-+	if ((dev->cmbsz & (NVME_CMBSZ_WDS | NVME_CMBSZ_RDS)) ==
-+			(NVME_CMBSZ_WDS | NVME_CMBSZ_RDS))
-+		pci_p2pmem_publish(pdev, true);
- 
- 	if (sysfs_add_file_to_group(&dev->ctrl.device->kobj,
- 				    &dev_attr_cmb.attr, NULL))
-@@ -1724,12 +1733,10 @@ static void nvme_map_cmb(struct nvme_dev *dev)
- 
- static inline void nvme_release_cmb(struct nvme_dev *dev)
- {
--	if (dev->cmb) {
--		iounmap(dev->cmb);
--		dev->cmb = NULL;
-+	if (dev->cmb_size) {
- 		sysfs_remove_file_from_group(&dev->ctrl.device->kobj,
- 					     &dev_attr_cmb.attr, NULL);
--		dev->cmbsz = 0;
-+		dev->cmb_size = 0;
- 	}
- }
- 
-@@ -1928,13 +1935,13 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
- 	if (nr_io_queues == 0)
- 		return 0;
- 
--	if (dev->cmb && (dev->cmbsz & NVME_CMBSZ_SQS)) {
-+	if (dev->cmb_use_sqes) {
- 		result = nvme_cmb_qdepth(dev, nr_io_queues,
- 				sizeof(struct nvme_command));
- 		if (result > 0)
- 			dev->q_depth = result;
- 		else
--			nvme_release_cmb(dev);
-+			dev->cmb_use_sqes = false;
- 	}
- 
- 	do {
 -- 
-2.11.0
+2.16.2
