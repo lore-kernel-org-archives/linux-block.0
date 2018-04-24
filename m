@@ -1,46 +1,91 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:57674 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756632AbeDXHzS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Apr 2018 03:55:18 -0400
-Date: Tue, 24 Apr 2018 09:56:45 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Russell King - ARM Linux <linux@armlinux.org.uk>
-Cc: Christoph Hellwig <hch@lst.de>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+Received: from pandora.armlinux.org.uk ([78.32.30.218]:50506 "EHLO
+        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756045AbeDXHrk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Apr 2018 03:47:40 -0400
+Date: Tue, 24 Apr 2018 08:47:27 +0100
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
         iommu@lists.linux-foundation.org, linux-mips@linux-mips.org,
         linux-pci@vger.kernel.org, x86@kernel.org,
         linux-block@vger.kernel.org, linux-mm@kvack.org,
         sparclinux@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 Subject: Re: [PATCH 11/12] swiotlb: move the SWIOTLB config symbol to
-        lib/Kconfig
-Message-ID: <20180424075645.GA19379@lst.de>
-References: <20180423170419.20330-1-hch@lst.de> <20180423170419.20330-12-hch@lst.de> <20180423235205.GH16141@n2100.armlinux.org.uk> <20180424065549.GA18468@lst.de> <20180424074726.GI16141@n2100.armlinux.org.uk>
+ lib/Kconfig
+Message-ID: <20180424074726.GI16141@n2100.armlinux.org.uk>
+References: <20180423170419.20330-1-hch@lst.de>
+ <20180423170419.20330-12-hch@lst.de>
+ <20180423235205.GH16141@n2100.armlinux.org.uk>
+ <20180424065549.GA18468@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180424074726.GI16141@n2100.armlinux.org.uk>
+In-Reply-To: <20180424065549.GA18468@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, Apr 24, 2018 at 08:47:27AM +0100, Russell King - ARM Linux wrote:
-> Therefore, the default state for SWIOTLB and hence NEED_SG_DMA_LENGTH
-> becomes 'y' on ARM, and any defconfig file that does not mention SWIOTLB
-> explicitly ends up with both these enabled.
+On Tue, Apr 24, 2018 at 08:55:49AM +0200, Christoph Hellwig wrote:
+> On Tue, Apr 24, 2018 at 12:52:05AM +0100, Russell King - ARM Linux wrote:
+> > On Mon, Apr 23, 2018 at 07:04:18PM +0200, Christoph Hellwig wrote:
+> > > This way we have one central definition of it, and user can select it as
+> > > needed.  Note that we also add a second ARCH_HAS_SWIOTLB symbol to
+> > > indicate the architecture supports swiotlb at all, so that we can still
+> > > make the usage optional for a few architectures that want this feature
+> > > to be user selectable.
+> > > 
+> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > 
+> > Hmm, this looks like we end up with NEED_SG_DMA_LENGTH=y on ARM by
+> > default, which probably isn't a good idea - ARM pre-dates the dma_length
+> > parameter in scatterlists, and I don't think all code is guaranteed to
+> > do the right thing if this is enabled.
+> 
+> We shouldn't end up with NEED_SG_DMA_LENGTH=y on ARM by default.
 
-Indeed, sorry.
+Your patch as sent would end up with:
 
-> It does look a bit weird though - patch 10 arranged stuff so that we
-> didn't end up with SWIOTLB always enabled, but this patch reintroduces
-> that with the allowance that the user can disable if so desired.
+ARM selects ARCH_HAS_SWIOTLB
+SWIOTLB is defaulted to ARCH_HAS_SWIOTLB
+SWIOTLB selects NEED_SG_DMA_LENGTH
 
-I am not very happy with that patch, but I have a hard time coming
-up with something saner.
+due to:
 
-Bascially x86_64 and mips/loongson default to SWIOTLB=y but allow to
-deselect it, powerpc has it optional without any real dependency
-and defaults to n and everyone just selects it otherwise.
+@@ -106,6 +106,7 @@ config ARM
+        select REFCOUNT_FULL
+        select RTC_LIB
+        select SYS_SUPPORTS_APM_EMULATION
++       select ARCH_HAS_SWIOTLB
 
-I suspect the right thing is to just have it always one for x86_64
-and loongson and have a ppc-specific option to enable it on powerpc
-so that we can always use select statements.  I'll do that for the
-next round.
+and:
+
++config SWIOTLB
++       bool "SWIOTLB support"
++       default ARCH_HAS_SWIOTLB
++       select NEED_SG_DMA_LENGTH
+
+Therefore, the default state for SWIOTLB and hence NEED_SG_DMA_LENGTH
+becomes 'y' on ARM, and any defconfig file that does not mention SWIOTLB
+explicitly ends up with both these enabled.
+
+> It is only select by ARM_DMA_USE_IOMMU before the patch, and it will
+> now also be selected by SWIOTLB, which for arm is never used or seleted
+> directly by anything but xen-swiotlb.
+
+See above.
+
+> Then again looking at the series there shouldn't be any need to
+> even select NEED_SG_DMA_LENGTH for swiotlb, as we'll never merge segments,
+> so I'll fix that up.
+
+That would help to avoid any regressions along the lines I've spotted
+by review.
+
+It does look a bit weird though - patch 10 arranged stuff so that we
+didn't end up with SWIOTLB always enabled, but this patch reintroduces
+that with the allowance that the user can disable if so desired.
+
+-- 
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
+According to speedtest.net: 8.21Mbps down 510kbps up
