@@ -1,69 +1,206 @@
-Return-Path: <prvs=6487dbab9=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "maier@linux.ibm.com" <maier@linux.ibm.com>, "osandov@osandov.com"
-	<osandov@osandov.com>
-CC: "lizefan@huawei.com" <lizefan@huawei.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "rostedt@goodmis.org" <rostedt@goodmis.org>,
-	"mingo@redhat.com" <mingo@redhat.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
+Return-Path: <maier@linux.ibm.com>
+From: Steffen Maier <maier@linux.ibm.com>
 Subject: Re: [PATCH 2/2] tracing/events: block: dev_t via driver core for plug
  and unplug events
-Date: Fri, 27 Apr 2018 16:38:05 +0000
-Message-ID: <9b5e43db06f6516f7c0e9cc379e0c2964000d4e1.camel@wdc.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>,
+        "osandov@osandov.com" <osandov@osandov.com>
+Cc: "lizefan@huawei.com" <lizefan@huawei.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "rostedt@goodmis.org" <rostedt@goodmis.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
 References: <20180413130719.22921-1-maier@linux.ibm.com>
-	 <20180413130719.22921-3-maier@linux.ibm.com>
-	 <20180415083154.GA12254@kroah.com>
-	 <59186bf6-abf1-87b0-914d-eed1b40ef4a8@linux.ibm.com>
-	 <20180419192341.GC20941@vader>
-	 <8624e2bec853f0bb195966ab54bc42bf15eda0ec.camel@wdc.com>
-	 <056d8ee9-5e1d-8219-c24c-9130d6c1dcbf@linux.ibm.com>
-In-Reply-To: <056d8ee9-5e1d-8219-c24c-9130d6c1dcbf@linux.ibm.com>
-Content-Type: text/plain; charset="utf-8"
+ <20180413130719.22921-3-maier@linux.ibm.com>
+ <20180415083154.GA12254@kroah.com>
+ <59186bf6-abf1-87b0-914d-eed1b40ef4a8@linux.ibm.com>
+ <20180419192341.GC20941@vader>
+ <8624e2bec853f0bb195966ab54bc42bf15eda0ec.camel@wdc.com>
+Date: Tue, 24 Apr 2018 16:49:59 +0200
 MIME-Version: 1.0
+In-Reply-To: <8624e2bec853f0bb195966ab54bc42bf15eda0ec.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <056d8ee9-5e1d-8219-c24c-9130d6c1dcbf@linux.ibm.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTA0LTI0IGF0IDE2OjQ5ICswMjAwLCBTdGVmZmVuIE1haWVyIHdyb3RlOg0K
-PiBUaGUgb2JqZWN0IGxpZmUgY3ljbGUgc2VlbXMgdG8gYmU6DQo+IA0KPiAoMSkgYmxrX2FsbG9j
-X3F1ZXVlKCkgYWxzbyBjcmVhdGVzIGdlbmRpc2sga29iag0KDQpJIHRoaW5rIHRoaXMgaXMgYSBt
-aXNpbnRlcnByZXRhdGlvbi4gYmxrX2FsbG9jX3F1ZXVlX25vZGUoKSBpbml0aWFsaXplcyB0aGUN
-CnJlcXVlc3QgcXVldWUga29iaiBhcyBmb2xsb3dzOg0KDQoJa29iamVjdF9pbml0KCZxLT5rb2Jq
-LCAmYmxrX3F1ZXVlX2t0eXBlKTsNCg0KcmVnaXN0ZXJfZGlzaygpIGNyZWF0ZXMgdGhlIC9zeXMv
-Y2xhc3MvYmxvY2svPGRpc2s+IG5vZGUgYW5kIC9zeXMvYmxvY2svPGRpc2s+DQpsaW5rIGFzIGZv
-bGxvd3M6DQoNCglpZiAoZGV2aWNlX2FkZChkZGV2KSkNCgkJcmV0dXJuOw0KCWlmICghc3lzZnNf
-ZGVwcmVjYXRlZCkgew0KCQllcnIgPSBzeXNmc19jcmVhdGVfbGluayhibG9ja19kZXByLCAmZGRl
-di0+a29iaiwNCgkJCQkJa29iamVjdF9uYW1lKCZkZGV2LT5rb2JqKSk7DQoJCWlmIChlcnIpIHsN
-CgkJCWRldmljZV9kZWwoZGRldik7DQoJCQlyZXR1cm47DQoJCX0NCgl9DQoNCj4gKDFhKSBTQ1NJ
-IGRvZXMgTFVOIHByb2JpbmcgSS9PDQo+ICAgICAgbW9zdCBvZiB0aGF0IGlzIGJsa3RyYWNlIFJX
-QlMgZmllbGQgdmFsdWUgJ04nIGkuZS4gbm9uLVIvVyB3aXRoIGRldl90PT0wDQo+ICAgICAgIHNp
-bmNlIHEtPmtvYmoucGFyZW50IGlzIHN0aWxsIE5VTEwgd2UgY2Fubm90IGdldCBnZW5kaXNrIGFu
-ZCB0aHVzIGRldl90DQo+ICAgICAgbmVhciB0aGUgZW5kIGlzIHRoZSBmaXJzdCByZWd1bGFyIHJl
-YWQgYmxvY2sgSS9PIHdpdGggZGV2X3QhPTANCj4gICAgICAgYXMgYmlvIT1OVUxMIGFuZCBiaV9k
-aXNrIG9yIHJxX2Rpc2sgYXJlIG5vbi1OVUxMDQo+ICgyKSBibGtfcmVnaXN0ZXJfcXVldWUoKSBh
-bHNvIGNyZWF0ZXMgcXVldWUga29iaiB3aXRoIGdlbmRpc2sgcGFyZW50DQo+ICAgICBub3cgd2Ug
-Y2FuIGZvbGxvdyBxLT5rb2JqLnBhcmVudCB0byBnZW5kaXNrIHRvIGdldCBkZXZfdCwNCj4gICAg
-IGUuZy4gZm9yIFJXQlMgJ04nIHN1Y2ggYXMgaW1wbGljaXQgU0NTSSB0ZXN0IHVuaXQgcmVhZHkg
-b24gYmxrIGRldiBjbG9zZQ0KDQpQbGVhc2UgaGF2ZSBhIGxvb2sgYXQgdGhlIGRldmljZV9hZGRf
-ZGlzaygpIGNhbGwgaW4gc2RfcHJvYmVfYXN5bmMoKS4gSSB0aGluaw0KdGhhdCBmdW5jdGlvbiB0
-cmlnZ2VycyBhIGNhbGwgb2YgYmxrX3JlZ2lzdGVyX3F1ZXVlKCkuIFRoYXQgbGFzdCBmdW5jdGlv
-bg0KYXNzb2NpYXRlcyB0aGUgcmVxdWVzdCBxdWV1ZSB3aXRoIHRoZSBnZW5kaXNrIGFzIGZvbGxv
-d3M6DQoNCglyZXQgPSBrb2JqZWN0X2FkZCgmcS0+a29iaiwga29iamVjdF9nZXQoJmRldi0+a29i
-aiksICIlcyIsICJxdWV1ZSIpOw0KDQo+ICgzKSBvcHRpb25hbGx5ICJyZWd1bGFyIiBJL08NCj4g
-KDQpIGJsa191bnJlZ2lzdGVyX3F1ZXVlKCkgY2FsbGVkIGJ5IGRlbF9nZW5kaXNrKCkNCj4gICAg
-IGRvZXMga29iamVjdF9kZWwoJnEtPmtvYmopIHdoaWNoIE5VTExpZmllcyBxLT5rb2JqLnBhcmVu
-dCBhZ2Fpbg0KPiAgICAgdGhlIGxhc3QgcHV0IG9mIGdlbmRpc2sgcmVmZXJlbmNlIHJlbGVhc2Vz
-IGdlbmRpc2sga29iag0KPiAoNSkgYmxrX2NsZWFudXBfcXVldWUoKQ0KPiAgICAgdGhlIGxhc3Qg
-cHV0IG9mIHF1ZXVlICgvbXEpIHJlZmVyZW5jZSByZWxlYXNlcyBxdWV1ZSAoL21xKSBrb2JqDQoN
-ClRoZSAvbXEgZGlyZWN0b3J5IGNvcnJlc3BvbmRzIHRvIHEtPm1xX2tvYmouIFRoZSBibG9jayBs
-YXllciBjb3JlIGRyb3BzIGl0cw0KcmVmZXJlbmNlIHRvIHRoZSBxdWV1ZSBrb2JqZWN0IChxLT5r
-b2JqKSBieSBjYWxsaW5nIGJsa19wdXRfcXVldWUoKSBhdCB0aGUNCmVuZCBvZiBibGtfY2xlYW51
-cF9xdWV1ZSgpLg0KDQo+IFNpbmNlIEkgY2Fubm90IHByb3ZlIGl0J3MgYWx3YXlzIGxpa2UgdGhp
-cywgSSBmb2xsb3dlZCBCYXJ0J3Mgc3VnZ2VzdGlvbg0KPiBhbmQgYWRkZWQgYW5vdGhlciByZWZj
-b3VudCBnZXQgYXQgKDIpIGJsa19yZWdpc3Rlcl9xdWV1ZSgpLg0KPiBIb3dldmVyLCB3aGVuIEkg
-d2FudCB0byBwdXQgdGhhdCBhZGRpdGlvbmFsIHJlZmNvdW50IGF0ICg1KSBibGtfY2xlYW51cF9x
-dWV1ZSgpLA0KPiB3ZSBvbmx5IGdldCBhIHF1ZXVlIHBvaW50ZXIgYXJndW1lbnQgYXMgY29udGV4
-dA0KPiBhbmQgcS0+a29iai5wYXJlbnQ9PU5VTEwgc2luY2UgKDQpLA0KPiBzbyBJIGRvbid0IGtu
-b3cgaG93IHRvIGdldCB0byB0aGUgZ2VuZGlzayBvYmplY3QgZm9yIHRoZSByZWZjb3VudCBwdXQu
-DQoNCkhhdmUgeW91IHRyaWVkIHRvIG1vZGlmeSBibGtfcmVnaXN0ZXJfcXVldWUoKSBzdWNoIHRo
-YXQgaXQgc3RvcmVzIHRoZSBkaXNrDQpwb2ludGVyIGluIGEgbmV3IHN0cnVjdCByZXF1ZXN0X3F1
-ZXVlIG1lbWJlcj8NCg0KVGhhbmtzLA0KDQpCYXJ0Lg0KDQoNCg0KDQoNCg0K
+
+On 04/19/2018 10:56 PM, Bart Van Assche wrote:
+> On Thu, 2018-04-19 at 12:24 -0700, Omar Sandoval wrote:
+>> We quiesce and freeze the queue before tearing it down, so it won't be=
+
+>> NULL while we're still doing I/O. Cc'ing Bart in case I'm lying to you=
+,
+>> though ;)
+>=20
+> blk_cleanup_queue() waits until all I/O requests have finished. Since t=
+he
+> block layer tracing code is triggered from inside the code that process=
+es a
+> request it is safe to access the request pointer from inside the tracin=
+g code.
+> But I think the question was about the parent of the request queue kobj=
+
+> instead of about the request queue pointer, the device structure that i=
+s
+> embedded in struct gendisk? I think that parent can disappear at any ti=
+me.
+> Most block drivers call del_gendisk() before they call blk_cleanup_queu=
+e().
+> Unless I'm overlooking something I think the request queue will need to=
+
+> obtain a reference to the gendisk device from inside blk_register_queue=
+()
+> and drop that reference from inside blk_cleanup_queue() to make it safe=
+for
+> the tracing code to access struct gendisk.
+
+Got it, thanks, makes sense.
+
+I did some research, tried the refcount approach, and failed.
+
+Experiment Preparation:
+Stopped any udevd and lvm services to avoid additional I/O.
+Used the following debug/tracing setup:
+modprobe sd_mod
+echo -n 'module core +pt; module kobject +pt' > /sys/kernel/debug/dynamic=
+_debug/control
+trace-cmd start -e block -f "(dev >=3D 0x800000 && dev <=3D 0x80000f) || =
+dev =3D=3D 0" -e scsi -p function -l "*_gendisk" -l blk_alloc_queue -l bl=
+k_register_queue -l blk_unregister_queue -l blk_cleanup_queue
+echo "blk_alloc_queue_node:stacktrace" >> /sys/kernel/debug/tracing/set_f=
+trace_filter
+echo "scsi_execute:stacktrace" >> /sys/kernel/debug/tracing/set_ftrace_fi=
+lter
+echo "blk_register_queue:stacktrace" >> /sys/kernel/debug/tracing/set_ftr=
+ace_filter
+echo "blk_unregister_queue:stacktrace" >> /sys/kernel/debug/tracing/set_f=
+trace_filter
+echo "blk_cleanup_queue:stacktrace" >> /sys/kernel/debug/tracing/set_ftra=
+ce_filter
+
+Experiment:
+modprobe scsi_debug num_parts=3D1
+sleep 3
+echo "HOTUNPLUG" > /sys/kernel/debug/tracing/trace_marker
+echo 1 > /sys/class/scsi_device/0:0:0:0/device/delete
+echo 0 > /sys/kernel/debug/tracing/tracing_on
+
+Also tried a similar sequence but hotplugged & hotunplugged
+a DASD disk (non-SCSI) incl. mq for comparison.
+
+The object life cycle seems to be:
+
+(1) blk_alloc_queue() also creates gendisk kobj
+(1a) SCSI does LUN probing I/O
+     most of that is blktrace RWBS field value 'N' i.e. non-R/W with dev_=
+t=3D=3D0
+      since q->kobj.parent is still NULL we cannot get gendisk and thus d=
+ev_t
+     near the end is the first regular read block I/O with dev_t!=3D0
+      as bio!=3DNULL and bi_disk or rq_disk are non-NULL
+(2) blk_register_queue() also creates queue kobj with gendisk parent
+    now we can follow q->kobj.parent to gendisk to get dev_t,
+    e.g. for RWBS 'N' such as implicit SCSI test unit ready on blk dev cl=
+ose
+(3) optionally "regular" I/O
+(4) blk_unregister_queue() called by del_gendisk()
+    does kobject_del(&q->kobj) which NULLifies q->kobj.parent again
+    the last put of gendisk reference releases gendisk kobj
+(5) blk_cleanup_queue()
+    the last put of queue (/mq) reference releases queue (/mq) kobj
+
+The patch set would have made dev_t meaningful between and incl. (2) and =
+(3)
+for (un)plug and even for other block events with RWBS 'N'.
+I noticed that I missed one more spot in block_rq_complete [PATCH 3/3],
+which explains why I had missed some rq_completions while filtering
+block trace events for specific (non-zero) dev_t.
+It still wouldn't have been perfect as (1a) events still are dev_t=3D=3D0=
+
+even though the gendisk exists since (1).
+
+I tried the same but increased scsi_debug/delay to a huge value
+and made one I/O request pending with "dd" before the hotunplug
+to see how flushing would work. For SCSI, at least,
+all flushing including a full (and unsuccessful due to eh TUR tmo)
+scsi_eh escalation for several minutes happened between
+'block' kobj release during (4) and gendisk release during (5),
+i.e. before the gendisk was gone but q->kobj.parent was already NULL.
+The 'queue' kobj was released last finally.
+
+Since I cannot prove it's always like this, I followed Bart's suggestion
+and added another refcount get at (2) blk_register_queue().
+However, when I want to put that additional refcount at (5) blk_cleanup_q=
+ueue(),
+we only get a queue pointer argument as context
+and q->kobj.parent=3D=3DNULL since (4),
+so I don't know how to get to the gendisk object for the refcount put.
+Probably the additional refcount would not help either as (4) has the
+unconditional kobject_del(&q->kobj) NULLifying q->kobj.parent anyway...
+I guess I came full circle.
+
+
+
+Side notes:
+The existing code holds a reference on gendisk, but between (2) and (4).
+
+Apparently block trace events can easily observe parts such as (1a)
+which are difficult for traditional blktrace to be started via blk dev io=
+ctl
+(or for ftrace 'blk' tracer which can be enabled between (2) and (4)).
+
+
+
+Independently, I started to wonder if there is a refcount leak in the ear=
+ly error out if kobject_add() failed:
+
+> int blk_register_queue(struct gendisk *disk)
+>         struct device *dev =3D disk_to_dev(disk);
+>         struct request_queue *q =3D disk->queue;
+>         ret =3D kobject_add(&q->kobj, kobject_get(&dev->kobj), "%s", "q=
+ueue");
+>                                     ^^^ref+1
+> 	if (ret < 0) {
+> 		blk_trace_remove_sysfs(dev);
+
+Above kobject_get already did its side-effect to provide the second argum=
+ent when calling kobject_add. Even if kobject_add failed, we still have t=
+he refcount on the gendisk but don't put it?
+
+> 		goto unlock;
+> 	}
+
+> 	if (q->request_fn || (q->mq_ops && q->elevator)) {
+> 		ret =3D elv_register_queue(q);
+> 		if (ret) {
+> 			mutex_unlock(&q->sysfs_lock);
+> 			kobject_uevent(&q->kobj, KOBJ_REMOVE);
+> 			kobject_del(&q->kobj);
+> 			blk_trace_remove_sysfs(dev);
+> 			kobject_put(&dev->kobj);
+
+In contrast, this early return seems to do the pairwise put.
+
+> 			return ret;
+> 		}
+> 	}
+
+> unlock:
+> 	mutex_unlock(&q->sysfs_lock);
+> 	return ret;
+> }
+
+
+
+--=20
+Mit freundlichen Gr=C3=BC=C3=9Fen / Kind regards
+Steffen Maier
+
+Linux on z Systems Development
+
+IBM Deutschland Research & Development GmbH
+Vorsitzende des Aufsichtsrats: Martina Koederitz
+Geschaeftsfuehrung: Dirk Wittkopp
+Sitz der Gesellschaft: Boeblingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
