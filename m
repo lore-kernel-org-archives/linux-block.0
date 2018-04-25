@@ -1,341 +1,63 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:39846 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755643AbeDWRFF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Apr 2018 13:05:05 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        iommu@lists.linux-foundation.org
-Cc: x86@kernel.org, linux-block@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-mm@kvack.org,
-        linux-mips@linux-mips.org, sparclinux@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 06/12] dma-mapping: move the NEED_DMA_MAP_STATE config symbol to lib/Kconfig
-Date: Mon, 23 Apr 2018 19:04:13 +0200
-Message-Id: <20180423170419.20330-7-hch@lst.de>
-In-Reply-To: <20180423170419.20330-1-hch@lst.de>
-References: <20180423170419.20330-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Wed, 25 Apr 2018 15:02:10 +0200
+From: Jan Kara <jack@suse.cz>
+To: Holger =?iso-8859-1?Q?Hoffst=E4tte?=
+        <holger@applied-asynchrony.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
+        Dave Chinner <david@fromorbit.com>, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        hch@lst.de, rdorr@microsoft.com
+Subject: Re: [PATCH 4/4] iomap: Use FUA for pure data O_DSYNC DIO writes
+Message-ID: <20180425130210.i6drajub4yrbmubf@quack2.suse.cz>
+References: <20180418040828.18165-1-david@fromorbit.com>
+ <20180418040828.18165-5-david@fromorbit.com>
+ <20180421125405.hyx3bbkohdgvducq@quack2.suse.cz>
+ <20180424173444.GA25233@infradead.org>
+ <2fb29b95-a39d-3ee7-249b-86614a8dcbb4@applied-asynchrony.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <2fb29b95-a39d-3ee7-249b-86614a8dcbb4@applied-asynchrony.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-This way we have one central definition of it, and user can select it as
-needed.  Note that we now also always select it when CONFIG_DMA_API_DEBUG
-is select, which fixes some incorrect checks in a few network drivers.
+On Wed 25-04-18 00:07:07, Holger Hoffst�tte wrote:
+> On 04/24/18 19:34, Christoph Hellwig wrote:
+> > On Sat, Apr 21, 2018 at 02:54:05PM +0200, Jan Kara wrote:
+> > > > -		if (iocb->ki_flags & IOCB_DSYNC)
+> > > > +		if (iocb->ki_flags & IOCB_DSYNC) {
+> > > >   			dio->flags |= IOMAP_DIO_NEED_SYNC;
+> > > > +			/*
+> > > > +			 * We optimistically try using FUA for this IO.  Any
+> > > > +			 * non-FUA write that occurs will clear this flag, hence
+> > > > +			 * we know before completion whether a cache flush is
+> > > > +			 * necessary.
+> > > > +			 */
+> > > > +			dio->flags |= IOMAP_DIO_WRITE_FUA;
+> > > > +		}
+> > > 
+> > > So I don't think this is quite correct. IOCB_DSYNC gets set also for O_SYNC
+> > > writes (in that case we also set IOCB_SYNC). And for those we cannot use
+> > > the FUA optimization AFAICT (definitely IOMAP_F_DIRTY isn't a safe
+> > > indicator of a need of full fsync for O_SYNC). Other than that the patch
+> > > looks good to me.
+> > 
+> > Oops, good catch. I think the above if should just be
+> > 
+> > 		if (iocb->ki_flags & (IOCB_DSYNC | IOCB_SYNC) == IOCB_DSYNC)) {
+> > 
+> > and we are fine.
+> 
+> The above line just gives parenthesis salad errors, so why not compromise
+> on:
+> 
+> 	if ((iocb->ki_flags & (IOCB_DSYNC | IOCB_SYNC)) == IOCB_DSYNC) {
+> 
+> Unless my bit twiddling has completely left me I think this is what was
+> intended, and it actually compiles too.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Anshuman Khandual <khandual@linux.vnet.ibm.com>
----
- arch/alpha/Kconfig          | 4 +---
- arch/arm/Kconfig            | 4 +---
- arch/arm64/Kconfig          | 4 +---
- arch/ia64/Kconfig           | 4 +---
- arch/mips/Kconfig           | 3 ---
- arch/parisc/Kconfig         | 4 +---
- arch/s390/Kconfig           | 4 +---
- arch/sh/Kconfig             | 4 +---
- arch/sparc/Kconfig          | 4 +---
- arch/unicore32/Kconfig      | 4 +---
- arch/x86/Kconfig            | 6 ++----
- drivers/iommu/Kconfig       | 1 +
- include/linux/dma-mapping.h | 2 +-
- lib/Kconfig                 | 3 +++
- lib/Kconfig.debug           | 1 +
- 15 files changed, 17 insertions(+), 35 deletions(-)
+Yup, I agree this is what needs to happen.
 
-diff --git a/arch/alpha/Kconfig b/arch/alpha/Kconfig
-index 8e6a67ecf069..1fd9645b0c67 100644
---- a/arch/alpha/Kconfig
-+++ b/arch/alpha/Kconfig
-@@ -10,6 +10,7 @@ config ALPHA
- 	select HAVE_OPROFILE
- 	select HAVE_PCSPKR_PLATFORM
- 	select HAVE_PERF_EVENTS
-+	select NEED_DMA_MAP_STATE
- 	select NEED_SG_DMA_LENGTH
- 	select VIRT_TO_BUS
- 	select GENERIC_IRQ_PROBE
-@@ -68,9 +69,6 @@ config ZONE_DMA
- config ARCH_DMA_ADDR_T_64BIT
- 	def_bool y
- 
--config NEED_DMA_MAP_STATE
--       def_bool y
--
- config GENERIC_ISA_DMA
- 	bool
- 	default y
-diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 602c8320282f..aa1c187d756d 100644
---- a/arch/arm/Kconfig
-+++ b/arch/arm/Kconfig
-@@ -96,6 +96,7 @@ config ARM
- 	select HAVE_VIRT_CPU_ACCOUNTING_GEN
- 	select IRQ_FORCED_THREADING
- 	select MODULES_USE_ELF_REL
-+	select NEED_DMA_MAP_STATE
- 	select NO_BOOTMEM
- 	select OF_EARLY_FLATTREE if OF
- 	select OF_RESERVED_MEM if OF
-@@ -221,9 +222,6 @@ config ARCH_MAY_HAVE_PC_FDC
- config ZONE_DMA
- 	bool
- 
--config NEED_DMA_MAP_STATE
--       def_bool y
--
- config ARCH_SUPPORTS_UPROBES
- 	def_bool y
- 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 3b441c5587f1..940adfb9a2bc 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -133,6 +133,7 @@ config ARM64
- 	select IRQ_FORCED_THREADING
- 	select MODULES_USE_ELF_RELA
- 	select MULTI_IRQ_HANDLER
-+	select NEED_DMA_MAP_STATE
- 	select NEED_SG_DMA_LENGTH
- 	select NO_BOOTMEM
- 	select OF
-@@ -241,9 +242,6 @@ config HAVE_GENERIC_GUP
- config ARCH_DMA_ADDR_T_64BIT
- 	def_bool y
- 
--config NEED_DMA_MAP_STATE
--	def_bool y
--
- config SMP
- 	def_bool y
- 
-diff --git a/arch/ia64/Kconfig b/arch/ia64/Kconfig
-index 333917676f7f..0e42731adaf1 100644
---- a/arch/ia64/Kconfig
-+++ b/arch/ia64/Kconfig
-@@ -54,6 +54,7 @@ config IA64
- 	select MODULES_USE_ELF_RELA
- 	select ARCH_USE_CMPXCHG_LOCKREF
- 	select HAVE_ARCH_AUDITSYSCALL
-+	select NEED_DMA_MAP_STATE
- 	select NEED_SG_DMA_LENGTH
- 	default y
- 	help
-@@ -82,9 +83,6 @@ config MMU
- config ARCH_DMA_ADDR_T_64BIT
- 	def_bool y
- 
--config NEED_DMA_MAP_STATE
--	def_bool y
--
- config SWIOTLB
-        bool
- 
-diff --git a/arch/mips/Kconfig b/arch/mips/Kconfig
-index 225c95da23ce..47d72c64d687 100644
---- a/arch/mips/Kconfig
-+++ b/arch/mips/Kconfig
-@@ -1122,9 +1122,6 @@ config DMA_NONCOHERENT
- 	bool
- 	select NEED_DMA_MAP_STATE
- 
--config NEED_DMA_MAP_STATE
--	bool
--
- config SYS_HAS_EARLY_PRINTK
- 	bool
- 
-diff --git a/arch/parisc/Kconfig b/arch/parisc/Kconfig
-index 89caea87556e..4d8f64d48597 100644
---- a/arch/parisc/Kconfig
-+++ b/arch/parisc/Kconfig
-@@ -51,6 +51,7 @@ config PARISC
- 	select GENERIC_CLOCKEVENTS
- 	select ARCH_NO_COHERENT_DMA_MMAP
- 	select CPU_NO_EFFICIENT_FFS
-+	select NEED_DMA_MAP_STATE
- 	select NEED_SG_DMA_LENGTH
- 
- 	help
-@@ -112,9 +113,6 @@ config PM
- config STACKTRACE_SUPPORT
- 	def_bool y
- 
--config NEED_DMA_MAP_STATE
--	def_bool y
--
- config ISA_DMA_API
- 	bool
- 
-diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
-index f80c6b983159..89a007672f70 100644
---- a/arch/s390/Kconfig
-+++ b/arch/s390/Kconfig
-@@ -711,6 +711,7 @@ menuconfig PCI
- 	select PCI_MSI
- 	select IOMMU_HELPER
- 	select IOMMU_SUPPORT
-+	select NEED_DMA_MAP_STATE
- 	select NEED_SG_DMA_LENGTH
- 
- 	help
-@@ -736,9 +737,6 @@ config PCI_DOMAINS
- config HAS_IOMEM
- 	def_bool PCI
- 
--config NEED_DMA_MAP_STATE
--	def_bool PCI
--
- config CHSC_SCH
- 	def_tristate m
- 	prompt "Support for CHSC subchannels"
-diff --git a/arch/sh/Kconfig b/arch/sh/Kconfig
-index e127e0cbe30f..9417f70e008e 100644
---- a/arch/sh/Kconfig
-+++ b/arch/sh/Kconfig
-@@ -50,6 +50,7 @@ config SUPERH
- 	select HAVE_ARCH_AUDITSYSCALL
- 	select HAVE_FUTEX_CMPXCHG if FUTEX
- 	select HAVE_NMI
-+	select NEED_DMA_MAP_STATE
- 	select NEED_SG_DMA_LENGTH
- 
- 	help
-@@ -162,9 +163,6 @@ config DMA_COHERENT
- config DMA_NONCOHERENT
- 	def_bool !DMA_COHERENT
- 
--config NEED_DMA_MAP_STATE
--	def_bool DMA_NONCOHERENT
--
- config PGTABLE_LEVELS
- 	default 3 if X2TLB
- 	default 2
-diff --git a/arch/sparc/Kconfig b/arch/sparc/Kconfig
-index e79badc8a682..be770b511ddd 100644
---- a/arch/sparc/Kconfig
-+++ b/arch/sparc/Kconfig
-@@ -44,6 +44,7 @@ config SPARC
- 	select ARCH_HAS_SG_CHAIN
- 	select CPU_NO_EFFICIENT_FFS
- 	select LOCKDEP_SMALL if LOCKDEP
-+	select NEED_DMA_MAP_STATE
- 	select NEED_SG_DMA_LENGTH
- 
- config SPARC32
-@@ -144,9 +145,6 @@ config ZONE_DMA
- 	bool
- 	default y if SPARC32
- 
--config NEED_DMA_MAP_STATE
--	def_bool y
--
- config GENERIC_ISA_DMA
- 	bool
- 	default y if SPARC32
-diff --git a/arch/unicore32/Kconfig b/arch/unicore32/Kconfig
-index 462e59a7ae78..82195714d20b 100644
---- a/arch/unicore32/Kconfig
-+++ b/arch/unicore32/Kconfig
-@@ -19,6 +19,7 @@ config UNICORE32
- 	select ARCH_WANT_FRAME_POINTERS
- 	select GENERIC_IOMAP
- 	select MODULES_USE_ELF_REL
-+	select NEED_DMA_MAP_STATE
- 	help
- 	  UniCore-32 is 32-bit Instruction Set Architecture,
- 	  including a series of low-power-consumption RISC chip
-@@ -61,9 +62,6 @@ config ARCH_MAY_HAVE_PC_FDC
- config ZONE_DMA
- 	def_bool y
- 
--config NEED_DMA_MAP_STATE
--       def_bool y
--
- source "init/Kconfig"
- 
- source "kernel/Kconfig.freezer"
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index ead3babe4e79..a98a9b14fda2 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -28,6 +28,7 @@ config X86_64
- 	select ARCH_USE_CMPXCHG_LOCKREF
- 	select HAVE_ARCH_SOFT_DIRTY
- 	select MODULES_USE_ELF_RELA
-+	select NEED_DMA_MAP_STATE
- 	select X86_DEV_DMA_OPS
- 	select ARCH_HAS_SYSCALL_WRAPPER
- 
-@@ -236,10 +237,6 @@ config ARCH_MMAP_RND_COMPAT_BITS_MAX
- config SBUS
- 	bool
- 
--config NEED_DMA_MAP_STATE
--	def_bool y
--	depends on X86_64 || INTEL_IOMMU || DMA_API_DEBUG || SWIOTLB
--
- config GENERIC_ISA_DMA
- 	def_bool y
- 	depends on ISA_DMA_API
-@@ -922,6 +919,7 @@ config CALGARY_IOMMU_ENABLED_BY_DEFAULT
- # need this always selected by IOMMU for the VIA workaround
- config SWIOTLB
- 	def_bool y if X86_64
-+	select NEED_DMA_MAP_STATE
- 	---help---
- 	  Support for software bounce buffers used on x86-64 systems
- 	  which don't have a hardware IOMMU. Using this PCI devices
-diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
-index df171cb85822..5b714a062fa7 100644
---- a/drivers/iommu/Kconfig
-+++ b/drivers/iommu/Kconfig
-@@ -146,6 +146,7 @@ config INTEL_IOMMU
- 	select DMA_DIRECT_OPS
- 	select IOMMU_API
- 	select IOMMU_IOVA
-+	select NEED_DMA_MAP_STATE
- 	select DMAR_TABLE
- 	help
- 	  DMA remapping (DMAR) devices support enables independent address
-diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
-index f8ab1c0f589e..14269d25498b 100644
---- a/include/linux/dma-mapping.h
-+++ b/include/linux/dma-mapping.h
-@@ -839,7 +839,7 @@ static inline int dma_mmap_wc(struct device *dev,
- #define dma_mmap_writecombine dma_mmap_wc
- #endif
- 
--#if defined(CONFIG_NEED_DMA_MAP_STATE) || defined(CONFIG_DMA_API_DEBUG)
-+#ifdef CONFIG_NEED_DMA_MAP_STATE
- #define DEFINE_DMA_UNMAP_ADDR(ADDR_NAME)        dma_addr_t ADDR_NAME
- #define DEFINE_DMA_UNMAP_LEN(LEN_NAME)          __u32 LEN_NAME
- #define dma_unmap_addr(PTR, ADDR_NAME)           ((PTR)->ADDR_NAME)
-diff --git a/lib/Kconfig b/lib/Kconfig
-index aeb7fae16bc2..ce9fa962d59b 100644
---- a/lib/Kconfig
-+++ b/lib/Kconfig
-@@ -432,6 +432,9 @@ config SGL_ALLOC
- config NEED_SG_DMA_LENGTH
- 	bool
- 
-+config NEED_DMA_MAP_STATE
-+	bool
-+
- config IOMMU_HELPER
- 	bool
- 
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index c40c7b734cd1..685ed2dd4384 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1635,6 +1635,7 @@ config PROVIDE_OHCI1394_DMA_INIT
- config DMA_API_DEBUG
- 	bool "Enable debugging of DMA-API usage"
- 	depends on HAVE_DMA_API_DEBUG
-+	select NEED_DMA_MAP_STATE
- 	help
- 	  Enable this option to debug the use of the DMA API by device drivers.
- 	  With this option you will be able to detect common bugs in device
+								Honza
 -- 
-2.17.0
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
