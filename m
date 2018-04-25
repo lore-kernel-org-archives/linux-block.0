@@ -1,155 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:35705 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753582AbeD3JKT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Apr 2018 05:10:19 -0400
-Received: by mail-wm0-f68.google.com with SMTP id o78so13106606wmg.0
-        for <linux-block@vger.kernel.org>; Mon, 30 Apr 2018 02:10:18 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 02/11] lightnvm: pblk: recheck for bad lines at runtime
-Date: Mon, 30 Apr 2018 11:10:00 +0200
-Message-Id: <1525079409-6588-3-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1525079409-6588-1-git-send-email-javier@cnexlabs.com>
-References: <1525079409-6588-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <prvs=646b96731=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "pmenzel+linux-block@molgen.mpg.de" <pmenzel+linux-block@molgen.mpg.de>
+CC: "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+	"regressions@leemhuis.info" <regressions@leemhuis.info>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+Subject: Re: Regression 4.17-rc1: SSD doesn properly resume causing system
+ hang (NULL pointer dereference)
+Date: Wed, 25 Apr 2018 12:26:25 +0000
+Message-ID: <df8a54d242adb7c26ceef57d6a0e7a51232f911c.camel@wdc.com>
+References: <59ca6556-11a6-4f77-76e7-d51c7175eb32@molgen.mpg.de>
+	 <67ffdf0050a04bf3615c3d8a3a90b0c9c2aeb1ad.camel@wdc.com>
+	 <2cc5f0fb-4caa-9c28-7daa-68993d5cb41a@molgen.mpg.de>
+	 <14ff1ed06e36a372680872c227b5abe389c753da.camel@wdc.com>
+	 <a3a7f906-3681-15cc-67af-b96e4ac71b0e@molgen.mpg.de>
+	 <134955874b401e6764077393c75ab2d4549b940a.camel@wdc.com>
+	 <6a2162a7-5f48-c107-0b1c-5258089522c5@molgen.mpg.de>
+	 <19e19bc6b2fef11faf428fe75447b06e56af9ffd.camel@wdc.com>
+	 <d5e8823e-27bd-dabe-174f-b111a48b440a@molgen.mpg.de>
+In-Reply-To: <d5e8823e-27bd-dabe-174f-b111a48b440a@molgen.mpg.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Bad blocks can grow at runtime. Check that the number of valid blocks in
-a line are within the sanity threshold before allocating the line for
-new writes.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-core.c | 38 ++++++++++++++++++++++++++++----------
- drivers/lightnvm/pblk-init.c | 11 +++++++----
- 2 files changed, 35 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index ceacd10a043e..128101f9e606 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1174,7 +1174,8 @@ static int pblk_prepare_new_line(struct pblk *pblk, struct pblk_line *line)
- static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
- {
- 	struct pblk_line_meta *lm = &pblk->lm;
--	int blk_to_erase;
-+	int blk_in_line = atomic_read(&line->blk_in_line);
-+	int blk_to_erase, ret;
- 
- 	line->map_bitmap = kzalloc(lm->sec_bitmap_len, GFP_ATOMIC);
- 	if (!line->map_bitmap)
-@@ -1183,8 +1184,8 @@ static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
- 	/* will be initialized using bb info from map_bitmap */
- 	line->invalid_bitmap = kmalloc(lm->sec_bitmap_len, GFP_ATOMIC);
- 	if (!line->invalid_bitmap) {
--		kfree(line->map_bitmap);
--		return -ENOMEM;
-+		ret = -ENOMEM;
-+		goto fail_free_map_bitmap;
- 	}
- 
- 	/* Bad blocks do not need to be erased */
-@@ -1199,16 +1200,19 @@ static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
- 		blk_to_erase = pblk_prepare_new_line(pblk, line);
- 		line->state = PBLK_LINESTATE_FREE;
- 	} else {
--		blk_to_erase = atomic_read(&line->blk_in_line);
-+		blk_to_erase = blk_in_line;
-+	}
-+
-+	if (blk_in_line < lm->min_blk_line) {
-+		ret = -EAGAIN;
-+		goto fail_free_invalid_bitmap;
- 	}
- 
- 	if (line->state != PBLK_LINESTATE_FREE) {
--		kfree(line->map_bitmap);
--		kfree(line->invalid_bitmap);
--		spin_unlock(&line->lock);
- 		WARN(1, "pblk: corrupted line %d, state %d\n",
- 							line->id, line->state);
--		return -EAGAIN;
-+		ret = -EINTR;
-+		goto fail_free_invalid_bitmap;
- 	}
- 
- 	line->state = PBLK_LINESTATE_OPEN;
-@@ -1222,6 +1226,16 @@ static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
- 	kref_init(&line->ref);
- 
- 	return 0;
-+
-+fail_free_invalid_bitmap:
-+	spin_unlock(&line->lock);
-+	kfree(line->invalid_bitmap);
-+	line->invalid_bitmap = NULL;
-+fail_free_map_bitmap:
-+	kfree(line->map_bitmap);
-+	line->map_bitmap = NULL;
-+
-+	return ret;
- }
- 
- int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line)
-@@ -1292,10 +1306,14 @@ struct pblk_line *pblk_line_get(struct pblk *pblk)
- 
- 	ret = pblk_line_prepare(pblk, line);
- 	if (ret) {
--		if (ret == -EAGAIN) {
-+		switch (ret) {
-+		case -EAGAIN:
-+			list_add(&line->list, &l_mg->bad_list);
-+			goto retry;
-+		case -EINTR:
- 			list_add(&line->list, &l_mg->corrupt_list);
- 			goto retry;
--		} else {
-+		default:
- 			pr_err("pblk: failed to prepare line %d\n", line->id);
- 			list_add(&line->list, &l_mg->free_list);
- 			l_mg->nr_free_lines++;
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index dee64f91227d..8f8c9abd14fc 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -127,10 +127,8 @@ static int pblk_l2p_recover(struct pblk *pblk, bool factory_init)
- 	if (!line) {
- 		/* Configure next line for user data */
- 		line = pblk_line_get_first_data(pblk);
--		if (!line) {
--			pr_err("pblk: line list corrupted\n");
-+		if (!line)
- 			return -EFAULT;
--		}
- 	}
- 
- 	return 0;
-@@ -141,6 +139,7 @@ static int pblk_l2p_init(struct pblk *pblk, bool factory_init)
- 	sector_t i;
- 	struct ppa_addr ppa;
- 	size_t map_size;
-+	int ret = 0;
- 
- 	map_size = pblk_trans_map_size(pblk);
- 	pblk->trans_map = vmalloc(map_size);
-@@ -152,7 +151,11 @@ static int pblk_l2p_init(struct pblk *pblk, bool factory_init)
- 	for (i = 0; i < pblk->rl.nr_secs; i++)
- 		pblk_trans_map_set(pblk, i, ppa);
- 
--	return pblk_l2p_recover(pblk, factory_init);
-+	ret = pblk_l2p_recover(pblk, factory_init);
-+	if (ret)
-+		vfree(pblk->trans_map);
-+
-+	return ret;
- }
- 
- static void pblk_rwb_free(struct pblk *pblk)
--- 
-2.7.4
+T24gV2VkLCAyMDE4LTA0LTI1IGF0IDA3OjM3ICswMjAwLCBQYXVsIE1lbnplbCB3cm90ZToNCj4g
+QW0gMjQuMDQuMjAxOCB1bSAyMzoxNyBzY2hyaWViIEJhcnQgVmFuIEFzc2NoZToNCj4gPiBPbiBU
+dWUsIDIwMTgtMDQtMjQgYXQgMjM6MDQgKzAyMDAsIFBhdWwgTWVuemVsIHdyb3RlOg0KPiA+ID4g
+SSBhcHBsaWVkIHlvdXIgY2hhbmdlLCBhbmQgcmVidWlsdCB0aGUgTGludXgga2VybmVsLiBVbmZv
+cnR1bmF0ZWx5LCBpdA0KPiA+ID4gbG9va3MgbGlrZSwgaXQgZGlkbuKAmXQgbWFrZSBhIGRpZmZl
+cmVuY2UuDQo+ID4gDQo+ID4gSW4gdGhhdCBjYXNlIEkgZG9uJ3Qga25vdyB3aGF0IGlzIGNhdXNp
+bmcgdGhlIGZhaWx1cmUuIENhbiB5b3UgcnVuIGEgYmlzZWN0DQo+ID4gdG8gZGV0ZXJtaW5lIHdo
+aWNoIGNvbW1pdCBpbnRyb2R1Y2VkIHRoaXMgcmVncmVzc2lvbj8NCj4gDQo+IFdpdGggYHNjc2lf
+bW9kLnVzZV9ibGtfbXE9bmAgdGhlIHN5c3RlbSByZXN1bWVzIGZpbmUsIHNvIGZvciB0byBtZSAN
+Cj4gdW5rbm93biByZWFzb25zLCB0aGF0IEtjb25maWcgb3B0aW9uIGdldCBzZWxlY3RlZCBpbiBt
+eSBMaW51eCBrZXJuZWwgDQo+IGNvbmZpZ3VyYXRpb24uIEkgcmVtZW1iZXIgaGF2aW5nIHNpbWls
+YXIgaXNzdWVzIHdoZW4gdGhpcyB3YXMgZW5hYmxlZCBieSANCj4gZGVmYXVsdCBpbiBMaW51eCA0
+LjEzLXJjPywgc28gaXQgd2FzIGp1c3QgYSBjb25maWd1cmF0aW9uIHByb2JsZW0gYW5kIA0KPiBu
+b3QgYSByZWdyZXNzaW9uLiBVbmZvcnR1bmF0ZWx5LCB0aGUgTGludXggY29uZmlndXJhdGlvbiBm
+aWxlcyBhcmUgbm90IA0KPiB1bmRlciB2ZXJzaW9uIGNvbnRyb2wsIHNvIEkgY2Fubm90IGNoZWNr
+LCBidXQgaXQgaXMgcHJvYmFibHkgbXkgZmF1bHQuDQo+IA0KPiBTb3JyeSBmb3IgdGhlIG5vaXNl
+LCBhbmQgcGxlYXNlIHRlbGwgbWUsIHdoYXQgSSBjYW4gZG8gdG8gZ2V0IHRoZSBvcHRpb24gDQo+
+IHdvcmtpbmcgb24gdGhpcyBvbGQgZGV2aWNlLg0KDQpIZWxsbyBQYXVsLA0KDQpEaWQgdGhlIHNh
+bWUgc3lzdGVtIGJvb3QgZmluZSB3aXRoIGEgcHJldmlvdXMga2VybmVsIHdpdGggc2NzaS1tcSBl
+bmFibGVkPw0KQW55d2F5LCB3ZSB3b3VsZCBsaWtlIHRvIGtub3cgd2hhdCBpcyB0aGUgcm9vdCBj
+YXVzZSBzdWNoIHRoYXQgdGhpcyBOVUxMDQpwb2ludGVyIGRlcmVmZXJlbmNlIGNhbiBiZSBmaXhl
+ZC4gVGhlcmUgYXJlIG5hbWVseSBwbGFucyB0byByZW1vdmUgdGhlDQpsZWdhY3kgYmxvY2sgbGF5
+ZXIgaW4gdGhlIG5vdCB0b28gZGlzdGFudCBmdXR1cmUuDQoNClRoYW5rcywNCg0KQmFydC4=
