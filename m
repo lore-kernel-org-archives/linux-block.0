@@ -1,161 +1,40 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46370 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753700AbeDTG7s (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Apr 2018 02:59:48 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Don Brace <don.brace@microsemi.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH 3/3] scsi: avoid to hold host-wide counter of host_busy for scsi_mq
-Date: Fri, 20 Apr 2018 14:57:42 +0800
-Message-Id: <20180420065742.8043-4-ming.lei@redhat.com>
-In-Reply-To: <20180420065742.8043-1-ming.lei@redhat.com>
-References: <20180420065742.8043-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <scott.bauer@intel.com>
+Date: Wed, 25 Apr 2018 11:37:15 -0600
+From: Scott Bauer <scott.bauer@intel.com>
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	hch@infradead.org
+Subject: Re: [PATCH] cdrom: information leak in cdrom_ioctl_media_changed()
+Message-ID: <20180425173711.ppikkczih54daplg@sbauer-Z170X-UD5>
+References: <20180418095130.GA26904@mwanda>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180418095130.GA26904@mwanda>
+List-ID: <linux-block@vger.kernel.org>
 
-It isn't necessary to check the host depth in scsi_queue_rq() any more
-since it has been respected by blk-mq before calling scsi_queue_rq() via
-getting driver tag.
+On Wed, Apr 18, 2018 at 12:51:31PM +0300, Dan Carpenter wrote:
+> This cast is wrong.  "cdi->capacity" is an int and "arg" is an unsigned
+> long.  The way the check is written now, if one of the high 32 bits is
+> set then we could read outside the info->slots[] array.
+> 
+> This bug is pretty old and it predates git.
 
-Lots of LUNs may attach to same host, and per-host IOPS may reach millions
-level, so we should avoid to this expensive atomic operations on the
-hostwide counter in IO path.
 
-This patch implemens scsi_host_busy() via blk_mq_tagset_busy_iter() for
-reading the count of busy IOs for scsi_mq.
+There seems to be another one in this file too. We can send an arg that when type'd to int will be negative, or like the above bug the upper 32 bits will be cast-away.
 
-It is observed that IOPS is increased by 15% in IO test on scsi_debug
-(32 LUNs, 32 submit queues, 1024 can_queue, libaio/dio) in one
-dual-socket system.
 
-Cc: Omar Sandoval <osandov@fb.com>,
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Don Brace <don.brace@microsemi.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/hosts.c    | 24 +++++++++++++++++++++++-
- drivers/scsi/scsi_lib.c | 23 +++++++++++++++++------
- 2 files changed, 40 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
-index 69beb30205f1..ad56e2b10ac8 100644
---- a/drivers/scsi/hosts.c
-+++ b/drivers/scsi/hosts.c
-@@ -564,13 +564,35 @@ struct Scsi_Host *scsi_host_get(struct Scsi_Host *shost)
+diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
+index bfc566d3f31a..8cfa10ab7abc 100644
+--- a/drivers/cdrom/cdrom.c
++++ b/drivers/cdrom/cdrom.c
+@@ -2542,7 +2542,7 @@ static int cdrom_ioctl_drive_status(struct cdrom_device_info *cdi,
+        if (!CDROM_CAN(CDC_SELECT_DISC) ||
+            (arg == CDSL_CURRENT || arg == CDSL_NONE))
+                return cdi->ops->drive_status(cdi, CDSL_CURRENT);
+-       if (((int)arg >= cdi->capacity))
++       if (arg >= cdi->capacity)
+                return -EINVAL;
+        return cdrom_slot_status(cdi, arg);
  }
- EXPORT_SYMBOL(scsi_host_get);
- 
-+struct scsi_host_mq_in_flight {
-+	int cnt;
-+};
-+
-+static void scsi_host_check_in_flight(struct request *rq, void *data,
-+		bool reserved)
-+{
-+	struct scsi_host_mq_in_flight *in_flight = data;
-+
-+	if (blk_mq_request_started(rq))
-+		in_flight->cnt++;
-+}
-+
- /**
-  * scsi_host_busy - Return the host busy counter
-  * @shost:	Pointer to Scsi_Host to inc.
-  **/
- int scsi_host_busy(struct Scsi_Host *shost)
- {
--	return atomic_read(&shost->host_busy);
-+	struct scsi_host_mq_in_flight in_flight = {
-+		.cnt = 0,
-+	};
-+
-+	if (!shost->use_blk_mq)
-+		return atomic_read(&shost->host_busy);
-+
-+	blk_mq_tagset_busy_iter(&shost->tag_set, scsi_host_check_in_flight,
-+			&in_flight);
-+	return in_flight.cnt;
- }
- EXPORT_SYMBOL(scsi_host_busy);
- 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 0dfec0dedd5e..dc437c642934 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -345,7 +345,8 @@ static void scsi_dec_host_busy(struct Scsi_Host *shost)
- 	unsigned long flags;
- 
- 	rcu_read_lock();
--	atomic_dec(&shost->host_busy);
-+	if (!shost->use_blk_mq)
-+		atomic_dec(&shost->host_busy);
- 	if (unlikely(scsi_host_in_recovery(shost))) {
- 		spin_lock_irqsave(shost->host_lock, flags);
- 		if (shost->host_failed || shost->host_eh_scheduled)
-@@ -444,7 +445,12 @@ static inline bool scsi_target_is_busy(struct scsi_target *starget)
- 
- static inline bool scsi_host_is_busy(struct Scsi_Host *shost)
- {
--	if (shost->can_queue > 0 &&
-+	/*
-+	 * blk-mq can handle host queue busy efficiently via host-wide driver
-+	 * tag allocation
-+	 */
-+
-+	if (!shost->use_blk_mq && shost->can_queue > 0 &&
- 	    atomic_read(&shost->host_busy) >= shost->can_queue)
- 		return true;
- 	if (atomic_read(&shost->host_blocked) > 0)
-@@ -1539,9 +1545,12 @@ static inline int scsi_host_queue_ready(struct request_queue *q,
- 	if (scsi_host_in_recovery(shost))
- 		return 0;
- 
--	busy = atomic_inc_return(&shost->host_busy) - 1;
-+	if (!shost->use_blk_mq)
-+		busy = atomic_inc_return(&shost->host_busy) - 1;
-+	else
-+		busy = 0;
- 	if (atomic_read(&shost->host_blocked) > 0) {
--		if (busy)
-+		if (busy || scsi_host_busy(shost))
- 			goto starved;
- 
- 		/*
-@@ -1555,7 +1564,7 @@ static inline int scsi_host_queue_ready(struct request_queue *q,
- 				     "unblocking host at zero depth\n"));
- 	}
- 
--	if (shost->can_queue > 0 && busy >= shost->can_queue)
-+	if (!shost->use_blk_mq && shost->can_queue > 0 && busy >= shost->can_queue)
- 		goto starved;
- 	if (shost->host_self_blocked)
- 		goto starved;
-@@ -1641,7 +1650,9 @@ static void scsi_kill_request(struct request *req, struct request_queue *q)
- 	 * with the locks as normal issue path does.
- 	 */
- 	atomic_inc(&sdev->device_busy);
--	atomic_inc(&shost->host_busy);
-+
-+	if (!shost->use_blk_mq)
-+		atomic_inc(&shost->host_busy);
- 	if (starget->can_queue > 0)
- 		atomic_inc(&starget->target_busy);
- 
--- 
-2.9.5
+
+I can submit a normal patch if there are no objections.
