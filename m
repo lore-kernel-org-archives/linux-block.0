@@ -1,33 +1,51 @@
-Return-Path: <dan.carpenter@oracle.com>
-Date: Wed, 18 Apr 2018 12:51:31 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH] cdrom: information leak in cdrom_ioctl_media_changed()
-Message-ID: <20180418095130.GA26904@mwanda>
+Return-Path: <roland.kammerer@linbit.com>
+Return-Path: <roland.kammerer@linbit.com>
+Date: Wed, 25 Apr 2018 12:54:36 +0200
+From: Roland Kammerer <roland.kammerer@linbit.com>
+To: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	linux-block@vger.kernel.org,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	drbd-dev@lists.linbit.com
+Subject: Re: [Drbd-dev] [PATCH] drdb: fix print_st_err()'s prototype
+Message-ID: <20180425105436.5ko6imz66hfsxwk3@rck.sh>
+References: <20180424131410.1603-1-luc.vanoostenryck@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180424131410.1603-1-luc.vanoostenryck@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This cast is wrong.  "cdi->capacity" is an int and "arg" is an unsigned
-long.  The way the check is written now, if one of the high 32 bits is
-set then we could read outside the info->slots[] array.
+On Tue, Apr 24, 2018 at 03:14:10PM +0200, Luc Van Oostenryck wrote:
+> print_st_err() is defined with its 4th argument taking an
+> 'enum drbd_state_rv' but its prototype use an int for it.
+> 
+> Fix this by using 'enum drbd_state_rv' in the prototype too.
+> 
+> Signed-off-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+> ---
+>  drivers/block/drbd/drbd_state.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/drbd/drbd_state.h b/drivers/block/drbd/drbd_state.h
+> index ea58301d0..b2a390ba7 100644
+> --- a/drivers/block/drbd/drbd_state.h
+> +++ b/drivers/block/drbd/drbd_state.h
+> @@ -131,7 +131,7 @@ extern enum drbd_state_rv _drbd_set_state(struct drbd_device *, union drbd_state
+>  					  enum chg_state_flags,
+>  					  struct completion *done);
+>  extern void print_st_err(struct drbd_device *, union drbd_state,
+> -			union drbd_state, int);
+> +			union drbd_state, enum drbd_state_rv);
+>  
+>  enum drbd_state_rv
+>  _conn_request_state(struct drbd_connection *connection, union drbd_state mask, union drbd_state val,
+> -- 
+> 2.17.0
 
-This bug is pretty old and it predates git.
+Thanks, looks good.
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Applied to our internal tree. As usual, we send it mainline bundled with
+other pending changes.
 
-diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
-index 8327478effd0..bfc566d3f31a 100644
---- a/drivers/cdrom/cdrom.c
-+++ b/drivers/cdrom/cdrom.c
-@@ -2371,7 +2371,7 @@ static int cdrom_ioctl_media_changed(struct cdrom_device_info *cdi,
- 	if (!CDROM_CAN(CDC_SELECT_DISC) || arg == CDSL_CURRENT)
- 		return media_changed(cdi, 1);
- 
--	if ((unsigned int)arg >= cdi->capacity)
-+	if (arg >= cdi->capacity)
- 		return -EINVAL;
- 
- 	info = kmalloc(sizeof(*info), GFP_KERNEL);
+Regards, rck
