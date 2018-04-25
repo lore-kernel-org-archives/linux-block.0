@@ -1,203 +1,56 @@
-Return-Path: <marmarek@invisiblethingslab.com>
-From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
-To: xen-devel@lists.xenproject.org
-Cc: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>,
-	stable@vger.kernel.org,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	Juergen Gross <jgross@suse.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org (open list:BLOCK LAYER),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH 6/6] xen-blkfront: prepare request locally, only then put it on the shared ring
-Date: Mon, 30 Apr 2018 23:01:50 +0200
-Message-Id: <951a221b0e655b3077d1f96ac365194320bc8809.1525122026.git-series.marmarek@invisiblethingslab.com>
-In-Reply-To: <cover.7ee732ab822b728ec486a3118ec12e9c06f0f325.1525122026.git-series.marmarek@invisiblethingslab.com>
-References: <cover.7ee732ab822b728ec486a3118ec12e9c06f0f325.1525122026.git-series.marmarek@invisiblethingslab.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f175.google.com ([209.85.192.175]:34076 "EHLO
+        mail-pf0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755577AbeDYP6m (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Apr 2018 11:58:42 -0400
+Received: by mail-pf0-f175.google.com with SMTP id a14so5091542pfi.1
+        for <linux-block@vger.kernel.org>; Wed, 25 Apr 2018 08:58:42 -0700 (PDT)
+Date: Wed, 25 Apr 2018 08:58:39 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Linux NVMe Mailinglist <linux-nvme@lists.infradead.org>,
+        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>
+Subject: Re: [PATCH blktests 3/3] nvme: add a regression test for UUID ns
+ descriptops
+Message-ID: <20180425155839.GC30070@vader>
+References: <20180424161251.6502-1-jthumshirn@suse.de>
+ <20180424161251.6502-3-jthumshirn@suse.de>
+ <20180425153036.GA30070@vader>
+ <20180425155211.o4bwaryvo3lo6l4i@linux-x5ow.site>
 MIME-Version: 1.0
-In-Reply-To: <cover.7ee732ab822b728ec486a3118ec12e9c06f0f325.1525122026.git-series.marmarek@invisiblethingslab.com>
-References: <cover.7ee732ab822b728ec486a3118ec12e9c06f0f325.1525122026.git-series.marmarek@invisiblethingslab.com>
-Content-Type: text/plain; charset=UTF-8
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180425155211.o4bwaryvo3lo6l4i@linux-x5ow.site>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Do not reuse data which theoretically might be already modified by the
-backend. This is mostly about private copy of the request
-(info->shadow[id].req) - make sure the request saved there is really the
-one just filled.
+On Wed, Apr 25, 2018 at 09:52:12AM -0600, Johannes Thumshirn wrote:
+> On Wed, Apr 25, 2018 at 08:30:36AM -0700, Omar Sandoval wrote:
+> [...]
+> > The TODO comment was leftover here, I removed it.
+> 
+> Oops sorry.
 
-This is complementary to XSA155.
+I should probably rename it `make check` and have it check for leftover
+TODO comments as well.
 
-CC: stable@vger.kernel.org
-Signed-off-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
----
- drivers/block/xen-blkfront.c | 76 +++++++++++++++++++++----------------
- 1 file changed, 44 insertions(+), 32 deletions(-)
+> > > +DESCRIPTION="Test nvme and nvmet UUID NS descriptors"
+> > > +
+> > > +QUICK=1
+> > > +
+> > > +requires() {
+> > > +	_have_program nvme && _have_module nvme-loop && _have_module loop \
+> > > +	    && _have_configfs
+> > > +}
+> > > +
+> > > +_find_nvme_loop_dev() {
+> > > +	for dev in /sys/block/nvme*; do
+> > > +		dev="$(basename $dev)"
+> > 
+> > There's some missing quoting around "$dev" here. There's also some more
+> > missing quoting, `make shellcheck` will catch this sort of thing.
+> 
+> Thanks, I'll try to not forget running shellcheck. Maybe we should set
+> up travis on github to catch this?
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 3926811..b100b55 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -525,19 +525,16 @@ static int blkif_ioctl(struct block_device *bdev, fmode_t mode,
- 
- static unsigned long blkif_ring_get_request(struct blkfront_ring_info *rinfo,
- 					    struct request *req,
--					    struct blkif_request **ring_req)
-+					    struct blkif_request *ring_req)
- {
- 	unsigned long id;
- 
--	*ring_req = RING_GET_REQUEST(&rinfo->ring, rinfo->ring.req_prod_pvt);
--	rinfo->ring.req_prod_pvt++;
--
- 	id = get_id_from_freelist(rinfo);
- 	rinfo->shadow[id].request = req;
- 	rinfo->shadow[id].status = REQ_WAITING;
- 	rinfo->shadow[id].associated_id = NO_ASSOCIATED_ID;
- 
--	(*ring_req)->u.rw.id = id;
-+	ring_req->u.rw.id = id;
- 
- 	return id;
- }
-@@ -545,23 +542,28 @@ static unsigned long blkif_ring_get_request(struct blkfront_ring_info *rinfo,
- static int blkif_queue_discard_req(struct request *req, struct blkfront_ring_info *rinfo)
- {
- 	struct blkfront_info *info = rinfo->dev_info;
--	struct blkif_request *ring_req;
-+	struct blkif_request ring_req = { 0 };
- 	unsigned long id;
- 
- 	/* Fill out a communications ring structure. */
- 	id = blkif_ring_get_request(rinfo, req, &ring_req);
- 
--	ring_req->operation = BLKIF_OP_DISCARD;
--	ring_req->u.discard.nr_sectors = blk_rq_sectors(req);
--	ring_req->u.discard.id = id;
--	ring_req->u.discard.sector_number = (blkif_sector_t)blk_rq_pos(req);
-+	ring_req.operation = BLKIF_OP_DISCARD;
-+	ring_req.u.discard.nr_sectors = blk_rq_sectors(req);
-+	ring_req.u.discard.id = id;
-+	ring_req.u.discard.sector_number = (blkif_sector_t)blk_rq_pos(req);
- 	if (req_op(req) == REQ_OP_SECURE_ERASE && info->feature_secdiscard)
--		ring_req->u.discard.flag = BLKIF_DISCARD_SECURE;
-+		ring_req.u.discard.flag = BLKIF_DISCARD_SECURE;
- 	else
--		ring_req->u.discard.flag = 0;
-+		ring_req.u.discard.flag = 0;
-+
-+	/* make the request available to the backend */
-+	*RING_GET_REQUEST(&rinfo->ring, rinfo->ring.req_prod_pvt) = ring_req;
-+	wmb();
-+	rinfo->ring.req_prod_pvt++;
- 
- 	/* Keep a private copy so we can reissue requests when recovering. */
--	rinfo->shadow[id].req = *ring_req;
-+	rinfo->shadow[id].req = ring_req;
- 
- 	return 0;
- }
-@@ -693,7 +695,7 @@ static void blkif_setup_extra_req(struct blkif_request *first,
- static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *rinfo)
- {
- 	struct blkfront_info *info = rinfo->dev_info;
--	struct blkif_request *ring_req, *extra_ring_req = NULL;
-+	struct blkif_request ring_req = { 0 }, extra_ring_req = { 0 };
- 	unsigned long id, extra_id = NO_ASSOCIATED_ID;
- 	bool require_extra_req = false;
- 	int i;
-@@ -758,16 +760,16 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
- 		 * BLKIF_OP_WRITE
- 		 */
- 		BUG_ON(req_op(req) == REQ_OP_FLUSH || req->cmd_flags & REQ_FUA);
--		ring_req->operation = BLKIF_OP_INDIRECT;
--		ring_req->u.indirect.indirect_op = rq_data_dir(req) ?
-+		ring_req.operation = BLKIF_OP_INDIRECT;
-+		ring_req.u.indirect.indirect_op = rq_data_dir(req) ?
- 			BLKIF_OP_WRITE : BLKIF_OP_READ;
--		ring_req->u.indirect.sector_number = (blkif_sector_t)blk_rq_pos(req);
--		ring_req->u.indirect.handle = info->handle;
--		ring_req->u.indirect.nr_segments = num_grant;
-+		ring_req.u.indirect.sector_number = (blkif_sector_t)blk_rq_pos(req);
-+		ring_req.u.indirect.handle = info->handle;
-+		ring_req.u.indirect.nr_segments = num_grant;
- 	} else {
--		ring_req->u.rw.sector_number = (blkif_sector_t)blk_rq_pos(req);
--		ring_req->u.rw.handle = info->handle;
--		ring_req->operation = rq_data_dir(req) ?
-+		ring_req.u.rw.sector_number = (blkif_sector_t)blk_rq_pos(req);
-+		ring_req.u.rw.handle = info->handle;
-+		ring_req.operation = rq_data_dir(req) ?
- 			BLKIF_OP_WRITE : BLKIF_OP_READ;
- 		if (req_op(req) == REQ_OP_FLUSH || req->cmd_flags & REQ_FUA) {
- 			/*
-@@ -778,15 +780,15 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
- 			 * since it is guaranteed ordered WRT previous writes.)
- 			 */
- 			if (info->feature_flush && info->feature_fua)
--				ring_req->operation =
-+				ring_req.operation =
- 					BLKIF_OP_WRITE_BARRIER;
- 			else if (info->feature_flush)
--				ring_req->operation =
-+				ring_req.operation =
- 					BLKIF_OP_FLUSH_DISKCACHE;
- 			else
--				ring_req->operation = 0;
-+				ring_req.operation = 0;
- 		}
--		ring_req->u.rw.nr_segments = num_grant;
-+		ring_req.u.rw.nr_segments = num_grant;
- 		if (unlikely(require_extra_req)) {
- 			extra_id = blkif_ring_get_request(rinfo, req,
- 							  &extra_ring_req);
-@@ -796,7 +798,7 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
- 			 */
- 			rinfo->shadow[extra_id].num_sg = 0;
- 
--			blkif_setup_extra_req(ring_req, extra_ring_req);
-+			blkif_setup_extra_req(&ring_req, &extra_ring_req);
- 
- 			/* Link the 2 requests together */
- 			rinfo->shadow[extra_id].associated_id = id;
-@@ -804,12 +806,12 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
- 		}
- 	}
- 
--	setup.ring_req = ring_req;
-+	setup.ring_req = &ring_req;
- 	setup.id = id;
- 
- 	setup.require_extra_req = require_extra_req;
- 	if (unlikely(require_extra_req))
--		setup.extra_ring_req = extra_ring_req;
-+		setup.extra_ring_req = &extra_ring_req;
- 
- 	for_each_sg(rinfo->shadow[id].sg, sg, num_sg, i) {
- 		BUG_ON(sg->offset + sg->length > PAGE_SIZE);
-@@ -831,10 +833,20 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
- 	if (setup.segments)
- 		kunmap_atomic(setup.segments);
- 
-+	/* make the request available to the backend */
-+	*RING_GET_REQUEST(&rinfo->ring, rinfo->ring.req_prod_pvt) = ring_req;
-+	wmb();
-+	rinfo->ring.req_prod_pvt++;
- 	/* Keep a private copy so we can reissue requests when recovering. */
--	rinfo->shadow[id].req = *ring_req;
--	if (unlikely(require_extra_req))
--		rinfo->shadow[extra_id].req = *extra_ring_req;
-+	rinfo->shadow[id].req = ring_req;
-+
-+	if (unlikely(require_extra_req)) {
-+		*RING_GET_REQUEST(&rinfo->ring, rinfo->ring.req_prod_pvt) = extra_ring_req;
-+		wmb();
-+		rinfo->ring.req_prod_pvt++;
-+		/* Keep a private copy so we can reissue requests when recovering. */
-+		rinfo->shadow[extra_id].req = extra_ring_req;
-+	}
- 
- 	if (new_persistent_gnts)
- 		gnttab_free_grant_references(setup.gref_head);
--- 
-git-series 0.9.1
+Good idea. I need to clean up some other errors that have snuck in.
