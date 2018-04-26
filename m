@@ -1,33 +1,44 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46672 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751299AbeDRVTm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Apr 2018 17:19:42 -0400
-Date: Wed, 18 Apr 2018 17:19:39 -0400
-From: Jerome Glisse <jglisse@redhat.com>
-To: linux-mm@kvack.org
-Cc: lsf-pc@lists.linux-foundation.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org, Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>
-Subject: [LSF/MM] schedule suggestion
-Message-ID: <20180418211939.GD3476@redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 2/5] ide: kill ide_toggle_bounce
+To: Christoph Hellwig <hch@lst.de>
+Cc: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+ linux-scsi@vger.kernel.org, netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org
+References: <20180424181625.22410-1-hch@lst.de>
+ <20180424181625.22410-3-hch@lst.de>
+ <5aaca0d3-417f-57f3-969f-b4c777c3fd48@kernel.dk>
+ <20180426072033.GA14700@lst.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <682db9af-33bc-639d-8930-7a66c30bc644@kernel.dk>
+Date: Thu, 26 Apr 2018 09:11:21 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180426072033.GA14700@lst.de>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Just wanted to suggest to push HMM status down one slot in the
-agenda to avoid having FS and MM first going into their own
-room and then merging back for GUP and DAX, and re-splitting
-after. More over HMM and NUMA talks will be good to have back
-to back as they deal with same kind of thing mostly.
+On 4/26/18 1:20 AM, Christoph Hellwig wrote:
+> On Tue, Apr 24, 2018 at 08:02:56PM -0600, Jens Axboe wrote:
+>> On 4/24/18 12:16 PM, Christoph Hellwig wrote:
+>>> ide_toggle_bounce did select various strange block bounce limits, including
+>>> not bouncing at all as soon as an iommu is present in the system.  Given
+>>> that the dma_map routines now handle any required bounce buffering except
+>>> for ISA DMA, and the ide code already must handle either ISA DMA or highmem
+>>> at least for iommu equipped systems we can get rid of the block layer
+>>> bounce limit setting entirely.
+>>
+>> Pretty sure I was the one to add this code, when highmem page IO was
+>> enabled about two decades ago...
+>>
+>> Outside of DMA, the issue was that the PIO code could not handle
+>> highmem. That's not the case anymore, so this should be fine.
+> 
+> Yes, that is the rationale.  Any chance to you could look over the
+> other patches as well?  Except for the networking one for which I'd
+> really like to see a review from Dave all the users of the interface
+> are block related.
 
-So on Monday afternoon GUP in first slot would be nice :)
+You can add my reviewed-by to 1-3, and 5. Looks good to me.
 
-Just a suggestion
-
-https://docs.google.com/spreadsheets/d/15XFz_Zsklmle--L9CO4-ygCqmSHwBsFPjvjDpiL5qwM/edit#gid=0
-
-Cheers,
-J�r�me
+-- 
+Jens Axboe
