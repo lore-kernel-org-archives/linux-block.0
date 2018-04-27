@@ -1,41 +1,69 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it0-f68.google.com ([209.85.214.68]:35289 "EHLO
-        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752148AbeDZHWH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Apr 2018 03:22:07 -0400
-Received: by mail-it0-f68.google.com with SMTP id 186-v6so22538000itu.0
-        for <linux-block@vger.kernel.org>; Thu, 26 Apr 2018 00:22:07 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
-Subject: [PATCH 0/2] block: inflight counter fixes
-Date: Thu, 26 Apr 2018 00:21:57 -0700
-Message-Id: <cover.1524727168.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=6487dbab9=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "maier@linux.ibm.com" <maier@linux.ibm.com>, "osandov@osandov.com"
+	<osandov@osandov.com>
+CC: "lizefan@huawei.com" <lizefan@huawei.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "rostedt@goodmis.org" <rostedt@goodmis.org>,
+	"mingo@redhat.com" <mingo@redhat.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 2/2] tracing/events: block: dev_t via driver core for plug
+ and unplug events
+Date: Fri, 27 Apr 2018 16:38:05 +0000
+Message-ID: <9b5e43db06f6516f7c0e9cc379e0c2964000d4e1.camel@wdc.com>
+References: <20180413130719.22921-1-maier@linux.ibm.com>
+	 <20180413130719.22921-3-maier@linux.ibm.com>
+	 <20180415083154.GA12254@kroah.com>
+	 <59186bf6-abf1-87b0-914d-eed1b40ef4a8@linux.ibm.com>
+	 <20180419192341.GC20941@vader>
+	 <8624e2bec853f0bb195966ab54bc42bf15eda0ec.camel@wdc.com>
+	 <056d8ee9-5e1d-8219-c24c-9130d6c1dcbf@linux.ibm.com>
+In-Reply-To: <056d8ee9-5e1d-8219-c24c-9130d6c1dcbf@linux.ibm.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
-
-Hi, Jens,
-
-I added a blktest (block/017) for the inflight counter after you
-mentioned that we should have one and it easily found a bug :) Patch 2
-fixes the bug found by the test, and patch 1 fixes another bug I
-noticed. Based on Linus' master.
-
-Thanks!
-
-Omar Sandoval (2):
-  blk-mq: count allocated but not started requests in iostats inflight
-  blk-mq: fix sysfs inflight counter
-
- block/blk-mq.c            | 40 +++++++++++++++++++++++++++------------
- block/blk-mq.h            |  4 +++-
- block/genhd.c             | 12 ++++++++++++
- block/partition-generic.c | 10 ++++++----
- include/linux/genhd.h     |  4 +++-
- 5 files changed, 52 insertions(+), 18 deletions(-)
-
--- 
-2.17.0
+T24gVHVlLCAyMDE4LTA0LTI0IGF0IDE2OjQ5ICswMjAwLCBTdGVmZmVuIE1haWVyIHdyb3RlOg0K
+PiBUaGUgb2JqZWN0IGxpZmUgY3ljbGUgc2VlbXMgdG8gYmU6DQo+IA0KPiAoMSkgYmxrX2FsbG9j
+X3F1ZXVlKCkgYWxzbyBjcmVhdGVzIGdlbmRpc2sga29iag0KDQpJIHRoaW5rIHRoaXMgaXMgYSBt
+aXNpbnRlcnByZXRhdGlvbi4gYmxrX2FsbG9jX3F1ZXVlX25vZGUoKSBpbml0aWFsaXplcyB0aGUN
+CnJlcXVlc3QgcXVldWUga29iaiBhcyBmb2xsb3dzOg0KDQoJa29iamVjdF9pbml0KCZxLT5rb2Jq
+LCAmYmxrX3F1ZXVlX2t0eXBlKTsNCg0KcmVnaXN0ZXJfZGlzaygpIGNyZWF0ZXMgdGhlIC9zeXMv
+Y2xhc3MvYmxvY2svPGRpc2s+IG5vZGUgYW5kIC9zeXMvYmxvY2svPGRpc2s+DQpsaW5rIGFzIGZv
+bGxvd3M6DQoNCglpZiAoZGV2aWNlX2FkZChkZGV2KSkNCgkJcmV0dXJuOw0KCWlmICghc3lzZnNf
+ZGVwcmVjYXRlZCkgew0KCQllcnIgPSBzeXNmc19jcmVhdGVfbGluayhibG9ja19kZXByLCAmZGRl
+di0+a29iaiwNCgkJCQkJa29iamVjdF9uYW1lKCZkZGV2LT5rb2JqKSk7DQoJCWlmIChlcnIpIHsN
+CgkJCWRldmljZV9kZWwoZGRldik7DQoJCQlyZXR1cm47DQoJCX0NCgl9DQoNCj4gKDFhKSBTQ1NJ
+IGRvZXMgTFVOIHByb2JpbmcgSS9PDQo+ICAgICAgbW9zdCBvZiB0aGF0IGlzIGJsa3RyYWNlIFJX
+QlMgZmllbGQgdmFsdWUgJ04nIGkuZS4gbm9uLVIvVyB3aXRoIGRldl90PT0wDQo+ICAgICAgIHNp
+bmNlIHEtPmtvYmoucGFyZW50IGlzIHN0aWxsIE5VTEwgd2UgY2Fubm90IGdldCBnZW5kaXNrIGFu
+ZCB0aHVzIGRldl90DQo+ICAgICAgbmVhciB0aGUgZW5kIGlzIHRoZSBmaXJzdCByZWd1bGFyIHJl
+YWQgYmxvY2sgSS9PIHdpdGggZGV2X3QhPTANCj4gICAgICAgYXMgYmlvIT1OVUxMIGFuZCBiaV9k
+aXNrIG9yIHJxX2Rpc2sgYXJlIG5vbi1OVUxMDQo+ICgyKSBibGtfcmVnaXN0ZXJfcXVldWUoKSBh
+bHNvIGNyZWF0ZXMgcXVldWUga29iaiB3aXRoIGdlbmRpc2sgcGFyZW50DQo+ICAgICBub3cgd2Ug
+Y2FuIGZvbGxvdyBxLT5rb2JqLnBhcmVudCB0byBnZW5kaXNrIHRvIGdldCBkZXZfdCwNCj4gICAg
+IGUuZy4gZm9yIFJXQlMgJ04nIHN1Y2ggYXMgaW1wbGljaXQgU0NTSSB0ZXN0IHVuaXQgcmVhZHkg
+b24gYmxrIGRldiBjbG9zZQ0KDQpQbGVhc2UgaGF2ZSBhIGxvb2sgYXQgdGhlIGRldmljZV9hZGRf
+ZGlzaygpIGNhbGwgaW4gc2RfcHJvYmVfYXN5bmMoKS4gSSB0aGluaw0KdGhhdCBmdW5jdGlvbiB0
+cmlnZ2VycyBhIGNhbGwgb2YgYmxrX3JlZ2lzdGVyX3F1ZXVlKCkuIFRoYXQgbGFzdCBmdW5jdGlv
+bg0KYXNzb2NpYXRlcyB0aGUgcmVxdWVzdCBxdWV1ZSB3aXRoIHRoZSBnZW5kaXNrIGFzIGZvbGxv
+d3M6DQoNCglyZXQgPSBrb2JqZWN0X2FkZCgmcS0+a29iaiwga29iamVjdF9nZXQoJmRldi0+a29i
+aiksICIlcyIsICJxdWV1ZSIpOw0KDQo+ICgzKSBvcHRpb25hbGx5ICJyZWd1bGFyIiBJL08NCj4g
+KDQpIGJsa191bnJlZ2lzdGVyX3F1ZXVlKCkgY2FsbGVkIGJ5IGRlbF9nZW5kaXNrKCkNCj4gICAg
+IGRvZXMga29iamVjdF9kZWwoJnEtPmtvYmopIHdoaWNoIE5VTExpZmllcyBxLT5rb2JqLnBhcmVu
+dCBhZ2Fpbg0KPiAgICAgdGhlIGxhc3QgcHV0IG9mIGdlbmRpc2sgcmVmZXJlbmNlIHJlbGVhc2Vz
+IGdlbmRpc2sga29iag0KPiAoNSkgYmxrX2NsZWFudXBfcXVldWUoKQ0KPiAgICAgdGhlIGxhc3Qg
+cHV0IG9mIHF1ZXVlICgvbXEpIHJlZmVyZW5jZSByZWxlYXNlcyBxdWV1ZSAoL21xKSBrb2JqDQoN
+ClRoZSAvbXEgZGlyZWN0b3J5IGNvcnJlc3BvbmRzIHRvIHEtPm1xX2tvYmouIFRoZSBibG9jayBs
+YXllciBjb3JlIGRyb3BzIGl0cw0KcmVmZXJlbmNlIHRvIHRoZSBxdWV1ZSBrb2JqZWN0IChxLT5r
+b2JqKSBieSBjYWxsaW5nIGJsa19wdXRfcXVldWUoKSBhdCB0aGUNCmVuZCBvZiBibGtfY2xlYW51
+cF9xdWV1ZSgpLg0KDQo+IFNpbmNlIEkgY2Fubm90IHByb3ZlIGl0J3MgYWx3YXlzIGxpa2UgdGhp
+cywgSSBmb2xsb3dlZCBCYXJ0J3Mgc3VnZ2VzdGlvbg0KPiBhbmQgYWRkZWQgYW5vdGhlciByZWZj
+b3VudCBnZXQgYXQgKDIpIGJsa19yZWdpc3Rlcl9xdWV1ZSgpLg0KPiBIb3dldmVyLCB3aGVuIEkg
+d2FudCB0byBwdXQgdGhhdCBhZGRpdGlvbmFsIHJlZmNvdW50IGF0ICg1KSBibGtfY2xlYW51cF9x
+dWV1ZSgpLA0KPiB3ZSBvbmx5IGdldCBhIHF1ZXVlIHBvaW50ZXIgYXJndW1lbnQgYXMgY29udGV4
+dA0KPiBhbmQgcS0+a29iai5wYXJlbnQ9PU5VTEwgc2luY2UgKDQpLA0KPiBzbyBJIGRvbid0IGtu
+b3cgaG93IHRvIGdldCB0byB0aGUgZ2VuZGlzayBvYmplY3QgZm9yIHRoZSByZWZjb3VudCBwdXQu
+DQoNCkhhdmUgeW91IHRyaWVkIHRvIG1vZGlmeSBibGtfcmVnaXN0ZXJfcXVldWUoKSBzdWNoIHRo
+YXQgaXQgc3RvcmVzIHRoZSBkaXNrDQpwb2ludGVyIGluIGEgbmV3IHN0cnVjdCByZXF1ZXN0X3F1
+ZXVlIG1lbWJlcj8NCg0KVGhhbmtzLA0KDQpCYXJ0Lg0KDQoNCg0KDQoNCg0K
