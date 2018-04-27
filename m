@@ -1,83 +1,57 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "axboe@fb.com" <axboe@fb.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "hch@lst.de" <hch@lst.de>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "hare@suse.de" <hare@suse.de>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "don.brace@microsemi.com" <don.brace@microsemi.com>,
+        "james.bottomley@hansenpartnership.com"
+        <james.bottomley@hansenpartnership.com>,
+        "osandov@fb.com" <osandov@fb.com>,
+        "loberman@redhat.com" <loberman@redhat.com>,
+        "kashyap.desai@broadcom.com" <kashyap.desai@broadcom.com>
 Subject: Re: [PATCH 0/3] scsi: scsi-mq: don't hold host_busy in IO path
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
- "ming.lei@redhat.com" <ming.lei@redhat.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "snitzer@redhat.com" <snitzer@redhat.com>, "hch@lst.de" <hch@lst.de>,
- "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
- "hare@suse.de" <hare@suse.de>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "don.brace@microsemi.com" <don.brace@microsemi.com>,
- "james.bottomley@hansenpartnership.com"
- <james.bottomley@hansenpartnership.com>, "osandov@fb.com" <osandov@fb.com>,
- "loberman@redhat.com" <loberman@redhat.com>,
- "kashyap.desai@broadcom.com" <kashyap.desai@broadcom.com>
+Date: Fri, 27 Apr 2018 15:31:53 +0000
+Message-ID: <87619135ac0bfefa07f510170024b609e641db0c.camel@wdc.com>
 References: <20180420065742.8043-1-ming.lei@redhat.com>
- <87619135ac0bfefa07f510170024b609e641db0c.camel@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <607c4d2f-28e7-4152-dbf5-7fb4387e9413@kernel.dk>
-Date: Fri, 27 Apr 2018 09:39:47 -0600
+In-Reply-To: <20180420065742.8043-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <87619135ac0bfefa07f510170024b609e641db0c.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On 4/27/18 9:31 AM, Bart Van Assche wrote:
-> On Fri, 2018-04-20 at 14:57 +0800, Ming Lei wrote:
->> This patches removes the expensive atomic opeation on host-wide counter
->> of .host_busy for scsi-mq, and it is observed that IOPS can be increased by
->> 15% with this change in IO test over scsi_debug.
->>
->>
->> Ming Lei (3):
->>   scsi: introduce scsi_host_busy()
->>   scsi: read host_busy via scsi_host_busy()
->>   scsi: avoid to hold host-wide counter of host_busy for scsi_mq
->>
->>  drivers/scsi/advansys.c                   |  8 ++++----
->>  drivers/scsi/hosts.c                      | 32 +++++++++++++++++++++++++++++++
->>  drivers/scsi/libsas/sas_scsi_host.c       |  4 ++--
->>  drivers/scsi/megaraid/megaraid_sas_base.c |  2 +-
->>  drivers/scsi/mpt3sas/mpt3sas_base.c       |  4 ++--
->>  drivers/scsi/qlogicpti.c                  |  2 +-
->>  drivers/scsi/scsi.c                       |  2 +-
->>  drivers/scsi/scsi_error.c                 |  6 +++---
->>  drivers/scsi/scsi_lib.c                   | 23 ++++++++++++++++------
->>  drivers/scsi/scsi_sysfs.c                 |  2 +-
->>  include/scsi/scsi_host.h                  |  1 +
->>  11 files changed, 65 insertions(+), 21 deletions(-)\
-> 
-> Hello Ming,
-> 
-> From the MAINTAINERS file:
-> 
-> SCSI SUBSYSTEM
-> M:      "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-> T:      git git://git.kernel.org/pub/scm/linux/kernel/git/jejb/scsi.git
-> M:      "Martin K. Petersen" <martin.petersen@oracle.com>
-> T:      git git://git.kernel.org/pub/scm/linux/kernel/git/mkp/scsi.git
-> L:      linux-scsi@vger.kernel.org
-> S:      Maintained
-> F:      Documentation/devicetree/bindings/scsi/
-> F:      drivers/scsi/
-> F:      include/scsi/
-> 
-> Hence my surprise when I saw that you sent this patch series to Jens instead
-> of James and Martin?
-
-Martin and James are both on the CC as well. For what it's worth, the patch
-seems like a good approach to me. To handle the case that Hannes was concerned
-about (older drivers doing internal command issue), I would suggest that those
-drivers get instrumented to include a inc/dec of the host busy count for
-internal commands that bypass the normal tagging. That means the mq case needs
-to be
-
-blk_mq_tagset_busy_iter(&shost->tag_set, scsi_host_check_in_flight,
-			&in_flight);
-return in_flight.cnt + atomic_read(&shost->host_busy);
-
-The atomic read is basically free, once we get rid of the dirty of that
-variable on each IO.
-
--- 
-Jens Axboe
+T24gRnJpLCAyMDE4LTA0LTIwIGF0IDE0OjU3ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gVGhp
+cyBwYXRjaGVzIHJlbW92ZXMgdGhlIGV4cGVuc2l2ZSBhdG9taWMgb3BlYXRpb24gb24gaG9zdC13
+aWRlIGNvdW50ZXINCj4gb2YgLmhvc3RfYnVzeSBmb3Igc2NzaS1tcSwgYW5kIGl0IGlzIG9ic2Vy
+dmVkIHRoYXQgSU9QUyBjYW4gYmUgaW5jcmVhc2VkIGJ5DQo+IDE1JSB3aXRoIHRoaXMgY2hhbmdl
+IGluIElPIHRlc3Qgb3ZlciBzY3NpX2RlYnVnLg0KPiANCj4gDQo+IE1pbmcgTGVpICgzKToNCj4g
+ICBzY3NpOiBpbnRyb2R1Y2Ugc2NzaV9ob3N0X2J1c3koKQ0KPiAgIHNjc2k6IHJlYWQgaG9zdF9i
+dXN5IHZpYSBzY3NpX2hvc3RfYnVzeSgpDQo+ICAgc2NzaTogYXZvaWQgdG8gaG9sZCBob3N0LXdp
+ZGUgY291bnRlciBvZiBob3N0X2J1c3kgZm9yIHNjc2lfbXENCj4gDQo+ICBkcml2ZXJzL3Njc2kv
+YWR2YW5zeXMuYyAgICAgICAgICAgICAgICAgICB8ICA4ICsrKystLS0tDQo+ICBkcml2ZXJzL3Nj
+c2kvaG9zdHMuYyAgICAgICAgICAgICAgICAgICAgICB8IDMyICsrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysNCj4gIGRyaXZlcnMvc2NzaS9saWJzYXMvc2FzX3Njc2lfaG9zdC5jICAgICAg
+IHwgIDQgKystLQ0KPiAgZHJpdmVycy9zY3NpL21lZ2FyYWlkL21lZ2FyYWlkX3Nhc19iYXNlLmMg
+fCAgMiArLQ0KPiAgZHJpdmVycy9zY3NpL21wdDNzYXMvbXB0M3Nhc19iYXNlLmMgICAgICAgfCAg
+NCArKy0tDQo+ICBkcml2ZXJzL3Njc2kvcWxvZ2ljcHRpLmMgICAgICAgICAgICAgICAgICB8ICAy
+ICstDQo+ICBkcml2ZXJzL3Njc2kvc2NzaS5jICAgICAgICAgICAgICAgICAgICAgICB8ICAyICst
+DQo+ICBkcml2ZXJzL3Njc2kvc2NzaV9lcnJvci5jICAgICAgICAgICAgICAgICB8ICA2ICsrKy0t
+LQ0KPiAgZHJpdmVycy9zY3NpL3Njc2lfbGliLmMgICAgICAgICAgICAgICAgICAgfCAyMyArKysr
+KysrKysrKysrKysrLS0tLS0tDQo+ICBkcml2ZXJzL3Njc2kvc2NzaV9zeXNmcy5jICAgICAgICAg
+ICAgICAgICB8ICAyICstDQo+ICBpbmNsdWRlL3Njc2kvc2NzaV9ob3N0LmggICAgICAgICAgICAg
+ICAgICB8ICAxICsNCj4gIDExIGZpbGVzIGNoYW5nZWQsIDY1IGluc2VydGlvbnMoKyksIDIxIGRl
+bGV0aW9ucygtKVwNCg0KSGVsbG8gTWluZywNCg0KRnJvbSB0aGUgTUFJTlRBSU5FUlMgZmlsZToN
+Cg0KU0NTSSBTVUJTWVNURU0NCk06ICAgICAgIkphbWVzIEUuSi4gQm90dG9tbGV5IiA8amVqYkBs
+aW51eC52bmV0LmlibS5jb20+DQpUOiAgICAgIGdpdCBnaXQ6Ly9naXQua2VybmVsLm9yZy9wdWIv
+c2NtL2xpbnV4L2tlcm5lbC9naXQvamVqYi9zY3NpLmdpdA0KTTogICAgICAiTWFydGluIEsuIFBl
+dGVyc2VuIiA8bWFydGluLnBldGVyc2VuQG9yYWNsZS5jb20+DQpUOiAgICAgIGdpdCBnaXQ6Ly9n
+aXQua2VybmVsLm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9naXQvbWtwL3Njc2kuZ2l0DQpMOiAg
+ICAgIGxpbnV4LXNjc2lAdmdlci5rZXJuZWwub3JnDQpTOiAgICAgIE1haW50YWluZWQNCkY6ICAg
+ICAgRG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL3Njc2kvDQpGOiAgICAgIGRyaXZl
+cnMvc2NzaS8NCkY6ICAgICAgaW5jbHVkZS9zY3NpLw0KDQpIZW5jZSBteSBzdXJwcmlzZSB3aGVu
+IEkgc2F3IHRoYXQgeW91IHNlbnQgdGhpcyBwYXRjaCBzZXJpZXMgdG8gSmVucyBpbnN0ZWFkDQpv
+ZiBKYW1lcyBhbmQgTWFydGluPw0KDQpCYXJ0Lg==
