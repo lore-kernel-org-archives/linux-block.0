@@ -1,40 +1,34 @@
-Return-Path: <luc.vanoostenryck@gmail.com>
-Return-Path: <luc.vanoostenryck@gmail.com>
-From: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-To: linux-kernel@vger.kernel.org
-Cc: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org
-Subject: [PATCH] drdb: fix print_st_err()'s prototype
-Date: Tue, 24 Apr 2018 15:14:10 +0200
-Message-Id: <20180424131410.1603-1-luc.vanoostenryck@gmail.com>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 27 Apr 2018 05:34:31 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Brian Foster <bfoster@redhat.com>
+Cc: Benlong Zhang <zhangbenlong@didichuxing.com>, axboe@kernel.dk,
+	shli@kernel.org, david@fromorbit.com, linux-block@vger.kernel.org,
+	Josef Bacik <jbacik@fb.com>
+Subject: Re: [PATCH] A tentative patch to bypass REQ_META in blk throttle
+Message-ID: <20180427123431.GA2368884@devbig577.frc2.facebook.com>
+References: <20180420100554.GA23471@localhost>
+ <20180426190118.GP1911913@devbig577.frc2.facebook.com>
+ <20180427122006.GA9380@bfoster.bfoster>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180427122006.GA9380@bfoster.bfoster>
 List-ID: <linux-block@vger.kernel.org>
 
-print_st_err() is defined with its 4th argument taking an
-'enum drbd_state_rv' but its prototype use an int for it.
+Hello, Brian.
 
-Fix this by using 'enum drbd_state_rv' in the prototype too.
+On Fri, Apr 27, 2018 at 08:20:06AM -0400, Brian Foster wrote:
+> I thought Josef's work had more to do with tracking/managing dirty
+> metadata (i.e., driving writeback/reclaim and whatnot). Perhaps I just
+> haven't followed it close enough... how does that relate to cgroup bio
+> ownership?
 
-Signed-off-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
----
- drivers/block/drbd/drbd_state.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Oh, we've been working on it for a while now but haven't posted the
+patches yet.  We should be able to post the patches in several weeks.
 
-diff --git a/drivers/block/drbd/drbd_state.h b/drivers/block/drbd/drbd_state.h
-index ea58301d0..b2a390ba7 100644
---- a/drivers/block/drbd/drbd_state.h
-+++ b/drivers/block/drbd/drbd_state.h
-@@ -131,7 +131,7 @@ extern enum drbd_state_rv _drbd_set_state(struct drbd_device *, union drbd_state
- 					  enum chg_state_flags,
- 					  struct completion *done);
- extern void print_st_err(struct drbd_device *, union drbd_state,
--			union drbd_state, int);
-+			union drbd_state, enum drbd_state_rv);
- 
- enum drbd_state_rv
- _conn_request_state(struct drbd_connection *connection, union drbd_state mask, union drbd_state val,
+Thanks.
+
 -- 
-2.17.0
+tejun
