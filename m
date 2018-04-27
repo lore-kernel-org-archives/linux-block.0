@@ -1,69 +1,89 @@
 Return-Path: <jiangqi903@gmail.com>
 Return-Path: <jiangqi903@gmail.com>
 Subject: Re: testing io.low limit for blk-throttle
-To: Paolo Valente <paolo.valente@linaro.org>
-Cc: linux-block <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
+To: "jianchao.wang" <jianchao.w.wang@oracle.com>, Tejun Heo <tj@kernel.org>
+Cc: Paolo Valente <paolo.valente@linaro.org>,
+ linux-block <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
  Shaohua Li <shli@fb.com>, Mark Brown <broonie@kernel.org>,
  Linus Walleij <linus.walleij@linaro.org>,
- Ulf Hansson <ulf.hansson@linaro.org>, LKML <linux-kernel@vger.kernel.org>,
- Tejun Heo <tj@kernel.org>,
- 'Paolo Valente' via bfq-iosched <bfq-iosched@googlegroups.com>
+ Ulf Hansson <ulf.hansson@linaro.org>, LKML <linux-kernel@vger.kernel.org>
 References: <A749046B-BEB9-4278-ABEF-3007817D59DD@linaro.org>
  <4c6b86d9-1668-43c3-c159-e6e23ffb04b4@gmail.com>
  <A0424504-2778-41F4-B1C6-BE1B0253E524@linaro.org>
  <18accc1e-c7b3-86a7-091b-1d4b631fcd4a@gmail.com>
  <536A1B1D-575F-4193-ADA6-BA832AEC7179@linaro.org>
- <871b8d16-a172-af68-1aae-92ae55c0cce7@gmail.com>
- <5FEFF82B-4160-4F00-A60A-D3A6D9DDE66C@linaro.org>
+ <20180426183200.GK1911913@devbig577.frc2.facebook.com>
+ <9aee3b22-2600-b16b-d944-f3a09089664f@oracle.com>
 From: Joseph Qi <jiangqi903@gmail.com>
-Message-ID: <b8c4c2b1-dafa-703b-f322-0ea3bbc768f1@gmail.com>
-Date: Fri, 27 Apr 2018 11:27:35 +0800
+Message-ID: <9ef3c9be-8973-33ae-6dba-c7a5af55e5ea@gmail.com>
+Date: Fri, 27 Apr 2018 10:40:40 +0800
 MIME-Version: 1.0
-In-Reply-To: <5FEFF82B-4160-4F00-A60A-D3A6D9DDE66C@linaro.org>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <9aee3b22-2600-b16b-d944-f3a09089664f@oracle.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Paolo,
+Hi Jianchao,
 
-On 18/4/27 01:27, Paolo Valente wrote:
+On 18/4/27 10:09, jianchao.wang wrote:
+> Hi Tejun and Joseph
 > 
-> 
->> Il giorno 25 apr 2018, alle ore 14:13, Joseph Qi <jiangqi903@gmail.com> ha scritto:
+> On 04/27/2018 02:32 AM, Tejun Heo wrote:
+>> Hello,
 >>
->> Hi Paolo,
+>> On Tue, Apr 24, 2018 at 02:12:51PM +0200, Paolo Valente wrote:
+>>> +Tejun (I guess he might be interested in the results below)
 >>
+>> Our experiments didn't work out too well either.  At this point, it
+>> isn't clear whether io.low will ever leave experimental state.  We're
+>> trying to find a working solution.
 > 
-> Hi Joseph
+> Would you please take a look at the following two patches.
 > 
->> ...
->> Could you run blktrace as well when testing your case? There are several
->> throtl traces to help analyze whether it is caused by frequently
->> upgrade/downgrade.
+> https://marc.info/?l=linux-block&m=152325456307423&w=2
+> https://marc.info/?l=linux-block&m=152325457607425&w=2
 > 
-> Certainly.  You can find a trace attached.  Unfortunately, I'm not
-> familiar with the internals of blk-throttle and low limit, so, if you
-> want me to analyze the trace, give me some hints on what I have to
-> look for.  Otherwise, I'll be happy to learn from your analysis.
+> In addition, when I tested blk-throtl io.low on NVMe card, I always got
+> even if the iops has been lower than io.low limit for a while, but the
+> due to group is not idle, the downgrade always fails.
+> 
+>        tg->latency_target && tg->bio_cnt &&
+> 		tg->bad_bio_cnt * 5 < tg->bio_cn
 > 
 
-I've taken a glance at your blktrace attached. It is only upgrade at first and
-then downgrade (just adjust limit, not to LIMIT_LOW) frequently.
-But I don't know why it always thinks throttle group is not idle.
+I'm afraid the latency check is a must for io.low. Because idle time
+check can only apply to simple scenarios from my test.
 
-For example:
-fio-2336  [004] d...   428.458249:   8,16   m   N throtl avg_idle=90, idle_threshold=1000, bad_bio=10, total_bio=84, is_idle=0, scale=9
-fio-2336  [004] d...   428.458251:   8,16   m   N throtl downgrade, scale 4
+Yes, in some cases last_low_overflow_time does have problems.
+And for not downgrade properly, I've also posted two patches before,
+waiting Shaohua's review. You can also have a try.
 
-In throtl_tg_is_idle():
-is_idle = ... ||
-	(tg->latency_target && tg->bio_cnt &&
-	 tg->bad_bio_cnt * 5 < tg->bio_cnt);
-
-It should be idle and allow run more bandwidth. But here the result shows not
-idle (is_idle=0). I have to do more investigation to figure it out why. 
-
-You can also filter these logs using:
-grep throtl trace | grep -E 'upgrade|downgrade|is_idle'
+https://patchwork.kernel.org/patch/10177185/
+https://patchwork.kernel.org/patch/10177187/
 
 Thanks,
 Joseph
+
+> the latency always looks well even the sum of two groups's iops has reached the top.
+> so I disable this check on my test, plus the 2 patches above, the io.low
+> could basically works.
+> 
+> My NVMe card's max bps is ~600M, and max iops is ~160k.
+> Here is my config
+> io.low riops=50000 wiops=50000 rbps=209715200 wbps=209715200 idle=200 latency=10
+> io.max riops=150000
+> There are two cgroups in my test, both of them have same config.
+> 
+> In addition, saying "basically work" is due to the iops of the two cgroup will jump up and down.
+> such as, I launched one fio test per cgroup, the iops will wave as following:
+> 
+> group0   30k  50k   70k   60k  40k
+> group1   120k 100k  80k   90k  110k
+> 
+> however, if I launched two fio tests only in one cgroup, the iops of two test could stay 
+> about 70k~80k.
+> 
+> Could help to explain this scenario ?
+> 
+> Thanks in advance
+> Jianchao
+> 
