@@ -1,90 +1,89 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:34334 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753746AbeD3JKY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Apr 2018 05:10:24 -0400
-Received: by mail-wm0-f66.google.com with SMTP id a137so9303616wme.1
-        for <linux-block@vger.kernel.org>; Mon, 30 Apr 2018 02:10:24 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 08/11] lightnvm: pblk: remove unnecessary argument
-Date: Mon, 30 Apr 2018 11:10:06 +0200
-Message-Id: <1525079409-6588-9-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1525079409-6588-1-git-send-email-javier@cnexlabs.com>
-References: <1525079409-6588-1-git-send-email-javier@cnexlabs.com>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55892 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S933409AbeD1I1I (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 28 Apr 2018 04:27:08 -0400
+Date: Sat, 28 Apr 2018 16:26:44 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "axboe@fb.com" <axboe@fb.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "hch@lst.de" <hch@lst.de>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "hare@suse.de" <hare@suse.de>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "don.brace@microsemi.com" <don.brace@microsemi.com>,
+        "james.bottomley@hansenpartnership.com"
+        <james.bottomley@hansenpartnership.com>,
+        "osandov@fb.com" <osandov@fb.com>,
+        "loberman@redhat.com" <loberman@redhat.com>,
+        "kashyap.desai@broadcom.com" <kashyap.desai@broadcom.com>
+Subject: Re: [PATCH 3/3] scsi: avoid to hold host-wide counter of host_busy
+ for scsi_mq
+Message-ID: <20180428082638.GB7325@ming.t460p>
+References: <20180420065742.8043-1-ming.lei@redhat.com>
+ <20180420065742.8043-4-ming.lei@redhat.com>
+ <cf84baf9bd61fd1a3ab34aa956d496d164aef44f.camel@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <cf84baf9bd61fd1a3ab34aa956d496d164aef44f.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Remove unnecessary argument on pblk_line_free()
+On Fri, Apr 27, 2018 at 04:16:48PM +0000, Bart Van Assche wrote:
+> On Fri, 2018-04-20 at 14:57 +0800, Ming Lei wrote:
+> > +struct scsi_host_mq_in_flight {
+> > +	int cnt;
+> > +};
+> > +
+> > +static void scsi_host_check_in_flight(struct request *rq, void *data,
+> > +		bool reserved)
+> > +{
+> > +	struct scsi_host_mq_in_flight *in_flight = data;
+> > +
+> > +	if (blk_mq_request_started(rq))
+> > +		in_flight->cnt++;
+> > +}
+> > +
+> >  /**
+> >   * scsi_host_busy - Return the host busy counter
+> >   * @shost:	Pointer to Scsi_Host to inc.
+> >   **/
+> >  int scsi_host_busy(struct Scsi_Host *shost)
+> >  {
+> > -	return atomic_read(&shost->host_busy);
+> > +	struct scsi_host_mq_in_flight in_flight = {
+> > +		.cnt = 0,
+> > +	};
+> > +
+> > +	if (!shost->use_blk_mq)
+> > +		return atomic_read(&shost->host_busy);
+> > +
+> > +	blk_mq_tagset_busy_iter(&shost->tag_set, scsi_host_check_in_flight,
+> > +			&in_flight);
+> > +	return in_flight.cnt;
+> >  }
+> >  EXPORT_SYMBOL(scsi_host_busy);
+> 
+> This patch introduces a subtle behavior change that has not been explained
+> in the commit message. If a SCSI request gets requeued that results in a
+> decrease of the .host_busy counter by scsi_device_unbusy() before the request
+> is requeued and an increase of the host_busy counter when scsi_queue_rq() is
+> called again. During that time such requests have the state MQ_RQ_COMPLETE and
+> hence blk_mq_request_started() will return true and scsi_host_check_in_flight()
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-core.c | 6 +++---
- drivers/lightnvm/pblk-init.c | 2 +-
- drivers/lightnvm/pblk.h      | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
+No, __blk_mq_requeue_request() will change the rq state into MQ_RQ_IDLE,
+so such issue you worried about, please look at scsi_mq_requeue_cmd(),
+which calls blk_mq_requeue_request(), which puts driver tag and updates
+rq's state to IDLE.
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 6bc0c7f61aac..1b871441d816 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1337,7 +1337,7 @@ static struct pblk_line *pblk_line_retry(struct pblk *pblk,
- 	retry_line->emeta = line->emeta;
- 	retry_line->meta_line = line->meta_line;
- 
--	pblk_line_free(pblk, line);
-+	pblk_line_free(line);
- 	l_mg->data_line = retry_line;
- 	spin_unlock(&l_mg->free_lock);
- 
-@@ -1562,7 +1562,7 @@ struct pblk_line *pblk_line_replace_data(struct pblk *pblk)
- 	return new;
- }
- 
--void pblk_line_free(struct pblk *pblk, struct pblk_line *line)
-+void pblk_line_free(struct pblk_line *line)
- {
- 	kfree(line->map_bitmap);
- 	kfree(line->invalid_bitmap);
-@@ -1584,7 +1584,7 @@ static void __pblk_line_put(struct pblk *pblk, struct pblk_line *line)
- 	WARN_ON(line->state != PBLK_LINESTATE_GC);
- 	line->state = PBLK_LINESTATE_FREE;
- 	line->gc_group = PBLK_LINEGC_NONE;
--	pblk_line_free(pblk, line);
-+	pblk_line_free(line);
- 	spin_unlock(&line->lock);
- 
- 	atomic_dec(&gc->pipeline_gc);
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 8f8c9abd14fc..b52855f9336b 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -509,7 +509,7 @@ static void pblk_lines_free(struct pblk *pblk)
- 	for (i = 0; i < l_mg->nr_lines; i++) {
- 		line = &pblk->lines[i];
- 
--		pblk_line_free(pblk, line);
-+		pblk_line_free(line);
- 		pblk_line_meta_free(line);
- 	}
- 	spin_unlock(&l_mg->free_lock);
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 856ac41e1201..ff0e5e6421dd 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -766,7 +766,7 @@ struct pblk_line *pblk_line_get_data(struct pblk *pblk);
- struct pblk_line *pblk_line_get_erase(struct pblk *pblk);
- int pblk_line_erase(struct pblk *pblk, struct pblk_line *line);
- int pblk_line_is_full(struct pblk_line *line);
--void pblk_line_free(struct pblk *pblk, struct pblk_line *line);
-+void pblk_line_free(struct pblk_line *line);
- void pblk_line_close_meta(struct pblk *pblk, struct pblk_line *line);
- void pblk_line_close(struct pblk *pblk, struct pblk_line *line);
- void pblk_line_close_ws(struct work_struct *work);
--- 
-2.7.4
+> will include these requests. In other words, this patch introduces a subtle
+> behavior change that has not been explained in the commit message. Hence I'm
+> doubt that this change is correct.
+
+As I explained above, no such issue.
+
+
+Thanks,
+Ming
