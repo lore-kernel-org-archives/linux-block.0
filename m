@@ -1,70 +1,44 @@
 Return-Path: <jianchao.w.wang@oracle.com>
 Subject: Re: [PATCH 1/2] nvme: pci: simplify timeout handling
-To: Keith Busch <keith.busch@linux.intel.com>, Ming Lei <ming.lei@redhat.com>
-Cc: Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@kernel.dk>,
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
         Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
 References: <20180426123956.26039-1-ming.lei@redhat.com>
  <20180426123956.26039-2-ming.lei@redhat.com>
- <20180427175157.GB5073@localhost.localdomain>
- <20180428035015.GB5657@ming.t460p>
- <20180428133514.GB5938@localhost.localdomain>
+ <b8dd2c24-a011-7e66-feca-502b0a6b10c0@oracle.com>
+ <20180426155722.GA3597@ming.t460p>
+ <325688af-3ae2-49db-3a59-ef3903adcdf6@oracle.com>
+ <20180427145708.GA2767@ming.t460p>
 From: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <401cba4e-4a70-291d-54f0-5cb484006587@oracle.com>
-Date: Sat, 28 Apr 2018 22:31:26 +0800
+Message-ID: <18b7ab23-f0d6-6765-021a-28c225f8a990@oracle.com>
+Date: Sat, 28 Apr 2018 22:00:17 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180428133514.GB5938@localhost.localdomain>
+In-Reply-To: <20180427145708.GA2767@ming.t460p>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Ming and Keith
+Hi ming
 
-Let me detail extend more here. :)
-
-On 04/28/2018 09:35 PM, Keith Busch wrote:
->> Actually there isn't the case before, even for legacy path, one .timeout()
->> handles one request only.
-
-Yes, .timeout should be invoked for every timeout request and .timeout should also
-handle this only one request in principle
-however, nvme_timeout will invoke nvme_dev_disable
-
-> That's not quite what I was talking about.
+On 04/27/2018 10:57 PM, Ming Lei wrote:
+> I may not understand your point, once blk_sync_queue() returns, the
+> timer itself is deactivated, meantime the synced .nvme_timeout() only
+> returns EH_NOT_HANDLED before the deactivation.
 > 
-> Before, only the command that was about to be sent to the driver's
-> .timeout() was marked completed. The driver could (and did) compete
-> other timed out commands in a single .timeout(), and the tag would
-> clear, so we could hanlde all timeouts in a single .timeout().
+> That means this timer won't be expired any more, so could you explain
+> a bit why timeout can come again after blk_sync_queue() returns
 
-I think Keith are saying that
-before this new blk-mq timeout implementation, the logic of blk_mq_timeout_work is
+Please consider the following case:
 
-get _only_ _one_ timeout request
-mark completed
-invoke .timeout, in nvme, it is nvme_timeout
-then nvme_dev_disable is invoked and thus other requests could be completed by blk_mq_complete_request
-because they have not been mark completed 
-
-> 
-> Now, blk-mq marks all timed out commands as aborted prior to calling
-> the driver's .timeout(). If the driver completes any of those commands,
-> the tag does not clear, so the driver's .timeout() just gets to be called
-> again for commands it already reaped.
-> 
-
-After the new blk-mq timeout implementation, 
-
-set the aborted_gstate of _all_ the timeout requests
-invoke the .timeout one by one
-for the first timeout request's .timeout, in nvme, it is nvme_timeout
-nvme_dev_disable is invoked and try to complete all the in-flight requests through blk_mq_complete_request
-but timeout requests that have been set aborted_gstate cannot handled by blk_mq_complete_request
-so some requests are leaked by nvme_dev_disable
-these residual timeout requests will still be handled by blk_mq_timeout_work through invoke .timeout one by one
-
+blk_sync_queue
+  -> del_timer_sync          
+                          blk_mq_timeout_work
+                            -> blk_mq_check_expired // return the timeout value
+                            -> blk_mq_terninate_expired
+                              -> .timeout //return EH_NOT_HANDLED
+                            -> mod_timer // setup the timer again based on the result of blk_mq_check_expired
+  -> cancel_work_sync
+So after the blk_sync_queue, the timer may come back again, then the timeout work.
 
 Thanks
 Jianchao
-
-
-> 
