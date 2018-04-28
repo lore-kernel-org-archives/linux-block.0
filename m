@@ -1,56 +1,69 @@
 Return-Path: <tom.leiming@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <18b7ab23-f0d6-6765-021a-28c225f8a990@oracle.com>
+In-Reply-To: <20180428133514.GB5938@localhost.localdomain>
 References: <20180426123956.26039-1-ming.lei@redhat.com> <20180426123956.26039-2-ming.lei@redhat.com>
- <b8dd2c24-a011-7e66-feca-502b0a6b10c0@oracle.com> <20180426155722.GA3597@ming.t460p>
- <325688af-3ae2-49db-3a59-ef3903adcdf6@oracle.com> <20180427145708.GA2767@ming.t460p>
- <18b7ab23-f0d6-6765-021a-28c225f8a990@oracle.com>
+ <20180427175157.GB5073@localhost.localdomain> <20180428035015.GB5657@ming.t460p>
+ <20180428133514.GB5938@localhost.localdomain>
 From: Ming Lei <tom.leiming@gmail.com>
-Date: Sun, 29 Apr 2018 05:57:36 +0800
-Message-ID: <CACVXFVPwV7cAChndWXxg8A2onJu5Ngr9fpKVvLjNwMqDPM9yJg@mail.gmail.com>
+Date: Sun, 29 Apr 2018 05:39:52 +0800
+Message-ID: <CACVXFVMfvLLt7h58W-ifJKbC-s_1oDhCJEx4AqD6wJ+w2AjnYg@mail.gmail.com>
 Subject: Re: [PATCH 1/2] nvme: pci: simplify timeout handling
-To: "jianchao.wang" <jianchao.w.wang@oracle.com>
+To: Keith Busch <keith.busch@linux.intel.com>
 Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
 	linux-block <linux-block@vger.kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
 	linux-nvme <linux-nvme@lists.infradead.org>, Keith Busch <keith.busch@intel.com>,
-	Christoph Hellwig <hch@lst.de>
+	Jianchao Wang <jianchao.w.wang@oracle.com>, Christoph Hellwig <hch@lst.de>
 Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On Sat, Apr 28, 2018 at 10:00 PM, jianchao.wang
-<jianchao.w.wang@oracle.com> wrote:
-> Hi ming
->
-> On 04/27/2018 10:57 PM, Ming Lei wrote:
->> I may not understand your point, once blk_sync_queue() returns, the
->> timer itself is deactivated, meantime the synced .nvme_timeout() only
->> returns EH_NOT_HANDLED before the deactivation.
+On Sat, Apr 28, 2018 at 9:35 PM, Keith Busch
+<keith.busch@linux.intel.com> wrote:
+> On Sat, Apr 28, 2018 at 11:50:17AM +0800, Ming Lei wrote:
+>> > I understand how the problems are happening a bit better now. It used
+>> > to be that blk-mq would lock an expired command one at a time, so when
+>> > we had a batch of IO timeouts, the driver was able to complete all of
+>> > them inside a single IO timeout handler.
+>> >
+>> > That's not the case anymore, so the driver is called for every IO
+>> > timeout even though if it reaped all the commands at once.
 >>
->> That means this timer won't be expired any more, so could you explain
->> a bit why timeout can come again after blk_sync_queue() returns
+>> Actually there isn't the case before, even for legacy path, one .timeout()
+>> handles one request only.
 >
-> Please consider the following case:
+> That's not quite what I was talking about.
 >
-> blk_sync_queue
->   -> del_timer_sync
->                           blk_mq_timeout_work
->                             -> blk_mq_check_expired // return the timeout value
->                             -> blk_mq_terninate_expired
->                               -> .timeout //return EH_NOT_HANDLED
->                             -> mod_timer // setup the timer again based on the result of blk_mq_check_expired
->   -> cancel_work_sync
-> So after the blk_sync_queue, the timer may come back again, then the timeout work.
+> Before, only the command that was about to be sent to the driver's
+> .timeout() was marked completed. The driver could (and did) compete
+> other timed out commands in a single .timeout(), and the tag would
+> clear, so we could hanlde all timeouts in a single .timeout().
+>
+> Now, blk-mq marks all timed out commands as aborted prior to calling
+> the driver's .timeout(). If the driver completes any of those commands,
+> the tag does not clear, so the driver's .timeout() just gets to be called
+> again for commands it already reaped.
 
-OK, I was trying to avoid to use blk_abort_request(), but looks we
-may have to depend on it or similar way.
+That won't happen because new timeout model will mark aborted on timed-out
+request first, then run synchronize_rcu() before making these requests
+really expired, and now rcu lock is held in normal completion
+handler(blk_mq_complete_request).
 
-BTW, that means blk_sync_queue() has been broken, even though the uses
-in blk_cleanup_queue().
+Yes, Bart is working towards that way, but there is still the same race
+between timeout handler(nvme_dev_disable()) and reset_work(), and nothing
+changes wrt. the timeout model:
 
-Another approach is to introduce one perpcu_ref of
-'q->timeout_usage_counter' for
-syncing timeout, seems a bit over-kill too, but simpler in both theory
-and implement.
+- reset may take a while to complete because of nvme_wait_freeze(), and
+timeout can happen during resetting, then reset may hang forever. Even
+without nvme_wait_freeze(), it is possible for timeout to happen during
+reset work too in theory.
+
+Actually for non-shutdown, it isn't necessary to freeze queue at all, and it
+is enough to just quiesce queues to make hardware happy for recovery,
+that has been part of my V2 patchset.
+
+But it is really simple and clean to run the recovery(nvme_dev_disable and
+reset_work) in one same context for avoiding this race, and the two
+parts should have been done together for making our life easier, that is why
+I was trying to work towards this direction.
 
 Thanks,
-Ming Lei
+Ming
