@@ -1,55 +1,168 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:32951 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753812AbeD3JKZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Apr 2018 05:10:25 -0400
-Received: by mail-wm0-f65.google.com with SMTP id x12so10640705wmc.0
-        for <linux-block@vger.kernel.org>; Mon, 30 Apr 2018 02:10:24 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 09/11] lightnvm: pblk: check for chunk size before allocating it
-Date: Mon, 30 Apr 2018 11:10:07 +0200
-Message-Id: <1525079409-6588-10-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1525079409-6588-1-git-send-email-javier@cnexlabs.com>
-References: <1525079409-6588-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org
+Subject: [PATCH V2 1/5] block: introduce blk_quiesce_timeout() and blk_unquiesce_timeout()
+Date: Sun, 29 Apr 2018 23:41:48 +0800
+Message-Id: <20180429154152.16656-2-ming.lei@redhat.com>
+In-Reply-To: <20180429154152.16656-1-ming.lei@redhat.com>
+References: <20180429154152.16656-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Do the check for the chunk state after making sure that the chunk type
-is supported.
+Turns out the current way can't drain timout completely because mod_timer()
+can be triggered in the work func, which can be just run inside the synced
+timeout work:
 
-Fixes: 32ef9412c114 ("lightnvm: pblk: implement get log report chunk")
-Signed-off-by: Javier González <javier@cnexlabs.com>
+        del_timer_sync(&q->timeout);
+        cancel_work_sync(&q->timeout_work);
+
+This patch introduces one flag of 'timeout_off' for fixing this issue, turns
+out this simple way does work.
+
+Also blk_quiesce_timeout() and blk_unquiesce_timeout() are introduced for
+draining timeout, which is needed by NVMe.
+
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-init.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ block/blk-core.c       | 34 ++++++++++++++++++++++++++++++++--
+ block/blk-mq.c         |  9 +++++++++
+ block/blk-timeout.c    |  5 ++++-
+ include/linux/blkdev.h |  4 ++++
+ 4 files changed, 49 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index b52855f9336b..9e3a43346d4c 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -751,14 +751,14 @@ static int pblk_setup_line_meta_20(struct pblk *pblk, struct pblk_line *line,
- 		chunk->cnlb = chunk_meta->cnlb;
- 		chunk->wp = chunk_meta->wp;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 806ce2442819..1288a0673ed1 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -388,6 +388,35 @@ void blk_stop_queue(struct request_queue *q)
+ }
+ EXPORT_SYMBOL(blk_stop_queue);
  
--		if (!(chunk->state & NVM_CHK_ST_OFFLINE))
--			continue;
--
- 		if (chunk->type & NVM_CHK_TP_SZ_SPEC) {
- 			WARN_ONCE(1, "pblk: custom-sized chunks unsupported\n");
- 			continue;
- 		}
- 
-+		if (!(chunk->state & NVM_CHK_ST_OFFLINE))
-+			continue;
++static void __blk_unquiesce_timeout(struct request_queue *q)
++{
++	unsigned long flags;
 +
- 		set_bit(pos, line->blk_bitmap);
- 		nr_bad_chks++;
++	spin_lock_irqsave(q->queue_lock, flags);
++	q->timeout_off = false;
++	spin_unlock_irqrestore(q->queue_lock, flags);
++}
++
++void blk_unquiesce_timeout(struct request_queue *q)
++{
++	__blk_unquiesce_timeout(q);
++	mod_timer(&q->timeout, jiffies + q->rq_timeout);
++}
++EXPORT_SYMBOL(blk_unquiesce_timeout);
++
++void blk_quiesce_timeout(struct request_queue *q)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(q->queue_lock, flags);
++	q->timeout_off = true;
++	spin_unlock_irqrestore(q->queue_lock, flags);
++
++	del_timer_sync(&q->timeout);
++	cancel_work_sync(&q->timeout_work);
++}
++EXPORT_SYMBOL(blk_quiesce_timeout);
++
+ /**
+  * blk_sync_queue - cancel any pending callbacks on a queue
+  * @q: the queue
+@@ -408,8 +437,7 @@ EXPORT_SYMBOL(blk_stop_queue);
+  */
+ void blk_sync_queue(struct request_queue *q)
+ {
+-	del_timer_sync(&q->timeout);
+-	cancel_work_sync(&q->timeout_work);
++	blk_quiesce_timeout(q);
+ 
+ 	if (q->mq_ops) {
+ 		struct blk_mq_hw_ctx *hctx;
+@@ -421,6 +449,8 @@ void blk_sync_queue(struct request_queue *q)
+ 	} else {
+ 		cancel_delayed_work_sync(&q->delay_work);
  	}
++
++	__blk_unquiesce_timeout(q);
+ }
+ EXPORT_SYMBOL(blk_sync_queue);
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 0dc9e341c2a7..890dd3b3e3e1 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -901,6 +901,15 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 	};
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i;
++	bool timeout_off;
++	unsigned long flags;
++
++	spin_lock_irqsave(q->queue_lock, flags);
++	timeout_off = q->timeout_off;
++	spin_unlock_irqrestore(q->queue_lock, flags);
++
++	if (timeout_off)
++		return;
+ 
+ 	/* A deadlock might occur if a request is stuck requiring a
+ 	 * timeout at the same time a queue freeze is waiting
+diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+index 652d4d4d3e97..ffd0b609091e 100644
+--- a/block/blk-timeout.c
++++ b/block/blk-timeout.c
+@@ -136,12 +136,15 @@ void blk_timeout_work(struct work_struct *work)
+ 
+ 	spin_lock_irqsave(q->queue_lock, flags);
+ 
++	if (q->timeout_off)
++		goto exit;
++
+ 	list_for_each_entry_safe(rq, tmp, &q->timeout_list, timeout_list)
+ 		blk_rq_check_expired(rq, &next, &next_set);
+ 
+ 	if (next_set)
+ 		mod_timer(&q->timeout, round_jiffies_up(next));
+-
++exit:
+ 	spin_unlock_irqrestore(q->queue_lock, flags);
+ }
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 9af3e0f430bc..99488a5c7d34 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -584,6 +584,7 @@ struct request_queue {
+ 	struct timer_list	timeout;
+ 	struct work_struct	timeout_work;
+ 	struct list_head	timeout_list;
++	bool			timeout_off;
+ 
+ 	struct list_head	icq_list;
+ #ifdef CONFIG_BLK_CGROUP
+@@ -1011,6 +1012,9 @@ extern void blk_execute_rq(struct request_queue *, struct gendisk *,
+ extern void blk_execute_rq_nowait(struct request_queue *, struct gendisk *,
+ 				  struct request *, int, rq_end_io_fn *);
+ 
++extern void blk_quiesce_timeout(struct request_queue *q);
++extern void blk_unquiesce_timeout(struct request_queue *q);
++
+ int blk_status_to_errno(blk_status_t status);
+ blk_status_t errno_to_blk_status(int errno);
+ 
 -- 
-2.7.4
+2.9.5
