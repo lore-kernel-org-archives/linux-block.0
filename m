@@ -1,54 +1,56 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44982 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1757528AbeDXMPL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Apr 2018 08:15:11 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 3/6] bcache: count backing device I/O error for writeback I/O
-Date: Tue, 24 Apr 2018 20:14:43 +0800
-Message-Id: <20180424121446.130552-4-colyli@suse.de>
-In-Reply-To: <20180424121446.130552-1-colyli@suse.de>
-References: <20180424121446.130552-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org
+Subject: [PATCH V2 0/5] nvme: pci: fix & improve timeout handling
+Date: Sun, 29 Apr 2018 23:41:47 +0800
+Message-Id: <20180429154152.16656-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Commit c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev")
-counts backing device I/O requets and set dc->io_disable to true if error
-counters exceeds dc->io_error_limit. But it only counts I/O errors for
-regular I/O request, neglects errors of write back I/Os when backing device
-is offline.
+Hi,
 
-This patch counts the errors of writeback I/Os, in dirty_endio() if
-bio->bi_status is  not 0, it means error happens when writing dirty keys
-to backing device, then bch_count_backing_io_errors() is called.
+The 1st patch introduces blk_quiesce_timeout() and blk_unquiesce_timeout()
+for NVMe, meantime fixes blk_sync_queue().
 
-By this fix, even there is no reqular I/O request coming, if writeback I/O
-errors exceed dc->io_error_limit, the bcache device may still be stopped
-for the broken backing device.
+The 2nd patch covers timeout for admin commands for recovering controller
+for avoiding possible deadlock.
 
-Fixes: c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev")
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/writeback.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+The other 3 patches fixes several races wrt. NVMe timeout handler, and
+finally can make blktests block/011 passed.
 
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 4a9547cdcdc5..ad45ebe1a74b 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -244,8 +244,10 @@ static void dirty_endio(struct bio *bio)
- 	struct keybuf_key *w = bio->bi_private;
- 	struct dirty_io *io = w->private;
- 
--	if (bio->bi_status)
-+	if (bio->bi_status) {
- 		SET_KEY_DIRTY(&w->key, false);
-+		bch_count_backing_io_errors(io->dc, bio);
-+	}
- 
- 	closure_put(&io->cl);
- }
+
+Ming Lei (5):
+  block: introduce blk_quiesce_timeout() and blk_unquiesce_timeout()
+  nvme: pci: cover timeout for admin commands running in EH
+  nvme: pci: only wait freezing if queue is frozen
+  nvme: fix race between freeze queues and unfreeze queues
+  nvme: pci: simplify timeout handling
+
+V2:
+	- fix draining timeout work, so no need to change return value from
+	.timeout()
+	- fix race between nvme_start_freeze() and nvme_unfreeze()
+	- cover timeout for admin commands running in EH
+
+ block/blk-core.c         |  34 +++++++-
+ block/blk-mq.c           |   9 ++
+ block/blk-timeout.c      |   5 +-
+ drivers/nvme/host/core.c |  47 ++++++++--
+ drivers/nvme/host/nvme.h |   6 ++
+ drivers/nvme/host/pci.c  | 222 ++++++++++++++++++++++++++++++++++++++++++-----
+ include/linux/blkdev.h   |   4 +
+ 7 files changed, 296 insertions(+), 31 deletions(-)
+
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+
 -- 
-2.16.2
+2.9.5
