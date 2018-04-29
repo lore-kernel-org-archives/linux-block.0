@@ -1,55 +1,139 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f193.google.com ([209.85.128.193]:45973 "EHLO
-        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754115AbeDPKZt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Apr 2018 06:25:49 -0400
-Received: by mail-wr0-f193.google.com with SMTP id u11so24436852wri.12
-        for <linux-block@vger.kernel.org>; Mon, 16 Apr 2018 03:25:49 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 09/11] lightnvm: pblk: check for chunk size before allocating it
-Date: Mon, 16 Apr 2018 12:25:30 +0200
-Message-Id: <1523874332-6272-10-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1523874332-6272-1-git-send-email-javier@cnexlabs.com>
-References: <1523874332-6272-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org
+Subject: [PATCH V2 2/5] nvme: pci: cover timeout for admin commands running in EH
+Date: Sun, 29 Apr 2018 23:41:49 +0800
+Message-Id: <20180429154152.16656-3-ming.lei@redhat.com>
+In-Reply-To: <20180429154152.16656-1-ming.lei@redhat.com>
+References: <20180429154152.16656-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Do the check for the chunk state after making sure that the chunk type
-is supported.
+When admin commands are used in EH for recovering controller, we have to
+cover their timeout and can't depend on block's timeout since deadlock may
+be caused when these commands are timed-out by block layer again.
 
-Fixes: 32ef9412c114 ("lightnvm: pblk: implement get log report chunk")
-Signed-off-by: Javier González <javier@cnexlabs.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-init.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/nvme/host/pci.c | 77 ++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 66 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index b52855f9336b..9e3a43346d4c 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -751,14 +751,14 @@ static int pblk_setup_line_meta_20(struct pblk *pblk, struct pblk_line *line,
- 		chunk->cnlb = chunk_meta->cnlb;
- 		chunk->wp = chunk_meta->wp;
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index fbc71fac6f1e..0e6cd605164a 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -1733,21 +1733,28 @@ static inline void nvme_release_cmb(struct nvme_dev *dev)
+ 	}
+ }
  
--		if (!(chunk->state & NVM_CHK_ST_OFFLINE))
--			continue;
--
- 		if (chunk->type & NVM_CHK_TP_SZ_SPEC) {
- 			WARN_ONCE(1, "pblk: custom-sized chunks unsupported\n");
- 			continue;
- 		}
- 
-+		if (!(chunk->state & NVM_CHK_ST_OFFLINE))
-+			continue;
+-static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
++static void nvme_init_set_host_mem_cmd(struct nvme_dev *dev,
++		struct nvme_command *c, u32 bits)
+ {
+ 	u64 dma_addr = dev->host_mem_descs_dma;
 +
- 		set_bit(pos, line->blk_bitmap);
- 		nr_bad_chks++;
++	memset(c, 0, sizeof(*c));
++	c->features.opcode	= nvme_admin_set_features;
++	c->features.fid		= cpu_to_le32(NVME_FEAT_HOST_MEM_BUF);
++	c->features.dword11	= cpu_to_le32(bits);
++	c->features.dword12	= cpu_to_le32(dev->host_mem_size >>
++					      ilog2(dev->ctrl.page_size));
++	c->features.dword13	= cpu_to_le32(lower_32_bits(dma_addr));
++	c->features.dword14	= cpu_to_le32(upper_32_bits(dma_addr));
++	c->features.dword15	= cpu_to_le32(dev->nr_host_mem_descs);
++}
++
++static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
++{
+ 	struct nvme_command c;
+ 	int ret;
+ 
+-	memset(&c, 0, sizeof(c));
+-	c.features.opcode	= nvme_admin_set_features;
+-	c.features.fid		= cpu_to_le32(NVME_FEAT_HOST_MEM_BUF);
+-	c.features.dword11	= cpu_to_le32(bits);
+-	c.features.dword12	= cpu_to_le32(dev->host_mem_size >>
+-					      ilog2(dev->ctrl.page_size));
+-	c.features.dword13	= cpu_to_le32(lower_32_bits(dma_addr));
+-	c.features.dword14	= cpu_to_le32(upper_32_bits(dma_addr));
+-	c.features.dword15	= cpu_to_le32(dev->nr_host_mem_descs);
++	nvme_init_set_host_mem_cmd(dev, &c, bits);
+ 
+ 	ret = nvme_submit_sync_cmd(dev->ctrl.admin_q, &c, NULL, 0);
+ 	if (ret) {
+@@ -1758,6 +1765,54 @@ static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
+ 	return ret;
+ }
+ 
++static void nvme_set_host_mem_end_io(struct request *rq, blk_status_t sts)
++{
++	struct completion *waiting = rq->end_io_data;
++
++	rq->end_io_data = NULL;
++
++	/*
++	 * complete last, if this is a stack request the process (and thus
++	 * the rq pointer) could be invalid right after this complete()
++	 */
++	complete(waiting);
++}
++
++/*
++ * This function can be used inside timeout handler, when the block layer
++ * timeout may not work, so this function has to cover the timeout by itself.
++ */
++static int nvme_set_host_mem_timeout(struct nvme_dev *dev, u32 bits)
++{
++	DECLARE_COMPLETION_ONSTACK(wait);
++	struct nvme_command c;
++	struct request_queue *q = dev->ctrl.admin_q;
++	struct request *req;
++	int ret;
++
++	nvme_init_set_host_mem_cmd(dev, &c, bits);
++
++	req = nvme_alloc_request(q, &c, 0, NVME_QID_ANY);
++	if (IS_ERR(req))
++		return PTR_ERR(req);
++
++	req->timeout = ADMIN_TIMEOUT;
++	req->end_io_data = &wait;
++
++	blk_execute_rq_nowait(q, NULL, req, false,
++			nvme_set_host_mem_end_io);
++	wait_for_completion_io_timeout(&wait, ADMIN_TIMEOUT);
++
++	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
++		ret = -EINTR;
++	else
++		ret = nvme_req(req)->status;
++
++	blk_mq_free_request(req);
++
++	return ret;
++}
++
+ static void nvme_free_host_mem(struct nvme_dev *dev)
+ {
+ 	int i;
+@@ -2216,7 +2271,7 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
+ 		 * but I'd rather be safe than sorry..
+ 		 */
+ 		if (dev->host_mem_descs)
+-			nvme_set_host_mem(dev, 0);
++			nvme_set_host_mem_timeout(dev, 0);
+ 		nvme_disable_io_queues(dev);
+ 		nvme_disable_admin_queue(dev, shutdown);
  	}
 -- 
-2.7.4
+2.9.5
