@@ -1,336 +1,370 @@
-Return-Path: <linux-ide-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        iommu@lists.linux-foundation.org
-Cc: x86@kernel.org, linux-block@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-mm@kvack.org,
-        linux-ide@vger.kernel.org, linux-mips@linux-mips.org,
-        sparclinux@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 06/12] dma-mapping: move the NEED_DMA_MAP_STATE config symbol to lib/Kconfig
-Date: Sun, 15 Apr 2018 16:59:41 +0200
-Message-Id: <20180415145947.1248-7-hch@lst.de>
-In-Reply-To: <20180415145947.1248-1-hch@lst.de>
-References: <20180415145947.1248-1-hch@lst.de>
-Sender: linux-ide-owner@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org
+Subject: [PATCH V2 5/5] nvme: pci: simplify timeout handling
+Date: Sun, 29 Apr 2018 23:41:52 +0800
+Message-Id: <20180429154152.16656-6-ming.lei@redhat.com>
+In-Reply-To: <20180429154152.16656-1-ming.lei@redhat.com>
+References: <20180429154152.16656-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This way we have one central definition of it, and user can select it as
-needed.  Note that we now also always select it when CONFIG_DMA_API_DEBUG
-is select, which fixes some incorrect checks in a few network drivers.
+When one req is timed out, now nvme_timeout() handles it by the
+following way:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+	nvme_dev_disable(dev, false);
+	nvme_reset_ctrl(&dev->ctrl);
+	return BLK_EH_HANDLED.
+
+which may introduces the following issues:
+
+1) the following timeout on other reqs may call nvme_dev_disable()
+again, which may quiesce queue again when resetting is in-progress,
+then finally nothing can move on.
+
+2) when timeout is triggered in reset work function, nvme_wait_freeze()
+may wait forever because now controller can't be recovered at all
+
+This patch fixes the issues by:
+
+1) handle timeout event in one EH thread, and wakeup this thread if
+controller recovery is needed
+
+2) Inside the EH handler, timeout work is drained by nvme_unquiesce_timeout()
+before canceling in-flight requrests, so all requests can be canceled or
+completed by either EH or block timeout handler.
+
+3) Moves the draining IO and unfreezing queues into one post_eh work context,
+so controller can be recovered always.
+
+This patch fixes reports from the horible test of block/011.
+
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- arch/alpha/Kconfig          | 4 +---
- arch/arm/Kconfig            | 4 +---
- arch/arm64/Kconfig          | 4 +---
- arch/ia64/Kconfig           | 4 +---
- arch/mips/Kconfig           | 3 ---
- arch/parisc/Kconfig         | 4 +---
- arch/s390/Kconfig           | 4 +---
- arch/sh/Kconfig             | 4 +---
- arch/sparc/Kconfig          | 4 +---
- arch/unicore32/Kconfig      | 4 +---
- arch/x86/Kconfig            | 6 ++----
- drivers/iommu/Kconfig       | 1 +
- include/linux/dma-mapping.h | 2 +-
- lib/Kconfig                 | 3 +++
- lib/Kconfig.debug           | 1 +
- 15 files changed, 17 insertions(+), 35 deletions(-)
+ drivers/nvme/host/core.c |  22 ++++++++
+ drivers/nvme/host/nvme.h |   3 +
+ drivers/nvme/host/pci.c  | 140 +++++++++++++++++++++++++++++++++++++++++++----
+ 3 files changed, 155 insertions(+), 10 deletions(-)
 
-diff --git a/arch/alpha/Kconfig b/arch/alpha/Kconfig
-index 8e6a67ecf069..1fd9645b0c67 100644
---- a/arch/alpha/Kconfig
-+++ b/arch/alpha/Kconfig
-@@ -10,6 +10,7 @@ config ALPHA
- 	select HAVE_OPROFILE
- 	select HAVE_PCSPKR_PLATFORM
- 	select HAVE_PERF_EVENTS
-+	select NEED_DMA_MAP_STATE
- 	select NEED_SG_DMA_LENGTH
- 	select VIRT_TO_BUS
- 	select GENERIC_IRQ_PROBE
-@@ -68,9 +69,6 @@ config ZONE_DMA
- config ARCH_DMA_ADDR_T_64BIT
- 	def_bool y
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index f9028873298e..664a268accd1 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -3582,6 +3582,28 @@ void nvme_start_freeze(struct nvme_ctrl *ctrl)
+ }
+ EXPORT_SYMBOL_GPL(nvme_start_freeze);
  
--config NEED_DMA_MAP_STATE
--       def_bool y
--
- config GENERIC_ISA_DMA
- 	bool
- 	default y
-diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 602c8320282f..aa1c187d756d 100644
---- a/arch/arm/Kconfig
-+++ b/arch/arm/Kconfig
-@@ -96,6 +96,7 @@ config ARM
- 	select HAVE_VIRT_CPU_ACCOUNTING_GEN
- 	select IRQ_FORCED_THREADING
- 	select MODULES_USE_ELF_REL
-+	select NEED_DMA_MAP_STATE
- 	select NO_BOOTMEM
- 	select OF_EARLY_FLATTREE if OF
- 	select OF_RESERVED_MEM if OF
-@@ -221,9 +222,6 @@ config ARCH_MAY_HAVE_PC_FDC
- config ZONE_DMA
- 	bool
- 
--config NEED_DMA_MAP_STATE
--       def_bool y
--
- config ARCH_SUPPORTS_UPROBES
- 	def_bool y
- 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 3b441c5587f1..940adfb9a2bc 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -133,6 +133,7 @@ config ARM64
- 	select IRQ_FORCED_THREADING
- 	select MODULES_USE_ELF_RELA
- 	select MULTI_IRQ_HANDLER
-+	select NEED_DMA_MAP_STATE
- 	select NEED_SG_DMA_LENGTH
- 	select NO_BOOTMEM
- 	select OF
-@@ -241,9 +242,6 @@ config HAVE_GENERIC_GUP
- config ARCH_DMA_ADDR_T_64BIT
- 	def_bool y
- 
--config NEED_DMA_MAP_STATE
--	def_bool y
--
- config SMP
- 	def_bool y
- 
-diff --git a/arch/ia64/Kconfig b/arch/ia64/Kconfig
-index 333917676f7f..0e42731adaf1 100644
---- a/arch/ia64/Kconfig
-+++ b/arch/ia64/Kconfig
-@@ -54,6 +54,7 @@ config IA64
- 	select MODULES_USE_ELF_RELA
- 	select ARCH_USE_CMPXCHG_LOCKREF
- 	select HAVE_ARCH_AUDITSYSCALL
-+	select NEED_DMA_MAP_STATE
- 	select NEED_SG_DMA_LENGTH
- 	default y
- 	help
-@@ -82,9 +83,6 @@ config MMU
- config ARCH_DMA_ADDR_T_64BIT
- 	def_bool y
- 
--config NEED_DMA_MAP_STATE
--	def_bool y
--
- config SWIOTLB
-        bool
- 
-diff --git a/arch/mips/Kconfig b/arch/mips/Kconfig
-index 225c95da23ce..47d72c64d687 100644
---- a/arch/mips/Kconfig
-+++ b/arch/mips/Kconfig
-@@ -1122,9 +1122,6 @@ config DMA_NONCOHERENT
- 	bool
- 	select NEED_DMA_MAP_STATE
- 
--config NEED_DMA_MAP_STATE
--	bool
--
- config SYS_HAS_EARLY_PRINTK
- 	bool
- 
-diff --git a/arch/parisc/Kconfig b/arch/parisc/Kconfig
-index 491912f9b978..47047f0cbe35 100644
---- a/arch/parisc/Kconfig
-+++ b/arch/parisc/Kconfig
-@@ -51,6 +51,7 @@ config PARISC
- 	select GENERIC_CLOCKEVENTS
- 	select ARCH_NO_COHERENT_DMA_MMAP
- 	select CPU_NO_EFFICIENT_FFS
-+	select NEED_DMA_MAP_STATE
- 	select NEED_SG_DMA_LENGTH
- 
- 	help
-@@ -112,9 +113,6 @@ config PM
- config STACKTRACE_SUPPORT
- 	def_bool y
- 
--config NEED_DMA_MAP_STATE
--	def_bool y
--
- config ISA_DMA_API
- 	bool
- 
-diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
-index 4fa47b1445a2..f682dd8d381d 100644
---- a/arch/s390/Kconfig
-+++ b/arch/s390/Kconfig
-@@ -695,6 +695,7 @@ menuconfig PCI
- 	select PCI_MSI
- 	select IOMMU_HELPER
- 	select IOMMU_SUPPORT
-+	select NEED_DMA_MAP_STATE
- 	select NEED_SG_DMA_LENGTH
- 
- 	help
-@@ -720,9 +721,6 @@ config PCI_DOMAINS
- config HAS_IOMEM
- 	def_bool PCI
- 
--config NEED_DMA_MAP_STATE
--	def_bool PCI
--
- config CHSC_SCH
- 	def_tristate m
- 	prompt "Support for CHSC subchannels"
-diff --git a/arch/sh/Kconfig b/arch/sh/Kconfig
-index e127e0cbe30f..9417f70e008e 100644
---- a/arch/sh/Kconfig
-+++ b/arch/sh/Kconfig
-@@ -50,6 +50,7 @@ config SUPERH
- 	select HAVE_ARCH_AUDITSYSCALL
- 	select HAVE_FUTEX_CMPXCHG if FUTEX
- 	select HAVE_NMI
-+	select NEED_DMA_MAP_STATE
- 	select NEED_SG_DMA_LENGTH
- 
- 	help
-@@ -162,9 +163,6 @@ config DMA_COHERENT
- config DMA_NONCOHERENT
- 	def_bool !DMA_COHERENT
- 
--config NEED_DMA_MAP_STATE
--	def_bool DMA_NONCOHERENT
--
- config PGTABLE_LEVELS
- 	default 3 if X2TLB
- 	default 2
-diff --git a/arch/sparc/Kconfig b/arch/sparc/Kconfig
-index e79badc8a682..be770b511ddd 100644
---- a/arch/sparc/Kconfig
-+++ b/arch/sparc/Kconfig
-@@ -44,6 +44,7 @@ config SPARC
- 	select ARCH_HAS_SG_CHAIN
- 	select CPU_NO_EFFICIENT_FFS
- 	select LOCKDEP_SMALL if LOCKDEP
-+	select NEED_DMA_MAP_STATE
- 	select NEED_SG_DMA_LENGTH
- 
- config SPARC32
-@@ -144,9 +145,6 @@ config ZONE_DMA
- 	bool
- 	default y if SPARC32
- 
--config NEED_DMA_MAP_STATE
--	def_bool y
--
- config GENERIC_ISA_DMA
- 	bool
- 	default y if SPARC32
-diff --git a/arch/unicore32/Kconfig b/arch/unicore32/Kconfig
-index 462e59a7ae78..82195714d20b 100644
---- a/arch/unicore32/Kconfig
-+++ b/arch/unicore32/Kconfig
-@@ -19,6 +19,7 @@ config UNICORE32
- 	select ARCH_WANT_FRAME_POINTERS
- 	select GENERIC_IOMAP
- 	select MODULES_USE_ELF_REL
-+	select NEED_DMA_MAP_STATE
- 	help
- 	  UniCore-32 is 32-bit Instruction Set Architecture,
- 	  including a series of low-power-consumption RISC chip
-@@ -61,9 +62,6 @@ config ARCH_MAY_HAVE_PC_FDC
- config ZONE_DMA
- 	def_bool y
- 
--config NEED_DMA_MAP_STATE
--       def_bool y
--
- source "init/Kconfig"
- 
- source "kernel/Kconfig.freezer"
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 491a723bc2b3..414043303ea1 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -28,6 +28,7 @@ config X86_64
- 	select ARCH_USE_CMPXCHG_LOCKREF
- 	select HAVE_ARCH_SOFT_DIRTY
- 	select MODULES_USE_ELF_RELA
-+	select NEED_DMA_MAP_STATE
- 	select X86_DEV_DMA_OPS
- 
- #
-@@ -235,10 +236,6 @@ config ARCH_MMAP_RND_COMPAT_BITS_MAX
- config SBUS
- 	bool
- 
--config NEED_DMA_MAP_STATE
--	def_bool y
--	depends on X86_64 || INTEL_IOMMU || DMA_API_DEBUG || SWIOTLB
--
- config GENERIC_ISA_DMA
- 	def_bool y
- 	depends on ISA_DMA_API
-@@ -921,6 +918,7 @@ config CALGARY_IOMMU_ENABLED_BY_DEFAULT
- # need this always selected by IOMMU for the VIA workaround
- config SWIOTLB
- 	def_bool y if X86_64
-+	select NEED_DMA_MAP_STATE
- 	---help---
- 	  Support for software bounce buffers used on x86-64 systems
- 	  which don't have a hardware IOMMU. Using this PCI devices
-diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
-index df171cb85822..5b714a062fa7 100644
---- a/drivers/iommu/Kconfig
-+++ b/drivers/iommu/Kconfig
-@@ -146,6 +146,7 @@ config INTEL_IOMMU
- 	select DMA_DIRECT_OPS
- 	select IOMMU_API
- 	select IOMMU_IOVA
-+	select NEED_DMA_MAP_STATE
- 	select DMAR_TABLE
- 	help
- 	  DMA remapping (DMAR) devices support enables independent address
-diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
-index f8ab1c0f589e..14269d25498b 100644
---- a/include/linux/dma-mapping.h
-+++ b/include/linux/dma-mapping.h
-@@ -839,7 +839,7 @@ static inline int dma_mmap_wc(struct device *dev,
- #define dma_mmap_writecombine dma_mmap_wc
- #endif
- 
--#if defined(CONFIG_NEED_DMA_MAP_STATE) || defined(CONFIG_DMA_API_DEBUG)
-+#ifdef CONFIG_NEED_DMA_MAP_STATE
- #define DEFINE_DMA_UNMAP_ADDR(ADDR_NAME)        dma_addr_t ADDR_NAME
- #define DEFINE_DMA_UNMAP_LEN(LEN_NAME)          __u32 LEN_NAME
- #define dma_unmap_addr(PTR, ADDR_NAME)           ((PTR)->ADDR_NAME)
-diff --git a/lib/Kconfig b/lib/Kconfig
-index aeb7fae16bc2..ce9fa962d59b 100644
---- a/lib/Kconfig
-+++ b/lib/Kconfig
-@@ -432,6 +432,9 @@ config SGL_ALLOC
- config NEED_SG_DMA_LENGTH
- 	bool
- 
-+config NEED_DMA_MAP_STATE
-+	bool
++void nvme_unquiesce_timeout(struct nvme_ctrl *ctrl)
++{
++	struct nvme_ns *ns;
 +
- config IOMMU_HELPER
- 	bool
++	down_read(&ctrl->namespaces_rwsem);
++	list_for_each_entry(ns, &ctrl->namespaces, list)
++		blk_unquiesce_timeout(ns->queue);
++	up_read(&ctrl->namespaces_rwsem);
++}
++EXPORT_SYMBOL_GPL(nvme_unquiesce_timeout);
++
++void nvme_quiesce_timeout(struct nvme_ctrl *ctrl)
++{
++	struct nvme_ns *ns;
++
++	down_read(&ctrl->namespaces_rwsem);
++	list_for_each_entry(ns, &ctrl->namespaces, list)
++		blk_quiesce_timeout(ns->queue);
++	up_read(&ctrl->namespaces_rwsem);
++}
++EXPORT_SYMBOL_GPL(nvme_quiesce_timeout);
++
+ void nvme_stop_queues(struct nvme_ctrl *ctrl)
+ {
+ 	struct nvme_ns *ns;
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index a19b7f04ac24..956ee19ff403 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -19,6 +19,7 @@
+ #include <linux/pci.h>
+ #include <linux/kref.h>
+ #include <linux/blk-mq.h>
++#include <linux/blkdev.h>
+ #include <linux/lightnvm.h>
+ #include <linux/sed-opal.h>
+ #include <linux/fault-inject.h>
+@@ -405,6 +406,8 @@ int nvme_sec_submit(void *data, u16 spsp, u8 secp, void *buffer, size_t len,
+ void nvme_complete_async_event(struct nvme_ctrl *ctrl, __le16 status,
+ 		union nvme_result *res);
  
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index c40c7b734cd1..685ed2dd4384 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1635,6 +1635,7 @@ config PROVIDE_OHCI1394_DMA_INIT
- config DMA_API_DEBUG
- 	bool "Enable debugging of DMA-API usage"
- 	depends on HAVE_DMA_API_DEBUG
-+	select NEED_DMA_MAP_STATE
- 	help
- 	  Enable this option to debug the use of the DMA API by device drivers.
- 	  With this option you will be able to detect common bugs in device
++void nvme_unquiesce_timeout(struct nvme_ctrl *ctrl);
++void nvme_quiesce_timeout(struct nvme_ctrl *ctrl);
+ void nvme_stop_queues(struct nvme_ctrl *ctrl);
+ void nvme_start_queues(struct nvme_ctrl *ctrl);
+ void nvme_kill_queues(struct nvme_ctrl *ctrl);
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 8172ee584130..86c14d9051ff 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -29,6 +29,7 @@
+ #include <linux/types.h>
+ #include <linux/io-64-nonatomic-lo-hi.h>
+ #include <linux/sed-opal.h>
++#include <linux/kthread.h>
+ 
+ #include "nvme.h"
+ 
+@@ -112,6 +113,11 @@ struct nvme_dev {
+ 	dma_addr_t host_mem_descs_dma;
+ 	struct nvme_host_mem_buf_desc *host_mem_descs;
+ 	void **host_mem_desc_bufs;
++
++	spinlock_t	  eh_lock;
++	bool		eh_in_recovery;
++	struct task_struct    *ehandler;
++	struct work_struct post_eh_work;
+ };
+ 
+ static int io_queue_depth_set(const char *val, const struct kernel_param *kp)
+@@ -1176,6 +1182,100 @@ static void nvme_warn_reset(struct nvme_dev *dev, u32 csts)
+ 			 csts, result);
+ }
+ 
++static void nvme_eh_schedule(struct nvme_dev *dev)
++{
++	spin_lock(&dev->eh_lock);
++	if (!dev->eh_in_recovery) {
++		dev->eh_in_recovery = true;
++		wake_up_process(dev->ehandler);
++	}
++	spin_unlock(&dev->eh_lock);
++}
++
++static void nvme_eh_done(struct nvme_dev *dev)
++{
++	spin_lock(&dev->eh_lock);
++	if (dev->eh_in_recovery)
++		dev->eh_in_recovery = false;
++	spin_unlock(&dev->eh_lock);
++}
++
++static int nvme_error_handler(void *data)
++{
++	struct nvme_dev *dev = data;
++
++	while (true) {
++		/*
++		 * The sequence in kthread_stop() sets the stop flag first
++		 * then wakes the process.  To avoid missed wakeups, the task
++		 * should always be in a non running state before the stop
++		 * flag is checked
++		 */
++		set_current_state(TASK_INTERRUPTIBLE);
++		if (kthread_should_stop())
++			break;
++
++		spin_lock(&dev->eh_lock);
++		if (!dev->eh_in_recovery) {
++			spin_unlock(&dev->eh_lock);
++			schedule();
++			continue;
++		}
++		spin_unlock(&dev->eh_lock);
++
++		__set_current_state(TASK_RUNNING);
++
++		dev_info(dev->ctrl.device, "start eh recovery\n");
++
++		/* freeze queues before recovery */
++		nvme_start_freeze(&dev->ctrl);
++
++		nvme_dev_disable(dev, false);
++
++		/*
++		 * reset won't wait for IO completion any more, so it
++		 * is safe to reset controller in sync way
++		 */
++		nvme_reset_ctrl_sync(&dev->ctrl);
++
++		dev_info(dev->ctrl.device, "eh recovery done\n");
++
++		/*
++		 * drain IO & unfreeze queues in another context because
++		 * these IOs may trigger timeout again
++		 */
++		queue_work(nvme_reset_wq, &dev->post_eh_work);
++	}
++	__set_current_state(TASK_RUNNING);
++	dev->ehandler = NULL;
++
++	return 0;
++}
++
++static void nvme_post_eh_work(struct work_struct *work)
++{
++	struct nvme_dev *dev =
++		container_of(work, struct nvme_dev, post_eh_work);
++
++	nvme_wait_freeze(&dev->ctrl);
++	nvme_unfreeze(&dev->ctrl);
++}
++
++static int nvme_eh_init(struct nvme_dev *dev)
++{
++	spin_lock_init(&dev->eh_lock);
++	INIT_WORK(&dev->post_eh_work, nvme_post_eh_work);
++
++	dev->ehandler = kthread_run(nvme_error_handler, dev,
++			"nvme_eh_%d", dev->ctrl.instance);
++	if (IS_ERR(dev->ehandler)) {
++		dev_err(dev->ctrl.device, "error handler thread failed to spawn, error = %ld\n",
++			PTR_ERR(dev->ehandler));
++		return PTR_ERR(dev->ehandler);
++	}
++	return 0;
++}
++
+ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
+ {
+ 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+@@ -1197,8 +1297,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
+ 	 */
+ 	if (nvme_should_reset(dev, csts)) {
+ 		nvme_warn_reset(dev, csts);
+-		nvme_dev_disable(dev, false);
+-		nvme_reset_ctrl(&dev->ctrl);
++		nvme_eh_schedule(dev);
+ 		return BLK_EH_HANDLED;
+ 	}
+ 
+@@ -1224,8 +1323,8 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
+ 		dev_warn(dev->ctrl.device,
+ 			 "I/O %d QID %d timeout, disable controller\n",
+ 			 req->tag, nvmeq->qid);
+-		nvme_dev_disable(dev, false);
+ 		nvme_req(req)->flags |= NVME_REQ_CANCELLED;
++		nvme_eh_schedule(dev);
+ 		return BLK_EH_HANDLED;
+ 	default:
+ 		break;
+@@ -1240,14 +1339,12 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
+ 		dev_warn(dev->ctrl.device,
+ 			 "I/O %d QID %d timeout, reset controller\n",
+ 			 req->tag, nvmeq->qid);
+-		nvme_dev_disable(dev, false);
+-		nvme_reset_ctrl(&dev->ctrl);
+-
+ 		/*
+ 		 * Mark the request as handled, since the inline shutdown
+ 		 * forces all outstanding requests to complete.
+ 		 */
+ 		nvme_req(req)->flags |= NVME_REQ_CANCELLED;
++		nvme_eh_schedule(dev);
+ 		return BLK_EH_HANDLED;
+ 	}
+ 
+@@ -2246,8 +2343,8 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
+ 	if (pci_is_enabled(pdev)) {
+ 		u32 csts = readl(dev->bar + NVME_REG_CSTS);
+ 
+-		if (dev->ctrl.state == NVME_CTRL_LIVE ||
+-		    dev->ctrl.state == NVME_CTRL_RESETTING) {
++		if (shutdown && (dev->ctrl.state == NVME_CTRL_LIVE ||
++		    dev->ctrl.state == NVME_CTRL_RESETTING)) {
+ 			nvme_start_freeze(&dev->ctrl);
+ 			frozen = true;
+ 		}
+@@ -2281,11 +2378,23 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
+ 	for (i = dev->ctrl.queue_count - 1; i >= 0; i--)
+ 		nvme_suspend_queue(&dev->queues[i]);
+ 
++	/* safe to sync timeout after queues are quiesced */
++	nvme_quiesce_timeout(&dev->ctrl);
++	blk_quiesce_timeout(dev->ctrl.admin_q);
++
+ 	nvme_pci_disable(dev);
+ 
++	/*
++	 * Both timeout and interrupt handler have been drained, and all
++	 * in-flight requests will be canceled now.
++	 */
+ 	blk_mq_tagset_busy_iter(&dev->tagset, nvme_cancel_request, &dev->ctrl);
+ 	blk_mq_tagset_busy_iter(&dev->admin_tagset, nvme_cancel_request, &dev->ctrl);
+ 
++	/* all requests are canceled now, so enable timeout now */
++	nvme_unquiesce_timeout(&dev->ctrl);
++	blk_unquiesce_timeout(dev->ctrl.admin_q);
++
+ 	/*
+ 	 * The driver will not be starting up queues again if shutting down so
+ 	 * must flush all entered requests to their failed completion to avoid
+@@ -2416,9 +2525,14 @@ static void nvme_reset_work(struct work_struct *work)
+ 	if (result)
+ 		goto out;
+ 
++	nvme_eh_done(dev);
++
+ 	/*
+ 	 * Keep the controller around but remove all namespaces if we don't have
+ 	 * any working I/O queue.
++	 *
++	 * Now we won't wait for IO completion here any more, and sync reset
++	 * can be used safely anywhere.
+ 	 */
+ 	if (dev->online_queues < 2) {
+ 		dev_warn(dev->ctrl.device, "IO queues not created\n");
+@@ -2427,11 +2541,9 @@ static void nvme_reset_work(struct work_struct *work)
+ 		new_state = NVME_CTRL_ADMIN_ONLY;
+ 	} else {
+ 		nvme_start_queues(&dev->ctrl);
+-		nvme_wait_freeze(&dev->ctrl);
+ 		/* hit this only when allocate tagset fails */
+ 		if (nvme_dev_add(dev))
+ 			new_state = NVME_CTRL_ADMIN_ONLY;
+-		nvme_unfreeze(&dev->ctrl);
+ 	}
+ 
+ 	/*
+@@ -2449,6 +2561,7 @@ static void nvme_reset_work(struct work_struct *work)
+ 
+  out:
+ 	nvme_remove_dead_ctrl(dev, result);
++	nvme_eh_done(dev);
+ }
+ 
+ static void nvme_remove_dead_ctrl_work(struct work_struct *work)
+@@ -2590,10 +2703,15 @@ static int nvme_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 
+ 	dev_info(dev->ctrl.device, "pci function %s\n", dev_name(&pdev->dev));
+ 
++	if (nvme_eh_init(dev))
++		goto uninit_ctrl;
++
+ 	nvme_reset_ctrl(&dev->ctrl);
+ 
+ 	return 0;
+ 
++ uninit_ctrl:
++	nvme_uninit_ctrl(&dev->ctrl);
+  release_pools:
+ 	nvme_release_prp_pools(dev);
+  unmap:
+@@ -2647,6 +2765,8 @@ static void nvme_remove(struct pci_dev *pdev)
+ 	nvme_stop_ctrl(&dev->ctrl);
+ 	nvme_remove_namespaces(&dev->ctrl);
+ 	nvme_dev_disable(dev, true);
++	if (dev->ehandler)
++		kthread_stop(dev->ehandler);
+ 	nvme_free_host_mem(dev);
+ 	nvme_dev_remove_admin(dev);
+ 	nvme_free_queues(dev, 0);
 -- 
-2.17.0
-
+2.9.5
