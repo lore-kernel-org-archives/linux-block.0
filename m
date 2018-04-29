@@ -1,103 +1,109 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: jglisse@redhat.com
-To: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Kees Cook <keescook@chromium.org>,
-        Joe Lawrence <joe.lawrence@redhat.com>,
-        Willy Tarreau <w@1wt.eu>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Tejun Heo <tj@kernel.org>, Jan Kara <jack@suse.cz>,
-        Josef Bacik <jbacik@fb.com>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Jeff Layton <jlayton@redhat.com>
-Subject: [RFC PATCH 04/79] pipe: add inode field to struct pipe_inode_info
-Date: Wed,  4 Apr 2018 15:17:51 -0400
-Message-Id: <20180404191831.5378-2-jglisse@redhat.com>
-In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
-References: <20180404191831.5378-1-jglisse@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org
+Subject: [PATCH V2 4/5] nvme: fix race between freeze queues and unfreeze queues
+Date: Sun, 29 Apr 2018 23:41:51 +0800
+Message-Id: <20180429154152.16656-5-ming.lei@redhat.com>
+In-Reply-To: <20180429154152.16656-1-ming.lei@redhat.com>
+References: <20180429154152.16656-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jérôme Glisse <jglisse@redhat.com>
+nvme_dev_disable() and resetting controller are required for recovering
+controller, but the two are run from different contexts.
 
-Pipes are associated with a file and thus an inode, store a pointer
-back to the inode in struct pipe_inode_info, this will be use when
-testing pages haven't been truncated.
+nvme_start_freeze() is run from nvme_dev_disable(), and nvme_unfreeze()
+is run from resetting context. Unfortunatley timeout may be triggered
+when draining IO from resetting controller, so nvme_start_freeze() may
+be run several times.
 
-Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
-Cc: Eric Biggers <ebiggers@google.com>
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Joe Lawrence <joe.lawrence@redhat.com>
-Cc: Willy Tarreau <w@1wt.eu>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-fsdevel@vger.kernel.org
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Josef Bacik <jbacik@fb.com>
-Cc: Mel Gorman <mgorman@techsingularity.net>
-Cc: Jeff Layton <jlayton@redhat.com>
+This patch fixes the race between nvme_start_freeze() and
+nvme_unfreeze() by introducing flags of 'queues_freezed' and the lock
+of 'freeze_mutex'.
+
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/pipe.c                 | 2 ++
- fs/splice.c               | 1 +
- include/linux/pipe_fs_i.h | 2 ++
- 3 files changed, 5 insertions(+)
+ drivers/nvme/host/core.c | 29 +++++++++++++++++++++--------
+ drivers/nvme/host/nvme.h |  3 +++
+ 2 files changed, 24 insertions(+), 8 deletions(-)
 
-diff --git a/fs/pipe.c b/fs/pipe.c
-index 7b1954caf388..41e115b0bde7 100644
---- a/fs/pipe.c
-+++ b/fs/pipe.c
-@@ -715,6 +715,7 @@ static struct inode * get_pipe_inode(void)
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 9df4f71e58ca..f9028873298e 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -3447,6 +3447,9 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
+ 	INIT_WORK(&ctrl->fw_act_work, nvme_fw_act_work);
+ 	INIT_WORK(&ctrl->delete_work, nvme_delete_ctrl_work);
  
- 	inode->i_pipe = pipe;
- 	pipe->files = 2;
-+	pipe->inode = inode;
- 	pipe->readers = pipe->writers = 1;
- 	inode->i_fop = &pipefifo_fops;
++	ctrl->queues_freezed = false;
++	mutex_init(&ctrl->freeze_mutex);
++
+ 	ret = ida_simple_get(&nvme_instance_ida, 0, 0, GFP_KERNEL);
+ 	if (ret < 0)
+ 		goto out;
+@@ -3526,10 +3529,15 @@ void nvme_unfreeze(struct nvme_ctrl *ctrl)
+ {
+ 	struct nvme_ns *ns;
  
-@@ -903,6 +904,7 @@ static int fifo_open(struct inode *inode, struct file *filp)
- 		pipe = alloc_pipe_info();
- 		if (!pipe)
- 			return -ENOMEM;
-+		pipe->inode = inode;
- 		pipe->files = 1;
- 		spin_lock(&inode->i_lock);
- 		if (unlikely(inode->i_pipe)) {
-diff --git a/fs/splice.c b/fs/splice.c
-index 39e2dc01ac12..acab52a7fe56 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -927,6 +927,7 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
- 		 * PIPE_READERS appropriately.
- 		 */
- 		pipe->readers = 1;
-+		pipe->inode = file_inode(in);
+-	down_read(&ctrl->namespaces_rwsem);
+-	list_for_each_entry(ns, &ctrl->namespaces, list)
+-		blk_mq_unfreeze_queue(ns->queue);
+-	up_read(&ctrl->namespaces_rwsem);
++	mutex_lock(&ctrl->freeze_mutex);
++	if (ctrl->queues_freezed) {
++		down_read(&ctrl->namespaces_rwsem);
++		list_for_each_entry(ns, &ctrl->namespaces, list)
++			blk_mq_unfreeze_queue(ns->queue);
++		up_read(&ctrl->namespaces_rwsem);
++		ctrl->queues_freezed = false;
++	}
++	mutex_unlock(&ctrl->freeze_mutex);
+ }
+ EXPORT_SYMBOL_GPL(nvme_unfreeze);
  
- 		current->splice_pipe = pipe;
- 	}
-diff --git a/include/linux/pipe_fs_i.h b/include/linux/pipe_fs_i.h
-index 5a3bb3b7c9ad..171aa78ebbf0 100644
---- a/include/linux/pipe_fs_i.h
-+++ b/include/linux/pipe_fs_i.h
-@@ -44,6 +44,7 @@ struct pipe_buffer {
-  *	@fasync_writers: writer side fasync
-  *	@bufs: the circular array of pipe buffers
-  *	@user: the user who created this pipe
-+ *	@inode: inode this pipe is associated to
-  **/
- struct pipe_inode_info {
- 	struct mutex mutex;
-@@ -60,6 +61,7 @@ struct pipe_inode_info {
- 	struct fasync_struct *fasync_writers;
- 	struct pipe_buffer *bufs;
- 	struct user_struct *user;
-+	struct inode *inode;
- };
+@@ -3562,10 +3570,15 @@ void nvme_start_freeze(struct nvme_ctrl *ctrl)
+ {
+ 	struct nvme_ns *ns;
  
- /*
+-	down_read(&ctrl->namespaces_rwsem);
+-	list_for_each_entry(ns, &ctrl->namespaces, list)
+-		blk_freeze_queue_start(ns->queue);
+-	up_read(&ctrl->namespaces_rwsem);
++	mutex_lock(&ctrl->freeze_mutex);
++	if (!ctrl->queues_freezed) {
++		down_read(&ctrl->namespaces_rwsem);
++		list_for_each_entry(ns, &ctrl->namespaces, list)
++			blk_freeze_queue_start(ns->queue);
++		up_read(&ctrl->namespaces_rwsem);
++		ctrl->queues_freezed = true;
++	}
++	mutex_unlock(&ctrl->freeze_mutex);
+ }
+ EXPORT_SYMBOL_GPL(nvme_start_freeze);
+ 
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 061fecfd44f5..a19b7f04ac24 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -149,6 +149,9 @@ struct nvme_ctrl {
+ 	struct work_struct reset_work;
+ 	struct work_struct delete_work;
+ 
++	bool queues_freezed;
++	struct mutex freeze_mutex;
++
+ 	struct nvme_subsystem *subsys;
+ 	struct list_head subsys_entry;
+ 
 -- 
-2.14.3
+2.9.5
