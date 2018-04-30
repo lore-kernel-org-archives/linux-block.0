@@ -1,50 +1,43 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:59701 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751304AbeD3WEG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Apr 2018 18:04:06 -0400
-Date: Mon, 30 Apr 2018 22:04:04 +0000
-From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-To: Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc: "Luis R. Rodriguez" <mcgrof@kernel.org>,
-        "hare@suse.de" <hare@suse.de>,
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Damien Le Moal <Damien.LeMoal@wdc.com>
+To: "Luis R. Rodriguez" <mcgrof@kernel.org>
+CC: "hare@suse.de" <hare@suse.de>,
         "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: [PATCH dm-zoned-tools 2/2] README: fix example script
-Message-ID: <20180430220404.GY27853@wotan.suse.de>
+Date: Mon, 30 Apr 2018 20:36:09 +0000
+Message-ID: <9d60b721-6ca4-62cb-d801-a2fe901f4c72@wdc.com>
 References: <20180430194520.9065-1-mcgrof@kernel.org>
  <20180430194520.9065-2-mcgrof@kernel.org>
- <9d60b721-6ca4-62cb-d801-a2fe901f4c72@wdc.com>
+In-Reply-To: <20180430194520.9065-2-mcgrof@kernel.org>
+Reply-To: Damien Le Moal <Damien.LeMoal@wdc.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <9d60b721-6ca4-62cb-d801-a2fe901f4c72@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Apr 30, 2018 at 08:36:09PM +0000, Damien Le Moal wrote:
-> On 2018/04/30 12:45, Luis R. Rodriguez wrote:
-> > The target type should be "zoned", not "dm-zoned".
-> > 
-> > Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
-> > ---
-> >  README | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > The README does note explain if one should use dmzadm to format a drive
-> > if using dm zone or only if one is to use a filesystem which supports
-> > zones, such as f2fs. Or if we should *always* use dmzadm format regardless
-> > of the circumstance.
-> 
-> dmzadm is only for dm-zoned device mapper. If the file system natively support
-> zoned block devices, it is the FS problem to format the drive accordingly to
-> ZBC/ZAC constraints.
-
-The README could be update to reflect this then, just to be sure. Only now
-that I realize it has the dm prefix did I realize this was an obvious
-requirement :P
-
-> And for these files systems, dm-zoned is useless.
-
-Sure, make sense.
-
-  Luis
+T24gMjAxOC8wNC8zMCAxMjo0NSwgTHVpcyBSLiBSb2RyaWd1ZXogd3JvdGU6DQo+IFRoZSB0YXJn
+ZXQgdHlwZSBzaG91bGQgYmUgInpvbmVkIiwgbm90ICJkbS16b25lZCIuDQo+IA0KPiBTaWduZWQt
+b2ZmLWJ5OiBMdWlzIFIuIFJvZHJpZ3VleiA8bWNncm9mQGtlcm5lbC5vcmc+DQo+IC0tLQ0KPiAg
+UkVBRE1FIHwgMiArLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0
+aW9uKC0pDQo+IA0KPiBUaGUgUkVBRE1FIGRvZXMgbm90ZSBleHBsYWluIGlmIG9uZSBzaG91bGQg
+dXNlIGRtemFkbSB0byBmb3JtYXQgYSBkcml2ZQ0KPiBpZiB1c2luZyBkbSB6b25lIG9yIG9ubHkg
+aWYgb25lIGlzIHRvIHVzZSBhIGZpbGVzeXN0ZW0gd2hpY2ggc3VwcG9ydHMNCj4gem9uZXMsIHN1
+Y2ggYXMgZjJmcy4gT3IgaWYgd2Ugc2hvdWxkICphbHdheXMqIHVzZSBkbXphZG0gZm9ybWF0IHJl
+Z2FyZGxlc3MNCj4gb2YgdGhlIGNpcmN1bXN0YW5jZS4NCg0KZG16YWRtIGlzIG9ubHkgZm9yIGRt
+LXpvbmVkIGRldmljZSBtYXBwZXIuIElmIHRoZSBmaWxlIHN5c3RlbSBuYXRpdmVseSBzdXBwb3J0
+DQp6b25lZCBibG9jayBkZXZpY2VzLCBpdCBpcyB0aGUgRlMgcHJvYmxlbSB0byBmb3JtYXQgdGhl
+IGRyaXZlIGFjY29yZGluZ2x5IHRvDQpaQkMvWkFDIGNvbnN0cmFpbnRzLiBBbmQgZm9yIHRoZXNl
+IGZpbGVzIHN5c3RlbXMsIGRtLXpvbmVkIGlzIHVzZWxlc3MuDQoNCj4gQ291bGQgdGhpcyBiZSBj
+bGFyZmllZD8gV2hhdCBhcmUgdGhlIGRvd25zaWRlcyB0byBub3QgdXNpbmcgZG16YWRtDQo+IGZv
+cm1hdCBvbiBhIGRyaXZlIGFuZCBzYXkgYSB1c2VyIGp1c3QgZ29pbmcgc3RyYWlnaHQgdG8gdXNl
+IHRoZSBkbSB6b25lDQo+IGFuZCB0aGVuIG1rZnMgb24gdG9wIG9mIGl0Pw0KDQpPSy4gSSB3aWxs
+IGxvb2sgaW50byBpdCBhbmQgY2xhcmlmeS4NCg0KPiANCj4gZGlmZiAtLWdpdCBhL1JFQURNRSBi
+L1JFQURNRQ0KPiBpbmRleCA3NzYyNjk0Li45YWVhMjhlIDEwMDY0NA0KPiAtLS0gYS9SRUFETUUN
+Cj4gKysrIGIvUkVBRE1FDQo+IEBAIC0xODQsNyArMTg0LDcgQEAgb3B0aW9ucz0iJEAiDQo+ICAN
+Cj4gIG1vZHByb2JlIGRtLXpvbmVkDQo+ICANCj4gLWVjaG8gIjAgYGJsb2NrZGV2IC0tZ2V0c2l6
+ZSAke2Rldn1gIGRtLXpvbmVkICR7ZGV2fSAke29wdGlvbnN9IiB8IFwNCj4gK2VjaG8gIjAgYGJs
+b2NrZGV2IC0tZ2V0c2l6ZSAke2Rldn1gIHpvbmVkICR7ZGV2fSAke29wdGlvbnN9IiB8IFwNCj4g
+IGRtc2V0dXAgY3JlYXRlIHpvbmVkLWBiYXNlbmFtZSAke2Rldn1gDQo+ICBdXQ0KDQpZZXMsIGlu
+ZGVlZC4uLg0KDQpSZXZpZXdlZC1ieTogRGFtaWVuIExlIE1vYWwgPGRhbWllbi5sZW1vYWxAd2Rj
+LmNvbT4NCg0KLS0gDQpEYW1pZW4gTGUgTW9hbA0KV2VzdGVybiBEaWdpdGFsIFJlc2VhcmNo
