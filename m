@@ -1,7 +1,6 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <sandeen@sandeen.net>
 Subject: Re: [PATCH 2/2] xfs: add 'discard_sync' mount flag
-To: Eric Sandeen <sandeen@sandeen.net>, "Luis R. Rodriguez"
- <mcgrof@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>, "Luis R. Rodriguez" <mcgrof@kernel.org>
 Cc: Brian Foster <bfoster@redhat.com>, linux-xfs@vger.kernel.org,
  linux-block@vger.kernel.org, hch@lst.de
 References: <1525102372-8430-1-git-send-email-axboe@kernel.dk>
@@ -11,76 +10,66 @@ References: <1525102372-8430-1-git-send-email-axboe@kernel.dk>
  <20180430182525.GE27875@wotan.suse.de>
  <4cb68c8e-bf6c-b717-73f0-20e850582004@sandeen.net>
  <210ebc4e-780a-1cf2-92e0-2482b98704a2@kernel.dk>
- <c149cd30-97ba-cd86-de8d-efb83825521a@sandeen.net>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <6f4137ac-d7c2-2727-d1da-649df30f3682@kernel.dk>
-Date: Mon, 30 Apr 2018 13:58:51 -0600
+From: Eric Sandeen <sandeen@sandeen.net>
+Message-ID: <c149cd30-97ba-cd86-de8d-efb83825521a@sandeen.net>
+Date: Mon, 30 Apr 2018 14:57:24 -0500
 MIME-Version: 1.0
-In-Reply-To: <c149cd30-97ba-cd86-de8d-efb83825521a@sandeen.net>
+In-Reply-To: <210ebc4e-780a-1cf2-92e0-2482b98704a2@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 4/30/18 1:57 PM, Eric Sandeen wrote:
-> 
-> 
-> On 4/30/18 2:21 PM, Jens Axboe wrote:
->> On 4/30/18 1:19 PM, Eric Sandeen wrote:
->>>
->>>
->>> On 4/30/18 1:25 PM, Luis R. Rodriguez wrote:
->>>> On Mon, Apr 30, 2018 at 12:07:31PM -0600, Jens Axboe wrote:
->>>>> On 4/30/18 11:19 AM, Brian Foster wrote:
->>>>>> On Mon, Apr 30, 2018 at 09:32:52AM -0600, Jens Axboe wrote:
->>>>>>> XFS recently added support for async discards. While this can be
->>>>>>> a win for some workloads and devices, there are also cases where
->>>>>>> async bursty discard will severly harm the latencies of reads
->>>>>>> and writes.
->>>>>>>
->>>>>>> Add a 'discard_sync' mount flag to revert to using sync discard,
->>>>>>> issuing them one at the time and waiting for each one. This fixes
->>>>>>> a big performance regression we had moving to kernels that include
->>>>>>> the XFS async discard support.
->>>>>>>
->>>>>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->>>>>>> ---
->>>>>>
->>>>>> Hm, I figured the async discard stuff would have been a pretty clear win
->>>>>> all around, but then again I'm not terribly familiar with what happens
->>>>>> with discards beneath the fs. I do know that the previous behavior would
->>>>>> cause fs level latencies due to holding up log I/O completion while
->>>>>> discards completed one at a time. My understanding is that this lead to
->>>>>> online discard being pretty much universally "not recommended" in favor
->>>>>> of fstrim.
->>>>>
->>>>> It's not a secret that most devices suck at discard.
->>>>
->>>> How can we know if a device sucks at discard?
->>>
->>> I was going to ask the same thing.  ;)  "Meh, punt to the admin!"
->>>
->>> I'm having deja vu but can't remember why.  Seems like this has come up
->>> before and we thought it should be a block device tunable, not pushed down
->>> from the filesystem.  Is that possible?
+
+
+On 4/30/18 2:21 PM, Jens Axboe wrote:
+> On 4/30/18 1:19 PM, Eric Sandeen wrote:
 >>
->> The problem is that it'll depend on the workload as well. The device in
->> may laptop is fine with discard for my workload, which is very light.
->> But if you are running RocksDB on it, and doing heavy compactions and
->> deletes, it probably would not be.
+>>
+>> On 4/30/18 1:25 PM, Luis R. Rodriguez wrote:
+>>> On Mon, Apr 30, 2018 at 12:07:31PM -0600, Jens Axboe wrote:
+>>>> On 4/30/18 11:19 AM, Brian Foster wrote:
+>>>>> On Mon, Apr 30, 2018 at 09:32:52AM -0600, Jens Axboe wrote:
+>>>>>> XFS recently added support for async discards. While this can be
+>>>>>> a win for some workloads and devices, there are also cases where
+>>>>>> async bursty discard will severly harm the latencies of reads
+>>>>>> and writes.
+>>>>>>
+>>>>>> Add a 'discard_sync' mount flag to revert to using sync discard,
+>>>>>> issuing them one at the time and waiting for each one. This fixes
+>>>>>> a big performance regression we had moving to kernels that include
+>>>>>> the XFS async discard support.
+>>>>>>
+>>>>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>>>>>> ---
+>>>>>
+>>>>> Hm, I figured the async discard stuff would have been a pretty clear win
+>>>>> all around, but then again I'm not terribly familiar with what happens
+>>>>> with discards beneath the fs. I do know that the previous behavior would
+>>>>> cause fs level latencies due to holding up log I/O completion while
+>>>>> discards completed one at a time. My understanding is that this lead to
+>>>>> online discard being pretty much universally "not recommended" in favor
+>>>>> of fstrim.
+>>>>
+>>>> It's not a secret that most devices suck at discard.
+>>>
+>>> How can we know if a device sucks at discard?
+>>
+>> I was going to ask the same thing.  ;)  "Meh, punt to the admin!"
+>>
+>> I'm having deja vu but can't remember why.  Seems like this has come up
+>> before and we thought it should be a block device tunable, not pushed down
+>> from the filesystem.  Is that possible?
 > 
-> Ok, but I'm not sure how that precludes a block device tunable?  You'd tune
-> it for your workload, right?
+> The problem is that it'll depend on the workload as well. The device in
+> may laptop is fine with discard for my workload, which is very light.
+> But if you are running RocksDB on it, and doing heavy compactions and
+> deletes, it probably would not be.
 
-What kind of tunable are you thinking of? Right now we have one tunable,
-which is the max discard size. Patch #1 actually helps make this do what
-it should for sync discards, instead of just building a bio chain and
-submitting that all at once.
+Ok, but I'm not sure how that precludes a block device tunable?  You'd tune
+it for your workload, right?
 
-> Or is the concern that it could only be for the entire block device, and
-> perhaps different partitions have different workloads?
-> 
-> Sorry, caveman filesystem guy doesn't completely understand block devices.
+Or is the concern that it could only be for the entire block device, and
+perhaps different partitions have different workloads?
 
-I just don't know what you are trying to tune :-)
+Sorry, caveman filesystem guy doesn't completely understand block devices.
 
--- 
-Jens Axboe
+-Eric
