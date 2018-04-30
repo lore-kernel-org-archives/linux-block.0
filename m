@@ -1,61 +1,50 @@
-Return-Path: <m.tretter@pengutronix.de>
-Date: Fri, 13 Apr 2018 16:25:18 +0200
-From: Michael Tretter <m.tretter@pengutronix.de>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
- kernel@pengutronix.de
-Subject: Re: [PATCH] nbd: do not update block size if file system is mounted
-Message-ID: <20180413162518.47840e6f@litschi.hi.pengutronix.de>
-In-Reply-To: <6c862ddf-b352-6ef4-06f8-516680e9f19f@kernel.dk>
-References: <20180228095456.31472-1-m.tretter@pengutronix.de>
-	<20180315110057.13eecda6@litschi.hi.pengutronix.de>
-	<6c862ddf-b352-6ef4-06f8-516680e9f19f@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:59701 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751304AbeD3WEG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Apr 2018 18:04:06 -0400
+Date: Mon, 30 Apr 2018 22:04:04 +0000
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+To: Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc: "Luis R. Rodriguez" <mcgrof@kernel.org>,
+        "hare@suse.de" <hare@suse.de>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH dm-zoned-tools 2/2] README: fix example script
+Message-ID: <20180430220404.GY27853@wotan.suse.de>
+References: <20180430194520.9065-1-mcgrof@kernel.org>
+ <20180430194520.9065-2-mcgrof@kernel.org>
+ <9d60b721-6ca4-62cb-d801-a2fe901f4c72@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <9d60b721-6ca4-62cb-d801-a2fe901f4c72@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Fri, 16 Mar 2018 09:36:45 -0700, Jens Axboe wrote:
-> On 3/15/18 3:00 AM, Michael Tretter wrote:
-> > On Wed, 28 Feb 2018 10:54:56 +0100, Michael Tretter wrote:  
-> >> If a file system is mounted on the nbd during a disconnect, resetting
-> >> the size to 0, might change the block size and destroy the buffer_head
-> >> mappings. This will cause a infinite loop when the file system looks for
-> >> the buffer_heads for flushing.
-> >>
-> >> Only set the file size to 0, if we are the only opener of the nbd.
-> >>
-> >> Signed-off-by: Michael Tretter <m.tretter@pengutronix.de>
-> >> ---
-> >>  drivers/block/nbd.c | 3 ++-
-> >>  1 file changed, 2 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> >> index 5f2a4240a204..0d1dbb60430b 100644
-> >> --- a/drivers/block/nbd.c
-> >> +++ b/drivers/block/nbd.c
-> >> @@ -1118,7 +1118,8 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
-> >>  	if (ret)
-> >>  		sock_shutdown(nbd);
-> >>  	mutex_lock(&nbd->config_lock);
-> >> -	bd_set_size(bdev, 0);
-> >> +	if (bdev->bd_openers <= 1)
-> >> +		bd_set_size(bdev, 0);
-> >>  	/* user requested, ignore socket errors */
-> >>  	if (test_bit(NBD_DISCONNECT_REQUESTED, &config->runtime_flags))
-> >>  		ret = 0;  
+On Mon, Apr 30, 2018 at 08:36:09PM +0000, Damien Le Moal wrote:
+> On 2018/04/30 12:45, Luis R. Rodriguez wrote:
+> > The target type should be "zoned", not "dm-zoned".
 > > 
-> > Are there any comments on this patch?  
+> > Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
+> > ---
+> >  README | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > The README does note explain if one should use dmzadm to format a drive
+> > if using dm zone or only if one is to use a filesystem which supports
+> > zones, such as f2fs. Or if we should *always* use dmzadm format regardless
+> > of the circumstance.
 > 
-> Josef?
-> 
+> dmzadm is only for dm-zoned device mapper. If the file system natively support
+> zoned block devices, it is the FS problem to format the drive accordingly to
+> ZBC/ZAC constraints.
 
-Maybe some history helps for reviewing the patch:
+The README could be update to reflect this then, just to be sure. Only now
+that I realize it has the dm prefix did I realize this was an obvious
+requirement :P
 
-Commit abbbdf12497d ("nbd: replace kill_bdev() with
-__invalidate_device()") already fixed this issue once by changing
-nbd_size_clear() to only set the size to 0 if the device is only opened
-once. The line was moved several times during the rework for the
-netlink interface and the check for the number of openers was dropped,
-reintroducing the issue.
+> And for these files systems, dm-zoned is useless.
 
-Michael
+Sure, make sense.
+
+  Luis
