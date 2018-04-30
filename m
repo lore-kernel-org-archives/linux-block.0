@@ -1,46 +1,57 @@
-Return-Path: <zhangbenlong@didichuxing.com>
-Date: Fri, 20 Apr 2018 18:06:01 +0800
-From: Benlong Zhang <zhangbenlong@didichuxing.com>
-To: <axboe@kernel.dk>
-CC: <tj@kernel.org>, <shli@kernel.org>, <david@fromorbit.com>,
-	<bfoster@redhat.com>, <linux-block@vger.kernel.org>
-Subject: [PATCH] A tentative patch to bypass REQ_META in blk throttle
-Message-ID: <20180420100554.GA23471@localhost>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:45434 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751589AbeD3GYq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Apr 2018 02:24:46 -0400
+Subject: Re: [PATCH 0/6] bcache fixes for device failure handling
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+References: <20180424121446.130552-1-colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+Message-ID: <c2ec71c1-cd34-56c2-f1a5-814b6a91f8e9@suse.de>
+Date: Mon, 30 Apr 2018 14:24:37 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Return-Path: zhangbenlong@didichuxing.com
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20180424121446.130552-1-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-One problem with cgwb is how fs should treat metadata bios.
-For example in xfs, the log might be partially stuck in one
-group, leaving threads in other groups waiting for too long.
-Please refer to the linux-xfs discussion:
-"[PATCH V2] xfs: implement cgroup writeback support"
+On 2018/4/24 8:14 PM, Coly Li wrote:
+> Hi folks,
+> 
+> I receive bug reports from partners for the bcache cache device failure
+> handling patch set (which is just merged into 4.17). Fortunately we are
+> still in 4.17 merge window, so I ask helps for offering code review
+> before I ask Jens to pick these fixes for 4.17-rc3.
+> 
+> The patches are well commneted IMHO and passes regression test by myself.
+> Thanks for your help in advance.
 
-One approach is to correctly tag bio->bi_css from within the
-filesystems (for xfs log should be blkcg_root), and the other
-is to skip them, but relies on REQ_META being set.
+Hi folks,
 
-It works with xfs on a cgwb porting implementation to 3.10.0.
-But really not sure about other filesystems...
----
- block/blk-throttle.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Can anybody help to offer Reivew-by: to these fixes ? Now it is already
+4.17-rc3, we need these fixes go into 4.17 kernel with the patches to be
+fixed. Even Acked-by: is helpful.
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index c5a1316..e2abf6e 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2159,6 +2159,10 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 	if (bio_flagged(bio, BIO_THROTTLED) || !tg->has_rules[rw])
- 		goto out;
- 
-+	/* bypass REQ_META for fs global resource */
-+	if (bio->bi_opf & REQ_META)
-+		goto out;
-+
- 	spin_lock_irq(q->queue_lock);
- 
- 	throtl_update_latency_buckets(td);
--- 
-1.8.3.1
+Thanks in advance.
+
+Coly Li
+
+> ---
+> Coly Li (6):
+>   bcache: store disk name in struct cache and struct cached_dev
+>   bcache: set CACHE_SET_IO_DISABLE in bch_cached_dev_error()
+>   bcache: count backing device I/O error for writeback I/O
+>   bcache: add wait_for_kthread_stop() in bch_allocator_thread()
+>   bcache: set dc->io_disable to true in conditional_stop_bcache_device()
+>   bcache: use pr_info() to inform duplicated CACHE_SET_IO_DISABLE set
+> 
+>  drivers/md/bcache/alloc.c     |  1 +
+>  drivers/md/bcache/bcache.h    |  4 +++
+>  drivers/md/bcache/debug.c     |  3 +-
+>  drivers/md/bcache/io.c        |  8 ++---
+>  drivers/md/bcache/request.c   |  5 +--
+>  drivers/md/bcache/super.c     | 73 ++++++++++++++++++++++++++++++-------------
+>  drivers/md/bcache/writeback.c |  4 ++-
+>  7 files changed, 64 insertions(+), 34 deletions(-)
+> 
