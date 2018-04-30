@@ -1,30 +1,52 @@
-Return-Path: <prvs=645297662=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "pmenzel+linux-block@molgen.mpg.de" <pmenzel+linux-block@molgen.mpg.de>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
-CC: "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-	"regressions@leemhuis.info" <regressions@leemhuis.info>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
-Subject: Re: Regression 4.17-rc1: SSD doesn properly resume causing system
- hang (NULL pointer dereference)
-Date: Tue, 24 Apr 2018 17:31:40 +0000
-Message-ID: <14ff1ed06e36a372680872c227b5abe389c753da.camel@wdc.com>
-References: <59ca6556-11a6-4f77-76e7-d51c7175eb32@molgen.mpg.de>
-	 <67ffdf0050a04bf3615c3d8a3a90b0c9c2aeb1ad.camel@wdc.com>
-	 <2cc5f0fb-4caa-9c28-7daa-68993d5cb41a@molgen.mpg.de>
-In-Reply-To: <2cc5f0fb-4caa-9c28-7daa-68993d5cb41a@molgen.mpg.de>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:37279 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753563AbeD3JKW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Apr 2018 05:10:22 -0400
+Received: by mail-wm0-f66.google.com with SMTP id l1so13088847wmb.2
+        for <linux-block@vger.kernel.org>; Mon, 30 Apr 2018 02:10:21 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 05/11] lightnvm: pblk: warn in case of corrupted write buffer
+Date: Mon, 30 Apr 2018 11:10:03 +0200
+Message-Id: <1525079409-6588-6-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1525079409-6588-1-git-send-email-javier@cnexlabs.com>
+References: <1525079409-6588-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-T24gVHVlLCAyMDE4LTA0LTI0IGF0IDE5OjEwICswMjAwLCBQYXVsIE1lbnplbCB3cm90ZToNCj4g
-UGxlYXNlIGZpbmQgdGhlIGNvbmZpZ3VyYXRpb24gZmlsZSBhdHRhY2hlZC4gVGhlIGxvZyBvbmx5
-IGhhcyANCj4gYGluaXRjYWxsX2RlYnVnIG5vX2NvbnNvbGVfc3VzcGVuZGAgYWRkZWQuDQoNCldo
-YXQgSSB3YXMgbG9va2luZyBmb3IgaW4gdGhlIC5jb25maWcgaXMgdGhlIGZvbGxvd2luZzoNCkNP
-TkZJR19TQ1NJX01RX0RFRkFVTFQ9eQ0KDQpDYW4geW91IGFsc28gcHJvdmlkZSB0aGUgZGlzYXNz
-ZW1ibHkgb3V0cHV0IGZvciBibGtfc2V0X3J1bnRpbWVfYWN0aXZlLA0KZS5nLiBieSBsb2FkaW5n
-IHZtbGludXggaW50byBnZGIgYW5kIGJ5IHJ1bm5pbmcgdGhlIGNvbW1hbmQgImRpc2FzDQpibGtf
-c2V0X3J1bnRpbWVfYWN0aXZlIj8NCg0KVGhhbmtzLA0KDQpCYXJ0Lg0KDQoNCg0K
+When cleaning up buffer entries as we wrap up, their state should be
+"completed". If any of the entries is in "submitted" state, it means
+that something bad has happened. Trigger a warning immediately instead of
+waiting for the state flag to eventually be updated, thus hiding the
+issue.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
+---
+ drivers/lightnvm/pblk-rb.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+index 7a632913475f..024a366a995c 100644
+--- a/drivers/lightnvm/pblk-rb.c
++++ b/drivers/lightnvm/pblk-rb.c
+@@ -142,10 +142,9 @@ static void clean_wctx(struct pblk_w_ctx *w_ctx)
+ {
+ 	int flags;
+ 
+-try:
+ 	flags = READ_ONCE(w_ctx->flags);
+-	if (!(flags & PBLK_SUBMITTED_ENTRY))
+-		goto try;
++	WARN_ONCE(!(flags & PBLK_SUBMITTED_ENTRY),
++			"pblk: overwriting unsubmitted data\n");
+ 
+ 	/* Release flags on context. Protect from writes and reads */
+ 	smp_store_release(&w_ctx->flags, PBLK_WRITABLE_ENTRY);
+-- 
+2.7.4
