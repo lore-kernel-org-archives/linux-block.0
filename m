@@ -1,20 +1,20 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f195.google.com ([209.85.128.195]:36622 "EHLO
-        mail-wr0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754253AbeDPKZv (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:38272 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751027AbeD3JK1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Apr 2018 06:25:51 -0400
-Received: by mail-wr0-f195.google.com with SMTP id q13so21010642wre.3
-        for <linux-block@vger.kernel.org>; Mon, 16 Apr 2018 03:25:50 -0700 (PDT)
+        Mon, 30 Apr 2018 05:10:27 -0400
+Received: by mail-wm0-f67.google.com with SMTP id i3so13015408wmf.3
+        for <linux-block@vger.kernel.org>; Mon, 30 Apr 2018 02:10:26 -0700 (PDT)
 From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
 To: mb@lightnvm.io
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
 Subject: [PATCH 11/11] lightnvm: pblk: remove dead function
-Date: Mon, 16 Apr 2018 12:25:32 +0200
-Message-Id: <1523874332-6272-12-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1523874332-6272-1-git-send-email-javier@cnexlabs.com>
-References: <1523874332-6272-1-git-send-email-javier@cnexlabs.com>
+Date: Mon, 30 Apr 2018 11:10:09 +0200
+Message-Id: <1525079409-6588-12-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1525079409-6588-1-git-send-email-javier@cnexlabs.com>
+References: <1525079409-6588-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
