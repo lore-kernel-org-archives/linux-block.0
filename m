@@ -1,30 +1,86 @@
-Return-Path: <lsf-pc-bounces@lists.linux-foundation.org>
-Date: Thu, 19 Apr 2018 13:34:32 -0700
-From: Matthew Wilcox <willy@infradead.org>
-To: lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Message-ID: <20180419203432.GC14024@bombadil.infradead.org>
+Return-Path: <david@fromorbit.com>
+Date: Tue, 1 May 2018 09:23:20 +1000
+From: Dave Chinner <david@fromorbit.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-xfs@vger.kernel.org, linux-block@vger.kernel.org, hch@lst.de
+Subject: Re: [PATCH 2/2] xfs: add 'discard_sync' mount flag
+Message-ID: <20180430232319.GV23861@dastard>
+References: <1525102372-8430-1-git-send-email-axboe@kernel.dk>
+ <1525102372-8430-3-git-send-email-axboe@kernel.dk>
+ <20180430213120.GD13766@dastard>
+ <c6e9db38-51d3-ae13-58cb-2b815ddd5891@kernel.dk>
+ <20180430222852.GF13766@dastard>
+ <87589bc6-e5f5-6247-485f-2237e0c493ad@kernel.dk>
+ <799de885-34f0-0cae-ae64-bf7bc194965d@kernel.dk>
 MIME-Version: 1.0
-Subject: [Lsf-pc] [LSF/MM] Ride sharing
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/lsf-pc>,
-	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=unsubscribe>
-List-Archive: <https://lists.linuxfoundation.org/mailman/private/lsf-pc/>
-List-Post: <mailto:lsf-pc@lists.linux-foundation.org>
-List-Help: <mailto:lsf-pc-request@lists.linux-foundation.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/lsf-pc>,
-	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: lsf-pc-bounces@lists.linux-foundation.org
-Errors-To: lsf-pc-bounces@lists.linux-foundation.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <799de885-34f0-0cae-ae64-bf7bc194965d@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-I hate renting unnecessary cars, and the various transportation companies
-offer a better deal if multiple people book at once.
+On Mon, Apr 30, 2018 at 05:00:14PM -0600, Jens Axboe wrote:
+> On 4/30/18 4:40 PM, Jens Axboe wrote:
+> > On 4/30/18 4:28 PM, Dave Chinner wrote:
+> >> Yes, it does, but so would having the block layer to throttle device
+> >> discard requests in flight to a queue depth of 1. And then we don't
+> >> have to change XFS at all.
+> > 
+> > I'm perfectly fine with making that change by default, and much easier
+> > for me since I don't have to patch file systems.
+> 
+> Totally untested, but this should do the trick. It ensures we have
+> a QD of 1 (per caller), which should be sufficient.
+> 
+> If people tune down the discard size, then you'll be blocking waiting
+> for discards on issue.
+> 
+> diff --git a/block/blk-lib.c b/block/blk-lib.c
+> index a676084d4740..0bf9befcc863 100644
+> --- a/block/blk-lib.c
+> +++ b/block/blk-lib.c
+> @@ -11,16 +11,19 @@
+>  #include "blk.h"
+>  
+>  static struct bio *next_bio(struct bio *bio, unsigned int nr_pages,
+> -		gfp_t gfp)
+> +			    gfp_t gfp)
+>  {
+> -	struct bio *new = bio_alloc(gfp, nr_pages);
+> -
+> +	/*
+> +	 * Devices suck at discard, so if we have to break up the bio
+> +	 * size due to the max discard size setting, wait for the
+> +	 * previous one to finish first.
+> +	 */
+>  	if (bio) {
+> -		bio_chain(bio, new);
+> -		submit_bio(bio);
+> +		submit_bio_wait(bio);
+> +		bio_put(bio);
+>  	}
 
-I'm scheduled to arrive on Sunday at 3:18pm local time if anyone wants to
-share transport.  Does anyone have a wiki we can use to coordinate this?
+This only addresses the case where __blkdev_issue_discard() breaks
+up a single large discard, right? It seems like a brute force
+solution, too, because it will do so even when the underlying device
+is idle and there's no need to throttle.
 
-_______________________________________________
-Lsf-pc mailing list
-Lsf-pc@lists.linux-foundation.org
-https://lists.linuxfoundation.org/mailman/listinfo/lsf-pc
+Shouldn't the throttling logic at least look at device congestion?
+i.e. if the device is not backlogged, then we should be able to
+issue the discard without problems. 
+
+I ask this because this only addresses throttling the "discard large
+extent" case when the discard limit is set low. i.e. your exact
+problem case. We know that XFS can issue large numbers of
+discontiguous async discards in a single batch - this patch does not
+address that case and so it will still cause starvation problems.
+
+If we look at device congestion in determining how to throttle/back
+off during discard issuing, then it doesn't matter what
+max_discard_sectors is set to - it will throttle in all situations
+that cause device overloads and starvations....
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
