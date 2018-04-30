@@ -1,76 +1,47 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <sandeen@sandeen.net>
 Subject: Re: [PATCH 2/2] xfs: add 'discard_sync' mount flag
-From: Jens Axboe <axboe@kernel.dk>
-To: Dave Chinner <david@fromorbit.com>
-Cc: linux-xfs@vger.kernel.org, linux-block@vger.kernel.org, hch@lst.de
+To: Jens Axboe <axboe@kernel.dk>, "Luis R. Rodriguez" <mcgrof@kernel.org>
+Cc: Brian Foster <bfoster@redhat.com>, linux-xfs@vger.kernel.org,
+ linux-block@vger.kernel.org, hch@lst.de
 References: <1525102372-8430-1-git-send-email-axboe@kernel.dk>
  <1525102372-8430-3-git-send-email-axboe@kernel.dk>
- <20180430213120.GD13766@dastard>
- <c6e9db38-51d3-ae13-58cb-2b815ddd5891@kernel.dk>
- <20180430222852.GF13766@dastard>
- <87589bc6-e5f5-6247-485f-2237e0c493ad@kernel.dk>
-Message-ID: <799de885-34f0-0cae-ae64-bf7bc194965d@kernel.dk>
-Date: Mon, 30 Apr 2018 17:00:14 -0600
+ <20180430171945.GB22176@bfoster.bfoster>
+ <24df628d-c861-6f39-96a8-d759902d1fe3@kernel.dk>
+ <20180430182525.GE27875@wotan.suse.de>
+ <4cb68c8e-bf6c-b717-73f0-20e850582004@sandeen.net>
+ <210ebc4e-780a-1cf2-92e0-2482b98704a2@kernel.dk>
+ <c149cd30-97ba-cd86-de8d-efb83825521a@sandeen.net>
+ <6f4137ac-d7c2-2727-d1da-649df30f3682@kernel.dk>
+From: Eric Sandeen <sandeen@sandeen.net>
+Message-ID: <5d5d6d6a-f312-a2ad-8718-97a2f334ec7f@sandeen.net>
+Date: Mon, 30 Apr 2018 17:59:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <87589bc6-e5f5-6247-485f-2237e0c493ad@kernel.dk>
+In-Reply-To: <6f4137ac-d7c2-2727-d1da-649df30f3682@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 4/30/18 4:40 PM, Jens Axboe wrote:
-> On 4/30/18 4:28 PM, Dave Chinner wrote:
->> Yes, it does, but so would having the block layer to throttle device
->> discard requests in flight to a queue depth of 1. And then we don't
->> have to change XFS at all.
+On 4/30/18 2:58 PM, Jens Axboe wrote:
+> On 4/30/18 1:57 PM, Eric Sandeen wrote:
+>> On 4/30/18 2:21 PM, Jens Axboe wrote:
+
+...
+
+>> Ok, but I'm not sure how that precludes a block device tunable?  You'd tune
+>> it for your workload, right?
 > 
-> I'm perfectly fine with making that change by default, and much easier
-> for me since I don't have to patch file systems.
+> What kind of tunable are you thinking of? Right now we have one tunable,
+> which is the max discard size. Patch #1 actually helps make this do what
+> it should for sync discards, instead of just building a bio chain and
+> submitting that all at once.
+> 
+>> Or is the concern that it could only be for the entire block device, and
+>> perhaps different partitions have different workloads?
+>>
+>> Sorry, caveman filesystem guy doesn't completely understand block devices.
+> 
+> I just don't know what you are trying to tune :-)
 
-Totally untested, but this should do the trick. It ensures we have
-a QD of 1 (per caller), which should be sufficient.
+I'm wondering if "make discards synchronous" couldn't just be a block device
+tunable, rather than a filesystem mount option tunable.
 
-If people tune down the discard size, then you'll be blocking waiting
-for discards on issue.
-
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index a676084d4740..0bf9befcc863 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -11,16 +11,19 @@
- #include "blk.h"
- 
- static struct bio *next_bio(struct bio *bio, unsigned int nr_pages,
--		gfp_t gfp)
-+			    gfp_t gfp)
- {
--	struct bio *new = bio_alloc(gfp, nr_pages);
--
-+	/*
-+	 * Devices suck at discard, so if we have to break up the bio
-+	 * size due to the max discard size setting, wait for the
-+	 * previous one to finish first.
-+	 */
- 	if (bio) {
--		bio_chain(bio, new);
--		submit_bio(bio);
-+		submit_bio_wait(bio);
-+		bio_put(bio);
- 	}
- 
--	return new;
-+	return bio_alloc(gfp, nr_pages);
- }
- 
- int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
-@@ -63,7 +66,8 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 		sector_t end_sect, tmp;
- 
- 		/* Make sure bi_size doesn't overflow */
--		req_sects = min_t(sector_t, nr_sects, UINT_MAX >> 9);
-+		req_sects = min_t(sector_t, nr_sects,
-+					q->limits.max_discard_sectors);
- 
- 		/**
- 		 * If splitting a request, and the next starting sector would be
-
--- 
-Jens Axboe
+-Eric
