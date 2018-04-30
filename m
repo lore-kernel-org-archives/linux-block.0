@@ -1,114 +1,129 @@
-Return-Path: <BATV+d9901c46b23ecc19815a+5342+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: Bart.VanAssche@wdc.com,
-	willy@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: [PATCH 4/7] block: pass explicit gfp_t to get_request
-Date: Mon,  9 Apr 2018 17:39:13 +0200
-Message-Id: <20180409153916.23901-5-hch@lst.de>
-In-Reply-To: <20180409153916.23901-1-hch@lst.de>
-References: <20180409153916.23901-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:34328 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753672AbeD3JKV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Apr 2018 05:10:21 -0400
+Received: by mail-wm0-f65.google.com with SMTP id a137so9303423wme.1
+        for <linux-block@vger.kernel.org>; Mon, 30 Apr 2018 02:10:20 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 04/11] lightnvn: pblk: improve error msg on corrupted LBAs
+Date: Mon, 30 Apr 2018 11:10:02 +0200
+Message-Id: <1525079409-6588-5-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1525079409-6588-1-git-send-email-javier@cnexlabs.com>
+References: <1525079409-6588-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-blk_old_get_request already has it at hand, and in blk_queue_bio, which
-is the fast path, it is constant.
+In the event of a mismatch between the read LBA and the metadata pointer
+reported by the device, improve the error message to be able to detect
+the offending physical address (PPA) mapped to the corrupted LBA.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- block/blk-core.c          | 14 +++++++-------
- drivers/scsi/scsi_error.c |  4 ----
- 2 files changed, 7 insertions(+), 11 deletions(-)
+ drivers/lightnvm/pblk-read.c | 42 ++++++++++++++++++++++++++++++++----------
+ 1 file changed, 32 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 9002b4b34930..16ff472233ba 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1333,6 +1333,7 @@ int blk_update_nr_requests(struct request_queue *q, unsigned int nr)
-  * @op: operation and flags
-  * @bio: bio to allocate request for (can be %NULL)
-  * @flags: BLQ_MQ_REQ_* flags
-+ * @gfp_mask: allocator flags
-  *
-  * Get a free request from @q.  This function may fail under memory
-  * pressure or if @q is dead.
-@@ -1342,7 +1343,7 @@ int blk_update_nr_requests(struct request_queue *q, unsigned int nr)
-  * Returns request pointer on success, with @q->queue_lock *not held*.
-  */
- static struct request *__get_request(struct request_list *rl, unsigned int op,
--				     struct bio *bio, blk_mq_req_flags_t flags)
-+		struct bio *bio, blk_mq_req_flags_t flags, gfp_t gfp_mask)
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index 1f699c09e0ea..b201fc486adb 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -113,10 +113,11 @@ static int pblk_submit_read_io(struct pblk *pblk, struct nvm_rq *rqd)
+ 	return NVM_IO_OK;
+ }
+ 
+-static void pblk_read_check_seq(struct pblk *pblk, void *meta_list,
+-				sector_t blba, int nr_lbas)
++static void pblk_read_check_seq(struct pblk *pblk, struct nvm_rq *rqd,
++				sector_t blba)
  {
- 	struct request_queue *q = rl->q;
- 	struct request *rq;
-@@ -1351,8 +1352,6 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
- 	struct io_cq *icq = NULL;
- 	const bool is_sync = op_is_sync(op);
- 	int may_queue;
--	gfp_t gfp_mask = flags & BLK_MQ_REQ_NOWAIT ? GFP_ATOMIC :
--			 __GFP_DIRECT_RECLAIM;
- 	req_flags_t rq_flags = RQF_ALLOCED;
+-	struct pblk_sec_meta *meta_lba_list = meta_list;
++	struct pblk_sec_meta *meta_lba_list = rqd->meta_list;
++	int nr_lbas = rqd->nr_ppas;
+ 	int i;
  
- 	lockdep_assert_held(q->queue_lock);
-@@ -1516,6 +1515,7 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
-  * @op: operation and flags
-  * @bio: bio to allocate request for (can be %NULL)
-  * @flags: BLK_MQ_REQ_* flags.
-+ * @gfp: allocator flags
-  *
-  * Get a free request from @q.  If %BLK_MQ_REQ_NOWAIT is set in @flags,
-  * this function keeps retrying under memory pressure and fails iff @q is dead.
-@@ -1525,7 +1525,7 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
-  * Returns request pointer on success, with @q->queue_lock *not held*.
+ 	for (i = 0; i < nr_lbas; i++) {
+@@ -125,17 +126,27 @@ static void pblk_read_check_seq(struct pblk *pblk, void *meta_list,
+ 		if (lba == ADDR_EMPTY)
+ 			continue;
+ 
+-		WARN(lba != blba + i, "pblk: corrupted read LBA\n");
++		if (lba != blba + i) {
++#ifdef CONFIG_NVM_DEBUG
++			struct ppa_addr *p;
++
++			p = (nr_lbas == 1) ? &rqd->ppa_list[i] : &rqd->ppa_addr;
++			print_ppa(&pblk->dev->geo, p, "seq", i);
++#endif
++			pr_err("pblk: corrupted read LBA (%llu/%llu)\n",
++							lba, (u64)blba + i);
++			WARN_ON(1);
++		}
+ 	}
+ }
+ 
+ /*
+  * There can be holes in the lba list.
   */
- static struct request *get_request(struct request_queue *q, unsigned int op,
--				   struct bio *bio, blk_mq_req_flags_t flags)
-+		struct bio *bio, blk_mq_req_flags_t flags, gfp_t gfp)
+-static void pblk_read_check_rand(struct pblk *pblk, void *meta_list,
+-				u64 *lba_list, int nr_lbas)
++static void pblk_read_check_rand(struct pblk *pblk, struct nvm_rq *rqd,
++				 u64 *lba_list, int nr_lbas)
  {
- 	const bool is_sync = op_is_sync(op);
- 	DEFINE_WAIT(wait);
-@@ -1537,7 +1537,7 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
+-	struct pblk_sec_meta *meta_lba_list = meta_list;
++	struct pblk_sec_meta *meta_lba_list = rqd->meta_list;
+ 	int i, j;
  
- 	rl = blk_get_rl(q, bio);	/* transferred to @rq on success */
- retry:
--	rq = __get_request(rl, op, bio, flags);
-+	rq = __get_request(rl, op, bio, flags, gfp);
- 	if (!IS_ERR(rq))
- 		return rq;
+ 	for (i = 0, j = 0; i < nr_lbas; i++) {
+@@ -145,14 +156,25 @@ static void pblk_read_check_rand(struct pblk *pblk, void *meta_list,
+ 		if (lba == ADDR_EMPTY)
+ 			continue;
  
-@@ -1591,7 +1591,7 @@ static struct request *blk_old_get_request(struct request_queue *q,
- 	if (ret)
- 		return ERR_PTR(ret);
- 	spin_lock_irq(q->queue_lock);
--	rq = get_request(q, op, NULL, flags);
-+	rq = get_request(q, op, NULL, flags, gfp_mask);
- 	if (IS_ERR(rq)) {
- 		spin_unlock_irq(q->queue_lock);
- 		blk_queue_exit(q);
-@@ -2057,7 +2057,7 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- 	 * Returns with the queue unlocked.
- 	 */
- 	blk_queue_enter_live(q);
--	req = get_request(q, bio->bi_opf, bio, 0);
-+	req = get_request(q, bio->bi_opf, bio, 0, __GFP_DIRECT_RECLAIM);
- 	if (IS_ERR(req)) {
- 		blk_queue_exit(q);
- 		__wbt_done(q->rq_wb, wb_acct);
-diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-index 61d280f560df..b36e73090018 100644
---- a/drivers/scsi/scsi_error.c
-+++ b/drivers/scsi/scsi_error.c
-@@ -1933,10 +1933,6 @@ static void scsi_eh_lock_door(struct scsi_device *sdev)
- 	struct request *req;
- 	struct scsi_request *rq;
+-		meta_lba = le64_to_cpu(meta_lba_list[j++].lba);
++		meta_lba = le64_to_cpu(meta_lba_list[j].lba);
  
--	/*
--	 * blk_get_request with GFP_KERNEL (__GFP_RECLAIM) sleeps until a
--	 * request becomes available
--	 */
- 	req = blk_get_request(sdev->request_queue, REQ_OP_SCSI_IN, 0);
- 	if (IS_ERR(req))
- 		return;
+ 		if (lba != meta_lba) {
++#ifdef CONFIG_NVM_DEBUG
++			struct ppa_addr *p;
++			int nr_ppas = rqd->nr_ppas;
++
++			p = (nr_ppas == 1) ? &rqd->ppa_list[j] : &rqd->ppa_addr;
++			print_ppa(&pblk->dev->geo, p, "seq", j);
++#endif
+ 			pr_err("pblk: corrupted read LBA (%llu/%llu)\n",
+ 								lba, meta_lba);
+ 			WARN_ON(1);
+ 		}
++
++		j++;
+ 	}
++
++	WARN_ONCE(j != rqd->nr_ppas, "pblk: corrupted random request\n");
+ }
+ 
+ static void pblk_read_put_rqd_kref(struct pblk *pblk, struct nvm_rq *rqd)
+@@ -197,7 +219,7 @@ static void __pblk_end_io_read(struct pblk *pblk, struct nvm_rq *rqd,
+ 		WARN_ONCE(bio->bi_status, "pblk: corrupted read error\n");
+ #endif
+ 
+-	pblk_read_check_seq(pblk, rqd->meta_list, r_ctx->lba, rqd->nr_ppas);
++	pblk_read_check_seq(pblk, rqd, r_ctx->lba);
+ 
+ 	bio_put(bio);
+ 	if (r_ctx->private)
+@@ -610,7 +632,7 @@ int pblk_submit_read_gc(struct pblk *pblk, struct pblk_gc_rq *gc_rq)
+ 		goto err_free_bio;
+ 	}
+ 
+-	pblk_read_check_rand(pblk, rqd.meta_list, gc_rq->lba_list, rqd.nr_ppas);
++	pblk_read_check_rand(pblk, &rqd, gc_rq->lba_list, gc_rq->nr_secs);
+ 
+ 	atomic_dec(&pblk->inflight_io);
+ 
 -- 
-2.16.3
+2.7.4
