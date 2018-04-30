@@ -1,55 +1,100 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:47246 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752778AbeDTX7M (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Apr 2018 19:59:12 -0400
-From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-To: viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org
-Cc: jack@suse.cz, bart.vanassche@wdc.com, ming.lei@redhat.com,
-        rjw@rjwysocki.net, mguzik@redhat.com, linux-pm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Luis R. Rodriguez" <mcgrof@kernel.org>
-Subject: [PATCH 3/3] fs: fix corner case race on freeze_bdev() when sb disappears
-Date: Fri, 20 Apr 2018 16:59:04 -0700
-Message-Id: <20180420235904.27496-4-mcgrof@kernel.org>
-In-Reply-To: <20180420235904.27496-1-mcgrof@kernel.org>
-References: <20180420235904.27496-1-mcgrof@kernel.org>
+Received: from mail-by2nam01on0067.outbound.protection.outlook.com ([104.47.34.67]:6807
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752701AbeD3JLh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Apr 2018 05:11:37 -0400
+From: Javier Gonzalez <javier@cnexlabs.com>
+To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
+CC: Hans Holmberg <hans.ml.holmberg@owltronix.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>
+Subject: Re: [PATCH v2 0/3] Rework write error handling in pblk
+Date: Mon, 30 Apr 2018 09:11:30 +0000
+Message-ID: <33E16356-2CFE-43D2-9298-98CF9D598A51@cnexlabs.com>
+References: <1524548732-4326-1-git-send-email-hans.ml.holmberg@owltronix.com>
+ <7536f5dc-bc11-ae4b-b11e-9c3995142cd0@lightnvm.io>
+In-Reply-To: <7536f5dc-bc11-ae4b-b11e-9c3995142cd0@lightnvm.io>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_E13FE755-3BFF-4A76-9927-26DB353A0D87";
+        protocol="application/pgp-signature"; micalg=pgp-sha512
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-freeze_bdev() will bail but leave the bd_fsfreeze_count incremented
-if the get_active_super() does not find the superblock on our
-super_blocks list to match.
+--Apple-Mail=_E13FE755-3BFF-4A76-9927-26DB353A0D87
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-This issue has been present since v2.6.29 during the introduction of the
-ioctl_fsfreeze() and ioctl_fsthaw() via commit fcccf502540e3 ("filesystem
-freeze: implement generic freeze feature").
+> On 28 Apr 2018, at 21.31, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
+>=20
+> On 4/23/18 10:45 PM, Hans Holmberg wrote:
+>> From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+>> This patch series fixes the(currently incomplete) write error =
+handling
+>> in pblk by:
+>>  * queuing and re-submitting failed writes in the write buffer
+>>  * evacuating valid data data in lines with write failures, so the
+>>    chunk(s) with write failures can be reset to a known state by the =
+fw
+>> Lines with failures in smeta are put back on the free list.
+>> Failed chunks will be reset on the next use.
+>> If a write failes in emeta, the lba list is cached so the line can be
+>> garbage collected without scanning the out-of-band area.
+>> Changes in V2:
+>> - Added the recov_writes counter increase to the new path
+>> - Moved lba list emeta reading during gc to a separate function
+>> - Allocating the saved lba list with pblk_malloc instead of kmalloc
+>> - Fixed formatting issues
+>> - Removed dead code
+>> Hans Holmberg (3):
+>>   lightnvm: pblk: rework write error recovery path
+>>   lightnvm: pblk: garbage collect lines with failed writes
+>>   lightnvm: pblk: fix smeta write error path
+>>  drivers/lightnvm/pblk-core.c     |  52 +++++++-
+>>  drivers/lightnvm/pblk-gc.c       | 102 +++++++++------
+>>  drivers/lightnvm/pblk-init.c     |  47 ++++---
+>>  drivers/lightnvm/pblk-rb.c       |  39 ------
+>>  drivers/lightnvm/pblk-recovery.c |  91 -------------
+>>  drivers/lightnvm/pblk-rl.c       |  29 ++++-
+>>  drivers/lightnvm/pblk-sysfs.c    |  15 ++-
+>>  drivers/lightnvm/pblk-write.c    | 269 =
+++++++++++++++++++++++++++-------------
+>>  drivers/lightnvm/pblk.h          |  36 ++++--
+>>  9 files changed, 384 insertions(+), 296 deletions(-)
+>=20
+> Thanks Hans. I've applied 1 & 3. The second did not apply cleanly to =
+for-4.18/core. Could you please resend a rebased version?
 
-I am not aware of any existing races which have triggered this
-situation, however, if it does trigger it could mean leaving a
-superblock with bd_fsfreeze_count always positive.
+Hans' patches apply on top of the fixes I sent this week. I have just
+sent the V2 and the patches still apply. You can find them at:
+  https://github.com/OpenChannelSSD/linux/tree/for-4.18/pblk
 
-Fixes: fcccf502540e3 ("filesystem freeze: implement generic freeze feature")
-Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
----
- fs/block_dev.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Javier
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index b54966679833..7a532aa58c07 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -507,8 +507,10 @@ struct super_block *freeze_bdev(struct block_device *bdev)
- 	}
- 
- 	sb = get_active_super(bdev);
--	if (!sb)
-+	if (!sb) {
-+		bdev->bd_fsfreeze_count--;
- 		goto out;
-+	}
- 	if (sb->s_op->freeze_super)
- 		error = sb->s_op->freeze_super(sb);
- 	else
--- 
-2.16.3
+--Apple-Mail=_E13FE755-3BFF-4A76-9927-26DB353A0D87
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="signature.asc"
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAlrm3cAACgkQIX4xUKFR
+nnQ2FA/9E9J9apS2axTcK9V8tnhqPoUUlEnXrRoBjZaI4W7DTev0zTr03x0Eu6Sr
+XM4XEo1VnqQsR6FFb5EFZuXA0UPHMUXJjS9rfn2OzULVuv6lz6Ckb35NnpgUKX+M
+Jegmybh/bEaU32d2iUMDZgVnatH208WDVH0KxBPoILYn+WziBj+SANaeEtb9qxXW
+5bRtBkLgzUcwn33IS0uFiYboV0pvzmCAW3LO36cFfEOeAHrMqH8Zc1twym7ckSDv
+jwJ1yNef9168reLPRY5tAakZ64EhgXeLSDkF3OF7vZNqFWH2ZYsocgLyfMXCvPRu
+Tdo08FGesc8ruyGn0+6YAQnU23rNTGmYoQWSMAMTf6hjPjIGiL94exSs8KMcU56S
+6dXNSuNspXcKwmC6ruOugKHepNE8Uz8dTuBiV8m+OI7rW5JbcHVoy9lWG++rDgNp
+b9mX8bEdiyiEvj/XnAQi9p7URNCmqZwjJ/Tur+HxGrfVQVargNQ6g+iUcl6dEc/l
+u891tUIp9aJcoWrjTaAB5F1qEkXIhPrCcIrvXFwcKrDHnTsUIEiDiLDZvjDaISe+
+bUt3fzsxBPQz3S3Y43pAP3cD0Jw8b74jvDvAtd69Mll5dmIBbTd8pgrjrhaPcW79
+vZmgphbxdUkCunGwqrWVmHNtkHSrPnGfjCFcO1N7bp5jJO6Zm+w=
+=6bPW
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_E13FE755-3BFF-4A76-9927-26DB353A0D87--
