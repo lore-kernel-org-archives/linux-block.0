@@ -1,43 +1,49 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Damien Le Moal <Damien.LeMoal@wdc.com>
-To: "Luis R. Rodriguez" <mcgrof@kernel.org>
-CC: "hare@suse.de" <hare@suse.de>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH dm-zoned-tools 2/2] README: fix example script
-Date: Mon, 30 Apr 2018 20:36:09 +0000
-Message-ID: <9d60b721-6ca4-62cb-d801-a2fe901f4c72@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:42894 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1756365AbeD3TpY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Apr 2018 15:45:24 -0400
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+To: damien.lemoal@wdc.com
+Cc: hare@suse.de, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        "Luis R. Rodriguez" <mcgrof@kernel.org>
+Subject: [PATCH dm-zoned-tools 2/2] README: fix example script
+Date: Mon, 30 Apr 2018 12:45:20 -0700
+Message-Id: <20180430194520.9065-2-mcgrof@kernel.org>
+In-Reply-To: <20180430194520.9065-1-mcgrof@kernel.org>
 References: <20180430194520.9065-1-mcgrof@kernel.org>
- <20180430194520.9065-2-mcgrof@kernel.org>
-In-Reply-To: <20180430194520.9065-2-mcgrof@kernel.org>
-Reply-To: Damien Le Moal <Damien.LeMoal@wdc.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-T24gMjAxOC8wNC8zMCAxMjo0NSwgTHVpcyBSLiBSb2RyaWd1ZXogd3JvdGU6DQo+IFRoZSB0YXJn
-ZXQgdHlwZSBzaG91bGQgYmUgInpvbmVkIiwgbm90ICJkbS16b25lZCIuDQo+IA0KPiBTaWduZWQt
-b2ZmLWJ5OiBMdWlzIFIuIFJvZHJpZ3VleiA8bWNncm9mQGtlcm5lbC5vcmc+DQo+IC0tLQ0KPiAg
-UkVBRE1FIHwgMiArLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0
-aW9uKC0pDQo+IA0KPiBUaGUgUkVBRE1FIGRvZXMgbm90ZSBleHBsYWluIGlmIG9uZSBzaG91bGQg
-dXNlIGRtemFkbSB0byBmb3JtYXQgYSBkcml2ZQ0KPiBpZiB1c2luZyBkbSB6b25lIG9yIG9ubHkg
-aWYgb25lIGlzIHRvIHVzZSBhIGZpbGVzeXN0ZW0gd2hpY2ggc3VwcG9ydHMNCj4gem9uZXMsIHN1
-Y2ggYXMgZjJmcy4gT3IgaWYgd2Ugc2hvdWxkICphbHdheXMqIHVzZSBkbXphZG0gZm9ybWF0IHJl
-Z2FyZGxlc3MNCj4gb2YgdGhlIGNpcmN1bXN0YW5jZS4NCg0KZG16YWRtIGlzIG9ubHkgZm9yIGRt
-LXpvbmVkIGRldmljZSBtYXBwZXIuIElmIHRoZSBmaWxlIHN5c3RlbSBuYXRpdmVseSBzdXBwb3J0
-DQp6b25lZCBibG9jayBkZXZpY2VzLCBpdCBpcyB0aGUgRlMgcHJvYmxlbSB0byBmb3JtYXQgdGhl
-IGRyaXZlIGFjY29yZGluZ2x5IHRvDQpaQkMvWkFDIGNvbnN0cmFpbnRzLiBBbmQgZm9yIHRoZXNl
-IGZpbGVzIHN5c3RlbXMsIGRtLXpvbmVkIGlzIHVzZWxlc3MuDQoNCj4gQ291bGQgdGhpcyBiZSBj
-bGFyZmllZD8gV2hhdCBhcmUgdGhlIGRvd25zaWRlcyB0byBub3QgdXNpbmcgZG16YWRtDQo+IGZv
-cm1hdCBvbiBhIGRyaXZlIGFuZCBzYXkgYSB1c2VyIGp1c3QgZ29pbmcgc3RyYWlnaHQgdG8gdXNl
-IHRoZSBkbSB6b25lDQo+IGFuZCB0aGVuIG1rZnMgb24gdG9wIG9mIGl0Pw0KDQpPSy4gSSB3aWxs
-IGxvb2sgaW50byBpdCBhbmQgY2xhcmlmeS4NCg0KPiANCj4gZGlmZiAtLWdpdCBhL1JFQURNRSBi
-L1JFQURNRQ0KPiBpbmRleCA3NzYyNjk0Li45YWVhMjhlIDEwMDY0NA0KPiAtLS0gYS9SRUFETUUN
-Cj4gKysrIGIvUkVBRE1FDQo+IEBAIC0xODQsNyArMTg0LDcgQEAgb3B0aW9ucz0iJEAiDQo+ICAN
-Cj4gIG1vZHByb2JlIGRtLXpvbmVkDQo+ICANCj4gLWVjaG8gIjAgYGJsb2NrZGV2IC0tZ2V0c2l6
-ZSAke2Rldn1gIGRtLXpvbmVkICR7ZGV2fSAke29wdGlvbnN9IiB8IFwNCj4gK2VjaG8gIjAgYGJs
-b2NrZGV2IC0tZ2V0c2l6ZSAke2Rldn1gIHpvbmVkICR7ZGV2fSAke29wdGlvbnN9IiB8IFwNCj4g
-IGRtc2V0dXAgY3JlYXRlIHpvbmVkLWBiYXNlbmFtZSAke2Rldn1gDQo+ICBdXQ0KDQpZZXMsIGlu
-ZGVlZC4uLg0KDQpSZXZpZXdlZC1ieTogRGFtaWVuIExlIE1vYWwgPGRhbWllbi5sZW1vYWxAd2Rj
-LmNvbT4NCg0KLS0gDQpEYW1pZW4gTGUgTW9hbA0KV2VzdGVybiBEaWdpdGFsIFJlc2VhcmNo
+The target type should be "zoned", not "dm-zoned".
+
+Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
+---
+ README | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+The README does note explain if one should use dmzadm to format a drive
+if using dm zone or only if one is to use a filesystem which supports
+zones, such as f2fs. Or if we should *always* use dmzadm format regardless
+of the circumstance.
+
+Could this be clarfied? What are the downsides to not using dmzadm
+format on a drive and say a user just going straight to use the dm zone
+and then mkfs on top of it?
+
+diff --git a/README b/README
+index 7762694..9aea28e 100644
+--- a/README
++++ b/README
+@@ -184,7 +184,7 @@ options="$@"
+ 
+ modprobe dm-zoned
+ 
+-echo "0 `blockdev --getsize ${dev}` dm-zoned ${dev} ${options}" | \
++echo "0 `blockdev --getsize ${dev}` zoned ${dev} ${options}" | \
+ dmsetup create zoned-`basename ${dev}`
+ ]]
+ 
+-- 
+2.17.0
