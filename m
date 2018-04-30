@@ -1,61 +1,141 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:40838 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753154AbeDPKZs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Apr 2018 06:25:48 -0400
-Received: by mail-wr0-f196.google.com with SMTP id v60so20539999wrc.7
-        for <linux-block@vger.kernel.org>; Mon, 16 Apr 2018 03:25:47 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 07/11] lightnvm: pblk: remove unnecessary indirection
-Date: Mon, 16 Apr 2018 12:25:28 +0200
-Message-Id: <1523874332-6272-8-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1523874332-6272-1-git-send-email-javier@cnexlabs.com>
-References: <1523874332-6272-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <marmarek@invisiblethingslab.com>
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
+To: xen-devel@lists.xenproject.org
+Cc: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>,
+	stable@vger.kernel.org,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Juergen Gross <jgross@suse.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org (open list:BLOCK LAYER),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH 5/6] xen-blkfront: make local copy of response before using it
+Date: Mon, 30 Apr 2018 23:01:49 +0200
+Message-Id: <4af6663fbb4b4a97e5c89096033064627367982d.1525122026.git-series.marmarek@invisiblethingslab.com>
+In-Reply-To: <cover.7ee732ab822b728ec486a3118ec12e9c06f0f325.1525122026.git-series.marmarek@invisiblethingslab.com>
+References: <cover.7ee732ab822b728ec486a3118ec12e9c06f0f325.1525122026.git-series.marmarek@invisiblethingslab.com>
 MIME-Version: 1.0
+In-Reply-To: <cover.7ee732ab822b728ec486a3118ec12e9c06f0f325.1525122026.git-series.marmarek@invisiblethingslab.com>
+References: <cover.7ee732ab822b728ec486a3118ec12e9c06f0f325.1525122026.git-series.marmarek@invisiblethingslab.com>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Remove unnecessary indirection on the read path.
+Data on the shared page can be changed at any time by the backend. Make
+a local copy, which is no longer controlled by the backend. And only
+then access it.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+This is complementary to XSA155.
+
+CC: stable@vger.kernel.org
+Signed-off-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
 ---
- drivers/lightnvm/pblk-read.c | 12 +-----------
- 1 file changed, 1 insertion(+), 11 deletions(-)
+ drivers/block/xen-blkfront.c | 34 +++++++++++++++++-----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index 89aed634333a..2f8224354c62 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -102,16 +102,6 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
- #endif
- }
+diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+index 2a8e781..3926811 100644
+--- a/drivers/block/xen-blkfront.c
++++ b/drivers/block/xen-blkfront.c
+@@ -1549,7 +1549,7 @@ static bool blkif_completion(unsigned long *id,
+ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
+ {
+ 	struct request *req;
+-	struct blkif_response *bret;
++	struct blkif_response bret;
+ 	RING_IDX i, rp;
+ 	unsigned long flags;
+ 	struct blkfront_ring_info *rinfo = (struct blkfront_ring_info *)dev_id;
+@@ -1566,8 +1566,8 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
+ 	for (i = rinfo->ring.rsp_cons; i != rp; i++) {
+ 		unsigned long id;
  
--static int pblk_submit_read_io(struct pblk *pblk, struct nvm_rq *rqd)
--{
--	int err;
--
--	err = pblk_submit_io(pblk, rqd);
--	if (err)
--		return NVM_IO_ERR;
--
--	return NVM_IO_OK;
--}
+-		bret = RING_GET_RESPONSE(&rinfo->ring, i);
+-		id   = bret->id;
++		RING_COPY_RESPONSE(&rinfo->ring, i, &bret);
++		id   = bret.id;
+ 		/*
+ 		 * The backend has messed up and given us an id that we would
+ 		 * never have given to it (we stamp it up to BLK_RING_SIZE -
+@@ -1575,39 +1575,39 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
+ 		 */
+ 		if (id >= BLK_RING_SIZE(info)) {
+ 			WARN(1, "%s: response to %s has incorrect id (%ld)\n",
+-			     info->gd->disk_name, op_name(bret->operation), id);
++			     info->gd->disk_name, op_name(bret.operation), id);
+ 			/* We can't safely get the 'struct request' as
+ 			 * the id is busted. */
+ 			continue;
+ 		}
+ 		req  = rinfo->shadow[id].request;
  
- static void pblk_read_check_seq(struct pblk *pblk, struct nvm_rq *rqd,
- 				sector_t blba)
-@@ -485,7 +475,7 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
- 		rqd->bio = int_bio;
- 		r_ctx->private = bio;
+-		if (bret->operation != BLKIF_OP_DISCARD) {
++		if (bret.operation != BLKIF_OP_DISCARD) {
+ 			/*
+ 			 * We may need to wait for an extra response if the
+ 			 * I/O request is split in 2
+ 			 */
+-			if (!blkif_completion(&id, rinfo, bret))
++			if (!blkif_completion(&id, rinfo, &bret))
+ 				continue;
+ 		}
  
--		ret = pblk_submit_read_io(pblk, rqd);
-+		ret = pblk_submit_io(pblk, rqd);
- 		if (ret) {
- 			pr_err("pblk: read IO submission failed\n");
- 			if (int_bio)
+ 		if (add_id_to_freelist(rinfo, id)) {
+ 			WARN(1, "%s: response to %s (id %ld) couldn't be recycled!\n",
+-			     info->gd->disk_name, op_name(bret->operation), id);
++			     info->gd->disk_name, op_name(bret.operation), id);
+ 			continue;
+ 		}
+ 
+-		if (bret->status == BLKIF_RSP_OKAY)
++		if (bret.status == BLKIF_RSP_OKAY)
+ 			blkif_req(req)->error = BLK_STS_OK;
+ 		else
+ 			blkif_req(req)->error = BLK_STS_IOERR;
+ 
+-		switch (bret->operation) {
++		switch (bret.operation) {
+ 		case BLKIF_OP_DISCARD:
+-			if (unlikely(bret->status == BLKIF_RSP_EOPNOTSUPP)) {
++			if (unlikely(bret.status == BLKIF_RSP_EOPNOTSUPP)) {
+ 				struct request_queue *rq = info->rq;
+ 				printk(KERN_WARNING "blkfront: %s: %s op failed\n",
+-					   info->gd->disk_name, op_name(bret->operation));
++					   info->gd->disk_name, op_name(bret.operation));
+ 				blkif_req(req)->error = BLK_STS_NOTSUPP;
+ 				info->feature_discard = 0;
+ 				info->feature_secdiscard = 0;
+@@ -1617,15 +1617,15 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
+ 			break;
+ 		case BLKIF_OP_FLUSH_DISKCACHE:
+ 		case BLKIF_OP_WRITE_BARRIER:
+-			if (unlikely(bret->status == BLKIF_RSP_EOPNOTSUPP)) {
++			if (unlikely(bret.status == BLKIF_RSP_EOPNOTSUPP)) {
+ 				printk(KERN_WARNING "blkfront: %s: %s op failed\n",
+-				       info->gd->disk_name, op_name(bret->operation));
++				       info->gd->disk_name, op_name(bret.operation));
+ 				blkif_req(req)->error = BLK_STS_NOTSUPP;
+ 			}
+-			if (unlikely(bret->status == BLKIF_RSP_ERROR &&
++			if (unlikely(bret.status == BLKIF_RSP_ERROR &&
+ 				     rinfo->shadow[id].req.u.rw.nr_segments == 0)) {
+ 				printk(KERN_WARNING "blkfront: %s: empty %s op failed\n",
+-				       info->gd->disk_name, op_name(bret->operation));
++				       info->gd->disk_name, op_name(bret.operation));
+ 				blkif_req(req)->error = BLK_STS_NOTSUPP;
+ 			}
+ 			if (unlikely(blkif_req(req)->error)) {
+@@ -1638,9 +1638,9 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
+ 			/* fall through */
+ 		case BLKIF_OP_READ:
+ 		case BLKIF_OP_WRITE:
+-			if (unlikely(bret->status != BLKIF_RSP_OKAY))
++			if (unlikely(bret.status != BLKIF_RSP_OKAY))
+ 				dev_dbg(&info->xbdev->dev, "Bad return from blkdev data "
+-					"request: %x\n", bret->status);
++					"request: %x\n", bret.status);
+ 
+ 			break;
+ 		default:
 -- 
-2.7.4
+git-series 0.9.1
