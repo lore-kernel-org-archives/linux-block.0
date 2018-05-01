@@ -1,59 +1,61 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:40476 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934189AbeEIJJI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 05:09:08 -0400
-Received: by mail-pg0-f65.google.com with SMTP id l2-v6so22386975pgc.7
-        for <linux-block@vger.kernel.org>; Wed, 09 May 2018 02:09:08 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
-Subject: [PATCH v3 6/7] block: move blk_stat_add() to __blk_mq_end_request()
-Date: Wed,  9 May 2018 02:08:52 -0700
-Message-Id: <b8320e85152e00493d0a552680be8534bfd47848.1525856631.git.osandov@fb.com>
-In-Reply-To: <cover.1525856630.git.osandov@fb.com>
-References: <cover.1525856630.git.osandov@fb.com>
-In-Reply-To: <cover.1525856630.git.osandov@fb.com>
-References: <cover.1525856630.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=652d33fe9=roger.pau@citrix.com>
+Date: Tue, 1 May 2018 10:15:26 +0100
+From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+To: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+CC: Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?=
+	<marmarek@invisiblethingslab.com>, Juergen Gross <jgross@suse.com>, Jens
+ Axboe <axboe@kernel.dk>, open list <linux-kernel@vger.kernel.org>,
+	<stable@vger.kernel.org>, "open list:BLOCK LAYER"
+	<linux-block@vger.kernel.org>, <xen-devel@lists.xenproject.org>, Boris
+ Ostrovsky <boris.ostrovsky@oracle.com>
+Subject: Re: [Xen-devel] [PATCH 6/6] xen-blkfront: prepare request locally,
+ only then put it on the shared ring
+Message-ID: <20180501091526.6b6j6h6rh62646fx@MacBook-Pro-de-Roger.local>
+References: <cover.7ee732ab822b728ec486a3118ec12e9c06f0f325.1525122026.git-series.marmarek@invisiblethingslab.com>
+ <951a221b0e655b3077d1f96ac365194320bc8809.1525122026.git-series.marmarek@invisiblethingslab.com>
+ <20180501082231.dzdbcghtwvlbkoys@MacBook-Pro-de-Roger.local>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+In-Reply-To: <20180501082231.dzdbcghtwvlbkoys@MacBook-Pro-de-Roger.local>
+Return-Path: roger.pau@citrix.com
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+On Tue, May 01, 2018 at 09:22:31AM +0100, Roger Pau Monn� wrote:
+> On Mon, Apr 30, 2018 at 11:01:50PM +0200, Marek Marczykowski-G�recki wrote:
+> >  					    struct request *req,
+> > -					    struct blkif_request **ring_req)
+> > +					    struct blkif_request *ring_req)
+> >  {
+> >  	unsigned long id;
+> >  
+> > -	*ring_req = RING_GET_REQUEST(&rinfo->ring, rinfo->ring.req_prod_pvt);
+> > -	rinfo->ring.req_prod_pvt++;
+> > -
+> >  	id = get_id_from_freelist(rinfo);
+> >  	rinfo->shadow[id].request = req;
+> >  	rinfo->shadow[id].status = REQ_WAITING;
+> >  	rinfo->shadow[id].associated_id = NO_ASSOCIATED_ID;
+> >  
+> > -	(*ring_req)->u.rw.id = id;
+> > +	ring_req->u.rw.id = id;
+> >  
+> >  	return id;
+> >  }
+> > @@ -545,23 +542,28 @@ static unsigned long blkif_ring_get_request(struct blkfront_ring_info *rinfo,
+> >  static int blkif_queue_discard_req(struct request *req, struct blkfront_ring_info *rinfo)
+> >  {
+> >  	struct blkfront_info *info = rinfo->dev_info;
+> > -	struct blkif_request *ring_req;
+> > +	struct blkif_request ring_req = { 0 };
+> >  	unsigned long id;
+> >  
+> >  	/* Fill out a communications ring structure. */
+> >  	id = blkif_ring_get_request(rinfo, req, &ring_req);
+> 
+> Maybe I'm missing something obvious here, but you are adding a struct
+> allocated on the stack to the shadow ring copy, isn't this dangerous?
 
-We want this next to blk_account_io_done() for the next change so that
-we can call ktime_get() only once for both.
+The above comment is wrong, you are storing a pointer to 'req' in the
+shadow ring copy, which is fine and is not the ring request.
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- block/blk-mq.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 17612e04d041..39b4e9834d82 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -506,6 +506,11 @@ EXPORT_SYMBOL_GPL(blk_mq_free_request);
- 
- inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
- {
-+	if (rq->rq_flags & RQF_STATS) {
-+		blk_mq_poll_stats_start(rq->q);
-+		blk_stat_add(rq);
-+	}
-+
- 	blk_account_io_done(rq);
- 
- 	if (rq->end_io) {
-@@ -545,10 +550,6 @@ static void __blk_mq_complete_request(struct request *rq)
- 
- 	if (rq->internal_tag != -1)
- 		blk_mq_sched_completed_request(rq);
--	if (rq->rq_flags & RQF_STATS) {
--		blk_mq_poll_stats_start(rq->q);
--		blk_stat_add(rq);
--	}
- 
- 	if (!test_bit(QUEUE_FLAG_SAME_COMP, &rq->q->queue_flags)) {
- 		rq->q->softirq_done_fn(rq);
--- 
-2.17.0
+Roger.
