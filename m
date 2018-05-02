@@ -1,68 +1,173 @@
-Return-Path: <owner-linux-aio@kvack.org>
-From: adam.manzanares@wdc.com
-To: viro@zeniv.linux.org.uk,
-	linux-fsdevel@vger.kernel.org,
-	axboe@kernel.dk,
-	bcrl@kvack.org
-Cc: mingo@kernel.org,
-	tglx@linutronix.de,
-	kstewart@linuxfoundation.org,
-	peterz@infradead.org,
-	pombredanne@nexb.com,
-	gregkh@linuxfoundation.org,
-	bigeasy@linutronix.de,
-	rgoldwyn@suse.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-aio@kvack.org,
-	linux-api@vger.kernel.org,
-	hch@infradread.org,
-	jmoyer@redhat.com,
-	Adam Manzanares <adam.manzanares@wdc.com>
-Subject: [PATCH v7 4/5] fs: blkdev set bio prio from kiocb prio
-Date: Tue, 22 May 2018 10:52:20 -0700
-Message-Id: <20180522175221.2391-5-adam.manzanares@wdc.com>
-In-Reply-To: <20180522175221.2391-1-adam.manzanares@wdc.com>
-References: <20180522175221.2391-1-adam.manzanares@wdc.com>
-Sender: owner-linux-aio@kvack.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:42530 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751339AbeEBVdG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 May 2018 17:33:06 -0400
+Received: by mail-pg0-f67.google.com with SMTP id p9-v6so8655901pgc.9
+        for <linux-block@vger.kernel.org>; Wed, 02 May 2018 14:33:06 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com,
+        Josef Bacik <josef@toxicpanda.com>
+Subject: [PATCH v2 3/7] block: replace bio->bi_issue_stat with bio-specific type
+Date: Wed,  2 May 2018 14:32:41 -0700
+Message-Id: <7dabf9eaa28c5dbf4a83a9e95da386d302e7b560.1525296089.git.osandov@fb.com>
+In-Reply-To: <cover.1525296089.git.osandov@fb.com>
+References: <cover.1525296089.git.osandov@fb.com>
+In-Reply-To: <cover.1525296089.git.osandov@fb.com>
+References: <cover.1525296089.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Adam Manzanares <adam.manzanares@wdc.com>
+From: Omar Sandoval <osandov@fb.com>
 
-Now that kiocb has an ioprio field copy this over to the bio when it is
-created from the kiocb.
+struct blk_issue_stat is going away, and bio->bi_issue_stat doesn't even
+use the blk-stats interface, so we can provide a separate implementation
+specific for bios. The helpers work the same way as the blk-stats
+helpers.
 
-Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
-Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- fs/block_dev.c | 2 ++
- 1 file changed, 2 insertions(+)
+ block/blk-throttle.c      | 19 +++++++--------
+ include/linux/blk_types.h | 49 ++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 56 insertions(+), 12 deletions(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 7ec920e27065..11ba99e79d2a 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -216,6 +216,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 	bio.bi_write_hint = iocb->ki_hint;
- 	bio.bi_private = current;
- 	bio.bi_end_io = blkdev_bio_end_io_simple;
-+	bio.bi_ioprio = iocb->ki_ioprio;
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index c5a131673733..35f9b8ff40d7 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -36,8 +36,6 @@ static int throtl_quantum = 32;
+  */
+ #define LATENCY_FILTERED_HD (1000L) /* 1ms */
  
- 	ret = bio_iov_iter_get_pages(&bio, iter);
- 	if (unlikely(ret))
-@@ -355,6 +356,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 		bio->bi_write_hint = iocb->ki_hint;
- 		bio->bi_private = dio;
- 		bio->bi_end_io = blkdev_bio_end_io;
-+		bio->bi_ioprio = iocb->ki_ioprio;
+-#define SKIP_LATENCY (((u64)1) << BLK_STAT_RES_SHIFT)
+-
+ static struct blkcg_policy blkcg_policy_throtl;
  
- 		ret = bio_iov_iter_get_pages(bio, iter);
- 		if (unlikely(ret)) {
+ /* A workqueue to queue throttle related work */
+@@ -2139,7 +2137,7 @@ static void blk_throtl_assoc_bio(struct throtl_grp *tg, struct bio *bio)
+ 		bio->bi_cg_private = tg;
+ 		blkg_get(tg_to_blkg(tg));
+ 	}
+-	blk_stat_set_issue(&bio->bi_issue_stat, bio_sectors(bio));
++	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
+ #endif
+ }
+ 
+@@ -2251,7 +2249,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+ 	if (throttled || !td->track_bio_latency)
+-		bio->bi_issue_stat.stat |= SKIP_LATENCY;
++		bio->bi_issue.value |= BIO_ISSUE_THROTL_SKIP_LATENCY;
+ #endif
+ 	return throttled;
+ }
+@@ -2302,8 +2300,8 @@ void blk_throtl_bio_endio(struct bio *bio)
+ 	finish_time_ns = ktime_get_ns();
+ 	tg->last_finish_time = finish_time_ns >> 10;
+ 
+-	start_time = blk_stat_time(&bio->bi_issue_stat) >> 10;
+-	finish_time = __blk_stat_time(finish_time_ns) >> 10;
++	start_time = bio_issue_time(&bio->bi_issue) >> 10;
++	finish_time = __bio_issue_time(finish_time_ns) >> 10;
+ 	if (!start_time || finish_time <= start_time) {
+ 		blkg_put(tg_to_blkg(tg));
+ 		return;
+@@ -2311,16 +2309,15 @@ void blk_throtl_bio_endio(struct bio *bio)
+ 
+ 	lat = finish_time - start_time;
+ 	/* this is only for bio based driver */
+-	if (!(bio->bi_issue_stat.stat & SKIP_LATENCY))
+-		throtl_track_latency(tg->td, blk_stat_size(&bio->bi_issue_stat),
+-			bio_op(bio), lat);
++	if (!(bio->bi_issue.value & BIO_ISSUE_THROTL_SKIP_LATENCY))
++		throtl_track_latency(tg->td, bio_issue_size(&bio->bi_issue),
++				     bio_op(bio), lat);
+ 
+ 	if (tg->latency_target && lat >= tg->td->filtered_latency) {
+ 		int bucket;
+ 		unsigned int threshold;
+ 
+-		bucket = request_bucket_index(
+-			blk_stat_size(&bio->bi_issue_stat));
++		bucket = request_bucket_index(bio_issue_size(&bio->bi_issue));
+ 		threshold = tg->td->avg_buckets[rw][bucket].latency +
+ 			tg->latency_target;
+ 		if (lat > threshold)
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 17b18b91ebac..b6f1d53cf113 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -8,6 +8,7 @@
+ 
+ #include <linux/types.h>
+ #include <linux/bvec.h>
++#include <linux/ktime.h>
+ 
+ struct bio_set;
+ struct bio;
+@@ -94,6 +95,52 @@ struct blk_issue_stat {
+ 	u64 stat;
+ };
+ 
++/*
++ * From most significant bit:
++ * 1 bit: reserved for other usage, see below
++ * 12 bits: original size of bio
++ * 51 bits: issue time of bio
++ */
++#define BIO_ISSUE_RES_BITS      1
++#define BIO_ISSUE_SIZE_BITS     12
++#define BIO_ISSUE_RES_SHIFT     (64 - BIO_ISSUE_RES_BITS)
++#define BIO_ISSUE_SIZE_SHIFT    (BIO_ISSUE_RES_SHIFT - BIO_ISSUE_SIZE_BITS)
++#define BIO_ISSUE_TIME_MASK     ((1ULL << BIO_ISSUE_SIZE_SHIFT) - 1)
++#define BIO_ISSUE_SIZE_MASK     \
++	(((1ULL << BIO_ISSUE_SIZE_BITS) - 1) << BIO_ISSUE_SIZE_SHIFT)
++#define BIO_ISSUE_RES_MASK      (~((1ULL << BIO_ISSUE_RES_SHIFT) - 1))
++
++/* Reserved bit for blk-throtl */
++#define BIO_ISSUE_THROTL_SKIP_LATENCY (1ULL << 63)
++
++struct bio_issue {
++	u64 value;
++};
++
++static inline u64 __bio_issue_time(u64 time)
++{
++	return time & BIO_ISSUE_TIME_MASK;
++}
++
++static inline u64 bio_issue_time(struct bio_issue *issue)
++{
++	return __bio_issue_time(issue->value);
++}
++
++static inline sector_t bio_issue_size(struct bio_issue *issue)
++{
++	return ((issue->value & BIO_ISSUE_SIZE_MASK) >> BIO_ISSUE_SIZE_SHIFT);
++}
++
++static inline void bio_issue_init(struct bio_issue *issue,
++				       sector_t size)
++{
++	size &= (1ULL << BIO_ISSUE_SIZE_BITS) - 1;
++	issue->value = ((issue->value & BIO_ISSUE_RES_MASK) |
++			(ktime_get_ns() & BIO_ISSUE_TIME_MASK) |
++			((u64)size << BIO_ISSUE_SIZE_SHIFT));
++}
++
+ /*
+  * main unit of I/O for the block layer and lower layers (ie drivers and
+  * stacking drivers)
+@@ -138,7 +185,7 @@ struct bio {
+ 	struct cgroup_subsys_state *bi_css;
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+ 	void			*bi_cg_private;
+-	struct blk_issue_stat	bi_issue_stat;
++	struct bio_issue	bi_issue;
+ #endif
+ #endif
+ 	union {
 -- 
-2.15.1
-
---
-To unsubscribe, send a message with 'unsubscribe linux-aio' in
-the body to majordomo@kvack.org.  For more info on Linux AIO,
-see: http://www.kvack.org/aio/
-Don't email: <a href=mailto:"aart@kvack.org">aart@kvack.org</a>
+2.17.0
