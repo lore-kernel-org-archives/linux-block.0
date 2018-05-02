@@ -1,21 +1,20 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:46917 "EHLO
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:46634 "EHLO
         mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751339AbeEBVdI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 May 2018 17:33:08 -0400
-Received: by mail-pf0-f194.google.com with SMTP id p12so12863723pff.13
-        for <linux-block@vger.kernel.org>; Wed, 02 May 2018 14:33:07 -0700 (PDT)
+        with ESMTP id S1750942AbeEBRep (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 May 2018 13:34:45 -0400
+Received: by mail-pf0-f194.google.com with SMTP id p12so12359574pff.13
+        for <linux-block@vger.kernel.org>; Wed, 02 May 2018 10:34:45 -0700 (PDT)
 From: Omar Sandoval <osandov@osandov.com>
 To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com,
-        Josef Bacik <josef@toxicpanda.com>
-Subject: [PATCH v2 4/7] block: get rid of struct blk_issue_stat
-Date: Wed,  2 May 2018 14:32:42 -0700
-Message-Id: <672f74a4dc09d6151f593159a1fe24a695a2ee04.1525296089.git.osandov@fb.com>
-In-Reply-To: <cover.1525296089.git.osandov@fb.com>
-References: <cover.1525296089.git.osandov@fb.com>
-In-Reply-To: <cover.1525296089.git.osandov@fb.com>
-References: <cover.1525296089.git.osandov@fb.com>
+Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
+Subject: [PATCH 4/7] block: get rid of struct blk_issue_stat
+Date: Wed,  2 May 2018 10:34:23 -0700
+Message-Id: <068fdcc508f873d3000de469c2dcdd847590f4a3.1525282392.git.osandov@fb.com>
+In-Reply-To: <cover.1525282392.git.osandov@fb.com>
+References: <cover.1525282392.git.osandov@fb.com>
+In-Reply-To: <cover.1525282392.git.osandov@fb.com>
+References: <cover.1525282392.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
@@ -174,10 +173,10 @@ index 2dd36347252a..17c812db0aca 100644
  void blk_stat_enable_accounting(struct request_queue *q);
  
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 35f9b8ff40d7..f63d88c92c3a 100644
+index e2957a93ed11..0b75eaa7acb9 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -2279,8 +2279,7 @@ void blk_throtl_stat_add(struct request *rq, u64 time_ns)
+@@ -2310,8 +2310,7 @@ void blk_throtl_stat_add(struct request *rq, u64 time_ns)
  	struct request_queue *q = rq->q;
  	struct throtl_data *td = q->td;
  
@@ -278,10 +277,10 @@ index 0d6d25e32e1f..564967fafe5f 100644
  	if (latency > target)
  		blk_stat_activate_msecs(kqd->cb, 10);
 diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index b6f1d53cf113..4cb970cdcd11 100644
+index 3a263538d315..7b55513407ee 100644
 --- a/include/linux/blk_types.h
 +++ b/include/linux/blk_types.h
-@@ -91,10 +91,6 @@ static inline bool blk_path_error(blk_status_t error)
+@@ -90,10 +90,6 @@ static inline bool blk_path_error(blk_status_t error)
  	return true;
  }
  
@@ -290,8 +289,8 @@ index b6f1d53cf113..4cb970cdcd11 100644
 -};
 -
  /*
-  * From most significant bit:
-  * 1 bit: reserved for other usage, see below
+  * main unit of I/O for the block layer and lower layers (ie drivers and
+  * stacking drivers)
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
 index 5c4eee043191..f2c2fc011e6b 100644
 --- a/include/linux/blkdev.h
