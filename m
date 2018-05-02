@@ -1,85 +1,356 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:46909 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751339AbeEBVdD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 May 2018 17:33:03 -0400
-Received: by mail-pf0-f193.google.com with SMTP id p12so12863609pff.13
-        for <linux-block@vger.kernel.org>; Wed, 02 May 2018 14:33:03 -0700 (PDT)
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:44115 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750942AbeEBRet (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 May 2018 13:34:49 -0400
+Received: by mail-pf0-f196.google.com with SMTP id q22so12370326pff.11
+        for <linux-block@vger.kernel.org>; Wed, 02 May 2018 10:34:49 -0700 (PDT)
 From: Omar Sandoval <osandov@osandov.com>
 To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com,
-        Josef Bacik <josef@toxicpanda.com>
-Subject: [PATCH v2 0/7] block: consolidate struct request timestamp fields
-Date: Wed,  2 May 2018 14:32:38 -0700
-Message-Id: <cover.1525296089.git.osandov@fb.com>
+Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
+Subject: [PATCH 7/7] block: consolidate struct request timestamp fields
+Date: Wed,  2 May 2018 10:34:26 -0700
+Message-Id: <2210e2a1d344729b747e9293c94edc55e029863a.1525282392.git.osandov@fb.com>
+In-Reply-To: <cover.1525282392.git.osandov@fb.com>
+References: <cover.1525282392.git.osandov@fb.com>
+In-Reply-To: <cover.1525282392.git.osandov@fb.com>
+References: <cover.1525282392.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
 From: Omar Sandoval <osandov@fb.com>
 
-Josef mentioned that his upcoming cgroups io controller uses
-blk_issue_stat, so moving it to be private to blk-throtl would cause him
-some pain. v2 changes patch 3 to replace bi_issue_stat with a new type
-with the same helpers (I didn't want to keep the naming because it no
-longer has anything to do with blk-stats).
-
-Cover letter from v1:
-
 Currently, struct request has four timestamp fields:
 
-- start_time (jiffies), marked at get_request() time and used for
-  iostats
-- issue_stat (ktime nanoseconds, with some bits shared with wbt and
-  io.low), marked at start_request() time and used for accounting the
-  time spent in the device for blk-stats (i.e., wbt, kyber, hybrid
-  polling)
-- start_time_ns (sched_clock nanoseconds), also marked at get_request()
-  time, used for CFQ and BFQ cgroups support
-- io_start_time_ns (sched_clock nanoseconds), also marked at
-  start_request() time and also used for CFQ and BFQ
+- A start time, set at get_request time, in jiffies, used for iostats
+- An I/O start time, set at start_request time, in ktime nanoseconds,
+  used for blk-stats (i.e., wbt, kyber, hybrid polling)
+- Another start time and another I/O start time, used for cfq and bfq
 
-Clearly, there's some redundancy here. This patch series consolidates
-these four timestamps into two, both of which are in ktime nanoseconds.
-This shaves off up to 16 bytes from struct request, gets rid of the
-usage of sched_clock(), and actually removes lines of code.
+These can all be consolidated into one start time and one I/O start
+time, both in ktime nanoseconds, shaving off up to 16 bytes from struct
+request depending on the kernel config.
 
-Patches 1 and 2 do some prep in wbt. Patch 3 does some prep in io.low.
-Patch 4 splits up issue_stat into just a timestamp and separate fields
-to fill a hole in struct request. Patch 5 does some prep in CFQ and BFQ.
-Patch 6 allows us to save a call to ktime_get(). Patch 7 does the final
-consolidation.
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+---
+ block/bfq-iosched.c    |  4 ++--
+ block/blk-core.c       | 17 ++++++++---------
+ block/blk-merge.c      | 11 +++++------
+ block/blk-mq.c         | 10 +++++-----
+ block/blk-stat.c       |  5 ++---
+ block/blk-stat.h       |  2 +-
+ block/blk.h            |  2 +-
+ block/cfq-iosched.c    | 15 +++------------
+ drivers/md/dm-rq.c     |  2 +-
+ include/linux/blkdev.h | 38 ++------------------------------------
+ 10 files changed, 30 insertions(+), 76 deletions(-)
 
-Please take a look. I added a blktest (block/018) to sanity check
-iostats, but other stuff is harder to test so it could use some eyes.
-Thanks!
-
-Omar Sandoval (7):
-  block: move some wbt helpers to blk-wbt.c
-  block: pass struct request instead of struct blk_issue_stat to wbt
-  block: replace bio->bi_issue_stat with bio-specific type
-  block: get rid of struct blk_issue_stat
-  block: use ktime_get_ns() instead of sched_clock() for cfq and bfq
-  block: move blk_stat_add() to __blk_mq_end_request()
-  block: consolidate struct request timestamp fields
-
- block/bfq-cgroup.c        | 40 ++++++++++++------------
- block/bfq-iosched.c       |  4 +--
- block/bfq-iosched.h       | 10 +++---
- block/blk-core.c          | 32 +++++++++++---------
- block/blk-merge.c         | 11 +++----
- block/blk-mq.c            | 33 +++++++++++---------
- block/blk-stat.c          | 10 ++----
- block/blk-stat.h          | 45 +--------------------------
- block/blk-throttle.c      | 22 ++++++--------
- block/blk-wbt.c           | 59 +++++++++++++++++++++++-------------
- block/blk-wbt.h           | 47 +++++++++-------------------
- block/blk.h               |  2 +-
- block/cfq-iosched.c       | 64 ++++++++++++++++++---------------------
- block/kyber-iosched.c     |  6 ++--
- drivers/md/dm-rq.c        |  2 +-
- include/linux/blk_types.h | 49 ++++++++++++++++++++++++++++--
- include/linux/blkdev.h    | 61 +++++++++----------------------------
- 17 files changed, 228 insertions(+), 269 deletions(-)
-
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 771ae9730ac6..ebc264c87a09 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -4778,8 +4778,8 @@ static void bfq_finish_requeue_request(struct request *rq)
+ 
+ 	if (rq->rq_flags & RQF_STARTED)
+ 		bfqg_stats_update_completion(bfqq_group(bfqq),
+-					     rq_start_time_ns(rq),
+-					     rq_io_start_time_ns(rq),
++					     rq->start_time_ns,
++					     rq->io_start_time_ns,
+ 					     rq->cmd_flags);
+ 
+ 	if (likely(rq->rq_flags & RQF_STARTED)) {
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 02b0cc23fd1b..571a4fd3c394 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -196,8 +196,7 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
+ 	RB_CLEAR_NODE(&rq->rb_node);
+ 	rq->tag = -1;
+ 	rq->internal_tag = -1;
+-	rq->start_time = jiffies;
+-	set_start_time_ns(rq);
++	rq->start_time_ns = ktime_get_ns();
+ 	rq->part = NULL;
+ 	seqcount_init(&rq->gstate_seq);
+ 	u64_stats_init(&rq->aborted_gstate_sync);
+@@ -2727,7 +2726,7 @@ void blk_account_io_completion(struct request *req, unsigned int bytes)
+ 	}
+ }
+ 
+-void blk_account_io_done(struct request *req)
++void blk_account_io_done(struct request *req, u64 now)
+ {
+ 	/*
+ 	 * Account IO completion.  flush_rq isn't accounted as a
+@@ -2735,11 +2734,12 @@ void blk_account_io_done(struct request *req)
+ 	 * containing request is enough.
+ 	 */
+ 	if (blk_do_io_stat(req) && !(req->rq_flags & RQF_FLUSH_SEQ)) {
+-		unsigned long duration = jiffies - req->start_time;
++		unsigned long duration;
+ 		const int rw = rq_data_dir(req);
+ 		struct hd_struct *part;
+ 		int cpu;
+ 
++		duration = nsecs_to_jiffies(now - req->start_time_ns);
+ 		cpu = part_stat_lock();
+ 		part = req->part;
+ 
+@@ -2970,10 +2970,8 @@ static void blk_dequeue_request(struct request *rq)
+ 	 * and to it is freed is accounted as io that is in progress at
+ 	 * the driver side.
+ 	 */
+-	if (blk_account_rq(rq)) {
++	if (blk_account_rq(rq))
+ 		q->in_flight[rq_is_sync(rq)]++;
+-		set_io_start_time_ns(rq);
+-	}
+ }
+ 
+ /**
+@@ -3193,12 +3191,13 @@ EXPORT_SYMBOL_GPL(blk_unprep_request);
+ void blk_finish_request(struct request *req, blk_status_t error)
+ {
+ 	struct request_queue *q = req->q;
++	u64 now = ktime_get_ns();
+ 
+ 	lockdep_assert_held(req->q->queue_lock);
+ 	WARN_ON_ONCE(q->mq_ops);
+ 
+ 	if (req->rq_flags & RQF_STATS)
+-		blk_stat_add(req);
++		blk_stat_add(req, now);
+ 
+ 	if (req->rq_flags & RQF_QUEUED)
+ 		blk_queue_end_tag(q, req);
+@@ -3213,7 +3212,7 @@ void blk_finish_request(struct request *req, blk_status_t error)
+ 	if (req->rq_flags & RQF_DONTPREP)
+ 		blk_unprep_request(req);
+ 
+-	blk_account_io_done(req);
++	blk_account_io_done(req, now);
+ 
+ 	if (req->end_io) {
+ 		wbt_done(req->q->rq_wb, req);
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 782940c65d8a..5573d0fbec53 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -724,13 +724,12 @@ static struct request *attempt_merge(struct request_queue *q,
+ 	}
+ 
+ 	/*
+-	 * At this point we have either done a back merge
+-	 * or front merge. We need the smaller start_time of
+-	 * the merged requests to be the current request
+-	 * for accounting purposes.
++	 * At this point we have either done a back merge or front merge. We
++	 * need the smaller start_time_ns of the merged requests to be the
++	 * current request for accounting purposes.
+ 	 */
+-	if (time_after(req->start_time, next->start_time))
+-		req->start_time = next->start_time;
++	if (next->start_time_ns < req->start_time_ns)
++		req->start_time_ns = next->start_time_ns;
+ 
+ 	req->biotail->bi_next = next->bio;
+ 	req->biotail = next->biotail;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 65141edda189..31a5a3b00871 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -293,7 +293,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	RB_CLEAR_NODE(&rq->rb_node);
+ 	rq->rq_disk = NULL;
+ 	rq->part = NULL;
+-	rq->start_time = jiffies;
++	rq->start_time_ns = ktime_get_ns();
+ 	rq->io_start_time_ns = 0;
+ 	rq->nr_phys_segments = 0;
+ #if defined(CONFIG_BLK_DEV_INTEGRITY)
+@@ -313,8 +313,6 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 
+ #ifdef CONFIG_BLK_CGROUP
+ 	rq->rl = NULL;
+-	set_start_time_ns(rq);
+-	rq->cgroup_io_start_time_ns = 0;
+ #endif
+ 
+ 	data->ctx->rq_dispatched[op_is_sync(op)]++;
+@@ -490,12 +488,14 @@ EXPORT_SYMBOL_GPL(blk_mq_free_request);
+ 
+ inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
+ {
++	u64 now = ktime_get_ns();
++
+ 	if (rq->rq_flags & RQF_STATS) {
+ 		blk_mq_poll_stats_start(rq->q);
+-		blk_stat_add(rq);
++		blk_stat_add(rq, now);
+ 	}
+ 
+-	blk_account_io_done(rq);
++	blk_account_io_done(rq, now);
+ 
+ 	if (rq->end_io) {
+ 		wbt_done(rq->q->rq_wb, rq);
+diff --git a/block/blk-stat.c b/block/blk-stat.c
+index 725a881723b0..175c143ac5b9 100644
+--- a/block/blk-stat.c
++++ b/block/blk-stat.c
+@@ -47,15 +47,14 @@ static void __blk_stat_add(struct blk_rq_stat *stat, u64 value)
+ 	stat->nr_samples++;
+ }
+ 
+-void blk_stat_add(struct request *rq)
++void blk_stat_add(struct request *rq, u64 now)
+ {
+ 	struct request_queue *q = rq->q;
+ 	struct blk_stat_callback *cb;
+ 	struct blk_rq_stat *stat;
+ 	int bucket;
+-	u64 now, value;
++	u64 value;
+ 
+-	now = ktime_get_ns();
+ 	value = (now >= rq->io_start_time_ns) ? now - rq->io_start_time_ns : 0;
+ 
+ 	blk_throtl_stat_add(rq, value);
+diff --git a/block/blk-stat.h b/block/blk-stat.h
+index 17c812db0aca..78399cdde9c9 100644
+--- a/block/blk-stat.h
++++ b/block/blk-stat.h
+@@ -65,7 +65,7 @@ struct blk_stat_callback {
+ struct blk_queue_stats *blk_alloc_queue_stats(void);
+ void blk_free_queue_stats(struct blk_queue_stats *);
+ 
+-void blk_stat_add(struct request *);
++void blk_stat_add(struct request *rq, u64 now);
+ 
+ /* record time/size info in request but not add a callback */
+ void blk_stat_enable_accounting(struct request_queue *q);
+diff --git a/block/blk.h b/block/blk.h
+index b034fd2460c4..eaf1a8e87d11 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -186,7 +186,7 @@ unsigned int blk_plug_queued_count(struct request_queue *q);
+ 
+ void blk_account_io_start(struct request *req, bool new_io);
+ void blk_account_io_completion(struct request *req, unsigned int bytes);
+-void blk_account_io_done(struct request *req);
++void blk_account_io_done(struct request *req, u64 now);
+ 
+ /*
+  * EH timer and IO completion will both attempt to 'grab' the request, make
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 652ca064de20..6b9f6b1cd33b 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -4228,8 +4228,8 @@ static void cfq_completed_request(struct request_queue *q, struct request *rq)
+ 	cfqd->rq_in_driver--;
+ 	cfqq->dispatched--;
+ 	(RQ_CFQG(rq))->dispatched--;
+-	cfqg_stats_update_completion(cfqq->cfqg, rq_start_time_ns(rq),
+-				     rq_io_start_time_ns(rq), rq->cmd_flags);
++	cfqg_stats_update_completion(cfqq->cfqg, rq->start_time_ns,
++				     rq->io_start_time_ns, rq->cmd_flags);
+ 
+ 	cfqd->rq_in_flight[cfq_cfqq_sync(cfqq)]--;
+ 
+@@ -4245,16 +4245,7 @@ static void cfq_completed_request(struct request_queue *q, struct request *rq)
+ 					cfqq_type(cfqq));
+ 
+ 		st->ttime.last_end_request = now;
+-		/*
+-		 * We have to do this check in jiffies since start_time is in
+-		 * jiffies and it is not trivial to convert to ns. If
+-		 * cfq_fifo_expire[1] ever comes close to 1 jiffie, this test
+-		 * will become problematic but so far we are fine (the default
+-		 * is 128 ms).
+-		 */
+-		if (!time_after(rq->start_time +
+-				  nsecs_to_jiffies(cfqd->cfq_fifo_expire[1]),
+-				jiffies))
++		if (rq->start_time_ns + cfqd->cfq_fifo_expire[1] <= now)
+ 			cfqd->last_delayed_sync = now;
+ 	}
+ 
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index bf0b840645cc..1c18f335da04 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -406,7 +406,7 @@ static blk_status_t dm_dispatch_clone_request(struct request *clone, struct requ
+ 	if (blk_queue_io_stat(clone->q))
+ 		clone->rq_flags |= RQF_IO_STAT;
+ 
+-	clone->start_time = jiffies;
++	clone->start_time_ns = ktime_get_ns();
+ 	r = blk_insert_cloned_request(clone->q, clone);
+ 	if (r != BLK_STS_OK && r != BLK_STS_RESOURCE && r != BLK_STS_DEV_RESOURCE)
+ 		/* must complete clone in terms of original request */
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 9ef412666df1..e42d510daf3c 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -205,7 +205,8 @@ struct request {
+ 
+ 	struct gendisk *rq_disk;
+ 	struct hd_struct *part;
+-	unsigned long start_time;
++	/* Time that I/O was submitted to the kernel. */
++	u64 start_time_ns;
+ 	/* Time that I/O was submitted to the device. */
+ 	u64 io_start_time_ns;
+ 
+@@ -277,8 +278,6 @@ struct request {
+ 
+ #ifdef CONFIG_BLK_CGROUP
+ 	struct request_list *rl;		/* rl this rq is alloced from */
+-	unsigned long long cgroup_start_time_ns;
+-	unsigned long long cgroup_io_start_time_ns;    /* when passed to hardware */
+ #endif
+ };
+ 
+@@ -1798,39 +1797,6 @@ int kblockd_schedule_work(struct work_struct *work);
+ int kblockd_schedule_work_on(int cpu, struct work_struct *work);
+ int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork, unsigned long delay);
+ 
+-#ifdef CONFIG_BLK_CGROUP
+-static inline void set_start_time_ns(struct request *req)
+-{
+-	req->cgroup_start_time_ns = ktime_get_ns();
+-}
+-
+-static inline void set_io_start_time_ns(struct request *req)
+-{
+-	req->cgroup_io_start_time_ns = ktime_get_ns();
+-}
+-
+-static inline u64 rq_start_time_ns(struct request *req)
+-{
+-	return req->cgroup_start_time_ns;
+-}
+-
+-static inline u64 rq_io_start_time_ns(struct request *req)
+-{
+-	return req->cgroup_io_start_time_ns;
+-}
+-#else
+-static inline void set_start_time_ns(struct request *req) {}
+-static inline void set_io_start_time_ns(struct request *req) {}
+-static inline u64 rq_start_time_ns(struct request *req)
+-{
+-	return 0;
+-}
+-static inline u64 rq_io_start_time_ns(struct request *req)
+-{
+-	return 0;
+-}
+-#endif
+-
+ #define MODULE_ALIAS_BLOCKDEV(major,minor) \
+ 	MODULE_ALIAS("block-major-" __stringify(major) "-" __stringify(minor))
+ #define MODULE_ALIAS_BLOCKDEV_MAJOR(major) \
 -- 
 2.17.0
