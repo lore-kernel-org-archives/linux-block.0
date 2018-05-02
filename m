@@ -1,63 +1,51 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH v3 5/6] bcache: set dc->io_disable to true in conditional_stop_bcache_device()
-Date: Thu,  3 May 2018 18:51:36 +0800
-Message-Id: <20180503105137.2922-6-colyli@suse.de>
-In-Reply-To: <20180503105137.2922-1-colyli@suse.de>
-References: <20180503105137.2922-1-colyli@suse.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Wed, 2 May 2018 13:09:51 -0700
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+To: Dave Chinner <david@fromorbit.com>
+Cc: linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, hch@lst.de, rdorr@microsoft.com
+Subject: Re: [PATCH 0/3 v3] iomap: Use FUA for O_DSYNC DIO writes
+Message-ID: <20180502200951.GB4127@magnolia>
+References: <20180502053807.13846-1-david@fromorbit.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180502053807.13846-1-david@fromorbit.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Commit 7e027ca4b534b ("bcache: add stop_when_cache_set_failed option to
-backing device") adds stop_when_cache_set_failed option and stops bcache
-device if stop_when_cache_set_failed is auto and there is dirty data on
-broken cache device. There might exists a small time gap that the cache
-set is released and set to NULL but bcache device is not released yet
-(because they are released in parallel). During this time gap, dc->c is
-NULL so CACHE_SET_IO_DISABLE won't be checked, and dc->io_disable is still
-false, so new coming I/O requests will be accepted and directly go into
-backing device as no cache set attached to. If there is dirty data on
-cache device, this behavior may introduce potential inconsistent data.
+On Wed, May 02, 2018 at 03:38:04PM +1000, Dave Chinner wrote:
+> Hi folks,
+> 
+> Version 3 of the FUA for O-DSYNC patchset. This version fixes bugs
+> found in the previous version. Functionality is otherwise the same
+> as described in the first version:
+> 
+> https://marc.info/?l=linux-xfs&m=152213446528167&w=2
 
-This patch sets dc->io_disable to true before calling bcache_device_stop()
-to make sure the backing device will reject new coming I/O request as
-well, so even in the small time gap no I/O will directly go into backing
-device to corrupt data consistency.
+Will test the whole series, consider this a tentative:
+Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
 
-Fixes: 7e027ca4b534b ("bcache: add stop_when_cache_set_failed option to backing device")
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- drivers/md/bcache/super.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+--D
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index c017cd444c66..cedbb41533c2 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1556,6 +1556,20 @@ static void conditional_stop_bcache_device(struct cache_set *c,
- 		 */
- 		pr_warn("stop_when_cache_set_failed of %s is \"auto\" and cache is dirty, stop it to avoid potential data corruption.",
- 			d->disk->disk_name);
-+			/*
-+			 * There might be a small time gap that cache set is
-+			 * released but bcache device is not. Inside this time
-+			 * gap, regular I/O requests will directly go into
-+			 * backing device as no cache set attached to. This
-+			 * behavior may also introduce potential inconsistence
-+			 * data in writeback mode while cache is dirty.
-+			 * Therefore before calling bcache_device_stop() due
-+			 * to a broken cache device, dc->io_disable should be
-+			 * explicitly set to true.
-+			 */
-+			dc->io_disable = true;
-+			/* make others know io_disable is true earlier */
-+			smp_mb();
- 			bcache_device_stop(d);
- 	} else {
- 		/*
--- 
-2.16.3
+> 
+> Version 3:
+> 
+> - fixed O_SYNC behaviour as noticed by Jan Kara
+> - fixed use after free on IO completion due
+>   iomap_dio_complete_work() simplification added in version 2. Found
+>   by KASAN when running xfstests.
+> 
+> Version 2:
+> - Fixed comment typos in first patch
+> - simplified iomap_dio_complete_work()
+> - changed IOMAP_DIO_WRITE_SYNC to IOMAP_DIO_NEED_SYNC
+> - split blk_queue_fua() into it's own patch
+> - fixed formatting issue in last patch
+> - update bio->io_opf directly rather than use bio_set_op_attrs()
+> - Updated comment to mention we try to use FUA optimistically.
+> 
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-xfs" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
