@@ -1,114 +1,33 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	"jianchao.wang" <jianchao.w.wang@oracle.com>,
-	James Smart <james.smart@broadcom.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 04/11] nvme: pci: set nvmeq->cq_vector after alloc cq/sq
-Date: Wed, 16 May 2018 12:03:06 +0800
-Message-Id: <20180516040313.13596-5-ming.lei@redhat.com>
-In-Reply-To: <20180516040313.13596-1-ming.lei@redhat.com>
-References: <20180516040313.13596-1-ming.lei@redhat.com>
+Return-Path: <jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH V2 1/5] block: introduce blk_quiesce_timeout() and
+ blk_unquiesce_timeout()
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@kernel.dk>,
+        Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, Bart Van Assche <bart.vanassche@wdc.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20180429154152.16656-1-ming.lei@redhat.com>
+ <20180429154152.16656-2-ming.lei@redhat.com>
+ <93c4190f-178a-a3b4-5203-bd8c6a0eaef2@oracle.com>
+ <20180502033342.GD22363@ming.t460p>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <81dd6a4b-c27c-d39e-cccf-68a0ff3d1711@oracle.com>
+Date: Wed, 2 May 2018 13:16:46 +0800
+MIME-Version: 1.0
+In-Reply-To: <20180502033342.GD22363@ming.t460p>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Hi Ming
 
-Currently nvmeq->cq_vector is set before alloc cq/sq. If the alloc
-cq/sq command timeout, nvme_suspend_queue will invoke free_irq
-for the nvmeq because the cq_vector is valid, this will cause warning
-'Trying to free already-free IRQ xxx'. set nvmeq->cq_vector after
-alloc cq/sq successes to fix this.
+On 05/02/2018 11:33 AM, Ming Lei wrote:
+> No, there isn't such race, the 'mod_timer' doesn't make a difference
+> because 'q->timeout_off' will be visible in new work func after
+> cancel_work_sync() returns. So even the timer is expired, work func
+> still returns immediately.
 
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
----
- drivers/nvme/host/pci.c | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
+Yes, you are right.
+even if timer is setup , but the timeout work will return.
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 9e28d7118232..e94a103ead1e 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1070,7 +1070,7 @@ static int adapter_delete_queue(struct nvme_dev *dev, u8 opcode, u16 id)
- }
- 
- static int adapter_alloc_cq(struct nvme_dev *dev, u16 qid,
--						struct nvme_queue *nvmeq)
-+						struct nvme_queue *nvmeq, int cq_vector)
- {
- 	struct nvme_command c;
- 	int flags = NVME_QUEUE_PHYS_CONTIG | NVME_CQ_IRQ_ENABLED;
-@@ -1085,7 +1085,7 @@ static int adapter_alloc_cq(struct nvme_dev *dev, u16 qid,
- 	c.create_cq.cqid = cpu_to_le16(qid);
- 	c.create_cq.qsize = cpu_to_le16(nvmeq->q_depth - 1);
- 	c.create_cq.cq_flags = cpu_to_le16(flags);
--	c.create_cq.irq_vector = cpu_to_le16(nvmeq->cq_vector);
-+	c.create_cq.irq_vector = cpu_to_le16(cq_vector);
- 
- 	return nvme_submit_sync_cmd(dev->ctrl.admin_q, &c, NULL, 0);
- }
-@@ -1459,6 +1459,7 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
- {
- 	struct nvme_dev *dev = nvmeq->dev;
- 	int result;
-+	int cq_vector;
- 
- 	if (dev->cmb && use_cmb_sqes && (dev->cmbsz & NVME_CMBSZ_SQS)) {
- 		unsigned offset = (qid - 1) * roundup(SQ_SIZE(nvmeq->q_depth),
-@@ -1471,15 +1472,21 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
- 	 * A queue's vector matches the queue identifier unless the controller
- 	 * has only one vector available.
- 	 */
--	nvmeq->cq_vector = dev->num_vecs == 1 ? 0 : qid;
--	result = adapter_alloc_cq(dev, qid, nvmeq);
-+	cq_vector = dev->num_vecs == 1 ? 0 : qid;
-+	result = adapter_alloc_cq(dev, qid, nvmeq, cq_vector);
- 	if (result < 0)
--		goto release_vector;
-+		goto out;
- 
- 	result = adapter_alloc_sq(dev, qid, nvmeq);
- 	if (result < 0)
- 		goto release_cq;
- 
-+	/*
-+	 * set cq_vector after alloc cq/sq, otherwise, if alloc cq/sq command
-+	 * timeout, nvme_suspend_queue will invoke free_irq for it and cause warning
-+	 * 'Trying to free already-free IRQ xxx'
-+	 */
-+	nvmeq->cq_vector = cq_vector;
- 	nvme_init_queue(nvmeq, qid);
- 	result = queue_request_irq(nvmeq);
- 	if (result < 0)
-@@ -1487,13 +1494,13 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
- 
- 	return result;
- 
-- release_sq:
-+release_sq:
-+	nvmeq->cq_vector = -1;
- 	dev->online_queues--;
- 	adapter_delete_sq(dev, qid);
-- release_cq:
-+release_cq:
- 	adapter_delete_cq(dev, qid);
-- release_vector:
--	nvmeq->cq_vector = -1;
-+out:
- 	return result;
- }
- 
--- 
-2.9.5
+Thanks
+Jianchao
