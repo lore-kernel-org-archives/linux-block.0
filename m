@@ -4,11 +4,11 @@ To: linux-bcache@vger.kernel.org,
 	axboe@kernel.dk
 Cc: linux-block@vger.kernel.org,
 	Coly Li <colyli@suse.de>
-Subject: [PATCH v3 5/6] bcache: set dc->io_disable to true in conditional_stop_bcache_device()
-Date: Wed,  2 May 2018 23:13:16 +0800
-Message-Id: <20180502151317.120036-6-colyli@suse.de>
-In-Reply-To: <20180502151317.120036-1-colyli@suse.de>
-References: <20180502151317.120036-1-colyli@suse.de>
+Subject: [PATCH 5/6] bcache: set dc->io_disable to true in conditional_stop_bcache_device()
+Date: Wed,  2 May 2018 22:46:58 +0800
+Message-Id: <20180502144659.118628-6-colyli@suse.de>
+In-Reply-To: <20180502144659.118628-1-colyli@suse.de>
+References: <20180502144659.118628-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
 Commit 7e027ca4b534b ("bcache: add stop_when_cache_set_failed option to
@@ -34,7 +34,7 @@ Signed-off-by: Coly Li <colyli@suse.de>
  1 file changed, 14 insertions(+)
 
 diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index c017cd444c66..cedbb41533c2 100644
+index a0d5a3ccc7d0..507755fcac5a 100644
 --- a/drivers/md/bcache/super.c
 +++ b/drivers/md/bcache/super.c
 @@ -1556,6 +1556,20 @@ static void conditional_stop_bcache_device(struct cache_set *c,
