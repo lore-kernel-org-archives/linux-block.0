@@ -1,21 +1,20 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:45293 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751822AbeEBVdK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 May 2018 17:33:10 -0400
-Received: by mail-pg0-f66.google.com with SMTP id i29-v6so11544945pgn.12
-        for <linux-block@vger.kernel.org>; Wed, 02 May 2018 14:33:10 -0700 (PDT)
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:43684 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750942AbeEBRer (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 May 2018 13:34:47 -0400
+Received: by mail-pf0-f193.google.com with SMTP id j11so12367213pff.10
+        for <linux-block@vger.kernel.org>; Wed, 02 May 2018 10:34:47 -0700 (PDT)
 From: Omar Sandoval <osandov@osandov.com>
 To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com,
-        Josef Bacik <josef@toxicpanda.com>
-Subject: [PATCH v2 6/7] block: move blk_stat_add() to __blk_mq_end_request()
-Date: Wed,  2 May 2018 14:32:44 -0700
-Message-Id: <728efba0143eef9d37212d1b1def9ccc9b93c3af.1525296089.git.osandov@fb.com>
-In-Reply-To: <cover.1525296089.git.osandov@fb.com>
-References: <cover.1525296089.git.osandov@fb.com>
-In-Reply-To: <cover.1525296089.git.osandov@fb.com>
-References: <cover.1525296089.git.osandov@fb.com>
+Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
+Subject: [PATCH 6/7] block: move blk_stat_add() to __blk_mq_end_request()
+Date: Wed,  2 May 2018 10:34:25 -0700
+Message-Id: <cd489c632d7294cdc41603008777c472ae183c55.1525282392.git.osandov@fb.com>
+In-Reply-To: <cover.1525282392.git.osandov@fb.com>
+References: <cover.1525282392.git.osandov@fb.com>
+In-Reply-To: <cover.1525282392.git.osandov@fb.com>
+References: <cover.1525282392.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
