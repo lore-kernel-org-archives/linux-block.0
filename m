@@ -1,92 +1,83 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH 2/6] bcache: set CACHE_SET_IO_DISABLE in
- bch_cached_dev_error()
-To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-References: <20180502144659.118628-1-colyli@suse.de>
- <20180502144659.118628-3-colyli@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <999e1618-c9a4-507e-aecc-d8ea30172d48@suse.de>
-Date: Thu, 3 May 2018 07:53:17 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180502144659.118628-3-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	Coly Li <colyli@suse.de>
+Subject: [PATCH v3 2/6] bcache: set CACHE_SET_IO_DISABLE in bch_cached_dev_error()
+Date: Wed,  2 May 2018 23:13:13 +0800
+Message-Id: <20180502151317.120036-3-colyli@suse.de>
+In-Reply-To: <20180502151317.120036-1-colyli@suse.de>
+References: <20180502151317.120036-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On 05/02/2018 04:46 PM, Coly Li wrote:
-> Commit c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev") tries
-> to stop bcache device by calling bcache_device_stop() when too many I/O
-> errors happened on backing device. But if there is internal I/O happening
-> on cache device (writeback scan, garbage collection, etc), a regular I/O
-> request triggers the internal I/Os may still holds a refcount of dc->count,
-> and the refcount may only be dropped after the internal I/O stopped.
-> 
-> By this patch, bch_cached_dev_error() will check if the backing device is
-> attached to a cache set, if yes that CACHE_SET_IO_DISABLE will be set to
-> flags of this cache set. Then internal I/Os on cache device will be
-> rejected and stopped immediately, and the bcache device can be stopped.
-> 
-> For people who are not familiar with the interesting refcount dependance,
-> let me explain a bit more how the fix works. Example the writeback thread
-> will scan cache device for dirty data writeback purpose. Before it stopps,
-> it holds a refcount of dc->count. When CACHE_SET_IO_DISABLE bit is set,
-> the internal I/O will stopped and the while-loop in bch_writeback_thread()
-> quits and calls cached_dev_put() to drop dc->count. If this is the last
-> refcount to drop, then cached_dev_detach_finish() will be called. In this
-> call back function, in turn closure_put(dc->disk.cl) is called to drop a
-> refcount of closure dc->disk.cl. If this is the last refcount of this
-> closure to drop, then cached_dev_flush() will be called. Then the cached
-> device is freed. So if CACHE_SET_IO_DISABLE is not set, the bache device
-> can not be stopped until all inernal cache device I/O stopped. For large
-> size cache device, and writeback thread competes locks with gc thread,
-> there might be a quite long time to wait.
-> 
-> Fixes: c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev")
-> Signed-off-by: Coly Li <colyli@suse.de>
-> ---
->   drivers/md/bcache/super.c | 17 +++++++++++++++++
->   1 file changed, 17 insertions(+)
-> 
-> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-> index 8196b19fada2..a0d5a3ccc7d0 100644
-> --- a/drivers/md/bcache/super.c
-> +++ b/drivers/md/bcache/super.c
-> @@ -1369,6 +1369,8 @@ int bch_flash_dev_create(struct cache_set *c, uint64_t size)
->   
->   bool bch_cached_dev_error(struct cached_dev *dc)
->   {
-> +	struct cache_set *c;
-> +
->   	if (!dc || test_bit(BCACHE_DEV_CLOSING, &dc->disk.flags))
->   		return false;
->   
-> @@ -1379,6 +1381,21 @@ bool bch_cached_dev_error(struct cached_dev *dc)
->   	pr_err("stop %s: too many IO errors on backing device %s\n",
->   		dc->disk.disk->disk_name, dc->backing_dev_name);
->   
-> +	/*
-> +	 * If the cached device is still attached to a cache set,
-> +	 * even dc->io_disable is true and no more I/O requests
-> +	 * accepted, cache device internal I/O (writeback scan or
-> +	 * garbage collection) may still prevent bcache device from
-> +	 * being stopped. So here CACHE_SET_IO_DISABLE should be
-> +	 * set to c->flags too, to make the internal I/O to cache
-> +	 * device rejected and stopped immediately.
-> +	 * If c is NULL, that means the bcache device is not attached
-> +	 * to any cache set, then no CACHE_SET_IO_DISABLE bit to set.
-> +	 */
-> +	c = dc->disk.c;
-> +	if (c && test_and_set_bit(CACHE_SET_IO_DISABLE, &c->flags))
-> +		pr_warn("CACHE_SET_IO_DISABLE already set");
-> +
->   	bcache_device_stop(&dc->disk);
->   	return true;
->   }
-> 
-Neat.
+Commit c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev") tries
+to stop bcache device by calling bcache_device_stop() when too many I/O
+errors happened on backing device. But if there is internal I/O happening
+on cache device (writeback scan, garbage collection, etc), a regular I/O
+request triggers the internal I/Os may still holds a refcount of dc->count,
+and the refcount may only be dropped after the internal I/O stopped.
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+By this patch, bch_cached_dev_error() will check if the backing device is
+attached to a cache set, if yes that CACHE_SET_IO_DISABLE will be set to
+flags of this cache set. Then internal I/Os on cache device will be
+rejected and stopped immediately, and the bcache device can be stopped.
 
-Cheers,
+For people who are not familiar with the interesting refcount dependance,
+let me explain a bit more how the fix works. Example the writeback thread
+will scan cache device for dirty data writeback purpose. Before it stopps,
+it holds a refcount of dc->count. When CACHE_SET_IO_DISABLE bit is set,
+the internal I/O will stopped and the while-loop in bch_writeback_thread()
+quits and calls cached_dev_put() to drop dc->count. If this is the last
+refcount to drop, then cached_dev_detach_finish() will be called. In this
+call back function, in turn closure_put(dc->disk.cl) is called to drop a
+refcount of closure dc->disk.cl. If this is the last refcount of this
+closure to drop, then cached_dev_flush() will be called. Then the cached
+device is freed. So if CACHE_SET_IO_DISABLE is not set, the bache device
+can not be stopped until all inernal cache device I/O stopped. For large
+size cache device, and writeback thread competes locks with gc thread,
+there might be a quite long time to wait.
 
-Hannes
+Fixes: c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev")
+Signed-off-by: Coly Li <colyli@suse.de>
+---
+ drivers/md/bcache/super.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 8196b19fada2..c017cd444c66 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1369,6 +1369,8 @@ int bch_flash_dev_create(struct cache_set *c, uint64_t size)
+ 
+ bool bch_cached_dev_error(struct cached_dev *dc)
+ {
++	struct cache_set *c;
++
+ 	if (!dc || test_bit(BCACHE_DEV_CLOSING, &dc->disk.flags))
+ 		return false;
+ 
+@@ -1379,6 +1381,21 @@ bool bch_cached_dev_error(struct cached_dev *dc)
+ 	pr_err("stop %s: too many IO errors on backing device %s\n",
+ 		dc->disk.disk->disk_name, dc->backing_dev_name);
+ 
++	/*
++	 * If the cached device is still attached to a cache set,
++	 * even dc->io_disable is true and no more I/O requests
++	 * accepted, cache device internal I/O (writeback scan or
++	 * garbage collection) may still prevent bcache device from
++	 * being stopped. So here CACHE_SET_IO_DISABLE should be
++	 * set to c->flags too, to make the internal I/O to cache
++	 * device rejected and stopped immediately.
++	 * If c is NULL, that means the bcache device is not attached
++	 * to any cache set, then no CACHE_SET_IO_DISABLE bit to set.
++	 */
++	c = dc->disk.c;
++	if (c && test_and_set_bit(CACHE_SET_IO_DISABLE, &c->flags))
++		pr_info("CACHE_SET_IO_DISABLE already set");
++
+ 	bcache_device_stop(&dc->disk);
+ 	return true;
+ }
+-- 
+2.16.3
