@@ -4,11 +4,11 @@ To: linux-bcache@vger.kernel.org,
 	axboe@kernel.dk
 Cc: linux-block@vger.kernel.org,
 	Coly Li <colyli@suse.de>
-Subject: [PATCH v3 2/6] bcache: set CACHE_SET_IO_DISABLE in bch_cached_dev_error()
-Date: Wed,  2 May 2018 23:13:13 +0800
-Message-Id: <20180502151317.120036-3-colyli@suse.de>
-In-Reply-To: <20180502151317.120036-1-colyli@suse.de>
-References: <20180502151317.120036-1-colyli@suse.de>
+Subject: [PATCH 2/6] bcache: set CACHE_SET_IO_DISABLE in bch_cached_dev_error()
+Date: Wed,  2 May 2018 22:46:55 +0800
+Message-Id: <20180502144659.118628-3-colyli@suse.de>
+In-Reply-To: <20180502144659.118628-1-colyli@suse.de>
+References: <20180502144659.118628-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
 Commit c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev") tries
@@ -45,7 +45,7 @@ Signed-off-by: Coly Li <colyli@suse.de>
  1 file changed, 17 insertions(+)
 
 diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 8196b19fada2..c017cd444c66 100644
+index 8196b19fada2..a0d5a3ccc7d0 100644
 --- a/drivers/md/bcache/super.c
 +++ b/drivers/md/bcache/super.c
 @@ -1369,6 +1369,8 @@ int bch_flash_dev_create(struct cache_set *c, uint64_t size)
@@ -74,7 +74,7 @@ index 8196b19fada2..c017cd444c66 100644
 +	 */
 +	c = dc->disk.c;
 +	if (c && test_and_set_bit(CACHE_SET_IO_DISABLE, &c->flags))
-+		pr_info("CACHE_SET_IO_DISABLE already set");
++		pr_warn("CACHE_SET_IO_DISABLE already set");
 +
  	bcache_device_stop(&dc->disk);
  	return true;
