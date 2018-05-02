@@ -1,63 +1,50 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [RESEND PATCH V5 25/33] xfs: conver to bio_for_each_page_all2
-Date: Fri, 25 May 2018 11:46:13 +0800
-Message-Id: <20180525034621.31147-26-ming.lei@redhat.com>
-In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
-References: <20180525034621.31147-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <zhangbenlong@didichuxing.com>
+Date: Wed, 2 May 2018 10:20:20 +0800
+From: Benlong Zhang <zhangbenlong@didichuxing.com>
+To: Tejun Heo <tj@kernel.org>
+CC: <axboe@kernel.dk>, <shli@kernel.org>, <david@fromorbit.com>,
+	<bfoster@redhat.com>, <linux-block@vger.kernel.org>, Josef Bacik
+	<jbacik@fb.com>
+Subject: Re: [PATCH] A tentative patch to bypass REQ_META in blk throttle
+Message-ID: <20180502022004.GA3831@localhost>
+References: <20180420100554.GA23471@localhost>
+ <20180426190118.GP1911913@devbig577.frc2.facebook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20180426190118.GP1911913@devbig577.frc2.facebook.com>
+Return-Path: zhangbenlong@didichuxing.com
 List-ID: <linux-block@vger.kernel.org>
 
-bio_for_each_page_all() can't be used any more after multipage bvec is
-enabled, so we have to convert to bio_for_each_page_all2().
+Hi Tejun,
 
-Given bvec can't be changed under bio_for_each_page_all2(), this patch
-marks the bvec parameter as 'const' for xfs_finish_page_writeback().
+On Thu, Apr 26, 2018 at 12:01:18PM -0700, Tejun Heo wrote:
+> Hello,
+> 
+> On Fri, Apr 20, 2018 at 06:06:01PM +0800, Benlong Zhang wrote:
+> > One problem with cgwb is how fs should treat metadata bios.
+> > For example in xfs, the log might be partially stuck in one
+> > group, leaving threads in other groups waiting for too long.
+> > Please refer to the linux-xfs discussion:
+> > "[PATCH V2] xfs: implement cgroup writeback support"
+> > 
+> > One approach is to correctly tag bio->bi_css from within the
+> > filesystems (for xfs log should be blkcg_root), and the other
+> > is to skip them, but relies on REQ_META being set.
+> > 
+> > It works with xfs on a cgwb porting implementation to 3.10.0.
+> > But really not sure about other filesystems...
+> 
+> Yeah, Josef (cc'd) is working on a similar approach but in a more
+> generic way.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/xfs/xfs_aops.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Good to know and looking forward to the code.
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 13e2c167aec3..b5077eb4df51 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -107,7 +107,7 @@ xfs_find_daxdev_for_inode(
- static void
- xfs_finish_page_writeback(
- 	struct inode		*inode,
--	struct bio_vec		*bvec,
-+	const struct bio_vec	*bvec,
- 	int			error)
- {
- 	struct buffer_head	*head = page_buffers(bvec->bv_page), *bh = head;
-@@ -169,6 +169,7 @@ xfs_destroy_ioend(
- 	for (bio = &ioend->io_inline_bio; bio; bio = next) {
- 		struct bio_vec	*bvec;
- 		int		i;
-+		struct bvec_iter_all bia;
- 
- 		/*
- 		 * For the last bio, bi_private points to the ioend, so we
-@@ -180,7 +181,7 @@ xfs_destroy_ioend(
- 			next = bio->bi_private;
- 
- 		/* walk each page on bio, ending page IO on them */
--		bio_for_each_page_all(bvec, bio, i)
-+		bio_for_each_page_all2(bvec, bio, i, bia)
- 			xfs_finish_page_writeback(inode, bvec, error);
- 
- 		bio_put(bio);
--- 
-2.9.5
+Thank you for your reply!
+
+Benlong
+
+> 
+> Thanks.
+> 
+> -- 
+> tejun
