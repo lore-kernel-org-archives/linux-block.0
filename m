@@ -1,35 +1,34 @@
-Return-Path: <BATV+a01a3e67072ae75c0352+5392+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Tue, 29 May 2018 20:51:48 +0200
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme one-liner fix for 4.17
-Message-ID: <20180529185148.GA30983@infradead.org>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCHSET 0/2] sync discard
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
+References: <1525102372-8430-1-git-send-email-axboe@kernel.dk>
+ <20180502124508.GD22857@lst.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <b219c171-1b28-d7ea-f5b9-c352da64cafb@kernel.dk>
+Date: Wed, 2 May 2018 08:19:43 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180502124508.GD22857@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+On 5/2/18 6:45 AM, Christoph Hellwig wrote:
+> On Mon, Apr 30, 2018 at 09:32:50AM -0600, Jens Axboe wrote:
+>> We recently had a pretty severe perf regression with the XFS async
+>> discard. This small series add a SYNC issue discard flag, and also
+>> limits the chain size for sync discards. Patch 2 adds support for
+>> reverting XFS back to doign sync discards.
+> 
+> Please explain the hardware and workload that you see this with.
+> Also given that it is a hardware limitation a quirk limiting the
+> size of discard requests and/or number of outstanding discards
+> would be more useful than falling back to a broken mode of issueing
+> block commands.
 
-below is a one-liner fix from Max that unbreaks T10-DIF support, which
-got broken in 4.15.
+Honestly, from what I've seen in production, I can whitelist one
+device and that one is no longer being produced. The rest is crap
+in terms of latency impacting trim. A quirk or whitelist/blacklist
+isn't going to be of any help.
 
-The following changes since commit eedffa28c9b00ca2dcb4d541b5a530f4c917052d:
-
-  loop: clear wb_err in bd_inode when detaching backing file (2018-05-21 12:36:03 -0600)
-
-are available in the Git repository at:
-
-  git://git.infradead.org/nvme.git nvme-4.17
-
-for you to fetch changes up to c97f414c54a255f4f05a50a2625efaeee406e134:
-
-  nvme: fix extended data LBA supported setting (2018-05-29 20:29:16 +0200)
-
-----------------------------------------------------------------
-Max Gurtovoy (1):
-      nvme: fix extended data LBA supported setting
-
- drivers/nvme/host/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+-- 
+Jens Axboe
