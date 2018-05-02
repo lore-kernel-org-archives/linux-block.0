@@ -4,11 +4,11 @@ To: linux-bcache@vger.kernel.org,
 	axboe@kernel.dk
 Cc: linux-block@vger.kernel.org,
 	Coly Li <colyli@suse.de>
-Subject: [PATCH v3 1/6] bcache: store disk name in struct cache and struct cached_dev
-Date: Wed,  2 May 2018 23:13:12 +0800
-Message-Id: <20180502151317.120036-2-colyli@suse.de>
-In-Reply-To: <20180502151317.120036-1-colyli@suse.de>
-References: <20180502151317.120036-1-colyli@suse.de>
+Subject: [PATCH 1/6] bcache: store disk name in struct cache and struct cached_dev
+Date: Wed,  2 May 2018 22:46:54 +0800
+Message-Id: <20180502144659.118628-2-colyli@suse.de>
+In-Reply-To: <20180502144659.118628-1-colyli@suse.de>
+References: <20180502144659.118628-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
 Current code uses bdevname() or bio_devname() to reference gendisk
