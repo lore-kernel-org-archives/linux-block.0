@@ -1,176 +1,62 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ipmail03.adl2.internode.on.net ([150.101.137.141]:28044 "EHLO
+Received: from ipmail03.adl2.internode.on.net ([150.101.137.141]:11272 "EHLO
         ipmail03.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751045AbeEBGCJ (ORCPT
+        by vger.kernel.org with ESMTP id S1751069AbeEBCfA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 2 May 2018 02:02:09 -0400
+        Tue, 1 May 2018 22:35:00 -0400
+Date: Wed, 2 May 2018 12:34:50 +1000
 From: Dave Chinner <david@fromorbit.com>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jan Kara <jack@suse.cz>, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         hch@lst.de, rdorr@microsoft.com
-Subject: [PATCH 3/3] iomap: Use FUA for pure data O_DSYNC DIO writes
-Date: Wed,  2 May 2018 15:38:07 +1000
-Message-Id: <20180502053807.13846-4-david@fromorbit.com>
-In-Reply-To: <20180502053807.13846-1-david@fromorbit.com>
-References: <20180502053807.13846-1-david@fromorbit.com>
+Subject: Re: [PATCH 4/4] iomap: Use FUA for pure data O_DSYNC DIO writes
+Message-ID: <20180502023450.GZ23861@dastard>
+References: <20180418040828.18165-1-david@fromorbit.com>
+ <20180418040828.18165-5-david@fromorbit.com>
+ <20180421125405.hyx3bbkohdgvducq@quack2.suse.cz>
+ <20180424173444.GA25233@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180424173444.GA25233@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Dave Chinner <dchinner@redhat.com>
+On Tue, Apr 24, 2018 at 10:34:44AM -0700, Christoph Hellwig wrote:
+> On Sat, Apr 21, 2018 at 02:54:05PM +0200, Jan Kara wrote:
+> > > -		if (iocb->ki_flags & IOCB_DSYNC)
+> > > +		if (iocb->ki_flags & IOCB_DSYNC) {
+> > >  			dio->flags |= IOMAP_DIO_NEED_SYNC;
+> > > +			/*
+> > > +			 * We optimistically try using FUA for this IO.  Any
+> > > +			 * non-FUA write that occurs will clear this flag, hence
+> > > +			 * we know before completion whether a cache flush is
+> > > +			 * necessary.
+> > > +			 */
+> > > +			dio->flags |= IOMAP_DIO_WRITE_FUA;
+> > > +		}
+> > 
+> > So I don't think this is quite correct. IOCB_DSYNC gets set also for O_SYNC
+> > writes (in that case we also set IOCB_SYNC). And for those we cannot use
+> > the FUA optimization AFAICT (definitely IOMAP_F_DIRTY isn't a safe
+> > indicator of a need of full fsync for O_SYNC). Other than that the patch
+> > looks good to me.
+> 
+> Oops, good catch. I think the above if should just be
+> 
+> 		if (iocb->ki_flags & (IOCB_DSYNC | IOCB_SYNC) == IOCB_DSYNC)) {
+> 
+> and we are fine. 
 
-If we are doing direct IO writes with datasync semantics, we often
-have to flush metadata changes along with the data write. However,
-if we are overwriting existing data, there are no metadata changes
-that we need to flush. In this case, optimising the IO by using
-FUA write makes sense.
+Ah, not exactly. IOMAP_DIO_NEED_SYNC needs to be set for either
+DYSNC or SYNC writes, while IOMAP_DIO_WRITE_FUA should only be set
+for DSYNC.
 
-We know from the IOMAP_F_DIRTY flag as to whether a specific inode
-requires a metadata flush - this is currently used by DAX to ensure
-extent modification as stable in page fault operations. For direct
-IO writes, we can use it to determine if we need to flush metadata
-or not once the data is on disk.
+I'll fix this up appropriately.
 
-Hence if we have been returned a mapped extent that is not new and
-the IO mapping is not dirty, then we can use a FUA write to provide
-datasync semantics. This allows us to short-cut the
-generic_write_sync() call in IO completion and hence avoid
-unnecessary operations. This makes pure direct IO data write
-behaviour identical to the way block devices use REQ_FUA to provide
-datasync semantics.
+Cheers,
 
-On a FUA enabled device, a synchronous direct IO write workload
-(sequential 4k overwrites in 32MB file) had the following results:
-
-# xfs_io -fd -c "pwrite -V 1 -D 0 32m" /mnt/scratch/boo
-
-kernel		time	write()s	write iops	Write b/w
-------		----	--------	----------	---------
-(no dsync)	 4s	2173/s		2173		8.5MB/s
-vanilla		22s	 370/s		 750		1.4MB/s
-patched		19s	 420/s		 420		1.6MB/s
-
-The patched code clearly doesn't send cache flushes anymore, but
-instead uses FUA (confirmed via blktrace), and performance improves
-a bit as a result. However, the benefits will be higher on workloads
-that mix O_DSYNC overwrites with other write IO as we won't be
-flushing the entire device cache on every DSYNC overwrite IO
-anymore.
-
-Signed-Off-By: Dave Chinner <dchinner@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- fs/iomap.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 46 insertions(+), 5 deletions(-)
-
-diff --git a/fs/iomap.c b/fs/iomap.c
-index b044d8ee2efd..bcfd7f3654d4 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -685,6 +685,7 @@ EXPORT_SYMBOL_GPL(iomap_seek_data);
-  * Private flags for iomap_dio, must not overlap with the public ones in
-  * iomap.h:
-  */
-+#define IOMAP_DIO_WRITE_FUA	(1 << 28)
- #define IOMAP_DIO_NEED_SYNC	(1 << 29)
- #define IOMAP_DIO_WRITE		(1 << 30)
- #define IOMAP_DIO_DIRTY		(1 << 31)
-@@ -861,6 +862,7 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
- 	struct iov_iter iter;
- 	struct bio *bio;
- 	bool need_zeroout = false;
-+	bool use_fua = false;
- 	int nr_pages, ret;
- 	size_t copied = 0;
- 
-@@ -884,8 +886,20 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
- 	case IOMAP_MAPPED:
- 		if (iomap->flags & IOMAP_F_SHARED)
- 			dio->flags |= IOMAP_DIO_COW;
--		if (iomap->flags & IOMAP_F_NEW)
-+		if (iomap->flags & IOMAP_F_NEW) {
- 			need_zeroout = true;
-+		} else {
-+			/*
-+			 * Use a FUA write if we need datasync semantics, this
-+			 * is a pure data IO that doesn't require any metadata
-+			 * updates and the underlying device supports FUA. This
-+			 * allows us to avoid cache flushes on IO completion.
-+			 */
-+			if (!(iomap->flags & (IOMAP_F_SHARED|IOMAP_F_DIRTY)) &&
-+			    (dio->flags & IOMAP_DIO_WRITE_FUA) &&
-+			    blk_queue_fua(bdev_get_queue(iomap->bdev)))
-+				use_fua = true;
-+		}
- 		break;
- 	default:
- 		WARN_ON_ONCE(1);
-@@ -933,10 +947,14 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
- 
- 		n = bio->bi_iter.bi_size;
- 		if (dio->flags & IOMAP_DIO_WRITE) {
--			bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC | REQ_IDLE);
-+			bio->bi_opf = REQ_OP_WRITE | REQ_SYNC | REQ_IDLE;
-+			if (use_fua)
-+				bio->bi_opf |= REQ_FUA;
-+			else
-+				dio->flags &= ~IOMAP_DIO_WRITE_FUA;
- 			task_io_account_write(n);
- 		} else {
--			bio_set_op_attrs(bio, REQ_OP_READ, 0);
-+			bio->bi_opf = REQ_OP_READ;
- 			if (dio->flags & IOMAP_DIO_DIRTY)
- 				bio_set_pages_dirty(bio);
- 		}
-@@ -966,7 +984,12 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
- 
- /*
-  * iomap_dio_rw() always completes O_[D]SYNC writes regardless of whether the IO
-- * is being issued as AIO or not.
-+ * is being issued as AIO or not.  This allows us to optimise pure data writes
-+ * to use REQ_FUA rather than requiring generic_write_sync() to issue a
-+ * REQ_FLUSH post write. This is slightly tricky because a single request here
-+ * can be mapped into multiple disjoint IOs and only a subset of the IOs issued
-+ * may be pure data writes. In that case, we still need to do a full data sync
-+ * completion.
-  */
- ssize_t
- iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
-@@ -1012,10 +1035,21 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 		if (iter->type == ITER_IOVEC)
- 			dio->flags |= IOMAP_DIO_DIRTY;
- 	} else {
-+		flags |= IOMAP_WRITE;
- 		dio->flags |= IOMAP_DIO_WRITE;
-+
-+		/* for data sync or sync, we need sync completion processing */
- 		if (iocb->ki_flags & IOCB_DSYNC)
- 			dio->flags |= IOMAP_DIO_NEED_SYNC;
--		flags |= IOMAP_WRITE;
-+
-+		/*
-+		 * For datasync only writes, we optimistically try using FUA for
-+		 * this IO.  Any non-FUA write that occurs will clear this flag,
-+		 * hence we know before completion whether a cache flush is
-+		 * necessary.
-+		 */
-+		if ((iocb->ki_flags & (IOCB_DSYNC | IOCB_SYNC)) == IOCB_DSYNC)
-+			dio->flags |= IOMAP_DIO_WRITE_FUA;
- 	}
- 
- 	if (iocb->ki_flags & IOCB_NOWAIT) {
-@@ -1071,6 +1105,13 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 	if (ret < 0)
- 		iomap_dio_set_error(dio, ret);
- 
-+	/*
-+	 * If all the writes we issued were FUA, we don't need to flush the
-+	 * cache on IO completion. Clear the sync flag for this case.
-+	 */
-+	if (dio->flags & IOMAP_DIO_WRITE_FUA)
-+		dio->flags &= ~IOMAP_DIO_NEED_SYNC;
-+
- 	if (!atomic_dec_and_test(&dio->ref)) {
- 		if (!is_sync_kiocb(iocb))
- 			return -EIOCBQUEUED;
+Dave.
 -- 
-2.17.0
+Dave Chinner
+david@fromorbit.com
