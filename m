@@ -4,11 +4,11 @@ To: linux-bcache@vger.kernel.org,
 	axboe@kernel.dk
 Cc: linux-block@vger.kernel.org,
 	Coly Li <colyli@suse.de>
-Subject: [PATCH v3 4/6] bcache: add wait_for_kthread_stop() in bch_allocator_thread()
-Date: Wed,  2 May 2018 23:13:15 +0800
-Message-Id: <20180502151317.120036-5-colyli@suse.de>
-In-Reply-To: <20180502151317.120036-1-colyli@suse.de>
-References: <20180502151317.120036-1-colyli@suse.de>
+Subject: [PATCH 4/6] bcache: add wait_for_kthread_stop() in bch_allocator_thread()
+Date: Wed,  2 May 2018 22:46:57 +0800
+Message-Id: <20180502144659.118628-5-colyli@suse.de>
+In-Reply-To: <20180502144659.118628-1-colyli@suse.de>
+References: <20180502144659.118628-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
 When CACHE_SET_IO_DISABLE is set on cache set flags, bcache allocator
