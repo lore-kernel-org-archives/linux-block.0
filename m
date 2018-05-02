@@ -1,110 +1,115 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-by2nam01on0114.outbound.protection.outlook.com ([104.47.34.114]:53782
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751262AbeEBO1l (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 2 May 2018 10:27:41 -0400
-From: Robert Dorr <rdorr@microsoft.com>
-To: Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>
-CC: "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "hch@lst.de" <hch@lst.de>, Slava Oks <slavao@microsoft.com>,
-        Jasraj Dange <jasrajd@microsoft.com>,
-        Michael Nelson <micn@microsoft.com>,
-        Amit Banerjee <amit.banerjee@microsoft.com>,
-        Travis Wright <twright@microsoft.com>,
-        Bob Ward <bobward@microsoft.com>,
-        Scott Konersmann <scottkon@microsoft.com>
-Subject: RE: [PATCH 2/4] iomap: iomap_dio_rw() handles all sync writes
-Date: Wed, 2 May 2018 14:27:37 +0000
-Message-ID: <BN6PR21MB07409BC39716894D592EB0C0B8800@BN6PR21MB0740.namprd21.prod.outlook.com>
-References: <20180418040828.18165-1-david@fromorbit.com>
- <20180418040828.18165-3-david@fromorbit.com>
- <20180421130309.efivmjo5ald2jchv@quack2.suse.cz>
- <20180502024540.GA23861@dastard>
-In-Reply-To: <20180502024540.GA23861@dastard>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Dave Chinner <david@fromorbit.com>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        hch@lst.de, rdorr@microsoft.com
+Subject: [PATCH 2/3] iomap: iomap_dio_rw() handles all sync writes
+Date: Wed,  2 May 2018 15:38:06 +1000
+Message-Id: <20180502053807.13846-3-david@fromorbit.com>
+In-Reply-To: <20180502053807.13846-1-david@fromorbit.com>
+References: <20180502053807.13846-1-david@fromorbit.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Thanks for your continued effort Dave.
+From: Dave Chinner <dchinner@redhat.com>
 
-In the current implementation the first write to the location updates the m=
-etadata and must issue the flush.   In Windows SQL Server can avoid this be=
-havior.   SQL Server can issue DeviceIoControl with SET_FILE_VALID_DATA and=
- then SetEndOfFile.  The SetEndOfFile acquires space and saves metadata wit=
-hout requiring the actual write.   This allows us to quickly create a large=
- file and the writes do not need the added flush.
+Currently iomap_dio_rw() only handles (data)sync write completions
+for AIO. This means we can't optimised non-AIO IO to minimise device
+flushes as we can't tell the caller whether a flush is required or
+not.
 
-Is this something that fallocate could accommodate to avoid having to write=
- once (triggers flush for metadata) and then secondary writes can use FUA a=
-nd avoid the flush?
+To solve this problem and enable further optimisations, make
+iomap_dio_rw responsible for data sync behaviour for all IO, not
+just AIO.
 
+In doing so, the sync operation is now accounted as part of the DIO
+IO by inode_dio_end(), hence post-IO data stability updates will no
+long race against operations that serialise via inode_dio_wait()
+such as truncate or hole punch.
 
+Signed-Off-By: Dave Chinner <dchinner@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/iomap.c        | 21 +++++++++++++++------
+ fs/xfs/xfs_file.c |  5 -----
+ 2 files changed, 15 insertions(+), 11 deletions(-)
 
------Original Message-----
-From: Dave Chinner <david@fromorbit.com>=20
-Sent: Tuesday, May 1, 2018 9:46 PM
-To: Jan Kara <jack@suse.cz>
-Cc: linux-xfs@vger.kernel.org; linux-fsdevel@vger.kernel.org; linux-block@v=
-ger.kernel.org; hch@lst.de; Robert Dorr <rdorr@microsoft.com>
-Subject: Re: [PATCH 2/4] iomap: iomap_dio_rw() handles all sync writes
-
-On Sat, Apr 21, 2018 at 03:03:09PM +0200, Jan Kara wrote:
-> On Wed 18-04-18 14:08:26, Dave Chinner wrote:
-> > From: Dave Chinner <dchinner@redhat.com>
-> >=20
-> > Currently iomap_dio_rw() only handles (data)sync write completions=20
-> > for AIO. This means we can't optimised non-AIO IO to minimise device=20
-> > flushes as we can't tell the caller whether a flush is required or=20
-> > not.
-> >=20
-> > To solve this problem and enable further optimisations, make=20
-> > iomap_dio_rw responsible for data sync behaviour for all IO, not=20
-> > just AIO.
-> >=20
-> > In doing so, the sync operation is now accounted as part of the DIO=20
-> > IO by inode_dio_end(), hence post-IO data stability updates will no=20
-> > long race against operations that serialise via inode_dio_wait()=20
-> > such as truncate or hole punch.
-> >=20
-> > Signed-Off-By: Dave Chinner <dchinner@redhat.com>
-> > Reviewed-by: Christoph Hellwig <hch@lst.de>
->=20
-> Looks good to me. You can add:
->=20
-> Reviewed-by: Jan Kara <jack@suse.cz>
-
-It looks good, but it's broken in a subtle, nasty way. :/
-
-> > @@ -768,14 +776,8 @@ static ssize_t iomap_dio_complete(struct=20
-> > iomap_dio *dio)  static void iomap_dio_complete_work(struct=20
-> > work_struct *work)  {
-> >  	struct iomap_dio *dio =3D container_of(work, struct iomap_dio, aio.wo=
-rk);
-> > -	struct kiocb *iocb =3D dio->iocb;
-> > -	bool is_write =3D (dio->flags & IOMAP_DIO_WRITE);
-> > -	ssize_t ret;
-> > =20
-> > -	ret =3D iomap_dio_complete(dio);
-> > -	if (is_write && ret > 0)
-> > -		ret =3D generic_write_sync(iocb, ret);
-> > -	iocb->ki_complete(iocb, ret, 0);
-> > +	dio->iocb->ki_complete(dio->iocb, iomap_dio_complete(dio), 0);
-
-This generates a use after free from KASAN from generic/016. it appears the=
- compiler orders the code so that it dereferences
-dio->iocb after iomap_dio_complete() has freed the dio structure
-(yay!).
-
-I'll post a new version of the patchset now that I've got changes to
-2 of the 3 remaining patches in it....
-
-Cheers,
-
-Dave.
---
-Dave Chinner
-david@fromorbit.com
+diff --git a/fs/iomap.c b/fs/iomap.c
+index afd163586aa0..b044d8ee2efd 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -685,6 +685,7 @@ EXPORT_SYMBOL_GPL(iomap_seek_data);
+  * Private flags for iomap_dio, must not overlap with the public ones in
+  * iomap.h:
+  */
++#define IOMAP_DIO_NEED_SYNC	(1 << 29)
+ #define IOMAP_DIO_WRITE		(1 << 30)
+ #define IOMAP_DIO_DIRTY		(1 << 31)
+ 
+@@ -759,6 +760,13 @@ static ssize_t iomap_dio_complete(struct iomap_dio *dio)
+ 			dio_warn_stale_pagecache(iocb->ki_filp);
+ 	}
+ 
++	/*
++	 * If this is a DSYNC write, make sure we push it to stable storage now
++	 * that we've written data.
++	 */
++	if (ret > 0 && (dio->flags & IOMAP_DIO_NEED_SYNC))
++		ret = generic_write_sync(iocb, ret);
++
+ 	inode_dio_end(file_inode(iocb->ki_filp));
+ 	kfree(dio);
+ 
+@@ -769,13 +777,8 @@ static void iomap_dio_complete_work(struct work_struct *work)
+ {
+ 	struct iomap_dio *dio = container_of(work, struct iomap_dio, aio.work);
+ 	struct kiocb *iocb = dio->iocb;
+-	bool is_write = (dio->flags & IOMAP_DIO_WRITE);
+-	ssize_t ret;
+ 
+-	ret = iomap_dio_complete(dio);
+-	if (is_write && ret > 0)
+-		ret = generic_write_sync(iocb, ret);
+-	iocb->ki_complete(iocb, ret, 0);
++	iocb->ki_complete(iocb, iomap_dio_complete(dio), 0);
+ }
+ 
+ /*
+@@ -961,6 +964,10 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
+ 	return copied;
+ }
+ 
++/*
++ * iomap_dio_rw() always completes O_[D]SYNC writes regardless of whether the IO
++ * is being issued as AIO or not.
++ */
+ ssize_t
+ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+ 		const struct iomap_ops *ops, iomap_dio_end_io_t end_io)
+@@ -1006,6 +1013,8 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+ 			dio->flags |= IOMAP_DIO_DIRTY;
+ 	} else {
+ 		dio->flags |= IOMAP_DIO_WRITE;
++		if (iocb->ki_flags & IOCB_DSYNC)
++			dio->flags |= IOMAP_DIO_NEED_SYNC;
+ 		flags |= IOMAP_WRITE;
+ 	}
+ 
+diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+index 4cbd15d84bb8..64112a57b004 100644
+--- a/fs/xfs/xfs_file.c
++++ b/fs/xfs/xfs_file.c
+@@ -570,11 +570,6 @@ xfs_file_dio_aio_write(
+ 	 * complete fully or fail.
+ 	 */
+ 	ASSERT(ret < 0 || ret == count);
+-
+-	if (ret > 0) {
+-		/* Handle various SYNC-type writes */
+-		ret = generic_write_sync(iocb, ret);
+-	}
+ 	return ret;
+ }
+ 
+-- 
+2.17.0
