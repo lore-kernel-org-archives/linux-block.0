@@ -1,55 +1,124 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41366 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S934426AbeEYDs5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 May 2018 23:48:57 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [RESEND PATCH V5 11/33] block: implement bio_pages_all() via bio_for_each_page_all()
-Date: Fri, 25 May 2018 11:45:59 +0800
-Message-Id: <20180525034621.31147-12-ming.lei@redhat.com>
-In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
-References: <20180525034621.31147-1-ming.lei@redhat.com>
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:42475 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751585AbeEBVdE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 May 2018 17:33:04 -0400
+Received: by mail-pf0-f194.google.com with SMTP id p14so1496682pfh.9
+        for <linux-block@vger.kernel.org>; Wed, 02 May 2018 14:33:04 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com,
+        Josef Bacik <josef@toxicpanda.com>
+Subject: [PATCH v2 1/7] block: move some wbt helpers to blk-wbt.c
+Date: Wed,  2 May 2018 14:32:39 -0700
+Message-Id: <13f91069b511243a6245f091e9f0b8ce566daa0d.1525296089.git.osandov@fb.com>
+In-Reply-To: <cover.1525296089.git.osandov@fb.com>
+References: <cover.1525296089.git.osandov@fb.com>
+In-Reply-To: <cover.1525296089.git.osandov@fb.com>
+References: <cover.1525296089.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-As multipage bvec will be enabled soon, bio->bi_vcnt isn't same with
-page count in the bio any more, so use bio_for_each_page_all() to
-compute the number.
+From: Omar Sandoval <osandov@fb.com>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+A few helpers are only used from blk-wbt.c, so move them there, and put
+wbt_track() behind the CONFIG_BLK_WBT typedef. This is in preparation
+for changing how the wbt flags are tracked.
+
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- include/linux/bio.h | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ block/blk-wbt.c | 20 ++++++++++++++++++++
+ block/blk-wbt.h | 33 ++++++++-------------------------
+ 2 files changed, 28 insertions(+), 25 deletions(-)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 3d3795b9a353..08af9272687f 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -334,8 +334,14 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index f92fc84b5e2c..030d6bdcaa4c 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -29,6 +29,26 @@
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/wbt.h>
  
- static inline unsigned bio_pages_all(struct bio *bio)
++static inline void wbt_clear_state(struct blk_issue_stat *stat)
++{
++	stat->stat &= ~BLK_STAT_RES_MASK;
++}
++
++static inline enum wbt_flags wbt_stat_to_mask(struct blk_issue_stat *stat)
++{
++	return (stat->stat & BLK_STAT_RES_MASK) >> BLK_STAT_RES_SHIFT;
++}
++
++static inline bool wbt_is_tracked(struct blk_issue_stat *stat)
++{
++	return (stat->stat >> BLK_STAT_RES_SHIFT) & WBT_TRACKED;
++}
++
++static inline bool wbt_is_read(struct blk_issue_stat *stat)
++{
++	return (stat->stat >> BLK_STAT_RES_SHIFT) & WBT_READ;
++}
++
+ enum {
+ 	/*
+ 	 * Default setting, we'll scale up (to 75% of QD max) or down (min 1)
+diff --git a/block/blk-wbt.h b/block/blk-wbt.h
+index a232c98fbf4d..d3f47a721aec 100644
+--- a/block/blk-wbt.h
++++ b/block/blk-wbt.h
+@@ -31,31 +31,6 @@ enum {
+ 	WBT_STATE_ON_MANUAL	= 2,
+ };
+ 
+-static inline void wbt_clear_state(struct blk_issue_stat *stat)
+-{
+-	stat->stat &= ~BLK_STAT_RES_MASK;
+-}
+-
+-static inline enum wbt_flags wbt_stat_to_mask(struct blk_issue_stat *stat)
+-{
+-	return (stat->stat & BLK_STAT_RES_MASK) >> BLK_STAT_RES_SHIFT;
+-}
+-
+-static inline void wbt_track(struct blk_issue_stat *stat, enum wbt_flags wb_acct)
+-{
+-	stat->stat |= ((u64) wb_acct) << BLK_STAT_RES_SHIFT;
+-}
+-
+-static inline bool wbt_is_tracked(struct blk_issue_stat *stat)
+-{
+-	return (stat->stat >> BLK_STAT_RES_SHIFT) & WBT_TRACKED;
+-}
+-
+-static inline bool wbt_is_read(struct blk_issue_stat *stat)
+-{
+-	return (stat->stat >> BLK_STAT_RES_SHIFT) & WBT_READ;
+-}
+-
+ struct rq_wait {
+ 	wait_queue_head_t wait;
+ 	atomic_t inflight;
+@@ -109,6 +84,11 @@ static inline unsigned int wbt_inflight(struct rq_wb *rwb)
+ 
+ #ifdef CONFIG_BLK_WBT
+ 
++static inline void wbt_track(struct blk_issue_stat *stat, enum wbt_flags flags)
++{
++	stat->stat |= ((u64)flags) << BLK_STAT_RES_SHIFT;
++}
++
+ void __wbt_done(struct rq_wb *, enum wbt_flags);
+ void wbt_done(struct rq_wb *, struct blk_issue_stat *);
+ enum wbt_flags wbt_wait(struct rq_wb *, struct bio *, spinlock_t *);
+@@ -127,6 +107,9 @@ u64 wbt_default_latency_nsec(struct request_queue *);
+ 
+ #else
+ 
++static inline void wbt_track(struct blk_issue_stat *stat, enum wbt_flags flags)
++{
++}
+ static inline void __wbt_done(struct rq_wb *rwb, enum wbt_flags flags)
  {
-+	unsigned i;
-+	struct bio_vec *bv;
-+
- 	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
--	return bio->bi_vcnt;
-+
-+	bio_for_each_page_all(bv, bio, i)
-+		;
-+	return i;
  }
- 
- static inline struct bio_vec *bio_first_bvec_all(struct bio *bio)
 -- 
-2.9.5
+2.17.0
