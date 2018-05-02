@@ -1,21 +1,20 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:37752 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751339AbeEBVdJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 May 2018 17:33:09 -0400
-Received: by mail-pg0-f65.google.com with SMTP id a13-v6so11565218pgu.4
-        for <linux-block@vger.kernel.org>; Wed, 02 May 2018 14:33:09 -0700 (PDT)
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:34540 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751128AbeEBReq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 May 2018 13:34:46 -0400
+Received: by mail-pg0-f67.google.com with SMTP id g20-v6so4455227pgv.1
+        for <linux-block@vger.kernel.org>; Wed, 02 May 2018 10:34:46 -0700 (PDT)
 From: Omar Sandoval <osandov@osandov.com>
 To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com,
-        Josef Bacik <josef@toxicpanda.com>
-Subject: [PATCH v2 5/7] block: use ktime_get_ns() instead of sched_clock() for cfq and bfq
-Date: Wed,  2 May 2018 14:32:43 -0700
-Message-Id: <ac0213d73aadc20cc055baae6666c7d3a693f288.1525296089.git.osandov@fb.com>
-In-Reply-To: <cover.1525296089.git.osandov@fb.com>
-References: <cover.1525296089.git.osandov@fb.com>
-In-Reply-To: <cover.1525296089.git.osandov@fb.com>
-References: <cover.1525296089.git.osandov@fb.com>
+Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
+Subject: [PATCH 5/7] block: use ktime_get_ns() instead of sched_clock() for cfq and bfq
+Date: Wed,  2 May 2018 10:34:24 -0700
+Message-Id: <51ba97a1e6d475ae0fedaa1c8e4dc9344e9705eb.1525282392.git.osandov@fb.com>
+In-Reply-To: <cover.1525282392.git.osandov@fb.com>
+References: <cover.1525282392.git.osandov@fb.com>
+In-Reply-To: <cover.1525282392.git.osandov@fb.com>
+References: <cover.1525282392.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
