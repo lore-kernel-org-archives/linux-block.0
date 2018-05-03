@@ -1,60 +1,41 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <prvs=65464b731=Adam.Manzanares@wdc.com>
+From: Adam Manzanares <Adam.Manzanares@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>
+CC: "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, "bcrl@kvack.org"
+	<bcrl@kvack.org>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>, "linux-aio@kvack.org" <linux-aio@kvack.org>,
+	"linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH v2] fs: Add aio iopriority support for block_dev
-To: Adam Manzanares <Adam.Manzanares@wdc.com>,
- Matthew Wilcox <willy@infradead.org>
-Cc: "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
- "bcrl@kvack.org" <bcrl@kvack.org>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-aio@kvack.org" <linux-aio@kvack.org>,
- "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Date: Thu, 3 May 2018 20:58:17 +0000
+Message-ID: <e81c74fd-a4a2-80e0-476c-6ff35f158abf@wdc.com>
 References: <20180503182114.2797-1-adam.manzanares@wdc.com>
  <20180503183353.GC1562@bombadil.infradead.org>
  <47e0a519-37b4-f5e7-0616-8659d11c2b69@wdc.com>
  <18300bdb-a12f-0b6c-1317-6db3e4391d57@kernel.dk>
- <e81c74fd-a4a2-80e0-476c-6ff35f158abf@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <9e3ba3eb-9c41-3b5d-dc12-f9ef573ab53f@kernel.dk>
-Date: Thu, 3 May 2018 15:20:26 -0600
+In-Reply-To: <18300bdb-a12f-0b6c-1317-6db3e4391d57@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <e81c74fd-a4a2-80e0-476c-6ff35f158abf@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 5/3/18 2:58 PM, Adam Manzanares wrote:
-> 
-> 
-> On 5/3/18 1:24 PM, Jens Axboe wrote:
->> On 5/3/18 2:15 PM, Adam Manzanares wrote:
->>>
->>>
->>> On 5/3/18 11:33 AM, Matthew Wilcox wrote:
->>>> On Thu, May 03, 2018 at 11:21:14AM -0700, adam.manzanares@wdc.com wrote:
->>>>> If we want to avoid bloating struct kiocb, I suggest we turn the private field
->>>>> into a union of the private and ki_ioprio field. It seems like the users of
->>>>> the private field all use it at a point where we can yank the priority from
->>>>> the kiocb before the private field is used. Comments and suggestions welcome.
->>>>
->>>> Or we could just make ki_hint a u8 or u16 ... seems unlikely we'll need
->>>> 32 bits of ki_hint.  (currently defined values are 1-5)
->>>
->>> I like the approach of using a u16 for the ki_hint. I'll update and
->>> resubmit.
->>
->> It's intended to be a mask. If you do shrink it for now, then we need some
->> guard code to ensure it can always carry what it needs to.
->>
-> 
-> Got it, I'll add the guard to rw_hint_valid along with a comment about 
-> being limited by the size of ki_hint in case we get to a situation where 
-> 16 bits is not enough.
-
-Other way around - the API should not be limited by the fact that some
-smaller type was chosen for an internal structure. Hence the guard/check
-should not be in rw_hint_valid, but rather around where you assign
-ki_hint. If/when we do extend the read/write hints, then we'll
-potentially need to bump ki_hint to accommodate it.
-
--- 
-Jens Axboe
+DQoNCk9uIDUvMy8xOCAxOjI0IFBNLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBPbiA1LzMvMTggMjox
+NSBQTSwgQWRhbSBNYW56YW5hcmVzIHdyb3RlOg0KPj4NCj4+DQo+PiBPbiA1LzMvMTggMTE6MzMg
+QU0sIE1hdHRoZXcgV2lsY294IHdyb3RlOg0KPj4+IE9uIFRodSwgTWF5IDAzLCAyMDE4IGF0IDEx
+OjIxOjE0QU0gLTA3MDAsIGFkYW0ubWFuemFuYXJlc0B3ZGMuY29tIHdyb3RlOg0KPj4+PiBJZiB3
+ZSB3YW50IHRvIGF2b2lkIGJsb2F0aW5nIHN0cnVjdCBraW9jYiwgSSBzdWdnZXN0IHdlIHR1cm4g
+dGhlIHByaXZhdGUgZmllbGQNCj4+Pj4gaW50byBhIHVuaW9uIG9mIHRoZSBwcml2YXRlIGFuZCBr
+aV9pb3ByaW8gZmllbGQuIEl0IHNlZW1zIGxpa2UgdGhlIHVzZXJzIG9mDQo+Pj4+IHRoZSBwcml2
+YXRlIGZpZWxkIGFsbCB1c2UgaXQgYXQgYSBwb2ludCB3aGVyZSB3ZSBjYW4geWFuayB0aGUgcHJp
+b3JpdHkgZnJvbQ0KPj4+PiB0aGUga2lvY2IgYmVmb3JlIHRoZSBwcml2YXRlIGZpZWxkIGlzIHVz
+ZWQuIENvbW1lbnRzIGFuZCBzdWdnZXN0aW9ucyB3ZWxjb21lLg0KPj4+DQo+Pj4gT3Igd2UgY291
+bGQganVzdCBtYWtlIGtpX2hpbnQgYSB1OCBvciB1MTYgLi4uIHNlZW1zIHVubGlrZWx5IHdlJ2xs
+IG5lZWQNCj4+PiAzMiBiaXRzIG9mIGtpX2hpbnQuICAoY3VycmVudGx5IGRlZmluZWQgdmFsdWVz
+IGFyZSAxLTUpDQo+Pg0KPj4gSSBsaWtlIHRoZSBhcHByb2FjaCBvZiB1c2luZyBhIHUxNiBmb3Ig
+dGhlIGtpX2hpbnQuIEknbGwgdXBkYXRlIGFuZA0KPj4gcmVzdWJtaXQuDQo+IA0KPiBJdCdzIGlu
+dGVuZGVkIHRvIGJlIGEgbWFzay4gSWYgeW91IGRvIHNocmluayBpdCBmb3Igbm93LCB0aGVuIHdl
+IG5lZWQgc29tZQ0KPiBndWFyZCBjb2RlIHRvIGVuc3VyZSBpdCBjYW4gYWx3YXlzIGNhcnJ5IHdo
+YXQgaXQgbmVlZHMgdG8uDQo+IA0KDQpHb3QgaXQsIEknbGwgYWRkIHRoZSBndWFyZCB0byByd19o
+aW50X3ZhbGlkIGFsb25nIHdpdGggYSBjb21tZW50IGFib3V0IA0KYmVpbmcgbGltaXRlZCBieSB0
+aGUgc2l6ZSBvZiBraV9oaW50IGluIGNhc2Ugd2UgZ2V0IHRvIGEgc2l0dWF0aW9uIHdoZXJlIA0K
+MTYgYml0cyBpcyBub3QgZW5vdWdoLg0K
