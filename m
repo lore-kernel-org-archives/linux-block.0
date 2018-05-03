@@ -1,79 +1,111 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <ming.lei@redhat.com>
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [RESEND PATCH V5 24/33] f2fs: conver to bio_for_each_page_all2
-Date: Fri, 25 May 2018 11:46:12 +0800
-Message-Id: <20180525034621.31147-25-ming.lei@redhat.com>
-In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
-References: <20180525034621.31147-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>
+Subject: [PATCH V3 5/8] nvme: fix race between freeze queues and unfreeze queues
+Date: Thu,  3 May 2018 11:17:13 +0800
+Message-Id: <20180503031716.31446-6-ming.lei@redhat.com>
+In-Reply-To: <20180503031716.31446-1-ming.lei@redhat.com>
+References: <20180503031716.31446-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-bio_for_each_page_all() can't be used any more after multipage bvec is
-enabled, so we have to convert to bio_for_each_page_all2().
+nvme_dev_disable() and resetting controller are required for recovering
+controller, but the two are run from different contexts.
 
+nvme_start_freeze() is run from nvme_dev_disable(), and nvme_unfreeze()
+is run from resetting context. Unfortunatley timeout may be triggered
+when draining IO from resetting controller, so nvme_start_freeze() may
+be run several times.
+
+This patch fixes the race between nvme_start_freeze() and
+nvme_unfreeze() by introducing flags of 'queues_freezed' and the lock
+of 'freeze_mutex'.
+
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Cc: Laurence Oberman <loberman@redhat.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/f2fs/data.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ drivers/nvme/host/core.c | 29 +++++++++++++++++++++--------
+ drivers/nvme/host/nvme.h |  3 +++
+ 2 files changed, 24 insertions(+), 8 deletions(-)
 
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index 89da84b0f0bd..924284e2f358 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -54,6 +54,7 @@ static void f2fs_read_end_io(struct bio *bio)
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 9df4f71e58ca..f9028873298e 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -3447,6 +3447,9 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
+ 	INIT_WORK(&ctrl->fw_act_work, nvme_fw_act_work);
+ 	INIT_WORK(&ctrl->delete_work, nvme_delete_ctrl_work);
+ 
++	ctrl->queues_freezed = false;
++	mutex_init(&ctrl->freeze_mutex);
++
+ 	ret = ida_simple_get(&nvme_instance_ida, 0, 0, GFP_KERNEL);
+ 	if (ret < 0)
+ 		goto out;
+@@ -3526,10 +3529,15 @@ void nvme_unfreeze(struct nvme_ctrl *ctrl)
  {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
+ 	struct nvme_ns *ns;
  
- #ifdef CONFIG_F2FS_FAULT_INJECTION
- 	if (time_to_inject(F2FS_P_SB(bio_first_page_all(bio)), FAULT_IO)) {
-@@ -71,7 +72,7 @@ static void f2fs_read_end_io(struct bio *bio)
- 		}
- 	}
+-	down_read(&ctrl->namespaces_rwsem);
+-	list_for_each_entry(ns, &ctrl->namespaces, list)
+-		blk_mq_unfreeze_queue(ns->queue);
+-	up_read(&ctrl->namespaces_rwsem);
++	mutex_lock(&ctrl->freeze_mutex);
++	if (ctrl->queues_freezed) {
++		down_read(&ctrl->namespaces_rwsem);
++		list_for_each_entry(ns, &ctrl->namespaces, list)
++			blk_mq_unfreeze_queue(ns->queue);
++		up_read(&ctrl->namespaces_rwsem);
++		ctrl->queues_freezed = false;
++	}
++	mutex_unlock(&ctrl->freeze_mutex);
+ }
+ EXPORT_SYMBOL_GPL(nvme_unfreeze);
  
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
+@@ -3562,10 +3570,15 @@ void nvme_start_freeze(struct nvme_ctrl *ctrl)
+ {
+ 	struct nvme_ns *ns;
  
- 		if (!bio->bi_status) {
-@@ -91,8 +92,9 @@ static void f2fs_write_end_io(struct bio *bio)
- 	struct f2fs_sb_info *sbi = bio->bi_private;
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
+-	down_read(&ctrl->namespaces_rwsem);
+-	list_for_each_entry(ns, &ctrl->namespaces, list)
+-		blk_freeze_queue_start(ns->queue);
+-	up_read(&ctrl->namespaces_rwsem);
++	mutex_lock(&ctrl->freeze_mutex);
++	if (!ctrl->queues_freezed) {
++		down_read(&ctrl->namespaces_rwsem);
++		list_for_each_entry(ns, &ctrl->namespaces, list)
++			blk_freeze_queue_start(ns->queue);
++		up_read(&ctrl->namespaces_rwsem);
++		ctrl->queues_freezed = true;
++	}
++	mutex_unlock(&ctrl->freeze_mutex);
+ }
+ EXPORT_SYMBOL_GPL(nvme_start_freeze);
  
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- 		enum count_type type = WB_DATA_TYPE(page);
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 061fecfd44f5..a19b7f04ac24 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -149,6 +149,9 @@ struct nvme_ctrl {
+ 	struct work_struct reset_work;
+ 	struct work_struct delete_work;
  
-@@ -267,6 +269,7 @@ static bool __has_merged_page(struct f2fs_bio_info *io,
- 	struct bio_vec *bvec;
- 	struct page *target;
- 	int i;
-+	struct bvec_iter_all bia;
++	bool queues_freezed;
++	struct mutex freeze_mutex;
++
+ 	struct nvme_subsystem *subsys;
+ 	struct list_head subsys_entry;
  
- 	if (!io->bio)
- 		return false;
-@@ -274,7 +277,7 @@ static bool __has_merged_page(struct f2fs_bio_info *io,
- 	if (!inode && !ino)
- 		return true;
- 
--	bio_for_each_page_all(bvec, io->bio, i) {
-+	bio_for_each_page_all2(bvec, io->bio, i, bia) {
- 
- 		if (bvec->bv_page->mapping)
- 			target = bvec->bv_page;
 -- 
 2.9.5
