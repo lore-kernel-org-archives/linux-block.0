@@ -1,114 +1,84 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	akpm@linux-foundation.org,
-	linux-mm@kvack.org,
-	hannes@cmpxchg.org,
-	linux-kernel@vger.kernel.org,
-	tj@kernel.org,
-	linux-fsdevel@vger.kernel.org
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 08/13] blk-stat: export helpers for modifying blk_rq_stat
-Date: Tue, 29 May 2018 17:17:19 -0400
-Message-Id: <20180529211724.4531-9-josef@toxicpanda.com>
-In-Reply-To: <20180529211724.4531-1-josef@toxicpanda.com>
-References: <20180529211724.4531-1-josef@toxicpanda.com>
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	Coly Li <colyli@suse.de>
+Subject: [PATCH v4 2/6] bcache: set CACHE_SET_IO_DISABLE in bch_cached_dev_error()
+Date: Thu,  3 May 2018 18:51:33 +0800
+Message-Id: <20180503105137.2922-3-colyli@suse.de>
+In-Reply-To: <20180503105137.2922-1-colyli@suse.de>
+References: <20180503105137.2922-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Josef Bacik <jbacik@fb.com>
+Commit c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev") tries
+to stop bcache device by calling bcache_device_stop() when too many I/O
+errors happened on backing device. But if there is internal I/O happening
+on cache device (writeback scan, garbage collection, etc), a regular I/O
+request triggers the internal I/Os may still holds a refcount of dc->count,
+and the refcount may only be dropped after the internal I/O stopped.
 
-We need to use blk_rq_stat in the blkcg qos stuff, so export some of
-these helpers so they can be used by other things.
+By this patch, bch_cached_dev_error() will check if the backing device is
+attached to a cache set, if yes that CACHE_SET_IO_DISABLE will be set to
+flags of this cache set. Then internal I/Os on cache device will be
+rejected and stopped immediately, and the bcache device can be stopped.
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
+For people who are not familiar with the interesting refcount dependance,
+let me explain a bit more how the fix works. Example the writeback thread
+will scan cache device for dirty data writeback purpose. Before it stopps,
+it holds a refcount of dc->count. When CACHE_SET_IO_DISABLE bit is set,
+the internal I/O will stopped and the while-loop in bch_writeback_thread()
+quits and calls cached_dev_put() to drop dc->count. If this is the last
+refcount to drop, then cached_dev_detach_finish() will be called. In this
+call back function, in turn closure_put(dc->disk.cl) is called to drop a
+refcount of closure dc->disk.cl. If this is the last refcount of this
+closure to drop, then cached_dev_flush() will be called. Then the cached
+device is freed. So if CACHE_SET_IO_DISABLE is not set, the bache device
+can not be stopped until all inernal cache device I/O stopped. For large
+size cache device, and writeback thread competes locks with gc thread,
+there might be a quite long time to wait.
+
+Fixes: c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev")
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-stat.c | 16 ++++++++--------
- block/blk-stat.h |  4 ++++
- 2 files changed, 12 insertions(+), 8 deletions(-)
+ drivers/md/bcache/super.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/block/blk-stat.c b/block/blk-stat.c
-index 175c143ac5b9..7587b1c3caaf 100644
---- a/block/blk-stat.c
-+++ b/block/blk-stat.c
-@@ -17,7 +17,7 @@ struct blk_queue_stats {
- 	bool enable_accounting;
- };
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 8196b19fada2..c017cd444c66 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1369,6 +1369,8 @@ int bch_flash_dev_create(struct cache_set *c, uint64_t size)
  
--static void blk_stat_init(struct blk_rq_stat *stat)
-+void blk_rq_stat_init(struct blk_rq_stat *stat)
+ bool bch_cached_dev_error(struct cached_dev *dc)
  {
- 	stat->min = -1ULL;
- 	stat->max = stat->nr_samples = stat->mean = 0;
-@@ -25,7 +25,7 @@ static void blk_stat_init(struct blk_rq_stat *stat)
- }
- 
- /* src is a per-cpu stat, mean isn't initialized */
--static void blk_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
-+void blk_rq_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
- {
- 	if (!src->nr_samples)
- 		return;
-@@ -39,7 +39,7 @@ static void blk_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
- 	dst->nr_samples += src->nr_samples;
- }
- 
--static void __blk_stat_add(struct blk_rq_stat *stat, u64 value)
-+void blk_rq_stat_add(struct blk_rq_stat *stat, u64 value)
- {
- 	stat->min = min(stat->min, value);
- 	stat->max = max(stat->max, value);
-@@ -69,7 +69,7 @@ void blk_stat_add(struct request *rq, u64 now)
- 			continue;
- 
- 		stat = &get_cpu_ptr(cb->cpu_stat)[bucket];
--		__blk_stat_add(stat, value);
-+		blk_rq_stat_add(stat, value);
- 		put_cpu_ptr(cb->cpu_stat);
- 	}
- 	rcu_read_unlock();
-@@ -82,15 +82,15 @@ static void blk_stat_timer_fn(struct timer_list *t)
- 	int cpu;
- 
- 	for (bucket = 0; bucket < cb->buckets; bucket++)
--		blk_stat_init(&cb->stat[bucket]);
-+		blk_rq_stat_init(&cb->stat[bucket]);
- 
- 	for_each_online_cpu(cpu) {
- 		struct blk_rq_stat *cpu_stat;
- 
- 		cpu_stat = per_cpu_ptr(cb->cpu_stat, cpu);
- 		for (bucket = 0; bucket < cb->buckets; bucket++) {
--			blk_stat_sum(&cb->stat[bucket], &cpu_stat[bucket]);
--			blk_stat_init(&cpu_stat[bucket]);
-+			blk_rq_stat_sum(&cb->stat[bucket], &cpu_stat[bucket]);
-+			blk_rq_stat_init(&cpu_stat[bucket]);
- 		}
- 	}
- 
-@@ -143,7 +143,7 @@ void blk_stat_add_callback(struct request_queue *q,
- 
- 		cpu_stat = per_cpu_ptr(cb->cpu_stat, cpu);
- 		for (bucket = 0; bucket < cb->buckets; bucket++)
--			blk_stat_init(&cpu_stat[bucket]);
-+			blk_rq_stat_init(&cpu_stat[bucket]);
- 	}
- 
- 	spin_lock(&q->stats->lock);
-diff --git a/block/blk-stat.h b/block/blk-stat.h
-index 78399cdde9c9..f4a1568e81a4 100644
---- a/block/blk-stat.h
-+++ b/block/blk-stat.h
-@@ -159,4 +159,8 @@ static inline void blk_stat_activate_msecs(struct blk_stat_callback *cb,
- 	mod_timer(&cb->timer, jiffies + msecs_to_jiffies(msecs));
- }
- 
-+void blk_rq_stat_add(struct blk_rq_stat *, u64);
-+void blk_rq_stat_sum(struct blk_rq_stat *, struct blk_rq_stat *);
-+void blk_rq_stat_init(struct blk_rq_stat *);
++	struct cache_set *c;
 +
- #endif
+ 	if (!dc || test_bit(BCACHE_DEV_CLOSING, &dc->disk.flags))
+ 		return false;
+ 
+@@ -1379,6 +1381,21 @@ bool bch_cached_dev_error(struct cached_dev *dc)
+ 	pr_err("stop %s: too many IO errors on backing device %s\n",
+ 		dc->disk.disk->disk_name, dc->backing_dev_name);
+ 
++	/*
++	 * If the cached device is still attached to a cache set,
++	 * even dc->io_disable is true and no more I/O requests
++	 * accepted, cache device internal I/O (writeback scan or
++	 * garbage collection) may still prevent bcache device from
++	 * being stopped. So here CACHE_SET_IO_DISABLE should be
++	 * set to c->flags too, to make the internal I/O to cache
++	 * device rejected and stopped immediately.
++	 * If c is NULL, that means the bcache device is not attached
++	 * to any cache set, then no CACHE_SET_IO_DISABLE bit to set.
++	 */
++	c = dc->disk.c;
++	if (c && test_and_set_bit(CACHE_SET_IO_DISABLE, &c->flags))
++		pr_info("CACHE_SET_IO_DISABLE already set");
++
+ 	bcache_device_stop(&dc->disk);
+ 	return true;
+ }
 -- 
-2.14.3
+2.16.3
