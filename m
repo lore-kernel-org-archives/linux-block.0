@@ -1,22 +1,43 @@
-Return-Path: <hch@lst.de>
-Date: Mon, 7 May 2018 11:51:28 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-	dchinner@redhat.com, hch@lst.de
-Subject: Re: [PATCH 1/3] block: break discard submissions into the user
-	defined size
-Message-ID: <20180507095128.GA25210@lst.de>
-References: <1525360843-6504-1-git-send-email-axboe@kernel.dk> <1525360843-6504-2-git-send-email-axboe@kernel.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1525360843-6504-2-git-send-email-axboe@kernel.dk>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org
+Cc: dchinner@redhat.com,
+	hch@lst.de,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 1/3] block: break discard submissions into the user defined size
+Date: Thu,  3 May 2018 09:20:41 -0600
+Message-Id: <1525360843-6504-2-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1525360843-6504-1-git-send-email-axboe@kernel.dk>
+References: <1525360843-6504-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, May 03, 2018 at 09:20:41AM -0600, Jens Axboe wrote:
-> Don't build discards bigger than what the user asked for, if the
-> user decided to limit the size by writing to 'discard_max_bytes'.
-> 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Don't build discards bigger than what the user asked for, if the
+user decided to limit the size by writing to 'discard_max_bytes'.
 
-Why do this here when blk_bio_discard_split already takes care of it?
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ block/blk-lib.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index a676084d4740..7417d617091b 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -62,10 +62,11 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 		unsigned int req_sects;
+ 		sector_t end_sect, tmp;
+ 
+-		/* Make sure bi_size doesn't overflow */
+-		req_sects = min_t(sector_t, nr_sects, UINT_MAX >> 9);
++		/* Issue in chunks of the user defined max discard setting */
++		req_sects = min_t(sector_t, nr_sects,
++					q->limits.max_discard_sectors);
+ 
+-		/**
++		/*
+ 		 * If splitting a request, and the next starting sector would be
+ 		 * misaligned, stop the discard at the previous aligned sector.
+ 		 */
+-- 
+2.7.4
