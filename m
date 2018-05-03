@@ -1,131 +1,193 @@
-Return-Path: <udknight@gmail.com>
-Return-Path: <udknight@gmail.com>
-Date: Tue, 8 May 2018 09:21:06 +0800
-From: Wang YanQing <udknight@gmail.com>
-To: axboe@kernel.dk
-Cc: gregkh@linuxfoundation.org, pombredanne@nexb.com, tglx@linutronix.de,
-        caizhiyong@hisilicon.com, rdunlap@infradead.org,
-        jiangheng@hisilicon.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v4] block: add verifier for cmdline partition
-Message-ID: <20180508012106.GA4158@udknight>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>
+Subject: [PATCH V3 4/8] nvme: pci: freeze queue in nvme_dev_disable() in case of error recovery
+Date: Thu,  3 May 2018 11:17:12 +0800
+Message-Id: <20180503031716.31446-5-ming.lei@redhat.com>
+In-Reply-To: <20180503031716.31446-1-ming.lei@redhat.com>
+References: <20180503031716.31446-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-I meet strange filesystem corruption issue recently, the reason
-is there are overlaps partitions in cmdline partition argument.
+When nvme_dev_disable() is used for error recovery, we should always
+freeze queues before shutdown controller:
 
-This patch add verifier for cmdline partition, then if there are
-overlaps partitions, cmdline_partition will log a warning. We don't
-treat overlaps partition as a error:
-"
-Caizhiyong <caizhiyong@hisilicon.com> said:
-Partition overlap was intentionally designed in this cmdline partition.
-reference http://lists.infradead.org/pipermail/linux-mtd/2013-August/048092.html
-"
+- reset handler supposes queues are frozen, and will wait_freeze &
+unfreeze them explicitly, if queues aren't frozen during nvme_dev_disable(),
+reset handler may wait forever even though there isn't any requests
+allocated.
 
-Signed-off-by: Wang YanQing <udknight@gmail.com>
+- this way may avoid to cancel lots of requests during error recovery
+
+This patch introduces the parameter of 'freeze_queue' for fixing this
+issue.
+
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Cc: Laurence Oberman <loberman@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- Changes
- v3-v4:
- 1:Fix grammar typo, reported by Randy Dunlap.
- 2:Delete unnecessary type casting, reported by Caizhiyong.
- 3:Record the reason why we can't treat overlapping partitions
-   as errors into changelog.
+ drivers/nvme/host/pci.c | 47 ++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 32 insertions(+), 15 deletions(-)
 
- v2-v3:
- 1:Fix log one pair of overlaps partitions twice in cmdline_parts_verifier.
- 2:Fix out of bound access in cmdline_parts_verifier.
-
- v1-v2:
- 1:Don't treat overlaps partition as a error, but log a warning.
- block/partitions/cmdline.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 66 insertions(+)
-
-diff --git a/block/partitions/cmdline.c b/block/partitions/cmdline.c
-index e333583..2fd1b99 100644
---- a/block/partitions/cmdline.c
-+++ b/block/partitions/cmdline.c
-@@ -58,6 +58,71 @@ static int __init cmdline_parts_setup(char *s)
- }
- __setup("blkdevparts=", cmdline_parts_setup);
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 8172ee584130..ef80e064a62c 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -69,7 +69,8 @@ struct nvme_dev;
+ struct nvme_queue;
  
-+static bool has_overlaps(sector_t from, sector_t size,
-+			 sector_t from2, sector_t size2)
-+{
-+	sector_t end = from + size;
-+	sector_t end2 = from2 + size2;
-+
-+	if (from >= from2 && from < end2)
-+		return true;
-+
-+	if (end > from2 && end <= end2)
-+		return true;
-+
-+	if (from2 >= from && from2 < end)
-+		return true;
-+
-+	if (end2 > from && end2 <= end)
-+		return true;
-+
-+	return false;
-+}
-+
-+static inline void overlaps_warns_header(void)
-+{
-+	pr_warn("\n");
-+	pr_warn("Overlapping partitions are used in command line partitions.\n");
-+	pr_warn("Don't use filesystems on overlapping partitions:\n");
-+}
-+
-+static inline void overlaps_warns_tailer(void)
-+{
-+	pr_warn("\n");
-+}
-+
-+static void cmdline_parts_verifier(int slot, struct parsed_partitions *state)
-+{
-+	int i;
-+	bool header = true;
-+
-+	for (; slot < state->limit && state->parts[slot].has_info; slot++) {
-+		for (i = slot+1; i < state->limit && state->parts[i].has_info;
-+		     i++) {
-+			if (has_overlaps(state->parts[slot].from,
-+					 state->parts[slot].size,
-+					 state->parts[i].from,
-+					 state->parts[i].size)) {
-+				if (header) {
-+					header = false;
-+					overlaps_warns_header();
-+				}
-+				pr_warn("%s[%llu,%llu] overlaps with "
-+					"%s[%llu,%llu].\n",
-+					state->parts[slot].info.volname,
-+					(u64)state->parts[slot].from << 9,
-+					(u64)state->parts[slot].size << 9,
-+					state->parts[i].info.volname,
-+					(u64)state->parts[i].from << 9,
-+					(u64)state->parts[i].size << 9);
-+			}
-+		}
-+	}
-+
-+	if (!header)
-+		overlaps_warns_tailer();
-+}
-+
+ static void nvme_process_cq(struct nvme_queue *nvmeq);
+-static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown);
++static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown, bool
++		freeze_queue);
+ 
  /*
-  * Purpose: allocate cmdline partitions.
-  * Returns:
-@@ -93,6 +158,7 @@ int cmdline_partition(struct parsed_partitions *state)
- 	disk_size = get_capacity(state->bdev->bd_disk) << 9;
+  * Represents an NVM Express device.  Each nvme_dev is a PCI function.
+@@ -1197,7 +1198,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
+ 	 */
+ 	if (nvme_should_reset(dev, csts)) {
+ 		nvme_warn_reset(dev, csts);
+-		nvme_dev_disable(dev, false);
++		nvme_dev_disable(dev, false, true);
+ 		nvme_reset_ctrl(&dev->ctrl);
+ 		return BLK_EH_HANDLED;
+ 	}
+@@ -1224,7 +1225,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
+ 		dev_warn(dev->ctrl.device,
+ 			 "I/O %d QID %d timeout, disable controller\n",
+ 			 req->tag, nvmeq->qid);
+-		nvme_dev_disable(dev, false);
++		nvme_dev_disable(dev, false, false);
+ 		nvme_req(req)->flags |= NVME_REQ_CANCELLED;
+ 		return BLK_EH_HANDLED;
+ 	default:
+@@ -1240,7 +1241,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
+ 		dev_warn(dev->ctrl.device,
+ 			 "I/O %d QID %d timeout, reset controller\n",
+ 			 req->tag, nvmeq->qid);
+-		nvme_dev_disable(dev, false);
++		nvme_dev_disable(dev, false, true);
+ 		nvme_reset_ctrl(&dev->ctrl);
  
- 	cmdline_parts_set(parts, disk_size, 1, add_part, (void *)state);
-+	cmdline_parts_verifier(1, state);
+ 		/*
+@@ -2235,19 +2236,35 @@ static void nvme_pci_disable(struct nvme_dev *dev)
+ 	}
+ }
  
- 	strlcat(state->pp_buf, "\n", PAGE_SIZE);
+-static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
++/*
++ * Resetting often follows nvme_dev_disable(), so queues need to be frozen
++ * before resetting.
++ */
++static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown, bool
++		freeze_queue)
+ {
+ 	int i;
+ 	bool dead = true;
+ 	struct pci_dev *pdev = to_pci_dev(dev->dev);
+ 	bool frozen = false;
  
++	/*
++	 * 'freeze_queue' is only valid for non-shutdown, and we do
++	 * inline freeze & wait_freeze_timeout for shutdown just for
++	 * completing as many as possible requests before shutdown
++	 */
++	if (shutdown)
++		freeze_queue = false;
++
++	if (freeze_queue)
++		nvme_start_freeze(&dev->ctrl);
++
+ 	mutex_lock(&dev->shutdown_lock);
+ 	if (pci_is_enabled(pdev)) {
+ 		u32 csts = readl(dev->bar + NVME_REG_CSTS);
+ 
+-		if (dev->ctrl.state == NVME_CTRL_LIVE ||
+-		    dev->ctrl.state == NVME_CTRL_RESETTING) {
++		if (shutdown && (dev->ctrl.state == NVME_CTRL_LIVE ||
++		    dev->ctrl.state == NVME_CTRL_RESETTING)) {
+ 			nvme_start_freeze(&dev->ctrl);
+ 			frozen = true;
+ 		}
+@@ -2339,7 +2356,7 @@ static void nvme_remove_dead_ctrl(struct nvme_dev *dev, int status)
+ 	dev_warn(dev->ctrl.device, "Removing after probe failure status: %d\n", status);
+ 
+ 	nvme_get_ctrl(&dev->ctrl);
+-	nvme_dev_disable(dev, false);
++	nvme_dev_disable(dev, false, false);
+ 	if (!queue_work(nvme_wq, &dev->remove_work))
+ 		nvme_put_ctrl(&dev->ctrl);
+ }
+@@ -2360,7 +2377,7 @@ static void nvme_reset_work(struct work_struct *work)
+ 	 * moving on.
+ 	 */
+ 	if (dev->ctrl.ctrl_config & NVME_CC_ENABLE)
+-		nvme_dev_disable(dev, false);
++		nvme_dev_disable(dev, false, false);
+ 
+ 	/*
+ 	 * Introduce CONNECTING state from nvme-fc/rdma transports to mark the
+@@ -2609,7 +2626,7 @@ static int nvme_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ static void nvme_reset_prepare(struct pci_dev *pdev)
+ {
+ 	struct nvme_dev *dev = pci_get_drvdata(pdev);
+-	nvme_dev_disable(dev, false);
++	nvme_dev_disable(dev, false, true);
+ }
+ 
+ static void nvme_reset_done(struct pci_dev *pdev)
+@@ -2621,7 +2638,7 @@ static void nvme_reset_done(struct pci_dev *pdev)
+ static void nvme_shutdown(struct pci_dev *pdev)
+ {
+ 	struct nvme_dev *dev = pci_get_drvdata(pdev);
+-	nvme_dev_disable(dev, true);
++	nvme_dev_disable(dev, true, false);
+ }
+ 
+ /*
+@@ -2640,13 +2657,13 @@ static void nvme_remove(struct pci_dev *pdev)
+ 
+ 	if (!pci_device_is_present(pdev)) {
+ 		nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_DEAD);
+-		nvme_dev_disable(dev, false);
++		nvme_dev_disable(dev, false, false);
+ 	}
+ 
+ 	flush_work(&dev->ctrl.reset_work);
+ 	nvme_stop_ctrl(&dev->ctrl);
+ 	nvme_remove_namespaces(&dev->ctrl);
+-	nvme_dev_disable(dev, true);
++	nvme_dev_disable(dev, true, false);
+ 	nvme_free_host_mem(dev);
+ 	nvme_dev_remove_admin(dev);
+ 	nvme_free_queues(dev, 0);
+@@ -2680,7 +2697,7 @@ static int nvme_suspend(struct device *dev)
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+ 	struct nvme_dev *ndev = pci_get_drvdata(pdev);
+ 
+-	nvme_dev_disable(ndev, true);
++	nvme_dev_disable(ndev, true, false);
+ 	return 0;
+ }
+ 
+@@ -2712,7 +2729,7 @@ static pci_ers_result_t nvme_error_detected(struct pci_dev *pdev,
+ 	case pci_channel_io_frozen:
+ 		dev_warn(dev->ctrl.device,
+ 			"frozen state error detected, reset controller\n");
+-		nvme_dev_disable(dev, false);
++		nvme_dev_disable(dev, false, true);
+ 		return PCI_ERS_RESULT_NEED_RESET;
+ 	case pci_channel_io_perm_failure:
+ 		dev_warn(dev->ctrl.device,
 -- 
-1.8.5.6.2.g3d8a54e.dirty
+2.9.5
