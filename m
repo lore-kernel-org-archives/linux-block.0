@@ -1,96 +1,92 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH 4/6] bcache: add wait_for_kthread_stop() in bch_allocator_thread()
-Date: Wed,  2 May 2018 22:46:57 +0800
-Message-Id: <20180502144659.118628-5-colyli@suse.de>
-In-Reply-To: <20180502144659.118628-1-colyli@suse.de>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 2/6] bcache: set CACHE_SET_IO_DISABLE in
+ bch_cached_dev_error()
+To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
 References: <20180502144659.118628-1-colyli@suse.de>
+ <20180502144659.118628-3-colyli@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <999e1618-c9a4-507e-aecc-d8ea30172d48@suse.de>
+Date: Thu, 3 May 2018 07:53:17 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180502144659.118628-3-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-When CACHE_SET_IO_DISABLE is set on cache set flags, bcache allocator
-thread routine bch_allocator_thread() may stop the while-loops and
-exit. Then it is possible to observe the following kernel oops message,
+On 05/02/2018 04:46 PM, Coly Li wrote:
+> Commit c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev") tries
+> to stop bcache device by calling bcache_device_stop() when too many I/O
+> errors happened on backing device. But if there is internal I/O happening
+> on cache device (writeback scan, garbage collection, etc), a regular I/O
+> request triggers the internal I/Os may still holds a refcount of dc->count,
+> and the refcount may only be dropped after the internal I/O stopped.
+> 
+> By this patch, bch_cached_dev_error() will check if the backing device is
+> attached to a cache set, if yes that CACHE_SET_IO_DISABLE will be set to
+> flags of this cache set. Then internal I/Os on cache device will be
+> rejected and stopped immediately, and the bcache device can be stopped.
+> 
+> For people who are not familiar with the interesting refcount dependance,
+> let me explain a bit more how the fix works. Example the writeback thread
+> will scan cache device for dirty data writeback purpose. Before it stopps,
+> it holds a refcount of dc->count. When CACHE_SET_IO_DISABLE bit is set,
+> the internal I/O will stopped and the while-loop in bch_writeback_thread()
+> quits and calls cached_dev_put() to drop dc->count. If this is the last
+> refcount to drop, then cached_dev_detach_finish() will be called. In this
+> call back function, in turn closure_put(dc->disk.cl) is called to drop a
+> refcount of closure dc->disk.cl. If this is the last refcount of this
+> closure to drop, then cached_dev_flush() will be called. Then the cached
+> device is freed. So if CACHE_SET_IO_DISABLE is not set, the bache device
+> can not be stopped until all inernal cache device I/O stopped. For large
+> size cache device, and writeback thread competes locks with gc thread,
+> there might be a quite long time to wait.
+> 
+> Fixes: c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev")
+> Signed-off-by: Coly Li <colyli@suse.de>
+> ---
+>   drivers/md/bcache/super.c | 17 +++++++++++++++++
+>   1 file changed, 17 insertions(+)
+> 
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index 8196b19fada2..a0d5a3ccc7d0 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -1369,6 +1369,8 @@ int bch_flash_dev_create(struct cache_set *c, uint64_t size)
+>   
+>   bool bch_cached_dev_error(struct cached_dev *dc)
+>   {
+> +	struct cache_set *c;
+> +
+>   	if (!dc || test_bit(BCACHE_DEV_CLOSING, &dc->disk.flags))
+>   		return false;
+>   
+> @@ -1379,6 +1381,21 @@ bool bch_cached_dev_error(struct cached_dev *dc)
+>   	pr_err("stop %s: too many IO errors on backing device %s\n",
+>   		dc->disk.disk->disk_name, dc->backing_dev_name);
+>   
+> +	/*
+> +	 * If the cached device is still attached to a cache set,
+> +	 * even dc->io_disable is true and no more I/O requests
+> +	 * accepted, cache device internal I/O (writeback scan or
+> +	 * garbage collection) may still prevent bcache device from
+> +	 * being stopped. So here CACHE_SET_IO_DISABLE should be
+> +	 * set to c->flags too, to make the internal I/O to cache
+> +	 * device rejected and stopped immediately.
+> +	 * If c is NULL, that means the bcache device is not attached
+> +	 * to any cache set, then no CACHE_SET_IO_DISABLE bit to set.
+> +	 */
+> +	c = dc->disk.c;
+> +	if (c && test_and_set_bit(CACHE_SET_IO_DISABLE, &c->flags))
+> +		pr_warn("CACHE_SET_IO_DISABLE already set");
+> +
+>   	bcache_device_stop(&dc->disk);
+>   	return true;
+>   }
+> 
+Neat.
 
-[  631.068366] bcache: bch_btree_insert() error -5
-[  631.069115] bcache: cached_dev_detach_finish() Caching disabled for sdf
-[  631.070220] BUG: unable to handle kernel NULL pointer dereference at 0000000000000000
-[  631.070250] PGD 0 P4D 0
-[  631.070261] Oops: 0002 [#1] SMP PTI
-[snipped]
-[  631.070578] Workqueue: events cache_set_flush [bcache]
-[  631.070597] RIP: 0010:exit_creds+0x1b/0x50
-[  631.070610] RSP: 0018:ffffc9000705fe08 EFLAGS: 00010246
-[  631.070626] RAX: 0000000000000001 RBX: ffff880a622ad300 RCX: 000000000000000b
-[  631.070645] RDX: 0000000000000601 RSI: 000000000000000c RDI: 0000000000000000
-[  631.070663] RBP: ffff880a622ad300 R08: ffffea00190c66e0 R09: 0000000000000200
-[  631.070682] R10: ffff880a48123000 R11: ffff880000000000 R12: 0000000000000000
-[  631.070700] R13: ffff880a4b160e40 R14: ffff880a4b160000 R15: 0ffff880667e2530
-[  631.070719] FS:  0000000000000000(0000) GS:ffff880667e00000(0000) knlGS:0000000000000000
-[  631.070740] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  631.070755] CR2: 0000000000000000 CR3: 000000000200a001 CR4: 00000000003606e0
-[  631.070774] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  631.070793] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  631.070811] Call Trace:
-[  631.070828]  __put_task_struct+0x55/0x160
-[  631.070845]  kthread_stop+0xee/0x100
-[  631.070863]  cache_set_flush+0x11d/0x1a0 [bcache]
-[  631.070879]  process_one_work+0x146/0x340
-[  631.070892]  worker_thread+0x47/0x3e0
-[  631.070906]  kthread+0xf5/0x130
-[  631.070917]  ? max_active_store+0x60/0x60
-[  631.070930]  ? kthread_bind+0x10/0x10
-[  631.070945]  ret_from_fork+0x35/0x40
-[snipped]
-[  631.071017] RIP: exit_creds+0x1b/0x50 RSP: ffffc9000705fe08
-[  631.071033] CR2: 0000000000000000
-[  631.071045] ---[ end trace 011c63a24b22c927 ]---
-[  631.071085] bcache: bcache_device_free() bcache0 stopped
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-The reason is when cache_set_flush() tries to call kthread_stop() to stop
-allocator thread, but it exits already due to cache device I/O errors.
+Cheers,
 
-This patch adds wait_for_kthread_stop() at tail of bch_allocator_thread(),
-to prevent the thread routine exiting directly. Then the allocator thread
-can be blocked at wait_for_kthread_stop() and wait for cache_set_flush()
-to stop it by calling kthread_stop().
-
-changelog:
-v2: not directly return from allocator_wait(), move 'return 0' to tail of
-    bch_allocator_thread().
-v1: initial version.
-
-Fixes: 771f393e8ffc ("bcache: add CACHE_SET_IO_DISABLE to struct cache_set flags")
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/alloc.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-index 004cc3cc6123..7fa2631b422c 100644
---- a/drivers/md/bcache/alloc.c
-+++ b/drivers/md/bcache/alloc.c
-@@ -290,7 +290,7 @@ do {									\
- 		if (kthread_should_stop() ||				\
- 		    test_bit(CACHE_SET_IO_DISABLE, &ca->set->flags)) {	\
- 			set_current_state(TASK_RUNNING);		\
--			return 0;					\
-+			goto out;					\
- 		}							\
- 									\
- 		schedule();						\
-@@ -378,6 +378,9 @@ static int bch_allocator_thread(void *arg)
- 			bch_prio_write(ca);
- 		}
- 	}
-+out:
-+	wait_for_kthread_stop();
-+	return 0;
- }
- 
- /* Allocation */
--- 
-2.16.3
+Hannes
