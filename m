@@ -1,115 +1,71 @@
-Return-Path: <BATV+e0efdd19ce80d487e3da+5372+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: Bart.VanAssche@wdc.com,
-	willy@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: [PATCH 4/6] block: pass an explicit gfp_t to get_request
-Date: Wed,  9 May 2018 09:54:06 +0200
-Message-Id: <20180509075408.16388-5-hch@lst.de>
-In-Reply-To: <20180509075408.16388-1-hch@lst.de>
-References: <20180509075408.16388-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:48068 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751095AbeECPCU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 3 May 2018 11:02:20 -0400
+Date: Thu, 3 May 2018 17:02:17 +0200
+From: Jan Kara <jack@suse.cz>
+To: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Cc: viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
+        jack@suse.cz, bart.vanassche@wdc.com, ming.lei@redhat.com,
+        rjw@rjwysocki.net, mguzik@redhat.com, linux-pm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/3] fs: fix corner case race on freeze_bdev() when sb
+ disappears
+Message-ID: <20180503150217.ywu2cuxjbsgr47a6@quack2.suse.cz>
+References: <20180420235904.27496-1-mcgrof@kernel.org>
+ <20180420235904.27496-4-mcgrof@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180420235904.27496-4-mcgrof@kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-blk_old_get_request already has it at hand, and in blk_queue_bio, which
-is the fast path, it is constant.
+On Fri 20-04-18 16:59:04, Luis R. Rodriguez wrote:
+> freeze_bdev() will bail but leave the bd_fsfreeze_count incremented
+> if the get_active_super() does not find the superblock on our
+> super_blocks list to match.
+> 
+> This issue has been present since v2.6.29 during the introduction of the
+> ioctl_fsfreeze() and ioctl_fsthaw() via commit fcccf502540e3 ("filesystem
+> freeze: implement generic freeze feature").
+> 
+> I am not aware of any existing races which have triggered this
+> situation, however, if it does trigger it could mean leaving a
+> superblock with bd_fsfreeze_count always positive.
+> 
+> Fixes: fcccf502540e3 ("filesystem freeze: implement generic freeze feature")
+> Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- block/blk-core.c          | 14 +++++++-------
- drivers/scsi/scsi_error.c |  4 ----
- 2 files changed, 7 insertions(+), 11 deletions(-)
+Looks good to me. You can add:
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 5013027eae70..cc56e56c2eff 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1333,6 +1333,7 @@ int blk_update_nr_requests(struct request_queue *q, unsigned int nr)
-  * @op: operation and flags
-  * @bio: bio to allocate request for (can be %NULL)
-  * @flags: BLQ_MQ_REQ_* flags
-+ * @gfp_mask: allocator flags
-  *
-  * Get a free request from @q.  This function may fail under memory
-  * pressure or if @q is dead.
-@@ -1342,7 +1343,7 @@ int blk_update_nr_requests(struct request_queue *q, unsigned int nr)
-  * Returns request pointer on success, with @q->queue_lock *not held*.
-  */
- static struct request *__get_request(struct request_list *rl, unsigned int op,
--				     struct bio *bio, blk_mq_req_flags_t flags)
-+		struct bio *bio, blk_mq_req_flags_t flags, gfp_t gfp_mask)
- {
- 	struct request_queue *q = rl->q;
- 	struct request *rq;
-@@ -1351,8 +1352,6 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
- 	struct io_cq *icq = NULL;
- 	const bool is_sync = op_is_sync(op);
- 	int may_queue;
--	gfp_t gfp_mask = flags & BLK_MQ_REQ_NOWAIT ? GFP_ATOMIC :
--			 __GFP_DIRECT_RECLAIM;
- 	req_flags_t rq_flags = RQF_ALLOCED;
- 
- 	lockdep_assert_held(q->queue_lock);
-@@ -1516,6 +1515,7 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
-  * @op: operation and flags
-  * @bio: bio to allocate request for (can be %NULL)
-  * @flags: BLK_MQ_REQ_* flags.
-+ * @gfp: allocator flags
-  *
-  * Get a free request from @q.  If %BLK_MQ_REQ_NOWAIT is set in @flags,
-  * this function keeps retrying under memory pressure and fails iff @q is dead.
-@@ -1525,7 +1525,7 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
-  * Returns request pointer on success, with @q->queue_lock *not held*.
-  */
- static struct request *get_request(struct request_queue *q, unsigned int op,
--				   struct bio *bio, blk_mq_req_flags_t flags)
-+		struct bio *bio, blk_mq_req_flags_t flags, gfp_t gfp)
- {
- 	const bool is_sync = op_is_sync(op);
- 	DEFINE_WAIT(wait);
-@@ -1537,7 +1537,7 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
- 
- 	rl = blk_get_rl(q, bio);	/* transferred to @rq on success */
- retry:
--	rq = __get_request(rl, op, bio, flags);
-+	rq = __get_request(rl, op, bio, flags, gfp);
- 	if (!IS_ERR(rq))
- 		return rq;
- 
-@@ -1591,7 +1591,7 @@ static struct request *blk_old_get_request(struct request_queue *q,
- 	if (ret)
- 		return ERR_PTR(ret);
- 	spin_lock_irq(q->queue_lock);
--	rq = get_request(q, op, NULL, flags);
-+	rq = get_request(q, op, NULL, flags, gfp_mask);
- 	if (IS_ERR(rq)) {
- 		spin_unlock_irq(q->queue_lock);
- 		blk_queue_exit(q);
-@@ -2057,7 +2057,7 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- 	 * Returns with the queue unlocked.
- 	 */
- 	blk_queue_enter_live(q);
--	req = get_request(q, bio->bi_opf, bio, 0);
-+	req = get_request(q, bio->bi_opf, bio, 0, __GFP_DIRECT_RECLAIM);
- 	if (IS_ERR(req)) {
- 		blk_queue_exit(q);
- 		__wbt_done(q->rq_wb, wb_acct);
-diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-index 61d280f560df..b36e73090018 100644
---- a/drivers/scsi/scsi_error.c
-+++ b/drivers/scsi/scsi_error.c
-@@ -1933,10 +1933,6 @@ static void scsi_eh_lock_door(struct scsi_device *sdev)
- 	struct request *req;
- 	struct scsi_request *rq;
- 
--	/*
--	 * blk_get_request with GFP_KERNEL (__GFP_RECLAIM) sleeps until a
--	 * request becomes available
--	 */
- 	req = blk_get_request(sdev->request_queue, REQ_OP_SCSI_IN, 0);
- 	if (IS_ERR(req))
- 		return;
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> ---
+>  fs/block_dev.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index b54966679833..7a532aa58c07 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -507,8 +507,10 @@ struct super_block *freeze_bdev(struct block_device *bdev)
+>  	}
+>  
+>  	sb = get_active_super(bdev);
+> -	if (!sb)
+> +	if (!sb) {
+> +		bdev->bd_fsfreeze_count--;
+>  		goto out;
+> +	}
+>  	if (sb->s_op->freeze_super)
+>  		error = sb->s_op->freeze_super(sb);
+>  	else
+> -- 
+> 2.16.3
+> 
 -- 
-2.17.0
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
