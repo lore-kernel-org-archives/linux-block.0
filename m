@@ -1,94 +1,103 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-Subject: Re: [PATCH V2 5/5] nvme: pci: simplify timeout handling
-To: Ming Lei <ming.lei@redhat.com>, Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-References: <20180429154152.16656-1-ming.lei@redhat.com>
- <20180429154152.16656-6-ming.lei@redhat.com>
-From: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <655b9d93-b4fc-b78b-1ea1-1c34d5c0535e@oracle.com>
-Date: Wed, 2 May 2018 10:23:20 +0800
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 4/6] bcache: add wait_for_kthread_stop() in
+ bch_allocator_thread()
+To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+References: <20180502144659.118628-1-colyli@suse.de>
+ <20180502144659.118628-5-colyli@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <f2bb26fc-a15b-cc0e-5c60-24e0c7046904@suse.de>
+Date: Thu, 3 May 2018 07:54:44 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180429154152.16656-6-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180502144659.118628-5-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Ming
+On 05/02/2018 04:46 PM, Coly Li wrote:
+> When CACHE_SET_IO_DISABLE is set on cache set flags, bcache allocator
+> thread routine bch_allocator_thread() may stop the while-loops and
+> exit. Then it is possible to observe the following kernel oops message,
+> 
+> [  631.068366] bcache: bch_btree_insert() error -5
+> [  631.069115] bcache: cached_dev_detach_finish() Caching disabled for sdf
+> [  631.070220] BUG: unable to handle kernel NULL pointer dereference at 0000000000000000
+> [  631.070250] PGD 0 P4D 0
+> [  631.070261] Oops: 0002 [#1] SMP PTI
+> [snipped]
+> [  631.070578] Workqueue: events cache_set_flush [bcache]
+> [  631.070597] RIP: 0010:exit_creds+0x1b/0x50
+> [  631.070610] RSP: 0018:ffffc9000705fe08 EFLAGS: 00010246
+> [  631.070626] RAX: 0000000000000001 RBX: ffff880a622ad300 RCX: 000000000000000b
+> [  631.070645] RDX: 0000000000000601 RSI: 000000000000000c RDI: 0000000000000000
+> [  631.070663] RBP: ffff880a622ad300 R08: ffffea00190c66e0 R09: 0000000000000200
+> [  631.070682] R10: ffff880a48123000 R11: ffff880000000000 R12: 0000000000000000
+> [  631.070700] R13: ffff880a4b160e40 R14: ffff880a4b160000 R15: 0ffff880667e2530
+> [  631.070719] FS:  0000000000000000(0000) GS:ffff880667e00000(0000) knlGS:0000000000000000
+> [  631.070740] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  631.070755] CR2: 0000000000000000 CR3: 000000000200a001 CR4: 00000000003606e0
+> [  631.070774] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> [  631.070793] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> [  631.070811] Call Trace:
+> [  631.070828]  __put_task_struct+0x55/0x160
+> [  631.070845]  kthread_stop+0xee/0x100
+> [  631.070863]  cache_set_flush+0x11d/0x1a0 [bcache]
+> [  631.070879]  process_one_work+0x146/0x340
+> [  631.070892]  worker_thread+0x47/0x3e0
+> [  631.070906]  kthread+0xf5/0x130
+> [  631.070917]  ? max_active_store+0x60/0x60
+> [  631.070930]  ? kthread_bind+0x10/0x10
+> [  631.070945]  ret_from_fork+0x35/0x40
+> [snipped]
+> [  631.071017] RIP: exit_creds+0x1b/0x50 RSP: ffffc9000705fe08
+> [  631.071033] CR2: 0000000000000000
+> [  631.071045] ---[ end trace 011c63a24b22c927 ]---
+> [  631.071085] bcache: bcache_device_free() bcache0 stopped
+> 
+> The reason is when cache_set_flush() tries to call kthread_stop() to stop
+> allocator thread, but it exits already due to cache device I/O errors.
+> 
+> This patch adds wait_for_kthread_stop() at tail of bch_allocator_thread(),
+> to prevent the thread routine exiting directly. Then the allocator thread
+> can be blocked at wait_for_kthread_stop() and wait for cache_set_flush()
+> to stop it by calling kthread_stop().
+> 
+> changelog:
+> v2: not directly return from allocator_wait(), move 'return 0' to tail of
+>      bch_allocator_thread().
+> v1: initial version.
+> 
+> Fixes: 771f393e8ffc ("bcache: add CACHE_SET_IO_DISABLE to struct cache_set flags")
+> Signed-off-by: Coly Li <colyli@suse.de>
+> ---
+>   drivers/md/bcache/alloc.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
+> index 004cc3cc6123..7fa2631b422c 100644
+> --- a/drivers/md/bcache/alloc.c
+> +++ b/drivers/md/bcache/alloc.c
+> @@ -290,7 +290,7 @@ do {									\
+>   		if (kthread_should_stop() ||				\
+>   		    test_bit(CACHE_SET_IO_DISABLE, &ca->set->flags)) {	\
+>   			set_current_state(TASK_RUNNING);		\
+> -			return 0;					\
+> +			goto out;					\
+>   		}							\
+>   									\
+>   		schedule();						\
+> @@ -378,6 +378,9 @@ static int bch_allocator_thread(void *arg)
+>   			bch_prio_write(ca);
+>   		}
+>   	}
+> +out:
+> +	wait_for_kthread_stop();
+> +	return 0;
+>   }
+>   
+>   /* Allocation */
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-On 04/29/2018 11:41 PM, Ming Lei wrote:
-> +
->  static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
->  {
->  	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-> @@ -1197,8 +1297,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
->  	 */
->  	if (nvme_should_reset(dev, csts)) {
->  		nvme_warn_reset(dev, csts);
-> -		nvme_dev_disable(dev, false);
-> -		nvme_reset_ctrl(&dev->ctrl);
-> +		nvme_eh_schedule(dev);
->  		return BLK_EH_HANDLED;
->  	}
->  
-> @@ -1224,8 +1323,8 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
->  		dev_warn(dev->ctrl.device,
->  			 "I/O %d QID %d timeout, disable controller\n",
->  			 req->tag, nvmeq->qid);
-> -		nvme_dev_disable(dev, false);
->  		nvme_req(req)->flags |= NVME_REQ_CANCELLED;
-> +		nvme_eh_schedule(dev);
->  		return BLK_EH_HANDLED;
->  	default:
->  		break;
-> @@ -1240,14 +1339,12 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
->  		dev_warn(dev->ctrl.device,
->  			 "I/O %d QID %d timeout, reset controller\n",
->  			 req->tag, nvmeq->qid);
-> -		nvme_dev_disable(dev, false);
-> -		nvme_reset_ctrl(&dev->ctrl);
-> -
->  		/*
->  		 * Mark the request as handled, since the inline shutdown
->  		 * forces all outstanding requests to complete.
->  		 */
->  		nvme_req(req)->flags |= NVME_REQ_CANCELLED;
-> +		nvme_eh_schedule(dev);
->  		return BLK_EH_HANDLED;
->  	}
->  
-> @@ -2246,8 +2343,8 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
->  	if (pci_is_enabled(pdev)) {
->  		u32 csts = readl(dev->bar + NVME_REG_CSTS);
->  
-> -		if (dev->ctrl.state == NVME_CTRL_LIVE ||
-> -		    dev->ctrl.state == NVME_CTRL_RESETTING) {
-> +		if (shutdown && (dev->ctrl.state == NVME_CTRL_LIVE ||
-> +		    dev->ctrl.state == NVME_CTRL_RESETTING)) {
->  			nvme_start_freeze(&dev->ctrl);
->  			frozen = true;
->  		}
-> @@ -2281,11 +2378,23 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
->  	for (i = dev->ctrl.queue_count - 1; i >= 0; i--)
->  		nvme_suspend_queue(&dev->queues[i]);
->  
-> +	/* safe to sync timeout after queues are quiesced */
-> +	nvme_quiesce_timeout(&dev->ctrl);
-> +	blk_quiesce_timeout(dev->ctrl.admin_q);
-> +
->  	nvme_pci_disable(dev);
->  
-> +	/*
-> +	 * Both timeout and interrupt handler have been drained, and all
-> +	 * in-flight requests will be canceled now.
-> +	 */
->  	blk_mq_tagset_busy_iter(&dev->tagset, nvme_cancel_request, &dev->ctrl);
->  	blk_mq_tagset_busy_iter(&dev->admin_tagset, nvme_cancel_request, &dev->ctrl);
+Cheers,
 
-
-We need to return BLK_EH_RESET_TIMER in nvme_timeout then:
-1. defer the completion. we can't unmap the io request before close the controller totally, so not BLK_EH_HANDLED.
-2. nvme_cancel_request could complete it. blk_mq_complete_request is invoked by nvme_cancel_request, so not BLK_EH_NOT_HANDLED.
-
-Thanks
-Jianchao
+Hannes
