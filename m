@@ -1,166 +1,141 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from smtprelay0020.hostedemail.com ([216.40.44.20]:58598 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S965033AbeEJPzW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 May 2018 11:55:22 -0400
-From: Joe Perches <joe@perches.com>
-To: Steven Rostedt <rostedt@goodmis.org>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Will Drewry <wad@chromium.org>, linux-block@vger.kernel.org,
-        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux-audit@redhat.com,
-        linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-        selinux@tycho.nsa.gov
-Cc: dri-devel@lists.freedesktop.org,
-        linux-security-module@vger.kernel.org
-Subject: [PATCH 00/18] Convert default pr_fmt from empty to KBUILD_MODNAME
-Date: Thu, 10 May 2018 08:45:26 -0700
-Message-Id: <cover.1525964381.git.joe@perches.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>
+Subject: [PATCH V3 2/8] nvme: pci: cover timeout for admin commands running in EH
+Date: Thu,  3 May 2018 11:17:10 +0800
+Message-Id: <20180503031716.31446-3-ming.lei@redhat.com>
+In-Reply-To: <20180503031716.31446-1-ming.lei@redhat.com>
+References: <20180503031716.31446-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-pr_<level> logging uses allow a prefix to be specified with a
-specific #define pr_fmt
+When admin commands are used in EH for recovering controller, we have to
+cover their timeout and can't depend on block's timeout since deadlock may
+be caused when these commands are timed-out by block layer again.
 
-The default of pr_fmt in printk.h is #define pr_fmt(fmt) fmt
-so no prefixing of logging output is generically done.
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Cc: Laurence Oberman <loberman@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/nvme/host/pci.c | 77 ++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 66 insertions(+), 11 deletions(-)
 
-There are several output logging uses like dump_stack() that are
-unprefixed and should remain unprefixed.
-
-This patch series attempts to convert the default #define of pr_fmt to
-KBUILD_MODNAME ": " fmt and as well update the various bits of the kernel
-that should _not_ be prefixed by adding #define pr_fmt(fmt) fmt to those
-compilation units that do not want output message prefixing.
-
-There are about 1200 uses of #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-that could be removed if the default is changed.
-
-A script that does this removal (and removes any blank lines that follow)
-for the linux-kernel tree is included below:
-
-$ git grep -P --name-only "define\s+pr_fmt\b" | \
-  grep -v include/linux/printk.h | \
-  xargs perl -i -e 'local $/; while (<>) {s/(\n)*[ \t]*#[ \t]*define[ \t]+pr_fmt[ \t]*\([ \t]*(\w+)[ \t]*\)[ \t]*KBUILD_MODNAME[ \t]*\": \"[ \t]*\2[ \t]*\n\s*/\1\n/; s/^\n//; print;}'
-
-This script should be run after this patch series is applied.
-
-The above script output diff is currently:
-
-1198 files changed, 70 insertions(+), 2241 deletions(-)
-
-Joe Perches (18):
-  kernel: Use pr_fmt
-  lib: Use pr_fmt
-  printk: Convert pr_fmt from blank define to KBUILD_MODNAME
-  x86: Remove pr_fmt duplicate logging prefixes
-  x86/mtrr: Rename main.c to mtrr.c and remove duplicate prefixes
-  net: Remove pr_fmt duplicate logging prefixes
-  blk-mq: Remove pr_fmt duplicate logging prefixes
-  random: Remove pr_fmt duplicate logging prefixes
-  ptp: Remove pr_fmt duplicate logging prefixes
-  efifb: Remove pr_fmt duplicate logging prefixes
-  proc: Remove pr_fmt duplicate logging prefixes
-  uprobes: Remove pr_fmt duplicate logging prefixes
-  printk: Remove pr_fmt duplicate logging prefixes
-  lib/mpi: Remove pr_fmt duplicate logging prefixes
-  security: Remove pr_fmt duplicate logging prefixes
-  aoe: Remove pr_fmt duplicate logging prefixes
-  security: encrypted-keys: Remove pr_fmt duplicate logging prefixes
-  rcu: Use pr_fmt to prefix "rcu: " to logging output
-
- arch/x86/events/amd/ibs.c                      |  2 +-
- arch/x86/kernel/cpu/mtrr/Makefile              |  2 +-
- arch/x86/kernel/cpu/mtrr/{main.c => mtrr.c}    | 33 ++++++-------
- arch/x86/kernel/e820.c                         | 32 ++++++------
- arch/x86/kernel/hpet.c                         |  5 +-
- arch/x86/kernel/uprobes.c                      |  4 +-
- arch/x86/mm/numa.c                             | 22 ++++-----
- block/blk-mq.c                                 |  9 ++--
- drivers/block/aoe/aoeblk.c                     | 29 ++++++-----
- drivers/block/aoe/aoechr.c                     | 11 ++---
- drivers/block/aoe/aoecmd.c                     | 34 ++++++-------
- drivers/block/aoe/aoedev.c                     | 19 +++-----
- drivers/block/aoe/aoemain.c                    |  6 +--
- drivers/block/aoe/aoenet.c                     | 19 +++-----
- drivers/char/hw_random/via-rng.c               | 10 ++--
- drivers/char/random.c                          | 16 +++---
- drivers/ptp/ptp_clock.c                        |  4 +-
- drivers/video/fbdev/efifb.c                    | 48 +++++++++---------
- fs/proc/root.c                                 |  6 +--
- include/linux/printk.h                         |  2 +-
- kernel/acct.c                                  |  2 +
- kernel/async.c                                 | 14 +++---
- kernel/audit_tree.c                            |  2 +-
- kernel/backtracetest.c                         |  8 +--
- kernel/crash_core.c                            | 29 ++++++-----
- kernel/events/uprobes.c                        |  3 +-
- kernel/exit.c                                  |  2 +
- kernel/hung_task.c                             | 13 +++--
- kernel/kprobes.c                               | 20 +++++---
- kernel/module.c                                | 59 +++++++++++------------
- kernel/panic.c                                 |  3 ++
- kernel/params.c                                | 13 +++--
- kernel/pid.c                                   |  2 +
- kernel/printk/printk.c                         |  2 +-
- kernel/profile.c                               |  2 +
- kernel/range.c                                 |  2 +-
- kernel/rcu/rcu_segcblist.c                     |  2 +
- kernel/rcu/rcuperf.c                           | 10 ++--
- kernel/rcu/rcutorture.c                        | 46 +++++++++---------
- kernel/rcu/srcutiny.c                          |  2 +
- kernel/rcu/srcutree.c                          |  5 +-
- kernel/rcu/tiny.c                              |  3 ++
- kernel/rcu/tree.c                              |  8 +--
- kernel/rcu/tree_plugin.h                       | 67 +++++++++++++++-----------
- kernel/rcu/update.c                            | 19 +++++---
- kernel/relay.c                                 |  5 +-
- kernel/seccomp.c                               |  4 +-
- kernel/signal.c                                | 10 ++--
- kernel/smpboot.c                               |  5 +-
- kernel/taskstats.c                             |  4 +-
- kernel/torture.c                               |  6 ++-
- kernel/tracepoint.c                            |  3 ++
- kernel/workqueue.c                             |  2 +
- lib/cpu_rmap.c                                 | 15 +++---
- lib/crc32test.c                                |  2 +
- lib/earlycpio.c                                |  5 +-
- lib/find_bit_benchmark.c                       |  2 +
- lib/kobject.c                                  | 36 +++++++-------
- lib/kobject_uevent.c                           | 27 +++++------
- lib/mpi/mpicoder.c                             | 10 ++--
- lib/nmi_backtrace.c                            |  3 ++
- lib/percpu_ida.c                               |  4 +-
- lib/percpu_test.c                              |  2 +
- lib/random32.c                                 | 10 ++--
- lib/stmp_device.c                              |  2 +
- lib/string.c                                   |  2 +
- lib/swiotlb.c                                  |  4 +-
- lib/test_debug_virtual.c                       |  2 +
- lib/test_rhashtable.c                          | 44 +++++++++--------
- lib/test_sort.c                                |  2 +
- lib/ubsan.c                                    | 61 ++++++++++++-----------
- net/ipv4/ipconfig.c                            | 59 ++++++++++-------------
- net/ipv4/ipmr.c                                |  2 +-
- net/ipv4/netfilter/nf_conntrack_l3proto_ipv4.c |  9 ++--
- net/ipv6/ip6mr.c                               |  2 +-
- net/ipv6/netfilter/nf_conntrack_l3proto_ipv6.c |  6 +--
- net/ipv6/netfilter/nf_defrag_ipv6_hooks.c      |  4 +-
- net/netfilter/nf_conntrack_helper.c            | 11 ++---
- net/netfilter/nf_conntrack_standalone.c        |  2 +-
- net/socket.c                                   |  2 +-
- security/keys/encrypted-keys/encrypted.c       | 63 +++++++++++-------------
- security/selinux/selinuxfs.c                   | 29 ++++++-----
- 82 files changed, 580 insertions(+), 532 deletions(-)
- rename arch/x86/kernel/cpu/mtrr/{main.c => mtrr.c} (96%)
-
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index fbc71fac6f1e..0e6cd605164a 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -1733,21 +1733,28 @@ static inline void nvme_release_cmb(struct nvme_dev *dev)
+ 	}
+ }
+ 
+-static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
++static void nvme_init_set_host_mem_cmd(struct nvme_dev *dev,
++		struct nvme_command *c, u32 bits)
+ {
+ 	u64 dma_addr = dev->host_mem_descs_dma;
++
++	memset(c, 0, sizeof(*c));
++	c->features.opcode	= nvme_admin_set_features;
++	c->features.fid		= cpu_to_le32(NVME_FEAT_HOST_MEM_BUF);
++	c->features.dword11	= cpu_to_le32(bits);
++	c->features.dword12	= cpu_to_le32(dev->host_mem_size >>
++					      ilog2(dev->ctrl.page_size));
++	c->features.dword13	= cpu_to_le32(lower_32_bits(dma_addr));
++	c->features.dword14	= cpu_to_le32(upper_32_bits(dma_addr));
++	c->features.dword15	= cpu_to_le32(dev->nr_host_mem_descs);
++}
++
++static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
++{
+ 	struct nvme_command c;
+ 	int ret;
+ 
+-	memset(&c, 0, sizeof(c));
+-	c.features.opcode	= nvme_admin_set_features;
+-	c.features.fid		= cpu_to_le32(NVME_FEAT_HOST_MEM_BUF);
+-	c.features.dword11	= cpu_to_le32(bits);
+-	c.features.dword12	= cpu_to_le32(dev->host_mem_size >>
+-					      ilog2(dev->ctrl.page_size));
+-	c.features.dword13	= cpu_to_le32(lower_32_bits(dma_addr));
+-	c.features.dword14	= cpu_to_le32(upper_32_bits(dma_addr));
+-	c.features.dword15	= cpu_to_le32(dev->nr_host_mem_descs);
++	nvme_init_set_host_mem_cmd(dev, &c, bits);
+ 
+ 	ret = nvme_submit_sync_cmd(dev->ctrl.admin_q, &c, NULL, 0);
+ 	if (ret) {
+@@ -1758,6 +1765,54 @@ static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
+ 	return ret;
+ }
+ 
++static void nvme_set_host_mem_end_io(struct request *rq, blk_status_t sts)
++{
++	struct completion *waiting = rq->end_io_data;
++
++	rq->end_io_data = NULL;
++
++	/*
++	 * complete last, if this is a stack request the process (and thus
++	 * the rq pointer) could be invalid right after this complete()
++	 */
++	complete(waiting);
++}
++
++/*
++ * This function can be used inside timeout handler, when the block layer
++ * timeout may not work, so this function has to cover the timeout by itself.
++ */
++static int nvme_set_host_mem_timeout(struct nvme_dev *dev, u32 bits)
++{
++	DECLARE_COMPLETION_ONSTACK(wait);
++	struct nvme_command c;
++	struct request_queue *q = dev->ctrl.admin_q;
++	struct request *req;
++	int ret;
++
++	nvme_init_set_host_mem_cmd(dev, &c, bits);
++
++	req = nvme_alloc_request(q, &c, 0, NVME_QID_ANY);
++	if (IS_ERR(req))
++		return PTR_ERR(req);
++
++	req->timeout = ADMIN_TIMEOUT;
++	req->end_io_data = &wait;
++
++	blk_execute_rq_nowait(q, NULL, req, false,
++			nvme_set_host_mem_end_io);
++	wait_for_completion_io_timeout(&wait, ADMIN_TIMEOUT);
++
++	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
++		ret = -EINTR;
++	else
++		ret = nvme_req(req)->status;
++
++	blk_mq_free_request(req);
++
++	return ret;
++}
++
+ static void nvme_free_host_mem(struct nvme_dev *dev)
+ {
+ 	int i;
+@@ -2216,7 +2271,7 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
+ 		 * but I'd rather be safe than sorry..
+ 		 */
+ 		if (dev->host_mem_descs)
+-			nvme_set_host_mem(dev, 0);
++			nvme_set_host_mem_timeout(dev, 0);
+ 		nvme_disable_io_queues(dev);
+ 		nvme_disable_admin_queue(dev, shutdown);
+ 	}
 -- 
-2.15.0
+2.9.5
