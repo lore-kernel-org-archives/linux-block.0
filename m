@@ -4,33 +4,30 @@ To: Keith Busch <keith.busch@intel.com>
 Cc: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
 	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
 	Jianchao Wang <jianchao.w.wang@oracle.com>,
 	Christoph Hellwig <hch@lst.de>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	linux-nvme@lists.infradead.org,
 	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V3 1/8] block: introduce blk_quiesce_timeout() and blk_unquiesce_timeout()
-Date: Thu,  3 May 2018 11:17:09 +0800
-Message-Id: <20180503031716.31446-2-ming.lei@redhat.com>
+Subject: [PATCH V3 6/8] nvme: pci: split controller resetting into two parts
+Date: Thu,  3 May 2018 11:17:14 +0800
+Message-Id: <20180503031716.31446-7-ming.lei@redhat.com>
 In-Reply-To: <20180503031716.31446-1-ming.lei@redhat.com>
 References: <20180503031716.31446-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Turns out the current way can't drain timout completely because mod_timer()
-can be triggered in the work func, which can be just run inside the synced
-timeout work:
+This patch splits controller resetting into the following two parts:
 
-        del_timer_sync(&q->timeout);
-        cancel_work_sync(&q->timeout_work);
+1) the real resetting part
 
-This patch introduces one flag of 'timeout_off' for fixing this issue, turns
-out this simple way does work.
+2) the 2nd part for draining IO and updating controller state
 
-Also blk_quiesce_timeout() and blk_unquiesce_timeout() are introduced for
-draining timeout, which is needed by NVMe.
+The patch prepares for supporting reliable controller recovery, for
+example, IO timeout still may be triggered when running the above part 2,
+so we still have to recover hardware under this situation.
 
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
+No functional change.
+
 Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Sagi Grimberg <sagi@grimberg.me>
@@ -38,129 +35,73 @@ Cc: linux-nvme@lists.infradead.org
 Cc: Laurence Oberman <loberman@redhat.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-core.c       | 21 +++++++++++++++++++--
- block/blk-mq.c         |  9 +++++++++
- block/blk-timeout.c    |  5 ++++-
- include/linux/blkdev.h | 13 +++++++++++++
- 4 files changed, 45 insertions(+), 3 deletions(-)
+ drivers/nvme/host/pci.c | 37 +++++++++++++++++++++++++++----------
+ 1 file changed, 27 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 85909b431eb0..c277f1023703 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -392,6 +392,22 @@ void blk_stop_queue(struct request_queue *q)
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index ef80e064a62c..16d7507bfd79 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -2361,16 +2361,10 @@ static void nvme_remove_dead_ctrl(struct nvme_dev *dev, int status)
+ 		nvme_put_ctrl(&dev->ctrl);
  }
- EXPORT_SYMBOL(blk_stop_queue);
  
-+void blk_unquiesce_timeout(struct request_queue *q)
-+{
-+	blk_mark_timeout_quiesce(q, false);
-+	mod_timer(&q->timeout, jiffies + q->rq_timeout);
-+}
-+EXPORT_SYMBOL(blk_unquiesce_timeout);
-+
-+void blk_quiesce_timeout(struct request_queue *q)
-+{
-+	blk_mark_timeout_quiesce(q, true);
-+
-+	del_timer_sync(&q->timeout);
-+	cancel_work_sync(&q->timeout_work);
-+}
-+EXPORT_SYMBOL(blk_quiesce_timeout);
-+
- /**
-  * blk_sync_queue - cancel any pending callbacks on a queue
-  * @q: the queue
-@@ -412,8 +428,7 @@ EXPORT_SYMBOL(blk_stop_queue);
-  */
- void blk_sync_queue(struct request_queue *q)
+-static void nvme_reset_work(struct work_struct *work)
++static int nvme_pre_reset_dev(struct nvme_dev *dev)
  {
--	del_timer_sync(&q->timeout);
--	cancel_work_sync(&q->timeout_work);
-+	blk_quiesce_timeout(q);
- 
- 	if (q->mq_ops) {
- 		struct blk_mq_hw_ctx *hctx;
-@@ -425,6 +440,8 @@ void blk_sync_queue(struct request_queue *q)
- 	} else {
- 		cancel_delayed_work_sync(&q->delay_work);
- 	}
-+
-+	blk_mark_timeout_quiesce(q, false);
- }
- EXPORT_SYMBOL(blk_sync_queue);
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c3621453ad87..d0a5dc29c8ef 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -901,6 +901,15 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 	};
- 	struct blk_mq_hw_ctx *hctx;
- 	int i;
-+	bool timeout_off;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	timeout_off = q->timeout_off;
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+	if (timeout_off)
-+		return;
- 
- 	/* A deadlock might occur if a request is stuck requiring a
- 	 * timeout at the same time a queue freeze is waiting
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index 652d4d4d3e97..ffd0b609091e 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -136,12 +136,15 @@ void blk_timeout_work(struct work_struct *work)
- 
- 	spin_lock_irqsave(q->queue_lock, flags);
- 
-+	if (q->timeout_off)
-+		goto exit;
-+
- 	list_for_each_entry_safe(rq, tmp, &q->timeout_list, timeout_list)
- 		blk_rq_check_expired(rq, &next, &next_set);
- 
- 	if (next_set)
- 		mod_timer(&q->timeout, round_jiffies_up(next));
+-	struct nvme_dev *dev =
+-		container_of(work, struct nvme_dev, ctrl.reset_work);
+ 	bool was_suspend = !!(dev->ctrl.ctrl_config & NVME_CC_SHN_NORMAL);
+ 	int result = -ENODEV;
+-	enum nvme_ctrl_state new_state = NVME_CTRL_LIVE;
 -
-+exit:
- 	spin_unlock_irqrestore(q->queue_lock, flags);
- }
+-	if (WARN_ON(dev->ctrl.state != NVME_CTRL_RESETTING))
+-		goto out;
  
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 5c4eee043191..a2cc4aaecf50 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -584,6 +584,7 @@ struct request_queue {
- 	struct timer_list	timeout;
- 	struct work_struct	timeout_work;
- 	struct list_head	timeout_list;
-+	bool			timeout_off;
+ 	/*
+ 	 * If we're called to reset a live controller first shut it down before
+@@ -2430,8 +2424,13 @@ static void nvme_reset_work(struct work_struct *work)
+ 	}
  
- 	struct list_head	icq_list;
- #ifdef CONFIG_BLK_CGROUP
-@@ -1017,6 +1018,18 @@ extern void blk_execute_rq(struct request_queue *, struct gendisk *,
- extern void blk_execute_rq_nowait(struct request_queue *, struct gendisk *,
- 				  struct request *, int, rq_end_io_fn *);
- 
-+static inline void blk_mark_timeout_quiesce(struct request_queue *q, bool quiesce)
-+{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	q->timeout_off = quiesce;
-+	spin_unlock_irqrestore(q->queue_lock, flags);
+ 	result = nvme_setup_io_queues(dev);
+-	if (result)
+-		goto out;
++ out:
++	return result;
 +}
 +
-+extern void blk_quiesce_timeout(struct request_queue *q);
-+extern void blk_unquiesce_timeout(struct request_queue *q);
-+
- int blk_status_to_errno(blk_status_t status);
- blk_status_t errno_to_blk_status(int errno);
++static void nvme_post_reset_dev(struct nvme_dev *dev)
++{
++	enum nvme_ctrl_state new_state = NVME_CTRL_LIVE;
  
+ 	/*
+ 	 * Keep the controller around but remove all namespaces if we don't have
+@@ -2465,7 +2464,25 @@ static void nvme_reset_work(struct work_struct *work)
+ 	return;
+ 
+  out:
+-	nvme_remove_dead_ctrl(dev, result);
++	nvme_remove_dead_ctrl(dev, 0);
++}
++
++static void nvme_reset_work(struct work_struct *work)
++{
++	struct nvme_dev *dev =
++		container_of(work, struct nvme_dev, ctrl.reset_work);
++	int ret;
++
++	if (WARN_ON(dev->ctrl.state != NVME_CTRL_RESETTING))
++		return;
++
++	ret = nvme_pre_reset_dev(dev);
++	if (ret) {
++		nvme_remove_dead_ctrl(dev, ret);
++		return;
++	}
++
++	nvme_post_reset_dev(dev);
+ }
+ 
+ static void nvme_remove_dead_ctrl_work(struct work_struct *work)
 -- 
 2.9.5
