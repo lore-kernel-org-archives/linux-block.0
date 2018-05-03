@@ -1,86 +1,64 @@
-Return-Path: <BATV+1f4557cc97fec8e307c5+5393+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-nvme@lists.infradead.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 09/12] nvme: submit AEN event configuration on startup
-Date: Wed, 30 May 2018 18:45:57 +0200
-Message-Id: <20180530164600.26856-10-hch@lst.de>
-In-Reply-To: <20180530164600.26856-1-hch@lst.de>
-References: <20180530164600.26856-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v2] fs: Add aio iopriority support for block_dev
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Adam Manzanares <Adam.Manzanares@wdc.com>,
+ "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+ "bcrl@kvack.org" <bcrl@kvack.org>,
+ "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+ "linux-aio@kvack.org" <linux-aio@kvack.org>,
+ "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20180503182114.2797-1-adam.manzanares@wdc.com>
+ <20180503183353.GC1562@bombadil.infradead.org>
+ <47e0a519-37b4-f5e7-0616-8659d11c2b69@wdc.com>
+ <18300bdb-a12f-0b6c-1317-6db3e4391d57@kernel.dk>
+ <20180503224308.GA30823@bombadil.infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <b74a5202-7078-88e8-6b30-7cad0c123703@kernel.dk>
+Date: Thu, 3 May 2018 16:53:19 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180503224308.GA30823@bombadil.infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Hannes Reinecke <hare@suse.de>
+On 5/3/18 4:43 PM, Matthew Wilcox wrote:
+> On Thu, May 03, 2018 at 02:24:58PM -0600, Jens Axboe wrote:
+>> On 5/3/18 2:15 PM, Adam Manzanares wrote:
+>>> On 5/3/18 11:33 AM, Matthew Wilcox wrote:
+>>>> Or we could just make ki_hint a u8 or u16 ... seems unlikely we'll need
+>>>> 32 bits of ki_hint.  (currently defined values are 1-5)
+>>>
+>>> I like the approach of using a u16 for the ki_hint. I'll update and 
+>>> resubmit.
+>>
+>> It's intended to be a mask. If you do shrink it for now, then we need some
+>> guard code to ensure it can always carry what it needs to.
+> 
+> ummm ...
+> 
+> enum rw_hint {
+>         WRITE_LIFE_NOT_SET      = 0,
+>         WRITE_LIFE_NONE         = RWH_WRITE_LIFE_NONE,
+>         WRITE_LIFE_SHORT        = RWH_WRITE_LIFE_SHORT,
+> ...
+> 
+>                 .ki_hint = file_write_hint(filp),
+> 
+> static inline enum rw_hint file_write_hint(struct file *file)
+> 
+> #define RWF_WRITE_LIFE_NOT_SET  0
+> #define RWH_WRITE_LIFE_NONE     1
+> #define RWH_WRITE_LIFE_SHORT    2
+> #define RWH_WRITE_LIFE_MEDIUM   3
+> #define RWH_WRITE_LIFE_LONG     4
+> #define RWH_WRITE_LIFE_EXTREME  5
+> 
+> It doesn't look like it's being used as a mask.
 
-We should register for AEN events; some law-abiding targets might
-not be sending us AENs otherwise.
+Right, currently it only supports the life time hint. I'm saying the
+intent is, for when it's being expanded to cover other hints, is to
+split up the value into maskable sections.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-[hch: slight cleanups]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/nvme/host/core.c | 17 +++++++++++++++++
- drivers/nvme/host/nvme.h |  1 +
- 2 files changed, 18 insertions(+)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 86cb78653155..c0bc76d98194 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1030,6 +1030,21 @@ int nvme_set_queue_count(struct nvme_ctrl *ctrl, int *count)
- }
- EXPORT_SYMBOL_GPL(nvme_set_queue_count);
- 
-+#define NVME_AEN_SUPPORTED \
-+	(NVME_AEN_CFG_NS_ATTR | NVME_AEN_CFG_FW_ACT)
-+
-+static void nvme_enable_aen(struct nvme_ctrl *ctrl)
-+{
-+	u32 result;
-+	int status;
-+
-+	status = nvme_set_features(ctrl, NVME_FEAT_ASYNC_EVENT,
-+			ctrl->oaes & NVME_AEN_SUPPORTED, NULL, 0, &result);
-+	if (status)
-+		dev_warn(ctrl->device, "Failed to configure AEN (cfg %x)\n",
-+			 ctrl->oaes & NVME_AEN_SUPPORTED);
-+}
-+
- static int nvme_submit_io(struct nvme_ns *ns, struct nvme_user_io __user *uio)
- {
- 	struct nvme_user_io io;
-@@ -2347,6 +2362,7 @@ int nvme_init_identify(struct nvme_ctrl *ctrl)
- 
- 	ctrl->oacs = le16_to_cpu(id->oacs);
- 	ctrl->oncs = le16_to_cpup(&id->oncs);
-+	ctrl->oaes = le32_to_cpu(id->oaes);
- 	atomic_set(&ctrl->abort_limit, id->acl + 1);
- 	ctrl->vwc = id->vwc;
- 	ctrl->cntlid = le16_to_cpup(&id->cntlid);
-@@ -3379,6 +3395,7 @@ void nvme_start_ctrl(struct nvme_ctrl *ctrl)
- 
- 	if (ctrl->queue_count > 1) {
- 		nvme_queue_scan(ctrl);
-+		nvme_enable_aen(ctrl);
- 		queue_work(nvme_wq, &ctrl->async_event_work);
- 		nvme_start_queues(ctrl);
- 	}
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index ec6e4acc4d48..dcf9e9592c1a 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -176,6 +176,7 @@ struct nvme_ctrl {
- 	u16 kas;
- 	u8 npss;
- 	u8 apsta;
-+	u32 oaes;
- 	u32 aen_result;
- 	unsigned int shutdown_timeout;
- 	unsigned int kato;
 -- 
-2.17.0
+Jens Axboe
