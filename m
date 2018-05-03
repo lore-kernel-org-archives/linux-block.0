@@ -1,47 +1,98 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out30-133.freemail.mail.aliyun.com ([115.124.30.133]:57840 "EHLO
-        out30-133.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1754942AbeE2IaB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 May 2018 04:30:01 -0400
-From: Liu Bo <bo.liu@linux.alibaba.com>
-To: <linux-block@vger.kernel.org>
-Subject: [PATCH RESEND] blk-throttle: fix potential NULL pointer dereference in throtl_select_dispatch
-Date: Tue, 29 May 2018 16:29:12 +0800
-Message-Id: <1527582552-4841-1-git-send-email-bo.liu@linux.alibaba.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	Coly Li <colyli@suse.de>
+Subject: [PATCH v4 4/6] bcache: add wait_for_kthread_stop() in bch_allocator_thread()
+Date: Thu,  3 May 2018 18:51:35 +0800
+Message-Id: <20180503105137.2922-5-colyli@suse.de>
+In-Reply-To: <20180503105137.2922-1-colyli@suse.de>
+References: <20180503105137.2922-1-colyli@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-tg in throtl_select_dispatch is used first and then do check. Since tg
-may be NULL, it has potential NULL pointer dereference risk. So fix
-it.
+When CACHE_SET_IO_DISABLE is set on cache set flags, bcache allocator
+thread routine bch_allocator_thread() may stop the while-loops and
+exit. Then it is possible to observe the following kernel oops message,
 
-Signed-off-by: Joseph Qi <joseph.qi@linux.alibaba.com>
-Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
+[  631.068366] bcache: bch_btree_insert() error -5
+[  631.069115] bcache: cached_dev_detach_finish() Caching disabled for sdf
+[  631.070220] BUG: unable to handle kernel NULL pointer dereference at 0000000000000000
+[  631.070250] PGD 0 P4D 0
+[  631.070261] Oops: 0002 [#1] SMP PTI
+[snipped]
+[  631.070578] Workqueue: events cache_set_flush [bcache]
+[  631.070597] RIP: 0010:exit_creds+0x1b/0x50
+[  631.070610] RSP: 0018:ffffc9000705fe08 EFLAGS: 00010246
+[  631.070626] RAX: 0000000000000001 RBX: ffff880a622ad300 RCX: 000000000000000b
+[  631.070645] RDX: 0000000000000601 RSI: 000000000000000c RDI: 0000000000000000
+[  631.070663] RBP: ffff880a622ad300 R08: ffffea00190c66e0 R09: 0000000000000200
+[  631.070682] R10: ffff880a48123000 R11: ffff880000000000 R12: 0000000000000000
+[  631.070700] R13: ffff880a4b160e40 R14: ffff880a4b160000 R15: 0ffff880667e2530
+[  631.070719] FS:  0000000000000000(0000) GS:ffff880667e00000(0000) knlGS:0000000000000000
+[  631.070740] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  631.070755] CR2: 0000000000000000 CR3: 000000000200a001 CR4: 00000000003606e0
+[  631.070774] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[  631.070793] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[  631.070811] Call Trace:
+[  631.070828]  __put_task_struct+0x55/0x160
+[  631.070845]  kthread_stop+0xee/0x100
+[  631.070863]  cache_set_flush+0x11d/0x1a0 [bcache]
+[  631.070879]  process_one_work+0x146/0x340
+[  631.070892]  worker_thread+0x47/0x3e0
+[  631.070906]  kthread+0xf5/0x130
+[  631.070917]  ? max_active_store+0x60/0x60
+[  631.070930]  ? kthread_bind+0x10/0x10
+[  631.070945]  ret_from_fork+0x35/0x40
+[snipped]
+[  631.071017] RIP: exit_creds+0x1b/0x50 RSP: ffffc9000705fe08
+[  631.071033] CR2: 0000000000000000
+[  631.071045] ---[ end trace 011c63a24b22c927 ]---
+[  631.071085] bcache: bcache_device_free() bcache0 stopped
+
+The reason is when cache_set_flush() tries to call kthread_stop() to stop
+allocator thread, but it exits already due to cache device I/O errors.
+
+This patch adds wait_for_kthread_stop() at tail of bch_allocator_thread(),
+to prevent the thread routine exiting directly. Then the allocator thread
+can be blocked at wait_for_kthread_stop() and wait for cache_set_flush()
+to stop it by calling kthread_stop().
+
+changelog:
+v3: add Reviewed-by from Hannnes.
+v2: not directly return from allocator_wait(), move 'return 0' to tail of
+    bch_allocator_thread().
+v1: initial version.
+
+Fixes: 771f393e8ffc ("bcache: add CACHE_SET_IO_DISABLE to struct cache_set flags")
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-throttle.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/md/bcache/alloc.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index dffe982..a168e82 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1294,7 +1294,7 @@ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
+diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
+index 004cc3cc6123..7fa2631b422c 100644
+--- a/drivers/md/bcache/alloc.c
++++ b/drivers/md/bcache/alloc.c
+@@ -290,7 +290,7 @@ do {									\
+ 		if (kthread_should_stop() ||				\
+ 		    test_bit(CACHE_SET_IO_DISABLE, &ca->set->flags)) {	\
+ 			set_current_state(TASK_RUNNING);		\
+-			return 0;					\
++			goto out;					\
+ 		}							\
+ 									\
+ 		schedule();						\
+@@ -378,6 +378,9 @@ static int bch_allocator_thread(void *arg)
+ 			bch_prio_write(ca);
+ 		}
+ 	}
++out:
++	wait_for_kthread_stop();
++	return 0;
+ }
  
- 	while (1) {
- 		struct throtl_grp *tg = throtl_rb_first(parent_sq);
--		struct throtl_service_queue *sq = &tg->service_queue;
-+		struct throtl_service_queue *sq;
- 
- 		if (!tg)
- 			break;
-@@ -1306,6 +1306,7 @@ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
- 
- 		nr_disp += throtl_dispatch_tg(tg);
- 
-+		sq = &tg->service_queue;
- 		if (sq->nr_queued[0] || sq->nr_queued[1])
- 			tg_update_disptime(tg);
- 
+ /* Allocation */
 -- 
-1.8.3.1
+2.16.3
