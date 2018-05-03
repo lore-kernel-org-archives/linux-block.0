@@ -1,71 +1,166 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:48068 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751095AbeECPCU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 3 May 2018 11:02:20 -0400
-Date: Thu, 3 May 2018 17:02:17 +0200
-From: Jan Kara <jack@suse.cz>
-To: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Cc: viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
-        jack@suse.cz, bart.vanassche@wdc.com, ming.lei@redhat.com,
-        rjw@rjwysocki.net, mguzik@redhat.com, linux-pm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] fs: fix corner case race on freeze_bdev() when sb
- disappears
-Message-ID: <20180503150217.ywu2cuxjbsgr47a6@quack2.suse.cz>
-References: <20180420235904.27496-1-mcgrof@kernel.org>
- <20180420235904.27496-4-mcgrof@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180420235904.27496-4-mcgrof@kernel.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>
+Subject: [PATCH V3 1/8] block: introduce blk_quiesce_timeout() and blk_unquiesce_timeout()
+Date: Thu,  3 May 2018 11:17:09 +0800
+Message-Id: <20180503031716.31446-2-ming.lei@redhat.com>
+In-Reply-To: <20180503031716.31446-1-ming.lei@redhat.com>
+References: <20180503031716.31446-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-On Fri 20-04-18 16:59:04, Luis R. Rodriguez wrote:
-> freeze_bdev() will bail but leave the bd_fsfreeze_count incremented
-> if the get_active_super() does not find the superblock on our
-> super_blocks list to match.
-> 
-> This issue has been present since v2.6.29 during the introduction of the
-> ioctl_fsfreeze() and ioctl_fsthaw() via commit fcccf502540e3 ("filesystem
-> freeze: implement generic freeze feature").
-> 
-> I am not aware of any existing races which have triggered this
-> situation, however, if it does trigger it could mean leaving a
-> superblock with bd_fsfreeze_count always positive.
-> 
-> Fixes: fcccf502540e3 ("filesystem freeze: implement generic freeze feature")
-> Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
+Turns out the current way can't drain timout completely because mod_timer()
+can be triggered in the work func, which can be just run inside the synced
+timeout work:
 
-Looks good to me. You can add:
+        del_timer_sync(&q->timeout);
+        cancel_work_sync(&q->timeout_work);
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+This patch introduces one flag of 'timeout_off' for fixing this issue, turns
+out this simple way does work.
 
-								Honza
+Also blk_quiesce_timeout() and blk_unquiesce_timeout() are introduced for
+draining timeout, which is needed by NVMe.
 
-> ---
->  fs/block_dev.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/block_dev.c b/fs/block_dev.c
-> index b54966679833..7a532aa58c07 100644
-> --- a/fs/block_dev.c
-> +++ b/fs/block_dev.c
-> @@ -507,8 +507,10 @@ struct super_block *freeze_bdev(struct block_device *bdev)
->  	}
->  
->  	sb = get_active_super(bdev);
-> -	if (!sb)
-> +	if (!sb) {
-> +		bdev->bd_fsfreeze_count--;
->  		goto out;
-> +	}
->  	if (sb->s_op->freeze_super)
->  		error = sb->s_op->freeze_super(sb);
->  	else
-> -- 
-> 2.16.3
-> 
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Cc: Laurence Oberman <loberman@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-core.c       | 21 +++++++++++++++++++--
+ block/blk-mq.c         |  9 +++++++++
+ block/blk-timeout.c    |  5 ++++-
+ include/linux/blkdev.h | 13 +++++++++++++
+ 4 files changed, 45 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 85909b431eb0..c277f1023703 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -392,6 +392,22 @@ void blk_stop_queue(struct request_queue *q)
+ }
+ EXPORT_SYMBOL(blk_stop_queue);
+ 
++void blk_unquiesce_timeout(struct request_queue *q)
++{
++	blk_mark_timeout_quiesce(q, false);
++	mod_timer(&q->timeout, jiffies + q->rq_timeout);
++}
++EXPORT_SYMBOL(blk_unquiesce_timeout);
++
++void blk_quiesce_timeout(struct request_queue *q)
++{
++	blk_mark_timeout_quiesce(q, true);
++
++	del_timer_sync(&q->timeout);
++	cancel_work_sync(&q->timeout_work);
++}
++EXPORT_SYMBOL(blk_quiesce_timeout);
++
+ /**
+  * blk_sync_queue - cancel any pending callbacks on a queue
+  * @q: the queue
+@@ -412,8 +428,7 @@ EXPORT_SYMBOL(blk_stop_queue);
+  */
+ void blk_sync_queue(struct request_queue *q)
+ {
+-	del_timer_sync(&q->timeout);
+-	cancel_work_sync(&q->timeout_work);
++	blk_quiesce_timeout(q);
+ 
+ 	if (q->mq_ops) {
+ 		struct blk_mq_hw_ctx *hctx;
+@@ -425,6 +440,8 @@ void blk_sync_queue(struct request_queue *q)
+ 	} else {
+ 		cancel_delayed_work_sync(&q->delay_work);
+ 	}
++
++	blk_mark_timeout_quiesce(q, false);
+ }
+ EXPORT_SYMBOL(blk_sync_queue);
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c3621453ad87..d0a5dc29c8ef 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -901,6 +901,15 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 	};
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i;
++	bool timeout_off;
++	unsigned long flags;
++
++	spin_lock_irqsave(q->queue_lock, flags);
++	timeout_off = q->timeout_off;
++	spin_unlock_irqrestore(q->queue_lock, flags);
++
++	if (timeout_off)
++		return;
+ 
+ 	/* A deadlock might occur if a request is stuck requiring a
+ 	 * timeout at the same time a queue freeze is waiting
+diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+index 652d4d4d3e97..ffd0b609091e 100644
+--- a/block/blk-timeout.c
++++ b/block/blk-timeout.c
+@@ -136,12 +136,15 @@ void blk_timeout_work(struct work_struct *work)
+ 
+ 	spin_lock_irqsave(q->queue_lock, flags);
+ 
++	if (q->timeout_off)
++		goto exit;
++
+ 	list_for_each_entry_safe(rq, tmp, &q->timeout_list, timeout_list)
+ 		blk_rq_check_expired(rq, &next, &next_set);
+ 
+ 	if (next_set)
+ 		mod_timer(&q->timeout, round_jiffies_up(next));
+-
++exit:
+ 	spin_unlock_irqrestore(q->queue_lock, flags);
+ }
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 5c4eee043191..a2cc4aaecf50 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -584,6 +584,7 @@ struct request_queue {
+ 	struct timer_list	timeout;
+ 	struct work_struct	timeout_work;
+ 	struct list_head	timeout_list;
++	bool			timeout_off;
+ 
+ 	struct list_head	icq_list;
+ #ifdef CONFIG_BLK_CGROUP
+@@ -1017,6 +1018,18 @@ extern void blk_execute_rq(struct request_queue *, struct gendisk *,
+ extern void blk_execute_rq_nowait(struct request_queue *, struct gendisk *,
+ 				  struct request *, int, rq_end_io_fn *);
+ 
++static inline void blk_mark_timeout_quiesce(struct request_queue *q, bool quiesce)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(q->queue_lock, flags);
++	q->timeout_off = quiesce;
++	spin_unlock_irqrestore(q->queue_lock, flags);
++}
++
++extern void blk_quiesce_timeout(struct request_queue *q);
++extern void blk_unquiesce_timeout(struct request_queue *q);
++
+ int blk_status_to_errno(blk_status_t status);
+ blk_status_t errno_to_blk_status(int errno);
+ 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.9.5
