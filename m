@@ -1,96 +1,44 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
+Return-Path: <bigeasy@linutronix.de>
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 To: linux-block@vger.kernel.org
-Cc: osandov@fb.com,
-	efault@gmx.de,
-	paolo.valente@linaro.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 3/3] blk-mq-sched: inform sbitmap of shallow depth changes
-Date: Wed,  9 May 2018 09:36:04 -0600
-Message-Id: <1525880164-11943-4-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1525880164-11943-1-git-send-email-axboe@kernel.dk>
-References: <1525880164-11943-1-git-send-email-axboe@kernel.dk>
+Cc: Thomas Gleixner <tglx@linutronix.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Anna-Maria Gleixner <anna-maria@linutronix.de>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: [PATCH 2/3] block: Remove redundant WARN_ON()
+Date: Fri,  4 May 2018 16:32:46 +0200
+Message-Id: <20180504143247.5240-2-bigeasy@linutronix.de>
+In-Reply-To: <20180504143247.5240-1-bigeasy@linutronix.de>
+References: <20180504143247.5240-1-bigeasy@linutronix.de>
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-If the scheduler returns a new shallow depth setting, then inform
-sbitmap so it can update the wait batch counts.
+From: Anna-Maria Gleixner <anna-maria@linutronix.de>
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Commit 2fff8a924d4c ("block: Check locking assumptions at runtime") added a
+lockdep_assert_held(q->queue_lock) which makes the WARN_ON() redundant
+because lockdep will detect and warn about context violations.
+
+The unconditional WARN_ON() does not provide real additional value, so it
+can be removed.
+
+Signed-off-by: Anna-Maria Gleixner <anna-maria@linutronix.de>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 ---
- block/blk-mq-sched.c | 26 ++++++++++++++++++++++++++
- block/blk-mq-sched.h |  3 +++
- block/blk-mq.c       |  8 +-------
- 3 files changed, 30 insertions(+), 7 deletions(-)
+ block/blk-core.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 25c14c58385c..0c53a254671f 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -16,6 +16,32 @@
- #include "blk-mq-tag.h"
- #include "blk-wbt.h"
- 
-+void blk_mq_sched_limit_depth(struct elevator_queue *e,
-+			      struct blk_mq_alloc_data *data, unsigned int op)
-+{
-+	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
-+	struct sbitmap_queue *bt;
-+	int ret;
-+
-+	/*
-+	 * Flush requests are special and go directly to the
-+	 * dispatch list.
-+	 */
-+	if (op_is_flush(op) || !e->type->ops.mq.limit_depth)
-+		return;
-+
-+	ret = e->type->ops.mq.limit_depth(op, data);
-+	if (!ret)
-+		return;
-+
-+	if (data->flags & BLK_MQ_REQ_RESERVED)
-+		bt = &tags->breserved_tags;
-+	else
-+		bt = &tags->bitmap_tags;
-+
-+	sbitmap_queue_shallow_depth(bt, ret);
-+}
-+
- void blk_mq_sched_free_hctx_data(struct request_queue *q,
- 				 void (*exit)(struct blk_mq_hw_ctx *))
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 85909b431eb0..a3caccaa7d1f 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -360,7 +360,6 @@ EXPORT_SYMBOL(blk_start_queue_async);
+ void blk_start_queue(struct request_queue *q)
  {
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 1e9c9018ace1..6abebc1b9ae0 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -5,6 +5,9 @@
- #include "blk-mq.h"
- #include "blk-mq-tag.h"
- 
-+void blk_mq_sched_limit_depth(struct elevator_queue *e,
-+			      struct blk_mq_alloc_data *data, unsigned int op);
-+
- void blk_mq_sched_free_hctx_data(struct request_queue *q,
- 				 void (*exit)(struct blk_mq_hw_ctx *));
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4e9d83594cca..1bb7aa40c192 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -357,13 +357,7 @@ static struct request *blk_mq_get_request(struct request_queue *q,
- 
- 	if (e) {
- 		data->flags |= BLK_MQ_REQ_INTERNAL;
--
--		/*
--		 * Flush requests are special and go directly to the
--		 * dispatch list.
--		 */
--		if (!op_is_flush(op) && e->type->ops.mq.limit_depth)
--			e->type->ops.mq.limit_depth(op, data);
-+		blk_mq_sched_limit_depth(e, data, op);
- 	}
- 
- 	tag = blk_mq_get_tag(data);
--- 
-2.7.4
+ 	lockdep_assert_held(q->queue_lock);
+-	WARN_ON(!in_interrupt() && !irqs_disabled());
+ 	WARN_ON_ONCE(q->mq_ops);
+=20
+ 	queue_flag_clear(QUEUE_FLAG_STOPPED, q);
+--=20
+2.17.0
