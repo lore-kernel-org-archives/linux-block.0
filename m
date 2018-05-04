@@ -1,67 +1,36 @@
-Return-Path: <penguin-kernel@i-love.sakura.ne.jp>
-To: tytso@mit.edu, axboe@kernel.dk, syzkaller-bugs@googlegroups.com
-Cc: linux-block@vger.kernel.org
-Subject: Re: [PATCH] loop: add recursion validation to LOOP_CHANGE_FD
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-References: <20180504021717.9246-1-tytso@mit.edu>
-In-Reply-To: <20180504021717.9246-1-tytso@mit.edu>
-Message-Id: <201805072016.GAC48495.VSJQFtFHLFMOOO@I-love.SAKURA.ne.jp>
-Date: Mon, 7 May 2018 20:16:58 +0900
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <tytso@thunk.org>
+From: Theodore Ts'o <tytso@mit.edu>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	Theodore Ts'o <tytso@mit.edu>
+Subject: [PATCH] loop: add recursion validation to LOOP_CHANGE_FD
+Date: Thu,  3 May 2018 22:17:17 -0400
+Message-Id: <20180504021717.9246-1-tytso@mit.edu>
 List-ID: <linux-block@vger.kernel.org>
 
-Oh, your message did not arrive at news.gmane.org and I didn't notice that you
-already wrote this patch. But please update yours or review mine shown below.
+Refactor the validation code used in LOOP_SET_FD so it is also used in
+LOOP_CHANGE_FD.  Otherwise it is possible to construct a set of loop
+devices that all refer to each other.  This can lead to a infinite
+loop in starting with "while (is_loop_device(f)) .." in loop_set_fd().
 
-> @@ -673,14 +703,13 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
->  	if (!file)
->  		goto out;
->  
-> +	error = loop_validate_file(file, bdev);
-> +	if (error)
-> +		goto out_putf;
-> +
->  	inode = file->f_mapping->host;
->  	old_file = lo->lo_backing_file;
->  
-> -	error = -EINVAL;
-> -
-> -	if (!S_ISREG(inode->i_mode) && !S_ISBLK(inode->i_mode))
-> -		goto out_putf;
-> -
->  	/* size of the new backing store needs to be the same */
->  	if (get_loop_size(lo, file) != get_loop_size(lo, old_file))
->  		goto out_putf;
+Fix this by refactoring out the validation code and using it for
+LOOP_CHANGE_FD as well as LOOP_SET_FD.
 
-error == 0 upon "goto out_putf" is wrong.
-
-
-
->>From eed54c6ae475860a9c63b37b58f34735e792eef7 Mon Sep 17 00:00:00 2001
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Date: Sat, 5 May 2018 12:59:12 +0900
-Subject: [PATCH] block/loop: Add recursion check for LOOP_CHANGE_FD request.
-
-syzbot is reporting hung tasks at blk_freeze_queue() [1]. This is
-due to ioctl(loop_fd, LOOP_CHANGE_FD, loop_fd) request which should be
-rejected. Fix this by adding same recursion check which is used by
-LOOP_SET_FD request.
-
-[1] https://syzkaller.appspot.com/bug?id=078805a692853552e08154b1bcd2bc2c729eda88
-
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Reported-by: syzbot <syzbot+2ab52b8d94df5e2eaa01@syzkaller.appspotmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>
+Reported-by: syzbot+4349872271ece473a7c91190b68b4bac7c5dbc87@syzkaller.appspotmail.com
+Reported-by: syzbot+40bd32c4d9a3cc12a339@syzkaller.appspotmail.com
+Reported-by: syzbot+769c54e66f994b041be7@syzkaller.appspotmail.com
+Reported-by: syzbot+0a89a9ce473936c57065@syzkaller.appspotmail.com
+Signed-off-by: Theodore Ts'o <tytso@mit.edu>
 ---
- drivers/block/loop.c | 59 ++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 37 insertions(+), 22 deletions(-)
+ drivers/block/loop.c | 70 ++++++++++++++++++++++++++++------------------------
+ 1 file changed, 38 insertions(+), 32 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 5d4e316..cee3c01 100644
+index 5d4e31655d96..fd2ddd60d267 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -644,6 +644,34 @@ static void loop_reread_partitions(struct loop_device *lo,
+@@ -644,6 +644,36 @@ static void loop_reread_partitions(struct loop_device *lo,
  			__func__, lo->lo_number, lo->lo_file_name, rc);
  }
  
@@ -72,43 +41,52 @@ index 5d4e316..cee3c01 100644
 +	return i && S_ISBLK(i->i_mode) && MAJOR(i->i_rdev) == LOOP_MAJOR;
 +}
 +
-+static int check_loop_recursion(struct file *f, struct block_device *bdev)
++static int loop_validate_file(struct file *file, struct block_device *bdev)
 +{
-+	/*
-+	 * FIXME: Traversing on other loop devices without corresponding
-+	 * lo_ctl_mutex is not safe. l->lo_state can become Lo_rundown and
-+	 * l->lo_backing_file can become NULL when raced with LOOP_CLR_FD.
-+	 */
++	struct inode	*inode = file->f_mapping->host;
++	struct file	*f = file;
++
++	/* Avoid recursion */
 +	while (is_loop_device(f)) {
 +		struct loop_device *l;
 +
 +		if (f->f_mapping->host->i_bdev == bdev)
-+			return -EBUSY;
++			return -EBADF;
 +
 +		l = f->f_mapping->host->i_bdev->bd_disk->private_data;
-+		if (l->lo_state == Lo_unbound)
++		if (l->lo_state == Lo_unbound) {
 +			return -EINVAL;
++		}
 +		f = l->lo_backing_file;
 +	}
++	if (!S_ISREG(inode->i_mode) && !S_ISBLK(inode->i_mode))
++		return -EINVAL;
 +	return 0;
 +}
 +
  /*
   * loop_change_fd switched the backing store of a loopback device to
   * a new file. This is useful for operating system installers to free up
-@@ -673,6 +701,11 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+@@ -673,14 +703,13 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
  	if (!file)
  		goto out;
  
-+	/* Avoid recursion */
-+	error = check_loop_recursion(file, bdev);
++	error = loop_validate_file(file, bdev);
 +	if (error)
 +		goto out_putf;
 +
  	inode = file->f_mapping->host;
  	old_file = lo->lo_backing_file;
  
-@@ -706,13 +739,6 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+-	error = -EINVAL;
+-
+-	if (!S_ISREG(inode->i_mode) && !S_ISBLK(inode->i_mode))
+-		goto out_putf;
+-
+ 	/* size of the new backing store needs to be the same */
+ 	if (get_loop_size(lo, file) != get_loop_size(lo, old_file))
+ 		goto out_putf;
+@@ -706,13 +735,6 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
  	return error;
  }
  
@@ -122,7 +100,7 @@ index 5d4e316..cee3c01 100644
  /* loop sysfs attributes */
  
  static ssize_t loop_attr_show(struct device *dev, char *page,
-@@ -877,7 +903,7 @@ static int loop_prepare_queue(struct loop_device *lo)
+@@ -877,7 +899,7 @@ static int loop_prepare_queue(struct loop_device *lo)
  static int loop_set_fd(struct loop_device *lo, fmode_t mode,
  		       struct block_device *bdev, unsigned int arg)
  {
@@ -131,10 +109,11 @@ index 5d4e316..cee3c01 100644
  	struct inode	*inode;
  	struct address_space *mapping;
  	int		lo_flags = 0;
-@@ -897,20 +923,9 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+@@ -896,29 +918,13 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	if (lo->lo_state != Lo_unbound)
  		goto out_putf;
  
- 	/* Avoid recursion */
+-	/* Avoid recursion */
 -	f = file;
 -	while (is_loop_device(f)) {
 -		struct loop_device *l;
@@ -149,11 +128,19 @@ index 5d4e316..cee3c01 100644
 -		}
 -		f = l->lo_backing_file;
 -	}
-+	error = check_loop_recursion(file, bdev);
++	error = loop_validate_file(file, bdev);
 +	if (error)
 +		goto out_putf;
  
  	mapping = file->f_mapping;
  	inode = mapping->host;
+ 
+-	error = -EINVAL;
+-	if (!S_ISREG(inode->i_mode) && !S_ISBLK(inode->i_mode))
+-		goto out_putf;
+-
+ 	if (!(file->f_mode & FMODE_WRITE) || !(mode & FMODE_WRITE) ||
+ 	    !file->f_op->write_iter)
+ 		lo_flags |= LO_FLAGS_READ_ONLY;
 -- 
-1.8.3.1
+2.16.1.72.g5be1f00a9a
