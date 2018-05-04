@@ -1,73 +1,47 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 18/33] xfs: remove the now unused XFS_BMAPI_IGSTATE flag
-Date: Wed,  9 May 2018 09:48:15 +0200
-Message-Id: <20180509074830.16196-19-hch@lst.de>
-In-Reply-To: <20180509074830.16196-1-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: add verifier for cmdline partition
+To: Caizhiyong <caizhiyong@hisilicon.com>, Wang YanQing <udknight@gmail.com>
+Cc: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+ "pombredanne@nexb.com" <pombredanne@nexb.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Jiangheng <jiangheng@hisilicon.com>
+References: <20180503111748.GA904@udknight>
+ <C3050A4DBA34F345975765E43127F10F8B77159A@dggemm511-mbs.china.huawei.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <3267b3ec-0500-5772-949e-49570395085d@kernel.dk>
+Date: Fri, 4 May 2018 08:20:08 -0600
+MIME-Version: 1.0
+In-Reply-To: <C3050A4DBA34F345975765E43127F10F8B77159A@dggemm511-mbs.china.huawei.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/libxfs/xfs_bmap.c | 6 ++----
- fs/xfs/libxfs/xfs_bmap.h | 3 ---
- 2 files changed, 2 insertions(+), 7 deletions(-)
+On 5/4/18 1:07 AM, Caizhiyong wrote:
+>> -----Original Message-----
+>> From: Wang YanQing [mailto:udknight@gmail.com]
+>> Sent: Thursday, May 03, 2018 7:18 PM
+>> To: axboe@kernel.dk
+>> Cc: gregkh@linuxfoundation.org; pombredanne@nexb.com;
+>> tglx@linutronix.de; Caizhiyong <caizhiyong@hisilicon.com>; linux-
+>> block@vger.kernel.org; linux-kernel@vger.kernel.org
+>> Subject: [PATCH] block: add verifier for cmdline partition
+>>
+>> I meet strange filesystem corruption issue recently, the reason
+>> is there are overlaps partitions in cmdline partition argument.
+>>
+>> This patch add verifier for cmdline partition, then if there are
+>> overlaps partitions, cmdline_partition will return error and log
+>> a error message.
+>>
+> 
+> Partition overlap was intentionally designed in this cmdline partition.
+> some time, the cmdline partition save raw data(not filesystem), the overlap makes data  access very convenient.
+> 
+> reference  http://lists.infradead.org/pipermail/linux-mtd/2013-August/048092.html
 
-diff --git a/fs/xfs/libxfs/xfs_bmap.c b/fs/xfs/libxfs/xfs_bmap.c
-index 6a7c2f03ea11..30a2242a1eba 100644
---- a/fs/xfs/libxfs/xfs_bmap.c
-+++ b/fs/xfs/libxfs/xfs_bmap.c
-@@ -3785,8 +3785,7 @@ xfs_bmapi_update_map(
- 		   mval[-1].br_startblock != HOLESTARTBLOCK &&
- 		   mval->br_startblock == mval[-1].br_startblock +
- 					  mval[-1].br_blockcount &&
--		   ((flags & XFS_BMAPI_IGSTATE) ||
--			mval[-1].br_state == mval->br_state)) {
-+		   mval[-1].br_state == mval->br_state) {
- 		ASSERT(mval->br_startoff ==
- 		       mval[-1].br_startoff + mval[-1].br_blockcount);
- 		mval[-1].br_blockcount += mval->br_blockcount;
-@@ -3831,7 +3830,7 @@ xfs_bmapi_read(
- 
- 	ASSERT(*nmap >= 1);
- 	ASSERT(!(flags & ~(XFS_BMAPI_ATTRFORK|XFS_BMAPI_ENTIRE|
--			   XFS_BMAPI_IGSTATE|XFS_BMAPI_COWFORK)));
-+			   XFS_BMAPI_COWFORK)));
- 	ASSERT(xfs_isilocked(ip, XFS_ILOCK_SHARED|XFS_ILOCK_EXCL));
- 
- 	if (unlikely(XFS_TEST_ERROR(
-@@ -4275,7 +4274,6 @@ xfs_bmapi_write(
- 
- 	ASSERT(*nmap >= 1);
- 	ASSERT(*nmap <= XFS_BMAP_MAX_NMAP);
--	ASSERT(!(flags & XFS_BMAPI_IGSTATE));
- 	ASSERT(tp != NULL ||
- 	       (flags & (XFS_BMAPI_CONVERT | XFS_BMAPI_COWFORK)) ==
- 			(XFS_BMAPI_CONVERT | XFS_BMAPI_COWFORK));
-diff --git a/fs/xfs/libxfs/xfs_bmap.h b/fs/xfs/libxfs/xfs_bmap.h
-index 2b766b37096d..2c6da709a521 100644
---- a/fs/xfs/libxfs/xfs_bmap.h
-+++ b/fs/xfs/libxfs/xfs_bmap.h
-@@ -79,8 +79,6 @@ struct xfs_extent_free_item
- #define XFS_BMAPI_METADATA	0x002	/* mapping metadata not user data */
- #define XFS_BMAPI_ATTRFORK	0x004	/* use attribute fork not data */
- #define XFS_BMAPI_PREALLOC	0x008	/* preallocation op: unwritten space */
--#define XFS_BMAPI_IGSTATE	0x010	/* Ignore state - */
--					/* combine contig. space */
- #define XFS_BMAPI_CONTIG	0x020	/* must allocate only one extent */
- /*
-  * unwritten extent conversion - this needs write cache flushing and no additional
-@@ -121,7 +119,6 @@ struct xfs_extent_free_item
- 	{ XFS_BMAPI_METADATA,	"METADATA" }, \
- 	{ XFS_BMAPI_ATTRFORK,	"ATTRFORK" }, \
- 	{ XFS_BMAPI_PREALLOC,	"PREALLOC" }, \
--	{ XFS_BMAPI_IGSTATE,	"IGSTATE" }, \
- 	{ XFS_BMAPI_CONTIG,	"CONTIG" }, \
- 	{ XFS_BMAPI_CONVERT,	"CONVERT" }, \
- 	{ XFS_BMAPI_ZERO,	"ZERO" }, \
+Might make sense to warn about it at least, it can be very surprising if
+it happens inadvertently.
+
 -- 
-2.17.0
+Jens Axboe
