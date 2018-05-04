@@ -1,54 +1,33 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH v4 0/6] bcache device failure handling fixes for 4.17-rc4
-Date: Thu,  3 May 2018 18:51:31 +0800
-Message-Id: <20180503105137.2922-1-colyli@suse.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 1/3] block: don't disable interrupts during kmap_atomic()
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ linux-block@vger.kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>
+References: <20180504143247.5240-1-bigeasy@linutronix.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <19824605-9ff8-1122-a401-69ffd3fe558a@kernel.dk>
+Date: Fri, 4 May 2018 08:36:41 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180504143247.5240-1-bigeasy@linutronix.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+On 5/4/18 8:32 AM, Sebastian Andrzej Siewior wrote:
+> bounce_copy_vec() disables interrupts around kmap_atomic(). This is a
+> leftover from the old kmap_atomic() implementation which relied on fixed
+> mapping slots, so the caller had to make sure that the same slot could not
+> be reused from an interrupting context.
+> 
+> kmap_atomic() was changed to dynamic slots long ago and commit 1ec9c5ddc17a
+> ("include/linux/highmem.h: remove the second argument of k[un]map_atomic()")
+> removed the slot assignements, but the callers were not checked for now
+> redundant interrupt disabling.
+> 
+> Remove the conditional interrupt disable.
 
-I receive bug reports from partners for the bcache cache device failure
-handling patch set (which is just merged into 4.17-rc1). Fortunately we
-are still in 4.17 merge window, I suggest to have these fixes to go into
-4.17 merge window too.
-
-The patches are well commented IMHO and pass my own regression tests.
-Fortunately Hannes offers code reveiw to all the patches and offers his
-Reviewed-by.
-
-Thanks for your help in advance.
-
-Changlog:
-v4: Add reviewed-by from Hannnes Reinecke.
-v3: Remove an extra "Fixes:" line from patch "bcache: use pr_info() to
-    inform duplicated CACHE_SET_IO_DISABLE set", and move part of its
-    content into patch "bcache: set CACHE_SET_IO_DISABLE in
-    bch_cached_dev_error()".
-v2: With more fixes from v1 patch set.
-v1: First version for review.
-
-Coly Li
----
-Coly Li (6):
-  bcache: store disk name in struct cache and struct cached_dev
-  bcache: set CACHE_SET_IO_DISABLE in bch_cached_dev_error()
-  bcache: count backing device I/O error for writeback I/O
-  bcache: add wait_for_kthread_stop() in bch_allocator_thread()
-  bcache: set dc->io_disable to true in conditional_stop_bcache_device()
-  bcache: use pr_info() to inform duplicated CACHE_SET_IO_DISABLE set
-
- drivers/md/bcache/alloc.c     |  5 ++-
- drivers/md/bcache/bcache.h    |  4 +++
- drivers/md/bcache/debug.c     |  3 +-
- drivers/md/bcache/io.c        |  8 ++---
- drivers/md/bcache/request.c   |  5 +--
- drivers/md/bcache/super.c     | 75 ++++++++++++++++++++++++++++++-------------
- drivers/md/bcache/writeback.c |  4 ++-
- 7 files changed, 68 insertions(+), 36 deletions(-)
+All three patches look fine to me, I'll queue them up for 4.18. In
+the future, please include a cover letter for block patches when
+sending > 1 patch. Makes it easier to reply to the series as a whole.
 
 -- 
-2.16.3
+Jens Axboe
