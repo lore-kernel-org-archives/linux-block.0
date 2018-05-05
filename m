@@ -4,25 +4,23 @@ To: Keith Busch <keith.busch@intel.com>
 Cc: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
 	Ming Lei <ming.lei@redhat.com>,
-	James Smart <james.smart@broadcom.com>,
 	Jianchao Wang <jianchao.w.wang@oracle.com>,
 	Christoph Hellwig <hch@lst.de>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	linux-nvme@lists.infradead.org,
 	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V6 08/11] nvme: pci: move error handling out of nvme_reset_dev()
-Date: Wed, 16 May 2018 12:03:10 +0800
-Message-Id: <20180516040313.13596-9-ming.lei@redhat.com>
-In-Reply-To: <20180516040313.13596-1-ming.lei@redhat.com>
-References: <20180516040313.13596-1-ming.lei@redhat.com>
+Subject: [PATCH V4 5/7] nvme: core: introduce 'reset_lock' for sync reset state and reset activities
+Date: Sat,  5 May 2018 21:59:03 +0800
+Message-Id: <20180505135905.18815-6-ming.lei@redhat.com>
+In-Reply-To: <20180505135905.18815-1-ming.lei@redhat.com>
+References: <20180505135905.18815-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Once nested EH is introduced, we may not need to handle error
-in the inner EH, so move error handling out of nvme_reset_dev().
+NVMe PCI may start a new reset context to run nested reset for recovering
+from reset context, and we may not change the rule of state machine until
+other kinds of NVMe controller support that, so use the 'reset_lock' to sync
+the state change here.
 
-Meantime return the reset result to caller.
-
-Cc: James Smart <james.smart@broadcom.com>
 Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Sagi Grimberg <sagi@grimberg.me>
@@ -30,55 +28,65 @@ Cc: linux-nvme@lists.infradead.org
 Cc: Laurence Oberman <loberman@redhat.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/nvme/host/pci.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ drivers/nvme/host/core.c | 20 +++++++++++++++++---
+ drivers/nvme/host/nvme.h |  3 +++
+ 2 files changed, 20 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 50bd1818deb5..634fd7f17950 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2391,7 +2391,7 @@ static void nvme_remove_dead_ctrl(struct nvme_dev *dev, int status)
- 		nvme_put_ctrl(&dev->ctrl);
- }
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 9df4f71e58ca..3aaee4dbf58e 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -100,13 +100,25 @@ static struct class *nvme_subsys_class;
+ static void nvme_ns_remove(struct nvme_ns *ns);
+ static int nvme_revalidate_disk(struct gendisk *disk);
  
--static void nvme_reset_dev(struct nvme_dev *dev)
-+static int nvme_reset_dev(struct nvme_dev *dev)
++/*
++ * NVMe PCI may support nested reset for recovering from reset context,
++ * and we may not change the rule of state machine until other kinds of
++ * NVMe controller support that, so use the 'reset_lock' to sync the
++ * state change here.
++ */
+ int nvme_reset_ctrl(struct nvme_ctrl *ctrl)
  {
- 	bool was_suspend = !!(dev->ctrl.ctrl_config & NVME_CC_SHN_NORMAL);
- 	int result = -ENODEV;
-@@ -2485,6 +2485,7 @@ static void nvme_reset_dev(struct nvme_dev *dev)
- 		nvme_unfreeze(&dev->ctrl);
- 	}
- 
-+	result = -ENODEV;
- 	/*
- 	 * If only admin queue live, keep it to do further investigation or
- 	 * recovery.
-@@ -2496,19 +2497,22 @@ static void nvme_reset_dev(struct nvme_dev *dev)
- 	}
- 
- 	nvme_start_ctrl(&dev->ctrl);
--	return;
-+	return 0;
- 
-  out:
--	nvme_remove_dead_ctrl(dev, result);
-+	return result;
++	int ret = -EBUSY;
++
++	mutex_lock(&ctrl->reset_lock);
+ 	if (!nvme_change_ctrl_state(ctrl, NVME_CTRL_RESETTING))
+-		return -EBUSY;
++		goto fail;
+ 	if (!queue_work(nvme_reset_wq, &ctrl->reset_work))
+-		return -EBUSY;
+-	return 0;
++		goto fail;
++	ret = 0;
++ fail:
++	mutex_unlock(&ctrl->reset_lock);
++	return ret;
  }
+ EXPORT_SYMBOL_GPL(nvme_reset_ctrl);
  
- static void nvme_reset_work(struct work_struct *work)
- {
- 	struct nvme_dev *dev =
- 		container_of(work, struct nvme_dev, ctrl.reset_work);
-+	int result;
+@@ -3447,6 +3459,8 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
+ 	INIT_WORK(&ctrl->fw_act_work, nvme_fw_act_work);
+ 	INIT_WORK(&ctrl->delete_work, nvme_delete_ctrl_work);
  
- 	mutex_lock(&dev->ctrl.reset_lock);
--	nvme_reset_dev(dev);
-+	result = nvme_reset_dev(dev);
-+	if (result)
-+		nvme_remove_dead_ctrl(dev, result);
- 	mutex_unlock(&dev->ctrl.reset_lock);
- }
++	mutex_init(&ctrl->reset_lock);
++
+ 	ret = ida_simple_get(&nvme_instance_ida, 0, 0, GFP_KERNEL);
+ 	if (ret < 0)
+ 		goto out;
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 061fecfd44f5..99f55c6f69f8 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -146,6 +146,9 @@ struct nvme_ctrl {
+ 	struct device ctrl_device;
+ 	struct device *device;	/* char device */
+ 	struct cdev cdev;
++
++	/* sync reset state update and related reset activities */
++	struct mutex reset_lock;
+ 	struct work_struct reset_work;
+ 	struct work_struct delete_work;
  
 -- 
 2.9.5
