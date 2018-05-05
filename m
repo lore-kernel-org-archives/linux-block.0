@@ -1,39 +1,166 @@
-Return-Path: <prvs=6616f3864=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "keith.busch@intel.com" <keith.busch@intel.com>, "ming.lei@redhat.com"
-	<ming.lei@redhat.com>
-CC: "hch@lst.de" <hch@lst.de>, "sagi@grimberg.me" <sagi@grimberg.me>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"loberman@redhat.com" <loberman@redhat.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>
-Subject: Re: [PATCH V4 1/7] block: introduce blk_quiesce_timeout() and
- blk_unquiesce_timeout()
-Date: Thu, 10 May 2018 15:01:04 +0000
-Message-ID: <4cf98f8d3d763ab3decb5f4bfaee6a4394de5caf.camel@wdc.com>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>
+Subject: [PATCH V4 1/7] block: introduce blk_quiesce_timeout() and blk_unquiesce_timeout()
+Date: Sat,  5 May 2018 21:58:59 +0800
+Message-Id: <20180505135905.18815-2-ming.lei@redhat.com>
+In-Reply-To: <20180505135905.18815-1-ming.lei@redhat.com>
 References: <20180505135905.18815-1-ming.lei@redhat.com>
-	 <20180505135905.18815-2-ming.lei@redhat.com>
-In-Reply-To: <20180505135905.18815-2-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gU2F0LCAyMDE4LTA1LTA1IGF0IDIxOjU4ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gVHVy
-bnMgb3V0IHRoZSBjdXJyZW50IHdheSBjYW4ndCBkcmFpbiB0aW1vdXQgY29tcGxldGVseSBiZWNh
-dXNlIG1vZF90aW1lcigpDQo+IGNhbiBiZSB0cmlnZ2VyZWQgaW4gdGhlIHdvcmsgZnVuYywgd2hp
-Y2ggY2FuIGJlIGp1c3QgcnVuIGluc2lkZSB0aGUgc3luY2VkDQo+IHRpbWVvdXQgd29yazoNCj4g
-DQo+ICAgICAgICAgZGVsX3RpbWVyX3N5bmMoJnEtPnRpbWVvdXQpOw0KPiAgICAgICAgIGNhbmNl
-bF93b3JrX3N5bmMoJnEtPnRpbWVvdXRfd29yayk7DQo+IA0KPiBUaGlzIHBhdGNoIGludHJvZHVj
-ZXMgb25lIGZsYWcgb2YgJ3RpbWVvdXRfb2ZmJyBmb3IgZml4aW5nIHRoaXMgaXNzdWUsIHR1cm5z
-DQo+IG91dCB0aGlzIHNpbXBsZSB3YXkgZG9lcyB3b3JrLg0KPiANCj4gQWxzbyBibGtfcXVpZXNj
-ZV90aW1lb3V0KCkgYW5kIGJsa191bnF1aWVzY2VfdGltZW91dCgpIGFyZSBpbnRyb2R1Y2VkIGZv
-cg0KPiBkcmFpbmluZyB0aW1lb3V0LCB3aGljaCBpcyBuZWVkZWQgYnkgTlZNZS4NCg0KSGVsbG8g
-TWluZywNCg0KVGhlIGRlc2NyaXB0aW9uIG9mIHRoZSBhYm92ZSBwYXRjaCBkb2VzIG5vdCBtb3Rp
-dmF0ZSBzdWZmaWNpZW50bHkgd2h5IHlvdSB0aGluaw0KdGhhdCB0aGlzIGNoYW5nZSBpcyBuZWNl
-c3NhcnkuIEFzIHlvdSBrbm93IGl0IGlzIGFscmVhZHkgcG9zc2libGUgdG8gd2FpdCB1bnRpbA0K
-dGltZW91dCBoYW5kbGluZyBoYXMgZmluaXNoZWQgYnkgY2FsbGluZyBibGtfbXFfZnJlZXplX3F1
-ZXVlKCkgKw0KYmxrX21xX3VuZnJlZXplX3F1ZXVlKCkuIEFuIGV4cGxhbmF0aW9uIGlzIG5lZWRl
-ZCBvZiB3aHkgeW91IHRoaW5rIHRoYXQgY2FsbGluZw0KYmxrX21xX2ZyZWV6ZV9xdWV1ZSgpICsg
-YmxrX21xX3VuZnJlZXplX3F1ZXVlKCkgaXMgbm90IHN1ZmZpY2llbnQgYW5kIHdoeSB5b3UNCmNo
-b3NlIHRoZSBzb2x1dGlvbiBpbXBsZW1lbnRlZCBpbiB0aGlzIHBhdGNoLg0KDQpUaGFua3MsDQoN
-CkJhcnQuDQoNCg0KDQo=
+Turns out the current way can't drain timout completely because mod_timer()
+can be triggered in the work func, which can be just run inside the synced
+timeout work:
+
+        del_timer_sync(&q->timeout);
+        cancel_work_sync(&q->timeout_work);
+
+This patch introduces one flag of 'timeout_off' for fixing this issue, turns
+out this simple way does work.
+
+Also blk_quiesce_timeout() and blk_unquiesce_timeout() are introduced for
+draining timeout, which is needed by NVMe.
+
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Cc: Laurence Oberman <loberman@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-core.c       | 21 +++++++++++++++++++--
+ block/blk-mq.c         |  9 +++++++++
+ block/blk-timeout.c    |  5 ++++-
+ include/linux/blkdev.h | 13 +++++++++++++
+ 4 files changed, 45 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 85909b431eb0..c277f1023703 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -392,6 +392,22 @@ void blk_stop_queue(struct request_queue *q)
+ }
+ EXPORT_SYMBOL(blk_stop_queue);
+ 
++void blk_unquiesce_timeout(struct request_queue *q)
++{
++	blk_mark_timeout_quiesce(q, false);
++	mod_timer(&q->timeout, jiffies + q->rq_timeout);
++}
++EXPORT_SYMBOL(blk_unquiesce_timeout);
++
++void blk_quiesce_timeout(struct request_queue *q)
++{
++	blk_mark_timeout_quiesce(q, true);
++
++	del_timer_sync(&q->timeout);
++	cancel_work_sync(&q->timeout_work);
++}
++EXPORT_SYMBOL(blk_quiesce_timeout);
++
+ /**
+  * blk_sync_queue - cancel any pending callbacks on a queue
+  * @q: the queue
+@@ -412,8 +428,7 @@ EXPORT_SYMBOL(blk_stop_queue);
+  */
+ void blk_sync_queue(struct request_queue *q)
+ {
+-	del_timer_sync(&q->timeout);
+-	cancel_work_sync(&q->timeout_work);
++	blk_quiesce_timeout(q);
+ 
+ 	if (q->mq_ops) {
+ 		struct blk_mq_hw_ctx *hctx;
+@@ -425,6 +440,8 @@ void blk_sync_queue(struct request_queue *q)
+ 	} else {
+ 		cancel_delayed_work_sync(&q->delay_work);
+ 	}
++
++	blk_mark_timeout_quiesce(q, false);
+ }
+ EXPORT_SYMBOL(blk_sync_queue);
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c3621453ad87..d0a5dc29c8ef 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -901,6 +901,15 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 	};
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i;
++	bool timeout_off;
++	unsigned long flags;
++
++	spin_lock_irqsave(q->queue_lock, flags);
++	timeout_off = q->timeout_off;
++	spin_unlock_irqrestore(q->queue_lock, flags);
++
++	if (timeout_off)
++		return;
+ 
+ 	/* A deadlock might occur if a request is stuck requiring a
+ 	 * timeout at the same time a queue freeze is waiting
+diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+index 652d4d4d3e97..ffd0b609091e 100644
+--- a/block/blk-timeout.c
++++ b/block/blk-timeout.c
+@@ -136,12 +136,15 @@ void blk_timeout_work(struct work_struct *work)
+ 
+ 	spin_lock_irqsave(q->queue_lock, flags);
+ 
++	if (q->timeout_off)
++		goto exit;
++
+ 	list_for_each_entry_safe(rq, tmp, &q->timeout_list, timeout_list)
+ 		blk_rq_check_expired(rq, &next, &next_set);
+ 
+ 	if (next_set)
+ 		mod_timer(&q->timeout, round_jiffies_up(next));
+-
++exit:
+ 	spin_unlock_irqrestore(q->queue_lock, flags);
+ }
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 5c4eee043191..a2cc4aaecf50 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -584,6 +584,7 @@ struct request_queue {
+ 	struct timer_list	timeout;
+ 	struct work_struct	timeout_work;
+ 	struct list_head	timeout_list;
++	bool			timeout_off;
+ 
+ 	struct list_head	icq_list;
+ #ifdef CONFIG_BLK_CGROUP
+@@ -1017,6 +1018,18 @@ extern void blk_execute_rq(struct request_queue *, struct gendisk *,
+ extern void blk_execute_rq_nowait(struct request_queue *, struct gendisk *,
+ 				  struct request *, int, rq_end_io_fn *);
+ 
++static inline void blk_mark_timeout_quiesce(struct request_queue *q, bool quiesce)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(q->queue_lock, flags);
++	q->timeout_off = quiesce;
++	spin_unlock_irqrestore(q->queue_lock, flags);
++}
++
++extern void blk_quiesce_timeout(struct request_queue *q);
++extern void blk_unquiesce_timeout(struct request_queue *q);
++
+ int blk_status_to_errno(blk_status_t status);
+ blk_status_t errno_to_blk_status(int errno);
+ 
+-- 
+2.9.5
