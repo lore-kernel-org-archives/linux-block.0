@@ -1,59 +1,145 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:43684 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750942AbeEBRer (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 May 2018 13:34:47 -0400
-Received: by mail-pf0-f193.google.com with SMTP id j11so12367213pff.10
-        for <linux-block@vger.kernel.org>; Wed, 02 May 2018 10:34:47 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
-Subject: [PATCH 6/7] block: move blk_stat_add() to __blk_mq_end_request()
-Date: Wed,  2 May 2018 10:34:25 -0700
-Message-Id: <cd489c632d7294cdc41603008777c472ae183c55.1525282392.git.osandov@fb.com>
-In-Reply-To: <cover.1525282392.git.osandov@fb.com>
-References: <cover.1525282392.git.osandov@fb.com>
-In-Reply-To: <cover.1525282392.git.osandov@fb.com>
-References: <cover.1525282392.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>
+Subject: [PATCH V4 2/7] nvme: pci: cover timeout for admin commands running in EH
+Date: Sat,  5 May 2018 21:59:00 +0800
+Message-Id: <20180505135905.18815-3-ming.lei@redhat.com>
+In-Reply-To: <20180505135905.18815-1-ming.lei@redhat.com>
+References: <20180505135905.18815-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+When admin commands are used in EH for recovering controller, we have to
+cover their timeout and can't depend on block's timeout since deadlock may
+be caused when these commands are timed-out by block layer again.
 
-We want this next to blk_account_io_done() for the next change so that
-we can call ktime_get() only once for both.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Cc: Laurence Oberman <loberman@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ drivers/nvme/host/pci.c | 81 ++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 70 insertions(+), 11 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9fa8069af032..65141edda189 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -490,6 +490,11 @@ EXPORT_SYMBOL_GPL(blk_mq_free_request);
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index fbc71fac6f1e..ff09b1c760ea 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -1733,21 +1733,28 @@ static inline void nvme_release_cmb(struct nvme_dev *dev)
+ 	}
+ }
  
- inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
+-static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
++static void nvme_init_set_host_mem_cmd(struct nvme_dev *dev,
++		struct nvme_command *c, u32 bits)
  {
-+	if (rq->rq_flags & RQF_STATS) {
-+		blk_mq_poll_stats_start(rq->q);
-+		blk_stat_add(rq);
-+	}
+ 	u64 dma_addr = dev->host_mem_descs_dma;
 +
- 	blk_account_io_done(rq);
++	memset(c, 0, sizeof(*c));
++	c->features.opcode	= nvme_admin_set_features;
++	c->features.fid		= cpu_to_le32(NVME_FEAT_HOST_MEM_BUF);
++	c->features.dword11	= cpu_to_le32(bits);
++	c->features.dword12	= cpu_to_le32(dev->host_mem_size >>
++					      ilog2(dev->ctrl.page_size));
++	c->features.dword13	= cpu_to_le32(lower_32_bits(dma_addr));
++	c->features.dword14	= cpu_to_le32(upper_32_bits(dma_addr));
++	c->features.dword15	= cpu_to_le32(dev->nr_host_mem_descs);
++}
++
++static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
++{
+ 	struct nvme_command c;
+ 	int ret;
  
- 	if (rq->end_io) {
-@@ -529,10 +534,6 @@ static void __blk_mq_complete_request(struct request *rq)
+-	memset(&c, 0, sizeof(c));
+-	c.features.opcode	= nvme_admin_set_features;
+-	c.features.fid		= cpu_to_le32(NVME_FEAT_HOST_MEM_BUF);
+-	c.features.dword11	= cpu_to_le32(bits);
+-	c.features.dword12	= cpu_to_le32(dev->host_mem_size >>
+-					      ilog2(dev->ctrl.page_size));
+-	c.features.dword13	= cpu_to_le32(lower_32_bits(dma_addr));
+-	c.features.dword14	= cpu_to_le32(upper_32_bits(dma_addr));
+-	c.features.dword15	= cpu_to_le32(dev->nr_host_mem_descs);
++	nvme_init_set_host_mem_cmd(dev, &c, bits);
  
- 	if (rq->internal_tag != -1)
- 		blk_mq_sched_completed_request(rq);
--	if (rq->rq_flags & RQF_STATS) {
--		blk_mq_poll_stats_start(rq->q);
--		blk_stat_add(rq);
--	}
+ 	ret = nvme_submit_sync_cmd(dev->ctrl.admin_q, &c, NULL, 0);
+ 	if (ret) {
+@@ -1758,6 +1765,58 @@ static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
+ 	return ret;
+ }
  
- 	if (!test_bit(QUEUE_FLAG_SAME_COMP, &rq->q->queue_flags)) {
- 		rq->q->softirq_done_fn(rq);
++static void nvme_set_host_mem_end_io(struct request *rq, blk_status_t sts)
++{
++	struct completion *waiting = rq->end_io_data;
++
++	rq->end_io_data = NULL;
++
++	/*
++	 * complete last, if this is a stack request the process (and thus
++	 * the rq pointer) could be invalid right after this complete()
++	 */
++	complete(waiting);
++}
++
++/*
++ * This function can only be used inside nvme_dev_disable() when timeout
++ * may not work, then this function has to cover the timeout by itself.
++ *
++ * When wait_for_completion_io_timeout() returns 0 and timeout happens,
++ * this request will be completed after controller is shutdown.
++ */
++static int nvme_set_host_mem_timeout(struct nvme_dev *dev, u32 bits)
++{
++	DECLARE_COMPLETION_ONSTACK(wait);
++	struct nvme_command c;
++	struct request_queue *q = dev->ctrl.admin_q;
++	struct request *req;
++	int ret;
++
++	nvme_init_set_host_mem_cmd(dev, &c, bits);
++
++	req = nvme_alloc_request(q, &c, 0, NVME_QID_ANY);
++	if (IS_ERR(req))
++		return PTR_ERR(req);
++
++	req->timeout = ADMIN_TIMEOUT;
++	req->end_io_data = &wait;
++
++	blk_execute_rq_nowait(q, NULL, req, false,
++			nvme_set_host_mem_end_io);
++	ret = wait_for_completion_io_timeout(&wait, ADMIN_TIMEOUT);
++	if (ret > 0) {
++		if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
++			ret = -EINTR;
++		else
++			ret = nvme_req(req)->status;
++		blk_mq_free_request(req);
++	} else
++		ret = -EINTR;
++
++	return ret;
++}
++
+ static void nvme_free_host_mem(struct nvme_dev *dev)
+ {
+ 	int i;
+@@ -2216,7 +2275,7 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
+ 		 * but I'd rather be safe than sorry..
+ 		 */
+ 		if (dev->host_mem_descs)
+-			nvme_set_host_mem(dev, 0);
++			nvme_set_host_mem_timeout(dev, 0);
+ 		nvme_disable_io_queues(dev);
+ 		nvme_disable_admin_queue(dev, shutdown);
+ 	}
 -- 
-2.17.0
+2.9.5
