@@ -1,76 +1,237 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
+Return-Path: <oleksandr@natalenko.name>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Date: Sun, 06 May 2018 09:33:41 +0200
+From: Oleksandr Natalenko <oleksandr@natalenko.name>
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, ulf.hansson@linaro.org, broonie@kernel.org,
+ linus.walleij@linaro.org, bfq-iosched@googlegroups.com
 Subject: Re: [PATCH BUGFIX] block, bfq: postpone rq preparation to insert or
  merge
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <1525532191.5406.15.camel@gmx.de>
-Date: Sun, 6 May 2018 09:42:51 +0200
-Cc: Jens Axboe <axboe@kernel.dk>,
- linux-block <linux-block@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>,
- Ulf Hansson <ulf.hansson@linaro.org>,
- Mark Brown <broonie@kernel.org>,
- linus.walleij@linaro.org,
- bfq-iosched@googlegroups.com,
- oleksandr@natalenko.name
-Message-Id: <223CABEA-71E0-426F-A4AB-17BA8437C978@linaro.org>
+In-Reply-To: <20180504171701.6876-1-paolo.valente@linaro.org>
 References: <20180504171701.6876-1-paolo.valente@linaro.org>
- <1525463210.622.1.camel@gmx.de> <1525508378.5406.6.camel@gmx.de>
- <9F155F9F-F6B2-465A-BA4D-A86FF6825071@linaro.org>
- <1525532191.5406.15.camel@gmx.de>
-To: Mike Galbraith <efault@gmx.de>
+Message-ID: <8f68cb3cfa16a239a3895687cf329bb3@natalenko.name>
 List-ID: <linux-block@vger.kernel.org>
 
+Hi.
 
+On 04.05.2018 19:17, Paolo Valente wrote:
+> When invoked for an I/O request rq, the prepare_request hook of bfq
+> increments reference counters in the destination bfq_queue for rq. In
+> this respect, after this hook has been invoked, rq may still be
+> transformed into a request with no icq attached, i.e., for bfq, a
+> request not associated with any bfq_queue. No further hook is invoked
+> to signal this tranformation to bfq (in general, to the destination
+> elevator for rq). This leads bfq into an inconsistent state, because
+> bfq has no chance to correctly lower these counters back. This
+> inconsistency may in its turn cause incorrect scheduling and hangs. It
+> certainly causes memory leaks, by making it impossible for bfq to free
+> the involved bfq_queue.
+> 
+> On the bright side, no transformation can still happen for rq after rq
+> has been inserted into bfq, or merged with another, already inserted,
+> request. Exploiting this fact, this commit addresses the above issue
+> by delaying the preparation of an I/O request to when the request is
+> inserted or merged.
+> 
+> This change also gives a performance bonus: a lock-contention point
+> gets removed. To prepare a request, bfq needs to hold its scheduler
+> lock. After postponing request preparation to insertion or merging, no
+> lock needs to be grabbed any longer in the prepare_request hook, while
+> the lock already taken to perform insertion or merging is used to
+> preparare the request as well.
+> 
+> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+> ---
+>  block/bfq-iosched.c | 86 
+> +++++++++++++++++++++++++++++++++++------------------
+>  1 file changed, 57 insertions(+), 29 deletions(-)
+> 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 771ae9730ac6..ea02162df6c7 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -1858,6 +1858,8 @@ static int bfq_request_merge(struct
+> request_queue *q, struct request **req,
+>  	return ELEVATOR_NO_MERGE;
+>  }
+> 
+> +static struct bfq_queue *bfq_init_rq(struct request *rq);
+> +
+>  static void bfq_request_merged(struct request_queue *q, struct request 
+> *req,
+>  			       enum elv_merge type)
+>  {
+> @@ -1866,7 +1868,7 @@ static void bfq_request_merged(struct
+> request_queue *q, struct request *req,
+>  	    blk_rq_pos(req) <
+>  	    blk_rq_pos(container_of(rb_prev(&req->rb_node),
+>  				    struct request, rb_node))) {
+> -		struct bfq_queue *bfqq = RQ_BFQQ(req);
+> +		struct bfq_queue *bfqq = bfq_init_rq(req);
+>  		struct bfq_data *bfqd = bfqq->bfqd;
+>  		struct request *prev, *next_rq;
+> 
+> @@ -1894,7 +1896,8 @@ static void bfq_request_merged(struct
+> request_queue *q, struct request *req,
+>  static void bfq_requests_merged(struct request_queue *q, struct 
+> request *rq,
+>  				struct request *next)
+>  {
+> -	struct bfq_queue *bfqq = RQ_BFQQ(rq), *next_bfqq = RQ_BFQQ(next);
+> +	struct bfq_queue *bfqq = bfq_init_rq(rq),
+> +		*next_bfqq = bfq_init_rq(next);
+> 
+>  	if (!RB_EMPTY_NODE(&rq->rb_node))
+>  		goto end;
+> @@ -4540,14 +4543,12 @@ static inline void
+> bfq_update_insert_stats(struct request_queue *q,
+>  					   unsigned int cmd_flags) {}
+>  #endif
+> 
+> -static void bfq_prepare_request(struct request *rq, struct bio *bio);
+> -
+>  static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct 
+> request *rq,
+>  			       bool at_head)
+>  {
+>  	struct request_queue *q = hctx->queue;
+>  	struct bfq_data *bfqd = q->elevator->elevator_data;
+> -	struct bfq_queue *bfqq = RQ_BFQQ(rq);
+> +	struct bfq_queue *bfqq;
+>  	bool idle_timer_disabled = false;
+>  	unsigned int cmd_flags;
+> 
+> @@ -4562,24 +4563,13 @@ static void bfq_insert_request(struct
+> blk_mq_hw_ctx *hctx, struct request *rq,
+>  	blk_mq_sched_request_inserted(rq);
+> 
+>  	spin_lock_irq(&bfqd->lock);
+> +	bfqq = bfq_init_rq(rq);
+>  	if (at_head || blk_rq_is_passthrough(rq)) {
+>  		if (at_head)
+>  			list_add(&rq->queuelist, &bfqd->dispatch);
+>  		else
+>  			list_add_tail(&rq->queuelist, &bfqd->dispatch);
+> -	} else {
+> -		if (WARN_ON_ONCE(!bfqq)) {
+> -			/*
+> -			 * This should never happen. Most likely rq is
+> -			 * a requeued regular request, being
+> -			 * re-inserted without being first
+> -			 * re-prepared. Do a prepare, to avoid
+> -			 * failure.
+> -			 */
+> -			bfq_prepare_request(rq, rq->bio);
+> -			bfqq = RQ_BFQQ(rq);
+> -		}
+> -
+> +	} else { /* bfqq is assumed to be non null here */
+>  		idle_timer_disabled = __bfq_insert_request(bfqd, rq);
+>  		/*
+>  		 * Update bfqq, because, if a queue merge has occurred
+> @@ -4922,11 +4912,48 @@ static struct bfq_queue
+> *bfq_get_bfqq_handle_split(struct bfq_data *bfqd,
+>  }
+> 
+>  /*
+> - * Allocate bfq data structures associated with this request.
+> + * Only reset private fields. The actual request preparation will be
+> + * performed by bfq_init_rq, when rq is either inserted or merged. See
+> + * comments on bfq_init_rq for the reason behind this delayed
+> + * preparation.
+>   */
+>  static void bfq_prepare_request(struct request *rq, struct bio *bio)
+> +{
+> +	/*
+> +	 * Regardless of whether we have an icq attached, we have to
+> +	 * clear the scheduler pointers, as they might point to
+> +	 * previously allocated bic/bfqq structs.
+> +	 */
+> +	rq->elv.priv[0] = rq->elv.priv[1] = NULL;
+> +}
+> +
+> +/*
+> + * If needed, init rq, allocate bfq data structures associated with
+> + * rq, and increment reference counters in the destination bfq_queue
+> + * for rq. Return the destination bfq_queue for rq, or NULL is rq is
+> + * not associated with any bfq_queue.
+> + *
+> + * This function is invoked by the functions that perform rq insertion
+> + * or merging. One may have expected the above preparation operations
+> + * to be performed in bfq_prepare_request, and not delayed to when rq
+> + * is inserted or merged. The rationale behind this delayed
+> + * preparation is that, after the prepare_request hook is invoked for
+> + * rq, rq may still be transformed into a request with no icq, i.e., a
+> + * request not associated with any queue. No bfq hook is invoked to
+> + * signal this tranformation. As a consequence, should these
+> + * preparation operations be performed when the prepare_request hook
+> + * is invoked, and should rq be transformed one moment later, bfq
+> + * would end up in an inconsistent state, because it would have
+> + * incremented some queue counters for an rq destined to
+> + * transformation, without any chance to correctly lower these
+> + * counters back. In contrast, no transformation can still happen for
+> + * rq after rq has been inserted or merged. So, it is safe to execute
+> + * these preparation operations when rq is finally inserted or merged.
+> + */
+> +static struct bfq_queue *bfq_init_rq(struct request *rq)
+>  {
+>  	struct request_queue *q = rq->q;
+> +	struct bio *bio = rq->bio;
+>  	struct bfq_data *bfqd = q->elevator->elevator_data;
+>  	struct bfq_io_cq *bic;
+>  	const int is_sync = rq_is_sync(rq);
+> @@ -4934,20 +4961,21 @@ static void bfq_prepare_request(struct request
+> *rq, struct bio *bio)
+>  	bool new_queue = false;
+>  	bool bfqq_already_existing = false, split = false;
+> 
+> +	if (unlikely(!rq->elv.icq))
+> +		return NULL;
+> +
+>  	/*
+> -	 * Even if we don't have an icq attached, we should still clear
+> -	 * the scheduler pointers, as they might point to previously
+> -	 * allocated bic/bfqq structs.
+> +	 * Assuming that elv.priv[1] is set only if everything is set
+> +	 * for this rq. This holds true, because this function is
+> +	 * invoked only for insertion or merging, and, after such
+> +	 * events, a request cannot be manipulated any longer before
+> +	 * being removed from bfq.
+>  	 */
+> -	if (!rq->elv.icq) {
+> -		rq->elv.priv[0] = rq->elv.priv[1] = NULL;
+> -		return;
+> -	}
+> +	if (rq->elv.priv[1])
+> +		return rq->elv.priv[1];
+> 
+>  	bic = icq_to_bic(rq->elv.icq);
+> 
+> -	spin_lock_irq(&bfqd->lock);
+> -
+>  	bfq_check_ioprio_change(bic, bio);
+> 
+>  	bfq_bic_update_cgroup(bic, bio);
+> @@ -5006,7 +5034,7 @@ static void bfq_prepare_request(struct request
+> *rq, struct bio *bio)
+>  	if (unlikely(bfq_bfqq_just_created(bfqq)))
+>  		bfq_handle_burst(bfqd, bfqq);
+> 
+> -	spin_unlock_irq(&bfqd->lock);
+> +	return bfqq;
+>  }
+> 
+>  static void bfq_idle_slice_timer_body(struct bfq_queue *bfqq)
 
-> Il giorno 05 mag 2018, alle ore 16:56, Mike Galbraith <efault@gmx.de> =
-ha scritto:
->=20
-> On Sat, 2018-05-05 at 12:39 +0200, Paolo Valente wrote:
->>=20
->> BTW, if you didn't run out of patience with this permanent issue yet,
->> I was thinking of two o three changes to retry to trigger your =
-failure
->> reliably.
->=20
-> Sure, fire away, I'll happily give the annoying little bugger
-> opportunities to show its tender belly.
+No harm is observed on both test VM with smartctl hammer and my laptop. 
+So,
 
-I've attached a compressed patch (to avoid possible corruption from my
-mailer).  I'm little confident, but no pain, no gain, right?
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
 
-If possible, apply this patch on top of the fix I proposed in this
-thread, just to eliminate possible further noise. Finally, the
-patch content follows.
+Thanks.
 
-Hoping for a stroke of luck,
-Paolo
-
-diff --git a/block/bfq-mq-iosched.c b/block/bfq-mq-iosched.c
-index 118f319af7c0..6662efe29b69 100644
---- a/block/bfq-mq-iosched.c
-+++ b/block/bfq-mq-iosched.c
-@@ -525,8 +525,13 @@ static void bfq_limit_depth(unsigned int op, struct =
-blk_mq_alloc_data *data)
-        if (unlikely(bfqd->sb_shift !=3D bt->sb.shift))
-                bfq_update_depths(bfqd, bt);
-=20
-+#if 0
-        data->shallow_depth =3D
-                =
-bfqd->word_depths[!!bfqd->wr_busy_queues][op_is_sync(op)];
-+#else
-+       data->shallow_depth =3D 1;
-+#endif
-+
-=20
-        bfq_log(bfqd, "wr_busy %d sync %d depth %u",
-                        bfqd->wr_busy_queues, op_is_sync(op),
-
-
->=20
-> 	-Mike
->=20
+-- 
+   Oleksandr Natalenko (post-factum)
