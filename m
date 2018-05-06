@@ -1,78 +1,86 @@
-Return-Path: <caizhiyong@hisilicon.com>
-From: Caizhiyong <caizhiyong@hisilicon.com>
-To: Randy Dunlap <rdunlap@infradead.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, axboe <axboe@kernel.dk>
-CC: LKML <linux-kernel@vger.kernel.org>, Andrew Morton
-	<akpm@linux-foundation.org>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Jiangheng
-	<jiangheng@hisilicon.com>
-Subject: RE: [PATCH] Documentation: block: cmdline-partition.txt fixes and
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from merlin.infradead.org ([205.233.59.134]:43232 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751771AbeEFSug (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 May 2018 14:50:36 -0400
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        axboe <axboe@kernel.dk>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        Cai Zhiyong <caizhiyong@huawei.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH] Documentation: block: cmdline-partition.txt fixes and
  additions
-Date: Mon, 7 May 2018 02:43:24 +0000
-Message-ID: <C3050A4DBA34F345975765E43127F10F8B7720F8@dggemm511-mbs.china.huawei.com>
-References: <dba389fc-2745-34b1-e33e-fc83f53eaf42@infradead.org>
-In-Reply-To: <dba389fc-2745-34b1-e33e-fc83f53eaf42@infradead.org>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <dba389fc-2745-34b1-e33e-fc83f53eaf42@infradead.org>
+Date: Sun, 6 May 2018 11:50:29 -0700
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBSYW5keSBEdW5sYXAgW21haWx0
-bzpyZHVubGFwQGluZnJhZGVhZC5vcmddDQo+IFNlbnQ6IE1vbmRheSwgTWF5IDA3LCAyMDE4IDI6
-NTAgQU0NCj4gVG86IGxpbnV4LWJsb2NrQHZnZXIua2VybmVsLm9yZzsgYXhib2UgPGF4Ym9lQGtl
-cm5lbC5kaz4NCj4gQ2M6IExLTUwgPGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc+OyBDYWl6
-aGl5b25nDQo+IDxjYWl6aGl5b25nQGhpc2lsaWNvbi5jb20+OyBBbmRyZXcgTW9ydG9uIDxha3Bt
-QGxpbnV4LWZvdW5kYXRpb24ub3JnPjsNCj4gbGludXgtZG9jQHZnZXIua2VybmVsLm9yZzsgSm9u
-YXRoYW4gQ29yYmV0IDxjb3JiZXRAbHduLm5ldD4NCj4gU3ViamVjdDogW1BBVENIXSBEb2N1bWVu
-dGF0aW9uOiBibG9jazogY21kbGluZS1wYXJ0aXRpb24udHh0IGZpeGVzIGFuZA0KPiBhZGRpdGlv
-bnMNCj4gDQo+IEZyb206IFJhbmR5IER1bmxhcCA8cmR1bmxhcEBpbmZyYWRlYWQub3JnPg0KPiAN
-Cj4gTWFrZSB0aGUgZGVzY3JpcHRpb24gb2YgdGhlIGtlcm5lbCBjb21tYW5kIGxpbmUgb3B0aW9u
-ICJibGtkZXZwYXJ0cyINCj4gYSBiaXQgbW9yZSBmbG93aW5nIGFuZCByZWFkYWJsZS4NCj4gDQo+
-IEZpeCBhIGZldyB0eXBvcy4NCj4gQWRkIHRoZSBvcHRpb25hbCA8c2l6ZT4gYW5kIDxvZmZzZXQ+
-IHN1ZmZpeGVzLg0KPiBOb3RlIHRoYXQgc2l6ZSBjYW4gYmUgIi0iIHRvIGluZGljYXRlIGFsbCBv
-ZiB0aGUgcmVtYWluaW5nIHNwYWNlLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogUmFuZHkgRHVubGFw
-IDxyZHVubGFwQGluZnJhZGVhZC5vcmc+DQo+IENjOiBDYWkgWmhpeW9uZyA8Y2FpemhpeW9uZ0Bo
-dWF3ZWkuY29tPg0KPiAtLS0NCj4gU2hvdWxkIHRoZSAicm8iIGFuZCAibGsiIGZsYWdzIG9wdGlv
-bnMgYmUgZGVzY3JpYmVkPw0KDQp0aGFuayB5b3UgZm9yIGZpeCB0eXBvcy4NClRoZSAicm8iIGFu
-ZCAibGsiIGZlYXR1cmUgYXJlIG5vdCBpbXBsZW1lbnRlZCBpbiBibG9jayBkZXZpY2VzLiBjb3Vs
-ZCB5b3UgaW1wbGVtZW50IHRoZW0/DQoNCj4gIERvY3VtZW50YXRpb24vYmxvY2svY21kbGluZS1w
-YXJ0aXRpb24udHh0IHwgICAyMSArKysrKysrKysrKysrLS0tLS0tLQ0KPiAgMSBmaWxlIGNoYW5n
-ZWQsIDE0IGluc2VydGlvbnMoKyksIDcgZGVsZXRpb25zKC0pDQo+IA0KPiAtLS0gbGludXgtbmV4
-dC0yMDE4MDUwNC5vcmlnL0RvY3VtZW50YXRpb24vYmxvY2svY21kbGluZS1wYXJ0aXRpb24udHh0
-DQo+ICsrKyBsaW51eC1uZXh0LTIwMTgwNTA0L0RvY3VtZW50YXRpb24vYmxvY2svY21kbGluZS1w
-YXJ0aXRpb24udHh0DQo+IEBAIC0xLDcgKzEsOSBAQA0KPiAgRW1iZWRkZWQgZGV2aWNlIGNvbW1h
-bmQgbGluZSBwYXJ0aXRpb24gcGFyc2luZw0KPiANCj4gPT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KPiA9PT09PT09PT09PQ0KPiANCj4g
-LVN1cHBvcnQgZm9yIHJlYWRpbmcgdGhlIGJsb2NrIGRldmljZSBwYXJ0aXRpb24gdGFibGUgZnJv
-bSB0aGUgY29tbWFuZCBsaW5lLg0KPiArVGhlICJibGtkZXZwYXJ0cyIgY29tbWFuZCBsaW5lIG9w
-dGlvbiBhZGRzIHN1cHBvcnQgZm9yIHJlYWRpbmcgdGhlDQo+ICtibG9jayBkZXZpY2UgcGFydGl0
-aW9uIHRhYmxlIGZyb20gdGhlIGtlcm5lbCBjb21tYW5kIGxpbmUuDQo+ICsNCj4gIEl0IGlzIHR5
-cGljYWxseSB1c2VkIGZvciBmaXhlZCBibG9jayAoZU1NQykgZW1iZWRkZWQgZGV2aWNlcy4NCj4g
-IEl0IGhhcyBubyBNQlIsIHNvIHNhdmVzIHN0b3JhZ2Ugc3BhY2UuIEJvb3Rsb2FkZXIgY2FuIGJl
-IGVhc2lseSBhY2Nlc3NlZA0KPiAgYnkgYWJzb2x1dGUgYWRkcmVzcyBvZiBkYXRhIG9uIHRoZSBi
-bG9jayBkZXZpY2UuDQo+IEBAIC0xNCwyMiArMTYsMjcgQEAgYmxrZGV2cGFydHM9PGJsa2Rldi1k
-ZWY+Wzs8YmxrZGV2LWRlZj5dDQo+ICAgICAgPHBhcnRkZWY+IDo9IDxzaXplPltAPG9mZnNldD5d
-KHBhcnQtbmFtZSkNCj4gDQo+ICA8YmxrZGV2LWlkPg0KPiAtICAgIGJsb2NrIGRldmljZSBkaXNr
-IG5hbWUsIGVtYmVkZGVkIGRldmljZSB1c2VkIGZpeGVkIGJsb2NrIGRldmljZSwNCj4gLSAgICBp
-dCdzIGRpc2sgbmFtZSBhbHNvIGZpeGVkLiBzdWNoIGFzOiBtbWNibGswLCBtbWNibGsxLCBtbWNi
-bGswYm9vdDAuDQo+ICsgICAgYmxvY2sgZGV2aWNlIGRpc2sgbmFtZS4gRW1iZWRkZWQgZGV2aWNl
-IHVzZXMgZml4ZWQgYmxvY2sgZGV2aWNlLg0KPiArICAgIEl0cyBkaXNrIG5hbWUgaXMgYWxzbyBm
-aXhlZCwgc3VjaCBhczogbW1jYmxrMCwgbW1jYmxrMSwgbW1jYmxrMGJvb3QwLg0KPiANCj4gIDxz
-aXplPg0KPiAgICAgIHBhcnRpdGlvbiBzaXplLCBpbiBieXRlcywgc3VjaCBhczogNTEyLCAxbSwg
-MUcuDQo+ICsgICAgc2l6ZSBtYXkgY29udGFpbiBhbiBvcHRpb25hbCBzdWZmaXggb2YgKHVwcGVy
-IG9yIGxvd2VyIGNhc2UpOg0KPiArICAgICAgSywgTSwgRywgVCwgUCwgRS4NCj4gKyAgICAiLSIg
-aXMgdXNlZCB0byBkZW5vdGUgYWxsIHJlbWFpbmluZyBzcGFjZS4NCj4gDQo+ICA8b2Zmc2V0Pg0K
-PiAgICAgIHBhcnRpdGlvbiBzdGFydCBhZGRyZXNzLCBpbiBieXRlcy4NCj4gKyAgICBvZmZzZXQg
-bWF5IGNvbnRhaW4gYW4gb3B0aW9uYWwgc3VmZml4IG9mICh1cHBlciBvciBsb3dlciBjYXNlKToN
-Cj4gKyAgICAgIEssIE0sIEcsIFQsIFAsIEUuDQo+IA0KPiAgKHBhcnQtbmFtZSkNCj4gLSAgICBw
-YXJ0aXRpb24gbmFtZSwga2VybmVsIHNlbmQgdWV2ZW50IHdpdGggIlBBUlROQU1FIi4gYXBwbGlj
-YXRpb24gY2FuDQo+IGNyZWF0ZQ0KPiAtICAgIGEgbGluayB0byBibG9jayBkZXZpY2UgcGFydGl0
-aW9uIHdpdGggdGhlIG5hbWUgIlBBUlROQU1FIi4NCj4gLSAgICB1c2VyIHNwYWNlIGFwcGxpY2F0
-aW9uIGNhbiBhY2Nlc3MgcGFydGl0aW9uIGJ5IHBhcnRpdGlvbiBuYW1lLg0KPiArICAgIHBhcnRp
-dGlvbiBuYW1lLiBLZXJuZWwgc2VuZHMgdWV2ZW50IHdpdGggIlBBUlROQU1FIi4gQXBwbGljYXRp
-b24gY2FuDQo+ICsgICAgY3JlYXRlIGEgbGluayB0byBibG9jayBkZXZpY2UgcGFydGl0aW9uIHdp
-dGggdGhlIG5hbWUgIlBBUlROQU1FIi4NCj4gKyAgICBVc2VyIHNwYWNlIGFwcGxpY2F0aW9uIGNh
-biBhY2Nlc3MgcGFydGl0aW9uIGJ5IHBhcnRpdGlvbiBuYW1lLg0KPiANCj4gIEV4YW1wbGU6DQo+
-IC0gICAgZU1NQyBkaXNrIG5hbWUgaXMgIm1tY2JsazAiIGFuZCAibW1jYmxrMGJvb3QwIg0KPiAr
-ICAgIGVNTUMgZGlzayBuYW1lcyBhcmUgIm1tY2JsazAiIGFuZCAibW1jYmxrMGJvb3QwIi4NCj4g
-DQo+ICAgIGJvb3RhcmdzOg0KPiAgICAgICdibGtkZXZwYXJ0cz1tbWNibGswOjFHKGRhdGEwKSwx
-RyhkYXRhMSksLTttbWNibGswYm9vdDA6MW0oYm9vdCksLQ0KPiAoa2VybmVsKScNCg0K
+From: Randy Dunlap <rdunlap@infradead.org>
+
+Make the description of the kernel command line option "blkdevparts"
+a bit more flowing and readable.
+
+Fix a few typos.
+Add the optional <size> and <offset> suffixes.
+Note that size can be "-" to indicate all of the remaining space.
+
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Cai Zhiyong <caizhiyong@huawei.com>
+---
+Should the "ro" and "lk" flags options be described?
+
+ Documentation/block/cmdline-partition.txt |   21 +++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
+
+--- linux-next-20180504.orig/Documentation/block/cmdline-partition.txt
++++ linux-next-20180504/Documentation/block/cmdline-partition.txt
+@@ -1,7 +1,9 @@
+ Embedded device command line partition parsing
+ =====================================================================
+ 
+-Support for reading the block device partition table from the command line.
++The "blkdevparts" command line option adds support for reading the
++block device partition table from the kernel command line.
++
+ It is typically used for fixed block (eMMC) embedded devices.
+ It has no MBR, so saves storage space. Bootloader can be easily accessed
+ by absolute address of data on the block device.
+@@ -14,22 +16,27 @@ blkdevparts=<blkdev-def>[;<blkdev-def>]
+     <partdef> := <size>[@<offset>](part-name)
+ 
+ <blkdev-id>
+-    block device disk name, embedded device used fixed block device,
+-    it's disk name also fixed. such as: mmcblk0, mmcblk1, mmcblk0boot0.
++    block device disk name. Embedded device uses fixed block device.
++    Its disk name is also fixed, such as: mmcblk0, mmcblk1, mmcblk0boot0.
+ 
+ <size>
+     partition size, in bytes, such as: 512, 1m, 1G.
++    size may contain an optional suffix of (upper or lower case):
++      K, M, G, T, P, E.
++    "-" is used to denote all remaining space.
+ 
+ <offset>
+     partition start address, in bytes.
++    offset may contain an optional suffix of (upper or lower case):
++      K, M, G, T, P, E.
+ 
+ (part-name)
+-    partition name, kernel send uevent with "PARTNAME". application can create
+-    a link to block device partition with the name "PARTNAME".
+-    user space application can access partition by partition name.
++    partition name. Kernel sends uevent with "PARTNAME". Application can
++    create a link to block device partition with the name "PARTNAME".
++    User space application can access partition by partition name.
+ 
+ Example:
+-    eMMC disk name is "mmcblk0" and "mmcblk0boot0"
++    eMMC disk names are "mmcblk0" and "mmcblk0boot0".
+ 
+   bootargs:
+     'blkdevparts=mmcblk0:1G(data0),1G(data1),-;mmcblk0boot0:1m(boot),-(kernel)'
