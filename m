@@ -1,86 +1,72 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH 3/3] blk-wbt: throttle discards like background writes
-To: Christoph Hellwig <hch@lst.de>
+Return-Path: <hch@lst.de>
+Date: Mon, 7 May 2018 11:57:46 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
- dchinner@redhat.com
-References: <1525360843-6504-1-git-send-email-axboe@kernel.dk>
- <1525360843-6504-4-git-send-email-axboe@kernel.dk>
- <20180507095746.GC25210@lst.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <d2657561-8c24-9a29-6aa1-01e6548a0d31@kernel.dk>
-Date: Mon, 7 May 2018 09:51:03 -0600
+	dchinner@redhat.com, hch@lst.de
+Subject: Re: [PATCH 3/3] blk-wbt: throttle discards like background writes
+Message-ID: <20180507095746.GC25210@lst.de>
+References: <1525360843-6504-1-git-send-email-axboe@kernel.dk> <1525360843-6504-4-git-send-email-axboe@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <20180507095746.GC25210@lst.de>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1525360843-6504-4-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On 5/7/18 3:57 AM, Christoph Hellwig wrote:
->> -static inline struct rq_wait *get_rq_wait(struct rq_wb *rwb, bool is_kswapd)
->> +static inline struct rq_wait *get_rq_wait(struct rq_wb *rwb, bool is_trim,
->> +					  bool is_kswapd)
->>  {
->> -	return &rwb->rq_wait[is_kswapd];
->> +	if (is_trim)
->> +		return &rwb->rq_wait[WBT_REQ_DISCARD];
->> +	else if (is_kswapd)
->> +		return &rwb->rq_wait[WBT_REQ_KSWAPD];
->> +	else
->> +		return &rwb->rq_wait[WBT_REQ_BG];
->>  }
-> 
-> Wouldn't it be more useful to pass a enum wbt_flag here?
-> 
-> Or just have a wbt_flag_to_wait_idx helper and do the array indexing
-> in the callers?
+> -static inline struct rq_wait *get_rq_wait(struct rq_wb *rwb, bool is_kswapd)
+> +static inline struct rq_wait *get_rq_wait(struct rq_wb *rwb, bool is_trim,
+> +					  bool is_kswapd)
+>  {
+> -	return &rwb->rq_wait[is_kswapd];
+> +	if (is_trim)
+> +		return &rwb->rq_wait[WBT_REQ_DISCARD];
+> +	else if (is_kswapd)
+> +		return &rwb->rq_wait[WBT_REQ_KSWAPD];
+> +	else
+> +		return &rwb->rq_wait[WBT_REQ_BG];
+>  }
 
-It would be cleaner, but we don't have wbt_flag everywhere we need it.
-Though I guess we could swap the masking in wbt_wait() and do it
-before the __wbt_wait() call, and just use that. Since we only do
-the indexing in that one spot, I don't think we should add a helper.
+Wouldn't it be more useful to pass a enum wbt_flag here?
 
-> 
->>  {
->>  	const int op = bio_op(bio);
->>  
->> -	/*
->> -	 * If not a WRITE, do nothing
->> -	 */
->> -	if (op != REQ_OP_WRITE)
->> -		return false;
->> +	if (op == REQ_OP_WRITE) {
->> +		/*
->> +		 * Don't throttle WRITE_ODIRECT
->> +		 */
->> +		if ((bio->bi_opf & (REQ_SYNC | REQ_IDLE)) ==
->> +		    (REQ_SYNC | REQ_IDLE))
->> +			return false;
->>  
->> -	/*
->> -	 * Don't throttle WRITE_ODIRECT
->> -	 */
->> -	if ((bio->bi_opf & (REQ_SYNC | REQ_IDLE)) == (REQ_SYNC | REQ_IDLE))
->> -		return false;
->> +		return true;
->> +	} else if (op == REQ_OP_DISCARD)
->> +		return true;
-> 
-> what about:
-> 
-> 	switch (bio_op(bio)) {
-> 	case REQ_OP_WRITE:
-> 		/*
-> 		 * Don't throttle WRITE_ODIRECT
-> 		 */
-> 		if ((bio->bi_opf & (REQ_SYNC | REQ_IDLE)) ==
-> 		    (REQ_SYNC | REQ_IDLE))
-> 			return false;
-> 		/*FALLTHROUGH*/
-> 	case REQ_OP_DISCARD:
-> 		return true;
-> 	default:
-> 		return false;
+Or just have a wbt_flag_to_wait_idx helper and do the array indexing
+in the callers?
 
-Sure, I can do that. I'll spin a v2.
+>  {
+>  	const int op = bio_op(bio);
+>  
+> -	/*
+> -	 * If not a WRITE, do nothing
+> -	 */
+> -	if (op != REQ_OP_WRITE)
+> -		return false;
+> +	if (op == REQ_OP_WRITE) {
+> +		/*
+> +		 * Don't throttle WRITE_ODIRECT
+> +		 */
+> +		if ((bio->bi_opf & (REQ_SYNC | REQ_IDLE)) ==
+> +		    (REQ_SYNC | REQ_IDLE))
+> +			return false;
+>  
+> -	/*
+> -	 * Don't throttle WRITE_ODIRECT
+> -	 */
+> -	if ((bio->bi_opf & (REQ_SYNC | REQ_IDLE)) == (REQ_SYNC | REQ_IDLE))
+> -		return false;
+> +		return true;
+> +	} else if (op == REQ_OP_DISCARD)
+> +		return true;
 
--- 
-Jens Axboe
+what about:
+
+	switch (bio_op(bio)) {
+	case REQ_OP_WRITE:
+		/*
+		 * Don't throttle WRITE_ODIRECT
+		 */
+		if ((bio->bi_opf & (REQ_SYNC | REQ_IDLE)) ==
+		    (REQ_SYNC | REQ_IDLE))
+			return false;
+		/*FALLTHROUGH*/
+	case REQ_OP_DISCARD:
+		return true;
+	default:
+		return false;
