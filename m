@@ -1,12 +1,11 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
-Date: Tue, 8 May 2018 13:44:27 -0700
-From: Omar Sandoval <osandov@osandov.com>
+Return-Path: <darrick.wong@oracle.com>
+Date: Mon, 7 May 2018 16:58:35 -0700
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-	dchinner@redhat.com, hch@lst.de
+        dchinner@redhat.com, hch@lst.de
 Subject: Re: [PATCH 2/4] blk-wbt: account any writing command as a write
-Message-ID: <20180508204427.GC27324@vader>
+Message-ID: <20180507235835.GX11261@magnolia>
 References: <1525709615-14395-1-git-send-email-axboe@kernel.dk>
  <1525709615-14395-3-git-send-email-axboe@kernel.dk>
 MIME-Version: 1.0
@@ -20,10 +19,13 @@ On Mon, May 07, 2018 at 10:13:33AM -0600, Jens Axboe wrote:
 > that we account DISCARD.
 > 
 > Reviewed-by: Christoph Hellwig <hch@lst.de>
-
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-
 > Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+Looks ok,
+Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
+
+--D
+
 > ---
 >  block/blk-wbt.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
