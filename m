@@ -1,99 +1,62 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Ingo Molnar <mingo@kernel.org>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Subject: [PATCH 04/10] block: Use bioset_init() for fs_bio_set
-Date: Tue,  8 May 2018 21:33:52 -0400
-Message-Id: <20180509013358.16399-5-kent.overstreet@gmail.com>
-In-Reply-To: <20180509013358.16399-1-kent.overstreet@gmail.com>
-References: <20180509013358.16399-1-kent.overstreet@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:44718 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750881AbeEGNFW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 May 2018 09:05:22 -0400
+Received: by mail-lf0-f66.google.com with SMTP id h197-v6so40452343lfg.11
+        for <linux-block@vger.kernel.org>; Mon, 07 May 2018 06:05:22 -0700 (PDT)
+Subject: Re: [V2 PATCH 00/11] lightnvm: pblk: small fixes
+To: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@cnexlabs.com>
+References: <1525079409-6588-1-git-send-email-javier@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <5f93b0a3-cc8e-0c16-d01f-c3c1fdf5642f@lightnvm.io>
+Date: Mon, 7 May 2018 15:05:20 +0200
+MIME-Version: 1.0
+In-Reply-To: <1525079409-6588-1-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Minor optimization - remove a pointer indirection when using fs_bio_set.
+On 04/30/2018 11:09 AM, Javier González wrote:
+> Changes since V1 (from Matias):
+>   - Improve commit messages
+>   - Fix error code on read path refactoring
+> 
+> Changes can be found at. This includes this series, the 2 extra patches I sent
+> for pblk and Hans' write recovery on top.
+> 	https://github.com/OpenChannelSSD/linux/tree/for-4.18/pblk
+> 
+> A bunch of small fixes and extra checks for pblk. Non is critical, though
+> ("lightnvm: pblk: check for chunk size before allocating it") might be nice to
+> get into 4.17 as it is a fix for the 2.0 pblk patches.
+> 
+> Javier
+> 
+> Javier González (11):
+>    lightnvm: pblk: fail gracefully on line alloc. failure
+>    lightnvm: pblk: recheck for bad lines at runtime
+>    lightnvm: pblk: check read lba on gc path
+>    lightnvn: pblk: improve error msg on corrupted LBAs
+>    lightnvm: pblk: warn in case of corrupted write buffer
+>    lightnvm: pblk: return NVM_ error on failed submission
+>    lightnvm: pblk: remove unnecessary indirection
+>    lightnvm: pblk: remove unnecessary argument
+>    lightnvm: pblk: check for chunk size before allocating it
+>    lightnvn: pass flag on graceful teardown to targets
+>    lightnvm: pblk: remove dead function
+> 
+>   drivers/lightnvm/core.c      | 10 +++---
+>   drivers/lightnvm/pblk-core.c | 86 ++++++++++++++++++++++++++------------------
+>   drivers/lightnvm/pblk-gc.c   | 10 +++---
+>   drivers/lightnvm/pblk-init.c | 38 ++++++++++++--------
+>   drivers/lightnvm/pblk-map.c  | 33 ++++++++++++-----
+>   drivers/lightnvm/pblk-rb.c   |  5 ++-
+>   drivers/lightnvm/pblk-read.c | 75 ++++++++++++++++++++++++++++----------
+>   drivers/lightnvm/pblk.h      |  7 ++--
+>   include/linux/lightnvm.h     |  2 +-
+>   9 files changed, 174 insertions(+), 92 deletions(-)
+> 
 
-Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
----
- block/bio.c                         | 7 +++----
- block/blk-core.c                    | 2 +-
- drivers/target/target_core_iblock.c | 2 +-
- include/linux/bio.h                 | 4 ++--
- 4 files changed, 7 insertions(+), 8 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 980befd919..b7cdad6fc4 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -53,7 +53,7 @@ static struct biovec_slab bvec_slabs[BVEC_POOL_NR] __read_mostly = {
-  * fs_bio_set is the bio_set containing bio and iovec memory pools used by
-  * IO code that does not need private memory pools.
-  */
--struct bio_set *fs_bio_set;
-+struct bio_set fs_bio_set;
- EXPORT_SYMBOL(fs_bio_set);
- 
- /*
-@@ -2055,11 +2055,10 @@ static int __init init_bio(void)
- 	bio_integrity_init();
- 	biovec_init_slabs();
- 
--	fs_bio_set = bioset_create(BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
--	if (!fs_bio_set)
-+	if (bioset_init(&fs_bio_set, BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS))
- 		panic("bio: can't allocate bios\n");
- 
--	if (bioset_integrity_create(fs_bio_set, BIO_POOL_SIZE))
-+	if (bioset_integrity_create(&fs_bio_set, BIO_POOL_SIZE))
- 		panic("bio: can't create integrity pool\n");
- 
- 	return 0;
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 6d82c4f7fa..66f24798ef 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -3409,7 +3409,7 @@ int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
- 	struct bio *bio, *bio_src;
- 
- 	if (!bs)
--		bs = fs_bio_set;
-+		bs = &fs_bio_set;
- 
- 	__rq_for_each_bio(bio_src, rq_src) {
- 		bio = bio_clone_fast(bio_src, gfp_mask, bs);
-diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
-index 07c814c426..c969c01c7c 100644
---- a/drivers/target/target_core_iblock.c
-+++ b/drivers/target/target_core_iblock.c
-@@ -164,7 +164,7 @@ static int iblock_configure_device(struct se_device *dev)
- 				goto out_blkdev_put;
- 			}
- 			pr_debug("IBLOCK setup BIP bs->bio_integrity_pool: %p\n",
--				 bs->bio_integrity_pool);
-+				 &bs->bio_integrity_pool);
- 		}
- 		dev->dev_attrib.hw_pi_prot_type = dev->dev_attrib.pi_prot_type;
- 	}
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index fa3cf94a50..91b02520e2 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -423,11 +423,11 @@ extern void __bio_clone_fast(struct bio *, struct bio *);
- extern struct bio *bio_clone_fast(struct bio *, gfp_t, struct bio_set *);
- extern struct bio *bio_clone_bioset(struct bio *, gfp_t, struct bio_set *bs);
- 
--extern struct bio_set *fs_bio_set;
-+extern struct bio_set fs_bio_set;
- 
- static inline struct bio *bio_alloc(gfp_t gfp_mask, unsigned int nr_iovecs)
- {
--	return bio_alloc_bioset(gfp_mask, nr_iovecs, fs_bio_set);
-+	return bio_alloc_bioset(gfp_mask, nr_iovecs, &fs_bio_set);
- }
- 
- static inline struct bio *bio_kmalloc(gfp_t gfp_mask, unsigned int nr_iovecs)
--- 
-2.17.0
+Applied for 4.18.
