@@ -1,13 +1,12 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
-Date: Tue, 8 May 2018 13:43:18 -0700
-From: Omar Sandoval <osandov@osandov.com>
+Return-Path: <darrick.wong@oracle.com>
+Date: Mon, 7 May 2018 16:56:24 -0700
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-	dchinner@redhat.com, hch@lst.de
+        dchinner@redhat.com, hch@lst.de
 Subject: Re: [PATCH 1/4] block: break discard submissions into the user
  defined size
-Message-ID: <20180508204318.GB27324@vader>
+Message-ID: <20180507235624.GW11261@magnolia>
 References: <1525709615-14395-1-git-send-email-axboe@kernel.dk>
  <1525709615-14395-2-git-send-email-axboe@kernel.dk>
 MIME-Version: 1.0
@@ -20,6 +19,12 @@ On Mon, May 07, 2018 at 10:13:32AM -0600, Jens Axboe wrote:
 > user decided to limit the size by writing to 'discard_max_bytes'.
 > 
 > Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+Seems fine to me,
+Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
+
+--D
+
 > ---
 >  block/blk-lib.c | 7 ++++---
 >  1 file changed, 4 insertions(+), 3 deletions(-)
@@ -38,14 +43,15 @@ On Mon, May 07, 2018 at 10:13:32AM -0600, Jens Axboe wrote:
 > +		req_sects = min_t(sector_t, nr_sects,
 > +					q->limits.max_discard_sectors);
 >  
-
-Some drivers, including nvme, do
-
-   blk_queue_max_discard_sectors(q, UINT_MAX)
-
-That means q->limits.max_discard_sectors can be UINT_MAX, and
-
-    bio->bi_iter.bi_size = req_sects << 9;
-
-will overflow. We should probably cap max_discard_sectors at
-UINT_MAX >> 9 in a prep patch.
+> -		/**
+> +		/*
+>  		 * If splitting a request, and the next starting sector would be
+>  		 * misaligned, stop the discard at the previous aligned sector.
+>  		 */
+> -- 
+> 2.7.4
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-xfs" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
