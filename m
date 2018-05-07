@@ -1,141 +1,41 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V3 2/8] nvme: pci: cover timeout for admin commands running in EH
-Date: Thu,  3 May 2018 11:17:10 +0800
-Message-Id: <20180503031716.31446-3-ming.lei@redhat.com>
-In-Reply-To: <20180503031716.31446-1-ming.lei@redhat.com>
-References: <20180503031716.31446-1-ming.lei@redhat.com>
+Return-Path: <hch@lst.de>
+Date: Mon, 7 May 2018 11:53:26 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
+	dchinner@redhat.com, hch@lst.de
+Subject: Re: [PATCH 2/3] blk-wbt: account any writing command as a write
+Message-ID: <20180507095326.GB25210@lst.de>
+References: <1525360843-6504-1-git-send-email-axboe@kernel.dk> <1525360843-6504-3-git-send-email-axboe@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1525360843-6504-3-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-When admin commands are used in EH for recovering controller, we have to
-cover their timeout and can't depend on block's timeout since deadlock may
-be caused when these commands are timed-out by block layer again.
+On Thu, May 03, 2018 at 09:20:42AM -0600, Jens Axboe wrote:
+> We currently special case WRITE and FLUSH, but we should really
+> just include any command with the write bit set. This ensures
+> that we account DISCARD.
 
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/nvme/host/pci.c | 77 ++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 66 insertions(+), 11 deletions(-)
+Looks fine,
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index fbc71fac6f1e..0e6cd605164a 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1733,21 +1733,28 @@ static inline void nvme_release_cmb(struct nvme_dev *dev)
- 	}
- }
- 
--static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
-+static void nvme_init_set_host_mem_cmd(struct nvme_dev *dev,
-+		struct nvme_command *c, u32 bits)
- {
- 	u64 dma_addr = dev->host_mem_descs_dma;
-+
-+	memset(c, 0, sizeof(*c));
-+	c->features.opcode	= nvme_admin_set_features;
-+	c->features.fid		= cpu_to_le32(NVME_FEAT_HOST_MEM_BUF);
-+	c->features.dword11	= cpu_to_le32(bits);
-+	c->features.dword12	= cpu_to_le32(dev->host_mem_size >>
-+					      ilog2(dev->ctrl.page_size));
-+	c->features.dword13	= cpu_to_le32(lower_32_bits(dma_addr));
-+	c->features.dword14	= cpu_to_le32(upper_32_bits(dma_addr));
-+	c->features.dword15	= cpu_to_le32(dev->nr_host_mem_descs);
-+}
-+
-+static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
-+{
- 	struct nvme_command c;
- 	int ret;
- 
--	memset(&c, 0, sizeof(c));
--	c.features.opcode	= nvme_admin_set_features;
--	c.features.fid		= cpu_to_le32(NVME_FEAT_HOST_MEM_BUF);
--	c.features.dword11	= cpu_to_le32(bits);
--	c.features.dword12	= cpu_to_le32(dev->host_mem_size >>
--					      ilog2(dev->ctrl.page_size));
--	c.features.dword13	= cpu_to_le32(lower_32_bits(dma_addr));
--	c.features.dword14	= cpu_to_le32(upper_32_bits(dma_addr));
--	c.features.dword15	= cpu_to_le32(dev->nr_host_mem_descs);
-+	nvme_init_set_host_mem_cmd(dev, &c, bits);
- 
- 	ret = nvme_submit_sync_cmd(dev->ctrl.admin_q, &c, NULL, 0);
- 	if (ret) {
-@@ -1758,6 +1765,54 @@ static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
- 	return ret;
- }
- 
-+static void nvme_set_host_mem_end_io(struct request *rq, blk_status_t sts)
-+{
-+	struct completion *waiting = rq->end_io_data;
-+
-+	rq->end_io_data = NULL;
-+
-+	/*
-+	 * complete last, if this is a stack request the process (and thus
-+	 * the rq pointer) could be invalid right after this complete()
-+	 */
-+	complete(waiting);
-+}
-+
-+/*
-+ * This function can be used inside timeout handler, when the block layer
-+ * timeout may not work, so this function has to cover the timeout by itself.
-+ */
-+static int nvme_set_host_mem_timeout(struct nvme_dev *dev, u32 bits)
-+{
-+	DECLARE_COMPLETION_ONSTACK(wait);
-+	struct nvme_command c;
-+	struct request_queue *q = dev->ctrl.admin_q;
-+	struct request *req;
-+	int ret;
-+
-+	nvme_init_set_host_mem_cmd(dev, &c, bits);
-+
-+	req = nvme_alloc_request(q, &c, 0, NVME_QID_ANY);
-+	if (IS_ERR(req))
-+		return PTR_ERR(req);
-+
-+	req->timeout = ADMIN_TIMEOUT;
-+	req->end_io_data = &wait;
-+
-+	blk_execute_rq_nowait(q, NULL, req, false,
-+			nvme_set_host_mem_end_io);
-+	wait_for_completion_io_timeout(&wait, ADMIN_TIMEOUT);
-+
-+	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
-+		ret = -EINTR;
-+	else
-+		ret = nvme_req(req)->status;
-+
-+	blk_mq_free_request(req);
-+
-+	return ret;
-+}
-+
- static void nvme_free_host_mem(struct nvme_dev *dev)
- {
- 	int i;
-@@ -2216,7 +2271,7 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
- 		 * but I'd rather be safe than sorry..
- 		 */
- 		if (dev->host_mem_descs)
--			nvme_set_host_mem(dev, 0);
-+			nvme_set_host_mem_timeout(dev, 0);
- 		nvme_disable_io_queues(dev);
- 		nvme_disable_admin_queue(dev, shutdown);
- 	}
--- 
-2.9.5
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+
+> diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+> index f92fc84b5e2c..3e34b41bcefc 100644
+> --- a/block/blk-wbt.c
+> +++ b/block/blk-wbt.c
+> @@ -701,7 +701,7 @@ static int wbt_data_dir(const struct request *rq)
+>  
+>  	if (op == REQ_OP_READ)
+>  		return READ;
+> -	else if (op == REQ_OP_WRITE || op == REQ_OP_FLUSH)
+> +	else if (op_is_write(op))
+>  		return WRITE;
+>  
+>  	/* don't account */
+
+But this whole function smells, the return value is an array
+index, so instead of abusing read/write this should return 0 or 1
+and be called _idx or similar.  But I guess that is a question for the
+higher level interface.
