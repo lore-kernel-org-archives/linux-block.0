@@ -1,84 +1,39 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 10/33] iomap: add an iomap-based bmap implementation
-Date: Wed,  9 May 2018 09:48:07 +0200
-Message-Id: <20180509074830.16196-11-hch@lst.de>
-In-Reply-To: <20180509074830.16196-1-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <helgaas@kernel.org>
+Date: Mon, 7 May 2018 18:02:08 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Logan Gunthorpe <logang@deltatee.com>
+Cc: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org, linux-block@vger.kernel.org,
+	Stephen Bates <sbates@raithlin.com>, Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
+Subject: Re: [PATCH v4 03/14] PCI/P2PDMA: Add PCI p2pmem dma mappings to
+ adjust the bus offset
+Message-ID: <20180507230208.GF161390@bhelgaas-glaptop.roam.corp.google.com>
+References: <20180423233046.21476-1-logang@deltatee.com>
+ <20180423233046.21476-4-logang@deltatee.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180423233046.21476-4-logang@deltatee.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This adds a simple iomap-based implementation of the legacy ->bmap
-interface.  Note that we can't easily add checks for rt or reflink
-files, so these will have to remain in the callers.  This interface
-just needs to die..
+s/dma/DMA/ (in subject)
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/iomap.c            | 29 +++++++++++++++++++++++++++++
- include/linux/iomap.h |  3 +++
- 2 files changed, 32 insertions(+)
-
-diff --git a/fs/iomap.c b/fs/iomap.c
-index af525cb47339..049e0c4aacac 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -1201,3 +1201,32 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(iomap_dio_rw);
-+
-+static loff_t
-+iomap_bmap_actor(struct inode *inode, loff_t pos, loff_t length,
-+		void *data, struct iomap *iomap)
-+{
-+	sector_t *bno = data;
-+
-+	if (iomap->type == IOMAP_MAPPED)
-+		*bno = (iomap->addr + pos - iomap->offset) >> inode->i_blkbits;
-+	return 0;
-+}
-+
-+/* legacy ->bmap interface.  0 is the error return (!) */
-+sector_t
-+iomap_bmap(struct address_space *mapping, sector_t bno,
-+		const struct iomap_ops *ops)
-+{
-+	struct inode *inode = mapping->host;
-+	loff_t pos = bno >> inode->i_blkbits;
-+	unsigned blocksize = i_blocksize(inode);
-+
-+	if (filemap_write_and_wait(mapping))
-+		return 0;
-+
-+	bno = 0;
-+	iomap_apply(inode, pos, blocksize, 0, ops, &bno, iomap_bmap_actor);
-+	return bno;
-+}
-+EXPORT_SYMBOL_GPL(iomap_bmap);
-diff --git a/include/linux/iomap.h b/include/linux/iomap.h
-index 19a07de28212..07f73224c38b 100644
---- a/include/linux/iomap.h
-+++ b/include/linux/iomap.h
-@@ -4,6 +4,7 @@
- 
- #include <linux/types.h>
- 
-+struct address_space;
- struct fiemap_extent_info;
- struct inode;
- struct iov_iter;
-@@ -95,6 +96,8 @@ loff_t iomap_seek_hole(struct inode *inode, loff_t offset,
- 		const struct iomap_ops *ops);
- loff_t iomap_seek_data(struct inode *inode, loff_t offset,
- 		const struct iomap_ops *ops);
-+sector_t iomap_bmap(struct address_space *mapping, sector_t bno,
-+		const struct iomap_ops *ops);
- 
- /*
-  * Flags for direct I/O ->end_io:
--- 
-2.17.0
+On Mon, Apr 23, 2018 at 05:30:35PM -0600, Logan Gunthorpe wrote:
+> The DMA address used when mapping PCI P2P memory must be the PCI bus
+> address. Thus, introduce pci_p2pmem_[un]map_sg() to map the correct
+> addresses when using P2P memory.
+> 
+> For this, we assume that an SGL passed to these functions contain all
+> P2P memory or no P2P memory.
+> 
+> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
