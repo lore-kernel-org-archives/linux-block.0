@@ -1,107 +1,63 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V3 6/8] nvme: pci: split controller resetting into two parts
-Date: Thu,  3 May 2018 11:17:14 +0800
-Message-Id: <20180503031716.31446-7-ming.lei@redhat.com>
-In-Reply-To: <20180503031716.31446-1-ming.lei@redhat.com>
-References: <20180503031716.31446-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:37761 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752080AbeEGNFl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 May 2018 09:05:41 -0400
+Received: by mail-lf0-f65.google.com with SMTP id r2-v6so4359196lff.4
+        for <linux-block@vger.kernel.org>; Mon, 07 May 2018 06:05:40 -0700 (PDT)
+Subject: Re: [PATCH v2 0/3] Rework write error handling in pblk
+To: Hans Holmberg <hans.ml.holmberg@owltronix.com>
+Cc: linux-block@vger.kernel.org, Javier Gonzales <javier@cnexlabs.com>,
+        linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>
+References: <1524548732-4326-1-git-send-email-hans.ml.holmberg@owltronix.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <a53698ac-71c3-733e-991a-491d6ad7dd8a@lightnvm.io>
+Date: Mon, 7 May 2018 15:05:38 +0200
+MIME-Version: 1.0
+In-Reply-To: <1524548732-4326-1-git-send-email-hans.ml.holmberg@owltronix.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch splits controller resetting into the following two parts:
+On 04/24/2018 07:45 AM, Hans Holmberg wrote:
+> From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+> 
+> This patch series fixes the(currently incomplete) write error handling
+> in pblk by:
+> 
+>   * queuing and re-submitting failed writes in the write buffer
+>   * evacuating valid data data in lines with write failures, so the
+>     chunk(s) with write failures can be reset to a known state by the fw
+> 
+> Lines with failures in smeta are put back on the free list.
+> Failed chunks will be reset on the next use.
+> 
+> If a write failes in emeta, the lba list is cached so the line can be
+> garbage collected without scanning the out-of-band area.
+> 
+> Changes in V2:
+> - Added the recov_writes counter increase to the new path
+> - Moved lba list emeta reading during gc to a separate function
+> - Allocating the saved lba list with pblk_malloc instead of kmalloc
+> - Fixed formatting issues
+> - Removed dead code
+> 
+> Hans Holmberg (3):
+>    lightnvm: pblk: rework write error recovery path
+>    lightnvm: pblk: garbage collect lines with failed writes
+>    lightnvm: pblk: fix smeta write error path
+> 
+>   drivers/lightnvm/pblk-core.c     |  52 +++++++-
+>   drivers/lightnvm/pblk-gc.c       | 102 +++++++++------
+>   drivers/lightnvm/pblk-init.c     |  47 ++++---
+>   drivers/lightnvm/pblk-rb.c       |  39 ------
+>   drivers/lightnvm/pblk-recovery.c |  91 -------------
+>   drivers/lightnvm/pblk-rl.c       |  29 ++++-
+>   drivers/lightnvm/pblk-sysfs.c    |  15 ++-
+>   drivers/lightnvm/pblk-write.c    | 269 ++++++++++++++++++++++++++-------------
+>   drivers/lightnvm/pblk.h          |  36 ++++--
+>   9 files changed, 384 insertions(+), 296 deletions(-)
+> 
 
-1) the real resetting part
-
-2) the 2nd part for draining IO and updating controller state
-
-The patch prepares for supporting reliable controller recovery, for
-example, IO timeout still may be triggered when running the above part 2,
-so we still have to recover hardware under this situation.
-
-No functional change.
-
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/nvme/host/pci.c | 37 +++++++++++++++++++++++++++----------
- 1 file changed, 27 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index ef80e064a62c..16d7507bfd79 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2361,16 +2361,10 @@ static void nvme_remove_dead_ctrl(struct nvme_dev *dev, int status)
- 		nvme_put_ctrl(&dev->ctrl);
- }
- 
--static void nvme_reset_work(struct work_struct *work)
-+static int nvme_pre_reset_dev(struct nvme_dev *dev)
- {
--	struct nvme_dev *dev =
--		container_of(work, struct nvme_dev, ctrl.reset_work);
- 	bool was_suspend = !!(dev->ctrl.ctrl_config & NVME_CC_SHN_NORMAL);
- 	int result = -ENODEV;
--	enum nvme_ctrl_state new_state = NVME_CTRL_LIVE;
--
--	if (WARN_ON(dev->ctrl.state != NVME_CTRL_RESETTING))
--		goto out;
- 
- 	/*
- 	 * If we're called to reset a live controller first shut it down before
-@@ -2430,8 +2424,13 @@ static void nvme_reset_work(struct work_struct *work)
- 	}
- 
- 	result = nvme_setup_io_queues(dev);
--	if (result)
--		goto out;
-+ out:
-+	return result;
-+}
-+
-+static void nvme_post_reset_dev(struct nvme_dev *dev)
-+{
-+	enum nvme_ctrl_state new_state = NVME_CTRL_LIVE;
- 
- 	/*
- 	 * Keep the controller around but remove all namespaces if we don't have
-@@ -2465,7 +2464,25 @@ static void nvme_reset_work(struct work_struct *work)
- 	return;
- 
-  out:
--	nvme_remove_dead_ctrl(dev, result);
-+	nvme_remove_dead_ctrl(dev, 0);
-+}
-+
-+static void nvme_reset_work(struct work_struct *work)
-+{
-+	struct nvme_dev *dev =
-+		container_of(work, struct nvme_dev, ctrl.reset_work);
-+	int ret;
-+
-+	if (WARN_ON(dev->ctrl.state != NVME_CTRL_RESETTING))
-+		return;
-+
-+	ret = nvme_pre_reset_dev(dev);
-+	if (ret) {
-+		nvme_remove_dead_ctrl(dev, ret);
-+		return;
-+	}
-+
-+	nvme_post_reset_dev(dev);
- }
- 
- static void nvme_remove_dead_ctrl_work(struct work_struct *work)
--- 
-2.9.5
+Applied for 4.18.
