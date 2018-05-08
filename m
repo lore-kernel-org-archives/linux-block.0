@@ -1,89 +1,56 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block IO fixes for 4.17-rc4
-Message-ID: <d50dcb55-caea-348a-4e87-3ee0df7dd727@kernel.dk>
-Date: Fri, 4 May 2018 09:13:02 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <penguin-kernel@i-love.sakura.ne.jp>
+To: tytso@mit.edu
+Cc: syzbot+bf89c128e05dd6c62523@syzkaller.appspotmail.com, axboe@kernel.dk,
+        syzkaller-bugs@googlegroups.com, jack@suse.cz, gmazyland@gmail.com,
+        dvyukov@google.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: general protection fault in lo_ioctl (2)
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+References: <000000000000cbaaf6056b341859@google.com>
+	<CACT4Y+bTo34q4=7X8zGL_XVOGoYd7fqhfAbCAWUxsr-N96Kyxw@mail.gmail.com>
+	<2030b2cf-29f9-7bfd-8266-b39abc19bdfe@I-love.SAKURA.ne.jp>
+	<4d91224a-ecba-3696-1116-3da2e48ec4d3@I-love.SAKURA.ne.jp>
+	<20180508123730.GH999@thunk.org>
+In-Reply-To: <20180508123730.GH999@thunk.org>
+Message-Id: <201805090606.IBH69745.SOQVMFOOFHtFJL@I-love.SAKURA.ne.jp>
+Date: Wed, 9 May 2018 06:06:50 +0900
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+Theodore Y. Ts'o wrote:
+> On Tue, May 08, 2018 at 08:05:12PM +0900, Tetsuo Handa wrote:
+> > 
+> > So, it is time to think how to solve this race condition, as well as how to solve
+> > lockdep's deadlock warning (and I guess that syzbot is actually hitting deadlocks).
+> > An approach which serializes loop operations using global lock was proposed at
+> > https://groups.google.com/d/msg/syzkaller-bugs/2Rw8-OM6IbM/PzdobV8kAgAJ .
+> > Please respond...
+> 
+> I'm looking at your patch which you proposed on this, and the locking
+> architecture still looks way too complex.  Things like
+> loop_mutex_owner, and all of the infrastructure around
+> lo->ioctl_in_progress should be removed, if at all possible.
 
-A collection of fixes that should to into this release. This pull
-request contains:
+The patch in the above link no longer uses "lo->ioctl_in_progress".
+You looked at previous version rather than current version.
 
-- Set of bcache fixes from Coly, fixing regression in patches that went
-  into this series.
+> 
+> I believe it should be possible to do things with a single global
+> mutex, some code refactoring, and some unlocked versions of some of
+> the functions.
 
-- Set of NVMe fixes by way of Keith.
+The patch in the above link uses single global mutex "loop_mutex".
 
-- Set of bdi related fixes, one from Jan and two from Tetsuo Handa,
-  fixing various issues around device addition/removal.
+> 
+> Again, this requires root, and it requires someone deliberately trying
+> to induce a race.  So "it's time" is not necessarily the priority I
+> would set for this item.  But if we are going to fix it, let's fix it
+> right, and not make the code more complex and less maintainable, all
+> in the name of trying to make a rare, not-likely-to-happen-in-real-life
+> syzbot reported problem to go away.
 
-- Two block inflight fixes from Omar, fixing issues around the
-  transition to using tags for blk-mq inflight accounting that we did a
-  few releases ago.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20180504
-
-
-----------------------------------------------------------------
-Chengguang Xu (1):
-      nvme: fix potential memory leak in option parsing
-
-Coly Li (6):
-      bcache: store disk name in struct cache and struct cached_dev
-      bcache: set CACHE_SET_IO_DISABLE in bch_cached_dev_error()
-      bcache: count backing device I/O error for writeback I/O
-      bcache: add wait_for_kthread_stop() in bch_allocator_thread()
-      bcache: set dc->io_disable to true in conditional_stop_bcache_device()
-      bcache: use pr_info() to inform duplicated CACHE_SET_IO_DISABLE set
-
-Jan Kara (1):
-      bdi: Fix oops in wb_workfn()
-
-Johannes Thumshirn (1):
-      nvmet: switch loopback target state to connecting when resetting
-
-Keith Busch (3):
-      nvme: Set integrity flag for user passthrough commands
-      nvme/multipath: Disable runtime writable enabling parameter
-      nvme/multipath: Fix multipath disabled naming collisions
-
-Omar Sandoval (2):
-      blk-mq: count allocated but not started requests in iostats inflight
-      blk-mq: fix sysfs inflight counter
-
-Tetsuo Handa (2):
-      bdi: wake up concurrent wb_shutdown() callers.
-      bdi: Fix use after free bug in debugfs_remove()
-
- block/blk-mq.c                | 40 ++++++++++++++++-------
- block/blk-mq.h                |  4 ++-
- block/genhd.c                 | 12 +++++++
- block/partition-generic.c     | 10 +++---
- drivers/md/bcache/alloc.c     |  5 ++-
- drivers/md/bcache/bcache.h    |  4 +++
- drivers/md/bcache/debug.c     |  3 +-
- drivers/md/bcache/io.c        |  8 ++---
- drivers/md/bcache/request.c   |  5 +--
- drivers/md/bcache/super.c     | 75 ++++++++++++++++++++++++++++++-------------
- drivers/md/bcache/writeback.c |  4 ++-
- drivers/nvme/host/core.c      | 27 ++--------------
- drivers/nvme/host/fabrics.c   |  6 ++++
- drivers/nvme/host/multipath.c | 24 +++++++++++++-
- drivers/nvme/host/nvme.h      | 12 +++++++
- drivers/nvme/target/loop.c    |  6 ++++
- fs/fs-writeback.c             |  2 +-
- include/linux/genhd.h         |  4 ++-
- include/linux/wait_bit.h      | 17 ++++++++++
- mm/backing-dev.c              |  3 +-
- 20 files changed, 189 insertions(+), 82 deletions(-)
-
--- 
-Jens Axboe
+While NULL pointer dereference would be rare, deadlocks might not be rare
+enough to postpone the patch. Deadlocks can cause pile of false-positive
+hung task reports and can prevent syzbot from finding other bugs. That's
+why I say "it is time to think".
