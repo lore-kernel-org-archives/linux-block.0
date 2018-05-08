@@ -1,72 +1,58 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	James Smart <james.smart@broadcom.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V6 03/11] nvme: pci: unquiesce admin queue after controller is shutdown
-Date: Wed, 16 May 2018 12:03:05 +0800
-Message-Id: <20180516040313.13596-4-ming.lei@redhat.com>
-In-Reply-To: <20180516040313.13596-1-ming.lei@redhat.com>
-References: <20180516040313.13596-1-ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 1/4] block: break discard submissions into the user
+ defined size
+To: Omar Sandoval <osandov@osandov.com>
+Cc: linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
+ dchinner@redhat.com, hch@lst.de
+References: <1525709615-14395-1-git-send-email-axboe@kernel.dk>
+ <1525709615-14395-2-git-send-email-axboe@kernel.dk>
+ <20180508204318.GB27324@vader>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <a481ea48-329e-7f68-ff5c-0737b2c25a8c@kernel.dk>
+Date: Tue, 8 May 2018 14:57:11 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180508204318.GB27324@vader>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Given timeout event can come during reset, nvme_dev_disable() shouldn't
-keep admin queue as quiesced after controller is shutdown. Otherwise
-it may block admin IO in reset, and cause reset hang forever.
+On 5/8/18 2:43 PM, Omar Sandoval wrote:
+> On Mon, May 07, 2018 at 10:13:32AM -0600, Jens Axboe wrote:
+>> Don't build discards bigger than what the user asked for, if the
+>> user decided to limit the size by writing to 'discard_max_bytes'.
+>>
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> ---
+>>  block/blk-lib.c | 7 ++++---
+>>  1 file changed, 4 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/block/blk-lib.c b/block/blk-lib.c
+>> index a676084d4740..7417d617091b 100644
+>> --- a/block/blk-lib.c
+>> +++ b/block/blk-lib.c
+>> @@ -62,10 +62,11 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+>>  		unsigned int req_sects;
+>>  		sector_t end_sect, tmp;
+>>  
+>> -		/* Make sure bi_size doesn't overflow */
+>> -		req_sects = min_t(sector_t, nr_sects, UINT_MAX >> 9);
+>> +		/* Issue in chunks of the user defined max discard setting */
+>> +		req_sects = min_t(sector_t, nr_sects,
+>> +					q->limits.max_discard_sectors);
+>>  
+> 
+> Some drivers, including nvme, do
+> 
+>    blk_queue_max_discard_sectors(q, UINT_MAX)
+> 
+> That means q->limits.max_discard_sectors can be UINT_MAX, and
+> 
+>     bio->bi_iter.bi_size = req_sects << 9;
+> 
+> will overflow. We should probably cap max_discard_sectors at
+> UINT_MAX >> 9 in a prep patch.
 
-This patch fixes this issue by unquiescing admin queue at the end
-of nvme_dev_disable().
+Probably better to just keep the local overflow check, I'll do that.
+Thanks for spotting it!
 
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
-Reported-by: Jianchao Wang <jianchao.w.wang@oracle.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/nvme/host/pci.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index b60f727b844c..9e28d7118232 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1557,8 +1557,7 @@ static int nvme_alloc_admin_tags(struct nvme_dev *dev)
- 			dev->ctrl.admin_q = NULL;
- 			return -ENODEV;
- 		}
--	} else
--		blk_mq_unquiesce_queue(dev->ctrl.admin_q);
-+	}
- 
- 	return 0;
- }
-@@ -2303,6 +2302,17 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
- 	 */
- 	if (shutdown)
- 		nvme_start_queues(&dev->ctrl);
-+
-+	/*
-+	 * Avoid to stuck reset because timeout may happen during reset and
-+	 * reset may hang forever if admin queue is kept as quiesced.
-+	 *
-+	 * Druing reset, if admin queue isn't ready, the command will be
-+	 * failed immediately, that means we don't need to quiesce admin
-+	 * queue.
-+	 */
-+	if (dev->ctrl.admin_q)
-+		blk_mq_unquiesce_queue(dev->ctrl.admin_q);
- 	mutex_unlock(&dev->shutdown_lock);
- }
- 
 -- 
-2.9.5
+Jens Axboe
