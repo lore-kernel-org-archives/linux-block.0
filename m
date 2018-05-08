@@ -13,73 +13,39 @@ References: <999DF2B3-4EE8-4BDF-89C5-EB0C2D8BF69E@linaro.org>
  <ffd0c030-43f8-0dbe-42b3-03bb9c410bea@kernel.dk>
  <1525797766.5204.2.camel@gmx.de>
  <3692ce7d-a767-72e6-65ae-6178b6c2e7d8@kernel.dk>
- <f04636df-3f97-6c16-f37b-d407e062b9e5@kernel.dk>
-Message-ID: <57952405-bdeb-f4e4-1aef-a7c0a8a68674@kernel.dk>
-Date: Tue, 8 May 2018 19:09:04 -0600
+Message-ID: <f04636df-3f97-6c16-f37b-d407e062b9e5@kernel.dk>
+Date: Tue, 8 May 2018 15:19:23 -0600
 MIME-Version: 1.0
-In-Reply-To: <f04636df-3f97-6c16-f37b-d407e062b9e5@kernel.dk>
+In-Reply-To: <3692ce7d-a767-72e6-65ae-6178b6c2e7d8@kernel.dk>
 Content-Type: text/plain; charset=iso-8859-15
 List-ID: <linux-block@vger.kernel.org>
 
-On 5/8/18 3:19 PM, Jens Axboe wrote:
-> On 5/8/18 2:37 PM, Jens Axboe wrote:
->> On 5/8/18 10:42 AM, Mike Galbraith wrote:
->>> On Tue, 2018-05-08 at 08:55 -0600, Jens Axboe wrote:
->>>>
->>>> All the block debug files are empty...
+On 5/8/18 2:37 PM, Jens Axboe wrote:
+> On 5/8/18 10:42 AM, Mike Galbraith wrote:
+>> On Tue, 2018-05-08 at 08:55 -0600, Jens Axboe wrote:
 >>>
->>> Sigh.  Take 2, this time cat debug files, having turned block tracing
->>> off before doing anything else (so trace bits in dmesg.txt should end
->>> AT the stall).
+>>> All the block debug files are empty...
 >>
->> OK, that's better. What I see from the traces:
->>
->> - You have regular IO and some non-fs IO (from scsi_execute()). This mix
->>   may be key.
->>
->> - sdd has nothing pending, yet has 6 active waitqueues.
->>
->> I'm going to see if I can reproduce this. Paolo, what kind of attempts
->> to reproduce this have you done?
+>> Sigh.  Take 2, this time cat debug files, having turned block tracing
+>> off before doing anything else (so trace bits in dmesg.txt should end
+>> AT the stall).
 > 
-> No luck so far. Out of the patches you referenced, I can only find the
-> shallow depth change, since that's in the parent of this email. Can
-> you send those as well?
+> OK, that's better. What I see from the traces:
 > 
-> Perhaps also expand a bit on exactly what you are running. File system,
-> mount options, etc.
+> - You have regular IO and some non-fs IO (from scsi_execute()). This mix
+>   may be key.
+> 
+> - sdd has nothing pending, yet has 6 active waitqueues.
+> 
+> I'm going to see if I can reproduce this. Paolo, what kind of attempts
+> to reproduce this have you done?
 
-Alright, I managed to reproduce it. What I think is happening is that
-BFQ is limiting the inflight case to something less than the wake
-batch for sbitmap, which can lead to stalls. I don't have time to test
-this tonight, but perhaps you can give it a go when you are back at it.
-If not, I'll try tomorrow morning.
+No luck so far. Out of the patches you referenced, I can only find the
+shallow depth change, since that's in the parent of this email. Can
+you send those as well?
 
-If this is the issue, I can turn it into a real patch. This is just to
-confirm that the issue goes away with the below.
-
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index e6a9c06ec70c..94ced15b6428 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -272,6 +272,7 @@ EXPORT_SYMBOL_GPL(sbitmap_bitmap_show);
- 
- static unsigned int sbq_calc_wake_batch(unsigned int depth)
- {
-+#if 0
- 	unsigned int wake_batch;
- 
- 	/*
-@@ -284,6 +285,9 @@ static unsigned int sbq_calc_wake_batch(unsigned int depth)
- 		wake_batch = max(1U, depth / SBQ_WAIT_QUEUES);
- 
- 	return wake_batch;
-+#else
-+	return 1;
-+#endif
- }
- 
- int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
+Perhaps also expand a bit on exactly what you are running. File system,
+mount options, etc.
 
 -- 
 Jens Axboe
