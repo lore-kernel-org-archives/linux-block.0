@@ -1,55 +1,51 @@
 Return-Path: <sbates@raithlin.com>
 From: "Stephen  Bates" <sbates@raithlin.com>
-To: Jerome Glisse <jglisse@redhat.com>, Logan Gunthorpe <logang@deltatee.com>
-CC: Alex Williamson <alex.williamson@redhat.com>,
-	=?utf-8?B?Q2hyaXN0aWFuIEvDtm5pZw==?= <christian.koenig@amd.com>, "Bjorn
- Helgaas" <helgaas@kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-pci@vger.kernel.org"
-	<linux-pci@vger.kernel.org>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>, "linux-nvdimm@lists.01.org"
-	<linux-nvdimm@lists.01.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, Jens Axboe
-	<axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>, Sagi Grimberg
-	<sagi@grimberg.me>, Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe
-	<jgg@mellanox.com>, Max Gurtovoy <maxg@mellanox.com>, Dan Williams
-	<dan.j.williams@intel.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Don Dutile <ddutile@redhat.com>, Dan Williams <dan.j.williams@intel.com>,
+	Logan Gunthorpe <logang@deltatee.com>
+CC: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, linux-rdma
+	<linux-rdma@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "Christoph
+ Hellwig" <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Keith Busch
+	<keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>, Bjorn Helgaas
+	<bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>, Max Gurtovoy
+	<maxg@mellanox.com>, =?utf-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alex Williamson
+	<alex.williamson@redhat.com>, =?utf-8?B?Q2hyaXN0aWFuIEvDtm5pZw==?=
+	<christian.koenig@amd.com>
 Subject: Re: [PATCH v4 04/14] PCI/P2PDMA: Clear ACS P2P flags for all devices
  behind switches
-Date: Tue, 8 May 2018 21:35:08 +0000
-Message-ID: <F2F18B0F-8083-4A2C-AD21-58E460F5FD1B@raithlin.com>
-References: <20180423233046.21476-5-logang@deltatee.com>
- <20180507231306.GG161390@bhelgaas-glaptop.roam.corp.google.com>
- <e58e8d27-42a5-ca69-3b68-c409a2922cd1@amd.com>
- <0b4183ef-e720-204b-9e85-b9eaf7a4136a@deltatee.com>
- <a943a92d-15cd-fb2d-21c3-5e5cfccd9eff@amd.com>
- <3584a6ac-95c7-5d23-1859-aee30605776e@deltatee.com>
- <20180508133407.57a46902@w520.home>
- <5fc9b1c1-9208-06cc-0ec5-1f54c2520494@deltatee.com>
- <20180508141331.7cd737cb@w520.home>
- <d70cf286-f7b7-99a5-1042-022506298fed@deltatee.com>
- <20180508205005.GC15608@redhat.com>
-In-Reply-To: <20180508205005.GC15608@redhat.com>
+Date: Tue, 8 May 2018 21:27:45 +0000
+Message-ID: <3C9FB262-A93C-4C8F-B1E0-85C6D6F78BC2@raithlin.com>
+References: <20180423233046.21476-1-logang@deltatee.com>
+ <20180423233046.21476-5-logang@deltatee.com>
+ <CAPcyv4g+5N_n03J-VhmJfrr60Sqk95ZapLKBkwSsGvV4nQ+ZRw@mail.gmail.com>
+ <64C231F5-DE36-415F-B308-3A423B0BBACB@raithlin.com>
+ <15433946-f7f5-f610-4e80-380fb59920e5@redhat.com>
+In-Reply-To: <15433946-f7f5-f610-4e80-380fb59920e5@redhat.com>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-SGkgSmVyb21lDQoNCj4gICAgSSB0aGluayB0aGVyZSBpcyBjb25mdXNpb24gaGVyZSwgQWxleCBw
-cm9wZXJseSBleHBsYWluZWQgdGhlIHNjaGVtZQ0KPiAgIFBDSUUtZGV2aWNlIGRvIGEgQVRTIHJl
-cXVlc3QgdG8gdGhlIElPTU1VIHdoaWNoIHJldHVybnMgYSB2YWxpZA0KPiAgICB0cmFuc2xhdGlv
-biBmb3IgYSB2aXJ0dWFsIGFkZHJlc3MuIERldmljZSBjYW4gdGhlbiB1c2UgdGhhdCBhZGRyZXNz
-DQo+ICAgIGRpcmVjdGx5IHdpdGhvdXQgZ29pbmcgdGhyb3VnaCBJT01NVSBmb3IgdHJhbnNsYXRp
-b24uDQoNClRoaXMgbWFrZXMgc2Vuc2UgYW5kIHRvIGJlIGhvbmVzdCBJIG5vdyB1bmRlcnN0YW5k
-IEFUUyBhbmQgaXRzIGludGVyYWN0aW9uIHdpdGggQUNTIGEgbG90IGJldHRlciB0aGFuIEkgZGlk
-IDI0IGhvdXJzIGFnbyA7LSkuDQoNCj4gICAgQVRTIGlzIGltcGxlbWVudGVkIGJ5IHRoZSBJT01N
-VSBub3QgYnkgdGhlIGRldmljZSAod2VsbCBkZXZpY2UgaW1wbGVtZW50DQo+ICAgIHRoZSBjbGll
-bnQgc2lkZSBvZiBpdCkuIEFsc28gQVRTIGlzIG1lYW5pbmdsZXNzIHdpdGhvdXQgc29tZXRoaW5n
-IGxpa2UNCj4gICAgUEFTSUQgYXMgZmFyIGFzIGkga25vdy4NCiAgICANCkkgdGhpbmsgaXQncyB0
-aGUgY2xpZW50IHNpZGUgdGhhdCBpcyB3aGF0IGlzIGltcG9ydGFudCB0byB1cy4gTm90IG1hbnkg
-RVBzIHN1cHBvcnQgQVRTIHRvZGF5IGFuZCBpdCdzIG5vdCBjbGVhciBpZiBtYW55IHdpbGwgaW4g
-dGhlIGZ1dHVyZS4gIFNvIGFzc3VtaW5nIHdlIHdhbnQgdG8gZG8gcDJwZG1hIGJldHdlZW4gZGV2
-aWNlcyAoc29tZSBvZikgd2hpY2ggZG8gTk9UIHN1cHBvcnQgQVRTIGhvdyBiZXN0IGRvIHdlIGhh
-bmRsZSB0aGUgQUNTIGlzc3VlPyBEaXNhYmxpbmcgdGhlIElPTU1VIHNlZW1zIGEgYml0IHN0cm9u
-ZyB0byBtZSBnaXZlbiB0aGlzIGltcGFjdHMgYWxsIHRoZSBQQ0kgZG9tYWlucyBpbiB0aGUgc3lz
-dGVtIGFuZCBub3QganVzdCB0aGUgZG9tYWluIHdlIHdpc2ggdG8gZG8gUDJQIG9uLg0KDQpTdGVw
-aGVuDQoNCg==
+SGkgRG9uDQoNCj5XZWxsLCBwMnAgRE1BIGlzIGEgZnVuY3Rpb24gb2YgYSBjb29wZXJhdGluZyAn
+YWdlbnQnIHNvbWV3aGVyZSBhYm92ZSB0aGUgdHdvIGRldmljZXMuDQo+ICAgIFRoYXQgYWdlbnQg
+c2hvdWxkICdyZXF1ZXN0JyB0byB0aGUga2VybmVsIHRoYXQgQUNTIGJlIHJlbW92ZWQvY2lyY3Vt
+dmVudGVkIChwMnAgZW5hYmxlZCkgYnR3biB0d28gZW5kcG9pbnRzLg0KPiAgICBJIHJlY29tbWVu
+ZCBkb2luZyBzbyB2aWEgYSBzeXNmcyBtZXRob2QuDQoNClllcyB3ZSBsb29rZWQgYXQgc29tZXRo
+aW5nIGxpa2UgdGhpcyBpbiB0aGUgcGFzdCBidXQgaXQgZG9lcyBoaXQgdGhlIElPTU1VIGdyb3Vw
+aW5nIGlzc3VlIEkgZGlzY3Vzc2VkIGVhcmxpZXIgdG9kYXkgd2hpY2ggaXMgbm90IGFjY2VwdGFi
+bGUgcmlnaHQgbm93LiBJbiB0aGUgbG9uZyB0ZXJtLCBvbmNlIHdlIGdldCBJT01NVSBncm91cGlu
+ZyBjYWxsYmFja3MgdG8gVk1zIHdlIGNhbiBsb29rIGF0IGV4dGVuZGluZyBwMnBkbWEgaW4gdGhp
+cyB3YXkuIEJ1dCBJIGRvbid0IHRoaW5rIHRoaXMgaXMgdmlhYmxlIGZvciB0aGUgaW5pdGlhbCBz
+ZXJpZXMuIA0KDQogICAgDQo+ICAgICAgICAgICAgU28gSSBkb24ndCB1bmRlcnN0YW5kIHRoZSBj
+b21tZW50cyB3aHkgVk1zIHNob3VsZCBuZWVkIHRvIGtub3cuDQoNCkFzIEkgdW5kZXJzdGFuZCBp
+dCBWTXMgbmVlZCB0byBrbm93IGJlY2F1c2UgVkZJTyBwYXNzZXMgSU9NTVUgZ3JvdXBpbmcgdXAg
+aW50byB0aGUgVk1zLiBTbyBpZiBhIElPTU1VIGdyb3VwaW5nIGNoYW5nZXMgdGhlIFZNJ3Mgdmll
+dyBvZiBpdHMgUENJZSB0b3BvbG9neSBjaGFuZ2VzLiBJIHRoaW5rIHdlIGV2ZW4gaGF2ZSB0byBi
+ZSBjb2duaXphbnQgb2YgdGhlIGZhY3QgdGhlIE9TIHJ1bm5pbmcgb24gdGhlIFZNIG1heSBub3Qg
+ZXZlbiBzdXBwb3J0IGhvdC1wbHVnIG9mIFBDSSBkZXZpY2VzLg0KICAgIA0KPiBJcyB0aGVyZSBh
+IHRocmVhZCBJIG5lZWQgdG8gcmVhZCB1cCB0byBleHBsYWluIC9jbGVhci11cCB0aGUgdGhvdWdo
+dHMgYWJvdmU/DQoNCklmIHlvdSBzZWFyY2ggZm9yIHAycGRtYSB5b3Ugc2hvdWxkIGZpbmQgdGhl
+IHByZXZpb3VzIGRpc2N1c3Npb25zLiBUaGFua3MgZm9yIHRoZSBpbnB1dCENCg0KU3RlcGhlbg0K
+ICAgIA0KICAgIA0KDQo=
