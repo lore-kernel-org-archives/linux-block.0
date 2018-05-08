@@ -1,148 +1,60 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 26/33] xfs: allow writeback on pages without buffer heads
-Date: Wed,  9 May 2018 09:48:23 +0200
-Message-Id: <20180509074830.16196-27-hch@lst.de>
-In-Reply-To: <20180509074830.16196-1-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <owner-linux-aio@kvack.org>
+From: adam.manzanares@wdc.com
+To: viro@zeniv.linux.org.uk,
+	bcrl@kvack.org
+Cc: linux-fsdevel@vger.kernel.org,
+	linux-aio@kvack.org,
+	linux-api@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Adam Manzanares <adam.manzanares@wdc.com>
+Subject: [PATCH v3 0/3] AIO add per-command iopriority
+Date: Tue,  8 May 2018 10:41:59 -0700
+Message-Id: <20180508174202.2537-1-adam.manzanares@wdc.com>
+Sender: owner-linux-aio@kvack.org
 List-ID: <linux-block@vger.kernel.org>
 
-We'll soon allow these through changes in the iomap write_begin and
-page_mkwrite implementations, so get ready for them.  After the previous
-refactoring this is as simple as not maintaining the bh variable if
-the page doesn' thave private data, and skipping the non-uptodate buffer
-check in this case for the writepage path, and adding a new per-page
-I/O completion handler that skips all buffer head manipulation.
+From: Adam Manzanares <adam.manzanares@wdc.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/xfs_aops.c | 47 ++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 34 insertions(+), 13 deletions(-)
+This is the per-I/O equivalent of the ioprio_set system call.
+See the following link for performance implications on a SATA HDD:
+https://lkml.org/lkml/2016/12/6/495
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index c76c943473be..879599f723b6 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -91,6 +91,19 @@ xfs_find_daxdev_for_inode(
- 		return mp->m_ddev_targp->bt_daxdev;
- }
- 
-+static void
-+xfs_finish_page_writeback(
-+	struct inode		*inode,
-+	struct bio_vec		*bvec,
-+	int			error)
-+{
-+	if (error) {
-+		SetPageError(bvec->bv_page);
-+		mapping_set_error(inode->i_mapping, -EIO);
-+	}
-+	end_page_writeback(bvec->bv_page);
-+}
-+
- /*
-  * We're now finished for good with this page.  Update the page state via the
-  * associated buffer_heads, paying attention to the start and end offsets that
-@@ -103,7 +116,7 @@ xfs_find_daxdev_for_inode(
-  * and buffers potentially freed after every call to end_buffer_async_write.
-  */
- static void
--xfs_finish_page_writeback(
-+xfs_finish_buffer_writeback(
- 	struct inode		*inode,
- 	struct bio_vec		*bvec,
- 	int			error)
-@@ -178,9 +191,12 @@ xfs_destroy_ioend(
- 			next = bio->bi_private;
- 
- 		/* walk each page on bio, ending page IO on them */
--		bio_for_each_segment_all(bvec, bio, i)
--			xfs_finish_page_writeback(inode, bvec, error);
--
-+		bio_for_each_segment_all(bvec, bio, i) {
-+			if (page_has_buffers(bvec->bv_page))
-+				xfs_finish_buffer_writeback(inode, bvec, error);
-+			else
-+				xfs_finish_page_writeback(inode, bvec, error);
-+		}
- 		bio_put(bio);
- 	}
- 
-@@ -816,7 +832,7 @@ xfs_writepage_map(
- {
- 	LIST_HEAD(submit_list);
- 	struct xfs_ioend	*ioend, *next;
--	struct buffer_head	*bh;
-+	struct buffer_head	*bh = NULL;
- 	ssize_t			len = i_blocksize(inode);
- 	int			error = 0;
- 	int			count = 0;
-@@ -824,6 +840,9 @@ xfs_writepage_map(
- 	loff_t			file_offset;	/* file offset of page */
- 	unsigned		poffset;	/* offset into page */
- 
-+	if (page_has_buffers(page))
-+		bh = page_buffers(page);
-+
- 	/*
- 	 * Walk the blocks on the page, and we we run off then end of the
- 	 * current map or find the current map invalid, grab a new one.
-@@ -832,11 +851,9 @@ xfs_writepage_map(
- 	 * replace the bufferhead with some other state tracking mechanism in
- 	 * future.
- 	 */
--	file_offset = page_offset(page);
--	bh = page_buffers(page);
--	for (poffset = 0;
-+	for (poffset = 0, file_offset = page_offset(page);
- 	     poffset < PAGE_SIZE;
--	     poffset += len, file_offset += len, bh = bh->b_this_page) {
-+	     poffset += len, file_offset += len) {
- 		/* past the range we are writing, so nothing more to write. */
- 		if (file_offset >= end_offset)
- 			break;
-@@ -844,10 +861,11 @@ xfs_writepage_map(
- 		/*
- 		 * Block does not contain valid data, skip it.
- 		 */
--		if (!buffer_uptodate(bh)) {
-+		if (bh && !buffer_uptodate(bh)) {
- 			if (PageUptodate(page))
- 				ASSERT(buffer_mapped(bh));
- 			uptodate = false;
-+			bh = bh->b_this_page;
- 			continue;
- 		}
- 
-@@ -872,10 +890,15 @@ xfs_writepage_map(
- 			 * meaningless for holes (!mapped && uptodate), so check we did
- 			 * have a buffer covering a hole here and continue.
- 			 */
-+			if (bh)
-+				bh = bh->b_this_page;
- 			continue;
- 		}
- 
--		xfs_map_at_offset(inode, bh, &wpc->imap, file_offset);
-+		if (bh) {
-+			xfs_map_at_offset(inode, bh, &wpc->imap, file_offset);
-+			bh = bh->b_this_page;
-+		}
- 		xfs_add_to_ioend(inode, file_offset, page, wpc, wbc,
- 				&submit_list);
- 		count++;
-@@ -960,8 +983,6 @@ xfs_do_writepage(
- 
- 	trace_xfs_writepage(inode, page, 0, 0);
- 
--	ASSERT(page_has_buffers(page));
--
- 	/*
- 	 * Refuse to write the page out if we are called from reclaim context.
- 	 *
+First patch factors ioprio_check_cap function out of ioprio_set system call to 
+also be used by the aio ioprio interface.
+
+Second patch converts kiocb ki_hint field to a u16 to avoid kiocb bloat.
+
+Third patch passes ioprio hint from aio iocb to kiocb and enables block_dev 
+usage of the per I/O ioprio feature.
+
+v2: merge patches
+    use IOCB_FLAG_IOPRIO
+    validate intended use with IOCB_IOPRIO
+    add linux-api and linux-block to cc
+
+v3: add ioprio_check_cap function
+    convert kiocb ki_hint to u16
+    use ioprio_check_cap when adding ioprio to kiocb in aio.c
+
+Adam Manzanares (3):
+  block: add ioprio_check_cap function
+  fs: Convert kiocb rw_hint from enum to u16
+  fs: Add aio iopriority support for block_dev
+
+ block/ioprio.c               | 22 ++++++++++++++++------
+ fs/aio.c                     | 16 ++++++++++++++++
+ fs/block_dev.c               |  2 ++
+ include/linux/fs.h           | 17 +++++++++++++++--
+ include/linux/ioprio.h       |  2 ++
+ include/uapi/linux/aio_abi.h |  1 +
+ 6 files changed, 52 insertions(+), 8 deletions(-)
+
 -- 
-2.17.0
+2.15.1
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-aio' in
+the body to majordomo@kvack.org.  For more info on Linux AIO,
+see: http://www.kvack.org/aio/
+Don't email: <a href=mailto:"aart@kvack.org">aart@kvack.org</a>
