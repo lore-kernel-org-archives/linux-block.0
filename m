@@ -1,84 +1,74 @@
-Return-Path: <dan.j.williams@intel.com>
-MIME-Version: 1.0
-In-Reply-To: <20180423233046.21476-5-logang@deltatee.com>
-References: <20180423233046.21476-1-logang@deltatee.com> <20180423233046.21476-5-logang@deltatee.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Tue, 8 May 2018 07:31:30 -0700
-Message-ID: <CAPcyv4g+5N_n03J-VhmJfrr60Sqk95ZapLKBkwSsGvV4nQ+ZRw@mail.gmail.com>
+Return-Path: <sbates@raithlin.com>
+From: "Stephen  Bates" <sbates@raithlin.com>
+To: =?utf-8?B?Q2hyaXN0aWFuIEvDtm5pZw==?= <christian.koenig@amd.com>, "Bjorn
+ Helgaas" <helgaas@kernel.org>, Logan Gunthorpe <logang@deltatee.com>, "Alex
+ Williamson" <alex.williamson@redhat.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "Christoph
+ Hellwig" <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Keith Busch
+	<keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>, Bjorn Helgaas
+	<bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>, Max Gurtovoy
+	<maxg@mellanox.com>, Dan Williams <dan.j.williams@intel.com>,
+	=?utf-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>, Benjamin Herrenschmidt
+	<benh@kernel.crashing.org>
 Subject: Re: [PATCH v4 04/14] PCI/P2PDMA: Clear ACS P2P flags for all devices
  behind switches
-To: Logan Gunthorpe <logang@deltatee.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-rdma <linux-rdma@vger.kernel.org>,
-	linux-nvdimm <linux-nvdimm@lists.01.org>, linux-block@vger.kernel.org,
-	Stephen Bates <sbates@raithlin.com>, Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>, Max Gurtovoy <maxg@mellanox.com>,
-	=?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alex Williamson <alex.williamson@redhat.com>,
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 8 May 2018 14:25:10 +0000
+Message-ID: <479F2F93-903B-4A8A-8989-A4BD0E5E1471@raithlin.com>
+References: <20180423233046.21476-1-logang@deltatee.com>
+ <20180423233046.21476-5-logang@deltatee.com>
+ <20180507231306.GG161390@bhelgaas-glaptop.roam.corp.google.com>
+ <e58e8d27-42a5-ca69-3b68-c409a2922cd1@amd.com>
+In-Reply-To: <e58e8d27-42a5-ca69-3b68-c409a2922cd1@amd.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Apr 23, 2018 at 4:30 PM, Logan Gunthorpe <logang@deltatee.com> wrote:
-> For peer-to-peer transactions to work the downstream ports in each
-> switch must not have the ACS flags set. At this time there is no way
-> to dynamically change the flags and update the corresponding IOMMU
-> groups so this is done at enumeration time before the groups are
-> assigned.
->
-> This effectively means that if CONFIG_PCI_P2PDMA is selected then
-> all devices behind any PCIe switch heirarchy will be in the same IOMMU
-> group. Which implies that individual devices behind any switch
-> heirarchy will not be able to be assigned to separate VMs because
-> there is no isolation between them. Additionally, any malicious PCIe
-> devices will be able to DMA to memory exposed by other EPs in the same
-> domain as TLPs will not be checked by the IOMMU.
->
-> Given that the intended use case of P2P Memory is for users with
-> custom hardware designed for purpose, we do not expect distributors
-> to ever need to enable this option. Users that want to use P2P
-> must have compiled a custom kernel with this configuration option
-> and understand the implications regarding ACS. They will either
-> not require ACS or will have design the system in such a way that
-> devices that require isolation will be separate from those using P2P
-> transactions.
-
->
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> ---
->  drivers/pci/Kconfig        |  9 +++++++++
->  drivers/pci/p2pdma.c       | 45 ++++++++++++++++++++++++++++++---------------
->  drivers/pci/pci.c          |  6 ++++++
->  include/linux/pci-p2pdma.h |  5 +++++
->  4 files changed, 50 insertions(+), 15 deletions(-)
->
-> diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
-> index b2396c22b53e..b6db41d4b708 100644
-> --- a/drivers/pci/Kconfig
-> +++ b/drivers/pci/Kconfig
-> @@ -139,6 +139,15 @@ config PCI_P2PDMA
->           transations must be between devices behind the same root port.
->           (Typically behind a network of PCIe switches).
->
-> +         Enabling this option will also disable ACS on all ports behind
-> +         any PCIe switch. This effectively puts all devices behind any
-> +         switch heirarchy into the same IOMMU group. Which implies that
-> +         individual devices behind any switch will not be able to be
-> +         assigned to separate VMs because there is no isolation between
-> +         them. Additionally, any malicious PCIe devices will be able to
-> +         DMA to memory exposed by other EPs in the same domain as TLPs
-> +         will not be checked by the IOMMU.
-> +
->           If unsure, say N.
-
-It seems unwieldy that this is a compile time option and not a runtime
-option. Can't we have a kernel command line option to opt-in to this
-behavior rather than require a wholly separate kernel image?
-
-Why is this text added in a follow on patch and not the patch that
-introduced the config option?
-
-I'm also wondering if that command line option can take a 'bus device
-function' address of a switch to limit the scope of where ACS is
-disabled.
+ICAgIA0KSGkgQ2hyaXN0aWFuDQoNCj4gQU1EIEFQVXMgbWFuZGF0b3J5IG5lZWQgdGhlIEFDUyBm
+bGFnIHNldCBmb3IgdGhlIEdQVSBpbnRlZ3JhdGVkIGluIHRoZSANCj4gQ1BVIHdoZW4gSU9NTVUg
+aXMgZW5hYmxlZCBvciBvdGhlcndpc2UgeW91IHdpbGwgYnJlYWsgU1ZNLg0KDQpPSyBidXQgaW4g
+dGhpcyBjYXNlIGFyZW4ndCB5b3UgbG9zaW5nIChtYW55IG9mKSB0aGUgYmVuZWZpdHMgb2YgUDJQ
+IHNpbmNlIGFsbCBETUFzIHdpbGwgbm93IGdldCByb3V0ZWQgdXAgdG8gdGhlIElPTU1VIGJlZm9y
+ZSBiZWluZyBwYXNzZWQgZG93biB0byB0aGUgZGVzdGluYXRpb24gUENJZSBFUD8NCg0KPiBTaW1p
+bGFyIHByb2JsZW1zIGFyaXNlIHdoZW4geW91IGRvIHRoaXMgZm9yIGRlZGljYXRlZCBHUFUsIGJ1
+dCB3ZSANCj4gaGF2ZW4ndCB1cHN0cmVhbWVkIHRoZSBzdXBwb3J0IGZvciB0aGlzIHlldC4NCg0K
+SG1tLCBhcyBhYm92ZS4gV2l0aCBBQ1MgZW5hYmxlZCBvbiBhbGwgZG93bnN0cmVhbSBwb3J0cyBh
+bnkgUDJQIGVuYWJsZWQgRE1BIHdpbGwgYmUgcm91dGVkIHRvIHRoZSBJT01NVSB3aGljaCByZW1v
+dmVzIGEgbG90IG9mIHRoZSBiZW5lZml0LiANCiAgICANCj4gU28gdGhhdCBpcyBhIGNsZWFyIE5B
+SyBmcm9tIG15IHNpZGUgZm9yIHRoZSBhcHByb2FjaC4NCg0KRG8geW91IGhhdmUgYW4gYWx0ZXJu
+YXRpdmU/IFRoaXMgaXMgdGhlIGFwcHJvYWNoIHdlIGFycml2ZWQgaXQgYWZ0ZXIgYSByZWFzb25h
+Ymx5IGxlbmd0aHkgZGlzY3Vzc2lvbiBvbiB0aGUgbWFpbGluZyBsaXN0cy4gQWxleCwgYXJlIHlv
+dSBzdGlsbCBjb21mb3J0YWJsZSB3aXRoIHRoaXMgYXBwcm9hY2g/DQogICAgDQo+IEFuZCB3aGF0
+IGV4YWN0bHkgaXMgdGhlIHByb2JsZW0gaGVyZT8NCiANCldlIGhhZCBhIHByZXR0eSBsZW5ndGh5
+IGRpc2N1c3Npb24gb24gdGhpcyB0b3BpYyBvbiBvbmUgb2YgdGhlIHByZXZpb3VzIHJldmlzaW9u
+cy4gVGhlIGlzc3VlIGlzIHRoYXQgY3VycmVudGx5IHRoZXJlIGlzIG5vIG1lY2hhbmlzbSBpbiB0
+aGUgSU9NTVUgY29kZSB0byBpbmZvcm0gVk1zIGlmIElPTU1VIGdyb3VwaW5ncyBjaGFuZ2UuIFNp
+bmNlIHAycGRtYSBjYW4gZHluYW1pY2FsbHkgY2hhbmdlIGl0cyB0b3BvbG9neSAoZHVlIHRvIFBD
+SSBob3RwbHVnKSB3ZSBoYWQgdG8gYmUgY29nbml6YW50IG9mIHRoZSBmYWN0IHRoYXQgQUNTIHNl
+dHRpbmdzIGNvdWxkIGNoYW5nZS4gU2luY2UgdGhlcmUgaXMgbm8gd2F5IHRvIGN1cnJlbnRseSBo
+YW5kbGUgY2hhbmdpbmcgQUNTIHNldHRpbmdzIGFuZCBoZW5jZSBJT01NVSBncm91cGluZ3MgdGhl
+IGNvbnNlbnN1cyB3YXMgdG8gc2ltcGx5IGRpc2FibGUgQUNTIG9uIGFsbCBwb3J0cyBpbiBhIHAy
+cGRtYSBkb21haW4uIFRoaXMgZWZmZWN0aXZlbHkgbWFrZXMgYWxsIHRoZSBkZXZpY2VzIGluIHRo
+ZSBwMnBkbWEgZG9tYWluIHBhcnQgb2YgdGhlIHNhbWUgSU9NTVUgZ3JvdXBpbmcuIFRoZSBwbGFu
+IHdpbGwgYmUgdG8gYWRkcmVzcyB0aGlzIGluIHRpbWUgYW5kIGFkZCBhIG1lY2hhbmlzbSBmb3Ig
+SU9NTVUgZ3JvdXBpbmcgY2hhbmdlcyBhbmQgbm90aWZpY2F0aW9uIHRvIFZNcyBidXQgdGhhdCdz
+IG5vdCBwYXJ0IG9mIHRoaXMgc2VyaWVzLiBOb3RlIHlvdSBhcmUgc3RpbGwgYWxsb3dlZCB0byBo
+YXZlIEFDUyBmdW5jdGlvbmluZyBvbiBvdGhlciBQQ0kgZG9tYWlucyBzbyBpZiB5b3UgZG8gbm90
+IGEgcGx1cmFsaXR5IG9mIElPTU1VIGdyb3VwaW5ncyB5b3UgY2FuIHN0aWxsIGFjaGlldmUgaXQg
+KGJ1dCB5b3UgY2FuJ3QgZG8gcDJwZG1hIGFjcm9zcyBJT01NVSBncm91cGluZ3MsIHdoaWNoIGlz
+IHNhZmUpLg0KDQo+IEknbSBjdXJyZW50bHkgdGVzdGluZyBQMlAgd2l0aCAgR1BVcyBpbiBkaWZm
+ZXJlbnQgSU9NTVUgZG9tYWlucyBhbmQgYXQgbGVhc3Qgd2l0aCBBTUQgSU9NTVVzIHRoYXQgd29y
+a3MgcGVyZmVjdGx5IGZpbmUuDQoNCll1cCB0aGF0IHNob3VsZCB3b3JrIHRob3VnaCBhZ2FpbiBJ
+IGhhdmUgdG8gYXNrIGFyZSB5b3UgZGlzYWJsaW5nIEFDUyBvbiB0aGUgcG9ydHMgYmV0d2VlbiB0
+aGUgdHdvIHBlZXIgZGV2aWNlcyB0byBnZXQgdGhlIHAycCBiZW5lZml0PyBJZiBub3QgeW91IGFy
+ZSBub3QgZ2V0dGluZyBhbGwgdGhlIHBlcmZvcm1hbmNlIGJlbmVmaXQgKGR1ZSB0byBJT01NVSBy
+b3V0aW5nKSwgaWYgeW91IGFyZSB0aGVuIHRoZXJlIGFyZSBvYnZpb3VzbHkgc2VjdXJpdHkgaW1w
+bGljYXRpb25zIGJldHdlZW4gdGhvc2UgSU9NTVUgZG9tYWlucyBpZiB0aGV5IGFyZSBhc3NpZ25l
+ZCB0byBkaWZmZXJlbnQgVk1zLiBBbmQgbm93IHRoZSBpc3N1ZSBpcyBpZiBuZXcgZGV2aWNlcyBh
+cmUgYWRkZWQgYW5kIHRoZSBwMnAgdG9wb2xvZ3kgbmVlZGVkIHRvIGNoYW5nZSB0aGVyZSB3b3Vs
+ZCBiZSBubyB3YXkgdG8gaW5mb3JtIHRoZSBWTXMgb2YgYW55IElPTU1VIGdyb3VwIGNoYW5nZS4g
+DQoNCkNoZWVycw0KDQpTdGVwaGVuDQogICAgDQoNCg==
