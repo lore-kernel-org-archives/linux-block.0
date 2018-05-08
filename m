@@ -1,85 +1,52 @@
-Return-Path: <alex.williamson@redhat.com>
-Date: Tue, 8 May 2018 16:32:06 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Logan Gunthorpe <logang@deltatee.com>
-Cc: Stephen Bates <sbates@raithlin.com>, Christian =?UTF-8?B?S8O2bmln?=
- <christian.koenig@amd.com>, Bjorn Helgaas <helgaas@kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Christoph
- Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Keith Busch
- <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>, Bjorn Helgaas
- <bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>, Max Gurtovoy
- <maxg@mellanox.com>, Dan Williams <dan.j.williams@intel.com>,
- =?UTF-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>, Benjamin
- Herrenschmidt <benh@kernel.crashing.org>
-Subject: Re: [PATCH v4 04/14] PCI/P2PDMA: Clear ACS P2P flags for all
- devices behind switches
-Message-ID: <20180508163206.7d3bf383@w520.home>
-In-Reply-To: <20905682-9440-7d4b-0260-99d3dc794c3d@deltatee.com>
+Return-Path: <sbates@raithlin.com>
+From: "Stephen  Bates" <sbates@raithlin.com>
+To: Logan Gunthorpe <logang@deltatee.com>, Alex Williamson
+	<alex.williamson@redhat.com>
+CC: =?utf-8?B?Q2hyaXN0aWFuIEvDtm5pZw==?= <christian.koenig@amd.com>, "Bjorn
+ Helgaas" <helgaas@kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-pci@vger.kernel.org"
+	<linux-pci@vger.kernel.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "linux-nvdimm@lists.01.org"
+	<linux-nvdimm@lists.01.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, Jens Axboe
+	<axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>, Sagi Grimberg
+	<sagi@grimberg.me>, Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe
+	<jgg@mellanox.com>, Max Gurtovoy <maxg@mellanox.com>, Dan Williams
+	<dan.j.williams@intel.com>, =?utf-8?B?SsOpcsO0bWUgR2xpc3Nl?=
+	<jglisse@redhat.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Subject: Re: [PATCH v4 04/14] PCI/P2PDMA: Clear ACS P2P flags for all devices
+ behind switches
+Date: Tue, 8 May 2018 22:25:06 +0000
+Message-ID: <C3CEE4DB-A001-4E4C-B9B9-4B160E4C5367@raithlin.com>
 References: <20180423233046.21476-1-logang@deltatee.com>
-	<20180423233046.21476-5-logang@deltatee.com>
-	<20180507231306.GG161390@bhelgaas-glaptop.roam.corp.google.com>
-	<e58e8d27-42a5-ca69-3b68-c409a2922cd1@amd.com>
-	<0b4183ef-e720-204b-9e85-b9eaf7a4136a@deltatee.com>
-	<a943a92d-15cd-fb2d-21c3-5e5cfccd9eff@amd.com>
-	<3584a6ac-95c7-5d23-1859-aee30605776e@deltatee.com>
-	<20180508133407.57a46902@w520.home>
-	<5fc9b1c1-9208-06cc-0ec5-1f54c2520494@deltatee.com>
-	<20180508141331.7cd737cb@w520.home>
-	<d70cf286-f7b7-99a5-1042-022506298fed@deltatee.com>
-	<20180508144341.0441b676@w520.home>
-	<a524127a-3557-3dff-971c-dfe94ba5a01c@deltatee.com>
-	<20180508152631.50fd583c@w520.home>
-	<354F7407-0DC7-470C-B9AA-74FDF9C46B08@raithlin.com>
-	<20180508160336.0935ddde@w520.home>
-	<20905682-9440-7d4b-0260-99d3dc794c3d@deltatee.com>
+ <20180423233046.21476-5-logang@deltatee.com>
+ <20180507231306.GG161390@bhelgaas-glaptop.roam.corp.google.com>
+ <e58e8d27-42a5-ca69-3b68-c409a2922cd1@amd.com>
+ <0b4183ef-e720-204b-9e85-b9eaf7a4136a@deltatee.com>
+ <a943a92d-15cd-fb2d-21c3-5e5cfccd9eff@amd.com>
+ <3584a6ac-95c7-5d23-1859-aee30605776e@deltatee.com>
+ <20180508133407.57a46902@w520.home>
+ <5fc9b1c1-9208-06cc-0ec5-1f54c2520494@deltatee.com>
+ <20180508141331.7cd737cb@w520.home>
+ <d70cf286-f7b7-99a5-1042-022506298fed@deltatee.com>
+ <20180508144341.0441b676@w520.home>
+ <a524127a-3557-3dff-971c-dfe94ba5a01c@deltatee.com>
+ <20180508152631.50fd583c@w520.home>
+ <354F7407-0DC7-470C-B9AA-74FDF9C46B08@raithlin.com>
+ <20180508160336.0935ddde@w520.home>
+ <20905682-9440-7d4b-0260-99d3dc794c3d@deltatee.com>
+In-Reply-To: <20905682-9440-7d4b-0260-99d3dc794c3d@deltatee.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, 8 May 2018 16:10:19 -0600
-Logan Gunthorpe <logang@deltatee.com> wrote:
-
-> On 08/05/18 04:03 PM, Alex Williamson wrote:
-> > If IOMMU grouping implies device assignment (because nobody else uses
-> > it to the same extent as device assignment) then the build-time option
-> > falls to pieces, we need a single kernel that can do both.  I think we
-> > need to get more clever about allowing the user to specify exactly at
-> > which points in the topology they want to disable isolation.  Thanks,  
-> 
-> 
-> Yeah, so based on the discussion I'm leaning toward just having a
-> command line option that takes a list of BDFs and disables ACS for them.
-> (Essentially as Dan has suggested.) This avoids the shotgun.
-> 
-> Then, the pci_p2pdma_distance command needs to check that ACS is
-> disabled for all bridges between the two devices. If this is not the
-> case, it returns -1. Future work can check if the EP has ATS support, in
-> which case it has to check for the ACS direct translated bit.
-> 
-> A user then needs to either disable the IOMMU and/or add the command
-> line option to disable ACS for the specific downstream ports in the PCI
-> hierarchy. This means the IOMMU groups will be less granular but
-> presumably the person adding the command line argument understands this.
-> 
-> We may also want to do some work so that there's informative dmesgs on
-> which BDFs need to be specified on the command line so it's not so
-> difficult for the user to figure out.
-
-I'd advise caution with a user supplied BDF approach, we have no
-guaranteed persistence for a device's PCI address.  Adding a device
-might renumber the buses, replacing a device with one that consumes
-more/less bus numbers can renumber the buses, motherboard firmware
-updates could renumber the buses, pci=assign-buses can renumber the
-buses, etc.  This is why the VT-d spec makes use of device paths when
-describing PCI hierarchies, firmware can't know what bus number will be
-assigned to a device, but it does know the base bus number and the path
-of devfns needed to get to it.  I don't know how we come up with an
-option that's easy enough for a user to understand, but reasonably
-robust against hardware changes.  Thanks,
-
-Alex
+PiAgICBZZWFoLCBzbyBiYXNlZCBvbiB0aGUgZGlzY3Vzc2lvbiBJJ20gbGVhbmluZyB0b3dhcmQg
+anVzdCBoYXZpbmcgYQ0KPiAgICBjb21tYW5kIGxpbmUgb3B0aW9uIHRoYXQgdGFrZXMgYSBsaXN0
+IG9mIEJERnMgYW5kIGRpc2FibGVzIEFDUyBmb3IgdGhlbS4NCj4gICAgKEVzc2VudGlhbGx5IGFz
+IERhbiBoYXMgc3VnZ2VzdGVkLikgVGhpcyBhdm9pZHMgdGhlIHNob3RndW4uDQoNCkkgY29uY3Vy
+IHRoYXQgdGhpcyBzZWVtcyB0byBiZSB3aGVyZSB0aGUgY29udmVyc2F0aW9uIGlzIHRha2luZyB1
+cy4NCg0KQEFsZXggLSBCZWZvcmUgd2UgZ28gZG8gdGhpcyBjYW4geW91IHByb3ZpZGUgaW5wdXQg
+b24gdGhlIGFwcHJvYWNoPyBJIGRvbid0IHdhbnQgdG8gcmUtc3BpbiBvbmx5IHRvIGZpbmQgd2Ug
+YXJlIHN0aWxsIG5vdCBjb252ZXJnaW5nIG9uIHRoZSBBQ1MgaXNzdWUuLi4uDQoNClRoYW5rcw0K
+DQpTdGVwaGVuDQogICAgDQoNCg==
