@@ -1,81 +1,88 @@
-Return-Path: <logang@deltatee.com>
-To: Dan Williams <dan.j.williams@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>
-Cc: Stephen Bates <sbates@raithlin.com>,
- =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
- Bjorn Helgaas <helgaas@kernel.org>,
+Return-Path: <alex.williamson@redhat.com>
+Date: Tue, 8 May 2018 17:11:50 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: "Stephen  Bates" <sbates@raithlin.com>
+Cc: Logan Gunthorpe <logang@deltatee.com>, Christian =?UTF-8?B?S8O2bmln?=
+ <christian.koenig@amd.com>, "Bjorn Helgaas" <helgaas@kernel.org>,
  "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
  "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
  "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
  "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
  "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
- Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
- Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>,
- Max Gurtovoy <maxg@mellanox.com>, =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?=
- <jglisse@redhat.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Christoph
+ Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Keith Busch
+ <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>, Bjorn Helgaas
+ <bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>, Max Gurtovoy
+ <maxg@mellanox.com>, Dan Williams <dan.j.williams@intel.com>,
+ =?UTF-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>, Benjamin
+ Herrenschmidt <benh@kernel.crashing.org>
+Subject: Re: [PATCH v4 04/14] PCI/P2PDMA: Clear ACS P2P flags for all
+ devices behind switches
+Message-ID: <20180508171150.0e8fd291@w520.home>
+In-Reply-To: <C3CEE4DB-A001-4E4C-B9B9-4B160E4C5367@raithlin.com>
 References: <20180423233046.21476-1-logang@deltatee.com>
- <20180423233046.21476-5-logang@deltatee.com>
- <20180507231306.GG161390@bhelgaas-glaptop.roam.corp.google.com>
- <e58e8d27-42a5-ca69-3b68-c409a2922cd1@amd.com>
- <0b4183ef-e720-204b-9e85-b9eaf7a4136a@deltatee.com>
- <a943a92d-15cd-fb2d-21c3-5e5cfccd9eff@amd.com>
- <3584a6ac-95c7-5d23-1859-aee30605776e@deltatee.com>
- <20180508133407.57a46902@w520.home>
- <5fc9b1c1-9208-06cc-0ec5-1f54c2520494@deltatee.com>
- <20180508141331.7cd737cb@w520.home>
- <d70cf286-f7b7-99a5-1042-022506298fed@deltatee.com>
- <20180508144341.0441b676@w520.home>
- <a524127a-3557-3dff-971c-dfe94ba5a01c@deltatee.com>
- <20180508152631.50fd583c@w520.home>
- <354F7407-0DC7-470C-B9AA-74FDF9C46B08@raithlin.com>
- <20180508160336.0935ddde@w520.home>
- <20905682-9440-7d4b-0260-99d3dc794c3d@deltatee.com>
- <20180508163206.7d3bf383@w520.home>
- <CAPcyv4i1ksiu1pExF=EE21P2Wz1a9LaDaG247oG_WSbYgcR93g@mail.gmail.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <2ce7908d-1422-55f8-aeba-94ccce2cb484@deltatee.com>
-Date: Tue, 8 May 2018 17:15:21 -0600
+	<20180423233046.21476-5-logang@deltatee.com>
+	<20180507231306.GG161390@bhelgaas-glaptop.roam.corp.google.com>
+	<e58e8d27-42a5-ca69-3b68-c409a2922cd1@amd.com>
+	<0b4183ef-e720-204b-9e85-b9eaf7a4136a@deltatee.com>
+	<a943a92d-15cd-fb2d-21c3-5e5cfccd9eff@amd.com>
+	<3584a6ac-95c7-5d23-1859-aee30605776e@deltatee.com>
+	<20180508133407.57a46902@w520.home>
+	<5fc9b1c1-9208-06cc-0ec5-1f54c2520494@deltatee.com>
+	<20180508141331.7cd737cb@w520.home>
+	<d70cf286-f7b7-99a5-1042-022506298fed@deltatee.com>
+	<20180508144341.0441b676@w520.home>
+	<a524127a-3557-3dff-971c-dfe94ba5a01c@deltatee.com>
+	<20180508152631.50fd583c@w520.home>
+	<354F7407-0DC7-470C-B9AA-74FDF9C46B08@raithlin.com>
+	<20180508160336.0935ddde@w520.home>
+	<20905682-9440-7d4b-0260-99d3dc794c3d@deltatee.com>
+	<C3CEE4DB-A001-4E4C-B9B9-4B160E4C5367@raithlin.com>
 MIME-Version: 1.0
-In-Reply-To: <CAPcyv4i1ksiu1pExF=EE21P2Wz1a9LaDaG247oG_WSbYgcR93g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Subject: Re: [PATCH v4 04/14] PCI/P2PDMA: Clear ACS P2P flags for all devices
- behind switches
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
+On Tue, 8 May 2018 22:25:06 +0000
+"Stephen  Bates" <sbates@raithlin.com> wrote:
 
-
-On 08/05/18 05:00 PM, Dan Williams wrote:
->> I'd advise caution with a user supplied BDF approach, we have no
->> guaranteed persistence for a device's PCI address.  Adding a device
->> might renumber the buses, replacing a device with one that consumes
->> more/less bus numbers can renumber the buses, motherboard firmware
->> updates could renumber the buses, pci=assign-buses can renumber the
->> buses, etc.  This is why the VT-d spec makes use of device paths when
->> describing PCI hierarchies, firmware can't know what bus number will be
->> assigned to a device, but it does know the base bus number and the path
->> of devfns needed to get to it.  I don't know how we come up with an
->> option that's easy enough for a user to understand, but reasonably
->> robust against hardware changes.  Thanks,
+> >    Yeah, so based on the discussion I'm leaning toward just having a
+> >    command line option that takes a list of BDFs and disables ACS
+> > for them. (Essentially as Dan has suggested.) This avoids the
+> > shotgun.  
 > 
-> True, but at the same time this feature is for "users with custom
-> hardware designed for purpose", I assume they would be willing to take
-> on the bus renumbering risk. It's already the case that
-> /sys/bus/pci/drivers/<x>/bind takes BDF, which is why it seemed to
-> make a similar interface for the command line. Ideally we could later
-> get something into ACPI or other platform firmware to arrange for
-> bridges to disable ACS by default if we see p2p becoming a
-> common-off-the-shelf feature. I.e. a BIOS switch to enable p2p in a
-> given PCI-E sub-domain.
+> I concur that this seems to be where the conversation is taking us.
+> 
+> @Alex - Before we go do this can you provide input on the approach? I
+> don't want to re-spin only to find we are still not converging on the
+> ACS issue....
 
-Yeah, I'm having a hard time coming up with an easy enough solution for
-the user. I agree with Dan though, the bus renumbering risk would be
-fairly low in the custom hardware seeing the switches are likely going
-to be directly soldered to the same board with the CPU.
+I can envision numerous implementation details that makes this less
+trivial than it sounds, but it seems like the thing we need to decide
+first is if intentionally leaving windows between devices with the
+intention of exploiting them for direct P2P DMA in an otherwise IOMMU
+managed address space is something we want to do.  From a security
+perspective, we already handle this with IOMMU groups because many
+devices do not support ACS, the new thing is embracing this rather than
+working around it.  It makes me a little twitchy, but so long as the
+IOMMU groups match the expected worst case routing between devices,
+it's really no different than if we could wipe the ACS capability from
+the device.
 
-That being said, I supposed we could allow the command line to take both
-a BDF or a BaseBus/DF/DF/DF path. Though, implementing this sounds like
-a bit of a challenge.
+On to the implementation details... I already mentioned the BDF issue
+in my other reply.  If we had a way to persistently identify a device,
+would we specify the downstream points at which we want to disable ACS
+or the endpoints that we want to connect?  The latter has a problem
+that the grouping upstream of an endpoint is already set by the time we
+discover the endpoint, so we might need to unwind to get the grouping
+correct.  The former might be more difficult for users to find the
+necessary nodes, but easier for the kernel to deal with during
+discovery.  A runtime, sysfs approach has some benefits here,
+especially in identifying the device assuming we're ok with leaving
+the persistence problem to userspace tools.  I'm still a little fond of
+the idea of exposing an acs_flags attribute for devices in sysfs where
+a write would do a soft unplug and re-add of all affected devices to
+automatically recreate the proper grouping.  Any dynamic change in
+routing and grouping would require all DMA be re-established anyway and
+a soft hotplug seems like an elegant way of handling it.  Thanks,
 
-Logan
+Alex
