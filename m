@@ -1,44 +1,57 @@
-Return-Path: <jianchao.w.wang@oracle.com>
+Return-Path: <keith.busch@linux.intel.com>
+Date: Tue, 8 May 2018 09:09:33 -0600
+From: Keith Busch <keith.busch@linux.intel.com>
+To: Laurence Oberman <loberman@redhat.com>
+Cc: Ming Lei <ming.lei@redhat.com>, Keith Busch <keith.busch@intel.com>,
+	Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>
 Subject: Re: [PATCH V4 0/7] nvme: pci: fix & improve timeout handling
-To: Ming Lei <ming.lei@redhat.com>, Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, Laurence Oberman <loberman@redhat.com>
+Message-ID: <20180508150933.GA30736@localhost.localdomain>
 References: <20180505135905.18815-1-ming.lei@redhat.com>
-From: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <b913ff71-23b3-69e7-b9cc-3c48cb5d9d36@oracle.com>
-Date: Wed, 9 May 2018 13:46:09 +0800
+ <1525561893.3082.1.camel@redhat.com>
+ <1525563110.4007.1.camel@redhat.com>
+ <1525564282.4007.3.camel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180505135905.18815-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1525564282.4007.3.camel@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi ming
+On Sat, May 05, 2018 at 07:51:22PM -0400, Laurence Oberman wrote:
+> 3rd and 4th attempts slightly better, but clearly not dependable
+> 
+> [root@segstorage1 blktests]# ./check block/011
+> block/011 => nvme0n1 (disable PCI device while doing I/O)����[failed]
+> ����runtime����...��81.188s
+> ����--- tests/block/011.out	2018-05-05 18:01:14.268414752 -0400
+> ����+++ results/nvme0n1/block/011.out.bad	2018-05-05
+> 19:44:48.848568687 -0400
+> ����@@ -1,2 +1,3 @@
+> �����Running block/011
+> ����+tests/block/011: line 47: echo: write error: Input/output error
+> �����Test complete
+> 
+> This one passed 
+> [root@segstorage1 blktests]# ./check block/011
+> block/011 => nvme0n1 (disable PCI device while doing I/O)����[passed]
+> ����runtime��81.188s��...��43.400s
+> 
+> I will capture a vmcore next time it panics and give some information
+> after analyzing the core
 
-I did some tests on my local.
+We definitely should never panic, but I am not sure this blktest can be
+reliable on IO errors: the test is disabling memory space enabling and
+bus master without the driver's knowledge, and it does this repeatedly
+in a tight loop. If the test happens to disable the device while the
+driver is trying to recover from the previous iteration, the recovery
+will surely fail, so I think IO errors may possibly be expected.
 
-[  598.828578] nvme nvme0: I/O 51 QID 4 timeout, disable controller
+As far as I can tell, the only way you'll actually get it to succeed is
+if the test's subsequent "enable" happen's to hit in conjuction with the
+driver's reset pci_enable_device_mem(), such that the pci_dev's enable_cnt
+is > 1, which prevents the disabling for the remainder of the test's
+looping.
 
-This should be a timeout on nvme_reset_dev->nvme_wait_freeze.
-
-[  598.828743] nvme nvme0: EH 1: before shutdown
-[  599.013586] nvme nvme0: EH 1: after shutdown
-[  599.137197] nvme nvme0: EH 1: after recovery
-
-The EH 1 have mark the state to LIVE
-
-[  599.137241] nvme nvme0: failed to mark controller state 1
-
-So the EH 0 failed to mark state to LIVE
-The card was removed.
-This should not be expected by nested EH.
-
-[  599.137322] nvme nvme0: Removing after probe failure status: 0
-[  599.326539] nvme nvme0: EH 0: after recovery
-[  599.326760] nvme0n1: detected capacity change from 128035676160 to 0
-[  599.457208] nvme nvme0: failed to set APST feature (-19)
-
-nvme_reset_dev should identify whether it is nested.
-
-Thanks
-Jianchao
+I still think this is a very good test, but we might be able to make it
+more deterministic on what actually happens to the pci device.
