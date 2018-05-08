@@ -1,47 +1,30 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 13/33] xfs: use iomap for blocksize == PAGE_SIZE readpage and readpages
-Date: Wed,  9 May 2018 09:48:10 +0200
-Message-Id: <20180509074830.16196-14-hch@lst.de>
-In-Reply-To: <20180509074830.16196-1-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Tue, 8 May 2018 13:46:36 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
+	dchinner@redhat.com, hch@lst.de
+Subject: Re: [PATCH 3/4] blk-wbt: pass in enum wbt_flags to get_rq_wait()
+Message-ID: <20180508204636.GD27324@vader>
+References: <1525709615-14395-1-git-send-email-axboe@kernel.dk>
+ <1525709615-14395-4-git-send-email-axboe@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1525709615-14395-4-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-For file systems with a block size that equals the page size we never do
-partial reads, so we can use the buffer_head-less iomap versions of
-readpage and readpages without conflicting with the buffer_head structures
-create later in write_begin.
+On Mon, May 07, 2018 at 10:13:34AM -0600, Jens Axboe wrote:
+> This is in preparation for having more write queues, in which
+> case we would have needed to pass in more information than just
+> a simple 'is_kswapd' boolean.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/xfs_aops.c | 4 ++++
- 1 file changed, 4 insertions(+)
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 8b06be0a80da..8e4d01e76fc8 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -1402,6 +1402,8 @@ xfs_vm_readpage(
- 	struct page		*page)
- {
- 	trace_xfs_vm_readpage(page->mapping->host, 1);
-+	if (i_blocksize(page->mapping->host) == PAGE_SIZE)
-+		return iomap_readpage(page, &xfs_iomap_ops);
- 	return mpage_readpage(page, xfs_get_blocks);
- }
- 
-@@ -1413,6 +1415,8 @@ xfs_vm_readpages(
- 	unsigned		nr_pages)
- {
- 	trace_xfs_vm_readpages(mapping->host, nr_pages);
-+	if (i_blocksize(mapping->host) == PAGE_SIZE)
-+		return iomap_readpages(mapping, pages, nr_pages, &xfs_iomap_ops);
- 	return mpage_readpages(mapping, pages, nr_pages, xfs_get_blocks);
- }
- 
--- 
-2.17.0
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  block/blk-wbt.c | 25 +++++++++++++++----------
+>  block/blk-wbt.h |  4 +++-
+>  2 files changed, 18 insertions(+), 11 deletions(-)
