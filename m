@@ -1,74 +1,95 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:36334 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751395AbeEPMjc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 May 2018 08:39:32 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        stable@vger.kernel.org, Kent Overstreet <kent.overstreet@gmail.com>
-Subject: [PATCH] bcache: return 0 from bch_debug_init() if CONFIG_DEBUG_FS=n
-Date: Wed, 16 May 2018 20:39:19 +0800
-Message-Id: <20180516123919.2159-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <owner-linux-aio@kvack.org>
+From: adam.manzanares@wdc.com
+To: viro@zeniv.linux.org.uk,
+	bcrl@kvack.org
+Cc: linux-fsdevel@vger.kernel.org,
+	linux-aio@kvack.org,
+	linux-api@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Adam Manzanares <adam.manzanares@wdc.com>
+Subject: [PATCH v3 1/3] block: add ioprio_check_cap function
+Date: Tue,  8 May 2018 10:42:00 -0700
+Message-Id: <20180508174202.2537-2-adam.manzanares@wdc.com>
+In-Reply-To: <20180508174202.2537-1-adam.manzanares@wdc.com>
+References: <20180508174202.2537-1-adam.manzanares@wdc.com>
+Sender: owner-linux-aio@kvack.org
+List-ID: <linux-block@vger.kernel.org>
 
-Commit 539d39eb2708 ("bcache: fix wrong return value in bch_debug_init()")
-returns the return value of debugfs_create_dir() to bcache_init(). When
-CONFIG_DEBUG_FS=n, bch_debug_init() always returns 1 and makes
-bcache_init() failedi.
+From: Adam Manzanares <adam.manzanares@wdc.com>
 
-This patch makes bch_debug_init() always returns 0 if CONFIG_DEBUG_FS=n,
-so bcache can continue to work for the kernels which don't have debugfs
-enanbled.
+Aio per command iopriority support introduces a second interface between
+userland and the kernel capable of passing iopriority. The aio interface also
+needs the ability to verify that the submitting context has sufficient
+priviledges to submit IOPRIO_RT commands. This patch creates the
+ioprio_check_cap function to be used by the ioprio_set system call and also by
+the aio interface.
 
-Fixes: Commit 539d39eb2708 ("bcache: fix wrong return value in bch_debug_init()")
-Cc: stable@vger.kernel.org
-Signed-off-by: Coly Li <colyli@suse.de>
-Reported-by: Massimo B. <massimo.b@gmx.net>
-Reported-by: Kai Krakow <kai@kaishome.de>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
 ---
- drivers/md/bcache/bcache.h | 5 +++++
- drivers/md/bcache/debug.c  | 4 ++--
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ block/ioprio.c         | 22 ++++++++++++++++------
+ include/linux/ioprio.h |  2 ++
+ 2 files changed, 18 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 3a0cfb237af9..5b3fe87f32ee 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -994,8 +994,13 @@ void bch_open_buckets_free(struct cache_set *);
- 
- int bch_cache_allocator_start(struct cache *ca);
- 
-+#ifdef CONFIG_DEBUG_FS
- void bch_debug_exit(void);
- int bch_debug_init(struct kobject *);
-+#else
-+static inline void bch_debug_exit(void) {};
-+static inline int bch_debug_init(struct kobject *kobj) { return 0; };
-+#endif
- void bch_request_exit(void);
- int bch_request_init(void);
- 
-diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
-index 4e63c6f6c04d..34a0ed4ed70c 100644
---- a/drivers/md/bcache/debug.c
-+++ b/drivers/md/bcache/debug.c
-@@ -240,8 +240,6 @@ void bch_debug_init_cache_set(struct cache_set *c)
- 	}
+diff --git a/block/ioprio.c b/block/ioprio.c
+index 6f5d0b6625e3..f9821080c92c 100644
+--- a/block/ioprio.c
++++ b/block/ioprio.c
+@@ -61,15 +61,10 @@ int set_task_ioprio(struct task_struct *task, int ioprio)
  }
+ EXPORT_SYMBOL_GPL(set_task_ioprio);
  
--#endif
--
- void bch_debug_exit(void)
+-SYSCALL_DEFINE3(ioprio_set, int, which, int, who, int, ioprio)
++int ioprio_check_cap(int ioprio)
  {
- 	if (!IS_ERR_OR_NULL(bcache_debug))
-@@ -254,3 +252,5 @@ int __init bch_debug_init(struct kobject *kobj)
+ 	int class = IOPRIO_PRIO_CLASS(ioprio);
+ 	int data = IOPRIO_PRIO_DATA(ioprio);
+-	struct task_struct *p, *g;
+-	struct user_struct *user;
+-	struct pid *pgrp;
+-	kuid_t uid;
+-	int ret;
  
- 	return IS_ERR_OR_NULL(bcache_debug);
- }
+ 	switch (class) {
+ 		case IOPRIO_CLASS_RT:
+@@ -92,6 +87,21 @@ SYSCALL_DEFINE3(ioprio_set, int, which, int, who, int, ioprio)
+ 			return -EINVAL;
+ 	}
+ 
++	return 0;
++}
 +
-+#endif
++SYSCALL_DEFINE3(ioprio_set, int, which, int, who, int, ioprio)
++{
++	struct task_struct *p, *g;
++	struct user_struct *user;
++	struct pid *pgrp;
++	kuid_t uid;
++	int ret;
++
++	ret = ioprio_check_cap(ioprio);
++	if (ret)
++		return ret;
++
+ 	ret = -ESRCH;
+ 	rcu_read_lock();
+ 	switch (which) {
+diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
+index 627efac73e6d..4a28cec49ec3 100644
+--- a/include/linux/ioprio.h
++++ b/include/linux/ioprio.h
+@@ -77,4 +77,6 @@ extern int ioprio_best(unsigned short aprio, unsigned short bprio);
+ 
+ extern int set_task_ioprio(struct task_struct *task, int ioprio);
+ 
++extern int ioprio_check_cap(int ioprio);
++
+ #endif
 -- 
-2.16.3
+2.15.1
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-aio' in
+the body to majordomo@kvack.org.  For more info on Linux AIO,
+see: http://www.kvack.org/aio/
+Don't email: <a href=mailto:"aart@kvack.org">aart@kvack.org</a>
