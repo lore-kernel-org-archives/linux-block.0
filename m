@@ -1,123 +1,61 @@
-Return-Path: <udknight@gmail.com>
-Return-Path: <udknight@gmail.com>
-Date: Sun, 6 May 2018 12:52:16 +0800
-From: Wang YanQing <udknight@gmail.com>
-To: axboe@kernel.dk
-Cc: gregkh@linuxfoundation.org, pombredanne@nexb.com, tglx@linutronix.de,
-        caizhiyong@hisilicon.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2] block: add verifier for cmdline partition
-Message-ID: <20180506045215.GA9738@udknight>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 29/33] xfs: do not set the page uptodate in xfs_writepage_map
+Date: Wed,  9 May 2018 09:48:26 +0200
+Message-Id: <20180509074830.16196-30-hch@lst.de>
+In-Reply-To: <20180509074830.16196-1-hch@lst.de>
+References: <20180509074830.16196-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-I meet strange filesystem corruption issue recently, the reason
-is there are overlaps partitions in cmdline partition argument.
+We already track the page uptodate status based on the buffer uptodate
+status, which is updated whenever reading or zeroing blocks.
 
-This patch add verifier for cmdline partition, then if there are
-overlaps partitions, cmdline_partition will log a warning. We don't
-treat overlaps partition as a error:
-"
-Caizhiyong <caizhiyong@hisilicon.com> said:
-Partition overlap was intentionally designed in this cmdline partition.
-reference http://lists.infradead.org/pipermail/linux-mtd/2013-August/048092.html
-"
+This code has been there since commit a ptool commit in 2002, which
+claims to:
 
-Signed-off-by: Wang YanQing <udknight@gmail.com>
+    "merge" the 2.4 fsx fix for block size < page size to 2.5.  This needed
+    major changes to actually fit.
+
+and isn't present in other writepage implementations.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- Changes
- v1-v2:
- 1:Don't treat overlaps partition as a error, but log a warning.
+ fs/xfs/xfs_aops.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
- block/partitions/cmdline.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 68 insertions(+)
-
-diff --git a/block/partitions/cmdline.c b/block/partitions/cmdline.c
-index e333583..7d70046 100644
---- a/block/partitions/cmdline.c
-+++ b/block/partitions/cmdline.c
-@@ -58,6 +58,73 @@ static int __init cmdline_parts_setup(char *s)
- }
- __setup("blkdevparts=", cmdline_parts_setup);
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index dc82d4e71a64..dc92f23b0ea4 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -812,7 +812,6 @@ xfs_writepage_map(
+ 	ssize_t			len = i_blocksize(inode);
+ 	int			error = 0;
+ 	int			count = 0;
+-	bool			uptodate = true;
+ 	loff_t			file_offset;	/* file offset of page */
+ 	unsigned		poffset;	/* offset into page */
  
-+static bool has_overlaps(sector_t from, sector_t size,
-+			 sector_t from2, sector_t size2)
-+{
-+	sector_t end = from + size;
-+	sector_t end2 = from2 + size2;
-+
-+	if (from >= from2 && from < end2)
-+		return true;
-+
-+	if (end > from2 && end <= end2)
-+		return true;
-+
-+	if (from2 >= from && from2 < end)
-+		return true;
-+
-+	if (end2 > from && end2 <= end)
-+		return true;
-+
-+	return false;
-+}
-+
-+static inline void overlaps_warns_header(void)
-+{
-+	pr_warn("\n");
-+	pr_warn("Overlaps partitions being used in command line partition.\n");
-+	pr_warn("Don't use filesystems on overlaps partitions:\n");
-+}
-+
-+static inline void overlaps_warns_tailer(void)
-+{
-+	pr_warn("\n");
-+}
-+
-+static void cmdline_parts_verifier(int slot, struct parsed_partitions *state)
-+{
-+	int i, j = slot;
-+	bool header = true;
-+
-+	for (; state->parts[slot].has_info; slot++) {
-+		for (i = j; state->parts[i].has_info; i++) {
-+			if (i == slot)
-+				continue;
-+
-+			if (has_overlaps(state->parts[slot].from,
-+					 state->parts[slot].size,
-+					 state->parts[i].from,
-+					 state->parts[i].size)) {
-+				if (header) {
-+					header = false;
-+					overlaps_warns_header();
-+				}
-+				pr_warn("%s[%llu,%llu] overlaps with "
-+					"%s[%llu,%llu].\n",
-+					state->parts[slot].info.volname,
-+					(u64)state->parts[slot].from << 9,
-+					(u64)state->parts[slot].size << 9,
-+					state->parts[i].info.volname,
-+					(u64)state->parts[i].from << 9,
-+					(u64)state->parts[i].size << 9);
-+			}
-+		}
-+	}
-+
-+	if (!header)
-+		overlaps_warns_tailer();
-+}
-+
- /*
-  * Purpose: allocate cmdline partitions.
-  * Returns:
-@@ -93,6 +160,7 @@ int cmdline_partition(struct parsed_partitions *state)
- 	disk_size = get_capacity(state->bdev->bd_disk) << 9;
+@@ -840,7 +839,6 @@ xfs_writepage_map(
+ 		if (bh && !buffer_uptodate(bh)) {
+ 			if (PageUptodate(page))
+ 				ASSERT(buffer_mapped(bh));
+-			uptodate = false;
+ 			bh = bh->b_this_page;
+ 			continue;
+ 		}
+@@ -880,9 +878,6 @@ xfs_writepage_map(
+ 		count++;
+ 	}
  
- 	cmdline_parts_set(parts, disk_size, 1, add_part, (void *)state);
-+	cmdline_parts_verifier(1, (void *)state);
+-	if (uptodate && poffset == PAGE_SIZE)
+-		SetPageUptodate(page);
+-
+ 	ASSERT(wpc->ioend || list_empty(&submit_list));
  
- 	strlcat(state->pp_buf, "\n", PAGE_SIZE);
- 
+ out:
 -- 
-1.8.5.6.2.g3d8a54e.dirty
+2.17.0
