@@ -1,28 +1,131 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:51180 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:51606 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S964933AbeEIPP5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 11:15:57 -0400
-Date: Wed, 9 May 2018 08:15:56 -0700
-From: Matthew Wilcox <willy@infradead.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH 02/33] fs: factor out a __generic_write_end helper
-Message-ID: <20180509151556.GB1313@bombadil.infradead.org>
+        with ESMTP id S933383AbeEIHsp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 03:48:45 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 02/33] fs: factor out a __generic_write_end helper
+Date: Wed,  9 May 2018 09:47:59 +0200
+Message-Id: <20180509074830.16196-3-hch@lst.de>
+In-Reply-To: <20180509074830.16196-1-hch@lst.de>
 References: <20180509074830.16196-1-hch@lst.de>
- <20180509074830.16196-3-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180509074830.16196-3-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, May 09, 2018 at 09:47:59AM +0200, Christoph Hellwig wrote:
->  }
->  EXPORT_SYMBOL(generic_write_end);
->  
-> +
->  /*
+Bits of the buffer.c based write_end implementations that don't know
+about buffer_heads and can be reused by other implementations.
 
-Spurious?
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/buffer.c   | 68 +++++++++++++++++++++++++++------------------------
+ fs/internal.h |  2 ++
+ 2 files changed, 38 insertions(+), 32 deletions(-)
+
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 249b83fafe48..923391702f51 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -2076,6 +2076,40 @@ int block_write_begin(struct address_space *mapping, loff_t pos, unsigned len,
+ }
+ EXPORT_SYMBOL(block_write_begin);
+ 
++int __generic_write_end(struct inode *inode, loff_t pos, unsigned copied,
++		struct page *page)
++{
++	loff_t old_size = inode->i_size;
++	bool i_size_changed = false;
++
++	/*
++	 * No need to use i_size_read() here, the i_size cannot change under us
++	 * because we hold i_rwsem.
++	 *
++	 * But it's important to update i_size while still holding page lock:
++	 * page writeout could otherwise come in and zero beyond i_size.
++	 */
++	if (pos + copied > inode->i_size) {
++		i_size_write(inode, pos + copied);
++		i_size_changed = true;
++	}
++
++	unlock_page(page);
++	put_page(page);
++
++	if (old_size < pos)
++		pagecache_isize_extended(inode, old_size, pos);
++	/*
++	 * Don't mark the inode dirty under page lock. First, it unnecessarily
++	 * makes the holding time of page lock longer. Second, it forces lock
++	 * ordering of page lock and transaction start for journaling
++	 * filesystems.
++	 */
++	if (i_size_changed)
++		mark_inode_dirty(inode);
++	return copied;
++}
++
+ int block_write_end(struct file *file, struct address_space *mapping,
+ 			loff_t pos, unsigned len, unsigned copied,
+ 			struct page *page, void *fsdata)
+@@ -2116,42 +2150,12 @@ int generic_write_end(struct file *file, struct address_space *mapping,
+ 			loff_t pos, unsigned len, unsigned copied,
+ 			struct page *page, void *fsdata)
+ {
+-	struct inode *inode = mapping->host;
+-	loff_t old_size = inode->i_size;
+-	int i_size_changed = 0;
+-
+ 	copied = block_write_end(file, mapping, pos, len, copied, page, fsdata);
+-
+-	/*
+-	 * No need to use i_size_read() here, the i_size
+-	 * cannot change under us because we hold i_mutex.
+-	 *
+-	 * But it's important to update i_size while still holding page lock:
+-	 * page writeout could otherwise come in and zero beyond i_size.
+-	 */
+-	if (pos+copied > inode->i_size) {
+-		i_size_write(inode, pos+copied);
+-		i_size_changed = 1;
+-	}
+-
+-	unlock_page(page);
+-	put_page(page);
+-
+-	if (old_size < pos)
+-		pagecache_isize_extended(inode, old_size, pos);
+-	/*
+-	 * Don't mark the inode dirty under page lock. First, it unnecessarily
+-	 * makes the holding time of page lock longer. Second, it forces lock
+-	 * ordering of page lock and transaction start for journaling
+-	 * filesystems.
+-	 */
+-	if (i_size_changed)
+-		mark_inode_dirty(inode);
+-
+-	return copied;
++	return __generic_write_end(mapping->host, pos, copied, page);
+ }
+ EXPORT_SYMBOL(generic_write_end);
+ 
++
+ /*
+  * block_is_partially_uptodate checks whether buffers within a page are
+  * uptodate or not.
+diff --git a/fs/internal.h b/fs/internal.h
+index e08972db0303..b955232d3d49 100644
+--- a/fs/internal.h
++++ b/fs/internal.h
+@@ -43,6 +43,8 @@ static inline int __sync_blockdev(struct block_device *bdev, int wait)
+ extern void guard_bio_eod(int rw, struct bio *bio);
+ extern int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
+ 		get_block_t *get_block, struct iomap *iomap);
++int __generic_write_end(struct inode *inode, loff_t pos, unsigned copied,
++		struct page *page);
+ 
+ /*
+  * char_dev.c
+-- 
+2.17.0
