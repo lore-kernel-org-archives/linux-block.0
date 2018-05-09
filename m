@@ -1,77 +1,135 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ipmail07.adl2.internode.on.net ([150.101.137.131]:57320 "EHLO
-        ipmail07.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750785AbeEBCpn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 1 May 2018 22:45:43 -0400
-Date: Wed, 2 May 2018 12:45:40 +1000
-From: Dave Chinner <david@fromorbit.com>
-To: Jan Kara <jack@suse.cz>
-Cc: linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, hch@lst.de, rdorr@microsoft.com
-Subject: Re: [PATCH 2/4] iomap: iomap_dio_rw() handles all sync writes
-Message-ID: <20180502024540.GA23861@dastard>
-References: <20180418040828.18165-1-david@fromorbit.com>
- <20180418040828.18165-3-david@fromorbit.com>
- <20180421130309.efivmjo5ald2jchv@quack2.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180421130309.efivmjo5ald2jchv@quack2.suse.cz>
+Received: from bombadil.infradead.org ([198.137.202.133]:51970 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933832AbeEIHtX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 03:49:23 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 14/33] xfs: simplify xfs_bmap_punch_delalloc_range
+Date: Wed,  9 May 2018 09:48:11 +0200
+Message-Id: <20180509074830.16196-15-hch@lst.de>
+In-Reply-To: <20180509074830.16196-1-hch@lst.de>
+References: <20180509074830.16196-1-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Sat, Apr 21, 2018 at 03:03:09PM +0200, Jan Kara wrote:
-> On Wed 18-04-18 14:08:26, Dave Chinner wrote:
-> > From: Dave Chinner <dchinner@redhat.com>
-> > 
-> > Currently iomap_dio_rw() only handles (data)sync write completions
-> > for AIO. This means we can't optimised non-AIO IO to minimise device
-> > flushes as we can't tell the caller whether a flush is required or
-> > not.
-> > 
-> > To solve this problem and enable further optimisations, make
-> > iomap_dio_rw responsible for data sync behaviour for all IO, not
-> > just AIO.
-> > 
-> > In doing so, the sync operation is now accounted as part of the DIO
-> > IO by inode_dio_end(), hence post-IO data stability updates will no
-> > long race against operations that serialise via inode_dio_wait()
-> > such as truncate or hole punch.
-> > 
-> > Signed-Off-By: Dave Chinner <dchinner@redhat.com>
-> > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> 
-> Looks good to me. You can add:
-> 
-> Reviewed-by: Jan Kara <jack@suse.cz>
+Instead of using xfs_bmapi_read to find delalloc extents and then punch
+them out using xfs_bunmapi, opencode the loop to iterate over the extents
+and call xfs_bmap_del_extent_delay directly.  This both simplifies the
+code and reduces the number of extent tree lookups required.
 
-It looks good, but it's broken in a subtle, nasty way. :/
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/xfs/xfs_bmap_util.c | 78 ++++++++++++++----------------------------
+ 1 file changed, 25 insertions(+), 53 deletions(-)
 
-> > @@ -768,14 +776,8 @@ static ssize_t iomap_dio_complete(struct iomap_dio *dio)
-> >  static void iomap_dio_complete_work(struct work_struct *work)
-> >  {
-> >  	struct iomap_dio *dio = container_of(work, struct iomap_dio, aio.work);
-> > -	struct kiocb *iocb = dio->iocb;
-> > -	bool is_write = (dio->flags & IOMAP_DIO_WRITE);
-> > -	ssize_t ret;
-> >  
-> > -	ret = iomap_dio_complete(dio);
-> > -	if (is_write && ret > 0)
-> > -		ret = generic_write_sync(iocb, ret);
-> > -	iocb->ki_complete(iocb, ret, 0);
-> > +	dio->iocb->ki_complete(dio->iocb, iomap_dio_complete(dio), 0);
-
-This generates a use after free from KASAN from generic/016. it
-appears the compiler orders the code so that it dereferences
-dio->iocb after iomap_dio_complete() has freed the dio structure
-(yay!).
-
-I'll post a new version of the patchset now that I've got changes to
-2 of the 3 remaining patches in it....
-
-Cheers,
-
-Dave.
+diff --git a/fs/xfs/xfs_bmap_util.c b/fs/xfs/xfs_bmap_util.c
+index 8cd8c412f52d..7d2ba4cc8fba 100644
+--- a/fs/xfs/xfs_bmap_util.c
++++ b/fs/xfs/xfs_bmap_util.c
+@@ -695,12 +695,10 @@ xfs_getbmap(
+ }
+ 
+ /*
+- * dead simple method of punching delalyed allocation blocks from a range in
+- * the inode. Walks a block at a time so will be slow, but is only executed in
+- * rare error cases so the overhead is not critical. This will always punch out
+- * both the start and end blocks, even if the ranges only partially overlap
+- * them, so it is up to the caller to ensure that partial blocks are not
+- * passed in.
++ * Dead simple method of punching delalyed allocation blocks from a range in
++ * the inode.  This will always punch out both the start and end blocks, even
++ * if the ranges only partially overlap them, so it is up to the caller to
++ * ensure that partial blocks are not passed in.
+  */
+ int
+ xfs_bmap_punch_delalloc_range(
+@@ -708,63 +706,37 @@ xfs_bmap_punch_delalloc_range(
+ 	xfs_fileoff_t		start_fsb,
+ 	xfs_fileoff_t		length)
+ {
+-	xfs_fileoff_t		remaining = length;
++	struct xfs_ifork	*ifp = &ip->i_df;
++	struct xfs_bmbt_irec	got, del;
++	struct xfs_iext_cursor	icur;
+ 	int			error = 0;
+ 
+ 	ASSERT(xfs_isilocked(ip, XFS_ILOCK_EXCL));
+ 
+-	do {
+-		int		done;
+-		xfs_bmbt_irec_t	imap;
+-		int		nimaps = 1;
+-		xfs_fsblock_t	firstblock;
+-		struct xfs_defer_ops dfops;
++	if (!(ifp->if_flags & XFS_IFEXTENTS)) {
++		error = xfs_iread_extents(NULL, ip, XFS_DATA_FORK);
++		if (error)
++			return error;
++	}
+ 
+-		/*
+-		 * Map the range first and check that it is a delalloc extent
+-		 * before trying to unmap the range. Otherwise we will be
+-		 * trying to remove a real extent (which requires a
+-		 * transaction) or a hole, which is probably a bad idea...
+-		 */
+-		error = xfs_bmapi_read(ip, start_fsb, 1, &imap, &nimaps,
+-				       XFS_BMAPI_ENTIRE);
++	if (!xfs_iext_lookup_extent(ip, ifp, start_fsb, &icur, &got))
++		return 0;
+ 
+-		if (error) {
+-			/* something screwed, just bail */
+-			if (!XFS_FORCED_SHUTDOWN(ip->i_mount)) {
+-				xfs_alert(ip->i_mount,
+-			"Failed delalloc mapping lookup ino %lld fsb %lld.",
+-						ip->i_ino, start_fsb);
+-			}
++	do {
++		if (got.br_startoff >= start_fsb + length)
+ 			break;
+-		}
+-		if (!nimaps) {
+-			/* nothing there */
+-			goto next_block;
+-		}
+-		if (imap.br_startblock != DELAYSTARTBLOCK) {
+-			/* been converted, ignore */
+-			goto next_block;
+-		}
+-		WARN_ON(imap.br_blockcount == 0);
++		if (!isnullstartblock(got.br_startblock))
++			continue;
+ 
+-		/*
+-		 * Note: while we initialise the firstblock/dfops pair, they
+-		 * should never be used because blocks should never be
+-		 * allocated or freed for a delalloc extent and hence we need
+-		 * don't cancel or finish them after the xfs_bunmapi() call.
+-		 */
+-		xfs_defer_init(&dfops, &firstblock);
+-		error = xfs_bunmapi(NULL, ip, start_fsb, 1, 0, 1, &firstblock,
+-					&dfops, &done);
++		del = got;
++		xfs_trim_extent(&del, start_fsb, length);
++		error = xfs_bmap_del_extent_delay(ip, XFS_DATA_FORK, &icur,
++				&got, &del);
+ 		if (error)
+ 			break;
+-
+-		ASSERT(!xfs_defer_has_unfinished_work(&dfops));
+-next_block:
+-		start_fsb++;
+-		remaining--;
+-	} while(remaining > 0);
++		if (!xfs_iext_get_extent(ifp, &icur, &got))
++			break;
++	} while (xfs_iext_next_extent(ifp, &icur, &got));
+ 
+ 	return error;
+ }
 -- 
-Dave Chinner
-david@fromorbit.com
+2.17.0
