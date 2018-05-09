@@ -1,66 +1,173 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V3 3/8] nvme: pci: only wait freezing if queue is frozen
-Date: Thu,  3 May 2018 11:17:11 +0800
-Message-Id: <20180503031716.31446-4-ming.lei@redhat.com>
-In-Reply-To: <20180503031716.31446-1-ming.lei@redhat.com>
-References: <20180503031716.31446-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:53216 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933383AbeEIHuN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 03:50:13 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 24/33] xfs: don't look at buffer heads in xfs_add_to_ioend
+Date: Wed,  9 May 2018 09:48:21 +0200
+Message-Id: <20180509074830.16196-25-hch@lst.de>
+In-Reply-To: <20180509074830.16196-1-hch@lst.de>
+References: <20180509074830.16196-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-In nvme_dev_disable() called during shutting down controler,
-nvme_wait_freeze_timeout() may be done on the controller not
-frozen yet, so add the check for avoiding the case.
+Calculate all information for the bio based on the passed in information
+without requiring a buffer_head structure.
 
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/pci.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ fs/xfs/xfs_aops.c | 68 ++++++++++++++++++++++-------------------------
+ 1 file changed, 32 insertions(+), 36 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 0e6cd605164a..8172ee584130 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2240,14 +2240,17 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
- 	int i;
- 	bool dead = true;
- 	struct pci_dev *pdev = to_pci_dev(dev->dev);
-+	bool frozen = false;
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 7ebd686cb723..f6d28e6aa911 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -44,7 +44,6 @@ struct xfs_writepage_ctx {
+ 	struct xfs_bmbt_irec    imap;
+ 	unsigned int		io_type;
+ 	struct xfs_ioend	*ioend;
+-	sector_t		last_block;
+ };
  
- 	mutex_lock(&dev->shutdown_lock);
- 	if (pci_is_enabled(pdev)) {
- 		u32 csts = readl(dev->bar + NVME_REG_CSTS);
+ void
+@@ -545,11 +544,6 @@ xfs_start_page_writeback(
+ 	unlock_page(page);
+ }
  
- 		if (dev->ctrl.state == NVME_CTRL_LIVE ||
--		    dev->ctrl.state == NVME_CTRL_RESETTING)
-+		    dev->ctrl.state == NVME_CTRL_RESETTING) {
- 			nvme_start_freeze(&dev->ctrl);
-+			frozen = true;
-+		}
- 		dead = !!((csts & NVME_CSTS_CFS) || !(csts & NVME_CSTS_RDY) ||
- 			pdev->error_state  != pci_channel_io_normal);
+-static inline int xfs_bio_add_buffer(struct bio *bio, struct buffer_head *bh)
+-{
+-	return bio_add_page(bio, bh->b_page, bh->b_size, bh_offset(bh));
+-}
+-
+ /*
+  * Submit the bio for an ioend. We are passed an ioend with a bio attached to
+  * it, and we submit that bio. The ioend may be used for multiple bio
+@@ -604,27 +598,20 @@ xfs_submit_ioend(
+ 	return 0;
+ }
+ 
+-static void
+-xfs_init_bio_from_bh(
+-	struct bio		*bio,
+-	struct buffer_head	*bh)
+-{
+-	bio->bi_iter.bi_sector = bh->b_blocknr * (bh->b_size >> 9);
+-	bio_set_dev(bio, bh->b_bdev);
+-}
+-
+ static struct xfs_ioend *
+ xfs_alloc_ioend(
+ 	struct inode		*inode,
+ 	unsigned int		type,
+ 	xfs_off_t		offset,
+-	struct buffer_head	*bh)
++	struct block_device	*bdev,
++	sector_t		sector)
+ {
+ 	struct xfs_ioend	*ioend;
+ 	struct bio		*bio;
+ 
+ 	bio = bio_alloc_bioset(GFP_NOFS, BIO_MAX_PAGES, xfs_ioend_bioset);
+-	xfs_init_bio_from_bh(bio, bh);
++	bio_set_dev(bio, bdev);
++	bio->bi_iter.bi_sector = sector;
+ 
+ 	ioend = container_of(bio, struct xfs_ioend, io_inline_bio);
+ 	INIT_LIST_HEAD(&ioend->io_list);
+@@ -649,13 +636,14 @@ static void
+ xfs_chain_bio(
+ 	struct xfs_ioend	*ioend,
+ 	struct writeback_control *wbc,
+-	struct buffer_head	*bh)
++	struct block_device	*bdev,
++	sector_t		sector)
+ {
+ 	struct bio *new;
+ 
+ 	new = bio_alloc(GFP_NOFS, BIO_MAX_PAGES);
+-	xfs_init_bio_from_bh(new, bh);
+-
++	bio_set_dev(new, bdev);
++	new->bi_iter.bi_sector = sector;
+ 	bio_chain(ioend->io_bio, new);
+ 	bio_get(ioend->io_bio);		/* for xfs_destroy_ioend */
+ 	ioend->io_bio->bi_opf = REQ_OP_WRITE | wbc_to_write_flags(wbc);
+@@ -665,39 +653,45 @@ xfs_chain_bio(
+ }
+ 
+ /*
+- * Test to see if we've been building up a completion structure for
+- * earlier buffers -- if so, we try to append to this ioend if we
+- * can, otherwise we finish off any current ioend and start another.
+- * Return the ioend we finished off so that the caller can submit it
+- * once it has finished processing the dirty page.
++ * Test to see if we have an existing ioend structure that we could append to
++ * first, otherwise finish off the current ioend and start another.
+  */
+ STATIC void
+ xfs_add_to_ioend(
+ 	struct inode		*inode,
+-	struct buffer_head	*bh,
+ 	xfs_off_t		offset,
++	struct page		*page,
+ 	struct xfs_writepage_ctx *wpc,
+ 	struct writeback_control *wbc,
+ 	struct list_head	*iolist)
+ {
++	struct xfs_inode	*ip = XFS_I(inode);
++	struct xfs_mount	*mp = ip->i_mount;
++	struct block_device	*bdev = xfs_find_bdev_for_inode(inode);
++	unsigned		len = i_blocksize(inode);
++	unsigned		poff = offset & (PAGE_SIZE - 1);
++	sector_t		sector;
++
++	sector = xfs_fsb_to_db(ip, wpc->imap.br_startblock) +
++		((offset - XFS_FSB_TO_B(mp, wpc->imap.br_startoff)) >> 9);
++
+ 	if (!wpc->ioend || wpc->io_type != wpc->ioend->io_type ||
+-	    bh->b_blocknr != wpc->last_block + 1 ||
++	    sector != bio_end_sector(wpc->ioend->io_bio) ||
+ 	    offset != wpc->ioend->io_offset + wpc->ioend->io_size) {
+ 		if (wpc->ioend)
+ 			list_add(&wpc->ioend->io_list, iolist);
+-		wpc->ioend = xfs_alloc_ioend(inode, wpc->io_type, offset, bh);
++		wpc->ioend = xfs_alloc_ioend(inode, wpc->io_type, offset,
++				bdev, sector);
  	}
-@@ -2257,7 +2260,7 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
- 	 * doing a safe shutdown.
+ 
+ 	/*
+-	 * If the buffer doesn't fit into the bio we need to allocate a new
+-	 * one.  This shouldn't happen more than once for a given buffer.
++	 * If the block doesn't fit into the bio we need to allocate a new
++	 * one.  This shouldn't happen more than once for a given block.
  	 */
- 	if (!dead) {
--		if (shutdown)
-+		if (shutdown && frozen)
- 			nvme_wait_freeze_timeout(&dev->ctrl, NVME_IO_TIMEOUT);
+-	while (xfs_bio_add_buffer(wpc->ioend->io_bio, bh) != bh->b_size)
+-		xfs_chain_bio(wpc->ioend, wbc, bh);
++	while (bio_add_page(wpc->ioend->io_bio, page, len, poff) != len)
++		xfs_chain_bio(wpc->ioend, wbc, bdev, sector);
+ 
+-	wpc->ioend->io_size += bh->b_size;
+-	wpc->last_block = bh->b_blocknr;
+-	xfs_start_buffer_writeback(bh);
++	wpc->ioend->io_size += len;
+ }
+ 
+ STATIC void
+@@ -893,7 +887,9 @@ xfs_writepage_map(
+ 
+ 		lock_buffer(bh);
+ 		xfs_map_at_offset(inode, bh, &wpc->imap, file_offset);
+-		xfs_add_to_ioend(inode, bh, file_offset, wpc, wbc, &submit_list);
++		xfs_add_to_ioend(inode, file_offset, page, wpc, wbc,
++				&submit_list);
++		xfs_start_buffer_writeback(bh);
+ 		count++;
  	}
  
 -- 
-2.9.5
+2.17.0
