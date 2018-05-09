@@ -1,117 +1,51 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38128 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S934999AbeEYDwa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 May 2018 23:52:30 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [RESEND PATCH V5 31/33] block: bio: pass segments to bio if bio_add_page() is bypassed
-Date: Fri, 25 May 2018 11:46:19 +0800
-Message-Id: <20180525034621.31147-32-ming.lei@redhat.com>
-In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
-References: <20180525034621.31147-1-ming.lei@redhat.com>
+Received: from bombadil.infradead.org ([198.137.202.133]:52904 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933806AbeEIHuC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 03:50:02 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 22/33] xfs: don't clear imap_valid for a non-uptodate buffers
+Date: Wed,  9 May 2018 09:48:19 +0200
+Message-Id: <20180509074830.16196-23-hch@lst.de>
+In-Reply-To: <20180509074830.16196-1-hch@lst.de>
+References: <20180509074830.16196-1-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Under some situations, such as block direct I/O, we can't use
-bio_add_page() for merging pages into multipage bvec, so
-a new function is implemented for converting page array into one
-segment array, then these cases can benefit from multipage bvec
-too.
+Finding a buffer that isn't uptodate doesn't invalidate the mapping for
+any given block.  The last_sector check will already take care of starting
+another ioend as soon as we find any non-update buffer, and if the current
+mapping doesn't include the next uptodate buffer the xfs_imap_valid check
+will take care of it.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bio.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 48 insertions(+), 6 deletions(-)
+ fs/xfs/xfs_aops.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index bc3992f52fe8..b7d9089cb28f 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -913,6 +913,41 @@ int bio_add_page(struct bio *bio, struct page *page,
- }
- EXPORT_SYMBOL(bio_add_page);
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 07d5255a0f9f..5da2e99b0559 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -859,15 +859,12 @@ xfs_writepage_map(
+ 			break;
  
-+static unsigned convert_to_segs(struct bio* bio, struct page **pages,
-+				unsigned char *page_cnt,
-+				unsigned nr_pages)
-+{
-+
-+	unsigned idx;
-+	unsigned nr_seg = 0;
-+	struct request_queue *q = NULL;
-+
-+	if (bio->bi_disk)
-+		q = bio->bi_disk->queue;
-+
-+	if (!q || !blk_queue_cluster(q)) {
-+		memset(page_cnt, 0, nr_pages);
-+		return nr_pages;
-+	}
-+
-+	page_cnt[nr_seg] = 0;
-+	for (idx = 1; idx < nr_pages; idx++) {
-+		struct page *pg_s = pages[nr_seg];
-+		struct page *pg = pages[idx];
-+
-+		if (page_to_pfn(pg_s) + page_cnt[nr_seg] + 1 ==
-+		    page_to_pfn(pg)) {
-+			page_cnt[nr_seg]++;
-+		} else {
-+			page_cnt[++nr_seg] = 0;
-+			if (nr_seg < idx)
-+				pages[nr_seg] = pg;
-+		}
-+	}
-+
-+	return nr_seg + 1;
-+}
-+
- /**
-  * bio_iov_iter_get_pages - pin user or kernel pages and add them to a bio
-  * @bio: bio to add pages to
-@@ -928,6 +963,8 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	struct page **pages = (struct page **)bv;
- 	size_t offset, diff;
- 	ssize_t size;
-+	unsigned short nr_segs;
-+	unsigned char page_cnt[nr_pages];	/* at most 256 pages */
+ 		/*
+-		 * Block does not contain valid data, skip it, mark the current
+-		 * map as invalid because we have a discontiguity. This ensures
+-		 * we put subsequent writeable buffers into a new ioend.
++		 * Block does not contain valid data, skip it.
+ 		 */
+ 		if (!buffer_uptodate(bh)) {
+ 			if (PageUptodate(page))
+ 				ASSERT(buffer_mapped(bh));
+ 			uptodate = false;
+-			wpc->imap_valid = false;
+ 			continue;
+ 		}
  
- 	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
- 	if (unlikely(size <= 0))
-@@ -943,13 +980,18 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	 * need to be reflected here as well.
- 	 */
- 	bio->bi_iter.bi_size += size;
--	bio->bi_vcnt += nr_pages;
--
- 	diff = (nr_pages * PAGE_SIZE - offset) - size;
--	while (nr_pages--) {
--		bv[nr_pages].bv_page = pages[nr_pages];
--		bv[nr_pages].bv_len = PAGE_SIZE;
--		bv[nr_pages].bv_offset = 0;
-+
-+	/* convert into segments */
-+	nr_segs = convert_to_segs(bio, pages, page_cnt, nr_pages);
-+	bio->bi_vcnt += nr_segs;
-+
-+	while (nr_segs--) {
-+		unsigned cnt = (unsigned)page_cnt[nr_segs] + 1;
-+
-+		bv[nr_segs].bv_page = pages[nr_segs];
-+		bv[nr_segs].bv_len = PAGE_SIZE * cnt;
-+		bv[nr_segs].bv_offset = 0;
- 	}
- 
- 	bv[0].bv_offset += offset;
 -- 
-2.9.5
+2.17.0
