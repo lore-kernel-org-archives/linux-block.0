@@ -1,60 +1,79 @@
-Return-Path: <owner-linux-aio@kvack.org>
-From: adam.manzanares@wdc.com
-To: viro@zeniv.linux.org.uk,
-	bcrl@kvack.org
-Cc: linux-fsdevel@vger.kernel.org,
-	linux-aio@kvack.org,
-	linux-api@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Adam Manzanares <adam.manzanares@wdc.com>
-Subject: [PATCH v3 0/3] AIO add per-command iopriority
-Date: Tue,  8 May 2018 10:41:59 -0700
-Message-Id: <20180508174202.2537-1-adam.manzanares@wdc.com>
-Sender: owner-linux-aio@kvack.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 25/33] xfs: move all writeback buffer_head manipulation into xfs_map_at_offset
+Date: Wed,  9 May 2018 09:48:22 +0200
+Message-Id: <20180509074830.16196-26-hch@lst.de>
+In-Reply-To: <20180509074830.16196-1-hch@lst.de>
+References: <20180509074830.16196-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Adam Manzanares <adam.manzanares@wdc.com>
+This keeps it in a single place so it can be made otional more easily.
 
-This is the per-I/O equivalent of the ioprio_set system call.
-See the following link for performance implications on a SATA HDD:
-https://lkml.org/lkml/2016/12/6/495
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/xfs/xfs_aops.c | 22 +++++-----------------
+ 1 file changed, 5 insertions(+), 17 deletions(-)
 
-First patch factors ioprio_check_cap function out of ioprio_set system call to 
-also be used by the aio ioprio interface.
-
-Second patch converts kiocb ki_hint field to a u16 to avoid kiocb bloat.
-
-Third patch passes ioprio hint from aio iocb to kiocb and enables block_dev 
-usage of the per I/O ioprio feature.
-
-v2: merge patches
-    use IOCB_FLAG_IOPRIO
-    validate intended use with IOCB_IOPRIO
-    add linux-api and linux-block to cc
-
-v3: add ioprio_check_cap function
-    convert kiocb ki_hint to u16
-    use ioprio_check_cap when adding ioprio to kiocb in aio.c
-
-Adam Manzanares (3):
-  block: add ioprio_check_cap function
-  fs: Convert kiocb rw_hint from enum to u16
-  fs: Add aio iopriority support for block_dev
-
- block/ioprio.c               | 22 ++++++++++++++++------
- fs/aio.c                     | 16 ++++++++++++++++
- fs/block_dev.c               |  2 ++
- include/linux/fs.h           | 17 +++++++++++++++--
- include/linux/ioprio.h       |  2 ++
- include/uapi/linux/aio_abi.h |  1 +
- 6 files changed, 52 insertions(+), 8 deletions(-)
-
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index f6d28e6aa911..c76c943473be 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -505,21 +505,6 @@ xfs_imap_valid(
+ 		offset < imap->br_startoff + imap->br_blockcount;
+ }
+ 
+-STATIC void
+-xfs_start_buffer_writeback(
+-	struct buffer_head	*bh)
+-{
+-	ASSERT(buffer_mapped(bh));
+-	ASSERT(buffer_locked(bh));
+-	ASSERT(!buffer_delay(bh));
+-	ASSERT(!buffer_unwritten(bh));
+-
+-	bh->b_end_io = NULL;
+-	set_buffer_async_write(bh);
+-	set_buffer_uptodate(bh);
+-	clear_buffer_dirty(bh);
+-}
+-
+ STATIC void
+ xfs_start_page_writeback(
+ 	struct page		*page,
+@@ -728,6 +713,7 @@ xfs_map_at_offset(
+ 	ASSERT(imap->br_startblock != HOLESTARTBLOCK);
+ 	ASSERT(imap->br_startblock != DELAYSTARTBLOCK);
+ 
++	lock_buffer(bh);
+ 	xfs_map_buffer(inode, bh, imap, offset);
+ 	set_buffer_mapped(bh);
+ 	clear_buffer_delay(bh);
+@@ -740,6 +726,10 @@ xfs_map_at_offset(
+ 	 * set the bdev now.
+ 	 */
+ 	bh->b_bdev = xfs_find_bdev_for_inode(inode);
++	bh->b_end_io = NULL;
++	set_buffer_async_write(bh);
++	set_buffer_uptodate(bh);
++	clear_buffer_dirty(bh);
+ }
+ 
+ STATIC void
+@@ -885,11 +875,9 @@ xfs_writepage_map(
+ 			continue;
+ 		}
+ 
+-		lock_buffer(bh);
+ 		xfs_map_at_offset(inode, bh, &wpc->imap, file_offset);
+ 		xfs_add_to_ioend(inode, file_offset, page, wpc, wbc,
+ 				&submit_list);
+-		xfs_start_buffer_writeback(bh);
+ 		count++;
+ 	}
+ 
 -- 
-2.15.1
-
---
-To unsubscribe, send a message with 'unsubscribe linux-aio' in
-the body to majordomo@kvack.org.  For more info on Linux AIO,
-see: http://www.kvack.org/aio/
-Don't email: <a href=mailto:"aart@kvack.org">aart@kvack.org</a>
+2.17.0
