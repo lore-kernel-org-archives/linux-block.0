@@ -4,29 +4,32 @@ To: linux-block@vger.kernel.org
 Cc: osandov@fb.com,
 	efault@gmx.de,
 	paolo.valente@linaro.org
-Subject: [PATCHSET v2 0/7] blk-mq-sched and sbitmap shallow depth
-Date: Wed,  9 May 2018 14:49:20 -0600
-Message-Id: <1525898967-13425-1-git-send-email-axboe@kernel.dk>
+Subject: [PATCHSET 0/3] blk-mq-sched and sbitmap shallow depth
+Date: Wed,  9 May 2018 09:36:01 -0600
+Message-Id: <1525880164-11943-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Omar had some valid complaints about the previous patchset, mostly
-around the fact that we should not be updating depths on a per-IO
-basis.  He's right. In fact, BFQ oddly enough does it from the
-->limit_depth hook, but the shallow depth counts remain static.
+Mike has been running into an issue with BFQ, where things grind
+to a halt. This is because of how BFQ limits the shallow depth. If
+it ends up limiting it to something low that is smaller than the
+wake batch sizing for sbitmap, we can run into cases where we
+never wake up folks waiting for a tag. The end result is an idle
+system with no IO pending, but with tasks waiting for a tag with
+no one to wake them up. Kyber could run into the same issue, if
+the async depth is limited low enough.
 
-This series cleans that up the ->limit_depth() handling, and keeps it
-out of the hot path.
+This patchset adds a helper to inform sbitmap about shallow depth
+limiting, and handles this from blk-mq-sched.
 
-Mike, this should (still) fix your hangs with BFQ. This series is
-(functionally) identical to the bundled up version I sent you earlier.
-
- block/bfq-iosched.c     |  113 +++++++++++++++++++++++++-----------------------
- block/bfq-iosched.h     |    6 --
- block/blk-mq.c          |    6 +-
- block/kyber-iosched.c   |    3 +
- include/linux/sbitmap.h |   11 ++++
- lib/sbitmap.c           |   19 +++++++-
- 6 files changed, 95 insertions(+), 63 deletions(-)
+ block/bfq-iosched.c      |   13 ++++++++++---
+ block/blk-mq-sched.c     |   26 ++++++++++++++++++++++++++
+ block/blk-mq-sched.h     |    3 +++
+ block/blk-mq.c           |    8 +-------
+ block/kyber-iosched.c    |   14 ++++++++++----
+ include/linux/elevator.h |    2 +-
+ include/linux/sbitmap.h  |   11 +++++++++++
+ lib/sbitmap.c            |   17 ++++++++++++++++-
+ 8 files changed, 78 insertions(+), 16 deletions(-)
 
 -- 
 Jens Axboe
