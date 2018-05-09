@@ -1,48 +1,304 @@
-Return-Path: <BATV+a01a3e67072ae75c0352+5392+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>,
-	Lee Duncan <lduncan@suse.com>,
-	Chris Leech <cleech@redhat.com>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 02/14] blk-mq: Fix timeout and state order
-Date: Tue, 29 May 2018 15:52:27 +0200
-Message-Id: <20180529135239.27005-3-hch@lst.de>
-In-Reply-To: <20180529135239.27005-1-hch@lst.de>
-References: <20180529135239.27005-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:36996 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934164AbeEIJJE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 05:09:04 -0400
+Received: by mail-pg0-f66.google.com with SMTP id a13-v6so22394554pgu.4
+        for <linux-block@vger.kernel.org>; Wed, 09 May 2018 02:09:04 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
+Subject: [PATCH v3 2/7] block: pass struct request instead of struct blk_issue_stat to wbt
+Date: Wed,  9 May 2018 02:08:48 -0700
+Message-Id: <61365b04030f2c2a01afcfd14255e888614d4524.1525856631.git.osandov@fb.com>
+In-Reply-To: <cover.1525856630.git.osandov@fb.com>
+References: <cover.1525856630.git.osandov@fb.com>
+In-Reply-To: <cover.1525856630.git.osandov@fb.com>
+References: <cover.1525856630.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Keith Busch <keith.busch@intel.com>
+From: Omar Sandoval <osandov@fb.com>
 
-The block layer had been setting the state to in-flight prior to updating
-the timer. This is the wrong order since the timeout handler could observe
-the in-flight state with the older timeout, believing the request had
-expired when in fact it is just getting started.
+issue_stat is going to go away, so first make writeback throttling take
+the containing request, update the internal wbt helpers accordingly, and
+change rwb->sync_cookie to be the request pointer instead of the
+issue_stat pointer. No functional change.
 
-Signed-off-by: Keith Busch <keith.busch@intel.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-core.c | 10 ++++-----
+ block/blk-mq.c   | 10 ++++-----
+ block/blk-wbt.c  | 53 ++++++++++++++++++++++++------------------------
+ block/blk-wbt.h  | 18 ++++++++--------
+ 4 files changed, 45 insertions(+), 46 deletions(-)
 
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 0573f9226c2d..fe2f457ed27d 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1659,7 +1659,7 @@ void blk_requeue_request(struct request_queue *q, struct request *rq)
+ 	blk_delete_timer(rq);
+ 	blk_clear_rq_complete(rq);
+ 	trace_block_rq_requeue(q, rq);
+-	wbt_requeue(q->rq_wb, &rq->issue_stat);
++	wbt_requeue(q->rq_wb, rq);
+ 
+ 	if (rq->rq_flags & RQF_QUEUED)
+ 		blk_queue_end_tag(q, rq);
+@@ -1766,7 +1766,7 @@ void __blk_put_request(struct request_queue *q, struct request *req)
+ 	/* this is a bio leak */
+ 	WARN_ON(req->bio != NULL);
+ 
+-	wbt_done(q->rq_wb, &req->issue_stat);
++	wbt_done(q->rq_wb, req);
+ 
+ 	/*
+ 	 * Request may not have originated from ll_rw_blk. if not,
+@@ -2077,7 +2077,7 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
+ 		goto out_unlock;
+ 	}
+ 
+-	wbt_track(&req->issue_stat, wb_acct);
++	wbt_track(req, wb_acct);
+ 
+ 	/*
+ 	 * After dropping the lock and possibly sleeping here, our request
+@@ -2993,7 +2993,7 @@ void blk_start_request(struct request *req)
+ 	if (test_bit(QUEUE_FLAG_STATS, &req->q->queue_flags)) {
+ 		blk_stat_set_issue(&req->issue_stat, blk_rq_sectors(req));
+ 		req->rq_flags |= RQF_STATS;
+-		wbt_issue(req->q->rq_wb, &req->issue_stat);
++		wbt_issue(req->q->rq_wb, req);
+ 	}
+ 
+ 	BUG_ON(blk_rq_is_complete(req));
+@@ -3212,7 +3212,7 @@ void blk_finish_request(struct request *req, blk_status_t error)
+ 	blk_account_io_done(req);
+ 
+ 	if (req->end_io) {
+-		wbt_done(req->q->rq_wb, &req->issue_stat);
++		wbt_done(req->q->rq_wb, req);
+ 		req->end_io(req, error);
+ 	} else {
+ 		if (blk_bidi_rq(req))
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index df928200b17e..3581a1e5c8a7 100644
+index 9ce9cac16c3f..deb85b5c6c21 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -697,8 +697,8 @@ void blk_mq_start_request(struct request *rq)
- 	preempt_disable();
- 	write_seqcount_begin(&rq->gstate_seq);
+@@ -488,7 +488,7 @@ void blk_mq_free_request(struct request *rq)
+ 	if (unlikely(laptop_mode && !blk_rq_is_passthrough(rq)))
+ 		laptop_io_completion(q->backing_dev_info);
  
--	blk_mq_rq_update_state(rq, MQ_RQ_IN_FLIGHT);
- 	blk_add_timer(rq);
-+	blk_mq_rq_update_state(rq, MQ_RQ_IN_FLIGHT);
+-	wbt_done(q->rq_wb, &rq->issue_stat);
++	wbt_done(q->rq_wb, rq);
  
- 	write_seqcount_end(&rq->gstate_seq);
- 	preempt_enable();
+ 	if (blk_rq_rl(rq))
+ 		blk_put_rl(blk_rq_rl(rq));
+@@ -508,7 +508,7 @@ inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
+ 	blk_account_io_done(rq);
+ 
+ 	if (rq->end_io) {
+-		wbt_done(rq->q->rq_wb, &rq->issue_stat);
++		wbt_done(rq->q->rq_wb, rq);
+ 		rq->end_io(rq, error);
+ 	} else {
+ 		if (unlikely(blk_bidi_rq(rq)))
+@@ -671,7 +671,7 @@ void blk_mq_start_request(struct request *rq)
+ 	if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
+ 		blk_stat_set_issue(&rq->issue_stat, blk_rq_sectors(rq));
+ 		rq->rq_flags |= RQF_STATS;
+-		wbt_issue(q->rq_wb, &rq->issue_stat);
++		wbt_issue(q->rq_wb, rq);
+ 	}
+ 
+ 	WARN_ON_ONCE(blk_mq_rq_state(rq) != MQ_RQ_IDLE);
+@@ -719,7 +719,7 @@ static void __blk_mq_requeue_request(struct request *rq)
+ 	blk_mq_put_driver_tag(rq);
+ 
+ 	trace_block_rq_requeue(q, rq);
+-	wbt_requeue(q->rq_wb, &rq->issue_stat);
++	wbt_requeue(q->rq_wb, rq);
+ 
+ 	if (blk_mq_rq_state(rq) != MQ_RQ_IDLE) {
+ 		blk_mq_rq_update_state(rq, MQ_RQ_IDLE);
+@@ -1882,7 +1882,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 		return BLK_QC_T_NONE;
+ 	}
+ 
+-	wbt_track(&rq->issue_stat, wb_acct);
++	wbt_track(rq, wb_acct);
+ 
+ 	cookie = request_to_qc_t(data.hctx, rq);
+ 
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 450cffa85dfb..592e914c9890 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -29,24 +29,24 @@
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/wbt.h>
+ 
+-static inline void wbt_clear_state(struct blk_issue_stat *stat)
++static inline void wbt_clear_state(struct request *rq)
+ {
+-	stat->stat &= ~BLK_STAT_RES_MASK;
++	rq->issue_stat.stat &= ~BLK_STAT_RES_MASK;
+ }
+ 
+-static inline enum wbt_flags wbt_stat_to_mask(struct blk_issue_stat *stat)
++static inline enum wbt_flags wbt_flags(struct request *rq)
+ {
+-	return (stat->stat & BLK_STAT_RES_MASK) >> BLK_STAT_RES_SHIFT;
++	return (rq->issue_stat.stat & BLK_STAT_RES_MASK) >> BLK_STAT_RES_SHIFT;
+ }
+ 
+-static inline bool wbt_is_tracked(struct blk_issue_stat *stat)
++static inline bool wbt_is_tracked(struct request *rq)
+ {
+-	return (stat->stat >> BLK_STAT_RES_SHIFT) & WBT_TRACKED;
++	return (rq->issue_stat.stat >> BLK_STAT_RES_SHIFT) & WBT_TRACKED;
+ }
+ 
+-static inline bool wbt_is_read(struct blk_issue_stat *stat)
++static inline bool wbt_is_read(struct request *rq)
+ {
+-	return (stat->stat >> BLK_STAT_RES_SHIFT) & WBT_READ;
++	return (rq->issue_stat.stat >> BLK_STAT_RES_SHIFT) & WBT_READ;
+ }
+ 
+ enum {
+@@ -194,24 +194,24 @@ void __wbt_done(struct rq_wb *rwb, enum wbt_flags wb_acct)
+  * Called on completion of a request. Note that it's also called when
+  * a request is merged, when the request gets freed.
+  */
+-void wbt_done(struct rq_wb *rwb, struct blk_issue_stat *stat)
++void wbt_done(struct rq_wb *rwb, struct request *rq)
+ {
+ 	if (!rwb)
+ 		return;
+ 
+-	if (!wbt_is_tracked(stat)) {
+-		if (rwb->sync_cookie == stat) {
++	if (!wbt_is_tracked(rq)) {
++		if (rwb->sync_cookie == rq) {
+ 			rwb->sync_issue = 0;
+ 			rwb->sync_cookie = NULL;
+ 		}
+ 
+-		if (wbt_is_read(stat))
++		if (wbt_is_read(rq))
+ 			wb_timestamp(rwb, &rwb->last_comp);
+ 	} else {
+-		WARN_ON_ONCE(stat == rwb->sync_cookie);
+-		__wbt_done(rwb, wbt_stat_to_mask(stat));
++		WARN_ON_ONCE(rq == rwb->sync_cookie);
++		__wbt_done(rwb, wbt_flags(rq));
+ 	}
+-	wbt_clear_state(stat);
++	wbt_clear_state(rq);
+ }
+ 
+ /*
+@@ -643,30 +643,29 @@ enum wbt_flags wbt_wait(struct rq_wb *rwb, struct bio *bio, spinlock_t *lock)
+ 	return ret | WBT_TRACKED;
+ }
+ 
+-void wbt_issue(struct rq_wb *rwb, struct blk_issue_stat *stat)
++void wbt_issue(struct rq_wb *rwb, struct request *rq)
+ {
+ 	if (!rwb_enabled(rwb))
+ 		return;
+ 
+ 	/*
+-	 * Track sync issue, in case it takes a long time to complete. Allows
+-	 * us to react quicker, if a sync IO takes a long time to complete.
+-	 * Note that this is just a hint. 'stat' can go away when the
+-	 * request completes, so it's important we never dereference it. We
+-	 * only use the address to compare with, which is why we store the
+-	 * sync_issue time locally.
++	 * Track sync issue, in case it takes a long time to complete. Allows us
++	 * to react quicker, if a sync IO takes a long time to complete. Note
++	 * that this is just a hint. The request can go away when it completes,
++	 * so it's important we never dereference it. We only use the address to
++	 * compare with, which is why we store the sync_issue time locally.
+ 	 */
+-	if (wbt_is_read(stat) && !rwb->sync_issue) {
+-		rwb->sync_cookie = stat;
+-		rwb->sync_issue = blk_stat_time(stat);
++	if (wbt_is_read(rq) && !rwb->sync_issue) {
++		rwb->sync_cookie = rq;
++		rwb->sync_issue = blk_stat_time(&rq->issue_stat);
+ 	}
+ }
+ 
+-void wbt_requeue(struct rq_wb *rwb, struct blk_issue_stat *stat)
++void wbt_requeue(struct rq_wb *rwb, struct request *rq)
+ {
+ 	if (!rwb_enabled(rwb))
+ 		return;
+-	if (stat == rwb->sync_cookie) {
++	if (rq == rwb->sync_cookie) {
+ 		rwb->sync_issue = 0;
+ 		rwb->sync_cookie = NULL;
+ 	}
+diff --git a/block/blk-wbt.h b/block/blk-wbt.h
+index 5bdae205e5df..85fbcccf12a5 100644
+--- a/block/blk-wbt.h
++++ b/block/blk-wbt.h
+@@ -88,19 +88,19 @@ static inline unsigned int wbt_inflight(struct rq_wb *rwb)
+ 
+ #ifdef CONFIG_BLK_WBT
+ 
+-static inline void wbt_track(struct blk_issue_stat *stat, enum wbt_flags flags)
++static inline void wbt_track(struct request *rq, enum wbt_flags flags)
+ {
+-	stat->stat |= ((u64)flags) << BLK_STAT_RES_SHIFT;
++	rq->issue_stat.stat |= ((u64)flags) << BLK_STAT_RES_SHIFT;
+ }
+ 
+ void __wbt_done(struct rq_wb *, enum wbt_flags);
+-void wbt_done(struct rq_wb *, struct blk_issue_stat *);
++void wbt_done(struct rq_wb *, struct request *);
+ enum wbt_flags wbt_wait(struct rq_wb *, struct bio *, spinlock_t *);
+ int wbt_init(struct request_queue *);
+ void wbt_exit(struct request_queue *);
+ void wbt_update_limits(struct rq_wb *);
+-void wbt_requeue(struct rq_wb *, struct blk_issue_stat *);
+-void wbt_issue(struct rq_wb *, struct blk_issue_stat *);
++void wbt_requeue(struct rq_wb *, struct request *);
++void wbt_issue(struct rq_wb *, struct request *);
+ void wbt_disable_default(struct request_queue *);
+ void wbt_enable_default(struct request_queue *);
+ 
+@@ -111,13 +111,13 @@ u64 wbt_default_latency_nsec(struct request_queue *);
+ 
+ #else
+ 
+-static inline void wbt_track(struct blk_issue_stat *stat, enum wbt_flags flags)
++static inline void wbt_track(struct request *rq, enum wbt_flags flags)
+ {
+ }
+ static inline void __wbt_done(struct rq_wb *rwb, enum wbt_flags flags)
+ {
+ }
+-static inline void wbt_done(struct rq_wb *rwb, struct blk_issue_stat *stat)
++static inline void wbt_done(struct rq_wb *rwb, struct request *rq)
+ {
+ }
+ static inline enum wbt_flags wbt_wait(struct rq_wb *rwb, struct bio *bio,
+@@ -135,10 +135,10 @@ static inline void wbt_exit(struct request_queue *q)
+ static inline void wbt_update_limits(struct rq_wb *rwb)
+ {
+ }
+-static inline void wbt_requeue(struct rq_wb *rwb, struct blk_issue_stat *stat)
++static inline void wbt_requeue(struct rq_wb *rwb, struct request *rq)
+ {
+ }
+-static inline void wbt_issue(struct rq_wb *rwb, struct blk_issue_stat *stat)
++static inline void wbt_issue(struct rq_wb *rwb, struct request *rq)
+ {
+ }
+ static inline void wbt_disable_default(struct request_queue *q)
 -- 
 2.17.0
