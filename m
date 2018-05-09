@@ -1,47 +1,83 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH v2 0/6] bcache device failure handling fixes for 4.17-rc4
-Date: Wed,  2 May 2018 22:46:53 +0800
-Message-Id: <20180502144659.118628-1-colyli@suse.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 16/33] xfs: move locking into xfs_bmap_punch_delalloc_range
+Date: Wed,  9 May 2018 09:48:13 +0200
+Message-Id: <20180509074830.16196-17-hch@lst.de>
+In-Reply-To: <20180509074830.16196-1-hch@lst.de>
+References: <20180509074830.16196-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+Both callers want the same looking, so do it only once.
 
-I receive bug reports from partners for the bcache cache device failure
-handling patch set (which is just merged into 4.17-rc1). Fortunately we
-are still in 4.17 merge window, I suggest to have these fixes to go into
-4.17 merge window too.
-
-These patches have non peer reviewer so far, Tang Junhui is not able to
-be available temporarily, and no other active code review since last
-patch set post. In order to have these patches go into linux-4.17 in time,
-I have to send these patches only with my Signed-off-by.
-
-The patches are well commented IMHO and pass my own regression tests. 
-Thanks for your help in advance.
-
-Coly Li
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
-Coly Li (6):
-  bcache: store disk name in struct cache and struct cached_dev
-  bcache: set CACHE_SET_IO_DISABLE in bch_cached_dev_error()
-  bcache: count backing device I/O error for writeback I/O
-  bcache: add wait_for_kthread_stop() in bch_allocator_thread()
-  bcache: set dc->io_disable to true in conditional_stop_bcache_device()
-  bcache: use pr_info() to inform duplicated CACHE_SET_IO_DISABLE set
+ fs/xfs/xfs_aops.c      | 2 --
+ fs/xfs/xfs_bmap_util.c | 7 ++++---
+ fs/xfs/xfs_iomap.c     | 3 ---
+ 3 files changed, 4 insertions(+), 8 deletions(-)
 
- drivers/md/bcache/alloc.c     |  5 ++-
- drivers/md/bcache/bcache.h    |  4 +++
- drivers/md/bcache/debug.c     |  3 +-
- drivers/md/bcache/io.c        |  8 ++---
- drivers/md/bcache/request.c   |  5 +--
- drivers/md/bcache/super.c     | 75 ++++++++++++++++++++++++++++++-------------
- drivers/md/bcache/writeback.c |  4 ++-
- 7 files changed, 68 insertions(+), 36 deletions(-)
-
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 313449ac0288..196c5daa6dce 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -761,10 +761,8 @@ xfs_aops_discard_page(
+ 		"page discard on page "PTR_FMT", inode 0x%llx, offset %llu.",
+ 			page, ip->i_ino, offset);
+ 
+-	xfs_ilock(ip, XFS_ILOCK_EXCL);
+ 	error = xfs_bmap_punch_delalloc_range(ip, start_fsb,
+ 			PAGE_SIZE / i_blocksize(inode));
+-	xfs_iunlock(ip, XFS_ILOCK_EXCL);
+ 	if (error && !XFS_FORCED_SHUTDOWN(mp))
+ 		xfs_alert(mp, "page discard unable to remove delalloc mapping.");
+ out_invalidate:
+diff --git a/fs/xfs/xfs_bmap_util.c b/fs/xfs/xfs_bmap_util.c
+index 7d2ba4cc8fba..82189ea97319 100644
+--- a/fs/xfs/xfs_bmap_util.c
++++ b/fs/xfs/xfs_bmap_util.c
+@@ -711,12 +711,11 @@ xfs_bmap_punch_delalloc_range(
+ 	struct xfs_iext_cursor	icur;
+ 	int			error = 0;
+ 
+-	ASSERT(xfs_isilocked(ip, XFS_ILOCK_EXCL));
+-
++	xfs_ilock(ip, XFS_ILOCK_EXCL);
+ 	if (!(ifp->if_flags & XFS_IFEXTENTS)) {
+ 		error = xfs_iread_extents(NULL, ip, XFS_DATA_FORK);
+ 		if (error)
+-			return error;
++			goto out_unlock;
+ 	}
+ 
+ 	if (!xfs_iext_lookup_extent(ip, ifp, start_fsb, &icur, &got))
+@@ -738,6 +737,8 @@ xfs_bmap_punch_delalloc_range(
+ 			break;
+ 	} while (xfs_iext_next_extent(ifp, &icur, &got));
+ 
++out_unlock:
++	xfs_iunlock(ip, XFS_ILOCK_EXCL);
+ 	return error;
+ }
+ 
+diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
+index 046469fcc1b8..407bbd978d1b 100644
+--- a/fs/xfs/xfs_iomap.c
++++ b/fs/xfs/xfs_iomap.c
+@@ -1167,11 +1167,8 @@ xfs_file_iomap_end_delalloc(
+ 		truncate_pagecache_range(VFS_I(ip), XFS_FSB_TO_B(mp, start_fsb),
+ 					 XFS_FSB_TO_B(mp, end_fsb) - 1);
+ 
+-		xfs_ilock(ip, XFS_ILOCK_EXCL);
+ 		error = xfs_bmap_punch_delalloc_range(ip, start_fsb,
+ 					       end_fsb - start_fsb);
+-		xfs_iunlock(ip, XFS_ILOCK_EXCL);
+-
+ 		if (error && !XFS_FORCED_SHUTDOWN(mp)) {
+ 			xfs_alert(mp, "%s: unable to clean up ino %lld",
+ 				__func__, ip->i_ino);
 -- 
-2.16.3
+2.17.0
