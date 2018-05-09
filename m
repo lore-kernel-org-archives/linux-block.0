@@ -1,86 +1,176 @@
-Return-Path: <prvs=669a0b661=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Tejun Heo <tj@kernel.org>,
-	Alexandru Moise <00moses.alexander00@gmail.com>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>
-Subject: [PATCH v3 2/2] block: Ensure that a request queue is dissociated from the cgroup controller
-Date: Fri, 18 May 2018 11:40:03 -0700
-Message-Id: <20180518184003.29738-3-bart.vanassche@wdc.com>
-In-Reply-To: <20180518184003.29738-1-bart.vanassche@wdc.com>
-References: <20180518184003.29738-1-bart.vanassche@wdc.com>
+Return-Path: <kent.overstreet@gmail.com>
+Return-Path: <kent.overstreet@gmail.com>
+From: Kent Overstreet <kent.overstreet@gmail.com>
+To: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-mm@kvack.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Ingo Molnar <mingo@kernel.org>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Subject: [PATCH 03/10] block: Add bioset_init()/bioset_exit()
+Date: Tue,  8 May 2018 21:33:51 -0400
+Message-Id: <20180509013358.16399-4-kent.overstreet@gmail.com>
+In-Reply-To: <20180509013358.16399-1-kent.overstreet@gmail.com>
+References: <20180509013358.16399-1-kent.overstreet@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Several block drivers call alloc_disk() followed by put_disk() if
-something fails before device_add_disk() is called without calling
-blk_cleanup_queue(). Make sure that also for this scenario a request
-queue is dissociated from the cgroup controller. This patch avoids
-that loading the parport_pc, paride and pf drivers triggers the
-following kernel crash:
+Similarly to mempool_init()/mempool_exit(), take a pointer indirection
+out of allocation/freeing by allowing biosets to be embedded in other
+structs.
 
-BUG: KASAN: null-ptr-deref in pi_init+0x42e/0x580 [paride]
-Read of size 4 at addr 0000000000000008 by task modprobe/744
-Call Trace:
-dump_stack+0x9a/0xeb
-kasan_report+0x139/0x350
-pi_init+0x42e/0x580 [paride]
-pf_init+0x2bb/0x1000 [pf]
-do_one_initcall+0x8e/0x405
-do_init_module+0xd9/0x2f2
-load_module+0x3ab4/0x4700
-SYSC_finit_module+0x176/0x1a0
-do_syscall_64+0xee/0x2b0
-entry_SYSCALL_64_after_hwframe+0x42/0xb7
-
-Reported-by: Alexandru Moise <00moses.alexander00@gmail.com>
-Fixes: a063057d7c73 ("block: Fix a race between request queue removal and the block cgroup controller")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Tested-by: Alexandru Moise <00moses.alexander00@gmail.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Alexandru Moise <00moses.alexander00@gmail.com>
-Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
+Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
 ---
- block/blk-sysfs.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ block/bio.c         | 93 +++++++++++++++++++++++++++++++--------------
+ include/linux/bio.h |  2 +
+ 2 files changed, 67 insertions(+), 28 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 9cf41fee3790..a239c73fa20f 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -804,6 +804,31 @@ static void __blk_release_queue(struct work_struct *work)
- 		blk_stat_remove_callback(q, q->poll_cb);
- 	blk_stat_free_callback(q->poll_cb);
+diff --git a/block/bio.c b/block/bio.c
+index 360e9bcea5..980befd919 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1856,21 +1856,83 @@ int biovec_init_pool(mempool_t *pool, int pool_entries)
+ 	return mempool_init_slab_pool(pool, pool_entries, bp->slab);
+ }
  
-+	if (!blk_queue_dead(q)) {
-+		/*
-+		 * Last reference was dropped without having called
-+		 * blk_cleanup_queue().
-+		 */
-+		WARN_ONCE(blk_queue_init_done(q),
-+			  "request queue %p has been registered but blk_cleanup_queue() has not been called for that queue\n",
-+			  q);
-+		blk_exit_queue(q);
-+	}
-+
-+#ifdef CONFIG_BLK_CGROUP
-+	{
-+		struct blkcg_gq *blkg;
-+
-+		rcu_read_lock();
-+		blkg = blkg_lookup(&blkcg_root, q);
-+		rcu_read_unlock();
-+
-+		WARN(blkg,
-+		     "request queue %p is being released but it has not yet been removed from the blkcg controller\n",
-+		     q);
-+	}
-+#endif
-+
- 	blk_free_queue_stats(q->stats);
+-void bioset_free(struct bio_set *bs)
++/*
++ * bioset_exit - exit a bioset initialized with bioset_init()
++ *
++ * May be called on a zeroed but uninitialized bioset (i.e. allocated with
++ * kzalloc()).
++ */
++void bioset_exit(struct bio_set *bs)
+ {
+ 	if (bs->rescue_workqueue)
+ 		destroy_workqueue(bs->rescue_workqueue);
++	bs->rescue_workqueue = NULL;
  
- 	blk_exit_rl(q, &q->root_rl);
+ 	mempool_exit(&bs->bio_pool);
+ 	mempool_exit(&bs->bvec_pool);
+ 
+ 	bioset_integrity_free(bs);
+-	bio_put_slab(bs);
++	if (bs->bio_slab)
++		bio_put_slab(bs);
++	bs->bio_slab = NULL;
++}
++EXPORT_SYMBOL(bioset_exit);
+ 
++void bioset_free(struct bio_set *bs)
++{
++	bioset_exit(bs);
+ 	kfree(bs);
+ }
+ EXPORT_SYMBOL(bioset_free);
+ 
++/**
++ * bioset_init - Initialize a bio_set
++ * @pool_size:	Number of bio and bio_vecs to cache in the mempool
++ * @front_pad:	Number of bytes to allocate in front of the returned bio
++ * @flags:	Flags to modify behavior, currently %BIOSET_NEED_BVECS
++ *              and %BIOSET_NEED_RESCUER
++ *
++ * Similar to bioset_create(), but initializes a passed-in bioset instead of
++ * separately allocating it.
++ */
++int bioset_init(struct bio_set *bs,
++		unsigned int pool_size,
++		unsigned int front_pad,
++		int flags)
++{
++	unsigned int back_pad = BIO_INLINE_VECS * sizeof(struct bio_vec);
++
++	bs->front_pad = front_pad;
++
++	spin_lock_init(&bs->rescue_lock);
++	bio_list_init(&bs->rescue_list);
++	INIT_WORK(&bs->rescue_work, bio_alloc_rescue);
++
++	bs->bio_slab = bio_find_or_create_slab(front_pad + back_pad);
++	if (!bs->bio_slab)
++		return -ENOMEM;
++
++	if (mempool_init_slab_pool(&bs->bio_pool, pool_size, bs->bio_slab))
++		goto bad;
++
++	if ((flags & BIOSET_NEED_BVECS) &&
++	    biovec_init_pool(&bs->bvec_pool, pool_size))
++		goto bad;
++
++	if (!(flags & BIOSET_NEED_RESCUER))
++		return 0;
++
++	bs->rescue_workqueue = alloc_workqueue("bioset", WQ_MEM_RECLAIM, 0);
++	if (!bs->rescue_workqueue)
++		goto bad;
++
++	return 0;
++bad:
++	bioset_exit(bs);
++	return -ENOMEM;
++}
++EXPORT_SYMBOL(bioset_init);
++
+ /**
+  * bioset_create  - Create a bio_set
+  * @pool_size:	Number of bio and bio_vecs to cache in the mempool
+@@ -1895,43 +1957,18 @@ struct bio_set *bioset_create(unsigned int pool_size,
+ 			      unsigned int front_pad,
+ 			      int flags)
+ {
+-	unsigned int back_pad = BIO_INLINE_VECS * sizeof(struct bio_vec);
+ 	struct bio_set *bs;
+ 
+ 	bs = kzalloc(sizeof(*bs), GFP_KERNEL);
+ 	if (!bs)
+ 		return NULL;
+ 
+-	bs->front_pad = front_pad;
+-
+-	spin_lock_init(&bs->rescue_lock);
+-	bio_list_init(&bs->rescue_list);
+-	INIT_WORK(&bs->rescue_work, bio_alloc_rescue);
+-
+-	bs->bio_slab = bio_find_or_create_slab(front_pad + back_pad);
+-	if (!bs->bio_slab) {
++	if (bioset_init(bs, pool_size, front_pad, flags)) {
+ 		kfree(bs);
+ 		return NULL;
+ 	}
+ 
+-	if (mempool_init_slab_pool(&bs->bio_pool, pool_size, bs->bio_slab))
+-		goto bad;
+-
+-	if ((flags & BIOSET_NEED_BVECS) &&
+-	    biovec_init_pool(&bs->bvec_pool, pool_size))
+-		goto bad;
+-
+-	if (!(flags & BIOSET_NEED_RESCUER))
+-		return bs;
+-
+-	bs->rescue_workqueue = alloc_workqueue("bioset", WQ_MEM_RECLAIM, 0);
+-	if (!bs->rescue_workqueue)
+-		goto bad;
+-
+ 	return bs;
+-bad:
+-	bioset_free(bs);
+-	return NULL;
+ }
+ EXPORT_SYMBOL(bioset_create);
+ 
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 720f7261d0..fa3cf94a50 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -406,6 +406,8 @@ static inline struct bio *bio_next_split(struct bio *bio, int sectors,
+ 	return bio_split(bio, sectors, gfp, bs);
+ }
+ 
++extern int bioset_init(struct bio_set *, unsigned int, unsigned int, int flags);
++extern void bioset_exit(struct bio_set *);
+ extern struct bio_set *bioset_create(unsigned int, unsigned int, int flags);
+ enum {
+ 	BIOSET_NEED_BVECS = BIT(0),
 -- 
-2.16.3
+2.17.0
