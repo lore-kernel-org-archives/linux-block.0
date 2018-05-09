@@ -1,39 +1,45 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20180509074830.16196-5-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de> <20180509074830.16196-5-hch@lst.de>
-From: =?UTF-8?Q?Andreas_Gr=C3=BCnbacher?= <andreas.gruenbacher@gmail.com>
-Date: Thu, 17 May 2018 13:33:17 +0200
-Message-ID: <CAHpGcM+i1sAPGLxN9m5tcu973cx-Jr-DU2D7xWYScp7hfpcvnA@mail.gmail.com>
-Subject: Re: [PATCH 04/33] fs: remove the buffer_unwritten check in page_seek_hole_data
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-xfs@vger.kernel.org,
-        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 04/33] fs: remove the buffer_unwritten check in page_seek_hole_data
+Date: Wed,  9 May 2018 09:48:01 +0200
+Message-Id: <20180509074830.16196-5-hch@lst.de>
+In-Reply-To: <20180509074830.16196-1-hch@lst.de>
+References: <20180509074830.16196-1-hch@lst.de>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-2018-05-09 9:48 GMT+02:00 Christoph Hellwig <hch@lst.de>:
-> We only call into this function through the iomap iterators, so we already
-> know the buffer is unwritten.  In addition to that we always require the
-> uptodate flag that is ORed with the result anyway.
+We only call into this function through the iomap iterators, so we already
+know the buffer is unwritten.  In addition to that we always require the
+uptodate flag that is ORed with the result anyway.
 
-Please update the page_cache_seek_hole_data description as well:
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/iomap.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 13f518c7d3be..a739f3f995d9 100644
 --- a/fs/iomap.c
 +++ b/fs/iomap.c
-@@ -647,8 +647,8 @@
-  * Seek for SEEK_DATA / SEEK_HOLE in the page cache.
-  *
-  * Within unwritten extents, the page cache determines which parts are holes
-- * and which are data: unwritten and uptodate buffer heads count as data;
-- * everything else counts as a hole.
-+ * and which are data: uptodate buffer heads count as data; everything else
-+ * counts as a hole.
-  *
-  * Returns the resulting offset on successs, and -ENOENT otherwise.
-  */
-
-Thanks,
-Andreas
+@@ -610,14 +610,9 @@ page_seek_hole_data(struct page *page, loff_t lastoff, int whence)
+ 			continue;
+ 
+ 		/*
+-		 * Unwritten extents that have data in the page cache covering
+-		 * them can be identified by the BH_Unwritten state flag.
+-		 * Pages with multiple buffers might have a mix of holes, data
+-		 * and unwritten extents - any buffer with valid data in it
+-		 * should have BH_Uptodate flag set on it.
++		 * Any buffer with valid data in it should have BH_Uptodate set.
+ 		 */
+-
+-		if ((buffer_unwritten(bh) || buffer_uptodate(bh)) == seek_data)
++		if (buffer_uptodate(bh) == seek_data)
+ 			return lastoff;
+ 
+ 		lastoff = offset;
+-- 
+2.17.0
