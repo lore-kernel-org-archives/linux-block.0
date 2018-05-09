@@ -1,61 +1,60 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [RESEND PATCH V5 08/33] block: introduce segment_last_page()
-Date: Fri, 25 May 2018 11:45:56 +0800
-Message-Id: <20180525034621.31147-9-ming.lei@redhat.com>
-In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
-References: <20180525034621.31147-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <BATV+e0efdd19ce80d487e3da+5372+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "Ed L. Cashin" <ed.cashin@acm.org>,
+	Geoff Levand <geoff@infradead.org>,
+	Maxim Levitsky <maximlevitsky@gmail.com>,
+	linux-block@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-mtd@lists.infradead.org,
+	sparclinux@vger.kernel.org
+Subject: [PATCH 6/7] jsflash: handle highmem pages
+Date: Wed,  9 May 2018 15:59:47 +0200
+Message-Id: <20180509135948.20329-7-hch@lst.de>
+In-Reply-To: <20180509135948.20329-1-hch@lst.de>
+References: <20180509135948.20329-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-BTRFS and guard_bio_eod() need to get the last page from one segment, so
-introduce this helper to make them happy.
+Just kmap the bio single page payload before processing it.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+(and yes, now highmem on sparc32 anyway, but kmap_(un)map atomic are nops,
+so this gives the right example)
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- include/linux/bvec.h | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ drivers/sbus/char/jsflash.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 84c395feed49..217afcd83a15 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -219,4 +219,26 @@ static inline bool bvec_iter_seg_advance(const struct bio_vec *bv,
- 	.bi_bvec_done	= 0,						\
- }
+diff --git a/drivers/sbus/char/jsflash.c b/drivers/sbus/char/jsflash.c
+index 14f377ac1280..8520587b8d09 100644
+--- a/drivers/sbus/char/jsflash.c
++++ b/drivers/sbus/char/jsflash.c
+@@ -215,6 +215,7 @@ static void jsfd_request(void)
+ 		unsigned long offset = blk_rq_pos(req) << 9;
+ 		size_t len = blk_rq_cur_bytes(req);
+ 		blk_status_t err = BLK_STS_IOERR;
++		void *p;
  
-+/* get the last page from the multipage bvec and store it in @pg */
-+static inline void segment_last_page(const struct bio_vec *seg,
-+		struct bio_vec *pg)
-+{
-+	unsigned total = seg->bv_offset + seg->bv_len;
-+	unsigned last_page = total / PAGE_SIZE;
-+
-+	if (last_page * PAGE_SIZE == total)
-+		last_page--;
-+
-+	pg->bv_page = nth_page(seg->bv_page, last_page);
-+
-+	/* the whole segment is inside the last page */
-+	if (seg->bv_offset >= last_page * PAGE_SIZE) {
-+		pg->bv_offset = seg->bv_offset % PAGE_SIZE;
-+		pg->bv_len = seg->bv_len;
-+	} else {
-+		pg->bv_offset = 0;
-+		pg->bv_len = total - last_page * PAGE_SIZE;
-+	}
-+}
-+
- #endif /* __LINUX_BVEC_ITER_H */
+ 		if ((offset + len) > jdp->dsize)
+ 			goto end;
+@@ -229,7 +230,9 @@ static void jsfd_request(void)
+ 			goto end;
+ 		}
+ 
+-		jsfd_read(bio_data(req->bio), jdp->dbase + offset, len);
++		p = kmap_atomic(bio_page(bio)) + bio_offset(bio);
++		jsfd_read(p, jdp->dbase + offset, len);
++		kunmap_atomic(p);
+ 		err = BLK_STS_OK;
+ 	end:
+ 		if (!__blk_end_request_cur(req, err))
+@@ -592,7 +595,6 @@ static int jsfd_init(void)
+ 			put_disk(disk);
+ 			goto out;
+ 		}
+-		blk_queue_bounce_limit(disk->queue, BLK_BOUNCE_HIGH);
+ 		jsfd_disk[i] = disk;
+ 	}
+ 
 -- 
-2.9.5
+2.17.0
