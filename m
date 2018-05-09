@@ -1,48 +1,140 @@
-Return-Path: <BATV+df5a2477ff0fa86e9985+5386+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:52200 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933815AbeEIHtn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 03:49:43 -0400
 From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>,
-	Lee Duncan <lduncan@suse.com>,
-	Chris Leech <cleech@redhat.com>,
-	Rafael David Tinoco <rafael.tinoco@canonical.com>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 12/14] blk-mq: Fix timeout and state order
-Date: Wed, 23 May 2018 14:19:39 +0200
-Message-Id: <20180523121941.8632-13-hch@lst.de>
-In-Reply-To: <20180523121941.8632-1-hch@lst.de>
-References: <20180523121941.8632-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 19/33] xfs: remove xfs_reflink_find_cow_mapping
+Date: Wed,  9 May 2018 09:48:16 +0200
+Message-Id: <20180509074830.16196-20-hch@lst.de>
+In-Reply-To: <20180509074830.16196-1-hch@lst.de>
+References: <20180509074830.16196-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Keith Busch <keith.busch@intel.com>
+We only have one caller left, and open coding the simple extent list
+lookup in it allows us to make the code both more understandable and
+reuse calculations and variables already present.
 
-The block layer had been setting the state to in-flight prior to updating
-the timer. This is the wrong order since the timeout handler could observe
-the in-flight state with the older timeout, believing the request had
-expired when in fact it is just getting started.
-
-Signed-off-by: Keith Busch <keith.busch@intel.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/xfs/xfs_aops.c    | 17 ++++++++++++-----
+ fs/xfs/xfs_reflink.c | 30 ------------------------------
+ fs/xfs/xfs_reflink.h |  2 --
+ fs/xfs/xfs_trace.h   |  1 -
+ 4 files changed, 12 insertions(+), 38 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 22ab2a148a9b..614cb03732ed 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -697,8 +697,8 @@ void blk_mq_start_request(struct request *rq)
- 	preempt_disable();
- 	write_seqcount_begin(&rq->gstate_seq);
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 6ad43829c89a..41616629dd13 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -385,6 +385,7 @@ xfs_map_blocks(
+ 	ssize_t			count = i_blocksize(inode);
+ 	xfs_fileoff_t		offset_fsb, end_fsb;
+ 	int			whichfork = XFS_DATA_FORK;
++	struct xfs_iext_cursor	icur;
+ 	int			error = 0;
+ 	int			nimaps = 1;
  
--	blk_mq_rq_update_state(rq, MQ_RQ_IN_FLIGHT);
- 	blk_add_timer(rq);
-+	blk_mq_rq_update_state(rq, MQ_RQ_IN_FLIGHT);
+@@ -396,8 +397,18 @@ xfs_map_blocks(
+ 	       (ip->i_df.if_flags & XFS_IFEXTENTS));
+ 	ASSERT(offset <= mp->m_super->s_maxbytes);
  
- 	write_seqcount_end(&rq->gstate_seq);
- 	preempt_enable();
++	if (offset > mp->m_super->s_maxbytes - count)
++		count = mp->m_super->s_maxbytes - offset;
++	end_fsb = XFS_B_TO_FSB(mp, (xfs_ufsize_t)offset + count);
++	offset_fsb = XFS_B_TO_FSBT(mp, offset);
++
++	/*
++	 * Check if this is offset is covered by a COW extents, and if yes use
++	 * it directly instead of looking up anything in the data fork.
++	 */
+ 	if (xfs_is_reflink_inode(ip) &&
+-	    xfs_reflink_find_cow_mapping(ip, offset, imap)) {
++	    xfs_iext_lookup_extent(ip, ip->i_cowfp, offset_fsb, &icur, imap) &&
++	    imap->br_startoff <= offset_fsb) {
+ 		xfs_iunlock(ip, XFS_ILOCK_SHARED);
+ 		/*
+ 		 * Truncate can race with writeback since writeback doesn't
+@@ -417,10 +428,6 @@ xfs_map_blocks(
+ 		goto done;
+ 	}
+ 
+-	if (offset > mp->m_super->s_maxbytes - count)
+-		count = mp->m_super->s_maxbytes - offset;
+-	end_fsb = XFS_B_TO_FSB(mp, (xfs_ufsize_t)offset + count);
+-	offset_fsb = XFS_B_TO_FSBT(mp, offset);
+ 	error = xfs_bmapi_read(ip, offset_fsb, end_fsb - offset_fsb,
+ 				imap, &nimaps, XFS_BMAPI_ENTIRE);
+ 	if (!nimaps) {
+diff --git a/fs/xfs/xfs_reflink.c b/fs/xfs/xfs_reflink.c
+index cdbd342a5249..3776b7bbd8c6 100644
+--- a/fs/xfs/xfs_reflink.c
++++ b/fs/xfs/xfs_reflink.c
+@@ -484,36 +484,6 @@ xfs_reflink_allocate_cow(
+ 	return error;
+ }
+ 
+-/*
+- * Find the CoW reservation for a given byte offset of a file.
+- */
+-bool
+-xfs_reflink_find_cow_mapping(
+-	struct xfs_inode		*ip,
+-	xfs_off_t			offset,
+-	struct xfs_bmbt_irec		*imap)
+-{
+-	struct xfs_ifork		*ifp = XFS_IFORK_PTR(ip, XFS_COW_FORK);
+-	xfs_fileoff_t			offset_fsb;
+-	struct xfs_bmbt_irec		got;
+-	struct xfs_iext_cursor		icur;
+-
+-	ASSERT(xfs_isilocked(ip, XFS_ILOCK_EXCL | XFS_ILOCK_SHARED));
+-
+-	if (!xfs_is_reflink_inode(ip))
+-		return false;
+-	offset_fsb = XFS_B_TO_FSBT(ip->i_mount, offset);
+-	if (!xfs_iext_lookup_extent(ip, ifp, offset_fsb, &icur, &got))
+-		return false;
+-	if (got.br_startoff > offset_fsb)
+-		return false;
+-
+-	trace_xfs_reflink_find_cow_mapping(ip, offset, 1, XFS_IO_OVERWRITE,
+-			&got);
+-	*imap = got;
+-	return true;
+-}
+-
+ /*
+  * Trim an extent to end at the next CoW reservation past offset_fsb.
+  */
+diff --git a/fs/xfs/xfs_reflink.h b/fs/xfs/xfs_reflink.h
+index 701487bab468..15a456492667 100644
+--- a/fs/xfs/xfs_reflink.h
++++ b/fs/xfs/xfs_reflink.h
+@@ -32,8 +32,6 @@ extern int xfs_reflink_allocate_cow(struct xfs_inode *ip,
+ 		struct xfs_bmbt_irec *imap, bool *shared, uint *lockmode);
+ extern int xfs_reflink_convert_cow(struct xfs_inode *ip, xfs_off_t offset,
+ 		xfs_off_t count);
+-extern bool xfs_reflink_find_cow_mapping(struct xfs_inode *ip, xfs_off_t offset,
+-		struct xfs_bmbt_irec *imap);
+ extern void xfs_reflink_trim_irec_to_next_cow(struct xfs_inode *ip,
+ 		xfs_fileoff_t offset_fsb, struct xfs_bmbt_irec *imap);
+ 
+diff --git a/fs/xfs/xfs_trace.h b/fs/xfs/xfs_trace.h
+index 8955254b900e..aa284f840d33 100644
+--- a/fs/xfs/xfs_trace.h
++++ b/fs/xfs/xfs_trace.h
+@@ -3220,7 +3220,6 @@ DEFINE_INODE_IREC_EVENT(xfs_reflink_convert_cow);
+ DEFINE_RW_EVENT(xfs_reflink_reserve_cow);
+ 
+ DEFINE_SIMPLE_IO_EVENT(xfs_reflink_bounce_dio_write);
+-DEFINE_IOMAP_EVENT(xfs_reflink_find_cow_mapping);
+ DEFINE_INODE_IREC_EVENT(xfs_reflink_trim_irec);
+ 
+ DEFINE_SIMPLE_IO_EVENT(xfs_reflink_cancel_cow_range);
 -- 
 2.17.0
