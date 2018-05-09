@@ -1,14 +1,15 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:36720 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933832AbeEILi7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 07:38:59 -0400
-Date: Wed, 9 May 2018 13:38:49 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Johannes Weiner <hannes@cmpxchg.org>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
+Received: from smtp.codeaurora.org ([198.145.29.96]:41200 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933685AbeEILDe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 07:03:34 -0400
+Subject: Re: [PATCH 6/7] psi: pressure stall information for CPU, memory, and
+ IO
+To: Johannes Weiner <hannes@cmpxchg.org>, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org
+Cc: Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
         Andrew Morton <akpm@linuxfoundation.org>,
         Tejun Heo <tj@kernel.org>,
         Balbir Singh <bsingharora@gmail.com>,
@@ -18,68 +19,96 @@ Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         xxx xxx <x.qendo@gmail.com>,
         Taras Kondratiuk <takondra@cisco.com>,
         Daniel Walker <danielwa@cisco.com>,
-        Vinayak Menon <vinmenon@codeaurora.org>,
         Ruslan Ruslichenko <rruslich@cisco.com>, kernel-team@fb.com
-Subject: Re: [PATCH 6/7] psi: pressure stall information for CPU, memory, and
- IO
-Message-ID: <20180509113849.GJ12235@hirez.programming.kicks-ass.net>
 References: <20180507210135.1823-1-hannes@cmpxchg.org>
  <20180507210135.1823-7-hannes@cmpxchg.org>
- <20180509104618.GP12217@hirez.programming.kicks-ass.net>
+From: Vinayak Menon <vinmenon@codeaurora.org>
+Message-ID: <87060553-2e09-2e2a-13a2-a91345d6df30@codeaurora.org>
+Date: Wed, 9 May 2018 16:33:24 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180509104618.GP12217@hirez.programming.kicks-ass.net>
+In-Reply-To: <20180507210135.1823-7-hannes@cmpxchg.org>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, May 09, 2018 at 12:46:18PM +0200, Peter Zijlstra wrote:
-> On Mon, May 07, 2018 at 05:01:34PM -0400, Johannes Weiner wrote:
-> 
-> > @@ -2038,6 +2038,7 @@ try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
-> >  	cpu = select_task_rq(p, p->wake_cpu, SD_BALANCE_WAKE, wake_flags);
-> >  	if (task_cpu(p) != cpu) {
-> >  		wake_flags |= WF_MIGRATED;
-> > +		psi_ttwu_dequeue(p);
-> >  		set_task_cpu(p, cpu);
-> >  	}
-> >  
-> 
-> > +static inline void psi_ttwu_dequeue(struct task_struct *p)
-> > +{
-> > +	/*
-> > +	 * Is the task being migrated during a wakeup? Make sure to
-> > +	 * deregister its sleep-persistent psi states from the old
-> > +	 * queue, and let psi_enqueue() know it has to requeue.
-> > +	 */
-> > +	if (unlikely(p->in_iowait || (p->flags & PF_MEMSTALL))) {
-> > +		struct rq_flags rf;
-> > +		struct rq *rq;
-> > +		int clear = 0;
-> > +
-> > +		if (p->in_iowait)
-> > +			clear |= TSK_IOWAIT;
-> > +		if (p->flags & PF_MEMSTALL)
-> > +			clear |= TSK_MEMSTALL;
-> > +
-> > +		rq = __task_rq_lock(p, &rf);
-> > +		update_rq_clock(rq);
-> > +		psi_task_change(p, rq_clock(rq), clear, 0);
-> > +		p->sched_psi_wake_requeue = 1;
-> > +		__task_rq_unlock(rq, &rf);
-> > +	}
-> > +}
-> 
-> Yeah, no... not happening.
-> 
-> We spend a lot of time to never touch the old rq->lock on wakeups. Mason
-> was the one pushing for that, so he should very well know this.
-> 
-> The one cross-cpu atomic (iowait) is already a problem (the whole iowait
-> accounting being useless makes it even worse), adding significant remote
-> prodding is just really bad.
 
-Also, since all you need is the global number, I don't think you
-actually need any of this. See what we do for nr_uninterruptible.
+On 5/8/2018 2:31 AM, Johannes Weiner wrote:
+> +static void psi_group_update(struct psi_group *group, int cpu, u64 now,
+> +			     unsigned int clear, unsigned int set)
+> +{
+> +	enum psi_state state = PSI_NONE;
+> +	struct psi_group_cpu *groupc;
+> +	unsigned int *tasks;
+> +	unsigned int to, bo;
+> +
+> +	groupc = per_cpu_ptr(group->cpus, cpu);
+> +	tasks = groupc->tasks;
+> +
+> +	/* Update task counts according to the set/clear bitmasks */
+> +	for (to = 0; (bo = ffs(clear)); to += bo, clear >>= bo) {
+> +		int idx = to + (bo - 1);
+> +
+> +		if (tasks[idx] == 0 && !psi_bug) {
+> +			printk_deferred(KERN_ERR "psi: task underflow! cpu=%d idx=%d tasks=[%u %u %u %u]\n",
+> +					cpu, idx, tasks[0], tasks[1],
+> +					tasks[2], tasks[3]);
+> +			psi_bug = 1;
+> +		}
+> +		tasks[idx]--;
+> +	}
+> +	for (to = 0; (bo = ffs(set)); to += bo, set >>= bo)
+> +		tasks[to + (bo - 1)]++;
+> +
+> +	/* Time in which tasks wait for the CPU */
+> +	state = PSI_NONE;
+> +	if (tasks[NR_RUNNING] > 1)
+> +		state = PSI_SOME;
+> +	time_state(&groupc->res[PSI_CPU], state, now);
+> +
+> +	/* Time in which tasks wait for memory */
+> +	state = PSI_NONE;
+> +	if (tasks[NR_MEMSTALL]) {
+> +		if (!tasks[NR_RUNNING] ||
+> +		    (cpu_curr(cpu)->flags & PF_MEMSTALL))
+> +			state = PSI_FULL;
+> +		else
+> +			state = PSI_SOME;
+> +	}
+> +	time_state(&groupc->res[PSI_MEM], state, now);
+> +
+> +	/* Time in which tasks wait for IO */
+> +	state = PSI_NONE;
+> +	if (tasks[NR_IOWAIT]) {
+> +		if (!tasks[NR_RUNNING])
+> +			state = PSI_FULL;
+> +		else
+> +			state = PSI_SOME;
+> +	}
+> +	time_state(&groupc->res[PSI_IO], state, now);
+> +
+> +	/* Time in which tasks are non-idle, to weigh the CPU in summaries */
+> +	if (groupc->nonidle)
+> +		groupc->nonidle_time += now - groupc->nonidle_start;
+> +	groupc->nonidle = tasks[NR_RUNNING] ||
+> +		tasks[NR_IOWAIT] || tasks[NR_MEMSTALL];
+> +	if (groupc->nonidle)
+> +		groupc->nonidle_start = now;
+> +
+> +	/* Kick the stats aggregation worker if it's gone to sleep */
+> +	if (!delayed_work_pending(&group->clock_work))
 
-In general I think you want to (re)read loadavg.c some more, and maybe
-reuse a bit more of that.
+This causes a crash when the work is scheduled before system_wq is up. In my case when the first
+schedule was called from kthreadd. And I had to do this to make it work.
+if (keventd_up() && !delayed_work_pending(&group->clock_work))
+
+> +		schedule_delayed_work(&group->clock_work, MY_LOAD_FREQ);
+> +}
+> +
+> +void psi_task_change(struct task_struct *task, u64 now, int clear, int set)
+> +{
+> +	struct cgroup *cgroup, *parent;
+
+unused variables
+
+Thanks,
+Vinayak
