@@ -1,147 +1,102 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	James Smart <james.smart@broadcom.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V5 2/9] nvme: pci: cover timeout for admin commands running in EH
-Date: Fri, 11 May 2018 20:29:26 +0800
-Message-Id: <20180511122933.27155-3-ming.lei@redhat.com>
-In-Reply-To: <20180511122933.27155-1-ming.lei@redhat.com>
-References: <20180511122933.27155-1-ming.lei@redhat.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 27/33] xfs: remove xfs_start_page_writeback
+Date: Wed,  9 May 2018 09:48:24 +0200
+Message-Id: <20180509074830.16196-28-hch@lst.de>
+In-Reply-To: <20180509074830.16196-1-hch@lst.de>
+References: <20180509074830.16196-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-When admin commands are used in EH for recovering controller, we have to
-cover their timeout and can't depend on block's timeout since deadlock may
-be caused when these commands are timed-out by block layer again.
+This helper only has two callers, one of them with a constant error
+argument.  Remove it to make pending changes to the code a little easier.
 
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/pci.c | 81 ++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 70 insertions(+), 11 deletions(-)
+ fs/xfs/xfs_aops.c | 47 +++++++++++++++++++++--------------------------
+ 1 file changed, 21 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index fbc71fac6f1e..ff09b1c760ea 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1733,21 +1733,28 @@ static inline void nvme_release_cmb(struct nvme_dev *dev)
- 	}
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 879599f723b6..6b39792270aa 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -521,30 +521,6 @@ xfs_imap_valid(
+ 		offset < imap->br_startoff + imap->br_blockcount;
  }
  
--static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
-+static void nvme_init_set_host_mem_cmd(struct nvme_dev *dev,
-+		struct nvme_command *c, u32 bits)
- {
- 	u64 dma_addr = dev->host_mem_descs_dma;
-+
-+	memset(c, 0, sizeof(*c));
-+	c->features.opcode	= nvme_admin_set_features;
-+	c->features.fid		= cpu_to_le32(NVME_FEAT_HOST_MEM_BUF);
-+	c->features.dword11	= cpu_to_le32(bits);
-+	c->features.dword12	= cpu_to_le32(dev->host_mem_size >>
-+					      ilog2(dev->ctrl.page_size));
-+	c->features.dword13	= cpu_to_le32(lower_32_bits(dma_addr));
-+	c->features.dword14	= cpu_to_le32(upper_32_bits(dma_addr));
-+	c->features.dword15	= cpu_to_le32(dev->nr_host_mem_descs);
-+}
-+
-+static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
-+{
- 	struct nvme_command c;
- 	int ret;
+-STATIC void
+-xfs_start_page_writeback(
+-	struct page		*page,
+-	int			clear_dirty)
+-{
+-	ASSERT(PageLocked(page));
+-	ASSERT(!PageWriteback(page));
+-
+-	/*
+-	 * if the page was not fully cleaned, we need to ensure that the higher
+-	 * layers come back to it correctly. That means we need to keep the page
+-	 * dirty, and for WB_SYNC_ALL writeback we need to ensure the
+-	 * PAGECACHE_TAG_TOWRITE index mark is not removed so another attempt to
+-	 * write this page in this writeback sweep will be made.
+-	 */
+-	if (clear_dirty) {
+-		clear_page_dirty_for_io(page);
+-		set_page_writeback(page);
+-	} else
+-		set_page_writeback_keepwrite(page);
+-
+-	unlock_page(page);
+-}
+-
+ /*
+  * Submit the bio for an ioend. We are passed an ioend with a bio attached to
+  * it, and we submit that bio. The ioend may be used for multiple bio
+@@ -910,6 +886,9 @@ xfs_writepage_map(
+ 	ASSERT(wpc->ioend || list_empty(&submit_list));
  
--	memset(&c, 0, sizeof(c));
--	c.features.opcode	= nvme_admin_set_features;
--	c.features.fid		= cpu_to_le32(NVME_FEAT_HOST_MEM_BUF);
--	c.features.dword11	= cpu_to_le32(bits);
--	c.features.dword12	= cpu_to_le32(dev->host_mem_size >>
--					      ilog2(dev->ctrl.page_size));
--	c.features.dword13	= cpu_to_le32(lower_32_bits(dma_addr));
--	c.features.dword14	= cpu_to_le32(upper_32_bits(dma_addr));
--	c.features.dword15	= cpu_to_le32(dev->nr_host_mem_descs);
-+	nvme_init_set_host_mem_cmd(dev, &c, bits);
+ out:
++	ASSERT(PageLocked(page));
++	ASSERT(!PageWriteback(page));
++
+ 	/*
+ 	 * On error, we have to fail the ioend here because we have locked
+ 	 * buffers in the ioend. If we don't do this, we'll deadlock
+@@ -928,7 +907,21 @@ xfs_writepage_map(
+ 	 * treated correctly on error.
+ 	 */
+ 	if (count) {
+-		xfs_start_page_writeback(page, !error);
++		/*
++		 * If the page was not fully cleaned, we need to ensure that the
++		 * higher layers come back to it correctly.  That means we need
++		 * to keep the page dirty, and for WB_SYNC_ALL writeback we need
++		 * to ensure the PAGECACHE_TAG_TOWRITE index mark is not removed
++		 * so another attempt to write this page in this writeback sweep
++		 * will be made.
++		 */
++		if (error) {
++			set_page_writeback_keepwrite(page);
++		} else {
++			clear_page_dirty_for_io(page);
++			set_page_writeback(page);
++		}
++		unlock_page(page);
  
- 	ret = nvme_submit_sync_cmd(dev->ctrl.admin_q, &c, NULL, 0);
- 	if (ret) {
-@@ -1758,6 +1765,58 @@ static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
- 	return ret;
- }
- 
-+static void nvme_set_host_mem_end_io(struct request *rq, blk_status_t sts)
-+{
-+	struct completion *waiting = rq->end_io_data;
-+
-+	rq->end_io_data = NULL;
-+
-+	/*
-+	 * complete last, if this is a stack request the process (and thus
-+	 * the rq pointer) could be invalid right after this complete()
-+	 */
-+	complete(waiting);
-+}
-+
-+/*
-+ * This function can only be used inside nvme_dev_disable() when timeout
-+ * may not work, then this function has to cover the timeout by itself.
-+ *
-+ * When wait_for_completion_io_timeout() returns 0 and timeout happens,
-+ * this request will be completed after controller is shutdown.
-+ */
-+static int nvme_set_host_mem_timeout(struct nvme_dev *dev, u32 bits)
-+{
-+	DECLARE_COMPLETION_ONSTACK(wait);
-+	struct nvme_command c;
-+	struct request_queue *q = dev->ctrl.admin_q;
-+	struct request *req;
-+	int ret;
-+
-+	nvme_init_set_host_mem_cmd(dev, &c, bits);
-+
-+	req = nvme_alloc_request(q, &c, 0, NVME_QID_ANY);
-+	if (IS_ERR(req))
-+		return PTR_ERR(req);
-+
-+	req->timeout = ADMIN_TIMEOUT;
-+	req->end_io_data = &wait;
-+
-+	blk_execute_rq_nowait(q, NULL, req, false,
-+			nvme_set_host_mem_end_io);
-+	ret = wait_for_completion_io_timeout(&wait, ADMIN_TIMEOUT);
-+	if (ret > 0) {
-+		if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
-+			ret = -EINTR;
-+		else
-+			ret = nvme_req(req)->status;
-+		blk_mq_free_request(req);
-+	} else
-+		ret = -EINTR;
-+
-+	return ret;
-+}
-+
- static void nvme_free_host_mem(struct nvme_dev *dev)
- {
- 	int i;
-@@ -2216,7 +2275,7 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
- 		 * but I'd rather be safe than sorry..
+ 		/*
+ 		 * Preserve the original error if there was one, otherwise catch
+@@ -953,7 +946,9 @@ xfs_writepage_map(
+ 		 * race with a partial page truncate on a sub-page block sized
+ 		 * filesystem. In that case we need to mark the page clean.
  		 */
- 		if (dev->host_mem_descs)
--			nvme_set_host_mem(dev, 0);
-+			nvme_set_host_mem_timeout(dev, 0);
- 		nvme_disable_io_queues(dev);
- 		nvme_disable_admin_queue(dev, shutdown);
+-		xfs_start_page_writeback(page, 1);
++		clear_page_dirty_for_io(page);
++		set_page_writeback(page);
++		unlock_page(page);
+ 		end_page_writeback(page);
  	}
+ 
 -- 
-2.9.5
+2.17.0
