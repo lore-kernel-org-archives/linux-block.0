@@ -1,46 +1,21 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH v3 6/6] bcache: use pr_info() to inform duplicated CACHE_SET_IO_DISABLE set
-Date: Thu,  3 May 2018 18:51:37 +0800
-Message-Id: <20180503105137.2922-7-colyli@suse.de>
-In-Reply-To: <20180503105137.2922-1-colyli@suse.de>
-References: <20180503105137.2922-1-colyli@suse.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] brd: Mark as non-rotational
+To: SeongJae Park <sj38.park@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20180503095326.7414-1-sj38.park@gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <4da307ac-77c5-1eed-434c-005c97f9a308@kernel.dk>
+Date: Wed, 9 May 2018 08:44:10 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180503095326.7414-1-sj38.park@gmail.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-It is possible that multiple I/O requests hits on failed cache device or
-backing device, therefore it is quite common that CACHE_SET_IO_DISABLE is
-set already when a task tries to set the bit from bch_cache_set_error().
-Currently the message "CACHE_SET_IO_DISABLE already set" is printed by
-pr_warn(), which might mislead users to think a serious fault happens in
-source code.
+On 5/3/18 3:53 AM, SeongJae Park wrote:
+> This commit sets QUEUE_FLAG_NONROT and clears up QUEUE_FLAG_ADD_RANDOM
+> to mark the ramdisks as non-rotational device.
 
-This patch uses pr_info() to print the information in such situation,
-avoid extra worries. This information is helpful to understand bcache
-behavior in cache device failures, so I still keep them in source code.
+Applied for 4.18, thanks.
 
-Fixes: 771f393e8ffc9 ("bcache: add CACHE_SET_IO_DISABLE to struct cache_set flags")
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- drivers/md/bcache/super.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index cedbb41533c2..3dea06b41d43 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1412,7 +1412,7 @@ bool bch_cache_set_error(struct cache_set *c, const char *fmt, ...)
- 		return false;
- 
- 	if (test_and_set_bit(CACHE_SET_IO_DISABLE, &c->flags))
--		pr_warn("CACHE_SET_IO_DISABLE already set");
-+		pr_info("CACHE_SET_IO_DISABLE already set");
- 
- 	/* XXX: we can be called from atomic context
- 	acquire_console_sem();
 -- 
-2.16.3
+Jens Axboe
