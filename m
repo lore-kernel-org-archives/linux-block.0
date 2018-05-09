@@ -1,53 +1,79 @@
-Return-Path: <tytso@thunk.org>
-Date: Wed, 9 May 2018 10:02:48 -0400
-From: "Theodore Y. Ts'o" <tytso@mit.edu>
-To: Dmitry Vyukov <dvyukov@google.com>
-Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Jens Axboe <axboe@kernel.dk>,
-	syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH] loop: add recursion validation to LOOP_CHANGE_FD
-Message-ID: <20180509140248.GF28388@thunk.org>
-References: <201805080545.HAF30756.QJOFOHFtSVMFLO@I-love.SAKURA.ne.jp>
- <20180507235142.GC999@thunk.org>
- <201805080028.w480SH3m013943@www262.sakura.ne.jp>
- <20180508035626.GF999@thunk.org>
- <CACT4Y+ZZqUHgBduxGoSo5GuEBp8jTD=_mqq1wnyoA_hWVrD+jQ@mail.gmail.com>
+Return-Path: <dvyukov@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CACT4Y+ZZqUHgBduxGoSo5GuEBp8jTD=_mqq1wnyoA_hWVrD+jQ@mail.gmail.com>
+In-Reply-To: <20180508035626.GF999@thunk.org>
+References: <201805080545.HAF30756.QJOFOHFtSVMFLO@I-love.SAKURA.ne.jp>
+ <20180507235142.GC999@thunk.org> <201805080028.w480SH3m013943@www262.sakura.ne.jp>
+ <20180508035626.GF999@thunk.org>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Wed, 9 May 2018 10:49:54 +0200
+Message-ID: <CACT4Y+ZZqUHgBduxGoSo5GuEBp8jTD=_mqq1wnyoA_hWVrD+jQ@mail.gmail.com>
+Subject: Re: [PATCH] loop: add recursion validation to LOOP_CHANGE_FD
+To: "Theodore Y. Ts'o" <tytso@mit.edu>
+Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Jens Axboe <axboe@kernel.dk>,
+	syzkaller-bugs <syzkaller-bugs@googlegroups.com>, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, May 09, 2018 at 10:49:54AM +0200, Dmitry Vyukov wrote:
-> Hi Ted,
-> 
-> Did you follow all instructions (commit, config, compiler, etc)?
-> syzbot does not have any special magic, it just executes the described
-> steps and then collects the kernel crash output it sees.
+On Tue, May 8, 2018 at 5:56 AM, Theodore Y. Ts'o <tytso@mit.edu> wrote:
+> On Tue, May 08, 2018 at 09:28:17AM +0900, Tetsuo Handa wrote:
+>> The thread I mean is:
+>>
+>>   general protection fault in lo_ioctl (2)
+>>   https://syzkaller.appspot.com/bug?id=f3cfe26e785d85f9ee259f385515291d21bd80a3
+>>
+>> Are you sure that your patch solves this problem as well?
+>
+> Well, I can't be sure, since there's not enough information in that
+> particular syzkaller report to definitively pin down the root cause.
+>
+> And while I can't reproduce the crash using the syzkaller repro with
+> the patch; I can't reproduce the crash *without* the patch, either.
 
-No, I didn't.  Unfortunately, I don't have the time to repro it on
-exactly the config, commit, compiler.  And debugging tons of Syzkaller
-commits is not on my OKR list, and I have lots of P0/P1 bugs and
-projects that are competing for my attention.
+Hi Ted,
 
-I tried repro'ing it using the standard compiler, and using -rc4 as a
-base.  If it doesn't repro there, using my standard kernel config ---
-and it requires root, and in my judgement it's *highly* unlikely to
-happen in real life --- then it becomes a P2 or P3 bug, it's not worth
-my time to build a kernel using exactly the commit, config, and
-compiler that Syzkaller specified.  Someday, you or I or someone else
-will build at tool that builds the kernel in a GCE VM, using the
-specified config and a compiler, and which minimizes the amount of
-human toil needed to do the sort of investigation you seem to want to
-dump on upstream developers.
+Did you follow all instructions (commit, config, compiler, etc)?
+syzbot does not have any special magic, it just executes the described
+steps and then collects the kernel crash output it sees.
 
-There's a *reason* why many upstream developers have been asking for
-improvements in the syzkaller tool to reduce toil.  If it's fair for
-you to ask for us to do work, then it's also fair for us to ask you to
-do work.  And if the answer is "sorry, I don't have the time; other
-things are higher priority", that's a fair answer coming from both
-sides.
 
-Regards,
+> This is what Syzkaller has to say, but of course, in its own
+> documentation's words, "It's only a dumb bot".  :-)e
 
-						- Ted
+Well, not anymore. Now it's just a "bot":
+https://github.com/google/syzkaller/commit/8180779d1d06e1cdf27882f50e7f72650f95797d
+Too many people took "dumb bot" too seriously ;)
+
+
+> That being said, triggering the problem which it is so concerned about
+> requires root privilieges, so I would not consider it high priority to
+> track down --- especially given that we don't have a reliable
+> reproducer for it.
+>
+>
+>                                     - Ted
+>
+> Hello,
+>
+> syzbot has tested the proposed patch and the reproducer did not trigger
+> crash:
+>
+> Reported-and-tested-by:
+> syzbot+bf89c128e05dd6c62523@syzkaller.appspotmail.com
+>
+> Tested on:
+>
+> commit:         170785a9cc72 loop: add recursion validation to LOOP_CHANGE..
+> git tree:
+> git://git.kernel.org/pub/scm/linux/kernel/git/tytso/ext4.git/loop-fix
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=5a1dc06635c10d27
+> compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
+> userspace arch: i386
+>
+> Note: testing is done by a robot and is best-effort only.
+>
+>
+> --
+> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/20180508035626.GF999%40thunk.org.
+> For more options, visit https://groups.google.com/d/optout.
