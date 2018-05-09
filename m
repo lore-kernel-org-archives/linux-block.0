@@ -1,113 +1,99 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-xfs@vger.kernel.org
-Cc: dchinner@redhat.com,
-	hch@lst.de,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 3/4] blk-wbt: pass in enum wbt_flags to get_rq_wait()
-Date: Mon,  7 May 2018 10:13:34 -0600
-Message-Id: <1525709615-14395-4-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1525709615-14395-1-git-send-email-axboe@kernel.dk>
-References: <1525709615-14395-1-git-send-email-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:38105 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S934770AbeEIOpR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 9 May 2018 10:45:17 -0400
+Date: Wed, 9 May 2018 16:45:15 +0200
+From: Jan Kara <jack@suse.cz>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Jeff Layton <jlayton@kernel.org>, Jan Kara <jack@suse.cz>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        tj@kernel.org
+Subject: Re: write call hangs in kernel space after virtio hot-remove
+Message-ID: <20180509144515.szlyekiway7sppwz@quack2.suse.cz>
+References: <f0787b79-1e50-5f55-a400-44f715451777@linux.ibm.com>
+ <20180503144255.gortapk4rfqib3kj@quack2.suse.cz>
+ <0e80a398d8384741f8151212c63cbdff42c9cad1.camel@kernel.org>
+ <20180503174820.GA1562@bombadil.infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180503174820.GA1562@bombadil.infradead.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This is in preparation for having more write queues, in which
-case we would have needed to pass in more information than just
-a simple 'is_kswapd' boolean.
+On Thu 03-05-18 10:48:20, Matthew Wilcox wrote:
+> On Thu, May 03, 2018 at 12:05:14PM -0400, Jeff Layton wrote:
+> > On Thu, 2018-05-03 at 16:42 +0200, Jan Kara wrote:
+> > > On Wed 25-04-18 17:07:48, Fabiano Rosas wrote:
+> > > > I'm looking into an issue where removing a virtio disk via sysfs while another
+> > > > process is issuing write() calls results in the writing task going into a
+> > > > livelock:
+> >
+> > > Thanks for the debugging of the problem. I agree with your analysis however
+> > > I don't like your fix. The issue is that when bdi is unregistered we don't
+> > > really expect any writeback to happen after that moment. This is what
+> > > prevents various use-after-free issues and I'd like that to stay the way it
+> > > is.
+> > > 
+> > > What I think we should do is that we'll prevent dirtying of new pages when
+> > > we know the underlying device is gone. Because that will fix your problem
+> > > and also make sure user sees the IO errors directly instead of just in the
+> > > kernel log. The question is how to make this happen in the least painful
+> > > way. I think we could intercept writes in grab_cache_page_write_begin()
+> > > (which however requires that function to return a proper error code and not
+> > > just NULL / non-NULL). And we should also intercept write faults to not
+> > > allow page dirtying via mmap - probably somewhere in do_shared_fault() and
+> > > do_wp_page(). I've added Jeff to CC since he's dealing with IO error
+> > > handling a lot these days. Jeff, what do you think?
+> > 
+> > (cc'ing Willy too since he's given this more thought than me)
+> > 
+> > For the record, I've mostly been looking at error _reporting_. Handling
+> > errors at this level is not something I've really considered in great
+> > detail as of yet.
+> > 
+> > Still, I think the basic idea sounds reasonable. Not allowing pages to
+> > be dirtied when we can't clean them seems like a reasonable thing to
+> > do.
+> > 
+> > The big question is how we'll report this to userland:
+> > 
+> > Would your approach have it return an error on write() and such? What
+> > sort of error if so? ENODEV? Would we have to SIGBUS when someone tries
+> > to dirty the page through mmap?
+> 
+> I have been having some thoughts in this direction.  They are perhaps
+> a little more long-term than this particular bug, so they may not be
+> relevant to the immediate fix.
+> 
+> I want to separate removing hardware from tearing down the block device
+> that represents something on those hardware devices.  That allows for
+> better handling of intermittent transport failures, or accidental device
+> removal, followed by a speedy insert.
+> 
+> In that happy future, the bug described here wouldn't be getting an
+> -EIO, it'd be getting an -ENODEV because we've decided this device is
+> permanently gone.  I think that should indeed be a SIGBUS on mapped
+> writes.
+> 
+> Looking at the current code, filemap_fault() will return VM_FAULT_SIGBUS
+> already if page_cache_read() returns any error other than -ENOMEM, so
+> that's fine.  We probably want some code (and this is where I reach the
+> edge of my knowledge about the current page cache) to rip all the pages
+> out of the page cache for every file on an -ENODEV filesystem.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-wbt.c | 25 +++++++++++++++----------
- block/blk-wbt.h |  4 +++-
- 2 files changed, 18 insertions(+), 11 deletions(-)
+Note that that already (partially) happens through:
 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 3e34b41bcefc..25d202345965 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -101,9 +101,13 @@ static bool wb_recent_wait(struct rq_wb *rwb)
- 	return time_before(jiffies, wb->dirty_sleep + HZ);
- }
- 
--static inline struct rq_wait *get_rq_wait(struct rq_wb *rwb, bool is_kswapd)
-+static inline struct rq_wait *get_rq_wait(struct rq_wb *rwb,
-+					  enum wbt_flags wb_acct)
- {
--	return &rwb->rq_wait[is_kswapd];
-+	if (wb_acct & WBT_KSWAPD)
-+		return &rwb->rq_wait[WBT_RWQ_KSWAPD];
-+
-+	return &rwb->rq_wait[WBT_RWQ_BG];
- }
- 
- static void rwb_wake_all(struct rq_wb *rwb)
-@@ -126,7 +130,7 @@ void __wbt_done(struct rq_wb *rwb, enum wbt_flags wb_acct)
- 	if (!(wb_acct & WBT_TRACKED))
- 		return;
- 
--	rqw = get_rq_wait(rwb, wb_acct & WBT_KSWAPD);
-+	rqw = get_rq_wait(rwb, wb_acct);
- 	inflight = atomic_dec_return(&rqw->inflight);
- 
- 	/*
-@@ -529,11 +533,12 @@ static inline bool may_queue(struct rq_wb *rwb, struct rq_wait *rqw,
-  * Block if we will exceed our limit, or if we are currently waiting for
-  * the timer to kick off queuing again.
-  */
--static void __wbt_wait(struct rq_wb *rwb, unsigned long rw, spinlock_t *lock)
-+static void __wbt_wait(struct rq_wb *rwb, enum wbt_flags wb_acct,
-+		       unsigned long rw, spinlock_t *lock)
- 	__releases(lock)
- 	__acquires(lock)
- {
--	struct rq_wait *rqw = get_rq_wait(rwb, current_is_kswapd());
-+	struct rq_wait *rqw = get_rq_wait(rwb, wb_acct);
- 	DEFINE_WAIT(wait);
- 
- 	if (may_queue(rwb, rqw, &wait, rw))
-@@ -584,7 +589,7 @@ static inline bool wbt_should_throttle(struct rq_wb *rwb, struct bio *bio)
-  */
- enum wbt_flags wbt_wait(struct rq_wb *rwb, struct bio *bio, spinlock_t *lock)
- {
--	unsigned int ret = 0;
-+	enum wbt_flags ret = 0;
- 
- 	if (!rwb_enabled(rwb))
- 		return 0;
-@@ -598,14 +603,14 @@ enum wbt_flags wbt_wait(struct rq_wb *rwb, struct bio *bio, spinlock_t *lock)
- 		return ret;
- 	}
- 
--	__wbt_wait(rwb, bio->bi_opf, lock);
-+	if (current_is_kswapd())
-+		ret |= WBT_KSWAPD;
-+
-+	__wbt_wait(rwb, ret, bio->bi_opf, lock);
- 
- 	if (!blk_stat_is_active(rwb->cb))
- 		rwb_arm_timer(rwb);
- 
--	if (current_is_kswapd())
--		ret |= WBT_KSWAPD;
--
- 	return ret | WBT_TRACKED;
- }
- 
-diff --git a/block/blk-wbt.h b/block/blk-wbt.h
-index a232c98fbf4d..8038b4a0d4ef 100644
---- a/block/blk-wbt.h
-+++ b/block/blk-wbt.h
-@@ -19,7 +19,9 @@ enum wbt_flags {
- };
- 
- enum {
--	WBT_NUM_RWQ		= 2,
-+	WBT_RWQ_BG		= 0,
-+	WBT_RWQ_KSWAPD,
-+	WBT_NUM_RWQ,
- };
- 
- /*
+del_gendisk() -> invalidate_partition() -> __invalidate_device() ->
+  invalidate_inodes()
+  invalidate_bdev()
+
+The slight trouble is this currently won't do anything for open files (as
+such inodes will have elevated refcount) so that needs fixing. And then
+we need to prevent new dirty pages from being created...
+
+								Honza
 -- 
-2.7.4
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
