@@ -1,168 +1,148 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	James Smart <james.smart@broadcom.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V5 1/9] block: introduce blk_quiesce_timeout() and blk_unquiesce_timeout()
-Date: Fri, 11 May 2018 20:29:25 +0800
-Message-Id: <20180511122933.27155-2-ming.lei@redhat.com>
-In-Reply-To: <20180511122933.27155-1-ming.lei@redhat.com>
-References: <20180511122933.27155-1-ming.lei@redhat.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 26/33] xfs: allow writeback on pages without buffer heads
+Date: Wed,  9 May 2018 09:48:23 +0200
+Message-Id: <20180509074830.16196-27-hch@lst.de>
+In-Reply-To: <20180509074830.16196-1-hch@lst.de>
+References: <20180509074830.16196-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Turns out the current way can't drain timout completely because mod_timer()
-can be triggered in the work func, which can be just run inside the synced
-timeout work:
+We'll soon allow these through changes in the iomap write_begin and
+page_mkwrite implementations, so get ready for them.  After the previous
+refactoring this is as simple as not maintaining the bh variable if
+the page doesn' thave private data, and skipping the non-uptodate buffer
+check in this case for the writepage path, and adding a new per-page
+I/O completion handler that skips all buffer head manipulation.
 
-        del_timer_sync(&q->timeout);
-        cancel_work_sync(&q->timeout_work);
-
-This patch introduces one flag of 'timeout_off' for fixing this issue, turns
-out this simple way does work.
-
-Also blk_quiesce_timeout() and blk_unquiesce_timeout() are introduced for
-draining timeout, which is needed by NVMe.
-
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-core.c       | 21 +++++++++++++++++++--
- block/blk-mq.c         |  9 +++++++++
- block/blk-timeout.c    |  5 ++++-
- include/linux/blkdev.h | 13 +++++++++++++
- 4 files changed, 45 insertions(+), 3 deletions(-)
+ fs/xfs/xfs_aops.c | 47 ++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 34 insertions(+), 13 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 85909b431eb0..c277f1023703 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -392,6 +392,22 @@ void blk_stop_queue(struct request_queue *q)
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index c76c943473be..879599f723b6 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -91,6 +91,19 @@ xfs_find_daxdev_for_inode(
+ 		return mp->m_ddev_targp->bt_daxdev;
  }
- EXPORT_SYMBOL(blk_stop_queue);
  
-+void blk_unquiesce_timeout(struct request_queue *q)
++static void
++xfs_finish_page_writeback(
++	struct inode		*inode,
++	struct bio_vec		*bvec,
++	int			error)
 +{
-+	blk_mark_timeout_quiesce(q, false);
-+	mod_timer(&q->timeout, jiffies + q->rq_timeout);
++	if (error) {
++		SetPageError(bvec->bv_page);
++		mapping_set_error(inode->i_mapping, -EIO);
++	}
++	end_page_writeback(bvec->bv_page);
 +}
-+EXPORT_SYMBOL(blk_unquiesce_timeout);
 +
-+void blk_quiesce_timeout(struct request_queue *q)
-+{
-+	blk_mark_timeout_quiesce(q, true);
-+
-+	del_timer_sync(&q->timeout);
-+	cancel_work_sync(&q->timeout_work);
-+}
-+EXPORT_SYMBOL(blk_quiesce_timeout);
-+
- /**
-  * blk_sync_queue - cancel any pending callbacks on a queue
-  * @q: the queue
-@@ -412,8 +428,7 @@ EXPORT_SYMBOL(blk_stop_queue);
+ /*
+  * We're now finished for good with this page.  Update the page state via the
+  * associated buffer_heads, paying attention to the start and end offsets that
+@@ -103,7 +116,7 @@ xfs_find_daxdev_for_inode(
+  * and buffers potentially freed after every call to end_buffer_async_write.
   */
- void blk_sync_queue(struct request_queue *q)
- {
--	del_timer_sync(&q->timeout);
--	cancel_work_sync(&q->timeout_work);
-+	blk_quiesce_timeout(q);
+ static void
+-xfs_finish_page_writeback(
++xfs_finish_buffer_writeback(
+ 	struct inode		*inode,
+ 	struct bio_vec		*bvec,
+ 	int			error)
+@@ -178,9 +191,12 @@ xfs_destroy_ioend(
+ 			next = bio->bi_private;
  
- 	if (q->mq_ops) {
- 		struct blk_mq_hw_ctx *hctx;
-@@ -425,6 +440,8 @@ void blk_sync_queue(struct request_queue *q)
- 	} else {
- 		cancel_delayed_work_sync(&q->delay_work);
- 	}
-+
-+	blk_mark_timeout_quiesce(q, false);
- }
- EXPORT_SYMBOL(blk_sync_queue);
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9ce9cac16c3f..173f1723e48f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -917,6 +917,15 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 	};
- 	struct blk_mq_hw_ctx *hctx;
- 	int i;
-+	bool timeout_off;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	timeout_off = q->timeout_off;
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+	if (timeout_off)
-+		return;
- 
- 	/* A deadlock might occur if a request is stuck requiring a
- 	 * timeout at the same time a queue freeze is waiting
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index 652d4d4d3e97..ffd0b609091e 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -136,12 +136,15 @@ void blk_timeout_work(struct work_struct *work)
- 
- 	spin_lock_irqsave(q->queue_lock, flags);
- 
-+	if (q->timeout_off)
-+		goto exit;
-+
- 	list_for_each_entry_safe(rq, tmp, &q->timeout_list, timeout_list)
- 		blk_rq_check_expired(rq, &next, &next_set);
- 
- 	if (next_set)
- 		mod_timer(&q->timeout, round_jiffies_up(next));
+ 		/* walk each page on bio, ending page IO on them */
+-		bio_for_each_segment_all(bvec, bio, i)
+-			xfs_finish_page_writeback(inode, bvec, error);
 -
-+exit:
- 	spin_unlock_irqrestore(q->queue_lock, flags);
- }
++		bio_for_each_segment_all(bvec, bio, i) {
++			if (page_has_buffers(bvec->bv_page))
++				xfs_finish_buffer_writeback(inode, bvec, error);
++			else
++				xfs_finish_page_writeback(inode, bvec, error);
++		}
+ 		bio_put(bio);
+ 	}
  
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 5c4eee043191..a2cc4aaecf50 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -584,6 +584,7 @@ struct request_queue {
- 	struct timer_list	timeout;
- 	struct work_struct	timeout_work;
- 	struct list_head	timeout_list;
-+	bool			timeout_off;
+@@ -816,7 +832,7 @@ xfs_writepage_map(
+ {
+ 	LIST_HEAD(submit_list);
+ 	struct xfs_ioend	*ioend, *next;
+-	struct buffer_head	*bh;
++	struct buffer_head	*bh = NULL;
+ 	ssize_t			len = i_blocksize(inode);
+ 	int			error = 0;
+ 	int			count = 0;
+@@ -824,6 +840,9 @@ xfs_writepage_map(
+ 	loff_t			file_offset;	/* file offset of page */
+ 	unsigned		poffset;	/* offset into page */
  
- 	struct list_head	icq_list;
- #ifdef CONFIG_BLK_CGROUP
-@@ -1017,6 +1018,18 @@ extern void blk_execute_rq(struct request_queue *, struct gendisk *,
- extern void blk_execute_rq_nowait(struct request_queue *, struct gendisk *,
- 				  struct request *, int, rq_end_io_fn *);
- 
-+static inline void blk_mark_timeout_quiesce(struct request_queue *q, bool quiesce)
-+{
-+	unsigned long flags;
++	if (page_has_buffers(page))
++		bh = page_buffers(page);
 +
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	q->timeout_off = quiesce;
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+}
-+
-+extern void blk_quiesce_timeout(struct request_queue *q);
-+extern void blk_unquiesce_timeout(struct request_queue *q);
-+
- int blk_status_to_errno(blk_status_t status);
- blk_status_t errno_to_blk_status(int errno);
+ 	/*
+ 	 * Walk the blocks on the page, and we we run off then end of the
+ 	 * current map or find the current map invalid, grab a new one.
+@@ -832,11 +851,9 @@ xfs_writepage_map(
+ 	 * replace the bufferhead with some other state tracking mechanism in
+ 	 * future.
+ 	 */
+-	file_offset = page_offset(page);
+-	bh = page_buffers(page);
+-	for (poffset = 0;
++	for (poffset = 0, file_offset = page_offset(page);
+ 	     poffset < PAGE_SIZE;
+-	     poffset += len, file_offset += len, bh = bh->b_this_page) {
++	     poffset += len, file_offset += len) {
+ 		/* past the range we are writing, so nothing more to write. */
+ 		if (file_offset >= end_offset)
+ 			break;
+@@ -844,10 +861,11 @@ xfs_writepage_map(
+ 		/*
+ 		 * Block does not contain valid data, skip it.
+ 		 */
+-		if (!buffer_uptodate(bh)) {
++		if (bh && !buffer_uptodate(bh)) {
+ 			if (PageUptodate(page))
+ 				ASSERT(buffer_mapped(bh));
+ 			uptodate = false;
++			bh = bh->b_this_page;
+ 			continue;
+ 		}
  
+@@ -872,10 +890,15 @@ xfs_writepage_map(
+ 			 * meaningless for holes (!mapped && uptodate), so check we did
+ 			 * have a buffer covering a hole here and continue.
+ 			 */
++			if (bh)
++				bh = bh->b_this_page;
+ 			continue;
+ 		}
+ 
+-		xfs_map_at_offset(inode, bh, &wpc->imap, file_offset);
++		if (bh) {
++			xfs_map_at_offset(inode, bh, &wpc->imap, file_offset);
++			bh = bh->b_this_page;
++		}
+ 		xfs_add_to_ioend(inode, file_offset, page, wpc, wbc,
+ 				&submit_list);
+ 		count++;
+@@ -960,8 +983,6 @@ xfs_do_writepage(
+ 
+ 	trace_xfs_writepage(inode, page, 0, 0);
+ 
+-	ASSERT(page_has_buffers(page));
+-
+ 	/*
+ 	 * Refuse to write the page out if we are called from reclaim context.
+ 	 *
 -- 
-2.9.5
+2.17.0
