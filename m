@@ -1,55 +1,157 @@
-Return-Path: <BATV+df5a2477ff0fa86e9985+5386+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>,
-	Lee Duncan <lduncan@suse.com>,
-	Chris Leech <cleech@redhat.com>,
-	Rafael David Tinoco <rafael.tinoco@canonical.com>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 06/14] null_blk: complete requests from ->timeout
-Date: Wed, 23 May 2018 14:19:33 +0200
-Message-Id: <20180523121941.8632-7-hch@lst.de>
-In-Reply-To: <20180523121941.8632-1-hch@lst.de>
-References: <20180523121941.8632-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Cc: osandov@fb.com,
+	efault@gmx.de,
+	paolo.valente@linaro.org,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 3/7] bfq: calculate shallow depths at init time
+Date: Wed,  9 May 2018 14:49:23 -0600
+Message-Id: <1525898967-13425-4-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1525898967-13425-1-git-send-email-axboe@kernel.dk>
+References: <1525898967-13425-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-By completing the request entirely in the driver we can remove the
-BLK_EH_HANDLED return value and thus the split responsibility between the
-driver and the block layer that has been causing trouble.
+It doesn't change, so don't put it in the per-IO hot path.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/block/null_blk.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ block/bfq-iosched.c | 97 +++++++++++++++++++++++++++--------------------------
+ 1 file changed, 50 insertions(+), 47 deletions(-)
 
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index a76553293a31..f86e7af1dc8e 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -1365,7 +1365,8 @@ static blk_qc_t null_queue_bio(struct request_queue *q, struct bio *bio)
- static enum blk_eh_timer_return null_rq_timed_out_fn(struct request *rq)
- {
- 	pr_info("null: rq %p timed out\n", rq);
--	return BLK_EH_HANDLED;
-+	blk_mq_complete_request(rq);
-+	return BLK_EH_DONE;
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 246ae25a5f34..b7722668e295 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -487,46 +487,6 @@ static struct request *bfq_choose_req(struct bfq_data *bfqd,
  }
  
- static int null_rq_prep_fn(struct request_queue *q, struct request *req)
-@@ -1427,7 +1428,8 @@ static void null_request_fn(struct request_queue *q)
- static enum blk_eh_timer_return null_timeout_rq(struct request *rq, bool res)
+ /*
+- * See the comments on bfq_limit_depth for the purpose of
+- * the depths set in the function.
+- */
+-static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
+-{
+-	bfqd->sb_shift = bt->sb.shift;
+-
+-	/*
+-	 * In-word depths if no bfq_queue is being weight-raised:
+-	 * leaving 25% of tags only for sync reads.
+-	 *
+-	 * In next formulas, right-shift the value
+-	 * (1U<<bfqd->sb_shift), instead of computing directly
+-	 * (1U<<(bfqd->sb_shift - something)), to be robust against
+-	 * any possible value of bfqd->sb_shift, without having to
+-	 * limit 'something'.
+-	 */
+-	/* no more than 50% of tags for async I/O */
+-	bfqd->word_depths[0][0] = max((1U<<bfqd->sb_shift)>>1, 1U);
+-	/*
+-	 * no more than 75% of tags for sync writes (25% extra tags
+-	 * w.r.t. async I/O, to prevent async I/O from starving sync
+-	 * writes)
+-	 */
+-	bfqd->word_depths[0][1] = max(((1U<<bfqd->sb_shift) * 3)>>2, 1U);
+-
+-	/*
+-	 * In-word depths in case some bfq_queue is being weight-
+-	 * raised: leaving ~63% of tags for sync reads. This is the
+-	 * highest percentage for which, in our tests, application
+-	 * start-up times didn't suffer from any regression due to tag
+-	 * shortage.
+-	 */
+-	/* no more than ~18% of tags for async I/O */
+-	bfqd->word_depths[1][0] = max(((1U<<bfqd->sb_shift) * 3)>>4, 1U);
+-	/* no more than ~37% of tags for sync writes (~20% extra tags) */
+-	bfqd->word_depths[1][1] = max(((1U<<bfqd->sb_shift) * 6)>>4, 1U);
+-}
+-
+-/*
+  * Async I/O can easily starve sync I/O (both sync reads and sync
+  * writes), by consuming all tags. Similarly, storms of sync writes,
+  * such as those that sync(2) may trigger, can starve sync reads.
+@@ -535,18 +495,11 @@ static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
+  */
+ static void bfq_limit_depth(unsigned int op, struct blk_mq_alloc_data *data)
  {
- 	pr_info("null: rq %p timed out\n", rq);
--	return BLK_EH_HANDLED;
-+	blk_mq_complete_request(rq);
-+	return BLK_EH_DONE;
+-	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
+ 	struct bfq_data *bfqd = data->q->elevator->elevator_data;
+-	struct sbitmap_queue *bt;
+ 
+ 	if (op_is_sync(op) && !op_is_write(op))
+ 		return;
+ 
+-	bt = &tags->bitmap_tags;
+-
+-	if (unlikely(bfqd->sb_shift != bt->sb.shift))
+-		bfq_update_depths(bfqd, bt);
+-
+ 	data->shallow_depth =
+ 		bfqd->word_depths[!!bfqd->wr_busy_queues][op_is_sync(op)];
+ 
+@@ -5098,6 +5051,55 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
+ 	__bfq_put_async_bfqq(bfqd, &bfqg->async_idle_bfqq);
  }
  
- static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
++/*
++ * See the comments on bfq_limit_depth for the purpose of
++ * the depths set in the function.
++ */
++static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
++{
++	bfqd->sb_shift = bt->sb.shift;
++
++	/*
++	 * In-word depths if no bfq_queue is being weight-raised:
++	 * leaving 25% of tags only for sync reads.
++	 *
++	 * In next formulas, right-shift the value
++	 * (1U<<bfqd->sb_shift), instead of computing directly
++	 * (1U<<(bfqd->sb_shift - something)), to be robust against
++	 * any possible value of bfqd->sb_shift, without having to
++	 * limit 'something'.
++	 */
++	/* no more than 50% of tags for async I/O */
++	bfqd->word_depths[0][0] = max((1U<<bfqd->sb_shift)>>1, 1U);
++	/*
++	 * no more than 75% of tags for sync writes (25% extra tags
++	 * w.r.t. async I/O, to prevent async I/O from starving sync
++	 * writes)
++	 */
++	bfqd->word_depths[0][1] = max(((1U<<bfqd->sb_shift) * 3)>>2, 1U);
++
++	/*
++	 * In-word depths in case some bfq_queue is being weight-
++	 * raised: leaving ~63% of tags for sync reads. This is the
++	 * highest percentage for which, in our tests, application
++	 * start-up times didn't suffer from any regression due to tag
++	 * shortage.
++	 */
++	/* no more than ~18% of tags for async I/O */
++	bfqd->word_depths[1][0] = max(((1U<<bfqd->sb_shift) * 3)>>4, 1U);
++	/* no more than ~37% of tags for sync writes (~20% extra tags) */
++	bfqd->word_depths[1][1] = max(((1U<<bfqd->sb_shift) * 6)>>4, 1U);
++}
++
++static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
++{
++	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
++	struct blk_mq_tags *tags = hctx->sched_tags;
++
++	bfq_update_depths(bfqd, &tags->bitmap_tags);
++	return 0;
++}
++
+ static void bfq_exit_queue(struct elevator_queue *e)
+ {
+ 	struct bfq_data *bfqd = e->elevator_data;
+@@ -5519,6 +5521,7 @@ static struct elevator_type iosched_bfq_mq = {
+ 		.requests_merged	= bfq_requests_merged,
+ 		.request_merged		= bfq_request_merged,
+ 		.has_work		= bfq_has_work,
++		.init_hctx		= bfq_init_hctx,
+ 		.init_sched		= bfq_init_queue,
+ 		.exit_sched		= bfq_exit_queue,
+ 	},
 -- 
-2.17.0
+2.7.4
