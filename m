@@ -1,158 +1,91 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: osandov@fb.com,
-	efault@gmx.de,
-	paolo.valente@linaro.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 3/9] bfq: calculate shallow depths at init time
-Date: Thu, 10 May 2018 10:24:21 -0600
-Message-Id: <1525969467-12476-4-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1525969467-12476-1-git-send-email-axboe@kernel.dk>
-References: <1525969467-12476-1-git-send-email-axboe@kernel.dk>
+Return-Path: <jack@suse.cz>
+Date: Wed, 9 May 2018 14:31:02 +0200
+From: Jan Kara <jack@suse.cz>
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc: axboe@kernel.dk, jack@suse.cz, linux-block@vger.kernel.org
+Subject: Re: [PATCH] loop: remember whether sysfs_create_group() succeeded
+Message-ID: <20180509123102.7tvpq6aq4ayjuynh@quack2.suse.cz>
+References: <001a113ed2fa7bedfe055c8316a5@google.com>
+ <94eb2c030882b2b1b505610813df@google.com>
+ <55ff5960-eaab-5a36-5605-4e2230b77607@I-love.SAKURA.ne.jp>
+ <20180502142434.GA10928@kroah.com>
+ <201805042047.EFJ26068.OtOJFSLFFQOVHM@I-love.SAKURA.ne.jp>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <201805042047.EFJ26068.OtOJFSLFFQOVHM@I-love.SAKURA.ne.jp>
 List-ID: <linux-block@vger.kernel.org>
 
-It doesn't change, so don't put it in the per-IO hot path.
+On Fri 04-05-18 20:47:29, Tetsuo Handa wrote:
+> >From 626d33de1b70b11ecaf95a9f83f7644998e54cbb Mon Sep 17 00:00:00 2001
+> From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+> Date: Wed, 2 May 2018 23:03:48 +0900
+> Subject: [PATCH] loop: remember whether sysfs_create_group() succeeded
+> 
+> syzbot is hitting WARN() triggered by memory allocation fault
+> injection [1] because loop module is calling sysfs_remove_group()
+> when sysfs_create_group() failed.
+> Fix this by remembering whether sysfs_create_group() succeeded.
+> 
+> [1] https://syzkaller.appspot.com/bug?id=3f86c0edf75c86d2633aeb9dd69eccc70bc7e90b
+> 
+> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+> Reported-by: syzbot <syzbot+9f03168400f56df89dbc6f1751f4458fe739ff29@syzkaller.appspotmail.com>
+> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Jens Axboe <axboe@kernel.dk>
 
-Acked-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/bfq-iosched.c | 97 +++++++++++++++++++++++++++--------------------------
- 1 file changed, 50 insertions(+), 47 deletions(-)
+Looks good to me. You can add:
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index db38e88a5670..0cd8aa80c32d 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -487,46 +487,6 @@ static struct request *bfq_choose_req(struct bfq_data *bfqd,
- }
- 
- /*
-- * See the comments on bfq_limit_depth for the purpose of
-- * the depths set in the function.
-- */
--static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
--{
--	bfqd->sb_shift = bt->sb.shift;
--
--	/*
--	 * In-word depths if no bfq_queue is being weight-raised:
--	 * leaving 25% of tags only for sync reads.
--	 *
--	 * In next formulas, right-shift the value
--	 * (1U<<bfqd->sb_shift), instead of computing directly
--	 * (1U<<(bfqd->sb_shift - something)), to be robust against
--	 * any possible value of bfqd->sb_shift, without having to
--	 * limit 'something'.
--	 */
--	/* no more than 50% of tags for async I/O */
--	bfqd->word_depths[0][0] = max((1U<<bfqd->sb_shift)>>1, 1U);
--	/*
--	 * no more than 75% of tags for sync writes (25% extra tags
--	 * w.r.t. async I/O, to prevent async I/O from starving sync
--	 * writes)
--	 */
--	bfqd->word_depths[0][1] = max(((1U<<bfqd->sb_shift) * 3)>>2, 1U);
--
--	/*
--	 * In-word depths in case some bfq_queue is being weight-
--	 * raised: leaving ~63% of tags for sync reads. This is the
--	 * highest percentage for which, in our tests, application
--	 * start-up times didn't suffer from any regression due to tag
--	 * shortage.
--	 */
--	/* no more than ~18% of tags for async I/O */
--	bfqd->word_depths[1][0] = max(((1U<<bfqd->sb_shift) * 3)>>4, 1U);
--	/* no more than ~37% of tags for sync writes (~20% extra tags) */
--	bfqd->word_depths[1][1] = max(((1U<<bfqd->sb_shift) * 6)>>4, 1U);
--}
--
--/*
-  * Async I/O can easily starve sync I/O (both sync reads and sync
-  * writes), by consuming all tags. Similarly, storms of sync writes,
-  * such as those that sync(2) may trigger, can starve sync reads.
-@@ -535,18 +495,11 @@ static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
-  */
- static void bfq_limit_depth(unsigned int op, struct blk_mq_alloc_data *data)
- {
--	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
- 	struct bfq_data *bfqd = data->q->elevator->elevator_data;
--	struct sbitmap_queue *bt;
- 
- 	if (op_is_sync(op) && !op_is_write(op))
- 		return;
- 
--	bt = &tags->bitmap_tags;
--
--	if (unlikely(bfqd->sb_shift != bt->sb.shift))
--		bfq_update_depths(bfqd, bt);
--
- 	data->shallow_depth =
- 		bfqd->word_depths[!!bfqd->wr_busy_queues][op_is_sync(op)];
- 
-@@ -5126,6 +5079,55 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
- 	__bfq_put_async_bfqq(bfqd, &bfqg->async_idle_bfqq);
- }
- 
-+/*
-+ * See the comments on bfq_limit_depth for the purpose of
-+ * the depths set in the function.
-+ */
-+static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
-+{
-+	bfqd->sb_shift = bt->sb.shift;
-+
-+	/*
-+	 * In-word depths if no bfq_queue is being weight-raised:
-+	 * leaving 25% of tags only for sync reads.
-+	 *
-+	 * In next formulas, right-shift the value
-+	 * (1U<<bfqd->sb_shift), instead of computing directly
-+	 * (1U<<(bfqd->sb_shift - something)), to be robust against
-+	 * any possible value of bfqd->sb_shift, without having to
-+	 * limit 'something'.
-+	 */
-+	/* no more than 50% of tags for async I/O */
-+	bfqd->word_depths[0][0] = max((1U<<bfqd->sb_shift)>>1, 1U);
-+	/*
-+	 * no more than 75% of tags for sync writes (25% extra tags
-+	 * w.r.t. async I/O, to prevent async I/O from starving sync
-+	 * writes)
-+	 */
-+	bfqd->word_depths[0][1] = max(((1U<<bfqd->sb_shift) * 3)>>2, 1U);
-+
-+	/*
-+	 * In-word depths in case some bfq_queue is being weight-
-+	 * raised: leaving ~63% of tags for sync reads. This is the
-+	 * highest percentage for which, in our tests, application
-+	 * start-up times didn't suffer from any regression due to tag
-+	 * shortage.
-+	 */
-+	/* no more than ~18% of tags for async I/O */
-+	bfqd->word_depths[1][0] = max(((1U<<bfqd->sb_shift) * 3)>>4, 1U);
-+	/* no more than ~37% of tags for sync writes (~20% extra tags) */
-+	bfqd->word_depths[1][1] = max(((1U<<bfqd->sb_shift) * 6)>>4, 1U);
-+}
-+
-+static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
-+{
-+	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
-+	struct blk_mq_tags *tags = hctx->sched_tags;
-+
-+	bfq_update_depths(bfqd, &tags->bitmap_tags);
-+	return 0;
-+}
-+
- static void bfq_exit_queue(struct elevator_queue *e)
- {
- 	struct bfq_data *bfqd = e->elevator_data;
-@@ -5547,6 +5549,7 @@ static struct elevator_type iosched_bfq_mq = {
- 		.requests_merged	= bfq_requests_merged,
- 		.request_merged		= bfq_request_merged,
- 		.has_work		= bfq_has_work,
-+		.init_hctx		= bfq_init_hctx,
- 		.init_sched		= bfq_init_queue,
- 		.exit_sched		= bfq_exit_queue,
- 	},
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> ---
+>  drivers/block/loop.c | 11 ++++++-----
+>  drivers/block/loop.h |  1 +
+>  2 files changed, 7 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 5d4e316..1d758d8 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -809,16 +809,17 @@ static ssize_t loop_attr_dio_show(struct loop_device *lo, char *buf)
+>  	.attrs= loop_attrs,
+>  };
+>  
+> -static int loop_sysfs_init(struct loop_device *lo)
+> +static void loop_sysfs_init(struct loop_device *lo)
+>  {
+> -	return sysfs_create_group(&disk_to_dev(lo->lo_disk)->kobj,
+> -				  &loop_attribute_group);
+> +	lo->sysfs_ready = !sysfs_create_group(&disk_to_dev(lo->lo_disk)->kobj,
+> +					      &loop_attribute_group);
+>  }
+>  
+>  static void loop_sysfs_exit(struct loop_device *lo)
+>  {
+> -	sysfs_remove_group(&disk_to_dev(lo->lo_disk)->kobj,
+> -			   &loop_attribute_group);
+> +	if (lo->sysfs_ready)
+> +		sysfs_remove_group(&disk_to_dev(lo->lo_disk)->kobj,
+> +				   &loop_attribute_group);
+>  }
+>  
+>  static void loop_config_discard(struct loop_device *lo)
+> diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+> index b78de98..73c801f 100644
+> --- a/drivers/block/loop.h
+> +++ b/drivers/block/loop.h
+> @@ -58,6 +58,7 @@ struct loop_device {
+>  	struct kthread_worker	worker;
+>  	struct task_struct	*worker_task;
+>  	bool			use_dio;
+> +	bool			sysfs_ready;
+>  
+>  	struct request_queue	*lo_queue;
+>  	struct blk_mq_tag_set	tag_set;
+> -- 
+> 1.8.3.1
+> 
 -- 
-2.7.4
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
