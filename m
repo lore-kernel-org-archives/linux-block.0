@@ -1,42 +1,33 @@
-Return-Path: <penguin-kernel@i-love.sakura.ne.jp>
-Subject: Re: INFO: rcu detected stall in blkdev_ioctl
-To: syzbot
- <syzbot+369c35474963daf8f8eea897ecf33cb6ad6c7ea2@syzkaller.appspotmail.com>,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, Jan Kara <jack@suse.cz>
-Cc: akpm@linux-foundation.org, gregkh@linuxfoundation.org, hpa@zytor.com,
-        kstewart@linuxfoundation.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, npiggin@gmail.com, pombredanne@nexb.com,
-        tglx@linutronix.de, x86@kernel.org
-References: <94eb2c05a38090aaeb0560706bb5@google.com>
- <0000000000001554a7056add26c6@google.com>
- <18608105-31d3-3d77-ccbb-a25bbe7e55e6@I-love.SAKURA.ne.jp>
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Message-ID: <00724984-6edd-d0df-4c51-53be8c330234@I-love.SAKURA.ne.jp>
-Date: Sat, 5 May 2018 20:57:16 +0900
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:54320 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965129AbeEIPqx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 11:46:53 -0400
+Date: Wed, 9 May 2018 08:46:52 -0700
+From: Matthew Wilcox <willy@infradead.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH 07/33] mm: split ->readpages calls to avoid
+ non-contiguous pages lists
+Message-ID: <20180509154652.GE1313@bombadil.infradead.org>
+References: <20180509074830.16196-1-hch@lst.de>
+ <20180509074830.16196-8-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <18608105-31d3-3d77-ccbb-a25bbe7e55e6@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180509074830.16196-8-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-If various stall reports regarding loop_set_fd() are hitting below sequence, a patch
-was proposed at https://groups.google.com/d/msg/syzkaller-bugs/5pzXJ8yQFR0/vWeRytaQBAAJ .
+On Wed, May 09, 2018 at 09:48:04AM +0200, Christoph Hellwig wrote:
+> That way file systems don't have to go spotting for non-contiguous pages
+> and work around them.  It also kicks off I/O earlier, allowing it to
+> finish earlier and reduce latency.
 
-----------
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <linux/loop.h>
+Makes sense.
 
-int main(int argc, char *argv[])
-{
-        const int fd = open("/tmp/file", O_RDWR | O_CREAT | O_TRUNC, 0600);
-        const int fd0 = open("/dev/loop0", O_RDONLY);
-        const int fd1 = open("/dev/loop1", O_RDONLY);
-        ioctl(fd0, LOOP_SET_FD, fd);
-        ioctl(fd0, LOOP_CHANGE_FD, fd0);
-        ioctl(fd1, LOOP_SET_FD, fd0);
-        return 0;
-}
-----------
+> +			/*
+> +			 * Page already present?  Kick off the current batch of
+> +			 * contiguous pages before continueing with the next
+
+"continuing" (no 'e')
