@@ -1,68 +1,55 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	James Smart <james.smart@broadcom.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V6 05/11] nvme: pci: only wait freezing if queue is frozen
-Date: Wed, 16 May 2018 12:03:07 +0800
-Message-Id: <20180516040313.13596-6-ming.lei@redhat.com>
-In-Reply-To: <20180516040313.13596-1-ming.lei@redhat.com>
-References: <20180516040313.13596-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from merlin.infradead.org ([205.233.59.134]:52286 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756022AbeEILH7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 07:07:59 -0400
+Date: Wed, 9 May 2018 13:07:36 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Johannes Weiner <hannes@cmpxchg.org>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        Ingo Molnar <mingo@redhat.com>,
+        Andrew Morton <akpm@linuxfoundation.org>,
+        Tejun Heo <tj@kernel.org>,
+        Balbir Singh <bsingharora@gmail.com>,
+        Mike Galbraith <efault@gmx.de>,
+        Oliver Yang <yangoliver@me.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        xxx xxx <x.qendo@gmail.com>,
+        Taras Kondratiuk <takondra@cisco.com>,
+        Daniel Walker <danielwa@cisco.com>,
+        Vinayak Menon <vinmenon@codeaurora.org>,
+        Ruslan Ruslichenko <rruslich@cisco.com>, kernel-team@fb.com
+Subject: Re: [PATCH 7/7] psi: cgroup support
+Message-ID: <20180509110736.GR12217@hirez.programming.kicks-ass.net>
+References: <20180507210135.1823-1-hannes@cmpxchg.org>
+ <20180507210135.1823-8-hannes@cmpxchg.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180507210135.1823-8-hannes@cmpxchg.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-In nvme_dev_disable() called during shutting down controler,
-nvme_wait_freeze_timeout() may be done on the controller not
-frozen yet, so add the check for avoiding the case.
+On Mon, May 07, 2018 at 05:01:35PM -0400, Johannes Weiner wrote:
+> --- a/kernel/sched/psi.c
+> +++ b/kernel/sched/psi.c
+> @@ -260,6 +260,18 @@ void psi_task_change(struct task_struct *task, u64 now, int clear, int set)
+>  	task->psi_flags |= set;
+>  
+>  	psi_group_update(&psi_system, cpu, now, clear, set);
+> +
+> +#ifdef CONFIG_CGROUPS
+> +       cgroup = task->cgroups->dfl_cgrp;
+> +       while (cgroup && (parent = cgroup_parent(cgroup))) {
+> +               struct psi_group *group;
+> +
+> +               group = cgroup_psi(cgroup);
+> +               psi_group_update(group, cpu, now, clear, set);
+> +
+> +               cgroup = parent;
+> +       }
+> +#endif
+>  }
 
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/nvme/host/pci.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index e94a103ead1e..6413dad51107 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2259,14 +2259,17 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
- 	int i;
- 	bool dead = true;
- 	struct pci_dev *pdev = to_pci_dev(dev->dev);
-+	bool frozen = false;
- 
- 	mutex_lock(&dev->shutdown_lock);
- 	if (pci_is_enabled(pdev)) {
- 		u32 csts = readl(dev->bar + NVME_REG_CSTS);
- 
- 		if (dev->ctrl.state == NVME_CTRL_LIVE ||
--		    dev->ctrl.state == NVME_CTRL_RESETTING)
-+		    dev->ctrl.state == NVME_CTRL_RESETTING) {
- 			nvme_start_freeze(&dev->ctrl);
-+			frozen = true;
-+		}
- 		dead = !!((csts & NVME_CSTS_CFS) || !(csts & NVME_CSTS_RDY) ||
- 			pdev->error_state  != pci_channel_io_normal);
- 	}
-@@ -2276,7 +2279,7 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
- 	 * doing a safe shutdown.
- 	 */
- 	if (!dead) {
--		if (shutdown)
-+		if (shutdown && frozen)
- 			nvme_wait_freeze_timeout(&dev->ctrl, NVME_IO_TIMEOUT);
- 	}
- 
--- 
-2.9.5
+TJ fixed needing that for stats at some point, why can't you do the
+same?
