@@ -1,131 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:51606 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933383AbeEIHsp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 03:48:45 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 02/33] fs: factor out a __generic_write_end helper
-Date: Wed,  9 May 2018 09:47:59 +0200
-Message-Id: <20180509074830.16196-3-hch@lst.de>
-In-Reply-To: <20180509074830.16196-1-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Cc: osandov@fb.com,
+	efault@gmx.de,
+	paolo.valente@linaro.org,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 1/7] blk-mq: don't call into depth limiting for reserved tags
+Date: Wed,  9 May 2018 14:49:21 -0600
+Message-Id: <1525898967-13425-2-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1525898967-13425-1-git-send-email-axboe@kernel.dk>
+References: <1525898967-13425-1-git-send-email-axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-Bits of the buffer.c based write_end implementations that don't know
-about buffer_heads and can be reused by other implementations.
+It's not useful, they are internal and/or error handling recovery
+commands.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/buffer.c   | 68 +++++++++++++++++++++++++++------------------------
- fs/internal.h |  2 ++
- 2 files changed, 38 insertions(+), 32 deletions(-)
+ block/blk-mq.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 249b83fafe48..923391702f51 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -2076,6 +2076,40 @@ int block_write_begin(struct address_space *mapping, loff_t pos, unsigned len,
- }
- EXPORT_SYMBOL(block_write_begin);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4e9d83594cca..64630caaf27e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -360,9 +360,11 @@ static struct request *blk_mq_get_request(struct request_queue *q,
  
-+int __generic_write_end(struct inode *inode, loff_t pos, unsigned copied,
-+		struct page *page)
-+{
-+	loff_t old_size = inode->i_size;
-+	bool i_size_changed = false;
-+
-+	/*
-+	 * No need to use i_size_read() here, the i_size cannot change under us
-+	 * because we hold i_rwsem.
-+	 *
-+	 * But it's important to update i_size while still holding page lock:
-+	 * page writeout could otherwise come in and zero beyond i_size.
-+	 */
-+	if (pos + copied > inode->i_size) {
-+		i_size_write(inode, pos + copied);
-+		i_size_changed = true;
-+	}
-+
-+	unlock_page(page);
-+	put_page(page);
-+
-+	if (old_size < pos)
-+		pagecache_isize_extended(inode, old_size, pos);
-+	/*
-+	 * Don't mark the inode dirty under page lock. First, it unnecessarily
-+	 * makes the holding time of page lock longer. Second, it forces lock
-+	 * ordering of page lock and transaction start for journaling
-+	 * filesystems.
-+	 */
-+	if (i_size_changed)
-+		mark_inode_dirty(inode);
-+	return copied;
-+}
-+
- int block_write_end(struct file *file, struct address_space *mapping,
- 			loff_t pos, unsigned len, unsigned copied,
- 			struct page *page, void *fsdata)
-@@ -2116,42 +2150,12 @@ int generic_write_end(struct file *file, struct address_space *mapping,
- 			loff_t pos, unsigned len, unsigned copied,
- 			struct page *page, void *fsdata)
- {
--	struct inode *inode = mapping->host;
--	loff_t old_size = inode->i_size;
--	int i_size_changed = 0;
--
- 	copied = block_write_end(file, mapping, pos, len, copied, page, fsdata);
--
--	/*
--	 * No need to use i_size_read() here, the i_size
--	 * cannot change under us because we hold i_mutex.
--	 *
--	 * But it's important to update i_size while still holding page lock:
--	 * page writeout could otherwise come in and zero beyond i_size.
--	 */
--	if (pos+copied > inode->i_size) {
--		i_size_write(inode, pos+copied);
--		i_size_changed = 1;
--	}
--
--	unlock_page(page);
--	put_page(page);
--
--	if (old_size < pos)
--		pagecache_isize_extended(inode, old_size, pos);
--	/*
--	 * Don't mark the inode dirty under page lock. First, it unnecessarily
--	 * makes the holding time of page lock longer. Second, it forces lock
--	 * ordering of page lock and transaction start for journaling
--	 * filesystems.
--	 */
--	if (i_size_changed)
--		mark_inode_dirty(inode);
--
--	return copied;
-+	return __generic_write_end(mapping->host, pos, copied, page);
- }
- EXPORT_SYMBOL(generic_write_end);
+ 		/*
+ 		 * Flush requests are special and go directly to the
+-		 * dispatch list.
++		 * dispatch list. Don't include reserved tags in the
++		 * limiting, as it isn't useful.
+ 		 */
+-		if (!op_is_flush(op) && e->type->ops.mq.limit_depth)
++		if (!op_is_flush(op) && e->type->ops.mq.limit_depth &&
++		    !(data->flags & BLK_MQ_REQ_RESERVED))
+ 			e->type->ops.mq.limit_depth(op, data);
+ 	}
  
-+
- /*
-  * block_is_partially_uptodate checks whether buffers within a page are
-  * uptodate or not.
-diff --git a/fs/internal.h b/fs/internal.h
-index e08972db0303..b955232d3d49 100644
---- a/fs/internal.h
-+++ b/fs/internal.h
-@@ -43,6 +43,8 @@ static inline int __sync_blockdev(struct block_device *bdev, int wait)
- extern void guard_bio_eod(int rw, struct bio *bio);
- extern int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
- 		get_block_t *get_block, struct iomap *iomap);
-+int __generic_write_end(struct inode *inode, loff_t pos, unsigned copied,
-+		struct page *page);
- 
- /*
-  * char_dev.c
 -- 
-2.17.0
+2.7.4
