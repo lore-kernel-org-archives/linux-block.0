@@ -1,331 +1,73 @@
-Return-Path: <BATV+df5a2477ff0fa86e9985+5386+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>,
-	Lee Duncan <lduncan@suse.com>,
-	Chris Leech <cleech@redhat.com>,
-	Rafael David Tinoco <rafael.tinoco@canonical.com>,
+Return-Path: <kent.overstreet@gmail.com>
+Return-Path: <kent.overstreet@gmail.com>
+From: Kent Overstreet <kent.overstreet@gmail.com>
+To: linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 02/14] block: rename BLK_EH_NOT_HANDLED to BLK_EH_DONE
-Date: Wed, 23 May 2018 14:19:29 +0200
-Message-Id: <20180523121941.8632-3-hch@lst.de>
-In-Reply-To: <20180523121941.8632-1-hch@lst.de>
-References: <20180523121941.8632-1-hch@lst.de>
+	linux-mm@kvack.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Ingo Molnar <mingo@kernel.org>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Subject: [PATCH 08/10] block: Add warning for bi_next not NULL in bio_endio()
+Date: Tue,  8 May 2018 21:33:56 -0400
+Message-Id: <20180509013358.16399-9-kent.overstreet@gmail.com>
+In-Reply-To: <20180509013358.16399-1-kent.overstreet@gmail.com>
+References: <20180509013358.16399-1-kent.overstreet@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The BLK_EH_NOT_HANDLED implies nothing happen, but very often that
-is not what is happening - instead the driver already completed the
-command.  Fix the symbolic name to reflect that a little better.
+Recently found a bug where a driver left bi_next not NULL and then
+called bio_endio(), and then the submitter of the bio used
+bio_copy_data() which was treating src and dst as lists of bios.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Fixed that bug by splitting out bio_list_copy_data(), but in case other
+things are depending on bi_next in weird ways, add a warning to help
+avoid more bugs like that in the future.
+
+Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
 ---
- Documentation/scsi/scsi_eh.txt            | 4 ++--
- block/blk-mq.c                            | 2 +-
- block/blk-timeout.c                       | 2 +-
- drivers/block/nbd.c                       | 2 +-
- drivers/message/fusion/mptsas.c           | 2 +-
- drivers/s390/block/dasd.c                 | 6 +++---
- drivers/scsi/gdth.c                       | 2 +-
- drivers/scsi/libiscsi.c                   | 2 +-
- drivers/scsi/megaraid/megaraid_sas_base.c | 2 +-
- drivers/scsi/mvumi.c                      | 2 +-
- drivers/scsi/qla4xxx/ql4_os.c             | 2 +-
- drivers/scsi/scsi_error.c                 | 4 ++--
- drivers/scsi/scsi_transport_fc.c          | 4 ++--
- drivers/scsi/scsi_transport_srp.c         | 4 ++--
- drivers/scsi/ufs/ufshcd.c                 | 6 +++---
- include/linux/blkdev.h                    | 2 +-
- include/scsi/scsi_host.h                  | 2 +-
- 17 files changed, 25 insertions(+), 25 deletions(-)
+ block/bio.c      | 3 +++
+ block/blk-core.c | 8 +++++++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/scsi/scsi_eh.txt b/Documentation/scsi/scsi_eh.txt
-index 11e447bdb3a5..3ae8419e72cf 100644
---- a/Documentation/scsi/scsi_eh.txt
-+++ b/Documentation/scsi/scsi_eh.txt
-@@ -97,9 +97,9 @@ function
- 	This indicates that more time is required to finish the
- 	command.  Timer is restarted.  This action is counted as a
- 	retry and only allowed scmd->allowed + 1(!) times.  Once the
--	limit is reached, action for BLK_EH_NOT_HANDLED is taken instead.
-+	limit is reached, action for BLK_EH_DONE is taken instead.
+diff --git a/block/bio.c b/block/bio.c
+index ce8e259f9a..5c81391100 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1775,6 +1775,9 @@ void bio_endio(struct bio *bio)
+ 	if (!bio_integrity_endio(bio))
+ 		return;
  
--    - BLK_EH_NOT_HANDLED
-+    - BLK_EH_DONE
-         eh_timed_out() callback did not handle the command.
- 	Step #2 is taken.
++	if (WARN_ONCE(bio->bi_next, "driver left bi_next not NULL"))
++		bio->bi_next = NULL;
++
+ 	/*
+ 	 * Need to have a real endio function for chained bios, otherwise
+ 	 * various corner cases will break (like stacking block devices that
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 66f24798ef..f3cf79198a 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -204,6 +204,10 @@ static void req_bio_endio(struct request *rq, struct bio *bio,
+ 	bio_advance(bio, nbytes);
  
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index df928200b17e..546acc8cb201 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -856,7 +856,7 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
- 		blk_mq_rq_update_aborted_gstate(req, 0);
- 		blk_add_timer(req);
- 		break;
--	case BLK_EH_NOT_HANDLED:
-+	case BLK_EH_DONE:
- 		break;
- 	default:
- 		printk(KERN_ERR "block: bad eh return: %d\n", ret);
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index 652d4d4d3e97..3c622335811f 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -93,7 +93,7 @@ static void blk_rq_timed_out(struct request *req)
- 		blk_add_timer(req);
- 		blk_clear_rq_complete(req);
- 		break;
--	case BLK_EH_NOT_HANDLED:
-+	case BLK_EH_DONE:
- 		/*
- 		 * LLD handles this for now but in the future
- 		 * we can send a request msg to abort the command
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 1147e4680c80..09d9959287fe 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -328,7 +328,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 			}
- 			blk_mq_requeue_request(req, true);
- 			nbd_config_put(nbd);
--			return BLK_EH_NOT_HANDLED;
-+			return BLK_EH_DONE;
- 		}
- 	} else {
- 		dev_err_ratelimited(nbd_to_dev(nbd),
-diff --git a/drivers/message/fusion/mptsas.c b/drivers/message/fusion/mptsas.c
-index 86503f60468f..19a5aa70ecda 100644
---- a/drivers/message/fusion/mptsas.c
-+++ b/drivers/message/fusion/mptsas.c
-@@ -1929,7 +1929,7 @@ static enum blk_eh_timer_return mptsas_eh_timed_out(struct scsi_cmnd *sc)
- 	MPT_SCSI_HOST *hd;
- 	MPT_ADAPTER   *ioc;
- 	VirtDevice    *vdevice;
--	enum blk_eh_timer_return rc = BLK_EH_NOT_HANDLED;
-+	enum blk_eh_timer_return rc = BLK_EH_DONE;
- 
- 	hd = shost_priv(sc->device->host);
- 	if (hd == NULL) {
-diff --git a/drivers/s390/block/dasd.c b/drivers/s390/block/dasd.c
-index 04143c08bd6e..b0e89ca48a3c 100644
---- a/drivers/s390/block/dasd.c
-+++ b/drivers/s390/block/dasd.c
-@@ -3053,7 +3053,7 @@ static blk_status_t do_dasd_request(struct blk_mq_hw_ctx *hctx,
-  *
-  * Return values:
-  * BLK_EH_RESET_TIMER if the request should be left running
-- * BLK_EH_NOT_HANDLED if the request is handled or terminated
-+ * BLK_EH_DONE if the request is handled or terminated
-  *		      by the driver.
-  */
- enum blk_eh_timer_return dasd_times_out(struct request *req, bool reserved)
-@@ -3065,7 +3065,7 @@ enum blk_eh_timer_return dasd_times_out(struct request *req, bool reserved)
- 	int rc = 0;
- 
- 	if (!cqr)
--		return BLK_EH_NOT_HANDLED;
-+		return BLK_EH_DONE;
- 
- 	spin_lock_irqsave(&cqr->dq->lock, flags);
- 	device = cqr->startdev ? cqr->startdev : block->base;
-@@ -3124,7 +3124,7 @@ enum blk_eh_timer_return dasd_times_out(struct request *req, bool reserved)
- 	spin_unlock(&block->queue_lock);
- 	spin_unlock_irqrestore(&cqr->dq->lock, flags);
- 
--	return rc ? BLK_EH_RESET_TIMER : BLK_EH_NOT_HANDLED;
-+	return rc ? BLK_EH_RESET_TIMER : BLK_EH_DONE;
+ 	/* don't actually finish bio if it's part of flush sequence */
++	/*
++	 * XXX this code looks suspicious - it's not consistent with advancing
++	 * req->bio in caller
++	 */
+ 	if (bio->bi_iter.bi_size == 0 && !(rq->rq_flags & RQF_FLUSH_SEQ))
+ 		bio_endio(bio);
  }
+@@ -2982,8 +2986,10 @@ bool blk_update_request(struct request *req, blk_status_t error,
+ 		struct bio *bio = req->bio;
+ 		unsigned bio_bytes = min(bio->bi_iter.bi_size, nr_bytes);
  
- static int dasd_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
-diff --git a/drivers/scsi/gdth.c b/drivers/scsi/gdth.c
-index c35f05c4c6bb..85604795d8ee 100644
---- a/drivers/scsi/gdth.c
-+++ b/drivers/scsi/gdth.c
-@@ -3882,7 +3882,7 @@ static enum blk_eh_timer_return gdth_timed_out(struct scsi_cmnd *scp)
- 	struct gdth_cmndinfo *cmndinfo = gdth_cmnd_priv(scp);
- 	u8 b, t;
- 	unsigned long flags;
--	enum blk_eh_timer_return retval = BLK_EH_NOT_HANDLED;
-+	enum blk_eh_timer_return retval = BLK_EH_DONE;
+-		if (bio_bytes == bio->bi_iter.bi_size)
++		if (bio_bytes == bio->bi_iter.bi_size) {
+ 			req->bio = bio->bi_next;
++			bio->bi_next = NULL;
++		}
  
- 	TRACE(("%s() cmd 0x%x\n", scp->cmnd[0], __func__));
- 	b = scp->device->channel;
-diff --git a/drivers/scsi/libiscsi.c b/drivers/scsi/libiscsi.c
-index 15a2fef51e38..eee43ba83a60 100644
---- a/drivers/scsi/libiscsi.c
-+++ b/drivers/scsi/libiscsi.c
-@@ -1963,7 +1963,7 @@ static int iscsi_has_ping_timed_out(struct iscsi_conn *conn)
- 
- enum blk_eh_timer_return iscsi_eh_cmd_timed_out(struct scsi_cmnd *sc)
- {
--	enum blk_eh_timer_return rc = BLK_EH_NOT_HANDLED;
-+	enum blk_eh_timer_return rc = BLK_EH_DONE;
- 	struct iscsi_task *task = NULL, *running_task;
- 	struct iscsi_cls_session *cls_session;
- 	struct iscsi_session *session;
-diff --git a/drivers/scsi/megaraid/megaraid_sas_base.c b/drivers/scsi/megaraid/megaraid_sas_base.c
-index b89c6e6c0589..ce656c466ca9 100644
---- a/drivers/scsi/megaraid/megaraid_sas_base.c
-+++ b/drivers/scsi/megaraid/megaraid_sas_base.c
-@@ -2772,7 +2772,7 @@ blk_eh_timer_return megasas_reset_timer(struct scsi_cmnd *scmd)
- 
- 	if (time_after(jiffies, scmd->jiffies_at_alloc +
- 				(scmd_timeout * 2) * HZ)) {
--		return BLK_EH_NOT_HANDLED;
-+		return BLK_EH_DONE;
- 	}
- 
- 	instance = (struct megasas_instance *)scmd->device->host->hostdata;
-diff --git a/drivers/scsi/mvumi.c b/drivers/scsi/mvumi.c
-index fe97401ad192..afd27165cd93 100644
---- a/drivers/scsi/mvumi.c
-+++ b/drivers/scsi/mvumi.c
-@@ -2155,7 +2155,7 @@ static enum blk_eh_timer_return mvumi_timed_out(struct scsi_cmnd *scmd)
- 	mvumi_return_cmd(mhba, cmd);
- 	spin_unlock_irqrestore(mhba->shost->host_lock, flags);
- 
--	return BLK_EH_NOT_HANDLED;
-+	return BLK_EH_DONE;
- }
- 
- static int
-diff --git a/drivers/scsi/qla4xxx/ql4_os.c b/drivers/scsi/qla4xxx/ql4_os.c
-index 94c14ce94da2..0e13349dce57 100644
---- a/drivers/scsi/qla4xxx/ql4_os.c
-+++ b/drivers/scsi/qla4xxx/ql4_os.c
-@@ -1848,7 +1848,7 @@ static enum blk_eh_timer_return qla4xxx_eh_cmd_timed_out(struct scsi_cmnd *sc)
- 	struct iscsi_cls_session *session;
- 	struct iscsi_session *sess;
- 	unsigned long flags;
--	enum blk_eh_timer_return ret = BLK_EH_NOT_HANDLED;
-+	enum blk_eh_timer_return ret = BLK_EH_DONE;
- 
- 	session = starget_to_session(scsi_target(sc->device));
- 	sess = session->dd_data;
-diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-index b36e73090018..9c02ba2e7ef3 100644
---- a/drivers/scsi/scsi_error.c
-+++ b/drivers/scsi/scsi_error.c
-@@ -282,7 +282,7 @@ void scsi_eh_scmd_add(struct scsi_cmnd *scmd)
- enum blk_eh_timer_return scsi_times_out(struct request *req)
- {
- 	struct scsi_cmnd *scmd = blk_mq_rq_to_pdu(req);
--	enum blk_eh_timer_return rtn = BLK_EH_NOT_HANDLED;
-+	enum blk_eh_timer_return rtn = BLK_EH_DONE;
- 	struct Scsi_Host *host = scmd->device->host;
- 
- 	trace_scsi_dispatch_cmd_timeout(scmd);
-@@ -294,7 +294,7 @@ enum blk_eh_timer_return scsi_times_out(struct request *req)
- 	if (host->hostt->eh_timed_out)
- 		rtn = host->hostt->eh_timed_out(scmd);
- 
--	if (rtn == BLK_EH_NOT_HANDLED) {
-+	if (rtn == BLK_EH_DONE) {
- 		if (scsi_abort_command(scmd) != SUCCESS) {
- 			set_host_byte(scmd, DID_TIME_OUT);
- 			scsi_eh_scmd_add(scmd);
-diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
-index be3be0f9cb2d..90075a0ddcfe 100644
---- a/drivers/scsi/scsi_transport_fc.c
-+++ b/drivers/scsi/scsi_transport_fc.c
-@@ -2087,7 +2087,7 @@ fc_eh_timed_out(struct scsi_cmnd *scmd)
- 	if (rport->port_state == FC_PORTSTATE_BLOCKED)
- 		return BLK_EH_RESET_TIMER;
- 
--	return BLK_EH_NOT_HANDLED;
-+	return BLK_EH_DONE;
- }
- EXPORT_SYMBOL(fc_eh_timed_out);
- 
-@@ -3592,7 +3592,7 @@ fc_bsg_job_timeout(struct request *req)
- 
- 	/* the blk_end_sync_io() doesn't check the error */
- 	if (!inflight)
--		return BLK_EH_NOT_HANDLED;
-+		return BLK_EH_DONE;
- 	else
- 		return BLK_EH_HANDLED;
- }
-diff --git a/drivers/scsi/scsi_transport_srp.c b/drivers/scsi/scsi_transport_srp.c
-index 36f6190931bc..a9c1c991da35 100644
---- a/drivers/scsi/scsi_transport_srp.c
-+++ b/drivers/scsi/scsi_transport_srp.c
-@@ -587,7 +587,7 @@ EXPORT_SYMBOL(srp_reconnect_rport);
-  *
-  * If a timeout occurs while an rport is in the blocked state, ask the SCSI
-  * EH to continue waiting (BLK_EH_RESET_TIMER). Otherwise let the SCSI core
-- * handle the timeout (BLK_EH_NOT_HANDLED).
-+ * handle the timeout (BLK_EH_DONE).
-  *
-  * Note: This function is called from soft-IRQ context and with the request
-  * queue lock held.
-@@ -602,7 +602,7 @@ enum blk_eh_timer_return srp_timed_out(struct scsi_cmnd *scmd)
- 	pr_debug("timeout for sdev %s\n", dev_name(&sdev->sdev_gendev));
- 	return rport->fast_io_fail_tmo < 0 && rport->dev_loss_tmo < 0 &&
- 		i->f->reset_timer_if_blocked && scsi_device_blocked(sdev) ?
--		BLK_EH_RESET_TIMER : BLK_EH_NOT_HANDLED;
-+		BLK_EH_RESET_TIMER : BLK_EH_DONE;
- }
- EXPORT_SYMBOL(srp_timed_out);
- 
-diff --git a/drivers/scsi/ufs/ufshcd.c b/drivers/scsi/ufs/ufshcd.c
-index 00e79057f870..d0a1674915a1 100644
---- a/drivers/scsi/ufs/ufshcd.c
-+++ b/drivers/scsi/ufs/ufshcd.c
-@@ -6497,12 +6497,12 @@ static enum blk_eh_timer_return ufshcd_eh_timed_out(struct scsi_cmnd *scmd)
- 	bool found = false;
- 
- 	if (!scmd || !scmd->device || !scmd->device->host)
--		return BLK_EH_NOT_HANDLED;
-+		return BLK_EH_DONE;
- 
- 	host = scmd->device->host;
- 	hba = shost_priv(host);
- 	if (!hba)
--		return BLK_EH_NOT_HANDLED;
-+		return BLK_EH_DONE;
- 
- 	spin_lock_irqsave(host->host_lock, flags);
- 
-@@ -6520,7 +6520,7 @@ static enum blk_eh_timer_return ufshcd_eh_timed_out(struct scsi_cmnd *scmd)
- 	 * SCSI command was not actually dispatched to UFS driver, otherwise
- 	 * let SCSI layer handle the error as usual.
- 	 */
--	return found ? BLK_EH_NOT_HANDLED : BLK_EH_RESET_TIMER;
-+	return found ? BLK_EH_DONE : BLK_EH_RESET_TIMER;
- }
- 
- static const struct attribute_group *ufshcd_driver_groups[] = {
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index f3999719f828..ba0844c176f2 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -337,7 +337,7 @@ typedef int (init_rq_fn)(struct request_queue *, struct request *, gfp_t);
- typedef void (exit_rq_fn)(struct request_queue *, struct request *);
- 
- enum blk_eh_timer_return {
--	BLK_EH_NOT_HANDLED,
-+	BLK_EH_DONE,
- 	BLK_EH_HANDLED,
- 	BLK_EH_RESET_TIMER,
- };
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index 12f454cb6f61..53b485fe9b67 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -307,7 +307,7 @@ struct scsi_host_template {
- 	 * EH_HANDLED:		I fixed the error, please complete the command
- 	 * EH_RESET_TIMER:	I need more time, reset the timer and
- 	 *			begin counting again
--	 * EH_NOT_HANDLED	Begin normal error recovery
-+	 * EH_DONE:		Begin normal error recovery
- 	 *
- 	 * Status: OPTIONAL
- 	 */
+ 		/* Completion has already been traced */
+ 		bio_clear_flag(bio, BIO_TRACE_COMPLETION);
 -- 
 2.17.0
