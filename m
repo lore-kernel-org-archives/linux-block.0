@@ -1,78 +1,177 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Wed, 9 May 2018 08:12:43 -0700
-From: Matthew Wilcox <willy@infradead.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH 01/33] block: add a lower-level bio_add_page interface
-Message-ID: <20180509151243.GA1313@bombadil.infradead.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:51576 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933383AbeEIHsk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 03:48:40 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 01/33] block: add a lower-level bio_add_page interface
+Date: Wed,  9 May 2018 09:47:58 +0200
+Message-Id: <20180509074830.16196-2-hch@lst.de>
+In-Reply-To: <20180509074830.16196-1-hch@lst.de>
 References: <20180509074830.16196-1-hch@lst.de>
- <20180509074830.16196-2-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180509074830.16196-2-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Wed, May 09, 2018 at 09:47:58AM +0200, Christoph Hellwig wrote:
-> +/**
-> + * __bio_try_merge_page - try adding data to an existing bvec
-> + * @bio: destination bio
-> + * @page: page to add
-> + * @len: length of the range to add
-> + * @off: offset into @page
-> + *
-> + * Try adding the data described at @page + @offset to the last bvec of @bio.
-> + * Return %true on success or %false on failure.  This can happen frequently
-> + * for file systems with a block size smaller than the page size.
-> + */
+For the upcoming removal of buffer heads in XFS we need to keep track of
+the number of outstanding writeback requests per page.  For this we need
+to know if bio_add_page merged a region with the previous bvec or not.
+Instead of adding additional arguments this refactors bio_add_page to
+be implemented using three lower level helpers which users like XFS can
+use directly if they care about the merge decisions.
 
-Could we make this:
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/bio.c         | 87 ++++++++++++++++++++++++++++++---------------
+ include/linux/bio.h |  9 +++++
+ 2 files changed, 67 insertions(+), 29 deletions(-)
 
-/**
- * __bio_try_merge_page() - Try appending data to an existing bvec.
- * @bio: Destination bio.
- * @page: Page to add.
- * @len: Length of the data to add.
- * @off: Offset of the data in @page.
- *
- * Try to add the data at @page + @off to the last bvec of @bio.  This is
- * a useful optimisation for file systems with a block size smaller than
- * the page size.
- *
- * Context: Any context.
- * Return: %true on success or %false on failure.
- */
-
-(page, len, off) is a bit weird to me.  Usually we do (page, off, len).
-
-> +/**
-> + * __bio_add_page - add page to a bio in a new segment
-> + * @bio: destination bio
-> + * @page: page to add
-> + * @len: length of the range to add
-> + * @off: offset into @page
-> + *
-> + * Add the data at @page + @offset to @bio as a new bvec.  The caller must
-> + * ensure that @bio has space for another bvec.
-> + */
-
-/**
- * __bio_add_page - Add page to a bio in a new segment.
- * @bio: Destination bio.
- * @page: Page to add.
- * @len: Length of the data to add.
- * @off: Offset of the data in @page.
- *
- * Add the data at @page + @off to @bio as a new bvec.  The caller must
- * ensure that @bio has space for another bvec.
- *
- * Context: Any context.
- */
-
-> +static inline bool bio_full(struct bio *bio)
-> +{
-> +	return bio->bi_vcnt >= bio->bi_max_vecs;
-> +}
-
-I really like this helper.
+diff --git a/block/bio.c b/block/bio.c
+index 53e0f0a1ed94..6ceba6adbf42 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -773,7 +773,7 @@ int bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
+ 			return 0;
+ 	}
+ 
+-	if (bio->bi_vcnt >= bio->bi_max_vecs)
++	if (bio_full(bio))
+ 		return 0;
+ 
+ 	/*
+@@ -820,6 +820,59 @@ int bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
+ }
+ EXPORT_SYMBOL(bio_add_pc_page);
+ 
++/**
++ * __bio_try_merge_page - try adding data to an existing bvec
++ * @bio: destination bio
++ * @page: page to add
++ * @len: length of the range to add
++ * @off: offset into @page
++ *
++ * Try adding the data described at @page + @offset to the last bvec of @bio.
++ * Return %true on success or %false on failure.  This can happen frequently
++ * for file systems with a block size smaller than the page size.
++ */
++bool __bio_try_merge_page(struct bio *bio, struct page *page,
++		unsigned int len, unsigned int off)
++{
++	if (bio->bi_vcnt > 0) {
++		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
++
++		if (page == bv->bv_page && off == bv->bv_offset + bv->bv_len) {
++			bv->bv_len += len;
++			bio->bi_iter.bi_size += len;
++			return true;
++		}
++	}
++	return false;
++}
++EXPORT_SYMBOL_GPL(__bio_try_merge_page);
++
++/**
++ * __bio_add_page - add page to a bio in a new segment
++ * @bio: destination bio
++ * @page: page to add
++ * @len: length of the range to add
++ * @off: offset into @page
++ *
++ * Add the data at @page + @offset to @bio as a new bvec.  The caller must
++ * ensure that @bio has space for another bvec.
++ */
++void __bio_add_page(struct bio *bio, struct page *page,
++		unsigned int len, unsigned int off)
++{
++	struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt];
++
++	WARN_ON_ONCE(bio_full(bio));
++
++	bv->bv_page = page;
++	bv->bv_offset = off;
++	bv->bv_len = len;
++
++	bio->bi_iter.bi_size += len;
++	bio->bi_vcnt++;
++}
++EXPORT_SYMBOL_GPL(__bio_add_page);
++
+ /**
+  *	bio_add_page	-	attempt to add page to bio
+  *	@bio: destination bio
+@@ -833,40 +886,16 @@ EXPORT_SYMBOL(bio_add_pc_page);
+ int bio_add_page(struct bio *bio, struct page *page,
+ 		 unsigned int len, unsigned int offset)
+ {
+-	struct bio_vec *bv;
+-
+ 	/*
+ 	 * cloned bio must not modify vec list
+ 	 */
+ 	if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
+ 		return 0;
+-
+-	/*
+-	 * For filesystems with a blocksize smaller than the pagesize
+-	 * we will often be called with the same page as last time and
+-	 * a consecutive offset.  Optimize this special case.
+-	 */
+-	if (bio->bi_vcnt > 0) {
+-		bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
+-
+-		if (page == bv->bv_page &&
+-		    offset == bv->bv_offset + bv->bv_len) {
+-			bv->bv_len += len;
+-			goto done;
+-		}
++	if (!__bio_try_merge_page(bio, page, len, offset)) {
++		if (bio_full(bio))
++			return 0;
++		__bio_add_page(bio, page, len, offset);
+ 	}
+-
+-	if (bio->bi_vcnt >= bio->bi_max_vecs)
+-		return 0;
+-
+-	bv		= &bio->bi_io_vec[bio->bi_vcnt];
+-	bv->bv_page	= page;
+-	bv->bv_len	= len;
+-	bv->bv_offset	= offset;
+-
+-	bio->bi_vcnt++;
+-done:
+-	bio->bi_iter.bi_size += len;
+ 	return len;
+ }
+ EXPORT_SYMBOL(bio_add_page);
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index ce547a25e8ae..3e73c8bc25ea 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -123,6 +123,11 @@ static inline void *bio_data(struct bio *bio)
+ 	return NULL;
+ }
+ 
++static inline bool bio_full(struct bio *bio)
++{
++	return bio->bi_vcnt >= bio->bi_max_vecs;
++}
++
+ /*
+  * will die
+  */
+@@ -470,6 +475,10 @@ void bio_chain(struct bio *, struct bio *);
+ extern int bio_add_page(struct bio *, struct page *, unsigned int,unsigned int);
+ extern int bio_add_pc_page(struct request_queue *, struct bio *, struct page *,
+ 			   unsigned int, unsigned int);
++bool __bio_try_merge_page(struct bio *bio, struct page *page,
++		unsigned int len, unsigned int off);
++void __bio_add_page(struct bio *bio, struct page *page,
++		unsigned int len, unsigned int off);
+ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter);
+ struct rq_map_data;
+ extern struct bio *bio_map_user_iov(struct request_queue *,
+-- 
+2.17.0
