@@ -1,73 +1,54 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Thu, 3 May 2018 16:53:54 +0200
-From: Jan Kara <jack@suse.cz>
-To: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Cc: viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
-        jack@suse.cz, bart.vanassche@wdc.com, ming.lei@redhat.com,
-        rjw@rjwysocki.net, mguzik@redhat.com, linux-pm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] fs: move documentation for thaw_super() where
- appropriate
-Message-ID: <20180503145354.unbzycfj6axeumfl@quack2.suse.cz>
-References: <20180420235904.27496-1-mcgrof@kernel.org>
- <20180420235904.27496-2-mcgrof@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180420235904.27496-2-mcgrof@kernel.org>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <BATV+e0efdd19ce80d487e3da+5372+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "Ed L. Cashin" <ed.cashin@acm.org>,
+	Geoff Levand <geoff@infradead.org>,
+	Maxim Levitsky <maximlevitsky@gmail.com>,
+	linux-block@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-mtd@lists.infradead.org,
+	sparclinux@vger.kernel.org
+Subject: [PATCH 5/7] aoe: handle highmem pages
+Date: Wed,  9 May 2018 15:59:46 +0200
+Message-Id: <20180509135948.20329-6-hch@lst.de>
+In-Reply-To: <20180509135948.20329-1-hch@lst.de>
+References: <20180509135948.20329-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri 20-04-18 16:59:02, Luis R. Rodriguez wrote:
-> On commit 08fdc8a0138a ("buffer.c: call thaw_super during emergency thaw")
-> Mateusz added thaw_super_locked() and made thaw_super() use it, but
-> forgot to move the documentation.
-> 
-> Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
+Use kmap_atomic when copying out of a bio_vec.
 
-Looks good (modulo the -- which is probably worth fixing when touching the
-comment anyway). You can add:
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/aoe/aoeblk.c | 1 -
+ drivers/block/aoe/aoecmd.c | 3 ++-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  fs/super.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/fs/super.c b/fs/super.c
-> index 5fa9a8d8d865..9d0eb5e20a1f 100644
-> --- a/fs/super.c
-> +++ b/fs/super.c
-> @@ -1532,12 +1532,6 @@ int freeze_super(struct super_block *sb)
->  }
->  EXPORT_SYMBOL(freeze_super);
->  
-> -/**
-> - * thaw_super -- unlock filesystem
-> - * @sb: the super to thaw
-> - *
-> - * Unlocks the filesystem and marks it writeable again after freeze_super().
-> - */
->  static int thaw_super_locked(struct super_block *sb)
->  {
->  	int error;
-> @@ -1573,6 +1567,12 @@ static int thaw_super_locked(struct super_block *sb)
->  	return 0;
->  }
->  
-> +/**
-> + * thaw_super -- unlock filesystem
-> + * @sb: the super to thaw
-> + *
-> + * Unlocks the filesystem and marks it writeable again after freeze_super().
-> + */
->  int thaw_super(struct super_block *sb)
->  {
->  	down_write(&sb->s_umount);
-> -- 
-> 2.16.3
-> 
+diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
+index 6797e6c23c8a..027b876370bc 100644
+--- a/drivers/block/aoe/aoeblk.c
++++ b/drivers/block/aoe/aoeblk.c
+@@ -388,7 +388,6 @@ aoeblk_gdalloc(void *vp)
+ 			d->aoemajor, d->aoeminor);
+ 		goto err_mempool;
+ 	}
+-	blk_queue_bounce_limit(q, BLK_BOUNCE_HIGH);
+ 
+ 	spin_lock_irqsave(&d->lock, flags);
+ 	WARN_ON(!(d->flags & DEVFL_GD_NOW));
+diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
+index 540bb60cd071..096882e54095 100644
+--- a/drivers/block/aoe/aoecmd.c
++++ b/drivers/block/aoe/aoecmd.c
+@@ -1032,8 +1032,9 @@ bvcpy(struct sk_buff *skb, struct bio *bio, struct bvec_iter iter, long cnt)
+ 	iter.bi_size = cnt;
+ 
+ 	__bio_for_each_segment(bv, bio, iter, iter) {
+-		char *p = page_address(bv.bv_page) + bv.bv_offset;
++		char *p = kmap_atomic(bv.bv_page) + bv.bv_offset;
+ 		skb_copy_bits(skb, soff, p, bv.bv_len);
++		kunmap_atomic(p);
+ 		soff += bv.bv_len;
+ 	}
+ }
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.17.0
