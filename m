@@ -1,86 +1,147 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:43232 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751771AbeEFSug (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 6 May 2018 14:50:36 -0400
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        axboe <axboe@kernel.dk>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        Cai Zhiyong <caizhiyong@huawei.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH] Documentation: block: cmdline-partition.txt fixes and
- additions
-Message-ID: <dba389fc-2745-34b1-e33e-fc83f53eaf42@infradead.org>
-Date: Sun, 6 May 2018 11:50:29 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 15/33] xfs: simplify xfs_aops_discard_page
+Date: Wed,  9 May 2018 09:48:12 +0200
+Message-Id: <20180509074830.16196-16-hch@lst.de>
+In-Reply-To: <20180509074830.16196-1-hch@lst.de>
+References: <20180509074830.16196-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Randy Dunlap <rdunlap@infradead.org>
+Instead of looking at the buffer heads to see if a block is delalloc just
+call xfs_bmap_punch_delalloc_range on the whole page - this will leave
+any non-delalloc block intact and handle the iteration for us.  As a side
+effect one more place stops caring about buffer heads and we can remove the
+xfs_check_page_type function entirely.
 
-Make the description of the kernel command line option "blkdevparts"
-a bit more flowing and readable.
-
-Fix a few typos.
-Add the optional <size> and <offset> suffixes.
-Note that size can be "-" to indicate all of the remaining space.
-
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Cai Zhiyong <caizhiyong@huawei.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
-Should the "ro" and "lk" flags options be described?
+ fs/xfs/xfs_aops.c | 85 +++++------------------------------------------
+ 1 file changed, 9 insertions(+), 76 deletions(-)
 
- Documentation/block/cmdline-partition.txt |   21 +++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
-
---- linux-next-20180504.orig/Documentation/block/cmdline-partition.txt
-+++ linux-next-20180504/Documentation/block/cmdline-partition.txt
-@@ -1,7 +1,9 @@
- Embedded device command line partition parsing
- =====================================================================
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 8e4d01e76fc8..313449ac0288 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -711,49 +711,6 @@ xfs_map_at_offset(
+ 	clear_buffer_unwritten(bh);
+ }
  
--Support for reading the block device partition table from the command line.
-+The "blkdevparts" command line option adds support for reading the
-+block device partition table from the kernel command line.
-+
- It is typically used for fixed block (eMMC) embedded devices.
- It has no MBR, so saves storage space. Bootloader can be easily accessed
- by absolute address of data on the block device.
-@@ -14,22 +16,27 @@ blkdevparts=<blkdev-def>[;<blkdev-def>]
-     <partdef> := <size>[@<offset>](part-name)
+-/*
+- * Test if a given page contains at least one buffer of a given @type.
+- * If @check_all_buffers is true, then we walk all the buffers in the page to
+- * try to find one of the type passed in. If it is not set, then the caller only
+- * needs to check the first buffer on the page for a match.
+- */
+-STATIC bool
+-xfs_check_page_type(
+-	struct page		*page,
+-	unsigned int		type,
+-	bool			check_all_buffers)
+-{
+-	struct buffer_head	*bh;
+-	struct buffer_head	*head;
+-
+-	if (PageWriteback(page))
+-		return false;
+-	if (!page->mapping)
+-		return false;
+-	if (!page_has_buffers(page))
+-		return false;
+-
+-	bh = head = page_buffers(page);
+-	do {
+-		if (buffer_unwritten(bh)) {
+-			if (type == XFS_IO_UNWRITTEN)
+-				return true;
+-		} else if (buffer_delay(bh)) {
+-			if (type == XFS_IO_DELALLOC)
+-				return true;
+-		} else if (buffer_dirty(bh) && buffer_mapped(bh)) {
+-			if (type == XFS_IO_OVERWRITE)
+-				return true;
+-		}
+-
+-		/* If we are only checking the first buffer, we are done now. */
+-		if (!check_all_buffers)
+-			break;
+-	} while ((bh = bh->b_this_page) != head);
+-
+-	return false;
+-}
+-
+ STATIC void
+ xfs_vm_invalidatepage(
+ 	struct page		*page,
+@@ -785,9 +742,6 @@ xfs_vm_invalidatepage(
+  * transaction. Indeed - if we get ENOSPC errors, we have to be able to do this
+  * truncation without a transaction as there is no space left for block
+  * reservation (typically why we see a ENOSPC in writeback).
+- *
+- * This is not a performance critical path, so for now just do the punching a
+- * buffer head at a time.
+  */
+ STATIC void
+ xfs_aops_discard_page(
+@@ -795,47 +749,26 @@ xfs_aops_discard_page(
+ {
+ 	struct inode		*inode = page->mapping->host;
+ 	struct xfs_inode	*ip = XFS_I(inode);
+-	struct buffer_head	*bh, *head;
++	struct xfs_mount	*mp = ip->i_mount;
+ 	loff_t			offset = page_offset(page);
++	xfs_fileoff_t		start_fsb = XFS_B_TO_FSBT(mp, offset);
++	int			error;
  
- <blkdev-id>
--    block device disk name, embedded device used fixed block device,
--    it's disk name also fixed. such as: mmcblk0, mmcblk1, mmcblk0boot0.
-+    block device disk name. Embedded device uses fixed block device.
-+    Its disk name is also fixed, such as: mmcblk0, mmcblk1, mmcblk0boot0.
+-	if (!xfs_check_page_type(page, XFS_IO_DELALLOC, true))
+-		goto out_invalidate;
+-
+-	if (XFS_FORCED_SHUTDOWN(ip->i_mount))
++	if (XFS_FORCED_SHUTDOWN(mp))
+ 		goto out_invalidate;
  
- <size>
-     partition size, in bytes, such as: 512, 1m, 1G.
-+    size may contain an optional suffix of (upper or lower case):
-+      K, M, G, T, P, E.
-+    "-" is used to denote all remaining space.
+-	xfs_alert(ip->i_mount,
++	xfs_alert(mp,
+ 		"page discard on page "PTR_FMT", inode 0x%llx, offset %llu.",
+ 			page, ip->i_ino, offset);
  
- <offset>
-     partition start address, in bytes.
-+    offset may contain an optional suffix of (upper or lower case):
-+      K, M, G, T, P, E.
+ 	xfs_ilock(ip, XFS_ILOCK_EXCL);
+-	bh = head = page_buffers(page);
+-	do {
+-		int		error;
+-		xfs_fileoff_t	start_fsb;
+-
+-		if (!buffer_delay(bh))
+-			goto next_buffer;
+-
+-		start_fsb = XFS_B_TO_FSBT(ip->i_mount, offset);
+-		error = xfs_bmap_punch_delalloc_range(ip, start_fsb, 1);
+-		if (error) {
+-			/* something screwed, just bail */
+-			if (!XFS_FORCED_SHUTDOWN(ip->i_mount)) {
+-				xfs_alert(ip->i_mount,
+-			"page discard unable to remove delalloc mapping.");
+-			}
+-			break;
+-		}
+-next_buffer:
+-		offset += i_blocksize(inode);
+-
+-	} while ((bh = bh->b_this_page) != head);
+-
++	error = xfs_bmap_punch_delalloc_range(ip, start_fsb,
++			PAGE_SIZE / i_blocksize(inode));
+ 	xfs_iunlock(ip, XFS_ILOCK_EXCL);
++	if (error && !XFS_FORCED_SHUTDOWN(mp))
++		xfs_alert(mp, "page discard unable to remove delalloc mapping.");
+ out_invalidate:
+ 	xfs_vm_invalidatepage(page, 0, PAGE_SIZE);
+-	return;
+ }
  
- (part-name)
--    partition name, kernel send uevent with "PARTNAME". application can create
--    a link to block device partition with the name "PARTNAME".
--    user space application can access partition by partition name.
-+    partition name. Kernel sends uevent with "PARTNAME". Application can
-+    create a link to block device partition with the name "PARTNAME".
-+    User space application can access partition by partition name.
- 
- Example:
--    eMMC disk name is "mmcblk0" and "mmcblk0boot0"
-+    eMMC disk names are "mmcblk0" and "mmcblk0boot0".
- 
-   bootargs:
-     'blkdevparts=mmcblk0:1G(data0),1G(data1),-;mmcblk0boot0:1m(boot),-(kernel)'
+ static int
+-- 
+2.17.0
