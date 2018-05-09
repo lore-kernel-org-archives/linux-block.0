@@ -1,68 +1,360 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:37622 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934270AbeEIJJH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 05:09:07 -0400
+Received: by mail-pf0-f195.google.com with SMTP id e9so21320645pfi.4
+        for <linux-block@vger.kernel.org>; Wed, 09 May 2018 02:09:07 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
 To: linux-block@vger.kernel.org
-Cc: osandov@fb.com,
-	efault@gmx.de,
-	paolo.valente@linaro.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 5/7] bfq-iosched: update shallow depth to smallest one used
-Date: Wed,  9 May 2018 14:49:25 -0600
-Message-Id: <1525898967-13425-6-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1525898967-13425-1-git-send-email-axboe@kernel.dk>
-References: <1525898967-13425-1-git-send-email-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
+Subject: [PATCH v3 5/7] block: use ktime_get_ns() instead of sched_clock() for cfq and bfq
+Date: Wed,  9 May 2018 02:08:51 -0700
+Message-Id: <21f203334e8c86a25d47812342fdb53b788203df.1525856631.git.osandov@fb.com>
+In-Reply-To: <cover.1525856630.git.osandov@fb.com>
+References: <cover.1525856630.git.osandov@fb.com>
+In-Reply-To: <cover.1525856630.git.osandov@fb.com>
+References: <cover.1525856630.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-If our shallow depth is smaller than the wake batching of sbitmap,
-we can introduce hangs. Ensure that sbitmap knows how low we'll go.
+From: Omar Sandoval <osandov@fb.com>
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+cfq and bfq have some internal fields that use sched_clock() which can
+trivially use ktime_get_ns() instead. Their timestamp fields in struct
+request can also use ktime_get_ns(), which resolves the 8 year old
+comment added by commit 28f4197e5d47 ("block: disable preemption before
+using sched_clock()").
+
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- block/bfq-iosched.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+ block/bfq-cgroup.c     | 40 +++++++++++++++++-----------------
+ block/bfq-iosched.h    | 10 ++++-----
+ block/cfq-iosched.c    | 49 ++++++++++++++++++++++--------------------
+ include/linux/blkdev.h | 21 ++++++------------
+ 4 files changed, 57 insertions(+), 63 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index b7722668e295..cba6e82153a2 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -5053,10 +5053,13 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
- 
- /*
-  * See the comments on bfq_limit_depth for the purpose of
-- * the depths set in the function.
-+ * the depths set in the function. Return minimum shallow depth we'll use.
-  */
--static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
-+static unsigned int bfq_update_depths(struct bfq_data *bfqd,
-+				      struct sbitmap_queue *bt)
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index d819dc77fe65..a9e8633388f4 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -55,13 +55,13 @@ BFQG_FLAG_FNS(empty)
+ /* This should be called with the scheduler lock held. */
+ static void bfqg_stats_update_group_wait_time(struct bfqg_stats *stats)
  {
-+	unsigned int i, j, min_shallow = UINT_MAX;
-+
- 	bfqd->sb_shift = bt->sb.shift;
+-	unsigned long long now;
++	u64 now;
  
- 	/*
-@@ -5089,14 +5092,22 @@ static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
- 	bfqd->word_depths[1][0] = max(((1U<<bfqd->sb_shift) * 3)>>4, 1U);
- 	/* no more than ~37% of tags for sync writes (~20% extra tags) */
- 	bfqd->word_depths[1][1] = max(((1U<<bfqd->sb_shift) * 6)>>4, 1U);
-+
-+	for (i = 0; i < 2; i++)
-+		for (j = 0; j < 2; j++)
-+			min_shallow = min(min_shallow, bfqd->word_depths[i][j]);
-+
-+	return min_shallow;
+ 	if (!bfqg_stats_waiting(stats))
+ 		return;
+ 
+-	now = sched_clock();
+-	if (time_after64(now, stats->start_group_wait_time))
++	now = ktime_get_ns();
++	if (now > stats->start_group_wait_time)
+ 		blkg_stat_add(&stats->group_wait_time,
+ 			      now - stats->start_group_wait_time);
+ 	bfqg_stats_clear_waiting(stats);
+@@ -77,20 +77,20 @@ static void bfqg_stats_set_start_group_wait_time(struct bfq_group *bfqg,
+ 		return;
+ 	if (bfqg == curr_bfqg)
+ 		return;
+-	stats->start_group_wait_time = sched_clock();
++	stats->start_group_wait_time = ktime_get_ns();
+ 	bfqg_stats_mark_waiting(stats);
  }
  
- static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
+ /* This should be called with the scheduler lock held. */
+ static void bfqg_stats_end_empty_time(struct bfqg_stats *stats)
  {
- 	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
- 	struct blk_mq_tags *tags = hctx->sched_tags;
-+	unsigned int min_shallow;
+-	unsigned long long now;
++	u64 now;
  
--	bfq_update_depths(bfqd, &tags->bitmap_tags);
-+	min_shallow = bfq_update_depths(bfqd, &tags->bitmap_tags);
-+	sbitmap_queue_shallow_depth(&tags->bitmap_tags, min_shallow);
+ 	if (!bfqg_stats_empty(stats))
+ 		return;
+ 
+-	now = sched_clock();
+-	if (time_after64(now, stats->start_empty_time))
++	now = ktime_get_ns();
++	if (now > stats->start_empty_time)
+ 		blkg_stat_add(&stats->empty_time,
+ 			      now - stats->start_empty_time);
+ 	bfqg_stats_clear_empty(stats);
+@@ -116,7 +116,7 @@ void bfqg_stats_set_start_empty_time(struct bfq_group *bfqg)
+ 	if (bfqg_stats_empty(stats))
+ 		return;
+ 
+-	stats->start_empty_time = sched_clock();
++	stats->start_empty_time = ktime_get_ns();
+ 	bfqg_stats_mark_empty(stats);
+ }
+ 
+@@ -125,9 +125,9 @@ void bfqg_stats_update_idle_time(struct bfq_group *bfqg)
+ 	struct bfqg_stats *stats = &bfqg->stats;
+ 
+ 	if (bfqg_stats_idling(stats)) {
+-		unsigned long long now = sched_clock();
++		u64 now = ktime_get_ns();
+ 
+-		if (time_after64(now, stats->start_idle_time))
++		if (now > stats->start_idle_time)
+ 			blkg_stat_add(&stats->idle_time,
+ 				      now - stats->start_idle_time);
+ 		bfqg_stats_clear_idling(stats);
+@@ -138,7 +138,7 @@ void bfqg_stats_set_start_idle_time(struct bfq_group *bfqg)
+ {
+ 	struct bfqg_stats *stats = &bfqg->stats;
+ 
+-	stats->start_idle_time = sched_clock();
++	stats->start_idle_time = ktime_get_ns();
+ 	bfqg_stats_mark_idling(stats);
+ }
+ 
+@@ -171,18 +171,18 @@ void bfqg_stats_update_io_merged(struct bfq_group *bfqg, unsigned int op)
+ 	blkg_rwstat_add(&bfqg->stats.merged, op, 1);
+ }
+ 
+-void bfqg_stats_update_completion(struct bfq_group *bfqg, uint64_t start_time,
+-				  uint64_t io_start_time, unsigned int op)
++void bfqg_stats_update_completion(struct bfq_group *bfqg, u64 start_time_ns,
++				  u64 io_start_time_ns, unsigned int op)
+ {
+ 	struct bfqg_stats *stats = &bfqg->stats;
+-	unsigned long long now = sched_clock();
++	u64 now = ktime_get_ns();
+ 
+-	if (time_after64(now, io_start_time))
++	if (now > io_start_time_ns)
+ 		blkg_rwstat_add(&stats->service_time, op,
+-				now - io_start_time);
+-	if (time_after64(io_start_time, start_time))
++				now - io_start_time_ns);
++	if (io_start_time_ns > start_time_ns)
+ 		blkg_rwstat_add(&stats->wait_time, op,
+-				io_start_time - start_time);
++				io_start_time_ns - start_time_ns);
+ }
+ 
+ #else /* CONFIG_BFQ_GROUP_IOSCHED && CONFIG_DEBUG_BLK_CGROUP */
+@@ -191,8 +191,8 @@ void bfqg_stats_update_io_add(struct bfq_group *bfqg, struct bfq_queue *bfqq,
+ 			      unsigned int op) { }
+ void bfqg_stats_update_io_remove(struct bfq_group *bfqg, unsigned int op) { }
+ void bfqg_stats_update_io_merged(struct bfq_group *bfqg, unsigned int op) { }
+-void bfqg_stats_update_completion(struct bfq_group *bfqg, uint64_t start_time,
+-				  uint64_t io_start_time, unsigned int op) { }
++void bfqg_stats_update_completion(struct bfq_group *bfqg, u64 start_time_ns,
++				  u64 io_start_time_ns, unsigned int op) { }
+ void bfqg_stats_update_dequeue(struct bfq_group *bfqg) { }
+ void bfqg_stats_set_start_empty_time(struct bfq_group *bfqg) { }
+ void bfqg_stats_update_idle_time(struct bfq_group *bfqg) { }
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index ae2f3dadec44..8ec7ff92cd6f 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -732,9 +732,9 @@ struct bfqg_stats {
+ 	/* total time with empty current active q with other requests queued */
+ 	struct blkg_stat		empty_time;
+ 	/* fields after this shouldn't be cleared on stat reset */
+-	uint64_t			start_group_wait_time;
+-	uint64_t			start_idle_time;
+-	uint64_t			start_empty_time;
++	u64				start_group_wait_time;
++	u64				start_idle_time;
++	u64				start_empty_time;
+ 	uint16_t			flags;
+ #endif	/* CONFIG_BFQ_GROUP_IOSCHED && CONFIG_DEBUG_BLK_CGROUP */
+ };
+@@ -856,8 +856,8 @@ void bfqg_stats_update_io_add(struct bfq_group *bfqg, struct bfq_queue *bfqq,
+ 			      unsigned int op);
+ void bfqg_stats_update_io_remove(struct bfq_group *bfqg, unsigned int op);
+ void bfqg_stats_update_io_merged(struct bfq_group *bfqg, unsigned int op);
+-void bfqg_stats_update_completion(struct bfq_group *bfqg, uint64_t start_time,
+-				  uint64_t io_start_time, unsigned int op);
++void bfqg_stats_update_completion(struct bfq_group *bfqg, u64 start_time_ns,
++				  u64 io_start_time_ns, unsigned int op);
+ void bfqg_stats_update_dequeue(struct bfq_group *bfqg);
+ void bfqg_stats_set_start_empty_time(struct bfq_group *bfqg);
+ void bfqg_stats_update_idle_time(struct bfq_group *bfqg);
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 9f342ef1ad42..652ca064de20 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -210,9 +210,9 @@ struct cfqg_stats {
+ 	/* total time with empty current active q with other requests queued */
+ 	struct blkg_stat		empty_time;
+ 	/* fields after this shouldn't be cleared on stat reset */
+-	uint64_t			start_group_wait_time;
+-	uint64_t			start_idle_time;
+-	uint64_t			start_empty_time;
++	u64				start_group_wait_time;
++	u64				start_idle_time;
++	u64				start_empty_time;
+ 	uint16_t			flags;
+ #endif	/* CONFIG_DEBUG_BLK_CGROUP */
+ #endif	/* CONFIG_CFQ_GROUP_IOSCHED */
+@@ -491,13 +491,13 @@ CFQG_FLAG_FNS(empty)
+ /* This should be called with the queue_lock held. */
+ static void cfqg_stats_update_group_wait_time(struct cfqg_stats *stats)
+ {
+-	unsigned long long now;
++	u64 now;
+ 
+ 	if (!cfqg_stats_waiting(stats))
+ 		return;
+ 
+-	now = sched_clock();
+-	if (time_after64(now, stats->start_group_wait_time))
++	now = ktime_get_ns();
++	if (now > stats->start_group_wait_time)
+ 		blkg_stat_add(&stats->group_wait_time,
+ 			      now - stats->start_group_wait_time);
+ 	cfqg_stats_clear_waiting(stats);
+@@ -513,20 +513,20 @@ static void cfqg_stats_set_start_group_wait_time(struct cfq_group *cfqg,
+ 		return;
+ 	if (cfqg == curr_cfqg)
+ 		return;
+-	stats->start_group_wait_time = sched_clock();
++	stats->start_group_wait_time = ktime_get_ns();
+ 	cfqg_stats_mark_waiting(stats);
+ }
+ 
+ /* This should be called with the queue_lock held. */
+ static void cfqg_stats_end_empty_time(struct cfqg_stats *stats)
+ {
+-	unsigned long long now;
++	u64 now;
+ 
+ 	if (!cfqg_stats_empty(stats))
+ 		return;
+ 
+-	now = sched_clock();
+-	if (time_after64(now, stats->start_empty_time))
++	now = ktime_get_ns();
++	if (now > stats->start_empty_time)
+ 		blkg_stat_add(&stats->empty_time,
+ 			      now - stats->start_empty_time);
+ 	cfqg_stats_clear_empty(stats);
+@@ -552,7 +552,7 @@ static void cfqg_stats_set_start_empty_time(struct cfq_group *cfqg)
+ 	if (cfqg_stats_empty(stats))
+ 		return;
+ 
+-	stats->start_empty_time = sched_clock();
++	stats->start_empty_time = ktime_get_ns();
+ 	cfqg_stats_mark_empty(stats);
+ }
+ 
+@@ -561,9 +561,9 @@ static void cfqg_stats_update_idle_time(struct cfq_group *cfqg)
+ 	struct cfqg_stats *stats = &cfqg->stats;
+ 
+ 	if (cfqg_stats_idling(stats)) {
+-		unsigned long long now = sched_clock();
++		u64 now = ktime_get_ns();
+ 
+-		if (time_after64(now, stats->start_idle_time))
++		if (now > stats->start_idle_time)
+ 			blkg_stat_add(&stats->idle_time,
+ 				      now - stats->start_idle_time);
+ 		cfqg_stats_clear_idling(stats);
+@@ -576,7 +576,7 @@ static void cfqg_stats_set_start_idle_time(struct cfq_group *cfqg)
+ 
+ 	BUG_ON(cfqg_stats_idling(stats));
+ 
+-	stats->start_idle_time = sched_clock();
++	stats->start_idle_time = ktime_get_ns();
+ 	cfqg_stats_mark_idling(stats);
+ }
+ 
+@@ -701,17 +701,19 @@ static inline void cfqg_stats_update_io_merged(struct cfq_group *cfqg,
+ }
+ 
+ static inline void cfqg_stats_update_completion(struct cfq_group *cfqg,
+-			uint64_t start_time, uint64_t io_start_time,
+-			unsigned int op)
++						u64 start_time_ns,
++						u64 io_start_time_ns,
++						unsigned int op)
+ {
+ 	struct cfqg_stats *stats = &cfqg->stats;
+-	unsigned long long now = sched_clock();
++	u64 now = ktime_get_ns();
+ 
+-	if (time_after64(now, io_start_time))
+-		blkg_rwstat_add(&stats->service_time, op, now - io_start_time);
+-	if (time_after64(io_start_time, start_time))
++	if (now > io_start_time_ns)
++		blkg_rwstat_add(&stats->service_time, op,
++				now - io_start_time_ns);
++	if (io_start_time_ns > start_time_ns)
+ 		blkg_rwstat_add(&stats->wait_time, op,
+-				io_start_time - start_time);
++				io_start_time_ns - start_time_ns);
+ }
+ 
+ /* @stats = 0 */
+@@ -797,8 +799,9 @@ static inline void cfqg_stats_update_io_remove(struct cfq_group *cfqg,
+ static inline void cfqg_stats_update_io_merged(struct cfq_group *cfqg,
+ 			unsigned int op) { }
+ static inline void cfqg_stats_update_completion(struct cfq_group *cfqg,
+-			uint64_t start_time, uint64_t io_start_time,
+-			unsigned int op) { }
++						u64 start_time_ns,
++						u64 io_start_time_ns,
++						unsigned int op) { }
+ 
+ #endif	/* CONFIG_CFQ_GROUP_IOSCHED */
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index f2c2fc011e6b..9ef412666df1 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1799,42 +1799,33 @@ int kblockd_schedule_work_on(int cpu, struct work_struct *work);
+ int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork, unsigned long delay);
+ 
+ #ifdef CONFIG_BLK_CGROUP
+-/*
+- * This should not be using sched_clock(). A real patch is in progress
+- * to fix this up, until that is in place we need to disable preemption
+- * around sched_clock() in this function and set_io_start_time_ns().
+- */
+ static inline void set_start_time_ns(struct request *req)
+ {
+-	preempt_disable();
+-	req->cgroup_start_time_ns = sched_clock();
+-	preempt_enable();
++	req->cgroup_start_time_ns = ktime_get_ns();
+ }
+ 
+ static inline void set_io_start_time_ns(struct request *req)
+ {
+-	preempt_disable();
+-	req->cgroup_io_start_time_ns = sched_clock();
+-	preempt_enable();
++	req->cgroup_io_start_time_ns = ktime_get_ns();
+ }
+ 
+-static inline uint64_t rq_start_time_ns(struct request *req)
++static inline u64 rq_start_time_ns(struct request *req)
+ {
+ 	return req->cgroup_start_time_ns;
+ }
+ 
+-static inline uint64_t rq_io_start_time_ns(struct request *req)
++static inline u64 rq_io_start_time_ns(struct request *req)
+ {
+ 	return req->cgroup_io_start_time_ns;
+ }
+ #else
+ static inline void set_start_time_ns(struct request *req) {}
+ static inline void set_io_start_time_ns(struct request *req) {}
+-static inline uint64_t rq_start_time_ns(struct request *req)
++static inline u64 rq_start_time_ns(struct request *req)
+ {
  	return 0;
  }
- 
+-static inline uint64_t rq_io_start_time_ns(struct request *req)
++static inline u64 rq_io_start_time_ns(struct request *req)
+ {
+ 	return 0;
+ }
 -- 
-2.7.4
+2.17.0
