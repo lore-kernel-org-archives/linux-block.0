@@ -1,75 +1,64 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:53644 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:51740 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935362AbeEIPpD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 11:45:03 -0400
-Date: Wed, 9 May 2018 08:45:01 -0700
-From: Matthew Wilcox <willy@infradead.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH 06/33] mm: give the 'ret' variable a better name
- __do_page_cache_readahead
-Message-ID: <20180509154501.GD1313@bombadil.infradead.org>
+        with ESMTP id S933383AbeEIHs5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 03:48:57 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 06/33] mm: give the 'ret' variable a better name __do_page_cache_readahead
+Date: Wed,  9 May 2018 09:48:03 +0200
+Message-Id: <20180509074830.16196-7-hch@lst.de>
+In-Reply-To: <20180509074830.16196-1-hch@lst.de>
 References: <20180509074830.16196-1-hch@lst.de>
- <20180509074830.16196-7-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180509074830.16196-7-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, May 09, 2018 at 09:48:03AM +0200, Christoph Hellwig wrote:
-> It counts the number of pages acted on, so name it nr_pages to make that
-> obvious.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+It counts the number of pages acted on, so name it nr_pages to make that
+obvious.
 
-Yes!
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ mm/readahead.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Also, it can't return an error, so how about changing it to unsigned int?
-And deleting the error check from the caller?
-
->  mm/readahead.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/mm/readahead.c b/mm/readahead.c
-> index 539bbb6c1fad..16d0cb1e2616 100644
-> --- a/mm/readahead.c
-> +++ b/mm/readahead.c
-> @@ -156,7 +156,7 @@ int __do_page_cache_readahead(struct address_space *mapping, struct file *filp,
->  	unsigned long end_index;	/* The last page we want to read */
->  	LIST_HEAD(page_pool);
->  	int page_idx;
-> -	int ret = 0;
-> +	int nr_pages = 0;
->  	loff_t isize = i_size_read(inode);
->  	gfp_t gfp_mask = readahead_gfp_mask(mapping);
->  
-> @@ -187,7 +187,7 @@ int __do_page_cache_readahead(struct address_space *mapping, struct file *filp,
->  		list_add(&page->lru, &page_pool);
->  		if (page_idx == nr_to_read - lookahead_size)
->  			SetPageReadahead(page);
-> -		ret++;
-> +		nr_pages++;
->  	}
->  
->  	/*
-> @@ -195,11 +195,11 @@ int __do_page_cache_readahead(struct address_space *mapping, struct file *filp,
->  	 * uptodate then the caller will launch readpage again, and
->  	 * will then handle the error.
->  	 */
-> -	if (ret)
-> -		read_pages(mapping, filp, &page_pool, ret, gfp_mask);
-> +	if (nr_pages)
-> +		read_pages(mapping, filp, &page_pool, nr_pages, gfp_mask);
->  	BUG_ON(!list_empty(&page_pool));
->  out:
-> -	return ret;
-> +	return nr_pages;
->  }
->  
->  /*
-> -- 
-> 2.17.0
-> 
+diff --git a/mm/readahead.c b/mm/readahead.c
+index 539bbb6c1fad..16d0cb1e2616 100644
+--- a/mm/readahead.c
++++ b/mm/readahead.c
+@@ -156,7 +156,7 @@ int __do_page_cache_readahead(struct address_space *mapping, struct file *filp,
+ 	unsigned long end_index;	/* The last page we want to read */
+ 	LIST_HEAD(page_pool);
+ 	int page_idx;
+-	int ret = 0;
++	int nr_pages = 0;
+ 	loff_t isize = i_size_read(inode);
+ 	gfp_t gfp_mask = readahead_gfp_mask(mapping);
+ 
+@@ -187,7 +187,7 @@ int __do_page_cache_readahead(struct address_space *mapping, struct file *filp,
+ 		list_add(&page->lru, &page_pool);
+ 		if (page_idx == nr_to_read - lookahead_size)
+ 			SetPageReadahead(page);
+-		ret++;
++		nr_pages++;
+ 	}
+ 
+ 	/*
+@@ -195,11 +195,11 @@ int __do_page_cache_readahead(struct address_space *mapping, struct file *filp,
+ 	 * uptodate then the caller will launch readpage again, and
+ 	 * will then handle the error.
+ 	 */
+-	if (ret)
+-		read_pages(mapping, filp, &page_pool, ret, gfp_mask);
++	if (nr_pages)
++		read_pages(mapping, filp, &page_pool, nr_pages, gfp_mask);
+ 	BUG_ON(!list_empty(&page_pool));
+ out:
+-	return ret;
++	return nr_pages;
+ }
+ 
+ /*
+-- 
+2.17.0
