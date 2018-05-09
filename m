@@ -1,64 +1,99 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-Subject: bug in tag handling in blk-mq?
-Message-Id: <999DF2B3-4EE8-4BDF-89C5-EB0C2D8BF69E@linaro.org>
-Date: Mon, 7 May 2018 16:03:34 +0200
-Cc: linux-block <linux-block@vger.kernel.org>,
- Ulf Hansson <ulf.hansson@linaro.org>,
- LKML <linux-kernel@vger.kernel.org>,
- Linus Walleij <linus.walleij@linaro.org>,
- Ulf Hansson <ulf.hansson@linaro.org>,
- Oleksandr Natalenko <oleksandr@natalenko.name>
-To: Mike Galbraith <efault@gmx.de>,
- Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@lst.de>
+Return-Path: <kent.overstreet@gmail.com>
+Return-Path: <kent.overstreet@gmail.com>
+From: Kent Overstreet <kent.overstreet@gmail.com>
+To: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-mm@kvack.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Ingo Molnar <mingo@kernel.org>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Subject: [PATCH 04/10] block: Use bioset_init() for fs_bio_set
+Date: Tue,  8 May 2018 21:33:52 -0400
+Message-Id: <20180509013358.16399-5-kent.overstreet@gmail.com>
+In-Reply-To: <20180509013358.16399-1-kent.overstreet@gmail.com>
+References: <20180509013358.16399-1-kent.overstreet@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens, Christoph, all,
-Mike Galbraith has been experiencing hangs, on blk_mq_get_tag, only
-with bfq [1].  Symptoms seem to clearly point to a problem in I/O-tag
-handling, triggered by bfq because it limits the number of tags for
-async and sync write requests (in bfq_limit_depth).
+Minor optimization - remove a pointer indirection when using fs_bio_set.
 
-Fortunately, I just happened to find a way to apparently confirm it.
-With the following one-liner for block/bfq-iosched.c:
+Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
+---
+ block/bio.c                         | 7 +++----
+ block/blk-core.c                    | 2 +-
+ drivers/target/target_core_iblock.c | 2 +-
+ include/linux/bio.h                 | 4 ++--
+ 4 files changed, 7 insertions(+), 8 deletions(-)
 
-@@ -554,8 +554,7 @@ static void bfq_limit_depth(unsigned int op, struct =
-blk_mq_alloc_data *data)
-        if (unlikely(bfqd->sb_shift !=3D bt->sb.shift))
-                bfq_update_depths(bfqd, bt);
-=20
--       data->shallow_depth =3D
--               =
-bfqd->word_depths[!!bfqd->wr_busy_queues][op_is_sync(op)];
-+       data->shallow_depth =3D 1;
-=20
-        bfq_log(bfqd, "[%s] wr_busy %d sync %d depth %u",
-                        __func__, bfqd->wr_busy_queues, op_is_sync(op),
-
-Mike's machine now crashes soon and systematically, while nothing bad
-happens on my machines, even with heavy workloads (apart from an
-expected throughput drop).
-
-This change simply reduces to 1 the maximum possible value for the sum
-of the number of async requests and of sync write requests.
-
-This email is basically a request for help to knowledgeable people.  To
-start, here are my first doubts/questions:
-1) Just to be certain, I guess it is not normal that blk-mq hangs if
-async requests and sync write requests can be at most one, right?
-2) Do you have any hint to where I could look for, to chase this bug?
-Of course, the bug may be in bfq, i.e, it may be a somehow unrelated
-bfq bug that causes this hang in blk-mq, indirectly.  But it is hard
-for me to understand how.
-
-Looking forward to some help.
-
-Thanks,
-Paolo
-
-[1] https://www.spinics.net/lists/stable/msg215036.html=
+diff --git a/block/bio.c b/block/bio.c
+index 980befd919..b7cdad6fc4 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -53,7 +53,7 @@ static struct biovec_slab bvec_slabs[BVEC_POOL_NR] __read_mostly = {
+  * fs_bio_set is the bio_set containing bio and iovec memory pools used by
+  * IO code that does not need private memory pools.
+  */
+-struct bio_set *fs_bio_set;
++struct bio_set fs_bio_set;
+ EXPORT_SYMBOL(fs_bio_set);
+ 
+ /*
+@@ -2055,11 +2055,10 @@ static int __init init_bio(void)
+ 	bio_integrity_init();
+ 	biovec_init_slabs();
+ 
+-	fs_bio_set = bioset_create(BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
+-	if (!fs_bio_set)
++	if (bioset_init(&fs_bio_set, BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS))
+ 		panic("bio: can't allocate bios\n");
+ 
+-	if (bioset_integrity_create(fs_bio_set, BIO_POOL_SIZE))
++	if (bioset_integrity_create(&fs_bio_set, BIO_POOL_SIZE))
+ 		panic("bio: can't create integrity pool\n");
+ 
+ 	return 0;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 6d82c4f7fa..66f24798ef 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -3409,7 +3409,7 @@ int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
+ 	struct bio *bio, *bio_src;
+ 
+ 	if (!bs)
+-		bs = fs_bio_set;
++		bs = &fs_bio_set;
+ 
+ 	__rq_for_each_bio(bio_src, rq_src) {
+ 		bio = bio_clone_fast(bio_src, gfp_mask, bs);
+diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
+index 07c814c426..c969c01c7c 100644
+--- a/drivers/target/target_core_iblock.c
++++ b/drivers/target/target_core_iblock.c
+@@ -164,7 +164,7 @@ static int iblock_configure_device(struct se_device *dev)
+ 				goto out_blkdev_put;
+ 			}
+ 			pr_debug("IBLOCK setup BIP bs->bio_integrity_pool: %p\n",
+-				 bs->bio_integrity_pool);
++				 &bs->bio_integrity_pool);
+ 		}
+ 		dev->dev_attrib.hw_pi_prot_type = dev->dev_attrib.pi_prot_type;
+ 	}
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index fa3cf94a50..91b02520e2 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -423,11 +423,11 @@ extern void __bio_clone_fast(struct bio *, struct bio *);
+ extern struct bio *bio_clone_fast(struct bio *, gfp_t, struct bio_set *);
+ extern struct bio *bio_clone_bioset(struct bio *, gfp_t, struct bio_set *bs);
+ 
+-extern struct bio_set *fs_bio_set;
++extern struct bio_set fs_bio_set;
+ 
+ static inline struct bio *bio_alloc(gfp_t gfp_mask, unsigned int nr_iovecs)
+ {
+-	return bio_alloc_bioset(gfp_mask, nr_iovecs, fs_bio_set);
++	return bio_alloc_bioset(gfp_mask, nr_iovecs, &fs_bio_set);
+ }
+ 
+ static inline struct bio *bio_kmalloc(gfp_t gfp_mask, unsigned int nr_iovecs)
+-- 
+2.17.0
