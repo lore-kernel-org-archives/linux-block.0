@@ -1,50 +1,112 @@
-Return-Path: <zhangbenlong@didichuxing.com>
-Date: Wed, 2 May 2018 10:20:20 +0800
-From: Benlong Zhang <zhangbenlong@didichuxing.com>
-To: Tejun Heo <tj@kernel.org>
-CC: <axboe@kernel.dk>, <shli@kernel.org>, <david@fromorbit.com>,
-	<bfoster@redhat.com>, <linux-block@vger.kernel.org>, Josef Bacik
-	<jbacik@fb.com>
-Subject: Re: [PATCH] A tentative patch to bypass REQ_META in blk throttle
-Message-ID: <20180502022004.GA3831@localhost>
-References: <20180420100554.GA23471@localhost>
- <20180426190118.GP1911913@devbig577.frc2.facebook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <20180426190118.GP1911913@devbig577.frc2.facebook.com>
-Return-Path: zhangbenlong@didichuxing.com
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 28/33] xfs: refactor the tail of xfs_writepage_map
+Date: Wed,  9 May 2018 09:48:25 +0200
+Message-Id: <20180509074830.16196-29-hch@lst.de>
+In-Reply-To: <20180509074830.16196-1-hch@lst.de>
+References: <20180509074830.16196-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Tejun,
+Rejuggle how we deal with the different error vs non-error and have
+ioends vs not have ioend cases to keep the fast path streamlined, and
+the duplicate code at a minimum.
 
-On Thu, Apr 26, 2018 at 12:01:18PM -0700, Tejun Heo wrote:
-> Hello,
-> 
-> On Fri, Apr 20, 2018 at 06:06:01PM +0800, Benlong Zhang wrote:
-> > One problem with cgwb is how fs should treat metadata bios.
-> > For example in xfs, the log might be partially stuck in one
-> > group, leaving threads in other groups waiting for too long.
-> > Please refer to the linux-xfs discussion:
-> > "[PATCH V2] xfs: implement cgroup writeback support"
-> > 
-> > One approach is to correctly tag bio->bi_css from within the
-> > filesystems (for xfs log should be blkcg_root), and the other
-> > is to skip them, but relies on REQ_META being set.
-> > 
-> > It works with xfs on a cgwb porting implementation to 3.10.0.
-> > But really not sure about other filesystems...
-> 
-> Yeah, Josef (cc'd) is working on a similar approach but in a more
-> generic way.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/xfs/xfs_aops.c | 65 +++++++++++++++++++++++------------------------
+ 1 file changed, 32 insertions(+), 33 deletions(-)
 
-Good to know and looking forward to the code.
-
-Thank you for your reply!
-
-Benlong
-
-> 
-> Thanks.
-> 
-> -- 
-> tejun
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 6b39792270aa..dc82d4e71a64 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -906,7 +906,14 @@ xfs_writepage_map(
+ 	 * submission of outstanding ioends on the writepage context so they are
+ 	 * treated correctly on error.
+ 	 */
+-	if (count) {
++	if (unlikely(error)) {
++		if (!count) {
++			xfs_aops_discard_page(page);
++			ClearPageUptodate(page);
++			unlock_page(page);
++			goto done;
++		}
++
+ 		/*
+ 		 * If the page was not fully cleaned, we need to ensure that the
+ 		 * higher layers come back to it correctly.  That means we need
+@@ -915,43 +922,35 @@ xfs_writepage_map(
+ 		 * so another attempt to write this page in this writeback sweep
+ 		 * will be made.
+ 		 */
+-		if (error) {
+-			set_page_writeback_keepwrite(page);
+-		} else {
+-			clear_page_dirty_for_io(page);
+-			set_page_writeback(page);
+-		}
+-		unlock_page(page);
+-
+-		/*
+-		 * Preserve the original error if there was one, otherwise catch
+-		 * submission errors here and propagate into subsequent ioend
+-		 * submissions.
+-		 */
+-		list_for_each_entry_safe(ioend, next, &submit_list, io_list) {
+-			int error2;
+-
+-			list_del_init(&ioend->io_list);
+-			error2 = xfs_submit_ioend(wbc, ioend, error);
+-			if (error2 && !error)
+-				error = error2;
+-		}
+-	} else if (error) {
+-		xfs_aops_discard_page(page);
+-		ClearPageUptodate(page);
+-		unlock_page(page);
++		set_page_writeback_keepwrite(page);
+ 	} else {
+-		/*
+-		 * We can end up here with no error and nothing to write if we
+-		 * race with a partial page truncate on a sub-page block sized
+-		 * filesystem. In that case we need to mark the page clean.
+-		 */
+ 		clear_page_dirty_for_io(page);
+ 		set_page_writeback(page);
+-		unlock_page(page);
+-		end_page_writeback(page);
+ 	}
+ 
++	unlock_page(page);
++
++	/*
++	 * Preserve the original error if there was one, otherwise catch
++	 * submission errors here and propagate into subsequent ioend
++	 * submissions.
++	 */
++	list_for_each_entry_safe(ioend, next, &submit_list, io_list) {
++		int error2;
++
++		list_del_init(&ioend->io_list);
++		error2 = xfs_submit_ioend(wbc, ioend, error);
++		if (error2 && !error)
++			error = error2;
++	}
++
++	/*
++	 * We can end up here with no error and nothing to write if we race with
++	 * a partial page truncate on a sub-page block sized filesystem.
++	 */
++	if (!count)
++		end_page_writeback(page);
++done:
+ 	mapping_set_error(page->mapping, error);
+ 	return error;
+ }
+-- 
+2.17.0
