@@ -1,168 +1,361 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	James Smart <james.smart@broadcom.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V6 01/11] block: introduce blk_quiesce_timeout() and blk_unquiesce_timeout()
-Date: Wed, 16 May 2018 12:03:03 +0800
-Message-Id: <20180516040313.13596-2-ming.lei@redhat.com>
-In-Reply-To: <20180516040313.13596-1-ming.lei@redhat.com>
-References: <20180516040313.13596-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:43764 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934260AbeEIJJG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 05:09:06 -0400
+Received: by mail-pg0-f65.google.com with SMTP id k11-v6so21275324pgo.10
+        for <linux-block@vger.kernel.org>; Wed, 09 May 2018 02:09:06 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
+Subject: [PATCH v3 4/7] block: get rid of struct blk_issue_stat
+Date: Wed,  9 May 2018 02:08:50 -0700
+Message-Id: <0ccce15a26e7bca945dbff1150cb9a42ef1f6579.1525856631.git.osandov@fb.com>
+In-Reply-To: <cover.1525856630.git.osandov@fb.com>
+References: <cover.1525856630.git.osandov@fb.com>
+In-Reply-To: <cover.1525856630.git.osandov@fb.com>
+References: <cover.1525856630.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Turns out the current way can't drain timout completely because mod_timer()
-can be triggered in the work func, which can be just run inside the synced
-timeout work:
+From: Omar Sandoval <osandov@fb.com>
 
-        del_timer_sync(&q->timeout);
-        cancel_work_sync(&q->timeout_work);
+struct blk_issue_stat squashes three things into one u64:
 
-This patch introduces one flag of 'timeout_off' for fixing this issue, turns
-out this simple way does work.
+- The time the driver started working on a request
+- The original size of the request (for the io.low controller)
+- Flags for writeback throttling
 
-Also blk_quiesce_timeout() and blk_unquiesce_timeout() are introduced for
-draining timeout, which is needed by NVMe.
+It turns out that on x86_64, we have a 4 byte hole in struct request
+which we can fill with the non-timestamp fields from blk_issue_stat,
+simplifying things quite a bit.
 
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- block/blk-core.c       | 21 +++++++++++++++++++--
- block/blk-mq.c         |  9 +++++++++
- block/blk-timeout.c    |  5 ++++-
- include/linux/blkdev.h | 13 +++++++++++++
- 4 files changed, 45 insertions(+), 3 deletions(-)
+ block/blk-core.c          |  5 ++++-
+ block/blk-mq.c            |  8 ++++++--
+ block/blk-stat.c          |  7 ++-----
+ block/blk-stat.h          | 43 ---------------------------------------
+ block/blk-throttle.c      |  3 +--
+ block/blk-wbt.c           | 12 +++++------
+ block/blk-wbt.h           |  4 ++--
+ block/kyber-iosched.c     |  6 +++---
+ include/linux/blk_types.h |  4 ----
+ include/linux/blkdev.h    | 26 +++++++++++++++--------
+ 10 files changed, 41 insertions(+), 77 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 85909b431eb0..c277f1023703 100644
+index fe2f457ed27d..33d5c7d85da1 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -392,6 +392,22 @@ void blk_stop_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_stop_queue);
+@@ -2991,7 +2991,10 @@ void blk_start_request(struct request *req)
+ 	blk_dequeue_request(req);
  
-+void blk_unquiesce_timeout(struct request_queue *q)
-+{
-+	blk_mark_timeout_quiesce(q, false);
-+	mod_timer(&q->timeout, jiffies + q->rq_timeout);
-+}
-+EXPORT_SYMBOL(blk_unquiesce_timeout);
-+
-+void blk_quiesce_timeout(struct request_queue *q)
-+{
-+	blk_mark_timeout_quiesce(q, true);
-+
-+	del_timer_sync(&q->timeout);
-+	cancel_work_sync(&q->timeout_work);
-+}
-+EXPORT_SYMBOL(blk_quiesce_timeout);
-+
- /**
-  * blk_sync_queue - cancel any pending callbacks on a queue
-  * @q: the queue
-@@ -412,8 +428,7 @@ EXPORT_SYMBOL(blk_stop_queue);
-  */
- void blk_sync_queue(struct request_queue *q)
- {
--	del_timer_sync(&q->timeout);
--	cancel_work_sync(&q->timeout_work);
-+	blk_quiesce_timeout(q);
- 
- 	if (q->mq_ops) {
- 		struct blk_mq_hw_ctx *hctx;
-@@ -425,6 +440,8 @@ void blk_sync_queue(struct request_queue *q)
- 	} else {
- 		cancel_delayed_work_sync(&q->delay_work);
+ 	if (test_bit(QUEUE_FLAG_STATS, &req->q->queue_flags)) {
+-		blk_stat_set_issue(&req->issue_stat, blk_rq_sectors(req));
++		req->io_start_time_ns = ktime_get_ns();
++#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
++		req->throtl_size = blk_rq_sectors(req);
++#endif
+ 		req->rq_flags |= RQF_STATS;
+ 		wbt_issue(req->q->rq_wb, req);
  	}
-+
-+	blk_mark_timeout_quiesce(q, false);
- }
- EXPORT_SYMBOL(blk_sync_queue);
- 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9ce9cac16c3f..173f1723e48f 100644
+index deb85b5c6c21..17612e04d041 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -917,6 +917,15 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 	};
- 	struct blk_mq_hw_ctx *hctx;
- 	int i;
-+	bool timeout_off;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	timeout_off = q->timeout_off;
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+	if (timeout_off)
-+		return;
+@@ -310,6 +310,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	rq->rq_disk = NULL;
+ 	rq->part = NULL;
+ 	rq->start_time = jiffies;
++	rq->io_start_time_ns = 0;
+ 	rq->nr_phys_segments = 0;
+ #if defined(CONFIG_BLK_DEV_INTEGRITY)
+ 	rq->nr_integrity_segments = 0;
+@@ -329,7 +330,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ #ifdef CONFIG_BLK_CGROUP
+ 	rq->rl = NULL;
+ 	set_start_time_ns(rq);
+-	rq->io_start_time_ns = 0;
++	rq->cgroup_io_start_time_ns = 0;
+ #endif
  
- 	/* A deadlock might occur if a request is stuck requiring a
- 	 * timeout at the same time a queue freeze is waiting
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index 652d4d4d3e97..ffd0b609091e 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -136,12 +136,15 @@ void blk_timeout_work(struct work_struct *work)
+ 	data->ctx->rq_dispatched[op_is_sync(op)]++;
+@@ -669,7 +670,10 @@ void blk_mq_start_request(struct request *rq)
+ 	trace_block_rq_issue(q, rq);
  
- 	spin_lock_irqsave(q->queue_lock, flags);
+ 	if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
+-		blk_stat_set_issue(&rq->issue_stat, blk_rq_sectors(rq));
++		rq->io_start_time_ns = ktime_get_ns();
++#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
++		rq->throtl_size = blk_rq_sectors(rq);
++#endif
+ 		rq->rq_flags |= RQF_STATS;
+ 		wbt_issue(q->rq_wb, rq);
+ 	}
+diff --git a/block/blk-stat.c b/block/blk-stat.c
+index bd365a95fcf8..725a881723b0 100644
+--- a/block/blk-stat.c
++++ b/block/blk-stat.c
+@@ -55,11 +55,8 @@ void blk_stat_add(struct request *rq)
+ 	int bucket;
+ 	u64 now, value;
  
-+	if (q->timeout_off)
-+		goto exit;
-+
- 	list_for_each_entry_safe(rq, tmp, &q->timeout_list, timeout_list)
- 		blk_rq_check_expired(rq, &next, &next_set);
- 
- 	if (next_set)
- 		mod_timer(&q->timeout, round_jiffies_up(next));
+-	now = __blk_stat_time(ktime_to_ns(ktime_get()));
+-	if (now < blk_stat_time(&rq->issue_stat))
+-		return;
 -
-+exit:
- 	spin_unlock_irqrestore(q->queue_lock, flags);
+-	value = now - blk_stat_time(&rq->issue_stat);
++	now = ktime_get_ns();
++	value = (now >= rq->io_start_time_ns) ? now - rq->io_start_time_ns : 0;
+ 
+ 	blk_throtl_stat_add(rq, value);
+ 
+diff --git a/block/blk-stat.h b/block/blk-stat.h
+index c22049a8125e..17c812db0aca 100644
+--- a/block/blk-stat.h
++++ b/block/blk-stat.h
+@@ -8,21 +8,6 @@
+ #include <linux/rcupdate.h>
+ #include <linux/timer.h>
+ 
+-/*
+- * from upper:
+- * 4 bits: reserved for other usage
+- * 12 bits: size
+- * 48 bits: time
+- */
+-#define BLK_STAT_RES_BITS	4
+-#define BLK_STAT_SIZE_BITS	12
+-#define BLK_STAT_RES_SHIFT	(64 - BLK_STAT_RES_BITS)
+-#define BLK_STAT_SIZE_SHIFT	(BLK_STAT_RES_SHIFT - BLK_STAT_SIZE_BITS)
+-#define BLK_STAT_TIME_MASK	((1ULL << BLK_STAT_SIZE_SHIFT) - 1)
+-#define BLK_STAT_SIZE_MASK	\
+-	(((1ULL << BLK_STAT_SIZE_BITS) - 1) << BLK_STAT_SIZE_SHIFT)
+-#define BLK_STAT_RES_MASK	(~((1ULL << BLK_STAT_RES_SHIFT) - 1))
+-
+ /**
+  * struct blk_stat_callback - Block statistics callback.
+  *
+@@ -82,34 +67,6 @@ void blk_free_queue_stats(struct blk_queue_stats *);
+ 
+ void blk_stat_add(struct request *);
+ 
+-static inline u64 __blk_stat_time(u64 time)
+-{
+-	return time & BLK_STAT_TIME_MASK;
+-}
+-
+-static inline u64 blk_stat_time(struct blk_issue_stat *stat)
+-{
+-	return __blk_stat_time(stat->stat);
+-}
+-
+-static inline sector_t blk_capped_size(sector_t size)
+-{
+-	return size & ((1ULL << BLK_STAT_SIZE_BITS) - 1);
+-}
+-
+-static inline sector_t blk_stat_size(struct blk_issue_stat *stat)
+-{
+-	return (stat->stat & BLK_STAT_SIZE_MASK) >> BLK_STAT_SIZE_SHIFT;
+-}
+-
+-static inline void blk_stat_set_issue(struct blk_issue_stat *stat,
+-	sector_t size)
+-{
+-	stat->stat = (stat->stat & BLK_STAT_RES_MASK) |
+-		(ktime_to_ns(ktime_get()) & BLK_STAT_TIME_MASK) |
+-		(((u64)blk_capped_size(size)) << BLK_STAT_SIZE_SHIFT);
+-}
+-
+ /* record time/size info in request but not add a callback */
+ void blk_stat_enable_accounting(struct request_queue *q);
+ 
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 35f9b8ff40d7..f63d88c92c3a 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -2279,8 +2279,7 @@ void blk_throtl_stat_add(struct request *rq, u64 time_ns)
+ 	struct request_queue *q = rq->q;
+ 	struct throtl_data *td = q->td;
+ 
+-	throtl_track_latency(td, blk_stat_size(&rq->issue_stat),
+-		req_op(rq), time_ns >> 10);
++	throtl_track_latency(td, rq->throtl_size, req_op(rq), time_ns >> 10);
  }
  
+ void blk_throtl_bio_endio(struct bio *bio)
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 592e914c9890..4f89b28fa652 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -31,22 +31,22 @@
+ 
+ static inline void wbt_clear_state(struct request *rq)
+ {
+-	rq->issue_stat.stat &= ~BLK_STAT_RES_MASK;
++	rq->wbt_flags = 0;
+ }
+ 
+ static inline enum wbt_flags wbt_flags(struct request *rq)
+ {
+-	return (rq->issue_stat.stat & BLK_STAT_RES_MASK) >> BLK_STAT_RES_SHIFT;
++	return rq->wbt_flags;
+ }
+ 
+ static inline bool wbt_is_tracked(struct request *rq)
+ {
+-	return (rq->issue_stat.stat >> BLK_STAT_RES_SHIFT) & WBT_TRACKED;
++	return rq->wbt_flags & WBT_TRACKED;
+ }
+ 
+ static inline bool wbt_is_read(struct request *rq)
+ {
+-	return (rq->issue_stat.stat >> BLK_STAT_RES_SHIFT) & WBT_READ;
++	return rq->wbt_flags & WBT_READ;
+ }
+ 
+ enum {
+@@ -657,7 +657,7 @@ void wbt_issue(struct rq_wb *rwb, struct request *rq)
+ 	 */
+ 	if (wbt_is_read(rq) && !rwb->sync_issue) {
+ 		rwb->sync_cookie = rq;
+-		rwb->sync_issue = blk_stat_time(&rq->issue_stat);
++		rwb->sync_issue = rq->io_start_time_ns;
+ 	}
+ }
+ 
+@@ -746,8 +746,6 @@ int wbt_init(struct request_queue *q)
+ 	struct rq_wb *rwb;
+ 	int i;
+ 
+-	BUILD_BUG_ON(WBT_NR_BITS > BLK_STAT_RES_BITS);
+-
+ 	rwb = kzalloc(sizeof(*rwb), GFP_KERNEL);
+ 	if (!rwb)
+ 		return -ENOMEM;
+diff --git a/block/blk-wbt.h b/block/blk-wbt.h
+index 85fbcccf12a5..300df531d0a6 100644
+--- a/block/blk-wbt.h
++++ b/block/blk-wbt.h
+@@ -63,7 +63,7 @@ struct rq_wb {
+ 
+ 	struct blk_stat_callback *cb;
+ 
+-	s64 sync_issue;
++	u64 sync_issue;
+ 	void *sync_cookie;
+ 
+ 	unsigned int wc;
+@@ -90,7 +90,7 @@ static inline unsigned int wbt_inflight(struct rq_wb *rwb)
+ 
+ static inline void wbt_track(struct request *rq, enum wbt_flags flags)
+ {
+-	rq->issue_stat.stat |= ((u64)flags) << BLK_STAT_RES_SHIFT;
++	rq->wbt_flags |= flags;
+ }
+ 
+ void __wbt_done(struct rq_wb *, enum wbt_flags);
+diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
+index 0d6d25e32e1f..564967fafe5f 100644
+--- a/block/kyber-iosched.c
++++ b/block/kyber-iosched.c
+@@ -485,11 +485,11 @@ static void kyber_completed_request(struct request *rq)
+ 	if (blk_stat_is_active(kqd->cb))
+ 		return;
+ 
+-	now = __blk_stat_time(ktime_to_ns(ktime_get()));
+-	if (now < blk_stat_time(&rq->issue_stat))
++	now = ktime_get_ns();
++	if (now < rq->io_start_time_ns)
+ 		return;
+ 
+-	latency = now - blk_stat_time(&rq->issue_stat);
++	latency = now - rq->io_start_time_ns;
+ 
+ 	if (latency > target)
+ 		blk_stat_activate_msecs(kqd->cb, 10);
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index b6f1d53cf113..4cb970cdcd11 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -91,10 +91,6 @@ static inline bool blk_path_error(blk_status_t error)
+ 	return true;
+ }
+ 
+-struct blk_issue_stat {
+-	u64 stat;
+-};
+-
+ /*
+  * From most significant bit:
+  * 1 bit: reserved for other usage, see below
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 5c4eee043191..a2cc4aaecf50 100644
+index 5c4eee043191..f2c2fc011e6b 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -584,6 +584,7 @@ struct request_queue {
- 	struct timer_list	timeout;
- 	struct work_struct	timeout_work;
- 	struct list_head	timeout_list;
-+	bool			timeout_off;
+@@ -206,8 +206,18 @@ struct request {
+ 	struct gendisk *rq_disk;
+ 	struct hd_struct *part;
+ 	unsigned long start_time;
+-	struct blk_issue_stat issue_stat;
+-	/* Number of scatter-gather DMA addr+len pairs after
++	/* Time that I/O was submitted to the device. */
++	u64 io_start_time_ns;
++
++#ifdef CONFIG_BLK_WBT
++	unsigned short wbt_flags;
++#endif
++#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
++	unsigned short throtl_size;
++#endif
++
++	/*
++	 * Number of scatter-gather DMA addr+len pairs after
+ 	 * physical address coalescing is performed.
+ 	 */
+ 	unsigned short nr_phys_segments;
+@@ -267,8 +277,8 @@ struct request {
  
- 	struct list_head	icq_list;
  #ifdef CONFIG_BLK_CGROUP
-@@ -1017,6 +1018,18 @@ extern void blk_execute_rq(struct request_queue *, struct gendisk *,
- extern void blk_execute_rq_nowait(struct request_queue *, struct gendisk *,
- 				  struct request *, int, rq_end_io_fn *);
+ 	struct request_list *rl;		/* rl this rq is alloced from */
+-	unsigned long long start_time_ns;
+-	unsigned long long io_start_time_ns;    /* when passed to hardware */
++	unsigned long long cgroup_start_time_ns;
++	unsigned long long cgroup_io_start_time_ns;    /* when passed to hardware */
+ #endif
+ };
  
-+static inline void blk_mark_timeout_quiesce(struct request_queue *q, bool quiesce)
-+{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	q->timeout_off = quiesce;
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+}
-+
-+extern void blk_quiesce_timeout(struct request_queue *q);
-+extern void blk_unquiesce_timeout(struct request_queue *q);
-+
- int blk_status_to_errno(blk_status_t status);
- blk_status_t errno_to_blk_status(int errno);
+@@ -1797,25 +1807,25 @@ int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork, unsigned lo
+ static inline void set_start_time_ns(struct request *req)
+ {
+ 	preempt_disable();
+-	req->start_time_ns = sched_clock();
++	req->cgroup_start_time_ns = sched_clock();
+ 	preempt_enable();
+ }
  
+ static inline void set_io_start_time_ns(struct request *req)
+ {
+ 	preempt_disable();
+-	req->io_start_time_ns = sched_clock();
++	req->cgroup_io_start_time_ns = sched_clock();
+ 	preempt_enable();
+ }
+ 
+ static inline uint64_t rq_start_time_ns(struct request *req)
+ {
+-        return req->start_time_ns;
++	return req->cgroup_start_time_ns;
+ }
+ 
+ static inline uint64_t rq_io_start_time_ns(struct request *req)
+ {
+-        return req->io_start_time_ns;
++	return req->cgroup_io_start_time_ns;
+ }
+ #else
+ static inline void set_start_time_ns(struct request *req) {}
 -- 
-2.9.5
+2.17.0
