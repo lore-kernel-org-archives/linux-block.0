@@ -1,16 +1,14 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from a9-46.smtp-out.amazonses.com ([54.240.9.46]:34400 "EHLO
-        a9-46.smtp-out.amazonses.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752416AbeENPje (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 May 2018 11:39:34 -0400
-Date: Mon, 14 May 2018 15:39:33 +0000
-From: Christopher Lameter <cl@linux.com>
+Received: from bombadil.infradead.org ([198.137.202.133]:36720 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933832AbeEILi7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 07:38:59 -0400
+Date: Wed, 9 May 2018 13:38:49 +0200
+From: Peter Zijlstra <peterz@infradead.org>
 To: Johannes Weiner <hannes@cmpxchg.org>
-cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org, cgroups@vger.kernel.org,
         Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
         Andrew Morton <akpm@linuxfoundation.org>,
         Tejun Heo <tj@kernel.org>,
         Balbir Singh <bsingharora@gmail.com>,
@@ -22,29 +20,66 @@ cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Daniel Walker <danielwa@cisco.com>,
         Vinayak Menon <vinmenon@codeaurora.org>,
         Ruslan Ruslichenko <rruslich@cisco.com>, kernel-team@fb.com
-Subject: Re: [PATCH 0/7] psi: pressure stall information for CPU, memory,
- and IO
-In-Reply-To: <20180507210135.1823-1-hannes@cmpxchg.org>
-Message-ID: <010001635f4e8be9-94e7be7a-e75c-438c-bffb-5b56301c4c55-000000@email.amazonses.com>
+Subject: Re: [PATCH 6/7] psi: pressure stall information for CPU, memory, and
+ IO
+Message-ID: <20180509113849.GJ12235@hirez.programming.kicks-ass.net>
 References: <20180507210135.1823-1-hannes@cmpxchg.org>
+ <20180507210135.1823-7-hannes@cmpxchg.org>
+ <20180509104618.GP12217@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180509104618.GP12217@hirez.programming.kicks-ass.net>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, 7 May 2018, Johannes Weiner wrote:
+On Wed, May 09, 2018 at 12:46:18PM +0200, Peter Zijlstra wrote:
+> On Mon, May 07, 2018 at 05:01:34PM -0400, Johannes Weiner wrote:
+> 
+> > @@ -2038,6 +2038,7 @@ try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
+> >  	cpu = select_task_rq(p, p->wake_cpu, SD_BALANCE_WAKE, wake_flags);
+> >  	if (task_cpu(p) != cpu) {
+> >  		wake_flags |= WF_MIGRATED;
+> > +		psi_ttwu_dequeue(p);
+> >  		set_task_cpu(p, cpu);
+> >  	}
+> >  
+> 
+> > +static inline void psi_ttwu_dequeue(struct task_struct *p)
+> > +{
+> > +	/*
+> > +	 * Is the task being migrated during a wakeup? Make sure to
+> > +	 * deregister its sleep-persistent psi states from the old
+> > +	 * queue, and let psi_enqueue() know it has to requeue.
+> > +	 */
+> > +	if (unlikely(p->in_iowait || (p->flags & PF_MEMSTALL))) {
+> > +		struct rq_flags rf;
+> > +		struct rq *rq;
+> > +		int clear = 0;
+> > +
+> > +		if (p->in_iowait)
+> > +			clear |= TSK_IOWAIT;
+> > +		if (p->flags & PF_MEMSTALL)
+> > +			clear |= TSK_MEMSTALL;
+> > +
+> > +		rq = __task_rq_lock(p, &rf);
+> > +		update_rq_clock(rq);
+> > +		psi_task_change(p, rq_clock(rq), clear, 0);
+> > +		p->sched_psi_wake_requeue = 1;
+> > +		__task_rq_unlock(rq, &rf);
+> > +	}
+> > +}
+> 
+> Yeah, no... not happening.
+> 
+> We spend a lot of time to never touch the old rq->lock on wakeups. Mason
+> was the one pushing for that, so he should very well know this.
+> 
+> The one cross-cpu atomic (iowait) is already a problem (the whole iowait
+> accounting being useless makes it even worse), adding significant remote
+> prodding is just really bad.
 
-> What to make of this number? If CPU utilization is at 100% and CPU
-> pressure is 0, it means the system is perfectly utilized, with one
-> runnable thread per CPU and nobody waiting. At two or more runnable
-> tasks per CPU, the system is 100% overcommitted and the pressure
-> average will indicate as much. From a utilization perspective this is
-> a great state of course: no CPU cycles are being wasted, even when 50%
-> of the threads were to go idle (and most workloads do vary). From the
-> perspective of the individual job it's not great, however, and they
-> might do better with more resources. Depending on what your priority
-> is, an elevated "some" number may or may not require action.
+Also, since all you need is the global number, I don't think you
+actually need any of this. See what we do for nr_uninterruptible.
 
-This looks awfully similar to loadavg. Problem is that loadavg gets
-screwed up by tasks blocked waiting for I/O. Isnt there some way to fix
-loadavg instead?
+In general I think you want to (re)read loadavg.c some more, and maybe
+reuse a bit more of that.
