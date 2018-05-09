@@ -1,19 +1,34 @@
-Return-Path: <prvs=6650905ae=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-mm@kvack.org" <linux-mm@kvack.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "willy@infradead.org" <willy@infradead.org>
-Subject: Re: [PATCH 2/6] block: fix __get_request documentation
-Date: Mon, 14 May 2018 15:22:34 +0000
-Message-ID: <53008ead68ab5babe5f718bb047971ae74fc443e.camel@wdc.com>
+Return-Path: <BATV+e0efdd19ce80d487e3da+5372+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: Bart.VanAssche@wdc.com,
+	willy@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: [PATCH 2/6] block: fix __get_request documentation
+Date: Wed,  9 May 2018 09:54:04 +0200
+Message-Id: <20180509075408.16388-3-hch@lst.de>
+In-Reply-To: <20180509075408.16388-1-hch@lst.de>
 References: <20180509075408.16388-1-hch@lst.de>
-	 <20180509075408.16388-3-hch@lst.de>
-In-Reply-To: <20180509075408.16388-3-hch@lst.de>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE4LTA1LTA5IGF0IDA5OjU0ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
-ZToNCj4gU2lnbmVkLW9mZi1ieTogQ2hyaXN0b3BoIEhlbGx3aWcgPGhjaEBsc3QuZGU+DQoNClJl
-dmlld2VkLWJ5OiBCYXJ0IFZhbiBBc3NjaGUgPGJhcnQudmFuYXNzY2hlQHdkYy5jb20+DQoNCg0K
-DQo=
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 0573f9226c2d..52f2d4623ec7 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1517,7 +1517,7 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
+  * @bio: bio to allocate request for (can be %NULL)
+  * @flags: BLK_MQ_REQ_* flags.
+  *
+- * Get a free request from @q.  If %__GFP_DIRECT_RECLAIM is set in @gfp_mask,
++ * Get a free request from @q.  If %BLK_MQ_REQ_NOWAIT is set in @flags,
+  * this function keeps retrying under memory pressure and fails iff @q is dead.
+  *
+  * Must be called with @q->queue_lock held and,
+-- 
+2.17.0
