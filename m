@@ -1,15 +1,14 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from smtp.codeaurora.org ([198.145.29.96]:41200 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933685AbeEILDe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 07:03:34 -0400
-Subject: Re: [PATCH 6/7] psi: pressure stall information for CPU, memory, and
- IO
-To: Johannes Weiner <hannes@cmpxchg.org>, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org
-Cc: Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
+Received: from merlin.infradead.org ([205.233.59.134]:52234 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750767AbeEIKz0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 06:55:26 -0400
+Date: Wed, 9 May 2018 12:55:05 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Johannes Weiner <hannes@cmpxchg.org>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        Ingo Molnar <mingo@redhat.com>,
         Andrew Morton <akpm@linuxfoundation.org>,
         Tejun Heo <tj@kernel.org>,
         Balbir Singh <bsingharora@gmail.com>,
@@ -19,96 +18,110 @@ Cc: Ingo Molnar <mingo@redhat.com>,
         xxx xxx <x.qendo@gmail.com>,
         Taras Kondratiuk <takondra@cisco.com>,
         Daniel Walker <danielwa@cisco.com>,
+        Vinayak Menon <vinmenon@codeaurora.org>,
         Ruslan Ruslichenko <rruslich@cisco.com>, kernel-team@fb.com
+Subject: Re: [PATCH 6/7] psi: pressure stall information for CPU, memory, and
+ IO
+Message-ID: <20180509105505.GQ12217@hirez.programming.kicks-ass.net>
 References: <20180507210135.1823-1-hannes@cmpxchg.org>
  <20180507210135.1823-7-hannes@cmpxchg.org>
-From: Vinayak Menon <vinmenon@codeaurora.org>
-Message-ID: <87060553-2e09-2e2a-13a2-a91345d6df30@codeaurora.org>
-Date: Wed, 9 May 2018 16:33:24 +0530
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180507210135.1823-7-hannes@cmpxchg.org>
-Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+On Mon, May 07, 2018 at 05:01:34PM -0400, Johannes Weiner wrote:
 
-On 5/8/2018 2:31 AM, Johannes Weiner wrote:
-> +static void psi_group_update(struct psi_group *group, int cpu, u64 now,
-> +			     unsigned int clear, unsigned int set)
+> @@ -28,10 +28,14 @@ static inline int sched_info_on(void)
+>  	return 1;
+>  #elif defined(CONFIG_TASK_DELAY_ACCT)
+>  	extern int delayacct_on;
+> -	return delayacct_on;
+> -#else
+> -	return 0;
+> +	if (delayacct_on)
+> +		return 1;
+> +#elif defined(CONFIG_PSI)
+> +	extern int psi_disabled;
+> +	if (!psi_disabled)
+> +		return 1;
+>  #endif
+> +	return 0;
+>  }
+
+> diff --git a/kernel/sched/stats.h b/kernel/sched/stats.h
+> index 8aea199a39b4..cb4a68bcf37a 100644
+> --- a/kernel/sched/stats.h
+> +++ b/kernel/sched/stats.h
+> @@ -55,12 +55,90 @@ static inline void rq_sched_info_depart  (struct rq *rq, unsigned long long delt
+>  # define   schedstat_val_or_zero(var)	0
+>  #endif /* CONFIG_SCHEDSTATS */
+>  
+> +#ifdef CONFIG_PSI
+> +/*
+> + * PSI tracks state that persists across sleeps, such as iowaits and
+> + * memory stalls. As a result, it has to distinguish between sleeps,
+> + * where a task's runnable state changes, and requeues, where a task
+> + * and its state are being moved between CPUs and runqueues.
+> + */
+> +static inline void psi_enqueue(struct task_struct *p, u64 now)
 > +{
-> +	enum psi_state state = PSI_NONE;
-> +	struct psi_group_cpu *groupc;
-> +	unsigned int *tasks;
-> +	unsigned int to, bo;
+> +	int clear = 0, set = TSK_RUNNING;
 > +
-> +	groupc = per_cpu_ptr(group->cpus, cpu);
-> +	tasks = groupc->tasks;
-> +
-> +	/* Update task counts according to the set/clear bitmasks */
-> +	for (to = 0; (bo = ffs(clear)); to += bo, clear >>= bo) {
-> +		int idx = to + (bo - 1);
-> +
-> +		if (tasks[idx] == 0 && !psi_bug) {
-> +			printk_deferred(KERN_ERR "psi: task underflow! cpu=%d idx=%d tasks=[%u %u %u %u]\n",
-> +					cpu, idx, tasks[0], tasks[1],
-> +					tasks[2], tasks[3]);
-> +			psi_bug = 1;
-> +		}
-> +		tasks[idx]--;
+> +	if (p->state == TASK_RUNNING || p->sched_psi_wake_requeue) {
+> +		if (p->flags & PF_MEMSTALL)
+> +			set |= TSK_MEMSTALL;
+> +		p->sched_psi_wake_requeue = 0;
+> +	} else {
+> +		if (p->in_iowait)
+> +			clear |= TSK_IOWAIT;
 > +	}
-> +	for (to = 0; (bo = ffs(set)); to += bo, set >>= bo)
-> +		tasks[to + (bo - 1)]++;
 > +
-> +	/* Time in which tasks wait for the CPU */
-> +	state = PSI_NONE;
-> +	if (tasks[NR_RUNNING] > 1)
-> +		state = PSI_SOME;
-> +	time_state(&groupc->res[PSI_CPU], state, now);
-> +
-> +	/* Time in which tasks wait for memory */
-> +	state = PSI_NONE;
-> +	if (tasks[NR_MEMSTALL]) {
-> +		if (!tasks[NR_RUNNING] ||
-> +		    (cpu_curr(cpu)->flags & PF_MEMSTALL))
-> +			state = PSI_FULL;
-> +		else
-> +			state = PSI_SOME;
-> +	}
-> +	time_state(&groupc->res[PSI_MEM], state, now);
-> +
-> +	/* Time in which tasks wait for IO */
-> +	state = PSI_NONE;
-> +	if (tasks[NR_IOWAIT]) {
-> +		if (!tasks[NR_RUNNING])
-> +			state = PSI_FULL;
-> +		else
-> +			state = PSI_SOME;
-> +	}
-> +	time_state(&groupc->res[PSI_IO], state, now);
-> +
-> +	/* Time in which tasks are non-idle, to weigh the CPU in summaries */
-> +	if (groupc->nonidle)
-> +		groupc->nonidle_time += now - groupc->nonidle_start;
-> +	groupc->nonidle = tasks[NR_RUNNING] ||
-> +		tasks[NR_IOWAIT] || tasks[NR_MEMSTALL];
-> +	if (groupc->nonidle)
-> +		groupc->nonidle_start = now;
-> +
-> +	/* Kick the stats aggregation worker if it's gone to sleep */
-> +	if (!delayed_work_pending(&group->clock_work))
-
-This causes a crash when the work is scheduled before system_wq is up. In my case when the first
-schedule was called from kthreadd. And I had to do this to make it work.
-if (keventd_up() && !delayed_work_pending(&group->clock_work))
-
-> +		schedule_delayed_work(&group->clock_work, MY_LOAD_FREQ);
+> +	psi_task_change(p, now, clear, set);
 > +}
-> +
-> +void psi_task_change(struct task_struct *task, u64 now, int clear, int set)
+> +static inline void psi_dequeue(struct task_struct *p, u64 now)
 > +{
-> +	struct cgroup *cgroup, *parent;
+> +	int clear = TSK_RUNNING, set = 0;
+> +
+> +	if (p->state == TASK_RUNNING) {
+> +		if (p->flags & PF_MEMSTALL)
+> +			clear |= TSK_MEMSTALL;
+> +	} else {
+> +		if (p->in_iowait)
+> +			set |= TSK_IOWAIT;
+> +	}
+> +
+> +	psi_task_change(p, now, clear, set);
+> +}
+> +static inline void psi_ttwu_dequeue(struct task_struct *p)
+> +{
+> +	/*
+> +	 * Is the task being migrated during a wakeup? Make sure to
+> +	 * deregister its sleep-persistent psi states from the old
+> +	 * queue, and let psi_enqueue() know it has to requeue.
+> +	 */
+> +	if (unlikely(p->in_iowait || (p->flags & PF_MEMSTALL))) {
+> +		struct rq_flags rf;
+> +		struct rq *rq;
+> +		int clear = 0;
+> +
+> +		if (p->in_iowait)
+> +			clear |= TSK_IOWAIT;
+> +		if (p->flags & PF_MEMSTALL)
+> +			clear |= TSK_MEMSTALL;
+> +
+> +		rq = __task_rq_lock(p, &rf);
+> +		update_rq_clock(rq);
+> +		psi_task_change(p, rq_clock(rq), clear, 0);
+> +		p->sched_psi_wake_requeue = 1;
+> +		__task_rq_unlock(rq, &rf);
+> +	}
+> +}
 
-unused variables
+That all seems to be missing psi_disabled tests.. Yes I know it's
+burried down in psi_task_change() somewhere, but that's really (too)
+late.
 
-Thanks,
-Vinayak
+(also, you seem to be conserving whitespace; typically we have an empty
+lines between functions)
