@@ -1,83 +1,79 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <BATV+e0efdd19ce80d487e3da+5372+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 16/33] xfs: move locking into xfs_bmap_punch_delalloc_range
-Date: Wed,  9 May 2018 09:48:13 +0200
-Message-Id: <20180509074830.16196-17-hch@lst.de>
-In-Reply-To: <20180509074830.16196-1-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "Ed L. Cashin" <ed.cashin@acm.org>,
+	Geoff Levand <geoff@infradead.org>,
+	Maxim Levitsky <maximlevitsky@gmail.com>,
+	linux-block@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-mtd@lists.infradead.org,
+	sparclinux@vger.kernel.org
+Subject: [PATCH 3/7] memstick: don't call blk_queue_bounce_limit
+Date: Wed,  9 May 2018 15:59:44 +0200
+Message-Id: <20180509135948.20329-4-hch@lst.de>
+In-Reply-To: <20180509135948.20329-1-hch@lst.de>
+References: <20180509135948.20329-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Both callers want the same looking, so do it only once.
+All in-tree host drivers set up a proper dma mask and use the dma-mapping
+helpers.  This means they will be able to deal with any address that we
+are throwing at them.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/xfs/xfs_aops.c      | 2 --
- fs/xfs/xfs_bmap_util.c | 7 ++++---
- fs/xfs/xfs_iomap.c     | 3 ---
- 3 files changed, 4 insertions(+), 8 deletions(-)
+ drivers/memstick/core/ms_block.c    | 5 -----
+ drivers/memstick/core/mspro_block.c | 5 -----
+ 2 files changed, 10 deletions(-)
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 313449ac0288..196c5daa6dce 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -761,10 +761,8 @@ xfs_aops_discard_page(
- 		"page discard on page "PTR_FMT", inode 0x%llx, offset %llu.",
- 			page, ip->i_ino, offset);
+diff --git a/drivers/memstick/core/ms_block.c b/drivers/memstick/core/ms_block.c
+index 57b13dfbd21e..b2d025f42d14 100644
+--- a/drivers/memstick/core/ms_block.c
++++ b/drivers/memstick/core/ms_block.c
+@@ -2096,12 +2096,8 @@ static int msb_init_disk(struct memstick_dev *card)
+ 	struct msb_data *msb = memstick_get_drvdata(card);
+ 	struct memstick_host *host = card->host;
+ 	int rc;
+-	u64 limit = BLK_BOUNCE_HIGH;
+ 	unsigned long capacity;
  
--	xfs_ilock(ip, XFS_ILOCK_EXCL);
- 	error = xfs_bmap_punch_delalloc_range(ip, start_fsb,
- 			PAGE_SIZE / i_blocksize(inode));
--	xfs_iunlock(ip, XFS_ILOCK_EXCL);
- 	if (error && !XFS_FORCED_SHUTDOWN(mp))
- 		xfs_alert(mp, "page discard unable to remove delalloc mapping.");
- out_invalidate:
-diff --git a/fs/xfs/xfs_bmap_util.c b/fs/xfs/xfs_bmap_util.c
-index 7d2ba4cc8fba..82189ea97319 100644
---- a/fs/xfs/xfs_bmap_util.c
-+++ b/fs/xfs/xfs_bmap_util.c
-@@ -711,12 +711,11 @@ xfs_bmap_punch_delalloc_range(
- 	struct xfs_iext_cursor	icur;
- 	int			error = 0;
- 
--	ASSERT(xfs_isilocked(ip, XFS_ILOCK_EXCL));
+-	if (host->dev.dma_mask && *(host->dev.dma_mask))
+-		limit = *(host->dev.dma_mask);
 -
-+	xfs_ilock(ip, XFS_ILOCK_EXCL);
- 	if (!(ifp->if_flags & XFS_IFEXTENTS)) {
- 		error = xfs_iread_extents(NULL, ip, XFS_DATA_FORK);
- 		if (error)
--			return error;
-+			goto out_unlock;
- 	}
+ 	mutex_lock(&msb_disk_lock);
+ 	msb->disk_id = idr_alloc(&msb_disk_idr, card, 0, 256, GFP_KERNEL);
+ 	mutex_unlock(&msb_disk_lock);
+@@ -2123,7 +2119,6 @@ static int msb_init_disk(struct memstick_dev *card)
  
- 	if (!xfs_iext_lookup_extent(ip, ifp, start_fsb, &icur, &got))
-@@ -738,6 +737,8 @@ xfs_bmap_punch_delalloc_range(
- 			break;
- 	} while (xfs_iext_next_extent(ifp, &icur, &got));
+ 	msb->queue->queuedata = card;
  
-+out_unlock:
-+	xfs_iunlock(ip, XFS_ILOCK_EXCL);
- 	return error;
- }
+-	blk_queue_bounce_limit(msb->queue, limit);
+ 	blk_queue_max_hw_sectors(msb->queue, MS_BLOCK_MAX_PAGES);
+ 	blk_queue_max_segments(msb->queue, MS_BLOCK_MAX_SEGS);
+ 	blk_queue_max_segment_size(msb->queue,
+diff --git a/drivers/memstick/core/mspro_block.c b/drivers/memstick/core/mspro_block.c
+index 8897962781bb..a2fadc605750 100644
+--- a/drivers/memstick/core/mspro_block.c
++++ b/drivers/memstick/core/mspro_block.c
+@@ -1175,12 +1175,8 @@ static int mspro_block_init_disk(struct memstick_dev *card)
+ 	struct mspro_sys_info *sys_info = NULL;
+ 	struct mspro_sys_attr *s_attr = NULL;
+ 	int rc, disk_id;
+-	u64 limit = BLK_BOUNCE_HIGH;
+ 	unsigned long capacity;
  
-diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
-index 046469fcc1b8..407bbd978d1b 100644
---- a/fs/xfs/xfs_iomap.c
-+++ b/fs/xfs/xfs_iomap.c
-@@ -1167,11 +1167,8 @@ xfs_file_iomap_end_delalloc(
- 		truncate_pagecache_range(VFS_I(ip), XFS_FSB_TO_B(mp, start_fsb),
- 					 XFS_FSB_TO_B(mp, end_fsb) - 1);
- 
--		xfs_ilock(ip, XFS_ILOCK_EXCL);
- 		error = xfs_bmap_punch_delalloc_range(ip, start_fsb,
- 					       end_fsb - start_fsb);
--		xfs_iunlock(ip, XFS_ILOCK_EXCL);
+-	if (host->dev.dma_mask && *(host->dev.dma_mask))
+-		limit = *(host->dev.dma_mask);
 -
- 		if (error && !XFS_FORCED_SHUTDOWN(mp)) {
- 			xfs_alert(mp, "%s: unable to clean up ino %lld",
- 				__func__, ip->i_ino);
+ 	for (rc = 0; msb->attr_group.attrs[rc]; ++rc) {
+ 		s_attr = mspro_from_sysfs_attr(msb->attr_group.attrs[rc]);
+ 
+@@ -1219,7 +1215,6 @@ static int mspro_block_init_disk(struct memstick_dev *card)
+ 
+ 	msb->queue->queuedata = card;
+ 
+-	blk_queue_bounce_limit(msb->queue, limit);
+ 	blk_queue_max_hw_sectors(msb->queue, MSPRO_BLOCK_MAX_PAGES);
+ 	blk_queue_max_segments(msb->queue, MSPRO_BLOCK_MAX_SEGS);
+ 	blk_queue_max_segment_size(msb->queue,
 -- 
 2.17.0
