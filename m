@@ -1,34 +1,46 @@
-Return-Path: <tytso@thunk.org>
-Date: Wed, 9 May 2018 11:21:49 -0400
-From: "Theodore Y. Ts'o" <tytso@mit.edu>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: adam.manzanares@wdc.com, viro@zeniv.linux.org.uk, bcrl@kvack.org,
-	linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
-	linux-api@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH v3 2/3] fs: Convert kiocb rw_hint from enum to u16
-Message-ID: <20180509152149.GG28388@thunk.org>
+To: "Theodore Y. Ts'o" <tytso@mit.edu>, adam.manzanares@wdc.com,
+ viro@zeniv.linux.org.uk, bcrl@kvack.org, linux-fsdevel@vger.kernel.org,
+ linux-aio@kvack.org, linux-api@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 References: <20180508174202.2537-1-adam.manzanares@wdc.com>
  <20180508174202.2537-3-adam.manzanares@wdc.com>
  <20180509133432.GD28388@thunk.org>
- <0aad993b-448c-3586-cfc0-f2e50b1dda28@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <0aad993b-448c-3586-cfc0-f2e50b1dda28@kernel.dk>
+Date: Wed, 9 May 2018 08:23:00 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <0aad993b-448c-3586-cfc0-f2e50b1dda28@kernel.dk>
+In-Reply-To: <20180509133432.GD28388@thunk.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, May 09, 2018 at 08:23:00AM -0600, Jens Axboe wrote:
-> Streams is essentially the only thing ki_hint is currently used for,
-> with the write life time hints mapping to a stream. The idea for the
-> user side API was to have other things than just write life time hints.
+On 5/9/18 7:34 AM, Theodore Y. Ts'o wrote:
+> On Tue, May 08, 2018 at 10:42:01AM -0700, adam.manzanares@wdc.com wrote:
+>> diff --git a/include/linux/fs.h b/include/linux/fs.h
+>> index 760d8da1b6c7..7a90ce387e00 100644
+>> --- a/include/linux/fs.h
+>> +++ b/include/linux/fs.h
+>> @@ -284,6 +284,8 @@ enum rw_hint {
+>>  	WRITE_LIFE_EXTREME	= RWH_WRITE_LIFE_EXTREME,
+>>  };
+>>  
+>> +#define MAX_KI_HINT		((1 << 16) - 1) /* ki_hint type is u16 */
+>> +
 > 
-> Since Adam wants to do priorities, he'd either need to pack into the
-> existing ki_hint, or do this patch does, which is make it smaller and
-> add a new member. I think the latter is cleaner.
+> Do we really think there will be *ever* be a need for more than 16 I/O
+> priority levels?  I would much rather use the low four bits of KI_HINT
+> for the priority level, and reserve the rest of the 16 bits in KI_HINT
+> for some future use.  (For example, we might want to use some number
+> of bits for a stream ID.)
 
-Fair enough; but maybe we can use a u8 instead of a u16?  65,535
-priorities still seem like way more than would ever make sense.  I
-think 256 priorities is still way to many, but it's simpler while
-still reserving number of bits for future se.
+Streams is essentially the only thing ki_hint is currently used for,
+with the write life time hints mapping to a stream. The idea for the
+user side API was to have other things than just write life time hints.
 
-            		       	       	   - Ted
+Since Adam wants to do priorities, he'd either need to pack into the
+existing ki_hint, or do this patch does, which is make it smaller and
+add a new member. I think the latter is cleaner.
+
+-- 
+Jens Axboe
