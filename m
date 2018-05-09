@@ -1,86 +1,172 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:43764 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934189AbeEIJJF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 05:09:05 -0400
+Received: by mail-pg0-f67.google.com with SMTP id k11-v6so21275289pgo.10
+        for <linux-block@vger.kernel.org>; Wed, 09 May 2018 02:09:05 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
 To: linux-block@vger.kernel.org
-Cc: osandov@fb.com,
-	efault@gmx.de,
-	paolo.valente@linaro.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 9/9] sbitmap: fix race in wait batch accounting
-Date: Thu, 10 May 2018 10:24:27 -0600
-Message-Id: <1525969467-12476-10-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1525969467-12476-1-git-send-email-axboe@kernel.dk>
-References: <1525969467-12476-1-git-send-email-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
+Subject: [PATCH v3 3/7] block: replace bio->bi_issue_stat with bio-specific type
+Date: Wed,  9 May 2018 02:08:49 -0700
+Message-Id: <14063754be92058f45c890bccb10ca78bb510060.1525856631.git.osandov@fb.com>
+In-Reply-To: <cover.1525856630.git.osandov@fb.com>
+References: <cover.1525856630.git.osandov@fb.com>
+In-Reply-To: <cover.1525856630.git.osandov@fb.com>
+References: <cover.1525856630.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-If we have multiple callers of sbq_wake_up(), we can end up in a
-situation where the wait_cnt will continually go more and more
-negative. Consider the case where our wake batch is 1, hence
-wait_cnt will start out as 1.
+From: Omar Sandoval <osandov@fb.com>
 
-wait_cnt == 1
+struct blk_issue_stat is going away, and bio->bi_issue_stat doesn't even
+use the blk-stats interface, so we can provide a separate implementation
+specific for bios. The helpers work the same way as the blk-stats
+helpers.
 
-CPU0				CPU1
-atomic_dec_return(), cnt == 0
-				atomic_dec_return(), cnt == -1
-				cmpxchg(-1, 0) (succeeds)
-				[wait_cnt now 0]
-cmpxchg(0, 1) (fails)
-
-This ends up with wait_cnt being 0, we'll wakeup immediately
-next time. Going through the same loop as above again, and
-we'll have wait_cnt -1.
-
-For the case where we have a larger wake batch, the only
-difference is that the starting point will be higher. We'll
-still end up with continually smaller batch wakeups, which
-defeats the purpose of the rolling wakeups.
-
-Always reset the wait_cnt to the batch value. Then it doesn't
-matter who wins the race. But ensure that whomever does win
-the race is the one that increments the ws index as well.
-
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- lib/sbitmap.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ block/blk-throttle.c      | 19 +++++++--------
+ include/linux/blk_types.h | 49 ++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 56 insertions(+), 12 deletions(-)
 
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 8f0950fbaa5c..ffc36e695f50 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -478,22 +478,26 @@ static void sbq_wake_up(struct sbitmap_queue *sbq)
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index c5a131673733..35f9b8ff40d7 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -36,8 +36,6 @@ static int throtl_quantum = 32;
+  */
+ #define LATENCY_FILTERED_HD (1000L) /* 1ms */
  
- 	wait_cnt = atomic_dec_return(&ws->wait_cnt);
- 	if (wait_cnt <= 0) {
-+		int ret;
-+
- 		wake_batch = READ_ONCE(sbq->wake_batch);
-+
- 		/*
- 		 * Pairs with the memory barrier in sbitmap_queue_resize() to
- 		 * ensure that we see the batch size update before the wait
- 		 * count is reset.
- 		 */
- 		smp_mb__before_atomic();
-+
- 		/*
--		 * If there are concurrent callers to sbq_wake_up(), the last
--		 * one to decrement the wait count below zero will bump it back
--		 * up. If there is a concurrent resize, the count reset will
--		 * either cause the cmpxchg to fail or overwrite after the
--		 * cmpxchg.
-+		 * For concurrent callers (either resize, or just multiple
-+		 * concurrent wakeups of waiters), the one that wins the
-+		 * cmpxchg() race increments the waiter index.
- 		 */
--		atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wait_cnt + wake_batch);
--		sbq_index_atomic_inc(&sbq->wake_index);
-+		ret = atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wake_batch);
-+		if (ret == wait_cnt)
-+			sbq_index_atomic_inc(&sbq->wake_index);
-+
- 		wake_up_nr(&ws->wait, wake_batch);
+-#define SKIP_LATENCY (((u64)1) << BLK_STAT_RES_SHIFT)
+-
+ static struct blkcg_policy blkcg_policy_throtl;
+ 
+ /* A workqueue to queue throttle related work */
+@@ -2139,7 +2137,7 @@ static void blk_throtl_assoc_bio(struct throtl_grp *tg, struct bio *bio)
+ 		bio->bi_cg_private = tg;
+ 		blkg_get(tg_to_blkg(tg));
  	}
+-	blk_stat_set_issue(&bio->bi_issue_stat, bio_sectors(bio));
++	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
+ #endif
  }
+ 
+@@ -2251,7 +2249,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+ 	if (throttled || !td->track_bio_latency)
+-		bio->bi_issue_stat.stat |= SKIP_LATENCY;
++		bio->bi_issue.value |= BIO_ISSUE_THROTL_SKIP_LATENCY;
+ #endif
+ 	return throttled;
+ }
+@@ -2302,8 +2300,8 @@ void blk_throtl_bio_endio(struct bio *bio)
+ 	finish_time_ns = ktime_get_ns();
+ 	tg->last_finish_time = finish_time_ns >> 10;
+ 
+-	start_time = blk_stat_time(&bio->bi_issue_stat) >> 10;
+-	finish_time = __blk_stat_time(finish_time_ns) >> 10;
++	start_time = bio_issue_time(&bio->bi_issue) >> 10;
++	finish_time = __bio_issue_time(finish_time_ns) >> 10;
+ 	if (!start_time || finish_time <= start_time) {
+ 		blkg_put(tg_to_blkg(tg));
+ 		return;
+@@ -2311,16 +2309,15 @@ void blk_throtl_bio_endio(struct bio *bio)
+ 
+ 	lat = finish_time - start_time;
+ 	/* this is only for bio based driver */
+-	if (!(bio->bi_issue_stat.stat & SKIP_LATENCY))
+-		throtl_track_latency(tg->td, blk_stat_size(&bio->bi_issue_stat),
+-			bio_op(bio), lat);
++	if (!(bio->bi_issue.value & BIO_ISSUE_THROTL_SKIP_LATENCY))
++		throtl_track_latency(tg->td, bio_issue_size(&bio->bi_issue),
++				     bio_op(bio), lat);
+ 
+ 	if (tg->latency_target && lat >= tg->td->filtered_latency) {
+ 		int bucket;
+ 		unsigned int threshold;
+ 
+-		bucket = request_bucket_index(
+-			blk_stat_size(&bio->bi_issue_stat));
++		bucket = request_bucket_index(bio_issue_size(&bio->bi_issue));
+ 		threshold = tg->td->avg_buckets[rw][bucket].latency +
+ 			tg->latency_target;
+ 		if (lat > threshold)
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 17b18b91ebac..b6f1d53cf113 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -8,6 +8,7 @@
+ 
+ #include <linux/types.h>
+ #include <linux/bvec.h>
++#include <linux/ktime.h>
+ 
+ struct bio_set;
+ struct bio;
+@@ -94,6 +95,52 @@ struct blk_issue_stat {
+ 	u64 stat;
+ };
+ 
++/*
++ * From most significant bit:
++ * 1 bit: reserved for other usage, see below
++ * 12 bits: original size of bio
++ * 51 bits: issue time of bio
++ */
++#define BIO_ISSUE_RES_BITS      1
++#define BIO_ISSUE_SIZE_BITS     12
++#define BIO_ISSUE_RES_SHIFT     (64 - BIO_ISSUE_RES_BITS)
++#define BIO_ISSUE_SIZE_SHIFT    (BIO_ISSUE_RES_SHIFT - BIO_ISSUE_SIZE_BITS)
++#define BIO_ISSUE_TIME_MASK     ((1ULL << BIO_ISSUE_SIZE_SHIFT) - 1)
++#define BIO_ISSUE_SIZE_MASK     \
++	(((1ULL << BIO_ISSUE_SIZE_BITS) - 1) << BIO_ISSUE_SIZE_SHIFT)
++#define BIO_ISSUE_RES_MASK      (~((1ULL << BIO_ISSUE_RES_SHIFT) - 1))
++
++/* Reserved bit for blk-throtl */
++#define BIO_ISSUE_THROTL_SKIP_LATENCY (1ULL << 63)
++
++struct bio_issue {
++	u64 value;
++};
++
++static inline u64 __bio_issue_time(u64 time)
++{
++	return time & BIO_ISSUE_TIME_MASK;
++}
++
++static inline u64 bio_issue_time(struct bio_issue *issue)
++{
++	return __bio_issue_time(issue->value);
++}
++
++static inline sector_t bio_issue_size(struct bio_issue *issue)
++{
++	return ((issue->value & BIO_ISSUE_SIZE_MASK) >> BIO_ISSUE_SIZE_SHIFT);
++}
++
++static inline void bio_issue_init(struct bio_issue *issue,
++				       sector_t size)
++{
++	size &= (1ULL << BIO_ISSUE_SIZE_BITS) - 1;
++	issue->value = ((issue->value & BIO_ISSUE_RES_MASK) |
++			(ktime_get_ns() & BIO_ISSUE_TIME_MASK) |
++			((u64)size << BIO_ISSUE_SIZE_SHIFT));
++}
++
+ /*
+  * main unit of I/O for the block layer and lower layers (ie drivers and
+  * stacking drivers)
+@@ -138,7 +185,7 @@ struct bio {
+ 	struct cgroup_subsys_state *bi_css;
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+ 	void			*bi_cg_private;
+-	struct blk_issue_stat	bi_issue_stat;
++	struct bio_issue	bi_issue;
+ #endif
+ #endif
+ 	union {
 -- 
-2.7.4
+2.17.0
