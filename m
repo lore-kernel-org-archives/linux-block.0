@@ -1,55 +1,68 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:51920 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933832AbeEIHtR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 03:49:17 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 12/33] xfs: use iomap_bmap
-Date: Wed,  9 May 2018 09:48:09 +0200
-Message-Id: <20180509074830.16196-13-hch@lst.de>
-In-Reply-To: <20180509074830.16196-1-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Cc: osandov@fb.com,
+	efault@gmx.de,
+	paolo.valente@linaro.org,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 5/7] bfq-iosched: update shallow depth to smallest one used
+Date: Wed,  9 May 2018 14:49:25 -0600
+Message-Id: <1525898967-13425-6-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1525898967-13425-1-git-send-email-axboe@kernel.dk>
+References: <1525898967-13425-1-git-send-email-axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-Switch to the iomap based bmap implementation to get rid of one of the
-last users of xfs_get_blocks.
+If our shallow depth is smaller than the wake batching of sbitmap,
+we can introduce hangs. Ensure that sbitmap knows how low we'll go.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/xfs/xfs_aops.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ block/bfq-iosched.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 0ab824f574ed..8b06be0a80da 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -1378,10 +1378,9 @@ xfs_vm_bmap(
- 	struct address_space	*mapping,
- 	sector_t		block)
- {
--	struct inode		*inode = (struct inode *)mapping->host;
--	struct xfs_inode	*ip = XFS_I(inode);
-+	struct xfs_inode	*ip = XFS_I(mapping->host);
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index b7722668e295..cba6e82153a2 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -5053,10 +5053,13 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
  
--	trace_xfs_vm_bmap(XFS_I(inode));
-+	trace_xfs_vm_bmap(ip);
+ /*
+  * See the comments on bfq_limit_depth for the purpose of
+- * the depths set in the function.
++ * the depths set in the function. Return minimum shallow depth we'll use.
+  */
+-static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
++static unsigned int bfq_update_depths(struct bfq_data *bfqd,
++				      struct sbitmap_queue *bt)
+ {
++	unsigned int i, j, min_shallow = UINT_MAX;
++
+ 	bfqd->sb_shift = bt->sb.shift;
  
  	/*
- 	 * The swap code (ab-)uses ->bmap to get a block mapping and then
-@@ -1394,9 +1393,7 @@ xfs_vm_bmap(
- 	 */
- 	if (xfs_is_reflink_inode(ip) || XFS_IS_REALTIME_INODE(ip))
- 		return 0;
--
--	filemap_write_and_wait(mapping);
--	return generic_block_bmap(mapping, block, xfs_get_blocks);
-+	return iomap_bmap(mapping, block, &xfs_iomap_ops);
+@@ -5089,14 +5092,22 @@ static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
+ 	bfqd->word_depths[1][0] = max(((1U<<bfqd->sb_shift) * 3)>>4, 1U);
+ 	/* no more than ~37% of tags for sync writes (~20% extra tags) */
+ 	bfqd->word_depths[1][1] = max(((1U<<bfqd->sb_shift) * 6)>>4, 1U);
++
++	for (i = 0; i < 2; i++)
++		for (j = 0; j < 2; j++)
++			min_shallow = min(min_shallow, bfqd->word_depths[i][j]);
++
++	return min_shallow;
  }
  
- STATIC int
+ static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
+ {
+ 	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
+ 	struct blk_mq_tags *tags = hctx->sched_tags;
++	unsigned int min_shallow;
+ 
+-	bfq_update_depths(bfqd, &tags->bitmap_tags);
++	min_shallow = bfq_update_depths(bfqd, &tags->bitmap_tags);
++	sbitmap_queue_shallow_depth(&tags->bitmap_tags, min_shallow);
+ 	return 0;
+ }
+ 
 -- 
-2.17.0
+2.7.4
