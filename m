@@ -1,51 +1,96 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:52904 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933806AbeEIHuC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 03:50:02 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 22/33] xfs: don't clear imap_valid for a non-uptodate buffers
-Date: Wed,  9 May 2018 09:48:19 +0200
-Message-Id: <20180509074830.16196-23-hch@lst.de>
-In-Reply-To: <20180509074830.16196-1-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Cc: osandov@fb.com,
+	efault@gmx.de,
+	paolo.valente@linaro.org,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 3/3] blk-mq-sched: inform sbitmap of shallow depth changes
+Date: Wed,  9 May 2018 09:36:04 -0600
+Message-Id: <1525880164-11943-4-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1525880164-11943-1-git-send-email-axboe@kernel.dk>
+References: <1525880164-11943-1-git-send-email-axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-Finding a buffer that isn't uptodate doesn't invalidate the mapping for
-any given block.  The last_sector check will already take care of starting
-another ioend as soon as we find any non-update buffer, and if the current
-mapping doesn't include the next uptodate buffer the xfs_imap_valid check
-will take care of it.
+If the scheduler returns a new shallow depth setting, then inform
+sbitmap so it can update the wait batch counts.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/xfs/xfs_aops.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ block/blk-mq-sched.c | 26 ++++++++++++++++++++++++++
+ block/blk-mq-sched.h |  3 +++
+ block/blk-mq.c       |  8 +-------
+ 3 files changed, 30 insertions(+), 7 deletions(-)
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 07d5255a0f9f..5da2e99b0559 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -859,15 +859,12 @@ xfs_writepage_map(
- 			break;
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 25c14c58385c..0c53a254671f 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -16,6 +16,32 @@
+ #include "blk-mq-tag.h"
+ #include "blk-wbt.h"
  
- 		/*
--		 * Block does not contain valid data, skip it, mark the current
--		 * map as invalid because we have a discontiguity. This ensures
--		 * we put subsequent writeable buffers into a new ioend.
-+		 * Block does not contain valid data, skip it.
- 		 */
- 		if (!buffer_uptodate(bh)) {
- 			if (PageUptodate(page))
- 				ASSERT(buffer_mapped(bh));
- 			uptodate = false;
--			wpc->imap_valid = false;
- 			continue;
- 		}
++void blk_mq_sched_limit_depth(struct elevator_queue *e,
++			      struct blk_mq_alloc_data *data, unsigned int op)
++{
++	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
++	struct sbitmap_queue *bt;
++	int ret;
++
++	/*
++	 * Flush requests are special and go directly to the
++	 * dispatch list.
++	 */
++	if (op_is_flush(op) || !e->type->ops.mq.limit_depth)
++		return;
++
++	ret = e->type->ops.mq.limit_depth(op, data);
++	if (!ret)
++		return;
++
++	if (data->flags & BLK_MQ_REQ_RESERVED)
++		bt = &tags->breserved_tags;
++	else
++		bt = &tags->bitmap_tags;
++
++	sbitmap_queue_shallow_depth(bt, ret);
++}
++
+ void blk_mq_sched_free_hctx_data(struct request_queue *q,
+ 				 void (*exit)(struct blk_mq_hw_ctx *))
+ {
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 1e9c9018ace1..6abebc1b9ae0 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -5,6 +5,9 @@
+ #include "blk-mq.h"
+ #include "blk-mq-tag.h"
  
++void blk_mq_sched_limit_depth(struct elevator_queue *e,
++			      struct blk_mq_alloc_data *data, unsigned int op);
++
+ void blk_mq_sched_free_hctx_data(struct request_queue *q,
+ 				 void (*exit)(struct blk_mq_hw_ctx *));
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4e9d83594cca..1bb7aa40c192 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -357,13 +357,7 @@ static struct request *blk_mq_get_request(struct request_queue *q,
+ 
+ 	if (e) {
+ 		data->flags |= BLK_MQ_REQ_INTERNAL;
+-
+-		/*
+-		 * Flush requests are special and go directly to the
+-		 * dispatch list.
+-		 */
+-		if (!op_is_flush(op) && e->type->ops.mq.limit_depth)
+-			e->type->ops.mq.limit_depth(op, data);
++		blk_mq_sched_limit_depth(e, data, op);
+ 	}
+ 
+ 	tag = blk_mq_get_tag(data);
 -- 
-2.17.0
+2.7.4
