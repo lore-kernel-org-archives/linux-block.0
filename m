@@ -1,103 +1,59 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	stable@vger.kernel.org,
-	Omar Sandoval <osandov@fb.com>
-Subject: [PATCH] blk-mq: avoid to starve tag allocation after allocation process migrates
-Date: Sat, 19 May 2018 15:27:47 +0800
-Message-Id: <20180519072747.20070-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:42866 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934097AbeEIJtZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 05:49:25 -0400
+Date: Wed, 9 May 2018 11:49:06 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Johannes Weiner <hannes@cmpxchg.org>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        Ingo Molnar <mingo@redhat.com>,
+        Andrew Morton <akpm@linuxfoundation.org>,
+        Tejun Heo <tj@kernel.org>,
+        Balbir Singh <bsingharora@gmail.com>,
+        Mike Galbraith <efault@gmx.de>,
+        Oliver Yang <yangoliver@me.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        xxx xxx <x.qendo@gmail.com>,
+        Taras Kondratiuk <takondra@cisco.com>,
+        Daniel Walker <danielwa@cisco.com>,
+        Vinayak Menon <vinmenon@codeaurora.org>,
+        Ruslan Ruslichenko <rruslich@cisco.com>, kernel-team@fb.com
+Subject: Re: [PATCH 5/7] sched: loadavg: make calc_load_n() public
+Message-ID: <20180509094906.GI12217@hirez.programming.kicks-ass.net>
+References: <20180507210135.1823-1-hannes@cmpxchg.org>
+ <20180507210135.1823-6-hannes@cmpxchg.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180507210135.1823-6-hannes@cmpxchg.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When the allocation process is scheduled back and the mapped hw queue is
-changed, do one extra wake up on orignal queue for compensating wake up
-miss, so other allocations on the orignal queue won't be starved.
+On Mon, May 07, 2018 at 05:01:33PM -0400, Johannes Weiner wrote:
+> +static inline unsigned long
+> +fixed_power_int(unsigned long x, unsigned int frac_bits, unsigned int n)
+> +{
+> +	unsigned long result = 1UL << frac_bits;
+> +
+> +	if (n) {
+> +		for (;;) {
+> +			if (n & 1) {
+> +				result *= x;
+> +				result += 1UL << (frac_bits - 1);
+> +				result >>= frac_bits;
+> +			}
+> +			n >>= 1;
+> +			if (!n)
+> +				break;
+> +			x *= x;
+> +			x += 1UL << (frac_bits - 1);
+> +			x >>= frac_bits;
+> +		}
+> +	}
+> +
+> +	return result;
+> +}
 
-This patch fixes one request allocation hang issue, which can be
-triggered easily in case of very low nr_request.
-
-Cc: <stable@vger.kernel.org>
-Cc: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-tag.c      | 13 +++++++++++++
- include/linux/sbitmap.h |  7 +++++++
- lib/sbitmap.c           |  6 ++++++
- 3 files changed, 26 insertions(+)
-
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 336dde07b230..a965db489f98 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -134,6 +134,8 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
- 	ws = bt_wait_ptr(bt, data->hctx);
- 	drop_ctx = data->ctx == NULL;
- 	do {
-+		struct sbitmap_queue *bt_orig;
-+
- 		/*
- 		 * We're out of tags on this hardware queue, kick any
- 		 * pending IO submits before going to sleep waiting for
-@@ -159,6 +161,7 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
- 		if (data->ctx)
- 			blk_mq_put_ctx(data->ctx);
- 
-+		bt_orig = bt;
- 		io_schedule();
- 
- 		data->ctx = blk_mq_get_ctx(data->q);
-@@ -170,6 +173,16 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
- 			bt = &tags->bitmap_tags;
- 
- 		finish_wait(&ws->wait, &wait);
-+
-+		/*
-+		 * If destination hw queue is changed, wake up original
-+		 * queue one extra time for compensating the wake up
-+		 * miss, so other allocations on original queue won't
-+		 * be starved.
-+		 */
-+		if (bt != bt_orig)
-+			sbitmap_queue_wake(bt_orig);
-+
- 		ws = bt_wait_ptr(bt, data->hctx);
- 	} while (1);
- 
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index 841585f6e5f2..b23f50355281 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -484,6 +484,13 @@ static inline struct sbq_wait_state *sbq_wait_ptr(struct sbitmap_queue *sbq,
- void sbitmap_queue_wake_all(struct sbitmap_queue *sbq);
- 
- /**
-+ * sbitmap_wake_up() - Do a regular wake up compensation if the queue
-+ * allocated from is changed after scheduling back.
-+ * @sbq: Bitmap queue to wake up.
-+ */
-+void sbitmap_queue_wake_up(struct sbitmap_queue *sbq);
-+
-+/**
-  * sbitmap_queue_show() - Dump &struct sbitmap_queue information to a &struct
-  * seq_file.
-  * @sbq: Bitmap queue to show.
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index e6a9c06ec70c..c6ae4206bcb1 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -466,6 +466,12 @@ static void sbq_wake_up(struct sbitmap_queue *sbq)
- 	}
- }
- 
-+void sbitmap_queue_wake_up(struct sbitmap_queue *sbq)
-+{
-+	sbq_wake_up(sbq);
-+}
-+EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up);
-+
- void sbitmap_queue_clear(struct sbitmap_queue *sbq, unsigned int nr,
- 			 unsigned int cpu)
- {
--- 
-2.9.5
+No real objection; but that does look a wee bit fat for an inline I
+suppose.
