@@ -1,136 +1,93 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:50024 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752348AbeERQt2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 May 2018 12:49:28 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 19/34] xfs: simplify xfs_bmap_punch_delalloc_range
-Date: Fri, 18 May 2018 18:48:15 +0200
-Message-Id: <20180518164830.1552-20-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Cc: osandov@fb.com,
+	efault@gmx.de,
+	paolo.valente@linaro.org,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 4/7] sbitmap: add helper to inform the core about shallow depth limiting
+Date: Wed,  9 May 2018 14:49:24 -0600
+Message-Id: <1525898967-13425-5-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1525898967-13425-1-git-send-email-axboe@kernel.dk>
+References: <1525898967-13425-1-git-send-email-axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-Instead of using xfs_bmapi_read to find delalloc extents and then punch
-them out using xfs_bunmapi, opencode the loop to iterate over the extents
-and call xfs_bmap_del_extent_delay directly.  This both simplifies the
-code and reduces the number of extent tree lookups required.
+If a user of sbitmap limits the shallow depth on his own, then
+we need to inform the lower layers. Otherwise we can run into
+a situation where the user has limited the depth to something
+smaller than our wake batch count, which can cause hangs.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/xfs/xfs_bmap_util.c | 78 ++++++++++++++----------------------------
- 1 file changed, 25 insertions(+), 53 deletions(-)
+ include/linux/sbitmap.h | 11 +++++++++++
+ lib/sbitmap.c           | 19 ++++++++++++++++++-
+ 2 files changed, 29 insertions(+), 1 deletion(-)
 
-diff --git a/fs/xfs/xfs_bmap_util.c b/fs/xfs/xfs_bmap_util.c
-index 06badcbadeb4..c009bdf9fdce 100644
---- a/fs/xfs/xfs_bmap_util.c
-+++ b/fs/xfs/xfs_bmap_util.c
-@@ -695,12 +695,10 @@ xfs_getbmap(
- }
+diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+index 841585f6e5f2..99059789f45f 100644
+--- a/include/linux/sbitmap.h
++++ b/include/linux/sbitmap.h
+@@ -164,6 +164,17 @@ static inline void sbitmap_free(struct sbitmap *sb)
+ void sbitmap_resize(struct sbitmap *sb, unsigned int depth);
  
- /*
-- * dead simple method of punching delalyed allocation blocks from a range in
-- * the inode. Walks a block at a time so will be slow, but is only executed in
-- * rare error cases so the overhead is not critical. This will always punch out
-- * both the start and end blocks, even if the ranges only partially overlap
-- * them, so it is up to the caller to ensure that partial blocks are not
-- * passed in.
-+ * Dead simple method of punching delalyed allocation blocks from a range in
-+ * the inode.  This will always punch out both the start and end blocks, even
-+ * if the ranges only partially overlap them, so it is up to the caller to
-+ * ensure that partial blocks are not passed in.
-  */
- int
- xfs_bmap_punch_delalloc_range(
-@@ -708,63 +706,37 @@ xfs_bmap_punch_delalloc_range(
- 	xfs_fileoff_t		start_fsb,
- 	xfs_fileoff_t		length)
+ /**
++ * sbitmap_queue_shallow_depth() - Inform sbitmap about shallow depth changes
++ * @sbq: Bitmap queue in question
++ * @depth: Shallow depth limit
++ *
++ * Due to how sbitmap does batched wakes, if a user of sbitmap updates the
++ * shallow depth, then we might need to update our batched wake counts.
++ *
++ */
++void sbitmap_queue_shallow_depth(struct sbitmap_queue *sbq, unsigned int depth);
++
++/**
+  * sbitmap_get() - Try to allocate a free bit from a &struct sbitmap.
+  * @sb: Bitmap to allocate from.
+  * @alloc_hint: Hint for where to start searching for a free bit.
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index e6a9c06ec70c..a4fb48e4c26b 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -327,7 +327,8 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
+ }
+ EXPORT_SYMBOL_GPL(sbitmap_queue_init_node);
+ 
+-void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
++static void sbitmap_queue_update_batch_wake(struct sbitmap_queue *sbq,
++					    unsigned int depth)
  {
--	xfs_fileoff_t		remaining = length;
-+	struct xfs_ifork	*ifp = &ip->i_df;
-+	struct xfs_bmbt_irec	got, del;
-+	struct xfs_iext_cursor	icur;
- 	int			error = 0;
- 
- 	ASSERT(xfs_isilocked(ip, XFS_ILOCK_EXCL));
- 
--	do {
--		int		done;
--		xfs_bmbt_irec_t	imap;
--		int		nimaps = 1;
--		xfs_fsblock_t	firstblock;
--		struct xfs_defer_ops dfops;
-+	if (!(ifp->if_flags & XFS_IFEXTENTS)) {
-+		error = xfs_iread_extents(NULL, ip, XFS_DATA_FORK);
-+		if (error)
-+			return error;
-+	}
- 
--		/*
--		 * Map the range first and check that it is a delalloc extent
--		 * before trying to unmap the range. Otherwise we will be
--		 * trying to remove a real extent (which requires a
--		 * transaction) or a hole, which is probably a bad idea...
--		 */
--		error = xfs_bmapi_read(ip, start_fsb, 1, &imap, &nimaps,
--				       XFS_BMAPI_ENTIRE);
-+	if (!xfs_iext_lookup_extent(ip, ifp, start_fsb, &icur, &got))
-+		return 0;
- 
--		if (error) {
--			/* something screwed, just bail */
--			if (!XFS_FORCED_SHUTDOWN(ip->i_mount)) {
--				xfs_alert(ip->i_mount,
--			"Failed delalloc mapping lookup ino %lld fsb %lld.",
--						ip->i_ino, start_fsb);
--			}
-+	do {
-+		if (got.br_startoff >= start_fsb + length)
- 			break;
--		}
--		if (!nimaps) {
--			/* nothing there */
--			goto next_block;
--		}
--		if (imap.br_startblock != DELAYSTARTBLOCK) {
--			/* been converted, ignore */
--			goto next_block;
--		}
--		WARN_ON(imap.br_blockcount == 0);
-+		if (!isnullstartblock(got.br_startblock))
-+			continue;
- 
--		/*
--		 * Note: while we initialise the firstblock/dfops pair, they
--		 * should never be used because blocks should never be
--		 * allocated or freed for a delalloc extent and hence we need
--		 * don't cancel or finish them after the xfs_bunmapi() call.
--		 */
--		xfs_defer_init(&dfops, &firstblock);
--		error = xfs_bunmapi(NULL, ip, start_fsb, 1, 0, 1, &firstblock,
--					&dfops, &done);
-+		del = got;
-+		xfs_trim_extent(&del, start_fsb, length);
-+		error = xfs_bmap_del_extent_delay(ip, XFS_DATA_FORK, &icur,
-+				&got, &del);
- 		if (error)
- 			break;
--
--		ASSERT(!xfs_defer_has_unfinished_work(&dfops));
--next_block:
--		start_fsb++;
--		remaining--;
--	} while(remaining > 0);
-+		if (!xfs_iext_get_extent(ifp, &icur, &got))
-+			break;
-+	} while (xfs_iext_next_extent(ifp, &icur, &got));
- 
- 	return error;
+ 	unsigned int wake_batch = sbq_calc_wake_batch(depth);
+ 	int i;
+@@ -342,6 +343,11 @@ void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
+ 		for (i = 0; i < SBQ_WAIT_QUEUES; i++)
+ 			atomic_set(&sbq->ws[i].wait_cnt, 1);
+ 	}
++}
++
++void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
++{
++	sbitmap_queue_update_batch_wake(sbq, depth);
+ 	sbitmap_resize(&sbq->sb, depth);
  }
+ EXPORT_SYMBOL_GPL(sbitmap_queue_resize);
+@@ -403,6 +409,17 @@ int __sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
+ }
+ EXPORT_SYMBOL_GPL(__sbitmap_queue_get_shallow);
+ 
++/*
++ * User has limited the shallow depth to 'depth', update batch wake counts
++ * if depth is smaller than the sbitmap_queue depth
++ */
++void sbitmap_queue_shallow_depth(struct sbitmap_queue *sbq, unsigned int depth)
++{
++	if (depth < sbq->sb.depth)
++		sbitmap_queue_update_batch_wake(sbq, depth);
++}
++EXPORT_SYMBOL_GPL(sbitmap_queue_shallow_depth);
++
+ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
+ {
+ 	int i, wake_index;
 -- 
-2.17.0
+2.7.4
