@@ -1,129 +1,145 @@
-Return-Path: <BATV+7138d8dfc060164c836f+5389+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: Christoph Hellwig <hch@lst.de>
-To: linux-nvme@lists.infradead.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 13/14] nvme: use the changed namespaces list log to clear ns data changed AENs
-Date: Sat, 26 May 2018 12:27:34 +0200
-Message-Id: <20180526102735.31404-14-hch@lst.de>
-In-Reply-To: <20180526102735.31404-1-hch@lst.de>
-References: <20180526102735.31404-1-hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 33/33] fs: remove __block_write_begin and iomap_to_bh
+Date: Wed,  9 May 2018 09:48:30 +0200
+Message-Id: <20180509074830.16196-34-hch@lst.de>
+In-Reply-To: <20180509074830.16196-1-hch@lst.de>
+References: <20180509074830.16196-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Per section 5.2 we need to issue the corresponding log page to clear an
-AEN, so for a namespace data changed AEN we need to read the changed
-namespace list log.  And once we read that log anyway we might as well
-use it to optimize the rescan.
+Now that the iomap buffered write code stopped using bufferheads these
+aren't used anymore.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/core.c | 51 ++++++++++++++++++++++++++++++++++++----
- drivers/nvme/host/nvme.h |  2 ++
- 2 files changed, 49 insertions(+), 4 deletions(-)
+ fs/buffer.c   | 76 ++++-----------------------------------------------
+ fs/internal.h |  2 --
+ 2 files changed, 5 insertions(+), 73 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 06cd04dcffbc..1ae77428a1a5 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -3194,6 +3194,42 @@ static void nvme_scan_ns_sequential(struct nvme_ctrl *ctrl, unsigned nn)
- 	nvme_remove_invalid_namespaces(ctrl, nn);
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 71ea9a29e9d5..5cdcaa6230ed 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -22,7 +22,6 @@
+ #include <linux/sched/signal.h>
+ #include <linux/syscalls.h>
+ #include <linux/fs.h>
+-#include <linux/iomap.h>
+ #include <linux/mm.h>
+ #include <linux/percpu.h>
+ #include <linux/slab.h>
+@@ -1863,62 +1862,8 @@ void page_zero_new_buffers(struct page *page, unsigned from, unsigned to)
  }
+ EXPORT_SYMBOL(page_zero_new_buffers);
  
-+static bool nvme_scan_changed_ns_log(struct nvme_ctrl *ctrl)
-+{
-+	size_t log_size = NVME_MAX_CHANGED_NAMESPACES * sizeof(__le32);
-+	__le32 *log;
-+	int error, i;
-+	bool ret = false;
-+
-+	log = kzalloc(log_size, GFP_KERNEL);
-+	if (!log)
-+		return false;
-+
-+	error = nvme_get_log(ctrl, NVME_LOG_CHANGED_NS, log, log_size);
-+	if (error) {
-+		dev_warn(ctrl->device,
-+			"reading changed ns log failed: %d\n", error);
-+		goto out_free_log;
-+	}
-+
-+	if (log[0] == cpu_to_le32(0xffffffff))
-+		goto out_free_log;
-+
-+	for (i = 0; i < NVME_MAX_CHANGED_NAMESPACES; i++) {
-+		u32 nsid = le32_to_cpu(log[i]);
-+
-+		if (nsid == 0)
-+			break;
-+		dev_info(ctrl->device, "rescanning namespace %d.\n", nsid);
-+		nvme_validate_ns(ctrl, nsid);
-+	}
-+	ret = true;
-+
-+out_free_log:
-+	kfree(log);
-+	return ret;
-+}
-+
- static void nvme_scan_work(struct work_struct *work)
+-static void
+-iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
+-		struct iomap *iomap)
+-{
+-	loff_t offset = block << inode->i_blkbits;
+-
+-	bh->b_bdev = iomap->bdev;
+-
+-	/*
+-	 * Block points to offset in file we need to map, iomap contains
+-	 * the offset at which the map starts. If the map ends before the
+-	 * current block, then do not map the buffer and let the caller
+-	 * handle it.
+-	 */
+-	BUG_ON(offset >= iomap->offset + iomap->length);
+-
+-	switch (iomap->type) {
+-	case IOMAP_HOLE:
+-		/*
+-		 * If the buffer is not up to date or beyond the current EOF,
+-		 * we need to mark it as new to ensure sub-block zeroing is
+-		 * executed if necessary.
+-		 */
+-		if (!buffer_uptodate(bh) ||
+-		    (offset >= i_size_read(inode)))
+-			set_buffer_new(bh);
+-		break;
+-	case IOMAP_DELALLOC:
+-		if (!buffer_uptodate(bh) ||
+-		    (offset >= i_size_read(inode)))
+-			set_buffer_new(bh);
+-		set_buffer_uptodate(bh);
+-		set_buffer_mapped(bh);
+-		set_buffer_delay(bh);
+-		break;
+-	case IOMAP_UNWRITTEN:
+-		/*
+-		 * For unwritten regions, we always need to ensure that
+-		 * sub-block writes cause the regions in the block we are not
+-		 * writing to are zeroed. Set the buffer as new to ensure this.
+-		 */
+-		set_buffer_new(bh);
+-		set_buffer_unwritten(bh);
+-		/* FALLTHRU */
+-	case IOMAP_MAPPED:
+-		if (offset >= i_size_read(inode))
+-			set_buffer_new(bh);
+-		bh->b_blocknr = (iomap->addr + offset - iomap->offset) >>
+-				inode->i_blkbits;
+-		set_buffer_mapped(bh);
+-		break;
+-	}
+-}
+-
+-int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
+-		get_block_t *get_block, struct iomap *iomap)
++int __block_write_begin(struct page *page, loff_t pos, unsigned len,
++		get_block_t *get_block)
  {
- 	struct nvme_ctrl *ctrl =
-@@ -3206,6 +3242,12 @@ static void nvme_scan_work(struct work_struct *work)
- 
- 	WARN_ON_ONCE(!ctrl->tagset);
- 
-+	if (test_and_clear_bit(EVENT_NS_CHANGED, &ctrl->events)) {
-+		if (nvme_scan_changed_ns_log(ctrl))
-+			goto out_sort_namespaces;
-+		dev_info(ctrl->device, "rescanning namespaces.\n");
-+	}
-+
- 	if (nvme_identify_ctrl(ctrl, &id))
- 		return;
- 
-@@ -3213,14 +3255,15 @@ static void nvme_scan_work(struct work_struct *work)
- 	if (ctrl->vs >= NVME_VS(1, 1, 0) &&
- 	    !(ctrl->quirks & NVME_QUIRK_IDENTIFY_CNS)) {
- 		if (!nvme_scan_ns_list(ctrl, nn))
--			goto done;
-+			goto out_free_id;
- 	}
- 	nvme_scan_ns_sequential(ctrl, nn);
-- done:
-+out_free_id:
-+	kfree(id);
-+out_sort_namespaces:
- 	down_write(&ctrl->namespaces_rwsem);
- 	list_sort(NULL, &ctrl->namespaces, ns_cmp);
- 	up_write(&ctrl->namespaces_rwsem);
--	kfree(id);
+ 	unsigned from = pos & (PAGE_SIZE - 1);
+ 	unsigned to = from + len;
+@@ -1954,14 +1899,9 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
+ 			clear_buffer_new(bh);
+ 		if (!buffer_mapped(bh)) {
+ 			WARN_ON(bh->b_size != blocksize);
+-			if (get_block) {
+-				err = get_block(inode, block, bh, 1);
+-				if (err)
+-					break;
+-			} else {
+-				iomap_to_bh(inode, block, bh, iomap);
+-			}
+-
++			err = get_block(inode, block, bh, 1);
++			if (err)
++				break;
+ 			if (buffer_new(bh)) {
+ 				clean_bdev_bh_alias(bh);
+ 				if (PageUptodate(page)) {
+@@ -2001,12 +1941,6 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
+ 		page_zero_new_buffers(page, from, to);
+ 	return err;
  }
+-
+-int __block_write_begin(struct page *page, loff_t pos, unsigned len,
+-		get_block_t *get_block)
+-{
+-	return __block_write_begin_int(page, pos, len, get_block, NULL);
+-}
+ EXPORT_SYMBOL(__block_write_begin);
  
- /*
-@@ -3340,7 +3383,7 @@ static void nvme_handle_aen_notice(struct nvme_ctrl *ctrl, u32 result)
- {
- 	switch ((result & 0xff00) >> 8) {
- 	case NVME_AER_NOTICE_NS_CHANGED:
--		dev_info(ctrl->device, "rescanning\n");
-+		set_bit(EVENT_NS_CHANGED, &ctrl->events);
- 		nvme_queue_scan(ctrl);
- 		break;
- 	case NVME_AER_NOTICE_FW_ACT_STARTING:
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 11681278fdf6..07e8bfe705c6 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -189,6 +189,8 @@ struct nvme_ctrl {
- 	struct delayed_work ka_work;
- 	struct nvme_command ka_cmd;
- 	struct work_struct fw_act_work;
-+#define EVENT_NS_CHANGED		(1 << 0)
-+	unsigned long events;
+ static int __block_commit_write(struct inode *inode, struct page *page,
+diff --git a/fs/internal.h b/fs/internal.h
+index b955232d3d49..47764f739075 100644
+--- a/fs/internal.h
++++ b/fs/internal.h
+@@ -41,8 +41,6 @@ static inline int __sync_blockdev(struct block_device *bdev, int wait)
+  * buffer.c
+  */
+ extern void guard_bio_eod(int rw, struct bio *bio);
+-extern int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
+-		get_block_t *get_block, struct iomap *iomap);
+ int __generic_write_end(struct inode *inode, loff_t pos, unsigned copied,
+ 		struct page *page);
  
- 	/* Power saving configuration */
- 	u64 ps_max_latency_us;
 -- 
 2.17.0
