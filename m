@@ -1,166 +1,123 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V4 1/7] block: introduce blk_quiesce_timeout() and blk_unquiesce_timeout()
-Date: Sat,  5 May 2018 21:58:59 +0800
-Message-Id: <20180505135905.18815-2-ming.lei@redhat.com>
-In-Reply-To: <20180505135905.18815-1-ming.lei@redhat.com>
-References: <20180505135905.18815-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:33244 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934189AbeEIJJC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 05:09:02 -0400
+Received: by mail-pf0-f195.google.com with SMTP id f20so16526082pfn.0
+        for <linux-block@vger.kernel.org>; Wed, 09 May 2018 02:09:02 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
+Subject: [PATCH v3 1/7] block: move some wbt helpers to blk-wbt.c
+Date: Wed,  9 May 2018 02:08:47 -0700
+Message-Id: <c2045e45dd3a63579dd1710d1360279a0de1d41d.1525856631.git.osandov@fb.com>
+In-Reply-To: <cover.1525856630.git.osandov@fb.com>
+References: <cover.1525856630.git.osandov@fb.com>
+In-Reply-To: <cover.1525856630.git.osandov@fb.com>
+References: <cover.1525856630.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Turns out the current way can't drain timout completely because mod_timer()
-can be triggered in the work func, which can be just run inside the synced
-timeout work:
+From: Omar Sandoval <osandov@fb.com>
 
-        del_timer_sync(&q->timeout);
-        cancel_work_sync(&q->timeout_work);
+A few helpers are only used from blk-wbt.c, so move them there, and put
+wbt_track() behind the CONFIG_BLK_WBT typedef. This is in preparation
+for changing how the wbt flags are tracked.
 
-This patch introduces one flag of 'timeout_off' for fixing this issue, turns
-out this simple way does work.
-
-Also blk_quiesce_timeout() and blk_unquiesce_timeout() are introduced for
-draining timeout, which is needed by NVMe.
-
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- block/blk-core.c       | 21 +++++++++++++++++++--
- block/blk-mq.c         |  9 +++++++++
- block/blk-timeout.c    |  5 ++++-
- include/linux/blkdev.h | 13 +++++++++++++
- 4 files changed, 45 insertions(+), 3 deletions(-)
+ block/blk-wbt.c | 20 ++++++++++++++++++++
+ block/blk-wbt.h | 33 ++++++++-------------------------
+ 2 files changed, 28 insertions(+), 25 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 85909b431eb0..c277f1023703 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -392,6 +392,22 @@ void blk_stop_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_stop_queue);
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index a7a724580033..450cffa85dfb 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -29,6 +29,26 @@
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/wbt.h>
  
-+void blk_unquiesce_timeout(struct request_queue *q)
++static inline void wbt_clear_state(struct blk_issue_stat *stat)
 +{
-+	blk_mark_timeout_quiesce(q, false);
-+	mod_timer(&q->timeout, jiffies + q->rq_timeout);
++	stat->stat &= ~BLK_STAT_RES_MASK;
 +}
-+EXPORT_SYMBOL(blk_unquiesce_timeout);
 +
-+void blk_quiesce_timeout(struct request_queue *q)
++static inline enum wbt_flags wbt_stat_to_mask(struct blk_issue_stat *stat)
 +{
-+	blk_mark_timeout_quiesce(q, true);
-+
-+	del_timer_sync(&q->timeout);
-+	cancel_work_sync(&q->timeout_work);
++	return (stat->stat & BLK_STAT_RES_MASK) >> BLK_STAT_RES_SHIFT;
 +}
-+EXPORT_SYMBOL(blk_quiesce_timeout);
 +
- /**
-  * blk_sync_queue - cancel any pending callbacks on a queue
-  * @q: the queue
-@@ -412,8 +428,7 @@ EXPORT_SYMBOL(blk_stop_queue);
-  */
- void blk_sync_queue(struct request_queue *q)
- {
--	del_timer_sync(&q->timeout);
--	cancel_work_sync(&q->timeout_work);
-+	blk_quiesce_timeout(q);
- 
- 	if (q->mq_ops) {
- 		struct blk_mq_hw_ctx *hctx;
-@@ -425,6 +440,8 @@ void blk_sync_queue(struct request_queue *q)
- 	} else {
- 		cancel_delayed_work_sync(&q->delay_work);
- 	}
++static inline bool wbt_is_tracked(struct blk_issue_stat *stat)
++{
++	return (stat->stat >> BLK_STAT_RES_SHIFT) & WBT_TRACKED;
++}
 +
-+	blk_mark_timeout_quiesce(q, false);
- }
- EXPORT_SYMBOL(blk_sync_queue);
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c3621453ad87..d0a5dc29c8ef 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -901,6 +901,15 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 	};
- 	struct blk_mq_hw_ctx *hctx;
- 	int i;
-+	bool timeout_off;
-+	unsigned long flags;
++static inline bool wbt_is_read(struct blk_issue_stat *stat)
++{
++	return (stat->stat >> BLK_STAT_RES_SHIFT) & WBT_READ;
++}
 +
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	timeout_off = q->timeout_off;
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+	if (timeout_off)
-+		return;
+ enum {
+ 	/*
+ 	 * Default setting, we'll scale up (to 75% of QD max) or down (min 1)
+diff --git a/block/blk-wbt.h b/block/blk-wbt.h
+index d6a125e49db5..5bdae205e5df 100644
+--- a/block/blk-wbt.h
++++ b/block/blk-wbt.h
+@@ -35,31 +35,6 @@ enum {
+ 	WBT_STATE_ON_MANUAL	= 2,
+ };
  
- 	/* A deadlock might occur if a request is stuck requiring a
- 	 * timeout at the same time a queue freeze is waiting
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index 652d4d4d3e97..ffd0b609091e 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -136,12 +136,15 @@ void blk_timeout_work(struct work_struct *work)
- 
- 	spin_lock_irqsave(q->queue_lock, flags);
- 
-+	if (q->timeout_off)
-+		goto exit;
-+
- 	list_for_each_entry_safe(rq, tmp, &q->timeout_list, timeout_list)
- 		blk_rq_check_expired(rq, &next, &next_set);
- 
- 	if (next_set)
- 		mod_timer(&q->timeout, round_jiffies_up(next));
+-static inline void wbt_clear_state(struct blk_issue_stat *stat)
+-{
+-	stat->stat &= ~BLK_STAT_RES_MASK;
+-}
 -
-+exit:
- 	spin_unlock_irqrestore(q->queue_lock, flags);
- }
+-static inline enum wbt_flags wbt_stat_to_mask(struct blk_issue_stat *stat)
+-{
+-	return (stat->stat & BLK_STAT_RES_MASK) >> BLK_STAT_RES_SHIFT;
+-}
+-
+-static inline void wbt_track(struct blk_issue_stat *stat, enum wbt_flags wb_acct)
+-{
+-	stat->stat |= ((u64) wb_acct) << BLK_STAT_RES_SHIFT;
+-}
+-
+-static inline bool wbt_is_tracked(struct blk_issue_stat *stat)
+-{
+-	return (stat->stat >> BLK_STAT_RES_SHIFT) & WBT_TRACKED;
+-}
+-
+-static inline bool wbt_is_read(struct blk_issue_stat *stat)
+-{
+-	return (stat->stat >> BLK_STAT_RES_SHIFT) & WBT_READ;
+-}
+-
+ struct rq_wait {
+ 	wait_queue_head_t wait;
+ 	atomic_t inflight;
+@@ -113,6 +88,11 @@ static inline unsigned int wbt_inflight(struct rq_wb *rwb)
  
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 5c4eee043191..a2cc4aaecf50 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -584,6 +584,7 @@ struct request_queue {
- 	struct timer_list	timeout;
- 	struct work_struct	timeout_work;
- 	struct list_head	timeout_list;
-+	bool			timeout_off;
+ #ifdef CONFIG_BLK_WBT
  
- 	struct list_head	icq_list;
- #ifdef CONFIG_BLK_CGROUP
-@@ -1017,6 +1018,18 @@ extern void blk_execute_rq(struct request_queue *, struct gendisk *,
- extern void blk_execute_rq_nowait(struct request_queue *, struct gendisk *,
- 				  struct request *, int, rq_end_io_fn *);
- 
-+static inline void blk_mark_timeout_quiesce(struct request_queue *q, bool quiesce)
++static inline void wbt_track(struct blk_issue_stat *stat, enum wbt_flags flags)
 +{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	q->timeout_off = quiesce;
-+	spin_unlock_irqrestore(q->queue_lock, flags);
++	stat->stat |= ((u64)flags) << BLK_STAT_RES_SHIFT;
 +}
 +
-+extern void blk_quiesce_timeout(struct request_queue *q);
-+extern void blk_unquiesce_timeout(struct request_queue *q);
-+
- int blk_status_to_errno(blk_status_t status);
- blk_status_t errno_to_blk_status(int errno);
+ void __wbt_done(struct rq_wb *, enum wbt_flags);
+ void wbt_done(struct rq_wb *, struct blk_issue_stat *);
+ enum wbt_flags wbt_wait(struct rq_wb *, struct bio *, spinlock_t *);
+@@ -131,6 +111,9 @@ u64 wbt_default_latency_nsec(struct request_queue *);
  
+ #else
+ 
++static inline void wbt_track(struct blk_issue_stat *stat, enum wbt_flags flags)
++{
++}
+ static inline void __wbt_done(struct rq_wb *rwb, enum wbt_flags flags)
+ {
+ }
 -- 
-2.9.5
+2.17.0
