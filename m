@@ -1,81 +1,55 @@
-Return-Path: <prvs=668cc6ab6=adam.manzanares@wdc.com>
-From: adam.manzanares@wdc.com
-To: viro@zeniv.linux.org.uk,
-	linux-fsdevel@vger.kernel.org,
-	axboe@kernel.dk,
-	bcrl@kvack.org
-Cc: mingo@kernel.org,
-	peterz@infradead.org,
-	pombredanne@nexb.com,
-	gregkh@linuxfoundation.org,
-	bigeasy@linutronix.de,
-	rgoldwyn@suse.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-aio@kvack.org,
-	linux-api@vger.kernel.org,
-	Adam Manzanares <adam.manzanares@wdc.com>
-Subject: [PATCH v4 2/3] fs: Convert kiocb rw_hint from enum to u16
-Date: Thu, 17 May 2018 13:38:02 -0700
-Message-Id: <20180517203803.2664-3-adam.manzanares@wdc.com>
-In-Reply-To: <20180517203803.2664-1-adam.manzanares@wdc.com>
-References: <20180517203803.2664-1-adam.manzanares@wdc.com>
+Return-Path: <joe@perches.com>
+From: Joe Perches <joe@perches.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 07/18] blk-mq: Remove pr_fmt duplicate logging prefixes
+Date: Thu, 10 May 2018 08:45:33 -0700
+Message-Id: <55ec0aec733169ae8cd8eec0a9581c693725de04.1525964385.git.joe@perches.com>
+In-Reply-To: <cover.1525964381.git.joe@perches.com>
+References: <cover.1525964381.git.joe@perches.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Adam Manzanares <adam.manzanares@wdc.com>
+Converting pr_fmt from a simple define to use KBUILD_MODNAME added
+some duplicate logging prefixes to existing uses.
 
-In order to avoid kiocb bloat for per command iopriority support, rw_hint
-is converted from enum to a u16. Added a guard around ki_hint assigment.
+Remove them.
 
-Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
+Signed-off-by: Joe Perches <joe@perches.com>
 ---
- include/linux/fs.h | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+ block/blk-mq.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 760d8da1b6c7..7a90ce387e00 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -284,6 +284,8 @@ enum rw_hint {
- 	WRITE_LIFE_EXTREME	= RWH_WRITE_LIFE_EXTREME,
- };
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 9ce9cac16c3f..37e6206e745c 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2782,13 +2782,13 @@ static int blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+ 	} while (set->queue_depth);
  
-+#define MAX_KI_HINT		((1 << 16) - 1) /* ki_hint type is u16 */
-+
- #define IOCB_EVENTFD		(1 << 0)
- #define IOCB_APPEND		(1 << 1)
- #define IOCB_DIRECT		(1 << 2)
-@@ -299,7 +301,7 @@ struct kiocb {
- 	void (*ki_complete)(struct kiocb *iocb, long ret, long ret2);
- 	void			*private;
- 	int			ki_flags;
--	enum rw_hint		ki_hint;
-+	u16			ki_hint;
- } __randomize_layout;
+ 	if (!set->queue_depth || err) {
+-		pr_err("blk-mq: failed to allocate request map\n");
++		pr_err("failed to allocate request map\n");
+ 		return -ENOMEM;
+ 	}
  
- static inline bool is_sync_kiocb(struct kiocb *kiocb)
-@@ -1927,12 +1929,21 @@ static inline enum rw_hint file_write_hint(struct file *file)
+ 	if (depth != set->queue_depth)
+-		pr_info("blk-mq: reduced tag depth (%u -> %u)\n",
+-						depth, set->queue_depth);
++		pr_info("reduced tag depth (%u -> %u)\n",
++			depth, set->queue_depth);
  
- static inline int iocb_flags(struct file *file);
- 
-+/* ki_hint changed from enum to u16, make sure rw_hint fits into u16 */
-+static inline u16 ki_hint_valid(enum rw_hint hint)
-+{
-+	if (hint > MAX_KI_HINT)
-+		return 0;
-+
-+	return hint;
-+}
-+
- static inline void init_sync_kiocb(struct kiocb *kiocb, struct file *filp)
- {
- 	*kiocb = (struct kiocb) {
- 		.ki_filp = filp,
- 		.ki_flags = iocb_flags(filp),
--		.ki_hint = file_write_hint(filp),
-+		.ki_hint = ki_hint_valid(file_write_hint(filp)),
- 	};
+ 	return 0;
  }
+@@ -2845,8 +2845,7 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+ 		return -EINVAL;
+ 
+ 	if (set->queue_depth > BLK_MQ_MAX_DEPTH) {
+-		pr_info("blk-mq: reduced tag depth to %u\n",
+-			BLK_MQ_MAX_DEPTH);
++		pr_info("reduced tag depth to %u\n", BLK_MQ_MAX_DEPTH);
+ 		set->queue_depth = BLK_MQ_MAX_DEPTH;
+ 	}
  
 -- 
-2.15.1
+2.15.0
