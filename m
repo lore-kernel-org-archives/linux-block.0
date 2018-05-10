@@ -1,84 +1,165 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	James Smart <james.smart@broadcom.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V5 6/9] nvme: pci: move error handling out of nvme_reset_dev()
-Date: Fri, 11 May 2018 20:29:30 +0800
-Message-Id: <20180511122933.27155-7-ming.lei@redhat.com>
-In-Reply-To: <20180511122933.27155-1-ming.lei@redhat.com>
-References: <20180511122933.27155-1-ming.lei@redhat.com>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Thu, 10 May 2018 10:00:11 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, osandov@fb.com, efault@gmx.de,
+	paolo.valente@linaro.org
+Subject: Re: [PATCH 3/9] bfq: calculate shallow depths at init time
+Message-ID: <20180510170011.GC30485@vader>
+References: <1525969467-12476-1-git-send-email-axboe@kernel.dk>
+ <1525969467-12476-4-git-send-email-axboe@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1525969467-12476-4-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Once nested EH is introduced, we may not need to handle error
-in the inner EH, so move error handling out of nvme_reset_dev().
+On Thu, May 10, 2018 at 10:24:21AM -0600, Jens Axboe wrote:
+> It doesn't change, so don't put it in the per-IO hot path.
+> 
+> Acked-by: Paolo Valente <paolo.valente@linaro.org>
 
-Meantime return the reset result to caller.
+Reviewed-by: Omar Sandoval <osandov@fb.com>
 
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/nvme/host/pci.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index a924246ffdb6..d880356feee2 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2365,7 +2365,7 @@ static void nvme_remove_dead_ctrl(struct nvme_dev *dev, int status)
- 		nvme_put_ctrl(&dev->ctrl);
- }
- 
--static void nvme_reset_dev(struct nvme_dev *dev)
-+static int nvme_reset_dev(struct nvme_dev *dev)
- {
- 	bool was_suspend = !!(dev->ctrl.ctrl_config & NVME_CC_SHN_NORMAL);
- 	int result = -ENODEV;
-@@ -2459,6 +2459,7 @@ static void nvme_reset_dev(struct nvme_dev *dev)
- 		nvme_unfreeze(&dev->ctrl);
- 	}
- 
-+	result = -ENODEV;
- 	/*
- 	 * If only admin queue live, keep it to do further investigation or
- 	 * recovery.
-@@ -2470,19 +2471,22 @@ static void nvme_reset_dev(struct nvme_dev *dev)
- 	}
- 
- 	nvme_start_ctrl(&dev->ctrl);
--	return;
-+	return 0;
- 
-  out:
--	nvme_remove_dead_ctrl(dev, result);
-+	return result;
- }
- 
- static void nvme_reset_work(struct work_struct *work)
- {
- 	struct nvme_dev *dev =
- 		container_of(work, struct nvme_dev, ctrl.reset_work);
-+	int result;
- 
- 	mutex_lock(&dev->ctrl.reset_lock);
--	nvme_reset_dev(dev);
-+	result = nvme_reset_dev(dev);
-+	if (result)
-+		nvme_remove_dead_ctrl(dev, result);
- 	mutex_unlock(&dev->ctrl.reset_lock);
- }
- 
--- 
-2.9.5
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  block/bfq-iosched.c | 97 +++++++++++++++++++++++++++--------------------------
+>  1 file changed, 50 insertions(+), 47 deletions(-)
+> 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index db38e88a5670..0cd8aa80c32d 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -487,46 +487,6 @@ static struct request *bfq_choose_req(struct bfq_data *bfqd,
+>  }
+>  
+>  /*
+> - * See the comments on bfq_limit_depth for the purpose of
+> - * the depths set in the function.
+> - */
+> -static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
+> -{
+> -	bfqd->sb_shift = bt->sb.shift;
+> -
+> -	/*
+> -	 * In-word depths if no bfq_queue is being weight-raised:
+> -	 * leaving 25% of tags only for sync reads.
+> -	 *
+> -	 * In next formulas, right-shift the value
+> -	 * (1U<<bfqd->sb_shift), instead of computing directly
+> -	 * (1U<<(bfqd->sb_shift - something)), to be robust against
+> -	 * any possible value of bfqd->sb_shift, without having to
+> -	 * limit 'something'.
+> -	 */
+> -	/* no more than 50% of tags for async I/O */
+> -	bfqd->word_depths[0][0] = max((1U<<bfqd->sb_shift)>>1, 1U);
+> -	/*
+> -	 * no more than 75% of tags for sync writes (25% extra tags
+> -	 * w.r.t. async I/O, to prevent async I/O from starving sync
+> -	 * writes)
+> -	 */
+> -	bfqd->word_depths[0][1] = max(((1U<<bfqd->sb_shift) * 3)>>2, 1U);
+> -
+> -	/*
+> -	 * In-word depths in case some bfq_queue is being weight-
+> -	 * raised: leaving ~63% of tags for sync reads. This is the
+> -	 * highest percentage for which, in our tests, application
+> -	 * start-up times didn't suffer from any regression due to tag
+> -	 * shortage.
+> -	 */
+> -	/* no more than ~18% of tags for async I/O */
+> -	bfqd->word_depths[1][0] = max(((1U<<bfqd->sb_shift) * 3)>>4, 1U);
+> -	/* no more than ~37% of tags for sync writes (~20% extra tags) */
+> -	bfqd->word_depths[1][1] = max(((1U<<bfqd->sb_shift) * 6)>>4, 1U);
+> -}
+> -
+> -/*
+>   * Async I/O can easily starve sync I/O (both sync reads and sync
+>   * writes), by consuming all tags. Similarly, storms of sync writes,
+>   * such as those that sync(2) may trigger, can starve sync reads.
+> @@ -535,18 +495,11 @@ static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
+>   */
+>  static void bfq_limit_depth(unsigned int op, struct blk_mq_alloc_data *data)
+>  {
+> -	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
+>  	struct bfq_data *bfqd = data->q->elevator->elevator_data;
+> -	struct sbitmap_queue *bt;
+>  
+>  	if (op_is_sync(op) && !op_is_write(op))
+>  		return;
+>  
+> -	bt = &tags->bitmap_tags;
+> -
+> -	if (unlikely(bfqd->sb_shift != bt->sb.shift))
+> -		bfq_update_depths(bfqd, bt);
+> -
+>  	data->shallow_depth =
+>  		bfqd->word_depths[!!bfqd->wr_busy_queues][op_is_sync(op)];
+>  
+> @@ -5126,6 +5079,55 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
+>  	__bfq_put_async_bfqq(bfqd, &bfqg->async_idle_bfqq);
+>  }
+>  
+> +/*
+> + * See the comments on bfq_limit_depth for the purpose of
+> + * the depths set in the function.
+> + */
+> +static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
+> +{
+> +	bfqd->sb_shift = bt->sb.shift;
+> +
+> +	/*
+> +	 * In-word depths if no bfq_queue is being weight-raised:
+> +	 * leaving 25% of tags only for sync reads.
+> +	 *
+> +	 * In next formulas, right-shift the value
+> +	 * (1U<<bfqd->sb_shift), instead of computing directly
+> +	 * (1U<<(bfqd->sb_shift - something)), to be robust against
+> +	 * any possible value of bfqd->sb_shift, without having to
+> +	 * limit 'something'.
+> +	 */
+> +	/* no more than 50% of tags for async I/O */
+> +	bfqd->word_depths[0][0] = max((1U<<bfqd->sb_shift)>>1, 1U);
+> +	/*
+> +	 * no more than 75% of tags for sync writes (25% extra tags
+> +	 * w.r.t. async I/O, to prevent async I/O from starving sync
+> +	 * writes)
+> +	 */
+> +	bfqd->word_depths[0][1] = max(((1U<<bfqd->sb_shift) * 3)>>2, 1U);
+> +
+> +	/*
+> +	 * In-word depths in case some bfq_queue is being weight-
+> +	 * raised: leaving ~63% of tags for sync reads. This is the
+> +	 * highest percentage for which, in our tests, application
+> +	 * start-up times didn't suffer from any regression due to tag
+> +	 * shortage.
+> +	 */
+> +	/* no more than ~18% of tags for async I/O */
+> +	bfqd->word_depths[1][0] = max(((1U<<bfqd->sb_shift) * 3)>>4, 1U);
+> +	/* no more than ~37% of tags for sync writes (~20% extra tags) */
+> +	bfqd->word_depths[1][1] = max(((1U<<bfqd->sb_shift) * 6)>>4, 1U);
+> +}
+> +
+> +static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
+> +{
+> +	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
+> +	struct blk_mq_tags *tags = hctx->sched_tags;
+> +
+> +	bfq_update_depths(bfqd, &tags->bitmap_tags);
+> +	return 0;
+> +}
+> +
+>  static void bfq_exit_queue(struct elevator_queue *e)
+>  {
+>  	struct bfq_data *bfqd = e->elevator_data;
+> @@ -5547,6 +5549,7 @@ static struct elevator_type iosched_bfq_mq = {
+>  		.requests_merged	= bfq_requests_merged,
+>  		.request_merged		= bfq_request_merged,
+>  		.has_work		= bfq_has_work,
+> +		.init_hctx		= bfq_init_hctx,
+>  		.init_sched		= bfq_init_queue,
+>  		.exit_sched		= bfq_exit_queue,
+>  	},
+> -- 
+> 2.7.4
+> 
