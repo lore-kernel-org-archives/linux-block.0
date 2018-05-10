@@ -1,113 +1,71 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
+Return-Path: <prvs=6616f3864=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "paolo.valente@linaro.org" <paolo.valente@linaro.org>
+CC: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "snitzer@redhat.com" <snitzer@redhat.com>,
+	"broonie@linaro.org" <broonie@linaro.org>, "axboe@fb.com" <axboe@fb.com>,
+	"linus.walleij@linaro.org" <linus.walleij@linaro.org>
 Subject: Re: v4.16-rc1 + dm-mpath + BFQ
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <450d81c7d03a33005e7d49a9499fe20b6748c019.camel@wdc.com>
-Date: Thu, 10 May 2018 18:13:13 +0200
-Cc: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
- "axboe@kernel.dk" <axboe@kernel.dk>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "snitzer@redhat.com" <snitzer@redhat.com>,
- "broonie@linaro.org" <broonie@linaro.org>,
- "axboe@fb.com" <axboe@fb.com>,
- "linus.walleij@linaro.org" <linus.walleij@linaro.org>
-Message-Id: <8402D464-3403-4129-90A9-ABF4E67282B0@linaro.org>
+Date: Thu, 10 May 2018 16:12:37 +0000
+Message-ID: <450d81c7d03a33005e7d49a9499fe20b6748c019.camel@wdc.com>
 References: <1518202449.2871.32.camel@wdc.com>
- <6a1695f4-de6f-a959-5242-9611e148bc11@kernel.dk>
- <13a55c03-b138-ca8c-0a0a-95c976b4909e@wdc.com>
- <bee15d7a-de1f-daee-717d-b9e314ab06a1@kernel.dk>
- <1FC84680-6482-4FE5-97D0-0F7079C45AA7@linaro.org>
- <06795609-6ec6-4ae2-f219-3bf7219c11a3@wdc.com>
- <D89FF8A1-871E-4661-AE9F-6515E6C5EF22@linaro.org>
- <1518547636.2796.15.camel@wdc.com>
- <0BF6AC73-69CE-41B5-BDAC-C5249037C83C@linaro.org>
- <60f48ff1-7c8b-2c10-4560-744d70bccea1@wdc.com>
- <6C49304C-D506-4719-9365-E7D35BEC9851@linaro.org>
- <1519868123.2777.28.camel@wdc.com>
- <10BDC305-A874-477C-9545-5617036C2E91@linaro.org>
- <2dcb12b92e50a31c55dd3ab0e464cc819432c3d3.camel@wdc.com>
- <7E372E2C-83A8-4EF4-B52E-E3AC6ED01C74@linaro.org>
- <a6e512dff10d0cff12a688bbf1b30e275a91633e.camel@wdc.com>
- <6A355080-C9A8-475D-9A35-32850D771ABB@linaro.org>
- <450d81c7d03a33005e7d49a9499fe20b6748c019.camel@wdc.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
+	 <6a1695f4-de6f-a959-5242-9611e148bc11@kernel.dk>
+	 <13a55c03-b138-ca8c-0a0a-95c976b4909e@wdc.com>
+	 <bee15d7a-de1f-daee-717d-b9e314ab06a1@kernel.dk>
+	 <1FC84680-6482-4FE5-97D0-0F7079C45AA7@linaro.org>
+	 <06795609-6ec6-4ae2-f219-3bf7219c11a3@wdc.com>
+	 <D89FF8A1-871E-4661-AE9F-6515E6C5EF22@linaro.org>
+	 <1518547636.2796.15.camel@wdc.com>
+	 <0BF6AC73-69CE-41B5-BDAC-C5249037C83C@linaro.org>
+	 <60f48ff1-7c8b-2c10-4560-744d70bccea1@wdc.com>
+	 <6C49304C-D506-4719-9365-E7D35BEC9851@linaro.org>
+	 <1519868123.2777.28.camel@wdc.com>
+	 <10BDC305-A874-477C-9545-5617036C2E91@linaro.org>
+	 <2dcb12b92e50a31c55dd3ab0e464cc819432c3d3.camel@wdc.com>
+	 <7E372E2C-83A8-4EF4-B52E-E3AC6ED01C74@linaro.org>
+	 <a6e512dff10d0cff12a688bbf1b30e275a91633e.camel@wdc.com>
+	 <6A355080-C9A8-475D-9A35-32850D771ABB@linaro.org>
+In-Reply-To: <6A355080-C9A8-475D-9A35-32850D771ABB@linaro.org>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-
-
-> Il giorno 10 mag 2018, alle ore 18:12, Bart Van Assche =
-<Bart.VanAssche@wdc.com> ha scritto:
->=20
-> On Fri, 2018-05-04 at 22:11 +0200, Paolo Valente wrote:
->>> Il giorno 30 mar 2018, alle ore 18:57, Bart Van Assche =
-<bart.vanassche@wdc.com> ha scritto:
->>>=20
->>> On Fri, 2018-03-30 at 10:23 +0200, Paolo Valente wrote:
->>>> Still 4.16-rc1, being that the version for which you reported this
->>>> issue in the first place.
->>>=20
->>> A vanilla v4.16-rc1 kernel is not sufficient to run the srp-test =
-software
->>> since RDMA/CM support for the SRP target driver is missing from that =
-kernel.
->>> That's why I asked you to use the for-next branch from my github =
-repository
->>> in a previous e-mail. Anyway, since the necessary patches are now in
->>> linux-next, the srp-test software can also be run against =
-linux-next. Here
->>> are the results that I obtained with label next-20180329 and the =
-kernel
->>> config attached to your previous e-mail:
->>>=20
->>> # while ./srp-test/run_tests -c -d -r 10 -e bfq; do :; done
->>>=20
->>> BUG: unable to handle kernel NULL pointer dereference at =
-0000000000000200
->>> PGD 0 P4D 0=20
->>> Oops: 0002 [#1] SMP PTI
->>> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS =
-1.0.0-prebuilt.qemu-project.org 04/01/2014
->>> RIP: 0010:rb_erase+0x284/0x380
->>> Call Trace:
->>> <IRQ>
->>> elv_rb_del+0x24/0x30
->>> bfq_remove_request+0x9a/0x2e0 [bfq]
->>> ? rcu_read_lock_sched_held+0x64/0x70
->>> ? update_load_avg+0x72b/0x760
->>> bfq_finish_requeue_request+0x2e1/0x3b0 [bfq]
->>> ? __lock_is_held+0x5a/0xa0
->>> blk_mq_free_request+0x5f/0x1a0
->>> blk_put_request+0x23/0x60
->>> multipath_release_clone+0xe/0x10
->>> dm_softirq_done+0xe3/0x270
->>> __blk_mq_complete_request_remote+0x18/0x20
->>> flush_smp_call_function_queue+0xa1/0x150
->>> generic_smp_call_function_single_interrupt+0x13/0x30
->>> smp_call_function_single_interrupt+0x4d/0x220
->>> call_function_single_interrupt+0xf/0x20
->>> </IRQ>
->>=20
->> I suspect my recent fix [1] might fix your failure too.
->>=20
->> [1] =
-https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1682264.html
->=20
-> Hello Paolo,
->=20
-> With patch [1] applied I can't reproduce the aforementioned crash. I =
-will add
-> my Tested-by.
->=20
-
-Great, thanks!
-
-Paolo
-
-> Thanks,
->=20
-> Bart.
->=20
->=20
+T24gRnJpLCAyMDE4LTA1LTA0IGF0IDIyOjExICswMjAwLCBQYW9sbyBWYWxlbnRlIHdyb3RlOg0K
+PiA+IElsIGdpb3JubyAzMCBtYXIgMjAxOCwgYWxsZSBvcmUgMTg6NTcsIEJhcnQgVmFuIEFzc2No
+ZSA8YmFydC52YW5hc3NjaGVAd2RjLmNvbT4gaGEgc2NyaXR0bzoNCj4gPiANCj4gPiBPbiBGcmks
+IDIwMTgtMDMtMzAgYXQgMTA6MjMgKzAyMDAsIFBhb2xvIFZhbGVudGUgd3JvdGU6DQo+ID4gPiBT
+dGlsbCA0LjE2LXJjMSwgYmVpbmcgdGhhdCB0aGUgdmVyc2lvbiBmb3Igd2hpY2ggeW91IHJlcG9y
+dGVkIHRoaXMNCj4gPiA+IGlzc3VlIGluIHRoZSBmaXJzdCBwbGFjZS4NCj4gPiANCj4gPiBBIHZh
+bmlsbGEgdjQuMTYtcmMxIGtlcm5lbCBpcyBub3Qgc3VmZmljaWVudCB0byBydW4gdGhlIHNycC10
+ZXN0IHNvZnR3YXJlDQo+ID4gc2luY2UgUkRNQS9DTSBzdXBwb3J0IGZvciB0aGUgU1JQIHRhcmdl
+dCBkcml2ZXIgaXMgbWlzc2luZyBmcm9tIHRoYXQga2VybmVsLg0KPiA+IFRoYXQncyB3aHkgSSBh
+c2tlZCB5b3UgdG8gdXNlIHRoZSBmb3ItbmV4dCBicmFuY2ggZnJvbSBteSBnaXRodWIgcmVwb3Np
+dG9yeQ0KPiA+IGluIGEgcHJldmlvdXMgZS1tYWlsLiBBbnl3YXksIHNpbmNlIHRoZSBuZWNlc3Nh
+cnkgcGF0Y2hlcyBhcmUgbm93IGluDQo+ID4gbGludXgtbmV4dCwgdGhlIHNycC10ZXN0IHNvZnR3
+YXJlIGNhbiBhbHNvIGJlIHJ1biBhZ2FpbnN0IGxpbnV4LW5leHQuIEhlcmUNCj4gPiBhcmUgdGhl
+IHJlc3VsdHMgdGhhdCBJIG9idGFpbmVkIHdpdGggbGFiZWwgbmV4dC0yMDE4MDMyOSBhbmQgdGhl
+IGtlcm5lbA0KPiA+IGNvbmZpZyBhdHRhY2hlZCB0byB5b3VyIHByZXZpb3VzIGUtbWFpbDoNCj4g
+PiANCj4gPiAjIHdoaWxlIC4vc3JwLXRlc3QvcnVuX3Rlc3RzIC1jIC1kIC1yIDEwIC1lIGJmcTsg
+ZG8gOjsgZG9uZQ0KPiA+IA0KPiA+IEJVRzogdW5hYmxlIHRvIGhhbmRsZSBrZXJuZWwgTlVMTCBw
+b2ludGVyIGRlcmVmZXJlbmNlIGF0IDAwMDAwMDAwMDAwMDAyMDANCj4gPiBQR0QgMCBQNEQgMCAN
+Cj4gPiBPb3BzOiAwMDAyIFsjMV0gU01QIFBUSQ0KPiA+IEhhcmR3YXJlIG5hbWU6IFFFTVUgU3Rh
+bmRhcmQgUEMgKGk0NDBGWCArIFBJSVgsIDE5OTYpLCBCSU9TIDEuMC4wLXByZWJ1aWx0LnFlbXUt
+cHJvamVjdC5vcmcgMDQvMDEvMjAxNA0KPiA+IFJJUDogMDAxMDpyYl9lcmFzZSsweDI4NC8weDM4
+MA0KPiA+IENhbGwgVHJhY2U6DQo+ID4gPElSUT4NCj4gPiBlbHZfcmJfZGVsKzB4MjQvMHgzMA0K
+PiA+IGJmcV9yZW1vdmVfcmVxdWVzdCsweDlhLzB4MmUwIFtiZnFdDQo+ID4gPyByY3VfcmVhZF9s
+b2NrX3NjaGVkX2hlbGQrMHg2NC8weDcwDQo+ID4gPyB1cGRhdGVfbG9hZF9hdmcrMHg3MmIvMHg3
+NjANCj4gPiBiZnFfZmluaXNoX3JlcXVldWVfcmVxdWVzdCsweDJlMS8weDNiMCBbYmZxXQ0KPiA+
+ID8gX19sb2NrX2lzX2hlbGQrMHg1YS8weGEwDQo+ID4gYmxrX21xX2ZyZWVfcmVxdWVzdCsweDVm
+LzB4MWEwDQo+ID4gYmxrX3B1dF9yZXF1ZXN0KzB4MjMvMHg2MA0KPiA+IG11bHRpcGF0aF9yZWxl
+YXNlX2Nsb25lKzB4ZS8weDEwDQo+ID4gZG1fc29mdGlycV9kb25lKzB4ZTMvMHgyNzANCj4gPiBf
+X2Jsa19tcV9jb21wbGV0ZV9yZXF1ZXN0X3JlbW90ZSsweDE4LzB4MjANCj4gPiBmbHVzaF9zbXBf
+Y2FsbF9mdW5jdGlvbl9xdWV1ZSsweGExLzB4MTUwDQo+ID4gZ2VuZXJpY19zbXBfY2FsbF9mdW5j
+dGlvbl9zaW5nbGVfaW50ZXJydXB0KzB4MTMvMHgzMA0KPiA+IHNtcF9jYWxsX2Z1bmN0aW9uX3Np
+bmdsZV9pbnRlcnJ1cHQrMHg0ZC8weDIyMA0KPiA+IGNhbGxfZnVuY3Rpb25fc2luZ2xlX2ludGVy
+cnVwdCsweGYvMHgyMA0KPiA+IDwvSVJRPg0KPiANCj4gSSBzdXNwZWN0IG15IHJlY2VudCBmaXgg
+WzFdIG1pZ2h0IGZpeCB5b3VyIGZhaWx1cmUgdG9vLg0KPiANCj4gWzFdIGh0dHBzOi8vd3d3Lm1h
+aWwtYXJjaGl2ZS5jb20vbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZy9tc2cxNjgyMjY0Lmh0
+bWwNCg0KSGVsbG8gUGFvbG8sDQoNCldpdGggcGF0Y2ggWzFdIGFwcGxpZWQgSSBjYW4ndCByZXBy
+b2R1Y2UgdGhlIGFmb3JlbWVudGlvbmVkIGNyYXNoLiBJIHdpbGwgYWRkDQpteSBUZXN0ZWQtYnku
+DQoNClRoYW5rcywNCg0KQmFydC4NCg0KDQo=
