@@ -1,73 +1,77 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Ingo Molnar <mingo@kernel.org>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Subject: [PATCH 08/10] block: Add warning for bi_next not NULL in bio_endio()
-Date: Tue,  8 May 2018 21:33:56 -0400
-Message-Id: <20180509013358.16399-9-kent.overstreet@gmail.com>
-In-Reply-To: <20180509013358.16399-1-kent.overstreet@gmail.com>
-References: <20180509013358.16399-1-kent.overstreet@gmail.com>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Thu, 10 May 2018 10:03:06 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, osandov@fb.com, efault@gmx.de,
+	paolo.valente@linaro.org
+Subject: Re: [PATCH 7/9] bfq-iosched: update shallow depth to smallest one
+ used
+Message-ID: <20180510170306.GG30485@vader>
+References: <1525969467-12476-1-git-send-email-axboe@kernel.dk>
+ <1525969467-12476-8-git-send-email-axboe@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1525969467-12476-8-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Recently found a bug where a driver left bi_next not NULL and then
-called bio_endio(), and then the submitter of the bio used
-bio_copy_data() which was treating src and dst as lists of bios.
+On Thu, May 10, 2018 at 10:24:25AM -0600, Jens Axboe wrote:
+> If our shallow depth is smaller than the wake batching of sbitmap,
+> we can introduce hangs. Ensure that sbitmap knows how low we'll go.
+> 
+> Acked-by: Paolo Valente <paolo.valente@linaro.org>
 
-Fixed that bug by splitting out bio_list_copy_data(), but in case other
-things are depending on bi_next in weird ways, add a warning to help
-avoid more bugs like that in the future.
+Reviewed-by: Omar Sandoval <osandov@fb.com>
 
-Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
----
- block/bio.c      | 3 +++
- block/blk-core.c | 8 +++++++-
- 2 files changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index ce8e259f9a..5c81391100 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1775,6 +1775,9 @@ void bio_endio(struct bio *bio)
- 	if (!bio_integrity_endio(bio))
- 		return;
- 
-+	if (WARN_ONCE(bio->bi_next, "driver left bi_next not NULL"))
-+		bio->bi_next = NULL;
-+
- 	/*
- 	 * Need to have a real endio function for chained bios, otherwise
- 	 * various corner cases will break (like stacking block devices that
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 66f24798ef..f3cf79198a 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -204,6 +204,10 @@ static void req_bio_endio(struct request *rq, struct bio *bio,
- 	bio_advance(bio, nbytes);
- 
- 	/* don't actually finish bio if it's part of flush sequence */
-+	/*
-+	 * XXX this code looks suspicious - it's not consistent with advancing
-+	 * req->bio in caller
-+	 */
- 	if (bio->bi_iter.bi_size == 0 && !(rq->rq_flags & RQF_FLUSH_SEQ))
- 		bio_endio(bio);
- }
-@@ -2982,8 +2986,10 @@ bool blk_update_request(struct request *req, blk_status_t error,
- 		struct bio *bio = req->bio;
- 		unsigned bio_bytes = min(bio->bi_iter.bi_size, nr_bytes);
- 
--		if (bio_bytes == bio->bi_iter.bi_size)
-+		if (bio_bytes == bio->bi_iter.bi_size) {
- 			req->bio = bio->bi_next;
-+			bio->bi_next = NULL;
-+		}
- 
- 		/* Completion has already been traced */
- 		bio_clear_flag(bio, BIO_TRACE_COMPLETION);
--- 
-2.17.0
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  block/bfq-iosched.c | 17 ++++++++++++++---
+>  1 file changed, 14 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 10294124d597..b622e73a326a 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -5081,10 +5081,13 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
+>  
+>  /*
+>   * See the comments on bfq_limit_depth for the purpose of
+> - * the depths set in the function.
+> + * the depths set in the function. Return minimum shallow depth we'll use.
+>   */
+> -static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
+> +static unsigned int bfq_update_depths(struct bfq_data *bfqd,
+> +				      struct sbitmap_queue *bt)
+>  {
+> +	unsigned int i, j, min_shallow = UINT_MAX;
+> +
+>  	/*
+>  	 * In-word depths if no bfq_queue is being weight-raised:
+>  	 * leaving 25% of tags only for sync reads.
+> @@ -5115,14 +5118,22 @@ static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
+>  	bfqd->word_depths[1][0] = max(((1U << bt->sb.shift) * 3) >> 4, 1U);
+>  	/* no more than ~37% of tags for sync writes (~20% extra tags) */
+>  	bfqd->word_depths[1][1] = max(((1U << bt->sb.shift) * 6) >> 4, 1U);
+> +
+> +	for (i = 0; i < 2; i++)
+> +		for (j = 0; j < 2; j++)
+> +			min_shallow = min(min_shallow, bfqd->word_depths[i][j]);
+> +
+> +	return min_shallow;
+>  }
+>  
+>  static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
+>  {
+>  	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
+>  	struct blk_mq_tags *tags = hctx->sched_tags;
+> +	unsigned int min_shallow;
+>  
+> -	bfq_update_depths(bfqd, &tags->bitmap_tags);
+> +	min_shallow = bfq_update_depths(bfqd, &tags->bitmap_tags);
+> +	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, min_shallow);
+>  	return 0;
+>  }
+>  
+> -- 
+> 2.7.4
+> 
