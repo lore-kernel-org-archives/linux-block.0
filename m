@@ -1,24 +1,20 @@
-Return-Path: <sbates@raithlin.com>
-From: "Stephen  Bates" <sbates@raithlin.com>
-To: Logan Gunthorpe <logang@deltatee.com>,
-	=?utf-8?B?Q2hyaXN0aWFuIEvDtm5pZw==?= <christian.koenig@amd.com>, "Jerome
- Glisse" <jglisse@redhat.com>
-CC: Alex Williamson <alex.williamson@redhat.com>, Bjorn Helgaas
-	<helgaas@kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-pci@vger.kernel.org"
-	<linux-pci@vger.kernel.org>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>, "linux-nvdimm@lists.01.org"
-	<linux-nvdimm@lists.01.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, Jens Axboe
-	<axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>, Sagi Grimberg
-	<sagi@grimberg.me>, Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe
-	<jgg@mellanox.com>, Max Gurtovoy <maxg@mellanox.com>, Dan Williams
-	<dan.j.williams@intel.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Subject: Re: [PATCH v4 04/14] PCI/P2PDMA: Clear ACS P2P flags for all devices
- behind switches
-Date: Thu, 10 May 2018 17:11:14 +0000
-Message-ID: <868B49CE-4F0E-4A48-BE78-12149F85F1A4@raithlin.com>
+Return-Path: <logang@deltatee.com>
+To: Stephen Bates <sbates@raithlin.com>,
+ =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+ Jerome Glisse <jglisse@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+ Bjorn Helgaas <helgaas@kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+ Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>,
+ Max Gurtovoy <maxg@mellanox.com>, Dan Williams <dan.j.williams@intel.com>,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>
 References: <20180423233046.21476-5-logang@deltatee.com>
  <20180507231306.GG161390@bhelgaas-glaptop.roam.corp.google.com>
  <e58e8d27-42a5-ca69-3b68-c409a2922cd1@amd.com>
@@ -35,31 +31,61 @@ References: <20180423233046.21476-5-logang@deltatee.com>
  <4e0d0b96-ab02-2662-adf3-fa956efd294c@deltatee.com>
  <2fc61d29-9eb4-d168-a3e5-955c36e5d821@amd.com>
  <94C8FE12-7FC3-48BD-9DCA-E6A427E71810@raithlin.com>
- <f0101988-cf82-7ffb-2aca-d3b8d2f4b504@deltatee.com>
-In-Reply-To: <f0101988-cf82-7ffb-2aca-d3b8d2f4b504@deltatee.com>
-Content-Type: text/plain; charset="utf-8"
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <f0101988-cf82-7ffb-2aca-d3b8d2f4b504@deltatee.com>
+Date: Thu, 10 May 2018 10:32:22 -0600
 MIME-Version: 1.0
+In-Reply-To: <94C8FE12-7FC3-48BD-9DCA-E6A427E71810@raithlin.com>
+Content-Type: text/plain; charset=utf-8
+Subject: Re: [PATCH v4 04/14] PCI/P2PDMA: Clear ACS P2P flags for all devices
+ behind switches
 List-ID: <linux-block@vger.kernel.org>
 
-PiBOb3QgdG8gbWUuIEluIHRoZSBwMnBkbWEgY29kZSB3ZSBzcGVjaWZpY2FsbHkgcHJvZ3JhbSBE
-TUEgZW5naW5lcyB3aXRoDQo+IHRoZSBQQ0kgYnVzIGFkZHJlc3MuIA0KDQpBaCB5ZXMgb2YgY291
-cnNlLiBCcmFpbiBmYXJ0IG9uIG15IHBhcnQuIFdlIGFyZSBub3QgcHJvZ3JhbW1pbmcgdGhlIFAy
-UERNQSBpbml0aWF0b3Igd2l0aCBhbiBJT1ZBIGJ1dCB3aXRoIHRoZSBQQ0kgYnVzIGFkZHJlc3Mu
-Li4NCg0KPiBTbyByZWdhcmRsZXNzIG9mIHdoZXRoZXIgd2UgYXJlIHVzaW5nIHRoZSBJT01NVSBv
-cg0KPiBub3QsIHRoZSBwYWNrZXRzIHdpbGwgYmUgZm9yd2FyZGVkIGRpcmVjdGx5IHRvIHRoZSBw
-ZWVyLiBJZiB0aGUgQUNTDQo+ICBSZWRpciBiaXRzIGFyZSBvbiB0aGV5IHdpbGwgYmUgZm9yY2Vk
-IGJhY2sgdG8gdGhlIFJDIGJ5IHRoZSBzd2l0Y2ggYW5kDQo+ICB0aGUgdHJhbnNhY3Rpb24gd2ls
-bCBmYWlsLiBJZiB3ZSBjbGVhciB0aGUgQUNTIGJpdHMsIHRoZSBUTFBzIHdpbGwgZ28NCj4gIHdo
-ZXJlIHdlIHdhbnQgYW5kIGV2ZXJ5dGhpbmcgd2lsbCB3b3JrIChidXQgd2UgbG9zZSB0aGUgaXNv
-bGF0aW9uIG9mIEFDUykuDQoNCkFncmVlZC4NCiAgICANCj4gICAgRm9yIEVQcyB0aGF0IHN1cHBv
-cnQgQVRTLCB3ZSBzaG91bGQgKGJ1dCBkb24ndCBuZWNlc3NhcmlseSBoYXZlIHRvKQ0KPiAgICBw
-cm9ncmFtIHRoZW0gd2l0aCB0aGUgSU9WQSBhZGRyZXNzIHNvIHRoZXkgY2FuIGdvIHRocm91Z2gg
-dGhlDQo+ICAgIHRyYW5zbGF0aW9uIHByb2Nlc3Mgd2hpY2ggd2lsbCBhbGxvdyBQMlAgd2l0aG91
-dCBkaXNhYmxpbmcgdGhlIEFDUyBSZWRpcg0KPiAgICBiaXRzIC0tIHByb3ZpZGVkIHRoZSBBQ1Mg
-ZGlyZWN0IHRyYW5zbGF0aW9uIGJpdCBpcyBzZXQuIChBbmQgYnR3LCBpZiBpdA0KPiAgICBpcywg
-dGhlbiB3ZSBsb3NlIHRoZSBiZW5lZml0IG9mIEFDUyBwcm90ZWN0aW5nIGFnYWluc3QgbWFsaWNp
-b3VzIEVQcykuDQo+ICAgIEJ1dCwgcGVyIGFib3ZlLCB0aGUgQVRTIHRyYW5zYWN0aW9uIHNob3Vs
-ZCBpbnZvbHZlIG9ubHkgdGhlIElPVkEgYWRkcmVzcw0KPiAgICBzbyB0aGUgQUNTIGJpdHMgbm90
-IGJlaW5nIHNldCBzaG91bGQgbm90IGJyZWFrIEFUUy4NCiAgICANCldlbGwgd2Ugd291bGQgc3Rp
-bGwgaGF2ZSB0byBjbGVhciBzb21lIEFDUyBiaXRzIGJ1dCBub3cgd2UgY2FuIGNsZWFyIG9ubHkg
-Zm9yIHRyYW5zbGF0ZWQgYWRkcmVzc2VzLg0KDQpTdGVwaGVuDQogICAgDQoNCg==
+
+
+On 10/05/18 08:16 AM, Stephen  Bates wrote:
+> Hi Christian
+> 
+>> Why would a switch not identify that as a peer address? We use the PASID 
+>>    together with ATS to identify the address space which a transaction 
+>>    should use.
+> 
+> I think you are conflating two types of TLPs here. If the device supports ATS then it will issue a TR TLP to obtain a translated address from the IOMMU. This TR TLP will be addressed to the RP and so regardless of ACS it is going up to the Root Port. When it gets the response it gets the physical address and can use that with the TA bit set for the p2pdma. In the case of ATS support we also have more control over ACS as we can disable it just for TA addresses (as per 7.7.7.7.2 of the spec).
+
+Yes. Remember if we are using the IOMMU the EP is being programmed
+(regardless of whether it's a DMA engine, NTB window or GPUVA) with an
+IOVA address which is separate from the device's PCI bus address. Any
+packet addressed to an IOVA address is going to go back to the root
+complex no matter what the ACS bits say. Only once ATS translates the
+addres back into the PCI bus address will the EP send packets to the
+peer and the switch will attempt to root them to the peer and only then
+do the ACS bits apply. And the direct translated ACS bit allows packets
+that have purportedly been translated through.
+
+>  >   If I'm not completely mistaken when you disable ACS it is perfectly 
+>  >   possible that a bridge identifies a transaction as belonging to a peer 
+>  >   address, which isn't what we want here.
+>    
+> You are right here and I think this illustrates a problem for using the IOMMU at all when P2PDMA devices do not support ATS. Let me explain:
+> 
+> If we want to do a P2PDMA and the DMA device does not support ATS then I think we have to disable the IOMMU (something Mike suggested earlier). The reason is that since ATS is not an option the EP must initiate the DMA using the addresses passed down to it. If the IOMMU is on then this is an IOVA that could (with some non-zero probability) point to an IO Memory address in the same PCI domain. So if we disable ACS we are in trouble as we might MemWr to the wrong place but if we enable ACS we lose much of the benefit of P2PDMA. Disabling the IOMMU removes the IOVA risk and ironically also resolves the IOMMU grouping issues.
+> So I think if we want to support performant P2PDMA for devices that don't have ATS (and no NVMe SSDs today support ATS) then we have to disable the IOMMU. I know this is problematic for AMDs use case so perhaps we also need to consider a mode for P2PDMA for devices that DO support ATS where we can enable the IOMMU (but in this case EPs without ATS cannot participate as P2PDMA DMA iniators).
+> 
+> Make sense?
+
+Not to me. In the p2pdma code we specifically program DMA engines with
+the PCI bus address. So regardless of whether we are using the IOMMU or
+not, the packets will be forwarded directly to the peer. If the ACS
+Redir bits are on they will be forced back to the RC by the switch and
+the transaction will fail. If we clear the ACS bits, the TLPs will go
+where we want and everything will work (but we lose the isolation of ACS).
+
+For EPs that support ATS, we should (but don't necessarily have to)
+program them with the IOVA address so they can go through the
+translation process which will allow P2P without disabling the ACS Redir
+bits -- provided the ACS direct translation bit is set. (And btw, if it
+is, then we lose the benefit of ACS protecting against malicious EPs).
+But, per above, the ATS transaction should involve only the IOVA address
+so the ACS bits not being set should not break ATS.
+
+Logan
