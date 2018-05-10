@@ -1,53 +1,39 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Fri, 11 May 2018 05:00:49 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "keith.busch@intel.com" <keith.busch@intel.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"loberman@redhat.com" <loberman@redhat.com>,
-	"sagi@grimberg.me" <sagi@grimberg.me>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+Return-Path: <prvs=6616f3864=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "keith.busch@intel.com" <keith.busch@intel.com>, "ming.lei@redhat.com"
+	<ming.lei@redhat.com>
+CC: "hch@lst.de" <hch@lst.de>, "sagi@grimberg.me" <sagi@grimberg.me>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
-	"hch@lst.de" <hch@lst.de>
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"loberman@redhat.com" <loberman@redhat.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>
 Subject: Re: [PATCH V4 1/7] block: introduce blk_quiesce_timeout() and
  blk_unquiesce_timeout()
-Message-ID: <20180510210048.GB3515@ming.t460p>
+Date: Thu, 10 May 2018 15:01:04 +0000
+Message-ID: <4cf98f8d3d763ab3decb5f4bfaee6a4394de5caf.camel@wdc.com>
 References: <20180505135905.18815-1-ming.lei@redhat.com>
- <20180505135905.18815-2-ming.lei@redhat.com>
- <4cf98f8d3d763ab3decb5f4bfaee6a4394de5caf.camel@wdc.com>
+	 <20180505135905.18815-2-ming.lei@redhat.com>
+In-Reply-To: <20180505135905.18815-2-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4cf98f8d3d763ab3decb5f4bfaee6a4394de5caf.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, May 10, 2018 at 03:01:04PM +0000, Bart Van Assche wrote:
-> On Sat, 2018-05-05 at 21:58 +0800, Ming Lei wrote:
-> > Turns out the current way can't drain timout completely because mod_timer()
-> > can be triggered in the work func, which can be just run inside the synced
-> > timeout work:
-> > 
-> >         del_timer_sync(&q->timeout);
-> >         cancel_work_sync(&q->timeout_work);
-> > 
-> > This patch introduces one flag of 'timeout_off' for fixing this issue, turns
-> > out this simple way does work.
-> > 
-> > Also blk_quiesce_timeout() and blk_unquiesce_timeout() are introduced for
-> > draining timeout, which is needed by NVMe.
-> 
-> Hello Ming,
-> 
-> The description of the above patch does not motivate sufficiently why you think
-> that this change is necessary. As you know it is already possible to wait until
-> timeout handling has finished by calling blk_mq_freeze_queue() +
-> blk_mq_unfreeze_queue(). An explanation is needed of why you think that calling
-
-blk_mq_freeze_queue() +  blk_mq_unfreeze_queue() can't work, you have to
-call blk_mq_freeze_queue_wait() between the two, but blk_mq_freeze_queue_wait
-is a big trouble for NVMe, and can't be used inside nvme_dev_disable().
-
-You can find the usage in the last patch of this series.
-
-Thanks,
-Ming
+T24gU2F0LCAyMDE4LTA1LTA1IGF0IDIxOjU4ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gVHVy
+bnMgb3V0IHRoZSBjdXJyZW50IHdheSBjYW4ndCBkcmFpbiB0aW1vdXQgY29tcGxldGVseSBiZWNh
+dXNlIG1vZF90aW1lcigpDQo+IGNhbiBiZSB0cmlnZ2VyZWQgaW4gdGhlIHdvcmsgZnVuYywgd2hp
+Y2ggY2FuIGJlIGp1c3QgcnVuIGluc2lkZSB0aGUgc3luY2VkDQo+IHRpbWVvdXQgd29yazoNCj4g
+DQo+ICAgICAgICAgZGVsX3RpbWVyX3N5bmMoJnEtPnRpbWVvdXQpOw0KPiAgICAgICAgIGNhbmNl
+bF93b3JrX3N5bmMoJnEtPnRpbWVvdXRfd29yayk7DQo+IA0KPiBUaGlzIHBhdGNoIGludHJvZHVj
+ZXMgb25lIGZsYWcgb2YgJ3RpbWVvdXRfb2ZmJyBmb3IgZml4aW5nIHRoaXMgaXNzdWUsIHR1cm5z
+DQo+IG91dCB0aGlzIHNpbXBsZSB3YXkgZG9lcyB3b3JrLg0KPiANCj4gQWxzbyBibGtfcXVpZXNj
+ZV90aW1lb3V0KCkgYW5kIGJsa191bnF1aWVzY2VfdGltZW91dCgpIGFyZSBpbnRyb2R1Y2VkIGZv
+cg0KPiBkcmFpbmluZyB0aW1lb3V0LCB3aGljaCBpcyBuZWVkZWQgYnkgTlZNZS4NCg0KSGVsbG8g
+TWluZywNCg0KVGhlIGRlc2NyaXB0aW9uIG9mIHRoZSBhYm92ZSBwYXRjaCBkb2VzIG5vdCBtb3Rp
+dmF0ZSBzdWZmaWNpZW50bHkgd2h5IHlvdSB0aGluaw0KdGhhdCB0aGlzIGNoYW5nZSBpcyBuZWNl
+c3NhcnkuIEFzIHlvdSBrbm93IGl0IGlzIGFscmVhZHkgcG9zc2libGUgdG8gd2FpdCB1bnRpbA0K
+dGltZW91dCBoYW5kbGluZyBoYXMgZmluaXNoZWQgYnkgY2FsbGluZyBibGtfbXFfZnJlZXplX3F1
+ZXVlKCkgKw0KYmxrX21xX3VuZnJlZXplX3F1ZXVlKCkuIEFuIGV4cGxhbmF0aW9uIGlzIG5lZWRl
+ZCBvZiB3aHkgeW91IHRoaW5rIHRoYXQgY2FsbGluZw0KYmxrX21xX2ZyZWV6ZV9xdWV1ZSgpICsg
+YmxrX21xX3VuZnJlZXplX3F1ZXVlKCkgaXMgbm90IHN1ZmZpY2llbnQgYW5kIHdoeSB5b3UNCmNo
+b3NlIHRoZSBzb2x1dGlvbiBpbXBsZW1lbnRlZCBpbiB0aGlzIHBhdGNoLg0KDQpUaGFua3MsDQoN
+CkJhcnQuDQoNCg0KDQo=
