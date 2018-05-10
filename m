@@ -1,36 +1,66 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Fri, 11 May 2018 08:25:27 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from aserp2120.oracle.com ([141.146.126.78]:51074 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965215AbeEJPIp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 10 May 2018 11:08:45 -0400
+Date: Thu, 10 May 2018 08:08:38 -0700
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-mm@kvack.org
 Subject: Re: [PATCH 10/33] iomap: add an iomap-based bmap implementation
-Message-ID: <20180511062527.GE7962@lst.de>
-References: <20180509074830.16196-1-hch@lst.de> <20180509074830.16196-11-hch@lst.de> <20180509164628.GV11261@magnolia> <20180510064250.GD11422@lst.de> <20180510150838.GE25312@magnolia>
+Message-ID: <20180510150838.GE25312@magnolia>
+References: <20180509074830.16196-1-hch@lst.de>
+ <20180509074830.16196-11-hch@lst.de>
+ <20180509164628.GV11261@magnolia>
+ <20180510064250.GD11422@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180510150838.GE25312@magnolia>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20180510064250.GD11422@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Thu, May 10, 2018 at 08:08:38AM -0700, Darrick J. Wong wrote:
-> > > > +	sector_t *bno = data;
-> > > > +
-> > > > +	if (iomap->type == IOMAP_MAPPED)
-> > > > +		*bno = (iomap->addr + pos - iomap->offset) >> inode->i_blkbits;
-> > > 
-> > > Does this need to be careful w.r.t. overflow on systems where sector_t
-> > > is a 32-bit unsigned long?
-> > > 
-> > > Also, ioctl_fibmap() typecasts the returned sector_t to an int, which
-> > > also seems broken.  I agree the interface needs to die, but ioctls take
-> > > a long time to deprecate.
+On Thu, May 10, 2018 at 08:42:50AM +0200, Christoph Hellwig wrote:
+> On Wed, May 09, 2018 at 09:46:28AM -0700, Darrick J. Wong wrote:
+> > On Wed, May 09, 2018 at 09:48:07AM +0200, Christoph Hellwig wrote:
+> > > This adds a simple iomap-based implementation of the legacy ->bmap
+> > > interface.  Note that we can't easily add checks for rt or reflink
+> > > files, so these will have to remain in the callers.  This interface
+> > > just needs to die..
 > > 
-> > Not much we can do about the interface.
+> > You /can/ check these...
+> > 
+> > if (iomap->bdev != inode->i_sb->s_bdev)
+> > 	return 0;
+> > if (iomap->flags & IOMAP_F_SHARED)
+> > 	return 0;
 > 
-> Yes, the interface is fubar, but if file /foo maps to block 8589934720
-> then do we return the truncated result 128?
+> The latter only checks for a shared extent, not a file with possibly
+> shared extents.  I'd rather keep the check for a file with possible
+> shared extents.
 
-Then we'll get a corrupt result.  What do you think we could do here
-eithere in the old or new code?
+<nod>
+
+> > > +static loff_t
+> > > +iomap_bmap_actor(struct inode *inode, loff_t pos, loff_t length,
+> > > +		void *data, struct iomap *iomap)
+> > > +{
+> > > +	sector_t *bno = data;
+> > > +
+> > > +	if (iomap->type == IOMAP_MAPPED)
+> > > +		*bno = (iomap->addr + pos - iomap->offset) >> inode->i_blkbits;
+> > 
+> > Does this need to be careful w.r.t. overflow on systems where sector_t
+> > is a 32-bit unsigned long?
+> > 
+> > Also, ioctl_fibmap() typecasts the returned sector_t to an int, which
+> > also seems broken.  I agree the interface needs to die, but ioctls take
+> > a long time to deprecate.
+> 
+> Not much we can do about the interface.
+
+Yes, the interface is fubar, but if file /foo maps to block 8589934720
+then do we return the truncated result 128?
+
+--D
