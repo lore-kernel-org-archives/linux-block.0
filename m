@@ -1,89 +1,32 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 14/34] iomap: add an iomap-based bmap implementation
-Date: Fri, 18 May 2018 18:48:10 +0200
-Message-Id: <20180518164830.1552-15-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 6/9] sbitmap: warn if using smaller shallow depth than was
+ setup
+To: Omar Sandoval <osandov@osandov.com>
+Cc: linux-block@vger.kernel.org, osandov@fb.com, efault@gmx.de,
+ paolo.valente@linaro.org
+References: <1525969467-12476-1-git-send-email-axboe@kernel.dk>
+ <1525969467-12476-7-git-send-email-axboe@kernel.dk>
+ <20180510170232.GF30485@vader>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <8b7b8022-13d3-c96a-22ab-04382d63a4b4@kernel.dk>
+Date: Thu, 10 May 2018 11:09:15 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180510170232.GF30485@vader>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This adds a simple iomap-based implementation of the legacy ->bmap
-interface.  Note that we can't easily add checks for rt or reflink
-files, so these will have to remain in the callers.  This interface
-just needs to die..
+On 5/10/18 11:02 AM, Omar Sandoval wrote:
+> On Thu, May 10, 2018 at 10:24:24AM -0600, Jens Axboe wrote:
+>> From: Omar Sandoval <osandov@fb.com>
+>>
+>> Make sure the user passed the right value to
+>> sbitmap_queue_min_shallow_depth().
+> 
+> An unlucky bisect that lands between this change and the BFQ/Kyber
+> changes is going to trigger this warning. We should have it after the
+> BFQ/Kyber changes.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/iomap.c            | 34 ++++++++++++++++++++++++++++++++++
- include/linux/iomap.h |  3 +++
- 2 files changed, 37 insertions(+)
+Good point, I'll move it after the kyber/bfq change.
 
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 44259eadb69d..7c1b071d115c 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -1419,3 +1419,37 @@ int iomap_swapfile_activate(struct swap_info_struct *sis,
- }
- EXPORT_SYMBOL_GPL(iomap_swapfile_activate);
- #endif /* CONFIG_SWAP */
-+
-+static loff_t
-+iomap_bmap_actor(struct inode *inode, loff_t pos, loff_t length,
-+		void *data, struct iomap *iomap)
-+{
-+	sector_t *bno = data, addr;
-+
-+	if (iomap->type == IOMAP_MAPPED) {
-+		addr = (pos - iomap->offset + iomap->addr) >> inode->i_blkbits;
-+		if (addr > INT_MAX)
-+			WARN(1, "would truncate bmap result\n");
-+		else
-+			*bno = addr;
-+	}
-+	return 0;
-+}
-+
-+/* legacy ->bmap interface.  0 is the error return (!) */
-+sector_t
-+iomap_bmap(struct address_space *mapping, sector_t bno,
-+		const struct iomap_ops *ops)
-+{
-+	struct inode *inode = mapping->host;
-+	loff_t pos = bno >> inode->i_blkbits;
-+	unsigned blocksize = i_blocksize(inode);
-+
-+	if (filemap_write_and_wait(mapping))
-+		return 0;
-+
-+	bno = 0;
-+	iomap_apply(inode, pos, blocksize, 0, ops, &bno, iomap_bmap_actor);
-+	return bno;
-+}
-+EXPORT_SYMBOL_GPL(iomap_bmap);
-diff --git a/include/linux/iomap.h b/include/linux/iomap.h
-index 819e0cd2a950..a044a824da85 100644
---- a/include/linux/iomap.h
-+++ b/include/linux/iomap.h
-@@ -4,6 +4,7 @@
- 
- #include <linux/types.h>
- 
-+struct address_space;
- struct fiemap_extent_info;
- struct inode;
- struct iov_iter;
-@@ -100,6 +101,8 @@ loff_t iomap_seek_hole(struct inode *inode, loff_t offset,
- 		const struct iomap_ops *ops);
- loff_t iomap_seek_data(struct inode *inode, loff_t offset,
- 		const struct iomap_ops *ops);
-+sector_t iomap_bmap(struct address_space *mapping, sector_t bno,
-+		const struct iomap_ops *ops);
- 
- /*
-  * Flags for direct I/O ->end_io:
 -- 
-2.17.0
+Jens Axboe
