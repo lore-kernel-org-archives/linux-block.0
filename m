@@ -1,41 +1,24 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
+Return-Path: <prvs=6616f3864=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "paolo.valente@linaro.org" <paolo.valente@linaro.org>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
+CC: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"broonie@kernel.org" <broonie@kernel.org>, "linus.walleij@linaro.org"
+	<linus.walleij@linaro.org>, "bfq-iosched@googlegroups.com"
+	<bfq-iosched@googlegroups.com>, "oleksandr@natalenko.name"
+	<oleksandr@natalenko.name>
 Subject: Re: [PATCH BUGFIX] block, bfq: postpone rq preparation to insert or
  merge
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <d534de4765c0fbcc7bcd858c1d2f40391ece19ac.camel@wdc.com>
-Date: Mon, 14 May 2018 19:16:54 +0200
-Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
- "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "broonie@kernel.org" <broonie@kernel.org>,
- "linus.walleij@linaro.org" <linus.walleij@linaro.org>,
- "bfq-iosched@googlegroups.com" <bfq-iosched@googlegroups.com>,
- "oleksandr@natalenko.name" <oleksandr@natalenko.name>
-Message-Id: <8B9DC3A2-0DB0-4EEB-AFB2-C4D6560B7A4A@linaro.org>
+Date: Thu, 10 May 2018 16:14:50 +0000
+Message-ID: <d534de4765c0fbcc7bcd858c1d2f40391ece19ac.camel@wdc.com>
 References: <20180504171701.6876-1-paolo.valente@linaro.org>
- <d534de4765c0fbcc7bcd858c1d2f40391ece19ac.camel@wdc.com>
-To: Bart Van Assche <bart.vanassche@wdc.com>
+In-Reply-To: <20180504171701.6876-1-paolo.valente@linaro.org>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-
-
-> Il giorno 10 mag 2018, alle ore 18:14, Bart Van Assche =
-<bart.vanassche@wdc.com> ha scritto:
->=20
-> On Fri, 2018-05-04 at 19:17 +0200, Paolo Valente wrote:
->> When invoked for an I/O request rq, [ ... ]
->=20
-> Tested-by: Bart Van Assche <bart.vanassche@wdc.com>
->=20
->=20
->=20
-
-Any decision for this fix, Jens?
-
-Thanks,
-Paolo=
+T24gRnJpLCAyMDE4LTA1LTA0IGF0IDE5OjE3ICswMjAwLCBQYW9sbyBWYWxlbnRlIHdyb3RlOg0K
+PiBXaGVuIGludm9rZWQgZm9yIGFuIEkvTyByZXF1ZXN0IHJxLCBbIC4uLiBdDQoNClRlc3RlZC1i
+eTogQmFydCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2NoZUB3ZGMuY29tPg0KDQoNCg0K
