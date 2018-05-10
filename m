@@ -1,96 +1,132 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	James Smart <james.smart@broadcom.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V5 8/9] nvme: core: introduce nvme_force_change_ctrl_state()
-Date: Fri, 11 May 2018 20:29:32 +0800
-Message-Id: <20180511122933.27155-9-ming.lei@redhat.com>
-In-Reply-To: <20180511122933.27155-1-ming.lei@redhat.com>
-References: <20180511122933.27155-1-ming.lei@redhat.com>
+Return-Path: <udknight@gmail.com>
+Return-Path: <udknight@gmail.com>
+Date: Thu, 10 May 2018 11:06:37 +0800
+From: Wang YanQing <udknight@gmail.com>
+To: axboe@kernel.dk
+Cc: gregkh@linuxfoundation.org, pombredanne@nexb.com, tglx@linutronix.de,
+        caizhiyong@hisilicon.com, rdunlap@infradead.org,
+        jiangheng@hisilicon.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v5] block: add verifier for cmdline partition
+Message-ID: <20180510030637.GA25734@udknight>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-block@vger.kernel.org>
 
-When controller is being reset, timeout still may be triggered,
-for handling this situation, the contoller state has to be
-changed to NVME_CTRL_RESETTING first.
+I meet strange filesystem corruption issue recently, the reason
+is there are overlaps partitions in cmdline partition argument.
 
-So introduce nvme_force_change_ctrl_state() for this purpose.
+This patch add verifier for cmdline partition, then if there are
+overlaps partitions, cmdline_partition will log a warning. We don't
+treat overlaps partition as a error:
+"
+Caizhiyong <caizhiyong@hisilicon.com> said:
+Partition overlap was intentionally designed in this cmdline partition.
+reference http://lists.infradead.org/pipermail/linux-mtd/2013-August/048092.html
+"
 
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Wang YanQing <udknight@gmail.com>
 ---
- drivers/nvme/host/core.c | 33 +++++++++++++++++++++++++++++++++
- drivers/nvme/host/nvme.h |  2 ++
- 2 files changed, 35 insertions(+)
+ Changes
+ v4-v5:
+ 1:Delete unnecessary blank line at begin and end of logs.
+ 2:Delete newline character in log, pr_* will add newline
+   automatically.
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index adb1743e87f7..af053309c610 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -254,6 +254,39 @@ void nvme_cancel_request(struct request *req, void *data, bool reserved)
+ v3-v4:
+ 1:Fix grammar typo, reported by Randy Dunlap.
+ 2:Delete unnecessary type casting, reported by Caizhiyong.
+ 3:Record the reason why we can't treat overlapping partitions
+   as errors into changelog.
+
+ v2-v3:
+ 1:Fix log one pair of overlaps partitions twice in cmdline_parts_verifier.
+ 2:Fix out of bound access in cmdline_parts_verifier.
+
+ v1-v2:
+ 1:Don't treat overlaps partition as a error, but log a warning.
+
+ Hi! Jens Axboe
+
+ What is your suggestion?
+
+ block/partitions/cmdline.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
+
+diff --git a/block/partitions/cmdline.c b/block/partitions/cmdline.c
+index e333583..60fb3df 100644
+--- a/block/partitions/cmdline.c
++++ b/block/partitions/cmdline.c
+@@ -58,6 +58,62 @@ static int __init cmdline_parts_setup(char *s)
  }
- EXPORT_SYMBOL_GPL(nvme_cancel_request);
+ __setup("blkdevparts=", cmdline_parts_setup);
  
-+/* should only be used by EH for handling error during reset */
-+void nvme_force_change_ctrl_state(struct nvme_ctrl *ctrl,
-+		enum nvme_ctrl_state new_state)
++static bool has_overlaps(sector_t from, sector_t size,
++			 sector_t from2, sector_t size2)
 +{
-+	enum nvme_ctrl_state old_state;
-+	unsigned long flags;
-+	bool warn = true;
++	sector_t end = from + size;
++	sector_t end2 = from2 + size2;
 +
-+	spin_lock_irqsave(&ctrl->lock, flags);
-+	old_state = ctrl->state;
-+	switch (new_state) {
-+	case NVME_CTRL_RESETTING:
-+		switch (old_state) {
-+		case NVME_CTRL_LIVE:
-+		case NVME_CTRL_ADMIN_ONLY:
-+		case NVME_CTRL_RESETTING:
-+		case NVME_CTRL_CONNECTING:
-+			warn = false;
-+			break;
-+		default:
-+			break;
-+		}
-+	default:
-+		break;
-+	}
-+	if (warn)
-+		WARN(1, "Make sure you want to change to %d from %d\n",
-+				new_state, old_state);
-+	ctrl->state = new_state;
-+	spin_unlock_irqrestore(&ctrl->lock, flags);
++	if (from >= from2 && from < end2)
++		return true;
++
++	if (end > from2 && end <= end2)
++		return true;
++
++	if (from2 >= from && from2 < end)
++		return true;
++
++	if (end2 > from && end2 <= end)
++		return true;
++
++	return false;
 +}
-+EXPORT_SYMBOL_GPL(nvme_force_change_ctrl_state);
 +
- bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
- 		enum nvme_ctrl_state new_state)
- {
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 021f7147f779..2a68df197c71 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -385,6 +385,8 @@ void nvme_complete_rq(struct request *req);
- void nvme_cancel_request(struct request *req, void *data, bool reserved);
- bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
- 		enum nvme_ctrl_state new_state);
-+void nvme_force_change_ctrl_state(struct nvme_ctrl *ctrl,
-+		enum nvme_ctrl_state new_state);
- int nvme_disable_ctrl(struct nvme_ctrl *ctrl, u64 cap);
- int nvme_enable_ctrl(struct nvme_ctrl *ctrl, u64 cap);
- int nvme_shutdown_ctrl(struct nvme_ctrl *ctrl);
++static inline void overlaps_warns_header(void)
++{
++	pr_warn("Overlapping partitions are used in command line partitions.");
++	pr_warn("Don't use filesystems on overlapping partitions:");
++}
++
++static void cmdline_parts_verifier(int slot, struct parsed_partitions *state)
++{
++	int i;
++	bool header = true;
++
++	for (; slot < state->limit && state->parts[slot].has_info; slot++) {
++		for (i = slot+1; i < state->limit && state->parts[i].has_info;
++		     i++) {
++			if (has_overlaps(state->parts[slot].from,
++					 state->parts[slot].size,
++					 state->parts[i].from,
++					 state->parts[i].size)) {
++				if (header) {
++					header = false;
++					overlaps_warns_header();
++				}
++				pr_warn("%s[%llu,%llu] overlaps with "
++					"%s[%llu,%llu].",
++					state->parts[slot].info.volname,
++					(u64)state->parts[slot].from << 9,
++					(u64)state->parts[slot].size << 9,
++					state->parts[i].info.volname,
++					(u64)state->parts[i].from << 9,
++					(u64)state->parts[i].size << 9);
++			}
++		}
++	}
++}
++
+ /*
+  * Purpose: allocate cmdline partitions.
+  * Returns:
+@@ -93,6 +149,7 @@ int cmdline_partition(struct parsed_partitions *state)
+ 	disk_size = get_capacity(state->bdev->bd_disk) << 9;
+ 
+ 	cmdline_parts_set(parts, disk_size, 1, add_part, (void *)state);
++	cmdline_parts_verifier(1, state);
+ 
+ 	strlcat(state->pp_buf, "\n", PAGE_SIZE);
+ 
 -- 
-2.9.5
+1.8.5.6.2.g3d8a54e.dirty
