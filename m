@@ -1,51 +1,86 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH 3/6] bcache: count backing device I/O error for writeback I/O
-Date: Wed,  2 May 2018 22:46:56 +0800
-Message-Id: <20180502144659.118628-4-colyli@suse.de>
-In-Reply-To: <20180502144659.118628-1-colyli@suse.de>
-References: <20180502144659.118628-1-colyli@suse.de>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Cc: osandov@fb.com,
+	efault@gmx.de,
+	paolo.valente@linaro.org,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 9/9] sbitmap: fix race in wait batch accounting
+Date: Thu, 10 May 2018 10:24:27 -0600
+Message-Id: <1525969467-12476-10-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1525969467-12476-1-git-send-email-axboe@kernel.dk>
+References: <1525969467-12476-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Commit c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev")
-counts backing device I/O requets and set dc->io_disable to true if error
-counters exceeds dc->io_error_limit. But it only counts I/O errors for
-regular I/O request, neglects errors of write back I/Os when backing device
-is offline.
+If we have multiple callers of sbq_wake_up(), we can end up in a
+situation where the wait_cnt will continually go more and more
+negative. Consider the case where our wake batch is 1, hence
+wait_cnt will start out as 1.
 
-This patch counts the errors of writeback I/Os, in dirty_endio() if
-bio->bi_status is  not 0, it means error happens when writing dirty keys
-to backing device, then bch_count_backing_io_errors() is called.
+wait_cnt == 1
 
-By this fix, even there is no reqular I/O request coming, if writeback I/O
-errors exceed dc->io_error_limit, the bcache device may still be stopped
-for the broken backing device.
+CPU0				CPU1
+atomic_dec_return(), cnt == 0
+				atomic_dec_return(), cnt == -1
+				cmpxchg(-1, 0) (succeeds)
+				[wait_cnt now 0]
+cmpxchg(0, 1) (fails)
 
-Fixes: c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev")
-Signed-off-by: Coly Li <colyli@suse.de>
+This ends up with wait_cnt being 0, we'll wakeup immediately
+next time. Going through the same loop as above again, and
+we'll have wait_cnt -1.
+
+For the case where we have a larger wake batch, the only
+difference is that the starting point will be higher. We'll
+still end up with continually smaller batch wakeups, which
+defeats the purpose of the rolling wakeups.
+
+Always reset the wait_cnt to the batch value. Then it doesn't
+matter who wins the race. But ensure that whomever does win
+the race is the one that increments the ws index as well.
+
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/md/bcache/writeback.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ lib/sbitmap.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 4a9547cdcdc5..ad45ebe1a74b 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -244,8 +244,10 @@ static void dirty_endio(struct bio *bio)
- 	struct keybuf_key *w = bio->bi_private;
- 	struct dirty_io *io = w->private;
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index 8f0950fbaa5c..ffc36e695f50 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -478,22 +478,26 @@ static void sbq_wake_up(struct sbitmap_queue *sbq)
  
--	if (bio->bi_status)
-+	if (bio->bi_status) {
- 		SET_KEY_DIRTY(&w->key, false);
-+		bch_count_backing_io_errors(io->dc, bio);
-+	}
- 
- 	closure_put(&io->cl);
+ 	wait_cnt = atomic_dec_return(&ws->wait_cnt);
+ 	if (wait_cnt <= 0) {
++		int ret;
++
+ 		wake_batch = READ_ONCE(sbq->wake_batch);
++
+ 		/*
+ 		 * Pairs with the memory barrier in sbitmap_queue_resize() to
+ 		 * ensure that we see the batch size update before the wait
+ 		 * count is reset.
+ 		 */
+ 		smp_mb__before_atomic();
++
+ 		/*
+-		 * If there are concurrent callers to sbq_wake_up(), the last
+-		 * one to decrement the wait count below zero will bump it back
+-		 * up. If there is a concurrent resize, the count reset will
+-		 * either cause the cmpxchg to fail or overwrite after the
+-		 * cmpxchg.
++		 * For concurrent callers (either resize, or just multiple
++		 * concurrent wakeups of waiters), the one that wins the
++		 * cmpxchg() race increments the waiter index.
+ 		 */
+-		atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wait_cnt + wake_batch);
+-		sbq_index_atomic_inc(&sbq->wake_index);
++		ret = atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wake_batch);
++		if (ret == wait_cnt)
++			sbq_index_atomic_inc(&sbq->wake_index);
++
+ 		wake_up_nr(&ws->wait, wake_batch);
+ 	}
  }
 -- 
-2.16.3
+2.7.4
