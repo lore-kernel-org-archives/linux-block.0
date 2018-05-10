@@ -1,32 +1,98 @@
-Return-Path: <tom.leiming@gmail.com>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Thu, 10 May 2018 10:00:26 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, osandov@fb.com, efault@gmx.de,
+	paolo.valente@linaro.org
+Subject: Re: [PATCH 4/9] bfq-iosched: remove unused variable
+Message-ID: <20180510170026.GD30485@vader>
+References: <1525969467-12476-1-git-send-email-axboe@kernel.dk>
+ <1525969467-12476-5-git-send-email-axboe@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <CAJrWOzBYNBzGuStrqjzLirUxhC1K02PE9kPdY+GuJF6ynRBZgA@mail.gmail.com>
-References: <1453803006-12812-1-git-send-email-roman.penyaev@profitbricks.com> <CAJrWOzBYNBzGuStrqjzLirUxhC1K02PE9kPdY+GuJF6ynRBZgA@mail.gmail.com>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Thu, 10 May 2018 08:51:54 +0800
-Message-ID: <CACVXFVO51Un=nGZCfyUN_SKG11O7+LR4paSkS8QMFsqBL9UewQ@mail.gmail.com>
-Subject: Re: [PATCH 1/1] block: fix race between opening blkext device and
- freeing it
-To: Roman Penyaev <roman.penyaev@profitbricks.com>
-Cc: Keith Busch <keith.busch@intel.com>, stable <stable@kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>,
-	Jens Axboe <axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1525969467-12476-5-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Feb 2, 2016 at 12:29 AM, Roman Penyaev
-<roman.penyaev@profitbricks.com> wrote:
-> Hello, Jens.
->
-> Could you please take a look at this patch.
-> This issue happens quite often on our servers, when udevd
-> tries to get detailed info about md raid starting mdadm,
-> but this raid device is already in closing state and is
-> about to free internal structures, afterwards an oops
-> happens and mdadm gets killed.
+On Thu, May 10, 2018 at 10:24:22AM -0600, Jens Axboe wrote:
+> bfqd->sb_shift was attempted used as a cache for the sbitmap queue
+> shift, but we don't need it, as it never changes. Kill it with fire.
+> 
+> Acked-by: Paolo Valente <paolo.valente@linaro.org>
 
-Looks the issue is still there, so could we consider Roman's approach
-for this issue?
+Reviewed-by: Omar Sandoval <osandov@fb.com>
 
-Thanks,
-Ming Lei
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  block/bfq-iosched.c | 16 +++++++---------
+>  block/bfq-iosched.h |  6 ------
+>  2 files changed, 7 insertions(+), 15 deletions(-)
+> 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 0cd8aa80c32d..10294124d597 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -5085,26 +5085,24 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
+>   */
+>  static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
+>  {
+> -	bfqd->sb_shift = bt->sb.shift;
+> -
+>  	/*
+>  	 * In-word depths if no bfq_queue is being weight-raised:
+>  	 * leaving 25% of tags only for sync reads.
+>  	 *
+>  	 * In next formulas, right-shift the value
+> -	 * (1U<<bfqd->sb_shift), instead of computing directly
+> -	 * (1U<<(bfqd->sb_shift - something)), to be robust against
+> -	 * any possible value of bfqd->sb_shift, without having to
+> +	 * (1U<<bt->sb.shift), instead of computing directly
+> +	 * (1U<<(bt->sb.shift - something)), to be robust against
+> +	 * any possible value of bt->sb.shift, without having to
+>  	 * limit 'something'.
+>  	 */
+>  	/* no more than 50% of tags for async I/O */
+> -	bfqd->word_depths[0][0] = max((1U<<bfqd->sb_shift)>>1, 1U);
+> +	bfqd->word_depths[0][0] = max((1U << bt->sb.shift) >> 1, 1U);
+>  	/*
+>  	 * no more than 75% of tags for sync writes (25% extra tags
+>  	 * w.r.t. async I/O, to prevent async I/O from starving sync
+>  	 * writes)
+>  	 */
+> -	bfqd->word_depths[0][1] = max(((1U<<bfqd->sb_shift) * 3)>>2, 1U);
+> +	bfqd->word_depths[0][1] = max(((1U << bt->sb.shift) * 3) >> 2, 1U);
+>  
+>  	/*
+>  	 * In-word depths in case some bfq_queue is being weight-
+> @@ -5114,9 +5112,9 @@ static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
+>  	 * shortage.
+>  	 */
+>  	/* no more than ~18% of tags for async I/O */
+> -	bfqd->word_depths[1][0] = max(((1U<<bfqd->sb_shift) * 3)>>4, 1U);
+> +	bfqd->word_depths[1][0] = max(((1U << bt->sb.shift) * 3) >> 4, 1U);
+>  	/* no more than ~37% of tags for sync writes (~20% extra tags) */
+> -	bfqd->word_depths[1][1] = max(((1U<<bfqd->sb_shift) * 6)>>4, 1U);
+> +	bfqd->word_depths[1][1] = max(((1U << bt->sb.shift) * 6) >> 4, 1U);
+>  }
+>  
+>  static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
+> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+> index 8ec7ff92cd6f..faac509cb35e 100644
+> --- a/block/bfq-iosched.h
+> +++ b/block/bfq-iosched.h
+> @@ -636,12 +636,6 @@ struct bfq_data {
+>  	struct bfq_queue *bio_bfqq;
+>  
+>  	/*
+> -	 * Cached sbitmap shift, used to compute depth limits in
+> -	 * bfq_update_depths.
+> -	 */
+> -	unsigned int sb_shift;
+> -
+> -	/*
+>  	 * Depth limits used in bfq_limit_depth (see comments on the
+>  	 * function)
+>  	 */
+> -- 
+> 2.7.4
+> 
