@@ -1,31 +1,49 @@
 Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCHSET v2 0/7] blk-mq-sched and sbitmap shallow depth
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: linux-block <linux-block@vger.kernel.org>, Omar Sandoval
+ <osandov@fb.com>, Mike Galbraith <efault@gmx.de>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ Linus Walleij <linus.walleij@linaro.org>, Mark Brown <broonie@kernel.org>
+References: <1525898967-13425-1-git-send-email-axboe@kernel.dk>
+ <BB4243FC-1AC7-4200-86D4-CC088F38A4DA@linaro.org>
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: osandov@fb.com,
-	efault@gmx.de,
-	paolo.valente@linaro.org
-Subject: [PATCHSET v3 0/9] blk-mq-sched and sbitmap shallow depth
-Date: Thu, 10 May 2018 10:24:18 -0600
-Message-Id: <1525969467-12476-1-git-send-email-axboe@kernel.dk>
+Message-ID: <ef70237b-f72b-9cf4-f6d1-c2a65c3ebf97@kernel.dk>
+Date: Thu, 10 May 2018 10:20:26 -0600
+MIME-Version: 1.0
+In-Reply-To: <BB4243FC-1AC7-4200-86D4-CC088F38A4DA@linaro.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Found another issue in sbitmap around our wake batch accounting.
-See the last patch for details.
+On 5/9/18 10:32 PM, Paolo Valente wrote:
+> 
+> 
+>> Il giorno 09 mag 2018, alle ore 22:49, Jens Axboe <axboe@kernel.dk> ha scritto:
+>>
+>> Omar had some valid complaints about the previous patchset, mostly
+>> around the fact that we should not be updating depths on a per-IO
+>> basis.  He's right. In fact, BFQ oddly enough does it from the
+>> ->limit_depth hook, but the shallow depth counts remain static.
+>>
+>> This series cleans that up the ->limit_depth() handling, and keeps it
+>> out of the hot path.
+>>
+>> Mike, this should (still) fix your hangs with BFQ. This series is
+>> (functionally) identical to the bundled up version I sent you earlier.
+>>
+> 
+> Only one question/curiosity: is performance unaffected by the lowering of
+> the wake batch counts?
 
-This series passes my testing. The sbitmap change was improved
-by Omar, I swapped in his patch instead.
+It's hard to discuss performance within the realm of "it hangs without
+it", there's just no way around this. That said, We still have the
+rolling waitqueues (default is 8) which also helps in reducing the
+overhead on both wakeups and adding to wait queues. So we should still
+be quite fine.
 
-You can also find this series here:
-
-http://git.kernel.dk/cgit/linux-block/log/?h=for-4.18/iosched
-
- block/bfq-iosched.c     |  113 +++++++++++++++++++++++++-----------------------
- block/bfq-iosched.h     |    6 --
- block/blk-mq.c          |    6 +-
- block/kyber-iosched.c   |    3 +
- include/linux/sbitmap.h |   29 ++++++++++++
- lib/sbitmap.c           |   69 ++++++++++++++++++++++-------
- 6 files changed, 148 insertions(+), 78 deletions(-)
+As it so happens, there's another bug in wake batch accounting in
+sbitmap, which would have defeated much of the win over time anyway. New
+series coming with that extra patch.
 
 -- 
 Jens Axboe
