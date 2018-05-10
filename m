@@ -1,91 +1,39 @@
 Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 5/9] sbitmap: fix missed wakeups caused by
+ sbitmap_queue_get_shallow()
+To: Omar Sandoval <osandov@osandov.com>
+Cc: linux-block@vger.kernel.org, osandov@fb.com, efault@gmx.de,
+ paolo.valente@linaro.org
+References: <1525969467-12476-1-git-send-email-axboe@kernel.dk>
+ <1525969467-12476-6-git-send-email-axboe@kernel.dk>
+ <20180510170110.GE30485@vader>
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: osandov@fb.com,
-	efault@gmx.de,
-	paolo.valente@linaro.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 1/3] sbitmap: add helper to inform the core about shallow depth limiting
-Date: Wed,  9 May 2018 09:36:02 -0600
-Message-Id: <1525880164-11943-2-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1525880164-11943-1-git-send-email-axboe@kernel.dk>
-References: <1525880164-11943-1-git-send-email-axboe@kernel.dk>
+Message-ID: <d7ade6ae-5066-3106-4a26-619beb2563e6@kernel.dk>
+Date: Thu, 10 May 2018 11:09:27 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180510170110.GE30485@vader>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-If a user of sbitmap limits the shallow depth on his own, then
-we need to inform the lower layers. Otherwise we can run into
-a situation where the user has limited the depth to something
-smaller than our wake batch count, which can cause hangs.
+On 5/10/18 11:01 AM, Omar Sandoval wrote:
+> On Thu, May 10, 2018 at 10:24:23AM -0600, Jens Axboe wrote:
+>> From: Omar Sandoval <osandov@fb.com>
+>>
+>> The sbitmap queue wake batch is calculated such that once allocations
+>> start blocking, all of the bits which are already allocated must be
+>> enough to fulfill the batch counters of all of the waitqueues. However,
+>> the shallow allocation depth can break this invariant, since we block
+>> before our full depth is being utilized. Add
+>> sbitmap_queue_min_shallow_depth(), which saves the minimum shallow depth
+>> the sbq will use, and update sbq_calc_wake_batch() to take it into
+>> account.
+>>
+>> Acked-by: Paolo Valente <paolo.valente@linaro.org>
+>> Signed-off-by: Omar Sandoval <osandov@fb.com>
+> 
+> Reviewed -- haha, wait, thanks for picking this one up :)
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- include/linux/sbitmap.h | 11 +++++++++++
- lib/sbitmap.c           | 17 ++++++++++++++++-
- 2 files changed, 27 insertions(+), 1 deletion(-)
+Just checking if you're awake!
 
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index 841585f6e5f2..99059789f45f 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -164,6 +164,17 @@ static inline void sbitmap_free(struct sbitmap *sb)
- void sbitmap_resize(struct sbitmap *sb, unsigned int depth);
- 
- /**
-+ * sbitmap_queue_shallow_depth() - Inform sbitmap about shallow depth changes
-+ * @sbq: Bitmap queue in question
-+ * @depth: Shallow depth limit
-+ *
-+ * Due to how sbitmap does batched wakes, if a user of sbitmap updates the
-+ * shallow depth, then we might need to update our batched wake counts.
-+ *
-+ */
-+void sbitmap_queue_shallow_depth(struct sbitmap_queue *sbq, unsigned int depth);
-+
-+/**
-  * sbitmap_get() - Try to allocate a free bit from a &struct sbitmap.
-  * @sb: Bitmap to allocate from.
-  * @alloc_hint: Hint for where to start searching for a free bit.
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index e6a9c06ec70c..563ae9d75fb8 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -327,7 +327,8 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
- }
- EXPORT_SYMBOL_GPL(sbitmap_queue_init_node);
- 
--void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
-+static void sbitmap_queue_update_batch_wake(struct sbitmap_queue *sbq,
-+					    unsigned int depth)
- {
- 	unsigned int wake_batch = sbq_calc_wake_batch(depth);
- 	int i;
-@@ -342,6 +343,11 @@ void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
- 		for (i = 0; i < SBQ_WAIT_QUEUES; i++)
- 			atomic_set(&sbq->ws[i].wait_cnt, 1);
- 	}
-+}
-+
-+void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
-+{
-+	sbitmap_queue_update_batch_wake(sbq, depth);
- 	sbitmap_resize(&sbq->sb, depth);
- }
- EXPORT_SYMBOL_GPL(sbitmap_queue_resize);
-@@ -403,6 +409,15 @@ int __sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
- }
- EXPORT_SYMBOL_GPL(__sbitmap_queue_get_shallow);
- 
-+/*
-+ * User has limited the shallow depth to 'depth', update batch wake counts
-+ */
-+void sbitmap_queue_shallow_depth(struct sbitmap_queue *sbq, unsigned int depth)
-+{
-+	sbitmap_queue_update_batch_wake(sbq, depth);
-+}
-+EXPORT_SYMBOL_GPL(sbitmap_queue_shallow_depth);
-+
- static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
- {
- 	int i, wake_index;
 -- 
-2.7.4
+Jens Axboe
