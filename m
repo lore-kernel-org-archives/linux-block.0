@@ -1,52 +1,32 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:50018 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752339AbeERQt0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 May 2018 12:49:26 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 18/34] xfs: use iomap for blocksize == PAGE_SIZE readpage and readpages
-Date: Fri, 18 May 2018 18:48:14 +0200
-Message-Id: <20180518164830.1552-19-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <tom.leiming@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAJrWOzBYNBzGuStrqjzLirUxhC1K02PE9kPdY+GuJF6ynRBZgA@mail.gmail.com>
+References: <1453803006-12812-1-git-send-email-roman.penyaev@profitbricks.com> <CAJrWOzBYNBzGuStrqjzLirUxhC1K02PE9kPdY+GuJF6ynRBZgA@mail.gmail.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Thu, 10 May 2018 08:51:54 +0800
+Message-ID: <CACVXFVO51Un=nGZCfyUN_SKG11O7+LR4paSkS8QMFsqBL9UewQ@mail.gmail.com>
+Subject: Re: [PATCH 1/1] block: fix race between opening blkext device and
+ freeing it
+To: Roman Penyaev <roman.penyaev@profitbricks.com>
+Cc: Keith Busch <keith.busch@intel.com>, stable <stable@kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>,
+	Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
+List-ID: <linux-block@vger.kernel.org>
 
-For file systems with a block size that equals the page size we never do
-partial reads, so we can use the buffer_head-less iomap versions of
-readpage and readpages without conflicting with the buffer_head structures
-create later in write_begin.
+On Tue, Feb 2, 2016 at 12:29 AM, Roman Penyaev
+<roman.penyaev@profitbricks.com> wrote:
+> Hello, Jens.
+>
+> Could you please take a look at this patch.
+> This issue happens quite often on our servers, when udevd
+> tries to get detailed info about md raid starting mdadm,
+> but this raid device is already in closing state and is
+> about to free internal structures, afterwards an oops
+> happens and mdadm gets killed.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/xfs_aops.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Looks the issue is still there, so could we consider Roman's approach
+for this issue?
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 56e405572909..c631c457b444 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -1402,6 +1402,8 @@ xfs_vm_readpage(
- 	struct page		*page)
- {
- 	trace_xfs_vm_readpage(page->mapping->host, 1);
-+	if (i_blocksize(page->mapping->host) == PAGE_SIZE)
-+		return iomap_readpage(page, &xfs_iomap_ops);
- 	return mpage_readpage(page, xfs_get_blocks);
- }
- 
-@@ -1413,6 +1415,8 @@ xfs_vm_readpages(
- 	unsigned		nr_pages)
- {
- 	trace_xfs_vm_readpages(mapping->host, nr_pages);
-+	if (i_blocksize(mapping->host) == PAGE_SIZE)
-+		return iomap_readpages(mapping, pages, nr_pages, &xfs_iomap_ops);
- 	return mpage_readpages(mapping, pages, nr_pages, xfs_get_blocks);
- }
- 
--- 
-2.17.0
+Thanks,
+Ming Lei
