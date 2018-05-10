@@ -1,112 +1,93 @@
-Return-Path: <Christian.Koenig@amd.com>
+Return-Path: <jglisse@redhat.com>
+Date: Thu, 10 May 2018 15:24:54 -0400
+From: Jerome Glisse <jglisse@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Stephen Bates <sbates@raithlin.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Bjorn Helgaas <helgaas@kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Subject: Re: [PATCH v4 04/14] PCI/P2PDMA: Clear ACS P2P flags for all devices
  behind switches
-To: Logan Gunthorpe <logang@deltatee.com>, Stephen Bates
- <sbates@raithlin.com>, Jerome Glisse <jglisse@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
- Bjorn Helgaas <helgaas@kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
- Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
- Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>,
- Max Gurtovoy <maxg@mellanox.com>, Dan Williams <dan.j.williams@intel.com>,
- Benjamin Herrenschmidt <benh@kernel.crashing.org>
-References: <20180423233046.21476-5-logang@deltatee.com>
- <20180507231306.GG161390@bhelgaas-glaptop.roam.corp.google.com>
- <e58e8d27-42a5-ca69-3b68-c409a2922cd1@amd.com>
- <0b4183ef-e720-204b-9e85-b9eaf7a4136a@deltatee.com>
- <a943a92d-15cd-fb2d-21c3-5e5cfccd9eff@amd.com>
- <3584a6ac-95c7-5d23-1859-aee30605776e@deltatee.com>
- <20180508133407.57a46902@w520.home>
- <5fc9b1c1-9208-06cc-0ec5-1f54c2520494@deltatee.com>
- <20180508141331.7cd737cb@w520.home>
- <d70cf286-f7b7-99a5-1042-022506298fed@deltatee.com>
+Message-ID: <20180510192454.GC3652@redhat.com>
+References: <d70cf286-f7b7-99a5-1042-022506298fed@deltatee.com>
  <20180508205005.GC15608@redhat.com>
  <7FFB9603-DF9F-4441-82E9-46037CB6C0DE@raithlin.com>
  <a1a36f88-fbfb-b5ee-6dcb-5c5bb96132dd@amd.com>
  <4e0d0b96-ab02-2662-adf3-fa956efd294c@deltatee.com>
  <2fc61d29-9eb4-d168-a3e5-955c36e5d821@amd.com>
  <94C8FE12-7FC3-48BD-9DCA-E6A427E71810@raithlin.com>
- <f0101988-cf82-7ffb-2aca-d3b8d2f4b504@deltatee.com>
- <868B49CE-4F0E-4A48-BE78-12149F85F1A4@raithlin.com>
- <8113cba8-62b9-1801-7a77-f82be223b183@deltatee.com>
-From: =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>
-Message-ID: <cf2b92c9-7c5b-f19c-b5b1-2f2d435296d1@amd.com>
-Date: Fri, 11 May 2018 10:52:49 +0200
+ <20180510144137.GA3652@redhat.com>
+ <B525870A-B25E-46BB-B501-DAA39F1741DC@raithlin.com>
+ <20180510131015.4ad59477@w520.home>
 MIME-Version: 1.0
-In-Reply-To: <8113cba8-62b9-1801-7a77-f82be223b183@deltatee.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Return-Path: christian.koenig@amd.com
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180510131015.4ad59477@w520.home>
 List-ID: <linux-block@vger.kernel.org>
 
-Am 10.05.2018 um 19:15 schrieb Logan Gunthorpe:
->
-> On 10/05/18 11:11 AM, Stephen  Bates wrote:
->>> Not to me. In the p2pdma code we specifically program DMA engines with
->>> the PCI bus address.
->> Ah yes of course. Brain fart on my part. We are not programming the P2PDMA initiator with an IOVA but with the PCI bus address...
+On Thu, May 10, 2018 at 01:10:15PM -0600, Alex Williamson wrote:
+> On Thu, 10 May 2018 18:41:09 +0000
+> "Stephen  Bates" <sbates@raithlin.com> wrote:    
+> > >    Reasons is that GPU are giving up on PCIe (see all specialize link like
+> > >    NVlink that are popping up in GPU space). So for fast GPU inter-connect
+> > >    we have this new links.   
+> > 
+> > I look forward to Nvidia open-licensing NVLink to anyone who wants to use it ;-).
+> 
+> No doubt, the marketing for it is quick to point out the mesh topology
+> of NVLink, but I haven't seen any technical documents that describe the
+> isolation capabilities or IOMMU interaction.  Whether this is included
+> or an afterthought, I have no idea.
 
-By disabling the ACS bits on the intermediate bridges you turn their 
-address routing from IOVA addresses (which are to be resolved by the 
-root complex) back to PCI bus addresses (which are resolved locally in 
-the bridge).
+AFAIK there is no IOMMU on NVLink between devices, walking a page table and
+being able to sustain 80GB/s or 160GB/s is hard to achieve :) I think idea
+behind those interconnect is that devices in the mesh are inherently secure
+ie each single device is suppose to make sure that no one can abuse it.
 
-This only works when the IOVA and the PCI bus addresses never overlap. 
-I'm not sure how the IOVA allocation works but I don't think we 
-guarantee that on Linux.
+GPU with their virtual address space and contextualize program executions
+unit are suppose to be secure (a specter like bug might be lurking on those
+but i doubt it).
 
->>
->>> So regardless of whether we are using the IOMMU or
->>> not, the packets will be forwarded directly to the peer. If the ACS
->>>   Redir bits are on they will be forced back to the RC by the switch and
->>>   the transaction will fail. If we clear the ACS bits, the TLPs will go
->>>   where we want and everything will work (but we lose the isolation of ACS).
->> Agreed.
+So for those interconnect you program physical address directly in the page
+table of the devices and those physical address are un-translated from hard-
+ware perspective.
 
-If we really want to enable P2P without ATS and IOMMU enabled I think we 
-should probably approach it like this:
+Note that the kernel driver that do the actual GPU page table programming
+can do sanity check on value it is setting. So checks can also happens at
+setup time. But after that assumption is hardware is secure and no one can
+abuse it AFAICT.
 
-a) Make double sure that IOVA in an IOMMU group never overlap with PCI 
-BARs in that group.
+> 
+> > >    Also the IOMMU isolation do matter a lot to us. Think someone using this
+> > >    peer to peer to gain control of a server in the cloud.  
+> 
+> From that perspective, do we have any idea what NVLink means for
+> topology and IOMMU provided isolation and translation?  I've seen a
+> device assignment user report that seems to suggest it might pretend to
+> be PCIe compatible, but the assigned GPU ultimately doesn't work
+> correctly in a VM, so perhaps the software compatibility is only so
+> deep. Thanks,
 
-b) Add configuration options to put a whole PCI branch of devices (e.g. 
-a bridge) into a single IOMMU group.
+Note that each single GPU (in configurations i am aware of) also have a
+PCIE link with the CPU/main memory. So from that point of view they very
+much behave like a regular PCIE devices. It is just that each GPUs in
+the mesh can access each other memory through high bandwidth interconnect.
 
-c) Add a configuration option to disable the ACS bit on bridges in the 
-same IOMMU group.
+I am not sure how much is public beyond that, i will ask NVidia to try to
+have someone chime in this thread and shed light on this, if possible.
 
-
-I agree that we have a rather special case here, but I still find that 
-approach rather brave and would vote for disabling P2P without ATS when 
-IOMMU is enabled.
-
-
-BTW: I can't say anything about other implementations, but at least for 
-the AMD-IOMMU the transaction won't fail when it is send to the root 
-complex.
-
-Instead the root complex would send it to the correct device. I already 
-tested that on an AMD Ryzen with IOMMU enabled and P2P between two GPUs 
-(but could be that this only works because of ATS).
-
-Regards,
-Christian.
-
->>>     For EPs that support ATS, we should (but don't necessarily have to)
->>>     program them with the IOVA address so they can go through the
->>>     translation process which will allow P2P without disabling the ACS Redir
->>>     bits -- provided the ACS direct translation bit is set. (And btw, if it
->>>     is, then we lose the benefit of ACS protecting against malicious EPs).
->>>     But, per above, the ATS transaction should involve only the IOVA address
->>>     so the ACS bits not being set should not break ATS.
->>      
->> Well we would still have to clear some ACS bits but now we can clear only for translated addresses.
-> We don't have to clear the ACS Redir bits as we did in the first case.
-> We just have to make sure the ACS Direct Translated bit is set.
->
-> Logan
+Cheers,
+J�r�me
