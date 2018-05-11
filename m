@@ -1,85 +1,147 @@
-Return-Path: <BATV+7138d8dfc060164c836f+5389+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-nvme@lists.infradead.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
 Cc: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
 	linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 11/14] nvme: submit AEN event configuration on startup
-Date: Sat, 26 May 2018 12:27:32 +0200
-Message-Id: <20180526102735.31404-12-hch@lst.de>
-In-Reply-To: <20180526102735.31404-1-hch@lst.de>
-References: <20180526102735.31404-1-hch@lst.de>
+	Ming Lei <ming.lei@redhat.com>,
+	James Smart <james.smart@broadcom.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>
+Subject: [PATCH V5 2/9] nvme: pci: cover timeout for admin commands running in EH
+Date: Fri, 11 May 2018 20:29:26 +0800
+Message-Id: <20180511122933.27155-3-ming.lei@redhat.com>
+In-Reply-To: <20180511122933.27155-1-ming.lei@redhat.com>
+References: <20180511122933.27155-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Hannes Reinecke <hare@suse.de>
+When admin commands are used in EH for recovering controller, we have to
+cover their timeout and can't depend on block's timeout since deadlock may
+be caused when these commands are timed-out by block layer again.
 
-We should register for AEN events; some law-abiding targets might
-not be sending us AENs otherwise.
-
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-[hch: slight cleanups]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Cc: Laurence Oberman <loberman@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/nvme/host/core.c | 17 +++++++++++++++++
- drivers/nvme/host/nvme.h |  1 +
- 2 files changed, 18 insertions(+)
+ drivers/nvme/host/pci.c | 81 ++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 70 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 86cb78653155..c0bc76d98194 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1030,6 +1030,21 @@ int nvme_set_queue_count(struct nvme_ctrl *ctrl, int *count)
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index fbc71fac6f1e..ff09b1c760ea 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -1733,21 +1733,28 @@ static inline void nvme_release_cmb(struct nvme_dev *dev)
+ 	}
  }
- EXPORT_SYMBOL_GPL(nvme_set_queue_count);
  
-+#define NVME_AEN_SUPPORTED \
-+	(NVME_AEN_CFG_NS_ATTR | NVME_AEN_CFG_FW_ACT)
+-static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
++static void nvme_init_set_host_mem_cmd(struct nvme_dev *dev,
++		struct nvme_command *c, u32 bits)
+ {
+ 	u64 dma_addr = dev->host_mem_descs_dma;
 +
-+static void nvme_enable_aen(struct nvme_ctrl *ctrl)
-+{
-+	u32 result;
-+	int status;
-+
-+	status = nvme_set_features(ctrl, NVME_FEAT_ASYNC_EVENT,
-+			ctrl->oaes & NVME_AEN_SUPPORTED, NULL, 0, &result);
-+	if (status)
-+		dev_warn(ctrl->device, "Failed to configure AEN (cfg %x)\n",
-+			 ctrl->oaes & NVME_AEN_SUPPORTED);
++	memset(c, 0, sizeof(*c));
++	c->features.opcode	= nvme_admin_set_features;
++	c->features.fid		= cpu_to_le32(NVME_FEAT_HOST_MEM_BUF);
++	c->features.dword11	= cpu_to_le32(bits);
++	c->features.dword12	= cpu_to_le32(dev->host_mem_size >>
++					      ilog2(dev->ctrl.page_size));
++	c->features.dword13	= cpu_to_le32(lower_32_bits(dma_addr));
++	c->features.dword14	= cpu_to_le32(upper_32_bits(dma_addr));
++	c->features.dword15	= cpu_to_le32(dev->nr_host_mem_descs);
 +}
 +
- static int nvme_submit_io(struct nvme_ns *ns, struct nvme_user_io __user *uio)
++static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
++{
+ 	struct nvme_command c;
+ 	int ret;
+ 
+-	memset(&c, 0, sizeof(c));
+-	c.features.opcode	= nvme_admin_set_features;
+-	c.features.fid		= cpu_to_le32(NVME_FEAT_HOST_MEM_BUF);
+-	c.features.dword11	= cpu_to_le32(bits);
+-	c.features.dword12	= cpu_to_le32(dev->host_mem_size >>
+-					      ilog2(dev->ctrl.page_size));
+-	c.features.dword13	= cpu_to_le32(lower_32_bits(dma_addr));
+-	c.features.dword14	= cpu_to_le32(upper_32_bits(dma_addr));
+-	c.features.dword15	= cpu_to_le32(dev->nr_host_mem_descs);
++	nvme_init_set_host_mem_cmd(dev, &c, bits);
+ 
+ 	ret = nvme_submit_sync_cmd(dev->ctrl.admin_q, &c, NULL, 0);
+ 	if (ret) {
+@@ -1758,6 +1765,58 @@ static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
+ 	return ret;
+ }
+ 
++static void nvme_set_host_mem_end_io(struct request *rq, blk_status_t sts)
++{
++	struct completion *waiting = rq->end_io_data;
++
++	rq->end_io_data = NULL;
++
++	/*
++	 * complete last, if this is a stack request the process (and thus
++	 * the rq pointer) could be invalid right after this complete()
++	 */
++	complete(waiting);
++}
++
++/*
++ * This function can only be used inside nvme_dev_disable() when timeout
++ * may not work, then this function has to cover the timeout by itself.
++ *
++ * When wait_for_completion_io_timeout() returns 0 and timeout happens,
++ * this request will be completed after controller is shutdown.
++ */
++static int nvme_set_host_mem_timeout(struct nvme_dev *dev, u32 bits)
++{
++	DECLARE_COMPLETION_ONSTACK(wait);
++	struct nvme_command c;
++	struct request_queue *q = dev->ctrl.admin_q;
++	struct request *req;
++	int ret;
++
++	nvme_init_set_host_mem_cmd(dev, &c, bits);
++
++	req = nvme_alloc_request(q, &c, 0, NVME_QID_ANY);
++	if (IS_ERR(req))
++		return PTR_ERR(req);
++
++	req->timeout = ADMIN_TIMEOUT;
++	req->end_io_data = &wait;
++
++	blk_execute_rq_nowait(q, NULL, req, false,
++			nvme_set_host_mem_end_io);
++	ret = wait_for_completion_io_timeout(&wait, ADMIN_TIMEOUT);
++	if (ret > 0) {
++		if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
++			ret = -EINTR;
++		else
++			ret = nvme_req(req)->status;
++		blk_mq_free_request(req);
++	} else
++		ret = -EINTR;
++
++	return ret;
++}
++
+ static void nvme_free_host_mem(struct nvme_dev *dev)
  {
- 	struct nvme_user_io io;
-@@ -2347,6 +2362,7 @@ int nvme_init_identify(struct nvme_ctrl *ctrl)
- 
- 	ctrl->oacs = le16_to_cpu(id->oacs);
- 	ctrl->oncs = le16_to_cpup(&id->oncs);
-+	ctrl->oaes = le32_to_cpu(id->oaes);
- 	atomic_set(&ctrl->abort_limit, id->acl + 1);
- 	ctrl->vwc = id->vwc;
- 	ctrl->cntlid = le16_to_cpup(&id->cntlid);
-@@ -3379,6 +3395,7 @@ void nvme_start_ctrl(struct nvme_ctrl *ctrl)
- 
- 	if (ctrl->queue_count > 1) {
- 		nvme_queue_scan(ctrl);
-+		nvme_enable_aen(ctrl);
- 		queue_work(nvme_wq, &ctrl->async_event_work);
- 		nvme_start_queues(ctrl);
+ 	int i;
+@@ -2216,7 +2275,7 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
+ 		 * but I'd rather be safe than sorry..
+ 		 */
+ 		if (dev->host_mem_descs)
+-			nvme_set_host_mem(dev, 0);
++			nvme_set_host_mem_timeout(dev, 0);
+ 		nvme_disable_io_queues(dev);
+ 		nvme_disable_admin_queue(dev, shutdown);
  	}
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index ec6e4acc4d48..dcf9e9592c1a 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -176,6 +176,7 @@ struct nvme_ctrl {
- 	u16 kas;
- 	u8 npss;
- 	u8 apsta;
-+	u32 oaes;
- 	u32 aen_result;
- 	unsigned int shutdown_timeout;
- 	unsigned int kato;
 -- 
-2.17.0
+2.9.5
