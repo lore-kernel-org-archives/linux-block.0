@@ -1,83 +1,84 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH 2/6] bcache: set CACHE_SET_IO_DISABLE in bch_cached_dev_error()
-Date: Wed,  2 May 2018 22:46:55 +0800
-Message-Id: <20180502144659.118628-3-colyli@suse.de>
-In-Reply-To: <20180502144659.118628-1-colyli@suse.de>
-References: <20180502144659.118628-1-colyli@suse.de>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	James Smart <james.smart@broadcom.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>
+Subject: [PATCH V5 6/9] nvme: pci: move error handling out of nvme_reset_dev()
+Date: Fri, 11 May 2018 20:29:30 +0800
+Message-Id: <20180511122933.27155-7-ming.lei@redhat.com>
+In-Reply-To: <20180511122933.27155-1-ming.lei@redhat.com>
+References: <20180511122933.27155-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Commit c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev") tries
-to stop bcache device by calling bcache_device_stop() when too many I/O
-errors happened on backing device. But if there is internal I/O happening
-on cache device (writeback scan, garbage collection, etc), a regular I/O
-request triggers the internal I/Os may still holds a refcount of dc->count,
-and the refcount may only be dropped after the internal I/O stopped.
+Once nested EH is introduced, we may not need to handle error
+in the inner EH, so move error handling out of nvme_reset_dev().
 
-By this patch, bch_cached_dev_error() will check if the backing device is
-attached to a cache set, if yes that CACHE_SET_IO_DISABLE will be set to
-flags of this cache set. Then internal I/Os on cache device will be
-rejected and stopped immediately, and the bcache device can be stopped.
+Meantime return the reset result to caller.
 
-For people who are not familiar with the interesting refcount dependance,
-let me explain a bit more how the fix works. Example the writeback thread
-will scan cache device for dirty data writeback purpose. Before it stopps,
-it holds a refcount of dc->count. When CACHE_SET_IO_DISABLE bit is set,
-the internal I/O will stopped and the while-loop in bch_writeback_thread()
-quits and calls cached_dev_put() to drop dc->count. If this is the last
-refcount to drop, then cached_dev_detach_finish() will be called. In this
-call back function, in turn closure_put(dc->disk.cl) is called to drop a
-refcount of closure dc->disk.cl. If this is the last refcount of this
-closure to drop, then cached_dev_flush() will be called. Then the cached
-device is freed. So if CACHE_SET_IO_DISABLE is not set, the bache device
-can not be stopped until all inernal cache device I/O stopped. For large
-size cache device, and writeback thread competes locks with gc thread,
-there might be a quite long time to wait.
-
-Fixes: c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev")
-Signed-off-by: Coly Li <colyli@suse.de>
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Cc: Laurence Oberman <loberman@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/super.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ drivers/nvme/host/pci.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 8196b19fada2..a0d5a3ccc7d0 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1369,6 +1369,8 @@ int bch_flash_dev_create(struct cache_set *c, uint64_t size)
- 
- bool bch_cached_dev_error(struct cached_dev *dc)
- {
-+	struct cache_set *c;
-+
- 	if (!dc || test_bit(BCACHE_DEV_CLOSING, &dc->disk.flags))
- 		return false;
- 
-@@ -1379,6 +1381,21 @@ bool bch_cached_dev_error(struct cached_dev *dc)
- 	pr_err("stop %s: too many IO errors on backing device %s\n",
- 		dc->disk.disk->disk_name, dc->backing_dev_name);
- 
-+	/*
-+	 * If the cached device is still attached to a cache set,
-+	 * even dc->io_disable is true and no more I/O requests
-+	 * accepted, cache device internal I/O (writeback scan or
-+	 * garbage collection) may still prevent bcache device from
-+	 * being stopped. So here CACHE_SET_IO_DISABLE should be
-+	 * set to c->flags too, to make the internal I/O to cache
-+	 * device rejected and stopped immediately.
-+	 * If c is NULL, that means the bcache device is not attached
-+	 * to any cache set, then no CACHE_SET_IO_DISABLE bit to set.
-+	 */
-+	c = dc->disk.c;
-+	if (c && test_and_set_bit(CACHE_SET_IO_DISABLE, &c->flags))
-+		pr_warn("CACHE_SET_IO_DISABLE already set");
-+
- 	bcache_device_stop(&dc->disk);
- 	return true;
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index a924246ffdb6..d880356feee2 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -2365,7 +2365,7 @@ static void nvme_remove_dead_ctrl(struct nvme_dev *dev, int status)
+ 		nvme_put_ctrl(&dev->ctrl);
  }
+ 
+-static void nvme_reset_dev(struct nvme_dev *dev)
++static int nvme_reset_dev(struct nvme_dev *dev)
+ {
+ 	bool was_suspend = !!(dev->ctrl.ctrl_config & NVME_CC_SHN_NORMAL);
+ 	int result = -ENODEV;
+@@ -2459,6 +2459,7 @@ static void nvme_reset_dev(struct nvme_dev *dev)
+ 		nvme_unfreeze(&dev->ctrl);
+ 	}
+ 
++	result = -ENODEV;
+ 	/*
+ 	 * If only admin queue live, keep it to do further investigation or
+ 	 * recovery.
+@@ -2470,19 +2471,22 @@ static void nvme_reset_dev(struct nvme_dev *dev)
+ 	}
+ 
+ 	nvme_start_ctrl(&dev->ctrl);
+-	return;
++	return 0;
+ 
+  out:
+-	nvme_remove_dead_ctrl(dev, result);
++	return result;
+ }
+ 
+ static void nvme_reset_work(struct work_struct *work)
+ {
+ 	struct nvme_dev *dev =
+ 		container_of(work, struct nvme_dev, ctrl.reset_work);
++	int result;
+ 
+ 	mutex_lock(&dev->ctrl.reset_lock);
+-	nvme_reset_dev(dev);
++	result = nvme_reset_dev(dev);
++	if (result)
++		nvme_remove_dead_ctrl(dev, result);
+ 	mutex_unlock(&dev->ctrl.reset_lock);
+ }
+ 
 -- 
-2.16.3
+2.9.5
