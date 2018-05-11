@@ -1,67 +1,68 @@
 Return-Path: <ming.lei@redhat.com>
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 12/33] block: introduce bio_segments()
-Date: Thu, 24 May 2018 17:01:17 +0800
-Message-Id: <20180524090139.2150-13-ming.lei@redhat.com>
-In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
-References: <20180524090139.2150-1-ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	James Smart <james.smart@broadcom.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>
+Subject: [PATCH V5 3/9] nvme: pci: only wait freezing if queue is frozen
+Date: Fri, 11 May 2018 20:29:27 +0800
+Message-Id: <20180511122933.27155-4-ming.lei@redhat.com>
+In-Reply-To: <20180511122933.27155-1-ming.lei@redhat.com>
+References: <20180511122933.27155-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-There are still cases in which we need to use bio_segments() for get the
-number of segment, so introduce it.
+In nvme_dev_disable() called during shutting down controler,
+nvme_wait_freeze_timeout() may be done on the controller not
+frozen yet, so add the check for avoiding the case.
 
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Cc: Laurence Oberman <loberman@redhat.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- include/linux/bio.h | 25 ++++++++++++++++++++-----
- 1 file changed, 20 insertions(+), 5 deletions(-)
+ drivers/nvme/host/pci.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 08af9272687f..b24c00f99c9c 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -227,9 +227,9 @@ static inline bool bio_rewind_iter(struct bio *bio, struct bvec_iter *iter,
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index ff09b1c760ea..57bd7bebd1e5 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -2244,14 +2244,17 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
+ 	int i;
+ 	bool dead = true;
+ 	struct pci_dev *pdev = to_pci_dev(dev->dev);
++	bool frozen = false;
  
- #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
+ 	mutex_lock(&dev->shutdown_lock);
+ 	if (pci_is_enabled(pdev)) {
+ 		u32 csts = readl(dev->bar + NVME_REG_CSTS);
  
--static inline unsigned bio_pages(struct bio *bio)
-+static inline unsigned __bio_elements(struct bio *bio, bool seg)
- {
--	unsigned segs = 0;
-+	unsigned elems = 0;
- 	struct bio_vec bv;
- 	struct bvec_iter iter;
- 
-@@ -249,10 +249,25 @@ static inline unsigned bio_pages(struct bio *bio)
- 		break;
+ 		if (dev->ctrl.state == NVME_CTRL_LIVE ||
+-		    dev->ctrl.state == NVME_CTRL_RESETTING)
++		    dev->ctrl.state == NVME_CTRL_RESETTING) {
+ 			nvme_start_freeze(&dev->ctrl);
++			frozen = true;
++		}
+ 		dead = !!((csts & NVME_CSTS_CFS) || !(csts & NVME_CSTS_RDY) ||
+ 			pdev->error_state  != pci_channel_io_normal);
+ 	}
+@@ -2261,7 +2264,7 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
+ 	 * doing a safe shutdown.
+ 	 */
+ 	if (!dead) {
+-		if (shutdown)
++		if (shutdown && frozen)
+ 			nvme_wait_freeze_timeout(&dev->ctrl, NVME_IO_TIMEOUT);
  	}
  
--	bio_for_each_page(bv, bio, iter)
--		segs++;
-+	if (!seg) {
-+		bio_for_each_page(bv, bio, iter)
-+			elems++;
-+	} else {
-+		bio_for_each_segment(bv, bio, iter)
-+			elems++;
-+	}
-+
-+	return elems;
-+}
-+
-+static inline unsigned bio_pages(struct bio *bio)
-+{
-+	return __bio_elements(bio, false);
-+}
- 
--	return segs;
-+static inline unsigned bio_segments(struct bio *bio)
-+{
-+	return __bio_elements(bio, true);
- }
- 
- /*
 -- 
 2.9.5
