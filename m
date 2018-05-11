@@ -1,153 +1,119 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:52290 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933856AbeEIHts (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 03:49:48 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 20/33] xfs: remove xfs_reflink_trim_irec_to_next_cow
-Date: Wed,  9 May 2018 09:48:17 +0200
-Message-Id: <20180509074830.16196-21-hch@lst.de>
-In-Reply-To: <20180509074830.16196-1-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	James Smart <james.smart@broadcom.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>
+Subject: [PATCH V5 5/9] nvme: pci: prepare for supporting error recovery from resetting context
+Date: Fri, 11 May 2018 20:29:29 +0800
+Message-Id: <20180511122933.27155-6-ming.lei@redhat.com>
+In-Reply-To: <20180511122933.27155-1-ming.lei@redhat.com>
+References: <20180511122933.27155-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-In the only caller we just did a lookup in the COW extent tree for
-the same offset.  Reuse that result and save a lookup, as well as
-shortening the ilock hold time.
+Either the admin or normal IO in reset context may be timed out because
+controller error happens. When this timeout happens, we may have to
+start controller recovery again.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+This patch introduces 'reset_lock' and holds this lock when running reset,
+so that we may support nested reset in the following patches.
+
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Cc: Laurence Oberman <loberman@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/xfs/xfs_aops.c    | 25 +++++++++++++++++--------
- fs/xfs/xfs_reflink.c | 33 ---------------------------------
- fs/xfs/xfs_reflink.h |  2 --
- 3 files changed, 17 insertions(+), 43 deletions(-)
+ drivers/nvme/host/core.c |  2 ++
+ drivers/nvme/host/nvme.h |  3 +++
+ drivers/nvme/host/pci.c  | 20 +++++++++++++++++---
+ 3 files changed, 22 insertions(+), 3 deletions(-)
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 41616629dd13..09fb10be1256 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -383,11 +383,12 @@ xfs_map_blocks(
- 	struct xfs_inode	*ip = XFS_I(inode);
- 	struct xfs_mount	*mp = ip->i_mount;
- 	ssize_t			count = i_blocksize(inode);
--	xfs_fileoff_t		offset_fsb, end_fsb;
-+	xfs_fileoff_t		offset_fsb, end_fsb, cow_fsb = 0;
- 	int			whichfork = XFS_DATA_FORK;
- 	struct xfs_iext_cursor	icur;
- 	int			error = 0;
- 	int			nimaps = 1;
-+	bool			cow_valid = false;
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index a3771c5729f5..adb1743e87f7 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -3424,6 +3424,8 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
+ 	INIT_WORK(&ctrl->fw_act_work, nvme_fw_act_work);
+ 	INIT_WORK(&ctrl->delete_work, nvme_delete_ctrl_work);
  
- 	if (XFS_FORCED_SHUTDOWN(mp))
- 		return -EIO;
-@@ -407,8 +408,11 @@ xfs_map_blocks(
- 	 * it directly instead of looking up anything in the data fork.
- 	 */
- 	if (xfs_is_reflink_inode(ip) &&
--	    xfs_iext_lookup_extent(ip, ip->i_cowfp, offset_fsb, &icur, imap) &&
--	    imap->br_startoff <= offset_fsb) {
-+	    xfs_iext_lookup_extent(ip, ip->i_cowfp, offset_fsb, &icur, imap)) {
-+		cow_fsb = imap->br_startoff;
-+		cow_valid = true;
-+	}
-+	if (cow_valid && cow_fsb <= offset_fsb) {
- 		xfs_iunlock(ip, XFS_ILOCK_SHARED);
- 		/*
- 		 * Truncate can race with writeback since writeback doesn't
-@@ -430,6 +434,10 @@ xfs_map_blocks(
++	mutex_init(&ctrl->reset_lock);
++
+ 	ret = ida_simple_get(&nvme_instance_ida, 0, 0, GFP_KERNEL);
+ 	if (ret < 0)
+ 		goto out;
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 7ded7a51c430..021f7147f779 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -146,6 +146,9 @@ struct nvme_ctrl {
+ 	struct device ctrl_device;
+ 	struct device *device;	/* char device */
+ 	struct cdev cdev;
++
++	/* sync reset activities */
++	struct mutex reset_lock;
+ 	struct work_struct reset_work;
+ 	struct work_struct delete_work;
  
- 	error = xfs_bmapi_read(ip, offset_fsb, end_fsb - offset_fsb,
- 				imap, &nimaps, XFS_BMAPI_ENTIRE);
-+	xfs_iunlock(ip, XFS_ILOCK_SHARED);
-+	if (error)
-+		return error;
-+
- 	if (!nimaps) {
- 		/*
- 		 * Lookup returns no match? Beyond eof? regardless,
-@@ -451,16 +459,17 @@ xfs_map_blocks(
- 		 * is a pending CoW reservation before the end of this extent,
- 		 * so that we pick up the COW extents in the next iteration.
- 		 */
--		xfs_reflink_trim_irec_to_next_cow(ip, offset_fsb, imap);
-+		if (cow_valid &&
-+		    cow_fsb < imap->br_startoff + imap->br_blockcount) {
-+			imap->br_blockcount = cow_fsb - imap->br_startoff;
-+			trace_xfs_reflink_trim_irec(ip, imap);
-+		}
-+
- 		if (imap->br_state == XFS_EXT_UNWRITTEN)
- 			*type = XFS_IO_UNWRITTEN;
- 		else
- 			*type = XFS_IO_OVERWRITE;
- 	}
--	xfs_iunlock(ip, XFS_ILOCK_SHARED);
--	if (error)
--		return error;
--
- done:
- 	switch (*type) {
- 	case XFS_IO_HOLE:
-diff --git a/fs/xfs/xfs_reflink.c b/fs/xfs/xfs_reflink.c
-index 3776b7bbd8c6..8231109f6256 100644
---- a/fs/xfs/xfs_reflink.c
-+++ b/fs/xfs/xfs_reflink.c
-@@ -484,39 +484,6 @@ xfs_reflink_allocate_cow(
- 	return error;
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 1fafe5d01355..a924246ffdb6 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -2365,14 +2365,14 @@ static void nvme_remove_dead_ctrl(struct nvme_dev *dev, int status)
+ 		nvme_put_ctrl(&dev->ctrl);
  }
  
--/*
-- * Trim an extent to end at the next CoW reservation past offset_fsb.
-- */
--void
--xfs_reflink_trim_irec_to_next_cow(
--	struct xfs_inode		*ip,
--	xfs_fileoff_t			offset_fsb,
--	struct xfs_bmbt_irec		*imap)
--{
--	struct xfs_ifork		*ifp = XFS_IFORK_PTR(ip, XFS_COW_FORK);
--	struct xfs_bmbt_irec		got;
--	struct xfs_iext_cursor		icur;
--
--	if (!xfs_is_reflink_inode(ip))
--		return;
--
--	/* Find the extent in the CoW fork. */
--	if (!xfs_iext_lookup_extent(ip, ifp, offset_fsb, &icur, &got))
--		return;
--
--	/* This is the extent before; try sliding up one. */
--	if (got.br_startoff < offset_fsb) {
--		if (!xfs_iext_next_extent(ifp, &icur, &got))
--			return;
--	}
--
--	if (got.br_startoff >= imap->br_startoff + imap->br_blockcount)
--		return;
--
--	imap->br_blockcount = got.br_startoff - imap->br_startoff;
--	trace_xfs_reflink_trim_irec(ip, imap);
--}
--
- /*
-  * Cancel CoW reservations for some block range of an inode.
-  *
-diff --git a/fs/xfs/xfs_reflink.h b/fs/xfs/xfs_reflink.h
-index 15a456492667..e8d4d50c629f 100644
---- a/fs/xfs/xfs_reflink.h
-+++ b/fs/xfs/xfs_reflink.h
-@@ -32,8 +32,6 @@ extern int xfs_reflink_allocate_cow(struct xfs_inode *ip,
- 		struct xfs_bmbt_irec *imap, bool *shared, uint *lockmode);
- extern int xfs_reflink_convert_cow(struct xfs_inode *ip, xfs_off_t offset,
- 		xfs_off_t count);
--extern void xfs_reflink_trim_irec_to_next_cow(struct xfs_inode *ip,
--		xfs_fileoff_t offset_fsb, struct xfs_bmbt_irec *imap);
+-static void nvme_reset_work(struct work_struct *work)
++static void nvme_reset_dev(struct nvme_dev *dev)
+ {
+-	struct nvme_dev *dev =
+-		container_of(work, struct nvme_dev, ctrl.reset_work);
+ 	bool was_suspend = !!(dev->ctrl.ctrl_config & NVME_CC_SHN_NORMAL);
+ 	int result = -ENODEV;
+ 	enum nvme_ctrl_state new_state = NVME_CTRL_LIVE;
  
- extern int xfs_reflink_cancel_cow_blocks(struct xfs_inode *ip,
- 		struct xfs_trans **tpp, xfs_fileoff_t offset_fsb,
++	lockdep_assert_held(&dev->ctrl.reset_lock);
++
+ 	if (WARN_ON(dev->ctrl.state != NVME_CTRL_RESETTING))
+ 		goto out;
+ 
+@@ -2448,7 +2448,11 @@ static void nvme_reset_work(struct work_struct *work)
+ 		new_state = NVME_CTRL_ADMIN_ONLY;
+ 	} else {
+ 		nvme_start_queues(&dev->ctrl);
++		mutex_unlock(&dev->ctrl.reset_lock);
++
+ 		nvme_wait_freeze(&dev->ctrl);
++
++		mutex_lock(&dev->ctrl.reset_lock);
+ 		/* hit this only when allocate tagset fails */
+ 		if (nvme_dev_add(dev))
+ 			new_state = NVME_CTRL_ADMIN_ONLY;
+@@ -2472,6 +2476,16 @@ static void nvme_reset_work(struct work_struct *work)
+ 	nvme_remove_dead_ctrl(dev, result);
+ }
+ 
++static void nvme_reset_work(struct work_struct *work)
++{
++	struct nvme_dev *dev =
++		container_of(work, struct nvme_dev, ctrl.reset_work);
++
++	mutex_lock(&dev->ctrl.reset_lock);
++	nvme_reset_dev(dev);
++	mutex_unlock(&dev->ctrl.reset_lock);
++}
++
+ static void nvme_remove_dead_ctrl_work(struct work_struct *work)
+ {
+ 	struct nvme_dev *dev = container_of(work, struct nvme_dev, remove_work);
 -- 
-2.17.0
+2.9.5
