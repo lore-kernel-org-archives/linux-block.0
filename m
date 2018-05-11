@@ -1,54 +1,54 @@
-Return-Path: <prvs=66238960d=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"israelr@mellanox.com" <israelr@mellanox.com>, "sagi@grimberg.me"
-	<sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>, "sebott@linux.ibm.com"
-	<sebott@linux.ibm.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
-	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
-	"maxg@mellanox.com" <maxg@mellanox.com>, "tj@kernel.org" <tj@kernel.org>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH v8] blk-mq: Rework blk-mq timeout handling again
-Date: Fri, 11 May 2018 21:55:16 +0000
-Message-ID: <e93098bdaa17f56c53259994ab64e6cb4ae46d01.camel@wdc.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Tejun Heo <tj@kernel.org>, Jianchao Wang <jianchao.w.wang@oracle.com>,
+ Ming Lei <ming.lei@redhat.com>, Sebastian Ott <sebott@linux.ibm.com>,
+ Sagi Grimberg <sagi@grimberg.me>, Israel Rukshin <israelr@mellanox.com>,
+ Max Gurtovoy <maxg@mellanox.com>
 References: <20180511210849.12743-1-bart.vanassche@wdc.com>
-	 <54bfda3e-2881-76e3-6d51-2ffee23e6070@kernel.dk>
-In-Reply-To: <54bfda3e-2881-76e3-6d51-2ffee23e6070@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <54bfda3e-2881-76e3-6d51-2ffee23e6070@kernel.dk>
+Date: Fri, 11 May 2018 15:21:26 -0600
 MIME-Version: 1.0
+In-Reply-To: <20180511210849.12743-1-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE4LTA1LTExIGF0IDE1OjIxIC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
-biA1LzExLzE4IDM6MDggUE0sIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gYmxrX21xX3JxX3Vw
-ZGF0ZV9hYm9ydGVkX2dzdGF0ZShycSwgZ3N0YXRlKTsNCj4gPiArCXVuaW9uIGJsa19kZWFkbGlu
-ZV9hbmRfc3RhdGUgZGFzID0gUkVBRF9PTkNFKHJxLT5kYXMpOw0KPiA+ICsJdW5zaWduZWQgbG9u
-ZyBub3cgPSBqaWZmaWVzOw0KPiA+ICsJaW50MzJfdCBkaWZmX2ppZmZpZXMgPSBkYXMuZGVhZGxp
-bmUgLSBub3c7DQo+ID4gKwlpbnQzMl90IGRpZmZfbmV4dCA9IGRhcy5kZWFkbGluZSAtIGRhdGEt
-Pm5leHQ7DQo+ID4gKwllbnVtIG1xX3JxX3N0YXRlIHJxX3N0YXRlID0gZGFzLnN0YXRlOw0KPiAN
-Cj4gV2h5IHRoZSBpbnQzMl90IHR5cGVzPyBKdXN0IHVzZSBhbiBpbnQvdW5zaWduZWQgaW50Pw0K
-DQpUaGUgY29kZSB0aGF0IHVzZXMgdGhlIGRpZmZfamlmZmllcyBhbmQgZGlmZl9uZXh0IHZhcmlh
-YmxlcyBjYW4gb25seSB3b3JrDQpjb3JyZWN0bHkgaWYgdGhlIHN1YnRyYWN0aW9uIHJlc3VsdHMg
-YXJlIHRydW5jYXRlZCB0byAzMiBiaXRzLiBIZW5jZSB0aGUNCnVzZSBvZiB0aGUgaW50MzJfdCBk
-YXRhIHR5cGVzIHRvIG1ha2UgdGhpcyBleHBsaWNpdC4gSSB0aGluayB1c2luZyBpbnQzMl90DQpp
-bnN0ZWFkIG9mIGludCBtYWtlcyB0aGlzIGNvZGUgZWFzaWVyIHRvIHJlYWQuDQoNCj4gPiBAQCAt
-MTAzLDM3ICs5NywxMTkgQEAgZXh0ZXJuIHZvaWQgYmxrX21xX2hjdHhfa29ial9pbml0KHN0cnVj
-dCBibGtfbXFfaHdfY3R4ICpoY3R4KTsNCj4gPiAgDQo+ID4gIHZvaWQgYmxrX21xX3JlbGVhc2Uo
-c3RydWN0IHJlcXVlc3RfcXVldWUgKnEpOw0KPiA+ICANCj4gPiArI2lmIGRlZmluZWQoQ09ORklH
-X0FSQykgfHwJCQkJCQlcDQo+ID4gKyAgICBkZWZpbmVkKENPTkZJR19BUk0pICYmIGRlZmluZWQo
-Q09ORklHX0NQVV9USFVNQk9OTFkpIHx8CQlcDQo+ID4gKyAgICBkZWZpbmVkKENPTkZJR19DNngp
-IHx8IGRlZmluZWQoQ09ORklHX0g4MzAwKSB8fAkJCVwNCj4gPiArICAgIGRlZmluZWQoQ09ORklH
-X0hFWEFHT04pIHx8IGRlZmluZWQoQ09ORklHX01JQ1JPQkxBWkUpIHx8CQlcDQo+ID4gKyAgICBk
-ZWZpbmVkKENPTkZJR19NSVBTKSAmJiAhZGVmaW5lZChDT05GSUdfNjRCSVQpIHx8CQkJXA0KPiA+
-ICsgICAgZGVmaW5lZChDT05GSUdfTkRTMzIpIHx8IGRlZmluZWQoQ09ORklHX05JT1MpIHx8CQkJ
-XA0KPiA+ICsgICAgZGVmaW5lZChDT05GSUdfT1BFTlJJU0MpIHx8IGRlZmluZWQoQ09ORklHX1BQ
-QzMyKSB8fAkJXA0KPiA+ICsgICAgZGVmaW5lZChDT05GSUdfU1VQRVJIKSB8fCBkZWZpbmVkKENP
-TkZJR19VTUwpIHx8IGRlZmluZWQoQ09ORklHX1VOSUNPUkUzMikNCj4gPiArI3VuZGVmIENPTkZJ
-R19BUkNIX0hBU19DTVBYQ0hHNjQNCj4gPiArI2Vsc2UNCj4gPiArI2RlZmluZSBDT05GSUdfQVJD
-SF9IQVNfQ01QWENIRzY0DQo+ID4gKyNlbmRpZg0KPiANCj4gSSB0aGluayB0aGUgZW5jYXBzdWxh
-dGlvbiBvZiBibGtfbXFfc2V0X3JxX3N0YXRlKCkgaW4gdGVybXMgb2YgbG9jayB2cw0KPiBjbXB4
-Y2hnNjQgaXMgZmluZSwgYnV0IHRoaXMgZG9lcyBub3QgYmVsb25nIGluIHRoZSBibG9jayBsYXll
-ci4NCj4gDQo+ID4gKwkvKiBPbmx5IHVzZWQgaWYgQ09ORklHX0FSQ0hfSEFTX0NNUFhDSEc2NCBp
-cyBub3QgZGVmaW5lZC4gKi8NCj4gPiArCXNwaW5sb2NrX3QgZGFzX2xvY2s7DQo+IA0KPiBMZXQn
-cyBwdXQgaXQgdW5kZXIgYW4gaWYgZGVmaW5lZCgpIHRoZW4uDQoNCk9LLCBJIHdpbGwgbW92ZSBD
-T05GSUdfQVJDSF9IQVNfQ01QWENIRzY0IGludG8gYXJjaC8qL0tjb25maWcgYW5kIEkgd2lsbA0K
-c3Vycm91bmQgc3BpbmxvY2tfdCBkYXNfbG9jayB3aXRoICNpZiBkZWZpbmVkKC4uLikgLyAjZW5k
-aWYuDQoNClRoYW5rcywNCg0KQmFydC4NCg0KDQo=
+On 5/11/18 3:08 PM, Bart Van Assche wrote:
+blk_mq_rq_update_aborted_gstate(rq, gstate);
+> +	union blk_deadline_and_state das = READ_ONCE(rq->das);
+> +	unsigned long now = jiffies;
+> +	int32_t diff_jiffies = das.deadline - now;
+> +	int32_t diff_next = das.deadline - data->next;
+> +	enum mq_rq_state rq_state = das.state;
+
+Why the int32_t types? Just use an int/unsigned int?
+
+> @@ -103,37 +97,119 @@ extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
+>  
+>  void blk_mq_release(struct request_queue *q);
+>  
+> +#if defined(CONFIG_ARC) ||						\
+> +    defined(CONFIG_ARM) && defined(CONFIG_CPU_THUMBONLY) ||		\
+> +    defined(CONFIG_C6x) || defined(CONFIG_H8300) ||			\
+> +    defined(CONFIG_HEXAGON) || defined(CONFIG_MICROBLAZE) ||		\
+> +    defined(CONFIG_MIPS) && !defined(CONFIG_64BIT) ||			\
+> +    defined(CONFIG_NDS32) || defined(CONFIG_NIOS) ||			\
+> +    defined(CONFIG_OPENRISC) || defined(CONFIG_PPC32) ||		\
+> +    defined(CONFIG_SUPERH) || defined(CONFIG_UML) || defined(CONFIG_UNICORE32)
+> +#undef CONFIG_ARCH_HAS_CMPXCHG64
+> +#else
+> +#define CONFIG_ARCH_HAS_CMPXCHG64
+> +#endif
+
+I think the encapsulation of blk_mq_set_rq_state() in terms of lock vs
+cmpxchg64 is fine, but this does not belong in the block layer.
+
+> +	/* Only used if CONFIG_ARCH_HAS_CMPXCHG64 is not defined. */
+> +	spinlock_t das_lock;
+
+Let's put it under an if defined() then.
+
+-- 
+Jens Axboe
