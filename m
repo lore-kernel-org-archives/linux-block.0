@@ -1,52 +1,65 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:51754 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933383AbeEIHtA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 03:49:00 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 07/33] mm: split ->readpages calls to avoid non-contiguous pages lists
-Date: Wed,  9 May 2018 09:48:04 +0200
-Message-Id: <20180509074830.16196-8-hch@lst.de>
-In-Reply-To: <20180509074830.16196-1-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <tom.leiming@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20180510210548.GB4787@localhost.localdomain>
+References: <20180426123956.26039-1-ming.lei@redhat.com> <20180426123956.26039-2-ming.lei@redhat.com>
+ <20180427175157.GB5073@localhost.localdomain> <20180428035015.GB5657@ming.t460p>
+ <20180508153038.GA30842@localhost.localdomain> <CACVXFVO+CuYghN3wHyHV2cskPr2pqaKKyQqQC5Xze4vCvpb+jg@mail.gmail.com>
+ <20180510210548.GB4787@localhost.localdomain>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Fri, 11 May 2018 10:10:36 +0800
+Message-ID: <CACVXFVPwMT9utux3+h0JokdRvE15KB0+GJgN_Y79odJ=5674-g@mail.gmail.com>
+Subject: Re: [PATCH 1/2] nvme: pci: simplify timeout handling
+To: Keith Busch <keith.busch@linux.intel.com>
+Cc: Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@kernel.dk>,
+	Sagi Grimberg <sagi@grimberg.me>, linux-nvme <linux-nvme@lists.infradead.org>,
+	Ming Lei <ming.lei@redhat.com>, linux-block <linux-block@vger.kernel.org>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>, Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+List-ID: <linux-block@vger.kernel.org>
 
-That way file systems don't have to go spotting for non-contiguous pages
-and work around them.  It also kicks off I/O earlier, allowing it to
-finish earlier and reduce latency.
+On Fri, May 11, 2018 at 5:05 AM, Keith Busch
+<keith.busch@linux.intel.com> wrote:
+> On Fri, May 11, 2018 at 04:52:11AM +0800, Ming Lei wrote:
+>> Hi Keith,
+>>
+>> On Tue, May 8, 2018 at 11:30 PM, Keith Busch <keith.busch@intel.com> wrote:
+>> > On Sat, Apr 28, 2018 at 11:50:17AM +0800, Ming Lei wrote:
+>> >> This sync may be raced with one timed-out request, which may be handled
+>> >> as BLK_EH_HANDLED or BLK_EH_RESET_TIMER, so the above sync queues can't
+>> >> work reliably.
+>> >
+>> > Ming,
+>> >
+>> > As proposed, that scenario is impossible to encounter. Resetting the
+>> > controller inline with the timeout reaps all the commands, and then
+>> > sets the controller state to RESETTING. While blk-mq may not allow the
+>> > driver to complete those requests, having the driver sync with the queues
+>> > will hold the controller in the reset state until blk-mq is done with
+>> > its timeout work; therefore, it is impossible for the NVMe driver to
+>> > return "BLK_EH_RESET_TIMER", and all commands will be completed through
+>> > nvme_timeout's BLK_EH_HANDLED exactly as desired.
+>>
+>> That isn't true for multiple namespace case,  each request queue has its
+>> own timeout work, and all these timeout work can be triggered concurrently.
+>
+> The controller state is most certainly not per queue/namespace. It's
+> global to the controller. Once the reset is triggered, nvme_timeout can
+> only return EH_HANDLED.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- mm/readahead.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+One exception is PCI error recovery, in which EH_RESET_TIMER still
+may be returned any time.
 
-diff --git a/mm/readahead.c b/mm/readahead.c
-index 16d0cb1e2616..3f608e00286d 100644
---- a/mm/readahead.c
-+++ b/mm/readahead.c
-@@ -177,8 +177,18 @@ int __do_page_cache_readahead(struct address_space *mapping, struct file *filp,
- 		rcu_read_lock();
- 		page = radix_tree_lookup(&mapping->i_pages, page_offset);
- 		rcu_read_unlock();
--		if (page && !radix_tree_exceptional_entry(page))
-+		if (page && !radix_tree_exceptional_entry(page)) {
-+			/*
-+			 * Page already present?  Kick off the current batch of
-+			 * contiguous pages before continueing with the next
-+			 * batch.
-+			 */
-+			if (nr_pages)
-+				read_pages(mapping, filp, &page_pool, nr_pages,
-+						gfp_mask);
-+			nr_pages = 0;
- 			continue;
-+		}
- 
- 		page = __page_cache_alloc(gfp_mask);
- 		if (!page)
--- 
-2.17.0
+Also the two timeout can happen at the same time from more than one
+NS, just before resetting is started(before updating to NVME_CTRL_RESETTING).
+
+OR one timeout is from admin queue, another one is from NS, both happen
+at the same time, still before updating to NVME_CTRL_RESETTING.
+
+In above two situations, one timeout can be handled as EH_HANDLED, and
+another can be handled as EH_RESET_TIMER.
+
+So it isn't enough to drain timeout by blk_sync_queue() simply.
+
+
+Thanks,
+Ming Lei
