@@ -1,66 +1,96 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41400 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S935215AbeEYDtc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 May 2018 23:49:32 -0400
+Return-Path: <ming.lei@redhat.com>
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [RESEND PATCH V5 14/33] block: loop: pass segments to iov_iter
-Date: Fri, 25 May 2018 11:46:02 +0800
-Message-Id: <20180525034621.31147-15-ming.lei@redhat.com>
-In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
-References: <20180525034621.31147-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	James Smart <james.smart@broadcom.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>
+Subject: [PATCH V5 8/9] nvme: core: introduce nvme_force_change_ctrl_state()
+Date: Fri, 11 May 2018 20:29:32 +0800
+Message-Id: <20180511122933.27155-9-ming.lei@redhat.com>
+In-Reply-To: <20180511122933.27155-1-ming.lei@redhat.com>
+References: <20180511122933.27155-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-iov_iter is implemented with bvec itererator, so it is safe to pass
-segment to it, and this way is much more efficient than passing one
-page in each bvec.
+When controller is being reset, timeout still may be triggered,
+for handling this situation, the contoller state has to be
+changed to NVME_CTRL_RESETTING first.
 
+So introduce nvme_force_change_ctrl_state() for this purpose.
+
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Cc: Laurence Oberman <loberman@redhat.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/loop.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/nvme/host/core.c | 33 +++++++++++++++++++++++++++++++++
+ drivers/nvme/host/nvme.h |  2 ++
+ 2 files changed, 35 insertions(+)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 8d7d5581ca9c..e709c0380566 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -521,7 +521,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 		struct bio_vec tmp;
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index adb1743e87f7..af053309c610 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -254,6 +254,39 @@ void nvme_cancel_request(struct request *req, void *data, bool reserved)
+ }
+ EXPORT_SYMBOL_GPL(nvme_cancel_request);
  
- 		__rq_for_each_bio(bio, rq)
--			segments += bio_pages(bio);
-+			segments += bio_segments(bio);
- 		bvec = kmalloc(sizeof(struct bio_vec) * segments, GFP_NOIO);
- 		if (!bvec)
- 			return -EIO;
-@@ -533,7 +533,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 		 * copy bio->bi_iov_vec to new bvec. The rq_for_each_page
- 		 * API will take care of all details for us.
- 		 */
--		rq_for_each_page(tmp, rq, iter) {
-+		rq_for_each_segment(tmp, rq, iter) {
- 			*bvec = tmp;
- 			bvec++;
- 		}
-@@ -547,7 +547,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 		 */
- 		offset = bio->bi_iter.bi_bvec_done;
- 		bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
--		segments = bio_pages(bio);
-+		segments = bio_segments(bio);
- 	}
- 	atomic_set(&cmd->ref, 2);
- 
++/* should only be used by EH for handling error during reset */
++void nvme_force_change_ctrl_state(struct nvme_ctrl *ctrl,
++		enum nvme_ctrl_state new_state)
++{
++	enum nvme_ctrl_state old_state;
++	unsigned long flags;
++	bool warn = true;
++
++	spin_lock_irqsave(&ctrl->lock, flags);
++	old_state = ctrl->state;
++	switch (new_state) {
++	case NVME_CTRL_RESETTING:
++		switch (old_state) {
++		case NVME_CTRL_LIVE:
++		case NVME_CTRL_ADMIN_ONLY:
++		case NVME_CTRL_RESETTING:
++		case NVME_CTRL_CONNECTING:
++			warn = false;
++			break;
++		default:
++			break;
++		}
++	default:
++		break;
++	}
++	if (warn)
++		WARN(1, "Make sure you want to change to %d from %d\n",
++				new_state, old_state);
++	ctrl->state = new_state;
++	spin_unlock_irqrestore(&ctrl->lock, flags);
++}
++EXPORT_SYMBOL_GPL(nvme_force_change_ctrl_state);
++
+ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
+ 		enum nvme_ctrl_state new_state)
+ {
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 021f7147f779..2a68df197c71 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -385,6 +385,8 @@ void nvme_complete_rq(struct request *req);
+ void nvme_cancel_request(struct request *req, void *data, bool reserved);
+ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
+ 		enum nvme_ctrl_state new_state);
++void nvme_force_change_ctrl_state(struct nvme_ctrl *ctrl,
++		enum nvme_ctrl_state new_state);
+ int nvme_disable_ctrl(struct nvme_ctrl *ctrl, u64 cap);
+ int nvme_enable_ctrl(struct nvme_ctrl *ctrl, u64 cap);
+ int nvme_shutdown_ctrl(struct nvme_ctrl *ctrl);
 -- 
 2.9.5
