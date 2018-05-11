@@ -1,72 +1,54 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-Subject: Re: [PATCH] blk-mq: Rework blk-mq timeout handling again
-To: Bart Van Assche <Bart.VanAssche@wdc.com>, "hch@lst.de" <hch@lst.de>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "israelr@mellanox.com" <israelr@mellanox.com>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "sebott@linux.ibm.com" <sebott@linux.ibm.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "maxg@mellanox.com" <maxg@mellanox.com>,
-        "tj@kernel.org" <tj@kernel.org>
-References: <20180510175607.27937-1-bart.vanassche@wdc.com>
- <73f77c62-25ca-0915-6f5b-452d60258f05@oracle.com>
- <20180511123519.GA14123@lst.de>
- <13279046837412fd5cfe845a27e469a23125caf3.camel@wdc.com>
-From: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <beab60f7-5fee-f1d8-12c3-c43d005d6427@oracle.com>
-Date: Mon, 14 May 2018 09:37:30 +0800
+Return-Path: <prvs=66238960d=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"israelr@mellanox.com" <israelr@mellanox.com>, "sagi@grimberg.me"
+	<sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>, "sebott@linux.ibm.com"
+	<sebott@linux.ibm.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
+	"maxg@mellanox.com" <maxg@mellanox.com>, "tj@kernel.org" <tj@kernel.org>
+Subject: Re: [PATCH v8] blk-mq: Rework blk-mq timeout handling again
+Date: Fri, 11 May 2018 21:55:16 +0000
+Message-ID: <e93098bdaa17f56c53259994ab64e6cb4ae46d01.camel@wdc.com>
+References: <20180511210849.12743-1-bart.vanassche@wdc.com>
+	 <54bfda3e-2881-76e3-6d51-2ffee23e6070@kernel.dk>
+In-Reply-To: <54bfda3e-2881-76e3-6d51-2ffee23e6070@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <13279046837412fd5cfe845a27e469a23125caf3.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-
-Hi bart
-
-On 05/11/2018 11:29 PM, Bart Van Assche wrote:
-> On Fri, 2018-05-11 at 14:35 +0200, Christoph Hellwig wrote:
->>> It should be due to union blk_deadline_and_state. 
->>> +union blk_deadline_and_state {
->>> +	struct {
->>> +		uint32_t generation:30;
->>> +		uint32_t state:2;
->>> +		uint32_t deadline;
->>> +	};
->>> +	unsigned long legacy_deadline;
->>> +	uint64_t das;
->>> +};
->>
->> Yikes.  Or we just move it into a separate field.  This patch already
->> shrinks struct request a lot, so I'd rather do that to keep it simple.
-> 
-> Hello Christoph,
-> 
-> Are you perhaps referring to the legacy_deadline field? Have you noticed that
-> Jianchao used a legacy block layer function in blk-mq code and that that is
-> why a wrong value for the deadline appeared in the trace output?
-> 
-
-I use blk_rq_deadline because __blk_add_timer uses it.
-
--
- 	/*
- 	 * If the timer isn't already pending or this timeout is earlier
- 	 * than an existing one, modify the timer. Round up to next nearest
- 	 * second.
- 	 */
- 	expiry = blk_rq_timeout(round_jiffies_up(blk_rq_deadline(req)));
--
- 	if (!timer_pending(&q->timeout) ||
- 	    time_before(expiry, q->timeout.expires)) {
- 		unsigned long diff = q->timeout.expires - expiry;
-
-
-This is also the reason why there is no issue about timeout when test.
-blk_rq_timeout will return reasonable value.
-
-In addition, on a 64bit system, how do you set up the timer with a 32bit deadline ?
-
-
-Thanks
-Jianchao
+T24gRnJpLCAyMDE4LTA1LTExIGF0IDE1OjIxIC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
+biA1LzExLzE4IDM6MDggUE0sIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gYmxrX21xX3JxX3Vw
+ZGF0ZV9hYm9ydGVkX2dzdGF0ZShycSwgZ3N0YXRlKTsNCj4gPiArCXVuaW9uIGJsa19kZWFkbGlu
+ZV9hbmRfc3RhdGUgZGFzID0gUkVBRF9PTkNFKHJxLT5kYXMpOw0KPiA+ICsJdW5zaWduZWQgbG9u
+ZyBub3cgPSBqaWZmaWVzOw0KPiA+ICsJaW50MzJfdCBkaWZmX2ppZmZpZXMgPSBkYXMuZGVhZGxp
+bmUgLSBub3c7DQo+ID4gKwlpbnQzMl90IGRpZmZfbmV4dCA9IGRhcy5kZWFkbGluZSAtIGRhdGEt
+Pm5leHQ7DQo+ID4gKwllbnVtIG1xX3JxX3N0YXRlIHJxX3N0YXRlID0gZGFzLnN0YXRlOw0KPiAN
+Cj4gV2h5IHRoZSBpbnQzMl90IHR5cGVzPyBKdXN0IHVzZSBhbiBpbnQvdW5zaWduZWQgaW50Pw0K
+DQpUaGUgY29kZSB0aGF0IHVzZXMgdGhlIGRpZmZfamlmZmllcyBhbmQgZGlmZl9uZXh0IHZhcmlh
+YmxlcyBjYW4gb25seSB3b3JrDQpjb3JyZWN0bHkgaWYgdGhlIHN1YnRyYWN0aW9uIHJlc3VsdHMg
+YXJlIHRydW5jYXRlZCB0byAzMiBiaXRzLiBIZW5jZSB0aGUNCnVzZSBvZiB0aGUgaW50MzJfdCBk
+YXRhIHR5cGVzIHRvIG1ha2UgdGhpcyBleHBsaWNpdC4gSSB0aGluayB1c2luZyBpbnQzMl90DQpp
+bnN0ZWFkIG9mIGludCBtYWtlcyB0aGlzIGNvZGUgZWFzaWVyIHRvIHJlYWQuDQoNCj4gPiBAQCAt
+MTAzLDM3ICs5NywxMTkgQEAgZXh0ZXJuIHZvaWQgYmxrX21xX2hjdHhfa29ial9pbml0KHN0cnVj
+dCBibGtfbXFfaHdfY3R4ICpoY3R4KTsNCj4gPiAgDQo+ID4gIHZvaWQgYmxrX21xX3JlbGVhc2Uo
+c3RydWN0IHJlcXVlc3RfcXVldWUgKnEpOw0KPiA+ICANCj4gPiArI2lmIGRlZmluZWQoQ09ORklH
+X0FSQykgfHwJCQkJCQlcDQo+ID4gKyAgICBkZWZpbmVkKENPTkZJR19BUk0pICYmIGRlZmluZWQo
+Q09ORklHX0NQVV9USFVNQk9OTFkpIHx8CQlcDQo+ID4gKyAgICBkZWZpbmVkKENPTkZJR19DNngp
+IHx8IGRlZmluZWQoQ09ORklHX0g4MzAwKSB8fAkJCVwNCj4gPiArICAgIGRlZmluZWQoQ09ORklH
+X0hFWEFHT04pIHx8IGRlZmluZWQoQ09ORklHX01JQ1JPQkxBWkUpIHx8CQlcDQo+ID4gKyAgICBk
+ZWZpbmVkKENPTkZJR19NSVBTKSAmJiAhZGVmaW5lZChDT05GSUdfNjRCSVQpIHx8CQkJXA0KPiA+
+ICsgICAgZGVmaW5lZChDT05GSUdfTkRTMzIpIHx8IGRlZmluZWQoQ09ORklHX05JT1MpIHx8CQkJ
+XA0KPiA+ICsgICAgZGVmaW5lZChDT05GSUdfT1BFTlJJU0MpIHx8IGRlZmluZWQoQ09ORklHX1BQ
+QzMyKSB8fAkJXA0KPiA+ICsgICAgZGVmaW5lZChDT05GSUdfU1VQRVJIKSB8fCBkZWZpbmVkKENP
+TkZJR19VTUwpIHx8IGRlZmluZWQoQ09ORklHX1VOSUNPUkUzMikNCj4gPiArI3VuZGVmIENPTkZJ
+R19BUkNIX0hBU19DTVBYQ0hHNjQNCj4gPiArI2Vsc2UNCj4gPiArI2RlZmluZSBDT05GSUdfQVJD
+SF9IQVNfQ01QWENIRzY0DQo+ID4gKyNlbmRpZg0KPiANCj4gSSB0aGluayB0aGUgZW5jYXBzdWxh
+dGlvbiBvZiBibGtfbXFfc2V0X3JxX3N0YXRlKCkgaW4gdGVybXMgb2YgbG9jayB2cw0KPiBjbXB4
+Y2hnNjQgaXMgZmluZSwgYnV0IHRoaXMgZG9lcyBub3QgYmVsb25nIGluIHRoZSBibG9jayBsYXll
+ci4NCj4gDQo+ID4gKwkvKiBPbmx5IHVzZWQgaWYgQ09ORklHX0FSQ0hfSEFTX0NNUFhDSEc2NCBp
+cyBub3QgZGVmaW5lZC4gKi8NCj4gPiArCXNwaW5sb2NrX3QgZGFzX2xvY2s7DQo+IA0KPiBMZXQn
+cyBwdXQgaXQgdW5kZXIgYW4gaWYgZGVmaW5lZCgpIHRoZW4uDQoNCk9LLCBJIHdpbGwgbW92ZSBD
+T05GSUdfQVJDSF9IQVNfQ01QWENIRzY0IGludG8gYXJjaC8qL0tjb25maWcgYW5kIEkgd2lsbA0K
+c3Vycm91bmQgc3BpbmxvY2tfdCBkYXNfbG9jayB3aXRoICNpZiBkZWZpbmVkKC4uLikgLyAjZW5k
+aWYuDQoNClRoYW5rcywNCg0KQmFydC4NCg0KDQo=
