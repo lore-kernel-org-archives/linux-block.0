@@ -1,36 +1,40 @@
-Return-Path: <hch@lst.de>
-Date: Fri, 11 May 2018 08:29:03 +0200
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from verein.lst.de ([213.95.11.211]:51236 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752001AbeEKGUv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 11 May 2018 02:20:51 -0400
+Date: Fri, 11 May 2018 08:24:35 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Andreas Dilger <adilger@dilger.ca>
-Cc: Christoph Hellwig <hch@lst.de>, Matthew Wilcox <willy@infradead.org>,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-mm@kvack.org, axboe@kernel.dk
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+        "open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>
 Subject: Re: [PATCH 01/33] block: add a lower-level bio_add_page interface
-Message-ID: <20180511062903.GA8210@lst.de>
-References: <20180509074830.16196-1-hch@lst.de> <20180509074830.16196-2-hch@lst.de> <20180509151243.GA1313@bombadil.infradead.org> <20180510064013.GA11422@lst.de> <AE0124C4-46F7-4051-BA24-AC2E3887E8A3@dilger.ca>
+Message-ID: <20180511062435.GD7962@lst.de>
+References: <20180509074830.16196-1-hch@lst.de> <20180509074830.16196-2-hch@lst.de> <CACVXFVMPwQV8M0raTcLUtqDix-kEkYV3E3fJSVOVw8m=iiv5Uw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <AE0124C4-46F7-4051-BA24-AC2E3887E8A3@dilger.ca>
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CACVXFVMPwQV8M0raTcLUtqDix-kEkYV3E3fJSVOVw8m=iiv5Uw@mail.gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Thu, May 10, 2018 at 03:49:53PM -0600, Andreas Dilger wrote:
-> Would it make sense to change the bio_add_page() and bio_add_pc_page()
-> to use the more common convention instead of continuing the spread of
-> this non-standard calling convention?  This is doubly problematic since
-> "off" and "len" are both unsigned int values so it is easy to get them
-> mixed up, and just reordering the bio_add_page() arguments would not
-> generate any errors.
+On Thu, May 10, 2018 at 04:52:00PM +0800, Ming Lei wrote:
+> On Wed, May 9, 2018 at 3:47 PM, Christoph Hellwig <hch@lst.de> wrote:
+> > For the upcoming removal of buffer heads in XFS we need to keep track of
+> > the number of outstanding writeback requests per page.  For this we need
+> > to know if bio_add_page merged a region with the previous bvec or not.
+> > Instead of adding additional arguments this refactors bio_add_page to
+> > be implemented using three lower level helpers which users like XFS can
+> > use directly if they care about the merge decisions.
+> 
+> The merge policy may be transparent to fs, such as multipage bvec.
 
-We have more than hundred callers.  I don't think we want to create
-so much churn just to clean things up a bit without any meaѕurable
-benefit.  And even if you want to clean it up I'd rather keep it
-away from my iomap/xfs buffered I/O series :)
-
-> One option would be to rename this function bio_page_add() so there are
-> build errors or first add bio_page_add() and mark bio_add_page()
-> deprecated and allow some short time for transition?  There are about
-> 50 uses under drivers/ and 50 uses under fs/.
-
-If you think the churn is worthwhile send a separate series for that.
-My two new functions should have very few callers even by then, so
-feel free to just update them as well.
+The whole point of this series it to make it explicit.  That will have to
+be carried over into a multipage bvec world.  That means the current
+__bio_try_merge_page will have to remain as-is in that new world order,
+but we'd also add a new __bio_try_merge_segment which merges beyond th
+e page.  For the iomap and xfs code we'd first call __bio_try_merge_page,
+if that fails increment the read/write count, and only after that
+call __bio_try_merge_segment.
