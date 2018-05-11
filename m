@@ -1,6 +1,8 @@
-Return-Path: <logang@deltatee.com>
-To: =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
- Stephen Bates <sbates@raithlin.com>, Jerome Glisse <jglisse@redhat.com>
+Return-Path: <Christian.Koenig@amd.com>
+Subject: Re: [PATCH v4 04/14] PCI/P2PDMA: Clear ACS P2P flags for all devices
+ behind switches
+To: Logan Gunthorpe <logang@deltatee.com>, Stephen Bates
+ <sbates@raithlin.com>, Jerome Glisse <jglisse@redhat.com>
 Cc: Alex Williamson <alex.williamson@redhat.com>,
  Bjorn Helgaas <helgaas@kernel.org>,
  "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
@@ -33,44 +35,78 @@ References: <20180423233046.21476-5-logang@deltatee.com>
  <f0101988-cf82-7ffb-2aca-d3b8d2f4b504@deltatee.com>
  <868B49CE-4F0E-4A48-BE78-12149F85F1A4@raithlin.com>
  <8113cba8-62b9-1801-7a77-f82be223b183@deltatee.com>
- <cf2b92c9-7c5b-f19c-b5b1-2f2d435296d1@amd.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <53fa38ce-40dd-6bc1-9b83-c6ccf228b755@deltatee.com>
-Date: Fri, 11 May 2018 09:48:27 -0600
+From: =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>
+Message-ID: <cf2b92c9-7c5b-f19c-b5b1-2f2d435296d1@amd.com>
+Date: Fri, 11 May 2018 10:52:49 +0200
 MIME-Version: 1.0
-In-Reply-To: <cf2b92c9-7c5b-f19c-b5b1-2f2d435296d1@amd.com>
+In-Reply-To: <8113cba8-62b9-1801-7a77-f82be223b183@deltatee.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Subject: Re: [PATCH v4 04/14] PCI/P2PDMA: Clear ACS P2P flags for all devices
- behind switches
+Return-Path: christian.koenig@amd.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 5/11/2018 2:52 AM, Christian König wrote:
-> This only works when the IOVA and the PCI bus addresses never overlap. 
-> I'm not sure how the IOVA allocation works but I don't think we 
-> guarantee that on Linux.
+Am 10.05.2018 um 19:15 schrieb Logan Gunthorpe:
+>
+> On 10/05/18 11:11 AM, Stephen  Bates wrote:
+>>> Not to me. In the p2pdma code we specifically program DMA engines with
+>>> the PCI bus address.
+>> Ah yes of course. Brain fart on my part. We are not programming the P2PDMA initiator with an IOVA but with the PCI bus address...
 
-I find this hard to believe. There's always the possibility that some 
-part of the system doesn't support ACS so if the PCI bus addresses and 
-IOVA overlap there's a good chance that P2P and ATS won't work at all on 
-some hardware.
+By disabling the ACS bits on the intermediate bridges you turn their 
+address routing from IOVA addresses (which are to be resolved by the 
+root complex) back to PCI bus addresses (which are resolved locally in 
+the bridge).
+
+This only works when the IOVA and the PCI bus addresses never overlap. 
+I'm not sure how the IOVA allocation works but I don't think we 
+guarantee that on Linux.
+
+>>
+>>> So regardless of whether we are using the IOMMU or
+>>> not, the packets will be forwarded directly to the peer. If the ACS
+>>>   Redir bits are on they will be forced back to the RC by the switch and
+>>>   the transaction will fail. If we clear the ACS bits, the TLPs will go
+>>>   where we want and everything will work (but we lose the isolation of ACS).
+>> Agreed.
+
+If we really want to enable P2P without ATS and IOMMU enabled I think we 
+should probably approach it like this:
+
+a) Make double sure that IOVA in an IOMMU group never overlap with PCI 
+BARs in that group.
+
+b) Add configuration options to put a whole PCI branch of devices (e.g. 
+a bridge) into a single IOMMU group.
+
+c) Add a configuration option to disable the ACS bit on bridges in the 
+same IOMMU group.
 
 
-> If we really want to enable P2P without ATS and IOMMU enabled I think we 
-> should probably approach it like this:
-> 
-> a) Make double sure that IOVA in an IOMMU group never overlap with PCI 
-> BARs in that group.
-> 
-> b) Add configuration options to put a whole PCI branch of devices (e.g. 
-> a bridge) into a single IOMMU group.
-> 
-> c) Add a configuration option to disable the ACS bit on bridges in the 
-> same IOMMU group.
+I agree that we have a rather special case here, but I still find that 
+approach rather brave and would vote for disabling P2P without ATS when 
+IOMMU is enabled.
 
-I think a configuration option to manage IOMMU groups as you suggest 
-would be a very complex interface and difficult to implement. I prefer 
-the option to disable the ACS bit on boot and let the existing code put 
-the devices into their own IOMMU group (as it should already do to 
-support hardware that doesn't have ACS support).
 
-Logan
+BTW: I can't say anything about other implementations, but at least for 
+the AMD-IOMMU the transaction won't fail when it is send to the root 
+complex.
+
+Instead the root complex would send it to the correct device. I already 
+tested that on an AMD Ryzen with IOMMU enabled and P2P between two GPUs 
+(but could be that this only works because of ATS).
+
+Regards,
+Christian.
+
+>>>     For EPs that support ATS, we should (but don't necessarily have to)
+>>>     program them with the IOVA address so they can go through the
+>>>     translation process which will allow P2P without disabling the ACS Redir
+>>>     bits -- provided the ACS direct translation bit is set. (And btw, if it
+>>>     is, then we lose the benefit of ACS protecting against malicious EPs).
+>>>     But, per above, the ATS transaction should involve only the IOVA address
+>>>     so the ACS bits not being set should not break ATS.
+>>      
+>> Well we would still have to clear some ACS bits but now we can clear only for translated addresses.
+> We don't have to clear the ACS Redir bits as we did in the first case.
+> We just have to make sure the ACS Direct Translated bit is set.
+>
+> Logan
