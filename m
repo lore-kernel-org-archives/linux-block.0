@@ -1,197 +1,168 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: osandov@fb.com,
-	efault@gmx.de,
-	paolo.valente@linaro.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 5/9] sbitmap: fix missed wakeups caused by sbitmap_queue_get_shallow()
-Date: Thu, 10 May 2018 10:24:23 -0600
-Message-Id: <1525969467-12476-6-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1525969467-12476-1-git-send-email-axboe@kernel.dk>
-References: <1525969467-12476-1-git-send-email-axboe@kernel.dk>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	James Smart <james.smart@broadcom.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>
+Subject: [PATCH V5 1/9] block: introduce blk_quiesce_timeout() and blk_unquiesce_timeout()
+Date: Fri, 11 May 2018 20:29:25 +0800
+Message-Id: <20180511122933.27155-2-ming.lei@redhat.com>
+In-Reply-To: <20180511122933.27155-1-ming.lei@redhat.com>
+References: <20180511122933.27155-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+Turns out the current way can't drain timout completely because mod_timer()
+can be triggered in the work func, which can be just run inside the synced
+timeout work:
 
-The sbitmap queue wake batch is calculated such that once allocations
-start blocking, all of the bits which are already allocated must be
-enough to fulfill the batch counters of all of the waitqueues. However,
-the shallow allocation depth can break this invariant, since we block
-before our full depth is being utilized. Add
-sbitmap_queue_min_shallow_depth(), which saves the minimum shallow depth
-the sbq will use, and update sbq_calc_wake_batch() to take it into
-account.
+        del_timer_sync(&q->timeout);
+        cancel_work_sync(&q->timeout_work);
 
-Acked-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+This patch introduces one flag of 'timeout_off' for fixing this issue, turns
+out this simple way does work.
+
+Also blk_quiesce_timeout() and blk_unquiesce_timeout() are introduced for
+draining timeout, which is needed by NVMe.
+
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Cc: Laurence Oberman <loberman@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- include/linux/sbitmap.h | 29 +++++++++++++++++++++++++++++
- lib/sbitmap.c           | 49 ++++++++++++++++++++++++++++++++++++++++---------
- 2 files changed, 69 insertions(+), 9 deletions(-)
+ block/blk-core.c       | 21 +++++++++++++++++++--
+ block/blk-mq.c         |  9 +++++++++
+ block/blk-timeout.c    |  5 ++++-
+ include/linux/blkdev.h | 13 +++++++++++++
+ 4 files changed, 45 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index 841585f6e5f2..0c4a9c242dd7 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -127,6 +127,12 @@ struct sbitmap_queue {
- 	 * @round_robin: Allocate bits in strict round-robin order.
- 	 */
- 	bool round_robin;
-+
-+	/**
-+	 * @min_shallow_depth: The minimum shallow depth which may be passed to
-+	 * sbitmap_queue_get_shallow() or __sbitmap_queue_get_shallow().
-+	 */
-+	unsigned int min_shallow_depth;
- };
- 
- /**
-@@ -390,6 +396,9 @@ int __sbitmap_queue_get(struct sbitmap_queue *sbq);
-  * @shallow_depth: The maximum number of bits to allocate from a single word.
-  * See sbitmap_get_shallow().
-  *
-+ * If you call this, make sure to call sbitmap_queue_min_shallow_depth() after
-+ * initializing @sbq.
-+ *
-  * Return: Non-negative allocated bit number if successful, -1 otherwise.
-  */
- int __sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
-@@ -424,6 +433,9 @@ static inline int sbitmap_queue_get(struct sbitmap_queue *sbq,
-  * @shallow_depth: The maximum number of bits to allocate from a single word.
-  * See sbitmap_get_shallow().
-  *
-+ * If you call this, make sure to call sbitmap_queue_min_shallow_depth() after
-+ * initializing @sbq.
-+ *
-  * Return: Non-negative allocated bit number if successful, -1 otherwise.
-  */
- static inline int sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
-@@ -439,6 +451,23 @@ static inline int sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 85909b431eb0..c277f1023703 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -392,6 +392,22 @@ void blk_stop_queue(struct request_queue *q)
  }
+ EXPORT_SYMBOL(blk_stop_queue);
  
- /**
-+ * sbitmap_queue_min_shallow_depth() - Inform a &struct sbitmap_queue of the
-+ * minimum shallow depth that will be used.
-+ * @sbq: Bitmap queue in question.
-+ * @min_shallow_depth: The minimum shallow depth that will be passed to
-+ * sbitmap_queue_get_shallow() or __sbitmap_queue_get_shallow().
-+ *
-+ * sbitmap_queue_clear() batches wakeups as an optimization. The batch size
-+ * depends on the depth of the bitmap. Since the shallow allocation functions
-+ * effectively operate with a different depth, the shallow depth must be taken
-+ * into account when calculating the batch size. This function must be called
-+ * with the minimum shallow depth that will be used. Failure to do so can result
-+ * in missed wakeups.
-+ */
-+void sbitmap_queue_min_shallow_depth(struct sbitmap_queue *sbq,
-+				     unsigned int min_shallow_depth);
++void blk_unquiesce_timeout(struct request_queue *q)
++{
++	blk_mark_timeout_quiesce(q, false);
++	mod_timer(&q->timeout, jiffies + q->rq_timeout);
++}
++EXPORT_SYMBOL(blk_unquiesce_timeout);
 +
-+/**
-  * sbitmap_queue_clear() - Free an allocated bit and wake up waiters on a
-  * &struct sbitmap_queue.
-  * @sbq: Bitmap to free from.
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index e6a9c06ec70c..d21473b42465 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -270,18 +270,33 @@ void sbitmap_bitmap_show(struct sbitmap *sb, struct seq_file *m)
- }
- EXPORT_SYMBOL_GPL(sbitmap_bitmap_show);
- 
--static unsigned int sbq_calc_wake_batch(unsigned int depth)
-+static unsigned int sbq_calc_wake_batch(struct sbitmap_queue *sbq,
-+					unsigned int depth)
++void blk_quiesce_timeout(struct request_queue *q)
++{
++	blk_mark_timeout_quiesce(q, true);
++
++	del_timer_sync(&q->timeout);
++	cancel_work_sync(&q->timeout_work);
++}
++EXPORT_SYMBOL(blk_quiesce_timeout);
++
+ /**
+  * blk_sync_queue - cancel any pending callbacks on a queue
+  * @q: the queue
+@@ -412,8 +428,7 @@ EXPORT_SYMBOL(blk_stop_queue);
+  */
+ void blk_sync_queue(struct request_queue *q)
  {
- 	unsigned int wake_batch;
-+	unsigned int shallow_depth;
+-	del_timer_sync(&q->timeout);
+-	cancel_work_sync(&q->timeout_work);
++	blk_quiesce_timeout(q);
  
- 	/*
- 	 * For each batch, we wake up one queue. We need to make sure that our
--	 * batch size is small enough that the full depth of the bitmap is
--	 * enough to wake up all of the queues.
-+	 * batch size is small enough that the full depth of the bitmap,
-+	 * potentially limited by a shallow depth, is enough to wake up all of
-+	 * the queues.
-+	 *
-+	 * Each full word of the bitmap has bits_per_word bits, and there might
-+	 * be a partial word. There are depth / bits_per_word full words and
-+	 * depth % bits_per_word bits left over. In bitwise arithmetic:
-+	 *
-+	 * bits_per_word = 1 << shift
-+	 * depth / bits_per_word = depth >> shift
-+	 * depth % bits_per_word = depth & ((1 << shift) - 1)
-+	 *
-+	 * Each word can be limited to sbq->min_shallow_depth bits.
- 	 */
--	wake_batch = SBQ_WAKE_BATCH;
--	if (wake_batch > depth / SBQ_WAIT_QUEUES)
--		wake_batch = max(1U, depth / SBQ_WAIT_QUEUES);
-+	shallow_depth = min(1U << sbq->sb.shift, sbq->min_shallow_depth);
-+	depth = ((depth >> sbq->sb.shift) * shallow_depth +
-+		 min(depth & ((1U << sbq->sb.shift) - 1), shallow_depth));
-+	wake_batch = clamp_t(unsigned int, depth / SBQ_WAIT_QUEUES, 1,
-+			     SBQ_WAKE_BATCH);
- 
- 	return wake_batch;
- }
-@@ -307,7 +322,8 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
- 			*per_cpu_ptr(sbq->alloc_hint, i) = prandom_u32() % depth;
+ 	if (q->mq_ops) {
+ 		struct blk_mq_hw_ctx *hctx;
+@@ -425,6 +440,8 @@ void blk_sync_queue(struct request_queue *q)
+ 	} else {
+ 		cancel_delayed_work_sync(&q->delay_work);
  	}
- 
--	sbq->wake_batch = sbq_calc_wake_batch(depth);
-+	sbq->min_shallow_depth = UINT_MAX;
-+	sbq->wake_batch = sbq_calc_wake_batch(sbq, depth);
- 	atomic_set(&sbq->wake_index, 0);
- 
- 	sbq->ws = kzalloc_node(SBQ_WAIT_QUEUES * sizeof(*sbq->ws), flags, node);
-@@ -327,9 +343,10 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
++
++	blk_mark_timeout_quiesce(q, false);
  }
- EXPORT_SYMBOL_GPL(sbitmap_queue_init_node);
+ EXPORT_SYMBOL(blk_sync_queue);
  
--void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
-+static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
-+					    unsigned int depth)
- {
--	unsigned int wake_batch = sbq_calc_wake_batch(depth);
-+	unsigned int wake_batch = sbq_calc_wake_batch(sbq, depth);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 9ce9cac16c3f..173f1723e48f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -917,6 +917,15 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 	};
+ 	struct blk_mq_hw_ctx *hctx;
  	int i;
++	bool timeout_off;
++	unsigned long flags;
++
++	spin_lock_irqsave(q->queue_lock, flags);
++	timeout_off = q->timeout_off;
++	spin_unlock_irqrestore(q->queue_lock, flags);
++
++	if (timeout_off)
++		return;
  
- 	if (sbq->wake_batch != wake_batch) {
-@@ -342,6 +359,11 @@ void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
- 		for (i = 0; i < SBQ_WAIT_QUEUES; i++)
- 			atomic_set(&sbq->ws[i].wait_cnt, 1);
- 	}
+ 	/* A deadlock might occur if a request is stuck requiring a
+ 	 * timeout at the same time a queue freeze is waiting
+diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+index 652d4d4d3e97..ffd0b609091e 100644
+--- a/block/blk-timeout.c
++++ b/block/blk-timeout.c
+@@ -136,12 +136,15 @@ void blk_timeout_work(struct work_struct *work)
+ 
+ 	spin_lock_irqsave(q->queue_lock, flags);
+ 
++	if (q->timeout_off)
++		goto exit;
++
+ 	list_for_each_entry_safe(rq, tmp, &q->timeout_list, timeout_list)
+ 		blk_rq_check_expired(rq, &next, &next_set);
+ 
+ 	if (next_set)
+ 		mod_timer(&q->timeout, round_jiffies_up(next));
+-
++exit:
+ 	spin_unlock_irqrestore(q->queue_lock, flags);
+ }
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 5c4eee043191..a2cc4aaecf50 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -584,6 +584,7 @@ struct request_queue {
+ 	struct timer_list	timeout;
+ 	struct work_struct	timeout_work;
+ 	struct list_head	timeout_list;
++	bool			timeout_off;
+ 
+ 	struct list_head	icq_list;
+ #ifdef CONFIG_BLK_CGROUP
+@@ -1017,6 +1018,18 @@ extern void blk_execute_rq(struct request_queue *, struct gendisk *,
+ extern void blk_execute_rq_nowait(struct request_queue *, struct gendisk *,
+ 				  struct request *, int, rq_end_io_fn *);
+ 
++static inline void blk_mark_timeout_quiesce(struct request_queue *q, bool quiesce)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(q->queue_lock, flags);
++	q->timeout_off = quiesce;
++	spin_unlock_irqrestore(q->queue_lock, flags);
 +}
 +
-+void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
-+{
-+	sbitmap_queue_update_wake_batch(sbq, depth);
- 	sbitmap_resize(&sbq->sb, depth);
- }
- EXPORT_SYMBOL_GPL(sbitmap_queue_resize);
-@@ -403,6 +425,14 @@ int __sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
- }
- EXPORT_SYMBOL_GPL(__sbitmap_queue_get_shallow);
- 
-+void sbitmap_queue_min_shallow_depth(struct sbitmap_queue *sbq,
-+				     unsigned int min_shallow_depth)
-+{
-+	sbq->min_shallow_depth = min_shallow_depth;
-+	sbitmap_queue_update_wake_batch(sbq, sbq->sb.depth);
-+}
-+EXPORT_SYMBOL_GPL(sbitmap_queue_min_shallow_depth);
++extern void blk_quiesce_timeout(struct request_queue *q);
++extern void blk_unquiesce_timeout(struct request_queue *q);
 +
- static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
- {
- 	int i, wake_index;
-@@ -528,5 +558,6 @@ void sbitmap_queue_show(struct sbitmap_queue *sbq, struct seq_file *m)
- 	seq_puts(m, "}\n");
+ int blk_status_to_errno(blk_status_t status);
+ blk_status_t errno_to_blk_status(int errno);
  
- 	seq_printf(m, "round_robin=%d\n", sbq->round_robin);
-+	seq_printf(m, "min_shallow_depth=%u\n", sbq->min_shallow_depth);
- }
- EXPORT_SYMBOL_GPL(sbitmap_queue_show);
 -- 
-2.7.4
+2.9.5
