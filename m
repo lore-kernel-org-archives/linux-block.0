@@ -1,56 +1,32 @@
-Return-Path: <prvs=66238960d=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"israelr@mellanox.com" <israelr@mellanox.com>, "sagi@grimberg.me"
-	<sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>, "sebott@linux.ibm.com"
-	<sebott@linux.ibm.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
-	"maxg@mellanox.com" <maxg@mellanox.com>, "tj@kernel.org" <tj@kernel.org>
+Return-Path: <hch@lst.de>
+Date: Fri, 11 May 2018 14:35:19 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+	Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@redhat.com>,
+	Sebastian Ott <sebott@linux.ibm.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Israel Rukshin <israelr@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>
 Subject: Re: [PATCH] blk-mq: Rework blk-mq timeout handling again
-Date: Fri, 11 May 2018 15:26:18 +0000
-Message-ID: <b38e338c651b2e39d259eca5bc559308d8aa4a24.camel@wdc.com>
-References: <20180510175607.27937-1-bart.vanassche@wdc.com>
-	 <73f77c62-25ca-0915-6f5b-452d60258f05@oracle.com>
-In-Reply-To: <73f77c62-25ca-0915-6f5b-452d60258f05@oracle.com>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <20180511123519.GA14123@lst.de>
+References: <20180510175607.27937-1-bart.vanassche@wdc.com> <73f77c62-25ca-0915-6f5b-452d60258f05@oracle.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <73f77c62-25ca-0915-6f5b-452d60258f05@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE4LTA1LTExIGF0IDIwOjA2ICswODAwLCBqaWFuY2hhby53YW5nIHdyb3RlOg0K
-PiBIaSBiYXJ0DQo+IA0KPiBJIGFkZCBkZWJ1ZyBsb2cgaW4gYmxrX21xX2FkZF90aW1lciBhcyBm
-b2xsb3dpbmcNCj4gDQo+IHZvaWQgYmxrX21xX2FkZF90aW1lcihzdHJ1Y3QgcmVxdWVzdCAqcmVx
-LCBlbnVtIG1xX3JxX3N0YXRlIG9sZCwNCj4gICAgICAgICAgICAgICAgICAgICAgZW51bSBtcV9y
-cV9zdGF0ZSBuZXcpDQo+IHsNCj4gICAgICAgIHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxID0gcmVx
-LT5xOw0KPiANCj4gICAgICAgIGlmICghcmVxLT50aW1lb3V0KQ0KPiAgICAgICAgICAgICAgICBy
-ZXEtPnRpbWVvdXQgPSBxLT5ycV90aW1lb3V0Ow0KPiAgICAgICAgaWYgKCFibGtfbXFfcnFfc2V0
-X2RlYWRsaW5lKHJlcSwgamlmZmllcyArIHJlcS0+dGltZW91dCwgb2xkLCBuZXcpKQ0KPiAgICAg
-ICAgICAgICAgICBXQVJOX09OX09OQ0UodHJ1ZSk7DQo+IA0KPiAgICAgICAgdHJhY2VfcHJpbnRr
-KCJqaWZmaWVzICVseCB0byAleCBsZGwgJWx4IGdlbiAldSBkbCAleFxuIiwNCj4gICAgICAgICAg
-ICAgICAgICAgICAgICBqaWZmaWVzLA0KPiAgICAgICAgICAgICAgICAgICAgICAgIHJlcS0+dGlt
-ZW91dCwNCj4gICAgICAgICAgICAgICAgICAgICAgICBibGtfcnFfZGVhZGxpbmUocmVxKSwNCj4g
-ICAgICAgICAgICAgICAgICAgICAgICByZXEtPmRhcy5nZW5lcmF0aW9uLA0KPiAgICAgICAgICAg
-ICAgICAgICAgICAgIHJlcS0+ZGFzLmRlYWRsaW5lKTsNCj4gIA0KPiAgICAgICAgcmV0dXJuIF9f
-YmxrX2FkZF90aW1lcihyZXEpOw0KPiAgfQ0KPiANCj4gQW5kIGdldCBsb2cgYmVsb3c6DQo+IA0K
-PiAgICAgIGpiZDIvc2RhMi04LTMyMCAgIFswMDBdIC4uLjEgICAgOTUuMDMwODI0OiBibGtfbXFf
-YWRkX3RpbWVyOiBqaWZmaWVzIGZmZmYzN2MwIHRvIDFkNGMgbGRsIGZmZmY1NTBjNDAwMDAwMDAg
-Z2VuIDAgZGwgZmZmZjU1MGMNCj4gICAgIGt3b3JrZXIvMDoxSC0xMzYgICBbMDAwXSAuLi4xICAg
-IDk1LjAzMTgyMjogYmxrX21xX2FkZF90aW1lcjogamlmZmllcyBmZmZmMzdjMCB0byAxZDRjIGxk
-bCBmZmZmNTUwYzQwMDAwMDAwIGdlbiAwIGRsIGZmZmY1NTBjDQo+ICAgICBrd29ya2VyLzY6MUgt
-MjQ0ICAgWzAwNl0gLi4uMSAgICA5NS4wNDE2OTU6IGJsa19tcV9hZGRfdGltZXI6IGppZmZpZXMg
-ZmZmZjM3YzMgdG8gMWQ0YyBsZGwgZmZmZjU1MGY0MDAwMDAwMCBnZW4gMCBkbCBmZmZmNTUwZg0K
-PiAgICAga3dvcmtlci82OjFILTI0NCAgIFswMDZdIC4uLjEgICAgOTUuMDQxOTU0OiBibGtfbXFf
-YWRkX3RpbWVyOiBqaWZmaWVzIGZmZmYzN2MzIHRvIDFkNGMgbGRsIGZmZmY1NTBmNDAwMDAwMDAg
-Z2VuIDAgZGwgZmZmZjU1MGYNCj4gDQo+IFRoZSBibGtfcnFfZGVhZGxpbmUgcmV0dXJuIGZmZmY1
-NTBjNDAwMDAwMDAgd2hpY2ggbG9va3MgcmVhbGx5IGNyYXp5Lg0KDQpUaGUgYnVnIGlzIGluIHRo
-ZSBhYm92ZSB0cmFjZV9wcmludGsoKSBjYWxsOiBibGtfcnFfZGVhZGxpbmUoKSBtdXN0IG9ubHkg
-YmUgdXNlZA0KZm9yIHRoZSBsZWdhY3kgYmxvY2sgbGF5ZXIgYW5kIG5vdCBmb3IgYmxrLW1xIGNv
-ZGUuIElmIHlvdSBoYXZlIGEgbG9vayBhdCB0aGUgdmFsdWUNCm9mIHRoZSBkYXMuZGVhZGxpbmUg
-ZmllbGQgdGhlbiBvbmUgY2FuIHNlZSB0aGF0IHRoZSB2YWx1ZSBvZiB0aGF0IGZpZWxkIGlzIGNv
-cnJlY3Q6DQoweGZmZmY1NTBjIC0gMHhmZmZmMzdjMCA9IDc1MDAgPSAzMCAqIDI1MC4gRG9lcyB0
-aGF0IG1lYW4gdGhhdCBIWiA9IDI1MCBvbiB0aGUgc3lzdGVtDQpvbiB3aGljaCB5b3UgcmFuIHRo
-aXMgdGVzdD8NCg0KPiBBbmQgZ2VuZXJhdGlvbiBuZXZlciBjaGFuZ2UuIA0KDQpUaGF0J3MgYSBn
-b29kIGNhdGNoLiBUaGUgY29kZSBmb3IgaW5jcmVtZW50aW5nIHRoZSBnZW5lcmF0aW9uIG51bWJl
-ciBvY2N1cnMgaW4NCmJsa19tcV9jaGFuZ2VfcnFfc3RhdGUoKSBidXQgaXMgbWlzc2luZyBmcm9t
-IGJsa19tcV9ycV9zZXRfZGVhZGxpbmUoKS4gSSB3aWxsIGZpeCB0aGlzLg0KDQpCYXJ0Lg0KDQoN
-Cg==
+> It should be due to union blk_deadline_and_state. 
+> +union blk_deadline_and_state {
+> +	struct {
+> +		uint32_t generation:30;
+> +		uint32_t state:2;
+> +		uint32_t deadline;
+> +	};
+> +	unsigned long legacy_deadline;
+> +	uint64_t das;
+> +};
+
+Yikes.  Or we just move it into a separate field.  This patch already
+shrinks struct request a lot, so I'd rather do that to keep it simple.
