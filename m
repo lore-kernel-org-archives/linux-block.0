@@ -5,8 +5,8 @@ To: Kent Overstreet <kent.overstreet@gmail.com>,
  linux-mm@kvack.org, Ingo Molnar <mingo@kernel.org>
 References: <20180509013358.16399-1-kent.overstreet@gmail.com>
 From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <bd9f9811-bec7-5394-30d4-5db833ecf5b4@kernel.dk>
-Date: Mon, 14 May 2018 13:24:02 -0600
+Message-ID: <b3970608-95dd-3d4f-140c-3d7cbd12cf8d@kernel.dk>
+Date: Fri, 11 May 2018 15:13:38 -0600
 MIME-Version: 1.0
 In-Reply-To: <20180509013358.16399-1-kent.overstreet@gmail.com>
 Content-Type: text/plain; charset=utf-8
@@ -25,7 +25,8 @@ On 5/8/18 7:33 PM, Kent Overstreet wrote:
 >  - show whether fua is supported in sysfs, because I don't know of anything that
 >    exports whether the _block layer_ specifically thinks fua is supported.
 
-Thanks Kent, applied for 4.18 with the update patch 1.
+Looked over the series, and looks like both good cleanups and optimizations.
+If we can get the mempool patch sorted, I can apply this for 4.18.
 
 -- 
 Jens Axboe
