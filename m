@@ -1,107 +1,55 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:51908 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752482AbeERQuG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 May 2018 12:50:06 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 31/34] xfs: remove xfs_start_page_writeback
-Date: Fri, 18 May 2018 18:48:27 +0200
-Message-Id: <20180518164830.1552-32-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Thu, 10 May 2018 23:39:25 -0700
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: stop using buffer heads in xfs and iomap
+Message-ID: <20180511063925.GH11261@magnolia>
+References: <20180509074830.16196-1-hch@lst.de>
+ <20180510151303.GW11261@magnolia>
+ <20180511062208.GC7962@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180511062208.GC7962@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-This helper only has two callers, one of them with a constant error
-argument.  Remove it to make pending changes to the code a little easier.
+On Fri, May 11, 2018 at 08:22:08AM +0200, Christoph Hellwig wrote:
+> On Thu, May 10, 2018 at 08:13:03AM -0700, Darrick J. Wong wrote:
+> > I ran xfstests on this for fun last night but hung in g/095:
+> > 
+> > FSTYP         -- xfs (debug)
+> > PLATFORM      -- Linux/x86_64 submarine-djwong-mtr01 4.17.0-rc4-djw
+> > MKFS_OPTIONS  -- -f -m reflink=1,rmapbt=1, -i sparse=1, -b size=1024, /dev/sdf
+> > MOUNT_OPTIONS -- /dev/sdf /opt
+> > 
+> > FWIW the stock v4 and the 'v5 with everything and 4k blocks' vms
+> > passed, so I guess there's a bug somewhere in the sub-page block size
+> > code paths...
+> 
+> I haven't seen that in my -b size 1024 -m relink test  I'll try your above
+> exact setup, too.  Is this disk or SSD?  How much memory and how many
+> CPUs?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/xfs_aops.c | 47 +++++++++++++++++++++--------------------------
- 1 file changed, 21 insertions(+), 26 deletions(-)
+4 CPUs in a VM on a Nehalem-era machine, 2GB RAM, two 2.3GB virtio-scsi
+disks...
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 951b329abb23..dd92d99df51f 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -505,30 +505,6 @@ xfs_imap_valid(
- 		offset < imap->br_startoff + imap->br_blockcount;
- }
- 
--STATIC void
--xfs_start_page_writeback(
--	struct page		*page,
--	int			clear_dirty)
--{
--	ASSERT(PageLocked(page));
--	ASSERT(!PageWriteback(page));
--
--	/*
--	 * if the page was not fully cleaned, we need to ensure that the higher
--	 * layers come back to it correctly. That means we need to keep the page
--	 * dirty, and for WB_SYNC_ALL writeback we need to ensure the
--	 * PAGECACHE_TAG_TOWRITE index mark is not removed so another attempt to
--	 * write this page in this writeback sweep will be made.
--	 */
--	if (clear_dirty) {
--		clear_page_dirty_for_io(page);
--		set_page_writeback(page);
--	} else
--		set_page_writeback_keepwrite(page);
--
--	unlock_page(page);
--}
--
- /*
-  * Submit the bio for an ioend. We are passed an ioend with a bio attached to
-  * it, and we submit that bio. The ioend may be used for multiple bio
-@@ -887,6 +863,9 @@ xfs_writepage_map(
- 	ASSERT(wpc->ioend || list_empty(&submit_list));
- 
- out:
-+	ASSERT(PageLocked(page));
-+	ASSERT(!PageWriteback(page));
-+
- 	/*
- 	 * On error, we have to fail the ioend here because we have locked
- 	 * buffers in the ioend. If we don't do this, we'll deadlock
-@@ -905,7 +884,21 @@ xfs_writepage_map(
- 	 * treated correctly on error.
- 	 */
- 	if (count) {
--		xfs_start_page_writeback(page, !error);
-+		/*
-+		 * If the page was not fully cleaned, we need to ensure that the
-+		 * higher layers come back to it correctly.  That means we need
-+		 * to keep the page dirty, and for WB_SYNC_ALL writeback we need
-+		 * to ensure the PAGECACHE_TAG_TOWRITE index mark is not removed
-+		 * so another attempt to write this page in this writeback sweep
-+		 * will be made.
-+		 */
-+		if (error) {
-+			set_page_writeback_keepwrite(page);
-+		} else {
-+			clear_page_dirty_for_io(page);
-+			set_page_writeback(page);
-+		}
-+		unlock_page(page);
- 
- 		/*
- 		 * Preserve the original error if there was one, otherwise catch
-@@ -930,7 +923,9 @@ xfs_writepage_map(
- 		 * race with a partial page truncate on a sub-page block sized
- 		 * filesystem. In that case we need to mark the page clean.
- 		 */
--		xfs_start_page_writeback(page, 1);
-+		clear_page_dirty_for_io(page);
-+		set_page_writeback(page);
-+		unlock_page(page);
- 		end_page_writeback(page);
- 	}
- 
--- 
-2.17.0
+...the VM host itself is a quad-core Nehalem, 24G RAM, atop an ext4 fs
+on spinning rust in a raid1.
+
+> Btw, I think the series might be worthwhile even if we have to delay
+> the sub-page blocksize support - the blocksize == pagesize code is
+> basically entirely separate and already very useful.  Only the last
+> three patches contain the small blocksize support, without that we'll
+> just continue using buffer heads for that case for now.
+
+<shrug> I'll keep reading, it seemed generally ok until I hit the
+sub-page part and my eyes glazed over. :)
+
+--D
+
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-xfs" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
