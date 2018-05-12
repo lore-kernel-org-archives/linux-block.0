@@ -1,169 +1,77 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 29/34] xfs: don't look at buffer heads in xfs_add_to_ioend
-Date: Fri, 18 May 2018 18:48:25 +0200
-Message-Id: <20180518164830.1552-30-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from userp2120.oracle.com ([156.151.31.85]:47166 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750776AbeELB4r (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 11 May 2018 21:56:47 -0400
+Date: Fri, 11 May 2018 18:56:38 -0700
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH 10/33] iomap: add an iomap-based bmap implementation
+Message-ID: <20180512015638.GX11261@magnolia>
+References: <20180509074830.16196-1-hch@lst.de>
+ <20180509074830.16196-11-hch@lst.de>
+ <20180509164628.GV11261@magnolia>
+ <20180510064250.GD11422@lst.de>
+ <20180510150838.GE25312@magnolia>
+ <20180511062527.GE7962@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180511062527.GE7962@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Calculate all information for the bio based on the passed in information
-without requiring a buffer_head structure.
+On Fri, May 11, 2018 at 08:25:27AM +0200, Christoph Hellwig wrote:
+> On Thu, May 10, 2018 at 08:08:38AM -0700, Darrick J. Wong wrote:
+> > > > > +	sector_t *bno = data;
+> > > > > +
+> > > > > +	if (iomap->type == IOMAP_MAPPED)
+> > > > > +		*bno = (iomap->addr + pos - iomap->offset) >> inode->i_blkbits;
+> > > > 
+> > > > Does this need to be careful w.r.t. overflow on systems where sector_t
+> > > > is a 32-bit unsigned long?
+> > > > 
+> > > > Also, ioctl_fibmap() typecasts the returned sector_t to an int, which
+> > > > also seems broken.  I agree the interface needs to die, but ioctls take
+> > > > a long time to deprecate.
+> > > 
+> > > Not much we can do about the interface.
+> > 
+> > Yes, the interface is fubar, but if file /foo maps to block 8589934720
+> > then do we return the truncated result 128?
+> 
+> Then we'll get a corrupt result.  What do you think we could do here
+> eithere in the old or new code?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/xfs_aops.c | 68 ++++++++++++++++++++++-------------------------
- 1 file changed, 32 insertions(+), 36 deletions(-)
+I think the only thing we /can/ do is figure out if we'd be truncating
+the result, dump a warning to the kernel, and return 0, because we don't
+want smartypants FIBMAP callers to be using crap block pointers.
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index f01c1dd737ec..592b33b35a30 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -44,7 +44,6 @@ struct xfs_writepage_ctx {
- 	struct xfs_bmbt_irec    imap;
- 	unsigned int		io_type;
- 	struct xfs_ioend	*ioend;
--	sector_t		last_block;
- };
- 
- void
-@@ -545,11 +544,6 @@ xfs_start_page_writeback(
- 	unlock_page(page);
- }
- 
--static inline int xfs_bio_add_buffer(struct bio *bio, struct buffer_head *bh)
--{
--	return bio_add_page(bio, bh->b_page, bh->b_size, bh_offset(bh));
--}
--
- /*
-  * Submit the bio for an ioend. We are passed an ioend with a bio attached to
-  * it, and we submit that bio. The ioend may be used for multiple bio
-@@ -604,27 +598,20 @@ xfs_submit_ioend(
- 	return 0;
- }
- 
--static void
--xfs_init_bio_from_bh(
--	struct bio		*bio,
--	struct buffer_head	*bh)
--{
--	bio->bi_iter.bi_sector = bh->b_blocknr * (bh->b_size >> 9);
--	bio_set_dev(bio, bh->b_bdev);
--}
--
- static struct xfs_ioend *
- xfs_alloc_ioend(
- 	struct inode		*inode,
- 	unsigned int		type,
- 	xfs_off_t		offset,
--	struct buffer_head	*bh)
-+	struct block_device	*bdev,
-+	sector_t		sector)
- {
- 	struct xfs_ioend	*ioend;
- 	struct bio		*bio;
- 
- 	bio = bio_alloc_bioset(GFP_NOFS, BIO_MAX_PAGES, xfs_ioend_bioset);
--	xfs_init_bio_from_bh(bio, bh);
-+	bio_set_dev(bio, bdev);
-+	bio->bi_iter.bi_sector = sector;
- 
- 	ioend = container_of(bio, struct xfs_ioend, io_inline_bio);
- 	INIT_LIST_HEAD(&ioend->io_list);
-@@ -649,13 +636,14 @@ static void
- xfs_chain_bio(
- 	struct xfs_ioend	*ioend,
- 	struct writeback_control *wbc,
--	struct buffer_head	*bh)
-+	struct block_device	*bdev,
-+	sector_t		sector)
- {
- 	struct bio *new;
- 
- 	new = bio_alloc(GFP_NOFS, BIO_MAX_PAGES);
--	xfs_init_bio_from_bh(new, bh);
--
-+	bio_set_dev(new, bdev);
-+	new->bi_iter.bi_sector = sector;
- 	bio_chain(ioend->io_bio, new);
- 	bio_get(ioend->io_bio);		/* for xfs_destroy_ioend */
- 	ioend->io_bio->bi_opf = REQ_OP_WRITE | wbc_to_write_flags(wbc);
-@@ -665,39 +653,45 @@ xfs_chain_bio(
- }
- 
- /*
-- * Test to see if we've been building up a completion structure for
-- * earlier buffers -- if so, we try to append to this ioend if we
-- * can, otherwise we finish off any current ioend and start another.
-- * Return the ioend we finished off so that the caller can submit it
-- * once it has finished processing the dirty page.
-+ * Test to see if we have an existing ioend structure that we could append to
-+ * first, otherwise finish off the current ioend and start another.
-  */
- STATIC void
- xfs_add_to_ioend(
- 	struct inode		*inode,
--	struct buffer_head	*bh,
- 	xfs_off_t		offset,
-+	struct page		*page,
- 	struct xfs_writepage_ctx *wpc,
- 	struct writeback_control *wbc,
- 	struct list_head	*iolist)
- {
-+	struct xfs_inode	*ip = XFS_I(inode);
-+	struct xfs_mount	*mp = ip->i_mount;
-+	struct block_device	*bdev = xfs_find_bdev_for_inode(inode);
-+	unsigned		len = i_blocksize(inode);
-+	unsigned		poff = offset & (PAGE_SIZE - 1);
-+	sector_t		sector;
-+
-+	sector = xfs_fsb_to_db(ip, wpc->imap.br_startblock) +
-+		((offset - XFS_FSB_TO_B(mp, wpc->imap.br_startoff)) >> 9);
-+
- 	if (!wpc->ioend || wpc->io_type != wpc->ioend->io_type ||
--	    bh->b_blocknr != wpc->last_block + 1 ||
-+	    sector != bio_end_sector(wpc->ioend->io_bio) ||
- 	    offset != wpc->ioend->io_offset + wpc->ioend->io_size) {
- 		if (wpc->ioend)
- 			list_add(&wpc->ioend->io_list, iolist);
--		wpc->ioend = xfs_alloc_ioend(inode, wpc->io_type, offset, bh);
-+		wpc->ioend = xfs_alloc_ioend(inode, wpc->io_type, offset,
-+				bdev, sector);
- 	}
- 
- 	/*
--	 * If the buffer doesn't fit into the bio we need to allocate a new
--	 * one.  This shouldn't happen more than once for a given buffer.
-+	 * If the block doesn't fit into the bio we need to allocate a new
-+	 * one.  This shouldn't happen more than once for a given block.
- 	 */
--	while (xfs_bio_add_buffer(wpc->ioend->io_bio, bh) != bh->b_size)
--		xfs_chain_bio(wpc->ioend, wbc, bh);
-+	while (bio_add_page(wpc->ioend->io_bio, page, len, poff) != len)
-+		xfs_chain_bio(wpc->ioend, wbc, bdev, sector);
- 
--	wpc->ioend->io_size += bh->b_size;
--	wpc->last_block = bh->b_blocknr;
--	xfs_start_buffer_writeback(bh);
-+	wpc->ioend->io_size += len;
- }
- 
- STATIC void
-@@ -893,7 +887,9 @@ xfs_writepage_map(
- 
- 		lock_buffer(bh);
- 		xfs_map_at_offset(inode, bh, &wpc->imap, file_offset);
--		xfs_add_to_ioend(inode, bh, file_offset, wpc, wbc, &submit_list);
-+		xfs_add_to_ioend(inode, file_offset, page, wpc, wbc,
-+				&submit_list);
-+		xfs_start_buffer_writeback(bh);
- 		count++;
- 	}
- 
--- 
-2.17.0
+Something like this for the bmap implementation...
+
+uint64_t mapping = iomap->addr;
+
+#ifdef CONFIG_LBDAF
+if (mapping > ULONG_MAX) {
+	/* Do not truncate results. */
+	return 0;
+}
+#endif
+
+...and in the bmap ioctl...
+
+sector_t mapping = ...;
+
+if (mapping > INT_MAX) {
+	WARN(1, "would truncate bmap result, go fix your stupid program");
+	return 0;
+}
+
+--D
+
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-xfs" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
