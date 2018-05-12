@@ -1,108 +1,133 @@
-Return-Path: <jianchao.w.wang@oracle.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Sat, 12 May 2018 08:21:22 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@linux.intel.com>
+Cc: Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@kernel.dk>,
+	Laurence Oberman <loberman@redhat.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	James Smart <james.smart@broadcom.com>,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>
 Subject: Re: [PATCH V5 0/9] nvme: pci: fix & improve timeout handling
-To: Ming Lei <ming.lei@redhat.com>, Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        James Smart <james.smart@broadcom.com>, Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
-        Laurence Oberman <loberman@redhat.com>
+Message-ID: <20180512002110.GA23631@ming.t460p>
 References: <20180511122933.27155-1-ming.lei@redhat.com>
-From: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <776f21e1-dc19-1b77-9ba4-44f0b8366625@oracle.com>
-Date: Mon, 14 May 2018 16:21:04 +0800
+ <20180511205028.GB7772@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20180511122933.27155-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180511205028.GB7772@localhost.localdomain>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi ming
+Hi Keith,
 
-Please refer to my test log and analysis.
+On Fri, May 11, 2018 at 02:50:28PM -0600, Keith Busch wrote:
+> On Fri, May 11, 2018 at 08:29:24PM +0800, Ming Lei wrote:
+> > Hi,
+> > 
+> > The 1st patch introduces blk_quiesce_timeout() and blk_unquiesce_timeout()
+> > for NVMe, meantime fixes blk_sync_queue().
+> > 
+> > The 2nd patch covers timeout for admin commands for recovering controller
+> > for avoiding possible deadlock.
+> > 
+> > The 3rd and 4th patches avoid to wait_freeze on queues which aren't frozen.
+> > 
+> > The last 5 patches fixes several races wrt. NVMe timeout handler, and
+> > finally can make blktests block/011 passed. Meantime the NVMe PCI timeout
+> > mecanism become much more rebost than before.
+> > 
+> > gitweb:
+> > 	https://github.com/ming1/linux/commits/v4.17-rc-nvme-timeout.V5
+> 
+> Hi Ming,
+> 
+> First test with simulated broken links is unsuccessful. I'm getting
+> stuck here:
+> 
+> [<0>] blk_mq_freeze_queue_wait+0x46/0xb0
+> [<0>] blk_cleanup_queue+0x78/0x170
+> [<0>] nvme_ns_remove+0x137/0x1a0 [nvme_core]
+> [<0>] nvme_remove_namespaces+0x86/0xc0 [nvme_core]
+> [<0>] nvme_remove+0x6b/0x130 [nvme]
+> [<0>] pci_device_remove+0x36/0xb0
+> [<0>] device_release_driver_internal+0x157/0x220
+> [<0>] nvme_remove_dead_ctrl_work+0x29/0x40 [nvme]
+> [<0>] process_one_work+0x170/0x350
+> [<0>] worker_thread+0x2e/0x380
+> [<0>] kthread+0x111/0x130
+> [<0>] ret_from_fork+0x1f/0x30
+> 
+> 
+> Here's the last parts of the kernel logs capturing the failure:
+> 
+> [  760.679105] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679116] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679120] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679124] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679127] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679131] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679135] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679138] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679141] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679144] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679148] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679151] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679155] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679158] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679161] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679164] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679169] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679172] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679176] nvme nvme1: EH 0: before shutdown
+> [  760.679177] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679181] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679185] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679189] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679192] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679196] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679199] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679202] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679240] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679243] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.679246] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> 
+> ( above repeats a few more hundred times )
+> 
+> [  760.679960] nvme nvme1: controller is down; will reset: CSTS=0xffffffff, PCI_STATUS=0xffff
+> [  760.701468] nvme nvme1: EH 0: after shutdown, top eh: 1
+> [  760.727099] pci_raw_set_power_state: 62 callbacks suppressed
+> [  760.727103] nvme 0000:86:00.0: Refused to change power state, currently in D3
 
-[  229.872622] nvme nvme0: I/O 164 QID 1 timeout, reset controller
-[  229.872649] nvme nvme0: EH 0: before shutdown
-[  229.872683] nvme nvme0: I/O 165 QID 1 timeout, reset controller
-[  229.872700] nvme nvme0: I/O 166 QID 1 timeout, reset controller
-[  229.872716] nvme nvme0: I/O 167 QID 1 timeout, reset controller
-[  229.872733] nvme nvme0: I/O 169 QID 1 timeout, reset controller
-[  229.872750] nvme nvme0: I/O 173 QID 1 timeout, reset controller
-[  229.872766] nvme nvme0: I/O 174 QID 1 timeout, reset controller
-[  229.872783] nvme nvme0: I/O 178 QID 1 timeout, reset controller
-[  229.872800] nvme nvme0: I/O 182 QID 1 timeout, aborting
-[  229.872900] nvme nvme0: I/O 185 QID 1 timeout, aborting
-[  229.872975] nvme nvme0: I/O 190 QID 1 timeout, reset controller
-[  229.872990] nvme nvme0: I/O 191 QID 1 timeout, aborting
-[  229.873021] nvme nvme0: I/O 5 QID 2 timeout, aborting
-[  229.873096] nvme nvme0: I/O 40 QID 2 timeout, aborting
-[  229.874041] nvme nvme0: Abort status: 0x0
-[  229.874064] nvme nvme0: Abort status: 0x0
-[  229.874078] nvme nvme0: Abort status: 0x0
-[  229.874092] nvme nvme0: Abort status: 0x0
-[  229.874106] nvme nvme0: Abort status: 0x0
-[  230.060698] nvme nvme0: EH 0: after shutdown, top eh: 1
-[  290.840592] nvme nvme0: I/O 18 QID 0 timeout, disable controller
-[  290.840746] nvme nvme0: EH 1: before shutdown
+EH may not cover this kind of failure, so it fails in the 1st try.
 
-[  290.992650] ------------[ cut here ]------------
-[  290.992751] Trying to free already-free IRQ 133
-[  290.992783] WARNING: CPU: 6 PID: 227 at /home/will/u04/source_code/linux-stable/kernel/irq/manage.c:1549 __free_irq+0xf6/0x420
-[  290.993394] CPU: 6 PID: 227 Comm: kworker/u16:4 Kdump: loaded Not tainted 4.17.0-rc3+ #37
-[  290.993402] Hardware name: LENOVO 10MLS0E339/3106, BIOS M1AKT22A 06/27/2017
-[  290.993418] Workqueue: nvme-reset-wq nvme_eh_work
-[  290.993436] RIP: 0010:__free_irq+0xf6/0x420
-...
-[  290.993541] Call Trace:
-[  290.993581]  free_irq+0x4c/0xa0
-[  290.993600]  pci_free_irq+0x18/0x30
-[  290.993615]  nvme_dev_disable+0x20b/0x720
-[  290.993745]  nvme_eh_work+0xdd/0x4b0
-[  290.993866]  process_one_work+0x3ca/0xaa0
-[  290.993960]  worker_thread+0x89/0x6c0
-[  290.994017]  kthread+0x18d/0x1e0
-[  290.994061]  ret_from_fork+0x24/0x30
-[  338.912379] INFO: task kworker/u16:4:227 blocked for more than 30 seconds.
-[  338.913348]       Tainted: G        W         4.17.0-rc3+ #37
-[  338.913549] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[  338.913809] kworker/u16:4   D    0   227      2 0x80000000
-[  338.913842] Workqueue: nvme-reset-wq nvme_eh_work
-[  338.913857] Call Trace:
-[  338.914002]  schedule+0x52/0xe0
-[  338.914019]  schedule_preempt_disabled+0x14/0x20
-[  338.914029]  __mutex_lock+0x5b4/0xca0
-[  338.914228]  nvme_eh_work+0x11a/0x4b0
-[  338.914344]  process_one_work+0x3ca/0xaa0
-[  338.914440]  worker_thread+0x89/0x6c0
-[  338.914496]  kthread+0x18d/0x1e0
-[  338.914542]  ret_from_fork+0x24/0x30
-[  338.914648]
+> [  760.727483] nvme nvme1: EH 0: state 4, eh_done -19, top eh 1
+> [  760.727485] nvme nvme1: EH 0: after recovery -19
+> [  760.727488] nvme nvme1: EH: fail controller
 
-Here is the deadlock scenario.
+The above issue(hang in nvme_remove()) is still an old issue, which
+is because queues are kept as quiesce during remove, so could you
+please test the following change?
 
-nvme_eh_work // EH0
-  -> nvme_reset_dev //hold reset_lock
-    -> nvme_setup_io_queues
-      -> nvme_create_io_queues
-        -> nvme_create_queue
-          -> set nvmeq->cq_vector
-          -> adapter_alloc_cq
-          -> adapter_alloc_sq
-             irq has not been requested
-             io timeout 
-                                    nvme_eh_work //EH1
-                                      -> nvme_dev_disable
-                                        -> quiesce the adminq //----> here !
-                                        -> nvme_suspend_queue
-                                          print out warning Trying to free already-free IRQ 133
-                                        -> nvme_cancel_request // complete the timeout admin request
-                                      -> require reset_lock
-          -> adapter_delete_cq
-            -> adapter_delete_queue // submit to the adminq which has been quiesced.
-              -> nvme_submit_sync_cmd
-                -> blk_execute_rq
-                  -> wait_for_completion_io_timeout
-                  hang_check is true, so there is no hung task warning for this context
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 1dec353388be..c78e5a0cde06 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -3254,6 +3254,11 @@ void nvme_remove_namespaces(struct nvme_ctrl *ctrl)
+         */
+        if (ctrl->state == NVME_CTRL_DEAD)
+                nvme_kill_queues(ctrl);
++       else {
++               if (ctrl->admin_q)
++                       blk_mq_unquiesce_queue(ctrl->admin_q);
++               nvme_start_queues(ctrl);
++       }
 
-EH0 submit cq delete admin command, but it will never be completed or timed out, because the admin request queue has
-been quiesced, so the reset_lock cannot be released, and EH1 cannot get reset_lock and make things forward.
+        down_write(&ctrl->namespaces_rwsem);
+        list_splice_init(&ctrl->namespaces, &ns_list);
 
-Thanks
-Jianchao
+BTW, in my environment, it is hard to trigger this failure, so not see
+this issue, but I did verify the nested EH which can recover from error
+in reset.
+
+Thanks,
+Ming
