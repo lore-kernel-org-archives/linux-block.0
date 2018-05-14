@@ -1,102 +1,40 @@
-Return-Path: <prvs=6650905ae=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v9 0/2] blk-mq: Rework blk-mq timeout handling again
-Date: Mon, 14 May 2018 11:46:32 -0700
-Message-Id: <20180514184634.2160-1-bart.vanassche@wdc.com>
+Return-Path: <prvs=6650905ae=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>, "jianchao.w.wang@oracle.com"
+	<jianchao.w.wang@oracle.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"israelr@mellanox.com" <israelr@mellanox.com>, "sagi@grimberg.me"
+	<sagi@grimberg.me>, "sebott@linux.ibm.com" <sebott@linux.ibm.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "ming.lei@redhat.com"
+	<ming.lei@redhat.com>, "maxg@mellanox.com" <maxg@mellanox.com>,
+	"tj@kernel.org" <tj@kernel.org>
+Subject: Re: [PATCH] blk-mq: Rework blk-mq timeout handling again
+Date: Mon, 14 May 2018 18:44:48 +0000
+Message-ID: <eaee69958fe9eabea2f0a377fc8933ab688c09b9.camel@wdc.com>
+References: <20180510175607.27937-1-bart.vanassche@wdc.com>
+	 <73f77c62-25ca-0915-6f5b-452d60258f05@oracle.com>
+	 <20180511123519.GA14123@lst.de>
+	 <13279046837412fd5cfe845a27e469a23125caf3.camel@wdc.com>
+	 <beab60f7-5fee-f1d8-12c3-c43d005d6427@oracle.com>
+	 <4f773949c3e32a9d65ab09159fb7b6988349e91b.camel@wdc.com>
+	 <b7f45d6b-f2a2-a778-9b58-245ecb99e4d9@oracle.com>
+In-Reply-To: <b7f45d6b-f2a2-a778-9b58-245ecb99e4d9@oracle.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
-
-This is the ninth incarnation of the blk-mq timeout handling rework. All
-previously posted comments have been addressed. Please consider this patch
-series for inclusion in the upstream kernel.
-
-Bart.
-
-Changes compared to v8:
-- Split into two patches.
-- Moved the spin_lock_init() call from blk_mq_rq_ctx_init() into
-  blk_mq_init_request().
-- Fixed the deadline set by blk_add_timer().
-- Surrounded the das_lock member with #ifndef CONFIG_ARCH_HAVE_CMPXCHG64 /
-  #endif.
-
-Changes compared to v7:
-- Fixed the generation number mechanism. Note: with this patch applied the
-  behavior of the block layer does not depend on the generation number.
-- Added more 32-bit architectures to the list of architectures on which
-  cmpxchg64() should not be used.
-
-Changes compared to v6:
-- Used a union instead of bit manipulations to store multiple values into
-  a single 64-bit field.
-- Reduced the size of the timeout field from 64 to 32 bits.
-- Made sure that the block layer still builds with this patch applied
-  for the sh and mips architectures.
-- Fixed two sparse warnings that were introduced by this patch in the
-  WRITE_ONCE() calls.
-
-Changes compared to v5:
-- Restored the synchronize_rcu() call between marking a request for timeout
-  handling and the actual timeout handling to avoid that timeout handling
-  starts while .queue_rq() is still in progress if the timeout is very short.
-- Only use cmpxchg() if another context could attempt to change the request
-  state concurrently. Use WRITE_ONCE() otherwise.
-
-Changes compared to v4:
-- Addressed multiple review comments from Christoph. The most important are
-  that atomic_long_cmpxchg() has been changed into cmpxchg() and also that
-  there is now a nice and clean split between the legacy and blk-mq versions
-  of blk_add_timer().
-- Changed the patch name and modified the patch description because there is
-  disagreement about whether or not the v4.16 blk-mq core can complete a
-  single request twice. Kept the "Cc: stable" tag because of
-  https://bugzilla.kernel.org/show_bug.cgi?id=199077.
-
-Changes compared to v3 (see also https://www.mail-archive.com/linux-block@vger.kernel.org/msg20073.html):
-- Removed the spinlock again that was introduced to protect the request state.
-  v4 uses atomic_long_cmpxchg() instead.
-- Split __deadline into two variables - one for the legacy block layer and one
-  for blk-mq.
-
-Changes compared to v2 (https://www.mail-archive.com/linux-block@vger.kernel.org/msg18338.html):
-- Rebased and retested on top of kernel v4.16.
-
-Changes compared to v1 (https://www.mail-archive.com/linux-block@vger.kernel.org/msg18089.html):
-- Removed the gstate and aborted_gstate members of struct request and used
-  the __deadline member to encode both the generation and state information.
-Bart Van Assche (2):
-  arch/*: Add CONFIG_ARCH_HAVE_CMPXCHG64
-  blk-mq: Rework blk-mq timeout handling again
-
- .../features/locking/cmpxchg64/arch-support.txt    |  31 ++++
- arch/Kconfig                                       |   3 +
- arch/alpha/Kconfig                                 |   1 +
- arch/arm/Kconfig                                   |   1 +
- arch/arm64/Kconfig                                 |   1 +
- arch/ia64/Kconfig                                  |   1 +
- arch/m68k/Kconfig                                  |   1 +
- arch/mips/Kconfig                                  |   1 +
- arch/parisc/Kconfig                                |   1 +
- arch/powerpc/Kconfig                               |   1 +
- arch/s390/Kconfig                                  |   1 +
- arch/sparc/Kconfig                                 |   1 +
- arch/x86/Kconfig                                   |   1 +
- arch/xtensa/Kconfig                                |   1 +
- block/blk-core.c                                   |   6 -
- block/blk-mq-debugfs.c                             |   1 -
- block/blk-mq.c                                     | 183 ++++++---------------
- block/blk-mq.h                                     | 117 ++++++++++---
- block/blk-timeout.c                                |  95 ++++++-----
- block/blk.h                                        |  14 +-
- include/linux/blkdev.h                             |  47 +++---
- 21 files changed, 276 insertions(+), 233 deletions(-)
- create mode 100644 Documentation/features/locking/cmpxchg64/arch-support.txt
-
--- 
-2.16.3
+T24gTW9uLCAyMDE4LTA1LTE0IGF0IDEzOjE1ICswODAwLCBqaWFuY2hhby53YW5nIHdyb3RlOg0K
+PiBhIDMyYml0IGRlYWRsaW5lIGlzIGluZGVlZCBPSyB0byBqdWRnZSB3aGV0aGVyIGEgcmVxdWVz
+dCBpcyB0aW1lb3V0IG9yIG5vdC4NCj4gYnV0IGhvdyBpcyB0aGUgZXhwaXJlcyB2YWx1ZSBkZXRl
+cm1pbmVkIGZvciBfX2Jsa19hZGRfdGltZXIgLT4gbW9kX3RpbWVyID8NCj4gYXMgd2Uga25vdywg
+d2hlbiBhIHJlcXVlc3QgaXMgc3RhcnRlZCwgd2UgbmVlZCB0byBhcm0gYSB0aW1lciBmb3IgaXQu
+DQo+IHRoZSBleHBpcmVzIHZhbHVlIGlzICd1bnNpZ25lZCBsb25nJy4NCg0KVGhpcyBoYXMgYmVl
+biBhZGRyZXNzZWQgaW4gdGhlIGp1c3QgcG9zdGVkIHZlcnNpb24gOS4gQ2FuIHlvdSBoYXZlIGEg
+bG9vaz8NCkFsdGhvdWdoIEkgaGFkIHRlc3RlZCB0aW1lb3V0IGhhbmRsaW5nIEkgdGhpbmsgdGhp
+cyBoYWQgbm90IGNhdXNlZCBteSB0ZXN0cw0KdG8gZmFpbCBiZWNhdXNlIHRoZSBmb2xsb3dpbmcg
+Y29kZSBsaW1pdHMgcmVxdWVzdCB0aW1lb3V0IGV4YW1pbmF0aW9uIHRvIDVzDQppbiB0aGUgZnV0
+dXJlOg0KDQojZGVmaW5lIEJMS19NQVhfVElNRU9VVAkoNSAqIEhaKQ0KDQp1bnNpZ25lZCBsb25n
+IGJsa19ycV90aW1lb3V0KHVuc2lnbmVkIGxvbmcgdGltZW91dCkNCnsNCgl1bnNpZ25lZCBsb25n
+IG1heHQ7DQoNCgltYXh0ID0gcm91bmRfamlmZmllc191cChqaWZmaWVzICsgQkxLX01BWF9USU1F
+T1VUKTsNCglpZiAodGltZV9hZnRlcih0aW1lb3V0LCBtYXh0KSkNCgkJdGltZW91dCA9IG1heHQ7
+DQoNCglyZXR1cm4gdGltZW91dDsNCn0NCg0KVGhhbmtzLA0KDQpCYXJ0Lg0KDQoNCg==
