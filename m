@@ -1,217 +1,57 @@
-Return-Path: <roman.penyaev@profitbricks.com>
-Return-Path: <roman.penyaev@profitbricks.com>
-From: Roman Pen <roman.penyaev@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Or Gerlitz <ogerlitz@mellanox.com>,
-	Doug Ledford <dledford@redhat.com>,
-	Swapnil Ingle <swapnil.ingle@profitbricks.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>,
-	Jack Wang <jinpu.wang@profitbricks.com>,
-	Roman Pen <roman.penyaev@profitbricks.com>
-Subject: [PATCH v2 10/26] ibtrs: server: private header with server structs and functions
-Date: Fri, 18 May 2018 15:03:57 +0200
-Message-Id: <20180518130413.16997-11-roman.penyaev@profitbricks.com>
-In-Reply-To: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
-References: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
+Subject: Re: [PATCH BUGFIX] block, bfq: postpone rq preparation to insert or
+ merge
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <4ea9999a-e316-f0bc-a99f-70cd0e901e55@kernel.dk>
+Date: Mon, 14 May 2018 19:37:48 +0200
+Cc: Bart Van Assche <bart.vanassche@wdc.com>,
+ "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "broonie@kernel.org" <broonie@kernel.org>,
+ "linus.walleij@linaro.org" <linus.walleij@linaro.org>,
+ "bfq-iosched@googlegroups.com" <bfq-iosched@googlegroups.com>,
+ "oleksandr@natalenko.name" <oleksandr@natalenko.name>
+Message-Id: <121C9095-504D-42BB-AD23-C7733E2849DF@linaro.org>
+References: <20180504171701.6876-1-paolo.valente@linaro.org>
+ <d534de4765c0fbcc7bcd858c1d2f40391ece19ac.camel@wdc.com>
+ <8B9DC3A2-0DB0-4EEB-AFB2-C4D6560B7A4A@linaro.org>
+ <4ea9999a-e316-f0bc-a99f-70cd0e901e55@kernel.dk>
+To: Jens Axboe <axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-This header describes main structs and functions used by ibtrs-server
-module, mainly for accepting IBTRS sessions, creating/destroying
-sysfs entries, accounting statistics on server side.
 
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
-Cc: Jack Wang <jinpu.wang@profitbricks.com>
----
- drivers/infiniband/ulp/ibtrs/ibtrs-srv.h | 175 +++++++++++++++++++++++++++++++
- 1 file changed, 175 insertions(+)
- create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-srv.h
 
-diff --git a/drivers/infiniband/ulp/ibtrs/ibtrs-srv.h b/drivers/infiniband/ulp/ibtrs/ibtrs-srv.h
-new file mode 100644
-index 000000000000..8193d568e67e
---- /dev/null
-+++ b/drivers/infiniband/ulp/ibtrs/ibtrs-srv.h
-@@ -0,0 +1,175 @@
-+/*
-+ * InfiniBand Transport Layer
-+ *
-+ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Fabian Holler <mail@fholler.de>
-+ *          Jack Wang <jinpu.wang@profitbricks.com>
-+ *          Kleber Souza <kleber.souza@profitbricks.com>
-+ *          Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *          Milind Dumbare <Milind.dumbare@gmail.com>
-+ *
-+ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *          Swapnil Ingle <swapnil.ingle@profitbricks.com>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef IBTRS_SRV_H
-+#define IBTRS_SRV_H
-+
-+#include <linux/device.h>
-+#include <linux/refcount.h>
-+#include "ibtrs-pri.h"
-+
-+/**
-+ * enum ibtrs_srv_state - Server states.
-+ */
-+enum ibtrs_srv_state {
-+	IBTRS_SRV_CONNECTING,
-+	IBTRS_SRV_CONNECTED,
-+	IBTRS_SRV_CLOSING,
-+	IBTRS_SRV_CLOSED,
-+};
-+
-+static inline const char *ibtrs_srv_state_str(enum ibtrs_srv_state state)
-+{
-+	switch (state) {
-+	case IBTRS_SRV_CONNECTING:
-+		return "IBTRS_SRV_CONNECTING";
-+	case IBTRS_SRV_CONNECTED:
-+		return "IBTRS_SRV_CONNECTED";
-+	case IBTRS_SRV_CLOSING:
-+		return "IBTRS_SRV_CLOSING";
-+	case IBTRS_SRV_CLOSED:
-+		return "IBTRS_SRV_CLOSED";
-+	default:
-+		return "UNKNOWN";
-+	}
-+}
-+
-+struct ibtrs_stats_wc_comp {
-+	atomic64_t	calls;
-+	atomic64_t	total_wc_cnt;
-+};
-+
-+struct ibtrs_srv_stats_rdma_stats {
-+	struct {
-+		atomic64_t	cnt;
-+		atomic64_t	size_total;
-+	} dir[2];
-+};
-+
-+struct ibtrs_srv_stats {
-+	struct ibtrs_srv_stats_rdma_stats	rdma_stats;
-+	atomic_t				apm_cnt;
-+	struct ibtrs_stats_wc_comp		wc_comp;
-+};
-+
-+struct ibtrs_srv_con {
-+	struct ibtrs_con	c;
-+	atomic_t		wr_cnt;
-+};
-+
-+struct ibtrs_srv_op {
-+	struct ibtrs_srv_con		*con;
-+	u32				msg_id;
-+	u8				dir;
-+	struct ibtrs_msg_rdma_read	*rd_msg;
-+	struct ib_rdma_wr		*tx_wr;
-+	struct ib_sge			*tx_sg;
-+};
-+
-+struct ibtrs_srv_mr {
-+	struct ib_mr	*mr;
-+	struct sg_table	sgt;
-+};
-+
-+struct ibtrs_srv_sess {
-+	struct ibtrs_sess	s;
-+	struct ibtrs_srv	*srv;
-+	struct work_struct	close_work;
-+	enum ibtrs_srv_state	state;
-+	spinlock_t		state_lock;
-+	int			cur_cq_vector;
-+	struct ibtrs_srv_op	**ops_ids;
-+	atomic_t		ids_inflight;
-+	wait_queue_head_t	ids_waitq;
-+	struct ibtrs_srv_mr	*mrs;
-+	unsigned int		mrs_num;
-+	dma_addr_t		*dma_addr;
-+	bool			established;
-+	unsigned int		mem_bits;
-+	struct kobject		kobj;
-+	struct kobject		kobj_stats;
-+	struct ibtrs_srv_stats	stats;
-+};
-+
-+struct ibtrs_srv {
-+	struct list_head	paths_list;
-+	int			paths_up;
-+	struct mutex		paths_ev_mutex;
-+	size_t			paths_num;
-+	struct mutex		paths_mutex;
-+	uuid_t			paths_uuid;
-+	refcount_t		refcount;
-+	struct ibtrs_srv_ctx	*ctx;
-+	struct list_head	ctx_list;
-+	void			*priv;
-+	size_t			queue_depth;
-+	struct page		**chunks;
-+	struct device		dev;
-+	unsigned		dev_ref;
-+	struct kobject		kobj_paths;
-+};
-+
-+struct ibtrs_srv_ctx {
-+	rdma_ev_fn *rdma_ev;
-+	link_ev_fn *link_ev;
-+	struct rdma_cm_id *cm_id_ip;
-+	struct rdma_cm_id *cm_id_ib;
-+	struct mutex srv_mutex;
-+	struct list_head srv_list;
-+};
-+
-+/* See ibtrs-log.h */
-+#define TYPES_TO_SESSNAME(obj)						\
-+	LIST(CASE(obj, struct ibtrs_srv_sess *, s.sessname))
-+
-+void ibtrs_srv_queue_close(struct ibtrs_srv_sess *sess);
-+
-+/* ibtrs-srv-stats.c */
-+
-+void ibtrs_srv_update_rdma_stats(struct ibtrs_srv_stats *s, size_t size, int d);
-+void ibtrs_srv_update_wc_stats(struct ibtrs_srv_stats *s);
-+
-+int ibtrs_srv_reset_rdma_stats(struct ibtrs_srv_stats *stats, bool enable);
-+ssize_t ibtrs_srv_stats_rdma_to_str(struct ibtrs_srv_stats *stats,
-+				    char *page, size_t len);
-+int ibtrs_srv_reset_wc_completion_stats(struct ibtrs_srv_stats *stats,
-+					bool enable);
-+int ibtrs_srv_stats_wc_completion_to_str(struct ibtrs_srv_stats *stats, char *buf,
-+					 size_t len);
-+int ibtrs_srv_reset_all_stats(struct ibtrs_srv_stats *stats, bool enable);
-+ssize_t ibtrs_srv_reset_all_help(struct ibtrs_srv_stats *stats,
-+				 char *page, size_t len);
-+
-+/* ibtrs-srv-sysfs.c */
-+
-+int ibtrs_srv_create_sess_files(struct ibtrs_srv_sess *sess);
-+void ibtrs_srv_destroy_sess_files(struct ibtrs_srv_sess *sess);
-+
-+#endif /* IBTRS_SRV_H */
--- 
-2.13.1
+> Il giorno 14 mag 2018, alle ore 19:31, Jens Axboe <axboe@kernel.dk> ha =
+scritto:
+>=20
+> On 5/14/18 11:16 AM, Paolo Valente wrote:
+>>=20
+>>=20
+>>> Il giorno 10 mag 2018, alle ore 18:14, Bart Van Assche =
+<bart.vanassche@wdc.com> ha scritto:
+>>>=20
+>>> On Fri, 2018-05-04 at 19:17 +0200, Paolo Valente wrote:
+>>>> When invoked for an I/O request rq, [ ... ]
+>>>=20
+>>> Tested-by: Bart Van Assche <bart.vanassche@wdc.com>
+>>>=20
+>>>=20
+>>>=20
+>>=20
+>> Any decision for this fix, Jens?
+>=20
+> Guess I didn't reply, but I did commit this on Thursday.
+>=20
+
+Great, thank you!
+
+Paolo
+
+> --=20
+> Jens Axboe
+>=20
