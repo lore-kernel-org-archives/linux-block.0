@@ -1,125 +1,138 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-Subject: Re: [PATCH V5 0/9] nvme: pci: fix & improve timeout handling
-To: Ming Lei <ming.lei@redhat.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Mon, 14 May 2018 17:38:56 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: "jianchao.wang" <jianchao.w.wang@oracle.com>
 Cc: Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, James Smart <james.smart@broadcom.com>,
-        Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, Laurence Oberman <loberman@redhat.com>
+	linux-block@vger.kernel.org, James Smart <james.smart@broadcom.com>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>
+Subject: Re: [PATCH V5 0/9] nvme: pci: fix & improve timeout handling
+Message-ID: <20180514093850.GA807@ming.t460p>
 References: <20180511122933.27155-1-ming.lei@redhat.com>
  <776f21e1-dc19-1b77-9ba4-44f0b8366625@oracle.com>
- <20180514093850.GA807@ming.t460p>
-From: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <008cb38d-aa91-6ab7-64d9-417d6c53a1eb@oracle.com>
-Date: Mon, 14 May 2018 18:05:50 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180514093850.GA807@ming.t460p>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <776f21e1-dc19-1b77-9ba4-44f0b8366625@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi ming
+On Mon, May 14, 2018 at 04:21:04PM +0800, jianchao.wang wrote:
+> Hi ming
+> 
+> Please refer to my test log and analysis.
+> 
+> [  229.872622] nvme nvme0: I/O 164 QID 1 timeout, reset controller
+> [  229.872649] nvme nvme0: EH 0: before shutdown
+> [  229.872683] nvme nvme0: I/O 165 QID 1 timeout, reset controller
+> [  229.872700] nvme nvme0: I/O 166 QID 1 timeout, reset controller
+> [  229.872716] nvme nvme0: I/O 167 QID 1 timeout, reset controller
+> [  229.872733] nvme nvme0: I/O 169 QID 1 timeout, reset controller
+> [  229.872750] nvme nvme0: I/O 173 QID 1 timeout, reset controller
+> [  229.872766] nvme nvme0: I/O 174 QID 1 timeout, reset controller
+> [  229.872783] nvme nvme0: I/O 178 QID 1 timeout, reset controller
+> [  229.872800] nvme nvme0: I/O 182 QID 1 timeout, aborting
+> [  229.872900] nvme nvme0: I/O 185 QID 1 timeout, aborting
+> [  229.872975] nvme nvme0: I/O 190 QID 1 timeout, reset controller
+> [  229.872990] nvme nvme0: I/O 191 QID 1 timeout, aborting
+> [  229.873021] nvme nvme0: I/O 5 QID 2 timeout, aborting
+> [  229.873096] nvme nvme0: I/O 40 QID 2 timeout, aborting
+> [  229.874041] nvme nvme0: Abort status: 0x0
+> [  229.874064] nvme nvme0: Abort status: 0x0
+> [  229.874078] nvme nvme0: Abort status: 0x0
+> [  229.874092] nvme nvme0: Abort status: 0x0
+> [  229.874106] nvme nvme0: Abort status: 0x0
+> [  230.060698] nvme nvme0: EH 0: after shutdown, top eh: 1
+> [  290.840592] nvme nvme0: I/O 18 QID 0 timeout, disable controller
+> [  290.840746] nvme nvme0: EH 1: before shutdown
+> 
+> [  290.992650] ------------[ cut here ]------------
+> [  290.992751] Trying to free already-free IRQ 133
+> [  290.992783] WARNING: CPU: 6 PID: 227 at /home/will/u04/source_code/linux-stable/kernel/irq/manage.c:1549 __free_irq+0xf6/0x420
+> [  290.993394] CPU: 6 PID: 227 Comm: kworker/u16:4 Kdump: loaded Not tainted 4.17.0-rc3+ #37
+> [  290.993402] Hardware name: LENOVO 10MLS0E339/3106, BIOS M1AKT22A 06/27/2017
+> [  290.993418] Workqueue: nvme-reset-wq nvme_eh_work
+> [  290.993436] RIP: 0010:__free_irq+0xf6/0x420
+> ...
+> [  290.993541] Call Trace:
+> [  290.993581]  free_irq+0x4c/0xa0
+> [  290.993600]  pci_free_irq+0x18/0x30
+> [  290.993615]  nvme_dev_disable+0x20b/0x720
+> [  290.993745]  nvme_eh_work+0xdd/0x4b0
+> [  290.993866]  process_one_work+0x3ca/0xaa0
+> [  290.993960]  worker_thread+0x89/0x6c0
+> [  290.994017]  kthread+0x18d/0x1e0
+> [  290.994061]  ret_from_fork+0x24/0x30
+> [  338.912379] INFO: task kworker/u16:4:227 blocked for more than 30 seconds.
+> [  338.913348]       Tainted: G        W         4.17.0-rc3+ #37
+> [  338.913549] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> [  338.913809] kworker/u16:4   D    0   227      2 0x80000000
+> [  338.913842] Workqueue: nvme-reset-wq nvme_eh_work
+> [  338.913857] Call Trace:
+> [  338.914002]  schedule+0x52/0xe0
+> [  338.914019]  schedule_preempt_disabled+0x14/0x20
+> [  338.914029]  __mutex_lock+0x5b4/0xca0
+> [  338.914228]  nvme_eh_work+0x11a/0x4b0
+> [  338.914344]  process_one_work+0x3ca/0xaa0
+> [  338.914440]  worker_thread+0x89/0x6c0
+> [  338.914496]  kthread+0x18d/0x1e0
+> [  338.914542]  ret_from_fork+0x24/0x30
+> [  338.914648]
 
-On 05/14/2018 05:38 PM, Ming Lei wrote:
->> Here is the deadlock scenario.
->>
->> nvme_eh_work // EH0
->>   -> nvme_reset_dev //hold reset_lock
->>     -> nvme_setup_io_queues
->>       -> nvme_create_io_queues
->>         -> nvme_create_queue
->>           -> set nvmeq->cq_vector
->>           -> adapter_alloc_cq
->>           -> adapter_alloc_sq
->>              irq has not been requested
->>              io timeout 
->>                                     nvme_eh_work //EH1
->>                                       -> nvme_dev_disable
->>                                         -> quiesce the adminq //----> here !
->>                                         -> nvme_suspend_queue
->>                                           print out warning Trying to free already-free IRQ 133
->>                                         -> nvme_cancel_request // complete the timeout admin request
->>                                       -> require reset_lock
->>           -> adapter_delete_cq
-> If the admin IO submitted in adapter_alloc_sq() is timed out,
-> nvme_dev_disable() in EH1 will complete it which is set as REQ_FAILFAST_DRIVER,
-> then adapter_alloc_sq() should return error, and the whole reset in EH0
-> should have been terminated immediately.
+The above isn't a new issue too, since nvme_dev_disable() can be
+run before the controller is recovered(nvme_setup_io_queues() done)
+without this patchset.
 
-Please refer to the following segment:
+This can happen in several cases, such as the one you listed below, or
+two or more timed-out req are triggered from different queues.
 
-static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
-{
-	struct nvme_dev *dev = nvmeq->dev;
-	int result;
-...
-	nvmeq->cq_vector = dev->num_vecs == 1 ? 0 : qid;
-	result = adapter_alloc_cq(dev, qid, nvmeq);
-	if (result < 0)
-		goto release_vector;
-
-	result = adapter_alloc_sq(dev, qid, nvmeq);   // if timeout and failed here
-	if (result < 0)
-		goto release_cq;
-
-	nvme_init_queue(nvmeq, qid);
-	result = queue_request_irq(nvmeq);
-	if (result < 0)
-		goto release_sq;
-
-	return result;
-
- release_sq:
-	dev->online_queues--;
-	adapter_delete_sq(dev, qid);
- release_cq:                                        // we will be here !
-	adapter_delete_cq(dev, qid);                // another cq delete admin command will be sent out.
- release_vector:
-	nvmeq->cq_vector = -1;
-	return result;
-}
-
+This issue is that genirq won't work well if the same IRQ is freed by
+two times.
 
 > 
-> I guess the issue should be that nvme_create_io_queues() ignores the failure.
+> Here is the deadlock scenario.
 > 
-> Could you dump the stack trace of EH0 reset task? So that we may see
-> where EH0 reset kthread hangs.
+> nvme_eh_work // EH0
+>   -> nvme_reset_dev //hold reset_lock
+>     -> nvme_setup_io_queues
+>       -> nvme_create_io_queues
+>         -> nvme_create_queue
+>           -> set nvmeq->cq_vector
+>           -> adapter_alloc_cq
+>           -> adapter_alloc_sq
+>              irq has not been requested
+>              io timeout 
+>                                     nvme_eh_work //EH1
+>                                       -> nvme_dev_disable
+>                                         -> quiesce the adminq //----> here !
+>                                         -> nvme_suspend_queue
+>                                           print out warning Trying to free already-free IRQ 133
+>                                         -> nvme_cancel_request // complete the timeout admin request
+>                                       -> require reset_lock
+>           -> adapter_delete_cq
 
-root@will-ThinkCentre-M910s:/home/will/Desktop# cat /proc/2273/stack 
-[<0>] blk_execute_rq+0xf7/0x150
-[<0>] __nvme_submit_sync_cmd+0x94/0x110
-[<0>] nvme_submit_sync_cmd+0x1b/0x20
-[<0>] adapter_delete_queue+0xad/0xf0
-[<0>] nvme_reset_dev+0x1b67/0x2450
-[<0>] nvme_eh_work+0x19c/0x4b0
-[<0>] process_one_work+0x3ca/0xaa0
-[<0>] worker_thread+0x89/0x6c0
-[<0>] kthread+0x18d/0x1e0
-[<0>] ret_from_fork+0x24/0x30
-[<0>] 0xffffffffffffffff
-root@will-ThinkCentre-M910s:/home/will/Desktop# cat /proc/2275/stack 
-[<0>] nvme_eh_work+0x11a/0x4b0
-[<0>] process_one_work+0x3ca/0xaa0
-[<0>] worker_thread+0x89/0x6c0
-[<0>] kthread+0x18d/0x1e0
-[<0>] ret_from_fork+0x24/0x30
-[<0>] 0xffffffffffffffff
+If the admin IO submitted in adapter_alloc_sq() is timed out,
+nvme_dev_disable() in EH1 will complete it which is set as REQ_FAILFAST_DRIVER,
+then adapter_alloc_sq() should return error, and the whole reset in EH0
+should have been terminated immediately.
 
+I guess the issue should be that nvme_create_io_queues() ignores the failure.
+
+Could you dump the stack trace of EH0 reset task? So that we may see
+where EH0 reset kthread hangs.
+
+>             -> adapter_delete_queue // submit to the adminq which has been quiesced.
+>               -> nvme_submit_sync_cmd
+>                 -> blk_execute_rq
+>                   -> wait_for_completion_io_timeout
+>                   hang_check is true, so there is no hung task warning for this context
 > 
->>             -> adapter_delete_queue // submit to the adminq which has been quiesced.
->>               -> nvme_submit_sync_cmd
->>                 -> blk_execute_rq
->>                   -> wait_for_completion_io_timeout
->>                   hang_check is true, so there is no hung task warning for this context
->>
->> EH0 submit cq delete admin command, but it will never be completed or timed out, because the admin request queue has
->> been quiesced, so the reset_lock cannot be released, and EH1 cannot get reset_lock and make things forward.
-> The nvme_dev_disable() in outer EH(EH1 in above log) will complete all
-> admin command, which won't be retried because it is set as
-> REQ_FAILFAST_DRIVER, so nvme_cancel_request() will complete it in
-> nvme_dev_disable().
+> EH0 submit cq delete admin command, but it will never be completed or timed out, because the admin request queue has
+> been quiesced, so the reset_lock cannot be released, and EH1 cannot get reset_lock and make things forward.
 
-This cq delete admin command is sent out after EH 1 nvme_dev_disable completed and failed the
-previous timeout sq alloc admin command. please refer to the code segment above.
+The nvme_dev_disable() in outer EH(EH1 in above log) will complete all
+admin command, which won't be retried because it is set as
+REQ_FAILFAST_DRIVER, so nvme_cancel_request() will complete it in
+nvme_dev_disable().
 
 Thanks
-jianchao
+Ming
