@@ -1,140 +1,106 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:52200 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933815AbeEIHtn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 03:49:43 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 19/33] xfs: remove xfs_reflink_find_cow_mapping
-Date: Wed,  9 May 2018 09:48:16 +0200
-Message-Id: <20180509074830.16196-20-hch@lst.de>
-In-Reply-To: <20180509074830.16196-1-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de>
+Received: from mail-pg0-f50.google.com ([74.125.83.50]:40156 "EHLO
+        mail-pg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752017AbeENULA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 14 May 2018 16:11:00 -0400
+Received: by mail-pg0-f50.google.com with SMTP id l2-v6so5947768pgc.7
+        for <linux-block@vger.kernel.org>; Mon, 14 May 2018 13:11:00 -0700 (PDT)
+Date: Mon, 14 May 2018 13:10:58 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH blktests] nvme: Add command timeout injection test
+Message-ID: <20180514201058.GC13417@vader>
+References: <20180514200237.15135-1-keith.busch@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180514200237.15135-1-keith.busch@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-We only have one caller left, and open coding the simple extent list
-lookup in it allows us to make the code both more understandable and
-reuse calculations and variables already present.
+On Mon, May 14, 2018 at 02:02:37PM -0600, Keith Busch wrote:
+> This test will run a background IO process and inject an admin command
+> with a very short timeout that is all but guaranteed to expire without
+> a completion: the async event request.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/xfs_aops.c    | 17 ++++++++++++-----
- fs/xfs/xfs_reflink.c | 30 ------------------------------
- fs/xfs/xfs_reflink.h |  2 --
- fs/xfs/xfs_trace.h   |  1 -
- 4 files changed, 12 insertions(+), 38 deletions(-)
+Thanks, a few comments below.
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 6ad43829c89a..41616629dd13 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -385,6 +385,7 @@ xfs_map_blocks(
- 	ssize_t			count = i_blocksize(inode);
- 	xfs_fileoff_t		offset_fsb, end_fsb;
- 	int			whichfork = XFS_DATA_FORK;
-+	struct xfs_iext_cursor	icur;
- 	int			error = 0;
- 	int			nimaps = 1;
- 
-@@ -396,8 +397,18 @@ xfs_map_blocks(
- 	       (ip->i_df.if_flags & XFS_IFEXTENTS));
- 	ASSERT(offset <= mp->m_super->s_maxbytes);
- 
-+	if (offset > mp->m_super->s_maxbytes - count)
-+		count = mp->m_super->s_maxbytes - offset;
-+	end_fsb = XFS_B_TO_FSB(mp, (xfs_ufsize_t)offset + count);
-+	offset_fsb = XFS_B_TO_FSBT(mp, offset);
-+
-+	/*
-+	 * Check if this is offset is covered by a COW extents, and if yes use
-+	 * it directly instead of looking up anything in the data fork.
-+	 */
- 	if (xfs_is_reflink_inode(ip) &&
--	    xfs_reflink_find_cow_mapping(ip, offset, imap)) {
-+	    xfs_iext_lookup_extent(ip, ip->i_cowfp, offset_fsb, &icur, imap) &&
-+	    imap->br_startoff <= offset_fsb) {
- 		xfs_iunlock(ip, XFS_ILOCK_SHARED);
- 		/*
- 		 * Truncate can race with writeback since writeback doesn't
-@@ -417,10 +428,6 @@ xfs_map_blocks(
- 		goto done;
- 	}
- 
--	if (offset > mp->m_super->s_maxbytes - count)
--		count = mp->m_super->s_maxbytes - offset;
--	end_fsb = XFS_B_TO_FSB(mp, (xfs_ufsize_t)offset + count);
--	offset_fsb = XFS_B_TO_FSBT(mp, offset);
- 	error = xfs_bmapi_read(ip, offset_fsb, end_fsb - offset_fsb,
- 				imap, &nimaps, XFS_BMAPI_ENTIRE);
- 	if (!nimaps) {
-diff --git a/fs/xfs/xfs_reflink.c b/fs/xfs/xfs_reflink.c
-index cdbd342a5249..3776b7bbd8c6 100644
---- a/fs/xfs/xfs_reflink.c
-+++ b/fs/xfs/xfs_reflink.c
-@@ -484,36 +484,6 @@ xfs_reflink_allocate_cow(
- 	return error;
- }
- 
--/*
-- * Find the CoW reservation for a given byte offset of a file.
-- */
--bool
--xfs_reflink_find_cow_mapping(
--	struct xfs_inode		*ip,
--	xfs_off_t			offset,
--	struct xfs_bmbt_irec		*imap)
--{
--	struct xfs_ifork		*ifp = XFS_IFORK_PTR(ip, XFS_COW_FORK);
--	xfs_fileoff_t			offset_fsb;
--	struct xfs_bmbt_irec		got;
--	struct xfs_iext_cursor		icur;
--
--	ASSERT(xfs_isilocked(ip, XFS_ILOCK_EXCL | XFS_ILOCK_SHARED));
--
--	if (!xfs_is_reflink_inode(ip))
--		return false;
--	offset_fsb = XFS_B_TO_FSBT(ip->i_mount, offset);
--	if (!xfs_iext_lookup_extent(ip, ifp, offset_fsb, &icur, &got))
--		return false;
--	if (got.br_startoff > offset_fsb)
--		return false;
--
--	trace_xfs_reflink_find_cow_mapping(ip, offset, 1, XFS_IO_OVERWRITE,
--			&got);
--	*imap = got;
--	return true;
--}
--
- /*
-  * Trim an extent to end at the next CoW reservation past offset_fsb.
-  */
-diff --git a/fs/xfs/xfs_reflink.h b/fs/xfs/xfs_reflink.h
-index 701487bab468..15a456492667 100644
---- a/fs/xfs/xfs_reflink.h
-+++ b/fs/xfs/xfs_reflink.h
-@@ -32,8 +32,6 @@ extern int xfs_reflink_allocate_cow(struct xfs_inode *ip,
- 		struct xfs_bmbt_irec *imap, bool *shared, uint *lockmode);
- extern int xfs_reflink_convert_cow(struct xfs_inode *ip, xfs_off_t offset,
- 		xfs_off_t count);
--extern bool xfs_reflink_find_cow_mapping(struct xfs_inode *ip, xfs_off_t offset,
--		struct xfs_bmbt_irec *imap);
- extern void xfs_reflink_trim_irec_to_next_cow(struct xfs_inode *ip,
- 		xfs_fileoff_t offset_fsb, struct xfs_bmbt_irec *imap);
- 
-diff --git a/fs/xfs/xfs_trace.h b/fs/xfs/xfs_trace.h
-index 8955254b900e..aa284f840d33 100644
---- a/fs/xfs/xfs_trace.h
-+++ b/fs/xfs/xfs_trace.h
-@@ -3220,7 +3220,6 @@ DEFINE_INODE_IREC_EVENT(xfs_reflink_convert_cow);
- DEFINE_RW_EVENT(xfs_reflink_reserve_cow);
- 
- DEFINE_SIMPLE_IO_EVENT(xfs_reflink_bounce_dio_write);
--DEFINE_IOMAP_EVENT(xfs_reflink_find_cow_mapping);
- DEFINE_INODE_IREC_EVENT(xfs_reflink_trim_irec);
- 
- DEFINE_SIMPLE_IO_EVENT(xfs_reflink_cancel_cow_range);
--- 
-2.17.0
+> Signed-off-by: Keith Busch <keith.busch@intel.com>
+> ---
+>  tests/nvme/005     | 42 ++++++++++++++++++++++++++++++++++++++++++
+>  tests/nvme/005.out |  3 +++
+>  2 files changed, 45 insertions(+)
+>  create mode 100755 tests/nvme/005
+>  create mode 100644 tests/nvme/005.out
+> 
+> diff --git a/tests/nvme/005 b/tests/nvme/005
+> new file mode 100755
+> index 0000000..3fe9cbe
+> --- /dev/null
+> +++ b/tests/nvme/005
+> @@ -0,0 +1,42 @@
+> +#!/bin/bash
+> +#
+> +# Regression test for timeout handling.
+
+Is there a specific patch that this is testing? If so, could you add:
+
+Regression test for patch "so and so".
+
+> +# Copyright (C) 2018 Keith Busch
+> +#
+> +# This program is free software: you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation, either version 3 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> +
+> +DESCRIPTION="test nvme admin command timeout handling with in-flight io"
+> +
+> +QUICK=1
+> +
+> +requires() {
+> +	_have_program nvme
+
+Also needs && _have_fio.
+
+> +}
+> +
+> +test_device() {
+> +	echo "Running ${TEST_NAME}"
+> +
+> +	# start fio job
+> +	_run_fio_rand_io --filename="${TEST_DEV}" --time_based --runtime=20 &
+> +
+> +	sleep 5
+> +
+> +	# send nvme admin command 'async event request', which  will surely time out
+> +	nvme admin-passthru ${TEST_DEV} -o 0xc --timeout=1
+
+Missing quotes around ${TEST_DEV}.
+
+> +	wait
+> +
+> +	echo "Test complete"
+> +}
+> diff --git a/tests/nvme/005.out b/tests/nvme/005.out
+> new file mode 100644
+> index 0000000..f4ff837
+> --- /dev/null
+> +++ b/tests/nvme/005.out
+> @@ -0,0 +1,3 @@
+> +Running nvme/005
+> +passthru: Interrupted system call
+> +Test complete
+> -- 
+> 2.14.3
+> 
