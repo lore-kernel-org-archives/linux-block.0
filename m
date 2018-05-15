@@ -1,138 +1,99 @@
-Return-Path: <prvs=673f59626=adam.manzanares@wdc.com>
-From: adam.manzanares@wdc.com
-To: viro@zeniv.linux.org.uk,
-	linux-fsdevel@vger.kernel.org,
-	axboe@kernel.dk,
-	bcrl@kvack.org
-Cc: tglx@linutronix.de,
-	mingo@kernel.org,
-	pombredanne@nexb.com,
-	kstewart@linuxfoundation.org,
-	gregkh@linuxfoundation.org,
-	bigeasy@linutronix.de,
-	jack@suse.cz,
-	darrick.wong@oracle.com,
-	rgoldwyn@suse.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-aio@kvack.org,
-	linux-api@vger.kernel.org,
-	hch@infradread.org,
-	jmoyer@redhat.com,
-	Adam Manzanares <adam.manzanares@wdc.com>
-Subject: [PATCH v6 3/5] fs: Add aio iopriority support
-Date: Tue, 22 May 2018 08:07:35 -0700
-Message-Id: <20180522150737.9893-4-adam.manzanares@wdc.com>
-In-Reply-To: <20180522150737.9893-1-adam.manzanares@wdc.com>
-References: <20180522150737.9893-1-adam.manzanares@wdc.com>
+Return-Path: <m.tretter@pengutronix.de>
+Date: Tue, 15 May 2018 10:44:02 +0200
+From: Michael Tretter <m.tretter@pengutronix.de>
+To: Josef Bacik <jbacik@fb.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Jens Axboe
+ <axboe@kernel.dk>, "kernel@pengutronix.de" <kernel@pengutronix.de>
+Subject: Re: [PATCH] nbd: do not update block size if file system is mounted
+Message-ID: <20180515104402.0866aeb2@litschi.hi.pengutronix.de>
+In-Reply-To: <20180417111543.65a4617b@litschi.hi.pengutronix.de>
+References: <20180228095456.31472-1-m.tretter@pengutronix.de>
+	<20180315110057.13eecda6@litschi.hi.pengutronix.de>
+	<6c862ddf-b352-6ef4-06f8-516680e9f19f@kernel.dk>
+	<20180413162518.47840e6f@litschi.hi.pengutronix.de>
+	<3A32B506-71AE-48AF-A44A-B60F054ED40D@fb.com>
+	<20180417111543.65a4617b@litschi.hi.pengutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Adam Manzanares <adam.manzanares@wdc.com>
+On Tue, 17 Apr 2018 11:15:43 +0200, Michael Tretter wrote:
+> Hi Josef,
+>=20
+> On Sat, 14 Apr 2018 01:10:27 +0000, Josef Bacik wrote:
+> > Yeah sorry I screwed that up again.  I=E2=80=99m wondering if we can ju=
+st
+> > drop this altogether and leave the zero setting in the config put
+> > that we already have. =20
+>=20
+> I'm not sure if I understand you correctly. The nbd_config_put()
+> function does not touch the bdev at all. How should config put take
+> care of setting the size to 0?
+>=20
+> Dropping the bd_set_size to 0 from nbd_start_device_ioctl should be
+> fine, because usually reset takes care of that. However, if there is
+> an opener during nbd_bdev_reset(), the size won't be changed to 0
+> either. This would still be the same behavior as with my patch.
 
-This is the per-I/O equivalent of the ioprio_set system call.
+Ping.
 
-When IOCB_FLAG_IOPRIO is set on the iocb aio_flags field, then we set the
-newly added kiocb ki_ioprio field to the value in the iocb aio_reqprio field.
+Michael
 
-This patch depends on block: add ioprio_check_cap function.
-
-Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
-Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/loop.c         |  3 +++
- fs/aio.c                     | 16 ++++++++++++++++
- include/linux/fs.h           |  3 +++
- include/uapi/linux/aio_abi.h |  1 +
- 4 files changed, 23 insertions(+)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 5d4e31655d96..dd98dfd97f5e 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -76,6 +76,8 @@
- #include <linux/miscdevice.h>
- #include <linux/falloc.h>
- #include <linux/uio.h>
-+#include <linux/ioprio.h>
-+
- #include "loop.h"
- 
- #include <linux/uaccess.h>
-@@ -559,6 +561,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	cmd->iocb.ki_filp = file;
- 	cmd->iocb.ki_complete = lo_rw_aio_complete;
- 	cmd->iocb.ki_flags = IOCB_DIRECT;
-+	cmd->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
- 	if (cmd->css)
- 		kthread_associate_blkcg(cmd->css);
- 
-diff --git a/fs/aio.c b/fs/aio.c
-index 755d3f57bcc8..8225013f70f0 100644
---- a/fs/aio.c
-+++ b/fs/aio.c
-@@ -1451,6 +1451,22 @@ static int aio_prep_rw(struct kiocb *req, struct iocb *iocb)
- 	if (iocb->aio_flags & IOCB_FLAG_RESFD)
- 		req->ki_flags |= IOCB_EVENTFD;
- 	req->ki_hint = file_write_hint(req->ki_filp);
-+	if (iocb->aio_flags & IOCB_FLAG_IOPRIO) {
-+		/*
-+		 * If the IOCB_FLAG_IOPRIO flag of aio_flags is set, then
-+		 * aio_reqprio is interpreted as an I/O scheduling
-+		 * class and priority.
-+		 */
-+		ret = ioprio_check_cap(iocb->aio_reqprio);
-+		if (ret) {
-+			pr_debug("aio ioprio check cap error\n");
-+			return -EINVAL;
-+		}
-+
-+		req->ki_ioprio = iocb->aio_reqprio;
-+	} else
-+		req->ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
-+
- 	ret = kiocb_set_rw_flags(req, iocb->aio_rw_flags);
- 	if (unlikely(ret))
- 		fput(req->ki_filp);
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 50de40dbbb85..73b749ed3ea1 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -36,6 +36,7 @@
- #include <linux/delayed_call.h>
- #include <linux/uuid.h>
- #include <linux/errseq.h>
-+#include <linux/ioprio.h>
- 
- #include <asm/byteorder.h>
- #include <uapi/linux/fs.h>
-@@ -302,6 +303,7 @@ struct kiocb {
- 	void			*private;
- 	int			ki_flags;
- 	u16			ki_hint;
-+	u16			ki_ioprio; /* See linux/ioprio.h */
- } __randomize_layout;
- 
- static inline bool is_sync_kiocb(struct kiocb *kiocb)
-@@ -1942,6 +1944,7 @@ static inline void init_sync_kiocb(struct kiocb *kiocb, struct file *filp)
- 		.ki_filp = filp,
- 		.ki_flags = iocb_flags(filp),
- 		.ki_hint = ki_hint_validate(file_write_hint(filp)),
-+		.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0),
- 	};
- }
- 
-diff --git a/include/uapi/linux/aio_abi.h b/include/uapi/linux/aio_abi.h
-index 2c0a3415beee..d4e768d55d14 100644
---- a/include/uapi/linux/aio_abi.h
-+++ b/include/uapi/linux/aio_abi.h
-@@ -55,6 +55,7 @@ enum {
-  *                   is valid.
-  */
- #define IOCB_FLAG_RESFD		(1 << 0)
-+#define IOCB_FLAG_IOPRIO	(1 << 1)
- 
- /* read() from /dev/aio returns these structures. */
- struct io_event {
--- 
-2.15.1
+>=20
+> Michael
+>=20
+>=20
+> > Does doing that fix it for you?  Thanks,
+> >=20
+> > Josef
+> >=20
+> > Sent from my iPhone
+> >  =20
+> > > On Apr 13, 2018, at 10:26 AM, Michael Tretter
+> > > <m.tretter@pengutronix.de> wrote:  =20
+> > >> On Fri, 16 Mar 2018 09:36:45 -0700, Jens Axboe wrote:   =20
+> > >>> On 3/15/18 3:00 AM, Michael Tretter wrote:   =20
+> > >>>> On Wed, 28 Feb 2018 10:54:56 +0100, Michael Tretter wrote: =20
+> > >>>> If a file system is mounted on the nbd during a disconnect,
+> > >>>> resetting the size to 0, might change the block size and destroy
+> > >>>> the buffer_head mappings. This will cause a infinite loop when
+> > >>>> the file system looks for the buffer_heads for flushing.
+> > >>>>=20
+> > >>>> Only set the file size to 0, if we are the only opener of the
+> > >>>> nbd.
+> > >>>>=20
+> > >>>> Signed-off-by: Michael Tretter <m.tretter@pengutronix.de>
+> > >>>> ---
+> > >>>> drivers/block/nbd.c | 3 ++-
+> > >>>> 1 file changed, 2 insertions(+), 1 deletion(-)
+> > >>>>=20
+> > >>>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> > >>>> index 5f2a4240a204..0d1dbb60430b 100644
+> > >>>> --- a/drivers/block/nbd.c
+> > >>>> +++ b/drivers/block/nbd.c
+> > >>>> @@ -1118,7 +1118,8 @@ static int nbd_start_device_ioctl(struct
+> > >>>> nbd_device *nbd, struct block_device *b if (ret)
+> > >>>>        sock_shutdown(nbd);
+> > >>>>    mutex_lock(&nbd->config_lock);
+> > >>>> -    bd_set_size(bdev, 0);
+> > >>>> +    if (bdev->bd_openers <=3D 1)
+> > >>>> +        bd_set_size(bdev, 0);
+> > >>>>    /* user requested, ignore socket errors */
+> > >>>>    if (test_bit(NBD_DISCONNECT_REQUESTED,
+> > >>>> &config->runtime_flags)) ret =3D 0;     =20
+> > >>>=20
+> > >>> Are there any comments on this patch?     =20
+> > >>=20
+> > >> Josef?
+> > >>    =20
+> > >=20
+> > > Maybe some history helps for reviewing the patch:
+> > >=20
+> > > Commit abbbdf12497d ("nbd: replace kill_bdev() with
+> > > __invalidate_device()") already fixed this issue once by changing
+> > > nbd_size_clear() to only set the size to 0 if the device is only
+> > > opened once. The line was moved several times during the rework for
+> > > the netlink interface and the check for the number of openers was
+> > > dropped, reintroducing the issue.
+> > >=20
+> > > Michael   =20
