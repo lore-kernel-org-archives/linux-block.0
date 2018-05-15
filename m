@@ -1,104 +1,69 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-Subject: Re: [PATCH V5 0/9] nvme: pci: fix & improve timeout handling
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Laurence Oberman <loberman@redhat.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <james.smart@broadcom.com>, linux-nvme@lists.infradead.org,
-        Keith Busch <keith.busch@intel.com>, Christoph Hellwig <hch@lst.de>
-References: <20180511122933.27155-1-ming.lei@redhat.com>
- <776f21e1-dc19-1b77-9ba4-44f0b8366625@oracle.com>
- <20180514093850.GA807@ming.t460p>
- <008cb38d-aa91-6ab7-64d9-417d6c53a1eb@oracle.com>
- <20180514122211.GB807@ming.t460p> <20180515003332.GB21743@ming.t460p>
-From: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <d97b375f-9b47-6b95-bd5b-8166dae93676@oracle.com>
-Date: Tue, 15 May 2018 17:56:14 +0800
+Return-Path: <tom.leiming@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180515003332.GB21743@ming.t460p>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180515003335.GB15199@localhost.localdomain>
+References: <20180511122933.27155-1-ming.lei@redhat.com> <20180511205028.GB7772@localhost.localdomain>
+ <20180512002110.GA23631@ming.t460p> <20180514151821.GE7772@localhost.localdomain>
+ <20180514234701.GA21743@ming.t460p> <20180515003335.GB15199@localhost.localdomain>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Tue, 15 May 2018 17:08:29 +0800
+Message-ID: <CACVXFVM_K+6u4JhCQcyNSWF=gu5_hDqW373PaKtsWWDeTho2pQ@mail.gmail.com>
+Subject: Re: [PATCH V5 0/9] nvme: pci: fix & improve timeout handling
+To: Keith Busch <keith.busch@linux.intel.com>
+Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block <linux-block@vger.kernel.org>, Laurence Oberman <loberman@redhat.com>,
+	Sagi Grimberg <sagi@grimberg.me>, James Smart <james.smart@broadcom.com>,
+	linux-nvme <linux-nvme@lists.infradead.org>, Keith Busch <keith.busch@intel.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>, Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Hi ming
+On Tue, May 15, 2018 at 8:33 AM, Keith Busch
+<keith.busch@linux.intel.com> wrote:
+> On Tue, May 15, 2018 at 07:47:07AM +0800, Ming Lei wrote:
+>> > > > [  760.727485] nvme nvme1: EH 0: after recovery -19
+>> > > > [  760.727488] nvme nvme1: EH: fail controller
+>> > >
+>> > > The above issue(hang in nvme_remove()) is still an old issue, which
+>> > > is because queues are kept as quiesce during remove, so could you
+>> > > please test the following change?
+>> > >
+>> > > diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+>> > > index 1dec353388be..c78e5a0cde06 100644
+>> > > --- a/drivers/nvme/host/core.c
+>> > > +++ b/drivers/nvme/host/core.c
+>> > > @@ -3254,6 +3254,11 @@ void nvme_remove_namespaces(struct nvme_ctrl *ctrl)
+>> > >          */
+>> > >         if (ctrl->state == NVME_CTRL_DEAD)
+>> > >                 nvme_kill_queues(ctrl);
+>> > > +       else {
+>> > > +               if (ctrl->admin_q)
+>> > > +                       blk_mq_unquiesce_queue(ctrl->admin_q);
+>> > > +               nvme_start_queues(ctrl);
+>> > > +       }
+>> > >
+>> > >         down_write(&ctrl->namespaces_rwsem);
+>> > >         list_splice_init(&ctrl->namespaces, &ns_list);
+>> >
+>> > The above won't actually do anything here since the broken link puts the
+>> > controller in the DEAD state, so we've killed the queues which also
+>> > unquiesces them.
+>>
+>> I suggest you to double check if the controller is set as DEAD
+>> in nvme_remove() since there won't be any log dumped when this happen.
+>
+> Yes, it's dead. pci_device_is_present returns false when the link is
+> broken.
+>
+> Also, the logs showed the capacity was set to 0, which only happens when
+> we kill the namespace queues, which supposedly restarts the queues too.
+>
 
-On 05/15/2018 08:33 AM, Ming Lei wrote:
-> We still have to quiesce admin queue before canceling request, so looks
-> the following patch is better, so please ignore the above patch and try
-> the following one and see if your hang can be addressed:
-> 
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index f509d37b2fb8..c2adc76472a8 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -1741,8 +1741,7 @@ static int nvme_alloc_admin_tags(struct nvme_dev *dev)
->  			dev->ctrl.admin_q = NULL;
->  			return -ENODEV;
->  		}
-> -	} else
-> -		blk_mq_unquiesce_queue(dev->ctrl.admin_q);
-> +	}
->  
->  	return 0;
->  }
-> @@ -2520,6 +2519,12 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown, bool
->  	 */
->  	if (shutdown)
->  		nvme_start_queues(&dev->ctrl);
-> +
-> +	/*
-> +	 * Avoid to suck reset because timeout may happen during reset and
-> +	 * reset may hang forever if admin queue is kept as quiesced
-> +	 */
-> +	blk_mq_unquiesce_queue(dev->ctrl.admin_q);
->  	mutex_unlock(&dev->shutdown_lock);
->  }
+Right, nvme_kill_queues() may trigger that, and in my 019 test, not see
+pci_device_is_present() returns false, but nvme_kill_queues() has been
+called in nvme_remove_dead_ctrl_work(),  and still didn't reproduce
+the hang in blk_cleanup_queue() yet.
 
-w/ patch above and patch below, both the warning and io hung issue didn't reproduce till now.
+Looks a bit weird, but debugfs may show some clue, :-)
 
-
-@@ -1450,6 +1648,7 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
- {
-        struct nvme_dev *dev = nvmeq->dev;
-        int result;
-+       int cq_vector;
- 
-        if (dev->cmb && use_cmb_sqes && (dev->cmbsz & NVME_CMBSZ_SQS)) {
-                unsigned offset = (qid - 1) * roundup(SQ_SIZE(nvmeq->q_depth),
-@@ -1462,15 +1661,16 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
-         * A queue's vector matches the queue identifier unless the controller
-         * has only one vector available.
-         */
--       nvmeq->cq_vector = dev->num_vecs == 1 ? 0 : qid;
--       result = adapter_alloc_cq(dev, qid, nvmeq);
-+       cq_vector = dev->num_vecs == 1 ? 0 : qid;
-+       result = adapter_alloc_cq(dev, qid, nvmeq, cq_vector);
-        if (result < 0)
--               goto release_vector;
-+               goto out;
- 
-        result = adapter_alloc_sq(dev, qid, nvmeq);
-        if (result < 0)
-                goto release_cq;
--
-+       
-+       nvmeq->cq_vector = cq_vector;
-        nvme_init_queue(nvmeq, qid);
-        result = queue_request_irq(nvmeq);
-        if (result < 0)
-@@ -1479,12 +1679,12 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
-        return result;
- 
-  release_sq:
-+       nvmeq->cq_vector = -1;
-        dev->online_queues--;
-        adapter_delete_sq(dev, qid);
-  release_cq:
-        adapter_delete_cq(dev, qid);
-- release_vector:
--       nvmeq->cq_vector = -1;
-+ out:
-        return result;
- }
-
-Thanks
-Jianchao
+Thanks,
+Ming Lei
