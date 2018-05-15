@@ -1,37 +1,30 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from verein.lst.de ([213.95.11.211]:40367 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752090AbeEOHWJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 May 2018 03:22:09 -0400
+Date: Tue, 15 May 2018 09:26:25 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
 Subject: Re: [PATCH 31/33] iomap: add support for sub-pagesize buffered I/O
- without buffer heads
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-mm@kvack.org
-References: <20180509074830.16196-1-hch@lst.de>
- <20180509074830.16196-32-hch@lst.de>
- <eebcc4bf-f646-edc6-264b-124b3880f3cb@suse.de>
- <20180515072625.GA23384@lst.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-Message-ID: <8b36b6c2-03b0-ea66-9bea-df2695dd1dba@suse.de>
-Date: Tue, 15 May 2018 08:47:25 -0500
+        without buffer heads
+Message-ID: <20180515072625.GA23384@lst.de>
+References: <20180509074830.16196-1-hch@lst.de> <20180509074830.16196-32-hch@lst.de> <eebcc4bf-f646-edc6-264b-124b3880f3cb@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20180515072625.GA23384@lst.de>
-Content-Type: text/plain; charset=utf-8
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <eebcc4bf-f646-edc6-264b-124b3880f3cb@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-
-
-On 05/15/2018 02:26 AM, Christoph Hellwig wrote:
-> On Mon, May 14, 2018 at 11:00:08AM -0500, Goldwyn Rodrigues wrote:
->>> +	if (iop || i_blocksize(inode) == PAGE_SIZE)
->>> +		return iop;
->>
->> Why is this an equal comparison operator? Shouldn't this be >= to
->> include filesystem blocksize greater than PAGE_SIZE?
+On Mon, May 14, 2018 at 11:00:08AM -0500, Goldwyn Rodrigues wrote:
+> > +	if (iop || i_blocksize(inode) == PAGE_SIZE)
+> > +		return iop;
 > 
-> Which filesystems would that be that have a tested and working PAGE_SIZE
-> support using iomap?
+> Why is this an equal comparison operator? Shouldn't this be >= to
+> include filesystem blocksize greater than PAGE_SIZE?
 
-Oh, I assumed iomap would work for filesystems with block size greater
-than PAGE_SIZE.
-
--- 
-Goldwyn
+Which filesystems would that be that have a tested and working PAGE_SIZE
+support using iomap?
