@@ -1,339 +1,74 @@
-Return-Path: <roman.penyaev@profitbricks.com>
-Return-Path: <roman.penyaev@profitbricks.com>
-From: Roman Pen <roman.penyaev@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 15 May 2018 20:39:58 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Cc: Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@kernel.dk>,
+	Laurence Oberman <loberman@redhat.com>,
 	Sagi Grimberg <sagi@grimberg.me>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Or Gerlitz <ogerlitz@mellanox.com>,
-	Doug Ledford <dledford@redhat.com>,
-	Swapnil Ingle <swapnil.ingle@profitbricks.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>,
-	Jack Wang <jinpu.wang@profitbricks.com>,
-	Roman Pen <roman.penyaev@profitbricks.com>
-Subject: [PATCH v2 25/26] ibnbd: a bit of documentation
-Date: Fri, 18 May 2018 15:04:12 +0200
-Message-Id: <20180518130413.16997-26-roman.penyaev@profitbricks.com>
-In-Reply-To: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
-References: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
+	James Smart <james.smart@broadcom.com>,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH V5 9/9] nvme: pci: support nested EH
+Message-ID: <20180515123950.GB13679@ming.t460p>
+References: <20180511122933.27155-1-ming.lei@redhat.com>
+ <20180511122933.27155-10-ming.lei@redhat.com>
+ <a2580133-f65c-b301-f1b0-672af97f2feb@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <a2580133-f65c-b301-f1b0-672af97f2feb@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-README with description of major sysfs entries.
+On Tue, May 15, 2018 at 06:02:13PM +0800, jianchao.wang wrote:
+> Hi ming
+> 
+> On 05/11/2018 08:29 PM, Ming Lei wrote:
+> > +static void nvme_eh_done(struct nvme_eh_work *eh_work, int result)
+> > +{
+> > +	struct nvme_dev *dev = eh_work->dev;
+> > +	bool top_eh;
+> > +
+> > +	spin_lock(&dev->eh_lock);
+> > +	top_eh = list_is_last(&eh_work->list, &dev->eh_head);
+> > +	dev->nested_eh--;
+> > +
+> > +	/* Fail controller if the top EH can't recover it */
+> > +	if (!result)
+> > +		wake_up_all(&dev->eh_wq);
+> > +	else if (top_eh) {
+> > +		dev->ctrl_failed = true;
+> > +		nvme_eh_sched_fail_ctrl(dev);
+> > +		wake_up_all(&dev->eh_wq);
+> > +	}
+> > +
+> > +	list_del(&eh_work->list);
+> > +	spin_unlock(&dev->eh_lock);
+> > +
+> > +	dev_info(dev->ctrl.device, "EH %d: state %d, eh_done %d, top eh %d\n",
+> > +			eh_work->seq, dev->ctrl.state, result, top_eh);
+> > +	wait_event(dev->eh_wq, nvme_eh_reset_done(dev));
+> 
+> decrease the nested_eh before it exits, another new EH will have confusing seq number.
+> please refer to following log:
+> [ 1342.961869] nvme nvme0: Abort status: 0x0
+> [ 1342.961878] nvme nvme0: Abort status: 0x0
+> [ 1343.148341] nvme nvme0: EH 0: after shutdown, top eh: 1
+> [ 1403.828484] nvme nvme0: I/O 21 QID 0 timeout, disable controller
+> [ 1403.828603] nvme nvme0: EH 1: before shutdown
+> ... waring logs are ignored here 
+> [ 1403.984731] nvme nvme0: EH 0: state 4, eh_done -4, top eh 0  // EH0 go to wait
+> [ 1403.984786] nvme nvme0: EH 1: after shutdown, top eh: 1
+> [ 1464.856290] nvme nvme0: I/O 22 QID 0 timeout, disable controller  // timeout again in EH 1
+> [ 1464.856411] nvme nvme0: EH 1: before shutdown // a new EH has a 1 seq number
+> 
+> Is it expected that the new EH has seq number 1 instead of 2 ?
 
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
-Cc: Jack Wang <jinpu.wang@profitbricks.com>
----
- drivers/block/ibnbd/README | 299 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 299 insertions(+)
- create mode 100644 drivers/block/ibnbd/README
+Right, it has been fixed in my local tree of V5.1:
 
-diff --git a/drivers/block/ibnbd/README b/drivers/block/ibnbd/README
-new file mode 100644
-index 000000000000..bbaddd02c1c5
---- /dev/null
-+++ b/drivers/block/ibnbd/README
-@@ -0,0 +1,299 @@
-+***************************************
-+Infiniband Network Block Device (IBNBD)
-+***************************************
-+
-+Introduction
-+------------
-+
-+IBNBD (InfiniBand Network Block Device) is a pair of kernel modules
-+(client and server) that allow for remote access of a block device on
-+the server over IBTRS protocol using the RDMA (InfiniBand, RoCE, iWarp)
-+transport. After being mapped, the remote block devices can be accessed
-+on the client side as local block devices.
-+
-+I/O is transfered between client and server by the IBTRS transport
-+modules. The administration of IBNBD and IBTRS modules is done via
-+sysfs entries.
-+
-+Requirements
-+------------
-+
-+  IBTRS kernel modules
-+
-+Quick Start
-+-----------
-+
-+Server side:
-+  # modprobe ibnbd_server
-+
-+Client side:
-+  # modprobe ibnbd_client
-+  # echo "sessname=blya path=ip:10.50.100.66 device_path=/dev/ram0" > \
-+            /sys/devices/virtual/ibnbd-client/ctl/map_device
-+
-+  Where "sessname=" is a session name, a string to identify the session
-+  on client and on server sides; "path=" is a destination IP address or
-+  a pair of a source and a destination IPs, separated by comma.  Multiple
-+  "path=" options can be specified in order to use multipath  (see IBTRS
-+  description for details); "device_path=" is the block device to be
-+  mapped from the server side. After the session to the server machine is
-+  established, the mapped device will appear on the client side under
-+  /dev/ibnbd<N>.
-+
-+
-+======================
-+Client Sysfs Interface
-+======================
-+
-+All sysfs files that are not read-only provide the usage information on read:
-+
-+Example:
-+  # cat /sys/devices/virtual/ibnbd-client/ctl/map_device
-+
-+  > Usage: echo "sessname=<name of the ibtrs session> path=<[srcaddr,]dstaddr>
-+  > [path=<[srcaddr,]dstaddr>] device_path=<full path on remote side>
-+  > [access_mode=<ro|rw|migration>]
-+  > [io_mode=<fileio|blockio>]" > map_device
-+  >
-+  > addr ::= [ ip:<ipv4> | ip:<ipv6> | gid:<gid> ]
-+
-+Entries under /sys/devices/virtual/ibnbd-client/ctl/
-+=======================================
-+
-+map_device (RW)
-+---------------
-+
-+Expected format is the following:
-+
-+    sessname=<name of the ibtrs session>
-+    path=<[srcaddr,]dstaddr> [path=<[srcaddr,]dstaddr> ...]
-+    device_path=<full path on remote side>
-+    [access_mode=<ro|rw|migration>]
-+    [io_mode=<fileio|blockio>]
-+
-+Where:
-+
-+sessname: accepts a string not bigger than 256 chars, which identifies
-+          a given session on the client and on the server.
-+          I.e. "clt_hostname-srv_hostname" could be a natural choice.
-+
-+path:     describes a connection between the client and the server by
-+      specifying destination and, when required, the source address.
-+      The addresses are to be provided in the following format:
-+
-+            ip:<IPv6>
-+            ip:<IPv4>
-+            gid:<GID>
-+
-+          for example:
-+
-+          path=ip:10.0.0.66
-+                         The single addr is treated as the destination.
-+                         The connection will be established to this
-+                         server from any client IP address.
-+
-+          path=ip:10.0.0.66,ip:10.0.1.66
-+                         First addr is the source address and the second
-+                         is the destination.
-+
-+          If multiple "path=" options are specified multiple connection
-+          will be established and data will be sent according to
-+          the selected multipath policy (see IBTRS mp_policy sysfs entry
-+          description).
-+
-+device_path: Path to the block device on the server side. Path is specified
-+         relative to the directory on server side configured in the
-+         'dev_search_path' module parameter of the ibnbd_server.
-+         The ibnbd_server prepends the <device_path> received from client
-+         with <dev_search_path> and tries to open the
-+         <dev_search_path>/<device_path> block device.  On success,
-+         a /dev/ibnbd<N> device file, a /sys/block/ibnbd_client/ibnbd<N>/
-+         directory and an entry in /sys/devices/virtual/ibnbd-client/ctl/devices
-+         will be created.
-+
-+         If 'dev_search_path' contains '%SESSNAME%', then each session can
-+         have different devices namespace, e.g. server was configured with
-+         the following parameter "dev_search_path=/run/ibnbd-devs/%SESSNAME%",
-+         client has this string "sessname=blya device_path=sda", then server
-+         will try to open: /run/ibnbd-devs/blya/sda.
-+
-+access_mode: the access_mode parameter specifies if the device is to be
-+             mapped as "ro" read-only or "rw" read-write. The server allows
-+             a device to be exported in rw mode only once. The "migration"
-+             access mode has to be specified if a second mapping in read-write
-+             mode is desired.
-+
-+             By default "rw" is used.
-+
-+io_mode:  the io_mode parameter specifies if the device on the server
-+          will be opened as block device "blockio" or as file "fileio".
-+          When the device is opened as file, the VFS page cache is used
-+          for read I/O operations, write I/O operations bypass the page
-+          cache and go directly to disk (except meta updates, like file
-+          access time).
-+
-+          By default "blockio" mode is used.
-+
-+Exit Codes:
-+
-+If the device is already mapped it will fail with EEXIST. If the input
-+has an invalid format it will return EINVAL. If the device path cannot
-+be found on the server, it will fail with ENOENT.
-+
-+Finding device file after mapping
-+---------------------------------
-+
-+After mapping, the device file can be found by:
-+ o  The symlink /sys/devices/virtual/ibnbd-client/ctl/devices/<device_id>
-+    points to /sys/block/<dev-name>. The last part of the symlink destination
-+    is the same as the device name.  By extracting the last part of the
-+    path the path to the device /dev/<dev-name> can be build.
-+
-+ o /dev/block/$(cat /sys/devices/virtual/ibnbd-client/ctl/devices/<device_id>/dev)
-+
-+How to find the <device_id> of the device is described on the next
-+section.
-+
-+Entries under /sys/devices/virtual/ibnbd-client/ctl/devices/
-+============================================================
-+
-+For each device mapped on the client a new symbolic link is created as
-+/sys/devices/virtual/ibnbd-client/ctl/devices/<device_id>, which points
-+to the block device created by ibnbd (/sys/block/ibnbd<N>/).
-+The <device_id> of each device is created as follows:
-+
-+- If the 'device_path' provided during mapping contains slashes ("/"),
-+  they are replaced by exclamation mark ("!") and used as as the
-+  <device_id>. Otherwise, the <device_id> will be the same as the
-+  "device_path" provided.
-+
-+Entries under /sys/block/ibnbd<N>/ibnbd_client/
-+===============================================
-+
-+unmap_device (RW)
-+-----------------
-+
-+To unmap a volume, "normal" or "force" has to be written to:
-+  /sys/block/ibnbd<N>/ibnbd_client/unmap_device
-+
-+When "normal" is used, the operation will fail with EBUSY if any process
-+is using the device.  When "force" is used, the device is also unmapped
-+when device is in use.  All I/Os that are in progress will fail.
-+
-+Example:
-+
-+   # echo "normal" > /sys/block/ibnbd0/ibnbd/unmap_device
-+
-+state (RO)
-+----------
-+
-+The file contains the current state of the block device. The state file
-+returns "open" when the device is successfully mapped from the server
-+and accepting I/O requests. When the connection to the server gets
-+disconnected in case of an error (e.g. link failure), the state file
-+returns "closed" and all I/O requests submitted to it will fail with -EIO.
-+
-+session (RO)
-+------------
-+
-+IBNBD uses IBTRS session to transport the data between client and
-+server.  The entry "session" contains the name of the session, that
-+was used to establish the IBTRS session.  It's the same name that
-+was passed as server parameter to the map_device entry.
-+
-+mapping_path (RO)
-+-----------------
-+
-+Contains the path that was passed as "device_path" to the map_device
-+operation.
-+
-+======================
-+Server Sysfs Interface
-+======================
-+
-+Entries under /sys/devices/virtual/ibnbd-server/ctl/
-+====================================================
-+
-+When a client maps a device, a directory entry with the name of the
-+block device is created under /sys/devices/virtual/ibnbd-server/ctl/devices/.
-+
-+Entries under /sys/devices/virtual/ibnbd-server/ctl/devices/<device_name>/
-+==========================================================================
-+
-+block_dev (link)
-+---------------
-+
-+Is a symlink to the sysfs entry of the exported device.
-+
-+Example:
-+
-+  block_dev -> ../../../../devices/virtual/block/ram0
-+
-+Entries under /sys/devices/virtual/ibnbd-server/ctl/devices/<device_name>/sessions/
-+===================================================================================
-+
-+For each client a particular device is exported to, following directory will be
-+created:
-+
-+/sys/devices/virtual/ibnbd-server/ctl/devices/<device_name>/sessions/<session-name>/
-+
-+When the device is unmapped by that client, the directory will be removed.
-+
-+Entries under /sys/devices/virtual/ibnbd-server/ctl/devices/<device_name>/sessions/<session-name>
-+=================================================================================================
-+
-+read_only (RO)
-+--------------
-+
-+Contains '1' if device is mapped read-only, otherwise '0'.
-+
-+mapping_path (RO)
-+-----------------
-+
-+Contains the relative device path provided by the user during mapping.
-+
-+==============================
-+IBNBD-Server Module Parameters
-+==============================
-+
-+dev_search_path
-+---------------
-+
-+When a device is mapped from the client, the server generates the path
-+to the block device on the server side by concatenating dev_search_path
-+and the "device_path" that was specified in the map_device operation.
-+
-+The default dev_search_path is: "/".
-+
-+dev_search_path option can also contain %SESSNAME% in order to provide
-+different deviec namespaces for different sessions.  See "device_path"
-+option for details.
-+
-+==============================
-+Protocol (ibnbd/ibnbd-proto.h)
-+==============================
-+
-+1. Before mapping first device from a given server, client sends an
-+IBNBD_MSG_SESS_INFO to the server. Server responds with
-+IBNBD_MSG_SESS_INFO_RSP. Currently the messages only contain the protocol
-+version for backward compatibility.
-+
-+2. Client requests to open a device by sending IBNBD_MSG_OPEN message. This
-+contains the path to the device, access mode (read-only or writable), and
-+io_mode which specifies if the device should be opened as block device or
-+using file io. Server responds to the message with IBNBD_MSG_OPEN_RSP. This
-+contains a 32 bit device id to be used for  IOs and device "geometry" related
-+information: side, max_hw_sectors, etc.
-+
-+3. Client attaches IBNBD_MSG_IO to each IO message send to a device. This
-+message contains device id, provided by server in his ibnbd_msg_open_rsp,
-+sector to be accessed, read-write flags and bi_size.
-+
-+4. Client closes a device by sending IBNBD_MSG_CLOSE which contains only the
-+device id provided by the server.
-+
-+
-+Contact
-+-------
-+
-+Mailing list: "IBNBD/IBTRS Storage Team" <ibnbd@profitbricks.com>
--- 
-2.13.1
+https://github.com/ming1/linux/commits/v4.17-rc-nvme-timeout.V5.1
+
+And there are also several other fixes in this tree.
+
+All will be merged to V6.
+
+Thanks,
+Ming
