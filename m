@@ -1,25 +1,50 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: blk-mq: remove unnecessary judgement from blk_mq_make_request
-To: =?UTF-8?B?6IOh5rW3?= <huhai@kylinos.cn>
-Cc: linux-block <linux-block@vger.kernel.org>
-References: <tencent_024782AB2B10E01A63664862@qq.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <fef2e37c-8f45-898b-96cc-a98b9093f7ea@kernel.dk>
-Date: Wed, 16 May 2018 08:19:45 -0600
-MIME-Version: 1.0
-In-Reply-To: <tencent_024782AB2B10E01A63664862@qq.com>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from smtpbgsg2.qq.com ([54.254.200.128]:49332 "EHLO smtpbgsg2.qq.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751904AbeEPCsB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 May 2018 22:48:01 -0400
+From: "=?utf-8?B?6IOh5rW3?=" <huhai@kylinos.cn>
+To: "=?utf-8?B?YXhib2U=?=" <axboe@kernel.dk>
+Cc: "=?utf-8?B?bGludXgtYmxvY2s=?=" <linux-block@vger.kernel.org>
+Subject: blk-mq: remove unnecessary judgement from blk_mq_make_request
+Mime-Version: 1.0
+Content-Type: text/plain;
+        charset="utf-8"
+Date: Wed, 16 May 2018 10:47:55 +0800
+Message-ID: <tencent_024782AB2B10E01A63664862@qq.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 5/15/18 8:47 PM, 胡海 wrote:
-> Author: huhai <huhai@kylinos.cn>
-> Date:   Tue May 15 15:15:06 2018 +0800
-> 
->     blk-mq: remove unnecessary judgement from blk_mq_make_request
->     
->     Whether q->elevator is true or not, we can use blk_mq_sched_insert_request to complete the work.
-
-This looks good, applied for 4.18.
-
--- 
-Jens Axboe
+QXV0aG9yOiBodWhhaSA8aHVoYWlAa3lsaW5vcy5jbj4NCkRhdGU6ICAgVHVlIE1heSAxNSAx
+NToxNTowNiAyMDE4ICswODAwDQoNCiAgICBibGstbXE6IHJlbW92ZSB1bm5lY2Vzc2FyeSBq
+dWRnZW1lbnQgZnJvbSBibGtfbXFfbWFrZV9yZXF1ZXN0DQogICAgDQogICAgV2hldGhlciBx
+LT5lbGV2YXRvciBpcyB0cnVlIG9yIG5vdCwgd2UgY2FuIHVzZSBibGtfbXFfc2NoZWRfaW5z
+ZXJ0X3JlcXVlc3QgdG8gY29tcGxldGUgdGhlIHdvcmsuDQogICAgDQogICAgU2lnbmVkLW9m
+Zi1ieTogaHVoYWkgPGh1aGFpQGt5bGlub3MuY24+DQoNCmRpZmYgLS1naXQgYS9ibG9jay9i
+bGstbXEuYyBiL2Jsb2NrL2Jsay1tcS5jDQppbmRleCBmY2YyZjE2Li4yNTQ1MDgxIDEwMDY0
+NA0KLS0tIGEvYmxvY2svYmxrLW1xLmMNCisrKyBiL2Jsb2NrL2Jsay1tcS5jDQpAQCAtMTU4
+MCwxNSArMTU4MCw2IEBAIHN0YXRpYyB2b2lkIGJsa19tcV9iaW9fdG9fcmVxdWVzdChzdHJ1
+Y3QgcmVxdWVzdCAqcnEsIHN0cnVjdCBiaW8gKmJpbykNCiAgICAgICAgYmxrX2FjY291bnRf
+aW9fc3RhcnQocnEsIHRydWUpOw0KIH0NCiANCi1zdGF0aWMgaW5saW5lIHZvaWQgYmxrX21x
+X3F1ZXVlX2lvKHN0cnVjdCBibGtfbXFfaHdfY3R4ICpoY3R4LA0KLSAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBzdHJ1Y3QgYmxrX21xX2N0eCAqY3R4LA0KLSAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3QgcmVxdWVzdCAqcnEpDQotew0KLSAg
+ICAgICBzcGluX2xvY2soJmN0eC0+bG9jayk7DQotICAgICAgIF9fYmxrX21xX2luc2VydF9y
+ZXF1ZXN0KGhjdHgsIHJxLCBmYWxzZSk7DQotICAgICAgIHNwaW5fdW5sb2NrKCZjdHgtPmxv
+Y2spOw0KLX0NCi0NCiBzdGF0aWMgYmxrX3FjX3QgcmVxdWVzdF90b19xY190KHN0cnVjdCBi
+bGtfbXFfaHdfY3R4ICpoY3R4LCBzdHJ1Y3QgcmVxdWVzdCAqcnEpDQogew0KICAgICAgICBp
+ZiAocnEtPnRhZyAhPSAtMSkNCkBAIC0xNzc1LDE1ICsxNzY2LDEwIEBAIHN0YXRpYyBibGtf
+cWNfdCBibGtfbXFfbWFrZV9yZXF1ZXN0KHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxLCBzdHJ1
+Y3QgYmlvICpiaW8pDQogICAgICAgICAgICAgICAgYmxrX21xX3B1dF9jdHgoZGF0YS5jdHgp
+Ow0KICAgICAgICAgICAgICAgIGJsa19tcV9iaW9fdG9fcmVxdWVzdChycSwgYmlvKTsNCiAg
+ICAgICAgICAgICAgICBibGtfbXFfdHJ5X2lzc3VlX2RpcmVjdGx5KGRhdGEuaGN0eCwgcnEs
+ICZjb29raWUpOw0KLSAgICAgICB9IGVsc2UgaWYgKHEtPmVsZXZhdG9yKSB7DQorICAgICAg
+IH0gZWxzZSAgew0KICAgICAgICAgICAgICAgIGJsa19tcV9wdXRfY3R4KGRhdGEuY3R4KTsN
+CiAgICAgICAgICAgICAgICBibGtfbXFfYmlvX3RvX3JlcXVlc3QocnEsIGJpbyk7DQogICAg
+ICAgICAgICAgICAgYmxrX21xX3NjaGVkX2luc2VydF9yZXF1ZXN0KHJxLCBmYWxzZSwgdHJ1
+ZSwgdHJ1ZSwgdHJ1ZSk7DQotICAgICAgIH0gZWxzZSB7DQotICAgICAgICAgICAgICAgYmxr
+X21xX3B1dF9jdHgoZGF0YS5jdHgpOw0KLSAgICAgICAgICAgICAgIGJsa19tcV9iaW9fdG9f
+cmVxdWVzdChycSwgYmlvKTsNCi0gICAgICAgICAgICAgICBibGtfbXFfcXVldWVfaW8oZGF0
+YS5oY3R4LCBkYXRhLmN0eCwgcnEpOw0KLSAgICAgICAgICAgICAgIGJsa19tcV9ydW5faHdf
+cXVldWUoZGF0YS5oY3R4LCB0cnVlKTsNCiAgICAgICAgfQ0KIA0KICAgICAgICByZXR1cm4g
+Y29va2llOw==
