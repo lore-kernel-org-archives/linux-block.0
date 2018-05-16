@@ -1,18 +1,21 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from smtpbgeu2.qq.com ([18.194.254.142]:40410 "EHLO smtpbgeu2.qq.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751182AbeEPDmj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 May 2018 23:42:39 -0400
+Return-Path: <huhai@kylinos.cn>
 From: "=?utf-8?B?6IOh5rW3?=" <huhai@kylinos.cn>
-To: "=?utf-8?B?bGludXgtYmxvY2s=?=" <linux-block@vger.kernel.org>
+To: "=?utf-8?B?YXhib2U=?=" <axboe@kernel.dk>
+Cc: "=?utf-8?B?bGludXgtYmxvY2s=?=" <linux-block@vger.kernel.org>
 Subject: blk-mq: for sync case, whether it is mq or sq make_request instances, we should send the request directly
 Mime-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_5AFB9DF2_0A687158_04669A46"
+Date: Wed, 16 May 2018 10:56:50 +0800
+Message-ID: <tencent_2420AE9479D31B721DD735D9@qq.com>
+List-ID: <linux-block@vger.kernel.org>
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_5AFB9DF2_0A687158_04669A46
 Content-Type: text/plain;
-        charset="utf-8"
-Date: Wed, 16 May 2018 11:42:33 +0800
-Message-ID: <tencent_4D4715133E9C8F2D37E3ACAF@qq.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+	charset="utf-8"
+Content-Transfer-Encoding: base64
 
 QXV0aG9yOiBodWhhaSA8aHVoYWlAa3lsaW5vcy5jbj4NCkRhdGU6ICAgV2VkIE1heSAxNiAx
 MDozNDoyMiAyMDE4ICswODAwDQoNCiAgICBibGstbXE6IGZvciBzeW5jIGNhc2UsIHdoZXRo
@@ -34,3 +37,47 @@ X3F1ZXVlcyA+IDEgJiYgaXNfc3luYykgew0KKyAgICAgICB9IGVsc2UgaWYgKGlzX3N5bmMp
 IHsNCiAgICAgICAgICAgICAgICBibGtfbXFfcHV0X2N0eChkYXRhLmN0eCk7DQogICAgICAg
 ICAgICAgICAgYmxrX21xX2Jpb190b19yZXF1ZXN0KHJxLCBiaW8pOw0KICAgICAgICAgICAg
 ICAgIGJsa19tcV90cnlfaXNzdWVfZGlyZWN0bHkoZGF0YS5oY3R4LCBycSwgJmNvb2tpZSk7
+
+
+------=_NextPart_5AFB9DF2_0A687158_04669A46
+Content-Type: text/html;
+	charset="utf-8"
+Content-Transfer-Encoding: base64
+
+QXV0aG9yOiBodWhhaSAmbHQ7aHVoYWlAa3lsaW5vcy5jbiZndDs8YnI+RGF0ZTogJm5ic3A7
+IFdlZCBNYXkgMTYgMTA6MzQ6MjIgMjAxOCArMDgwMDxicj48YnI+Jm5ic3A7ICZuYnNwOyBi
+bGstbXE6IGZvciBzeW5jIGNhc2UsIHdoZXRoZXIgaXQgaXMgbXEgb3Igc3EgbWFrZV9yZXF1
+ZXN0IGluc3RhbmNlcywgd2Ugc2hvdWxkIHNlbmQgdGhlIHJlcXVlc3QgZGlyZWN0bHk8YnI+
+Jm5ic3A7ICZuYnNwOyA8YnI+Jm5ic3A7ICZuYnNwOyBGb3Igc3EgbWFrZV9yZXF1ZXN0IGlu
+c3RhbmNlcywgd2Ugc2hvdWxkIGlzc3VlIHN5bmMgcmVxdWVzdCBkaXJlY3RseSB0b28sIDxi
+cj4mbmJzcDsgJm5ic3A7IG90aGVyd2lzZSBpdCB3aWxsIGJyZWFrIGRvd24gdGhlIHNlbWFu
+dGljcyBvZiBzeW5jIHJlcXVlc3QsIDxicj4mbmJzcDsgJm5ic3A7IHRoZSBjdXJyZW50IGNv
+ZGUgbG9naWMgaXMgdG8gc2VuZCBzeW5jaHJvbm91cyByZXF1ZXN0cyBhc3luY2hyb25vdXNs
+eS48YnI+Jm5ic3A7ICZuYnNwOyA8YnI+Jm5ic3A7ICZuYnNwOyBTaWduZWQtb2ZmLWJ5OiBo
+dWhhaSAmbHQ7aHVoYWlAa3lsaW5vcy5jbiZndDs8YnI+PGJyPmRpZmYgLS1naXQgYS9ibG9j
+ay9ibGstbXEuYyBiL2Jsb2NrL2Jsay1tcS5jPGJyPmluZGV4IDU2MjlmMTguLmZjZjJmMTYg
+MTAwNjQ0PGJyPi0tLSBhL2Jsb2NrL2Jsay1tcS5jPGJyPisrKyBiL2Jsb2NrL2Jsay1tcS5j
+PGJyPkBAIC0xNzcxLDcgKzE3NzEsNyBAQCBzdGF0aWMgYmxrX3FjX3QgYmxrX21xX21ha2Vf
+cmVxdWVzdChzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSwgc3RydWN0IGJpbyAqYmlvKTxicj4m
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
+bmJzcDsgJm5ic3A7ICZuYnNwOyBibGtfbXFfdHJ5X2lzc3VlX2RpcmVjdGx5KGRhdGEuaGN0
+eCwgc2FtZV9xdWV1ZV9ycSw8YnI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyAmbmJzcDsgJmFtcDtjb29raWUpOzxicj4mbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
+bmJzcDsgJm5ic3A7ICZuYnNwOyB9PGJyPi0mbmJzcDsmbmJzcDsgJm5ic3A7ICZuYnNwOyB9
+IGVsc2UgaWYgKHEtJmd0O25yX2h3X3F1ZXVlcyAmZ3Q7IDEgJmFtcDsmYW1wOyBpc19zeW5j
+KSB7PGJyPismbmJzcDsmbmJzcDsgJm5ic3A7ICZuYnNwOyB9IGVsc2UgaWYgKGlzX3N5bmMp
+IHs8YnI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyAmbmJzcDsgYmxrX21xX3B1dF9jdHgoZGF0YS5j
+dHgpOzxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7ICZuYnNwOyBibGtfbXFfYmlvX3RvX3JlcXVl
+c3QocnEsIGJpbyk7PGJyPjxkaXY+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyAmbmJzcDsgYmxrX21x
+X3RyeV9pc3N1ZV9kaXJlY3RseShkYXRhLmhjdHgsIHJxLCAmYW1wO2Nvb2tpZSk7PC9kaXY+
+PGRpdj48YnI+PC9kaXY+PGRpdj48YnI+PC9kaXY+PCEtLTwhW2VuZGlmXS0tPg==
+
+------=_NextPart_5AFB9DF2_0A687158_04669A46--
