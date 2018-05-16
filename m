@@ -1,176 +1,72 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: linux-kernel@vger.kernel.org,
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Ingo Molnar <mingo@kernel.org>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Subject: [PATCH 03/10] block: Add bioset_init()/bioset_exit()
-Date: Tue,  8 May 2018 21:33:51 -0400
-Message-Id: <20180509013358.16399-4-kent.overstreet@gmail.com>
-In-Reply-To: <20180509013358.16399-1-kent.overstreet@gmail.com>
-References: <20180509013358.16399-1-kent.overstreet@gmail.com>
+	Ming Lei <ming.lei@redhat.com>,
+	James Smart <james.smart@broadcom.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>
+Subject: [PATCH V6 03/11] nvme: pci: unquiesce admin queue after controller is shutdown
+Date: Wed, 16 May 2018 12:03:05 +0800
+Message-Id: <20180516040313.13596-4-ming.lei@redhat.com>
+In-Reply-To: <20180516040313.13596-1-ming.lei@redhat.com>
+References: <20180516040313.13596-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Similarly to mempool_init()/mempool_exit(), take a pointer indirection
-out of allocation/freeing by allowing biosets to be embedded in other
-structs.
+Given timeout event can come during reset, nvme_dev_disable() shouldn't
+keep admin queue as quiesced after controller is shutdown. Otherwise
+it may block admin IO in reset, and cause reset hang forever.
 
-Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
+This patch fixes this issue by unquiescing admin queue at the end
+of nvme_dev_disable().
+
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Cc: Laurence Oberman <loberman@redhat.com>
+Reported-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bio.c         | 93 +++++++++++++++++++++++++++++++--------------
- include/linux/bio.h |  2 +
- 2 files changed, 67 insertions(+), 28 deletions(-)
+ drivers/nvme/host/pci.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 360e9bcea5..980befd919 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1856,21 +1856,83 @@ int biovec_init_pool(mempool_t *pool, int pool_entries)
- 	return mempool_init_slab_pool(pool, pool_entries, bp->slab);
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index b60f727b844c..9e28d7118232 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -1557,8 +1557,7 @@ static int nvme_alloc_admin_tags(struct nvme_dev *dev)
+ 			dev->ctrl.admin_q = NULL;
+ 			return -ENODEV;
+ 		}
+-	} else
+-		blk_mq_unquiesce_queue(dev->ctrl.admin_q);
++	}
+ 
+ 	return 0;
+ }
+@@ -2303,6 +2302,17 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
+ 	 */
+ 	if (shutdown)
+ 		nvme_start_queues(&dev->ctrl);
++
++	/*
++	 * Avoid to stuck reset because timeout may happen during reset and
++	 * reset may hang forever if admin queue is kept as quiesced.
++	 *
++	 * Druing reset, if admin queue isn't ready, the command will be
++	 * failed immediately, that means we don't need to quiesce admin
++	 * queue.
++	 */
++	if (dev->ctrl.admin_q)
++		blk_mq_unquiesce_queue(dev->ctrl.admin_q);
+ 	mutex_unlock(&dev->shutdown_lock);
  }
  
--void bioset_free(struct bio_set *bs)
-+/*
-+ * bioset_exit - exit a bioset initialized with bioset_init()
-+ *
-+ * May be called on a zeroed but uninitialized bioset (i.e. allocated with
-+ * kzalloc()).
-+ */
-+void bioset_exit(struct bio_set *bs)
- {
- 	if (bs->rescue_workqueue)
- 		destroy_workqueue(bs->rescue_workqueue);
-+	bs->rescue_workqueue = NULL;
- 
- 	mempool_exit(&bs->bio_pool);
- 	mempool_exit(&bs->bvec_pool);
- 
- 	bioset_integrity_free(bs);
--	bio_put_slab(bs);
-+	if (bs->bio_slab)
-+		bio_put_slab(bs);
-+	bs->bio_slab = NULL;
-+}
-+EXPORT_SYMBOL(bioset_exit);
- 
-+void bioset_free(struct bio_set *bs)
-+{
-+	bioset_exit(bs);
- 	kfree(bs);
- }
- EXPORT_SYMBOL(bioset_free);
- 
-+/**
-+ * bioset_init - Initialize a bio_set
-+ * @pool_size:	Number of bio and bio_vecs to cache in the mempool
-+ * @front_pad:	Number of bytes to allocate in front of the returned bio
-+ * @flags:	Flags to modify behavior, currently %BIOSET_NEED_BVECS
-+ *              and %BIOSET_NEED_RESCUER
-+ *
-+ * Similar to bioset_create(), but initializes a passed-in bioset instead of
-+ * separately allocating it.
-+ */
-+int bioset_init(struct bio_set *bs,
-+		unsigned int pool_size,
-+		unsigned int front_pad,
-+		int flags)
-+{
-+	unsigned int back_pad = BIO_INLINE_VECS * sizeof(struct bio_vec);
-+
-+	bs->front_pad = front_pad;
-+
-+	spin_lock_init(&bs->rescue_lock);
-+	bio_list_init(&bs->rescue_list);
-+	INIT_WORK(&bs->rescue_work, bio_alloc_rescue);
-+
-+	bs->bio_slab = bio_find_or_create_slab(front_pad + back_pad);
-+	if (!bs->bio_slab)
-+		return -ENOMEM;
-+
-+	if (mempool_init_slab_pool(&bs->bio_pool, pool_size, bs->bio_slab))
-+		goto bad;
-+
-+	if ((flags & BIOSET_NEED_BVECS) &&
-+	    biovec_init_pool(&bs->bvec_pool, pool_size))
-+		goto bad;
-+
-+	if (!(flags & BIOSET_NEED_RESCUER))
-+		return 0;
-+
-+	bs->rescue_workqueue = alloc_workqueue("bioset", WQ_MEM_RECLAIM, 0);
-+	if (!bs->rescue_workqueue)
-+		goto bad;
-+
-+	return 0;
-+bad:
-+	bioset_exit(bs);
-+	return -ENOMEM;
-+}
-+EXPORT_SYMBOL(bioset_init);
-+
- /**
-  * bioset_create  - Create a bio_set
-  * @pool_size:	Number of bio and bio_vecs to cache in the mempool
-@@ -1895,43 +1957,18 @@ struct bio_set *bioset_create(unsigned int pool_size,
- 			      unsigned int front_pad,
- 			      int flags)
- {
--	unsigned int back_pad = BIO_INLINE_VECS * sizeof(struct bio_vec);
- 	struct bio_set *bs;
- 
- 	bs = kzalloc(sizeof(*bs), GFP_KERNEL);
- 	if (!bs)
- 		return NULL;
- 
--	bs->front_pad = front_pad;
--
--	spin_lock_init(&bs->rescue_lock);
--	bio_list_init(&bs->rescue_list);
--	INIT_WORK(&bs->rescue_work, bio_alloc_rescue);
--
--	bs->bio_slab = bio_find_or_create_slab(front_pad + back_pad);
--	if (!bs->bio_slab) {
-+	if (bioset_init(bs, pool_size, front_pad, flags)) {
- 		kfree(bs);
- 		return NULL;
- 	}
- 
--	if (mempool_init_slab_pool(&bs->bio_pool, pool_size, bs->bio_slab))
--		goto bad;
--
--	if ((flags & BIOSET_NEED_BVECS) &&
--	    biovec_init_pool(&bs->bvec_pool, pool_size))
--		goto bad;
--
--	if (!(flags & BIOSET_NEED_RESCUER))
--		return bs;
--
--	bs->rescue_workqueue = alloc_workqueue("bioset", WQ_MEM_RECLAIM, 0);
--	if (!bs->rescue_workqueue)
--		goto bad;
--
- 	return bs;
--bad:
--	bioset_free(bs);
--	return NULL;
- }
- EXPORT_SYMBOL(bioset_create);
- 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 720f7261d0..fa3cf94a50 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -406,6 +406,8 @@ static inline struct bio *bio_next_split(struct bio *bio, int sectors,
- 	return bio_split(bio, sectors, gfp, bs);
- }
- 
-+extern int bioset_init(struct bio_set *, unsigned int, unsigned int, int flags);
-+extern void bioset_exit(struct bio_set *);
- extern struct bio_set *bioset_create(unsigned int, unsigned int, int flags);
- enum {
- 	BIOSET_NEED_BVECS = BIT(0),
 -- 
-2.17.0
+2.9.5
