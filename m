@@ -6,11 +6,11 @@ To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
 	kernel-team@fb.com
 Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 7/7] nbd: call nbd_bdev_reset instead of bd_set_size on disconnect
-Date: Wed, 16 May 2018 14:51:22 -0400
-Message-Id: <20180516185122.18590-7-josef@toxicpanda.com>
-In-Reply-To: <20180516185122.18590-1-josef@toxicpanda.com>
-References: <20180516185122.18590-1-josef@toxicpanda.com>
+Subject: [PATCH 5/5] nbd: call nbd_bdev_reset instead of bd_set_size on disconnect
+Date: Wed, 16 May 2018 14:36:05 -0400
+Message-Id: <20180516183605.16159-5-josef@toxicpanda.com>
+In-Reply-To: <20180516183605.16159-1-josef@toxicpanda.com>
+References: <20180516183605.16159-1-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
 From: Josef Bacik <jbacik@fb.com>
