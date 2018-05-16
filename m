@@ -1,18 +1,18 @@
 Return-Path: <huhai@kylinos.cn>
 From: "=?utf-8?B?6IOh5rW3?=" <huhai@kylinos.cn>
 To: "=?utf-8?B?YXhib2U=?=" <axboe@kernel.dk>
-Cc: "=?utf-8?B?bGludXgtYmxvY2s=?=" <linux-block@vger.kernel.org>
+Cc: "=?utf-8?B?bGludXgtYmxvY2s=?=" <linux-block@vger.kernel.org>, "=?utf-8?B?aGNo?=" <hch@lst.de>
 Subject: blk-mq: for sync case, whether it is mq or sq make_request instances, we should send the request directly
 Mime-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_NextPart_5AFB9DF2_0A687158_04669A46"
-Date: Wed, 16 May 2018 10:56:50 +0800
-Message-ID: <tencent_2420AE9479D31B721DD735D9@qq.com>
+	boundary="----=_NextPart_5AFB9D4B_0AC72A30_3CC9F6C2"
+Date: Wed, 16 May 2018 10:54:03 +0800
+Message-ID: <tencent_5BDBB9F55476FDD650ACF141@qq.com>
 List-ID: <linux-block@vger.kernel.org>
 
 This is a multi-part message in MIME format.
 
-------=_NextPart_5AFB9DF2_0A687158_04669A46
+------=_NextPart_5AFB9D4B_0AC72A30_3CC9F6C2
 Content-Type: text/plain;
 	charset="utf-8"
 Content-Transfer-Encoding: base64
@@ -39,7 +39,7 @@ ICAgICAgICAgYmxrX21xX2Jpb190b19yZXF1ZXN0KHJxLCBiaW8pOw0KICAgICAgICAgICAg
 ICAgIGJsa19tcV90cnlfaXNzdWVfZGlyZWN0bHkoZGF0YS5oY3R4LCBycSwgJmNvb2tpZSk7
 
 
-------=_NextPart_5AFB9DF2_0A687158_04669A46
+------=_NextPart_5AFB9D4B_0AC72A30_3CC9F6C2
 Content-Type: text/html;
 	charset="utf-8"
 Content-Transfer-Encoding: base64
@@ -61,23 +61,24 @@ PGJyPkBAIC0xNzcxLDcgKzE3NzEsNyBAQCBzdGF0aWMgYmxrX3FjX3QgYmxrX21xX21ha2Vf
 cmVxdWVzdChzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSwgc3RydWN0IGJpbyAqYmlvKTxicj4m
 bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
 bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsgJm5ic3A7ICZuYnNwOyBibGtfbXFfdHJ5X2lzc3VlX2RpcmVjdGx5KGRhdGEuaGN0
-eCwgc2FtZV9xdWV1ZV9ycSw8YnI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyAmbmJzcDsgJmFtcDtjb29raWUpOzxicj4mbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsgJm5ic3A7ICZuYnNwOyB9PGJyPi0mbmJzcDsmbmJzcDsgJm5ic3A7ICZuYnNwOyB9
-IGVsc2UgaWYgKHEtJmd0O25yX2h3X3F1ZXVlcyAmZ3Q7IDEgJmFtcDsmYW1wOyBpc19zeW5j
-KSB7PGJyPismbmJzcDsmbmJzcDsgJm5ic3A7ICZuYnNwOyB9IGVsc2UgaWYgKGlzX3N5bmMp
-IHs8YnI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyAmbmJzcDsgYmxrX21xX3B1dF9jdHgoZGF0YS5j
-dHgpOzxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7ICZuYnNwOyBibGtfbXFfYmlvX3RvX3JlcXVl
-c3QocnEsIGJpbyk7PGJyPjxkaXY+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyAmbmJzcDsgYmxrX21x
-X3RyeV9pc3N1ZV9kaXJlY3RseShkYXRhLmhjdHgsIHJxLCAmYW1wO2Nvb2tpZSk7PC9kaXY+
-PGRpdj48YnI+PC9kaXY+PGRpdj48YnI+PC9kaXY+PCEtLTwhW2VuZGlmXS0tPg==
+bmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7IGJsa19tcV90cnlfaXNzdWVfZGlyZWN0bHkoZGF0
+YS5oY3R4LCBzYW1lX3F1ZXVlX3JxLDxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7ICZhbXA7Y29va2llKTs8
+YnI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyB9PGJyPi0mbmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsgJm5ic3A7IH0gZWxzZSBpZiAocS0mZ3Q7bnJfaHdfcXVldWVzICZndDsg
+MSAmYW1wOyZhbXA7IGlzX3N5bmMpIHs8YnI+KyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAm
+bmJzcDsgfSBlbHNlIGlmIChpc19zeW5jKSB7PGJyPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
+OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
+OyAmbmJzcDsgYmxrX21xX3B1dF9jdHgoZGF0YS5jdHgpOzxicj4mbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsgJm5ic3A7IGJsa19tcV9iaW9fdG9fcmVxdWVzdChycSwgYmlvKTs8YnI+PGRp
+dj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7IGJsa19tcV90cnlfaXNzdWVfZGly
+ZWN0bHkoZGF0YS5oY3R4LCBycSwgJmFtcDtjb29raWUpOzwvZGl2PjxkaXY+PGJyPjwvZGl2
+PjxkaXY+PGJyPjwvZGl2PjwhLS08IVtlbmRpZl0tLT4=
 
-------=_NextPart_5AFB9DF2_0A687158_04669A46--
+------=_NextPart_5AFB9D4B_0AC72A30_3CC9F6C2--
