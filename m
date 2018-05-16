@@ -1,55 +1,37 @@
-Return-Path: <prvs=667b6aabf=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@lst.de" <hch@lst.de>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+Return-Path: <hch@lst.de>
+Date: Wed, 16 May 2018 18:24:32 +0200
+From: "hch@lst.de" <hch@lst.de>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"israelr@mellanox.com" <israelr@mellanox.com>, "sagi@grimberg.me"
-	<sagi@grimberg.me>, "sebott@linux.ibm.com" <sebott@linux.ibm.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "ming.lei@redhat.com"
-	<ming.lei@redhat.com>, "jianchao.w.wang@oracle.com"
-	<jianchao.w.wang@oracle.com>, "maxg@mellanox.com" <maxg@mellanox.com>,
+	"israelr@mellanox.com" <israelr@mellanox.com>,
+	"sagi@grimberg.me" <sagi@grimberg.me>,
+	"sebott@linux.ibm.com" <sebott@linux.ibm.com>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
+	"maxg@mellanox.com" <maxg@mellanox.com>,
 	"tj@kernel.org" <tj@kernel.org>
 Subject: Re: [PATCH v9 2/2] blk-mq: Rework blk-mq timeout handling again
-Date: Wed, 16 May 2018 16:47:54 +0000
-Message-ID: <bd17181940994eb459e84e4d5940b1af8a725ded.camel@wdc.com>
-References: <20180515225124.20428-1-bart.vanassche@wdc.com>
-	 <20180515225124.20428-6-bart.vanassche@wdc.com>
-	 <20180516125110.GA32078@lst.de>
-	 <8058d72fef475caffa78c962bc4220f5f8fa3dde.camel@wdc.com>
-	 <20180516162432.GA4398@lst.de>
-In-Reply-To: <20180516162432.GA4398@lst.de>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <20180516162432.GA4398@lst.de>
+References: <20180515225124.20428-1-bart.vanassche@wdc.com> <20180515225124.20428-6-bart.vanassche@wdc.com> <20180516125110.GA32078@lst.de> <8058d72fef475caffa78c962bc4220f5f8fa3dde.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <8058d72fef475caffa78c962bc4220f5f8fa3dde.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE4LTA1LTE2IGF0IDE4OjI0ICswMjAwLCBoY2hAbHN0LmRlIHdyb3RlOg0KPiBP
-biBXZWQsIE1heSAxNiwgMjAxOCBhdCAwNDoxNzo0MlBNICswMDAwLCBCYXJ0IFZhbiBBc3NjaGUg
-d3JvdGU6DQo+ID4gVGhlcmUgaXMgYW5vdGhlciByZWFzb24gdGhlIGRlYWRsaW5lIGlzIGluY2x1
-ZGVkIGluIHRoZSBhdG9taWMgb3BlcmF0aW9uLA0KPiA+IG5hbWVseSB0byBoYW5kbGUgcmFjZXMg
-YmV0d2VlbiB0aGUgQkxLX0VIX1JFU0VUX1RJTUVSIGNhc2UgaW4gYmxrX21xX3JxX3RpbWVkX291
-dCgpDQo+ID4gYW5kIGJsa19tcV9jb21wbGV0ZV9yZXF1ZXN0KCkuIEkgZG9uJ3QgdGhpbmsgdGhh
-dCByYWNlIGlzIGFkZHJlc3NlZCBwcm9wZXJseSBieQ0KPiA+IHlvdXIgcGF0Y2guIEkgd2lsbCBz
-ZWUgd2hhdCBJIGNhbiBkbyB0byBhZGRyZXNzIHRoYXQgcmFjZSB3aXRob3V0IHVzaW5nIDY0LWJp
-dA0KPiA+IGF0b21pYyBvcGVyYXRpb25zLg0KPiANCj4gSSBtaWdodCBiZSBtaXNzaW5nIHNvbWV0
-aGluZyBoZXJlLCBzbyBwbGVhc2UgaGVscCBtZSB1bmRlcnN0YW5kDQo+IHdoYXQgaXMgbWlzc2lu
-Zy4NCj4gDQo+IElmIHdlIHJlc3RhcnQgdGhlIHRpbWVyIGluIGJsa19tcV9ycV90aW1lZF9vdXQg
-d2UgYWxzbyBidW1wIHRoZQ0KPiBnZW5lcmF0aW9uIGF0IHRoZSBzYW1lIHRpbWUgYXMgd2UgcmVz
-ZXQgdGhlIGRlYWRsaW5lIGluIHlvdXIgb2xkDQo+IHBhdGNoLiAgV2l0aCB0aGlzIHBhdGNoIHdl
-IG9ubHkgYnVtcCB0aGUgZ2VuZXJhdGlvbiwgYnV0IHRoYXQgc2hvdWxkDQo+IGJlIGVub3VnaCB0
-byBhZGRyZXNzIHRoZSByZXN0LCBvciBub3Q/DQoNCkhlbGxvIENocmlzdG9waCwNCg0KSSB0aGlu
-ayB5b3VyIHBhdGNoIGNoYW5nZXMgdGhlIG9yZGVyIG9mIGNoYW5naW5nIHRoZSByZXF1ZXN0IHN0
-YXRlIGFuZA0KY2FsbGluZyBtb2RfdGltZXIoKS4gSW4gbXkgcGF0Y2ggdGhlIHJlcXVlc3Qgc3Rh
-dGUgYW5kIHRoZSBkZWFkbGluZSBhcmUNCnVwZGF0ZWQgZmlyc3QgYW5kIG1vZF90aW1lcigpIGlz
-IGNhbGxlZCBhZnRlcndhcmRzLiBJIHRoaW5rIHlvdXIgcGF0Y2gNCmNoYW5nZXMgdGhlIG9yZGVy
-IG9mIHRoZXNlIG9wZXJhdGlvbnMgaW50byB0aGUgZm9sbG93aW5nOg0KKDEpIF9fYmxrX21xX3N0
-YXJ0X3JlcXVlc3QoKSBzZXRzIHRoZSByZXF1ZXN0IGRlYWRsaW5lLg0KKDIpIF9fYmxrX21xX3N0
-YXJ0X3JlcXVlc3QoKSBjYWxscyBfX2Jsa19hZGRfdGltZXIoKSB3aGljaCBpbiB0dXJuIGNhbGxz
-DQogICAgbW9kX3RpbWVyKCkuDQooMykgX19ibGtfbXFfc3RhcnRfcmVxdWVzdCgpIGNoYW5nZXMg
-dGhlIHJlcXVlc3Qgc3RhdGUgaW50byBNUV9SUV9JTl9GTElHSFQuDQoNCkluIHRoZSB1bmxpa2Vs
-eSBldmVudCBvZiBhIHNpZ25pZmljYW50IGRlbGF5IGJldHdlZW4gKDIpIGFuZCAoMykgaXQgY2Fu
-DQpoYXBwZW4gdGhhdCB0aGUgdGltZXIgZmlyZXMgYW5kIGV4YW1pbmVzIGFuZCBpZ25vcmVzIHRo
-ZSByZXF1ZXN0IGJlY2F1c2UNCml0cyBzdGF0ZSBkaWZmZXJzIGZyb20gTVFfUlFfSU5fRkxJR0hU
-LiBJZiB0aGUgcmVxdWVzdCBmb3Igd2hpY2ggdGhpcw0KaGFwcGVuZWQgdGltZXMgb3V0IGl0cyB0
-aW1lb3V0IHdpbGwgb25seSBiZSBoYW5kbGVkIHRoZSBuZXh0IHRpbWUNCmJsa19tcV90aW1lb3V0
-X3dvcmsoKSBpcyBjYWxsZWQuIElzIHRoaXMgdGhlIGJlaGF2aW9yIHlvdSBpbnRlbmRlZD8NCg0K
-VGhhbmtzLA0KDQpCYXJ0Lg0K
+On Wed, May 16, 2018 at 04:17:42PM +0000, Bart Van Assche wrote:
+> There is another reason the deadline is included in the atomic operation,
+> namely to handle races between the BLK_EH_RESET_TIMER case in blk_mq_rq_timed_out()
+> and blk_mq_complete_request(). I don't think that race is addressed properly by
+> your patch. I will see what I can do to address that race without using 64-bit
+> atomic operations.
+
+I might be missing something here, so please help me understand
+what is missing.
+
+If we restart the timer in blk_mq_rq_timed_out we also bump the
+generation at the same time as we reset the deadline in your old
+patch.  With this patch we only bump the generation, but that should
+be enough to address the rest, or not?
