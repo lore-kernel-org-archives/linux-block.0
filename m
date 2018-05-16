@@ -1,93 +1,147 @@
-Return-Path: <keith.busch@linux.intel.com>
-Date: Thu, 24 May 2018 09:39:50 -0600
-From: Keith Busch <keith.busch@linux.intel.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@kernel.dk>,
-	Laurence Oberman <loberman@redhat.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
 	James Smart <james.smart@broadcom.com>,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
 	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH V6 02/11] nvme: pci: cover timeout for admin commands
- running in EH
-Message-ID: <20180524153949.GK11037@localhost.localdomain>
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>
+Subject: [PATCH V6 02/11] nvme: pci: cover timeout for admin commands running in EH
+Date: Wed, 16 May 2018 12:03:04 +0800
+Message-Id: <20180516040313.13596-3-ming.lei@redhat.com>
+In-Reply-To: <20180516040313.13596-1-ming.lei@redhat.com>
 References: <20180516040313.13596-1-ming.lei@redhat.com>
- <20180516040313.13596-3-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180516040313.13596-3-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, May 16, 2018 at 12:03:04PM +0800, Ming Lei wrote:
-> +static void nvme_set_host_mem_end_io(struct request *rq, blk_status_t sts)
-> +{
-> +	struct completion *waiting = rq->end_io_data;
-> +
-> +	rq->end_io_data = NULL;
-> +	blk_mq_free_request(rq);
-> +
-> +	/*
-> +	 * complete last, if this is a stack request the process (and thus
-> +	 * the rq pointer) could be invalid right after this complete()
-> +	 */
-> +	complete(waiting);
-> +}
-> +
-> +/*
-> + * This function can only be used inside nvme_dev_disable() when timeout
-> + * may not work, then this function has to cover the timeout by itself.
-> + *
-> + * When wait_for_completion_io_timeout() returns 0 and timeout happens,
-> + * this request will be completed after controller is shutdown.
-> + */
-> +static int nvme_set_host_mem_timeout(struct nvme_dev *dev, u32 bits)
-> +{
-> +	DECLARE_COMPLETION_ONSTACK(wait);
-> +	struct nvme_command c;
-> +	struct request_queue *q = dev->ctrl.admin_q;
-> +	struct request *req;
-> +	int ret;
-> +
-> +	nvme_init_set_host_mem_cmd(dev, &c, bits);
-> +
-> +	req = nvme_alloc_request(q, &c, 0, NVME_QID_ANY);
-> +	if (IS_ERR(req))
-> +		return PTR_ERR(req);
-> +
-> +	req->timeout = ADMIN_TIMEOUT;
-> +	req->end_io_data = &wait;
-> +
-> +	blk_execute_rq_nowait(q, NULL, req, false,
-> +			nvme_set_host_mem_end_io);
-> +	ret = wait_for_completion_io_timeout(&wait, ADMIN_TIMEOUT);
-> +	if (ret > 0) {
-> +		if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
-> +			ret = -EINTR;
-> +		else
-> +			ret = nvme_req(req)->status;
-> +	} else
-> +		ret = -EINTR;
-> +
-> +	return ret;
-> +}
+When admin commands are used in EH for recovering controller, we have to
+cover their timeout and can't depend on block's timeout since deadlock may
+be caused when these commands are timed-out by block layer again.
 
-This function doesn't need to return anything at all. The caller doesn't
-care about the success in order to decide what to do next.
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Cc: Laurence Oberman <loberman@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/nvme/host/pci.c | 81 ++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 70 insertions(+), 11 deletions(-)
 
-Now let's say it does time out. The command will be be completed later
-through nvme_cancel_request, but your completion callback will reference
-a now invalid stack variable.
-
->  static void nvme_free_host_mem(struct nvme_dev *dev)
->  {
->  	int i;
-> @@ -2225,7 +2284,7 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
->  		 * but I'd rather be safe than sorry..
->  		 */
->  		if (dev->host_mem_descs)
-> -			nvme_set_host_mem(dev, 0);
-> +			nvme_set_host_mem_timeout(dev, 0);
->  		nvme_disable_io_queues(dev);
->  		nvme_disable_admin_queue(dev, shutdown);
->  	}
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 17a0190bd88f..b60f727b844c 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -1742,21 +1742,28 @@ static inline void nvme_release_cmb(struct nvme_dev *dev)
+ 	}
+ }
+ 
+-static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
++static void nvme_init_set_host_mem_cmd(struct nvme_dev *dev,
++		struct nvme_command *c, u32 bits)
+ {
+ 	u64 dma_addr = dev->host_mem_descs_dma;
++
++	memset(c, 0, sizeof(*c));
++	c->features.opcode	= nvme_admin_set_features;
++	c->features.fid		= cpu_to_le32(NVME_FEAT_HOST_MEM_BUF);
++	c->features.dword11	= cpu_to_le32(bits);
++	c->features.dword12	= cpu_to_le32(dev->host_mem_size >>
++					      ilog2(dev->ctrl.page_size));
++	c->features.dword13	= cpu_to_le32(lower_32_bits(dma_addr));
++	c->features.dword14	= cpu_to_le32(upper_32_bits(dma_addr));
++	c->features.dword15	= cpu_to_le32(dev->nr_host_mem_descs);
++}
++
++static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
++{
+ 	struct nvme_command c;
+ 	int ret;
+ 
+-	memset(&c, 0, sizeof(c));
+-	c.features.opcode	= nvme_admin_set_features;
+-	c.features.fid		= cpu_to_le32(NVME_FEAT_HOST_MEM_BUF);
+-	c.features.dword11	= cpu_to_le32(bits);
+-	c.features.dword12	= cpu_to_le32(dev->host_mem_size >>
+-					      ilog2(dev->ctrl.page_size));
+-	c.features.dword13	= cpu_to_le32(lower_32_bits(dma_addr));
+-	c.features.dword14	= cpu_to_le32(upper_32_bits(dma_addr));
+-	c.features.dword15	= cpu_to_le32(dev->nr_host_mem_descs);
++	nvme_init_set_host_mem_cmd(dev, &c, bits);
+ 
+ 	ret = nvme_submit_sync_cmd(dev->ctrl.admin_q, &c, NULL, 0);
+ 	if (ret) {
+@@ -1767,6 +1774,58 @@ static int nvme_set_host_mem(struct nvme_dev *dev, u32 bits)
+ 	return ret;
+ }
+ 
++static void nvme_set_host_mem_end_io(struct request *rq, blk_status_t sts)
++{
++	struct completion *waiting = rq->end_io_data;
++
++	rq->end_io_data = NULL;
++	blk_mq_free_request(rq);
++
++	/*
++	 * complete last, if this is a stack request the process (and thus
++	 * the rq pointer) could be invalid right after this complete()
++	 */
++	complete(waiting);
++}
++
++/*
++ * This function can only be used inside nvme_dev_disable() when timeout
++ * may not work, then this function has to cover the timeout by itself.
++ *
++ * When wait_for_completion_io_timeout() returns 0 and timeout happens,
++ * this request will be completed after controller is shutdown.
++ */
++static int nvme_set_host_mem_timeout(struct nvme_dev *dev, u32 bits)
++{
++	DECLARE_COMPLETION_ONSTACK(wait);
++	struct nvme_command c;
++	struct request_queue *q = dev->ctrl.admin_q;
++	struct request *req;
++	int ret;
++
++	nvme_init_set_host_mem_cmd(dev, &c, bits);
++
++	req = nvme_alloc_request(q, &c, 0, NVME_QID_ANY);
++	if (IS_ERR(req))
++		return PTR_ERR(req);
++
++	req->timeout = ADMIN_TIMEOUT;
++	req->end_io_data = &wait;
++
++	blk_execute_rq_nowait(q, NULL, req, false,
++			nvme_set_host_mem_end_io);
++	ret = wait_for_completion_io_timeout(&wait, ADMIN_TIMEOUT);
++	if (ret > 0) {
++		if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
++			ret = -EINTR;
++		else
++			ret = nvme_req(req)->status;
++	} else
++		ret = -EINTR;
++
++	return ret;
++}
++
+ static void nvme_free_host_mem(struct nvme_dev *dev)
+ {
+ 	int i;
+@@ -2225,7 +2284,7 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
+ 		 * but I'd rather be safe than sorry..
+ 		 */
+ 		if (dev->host_mem_descs)
+-			nvme_set_host_mem(dev, 0);
++			nvme_set_host_mem_timeout(dev, 0);
+ 		nvme_disable_io_queues(dev);
+ 		nvme_disable_admin_queue(dev, shutdown);
+ 	}
+-- 
+2.9.5
