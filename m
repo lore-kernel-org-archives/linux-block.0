@@ -1,159 +1,114 @@
-Return-Path: <BATV+7138d8dfc060164c836f+5389+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-nvme@lists.infradead.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
 Cc: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
+	linux-block@vger.kernel.org,
+	"jianchao.wang" <jianchao.w.wang@oracle.com>,
+	James Smart <james.smart@broadcom.com>,
+	Christoph Hellwig <hch@lst.de>,
 	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 07/14] nvmet: split log page implementation
-Date: Sat, 26 May 2018 12:27:28 +0200
-Message-Id: <20180526102735.31404-8-hch@lst.de>
-In-Reply-To: <20180526102735.31404-1-hch@lst.de>
-References: <20180526102735.31404-1-hch@lst.de>
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V6 04/11] nvme: pci: set nvmeq->cq_vector after alloc cq/sq
+Date: Wed, 16 May 2018 12:03:06 +0800
+Message-Id: <20180516040313.13596-5-ming.lei@redhat.com>
+In-Reply-To: <20180516040313.13596-1-ming.lei@redhat.com>
+References: <20180516040313.13596-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Remove the common code to allocate a buffer and copy it into the SGL.
-Instead the two no-op implementations just zero the SGL directly, and
-the smart log allocates a buffer on its own.  This prepares for the
-more elaborate ANA log page.
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Currently nvmeq->cq_vector is set before alloc cq/sq. If the alloc
+cq/sq command timeout, nvme_suspend_queue will invoke free_irq
+for the nvmeq because the cq_vector is valid, this will cause warning
+'Trying to free already-free IRQ xxx'. set nvmeq->cq_vector after
+alloc cq/sq successes to fix this.
+
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Cc: Laurence Oberman <loberman@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
 ---
- drivers/nvme/target/admin-cmd.c | 99 ++++++++++++---------------------
- 1 file changed, 36 insertions(+), 63 deletions(-)
+ drivers/nvme/host/pci.c | 25 ++++++++++++++++---------
+ 1 file changed, 16 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/nvme/target/admin-cmd.c b/drivers/nvme/target/admin-cmd.c
-index b2ba95b2eef7..e96bb02c4f2c 100644
---- a/drivers/nvme/target/admin-cmd.c
-+++ b/drivers/nvme/target/admin-cmd.c
-@@ -32,6 +32,11 @@ u32 nvmet_get_log_page_len(struct nvme_command *cmd)
- 	return len;
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 9e28d7118232..e94a103ead1e 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -1070,7 +1070,7 @@ static int adapter_delete_queue(struct nvme_dev *dev, u8 opcode, u16 id)
  }
  
-+static void nvmet_execute_get_log_page_noop(struct nvmet_req *req)
-+{
-+	nvmet_req_complete(req, nvmet_zero_sgl(req, 0, req->data_len));
-+}
-+
- static u16 nvmet_get_smart_log_nsid(struct nvmet_req *req,
- 		struct nvme_smart_log *slog)
+ static int adapter_alloc_cq(struct nvme_dev *dev, u16 qid,
+-						struct nvme_queue *nvmeq)
++						struct nvme_queue *nvmeq, int cq_vector)
  {
-@@ -97,74 +102,26 @@ static u16 nvmet_get_smart_log_all(struct nvmet_req *req,
- 	return NVME_SC_SUCCESS;
+ 	struct nvme_command c;
+ 	int flags = NVME_QUEUE_PHYS_CONTIG | NVME_CQ_IRQ_ENABLED;
+@@ -1085,7 +1085,7 @@ static int adapter_alloc_cq(struct nvme_dev *dev, u16 qid,
+ 	c.create_cq.cqid = cpu_to_le16(qid);
+ 	c.create_cq.qsize = cpu_to_le16(nvmeq->q_depth - 1);
+ 	c.create_cq.cq_flags = cpu_to_le16(flags);
+-	c.create_cq.irq_vector = cpu_to_le16(nvmeq->cq_vector);
++	c.create_cq.irq_vector = cpu_to_le16(cq_vector);
+ 
+ 	return nvme_submit_sync_cmd(dev->ctrl.admin_q, &c, NULL, 0);
  }
- 
--static u16 nvmet_get_smart_log(struct nvmet_req *req,
--		struct nvme_smart_log *slog)
--{
--	u16 status;
--
--	WARN_ON(req == NULL || slog == NULL);
--	if (req->cmd->get_log_page.nsid == cpu_to_le32(NVME_NSID_ALL))
--		status = nvmet_get_smart_log_all(req, slog);
--	else
--		status = nvmet_get_smart_log_nsid(req, slog);
--	return status;
--}
--
--static void nvmet_execute_get_log_page(struct nvmet_req *req)
-+static void nvmet_execute_get_log_page_smart(struct nvmet_req *req)
+@@ -1459,6 +1459,7 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
  {
--	struct nvme_smart_log *smart_log;
--	size_t data_len = nvmet_get_log_page_len(req->cmd);
--	void *buf;
--	u16 status = 0;
-+	struct nvme_smart_log *log;
-+	u16 status = NVME_SC_INTERNAL;
+ 	struct nvme_dev *dev = nvmeq->dev;
+ 	int result;
++	int cq_vector;
  
--	buf = kzalloc(data_len, GFP_KERNEL);
--	if (!buf) {
--		status = NVME_SC_INTERNAL;
-+	if (req->data_len != sizeof(*log))
- 		goto out;
--	}
- 
--	switch (req->cmd->get_log_page.lid) {
--	case NVME_LOG_ERROR:
--		/*
--		 * We currently never set the More bit in the status field,
--		 * so all error log entries are invalid and can be zeroed out.
--		 * This is called a minum viable implementation (TM) of this
--		 * mandatory log page.
--		 */
--		break;
--	case NVME_LOG_SMART:
--		/*
--		 * XXX: fill out actual smart log
--		 *
--		 * We might have a hard time coming up with useful values for
--		 * many of the fields, and even when we have useful data
--		 * available (e.g. units or commands read/written) those aren't
--		 * persistent over power loss.
--		 */
--		if (data_len != sizeof(*smart_log)) {
--			status = NVME_SC_INTERNAL;
--			goto err;
--		}
--		smart_log = buf;
--		status = nvmet_get_smart_log(req, smart_log);
--		if (status)
--			goto err;
--		break;
--	case NVME_LOG_FW_SLOT:
--		/*
--		 * We only support a single firmware slot which always is
--		 * active, so we can zero out the whole firmware slot log and
--		 * still claim to fully implement this mandatory log page.
--		 */
--		break;
--	default:
--		BUG();
--	}
-+	log = kzalloc(sizeof(*log), GFP_KERNEL);
-+	if (!log)
+ 	if (dev->cmb && use_cmb_sqes && (dev->cmbsz & NVME_CMBSZ_SQS)) {
+ 		unsigned offset = (qid - 1) * roundup(SQ_SIZE(nvmeq->q_depth),
+@@ -1471,15 +1472,21 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
+ 	 * A queue's vector matches the queue identifier unless the controller
+ 	 * has only one vector available.
+ 	 */
+-	nvmeq->cq_vector = dev->num_vecs == 1 ? 0 : qid;
+-	result = adapter_alloc_cq(dev, qid, nvmeq);
++	cq_vector = dev->num_vecs == 1 ? 0 : qid;
++	result = adapter_alloc_cq(dev, qid, nvmeq, cq_vector);
+ 	if (result < 0)
+-		goto release_vector;
 +		goto out;
  
--	status = nvmet_copy_to_sgl(req, 0, buf, data_len);
-+	if (req->cmd->get_log_page.nsid == cpu_to_le32(NVME_NSID_ALL))
-+		status = nvmet_get_smart_log_all(req, log);
-+	else
-+		status = nvmet_get_smart_log_nsid(req, log);
-+	if (status)
-+		goto out;
+ 	result = adapter_alloc_sq(dev, qid, nvmeq);
+ 	if (result < 0)
+ 		goto release_cq;
  
--err:
--	kfree(buf);
-+	status = nvmet_copy_to_sgl(req, 0, log, sizeof(*log));
- out:
- 	nvmet_req_complete(req, status);
++	/*
++	 * set cq_vector after alloc cq/sq, otherwise, if alloc cq/sq command
++	 * timeout, nvme_suspend_queue will invoke free_irq for it and cause warning
++	 * 'Trying to free already-free IRQ xxx'
++	 */
++	nvmeq->cq_vector = cq_vector;
+ 	nvme_init_queue(nvmeq, qid);
+ 	result = queue_request_irq(nvmeq);
+ 	if (result < 0)
+@@ -1487,13 +1494,13 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
+ 
+ 	return result;
+ 
+- release_sq:
++release_sq:
++	nvmeq->cq_vector = -1;
+ 	dev->online_queues--;
+ 	adapter_delete_sq(dev, qid);
+- release_cq:
++release_cq:
+ 	adapter_delete_cq(dev, qid);
+- release_vector:
+-	nvmeq->cq_vector = -1;
++out:
+ 	return result;
  }
-@@ -566,9 +523,25 @@ u16 nvmet_parse_admin_cmd(struct nvmet_req *req)
  
- 		switch (cmd->get_log_page.lid) {
- 		case NVME_LOG_ERROR:
-+			/*
-+			 * We currently never set the More bit in the status
-+			 * field, so all error log entries are invalid and can
-+			 * be zeroed out.  This is called a minum viable
-+			 * implementation (TM) of this mandatory log page.
-+			 */
-+			req->execute = nvmet_execute_get_log_page_noop;
-+			return 0;
- 		case NVME_LOG_SMART:
-+			req->execute = nvmet_execute_get_log_page_smart;
-+			return 0;
- 		case NVME_LOG_FW_SLOT:
--			req->execute = nvmet_execute_get_log_page;
-+			/*
-+			 * We only support a single firmware slot which always
-+			 * is active, so we can zero out the whole firmware slot
-+			 * log and still claim to fully implement this mandatory
-+			 * log page.
-+			 */
-+			req->execute = nvmet_execute_get_log_page_noop;
- 			return 0;
- 		}
- 		break;
 -- 
-2.17.0
+2.9.5
