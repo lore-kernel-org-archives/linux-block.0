@@ -1,18 +1,16 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from smtpbgeu1.qq.com ([52.59.177.22]:40789 "EHLO smtpbgeu1.qq.com"
+Received: from smtpbgeu2.qq.com ([18.194.254.142]:40410 "EHLO smtpbgeu2.qq.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751182AbeEPDnd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 May 2018 23:43:33 -0400
+        id S1751182AbeEPDmj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 May 2018 23:42:39 -0400
 From: "=?utf-8?B?6IOh5rW3?=" <huhai@kylinos.cn>
-To: "=?utf-8?B?YXhib2U=?=" <axboe@kernel.dk>
-Cc: "=?utf-8?B?bGludXgtYmxvY2s=?=" <linux-block@vger.kernel.org>,
-        "=?utf-8?B?aGNo?=" <hch@lst.de>
+To: "=?utf-8?B?bGludXgtYmxvY2s=?=" <linux-block@vger.kernel.org>
 Subject: blk-mq: for sync case, whether it is mq or sq make_request instances, we should send the request directly
 Mime-Version: 1.0
 Content-Type: text/plain;
         charset="utf-8"
-Date: Wed, 16 May 2018 11:43:26 +0800
-Message-ID: <tencent_1673E9D0031A9B033DE36EDB@qq.com>
+Date: Wed, 16 May 2018 11:42:33 +0800
+Message-ID: <tencent_4D4715133E9C8F2D37E3ACAF@qq.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
