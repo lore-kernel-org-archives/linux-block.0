@@ -1,39 +1,27 @@
 Return-Path: <josef@toxicpanda.com>
 Return-Path: <josef@toxicpanda.com>
+Date: Wed, 16 May 2018 14:50:39 -0400
 From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	nbd@other.debian.org,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 1/7] block: fix MAINTAINERS email for nbd
-Date: Wed, 16 May 2018 14:51:16 -0400
-Message-Id: <20180516185122.18590-1-josef@toxicpanda.com>
+To: Josef Bacik <josef@toxicpanda.com>
+Cc: axboe@kernel.dk, nbd@other.debian.org, linux-block@vger.kernel.org,
+	kernel-team@fb.com, Josef Bacik <jbacik@fb.com>
+Subject: Re: [PATCH 1/5] block: fix MAINTAINERS email for nbd
+Message-ID: <20180516185038.izvlvlge5kys4cys@destiny>
+References: <20180516183605.16159-1-josef@toxicpanda.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180516183605.16159-1-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Josef Bacik <jbacik@fb.com>
+On Wed, May 16, 2018 at 02:36:01PM -0400, Josef Bacik wrote:
+> From: Josef Bacik <jbacik@fb.com>
+> 
+> I've been missing stuff because it's been going into my work email which
+> is a black hole.  Update to the email I actually use so I stop missing
+> patches and bug reports.
+> 
 
-I've been missing stuff because it's been going into my work email which
-is a black hole.  Update to the email I actually use so I stop missing
-patches and bug reports.
+Ignore this series, I had assumed the previous patches I had sent were merged.
+I've reworked everything and will send a new series.  Thanks,
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index df6e9bb2559a..10eca48b11b4 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -9700,7 +9700,7 @@ S:	Maintained
- F:	drivers/net/ethernet/netronome/
- 
- NETWORK BLOCK DEVICE (NBD)
--M:	Josef Bacik <jbacik@fb.com>
-+M:	Josef Bacik <josef@toxicpanda.com>
- S:	Maintained
- L:	linux-block@vger.kernel.org
- L:	nbd@other.debian.org
--- 
-2.14.3
+Josef
