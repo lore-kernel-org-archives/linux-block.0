@@ -1,62 +1,93 @@
-Return-Path: <prvs=667b6aabf=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "syzbot+c4f9cebf9d651f6e54de@syzkaller.appspotmail.com"
-	<syzbot+c4f9cebf9d651f6e54de@syzkaller.appspotmail.com>,
-	"syzkaller-bugs@googlegroups.com" <syzkaller-bugs@googlegroups.com>,
-	"dan.j.williams@intel.com" <dan.j.williams@intel.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"penguin-kernel@I-love.SAKURA.ne.jp" <penguin-kernel@I-love.SAKURA.ne.jp>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"jthumshirn@suse.de" <jthumshirn@suse.de>,
-	"alan.christopher.jenkins@gmail.com" <alan.christopher.jenkins@gmail.com>,
-	"hch@lst.de" <hch@lst.de>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "dvyukov@google.com" <dvyukov@google.com>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>, "martin@lichtvoll.de"
-	<martin@lichtvoll.de>, "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-	"hare@suse.com" <hare@suse.com>, "ross.zwisler@linux.intel.com"
-	<ross.zwisler@linux.intel.com>, "keith.busch@intel.com"
-	<keith.busch@intel.com>, "linux-ext4@vger.kernel.org"
-	<linux-ext4@vger.kernel.org>
+Return-Path: <penguin-kernel@i-love.sakura.ne.jp>
 Subject: Re: INFO: task hung in blk_queue_enter
-Date: Wed, 16 May 2018 14:56:42 +0000
-Message-ID: <43327033306c3dd2f7c3717d64ce22415b6f3451.camel@wdc.com>
+To: syzbot <syzbot+c4f9cebf9d651f6e54de@syzkaller.appspotmail.com>,
+        linux-block@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        Dan Williams <dan.j.williams@intel.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        dvyukov@google.com, Alan Jenkins <alan.christopher.jenkins@gmail.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Keith Busch <keith.busch@intel.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Martin Steigerwald <martin@lichtvoll.de>,
+        Ming Lei <ming.lei@redhat.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>
 References: <0000000000009b212b056ae6dbad@google.com>
-	 <343bbbf6-64eb-879e-d19e-96aebb037d47@I-love.SAKURA.ne.jp>
-	 <b9c33b04-08d7-87a1-3d93-d81a84e6af12@I-love.SAKURA.ne.jp>
-In-Reply-To: <b9c33b04-08d7-87a1-3d93-d81a84e6af12@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset="utf-8"
+ <343bbbf6-64eb-879e-d19e-96aebb037d47@I-love.SAKURA.ne.jp>
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Message-ID: <b9c33b04-08d7-87a1-3d93-d81a84e6af12@I-love.SAKURA.ne.jp>
+Date: Wed, 16 May 2018 22:05:06 +0900
 MIME-Version: 1.0
+In-Reply-To: <343bbbf6-64eb-879e-d19e-96aebb037d47@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE4LTA1LTE2IGF0IDIyOjA1ICswOTAwLCBUZXRzdW8gSGFuZGEgd3JvdGU6DQo+
-IE9uZSBvcmUgbW9yZSB0aHJlYWRzIGFyZSB3YWl0aW5nIGZvciBxLT5tcV9mcmVlemVfZGVwdGgg
-dG8gYmVjb21lIDAuIEJ1dCB0aGUNCj4gdGhyZWFkIHdobyBpbmNyZW1lbnRlZCBxLT5tcV9mcmVl
-emVfZGVwdGggYXQgYmxrX2ZyZWV6ZV9xdWV1ZV9zdGFydChxKSBmcm9tDQo+IGJsa19mcmVlemVf
-cXVldWUoKSBpcyB3YWl0aW5nIGF0IGJsa19tcV9mcmVlemVfcXVldWVfd2FpdCgpLiBUaGVyZWZv
-cmUsDQo+IGF0b21pY19yZWFkKCZxLT5tcV9mcmVlemVfZGVwdGgpID09IDAgY29uZGl0aW9uIGZv
-ciB3YWl0X2V2ZW50KCkgaW4NCj4gYmxrX3F1ZXVlX2VudGVyKCkgd2lsbCBuZXZlciBiZSBzYXRp
-c2ZpZWQuIEJ1dCB3aGF0IGRvZXMgdGhhdCB3YWl0X2V2ZW50KCkNCj4gd2FudCB0byBkbz8gSXNu
-J3QgInN0YXJ0IGZyZWV6aW5nIiBhIHNvcnQgb2YgYmxrX3F1ZXVlX2R5aW5nKHEpID09IHRydWU/
-DQo+IFNpbmNlIHBlcmNwdV9yZWZfdHJ5Z2V0X2xpdmUoJnEtPnFfdXNhZ2VfY291bnRlcikgZmFp
-bGVkIGFuZCB0aGUgcXVldWUgaXMNCj4gYWJvdXQgdG8gYmUgZnJvemVuLCBzaG91bGRuJ3Qgd2Ug
-dHJlYXQgYXRvbWljX3JlYWQoJnEtPm1xX2ZyZWV6ZV9kZXB0aCkgIT0gMA0KPiBhcyBpZiBibGtf
-cXVldWVfZHlpbmcocSkgPT0gdHJ1ZT8gVGhhdCBpcywgc29tZXRoaW5nIGxpa2UgYmVsb3c6DQo+
-IA0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svYmxrLWNvcmUuYyBiL2Jsb2NrL2Jsay1jb3JlLmMNCj4g
-aW5kZXggODU5MDliNC4uNTllMjQ5NiAxMDA2NDQNCj4gLS0tIGEvYmxvY2svYmxrLWNvcmUuYw0K
-PiArKysgYi9ibG9jay9ibGstY29yZS5jDQo+IEBAIC05NTEsMTAgKzk1MSwxMCBAQCBpbnQgYmxr
-X3F1ZXVlX2VudGVyKHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxLCBibGtfbXFfcmVxX2ZsYWdzX3Qg
-ZmxhZ3MpDQo+ICAJCXNtcF9ybWIoKTsNCj4gIA0KPiAgCQl3YWl0X2V2ZW50KHEtPm1xX2ZyZWV6
-ZV93cSwNCj4gLQkJCSAgIChhdG9taWNfcmVhZCgmcS0+bXFfZnJlZXplX2RlcHRoKSA9PSAwICYm
-DQo+IC0JCQkgICAgKHByZWVtcHQgfHwgIWJsa19xdWV1ZV9wcmVlbXB0X29ubHkocSkpKSB8fA0K
-PiArCQkJICAgYXRvbWljX3JlYWQoJnEtPm1xX2ZyZWV6ZV9kZXB0aCkgfHwNCj4gKwkJCSAgIChw
-cmVlbXB0IHx8ICFibGtfcXVldWVfcHJlZW1wdF9vbmx5KHEpKSB8fA0KPiAgCQkJICAgYmxrX3F1
-ZXVlX2R5aW5nKHEpKTsNCj4gLQkJaWYgKGJsa19xdWV1ZV9keWluZyhxKSkNCj4gKwkJaWYgKGF0
-b21pY19yZWFkKCZxLT5tcV9mcmVlemVfZGVwdGgpIHx8IGJsa19xdWV1ZV9keWluZyhxKSkNCj4g
-IAkJCXJldHVybiAtRU5PREVWOw0KPiAgCX0NCj4gIH0NCg0KVGhhdCBjaGFuZ2UgbG9va3Mgd3Jv
-bmcgdG8gbWUuIEFkZGl0aW9uYWxseSwgSSB0aGluayB0aGF0IHlvdSBhcmUgbG9va2luZyBpbg0K
-dGhlIHdyb25nIGRpcmVjdGlvbi4gU2luY2UgYmxrX21xX2ZyZWV6ZV9xdWV1ZV93YWl0KCkgYW5k
-IGJsa19xdWV1ZV9lbnRlcigpDQp3b3JrIGZpbmUgZm9yIGFsbCBibG9jayBkcml2ZXJzIGV4Y2Vw
-dCB0aGUgbG9vcCBkcml2ZXIgSSB0aGluayB0aGF0IHlvdSBzaG91bGQNCmhhdmUgYSBjbG9zZXIg
-bG9vayBhdCBob3cgdGhlIGxvb3AgZHJpdmVyIHVzZXMgdGhpcyBibG9jayBsYXllciBmdW5jdGlv
-bmFsaXR5Lg0KDQpUaGFua3MsDQoNCkJhcnQuDQoNCg0KDQo=
+Tetsuo Handa wrote:
+> I couldn't check whether freeze_depth in blk_freeze_queue_start() was 1,
+> but presumably q->mq_freeze_depth > 0 because syz-executor7(PID=5010) is
+> stuck at wait_event() in blk_queue_enter().
+> 
+> Since flags == 0, preempt == false. Since stuck at wait_event(), success == false.
+> Thus, atomic_read(&q->mq_freeze_depth) > 0 if blk_queue_dying(q) == false. And I
+> guess blk_queue_dying(q) == false because we are just trying to freeze/unfreeze.
+> 
+
+I was able to reproduce the hung up using modified reproducer, and got values
+using below debug printk() patch.
+
+  --- a/block/blk-core.c
+  +++ b/block/blk-core.c
+  @@ -950,10 +950,12 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
+   		 */
+   		smp_rmb();
+   
+  -		wait_event(q->mq_freeze_wq,
+  -			   (atomic_read(&q->mq_freeze_depth) == 0 &&
+  -			    (preempt || !blk_queue_preempt_only(q))) ||
+  -			   blk_queue_dying(q));
+  +		while (wait_event_timeout(q->mq_freeze_wq,
+  +					  (atomic_read(&q->mq_freeze_depth) == 0 &&
+  +					   (preempt || !blk_queue_preempt_only(q))) ||
+  +					  blk_queue_dying(q), 10 * HZ) == 0)
+  +			printk("%s(%u): q->mq_freeze_depth=%d preempt=%d blk_queue_preempt_only(q)=%d blk_queue_dying(q)=%d\n",
+  +			       current->comm, current->pid, atomic_read(&q->mq_freeze_depth), preempt, blk_queue_preempt_only(q), blk_queue_dying(q));
+   		if (blk_queue_dying(q))
+   			return -ENODEV;
+   	}
+
+[   75.869126] print_req_error: I/O error, dev loop0, sector 0
+[   85.983146] a.out(8838): q->mq_freeze_depth=1 preempt=0 blk_queue_preempt_only(q)=0 blk_queue_dying(q)=0
+[   96.222884] a.out(8838): q->mq_freeze_depth=1 preempt=0 blk_queue_preempt_only(q)=0 blk_queue_dying(q)=0
+[  106.463322] a.out(8838): q->mq_freeze_depth=1 preempt=0 blk_queue_preempt_only(q)=0 blk_queue_dying(q)=0
+[  116.702912] a.out(8838): q->mq_freeze_depth=1 preempt=0 blk_queue_preempt_only(q)=0 blk_queue_dying(q)=0
+
+One ore more threads are waiting for q->mq_freeze_depth to become 0. But the
+thread who incremented q->mq_freeze_depth at blk_freeze_queue_start(q) from
+blk_freeze_queue() is waiting at blk_mq_freeze_queue_wait(). Therefore,
+atomic_read(&q->mq_freeze_depth) == 0 condition for wait_event() in
+blk_queue_enter() will never be satisfied. But what does that wait_event()
+want to do? Isn't "start freezing" a sort of blk_queue_dying(q) == true?
+Since percpu_ref_tryget_live(&q->q_usage_counter) failed and the queue is
+about to be frozen, shouldn't we treat atomic_read(&q->mq_freeze_depth) != 0
+as if blk_queue_dying(q) == true? That is, something like below:
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 85909b4..59e2496 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -951,10 +951,10 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
+ 		smp_rmb();
+ 
+ 		wait_event(q->mq_freeze_wq,
+-			   (atomic_read(&q->mq_freeze_depth) == 0 &&
+-			    (preempt || !blk_queue_preempt_only(q))) ||
++			   atomic_read(&q->mq_freeze_depth) ||
++			   (preempt || !blk_queue_preempt_only(q)) ||
+ 			   blk_queue_dying(q));
+-		if (blk_queue_dying(q))
++		if (atomic_read(&q->mq_freeze_depth) || blk_queue_dying(q))
+ 			return -ENODEV;
+ 	}
+ }
