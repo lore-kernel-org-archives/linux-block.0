@@ -1,123 +1,168 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 02/34] fs: factor out a __generic_write_end helper
-Date: Fri, 18 May 2018 18:47:58 +0200
-Message-Id: <20180518164830.1552-3-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	James Smart <james.smart@broadcom.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>
+Subject: [PATCH V6 01/11] block: introduce blk_quiesce_timeout() and blk_unquiesce_timeout()
+Date: Wed, 16 May 2018 12:03:03 +0800
+Message-Id: <20180516040313.13596-2-ming.lei@redhat.com>
+In-Reply-To: <20180516040313.13596-1-ming.lei@redhat.com>
+References: <20180516040313.13596-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Bits of the buffer.c based write_end implementations that don't know
-about buffer_heads and can be reused by other implementations.
+Turns out the current way can't drain timout completely because mod_timer()
+can be triggered in the work func, which can be just run inside the synced
+timeout work:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+        del_timer_sync(&q->timeout);
+        cancel_work_sync(&q->timeout_work);
+
+This patch introduces one flag of 'timeout_off' for fixing this issue, turns
+out this simple way does work.
+
+Also blk_quiesce_timeout() and blk_unquiesce_timeout() are introduced for
+draining timeout, which is needed by NVMe.
+
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Cc: Laurence Oberman <loberman@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/buffer.c   | 67 +++++++++++++++++++++++++++------------------------
- fs/internal.h |  2 ++
- 2 files changed, 37 insertions(+), 32 deletions(-)
+ block/blk-core.c       | 21 +++++++++++++++++++--
+ block/blk-mq.c         |  9 +++++++++
+ block/blk-timeout.c    |  5 ++++-
+ include/linux/blkdev.h | 13 +++++++++++++
+ 4 files changed, 45 insertions(+), 3 deletions(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 249b83fafe48..bd964b2ad99a 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -2076,6 +2076,40 @@ int block_write_begin(struct address_space *mapping, loff_t pos, unsigned len,
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 85909b431eb0..c277f1023703 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -392,6 +392,22 @@ void blk_stop_queue(struct request_queue *q)
  }
- EXPORT_SYMBOL(block_write_begin);
+ EXPORT_SYMBOL(blk_stop_queue);
  
-+int __generic_write_end(struct inode *inode, loff_t pos, unsigned copied,
-+		struct page *page)
++void blk_unquiesce_timeout(struct request_queue *q)
 +{
-+	loff_t old_size = inode->i_size;
-+	bool i_size_changed = false;
++	blk_mark_timeout_quiesce(q, false);
++	mod_timer(&q->timeout, jiffies + q->rq_timeout);
++}
++EXPORT_SYMBOL(blk_unquiesce_timeout);
 +
-+	/*
-+	 * No need to use i_size_read() here, the i_size cannot change under us
-+	 * because we hold i_rwsem.
-+	 *
-+	 * But it's important to update i_size while still holding page lock:
-+	 * page writeout could otherwise come in and zero beyond i_size.
-+	 */
-+	if (pos + copied > inode->i_size) {
-+		i_size_write(inode, pos + copied);
-+		i_size_changed = true;
-+	}
++void blk_quiesce_timeout(struct request_queue *q)
++{
++	blk_mark_timeout_quiesce(q, true);
 +
-+	unlock_page(page);
-+	put_page(page);
++	del_timer_sync(&q->timeout);
++	cancel_work_sync(&q->timeout_work);
++}
++EXPORT_SYMBOL(blk_quiesce_timeout);
 +
-+	if (old_size < pos)
-+		pagecache_isize_extended(inode, old_size, pos);
-+	/*
-+	 * Don't mark the inode dirty under page lock. First, it unnecessarily
-+	 * makes the holding time of page lock longer. Second, it forces lock
-+	 * ordering of page lock and transaction start for journaling
-+	 * filesystems.
-+	 */
-+	if (i_size_changed)
-+		mark_inode_dirty(inode);
-+	return copied;
+ /**
+  * blk_sync_queue - cancel any pending callbacks on a queue
+  * @q: the queue
+@@ -412,8 +428,7 @@ EXPORT_SYMBOL(blk_stop_queue);
+  */
+ void blk_sync_queue(struct request_queue *q)
+ {
+-	del_timer_sync(&q->timeout);
+-	cancel_work_sync(&q->timeout_work);
++	blk_quiesce_timeout(q);
+ 
+ 	if (q->mq_ops) {
+ 		struct blk_mq_hw_ctx *hctx;
+@@ -425,6 +440,8 @@ void blk_sync_queue(struct request_queue *q)
+ 	} else {
+ 		cancel_delayed_work_sync(&q->delay_work);
+ 	}
++
++	blk_mark_timeout_quiesce(q, false);
+ }
+ EXPORT_SYMBOL(blk_sync_queue);
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 9ce9cac16c3f..173f1723e48f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -917,6 +917,15 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 	};
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i;
++	bool timeout_off;
++	unsigned long flags;
++
++	spin_lock_irqsave(q->queue_lock, flags);
++	timeout_off = q->timeout_off;
++	spin_unlock_irqrestore(q->queue_lock, flags);
++
++	if (timeout_off)
++		return;
+ 
+ 	/* A deadlock might occur if a request is stuck requiring a
+ 	 * timeout at the same time a queue freeze is waiting
+diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+index 652d4d4d3e97..ffd0b609091e 100644
+--- a/block/blk-timeout.c
++++ b/block/blk-timeout.c
+@@ -136,12 +136,15 @@ void blk_timeout_work(struct work_struct *work)
+ 
+ 	spin_lock_irqsave(q->queue_lock, flags);
+ 
++	if (q->timeout_off)
++		goto exit;
++
+ 	list_for_each_entry_safe(rq, tmp, &q->timeout_list, timeout_list)
+ 		blk_rq_check_expired(rq, &next, &next_set);
+ 
+ 	if (next_set)
+ 		mod_timer(&q->timeout, round_jiffies_up(next));
+-
++exit:
+ 	spin_unlock_irqrestore(q->queue_lock, flags);
+ }
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 5c4eee043191..a2cc4aaecf50 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -584,6 +584,7 @@ struct request_queue {
+ 	struct timer_list	timeout;
+ 	struct work_struct	timeout_work;
+ 	struct list_head	timeout_list;
++	bool			timeout_off;
+ 
+ 	struct list_head	icq_list;
+ #ifdef CONFIG_BLK_CGROUP
+@@ -1017,6 +1018,18 @@ extern void blk_execute_rq(struct request_queue *, struct gendisk *,
+ extern void blk_execute_rq_nowait(struct request_queue *, struct gendisk *,
+ 				  struct request *, int, rq_end_io_fn *);
+ 
++static inline void blk_mark_timeout_quiesce(struct request_queue *q, bool quiesce)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(q->queue_lock, flags);
++	q->timeout_off = quiesce;
++	spin_unlock_irqrestore(q->queue_lock, flags);
 +}
 +
- int block_write_end(struct file *file, struct address_space *mapping,
- 			loff_t pos, unsigned len, unsigned copied,
- 			struct page *page, void *fsdata)
-@@ -2116,39 +2150,8 @@ int generic_write_end(struct file *file, struct address_space *mapping,
- 			loff_t pos, unsigned len, unsigned copied,
- 			struct page *page, void *fsdata)
- {
--	struct inode *inode = mapping->host;
--	loff_t old_size = inode->i_size;
--	int i_size_changed = 0;
--
- 	copied = block_write_end(file, mapping, pos, len, copied, page, fsdata);
--
--	/*
--	 * No need to use i_size_read() here, the i_size
--	 * cannot change under us because we hold i_mutex.
--	 *
--	 * But it's important to update i_size while still holding page lock:
--	 * page writeout could otherwise come in and zero beyond i_size.
--	 */
--	if (pos+copied > inode->i_size) {
--		i_size_write(inode, pos+copied);
--		i_size_changed = 1;
--	}
--
--	unlock_page(page);
--	put_page(page);
--
--	if (old_size < pos)
--		pagecache_isize_extended(inode, old_size, pos);
--	/*
--	 * Don't mark the inode dirty under page lock. First, it unnecessarily
--	 * makes the holding time of page lock longer. Second, it forces lock
--	 * ordering of page lock and transaction start for journaling
--	 * filesystems.
--	 */
--	if (i_size_changed)
--		mark_inode_dirty(inode);
--
--	return copied;
-+	return __generic_write_end(mapping->host, pos, copied, page);
- }
- EXPORT_SYMBOL(generic_write_end);
++extern void blk_quiesce_timeout(struct request_queue *q);
++extern void blk_unquiesce_timeout(struct request_queue *q);
++
+ int blk_status_to_errno(blk_status_t status);
+ blk_status_t errno_to_blk_status(int errno);
  
-diff --git a/fs/internal.h b/fs/internal.h
-index e08972db0303..b955232d3d49 100644
---- a/fs/internal.h
-+++ b/fs/internal.h
-@@ -43,6 +43,8 @@ static inline int __sync_blockdev(struct block_device *bdev, int wait)
- extern void guard_bio_eod(int rw, struct bio *bio);
- extern int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
- 		get_block_t *get_block, struct iomap *iomap);
-+int __generic_write_end(struct inode *inode, loff_t pos, unsigned copied,
-+		struct page *page);
- 
- /*
-  * char_dev.c
 -- 
-2.17.0
+2.9.5
