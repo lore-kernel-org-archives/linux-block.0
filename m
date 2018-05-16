@@ -1,45 +1,25 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	nbd@other.debian.org,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 2/5] nbd: do queue cleanup after del_gendisk
-Date: Wed, 16 May 2018 14:36:02 -0400
-Message-Id: <20180516183605.16159-2-josef@toxicpanda.com>
-In-Reply-To: <20180516183605.16159-1-josef@toxicpanda.com>
-References: <20180516183605.16159-1-josef@toxicpanda.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: blk-mq: remove unnecessary judgement from blk_mq_make_request
+To: =?UTF-8?B?6IOh5rW3?= <huhai@kylinos.cn>
+Cc: linux-block <linux-block@vger.kernel.org>
+References: <tencent_024782AB2B10E01A63664862@qq.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <fef2e37c-8f45-898b-96cc-a98b9093f7ea@kernel.dk>
+Date: Wed, 16 May 2018 08:19:45 -0600
+MIME-Version: 1.0
+In-Reply-To: <tencent_024782AB2B10E01A63664862@qq.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Josef Bacik <jbacik@fb.com>
+On 5/15/18 8:47 PM, 胡海 wrote:
+> Author: huhai <huhai@kylinos.cn>
+> Date:   Tue May 15 15:15:06 2018 +0800
+> 
+>     blk-mq: remove unnecessary judgement from blk_mq_make_request
+>     
+>     Whether q->elevator is true or not, we can use blk_mq_sched_insert_request to complete the work.
 
-Apparently del_gendisk is actually supposed to happen first to cleanup
-the sysfs stuff.
+This looks good, applied for 4.18.
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- drivers/block/nbd.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 7b7b6143a126..7e83d6364b35 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -173,9 +173,12 @@ static const struct device_attribute pid_attr = {
- static void nbd_dev_remove(struct nbd_device *nbd)
- {
- 	struct gendisk *disk = nbd->disk;
-+	struct request_queue *q;
-+
- 	if (disk) {
--		blk_cleanup_queue(disk->queue);
-+		q = disk->queue;
- 		del_gendisk(disk);
-+		blk_cleanup_queue(q);
- 		blk_mq_free_tag_set(&nbd->tag_set);
- 		disk->private_data = NULL;
- 		put_disk(disk);
 -- 
-2.14.3
+Jens Axboe
