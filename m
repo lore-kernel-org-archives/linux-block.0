@@ -1,31 +1,38 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: blk-mq: for sync case, whether it is mq or sq make_request
- instances, we should send the request directly
-To: =?UTF-8?B?6IOh5rW3?= <huhai@kylinos.cn>,
- linux-block <linux-block@vger.kernel.org>
-References: <tencent_4D4715133E9C8F2D37E3ACAF@qq.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <73bcb98c-2e0a-123b-5b45-6c7fd71f3595@kernel.dk>
-Date: Wed, 16 May 2018 08:15:57 -0600
-MIME-Version: 1.0
-In-Reply-To: <tencent_4D4715133E9C8F2D37E3ACAF@qq.com>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from smtpbgeu1.qq.com ([52.59.177.22]:40789 "EHLO smtpbgeu1.qq.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751182AbeEPDnd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 May 2018 23:43:33 -0400
+From: "=?utf-8?B?6IOh5rW3?=" <huhai@kylinos.cn>
+To: "=?utf-8?B?YXhib2U=?=" <axboe@kernel.dk>
+Cc: "=?utf-8?B?bGludXgtYmxvY2s=?=" <linux-block@vger.kernel.org>,
+        "=?utf-8?B?aGNo?=" <hch@lst.de>
+Subject: blk-mq: for sync case, whether it is mq or sq make_request instances, we should send the request directly
+Mime-Version: 1.0
+Content-Type: text/plain;
+        charset="utf-8"
+Date: Wed, 16 May 2018 11:43:26 +0800
+Message-ID: <tencent_1673E9D0031A9B033DE36EDB@qq.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 5/15/18 9:42 PM, 胡海 wrote:
-> Author: huhai <huhai@kylinos.cn>
-> Date:   Wed May 16 10:34:22 2018 +0800
-> 
->     blk-mq: for sync case, whether it is mq or sq make_request instances, we should send the request directly
->     
->     For sq make_request instances, we should issue sync request directly too, 
->     otherwise it will break down the semantics of sync request, 
->     the current code logic is to send synchronous requests asynchronously.
-
-It doesn't break the semantics of a sync request. The reason we don't do
-it on single queue hardware is for efficiency reasons. On multiple queue
-hardware, we can efficiently have multiple processes doing sync issue,
-that isn't the case on single queue hardware.
-
--- 
-Jens Axboe
+QXV0aG9yOiBodWhhaSA8aHVoYWlAa3lsaW5vcy5jbj4NCkRhdGU6ICAgV2VkIE1heSAxNiAx
+MDozNDoyMiAyMDE4ICswODAwDQoNCiAgICBibGstbXE6IGZvciBzeW5jIGNhc2UsIHdoZXRo
+ZXIgaXQgaXMgbXEgb3Igc3EgbWFrZV9yZXF1ZXN0IGluc3RhbmNlcywgd2Ugc2hvdWxkIHNl
+bmQgdGhlIHJlcXVlc3QgZGlyZWN0bHkNCiAgICANCiAgICBGb3Igc3EgbWFrZV9yZXF1ZXN0
+IGluc3RhbmNlcywgd2Ugc2hvdWxkIGlzc3VlIHN5bmMgcmVxdWVzdCBkaXJlY3RseSB0b28s
+IA0KICAgIG90aGVyd2lzZSBpdCB3aWxsIGJyZWFrIGRvd24gdGhlIHNlbWFudGljcyBvZiBz
+eW5jIHJlcXVlc3QsIA0KICAgIHRoZSBjdXJyZW50IGNvZGUgbG9naWMgaXMgdG8gc2VuZCBz
+eW5jaHJvbm91cyByZXF1ZXN0cyBhc3luY2hyb25vdXNseS4NCiAgICANCiAgICBTaWduZWQt
+b2ZmLWJ5OiBodWhhaSA8aHVoYWlAa3lsaW5vcy5jbj4NCg0KZGlmZiAtLWdpdCBhL2Jsb2Nr
+L2Jsay1tcS5jIGIvYmxvY2svYmxrLW1xLmMNCmluZGV4IDU2MjlmMTguLmZjZjJmMTYgMTAw
+NjQ0DQotLS0gYS9ibG9jay9ibGstbXEuYw0KKysrIGIvYmxvY2svYmxrLW1xLmMNCkBAIC0x
+NzcxLDcgKzE3NzEsNyBAQCBzdGF0aWMgYmxrX3FjX3QgYmxrX21xX21ha2VfcmVxdWVzdChz
+dHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSwgc3RydWN0IGJpbyAqYmlvKQ0KICAgICAgICAgICAg
+ICAgICAgICAgICAgYmxrX21xX3RyeV9pc3N1ZV9kaXJlY3RseShkYXRhLmhjdHgsIHNhbWVf
+cXVldWVfcnEsDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJmNv
+b2tpZSk7DQogICAgICAgICAgICAgICAgfQ0KLSAgICAgICB9IGVsc2UgaWYgKHEtPm5yX2h3
+X3F1ZXVlcyA+IDEgJiYgaXNfc3luYykgew0KKyAgICAgICB9IGVsc2UgaWYgKGlzX3N5bmMp
+IHsNCiAgICAgICAgICAgICAgICBibGtfbXFfcHV0X2N0eChkYXRhLmN0eCk7DQogICAgICAg
+ICAgICAgICAgYmxrX21xX2Jpb190b19yZXF1ZXN0KHJxLCBiaW8pOw0KICAgICAgICAgICAg
+ICAgIGJsa19tcV90cnlfaXNzdWVfZGlyZWN0bHkoZGF0YS5oY3R4LCBycSwgJmNvb2tpZSk7
