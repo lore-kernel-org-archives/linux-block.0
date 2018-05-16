@@ -1,79 +1,74 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 25/33] xfs: move all writeback buffer_head manipulation into xfs_map_at_offset
-Date: Wed,  9 May 2018 09:48:22 +0200
-Message-Id: <20180509074830.16196-26-hch@lst.de>
-In-Reply-To: <20180509074830.16196-1-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:36334 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751395AbeEPMjc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 16 May 2018 08:39:32 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        stable@vger.kernel.org, Kent Overstreet <kent.overstreet@gmail.com>
+Subject: [PATCH] bcache: return 0 from bch_debug_init() if CONFIG_DEBUG_FS=n
+Date: Wed, 16 May 2018 20:39:19 +0800
+Message-Id: <20180516123919.2159-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This keeps it in a single place so it can be made otional more easily.
+Commit 539d39eb2708 ("bcache: fix wrong return value in bch_debug_init()")
+returns the return value of debugfs_create_dir() to bcache_init(). When
+CONFIG_DEBUG_FS=n, bch_debug_init() always returns 1 and makes
+bcache_init() failedi.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+This patch makes bch_debug_init() always returns 0 if CONFIG_DEBUG_FS=n,
+so bcache can continue to work for the kernels which don't have debugfs
+enanbled.
+
+Fixes: Commit 539d39eb2708 ("bcache: fix wrong return value in bch_debug_init()")
+Cc: stable@vger.kernel.org
+Signed-off-by: Coly Li <colyli@suse.de>
+Reported-by: Massimo B. <massimo.b@gmx.net>
+Reported-by: Kai Krakow <kai@kaishome.de>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
 ---
- fs/xfs/xfs_aops.c | 22 +++++-----------------
- 1 file changed, 5 insertions(+), 17 deletions(-)
+ drivers/md/bcache/bcache.h | 5 +++++
+ drivers/md/bcache/debug.c  | 4 ++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index f6d28e6aa911..c76c943473be 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -505,21 +505,6 @@ xfs_imap_valid(
- 		offset < imap->br_startoff + imap->br_blockcount;
- }
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 3a0cfb237af9..5b3fe87f32ee 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -994,8 +994,13 @@ void bch_open_buckets_free(struct cache_set *);
  
--STATIC void
--xfs_start_buffer_writeback(
--	struct buffer_head	*bh)
--{
--	ASSERT(buffer_mapped(bh));
--	ASSERT(buffer_locked(bh));
--	ASSERT(!buffer_delay(bh));
--	ASSERT(!buffer_unwritten(bh));
--
--	bh->b_end_io = NULL;
--	set_buffer_async_write(bh);
--	set_buffer_uptodate(bh);
--	clear_buffer_dirty(bh);
--}
--
- STATIC void
- xfs_start_page_writeback(
- 	struct page		*page,
-@@ -728,6 +713,7 @@ xfs_map_at_offset(
- 	ASSERT(imap->br_startblock != HOLESTARTBLOCK);
- 	ASSERT(imap->br_startblock != DELAYSTARTBLOCK);
+ int bch_cache_allocator_start(struct cache *ca);
  
-+	lock_buffer(bh);
- 	xfs_map_buffer(inode, bh, imap, offset);
- 	set_buffer_mapped(bh);
- 	clear_buffer_delay(bh);
-@@ -740,6 +726,10 @@ xfs_map_at_offset(
- 	 * set the bdev now.
- 	 */
- 	bh->b_bdev = xfs_find_bdev_for_inode(inode);
-+	bh->b_end_io = NULL;
-+	set_buffer_async_write(bh);
-+	set_buffer_uptodate(bh);
-+	clear_buffer_dirty(bh);
- }
++#ifdef CONFIG_DEBUG_FS
+ void bch_debug_exit(void);
+ int bch_debug_init(struct kobject *);
++#else
++static inline void bch_debug_exit(void) {};
++static inline int bch_debug_init(struct kobject *kobj) { return 0; };
++#endif
+ void bch_request_exit(void);
+ int bch_request_init(void);
  
- STATIC void
-@@ -885,11 +875,9 @@ xfs_writepage_map(
- 			continue;
- 		}
- 
--		lock_buffer(bh);
- 		xfs_map_at_offset(inode, bh, &wpc->imap, file_offset);
- 		xfs_add_to_ioend(inode, file_offset, page, wpc, wbc,
- 				&submit_list);
--		xfs_start_buffer_writeback(bh);
- 		count++;
+diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
+index 4e63c6f6c04d..34a0ed4ed70c 100644
+--- a/drivers/md/bcache/debug.c
++++ b/drivers/md/bcache/debug.c
+@@ -240,8 +240,6 @@ void bch_debug_init_cache_set(struct cache_set *c)
  	}
+ }
  
+-#endif
+-
+ void bch_debug_exit(void)
+ {
+ 	if (!IS_ERR_OR_NULL(bcache_debug))
+@@ -254,3 +252,5 @@ int __init bch_debug_init(struct kobject *kobj)
+ 
+ 	return IS_ERR_OR_NULL(bcache_debug);
+ }
++
++#endif
 -- 
-2.17.0
+2.16.3
