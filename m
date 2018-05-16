@@ -1,136 +1,44 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-Subject: Re: [PATCH V2 1/5] block: introduce blk_quiesce_timeout() and
- blk_unquiesce_timeout()
-To: Ming Lei <ming.lei@redhat.com>, Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <20180429154152.16656-1-ming.lei@redhat.com>
- <20180429154152.16656-2-ming.lei@redhat.com>
-From: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <93c4190f-178a-a3b4-5203-bd8c6a0eaef2@oracle.com>
-Date: Wed, 2 May 2018 10:23:35 +0800
-MIME-Version: 1.0
-In-Reply-To: <20180429154152.16656-2-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	nbd@other.debian.org,
+	linux-block@vger.kernel.org,
+	kernel-team@fb.com
+Cc: Josef Bacik <jbacik@fb.com>,
+	stable@vger.kernel.org
+Subject: [PATCH 3/7] nbd: update size when connected
+Date: Wed, 16 May 2018 14:51:18 -0400
+Message-Id: <20180516185122.18590-3-josef@toxicpanda.com>
+In-Reply-To: <20180516185122.18590-1-josef@toxicpanda.com>
+References: <20180516185122.18590-1-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi ming
+From: Josef Bacik <jbacik@fb.com>
 
-On 04/29/2018 11:41 PM, Ming Lei wrote:
->  
-> +static void __blk_unquiesce_timeout(struct request_queue *q)
-> +{
-> +	unsigned long flags;
-> +
-> +	spin_lock_irqsave(q->queue_lock, flags);
-> +	q->timeout_off = false;
-> +	spin_unlock_irqrestore(q->queue_lock, flags);
-> +}
-> +
-> +void blk_unquiesce_timeout(struct request_queue *q)
-> +{
-> +	__blk_unquiesce_timeout(q);
-> +	mod_timer(&q->timeout, jiffies + q->rq_timeout);
-> +}
-> +EXPORT_SYMBOL(blk_unquiesce_timeout);
-> +
-> +void blk_quiesce_timeout(struct request_queue *q)
-> +{
-> +	unsigned long flags;
-> +
-> +	spin_lock_irqsave(q->queue_lock, flags);
-> +	q->timeout_off = true;
-> +	spin_unlock_irqrestore(q->queue_lock, flags);
-> +
-> +	del_timer_sync(&q->timeout);
-> +	cancel_work_sync(&q->timeout_work);
-> +}
-> +EXPORT_SYMBOL(blk_quiesce_timeout);
-> +
->  /**
->   * blk_sync_queue - cancel any pending callbacks on a queue
->   * @q: the queue
-> @@ -408,8 +437,7 @@ EXPORT_SYMBOL(blk_stop_queue);
->   */
->  void blk_sync_queue(struct request_queue *q)
->  {
-> -	del_timer_sync(&q->timeout);
-> -	cancel_work_sync(&q->timeout_work);
-> +	blk_quiesce_timeout(q);
->  
->  	if (q->mq_ops) {
->  		struct blk_mq_hw_ctx *hctx;
-> @@ -421,6 +449,8 @@ void blk_sync_queue(struct request_queue *q)
->  	} else {
->  		cancel_delayed_work_sync(&q->delay_work);
->  	}
-> +
-> +	__blk_unquiesce_timeout(q);
->  }
->  EXPORT_SYMBOL(blk_sync_queue);
->  
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 0dc9e341c2a7..890dd3b3e3e1 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -901,6 +901,15 @@ static void blk_mq_timeout_work(struct work_struct *work)
->  	};
->  	struct blk_mq_hw_ctx *hctx;
->  	int i;
-> +	bool timeout_off;
-> +	unsigned long flags;
-> +
-> +	spin_lock_irqsave(q->queue_lock, flags);
-> +	timeout_off = q->timeout_off;
-> +	spin_unlock_irqrestore(q->queue_lock, flags);
-> +
-> +	if (timeout_off)
-> +		return;
+I messed up changing the size of an NBD device while it was connected by
+not actually updating the device or doing the uevent.  Fix this by
+updating everything if we're connected and we change the size.
 
-Looks like there is still race as following:
+cc: stable@vger.kernel.org
+Fixes: 639812a ("nbd: don't set the device size until we're connected")
+Signed-off-by: Josef Bacik <jbacik@fb.com>
+---
+ drivers/block/nbd.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-blk_quiesce_timeout                          blk_mq_timeout_work
-                                               -> timeout_off = q->timeout_off; //still a false
-  -> q->timeout_off = true;
-  -> del_timer_sync(&q->timeout);
-                                               -> mod_timer
-  -> cancel_work_sync(&q->timeout_work);
-
-
-How about this:
-
-Introduce a new request queue flag QUEUE_FLAG_TIMEOUT_QUIESCED
-
-void blk_quiesce_queue_timeout(struct request_queue *q)
-{
-	unsigned long flags;
-
-	spin_lock_irqsave(q->queue_lock, flags);
-	queue_flag_set(QUEUE_FLAG_TIMEOUT_QUIESCED, q);
-	spin_unlock_irqrestore(q->queue_lock, flags);
-
-	synchronize_rcu_bh();
-	cancel_work_sync(&q->timeout_work);
-	/*
-	 * The timeout work will not be invoked anymore.
-	 */
-	del_timer_sync(&q->timeout);
-}
-
- void blk_set_queue_dying(struct request_queue *q)
- {
- 	spin_lock_irq(q->queue_lock);
-@@ -867,6 +905,9 @@ static void blk_rq_timed_out_timer(struct timer_list *t)
- {
- 	struct request_queue *q = from_timer(q, t, timeout);
- 
-+	if (blk_queue_timeout_quiesced(q))
-+		return;
-
- 	kblockd_schedule_work(&q->timeout_work);
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 9710a0c338b0..b709abf3cb79 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -246,6 +246,8 @@ static void nbd_size_set(struct nbd_device *nbd, loff_t blocksize,
+ 	struct nbd_config *config = nbd->config;
+ 	config->blksize = blocksize;
+ 	config->bytesize = blocksize * nr_blocks;
++	if (nbd->task_recv != NULL)
++		nbd_size_update(nbd);
  }
-
-Thanks
-Jianchao
+ 
+ static void nbd_complete_rq(struct request *req)
+-- 
+2.14.3
