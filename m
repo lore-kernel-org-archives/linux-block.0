@@ -1,41 +1,55 @@
-Return-Path: <hch@lst.de>
-Date: Wed, 16 May 2018 19:31:58 +0200
-From: "hch@lst.de" <hch@lst.de>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+Return-Path: <prvs=667b6aabf=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"israelr@mellanox.com" <israelr@mellanox.com>,
-	"sagi@grimberg.me" <sagi@grimberg.me>,
-	"sebott@linux.ibm.com" <sebott@linux.ibm.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>,
-	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
-	"maxg@mellanox.com" <maxg@mellanox.com>,
+	"israelr@mellanox.com" <israelr@mellanox.com>, "sagi@grimberg.me"
+	<sagi@grimberg.me>, "sebott@linux.ibm.com" <sebott@linux.ibm.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "ming.lei@redhat.com"
+	<ming.lei@redhat.com>, "jianchao.w.wang@oracle.com"
+	<jianchao.w.wang@oracle.com>, "maxg@mellanox.com" <maxg@mellanox.com>,
 	"tj@kernel.org" <tj@kernel.org>
 Subject: Re: [PATCH v9 2/2] blk-mq: Rework blk-mq timeout handling again
-Message-ID: <20180516173158.GA6022@lst.de>
-References: <20180515225124.20428-1-bart.vanassche@wdc.com> <20180515225124.20428-6-bart.vanassche@wdc.com> <20180516125110.GA32078@lst.de> <8058d72fef475caffa78c962bc4220f5f8fa3dde.camel@wdc.com> <20180516162432.GA4398@lst.de> <bd17181940994eb459e84e4d5940b1af8a725ded.camel@wdc.com>
+Date: Wed, 16 May 2018 16:47:54 +0000
+Message-ID: <bd17181940994eb459e84e4d5940b1af8a725ded.camel@wdc.com>
+References: <20180515225124.20428-1-bart.vanassche@wdc.com>
+	 <20180515225124.20428-6-bart.vanassche@wdc.com>
+	 <20180516125110.GA32078@lst.de>
+	 <8058d72fef475caffa78c962bc4220f5f8fa3dde.camel@wdc.com>
+	 <20180516162432.GA4398@lst.de>
+In-Reply-To: <20180516162432.GA4398@lst.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <bd17181940994eb459e84e4d5940b1af8a725ded.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, May 16, 2018 at 04:47:54PM +0000, Bart Van Assche wrote:
-> I think your patch changes the order of changing the request state and
-> calling mod_timer(). In my patch the request state and the deadline are
-> updated first and mod_timer() is called afterwards. I think your patch
-> changes the order of these operations into the following:
-> (1) __blk_mq_start_request() sets the request deadline.
-> (2) __blk_mq_start_request() calls __blk_add_timer() which in turn calls
->     mod_timer().
-> (3) __blk_mq_start_request() changes the request state into MQ_RQ_IN_FLIGHT.
-> 
-> In the unlikely event of a significant delay between (2) and (3) it can
-> happen that the timer fires and examines and ignores the request because
-> its state differs from MQ_RQ_IN_FLIGHT. If the request for which this
-> happened times out its timeout will only be handled the next time
-> blk_mq_timeout_work() is called. Is this the behavior you intended?
-
-We can move the timer manipulation after the change easily I think.
-It would make sense to add comments explaining the ordering.
+T24gV2VkLCAyMDE4LTA1LTE2IGF0IDE4OjI0ICswMjAwLCBoY2hAbHN0LmRlIHdyb3RlOg0KPiBP
+biBXZWQsIE1heSAxNiwgMjAxOCBhdCAwNDoxNzo0MlBNICswMDAwLCBCYXJ0IFZhbiBBc3NjaGUg
+d3JvdGU6DQo+ID4gVGhlcmUgaXMgYW5vdGhlciByZWFzb24gdGhlIGRlYWRsaW5lIGlzIGluY2x1
+ZGVkIGluIHRoZSBhdG9taWMgb3BlcmF0aW9uLA0KPiA+IG5hbWVseSB0byBoYW5kbGUgcmFjZXMg
+YmV0d2VlbiB0aGUgQkxLX0VIX1JFU0VUX1RJTUVSIGNhc2UgaW4gYmxrX21xX3JxX3RpbWVkX291
+dCgpDQo+ID4gYW5kIGJsa19tcV9jb21wbGV0ZV9yZXF1ZXN0KCkuIEkgZG9uJ3QgdGhpbmsgdGhh
+dCByYWNlIGlzIGFkZHJlc3NlZCBwcm9wZXJseSBieQ0KPiA+IHlvdXIgcGF0Y2guIEkgd2lsbCBz
+ZWUgd2hhdCBJIGNhbiBkbyB0byBhZGRyZXNzIHRoYXQgcmFjZSB3aXRob3V0IHVzaW5nIDY0LWJp
+dA0KPiA+IGF0b21pYyBvcGVyYXRpb25zLg0KPiANCj4gSSBtaWdodCBiZSBtaXNzaW5nIHNvbWV0
+aGluZyBoZXJlLCBzbyBwbGVhc2UgaGVscCBtZSB1bmRlcnN0YW5kDQo+IHdoYXQgaXMgbWlzc2lu
+Zy4NCj4gDQo+IElmIHdlIHJlc3RhcnQgdGhlIHRpbWVyIGluIGJsa19tcV9ycV90aW1lZF9vdXQg
+d2UgYWxzbyBidW1wIHRoZQ0KPiBnZW5lcmF0aW9uIGF0IHRoZSBzYW1lIHRpbWUgYXMgd2UgcmVz
+ZXQgdGhlIGRlYWRsaW5lIGluIHlvdXIgb2xkDQo+IHBhdGNoLiAgV2l0aCB0aGlzIHBhdGNoIHdl
+IG9ubHkgYnVtcCB0aGUgZ2VuZXJhdGlvbiwgYnV0IHRoYXQgc2hvdWxkDQo+IGJlIGVub3VnaCB0
+byBhZGRyZXNzIHRoZSByZXN0LCBvciBub3Q/DQoNCkhlbGxvIENocmlzdG9waCwNCg0KSSB0aGlu
+ayB5b3VyIHBhdGNoIGNoYW5nZXMgdGhlIG9yZGVyIG9mIGNoYW5naW5nIHRoZSByZXF1ZXN0IHN0
+YXRlIGFuZA0KY2FsbGluZyBtb2RfdGltZXIoKS4gSW4gbXkgcGF0Y2ggdGhlIHJlcXVlc3Qgc3Rh
+dGUgYW5kIHRoZSBkZWFkbGluZSBhcmUNCnVwZGF0ZWQgZmlyc3QgYW5kIG1vZF90aW1lcigpIGlz
+IGNhbGxlZCBhZnRlcndhcmRzLiBJIHRoaW5rIHlvdXIgcGF0Y2gNCmNoYW5nZXMgdGhlIG9yZGVy
+IG9mIHRoZXNlIG9wZXJhdGlvbnMgaW50byB0aGUgZm9sbG93aW5nOg0KKDEpIF9fYmxrX21xX3N0
+YXJ0X3JlcXVlc3QoKSBzZXRzIHRoZSByZXF1ZXN0IGRlYWRsaW5lLg0KKDIpIF9fYmxrX21xX3N0
+YXJ0X3JlcXVlc3QoKSBjYWxscyBfX2Jsa19hZGRfdGltZXIoKSB3aGljaCBpbiB0dXJuIGNhbGxz
+DQogICAgbW9kX3RpbWVyKCkuDQooMykgX19ibGtfbXFfc3RhcnRfcmVxdWVzdCgpIGNoYW5nZXMg
+dGhlIHJlcXVlc3Qgc3RhdGUgaW50byBNUV9SUV9JTl9GTElHSFQuDQoNCkluIHRoZSB1bmxpa2Vs
+eSBldmVudCBvZiBhIHNpZ25pZmljYW50IGRlbGF5IGJldHdlZW4gKDIpIGFuZCAoMykgaXQgY2Fu
+DQpoYXBwZW4gdGhhdCB0aGUgdGltZXIgZmlyZXMgYW5kIGV4YW1pbmVzIGFuZCBpZ25vcmVzIHRo
+ZSByZXF1ZXN0IGJlY2F1c2UNCml0cyBzdGF0ZSBkaWZmZXJzIGZyb20gTVFfUlFfSU5fRkxJR0hU
+LiBJZiB0aGUgcmVxdWVzdCBmb3Igd2hpY2ggdGhpcw0KaGFwcGVuZWQgdGltZXMgb3V0IGl0cyB0
+aW1lb3V0IHdpbGwgb25seSBiZSBoYW5kbGVkIHRoZSBuZXh0IHRpbWUNCmJsa19tcV90aW1lb3V0
+X3dvcmsoKSBpcyBjYWxsZWQuIElzIHRoaXMgdGhlIGJlaGF2aW9yIHlvdSBpbnRlbmRlZD8NCg0K
+VGhhbmtzLA0KDQpCYXJ0Lg0K
