@@ -1,58 +1,53 @@
-Return-Path: <penguin-kernel@i-love.sakura.ne.jp>
-To: Bart.VanAssche@wdc.com, dvyukov@google.com
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        jthumshirn@suse.de, alan.christopher.jenkins@gmail.com,
-        syzbot+c4f9cebf9d651f6e54de@syzkaller.appspotmail.com,
-        martin.petersen@oracle.com, axboe@kernel.dk, dan.j.williams@intel.com,
-        hch@lst.de, oleksandr@natalenko.name, ming.lei@redhat.com,
-        martin@lichtvoll.de, hare@suse.com, syzkaller-bugs@googlegroups.com,
-        ross.zwisler@linux.intel.com, keith.busch@intel.com,
-        linux-ext4@vger.kernel.org
+Return-Path: <alan.christopher.jenkins@gmail.com>
+Return-Path: <alan.christopher.jenkins@gmail.com>
 Subject: Re: INFO: task hung in blk_queue_enter
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-References: <343bbbf6-64eb-879e-d19e-96aebb037d47@I-love.SAKURA.ne.jp>
-	<b9c33b04-08d7-87a1-3d93-d81a84e6af12@I-love.SAKURA.ne.jp>
-	<43327033306c3dd2f7c3717d64ce22415b6f3451.camel@wdc.com>
-	<CACT4Y+ZJwvROpBmKWF08fTd2AH=dO-a5+dzCzZua_vVFjiCRBw@mail.gmail.com>
-	<6db16aa3a7c56b6dcca2d10b4e100a780c740081.camel@wdc.com>
-In-Reply-To: <6db16aa3a7c56b6dcca2d10b4e100a780c740081.camel@wdc.com>
-Message-Id: <201805220652.BFH82351.SMQFFOJOtFOVLH@I-love.SAKURA.ne.jp>
-Date: Tue, 22 May 2018 06:52:21 +0900
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+ syzkaller-bugs@googlegroups.com
+Cc: syzbot <syzbot+c4f9cebf9d651f6e54de@syzkaller.appspotmail.com>,
+ linux-block@vger.kernel.org, Dan Williams <dan.j.williams@intel.com>,
+ Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+ linux-ext4@vger.kernel.org, dvyukov@google.com,
+ Bart Van Assche <bart.vanassche@wdc.com>, Christoph Hellwig <hch@lst.de>,
+ Hannes Reinecke <hare@suse.com>, Johannes Thumshirn <jthumshirn@suse.de>,
+ Keith Busch <keith.busch@intel.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Martin Steigerwald <martin@lichtvoll.de>, Ming Lei <ming.lei@redhat.com>,
+ Oleksandr Natalenko <oleksandr@natalenko.name>,
+ Ross Zwisler <ross.zwisler@linux.intel.com>
+References: <0000000000009b212b056ae6dbad@google.com>
+ <343bbbf6-64eb-879e-d19e-96aebb037d47@I-love.SAKURA.ne.jp>
+ <b9c33b04-08d7-87a1-3d93-d81a84e6af12@I-love.SAKURA.ne.jp>
+From: Alan Jenkins <alan.christopher.jenkins@gmail.com>
+Message-ID: <0609ee2b-fbb6-9122-918a-cc2172ee2cfa@gmail.com>
+Date: Wed, 16 May 2018 18:33:36 +0100
+MIME-Version: 1.0
+In-Reply-To: <b9c33b04-08d7-87a1-3d93-d81a84e6af12@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Bart Van Assche wrote:
-> On Wed, 2018-05-16 at 17:16 +0200, Dmitry Vyukov wrote:
-> > On Wed, May 16, 2018 at 4:56 PM, Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
-> > > On Wed, 2018-05-16 at 22:05 +0900, Tetsuo Handa wrote:
-> > > > diff --git a/block/blk-core.c b/block/blk-core.c
-> > > > index 85909b4..59e2496 100644
-> > > > --- a/block/blk-core.c
-> > > > +++ b/block/blk-core.c
-> > > > @@ -951,10 +951,10 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
-> > > >               smp_rmb();
-> > > > 
-> > > >               wait_event(q->mq_freeze_wq,
-> > > > -                        (atomic_read(&q->mq_freeze_depth) == 0 &&
-> > > > -                         (preempt || !blk_queue_preempt_only(q))) ||
-> > > > +                        atomic_read(&q->mq_freeze_depth) ||
-> > > > +                        (preempt || !blk_queue_preempt_only(q)) ||
-> > > >                          blk_queue_dying(q));
-> > > > -             if (blk_queue_dying(q))
-> > > > +             if (atomic_read(&q->mq_freeze_depth) || blk_queue_dying(q))
-> > > >                       return -ENODEV;
-> > > >       }
-> > > >  }
-> > > 
-> > > That change looks wrong to me.
-> > 
-> > Hi Bart,
-> > 
-> > Why does it look wrong to you?
-> 
-> Because that change conflicts with the purpose of queue freezing and also because
-> that change would inject I/O errors in code paths that shouldn't inject I/O errors.
+ > jbd2/sda1-8(PID=2271) is stuck waiting for journal commit operation.
+ > I don't know how this thread is involved to this problem.
 
-But waiting there until atomic_read(&q->mq_freeze_depth) becomes 0 is causing deadlock.
-wait_event() never returns is a bug. I think we should not wait for q->mq_freeze_depth.
+It feels like it should be a necessary link in the chain. This is the 
+filesystem underneath the loop device. If that hangs, we would expect 
+the loop device to hang, but not vice versa.
+
+AIUI, you couldn't reproduce this hang on your own machine.
+
+Don't you think, your fuzzer has just found a nice exploit for reiserfs?
+
+Alan
+
+
+(It's interesting that you found this hang just after we fixed 
+block_queue_enter() to wait in D state instead of S state.[1]  I don't 
+know syszkaller, so I assume from this it only flagged this case up 
+because of the hung task warning. I.e. syzkaller didn't have its own 
+watchdog that would have failed the test anyway.
+
+[1] the commit that caused you to CC me. "block: do not use 
+interruptible wait anywhere"
+
+https://github.com/torvalds/linux/commit/1dc3039bc87ae7d19a990c3ee71cfd8a9068f428
+
+)
