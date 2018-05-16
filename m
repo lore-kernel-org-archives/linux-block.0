@@ -1,119 +1,54 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	akpm@linux-foundation.org,
-	linux-mm@kvack.org,
-	hannes@cmpxchg.org,
-	linux-kernel@vger.kernel.org,
-	tj@kernel.org,
-	linux-fsdevel@vger.kernel.org
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 13/13] Documentation: add a doc for blk-iolatency
-Date: Tue, 29 May 2018 17:17:24 -0400
-Message-Id: <20180529211724.4531-14-josef@toxicpanda.com>
-In-Reply-To: <20180529211724.4531-1-josef@toxicpanda.com>
-References: <20180529211724.4531-1-josef@toxicpanda.com>
+Return-Path: <prvs=667b6aabf=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"israelr@mellanox.com" <israelr@mellanox.com>, "sagi@grimberg.me"
+	<sagi@grimberg.me>, "sebott@linux.ibm.com" <sebott@linux.ibm.com>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
+	"maxg@mellanox.com" <maxg@mellanox.com>, "tj@kernel.org" <tj@kernel.org>
+Subject: Re: [PATCH v9 2/2] blk-mq: Rework blk-mq timeout handling again
+Date: Wed, 16 May 2018 18:06:16 +0000
+Message-ID: <4797ba1736ce53e799a799846704a53af05d2035.camel@wdc.com>
+References: <20180515225124.20428-1-bart.vanassche@wdc.com>
+	 <20180515225124.20428-6-bart.vanassche@wdc.com>
+	 <20180516125110.GA32078@lst.de>
+	 <8058d72fef475caffa78c962bc4220f5f8fa3dde.camel@wdc.com>
+	 <20180516162432.GA4398@lst.de>
+	 <bd17181940994eb459e84e4d5940b1af8a725ded.camel@wdc.com>
+	 <20180516173158.GA6022@lst.de>
+In-Reply-To: <20180516173158.GA6022@lst.de>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-From: Josef Bacik <jbacik@fb.com>
-
-A basic documentation to describe the interface, statistics, and
-behavior of io.latency.
-
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- Documentation/blk-iolatency.txt | 80 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 80 insertions(+)
- create mode 100644 Documentation/blk-iolatency.txt
-
-diff --git a/Documentation/blk-iolatency.txt b/Documentation/blk-iolatency.txt
-new file mode 100644
-index 000000000000..9dd86f4f64b6
---- /dev/null
-+++ b/Documentation/blk-iolatency.txt
-@@ -0,0 +1,80 @@
-+Block IO Latency Controller
-+
-+Overview
-+========
-+
-+This is a cgroup v2 controller for IO workload protection.  You provide a group
-+with a latency target, and if the average latency exceeds that target the
-+controller will throttle any peers that have a lower latency target than the
-+protected workload.
-+
-+Interface
-+=========
-+
-+- io.latency.  This takes a similar format as the other controllers
-+
-+	"MAJOR:MINOR target=<target time in microseconds"
-+
-+- io.stat.  If the controller is enabled you will see extra stats in io.stat in
-+  addition to the normal ones
-+
-+	- depth=<integer>.  This is the current queue depth for the group.
-+	- delay=<time in microseconds>. This is the current delay per task that
-+	  does IO in this group.
-+	- use_delay=<integer>.  This is how deep into the delay we currently
-+	  are, the larger this number is the longer it'll take us to get back to
-+	  queue depth > 1.
-+	- total_lat_avg=<time in microseconds>.  The running average IO latency
-+	  for this group.  Running average is generally flawed, but will give an
-+	  admistrator a general idea of the overall latency they can expect for
-+	  their workload on the given disk.
-+
-+HOWTO
-+=====
-+
-+The limits are only applied at the peer level in the heirarchy.  This means that
-+in the diagram below, only groups A, B, and C will influence eachother, and
-+groups D and F will influence eachother.  Group G will influence nobody.
-+
-+			[root]
-+		/	   |		\
-+		A	   B		C
-+	       /  \        |
-+	      D    F	   G
-+
-+
-+So the ideal way to configure this is to set io.latency in groups A, B, and C.
-+Generally you do not want to set a value lower than the latency your device
-+supports.  Experiment to find the value that works best for your workload, start
-+at higher than the expected latency for your device and watch the total_lat_avg
-+value in io.stat for your workload group to get an idea of the latency you see
-+during normal operation.  Use this value as a basis for your real setting,
-+setting at 10-15% higher than the value in io.stat.  Experimentation is key here
-+because total_lat_avg is a running total, so is the "statistics" portion of
-+"lies, damned lies, and statistics."
-+
-+How Throttling Works
-+====================
-+
-+io.latency is work conserving, so as long as everybody is meeting their latency
-+target the controller doesn't do anything.  Once a group starts missing it's
-+target it begins throttling any peer group that has a higher target than itself.
-+This throttling takes 2 forms
-+
-+- Queue depth throttling.  This is the number of outstanding IO's a group is
-+  allowed to have.  We will clamp down relatively quickly, starting at no limit
-+  and going all the way down to 1 IO at a time.
-+
-+- Artificial delay induction.  There are certain types of IO that cannot be
-+  throttled without possibly adversely affecting higher priority groups.  This
-+  includes swapping and metadata IO.  These types of IO are allowed to occur
-+  normally, however they are "charged" to the originating group.  If the
-+  originating group is being throttled you will see the use_delay and delay
-+  fields in io.stat increase.  The delay value is how many microseconds that are
-+  being added to any process that runs in this group.  Because this number can
-+  grow quite large if there is a lot of swapping or metadata IO occuring we
-+  limit the individual delay events to 1 second at a time.
-+
-+Once the victimized group starts meeting it's latency target again it will start
-+unthrottling any peer groups that were throttled previous.  If the victimized
-+group simply stops doing IO the global counter will unthrottle appropriately.
--- 
-2.14.3
+T24gV2VkLCAyMDE4LTA1LTE2IGF0IDE5OjMxICswMjAwLCBoY2hAbHN0LmRlIHdyb3RlOg0KPiBP
+biBXZWQsIE1heSAxNiwgMjAxOCBhdCAwNDo0Nzo1NFBNICswMDAwLCBCYXJ0IFZhbiBBc3NjaGUg
+d3JvdGU6DQo+ID4gSSB0aGluayB5b3VyIHBhdGNoIGNoYW5nZXMgdGhlIG9yZGVyIG9mIGNoYW5n
+aW5nIHRoZSByZXF1ZXN0IHN0YXRlIGFuZA0KPiA+IGNhbGxpbmcgbW9kX3RpbWVyKCkuIEluIG15
+IHBhdGNoIHRoZSByZXF1ZXN0IHN0YXRlIGFuZCB0aGUgZGVhZGxpbmUgYXJlDQo+ID4gdXBkYXRl
+ZCBmaXJzdCBhbmQgbW9kX3RpbWVyKCkgaXMgY2FsbGVkIGFmdGVyd2FyZHMuIEkgdGhpbmsgeW91
+ciBwYXRjaA0KPiA+IGNoYW5nZXMgdGhlIG9yZGVyIG9mIHRoZXNlIG9wZXJhdGlvbnMgaW50byB0
+aGUgZm9sbG93aW5nOg0KPiA+ICgxKSBfX2Jsa19tcV9zdGFydF9yZXF1ZXN0KCkgc2V0cyB0aGUg
+cmVxdWVzdCBkZWFkbGluZS4NCj4gPiAoMikgX19ibGtfbXFfc3RhcnRfcmVxdWVzdCgpIGNhbGxz
+IF9fYmxrX2FkZF90aW1lcigpIHdoaWNoIGluIHR1cm4gY2FsbHMNCj4gPiAgICAgbW9kX3RpbWVy
+KCkuDQo+ID4gKDMpIF9fYmxrX21xX3N0YXJ0X3JlcXVlc3QoKSBjaGFuZ2VzIHRoZSByZXF1ZXN0
+IHN0YXRlIGludG8gTVFfUlFfSU5fRkxJR0hULg0KPiA+IA0KPiA+IEluIHRoZSB1bmxpa2VseSBl
+dmVudCBvZiBhIHNpZ25pZmljYW50IGRlbGF5IGJldHdlZW4gKDIpIGFuZCAoMykgaXQgY2FuDQo+
+ID4gaGFwcGVuIHRoYXQgdGhlIHRpbWVyIGZpcmVzIGFuZCBleGFtaW5lcyBhbmQgaWdub3JlcyB0
+aGUgcmVxdWVzdCBiZWNhdXNlDQo+ID4gaXRzIHN0YXRlIGRpZmZlcnMgZnJvbSBNUV9SUV9JTl9G
+TElHSFQuIElmIHRoZSByZXF1ZXN0IGZvciB3aGljaCB0aGlzDQo+ID4gaGFwcGVuZWQgdGltZXMg
+b3V0IGl0cyB0aW1lb3V0IHdpbGwgb25seSBiZSBoYW5kbGVkIHRoZSBuZXh0IHRpbWUNCj4gPiBi
+bGtfbXFfdGltZW91dF93b3JrKCkgaXMgY2FsbGVkLiBJcyB0aGlzIHRoZSBiZWhhdmlvciB5b3Ug
+aW50ZW5kZWQ/DQo+IA0KPiBXZSBjYW4gbW92ZSB0aGUgdGltZXIgbWFuaXB1bGF0aW9uIGFmdGVy
+IHRoZSBjaGFuZ2UgZWFzaWx5IEkgdGhpbmsuDQo+IEl0IHdvdWxkIG1ha2Ugc2Vuc2UgdG8gYWRk
+IGNvbW1lbnRzIGV4cGxhaW5pbmcgdGhlIG9yZGVyaW5nLg0KDQpIZWxsbyBDaHJpc3RvcGgsDQoN
+CkknbSBhZnJhaWQgdGhhdCBjb3VsZCBsZWFkIHRvIG1vZF90aW1lcigpIGJlaW5nIGNhbGxlZCBp
+biBhbm90aGVyIG9yZGVyIHRoYW4NCmludGVuZGVkLiBJZiBlLmcuIHRoZSBjb2RlIHRoYXQgaGFu
+ZGxlcyBCTEtfRUhfUkVTRVRfVElNRVIgY2hhbmdlcyB0aGUgcmVxdWVzdA0Kc3RhdGUgZmlyc3Qg
+dG8gaW4tZmxpZ2h0IGFuZCBuZXh0IGNhbGxzIG1vZF90aW1lcigpIHRoZW4gaXQgY2FuIGhhcHBl
+biB0aGF0DQphbm90aGVyIGNvbnRleHQgY29tcGxldGVzIGFuZCByZXN0YXJ0cyB0aGUgcmVxdWVz
+dCwgcmVzdWx0aW5nIGluIGEgY29uY3VycmVudA0KbW9kX3RpbWVyKCkgY2FsbC4gSSdtIG5vdCBz
+dXJlIHJlb3JkZXJpbmcgb2YgdGhlIG1vZF90aW1lcigpIGNhbGxzIHdvdWxkIHJlc3VsdA0KaW4g
+Y29ycmVjdCBiZWhhdmlvci4NCg0KQmFydC4NCg0KDQo=
