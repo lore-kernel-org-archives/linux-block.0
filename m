@@ -6,11 +6,11 @@ To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
 	kernel-team@fb.com
 Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 5/7] nbd: clear_sock on netlink disconnect
-Date: Wed, 16 May 2018 14:51:20 -0400
-Message-Id: <20180516185122.18590-5-josef@toxicpanda.com>
-In-Reply-To: <20180516185122.18590-1-josef@toxicpanda.com>
-References: <20180516185122.18590-1-josef@toxicpanda.com>
+Subject: [PATCH 3/5] nbd: clear_sock on netlink disconnect
+Date: Wed, 16 May 2018 14:36:03 -0400
+Message-Id: <20180516183605.16159-3-josef@toxicpanda.com>
+In-Reply-To: <20180516183605.16159-1-josef@toxicpanda.com>
+References: <20180516183605.16159-1-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
 From: Josef Bacik <jbacik@fb.com>
@@ -27,10 +27,10 @@ Signed-off-by: Josef Bacik <jbacik@fb.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 64278f472efe..06725ce97593 100644
+index 7e83d6364b35..bc47bae9697a 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -1768,6 +1768,7 @@ static int nbd_genl_disconnect(struct sk_buff *skb, struct genl_info *info)
+@@ -1765,6 +1765,7 @@ static int nbd_genl_disconnect(struct sk_buff *skb, struct genl_info *info)
  	}
  	mutex_lock(&nbd->config_lock);
  	nbd_disconnect(nbd);
