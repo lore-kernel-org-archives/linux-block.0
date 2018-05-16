@@ -1,56 +1,42 @@
-Return-Path: <roman.penyaev@profitbricks.com>
-Return-Path: <roman.penyaev@profitbricks.com>
-From: Roman Pen <roman.penyaev@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Or Gerlitz <ogerlitz@mellanox.com>,
-	Doug Ledford <dledford@redhat.com>,
-	Swapnil Ingle <swapnil.ingle@profitbricks.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>,
-	Jack Wang <jinpu.wang@profitbricks.com>,
-	Roman Pen <roman.penyaev@profitbricks.com>
-Subject: [PATCH v2 26/26] MAINTAINERS: Add maintainer for IBNBD/IBTRS modules
-Date: Fri, 18 May 2018 15:04:13 +0200
-Message-Id: <20180518130413.16997-27-roman.penyaev@profitbricks.com>
-In-Reply-To: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
-References: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	nbd@other.debian.org,
+	linux-block@vger.kernel.org,
+	kernel-team@fb.com
+Cc: Josef Bacik <jbacik@fb.com>
+Subject: [PATCH 5/7] nbd: clear_sock on netlink disconnect
+Date: Wed, 16 May 2018 14:51:20 -0400
+Message-Id: <20180516185122.18590-5-josef@toxicpanda.com>
+In-Reply-To: <20180516185122.18590-1-josef@toxicpanda.com>
+References: <20180516185122.18590-1-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Cc: Danil Kipnis <danil.kipnis@profitbricks.com>
-Cc: Jack Wang <jinpu.wang@profitbricks.com>
----
- MAINTAINERS | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+From: Josef Bacik <jbacik@fb.com>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 92be777d060a..e5a001bd0f05 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -6786,6 +6786,20 @@ IBM ServeRAID RAID DRIVER
- S:	Orphan
- F:	drivers/scsi/ips.*
- 
-+IBNBD BLOCK DRIVERS
-+M:	IBNBD/IBTRS Storage Team <ibnbd@profitbricks.com>
-+L:	linux-block@vger.kernel.org
-+S:	Maintained
-+T:	git git://github.com/profitbricks/ibnbd.git
-+F:	drivers/block/ibnbd/
-+
-+IBTRS TRANSPORT DRIVERS
-+M:	IBNBD/IBTRS Storage Team <ibnbd@profitbricks.com>
-+L:	linux-rdma@vger.kernel.org
-+S:	Maintained
-+T:	git git://github.com/profitbricks/ibnbd.git
-+F:	drivers/infiniband/ulp/ibtrs/
-+
- ICH LPC AND GPIO DRIVER
- M:	Peter Tyser <ptyser@xes-inc.com>
- S:	Maintained
+This is what the ioctl based nbd disconnect does as well.  Without this
+the device will just sit there and wait for the connection to go away
+(or IO to occur) before the device gets torn down.  Instead clear
+everything up on our end so the configuration goes away as quickly as
+possible.
+
+Signed-off-by: Josef Bacik <jbacik@fb.com>
+---
+ drivers/block/nbd.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 64278f472efe..06725ce97593 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1768,6 +1768,7 @@ static int nbd_genl_disconnect(struct sk_buff *skb, struct genl_info *info)
+ 	}
+ 	mutex_lock(&nbd->config_lock);
+ 	nbd_disconnect(nbd);
++	nbd_clear_sock(nbd);
+ 	mutex_unlock(&nbd->config_lock);
+ 	if (test_and_clear_bit(NBD_HAS_CONFIG_REF,
+ 			       &nbd->config->runtime_flags))
 -- 
-2.13.1
+2.14.3
