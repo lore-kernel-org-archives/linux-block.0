@@ -1,34 +1,31 @@
-Return-Path: <huhai@kylinos.cn>
-From: huhai <huhai@kylinos.cn>
-To: axboe@kernel.dk
-Cc: ming.lei@redhat.com,
-	linux-block@vger.kernel.org
-Subject: [PATCH] blk-mq: remove wrong 'unlikely' checks
-Date: Tue, 22 May 2018 17:39:34 +0800
-Message-Id: <20180522093934.20849-1-huhai@kylinos.cn>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: blk-mq: for sync case, whether it is mq or sq make_request
+ instances, we should send the request directly
+To: =?UTF-8?B?6IOh5rW3?= <huhai@kylinos.cn>,
+ linux-block <linux-block@vger.kernel.org>
+References: <tencent_4D4715133E9C8F2D37E3ACAF@qq.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <73bcb98c-2e0a-123b-5b45-6c7fd71f3595@kernel.dk>
+Date: Wed, 16 May 2018 08:15:57 -0600
+MIME-Version: 1.0
+In-Reply-To: <tencent_4D4715133E9C8F2D37E3ACAF@qq.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-When dispatch_rq_from_ctx is called, in the vast majority of cases
-the ctx->rq_list is not empty
+On 5/15/18 9:42 PM, 胡海 wrote:
+> Author: huhai <huhai@kylinos.cn>
+> Date:   Wed May 16 10:34:22 2018 +0800
+> 
+>     blk-mq: for sync case, whether it is mq or sq make_request instances, we should send the request directly
+>     
+>     For sq make_request instances, we should issue sync request directly too, 
+>     otherwise it will break down the semantics of sync request, 
+>     the current code logic is to send synchronous requests asynchronously.
 
-Fixes: b347689ffbca ("blk-mq-sched: improve dispatching from sw queue")
-Signed-off-by: huhai <huhai@kylinos.cn>
----
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+It doesn't break the semantics of a sync request. The reason we don't do
+it on single queue hardware is for efficiency reasons. On multiple queue
+hardware, we can efficiently have multiple processes doing sync issue,
+that isn't the case on single queue hardware.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4cbfd784e837..df928200b17e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1036,7 +1036,7 @@ static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr,
- 	struct blk_mq_ctx *ctx = hctx->ctxs[bitnr];
- 
- 	spin_lock(&ctx->lock);
--	if (unlikely(!list_empty(&ctx->rq_list))) {
-+	if (!list_empty(&ctx->rq_list)) {
- 		dispatch_data->rq = list_entry_rq(ctx->rq_list.next);
- 		list_del_init(&dispatch_data->rq->queuelist);
- 		if (list_empty(&ctx->rq_list))
 -- 
-2.17.0
+Jens Axboe
