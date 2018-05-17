@@ -1,47 +1,73 @@
-Return-Path: <prvs=668afa802=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "josef@toxicpanda.com" <josef@toxicpanda.com>
-CC: "kernel-team@fb.com" <kernel-team@fb.com>, "jbacik@fb.com"
-	<jbacik@fb.com>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>, "nbd@other.debian.org"
-	<nbd@other.debian.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+Date: Thu, 17 May 2018 14:41:19 -0400
+From: Josef Bacik <josef@toxicpanda.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "kernel-team@fb.com" <kernel-team@fb.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"nbd@other.debian.org" <nbd@other.debian.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"jbacik@fb.com" <jbacik@fb.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
 Subject: Re: [PATCH 2/2] nbd: don't start req until after the dead connection
  logic
-Date: Thu, 17 May 2018 18:52:59 +0000
-Message-ID: <2f782b49489162b626d6b6c65c796926cbf6720f.camel@wdc.com>
+Message-ID: <20180517184117.v3tqqg4utvs6imcv@destiny>
 References: <1508444519-8751-1-git-send-email-josef@toxicpanda.com>
-	 <1508444519-8751-2-git-send-email-josef@toxicpanda.com>
-	 <18f4a25c14a0803c87bf465c686f0274f558818a.camel@wdc.com>
-	 <20180517184117.v3tqqg4utvs6imcv@destiny>
-In-Reply-To: <20180517184117.v3tqqg4utvs6imcv@destiny>
-Content-Type: text/plain; charset="utf-8"
+ <1508444519-8751-2-git-send-email-josef@toxicpanda.com>
+ <18f4a25c14a0803c87bf465c686f0274f558818a.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <18f4a25c14a0803c87bf465c686f0274f558818a.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVGh1LCAyMDE4LTA1LTE3IGF0IDE0OjQxIC0wNDAwLCBKb3NlZiBCYWNpayB3cm90ZToNCj4g
-WXVwIEkgY2FuIHRlbGwgeW91IHdoeSwgb24gNC4xMSB3aGVyZSBJIG9yaWdpbmFsbHkgZGlkIHRo
-aXMgd29yaw0KPiBfX2Jsa19tcV9yZXF1ZXVlX3JlcXVlc3QoKSBkaWQgdGhpcw0KPiANCj4gc3Rh
-dGljIHZvaWQgX19ibGtfbXFfcmVxdWV1ZV9yZXF1ZXN0KHN0cnVjdCByZXF1ZXN0ICpycSkNCj4g
-ew0KPiAgICAgICAgIHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxID0gcnEtPnE7DQo+IA0KPiAgICAg
-ICAgIHRyYWNlX2Jsb2NrX3JxX3JlcXVldWUocSwgcnEpOw0KPiAgICAgICAgIHJxX3Fvc19yZXF1
-ZXVlKHEsICZycS0+aXNzdWVfc3RhdCk7DQo+ICAgICAgICAgYmxrX21xX3NjaGVkX3JlcXVldWVf
-cmVxdWVzdChycSk7DQo+IA0KPiAgICAgICAgIGlmICh0ZXN0X2FuZF9jbGVhcl9iaXQoUkVRX0FU
-T01fU1RBUlRFRCwgJnJxLT5hdG9taWNfZmxhZ3MpKSB7DQo+ICAgICAgICAgICAgICAgICBpZiAo
-cS0+ZG1hX2RyYWluX3NpemUgJiYgYmxrX3JxX2J5dGVzKHJxKSkNCj4gICAgICAgICAgICAgICAg
-ICAgICAgICAgcnEtPm5yX3BoeXNfc2VnbWVudHMtLTsNCj4gICAgICAgICB9DQo+IH0NCj4gDQo+
-IFNvIGl0IHdhcyBjbGVhcmluZyB0aGUgc3RhcnRlZCBwYXJ0IHdoZW4gaXQgZGlkIHRoZSByZXF1
-ZXVlLiAgSWYgdGhhdCdzIG5vdCB3aGF0DQo+IEknbSBzdXBwb3NlZCB0byBiZSBkb2luZyBhbnlt
-b3JlIHRoZW4gSSBjYW4gc2VuZCBhIHBhdGNoIHRvIGZpeCBpdC4gIFdoYXQgaXMNCj4gc3VwcG9z
-ZWQgdG8gYmUgZG9uZSBpZiBJIGRpZCBhbHJlYWR5IGRvIGJsa19tcV9zdGFydF9yZXF1ZXN0LCBi
-ZWNhdXNlIEkgY2FuDQo+IGF2b2lkIGRvaW5nIHRoZSBzdGFydCB1bnRpbCBhZnRlciB0aGF0IGNo
-dW5rIG9mIGNvZGUsIGJ1dCB0aGVyZSdzIGEgcGFydCBmdXJ0aGVyDQo+IGRvd24gdGhhdCBuZWVk
-cyB0byBoYXZlIHN0YXJ0IGRvbmUgYmVmb3JlIHdlIHJlYWNoIGl0LCBzbyBJJ2xsIGhhdmUgdG8g
-ZG8NCj4gd2hhdGV2ZXIgdGhlIHNwZWNpYWwgdGhpbmcgaXMgbm93IHRoZXJlLiAgVGhhbmtzLA0K
-DQpIZWxsbyBKb3NlZiwNCg0KQWZ0ZXIgaGF2aW5nIGhhZCBhIGNsb3NlciBsb29rIEkgdGhpbmsg
-Y2FsbGluZyBibGtfbXFfc3RhcnRfcmVxdWVzdCgpIGJlZm9yZQ0KYmxrX21xX3JlcXVldWVfcmVx
-dWVzdCgpIGlzIGZpbmUgYW55d2F5LiBUaGUgdjQuMTYgYmxvY2sgbGF5ZXIgY29yZSBuYW1lbHkg
-ZGVmZXJzDQp0aW1lb3V0IHByb2Nlc3NpbmcgdW50aWwgYWZ0ZXIgLnF1ZXVlX3JxKCkgaGFzIHJl
-dHVybmVkLiBTbyB0aGUgdGltZW91dCBjb2RlDQpzaG91bGRuJ3Qgc2VlIHRoZSByZXF1ZXN0cyBm
-b3Igd2hpY2ggYm90aCBibGtfbXFfc3RhcnRfcmVxdWVzdCgpIGFuZA0KYmxrX21xX3JlcXVldWVf
-cmVxdWVzdCgpIGFyZSBjYWxsZWQgZnJvbSBpbnNpZGUgLnF1ZXVlX3JxKCkuIEkgd2lsbCBtYWtl
-IHN1cmUgdGhpcw0KYmVoYXZpb3IgaXMgcHJlc2VydmVkLg0KDQpCYXJ0Lg0KDQoNCg0K
+On Thu, May 17, 2018 at 06:21:40PM +0000, Bart Van Assche wrote:
+> On Thu, 2017-10-19 at 16:21 -0400, Josef Bacik wrote:
+> > +	blk_mq_start_request(req);
+> >  	if (unlikely(nsock->pending && nsock->pending != req)) {
+> >  		blk_mq_requeue_request(req, true);
+> >  		ret = 0;
+> 
+> (replying to an e-mail from seven months ago)
+> 
+> Hello Josef,
+> 
+> Are you aware that the nbd driver is one of the very few block drivers that
+> calls blk_mq_requeue_request() after a request has been started? I think that
+> can lead to the block layer core to undesired behavior, e.g. that the timeout
+> handler fires concurrently with a request being reinstered. Can you or a
+> colleague have a look at this? I would like to add the following code to the
+> block layer core and I think that the nbd driver would trigger this warning:
+> 
+>  void blk_mq_requeue_request(struct request *rq, bool kick_requeue_list)
+>  {
+> +       WARN_ON_ONCE(old_state != MQ_RQ_COMPLETE);
+> +
+>         __blk_mq_requeue_request(rq);
+> 
+
+Yup I can tell you why, on 4.11 where I originally did this work
+__blk_mq_requeue_request() did this
+
+static void __blk_mq_requeue_request(struct request *rq)
+{
+        struct request_queue *q = rq->q;
+
+        trace_block_rq_requeue(q, rq);
+        rq_qos_requeue(q, &rq->issue_stat);
+        blk_mq_sched_requeue_request(rq);
+
+        if (test_and_clear_bit(REQ_ATOM_STARTED, &rq->atomic_flags)) {
+                if (q->dma_drain_size && blk_rq_bytes(rq))
+                        rq->nr_phys_segments--;
+        }
+}
+
+So it was clearing the started part when it did the requeue.  If that's not what
+I'm supposed to be doing anymore then I can send a patch to fix it.  What is
+supposed to be done if I did already do blk_mq_start_request, because I can
+avoid doing the start until after that chunk of code, but there's a part further
+down that needs to have start done before we reach it, so I'll have to do
+whatever the special thing is now there.  Thanks,
+
+Josef
