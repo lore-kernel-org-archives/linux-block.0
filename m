@@ -1,60 +1,47 @@
-Return-Path: <BATV+e0efdd19ce80d487e3da+5372+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "Ed L. Cashin" <ed.cashin@acm.org>,
-	Geoff Levand <geoff@infradead.org>,
-	Maxim Levitsky <maximlevitsky@gmail.com>,
-	linux-block@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-mtd@lists.infradead.org,
-	sparclinux@vger.kernel.org
-Subject: [PATCH 6/7] jsflash: handle highmem pages
-Date: Wed,  9 May 2018 15:59:47 +0200
-Message-Id: <20180509135948.20329-7-hch@lst.de>
-In-Reply-To: <20180509135948.20329-1-hch@lst.de>
-References: <20180509135948.20329-1-hch@lst.de>
+Return-Path: <prvs=668afa802=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "josef@toxicpanda.com" <josef@toxicpanda.com>
+CC: "kernel-team@fb.com" <kernel-team@fb.com>, "jbacik@fb.com"
+	<jbacik@fb.com>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>, "nbd@other.debian.org"
+	<nbd@other.debian.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH 2/2] nbd: don't start req until after the dead connection
+ logic
+Date: Thu, 17 May 2018 18:52:59 +0000
+Message-ID: <2f782b49489162b626d6b6c65c796926cbf6720f.camel@wdc.com>
+References: <1508444519-8751-1-git-send-email-josef@toxicpanda.com>
+	 <1508444519-8751-2-git-send-email-josef@toxicpanda.com>
+	 <18f4a25c14a0803c87bf465c686f0274f558818a.camel@wdc.com>
+	 <20180517184117.v3tqqg4utvs6imcv@destiny>
+In-Reply-To: <20180517184117.v3tqqg4utvs6imcv@destiny>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Just kmap the bio single page payload before processing it.
-
-(and yes, now highmem on sparc32 anyway, but kmap_(un)map atomic are nops,
-so this gives the right example)
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/sbus/char/jsflash.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/sbus/char/jsflash.c b/drivers/sbus/char/jsflash.c
-index 14f377ac1280..8520587b8d09 100644
---- a/drivers/sbus/char/jsflash.c
-+++ b/drivers/sbus/char/jsflash.c
-@@ -215,6 +215,7 @@ static void jsfd_request(void)
- 		unsigned long offset = blk_rq_pos(req) << 9;
- 		size_t len = blk_rq_cur_bytes(req);
- 		blk_status_t err = BLK_STS_IOERR;
-+		void *p;
- 
- 		if ((offset + len) > jdp->dsize)
- 			goto end;
-@@ -229,7 +230,9 @@ static void jsfd_request(void)
- 			goto end;
- 		}
- 
--		jsfd_read(bio_data(req->bio), jdp->dbase + offset, len);
-+		p = kmap_atomic(bio_page(bio)) + bio_offset(bio);
-+		jsfd_read(p, jdp->dbase + offset, len);
-+		kunmap_atomic(p);
- 		err = BLK_STS_OK;
- 	end:
- 		if (!__blk_end_request_cur(req, err))
-@@ -592,7 +595,6 @@ static int jsfd_init(void)
- 			put_disk(disk);
- 			goto out;
- 		}
--		blk_queue_bounce_limit(disk->queue, BLK_BOUNCE_HIGH);
- 		jsfd_disk[i] = disk;
- 	}
- 
--- 
-2.17.0
+T24gVGh1LCAyMDE4LTA1LTE3IGF0IDE0OjQxIC0wNDAwLCBKb3NlZiBCYWNpayB3cm90ZToNCj4g
+WXVwIEkgY2FuIHRlbGwgeW91IHdoeSwgb24gNC4xMSB3aGVyZSBJIG9yaWdpbmFsbHkgZGlkIHRo
+aXMgd29yaw0KPiBfX2Jsa19tcV9yZXF1ZXVlX3JlcXVlc3QoKSBkaWQgdGhpcw0KPiANCj4gc3Rh
+dGljIHZvaWQgX19ibGtfbXFfcmVxdWV1ZV9yZXF1ZXN0KHN0cnVjdCByZXF1ZXN0ICpycSkNCj4g
+ew0KPiAgICAgICAgIHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxID0gcnEtPnE7DQo+IA0KPiAgICAg
+ICAgIHRyYWNlX2Jsb2NrX3JxX3JlcXVldWUocSwgcnEpOw0KPiAgICAgICAgIHJxX3Fvc19yZXF1
+ZXVlKHEsICZycS0+aXNzdWVfc3RhdCk7DQo+ICAgICAgICAgYmxrX21xX3NjaGVkX3JlcXVldWVf
+cmVxdWVzdChycSk7DQo+IA0KPiAgICAgICAgIGlmICh0ZXN0X2FuZF9jbGVhcl9iaXQoUkVRX0FU
+T01fU1RBUlRFRCwgJnJxLT5hdG9taWNfZmxhZ3MpKSB7DQo+ICAgICAgICAgICAgICAgICBpZiAo
+cS0+ZG1hX2RyYWluX3NpemUgJiYgYmxrX3JxX2J5dGVzKHJxKSkNCj4gICAgICAgICAgICAgICAg
+ICAgICAgICAgcnEtPm5yX3BoeXNfc2VnbWVudHMtLTsNCj4gICAgICAgICB9DQo+IH0NCj4gDQo+
+IFNvIGl0IHdhcyBjbGVhcmluZyB0aGUgc3RhcnRlZCBwYXJ0IHdoZW4gaXQgZGlkIHRoZSByZXF1
+ZXVlLiAgSWYgdGhhdCdzIG5vdCB3aGF0DQo+IEknbSBzdXBwb3NlZCB0byBiZSBkb2luZyBhbnlt
+b3JlIHRoZW4gSSBjYW4gc2VuZCBhIHBhdGNoIHRvIGZpeCBpdC4gIFdoYXQgaXMNCj4gc3VwcG9z
+ZWQgdG8gYmUgZG9uZSBpZiBJIGRpZCBhbHJlYWR5IGRvIGJsa19tcV9zdGFydF9yZXF1ZXN0LCBi
+ZWNhdXNlIEkgY2FuDQo+IGF2b2lkIGRvaW5nIHRoZSBzdGFydCB1bnRpbCBhZnRlciB0aGF0IGNo
+dW5rIG9mIGNvZGUsIGJ1dCB0aGVyZSdzIGEgcGFydCBmdXJ0aGVyDQo+IGRvd24gdGhhdCBuZWVk
+cyB0byBoYXZlIHN0YXJ0IGRvbmUgYmVmb3JlIHdlIHJlYWNoIGl0LCBzbyBJJ2xsIGhhdmUgdG8g
+ZG8NCj4gd2hhdGV2ZXIgdGhlIHNwZWNpYWwgdGhpbmcgaXMgbm93IHRoZXJlLiAgVGhhbmtzLA0K
+DQpIZWxsbyBKb3NlZiwNCg0KQWZ0ZXIgaGF2aW5nIGhhZCBhIGNsb3NlciBsb29rIEkgdGhpbmsg
+Y2FsbGluZyBibGtfbXFfc3RhcnRfcmVxdWVzdCgpIGJlZm9yZQ0KYmxrX21xX3JlcXVldWVfcmVx
+dWVzdCgpIGlzIGZpbmUgYW55d2F5LiBUaGUgdjQuMTYgYmxvY2sgbGF5ZXIgY29yZSBuYW1lbHkg
+ZGVmZXJzDQp0aW1lb3V0IHByb2Nlc3NpbmcgdW50aWwgYWZ0ZXIgLnF1ZXVlX3JxKCkgaGFzIHJl
+dHVybmVkLiBTbyB0aGUgdGltZW91dCBjb2RlDQpzaG91bGRuJ3Qgc2VlIHRoZSByZXF1ZXN0cyBm
+b3Igd2hpY2ggYm90aCBibGtfbXFfc3RhcnRfcmVxdWVzdCgpIGFuZA0KYmxrX21xX3JlcXVldWVf
+cmVxdWVzdCgpIGFyZSBjYWxsZWQgZnJvbSBpbnNpZGUgLnF1ZXVlX3JxKCkuIEkgd2lsbCBtYWtl
+IHN1cmUgdGhpcw0KYmVoYXZpb3IgaXMgcHJlc2VydmVkLg0KDQpCYXJ0Lg0KDQoNCg0K
