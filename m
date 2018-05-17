@@ -1,140 +1,93 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-Date: Fri, 18 May 2018 05:06:36 -0400
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "mingo@kernel.org" <mingo@kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+Return-Path: <prvs=668afa802=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "mingo@kernel.org" <mingo@kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
+	"kent.overstreet@gmail.com" <kent.overstreet@gmail.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
 Subject: Re: [PATCH 00/10] Misc block layer patches for bcachefs
-Message-ID: <20180518090636.GA14738@kmo-pixel>
+Date: Thu, 17 May 2018 20:54:57 +0000
+Message-ID: <a26feed52ec6ed371b3d3b0567e31d1ff4fc31cb.camel@wdc.com>
 References: <20180509013358.16399-1-kent.overstreet@gmail.com>
- <a26feed52ec6ed371b3d3b0567e31d1ff4fc31cb.camel@wdc.com>
+In-Reply-To: <20180509013358.16399-1-kent.overstreet@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <a26feed52ec6ed371b3d3b0567e31d1ff4fc31cb.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, May 17, 2018 at 08:54:57PM +0000, Bart Van Assche wrote:
-> On Tue, 2018-05-08 at 21:33 -0400, Kent Overstreet wrote:
-> > [ ... ]
-> 
-> Hello Kent,
-> 
-> With Jens' latest for-next branch I hit the kernel warning shown below. Can
-> you have a look?
-
-Any hints on how to reproduce it?
-
-> Thanks,
-> 
-> Bart.
-> 
-> 
-> ==================================================================
-> BUG: KASAN: use-after-free in bio_advance+0x110/0x1b0
-> Read of size 4 at addr ffff880156c5e6d0 by task ksoftirqd/10/72
-> 
-> CPU: 10 PID: 72 Comm: ksoftirqd/10 Tainted: G        W         4.17.0-rc4-dbg+ #5
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.0.0-prebuilt.qemu-project.org 04/01/2014
-> Call Trace:
-> dump_stack+0x9a/0xeb
-> print_address_description+0x65/0x270
-> kasan_report+0x232/0x350
-> bio_advance+0x110/0x1b0
-> blk_update_request+0x9d/0x5a0
-> scsi_end_request+0x4c/0x300 [scsi_mod]
-> scsi_io_completion+0x71e/0xa40 [scsi_mod]
-> __blk_mq_complete_request+0x143/0x220
-> srp_recv_done+0x454/0x1100 [ib_srp]
-> __ib_process_cq+0x9a/0xf0 [ib_core]
-> ib_poll_handler+0x2d/0x90 [ib_core]
-> irq_poll_softirq+0xe5/0x1e0
-> __do_softirq+0x112/0x5f0
-> run_ksoftirqd+0x29/0x50
-> smpboot_thread_fn+0x30f/0x410
-> kthread+0x1b2/0x1d0
-> ret_from_fork+0x24/0x30
-> 
-> Allocated by task 1356:
-> kasan_kmalloc+0xa0/0xd0
-> kmem_cache_alloc+0xed/0x320
-> mempool_alloc+0xc6/0x210
-> bio_alloc_bioset+0x128/0x2d0
-> submit_bh_wbc+0x95/0x2d0
-> __block_write_full_page+0x2a6/0x5c0
-> __writepage+0x37/0x80
-> write_cache_pages+0x305/0x7c0
-> generic_writepages+0xb9/0x110
-> do_writepages+0x96/0x180
-> __filemap_fdatawrite_range+0x162/0x1b0
-> file_write_and_wait_range+0x4d/0xb0
-> blkdev_fsync+0x3c/0x70
-> do_fsync+0x33/0x60
-> __x64_sys_fsync+0x18/0x20
-> do_syscall_64+0x6d/0x220
-> entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> 
-> Freed by task 72:
-> __kasan_slab_free+0x130/0x180
-> kmem_cache_free+0xcd/0x380
-> blk_update_request+0xc4/0x5a0
-> blk_update_request+0xc4/0x5a0
-> scsi_end_request+0x4c/0x300 [scsi_mod]
-> scsi_io_completion+0x71e/0xa40 [scsi_mod]
-> __blk_mq_complete_request+0x143/0x220
-> srp_recv_done+0x454/0x1100 [ib_srp]
-> __ib_process_cq+0x9a/0xf0 [ib_core]
-> ib_poll_handler+0x2d/0x90 [ib_core]
-> irq_poll_softirq+0xe5/0x1e0
-> __do_softirq+0x112/0x5f0
-> 
-> The buggy address belongs to the object at ffff880156c5e640
-> which belongs to the cache bio-0 of size 200
-> The buggy address is located 144 bytes inside of
-> 200-byte region [ffff880156c5e640, ffff880156c5e708)
-> The buggy address belongs to the page:
-> page:ffffea00055b1780 count:1 mapcount:0 mapping:0000000000000000 index:0x0 compound_mapcount: 0
-> ib_srpt:srpt_zerolength_write: ib_srpt 10.196.159.179-24: queued zerolength write
-> flags: 0x8000000000008100(slab|head)
-> raw: 8000000000008100 0000000000000000 0000000000000000 0000000100190019
-> raw: ffffea000543a800 0000000200000002 ffff88015a8f3a00 0000000000000000
-> ib_srpt:srpt_zerolength_write: ib_srpt 10.196.159.179-22: queued zerolength write
-> page dumped because: kasan: bad access detected
-> ib_srpt:srpt_zerolength_write: ib_srpt 10.196.159.179-20: queued zerolength write
-> 
-> Memory state around the buggy address:
-> ib_srpt:srpt_zerolength_write: ib_srpt 10.196.159.179-18: queued zerolength write
-> ffff880156c5e580: 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc
-> ib_srpt:srpt_zerolength_write_done: ib_srpt 10.196.159.179-24 wc->status 5
-> ffff880156c5e600: fc fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb
-> ib_srpt:srpt_zerolength_write_done: ib_srpt 10.196.159.179-22 wc->status 5
-> >ffff880156c5e680: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> ib_srpt:srpt_zerolength_write_done: ib_srpt 10.196.159.179-20 wc->status 5
->                                                 ^
-> ffff880156c5e700: fb fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-> ib_srpt:srpt_zerolength_write_done: ib_srpt 10.196.159.179-18 wc->status 5
-> ffff880156c5e780: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> ib_srpt:srpt_release_channel_work: ib_srpt 10.196.159.179-24
-> ==================================================================
-> 
-> (gdb) list *(bio_advance+0x110)
-> 0xffffffff81450090 is in bio_advance (./include/linux/bvec.h:82).
-> 77                      iter->bi_size = 0;
-> 78                      return false;
-> 79              }
-> 80
-> 81              while (bytes) {
-> 82                      unsigned iter_len = bvec_iter_len(bv, *iter);
-> 83                      unsigned len = min(bytes, iter_len);
-> 84
-> 85                      bytes -= len;
-> 86                      iter->bi_size -= len;
-> 
-> 
-> 
-> 
-> 
-> 
+T24gVHVlLCAyMDE4LTA1LTA4IGF0IDIxOjMzIC0wNDAwLCBLZW50IE92ZXJzdHJlZXQgd3JvdGU6
+DQo+IFsgLi4uIF0NCg0KSGVsbG8gS2VudCwNCg0KV2l0aCBKZW5zJyBsYXRlc3QgZm9yLW5leHQg
+YnJhbmNoIEkgaGl0IHRoZSBrZXJuZWwgd2FybmluZyBzaG93biBiZWxvdy4gQ2FuDQp5b3UgaGF2
+ZSBhIGxvb2s/DQoNClRoYW5rcywNCg0KQmFydC4NCg0KDQo9PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCkJVRzogS0FTQU46
+IHVzZS1hZnRlci1mcmVlIGluIGJpb19hZHZhbmNlKzB4MTEwLzB4MWIwDQpSZWFkIG9mIHNpemUg
+NCBhdCBhZGRyIGZmZmY4ODAxNTZjNWU2ZDAgYnkgdGFzayBrc29mdGlycWQvMTAvNzINCg0KQ1BV
+OiAxMCBQSUQ6IDcyIENvbW06IGtzb2Z0aXJxZC8xMCBUYWludGVkOiBHICAgICAgICBXICAgICAg
+ICAgNC4xNy4wLXJjNC1kYmcrICM1DQpIYXJkd2FyZSBuYW1lOiBRRU1VIFN0YW5kYXJkIFBDIChR
+MzUgKyBJQ0g5LCAyMDA5KSwgQklPUyAxLjAuMC1wcmVidWlsdC5xZW11LXByb2plY3Qub3JnIDA0
+LzAxLzIwMTQNCkNhbGwgVHJhY2U6DQpkdW1wX3N0YWNrKzB4OWEvMHhlYg0KcHJpbnRfYWRkcmVz
+c19kZXNjcmlwdGlvbisweDY1LzB4MjcwDQprYXNhbl9yZXBvcnQrMHgyMzIvMHgzNTANCmJpb19h
+ZHZhbmNlKzB4MTEwLzB4MWIwDQpibGtfdXBkYXRlX3JlcXVlc3QrMHg5ZC8weDVhMA0Kc2NzaV9l
+bmRfcmVxdWVzdCsweDRjLzB4MzAwIFtzY3NpX21vZF0NCnNjc2lfaW9fY29tcGxldGlvbisweDcx
+ZS8weGE0MCBbc2NzaV9tb2RdDQpfX2Jsa19tcV9jb21wbGV0ZV9yZXF1ZXN0KzB4MTQzLzB4MjIw
+DQpzcnBfcmVjdl9kb25lKzB4NDU0LzB4MTEwMCBbaWJfc3JwXQ0KX19pYl9wcm9jZXNzX2NxKzB4
+OWEvMHhmMCBbaWJfY29yZV0NCmliX3BvbGxfaGFuZGxlcisweDJkLzB4OTAgW2liX2NvcmVdDQpp
+cnFfcG9sbF9zb2Z0aXJxKzB4ZTUvMHgxZTANCl9fZG9fc29mdGlycSsweDExMi8weDVmMA0KcnVu
+X2tzb2Z0aXJxZCsweDI5LzB4NTANCnNtcGJvb3RfdGhyZWFkX2ZuKzB4MzBmLzB4NDEwDQprdGhy
+ZWFkKzB4MWIyLzB4MWQwDQpyZXRfZnJvbV9mb3JrKzB4MjQvMHgzMA0KDQpBbGxvY2F0ZWQgYnkg
+dGFzayAxMzU2Og0Ka2FzYW5fa21hbGxvYysweGEwLzB4ZDANCmttZW1fY2FjaGVfYWxsb2MrMHhl
+ZC8weDMyMA0KbWVtcG9vbF9hbGxvYysweGM2LzB4MjEwDQpiaW9fYWxsb2NfYmlvc2V0KzB4MTI4
+LzB4MmQwDQpzdWJtaXRfYmhfd2JjKzB4OTUvMHgyZDANCl9fYmxvY2tfd3JpdGVfZnVsbF9wYWdl
+KzB4MmE2LzB4NWMwDQpfX3dyaXRlcGFnZSsweDM3LzB4ODANCndyaXRlX2NhY2hlX3BhZ2VzKzB4
+MzA1LzB4N2MwDQpnZW5lcmljX3dyaXRlcGFnZXMrMHhiOS8weDExMA0KZG9fd3JpdGVwYWdlcysw
+eDk2LzB4MTgwDQpfX2ZpbGVtYXBfZmRhdGF3cml0ZV9yYW5nZSsweDE2Mi8weDFiMA0KZmlsZV93
+cml0ZV9hbmRfd2FpdF9yYW5nZSsweDRkLzB4YjANCmJsa2Rldl9mc3luYysweDNjLzB4NzANCmRv
+X2ZzeW5jKzB4MzMvMHg2MA0KX194NjRfc3lzX2ZzeW5jKzB4MTgvMHgyMA0KZG9fc3lzY2FsbF82
+NCsweDZkLzB4MjIwDQplbnRyeV9TWVNDQUxMXzY0X2FmdGVyX2h3ZnJhbWUrMHg0OS8weGJlDQoN
+CkZyZWVkIGJ5IHRhc2sgNzI6DQpfX2thc2FuX3NsYWJfZnJlZSsweDEzMC8weDE4MA0Ka21lbV9j
+YWNoZV9mcmVlKzB4Y2QvMHgzODANCmJsa191cGRhdGVfcmVxdWVzdCsweGM0LzB4NWEwDQpibGtf
+dXBkYXRlX3JlcXVlc3QrMHhjNC8weDVhMA0Kc2NzaV9lbmRfcmVxdWVzdCsweDRjLzB4MzAwIFtz
+Y3NpX21vZF0NCnNjc2lfaW9fY29tcGxldGlvbisweDcxZS8weGE0MCBbc2NzaV9tb2RdDQpfX2Js
+a19tcV9jb21wbGV0ZV9yZXF1ZXN0KzB4MTQzLzB4MjIwDQpzcnBfcmVjdl9kb25lKzB4NDU0LzB4
+MTEwMCBbaWJfc3JwXQ0KX19pYl9wcm9jZXNzX2NxKzB4OWEvMHhmMCBbaWJfY29yZV0NCmliX3Bv
+bGxfaGFuZGxlcisweDJkLzB4OTAgW2liX2NvcmVdDQppcnFfcG9sbF9zb2Z0aXJxKzB4ZTUvMHgx
+ZTANCl9fZG9fc29mdGlycSsweDExMi8weDVmMA0KDQpUaGUgYnVnZ3kgYWRkcmVzcyBiZWxvbmdz
+IHRvIHRoZSBvYmplY3QgYXQgZmZmZjg4MDE1NmM1ZTY0MA0Kd2hpY2ggYmVsb25ncyB0byB0aGUg
+Y2FjaGUgYmlvLTAgb2Ygc2l6ZSAyMDANClRoZSBidWdneSBhZGRyZXNzIGlzIGxvY2F0ZWQgMTQ0
+IGJ5dGVzIGluc2lkZSBvZg0KMjAwLWJ5dGUgcmVnaW9uIFtmZmZmODgwMTU2YzVlNjQwLCBmZmZm
+ODgwMTU2YzVlNzA4KQ0KVGhlIGJ1Z2d5IGFkZHJlc3MgYmVsb25ncyB0byB0aGUgcGFnZToNCnBh
+Z2U6ZmZmZmVhMDAwNTViMTc4MCBjb3VudDoxIG1hcGNvdW50OjAgbWFwcGluZzowMDAwMDAwMDAw
+MDAwMDAwIGluZGV4OjB4MCBjb21wb3VuZF9tYXBjb3VudDogMA0KaWJfc3JwdDpzcnB0X3plcm9s
+ZW5ndGhfd3JpdGU6IGliX3NycHQgMTAuMTk2LjE1OS4xNzktMjQ6IHF1ZXVlZCB6ZXJvbGVuZ3Ro
+IHdyaXRlDQpmbGFnczogMHg4MDAwMDAwMDAwMDA4MTAwKHNsYWJ8aGVhZCkNCnJhdzogODAwMDAw
+MDAwMDAwODEwMCAwMDAwMDAwMDAwMDAwMDAwIDAwMDAwMDAwMDAwMDAwMDAgMDAwMDAwMDEwMDE5
+MDAxOQ0KcmF3OiBmZmZmZWEwMDA1NDNhODAwIDAwMDAwMDAyMDAwMDAwMDIgZmZmZjg4MDE1YThm
+M2EwMCAwMDAwMDAwMDAwMDAwMDAwDQppYl9zcnB0OnNycHRfemVyb2xlbmd0aF93cml0ZTogaWJf
+c3JwdCAxMC4xOTYuMTU5LjE3OS0yMjogcXVldWVkIHplcm9sZW5ndGggd3JpdGUNCnBhZ2UgZHVt
+cGVkIGJlY2F1c2U6IGthc2FuOiBiYWQgYWNjZXNzIGRldGVjdGVkDQppYl9zcnB0OnNycHRfemVy
+b2xlbmd0aF93cml0ZTogaWJfc3JwdCAxMC4xOTYuMTU5LjE3OS0yMDogcXVldWVkIHplcm9sZW5n
+dGggd3JpdGUNCg0KTWVtb3J5IHN0YXRlIGFyb3VuZCB0aGUgYnVnZ3kgYWRkcmVzczoNCmliX3Ny
+cHQ6c3JwdF96ZXJvbGVuZ3RoX3dyaXRlOiBpYl9zcnB0IDEwLjE5Ni4xNTkuMTc5LTE4OiBxdWV1
+ZWQgemVyb2xlbmd0aCB3cml0ZQ0KZmZmZjg4MDE1NmM1ZTU4MDogMDAgMDAgMDAgMDAgMDAgMDAg
+MDAgMDAgMDAgZmMgZmMgZmMgZmMgZmMgZmMgZmMNCmliX3NycHQ6c3JwdF96ZXJvbGVuZ3RoX3dy
+aXRlX2RvbmU6IGliX3NycHQgMTAuMTk2LjE1OS4xNzktMjQgd2MtPnN0YXR1cyA1DQpmZmZmODgw
+MTU2YzVlNjAwOiBmYyBmYyBmYyBmYyBmYyBmYyBmYyBmYyBmYiBmYiBmYiBmYiBmYiBmYiBmYiBm
+Yg0KaWJfc3JwdDpzcnB0X3plcm9sZW5ndGhfd3JpdGVfZG9uZTogaWJfc3JwdCAxMC4xOTYuMTU5
+LjE3OS0yMiB3Yy0+c3RhdHVzIDUNCj5mZmZmODgwMTU2YzVlNjgwOiBmYiBmYiBmYiBmYiBmYiBm
+YiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYg0KaWJfc3JwdDpzcnB0X3plcm9sZW5ndGhf
+d3JpdGVfZG9uZTogaWJfc3JwdCAxMC4xOTYuMTU5LjE3OS0yMCB3Yy0+c3RhdHVzIDUNCiAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4NCmZmZmY4ODAxNTZj
+NWU3MDA6IGZiIGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjDQpp
+Yl9zcnB0OnNycHRfemVyb2xlbmd0aF93cml0ZV9kb25lOiBpYl9zcnB0IDEwLjE5Ni4xNTkuMTc5
+LTE4IHdjLT5zdGF0dXMgNQ0KZmZmZjg4MDE1NmM1ZTc4MDogZmIgZmIgZmIgZmIgZmIgZmIgZmIg
+ZmIgZmIgZmIgZmIgZmIgZmIgZmIgZmIgZmINCmliX3NycHQ6c3JwdF9yZWxlYXNlX2NoYW5uZWxf
+d29yazogaWJfc3JwdCAxMC4xOTYuMTU5LjE3OS0yNA0KPT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQoNCihnZGIpIGxpc3Qg
+KihiaW9fYWR2YW5jZSsweDExMCkNCjB4ZmZmZmZmZmY4MTQ1MDA5MCBpcyBpbiBiaW9fYWR2YW5j
+ZSAoLi9pbmNsdWRlL2xpbnV4L2J2ZWMuaDo4MikuDQo3NyAgICAgICAgICAgICAgICAgICAgICBp
+dGVyLT5iaV9zaXplID0gMDsNCjc4ICAgICAgICAgICAgICAgICAgICAgIHJldHVybiBmYWxzZTsN
+Cjc5ICAgICAgICAgICAgICB9DQo4MA0KODEgICAgICAgICAgICAgIHdoaWxlIChieXRlcykgew0K
+ODIgICAgICAgICAgICAgICAgICAgICAgdW5zaWduZWQgaXRlcl9sZW4gPSBidmVjX2l0ZXJfbGVu
+KGJ2LCAqaXRlcik7DQo4MyAgICAgICAgICAgICAgICAgICAgICB1bnNpZ25lZCBsZW4gPSBtaW4o
+Ynl0ZXMsIGl0ZXJfbGVuKTsNCjg0DQo4NSAgICAgICAgICAgICAgICAgICAgICBieXRlcyAtPSBs
+ZW47DQo4NiAgICAgICAgICAgICAgICAgICAgICBpdGVyLT5iaV9zaXplIC09IGxlbjsNCg0KDQoN
+Cg0KDQoNCg==
