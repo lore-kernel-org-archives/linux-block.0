@@ -1,123 +1,63 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:41209 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750925AbeEBRel (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 May 2018 13:34:41 -0400
-Received: by mail-pg0-f68.google.com with SMTP id m21-v6so11132319pgv.8
-        for <linux-block@vger.kernel.org>; Wed, 02 May 2018 10:34:41 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
-Subject: [PATCH 1/7] block: move some wbt helpers to blk-wbt.c
-Date: Wed,  2 May 2018 10:34:20 -0700
-Message-Id: <13f91069b511243a6245f091e9f0b8ce566daa0d.1525282392.git.osandov@fb.com>
-In-Reply-To: <cover.1525282392.git.osandov@fb.com>
-References: <cover.1525282392.git.osandov@fb.com>
-In-Reply-To: <cover.1525282392.git.osandov@fb.com>
-References: <cover.1525282392.git.osandov@fb.com>
+Received: from mx2.suse.de ([195.135.220.15]:43489 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751468AbeEQOep (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 17 May 2018 10:34:45 -0400
+Subject: Re: [PATCH v2] bcache: return 0 from bch_debug_init() if
+ CONFIG_DEBUG_FS=n
+To: Kent Overstreet <kent.overstreet@gmail.com>
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        stable@vger.kernel.org
+References: <20180517095348.21392-1-colyli@suse.de>
+ <20180517113548.GA24817@kmo-pixel>
+From: Coly Li <colyli@suse.de>
+Message-ID: <4dcc0ee4-6db1-3da5-5526-1b2d4121dd88@suse.de>
+Date: Thu, 17 May 2018 22:33:51 +0800
+MIME-Version: 1.0
+In-Reply-To: <20180517113548.GA24817@kmo-pixel>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+On 2018/5/17 7:35 PM, Kent Overstreet wrote:
+> On Thu, May 17, 2018 at 05:53:48PM +0800, Coly Li wrote:
+>> Commit 539d39eb2708 ("bcache: fix wrong return value in bch_debug_init()")
+>> returns the return value of debugfs_create_dir() to bcache_init(). When
+>> CONFIG_DEBUG_FS=n, bch_debug_init() always returns 1 and makes
+>> bcache_init() failedi.
+>>
+>> This patch makes bch_debug_init() always returns 0 if CONFIG_DEBUG_FS=n,
+>> so bcache can continue to work for the kernels which don't have debugfs
+>> enanbled.
+>>
+>> Fixes: Commit 539d39eb2708 ("bcache: fix wrong return value in bch_debug_init()")
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Coly Li <colyli@suse.de>
+>> Reported-by: Massimo B. <massimo.b@gmx.net>
+>> Reported-by: Kai Krakow <kai@kaishome.de>
+>> Tested-by: Kai Krakow <kai@kaishome.de>
+>> Cc: Kent Overstreet <kent.overstreet@gmail.com>
+>> ---
+>>  drivers/md/bcache/bcache.h | 5 +++++
+>>  drivers/md/bcache/debug.c  | 8 ++++----
+>>  2 files changed, 9 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+>> index 3a0cfb237af9..5b3fe87f32ee 100644
+>> --- a/drivers/md/bcache/bcache.h
+>> +++ b/drivers/md/bcache/bcache.h
+>> @@ -994,8 +994,13 @@ void bch_open_buckets_free(struct cache_set *);
+>>  
+>>  int bch_cache_allocator_start(struct cache *ca);
+>>  
+>> +#ifdef CONFIG_DEBUG_FS
+> 
+> you could just use if (IS_ENABLED(CONFIG_DEBUG_FS)) in bch_debug_init, that way
+> you don't need to add an #ifdef
+> 
 
-A few helpers are only used from blk-wbt.c, so move them there, and put
-wbt_track() behind the CONFIG_BLK_WBT typedef. This is in preparation
-for changing how the wbt flags are tracked.
+Yes, it is much simpler. v3 patch resent for your review.
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- block/blk-wbt.c | 20 ++++++++++++++++++++
- block/blk-wbt.h | 33 ++++++++-------------------------
- 2 files changed, 28 insertions(+), 25 deletions(-)
+Thanks for the hint.
 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index f92fc84b5e2c..030d6bdcaa4c 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -29,6 +29,26 @@
- #define CREATE_TRACE_POINTS
- #include <trace/events/wbt.h>
- 
-+static inline void wbt_clear_state(struct blk_issue_stat *stat)
-+{
-+	stat->stat &= ~BLK_STAT_RES_MASK;
-+}
-+
-+static inline enum wbt_flags wbt_stat_to_mask(struct blk_issue_stat *stat)
-+{
-+	return (stat->stat & BLK_STAT_RES_MASK) >> BLK_STAT_RES_SHIFT;
-+}
-+
-+static inline bool wbt_is_tracked(struct blk_issue_stat *stat)
-+{
-+	return (stat->stat >> BLK_STAT_RES_SHIFT) & WBT_TRACKED;
-+}
-+
-+static inline bool wbt_is_read(struct blk_issue_stat *stat)
-+{
-+	return (stat->stat >> BLK_STAT_RES_SHIFT) & WBT_READ;
-+}
-+
- enum {
- 	/*
- 	 * Default setting, we'll scale up (to 75% of QD max) or down (min 1)
-diff --git a/block/blk-wbt.h b/block/blk-wbt.h
-index a232c98fbf4d..d3f47a721aec 100644
---- a/block/blk-wbt.h
-+++ b/block/blk-wbt.h
-@@ -31,31 +31,6 @@ enum {
- 	WBT_STATE_ON_MANUAL	= 2,
- };
- 
--static inline void wbt_clear_state(struct blk_issue_stat *stat)
--{
--	stat->stat &= ~BLK_STAT_RES_MASK;
--}
--
--static inline enum wbt_flags wbt_stat_to_mask(struct blk_issue_stat *stat)
--{
--	return (stat->stat & BLK_STAT_RES_MASK) >> BLK_STAT_RES_SHIFT;
--}
--
--static inline void wbt_track(struct blk_issue_stat *stat, enum wbt_flags wb_acct)
--{
--	stat->stat |= ((u64) wb_acct) << BLK_STAT_RES_SHIFT;
--}
--
--static inline bool wbt_is_tracked(struct blk_issue_stat *stat)
--{
--	return (stat->stat >> BLK_STAT_RES_SHIFT) & WBT_TRACKED;
--}
--
--static inline bool wbt_is_read(struct blk_issue_stat *stat)
--{
--	return (stat->stat >> BLK_STAT_RES_SHIFT) & WBT_READ;
--}
--
- struct rq_wait {
- 	wait_queue_head_t wait;
- 	atomic_t inflight;
-@@ -109,6 +84,11 @@ static inline unsigned int wbt_inflight(struct rq_wb *rwb)
- 
- #ifdef CONFIG_BLK_WBT
- 
-+static inline void wbt_track(struct blk_issue_stat *stat, enum wbt_flags flags)
-+{
-+	stat->stat |= ((u64)flags) << BLK_STAT_RES_SHIFT;
-+}
-+
- void __wbt_done(struct rq_wb *, enum wbt_flags);
- void wbt_done(struct rq_wb *, struct blk_issue_stat *);
- enum wbt_flags wbt_wait(struct rq_wb *, struct bio *, spinlock_t *);
-@@ -127,6 +107,9 @@ u64 wbt_default_latency_nsec(struct request_queue *);
- 
- #else
- 
-+static inline void wbt_track(struct blk_issue_stat *stat, enum wbt_flags flags)
-+{
-+}
- static inline void __wbt_done(struct rq_wb *rwb, enum wbt_flags flags)
- {
- }
--- 
-2.17.0
+Coly Li
