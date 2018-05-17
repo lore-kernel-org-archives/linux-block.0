@@ -1,65 +1,39 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 26/34] xfs: simplify xfs_map_blocks by using xfs_iext_lookup_extent directly
-Date: Fri, 18 May 2018 18:48:22 +0200
-Message-Id: <20180518164830.1552-27-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
+MIME-Version: 1.0
+In-Reply-To: <20180509074830.16196-5-hch@lst.de>
+References: <20180509074830.16196-1-hch@lst.de> <20180509074830.16196-5-hch@lst.de>
+From: =?UTF-8?Q?Andreas_Gr=C3=BCnbacher?= <andreas.gruenbacher@gmail.com>
+Date: Thu, 17 May 2018 13:33:17 +0200
+Message-ID: <CAHpGcM+i1sAPGLxN9m5tcu973cx-Jr-DU2D7xWYScp7hfpcvnA@mail.gmail.com>
+Subject: Re: [PATCH 04/33] fs: remove the buffer_unwritten check in page_seek_hole_data
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-xfs@vger.kernel.org,
+        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
+        linux-block@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-xfs_bmapi_read adds zero value in xfs_map_blocks.  Replace it with a
-direct call to the low-level extent lookup function.
+2018-05-09 9:48 GMT+02:00 Christoph Hellwig <hch@lst.de>:
+> We only call into this function through the iomap iterators, so we already
+> know the buffer is unwritten.  In addition to that we always require the
+> uptodate flag that is ORed with the result anyway.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/xfs_aops.c | 19 +++++--------------
- 1 file changed, 5 insertions(+), 14 deletions(-)
+Please update the page_cache_seek_hole_data description as well:
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 354d26d66c12..b1dee2171194 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -387,7 +387,6 @@ xfs_map_blocks(
- 	int			whichfork = XFS_DATA_FORK;
- 	struct xfs_iext_cursor	icur;
- 	int			error = 0;
--	int			nimaps = 1;
- 	bool			cow_valid = false;
- 
- 	if (XFS_FORCED_SHUTDOWN(mp))
-@@ -432,24 +431,16 @@ xfs_map_blocks(
- 		goto done;
- 	}
- 
--	error = xfs_bmapi_read(ip, offset_fsb, end_fsb - offset_fsb,
--				imap, &nimaps, XFS_BMAPI_ENTIRE);
-+	if (!xfs_iext_lookup_extent(ip, &ip->i_df, offset_fsb, &icur, imap))
-+		imap->br_startoff = end_fsb;	/* fake a hole past EOF */
- 	xfs_iunlock(ip, XFS_ILOCK_SHARED);
--	if (error)
--		return error;
- 
--	if (!nimaps) {
--		/*
--		 * Lookup returns no match? Beyond eof? regardless,
--		 * return it as a hole so we don't write it
--		 */
-+	if (imap->br_startoff > offset_fsb) {
-+		/* landed in a hole or beyond EOF */
-+		imap->br_blockcount = imap->br_startoff - offset_fsb;
- 		imap->br_startoff = offset_fsb;
--		imap->br_blockcount = end_fsb - offset_fsb;
- 		imap->br_startblock = HOLESTARTBLOCK;
- 		*type = XFS_IO_HOLE;
--	} else if (imap->br_startblock == HOLESTARTBLOCK) {
--		/* landed in a hole */
--		*type = XFS_IO_HOLE;
- 	} else if (isnullstartblock(imap->br_startblock)) {
- 		/* got a delalloc extent */
- 		*type = XFS_IO_DELALLOC;
--- 
-2.17.0
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -647,8 +647,8 @@
+  * Seek for SEEK_DATA / SEEK_HOLE in the page cache.
+  *
+  * Within unwritten extents, the page cache determines which parts are holes
+- * and which are data: unwritten and uptodate buffer heads count as data;
+- * everything else counts as a hole.
++ * and which are data: uptodate buffer heads count as data; everything else
++ * counts as a hole.
+  *
+  * Returns the resulting offset on successs, and -ENOENT otherwise.
+  */
+
+Thanks,
+Andreas
