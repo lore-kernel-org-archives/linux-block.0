@@ -1,199 +1,244 @@
-Return-Path: <prvs=672e5e3bd=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hpa@zytor.com" <hpa@zytor.com>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "schwidefsky@de.ibm.com" <schwidefsky@de.ibm.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"jcmvbkbc@gmail.com" <jcmvbkbc@gmail.com>, "corbet@lwn.net" <corbet@lwn.net>,
-	"tglx@linutronix.de" <tglx@linutronix.de>, "deller@gmx.de" <deller@gmx.de>,
-	"heiko.carstens@de.ibm.com" <heiko.carstens@de.ibm.com>, "hch@lst.de"
-	<hch@lst.de>, "fenghua.yu@intel.com" <fenghua.yu@intel.com>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will.deacon@arm.com"
-	<will.deacon@arm.com>, "mingo@redhat.com" <mingo@redhat.com>,
-	"jejb@parisc-linux.org" <jejb@parisc-linux.org>, "tony.luck@intel.com"
-	<tony.luck@intel.com>, "chris@zankel.net" <chris@zankel.net>,
-	"davem@davemloft.net" <davem@davemloft.net>, "arnd@arndb.de" <arnd@arndb.de>,
-	"geert@linux-m68k.org" <geert@linux-m68k.org>, "benh@kernel.crashing.org"
-	<benh@kernel.crashing.org>, "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
-	"paulus@samba.org" <paulus@samba.org>
-Subject: Re: [PATCH v11 1/2] arch/*: Add CONFIG_ARCH_HAVE_CMPXCHG64
-Date: Mon, 21 May 2018 15:35:58 +0000
-Message-ID: <8f1ababa064eae4969162bb868f874ce90c586d2.camel@wdc.com>
-References: <20180518180006.24389-1-bart.vanassche@wdc.com>
-	 <20180518180006.24389-2-bart.vanassche@wdc.com>
-	 <C2876D88-F59B-48D7-85D9-49EB79B1FBE3@zytor.com>
-In-Reply-To: <C2876D88-F59B-48D7-85D9-49EB79B1FBE3@zytor.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <hpa@zytor.com>
+Date: Fri, 18 May 2018 11:32:57 -0700
+In-Reply-To: <20180518180006.24389-2-bart.vanassche@wdc.com>
+References: <20180518180006.24389-1-bart.vanassche@wdc.com> <20180518180006.24389-2-bart.vanassche@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Subject: Re: [PATCH v11 1/2] arch/*: Add CONFIG_ARCH_HAVE_CMPXCHG64
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+CC: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>, Tony Luck <tony.luck@intel.com>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        "James E.J. Bottomley" <jejb@parisc-linux.org>,
+        Helge Deller <deller@gmx.de>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+        Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>,
+        Arnd Bergmann <arnd@arndb.de>, Jonathan Corbet <corbet@lwn.net>
+From: hpa@zytor.com
+Message-ID: <C2876D88-F59B-48D7-85D9-49EB79B1FBE3@zytor.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE4LTA1LTE4IGF0IDExOjMyIC0wNzAwLCBocGFAenl0b3IuY29tIHdyb3RlOg0K
-PiBPbiBNYXkgMTgsIDIwMTggMTE6MDA6MDUgQU0gUERULCBCYXJ0IFZhbiBBc3NjaGUgPGJhcnQu
-dmFuYXNzY2hlQHdkYy5jb20+IHdyb3RlOg0KPiA+IFRoZSBuZXh0IHBhdGNoIGluIHRoaXMgc2Vy
-aWVzIGludHJvZHVjZXMgYSBjYWxsIHRvIGNtcHhjaGc2NCgpDQo+ID4gaW4gdGhlIGJsb2NrIGxh
-eWVyIGNvcmUgZm9yIHRob3NlIGFyY2hpdGVjdHVyZXMgb24gd2hpY2ggdGhpcw0KPiA+IGZ1bmN0
-aW9uYWxpdHkgaXMgYXZhaWxhYmxlLiBNYWtlIGl0IHBvc3NpYmxlIHRvIHRlc3Qgd2hldGhlcg0K
-PiA+IGNtcHhjaGc2NCgpIGlzIGF2YWlsYWJsZSBieSBpbnRyb2R1Y2luZyBDT05GSUdfQVJDSF9I
-QVZFX0NNUFhDSEc2NC4NCj4gPiANCj4gPiBTaWduZWQtb2ZmLWJ5OiBCYXJ0IFZhbiBBc3NjaGUg
-PGJhcnQudmFuYXNzY2hlQHdkYy5jb20+DQo+ID4gQ2M6IENhdGFsaW4gTWFyaW5hcyA8Y2F0YWxp
-bi5tYXJpbmFzQGFybS5jb20+DQo+ID4gQ2M6IFdpbGwgRGVhY29uIDx3aWxsLmRlYWNvbkBhcm0u
-Y29tPg0KPiA+IENjOiBUb255IEx1Y2sgPHRvbnkubHVja0BpbnRlbC5jb20+DQo+ID4gQ2M6IEZl
-bmdodWEgWXUgPGZlbmdodWEueXVAaW50ZWwuY29tPg0KPiA+IENjOiBHZWVydCBVeXR0ZXJob2V2
-ZW4gPGdlZXJ0QGxpbnV4LW02OGsub3JnPg0KPiA+IENjOiAiSmFtZXMgRS5KLiBCb3R0b21sZXki
-IDxqZWpiQHBhcmlzYy1saW51eC5vcmc+DQo+ID4gQ2M6IEhlbGdlIERlbGxlciA8ZGVsbGVyQGdt
-eC5kZT4NCj4gPiBDYzogQmVuamFtaW4gSGVycmVuc2NobWlkdCA8YmVuaEBrZXJuZWwuY3Jhc2hp
-bmcub3JnPg0KPiA+IENjOiBQYXVsIE1hY2tlcnJhcyA8cGF1bHVzQHNhbWJhLm9yZz4NCj4gPiBD
-YzogTWljaGFlbCBFbGxlcm1hbiA8bXBlQGVsbGVybWFuLmlkLmF1Pg0KPiA+IENjOiBNYXJ0aW4g
-U2Nod2lkZWZza3kgPHNjaHdpZGVmc2t5QGRlLmlibS5jb20+DQo+ID4gQ2M6IEhlaWtvIENhcnN0
-ZW5zIDxoZWlrby5jYXJzdGVuc0BkZS5pYm0uY29tPg0KPiA+IENjOiBEYXZpZCBTLiBNaWxsZXIg
-PGRhdmVtQGRhdmVtbG9mdC5uZXQ+DQo+ID4gQ2M6IFRob21hcyBHbGVpeG5lciA8dGdseEBsaW51
-dHJvbml4LmRlPg0KPiA+IENjOiBJbmdvIE1vbG5hciA8bWluZ29AcmVkaGF0LmNvbT4NCj4gPiBD
-YzogSC4gUGV0ZXIgQW52aW4gPGhwYUB6eXRvci5jb20+DQo+ID4gQ2M6IENocmlzIFphbmtlbCA8
-Y2hyaXNAemFua2VsLm5ldD4NCj4gPiBDYzogTWF4IEZpbGlwcG92IDxqY212YmtiY0BnbWFpbC5j
-b20+DQo+ID4gQ2M6IEFybmQgQmVyZ21hbm4gPGFybmRAYXJuZGIuZGU+DQo+ID4gQ2M6IEpvbmF0
-aGFuIENvcmJldCA8Y29yYmV0QGx3bi5uZXQ+DQo+ID4gLS0tDQo+ID4gLi4uL2ZlYXR1cmVzL2xv
-Y2tpbmcvY21weGNoZzY0L2FyY2gtc3VwcG9ydC50eHQgICAgfCAzMw0KPiA+ICsrKysrKysrKysr
-KysrKysrKysrKysNCj4gPiBhcmNoL0tjb25maWcgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICB8ICA0ICsrKw0KPiA+IGFyY2gvYXJtL0tjb25maWcgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIHwgIDEgKw0KPiA+IGFyY2gvaWE2NC9LY29uZmlnICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDEgKw0KPiA+IGFyY2gvbTY4ay9LY29uZmlnICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDEgKw0KPiA+IGFyY2gvbWlwcy9LY29u
-ZmlnICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDEgKw0KPiA+IGFyY2gvcGFy
-aXNjL0tjb25maWcgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDEgKw0KPiA+IGFy
-Y2gvcmlzY3YvS2NvbmZpZyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDEgKw0K
-PiA+IGFyY2gvc3BhcmMvS2NvbmZpZyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwg
-IDEgKw0KPiA+IGFyY2gveDg2L0tjb25maWcgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIHwgIDEgKw0KPiA+IGFyY2gveHRlbnNhL0tjb25maWcgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIHwgIDEgKw0KPiA+IDExIGZpbGVzIGNoYW5nZWQsIDQ2IGluc2VydGlvbnMoKykN
-Cj4gPiBjcmVhdGUgbW9kZSAxMDA2NDQNCj4gPiBEb2N1bWVudGF0aW9uL2ZlYXR1cmVzL2xvY2tp
-bmcvY21weGNoZzY0L2FyY2gtc3VwcG9ydC50eHQNCj4gPiANCj4gPiBkaWZmIC0tZ2l0IGEvRG9j
-dW1lbnRhdGlvbi9mZWF0dXJlcy9sb2NraW5nL2NtcHhjaGc2NC9hcmNoLXN1cHBvcnQudHh0DQo+
-ID4gYi9Eb2N1bWVudGF0aW9uL2ZlYXR1cmVzL2xvY2tpbmcvY21weGNoZzY0L2FyY2gtc3VwcG9y
-dC50eHQNCj4gPiBuZXcgZmlsZSBtb2RlIDEwMDY0NA0KPiA+IGluZGV4IDAwMDAwMDAwMDAwMC4u
-ODRiZmVmNzI0MmIyDQo+ID4gLS0tIC9kZXYvbnVsbA0KPiA+ICsrKyBiL0RvY3VtZW50YXRpb24v
-ZmVhdHVyZXMvbG9ja2luZy9jbXB4Y2hnNjQvYXJjaC1zdXBwb3J0LnR4dA0KPiA+IEBAIC0wLDAg
-KzEsMzMgQEANCj4gPiArIw0KPiA+ICsjIEZlYXR1cmUgbmFtZTogICAgICAgICAgY21weGNoZzY0
-DQo+ID4gKyMgICAgICAgICBLY29uZmlnOiAgICAgICBBUkNIX0hBVkVfQ01QWENIRzY0DQo+ID4g
-KyMgICAgICAgICBkZXNjcmlwdGlvbjogICBhcmNoIHN1cHBvcnRzIHRoZSBjbXB4Y2hnNjQoKSBB
-UEkNCj4gPiArIw0KPiA+ICsgICAgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gPiArICAgIHwg
-ICAgICAgICBhcmNoIHxzdGF0dXN8DQo+ID4gKyAgICAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0K
-PiA+ICsgICAgfCAgICAgICBhbHBoYTogfCAgb2sgIHwNCj4gPiArICAgIHwgICAgICAgICBhcmM6
-IHwgIC4uICB8DQo+ID4gKyAgICB8ICAgICAgICAgYXJtOiB8ICBvayAgfA0KPiA+ICsgICAgfCAg
-ICAgICBhcm02NDogfCAgb2sgIHwNCj4gPiArICAgIHwgICAgICAgICBjNng6IHwgIC4uICB8DQo+
-ID4gKyAgICB8ICAgICAgIGg4MzAwOiB8ICAuLiAgfA0KPiA+ICsgICAgfCAgICAgaGV4YWdvbjog
-fCAgLi4gIHwNCj4gPiArICAgIHwgICAgICAgIGlhNjQ6IHwgIG9rICB8DQo+ID4gKyAgICB8ICAg
-ICAgICBtNjhrOiB8ICBvayAgfA0KPiA+ICsgICAgfCAgbWljcm9ibGF6ZTogfCAgLi4gIHwNCj4g
-PiArICAgIHwgICAgICAgIG1pcHM6IHwgIG9rICB8DQo+ID4gKyAgICB8ICAgICAgIG5kczMyOiB8
-ICAuLiAgfA0KPiA+ICsgICAgfCAgICAgICBuaW9zMjogfCAgLi4gIHwNCj4gPiArICAgIHwgICAg
-b3BlbnJpc2M6IHwgIC4uICB8DQo+ID4gKyAgICB8ICAgICAgcGFyaXNjOiB8ICBvayAgfA0KPiA+
-ICsgICAgfCAgICAgcG93ZXJwYzogfCAgb2sgIHwNCj4gPiArICAgIHwgICAgICAgcmlzY3Y6IHwg
-IG9rICB8DQo+ID4gKyAgICB8ICAgICAgICBzMzkwOiB8ICBvayAgfA0KPiA+ICsgICAgfCAgICAg
-ICAgICBzaDogfCAgLi4gIHwNCj4gPiArICAgIHwgICAgICAgc3BhcmM6IHwgIG9rICB8DQo+ID4g
-KyAgICB8ICAgICAgICAgIHVtOiB8ICAuLiAgfA0KPiA+ICsgICAgfCAgIHVuaWNvcmUzMjogfCAg
-Li4gIHwNCj4gPiArICAgIHwgICAgICAgICB4ODY6IHwgIG9rICB8DQo+ID4gKyAgICB8ICAgICAg
-eHRlbnNhOiB8ICBvayAgfA0KPiA+ICsgICAgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gPiBk
-aWZmIC0tZ2l0IGEvYXJjaC9LY29uZmlnIGIvYXJjaC9LY29uZmlnDQo+ID4gaW5kZXggOGUwZDY2
-NWM4ZDUzLi45ODQwYjI1NzdhZjEgMTAwNjQ0DQo+ID4gLS0tIGEvYXJjaC9LY29uZmlnDQo+ID4g
-KysrIGIvYXJjaC9LY29uZmlnDQo+ID4gQEAgLTM1OCw2ICszNTgsMTAgQEAgY29uZmlnIEhBVkVf
-QUxJR05FRF9TVFJVQ1RfUEFHRQ0KPiA+IAkgIG9uIGEgc3RydWN0IHBhZ2UgZm9yIGJldHRlciBw
-ZXJmb3JtYW5jZS4gSG93ZXZlciBzZWxlY3RpbmcgdGhpcw0KPiA+IAkgIG1pZ2h0IGluY3JlYXNl
-IHRoZSBzaXplIG9mIGEgc3RydWN0IHBhZ2UgYnkgYSB3b3JkLg0KPiA+IA0KPiA+ICtjb25maWcg
-QVJDSF9IQVZFX0NNUFhDSEc2NA0KPiA+ICsJYm9vbA0KPiA+ICsJZGVmYXVsdCB5IGlmIDY0QklU
-DQo+ID4gKw0KPiA+IGNvbmZpZyBIQVZFX0NNUFhDSEdfTE9DQUwNCj4gPiAJYm9vbA0KPiA+IA0K
-PiA+IGRpZmYgLS1naXQgYS9hcmNoL2FybS9LY29uZmlnIGIvYXJjaC9hcm0vS2NvbmZpZw0KPiA+
-IGluZGV4IGE3ZjhlN2Y0Yjg4Zi4uMDJjNzU2OTcxNzZlIDEwMDY0NA0KPiA+IC0tLSBhL2FyY2gv
-YXJtL0tjb25maWcNCj4gPiArKysgYi9hcmNoL2FybS9LY29uZmlnDQo+ID4gQEAgLTEzLDYgKzEz
-LDcgQEAgY29uZmlnIEFSTQ0KPiA+IAlzZWxlY3QgQVJDSF9IQVNfU1RSSUNUX0tFUk5FTF9SV1gg
-aWYgTU1VICYmICFYSVBfS0VSTkVMDQo+ID4gCXNlbGVjdCBBUkNIX0hBU19TVFJJQ1RfTU9EVUxF
-X1JXWCBpZiBNTVUNCj4gPiAJc2VsZWN0IEFSQ0hfSEFTX1RJQ0tfQlJPQURDQVNUIGlmIEdFTkVS
-SUNfQ0xPQ0tFVkVOVFNfQlJPQURDQVNUDQo+ID4gKwlzZWxlY3QgQVJDSF9IQVZFX0NNUFhDSEc2
-NCBpZiAhVEhVTUIyX0tFUk5FTA0KPiA+IAlzZWxlY3QgQVJDSF9IQVZFX0NVU1RPTV9HUElPX0gN
-Cj4gPiAJc2VsZWN0IEFSQ0hfSEFTX0dDT1ZfUFJPRklMRV9BTEwNCj4gPiAJc2VsZWN0IEFSQ0hf
-TUlHSFRfSEFWRV9QQ19QQVJQT1JUDQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gvaWE2NC9LY29uZmln
-IGIvYXJjaC9pYTY0L0tjb25maWcNCj4gPiBpbmRleCBiYmUxMmEwMzhkMjEuLjMxYzQ5ZTE0ODJl
-MiAxMDA2NDQNCj4gPiAtLS0gYS9hcmNoL2lhNjQvS2NvbmZpZw0KPiA+ICsrKyBiL2FyY2gvaWE2
-NC9LY29uZmlnDQo+ID4gQEAgLTQxLDYgKzQxLDcgQEAgY29uZmlnIElBNjQNCj4gPiAJc2VsZWN0
-IEdFTkVSSUNfUEVORElOR19JUlEgaWYgU01QDQo+ID4gCXNlbGVjdCBHRU5FUklDX0lSUV9TSE9X
-DQo+ID4gCXNlbGVjdCBHRU5FUklDX0lSUV9MRUdBQ1kNCj4gPiArCXNlbGVjdCBBUkNIX0hBVkVf
-Q01QWENIRzY0DQo+ID4gCXNlbGVjdCBBUkNIX0hBVkVfTk1JX1NBRkVfQ01QWENIRw0KPiA+IAlz
-ZWxlY3QgR0VORVJJQ19JT01BUA0KPiA+IAlzZWxlY3QgR0VORVJJQ19TTVBfSURMRV9USFJFQUQN
-Cj4gPiBkaWZmIC0tZ2l0IGEvYXJjaC9tNjhrL0tjb25maWcgYi9hcmNoL202OGsvS2NvbmZpZw0K
-PiA+IGluZGV4IDc4NTYxMmI1NzZmNy4uN2I4N2NkYTNiYmVkIDEwMDY0NA0KPiA+IC0tLSBhL2Fy
-Y2gvbTY4ay9LY29uZmlnDQo+ID4gKysrIGIvYXJjaC9tNjhrL0tjb25maWcNCj4gPiBAQCAtMTEs
-NiArMTEsNyBAQCBjb25maWcgTTY4Sw0KPiA+IAlzZWxlY3QgR0VORVJJQ19BVE9NSUM2NA0KPiA+
-IAlzZWxlY3QgSEFWRV9VSUQxNg0KPiA+IAlzZWxlY3QgVklSVF9UT19CVVMNCj4gPiArCXNlbGVj
-dCBBUkNIX0hBVkVfQ01QWENIRzY0DQo+ID4gCXNlbGVjdCBBUkNIX0hBVkVfTk1JX1NBRkVfQ01Q
-WENIRyBpZiBSTVdfSU5TTlMNCj4gPiAJc2VsZWN0IEdFTkVSSUNfQ1BVX0RFVklDRVMNCj4gPiAJ
-c2VsZWN0IEdFTkVSSUNfSU9NQVANCj4gPiBkaWZmIC0tZ2l0IGEvYXJjaC9taXBzL0tjb25maWcg
-Yi9hcmNoL21pcHMvS2NvbmZpZw0KPiA+IGluZGV4IDIyNWM5NWRhMjNjZS4uMDg4YmNhMGZkOWYy
-IDEwMDY0NA0KPiA+IC0tLSBhL2FyY2gvbWlwcy9LY29uZmlnDQo+ID4gKysrIGIvYXJjaC9taXBz
-L0tjb25maWcNCj4gPiBAQCAtNyw2ICs3LDcgQEAgY29uZmlnIE1JUFMNCj4gPiAJc2VsZWN0IEFS
-Q0hfRElTQ0FSRF9NRU1CTE9DSw0KPiA+IAlzZWxlY3QgQVJDSF9IQVNfRUxGX1JBTkRPTUlaRQ0K
-PiA+IAlzZWxlY3QgQVJDSF9IQVNfVElDS19CUk9BRENBU1QgaWYgR0VORVJJQ19DTE9DS0VWRU5U
-U19CUk9BRENBU1QNCj4gPiArCXNlbGVjdCBBUkNIX0hBVkVfQ01QWENIRzY0IGlmIDY0QklUDQo+
-ID4gCXNlbGVjdCBBUkNIX1NVUFBPUlRTX1VQUk9CRVMNCj4gPiAJc2VsZWN0IEFSQ0hfVVNFX0JV
-SUxUSU5fQlNXQVANCj4gPiAJc2VsZWN0IEFSQ0hfVVNFX0NNUFhDSEdfTE9DS1JFRiBpZiA2NEJJ
-VA0KPiA+IGRpZmYgLS1naXQgYS9hcmNoL3BhcmlzYy9LY29uZmlnIGIvYXJjaC9wYXJpc2MvS2Nv
-bmZpZw0KPiA+IGluZGV4IGZjNWE1NzRjMzQ4Mi4uMTY2YzMwODY1MjU1IDEwMDY0NA0KPiA+IC0t
-LSBhL2FyY2gvcGFyaXNjL0tjb25maWcNCj4gPiArKysgYi9hcmNoL3BhcmlzYy9LY29uZmlnDQo+
-ID4gQEAgLTMwLDYgKzMwLDcgQEAgY29uZmlnIFBBUklTQw0KPiA+IAlzZWxlY3QgR0VORVJJQ19B
-VE9NSUM2NCBpZiAhNjRCSVQNCj4gPiAJc2VsZWN0IEdFTkVSSUNfSVJRX1BST0JFDQo+ID4gCXNl
-bGVjdCBHRU5FUklDX1BDSV9JT01BUA0KPiA+ICsJc2VsZWN0IEFSQ0hfSEFWRV9DTVBYQ0hHNjQN
-Cj4gPiAJc2VsZWN0IEFSQ0hfSEFWRV9OTUlfU0FGRV9DTVBYQ0hHDQo+ID4gCXNlbGVjdCBHRU5F
-UklDX1NNUF9JRExFX1RIUkVBRA0KPiA+IAlzZWxlY3QgR0VORVJJQ19DUFVfREVWSUNFUw0KPiA+
-IGRpZmYgLS1naXQgYS9hcmNoL3Jpc2N2L0tjb25maWcgYi9hcmNoL3Jpc2N2L0tjb25maWcNCj4g
-PiBpbmRleCBjZDRmZDg1ZmRlODQuLjRmODg2YTA1NWZmNiAxMDA2NDQNCj4gPiAtLS0gYS9hcmNo
-L3Jpc2N2L0tjb25maWcNCj4gPiArKysgYi9hcmNoL3Jpc2N2L0tjb25maWcNCj4gPiBAQCAtOCw2
-ICs4LDcgQEAgY29uZmlnIFJJU0NWDQo+ID4gCXNlbGVjdCBPRg0KPiA+IAlzZWxlY3QgT0ZfRUFS
-TFlfRkxBVFRSRUUNCj4gPiAJc2VsZWN0IE9GX0lSUQ0KPiA+ICsJc2VsZWN0IEFSQ0hfSEFWRV9D
-TVBYQ0hHNjQNCj4gPiAJc2VsZWN0IEFSQ0hfV0FOVF9GUkFNRV9QT0lOVEVSUw0KPiA+IAlzZWxl
-Y3QgQ0xPTkVfQkFDS1dBUkRTDQo+ID4gCXNlbGVjdCBDT01NT05fQ0xLDQo+ID4gZGlmZiAtLWdp
-dCBhL2FyY2gvc3BhcmMvS2NvbmZpZyBiL2FyY2gvc3BhcmMvS2NvbmZpZw0KPiA+IGluZGV4IDg3
-NjdlNDVmMWIyYi4uZTM0MjliNzhjNDkxIDEwMDY0NA0KPiA+IC0tLSBhL2FyY2gvc3BhcmMvS2Nv
-bmZpZw0KPiA+ICsrKyBiL2FyY2gvc3BhcmMvS2NvbmZpZw0KPiA+IEBAIC03NSw2ICs3NSw3IEBA
-IGNvbmZpZyBTUEFSQzY0DQo+ID4gCXNlbGVjdCBIQVZFX1BFUkZfRVZFTlRTDQo+ID4gCXNlbGVj
-dCBQRVJGX1VTRV9WTUFMTE9DDQo+ID4gCXNlbGVjdCBJUlFfUFJFRkxPV19GQVNURU9JDQo+ID4g
-KwlzZWxlY3QgQVJDSF9IQVZFX0NNUFhDSEc2NA0KPiA+IAlzZWxlY3QgQVJDSF9IQVZFX05NSV9T
-QUZFX0NNUFhDSEcNCj4gPiAJc2VsZWN0IEhBVkVfQ19SRUNPUkRNQ09VTlQNCj4gPiAJc2VsZWN0
-IE5PX0JPT1RNRU0NCj4gPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYvS2NvbmZpZyBiL2FyY2gveDg2
-L0tjb25maWcNCj4gPiBpbmRleCBjMDdmNDkyYjg3MWEuLjUyMzMxZjM5NWJmNCAxMDA2NDQNCj4g
-PiAtLS0gYS9hcmNoL3g4Ni9LY29uZmlnDQo+ID4gKysrIGIvYXJjaC94ODYvS2NvbmZpZw0KPiA+
-IEBAIC02Nyw2ICs2Nyw3IEBAIGNvbmZpZyBYODYNCj4gPiAJc2VsZWN0IEFSQ0hfSEFTX1NZTkNf
-Q09SRV9CRUZPUkVfVVNFUk1PREUNCj4gPiAJc2VsZWN0IEFSQ0hfSEFTX1VCU0FOX1NBTklUSVpF
-X0FMTA0KPiA+IAlzZWxlY3QgQVJDSF9IQVNfWk9ORV9ERVZJQ0UJCWlmIFg4Nl82NA0KPiA+ICsJ
-c2VsZWN0IEFSQ0hfSEFWRV9DTVBYQ0hHNjQJCWlmIFg4Nl9DTVBYQ0hHNjQNCj4gPiAJc2VsZWN0
-IEFSQ0hfSEFWRV9OTUlfU0FGRV9DTVBYQ0hHDQo+ID4gCXNlbGVjdCBBUkNIX01JR0hUX0hBVkVf
-QUNQSV9QREMJCWlmIEFDUEkNCj4gPiAJc2VsZWN0IEFSQ0hfTUlHSFRfSEFWRV9QQ19QQVJQT1JU
-DQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gveHRlbnNhL0tjb25maWcgYi9hcmNoL3h0ZW5zYS9LY29u
-ZmlnDQo+ID4gaW5kZXggYzkyMWU4YmNjZGM4Li4wZTVjNzc5NThmYTMgMTAwNjQ0DQo+ID4gLS0t
-IGEvYXJjaC94dGVuc2EvS2NvbmZpZw0KPiA+ICsrKyBiL2FyY2gveHRlbnNhL0tjb25maWcNCj4g
-PiBAQCAtNCw2ICs0LDcgQEAgY29uZmlnIFpPTkVfRE1BDQo+ID4gDQo+ID4gY29uZmlnIFhURU5T
-QQ0KPiA+IAlkZWZfYm9vbCB5DQo+ID4gKwlzZWxlY3QgQVJDSF9IQVZFX0NNUFhDSEc2NA0KPiA+
-IAlzZWxlY3QgQVJDSF9OT19DT0hFUkVOVF9ETUFfTU1BUCBpZiAhTU1VDQo+ID4gCXNlbGVjdCBB
-UkNIX1dBTlRfRlJBTUVfUE9JTlRFUlMNCj4gPiAJc2VsZWN0IEFSQ0hfV0FOVF9JUENfUEFSU0Vf
-VkVSU0lPTg0KPiANCj4gUGVyaGFwcyBpdCB3b3VsZCBiZSBiZXR0ZXIgdG8gZGVmaW5lIGNtcHhj
-aGc2NCBhcyBhIG1hY3JvICh3aGljaCBjYW4gYmUNCj4gI2RlZmluZSBjbXB4Y2hnNjQgY21weGNo
-ZzY0KSByYXRoZXIgcHV0dGluZyB0aGlzIGluIEtjb25maWc/IFB1dHRpbmcgaXQNCj4gaW4gS2Nv
-bmZpZyBtYWtlcyBzZW5zZSBpZiBpdCBhZmZlY3RzIGNvbmZpZyBvcHRpb25zLg0KDQpUaGF0J3Mg
-YW4gaW50ZXJlc3Rpbmcgc3VnZ2VzdGlvbi4gVGhlIGZvbGxvd2luZyBzZWVtcyB0byBiZSBzdWZm
-aWNpZW50IHRvDQphbGxvdyB0aGUgYmxvY2sgbGF5ZXIgdG8gY2hlY2sgd2l0aCBpZiBkZWZpbmVk
-KGNtcHhjaGc2NCkgZm9yIGNtcHhjaGc2NCgpDQpzdXBwb3J0Og0KDQpkaWZmIC0tZ2l0IGEvYXJj
-aC9hcm0vaW5jbHVkZS9hc20vY21weGNoZy5oIGIvYXJjaC9hcm0vaW5jbHVkZS9hc20vY21weGNo
-Zy5oDQppbmRleCA4YjcwMWY4ZTE3NWMuLjQxYWI5OWJjMDRjYSAxMDA2NDQNCi0tLSBhL2FyY2gv
-YXJtL2luY2x1ZGUvYXNtL2NtcHhjaGcuaA0KKysrIGIvYXJjaC9hcm0vaW5jbHVkZS9hc20vY21w
-eGNoZy5oDQpAQCAtMTQxLDcgKzE0MSw5IEBAIHN0YXRpYyBpbmxpbmUgdW5zaWduZWQgbG9uZyBf
-X3hjaGcodW5zaWduZWQgbG9uZyB4LCB2b2xhdGlsZSB2b2lkICpwdHIsIGludCBzaXplDQogCQkJ
-CQkgICAgICAgIHNpemVvZigqKHB0cikpKTsJXA0KIH0pDQogDQorI2lmbmRlZiBDT05GSUdfVEhV
-TUIyX0tFUk5FTA0KICNkZWZpbmUgY21weGNoZzY0X2xvY2FsKHB0ciwgbywgbikgX19jbXB4Y2hn
-NjRfbG9jYWxfZ2VuZXJpYygocHRyKSwgKG8pLCAobikpDQorI2VuZGlmIC8qIENPTkZJR19USFVN
-QjJfS0VSTkVMICovDQogDQogI2luY2x1ZGUgPGFzbS1nZW5lcmljL2NtcHhjaGcuaD4NCiANCkBA
-IC0yNDEsNiArMjQzLDcgQEAgc3RhdGljIGlubGluZSB1bnNpZ25lZCBsb25nIF9fY21weGNoZ19s
-b2NhbCh2b2xhdGlsZSB2b2lkICpwdHIsDQogCQkJCSAgICAgICAgc2l6ZW9mKCoocHRyKSkpOwkJ
-XA0KIH0pDQogDQorI2lmbmRlZiBDT05GSUdfVEhVTUIyX0tFUk5FTA0KIHN0YXRpYyBpbmxpbmUg
-dW5zaWduZWQgbG9uZyBsb25nIF9fY21weGNoZzY0KHVuc2lnbmVkIGxvbmcgbG9uZyAqcHRyLA0K
-IAkJCQkJICAgICB1bnNpZ25lZCBsb25nIGxvbmcgb2xkLA0KIAkJCQkJICAgICB1bnNpZ25lZCBs
-b25nIGxvbmcgbmV3KQ0KQEAgLTI3Myw2ICsyNzYsNyBAQCBzdGF0aWMgaW5saW5lIHVuc2lnbmVk
-IGxvbmcgbG9uZyBfX2NtcHhjaGc2NCh1bnNpZ25lZCBsb25nIGxvbmcgKnB0ciwNCiB9KQ0KIA0K
-ICNkZWZpbmUgY21weGNoZzY0X2xvY2FsKHB0ciwgbywgbikgY21weGNoZzY0X3JlbGF4ZWQoKHB0
-ciksIChvKSwgKG4pKQ0KKyNlbmRpZiAvKiBDT05GSUdfVEhVTUIyX0tFUk5FTCAqLw0KIA0KICNl
-bmRpZgkvKiBfX0xJTlVYX0FSTV9BUkNIX18gPj0gNiAqLw0KIA0K
+On May 18, 2018 11:00:05 AM PDT, Bart Van Assche <bart=2Evanassche@wdc=2Eco=
+m> wrote:
+>The next patch in this series introduces a call to cmpxchg64()
+>in the block layer core for those architectures on which this
+>functionality is available=2E Make it possible to test whether
+>cmpxchg64() is available by introducing CONFIG_ARCH_HAVE_CMPXCHG64=2E
+>
+>Signed-off-by: Bart Van Assche <bart=2Evanassche@wdc=2Ecom>
+>Cc: Catalin Marinas <catalin=2Emarinas@arm=2Ecom>
+>Cc: Will Deacon <will=2Edeacon@arm=2Ecom>
+>Cc: Tony Luck <tony=2Eluck@intel=2Ecom>
+>Cc: Fenghua Yu <fenghua=2Eyu@intel=2Ecom>
+>Cc: Geert Uytterhoeven <geert@linux-m68k=2Eorg>
+>Cc: "James E=2EJ=2E Bottomley" <jejb@parisc-linux=2Eorg>
+>Cc: Helge Deller <deller@gmx=2Ede>
+>Cc: Benjamin Herrenschmidt <benh@kernel=2Ecrashing=2Eorg>
+>Cc: Paul Mackerras <paulus@samba=2Eorg>
+>Cc: Michael Ellerman <mpe@ellerman=2Eid=2Eau>
+>Cc: Martin Schwidefsky <schwidefsky@de=2Eibm=2Ecom>
+>Cc: Heiko Carstens <heiko=2Ecarstens@de=2Eibm=2Ecom>
+>Cc: David S=2E Miller <davem@davemloft=2Enet>
+>Cc: Thomas Gleixner <tglx@linutronix=2Ede>
+>Cc: Ingo Molnar <mingo@redhat=2Ecom>
+>Cc: H=2E Peter Anvin <hpa@zytor=2Ecom>
+>Cc: Chris Zankel <chris@zankel=2Enet>
+>Cc: Max Filippov <jcmvbkbc@gmail=2Ecom>
+>Cc: Arnd Bergmann <arnd@arndb=2Ede>
+>Cc: Jonathan Corbet <corbet@lwn=2Enet>
+>---
+>=2E=2E=2E/features/locking/cmpxchg64/arch-support=2Etxt    | 33
+>++++++++++++++++++++++
+> arch/Kconfig                                       |  4 +++
+> arch/arm/Kconfig                                   |  1 +
+> arch/ia64/Kconfig                                  |  1 +
+> arch/m68k/Kconfig                                  |  1 +
+> arch/mips/Kconfig                                  |  1 +
+> arch/parisc/Kconfig                                |  1 +
+> arch/riscv/Kconfig                                 |  1 +
+> arch/sparc/Kconfig                                 |  1 +
+> arch/x86/Kconfig                                   |  1 +
+> arch/xtensa/Kconfig                                |  1 +
+> 11 files changed, 46 insertions(+)
+>create mode 100644
+>Documentation/features/locking/cmpxchg64/arch-support=2Etxt
+>
+>diff --git a/Documentation/features/locking/cmpxchg64/arch-support=2Etxt
+>b/Documentation/features/locking/cmpxchg64/arch-support=2Etxt
+>new file mode 100644
+>index 000000000000=2E=2E84bfef7242b2
+>--- /dev/null
+>+++ b/Documentation/features/locking/cmpxchg64/arch-support=2Etxt
+>@@ -0,0 +1,33 @@
+>+#
+>+# Feature name:          cmpxchg64
+>+#         Kconfig:       ARCH_HAVE_CMPXCHG64
+>+#         description:   arch supports the cmpxchg64() API
+>+#
+>+    -----------------------
+>+    |         arch |status|
+>+    -----------------------
+>+    |       alpha: |  ok  |
+>+    |         arc: |  =2E=2E  |
+>+    |         arm: |  ok  |
+>+    |       arm64: |  ok  |
+>+    |         c6x: |  =2E=2E  |
+>+    |       h8300: |  =2E=2E  |
+>+    |     hexagon: |  =2E=2E  |
+>+    |        ia64: |  ok  |
+>+    |        m68k: |  ok  |
+>+    |  microblaze: |  =2E=2E  |
+>+    |        mips: |  ok  |
+>+    |       nds32: |  =2E=2E  |
+>+    |       nios2: |  =2E=2E  |
+>+    |    openrisc: |  =2E=2E  |
+>+    |      parisc: |  ok  |
+>+    |     powerpc: |  ok  |
+>+    |       riscv: |  ok  |
+>+    |        s390: |  ok  |
+>+    |          sh: |  =2E=2E  |
+>+    |       sparc: |  ok  |
+>+    |          um: |  =2E=2E  |
+>+    |   unicore32: |  =2E=2E  |
+>+    |         x86: |  ok  |
+>+    |      xtensa: |  ok  |
+>+    -----------------------
+>diff --git a/arch/Kconfig b/arch/Kconfig
+>index 8e0d665c8d53=2E=2E9840b2577af1 100644
+>--- a/arch/Kconfig
+>+++ b/arch/Kconfig
+>@@ -358,6 +358,10 @@ config HAVE_ALIGNED_STRUCT_PAGE
+> 	  on a struct page for better performance=2E However selecting this
+> 	  might increase the size of a struct page by a word=2E
+>=20
+>+config ARCH_HAVE_CMPXCHG64
+>+	bool
+>+	default y if 64BIT
+>+
+> config HAVE_CMPXCHG_LOCAL
+> 	bool
+>=20
+>diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+>index a7f8e7f4b88f=2E=2E02c75697176e 100644
+>--- a/arch/arm/Kconfig
+>+++ b/arch/arm/Kconfig
+>@@ -13,6 +13,7 @@ config ARM
+> 	select ARCH_HAS_STRICT_KERNEL_RWX if MMU && !XIP_KERNEL
+> 	select ARCH_HAS_STRICT_MODULE_RWX if MMU
+> 	select ARCH_HAS_TICK_BROADCAST if GENERIC_CLOCKEVENTS_BROADCAST
+>+	select ARCH_HAVE_CMPXCHG64 if !THUMB2_KERNEL
+> 	select ARCH_HAVE_CUSTOM_GPIO_H
+> 	select ARCH_HAS_GCOV_PROFILE_ALL
+> 	select ARCH_MIGHT_HAVE_PC_PARPORT
+>diff --git a/arch/ia64/Kconfig b/arch/ia64/Kconfig
+>index bbe12a038d21=2E=2E31c49e1482e2 100644
+>--- a/arch/ia64/Kconfig
+>+++ b/arch/ia64/Kconfig
+>@@ -41,6 +41,7 @@ config IA64
+> 	select GENERIC_PENDING_IRQ if SMP
+> 	select GENERIC_IRQ_SHOW
+> 	select GENERIC_IRQ_LEGACY
+>+	select ARCH_HAVE_CMPXCHG64
+> 	select ARCH_HAVE_NMI_SAFE_CMPXCHG
+> 	select GENERIC_IOMAP
+> 	select GENERIC_SMP_IDLE_THREAD
+>diff --git a/arch/m68k/Kconfig b/arch/m68k/Kconfig
+>index 785612b576f7=2E=2E7b87cda3bbed 100644
+>--- a/arch/m68k/Kconfig
+>+++ b/arch/m68k/Kconfig
+>@@ -11,6 +11,7 @@ config M68K
+> 	select GENERIC_ATOMIC64
+> 	select HAVE_UID16
+> 	select VIRT_TO_BUS
+>+	select ARCH_HAVE_CMPXCHG64
+> 	select ARCH_HAVE_NMI_SAFE_CMPXCHG if RMW_INSNS
+> 	select GENERIC_CPU_DEVICES
+> 	select GENERIC_IOMAP
+>diff --git a/arch/mips/Kconfig b/arch/mips/Kconfig
+>index 225c95da23ce=2E=2E088bca0fd9f2 100644
+>--- a/arch/mips/Kconfig
+>+++ b/arch/mips/Kconfig
+>@@ -7,6 +7,7 @@ config MIPS
+> 	select ARCH_DISCARD_MEMBLOCK
+> 	select ARCH_HAS_ELF_RANDOMIZE
+> 	select ARCH_HAS_TICK_BROADCAST if GENERIC_CLOCKEVENTS_BROADCAST
+>+	select ARCH_HAVE_CMPXCHG64 if 64BIT
+> 	select ARCH_SUPPORTS_UPROBES
+> 	select ARCH_USE_BUILTIN_BSWAP
+> 	select ARCH_USE_CMPXCHG_LOCKREF if 64BIT
+>diff --git a/arch/parisc/Kconfig b/arch/parisc/Kconfig
+>index fc5a574c3482=2E=2E166c30865255 100644
+>--- a/arch/parisc/Kconfig
+>+++ b/arch/parisc/Kconfig
+>@@ -30,6 +30,7 @@ config PARISC
+> 	select GENERIC_ATOMIC64 if !64BIT
+> 	select GENERIC_IRQ_PROBE
+> 	select GENERIC_PCI_IOMAP
+>+	select ARCH_HAVE_CMPXCHG64
+> 	select ARCH_HAVE_NMI_SAFE_CMPXCHG
+> 	select GENERIC_SMP_IDLE_THREAD
+> 	select GENERIC_CPU_DEVICES
+>diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+>index cd4fd85fde84=2E=2E4f886a055ff6 100644
+>--- a/arch/riscv/Kconfig
+>+++ b/arch/riscv/Kconfig
+>@@ -8,6 +8,7 @@ config RISCV
+> 	select OF
+> 	select OF_EARLY_FLATTREE
+> 	select OF_IRQ
+>+	select ARCH_HAVE_CMPXCHG64
+> 	select ARCH_WANT_FRAME_POINTERS
+> 	select CLONE_BACKWARDS
+> 	select COMMON_CLK
+>diff --git a/arch/sparc/Kconfig b/arch/sparc/Kconfig
+>index 8767e45f1b2b=2E=2Ee3429b78c491 100644
+>--- a/arch/sparc/Kconfig
+>+++ b/arch/sparc/Kconfig
+>@@ -75,6 +75,7 @@ config SPARC64
+> 	select HAVE_PERF_EVENTS
+> 	select PERF_USE_VMALLOC
+> 	select IRQ_PREFLOW_FASTEOI
+>+	select ARCH_HAVE_CMPXCHG64
+> 	select ARCH_HAVE_NMI_SAFE_CMPXCHG
+> 	select HAVE_C_RECORDMCOUNT
+> 	select NO_BOOTMEM
+>diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+>index c07f492b871a=2E=2E52331f395bf4 100644
+>--- a/arch/x86/Kconfig
+>+++ b/arch/x86/Kconfig
+>@@ -67,6 +67,7 @@ config X86
+> 	select ARCH_HAS_SYNC_CORE_BEFORE_USERMODE
+> 	select ARCH_HAS_UBSAN_SANITIZE_ALL
+> 	select ARCH_HAS_ZONE_DEVICE		if X86_64
+>+	select ARCH_HAVE_CMPXCHG64		if X86_CMPXCHG64
+> 	select ARCH_HAVE_NMI_SAFE_CMPXCHG
+> 	select ARCH_MIGHT_HAVE_ACPI_PDC		if ACPI
+> 	select ARCH_MIGHT_HAVE_PC_PARPORT
+>diff --git a/arch/xtensa/Kconfig b/arch/xtensa/Kconfig
+>index c921e8bccdc8=2E=2E0e5c77958fa3 100644
+>--- a/arch/xtensa/Kconfig
+>+++ b/arch/xtensa/Kconfig
+>@@ -4,6 +4,7 @@ config ZONE_DMA
+>=20
+> config XTENSA
+> 	def_bool y
+>+	select ARCH_HAVE_CMPXCHG64
+> 	select ARCH_NO_COHERENT_DMA_MMAP if !MMU
+> 	select ARCH_WANT_FRAME_POINTERS
+> 	select ARCH_WANT_IPC_PARSE_VERSION
+
+Perhaps it would be better to define cmpxchg64 as a macro (which can be #d=
+efine cmpxchg64 cmpxchg64) rather putting this in Kconfig? Putting it in Kc=
+onfig makes sense if it affects config options=2E
+--=20
+Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
