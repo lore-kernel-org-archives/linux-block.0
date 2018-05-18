@@ -1,47 +1,79 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:43051 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751364AbeENLkt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 May 2018 07:40:49 -0400
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Omar Sandoval <osandov@osandov.com>
-Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Linux NVMe Mailinglist <linux-nvme@lists.infradead.org>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH blktests] Documentation: document prerequisite scriptlets
-Date: Mon, 14 May 2018 13:40:42 +0200
-Message-Id: <20180514114042.12082-1-jthumshirn@suse.de>
+Received: from bombadil.infradead.org ([198.137.202.133]:49912 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751395AbeERQtM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 May 2018 12:49:12 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 13/34] iomap: add a iomap_sector helper
+Date: Fri, 18 May 2018 18:48:09 +0200
+Message-Id: <20180518164830.1552-14-hch@lst.de>
+In-Reply-To: <20180518164830.1552-1-hch@lst.de>
+References: <20180518164830.1552-1-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The config file is bash and it gets sourced, so all bash magic is
-doable in there as well. Document it so others don't have to
-re-discover this gem as well.
+Factor the repeated calculation of the on-disk sector for a given logical
+block into a littler helper.
 
-Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- Documentation/running-tests.md | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ fs/iomap.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
-index a479d5e94c5e..b477c0679683 100644
---- a/Documentation/running-tests.md
-+++ b/Documentation/running-tests.md
-@@ -66,3 +66,15 @@ command line option.
- QUICK_RUN=1
- TIMEOUT=30
- ```
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 6427627a247f..44259eadb69d 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -97,6 +97,12 @@ iomap_apply(struct inode *inode, loff_t pos, loff_t length, unsigned flags,
+ 	return written ? written : ret;
+ }
+ 
++static sector_t
++iomap_sector(struct iomap *iomap, loff_t pos)
++{
++	return (iomap->addr + pos - iomap->offset) >> SECTOR_SHIFT;
++}
 +
-+### Pre-test setups
-+
-+Some tests, may need special prerequisites, like configfs being
-+mounted for NVMe over Fabrics tests. You can add your custom bash
-+scriptlets to `config` to get this done, e.g.:
-+
-+```sh
-+if ! test $(grep -q configfs /proc/mounts) ; then
-+        mount -t configfs none /sys/kernel/config
-+fi
-+```
+ static void
+ iomap_write_failed(struct inode *inode, loff_t pos, unsigned len)
+ {
+@@ -354,11 +360,8 @@ static int iomap_zero(struct inode *inode, loff_t pos, unsigned offset,
+ static int iomap_dax_zero(loff_t pos, unsigned offset, unsigned bytes,
+ 		struct iomap *iomap)
+ {
+-	sector_t sector = (iomap->addr +
+-			   (pos & PAGE_MASK) - iomap->offset) >> 9;
+-
+-	return __dax_zero_page_range(iomap->bdev, iomap->dax_dev, sector,
+-			offset, bytes);
++	return __dax_zero_page_range(iomap->bdev, iomap->dax_dev,
++			iomap_sector(iomap, pos & PAGE_MASK), offset, bytes);
+ }
+ 
+ static loff_t
+@@ -951,8 +954,7 @@ iomap_dio_zero(struct iomap_dio *dio, struct iomap *iomap, loff_t pos,
+ 
+ 	bio = bio_alloc(GFP_KERNEL, 1);
+ 	bio_set_dev(bio, iomap->bdev);
+-	bio->bi_iter.bi_sector =
+-		(iomap->addr + pos - iomap->offset) >> 9;
++	bio->bi_iter.bi_sector = iomap_sector(iomap, pos);
+ 	bio->bi_private = dio;
+ 	bio->bi_end_io = iomap_dio_bio_end_io;
+ 
+@@ -1046,8 +1048,7 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
+ 
+ 		bio = bio_alloc(GFP_KERNEL, nr_pages);
+ 		bio_set_dev(bio, iomap->bdev);
+-		bio->bi_iter.bi_sector =
+-			(iomap->addr + pos - iomap->offset) >> 9;
++		bio->bi_iter.bi_sector = iomap_sector(iomap, pos);
+ 		bio->bi_write_hint = dio->iocb->ki_hint;
+ 		bio->bi_private = dio;
+ 		bio->bi_end_io = iomap_dio_bio_end_io;
 -- 
-2.16.3
+2.17.0
