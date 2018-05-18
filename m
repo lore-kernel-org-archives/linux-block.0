@@ -1,23 +1,65 @@
-Return-Path: <BATV+77ddf8e9b1b344f28472+5381+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Fri, 18 May 2018 09:06:36 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: adam.manzanares@wdc.com
-Cc: viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org, axboe@kernel.dk,
-	bcrl@kvack.org, mingo@kernel.org, peterz@infradead.org,
-	pombredanne@nexb.com, gregkh@linuxfoundation.org,
-	bigeasy@linutronix.de, rgoldwyn@suse.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-aio@kvack.org, linux-api@vger.kernel.org
+Return-Path: <prvs=669193e76=Adam.Manzanares@wdc.com>
+From: Adam Manzanares <Adam.Manzanares@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>, "viro@zeniv.linux.org.uk"
+	<viro@zeniv.linux.org.uk>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>, "bcrl@kvack.org" <bcrl@kvack.org>
+CC: "mingo@kernel.org" <mingo@kernel.org>, "peterz@infradead.org"
+	<peterz@infradead.org>, "pombredanne@nexb.com" <pombredanne@nexb.com>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"bigeasy@linutronix.de" <bigeasy@linutronix.de>, "rgoldwyn@suse.com"
+	<rgoldwyn@suse.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-aio@kvack.org" <linux-aio@kvack.org>,
+	"linux-api@vger.kernel.org" <linux-api@vger.kernel.org>
 Subject: Re: [PATCH v4 3/3] fs: Add aio iopriority support for block_dev
-Message-ID: <20180518160636.GH22791@infradead.org>
+Date: Fri, 18 May 2018 15:29:21 +0000
+Message-ID: <c2055f86-08f8-582f-7055-23f272f057c4@wdc.com>
 References: <20180517203803.2664-1-adam.manzanares@wdc.com>
  <20180517203803.2664-4-adam.manzanares@wdc.com>
+ <51cbf2e9-1ff9-b9e7-fb68-055a64d54da5@kernel.dk>
+In-Reply-To: <51cbf2e9-1ff9-b9e7-fb68-055a64d54da5@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180517203803.2664-4-adam.manzanares@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks fine, although I'd split it into a aio and block_dev patch.
-
-Also please wire this up for the fs/iomap.c direct I/O code, it should
-be essentially the same sniplet as in the block_dev.c code.
+DQoNCk9uIDUvMTgvMTggODoxNCBBTSwgSmVucyBBeGJvZSB3cm90ZToNCj4gT24gNS8xNy8xOCAy
+OjM4IFBNLCBhZGFtLm1hbnphbmFyZXNAd2RjLmNvbSB3cm90ZToNCj4+IEZyb206IEFkYW0gTWFu
+emFuYXJlcyA8YWRhbS5tYW56YW5hcmVzQHdkYy5jb20+DQo+Pg0KPj4gVGhpcyBpcyB0aGUgcGVy
+LUkvTyBlcXVpdmFsZW50IG9mIHRoZSBpb3ByaW9fc2V0IHN5c3RlbSBjYWxsLg0KPj4NCj4+IFdo
+ZW4gSU9DQl9GTEFHX0lPUFJJTyBpcyBzZXQgb24gdGhlIGlvY2IgYWlvX2ZsYWdzIGZpZWxkLCB0
+aGVuIHdlIHNldCB0aGUNCj4+IG5ld2x5IGFkZGVkIGtpb2NiIGtpX2lvcHJpbyBmaWVsZCB0byB0
+aGUgdmFsdWUgaW4gdGhlIGlvY2IgYWlvX3JlcXByaW8gZmllbGQuDQo+Pg0KPj4gV2hlbiBhIGJp
+byBpcyBjcmVhdGVkIGZvciBhbiBhaW8gcmVxdWVzdCBieSB0aGUgYmxvY2sgZGV2IHdlIHNldCB0
+aGUgcHJpb3JpdHkNCj4+IHZhbHVlIG9mIHRoZSBiaW8gdG8gdGhlIHVzZXIgc3VwcGxpZWQgdmFs
+dWUuDQo+Pg0KPj4gVGhpcyBwYXRjaCBkZXBlbmRzIG9uIGJsb2NrOiBhZGQgaW9wcmlvX2NoZWNr
+X2NhcCBmdW5jdGlvbg0KPiANCj4gQWN0dWFsbHksIG9uZSBjb21tZW50IG9uIHRoaXMgb25lOg0K
+PiANCj4+IGRpZmYgLS1naXQgYS9mcy9haW8uYyBiL2ZzL2Fpby5jDQo+PiBpbmRleCBmM2VhZTVk
+NTc3MWIuLmZmMzEwN2FhODJkNSAxMDA2NDQNCj4+IC0tLSBhL2ZzL2Fpby5jDQo+PiArKysgYi9m
+cy9haW8uYw0KPj4gQEAgLTE0NTEsNiArMTQ1MSwyMiBAQCBzdGF0aWMgaW50IGFpb19wcmVwX3J3
+KHN0cnVjdCBraW9jYiAqcmVxLCBzdHJ1Y3QgaW9jYiAqaW9jYikNCj4+ICAgCWlmIChpb2NiLT5h
+aW9fZmxhZ3MgJiBJT0NCX0ZMQUdfUkVTRkQpDQo+PiAgIAkJcmVxLT5raV9mbGFncyB8PSBJT0NC
+X0VWRU5URkQ7DQo+PiAgIAlyZXEtPmtpX2hpbnQgPSBmaWxlX3dyaXRlX2hpbnQocmVxLT5raV9m
+aWxwKTsNCj4+ICsJaWYgKGlvY2ItPmFpb19mbGFncyAmIElPQ0JfRkxBR19JT1BSSU8pIHsNCj4+
+ICsJCS8qDQo+PiArCQkgKiBJZiB0aGUgSU9DQl9GTEFHX0lPUFJJTyBmbGFnIG9mIGFpb19mbGFn
+cyBpcyBzZXQsIHRoZW4NCj4+ICsJCSAqIGFpb19yZXFwcmlvIGlzIGludGVycHJldGVkIGFzIGFu
+IEkvTyBzY2hlZHVsaW5nDQo+PiArCQkgKiBjbGFzcyBhbmQgcHJpb3JpdHkuDQo+PiArCQkgKi8N
+Cj4+ICsJCXJldCA9IGlvcHJpb19jaGVja19jYXAoaW9jYi0+YWlvX3JlcXByaW8pOw0KPj4gKwkJ
+aWYgKHJldCkgew0KPj4gKwkJCXByX2RlYnVnKCJhaW8gaW9wcmlvIGNoZWNrIGNhcCBlcnJvclxu
+Iik7DQo+PiArCQkJcmV0dXJuIC1FSU5WQUw7DQo+PiArCQl9DQo+PiArDQo+PiArCQlyZXEtPmtp
+X2lvcHJpbyA9IGlvY2ItPmFpb19yZXFwcmlvOw0KPj4gKwkJcmVxLT5raV9mbGFncyB8PSBJT0NC
+X0lPUFJJTzsNCj4+ICsJfQ0KPiANCj4gRG8gd2UgcmVhbGx5IG5lZWQgSU9DQl9JT1BSSU8/IEFs
+bCB6ZXJvZXMgaXMgbm8gcHJpb3JpdHkgc2V0IGFueXdheSwNCj4gc28gd2Ugc2hvdWxkIGJlIGFi
+bGUgdG8gZ2V0IGJ5IHdpdGgganVzdCBzZXR0aW5nIC0+a2lfaW9wcmlvIHRvIGVpdGhlcg0KPiB0
+aGUgcHJpb3JpdHksIG9yIDAuDQo+IA0KPj4gZGlmZiAtLWdpdCBhL2ZzL2Jsb2NrX2Rldi5jIGIv
+ZnMvYmxvY2tfZGV2LmMNCj4+IGluZGV4IDdlYzkyMGUyNzA2NS4uOTcwYmVmNzljYWE2IDEwMDY0
+NA0KPj4gLS0tIGEvZnMvYmxvY2tfZGV2LmMNCj4+ICsrKyBiL2ZzL2Jsb2NrX2Rldi5jDQo+PiBA
+QCAtMzU1LDYgKzM1NSw4IEBAIF9fYmxrZGV2X2RpcmVjdF9JTyhzdHJ1Y3Qga2lvY2IgKmlvY2Is
+IHN0cnVjdCBpb3ZfaXRlciAqaXRlciwgaW50IG5yX3BhZ2VzKQ0KPj4gICAJCWJpby0+Ymlfd3Jp
+dGVfaGludCA9IGlvY2ItPmtpX2hpbnQ7DQo+PiAgIAkJYmlvLT5iaV9wcml2YXRlID0gZGlvOw0K
+Pj4gICAJCWJpby0+YmlfZW5kX2lvID0gYmxrZGV2X2Jpb19lbmRfaW87DQo+PiArCQlpZiAoaW9j
+Yi0+a2lfZmxhZ3MgJiBJT0NCX0lPUFJJTykNCj4+ICsJCQliaW8tPmJpX2lvcHJpbyA9IGlvY2It
+PmtpX2lvcHJpbzsNCj4gDQo+IEFuZCB0aGVuIHRoaXMgYXNzaWdubWVudCBjYW4ganVzdCBoYXBw
+ZW4gdW5jb25kaXRpb25hbGx5Lg0KDQpUaGF0IGlzIGEgY2xlYW5lciB3YXkgb2YgZ3VhcmFudGVl
+aW5nIHRoZSBpb3ByaW8gc2V0IG9uIHRoZSBraW9jYiBpcyANCm9ubHkgc2V0IHdoZW4gdGhlIHVz
+ZXIgaW50ZW5kcyB0byB1c2UgdGhlIGlvcHJpbyBmcm9tIHRoZSBpb2NiLg0KDQpJJ2xsIHJlc2Vu
+ZCB0aGUgc2VyaWVzLg0KDQoNCj4g
