@@ -1,131 +1,73 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41336 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1755141AbeEYDsO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 May 2018 23:48:14 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [RESEND PATCH V5 07/33] block: use bio_for_each_segment() to map sg
-Date: Fri, 25 May 2018 11:45:55 +0800
-Message-Id: <20180525034621.31147-8-ming.lei@redhat.com>
-In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
-References: <20180525034621.31147-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 23/34] xfs: remove the now unused XFS_BMAPI_IGSTATE flag
+Date: Fri, 18 May 2018 18:48:19 +0200
+Message-Id: <20180518164830.1552-24-hch@lst.de>
+In-Reply-To: <20180518164830.1552-1-hch@lst.de>
+References: <20180518164830.1552-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-It is more efficient to use bio_for_each_segment() to map sg, meantime
-we have to consider splitting multipage bvec as done in blk_bio_segment_split().
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-merge.c | 72 +++++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 52 insertions(+), 20 deletions(-)
+ fs/xfs/libxfs/xfs_bmap.c | 6 ++----
+ fs/xfs/libxfs/xfs_bmap.h | 3 ---
+ 2 files changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index d157b752d965..9fc96c9f6061 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -414,6 +414,56 @@ static int blk_phys_contig_segment(struct request_queue *q, struct bio *bio,
- 	return 0;
- }
+diff --git a/fs/xfs/libxfs/xfs_bmap.c b/fs/xfs/libxfs/xfs_bmap.c
+index 7b0e2b551e23..4b5e014417d2 100644
+--- a/fs/xfs/libxfs/xfs_bmap.c
++++ b/fs/xfs/libxfs/xfs_bmap.c
+@@ -3799,8 +3799,7 @@ xfs_bmapi_update_map(
+ 		   mval[-1].br_startblock != HOLESTARTBLOCK &&
+ 		   mval->br_startblock == mval[-1].br_startblock +
+ 					  mval[-1].br_blockcount &&
+-		   ((flags & XFS_BMAPI_IGSTATE) ||
+-			mval[-1].br_state == mval->br_state)) {
++		   mval[-1].br_state == mval->br_state) {
+ 		ASSERT(mval->br_startoff ==
+ 		       mval[-1].br_startoff + mval[-1].br_blockcount);
+ 		mval[-1].br_blockcount += mval->br_blockcount;
+@@ -3845,7 +3844,7 @@ xfs_bmapi_read(
  
-+static struct scatterlist *blk_next_sg(struct scatterlist **sg,
-+		struct scatterlist *sglist)
-+{
-+	if (!*sg)
-+		return sglist;
-+	else {
-+		/*
-+		 * If the driver previously mapped a shorter
-+		 * list, we could see a termination bit
-+		 * prematurely unless it fully inits the sg
-+		 * table on each mapping. We KNOW that there
-+		 * must be more entries here or the driver
-+		 * would be buggy, so force clear the
-+		 * termination bit to avoid doing a full
-+		 * sg_init_table() in drivers for each command.
-+		 */
-+		sg_unmark_end(*sg);
-+		return sg_next(*sg);
-+	}
-+}
-+
-+static unsigned blk_bvec_map_sg(struct request_queue *q,
-+		struct bio_vec *bvec, struct scatterlist *sglist,
-+		struct scatterlist **sg)
-+{
-+	unsigned nbytes = bvec->bv_len;
-+	unsigned nsegs = 0, total = 0;
-+
-+	while (nbytes > 0) {
-+		unsigned seg_size;
-+		struct page *pg;
-+		unsigned offset, idx;
-+
-+		*sg = blk_next_sg(sg, sglist);
-+
-+		seg_size = min(nbytes, queue_max_segment_size(q));
-+		offset = (total + bvec->bv_offset) % PAGE_SIZE;
-+		idx = (total + bvec->bv_offset) / PAGE_SIZE;
-+		pg = nth_page(bvec->bv_page, idx);
-+
-+		sg_set_page(*sg, pg, seg_size, offset);
-+
-+		total += seg_size;
-+		nbytes -= seg_size;
-+		nsegs++;
-+	}
-+
-+	return nsegs;
-+}
-+
- static inline void
- __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
- 		     struct scatterlist *sglist, struct bio_vec *bvprv,
-@@ -434,25 +484,7 @@ __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
- 		(*sg)->length += nbytes;
- 	} else {
- new_segment:
--		if (!*sg)
--			*sg = sglist;
--		else {
--			/*
--			 * If the driver previously mapped a shorter
--			 * list, we could see a termination bit
--			 * prematurely unless it fully inits the sg
--			 * table on each mapping. We KNOW that there
--			 * must be more entries here or the driver
--			 * would be buggy, so force clear the
--			 * termination bit to avoid doing a full
--			 * sg_init_table() in drivers for each command.
--			 */
--			sg_unmark_end(*sg);
--			*sg = sg_next(*sg);
--		}
--
--		sg_set_page(*sg, bvec->bv_page, nbytes, bvec->bv_offset);
--		(*nsegs)++;
-+		(*nsegs) += blk_bvec_map_sg(q, bvec, sglist, sg);
- 	}
- 	*bvprv = *bvec;
- }
-@@ -474,7 +506,7 @@ static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
- 	int cluster = blk_queue_cluster(q), nsegs = 0;
+ 	ASSERT(*nmap >= 1);
+ 	ASSERT(!(flags & ~(XFS_BMAPI_ATTRFORK|XFS_BMAPI_ENTIRE|
+-			   XFS_BMAPI_IGSTATE|XFS_BMAPI_COWFORK)));
++			   XFS_BMAPI_COWFORK)));
+ 	ASSERT(xfs_isilocked(ip, XFS_ILOCK_SHARED|XFS_ILOCK_EXCL));
  
- 	for_each_bio(bio)
--		bio_for_each_page(bvec, bio, iter)
-+		bio_for_each_segment(bvec, bio, iter)
- 			__blk_segment_map_sg(q, &bvec, sglist, &bvprv, sg,
- 					     &nsegs, &cluster);
+ 	if (unlikely(XFS_TEST_ERROR(
+@@ -4290,7 +4289,6 @@ xfs_bmapi_write(
  
+ 	ASSERT(*nmap >= 1);
+ 	ASSERT(*nmap <= XFS_BMAP_MAX_NMAP);
+-	ASSERT(!(flags & XFS_BMAPI_IGSTATE));
+ 	ASSERT(tp != NULL ||
+ 	       (flags & (XFS_BMAPI_CONVERT | XFS_BMAPI_COWFORK)) ==
+ 			(XFS_BMAPI_CONVERT | XFS_BMAPI_COWFORK));
+diff --git a/fs/xfs/libxfs/xfs_bmap.h b/fs/xfs/libxfs/xfs_bmap.h
+index 2c233f9f1a26..a845fe57d1b5 100644
+--- a/fs/xfs/libxfs/xfs_bmap.h
++++ b/fs/xfs/libxfs/xfs_bmap.h
+@@ -80,8 +80,6 @@ struct xfs_extent_free_item
+ #define XFS_BMAPI_METADATA	0x002	/* mapping metadata not user data */
+ #define XFS_BMAPI_ATTRFORK	0x004	/* use attribute fork not data */
+ #define XFS_BMAPI_PREALLOC	0x008	/* preallocation op: unwritten space */
+-#define XFS_BMAPI_IGSTATE	0x010	/* Ignore state - */
+-					/* combine contig. space */
+ #define XFS_BMAPI_CONTIG	0x020	/* must allocate only one extent */
+ /*
+  * unwritten extent conversion - this needs write cache flushing and no additional
+@@ -128,7 +126,6 @@ struct xfs_extent_free_item
+ 	{ XFS_BMAPI_METADATA,	"METADATA" }, \
+ 	{ XFS_BMAPI_ATTRFORK,	"ATTRFORK" }, \
+ 	{ XFS_BMAPI_PREALLOC,	"PREALLOC" }, \
+-	{ XFS_BMAPI_IGSTATE,	"IGSTATE" }, \
+ 	{ XFS_BMAPI_CONTIG,	"CONTIG" }, \
+ 	{ XFS_BMAPI_CONVERT,	"CONVERT" }, \
+ 	{ XFS_BMAPI_ZERO,	"ZERO" }, \
 -- 
-2.9.5
+2.17.0
