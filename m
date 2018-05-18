@@ -1,333 +1,85 @@
-Return-Path: <roman.penyaev@profitbricks.com>
-Return-Path: <roman.penyaev@profitbricks.com>
-From: Roman Pen <roman.penyaev@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Or Gerlitz <ogerlitz@mellanox.com>,
-	Doug Ledford <dledford@redhat.com>,
-	Swapnil Ingle <swapnil.ingle@profitbricks.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>,
-	Jack Wang <jinpu.wang@profitbricks.com>,
-	Roman Pen <roman.penyaev@profitbricks.com>
-Subject: [PATCH v2 13/26] ibtrs: server: sysfs interface functions
-Date: Fri, 18 May 2018 15:04:00 +0200
-Message-Id: <20180518130413.16997-14-roman.penyaev@profitbricks.com>
-In-Reply-To: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
-References: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
+Return-Path: <palmer@sifive.com>
+Return-Path: <palmer@sifive.com>
+Date: Fri, 18 May 2018 13:33:13 -0700 (PDT)
+Subject: Re: [PATCH v10 1/2] arch/*: Add CONFIG_ARCH_HAVE_CMPXCHG64
+In-Reply-To: <20180515225124.20428-2-bart.vanassche@wdc.com>
+CC: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+  Christoph Hellwig <hch@lst.de>, bart.vanassche@wdc.com, catalin.marinas@arm.com,
+  Will Deacon <will.deacon@arm.com>, tony.luck@intel.com, fenghua.yu@intel.com, geert@linux-m68k.org,
+  jejb@parisc-linux.org, deller@gmx.de, benh@kernel.crashing.org, paulus@samba.org, mpe@ellerman.id.au,
+  schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, davem@davemloft.net, tglx@linutronix.de,
+  mingo@redhat.com, hpa@zytor.com, chris@zankel.net, jcmvbkbc@gmail.com,
+  Arnd Bergmann <arnd@arndb.de>, corbet@lwn.net
+From: Palmer Dabbelt <palmer@sifive.com>
+To: bart.vanassche@wdc.com
+Message-ID: <mhng-26ddbf89-8276-47a4-9235-e900f91fa575@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-This is the sysfs interface to IBTRS sessions on server side:
+On Tue, 15 May 2018 15:51:20 PDT (-0700), bart.vanassche@wdc.com wrote:
+> The next patch in this series introduces a call to cmpxchg64()
+> in the block layer core for those architectures on which this
+> functionality is available. Make it possible to test whether
+> cmpxchg64() is available by introducing CONFIG_ARCH_HAVE_CMPXCHG64.
+>
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> Cc: Tony Luck <tony.luck@intel.com>
+> Cc: Fenghua Yu <fenghua.yu@intel.com>
+> Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+> Cc: "James E.J. Bottomley" <jejb@parisc-linux.org>
+> Cc: Helge Deller <deller@gmx.de>
+> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Cc: Paul Mackerras <paulus@samba.org>
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Cc: Martin Schwidefsky <schwidefsky@de.ibm.com>
+> Cc: Heiko Carstens <heiko.carstens@de.ibm.com>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: H. Peter Anvin <hpa@zytor.com>
+> Cc: Chris Zankel <chris@zankel.net>
+> Cc: Max Filippov <jcmvbkbc@gmail.com>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> ---
+>  .../features/locking/cmpxchg64/arch-support.txt    | 33 ++++++++++++++++++++++
+>  arch/Kconfig                                       |  3 ++
+>  arch/alpha/Kconfig                                 |  1 +
+>  arch/arm/Kconfig                                   |  1 +
+>  arch/arm64/Kconfig                                 |  1 +
+>  arch/ia64/Kconfig                                  |  1 +
+>  arch/m68k/Kconfig                                  |  1 +
+>  arch/mips/Kconfig                                  |  1 +
+>  arch/parisc/Kconfig                                |  1 +
+>  arch/powerpc/Kconfig                               |  1 +
+>  arch/riscv/Kconfig                                 |  1 +
+>  arch/s390/Kconfig                                  |  1 +
+>  arch/sparc/Kconfig                                 |  1 +
+>  arch/x86/Kconfig                                   |  1 +
+>  arch/xtensa/Kconfig                                |  1 +
+>  15 files changed, 49 insertions(+)
+>  create mode 100644 Documentation/features/locking/cmpxchg64/arch-support.txt
 
-  /sys/devices/virtual/ibtrs-server/<SESS-NAME>/
-    *** IBTRS session accepted from a client peer
-    |
-    |- paths/<SOURCE-IP>/
-       *** established paths from a client in a session
-       |
-       |- disconnect
-       |  *** disconnect path
-       |
-       |- hca_name
-       |  *** HCA name
-       |
-       |- hca_port
-       |  *** HCA port
-       |
-       |- stats/
-          *** current path statistics
-          |
-	  |- rdma
-	  |- reset_all
-	  |- wc_completions
+[...]
 
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
-Cc: Jack Wang <jinpu.wang@profitbricks.com>
----
- drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c | 271 +++++++++++++++++++++++++
- 1 file changed, 271 insertions(+)
- create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c
+> --- a/arch/riscv/Kconfig
+> +++ b/arch/riscv/Kconfig
+> @@ -8,6 +8,7 @@ config RISCV
+>  	select OF
+>  	select OF_EARLY_FLATTREE
+>  	select OF_IRQ
+> +	select ARCH_HAVE_CMPXCHG64
+>  	select ARCH_WANT_FRAME_POINTERS
+>  	select CLONE_BACKWARDS
+>  	select COMMON_CLK
 
-diff --git a/drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c b/drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c
-new file mode 100644
-index 000000000000..96d9d9f08e0e
---- /dev/null
-+++ b/drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c
-@@ -0,0 +1,271 @@
-+/*
-+ * InfiniBand Transport Layer
-+ *
-+ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Fabian Holler <mail@fholler.de>
-+ *          Jack Wang <jinpu.wang@profitbricks.com>
-+ *          Kleber Souza <kleber.souza@profitbricks.com>
-+ *          Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *          Milind Dumbare <Milind.dumbare@gmail.com>
-+ *
-+ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#undef pr_fmt
-+#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
-+
-+#include "ibtrs-pri.h"
-+#include "ibtrs-srv.h"
-+#include "ibtrs-log.h"
-+
-+extern struct class *ibtrs_dev_class;
-+
-+static struct kobj_type ktype = {
-+	.sysfs_ops	= &kobj_sysfs_ops,
-+};
-+
-+static ssize_t ibtrs_srv_disconnect_show(struct kobject *kobj,
-+					 struct kobj_attribute *attr,
-+					 char *page)
-+{
-+	return scnprintf(page, PAGE_SIZE, "Usage: echo 1 > %s\n",
-+			 attr->attr.name);
-+}
-+
-+static ssize_t ibtrs_srv_disconnect_store(struct kobject *kobj,
-+					  struct kobj_attribute *attr,
-+					  const char *buf, size_t count)
-+{
-+	struct ibtrs_srv_sess *sess;
-+	char str[MAXHOSTNAMELEN];
-+
-+	sess = container_of(kobj, struct ibtrs_srv_sess, kobj);
-+	if (!sysfs_streq(buf, "1")) {
-+		ibtrs_err(sess, "%s: invalid value: '%s'\n",
-+			  attr->attr.name, buf);
-+		return -EINVAL;
-+	}
-+
-+	sockaddr_to_str((struct sockaddr *)&sess->s.dst_addr, str, sizeof(str));
-+
-+	ibtrs_info(sess, "disconnect for path %s requested\n", str);
-+	ibtrs_srv_queue_close(sess);
-+
-+	return count;
-+}
-+
-+static struct kobj_attribute ibtrs_srv_disconnect_attr =
-+	__ATTR(disconnect, 0644,
-+	       ibtrs_srv_disconnect_show, ibtrs_srv_disconnect_store);
-+
-+static ssize_t ibtrs_srv_hca_port_show(struct kobject *kobj,
-+				       struct kobj_attribute *attr,
-+				       char *page)
-+{
-+	struct ibtrs_srv_sess *sess;
-+	struct ibtrs_con *usr_con;
-+
-+	sess = container_of(kobj, typeof(*sess), kobj);
-+	usr_con = sess->s.con[0];
-+
-+	return scnprintf(page, PAGE_SIZE, "%u\n",
-+			 usr_con->cm_id->port_num);
-+}
-+
-+static struct kobj_attribute ibtrs_srv_hca_port_attr =
-+	__ATTR(hca_port, 0444, ibtrs_srv_hca_port_show, NULL);
-+
-+static ssize_t ibtrs_srv_hca_name_show(struct kobject *kobj,
-+				       struct kobj_attribute *attr,
-+				       char *page)
-+{
-+	struct ibtrs_srv_sess *sess;
-+
-+	sess = container_of(kobj, struct ibtrs_srv_sess, kobj);
-+
-+	return scnprintf(page, PAGE_SIZE, "%s\n",
-+			 sess->s.dev->ib_dev->name);
-+}
-+
-+static struct kobj_attribute ibtrs_srv_hca_name_attr =
-+	__ATTR(hca_name, 0444, ibtrs_srv_hca_name_show, NULL);
-+
-+static struct attribute *ibtrs_srv_sess_attrs[] = {
-+	&ibtrs_srv_hca_name_attr.attr,
-+	&ibtrs_srv_hca_port_attr.attr,
-+	&ibtrs_srv_disconnect_attr.attr,
-+	NULL,
-+};
-+
-+static struct attribute_group ibtrs_srv_sess_attr_group = {
-+	.attrs = ibtrs_srv_sess_attrs,
-+};
-+
-+STAT_ATTR(struct ibtrs_srv_sess, rdma,
-+	  ibtrs_srv_stats_rdma_to_str,
-+	  ibtrs_srv_reset_rdma_stats);
-+
-+STAT_ATTR(struct ibtrs_srv_sess, wc_completion,
-+	  ibtrs_srv_stats_wc_completion_to_str,
-+	  ibtrs_srv_reset_wc_completion_stats);
-+
-+STAT_ATTR(struct ibtrs_srv_sess, reset_all,
-+	  ibtrs_srv_reset_all_help,
-+	  ibtrs_srv_reset_all_stats);
-+
-+static struct attribute *ibtrs_srv_stats_attrs[] = {
-+	&rdma_attr.attr,
-+	&wc_completion_attr.attr,
-+	&reset_all_attr.attr,
-+	NULL,
-+};
-+
-+static struct attribute_group ibtrs_srv_stats_attr_group = {
-+	.attrs = ibtrs_srv_stats_attrs,
-+};
-+
-+static void ibtrs_srv_dev_release(struct device *dev)
-+{
-+	/* Nobody plays with device references, so nop */
-+}
-+
-+static int ibtrs_srv_create_once_sysfs_root_folders(struct ibtrs_srv_sess *sess)
-+{
-+	struct ibtrs_srv *srv = sess->srv;
-+	int err = 0;
-+
-+	mutex_lock(&srv->paths_mutex);
-+	if (srv->dev_ref++) {
-+		/*
-+		 * Just increase device reference.  We can't use get_device()
-+		 * because we need to unregister device when ref goes to 0,
-+		 * not just to put it.
-+		 */
-+		goto unlock;
-+	}
-+	srv->dev.class = ibtrs_dev_class;
-+	srv->dev.release = ibtrs_srv_dev_release;
-+	dev_set_name(&srv->dev, "%s", sess->s.sessname);
-+
-+	err = device_register(&srv->dev);
-+	if (unlikely(err)) {
-+		pr_err("device_register(): %d\n", err);
-+		goto unlock;
-+	}
-+	err = kobject_init_and_add(&srv->kobj_paths, &ktype,
-+				   &srv->dev.kobj, "paths");
-+	if (unlikely(err)) {
-+		pr_err("kobject_init_and_add(): %d\n", err);
-+		device_unregister(&srv->dev);
-+		goto unlock;
-+	}
-+unlock:
-+	mutex_unlock(&srv->paths_mutex);
-+
-+	return err;
-+}
-+
-+static void ibtrs_srv_destroy_once_sysfs_root_folders(struct ibtrs_srv_sess *sess)
-+{
-+	struct ibtrs_srv *srv = sess->srv;
-+
-+	mutex_lock(&srv->paths_mutex);
-+	if (!--srv->dev_ref) {
-+		kobject_put(&srv->kobj_paths);
-+		device_unregister(&srv->dev);
-+	}
-+	mutex_unlock(&srv->paths_mutex);
-+}
-+
-+static int ibtrs_srv_create_stats_files(struct ibtrs_srv_sess *sess)
-+{
-+	int err;
-+
-+	err = kobject_init_and_add(&sess->kobj_stats, &ktype,
-+				   &sess->kobj, "stats");
-+	if (unlikely(err)) {
-+		ibtrs_err(sess, "kobject_init_and_add(): %d\n", err);
-+		return err;
-+	}
-+	err = sysfs_create_group(&sess->kobj_stats,
-+				 &ibtrs_srv_stats_attr_group);
-+	if (unlikely(err)) {
-+		ibtrs_err(sess, "sysfs_create_group(): %d\n", err);
-+		goto err;
-+	}
-+
-+	return 0;
-+
-+err:
-+	kobject_put(&sess->kobj_stats);
-+
-+	return err;
-+}
-+
-+int ibtrs_srv_create_sess_files(struct ibtrs_srv_sess *sess)
-+{
-+	struct ibtrs_srv *srv = sess->srv;
-+	char str[MAXHOSTNAMELEN];
-+	int err;
-+
-+	sockaddr_to_str((struct sockaddr *)&sess->s.dst_addr, str, sizeof(str));
-+
-+	err = ibtrs_srv_create_once_sysfs_root_folders(sess);
-+	if (unlikely(err))
-+		return err;
-+
-+	err = kobject_init_and_add(&sess->kobj, &ktype, &srv->kobj_paths,
-+				   "%s", str);
-+	if (unlikely(err)) {
-+		ibtrs_err(sess, "kobject_init_and_add(): %d\n", err);
-+		goto destroy_root;
-+	}
-+	err = sysfs_create_group(&sess->kobj, &ibtrs_srv_sess_attr_group);
-+	if (unlikely(err)) {
-+		ibtrs_err(sess, "sysfs_create_group(): %d\n", err);
-+		goto put_kobj;
-+	}
-+	err = ibtrs_srv_create_stats_files(sess);
-+	if (unlikely(err))
-+		goto remove_group;
-+
-+	return 0;
-+
-+remove_group:
-+	sysfs_remove_group(&sess->kobj, &ibtrs_srv_sess_attr_group);
-+put_kobj:
-+	kobject_del(&sess->kobj);
-+	kobject_put(&sess->kobj);
-+destroy_root:
-+	ibtrs_srv_destroy_once_sysfs_root_folders(sess);
-+
-+	return err;
-+}
-+
-+void ibtrs_srv_destroy_sess_files(struct ibtrs_srv_sess *sess)
-+{
-+	if (sess->kobj.state_in_sysfs) {
-+		kobject_del(&sess->kobj_stats);
-+		kobject_put(&sess->kobj_stats);
-+		kobject_del(&sess->kobj);
-+		kobject_put(&sess->kobj);
-+
-+		ibtrs_srv_destroy_once_sysfs_root_folders(sess);
-+	}
-+}
--- 
-2.13.1
+If I understand correctly, we should only have ARCH_HAVE_CMPXCHG64 on 64-bit 
+RISC-V systems so this should look something like
+
+   select ARCH_HAVE_CMPXCHG64 if 64BIT
+
+Of course, the RV32I port is broken right now so it's not a big deal, but we're 
+working through making it less broken...
