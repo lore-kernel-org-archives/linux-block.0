@@ -1,86 +1,56 @@
-Return-Path: <huhai@kylinos.cn>
-From: "=?utf-8?B?6IOh5rW3?=" <huhai@kylinos.cn>
-To: "=?utf-8?B?YXhib2U=?=" <axboe@kernel.dk>
-Cc: "=?utf-8?B?bGludXgtYmxvY2s=?=" <linux-block@vger.kernel.org>, "=?utf-8?B?aGNo?=" <hch@lst.de>
-Subject: blk-mq: for sync case, whether it is mq or sq make_request instances, we should send the request directly
-Mime-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_5AFB9B1C_0AF94130_72F3614E"
-Date: Wed, 16 May 2018 10:44:44 +0800
-Message-ID: <tencent_1349131F26ECB129026E2168@qq.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Doug Ledford <dledford@redhat.com>,
+	Swapnil Ingle <swapnil.ingle@profitbricks.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH v2 26/26] MAINTAINERS: Add maintainer for IBNBD/IBTRS modules
+Date: Fri, 18 May 2018 15:04:13 +0200
+Message-Id: <20180518130413.16997-27-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
+References: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This is a multi-part message in MIME format.
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Cc: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jack Wang <jinpu.wang@profitbricks.com>
+---
+ MAINTAINERS | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-------=_NextPart_5AFB9B1C_0AF94130_72F3614E
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
-
-QXV0aG9yOiBodWhhaSA8aHVoYWlAa3lsaW5vcy5jbj4NCkRhdGU6ICAgV2VkIE1heSAxNiAx
-MDozNDoyMiAyMDE4ICswODAwDQoNCiAgICBibGstbXE6IGZvciBzeW5jIGNhc2UsIHdoZXRo
-ZXIgaXQgaXMgbXEgb3Igc3EgbWFrZV9yZXF1ZXN0IGluc3RhbmNlcywgd2Ugc2hvdWxkIHNl
-bmQgdGhlIHJlcXVlc3QgZGlyZWN0bHkNCiAgICANCiAgICBGb3Igc3EgbWFrZV9yZXF1ZXN0
-IGluc3RhbmNlcywgd2Ugc2hvdWxkIGlzc3VlIHN5bmMgcmVxdWVzdCBkaXJlY3RseSB0b28s
-IA0KICAgIG90aGVyd2lzZSBpdCB3aWxsIGJyZWFrIGRvd24gdGhlIHNlbWFudGljcyBvZiBz
-eW5jIHJlcXVlc3QsIA0KICAgIHRoZSBjdXJyZW50IGNvZGUgbG9naWMgaXMgdG8gc2VuZCBz
-eW5jaHJvbm91cyByZXF1ZXN0cyBhc3luY2hyb25vdXNseS4NCiAgICANCiAgICBTaWduZWQt
-b2ZmLWJ5OiBodWhhaSA8aHVoYWlAa3lsaW5vcy5jbj4NCg0KZGlmZiAtLWdpdCBhL2Jsb2Nr
-L2Jsay1tcS5jIGIvYmxvY2svYmxrLW1xLmMNCmluZGV4IDU2MjlmMTguLmZjZjJmMTYgMTAw
-NjQ0DQotLS0gYS9ibG9jay9ibGstbXEuYw0KKysrIGIvYmxvY2svYmxrLW1xLmMNCkBAIC0x
-NzcxLDcgKzE3NzEsNyBAQCBzdGF0aWMgYmxrX3FjX3QgYmxrX21xX21ha2VfcmVxdWVzdChz
-dHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSwgc3RydWN0IGJpbyAqYmlvKQ0KICAgICAgICAgICAg
-ICAgICAgICAgICAgYmxrX21xX3RyeV9pc3N1ZV9kaXJlY3RseShkYXRhLmhjdHgsIHNhbWVf
-cXVldWVfcnEsDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJmNv
-b2tpZSk7DQogICAgICAgICAgICAgICAgfQ0KLSAgICAgICB9IGVsc2UgaWYgKHEtPm5yX2h3
-X3F1ZXVlcyA+IDEgJiYgaXNfc3luYykgew0KKyAgICAgICB9IGVsc2UgaWYgKGlzX3N5bmMp
-IHsNCiAgICAgICAgICAgICAgICBibGtfbXFfcHV0X2N0eChkYXRhLmN0eCk7DQogICAgICAg
-ICAgICAgICAgYmxrX21xX2Jpb190b19yZXF1ZXN0KHJxLCBiaW8pOw0KICAgICAgICAgICAg
-ICAgIGJsa19tcV90cnlfaXNzdWVfZGlyZWN0bHkoZGF0YS5oY3R4LCBycSwgJmNvb2tpZSk7
-
-
-------=_NextPart_5AFB9B1C_0AF94130_72F3614E
-Content-Type: text/html;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
-
-QXV0aG9yOiBodWhhaSAmbHQ7aHVoYWlAa3lsaW5vcy5jbiZndDs8YnI+RGF0ZTombmJzcDsm
-bmJzcDsgV2VkIE1heSAxNiAxMDozNDoyMiAyMDE4ICswODAwPGJyPjxicj4mbmJzcDsmbmJz
-cDsmbmJzcDsgYmxrLW1xOiBmb3Igc3luYyBjYXNlLCB3aGV0aGVyIGl0IGlzIG1xIG9yIHNx
-IG1ha2VfcmVxdWVzdCBpbnN0YW5jZXMsIHdlIHNob3VsZCBzZW5kIHRoZSByZXF1ZXN0IGRp
-cmVjdGx5PGJyPiZuYnNwOyZuYnNwOyZuYnNwOyA8YnI+Jm5ic3A7Jm5ic3A7Jm5ic3A7IEZv
-ciBzcSBtYWtlX3JlcXVlc3QgaW5zdGFuY2VzLCB3ZSBzaG91bGQgaXNzdWUgc3luYyByZXF1
-ZXN0IGRpcmVjdGx5IHRvbywgPGJyPiZuYnNwOyZuYnNwOyZuYnNwOyBvdGhlcndpc2UgaXQg
-d2lsbCBicmVhayBkb3duIHRoZSBzZW1hbnRpY3Mgb2Ygc3luYyByZXF1ZXN0LCA8YnI+Jm5i
-c3A7Jm5ic3A7Jm5ic3A7IHRoZSBjdXJyZW50IGNvZGUgbG9naWMgaXMgdG8gc2VuZCBzeW5j
-aHJvbm91cyByZXF1ZXN0cyBhc3luY2hyb25vdXNseS48YnI+Jm5ic3A7Jm5ic3A7Jm5ic3A7
-IDxicj4mbmJzcDsmbmJzcDsmbmJzcDsgU2lnbmVkLW9mZi1ieTogaHVoYWkgJmx0O2h1aGFp
-QGt5bGlub3MuY24mZ3Q7PGJyPjxicj5kaWZmIC0tZ2l0IGEvYmxvY2svYmxrLW1xLmMgYi9i
-bG9jay9ibGstbXEuYzxicj5pbmRleCA1NjI5ZjE4Li5mY2YyZjE2IDEwMDY0NDxicj4tLS0g
-YS9ibG9jay9ibGstbXEuYzxicj4rKysgYi9ibG9jay9ibGstbXEuYzxicj5AQCAtMTc3MSw3
-ICsxNzcxLDcgQEAgc3RhdGljIGJsa19xY190IGJsa19tcV9tYWtlX3JlcXVlc3Qoc3RydWN0
-IHJlcXVlc3RfcXVldWUgKnEsIHN0cnVjdCBiaW8gKmJpbyk8YnI+Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7IGJsa19tcV90cnlfaXNzdWVfZGlyZWN0bHkoZGF0YS5oY3R4LCBz
-YW1lX3F1ZXVlX3JxLDxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgJmFtcDtjb29raWUpOzxicj4m
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgfTxicj4tJm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IH0gZWxzZSBpZiAocS0mZ3Q7bnJfaHdfcXVldWVz
-ICZndDsgMSAmYW1wOyZhbXA7IGlzX3N5bmMpIHs8YnI+KyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyB9IGVsc2UgaWYgKGlzX3N5bmMpIHs8YnI+Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IGJsa19tcV9wdXRfY3R4KGRhdGEuY3R4KTs8YnI+
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IGJsa19tcV9iaW9fdG9fcmVx
-dWVzdChycSwgYmlvKTs8YnI+PGRpdj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsgYmxrX21xX3RyeV9pc3N1ZV9kaXJlY3RseShkYXRhLmhjdHgsIHJxLCAmYW1wO2Nv
-b2tpZSk7PC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj48YnI+PCEtLTwhW2VuZGlmXS0tPjwv
-ZGl2Pg==
-
-------=_NextPart_5AFB9B1C_0AF94130_72F3614E--
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 92be777d060a..e5a001bd0f05 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -6786,6 +6786,20 @@ IBM ServeRAID RAID DRIVER
+ S:	Orphan
+ F:	drivers/scsi/ips.*
+ 
++IBNBD BLOCK DRIVERS
++M:	IBNBD/IBTRS Storage Team <ibnbd@profitbricks.com>
++L:	linux-block@vger.kernel.org
++S:	Maintained
++T:	git git://github.com/profitbricks/ibnbd.git
++F:	drivers/block/ibnbd/
++
++IBTRS TRANSPORT DRIVERS
++M:	IBNBD/IBTRS Storage Team <ibnbd@profitbricks.com>
++L:	linux-rdma@vger.kernel.org
++S:	Maintained
++T:	git git://github.com/profitbricks/ibnbd.git
++F:	drivers/infiniband/ulp/ibtrs/
++
+ ICH LPC AND GPIO DRIVER
+ M:	Peter Tyser <ptyser@xes-inc.com>
+ S:	Maintained
+-- 
+2.13.1
