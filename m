@@ -1,214 +1,132 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX] block, bfq: postpone rq preparation to insert or merge
-Date: Fri,  4 May 2018 19:17:01 +0200
-Message-Id: <20180504171701.6876-1-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:49840 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751906AbeERQs7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 May 2018 12:48:59 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 09/34] iomap: inline data should be an iomap type, not a flag
+Date: Fri, 18 May 2018 18:48:05 +0200
+Message-Id: <20180518164830.1552-10-hch@lst.de>
+In-Reply-To: <20180518164830.1552-1-hch@lst.de>
+References: <20180518164830.1552-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When invoked for an I/O request rq, the prepare_request hook of bfq
-increments reference counters in the destination bfq_queue for rq. In
-this respect, after this hook has been invoked, rq may still be
-transformed into a request with no icq attached, i.e., for bfq, a
-request not associated with any bfq_queue. No further hook is invoked
-to signal this tranformation to bfq (in general, to the destination
-elevator for rq). This leads bfq into an inconsistent state, because
-bfq has no chance to correctly lower these counters back. This
-inconsistency may in its turn cause incorrect scheduling and hangs. It
-certainly causes memory leaks, by making it impossible for bfq to free
-the involved bfq_queue.
+Inline data is fundamentally different from our normal mapped case in that
+it doesn't even have a block address.  So instead of having a flag for it
+it should be an entirely separate iomap range type.
 
-On the bright side, no transformation can still happen for rq after rq
-has been inserted into bfq, or merged with another, already inserted,
-request. Exploiting this fact, this commit addresses the above issue
-by delaying the preparation of an I/O request to when the request is
-inserted or merged.
-
-This change also gives a performance bonus: a lock-contention point
-gets removed. To prepare a request, bfq needs to hold its scheduler
-lock. After postponing request preparation to insertion or merging, no
-lock needs to be grabbed any longer in the prepare_request hook, while
-the lock already taken to perform insertion or merging is used to
-preparare the request as well.
-
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bfq-iosched.c | 86 +++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 57 insertions(+), 29 deletions(-)
+ fs/ext4/inline.c      |  4 ++--
+ fs/gfs2/bmap.c        |  3 +--
+ fs/iomap.c            | 21 ++++++++++++---------
+ include/linux/iomap.h |  2 +-
+ 4 files changed, 16 insertions(+), 14 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 771ae9730ac6..ea02162df6c7 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -1858,6 +1858,8 @@ static int bfq_request_merge(struct request_queue *q, struct request **req,
- 	return ELEVATOR_NO_MERGE;
+diff --git a/fs/ext4/inline.c b/fs/ext4/inline.c
+index 70cf4c7b268a..e1f00891ef95 100644
+--- a/fs/ext4/inline.c
++++ b/fs/ext4/inline.c
+@@ -1835,8 +1835,8 @@ int ext4_inline_data_iomap(struct inode *inode, struct iomap *iomap)
+ 	iomap->offset = 0;
+ 	iomap->length = min_t(loff_t, ext4_get_inline_size(inode),
+ 			      i_size_read(inode));
+-	iomap->type = 0;
+-	iomap->flags = IOMAP_F_DATA_INLINE;
++	iomap->type = IOMAP_INLINE;
++	iomap->flags = 0;
+ 
+ out:
+ 	up_read(&EXT4_I(inode)->xattr_sem);
+diff --git a/fs/gfs2/bmap.c b/fs/gfs2/bmap.c
+index 278ed0869c3c..cbeedd3cfb36 100644
+--- a/fs/gfs2/bmap.c
++++ b/fs/gfs2/bmap.c
+@@ -680,8 +680,7 @@ static void gfs2_stuffed_iomap(struct inode *inode, struct iomap *iomap)
+ 		      sizeof(struct gfs2_dinode);
+ 	iomap->offset = 0;
+ 	iomap->length = i_size_read(inode);
+-	iomap->type = IOMAP_MAPPED;
+-	iomap->flags = IOMAP_F_DATA_INLINE;
++	iomap->type = IOMAP_INLINE;
  }
  
-+static struct bfq_queue *bfq_init_rq(struct request *rq);
-+
- static void bfq_request_merged(struct request_queue *q, struct request *req,
- 			       enum elv_merge type)
- {
-@@ -1866,7 +1868,7 @@ static void bfq_request_merged(struct request_queue *q, struct request *req,
- 	    blk_rq_pos(req) <
- 	    blk_rq_pos(container_of(rb_prev(&req->rb_node),
- 				    struct request, rb_node))) {
--		struct bfq_queue *bfqq = RQ_BFQQ(req);
-+		struct bfq_queue *bfqq = bfq_init_rq(req);
- 		struct bfq_data *bfqd = bfqq->bfqd;
- 		struct request *prev, *next_rq;
+ /**
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 0fecd5789d7b..a859e15d7bec 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -503,10 +503,13 @@ static int iomap_to_fiemap(struct fiemap_extent_info *fi,
+ 	case IOMAP_DELALLOC:
+ 		flags |= FIEMAP_EXTENT_DELALLOC | FIEMAP_EXTENT_UNKNOWN;
+ 		break;
++	case IOMAP_MAPPED:
++		break;
+ 	case IOMAP_UNWRITTEN:
+ 		flags |= FIEMAP_EXTENT_UNWRITTEN;
+ 		break;
+-	case IOMAP_MAPPED:
++	case IOMAP_INLINE:
++		flags |= FIEMAP_EXTENT_DATA_INLINE;
+ 		break;
+ 	}
  
-@@ -1894,7 +1896,8 @@ static void bfq_request_merged(struct request_queue *q, struct request *req,
- static void bfq_requests_merged(struct request_queue *q, struct request *rq,
- 				struct request *next)
- {
--	struct bfq_queue *bfqq = RQ_BFQQ(rq), *next_bfqq = RQ_BFQQ(next);
-+	struct bfq_queue *bfqq = bfq_init_rq(rq),
-+		*next_bfqq = bfq_init_rq(next);
+@@ -514,8 +517,6 @@ static int iomap_to_fiemap(struct fiemap_extent_info *fi,
+ 		flags |= FIEMAP_EXTENT_MERGED;
+ 	if (iomap->flags & IOMAP_F_SHARED)
+ 		flags |= FIEMAP_EXTENT_SHARED;
+-	if (iomap->flags & IOMAP_F_DATA_INLINE)
+-		flags |= FIEMAP_EXTENT_DATA_INLINE;
  
- 	if (!RB_EMPTY_NODE(&rq->rb_node))
- 		goto end;
-@@ -4540,14 +4543,12 @@ static inline void bfq_update_insert_stats(struct request_queue *q,
- 					   unsigned int cmd_flags) {}
- #endif
+ 	return fiemap_fill_next_extent(fi, iomap->offset,
+ 			iomap->addr != IOMAP_NULL_ADDR ? iomap->addr : 0,
+@@ -1326,14 +1327,16 @@ static loff_t iomap_swapfile_activate_actor(struct inode *inode, loff_t pos,
+ 	struct iomap_swapfile_info *isi = data;
+ 	int error;
  
--static void bfq_prepare_request(struct request *rq, struct bio *bio);
+-	/* No inline data. */
+-	if (iomap->flags & IOMAP_F_DATA_INLINE) {
++	switch (iomap->type) {
++	case IOMAP_MAPPED:
++	case IOMAP_UNWRITTEN:
++		/* Only real or unwritten extents. */
++		break;
++	case IOMAP_INLINE:
++		/* No inline data. */
+ 		pr_err("swapon: file is inline\n");
+ 		return -EINVAL;
+-	}
 -
- static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 			       bool at_head)
- {
- 	struct request_queue *q = hctx->queue;
- 	struct bfq_data *bfqd = q->elevator->elevator_data;
--	struct bfq_queue *bfqq = RQ_BFQQ(rq);
-+	struct bfq_queue *bfqq;
- 	bool idle_timer_disabled = false;
- 	unsigned int cmd_flags;
- 
-@@ -4562,24 +4563,13 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 	blk_mq_sched_request_inserted(rq);
- 
- 	spin_lock_irq(&bfqd->lock);
-+	bfqq = bfq_init_rq(rq);
- 	if (at_head || blk_rq_is_passthrough(rq)) {
- 		if (at_head)
- 			list_add(&rq->queuelist, &bfqd->dispatch);
- 		else
- 			list_add_tail(&rq->queuelist, &bfqd->dispatch);
--	} else {
--		if (WARN_ON_ONCE(!bfqq)) {
--			/*
--			 * This should never happen. Most likely rq is
--			 * a requeued regular request, being
--			 * re-inserted without being first
--			 * re-prepared. Do a prepare, to avoid
--			 * failure.
--			 */
--			bfq_prepare_request(rq, rq->bio);
--			bfqq = RQ_BFQQ(rq);
--		}
--
-+	} else { /* bfqq is assumed to be non null here */
- 		idle_timer_disabled = __bfq_insert_request(bfqd, rq);
- 		/*
- 		 * Update bfqq, because, if a queue merge has occurred
-@@ -4922,11 +4912,48 @@ static struct bfq_queue *bfq_get_bfqq_handle_split(struct bfq_data *bfqd,
- }
+-	/* Only real or unwritten extents. */
+-	if (iomap->type != IOMAP_MAPPED && iomap->type != IOMAP_UNWRITTEN) {
++	default:
+ 		pr_err("swapon: file has unallocated extents\n");
+ 		return -EINVAL;
+ 	}
+diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+index 4bd87294219a..8f7095fc514e 100644
+--- a/include/linux/iomap.h
++++ b/include/linux/iomap.h
+@@ -18,6 +18,7 @@ struct vm_fault;
+ #define IOMAP_DELALLOC	0x02	/* delayed allocation blocks */
+ #define IOMAP_MAPPED	0x03	/* blocks allocated at @addr */
+ #define IOMAP_UNWRITTEN	0x04	/* blocks allocated at @addr in unwritten state */
++#define IOMAP_INLINE	0x05	/* data inline in the inode */
  
  /*
-- * Allocate bfq data structures associated with this request.
-+ * Only reset private fields. The actual request preparation will be
-+ * performed by bfq_init_rq, when rq is either inserted or merged. See
-+ * comments on bfq_init_rq for the reason behind this delayed
-+ * preparation.
+  * Flags for all iomap mappings:
+@@ -34,7 +35,6 @@ struct vm_fault;
   */
- static void bfq_prepare_request(struct request *rq, struct bio *bio)
-+{
-+	/*
-+	 * Regardless of whether we have an icq attached, we have to
-+	 * clear the scheduler pointers, as they might point to
-+	 * previously allocated bic/bfqq structs.
-+	 */
-+	rq->elv.priv[0] = rq->elv.priv[1] = NULL;
-+}
-+
-+/*
-+ * If needed, init rq, allocate bfq data structures associated with
-+ * rq, and increment reference counters in the destination bfq_queue
-+ * for rq. Return the destination bfq_queue for rq, or NULL is rq is
-+ * not associated with any bfq_queue.
-+ *
-+ * This function is invoked by the functions that perform rq insertion
-+ * or merging. One may have expected the above preparation operations
-+ * to be performed in bfq_prepare_request, and not delayed to when rq
-+ * is inserted or merged. The rationale behind this delayed
-+ * preparation is that, after the prepare_request hook is invoked for
-+ * rq, rq may still be transformed into a request with no icq, i.e., a
-+ * request not associated with any queue. No bfq hook is invoked to
-+ * signal this tranformation. As a consequence, should these
-+ * preparation operations be performed when the prepare_request hook
-+ * is invoked, and should rq be transformed one moment later, bfq
-+ * would end up in an inconsistent state, because it would have
-+ * incremented some queue counters for an rq destined to
-+ * transformation, without any chance to correctly lower these
-+ * counters back. In contrast, no transformation can still happen for
-+ * rq after rq has been inserted or merged. So, it is safe to execute
-+ * these preparation operations when rq is finally inserted or merged.
-+ */
-+static struct bfq_queue *bfq_init_rq(struct request *rq)
- {
- 	struct request_queue *q = rq->q;
-+	struct bio *bio = rq->bio;
- 	struct bfq_data *bfqd = q->elevator->elevator_data;
- 	struct bfq_io_cq *bic;
- 	const int is_sync = rq_is_sync(rq);
-@@ -4934,20 +4961,21 @@ static void bfq_prepare_request(struct request *rq, struct bio *bio)
- 	bool new_queue = false;
- 	bool bfqq_already_existing = false, split = false;
+ #define IOMAP_F_MERGED		0x10	/* contains multiple blocks/extents */
+ #define IOMAP_F_SHARED		0x20	/* block shared with another file */
+-#define IOMAP_F_DATA_INLINE	0x40	/* data inline in the inode */
  
-+	if (unlikely(!rq->elv.icq))
-+		return NULL;
-+
- 	/*
--	 * Even if we don't have an icq attached, we should still clear
--	 * the scheduler pointers, as they might point to previously
--	 * allocated bic/bfqq structs.
-+	 * Assuming that elv.priv[1] is set only if everything is set
-+	 * for this rq. This holds true, because this function is
-+	 * invoked only for insertion or merging, and, after such
-+	 * events, a request cannot be manipulated any longer before
-+	 * being removed from bfq.
- 	 */
--	if (!rq->elv.icq) {
--		rq->elv.priv[0] = rq->elv.priv[1] = NULL;
--		return;
--	}
-+	if (rq->elv.priv[1])
-+		return rq->elv.priv[1];
- 
- 	bic = icq_to_bic(rq->elv.icq);
- 
--	spin_lock_irq(&bfqd->lock);
--
- 	bfq_check_ioprio_change(bic, bio);
- 
- 	bfq_bic_update_cgroup(bic, bio);
-@@ -5006,7 +5034,7 @@ static void bfq_prepare_request(struct request *rq, struct bio *bio)
- 	if (unlikely(bfq_bfqq_just_created(bfqq)))
- 		bfq_handle_burst(bfqd, bfqq);
- 
--	spin_unlock_irq(&bfqd->lock);
-+	return bfqq;
- }
- 
- static void bfq_idle_slice_timer_body(struct bfq_queue *bfqq)
+ /*
+  * Magic value for addr:
 -- 
-2.16.1
+2.17.0
