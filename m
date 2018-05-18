@@ -1,55 +1,34 @@
-Return-Path: <BATV+7138d8dfc060164c836f+5389+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-nvme@lists.infradead.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 06/14] nvmet: add a new nvmet_zero_sgl helper
-Date: Sat, 26 May 2018 12:27:27 +0200
-Message-Id: <20180526102735.31404-7-hch@lst.de>
-In-Reply-To: <20180526102735.31404-1-hch@lst.de>
-References: <20180526102735.31404-1-hch@lst.de>
+Return-Path: <BATV+77ddf8e9b1b344f28472+5381+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Fri, 18 May 2018 09:04:15 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: adam.manzanares@wdc.com
+Cc: viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org, axboe@kernel.dk,
+	bcrl@kvack.org, mingo@kernel.org, peterz@infradead.org,
+	pombredanne@nexb.com, gregkh@linuxfoundation.org,
+	bigeasy@linutronix.de, rgoldwyn@suse.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-aio@kvack.org, linux-api@vger.kernel.org
+Subject: Re: [PATCH v4 1/3] block: add ioprio_check_cap function
+Message-ID: <20180518160415.GF22791@infradead.org>
+References: <20180517203803.2664-1-adam.manzanares@wdc.com>
+ <20180517203803.2664-2-adam.manzanares@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180517203803.2664-2-adam.manzanares@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Zeroes the SGL in the payload.
+On Thu, May 17, 2018 at 01:38:01PM -0700, adam.manzanares@wdc.com wrote:
+> From: Adam Manzanares <adam.manzanares@wdc.com>
+> 
+> Aio per command iopriority support introduces a second interface between
+> userland and the kernel capable of passing iopriority. The aio interface also
+> needs the ability to verify that the submitting context has sufficient
+> priviledges to submit IOPRIO_RT commands. This patch creates the
+> ioprio_check_cap function to be used by the ioprio_set system call and also by
+> the aio interface.
+> 
+> Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/target/core.c  | 7 +++++++
- drivers/nvme/target/nvmet.h | 1 +
- 2 files changed, 8 insertions(+)
+Looks fine,
 
-diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
-index 800aaf96ddcd..55c4bc693aa2 100644
---- a/drivers/nvme/target/core.c
-+++ b/drivers/nvme/target/core.c
-@@ -57,6 +57,13 @@ u16 nvmet_copy_from_sgl(struct nvmet_req *req, off_t off, void *buf, size_t len)
- 	return 0;
- }
- 
-+u16 nvmet_zero_sgl(struct nvmet_req *req, off_t off, size_t len)
-+{
-+	if (sg_zero_buffer(req->sg, req->sg_cnt, len, off) != len)
-+		return NVME_SC_SGL_INVALID_DATA | NVME_SC_DNR;
-+	return 0;
-+}
-+
- static unsigned int nvmet_max_nsid(struct nvmet_subsys *subsys)
- {
- 	struct nvmet_ns *ns;
-diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
-index 2d09afcfe505..a4e14eb15d4e 100644
---- a/drivers/nvme/target/nvmet.h
-+++ b/drivers/nvme/target/nvmet.h
-@@ -330,6 +330,7 @@ u16 nvmet_copy_to_sgl(struct nvmet_req *req, off_t off, const void *buf,
- 		size_t len);
- u16 nvmet_copy_from_sgl(struct nvmet_req *req, off_t off, void *buf,
- 		size_t len);
-+u16 nvmet_zero_sgl(struct nvmet_req *req, off_t off, size_t len);
- 
- u32 nvmet_get_log_page_len(struct nvme_command *cmd);
- 
--- 
-2.17.0
+Reviewed-by: Christoph Hellwig <hch@lst.de>
