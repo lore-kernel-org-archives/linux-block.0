@@ -1,34 +1,53 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: blk-mq: make sure that correct hctx->dispatch_from is set
-To: =?UTF-8?B?6IOh5rW3?= <huhai@kylinos.cn>
-Cc: "ming.lei" <ming.lei@redhat.com>,
- linux-block <linux-block@vger.kernel.org>
-References: <tencent_47349987636D0D2B620828E0@qq.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <6c265e65-d248-f6e0-1be4-e4223f1a4ed6@kernel.dk>
-Date: Fri, 18 May 2018 08:27:57 -0600
+Return-Path: <tom.leiming@gmail.com>
 MIME-Version: 1.0
 In-Reply-To: <tencent_47349987636D0D2B620828E0@qq.com>
-Content-Type: text/plain; charset=utf-8
+References: <tencent_47349987636D0D2B620828E0@qq.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Fri, 18 May 2018 22:00:51 +0800
+Message-ID: <CACVXFVNK2WZkhXpXX4yEzZMgMf5hB8d4Umqd8j6XShp9iBvTqA@mail.gmail.com>
+Subject: Re: blk-mq: make sure that correct hctx->dispatch_from is set
+To: =?UTF-8?B?6IOh5rW3?= <huhai@kylinos.cn>
+Cc: axboe <axboe@kernel.dk>, "ming.lei" <ming.lei@redhat.com>,
+	linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On 5/18/18 7:42 AM, 胡海 wrote:
+On Fri, May 18, 2018 at 9:42 PM, =E8=83=A1=E6=B5=B7 <huhai@kylinos.cn> wrot=
+e:
 > Author: huhai <huhai@kylinos.cn>
 > Date:   Fri May 18 17:09:56 2018 +0800
-> 
+>
 >     blk-mq: make sure that correct hctx->dispatch_from is set
->     
+>
 >     When the number of hardware queues is changed, the drivers will call
 >     blk_mq_update_nr_hw_queues() to remap hardware queues, and then
->     the ctx mapped on hctx will also change, but the current code forgets to
->     make sure that correct hctx->dispatch_from is set, and hctx->dispatch_from
+>     the ctx mapped on hctx will also change, but the current code forgets=
+ to
+>     make sure that correct hctx->dispatch_from is set, and hctx->dispatch=
+_from
 >     may point to a ctx that does not belong to the current hctx.
+>
+>     Signed-off-by: huhai <huhai@kylinos.cn>
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 2545081..55d8a3d 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2214,6 +2214,8 @@ static void blk_mq_map_swqueue(struct request_queue=
+ *q)
+>                 hctx->tags =3D set->tags[i];
+>                 WARN_ON(!hctx->tags);
+>
+> +               hctx->dispatch_from =3D NULL;
+> +
+>                 /*
+>                  * Set the map size to the number of mapped software queu=
+es.
+>                  * This is more accurate and more efficient than looping
 
-Looks good, thanks. One minor note for future patches - for cases like this,
-when the patch fixes an issue with a specific commit, add a fixes line.
-For this one, it would be:
+Good catch,
 
-Fixes: b347689ffbca ("blk-mq-sched: improve dispatching from sw queue")
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
--- 
-Jens Axboe
+Thanks,
+Ming Lei
