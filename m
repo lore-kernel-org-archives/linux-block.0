@@ -1,52 +1,56 @@
-Return-Path: <huhai@kylinos.cn>
-From: "=?utf-8?B?aHVoYWk=?=" <huhai@kylinos.cn>
-To: "=?utf-8?B?SmVucyBBeGJvZQ==?=" <axboe@kernel.dk>
-Cc: "=?utf-8?B?bWluZy5sZWk=?=" <ming.lei@redhat.com>, "=?utf-8?B?bGludXgtYmxvY2s=?=" <linux-block@vger.kernel.org>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: blk-mq: make sure that correct hctx->dispatch_from is set
-Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Date: Fri, 18 May 2018 22:46:43 +0800
-Message-ID: <tencent_128A9294097C7C620337BAAF@qq.com>
+From: Jens Axboe <axboe@kernel.dk>
+To: =?UTF-8?B?6IOh5rW3?= <huhai@kylinos.cn>
+Cc: "ming.lei" <ming.lei@redhat.com>,
+ linux-block <linux-block@vger.kernel.org>
 References: <tencent_47349987636D0D2B620828E0@qq.com>
-	<6c265e65-d248-f6e0-1be4-e4223f1a4ed6@kernel.dk>
-	<07c44734-2aeb-79b2-6404-893b575debd5@kernel.dk>
-In-Reply-To: <07c44734-2aeb-79b2-6404-893b575debd5@kernel.dk>
+ <6c265e65-d248-f6e0-1be4-e4223f1a4ed6@kernel.dk>
+Message-ID: <07c44734-2aeb-79b2-6404-893b575debd5@kernel.dk>
+Date: Fri, 18 May 2018 08:31:31 -0600
+MIME-Version: 1.0
+In-Reply-To: <6c265e65-d248-f6e0-1be4-e4223f1a4ed6@kernel.dk>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-WWVzLCBpdCBpcyBtb3JlIHJlYWRhYmxlDQoNCkZpbmFsbHksIHRoYW5rIHlvdSBmb3IgcmVt
-aW5kaW5nIG1lLiBOZXh0IHRpbWUgSSdsbCBjaGFuZ2UgZ21haWwgdG8gc3VibWl0IHBhdGNo
-Lg0KDQogDQogDQogDQotLS0tLS0tLS0tLS0tLS0tLS0gT3JpZ2luYWwgLS0tLS0tLS0tLS0t
-LS0tLS0tDQpGcm9tOiAgIkplbnMgQXhib2UiPGF4Ym9lQGtlcm5lbC5kaz47DQpEYXRlOiAg
-RnJpLCBNYXkgMTgsIDIwMTggMTA6MzEgUE0NClRvOiAgIuiDoea1tyI8aHVoYWlAa3lsaW5v
-cy5jbj47DQpDYzogICJtaW5nLmxlaSI8bWluZy5sZWlAcmVkaGF0LmNvbT47ICJsaW51eC1i
-bG9jayI8bGludXgtYmxvY2tAdmdlci5rZXJuZWwub3JnPjsNClN1YmplY3Q6ICBSZTogYmxr
-LW1xOiBtYWtlIHN1cmUgdGhhdCBjb3JyZWN0IGhjdHgtPmRpc3BhdGNoX2Zyb20gaXMgc2V0
-DQogDQpPbiA1LzE4LzE4IDg6MjcgQU0sIEplbnMgQXhib2Ugd3JvdGU6DQo+IE9uIDUvMTgv
-MTggNzo0MiBBTSwg6IOh5rW3IHdyb3RlOg0KPj4gQXV0aG9yOiBodWhhaSA8aHVoYWlAa3ls
-aW5vcy5jbj4NCj4+IERhdGU6ICAgRnJpIE1heSAxOCAxNzowOTo1NiAyMDE4ICswODAwDQo+
-Pg0KPj4gICAgIGJsay1tcTogbWFrZSBzdXJlIHRoYXQgY29ycmVjdCBoY3R4LT5kaXNwYXRj
-aF9mcm9tIGlzIHNldA0KPj4gICAgIA0KPj4gICAgIFdoZW4gdGhlIG51bWJlciBvZiBoYXJk
-d2FyZSBxdWV1ZXMgaXMgY2hhbmdlZCwgdGhlIGRyaXZlcnMgd2lsbCBjYWxsDQo+PiAgICAg
-YmxrX21xX3VwZGF0ZV9ucl9od19xdWV1ZXMoKSB0byByZW1hcCBoYXJkd2FyZSBxdWV1ZXMs
-IGFuZCB0aGVuDQo+PiAgICAgdGhlIGN0eCBtYXBwZWQgb24gaGN0eCB3aWxsIGFsc28gY2hh
-bmdlLCBidXQgdGhlIGN1cnJlbnQgY29kZSBmb3JnZXRzIHRvDQo+PiAgICAgbWFrZSBzdXJl
-IHRoYXQgY29ycmVjdCBoY3R4LT5kaXNwYXRjaF9mcm9tIGlzIHNldCwgYW5kIGhjdHgtPmRp
-c3BhdGNoX2Zyb20NCj4+ICAgICBtYXkgcG9pbnQgdG8gYSBjdHggdGhhdCBkb2VzIG5vdCBi
-ZWxvbmcgdG8gdGhlIGN1cnJlbnQgaGN0eC4NCj4gDQo+IExvb2tzIGdvb2QsIHRoYW5rcy4g
-T25lIG1pbm9yIG5vdGUgZm9yIGZ1dHVyZSBwYXRjaGVzIC0gZm9yIGNhc2VzIGxpa2UgdGhp
-cywNCj4gd2hlbiB0aGUgcGF0Y2ggZml4ZXMgYW4gaXNzdWUgd2l0aCBhIHNwZWNpZmljIGNv
-bW1pdCwgYWRkIGEgZml4ZXMgbGluZS4NCj4gRm9yIHRoaXMgb25lLCBpdCB3b3VsZCBiZToN
-Cj4gDQo+IEZpeGVzOiBiMzQ3Njg5ZmZiY2EgKCJibGstbXEtc2NoZWQ6IGltcHJvdmUgZGlz
-cGF0Y2hpbmcgZnJvbSBzdyBxdWV1ZSIpDQoNClR3byBtb3JlIG5vdGVzLi4uIFlvdXIgcGF0
-Y2hlcyBhcmUgc3RpbGwgY29taW5nIHRocm91Z2ggYXMgYmFzZTY0IGVuY29kZWQsDQp0aGV5
-IHNob3VsZCBqdXN0IGJlIHBsYWluIHRleHQuDQoNCkZpbmFsbHksIEkgdGhpbmsgdGhlIGJl
-bG93IGlzIG11Y2ggY2xlYXJlciwgc2luY2UgdGhhdCdzIHRoZSBsb29wIHdoZXJlDQp3ZSBj
-bGVhciBhbnkgZXhpc3RpbmcgaGN0eCBjb250ZXh0Lg0KDQoNCmRpZmYgLS1naXQgYS9ibG9j
-ay9ibGstbXEuYyBiL2Jsb2NrL2Jsay1tcS5jDQppbmRleCA2YzZhZWY0NGJhZGQuLjRjYmZk
-Nzg0ZTgzNyAxMDA2NDQNCi0tLSBhL2Jsb2NrL2Jsay1tcS5jDQorKysgYi9ibG9jay9ibGst
-bXEuYw0KQEAgLTIzNTgsNiArMjM1OCw3IEBAIHN0YXRpYyB2b2lkIGJsa19tcV9tYXBfc3dx
-dWV1ZShzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSkNCiAJcXVldWVfZm9yX2VhY2hfaHdfY3R4
-KHEsIGhjdHgsIGkpIHsNCiAJY3B1bWFza19jbGVhcihoY3R4LT5jcHVtYXNrKTsNCiAJaGN0
-eC0+bnJfY3R4ID0gMDsNCisJaGN0eC0+ZGlzcGF0Y2hfZnJvbSA9IE5VTEw7DQogCX0NCiAN
-CiAJLyoNCg0KLS0gDQpKZW5zIEF4Ym9l
+On 5/18/18 8:27 AM, Jens Axboe wrote:
+> On 5/18/18 7:42 AM, 胡海 wrote:
+>> Author: huhai <huhai@kylinos.cn>
+>> Date:   Fri May 18 17:09:56 2018 +0800
+>>
+>>     blk-mq: make sure that correct hctx->dispatch_from is set
+>>     
+>>     When the number of hardware queues is changed, the drivers will call
+>>     blk_mq_update_nr_hw_queues() to remap hardware queues, and then
+>>     the ctx mapped on hctx will also change, but the current code forgets to
+>>     make sure that correct hctx->dispatch_from is set, and hctx->dispatch_from
+>>     may point to a ctx that does not belong to the current hctx.
+> 
+> Looks good, thanks. One minor note for future patches - for cases like this,
+> when the patch fixes an issue with a specific commit, add a fixes line.
+> For this one, it would be:
+> 
+> Fixes: b347689ffbca ("blk-mq-sched: improve dispatching from sw queue")
+
+Two more notes... Your patches are still coming through as base64 encoded,
+they should just be plain text.
+
+Finally, I think the below is much clearer, since that's the loop where
+we clear any existing hctx context.
+
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 6c6aef44badd..4cbfd784e837 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2358,6 +2358,7 @@ static void blk_mq_map_swqueue(struct request_queue *q)
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		cpumask_clear(hctx->cpumask);
+ 		hctx->nr_ctx = 0;
++		hctx->dispatch_from = NULL;
+ 	}
+ 
+ 	/*
+
+-- 
+Jens Axboe
