@@ -1,34 +1,33 @@
-Return-Path: <BATV+e0efdd19ce80d487e3da+5372+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: Bart.VanAssche@wdc.com,
-	willy@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: [PATCH 2/6] block: fix __get_request documentation
-Date: Wed,  9 May 2018 09:54:04 +0200
-Message-Id: <20180509075408.16388-3-hch@lst.de>
-In-Reply-To: <20180509075408.16388-1-hch@lst.de>
-References: <20180509075408.16388-1-hch@lst.de>
+Return-Path: <prvs=669193e76=Adam.Manzanares@wdc.com>
+From: Adam Manzanares <Adam.Manzanares@wdc.com>
+To: Christoph Hellwig <hch@infradead.org>
+CC: "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "bcrl@kvack.org" <bcrl@kvack.org>,
+	"mingo@kernel.org" <mingo@kernel.org>, "peterz@infradead.org"
+	<peterz@infradead.org>, "pombredanne@nexb.com" <pombredanne@nexb.com>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"bigeasy@linutronix.de" <bigeasy@linutronix.de>, "rgoldwyn@suse.com"
+	<rgoldwyn@suse.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-aio@kvack.org" <linux-aio@kvack.org>,
+	"linux-api@vger.kernel.org" <linux-api@vger.kernel.org>
+Subject: Re: [PATCH v4 2/3] fs: Convert kiocb rw_hint from enum to u16
+Date: Fri, 18 May 2018 19:53:36 +0000
+Message-ID: <db91bfca-4ec9-726d-aac1-fa5979c65692@wdc.com>
+References: <20180517203803.2664-1-adam.manzanares@wdc.com>
+ <20180517203803.2664-3-adam.manzanares@wdc.com>
+ <20180518160512.GG22791@infradead.org>
+In-Reply-To: <20180518160512.GG22791@infradead.org>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 0573f9226c2d..52f2d4623ec7 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1517,7 +1517,7 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
-  * @bio: bio to allocate request for (can be %NULL)
-  * @flags: BLK_MQ_REQ_* flags.
-  *
-- * Get a free request from @q.  If %__GFP_DIRECT_RECLAIM is set in @gfp_mask,
-+ * Get a free request from @q.  If %BLK_MQ_REQ_NOWAIT is set in @flags,
-  * this function keeps retrying under memory pressure and fails iff @q is dead.
-  *
-  * Must be called with @q->queue_lock held and,
--- 
-2.17.0
+DQoNCk9uIDUvMTgvMTggOTowNSBBTSwgQ2hyaXN0b3BoIEhlbGx3aWcgd3JvdGU6DQo+PiArLyog
+a2lfaGludCBjaGFuZ2VkIGZyb20gZW51bSB0byB1MTYsIG1ha2Ugc3VyZSByd19oaW50IGZpdHMg
+aW50byB1MTYgKi8NCj4gDQo+IEkgZG9uJ3QgdGhpbmsgdGhpcyBjb21tZW50IGlzIHZlcnkgdXNl
+ZnVsLg0KPiANCj4+ICtzdGF0aWMgaW5saW5lIHUxNiBraV9oaW50X3ZhbGlkKGVudW0gcndfaGlu
+dCBoaW50KQ0KPiANCj4gSSdkIGNhbGwgdGhpcyBraV9oaW50X3ZhbGlkYXRlLg0KPiANCj4+ICt7
+DQo+PiArCWlmIChoaW50ID4gTUFYX0tJX0hJTlQpDQo+PiArCQlyZXR1cm4gMDsNCj4+ICsNCj4+
+ICsJcmV0dXJuIGhpbnQ7DQo+IA0KPiBOaXQ6IGtpbGwgdGhlIGVtcHR5IGxpbmUuDQo+IA0KDQpJ
+J2xsIGNsZWFuIHRoaXMgdXAgaW4gdGhlIG5leHQgcmV2aXNpb24u
