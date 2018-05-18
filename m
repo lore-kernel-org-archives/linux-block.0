@@ -1,66 +1,47 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:52120 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752519AbeERQuO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 May 2018 12:50:14 -0400
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: Christoph Hellwig <hch@lst.de>
 To: linux-xfs@vger.kernel.org
 Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-mm@kvack.org
-Subject: [PATCH 33/34] xfs: do not set the page uptodate in xfs_writepage_map
-Date: Fri, 18 May 2018 18:48:29 +0200
-Message-Id: <20180518164830.1552-34-hch@lst.de>
+Subject: [PATCH 27/34] xfs: don't clear imap_valid for a non-uptodate buffers
+Date: Fri, 18 May 2018 18:48:23 +0200
+Message-Id: <20180518164830.1552-28-hch@lst.de>
 In-Reply-To: <20180518164830.1552-1-hch@lst.de>
 References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-We already track the page uptodate status based on the buffer uptodate
-status, which is updated whenever reading or zeroing blocks.
-
-This code has been there since commit a ptool commit in 2002, which
-claims to:
-
-    "merge" the 2.4 fsx fix for block size < page size to 2.5.  This needed
-    major changes to actually fit.
-
-and isn't present in other writepage implementations.
+Finding a buffer that isn't uptodate doesn't invalidate the mapping for
+any given block.  The last_sector check will already take care of starting
+another ioend as soon as we find any non-update buffer, and if the current
+mapping doesn't include the next uptodate buffer the xfs_imap_valid check
+will take care of it.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/xfs/xfs_aops.c | 5 -----
- 1 file changed, 5 deletions(-)
+ fs/xfs/xfs_aops.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index a4e53e0a57c2..492f4a4b1deb 100644
+index b1dee2171194..82fd08c29f7f 100644
 --- a/fs/xfs/xfs_aops.c
 +++ b/fs/xfs/xfs_aops.c
-@@ -796,7 +796,6 @@ xfs_writepage_map(
- 	ssize_t			len = i_blocksize(inode);
- 	int			error = 0;
- 	int			count = 0;
--	bool			uptodate = true;
- 	loff_t			file_offset;	/* file offset of page */
- 	unsigned		poffset;	/* offset into page */
+@@ -859,15 +859,12 @@ xfs_writepage_map(
+ 			break;
  
-@@ -823,7 +822,6 @@ xfs_writepage_map(
+ 		/*
+-		 * Block does not contain valid data, skip it, mark the current
+-		 * map as invalid because we have a discontiguity. This ensures
+-		 * we put subsequent writeable buffers into a new ioend.
++		 * Block does not contain valid data, skip it.
+ 		 */
  		if (!buffer_uptodate(bh)) {
  			if (PageUptodate(page))
  				ASSERT(buffer_mapped(bh));
--			uptodate = false;
+ 			uptodate = false;
+-			wpc->imap_valid = false;
  			continue;
  		}
  
-@@ -857,9 +855,6 @@ xfs_writepage_map(
- 		count++;
- 	}
- 
--	if (uptodate && poffset == PAGE_SIZE)
--		SetPageUptodate(page);
--
- 	ASSERT(wpc->ioend || list_empty(&submit_list));
- 
- out:
 -- 
 2.17.0
