@@ -1,63 +1,107 @@
-Return-Path: <prvs=668cc6ab6=adam.manzanares@wdc.com>
-From: adam.manzanares@wdc.com
-To: viro@zeniv.linux.org.uk,
-	linux-fsdevel@vger.kernel.org,
-	axboe@kernel.dk,
-	bcrl@kvack.org
-Cc: mingo@kernel.org,
-	peterz@infradead.org,
-	pombredanne@nexb.com,
-	gregkh@linuxfoundation.org,
-	bigeasy@linutronix.de,
-	rgoldwyn@suse.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-aio@kvack.org,
-	linux-api@vger.kernel.org,
-	Adam Manzanares <adam.manzanares@wdc.com>
-Subject: [PATCH v4 0/3] AIO add per-command iopriority
-Date: Thu, 17 May 2018 13:38:00 -0700
-Message-Id: <20180517203803.2664-1-adam.manzanares@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:51908 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752482AbeERQuG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 May 2018 12:50:06 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 31/34] xfs: remove xfs_start_page_writeback
+Date: Fri, 18 May 2018 18:48:27 +0200
+Message-Id: <20180518164830.1552-32-hch@lst.de>
+In-Reply-To: <20180518164830.1552-1-hch@lst.de>
+References: <20180518164830.1552-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Adam Manzanares <adam.manzanares@wdc.com>
+This helper only has two callers, one of them with a constant error
+argument.  Remove it to make pending changes to the code a little easier.
 
-This is the per-I/O equivalent of the ioprio_set system call.
-See the following link for performance implications on a SATA HDD:
-https://lkml.org/lkml/2016/12/6/495
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/xfs/xfs_aops.c | 47 +++++++++++++++++++++--------------------------
+ 1 file changed, 21 insertions(+), 26 deletions(-)
 
-First patch factors ioprio_check_cap function out of ioprio_set system call to
-also be used by the aio ioprio interface.
-
-Second patch converts kiocb ki_hint field to a u16 to avoid kiocb bloat.
-
-Third patch passes ioprio hint from aio iocb to kiocb and enables block_dev
-usage of the per I/O ioprio feature.
-
-v2: merge patches
-    use IOCB_FLAG_IOPRIO
-    validate intended use with IOCB_IOPRIO
-    add linux-api and linux-block to cc
-
-v3: add ioprio_check_cap function
-    convert kiocb ki_hint to u16
-    use ioprio_check_cap when adding ioprio to kiocb in aio.c
-
-v4: handle IOCB_IOPRIO in aio_prep_rw
-    note patch 3 depends on patch 1 in commit msg
-
-Adam Manzanares (3):
-  block: add ioprio_check_cap function
-  fs: Convert kiocb rw_hint from enum to u16
-  fs: Add aio iopriority support for block_dev
-
- block/ioprio.c               | 22 ++++++++++++++++------
- fs/aio.c                     | 16 ++++++++++++++++
- fs/block_dev.c               |  2 ++
- include/linux/fs.h           | 17 +++++++++++++++--
- include/linux/ioprio.h       |  2 ++
- include/uapi/linux/aio_abi.h |  1 +
- 6 files changed, 52 insertions(+), 8 deletions(-)
-
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 951b329abb23..dd92d99df51f 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -505,30 +505,6 @@ xfs_imap_valid(
+ 		offset < imap->br_startoff + imap->br_blockcount;
+ }
+ 
+-STATIC void
+-xfs_start_page_writeback(
+-	struct page		*page,
+-	int			clear_dirty)
+-{
+-	ASSERT(PageLocked(page));
+-	ASSERT(!PageWriteback(page));
+-
+-	/*
+-	 * if the page was not fully cleaned, we need to ensure that the higher
+-	 * layers come back to it correctly. That means we need to keep the page
+-	 * dirty, and for WB_SYNC_ALL writeback we need to ensure the
+-	 * PAGECACHE_TAG_TOWRITE index mark is not removed so another attempt to
+-	 * write this page in this writeback sweep will be made.
+-	 */
+-	if (clear_dirty) {
+-		clear_page_dirty_for_io(page);
+-		set_page_writeback(page);
+-	} else
+-		set_page_writeback_keepwrite(page);
+-
+-	unlock_page(page);
+-}
+-
+ /*
+  * Submit the bio for an ioend. We are passed an ioend with a bio attached to
+  * it, and we submit that bio. The ioend may be used for multiple bio
+@@ -887,6 +863,9 @@ xfs_writepage_map(
+ 	ASSERT(wpc->ioend || list_empty(&submit_list));
+ 
+ out:
++	ASSERT(PageLocked(page));
++	ASSERT(!PageWriteback(page));
++
+ 	/*
+ 	 * On error, we have to fail the ioend here because we have locked
+ 	 * buffers in the ioend. If we don't do this, we'll deadlock
+@@ -905,7 +884,21 @@ xfs_writepage_map(
+ 	 * treated correctly on error.
+ 	 */
+ 	if (count) {
+-		xfs_start_page_writeback(page, !error);
++		/*
++		 * If the page was not fully cleaned, we need to ensure that the
++		 * higher layers come back to it correctly.  That means we need
++		 * to keep the page dirty, and for WB_SYNC_ALL writeback we need
++		 * to ensure the PAGECACHE_TAG_TOWRITE index mark is not removed
++		 * so another attempt to write this page in this writeback sweep
++		 * will be made.
++		 */
++		if (error) {
++			set_page_writeback_keepwrite(page);
++		} else {
++			clear_page_dirty_for_io(page);
++			set_page_writeback(page);
++		}
++		unlock_page(page);
+ 
+ 		/*
+ 		 * Preserve the original error if there was one, otherwise catch
+@@ -930,7 +923,9 @@ xfs_writepage_map(
+ 		 * race with a partial page truncate on a sub-page block sized
+ 		 * filesystem. In that case we need to mark the page clean.
+ 		 */
+-		xfs_start_page_writeback(page, 1);
++		clear_page_dirty_for_io(page);
++		set_page_writeback(page);
++		unlock_page(page);
+ 		end_page_writeback(page);
+ 	}
+ 
 -- 
-2.15.1
+2.17.0
