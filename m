@@ -1,11 +1,10 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Fri, 18 May 2018 08:08:38 -0700
-From: Tejun Heo <tj@kernel.org>
-To: Roman Pen <roman.penyaev@profitbricks.com>
-Cc: linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	Bart Van Assche <bart.vanassche@sandisk.com>,
 	Or Gerlitz <ogerlitz@mellanox.com>,
@@ -13,29 +12,37 @@ Cc: linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
 	Swapnil Ingle <swapnil.ingle@profitbricks.com>,
 	Danil Kipnis <danil.kipnis@profitbricks.com>,
 	Jack Wang <jinpu.wang@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>,
+	Tejun Heo <tj@kernel.org>,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 02/26] sysfs: export sysfs_remove_file_self()
-Message-ID: <20180518150838.GC1718769@devbig577.frc2.facebook.com>
+Subject: [PATCH v2 02/26] sysfs: export sysfs_remove_file_self()
+Date: Fri, 18 May 2018 15:03:49 +0200
+Message-Id: <20180518130413.16997-3-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
 References: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
- <20180518130413.16997-3-roman.penyaev@profitbricks.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180518130413.16997-3-roman.penyaev@profitbricks.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, May 18, 2018 at 03:03:49PM +0200, Roman Pen wrote:
-> Function is going to be used in transport over RDMA module
-> in subsequent patches.
-> 
-> Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-> Cc: Tejun Heo <tj@kernel.org>
-> Cc: linux-kernel@vger.kernel.org
+Function is going to be used in transport over RDMA module
+in subsequent patches.
 
-Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: linux-kernel@vger.kernel.org
+---
+ fs/sysfs/file.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Please feel free to apply with other patches.
-
-Thanks.
-
+diff --git a/fs/sysfs/file.c b/fs/sysfs/file.c
+index 5c13f29bfcdb..ff7443ac2aa7 100644
+--- a/fs/sysfs/file.c
++++ b/fs/sysfs/file.c
+@@ -444,6 +444,7 @@ bool sysfs_remove_file_self(struct kobject *kobj, const struct attribute *attr)
+ 	kernfs_put(kn);
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(sysfs_remove_file_self);
+ 
+ void sysfs_remove_files(struct kobject *kobj, const struct attribute **ptr)
+ {
 -- 
-tejun
+2.13.1
