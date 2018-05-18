@@ -1,82 +1,52 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:50018 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752339AbeERQt0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 May 2018 12:49:26 -0400
 From: Christoph Hellwig <hch@lst.de>
 To: linux-xfs@vger.kernel.org
 Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-mm@kvack.org
-Subject: [PATCH 07/34] mm: return an unsigned int from __do_page_cache_readahead
-Date: Fri, 18 May 2018 18:48:03 +0200
-Message-Id: <20180518164830.1552-8-hch@lst.de>
+Subject: [PATCH 18/34] xfs: use iomap for blocksize == PAGE_SIZE readpage and readpages
+Date: Fri, 18 May 2018 18:48:14 +0200
+Message-Id: <20180518164830.1552-19-hch@lst.de>
 In-Reply-To: <20180518164830.1552-1-hch@lst.de>
 References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We never return an error, so switch to returning an unsigned int.  Most
-callers already did implicit casts to an unsigned type, and the one that
-didn't can be simplified now.
+For file systems with a block size that equals the page size we never do
+partial reads, so we can use the buffer_head-less iomap versions of
+readpage and readpages without conflicting with the buffer_head structures
+create later in write_begin.
 
-Suggested-by: Matthew Wilcox <willy@infradead.org>
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- mm/internal.h  |  2 +-
- mm/readahead.c | 15 +++++----------
- 2 files changed, 6 insertions(+), 11 deletions(-)
+ fs/xfs/xfs_aops.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/mm/internal.h b/mm/internal.h
-index 62d8c34e63d5..954003ac766a 100644
---- a/mm/internal.h
-+++ b/mm/internal.h
-@@ -53,7 +53,7 @@ void unmap_page_range(struct mmu_gather *tlb,
- 			     unsigned long addr, unsigned long end,
- 			     struct zap_details *details);
- 
--extern int __do_page_cache_readahead(struct address_space *mapping,
-+extern unsigned int __do_page_cache_readahead(struct address_space *mapping,
- 		struct file *filp, pgoff_t offset, unsigned long nr_to_read,
- 		unsigned long lookahead_size);
- 
-diff --git a/mm/readahead.c b/mm/readahead.c
-index 16d0cb1e2616..fa4d4b767130 100644
---- a/mm/readahead.c
-+++ b/mm/readahead.c
-@@ -147,16 +147,16 @@ static int read_pages(struct address_space *mapping, struct file *filp,
-  *
-  * Returns the number of pages requested, or the maximum amount of I/O allowed.
-  */
--int __do_page_cache_readahead(struct address_space *mapping, struct file *filp,
--			pgoff_t offset, unsigned long nr_to_read,
--			unsigned long lookahead_size)
-+unsigned int __do_page_cache_readahead(struct address_space *mapping,
-+		struct file *filp, pgoff_t offset, unsigned long nr_to_read,
-+		unsigned long lookahead_size)
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 56e405572909..c631c457b444 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -1402,6 +1402,8 @@ xfs_vm_readpage(
+ 	struct page		*page)
  {
- 	struct inode *inode = mapping->host;
- 	struct page *page;
- 	unsigned long end_index;	/* The last page we want to read */
- 	LIST_HEAD(page_pool);
- 	int page_idx;
--	int nr_pages = 0;
-+	unsigned int nr_pages = 0;
- 	loff_t isize = i_size_read(inode);
- 	gfp_t gfp_mask = readahead_gfp_mask(mapping);
+ 	trace_xfs_vm_readpage(page->mapping->host, 1);
++	if (i_blocksize(page->mapping->host) == PAGE_SIZE)
++		return iomap_readpage(page, &xfs_iomap_ops);
+ 	return mpage_readpage(page, xfs_get_blocks);
+ }
  
-@@ -223,16 +223,11 @@ int force_page_cache_readahead(struct address_space *mapping, struct file *filp,
- 	max_pages = max_t(unsigned long, bdi->io_pages, ra->ra_pages);
- 	nr_to_read = min(nr_to_read, max_pages);
- 	while (nr_to_read) {
--		int err;
--
- 		unsigned long this_chunk = (2 * 1024 * 1024) / PAGE_SIZE;
+@@ -1413,6 +1415,8 @@ xfs_vm_readpages(
+ 	unsigned		nr_pages)
+ {
+ 	trace_xfs_vm_readpages(mapping->host, nr_pages);
++	if (i_blocksize(mapping->host) == PAGE_SIZE)
++		return iomap_readpages(mapping, pages, nr_pages, &xfs_iomap_ops);
+ 	return mpage_readpages(mapping, pages, nr_pages, xfs_get_blocks);
+ }
  
- 		if (this_chunk > nr_to_read)
- 			this_chunk = nr_to_read;
--		err = __do_page_cache_readahead(mapping, filp,
--						offset, this_chunk, 0);
--		if (err < 0)
--			return err;
-+		__do_page_cache_readahead(mapping, filp, offset, this_chunk, 0);
- 
- 		offset += this_chunk;
- 		nr_to_read -= this_chunk;
 -- 
 2.17.0
