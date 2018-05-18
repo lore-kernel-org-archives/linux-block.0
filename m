@@ -1,171 +1,101 @@
-Return-Path: <keith.busch@intel.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga11.intel.com ([192.55.52.93]:10869 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751746AbeERQg2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 May 2018 12:36:28 -0400
 From: Keith Busch <keith.busch@intel.com>
-To: linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>
+To: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>
 Cc: Jens Axboe <axboe@kernel.dk>,
-	Laurence Oberman <loberman@redhat.com>,
-	James Smart <james.smart@broadcom.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Keith Busch <keith.busch@intel.com>
-Subject: [PATCH 3/6] nvme: Move all IO out of controller reset
-Date: Fri, 18 May 2018 10:38:20 -0600
-Message-Id: <20180518163823.27820-3-keith.busch@intel.com>
+        Laurence Oberman <loberman@redhat.com>,
+        James Smart <james.smart@broadcom.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Keith Busch <keith.busch@intel.com>
+Subject: [PATCH 5/6] nvme-pci: Attempt reset retry for IO failures
+Date: Fri, 18 May 2018 10:38:22 -0600
+Message-Id: <20180518163823.27820-5-keith.busch@intel.com>
 In-Reply-To: <20180518163823.27820-1-keith.busch@intel.com>
 References: <20180518163823.27820-1-keith.busch@intel.com>
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-IO may be retryable, so don't wait for them in the reset path. These
-commands may trigger a reset if that IO expires without a completion,
-placing it on the requeue list. Waiting for these would then deadlock
-the reset handler.
+If the reset failed due to a non-fatal error, this patch will attempt
+to reset the controller again, with a maximum of 4 attempts.
 
-To fix the theoretical deadlock, this patch unblocks IO submission from
-the reset_work as before, but moves the waiting to the IO safe scan_work
-so that the reset_work may proceed to completion. Since the unfreezing
-happens in the controller LIVE state, the nvme device has to track if
-the queues were frozen now to prevent incorrect freeze depths.
-
-This patch is also renaming the function 'nvme_dev_add' to a
-more appropriate name that describes what it's actually doing:
-nvme_alloc_io_tags.
+Since the failed reset case has changed purpose, this patch provides a
+more appropriate name and warning message for the reset failure.
 
 Signed-off-by: Keith Busch <keith.busch@intel.com>
 ---
- drivers/nvme/host/core.c |  3 +++
- drivers/nvme/host/nvme.h |  1 +
- drivers/nvme/host/pci.c  | 46 +++++++++++++++++++++++++++++++++-------------
- 3 files changed, 37 insertions(+), 13 deletions(-)
+ drivers/nvme/host/pci.c | 26 +++++++++++++++++++++++---
+ 1 file changed, 23 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 1de68b56b318..34d7731f1419 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -214,6 +214,7 @@ static inline bool nvme_req_needs_retry(struct request *req)
- 	if (blk_noretry_request(req))
- 		return false;
- 	if (nvme_req(req)->status & NVME_SC_DNR)
-+
- 		return false;
- 	if (nvme_req(req)->retries >= nvme_max_retries)
- 		return false;
-@@ -3177,6 +3178,8 @@ static void nvme_scan_work(struct work_struct *work)
- 	struct nvme_id_ctrl *id;
- 	unsigned nn;
- 
-+	if (ctrl->ops->update_hw_ctx)
-+		ctrl->ops->update_hw_ctx(ctrl);
- 	if (ctrl->state != NVME_CTRL_LIVE)
- 		return;
- 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index c15c2ee7f61a..230c5424b197 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -320,6 +320,7 @@ struct nvme_ctrl_ops {
- 	int (*get_address)(struct nvme_ctrl *ctrl, char *buf, int size);
- 	int (*reinit_request)(void *data, struct request *rq);
- 	void (*stop_ctrl)(struct nvme_ctrl *ctrl);
-+	void (*update_hw_ctx)(struct nvme_ctrl *ctrl);
- };
- 
- #ifdef CONFIG_FAULT_INJECTION_DEBUG_FS
 diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 2bd9d84f58d0..6a7cbc631d92 100644
+index 6a7cbc631d92..ddfeb186d129 100644
 --- a/drivers/nvme/host/pci.c
 +++ b/drivers/nvme/host/pci.c
-@@ -99,6 +99,7 @@ struct nvme_dev {
- 	u32 cmbloc;
- 	struct nvme_ctrl ctrl;
- 	struct completion ioq_wait;
-+	bool queues_froze;
+@@ -37,6 +37,8 @@
  
+ #define SGES_PER_PAGE	(PAGE_SIZE / sizeof(struct nvme_sgl_desc))
+ 
++#define MAX_RESET_FAILURES 4
++
+ static int use_threaded_interrupts;
+ module_param(use_threaded_interrupts, int, 0);
+ 
+@@ -101,6 +103,8 @@ struct nvme_dev {
+ 	struct completion ioq_wait;
+ 	bool queues_froze;
+ 
++	int reset_failures;
++
  	/* shadow doorbell buffer support: */
  	u32 *dbbuf_dbs;
-@@ -2065,10 +2066,33 @@ static void nvme_disable_io_queues(struct nvme_dev *dev)
- 	}
+ 	dma_addr_t dbbuf_dbs_dma_addr;
+@@ -2307,9 +2311,23 @@ static void nvme_pci_free_ctrl(struct nvme_ctrl *ctrl)
+ 	kfree(dev);
  }
  
-+static void nvme_pci_update_hw_ctx(struct nvme_ctrl *ctrl)
-+{
-+	struct nvme_dev *dev = to_nvme_dev(ctrl);
-+	bool unfreeze;
-+
-+	mutex_lock(&dev->shutdown_lock);
-+	unfreeze = dev->queues_froze;
-+	mutex_unlock(&dev->shutdown_lock);
-+
-+	if (unfreeze)
-+		nvme_wait_freeze(&dev->ctrl);
-+
-+	blk_mq_update_nr_hw_queues(ctrl->tagset, dev->online_queues - 1);
-+	nvme_free_queues(dev, dev->online_queues);
-+
-+	if (unfreeze)
-+		nvme_unfreeze(&dev->ctrl);
-+
-+	mutex_lock(&dev->shutdown_lock);
-+	dev->queues_froze = false;
-+	mutex_unlock(&dev->shutdown_lock);
-+}
-+
- /*
-  * return error value only when tagset allocation failed
-  */
--static int nvme_dev_add(struct nvme_dev *dev)
-+static int nvme_alloc_io_tags(struct nvme_dev *dev)
+-static void nvme_remove_dead_ctrl(struct nvme_dev *dev, int status)
++static void nvme_reset_failure(struct nvme_dev *dev, int status)
  {
- 	int ret;
+-	dev_warn(dev->ctrl.device, "Removing after probe failure status: %d\n", status);
++	dev->reset_failures++;
++	dev_warn(dev->ctrl.device, "Reset failure status: %d, failures:%d\n",
++		status, dev->reset_failures);
++
++	/* IO and Interrupted Call may indicate a retryable error */
++	switch (status) {
++	case -EIO:
++	case -EINTR:
++		if (dev->reset_failures < MAX_RESET_FAILURES &&
++		    !nvme_reset_ctrl(&dev->ctrl))
++			return;
++		break;
++	default:
++		break;
++	}
  
-@@ -2097,10 +2121,7 @@ static int nvme_dev_add(struct nvme_dev *dev)
- 
- 		nvme_dbbuf_set(dev);
- 	} else {
--		blk_mq_update_nr_hw_queues(&dev->tagset, dev->online_queues - 1);
--
--		/* Free previously allocated queues that are no longer usable */
--		nvme_free_queues(dev, dev->online_queues);
-+		nvme_start_queues(&dev->ctrl);
+ 	nvme_get_ctrl(&dev->ctrl);
+ 	nvme_dev_disable(dev, false);
+@@ -2410,14 +2428,16 @@ static void nvme_reset_work(struct work_struct *work)
+ 	if (!nvme_change_ctrl_state(&dev->ctrl, new_state)) {
+ 		dev_warn(dev->ctrl.device,
+ 			"failed to mark controller state %d\n", new_state);
++		result = -ENODEV;
+ 		goto out;
  	}
  
- 	return 0;
-@@ -2201,7 +2222,10 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
- 	     dev->ctrl.state == NVME_CTRL_RESETTING)) {
- 		u32 csts = readl(dev->bar + NVME_REG_CSTS);
++	dev->reset_failures = 0;
+ 	nvme_start_ctrl(&dev->ctrl);
+ 	return;
  
--		nvme_start_freeze(&dev->ctrl);
-+		if (!dev->queues_froze)	{
-+			nvme_start_freeze(&dev->ctrl);
-+			dev->queues_froze = true;
-+		}
- 		dead = !!((csts & NVME_CSTS_CFS) || !(csts & NVME_CSTS_RDY) ||
- 			pci_channel_offline(pdev) || !pci_is_enabled(pdev));
- 	}
-@@ -2375,13 +2399,8 @@ static void nvme_reset_work(struct work_struct *work)
- 		nvme_kill_queues(&dev->ctrl);
- 		nvme_remove_namespaces(&dev->ctrl);
- 		new_state = NVME_CTRL_ADMIN_ONLY;
--	} else {
--		nvme_start_queues(&dev->ctrl);
--		nvme_wait_freeze(&dev->ctrl);
--		/* hit this only when allocate tagset fails */
--		if (nvme_dev_add(dev))
--			new_state = NVME_CTRL_ADMIN_ONLY;
--		nvme_unfreeze(&dev->ctrl);
-+	} else if (nvme_alloc_io_tags(dev)) {
-+		new_state = NVME_CTRL_ADMIN_ONLY;
- 	}
+  out:
+-	nvme_remove_dead_ctrl(dev, result);
++	nvme_reset_failure(dev, result);
+ }
  
- 	/*
-@@ -2446,6 +2465,7 @@ static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
- 	.reg_read64		= nvme_pci_reg_read64,
- 	.free_ctrl		= nvme_pci_free_ctrl,
- 	.submit_async_event	= nvme_pci_submit_async_event,
-+	.update_hw_ctx		= nvme_pci_update_hw_ctx,
- 	.get_address		= nvme_pci_get_address,
- };
- 
+ static void nvme_remove_dead_ctrl_work(struct work_struct *work)
 -- 
 2.14.3
