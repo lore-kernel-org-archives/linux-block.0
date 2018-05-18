@@ -1,189 +1,286 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 19/33] block: convert to bio_for_each_page_all2()
-Date: Thu, 24 May 2018 17:01:24 +0800
-Message-Id: <20180524090139.2150-20-ming.lei@redhat.com>
-In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
-References: <20180524090139.2150-1-ming.lei@redhat.com>
+Return-Path: <BATV+77ddf8e9b1b344f28472+5381+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Fri, 18 May 2018 02:30:46 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Anatoliy Glagolev <glagolig@gmail.com>
+Cc: linux-scsi@vger.kernel.org,
+	FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, James.Bottomley@hansenpartnership.com
+Subject: Re: [PATCH] Bsg referencing parent device
+Message-ID: <20180518093046.GA9959@infradead.org>
+References: <20180517010214.GA18978@xldev-tmpl.dev.purestorage.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180517010214.GA18978@xldev-tmpl.dev.purestorage.com>
 List-ID: <linux-block@vger.kernel.org>
 
-We have to convert to bio_for_each_page_all2() for iterating page by
-page.
+The idea looks pretty reasonable, but once that is done we can get rid of
+the ->release callback entirely and just handle it in the callers.
+Something like the untested patch below:
 
-bio_for_each_page_all() can't be used any more after multipage bvec is
-enabled.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bio.c         | 18 ++++++++++++------
- block/blk-zoned.c   |  5 +++--
- block/bounce.c      |  6 ++++--
- include/linux/bio.h |  3 ++-
- 4 files changed, 21 insertions(+), 11 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index a200c42e55dc..a14c854b9111 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1119,8 +1119,9 @@ static int bio_copy_from_iter(struct bio *bio, struct iov_iter *iter)
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index fc2e5ff2c4b9..9419def8c017 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -303,11 +303,9 @@ static void bsg_exit_rq(struct request_queue *q, struct request *req)
+  * @name: device to give bsg device
+  * @job_fn: bsg job handler
+  * @dd_job_size: size of LLD data needed for each job
+- * @release: @dev release function
+  */
+ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
+-		bsg_job_fn *job_fn, int dd_job_size,
+-		void (*release)(struct device *))
++		bsg_job_fn *job_fn, int dd_job_size)
  {
- 	int i;
- 	struct bio_vec *bvec;
-+	struct bvec_iter_all bia;
+ 	struct request_queue *q;
+ 	int ret;
+@@ -331,7 +329,7 @@ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
+ 	blk_queue_softirq_done(q, bsg_softirq_done);
+ 	blk_queue_rq_timeout(q, BLK_DEFAULT_SG_TIMEOUT);
  
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		ssize_t ret;
- 
- 		ret = copy_page_from_iter(bvec->bv_page,
-@@ -1150,8 +1151,9 @@ static int bio_copy_to_iter(struct bio *bio, struct iov_iter iter)
- {
- 	int i;
- 	struct bio_vec *bvec;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		ssize_t ret;
- 
- 		ret = copy_page_to_iter(bvec->bv_page,
-@@ -1173,8 +1175,9 @@ void bio_free_pages(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_page_all(bvec, bio, i)
-+	bio_for_each_page_all2(bvec, bio, i, bia)
- 		__free_page(bvec->bv_page);
+-	ret = bsg_register_queue(q, dev, name, &bsg_transport_ops, release);
++	ret = bsg_register_queue(q, dev, name, &bsg_transport_ops);
+ 	if (ret) {
+ 		printk(KERN_ERR "%s: bsg interface failed to "
+ 		       "initialize - register queue\n", dev->kobj.name);
+diff --git a/block/bsg.c b/block/bsg.c
+index defa06c11858..fe1e5632e5d1 100644
+--- a/block/bsg.c
++++ b/block/bsg.c
+@@ -650,18 +650,6 @@ static struct bsg_device *bsg_alloc_device(void)
+ 	return bd;
  }
- EXPORT_SYMBOL(bio_free_pages);
-@@ -1340,6 +1343,7 @@ struct bio *bio_map_user_iov(struct request_queue *q,
- 	struct bio *bio;
- 	int ret;
- 	struct bio_vec *bvec;
-+	struct bvec_iter_all bia;
  
- 	if (!iov_iter_count(iter))
- 		return ERR_PTR(-EINVAL);
-@@ -1413,7 +1417,7 @@ struct bio *bio_map_user_iov(struct request_queue *q,
- 	return bio;
- 
-  out_unmap:
--	bio_for_each_page_all(bvec, bio, j) {
-+	bio_for_each_page_all2(bvec, bio, j, bia) {
- 		put_page(bvec->bv_page);
- 	}
- 	bio_put(bio);
-@@ -1424,11 +1428,12 @@ static void __bio_unmap_user(struct bio *bio)
+-static void bsg_kref_release_function(struct kref *kref)
+-{
+-	struct bsg_class_device *bcd =
+-		container_of(kref, struct bsg_class_device, ref);
+-	struct device *parent = bcd->parent;
+-
+-	if (bcd->release)
+-		bcd->release(bcd->parent);
+-
+-	put_device(parent);
+-}
+-
+ static int bsg_put_device(struct bsg_device *bd)
  {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
+ 	int ret = 0, do_free;
+@@ -694,7 +682,6 @@ static int bsg_put_device(struct bsg_device *bd)
  
- 	/*
- 	 * make sure we dirty pages we wrote to
- 	 */
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		if (bio_data_dir(bio) == READ)
- 			set_page_dirty_lock(bvec->bv_page);
- 
-@@ -1520,8 +1525,9 @@ static void bio_copy_kern_endio_read(struct bio *bio)
- 	char *p = bio->bi_private;
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		memcpy(p, page_address(bvec->bv_page), bvec->bv_len);
- 		p += bvec->bv_len;
- 	}
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 77f3cecfaa7d..a76053d6fd6c 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -123,6 +123,7 @@ int blkdev_report_zones(struct block_device *bdev,
- 	unsigned int ofst;
- 	void *addr;
- 	int ret;
-+	struct bvec_iter_all bia;
- 
- 	if (!q)
- 		return -ENXIO;
-@@ -190,7 +191,7 @@ int blkdev_report_zones(struct block_device *bdev,
- 	n = 0;
- 	nz = 0;
- 	nr_rep = 0;
--	bio_for_each_page_all(bv, bio, i) {
-+	bio_for_each_page_all2(bv, bio, i, bia) {
- 
- 		if (!bv->bv_page)
- 			break;
-@@ -223,7 +224,7 @@ int blkdev_report_zones(struct block_device *bdev,
- 
- 	*nr_zones = nz;
+ 	kfree(bd);
  out:
--	bio_for_each_page_all(bv, bio, i)
-+	bio_for_each_page_all2(bv, bio, i, bia)
- 		__free_page(bv->bv_page);
- 	bio_put(bio);
+-	kref_put(&q->bsg_dev.ref, bsg_kref_release_function);
+ 	if (do_free)
+ 		blk_put_queue(q);
+ 	return ret;
+@@ -760,8 +747,6 @@ static struct bsg_device *bsg_get_device(struct inode *inode, struct file *file)
+ 	 */
+ 	mutex_lock(&bsg_mutex);
+ 	bcd = idr_find(&bsg_minor_idr, iminor(inode));
+-	if (bcd)
+-		kref_get(&bcd->ref);
+ 	mutex_unlock(&bsg_mutex);
  
-diff --git a/block/bounce.c b/block/bounce.c
-index f4ee4b81f7a2..8b14683f4061 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -143,11 +143,12 @@ static void bounce_end_io(struct bio *bio, mempool_t *pool)
- 	struct bio_vec *bvec, orig_vec;
- 	int i;
- 	struct bvec_iter orig_iter = bio_orig->bi_iter;
-+	struct bvec_iter_all bia;
+ 	if (!bcd)
+@@ -772,8 +757,6 @@ static struct bsg_device *bsg_get_device(struct inode *inode, struct file *file)
+ 		return bd;
+ 
+ 	bd = bsg_add_device(inode, bcd->queue, file);
+-	if (IS_ERR(bd))
+-		kref_put(&bcd->ref, bsg_kref_release_function);
+ 
+ 	return bd;
+ }
+@@ -913,25 +896,17 @@ void bsg_unregister_queue(struct request_queue *q)
+ 		sysfs_remove_link(&q->kobj, "bsg");
+ 	device_unregister(bcd->class_dev);
+ 	bcd->class_dev = NULL;
+-	kref_put(&bcd->ref, bsg_kref_release_function);
+ 	mutex_unlock(&bsg_mutex);
+ }
+ EXPORT_SYMBOL_GPL(bsg_unregister_queue);
+ 
+ int bsg_register_queue(struct request_queue *q, struct device *parent,
+-		const char *name, const struct bsg_ops *ops,
+-		void (*release)(struct device *))
++		const char *name, const struct bsg_ops *ops)
+ {
+ 	struct bsg_class_device *bcd;
+ 	dev_t dev;
+ 	int ret;
+ 	struct device *class_dev = NULL;
+-	const char *devname;
+-
+-	if (name)
+-		devname = name;
+-	else
+-		devname = dev_name(parent);
  
  	/*
- 	 * free up bounce indirect pages used
- 	 */
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		orig_vec = bio_iter_iovec(bio_orig, orig_iter);
- 		if (bvec->bv_page != orig_vec.bv_page) {
- 			dec_zone_page_state(bvec->bv_page, NR_BOUNCE);
-@@ -203,6 +204,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 	bool bounce = false;
- 	int sectors = 0;
- 	bool passthrough = bio_is_passthrough(*bio_orig);
-+	struct bvec_iter_all bia;
+ 	 * we need a proper transport to send commands, not a stacked device
+@@ -955,15 +930,12 @@ int bsg_register_queue(struct request_queue *q, struct device *parent,
  
- 	bio_for_each_page(from, *bio_orig, iter) {
- 		if (i++ < BIO_MAX_PAGES)
-@@ -222,7 +224,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, passthrough ? NULL :
- 			bounce_bio_set);
+ 	bcd->minor = ret;
+ 	bcd->queue = q;
+-	bcd->parent = get_device(parent);
+-	bcd->release = release;
+ 	bcd->ops = ops;
+-	kref_init(&bcd->ref);
+ 	dev = MKDEV(bsg_major, bcd->minor);
+-	class_dev = device_create(bsg_class, parent, dev, NULL, "%s", devname);
++	class_dev = device_create(bsg_class, parent, dev, NULL, "%s", name);
+ 	if (IS_ERR(class_dev)) {
+ 		ret = PTR_ERR(class_dev);
+-		goto put_dev;
++		goto idr_remove;
+ 	}
+ 	bcd->class_dev = class_dev;
  
--	bio_for_each_page_all(to, bio, i) {
-+	bio_for_each_page_all2(to, bio, i, bia) {
- 		struct page *page = to->bv_page;
+@@ -978,8 +950,7 @@ int bsg_register_queue(struct request_queue *q, struct device *parent,
  
- 		if (page_to_pfn(page) <= q->limits.bounce_pfn)
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 75baad77d9a8..5ae2bc876295 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -369,10 +369,11 @@ static inline unsigned bio_pages_all(struct bio *bio)
- {
- 	unsigned i;
- 	struct bio_vec *bv;
-+	struct bvec_iter_all bia;
+ unregister_class_dev:
+ 	device_unregister(class_dev);
+-put_dev:
+-	put_device(parent);
++idr_remove:
+ 	idr_remove(&bsg_minor_idr, bcd->minor);
+ unlock:
+ 	mutex_unlock(&bsg_mutex);
+@@ -993,7 +964,7 @@ int bsg_scsi_register_queue(struct request_queue *q, struct device *parent)
+ 		return -EINVAL;
+ 	}
  
- 	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
- 
--	bio_for_each_page_all(bv, bio, i)
-+	bio_for_each_page_all2(bv, bio, i, bia)
- 		;
- 	return i;
+-	return bsg_register_queue(q, parent, NULL, &bsg_scsi_ops, NULL);
++	return bsg_register_queue(q, parent, dev_name(parent), &bsg_scsi_ops);
  }
--- 
-2.9.5
+ EXPORT_SYMBOL_GPL(bsg_scsi_register_queue);
+ 
+diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
+index be3be0f9cb2d..d97f689b9278 100644
+--- a/drivers/scsi/scsi_transport_fc.c
++++ b/drivers/scsi/scsi_transport_fc.c
+@@ -3781,8 +3781,7 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
+ 	snprintf(bsg_name, sizeof(bsg_name),
+ 		 "fc_host%d", shost->host_no);
+ 
+-	q = bsg_setup_queue(dev, bsg_name, fc_bsg_dispatch, i->f->dd_bsg_size,
+-			NULL);
++	q = bsg_setup_queue(dev, bsg_name, fc_bsg_dispatch, i->f->dd_bsg_size);
+ 	if (IS_ERR(q)) {
+ 		dev_err(dev,
+ 			"fc_host%d: bsg interface failed to initialize - setup queue\n",
+@@ -3827,8 +3826,8 @@ fc_bsg_rportadd(struct Scsi_Host *shost, struct fc_rport *rport)
+ 	if (!i->f->bsg_request)
+ 		return -ENOTSUPP;
+ 
+-	q = bsg_setup_queue(dev, NULL, fc_bsg_dispatch, i->f->dd_bsg_size,
+-			NULL);
++	q = bsg_setup_queue(dev, dev_name(dev), fc_bsg_dispatch,
++			i->f->dd_bsg_size);
+ 	if (IS_ERR(q)) {
+ 		dev_err(dev, "failed to setup bsg queue\n");
+ 		return PTR_ERR(q);
+diff --git a/drivers/scsi/scsi_transport_iscsi.c b/drivers/scsi/scsi_transport_iscsi.c
+index 65f6c94f2e9b..6fd2fe210fc3 100644
+--- a/drivers/scsi/scsi_transport_iscsi.c
++++ b/drivers/scsi/scsi_transport_iscsi.c
+@@ -1542,7 +1542,7 @@ iscsi_bsg_host_add(struct Scsi_Host *shost, struct iscsi_cls_host *ihost)
+ 		return -ENOTSUPP;
+ 
+ 	snprintf(bsg_name, sizeof(bsg_name), "iscsi_host%d", shost->host_no);
+-	q = bsg_setup_queue(dev, bsg_name, iscsi_bsg_host_dispatch, 0, NULL);
++	q = bsg_setup_queue(dev, bsg_name, iscsi_bsg_host_dispatch, 0);
+ 	if (IS_ERR(q)) {
+ 		shost_printk(KERN_ERR, shost, "bsg interface failed to "
+ 			     "initialize - no request queue\n");
+diff --git a/drivers/scsi/scsi_transport_sas.c b/drivers/scsi/scsi_transport_sas.c
+index 08acbabfae07..e2953b416746 100644
+--- a/drivers/scsi/scsi_transport_sas.c
++++ b/drivers/scsi/scsi_transport_sas.c
+@@ -187,16 +187,6 @@ static int sas_smp_dispatch(struct bsg_job *job)
+ 	return 0;
+ }
+ 
+-static void sas_host_release(struct device *dev)
+-{
+-	struct Scsi_Host *shost = dev_to_shost(dev);
+-	struct sas_host_attrs *sas_host = to_sas_host_attrs(shost);
+-	struct request_queue *q = sas_host->q;
+-
+-	if (q)
+-		blk_cleanup_queue(q);
+-}
+-
+ static int sas_bsg_initialize(struct Scsi_Host *shost, struct sas_rphy *rphy)
+ {
+ 	struct request_queue *q;
+@@ -208,7 +198,7 @@ static int sas_bsg_initialize(struct Scsi_Host *shost, struct sas_rphy *rphy)
+ 
+ 	if (rphy) {
+ 		q = bsg_setup_queue(&rphy->dev, dev_name(&rphy->dev),
+-				sas_smp_dispatch, 0, NULL);
++				sas_smp_dispatch, 0);
+ 		if (IS_ERR(q))
+ 			return PTR_ERR(q);
+ 		rphy->q = q;
+@@ -217,7 +207,7 @@ static int sas_bsg_initialize(struct Scsi_Host *shost, struct sas_rphy *rphy)
+ 
+ 		snprintf(name, sizeof(name), "sas_host%d", shost->host_no);
+ 		q = bsg_setup_queue(&shost->shost_gendev, name,
+-				sas_smp_dispatch, 0, sas_host_release);
++				sas_smp_dispatch, 0);
+ 		if (IS_ERR(q))
+ 			return PTR_ERR(q);
+ 		to_sas_host_attrs(shost)->q = q;
+@@ -260,8 +250,11 @@ static int sas_host_remove(struct transport_container *tc, struct device *dev,
+ 	struct Scsi_Host *shost = dev_to_shost(dev);
+ 	struct request_queue *q = to_sas_host_attrs(shost)->q;
+ 
+-	if (q)
++	if (q) {
+ 		bsg_unregister_queue(q);
++		blk_cleanup_queue(q);
++	}
++
+ 	return 0;
+ }
+ 
+diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
+index 28a7ccc55c89..6aeaf6472665 100644
+--- a/include/linux/bsg-lib.h
++++ b/include/linux/bsg-lib.h
+@@ -72,8 +72,7 @@ struct bsg_job {
+ void bsg_job_done(struct bsg_job *job, int result,
+ 		  unsigned int reply_payload_rcv_len);
+ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
+-		bsg_job_fn *job_fn, int dd_job_size,
+-		void (*release)(struct device *));
++		bsg_job_fn *job_fn, int dd_job_size);
+ void bsg_job_put(struct bsg_job *job);
+ int __must_check bsg_job_get(struct bsg_job *job);
+ 
+diff --git a/include/linux/bsg.h b/include/linux/bsg.h
+index 0c7dd9ceb139..dac37b6e00ec 100644
+--- a/include/linux/bsg.h
++++ b/include/linux/bsg.h
+@@ -17,17 +17,13 @@ struct bsg_ops {
+ 
+ struct bsg_class_device {
+ 	struct device *class_dev;
+-	struct device *parent;
+ 	int minor;
+ 	struct request_queue *queue;
+-	struct kref ref;
+ 	const struct bsg_ops *ops;
+-	void (*release)(struct device *);
+ };
+ 
+ int bsg_register_queue(struct request_queue *q, struct device *parent,
+-		const char *name, const struct bsg_ops *ops,
+-		void (*release)(struct device *));
++		const char *name, const struct bsg_ops *ops);
+ int bsg_scsi_register_queue(struct request_queue *q, struct device *parent);
+ void bsg_unregister_queue(struct request_queue *q);
+ #else
