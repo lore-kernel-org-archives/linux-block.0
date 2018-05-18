@@ -1,173 +1,99 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:53216 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933383AbeEIHuN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 03:50:13 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 24/33] xfs: don't look at buffer heads in xfs_add_to_ioend
-Date: Wed,  9 May 2018 09:48:21 +0200
-Message-Id: <20180509074830.16196-25-hch@lst.de>
-In-Reply-To: <20180509074830.16196-1-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <kent.overstreet@gmail.com>
+Return-Path: <kent.overstreet@gmail.com>
+From: Kent Overstreet <kent.overstreet@gmail.com>
+To: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-mm@kvack.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Ingo Molnar <mingo@kernel.org>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Subject: [PATCH 04/10] block: Use bioset_init() for fs_bio_set
+Date: Fri, 18 May 2018 03:49:05 -0400
+Message-Id: <20180518074918.13816-8-kent.overstreet@gmail.com>
+In-Reply-To: <20180518074918.13816-1-kent.overstreet@gmail.com>
+References: <20180518074918.13816-1-kent.overstreet@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Calculate all information for the bio based on the passed in information
-without requiring a buffer_head structure.
+Minor optimization - remove a pointer indirection when using fs_bio_set.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
 ---
- fs/xfs/xfs_aops.c | 68 ++++++++++++++++++++++-------------------------
- 1 file changed, 32 insertions(+), 36 deletions(-)
+ block/bio.c                         | 7 +++----
+ block/blk-core.c                    | 2 +-
+ drivers/target/target_core_iblock.c | 2 +-
+ include/linux/bio.h                 | 4 ++--
+ 4 files changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 7ebd686cb723..f6d28e6aa911 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -44,7 +44,6 @@ struct xfs_writepage_ctx {
- 	struct xfs_bmbt_irec    imap;
- 	unsigned int		io_type;
- 	struct xfs_ioend	*ioend;
--	sector_t		last_block;
- };
- 
- void
-@@ -545,11 +544,6 @@ xfs_start_page_writeback(
- 	unlock_page(page);
- }
- 
--static inline int xfs_bio_add_buffer(struct bio *bio, struct buffer_head *bh)
--{
--	return bio_add_page(bio, bh->b_page, bh->b_size, bh_offset(bh));
--}
--
- /*
-  * Submit the bio for an ioend. We are passed an ioend with a bio attached to
-  * it, and we submit that bio. The ioend may be used for multiple bio
-@@ -604,27 +598,20 @@ xfs_submit_ioend(
- 	return 0;
- }
- 
--static void
--xfs_init_bio_from_bh(
--	struct bio		*bio,
--	struct buffer_head	*bh)
--{
--	bio->bi_iter.bi_sector = bh->b_blocknr * (bh->b_size >> 9);
--	bio_set_dev(bio, bh->b_bdev);
--}
--
- static struct xfs_ioend *
- xfs_alloc_ioend(
- 	struct inode		*inode,
- 	unsigned int		type,
- 	xfs_off_t		offset,
--	struct buffer_head	*bh)
-+	struct block_device	*bdev,
-+	sector_t		sector)
- {
- 	struct xfs_ioend	*ioend;
- 	struct bio		*bio;
- 
- 	bio = bio_alloc_bioset(GFP_NOFS, BIO_MAX_PAGES, xfs_ioend_bioset);
--	xfs_init_bio_from_bh(bio, bh);
-+	bio_set_dev(bio, bdev);
-+	bio->bi_iter.bi_sector = sector;
- 
- 	ioend = container_of(bio, struct xfs_ioend, io_inline_bio);
- 	INIT_LIST_HEAD(&ioend->io_list);
-@@ -649,13 +636,14 @@ static void
- xfs_chain_bio(
- 	struct xfs_ioend	*ioend,
- 	struct writeback_control *wbc,
--	struct buffer_head	*bh)
-+	struct block_device	*bdev,
-+	sector_t		sector)
- {
- 	struct bio *new;
- 
- 	new = bio_alloc(GFP_NOFS, BIO_MAX_PAGES);
--	xfs_init_bio_from_bh(new, bh);
--
-+	bio_set_dev(new, bdev);
-+	new->bi_iter.bi_sector = sector;
- 	bio_chain(ioend->io_bio, new);
- 	bio_get(ioend->io_bio);		/* for xfs_destroy_ioend */
- 	ioend->io_bio->bi_opf = REQ_OP_WRITE | wbc_to_write_flags(wbc);
-@@ -665,39 +653,45 @@ xfs_chain_bio(
- }
- 
- /*
-- * Test to see if we've been building up a completion structure for
-- * earlier buffers -- if so, we try to append to this ioend if we
-- * can, otherwise we finish off any current ioend and start another.
-- * Return the ioend we finished off so that the caller can submit it
-- * once it has finished processing the dirty page.
-+ * Test to see if we have an existing ioend structure that we could append to
-+ * first, otherwise finish off the current ioend and start another.
+diff --git a/block/bio.c b/block/bio.c
+index 980befd919..b7cdad6fc4 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -53,7 +53,7 @@ static struct biovec_slab bvec_slabs[BVEC_POOL_NR] __read_mostly = {
+  * fs_bio_set is the bio_set containing bio and iovec memory pools used by
+  * IO code that does not need private memory pools.
   */
- STATIC void
- xfs_add_to_ioend(
- 	struct inode		*inode,
--	struct buffer_head	*bh,
- 	xfs_off_t		offset,
-+	struct page		*page,
- 	struct xfs_writepage_ctx *wpc,
- 	struct writeback_control *wbc,
- 	struct list_head	*iolist)
- {
-+	struct xfs_inode	*ip = XFS_I(inode);
-+	struct xfs_mount	*mp = ip->i_mount;
-+	struct block_device	*bdev = xfs_find_bdev_for_inode(inode);
-+	unsigned		len = i_blocksize(inode);
-+	unsigned		poff = offset & (PAGE_SIZE - 1);
-+	sector_t		sector;
-+
-+	sector = xfs_fsb_to_db(ip, wpc->imap.br_startblock) +
-+		((offset - XFS_FSB_TO_B(mp, wpc->imap.br_startoff)) >> 9);
-+
- 	if (!wpc->ioend || wpc->io_type != wpc->ioend->io_type ||
--	    bh->b_blocknr != wpc->last_block + 1 ||
-+	    sector != bio_end_sector(wpc->ioend->io_bio) ||
- 	    offset != wpc->ioend->io_offset + wpc->ioend->io_size) {
- 		if (wpc->ioend)
- 			list_add(&wpc->ioend->io_list, iolist);
--		wpc->ioend = xfs_alloc_ioend(inode, wpc->io_type, offset, bh);
-+		wpc->ioend = xfs_alloc_ioend(inode, wpc->io_type, offset,
-+				bdev, sector);
+-struct bio_set *fs_bio_set;
++struct bio_set fs_bio_set;
+ EXPORT_SYMBOL(fs_bio_set);
+ 
+ /*
+@@ -2055,11 +2055,10 @@ static int __init init_bio(void)
+ 	bio_integrity_init();
+ 	biovec_init_slabs();
+ 
+-	fs_bio_set = bioset_create(BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
+-	if (!fs_bio_set)
++	if (bioset_init(&fs_bio_set, BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS))
+ 		panic("bio: can't allocate bios\n");
+ 
+-	if (bioset_integrity_create(fs_bio_set, BIO_POOL_SIZE))
++	if (bioset_integrity_create(&fs_bio_set, BIO_POOL_SIZE))
+ 		panic("bio: can't create integrity pool\n");
+ 
+ 	return 0;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 6d82c4f7fa..66f24798ef 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -3409,7 +3409,7 @@ int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
+ 	struct bio *bio, *bio_src;
+ 
+ 	if (!bs)
+-		bs = fs_bio_set;
++		bs = &fs_bio_set;
+ 
+ 	__rq_for_each_bio(bio_src, rq_src) {
+ 		bio = bio_clone_fast(bio_src, gfp_mask, bs);
+diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
+index 07c814c426..c969c01c7c 100644
+--- a/drivers/target/target_core_iblock.c
++++ b/drivers/target/target_core_iblock.c
+@@ -164,7 +164,7 @@ static int iblock_configure_device(struct se_device *dev)
+ 				goto out_blkdev_put;
+ 			}
+ 			pr_debug("IBLOCK setup BIP bs->bio_integrity_pool: %p\n",
+-				 bs->bio_integrity_pool);
++				 &bs->bio_integrity_pool);
+ 		}
+ 		dev->dev_attrib.hw_pi_prot_type = dev->dev_attrib.pi_prot_type;
  	}
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index fa3cf94a50..91b02520e2 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -423,11 +423,11 @@ extern void __bio_clone_fast(struct bio *, struct bio *);
+ extern struct bio *bio_clone_fast(struct bio *, gfp_t, struct bio_set *);
+ extern struct bio *bio_clone_bioset(struct bio *, gfp_t, struct bio_set *bs);
  
- 	/*
--	 * If the buffer doesn't fit into the bio we need to allocate a new
--	 * one.  This shouldn't happen more than once for a given buffer.
-+	 * If the block doesn't fit into the bio we need to allocate a new
-+	 * one.  This shouldn't happen more than once for a given block.
- 	 */
--	while (xfs_bio_add_buffer(wpc->ioend->io_bio, bh) != bh->b_size)
--		xfs_chain_bio(wpc->ioend, wbc, bh);
-+	while (bio_add_page(wpc->ioend->io_bio, page, len, poff) != len)
-+		xfs_chain_bio(wpc->ioend, wbc, bdev, sector);
+-extern struct bio_set *fs_bio_set;
++extern struct bio_set fs_bio_set;
  
--	wpc->ioend->io_size += bh->b_size;
--	wpc->last_block = bh->b_blocknr;
--	xfs_start_buffer_writeback(bh);
-+	wpc->ioend->io_size += len;
+ static inline struct bio *bio_alloc(gfp_t gfp_mask, unsigned int nr_iovecs)
+ {
+-	return bio_alloc_bioset(gfp_mask, nr_iovecs, fs_bio_set);
++	return bio_alloc_bioset(gfp_mask, nr_iovecs, &fs_bio_set);
  }
  
- STATIC void
-@@ -893,7 +887,9 @@ xfs_writepage_map(
- 
- 		lock_buffer(bh);
- 		xfs_map_at_offset(inode, bh, &wpc->imap, file_offset);
--		xfs_add_to_ioend(inode, bh, file_offset, wpc, wbc, &submit_list);
-+		xfs_add_to_ioend(inode, file_offset, page, wpc, wbc,
-+				&submit_list);
-+		xfs_start_buffer_writeback(bh);
- 		count++;
- 	}
- 
+ static inline struct bio *bio_kmalloc(gfp_t gfp_mask, unsigned int nr_iovecs)
 -- 
 2.17.0
