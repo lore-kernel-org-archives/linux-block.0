@@ -1,13 +1,12 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-Date: Fri, 18 May 2018 13:36:21 -0400
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: Christoph Hellwig <hch@infradead.org>
+Return-Path: <BATV+77ddf8e9b1b344f28472+5381+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Fri, 18 May 2018 09:21:28 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Kent Overstreet <kent.overstreet@gmail.com>
 Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
 	linux-mm@kvack.org, Jens Axboe <axboe@kernel.dk>,
 	Ingo Molnar <mingo@kernel.org>
 Subject: Re: [PATCH 02/10] block: Convert bio_set to mempool_init()
-Message-ID: <20180518173621.GA31737@kmo-pixel>
+Message-ID: <20180518162128.GB25227@infradead.org>
 References: <20180509013358.16399-1-kent.overstreet@gmail.com>
  <20180509013358.16399-3-kent.overstreet@gmail.com>
  <20180518162028.GA25227@infradead.org>
@@ -26,4 +25,4 @@ On Fri, May 18, 2018 at 09:20:28AM -0700, Christoph Hellwig wrote:
 > almost the same interfaces around for just about two hand full
 > of users.
 
-Yeah, I can do that
+This comment was ment in reply to the next patch, sorry.
