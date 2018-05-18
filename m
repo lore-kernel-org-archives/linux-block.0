@@ -1,72 +1,217 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:51546 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752457AbeERQt6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 May 2018 12:49:58 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 28/34] xfs: remove the imap_valid flag
-Date: Fri, 18 May 2018 18:48:24 +0200
-Message-Id: <20180518164830.1552-29-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Doug Ledford <dledford@redhat.com>,
+	Swapnil Ingle <swapnil.ingle@profitbricks.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH v2 10/26] ibtrs: server: private header with server structs and functions
+Date: Fri, 18 May 2018 15:03:57 +0200
+Message-Id: <20180518130413.16997-11-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
+References: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Simplify the way we check for a valid imap - we know we have a valid
-mapping after xfs_map_blocks returned successfully, and we know we can
-call xfs_imap_valid on any imap, as it will always fail on a
-zero-initialized map.
+This header describes main structs and functions used by ibtrs-server
+module, mainly for accepting IBTRS sessions, creating/destroying
+sysfs entries, accounting statistics on server side.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jack Wang <jinpu.wang@profitbricks.com>
 ---
- fs/xfs/xfs_aops.c | 11 ++---------
- 1 file changed, 2 insertions(+), 9 deletions(-)
+ drivers/infiniband/ulp/ibtrs/ibtrs-srv.h | 175 +++++++++++++++++++++++++++++++
+ 1 file changed, 175 insertions(+)
+ create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-srv.h
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 82fd08c29f7f..f01c1dd737ec 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -42,7 +42,6 @@
-  */
- struct xfs_writepage_ctx {
- 	struct xfs_bmbt_irec    imap;
--	bool			imap_valid;
- 	unsigned int		io_type;
- 	struct xfs_ioend	*ioend;
- 	sector_t		last_block;
-@@ -868,10 +867,6 @@ xfs_writepage_map(
- 			continue;
- 		}
- 
--		/* Check to see if current map spans this file offset */
--		if (wpc->imap_valid)
--			wpc->imap_valid = xfs_imap_valid(inode, &wpc->imap,
--							 file_offset);
- 		/*
- 		 * If we don't have a valid map, now it's time to get a new one
- 		 * for this offset.  This will convert delayed allocations
-@@ -879,16 +874,14 @@ xfs_writepage_map(
- 		 * a valid map, it means we landed in a hole and we skip the
- 		 * block.
- 		 */
--		if (!wpc->imap_valid) {
-+		if (!xfs_imap_valid(inode, &wpc->imap, file_offset)) {
- 			error = xfs_map_blocks(inode, file_offset, &wpc->imap,
- 					     &wpc->io_type);
- 			if (error)
- 				goto out;
--			wpc->imap_valid = xfs_imap_valid(inode, &wpc->imap,
--							 file_offset);
- 		}
- 
--		if (!wpc->imap_valid || wpc->io_type == XFS_IO_HOLE) {
-+		if (wpc->io_type == XFS_IO_HOLE) {
- 			/*
- 			 * set_page_dirty dirties all buffers in a page, independent
- 			 * of their state.  The dirty state however is entirely
+diff --git a/drivers/infiniband/ulp/ibtrs/ibtrs-srv.h b/drivers/infiniband/ulp/ibtrs/ibtrs-srv.h
+new file mode 100644
+index 000000000000..8193d568e67e
+--- /dev/null
++++ b/drivers/infiniband/ulp/ibtrs/ibtrs-srv.h
+@@ -0,0 +1,175 @@
++/*
++ * InfiniBand Transport Layer
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler <mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *          Kleber Souza <kleber.souza@profitbricks.com>
++ *          Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
++ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *          Swapnil Ingle <swapnil.ingle@profitbricks.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef IBTRS_SRV_H
++#define IBTRS_SRV_H
++
++#include <linux/device.h>
++#include <linux/refcount.h>
++#include "ibtrs-pri.h"
++
++/**
++ * enum ibtrs_srv_state - Server states.
++ */
++enum ibtrs_srv_state {
++	IBTRS_SRV_CONNECTING,
++	IBTRS_SRV_CONNECTED,
++	IBTRS_SRV_CLOSING,
++	IBTRS_SRV_CLOSED,
++};
++
++static inline const char *ibtrs_srv_state_str(enum ibtrs_srv_state state)
++{
++	switch (state) {
++	case IBTRS_SRV_CONNECTING:
++		return "IBTRS_SRV_CONNECTING";
++	case IBTRS_SRV_CONNECTED:
++		return "IBTRS_SRV_CONNECTED";
++	case IBTRS_SRV_CLOSING:
++		return "IBTRS_SRV_CLOSING";
++	case IBTRS_SRV_CLOSED:
++		return "IBTRS_SRV_CLOSED";
++	default:
++		return "UNKNOWN";
++	}
++}
++
++struct ibtrs_stats_wc_comp {
++	atomic64_t	calls;
++	atomic64_t	total_wc_cnt;
++};
++
++struct ibtrs_srv_stats_rdma_stats {
++	struct {
++		atomic64_t	cnt;
++		atomic64_t	size_total;
++	} dir[2];
++};
++
++struct ibtrs_srv_stats {
++	struct ibtrs_srv_stats_rdma_stats	rdma_stats;
++	atomic_t				apm_cnt;
++	struct ibtrs_stats_wc_comp		wc_comp;
++};
++
++struct ibtrs_srv_con {
++	struct ibtrs_con	c;
++	atomic_t		wr_cnt;
++};
++
++struct ibtrs_srv_op {
++	struct ibtrs_srv_con		*con;
++	u32				msg_id;
++	u8				dir;
++	struct ibtrs_msg_rdma_read	*rd_msg;
++	struct ib_rdma_wr		*tx_wr;
++	struct ib_sge			*tx_sg;
++};
++
++struct ibtrs_srv_mr {
++	struct ib_mr	*mr;
++	struct sg_table	sgt;
++};
++
++struct ibtrs_srv_sess {
++	struct ibtrs_sess	s;
++	struct ibtrs_srv	*srv;
++	struct work_struct	close_work;
++	enum ibtrs_srv_state	state;
++	spinlock_t		state_lock;
++	int			cur_cq_vector;
++	struct ibtrs_srv_op	**ops_ids;
++	atomic_t		ids_inflight;
++	wait_queue_head_t	ids_waitq;
++	struct ibtrs_srv_mr	*mrs;
++	unsigned int		mrs_num;
++	dma_addr_t		*dma_addr;
++	bool			established;
++	unsigned int		mem_bits;
++	struct kobject		kobj;
++	struct kobject		kobj_stats;
++	struct ibtrs_srv_stats	stats;
++};
++
++struct ibtrs_srv {
++	struct list_head	paths_list;
++	int			paths_up;
++	struct mutex		paths_ev_mutex;
++	size_t			paths_num;
++	struct mutex		paths_mutex;
++	uuid_t			paths_uuid;
++	refcount_t		refcount;
++	struct ibtrs_srv_ctx	*ctx;
++	struct list_head	ctx_list;
++	void			*priv;
++	size_t			queue_depth;
++	struct page		**chunks;
++	struct device		dev;
++	unsigned		dev_ref;
++	struct kobject		kobj_paths;
++};
++
++struct ibtrs_srv_ctx {
++	rdma_ev_fn *rdma_ev;
++	link_ev_fn *link_ev;
++	struct rdma_cm_id *cm_id_ip;
++	struct rdma_cm_id *cm_id_ib;
++	struct mutex srv_mutex;
++	struct list_head srv_list;
++};
++
++/* See ibtrs-log.h */
++#define TYPES_TO_SESSNAME(obj)						\
++	LIST(CASE(obj, struct ibtrs_srv_sess *, s.sessname))
++
++void ibtrs_srv_queue_close(struct ibtrs_srv_sess *sess);
++
++/* ibtrs-srv-stats.c */
++
++void ibtrs_srv_update_rdma_stats(struct ibtrs_srv_stats *s, size_t size, int d);
++void ibtrs_srv_update_wc_stats(struct ibtrs_srv_stats *s);
++
++int ibtrs_srv_reset_rdma_stats(struct ibtrs_srv_stats *stats, bool enable);
++ssize_t ibtrs_srv_stats_rdma_to_str(struct ibtrs_srv_stats *stats,
++				    char *page, size_t len);
++int ibtrs_srv_reset_wc_completion_stats(struct ibtrs_srv_stats *stats,
++					bool enable);
++int ibtrs_srv_stats_wc_completion_to_str(struct ibtrs_srv_stats *stats, char *buf,
++					 size_t len);
++int ibtrs_srv_reset_all_stats(struct ibtrs_srv_stats *stats, bool enable);
++ssize_t ibtrs_srv_reset_all_help(struct ibtrs_srv_stats *stats,
++				 char *page, size_t len);
++
++/* ibtrs-srv-sysfs.c */
++
++int ibtrs_srv_create_sess_files(struct ibtrs_srv_sess *sess);
++void ibtrs_srv_destroy_sess_files(struct ibtrs_srv_sess *sess);
++
++#endif /* IBTRS_SRV_H */
 -- 
-2.17.0
+2.13.1
