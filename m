@@ -1,277 +1,117 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:49952 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752274AbeERQtS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 May 2018 12:49:18 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 15/34] iomap: add an iomap-based readpage and readpages implementation
-Date: Fri, 18 May 2018 18:48:11 +0200
-Message-Id: <20180518164830.1552-16-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=669a0b661=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Alexandru Moise <00moses.alexander00@gmail.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Omar Sandoval <osandov@fb.com>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>
+Subject: [PATCH v3 1/2] block: Introduce blk_exit_queue()
+Date: Fri, 18 May 2018 11:40:02 -0700
+Message-Id: <20180518184003.29738-2-bart.vanassche@wdc.com>
+In-Reply-To: <20180518184003.29738-1-bart.vanassche@wdc.com>
+References: <20180518184003.29738-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Simply use iomap_apply to iterate over the file and a submit a bio for
-each non-uptodate but mapped region and zero everything else.  Note that
-as-is this can not be used for file systems with a blocksize smaller than
-the page size, but that support will be added later.
+This patch does not change any functionality.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Alexandru Moise <00moses.alexander00@gmail.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
 ---
- fs/iomap.c            | 200 +++++++++++++++++++++++++++++++++++++++++-
- include/linux/iomap.h |   4 +
- 2 files changed, 203 insertions(+), 1 deletion(-)
+ block/blk-core.c | 54 ++++++++++++++++++++++++++++++------------------------
+ block/blk.h      |  1 +
+ 2 files changed, 31 insertions(+), 24 deletions(-)
 
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 7c1b071d115c..821671af2618 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -1,6 +1,6 @@
- /*
-  * Copyright (C) 2010 Red Hat, Inc.
-- * Copyright (c) 2016 Christoph Hellwig.
-+ * Copyright (c) 2016-2018 Christoph Hellwig.
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms and conditions of the GNU General Public License,
-@@ -18,6 +18,7 @@
- #include <linux/uaccess.h>
- #include <linux/gfp.h>
- #include <linux/mm.h>
-+#include <linux/mm_inline.h>
- #include <linux/swap.h>
- #include <linux/pagemap.h>
- #include <linux/pagevec.h>
-@@ -103,6 +104,203 @@ iomap_sector(struct iomap *iomap, loff_t pos)
- 	return (iomap->addr + pos - iomap->offset) >> SECTOR_SHIFT;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 4dadff238b02..ac28a9c7136f 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -720,6 +720,35 @@ void blk_set_queue_dying(struct request_queue *q)
  }
+ EXPORT_SYMBOL_GPL(blk_set_queue_dying);
  
-+static inline bool
-+iomap_block_needs_zeroing(struct inode *inode, loff_t pos, struct iomap *iomap)
++/* Unconfigure the I/O scheduler and dissociate from the cgroup controller. */
++void blk_exit_queue(struct request_queue *q)
 +{
-+       return iomap->type != IOMAP_MAPPED || pos > i_size_read(inode);
-+}
-+
-+static void
-+iomap_read_end_io(struct bio *bio)
-+{
-+	int error = blk_status_to_errno(bio->bi_status);
-+	struct bio_vec *bvec;
-+	int i;
-+
-+	bio_for_each_segment_all(bvec, bio, i)
-+		page_endio(bvec->bv_page, false, error);
-+	bio_put(bio);
-+}
-+
-+static struct bio *
-+iomap_read_bio_alloc(struct iomap *iomap, sector_t sector, loff_t length)
-+{
-+	int nr_vecs = (length + PAGE_SIZE - 1) >> PAGE_SHIFT;
-+	struct bio *bio = bio_alloc(GFP_NOFS, min(BIO_MAX_PAGES, nr_vecs));
-+
-+	bio->bi_opf = REQ_OP_READ;
-+	bio->bi_iter.bi_sector = sector;
-+	bio_set_dev(bio, iomap->bdev);
-+	bio->bi_end_io = iomap_read_end_io;
-+	return bio;
-+}
-+
-+struct iomap_readpage_ctx {
-+	struct page		*cur_page;
-+	bool			cur_page_in_bio;
-+	struct bio		*bio;
-+	struct list_head	*pages;
-+};
-+
-+static loff_t
-+iomap_readpage_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
-+		struct iomap *iomap)
-+{
-+	struct iomap_readpage_ctx *ctx = data;
-+	struct page *page = ctx->cur_page;
-+	unsigned poff = pos & (PAGE_SIZE - 1);
-+	unsigned plen = min_t(loff_t, PAGE_SIZE - poff, length);
-+	bool is_contig = false;
-+	sector_t sector;
-+
-+	/* we don't support blocksize < PAGE_SIZE quite yet: */
-+	WARN_ON_ONCE(pos != page_offset(page));
-+	WARN_ON_ONCE(plen != PAGE_SIZE);
-+
-+	if (iomap_block_needs_zeroing(inode, pos, iomap)) {
-+		zero_user(page, poff, plen);
-+		SetPageUptodate(page);
-+		goto done;
++	/*
++	 * Since the I/O scheduler exit code may access cgroup information,
++	 * perform I/O scheduler exit before disassociating from the block
++	 * cgroup controller.
++	 */
++	if (q->elevator) {
++		ioc_clear_queue(q);
++		elevator_exit(q, q->elevator);
++		q->elevator = NULL;
 +	}
-+
-+	ctx->cur_page_in_bio = true;
 +
 +	/*
-+	 * Try to merge into a previous segment if we can.
++	 * Remove all references to @q from the block cgroup controller before
++	 * restoring @q->queue_lock to avoid that restoring this pointer causes
++	 * e.g. blkcg_print_blkgs() to crash.
 +	 */
-+	sector = iomap_sector(iomap, pos);
-+	if (ctx->bio && bio_end_sector(ctx->bio) == sector) {
-+		if (__bio_try_merge_page(ctx->bio, page, plen, poff))
-+			goto done;
-+		is_contig = true;
-+	}
++	blkcg_exit_queue(q);
 +
-+	if (!ctx->bio || !is_contig || bio_full(ctx->bio)) {
-+		if (ctx->bio)
-+			submit_bio(ctx->bio);
-+		ctx->bio = iomap_read_bio_alloc(iomap, sector, length);
-+	}
-+
-+	__bio_add_page(ctx->bio, page, plen, poff);
-+done:
-+	return plen;
++	/*
++	 * Since the cgroup code may dereference the @q->backing_dev_info
++	 * pointer, only decrease its reference count after having removed the
++	 * association with the block cgroup controller.
++	 */
++	bdi_put(q->backing_dev_info);
 +}
 +
-+int
-+iomap_readpage(struct page *page, const struct iomap_ops *ops)
-+{
-+	struct iomap_readpage_ctx ctx = { .cur_page = page };
-+	struct inode *inode = page->mapping->host;
-+	unsigned poff;
-+	loff_t ret;
-+
-+	WARN_ON_ONCE(page_has_buffers(page));
-+
-+	for (poff = 0; poff < PAGE_SIZE; poff += ret) {
-+		ret = iomap_apply(inode, page_offset(page) + poff,
-+				PAGE_SIZE - poff, 0, ops, &ctx,
-+				iomap_readpage_actor);
-+		if (ret <= 0) {
-+			WARN_ON_ONCE(ret == 0);
-+			SetPageError(page);
-+			break;
-+		}
-+	}
-+
-+	if (ctx.bio) {
-+		submit_bio(ctx.bio);
-+		WARN_ON_ONCE(!ctx.cur_page_in_bio);
-+	} else {
-+		WARN_ON_ONCE(ctx.cur_page_in_bio);
-+		unlock_page(page);
-+	}
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(iomap_readpage);
-+
-+static struct page *
-+iomap_next_page(struct inode *inode, struct list_head *pages, loff_t pos,
-+		loff_t length, loff_t *done)
-+{
-+	while (!list_empty(pages)) {
-+		struct page *page = lru_to_page(pages);
-+
-+		if (page_offset(page) >= (u64)pos + length)
-+			break;
-+
-+		list_del(&page->lru);
-+		if (!add_to_page_cache_lru(page, inode->i_mapping, page->index,
-+				GFP_NOFS))
-+			return page;
-+
-+		*done += PAGE_SIZE;
-+		put_page(page);
-+	}
-+
-+	return NULL;
-+}
-+
-+static loff_t
-+iomap_readpages_actor(struct inode *inode, loff_t pos, loff_t length,
-+		void *data, struct iomap *iomap)
-+{
-+	struct iomap_readpage_ctx *ctx = data;
-+	loff_t done, ret;
-+
-+	for (done = 0; done < length; done += ret) {
-+		if (ctx->cur_page && ((pos + done) & (PAGE_SIZE - 1)) == 0) {
-+			if (!ctx->cur_page_in_bio)
-+				unlock_page(ctx->cur_page);
-+			put_page(ctx->cur_page);
-+			ctx->cur_page = NULL;
-+		}
-+		if (!ctx->cur_page) {
-+			ctx->cur_page = iomap_next_page(inode, ctx->pages,
-+					pos, length, &done);
-+			if (!ctx->cur_page)
-+				break;
-+			ctx->cur_page_in_bio = false;
-+		}
-+		ret = iomap_readpage_actor(inode, pos + done, length - done,
-+				ctx, iomap);
-+	}
-+
-+	return done;
-+}
-+
-+int
-+iomap_readpages(struct address_space *mapping, struct list_head *pages,
-+		unsigned nr_pages, const struct iomap_ops *ops)
-+{
-+	struct iomap_readpage_ctx ctx = { .pages = pages };
-+	loff_t pos = page_offset(list_entry(pages->prev, struct page, lru));
-+	loff_t last = page_offset(list_entry(pages->next, struct page, lru));
-+	loff_t length = last - pos + PAGE_SIZE, ret = 0;
-+
-+	while (length > 0) {
-+		ret = iomap_apply(mapping->host, pos, length, 0, ops,
-+				&ctx, iomap_readpages_actor);
-+		if (ret <= 0) {
-+			WARN_ON_ONCE(ret == 0);
-+			goto done;
-+		}
-+		pos += ret;
-+		length -= ret;
-+	}
-+	ret = 0;
-+done:
-+	if (ctx.bio)
-+		submit_bio(ctx.bio);
-+	if (ctx.cur_page) {
-+		if (!ctx.cur_page_in_bio)
-+			unlock_page(ctx.cur_page);
-+		put_page(ctx.cur_page);
-+	}
-+	WARN_ON_ONCE(!ret && !list_empty(ctx.pages));
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(iomap_readpages);
-+
- static void
- iomap_write_failed(struct inode *inode, loff_t pos, unsigned len)
- {
-diff --git a/include/linux/iomap.h b/include/linux/iomap.h
-index a044a824da85..7300d30ca495 100644
---- a/include/linux/iomap.h
-+++ b/include/linux/iomap.h
-@@ -9,6 +9,7 @@ struct fiemap_extent_info;
- struct inode;
- struct iov_iter;
- struct kiocb;
-+struct page;
- struct vm_area_struct;
- struct vm_fault;
+ /**
+  * blk_cleanup_queue - shutdown a request queue
+  * @q: request queue to shutdown
+@@ -785,30 +814,7 @@ void blk_cleanup_queue(struct request_queue *q)
+ 	 */
+ 	WARN_ON_ONCE(q->kobj.state_in_sysfs);
  
-@@ -88,6 +89,9 @@ struct iomap_ops {
+-	/*
+-	 * Since the I/O scheduler exit code may access cgroup information,
+-	 * perform I/O scheduler exit before disassociating from the block
+-	 * cgroup controller.
+-	 */
+-	if (q->elevator) {
+-		ioc_clear_queue(q);
+-		elevator_exit(q, q->elevator);
+-		q->elevator = NULL;
+-	}
+-
+-	/*
+-	 * Remove all references to @q from the block cgroup controller before
+-	 * restoring @q->queue_lock to avoid that restoring this pointer causes
+-	 * e.g. blkcg_print_blkgs() to crash.
+-	 */
+-	blkcg_exit_queue(q);
+-
+-	/*
+-	 * Since the cgroup code may dereference the @q->backing_dev_info
+-	 * pointer, only decrease its reference count after having removed the
+-	 * association with the block cgroup controller.
+-	 */
+-	bdi_put(q->backing_dev_info);
++	blk_exit_queue(q);
  
- ssize_t iomap_file_buffered_write(struct kiocb *iocb, struct iov_iter *from,
- 		const struct iomap_ops *ops);
-+int iomap_readpage(struct page *page, const struct iomap_ops *ops);
-+int iomap_readpages(struct address_space *mapping, struct list_head *pages,
-+		unsigned nr_pages, const struct iomap_ops *ops);
- int iomap_file_dirty(struct inode *inode, loff_t pos, loff_t len,
- 		const struct iomap_ops *ops);
- int iomap_zero_range(struct inode *inode, loff_t pos, loff_t len,
+ 	if (q->mq_ops)
+ 		blk_mq_free_queue(q);
+diff --git a/block/blk.h b/block/blk.h
+index 204a0345996c..ec914ae7130c 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -130,6 +130,7 @@ void blk_free_flush_queue(struct blk_flush_queue *q);
+ int blk_init_rl(struct request_list *rl, struct request_queue *q,
+ 		gfp_t gfp_mask);
+ void blk_exit_rl(struct request_queue *q, struct request_list *rl);
++void blk_exit_queue(struct request_queue *q);
+ void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
+ 			struct bio *bio);
+ void blk_queue_bypass_start(struct request_queue *q);
 -- 
-2.17.0
+2.16.3
