@@ -1,49 +1,84 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	nbd@other.debian.org,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Cc: Josef Bacik <jbacik@fb.com>,
-	stable@vger.kernel.org
-Subject: [PATCH 2/7] nbd: fix nbd device deletion
-Date: Wed, 16 May 2018 14:51:17 -0400
-Message-Id: <20180516185122.18590-2-josef@toxicpanda.com>
-In-Reply-To: <20180516185122.18590-1-josef@toxicpanda.com>
-References: <20180516185122.18590-1-josef@toxicpanda.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:51836 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752469AbeERQuF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 May 2018 12:50:05 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 30/34] xfs: move all writeback buffer_head manipulation into xfs_map_at_offset
+Date: Fri, 18 May 2018 18:48:26 +0200
+Message-Id: <20180518164830.1552-31-hch@lst.de>
+In-Reply-To: <20180518164830.1552-1-hch@lst.de>
+References: <20180518164830.1552-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Josef Bacik <jbacik@fb.com>
+This keeps it in a single place so it can be made otional more easily.
 
-This fixes a use after free bug, we shouldn't be doing disk->queue right
-after we do del_gendisk(disk).  Save the queue and do the cleanup after
-the del_gendisk.
-
-Fixes: c6a4759ea0c9 ("nbd: add device refcounting")
-cc: stable@vger.kernel.org
-Signed-off-by: Josef Bacik <jbacik@fb.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/nbd.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ fs/xfs/xfs_aops.c | 22 +++++-----------------
+ 1 file changed, 5 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index afbc202ca6fd..9710a0c338b0 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -173,9 +173,12 @@ static const struct device_attribute pid_attr = {
- static void nbd_dev_remove(struct nbd_device *nbd)
- {
- 	struct gendisk *disk = nbd->disk;
-+	struct request_queue *q;
-+
- 	if (disk) {
-+		q = disk->queue;
- 		del_gendisk(disk);
--		blk_cleanup_queue(disk->queue);
-+		blk_cleanup_queue(q);
- 		blk_mq_free_tag_set(&nbd->tag_set);
- 		disk->private_data = NULL;
- 		put_disk(disk);
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 592b33b35a30..951b329abb23 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -505,21 +505,6 @@ xfs_imap_valid(
+ 		offset < imap->br_startoff + imap->br_blockcount;
+ }
+ 
+-STATIC void
+-xfs_start_buffer_writeback(
+-	struct buffer_head	*bh)
+-{
+-	ASSERT(buffer_mapped(bh));
+-	ASSERT(buffer_locked(bh));
+-	ASSERT(!buffer_delay(bh));
+-	ASSERT(!buffer_unwritten(bh));
+-
+-	bh->b_end_io = NULL;
+-	set_buffer_async_write(bh);
+-	set_buffer_uptodate(bh);
+-	clear_buffer_dirty(bh);
+-}
+-
+ STATIC void
+ xfs_start_page_writeback(
+ 	struct page		*page,
+@@ -728,6 +713,7 @@ xfs_map_at_offset(
+ 	ASSERT(imap->br_startblock != HOLESTARTBLOCK);
+ 	ASSERT(imap->br_startblock != DELAYSTARTBLOCK);
+ 
++	lock_buffer(bh);
+ 	xfs_map_buffer(inode, bh, imap, offset);
+ 	set_buffer_mapped(bh);
+ 	clear_buffer_delay(bh);
+@@ -740,6 +726,10 @@ xfs_map_at_offset(
+ 	 * set the bdev now.
+ 	 */
+ 	bh->b_bdev = xfs_find_bdev_for_inode(inode);
++	bh->b_end_io = NULL;
++	set_buffer_async_write(bh);
++	set_buffer_uptodate(bh);
++	clear_buffer_dirty(bh);
+ }
+ 
+ STATIC void
+@@ -885,11 +875,9 @@ xfs_writepage_map(
+ 			continue;
+ 		}
+ 
+-		lock_buffer(bh);
+ 		xfs_map_at_offset(inode, bh, &wpc->imap, file_offset);
+ 		xfs_add_to_ioend(inode, file_offset, page, wpc, wbc,
+ 				&submit_list);
+-		xfs_start_buffer_writeback(bh);
+ 		count++;
+ 	}
+ 
 -- 
-2.14.3
+2.17.0
