@@ -1,35 +1,41 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: osandov@fb.com,
-	efault@gmx.de,
-	paolo.valente@linaro.org
-Subject: [PATCHSET 0/3] blk-mq-sched and sbitmap shallow depth
-Date: Wed,  9 May 2018 09:36:01 -0600
-Message-Id: <1525880164-11943-1-git-send-email-axboe@kernel.dk>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 18 May 2018 08:08:38 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Roman Pen <roman.penyaev@profitbricks.com>
+Cc: linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Doug Ledford <dledford@redhat.com>,
+	Swapnil Ingle <swapnil.ingle@profitbricks.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 02/26] sysfs: export sysfs_remove_file_self()
+Message-ID: <20180518150838.GC1718769@devbig577.frc2.facebook.com>
+References: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
+ <20180518130413.16997-3-roman.penyaev@profitbricks.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180518130413.16997-3-roman.penyaev@profitbricks.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Mike has been running into an issue with BFQ, where things grind
-to a halt. This is because of how BFQ limits the shallow depth. If
-it ends up limiting it to something low that is smaller than the
-wake batch sizing for sbitmap, we can run into cases where we
-never wake up folks waiting for a tag. The end result is an idle
-system with no IO pending, but with tasks waiting for a tag with
-no one to wake them up. Kyber could run into the same issue, if
-the async depth is limited low enough.
+On Fri, May 18, 2018 at 03:03:49PM +0200, Roman Pen wrote:
+> Function is going to be used in transport over RDMA module
+> in subsequent patches.
+> 
+> Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+> Cc: Tejun Heo <tj@kernel.org>
+> Cc: linux-kernel@vger.kernel.org
 
-This patchset adds a helper to inform sbitmap about shallow depth
-limiting, and handles this from blk-mq-sched.
+Acked-by: Tejun Heo <tj@kernel.org>
 
- block/bfq-iosched.c      |   13 ++++++++++---
- block/blk-mq-sched.c     |   26 ++++++++++++++++++++++++++
- block/blk-mq-sched.h     |    3 +++
- block/blk-mq.c           |    8 +-------
- block/kyber-iosched.c    |   14 ++++++++++----
- include/linux/elevator.h |    2 +-
- include/linux/sbitmap.h  |   11 +++++++++++
- lib/sbitmap.c            |   17 ++++++++++++++++-
- 8 files changed, 78 insertions(+), 16 deletions(-)
+Please feel free to apply with other patches.
+
+Thanks.
 
 -- 
-Jens Axboe
+tejun
