@@ -1,84 +1,42 @@
-Return-Path: <BATV+a01a3e67072ae75c0352+5392+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Tue, 29 May 2018 20:54:40 +0200
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme updates for 4.18
-Message-ID: <20180529185440.GA31083@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:49886 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752176AbeERQtJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 May 2018 12:49:09 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 12/34] iomap: use __bio_add_page in iomap_dio_zero
+Date: Fri, 18 May 2018 18:48:08 +0200
+Message-Id: <20180518164830.1552-13-hch@lst.de>
+In-Reply-To: <20180518164830.1552-1-hch@lst.de>
+References: <20180518164830.1552-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Jens,
+We don't need any merging logic, and this also replaces a BUG_ON with a
+WARN_ON_ONCE inside __bio_add_page for the impossible overflow condition.
 
-here is the current batch of nvme updates for 4.18, we have a few more
-patches in the queue, but I'd like to get this pile into your tree
-and linux-next ASAP.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/iomap.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-The biggest item is support for file-backed namespaces in the NVMe target
-from Chaitanya, in addition to that we mostly small fixes from all the
-usual suspects.
-
-The following changes since commit 327ea4adcfa37194739f1ec7c70568944d292281:
-
-  blkdev_report_zones_ioctl(): Use vmalloc() to allocate large buffers (2018-05-22 11:58:07 -0600)
-
-are available in the Git repository at:
-
-  git://git.infradead.org/nvme.git nvme-4.18-2
-
-for you to fetch changes up to 75c8b19a23100455339af947e032f1a221344c68:
-
-  nvme: fixup memory leak in nvme_init_identify() (2018-05-25 16:50:12 +0200)
-
-----------------------------------------------------------------
-Chaitanya Kulkarni (4):
-      nvmet: make a few error messages more generic
-      nvmet: remove duplicate NULL initialization for req->ns
-      nvmet: add simple file backed ns support
-      nvmet-loop: use nr_phys_segments when map rq to sgl
-
-Hannes Reinecke (4):
-      nvme-fabrics: centralize discovery controller defaults
-      nvme-fabrics: allow duplicate connections to the discovery controller
-      nvme: fix KASAN warning when parsing host nqn
-      nvme: fixup memory leak in nvme_init_identify()
-
-Ivan Bornyakov (1):
-      nvme: host: core: fix precedence of ternary operator
-
-James Smart (3):
-      nvme-fc: remove setting DNR on exception conditions
-      nvme-fabrics: remove unnecessary controller subnqn validation
-      nvmet-fc: increase LS buffer count per fc port
-
-Jianchao Wang (2):
-      nvme-pci: set nvmeq->cq_vector after alloc cq/sq
-      nvme-rdma: stop admin queue before freeing it
-
-Johannes Thumshirn (1):
-      nvme: fix lockdep warning in nvme_mpath_clear_current_path
-
-Keith Busch (1):
-      nvme-pci: Fix AER reset handling
-
- drivers/nvme/host/core.c                        |   9 +-
- drivers/nvme/host/fabrics.c                     |  21 +-
- drivers/nvme/host/fc.c                          |  10 -
- drivers/nvme/host/nvme.h                        |   3 +-
- drivers/nvme/host/pci.c                         |  39 +--
- drivers/nvme/host/rdma.c                        |  10 +-
- drivers/nvme/target/Makefile                    |   4 +-
- drivers/nvme/target/admin-cmd.c                 |  10 +-
- drivers/nvme/target/core.c                      |  55 +++--
- drivers/nvme/target/discovery.c                 |   2 -
- drivers/nvme/target/fabrics-cmd.c               |   4 -
- drivers/nvme/target/fc.c                        |   2 +-
- drivers/nvme/target/{io-cmd.c => io-cmd-bdev.c} |  77 +++---
- drivers/nvme/target/io-cmd-file.c               | 300 ++++++++++++++++++++++++
- drivers/nvme/target/loop.c                      |   2 +-
- drivers/nvme/target/nvmet.h                     |  28 ++-
- 16 files changed, 457 insertions(+), 119 deletions(-)
- rename drivers/nvme/target/{io-cmd.c => io-cmd-bdev.c} (76%)
- create mode 100644 drivers/nvme/target/io-cmd-file.c
+diff --git a/fs/iomap.c b/fs/iomap.c
+index a859e15d7bec..6427627a247f 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -957,8 +957,7 @@ iomap_dio_zero(struct iomap_dio *dio, struct iomap *iomap, loff_t pos,
+ 	bio->bi_end_io = iomap_dio_bio_end_io;
+ 
+ 	get_page(page);
+-	if (bio_add_page(bio, page, len, 0) != len)
+-		BUG();
++	__bio_add_page(bio, page, len, 0);
+ 	bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC | REQ_IDLE);
+ 
+ 	atomic_inc(&dio->ref);
+-- 
+2.17.0
