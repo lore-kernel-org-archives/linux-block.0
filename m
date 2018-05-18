@@ -1,112 +1,89 @@
-Return-Path: <prvs=672e5e3bd=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v12 0/2] blk-mq: Rework blk-mq timeout handling again
-Date: Mon, 21 May 2018 10:16:50 -0700
-Message-Id: <20180521171652.3021-1-bart.vanassche@wdc.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 14/34] iomap: add an iomap-based bmap implementation
+Date: Fri, 18 May 2018 18:48:10 +0200
+Message-Id: <20180518164830.1552-15-hch@lst.de>
+In-Reply-To: <20180518164830.1552-1-hch@lst.de>
+References: <20180518164830.1552-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
+This adds a simple iomap-based implementation of the legacy ->bmap
+interface.  Note that we can't easily add checks for rt or reflink
+files, so these will have to remain in the callers.  This interface
+just needs to die..
 
-This patch series reworks blk-mq timeout handling by introducing a state
-machine per request. Please consider this patch series for inclusion in the
-upstream kernel.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/iomap.c            | 34 ++++++++++++++++++++++++++++++++++
+ include/linux/iomap.h |  3 +++
+ 2 files changed, 37 insertions(+)
 
-Bart.
-
-Changes compared to v11:
-- Reworked patch 1/2: instead of introducing CONFIG_ARCH_HAVE_CMPXCHG64, make
-  sure that cmpxchg64() is only defined if it can be used.
-
-Changes compared to v10:
-- In patch 1/2, added "default y if 64BIT" to the "config ARCH_HAVE_CMPXCHG64"
-  entry in arch/Kconfig. Left out the "select ARCH_HAVE_CMPXCHG64" statements
-  that became superfluous due to this change (alpha, arm64, powerpc and s390).
-- Also in patch 1/2, only select ARCH_HAVE_CMPXCHG64 if X86_CMPXCHG64 has been
-  selected.
-- In patch 2/2, moved blk_mq_change_rq_state() from blk-mq.h to blk-mq.c.
-- Added a comment header above __blk_mq_requeue_request() and
-  blk_mq_requeue_request().
-- Documented the MQ_RQ_* state transitions in block/blk-mq.h.
-- Left out the fourth argument of blk_mq_rq_set_deadline().
-
-Changes compared to v9:
-- Addressed multiple comments related to patch 1/2: added
-  CONFIG_ARCH_HAVE_CMPXCHG64 for riscv, modified
-  features/locking/cmpxchg64/arch-support.txt as requested and made the
-  order of the symbols in the arch/*/Kconfig alphabetical where possible.
-
-Changes compared to v8:
-- Split into two patches.
-- Moved the spin_lock_init() call from blk_mq_rq_ctx_init() into
-  blk_mq_init_request().
-- Fixed the deadline set by blk_add_timer().
-- Surrounded the das_lock member with #ifndef CONFIG_ARCH_HAVE_CMPXCHG64 /
-  #endif.
-
-Changes compared to v7:
-- Fixed the generation number mechanism. Note: with this patch applied the
-  behavior of the block layer does not depend on the generation number.
-- Added more 32-bit architectures to the list of architectures on which
-  cmpxchg64() should not be used.
-
-Changes compared to v6:
-- Used a union instead of bit manipulations to store multiple values into
-  a single 64-bit field.
-- Reduced the size of the timeout field from 64 to 32 bits.
-- Made sure that the block layer still builds with this patch applied
-  for the sh and mips architectures.
-- Fixed two sparse warnings that were introduced by this patch in the
-  WRITE_ONCE() calls.
-
-Changes compared to v5:
-- Restored the synchronize_rcu() call between marking a request for timeout
-  handling and the actual timeout handling to avoid that timeout handling
-  starts while .queue_rq() is still in progress if the timeout is very short.
-- Only use cmpxchg() if another context could attempt to change the request
-  state concurrently. Use WRITE_ONCE() otherwise.
-
-Changes compared to v4:
-- Addressed multiple review comments from Christoph. The most important are
-  that atomic_long_cmpxchg() has been changed into cmpxchg() and also that
-  there is now a nice and clean split between the legacy and blk-mq versions
-  of blk_add_timer().
-- Changed the patch name and modified the patch description because there is
-  disagreement about whether or not the v4.16 blk-mq core can complete a
-  single request twice. Kept the "Cc: stable" tag because of
-  https://bugzilla.kernel.org/show_bug.cgi?id=199077.
-
-Changes compared to v3 (see also https://www.mail-archive.com/linux-block@vger.kernel.org/msg20073.html):
-- Removed the spinlock again that was introduced to protect the request state.
-  v4 uses atomic_long_cmpxchg() instead.
-- Split __deadline into two variables - one for the legacy block layer and one
-  for blk-mq.
-
-Changes compared to v2 (https://www.mail-archive.com/linux-block@vger.kernel.org/msg18338.html):
-- Rebased and retested on top of kernel v4.16.
-
-Changes compared to v1 (https://www.mail-archive.com/linux-block@vger.kernel.org/msg18089.html):
-- Removed the gstate and aborted_gstate members of struct request and used
-  the __deadline member to encode both the generation and state information.
-
-Bart Van Assche (2):
-  ARM: cmpxchg64: Only define cmpxchg64() if not using the Thumb
-    instruction set
-  blk-mq: Rework blk-mq timeout handling again
-
- arch/arm/include/asm/cmpxchg.h |   4 +
- block/blk-core.c               |   6 --
- block/blk-mq-debugfs.c         |   1 -
- block/blk-mq.c                 | 238 +++++++++++++++++++----------------------
- block/blk-mq.h                 |  64 +++++------
- block/blk-timeout.c            | 133 +++++++++++++++--------
- block/blk.h                    |  11 +-
- include/linux/blkdev.h         |  48 +++++----
- 8 files changed, 267 insertions(+), 238 deletions(-)
-
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 44259eadb69d..7c1b071d115c 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -1419,3 +1419,37 @@ int iomap_swapfile_activate(struct swap_info_struct *sis,
+ }
+ EXPORT_SYMBOL_GPL(iomap_swapfile_activate);
+ #endif /* CONFIG_SWAP */
++
++static loff_t
++iomap_bmap_actor(struct inode *inode, loff_t pos, loff_t length,
++		void *data, struct iomap *iomap)
++{
++	sector_t *bno = data, addr;
++
++	if (iomap->type == IOMAP_MAPPED) {
++		addr = (pos - iomap->offset + iomap->addr) >> inode->i_blkbits;
++		if (addr > INT_MAX)
++			WARN(1, "would truncate bmap result\n");
++		else
++			*bno = addr;
++	}
++	return 0;
++}
++
++/* legacy ->bmap interface.  0 is the error return (!) */
++sector_t
++iomap_bmap(struct address_space *mapping, sector_t bno,
++		const struct iomap_ops *ops)
++{
++	struct inode *inode = mapping->host;
++	loff_t pos = bno >> inode->i_blkbits;
++	unsigned blocksize = i_blocksize(inode);
++
++	if (filemap_write_and_wait(mapping))
++		return 0;
++
++	bno = 0;
++	iomap_apply(inode, pos, blocksize, 0, ops, &bno, iomap_bmap_actor);
++	return bno;
++}
++EXPORT_SYMBOL_GPL(iomap_bmap);
+diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+index 819e0cd2a950..a044a824da85 100644
+--- a/include/linux/iomap.h
++++ b/include/linux/iomap.h
+@@ -4,6 +4,7 @@
+ 
+ #include <linux/types.h>
+ 
++struct address_space;
+ struct fiemap_extent_info;
+ struct inode;
+ struct iov_iter;
+@@ -100,6 +101,8 @@ loff_t iomap_seek_hole(struct inode *inode, loff_t offset,
+ 		const struct iomap_ops *ops);
+ loff_t iomap_seek_data(struct inode *inode, loff_t offset,
+ 		const struct iomap_ops *ops);
++sector_t iomap_bmap(struct address_space *mapping, sector_t bno,
++		const struct iomap_ops *ops);
+ 
+ /*
+  * Flags for direct I/O ->end_io:
 -- 
-2.16.3
+2.17.0
