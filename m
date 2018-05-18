@@ -1,84 +1,123 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH v4 2/6] bcache: set CACHE_SET_IO_DISABLE in bch_cached_dev_error()
-Date: Thu,  3 May 2018 18:51:33 +0800
-Message-Id: <20180503105137.2922-3-colyli@suse.de>
-In-Reply-To: <20180503105137.2922-1-colyli@suse.de>
-References: <20180503105137.2922-1-colyli@suse.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 02/34] fs: factor out a __generic_write_end helper
+Date: Fri, 18 May 2018 18:47:58 +0200
+Message-Id: <20180518164830.1552-3-hch@lst.de>
+In-Reply-To: <20180518164830.1552-1-hch@lst.de>
+References: <20180518164830.1552-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Commit c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev") tries
-to stop bcache device by calling bcache_device_stop() when too many I/O
-errors happened on backing device. But if there is internal I/O happening
-on cache device (writeback scan, garbage collection, etc), a regular I/O
-request triggers the internal I/Os may still holds a refcount of dc->count,
-and the refcount may only be dropped after the internal I/O stopped.
+Bits of the buffer.c based write_end implementations that don't know
+about buffer_heads and can be reused by other implementations.
 
-By this patch, bch_cached_dev_error() will check if the backing device is
-attached to a cache set, if yes that CACHE_SET_IO_DISABLE will be set to
-flags of this cache set. Then internal I/Os on cache device will be
-rejected and stopped immediately, and the bcache device can be stopped.
-
-For people who are not familiar with the interesting refcount dependance,
-let me explain a bit more how the fix works. Example the writeback thread
-will scan cache device for dirty data writeback purpose. Before it stopps,
-it holds a refcount of dc->count. When CACHE_SET_IO_DISABLE bit is set,
-the internal I/O will stopped and the while-loop in bch_writeback_thread()
-quits and calls cached_dev_put() to drop dc->count. If this is the last
-refcount to drop, then cached_dev_detach_finish() will be called. In this
-call back function, in turn closure_put(dc->disk.cl) is called to drop a
-refcount of closure dc->disk.cl. If this is the last refcount of this
-closure to drop, then cached_dev_flush() will be called. Then the cached
-device is freed. So if CACHE_SET_IO_DISABLE is not set, the bache device
-can not be stopped until all inernal cache device I/O stopped. For large
-size cache device, and writeback thread competes locks with gc thread,
-there might be a quite long time to wait.
-
-Fixes: c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev")
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/md/bcache/super.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ fs/buffer.c   | 67 +++++++++++++++++++++++++++------------------------
+ fs/internal.h |  2 ++
+ 2 files changed, 37 insertions(+), 32 deletions(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 8196b19fada2..c017cd444c66 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1369,6 +1369,8 @@ int bch_flash_dev_create(struct cache_set *c, uint64_t size)
- 
- bool bch_cached_dev_error(struct cached_dev *dc)
- {
-+	struct cache_set *c;
-+
- 	if (!dc || test_bit(BCACHE_DEV_CLOSING, &dc->disk.flags))
- 		return false;
- 
-@@ -1379,6 +1381,21 @@ bool bch_cached_dev_error(struct cached_dev *dc)
- 	pr_err("stop %s: too many IO errors on backing device %s\n",
- 		dc->disk.disk->disk_name, dc->backing_dev_name);
- 
-+	/*
-+	 * If the cached device is still attached to a cache set,
-+	 * even dc->io_disable is true and no more I/O requests
-+	 * accepted, cache device internal I/O (writeback scan or
-+	 * garbage collection) may still prevent bcache device from
-+	 * being stopped. So here CACHE_SET_IO_DISABLE should be
-+	 * set to c->flags too, to make the internal I/O to cache
-+	 * device rejected and stopped immediately.
-+	 * If c is NULL, that means the bcache device is not attached
-+	 * to any cache set, then no CACHE_SET_IO_DISABLE bit to set.
-+	 */
-+	c = dc->disk.c;
-+	if (c && test_and_set_bit(CACHE_SET_IO_DISABLE, &c->flags))
-+		pr_info("CACHE_SET_IO_DISABLE already set");
-+
- 	bcache_device_stop(&dc->disk);
- 	return true;
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 249b83fafe48..bd964b2ad99a 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -2076,6 +2076,40 @@ int block_write_begin(struct address_space *mapping, loff_t pos, unsigned len,
  }
+ EXPORT_SYMBOL(block_write_begin);
+ 
++int __generic_write_end(struct inode *inode, loff_t pos, unsigned copied,
++		struct page *page)
++{
++	loff_t old_size = inode->i_size;
++	bool i_size_changed = false;
++
++	/*
++	 * No need to use i_size_read() here, the i_size cannot change under us
++	 * because we hold i_rwsem.
++	 *
++	 * But it's important to update i_size while still holding page lock:
++	 * page writeout could otherwise come in and zero beyond i_size.
++	 */
++	if (pos + copied > inode->i_size) {
++		i_size_write(inode, pos + copied);
++		i_size_changed = true;
++	}
++
++	unlock_page(page);
++	put_page(page);
++
++	if (old_size < pos)
++		pagecache_isize_extended(inode, old_size, pos);
++	/*
++	 * Don't mark the inode dirty under page lock. First, it unnecessarily
++	 * makes the holding time of page lock longer. Second, it forces lock
++	 * ordering of page lock and transaction start for journaling
++	 * filesystems.
++	 */
++	if (i_size_changed)
++		mark_inode_dirty(inode);
++	return copied;
++}
++
+ int block_write_end(struct file *file, struct address_space *mapping,
+ 			loff_t pos, unsigned len, unsigned copied,
+ 			struct page *page, void *fsdata)
+@@ -2116,39 +2150,8 @@ int generic_write_end(struct file *file, struct address_space *mapping,
+ 			loff_t pos, unsigned len, unsigned copied,
+ 			struct page *page, void *fsdata)
+ {
+-	struct inode *inode = mapping->host;
+-	loff_t old_size = inode->i_size;
+-	int i_size_changed = 0;
+-
+ 	copied = block_write_end(file, mapping, pos, len, copied, page, fsdata);
+-
+-	/*
+-	 * No need to use i_size_read() here, the i_size
+-	 * cannot change under us because we hold i_mutex.
+-	 *
+-	 * But it's important to update i_size while still holding page lock:
+-	 * page writeout could otherwise come in and zero beyond i_size.
+-	 */
+-	if (pos+copied > inode->i_size) {
+-		i_size_write(inode, pos+copied);
+-		i_size_changed = 1;
+-	}
+-
+-	unlock_page(page);
+-	put_page(page);
+-
+-	if (old_size < pos)
+-		pagecache_isize_extended(inode, old_size, pos);
+-	/*
+-	 * Don't mark the inode dirty under page lock. First, it unnecessarily
+-	 * makes the holding time of page lock longer. Second, it forces lock
+-	 * ordering of page lock and transaction start for journaling
+-	 * filesystems.
+-	 */
+-	if (i_size_changed)
+-		mark_inode_dirty(inode);
+-
+-	return copied;
++	return __generic_write_end(mapping->host, pos, copied, page);
+ }
+ EXPORT_SYMBOL(generic_write_end);
+ 
+diff --git a/fs/internal.h b/fs/internal.h
+index e08972db0303..b955232d3d49 100644
+--- a/fs/internal.h
++++ b/fs/internal.h
+@@ -43,6 +43,8 @@ static inline int __sync_blockdev(struct block_device *bdev, int wait)
+ extern void guard_bio_eod(int rw, struct bio *bio);
+ extern int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
+ 		get_block_t *get_block, struct iomap *iomap);
++int __generic_write_end(struct inode *inode, loff_t pos, unsigned copied,
++		struct page *page);
+ 
+ /*
+  * char_dev.c
 -- 
-2.16.3
+2.17.0
