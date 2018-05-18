@@ -1,77 +1,151 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
 Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
+	Christoph Hellwig <hch@infradead.org>,
 	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V4 0/7] nvme: pci: fix & improve timeout handling
-Date: Sat,  5 May 2018 21:58:58 +0800
-Message-Id: <20180505135905.18815-1-ming.lei@redhat.com>
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Doug Ledford <dledford@redhat.com>,
+	Swapnil Ingle <swapnil.ingle@profitbricks.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH v2 12/26] ibtrs: server: statistics functions
+Date: Fri, 18 May 2018 15:03:59 +0200
+Message-Id: <20180518130413.16997-13-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
+References: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+This introduces set of functions used on server side to account
+statistics of RDMA data sent/received.
 
-The 1st patch introduces blk_quiesce_timeout() and blk_unquiesce_timeout()
-for NVMe, meantime fixes blk_sync_queue().
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jack Wang <jinpu.wang@profitbricks.com>
+---
+ drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c | 110 +++++++++++++++++++++++++
+ 1 file changed, 110 insertions(+)
+ create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c
 
-The 2nd patch covers timeout for admin commands for recovering controller
-for avoiding possible deadlock.
-
-The 3rd and 4th patches avoid to wait_freeze on queues which aren't frozen.
-
-The last 4 patches fixes several races wrt. NVMe timeout handler, and
-finally can make blktests block/011 passed. Meantime the NVMe PCI timeout
-mecanism become much more rebost than before.
-
-gitweb:
-	https://github.com/ming1/linux/commits/v4.17-rc-nvme-timeout.V4
-
-V4:
-	- fixe nvme_init_set_host_mem_cmd()
-	- use nested EH model, and run both nvme_dev_disable() and
-	resetting in one same context
-
-V3:
-	- fix one new race related freezing in patch 4, nvme_reset_work()
-	may hang forever without this patch
-	- rewrite the last 3 patches, and avoid to break nvme_reset_ctrl*()
-
-V2:
-	- fix draining timeout work, so no need to change return value from
-	.timeout()
-	- fix race between nvme_start_freeze() and nvme_unfreeze()
-	- cover timeout for admin commands running in EH
-
-Ming Lei (7):
-  block: introduce blk_quiesce_timeout() and blk_unquiesce_timeout()
-  nvme: pci: cover timeout for admin commands running in EH
-  nvme: pci: only wait freezing if queue is frozen
-  nvme: pci: freeze queue in nvme_dev_disable() in case of error
-    recovery
-  nvme: core: introduce 'reset_lock' for sync reset state and reset
-    activities
-  nvme: pci: prepare for supporting error recovery from resetting
-    context
-  nvme: pci: support nested EH
-
- block/blk-core.c         |  21 +++-
- block/blk-mq.c           |   9 ++
- block/blk-timeout.c      |   5 +-
- drivers/nvme/host/core.c |  46 ++++++-
- drivers/nvme/host/nvme.h |   5 +
- drivers/nvme/host/pci.c  | 304 ++++++++++++++++++++++++++++++++++++++++-------
- include/linux/blkdev.h   |  13 ++
- 7 files changed, 356 insertions(+), 47 deletions(-)
-
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
+diff --git a/drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c b/drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c
+new file mode 100644
+index 000000000000..5933cfc03f95
+--- /dev/null
++++ b/drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c
+@@ -0,0 +1,110 @@
++/*
++ * InfiniBand Transport Layer
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler <mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *          Kleber Souza <kleber.souza@profitbricks.com>
++ *          Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
++ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#undef pr_fmt
++#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
++
++#include "ibtrs-srv.h"
++
++void ibtrs_srv_update_rdma_stats(struct ibtrs_srv_stats *s,
++				 size_t size, int d)
++{
++	atomic64_inc(&s->rdma_stats.dir[d].cnt);
++	atomic64_add(size, &s->rdma_stats.dir[d].size_total);
++}
++
++void ibtrs_srv_update_wc_stats(struct ibtrs_srv_stats *s)
++{
++	atomic64_inc(&s->wc_comp.calls);
++	atomic64_inc(&s->wc_comp.total_wc_cnt);
++}
++
++int ibtrs_srv_reset_rdma_stats(struct ibtrs_srv_stats *stats, bool enable)
++{
++	if (enable) {
++		struct ibtrs_srv_stats_rdma_stats *r = &stats->rdma_stats;
++
++		memset(r, 0, sizeof(*r));
++		return 0;
++	}
++
++	return -EINVAL;
++}
++
++ssize_t ibtrs_srv_stats_rdma_to_str(struct ibtrs_srv_stats *stats,
++				    char *page, size_t len)
++{
++	struct ibtrs_srv_stats_rdma_stats *r = &stats->rdma_stats;
++	struct ibtrs_srv_sess *sess;
++
++	sess = container_of(stats, typeof(*sess), stats);
++
++	return scnprintf(page, len, "%lld %lld %lld %lld %u\n",
++			 (s64)atomic64_read(&r->dir[READ].cnt),
++			 (s64)atomic64_read(&r->dir[READ].size_total),
++			 (s64)atomic64_read(&r->dir[WRITE].cnt),
++			 (s64)atomic64_read(&r->dir[WRITE].size_total),
++			 atomic_read(&sess->ids_inflight));
++}
++
++int ibtrs_srv_reset_wc_completion_stats(struct ibtrs_srv_stats *stats,
++					bool enable)
++{
++	if (enable) {
++		memset(&stats->wc_comp, 0, sizeof(stats->wc_comp));
++		return 0;
++	}
++
++	return -EINVAL;
++}
++
++int ibtrs_srv_stats_wc_completion_to_str(struct ibtrs_srv_stats *stats,
++					 char *buf, size_t len)
++{
++	return snprintf(buf, len, "%lld %lld\n",
++			(s64)atomic64_read(&stats->wc_comp.total_wc_cnt),
++			(s64)atomic64_read(&stats->wc_comp.calls));
++}
++
++ssize_t ibtrs_srv_reset_all_help(struct ibtrs_srv_stats *stats,
++				 char *page, size_t len)
++{
++	return scnprintf(page, PAGE_SIZE, "echo 1 to reset all statistics\n");
++}
++
++int ibtrs_srv_reset_all_stats(struct ibtrs_srv_stats *stats, bool enable)
++{
++	if (enable) {
++		ibtrs_srv_reset_wc_completion_stats(stats, enable);
++		ibtrs_srv_reset_rdma_stats(stats, enable);
++		return 0;
++	}
++
++	return -EINVAL;
++}
 -- 
-2.9.5
+2.13.1
