@@ -1,96 +1,333 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga12.intel.com ([192.55.52.136]:41009 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751498AbeENUkq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 May 2018 16:40:46 -0400
-From: Keith Busch <keith.busch@intel.com>
-To: Omar Sandoval <osandov@osandov.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Cc: Keith Busch <keith.busch@intel.com>
-Subject: [PATCHv2 blktests] nvme: Add command timeout injection test
-Date: Mon, 14 May 2018 14:42:41 -0600
-Message-Id: <20180514204241.15300-1-keith.busch@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Doug Ledford <dledford@redhat.com>,
+	Swapnil Ingle <swapnil.ingle@profitbricks.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH v2 13/26] ibtrs: server: sysfs interface functions
+Date: Fri, 18 May 2018 15:04:00 +0200
+Message-Id: <20180518130413.16997-14-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
+References: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
+List-ID: <linux-block@vger.kernel.org>
 
-This test will run a background IO process and inject an admin command
-with a very short timeout that is all but guaranteed to expire without
-a completion: the async event request.
+This is the sysfs interface to IBTRS sessions on server side:
 
-Signed-off-by: Keith Busch <keith.busch@intel.com>
+  /sys/devices/virtual/ibtrs-server/<SESS-NAME>/
+    *** IBTRS session accepted from a client peer
+    |
+    |- paths/<SOURCE-IP>/
+       *** established paths from a client in a session
+       |
+       |- disconnect
+       |  *** disconnect path
+       |
+       |- hca_name
+       |  *** HCA name
+       |
+       |- hca_port
+       |  *** HCA port
+       |
+       |- stats/
+          *** current path statistics
+          |
+	  |- rdma
+	  |- reset_all
+	  |- wc_completions
+
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jack Wang <jinpu.wang@profitbricks.com>
 ---
-v1 -> v2:
+ drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c | 271 +++++++++++++++++++++++++
+ 1 file changed, 271 insertions(+)
+ create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c
 
-  Changed description since its not a test for a specific
-  regression-fixing patch.
-
-  Added fio requirement.
-
-  Missing quotes around device name.
-
- tests/nvme/005     | 42 ++++++++++++++++++++++++++++++++++++++++++
- tests/nvme/005.out |  3 +++
- 2 files changed, 45 insertions(+)
- create mode 100755 tests/nvme/005
- create mode 100644 tests/nvme/005.out
-
-diff --git a/tests/nvme/005 b/tests/nvme/005
-new file mode 100755
-index 0000000..f2fcf19
---- /dev/null
-+++ b/tests/nvme/005
-@@ -0,0 +1,42 @@
-+#!/bin/bash
-+#
-+# Test for nvme timeout handling with inflight IO.
-+#
-+# Copyright (C) 2018 Keith Busch <keith.busch@intel.com>
-+#
-+# This program is free software: you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation, either version 3 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+
-+DESCRIPTION="test nvme admin command timeout handling with in-flight io"
-+
-+QUICK=1
-+
-+requires() {
-+	_have_fio && _have_program nvme
-+}
-+
-+test_device() {
-+	echo "Running ${TEST_NAME}"
-+
-+	# start fio job
-+	_run_fio_rand_io --filename="${TEST_DEV}" --time_based --runtime=20 &
-+
-+	sleep 5
-+
-+	# send nvme admin command 'async event request', which  will surely time out
-+	nvme admin-passthru "${TEST_DEV}" -o 0xc --timeout=1
-+
-+	wait
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/nvme/005.out b/tests/nvme/005.out
+diff --git a/drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c b/drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c
 new file mode 100644
-index 0000000..f4ff837
+index 000000000000..96d9d9f08e0e
 --- /dev/null
-+++ b/tests/nvme/005.out
-@@ -0,0 +1,3 @@
-+Running nvme/005
-+passthru: Interrupted system call
-+Test complete
++++ b/drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c
+@@ -0,0 +1,271 @@
++/*
++ * InfiniBand Transport Layer
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler <mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *          Kleber Souza <kleber.souza@profitbricks.com>
++ *          Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
++ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#undef pr_fmt
++#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
++
++#include "ibtrs-pri.h"
++#include "ibtrs-srv.h"
++#include "ibtrs-log.h"
++
++extern struct class *ibtrs_dev_class;
++
++static struct kobj_type ktype = {
++	.sysfs_ops	= &kobj_sysfs_ops,
++};
++
++static ssize_t ibtrs_srv_disconnect_show(struct kobject *kobj,
++					 struct kobj_attribute *attr,
++					 char *page)
++{
++	return scnprintf(page, PAGE_SIZE, "Usage: echo 1 > %s\n",
++			 attr->attr.name);
++}
++
++static ssize_t ibtrs_srv_disconnect_store(struct kobject *kobj,
++					  struct kobj_attribute *attr,
++					  const char *buf, size_t count)
++{
++	struct ibtrs_srv_sess *sess;
++	char str[MAXHOSTNAMELEN];
++
++	sess = container_of(kobj, struct ibtrs_srv_sess, kobj);
++	if (!sysfs_streq(buf, "1")) {
++		ibtrs_err(sess, "%s: invalid value: '%s'\n",
++			  attr->attr.name, buf);
++		return -EINVAL;
++	}
++
++	sockaddr_to_str((struct sockaddr *)&sess->s.dst_addr, str, sizeof(str));
++
++	ibtrs_info(sess, "disconnect for path %s requested\n", str);
++	ibtrs_srv_queue_close(sess);
++
++	return count;
++}
++
++static struct kobj_attribute ibtrs_srv_disconnect_attr =
++	__ATTR(disconnect, 0644,
++	       ibtrs_srv_disconnect_show, ibtrs_srv_disconnect_store);
++
++static ssize_t ibtrs_srv_hca_port_show(struct kobject *kobj,
++				       struct kobj_attribute *attr,
++				       char *page)
++{
++	struct ibtrs_srv_sess *sess;
++	struct ibtrs_con *usr_con;
++
++	sess = container_of(kobj, typeof(*sess), kobj);
++	usr_con = sess->s.con[0];
++
++	return scnprintf(page, PAGE_SIZE, "%u\n",
++			 usr_con->cm_id->port_num);
++}
++
++static struct kobj_attribute ibtrs_srv_hca_port_attr =
++	__ATTR(hca_port, 0444, ibtrs_srv_hca_port_show, NULL);
++
++static ssize_t ibtrs_srv_hca_name_show(struct kobject *kobj,
++				       struct kobj_attribute *attr,
++				       char *page)
++{
++	struct ibtrs_srv_sess *sess;
++
++	sess = container_of(kobj, struct ibtrs_srv_sess, kobj);
++
++	return scnprintf(page, PAGE_SIZE, "%s\n",
++			 sess->s.dev->ib_dev->name);
++}
++
++static struct kobj_attribute ibtrs_srv_hca_name_attr =
++	__ATTR(hca_name, 0444, ibtrs_srv_hca_name_show, NULL);
++
++static struct attribute *ibtrs_srv_sess_attrs[] = {
++	&ibtrs_srv_hca_name_attr.attr,
++	&ibtrs_srv_hca_port_attr.attr,
++	&ibtrs_srv_disconnect_attr.attr,
++	NULL,
++};
++
++static struct attribute_group ibtrs_srv_sess_attr_group = {
++	.attrs = ibtrs_srv_sess_attrs,
++};
++
++STAT_ATTR(struct ibtrs_srv_sess, rdma,
++	  ibtrs_srv_stats_rdma_to_str,
++	  ibtrs_srv_reset_rdma_stats);
++
++STAT_ATTR(struct ibtrs_srv_sess, wc_completion,
++	  ibtrs_srv_stats_wc_completion_to_str,
++	  ibtrs_srv_reset_wc_completion_stats);
++
++STAT_ATTR(struct ibtrs_srv_sess, reset_all,
++	  ibtrs_srv_reset_all_help,
++	  ibtrs_srv_reset_all_stats);
++
++static struct attribute *ibtrs_srv_stats_attrs[] = {
++	&rdma_attr.attr,
++	&wc_completion_attr.attr,
++	&reset_all_attr.attr,
++	NULL,
++};
++
++static struct attribute_group ibtrs_srv_stats_attr_group = {
++	.attrs = ibtrs_srv_stats_attrs,
++};
++
++static void ibtrs_srv_dev_release(struct device *dev)
++{
++	/* Nobody plays with device references, so nop */
++}
++
++static int ibtrs_srv_create_once_sysfs_root_folders(struct ibtrs_srv_sess *sess)
++{
++	struct ibtrs_srv *srv = sess->srv;
++	int err = 0;
++
++	mutex_lock(&srv->paths_mutex);
++	if (srv->dev_ref++) {
++		/*
++		 * Just increase device reference.  We can't use get_device()
++		 * because we need to unregister device when ref goes to 0,
++		 * not just to put it.
++		 */
++		goto unlock;
++	}
++	srv->dev.class = ibtrs_dev_class;
++	srv->dev.release = ibtrs_srv_dev_release;
++	dev_set_name(&srv->dev, "%s", sess->s.sessname);
++
++	err = device_register(&srv->dev);
++	if (unlikely(err)) {
++		pr_err("device_register(): %d\n", err);
++		goto unlock;
++	}
++	err = kobject_init_and_add(&srv->kobj_paths, &ktype,
++				   &srv->dev.kobj, "paths");
++	if (unlikely(err)) {
++		pr_err("kobject_init_and_add(): %d\n", err);
++		device_unregister(&srv->dev);
++		goto unlock;
++	}
++unlock:
++	mutex_unlock(&srv->paths_mutex);
++
++	return err;
++}
++
++static void ibtrs_srv_destroy_once_sysfs_root_folders(struct ibtrs_srv_sess *sess)
++{
++	struct ibtrs_srv *srv = sess->srv;
++
++	mutex_lock(&srv->paths_mutex);
++	if (!--srv->dev_ref) {
++		kobject_put(&srv->kobj_paths);
++		device_unregister(&srv->dev);
++	}
++	mutex_unlock(&srv->paths_mutex);
++}
++
++static int ibtrs_srv_create_stats_files(struct ibtrs_srv_sess *sess)
++{
++	int err;
++
++	err = kobject_init_and_add(&sess->kobj_stats, &ktype,
++				   &sess->kobj, "stats");
++	if (unlikely(err)) {
++		ibtrs_err(sess, "kobject_init_and_add(): %d\n", err);
++		return err;
++	}
++	err = sysfs_create_group(&sess->kobj_stats,
++				 &ibtrs_srv_stats_attr_group);
++	if (unlikely(err)) {
++		ibtrs_err(sess, "sysfs_create_group(): %d\n", err);
++		goto err;
++	}
++
++	return 0;
++
++err:
++	kobject_put(&sess->kobj_stats);
++
++	return err;
++}
++
++int ibtrs_srv_create_sess_files(struct ibtrs_srv_sess *sess)
++{
++	struct ibtrs_srv *srv = sess->srv;
++	char str[MAXHOSTNAMELEN];
++	int err;
++
++	sockaddr_to_str((struct sockaddr *)&sess->s.dst_addr, str, sizeof(str));
++
++	err = ibtrs_srv_create_once_sysfs_root_folders(sess);
++	if (unlikely(err))
++		return err;
++
++	err = kobject_init_and_add(&sess->kobj, &ktype, &srv->kobj_paths,
++				   "%s", str);
++	if (unlikely(err)) {
++		ibtrs_err(sess, "kobject_init_and_add(): %d\n", err);
++		goto destroy_root;
++	}
++	err = sysfs_create_group(&sess->kobj, &ibtrs_srv_sess_attr_group);
++	if (unlikely(err)) {
++		ibtrs_err(sess, "sysfs_create_group(): %d\n", err);
++		goto put_kobj;
++	}
++	err = ibtrs_srv_create_stats_files(sess);
++	if (unlikely(err))
++		goto remove_group;
++
++	return 0;
++
++remove_group:
++	sysfs_remove_group(&sess->kobj, &ibtrs_srv_sess_attr_group);
++put_kobj:
++	kobject_del(&sess->kobj);
++	kobject_put(&sess->kobj);
++destroy_root:
++	ibtrs_srv_destroy_once_sysfs_root_folders(sess);
++
++	return err;
++}
++
++void ibtrs_srv_destroy_sess_files(struct ibtrs_srv_sess *sess)
++{
++	if (sess->kobj.state_in_sysfs) {
++		kobject_del(&sess->kobj_stats);
++		kobject_put(&sess->kobj_stats);
++		kobject_del(&sess->kobj);
++		kobject_put(&sess->kobj);
++
++		ibtrs_srv_destroy_once_sysfs_root_folders(sess);
++	}
++}
 -- 
-2.14.3
+2.13.1
