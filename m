@@ -1,98 +1,42 @@
-Return-Path: <BATV+67dfbb8f664e29ec4bbc+5394+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
+Return-Path: <prvs=669a0b661=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <damien.lemoal@wdc.com>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 3/6] block: remove the always unused name argument to elevator_init
-Date: Thu, 31 May 2018 19:11:38 +0200
-Message-Id: <20180531171141.18478-4-hch@lst.de>
-In-Reply-To: <20180531171141.18478-1-hch@lst.de>
-References: <20180531171141.18478-1-hch@lst.de>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH v3 0/2] Ensure that a request queue is dissociated from the cgroup controller
+Date: Fri, 18 May 2018 11:40:01 -0700
+Message-Id: <20180518184003.29738-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Reported-by: Damien Le Moal <Damien.LeMoal@wdc.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
-Tested-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/blk-core.c     |  2 +-
- block/blk-mq-sched.c |  2 +-
- block/blk.h          |  2 +-
- block/elevator.c     | 10 ++--------
- 4 files changed, 5 insertions(+), 11 deletions(-)
+Hello Jens,
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index b00e7e6340ca..18b691c93b63 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1179,7 +1179,7 @@ int blk_init_allocated_queue(struct request_queue *q)
- 	mutex_lock(&q->sysfs_lock);
- 
- 	/* init elevator */
--	if (elevator_init(q, NULL)) {
-+	if (elevator_init(q)) {
- 		mutex_unlock(&q->sysfs_lock);
- 		goto out_exit_flush_rq;
- 	}
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index b0f2c2a40a0c..fd4f68d61df0 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -653,7 +653,7 @@ int blk_mq_sched_init(struct request_queue *q)
- 	int ret;
- 
- 	mutex_lock(&q->sysfs_lock);
--	ret = elevator_init(q, NULL);
-+	ret = elevator_init(q);
- 	mutex_unlock(&q->sysfs_lock);
- 
- 	return ret;
-diff --git a/block/blk.h b/block/blk.h
-index a559c0532347..ab5ec2dadc7b 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -231,7 +231,7 @@ static inline void elv_deactivate_rq(struct request_queue *q, struct request *rq
- 		e->type->ops.sq.elevator_deactivate_req_fn(q, rq);
- }
- 
--int elevator_init(struct request_queue *, char *);
-+int elevator_init(struct request_queue *);
- void elevator_exit(struct request_queue *, struct elevator_queue *);
- int elv_register_queue(struct request_queue *q);
- void elv_unregister_queue(struct request_queue *q);
-diff --git a/block/elevator.c b/block/elevator.c
-index a7baa4687b28..9276540af2a1 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -199,7 +199,7 @@ static void elevator_release(struct kobject *kobj)
- 	kfree(e);
- }
- 
--int elevator_init(struct request_queue *q, char *name)
-+int elevator_init(struct request_queue *q)
- {
- 	struct elevator_type *e = NULL;
- 	int err;
-@@ -213,19 +213,13 @@ int elevator_init(struct request_queue *q, char *name)
- 	if (unlikely(q->elevator))
- 		return 0;
- 
--	if (name) {
--		e = elevator_get(q, name, true);
--		if (!e)
--			return -EINVAL;
--	}
--
- 	/*
- 	 * Use the default elevator specified by config boot param for
- 	 * non-mq devices, or by config option. Don't try to load modules
- 	 * as we could be running off async and request_module() isn't
- 	 * allowed from async.
- 	 */
--	if (!e && !q->mq_ops && *chosen_elevator) {
-+	if (!q->mq_ops && *chosen_elevator) {
- 		e = elevator_get(q, chosen_elevator, false);
- 		if (!e)
- 			printk(KERN_ERR "I/O scheduler %s not found\n",
+Several block drivers call alloc_disk() followed by put_disk() if
+something fails before device_add_disk() is called without calling
+blk_cleanup_queue(). Make sure that also for this scenario a request
+queue is dissociated from the cgroup controller. This patch avoids
+that loading the parport_pc, paride and pf drivers trigger a kernel
+crash. Please consider these patches for the upstream kernel.
+
+Thanks,
+
+Bart.
+
+Changes between v2 and v3:
+- Avoid code duplication by introducing a new helper function.
+
+Changes between v1 and v2:
+- Fixed the build for CONFIG_BLK_CGROUP=n.
+
+Bart Van Assche (2):
+  block: Introduce blk_exit_queue()
+  block: Ensure that a request queue is dissociated from the cgroup
+    controller
+
+ block/blk-core.c  | 54 ++++++++++++++++++++++++++++++------------------------
+ block/blk-sysfs.c | 25 +++++++++++++++++++++++++
+ block/blk.h       |  1 +
+ 3 files changed, 56 insertions(+), 24 deletions(-)
+
 -- 
-2.17.0
+2.16.3
