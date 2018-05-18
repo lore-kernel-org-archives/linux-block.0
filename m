@@ -1,61 +1,136 @@
-Return-Path: <prvs=673f59626=adam.manzanares@wdc.com>
-From: adam.manzanares@wdc.com
-To: viro@zeniv.linux.org.uk,
-	linux-fsdevel@vger.kernel.org,
-	axboe@kernel.dk,
-	bcrl@kvack.org
-Cc: tglx@linutronix.de,
-	mingo@kernel.org,
-	pombredanne@nexb.com,
-	kstewart@linuxfoundation.org,
-	gregkh@linuxfoundation.org,
-	bigeasy@linutronix.de,
-	jack@suse.cz,
-	darrick.wong@oracle.com,
-	rgoldwyn@suse.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-aio@kvack.org,
-	linux-api@vger.kernel.org,
-	hch@infradread.org,
-	jmoyer@redhat.com,
-	Adam Manzanares <adam.manzanares@wdc.com>
-Subject: [PATCH v6 4/5] fs: blkdev set bio prio from kiocb prio
-Date: Tue, 22 May 2018 08:07:36 -0700
-Message-Id: <20180522150737.9893-5-adam.manzanares@wdc.com>
-In-Reply-To: <20180522150737.9893-1-adam.manzanares@wdc.com>
-References: <20180522150737.9893-1-adam.manzanares@wdc.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 24/34] xfs: remove xfs_reflink_find_cow_mapping
+Date: Fri, 18 May 2018 18:48:20 +0200
+Message-Id: <20180518164830.1552-25-hch@lst.de>
+In-Reply-To: <20180518164830.1552-1-hch@lst.de>
+References: <20180518164830.1552-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Adam Manzanares <adam.manzanares@wdc.com>
+We only have one caller left, and open coding the simple extent list
+lookup in it allows us to make the code both more understandable and
+reuse calculations and variables already present.
 
-Now that kiocb has an ioprio field copy this over to the bio when it is
-created from the kiocb.
-
-Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/block_dev.c | 2 ++
- 1 file changed, 2 insertions(+)
+ fs/xfs/xfs_aops.c    | 17 ++++++++++++-----
+ fs/xfs/xfs_reflink.c | 30 ------------------------------
+ fs/xfs/xfs_reflink.h |  2 --
+ fs/xfs/xfs_trace.h   |  1 -
+ 4 files changed, 12 insertions(+), 38 deletions(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 7ec920e27065..11ba99e79d2a 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -216,6 +216,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 	bio.bi_write_hint = iocb->ki_hint;
- 	bio.bi_private = current;
- 	bio.bi_end_io = blkdev_bio_end_io_simple;
-+	bio.bi_ioprio = iocb->ki_ioprio;
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index a50f69c2c602..a4b4a7037deb 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -385,6 +385,7 @@ xfs_map_blocks(
+ 	ssize_t			count = i_blocksize(inode);
+ 	xfs_fileoff_t		offset_fsb, end_fsb;
+ 	int			whichfork = XFS_DATA_FORK;
++	struct xfs_iext_cursor	icur;
+ 	int			error = 0;
+ 	int			nimaps = 1;
  
- 	ret = bio_iov_iter_get_pages(&bio, iter);
- 	if (unlikely(ret))
-@@ -355,6 +356,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 		bio->bi_write_hint = iocb->ki_hint;
- 		bio->bi_private = dio;
- 		bio->bi_end_io = blkdev_bio_end_io;
-+		bio->bi_ioprio = iocb->ki_ioprio;
+@@ -396,8 +397,18 @@ xfs_map_blocks(
+ 	       (ip->i_df.if_flags & XFS_IFEXTENTS));
+ 	ASSERT(offset <= mp->m_super->s_maxbytes);
  
- 		ret = bio_iov_iter_get_pages(bio, iter);
- 		if (unlikely(ret)) {
++	if (offset > mp->m_super->s_maxbytes - count)
++		count = mp->m_super->s_maxbytes - offset;
++	end_fsb = XFS_B_TO_FSB(mp, (xfs_ufsize_t)offset + count);
++	offset_fsb = XFS_B_TO_FSBT(mp, offset);
++
++	/*
++	 * Check if this is offset is covered by a COW extents, and if yes use
++	 * it directly instead of looking up anything in the data fork.
++	 */
+ 	if (xfs_is_reflink_inode(ip) &&
+-	    xfs_reflink_find_cow_mapping(ip, offset, imap)) {
++	    xfs_iext_lookup_extent(ip, ip->i_cowfp, offset_fsb, &icur, imap) &&
++	    imap->br_startoff <= offset_fsb) {
+ 		xfs_iunlock(ip, XFS_ILOCK_SHARED);
+ 		/*
+ 		 * Truncate can race with writeback since writeback doesn't
+@@ -417,10 +428,6 @@ xfs_map_blocks(
+ 		goto done;
+ 	}
+ 
+-	if (offset > mp->m_super->s_maxbytes - count)
+-		count = mp->m_super->s_maxbytes - offset;
+-	end_fsb = XFS_B_TO_FSB(mp, (xfs_ufsize_t)offset + count);
+-	offset_fsb = XFS_B_TO_FSBT(mp, offset);
+ 	error = xfs_bmapi_read(ip, offset_fsb, end_fsb - offset_fsb,
+ 				imap, &nimaps, XFS_BMAPI_ENTIRE);
+ 	if (!nimaps) {
+diff --git a/fs/xfs/xfs_reflink.c b/fs/xfs/xfs_reflink.c
+index 713e857d9ffa..8e5eb8e70c89 100644
+--- a/fs/xfs/xfs_reflink.c
++++ b/fs/xfs/xfs_reflink.c
+@@ -484,36 +484,6 @@ xfs_reflink_allocate_cow(
+ 	return error;
+ }
+ 
+-/*
+- * Find the CoW reservation for a given byte offset of a file.
+- */
+-bool
+-xfs_reflink_find_cow_mapping(
+-	struct xfs_inode		*ip,
+-	xfs_off_t			offset,
+-	struct xfs_bmbt_irec		*imap)
+-{
+-	struct xfs_ifork		*ifp = XFS_IFORK_PTR(ip, XFS_COW_FORK);
+-	xfs_fileoff_t			offset_fsb;
+-	struct xfs_bmbt_irec		got;
+-	struct xfs_iext_cursor		icur;
+-
+-	ASSERT(xfs_isilocked(ip, XFS_ILOCK_EXCL | XFS_ILOCK_SHARED));
+-
+-	if (!xfs_is_reflink_inode(ip))
+-		return false;
+-	offset_fsb = XFS_B_TO_FSBT(ip->i_mount, offset);
+-	if (!xfs_iext_lookup_extent(ip, ifp, offset_fsb, &icur, &got))
+-		return false;
+-	if (got.br_startoff > offset_fsb)
+-		return false;
+-
+-	trace_xfs_reflink_find_cow_mapping(ip, offset, 1, XFS_IO_OVERWRITE,
+-			&got);
+-	*imap = got;
+-	return true;
+-}
+-
+ /*
+  * Trim an extent to end at the next CoW reservation past offset_fsb.
+  */
+diff --git a/fs/xfs/xfs_reflink.h b/fs/xfs/xfs_reflink.h
+index 701487bab468..15a456492667 100644
+--- a/fs/xfs/xfs_reflink.h
++++ b/fs/xfs/xfs_reflink.h
+@@ -32,8 +32,6 @@ extern int xfs_reflink_allocate_cow(struct xfs_inode *ip,
+ 		struct xfs_bmbt_irec *imap, bool *shared, uint *lockmode);
+ extern int xfs_reflink_convert_cow(struct xfs_inode *ip, xfs_off_t offset,
+ 		xfs_off_t count);
+-extern bool xfs_reflink_find_cow_mapping(struct xfs_inode *ip, xfs_off_t offset,
+-		struct xfs_bmbt_irec *imap);
+ extern void xfs_reflink_trim_irec_to_next_cow(struct xfs_inode *ip,
+ 		xfs_fileoff_t offset_fsb, struct xfs_bmbt_irec *imap);
+ 
+diff --git a/fs/xfs/xfs_trace.h b/fs/xfs/xfs_trace.h
+index 9d4c4ca24fe6..ed8f774944ba 100644
+--- a/fs/xfs/xfs_trace.h
++++ b/fs/xfs/xfs_trace.h
+@@ -3227,7 +3227,6 @@ DEFINE_INODE_IREC_EVENT(xfs_reflink_convert_cow);
+ DEFINE_RW_EVENT(xfs_reflink_reserve_cow);
+ 
+ DEFINE_SIMPLE_IO_EVENT(xfs_reflink_bounce_dio_write);
+-DEFINE_IOMAP_EVENT(xfs_reflink_find_cow_mapping);
+ DEFINE_INODE_IREC_EVENT(xfs_reflink_trim_irec);
+ 
+ DEFINE_SIMPLE_IO_EVENT(xfs_reflink_cancel_cow_range);
 -- 
-2.15.1
+2.17.0
