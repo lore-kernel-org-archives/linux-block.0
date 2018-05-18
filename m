@@ -1,40 +1,182 @@
-Return-Path: <BATV+e0efdd19ce80d487e3da+5372+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "Ed L. Cashin" <ed.cashin@acm.org>,
-	Geoff Levand <geoff@infradead.org>,
-	Maxim Levitsky <maximlevitsky@gmail.com>,
+Return-Path: <kent.overstreet@gmail.com>
+Return-Path: <kent.overstreet@gmail.com>
+From: Kent Overstreet <kent.overstreet@gmail.com>
+To: linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-mtd@lists.infradead.org,
-	sparclinux@vger.kernel.org
-Subject: [PATCH 7/7] ps3disk: handle highmem pages
-Date: Wed,  9 May 2018 15:59:48 +0200
-Message-Id: <20180509135948.20329-8-hch@lst.de>
-In-Reply-To: <20180509135948.20329-1-hch@lst.de>
-References: <20180509135948.20329-1-hch@lst.de>
+	linux-mm@kvack.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Ingo Molnar <mingo@kernel.org>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Subject: [PATCH 06/10] block: Split out bio_list_copy_data()
+Date: Fri, 18 May 2018 03:49:09 -0400
+Message-Id: <20180518074918.13816-12-kent.overstreet@gmail.com>
+In-Reply-To: <20180518074918.13816-1-kent.overstreet@gmail.com>
+References: <20180518074918.13816-1-kent.overstreet@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The ps3disk driver already kmaps all pages when copying from/to the
-internal bounce buffer, so it can accept highmem pages just fine.
+Found a bug (with ASAN) where we were passing a bio to bio_copy_data()
+with bi_next not NULL, when it should have been - a driver had left
+bi_next set to something after calling bio_endio().
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Since the normal case is only copying single bios, split out
+bio_list_copy_data() to avoid more bugs like this in the future.
+
+Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
 ---
- drivers/block/ps3disk.c | 2 --
- 1 file changed, 2 deletions(-)
+ block/bio.c             | 83 +++++++++++++++++++++++++----------------
+ drivers/block/pktcdvd.c |  2 +-
+ include/linux/bio.h     |  5 ++-
+ 3 files changed, 55 insertions(+), 35 deletions(-)
 
-diff --git a/drivers/block/ps3disk.c b/drivers/block/ps3disk.c
-index 075662f2cf46..afe1508d82c6 100644
---- a/drivers/block/ps3disk.c
-+++ b/drivers/block/ps3disk.c
-@@ -465,8 +465,6 @@ static int ps3disk_probe(struct ps3_system_bus_device *_dev)
- 	priv->queue = queue;
- 	queue->queuedata = dev;
+diff --git a/block/bio.c b/block/bio.c
+index d7bd765e9e..c58544d4bc 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -971,32 +971,16 @@ void bio_advance(struct bio *bio, unsigned bytes)
+ }
+ EXPORT_SYMBOL(bio_advance);
  
--	blk_queue_bounce_limit(queue, BLK_BOUNCE_HIGH);
+-void bio_copy_data_iter(struct bio *dst, struct bvec_iter dst_iter,
+-			struct bio *src, struct bvec_iter src_iter)
++void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_iter,
++			struct bio *src, struct bvec_iter *src_iter)
+ {
+ 	struct bio_vec src_bv, dst_bv;
+ 	void *src_p, *dst_p;
+ 	unsigned bytes;
+ 
+-	while (1) {
+-		if (!src_iter.bi_size) {
+-			src = src->bi_next;
+-			if (!src)
+-				break;
 -
- 	blk_queue_max_hw_sectors(queue, dev->bounce_size >> 9);
- 	blk_queue_segment_boundary(queue, -1UL);
- 	blk_queue_dma_alignment(queue, dev->blk_size-1);
+-			src_iter = src->bi_iter;
+-		}
+-
+-		if (!dst_iter.bi_size) {
+-			dst = dst->bi_next;
+-			if (!dst)
+-				break;
+-
+-			dst_iter = dst->bi_iter;
+-		}
+-
+-		src_bv = bio_iter_iovec(src, src_iter);
+-		dst_bv = bio_iter_iovec(dst, dst_iter);
++	while (src_iter->bi_size && dst_iter->bi_size) {
++		src_bv = bio_iter_iovec(src, *src_iter);
++		dst_bv = bio_iter_iovec(dst, *dst_iter);
+ 
+ 		bytes = min(src_bv.bv_len, dst_bv.bv_len);
+ 
+@@ -1010,31 +994,66 @@ void bio_copy_data_iter(struct bio *dst, struct bvec_iter dst_iter,
+ 		kunmap_atomic(dst_p);
+ 		kunmap_atomic(src_p);
+ 
+-		bio_advance_iter(src, &src_iter, bytes);
+-		bio_advance_iter(dst, &dst_iter, bytes);
++		bio_advance_iter(src, src_iter, bytes);
++		bio_advance_iter(dst, dst_iter, bytes);
+ 	}
+ }
+ EXPORT_SYMBOL(bio_copy_data_iter);
+ 
+ /**
+- * bio_copy_data - copy contents of data buffers from one chain of bios to
+- * another
+- * @src: source bio list
+- * @dst: destination bio list
+- *
+- * If @src and @dst are single bios, bi_next must be NULL - otherwise, treats
+- * @src and @dst as linked lists of bios.
++ * bio_copy_data - copy contents of data buffers from one bio to another
++ * @src: source bio
++ * @dst: destination bio
+  *
+  * Stops when it reaches the end of either @src or @dst - that is, copies
+  * min(src->bi_size, dst->bi_size) bytes (or the equivalent for lists of bios).
+  */
+ void bio_copy_data(struct bio *dst, struct bio *src)
+ {
+-	bio_copy_data_iter(dst, dst->bi_iter,
+-			   src, src->bi_iter);
++	struct bvec_iter src_iter = src->bi_iter;
++	struct bvec_iter dst_iter = dst->bi_iter;
++
++	bio_copy_data_iter(dst, &dst_iter, src, &src_iter);
+ }
+ EXPORT_SYMBOL(bio_copy_data);
+ 
++/**
++ * bio_list_copy_data - copy contents of data buffers from one chain of bios to
++ * another
++ * @src: source bio list
++ * @dst: destination bio list
++ *
++ * Stops when it reaches the end of either the @src list or @dst list - that is,
++ * copies min(src->bi_size, dst->bi_size) bytes (or the equivalent for lists of
++ * bios).
++ */
++void bio_list_copy_data(struct bio *dst, struct bio *src)
++{
++	struct bvec_iter src_iter = src->bi_iter;
++	struct bvec_iter dst_iter = dst->bi_iter;
++
++	while (1) {
++		if (!src_iter.bi_size) {
++			src = src->bi_next;
++			if (!src)
++				break;
++
++			src_iter = src->bi_iter;
++		}
++
++		if (!dst_iter.bi_size) {
++			dst = dst->bi_next;
++			if (!dst)
++				break;
++
++			dst_iter = dst->bi_iter;
++		}
++
++		bio_copy_data_iter(dst, &dst_iter, src, &src_iter);
++	}
++}
++EXPORT_SYMBOL(bio_list_copy_data);
++
+ struct bio_map_data {
+ 	int is_our_pages;
+ 	struct iov_iter iter;
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index c61d20c9f3..00ea788b17 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -1285,7 +1285,7 @@ static void pkt_start_write(struct pktcdvd_device *pd, struct packet_data *pkt)
+ 	 * Fill-in bvec with data from orig_bios.
+ 	 */
+ 	spin_lock(&pkt->lock);
+-	bio_copy_data(pkt->w_bio, pkt->orig_bios.head);
++	bio_list_copy_data(pkt->w_bio, pkt->orig_bios.head);
+ 
+ 	pkt_set_state(pkt, PACKET_WRITE_WAIT_STATE);
+ 	spin_unlock(&pkt->lock);
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 5a6ee955a8..98b175cc00 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -505,9 +505,10 @@ static inline void bio_flush_dcache_pages(struct bio *bi)
+ }
+ #endif
+ 
+-extern void bio_copy_data_iter(struct bio *dst, struct bvec_iter dst_iter,
+-			       struct bio *src, struct bvec_iter src_iter);
++extern void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_iter,
++			       struct bio *src, struct bvec_iter *src_iter);
+ extern void bio_copy_data(struct bio *dst, struct bio *src);
++extern void bio_list_copy_data(struct bio *dst, struct bio *src);
+ extern void bio_free_pages(struct bio *bio);
+ 
+ extern struct bio *bio_copy_user_iov(struct request_queue *,
 -- 
 2.17.0
