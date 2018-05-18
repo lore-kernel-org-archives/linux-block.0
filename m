@@ -1,33 +1,34 @@
-Return-Path: <prvs=669193e76=Adam.Manzanares@wdc.com>
-From: Adam Manzanares <Adam.Manzanares@wdc.com>
-To: Christoph Hellwig <hch@infradead.org>
-CC: "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "bcrl@kvack.org" <bcrl@kvack.org>,
-	"mingo@kernel.org" <mingo@kernel.org>, "peterz@infradead.org"
-	<peterz@infradead.org>, "pombredanne@nexb.com" <pombredanne@nexb.com>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"bigeasy@linutronix.de" <bigeasy@linutronix.de>, "rgoldwyn@suse.com"
-	<rgoldwyn@suse.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-aio@kvack.org" <linux-aio@kvack.org>,
-	"linux-api@vger.kernel.org" <linux-api@vger.kernel.org>
+Return-Path: <BATV+77ddf8e9b1b344f28472+5381+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Fri, 18 May 2018 09:05:12 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: adam.manzanares@wdc.com
+Cc: viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org, axboe@kernel.dk,
+	bcrl@kvack.org, mingo@kernel.org, peterz@infradead.org,
+	pombredanne@nexb.com, gregkh@linuxfoundation.org,
+	bigeasy@linutronix.de, rgoldwyn@suse.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-aio@kvack.org, linux-api@vger.kernel.org
 Subject: Re: [PATCH v4 2/3] fs: Convert kiocb rw_hint from enum to u16
-Date: Fri, 18 May 2018 19:53:36 +0000
-Message-ID: <db91bfca-4ec9-726d-aac1-fa5979c65692@wdc.com>
+Message-ID: <20180518160512.GG22791@infradead.org>
 References: <20180517203803.2664-1-adam.manzanares@wdc.com>
  <20180517203803.2664-3-adam.manzanares@wdc.com>
- <20180518160512.GG22791@infradead.org>
-In-Reply-To: <20180518160512.GG22791@infradead.org>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180517203803.2664-3-adam.manzanares@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-DQoNCk9uIDUvMTgvMTggOTowNSBBTSwgQ2hyaXN0b3BoIEhlbGx3aWcgd3JvdGU6DQo+PiArLyog
-a2lfaGludCBjaGFuZ2VkIGZyb20gZW51bSB0byB1MTYsIG1ha2Ugc3VyZSByd19oaW50IGZpdHMg
-aW50byB1MTYgKi8NCj4gDQo+IEkgZG9uJ3QgdGhpbmsgdGhpcyBjb21tZW50IGlzIHZlcnkgdXNl
-ZnVsLg0KPiANCj4+ICtzdGF0aWMgaW5saW5lIHUxNiBraV9oaW50X3ZhbGlkKGVudW0gcndfaGlu
-dCBoaW50KQ0KPiANCj4gSSdkIGNhbGwgdGhpcyBraV9oaW50X3ZhbGlkYXRlLg0KPiANCj4+ICt7
-DQo+PiArCWlmIChoaW50ID4gTUFYX0tJX0hJTlQpDQo+PiArCQlyZXR1cm4gMDsNCj4+ICsNCj4+
-ICsJcmV0dXJuIGhpbnQ7DQo+IA0KPiBOaXQ6IGtpbGwgdGhlIGVtcHR5IGxpbmUuDQo+IA0KDQpJ
-J2xsIGNsZWFuIHRoaXMgdXAgaW4gdGhlIG5leHQgcmV2aXNpb24u
+> +/* ki_hint changed from enum to u16, make sure rw_hint fits into u16 */
+
+I don't think this comment is very useful.
+
+> +static inline u16 ki_hint_valid(enum rw_hint hint)
+
+I'd call this ki_hint_validate.
+
+> +{
+> +	if (hint > MAX_KI_HINT)
+> +		return 0;
+> +
+> +	return hint;
+
+Nit: kill the empty line.
