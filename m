@@ -1,96 +1,72 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	James Smart <james.smart@broadcom.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V6 10/11] nvme: core: introduce nvme_force_change_ctrl_state()
-Date: Wed, 16 May 2018 12:03:12 +0800
-Message-Id: <20180516040313.13596-11-ming.lei@redhat.com>
-In-Reply-To: <20180516040313.13596-1-ming.lei@redhat.com>
-References: <20180516040313.13596-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:51546 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752457AbeERQt6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 May 2018 12:49:58 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 28/34] xfs: remove the imap_valid flag
+Date: Fri, 18 May 2018 18:48:24 +0200
+Message-Id: <20180518164830.1552-29-hch@lst.de>
+In-Reply-To: <20180518164830.1552-1-hch@lst.de>
+References: <20180518164830.1552-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When controller is being reset, timeout still may be triggered,
-for handling this situation, the contoller state has to be
-changed to NVME_CTRL_RESETTING first.
+Simplify the way we check for a valid imap - we know we have a valid
+mapping after xfs_map_blocks returned successfully, and we know we can
+call xfs_imap_valid on any imap, as it will always fail on a
+zero-initialized map.
 
-So introduce nvme_force_change_ctrl_state() for this purpose.
-
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/core.c | 33 +++++++++++++++++++++++++++++++++
- drivers/nvme/host/nvme.h |  2 ++
- 2 files changed, 35 insertions(+)
+ fs/xfs/xfs_aops.c | 11 ++---------
+ 1 file changed, 2 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 3b0cf2fd3f53..9e51c3e1f534 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -256,6 +256,39 @@ void nvme_cancel_request(struct request *req, void *data, bool reserved)
- }
- EXPORT_SYMBOL_GPL(nvme_cancel_request);
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 82fd08c29f7f..f01c1dd737ec 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -42,7 +42,6 @@
+  */
+ struct xfs_writepage_ctx {
+ 	struct xfs_bmbt_irec    imap;
+-	bool			imap_valid;
+ 	unsigned int		io_type;
+ 	struct xfs_ioend	*ioend;
+ 	sector_t		last_block;
+@@ -868,10 +867,6 @@ xfs_writepage_map(
+ 			continue;
+ 		}
  
-+/* should only be used by EH for handling error during reset */
-+void nvme_force_change_ctrl_state(struct nvme_ctrl *ctrl,
-+		enum nvme_ctrl_state new_state)
-+{
-+	enum nvme_ctrl_state old_state;
-+	unsigned long flags;
-+	bool warn = true;
-+
-+	spin_lock_irqsave(&ctrl->lock, flags);
-+	old_state = ctrl->state;
-+	switch (new_state) {
-+	case NVME_CTRL_RESETTING:
-+		switch (old_state) {
-+		case NVME_CTRL_LIVE:
-+		case NVME_CTRL_ADMIN_ONLY:
-+		case NVME_CTRL_RESETTING:
-+		case NVME_CTRL_CONNECTING:
-+			warn = false;
-+			break;
-+		default:
-+			break;
-+		}
-+	default:
-+		break;
-+	}
-+	if (warn)
-+		WARN(1, "Make sure you want to change to %d from %d\n",
-+				new_state, old_state);
-+	ctrl->state = new_state;
-+	spin_unlock_irqrestore(&ctrl->lock, flags);
-+}
-+EXPORT_SYMBOL_GPL(nvme_force_change_ctrl_state);
-+
- bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
- 		enum nvme_ctrl_state new_state)
- {
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index b00a56412bab..715239226f4c 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -390,6 +390,8 @@ void nvme_complete_rq(struct request *req);
- void nvme_cancel_request(struct request *req, void *data, bool reserved);
- bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
- 		enum nvme_ctrl_state new_state);
-+void nvme_force_change_ctrl_state(struct nvme_ctrl *ctrl,
-+		enum nvme_ctrl_state new_state);
- int nvme_disable_ctrl(struct nvme_ctrl *ctrl, u64 cap);
- int nvme_enable_ctrl(struct nvme_ctrl *ctrl, u64 cap);
- int nvme_shutdown_ctrl(struct nvme_ctrl *ctrl);
+-		/* Check to see if current map spans this file offset */
+-		if (wpc->imap_valid)
+-			wpc->imap_valid = xfs_imap_valid(inode, &wpc->imap,
+-							 file_offset);
+ 		/*
+ 		 * If we don't have a valid map, now it's time to get a new one
+ 		 * for this offset.  This will convert delayed allocations
+@@ -879,16 +874,14 @@ xfs_writepage_map(
+ 		 * a valid map, it means we landed in a hole and we skip the
+ 		 * block.
+ 		 */
+-		if (!wpc->imap_valid) {
++		if (!xfs_imap_valid(inode, &wpc->imap, file_offset)) {
+ 			error = xfs_map_blocks(inode, file_offset, &wpc->imap,
+ 					     &wpc->io_type);
+ 			if (error)
+ 				goto out;
+-			wpc->imap_valid = xfs_imap_valid(inode, &wpc->imap,
+-							 file_offset);
+ 		}
+ 
+-		if (!wpc->imap_valid || wpc->io_type == XFS_IO_HOLE) {
++		if (wpc->io_type == XFS_IO_HOLE) {
+ 			/*
+ 			 * set_page_dirty dirties all buffers in a page, independent
+ 			 * of their state.  The dirty state however is entirely
 -- 
-2.9.5
+2.17.0
