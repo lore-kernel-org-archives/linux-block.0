@@ -1,91 +1,25 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: osandov@fb.com,
-	efault@gmx.de,
-	paolo.valente@linaro.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 4/9] bfq-iosched: remove unused variable
-Date: Thu, 10 May 2018 10:24:22 -0600
-Message-Id: <1525969467-12476-5-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1525969467-12476-1-git-send-email-axboe@kernel.dk>
-References: <1525969467-12476-1-git-send-email-axboe@kernel.dk>
+Return-Path: <jthumshirn@suse.de>
+Date: Fri, 18 May 2018 10:21:51 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Kent Overstreet <kent.overstreet@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, Jens Axboe <axboe@kernel.dk>,
+	Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCH 01/10] mempool: Add mempool_init()/mempool_exit()
+Message-ID: <20180518082151.eetor4vp777srxzx@linux-x5ow.site>
+References: <20180518074918.13816-1-kent.overstreet@gmail.com>
+ <20180518074918.13816-2-kent.overstreet@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180518074918.13816-2-kent.overstreet@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-bfqd->sb_shift was attempted used as a cache for the sbitmap queue
-shift, but we don't need it, as it never changes. Kill it with fire.
-
-Acked-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/bfq-iosched.c | 16 +++++++---------
- block/bfq-iosched.h |  6 ------
- 2 files changed, 7 insertions(+), 15 deletions(-)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 0cd8aa80c32d..10294124d597 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -5085,26 +5085,24 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
-  */
- static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
- {
--	bfqd->sb_shift = bt->sb.shift;
--
- 	/*
- 	 * In-word depths if no bfq_queue is being weight-raised:
- 	 * leaving 25% of tags only for sync reads.
- 	 *
- 	 * In next formulas, right-shift the value
--	 * (1U<<bfqd->sb_shift), instead of computing directly
--	 * (1U<<(bfqd->sb_shift - something)), to be robust against
--	 * any possible value of bfqd->sb_shift, without having to
-+	 * (1U<<bt->sb.shift), instead of computing directly
-+	 * (1U<<(bt->sb.shift - something)), to be robust against
-+	 * any possible value of bt->sb.shift, without having to
- 	 * limit 'something'.
- 	 */
- 	/* no more than 50% of tags for async I/O */
--	bfqd->word_depths[0][0] = max((1U<<bfqd->sb_shift)>>1, 1U);
-+	bfqd->word_depths[0][0] = max((1U << bt->sb.shift) >> 1, 1U);
- 	/*
- 	 * no more than 75% of tags for sync writes (25% extra tags
- 	 * w.r.t. async I/O, to prevent async I/O from starving sync
- 	 * writes)
- 	 */
--	bfqd->word_depths[0][1] = max(((1U<<bfqd->sb_shift) * 3)>>2, 1U);
-+	bfqd->word_depths[0][1] = max(((1U << bt->sb.shift) * 3) >> 2, 1U);
- 
- 	/*
- 	 * In-word depths in case some bfq_queue is being weight-
-@@ -5114,9 +5112,9 @@ static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
- 	 * shortage.
- 	 */
- 	/* no more than ~18% of tags for async I/O */
--	bfqd->word_depths[1][0] = max(((1U<<bfqd->sb_shift) * 3)>>4, 1U);
-+	bfqd->word_depths[1][0] = max(((1U << bt->sb.shift) * 3) >> 4, 1U);
- 	/* no more than ~37% of tags for sync writes (~20% extra tags) */
--	bfqd->word_depths[1][1] = max(((1U<<bfqd->sb_shift) * 6)>>4, 1U);
-+	bfqd->word_depths[1][1] = max(((1U << bt->sb.shift) * 6) >> 4, 1U);
- }
- 
- static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 8ec7ff92cd6f..faac509cb35e 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -636,12 +636,6 @@ struct bfq_data {
- 	struct bfq_queue *bio_bfqq;
- 
- 	/*
--	 * Cached sbitmap shift, used to compute depth limits in
--	 * bfq_update_depths.
--	 */
--	unsigned int sb_shift;
--
--	/*
- 	 * Depth limits used in bfq_limit_depth (see comments on the
- 	 * function)
- 	 */
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.7.4
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
