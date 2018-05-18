@@ -1,42 +1,70 @@
-Return-Path: <linus971@gmail.com>
-MIME-Version: 1.0
-References: <20180518130413.16997-1-roman.penyaev@profitbricks.com> <20180518130413.16997-2-roman.penyaev@profitbricks.com>
-In-Reply-To: <20180518130413.16997-2-roman.penyaev@profitbricks.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 18 May 2018 09:56:27 -0700
-Message-ID: <CA+55aFw2u4=X1LPU5kdqPX1C182-oTRvf1qwJ7_Ac+newVXAJA@mail.gmail.com>
-Subject: Re: [PATCH v2 01/26] rculist: introduce list_next_or_null_rr_rcu()
-To: Roman Pen <roman.penyaev@profitbricks.com>
-Cc: linux-block <linux-block@vger.kernel.org>, linux-rdma <linux-rdma@vger.kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bart Van Assche <bart.vanassche@sandisk.com>, Or Gerlitz <ogerlitz@mellanox.com>,
-	Doug Ledford <dledford@redhat.com>, swapnil.ingle@profitbricks.com,
-	danil.kipnis@profitbricks.com, jinpu.wang@profitbricks.com,
-	Paul McKenney <paulmck@linux.vnet.ibm.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Doug Ledford <dledford@redhat.com>,
+	Swapnil Ingle <swapnil.ingle@profitbricks.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>,
+	"Paul E . McKenney" <paulmck@linux.vnet.ibm.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 01/26] rculist: introduce list_next_or_null_rr_rcu()
+Date: Fri, 18 May 2018 15:03:48 +0200
+Message-Id: <20180518130413.16997-2-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
+References: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, May 18, 2018 at 6:07 AM Roman Pen <roman.penyaev@profitbricks.com>
-wrote:
+Function is going to be used in transport over RDMA module
+in subsequent patches.
 
-> Function is going to be used in transport over RDMA module
-> in subsequent patches.
+Function returns next element in round-robin fashion,
+i.e. head will be skipped.  NULL will be returned if list
+is observed as empty.
 
-Does this really merit its own helper macro in a generic header?
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Cc: Paul E. McKenney <paulmck@linux.vnet.ibm.com>
+Cc: linux-kernel@vger.kernel.org
+---
+ include/linux/rculist.h | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-It honestly smells more like "just have an inline helper function that is
-specific to rdma" to me. Particularly since it's probably just one specific
-list where you want this oddly specific behavior.
-
-Also, if we really want a round-robin list traversal macro, this isn't the
-way it should be implemented, I suspect, and it probably shouldn't be
-RCU-specific to begin with.
-
-Side note: I notice that I should already  have been more critical of even
-the much simpler "list_next_or_null_rcu()" macro. The "documentation"
-comment above the macro is pure and utter cut-and-paste garbage.
-
-Paul, mind giving this a look?
-
-                 Linus
+diff --git a/include/linux/rculist.h b/include/linux/rculist.h
+index 127f534fec94..b0840d5ab25a 100644
+--- a/include/linux/rculist.h
++++ b/include/linux/rculist.h
+@@ -339,6 +339,25 @@ static inline void list_splice_tail_init_rcu(struct list_head *list,
+ })
+ 
+ /**
++ * list_next_or_null_rr_rcu - get next list element in round-robin fashion.
++ * @head:	the head for the list.
++ * @ptr:        the list head to take the next element from.
++ * @type:       the type of the struct this is embedded in.
++ * @memb:       the name of the list_head within the struct.
++ *
++ * Next element returned in round-robin fashion, i.e. head will be skipped,
++ * but if list is observed as empty, NULL will be returned.
++ *
++ * This primitive may safely run concurrently with the _rcu list-mutation
++ * primitives such as list_add_rcu() as long as it's guarded by rcu_read_lock().
++ */
++#define list_next_or_null_rr_rcu(head, ptr, type, memb) \
++({ \
++	list_next_or_null_rcu(head, ptr, type, memb) ?: \
++		list_next_or_null_rcu(head, READ_ONCE((ptr)->next), type, memb); \
++})
++
++/**
+  * list_for_each_entry_rcu	-	iterate over rcu list of given type
+  * @pos:	the type * to use as a loop cursor.
+  * @head:	the head for your list.
+-- 
+2.13.1
