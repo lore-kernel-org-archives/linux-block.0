@@ -1,35 +1,27 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH 0/1] bcache fix for 4.17-rc6 
-Date: Thu, 17 May 2018 23:33:25 +0800
-Message-Id: <20180517153326.49271-1-colyli@suse.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: sub-page blocksize support in iomap non-buffer head path
+Date: Fri, 18 May 2018 18:52:04 +0200
+Message-Id: <20180518165206.13829-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jenns,
+Hi all,
 
-We have reports that bcache does not work when CONFIG_DEBUG_FS=n, here is
-the bug report on bugzilla.kernel.org:
-	https://bugzilla.kernel.org/show_bug.cgi?id=199683
-This problem happens since v4.16 and I believe it still happens in v4.17.
+this series adds support for buffered I/O without buffer heads for
+block size < PAGE_SIZE to the iomap and XFS code.
 
-This submission has one patch to fix this issue, the patch is tested by
-one of the reporters. If it is not too late for 4.17, could you please to
-pick it for 4.17-rc6 ?
+A git tree is available at:
 
-Thanks in advance.
+    git://git.infradead.org/users/hch/xfs.git xfs-iomap-read xfs-remove-bufferheads.2
 
-Coly Li
----
+Gitweb:
 
-Coly Li (1):
-  bcache: return 0 from bch_debug_init() if CONFIG_DEBUG_FS=n
+    http://git.infradead.org/users/hch/xfs.git/shortlog/refs/heads/xfs-remove-bufferheads.2
 
- drivers/md/bcache/debug.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
--- 
-2.16.3
+Changes since v1:
+ - call iomap_page_create in page_mkwrite to fix generic/095
+ - split into a separate series
