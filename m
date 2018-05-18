@@ -1,155 +1,86 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Ingo Molnar <mingo@kernel.org>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Subject: [PATCH 05/10] block: Add bio_copy_data_iter(), zero_fill_bio_iter()
-Date: Fri, 18 May 2018 03:49:07 -0400
-Message-Id: <20180518074918.13816-10-kent.overstreet@gmail.com>
-In-Reply-To: <20180518074918.13816-1-kent.overstreet@gmail.com>
-References: <20180518074918.13816-1-kent.overstreet@gmail.com>
+Return-Path: <prvs=669a0b661=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Tejun Heo <tj@kernel.org>,
+	Alexandru Moise <00moses.alexander00@gmail.com>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>
+Subject: [PATCH v3 2/2] block: Ensure that a request queue is dissociated from the cgroup controller
+Date: Fri, 18 May 2018 11:40:03 -0700
+Message-Id: <20180518184003.29738-3-bart.vanassche@wdc.com>
+In-Reply-To: <20180518184003.29738-1-bart.vanassche@wdc.com>
+References: <20180518184003.29738-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Add versions that take bvec_iter args instead of using bio->bi_iter - to
-be used by bcachefs.
+Several block drivers call alloc_disk() followed by put_disk() if
+something fails before device_add_disk() is called without calling
+blk_cleanup_queue(). Make sure that also for this scenario a request
+queue is dissociated from the cgroup controller. This patch avoids
+that loading the parport_pc, paride and pf drivers triggers the
+following kernel crash:
 
-Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
+BUG: KASAN: null-ptr-deref in pi_init+0x42e/0x580 [paride]
+Read of size 4 at addr 0000000000000008 by task modprobe/744
+Call Trace:
+dump_stack+0x9a/0xeb
+kasan_report+0x139/0x350
+pi_init+0x42e/0x580 [paride]
+pf_init+0x2bb/0x1000 [pf]
+do_one_initcall+0x8e/0x405
+do_init_module+0xd9/0x2f2
+load_module+0x3ab4/0x4700
+SYSC_finit_module+0x176/0x1a0
+do_syscall_64+0xee/0x2b0
+entry_SYSCALL_64_after_hwframe+0x42/0xb7
+
+Reported-by: Alexandru Moise <00moses.alexander00@gmail.com>
+Fixes: a063057d7c73 ("block: Fix a race between request queue removal and the block cgroup controller")
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Tested-by: Alexandru Moise <00moses.alexander00@gmail.com>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Alexandru Moise <00moses.alexander00@gmail.com>
+Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
 ---
- block/bio.c         | 44 ++++++++++++++++++++++++--------------------
- include/linux/bio.h | 18 +++++++++++++++---
- 2 files changed, 39 insertions(+), 23 deletions(-)
+ block/blk-sysfs.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/block/bio.c b/block/bio.c
-index b7cdad6fc4..d7bd765e9e 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -530,20 +530,20 @@ struct bio *bio_alloc_bioset(gfp_t gfp_mask, unsigned int nr_iovecs,
- }
- EXPORT_SYMBOL(bio_alloc_bioset);
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 9cf41fee3790..a239c73fa20f 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -804,6 +804,31 @@ static void __blk_release_queue(struct work_struct *work)
+ 		blk_stat_remove_callback(q, q->poll_cb);
+ 	blk_stat_free_callback(q->poll_cb);
  
--void zero_fill_bio(struct bio *bio)
-+void zero_fill_bio_iter(struct bio *bio, struct bvec_iter start)
- {
- 	unsigned long flags;
- 	struct bio_vec bv;
- 	struct bvec_iter iter;
- 
--	bio_for_each_segment(bv, bio, iter) {
-+	__bio_for_each_segment(bv, bio, iter, start) {
- 		char *data = bvec_kmap_irq(&bv, &flags);
- 		memset(data, 0, bv.bv_len);
- 		flush_dcache_page(bv.bv_page);
- 		bvec_kunmap_irq(data, &flags);
- 	}
- }
--EXPORT_SYMBOL(zero_fill_bio);
-+EXPORT_SYMBOL(zero_fill_bio_iter);
- 
- /**
-  * bio_put - release a reference to a bio
-@@ -971,28 +971,13 @@ void bio_advance(struct bio *bio, unsigned bytes)
- }
- EXPORT_SYMBOL(bio_advance);
- 
--/**
-- * bio_copy_data - copy contents of data buffers from one chain of bios to
-- * another
-- * @src: source bio list
-- * @dst: destination bio list
-- *
-- * If @src and @dst are single bios, bi_next must be NULL - otherwise, treats
-- * @src and @dst as linked lists of bios.
-- *
-- * Stops when it reaches the end of either @src or @dst - that is, copies
-- * min(src->bi_size, dst->bi_size) bytes (or the equivalent for lists of bios).
-- */
--void bio_copy_data(struct bio *dst, struct bio *src)
-+void bio_copy_data_iter(struct bio *dst, struct bvec_iter dst_iter,
-+			struct bio *src, struct bvec_iter src_iter)
- {
--	struct bvec_iter src_iter, dst_iter;
- 	struct bio_vec src_bv, dst_bv;
- 	void *src_p, *dst_p;
- 	unsigned bytes;
- 
--	src_iter = src->bi_iter;
--	dst_iter = dst->bi_iter;
--
- 	while (1) {
- 		if (!src_iter.bi_size) {
- 			src = src->bi_next;
-@@ -1029,6 +1014,25 @@ void bio_copy_data(struct bio *dst, struct bio *src)
- 		bio_advance_iter(dst, &dst_iter, bytes);
- 	}
- }
-+EXPORT_SYMBOL(bio_copy_data_iter);
++	if (!blk_queue_dead(q)) {
++		/*
++		 * Last reference was dropped without having called
++		 * blk_cleanup_queue().
++		 */
++		WARN_ONCE(blk_queue_init_done(q),
++			  "request queue %p has been registered but blk_cleanup_queue() has not been called for that queue\n",
++			  q);
++		blk_exit_queue(q);
++	}
 +
-+/**
-+ * bio_copy_data - copy contents of data buffers from one chain of bios to
-+ * another
-+ * @src: source bio list
-+ * @dst: destination bio list
-+ *
-+ * If @src and @dst are single bios, bi_next must be NULL - otherwise, treats
-+ * @src and @dst as linked lists of bios.
-+ *
-+ * Stops when it reaches the end of either @src or @dst - that is, copies
-+ * min(src->bi_size, dst->bi_size) bytes (or the equivalent for lists of bios).
-+ */
-+void bio_copy_data(struct bio *dst, struct bio *src)
-+{
-+	bio_copy_data_iter(dst, dst->bi_iter,
-+			   src, src->bi_iter);
-+}
- EXPORT_SYMBOL(bio_copy_data);
- 
- struct bio_map_data {
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 91b02520e2..5a6ee955a8 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -67,8 +67,12 @@
- 
- #define bio_multiple_segments(bio)				\
- 	((bio)->bi_iter.bi_size != bio_iovec(bio).bv_len)
--#define bio_sectors(bio)	((bio)->bi_iter.bi_size >> 9)
--#define bio_end_sector(bio)	((bio)->bi_iter.bi_sector + bio_sectors((bio)))
++#ifdef CONFIG_BLK_CGROUP
++	{
++		struct blkcg_gq *blkg;
 +
-+#define bvec_iter_sectors(iter)	((iter).bi_size >> 9)
-+#define bvec_iter_end_sector(iter) ((iter).bi_sector + bvec_iter_sectors((iter)))
++		rcu_read_lock();
++		blkg = blkg_lookup(&blkcg_root, q);
++		rcu_read_unlock();
 +
-+#define bio_sectors(bio)	bvec_iter_sectors((bio)->bi_iter)
-+#define bio_end_sector(bio)	bvec_iter_end_sector((bio)->bi_iter)
- 
- /*
-  * Return the data direction, READ or WRITE.
-@@ -501,6 +505,8 @@ static inline void bio_flush_dcache_pages(struct bio *bi)
- }
- #endif
- 
-+extern void bio_copy_data_iter(struct bio *dst, struct bvec_iter dst_iter,
-+			       struct bio *src, struct bvec_iter src_iter);
- extern void bio_copy_data(struct bio *dst, struct bio *src);
- extern void bio_free_pages(struct bio *bio);
- 
-@@ -509,7 +515,13 @@ extern struct bio *bio_copy_user_iov(struct request_queue *,
- 				     struct iov_iter *,
- 				     gfp_t);
- extern int bio_uncopy_user(struct bio *);
--void zero_fill_bio(struct bio *bio);
-+void zero_fill_bio_iter(struct bio *bio, struct bvec_iter iter);
++		WARN(blkg,
++		     "request queue %p is being released but it has not yet been removed from the blkcg controller\n",
++		     q);
++	}
++#endif
 +
-+static inline void zero_fill_bio(struct bio *bio)
-+{
-+	zero_fill_bio_iter(bio, bio->bi_iter);
-+}
-+
- extern struct bio_vec *bvec_alloc(gfp_t, int, unsigned long *, mempool_t *);
- extern void bvec_free(mempool_t *, struct bio_vec *, unsigned int);
- extern unsigned int bvec_nr_vecs(unsigned short idx);
+ 	blk_free_queue_stats(q->stats);
+ 
+ 	blk_exit_rl(q, &q->root_rl);
 -- 
-2.17.0
+2.16.3
