@@ -1,488 +1,886 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	James Smart <james.smart@broadcom.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
+Return-Path: <prvs=669a0b661=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Tejun Heo <tj@kernel.org>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Sebastian Ott <sebott@linux.ibm.com>,
 	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V6 11/11] nvme: pci: support nested EH
-Date: Wed, 16 May 2018 12:03:13 +0800
-Message-Id: <20180516040313.13596-12-ming.lei@redhat.com>
-In-Reply-To: <20180516040313.13596-1-ming.lei@redhat.com>
-References: <20180516040313.13596-1-ming.lei@redhat.com>
+	Israel Rukshin <israelr@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>
+Subject: [PATCH v11 2/2] blk-mq: Rework blk-mq timeout handling again
+Date: Fri, 18 May 2018 11:00:06 -0700
+Message-Id: <20180518180006.24389-3-bart.vanassche@wdc.com>
+In-Reply-To: <20180518180006.24389-1-bart.vanassche@wdc.com>
+References: <20180518180006.24389-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-When one req is timed out, now nvme_timeout() handles it by the
-following way:
+Recently the blk-mq timeout handling code was reworked. See also Tejun
+Heo, "[PATCHSET v4] blk-mq: reimplement timeout handling", 08 Jan 2018
+(https://www.mail-archive.com/linux-block@vger.kernel.org/msg16985.html).
+This patch reworks the blk-mq timeout handling code again. The timeout
+handling code is simplified by introducing a state machine per request.
+This change avoids that the blk-mq timeout handling code ignores
+completions that occur after blk_mq_check_expired() has been called and
+before blk_mq_rq_timed_out() has been called.
 
-	nvme_dev_disable(dev, false);
-	nvme_reset_ctrl(&dev->ctrl);
-	return BLK_EH_HANDLED.
+Fix this race as follows:
+- Replace the __deadline member of struct request by a new member
+  called das that contains the generation number, state and deadline.
+  Only 32 bits are used for the deadline field such that all three
+  fields occupy only 64 bits. This change reduces the maximum supported
+  request timeout value from (2**63/HZ) to (2**31/HZ).
+- Remove all request member variables that became superfluous due to
+  this change: gstate, gstate_seq and aborted_gstate_sync.
+- Remove the request state information that became superfluous due to
+  this patch, namely RQF_MQ_TIMEOUT_EXPIRED.
+- Remove the code that became superfluous due to this change, namely
+  the RCU lock and unlock statements in blk_mq_complete_request() and
+  also the synchronize_rcu() call in the timeout handler.
 
-There are several issues about the above approach:
+Notes:
+- A spinlock is used to protect atomic changes of rq->das on those
+  architectures that do not provide a cmpxchg64() implementation.
+- Atomic instructions are only used to update the request state if
+  a concurrent request state change could be in progress.
+- blk_add_timer() has been split into two functions - one for the
+  legacy block layer and one for blk-mq.
 
-1) IO may fail during resetting
-
-Admin IO timeout may be triggered in nvme_reset_dev() when error happens.
-Normal IO timeout may be triggered too during nvme_wait_freeze() in reset
-path. When the two kinds of timeout happen, the current reset mechanism
-can't work any more.
-
-2) race between nvme_start_freeze and nvme_wait_freeze() & nvme_unfreeze()
-
-- nvme_dev_disable() and resetting controller are required for recovering
-controller, but the two are run from different contexts. nvme_start_freeze()
-is call from nvme_dev_disable() which is run timeout work context, and
-nvme_unfreeze() is run from reset work context. Unfortunatley timeout may be
-triggered during resetting controller, so nvme_start_freeze() may be run
-several times.
-
-- Also two reset work may run one by one, this may cause hang in
-nvme_wait_freeze() forever too.
-
-3) all namespace's EH require to shutdown & reset the controller
-
-block's timeout handler is per-request-queue, that means each
-namespace's error handling may shutdown & reset the whole controller,
-then the shutdown from one namespace may quiese queues when resetting
-from another namespace is in-progress.
-
-This patch fixes the above issues by using nested EH:
-
-1) run controller shutdown(nvme_dev_disable()) and resetting(nvme_reset_dev)
-from one same EH context, so the above race 2) can be fixed easily.
-
-2) always start a new context for handling EH, and cancel all in-flight
-requests(include the timed-out ones) in nvme_dev_disable() by quiescing
-timeout event before shutdown controller.
-
-3) limit the max number of nested EH, when the limit is reached, removes
-the controller and fails all in-flight request.
-
-With this approach, blktest block/011 can be passed.
-
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Tejun Heo <tj@kernel.org>
 Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Sebastian Ott <sebott@linux.ibm.com>
 Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Cc: Israel Rukshin <israelr@mellanox.com>,
+Cc: Max Gurtovoy <maxg@mellanox.com>
 ---
- drivers/nvme/host/core.c |  22 +++++
- drivers/nvme/host/nvme.h |   2 +
- drivers/nvme/host/pci.c  | 252 +++++++++++++++++++++++++++++++++++++++++++----
- 3 files changed, 256 insertions(+), 20 deletions(-)
+ block/blk-core.c       |   6 --
+ block/blk-mq-debugfs.c |   1 -
+ block/blk-mq.c         | 238 ++++++++++++++++++++++---------------------------
+ block/blk-mq.h         |  64 ++++++-------
+ block/blk-timeout.c    | 133 ++++++++++++++++++---------
+ block/blk.h            |  11 +--
+ include/linux/blkdev.h |  47 +++++-----
+ 7 files changed, 262 insertions(+), 238 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 9e51c3e1f534..264619dc81db 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -3587,6 +3587,28 @@ void nvme_start_freeze(struct nvme_ctrl *ctrl)
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 43370faee935..cee03cad99f2 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -198,12 +198,6 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
+ 	rq->internal_tag = -1;
+ 	rq->start_time_ns = ktime_get_ns();
+ 	rq->part = NULL;
+-	seqcount_init(&rq->gstate_seq);
+-	u64_stats_init(&rq->aborted_gstate_sync);
+-	/*
+-	 * See comment of blk_mq_init_request
+-	 */
+-	WRITE_ONCE(rq->gstate, MQ_RQ_GEN_INC);
  }
- EXPORT_SYMBOL_GPL(nvme_start_freeze);
+ EXPORT_SYMBOL(blk_rq_init);
  
-+void nvme_unquiesce_timeout(struct nvme_ctrl *ctrl)
-+{
-+	struct nvme_ns *ns;
-+
-+	down_read(&ctrl->namespaces_rwsem);
-+	list_for_each_entry(ns, &ctrl->namespaces, list)
-+		blk_unquiesce_timeout(ns->queue);
-+	up_read(&ctrl->namespaces_rwsem);
-+}
-+EXPORT_SYMBOL_GPL(nvme_unquiesce_timeout);
-+
-+void nvme_quiesce_timeout(struct nvme_ctrl *ctrl)
-+{
-+	struct nvme_ns *ns;
-+
-+	down_read(&ctrl->namespaces_rwsem);
-+	list_for_each_entry(ns, &ctrl->namespaces, list)
-+		blk_quiesce_timeout(ns->queue);
-+	up_read(&ctrl->namespaces_rwsem);
-+}
-+EXPORT_SYMBOL_GPL(nvme_quiesce_timeout);
-+
- void nvme_stop_queues(struct nvme_ctrl *ctrl)
- {
- 	struct nvme_ns *ns;
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 715239226f4c..5ed7d7ddd597 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -412,6 +412,8 @@ int nvme_sec_submit(void *data, u16 spsp, u8 secp, void *buffer, size_t len,
- void nvme_complete_async_event(struct nvme_ctrl *ctrl, __le16 status,
- 		union nvme_result *res);
- 
-+void nvme_unquiesce_timeout(struct nvme_ctrl *ctrl);
-+void nvme_quiesce_timeout(struct nvme_ctrl *ctrl);
- void nvme_stop_queues(struct nvme_ctrl *ctrl);
- void nvme_start_queues(struct nvme_ctrl *ctrl);
- void nvme_kill_queues(struct nvme_ctrl *ctrl);
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 4236d79e3643..58e92c7c10e0 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -71,6 +71,7 @@ struct nvme_queue;
- static void nvme_process_cq(struct nvme_queue *nvmeq);
- static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown, bool
- 		freeze_queue);
-+static int nvme_reset_dev(struct nvme_dev *dev);
- 
- /*
-  * Represents an NVM Express device.  Each nvme_dev is a PCI function.
-@@ -113,6 +114,23 @@ struct nvme_dev {
- 	dma_addr_t host_mem_descs_dma;
- 	struct nvme_host_mem_buf_desc *host_mem_descs;
- 	void **host_mem_desc_bufs;
-+
-+	/* EH handler */
-+	spinlock_t	eh_lock;
-+	bool		ctrl_shutdown_started;
-+	bool		ctrl_failed;
-+	unsigned int	nested_eh;
-+	struct work_struct fail_ctrl_work;
-+	wait_queue_head_t	eh_wq;
-+	struct list_head	eh_head;
-+};
-+
-+#define  NVME_MAX_NESTED_EH	32
-+struct nvme_eh_work {
-+	struct work_struct	work;
-+	struct nvme_dev		*dev;
-+	int			seq;
-+	struct list_head	list;
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 3080e18cb859..ffa622366922 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -344,7 +344,6 @@ static const char *const rqf_name[] = {
+ 	RQF_NAME(STATS),
+ 	RQF_NAME(SPECIAL_PAYLOAD),
+ 	RQF_NAME(ZONE_WRITE_LOCKED),
+-	RQF_NAME(MQ_TIMEOUT_EXPIRED),
+ 	RQF_NAME(MQ_POLL_SLEPT),
  };
+ #undef RQF_NAME
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4cbfd784e837..e7dfa6ed7a44 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -318,7 +318,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	rq->special = NULL;
+ 	/* tag was already set */
+ 	rq->extra_len = 0;
+-	rq->__deadline = 0;
++	WARN_ON_ONCE(blk_mq_rq_state(rq) != MQ_RQ_IDLE);
  
- static int io_queue_depth_set(const char *val, const struct kernel_param *kp)
-@@ -1186,6 +1204,183 @@ static void nvme_warn_reset(struct nvme_dev *dev, u32 csts)
- 			 csts, result);
+ 	INIT_LIST_HEAD(&rq->timeout_list);
+ 	rq->timeout = 0;
+@@ -465,6 +465,39 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
  }
+ EXPORT_SYMBOL_GPL(blk_mq_alloc_request_hctx);
  
-+static void nvme_remove_dead_ctrl(struct nvme_dev *dev, int status)
++/**
++ * blk_mq_change_rq_state - atomically test and set request state
++ * @rq: Request pointer.
++ * @old_state: Old request state.
++ * @new_state: New request state.
++ *
++ * Returns %true if and only if the old state was @old and if the state has
++ * been changed into @new.
++ */
++static bool blk_mq_change_rq_state(struct request *rq,
++				   enum mq_rq_state old_state,
++				   enum mq_rq_state new_state)
 +{
-+	dev_warn(dev->ctrl.device, "Removing after probe failure status: %d\n", status);
++	union blk_deadline_and_state das = READ_ONCE(rq->das);
++	union blk_deadline_and_state old_val = das;
++	union blk_deadline_and_state new_val = das;
 +
-+	nvme_get_ctrl(&dev->ctrl);
-+	nvme_dev_disable(dev, false, false);
-+	if (!queue_work(nvme_wq, &dev->remove_work))
-+		nvme_put_ctrl(&dev->ctrl);
-+}
++	WARN_ON_ONCE(new_state == MQ_RQ_IN_FLIGHT);
 +
-+static void nvme_eh_fail_ctrl_work(struct work_struct *work)
-+{
-+	struct nvme_dev *dev =
-+		container_of(work, struct nvme_dev, fail_ctrl_work);
-+
-+	dev_info(dev->ctrl.device, "EH: fail controller\n");
-+	nvme_remove_dead_ctrl(dev, 0);
-+}
-+
-+static void nvme_eh_mark_ctrl_shutdown(struct nvme_dev *dev)
-+{
-+	spin_lock(&dev->eh_lock);
-+	dev->ctrl_shutdown_started = false;
-+	spin_unlock(&dev->eh_lock);
-+}
-+
-+static void nvme_eh_sched_fail_ctrl(struct nvme_dev *dev)
-+{
-+	INIT_WORK(&dev->fail_ctrl_work, nvme_eh_fail_ctrl_work);
-+	queue_work(nvme_reset_wq, &dev->fail_ctrl_work);
-+}
-+
-+/* either controller is updated to LIVE or will be removed */
-+static bool nvme_eh_reset_done(struct nvme_dev *dev)
-+{
-+	return dev->ctrl.state == NVME_CTRL_LIVE ||
-+		dev->ctrl.state == NVME_CTRL_ADMIN_ONLY ||
-+		dev->ctrl_failed;
-+}
-+
-+static void nvme_eh_done(struct nvme_eh_work *eh_work, int result)
-+{
-+	struct nvme_dev *dev = eh_work->dev;
-+	bool top_eh;
-+
-+	spin_lock(&dev->eh_lock);
-+	top_eh = list_is_last(&eh_work->list, &dev->eh_head);
-+
-+	/* Fail controller if the top EH can't recover it */
-+	if (!result)
-+		wake_up_all(&dev->eh_wq);
-+	else if (top_eh) {
-+		dev->ctrl_failed = true;
-+		nvme_eh_sched_fail_ctrl(dev);
-+		wake_up_all(&dev->eh_wq);
-+	}
-+
-+	list_del(&eh_work->list);
-+	spin_unlock(&dev->eh_lock);
-+
-+	dev_info(dev->ctrl.device, "EH %d: state %d, eh_done %d, top eh %d\n",
-+			eh_work->seq, dev->ctrl.state, result, top_eh);
-+	wait_event(dev->eh_wq, nvme_eh_reset_done(dev));
-+
-+	/* release the EH seq, so outer EH can be allocated bigger seq No. */
-+	spin_lock(&dev->eh_lock);
-+	dev->nested_eh--;
-+	spin_unlock(&dev->eh_lock);
-+
++	old_val.state = old_state;
++	new_val.state = new_state;
 +	/*
-+	 * After controller is recovered in upper EH finally, we have to
-+	 * unfreeze queues if reset failed in this EH, otherwise blk-mq
-+	 * queues' freeze counter may be leaked.
-+	 *
-+	 * nvme_unfreeze() can only be called after controller state is
-+	 * updated to LIVE.
++	 * For transitions from state in-flight to another state cmpxchg64()
++	 * must be used. For other state transitions it is safe to use
++	 * WRITE_ONCE().
 +	 */
-+	if (result && (dev->ctrl.state == NVME_CTRL_LIVE ||
-+				dev->ctrl.state == NVME_CTRL_ADMIN_ONLY))
-+		nvme_unfreeze(&dev->ctrl);
++	if (old_state != MQ_RQ_IN_FLIGHT) {
++		WRITE_ONCE(rq->das.val, new_val.val);
++		return true;
++	}
++	return blk_mq_set_rq_state(rq, old_val, new_val);
 +}
 +
-+static void nvme_eh_work(struct work_struct *work)
-+{
-+	struct nvme_eh_work *eh_work =
-+		container_of(work, struct nvme_eh_work, work);
-+	struct nvme_dev *dev = eh_work->dev;
-+	int result = -ENODEV;
-+	bool top_eh;
-+
-+	dev_info(dev->ctrl.device, "EH %d: before shutdown\n",
-+			eh_work->seq);
-+	nvme_dev_disable(dev, false, true);
-+
-+	/* allow new EH to be created */
-+	nvme_eh_mark_ctrl_shutdown(dev);
-+
-+	/*
-+	 * nvme_dev_disable cancels all in-flight requests, and wont't
-+	 * cause timout at all, so I am always the top EH now, but it
-+	 * becomes not true after 'reset_lock' is held, so have to check
-+	 * if I am still the top EH, and force to update to NVME_CTRL_RESETTING
-+	 * if yes.
-+	 */
-+	mutex_lock(&dev->ctrl.reset_lock);
-+	spin_lock(&dev->eh_lock);
-+
-+	/* allow top EH to preempt other inner EH */
-+	top_eh = list_is_last(&eh_work->list, &dev->eh_head);
-+	dev_info(dev->ctrl.device, "EH %d: after shutdown, top eh: %d\n",
-+			eh_work->seq, top_eh);
-+	if (!top_eh) {
-+		if (!nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_RESETTING)) {
-+			spin_unlock(&dev->eh_lock);
-+			goto done;
-+		}
-+	} else {
-+		nvme_force_change_ctrl_state(&dev->ctrl, NVME_CTRL_RESETTING);
-+		result = 0;
-+	}
-+
-+	spin_unlock(&dev->eh_lock);
-+	result = nvme_reset_dev(dev);
-+done:
-+	mutex_unlock(&dev->ctrl.reset_lock);
-+	nvme_eh_done(eh_work, result);
-+	dev_info(dev->ctrl.device, "EH %d: after recovery %d\n",
-+			eh_work->seq, result);
-+
-+	kfree(eh_work);
-+}
-+
-+static void nvme_eh_schedule(struct nvme_dev *dev)
-+{
-+	bool need_sched = false;
-+	bool fail_ctrl = false;
-+	struct nvme_eh_work *eh_work;
-+	int seq;
-+
-+	spin_lock(&dev->eh_lock);
-+	if (!dev->ctrl_shutdown_started) {
-+		need_sched = true;
-+		seq = dev->nested_eh;
-+		if (++dev->nested_eh >= NVME_MAX_NESTED_EH) {
-+			if (!dev->ctrl_failed)
-+				dev->ctrl_failed = fail_ctrl = true;
-+			else
-+				need_sched = false;
-+		} else
-+			dev->ctrl_shutdown_started = true;
-+	}
-+	spin_unlock(&dev->eh_lock);
-+
-+	if (!need_sched)
-+		return;
-+
-+	if (fail_ctrl) {
-+ fail_ctrl:
-+		nvme_eh_sched_fail_ctrl(dev);
-+		return;
-+	}
-+
-+	eh_work = kzalloc(sizeof(*eh_work), GFP_NOIO);
-+	if (!eh_work)
-+		goto fail_ctrl;
-+
-+	eh_work->dev = dev;
-+	eh_work->seq = seq;
-+
-+	spin_lock(&dev->eh_lock);
-+	list_add_tail(&eh_work->list, &dev->eh_head);
-+	spin_unlock(&dev->eh_lock);
-+
-+	INIT_WORK(&eh_work->work, nvme_eh_work);
-+	queue_work(nvme_reset_wq, &eh_work->work);
-+}
-+
- static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
+ void blk_mq_free_request(struct request *rq)
  {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-@@ -1207,9 +1402,8 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 	 */
- 	if (nvme_should_reset(dev, csts)) {
- 		nvme_warn_reset(dev, csts);
--		nvme_dev_disable(dev, false, true);
--		nvme_reset_ctrl(&dev->ctrl);
--		return BLK_EH_HANDLED;
-+		nvme_eh_schedule(dev);
-+		return BLK_EH_RESET_TIMER;
- 	}
+ 	struct request_queue *q = rq->q;
+@@ -494,7 +527,8 @@ void blk_mq_free_request(struct request *rq)
+ 	if (blk_rq_rl(rq))
+ 		blk_put_rl(blk_rq_rl(rq));
  
- 	/*
-@@ -1234,9 +1428,9 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 		dev_warn(dev->ctrl.device,
- 			 "I/O %d QID %d timeout, disable controller\n",
- 			 req->tag, nvmeq->qid);
--		nvme_dev_disable(dev, false, false);
- 		nvme_req(req)->flags |= NVME_REQ_CANCELLED;
--		return BLK_EH_HANDLED;
-+		nvme_eh_schedule(dev);
-+		return BLK_EH_RESET_TIMER;
- 	default:
- 		break;
- 	}
-@@ -1250,15 +1444,13 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 		dev_warn(dev->ctrl.device,
- 			 "I/O %d QID %d timeout, reset controller\n",
- 			 req->tag, nvmeq->qid);
--		nvme_dev_disable(dev, false, true);
--		nvme_reset_ctrl(&dev->ctrl);
--
- 		/*
- 		 * Mark the request as handled, since the inline shutdown
- 		 * forces all outstanding requests to complete.
- 		 */
- 		nvme_req(req)->flags |= NVME_REQ_CANCELLED;
--		return BLK_EH_HANDLED;
-+		nvme_eh_schedule(dev);
-+		return BLK_EH_RESET_TIMER;
- 	}
+-	blk_mq_rq_update_state(rq, MQ_RQ_IDLE);
++	if (!blk_mq_change_rq_state(rq, blk_mq_rq_state(rq), MQ_RQ_IDLE))
++		WARN_ON_ONCE(true);
+ 	if (rq->tag != -1)
+ 		blk_mq_put_tag(hctx, hctx->tags, ctx, rq->tag);
+ 	if (sched_tag != -1)
+@@ -547,8 +581,7 @@ static void __blk_mq_complete_request(struct request *rq)
+ 	bool shared = false;
+ 	int cpu;
  
- 	if (atomic_dec_return(&dev->ctrl.abort_limit) < 0) {
-@@ -2316,12 +2508,28 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown, bool
- 	}
- 	for (i = dev->ctrl.queue_count - 1; i >= 0; i--)
- 		nvme_suspend_queue(&dev->queues[i]);
-+	/*
-+	 * safe to sync timeout after queues are quiesced, then all
-+	 * requests(include the time-out ones) will be canceled.
-+	 */
-+	nvme_quiesce_timeout(&dev->ctrl);
-+	if (dev->ctrl.admin_q)
-+		blk_quiesce_timeout(dev->ctrl.admin_q);
+-	WARN_ON_ONCE(blk_mq_rq_state(rq) != MQ_RQ_IN_FLIGHT);
+-	blk_mq_rq_update_state(rq, MQ_RQ_COMPLETE);
++	WARN_ON_ONCE(blk_mq_rq_state(rq) != MQ_RQ_COMPLETE);
  
- 	nvme_pci_disable(dev);
- 
-+	/*
-+	 * Both timeout and interrupt handler have been drained, and all
-+	 * in-flight requests will be canceled now.
-+	 */
- 	blk_mq_tagset_busy_iter(&dev->tagset, nvme_cancel_request, &dev->ctrl);
- 	blk_mq_tagset_busy_iter(&dev->admin_tagset, nvme_cancel_request, &dev->ctrl);
- 
-+	/* all requests have been canceled now, so enable timeout now */
-+	nvme_unquiesce_timeout(&dev->ctrl);
-+	if (dev->ctrl.admin_q)
-+		blk_unquiesce_timeout(dev->ctrl.admin_q);
-+
- 	/*
- 	 * The driver will not be starting up queues again if shutting down so
- 	 * must flush all entered requests to their failed completion to avoid
-@@ -2381,16 +2589,6 @@ static void nvme_pci_free_ctrl(struct nvme_ctrl *ctrl)
- 	kfree(dev);
+ 	if (rq->internal_tag != -1)
+ 		blk_mq_sched_completed_request(rq);
+@@ -593,36 +626,6 @@ static void hctx_lock(struct blk_mq_hw_ctx *hctx, int *srcu_idx)
+ 		*srcu_idx = srcu_read_lock(hctx->srcu);
  }
  
--static void nvme_remove_dead_ctrl(struct nvme_dev *dev, int status)
+-static void blk_mq_rq_update_aborted_gstate(struct request *rq, u64 gstate)
 -{
--	dev_warn(dev->ctrl.device, "Removing after probe failure status: %d\n", status);
+-	unsigned long flags;
 -
--	nvme_get_ctrl(&dev->ctrl);
--	nvme_dev_disable(dev, false, false);
--	if (!queue_work(nvme_wq, &dev->remove_work))
--		nvme_put_ctrl(&dev->ctrl);
+-	/*
+-	 * blk_mq_rq_aborted_gstate() is used from the completion path and
+-	 * can thus be called from irq context.  u64_stats_fetch in the
+-	 * middle of update on the same CPU leads to lockup.  Disable irq
+-	 * while updating.
+-	 */
+-	local_irq_save(flags);
+-	u64_stats_update_begin(&rq->aborted_gstate_sync);
+-	rq->aborted_gstate = gstate;
+-	u64_stats_update_end(&rq->aborted_gstate_sync);
+-	local_irq_restore(flags);
 -}
 -
- static int nvme_reset_dev(struct nvme_dev *dev)
+-static u64 blk_mq_rq_aborted_gstate(struct request *rq)
+-{
+-	unsigned int start;
+-	u64 aborted_gstate;
+-
+-	do {
+-		start = u64_stats_fetch_begin(&rq->aborted_gstate_sync);
+-		aborted_gstate = rq->aborted_gstate;
+-	} while (u64_stats_fetch_retry(&rq->aborted_gstate_sync, start));
+-
+-	return aborted_gstate;
+-}
+-
+ /**
+  * blk_mq_complete_request - end I/O on a request
+  * @rq:		the request being processed
+@@ -634,27 +637,12 @@ static u64 blk_mq_rq_aborted_gstate(struct request *rq)
+ void blk_mq_complete_request(struct request *rq)
  {
- 	bool was_suspend = !!(dev->ctrl.ctrl_config & NVME_CC_SHN_NORMAL);
-@@ -2400,7 +2598,7 @@ static int nvme_reset_dev(struct nvme_dev *dev)
+ 	struct request_queue *q = rq->q;
+-	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, rq->mq_ctx->cpu);
+-	int srcu_idx;
  
- 	lockdep_assert_held(&dev->ctrl.reset_lock);
+ 	if (unlikely(blk_should_fake_timeout(q)))
+ 		return;
  
--	if (WARN_ON(dev->ctrl.state != NVME_CTRL_RESETTING))
-+	if (dev->ctrl.state != NVME_CTRL_RESETTING)
- 		goto out;
+-	/*
+-	 * If @rq->aborted_gstate equals the current instance, timeout is
+-	 * claiming @rq and we lost.  This is synchronized through
+-	 * hctx_lock().  See blk_mq_timeout_work() for details.
+-	 *
+-	 * Completion path never blocks and we can directly use RCU here
+-	 * instead of hctx_lock() which can be either RCU or SRCU.
+-	 * However, that would complicate paths which want to synchronize
+-	 * against us.  Let stay in sync with the issue path so that
+-	 * hctx_lock() covers both issue and completion paths.
+-	 */
+-	hctx_lock(hctx, &srcu_idx);
+-	if (blk_mq_rq_aborted_gstate(rq) != rq->gstate)
++	if (blk_mq_change_rq_state(rq, MQ_RQ_IN_FLIGHT, MQ_RQ_COMPLETE))
+ 		__blk_mq_complete_request(rq);
+-	hctx_unlock(hctx, srcu_idx);
+ }
+ EXPORT_SYMBOL(blk_mq_complete_request);
  
- 	/*
-@@ -2486,6 +2684,10 @@ static int nvme_reset_dev(struct nvme_dev *dev)
- 		unfreeze_queue = true;
+@@ -681,27 +669,7 @@ void blk_mq_start_request(struct request *rq)
+ 		wbt_issue(q->rq_wb, rq);
  	}
  
-+	/* controller state may have been updated already by inner EH */
-+	if (dev->ctrl.state == new_state)
-+		goto reset_done;
+-	WARN_ON_ONCE(blk_mq_rq_state(rq) != MQ_RQ_IDLE);
+-
+-	/*
+-	 * Mark @rq in-flight which also advances the generation number,
+-	 * and register for timeout.  Protect with a seqcount to allow the
+-	 * timeout path to read both @rq->gstate and @rq->deadline
+-	 * coherently.
+-	 *
+-	 * This is the only place where a request is marked in-flight.  If
+-	 * the timeout path reads an in-flight @rq->gstate, the
+-	 * @rq->deadline it reads together under @rq->gstate_seq is
+-	 * guaranteed to be the matching one.
+-	 */
+-	preempt_disable();
+-	write_seqcount_begin(&rq->gstate_seq);
+-
+-	blk_mq_rq_update_state(rq, MQ_RQ_IN_FLIGHT);
+-	blk_add_timer(rq);
+-
+-	write_seqcount_end(&rq->gstate_seq);
+-	preempt_enable();
++	blk_mq_add_timer(rq, MQ_RQ_IDLE);
+ 
+ 	if (q->dma_drain_size && blk_rq_bytes(rq)) {
+ 		/*
+@@ -714,27 +682,46 @@ void blk_mq_start_request(struct request *rq)
+ }
+ EXPORT_SYMBOL(blk_mq_start_request);
+ 
+-/*
+- * When we reach here because queue is busy, it's safe to change the state
+- * to IDLE without checking @rq->aborted_gstate because we should still be
+- * holding the RCU read lock and thus protected against timeout.
++/**
++ * __blk_mq_requeue_request - requeue a request
++ * @rq: request to be requeued
++ *
++ * This function is either called by blk_mq_requeue_request() or by the block
++ * layer core if .queue_rq() returned BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE.
++ * If the request state is MQ_RQ_IN_FLIGHT and if this function is called from
++ * inside .queue_rq() then it is guaranteed that the timeout code won't try to
++ * modify the request state while this function is in progress because an RCU
++ * read lock is held around .queue_rq() and because the timeout code calls
++ * synchronize_rcu() after having marked requests and before processing
++ * time-outs.
+  */
+ static void __blk_mq_requeue_request(struct request *rq)
+ {
+ 	struct request_queue *q = rq->q;
++	enum mq_rq_state old_state = blk_mq_rq_state(rq);
+ 
+ 	blk_mq_put_driver_tag(rq);
+ 
+ 	trace_block_rq_requeue(q, rq);
+ 	wbt_requeue(q->rq_wb, rq);
+ 
+-	if (blk_mq_rq_state(rq) != MQ_RQ_IDLE) {
+-		blk_mq_rq_update_state(rq, MQ_RQ_IDLE);
++	if (old_state != MQ_RQ_IDLE) {
++		if (!blk_mq_change_rq_state(rq, old_state, MQ_RQ_IDLE))
++			WARN_ON_ONCE(true);
+ 		if (q->dma_drain_size && blk_rq_bytes(rq))
+ 			rq->nr_phys_segments--;
+ 	}
+ }
+ 
++/**
++ * blk_mq_requeue_request - requeue a request
++ * @rq: request to be requeued
++ * @kick_requeue_list: whether or not to kick the requeue_list
++ *
++ * This function is called after a request has completed, after a request has
++ * timed out or from inside .queue_rq(). In the latter case the request may
++ * already have been started.
++ */
+ void blk_mq_requeue_request(struct request *rq, bool kick_requeue_list)
+ {
+ 	__blk_mq_requeue_request(rq);
+@@ -838,8 +825,6 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
+ 	const struct blk_mq_ops *ops = req->q->mq_ops;
+ 	enum blk_eh_timer_return ret = BLK_EH_RESET_TIMER;
+ 
+-	req->rq_flags |= RQF_MQ_TIMEOUT_EXPIRED;
+-
+ 	if (ops->timeout)
+ 		ret = ops->timeout(req, reserved);
+ 
+@@ -848,13 +833,7 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
+ 		__blk_mq_complete_request(req);
+ 		break;
+ 	case BLK_EH_RESET_TIMER:
+-		/*
+-		 * As nothing prevents from completion happening while
+-		 * ->aborted_gstate is set, this may lead to ignored
+-		 * completions and further spurious timeouts.
+-		 */
+-		blk_mq_rq_update_aborted_gstate(req, 0);
+-		blk_add_timer(req);
++		blk_mq_add_timer(req, MQ_RQ_COMPLETE);
+ 		break;
+ 	case BLK_EH_NOT_HANDLED:
+ 		break;
+@@ -868,48 +847,50 @@ static void blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
+ 		struct request *rq, void *priv, bool reserved)
+ {
+ 	struct blk_mq_timeout_data *data = priv;
+-	unsigned long gstate, deadline;
+-	int start;
++	union blk_deadline_and_state das = READ_ONCE(rq->das);
++	unsigned long now = jiffies;
++	int32_t diff_jiffies = das.deadline - now;
++	int32_t diff_next = das.deadline - data->next;
++	enum mq_rq_state rq_state = das.state;
+ 
+-	might_sleep();
+-
+-	if (rq->rq_flags & RQF_MQ_TIMEOUT_EXPIRED)
+-		return;
+-
+-	/* read coherent snapshots of @rq->state_gen and @rq->deadline */
+-	while (true) {
+-		start = read_seqcount_begin(&rq->gstate_seq);
+-		gstate = READ_ONCE(rq->gstate);
+-		deadline = blk_rq_deadline(rq);
+-		if (!read_seqcount_retry(&rq->gstate_seq, start))
+-			break;
+-		cond_resched();
+-	}
+-
+-	/* if in-flight && overdue, mark for abortion */
+-	if ((gstate & MQ_RQ_STATE_MASK) == MQ_RQ_IN_FLIGHT &&
+-	    time_after_eq(jiffies, deadline)) {
+-		blk_mq_rq_update_aborted_gstate(rq, gstate);
++	/*
++	 * Make sure that rq->aborted_gstate != rq->das if rq->deadline has not
++	 * yet been reached even if a request gets recycled before
++	 * blk_mq_terminate_expired() is called and the value of rq->deadline
++	 * is not modified due to the request recycling.
++	 */
++	rq->aborted_gstate = das;
++	rq->aborted_gstate.generation ^= (1UL << 29);
++	if (diff_jiffies <= 0 && rq_state == MQ_RQ_IN_FLIGHT) {
++		/* request timed out */
++		rq->aborted_gstate = das;
+ 		data->nr_expired++;
+ 		hctx->nr_expired++;
+-	} else if (!data->next_set || time_after(data->next, deadline)) {
+-		data->next = deadline;
++	} else if (!data->next_set) {
++		/* data->next is not yet set; set it to deadline. */
++		data->next = now + diff_jiffies;
+ 		data->next_set = 1;
++	} else if (diff_next < 0) {
++		/* data->next is later than deadline; reduce data->next. */
++		data->next += diff_next;
+ 	}
 +
- 	result = -ENODEV;
+ }
+ 
+ static void blk_mq_terminate_expired(struct blk_mq_hw_ctx *hctx,
+ 		struct request *rq, void *priv, bool reserved)
+ {
++	union blk_deadline_and_state old_val = rq->aborted_gstate;
++	union blk_deadline_and_state new_val = old_val;
++
++	new_val.state = MQ_RQ_COMPLETE;
++
  	/*
- 	 * If only admin queue live, keep it to do further investigation or
-@@ -2499,6 +2701,7 @@ static int nvme_reset_dev(struct nvme_dev *dev)
+-	 * We marked @rq->aborted_gstate and waited for RCU.  If there were
+-	 * completions that we lost to, they would have finished and
+-	 * updated @rq->gstate by now; otherwise, the completion path is
+-	 * now guaranteed to see @rq->aborted_gstate and yield.  If
+-	 * @rq->aborted_gstate still matches @rq->gstate, @rq is ours.
++	 * We marked @rq->aborted_gstate and waited for ongoing .queue_rq()
++	 * calls. If rq->das has not changed that means that it
++	 * is now safe to change the request state and to handle the timeout.
+ 	 */
+-	if (!(rq->rq_flags & RQF_MQ_TIMEOUT_EXPIRED) &&
+-	    READ_ONCE(rq->gstate) == rq->aborted_gstate)
++	if (blk_mq_set_rq_state(rq, old_val, new_val))
+ 		blk_mq_rq_timed_out(rq, reserved);
+ }
  
- 	nvme_start_ctrl(&dev->ctrl);
+@@ -948,10 +929,12 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 		bool has_rcu = false;
  
-+ reset_done:
- 	if (unfreeze_queue)
- 		nvme_unfreeze(&dev->ctrl);
- 	return 0;
-@@ -2615,6 +2818,13 @@ static unsigned long check_vendor_combination_bug(struct pci_dev *pdev)
+ 		/*
+-		 * Wait till everyone sees ->aborted_gstate.  The
+-		 * sequential waits for SRCUs aren't ideal.  If this ever
+-		 * becomes a problem, we can add per-hw_ctx rcu_head and
+-		 * wait in parallel.
++		 * For very short timeouts it can happen that
++		 * blk_mq_check_expired() modifies the state of a request
++		 * while .queue_rq() is still in progress. Hence wait until
++		 * these .queue_rq() calls have finished. This is also
++		 * necessary to avoid races with blk_mq_requeue_request() for
++		 * requests that have already been started.
+ 		 */
+ 		queue_for_each_hw_ctx(q, hctx, i) {
+ 			if (!hctx->nr_expired)
+@@ -967,7 +950,7 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 		if (has_rcu)
+ 			synchronize_rcu();
+ 
+-		/* terminate the ones we won */
++		/* Terminate the requests marked by blk_mq_check_expired(). */
+ 		blk_mq_queue_tag_busy_iter(q, blk_mq_terminate_expired, NULL);
+ 	}
+ 
+@@ -2043,21 +2026,16 @@ static int blk_mq_init_request(struct blk_mq_tag_set *set, struct request *rq,
+ {
+ 	int ret;
+ 
++#ifndef CONFIG_ARCH_HAVE_CMPXCHG64
++	spin_lock_init(&rq->das_lock);
++#endif
++
+ 	if (set->ops->init_request) {
+ 		ret = set->ops->init_request(set, rq, hctx_idx, node);
+ 		if (ret)
+ 			return ret;
+ 	}
+ 
+-	seqcount_init(&rq->gstate_seq);
+-	u64_stats_init(&rq->aborted_gstate_sync);
+-	/*
+-	 * start gstate with gen 1 instead of 0, otherwise it will be equal
+-	 * to aborted_gstate, and be identified timed out by
+-	 * blk_mq_terminate_expired.
+-	 */
+-	WRITE_ONCE(rq->gstate, MQ_RQ_GEN_INC);
+-
  	return 0;
  }
  
-+static void nvme_eh_init(struct nvme_dev *dev)
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index e1bb420dc5d6..80dc06810ecf 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -2,6 +2,7 @@
+ #ifndef INT_BLK_MQ_H
+ #define INT_BLK_MQ_H
+ 
++#include <asm/cmpxchg.h>
+ #include "blk-stat.h"
+ #include "blk-mq-tag.h"
+ 
+@@ -30,18 +31,22 @@ struct blk_mq_ctx {
+ 	struct kobject		kobj;
+ } ____cacheline_aligned_in_smp;
+ 
+-/*
+- * Bits for request->gstate.  The lower two bits carry MQ_RQ_* state value
+- * and the upper bits the generation number.
++/**
++ * enum mq_rq_state - blk-mq request state
++ *
++ * The legal state transitions are:
++ * - idle      -> in-flight: blk_mq_start_request()
++ * - in-flight -> complete:  blk_mq_complete_request() or request times out
++ * - complete  -> idle:      blk_mq_requeue_request() or blk_mq_free_request()
++ * - in-flight -> idle:      blk_mq_requeue_request() or blk_mq_free_request()
++ * - complete  -> in-flight: request restart due to BLK_EH_RESET_TIMER
++ *
++ * See also blk_deadline_and_state.state.
+  */
+ enum mq_rq_state {
+ 	MQ_RQ_IDLE		= 0,
+ 	MQ_RQ_IN_FLIGHT		= 1,
+ 	MQ_RQ_COMPLETE		= 2,
+-
+-	MQ_RQ_STATE_BITS	= 2,
+-	MQ_RQ_STATE_MASK	= (1 << MQ_RQ_STATE_BITS) - 1,
+-	MQ_RQ_GEN_INC		= 1 << MQ_RQ_STATE_BITS,
+ };
+ 
+ void blk_mq_freeze_queue(struct request_queue *q);
+@@ -103,37 +108,34 @@ extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
+ 
+ void blk_mq_release(struct request_queue *q);
+ 
+-/**
+- * blk_mq_rq_state() - read the current MQ_RQ_* state of a request
+- * @rq: target request.
+- */
+-static inline int blk_mq_rq_state(struct request *rq)
++static inline bool blk_mq_set_rq_state(struct request *rq,
++				       union blk_deadline_and_state old_val,
++				       union blk_deadline_and_state new_val)
+ {
+-	return READ_ONCE(rq->gstate) & MQ_RQ_STATE_MASK;
++#ifdef CONFIG_ARCH_HAVE_CMPXCHG64
++	return cmpxchg64(&rq->das.val, old_val.val, new_val.val) == old_val.val;
++#else
++	unsigned long flags;
++	bool res = false;
++
++	spin_lock_irqsave(&rq->das_lock, flags);
++	if (rq->das.val == old_val.val) {
++		rq->das = new_val;
++		res = true;
++	}
++	spin_unlock_irqrestore(&rq->das_lock, flags);
++
++	return res;
++#endif
+ }
+ 
+ /**
+- * blk_mq_rq_update_state() - set the current MQ_RQ_* state of a request
++ * blk_mq_rq_state() - read the current MQ_RQ_* state of a request
+  * @rq: target request.
+- * @state: new state to set.
+- *
+- * Set @rq's state to @state.  The caller is responsible for ensuring that
+- * there are no other updaters.  A request can transition into IN_FLIGHT
+- * only from IDLE and doing so increments the generation number.
+  */
+-static inline void blk_mq_rq_update_state(struct request *rq,
+-					  enum mq_rq_state state)
++static inline enum mq_rq_state blk_mq_rq_state(struct request *rq)
+ {
+-	u64 old_val = READ_ONCE(rq->gstate);
+-	u64 new_val = (old_val & ~MQ_RQ_STATE_MASK) | state;
+-
+-	if (state == MQ_RQ_IN_FLIGHT) {
+-		WARN_ON_ONCE((old_val & MQ_RQ_STATE_MASK) != MQ_RQ_IDLE);
+-		new_val += MQ_RQ_GEN_INC;
+-	}
+-
+-	/* avoid exposing interim values */
+-	WRITE_ONCE(rq->gstate, new_val);
++	return READ_ONCE(rq->das).state;
+ }
+ 
+ static inline struct blk_mq_ctx *__blk_mq_get_ctx(struct request_queue *q,
+diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+index 652d4d4d3e97..4b016886f42d 100644
+--- a/block/blk-timeout.c
++++ b/block/blk-timeout.c
+@@ -145,6 +145,42 @@ void blk_timeout_work(struct work_struct *work)
+ 	spin_unlock_irqrestore(q->queue_lock, flags);
+ }
+ 
++/*
++ * If the state of request @rq equals @old_state, update deadline and request
++ * state atomically to @time and @new_state. blk-mq only. cmpxchg64() is only
++ * used if there could be a concurrent update attempt from another context.
++ */
++static bool blk_mq_rq_set_deadline(struct request *rq, unsigned long new_time,
++				   enum mq_rq_state old_state)
 +{
-+	spin_lock_init(&dev->eh_lock);
-+	init_waitqueue_head(&dev->eh_wq);
-+	INIT_LIST_HEAD(&dev->eh_head);
++	union blk_deadline_and_state old_val, new_val;
++	const enum mq_rq_state new_state = MQ_RQ_IN_FLIGHT;
++
++	if (old_state != MQ_RQ_IN_FLIGHT) {
++		old_val = READ_ONCE(rq->das);
++		if (old_val.state != old_state)
++			return false;
++		new_val = old_val;
++		new_val.deadline = new_time;
++		new_val.state = new_state;
++		new_val.generation++;
++		WRITE_ONCE(rq->das.val, new_val.val);
++		return true;
++	}
++
++	do {
++		old_val = READ_ONCE(rq->das);
++		if (old_val.state != old_state)
++			return false;
++		new_val = old_val;
++		new_val.deadline = new_time;
++		new_val.state = new_state;
++		new_val.generation++;
++	} while (!blk_mq_set_rq_state(rq, old_val, new_val));
++
++	return true;
 +}
 +
- static int nvme_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ /**
+  * blk_abort_request -- Request request recovery for the specified command
+  * @req:	pointer to the request of interest
+@@ -158,12 +194,11 @@ void blk_abort_request(struct request *req)
  {
- 	int node, result = -ENOMEM;
-@@ -2659,6 +2869,8 @@ static int nvme_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	if (req->q->mq_ops) {
+ 		/*
+-		 * All we need to ensure is that timeout scan takes place
+-		 * immediately and that scan sees the new timeout value.
+-		 * No need for fancy synchronizations.
++		 * Ensure that a timeout scan takes place immediately and that
++		 * that scan sees the new timeout value.
+ 		 */
+-		blk_rq_set_deadline(req, jiffies);
+-		kblockd_schedule_work(&req->q->timeout_work);
++		if (blk_mq_rq_set_deadline(req, jiffies, MQ_RQ_IN_FLIGHT))
++			kblockd_schedule_work(&req->q->timeout_work);
+ 	} else {
+ 		if (blk_mark_rq_complete(req))
+ 			return;
+@@ -184,52 +219,17 @@ unsigned long blk_rq_timeout(unsigned long timeout)
+ 	return timeout;
+ }
  
- 	dev_info(dev->ctrl.device, "pci function %s\n", dev_name(&pdev->dev));
+-/**
+- * blk_add_timer - Start timeout timer for a single request
+- * @req:	request that is about to start running.
+- *
+- * Notes:
+- *    Each request has its own timer, and as it is added to the queue, we
+- *    set up the timer. When the request completes, we cancel the timer.
+- */
+-void blk_add_timer(struct request *req)
++static void __blk_add_timer(struct request *req, unsigned long deadline)
+ {
+ 	struct request_queue *q = req->q;
+ 	unsigned long expiry;
  
-+	nvme_eh_init(dev);
+-	if (!q->mq_ops)
+-		lockdep_assert_held(q->queue_lock);
+-
+-	/* blk-mq has its own handler, so we don't need ->rq_timed_out_fn */
+-	if (!q->mq_ops && !q->rq_timed_out_fn)
+-		return;
+-
+-	BUG_ON(!list_empty(&req->timeout_list));
+-
+-	/*
+-	 * Some LLDs, like scsi, peek at the timeout to prevent a
+-	 * command from being retried forever.
+-	 */
+-	if (!req->timeout)
+-		req->timeout = q->rq_timeout;
+-
+-	blk_rq_set_deadline(req, jiffies + req->timeout);
+-	req->rq_flags &= ~RQF_MQ_TIMEOUT_EXPIRED;
+-
+-	/*
+-	 * Only the non-mq case needs to add the request to a protected list.
+-	 * For the mq case we simply scan the tag map.
+-	 */
+-	if (!q->mq_ops)
+-		list_add_tail(&req->timeout_list, &req->q->timeout_list);
+-
+ 	/*
+ 	 * If the timer isn't already pending or this timeout is earlier
+ 	 * than an existing one, modify the timer. Round up to next nearest
+ 	 * second.
+ 	 */
+-	expiry = blk_rq_timeout(round_jiffies_up(blk_rq_deadline(req)));
+-
++	expiry = blk_rq_timeout(round_jiffies_up(deadline));
+ 	if (!timer_pending(&q->timeout) ||
+ 	    time_before(expiry, q->timeout.expires)) {
+ 		unsigned long diff = q->timeout.expires - expiry;
+@@ -244,5 +244,54 @@ void blk_add_timer(struct request *req)
+ 		if (!timer_pending(&q->timeout) || (diff >= HZ / 2))
+ 			mod_timer(&q->timeout, expiry);
+ 	}
++}
+ 
++/**
++ * blk_add_timer - Start timeout timer for a single request
++ * @req:	request that is about to start running.
++ *
++ * Notes:
++ *    Each request has its own timer, and as it is added to the queue, we
++ *    set up the timer. When the request completes, we cancel the timer.
++ */
++void blk_add_timer(struct request *req)
++{
++	struct request_queue *q = req->q;
++	unsigned long deadline;
 +
- 	nvme_reset_ctrl(&dev->ctrl);
++	lockdep_assert_held(q->queue_lock);
++
++	if (!q->rq_timed_out_fn)
++		return;
++	if (!req->timeout)
++		req->timeout = q->rq_timeout;
++
++	deadline = jiffies + req->timeout;
++	blk_rq_set_deadline(req, deadline);
++	list_add_tail(&req->timeout_list, &req->q->timeout_list);
++
++	return __blk_add_timer(req, deadline);
++}
++
++/**
++ * blk_mq_add_timer - set the deadline for a single request
++ * @req:	request for which to set the deadline.
++ * @old:	current request state.
++ *
++ * Sets the deadline of a request if and only if it has state @old and
++ * at the same time changes the request state from @old into @new. The caller
++ * must guarantee that the request state won't be modified while this function
++ * is in progress.
++ */
++void blk_mq_add_timer(struct request *req, enum mq_rq_state old)
++{
++	struct request_queue *q = req->q;
++	unsigned long deadline;
++
++	if (!req->timeout)
++		req->timeout = q->rq_timeout;
++	deadline = jiffies + req->timeout;
++	if (!blk_mq_rq_set_deadline(req, deadline, old))
++		WARN_ON_ONCE(true);
++	return __blk_add_timer(req, deadline);
+ }
+diff --git a/block/blk.h b/block/blk.h
+index eaf1a8e87d11..204a0345996c 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -170,6 +170,7 @@ static inline bool bio_integrity_endio(struct bio *bio)
+ void blk_timeout_work(struct work_struct *work);
+ unsigned long blk_rq_timeout(unsigned long timeout);
+ void blk_add_timer(struct request *req);
++void blk_mq_add_timer(struct request *req, enum mq_rq_state old);
+ void blk_delete_timer(struct request *);
  
- 	return 0;
+ 
+@@ -195,17 +196,17 @@ void blk_account_io_done(struct request *req, u64 now);
+  */
+ static inline int blk_mark_rq_complete(struct request *rq)
+ {
+-	return test_and_set_bit(0, &rq->__deadline);
++	return test_and_set_bit(0, &rq->das.legacy_deadline);
+ }
+ 
+ static inline void blk_clear_rq_complete(struct request *rq)
+ {
+-	clear_bit(0, &rq->__deadline);
++	clear_bit(0, &rq->das.legacy_deadline);
+ }
+ 
+ static inline bool blk_rq_is_complete(struct request *rq)
+ {
+-	return test_bit(0, &rq->__deadline);
++	return test_bit(0, &rq->das.legacy_deadline);
+ }
+ 
+ /*
+@@ -314,12 +315,12 @@ static inline void req_set_nomerge(struct request_queue *q, struct request *req)
+  */
+ static inline void blk_rq_set_deadline(struct request *rq, unsigned long time)
+ {
+-	rq->__deadline = time & ~0x1UL;
++	rq->das.legacy_deadline = time & ~0x1UL;
+ }
+ 
+ static inline unsigned long blk_rq_deadline(struct request *rq)
+ {
+-	return rq->__deadline & ~0x1UL;
++	return rq->das.legacy_deadline & ~0x1UL;
+ }
+ 
+ /*
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index f3999719f828..02078f53d636 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -27,8 +27,6 @@
+ #include <linux/percpu-refcount.h>
+ #include <linux/scatterlist.h>
+ #include <linux/blkzoned.h>
+-#include <linux/seqlock.h>
+-#include <linux/u64_stats_sync.h>
+ 
+ struct module;
+ struct scsi_ioctl_command;
+@@ -125,15 +123,23 @@ typedef __u32 __bitwise req_flags_t;
+ #define RQF_SPECIAL_PAYLOAD	((__force req_flags_t)(1 << 18))
+ /* The per-zone write lock is held for this request */
+ #define RQF_ZONE_WRITE_LOCKED	((__force req_flags_t)(1 << 19))
+-/* timeout is expired */
+-#define RQF_MQ_TIMEOUT_EXPIRED	((__force req_flags_t)(1 << 20))
+ /* already slept for hybrid poll */
+-#define RQF_MQ_POLL_SLEPT	((__force req_flags_t)(1 << 21))
++#define RQF_MQ_POLL_SLEPT	((__force req_flags_t)(1 << 20))
+ 
+ /* flags that prevent us from merging requests: */
+ #define RQF_NOMERGE_FLAGS \
+ 	(RQF_STARTED | RQF_SOFTBARRIER | RQF_FLUSH_SEQ | RQF_SPECIAL_PAYLOAD)
+ 
++union blk_deadline_and_state {
++	struct {
++		uint32_t generation:30;
++		uint32_t state:2;
++		uint32_t deadline;
++	};
++	uint64_t val;
++	unsigned long legacy_deadline;
++};
++
+ /*
+  * Try to put the fields that are referenced together in the same cacheline.
+  *
+@@ -236,29 +242,24 @@ struct request {
+ 
+ 	unsigned int extra_len;	/* length of alignment and padding */
+ 
+-	/*
+-	 * On blk-mq, the lower bits of ->gstate (generation number and
+-	 * state) carry the MQ_RQ_* state value and the upper bits the
+-	 * generation number which is monotonically incremented and used to
+-	 * distinguish the reuse instances.
+-	 *
+-	 * ->gstate_seq allows updates to ->gstate and other fields
+-	 * (currently ->deadline) during request start to be read
+-	 * atomically from the timeout path, so that it can operate on a
+-	 * coherent set of information.
+-	 */
+-	seqcount_t gstate_seq;
+-	u64 gstate;
+-
+ 	/*
+ 	 * ->aborted_gstate is used by the timeout to claim a specific
+ 	 * recycle instance of this request.  See blk_mq_timeout_work().
+ 	 */
+-	struct u64_stats_sync aborted_gstate_sync;
+-	u64 aborted_gstate;
++	union blk_deadline_and_state aborted_gstate;
++
++#ifndef CONFIG_ARCH_HAVE_CMPXCHG64
++	spinlock_t das_lock;
++#endif
+ 
+-	/* access through blk_rq_set_deadline, blk_rq_deadline */
+-	unsigned long __deadline;
++	/*
++	 * Access through blk_rq_deadline() and blk_rq_set_deadline(),
++	 * blk_mark_rq_complete(), blk_clear_rq_complete() and
++	 * blk_rq_is_complete() for legacy queues or blk_mq_rq_state(),
++	 * blk_mq_change_rq_state() and blk_mq_rq_set_deadline() for
++	 * blk-mq queues.
++	 */
++	union blk_deadline_and_state das;
+ 
+ 	struct list_head timeout_list;
+ 
 -- 
-2.9.5
+2.16.3
