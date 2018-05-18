@@ -1,92 +1,117 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Omar Sandoval <osandov@fb.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH blktests] block/020: test IO req allocation
-Date: Tue, 22 May 2018 19:12:49 +0800
-Message-Id: <20180522111249.14136-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:51998 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752514AbeERQuK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 May 2018 12:50:10 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 32/34] xfs: refactor the tail of xfs_writepage_map
+Date: Fri, 18 May 2018 18:48:28 +0200
+Message-Id: <20180518164830.1552-33-hch@lst.de>
+In-Reply-To: <20180518164830.1552-1-hch@lst.de>
+References: <20180518164830.1552-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-IO request allocation may hang for ever if the allocation process
-migrages. This test covers the request allocation code path.
+Rejuggle how we deal with the different error vs non-error and have
+ioends vs not have ioend cases to keep the fast path streamlined, and
+the duplicate code at a minimum.
 
-The following patch can fix this issue on linus kernel:
-
-https://marc.info/?l=linux-block&m=152671586923185&w=2
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- tests/block/020     | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/block/020.out |  2 ++
- 2 files changed, 52 insertions(+)
- create mode 100755 tests/block/020
- create mode 100755 tests/block/020.out
+ fs/xfs/xfs_aops.c | 65 +++++++++++++++++++++++------------------------
+ 1 file changed, 32 insertions(+), 33 deletions(-)
 
-diff --git a/tests/block/020 b/tests/block/020
-new file mode 100755
-index 000000000000..b102d7f12173
---- /dev/null
-+++ b/tests/block/020
-@@ -0,0 +1,50 @@
-+#!/bin/bash
-+#
-+# Test blk-mq IO request allocation.
-+#
-+# Copyright (C) 2018 Ming Lei <ming.lei@redhat.com>
-+#
-+# This program is free software: you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation, either version 3 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index dd92d99df51f..a4e53e0a57c2 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -883,7 +883,14 @@ xfs_writepage_map(
+ 	 * submission of outstanding ioends on the writepage context so they are
+ 	 * treated correctly on error.
+ 	 */
+-	if (count) {
++	if (unlikely(error)) {
++		if (!count) {
++			xfs_aops_discard_page(page);
++			ClearPageUptodate(page);
++			unlock_page(page);
++			goto done;
++		}
 +
-+DESCRIPTION="check if IO req allocation may hang"
-+QUICK=1
+ 		/*
+ 		 * If the page was not fully cleaned, we need to ensure that the
+ 		 * higher layers come back to it correctly.  That means we need
+@@ -892,43 +899,35 @@ xfs_writepage_map(
+ 		 * so another attempt to write this page in this writeback sweep
+ 		 * will be made.
+ 		 */
+-		if (error) {
+-			set_page_writeback_keepwrite(page);
+-		} else {
+-			clear_page_dirty_for_io(page);
+-			set_page_writeback(page);
+-		}
+-		unlock_page(page);
+-
+-		/*
+-		 * Preserve the original error if there was one, otherwise catch
+-		 * submission errors here and propagate into subsequent ioend
+-		 * submissions.
+-		 */
+-		list_for_each_entry_safe(ioend, next, &submit_list, io_list) {
+-			int error2;
+-
+-			list_del_init(&ioend->io_list);
+-			error2 = xfs_submit_ioend(wbc, ioend, error);
+-			if (error2 && !error)
+-				error = error2;
+-		}
+-	} else if (error) {
+-		xfs_aops_discard_page(page);
+-		ClearPageUptodate(page);
+-		unlock_page(page);
++		set_page_writeback_keepwrite(page);
+ 	} else {
+-		/*
+-		 * We can end up here with no error and nothing to write if we
+-		 * race with a partial page truncate on a sub-page block sized
+-		 * filesystem. In that case we need to mark the page clean.
+-		 */
+ 		clear_page_dirty_for_io(page);
+ 		set_page_writeback(page);
+-		unlock_page(page);
+-		end_page_writeback(page);
+ 	}
+ 
++	unlock_page(page);
 +
-+requires() {
-+	_have_module null_blk && _have_fio
-+}
++	/*
++	 * Preserve the original error if there was one, otherwise catch
++	 * submission errors here and propagate into subsequent ioend
++	 * submissions.
++	 */
++	list_for_each_entry_safe(ioend, next, &submit_list, io_list) {
++		int error2;
 +
-+test() {
-+	echo "Running ${TEST_NAME}"
++		list_del_init(&ioend->io_list);
++		error2 = xfs_submit_ioend(wbc, ioend, error);
++		if (error2 && !error)
++			error = error2;
++	}
 +
-+	modprobe -r null_blk
-+	modprobe null_blk queue_mode=2 irqmode=2 completion_nsec=2000000 \
-+			shared_tags=1 submit_queues=4 hw_queue_depth=1 || continue
-+
-+	local scheds
-+	# shellcheck disable=SC2207
-+	scheds=($(sed 's/[][]//g' /sys/block/nullb0/queue/scheduler))
-+
-+	for sched in "${scheds[@]}"; do
-+		echo "Testing $sched" >> "$FULL"
-+		echo "$sched" > /sys/block/nullb0/queue/scheduler
-+		_fio_perf --bs=4k --ioengine=libaio --iodepth=1024 \
-+				--numjobs="$(nproc)" --rw=randread --name=async \
-+				--filename=/dev/nullb0 --size=1g --direct=1 \
-+				--runtime=10
-+	done
-+
-+	modprobe -r null_blk
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/block/020.out b/tests/block/020.out
-new file mode 100755
-index 000000000000..dcb584d22e3e
---- /dev/null
-+++ b/tests/block/020.out
-@@ -0,0 +1,2 @@
-+Running block/020
-+Test complete
++	/*
++	 * We can end up here with no error and nothing to write if we race with
++	 * a partial page truncate on a sub-page block sized filesystem.
++	 */
++	if (!count)
++		end_page_writeback(page);
++done:
+ 	mapping_set_error(page->mapping, error);
+ 	return error;
+ }
 -- 
-2.9.5
+2.17.0
