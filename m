@@ -1,103 +1,214 @@
-Return-Path: <keith.busch@intel.com>
-From: Keith Busch <keith.busch@intel.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Keith Busch <keith.busch@intel.com>
-Subject: [RFC PATCH 1/3] blk-mq: Reference count request usage
-Date: Mon, 21 May 2018 17:11:29 -0600
-Message-Id: <20180521231131.6685-2-keith.busch@intel.com>
-In-Reply-To: <20180521231131.6685-1-keith.busch@intel.com>
-References: <20180521231131.6685-1-keith.busch@intel.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Doug Ledford <dledford@redhat.com>,
+	Swapnil Ingle <swapnil.ingle@profitbricks.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH v2 17/26] ibnbd: client: private header with client structs and functions
+Date: Fri, 18 May 2018 15:04:04 +0200
+Message-Id: <20180518130413.16997-18-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
+References: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch adds a struct kref to struct request so that request users
-can be sure they're operating on the same request without it changing
-while they're processing it. The request's tag won't be released for
-reuse until the last user is done with it.
+This header describes main structs and functions used by ibnbd-client
+module, mainly for managing IBNBD sessions and mapped block devices,
+creating and destroying sysfs entries.
 
-Signed-off-by: Keith Busch <keith.busch@intel.com>
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jack Wang <jinpu.wang@profitbricks.com>
 ---
- block/blk-mq.c         | 30 +++++++++++++++++++++++-------
- include/linux/blkdev.h |  2 ++
- 2 files changed, 25 insertions(+), 7 deletions(-)
+ drivers/block/ibnbd/ibnbd-clt.h | 172 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 172 insertions(+)
+ create mode 100644 drivers/block/ibnbd/ibnbd-clt.h
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4cbfd784e837..8b370ed75605 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -332,6 +332,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- #endif
- 
- 	data->ctx->rq_dispatched[op_is_sync(op)]++;
-+	kref_init(&rq->ref);
- 	return rq;
- }
- 
-@@ -465,13 +466,33 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
- }
- EXPORT_SYMBOL_GPL(blk_mq_alloc_request_hctx);
- 
-+static void blk_mq_exit_request(struct kref *ref)
-+{
-+	struct request *rq = container_of(ref, struct request, ref);
-+	struct request_queue *q = rq->q;
-+	struct blk_mq_ctx *ctx = rq->mq_ctx;
-+	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, ctx->cpu);
-+	const int sched_tag = rq->internal_tag;
+diff --git a/drivers/block/ibnbd/ibnbd-clt.h b/drivers/block/ibnbd/ibnbd-clt.h
+new file mode 100644
+index 000000000000..c5f6f08ec338
+--- /dev/null
++++ b/drivers/block/ibnbd/ibnbd-clt.h
+@@ -0,0 +1,172 @@
++/*
++ * InfiniBand Network Block Driver
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler <mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *          Kleber Souza <kleber.souza@profitbricks.com>
++ *          Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
++ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *          Swapnil Ingle <swapnil.ingle@profitbricks.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+	if (rq->tag != -1)
-+		blk_mq_put_tag(hctx, hctx->tags, ctx, rq->tag);
-+	if (sched_tag != -1)
-+		blk_mq_put_tag(hctx, hctx->sched_tags, ctx, sched_tag);
-+	blk_mq_sched_restart(hctx);
-+	blk_queue_exit(q);
-+}
++#ifndef IBNBD_CLT_H
++#define IBNBD_CLT_H
 +
-+static void blk_mq_put_request(struct request *rq)
-+{
-+       kref_put(&rq->ref, blk_mq_exit_request);
-+}
++#include <linux/wait.h>
++#include <linux/in.h>
++#include <linux/inet.h>
++#include <linux/blk-mq.h>
++#include <linux/refcount.h>
 +
- void blk_mq_free_request(struct request *rq)
- {
- 	struct request_queue *q = rq->q;
- 	struct elevator_queue *e = q->elevator;
- 	struct blk_mq_ctx *ctx = rq->mq_ctx;
- 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, ctx->cpu);
--	const int sched_tag = rq->internal_tag;
- 
- 	if (rq->rq_flags & RQF_ELVPRIV) {
- 		if (e && e->type->ops.mq.finish_request)
-@@ -495,12 +516,7 @@ void blk_mq_free_request(struct request *rq)
- 		blk_put_rl(blk_rq_rl(rq));
- 
- 	blk_mq_rq_update_state(rq, MQ_RQ_IDLE);
--	if (rq->tag != -1)
--		blk_mq_put_tag(hctx, hctx->tags, ctx, rq->tag);
--	if (sched_tag != -1)
--		blk_mq_put_tag(hctx, hctx->sched_tags, ctx, sched_tag);
--	blk_mq_sched_restart(hctx);
--	blk_queue_exit(q);
-+	blk_mq_put_request(rq);
- }
- EXPORT_SYMBOL_GPL(blk_mq_free_request);
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index f3999719f828..26bf2c1e3502 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -257,6 +257,8 @@ struct request {
- 	struct u64_stats_sync aborted_gstate_sync;
- 	u64 aborted_gstate;
- 
-+	struct kref ref;
++#include "ibtrs.h"
++#include "ibnbd-proto.h"
++#include "ibnbd-log.h"
 +
- 	/* access through blk_rq_set_deadline, blk_rq_deadline */
- 	unsigned long __deadline;
- 
++#define BMAX_SEGMENTS 31
++#define RECONNECT_DELAY 30
++#define MAX_RECONNECTS -1
++
++enum ibnbd_clt_dev_state {
++	DEV_STATE_INIT,
++	DEV_STATE_MAPPED,
++	DEV_STATE_MAPPED_DISCONNECTED,
++	DEV_STATE_UNMAPPED,
++};
++
++struct ibnbd_iu_comp {
++	wait_queue_head_t wait;
++	int errno;
++};
++
++struct ibnbd_iu {
++	union {
++		struct request *rq; /* for block io */
++		void *buf; /* for user messages */
++	};
++	struct ibtrs_tag	*tag;
++	union {
++		/* use to send msg associated with a dev */
++		struct ibnbd_clt_dev *dev;
++		/* use to send msg associated with a sess */
++		struct ibnbd_clt_session *sess;
++	};
++	blk_status_t		status;
++	struct scatterlist	sglist[BMAX_SEGMENTS];
++	struct work_struct	work;
++	int			errno;
++	struct ibnbd_iu_comp	*comp;
++};
++
++struct ibnbd_cpu_qlist {
++	struct list_head	requeue_list;
++	spinlock_t		requeue_lock;
++	unsigned int		cpu;
++};
++
++struct ibnbd_clt_session {
++	struct list_head        list;
++	struct ibtrs_clt        *ibtrs;
++	wait_queue_head_t       ibtrs_waitq;
++	bool                    ibtrs_ready;
++	struct ibnbd_cpu_qlist	__percpu
++				*cpu_queues;
++	DECLARE_BITMAP(cpu_queues_bm, NR_CPUS);
++	int	__percpu	*cpu_rr; /* per-cpu var for CPU round-robin */
++	atomic_t		busy;
++	int			queue_depth;
++	u32			max_io_size;
++	struct blk_mq_tag_set	tag_set;
++	struct mutex		lock; /* protects state and devs_list */
++	struct list_head        devs_list; /* list of struct ibnbd_clt_dev */
++	refcount_t		refcount;
++	char			sessname[NAME_MAX];
++	u8			ver; /* protocol version */
++};
++
++/**
++ * Submission queues.
++ */
++struct ibnbd_queue {
++	struct list_head	requeue_list;
++	unsigned long		in_list;
++	struct ibnbd_clt_dev	*dev;
++	struct blk_mq_hw_ctx	*hctx;
++};
++
++struct ibnbd_clt_dev {
++	struct ibnbd_clt_session	*sess;
++	struct request_queue	*queue;
++	struct ibnbd_queue	*hw_queues;
++	u32			device_id;
++	/* local Idr index - used to track minor number allocations. */
++	u32			clt_device_id;
++	struct mutex		lock;
++	enum ibnbd_clt_dev_state	dev_state;
++	enum ibnbd_io_mode	io_mode; /* user requested */
++	enum ibnbd_io_mode	remote_io_mode; /* server really used */
++	char			pathname[NAME_MAX];
++	enum ibnbd_access_mode	access_mode;
++	bool			read_only;
++	bool			rotational;
++	u32			max_hw_sectors;
++	u32			max_write_same_sectors;
++	u32			max_discard_sectors;
++	u32			discard_granularity;
++	u32			discard_alignment;
++	u16			secure_discard;
++	u16			physical_block_size;
++	u16			logical_block_size;
++	u16			max_segments;
++	size_t			nsectors;
++	u64			size;		/* device size in bytes */
++	struct list_head        list;
++	struct gendisk		*gd;
++	struct kobject		kobj;
++	char			blk_symlink_name[NAME_MAX];
++	refcount_t		refcount;
++	struct work_struct	unmap_on_rmmod_work;
++};
++
++/* ibnbd-clt.c */
++
++struct ibnbd_clt_dev *ibnbd_clt_map_device(const char *sessname,
++					   struct ibtrs_addr *paths,
++					   size_t path_cnt,
++					   const char *pathname,
++					   enum ibnbd_access_mode access_mode,
++					   enum ibnbd_io_mode io_mode);
++int ibnbd_clt_unmap_device(struct ibnbd_clt_dev *dev, bool force,
++			   const struct attribute *sysfs_self);
++
++int ibnbd_clt_remap_device(struct ibnbd_clt_dev *dev);
++int ibnbd_clt_resize_disk(struct ibnbd_clt_dev *dev, size_t newsize);
++
++/* ibnbd-clt-sysfs.c */
++
++int ibnbd_clt_create_sysfs_files(void);
++
++void ibnbd_clt_destroy_sysfs_files(void);
++void ibnbd_clt_destroy_default_group(void);
++
++void ibnbd_clt_remove_dev_symlink(struct ibnbd_clt_dev *dev);
++
++#endif /* IBNBD_CLT_H */
 -- 
-2.14.3
+2.13.1
