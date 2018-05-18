@@ -1,47 +1,88 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:50042 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751747AbeERQte (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 May 2018 12:49:34 -0400
 From: Christoph Hellwig <hch@lst.de>
 To: linux-xfs@vger.kernel.org
 Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-mm@kvack.org
-Subject: [PATCH 27/34] xfs: don't clear imap_valid for a non-uptodate buffers
-Date: Fri, 18 May 2018 18:48:23 +0200
-Message-Id: <20180518164830.1552-28-hch@lst.de>
+Subject: [PATCH 21/34] xfs: move locking into xfs_bmap_punch_delalloc_range
+Date: Fri, 18 May 2018 18:48:17 +0200
+Message-Id: <20180518164830.1552-22-hch@lst.de>
 In-Reply-To: <20180518164830.1552-1-hch@lst.de>
 References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Finding a buffer that isn't uptodate doesn't invalidate the mapping for
-any given block.  The last_sector check will already take care of starting
-another ioend as soon as we find any non-update buffer, and if the current
-mapping doesn't include the next uptodate buffer the xfs_imap_valid check
-will take care of it.
+Both callers want the same looking, so do it only once.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/xfs/xfs_aops.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ fs/xfs/xfs_aops.c      | 2 --
+ fs/xfs/xfs_bmap_util.c | 7 ++++---
+ fs/xfs/xfs_iomap.c     | 3 ---
+ 3 files changed, 4 insertions(+), 8 deletions(-)
 
 diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index b1dee2171194..82fd08c29f7f 100644
+index f2333e351e07..5dd09e83c81c 100644
 --- a/fs/xfs/xfs_aops.c
 +++ b/fs/xfs/xfs_aops.c
-@@ -859,15 +859,12 @@ xfs_writepage_map(
+@@ -761,10 +761,8 @@ xfs_aops_discard_page(
+ 		"page discard on page "PTR_FMT", inode 0x%llx, offset %llu.",
+ 			page, ip->i_ino, offset);
+ 
+-	xfs_ilock(ip, XFS_ILOCK_EXCL);
+ 	error = xfs_bmap_punch_delalloc_range(ip, start_fsb,
+ 			PAGE_SIZE / i_blocksize(inode));
+-	xfs_iunlock(ip, XFS_ILOCK_EXCL);
+ 	if (error && !XFS_FORCED_SHUTDOWN(mp))
+ 		xfs_alert(mp, "page discard unable to remove delalloc mapping.");
+ out_invalidate:
+diff --git a/fs/xfs/xfs_bmap_util.c b/fs/xfs/xfs_bmap_util.c
+index c009bdf9fdce..1a55fc06f917 100644
+--- a/fs/xfs/xfs_bmap_util.c
++++ b/fs/xfs/xfs_bmap_util.c
+@@ -711,12 +711,11 @@ xfs_bmap_punch_delalloc_range(
+ 	struct xfs_iext_cursor	icur;
+ 	int			error = 0;
+ 
+-	ASSERT(xfs_isilocked(ip, XFS_ILOCK_EXCL));
+-
++	xfs_ilock(ip, XFS_ILOCK_EXCL);
+ 	if (!(ifp->if_flags & XFS_IFEXTENTS)) {
+ 		error = xfs_iread_extents(NULL, ip, XFS_DATA_FORK);
+ 		if (error)
+-			return error;
++			goto out_unlock;
+ 	}
+ 
+ 	if (!xfs_iext_lookup_extent(ip, ifp, start_fsb, &icur, &got))
+@@ -738,6 +737,8 @@ xfs_bmap_punch_delalloc_range(
  			break;
+ 	} while (xfs_iext_next_extent(ifp, &icur, &got));
  
- 		/*
--		 * Block does not contain valid data, skip it, mark the current
--		 * map as invalid because we have a discontiguity. This ensures
--		 * we put subsequent writeable buffers into a new ioend.
-+		 * Block does not contain valid data, skip it.
- 		 */
- 		if (!buffer_uptodate(bh)) {
- 			if (PageUptodate(page))
- 				ASSERT(buffer_mapped(bh));
- 			uptodate = false;
--			wpc->imap_valid = false;
- 			continue;
- 		}
++out_unlock:
++	xfs_iunlock(ip, XFS_ILOCK_EXCL);
+ 	return error;
+ }
  
+diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
+index da6d1995e460..f949f0dd7382 100644
+--- a/fs/xfs/xfs_iomap.c
++++ b/fs/xfs/xfs_iomap.c
+@@ -1203,11 +1203,8 @@ xfs_file_iomap_end_delalloc(
+ 		truncate_pagecache_range(VFS_I(ip), XFS_FSB_TO_B(mp, start_fsb),
+ 					 XFS_FSB_TO_B(mp, end_fsb) - 1);
+ 
+-		xfs_ilock(ip, XFS_ILOCK_EXCL);
+ 		error = xfs_bmap_punch_delalloc_range(ip, start_fsb,
+ 					       end_fsb - start_fsb);
+-		xfs_iunlock(ip, XFS_ILOCK_EXCL);
+-
+ 		if (error && !XFS_FORCED_SHUTDOWN(mp)) {
+ 			xfs_alert(mp, "%s: unable to clean up ino %lld",
+ 				__func__, ip->i_ino);
 -- 
 2.17.0
