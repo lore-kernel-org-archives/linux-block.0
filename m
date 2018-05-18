@@ -1,303 +1,277 @@
-Return-Path: <keescook@chromium.org>
-Return-Path: <keescook@chromium.org>
-From: Kees Cook <keescook@chromium.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Kees Cook <keescook@chromium.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Tejun Heo <tj@kernel.org>,
-	Borislav Petkov <bp@alien8.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
-	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
-	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
-	linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 3/6] block: Create scsi_sense.h for SCSI and ATAPI
-Date: Tue, 22 May 2018 11:15:09 -0700
-Message-Id: <20180522181512.39316-4-keescook@chromium.org>
-In-Reply-To: <20180522181512.39316-1-keescook@chromium.org>
-References: <20180522181512.39316-1-keescook@chromium.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:49952 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752274AbeERQtS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 May 2018 12:49:18 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 15/34] iomap: add an iomap-based readpage and readpages implementation
+Date: Fri, 18 May 2018 18:48:11 +0200
+Message-Id: <20180518164830.1552-16-hch@lst.de>
+In-Reply-To: <20180518164830.1552-1-hch@lst.de>
+References: <20180518164830.1552-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Both SCSI and ATAPI share the sense header. In preparation for using the
-struct scsi_sense_hdr more widely, move this into a separate header and
-move the helper function to scsi_ioctl.c which is linked with CONFIG_IDE
-by way of CONFIG_BLK_SCSI_REQUEST.
+Simply use iomap_apply to iterate over the file and a submit a bio for
+each non-uptodate but mapped region and zero everything else.  Note that
+as-is this can not be used for file systems with a blocksize smaller than
+the page size, but that support will be added later.
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/scsi_ioctl.c         | 64 ++++++++++++++++++++++++++++++++++++++
- drivers/scsi/scsi_common.c | 64 --------------------------------------
- include/scsi/scsi_cmnd.h   |  1 -
- include/scsi/scsi_common.h | 32 +------------------
- include/scsi/scsi_sense.h  | 44 ++++++++++++++++++++++++++
- 5 files changed, 109 insertions(+), 96 deletions(-)
- create mode 100644 include/scsi/scsi_sense.h
+ fs/iomap.c            | 200 +++++++++++++++++++++++++++++++++++++++++-
+ include/linux/iomap.h |   4 +
+ 2 files changed, 203 insertions(+), 1 deletion(-)
 
-diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
-index 60b471f8621b..87ff3cc7a364 100644
---- a/block/scsi_ioctl.c
-+++ b/block/scsi_ioctl.c
-@@ -728,6 +728,70 @@ void scsi_req_init(struct scsi_request *req)
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 7c1b071d115c..821671af2618 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -1,6 +1,6 @@
+ /*
+  * Copyright (C) 2010 Red Hat, Inc.
+- * Copyright (c) 2016 Christoph Hellwig.
++ * Copyright (c) 2016-2018 Christoph Hellwig.
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -18,6 +18,7 @@
+ #include <linux/uaccess.h>
+ #include <linux/gfp.h>
+ #include <linux/mm.h>
++#include <linux/mm_inline.h>
+ #include <linux/swap.h>
+ #include <linux/pagemap.h>
+ #include <linux/pagevec.h>
+@@ -103,6 +104,203 @@ iomap_sector(struct iomap *iomap, loff_t pos)
+ 	return (iomap->addr + pos - iomap->offset) >> SECTOR_SHIFT;
  }
- EXPORT_SYMBOL(scsi_req_init);
  
-+/**
-+ * scsi_normalize_sense - normalize main elements from either fixed or
-+ *			descriptor sense data format into a common format.
-+ *
-+ * @sense_buffer:	byte array containing sense data returned by device
-+ * @sb_len:		number of valid bytes in sense_buffer
-+ * @sshdr:		pointer to instance of structure that common
-+ *			elements are written to.
-+ *
-+ * Notes:
-+ *	The "main elements" from sense data are: response_code, sense_key,
-+ *	asc, ascq and additional_length (only for descriptor format).
-+ *
-+ *	Typically this function can be called after a device has
-+ *	responded to a SCSI command with the CHECK_CONDITION status.
-+ *
-+ * Return value:
-+ *	true if valid sense data information found, else false;
-+ */
-+bool scsi_normalize_sense(const u8 *sense_buffer, int sb_len,
-+			  struct scsi_sense_hdr *sshdr)
++static inline bool
++iomap_block_needs_zeroing(struct inode *inode, loff_t pos, struct iomap *iomap)
 +{
-+	memset(sshdr, 0, sizeof(struct scsi_sense_hdr));
++       return iomap->type != IOMAP_MAPPED || pos > i_size_read(inode);
++}
 +
-+	if (!sense_buffer || !sb_len)
-+		return false;
++static void
++iomap_read_end_io(struct bio *bio)
++{
++	int error = blk_status_to_errno(bio->bi_status);
++	struct bio_vec *bvec;
++	int i;
 +
-+	sshdr->response_code = (sense_buffer[0] & 0x7f);
++	bio_for_each_segment_all(bvec, bio, i)
++		page_endio(bvec->bv_page, false, error);
++	bio_put(bio);
++}
 +
-+	if (!scsi_sense_valid(sshdr))
-+		return false;
++static struct bio *
++iomap_read_bio_alloc(struct iomap *iomap, sector_t sector, loff_t length)
++{
++	int nr_vecs = (length + PAGE_SIZE - 1) >> PAGE_SHIFT;
++	struct bio *bio = bio_alloc(GFP_NOFS, min(BIO_MAX_PAGES, nr_vecs));
 +
-+	if (sshdr->response_code >= 0x72) {
-+		/*
-+		 * descriptor format
-+		 */
-+		if (sb_len > 1)
-+			sshdr->sense_key = (sense_buffer[1] & 0xf);
-+		if (sb_len > 2)
-+			sshdr->asc = sense_buffer[2];
-+		if (sb_len > 3)
-+			sshdr->ascq = sense_buffer[3];
-+		if (sb_len > 7)
-+			sshdr->additional_length = sense_buffer[7];
-+	} else {
-+		/*
-+		 * fixed format
-+		 */
-+		if (sb_len > 2)
-+			sshdr->sense_key = (sense_buffer[2] & 0xf);
-+		if (sb_len > 7) {
-+			sb_len = (sb_len < (sense_buffer[7] + 8)) ?
-+					 sb_len : (sense_buffer[7] + 8);
-+			if (sb_len > 12)
-+				sshdr->asc = sense_buffer[12];
-+			if (sb_len > 13)
-+				sshdr->ascq = sense_buffer[13];
++	bio->bi_opf = REQ_OP_READ;
++	bio->bi_iter.bi_sector = sector;
++	bio_set_dev(bio, iomap->bdev);
++	bio->bi_end_io = iomap_read_end_io;
++	return bio;
++}
++
++struct iomap_readpage_ctx {
++	struct page		*cur_page;
++	bool			cur_page_in_bio;
++	struct bio		*bio;
++	struct list_head	*pages;
++};
++
++static loff_t
++iomap_readpage_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
++		struct iomap *iomap)
++{
++	struct iomap_readpage_ctx *ctx = data;
++	struct page *page = ctx->cur_page;
++	unsigned poff = pos & (PAGE_SIZE - 1);
++	unsigned plen = min_t(loff_t, PAGE_SIZE - poff, length);
++	bool is_contig = false;
++	sector_t sector;
++
++	/* we don't support blocksize < PAGE_SIZE quite yet: */
++	WARN_ON_ONCE(pos != page_offset(page));
++	WARN_ON_ONCE(plen != PAGE_SIZE);
++
++	if (iomap_block_needs_zeroing(inode, pos, iomap)) {
++		zero_user(page, poff, plen);
++		SetPageUptodate(page);
++		goto done;
++	}
++
++	ctx->cur_page_in_bio = true;
++
++	/*
++	 * Try to merge into a previous segment if we can.
++	 */
++	sector = iomap_sector(iomap, pos);
++	if (ctx->bio && bio_end_sector(ctx->bio) == sector) {
++		if (__bio_try_merge_page(ctx->bio, page, plen, poff))
++			goto done;
++		is_contig = true;
++	}
++
++	if (!ctx->bio || !is_contig || bio_full(ctx->bio)) {
++		if (ctx->bio)
++			submit_bio(ctx->bio);
++		ctx->bio = iomap_read_bio_alloc(iomap, sector, length);
++	}
++
++	__bio_add_page(ctx->bio, page, plen, poff);
++done:
++	return plen;
++}
++
++int
++iomap_readpage(struct page *page, const struct iomap_ops *ops)
++{
++	struct iomap_readpage_ctx ctx = { .cur_page = page };
++	struct inode *inode = page->mapping->host;
++	unsigned poff;
++	loff_t ret;
++
++	WARN_ON_ONCE(page_has_buffers(page));
++
++	for (poff = 0; poff < PAGE_SIZE; poff += ret) {
++		ret = iomap_apply(inode, page_offset(page) + poff,
++				PAGE_SIZE - poff, 0, ops, &ctx,
++				iomap_readpage_actor);
++		if (ret <= 0) {
++			WARN_ON_ONCE(ret == 0);
++			SetPageError(page);
++			break;
 +		}
 +	}
 +
-+	return true;
++	if (ctx.bio) {
++		submit_bio(ctx.bio);
++		WARN_ON_ONCE(!ctx.cur_page_in_bio);
++	} else {
++		WARN_ON_ONCE(ctx.cur_page_in_bio);
++		unlock_page(page);
++	}
++	return 0;
 +}
-+EXPORT_SYMBOL(scsi_normalize_sense);
++EXPORT_SYMBOL_GPL(iomap_readpage);
 +
- static int __init blk_scsi_ioctl_init(void)
- {
- 	blk_set_cmd_filter_defaults(&blk_default_cmd_filter);
-diff --git a/drivers/scsi/scsi_common.c b/drivers/scsi/scsi_common.c
-index 90349498f686..8621a07cb967 100644
---- a/drivers/scsi/scsi_common.c
-+++ b/drivers/scsi/scsi_common.c
-@@ -116,70 +116,6 @@ void int_to_scsilun(u64 lun, struct scsi_lun *scsilun)
- }
- EXPORT_SYMBOL(int_to_scsilun);
- 
--/**
-- * scsi_normalize_sense - normalize main elements from either fixed or
-- *			descriptor sense data format into a common format.
-- *
-- * @sense_buffer:	byte array containing sense data returned by device
-- * @sb_len:		number of valid bytes in sense_buffer
-- * @sshdr:		pointer to instance of structure that common
-- *			elements are written to.
-- *
-- * Notes:
-- *	The "main elements" from sense data are: response_code, sense_key,
-- *	asc, ascq and additional_length (only for descriptor format).
-- *
-- *	Typically this function can be called after a device has
-- *	responded to a SCSI command with the CHECK_CONDITION status.
-- *
-- * Return value:
-- *	true if valid sense data information found, else false;
-- */
--bool scsi_normalize_sense(const u8 *sense_buffer, int sb_len,
--			  struct scsi_sense_hdr *sshdr)
--{
--	memset(sshdr, 0, sizeof(struct scsi_sense_hdr));
--
--	if (!sense_buffer || !sb_len)
--		return false;
--
--	sshdr->response_code = (sense_buffer[0] & 0x7f);
--
--	if (!scsi_sense_valid(sshdr))
--		return false;
--
--	if (sshdr->response_code >= 0x72) {
--		/*
--		 * descriptor format
--		 */
--		if (sb_len > 1)
--			sshdr->sense_key = (sense_buffer[1] & 0xf);
--		if (sb_len > 2)
--			sshdr->asc = sense_buffer[2];
--		if (sb_len > 3)
--			sshdr->ascq = sense_buffer[3];
--		if (sb_len > 7)
--			sshdr->additional_length = sense_buffer[7];
--	} else {
--		/*
--		 * fixed format
--		 */
--		if (sb_len > 2)
--			sshdr->sense_key = (sense_buffer[2] & 0xf);
--		if (sb_len > 7) {
--			sb_len = (sb_len < (sense_buffer[7] + 8)) ?
--					 sb_len : (sense_buffer[7] + 8);
--			if (sb_len > 12)
--				sshdr->asc = sense_buffer[12];
--			if (sb_len > 13)
--				sshdr->ascq = sense_buffer[13];
--		}
--	}
--
--	return true;
--}
--EXPORT_SYMBOL(scsi_normalize_sense);
--
- /**
-  * scsi_sense_desc_find - search for a given descriptor type in	descriptor sense data format.
-  * @sense_buffer:	byte array of descriptor format sense data
-diff --git a/include/scsi/scsi_cmnd.h b/include/scsi/scsi_cmnd.h
-index aaf1e971c6a3..3b9f42f6615c 100644
---- a/include/scsi/scsi_cmnd.h
-+++ b/include/scsi/scsi_cmnd.h
-@@ -120,7 +120,6 @@ struct scsi_cmnd {
- 	struct request *request;	/* The command we are
- 				   	   working on */
- 
--#define SCSI_SENSE_BUFFERSIZE 	96
- 	unsigned char *sense_buffer;
- 				/* obtained by REQUEST SENSE when
- 				 * CHECK CONDITION is received on original
-diff --git a/include/scsi/scsi_common.h b/include/scsi/scsi_common.h
-index 731ac09ed231..82d6209f2e10 100644
---- a/include/scsi/scsi_common.h
-+++ b/include/scsi/scsi_common.h
-@@ -8,6 +8,7 @@
- 
- #include <linux/types.h>
- #include <scsi/scsi_proto.h>
-+#include <scsi/scsi_sense.h>
- 
- static inline unsigned
- scsi_varlen_cdb_length(const void *hdr)
-@@ -31,37 +32,6 @@ extern const char *scsi_device_type(unsigned type);
- extern void int_to_scsilun(u64, struct scsi_lun *);
- extern u64 scsilun_to_int(struct scsi_lun *);
- 
--/*
-- * This is a slightly modified SCSI sense "descriptor" format header.
-- * The addition is to allow the 0x70 and 0x71 response codes. The idea
-- * is to place the salient data from either "fixed" or "descriptor" sense
-- * format into one structure to ease application processing.
-- *
-- * The original sense buffer should be kept around for those cases
-- * in which more information is required (e.g. the LBA of a MEDIUM ERROR).
-- */
--struct scsi_sense_hdr {		/* See SPC-3 section 4.5 */
--	u8 response_code;	/* permit: 0x0, 0x70, 0x71, 0x72, 0x73 */
--	u8 sense_key;
--	u8 asc;
--	u8 ascq;
--	u8 byte4;
--	u8 byte5;
--	u8 byte6;
--	u8 additional_length;	/* always 0 for fixed sense format */
--};
--
--static inline bool scsi_sense_valid(const struct scsi_sense_hdr *sshdr)
--{
--	if (!sshdr)
--		return false;
--
--	return (sshdr->response_code & 0x70) == 0x70;
--}
--
--extern bool scsi_normalize_sense(const u8 *sense_buffer, int sb_len,
--				 struct scsi_sense_hdr *sshdr);
--
- extern void scsi_build_sense_buffer(int desc, u8 *buf, u8 key, u8 asc, u8 ascq);
- int scsi_set_sense_information(u8 *buf, int buf_len, u64 info);
- int scsi_set_sense_field_pointer(u8 *buf, int buf_len, u16 fp, u8 bp, bool cd);
-diff --git a/include/scsi/scsi_sense.h b/include/scsi/scsi_sense.h
-new file mode 100644
-index 000000000000..be923c67b93e
---- /dev/null
-+++ b/include/scsi/scsi_sense.h
-@@ -0,0 +1,44 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Structures and functions used by both SCSI and ATAPI sense code.
-+ */
-+
-+#ifndef _SCSI_SENSE_H_
-+#define _SCSI_SENSE_H_
-+
-+#include <linux/types.h>
-+
-+/*
-+ * This is a slightly modified SCSI sense "descriptor" format header.
-+ * The addition is to allow the 0x70 and 0x71 response codes. The idea
-+ * is to place the salient data from either "fixed" or "descriptor" sense
-+ * format into one structure to ease application processing.
-+ *
-+ * The original sense buffer should be kept around for those cases
-+ * in which more information is required (e.g. the LBA of a MEDIUM ERROR).
-+ */
-+struct scsi_sense_hdr {		/* See SPC-3 section 4.5 */
-+	u8 response_code;	/* permit: 0x0, 0x70, 0x71, 0x72, 0x73 */
-+	u8 sense_key;
-+	u8 asc;
-+	u8 ascq;
-+	u8 byte4;
-+	u8 byte5;
-+	u8 byte6;
-+	u8 additional_length;	/* always 0 for fixed sense format */
-+};
-+
-+static inline bool scsi_sense_valid(const struct scsi_sense_hdr *sshdr)
++static struct page *
++iomap_next_page(struct inode *inode, struct list_head *pages, loff_t pos,
++		loff_t length, loff_t *done)
 +{
-+	if (!sshdr)
-+		return false;
++	while (!list_empty(pages)) {
++		struct page *page = lru_to_page(pages);
 +
-+	return (sshdr->response_code & 0x70) == 0x70;
++		if (page_offset(page) >= (u64)pos + length)
++			break;
++
++		list_del(&page->lru);
++		if (!add_to_page_cache_lru(page, inode->i_mapping, page->index,
++				GFP_NOFS))
++			return page;
++
++		*done += PAGE_SIZE;
++		put_page(page);
++	}
++
++	return NULL;
 +}
 +
-+#define SCSI_SENSE_BUFFERSIZE 	96
++static loff_t
++iomap_readpages_actor(struct inode *inode, loff_t pos, loff_t length,
++		void *data, struct iomap *iomap)
++{
++	struct iomap_readpage_ctx *ctx = data;
++	loff_t done, ret;
 +
-+extern bool scsi_normalize_sense(const u8 *sense_buffer, int sb_len,
-+				 struct scsi_sense_hdr *sshdr);
++	for (done = 0; done < length; done += ret) {
++		if (ctx->cur_page && ((pos + done) & (PAGE_SIZE - 1)) == 0) {
++			if (!ctx->cur_page_in_bio)
++				unlock_page(ctx->cur_page);
++			put_page(ctx->cur_page);
++			ctx->cur_page = NULL;
++		}
++		if (!ctx->cur_page) {
++			ctx->cur_page = iomap_next_page(inode, ctx->pages,
++					pos, length, &done);
++			if (!ctx->cur_page)
++				break;
++			ctx->cur_page_in_bio = false;
++		}
++		ret = iomap_readpage_actor(inode, pos + done, length - done,
++				ctx, iomap);
++	}
 +
-+#endif /* _SCSI_SENSE_H_ */
++	return done;
++}
++
++int
++iomap_readpages(struct address_space *mapping, struct list_head *pages,
++		unsigned nr_pages, const struct iomap_ops *ops)
++{
++	struct iomap_readpage_ctx ctx = { .pages = pages };
++	loff_t pos = page_offset(list_entry(pages->prev, struct page, lru));
++	loff_t last = page_offset(list_entry(pages->next, struct page, lru));
++	loff_t length = last - pos + PAGE_SIZE, ret = 0;
++
++	while (length > 0) {
++		ret = iomap_apply(mapping->host, pos, length, 0, ops,
++				&ctx, iomap_readpages_actor);
++		if (ret <= 0) {
++			WARN_ON_ONCE(ret == 0);
++			goto done;
++		}
++		pos += ret;
++		length -= ret;
++	}
++	ret = 0;
++done:
++	if (ctx.bio)
++		submit_bio(ctx.bio);
++	if (ctx.cur_page) {
++		if (!ctx.cur_page_in_bio)
++			unlock_page(ctx.cur_page);
++		put_page(ctx.cur_page);
++	}
++	WARN_ON_ONCE(!ret && !list_empty(ctx.pages));
++	return ret;
++}
++EXPORT_SYMBOL_GPL(iomap_readpages);
++
+ static void
+ iomap_write_failed(struct inode *inode, loff_t pos, unsigned len)
+ {
+diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+index a044a824da85..7300d30ca495 100644
+--- a/include/linux/iomap.h
++++ b/include/linux/iomap.h
+@@ -9,6 +9,7 @@ struct fiemap_extent_info;
+ struct inode;
+ struct iov_iter;
+ struct kiocb;
++struct page;
+ struct vm_area_struct;
+ struct vm_fault;
+ 
+@@ -88,6 +89,9 @@ struct iomap_ops {
+ 
+ ssize_t iomap_file_buffered_write(struct kiocb *iocb, struct iov_iter *from,
+ 		const struct iomap_ops *ops);
++int iomap_readpage(struct page *page, const struct iomap_ops *ops);
++int iomap_readpages(struct address_space *mapping, struct list_head *pages,
++		unsigned nr_pages, const struct iomap_ops *ops);
+ int iomap_file_dirty(struct inode *inode, loff_t pos, loff_t len,
+ 		const struct iomap_ops *ops);
+ int iomap_zero_range(struct inode *inode, loff_t pos, loff_t len,
 -- 
 2.17.0
