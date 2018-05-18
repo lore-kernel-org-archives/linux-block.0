@@ -1,63 +1,61 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 33/33] block: document usage of bio iterator helpers
-Date: Thu, 24 May 2018 17:01:38 +0800
-Message-Id: <20180524090139.2150-34-ming.lei@redhat.com>
-In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
-References: <20180524090139.2150-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:49714 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750957AbeERQsp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 May 2018 12:48:45 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 04/34] fs: remove the buffer_unwritten check in page_seek_hole_data
+Date: Fri, 18 May 2018 18:48:00 +0200
+Message-Id: <20180518164830.1552-5-hch@lst.de>
+In-Reply-To: <20180518164830.1552-1-hch@lst.de>
+References: <20180518164830.1552-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Now multipage bvec is supported, and some helpers may return page by
-page, and some may return segment by segment, this patch documents the
-usage for helping us use them correctly.
+We only call into this function through the iomap iterators, so we already
+know the buffer is unwritten.  In addition to that we always require the
+uptodate flag that is ORed with the result anyway.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- Documentation/block/biovecs.txt | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ fs/iomap.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
-diff --git a/Documentation/block/biovecs.txt b/Documentation/block/biovecs.txt
-index b4d238b8d9fc..32a6643caeca 100644
---- a/Documentation/block/biovecs.txt
-+++ b/Documentation/block/biovecs.txt
-@@ -117,3 +117,35 @@ Other implications:
-    size limitations and the limitations of the underlying devices. Thus
-    there's no need to define ->merge_bvec_fn() callbacks for individual block
-    drivers.
-+
-+Usage of helpers:
-+=================
-+
-+* The following helpers which name has suffix of "_all" can only be used on
-+non-BIO_CLONED bio, and ususally they are used by filesystem code, and driver
-+shouldn't use them becasue bio may have been splitted before they got to the
-+driver:
-+
-+	bio_for_each_segment_all()
-+	bio_for_each_page_all()
-+	bio_pages_all()
-+	bio_first_bvec_all()
-+	bio_first_page_all()
-+	bio_last_bvec_all()
-+	segment_for_each_page_all()
-+
-+* The following helpers iterate bio page by page, and the local variable of
-+'struct bio_vec' or the reference records single page io vector during the
-+itearation:
-+
-+	bio_for_each_page()
-+	bio_for_each_page_all()
-+	segment_for_each_page_all()
-+
-+* The following helpers iterate bio segment by segment, and each segment may
-+include multiple physically contiguous pages, and the local variable of
-+'struct bio_vec' or the reference records multi page io vector during the
-+itearation:
-+
-+	bio_for_each_segment()
-+	bio_for_each_segment_all()
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 4a01d2f4e8e9..bef5e91d40bf 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -611,14 +611,9 @@ page_seek_hole_data(struct page *page, loff_t lastoff, int whence)
+ 			continue;
+ 
+ 		/*
+-		 * Unwritten extents that have data in the page cache covering
+-		 * them can be identified by the BH_Unwritten state flag.
+-		 * Pages with multiple buffers might have a mix of holes, data
+-		 * and unwritten extents - any buffer with valid data in it
+-		 * should have BH_Uptodate flag set on it.
++		 * Any buffer with valid data in it should have BH_Uptodate set.
+ 		 */
+-
+-		if ((buffer_unwritten(bh) || buffer_uptodate(bh)) == seek_data)
++		if (buffer_uptodate(bh) == seek_data)
+ 			return lastoff;
+ 
+ 		lastoff = offset;
+@@ -630,8 +625,8 @@ page_seek_hole_data(struct page *page, loff_t lastoff, int whence)
+  * Seek for SEEK_DATA / SEEK_HOLE in the page cache.
+  *
+  * Within unwritten extents, the page cache determines which parts are holes
+- * and which are data: unwritten and uptodate buffer heads count as data;
+- * everything else counts as a hole.
++ * and which are data: uptodate buffer heads count as data; everything else
++ * counts as a hole.
+  *
+  * Returns the resulting offset on successs, and -ENOENT otherwise.
+  */
 -- 
-2.9.5
+2.17.0
