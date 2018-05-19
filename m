@@ -5,9 +5,9 @@ Cc: linux-block@vger.kernel.org,
 	Ming Lei <ming.lei@redhat.com>,
 	stable@vger.kernel.org,
 	Omar Sandoval <osandov@fb.com>
-Subject: [PATCH V2] blk-mq: avoid to starve tag allocation after allocation process migrates
-Date: Sat, 19 May 2018 15:44:06 +0800
-Message-Id: <20180519074406.6045-1-ming.lei@redhat.com>
+Subject: [PATCH] blk-mq: avoid to starve tag allocation after allocation process migrates
+Date: Sat, 19 May 2018 15:27:47 +0800
+Message-Id: <20180519072747.20070-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
 When the allocation process is scheduled back and the mapped hw queue is
@@ -21,17 +21,13 @@ Cc: <stable@vger.kernel.org>
 Cc: Omar Sandoval <osandov@fb.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
-
-V2:
-	fix build failure
-
  block/blk-mq-tag.c      | 13 +++++++++++++
  include/linux/sbitmap.h |  7 +++++++
  lib/sbitmap.c           |  6 ++++++
  3 files changed, 26 insertions(+)
 
 diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 336dde07b230..77607f89d205 100644
+index 336dde07b230..a965db489f98 100644
 --- a/block/blk-mq-tag.c
 +++ b/block/blk-mq-tag.c
 @@ -134,6 +134,8 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
@@ -63,7 +59,7 @@ index 336dde07b230..77607f89d205 100644
 +		 * be starved.
 +		 */
 +		if (bt != bt_orig)
-+			sbitmap_queue_wake_up(bt_orig);
++			sbitmap_queue_wake(bt_orig);
 +
  		ws = bt_wait_ptr(bt, data->hctx);
  	} while (1);
