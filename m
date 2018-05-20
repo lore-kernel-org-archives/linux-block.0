@@ -1,64 +1,51 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-Date: Sun, 20 May 2018 19:00:55 -0400
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "mingo@kernel.org" <mingo@kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+Return-Path: <prvs=6716b5697=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "kent.overstreet@gmail.com" <kent.overstreet@gmail.com>
+CC: "mingo@kernel.org" <mingo@kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH 00/10] Misc block layer patches for bcachefs
-Message-ID: <20180520230055.GD11495@kmo-pixel>
+Date: Sun, 20 May 2018 22:35:29 +0000
+Message-ID: <b0aa2a8737b2d826fea58dc0bc113ddce50f018a.camel@wdc.com>
 References: <20180509013358.16399-1-kent.overstreet@gmail.com>
- <a26feed52ec6ed371b3d3b0567e31d1ff4fc31cb.camel@wdc.com>
- <20180518090636.GA14738@kmo-pixel>
- <8f62d8f870c6b66e90d3e7f57acee481acff57f5.camel@wdc.com>
- <20180520221733.GA11495@kmo-pixel>
- <bb4fd32d0baa6554615a7ec3b45cc2b89424328e.camel@wdc.com>
- <20180520223116.GB11495@kmo-pixel>
- <b0aa2a8737b2d826fea58dc0bc113ddce50f018a.camel@wdc.com>
+	 <a26feed52ec6ed371b3d3b0567e31d1ff4fc31cb.camel@wdc.com>
+	 <20180518090636.GA14738@kmo-pixel>
+	 <8f62d8f870c6b66e90d3e7f57acee481acff57f5.camel@wdc.com>
+	 <20180520221733.GA11495@kmo-pixel>
+	 <bb4fd32d0baa6554615a7ec3b45cc2b89424328e.camel@wdc.com>
+	 <20180520223116.GB11495@kmo-pixel>
+In-Reply-To: <20180520223116.GB11495@kmo-pixel>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <b0aa2a8737b2d826fea58dc0bc113ddce50f018a.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Sun, May 20, 2018 at 10:35:29PM +0000, Bart Van Assche wrote:
-> On Sun, 2018-05-20 at 18:31 -0400, Kent Overstreet wrote:
-> > On Sun, May 20, 2018 at 10:19:13PM +0000, Bart Van Assche wrote:
-> > > On Sun, 2018-05-20 at 18:17 -0400, Kent Overstreet wrote:
-> > > > On Fri, May 18, 2018 at 03:12:27PM +0000, Bart Van Assche wrote:
-> > > > > On Fri, 2018-05-18 at 05:06 -0400, Kent Overstreet wrote:
-> > > > > > On Thu, May 17, 2018 at 08:54:57PM +0000, Bart Van Assche wrote:
-> > > > > > > With Jens' latest for-next branch I hit the kernel warning shown below. Can
-> > > > > > > you have a look?
-> > > > > > 
-> > > > > > Any hints on how to reproduce it?
-> > > > > 
-> > > > > Sure. This is how I triggered it:
-> > > > > * Clone https://github.com/bvanassche/srp-test.
-> > > > > * Follow the instructions in README.md.
-> > > > > * Run srp-test/run_tests -c -r 10
-> > > > 
-> > > > Can you bisect it? I don't have infiniband hardware handy...
-> > > 
-> > > Hello Kent,
-> > > 
-> > > Have you noticed that the test I described uses the rdma_rxe driver and hence that
-> > > no InfiniBand hardware is needed to run that test?
-> > 
-> > No, I'm not terribly familiar with infiniband stuff....
-> > 
-> > Do you have some sort of self contained test/qemu recipe? I would really rather
-> > not have to figure out how to configure multipath, and infiniband, and I'm not
-> > even sure what else is needed based on that readme...
-> 
-> Hello Kent,
-> 
-> Please have another look at the srp-test README. The instructions in that document
-> are easy to follow. No multipath nor any InfiniBand knowledge is required. The test
-> even can be run in a virtual machine in case you would be worried about potential
-> impact of the test on the rest of the system.
-
-Your readme refers to kernel config options that don't even exist in the current
-kernel
+T24gU3VuLCAyMDE4LTA1LTIwIGF0IDE4OjMxIC0wNDAwLCBLZW50IE92ZXJzdHJlZXQgd3JvdGU6
+DQo+IE9uIFN1biwgTWF5IDIwLCAyMDE4IGF0IDEwOjE5OjEzUE0gKzAwMDAsIEJhcnQgVmFuIEFz
+c2NoZSB3cm90ZToNCj4gPiBPbiBTdW4sIDIwMTgtMDUtMjAgYXQgMTg6MTcgLTA0MDAsIEtlbnQg
+T3ZlcnN0cmVldCB3cm90ZToNCj4gPiA+IE9uIEZyaSwgTWF5IDE4LCAyMDE4IGF0IDAzOjEyOjI3
+UE0gKzAwMDAsIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gPiA+ID4gT24gRnJpLCAyMDE4LTA1
+LTE4IGF0IDA1OjA2IC0wNDAwLCBLZW50IE92ZXJzdHJlZXQgd3JvdGU6DQo+ID4gPiA+ID4gT24g
+VGh1LCBNYXkgMTcsIDIwMTggYXQgMDg6NTQ6NTdQTSArMDAwMCwgQmFydCBWYW4gQXNzY2hlIHdy
+b3RlOg0KPiA+ID4gPiA+ID4gV2l0aCBKZW5zJyBsYXRlc3QgZm9yLW5leHQgYnJhbmNoIEkgaGl0
+IHRoZSBrZXJuZWwgd2FybmluZyBzaG93biBiZWxvdy4gQ2FuDQo+ID4gPiA+ID4gPiB5b3UgaGF2
+ZSBhIGxvb2s/DQo+ID4gPiA+ID4gDQo+ID4gPiA+ID4gQW55IGhpbnRzIG9uIGhvdyB0byByZXBy
+b2R1Y2UgaXQ/DQo+ID4gPiA+IA0KPiA+ID4gPiBTdXJlLiBUaGlzIGlzIGhvdyBJIHRyaWdnZXJl
+ZCBpdDoNCj4gPiA+ID4gKiBDbG9uZSBodHRwczovL2dpdGh1Yi5jb20vYnZhbmFzc2NoZS9zcnAt
+dGVzdC4NCj4gPiA+ID4gKiBGb2xsb3cgdGhlIGluc3RydWN0aW9ucyBpbiBSRUFETUUubWQuDQo+
+ID4gPiA+ICogUnVuIHNycC10ZXN0L3J1bl90ZXN0cyAtYyAtciAxMA0KPiA+ID4gDQo+ID4gPiBD
+YW4geW91IGJpc2VjdCBpdD8gSSBkb24ndCBoYXZlIGluZmluaWJhbmQgaGFyZHdhcmUgaGFuZHku
+Li4NCj4gPiANCj4gPiBIZWxsbyBLZW50LA0KPiA+IA0KPiA+IEhhdmUgeW91IG5vdGljZWQgdGhh
+dCB0aGUgdGVzdCBJIGRlc2NyaWJlZCB1c2VzIHRoZSByZG1hX3J4ZSBkcml2ZXIgYW5kIGhlbmNl
+IHRoYXQNCj4gPiBubyBJbmZpbmlCYW5kIGhhcmR3YXJlIGlzIG5lZWRlZCB0byBydW4gdGhhdCB0
+ZXN0Pw0KPiANCj4gTm8sIEknbSBub3QgdGVycmlibHkgZmFtaWxpYXIgd2l0aCBpbmZpbmliYW5k
+IHN0dWZmLi4uLg0KPiANCj4gRG8geW91IGhhdmUgc29tZSBzb3J0IG9mIHNlbGYgY29udGFpbmVk
+IHRlc3QvcWVtdSByZWNpcGU/IEkgd291bGQgcmVhbGx5IHJhdGhlcg0KPiBub3QgaGF2ZSB0byBm
+aWd1cmUgb3V0IGhvdyB0byBjb25maWd1cmUgbXVsdGlwYXRoLCBhbmQgaW5maW5pYmFuZCwgYW5k
+IEknbSBub3QNCj4gZXZlbiBzdXJlIHdoYXQgZWxzZSBpcyBuZWVkZWQgYmFzZWQgb24gdGhhdCBy
+ZWFkbWUuLi4NCg0KSGVsbG8gS2VudCwNCg0KUGxlYXNlIGhhdmUgYW5vdGhlciBsb29rIGF0IHRo
+ZSBzcnAtdGVzdCBSRUFETUUuIFRoZSBpbnN0cnVjdGlvbnMgaW4gdGhhdCBkb2N1bWVudA0KYXJl
+IGVhc3kgdG8gZm9sbG93LiBObyBtdWx0aXBhdGggbm9yIGFueSBJbmZpbmlCYW5kIGtub3dsZWRn
+ZSBpcyByZXF1aXJlZC4gVGhlIHRlc3QNCmV2ZW4gY2FuIGJlIHJ1biBpbiBhIHZpcnR1YWwgbWFj
+aGluZSBpbiBjYXNlIHlvdSB3b3VsZCBiZSB3b3JyaWVkIGFib3V0IHBvdGVudGlhbA0KaW1wYWN0
+IG9mIHRoZSB0ZXN0IG9uIHRoZSByZXN0IG9mIHRoZSBzeXN0ZW0uDQoNCkJhcnQuDQoNCg0K
