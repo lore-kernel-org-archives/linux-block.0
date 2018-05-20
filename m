@@ -1,22 +1,99 @@
-Return-Path: <BATV+a8c6d037863aa87ae187+5385+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Tue, 22 May 2018 03:09:15 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Kent Overstreet <kent.overstreet@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	axboe@kernel.dk, hch@infradead.org, colyli@suse.de,
-	snitzer@redhat.com, darrick.wong@oracle.com, clm@fb.com,
-	bacik@fb.com, linux-xfs@vger.kernel.org, drbd-dev@lists.linbit.com,
-	linux-btrfs@vger.kernel.org, linux-raid@vger.kernel.org,
+Return-Path: <kent.overstreet@gmail.com>
+Return-Path: <kent.overstreet@gmail.com>
+From: Kent Overstreet <kent.overstreet@gmail.com>
+To: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	axboe@kernel.dk,
+	hch@infradead.org,
+	colyli@suse.de,
+	snitzer@redhat.com,
+	darrick.wong@oracle.com,
+	clm@fb.com,
+	bacik@fb.com,
+	linux-xfs@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	linux-btrfs@vger.kernel.org,
+	linux-raid@vger.kernel.org,
 	neilb@suse.com
-Subject: Re: [PATCH 08/12] target: convert to bioset_init()/mempool_init()
-Message-ID: <20180522100915.GB4477@infradead.org>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Subject: [PATCH 08/12] target: convert to bioset_init()/mempool_init()
+Date: Sun, 20 May 2018 18:25:54 -0400
+Message-Id: <20180520222558.7053-9-kent.overstreet@gmail.com>
+In-Reply-To: <20180520222558.7053-1-kent.overstreet@gmail.com>
 References: <20180520222558.7053-1-kent.overstreet@gmail.com>
- <20180520222558.7053-9-kent.overstreet@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180520222558.7053-9-kent.overstreet@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
+Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
+---
+ drivers/target/target_core_iblock.c | 14 ++++++--------
+ drivers/target/target_core_iblock.h |  2 +-
+ 2 files changed, 7 insertions(+), 9 deletions(-)
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
+index 44cacd001a..ce1321a5cb 100644
+--- a/drivers/target/target_core_iblock.c
++++ b/drivers/target/target_core_iblock.c
+@@ -94,8 +94,8 @@ static int iblock_configure_device(struct se_device *dev)
+ 		return -EINVAL;
+ 	}
+ 
+-	ib_dev->ibd_bio_set = bioset_create(IBLOCK_BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
+-	if (!ib_dev->ibd_bio_set) {
++	ret = bioset_init(&ib_dev->ibd_bio_set, IBLOCK_BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
++	if (ret) {
+ 		pr_err("IBLOCK: Unable to create bioset\n");
+ 		goto out;
+ 	}
+@@ -141,7 +141,7 @@ static int iblock_configure_device(struct se_device *dev)
+ 
+ 	bi = bdev_get_integrity(bd);
+ 	if (bi) {
+-		struct bio_set *bs = ib_dev->ibd_bio_set;
++		struct bio_set *bs = &ib_dev->ibd_bio_set;
+ 
+ 		if (!strcmp(bi->profile->name, "T10-DIF-TYPE3-IP") ||
+ 		    !strcmp(bi->profile->name, "T10-DIF-TYPE1-IP")) {
+@@ -174,8 +174,7 @@ static int iblock_configure_device(struct se_device *dev)
+ out_blkdev_put:
+ 	blkdev_put(ib_dev->ibd_bd, FMODE_WRITE|FMODE_READ|FMODE_EXCL);
+ out_free_bioset:
+-	bioset_free(ib_dev->ibd_bio_set);
+-	ib_dev->ibd_bio_set = NULL;
++	bioset_exit(&ib_dev->ibd_bio_set);
+ out:
+ 	return ret;
+ }
+@@ -199,8 +198,7 @@ static void iblock_destroy_device(struct se_device *dev)
+ 
+ 	if (ib_dev->ibd_bd != NULL)
+ 		blkdev_put(ib_dev->ibd_bd, FMODE_WRITE|FMODE_READ|FMODE_EXCL);
+-	if (ib_dev->ibd_bio_set != NULL)
+-		bioset_free(ib_dev->ibd_bio_set);
++	bioset_exit(&ib_dev->ibd_bio_set);
+ }
+ 
+ static unsigned long long iblock_emulate_read_cap_with_block_size(
+@@ -332,7 +330,7 @@ iblock_get_bio(struct se_cmd *cmd, sector_t lba, u32 sg_num, int op,
+ 	if (sg_num > BIO_MAX_PAGES)
+ 		sg_num = BIO_MAX_PAGES;
+ 
+-	bio = bio_alloc_bioset(GFP_NOIO, sg_num, ib_dev->ibd_bio_set);
++	bio = bio_alloc_bioset(GFP_NOIO, sg_num, &ib_dev->ibd_bio_set);
+ 	if (!bio) {
+ 		pr_err("Unable to allocate memory for bio\n");
+ 		return NULL;
+diff --git a/drivers/target/target_core_iblock.h b/drivers/target/target_core_iblock.h
+index b4aeb2584a..9cc3843404 100644
+--- a/drivers/target/target_core_iblock.h
++++ b/drivers/target/target_core_iblock.h
+@@ -22,7 +22,7 @@ struct iblock_dev {
+ 	struct se_device dev;
+ 	unsigned char ibd_udev_path[SE_UDEV_PATH_LEN];
+ 	u32	ibd_flags;
+-	struct bio_set	*ibd_bio_set;
++	struct bio_set	ibd_bio_set;
+ 	struct block_device *ibd_bd;
+ 	bool ibd_readonly;
+ } ____cacheline_aligned;
+-- 
+2.17.0
