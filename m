@@ -1,37 +1,47 @@
-Return-Path: <msnitzer@redhat.com>
-Date: Mon, 21 May 2018 10:03:56 -0400
-From: Mike Snitzer <snitzer@redhat.com>
-To: Kent Overstreet <kent.overstreet@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	axboe@kernel.dk, hch@infradead.org, colyli@suse.de,
-	darrick.wong@oracle.com, clm@fb.com, bacik@fb.com,
-	linux-xfs@vger.kernel.org, drbd-dev@lists.linbit.com,
-	linux-btrfs@vger.kernel.org, linux-raid@vger.kernel.org,
-	neilb@suse.com
-Subject: Re: [PATCH 00/13] convert block layer to bioset_init()/mempool_init()
-Message-ID: <20180521140348.GA19069@redhat.com>
-References: <20180520222558.7053-1-kent.overstreet@gmail.com>
+Return-Path: <kent.overstreet@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180520222558.7053-1-kent.overstreet@gmail.com>
+In-Reply-To: <87603i0vtx.fsf@notabene.neil.brown.name>
+References: <20180520222558.7053-1-kent.overstreet@gmail.com> <87603i0vtx.fsf@notabene.neil.brown.name>
+From: Kent Overstreet <kent.overstreet@gmail.com>
+Date: Sun, 20 May 2018 19:11:48 -0400
+Message-ID: <CAC7rs0vUCMuCvNez4Rr0M=OFEokKbL92e_R-M3nJ-gfoaLhgxw@mail.gmail.com>
+Subject: Re: [PATCH 00/13] convert block layer to bioset_init()/mempool_init()
+To: NeilBrown <neilb@suse.com>
+Cc: Shaohua Li <shli@kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>, Coly Li <colyli@suse.de>,
+	Mike Snitzer <snitzer@redhat.com>, "Darrick J. Wong" <darrick.wong@oracle.com>, Chris Mason <clm@fb.com>,
+	bacik@fb.com, linux-xfs@vger.kernel.org,
+	Lars Ellenberg <drbd-dev@lists.linbit.com>, linux-btrfs@vger.kernel.org,
+	"open list:SOFTWARE RAID (Multiple Disks) SUPPORT" <linux-raid@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On Sun, May 20 2018 at  6:25pm -0400,
-Kent Overstreet <kent.overstreet@gmail.com> wrote:
+Thanks - sending it to him
 
-> Jens - this series does the rest of the conversions that Christoph wanted, and
-> drops bioset_create().
-> 
-> Only lightly tested, but the changes are pretty mechanical. Based on your
-> for-next tree.
-
-By switching 'mempool_t *' to 'mempool_t' and 'bio_set *' to 'bio_set'
-you've altered the alignment of members in data structures.  So I'll
-need to audit all the data structures you've modified in DM.
-
-Could we get the backstory on _why_ you're making this change?
-Would go a long way to helping me appreciate why this is a good use of
-anyone's time.
-
-Thanks,
-Mike
+On Sun, May 20, 2018 at 7:08 PM, NeilBrown <neilb@suse.com> wrote:
+> On Sun, May 20 2018, Kent Overstreet wrote:
+>
+>> Jens - this series does the rest of the conversions that Christoph wanted, and
+>> drops bioset_create().
+>>
+>> Only lightly tested, but the changes are pretty mechanical. Based on your
+>> for-next tree.
+>>
+>> It's also in the for-jens branch at https://evilpiepirate.org/git/bcachefs.git
+>>
+>> Kent Overstreet (12):
+>>   block: convert bounce, q->bio_split to bioset_init()/mempool_init()
+>>   drbd: convert to bioset_init()/mempool_init()
+>>   pktcdvd: convert to bioset_init()/mempool_init()
+>>   lightnvm: convert to bioset_init()/mempool_init()
+>>   bcache: convert to bioset_init()/mempool_init()
+>>   md: convert to bioset_init()/mempool_init()
+>
+> Hi Kent,
+>  this conversion looks really good, thanks for Ccing me on it.
+>  However as Shaohua Li is now the maintainer of md, it probably should
+>  have gone to him as well.
+>
+> Thanks,
+> NeilBrown
