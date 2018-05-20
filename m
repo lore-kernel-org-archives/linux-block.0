@@ -1,32 +1,139 @@
-Return-Path: <prvs=6716b5697=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "kent.overstreet@gmail.com" <kent.overstreet@gmail.com>
-CC: "mingo@kernel.org" <mingo@kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+Return-Path: <kent.overstreet@gmail.com>
+Return-Path: <kent.overstreet@gmail.com>
+Date: Sun, 20 May 2018 19:21:39 -0400
+From: Kent Overstreet <kent.overstreet@gmail.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "mingo@kernel.org" <mingo@kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH 00/10] Misc block layer patches for bcachefs
-Date: Sun, 20 May 2018 23:40:45 +0000
-Message-ID: <238bacfbc43245159c1586189a436efbb069306b.camel@wdc.com>
+Message-ID: <20180520232139.GE11495@kmo-pixel>
 References: <20180509013358.16399-1-kent.overstreet@gmail.com>
-	 <a26feed52ec6ed371b3d3b0567e31d1ff4fc31cb.camel@wdc.com>
-	 <20180518090636.GA14738@kmo-pixel>
-	 <8f62d8f870c6b66e90d3e7f57acee481acff57f5.camel@wdc.com>
-	 <20180520221733.GA11495@kmo-pixel>
-	 <bb4fd32d0baa6554615a7ec3b45cc2b89424328e.camel@wdc.com>
-	 <20180520223116.GB11495@kmo-pixel>
-	 <b0aa2a8737b2d826fea58dc0bc113ddce50f018a.camel@wdc.com>
-	 <20180520232139.GE11495@kmo-pixel>
-In-Reply-To: <20180520232139.GE11495@kmo-pixel>
-Content-Type: text/plain; charset="utf-8"
+ <a26feed52ec6ed371b3d3b0567e31d1ff4fc31cb.camel@wdc.com>
+ <20180518090636.GA14738@kmo-pixel>
+ <8f62d8f870c6b66e90d3e7f57acee481acff57f5.camel@wdc.com>
+ <20180520221733.GA11495@kmo-pixel>
+ <bb4fd32d0baa6554615a7ec3b45cc2b89424328e.camel@wdc.com>
+ <20180520223116.GB11495@kmo-pixel>
+ <b0aa2a8737b2d826fea58dc0bc113ddce50f018a.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <b0aa2a8737b2d826fea58dc0bc113ddce50f018a.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gU3VuLCAyMDE4LTA1LTIwIGF0IDE5OjIxIC0wNDAwLCBLZW50IE92ZXJzdHJlZXQgd3JvdGU6
-DQo+IEkgcmVhbGx5IGhhdmUgYmV0dGVyIHRoaW5ncyB0byBkbyB0aGFuIGRlYnVnIHNvbWVvbmUg
-ZWxzZSdzIHRlc3RzLi4uDQo+IFsgLi4uIF0NCj4gLi4vcnVuX3Rlc3RzOiBsaW5lIDY1OiBjZDog
-L2xpYi9tb2R1bGVzLzQuMTYuMCsva2VybmVsL2Jsb2NrOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0
-b3J5DQoNCktlcm5lbCB2NC4xNiBpcyB0b28gb2xkIHRvIHJ1biB0aGVzZSB0ZXN0cy4gVGhlIHNy
-cC10ZXN0IHNjcmlwdCBuZWVkcyB0aGUNCmZvbGxvd2luZyBjb21taXQgdGhhdCB3ZW50IHVwc3Ry
-ZWFtIGluIGtlcm5lbCB2NC4xNy1yYzE6DQoNCjYzY2YxYTkwMmM5ZCAoIklCL3NycHQ6IEFkZCBS
-RE1BL0NNIHN1cHBvcnQiKQ0KDQpCYXJ0Lg0KDQoNCg==
+On Sun, May 20, 2018 at 10:35:29PM +0000, Bart Van Assche wrote:
+> On Sun, 2018-05-20 at 18:31 -0400, Kent Overstreet wrote:
+> > On Sun, May 20, 2018 at 10:19:13PM +0000, Bart Van Assche wrote:
+> > > On Sun, 2018-05-20 at 18:17 -0400, Kent Overstreet wrote:
+> > > > On Fri, May 18, 2018 at 03:12:27PM +0000, Bart Van Assche wrote:
+> > > > > On Fri, 2018-05-18 at 05:06 -0400, Kent Overstreet wrote:
+> > > > > > On Thu, May 17, 2018 at 08:54:57PM +0000, Bart Van Assche wrote:
+> > > > > > > With Jens' latest for-next branch I hit the kernel warning shown below. Can
+> > > > > > > you have a look?
+> > > > > > 
+> > > > > > Any hints on how to reproduce it?
+> > > > > 
+> > > > > Sure. This is how I triggered it:
+> > > > > * Clone https://github.com/bvanassche/srp-test.
+> > > > > * Follow the instructions in README.md.
+> > > > > * Run srp-test/run_tests -c -r 10
+> > > > 
+> > > > Can you bisect it? I don't have infiniband hardware handy...
+> > > 
+> > > Hello Kent,
+> > > 
+> > > Have you noticed that the test I described uses the rdma_rxe driver and hence that
+> > > no InfiniBand hardware is needed to run that test?
+> > 
+> > No, I'm not terribly familiar with infiniband stuff....
+> > 
+> > Do you have some sort of self contained test/qemu recipe? I would really rather
+> > not have to figure out how to configure multipath, and infiniband, and I'm not
+> > even sure what else is needed based on that readme...
+> 
+> Hello Kent,
+> 
+> Please have another look at the srp-test README. The instructions in that document
+> are easy to follow. No multipath nor any InfiniBand knowledge is required. The test
+> even can be run in a virtual machine in case you would be worried about potential
+> impact of the test on the rest of the system.
+
+
+I really have better things to do than debug someone else's tests...
+
+Restarting multipath-tools (via systemctl): multipath-tools.service.
+multipathd> reconfigure
+ok
+multipathd> make -C discontiguous-io discontiguous-io
+make[1]: Entering directory '/host/home/kent/ktest/tests/srp-test/discontiguous-io'
+make[1]: 'discontiguous-io' is up to date.
+make[1]: Leaving directory '/host/home/kent/ktest/tests/srp-test/discontiguous-io'
+Unloaded the ib_srpt kernel module
+Unloaded the rdma_rxe kernel module
+../run_tests: line 65: cd: /lib/modules/4.16.0+/kernel/block: No such file or directory
+Zero-initializing /dev/ram0 ... done
+Zero-initializing /dev/ram1 ... done
+Unable to load target_core_pscsi
+Unable to load target_core_user
+Configured SRP target driver
+Running test ../tests/01 ...
+Unloaded the ib_srp kernel module
+SRP login failed
+Test ../tests/01 failed
+Running test ../tests/02-mq ...
+Test file I/O on top of multipath concurrently with logout and login (10 min; mq)
+Unloaded the ib_srp kernel module
+SRP login failed
+Test ../tests/02-mq failed
+Running test ../tests/02-sq ...
+Test file I/O on top of multipath concurrently with logout and login (10 min; sq)
+Unloaded the ib_srp kernel module
+SRP login failed
+Test ../tests/02-sq failed
+Running test ../tests/02-sq-on-mq ...
+Test file I/O on top of multipath concurrently with logout and login (10 min; sq-on-mq)
+Unloaded the ib_srp kernel module
+SRP login failed
+Test ../tests/02-sq-on-mq failed
+Running test ../tests/03-4M ...
+Test direct I/O with large transfer sizes and cmd_sg_entries=255
+Unloaded the ib_srp kernel module
+SRP login failed
+Test ../tests/03-4M failed
+Running test ../tests/03-8M ...
+Test direct I/O with large transfer sizes and cmd_sg_entries=255
+Unloaded the ib_srp kernel module
+SRP login failed
+Test ../tests/03-8M failed
+Running test ../tests/04-4M ...
+Test direct I/O with large transfer sizes and cmd_sg_entries=1
+Unloaded the ib_srp kernel module
+SRP login failed
+Test ../tests/04-4M failed
+Running test ../tests/04-8M ...
+Test direct I/O with large transfer sizes and cmd_sg_entries=1
+Unloaded the ib_srp kernel module
+SRP login failed
+Test ../tests/04-8M failed
+Running test ../tests/05-4M ...
+Test buffered I/O with large transfer sizes and cmd_sg_entries=255
+Unloaded the ib_srp kernel module
+SRP login failed
+Test ../tests/05-4M failed
+Running test ../tests/05-8M ...
+Test buffered I/O with large transfer sizes and cmd_sg_entries=255
+Unloaded the ib_srp kernel module
+SRP login failed
+Test ../tests/05-8M failed
+Running test ../tests/06 ...
+Test block I/O on top of multipath concurrently with logout and login (10 min)
+Unloaded the ib_srp kernel module
+SRP login failed
+Test ../tests/06 failed
+0 tests succeeded and 11 tests failed
+Unloaded the ib_srpt kernel module
+Unloaded the rdma_rxe kernel module
+
+========= PASSED srp in 18s
