@@ -14,19 +14,17 @@ To: linux-kernel@vger.kernel.org,
 	drbd-dev@lists.linbit.com,
 	linux-btrfs@vger.kernel.org,
 	linux-raid@vger.kernel.org,
-	neilb@suse.com,
-	shli@fb.com
+	neilb@suse.com
 Cc: Kent Overstreet <kent.overstreet@gmail.com>
 Subject: [PATCH 06/12] md: convert to bioset_init()/mempool_init()
-Date: Sun, 20 May 2018 19:11:32 -0400
-Message-Id: <20180520231132.7970-1-kent.overstreet@gmail.com>
+Date: Sun, 20 May 2018 18:25:52 -0400
+Message-Id: <20180520222558.7053-7-kent.overstreet@gmail.com>
+In-Reply-To: <20180520222558.7053-1-kent.overstreet@gmail.com>
+References: <20180520222558.7053-1-kent.overstreet@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
 Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
 ---
-
-Resend, including Shaohua Li:
-
  drivers/md/md-faulty.c    |  2 +-
  drivers/md/md-linear.c    |  2 +-
  drivers/md/md-multipath.c | 17 ++++-----
