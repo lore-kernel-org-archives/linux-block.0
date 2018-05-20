@@ -1,105 +1,287 @@
-Return-Path: <keith.busch@intel.com>
-From: Keith Busch <keith.busch@intel.com>
-To: linux-nvme@lists.infradead.org,
+Return-Path: <kent.overstreet@gmail.com>
+Return-Path: <kent.overstreet@gmail.com>
+From: Kent Overstreet <kent.overstreet@gmail.com>
+To: linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Laurence Oberman <loberman@redhat.com>,
-	James Smart <james.smart@broadcom.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Keith Busch <keith.busch@intel.com>
-Subject: [PATCH 1/6] nvme: Sync request queues on reset
-Date: Fri, 18 May 2018 10:38:18 -0600
-Message-Id: <20180518163823.27820-1-keith.busch@intel.com>
+	axboe@kernel.dk,
+	hch@infradead.org,
+	colyli@suse.de,
+	snitzer@redhat.com,
+	darrick.wong@oracle.com,
+	clm@fb.com,
+	bacik@fb.com,
+	linux-xfs@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	linux-btrfs@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	neilb@suse.com
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Subject: [PATCH 02/12] drbd: convert to bioset_init()/mempool_init()
+Date: Sun, 20 May 2018 18:25:48 -0400
+Message-Id: <20180520222558.7053-3-kent.overstreet@gmail.com>
+In-Reply-To: <20180520222558.7053-1-kent.overstreet@gmail.com>
+References: <20180520222558.7053-1-kent.overstreet@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch fixes races that occur with simultaneous controller
-resets by synchronizing request queues prior to initializing the
-controller. Withouth this, a thread may attempt disabling a controller
-at the same time as we're trying to enable it.
-
-Signed-off-by: Keith Busch <keith.busch@intel.com>
+Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
 ---
- drivers/nvme/host/core.c | 21 +++++++++++++++++++--
- drivers/nvme/host/nvme.h |  1 +
- drivers/nvme/host/pci.c  |  1 +
- 3 files changed, 21 insertions(+), 2 deletions(-)
+ drivers/block/drbd/drbd_bitmap.c   |  4 +-
+ drivers/block/drbd/drbd_int.h      | 10 ++---
+ drivers/block/drbd/drbd_main.c     | 71 +++++++++++-------------------
+ drivers/block/drbd/drbd_receiver.c |  6 +--
+ drivers/block/drbd/drbd_req.c      |  4 +-
+ drivers/block/drbd/drbd_req.h      |  2 +-
+ 6 files changed, 38 insertions(+), 59 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 99b857e5a7a9..1de68b56b318 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -3471,6 +3471,12 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
- }
- EXPORT_SYMBOL_GPL(nvme_init_ctrl);
+diff --git a/drivers/block/drbd/drbd_bitmap.c b/drivers/block/drbd/drbd_bitmap.c
+index d82237d534..11a85b7403 100644
+--- a/drivers/block/drbd/drbd_bitmap.c
++++ b/drivers/block/drbd/drbd_bitmap.c
+@@ -977,7 +977,7 @@ static void drbd_bm_endio(struct bio *bio)
+ 	bm_page_unlock_io(device, idx);
  
-+static void nvme_start_queue(struct nvme_ns *ns)
-+{
-+	blk_mq_unquiesce_queue(ns->queue);
-+	blk_mq_kick_requeue_list(ns->queue);
-+}
-+
- /**
-  * nvme_kill_queues(): Ends all namespace queues
-  * @ctrl: the dead controller that needs to end
-@@ -3499,7 +3505,7 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
- 		blk_set_queue_dying(ns->queue);
+ 	if (ctx->flags & BM_AIO_COPY_PAGES)
+-		mempool_free(bio->bi_io_vec[0].bv_page, drbd_md_io_page_pool);
++		mempool_free(bio->bi_io_vec[0].bv_page, &drbd_md_io_page_pool);
  
- 		/* Forcibly unquiesce queues to avoid blocking dispatch */
--		blk_mq_unquiesce_queue(ns->queue);
-+		nvme_start_queue(ns);
- 	}
- 	up_read(&ctrl->namespaces_rwsem);
- }
-@@ -3569,11 +3575,22 @@ void nvme_start_queues(struct nvme_ctrl *ctrl)
+ 	bio_put(bio);
  
- 	down_read(&ctrl->namespaces_rwsem);
- 	list_for_each_entry(ns, &ctrl->namespaces, list)
--		blk_mq_unquiesce_queue(ns->queue);
-+		nvme_start_queue(ns);
- 	up_read(&ctrl->namespaces_rwsem);
- }
- EXPORT_SYMBOL_GPL(nvme_start_queues);
+@@ -1014,7 +1014,7 @@ static void bm_page_io_async(struct drbd_bm_aio_ctx *ctx, int page_nr) __must_ho
+ 	bm_set_page_unchanged(b->bm_pages[page_nr]);
  
-+void nvme_sync_queues(struct nvme_ctrl *ctrl)
-+{
-+	struct nvme_ns *ns;
-+
-+	down_read(&ctrl->namespaces_rwsem);
-+	list_for_each_entry(ns, &ctrl->namespaces, list)
-+		blk_sync_queue(ns->queue);
-+	up_read(&ctrl->namespaces_rwsem);
-+}
-+EXPORT_SYMBOL_GPL(nvme_sync_queues);
-+
- int nvme_reinit_tagset(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set)
+ 	if (ctx->flags & BM_AIO_COPY_PAGES) {
+-		page = mempool_alloc(drbd_md_io_page_pool,
++		page = mempool_alloc(&drbd_md_io_page_pool,
+ 				GFP_NOIO | __GFP_HIGHMEM);
+ 		copy_highpage(page, b->bm_pages[page_nr]);
+ 		bm_store_page_idx(page, page_nr);
+diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
+index 06ecee1b52..21b4186add 100644
+--- a/drivers/block/drbd/drbd_int.h
++++ b/drivers/block/drbd/drbd_int.h
+@@ -1405,8 +1405,8 @@ extern struct kmem_cache *drbd_request_cache;
+ extern struct kmem_cache *drbd_ee_cache;	/* peer requests */
+ extern struct kmem_cache *drbd_bm_ext_cache;	/* bitmap extents */
+ extern struct kmem_cache *drbd_al_ext_cache;	/* activity log extents */
+-extern mempool_t *drbd_request_mempool;
+-extern mempool_t *drbd_ee_mempool;
++extern mempool_t drbd_request_mempool;
++extern mempool_t drbd_ee_mempool;
+ 
+ /* drbd's page pool, used to buffer data received from the peer,
+  * or data requested by the peer.
+@@ -1432,16 +1432,16 @@ extern wait_queue_head_t drbd_pp_wait;
+  * 128 should be plenty, currently we probably can get away with as few as 1.
+  */
+ #define DRBD_MIN_POOL_PAGES	128
+-extern mempool_t *drbd_md_io_page_pool;
++extern mempool_t drbd_md_io_page_pool;
+ 
+ /* We also need to make sure we get a bio
+  * when we need it for housekeeping purposes */
+-extern struct bio_set *drbd_md_io_bio_set;
++extern struct bio_set drbd_md_io_bio_set;
+ /* to allocate from that set */
+ extern struct bio *bio_alloc_drbd(gfp_t gfp_mask);
+ 
+ /* And a bio_set for cloning */
+-extern struct bio_set *drbd_io_bio_set;
++extern struct bio_set drbd_io_bio_set;
+ 
+ extern struct mutex resources_mutex;
+ 
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index 185f1ef00a..faea36c5aa 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -124,11 +124,11 @@ struct kmem_cache *drbd_request_cache;
+ struct kmem_cache *drbd_ee_cache;	/* peer requests */
+ struct kmem_cache *drbd_bm_ext_cache;	/* bitmap extents */
+ struct kmem_cache *drbd_al_ext_cache;	/* activity log extents */
+-mempool_t *drbd_request_mempool;
+-mempool_t *drbd_ee_mempool;
+-mempool_t *drbd_md_io_page_pool;
+-struct bio_set *drbd_md_io_bio_set;
+-struct bio_set *drbd_io_bio_set;
++mempool_t drbd_request_mempool;
++mempool_t drbd_ee_mempool;
++mempool_t drbd_md_io_page_pool;
++struct bio_set drbd_md_io_bio_set;
++struct bio_set drbd_io_bio_set;
+ 
+ /* I do not use a standard mempool, because:
+    1) I want to hand out the pre-allocated objects first.
+@@ -153,10 +153,10 @@ struct bio *bio_alloc_drbd(gfp_t gfp_mask)
  {
- 	if (!ctrl->ops->reinit_request)
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 17d2f7cf3fed..c15c2ee7f61a 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -407,6 +407,7 @@ int nvme_sec_submit(void *data, u16 spsp, u8 secp, void *buffer, size_t len,
- void nvme_complete_async_event(struct nvme_ctrl *ctrl, __le16 status,
- 		union nvme_result *res);
+ 	struct bio *bio;
  
-+void nvme_sync_queues(struct nvme_ctrl *ctrl);
- void nvme_stop_queues(struct nvme_ctrl *ctrl);
- void nvme_start_queues(struct nvme_ctrl *ctrl);
- void nvme_kill_queues(struct nvme_ctrl *ctrl);
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 17a0190bd88f..8da63402d474 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2312,6 +2312,7 @@ static void nvme_reset_work(struct work_struct *work)
- 	 */
- 	if (dev->ctrl.ctrl_config & NVME_CC_ENABLE)
- 		nvme_dev_disable(dev, false);
-+	nvme_sync_queues(&dev->ctrl);
+-	if (!drbd_md_io_bio_set)
++	if (!bioset_initialized(&drbd_md_io_bio_set))
+ 		return bio_alloc(gfp_mask, 1);
  
- 	/*
- 	 * Introduce CONNECTING state from nvme-fc/rdma transports to mark the
+-	bio = bio_alloc_bioset(gfp_mask, 1, drbd_md_io_bio_set);
++	bio = bio_alloc_bioset(gfp_mask, 1, &drbd_md_io_bio_set);
+ 	if (!bio)
+ 		return NULL;
+ 	return bio;
+@@ -2097,16 +2097,11 @@ static void drbd_destroy_mempools(void)
+ 
+ 	/* D_ASSERT(device, atomic_read(&drbd_pp_vacant)==0); */
+ 
+-	if (drbd_io_bio_set)
+-		bioset_free(drbd_io_bio_set);
+-	if (drbd_md_io_bio_set)
+-		bioset_free(drbd_md_io_bio_set);
+-	if (drbd_md_io_page_pool)
+-		mempool_destroy(drbd_md_io_page_pool);
+-	if (drbd_ee_mempool)
+-		mempool_destroy(drbd_ee_mempool);
+-	if (drbd_request_mempool)
+-		mempool_destroy(drbd_request_mempool);
++	bioset_exit(&drbd_io_bio_set);
++	bioset_exit(&drbd_md_io_bio_set);
++	mempool_exit(&drbd_md_io_page_pool);
++	mempool_exit(&drbd_ee_mempool);
++	mempool_exit(&drbd_request_mempool);
+ 	if (drbd_ee_cache)
+ 		kmem_cache_destroy(drbd_ee_cache);
+ 	if (drbd_request_cache)
+@@ -2116,11 +2111,6 @@ static void drbd_destroy_mempools(void)
+ 	if (drbd_al_ext_cache)
+ 		kmem_cache_destroy(drbd_al_ext_cache);
+ 
+-	drbd_io_bio_set      = NULL;
+-	drbd_md_io_bio_set   = NULL;
+-	drbd_md_io_page_pool = NULL;
+-	drbd_ee_mempool      = NULL;
+-	drbd_request_mempool = NULL;
+ 	drbd_ee_cache        = NULL;
+ 	drbd_request_cache   = NULL;
+ 	drbd_bm_ext_cache    = NULL;
+@@ -2133,18 +2123,7 @@ static int drbd_create_mempools(void)
+ {
+ 	struct page *page;
+ 	const int number = (DRBD_MAX_BIO_SIZE/PAGE_SIZE) * drbd_minor_count;
+-	int i;
+-
+-	/* prepare our caches and mempools */
+-	drbd_request_mempool = NULL;
+-	drbd_ee_cache        = NULL;
+-	drbd_request_cache   = NULL;
+-	drbd_bm_ext_cache    = NULL;
+-	drbd_al_ext_cache    = NULL;
+-	drbd_pp_pool         = NULL;
+-	drbd_md_io_page_pool = NULL;
+-	drbd_md_io_bio_set   = NULL;
+-	drbd_io_bio_set      = NULL;
++	int i, ret;
+ 
+ 	/* caches */
+ 	drbd_request_cache = kmem_cache_create(
+@@ -2168,26 +2147,26 @@ static int drbd_create_mempools(void)
+ 		goto Enomem;
+ 
+ 	/* mempools */
+-	drbd_io_bio_set = bioset_create(BIO_POOL_SIZE, 0, 0);
+-	if (drbd_io_bio_set == NULL)
++	ret = bioset_init(&drbd_io_bio_set, BIO_POOL_SIZE, 0, 0);
++	if (ret)
+ 		goto Enomem;
+ 
+-	drbd_md_io_bio_set = bioset_create(DRBD_MIN_POOL_PAGES, 0,
+-					   BIOSET_NEED_BVECS);
+-	if (drbd_md_io_bio_set == NULL)
++	ret = bioset_init(&drbd_md_io_bio_set, DRBD_MIN_POOL_PAGES, 0,
++			  BIOSET_NEED_BVECS);
++	if (ret)
+ 		goto Enomem;
+ 
+-	drbd_md_io_page_pool = mempool_create_page_pool(DRBD_MIN_POOL_PAGES, 0);
+-	if (drbd_md_io_page_pool == NULL)
++	ret = mempool_init_page_pool(&drbd_md_io_page_pool, DRBD_MIN_POOL_PAGES, 0);
++	if (ret)
+ 		goto Enomem;
+ 
+-	drbd_request_mempool = mempool_create_slab_pool(number,
+-		drbd_request_cache);
+-	if (drbd_request_mempool == NULL)
++	ret = mempool_init_slab_pool(&drbd_request_mempool, number,
++				     drbd_request_cache);
++	if (ret)
+ 		goto Enomem;
+ 
+-	drbd_ee_mempool = mempool_create_slab_pool(number, drbd_ee_cache);
+-	if (drbd_ee_mempool == NULL)
++	ret = mempool_init_slab_pool(&drbd_ee_mempool, number, drbd_ee_cache);
++	if (ret)
+ 		goto Enomem;
+ 
+ 	/* drbd's page pool */
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index c72dee0ef0..be9450f5ad 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -378,7 +378,7 @@ drbd_alloc_peer_req(struct drbd_peer_device *peer_device, u64 id, sector_t secto
+ 	if (drbd_insert_fault(device, DRBD_FAULT_AL_EE))
+ 		return NULL;
+ 
+-	peer_req = mempool_alloc(drbd_ee_mempool, gfp_mask & ~__GFP_HIGHMEM);
++	peer_req = mempool_alloc(&drbd_ee_mempool, gfp_mask & ~__GFP_HIGHMEM);
+ 	if (!peer_req) {
+ 		if (!(gfp_mask & __GFP_NOWARN))
+ 			drbd_err(device, "%s: allocation failed\n", __func__);
+@@ -409,7 +409,7 @@ drbd_alloc_peer_req(struct drbd_peer_device *peer_device, u64 id, sector_t secto
+ 	return peer_req;
+ 
+  fail:
+-	mempool_free(peer_req, drbd_ee_mempool);
++	mempool_free(peer_req, &drbd_ee_mempool);
+ 	return NULL;
+ }
+ 
+@@ -426,7 +426,7 @@ void __drbd_free_peer_req(struct drbd_device *device, struct drbd_peer_request *
+ 		peer_req->flags &= ~EE_CALL_AL_COMPLETE_IO;
+ 		drbd_al_complete_io(device, &peer_req->i);
+ 	}
+-	mempool_free(peer_req, drbd_ee_mempool);
++	mempool_free(peer_req, &drbd_ee_mempool);
+ }
+ 
+ int drbd_free_peer_reqs(struct drbd_device *device, struct list_head *list)
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+index a500e738d9..a47e4987ee 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -55,7 +55,7 @@ static struct drbd_request *drbd_req_new(struct drbd_device *device, struct bio
+ {
+ 	struct drbd_request *req;
+ 
+-	req = mempool_alloc(drbd_request_mempool, GFP_NOIO);
++	req = mempool_alloc(&drbd_request_mempool, GFP_NOIO);
+ 	if (!req)
+ 		return NULL;
+ 	memset(req, 0, sizeof(*req));
+@@ -184,7 +184,7 @@ void drbd_req_destroy(struct kref *kref)
+ 		}
+ 	}
+ 
+-	mempool_free(req, drbd_request_mempool);
++	mempool_free(req, &drbd_request_mempool);
+ }
+ 
+ static void wake_all_senders(struct drbd_connection *connection)
+diff --git a/drivers/block/drbd/drbd_req.h b/drivers/block/drbd/drbd_req.h
+index cb97b3b309..94c654020f 100644
+--- a/drivers/block/drbd/drbd_req.h
++++ b/drivers/block/drbd/drbd_req.h
+@@ -269,7 +269,7 @@ enum drbd_req_state_bits {
+ static inline void drbd_req_make_private_bio(struct drbd_request *req, struct bio *bio_src)
+ {
+ 	struct bio *bio;
+-	bio = bio_clone_fast(bio_src, GFP_NOIO, drbd_io_bio_set);
++	bio = bio_clone_fast(bio_src, GFP_NOIO, &drbd_io_bio_set);
+ 
+ 	req->private_bio = bio;
+ 
 -- 
-2.14.3
+2.17.0
