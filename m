@@ -1,16 +1,16 @@
-Return-Path: <keith.busch@linux.intel.com>
-Date: Mon, 21 May 2018 10:25:17 -0600
-From: Keith Busch <keith.busch@linux.intel.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 22 May 2018 00:08:37 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@linux.intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	Laurence Oberman <loberman@redhat.com>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	James Smart <james.smart@broadcom.com>,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, Keith Busch <keith.busch@intel.com>,
 	Johannes Thumshirn <jthumshirn@suse.de>,
 	Christoph Hellwig <hch@lst.de>
 Subject: Re: [PATCH 1/6] nvme: Sync request queues on reset
-Message-ID: <20180521162517.GN5528@localhost.localdomain>
+Message-ID: <20180521160830.GA19858@ming.t460p>
 References: <20180518163823.27820-1-keith.busch@intel.com>
  <20180518223210.GB18334@ming.t460p>
  <20180518234408.GA31749@localhost.localdomain>
@@ -18,16 +18,77 @@ References: <20180518163823.27820-1-keith.busch@intel.com>
  <20180521140413.GA5528@localhost.localdomain>
  <20180521152536.GB19099@ming.t460p>
  <20180521155909.GK5528@localhost.localdomain>
- <20180521160830.GA19858@ming.t460p>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180521160830.GA19858@ming.t460p>
+In-Reply-To: <20180521155909.GK5528@localhost.localdomain>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, May 22, 2018 at 12:08:37AM +0800, Ming Lei wrote:
-> Please take a look at blk_mq_complete_request(). Even with Bart's
-> change, the request still won't be completed by driver. The request can
-> only be completed by either driver or blk-mq, not both.
+On Mon, May 21, 2018 at 09:59:09AM -0600, Keith Busch wrote:
+> On Mon, May 21, 2018 at 11:25:43PM +0800, Ming Lei wrote:
+> > On Mon, May 21, 2018 at 08:04:13AM -0600, Keith Busch wrote:
+> > > On Sat, May 19, 2018 at 08:01:42AM +0800, Ming Lei wrote:
+> > > > > You keep saying that, but the controller state is global to the
+> > > > > controller. It doesn't matter which namespace request_queue started the
+> > > > > reset: every namespaces request queue sees the RESETTING controller state
+> > > > 
+> > > > When timeouts come, the global state of RESETTING may not be updated
+> > > > yet, so all the timeouts may not observe the state.
+> > > 
+> > > Even prior to the RESETING state, every single command, no matter
+> > > which namespace or request_queue it came on, is reclaimed by the driver.
+> > > There *should* be no requests to timeout after nvme_dev_disable is called
+> > > because the nvme driver returned control of all requests in the tagset
+> > > to blk-mq.
+> > 
+> > The timed-out requests won't be canceled by nvme_dev_disable().
+> 
+> ??? nvme_dev_disable cancels all started requests. There are no exceptions.
 
-So you're saying blk-mq can't complete a request the driver returned to
-blk-mq to complete. And that's the nvme driver's problem to fix?
+Please take a look at blk_mq_complete_request(). Even with Bart's
+change, the request still won't be completed by driver. The request can
+only be completed by either driver or blk-mq, not both.
+
+> 
+> > If the timed-out requests is handled as RESET_TIMER, there may
+> > be new timeout event triggered again.
+> > 
+> > > 
+> > > In any case, if blk-mq decides it won't complete those requests, we
+> > > can just swap the order in the reset_work: sync first, uncondintionally
+> > > disable. Does the following snippet look more okay?
+> > > 
+> > > ---
+> > > diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+> > > index 17a0190bd88f..42af077ee07a 100644
+> > > --- a/drivers/nvme/host/pci.c
+> > > +++ b/drivers/nvme/host/pci.c
+> > > @@ -2307,11 +2307,14 @@ static void nvme_reset_work(struct work_struct *work)
+> > >  		goto out;
+> > >  
+> > >  	/*
+> > > -	 * If we're called to reset a live controller first shut it down before
+> > > -	 * moving on.
+> > > +	 * Ensure there are no timeout work in progress prior to forcefully
+> > > +	 * disabling the queue. There is no harm in disabling the device even
+> > > +	 * when it was already disabled, as this will forcefully reclaim any
+> > > +	 * IOs that are stuck due to blk-mq's timeout handling that prevents
+> > > +	 * timed out requests from completing.
+> > >  	 */
+> > > -	if (dev->ctrl.ctrl_config & NVME_CC_ENABLE)
+> > > -		nvme_dev_disable(dev, false);
+> > > +	nvme_sync_queues(&dev->ctrl);
+> > > +	nvme_dev_disable(dev, false);
+> > 
+> > That may not work reliably too.
+> > 
+> > For example, request A from NS_0 is timed-out and handled as RESET_TIMER,
+> > meantime request B from NS_1 is timed-out and handled as EH_HANDLED.
+> 
+> Meanwhile, request B's nvme_dev_disable prior to returning EH_HANDLED
+> cancels all requests, which includes request A.
+
+No, please see my above comment.
+
+
+Thanks,
+Ming
