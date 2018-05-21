@@ -1,31 +1,83 @@
-Return-Path: <BATV+a8c6d037863aa87ae187+5385+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Tue, 22 May 2018 03:04:27 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: adam.manzanares@wdc.com
-Cc: viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org, axboe@kernel.dk,
-	bcrl@kvack.org, tglx@linutronix.de, mingo@kernel.org,
-	pombredanne@nexb.com, kstewart@linuxfoundation.org,
-	gregkh@linuxfoundation.org, bigeasy@linutronix.de, jack@suse.cz,
-	darrick.wong@oracle.com, rgoldwyn@suse.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-aio@kvack.org, linux-api@vger.kernel.org
-Subject: Re: [PATCH v5 2/5] fs: Convert kiocb rw_hint from enum to u16
-Message-ID: <20180522100427.GA30026@infradead.org>
+Return-Path: <prvs=672bd835f=adam.manzanares@wdc.com>
+From: adam.manzanares@wdc.com
+To: viro@zeniv.linux.org.uk,
+	linux-fsdevel@vger.kernel.org,
+	axboe@kernel.dk,
+	bcrl@kvack.org
+Cc: tglx@linutronix.de,
+	mingo@kernel.org,
+	pombredanne@nexb.com,
+	kstewart@linuxfoundation.org,
+	gregkh@linuxfoundation.org,
+	bigeasy@linutronix.de,
+	jack@suse.cz,
+	darrick.wong@oracle.com,
+	rgoldwyn@suse.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-aio@kvack.org,
+	linux-api@vger.kernel.org,
+	hch@infradread.org,
+	Adam Manzanares <adam.manzanares@wdc.com>
+Subject: [PATCH v5 2/5] fs: Convert kiocb rw_hint from enum to u16
+Date: Mon, 21 May 2018 09:01:44 -0700
+Message-Id: <20180521160147.2372-3-adam.manzanares@wdc.com>
+In-Reply-To: <20180521160147.2372-1-adam.manzanares@wdc.com>
 References: <20180521160147.2372-1-adam.manzanares@wdc.com>
- <20180521160147.2372-3-adam.manzanares@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180521160147.2372-3-adam.manzanares@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, May 21, 2018 at 09:01:44AM -0700, adam.manzanares@wdc.com wrote:
-> From: Adam Manzanares <adam.manzanares@wdc.com>
-> 
-> In order to avoid kiocb bloat for per command iopriority support, rw_hint
-> is converted from enum to a u16. Added a guard around ki_hint assigment.
-> 
-> Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
+From: Adam Manzanares <adam.manzanares@wdc.com>
 
-Looks good,
+In order to avoid kiocb bloat for per command iopriority support, rw_hint
+is converted from enum to a u16. Added a guard around ki_hint assigment.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
+---
+ include/linux/fs.h | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 7f07977bdfd7..50de40dbbb85 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -284,6 +284,8 @@ enum rw_hint {
+ 	WRITE_LIFE_EXTREME	= RWH_WRITE_LIFE_EXTREME,
+ };
+ 
++#define MAX_KI_HINT		((1 << 16) - 1) /* ki_hint type is u16 */
++
+ #define IOCB_EVENTFD		(1 << 0)
+ #define IOCB_APPEND		(1 << 1)
+ #define IOCB_DIRECT		(1 << 2)
+@@ -299,7 +301,7 @@ struct kiocb {
+ 	void (*ki_complete)(struct kiocb *iocb, long ret, long ret2);
+ 	void			*private;
+ 	int			ki_flags;
+-	enum rw_hint		ki_hint;
++	u16			ki_hint;
+ } __randomize_layout;
+ 
+ static inline bool is_sync_kiocb(struct kiocb *kiocb)
+@@ -1927,12 +1929,19 @@ static inline enum rw_hint file_write_hint(struct file *file)
+ 
+ static inline int iocb_flags(struct file *file);
+ 
++static inline u16 ki_hint_validate(enum rw_hint hint)
++{
++	if (hint > MAX_KI_HINT)
++		return 0;
++	return hint;
++}
++
+ static inline void init_sync_kiocb(struct kiocb *kiocb, struct file *filp)
+ {
+ 	*kiocb = (struct kiocb) {
+ 		.ki_filp = filp,
+ 		.ki_flags = iocb_flags(filp),
+-		.ki_hint = file_write_hint(filp),
++		.ki_hint = ki_hint_validate(file_write_hint(filp)),
+ 	};
+ }
+ 
+-- 
+2.15.1
