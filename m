@@ -1,88 +1,62 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:50042 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751747AbeERQte (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 May 2018 12:49:34 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 21/34] xfs: move locking into xfs_bmap_punch_delalloc_range
-Date: Fri, 18 May 2018 18:48:17 +0200
-Message-Id: <20180518164830.1552-22-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=672e5e3bd=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will.deacon@arm.com>,
+	Russell King <linux@armlinux.org.uk>
+Subject: [PATCH v12 1/2] ARM: cmpxchg64: Only define cmpxchg64() if not using the Thumb instruction set
+Date: Mon, 21 May 2018 10:16:51 -0700
+Message-Id: <20180521171652.3021-2-bart.vanassche@wdc.com>
+In-Reply-To: <20180521171652.3021-1-bart.vanassche@wdc.com>
+References: <20180521171652.3021-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Both callers want the same looking, so do it only once.
+Since the implementation of cmpxchg64() uses instructions that are not
+Thumb instructions, only define cmpxchg64() if not building in Thumb
+mode. This patch allows the next patch in this series to check for
+cmpxchg64() support using #if defined(cmpxchg64).
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: Russell King <linux@armlinux.org.uk>
 ---
- fs/xfs/xfs_aops.c      | 2 --
- fs/xfs/xfs_bmap_util.c | 7 ++++---
- fs/xfs/xfs_iomap.c     | 3 ---
- 3 files changed, 4 insertions(+), 8 deletions(-)
+ arch/arm/include/asm/cmpxchg.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index f2333e351e07..5dd09e83c81c 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -761,10 +761,8 @@ xfs_aops_discard_page(
- 		"page discard on page "PTR_FMT", inode 0x%llx, offset %llu.",
- 			page, ip->i_ino, offset);
+diff --git a/arch/arm/include/asm/cmpxchg.h b/arch/arm/include/asm/cmpxchg.h
+index 8b701f8e175c..41ab99bc04ca 100644
+--- a/arch/arm/include/asm/cmpxchg.h
++++ b/arch/arm/include/asm/cmpxchg.h
+@@ -141,7 +141,9 @@ static inline unsigned long __xchg(unsigned long x, volatile void *ptr, int size
+ 					        sizeof(*(ptr)));	\
+ })
  
--	xfs_ilock(ip, XFS_ILOCK_EXCL);
- 	error = xfs_bmap_punch_delalloc_range(ip, start_fsb,
- 			PAGE_SIZE / i_blocksize(inode));
--	xfs_iunlock(ip, XFS_ILOCK_EXCL);
- 	if (error && !XFS_FORCED_SHUTDOWN(mp))
- 		xfs_alert(mp, "page discard unable to remove delalloc mapping.");
- out_invalidate:
-diff --git a/fs/xfs/xfs_bmap_util.c b/fs/xfs/xfs_bmap_util.c
-index c009bdf9fdce..1a55fc06f917 100644
---- a/fs/xfs/xfs_bmap_util.c
-+++ b/fs/xfs/xfs_bmap_util.c
-@@ -711,12 +711,11 @@ xfs_bmap_punch_delalloc_range(
- 	struct xfs_iext_cursor	icur;
- 	int			error = 0;
++#ifndef CONFIG_THUMB2_KERNEL
+ #define cmpxchg64_local(ptr, o, n) __cmpxchg64_local_generic((ptr), (o), (n))
++#endif /* CONFIG_THUMB2_KERNEL */
  
--	ASSERT(xfs_isilocked(ip, XFS_ILOCK_EXCL));
--
-+	xfs_ilock(ip, XFS_ILOCK_EXCL);
- 	if (!(ifp->if_flags & XFS_IFEXTENTS)) {
- 		error = xfs_iread_extents(NULL, ip, XFS_DATA_FORK);
- 		if (error)
--			return error;
-+			goto out_unlock;
- 	}
+ #include <asm-generic/cmpxchg.h>
  
- 	if (!xfs_iext_lookup_extent(ip, ifp, start_fsb, &icur, &got))
-@@ -738,6 +737,8 @@ xfs_bmap_punch_delalloc_range(
- 			break;
- 	} while (xfs_iext_next_extent(ifp, &icur, &got));
+@@ -241,6 +243,7 @@ static inline unsigned long __cmpxchg_local(volatile void *ptr,
+ 				        sizeof(*(ptr)));		\
+ })
  
-+out_unlock:
-+	xfs_iunlock(ip, XFS_ILOCK_EXCL);
- 	return error;
- }
++#ifndef CONFIG_THUMB2_KERNEL
+ static inline unsigned long long __cmpxchg64(unsigned long long *ptr,
+ 					     unsigned long long old,
+ 					     unsigned long long new)
+@@ -273,6 +276,7 @@ static inline unsigned long long __cmpxchg64(unsigned long long *ptr,
+ })
  
-diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
-index da6d1995e460..f949f0dd7382 100644
---- a/fs/xfs/xfs_iomap.c
-+++ b/fs/xfs/xfs_iomap.c
-@@ -1203,11 +1203,8 @@ xfs_file_iomap_end_delalloc(
- 		truncate_pagecache_range(VFS_I(ip), XFS_FSB_TO_B(mp, start_fsb),
- 					 XFS_FSB_TO_B(mp, end_fsb) - 1);
+ #define cmpxchg64_local(ptr, o, n) cmpxchg64_relaxed((ptr), (o), (n))
++#endif /* CONFIG_THUMB2_KERNEL */
  
--		xfs_ilock(ip, XFS_ILOCK_EXCL);
- 		error = xfs_bmap_punch_delalloc_range(ip, start_fsb,
- 					       end_fsb - start_fsb);
--		xfs_iunlock(ip, XFS_ILOCK_EXCL);
--
- 		if (error && !XFS_FORCED_SHUTDOWN(mp)) {
- 			xfs_alert(mp, "%s: unable to clean up ino %lld",
- 				__func__, ip->i_ino);
+ #endif	/* __LINUX_ARM_ARCH__ >= 6 */
+ 
 -- 
-2.17.0
+2.16.3
