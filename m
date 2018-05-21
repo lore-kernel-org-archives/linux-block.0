@@ -1,46 +1,43 @@
-Return-Path: <prvs=672bd835f=Adam.Manzanares@wdc.com>
-From: Adam Manzanares <Adam.Manzanares@wdc.com>
-To: Jeff Moyer <jmoyer@redhat.com>
-CC: "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "bcrl@kvack.org" <bcrl@kvack.org>,
-	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@kernel.org"
-	<mingo@kernel.org>, "pombredanne@nexb.com" <pombredanne@nexb.com>,
-	"kstewart@linuxfoundation.org" <kstewart@linuxfoundation.org>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"bigeasy@linutronix.de" <bigeasy@linutronix.de>, "jack@suse.cz"
-	<jack@suse.cz>, "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
-	"rgoldwyn@suse.com" <rgoldwyn@suse.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-aio@kvack.org" <linux-aio@kvack.org>,
-	"linux-api@vger.kernel.org" <linux-api@vger.kernel.org>, "hch@infradead.org"
-	<hch@infradead.org>
+Return-Path: <jmoyer@redhat.com>
+From: Jeff Moyer <jmoyer@redhat.com>
+To: adam.manzanares@wdc.com
+Cc: viro@zeniv.linux.org.uk,  linux-fsdevel@vger.kernel.org,  axboe@kernel.dk,  bcrl@kvack.org,  tglx@linutronix.de,  mingo@kernel.org,  pombredanne@nexb.com,  kstewart@linuxfoundation.org,  gregkh@linuxfoundation.org,  bigeasy@linutronix.de,  jack@suse.cz,  darrick.wong@oracle.com,  rgoldwyn@suse.com,  linux-block@vger.kernel.org,  linux-kernel@vger.kernel.org,  linux-aio@kvack.org,  linux-api@vger.kernel.org,  hch@infradead.org
 Subject: Re: [PATCH v5 4/5] fs: blkdev set bio prio from kiocb prio
-Date: Mon, 21 May 2018 21:43:16 +0000
-Message-ID: <d4f44ce3-3f4b-e8d9-4b8a-7f846dfd6d10@wdc.com>
+In-Reply-To: <20180521160147.2372-5-adam.manzanares@wdc.com> (adam
+	manzanares's message of "Mon, 21 May 2018 09:01:46 -0700")
 References: <20180521160147.2372-1-adam.manzanares@wdc.com>
- <20180521160147.2372-5-adam.manzanares@wdc.com>
- <x49r2m4u3e6.fsf@segfault.boston.devel.redhat.com>
-In-Reply-To: <x49r2m4u3e6.fsf@segfault.boston.devel.redhat.com>
-Content-Type: text/plain; charset="utf-8"
+	<20180521160147.2372-5-adam.manzanares@wdc.com>
+Date: Mon, 21 May 2018 17:04:17 -0400
+Message-ID: <x49r2m4u3e6.fsf@segfault.boston.devel.redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-DQoNCk9uIDUvMjEvMTggMjowNCBQTSwgSmVmZiBNb3llciB3cm90ZToNCj4gYWRhbS5tYW56YW5h
-cmVzQHdkYy5jb20gd3JpdGVzOg0KPiANCj4+IEZyb206IEFkYW0gTWFuemFuYXJlcyA8YWRhbS5t
-YW56YW5hcmVzQHdkYy5jb20+DQo+Pg0KPj4gTm93IHRoYXQga2lvY2IgaGFzIGFuIGlvcHJpbyBm
-aWVsZCBjb3B5IHRoaXMgb3ZlciB0byB0aGUgYmlvIHdoZW4gaXQgaXMNCj4+IGNyZWF0ZWQgZnJv
-bSB0aGUga2lvY2IuDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogQWRhbSBNYW56YW5hcmVzIDxhZGFt
-Lm1hbnphbmFyZXNAd2RjLmNvbT4NCj4+IC0tLQ0KPj4gICBmcy9ibG9ja19kZXYuYyB8IDEgKw0K
-Pj4gICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKykNCj4+DQo+PiBkaWZmIC0tZ2l0IGEv
-ZnMvYmxvY2tfZGV2LmMgYi9mcy9ibG9ja19kZXYuYw0KPj4gaW5kZXggN2VjOTIwZTI3MDY1Li5k
-YTFlOTRkMmJiNzUgMTAwNjQ0DQo+PiAtLS0gYS9mcy9ibG9ja19kZXYuYw0KPj4gKysrIGIvZnMv
-YmxvY2tfZGV2LmMNCj4+IEBAIC0zNTUsNiArMzU1LDcgQEAgX19ibGtkZXZfZGlyZWN0X0lPKHN0
-cnVjdCBraW9jYiAqaW9jYiwgc3RydWN0IGlvdl9pdGVyICppdGVyLCBpbnQgbnJfcGFnZXMpDQo+
-PiAgIAkJYmlvLT5iaV93cml0ZV9oaW50ID0gaW9jYi0+a2lfaGludDsNCj4+ICAgCQliaW8tPmJp
-X3ByaXZhdGUgPSBkaW87DQo+PiAgIAkJYmlvLT5iaV9lbmRfaW8gPSBibGtkZXZfYmlvX2VuZF9p
-bzsNCj4+ICsJCWJpby0+YmlfaW9wcmlvID0gaW9jYi0+a2lfaW9wcmlvOw0KPj4gICANCj4+ICAg
-CQlyZXQgPSBiaW9faW92X2l0ZXJfZ2V0X3BhZ2VzKGJpbywgaXRlcik7DQo+PiAgIAkJaWYgKHVu
-bGlrZWx5KHJldCkpIHsNCj4gDQo+IEZvcmdvdCB0byBtZW50aW9uLCB5b3Ugc2hvdWxkIGFsc28g
-Y29udmVydCBfX2Jsa2Rldl9kaXJlY3RfSU9fc2ltcGxlLg0KDQpOUC4NCg0KPiANCj4gLUplZmYN
-Cj4g
+adam.manzanares@wdc.com writes:
+
+> From: Adam Manzanares <adam.manzanares@wdc.com>
+>
+> Now that kiocb has an ioprio field copy this over to the bio when it is
+> created from the kiocb.
+>
+> Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
+> ---
+>  fs/block_dev.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 7ec920e27065..da1e94d2bb75 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -355,6 +355,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+>  		bio->bi_write_hint = iocb->ki_hint;
+>  		bio->bi_private = dio;
+>  		bio->bi_end_io = blkdev_bio_end_io;
+> +		bio->bi_ioprio = iocb->ki_ioprio;
+>  
+>  		ret = bio_iov_iter_get_pages(bio, iter);
+>  		if (unlikely(ret)) {
+
+Forgot to mention, you should also convert __blkdev_direct_IO_simple.
+
+-Jeff
