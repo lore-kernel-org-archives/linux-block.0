@@ -1,36 +1,42 @@
-Return-Path: <keith.busch@linux.intel.com>
-Date: Tue, 22 May 2018 08:06:53 -0600
-From: Keith Busch <keith.busch@linux.intel.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>,
-	"keith.busch@intel.com" <keith.busch@intel.com>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
+Return-Path: <prvs=672e5e3bd=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>, "keith.busch@intel.com"
+	<keith.busch@intel.com>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
 	"ming.lei@redhat.com" <ming.lei@redhat.com>
 Subject: Re: [RFC PATCH 0/3] blk-mq: Timeout rework
-Message-ID: <20180522140653.GP5528@localhost.localdomain>
+Date: Mon, 21 May 2018 23:29:21 +0000
+Message-ID: <9ca27e059fbd12a976e1e2f1ee1aa5c8ca579ad0.camel@wdc.com>
 References: <20180521231131.6685-1-keith.busch@intel.com>
- <9ca27e059fbd12a976e1e2f1ee1aa5c8ca579ad0.camel@wdc.com>
+In-Reply-To: <20180521231131.6685-1-keith.busch@intel.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <9ca27e059fbd12a976e1e2f1ee1aa5c8ca579ad0.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, May 21, 2018 at 11:29:21PM +0000, Bart Van Assche wrote:
-> Can you explain why the NVMe driver needs reference counting of requests but
-> no other block driver needs this? Additionally, why is it that for all block
-> drivers except NVMe the current block layer API is sufficient
-> (blk_get_request()/blk_execute_rq()/blk_mq_start_request()/
-> blk_mq_complete_request()/blk_mq_end_request())?
-
-Hi Bart,
-
-I'm pretty sure NVMe isn't the only driver where a call to
-blk_mq_complete_request silently fails to transition the request to
-COMPLETE, forcing unnecessary error handling. This patch isn't so
-much about NVMe as it is about removing that silent exception from the
-block API.
-
-Thanks,
-Keith
+T24gTW9uLCAyMDE4LTA1LTIxIGF0IDE3OjExIC0wNjAwLCBLZWl0aCBCdXNjaCB3cm90ZToNCj4g
+VGhlIGN1cnJlbnQgYmxrLW1xIGNvZGUgcG90ZW50aWFsbHkgbG9ja3MgcmVxdWVzdHMgb3V0IG9m
+IGNvbXBsZXRpb24gYnkNCj4gdGhlIHRob3VzYW5kcywgbWFraW5nIGRyaXZlcnMganVtcCB0aHJv
+dWdoIGhvb3BzIHRvIGhhbmRsZSB0aGVtLiBUaGlzDQo+IHBhdGNoIHNldCBhbGxvd3MgZHJpdmVy
+cyB0byBjb21wbGV0ZSB0aGVpciByZXF1ZXN0cyB3aGVuZXZlciB0aGV5J3JlDQo+IGNvbXBsZXRl
+ZCB3aXRob3V0IHJlcXVpcmluZyBkcml2ZXJzIGtub3cgYW55dGhpbmcgYWJvdXQgdGhlIHRpbWVv
+dXQgY29kZQ0KPiB3aXRoIG1pbmltYWwgc3luY3Jvbml6YXRpb24uDQo+IA0KPiBPdGhlciBwcm9w
+b3NhbHMgdW5kZXIgY3VycmVudCBjb25zaWRlcmF0aW9uIHN0aWxsIGhhdmUgbW9tZW50cyB0aGF0
+DQo+IHByZXZlbnQgYSBkcml2ZXIgZnJvbSBwcm9ncmVzc2luZyBhIHJlcXVlc3QgdG8gdGhlIGNv
+bXBsZXRlZCBzdGF0ZS4NCj4gDQo+IFRoZSB0aW1lb3V0IGlzIHVsdGltYXRsZXkgbWFkZSBzYWZl
+IGJ5IHJlZmVyZW5jZSBjb3VudGluZyB0aGUgcmVxdWVzdA0KPiB3aGVuIHRpbWVvdXQgaGFuZGxp
+bmcgY2xhaW1zIHRoZSByZXF1ZXN0LiBCeSBob2xkaW5nIHRoZSByZWZlcmVuY2UgY291bnQsDQo+
+IHdlIGRvbid0IG5lZWQgdG8gZG8gYW55IHRyaWNrcyB0byBwcmV2ZW50IGEgZHJpdmVyIGZyb20g
+Y29tcGxldGluZyB0aGUNCj4gcmVxdWVzdCBvdXQgZnJvbSB1bmRlciB0aGUgdGltZW91dCBoYW5k
+bGVyLCBhbGxvd2luZyB0aGUgYWN0dWFsIHN0YXRlDQo+IHRvIGJlIGNoYW5nZWQgaW5saW5lIHdp
+dGggdGhlIHRydWUgc3RhdGUsIGFuZCBkcml2ZXJzIGRvbid0IG5lZWQgdG8gYmUNCj4gYXdhcmUg
+YW55IG9mIHRoaXMgaXMgaGFwcGVuaW5nLg0KPiANCj4gSW4gb3JkZXIgdG8gbWFrZSB0aGUgb3Zl
+cmhlYWQgYXMgbWluaW1hbCBhcyBwb3NzaWJsZSwgdGhlIHJlcXVlc3Qncw0KPiByZWZlcmVuY2Ug
+aXMgdGFrZW4gb25seSB3aGVuIGl0IGFwcGVhcnMgdGhhdCBhY3R1YWwgdGltZW91dCBoYW5kbGlu
+Zw0KPiBuZWVkcyB0byBiZSBkb25lLg0KDQpIZWxsbyBLZWl0aCwNCg0KQ2FuIHlvdSBleHBsYWlu
+IHdoeSB0aGUgTlZNZSBkcml2ZXIgbmVlZHMgcmVmZXJlbmNlIGNvdW50aW5nIG9mIHJlcXVlc3Rz
+IGJ1dA0Kbm8gb3RoZXIgYmxvY2sgZHJpdmVyIG5lZWRzIHRoaXM/IEFkZGl0aW9uYWxseSwgd2h5
+IGlzIGl0IHRoYXQgZm9yIGFsbCBibG9jaw0KZHJpdmVycyBleGNlcHQgTlZNZSB0aGUgY3VycmVu
+dCBibG9jayBsYXllciBBUEkgaXMgc3VmZmljaWVudA0KKGJsa19nZXRfcmVxdWVzdCgpL2Jsa19l
+eGVjdXRlX3JxKCkvYmxrX21xX3N0YXJ0X3JlcXVlc3QoKS8NCmJsa19tcV9jb21wbGV0ZV9yZXF1
+ZXN0KCkvYmxrX21xX2VuZF9yZXF1ZXN0KCkpPw0KDQpUaGFua3MsDQoNCkJhcnQu
