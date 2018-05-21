@@ -1,79 +1,65 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:33538 "EHLO imap.thunk.org"
+Received: from mail.kernel.org ([198.145.29.99]:40216 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752727AbeEUOnm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 May 2018 10:43:42 -0400
-Date: Mon, 21 May 2018 10:43:33 -0400
-From: "Theodore Y. Ts'o" <tytso@mit.edu>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Matthew Wilcox <willy@infradead.org>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        id S1751719AbeEULUI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 May 2018 07:20:08 -0400
+Message-ID: <a11668bbe2050c8b5fb8f27b8b301ba8a78e6a97.camel@kernel.org>
+Subject: Re: [PATCH] fs: clear writeback errors in inode_init_always
+From: Jeff Layton <jlayton@kernel.org>
+To: "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Matthew Wilcox <willy@infradead.org>
+Cc: "Darrick J. Wong" <darrick.wong@oracle.com>,
         linux-fsdevel@vger.kernel.org, fstests@vger.kernel.org,
         xfs <linux-xfs@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] fs: clear writeback errors in inode_init_always
-Message-ID: <20180521144333.GA23868@thunk.org>
+Date: Mon, 21 May 2018 07:20:05 -0400
+In-Reply-To: <20180520194124.GB5072@thunk.org>
 References: <20180518225037.GA26206@thunk.org>
- <630faadb74f608aa5a42649b81657e8b62d46bc3.camel@kernel.org>
- <20180519152700.GB4507@magnolia>
- <20180519231944.GB23448@thunk.org>
- <fa3b4dec3452aa5696b8657ef509891908901d95.camel@kernel.org>
- <20180520125843.GA25612@bombadil.infradead.org>
- <20180520162954.GA5250@thunk.org>
- <20180520192009.GA22365@bombadil.infradead.org>
- <20180520194124.GB5072@thunk.org>
- <a11668bbe2050c8b5fb8f27b8b301ba8a78e6a97.camel@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <a11668bbe2050c8b5fb8f27b8b301ba8a78e6a97.camel@kernel.org>
+         <630faadb74f608aa5a42649b81657e8b62d46bc3.camel@kernel.org>
+         <20180519152700.GB4507@magnolia> <20180519231944.GB23448@thunk.org>
+         <fa3b4dec3452aa5696b8657ef509891908901d95.camel@kernel.org>
+         <20180520125843.GA25612@bombadil.infradead.org>
+         <20180520162954.GA5250@thunk.org>
+         <20180520192009.GA22365@bombadil.infradead.org>
+         <20180520194124.GB5072@thunk.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, May 21, 2018 at 07:20:05AM -0400, Jeff Layton wrote:
+On Sun, 2018-05-20 at 15:41 -0400, Theodore Y. Ts'o wrote:
+> On Sun, May 20, 2018 at 12:20:09PM -0700, Matthew Wilcox wrote:
+> > Oh!  I misunderstood.  I thought that bd_inode->i_mapping pointed to
+> > lo_backing_file->f_mapping.
+> > 
+> > So how about this to preserve the error _in the file with the error_?
+> > 
+> > 	if (bdev) {
+> > 		bdput(bdev);
+> > 		invalidate_bdev(bdev);
+> > +		filp->f_mapping->wb_err = bdev->bd_inode->i_mapping->wb_err;
+> > +		bdev->bd_inode->i_mapping->wb_err = 0;
+> > 	}
+> > 	set_capacity(lo->lo_disk, 0);
+> > 	loop_sysfs_exit(lo);
 > 
-> As a side note, it looks like __loop_update_dio will discard an error
-> from vfs_fsync, so certain ioctls against a loop device can cause errors
-> to be lost. It seems like those ought to get propagated to userland or
-> to the blockdev's mapping somehow.
+> I don't think it's necessary.  wb_err on the underlying file would
+> have already been set when the error was set.  So if someone tried
+> calling fsync(2) on the underlying file, it would have collected the
+> error already.  Re-setting the error when we detach the loop device
+> doesn't seem to make any sense.
+> 
 
-I'm not sure it's worth it.  All of the ioctls that call
-loop_update_dio are used just to configure the loop device.  In
-practice they are never called once the loop device is actually
-running.  It might be a better choice is to just define that errors
-get reset if there is any attempt to reconfigure the loop device.
+(cc'ing linux-block)
 
-One of these ioctls change the offset that a loop device maps onto the
-backing file.  So for example, while offset 0 of the loop device might
-have corresponds beginning of the backing file, after executing the
-ioctl, offset 0 of the loop device no corresponds to offset 2MB of the
-backing store.  This might happen if we are resetting the loop device
-to point at the first partition of a disk image, for example.  I
-really don't think that preserving the error status when we are doing
-that kind of radical configuration makes sense.
+Yes, the error would have been set on the original file already. As long
+as lo_req_flush or __loop_update_dio weren't called before we detach the
+device, it should still be possible to call fsync on the original fd and
+get back the error.
 
-Or for example, when we change the block size of the loop device; if
-the underlying backing store is an IBM Mainframe DASD with a 2k block
-size, the reason why the error was signalled was because there was an
-attempt to write a 1k block onto a 2k block device.  So again,
-resetting the error status of the loop device is the right thing to
-do.
-
-The final thing that's worth perhaps exploring is whether or not we
-need all of these knobs and ioctls.  In particular, LOOP_CHANGE_FD is
-used by losetup.  It exists because back in prehistory, some
-distribution installer needed it for some obscure corner case.  If I
-remember correctly, it had to do with switching out the initramfs
-floppy disk with the root file system floppy disk.  We've wasted
-developer bandwidth trying to deal with syzbot complaints about that
-ioctl, and it's not clear it was worth the effort, because it's not
-clear any real code actually _needs_ that ioctl.  It might have been
-easier to comment out the ioctl, and see if anyone screamed.
-
-Given that loop device is maintianed mostly on the margins, and it's
-not clear that lots of complicated error handling during setup is
-really necessary, this is basically a please to keep things simple, or
-at least no more complicated than it has to be.
-
-Cheers,
-
-						- Ted
+As a side note, it looks like __loop_update_dio will discard an error
+from vfs_fsync, so certain ioctls against a loop device can cause errors
+to be lost. It seems like those ought to get propagated to userland or
+to the blockdev's mapping somehow.
+-- 
+Jeff Layton <jlayton@kernel.org>
