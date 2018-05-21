@@ -1,70 +1,35 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	James Smart <james.smart@broadcom.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V6 09/11] nvme: pci: don't unfreeze queue until controller state updating succeeds
-Date: Wed, 16 May 2018 12:03:11 +0800
-Message-Id: <20180516040313.13596-10-ming.lei@redhat.com>
-In-Reply-To: <20180516040313.13596-1-ming.lei@redhat.com>
-References: <20180516040313.13596-1-ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH RESEND] loop: clear wb_err in bd_inode when detaching
+ backing file
+To: Jeff Layton <jlayton@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ willy@infradead.org, darrick.wong@oracle.com, tytso@mit.edu,
+ bfoster@redhat.com
+References: <20180521183503.6029-1-jlayton@kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <af70acb0-b636-b6a8-feca-a575c8e7c317@kernel.dk>
+Date: Mon, 21 May 2018 12:36:59 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180521183503.6029-1-jlayton@kernel.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-If it fails to update controller state into LIVE or ADMIN_ONLY, the
-controller will be removed, so not necessary to unfreeze queue any
-more.
+On 5/21/18 12:35 PM, Jeff Layton wrote:
+> From: Jeff Layton <jlayton@redhat.com>
+> 
+> When a loop block device encounters a writeback error, that error will
+> get propagated to the bd_inode's wb_err field. If we then detach the
+> backing file from it, attach another and fsync it, we'll get back the
+> writeback error that we had from the previous backing file.
+> 
+> This is a bit of a grey area as POSIX doesn't cover loop devices, but it
+> is somewhat counterintuitive.
+> 
+> If we detach a backing file from the loopdev while there are still
+> unreported errors, take it as a sign that we're no longer interested in
+> the previous file, and clear out the wb_err in the loop blockdev.
 
-This way will make the following patch easier to not leak the
-freeze couner.
+Applied, thanks Jeff.
 
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/nvme/host/pci.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 634fd7f17950..4236d79e3643 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2396,6 +2396,7 @@ static int nvme_reset_dev(struct nvme_dev *dev)
- 	bool was_suspend = !!(dev->ctrl.ctrl_config & NVME_CC_SHN_NORMAL);
- 	int result = -ENODEV;
- 	enum nvme_ctrl_state new_state = NVME_CTRL_LIVE;
-+	bool unfreeze_queue = false;
- 
- 	lockdep_assert_held(&dev->ctrl.reset_lock);
- 
-@@ -2482,7 +2483,7 @@ static int nvme_reset_dev(struct nvme_dev *dev)
- 		/* hit this only when allocate tagset fails */
- 		if (nvme_dev_add(dev))
- 			new_state = NVME_CTRL_ADMIN_ONLY;
--		nvme_unfreeze(&dev->ctrl);
-+		unfreeze_queue = true;
- 	}
- 
- 	result = -ENODEV;
-@@ -2497,6 +2498,9 @@ static int nvme_reset_dev(struct nvme_dev *dev)
- 	}
- 
- 	nvme_start_ctrl(&dev->ctrl);
-+
-+	if (unfreeze_queue)
-+		nvme_unfreeze(&dev->ctrl);
- 	return 0;
- 
-  out:
 -- 
-2.9.5
+Jens Axboe
