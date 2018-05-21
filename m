@@ -1,55 +1,46 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:52286 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756022AbeEILH7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 07:07:59 -0400
-Date: Wed, 9 May 2018 13:07:36 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Johannes Weiner <hannes@cmpxchg.org>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        Andrew Morton <akpm@linuxfoundation.org>,
-        Tejun Heo <tj@kernel.org>,
-        Balbir Singh <bsingharora@gmail.com>,
-        Mike Galbraith <efault@gmx.de>,
-        Oliver Yang <yangoliver@me.com>,
-        Shakeel Butt <shakeelb@google.com>,
-        xxx xxx <x.qendo@gmail.com>,
-        Taras Kondratiuk <takondra@cisco.com>,
-        Daniel Walker <danielwa@cisco.com>,
-        Vinayak Menon <vinmenon@codeaurora.org>,
-        Ruslan Ruslichenko <rruslich@cisco.com>, kernel-team@fb.com
-Subject: Re: [PATCH 7/7] psi: cgroup support
-Message-ID: <20180509110736.GR12217@hirez.programming.kicks-ass.net>
-References: <20180507210135.1823-1-hannes@cmpxchg.org>
- <20180507210135.1823-8-hannes@cmpxchg.org>
+Return-Path: <prvs=672bd835f=Adam.Manzanares@wdc.com>
+From: Adam Manzanares <Adam.Manzanares@wdc.com>
+To: Jeff Moyer <jmoyer@redhat.com>
+CC: "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "bcrl@kvack.org" <bcrl@kvack.org>,
+	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@kernel.org"
+	<mingo@kernel.org>, "pombredanne@nexb.com" <pombredanne@nexb.com>,
+	"kstewart@linuxfoundation.org" <kstewart@linuxfoundation.org>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"bigeasy@linutronix.de" <bigeasy@linutronix.de>, "jack@suse.cz"
+	<jack@suse.cz>, "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
+	"rgoldwyn@suse.com" <rgoldwyn@suse.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-aio@kvack.org" <linux-aio@kvack.org>,
+	"linux-api@vger.kernel.org" <linux-api@vger.kernel.org>, "hch@infradead.org"
+	<hch@infradead.org>
+Subject: Re: [PATCH v5 4/5] fs: blkdev set bio prio from kiocb prio
+Date: Mon, 21 May 2018 21:43:16 +0000
+Message-ID: <d4f44ce3-3f4b-e8d9-4b8a-7f846dfd6d10@wdc.com>
+References: <20180521160147.2372-1-adam.manzanares@wdc.com>
+ <20180521160147.2372-5-adam.manzanares@wdc.com>
+ <x49r2m4u3e6.fsf@segfault.boston.devel.redhat.com>
+In-Reply-To: <x49r2m4u3e6.fsf@segfault.boston.devel.redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180507210135.1823-8-hannes@cmpxchg.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Mon, May 07, 2018 at 05:01:35PM -0400, Johannes Weiner wrote:
-> --- a/kernel/sched/psi.c
-> +++ b/kernel/sched/psi.c
-> @@ -260,6 +260,18 @@ void psi_task_change(struct task_struct *task, u64 now, int clear, int set)
->  	task->psi_flags |= set;
->  
->  	psi_group_update(&psi_system, cpu, now, clear, set);
-> +
-> +#ifdef CONFIG_CGROUPS
-> +       cgroup = task->cgroups->dfl_cgrp;
-> +       while (cgroup && (parent = cgroup_parent(cgroup))) {
-> +               struct psi_group *group;
-> +
-> +               group = cgroup_psi(cgroup);
-> +               psi_group_update(group, cpu, now, clear, set);
-> +
-> +               cgroup = parent;
-> +       }
-> +#endif
->  }
-
-TJ fixed needing that for stats at some point, why can't you do the
-same?
+DQoNCk9uIDUvMjEvMTggMjowNCBQTSwgSmVmZiBNb3llciB3cm90ZToNCj4gYWRhbS5tYW56YW5h
+cmVzQHdkYy5jb20gd3JpdGVzOg0KPiANCj4+IEZyb206IEFkYW0gTWFuemFuYXJlcyA8YWRhbS5t
+YW56YW5hcmVzQHdkYy5jb20+DQo+Pg0KPj4gTm93IHRoYXQga2lvY2IgaGFzIGFuIGlvcHJpbyBm
+aWVsZCBjb3B5IHRoaXMgb3ZlciB0byB0aGUgYmlvIHdoZW4gaXQgaXMNCj4+IGNyZWF0ZWQgZnJv
+bSB0aGUga2lvY2IuDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogQWRhbSBNYW56YW5hcmVzIDxhZGFt
+Lm1hbnphbmFyZXNAd2RjLmNvbT4NCj4+IC0tLQ0KPj4gICBmcy9ibG9ja19kZXYuYyB8IDEgKw0K
+Pj4gICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKykNCj4+DQo+PiBkaWZmIC0tZ2l0IGEv
+ZnMvYmxvY2tfZGV2LmMgYi9mcy9ibG9ja19kZXYuYw0KPj4gaW5kZXggN2VjOTIwZTI3MDY1Li5k
+YTFlOTRkMmJiNzUgMTAwNjQ0DQo+PiAtLS0gYS9mcy9ibG9ja19kZXYuYw0KPj4gKysrIGIvZnMv
+YmxvY2tfZGV2LmMNCj4+IEBAIC0zNTUsNiArMzU1LDcgQEAgX19ibGtkZXZfZGlyZWN0X0lPKHN0
+cnVjdCBraW9jYiAqaW9jYiwgc3RydWN0IGlvdl9pdGVyICppdGVyLCBpbnQgbnJfcGFnZXMpDQo+
+PiAgIAkJYmlvLT5iaV93cml0ZV9oaW50ID0gaW9jYi0+a2lfaGludDsNCj4+ICAgCQliaW8tPmJp
+X3ByaXZhdGUgPSBkaW87DQo+PiAgIAkJYmlvLT5iaV9lbmRfaW8gPSBibGtkZXZfYmlvX2VuZF9p
+bzsNCj4+ICsJCWJpby0+YmlfaW9wcmlvID0gaW9jYi0+a2lfaW9wcmlvOw0KPj4gICANCj4+ICAg
+CQlyZXQgPSBiaW9faW92X2l0ZXJfZ2V0X3BhZ2VzKGJpbywgaXRlcik7DQo+PiAgIAkJaWYgKHVu
+bGlrZWx5KHJldCkpIHsNCj4gDQo+IEZvcmdvdCB0byBtZW50aW9uLCB5b3Ugc2hvdWxkIGFsc28g
+Y29udmVydCBfX2Jsa2Rldl9kaXJlY3RfSU9fc2ltcGxlLg0KDQpOUC4NCg0KPiANCj4gLUplZmYN
+Cj4g
