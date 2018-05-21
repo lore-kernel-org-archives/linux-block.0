@@ -3,12 +3,12 @@ From: Jeff Moyer <jmoyer@redhat.com>
 To: adam.manzanares@wdc.com
 Cc: viro@zeniv.linux.org.uk,  linux-fsdevel@vger.kernel.org,  axboe@kernel.dk,  bcrl@kvack.org,  tglx@linutronix.de,  mingo@kernel.org,  pombredanne@nexb.com,  kstewart@linuxfoundation.org,  gregkh@linuxfoundation.org,  bigeasy@linutronix.de,  jack@suse.cz,  darrick.wong@oracle.com,  rgoldwyn@suse.com,  linux-block@vger.kernel.org,  linux-kernel@vger.kernel.org,  linux-aio@kvack.org,  linux-api@vger.kernel.org,  hch@infradead.org
 Subject: Re: [PATCH v5 4/5] fs: blkdev set bio prio from kiocb prio
-In-Reply-To: <20180521160147.2372-5-adam.manzanares@wdc.com> (adam
-	manzanares's message of "Mon, 21 May 2018 09:01:46 -0700")
 References: <20180521160147.2372-1-adam.manzanares@wdc.com>
 	<20180521160147.2372-5-adam.manzanares@wdc.com>
-Date: Mon, 21 May 2018 17:04:17 -0400
-Message-ID: <x49r2m4u3e6.fsf@segfault.boston.devel.redhat.com>
+Date: Mon, 21 May 2018 16:59:03 -0400
+In-Reply-To: <20180521160147.2372-5-adam.manzanares@wdc.com> (adam
+	manzanares's message of "Mon, 21 May 2018 09:01:46 -0700")
+Message-ID: <x491se4vi7c.fsf@segfault.boston.devel.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
@@ -21,6 +21,10 @@ adam.manzanares@wdc.com writes:
 > created from the kiocb.
 >
 > Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
+
+Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
+
+
 > ---
 >  fs/block_dev.c | 1 +
 >  1 file changed, 1 insertion(+)
@@ -37,7 +41,3 @@ adam.manzanares@wdc.com writes:
 >  
 >  		ret = bio_iov_iter_get_pages(bio, iter);
 >  		if (unlikely(ret)) {
-
-Forgot to mention, you should also convert __blkdev_direct_IO_simple.
-
--Jeff
