@@ -1,8 +1,7 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-Date: Mon, 21 May 2018 19:38:55 -0400
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: Mike Snitzer <snitzer@redhat.com>
+Return-Path: <msnitzer@redhat.com>
+Date: Mon, 21 May 2018 14:24:32 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Kent Overstreet <kent.overstreet@gmail.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org, hch@infradead.org, colyli@suse.de,
 	darrick.wong@oracle.com, clm@fb.com, bacik@fb.com,
@@ -10,8 +9,9 @@ Cc: Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
 	linux-btrfs@vger.kernel.org, linux-raid@vger.kernel.org,
 	neilb@suse.com
 Subject: Re: [PATCH 00/13] convert block layer to bioset_init()/mempool_init()
-Message-ID: <20180521233855.GI11495@kmo-pixel>
-References: <2bbeeb1a-8b99-b06a-eb9b-eb8523c16460@kernel.dk>
+Message-ID: <20180521182427.GA20013@redhat.com>
+References: <20180521143132.GB19194@redhat.com>
+ <2bbeeb1a-8b99-b06a-eb9b-eb8523c16460@kernel.dk>
  <20180521144703.GA19303@redhat.com>
  <4b343aef-e11c-73ba-1d88-7e73ca838cad@kernel.dk>
  <20180521150439.GA19379@redhat.com>
@@ -20,31 +20,48 @@ References: <2bbeeb1a-8b99-b06a-eb9b-eb8523c16460@kernel.dk>
  <d01a150a-7752-f6ce-78f2-17a65c1e6fa5@kernel.dk>
  <20180521160907.GA19553@redhat.com>
  <20180521173724.GG11495@kmo-pixel>
- <20180521182427.GA20013@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180521182427.GA20013@redhat.com>
+In-Reply-To: <20180521173724.GG11495@kmo-pixel>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, May 21, 2018 at 02:24:32PM -0400, Mike Snitzer wrote:
-> Every single data structure change in this series should be reviewed for
-> unforeseen alignment consequences.  Jens seemed to say that is
-> worthwhile.  Not sure if he'll do it or we divide it up.  If we divide
-> it up a temp topic branch should be published for others to inspect.
+On Mon, May 21 2018 at  1:37pm -0400,
+Kent Overstreet <kent.overstreet@gmail.com> wrote:
+
 > 
-> Could be alignment hasn't been a historic concern for a bunch of the
-> data structures changed in this series.. if so then all we can do is fix
-> up any obvious potential for false sharing.
+> Uh, you came across as upset and paranoid to me too. Chalk it up to email? :)
 
-Honestly, I almost never worry about alignment... the very few times I do care,
-I use __cacheline_aligned_in_smp.
+Awesome.  See how easy it is to make someone with purely constructive
+questions and feedback come off as upset and paranoid?
 
-If alignment is a concern in any of those structs, there really ought to be a
-comment indicating it. I very much doubt anything I touched was performance
-sensitive enough for it to be an issue, though. And if there is a performance
-impact, it should be oughtweighed by the reduced pointer chasing.
+The tipping point occurs when bait is set with:
+"It's not like <insert complete non sequitur>".
+Then:
+"Let's focus on getting it reviewed, rather than pontificate on what
+could potentially go all wrong with this."
 
-If you disagree, I don't mind leaving the device mapper patch out, it really
-makes no difference to me. I could glance over for alignment issues but I feel
-like my analysis would not be terribly valuable to you considering I've already
-said my position on alignment is "meh, don't care" :)
+Message received: less pontificating, more doing!
+
+And here I thought that focusing on what could go wrong (across all code
+touched) was review.  But OK, I'm the one that made this all weird ;)
+
+It is what it is at this point.
+
+> I personally don't care, I have no horse in this race. This particular patch
+> series wasn't my idea, Christoph wanted all these conversions done so
+> bioset_create() could be deleted. If you want us to hold off on the dm patch for
+> awhile until someone can get around to testing it or whatever (since I don't
+> have tests for everything I pushed) that would be perfectly fine by me.
+
+As I clarified already: this isn't about DM.
+
+Every single data structure change in this series should be reviewed for
+unforeseen alignment consequences.  Jens seemed to say that is
+worthwhile.  Not sure if he'll do it or we divide it up.  If we divide
+it up a temp topic branch should be published for others to inspect.
+
+Could be alignment hasn't been a historic concern for a bunch of the
+data structures changed in this series.. if so then all we can do is fix
+up any obvious potential for false sharing.
+
+Mike
