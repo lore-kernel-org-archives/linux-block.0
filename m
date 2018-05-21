@@ -1,42 +1,49 @@
-Return-Path: <prvs=672e5e3bd=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@lst.de" <hch@lst.de>, "keith.busch@intel.com"
-	<keith.busch@intel.com>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>
-Subject: Re: [RFC PATCH 0/3] blk-mq: Timeout rework
-Date: Mon, 21 May 2018 23:29:21 +0000
-Message-ID: <9ca27e059fbd12a976e1e2f1ee1aa5c8ca579ad0.camel@wdc.com>
-References: <20180521231131.6685-1-keith.busch@intel.com>
-In-Reply-To: <20180521231131.6685-1-keith.busch@intel.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Return-Path: <keith.busch@intel.com>
+From: Keith Busch <keith.busch@intel.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Keith Busch <keith.busch@intel.com>
+Subject: [RFC PATCH 0/3] blk-mq: Timeout rework
+Date: Mon, 21 May 2018 17:11:28 -0600
+Message-Id: <20180521231131.6685-1-keith.busch@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE4LTA1LTIxIGF0IDE3OjExIC0wNjAwLCBLZWl0aCBCdXNjaCB3cm90ZToNCj4g
-VGhlIGN1cnJlbnQgYmxrLW1xIGNvZGUgcG90ZW50aWFsbHkgbG9ja3MgcmVxdWVzdHMgb3V0IG9m
-IGNvbXBsZXRpb24gYnkNCj4gdGhlIHRob3VzYW5kcywgbWFraW5nIGRyaXZlcnMganVtcCB0aHJv
-dWdoIGhvb3BzIHRvIGhhbmRsZSB0aGVtLiBUaGlzDQo+IHBhdGNoIHNldCBhbGxvd3MgZHJpdmVy
-cyB0byBjb21wbGV0ZSB0aGVpciByZXF1ZXN0cyB3aGVuZXZlciB0aGV5J3JlDQo+IGNvbXBsZXRl
-ZCB3aXRob3V0IHJlcXVpcmluZyBkcml2ZXJzIGtub3cgYW55dGhpbmcgYWJvdXQgdGhlIHRpbWVv
-dXQgY29kZQ0KPiB3aXRoIG1pbmltYWwgc3luY3Jvbml6YXRpb24uDQo+IA0KPiBPdGhlciBwcm9w
-b3NhbHMgdW5kZXIgY3VycmVudCBjb25zaWRlcmF0aW9uIHN0aWxsIGhhdmUgbW9tZW50cyB0aGF0
-DQo+IHByZXZlbnQgYSBkcml2ZXIgZnJvbSBwcm9ncmVzc2luZyBhIHJlcXVlc3QgdG8gdGhlIGNv
-bXBsZXRlZCBzdGF0ZS4NCj4gDQo+IFRoZSB0aW1lb3V0IGlzIHVsdGltYXRsZXkgbWFkZSBzYWZl
-IGJ5IHJlZmVyZW5jZSBjb3VudGluZyB0aGUgcmVxdWVzdA0KPiB3aGVuIHRpbWVvdXQgaGFuZGxp
-bmcgY2xhaW1zIHRoZSByZXF1ZXN0LiBCeSBob2xkaW5nIHRoZSByZWZlcmVuY2UgY291bnQsDQo+
-IHdlIGRvbid0IG5lZWQgdG8gZG8gYW55IHRyaWNrcyB0byBwcmV2ZW50IGEgZHJpdmVyIGZyb20g
-Y29tcGxldGluZyB0aGUNCj4gcmVxdWVzdCBvdXQgZnJvbSB1bmRlciB0aGUgdGltZW91dCBoYW5k
-bGVyLCBhbGxvd2luZyB0aGUgYWN0dWFsIHN0YXRlDQo+IHRvIGJlIGNoYW5nZWQgaW5saW5lIHdp
-dGggdGhlIHRydWUgc3RhdGUsIGFuZCBkcml2ZXJzIGRvbid0IG5lZWQgdG8gYmUNCj4gYXdhcmUg
-YW55IG9mIHRoaXMgaXMgaGFwcGVuaW5nLg0KPiANCj4gSW4gb3JkZXIgdG8gbWFrZSB0aGUgb3Zl
-cmhlYWQgYXMgbWluaW1hbCBhcyBwb3NzaWJsZSwgdGhlIHJlcXVlc3Qncw0KPiByZWZlcmVuY2Ug
-aXMgdGFrZW4gb25seSB3aGVuIGl0IGFwcGVhcnMgdGhhdCBhY3R1YWwgdGltZW91dCBoYW5kbGlu
-Zw0KPiBuZWVkcyB0byBiZSBkb25lLg0KDQpIZWxsbyBLZWl0aCwNCg0KQ2FuIHlvdSBleHBsYWlu
-IHdoeSB0aGUgTlZNZSBkcml2ZXIgbmVlZHMgcmVmZXJlbmNlIGNvdW50aW5nIG9mIHJlcXVlc3Rz
-IGJ1dA0Kbm8gb3RoZXIgYmxvY2sgZHJpdmVyIG5lZWRzIHRoaXM/IEFkZGl0aW9uYWxseSwgd2h5
-IGlzIGl0IHRoYXQgZm9yIGFsbCBibG9jaw0KZHJpdmVycyBleGNlcHQgTlZNZSB0aGUgY3VycmVu
-dCBibG9jayBsYXllciBBUEkgaXMgc3VmZmljaWVudA0KKGJsa19nZXRfcmVxdWVzdCgpL2Jsa19l
-eGVjdXRlX3JxKCkvYmxrX21xX3N0YXJ0X3JlcXVlc3QoKS8NCmJsa19tcV9jb21wbGV0ZV9yZXF1
-ZXN0KCkvYmxrX21xX2VuZF9yZXF1ZXN0KCkpPw0KDQpUaGFua3MsDQoNCkJhcnQu
+The current blk-mq code potentially locks requests out of completion by
+the thousands, making drivers jump through hoops to handle them. This
+patch set allows drivers to complete their requests whenever they're
+completed without requiring drivers know anything about the timeout code
+with minimal syncronization.
+
+Other proposals under current consideration still have moments that
+prevent a driver from progressing a request to the completed state.
+
+The timeout is ultimatley made safe by reference counting the request
+when timeout handling claims the request. By holding the reference count,
+we don't need to do any tricks to prevent a driver from completing the
+request out from under the timeout handler, allowing the actual state
+to be changed inline with the true state, and drivers don't need to be
+aware any of this is happening.
+
+In order to make the overhead as minimal as possible, the request's
+reference is taken only when it appears that actual timeout handling
+needs to be done.
+
+Keith Busch (3):
+  blk-mq: Reference count request usage
+  blk-mq: Fix timeout and state order
+  blk-mq: Remove generation seqeunce
+
+ block/blk-core.c       |   6 -
+ block/blk-mq-debugfs.c |   1 -
+ block/blk-mq.c         | 291 +++++++++++++------------------------------------
+ block/blk-mq.h         |  20 +---
+ block/blk-timeout.c    |   1 -
+ include/linux/blkdev.h |  26 +----
+ 6 files changed, 83 insertions(+), 262 deletions(-)
+
+-- 
+2.14.3
