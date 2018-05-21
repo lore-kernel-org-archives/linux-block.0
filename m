@@ -1,45 +1,46 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 04/33] fs: remove the buffer_unwritten check in page_seek_hole_data
-Date: Wed,  9 May 2018 09:48:01 +0200
-Message-Id: <20180509074830.16196-5-hch@lst.de>
-In-Reply-To: <20180509074830.16196-1-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <prvs=672bd835f=Adam.Manzanares@wdc.com>
+From: Adam Manzanares <Adam.Manzanares@wdc.com>
+To: Jeff Moyer <jmoyer@redhat.com>
+CC: "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "bcrl@kvack.org" <bcrl@kvack.org>,
+	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@kernel.org"
+	<mingo@kernel.org>, "pombredanne@nexb.com" <pombredanne@nexb.com>,
+	"kstewart@linuxfoundation.org" <kstewart@linuxfoundation.org>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"bigeasy@linutronix.de" <bigeasy@linutronix.de>, "jack@suse.cz"
+	<jack@suse.cz>, "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
+	"rgoldwyn@suse.com" <rgoldwyn@suse.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-aio@kvack.org" <linux-aio@kvack.org>,
+	"linux-api@vger.kernel.org" <linux-api@vger.kernel.org>, "hch@infradead.org"
+	<hch@infradead.org>
+Subject: Re: [PATCH v5 0/5] AIO add per-command iopriority
+Date: Mon, 21 May 2018 21:42:22 +0000
+Message-ID: <9791140b-1674-0e36-cbd9-f2bf8b6b25f5@wdc.com>
+References: <20180521160147.2372-1-adam.manzanares@wdc.com>
+ <x49fu2kvi9q.fsf@segfault.boston.devel.redhat.com>
+In-Reply-To: <x49fu2kvi9q.fsf@segfault.boston.devel.redhat.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-We only call into this function through the iomap iterators, so we already
-know the buffer is unwritten.  In addition to that we always require the
-uptodate flag that is ORed with the result anyway.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/iomap.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
-
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 13f518c7d3be..a739f3f995d9 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -610,14 +610,9 @@ page_seek_hole_data(struct page *page, loff_t lastoff, int whence)
- 			continue;
- 
- 		/*
--		 * Unwritten extents that have data in the page cache covering
--		 * them can be identified by the BH_Unwritten state flag.
--		 * Pages with multiple buffers might have a mix of holes, data
--		 * and unwritten extents - any buffer with valid data in it
--		 * should have BH_Uptodate flag set on it.
-+		 * Any buffer with valid data in it should have BH_Uptodate set.
- 		 */
--
--		if ((buffer_unwritten(bh) || buffer_uptodate(bh)) == seek_data)
-+		if (buffer_uptodate(bh) == seek_data)
- 			return lastoff;
- 
- 		lastoff = offset;
--- 
-2.17.0
+DQoNCk9uIDUvMjEvMTggMTo1NyBQTSwgSmVmZiBNb3llciB3cm90ZToNCj4gSGksIEFkYW0sDQo+
+IA0KPiBhZGFtLm1hbnphbmFyZXNAd2RjLmNvbSB3cml0ZXM6DQo+IA0KPj4gRnJvbTogQWRhbSBN
+YW56YW5hcmVzIDxhZGFtLm1hbnphbmFyZXNAd2RjLmNvbT4NCj4+DQo+PiBUaGlzIGlzIHRoZSBw
+ZXItSS9PIGVxdWl2YWxlbnQgb2YgdGhlIGlvcHJpb19zZXQgc3lzdGVtIGNhbGwuDQo+PiBTZWUg
+dGhlIGZvbGxvd2luZyBsaW5rIGZvciBwZXJmb3JtYW5jZSBpbXBsaWNhdGlvbnMgb24gYSBTQVRB
+IEhERDoNCj4+IGh0dHBzOi8vbGttbC5vcmcvbGttbC8yMDE2LzEyLzYvNDk1DQo+Pg0KPj4gRmly
+c3QgcGF0Y2ggZmFjdG9ycyBpb3ByaW9fY2hlY2tfY2FwIGZ1bmN0aW9uIG91dCBvZiBpb3ByaW9f
+c2V0IHN5c3RlbSBjYWxsIHRvDQo+PiBhbHNvIGJlIHVzZWQgYnkgdGhlIGFpbyBpb3ByaW8gaW50
+ZXJmYWNlLg0KPj4NCj4+IFNlY29uZCBwYXRjaCBjb252ZXJ0cyBraW9jYiBraV9oaW50IGZpZWxk
+IHRvIGEgdTE2IHRvIGF2b2lkIGtpb2NiIGJsb2F0Lg0KPj4NCj4+IFRoaXJkIHBhdGNoIHBhc3Nl
+cyBpb3ByaW8gaGludCBmcm9tIGFpbyBpb2NiIHRvIGtpb2NiIGFuZCBpbml0aXRhbGl6ZXMga2lv
+Y2INCj4+IGlvcHJpbyB2YWx1ZSBhcHByb3ByaWF0ZWx5IHdoZW4gaXQgaXMgbm90IGV4cGxpY2l0
+bHkgc2V0Lg0KPj4NCj4+IEZvdXJ0aCBwYXRjaCBlbmFibGVzIHRoZSBmZWF0dXJlIGZvciBibGtk
+ZXYuDQo+Pg0KPj4gRmlmdGggcGF0Y2ggZW5hYmxlcyB0aGUgZmVhdHVyZSBmb3IgaW9tYXAgZGly
+ZWN0IElPDQo+Pg0KPj4gTm90ZTogdGhpcyB3b3JrIGlzIGJhc2VkIG9uIHRvcCBvZiBsaW51eC12
+ZnMvZm9yLW5leHQNCj4gDQo+IEknbGwgY29vayB1cCBhIGxpYmFpbyB0ZXN0IGNhc2UuICBDYW4g
+eW91IHB1dCB0b2dldGhlciBhIG1hbi1wYWdlcw0KPiB1cGRhdGUgZm9yIHRoaXM/DQoNCkhlbGxv
+IEplZmYsDQoNCkknbGwgc2VuZCBvdXQgYSBtYW4tcGFnZXMgdXBkYXRlIHNvb24uDQoNClRoYW5r
+cywNCkFkYW0NCg0KPiANCj4gVGhhbmtzIQ0KPiBKZWZmDQo+IA==
