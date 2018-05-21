@@ -1,7 +1,7 @@
-Return-Path: <keith.busch@linux.intel.com>
-Date: Mon, 21 May 2018 09:59:09 -0600
-From: Keith Busch <keith.busch@linux.intel.com>
-To: Ming Lei <ming.lei@redhat.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Mon, 21 May 2018 23:25:43 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@linux.intel.com>
 Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
 	Laurence Oberman <loberman@redhat.com>,
 	Sagi Grimberg <sagi@grimberg.me>,
@@ -10,88 +10,76 @@ Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
 	Johannes Thumshirn <jthumshirn@suse.de>,
 	Christoph Hellwig <hch@lst.de>
 Subject: Re: [PATCH 1/6] nvme: Sync request queues on reset
-Message-ID: <20180521155909.GK5528@localhost.localdomain>
+Message-ID: <20180521152536.GB19099@ming.t460p>
 References: <20180518163823.27820-1-keith.busch@intel.com>
  <20180518223210.GB18334@ming.t460p>
  <20180518234408.GA31749@localhost.localdomain>
  <20180519000141.GB19799@ming.t460p>
  <20180521140413.GA5528@localhost.localdomain>
- <20180521152536.GB19099@ming.t460p>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180521152536.GB19099@ming.t460p>
+In-Reply-To: <20180521140413.GA5528@localhost.localdomain>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, May 21, 2018 at 11:25:43PM +0800, Ming Lei wrote:
-> On Mon, May 21, 2018 at 08:04:13AM -0600, Keith Busch wrote:
-> > On Sat, May 19, 2018 at 08:01:42AM +0800, Ming Lei wrote:
-> > > > You keep saying that, but the controller state is global to the
-> > > > controller. It doesn't matter which namespace request_queue started the
-> > > > reset: every namespaces request queue sees the RESETTING controller state
-> > > 
-> > > When timeouts come, the global state of RESETTING may not be updated
-> > > yet, so all the timeouts may not observe the state.
+On Mon, May 21, 2018 at 08:04:13AM -0600, Keith Busch wrote:
+> On Sat, May 19, 2018 at 08:01:42AM +0800, Ming Lei wrote:
+> > > You keep saying that, but the controller state is global to the
+> > > controller. It doesn't matter which namespace request_queue started the
+> > > reset: every namespaces request queue sees the RESETTING controller state
 > > 
-> > Even prior to the RESETING state, every single command, no matter
-> > which namespace or request_queue it came on, is reclaimed by the driver.
-> > There *should* be no requests to timeout after nvme_dev_disable is called
-> > because the nvme driver returned control of all requests in the tagset
-> > to blk-mq.
+> > When timeouts come, the global state of RESETTING may not be updated
+> > yet, so all the timeouts may not observe the state.
 > 
-> The timed-out requests won't be canceled by nvme_dev_disable().
+> Even prior to the RESETING state, every single command, no matter
+> which namespace or request_queue it came on, is reclaimed by the driver.
+> There *should* be no requests to timeout after nvme_dev_disable is called
+> because the nvme driver returned control of all requests in the tagset
+> to blk-mq.
 
-??? nvme_dev_disable cancels all started requests. There are no exceptions.
+The timed-out requests won't be canceled by nvme_dev_disable().
 
-> If the timed-out requests is handled as RESET_TIMER, there may
-> be new timeout event triggered again.
+If the timed-out requests is handled as RESET_TIMER, there may
+be new timeout event triggered again.
+
 > 
-> > 
-> > In any case, if blk-mq decides it won't complete those requests, we
-> > can just swap the order in the reset_work: sync first, uncondintionally
-> > disable. Does the following snippet look more okay?
-> > 
-> > ---
-> > diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> > index 17a0190bd88f..42af077ee07a 100644
-> > --- a/drivers/nvme/host/pci.c
-> > +++ b/drivers/nvme/host/pci.c
-> > @@ -2307,11 +2307,14 @@ static void nvme_reset_work(struct work_struct *work)
-> >  		goto out;
-> >  
-> >  	/*
-> > -	 * If we're called to reset a live controller first shut it down before
-> > -	 * moving on.
-> > +	 * Ensure there are no timeout work in progress prior to forcefully
-> > +	 * disabling the queue. There is no harm in disabling the device even
-> > +	 * when it was already disabled, as this will forcefully reclaim any
-> > +	 * IOs that are stuck due to blk-mq's timeout handling that prevents
-> > +	 * timed out requests from completing.
-> >  	 */
-> > -	if (dev->ctrl.ctrl_config & NVME_CC_ENABLE)
-> > -		nvme_dev_disable(dev, false);
-> > +	nvme_sync_queues(&dev->ctrl);
-> > +	nvme_dev_disable(dev, false);
+> In any case, if blk-mq decides it won't complete those requests, we
+> can just swap the order in the reset_work: sync first, uncondintionally
+> disable. Does the following snippet look more okay?
 > 
-> That may not work reliably too.
-> 
-> For example, request A from NS_0 is timed-out and handled as RESET_TIMER,
-> meantime request B from NS_1 is timed-out and handled as EH_HANDLED.
+> ---
+> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+> index 17a0190bd88f..42af077ee07a 100644
+> --- a/drivers/nvme/host/pci.c
+> +++ b/drivers/nvme/host/pci.c
+> @@ -2307,11 +2307,14 @@ static void nvme_reset_work(struct work_struct *work)
+>  		goto out;
+>  
+>  	/*
+> -	 * If we're called to reset a live controller first shut it down before
+> -	 * moving on.
+> +	 * Ensure there are no timeout work in progress prior to forcefully
+> +	 * disabling the queue. There is no harm in disabling the device even
+> +	 * when it was already disabled, as this will forcefully reclaim any
+> +	 * IOs that are stuck due to blk-mq's timeout handling that prevents
+> +	 * timed out requests from completing.
+>  	 */
+> -	if (dev->ctrl.ctrl_config & NVME_CC_ENABLE)
+> -		nvme_dev_disable(dev, false);
+> +	nvme_sync_queues(&dev->ctrl);
+> +	nvme_dev_disable(dev, false);
 
-Meanwhile, request B's nvme_dev_disable prior to returning EH_HANDLED
-cancels all requests, which includes request A.
+That may not work reliably too.
 
-> When the above reset work is run for handling timeout of req B,
-> new timeout event on request A may come just between the above
-> nvme_sync_queues() and nvme_dev_disable()
+For example, request A from NS_0 is timed-out and handled as RESET_TIMER,
+meantime request B from NS_1 is timed-out and handled as EH_HANDLED.
 
-The sync queues either stops the timer from running, or waits for it to
-complete. We are in the RESETTING state: if request A's timeout happens
-to be running, we're not restarting the timer; we're returning EH_HANDLED.
+When the above reset work is run for handling timeout of req B,
+new timeout event on request A may come just between the above
+nvme_sync_queues() and nvme_dev_disable(), then nvme_dev_disable()
+can't cover request A, and finally the timed-out event for req A
+will nvme_dev_disable() when the current reset is just in-progress,
+then this reset can't move on, and IO hang is caused.
 
-> then nvme_dev_disable()
-> can't cover request A, and finally the timed-out event for req A
-> will nvme_dev_disable() when the current reset is just in-progress,
-> then this reset can't move on, and IO hang is caused.
 
-At no point in the nvme_reset are we waiting for any IO to complete.
-Reset continues to make forward progress.
+Thanks,
+Ming
