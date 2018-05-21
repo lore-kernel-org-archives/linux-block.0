@@ -1,62 +1,91 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	nbd@other.debian.org,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH] nbd: set discard granularity properly
-Date: Wed, 23 May 2018 13:35:59 -0400
-Message-Id: <20180523173559.6336-1-josef@toxicpanda.com>
+Return-Path: <jmoyer@redhat.com>
+From: Jeff Moyer <jmoyer@redhat.com>
+To: adam.manzanares@wdc.com
+Cc: viro@zeniv.linux.org.uk,  linux-fsdevel@vger.kernel.org,  axboe@kernel.dk,  bcrl@kvack.org,  tglx@linutronix.de,  mingo@kernel.org,  pombredanne@nexb.com,  kstewart@linuxfoundation.org,  gregkh@linuxfoundation.org,  bigeasy@linutronix.de,  jack@suse.cz,  darrick.wong@oracle.com,  rgoldwyn@suse.com,  linux-block@vger.kernel.org,  linux-kernel@vger.kernel.org,  linux-aio@kvack.org,  linux-api@vger.kernel.org,  hch@infradead.org
+Subject: Re: [PATCH v5 1/5] block: add ioprio_check_cap function
+In-Reply-To: <20180521160147.2372-2-adam.manzanares@wdc.com> (adam
+	manzanares's message of "Mon, 21 May 2018 09:01:43 -0700")
+References: <20180521160147.2372-1-adam.manzanares@wdc.com>
+	<20180521160147.2372-2-adam.manzanares@wdc.com>
+Date: Mon, 21 May 2018 16:58:14 -0400
+Message-ID: <x49a7ssvi8p.fsf@segfault.boston.devel.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-From: Josef Bacik <jbacik@fb.com>
+adam.manzanares@wdc.com writes:
 
-For some reason we had discard granularity set to 512 always even when
-discards were disabled.  Fix this by having the default be 0, and then
-if we turn it on set the discard granularity to the blocksize.
+> From: Adam Manzanares <adam.manzanares@wdc.com>
+>
+> Aio per command iopriority support introduces a second interface between
+> userland and the kernel capable of passing iopriority. The aio interface also
+> needs the ability to verify that the submitting context has sufficient
+> priviledges to submit IOPRIO_RT commands. This patch creates the
+> ioprio_check_cap function to be used by the ioprio_set system call and also by
+> the aio interface.
+>
+> Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
----
- drivers/block/nbd.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 1147e4680c80..bdfbb2a7018c 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -236,6 +236,10 @@ static void nbd_size_update(struct nbd_device *nbd)
- 	struct nbd_config *config = nbd->config;
- 	struct block_device *bdev = bdget_disk(nbd->disk, 0);
- 
-+	if (config->flags & NBD_FLAG_SEND_TRIM) {
-+		nbd->disk->queue->limits.discard_granularity = config->blksize;
-+		blk_queue_max_discard_sectors(nbd->disk->queue, UINT_MAX);
-+	}
- 	blk_queue_logical_block_size(nbd->disk->queue, config->blksize);
- 	blk_queue_physical_block_size(nbd->disk->queue, config->blksize);
- 	set_capacity(nbd->disk, config->bytesize >> 9);
-@@ -1050,6 +1054,8 @@ static void nbd_config_put(struct nbd_device *nbd)
- 		nbd->config = NULL;
- 
- 		nbd->tag_set.timeout = 0;
-+		nbd->disk->queue->limits.discard_granularity = 0;
-+		blk_queue_max_discard_sectors(nbd->disk->queue, UINT_MAX);
- 		blk_queue_flag_clear(QUEUE_FLAG_DISCARD, nbd->disk->queue);
- 
- 		mutex_unlock(&nbd->config_lock);
-@@ -1502,8 +1508,8 @@ static int nbd_dev_add(int index)
- 	 */
- 	blk_queue_flag_set(QUEUE_FLAG_NONROT, disk->queue);
- 	blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, disk->queue);
--	disk->queue->limits.discard_granularity = 512;
--	blk_queue_max_discard_sectors(disk->queue, UINT_MAX);
-+	disk->queue->limits.discard_granularity = 0;
-+	blk_queue_max_discard_sectors(disk->queue, 0);
- 	blk_queue_max_segment_size(disk->queue, UINT_MAX);
- 	blk_queue_max_segments(disk->queue, USHRT_MAX);
- 	blk_queue_max_hw_sectors(disk->queue, 65536);
--- 
-2.14.3
+
+> ---
+>  block/ioprio.c         | 22 ++++++++++++++++------
+>  include/linux/ioprio.h |  2 ++
+>  2 files changed, 18 insertions(+), 6 deletions(-)
+>
+> diff --git a/block/ioprio.c b/block/ioprio.c
+> index 6f5d0b6625e3..f9821080c92c 100644
+> --- a/block/ioprio.c
+> +++ b/block/ioprio.c
+> @@ -61,15 +61,10 @@ int set_task_ioprio(struct task_struct *task, int ioprio)
+>  }
+>  EXPORT_SYMBOL_GPL(set_task_ioprio);
+>  
+> -SYSCALL_DEFINE3(ioprio_set, int, which, int, who, int, ioprio)
+> +int ioprio_check_cap(int ioprio)
+>  {
+>  	int class = IOPRIO_PRIO_CLASS(ioprio);
+>  	int data = IOPRIO_PRIO_DATA(ioprio);
+> -	struct task_struct *p, *g;
+> -	struct user_struct *user;
+> -	struct pid *pgrp;
+> -	kuid_t uid;
+> -	int ret;
+>  
+>  	switch (class) {
+>  		case IOPRIO_CLASS_RT:
+> @@ -92,6 +87,21 @@ SYSCALL_DEFINE3(ioprio_set, int, which, int, who, int, ioprio)
+>  			return -EINVAL;
+>  	}
+>  
+> +	return 0;
+> +}
+> +
+> +SYSCALL_DEFINE3(ioprio_set, int, which, int, who, int, ioprio)
+> +{
+> +	struct task_struct *p, *g;
+> +	struct user_struct *user;
+> +	struct pid *pgrp;
+> +	kuid_t uid;
+> +	int ret;
+> +
+> +	ret = ioprio_check_cap(ioprio);
+> +	if (ret)
+> +		return ret;
+> +
+>  	ret = -ESRCH;
+>  	rcu_read_lock();
+>  	switch (which) {
+> diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
+> index 627efac73e6d..4a28cec49ec3 100644
+> --- a/include/linux/ioprio.h
+> +++ b/include/linux/ioprio.h
+> @@ -77,4 +77,6 @@ extern int ioprio_best(unsigned short aprio, unsigned short bprio);
+>  
+>  extern int set_task_ioprio(struct task_struct *task, int ioprio);
+>  
+> +extern int ioprio_check_cap(int ioprio);
+> +
+>  #endif
