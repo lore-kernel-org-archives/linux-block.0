@@ -1,112 +1,30 @@
-Return-Path: <BATV+df5a2477ff0fa86e9985+5386+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>,
-	Lee Duncan <lduncan@suse.com>,
-	Chris Leech <cleech@redhat.com>,
-	Rafael David Tinoco <rafael.tinoco@canonical.com>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 03/14] nvme: return BLK_EH_DONE from ->timeout
-Date: Wed, 23 May 2018 14:19:30 +0200
-Message-Id: <20180523121941.8632-4-hch@lst.de>
-In-Reply-To: <20180523121941.8632-1-hch@lst.de>
-References: <20180523121941.8632-1-hch@lst.de>
+Return-Path: <keith.busch@linux.intel.com>
+Date: Tue, 22 May 2018 10:44:04 -0600
+From: Keith Busch <keith.busch@linux.intel.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+	"keith.busch@intel.com" <keith.busch@intel.com>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>
+Subject: Re: [RFC PATCH 0/3] blk-mq: Timeout rework
+Message-ID: <20180522164403.GB8388@localhost.localdomain>
+References: <20180521231131.6685-1-keith.busch@intel.com>
+ <9ca27e059fbd12a976e1e2f1ee1aa5c8ca579ad0.camel@wdc.com>
+ <20180522140653.GP5528@localhost.localdomain>
+ <56564c0694eb3a21dfdcfbc6c3053774f026d371.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <56564c0694eb3a21dfdcfbc6c3053774f026d371.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-NVMe always completes the request before returning from ->timeout, either
-by polling for it, or by disabling the controller.  Return BLK_EH_DONE so
-that the block layer doesn't even try to complete it again.
+On Tue, May 22, 2018 at 04:30:41PM +0000, Bart Van Assche wrote:
+> 
+> Please have a look at v13 of the timeout handling rework patch that I posted.
+> That patch should not introduce any new race conditions and should also handle
+> the scenario fine in which blk_mq_complete_request() is called while the NVMe
+> timeout handling function is in progress.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/pci.c    | 14 +++++---------
- drivers/nvme/host/rdma.c   |  2 +-
- drivers/nvme/target/loop.c |  2 +-
- 3 files changed, 7 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 917e1714f7d9..31525324b79f 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1205,7 +1205,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 		nvme_warn_reset(dev, csts);
- 		nvme_dev_disable(dev, false);
- 		nvme_reset_ctrl(&dev->ctrl);
--		return BLK_EH_HANDLED;
-+		return BLK_EH_DONE;
- 	}
- 
- 	/*
-@@ -1215,14 +1215,14 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 		dev_warn(dev->ctrl.device,
- 			 "I/O %d QID %d timeout, completion polled\n",
- 			 req->tag, nvmeq->qid);
--		return BLK_EH_HANDLED;
-+		return BLK_EH_DONE;
- 	}
- 
- 	/*
- 	 * Shutdown immediately if controller times out while starting. The
- 	 * reset work will see the pci device disabled when it gets the forced
- 	 * cancellation error. All outstanding requests are completed on
--	 * shutdown, so we return BLK_EH_HANDLED.
-+	 * shutdown, so we return BLK_EH_DONE.
- 	 */
- 	switch (dev->ctrl.state) {
- 	case NVME_CTRL_CONNECTING:
-@@ -1232,7 +1232,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 			 req->tag, nvmeq->qid);
- 		nvme_dev_disable(dev, false);
- 		nvme_req(req)->flags |= NVME_REQ_CANCELLED;
--		return BLK_EH_HANDLED;
-+		return BLK_EH_DONE;
- 	default:
- 		break;
- 	}
-@@ -1249,12 +1249,8 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 		nvme_dev_disable(dev, false);
- 		nvme_reset_ctrl(&dev->ctrl);
- 
--		/*
--		 * Mark the request as handled, since the inline shutdown
--		 * forces all outstanding requests to complete.
--		 */
- 		nvme_req(req)->flags |= NVME_REQ_CANCELLED;
--		return BLK_EH_HANDLED;
-+		return BLK_EH_DONE;
- 	}
- 
- 	if (atomic_dec_return(&dev->ctrl.abort_limit) < 0) {
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 1eb4438a8763..ac7462cd7f0f 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -1598,7 +1598,7 @@ nvme_rdma_timeout(struct request *rq, bool reserved)
- 	/* fail with DNR on cmd timeout */
- 	nvme_req(rq)->status = NVME_SC_ABORT_REQ | NVME_SC_DNR;
- 
--	return BLK_EH_HANDLED;
-+	return BLK_EH_DONE;
- }
- 
- static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
-diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
-index 27a8561c0cb9..22e3627bf16b 100644
---- a/drivers/nvme/target/loop.c
-+++ b/drivers/nvme/target/loop.c
-@@ -146,7 +146,7 @@ nvme_loop_timeout(struct request *rq, bool reserved)
- 	/* fail with DNR on admin cmd timeout */
- 	nvme_req(rq)->status = NVME_SC_ABORT_REQ | NVME_SC_DNR;
- 
--	return BLK_EH_HANDLED;
-+	return BLK_EH_DONE;
- }
- 
- static blk_status_t nvme_loop_queue_rq(struct blk_mq_hw_ctx *hctx,
--- 
-2.17.0
+Thanks for the notice. That sounds very interesting and will be happy
+take a look.
