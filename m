@@ -1,31 +1,49 @@
-Return-Path: <keith.busch@intel.com>
-Date: Tue, 22 May 2018 14:40:15 -0600
-From: Keith Busch <keith.busch@intel.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"israelr@mellanox.com" <israelr@mellanox.com>,
-	"sagi@grimberg.me" <sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>,
-	"sebott@linux.ibm.com" <sebott@linux.ibm.com>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
-	"maxg@mellanox.com" <maxg@mellanox.com>,
+Return-Path: <prvs=673874c89=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "keith.busch@intel.com" <keith.busch@intel.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"israelr@mellanox.com" <israelr@mellanox.com>, "sagi@grimberg.me"
+	<sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>, "sebott@linux.ibm.com"
+	<sebott@linux.ibm.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "jianchao.w.wang@oracle.com"
+	<jianchao.w.wang@oracle.com>, "maxg@mellanox.com" <maxg@mellanox.com>,
 	"tj@kernel.org" <tj@kernel.org>
 Subject: Re: [PATCH v13] blk-mq: Rework blk-mq timeout handling again
-Message-ID: <20180522204015.GA9005@localhost.localdomain>
+Date: Tue, 22 May 2018 20:36:27 +0000
+Message-ID: <632c16e5c06edb13c93d61f9164584da470d8a24.camel@wdc.com>
 References: <20180522162515.20650-1-bart.vanassche@wdc.com>
- <20180522203349.GB8961@localhost.localdomain>
- <632c16e5c06edb13c93d61f9164584da470d8a24.camel@wdc.com>
+	 <20180522203349.GB8961@localhost.localdomain>
+In-Reply-To: <20180522203349.GB8961@localhost.localdomain>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <632c16e5c06edb13c93d61f9164584da470d8a24.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, May 22, 2018 at 08:36:27PM +0000, Bart Van Assche wrote:
-> Have you noticed that if blk_mq_complete_request() encounters a request with
-> state MQ_RQ_TIMED_OUT that it doesn't call __blk_mq_complete_request()? I think
-> the code in blk_mq_complete_request() together with the above code guarantees
-> that __blk_mq_complete_request() is only called once per request generation.
-
-Right, my mistake. I noticed that when I saw your reply on the EH_HANDLED
-case, so looks fine.
+T24gVHVlLCAyMDE4LTA1LTIyIGF0IDE0OjMzIC0wNjAwLCBLZWl0aCBCdXNjaCB3cm90ZToNCj4g
+T24gVHVlLCBNYXkgMjIsIDIwMTggYXQgMDk6MjU6MTVBTSAtMDcwMCwgQmFydCBWYW4gQXNzY2hl
+IHdyb3RlOg0KPiA+IEBAIC04NDgsMTMgKzg0MywyMiBAQCBzdGF0aWMgdm9pZCBibGtfbXFfcnFf
+dGltZWRfb3V0KHN0cnVjdCByZXF1ZXN0ICpyZXEsIGJvb2wgcmVzZXJ2ZWQpDQo+ID4gIAljYXNl
+IEJMS19FSF9SRVNFVF9USU1FUjoNCj4gPiArCQlibGtfbXFfYWRkX3RpbWVyKHJlcSk7DQo+ID4g
+IAkJLyoNCj4gPiArCQkgKiBUaGUgbG9vcCBpcyBmb3IgdGhlIHVubGlrZWx5IGNhc2Ugb2YgYSBy
+YWNlIHdpdGggdGhlDQo+ID4gKwkJICogY29tcGxldGlvbiBjb2RlLiBUaGVyZSBpcyBubyBuZWVk
+IHRvIHJlc2V0IHRoZSBkZWFkbGluZQ0KPiA+ICsJCSAqIGlmIHRoZSB0cmFuc2l0aW9uIHRvIHRo
+ZSBpbi1mbGlnaHQgc3RhdGUgZmFpbHMgYmVjYXVzZQ0KPiA+ICsJCSAqIHRoZSBkZWFkbGluZSBv
+bmx5IG1hdHRlcnMgaW4gdGhlIGluLWZsaWdodCBzdGF0ZS4NCj4gPiAgCQkgKi8NCj4gPiAtCQli
+bGtfbXFfcnFfdXBkYXRlX2Fib3J0ZWRfZ3N0YXRlKHJlcSwgMCk7DQo+ID4gLQkJYmxrX2FkZF90
+aW1lcihyZXEpOw0KPiA+ICsJCXdoaWxlICh0cnVlKSB7DQo+ID4gKwkJCWlmIChibGtfbXFfY2hh
+bmdlX3JxX3N0YXRlKHJlcSwgTVFfUlFfVElNRURfT1VULA0KPiA+ICsJCQkJCQkgICBNUV9SUV9J
+Tl9GTElHSFQpKQ0KPiA+ICsJCQkJYnJlYWs7DQo+ID4gKwkJCWlmIChibGtfbXFfcnFfc3RhdGUo
+cmVxKSA9PSBNUV9SUV9DT01QTEVURSkgew0KPiA+ICsJCQkJX19ibGtfbXFfY29tcGxldGVfcmVx
+dWVzdChyZXEpOw0KPiA+ICsJCQkJYnJlYWs7DQo+ID4gKwkJCX0NCj4gPiArCQl9DQo+IA0KPiBJ
+J20gaGF2aW5nIHNvbWUgdHJvdWJsZSB0cmlnZ2VyaW5nIHRoaXMgY2FzZSB3aGVyZSB0aGUgc3Rh
+dGUgaXMgYWxyZWFkeQ0KPiBNUV9SUV9DT01QTEVURSwgc28gSSdtIGp1c3QgdHJ5aW5nIHRvIGZp
+Z3VyZSB0aGlzIG91dCB0aHJvdWdoIGluc3BlY3Rpb24uDQo+IA0KPiBJdCBsb29rcyBsaWtlIHRo
+ZSBuZXcgYmxrX21xX2NvbXBsZXRlX3JlcXVlc3QoKSBhbHJlYWR5IGNhbGxlZA0KPiBfX2Jsa19t
+cV9jb21wbGV0ZV9yZXF1ZXN0KCkgd2hlbiBpdCBnZXRzIHRoZSBzdGF0ZSB0byBNUV9SUV9DT01Q
+TEVURSwNCj4gc28gZG9pbmcgdGhhdCBhZ2FpbiBjb21wbGV0ZXMgaXQgYSBzZWNvbmQgdGltZS4N
+Cg0KSGVsbG8gS2VpdGgsDQoNCkhhdmUgeW91IG5vdGljZWQgdGhhdCBpZiBibGtfbXFfY29tcGxl
+dGVfcmVxdWVzdCgpIGVuY291bnRlcnMgYSByZXF1ZXN0IHdpdGgNCnN0YXRlIE1RX1JRX1RJTUVE
+X09VVCB0aGF0IGl0IGRvZXNuJ3QgY2FsbCBfX2Jsa19tcV9jb21wbGV0ZV9yZXF1ZXN0KCk/IEkg
+dGhpbmsNCnRoZSBjb2RlIGluIGJsa19tcV9jb21wbGV0ZV9yZXF1ZXN0KCkgdG9nZXRoZXIgd2l0
+aCB0aGUgYWJvdmUgY29kZSBndWFyYW50ZWVzDQp0aGF0IF9fYmxrX21xX2NvbXBsZXRlX3JlcXVl
+c3QoKSBpcyBvbmx5IGNhbGxlZCBvbmNlIHBlciByZXF1ZXN0IGdlbmVyYXRpb24uDQoNCkJhcnQu
+DQoNCg0KDQo=
