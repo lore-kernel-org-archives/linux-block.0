@@ -1,28 +1,34 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] blk-mq: remove wrong 'unlikely' checks
-To: huhai <huhai@kylinos.cn>
-Cc: ming.lei@redhat.com, linux-block@vger.kernel.org
-References: <20180522093934.20849-1-huhai@kylinos.cn>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <3bc10dfd-1167-5a0c-08c8-846755ca9105@kernel.dk>
-Date: Tue, 22 May 2018 08:37:26 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180522093934.20849-1-huhai@kylinos.cn>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <huhai@kylinos.cn>
+From: huhai <huhai@kylinos.cn>
+To: axboe@kernel.dk
+Cc: ming.lei@redhat.com,
+	linux-block@vger.kernel.org
+Subject: [PATCH] blk-mq: remove wrong 'unlikely' checks
+Date: Tue, 22 May 2018 17:39:34 +0800
+Message-Id: <20180522093934.20849-1-huhai@kylinos.cn>
 List-ID: <linux-block@vger.kernel.org>
 
-On 5/22/18 3:39 AM, huhai wrote:
-> When dispatch_rq_from_ctx is called, in the vast majority of cases
-> the ctx->rq_list is not empty
+When dispatch_rq_from_ctx is called, in the vast majority of cases
+the ctx->rq_list is not empty
 
-I'm fine with killing it, generally I dislike the likely/unlikely
-annotations unless the intent is absolutely clear. This one is not.
+Fixes: b347689ffbca ("blk-mq-sched: improve dispatching from sw queue")
+Signed-off-by: huhai <huhai@kylinos.cn>
+---
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Fixes: b347689ffbca ("blk-mq-sched: improve dispatching from sw queue")
-
-Though for this one, I'll drop the fixes tag as it isn't something we
-need to backport to stable and it's not really fixing a real bug that
-is causing an issue.
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4cbfd784e837..df928200b17e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1036,7 +1036,7 @@ static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr,
+ 	struct blk_mq_ctx *ctx = hctx->ctxs[bitnr];
+ 
+ 	spin_lock(&ctx->lock);
+-	if (unlikely(!list_empty(&ctx->rq_list))) {
++	if (!list_empty(&ctx->rq_list)) {
+ 		dispatch_data->rq = list_entry_rq(ctx->rq_list.next);
+ 		list_del_init(&dispatch_data->rq->queuelist);
+ 		if (list_empty(&ctx->rq_list))
 -- 
-Jens Axboe
+2.17.0
