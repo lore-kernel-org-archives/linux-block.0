@@ -1,14 +1,14 @@
-Return-Path: <hch@lst.de>
-Date: Tue, 22 May 2018 17:24:37 +0200
-From: Christoph Hellwig <hch@lst.de>
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 22 May 2018 10:28:14 +0800
+From: Ming Lei <ming.lei@redhat.com>
 To: Keith Busch <keith.busch@intel.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
+	linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
 	Bart Van Assche <bart.vanassche@wdc.com>
 Subject: Re: [RFC PATCH 2/3] blk-mq: Fix timeout and state order
-Message-ID: <20180522152437.GB18664@lst.de>
-References: <20180521231131.6685-1-keith.busch@intel.com> <20180521231131.6685-3-keith.busch@intel.com>
+Message-ID: <20180522022813.GC20430@ming.t460p>
+References: <20180521231131.6685-1-keith.busch@intel.com>
+ <20180521231131.6685-3-keith.busch@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180521231131.6685-3-keith.busch@intel.com>
@@ -21,8 +21,31 @@ On Mon, May 21, 2018 at 05:11:30PM -0600, Keith Busch wrote:
 > expired when in fact it is just getting started.
 > 
 > Signed-off-by: Keith Busch <keith.busch@intel.com>
+> ---
+>  block/blk-mq.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 8b370ed75605..66e5c768803f 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -713,8 +713,8 @@ void blk_mq_start_request(struct request *rq)
+>  	preempt_disable();
+>  	write_seqcount_begin(&rq->gstate_seq);
+>  
+> -	blk_mq_rq_update_state(rq, MQ_RQ_IN_FLIGHT);
+>  	blk_add_timer(rq);
+> +	blk_mq_rq_update_state(rq, MQ_RQ_IN_FLIGHT);
+>  
+>  	write_seqcount_end(&rq->gstate_seq);
+>  	preempt_enable();
+> -- 
+> 2.14.3
+> 
 
-The way I understood Barts comments to my comments on his patch we
-actually need the two updates to be atomic.  I haven't had much time
-to follow up, but I'd like to hear Barts opinion.  Either way we
-clearly need to document our assumptions here in comments.
+Looks fine,
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+Thanks,
+Ming
