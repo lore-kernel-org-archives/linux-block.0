@@ -1,99 +1,61 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
+Return-Path: <owner-linux-aio@kvack.org>
+From: adam.manzanares@wdc.com
+To: viro@zeniv.linux.org.uk,
+	linux-fsdevel@vger.kernel.org,
 	axboe@kernel.dk,
-	hch@infradead.org,
-	colyli@suse.de,
-	snitzer@redhat.com,
-	darrick.wong@oracle.com,
-	clm@fb.com,
-	bacik@fb.com,
-	linux-xfs@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	linux-btrfs@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	neilb@suse.com
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Subject: [PATCH 08/12] target: convert to bioset_init()/mempool_init()
-Date: Sun, 20 May 2018 18:25:54 -0400
-Message-Id: <20180520222558.7053-9-kent.overstreet@gmail.com>
-In-Reply-To: <20180520222558.7053-1-kent.overstreet@gmail.com>
-References: <20180520222558.7053-1-kent.overstreet@gmail.com>
+	bcrl@kvack.org
+Cc: mingo@kernel.org,
+	tglx@linutronix.de,
+	kstewart@linuxfoundation.org,
+	peterz@infradead.org,
+	pombredanne@nexb.com,
+	gregkh@linuxfoundation.org,
+	bigeasy@linutronix.de,
+	rgoldwyn@suse.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-aio@kvack.org,
+	linux-api@vger.kernel.org,
+	hch@infradread.org,
+	jmoyer@redhat.com,
+	Adam Manzanares <adam.manzanares@wdc.com>
+Subject: [PATCH v7 5/5] fs: iomap dio set bio prio from kiocb prio
+Date: Tue, 22 May 2018 10:52:21 -0700
+Message-Id: <20180522175221.2391-6-adam.manzanares@wdc.com>
+In-Reply-To: <20180522175221.2391-1-adam.manzanares@wdc.com>
+References: <20180522175221.2391-1-adam.manzanares@wdc.com>
+Sender: owner-linux-aio@kvack.org
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
----
- drivers/target/target_core_iblock.c | 14 ++++++--------
- drivers/target/target_core_iblock.h |  2 +-
- 2 files changed, 7 insertions(+), 9 deletions(-)
+From: Adam Manzanares <adam.manzanares@wdc.com>
 
-diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
-index 44cacd001a..ce1321a5cb 100644
---- a/drivers/target/target_core_iblock.c
-+++ b/drivers/target/target_core_iblock.c
-@@ -94,8 +94,8 @@ static int iblock_configure_device(struct se_device *dev)
- 		return -EINVAL;
- 	}
+Now that kiocb has an ioprio field copy this over to the bio when it is
+created from the kiocb during direct IO.
+
+Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
+Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/iomap.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/fs/iomap.c b/fs/iomap.c
+index afd163586aa0..65aae194aeca 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -919,6 +919,7 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
+ 		bio->bi_iter.bi_sector =
+ 			(iomap->addr + pos - iomap->offset) >> 9;
+ 		bio->bi_write_hint = dio->iocb->ki_hint;
++		bio->bi_ioprio = dio->iocb->ki_ioprio;
+ 		bio->bi_private = dio;
+ 		bio->bi_end_io = iomap_dio_bio_end_io;
  
--	ib_dev->ibd_bio_set = bioset_create(IBLOCK_BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
--	if (!ib_dev->ibd_bio_set) {
-+	ret = bioset_init(&ib_dev->ibd_bio_set, IBLOCK_BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
-+	if (ret) {
- 		pr_err("IBLOCK: Unable to create bioset\n");
- 		goto out;
- 	}
-@@ -141,7 +141,7 @@ static int iblock_configure_device(struct se_device *dev)
- 
- 	bi = bdev_get_integrity(bd);
- 	if (bi) {
--		struct bio_set *bs = ib_dev->ibd_bio_set;
-+		struct bio_set *bs = &ib_dev->ibd_bio_set;
- 
- 		if (!strcmp(bi->profile->name, "T10-DIF-TYPE3-IP") ||
- 		    !strcmp(bi->profile->name, "T10-DIF-TYPE1-IP")) {
-@@ -174,8 +174,7 @@ static int iblock_configure_device(struct se_device *dev)
- out_blkdev_put:
- 	blkdev_put(ib_dev->ibd_bd, FMODE_WRITE|FMODE_READ|FMODE_EXCL);
- out_free_bioset:
--	bioset_free(ib_dev->ibd_bio_set);
--	ib_dev->ibd_bio_set = NULL;
-+	bioset_exit(&ib_dev->ibd_bio_set);
- out:
- 	return ret;
- }
-@@ -199,8 +198,7 @@ static void iblock_destroy_device(struct se_device *dev)
- 
- 	if (ib_dev->ibd_bd != NULL)
- 		blkdev_put(ib_dev->ibd_bd, FMODE_WRITE|FMODE_READ|FMODE_EXCL);
--	if (ib_dev->ibd_bio_set != NULL)
--		bioset_free(ib_dev->ibd_bio_set);
-+	bioset_exit(&ib_dev->ibd_bio_set);
- }
- 
- static unsigned long long iblock_emulate_read_cap_with_block_size(
-@@ -332,7 +330,7 @@ iblock_get_bio(struct se_cmd *cmd, sector_t lba, u32 sg_num, int op,
- 	if (sg_num > BIO_MAX_PAGES)
- 		sg_num = BIO_MAX_PAGES;
- 
--	bio = bio_alloc_bioset(GFP_NOIO, sg_num, ib_dev->ibd_bio_set);
-+	bio = bio_alloc_bioset(GFP_NOIO, sg_num, &ib_dev->ibd_bio_set);
- 	if (!bio) {
- 		pr_err("Unable to allocate memory for bio\n");
- 		return NULL;
-diff --git a/drivers/target/target_core_iblock.h b/drivers/target/target_core_iblock.h
-index b4aeb2584a..9cc3843404 100644
---- a/drivers/target/target_core_iblock.h
-+++ b/drivers/target/target_core_iblock.h
-@@ -22,7 +22,7 @@ struct iblock_dev {
- 	struct se_device dev;
- 	unsigned char ibd_udev_path[SE_UDEV_PATH_LEN];
- 	u32	ibd_flags;
--	struct bio_set	*ibd_bio_set;
-+	struct bio_set	ibd_bio_set;
- 	struct block_device *ibd_bd;
- 	bool ibd_readonly;
- } ____cacheline_aligned;
 -- 
-2.17.0
+2.15.1
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-aio' in
+the body to majordomo@kvack.org.  For more info on Linux AIO,
+see: http://www.kvack.org/aio/
+Don't email: <a href=mailto:"aart@kvack.org">aart@kvack.org</a>
