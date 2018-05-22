@@ -1,133 +1,68 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	kernel-team@fb.com,
+Return-Path: <owner-linux-aio@kvack.org>
+From: adam.manzanares@wdc.com
+To: viro@zeniv.linux.org.uk,
+	linux-fsdevel@vger.kernel.org,
+	axboe@kernel.dk,
+	bcrl@kvack.org
+Cc: mingo@kernel.org,
+	tglx@linutronix.de,
+	kstewart@linuxfoundation.org,
+	peterz@infradead.org,
+	pombredanne@nexb.com,
+	gregkh@linuxfoundation.org,
+	bigeasy@linutronix.de,
+	rgoldwyn@suse.com,
 	linux-block@vger.kernel.org,
-	akpm@linux-foundation.org,
-	linux-mm@kvack.org,
-	hannes@cmpxchg.org,
 	linux-kernel@vger.kernel.org,
-	tj@kernel.org,
-	linux-fsdevel@vger.kernel.org
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 03/13] blk-cgroup: allow controllers to output their own stats
-Date: Tue, 29 May 2018 17:17:14 -0400
-Message-Id: <20180529211724.4531-4-josef@toxicpanda.com>
-In-Reply-To: <20180529211724.4531-1-josef@toxicpanda.com>
-References: <20180529211724.4531-1-josef@toxicpanda.com>
+	linux-aio@kvack.org,
+	linux-api@vger.kernel.org,
+	hch@infradread.org,
+	jmoyer@redhat.com,
+	Adam Manzanares <adam.manzanares@wdc.com>
+Subject: [PATCH v7 4/5] fs: blkdev set bio prio from kiocb prio
+Date: Tue, 22 May 2018 10:52:20 -0700
+Message-Id: <20180522175221.2391-5-adam.manzanares@wdc.com>
+In-Reply-To: <20180522175221.2391-1-adam.manzanares@wdc.com>
+References: <20180522175221.2391-1-adam.manzanares@wdc.com>
+Sender: owner-linux-aio@kvack.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Josef Bacik <jbacik@fb.com>
+From: Adam Manzanares <adam.manzanares@wdc.com>
 
-blk-iolatency has a few stats that it would like to print out, and
-instead of adding a bunch of crap to the generic code just provide a
-helper so that controllers can add stuff to the stat line if they want
-to.
+Now that kiocb has an ioprio field copy this over to the bio when it is
+created from the kiocb.
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
+Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
+Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
 ---
- block/blk-cgroup.c         | 52 +++++++++++++++++++++++++++++++++++++++++++---
- include/linux/blk-cgroup.h |  3 +++
- 2 files changed, 52 insertions(+), 3 deletions(-)
+ fs/block_dev.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index eb85cb87c40f..9e767e4a852d 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -954,13 +954,28 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 7ec920e27065..11ba99e79d2a 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -216,6 +216,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+ 	bio.bi_write_hint = iocb->ki_hint;
+ 	bio.bi_private = current;
+ 	bio.bi_end_io = blkdev_bio_end_io_simple;
++	bio.bi_ioprio = iocb->ki_ioprio;
  
- 	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
- 		const char *dname;
-+		char *buf;
- 		struct blkg_rwstat rwstat;
- 		u64 rbytes, wbytes, rios, wios;
-+		size_t size = seq_get_buf(sf, &buf), count = 0, total = 0;
-+		int i;
+ 	ret = bio_iov_iter_get_pages(&bio, iter);
+ 	if (unlikely(ret))
+@@ -355,6 +356,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 		bio->bi_write_hint = iocb->ki_hint;
+ 		bio->bi_private = dio;
+ 		bio->bi_end_io = blkdev_bio_end_io;
++		bio->bi_ioprio = iocb->ki_ioprio;
  
- 		dname = blkg_dev_name(blkg);
- 		if (!dname)
- 			continue;
- 
-+		/*
-+		 * Hooray string manipulation, count is the size written NOT
-+		 * INCLUDING THE \0, so size is now count+1 less than what we
-+		 * had before, but we want to start writing the next bit from
-+		 * the \0 so we only add count to buf.
-+		 */
-+		count = snprintf(buf, size, "%s ", dname);
-+		if (count >= size)
-+			continue;
-+		buf += count;
-+		size -= count + 1;
-+
- 		spin_lock_irq(blkg->q->queue_lock);
- 
- 		rwstat = blkg_rwstat_recursive_sum(blkg, NULL,
-@@ -975,9 +990,40 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
- 
- 		spin_unlock_irq(blkg->q->queue_lock);
- 
--		if (rbytes || wbytes || rios || wios)
--			seq_printf(sf, "%s rbytes=%llu wbytes=%llu rios=%llu wios=%llu\n",
--				   dname, rbytes, wbytes, rios, wios);
-+		if (rbytes || wbytes || rios || wios) {
-+			total += count;
-+			count = snprintf(buf, size,
-+					 "rbytes=%llu wbytes=%llu rios=%llu wios=%llu",
-+					 rbytes, wbytes, rios, wios);
-+			if (count >= size)
-+				continue;
-+			buf += count;
-+			total += count;
-+			size -= count + 1;
-+		}
-+
-+		mutex_lock(&blkcg_pol_mutex);
-+		for (i = 0; i < BLKCG_MAX_POLS; i++) {
-+			struct blkcg_policy *pol = blkcg_policy[i];
-+
-+			if (!blkg->pd[i] || !pol->pd_stat_fn)
-+				continue;
-+
-+			count = pol->pd_stat_fn(blkg->pd[i], buf, size);
-+			if (count >= size)
-+				continue;
-+			buf += count;
-+			total += count;
-+			size -= count + 1;
-+		}
-+		mutex_unlock(&blkcg_pol_mutex);
-+		if (total) {
-+			count = snprintf(buf, size, "\n");
-+			if (count >= size)
-+				continue;
-+			total += count;
-+			seq_commit(sf, total);
-+		}
- 	}
- 
- 	rcu_read_unlock();
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 69aa71dc0c04..b41292726c0f 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -148,6 +148,8 @@ typedef void (blkcg_pol_online_pd_fn)(struct blkg_policy_data *pd);
- typedef void (blkcg_pol_offline_pd_fn)(struct blkg_policy_data *pd);
- typedef void (blkcg_pol_free_pd_fn)(struct blkg_policy_data *pd);
- typedef void (blkcg_pol_reset_pd_stats_fn)(struct blkg_policy_data *pd);
-+typedef size_t (blkcg_pol_stat_pd_fn)(struct blkg_policy_data *pd, char *buf,
-+				      size_t size);
- 
- struct blkcg_policy {
- 	int				plid;
-@@ -167,6 +169,7 @@ struct blkcg_policy {
- 	blkcg_pol_offline_pd_fn		*pd_offline_fn;
- 	blkcg_pol_free_pd_fn		*pd_free_fn;
- 	blkcg_pol_reset_pd_stats_fn	*pd_reset_stats_fn;
-+	blkcg_pol_stat_pd_fn		*pd_stat_fn;
- };
- 
- extern struct blkcg blkcg_root;
+ 		ret = bio_iov_iter_get_pages(bio, iter);
+ 		if (unlikely(ret)) {
 -- 
-2.14.3
+2.15.1
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-aio' in
+the body to majordomo@kvack.org.  For more info on Linux AIO,
+see: http://www.kvack.org/aio/
+Don't email: <a href=mailto:"aart@kvack.org">aart@kvack.org</a>
