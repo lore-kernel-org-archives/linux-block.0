@@ -1,56 +1,44 @@
-Return-Path: <prvs=674a79f01=Damien.LeMoal@wdc.com>
-From: Damien Le Moal <Damien.LeMoal@wdc.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>, Jens Axboe <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Christoph
- Hellwig <hch@lst.de>, Damien Le Moal <Damien.LeMoal@wdc.com>, "Martin K .
- Petersen" <martin.petersen@oracle.com>, Hannes Reinecke <hare@suse.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH] blkdev_report_zones_ioctl(): Use vmalloc() to allocate
  large buffers
-Date: Wed, 23 May 2018 14:57:51 +0000
-Message-ID: <f874e1ca-8a96-1e8c-4bcf-bab5fe1a828e@wdc.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Shaun Tancheff <shaun.tancheff@seagate.com>,
+ Damien Le Moal <damien.lemoal@hgst.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Hannes Reinecke <hare@suse.com>, stable@vger.kernel.org
 References: <20180522152722.15920-1-bart.vanassche@wdc.com>
-In-Reply-To: <20180522152722.15920-1-bart.vanassche@wdc.com>
-Reply-To: Damien Le Moal <Damien.LeMoal@wdc.com>
-Content-Type: text/plain; charset="utf-8"
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <a903a9f6-e78d-d35d-c644-5a99c45f6919@kernel.dk>
+Date: Tue, 22 May 2018 11:58:30 -0600
 MIME-Version: 1.0
+In-Reply-To: <20180522152722.15920-1-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gMjAxOC8wNS8yMiA4OjI3LCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6DQo+IEF2b2lkIHRoYXQg
-Y29tcGxhaW50cyBzaW1pbGFyIHRvIHRoZSBmb2xsb3dpbmcgYXBwZWFyIGluIHRoZSBrZXJuZWwg
-bG9nDQo+IGlmIHRoZSBudW1iZXIgb2Ygem9uZXMgaXMgc3VmZmljaWVudGx5IGxhcmdlOg0KPiAN
-Cj4gICBmaW86IHBhZ2UgYWxsb2NhdGlvbiBmYWlsdXJlOiBvcmRlcjo5LCBtb2RlOjB4MTQwYzBj
-MChHRlBfS0VSTkVMfF9fR0ZQX0NPTVB8X19HRlBfWkVSTyksIG5vZGVtYXNrPShudWxsKQ0KPiAg
-IENhbGwgVHJhY2U6DQo+ICAgZHVtcF9zdGFjaysweDYzLzB4ODgNCj4gICB3YXJuX2FsbG9jKzB4
-ZjUvMHgxOTANCj4gICBfX2FsbG9jX3BhZ2VzX3Nsb3dwYXRoKzB4OGYwLzB4YjBkDQo+ICAgX19h
-bGxvY19wYWdlc19ub2RlbWFzaysweDI0Mi8weDI2MA0KPiAgIGFsbG9jX3BhZ2VzX2N1cnJlbnQr
-MHg2YS8weGIwDQo+ICAga21hbGxvY19vcmRlcisweDE4LzB4NTANCj4gICBrbWFsbG9jX29yZGVy
-X3RyYWNlKzB4MjYvMHhiMA0KPiAgIF9fa21hbGxvYysweDIwZS8weDIyMA0KPiAgIGJsa2Rldl9y
-ZXBvcnRfem9uZXNfaW9jdGwrMHhhNS8weDFhMA0KPiAgIGJsa2Rldl9pb2N0bCsweDFiYS8weDkz
-MA0KPiAgIGJsb2NrX2lvY3RsKzB4NDEvMHg1MA0KPiAgIGRvX3Zmc19pb2N0bCsweGFhLzB4NjEw
-DQo+ICAgU3lTX2lvY3RsKzB4NzkvMHg5MA0KPiAgIGRvX3N5c2NhbGxfNjQrMHg3OS8weDFiMA0K
-PiAgIGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJfaHdmcmFtZSsweDNkLzB4YTINCj4gDQo+IEZpeGVz
-OiAzZWQwNWE5ODdlMGYgKCJibGstem9uZWQ6IGltcGxlbWVudCBpb2N0bHMiKQ0KPiBTaWduZWQt
-b2ZmLWJ5OiBCYXJ0IFZhbiBBc3NjaGUgPGJhcnQudmFuYXNzY2hlQHdkYy5jb20+DQo+IENjOiBT
-aGF1biBUYW5jaGVmZiA8c2hhdW4udGFuY2hlZmZAc2VhZ2F0ZS5jb20+DQo+IENjOiBEYW1pZW4g
-TGUgTW9hbCA8ZGFtaWVuLmxlbW9hbEBoZ3N0LmNvbT4NCj4gQ2M6IENocmlzdG9waCBIZWxsd2ln
-IDxoY2hAbHN0LmRlPg0KPiBDYzogTWFydGluIEsuIFBldGVyc2VuIDxtYXJ0aW4ucGV0ZXJzZW5A
-b3JhY2xlLmNvbT4NCj4gQ2M6IEhhbm5lcyBSZWluZWNrZSA8aGFyZUBzdXNlLmNvbT4NCj4gQ2M6
-IDxzdGFibGVAdmdlci5rZXJuZWwub3JnPg0KPiAtLS0NCj4gIGJsb2NrL2Jsay16b25lZC5jIHwg
-OCArKysrKystLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlv
-bnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9ibG9jay9ibGstem9uZWQuYyBiL2Jsb2NrL2Jsay16
-b25lZC5jDQo+IGluZGV4IDIwYmZjMzdlMTg1Mi4uOTJlNjEwODQ4N2M0IDEwMDY0NA0KPiAtLS0g
-YS9ibG9jay9ibGstem9uZWQuYw0KPiArKysgYi9ibG9jay9ibGstem9uZWQuYw0KPiBAQCAtMzI4
-LDcgKzMyOCwxMSBAQCBpbnQgYmxrZGV2X3JlcG9ydF96b25lc19pb2N0bChzdHJ1Y3QgYmxvY2tf
-ZGV2aWNlICpiZGV2LCBmbW9kZV90IG1vZGUsDQo+ICAJaWYgKCFyZXAubnJfem9uZXMpDQo+ICAJ
-CXJldHVybiAtRUlOVkFMOw0KPiAgDQo+IC0Jem9uZXMgPSBrY2FsbG9jKHJlcC5ucl96b25lcywg
-c2l6ZW9mKHN0cnVjdCBibGtfem9uZSksIEdGUF9LRVJORUwpOw0KPiArCWlmIChyZXAubnJfem9u
-ZXMgPiBJTlRfTUFYIC8gc2l6ZW9mKHN0cnVjdCBibGtfem9uZSkpDQo+ICsJCXJldHVybiAtRVJB
-TkdFOw0KPiArDQo+ICsJem9uZXMgPSBrdm1hbGxvYyhyZXAubnJfem9uZXMgKiBzaXplb2Yoc3Ry
-dWN0IGJsa196b25lKSwNCj4gKwkJCUdGUF9LRVJORUwgfCBfX0dGUF9aRVJPKTsNCj4gIAlpZiAo
-IXpvbmVzKQ0KPiAgCQlyZXR1cm4gLUVOT01FTTsNCj4gIA0KPiBAQCAtMzUwLDcgKzM1NCw3IEBA
-IGludCBibGtkZXZfcmVwb3J0X3pvbmVzX2lvY3RsKHN0cnVjdCBibG9ja19kZXZpY2UgKmJkZXYs
-IGZtb2RlX3QgbW9kZSwNCj4gIAl9DQo+ICANCj4gICBvdXQ6DQo+IC0Ja2ZyZWUoem9uZXMpOw0K
-PiArCWt2ZnJlZSh6b25lcyk7DQo+ICANCj4gIAlyZXR1cm4gcmV0Ow0KPiAgfQ0KPiANClJldmll
-d2VkLWJ5OiBEYW1pZW4gTGUgTW9hbCA8ZGFtaWVuLmxlbW9hbEB3ZGMuY29tPg0KDQotLSANCkRh
-bWllbiBMZSBNb2FsDQpXZXN0ZXJuIERpZ2l0YWwgUmVzZWFyY2g=
+On 5/22/18 9:27 AM, Bart Van Assche wrote:
+> Avoid that complaints similar to the following appear in the kernel log
+> if the number of zones is sufficiently large:
+> 
+>   fio: page allocation failure: order:9, mode:0x140c0c0(GFP_KERNEL|__GFP_COMP|__GFP_ZERO), nodemask=(null)
+>   Call Trace:
+>   dump_stack+0x63/0x88
+>   warn_alloc+0xf5/0x190
+>   __alloc_pages_slowpath+0x8f0/0xb0d
+>   __alloc_pages_nodemask+0x242/0x260
+>   alloc_pages_current+0x6a/0xb0
+>   kmalloc_order+0x18/0x50
+>   kmalloc_order_trace+0x26/0xb0
+>   __kmalloc+0x20e/0x220
+>   blkdev_report_zones_ioctl+0xa5/0x1a0
+>   blkdev_ioctl+0x1ba/0x930
+>   block_ioctl+0x41/0x50
+>   do_vfs_ioctl+0xaa/0x610
+>   SyS_ioctl+0x79/0x90
+>   do_syscall_64+0x79/0x1b0
+>   entry_SYSCALL_64_after_hwframe+0x3d/0xa2
+
+Applied, thanks.
+
+-- 
+Jens Axboe
