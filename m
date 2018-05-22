@@ -1,67 +1,56 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga12.intel.com ([192.55.52.136]:63784 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933306AbeEWPRi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 May 2018 11:17:38 -0400
-From: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org,
-        Marcin Dziegielewski <marcin.dziegielewski@intel.com>,
-        Igor Konopko <igor.j.konopko@intel.com>
-Subject: [PATCH 2/2] lightnvm: pblk: handle case when device expose mw_cunits equal to 0
-Date: Wed, 23 May 2018 17:17:20 +0200
-Message-Id: <1527088640-13062-3-git-send-email-marcin.dziegielewski@intel.com>
-In-Reply-To: <1527088640-13062-1-git-send-email-marcin.dziegielewski@intel.com>
-References: <1527088640-13062-1-git-send-email-marcin.dziegielewski@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paulmck@linux.vnet.ibm.com>
+Date: Tue, 22 May 2018 10:04:33 -0700
+From: "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Roman Pen <roman.penyaev@profitbricks.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Or Gerlitz <ogerlitz@mellanox.com>, Doug Ledford <dledford@redhat.com>,
+        swapnil.ingle@profitbricks.com, danil.kipnis@profitbricks.com,
+        Jinpu Wang <jinpu.wang@profitbricks.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 01/26] rculist: introduce list_next_or_null_rr_rcu()
+Reply-To: paulmck@linux.vnet.ibm.com
+References: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
+ <20180518130413.16997-2-roman.penyaev@profitbricks.com>
+ <20180519163735.GX3803@linux.vnet.ibm.com>
+ <CAJrWOzAt8BDtypaRwYx_y9jpCVD5W_VL9aQsFsC3bL-XaoJz9g@mail.gmail.com>
+ <20180520004318.GY3803@linux.vnet.ibm.com>
+ <CAJrWOzBenkHg_5zs1VAxP_rVbCbOJO_eO0toJBhnzXuy_yWH2Q@mail.gmail.com>
+ <CA+55aFymFCVqh4VxtqDPoFYh6zsGEDLSV79_AnsMp3M=t2mhqg@mail.gmail.com>
+ <20180521153337.GF3803@linux.vnet.ibm.com>
+ <CAJrWOzDfJ46Vwz5k7VgUwz04EzCCUtt57jxCx1RC0LoOA3t0AA@mail.gmail.com>
+ <CA+55aFx+4D5bBYSKb5jKjJ8SP=osGB=PCf8vW3RZH+R5fp5jgQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CA+55aFx+4D5bBYSKb5jKjJ8SP=osGB=PCf8vW3RZH+R5fp5jgQ@mail.gmail.com>
+Message-Id: <20180522170433.GX3803@linux.vnet.ibm.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Some devices can expose mw_cunits equal to 0, it can cause creation of too
-small write buffer and in consecuence performance drop on write workloads.
+On Tue, May 22, 2018 at 09:38:13AM -0700, Linus Torvalds wrote:
+> On Tue, May 22, 2018 at 2:09 AM Roman Penyaev <
+> roman.penyaev@profitbricks.com> wrote:
+> 
+> > Should I resend current patch with more clear comments about how careful
+> > caller should be with a leaking pointer?
+> 
+> No. Even if we go your way, there is *one* single user, and that one is
+> special and needs to take a lot more care.
+> 
+> Just roll your own version, and make it an inline function like I've asked
+> now now many times, and add a shit-ton of explanations of why it's safe to
+> use in that *one* situation.
+> 
+> I don't want any crazy and unsafe stuff in the generic header file that
+> absolutely *nobody* should ever use.
 
-To handle that, in such case we are using default value for MLC and
-beacause it covers both 1.2 and 2.0 OC specification, setting up mw_cunits
-in nvme_nvm_setup_12 function isn't longer necessary.
+Completely agreed!
 
-Signed-off-by: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
-Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
----
- drivers/lightnvm/pblk-init.c | 10 +++++++++-
- drivers/nvme/host/lightnvm.c |  1 -
- 2 files changed, 9 insertions(+), 2 deletions(-)
+I was perhaps foolishly assuming that they would be making that adjustment
+based on earlier emails, but yes, I should have explicitly stated this
+requirement in my earlier reply.
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 9a7213e..42190de 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -366,7 +366,15 @@ static int pblk_core_init(struct pblk *pblk)
- 	atomic64_set(&pblk->nr_flush, 0);
- 	pblk->nr_flush_rst = 0;
- 
--	pblk->pgs_in_buffer = geo->mw_cunits * geo->all_luns;
-+	if (geo->mw_cunits) {
-+		pblk->pgs_in_buffer = geo->mw_cunits * geo->all_luns;
-+	} else {
-+		pblk->pgs_in_buffer = (geo->ws_opt << 3) * geo->all_luns;
-+		/*
-+		 * Some devices can expose mw_cunits equal to 0, so let's use
-+		 * here default safe value for MLC.
-+		 */
-+	}
- 
- 	pblk->min_write_pgs = geo->ws_opt * (geo->csecs / PAGE_SIZE);
- 	max_write_ppas = pblk->min_write_pgs * geo->all_luns;
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index 41279da..c747792 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -338,7 +338,6 @@ static int nvme_nvm_setup_12(struct nvme_nvm_id12 *id,
- 
- 	geo->ws_min = sec_per_pg;
- 	geo->ws_opt = sec_per_pg;
--	geo->mw_cunits = geo->ws_opt << 3;	/* default to MLC safe values */
- 
- 	/* Do not impose values for maximum number of open blocks as it is
- 	 * unspecified in 1.2. Users of 1.2 must be aware of this and eventually
--- 
-1.8.3.1
+							Thanx, Paul
