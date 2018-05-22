@@ -1,119 +1,54 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 07/33] block: use bio_for_each_segment() to map sg
-Date: Thu, 24 May 2018 17:01:12 +0800
-Message-Id: <20180524090139.2150-8-ming.lei@redhat.com>
-In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
-References: <20180524090139.2150-1-ming.lei@redhat.com>
+Return-Path: <prvs=673f59626=Adam.Manzanares@wdc.com>
+From: Adam Manzanares <Adam.Manzanares@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>, Al Viro <viro@ZenIV.linux.org.uk>
+CC: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"bcrl@kvack.org" <bcrl@kvack.org>, "mingo@kernel.org" <mingo@kernel.org>,
+	"tglx@linutronix.de" <tglx@linutronix.de>, "kstewart@linuxfoundation.org"
+	<kstewart@linuxfoundation.org>, "peterz@infradead.org"
+	<peterz@infradead.org>, "pombredanne@nexb.com" <pombredanne@nexb.com>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"bigeasy@linutronix.de" <bigeasy@linutronix.de>, "rgoldwyn@suse.com"
+	<rgoldwyn@suse.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-aio@kvack.org" <linux-aio@kvack.org>,
+	"linux-api@vger.kernel.org" <linux-api@vger.kernel.org>, "hch@infradread.org"
+	<hch@infradread.org>, "jmoyer@redhat.com" <jmoyer@redhat.com>
+Subject: Re: [PATCH v7 0/5] AIO add per-command iopriority
+Date: Tue, 22 May 2018 22:31:27 +0000
+Message-ID: <30e8e33f-8e66-2fb3-977a-ee6fe04f1d3c@wdc.com>
+References: <20180522175221.2391-1-adam.manzanares@wdc.com>
+ <da84d129-4dcd-c861-bfc4-62cd425e60e3@kernel.dk>
+ <20180522183019.GD30522@ZenIV.linux.org.uk>
+ <4b8732e8-1c51-3181-56a1-d03f7b229f63@kernel.dk>
+In-Reply-To: <4b8732e8-1c51-3181-56a1-d03f7b229f63@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-It is more efficient to use bio_for_each_segment() to map sg, meantime
-we have to consider splitting multipage bvec as done in blk_bio_segment_split().
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-merge.c | 72 +++++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 52 insertions(+), 20 deletions(-)
-
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index d157b752d965..9fc96c9f6061 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -414,6 +414,56 @@ static int blk_phys_contig_segment(struct request_queue *q, struct bio *bio,
- 	return 0;
- }
- 
-+static struct scatterlist *blk_next_sg(struct scatterlist **sg,
-+		struct scatterlist *sglist)
-+{
-+	if (!*sg)
-+		return sglist;
-+	else {
-+		/*
-+		 * If the driver previously mapped a shorter
-+		 * list, we could see a termination bit
-+		 * prematurely unless it fully inits the sg
-+		 * table on each mapping. We KNOW that there
-+		 * must be more entries here or the driver
-+		 * would be buggy, so force clear the
-+		 * termination bit to avoid doing a full
-+		 * sg_init_table() in drivers for each command.
-+		 */
-+		sg_unmark_end(*sg);
-+		return sg_next(*sg);
-+	}
-+}
-+
-+static unsigned blk_bvec_map_sg(struct request_queue *q,
-+		struct bio_vec *bvec, struct scatterlist *sglist,
-+		struct scatterlist **sg)
-+{
-+	unsigned nbytes = bvec->bv_len;
-+	unsigned nsegs = 0, total = 0;
-+
-+	while (nbytes > 0) {
-+		unsigned seg_size;
-+		struct page *pg;
-+		unsigned offset, idx;
-+
-+		*sg = blk_next_sg(sg, sglist);
-+
-+		seg_size = min(nbytes, queue_max_segment_size(q));
-+		offset = (total + bvec->bv_offset) % PAGE_SIZE;
-+		idx = (total + bvec->bv_offset) / PAGE_SIZE;
-+		pg = nth_page(bvec->bv_page, idx);
-+
-+		sg_set_page(*sg, pg, seg_size, offset);
-+
-+		total += seg_size;
-+		nbytes -= seg_size;
-+		nsegs++;
-+	}
-+
-+	return nsegs;
-+}
-+
- static inline void
- __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
- 		     struct scatterlist *sglist, struct bio_vec *bvprv,
-@@ -434,25 +484,7 @@ __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
- 		(*sg)->length += nbytes;
- 	} else {
- new_segment:
--		if (!*sg)
--			*sg = sglist;
--		else {
--			/*
--			 * If the driver previously mapped a shorter
--			 * list, we could see a termination bit
--			 * prematurely unless it fully inits the sg
--			 * table on each mapping. We KNOW that there
--			 * must be more entries here or the driver
--			 * would be buggy, so force clear the
--			 * termination bit to avoid doing a full
--			 * sg_init_table() in drivers for each command.
--			 */
--			sg_unmark_end(*sg);
--			*sg = sg_next(*sg);
--		}
--
--		sg_set_page(*sg, bvec->bv_page, nbytes, bvec->bv_offset);
--		(*nsegs)++;
-+		(*nsegs) += blk_bvec_map_sg(q, bvec, sglist, sg);
- 	}
- 	*bvprv = *bvec;
- }
-@@ -474,7 +506,7 @@ static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
- 	int cluster = blk_queue_cluster(q), nsegs = 0;
- 
- 	for_each_bio(bio)
--		bio_for_each_page(bvec, bio, iter)
-+		bio_for_each_segment(bvec, bio, iter)
- 			__blk_segment_map_sg(q, &bvec, sglist, &bvprv, sg,
- 					     &nsegs, &cluster);
- 
--- 
-2.9.5
+DQoNCk9uIDUvMjIvMTggMTE6MzAgQU0sIEplbnMgQXhib2Ugd3JvdGU6DQo+IE9uIDUvMjIvMTgg
+MTI6MzAgUE0sIEFsIFZpcm8gd3JvdGU6DQo+PiBPbiBUdWUsIE1heSAyMiwgMjAxOCBhdCAxMTo1
+NTowNEFNIC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPj4+IE9uIDUvMjIvMTggMTE6NTIgQU0s
+IGFkYW0ubWFuemFuYXJlc0B3ZGMuY29tIHdyb3RlOg0KPj4+PiBGcm9tOiBBZGFtIE1hbnphbmFy
+ZXMgPGFkYW0ubWFuemFuYXJlc0B3ZGMuY29tPg0KPj4+Pg0KPj4+PiBUaGlzIGlzIHRoZSBwZXIt
+SS9PIGVxdWl2YWxlbnQgb2YgdGhlIGlvcHJpb19zZXQgc3lzdGVtIGNhbGwuDQo+Pj4+IFNlZSB0
+aGUgZm9sbG93aW5nIGxpbmsgZm9yIHBlcmZvcm1hbmNlIGltcGxpY2F0aW9ucyBvbiBhIFNBVEEg
+SEREOg0KPj4+PiBodHRwczovL2xrbWwub3JnL2xrbWwvMjAxNi8xMi82LzQ5NQ0KPj4+Pg0KPj4+
+PiBGaXJzdCBwYXRjaCBmYWN0b3JzIGlvcHJpb19jaGVja19jYXAgZnVuY3Rpb24gb3V0IG9mIGlv
+cHJpb19zZXQgc3lzdGVtIGNhbGwgdG8NCj4+Pj4gYWxzbyBiZSB1c2VkIGJ5IHRoZSBhaW8gaW9w
+cmlvIGludGVyZmFjZS4NCj4+Pj4NCj4+Pj4gU2Vjb25kIHBhdGNoIGNvbnZlcnRzIGtpb2NiIGtp
+X2hpbnQgZmllbGQgdG8gYSB1MTYgdG8gYXZvaWQga2lvY2IgYmxvYXQuDQo+Pj4+DQo+Pj4+IFRo
+aXJkIHBhdGNoIHBhc3NlcyBpb3ByaW8gaGludCBmcm9tIGFpbyBpb2NiIHRvIGtpb2NiIGFuZCBp
+bml0aWFsaXplcyBraW9jYg0KPj4+PiBpb3ByaW8gdmFsdWUgYXBwcm9wcmlhdGVseSB3aGVuIGl0
+IGlzIG5vdCBleHBsaWNpdGx5IHNldC4NCj4+Pj4NCj4+Pj4gRm91cnRoIHBhdGNoIGVuYWJsZXMg
+dGhlIGZlYXR1cmUgZm9yIGJsa2Rldi4NCj4+Pj4NCj4+Pj4gRmlmdGggcGF0Y2ggZW5hYmxlcyB0
+aGUgZmVhdHVyZSBmb3IgaW9tYXAgZGlyZWN0IElPDQo+Pj4NCj4+PiBMR1RNLCB5b3UgY2FuIGFk
+ZDoNCj4+Pg0KPj4+IFJldmlld2VkLWJ5OiBKZW5zIEF4Ym9lIDxheGJvZUBrZXJuZWwuZGs+DQo+
+Pj4NCj4+PiBBbCwgYXJlIHlvdSBwaWNraW5nIHRoaXMgc2VyaWVzIHVwLCBvciBzaG91bGQgST8N
+Cj4+DQo+PiBQcm9iYWJseSBiZXR0ZXIgaWYgSSBkbywgb25jZSBJIGZpbmlzaCByZXZpZXdpbmcg
+Q2hyaXN0b3BoJ3MgcGF0Y2hzZXQgLQ0KPj4gd2UgYWxyZWFkeSBoYXZlIGEgYnVuY2ggb2Ygc3R1
+ZmYgYXJvdW5kIGZzL2Fpby5jIGluIHRoaXMgY3ljbGUuLi4NCj4gDQo+IEFscmlnaHQsIHNvdW5k
+cyBnb29kLCB0aGFua3MgQWwuDQo+IA0KDQpJIHdhcyB3b3JraW5nIG9uIHRoZSBtYW4gcGFnZSB1
+cGRhdGUgZm9yIHRoaXMgZmVhdHVyZSBhbmQgbm90aWNlZCBJIA0KY291bGQgYmUgYml0IG1vcmUg
+aW5mb3JtYXRpdmUgb24gZXJyb3IgaWYgSSByZXR1cm4gdGhlIGVycm9yIHZhbHVlIA0KcmV0dXJu
+ZWQgYnkgaW9wcmlvX2NoZWNrX2NhcCBpbiBmcy9haW8uYy4NCg0KU2hvdWxkIEkgcmVzZW5kIHRo
+ZSB3aG9sZSBzZXJpZXM/
