@@ -1,295 +1,35 @@
-Return-Path: <roman.penyaev@profitbricks.com>
-Return-Path: <roman.penyaev@profitbricks.com>
-From: Roman Pen <roman.penyaev@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Or Gerlitz <ogerlitz@mellanox.com>,
-	Doug Ledford <dledford@redhat.com>,
-	Swapnil Ingle <swapnil.ingle@profitbricks.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>,
-	Jack Wang <jinpu.wang@profitbricks.com>,
-	Roman Pen <roman.penyaev@profitbricks.com>
-Subject: [PATCH v2 23/26] ibnbd: server: sysfs interface functions
-Date: Fri, 18 May 2018 15:04:10 +0200
-Message-Id: <20180518130413.16997-24-roman.penyaev@profitbricks.com>
-In-Reply-To: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
-References: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
+Return-Path: <prvs=673874c89=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "kent.overstreet@gmail.com" <kent.overstreet@gmail.com>
+CC: "mingo@kernel.org" <mingo@kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH 00/10] Misc block layer patches for bcachefs
+Date: Tue, 22 May 2018 22:01:54 +0000
+Message-ID: <23d179b9a20859fb9dee1a20d59b9c1e6a72a854.camel@wdc.com>
+References: <20180509013358.16399-1-kent.overstreet@gmail.com>
+	 <a26feed52ec6ed371b3d3b0567e31d1ff4fc31cb.camel@wdc.com>
+	 <20180518090636.GA14738@kmo-pixel>
+	 <8f62d8f870c6b66e90d3e7f57acee481acff57f5.camel@wdc.com>
+	 <20180520221733.GA11495@kmo-pixel>
+In-Reply-To: <20180520221733.GA11495@kmo-pixel>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-This is the sysfs interface to IBNBD mapped devices on server side:
-
-  /sys/devices/virtual/ibnbd-server/ctl/devices/<device_name>/
-    |- block_dev
-    |  *** link pointing to the corresponding block device sysfs entry
-    |
-    |- sessions/<session-name>/
-    |  *** sessions directory
-       |
-       |- read_only
-       |  *** is devices mapped as read only
-       |
-       |- mapping_path
-          *** relative device path provided by the client during mapping
-
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
-Cc: Jack Wang <jinpu.wang@profitbricks.com>
----
- drivers/block/ibnbd/ibnbd-srv-sysfs.c | 242 ++++++++++++++++++++++++++++++++++
- 1 file changed, 242 insertions(+)
- create mode 100644 drivers/block/ibnbd/ibnbd-srv-sysfs.c
-
-diff --git a/drivers/block/ibnbd/ibnbd-srv-sysfs.c b/drivers/block/ibnbd/ibnbd-srv-sysfs.c
-new file mode 100644
-index 000000000000..5bf77cdb09c8
---- /dev/null
-+++ b/drivers/block/ibnbd/ibnbd-srv-sysfs.c
-@@ -0,0 +1,242 @@
-+/*
-+ * InfiniBand Network Block Driver
-+ *
-+ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Fabian Holler <mail@fholler.de>
-+ *          Jack Wang <jinpu.wang@profitbricks.com>
-+ *          Kleber Souza <kleber.souza@profitbricks.com>
-+ *          Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *          Milind Dumbare <Milind.dumbare@gmail.com>
-+ *
-+ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#undef pr_fmt
-+#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
-+
-+#include <uapi/linux/limits.h>
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+#include <linux/stat.h>
-+#include <linux/genhd.h>
-+#include <linux/list.h>
-+#include <linux/moduleparam.h>
-+#include <linux/device.h>
-+
-+#include "ibnbd-srv.h"
-+
-+static struct device *ibnbd_dev;
-+static struct class *ibnbd_dev_class;
-+static struct kobject *ibnbd_devs_kobj;
-+
-+static struct attribute *ibnbd_srv_default_dev_attrs[] = {
-+	NULL,
-+};
-+
-+static struct attribute_group ibnbd_srv_default_dev_attr_group = {
-+	.attrs = ibnbd_srv_default_dev_attrs,
-+};
-+
-+static struct kobj_type ktype = {
-+	.sysfs_ops	= &kobj_sysfs_ops,
-+};
-+
-+int ibnbd_srv_create_dev_sysfs(struct ibnbd_srv_dev *dev,
-+			       struct block_device *bdev,
-+			       const char *dir_name)
-+{
-+	struct kobject *bdev_kobj;
-+	int ret;
-+
-+	ret = kobject_init_and_add(&dev->dev_kobj, &ktype,
-+				   ibnbd_devs_kobj, dir_name);
-+	if (ret)
-+		return ret;
-+
-+	ret = kobject_init_and_add(&dev->dev_sessions_kobj,
-+				   &ktype,
-+				   &dev->dev_kobj, "sessions");
-+	if (ret)
-+		goto err;
-+
-+	ret = sysfs_create_group(&dev->dev_kobj,
-+				 &ibnbd_srv_default_dev_attr_group);
-+	if (ret)
-+		goto err2;
-+
-+	bdev_kobj = &disk_to_dev(bdev->bd_disk)->kobj;
-+	ret = sysfs_create_link(&dev->dev_kobj, bdev_kobj, "block_dev");
-+	if (ret)
-+		goto err3;
-+
-+	return 0;
-+
-+err3:
-+	sysfs_remove_group(&dev->dev_kobj,
-+			   &ibnbd_srv_default_dev_attr_group);
-+err2:
-+	kobject_del(&dev->dev_sessions_kobj);
-+	kobject_put(&dev->dev_sessions_kobj);
-+err:
-+	kobject_del(&dev->dev_kobj);
-+	kobject_put(&dev->dev_kobj);
-+	return ret;
-+}
-+
-+void ibnbd_srv_destroy_dev_sysfs(struct ibnbd_srv_dev *dev)
-+{
-+	sysfs_remove_link(&dev->dev_kobj, "block_dev");
-+	sysfs_remove_group(&dev->dev_kobj, &ibnbd_srv_default_dev_attr_group);
-+	kobject_del(&dev->dev_sessions_kobj);
-+	kobject_put(&dev->dev_sessions_kobj);
-+	kobject_del(&dev->dev_kobj);
-+	kobject_put(&dev->dev_kobj);
-+}
-+
-+static ssize_t ibnbd_srv_dev_session_ro_show(struct kobject *kobj,
-+					     struct kobj_attribute *attr,
-+					     char *page)
-+{
-+	struct ibnbd_srv_sess_dev *sess_dev;
-+
-+	sess_dev = container_of(kobj, struct ibnbd_srv_sess_dev, kobj);
-+
-+	return scnprintf(page, PAGE_SIZE, "%s\n",
-+			 (sess_dev->open_flags & FMODE_WRITE) ? "0" : "1");
-+}
-+
-+static struct kobj_attribute ibnbd_srv_dev_session_ro_attr =
-+	__ATTR(read_only, 0444,
-+	       ibnbd_srv_dev_session_ro_show,
-+	       NULL);
-+
-+static ssize_t
-+ibnbd_srv_dev_session_mapping_path_show(struct kobject *kobj,
-+					struct kobj_attribute *attr, char *page)
-+{
-+	struct ibnbd_srv_sess_dev *sess_dev;
-+
-+	sess_dev = container_of(kobj, struct ibnbd_srv_sess_dev, kobj);
-+
-+	return scnprintf(page, PAGE_SIZE, "%s\n", sess_dev->pathname);
-+}
-+
-+static struct kobj_attribute ibnbd_srv_dev_session_mapping_path_attr =
-+	__ATTR(mapping_path, 0444,
-+	       ibnbd_srv_dev_session_mapping_path_show,
-+	       NULL);
-+
-+static struct attribute *ibnbd_srv_default_dev_sessions_attrs[] = {
-+	&ibnbd_srv_dev_session_ro_attr.attr,
-+	&ibnbd_srv_dev_session_mapping_path_attr.attr,
-+	NULL,
-+};
-+
-+static struct attribute_group ibnbd_srv_default_dev_session_attr_group = {
-+	.attrs = ibnbd_srv_default_dev_sessions_attrs,
-+};
-+
-+void ibnbd_srv_destroy_dev_session_sysfs(struct ibnbd_srv_sess_dev *sess_dev)
-+{
-+	DECLARE_COMPLETION_ONSTACK(sysfs_compl);
-+
-+	sysfs_remove_group(&sess_dev->kobj,
-+			   &ibnbd_srv_default_dev_session_attr_group);
-+
-+	sess_dev->sysfs_release_compl = &sysfs_compl;
-+	kobject_del(&sess_dev->kobj);
-+	kobject_put(&sess_dev->kobj);
-+	wait_for_completion(&sysfs_compl);
-+}
-+
-+static void ibnbd_srv_sess_dev_release(struct kobject *kobj)
-+{
-+	struct ibnbd_srv_sess_dev *sess_dev;
-+
-+	sess_dev = container_of(kobj, struct ibnbd_srv_sess_dev, kobj);
-+	if (sess_dev->sysfs_release_compl)
-+		complete_all(sess_dev->sysfs_release_compl);
-+}
-+
-+static struct kobj_type ibnbd_srv_sess_dev_ktype = {
-+	.sysfs_ops	= &kobj_sysfs_ops,
-+	.release	= ibnbd_srv_sess_dev_release,
-+};
-+
-+int ibnbd_srv_create_dev_session_sysfs(struct ibnbd_srv_sess_dev *sess_dev)
-+{
-+	int ret;
-+
-+	ret = kobject_init_and_add(&sess_dev->kobj, &ibnbd_srv_sess_dev_ktype,
-+				   &sess_dev->dev->dev_sessions_kobj, "%s",
-+				   sess_dev->sess->sessname);
-+	if (ret)
-+		return ret;
-+
-+	ret = sysfs_create_group(&sess_dev->kobj,
-+				 &ibnbd_srv_default_dev_session_attr_group);
-+	if (ret)
-+		goto err;
-+
-+	return 0;
-+
-+err:
-+	kobject_del(&sess_dev->kobj);
-+	kobject_put(&sess_dev->kobj);
-+
-+	return ret;
-+}
-+
-+int ibnbd_srv_create_sysfs_files(void)
-+{
-+	int err;
-+
-+	ibnbd_dev_class = class_create(THIS_MODULE, "ibnbd-server");
-+	if (unlikely(IS_ERR(ibnbd_dev_class)))
-+		return PTR_ERR(ibnbd_dev_class);
-+
-+	ibnbd_dev = device_create(ibnbd_dev_class, NULL,
-+				  MKDEV(0, 0), NULL, "ctl");
-+	if (unlikely(IS_ERR(ibnbd_dev))) {
-+		err = PTR_ERR(ibnbd_dev);
-+		goto cls_destroy;
-+	}
-+	ibnbd_devs_kobj = kobject_create_and_add("devices", &ibnbd_dev->kobj);
-+	if (unlikely(!ibnbd_devs_kobj)) {
-+		err = -ENOMEM;
-+		goto dev_destroy;
-+	}
-+
-+	return 0;
-+
-+dev_destroy:
-+	device_destroy(ibnbd_dev_class, MKDEV(0, 0));
-+cls_destroy:
-+	class_destroy(ibnbd_dev_class);
-+
-+	return err;
-+}
-+
-+void ibnbd_srv_destroy_sysfs_files(void)
-+{
-+	kobject_del(ibnbd_devs_kobj);
-+	kobject_put(ibnbd_devs_kobj);
-+	device_destroy(ibnbd_dev_class, MKDEV(0, 0));
-+	class_destroy(ibnbd_dev_class);
-+}
--- 
-2.13.1
+T24gU3VuLCAyMDE4LTA1LTIwIGF0IDE4OjE3IC0wNDAwLCBLZW50IE92ZXJzdHJlZXQgd3JvdGU6
+DQo+IE9uIEZyaSwgTWF5IDE4LCAyMDE4IGF0IDAzOjEyOjI3UE0gKzAwMDAsIEJhcnQgVmFuIEFz
+c2NoZSB3cm90ZToNCj4gPiBPbiBGcmksIDIwMTgtMDUtMTggYXQgMDU6MDYgLTA0MDAsIEtlbnQg
+T3ZlcnN0cmVldCB3cm90ZToNCj4gPiA+IE9uIFRodSwgTWF5IDE3LCAyMDE4IGF0IDA4OjU0OjU3
+UE0gKzAwMDAsIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gPiA+ID4gV2l0aCBKZW5zJyBsYXRl
+c3QgZm9yLW5leHQgYnJhbmNoIEkgaGl0IHRoZSBrZXJuZWwgd2FybmluZyBzaG93biBiZWxvdy4g
+Q2FuDQo+ID4gPiA+IHlvdSBoYXZlIGEgbG9vaz8NCj4gPiA+IA0KPiA+ID4gQW55IGhpbnRzIG9u
+IGhvdyB0byByZXByb2R1Y2UgaXQ/DQo+ID4gDQo+ID4gU3VyZS4gVGhpcyBpcyBob3cgSSB0cmln
+Z2VyZWQgaXQ6DQo+ID4gKiBDbG9uZSBodHRwczovL2dpdGh1Yi5jb20vYnZhbmFzc2NoZS9zcnAt
+dGVzdC4NCj4gPiAqIEZvbGxvdyB0aGUgaW5zdHJ1Y3Rpb25zIGluIFJFQURNRS5tZC4NCj4gPiAq
+IFJ1biBzcnAtdGVzdC9ydW5fdGVzdHMgLWMgLXIgMTANCj4gDQo+IENhbiB5b3UgYmlzZWN0IGl0
+PyBJIGRvbid0IGhhdmUgaW5maW5pYmFuZCBoYXJkd2FyZSBoYW5keS4uLg0KDQpIZWxsbyBLZW50
+LA0KDQpUaGUgYmlzZWN0IEkgcmFuIHJlcG9ydGVkIHRoZSBmb2xsb3dpbmcgY29tbWl0IGFzIHRo
+ZSBmaXJzdCBmYXVsdHkgY29tbWl0Og0KDQpibG9jazogQWRkIHdhcm5pbmcgZm9yIGJpX25leHQg
+bm90IE5VTEwgaW4gYmlvX2VuZGlvKCkNCg0KQmFydC4NCg0KDQoNCg0KDQoNCg==
