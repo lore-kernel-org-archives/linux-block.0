@@ -1,28 +1,27 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:33451 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753268AbeEVXzg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 May 2018 19:55:36 -0400
-Received: by mail-pg0-f65.google.com with SMTP id e21-v6so3651746pgv.0
-        for <linux-block@vger.kernel.org>; Tue, 22 May 2018 16:55:36 -0700 (PDT)
-Date: Tue, 22 May 2018 16:55:34 -0700
-From: Omar Sandoval <osandov@osandov.com>
+Received: from mx2.suse.de ([195.135.220.15]:37630 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750709AbeEVIhF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 May 2018 04:37:05 -0400
+Date: Tue, 22 May 2018 10:37:03 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
 To: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Cc: linux-block@vger.kernel.org
+Cc: linux-block@vger.kernel.org, osandov@osandov.com
 Subject: Re: [PATCH blktests] blktests: use consistent helper returns
-Message-ID: <20180522235534.GH9536@vader>
+Message-ID: <20180522083703.ihteayaucxo42aux@linux-x5ow.site>
 References: <20180522073611.4022-1-chaitanya.kulkarni@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 In-Reply-To: <20180522073611.4022-1-chaitanya.kulkarni@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, May 22, 2018 at 03:36:11AM -0400, Chaitanya Kulkarni wrote:
-> This is a cleanup patch which uses consistent return values
-> for helper functions.
-> 
-> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-
-Thanks, applied.
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
