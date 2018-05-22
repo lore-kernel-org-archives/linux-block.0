@@ -1,54 +1,54 @@
-Return-Path: <prvs=673f59626=Adam.Manzanares@wdc.com>
-From: Adam Manzanares <Adam.Manzanares@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>, Al Viro <viro@ZenIV.linux.org.uk>
-CC: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"bcrl@kvack.org" <bcrl@kvack.org>, "mingo@kernel.org" <mingo@kernel.org>,
-	"tglx@linutronix.de" <tglx@linutronix.de>, "kstewart@linuxfoundation.org"
-	<kstewart@linuxfoundation.org>, "peterz@infradead.org"
-	<peterz@infradead.org>, "pombredanne@nexb.com" <pombredanne@nexb.com>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"bigeasy@linutronix.de" <bigeasy@linutronix.de>, "rgoldwyn@suse.com"
-	<rgoldwyn@suse.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-aio@kvack.org" <linux-aio@kvack.org>,
-	"linux-api@vger.kernel.org" <linux-api@vger.kernel.org>, "hch@infradread.org"
-	<hch@infradread.org>, "jmoyer@redhat.com" <jmoyer@redhat.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH v7 0/5] AIO add per-command iopriority
-Date: Tue, 22 May 2018 22:31:27 +0000
-Message-ID: <30e8e33f-8e66-2fb3-977a-ee6fe04f1d3c@wdc.com>
+To: Al Viro <viro@ZenIV.linux.org.uk>
+Cc: adam.manzanares@wdc.com, linux-fsdevel@vger.kernel.org, bcrl@kvack.org,
+ mingo@kernel.org, tglx@linutronix.de, kstewart@linuxfoundation.org,
+ peterz@infradead.org, pombredanne@nexb.com, gregkh@linuxfoundation.org,
+ bigeasy@linutronix.de, rgoldwyn@suse.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-aio@kvack.org,
+ linux-api@vger.kernel.org, hch@infradread.org, jmoyer@redhat.com
 References: <20180522175221.2391-1-adam.manzanares@wdc.com>
  <da84d129-4dcd-c861-bfc4-62cd425e60e3@kernel.dk>
  <20180522183019.GD30522@ZenIV.linux.org.uk>
- <4b8732e8-1c51-3181-56a1-d03f7b229f63@kernel.dk>
-In-Reply-To: <4b8732e8-1c51-3181-56a1-d03f7b229f63@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <4b8732e8-1c51-3181-56a1-d03f7b229f63@kernel.dk>
+Date: Tue, 22 May 2018 12:30:53 -0600
 MIME-Version: 1.0
+In-Reply-To: <20180522183019.GD30522@ZenIV.linux.org.uk>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-DQoNCk9uIDUvMjIvMTggMTE6MzAgQU0sIEplbnMgQXhib2Ugd3JvdGU6DQo+IE9uIDUvMjIvMTgg
-MTI6MzAgUE0sIEFsIFZpcm8gd3JvdGU6DQo+PiBPbiBUdWUsIE1heSAyMiwgMjAxOCBhdCAxMTo1
-NTowNEFNIC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPj4+IE9uIDUvMjIvMTggMTE6NTIgQU0s
-IGFkYW0ubWFuemFuYXJlc0B3ZGMuY29tIHdyb3RlOg0KPj4+PiBGcm9tOiBBZGFtIE1hbnphbmFy
-ZXMgPGFkYW0ubWFuemFuYXJlc0B3ZGMuY29tPg0KPj4+Pg0KPj4+PiBUaGlzIGlzIHRoZSBwZXIt
-SS9PIGVxdWl2YWxlbnQgb2YgdGhlIGlvcHJpb19zZXQgc3lzdGVtIGNhbGwuDQo+Pj4+IFNlZSB0
-aGUgZm9sbG93aW5nIGxpbmsgZm9yIHBlcmZvcm1hbmNlIGltcGxpY2F0aW9ucyBvbiBhIFNBVEEg
-SEREOg0KPj4+PiBodHRwczovL2xrbWwub3JnL2xrbWwvMjAxNi8xMi82LzQ5NQ0KPj4+Pg0KPj4+
-PiBGaXJzdCBwYXRjaCBmYWN0b3JzIGlvcHJpb19jaGVja19jYXAgZnVuY3Rpb24gb3V0IG9mIGlv
-cHJpb19zZXQgc3lzdGVtIGNhbGwgdG8NCj4+Pj4gYWxzbyBiZSB1c2VkIGJ5IHRoZSBhaW8gaW9w
-cmlvIGludGVyZmFjZS4NCj4+Pj4NCj4+Pj4gU2Vjb25kIHBhdGNoIGNvbnZlcnRzIGtpb2NiIGtp
-X2hpbnQgZmllbGQgdG8gYSB1MTYgdG8gYXZvaWQga2lvY2IgYmxvYXQuDQo+Pj4+DQo+Pj4+IFRo
-aXJkIHBhdGNoIHBhc3NlcyBpb3ByaW8gaGludCBmcm9tIGFpbyBpb2NiIHRvIGtpb2NiIGFuZCBp
-bml0aWFsaXplcyBraW9jYg0KPj4+PiBpb3ByaW8gdmFsdWUgYXBwcm9wcmlhdGVseSB3aGVuIGl0
-IGlzIG5vdCBleHBsaWNpdGx5IHNldC4NCj4+Pj4NCj4+Pj4gRm91cnRoIHBhdGNoIGVuYWJsZXMg
-dGhlIGZlYXR1cmUgZm9yIGJsa2Rldi4NCj4+Pj4NCj4+Pj4gRmlmdGggcGF0Y2ggZW5hYmxlcyB0
-aGUgZmVhdHVyZSBmb3IgaW9tYXAgZGlyZWN0IElPDQo+Pj4NCj4+PiBMR1RNLCB5b3UgY2FuIGFk
-ZDoNCj4+Pg0KPj4+IFJldmlld2VkLWJ5OiBKZW5zIEF4Ym9lIDxheGJvZUBrZXJuZWwuZGs+DQo+
-Pj4NCj4+PiBBbCwgYXJlIHlvdSBwaWNraW5nIHRoaXMgc2VyaWVzIHVwLCBvciBzaG91bGQgST8N
-Cj4+DQo+PiBQcm9iYWJseSBiZXR0ZXIgaWYgSSBkbywgb25jZSBJIGZpbmlzaCByZXZpZXdpbmcg
-Q2hyaXN0b3BoJ3MgcGF0Y2hzZXQgLQ0KPj4gd2UgYWxyZWFkeSBoYXZlIGEgYnVuY2ggb2Ygc3R1
-ZmYgYXJvdW5kIGZzL2Fpby5jIGluIHRoaXMgY3ljbGUuLi4NCj4gDQo+IEFscmlnaHQsIHNvdW5k
-cyBnb29kLCB0aGFua3MgQWwuDQo+IA0KDQpJIHdhcyB3b3JraW5nIG9uIHRoZSBtYW4gcGFnZSB1
-cGRhdGUgZm9yIHRoaXMgZmVhdHVyZSBhbmQgbm90aWNlZCBJIA0KY291bGQgYmUgYml0IG1vcmUg
-aW5mb3JtYXRpdmUgb24gZXJyb3IgaWYgSSByZXR1cm4gdGhlIGVycm9yIHZhbHVlIA0KcmV0dXJu
-ZWQgYnkgaW9wcmlvX2NoZWNrX2NhcCBpbiBmcy9haW8uYy4NCg0KU2hvdWxkIEkgcmVzZW5kIHRo
-ZSB3aG9sZSBzZXJpZXM/
+On 5/22/18 12:30 PM, Al Viro wrote:
+> On Tue, May 22, 2018 at 11:55:04AM -0600, Jens Axboe wrote:
+>> On 5/22/18 11:52 AM, adam.manzanares@wdc.com wrote:
+>>> From: Adam Manzanares <adam.manzanares@wdc.com>
+>>>
+>>> This is the per-I/O equivalent of the ioprio_set system call.
+>>> See the following link for performance implications on a SATA HDD:
+>>> https://lkml.org/lkml/2016/12/6/495
+>>>
+>>> First patch factors ioprio_check_cap function out of ioprio_set system call to
+>>> also be used by the aio ioprio interface.
+>>>
+>>> Second patch converts kiocb ki_hint field to a u16 to avoid kiocb bloat.
+>>>
+>>> Third patch passes ioprio hint from aio iocb to kiocb and initializes kiocb
+>>> ioprio value appropriately when it is not explicitly set.
+>>>
+>>> Fourth patch enables the feature for blkdev.
+>>>
+>>> Fifth patch enables the feature for iomap direct IO
+>>
+>> LGTM, you can add:
+>>
+>> Reviewed-by: Jens Axboe <axboe@kernel.dk>
+>>
+>> Al, are you picking this series up, or should I?
+> 
+> Probably better if I do, once I finish reviewing Christoph's patchset -
+> we already have a bunch of stuff around fs/aio.c in this cycle...
+
+Alright, sounds good, thanks Al.
+
+-- 
+Jens Axboe
