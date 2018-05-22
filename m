@@ -1,61 +1,22 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:49714 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750957AbeERQsp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 May 2018 12:48:45 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 04/34] fs: remove the buffer_unwritten check in page_seek_hole_data
-Date: Fri, 18 May 2018 18:48:00 +0200
-Message-Id: <20180518164830.1552-5-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+a8c6d037863aa87ae187+5385+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Tue, 22 May 2018 03:09:15 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Kent Overstreet <kent.overstreet@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	axboe@kernel.dk, hch@infradead.org, colyli@suse.de,
+	snitzer@redhat.com, darrick.wong@oracle.com, clm@fb.com,
+	bacik@fb.com, linux-xfs@vger.kernel.org, drbd-dev@lists.linbit.com,
+	linux-btrfs@vger.kernel.org, linux-raid@vger.kernel.org,
+	neilb@suse.com
+Subject: Re: [PATCH 08/12] target: convert to bioset_init()/mempool_init()
+Message-ID: <20180522100915.GB4477@infradead.org>
+References: <20180520222558.7053-1-kent.overstreet@gmail.com>
+ <20180520222558.7053-9-kent.overstreet@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180520222558.7053-9-kent.overstreet@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-We only call into this function through the iomap iterators, so we already
-know the buffer is unwritten.  In addition to that we always require the
-uptodate flag that is ORed with the result anyway.
+Looks good,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/iomap.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
-
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 4a01d2f4e8e9..bef5e91d40bf 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -611,14 +611,9 @@ page_seek_hole_data(struct page *page, loff_t lastoff, int whence)
- 			continue;
- 
- 		/*
--		 * Unwritten extents that have data in the page cache covering
--		 * them can be identified by the BH_Unwritten state flag.
--		 * Pages with multiple buffers might have a mix of holes, data
--		 * and unwritten extents - any buffer with valid data in it
--		 * should have BH_Uptodate flag set on it.
-+		 * Any buffer with valid data in it should have BH_Uptodate set.
- 		 */
--
--		if ((buffer_unwritten(bh) || buffer_uptodate(bh)) == seek_data)
-+		if (buffer_uptodate(bh) == seek_data)
- 			return lastoff;
- 
- 		lastoff = offset;
-@@ -630,8 +625,8 @@ page_seek_hole_data(struct page *page, loff_t lastoff, int whence)
-  * Seek for SEEK_DATA / SEEK_HOLE in the page cache.
-  *
-  * Within unwritten extents, the page cache determines which parts are holes
-- * and which are data: unwritten and uptodate buffer heads count as data;
-- * everything else counts as a hole.
-+ * and which are data: uptodate buffer heads count as data; everything else
-+ * counts as a hole.
-  *
-  * Returns the resulting offset on successs, and -ENOENT otherwise.
-  */
--- 
-2.17.0
+Reviewed-by: Christoph Hellwig <hch@lst.de>
