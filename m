@@ -1,40 +1,28 @@
-Return-Path: <prvs=673874c89=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@lst.de" <hch@lst.de>, "keith.busch@intel.com" <keith.busch@intel.com>
-CC: "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "ming.lei@redhat.com"
-	<ming.lei@redhat.com>
+Return-Path: <hch@lst.de>
+Date: Tue, 22 May 2018 17:24:37 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>
 Subject: Re: [RFC PATCH 2/3] blk-mq: Fix timeout and state order
-Date: Tue, 22 May 2018 16:27:55 +0000
-Message-ID: <3d14e88b2bb22ac929d2aa007b4ad9eaee6def56.camel@wdc.com>
-References: <20180521231131.6685-1-keith.busch@intel.com>
-	 <20180521231131.6685-3-keith.busch@intel.com>
-	 <20180522152437.GB18664@lst.de>
-In-Reply-To: <20180522152437.GB18664@lst.de>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <20180522152437.GB18664@lst.de>
+References: <20180521231131.6685-1-keith.busch@intel.com> <20180521231131.6685-3-keith.busch@intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180521231131.6685-3-keith.busch@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTA1LTIyIGF0IDE3OjI0ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
-ZToNCj4gT24gTW9uLCBNYXkgMjEsIDIwMTggYXQgMDU6MTE6MzBQTSAtMDYwMCwgS2VpdGggQnVz
-Y2ggd3JvdGU6DQo+ID4gVGhlIGJsb2NrIGxheWVyIGhhZCBiZWVuIHNldHRpbmcgdGhlIHN0YXRl
-IHRvIGluLWZsaWdodCBwcmlvciB0byB1cGRhdGluZw0KPiA+IHRoZSB0aW1lci4gVGhpcyBpcyB0
-aGUgd3Jvbmcgb3JkZXIgc2luY2UgdGhlIHRpbWVvdXQgaGFuZGxlciBjb3VsZCBvYnNlcnZlDQo+
-ID4gdGhlIGluLWZsaWdodCBzdGF0ZSB3aXRoIHRoZSBvbGRlciB0aW1lb3V0LCBiZWxpZXZpbmcg
-dGhlIHJlcXVlc3QgaGFkDQo+ID4gZXhwaXJlZCB3aGVuIGluIGZhY3QgaXQgaXMganVzdCBnZXR0
-aW5nIHN0YXJ0ZWQuDQo+ID4gDQo+ID4gU2lnbmVkLW9mZi1ieTogS2VpdGggQnVzY2ggPGtlaXRo
-LmJ1c2NoQGludGVsLmNvbT4NCj4gDQo+IFRoZSB3YXkgSSB1bmRlcnN0b29kIEJhcnRzIGNvbW1l
-bnRzIHRvIG15IGNvbW1lbnRzIG9uIGhpcyBwYXRjaCB3ZQ0KPiBhY3R1YWxseSBuZWVkIHRoZSB0
-d28gdXBkYXRlcyB0byBiZSBhdG9taWMuICBJIGhhdmVuJ3QgaGFkIG11Y2ggdGltZQ0KPiB0byBm
-b2xsb3cgdXAsIGJ1dCBJJ2QgbGlrZSB0byBoZWFyIEJhcnRzIG9waW5pb24uICBFaXRoZXIgd2F5
-IHdlDQo+IGNsZWFybHkgbmVlZCB0byBkb2N1bWVudCBvdXIgYXNzdW1wdGlvbnMgaGVyZSBpbiBj
-b21tZW50cy4NCg0KQWZ0ZXIgd2UgZGlzY3Vzc2VkIHJlcXVlc3Qgc3RhdGUgdXBkYXRpbmcgSSBo
-YXZlIGJlZW4gdGhpbmtpbmcgZnVydGhlciBhYm91dA0KdGhpcy4gSSB0aGluayBub3cgdGhhdCBp
-dCBpcyBzYWZlIHRvIHVwZGF0ZSB0aGUgcmVxdWVzdCBkZWFkbGluZSBmaXJzdCBiZWNhdXNlDQp0
-aGUgdGltZW91dCBjb2RlIGlnbm9yZXMgcmVxdWVzdHMgYW55d2F5IHRoYXQgaGF2ZSBhbm90aGVy
-IHN0YXRlIHRoYW4NCk1RX1JRX0lOX0ZMSUdIVC4gQWRkaXRpb25hbGx5LCBpdCBpcyB1bmxpa2Vs
-eSB0aGF0IHRoZSByZXF1ZXN0IHRpbWVyIHdpbGwgZmlyZQ0KYmVmb3JlIHRoZSByZXF1ZXN0IHN0
-YXRlIGhhcyBiZWVuIHVwZGF0ZWQuIEFuZCBpZiB0aGF0IHdvdWxkIGhhcHBlbiB0aGUgcmVxdWVz
-dA0KdGltZW91dCB3aWxsIGJlIGhhbmRsZWQgdGhlIG5leHQgdGltZSByZXF1ZXN0IHRpbWVvdXRz
-IGFyZSBleGFtaW5lZC4NCg0KQmFydC4NCg0KDQoNCg0K
+On Mon, May 21, 2018 at 05:11:30PM -0600, Keith Busch wrote:
+> The block layer had been setting the state to in-flight prior to updating
+> the timer. This is the wrong order since the timeout handler could observe
+> the in-flight state with the older timeout, believing the request had
+> expired when in fact it is just getting started.
+> 
+> Signed-off-by: Keith Busch <keith.busch@intel.com>
+
+The way I understood Barts comments to my comments on his patch we
+actually need the two updates to be atomic.  I haven't had much time
+to follow up, but I'd like to hear Barts opinion.  Either way we
+clearly need to document our assumptions here in comments.
