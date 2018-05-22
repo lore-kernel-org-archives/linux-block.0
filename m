@@ -1,16 +1,17 @@
-Return-Path: <owner-linux-aio@kvack.org>
+Return-Path: <prvs=673f59626=adam.manzanares@wdc.com>
 From: adam.manzanares@wdc.com
 To: viro@zeniv.linux.org.uk,
 	linux-fsdevel@vger.kernel.org,
 	axboe@kernel.dk,
 	bcrl@kvack.org
-Cc: mingo@kernel.org,
-	tglx@linutronix.de,
-	kstewart@linuxfoundation.org,
-	peterz@infradead.org,
+Cc: tglx@linutronix.de,
+	mingo@kernel.org,
 	pombredanne@nexb.com,
+	kstewart@linuxfoundation.org,
 	gregkh@linuxfoundation.org,
 	bigeasy@linutronix.de,
+	jack@suse.cz,
+	darrick.wong@oracle.com,
 	rgoldwyn@suse.com,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
@@ -19,12 +20,11 @@ Cc: mingo@kernel.org,
 	hch@infradread.org,
 	jmoyer@redhat.com,
 	Adam Manzanares <adam.manzanares@wdc.com>
-Subject: [PATCH v7 5/5] fs: iomap dio set bio prio from kiocb prio
-Date: Tue, 22 May 2018 10:52:21 -0700
-Message-Id: <20180522175221.2391-6-adam.manzanares@wdc.com>
-In-Reply-To: <20180522175221.2391-1-adam.manzanares@wdc.com>
-References: <20180522175221.2391-1-adam.manzanares@wdc.com>
-Sender: owner-linux-aio@kvack.org
+Subject: [PATCH v6 5/5] fs: iomap dio set bio prio from kiocb prio
+Date: Tue, 22 May 2018 08:07:37 -0700
+Message-Id: <20180522150737.9893-6-adam.manzanares@wdc.com>
+In-Reply-To: <20180522150737.9893-1-adam.manzanares@wdc.com>
+References: <20180522150737.9893-1-adam.manzanares@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
 From: Adam Manzanares <adam.manzanares@wdc.com>
@@ -53,9 +53,3 @@ index afd163586aa0..65aae194aeca 100644
  
 -- 
 2.15.1
-
---
-To unsubscribe, send a message with 'unsubscribe linux-aio' in
-the body to majordomo@kvack.org.  For more info on Linux AIO,
-see: http://www.kvack.org/aio/
-Don't email: <a href=mailto:"aart@kvack.org">aart@kvack.org</a>
