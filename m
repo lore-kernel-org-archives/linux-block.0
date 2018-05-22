@@ -1,89 +1,45 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	sapienza.dav@gmail.com,
-	177992@studenti.unimore.it,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENTS 3/4] block, bfq: increase weight-raising duration for interactive apps
-Date: Thu, 31 May 2018 16:45:07 +0200
-Message-Id: <20180531144508.3927-4-paolo.valente@linaro.org>
-In-Reply-To: <20180531144508.3927-1-paolo.valente@linaro.org>
-References: <20180531144508.3927-1-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga18.intel.com ([134.134.136.126]:19353 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751229AbeEVOB1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 May 2018 10:01:27 -0400
+Date: Tue, 22 May 2018 08:03:38 -0600
+From: Keith Busch <keith.busch@linux.intel.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Laurence Oberman <loberman@redhat.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        James Smart <james.smart@broadcom.com>,
+        linux-nvme@lists.infradead.org,
+        Keith Busch <keith.busch@intel.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 3/6] nvme: Move all IO out of controller reset
+Message-ID: <20180522140337.GO5528@localhost.localdomain>
+References: <20180518163823.27820-3-keith.busch@intel.com>
+ <20180518230357.GC18334@ming.t460p>
+ <20180521142219.GC5528@localhost.localdomain>
+ <20180521145850.GA19099@ming.t460p>
+ <20180521150331.GI5528@localhost.localdomain>
+ <20180521153425.GC19099@ming.t460p>
+ <20180521154433.GJ5528@localhost.localdomain>
+ <20180521160452.GD19099@ming.t460p>
+ <20180521162354.GM5528@localhost.localdomain>
+ <20180522014626.GA20430@ming.t460p>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180522014626.GA20430@ming.t460p>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Davide Sapienza <sapienza.dav@gmail.com>
+On Tue, May 22, 2018 at 09:46:32AM +0800, Ming Lei wrote:
+> It isn't a good practice to rely on timing for avoiding race, IMO.
 
-The maximum possible duration of the weight-raising period for
-interactive applications is limited to 13 seconds, as this is the time
-needed to load the largest application that we considered when tuning
-weight raising. Unfortunately, in such an evaluation, we did not
-consider the case of very slow virtual machines.
-
-For example, on a QEMU/KVM virtual machine
-- running in a slow PC;
-- with a virtual disk stacked on a slow low-end 5400rpm HDD;
-- serving a heavy I/O workload, such as the sequential reading of
-several files;
-mplayer takes 23 seconds to start, if constantly weight-raised.
-
-To address this issue, this commit conservatively sets the upper limit
-for weight-raising duration to 25 seconds.
-
-Signed-off-by: Davide Sapienza <sapienza.dav@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 26 +++++++++++++++-----------
- 1 file changed, 15 insertions(+), 11 deletions(-)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 262c929e24ee..31ce089d54eb 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -930,22 +930,26 @@ static unsigned int bfq_wr_duration(struct bfq_data *bfqd)
- 	do_div(dur, bfqd->peak_rate);
+Sure thing, and it's easy enough to avoid this one.
  
- 	/*
--	 * Limit duration between 3 and 13 seconds. Tests show that
--	 * higher values than 13 seconds often yield the opposite of
--	 * the desired result, i.e., worsen responsiveness by letting
--	 * non-interactive and non-soft-real-time applications
--	 * preserve weight raising for a too long time interval.
-+	 * Limit duration between 3 and 25 seconds. The upper limit
-+	 * has been conservatively set after the following worst case:
-+	 * on a QEMU/KVM virtual machine
-+	 * - running in a slow PC
-+	 * - with a virtual disk stacked on a slow low-end 5400rpm HDD
-+	 * - serving a heavy I/O workload, such as the sequential reading
-+	 *   of several files
-+	 * mplayer took 23 seconds to start, if constantly weight-raised.
-+	 *
-+	 * As for higher values than that accomodating the above bad
-+	 * scenario, tests show that higher values would often yield
-+	 * the opposite of the desired result, i.e., would worsen
-+	 * responsiveness by allowing non-interactive applications to
-+	 * preserve weight raising for too long.
- 	 *
- 	 * On the other end, lower values than 3 seconds make it
- 	 * difficult for most interactive tasks to complete their jobs
- 	 * before weight-raising finishes.
- 	 */
--	if (dur > msecs_to_jiffies(13000))
--		dur = msecs_to_jiffies(13000);
--	else if (dur < msecs_to_jiffies(3000))
--		dur = msecs_to_jiffies(3000);
--
--	return dur;
-+	return clamp_val(dur, msecs_to_jiffies(3000), msecs_to_jiffies(25000));
- }
- 
- /* switch back from soft real-time to interactive weight raising */
--- 
-2.16.1
+> OK, please fix other issues mentioned in the following comment together,
+> then I will review further and see if it can work well.
+> 
+> https://marc.info/?l=linux-block&m=152668465710591&w=2
+
+Will do, v2 coming up by end of today.
