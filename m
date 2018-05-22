@@ -1,162 +1,30 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:33250 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1033218AbeE1PWW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 May 2018 11:22:22 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Michael Lyle <mlyle@lyle.org>,
-        Junhui Tang <tang.junhui@zte.com.cn>
-Subject: [PATCH 1/4] bcache: stop bcache device when backing device is offline
-Date: Mon, 28 May 2018 15:37:41 +0800
-Message-Id: <20180528073744.71258-2-colyli@suse.de>
-In-Reply-To: <20180528073744.71258-1-colyli@suse.de>
-References: <20180528073744.71258-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <mrochs@linux.vnet.ibm.com>
+Date: Tue, 22 May 2018 16:03:06 -0500
+From: "Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>
+To: Kees Cook <keescook@chromium.org>
+Cc: Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Tejun Heo <tj@kernel.org>, Borislav Petkov <bp@alien8.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
+        Uma Krishnan <ukrishn@linux.vnet.ibm.com>, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/6] scsi: cxlflash: Drop unused sense buffers
+References: <20180522181512.39316-1-keescook@chromium.org>
+ <20180522181512.39316-3-keescook@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180522181512.39316-3-keescook@chromium.org>
+Message-Id: <20180522210306.GA60047@p8tul1-build.aus.stglabs.ibm.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Currently bcache does not handle backing device failure, if backing
-device is offline and disconnected from system, its bcache device can still
-be accessible. If the bcache device is in writeback mode, I/O requests even
-can success if the requests hit on cache device. That is to say, when and
-how bcache handles offline backing device is undefined.
+On Tue, May 22, 2018 at 11:15:08AM -0700, Kees Cook wrote:
+> This removes the unused sense buffer in read_cap16() and write_same16().
+> 
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-This patch tries to handle backing device offline in a rather simple way,
-- Add cached_dev->status_update_thread kernel thread to update backing
-  device status in every 1 second.
-- Add cached_dev->offline_seconds to record how many seconds the backing
-  device is observed to be offline. If the backing device is offline for
-  BACKING_DEV_OFFLINE_TIMEOUT (30) seconds, set dc->io_disable to 1 and
-  call bcache_device_stop() to stop the bache device which linked to the
-  offline backing device.
+Looks good.
 
-Now if a backing device is offline for BACKING_DEV_OFFLINE_TIMEOUT seconds,
-its bcache device will be removed, then user space application writing on
-it will get error immediately, and handler the device failure in time.
-
-This patch is quite simple, does not handle more complicated situations.
-Once the bcache device is stopped, users need to recovery the backing
-device, register and attach it manually.
-
-Changelog:
-v3: call wait_for_kthread_stop() before exits kernel thread.
-v2: remove "bcache: " prefix when calling pr_warn().
-v1: initial version.
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/bcache.h |  2 ++
- drivers/md/bcache/super.c  | 53 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 55 insertions(+)
-
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 3a0cfb237af9..ba98547c4ca0 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -345,6 +345,7 @@ struct cached_dev {
- 
- 	struct keybuf		writeback_keys;
- 
-+	struct task_struct	*status_update_thread;
- 	/*
- 	 * Order the write-half of writeback operations strongly in dispatch
- 	 * order.  (Maintain LBA order; don't allow reads completing out of
-@@ -392,6 +393,7 @@ struct cached_dev {
- #define DEFAULT_CACHED_DEV_ERROR_LIMIT	64
- 	atomic_t		io_errors;
- 	unsigned		error_limit;
-+	unsigned		offline_seconds;
- 
- 	char			backing_dev_name[BDEVNAME_SIZE];
- };
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 3dea06b41d43..a16b5b1df62a 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -654,6 +654,11 @@ static int ioctl_dev(struct block_device *b, fmode_t mode,
- 		     unsigned int cmd, unsigned long arg)
- {
- 	struct bcache_device *d = b->bd_disk->private_data;
-+	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
-+
-+	if (dc->io_disable)
-+		return -EIO;
-+
- 	return d->ioctl(d, mode, cmd, arg);
- }
- 
-@@ -864,6 +869,44 @@ static void calc_cached_dev_sectors(struct cache_set *c)
- 	c->cached_dev_sectors = sectors;
- }
- 
-+#define BACKING_DEV_OFFLINE_TIMEOUT 5
-+static int cached_dev_status_update(void *arg)
-+{
-+	struct cached_dev *dc = arg;
-+	struct request_queue *q;
-+
-+	/*
-+	 * If this delayed worker is stopping outside, directly quit here.
-+	 * dc->io_disable might be set via sysfs interface, so check it
-+	 * here too.
-+	 */
-+	while (!kthread_should_stop() && !dc->io_disable) {
-+		q = bdev_get_queue(dc->bdev);
-+		if (blk_queue_dying(q))
-+			dc->offline_seconds++;
-+		else
-+			dc->offline_seconds = 0;
-+
-+		if (dc->offline_seconds >= BACKING_DEV_OFFLINE_TIMEOUT) {
-+			pr_err("%s: device offline for %d seconds",
-+			       dc->backing_dev_name,
-+			       BACKING_DEV_OFFLINE_TIMEOUT);
-+			pr_err("%s: disable I/O request due to backing "
-+			       "device offline", dc->disk.name);
-+			dc->io_disable = true;
-+			/* let others know earlier that io_disable is true */
-+			smp_mb();
-+			bcache_device_stop(&dc->disk);
-+			break;
-+		}
-+		schedule_timeout_interruptible(HZ);
-+	}
-+
-+	wait_for_kthread_stop();
-+	return 0;
-+}
-+
-+
- void bch_cached_dev_run(struct cached_dev *dc)
- {
- 	struct bcache_device *d = &dc->disk;
-@@ -906,6 +949,14 @@ void bch_cached_dev_run(struct cached_dev *dc)
- 	if (sysfs_create_link(&d->kobj, &disk_to_dev(d->disk)->kobj, "dev") ||
- 	    sysfs_create_link(&disk_to_dev(d->disk)->kobj, &d->kobj, "bcache"))
- 		pr_debug("error creating sysfs link");
-+
-+	dc->status_update_thread = kthread_run(cached_dev_status_update,
-+					       dc, "bcache_status_update");
-+	if (IS_ERR(dc->status_update_thread)) {
-+		pr_warn("failed to create bcache_status_update kthread, "
-+			"continue to run without monitoring backing "
-+			"device status");
-+	}
- }
- 
- /*
-@@ -1139,6 +1190,8 @@ static void cached_dev_free(struct closure *cl)
- 		kthread_stop(dc->writeback_thread);
- 	if (dc->writeback_write_wq)
- 		destroy_workqueue(dc->writeback_write_wq);
-+	if (!IS_ERR_OR_NULL(dc->status_update_thread))
-+		kthread_stop(dc->status_update_thread);
- 
- 	if (atomic_read(&dc->running))
- 		bd_unlink_disk_holder(dc->bdev, dc->disk.disk);
--- 
-2.17.0
+Acked-by: Matthew R. Ochs <mrochs@linux.vnet.ibm.com>
