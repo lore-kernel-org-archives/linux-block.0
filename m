@@ -1,20 +1,25 @@
-Return-Path: <BATV+e0efdd19ce80d487e3da+5372+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "Ed L. Cashin" <ed.cashin@acm.org>,
-	Geoff Levand <geoff@infradead.org>,
-	Maxim Levitsky <maximlevitsky@gmail.com>,
-	linux-block@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-mtd@lists.infradead.org,
-	sparclinux@vger.kernel.org
-Subject: make a few block drivers highmem safe
-Date: Wed,  9 May 2018 15:59:41 +0200
-Message-Id: <20180509135948.20329-1-hch@lst.de>
+Return-Path: <BATV+a8c6d037863aa87ae187+5385+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Tue, 22 May 2018 03:10:16 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Kent Overstreet <kent.overstreet@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	axboe@kernel.dk, hch@infradead.org, colyli@suse.de,
+	snitzer@redhat.com, darrick.wong@oracle.com, clm@fb.com,
+	bacik@fb.com, linux-xfs@vger.kernel.org, drbd-dev@lists.linbit.com,
+	linux-btrfs@vger.kernel.org, linux-raid@vger.kernel.org,
+	neilb@suse.com
+Subject: Re: [PATCH 11/12] xfs: convert to bioset_init()/mempool_init()
+Message-ID: <20180522101016.GD4477@infradead.org>
+References: <20180520222558.7053-1-kent.overstreet@gmail.com>
+ <20180520222558.7053-12-kent.overstreet@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180520222558.7053-12-kent.overstreet@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
+This creates a minor conflict with my iomap series, but that should
+be easy to merge if needed.
 
-this series converts a few random block drivers to be highmem safe,
-in preparation of eventually getting rid of the block layer bounce
-buffering support.
+Otherwise looks good:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
