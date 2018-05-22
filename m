@@ -1,117 +1,46 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:51998 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752514AbeERQuK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 May 2018 12:50:10 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 32/34] xfs: refactor the tail of xfs_writepage_map
-Date: Fri, 18 May 2018 18:48:28 +0200
-Message-Id: <20180518164830.1552-33-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 22 May 2018 09:56:32 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@linux.intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Laurence Oberman <loberman@redhat.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	James Smart <james.smart@broadcom.com>,
+	linux-nvme@lists.infradead.org, Keith Busch <keith.busch@intel.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 1/6] nvme: Sync request queues on reset
+Message-ID: <20180522015631.GA20604@ming.t460p>
+References: <20180518163823.27820-1-keith.busch@intel.com>
+ <20180518223210.GB18334@ming.t460p>
+ <20180518234408.GA31749@localhost.localdomain>
+ <20180519000141.GB19799@ming.t460p>
+ <20180521140413.GA5528@localhost.localdomain>
+ <20180521152536.GB19099@ming.t460p>
+ <20180521155909.GK5528@localhost.localdomain>
+ <20180521160830.GA19858@ming.t460p>
+ <20180521162517.GN5528@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180521162517.GN5528@localhost.localdomain>
+List-ID: <linux-block@vger.kernel.org>
 
-Rejuggle how we deal with the different error vs non-error and have
-ioends vs not have ioend cases to keep the fast path streamlined, and
-the duplicate code at a minimum.
+On Mon, May 21, 2018 at 10:25:17AM -0600, Keith Busch wrote:
+> On Tue, May 22, 2018 at 12:08:37AM +0800, Ming Lei wrote:
+> > Please take a look at blk_mq_complete_request(). Even with Bart's
+> > change, the request still won't be completed by driver. The request can
+> > only be completed by either driver or blk-mq, not both.
+> 
+> So you're saying blk-mq can't complete a request the driver returned to
+> blk-mq to complete. And that's the nvme driver's problem to fix?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/xfs_aops.c | 65 +++++++++++++++++++++++------------------------
- 1 file changed, 32 insertions(+), 33 deletions(-)
+For avoiding use-after-free, one request can only be completed by
+one path, either by timeout path or normal completion(irq or cancel)
+from driver.
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index dd92d99df51f..a4e53e0a57c2 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -883,7 +883,14 @@ xfs_writepage_map(
- 	 * submission of outstanding ioends on the writepage context so they are
- 	 * treated correctly on error.
- 	 */
--	if (count) {
-+	if (unlikely(error)) {
-+		if (!count) {
-+			xfs_aops_discard_page(page);
-+			ClearPageUptodate(page);
-+			unlock_page(page);
-+			goto done;
-+		}
-+
- 		/*
- 		 * If the page was not fully cleaned, we need to ensure that the
- 		 * higher layers come back to it correctly.  That means we need
-@@ -892,43 +899,35 @@ xfs_writepage_map(
- 		 * so another attempt to write this page in this writeback sweep
- 		 * will be made.
- 		 */
--		if (error) {
--			set_page_writeback_keepwrite(page);
--		} else {
--			clear_page_dirty_for_io(page);
--			set_page_writeback(page);
--		}
--		unlock_page(page);
--
--		/*
--		 * Preserve the original error if there was one, otherwise catch
--		 * submission errors here and propagate into subsequent ioend
--		 * submissions.
--		 */
--		list_for_each_entry_safe(ioend, next, &submit_list, io_list) {
--			int error2;
--
--			list_del_init(&ioend->io_list);
--			error2 = xfs_submit_ioend(wbc, ioend, error);
--			if (error2 && !error)
--				error = error2;
--		}
--	} else if (error) {
--		xfs_aops_discard_page(page);
--		ClearPageUptodate(page);
--		unlock_page(page);
-+		set_page_writeback_keepwrite(page);
- 	} else {
--		/*
--		 * We can end up here with no error and nothing to write if we
--		 * race with a partial page truncate on a sub-page block sized
--		 * filesystem. In that case we need to mark the page clean.
--		 */
- 		clear_page_dirty_for_io(page);
- 		set_page_writeback(page);
--		unlock_page(page);
--		end_page_writeback(page);
- 	}
- 
-+	unlock_page(page);
-+
-+	/*
-+	 * Preserve the original error if there was one, otherwise catch
-+	 * submission errors here and propagate into subsequent ioend
-+	 * submissions.
-+	 */
-+	list_for_each_entry_safe(ioend, next, &submit_list, io_list) {
-+		int error2;
-+
-+		list_del_init(&ioend->io_list);
-+		error2 = xfs_submit_ioend(wbc, ioend, error);
-+		if (error2 && !error)
-+			error = error2;
-+	}
-+
-+	/*
-+	 * We can end up here with no error and nothing to write if we race with
-+	 * a partial page truncate on a sub-page block sized filesystem.
-+	 */
-+	if (!count)
-+		end_page_writeback(page);
-+done:
- 	mapping_set_error(page->mapping, error);
- 	return error;
- }
--- 
-2.17.0
+So before handling this req's timeout, this request has to be
+marked as completed by blk-mq timeout code already, then nvme_cancel_request()
+can't cover this timed-out request.
+
+Thanks,
+Ming
