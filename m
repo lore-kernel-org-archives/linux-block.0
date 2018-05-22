@@ -1,68 +1,56 @@
-Return-Path: <keith.busch@linux.intel.com>
-Date: Tue, 22 May 2018 08:15:07 -0600
-From: Keith Busch <keith.busch@linux.intel.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>,
-	"keith.busch@intel.com" <keith.busch@intel.com>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 22 May 2018 16:51:44 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>
 Subject: Re: [RFC PATCH 3/3] blk-mq: Remove generation seqeunce
-Message-ID: <20180522141507.GQ5528@localhost.localdomain>
+Message-ID: <20180522085143.GB20604@ming.t460p>
 References: <20180521231131.6685-1-keith.busch@intel.com>
  <20180521231131.6685-4-keith.busch@intel.com>
- <e7a287827b4c00151bb7714deca7ea6453177504.camel@wdc.com>
+ <20180522024910.GD20430@ming.t460p>
+ <34ba4583-25be-acf7-8407-755e920def6b@kernel.dk>
+ <20180522034727.GE20430@ming.t460p>
+ <29D40550-AF2A-4357-B87F-95C28259A334@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <e7a287827b4c00151bb7714deca7ea6453177504.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <29D40550-AF2A-4357-B87F-95C28259A334@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, May 21, 2018 at 11:29:06PM +0000, Bart Van Assche wrote:
-> On Mon, 2018-05-21 at 17:11 -0600, Keith Busch wrote:
-> >  	switch (ret) {
-> >  	case BLK_EH_HANDLED:
-> > -		__blk_mq_complete_request(req);
-> > -		break;
-> > -	case BLK_EH_RESET_TIMER:
-> >  		/*
-> > -		 * As nothing prevents from completion happening while
-> > -		 * ->aborted_gstate is set, this may lead to ignored
-> > -		 * completions and further spurious timeouts.
-> > +		 * If the request is still in flight, the driver is requesting
-> > +		 * blk-mq complete it.
-> >  		 */
-> > -		blk_mq_rq_update_aborted_gstate(req, 0);
-> > +		if (blk_mq_rq_state(req) == MQ_RQ_IN_FLIGHT)
-> > +			__blk_mq_complete_request(req);
-> > +		break;
-> > +	case BLK_EH_RESET_TIMER:
-> >  		blk_add_timer(req);
-> >  		break;
-> >  	case BLK_EH_NOT_HANDLED:
-> > @@ -880,64 +782,64 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
-> >  	}
-> >  }
+On Mon, May 21, 2018 at 09:51:19PM -0600, Jens Axboe wrote:
+> On May 21, 2018, at 9:47 PM, Ming Lei <ming.lei@redhat.com> wrote:
+> > 
+> >> On Mon, May 21, 2018 at 09:16:33PM -0600, Jens Axboe wrote:
+> >>> On 5/21/18 8:49 PM, Ming Lei wrote:
+> >>>> On Mon, May 21, 2018 at 05:11:31PM -0600, Keith Busch wrote:
+> >>>> This patch simplifies the timeout handling by relying on the request
+> >>>> reference counting to ensure the iterator is operating on an inflight
+> >>> 
+> >>> The reference counting isn't free, what is the real benefit in this way?
+> >> 
+> >> Neither is the current scheme and locking, and this is a hell of a lot
+> >> simpler. I'd get rid of the kref stuff and just do a simple
+> >> atomic_dec_and_test(). Most of the time we should be uncontended on
+> >> that, which would make it pretty darn cheap. I'd be surprised if it
+> >> wasn't better than the current alternatives.
+> > 
+> > The explicit memory barriers by atomic_dec_and_test() isn't free.
 > 
-> I think the above changes can lead to concurrent calls of
-> __blk_mq_complete_request() from the regular completion path and the timeout
-> path. That's wrong: the __blk_mq_complete_request() caller should guarantee
-> that no concurrent calls from another context to that function can occur.
+> I’m not saying it’s free. Neither is our current synchronization.
+> 
+> > Also the double completion issue need to be fixed before discussing
+> > this approach further.
+> 
+> Certainly. Also not saying that the current patch is perfect. But it’s a lot more palatable than the alternatives, hence my interest. And I’d like for this issue to get solved, we seem to be a bit stuck atm. 
+> 
 
-Hi Bart,
+It may not be something we are stuck at, and seems no alternatives for
+this patchset.
 
-This shouldn't be introducing any new concorrent calls to
-__blk_mq_complete_request if they don't already exist. The timeout work
-calls it only if the driver's timeout returns BLK_EH_HANDLED, which means
-the driver is claiming the command is now done, but the driver didn't call
-blk_mq_complete_request as indicated by the request's IN_FLIGHT state.
-
-In order to get a second call to __blk_mq_complete_request(), then,
-the driver would have to end up calling blk_mq_complete_request()
-in another context. But there's nothing stopping that from happening
-today, and would be bad if any driver actually did that: the request
-may have been re-allocated and issued as a new command, and calling
-blk_mq_complete_request() the second time introduces data corruption.
+It is a new requirement from NVMe, and Keith wants driver to complete
+timed-out request in .timeout(). We never support that before for both
+mq and non-mq code path.
 
 Thanks,
-Keith
+Ming
