@@ -1,80 +1,64 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [RESEND PATCH V5 27/33] gfs2: conver to bio_for_each_page_all2
-Date: Fri, 25 May 2018 11:46:15 +0800
-Message-Id: <20180525034621.31147-28-ming.lei@redhat.com>
-In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
-References: <20180525034621.31147-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <colyli@suse.de>
+Subject: Re: [PATCH 2/5] bcache: Split out crc64 to library
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, axboe@kernel.dk,
+ linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+References: <20180522093200.67193-1-colyli@suse.de>
+ <20180522093200.67193-3-colyli@suse.de>
+ <b7b0e4a9-10bf-dbff-f8ab-979345f3cd3b@suse.de>
+ <d00e1db87dec40dcc2a78f06a62e7df8fbfbdd51.camel@linux.intel.com>
+From: Coly Li <colyli@suse.de>
+Message-ID: <b8eb9b75-873f-beb3-9e2e-ccdcd4465d4a@suse.de>
+Date: Tue, 22 May 2018 21:03:10 +0800
+MIME-Version: 1.0
+In-Reply-To: <d00e1db87dec40dcc2a78f06a62e7df8fbfbdd51.camel@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-bio_for_each_page_all() can't be used any more after multipage bvec is
-enabled, so we have to convert to bio_for_each_page_all2().
+On 2018/5/22 7:42 PM, Andy Shevchenko wrote:
+> On Tue, 2018-05-22 at 18:33 +0800, Coly Li wrote:
+>> On 2018/5/22 5:31 PM, Coly Li wrote:
+>>> From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+>>>
+>>> For generic use split out crc64 code to a separate module
+>>> in the library folder.
+>>>
+>>> No functional change intended.
+>>>
+>>> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+>>> Signed-off-by: Coly Li <colyli@suse.de>
+>>
+>> Hi Jens and Andy,
+>>
+>> After discussed on mailing list, I realize the original crc64 code was
+>> copied from postgreSQL with PostgreSQL license. So we are not able to
+>> move the code into lib/crc64 and grant GPL license to the symbols.
+> 
 
-Given bvec can't be changed inside bio_for_each_page_all2(), this patch
-marks the bvec parameter as 'const' for gfs2_end_log_write_bh().
+Hi Andy,
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/gfs2/lops.c    | 6 ++++--
- fs/gfs2/meta_io.c | 3 ++-
- 2 files changed, 6 insertions(+), 3 deletions(-)
+> Indeed, I also didn't pay much attention to the exporting the symbols.
+> Another question if that code may be present in kernel in the first
+> place.
+>>> I will ask lawyers about how to handle the license issue.
+>> For this moment I will hold this patch and not submit it to Linux
+>> v4.18.
+> 
+> You still can apply the rest of clean ups which do not touch this part.
+> 
 
-diff --git a/fs/gfs2/lops.c b/fs/gfs2/lops.c
-index a31b9b028957..0284cd66089c 100644
---- a/fs/gfs2/lops.c
-+++ b/fs/gfs2/lops.c
-@@ -168,7 +168,8 @@ u64 gfs2_log_bmap(struct gfs2_sbd *sdp)
-  * that is pinned in the pagecache.
-  */
- 
--static void gfs2_end_log_write_bh(struct gfs2_sbd *sdp, struct bio_vec *bvec,
-+static void gfs2_end_log_write_bh(struct gfs2_sbd *sdp,
-+				  const struct bio_vec *bvec,
- 				  blk_status_t error)
- {
- 	struct buffer_head *bh, *next;
-@@ -207,6 +208,7 @@ static void gfs2_end_log_write(struct bio *bio)
- 	struct bio_vec *bvec;
- 	struct page *page;
- 	int i;
-+	struct bvec_iter_all bia;
- 
- 	if (bio->bi_status) {
- 		fs_err(sdp, "Error %d writing to journal, jid=%u\n",
-@@ -214,7 +216,7 @@ static void gfs2_end_log_write(struct bio *bio)
- 		wake_up(&sdp->sd_logd_waitq);
- 	}
- 
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		page = bvec->bv_page;
- 		if (page_has_buffers(page))
- 			gfs2_end_log_write_bh(sdp, bvec, bio->bi_status);
-diff --git a/fs/gfs2/meta_io.c b/fs/gfs2/meta_io.c
-index 1d720352310a..a945c9fa1dc6 100644
---- a/fs/gfs2/meta_io.c
-+++ b/fs/gfs2/meta_io.c
-@@ -190,8 +190,9 @@ static void gfs2_meta_read_endio(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- 		struct buffer_head *bh = page_buffers(page);
- 		unsigned int len = bvec->bv_len;
--- 
-2.9.5
+Yes, rest patches will go forward, just this one will be held before I
+have a reliable answer from lawyer.
+
+>> Sorry for the inconvenience.
+> 
+> I have to apologize as well for not being picky about licenses when was
+> cooking a patch.
+> 
+
+Indeed, I didn't realize it at beginning. Anyway, moving crc64 into lib/
+is great idea and I support it. Let's see how to push things forward.
+
+Thanks.
+
+Coly Li
