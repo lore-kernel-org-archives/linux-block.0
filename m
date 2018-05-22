@@ -1,107 +1,48 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:26142 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751423AbeEVUdk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 May 2018 16:33:40 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "israelr@mellanox.com" <israelr@mellanox.com>,
-        "sagi@grimberg.me" <sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>,
-        "sebott@linux.ibm.com" <sebott@linux.ibm.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
-        "maxg@mellanox.com" <maxg@mellanox.com>,
-        "tj@kernel.org" <tj@kernel.org>,
-        "keith.busch@intel.com" <keith.busch@intel.com>
+Return-Path: <keith.busch@intel.com>
+Date: Tue, 22 May 2018 14:33:49 -0600
+From: Keith Busch <keith.busch@intel.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Sebastian Ott <sebott@linux.ibm.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Israel Rukshin <israelr@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>
 Subject: Re: [PATCH v13] blk-mq: Rework blk-mq timeout handling again
-Date: Tue, 22 May 2018 20:33:20 +0000
-Message-ID: <256db3889953289d75b989dd589802ce8a756553.camel@wdc.com>
+Message-ID: <20180522203349.GB8961@localhost.localdomain>
 References: <20180522162515.20650-1-bart.vanassche@wdc.com>
-         <bc1946d4-7627-3885-68c9-5db6c13b585c@kernel.dk>
-         <fee466b8-8e39-adc6-efa4-e50ffa60a663@kernel.dk>
-         <448d63e9-cfcd-0bc8-abf3-30296590f1d6@kernel.dk>
-         <cd0693cc-a56d-665c-bc14-7e2653b91cb0@kernel.dk>
-         <e414a6f8-79a9-0faa-e186-beb3b528acd5@kernel.dk>
-In-Reply-To: <e414a6f8-79a9-0faa-e186-beb3b528acd5@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180522162515.20650-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTA1LTIyIGF0IDEzOjM4IC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
-biA1LzIyLzE4IDE6MDMgUE0sIEplbnMgQXhib2Ugd3JvdGU6DQo+ID4gT24gNS8yMi8xOCAxMjo0
-NyBQTSwgSmVucyBBeGJvZSB3cm90ZToNCj4gPiA+IFJhbiBpbnRvIHRoaXMsIHJ1bm5pbmcgYmxv
-Y2svMDE0IGZyb20gYmxrdGVzdHM6DQo+ID4gPiANCj4gPiA+IFsgNTc0NC45NDk4MzldIHJ1biBi
-bGt0ZXN0cyBibG9jay8wMTQgYXQgMjAxOC0wNS0yMiAxMjo0MToyNQ0KPiA+ID4gWyA1NzUwLjcy
-MzAwMF0gbnVsbDogcnEgMDAwMDAwMDBmZjY4ZjEwMyB0aW1lZCBvdXQNCj4gPiA+IFsgNTc1MC43
-MjgxODFdIFdBUk5JTkc6IENQVTogNDUgUElEOiAyNDgwIGF0IGJsb2NrL2Jsay1tcS5jOjU4NSBf
-X2Jsa19tcV9jb21wbGV0ZV9yZXF1ZXN0KzB4YTYvMHgwDQo+ID4gPiBbIDU3NTAuNzM4MTg3XSBN
-b2R1bGVzIGxpbmtlZCBpbjogbnVsbF9ibGsoKykgY29uZmlnZnMgbnZtZSBudm1lX2NvcmUgc2Jf
-ZWRhYyB4ODZfcGtnX3RlbXBfdGhlcm1hXQ0KPiA+ID4gWyA1NzUwLjc2NTUwOV0gQ1BVOiA0NSBQ
-SUQ6IDI0ODAgQ29tbToga3dvcmtlci80NToxSCBOb3QgdGFpbnRlZCA0LjE3LjAtcmM2KyAjNzEy
-DQo+ID4gPiBbIDU3NTAuNzc0MDg3XSBIYXJkd2FyZSBuYW1lOiBEZWxsIEluYy4gUG93ZXJFZGdl
-IFQ2MzAvME5UNzhYLCBCSU9TIDIuMy40IDExLzA5LzIwMTYNCj4gPiA+IFsgNTc1MC43ODMzNjld
-IFdvcmtxdWV1ZToga2Jsb2NrZCBibGtfbXFfdGltZW91dF93b3JrDQo+ID4gPiBbIDU3NTAuNzg5
-MjIzXSBSSVA6IDAwMTA6X19ibGtfbXFfY29tcGxldGVfcmVxdWVzdCsweGE2LzB4MTEwDQo+ID4g
-PiBbIDU3NTAuNzk1ODUwXSBSU1A6IDAwMTg6ZmZmZjg4M2ZmYjQxN2Q2OCBFRkxBR1M6IDAwMDEw
-MjAyDQo+ID4gPiBbIDU3NTAuODAyMTg3XSBSQVg6IDAwMDAwMDAwMDAwMDAwMDMgUkJYOiBmZmZm
-ODgxZmYxMDBkODAwIFJDWDogMDAwMDAwMDAwMDAwMDAwMA0KPiA+ID4gWyA1NzUwLjgxMDY0OV0g
-UkRYOiBmZmZmODg0MDdmZDllMDQwIFJTSTogZmZmZjg4NDA3ZmQ5NTZiOCBSREk6IGZmZmY4ODFm
-ZjEwMGQ4MDANCj4gPiA+IFsgNTc1MC44MTkxMTldIFJCUDogZmZmZmU4ZmZmZmQ5MTgwMCBSMDg6
-IDAwMDAwMDAwMDAwMDAwMDAgUjA5OiBmZmZmZmZmZjgyMDY2ZWI4DQo+ID4gPiBbIDU3NTAuODI3
-NTg4XSBSMTA6IGZmZmY4ODNmZmEzODYxMzggUjExOiBmZmZmODgzZmZhMzg1OTAwIFIxMjogMDAw
-MDAwMDAwMDAwMDAwMQ0KPiA+ID4gWyA1NzUwLjgzNjA1MF0gUjEzOiBmZmZmODgxZmU3ZGE2MDAw
-IFIxNDogMDAwMDAwMDAwMDAwMDAyMCBSMTU6IDAwMDAwMDAwMDAwMDAwMDINCj4gPiA+IFsgNTc1
-MC44NDQ1MjldIEZTOiAgMDAwMDAwMDAwMDAwMDAwMCgwMDAwKSBHUzpmZmZmODg0MDdmZDgwMDAw
-KDAwMDApIGtubEdTOjAwMDAwMDAwMDAwMDAwMDANCj4gPiA+IFsgNTc1MC44NTQ0ODJdIENTOiAg
-MDAxMCBEUzogMDAwMCBFUzogMDAwMCBDUjA6IDAwMDAwMDAwODAwNTAwMzMNCj4gPiA+IFsgNTc1
-MC44NjEzOTddIENSMjogMDAwMDdmZmM5MmY5N2Y2OCBDUjM6IDAwMDAwMDAwMDIwMWQwMDUgQ1I0
-OiAwMDAwMDAwMDAwMzYwNmUwDQo+ID4gPiBbIDU3NTAuODY5ODYxXSBEUjA6IDAwMDAwMDAwMDAw
-MDAwMDAgRFIxOiAwMDAwMDAwMDAwMDAwMDAwIERSMjogMDAwMDAwMDAwMDAwMDAwMA0KPiA+ID4g
-WyA1NzUwLjg3ODMzM10gRFIzOiAwMDAwMDAwMDAwMDAwMDAwIERSNjogMDAwMDAwMDBmZmZlMGZm
-MCBEUjc6IDAwMDAwMDAwMDAwMDA0MDANCj4gPiA+IFsgNTc1MC44ODY4MDVdIENhbGwgVHJhY2U6
-DQo+ID4gPiBbIDU3NTAuODkwMDMzXSAgYnRfaXRlcisweDQyLzB4NTANCj4gPiA+IFsgNTc1MC44
-OTQwMDBdICBibGtfbXFfcXVldWVfdGFnX2J1c3lfaXRlcisweDEyYi8weDIyMA0KPiA+ID4gWyA1
-NzUwLjg5OTk0MV0gID8gYmxrX21xX3RhZ190b19ycSsweDIwLzB4MjANCj4gPiA+IFsgNTc1MC45
-MDQ5MTNdICA/IF9fcmN1X3JlYWRfdW5sb2NrKzB4NTAvMHg1MA0KPiA+ID4gWyA1NzUwLjkwOTk3
-OF0gID8gYmxrX21xX3RhZ190b19ycSsweDIwLzB4MjANCj4gPiA+IFsgNTc1MC45MTQ5NDhdICBi
-bGtfbXFfdGltZW91dF93b3JrKzB4MTRiLzB4MjQwDQo+ID4gPiBbIDU3NTAuOTIwMjIwXSAgcHJv
-Y2Vzc19vbmVfd29yaysweDIxYi8weDUxMA0KPiA+ID4gWyA1NzUwLjkyNTE5N10gIHdvcmtlcl90
-aHJlYWQrMHgzYS8weDM5MA0KPiA+ID4gWyA1NzUwLjkyOTc4MV0gID8gcHJvY2Vzc19vbmVfd29y
-aysweDUxMC8weDUxMA0KPiA+ID4gWyA1NzUwLjkzNDk0NF0gIGt0aHJlYWQrMHgxMWMvMHgxNDAN
-Cj4gPiA+IFsgNTc1MC45MzkwMjhdICA/IGt0aHJlYWRfY3JlYXRlX3dvcmtlcl9vbl9jcHUrMHg1
-MC8weDUwDQo+ID4gPiBbIDU3NTAuOTQ1MTY5XSAgcmV0X2Zyb21fZm9yaysweDFmLzB4MzANCj4g
-PiA+IFsgNTc1MC45NDk2NTZdIENvZGU6IDQ4IDAyIDAwIDAwIDgwIGU2IDgwIDc0IDI5IDhiIDk1
-IDgwIDAwIDAwIDAwIDQ0IDM5IGUyIDc1IDNiIDQ4IDg5IGRmIGZmIDkwIDIgDQo+ID4gPiBbIDU3
-NTAuOTcyMTM5XSAtLS1bIGVuZCB0cmFjZSA0MDA2NWNiMTc2NGJmNTAwIF0tLS0NCj4gPiA+IA0K
-PiA+ID4gd2hpY2ggaXMgdGhpczoNCj4gPiA+IA0KPiA+ID4gICAgICAgICBXQVJOX09OX09OQ0Uo
-YmxrX21xX3JxX3N0YXRlKHJxKSAhPSBNUV9SUV9DT01QTEVURSk7DQo+ID4gDQo+ID4gVGhhdCBj
-aGVjayBsb29rcyB3cm9uZywgc2luY2UgVElNRURfT1VUIC0+IENPTVBMRVRFIGlzIGFsc28gYSB2
-YWxpZA0KPiA+IHN0YXRlIHRyYW5zaXRpb24uIFNvIHRoYXQgY2hlY2sgc2hvdWxkIGJlOg0KPiA+
-IA0KPiA+ICAgICAgICAgV0FSTl9PTl9PTkNFKGJsa19tcV9ycV9zdGF0ZShycSkgIT0gTVFfUlFf
-Q09NUExFVEUgJiYNCj4gPiAgICAgICAgICAgICAgICAgICAgICBibGtfbXFfcnFfc3RhdGUocnEp
-ICE9IE1RX1JRX1RJTUVEX09VVCk7DQo+IA0KPiBJIGd1ZXNzIGl0IHdvdWxkIGJlIGNsZWFuZXIg
-dG8gYWN0dWFsbHkgZG8gdGhlIHRyYW5zaXRpb24sIGluDQo+IGJsa19tcV9ycV90aW1lZF9vdXQo
-KToNCj4gDQo+ICAgICAgICAgY2FzZSBCTEtfRUhfSEFORExFRDogICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgDQo+ICAgICAgICAgICAgICAgICBpZiAo
-YmxrX21xX2NoYW5nZV9ycV9zdGF0ZShyZXEsIE1RX1JRX1RJTUVEX09VVCwgICAgICAgICAgICAg
-ICAgDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE1R
-X1JRX0NPTVBMRVRFKSkgICAgICAgICAgICAgICAgDQo+ICAgICAgICAgICAgICAgICAgICAgICAg
-IF9fYmxrX21xX2NvbXBsZXRlX3JlcXVlc3QocmVxKTsgICAgICAgICAgICAgICAgICAgICAgICAg
-DQo+ICAgICAgICAgICAgICAgICBicmVhazsgICAgICAgIA0KPiANCj4gVGhpcyB3b3JrcyBmb3Ig
-bWUuDQoNCkhlbGxvIEplbnMsDQoNClRoYW5rcyBmb3IgaGF2aW5nIHJlcG9ydGVkIHRoaXMuIEhv
-dyBhYm91dCB1c2luZyB0aGUgZm9sbG93aW5nIGNoYW5nZSB0byBzdXBwcmVzcw0KdGhhdCB3YXJu
-aW5nOg0KDQpkaWZmIC0tZ2l0IGEvYmxvY2svYmxrLW1xLmMgYi9ibG9jay9ibGstbXEuYw0KaW5k
-ZXggYmI5OWMwM2U3YTM0Li44NGU1NWVhNTViYWYgMTAwNjQ0DQotLS0gYS9ibG9jay9ibGstbXEu
-Yw0KKysrIGIvYmxvY2svYmxrLW1xLmMNCkBAIC04NDQsNiArODQ0LDcgQEAgc3RhdGljIHZvaWQg
-YmxrX21xX3JxX3RpbWVkX291dChzdHJ1Y3QgcmVxdWVzdCAqcmVxLCBib29sIHJlc2VydmVkKQ0K
-IA0KIAlzd2l0Y2ggKHJldCkgew0KIAljYXNlIEJMS19FSF9IQU5ETEVEOg0KKwkJYmxrX21xX2No
-YW5nZV9ycV9zdGF0ZShyZXEsIE1RX1JRX1RJTUVEX09VVCwgTVFfUlFfQ09NUExFVEUpOw0KIAkJ
-X19ibGtfbXFfY29tcGxldGVfcmVxdWVzdChyZXEpOw0KIAkJYnJlYWs7DQogCWNhc2UgQkxLX0VI
-X1JFU0VUX1RJTUVSOg0KDQpJIHRoaW5rIHRoaXMgd2lsbCB3b3JrIGJldHRlciB0aGFuIHdoYXQg
-d2FzIHByb3Bvc2VkIGluIHlvdXIgbGFzdCBlLW1haWwuIEknbSBhZnJhaWQNCnRoYXQgd2l0aCB0
-aGF0IGNoYW5nZSB0aGF0IGEgY29tcGxldGlvbiB0aGF0IG9jY3VycyB3aGlsZSB0aGUgdGltZW91
-dCBoYW5kbGVyIGlzDQpydW5uaW5nIGNhbiBiZSBpZ25vcmVkLg0KDQpUaGFua3MsDQoNCkJhcnQu
-DQoNCg==
+On Tue, May 22, 2018 at 09:25:15AM -0700, Bart Van Assche wrote:
+> @@ -848,13 +843,22 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
+>  	case BLK_EH_RESET_TIMER:
+> +		blk_mq_add_timer(req);
+>  		/*
+> +		 * The loop is for the unlikely case of a race with the
+> +		 * completion code. There is no need to reset the deadline
+> +		 * if the transition to the in-flight state fails because
+> +		 * the deadline only matters in the in-flight state.
+>  		 */
+> -		blk_mq_rq_update_aborted_gstate(req, 0);
+> -		blk_add_timer(req);
+> +		while (true) {
+> +			if (blk_mq_change_rq_state(req, MQ_RQ_TIMED_OUT,
+> +						   MQ_RQ_IN_FLIGHT))
+> +				break;
+> +			if (blk_mq_rq_state(req) == MQ_RQ_COMPLETE) {
+> +				__blk_mq_complete_request(req);
+> +				break;
+> +			}
+> +		}
+
+I'm having some trouble triggering this case where the state is already
+MQ_RQ_COMPLETE, so I'm just trying to figure this out through inspection.
+
+It looks like the new blk_mq_complete_request() already called
+__blk_mq_complete_request() when it gets the state to MQ_RQ_COMPLETE,
+so doing that again completes it a second time.
