@@ -1,89 +1,65 @@
-Return-Path: <tom.leiming@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <20180522142030.GR5528@localhost.localdomain>
-References: <20180521231131.6685-1-keith.busch@intel.com> <20180521231131.6685-4-keith.busch@intel.com>
- <20180522024910.GD20430@ming.t460p> <20180522142030.GR5528@localhost.localdomain>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Tue, 22 May 2018 22:37:32 +0800
-Message-ID: <CACVXFVNT5qiamN0ydXzNYDWE0szi2fTsAAmyG9Q884LEqUhSdQ@mail.gmail.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [RFC PATCH 3/3] blk-mq: Remove generation seqeunce
-To: Keith Busch <keith.busch@linux.intel.com>
-Cc: Ming Lei <ming.lei@redhat.com>, Keith Busch <keith.busch@intel.com>,
-	Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>,
-	Bart Van Assche <bart.vanassche@wdc.com>, Christoph Hellwig <hch@lst.de>,
-	linux-nvme <linux-nvme@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Keith Busch <keith.busch@intel.com>, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Bart Van Assche <bart.vanassche@wdc.com>
+References: <20180521231131.6685-1-keith.busch@intel.com>
+ <20180521231131.6685-4-keith.busch@intel.com>
+ <20180522024910.GD20430@ming.t460p>
+ <34ba4583-25be-acf7-8407-755e920def6b@kernel.dk>
+ <20180522034727.GE20430@ming.t460p>
+ <29D40550-AF2A-4357-B87F-95C28259A334@kernel.dk>
+ <20180522085143.GB20604@ming.t460p>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <73dd8a06-50b8-efc4-02ec-2fea6fb1f98d@kernel.dk>
+Date: Tue, 22 May 2018 08:35:58 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180522085143.GB20604@ming.t460p>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, May 22, 2018 at 10:20 PM, Keith Busch
-<keith.busch@linux.intel.com> wrote:
-> On Tue, May 22, 2018 at 10:49:11AM +0800, Ming Lei wrote:
->> On Mon, May 21, 2018 at 05:11:31PM -0600, Keith Busch wrote:
->> > -static void blk_mq_terminate_expired(struct blk_mq_hw_ctx *hctx,
->> > +static void blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
->> >             struct request *rq, void *priv, bool reserved)
->> >  {
->> > +   unsigned long *next = priv;
->> > +
->> >     /*
->> > -    * We marked @rq->aborted_gstate and waited for RCU.  If there were
->> > -    * completions that we lost to, they would have finished and
->> > -    * updated @rq->gstate by now; otherwise, the completion path is
->> > -    * now guaranteed to see @rq->aborted_gstate and yield.  If
->> > -    * @rq->aborted_gstate still matches @rq->gstate, @rq is ours.
->> > +    * Just do a quick check if it is expired before locking the request in
->> > +    * so we're not unnecessarilly synchronizing across CPUs.
->> >      */
->> > -   if (!(rq->rq_flags & RQF_MQ_TIMEOUT_EXPIRED) &&
->> > -       READ_ONCE(rq->gstate) == rq->aborted_gstate)
->> > +   if (!blk_mq_req_expired(rq, next))
->> > +           return;
->> > +
->> > +   /*
->> > +    * We have reason to believe the request may be expired. Take a
->> > +    * reference on the request to lock this request lifetime into its
->> > +    * currently allocated context to prevent it from being reallocated in
->> > +    * the event the completion by-passes this timeout handler.
->> > +    *
->> > +    * If the reference was already released, then the driver beat the
->> > +    * timeout handler to posting a natural completion.
->> > +    */
->> > +   if (!kref_get_unless_zero(&rq->ref))
->> > +           return;
+On 5/22/18 2:51 AM, Ming Lei wrote:
+> On Mon, May 21, 2018 at 09:51:19PM -0600, Jens Axboe wrote:
+>> On May 21, 2018, at 9:47 PM, Ming Lei <ming.lei@redhat.com> wrote:
+>>>
+>>>> On Mon, May 21, 2018 at 09:16:33PM -0600, Jens Axboe wrote:
+>>>>> On 5/21/18 8:49 PM, Ming Lei wrote:
+>>>>>> On Mon, May 21, 2018 at 05:11:31PM -0600, Keith Busch wrote:
+>>>>>> This patch simplifies the timeout handling by relying on the request
+>>>>>> reference counting to ensure the iterator is operating on an inflight
+>>>>>
+>>>>> The reference counting isn't free, what is the real benefit in this way?
+>>>>
+>>>> Neither is the current scheme and locking, and this is a hell of a lot
+>>>> simpler. I'd get rid of the kref stuff and just do a simple
+>>>> atomic_dec_and_test(). Most of the time we should be uncontended on
+>>>> that, which would make it pretty darn cheap. I'd be surprised if it
+>>>> wasn't better than the current alternatives.
+>>>
+>>> The explicit memory barriers by atomic_dec_and_test() isn't free.
 >>
->> If this request is just completed in normal path and its state isn't
->> updated yet, timeout will hold the request, and may complete this
->> request again, then this req can be completed two times.
->
-> Hi Ming,
->
-> In the event the driver requests a normal completion, the timeout work
-> releasing the last reference doesn't do a second completion: it only
+>> I’m not saying it’s free. Neither is our current synchronization.
+>>
+>>> Also the double completion issue need to be fixed before discussing
+>>> this approach further.
+>>
+>> Certainly. Also not saying that the current patch is perfect. But
+>> it’s a lot more palatable than the alternatives, hence my interest.
+>> And I’d like for this issue to get solved, we seem to be a bit stuck
+>> atm. 
+>>
+> 
+> It may not be something we are stuck at, and seems no alternatives for
+> this patchset.
+> 
+> It is a new requirement from NVMe, and Keith wants driver to complete
+> timed-out request in .timeout(). We never support that before for both
+> mq and non-mq code path.
 
-The reference only covers request's lifetime, not related with completion.
+No, that's not what he wants to do. He wants to use referencing to
+release the final resources of the request (the tag), to prevent
+premature reuse of the request.
 
-It isn't the last reference. When driver returns EH_HANDLED, blk-mq
-will complete this request on extra time.
-
-Yes, if driver's timeout code and normal completion code can sync
-about this completion, that should be fine, but the current behaviour
-doesn't depend driver's sync since the req is always completed atomically
-via the following way:
-
-1) timeout
-
-if (mark_completed(rq))
-   timed_out(rq)
-
-2) normal completion
-if (mark_completed(rq))
-    complete(rq)
-
-For example, before nvme_timeout() is trying to run nvme_dev_disable(),
-irq comes and this req is completed from normal completion path, but
-nvme_timeout() still returns EH_HANDLED, and blk-mq may complete
-the req one extra time since the normal completion path may not update
-req's state yet.
-
-Thanks,
-Ming Lei
+-- 
+Jens Axboe
