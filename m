@@ -1,81 +1,88 @@
-Return-Path: <prvs=673f59626=Adam.Manzanares@wdc.com>
-From: Adam Manzanares <Adam.Manzanares@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>, Goldwyn Rodrigues <rgoldwyn@suse.de>,
-	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"bcrl@kvack.org" <bcrl@kvack.org>
-CC: "tglx@linutronix.de" <tglx@linutronix.de>, "mingo@kernel.org"
-	<mingo@kernel.org>, "pombredanne@nexb.com" <pombredanne@nexb.com>,
-	"kstewart@linuxfoundation.org" <kstewart@linuxfoundation.org>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"bigeasy@linutronix.de" <bigeasy@linutronix.de>, "jack@suse.cz"
-	<jack@suse.cz>, "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-aio@kvack.org" <linux-aio@kvack.org>, "linux-api@vger.kernel.org"
-	<linux-api@vger.kernel.org>, "hch@infradread.org" <hch@infradread.org>,
-	"jmoyer@redhat.com" <jmoyer@redhat.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH v6 2/5] fs: Convert kiocb rw_hint from enum to u16
-Date: Tue, 22 May 2018 17:22:33 +0000
-Message-ID: <7bc8b818-7eb4-98ab-7af1-82bcc5f37ab7@wdc.com>
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>, adam.manzanares@wdc.com,
+ viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org, bcrl@kvack.org
+Cc: tglx@linutronix.de, mingo@kernel.org, pombredanne@nexb.com,
+ kstewart@linuxfoundation.org, gregkh@linuxfoundation.org,
+ bigeasy@linutronix.de, jack@suse.cz, darrick.wong@oracle.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-aio@kvack.org, linux-api@vger.kernel.org, hch@infradread.org,
+ jmoyer@redhat.com
 References: <20180522150737.9893-1-adam.manzanares@wdc.com>
  <20180522150737.9893-3-adam.manzanares@wdc.com>
  <11fb2ee5-8352-2d35-3154-68637d99b096@kernel.dk>
  <084d253c-52ab-7b23-521c-28602c56153b@suse.de>
- <58087b03-a3c7-93fd-d1ad-de77181e8806@kernel.dk>
-In-Reply-To: <58087b03-a3c7-93fd-d1ad-de77181e8806@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <58087b03-a3c7-93fd-d1ad-de77181e8806@kernel.dk>
+Date: Tue, 22 May 2018 10:30:36 -0600
 MIME-Version: 1.0
+In-Reply-To: <084d253c-52ab-7b23-521c-28602c56153b@suse.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-DQoNCk9uIDUvMjIvMTggOTozMCBBTSwgSmVucyBBeGJvZSB3cm90ZToNCj4gT24gNS8yMi8xOCAx
-MDoyNCBBTSwgR29sZHd5biBSb2RyaWd1ZXMgd3JvdGU6DQo+Pg0KPj4NCj4+IE9uIDA1LzIyLzIw
-MTggMTA6MzIgQU0sIEplbnMgQXhib2Ugd3JvdGU6DQo+Pj4gT24gNS8yMi8xOCA5OjA3IEFNLCBh
-ZGFtLm1hbnphbmFyZXNAd2RjLmNvbSB3cm90ZToNCj4+Pj4gRnJvbTogQWRhbSBNYW56YW5hcmVz
-IDxhZGFtLm1hbnphbmFyZXNAd2RjLmNvbT4NCj4+Pj4NCj4+Pj4gSW4gb3JkZXIgdG8gYXZvaWQg
-a2lvY2IgYmxvYXQgZm9yIHBlciBjb21tYW5kIGlvcHJpb3JpdHkgc3VwcG9ydCwgcndfaGludA0K
-Pj4+PiBpcyBjb252ZXJ0ZWQgZnJvbSBlbnVtIHRvIGEgdTE2LiBBZGRlZCBhIGd1YXJkIGFyb3Vu
-ZCBraV9oaW50IGFzc2lnbm1lbnQuDQo+Pj4+DQo+Pj4+IFNpZ25lZC1vZmYtYnk6IEFkYW0gTWFu
-emFuYXJlcyA8YWRhbS5tYW56YW5hcmVzQHdkYy5jb20+DQo+Pj4+IFJldmlld2VkLWJ5OiBDaHJp
-c3RvcGggSGVsbHdpZyA8aGNoQGxzdC5kZT4NCj4+Pj4gLS0tDQo+Pj4+ICAgaW5jbHVkZS9saW51
-eC9mcy5oIHwgMTMgKysrKysrKysrKystLQ0KPj4+PiAgIDEgZmlsZSBjaGFuZ2VkLCAxMSBpbnNl
-cnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KPj4+Pg0KPj4+PiBkaWZmIC0tZ2l0IGEvaW5jbHVk
-ZS9saW51eC9mcy5oIGIvaW5jbHVkZS9saW51eC9mcy5oDQo+Pj4+IGluZGV4IDdmMDc5NzdiZGZk
-Ny4uNTBkZTQwZGJiYjg1IDEwMDY0NA0KPj4+PiAtLS0gYS9pbmNsdWRlL2xpbnV4L2ZzLmgNCj4+
-Pj4gKysrIGIvaW5jbHVkZS9saW51eC9mcy5oDQo+Pj4+IEBAIC0yODQsNiArMjg0LDggQEAgZW51
-bSByd19oaW50IHsNCj4+Pj4gICAJV1JJVEVfTElGRV9FWFRSRU1FCT0gUldIX1dSSVRFX0xJRkVf
-RVhUUkVNRSwNCj4+Pj4gICB9Ow0KPj4+PiAgIA0KPj4+PiArI2RlZmluZSBNQVhfS0lfSElOVAkJ
-KCgxIDw8IDE2KSAtIDEpIC8qIGtpX2hpbnQgdHlwZSBpcyB1MTYgKi8NCj4+Pg0KPj4+IEluc3Rl
-YWQgb2YgaGF2aW5nIHRvIGRvIHRoaXMgYW5kIG5vdyByZWx5IG9uIHRob3NlIG5vdyBiZWluZyBz
-eW5jZWQsDQo+Pj4gaG93IGFib3V0IHNvbWV0aGluZyBsaWtlIHRoZSBiZWxvdy4NCj4+Pg0KPj4+
-IGRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L2ZzLmggYi9pbmNsdWRlL2xpbnV4L2ZzLmgNCj4+
-PiBpbmRleCA3NjBkOGRhMWI2YzcuLjA3MDQzOGQwYjYyZCAxMDA2NDQNCj4+PiAtLS0gYS9pbmNs
-dWRlL2xpbnV4L2ZzLmgNCj4+PiArKysgYi9pbmNsdWRlL2xpbnV4L2ZzLmgNCj4+PiBAQCAtMjk5
-LDcgKzI5OSw3IEBAIHN0cnVjdCBraW9jYiB7DQo+Pj4gICAJdm9pZCAoKmtpX2NvbXBsZXRlKShz
-dHJ1Y3Qga2lvY2IgKmlvY2IsIGxvbmcgcmV0LCBsb25nIHJldDIpOw0KPj4+ICAgCXZvaWQJCQkq
-cHJpdmF0ZTsNCj4+PiAgIAlpbnQJCQlraV9mbGFnczsNCj4+PiAtCWVudW0gcndfaGludAkJa2lf
-aGludDsNCj4+PiArCXUxNgkJCWtpX2hpbnQ7DQo+Pj4gICB9IF9fcmFuZG9taXplX2xheW91dDsN
-Cj4+PiAgIA0KPj4+ICAgc3RhdGljIGlubGluZSBib29sIGlzX3N5bmNfa2lvY2Ioc3RydWN0IGtp
-b2NiICpraW9jYikNCj4+PiBAQCAtMTkyNywxMiArMTkyNywyMiBAQCBzdGF0aWMgaW5saW5lIGVu
-dW0gcndfaGludCBmaWxlX3dyaXRlX2hpbnQoc3RydWN0IGZpbGUgKmZpbGUpDQo+Pj4gICANCj4+
-PiAgIHN0YXRpYyBpbmxpbmUgaW50IGlvY2JfZmxhZ3Moc3RydWN0IGZpbGUgKmZpbGUpOw0KPj4+
-ICAgDQo+Pj4gK3N0YXRpYyBpbmxpbmUgdTE2IGtpX2hpbnRfdmFsaWRhdGUoZW51bSByd19oaW50
-IGhpbnQpDQo+Pj4gK3sNCj4+PiArCXR5cGVvZigoKHN0cnVjdCBraW9jYiAqKTApLT5raV9oaW50
-KSBtYXhfaGludCA9IC0xOw0KPj4NCj4+IFRoaXMgbG9va3MgY29tcGxleCB0byBtZS4gV291bGQg
-Zm9yY2UgYSByZWFkZXIgdG8gbG9va2JhY2sgYXQgd2hhdA0KPj4gZGF0YXR5cGUga2lfaGludCBp
-cy4gSSdkIHByZWZlciB0byBkZWNsYXJlIGl0IGFzIHUxNiBtYXhfaGludCA9IC0xLCBvcg0KPj4g
-ZXZlbiB0aGUgcHJldmlvdXMgI2RlZmluZSBNQVhfS0lfSElOVCBmb3JtYXQgaXMgZWFzaWVyIHRv
-IHJlYWQuIEp1c3QgYQ0KPj4gcHJvZ3JhbSByZWFkaW5nIHN0eWxlIHlvdSBhcmUgY29tZm9ydGFi
-bGUgd2l0aCB0aG91Z2guDQo+IA0KPiBIb3cgaXMgaXQgY29tcGxleD8gSXQncyBkZWZpbmluZyBh
-IHR5cGUgdGhhdCdsbCBiZSB0aGUgc2FtZSBhcyBraV9oaW50DQo+IGluIHRoZSBraW9jYiwgd2hp
-Y2ggaXMgX2V4YWN0bHlfIHdoYXQgd2UgY2FyZSBhYm91dC4gQW55IHNvcnQgb2Ygb3RoZXINCj4g
-ZGVmaW5pdGlvbiB3aWxsIHJlbHkgb24gdGhvc2UgdHdvIGxvY2F0aW9ucyBub3cgYmVpbmcgc3lu
-Y2VkLiBUaGUNCj4gYWJvdmUgd2lsbCBuZXZlciBicmVhay4NCj4gDQo+IFNvIEkgc3Ryb25nbHkg
-ZGlzYWdyZWUuIFRoZSBhYm92ZSB3aWxsIF9uZXZlcl8gcmVxdWlyZSB0aGUgcmVhZGVyIHRvDQo+
-IGZpZ3VyZSBvdXQgd2hhdCB0aGUgdHlwZSBpcy4gQW55IG90aGVyIHZhcmlhbnQgd2lsbCBfYWx3
-YXlzXyByZXF1aXJlDQo+IHRoZSByZWFkZXIgdG8gY2hlY2sgaWYgdGhleSBhcmUgdGhlIHNhbWUu
-DQo+IA0KDQpJIGRvIHRoaW5rIHRoZSBwcmV2aW91cyBjb2RlIHdhcyBhIGJpdCBlYXNpZXIgdG8g
-cGFyc2UgYXQgZmlyc3QgZ2xhbmNlLCANCmJ1dCB0aGF0IGlzIG91dHdlaWdoZWQgYnkgdGhlIGZh
-Y3QgdGhhdCB0aGUgdmFsaWRhdGUgZnVuY3Rpb24gaXMgbm93IA0KZGlyZWN0bHkgdGllZCB0byB0
-aGUga2lvY2Iga2lfaGludCB0eXBlLg0KDQpJIGFsc28gbWlzc2VkIG9uZSBzcG90IHdoZXJlIEkg
-c2hvdWxkIGhhdmUgdXNlZCBraV9oaW50X3ZhbGlkYXRlLiBXaWxsIA0KcmVzZW5kIHNvb24u
+On 5/22/18 10:24 AM, Goldwyn Rodrigues wrote:
+> 
+> 
+> On 05/22/2018 10:32 AM, Jens Axboe wrote:
+>> On 5/22/18 9:07 AM, adam.manzanares@wdc.com wrote:
+>>> From: Adam Manzanares <adam.manzanares@wdc.com>
+>>>
+>>> In order to avoid kiocb bloat for per command iopriority support, rw_hint
+>>> is converted from enum to a u16. Added a guard around ki_hint assignment.
+>>>
+>>> Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
+>>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+>>> ---
+>>>  include/linux/fs.h | 13 +++++++++++--
+>>>  1 file changed, 11 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/include/linux/fs.h b/include/linux/fs.h
+>>> index 7f07977bdfd7..50de40dbbb85 100644
+>>> --- a/include/linux/fs.h
+>>> +++ b/include/linux/fs.h
+>>> @@ -284,6 +284,8 @@ enum rw_hint {
+>>>  	WRITE_LIFE_EXTREME	= RWH_WRITE_LIFE_EXTREME,
+>>>  };
+>>>  
+>>> +#define MAX_KI_HINT		((1 << 16) - 1) /* ki_hint type is u16 */
+>>
+>> Instead of having to do this and now rely on those now being synced,
+>> how about something like the below.
+>>
+>> diff --git a/include/linux/fs.h b/include/linux/fs.h
+>> index 760d8da1b6c7..070438d0b62d 100644
+>> --- a/include/linux/fs.h
+>> +++ b/include/linux/fs.h
+>> @@ -299,7 +299,7 @@ struct kiocb {
+>>  	void (*ki_complete)(struct kiocb *iocb, long ret, long ret2);
+>>  	void			*private;
+>>  	int			ki_flags;
+>> -	enum rw_hint		ki_hint;
+>> +	u16			ki_hint;
+>>  } __randomize_layout;
+>>  
+>>  static inline bool is_sync_kiocb(struct kiocb *kiocb)
+>> @@ -1927,12 +1927,22 @@ static inline enum rw_hint file_write_hint(struct file *file)
+>>  
+>>  static inline int iocb_flags(struct file *file);
+>>  
+>> +static inline u16 ki_hint_validate(enum rw_hint hint)
+>> +{
+>> +	typeof(((struct kiocb *)0)->ki_hint) max_hint = -1;
+> 
+> This looks complex to me. Would force a reader to lookback at what
+> datatype ki_hint is. I'd prefer to declare it as u16 max_hint = -1, or
+> even the previous #define MAX_KI_HINT format is easier to read. Just a
+> program reading style you are comfortable with though.
+
+How is it complex? It's defining a type that'll be the same as ki_hint
+in the kiocb, which is _exactly_ what we care about. Any sort of other
+definition will rely on those two locations now being synced. The
+above will never break.
+
+So I strongly disagree. The above will _never_ require the reader to
+figure out what the type is. Any other variant will _always_ require
+the reader to check if they are the same.
+
+-- 
+Jens Axboe
