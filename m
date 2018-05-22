@@ -1,92 +1,59 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V4 5/7] nvme: core: introduce 'reset_lock' for sync reset state and reset activities
-Date: Sat,  5 May 2018 21:59:03 +0800
-Message-Id: <20180505135905.18815-6-ming.lei@redhat.com>
-In-Reply-To: <20180505135905.18815-1-ming.lei@redhat.com>
-References: <20180505135905.18815-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:39267 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750709AbeEVIrl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 May 2018 04:47:41 -0400
+Subject: Re: [PATCH] lib/crc64.c: add MODULE_LICENSE("GPL")
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+References: <20180522084058.66520-1-colyli@suse.de>
+ <6e9bdb5464689cc3ade4c09683e38f9f0104948b.camel@linux.intel.com>
+From: Coly Li <colyli@suse.de>
+Message-ID: <7525b76a-8e13-b68f-0ae0-427bc6cb72fa@suse.de>
+Date: Tue, 22 May 2018 16:47:33 +0800
+MIME-Version: 1.0
+In-Reply-To: <6e9bdb5464689cc3ade4c09683e38f9f0104948b.camel@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-NVMe PCI may start a new reset context to run nested reset for recovering
-from reset context, and we may not change the rule of state machine until
-other kinds of NVMe controller support that, so use the 'reset_lock' to sync
-the state change here.
+On 2018/5/22 4:43 PM, Andy Shevchenko wrote:
+> On Tue, 2018-05-22 at 16:40 +0800, Coly Li wrote:
+>> This patch adds MODULE_LICENSE("GPL") to lib/crc64.c to remove a
+>> compiling
+>> warninng.
+> 
+> I have no opinion about this. Code has a top description from which it
+> has been taken / derived, so, I dunno if GPL is what it really is.
+> 
+> In any case it's probably worth to add SPDX header as well. 
+> 
 
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/nvme/host/core.c | 20 +++++++++++++++++---
- drivers/nvme/host/nvme.h |  3 +++
- 2 files changed, 20 insertions(+), 3 deletions(-)
+Hmm, there is a warning complains no MODULE_LICENSE() in lib/crc64.c,
+when I compile a kernel for testing. The purpose is just to kill a
+compiler warning.
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 9df4f71e58ca..3aaee4dbf58e 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -100,13 +100,25 @@ static struct class *nvme_subsys_class;
- static void nvme_ns_remove(struct nvme_ns *ns);
- static int nvme_revalidate_disk(struct gendisk *disk);
- 
-+/*
-+ * NVMe PCI may support nested reset for recovering from reset context,
-+ * and we may not change the rule of state machine until other kinds of
-+ * NVMe controller support that, so use the 'reset_lock' to sync the
-+ * state change here.
-+ */
- int nvme_reset_ctrl(struct nvme_ctrl *ctrl)
- {
-+	int ret = -EBUSY;
-+
-+	mutex_lock(&ctrl->reset_lock);
- 	if (!nvme_change_ctrl_state(ctrl, NVME_CTRL_RESETTING))
--		return -EBUSY;
-+		goto fail;
- 	if (!queue_work(nvme_reset_wq, &ctrl->reset_work))
--		return -EBUSY;
--	return 0;
-+		goto fail;
-+	ret = 0;
-+ fail:
-+	mutex_unlock(&ctrl->reset_lock);
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(nvme_reset_ctrl);
- 
-@@ -3447,6 +3459,8 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
- 	INIT_WORK(&ctrl->fw_act_work, nvme_fw_act_work);
- 	INIT_WORK(&ctrl->delete_work, nvme_delete_ctrl_work);
- 
-+	mutex_init(&ctrl->reset_lock);
-+
- 	ret = ida_simple_get(&nvme_instance_ida, 0, 0, GFP_KERNEL);
- 	if (ret < 0)
- 		goto out;
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 061fecfd44f5..99f55c6f69f8 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -146,6 +146,9 @@ struct nvme_ctrl {
- 	struct device ctrl_device;
- 	struct device *device;	/* char device */
- 	struct cdev cdev;
-+
-+	/* sync reset state update and related reset activities */
-+	struct mutex reset_lock;
- 	struct work_struct reset_work;
- 	struct work_struct delete_work;
- 
--- 
-2.9.5
+And sure, I will post an update version with SPDX header.
+
+Thanks for the hint :-)
+
+Coly Li
+
+>>
+>> Signed-off-by: Coly Li <colyli@suse.de>
+>> Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+>> ---
+>>  lib/crc64.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/lib/crc64.c b/lib/crc64.c
+>> index ed0ffac7b26a..586e46684ee8 100644
+>> --- a/lib/crc64.c
+>> +++ b/lib/crc64.c
+>> @@ -135,3 +135,4 @@ uint64_t crc64(const void *data, size_t len)
+>>  EXPORT_SYMBOL_GPL(crc64);
+>>  
+>>  MODULE_DESCRIPTION("CRC64 calculations");
+>> +MODULE_LICENSE("GPL");
+> 
