@@ -1,51 +1,90 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out30-131.freemail.mail.aliyun.com ([115.124.30.131]:43019 "EHLO
-        out30-131.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S936093AbeEYOli (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 May 2018 10:41:38 -0400
-From: Liu Bo <bo.liu@linux.alibaba.com>
-To: <linux-block@vger.kernel.org>
-Subject: [PATCH] Block: null_blk: add blocking description and remove lightnvm
-Date: Fri, 25 May 2018 22:40:04 +0800
-Message-Id: <1527259204-79604-1-git-send-email-bo.liu@linux.alibaba.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=673f59626=adam.manzanares@wdc.com>
+From: adam.manzanares@wdc.com
+To: viro@zeniv.linux.org.uk,
+	linux-fsdevel@vger.kernel.org,
+	axboe@kernel.dk,
+	bcrl@kvack.org
+Cc: mingo@kernel.org,
+	tglx@linutronix.de,
+	kstewart@linuxfoundation.org,
+	peterz@infradead.org,
+	pombredanne@nexb.com,
+	gregkh@linuxfoundation.org,
+	bigeasy@linutronix.de,
+	rgoldwyn@suse.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-aio@kvack.org,
+	linux-api@vger.kernel.org,
+	hch@infradread.org,
+	jmoyer@redhat.com,
+	Adam Manzanares <adam.manzanares@wdc.com>
+Subject: [PATCH v7 2/5] fs: Convert kiocb rw_hint from enum to u16
+Date: Tue, 22 May 2018 10:52:18 -0700
+Message-Id: <20180522175221.2391-3-adam.manzanares@wdc.com>
+In-Reply-To: <20180522175221.2391-1-adam.manzanares@wdc.com>
+References: <20180522175221.2391-1-adam.manzanares@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-- The description of 'blocking' is missing in null_blk.txt
+From: Adam Manzanares <adam.manzanares@wdc.com>
 
-- The 'lightnvm' parameter has been removed in null_blk.c
+In order to avoid kiocb bloat for per command iopriority support, rw_hint
+is converted from enum to a u16. Added a guard around ki_hint assignment.
 
-This updates both in null_blk.txt.
-
-Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
+Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
 ---
- Documentation/block/null_blk.txt | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ fs/aio.c           |  2 +-
+ include/linux/fs.h | 13 +++++++++++--
+ 2 files changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/block/null_blk.txt b/Documentation/block/null_blk.txt
-index 733927a7b501..07f147381f32 100644
---- a/Documentation/block/null_blk.txt
-+++ b/Documentation/block/null_blk.txt
-@@ -71,13 +71,16 @@ use_per_node_hctx=[0/1]: Default: 0
-   1: The multi-queue block layer is instantiated with a hardware dispatch
-      queue for each CPU node in the system.
+diff --git a/fs/aio.c b/fs/aio.c
+index 755d3f57bcc8..87d8939bb1e4 100644
+--- a/fs/aio.c
++++ b/fs/aio.c
+@@ -1450,7 +1450,7 @@ static int aio_prep_rw(struct kiocb *req, struct iocb *iocb)
+ 	req->ki_flags = iocb_flags(req->ki_filp);
+ 	if (iocb->aio_flags & IOCB_FLAG_RESFD)
+ 		req->ki_flags |= IOCB_EVENTFD;
+-	req->ki_hint = file_write_hint(req->ki_filp);
++	req->ki_hint = ki_hint_validate(file_write_hint(req->ki_filp));
+ 	ret = kiocb_set_rw_flags(req, iocb->aio_rw_flags);
+ 	if (unlikely(ret))
+ 		fput(req->ki_filp);
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 7f07977bdfd7..9b76ee73af14 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -299,7 +299,7 @@ struct kiocb {
+ 	void (*ki_complete)(struct kiocb *iocb, long ret, long ret2);
+ 	void			*private;
+ 	int			ki_flags;
+-	enum rw_hint		ki_hint;
++	u16			ki_hint;
+ } __randomize_layout;
  
--use_lightnvm=[0/1]: Default: 0
--  Register device with LightNVM. Requires blk-mq and CONFIG_NVM to be enabled.
--
- no_sched=[0/1]: Default: 0
-   0: nullb* use default blk-mq io scheduler.
-   1: nullb* doesn't use io scheduler.
+ static inline bool is_sync_kiocb(struct kiocb *kiocb)
+@@ -1927,12 +1927,21 @@ static inline enum rw_hint file_write_hint(struct file *file)
  
-+blocking=[0/1]: Default: 0
-+  0: Register as a non-blocking blk-mq driver device.
-+  1: Register as a blocking blk-mq driver device, null_blk will set
-+     the BLK_MQ_F_BLOCKING flag, indicating that it sometimes/always
-+     needs to block in its ->queue_rq() function.
+ static inline int iocb_flags(struct file *file);
+ 
++static inline u16 ki_hint_validate(enum rw_hint hint)
++{
++	typeof(((struct kiocb *)0)->ki_hint) max_hint = -1;
 +
- shared_tags=[0/1]: Default: 0
-   0: Tag set is not shared.
-   1: Tag set shared between devices for blk-mq. Only makes sense with
++	if (hint <= max_hint)
++		return hint;
++	return 0;
++}
++
+ static inline void init_sync_kiocb(struct kiocb *kiocb, struct file *filp)
+ {
+ 	*kiocb = (struct kiocb) {
+ 		.ki_filp = filp,
+ 		.ki_flags = iocb_flags(filp),
+-		.ki_hint = file_write_hint(filp),
++		.ki_hint = ki_hint_validate(file_write_hint(filp)),
+ 	};
+ }
+ 
 -- 
-1.8.3.1
+2.15.1
