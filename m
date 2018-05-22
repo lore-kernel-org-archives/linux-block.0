@@ -1,64 +1,68 @@
 Return-Path: <keith.busch@linux.intel.com>
-Date: Tue, 22 May 2018 08:20:30 -0600
+Date: Tue, 22 May 2018 08:15:07 -0600
 From: Keith Busch <keith.busch@linux.intel.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+	"keith.busch@intel.com" <keith.busch@intel.com>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>
 Subject: Re: [RFC PATCH 3/3] blk-mq: Remove generation seqeunce
-Message-ID: <20180522142030.GR5528@localhost.localdomain>
+Message-ID: <20180522141507.GQ5528@localhost.localdomain>
 References: <20180521231131.6685-1-keith.busch@intel.com>
  <20180521231131.6685-4-keith.busch@intel.com>
- <20180522024910.GD20430@ming.t460p>
+ <e7a287827b4c00151bb7714deca7ea6453177504.camel@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180522024910.GD20430@ming.t460p>
+In-Reply-To: <e7a287827b4c00151bb7714deca7ea6453177504.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, May 22, 2018 at 10:49:11AM +0800, Ming Lei wrote:
-> On Mon, May 21, 2018 at 05:11:31PM -0600, Keith Busch wrote:
-> > -static void blk_mq_terminate_expired(struct blk_mq_hw_ctx *hctx,
-> > +static void blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
-> >  		struct request *rq, void *priv, bool reserved)
-> >  {
-> > +	unsigned long *next = priv;
-> > +
-> >  	/*
-> > -	 * We marked @rq->aborted_gstate and waited for RCU.  If there were
-> > -	 * completions that we lost to, they would have finished and
-> > -	 * updated @rq->gstate by now; otherwise, the completion path is
-> > -	 * now guaranteed to see @rq->aborted_gstate and yield.  If
-> > -	 * @rq->aborted_gstate still matches @rq->gstate, @rq is ours.
-> > +	 * Just do a quick check if it is expired before locking the request in
-> > +	 * so we're not unnecessarilly synchronizing across CPUs.
-> >  	 */
-> > -	if (!(rq->rq_flags & RQF_MQ_TIMEOUT_EXPIRED) &&
-> > -	    READ_ONCE(rq->gstate) == rq->aborted_gstate)
-> > +	if (!blk_mq_req_expired(rq, next))
-> > +		return;
-> > +
-> > +	/*
-> > +	 * We have reason to believe the request may be expired. Take a
-> > +	 * reference on the request to lock this request lifetime into its
-> > +	 * currently allocated context to prevent it from being reallocated in
-> > +	 * the event the completion by-passes this timeout handler.
-> > +	 * 
-> > +	 * If the reference was already released, then the driver beat the
-> > +	 * timeout handler to posting a natural completion.
-> > +	 */
-> > +	if (!kref_get_unless_zero(&rq->ref))
-> > +		return;
+On Mon, May 21, 2018 at 11:29:06PM +0000, Bart Van Assche wrote:
+> On Mon, 2018-05-21 at 17:11 -0600, Keith Busch wrote:
+> >  	switch (ret) {
+> >  	case BLK_EH_HANDLED:
+> > -		__blk_mq_complete_request(req);
+> > -		break;
+> > -	case BLK_EH_RESET_TIMER:
+> >  		/*
+> > -		 * As nothing prevents from completion happening while
+> > -		 * ->aborted_gstate is set, this may lead to ignored
+> > -		 * completions and further spurious timeouts.
+> > +		 * If the request is still in flight, the driver is requesting
+> > +		 * blk-mq complete it.
+> >  		 */
+> > -		blk_mq_rq_update_aborted_gstate(req, 0);
+> > +		if (blk_mq_rq_state(req) == MQ_RQ_IN_FLIGHT)
+> > +			__blk_mq_complete_request(req);
+> > +		break;
+> > +	case BLK_EH_RESET_TIMER:
+> >  		blk_add_timer(req);
+> >  		break;
+> >  	case BLK_EH_NOT_HANDLED:
+> > @@ -880,64 +782,64 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
+> >  	}
+> >  }
 > 
-> If this request is just completed in normal path and its state isn't
-> updated yet, timeout will hold the request, and may complete this
-> request again, then this req can be completed two times.
+> I think the above changes can lead to concurrent calls of
+> __blk_mq_complete_request() from the regular completion path and the timeout
+> path. That's wrong: the __blk_mq_complete_request() caller should guarantee
+> that no concurrent calls from another context to that function can occur.
 
-Hi Ming,
+Hi Bart,
 
-In the event the driver requests a normal completion, the timeout work
-releasing the last reference doesn't do a second completion: it only
-releases the request's tag back for re-allocation.
+This shouldn't be introducing any new concorrent calls to
+__blk_mq_complete_request if they don't already exist. The timeout work
+calls it only if the driver's timeout returns BLK_EH_HANDLED, which means
+the driver is claiming the command is now done, but the driver didn't call
+blk_mq_complete_request as indicated by the request's IN_FLIGHT state.
+
+In order to get a second call to __blk_mq_complete_request(), then,
+the driver would have to end up calling blk_mq_complete_request()
+in another context. But there's nothing stopping that from happening
+today, and would be bad if any driver actually did that: the request
+may have been re-allocated and issued as a new command, and calling
+blk_mq_complete_request() the second time introduces data corruption.
 
 Thanks,
 Keith
