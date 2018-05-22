@@ -1,52 +1,159 @@
-Return-Path: <prvs=672bd835f=adam.manzanares@wdc.com>
-From: adam.manzanares@wdc.com
-To: viro@zeniv.linux.org.uk,
-	linux-fsdevel@vger.kernel.org,
-	axboe@kernel.dk,
-	bcrl@kvack.org
-Cc: tglx@linutronix.de,
-	mingo@kernel.org,
-	pombredanne@nexb.com,
-	kstewart@linuxfoundation.org,
-	gregkh@linuxfoundation.org,
-	bigeasy@linutronix.de,
-	jack@suse.cz,
-	darrick.wong@oracle.com,
-	rgoldwyn@suse.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-aio@kvack.org,
-	linux-api@vger.kernel.org,
-	hch@infradread.org,
-	Adam Manzanares <adam.manzanares@wdc.com>
-Subject: [PATCH v5 5/5] fs: iomap dio set bio prio from kiocb prio
-Date: Mon, 21 May 2018 09:01:47 -0700
-Message-Id: <20180521160147.2372-6-adam.manzanares@wdc.com>
-In-Reply-To: <20180521160147.2372-1-adam.manzanares@wdc.com>
-References: <20180521160147.2372-1-adam.manzanares@wdc.com>
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: axboe@kernel.dk,
+	linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Coly Li <colyli@suse.de>,
+	Michael Lyle <mlyle@lyle.org>,
+	Junhui Tang <tang.junhui@zte.com.cn>
+Subject: [PATCH 1/5] bcache: stop bcache device when backing device is offline
+Date: Tue, 22 May 2018 17:31:56 +0800
+Message-Id: <20180522093200.67193-2-colyli@suse.de>
+In-Reply-To: <20180522093200.67193-1-colyli@suse.de>
+References: <20180522093200.67193-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Adam Manzanares <adam.manzanares@wdc.com>
+Currently bcache does not handle backing device failure, if backing
+device is offline and disconnected from system, its bcache device can still
+be accessible. If the bcache device is in writeback mode, I/O requests even
+can success if the requests hit on cache device. That is to say, when and
+how bcache handles offline backing device is undefined.
 
-Now that kiocb has an ioprio field copy this over to the bio when it is
-created from the kiocb during direct IO.
+This patch tries to handle backing device offline in a rather simple way,
+- Add cached_dev->status_update_thread kernel thread to update backing
+  device status in every 1 second.
+- Add cached_dev->offline_seconds to record how many seconds the backing
+  device is observed to be offline. If the backing device is offline for
+  BACKING_DEV_OFFLINE_TIMEOUT (30) seconds, set dc->io_disable to 1 and
+  call bcache_device_stop() to stop the bache device which linked to the
+  offline backing device.
 
-Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
+Now if a backing device is offline for BACKING_DEV_OFFLINE_TIMEOUT seconds,
+its bcache device will be removed, then user space application writing on
+it will get error immediately, and handler the device failure in time.
+
+This patch is quite simple, does not handle more complicated situations.
+Once the bcache device is stopped, users need to recovery the backing
+device, register and attach it manually.
+
+Changelog:
+v3: call wait_for_kthread_stop() before exits kernel thread.
+v2: remove "bcache: " prefix when calling pr_warn().
+v1: initial version.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
 ---
- fs/iomap.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/md/bcache/bcache.h |  2 ++
+ drivers/md/bcache/super.c  | 53 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 55 insertions(+)
 
-diff --git a/fs/iomap.c b/fs/iomap.c
-index afd163586aa0..65aae194aeca 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -919,6 +919,7 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
- 		bio->bi_iter.bi_sector =
- 			(iomap->addr + pos - iomap->offset) >> 9;
- 		bio->bi_write_hint = dio->iocb->ki_hint;
-+		bio->bi_ioprio = dio->iocb->ki_ioprio;
- 		bio->bi_private = dio;
- 		bio->bi_end_io = iomap_dio_bio_end_io;
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 3a0cfb237af9..ba98547c4ca0 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -345,6 +345,7 @@ struct cached_dev {
  
+ 	struct keybuf		writeback_keys;
+ 
++	struct task_struct	*status_update_thread;
+ 	/*
+ 	 * Order the write-half of writeback operations strongly in dispatch
+ 	 * order.  (Maintain LBA order; don't allow reads completing out of
+@@ -392,6 +393,7 @@ struct cached_dev {
+ #define DEFAULT_CACHED_DEV_ERROR_LIMIT	64
+ 	atomic_t		io_errors;
+ 	unsigned		error_limit;
++	unsigned		offline_seconds;
+ 
+ 	char			backing_dev_name[BDEVNAME_SIZE];
+ };
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 3dea06b41d43..a16b5b1df62a 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -654,6 +654,11 @@ static int ioctl_dev(struct block_device *b, fmode_t mode,
+ 		     unsigned int cmd, unsigned long arg)
+ {
+ 	struct bcache_device *d = b->bd_disk->private_data;
++	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
++
++	if (dc->io_disable)
++		return -EIO;
++
+ 	return d->ioctl(d, mode, cmd, arg);
+ }
+ 
+@@ -864,6 +869,44 @@ static void calc_cached_dev_sectors(struct cache_set *c)
+ 	c->cached_dev_sectors = sectors;
+ }
+ 
++#define BACKING_DEV_OFFLINE_TIMEOUT 5
++static int cached_dev_status_update(void *arg)
++{
++	struct cached_dev *dc = arg;
++	struct request_queue *q;
++
++	/*
++	 * If this delayed worker is stopping outside, directly quit here.
++	 * dc->io_disable might be set via sysfs interface, so check it
++	 * here too.
++	 */
++	while (!kthread_should_stop() && !dc->io_disable) {
++		q = bdev_get_queue(dc->bdev);
++		if (blk_queue_dying(q))
++			dc->offline_seconds++;
++		else
++			dc->offline_seconds = 0;
++
++		if (dc->offline_seconds >= BACKING_DEV_OFFLINE_TIMEOUT) {
++			pr_err("%s: device offline for %d seconds",
++			       dc->backing_dev_name,
++			       BACKING_DEV_OFFLINE_TIMEOUT);
++			pr_err("%s: disable I/O request due to backing "
++			       "device offline", dc->disk.name);
++			dc->io_disable = true;
++			/* let others know earlier that io_disable is true */
++			smp_mb();
++			bcache_device_stop(&dc->disk);
++			break;
++		}
++		schedule_timeout_interruptible(HZ);
++	}
++
++	wait_for_kthread_stop();
++	return 0;
++}
++
++
+ void bch_cached_dev_run(struct cached_dev *dc)
+ {
+ 	struct bcache_device *d = &dc->disk;
+@@ -906,6 +949,14 @@ void bch_cached_dev_run(struct cached_dev *dc)
+ 	if (sysfs_create_link(&d->kobj, &disk_to_dev(d->disk)->kobj, "dev") ||
+ 	    sysfs_create_link(&disk_to_dev(d->disk)->kobj, &d->kobj, "bcache"))
+ 		pr_debug("error creating sysfs link");
++
++	dc->status_update_thread = kthread_run(cached_dev_status_update,
++					       dc, "bcache_status_update");
++	if (IS_ERR(dc->status_update_thread)) {
++		pr_warn("failed to create bcache_status_update kthread, "
++			"continue to run without monitoring backing "
++			"device status");
++	}
+ }
+ 
+ /*
+@@ -1139,6 +1190,8 @@ static void cached_dev_free(struct closure *cl)
+ 		kthread_stop(dc->writeback_thread);
+ 	if (dc->writeback_write_wq)
+ 		destroy_workqueue(dc->writeback_write_wq);
++	if (!IS_ERR_OR_NULL(dc->status_update_thread))
++		kthread_stop(dc->status_update_thread);
+ 
+ 	if (atomic_read(&dc->running))
+ 		bd_unlink_disk_holder(dc->bdev, dc->disk.disk);
 -- 
-2.15.1
+2.16.3
