@@ -4,13 +4,14 @@ To: viro@zeniv.linux.org.uk,
 	linux-fsdevel@vger.kernel.org,
 	axboe@kernel.dk,
 	bcrl@kvack.org
-Cc: mingo@kernel.org,
-	tglx@linutronix.de,
-	kstewart@linuxfoundation.org,
-	peterz@infradead.org,
+Cc: tglx@linutronix.de,
+	mingo@kernel.org,
 	pombredanne@nexb.com,
+	kstewart@linuxfoundation.org,
 	gregkh@linuxfoundation.org,
 	bigeasy@linutronix.de,
+	jack@suse.cz,
+	darrick.wong@oracle.com,
 	rgoldwyn@suse.com,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
@@ -19,11 +20,11 @@ Cc: mingo@kernel.org,
 	hch@infradread.org,
 	jmoyer@redhat.com,
 	Adam Manzanares <adam.manzanares@wdc.com>
-Subject: [PATCH v7 1/5] block: add ioprio_check_cap function
-Date: Tue, 22 May 2018 10:52:17 -0700
-Message-Id: <20180522175221.2391-2-adam.manzanares@wdc.com>
-In-Reply-To: <20180522175221.2391-1-adam.manzanares@wdc.com>
-References: <20180522175221.2391-1-adam.manzanares@wdc.com>
+Subject: [PATCH v6 1/5] block: add ioprio_check_cap function
+Date: Tue, 22 May 2018 08:07:33 -0700
+Message-Id: <20180522150737.9893-2-adam.manzanares@wdc.com>
+In-Reply-To: <20180522150737.9893-1-adam.manzanares@wdc.com>
+References: <20180522150737.9893-1-adam.manzanares@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
 From: Adam Manzanares <adam.manzanares@wdc.com>
