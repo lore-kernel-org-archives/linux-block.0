@@ -4,13 +4,14 @@ To: viro@zeniv.linux.org.uk,
 	linux-fsdevel@vger.kernel.org,
 	axboe@kernel.dk,
 	bcrl@kvack.org
-Cc: mingo@kernel.org,
-	tglx@linutronix.de,
-	kstewart@linuxfoundation.org,
-	peterz@infradead.org,
+Cc: tglx@linutronix.de,
+	mingo@kernel.org,
 	pombredanne@nexb.com,
+	kstewart@linuxfoundation.org,
 	gregkh@linuxfoundation.org,
 	bigeasy@linutronix.de,
+	jack@suse.cz,
+	darrick.wong@oracle.com,
 	rgoldwyn@suse.com,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
@@ -19,9 +20,9 @@ Cc: mingo@kernel.org,
 	hch@infradread.org,
 	jmoyer@redhat.com,
 	Adam Manzanares <adam.manzanares@wdc.com>
-Subject: [PATCH v7 0/5] AIO add per-command iopriority
-Date: Tue, 22 May 2018 10:52:16 -0700
-Message-Id: <20180522175221.2391-1-adam.manzanares@wdc.com>
+Subject: [PATCH v6 0/5] AIO add per-command iopriority
+Date: Tue, 22 May 2018 08:07:32 -0700
+Message-Id: <20180522150737.9893-1-adam.manzanares@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
 From: Adam Manzanares <adam.manzanares@wdc.com>
@@ -63,8 +64,6 @@ v5: rename ki_hint_valid -> ki_hint_validate
 
 v6: add __blkdev_direct_IO_simple ioprio support
 
-v7: Tie ki_hint_validate to kiocb ki_hint type
-    Add additional ki_hint_validate check
 
 Adam Manzanares (5):
   block: add ioprio_check_cap function
@@ -75,13 +74,13 @@ Adam Manzanares (5):
 
  block/ioprio.c               | 22 ++++++++++++++++------
  drivers/block/loop.c         |  3 +++
- fs/aio.c                     | 18 +++++++++++++++++-
+ fs/aio.c                     | 16 ++++++++++++++++
  fs/block_dev.c               |  2 ++
  fs/iomap.c                   |  1 +
  include/linux/fs.h           | 16 ++++++++++++++--
  include/linux/ioprio.h       |  2 ++
  include/uapi/linux/aio_abi.h |  1 +
- 8 files changed, 56 insertions(+), 9 deletions(-)
+ 8 files changed, 55 insertions(+), 8 deletions(-)
 
 -- 
 2.15.1
