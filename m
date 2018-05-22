@@ -1,29 +1,66 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:52493 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751085AbeEWF6T (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 May 2018 01:58:19 -0400
-Date: Wed, 23 May 2018 08:03:40 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Dave Chinner <david@fromorbit.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Wed, 23 May 2018 08:38:06 +1000
+From: Dave Chinner <david@fromorbit.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: "Darrick J. Wong" <darrick.wong@oracle.com>,
         linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org, linux-mm@kvack.org
 Subject: Re: [PATCH 16/34] iomap: add initial support for writes without
-        buffer heads
-Message-ID: <20180523060340.GA13873@lst.de>
-References: <20180518164830.1552-1-hch@lst.de> <20180518164830.1552-17-hch@lst.de> <20180521232700.GB14384@magnolia> <20180522000745.GU23861@dastard> <20180522082454.GB9801@lst.de> <20180522223806.GX23861@dastard>
+ buffer heads
+Message-ID: <20180522223806.GX23861@dastard>
+References: <20180518164830.1552-1-hch@lst.de>
+ <20180518164830.1552-17-hch@lst.de>
+ <20180521232700.GB14384@magnolia>
+ <20180522000745.GU23861@dastard>
+ <20180522082454.GB9801@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180522223806.GX23861@dastard>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180522082454.GB9801@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Wed, May 23, 2018 at 08:38:06AM +1000, Dave Chinner wrote:
-> Ok, I missed that detail as it's in a different patch. It looks like
-> if (pos > EOF) it will zeroed. But in this case I think that pos ==
-> EOF and so it was reading instead. That smells like off-by-one bug
-> to me.
+On Tue, May 22, 2018 at 10:24:54AM +0200, Christoph Hellwig wrote:
+> On Tue, May 22, 2018 at 10:07:45AM +1000, Dave Chinner wrote:
+> > > Something doesn't smell right here.  The only pages we need to read in
+> > > are the first and last pages in the write_begin range, and only if they
+> > > aren't page aligned and the underlying extent is IOMAP_MAPPED, right?
+> > 
+> > And not beyond EOF, too.
+> > 
+> > The bufferhead code handles this via the buffer_new() flag - it
+> > triggers the skipping of read IO and the states in which it is
+> > set are clearly indicated in iomap_to_bh(). That same logic needs to
+> > apply here.
+> 
+> The buffer_new logic itself isn't really something to copy directly
+> as it has all kinds of warts..
 
-This has been fixed in the tree I pushed yesterday already.
+Sure, my point was that it documents all the cases where we can
+avoid reading from disk, not that we should copy the logic.
+
+> > > I also noticed that speculative preallocation kicks in by the second 80M
+> > > write() call and writeback for the second call can successfully allocate
+> > > the entire preallocation, which means that the third (or nth) write call
+> > > can have a real extent already mapped in, and then we end up reading it.
+> > 
+> > Yeah, that's because there's no check against EOF here. These writes
+> > are all beyond EOF, so there shouldn't be any read at all...
+> 
+> The EOF case is already handled in iomap_block_needs_zeroing.
+
+Ok, I missed that detail as it's in a different patch. It looks like
+if (pos > EOF) it will zeroed. But in this case I think that pos ==
+EOF and so it was reading instead. That smells like off-by-one bug
+to me.
+
+> We just
+> need to skip the read for ranges entirely covered by the write.
+
+Yup.
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
