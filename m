@@ -1,36 +1,61 @@
-Return-Path: <keith.busch@linux.intel.com>
-Date: Wed, 23 May 2018 08:35:40 -0600
-From: Keith Busch <keith.busch@linux.intel.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@intel.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Return-Path: <hare@suse.de>
 Subject: Re: [RFC PATCH 3/3] blk-mq: Remove generation seqeunce
-Message-ID: <20180523143539.GA10882@localhost.localdomain>
+To: Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+ Bart Van Assche <bart.vanassche@wdc.com>
 References: <20180521231131.6685-1-keith.busch@intel.com>
- <20180521231131.6685-4-keith.busch@intel.com>
- <20180522161704.GA20000@lst.de>
- <20180523003446.GC31196@ming.t460p>
+ <20180521231131.6685-4-keith.busch@intel.com> <20180522161704.GA20000@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <53b05a82-a3f6-553a-ae3e-6efb8cbe7183@suse.de>
+Date: Wed, 23 May 2018 07:48:47 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180523003446.GC31196@ming.t460p>
+In-Reply-To: <20180522161704.GA20000@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, May 23, 2018 at 08:34:48AM +0800, Ming Lei wrote:
-> Let's consider the normal NVMe timeout code path:
+On 05/22/2018 06:17 PM, Christoph Hellwig wrote:
+> Hi Keith,
 > 
-> 1) one request is timed out;
+> I like this series a lot.  One comment that is probably close
+> to the big discussion in the thread:
 > 
-> 2) controller is shutdown, this timed-out request is requeued from
-> nvme_cancel_request(), but can't dispatch because queues are quiesced
+>>   	switch (ret) {
+>>   	case BLK_EH_HANDLED:
+>>   		/*
+>> +		 * If the request is still in flight, the driver is requesting
+>> +		 * blk-mq complete it.
+>>   		 */
+>> +		if (blk_mq_rq_state(req) == MQ_RQ_IN_FLIGHT)
+>> +			__blk_mq_complete_request(req);
+>> +		break;
 > 
-> 3) reset is done from another context, and this request is dispatched
-> again, and completed exactly before returning EH_HANDLED to blk-mq, but
-> its state isn't updated to COMPLETE yet.
+> The state check here really irked me, and from the thread it seems like
+> I'm not the only one.  At least for the NVMe case I think it is perfectly
+> safe, although I agree I'd rather audit what other drivers do carefully.
 > 
-> 4) then double completions are done from both normal completion and timeout
-> path.
+> That being said I think BLK_EH_HANDLED seems like a fundamentally broken
+> idea, and I'd actually prefer to get rid of it over adding things like
+> the MQ_RQ_IN_FLIGHT check above.
+> 
+I can't agree more here.
 
-We're definitely fixing this, but I must admit that's an impressive
-cognitive traversal across 5 thread contexts to arrive at that race. :)
+BLK_EH_HANDLED is breaking all sorts of assumptions, and I'd be glad to 
+see it go.
+
+> E.g. if we look at the cases where nvme-pci returns it:
+> 
+>   - if we did call nvme_dev_disable, we already canceled all requests,
+>     so we might as well just return BLK_EH_NOT_HANDLED
+>   - the poll for completion case already completed the command,
+>     so we should return BLK_EH_NOT_HANDLED
+> 
+> So I think we need to fix up nvme and if needed any other driver
+> to return the right value and then assert that the request is
+> still in in-flight status for the BLK_EH_HANDLED case.
+> 
+... and then kill BLK_EH_HANDLED :-)
+
+Cheers,
+
+Hannes
