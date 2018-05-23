@@ -1,54 +1,51 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
-Date: Wed, 23 May 2018 15:47:51 -0700
-From: Omar Sandoval <osandov@osandov.com>
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	linux-block <linux-block@vger.kernel.org>,
-	Omar Sandoval <osandov@fb.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH V2] blk-mq: avoid to starve tag allocation after
  allocation process migrates
-Message-ID: <20180523224751.GD12533@vader>
+To: Ming Lei <tom.leiming@gmail.com>, Omar Sandoval <osandov@osandov.com>
+Cc: Ming Lei <ming.lei@redhat.com>, linux-block
+ <linux-block@vger.kernel.org>, Omar Sandoval <osandov@fb.com>
 References: <20180519074406.6045-1-ming.lei@redhat.com>
  <7a4499e8-60bb-892a-91cf-f2d2c4be74b7@kernel.dk>
- <20180523093225.GA32067@ming.t460p>
- <20180523174823.GC12533@vader>
+ <20180523093225.GA32067@ming.t460p> <20180523174823.GC12533@vader>
  <CACVXFVPm_ds=b9ZGwfdfnwErdAPEVfoct65neRXt5pV1E9fjew@mail.gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <48643bc2-cff9-717a-73b1-7ce068529a39@kernel.dk>
+Date: Wed, 23 May 2018 16:19:40 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <CACVXFVPm_ds=b9ZGwfdfnwErdAPEVfoct65neRXt5pV1E9fjew@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, May 24, 2018 at 06:09:51AM +0800, Ming Lei wrote:
+On 5/23/18 4:09 PM, Ming Lei wrote:
 > On Thu, May 24, 2018 at 1:48 AM, Omar Sandoval <osandov@osandov.com> wrote:
-> > On Wed, May 23, 2018 at 05:32:31PM +0800, Ming Lei wrote:
-> >> On Tue, May 22, 2018 at 09:59:17PM -0600, Jens Axboe wrote:
-> >> > On 5/19/18 1:44 AM, Ming Lei wrote:
-> >> > > When the allocation process is scheduled back and the mapped hw queue is
-> >> > > changed, do one extra wake up on orignal queue for compensating wake up
-> >> > > miss, so other allocations on the orignal queue won't be starved.
-> >> > >
-> >> > > This patch fixes one request allocation hang issue, which can be
-> >> > > triggered easily in case of very low nr_request.
-> >> >
-> >> > Trying to think of better ways we can fix this, but I don't see
-> >> > any right now. Getting rid of the wake_up_nr() kills us on tons
-> >> > of tasks waiting.
-> >>
-> >> I am not sure if I understand your point, but this issue isn't related
-> >> with wake_up_nr() actually, and it can be reproduced after reverting
-> >> 4e5dff41be7b5201c1c47c (blk-mq: improve heavily contended tag case).
-> >>
-> >> All tasks in current sbq_wait_state may be scheduled to other CPUs, and
-> >> there may still be tasks waiting for allocation from this sbitmap_queue,
-> >> and the root cause is about cross-queue allocation, as you said,
-> >> there are too many queues, :-)
-> >
-> > I don't follow. Your description of the problem was that we have two
-> > waiters and only wake up one, which doesn't in turn allocate and free a
-> > tag and wake up the second waiter. Changing it back to wake_up_nr()
-> > eliminates that problem. And if waking up everything doesn't fix it, how
-> > does your fix of waking up a few extra tasks fix it?
+>> On Wed, May 23, 2018 at 05:32:31PM +0800, Ming Lei wrote:
+>>> On Tue, May 22, 2018 at 09:59:17PM -0600, Jens Axboe wrote:
+>>>> On 5/19/18 1:44 AM, Ming Lei wrote:
+>>>>> When the allocation process is scheduled back and the mapped hw queue is
+>>>>> changed, do one extra wake up on orignal queue for compensating wake up
+>>>>> miss, so other allocations on the orignal queue won't be starved.
+>>>>>
+>>>>> This patch fixes one request allocation hang issue, which can be
+>>>>> triggered easily in case of very low nr_request.
+>>>>
+>>>> Trying to think of better ways we can fix this, but I don't see
+>>>> any right now. Getting rid of the wake_up_nr() kills us on tons
+>>>> of tasks waiting.
+>>>
+>>> I am not sure if I understand your point, but this issue isn't related
+>>> with wake_up_nr() actually, and it can be reproduced after reverting
+>>> 4e5dff41be7b5201c1c47c (blk-mq: improve heavily contended tag case).
+>>>
+>>> All tasks in current sbq_wait_state may be scheduled to other CPUs, and
+>>> there may still be tasks waiting for allocation from this sbitmap_queue,
+>>> and the root cause is about cross-queue allocation, as you said,
+>>> there are too many queues, :-)
+>>
+>> I don't follow. Your description of the problem was that we have two
+>> waiters and only wake up one, which doesn't in turn allocate and free a
+>> tag and wake up the second waiter. Changing it back to wake_up_nr()
+>> eliminates that problem. And if waking up everything doesn't fix it, how
+>> does your fix of waking up a few extra tasks fix it?
 > 
 > What matters is that this patch wakes up the previous sbq, let's see if
 > from another view:
@@ -71,8 +68,13 @@ On Thu, May 24, 2018 at 06:09:51AM +0800, Ming Lei wrote:
 > The issue can be understood a bit easier if we just forget sbq_wait_state and
 > focus on sbq, :-)
 
-Okay, I see, although if I'm understanding correctly, it has everything
-to do with sbq_wait_state. If we only had one waitqueue, then wake_up()
-would always wake up all of the waiters, but because we have them spread
-out over multiple waitqueues, we have to call sbq_wake_up()/sbitmap_queue_wake_up()
-to do the wake up on the other waitqueue.
+It makes sense to me, and also explains why wake_up() vs wake_up_nr() doesn't
+matter. Which is actually a relief. And the condition of moving AND having
+a waiter should be rare enough that it'll work out fine in practice, I don't
+see any performance implications from this. You're right that we already
+abort early if we don't have pending waiters, so it's all good.
+
+Can you respin with the comments from Omar and myself covered?
+
+-- 
+Jens Axboe
