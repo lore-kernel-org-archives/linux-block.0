@@ -1,43 +1,59 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 11/33] block: implement bio_pages_all() via bio_for_each_page_all()
-Date: Thu, 24 May 2018 17:01:16 +0800
-Message-Id: <20180524090139.2150-12-ming.lei@redhat.com>
-In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
-References: <20180524090139.2150-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:57139 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932845AbeEWNah (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 23 May 2018 09:30:37 -0400
+Subject: Re: [PATCH 07/14] scsi_transport_fc: complete requests from ->timeout
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <keith.busch@intel.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Josef Bacik <josef@toxicpanda.com>, Tejun Heo <tj@kernel.org>,
+        Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
+        Rafael David Tinoco <rafael.tinoco@canonical.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+References: <20180523121941.8632-1-hch@lst.de>
+ <20180523121941.8632-8-hch@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <e63b1aeb-d428-ea24-4b1d-31a37314dd79@suse.de>
+Date: Wed, 23 May 2018 15:30:33 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180523121941.8632-8-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-As multipage bvec will be enabled soon, bio->bi_vcnt isn't same with
-page count in the bio any more, so use bio_for_each_page_all() to
-compute the number.
+On 05/23/2018 02:19 PM, Christoph Hellwig wrote:
+> By completing the request entirely in the driver we can remove the
+> BLK_EH_HANDLED return value and thus the split responsibility between the
+> driver and the block layer that has been causing trouble.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   drivers/scsi/scsi_transport_fc.c | 7 +++----
+>   1 file changed, 3 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
+> index 90075a0ddcfe..7a9a65588a1b 100644
+> --- a/drivers/scsi/scsi_transport_fc.c
+> +++ b/drivers/scsi/scsi_transport_fc.c
+> @@ -3591,10 +3591,9 @@ fc_bsg_job_timeout(struct request *req)
+>   	}
+>   
+>   	/* the blk_end_sync_io() doesn't check the error */
+> -	if (!inflight)
+> -		return BLK_EH_DONE;
+> -	else
+> -		return BLK_EH_HANDLED;
+> +	if (inflight)
+> +		blk_mq_complete_request(req);
+> +	return BLK_EH_DONE;
+>   }
+>   
+>   /**
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- include/linux/bio.h | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+Cheers,
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 3d3795b9a353..08af9272687f 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -334,8 +334,14 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
- 
- static inline unsigned bio_pages_all(struct bio *bio)
- {
-+	unsigned i;
-+	struct bio_vec *bv;
-+
- 	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
--	return bio->bi_vcnt;
-+
-+	bio_for_each_page_all(bv, bio, i)
-+		;
-+	return i;
- }
- 
- static inline struct bio_vec *bio_first_bvec_all(struct bio *bio)
--- 
-2.9.5
+Hannes
