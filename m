@@ -1,27 +1,66 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga12.intel.com ([192.55.52.136]:63784 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933165AbeEWPRg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 May 2018 11:17:36 -0400
-From: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org,
-        Marcin Dziegielewski <marcin.dziegielewski@intel.com>
-Subject: [PATCH 0/2] lightnvm: pblk: write buffer improvements
-Date: Wed, 23 May 2018 17:17:18 +0200
-Message-Id: <1527088640-13062-1-git-send-email-marcin.dziegielewski@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 09/14] libiscsi: don't try to bypass SCSI EH
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ Keith Busch <keith.busch@intel.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>, Ming Lei <ming.lei@redhat.com>,
+ Josef Bacik <josef@toxicpanda.com>, Tejun Heo <tj@kernel.org>,
+ Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
+ Rafael David Tinoco <rafael.tinoco@canonical.com>,
+ linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+References: <20180523121941.8632-1-hch@lst.de>
+ <20180523121941.8632-10-hch@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <d0fa12e3-b0b9-9442-2779-df8abb3b66b6@suse.de>
+Date: Wed, 23 May 2018 15:35:56 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180523121941.8632-10-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-This patchset provides two improvements related to setting size of write buffer.
+On 05/23/2018 02:19 PM, Christoph Hellwig wrote:
+> libiscsi is the only SCSI code that return BLK_EH_HANDLED, thus trying to
+> bypass the normal SCSI EH code.  We are going to remove this return value
+> at the block layer, and at least from a quick look it doesn't look too
+> harmful to try to send an abort for these cases, especially as the first
+> one should not actually be possible.  If this doesn't work out iscsi
+> will probably need its own eh_strategy_handler instead to just do the
+> right thing.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   drivers/scsi/libiscsi.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/scsi/libiscsi.c b/drivers/scsi/libiscsi.c
+> index eee43ba83a60..71bdc0b52cf9 100644
+> --- a/drivers/scsi/libiscsi.c
+> +++ b/drivers/scsi/libiscsi.c
+> @@ -1982,7 +1982,7 @@ enum blk_eh_timer_return iscsi_eh_cmd_timed_out(struct scsi_cmnd *sc)
+>   		 * Raced with completion. Blk layer has taken ownership
+>   		 * so let timeout code complete it now.
+>   		 */
+> -		rc = BLK_EH_HANDLED;
+> +		rc = BLK_EH_DONE;
+>   		goto done;
+>   	}
+>   
+> @@ -1997,7 +1997,7 @@ enum blk_eh_timer_return iscsi_eh_cmd_timed_out(struct scsi_cmnd *sc)
+>   		if (unlikely(system_state != SYSTEM_RUNNING)) {
+>   			sc->result = DID_NO_CONNECT << 16;
+>   			ISCSI_DBG_EH(session, "sc on shutdown, handled\n");
+> -			rc = BLK_EH_HANDLED;
+> +			rc = BLK_EH_DONE;
+>   			goto done;
+>   		}
+>   		/*
+> 
+That should be okay, as these two returns are the pathological case 
+where the command has already completed before the timeout handler got 
+invoked.
+IE the very same issue which triggered this patchset in the first place.
 
-Marcin Dziegielewski (2):
-  lightnvm: pblk: add possibility to set write buffer size manually
-  lightnvm: pblk: handle case when device expose mw_cunits equal to 0
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
- drivers/lightnvm/pblk-init.c | 24 +++++++++++++++++++++---
- drivers/nvme/host/lightnvm.c |  1 -
- 2 files changed, 21 insertions(+), 4 deletions(-)
+Cheers,
 
--- 
-1.8.3.1
+Hannes
