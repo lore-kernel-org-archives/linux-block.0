@@ -1,111 +1,62 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
+Return-Path: <BATV+df5a2477ff0fa86e9985+5386+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>,
 	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V3 5/8] nvme: fix race between freeze queues and unfreeze queues
-Date: Thu,  3 May 2018 11:17:13 +0800
-Message-Id: <20180503031716.31446-6-ming.lei@redhat.com>
-In-Reply-To: <20180503031716.31446-1-ming.lei@redhat.com>
-References: <20180503031716.31446-1-ming.lei@redhat.com>
+	Josef Bacik <josef@toxicpanda.com>,
+	Tejun Heo <tj@kernel.org>,
+	Lee Duncan <lduncan@suse.com>,
+	Chris Leech <cleech@redhat.com>,
+	Rafael David Tinoco <rafael.tinoco@canonical.com>,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Subject: [PATCH 14/14] blk-mq: simplify blk_mq_rq_timed_out
+Date: Wed, 23 May 2018 14:19:41 +0200
+Message-Id: <20180523121941.8632-15-hch@lst.de>
+In-Reply-To: <20180523121941.8632-1-hch@lst.de>
+References: <20180523121941.8632-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-nvme_dev_disable() and resetting controller are required for recovering
-controller, but the two are run from different contexts.
-
-nvme_start_freeze() is run from nvme_dev_disable(), and nvme_unfreeze()
-is run from resetting context. Unfortunatley timeout may be triggered
-when draining IO from resetting controller, so nvme_start_freeze() may
-be run several times.
-
-This patch fixes the race between nvme_start_freeze() and
-nvme_unfreeze() by introducing flags of 'queues_freezed' and the lock
-of 'freeze_mutex'.
-
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/core.c | 29 +++++++++++++++++++++--------
- drivers/nvme/host/nvme.h |  3 +++
- 2 files changed, 24 insertions(+), 8 deletions(-)
+ block/blk-mq.c | 22 ++++++++--------------
+ 1 file changed, 8 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 9df4f71e58ca..f9028873298e 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -3447,6 +3447,9 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
- 	INIT_WORK(&ctrl->fw_act_work, nvme_fw_act_work);
- 	INIT_WORK(&ctrl->delete_work, nvme_delete_ctrl_work);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 8c7b1803b7e9..592bab689f8e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -747,22 +747,16 @@ EXPORT_SYMBOL(blk_mq_tag_to_rq);
  
-+	ctrl->queues_freezed = false;
-+	mutex_init(&ctrl->freeze_mutex);
-+
- 	ret = ida_simple_get(&nvme_instance_ida, 0, 0, GFP_KERNEL);
- 	if (ret < 0)
- 		goto out;
-@@ -3526,10 +3529,15 @@ void nvme_unfreeze(struct nvme_ctrl *ctrl)
+ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
  {
- 	struct nvme_ns *ns;
+-	const struct blk_mq_ops *ops = req->q->mq_ops;
+-	enum blk_eh_timer_return ret = BLK_EH_RESET_TIMER;
++	if (req->q->mq_ops->timeout) {
++		enum blk_eh_timer_return ret;
  
--	down_read(&ctrl->namespaces_rwsem);
--	list_for_each_entry(ns, &ctrl->namespaces, list)
--		blk_mq_unfreeze_queue(ns->queue);
--	up_read(&ctrl->namespaces_rwsem);
-+	mutex_lock(&ctrl->freeze_mutex);
-+	if (ctrl->queues_freezed) {
-+		down_read(&ctrl->namespaces_rwsem);
-+		list_for_each_entry(ns, &ctrl->namespaces, list)
-+			blk_mq_unfreeze_queue(ns->queue);
-+		up_read(&ctrl->namespaces_rwsem);
-+		ctrl->queues_freezed = false;
-+	}
-+	mutex_unlock(&ctrl->freeze_mutex);
- }
- EXPORT_SYMBOL_GPL(nvme_unfreeze);
- 
-@@ -3562,10 +3570,15 @@ void nvme_start_freeze(struct nvme_ctrl *ctrl)
- {
- 	struct nvme_ns *ns;
- 
--	down_read(&ctrl->namespaces_rwsem);
--	list_for_each_entry(ns, &ctrl->namespaces, list)
--		blk_freeze_queue_start(ns->queue);
--	up_read(&ctrl->namespaces_rwsem);
-+	mutex_lock(&ctrl->freeze_mutex);
-+	if (!ctrl->queues_freezed) {
-+		down_read(&ctrl->namespaces_rwsem);
-+		list_for_each_entry(ns, &ctrl->namespaces, list)
-+			blk_freeze_queue_start(ns->queue);
-+		up_read(&ctrl->namespaces_rwsem);
-+		ctrl->queues_freezed = true;
-+	}
-+	mutex_unlock(&ctrl->freeze_mutex);
- }
- EXPORT_SYMBOL_GPL(nvme_start_freeze);
- 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 061fecfd44f5..a19b7f04ac24 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -149,6 +149,9 @@ struct nvme_ctrl {
- 	struct work_struct reset_work;
- 	struct work_struct delete_work;
- 
-+	bool queues_freezed;
-+	struct mutex freeze_mutex;
+-	if (ops->timeout)
+-		ret = ops->timeout(req, reserved);
+-
+-	switch (ret) {
+-	case BLK_EH_RESET_TIMER:
+-		blk_add_timer(req);
+-		break;
+-	case BLK_EH_DONE:
+-		break;
+-	default:
+-		printk(KERN_ERR "block: bad eh return: %d\n", ret);
+-		break;
++		ret = req->q->mq_ops->timeout(req, reserved);
++		if (ret == BLK_EH_DONE)
++			return;
++		WARN_ON_ONCE(ret != BLK_EH_RESET_TIMER);
+ 	}
 +
- 	struct nvme_subsystem *subsys;
- 	struct list_head subsys_entry;
++	blk_add_timer(req);
+ }
  
+ static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
 -- 
-2.9.5
+2.17.0
