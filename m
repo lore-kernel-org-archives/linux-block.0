@@ -1,24 +1,27 @@
-Return-Path: <prvs=674413952=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "kent.overstreet@gmail.com" <kent.overstreet@gmail.com>
-CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <kent.overstreet@gmail.com>
+Return-Path: <kent.overstreet@gmail.com>
+Date: Tue, 22 May 2018 21:30:20 -0400
+From: Kent Overstreet <kent.overstreet@gmail.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>
 Subject: Re: [PATCH] Revert "block: Add warning for bi_next not NULL in
  bio_endio()"
-Date: Wed, 23 May 2018 01:36:02 +0000
-Message-ID: <65261494f966d140a7542fb1533a4dd2f7fd02a1.camel@wdc.com>
+Message-ID: <20180523013020.GA12391@kmo-pixel>
 References: <20180522235505.20937-1-bart.vanassche@wdc.com>
-	 <20180523013020.GA12391@kmo-pixel>
-In-Reply-To: <20180523013020.GA12391@kmo-pixel>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180522235505.20937-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTA1LTIyIGF0IDIxOjMwIC0wNDAwLCBLZW50IE92ZXJzdHJlZXQgd3JvdGU6
-DQo+IE9uIFR1ZSwgTWF5IDIyLCAyMDE4IGF0IDA0OjU1OjA1UE0gLTA3MDAsIEJhcnQgVmFuIEFz
-c2NoZSB3cm90ZToNCj4gPiBUaGlzIHBhdGNoIGF2b2lkcyB0aGF0IEtBU0FOIHJlcG9ydHMgdGhl
-IGZvbGxvd2luZyBjb21wbGFpbnQgd2hlbg0KPiA+IHJ1bm5pbmcgdGhlIHNycC10ZXN0IHNvZnR3
-YXJlOg0KPiANCj4gSSBtYWRlIGEgcmVhbCBhdHRlbXB0IHRvIGdldCB5b3VyIHRlc3Qgc3VpdGUg
-d29ya2luZy4NCg0KUGxlYXNlIHRyeSBhIGxpdHRsZSBoYXJkZXIuIEV2ZXJ5b25lIEkgYXNrZWQg
-dG8gcnVuIHRoYXQgdGVzdCBzdWl0ZQ0KaGFzIGJlZW4gYWJsZSB0byBydW4gaXQuDQoNCkJhcnQu
-DQoNCg0KDQo=
+On Tue, May 22, 2018 at 04:55:05PM -0700, Bart Van Assche wrote:
+> This patch avoids that KASAN reports the following complaint when
+> running the srp-test software:
+
+I made a real attempt to get your test suite working. It would be nice if you
+could make an attempt at tracking it down instead of just reverting, and holding
+up improvements to the whole block layer, since you seem to have an easy repro
+for it.
+
+This is a real looming issue - we have other code which assumes things about
+bi_next and this isn't a practical thing to grep/audit for.
