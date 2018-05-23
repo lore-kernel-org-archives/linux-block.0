@@ -1,155 +1,56 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:38553 "EHLO
-        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753094AbeDPKZn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Apr 2018 06:25:43 -0400
-Received: by mail-wr0-f194.google.com with SMTP id h3so11815002wrh.5
-        for <linux-block@vger.kernel.org>; Mon, 16 Apr 2018 03:25:42 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 02/11] lightnvm: pblk: recheck for bad lines at runtime
-Date: Mon, 16 Apr 2018 12:25:23 +0200
-Message-Id: <1523874332-6272-3-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1523874332-6272-1-git-send-email-javier@cnexlabs.com>
-References: <1523874332-6272-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <prvs=674a79f01=Damien.LeMoal@wdc.com>
+From: Damien Le Moal <Damien.LeMoal@wdc.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Christoph
+ Hellwig <hch@lst.de>, Damien Le Moal <Damien.LeMoal@wdc.com>, "Martin K .
+ Petersen" <martin.petersen@oracle.com>, Hannes Reinecke <hare@suse.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [PATCH] blkdev_report_zones_ioctl(): Use vmalloc() to allocate
+ large buffers
+Date: Wed, 23 May 2018 14:57:51 +0000
+Message-ID: <f874e1ca-8a96-1e8c-4bcf-bab5fe1a828e@wdc.com>
+References: <20180522152722.15920-1-bart.vanassche@wdc.com>
+In-Reply-To: <20180522152722.15920-1-bart.vanassche@wdc.com>
+Reply-To: Damien Le Moal <Damien.LeMoal@wdc.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Bad blocks can grow at runtime. Check that the number of valid blocks in
-a line are within the sanity threshold before allocating the line for
-new writes.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-core.c | 38 ++++++++++++++++++++++++++++----------
- drivers/lightnvm/pblk-init.c | 11 +++++++----
- 2 files changed, 35 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index ceacd10a043e..128101f9e606 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1174,7 +1174,8 @@ static int pblk_prepare_new_line(struct pblk *pblk, struct pblk_line *line)
- static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
- {
- 	struct pblk_line_meta *lm = &pblk->lm;
--	int blk_to_erase;
-+	int blk_in_line = atomic_read(&line->blk_in_line);
-+	int blk_to_erase, ret;
- 
- 	line->map_bitmap = kzalloc(lm->sec_bitmap_len, GFP_ATOMIC);
- 	if (!line->map_bitmap)
-@@ -1183,8 +1184,8 @@ static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
- 	/* will be initialized using bb info from map_bitmap */
- 	line->invalid_bitmap = kmalloc(lm->sec_bitmap_len, GFP_ATOMIC);
- 	if (!line->invalid_bitmap) {
--		kfree(line->map_bitmap);
--		return -ENOMEM;
-+		ret = -ENOMEM;
-+		goto fail_free_map_bitmap;
- 	}
- 
- 	/* Bad blocks do not need to be erased */
-@@ -1199,16 +1200,19 @@ static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
- 		blk_to_erase = pblk_prepare_new_line(pblk, line);
- 		line->state = PBLK_LINESTATE_FREE;
- 	} else {
--		blk_to_erase = atomic_read(&line->blk_in_line);
-+		blk_to_erase = blk_in_line;
-+	}
-+
-+	if (blk_in_line < lm->min_blk_line) {
-+		ret = -EAGAIN;
-+		goto fail_free_invalid_bitmap;
- 	}
- 
- 	if (line->state != PBLK_LINESTATE_FREE) {
--		kfree(line->map_bitmap);
--		kfree(line->invalid_bitmap);
--		spin_unlock(&line->lock);
- 		WARN(1, "pblk: corrupted line %d, state %d\n",
- 							line->id, line->state);
--		return -EAGAIN;
-+		ret = -EINTR;
-+		goto fail_free_invalid_bitmap;
- 	}
- 
- 	line->state = PBLK_LINESTATE_OPEN;
-@@ -1222,6 +1226,16 @@ static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
- 	kref_init(&line->ref);
- 
- 	return 0;
-+
-+fail_free_invalid_bitmap:
-+	spin_unlock(&line->lock);
-+	kfree(line->invalid_bitmap);
-+	line->invalid_bitmap = NULL;
-+fail_free_map_bitmap:
-+	kfree(line->map_bitmap);
-+	line->map_bitmap = NULL;
-+
-+	return ret;
- }
- 
- int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line)
-@@ -1292,10 +1306,14 @@ struct pblk_line *pblk_line_get(struct pblk *pblk)
- 
- 	ret = pblk_line_prepare(pblk, line);
- 	if (ret) {
--		if (ret == -EAGAIN) {
-+		switch (ret) {
-+		case -EAGAIN:
-+			list_add(&line->list, &l_mg->bad_list);
-+			goto retry;
-+		case -EINTR:
- 			list_add(&line->list, &l_mg->corrupt_list);
- 			goto retry;
--		} else {
-+		default:
- 			pr_err("pblk: failed to prepare line %d\n", line->id);
- 			list_add(&line->list, &l_mg->free_list);
- 			l_mg->nr_free_lines++;
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index dee64f91227d..8f8c9abd14fc 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -127,10 +127,8 @@ static int pblk_l2p_recover(struct pblk *pblk, bool factory_init)
- 	if (!line) {
- 		/* Configure next line for user data */
- 		line = pblk_line_get_first_data(pblk);
--		if (!line) {
--			pr_err("pblk: line list corrupted\n");
-+		if (!line)
- 			return -EFAULT;
--		}
- 	}
- 
- 	return 0;
-@@ -141,6 +139,7 @@ static int pblk_l2p_init(struct pblk *pblk, bool factory_init)
- 	sector_t i;
- 	struct ppa_addr ppa;
- 	size_t map_size;
-+	int ret = 0;
- 
- 	map_size = pblk_trans_map_size(pblk);
- 	pblk->trans_map = vmalloc(map_size);
-@@ -152,7 +151,11 @@ static int pblk_l2p_init(struct pblk *pblk, bool factory_init)
- 	for (i = 0; i < pblk->rl.nr_secs; i++)
- 		pblk_trans_map_set(pblk, i, ppa);
- 
--	return pblk_l2p_recover(pblk, factory_init);
-+	ret = pblk_l2p_recover(pblk, factory_init);
-+	if (ret)
-+		vfree(pblk->trans_map);
-+
-+	return ret;
- }
- 
- static void pblk_rwb_free(struct pblk *pblk)
--- 
-2.7.4
+T24gMjAxOC8wNS8yMiA4OjI3LCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6DQo+IEF2b2lkIHRoYXQg
+Y29tcGxhaW50cyBzaW1pbGFyIHRvIHRoZSBmb2xsb3dpbmcgYXBwZWFyIGluIHRoZSBrZXJuZWwg
+bG9nDQo+IGlmIHRoZSBudW1iZXIgb2Ygem9uZXMgaXMgc3VmZmljaWVudGx5IGxhcmdlOg0KPiAN
+Cj4gICBmaW86IHBhZ2UgYWxsb2NhdGlvbiBmYWlsdXJlOiBvcmRlcjo5LCBtb2RlOjB4MTQwYzBj
+MChHRlBfS0VSTkVMfF9fR0ZQX0NPTVB8X19HRlBfWkVSTyksIG5vZGVtYXNrPShudWxsKQ0KPiAg
+IENhbGwgVHJhY2U6DQo+ICAgZHVtcF9zdGFjaysweDYzLzB4ODgNCj4gICB3YXJuX2FsbG9jKzB4
+ZjUvMHgxOTANCj4gICBfX2FsbG9jX3BhZ2VzX3Nsb3dwYXRoKzB4OGYwLzB4YjBkDQo+ICAgX19h
+bGxvY19wYWdlc19ub2RlbWFzaysweDI0Mi8weDI2MA0KPiAgIGFsbG9jX3BhZ2VzX2N1cnJlbnQr
+MHg2YS8weGIwDQo+ICAga21hbGxvY19vcmRlcisweDE4LzB4NTANCj4gICBrbWFsbG9jX29yZGVy
+X3RyYWNlKzB4MjYvMHhiMA0KPiAgIF9fa21hbGxvYysweDIwZS8weDIyMA0KPiAgIGJsa2Rldl9y
+ZXBvcnRfem9uZXNfaW9jdGwrMHhhNS8weDFhMA0KPiAgIGJsa2Rldl9pb2N0bCsweDFiYS8weDkz
+MA0KPiAgIGJsb2NrX2lvY3RsKzB4NDEvMHg1MA0KPiAgIGRvX3Zmc19pb2N0bCsweGFhLzB4NjEw
+DQo+ICAgU3lTX2lvY3RsKzB4NzkvMHg5MA0KPiAgIGRvX3N5c2NhbGxfNjQrMHg3OS8weDFiMA0K
+PiAgIGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJfaHdmcmFtZSsweDNkLzB4YTINCj4gDQo+IEZpeGVz
+OiAzZWQwNWE5ODdlMGYgKCJibGstem9uZWQ6IGltcGxlbWVudCBpb2N0bHMiKQ0KPiBTaWduZWQt
+b2ZmLWJ5OiBCYXJ0IFZhbiBBc3NjaGUgPGJhcnQudmFuYXNzY2hlQHdkYy5jb20+DQo+IENjOiBT
+aGF1biBUYW5jaGVmZiA8c2hhdW4udGFuY2hlZmZAc2VhZ2F0ZS5jb20+DQo+IENjOiBEYW1pZW4g
+TGUgTW9hbCA8ZGFtaWVuLmxlbW9hbEBoZ3N0LmNvbT4NCj4gQ2M6IENocmlzdG9waCBIZWxsd2ln
+IDxoY2hAbHN0LmRlPg0KPiBDYzogTWFydGluIEsuIFBldGVyc2VuIDxtYXJ0aW4ucGV0ZXJzZW5A
+b3JhY2xlLmNvbT4NCj4gQ2M6IEhhbm5lcyBSZWluZWNrZSA8aGFyZUBzdXNlLmNvbT4NCj4gQ2M6
+IDxzdGFibGVAdmdlci5rZXJuZWwub3JnPg0KPiAtLS0NCj4gIGJsb2NrL2Jsay16b25lZC5jIHwg
+OCArKysrKystLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlv
+bnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9ibG9jay9ibGstem9uZWQuYyBiL2Jsb2NrL2Jsay16
+b25lZC5jDQo+IGluZGV4IDIwYmZjMzdlMTg1Mi4uOTJlNjEwODQ4N2M0IDEwMDY0NA0KPiAtLS0g
+YS9ibG9jay9ibGstem9uZWQuYw0KPiArKysgYi9ibG9jay9ibGstem9uZWQuYw0KPiBAQCAtMzI4
+LDcgKzMyOCwxMSBAQCBpbnQgYmxrZGV2X3JlcG9ydF96b25lc19pb2N0bChzdHJ1Y3QgYmxvY2tf
+ZGV2aWNlICpiZGV2LCBmbW9kZV90IG1vZGUsDQo+ICAJaWYgKCFyZXAubnJfem9uZXMpDQo+ICAJ
+CXJldHVybiAtRUlOVkFMOw0KPiAgDQo+IC0Jem9uZXMgPSBrY2FsbG9jKHJlcC5ucl96b25lcywg
+c2l6ZW9mKHN0cnVjdCBibGtfem9uZSksIEdGUF9LRVJORUwpOw0KPiArCWlmIChyZXAubnJfem9u
+ZXMgPiBJTlRfTUFYIC8gc2l6ZW9mKHN0cnVjdCBibGtfem9uZSkpDQo+ICsJCXJldHVybiAtRVJB
+TkdFOw0KPiArDQo+ICsJem9uZXMgPSBrdm1hbGxvYyhyZXAubnJfem9uZXMgKiBzaXplb2Yoc3Ry
+dWN0IGJsa196b25lKSwNCj4gKwkJCUdGUF9LRVJORUwgfCBfX0dGUF9aRVJPKTsNCj4gIAlpZiAo
+IXpvbmVzKQ0KPiAgCQlyZXR1cm4gLUVOT01FTTsNCj4gIA0KPiBAQCAtMzUwLDcgKzM1NCw3IEBA
+IGludCBibGtkZXZfcmVwb3J0X3pvbmVzX2lvY3RsKHN0cnVjdCBibG9ja19kZXZpY2UgKmJkZXYs
+IGZtb2RlX3QgbW9kZSwNCj4gIAl9DQo+ICANCj4gICBvdXQ6DQo+IC0Ja2ZyZWUoem9uZXMpOw0K
+PiArCWt2ZnJlZSh6b25lcyk7DQo+ICANCj4gIAlyZXR1cm4gcmV0Ow0KPiAgfQ0KPiANClJldmll
+d2VkLWJ5OiBEYW1pZW4gTGUgTW9hbCA8ZGFtaWVuLmxlbW9hbEB3ZGMuY29tPg0KDQotLSANCkRh
+bWllbiBMZSBNb2FsDQpXZXN0ZXJuIERpZ2l0YWwgUmVzZWFyY2g=
