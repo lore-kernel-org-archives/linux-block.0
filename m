@@ -1,147 +1,55 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 15/33] xfs: simplify xfs_aops_discard_page
-Date: Wed,  9 May 2018 09:48:12 +0200
-Message-Id: <20180509074830.16196-16-hch@lst.de>
-In-Reply-To: <20180509074830.16196-1-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga09.intel.com ([134.134.136.24]:25419 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932747AbeEWMaw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 23 May 2018 08:30:52 -0400
+From: Igor Konopko <igor.j.konopko@intel.com>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, marcin.dziegielewski@intel.com,
+        Igor Konopko <igor.j.konopko@intel.com>
+Subject: [PATCH 3/3] lightnvm: Fix partial read error path
+Date: Wed, 23 May 2018 14:29:56 +0200
+Message-Id: <20180523122956.24137-4-igor.j.konopko@intel.com>
+In-Reply-To: <20180523122956.24137-1-igor.j.konopko@intel.com>
+References: <20180523122956.24137-1-igor.j.konopko@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Instead of looking at the buffer heads to see if a block is delalloc just
-call xfs_bmap_punch_delalloc_range on the whole page - this will leave
-any non-delalloc block intact and handle the iteration for us.  As a side
-effect one more place stops caring about buffer heads and we can remove the
-xfs_check_page_type function entirely.
+When error occurs during bio_add_page on partial read path, pblk tries to
+free pages twice. This patch fixes that issue.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+Signed-off-by: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
 ---
- fs/xfs/xfs_aops.c | 85 +++++------------------------------------------
- 1 file changed, 9 insertions(+), 76 deletions(-)
+ drivers/lightnvm/pblk-read.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 8e4d01e76fc8..313449ac0288 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -711,49 +711,6 @@ xfs_map_at_offset(
- 	clear_buffer_unwritten(bh);
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index a2e678de428f..fa7b60f852d9 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -256,7 +256,7 @@ static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 	new_bio = bio_alloc(GFP_KERNEL, nr_holes);
+ 
+ 	if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
+-		goto err;
++		goto err_add_pages;
+ 
+ 	if (nr_holes != new_bio->bi_vcnt) {
+ 		pr_err("pblk: malformed bio\n");
+@@ -347,10 +347,10 @@ static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 	return NVM_IO_OK;
+ 
+ err:
+-	pr_err("pblk: failed to perform partial read\n");
+-
+ 	/* Free allocated pages in new bio */
+-	pblk_bio_free_pages(pblk, bio, 0, new_bio->bi_vcnt);
++	pblk_bio_free_pages(pblk, new_bio, 0, new_bio->bi_vcnt);
++err_add_pages:
++	pr_err("pblk: failed to perform partial read\n");
+ 	__pblk_end_io_read(pblk, rqd, false);
+ 	return NVM_IO_ERR;
  }
- 
--/*
-- * Test if a given page contains at least one buffer of a given @type.
-- * If @check_all_buffers is true, then we walk all the buffers in the page to
-- * try to find one of the type passed in. If it is not set, then the caller only
-- * needs to check the first buffer on the page for a match.
-- */
--STATIC bool
--xfs_check_page_type(
--	struct page		*page,
--	unsigned int		type,
--	bool			check_all_buffers)
--{
--	struct buffer_head	*bh;
--	struct buffer_head	*head;
--
--	if (PageWriteback(page))
--		return false;
--	if (!page->mapping)
--		return false;
--	if (!page_has_buffers(page))
--		return false;
--
--	bh = head = page_buffers(page);
--	do {
--		if (buffer_unwritten(bh)) {
--			if (type == XFS_IO_UNWRITTEN)
--				return true;
--		} else if (buffer_delay(bh)) {
--			if (type == XFS_IO_DELALLOC)
--				return true;
--		} else if (buffer_dirty(bh) && buffer_mapped(bh)) {
--			if (type == XFS_IO_OVERWRITE)
--				return true;
--		}
--
--		/* If we are only checking the first buffer, we are done now. */
--		if (!check_all_buffers)
--			break;
--	} while ((bh = bh->b_this_page) != head);
--
--	return false;
--}
--
- STATIC void
- xfs_vm_invalidatepage(
- 	struct page		*page,
-@@ -785,9 +742,6 @@ xfs_vm_invalidatepage(
-  * transaction. Indeed - if we get ENOSPC errors, we have to be able to do this
-  * truncation without a transaction as there is no space left for block
-  * reservation (typically why we see a ENOSPC in writeback).
-- *
-- * This is not a performance critical path, so for now just do the punching a
-- * buffer head at a time.
-  */
- STATIC void
- xfs_aops_discard_page(
-@@ -795,47 +749,26 @@ xfs_aops_discard_page(
- {
- 	struct inode		*inode = page->mapping->host;
- 	struct xfs_inode	*ip = XFS_I(inode);
--	struct buffer_head	*bh, *head;
-+	struct xfs_mount	*mp = ip->i_mount;
- 	loff_t			offset = page_offset(page);
-+	xfs_fileoff_t		start_fsb = XFS_B_TO_FSBT(mp, offset);
-+	int			error;
- 
--	if (!xfs_check_page_type(page, XFS_IO_DELALLOC, true))
--		goto out_invalidate;
--
--	if (XFS_FORCED_SHUTDOWN(ip->i_mount))
-+	if (XFS_FORCED_SHUTDOWN(mp))
- 		goto out_invalidate;
- 
--	xfs_alert(ip->i_mount,
-+	xfs_alert(mp,
- 		"page discard on page "PTR_FMT", inode 0x%llx, offset %llu.",
- 			page, ip->i_ino, offset);
- 
- 	xfs_ilock(ip, XFS_ILOCK_EXCL);
--	bh = head = page_buffers(page);
--	do {
--		int		error;
--		xfs_fileoff_t	start_fsb;
--
--		if (!buffer_delay(bh))
--			goto next_buffer;
--
--		start_fsb = XFS_B_TO_FSBT(ip->i_mount, offset);
--		error = xfs_bmap_punch_delalloc_range(ip, start_fsb, 1);
--		if (error) {
--			/* something screwed, just bail */
--			if (!XFS_FORCED_SHUTDOWN(ip->i_mount)) {
--				xfs_alert(ip->i_mount,
--			"page discard unable to remove delalloc mapping.");
--			}
--			break;
--		}
--next_buffer:
--		offset += i_blocksize(inode);
--
--	} while ((bh = bh->b_this_page) != head);
--
-+	error = xfs_bmap_punch_delalloc_range(ip, start_fsb,
-+			PAGE_SIZE / i_blocksize(inode));
- 	xfs_iunlock(ip, XFS_ILOCK_EXCL);
-+	if (error && !XFS_FORCED_SHUTDOWN(mp))
-+		xfs_alert(mp, "page discard unable to remove delalloc mapping.");
- out_invalidate:
- 	xfs_vm_invalidatepage(page, 0, PAGE_SIZE);
--	return;
- }
- 
- static int
 -- 
-2.17.0
+2.14.3
