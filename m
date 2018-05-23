@@ -1,49 +1,57 @@
 Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: osandov@osandov.com, holger@applied-asynchrony.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH V2 0/2] block: kyber: make kyber more friendly with merging
-Date: Wed, 23 May 2018 14:33:20 +0800
-Message-Id: <1527057202-2802-1-git-send-email-jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH] block: kyber: make kyber more friendly with merging
+To: =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1527000509-2619-1-git-send-email-jianchao.w.wang@oracle.com>
+ <163c5760-cf0e-faea-ee4e-ac5d688310fe@applied-asynchrony.com>
+ <00e5dfd4-d3a2-b008-3d8b-390a788f61c9@kernel.dk>
+ <7c93b85f-6a02-bdcf-5e92-a9533500df20@kernel.dk>
+ <fc26ef08-2e2a-3b2d-2190-8419307b243e@applied-asynchrony.com>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <d5c15cb9-cef9-3d05-8895-b826fa1c7f01@oracle.com>
+Date: Wed, 23 May 2018 09:59:15 +0800
+MIME-Version: 1.0
+In-Reply-To: <fc26ef08-2e2a-3b2d-2190-8419307b243e@applied-asynchrony.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens
+Hi Jens and Holger
 
-This is the second version patchset to make the kyber io scheduler more firendly
-with merging.
+Thank for your kindly response.
+That's really appreciated.
 
-Most of time, kyber io scheduler will not leave any requests in ctx rq_list,
-this is because even if tokens of one domain is used up, kyber will try to
-dispatch requests from other domain and flush the rq_list there. So there is not
-any change to do merge.
-
-To improve this, setup kyber_ctx_queue (kcq) which is similar with blk_mq_ctx but has
-rq_list for every domain, and build mapping between kcq and khd as ctx and hctx.
-Then we could merge, insert and dispatch on rq_list of different domains separately.
-At the same time, only flush the rq_list of kcq after get domain token
-successfully, then the requests could be left in the rq_list of that domain and 
-maybe merged with following io. In my local test on NVMe card, the sequential io
-performance could be improved a lot, especially on high workload. More details
-please refer to the second patch.
-
-Changes V1 to V2:
- - Add patch from Jens which abstract out the blk-mq-sched rq list iteration bio
- merge helper interface and rebase the patch based on it.
- - merge bio_sched_domain and rq_sched_domain to avoid the duplicated code.
- - allocate kcqs per khd
-
-Jens Axboe (1)
-0001-blk-mq-abstract-out-blk-mq-sched-rq-list-iteration-b.patch
-
-Jianchao Wang (1)
-0002-block-kyber-make-kyber-more-friendly-with-merging.patch
-
- block/blk-mq-sched.c   |  34 ++++++---
- block/kyber-iosched.c  | 197 ++++++++++++++++++++++++++++++++++++++++---------
- include/linux/blk-mq.h |   3 +-
- 3 files changed, 188 insertions(+), 46 deletions(-)
-
+I will post next version based on Jens' patch.
 
 Thanks
 Jianchao
+
+On 05/23/2018 02:32 AM, Holger Hoffstätte wrote:
+>>>> This looks great but prevents kyber from being built as module,
+>>>> which is AFAIK supposed to work (and works now):
+>>>>
+>>>> ..
+>>>>   CC [M]  block/kyber-iosched.o
+>>>>   Building modules, stage 2.
+>>>>   MODPOST 313 modules
+>>>> ERROR: "bio_attempt_back_merge" [block/kyber-iosched.ko] undefined!
+>>>> ERROR: "bio_attempt_front_merge" [block/kyber-iosched.ko] undefined!
+>>>> ERROR: "bio_attempt_discard_merge" [block/kyber-iosched.ko] undefined!
+>>>> ERROR: "blk_try_merge" [block/kyber-iosched.ko] undefined!
+>>>> ERROR: "blk_rq_merge_ok" [block/kyber-iosched.ko] undefined!
+>>>> ..
+>>>>
+>>>> It does build fine when compiled in, obviously. :)
+>>> It's basically duplicating the contents of blk_attempt_plug_merge().
+>>> I would suggest abstracting out the list loop and merge check
+>>> into a helper, that could then both be called from kyber and the
+>>> plug merge function.
+>> See attached, prep patch and yours rebased on top of it.
+> That was quick. :)
+> 
+> Applies smoothly on top of my 4.16++ tree, now builds correctly as
+> module and is reproducibly (slightly) faster even on my pedestrian
+> SATA SSDs, now on par or occasionally even faster than mq-deadline.
+> What's not to like? So:
+> 
+> Tested-by: Holger Hoffstätte <holger@applied-asynchrony.com>
