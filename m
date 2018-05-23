@@ -1,29 +1,49 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Wed, 23 May 2018 14:48:36 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>, Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>, Lee Duncan <lduncan@suse.com>,
+Return-Path: <BATV+df5a2477ff0fa86e9985+5386+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Tejun Heo <tj@kernel.org>,
+	Lee Duncan <lduncan@suse.com>,
 	Chris Leech <cleech@redhat.com>,
 	Rafael David Tinoco <rafael.tinoco@canonical.com>,
-	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: Re: [PATCH 07/14] scsi_transport_fc: complete requests from ->timeout
-Message-ID: <20180523124836.dxks4lkodks5lkjt@linux-x5ow.site>
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Subject: [PATCH 07/14] scsi_transport_fc: complete requests from ->timeout
+Date: Wed, 23 May 2018 14:19:34 +0200
+Message-Id: <20180523121941.8632-8-hch@lst.de>
+In-Reply-To: <20180523121941.8632-1-hch@lst.de>
 References: <20180523121941.8632-1-hch@lst.de>
- <20180523121941.8632-8-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20180523121941.8632-8-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+By completing the request entirely in the driver we can remove the
+BLK_EH_HANDLED return value and thus the split responsibility between the
+driver and the block layer that has been causing trouble.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/scsi/scsi_transport_fc.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
+index 90075a0ddcfe..7a9a65588a1b 100644
+--- a/drivers/scsi/scsi_transport_fc.c
++++ b/drivers/scsi/scsi_transport_fc.c
+@@ -3591,10 +3591,9 @@ fc_bsg_job_timeout(struct request *req)
+ 	}
+ 
+ 	/* the blk_end_sync_io() doesn't check the error */
+-	if (!inflight)
+-		return BLK_EH_DONE;
+-	else
+-		return BLK_EH_HANDLED;
++	if (inflight)
++		blk_mq_complete_request(req);
++	return BLK_EH_DONE;
+ }
+ 
+ /**
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.17.0
