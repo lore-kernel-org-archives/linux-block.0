@@ -1,127 +1,116 @@
-Return-Path: <BATV+1f4557cc97fec8e307c5+5393+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-nvme@lists.infradead.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 07/12] nvmet: Add AEN configuration support
-Date: Wed, 30 May 2018 18:45:55 +0200
-Message-Id: <20180530164600.26856-8-hch@lst.de>
-In-Reply-To: <20180530164600.26856-1-hch@lst.de>
-References: <20180530164600.26856-1-hch@lst.de>
+Return-Path: <tom.leiming@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20180523174012.GB12533@vader>
+References: <20180519074406.6045-1-ming.lei@redhat.com> <20180523174012.GB12533@vader>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Thu, 24 May 2018 10:20:01 +0800
+Message-ID: <CACVXFVO-oD8gxczF93X_4ABOEeumE5e5KGoh+CFX-J3qgf0Auw@mail.gmail.com>
+Subject: Re: [PATCH V2] blk-mq: avoid to starve tag allocation after
+ allocation process migrates
+To: Omar Sandoval <osandov@osandov.com>
+Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block <linux-block@vger.kernel.org>, stable <stable@vger.kernel.org>,
+	Omar Sandoval <osandov@fb.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-AEN configuration via the 'Get Features' and 'Set Features' admin
-command is mandatory, so we should be implemeting handling for it.
+On Thu, May 24, 2018 at 1:40 AM, Omar Sandoval <osandov@osandov.com> wrote:
+> On Sat, May 19, 2018 at 03:44:06PM +0800, Ming Lei wrote:
+>> When the allocation process is scheduled back and the mapped hw queue is
+>> changed, do one extra wake up on orignal queue for compensating wake up
+>> miss, so other allocations on the orignal queue won't be starved.
+>>
+>> This patch fixes one request allocation hang issue, which can be
+>> triggered easily in case of very low nr_request.
+>>
+>> Cc: <stable@vger.kernel.org>
+>> Cc: Omar Sandoval <osandov@fb.com>
+>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>> ---
+>>
+>> V2:
+>>       fix build failure
+>>
+>>  block/blk-mq-tag.c      | 13 +++++++++++++
+>>  include/linux/sbitmap.h |  7 +++++++
+>>  lib/sbitmap.c           |  6 ++++++
+>>  3 files changed, 26 insertions(+)
+>>
+>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+>> index 336dde07b230..77607f89d205 100644
+>> --- a/block/blk-mq-tag.c
+>> +++ b/block/blk-mq-tag.c
+>> @@ -134,6 +134,8 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+>>       ws = bt_wait_ptr(bt, data->hctx);
+>>       drop_ctx = data->ctx == NULL;
+>>       do {
+>> +             struct sbitmap_queue *bt_orig;
+>> +
+>>               /*
+>>                * We're out of tags on this hardware queue, kick any
+>>                * pending IO submits before going to sleep waiting for
+>> @@ -159,6 +161,7 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+>>               if (data->ctx)
+>>                       blk_mq_put_ctx(data->ctx);
+>>
+>> +             bt_orig = bt;
+>>               io_schedule();
+>>
+>>               data->ctx = blk_mq_get_ctx(data->q);
+>> @@ -170,6 +173,16 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+>>                       bt = &tags->bitmap_tags;
+>>
+>>               finish_wait(&ws->wait, &wait);
+>> +
+>> +             /*
+>> +              * If destination hw queue is changed, wake up original
+>> +              * queue one extra time for compensating the wake up
+>> +              * miss, so other allocations on original queue won't
+>> +              * be starved.
+>> +              */
+>> +             if (bt != bt_orig)
+>> +                     sbitmap_queue_wake_up(bt_orig);
+>> +
+>>               ws = bt_wait_ptr(bt, data->hctx);
+>>       } while (1);
+>>
+>> diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+>> index 841585f6e5f2..b23f50355281 100644
+>> --- a/include/linux/sbitmap.h
+>> +++ b/include/linux/sbitmap.h
+>> @@ -484,6 +484,13 @@ static inline struct sbq_wait_state *sbq_wait_ptr(struct sbitmap_queue *sbq,
+>>  void sbitmap_queue_wake_all(struct sbitmap_queue *sbq);
+>>
+>>  /**
+>> + * sbitmap_wake_up() - Do a regular wake up compensation if the queue
+>> + * allocated from is changed after scheduling back.
+>> + * @sbq: Bitmap queue to wake up.
+>> + */
+>> +void sbitmap_queue_wake_up(struct sbitmap_queue *sbq);
+>> +
+>> +/**
+>>   * sbitmap_queue_show() - Dump &struct sbitmap_queue information to a &struct
+>>   * seq_file.
+>>   * @sbq: Bitmap queue to show.
+>> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+>> index e6a9c06ec70c..c6ae4206bcb1 100644
+>> --- a/lib/sbitmap.c
+>> +++ b/lib/sbitmap.c
+>> @@ -466,6 +466,12 @@ static void sbq_wake_up(struct sbitmap_queue *sbq)
+>>       }
+>>  }
+>>
+>> +void sbitmap_queue_wake_up(struct sbitmap_queue *sbq)
+>> +{
+>> +     sbq_wake_up(sbq);
+>> +}
+>> +EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up);
+>
+> There's no reason to wrap an internal helper with a function taking the
+> same arguments, just rename sbq_wake_up() and export it.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-[hch: use WRITE_ONCE, check for invalid values]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/target/admin-cmd.c | 15 +++++++++++++--
- drivers/nvme/target/core.c      |  3 +++
- drivers/nvme/target/nvmet.h     | 16 ++++++++++++++++
- 3 files changed, 32 insertions(+), 2 deletions(-)
+This way may keep sbq_wake_up() inlined to sbitmap_queue_clear(), so
+we won't introduce any cost to fast path.
 
-diff --git a/drivers/nvme/target/admin-cmd.c b/drivers/nvme/target/admin-cmd.c
-index 453d76db1647..4e269a8c8dbe 100644
---- a/drivers/nvme/target/admin-cmd.c
-+++ b/drivers/nvme/target/admin-cmd.c
-@@ -189,7 +189,7 @@ static void nvmet_execute_identify_ctrl(struct nvmet_req *req)
- 	id->ver = cpu_to_le32(ctrl->subsys->ver);
- 
- 	/* XXX: figure out what to do about RTD3R/RTD3 */
--	id->oaes = cpu_to_le32(1 << 8);
-+	id->oaes = cpu_to_le32(NVMET_AEN_CFG_OPTIONAL);
- 	id->ctratt = cpu_to_le32(1 << 0);
- 
- 	id->oacs = 0;
-@@ -441,6 +441,16 @@ static void nvmet_execute_set_features(struct nvmet_req *req)
- 		req->sq->ctrl->kato = DIV_ROUND_UP(val32, 1000);
- 		nvmet_set_result(req, req->sq->ctrl->kato);
- 		break;
-+	case NVME_FEAT_ASYNC_EVENT:
-+		val32 = le32_to_cpu(req->cmd->common.cdw10[1]);
-+		if (val32 & ~NVMET_AEN_CFG_ALL) {
-+			status = NVME_SC_INVALID_FIELD | NVME_SC_DNR;
-+			break;
-+		}
-+
-+		WRITE_ONCE(req->sq->ctrl->aen_enabled, val32);
-+		nvmet_set_result(req, val32);
-+		break;
- 	case NVME_FEAT_HOST_ID:
- 		status = NVME_SC_CMD_SEQ_ERROR | NVME_SC_DNR;
- 		break;
-@@ -479,9 +489,10 @@ static void nvmet_execute_get_features(struct nvmet_req *req)
- 		break;
- 	case NVME_FEAT_WRITE_ATOMIC:
- 		break;
-+#endif
- 	case NVME_FEAT_ASYNC_EVENT:
-+		nvmet_set_result(req, READ_ONCE(req->sq->ctrl->aen_enabled));
- 		break;
--#endif
- 	case NVME_FEAT_VOLATILE_WC:
- 		nvmet_set_result(req, 1);
- 		break;
-diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
-index 99fcff757608..b2da65aec8b7 100644
---- a/drivers/nvme/target/core.c
-+++ b/drivers/nvme/target/core.c
-@@ -168,6 +168,8 @@ static void nvmet_ns_changed(struct nvmet_subsys *subsys, u32 nsid)
- 
- 	list_for_each_entry(ctrl, &subsys->ctrls, subsys_entry) {
- 		nvmet_add_to_changed_ns_log(ctrl, cpu_to_le32(nsid));
-+		if (!(READ_ONCE(ctrl->aen_enabled) & NVME_AEN_CFG_NS_ATTR))
-+			continue;
- 		nvmet_add_async_event(ctrl, NVME_AER_TYPE_NOTICE,
- 				NVME_AER_NOTICE_NS_CHANGED,
- 				NVME_LOG_CHANGED_NS);
-@@ -855,6 +857,7 @@ u16 nvmet_alloc_ctrl(const char *subsysnqn, const char *hostnqn,
- 
- 	kref_init(&ctrl->ref);
- 	ctrl->subsys = subsys;
-+	WRITE_ONCE(ctrl->aen_enabled, NVMET_AEN_CFG_OPTIONAL);
- 
- 	ctrl->changed_ns_list = kmalloc_array(NVME_MAX_CHANGED_NAMESPACES,
- 			sizeof(__le32), GFP_KERNEL);
-diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
-index 8cdc1e550396..f4d16d9b3582 100644
---- a/drivers/nvme/target/nvmet.h
-+++ b/drivers/nvme/target/nvmet.h
-@@ -30,6 +30,21 @@
- #define NVMET_ASYNC_EVENTS		4
- #define NVMET_ERROR_LOG_SLOTS		128
- 
-+
-+/*
-+ * Supported optional AENs:
-+ */
-+#define NVMET_AEN_CFG_OPTIONAL \
-+	NVME_AEN_CFG_NS_ATTR
-+
-+/*
-+ * Plus mandatory SMART AENs (we'll never send them, but allow enabling them):
-+ */
-+#define NVMET_AEN_CFG_ALL \
-+	(NVME_SMART_CRIT_SPARE | NVME_SMART_CRIT_TEMPERATURE | \
-+	 NVME_SMART_CRIT_RELIABILITY | NVME_SMART_CRIT_MEDIA | \
-+	 NVME_SMART_CRIT_VOLATILE_MEMORY | NVMET_AEN_CFG_OPTIONAL)
-+
- /* Helper Macros when NVMe error is NVME_SC_CONNECT_INVALID_PARAM
-  * The 16 bit shift is to set IATTR bit to 1, which means offending
-  * offset starts in the data section of connect()
-@@ -123,6 +138,7 @@ struct nvmet_ctrl {
- 	u16			cntlid;
- 	u32			kato;
- 
-+	u32			aen_enabled;
- 	struct nvmet_req	*async_event_cmds[NVMET_ASYNC_EVENTS];
- 	unsigned int		nr_async_event_cmds;
- 	struct list_head	async_events;
--- 
-2.17.0
+Thanks,
+Ming Lei
