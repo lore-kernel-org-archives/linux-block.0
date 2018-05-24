@@ -1,101 +1,74 @@
-Return-Path: <keescook@chromium.org>
-Return-Path: <keescook@chromium.org>
-From: Kees Cook <keescook@chromium.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Kees Cook <keescook@chromium.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Tejun Heo <tj@kernel.org>,
-	Borislav Petkov <bp@alien8.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
-	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
-	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
-	linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 5/6] libata-scsi: Move sense buffers onto stack
-Date: Tue, 22 May 2018 11:15:11 -0700
-Message-Id: <20180522181512.39316-6-keescook@chromium.org>
-In-Reply-To: <20180522181512.39316-1-keescook@chromium.org>
-References: <20180522181512.39316-1-keescook@chromium.org>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block drivers/block: Use octal not symbolic permissions
+To: Joe Perches <joe@perches.com>, "Ed L. Cashin" <ed.cashin@acm.org>,
+ Philipp Reisner <philipp.reisner@linbit.com>,
+ Lars Ellenberg <lars.ellenberg@linbit.com>, Jiri Kosina <jikos@kernel.org>,
+ Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org,
+ Ilya Dryomov <idryomov@gmail.com>, Sage Weil <sage@redhat.com>,
+ Alex Elder <elder@kernel.org>, Philip Kelleher <pjk1939@linux.vnet.ibm.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+ =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>, Juergen Gross <jgross@suse.com>
+Cc: linux-kernel@vger.kernel.org, drbd-dev@lists.linbit.com,
+ nbd@other.debian.org, ceph-devel@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, xen-devel@lists.xenproject.org
+References: <5e97a292c1ba38a6b5a0caa271d85dc3de1b2aa7.1527105857.git.joe@perches.com>
+ <6bf44255-145f-bf14-e254-860731ff9296@kernel.dk>
+ <56ee8810463b6c537ca0c10c9f82e6d922acd1f1.camel@perches.com>
+ <539cc400-28d7-66df-eb24-77fe95d617a2@kernel.dk>
+ <e64c2846b1b9102a52eba7b242f746e7bfff1464.camel@perches.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <501407b0-ae9b-7943-0789-fb1c9959f7fe@kernel.dk>
+Date: Thu, 24 May 2018 13:40:04 -0600
+MIME-Version: 1.0
+In-Reply-To: <e64c2846b1b9102a52eba7b242f746e7bfff1464.camel@perches.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Instead of dynamically allocating the sense buffers, put them on the
-stack so that future compile-time sizeof() checks will be able to see
-their buffer length.
+On 5/24/18 7:01 AM, Joe Perches wrote:
+> On Thu, 2018-05-24 at 06:47 -0600, Jens Axboe wrote:
+>> On 5/23/18 4:35 PM, Joe Perches wrote:
+>>> On Wed, 2018-05-23 at 15:27 -0600, Jens Axboe wrote:
+>>>> On 5/23/18 2:05 PM, Joe Perches wrote:
+>>>>> Convert the S_<FOO> symbolic permissions to their octal equivalents as
+>>>>> using octal and not symbolic permissions is preferred by many as more
+>>>>> readable.
+>>>>>
+>>>>> see: https://lkml.org/lkml/2016/8/2/1945
+>>>>>
+>>>>> Done with automated conversion via:
+>>>>> $ ./scripts/checkpatch.pl -f --types=SYMBOLIC_PERMS --fix-inplace <files...>
+>>>>>
+>>>>> Miscellanea:
+>>>>>
+>>>>> o Wrapped modified multi-line calls to a single line where appropriate
+>>>>> o Realign modified multi-line calls to open parenthesis
+>>>>
+>>>> Honestly, I see this as pretty needless churn.
+>>>
+>>> btw:
+>>>
+>>> There is currently a mixture of symbolic and octal
+>>> permissions uses in block and drivers/block
+>>>
+>>> ie: 94 octal and 146 symbolic uses.
+>>>
+>>> If this is applied, all would become octal.
+>>
+>> That does help justify the change. My main worry here is creating
+>> unnecessary conflicts, which is always annoying. But it's even more
+>> annoying when the change creating the conflict isn't really that
+>> important at all. Case in point, the patch doesn't apply to the
+>> for-4.18/block branch that it should go into...
+> 
+> Done against most recent -next as it's basically impossible
+> to do anything against multiple private trees.
+> 
+> Also, the script that generated the patch is in the changelog
+> so it's simple to rerun.
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- drivers/ata/libata-scsi.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+Alright, applied, thanks.
 
-diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
-index 89a9d4a2efc8..3a43d3a1ce2d 100644
---- a/drivers/ata/libata-scsi.c
-+++ b/drivers/ata/libata-scsi.c
-@@ -597,8 +597,9 @@ static int ata_get_identity(struct ata_port *ap, struct scsi_device *sdev,
- int ata_cmd_ioctl(struct scsi_device *scsidev, void __user *arg)
- {
- 	int rc = 0;
-+	u8 sensebuf[SCSI_SENSE_BUFFERSIZE];
- 	u8 scsi_cmd[MAX_COMMAND_SIZE];
--	u8 args[4], *argbuf = NULL, *sensebuf = NULL;
-+	u8 args[4], *argbuf = NULL;
- 	int argsize = 0;
- 	enum dma_data_direction data_dir;
- 	struct scsi_sense_hdr sshdr;
-@@ -610,10 +611,7 @@ int ata_cmd_ioctl(struct scsi_device *scsidev, void __user *arg)
- 	if (copy_from_user(args, arg, sizeof(args)))
- 		return -EFAULT;
- 
--	sensebuf = kzalloc(SCSI_SENSE_BUFFERSIZE, GFP_NOIO);
--	if (!sensebuf)
--		return -ENOMEM;
--
-+	memset(sensebuf, 0, sizeof(sensebuf));
- 	memset(scsi_cmd, 0, sizeof(scsi_cmd));
- 
- 	if (args[3]) {
-@@ -685,7 +683,6 @@ int ata_cmd_ioctl(struct scsi_device *scsidev, void __user *arg)
- 	 && copy_to_user(arg + sizeof(args), argbuf, argsize))
- 		rc = -EFAULT;
- error:
--	kfree(sensebuf);
- 	kfree(argbuf);
- 	return rc;
- }
-@@ -704,8 +701,9 @@ int ata_cmd_ioctl(struct scsi_device *scsidev, void __user *arg)
- int ata_task_ioctl(struct scsi_device *scsidev, void __user *arg)
- {
- 	int rc = 0;
-+	u8 sensebuf[SCSI_SENSE_BUFFERSIZE];
- 	u8 scsi_cmd[MAX_COMMAND_SIZE];
--	u8 args[7], *sensebuf = NULL;
-+	u8 args[7];
- 	struct scsi_sense_hdr sshdr;
- 	int cmd_result;
- 
-@@ -715,10 +713,7 @@ int ata_task_ioctl(struct scsi_device *scsidev, void __user *arg)
- 	if (copy_from_user(args, arg, sizeof(args)))
- 		return -EFAULT;
- 
--	sensebuf = kzalloc(SCSI_SENSE_BUFFERSIZE, GFP_NOIO);
--	if (!sensebuf)
--		return -ENOMEM;
--
-+	memset(sensebuf, 0, sizeof(sensebuf));
- 	memset(scsi_cmd, 0, sizeof(scsi_cmd));
- 	scsi_cmd[0]  = ATA_16;
- 	scsi_cmd[1]  = (3 << 1); /* Non-data */
-@@ -769,7 +764,6 @@ int ata_task_ioctl(struct scsi_device *scsidev, void __user *arg)
- 	}
- 
-  error:
--	kfree(sensebuf);
- 	return rc;
- }
- 
 -- 
-2.17.0
+Jens Axboe
