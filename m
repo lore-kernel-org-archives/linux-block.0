@@ -1,92 +1,137 @@
 Return-Path: <ming.lei@redhat.com>
 From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V4 6/7] nvme: pci: prepare for supporting error recovery from resetting context
-Date: Sat,  5 May 2018 21:59:04 +0800
-Message-Id: <20180505135905.18815-7-ming.lei@redhat.com>
-In-Reply-To: <20180505135905.18815-1-ming.lei@redhat.com>
-References: <20180505135905.18815-1-ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 18/33] block: deal with dirtying pages for multipage bvec
+Date: Thu, 24 May 2018 17:01:23 +0800
+Message-Id: <20180524090139.2150-19-ming.lei@redhat.com>
+In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
+References: <20180524090139.2150-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Either the admin or normal IO in reset context may be timed out because
-controller error happens. When this timeout happens, we may have to
-start controller recovery again.
+In bio_check_pages_dirty(), bvec->bv_page is used as flag for marking
+if the page has been dirtied & released, and if no, it will be dirtied
+in deferred workqueue.
 
-This patch holds the introduced reset lock when running reset, so that
-we may support nested reset in the following patches.
+With multipage bvec, we can't do that any more, so change the logic into
+checking all pages in one mp bvec, and only release all these pages if all
+are dirtied, otherwise dirty them all in deferred wrokqueue.
 
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
+This patch introduces segment_for_each_page_all() to deal with the case
+a bit easier.
+
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/nvme/host/pci.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+ block/bio.c          | 45 +++++++++++++++++++++++++++++++++++++--------
+ include/linux/bvec.h |  7 +++++++
+ 2 files changed, 44 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 1fafe5d01355..2fbe24274ad0 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2365,14 +2365,14 @@ static void nvme_remove_dead_ctrl(struct nvme_dev *dev, int status)
- 		nvme_put_ctrl(&dev->ctrl);
- }
- 
--static void nvme_reset_work(struct work_struct *work)
-+static void nvme_reset_dev(struct nvme_dev *dev)
+diff --git a/block/bio.c b/block/bio.c
+index 63d4fe85f42e..a200c42e55dc 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1630,8 +1630,9 @@ void bio_set_pages_dirty(struct bio *bio)
  {
--	struct nvme_dev *dev =
--		container_of(work, struct nvme_dev, ctrl.reset_work);
- 	bool was_suspend = !!(dev->ctrl.ctrl_config & NVME_CC_SHN_NORMAL);
- 	int result = -ENODEV;
- 	enum nvme_ctrl_state new_state = NVME_CTRL_LIVE;
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_iter_all bia;
  
-+	mutex_lock(&dev->ctrl.reset_lock);
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ 
+ 		if (page && !PageCompound(page))
+@@ -1640,16 +1641,26 @@ void bio_set_pages_dirty(struct bio *bio)
+ }
+ EXPORT_SYMBOL_GPL(bio_set_pages_dirty);
+ 
++static inline void release_mp_bvec_pages(struct bio_vec *bvec)
++{
++	struct bio_vec bv;
++	struct bvec_iter iter;
 +
- 	if (WARN_ON(dev->ctrl.state != NVME_CTRL_RESETTING))
- 		goto out;
- 
-@@ -2448,7 +2448,11 @@ static void nvme_reset_work(struct work_struct *work)
- 		new_state = NVME_CTRL_ADMIN_ONLY;
- 	} else {
- 		nvme_start_queues(&dev->ctrl);
-+		mutex_unlock(&dev->ctrl.reset_lock);
-+
- 		nvme_wait_freeze(&dev->ctrl);
-+
-+		mutex_lock(&dev->ctrl.reset_lock);
- 		/* hit this only when allocate tagset fails */
- 		if (nvme_dev_add(dev))
- 			new_state = NVME_CTRL_ADMIN_ONLY;
-@@ -2466,10 +2470,20 @@ static void nvme_reset_work(struct work_struct *work)
- 	}
- 
- 	nvme_start_ctrl(&dev->ctrl);
-+	mutex_unlock(&dev->ctrl.reset_lock);
- 	return;
- 
-  out:
- 	nvme_remove_dead_ctrl(dev, result);
-+	mutex_unlock(&dev->ctrl.reset_lock);
++	segment_for_each_page_all(bv, bvec, iter)
++		put_page(bv.bv_page);
 +}
 +
-+static void nvme_reset_work(struct work_struct *work)
-+{
-+	struct nvme_dev *dev =
-+		container_of(work, struct nvme_dev, ctrl.reset_work);
-+
-+	nvme_reset_dev(dev);
+ static void bio_release_pages(struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+ 	int i;
+ 
+-	bio_for_each_page_all(bvec, bio, i) {
++	/* iterate each mp bvec */
++	bio_for_each_segment_all(bvec, bio, i) {
+ 		struct page *page = bvec->bv_page;
+ 
+ 		if (page)
+-			put_page(page);
++			release_mp_bvec_pages(bvec);
+ 	}
  }
  
- static void nvme_remove_dead_ctrl_work(struct work_struct *work)
+@@ -1693,20 +1704,38 @@ static void bio_dirty_fn(struct work_struct *work)
+ 	}
+ }
+ 
++static inline void check_mp_bvec_pages(struct bio_vec *bvec,
++		int *nr_dirty, int *nr_pages)
++{
++	struct bio_vec bv;
++	struct bvec_iter iter;
++
++	segment_for_each_page_all(bv, bvec, iter) {
++		struct page *page = bv.bv_page;
++
++		if (PageDirty(page) || PageCompound(page))
++			(*nr_dirty)++;
++		(*nr_pages)++;
++	}
++}
++
+ void bio_check_pages_dirty(struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+ 	int nr_clean_pages = 0;
+ 	int i;
+ 
+-	bio_for_each_page_all(bvec, bio, i) {
+-		struct page *page = bvec->bv_page;
++	bio_for_each_segment_all(bvec, bio, i) {
++		int nr_dirty = 0, nr_pages = 0;
++
++		check_mp_bvec_pages(bvec, &nr_dirty, &nr_pages);
+ 
+-		if (PageDirty(page) || PageCompound(page)) {
+-			put_page(page);
++		/* release all pages in the mp bvec if all are dirtied */
++		if (nr_dirty == nr_pages) {
++			release_mp_bvec_pages(bvec);
+ 			bvec->bv_page = NULL;
+ 		} else {
+-			nr_clean_pages++;
++			nr_clean_pages += nr_pages;
+ 		}
+ 	}
+ 
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 2deee87b823e..893e8fef0dd0 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -225,6 +225,13 @@ static inline bool bvec_iter_seg_advance(const struct bio_vec *bv,
+ 	.bi_bvec_done	= 0,						\
+ }
+ 
++#define segment_for_each_page_all(pg_bvl, seg_bvec, iter)		\
++	for (iter = BVEC_ITER_ALL_INIT,					\
++	     (iter).bi_size = (seg_bvec)->bv_len  - (iter).bi_bvec_done;\
++	     (iter).bi_size &&						\
++		((pg_bvl = bvec_iter_bvec((seg_bvec), (iter))), 1);	\
++	     bvec_iter_advance((seg_bvec), &(iter), (pg_bvl).bv_len))
++
+ /* get the last page from the multipage bvec and store it in @pg */
+ static inline void segment_last_page(const struct bio_vec *seg,
+ 		struct bio_vec *pg)
 -- 
 2.9.5
