@@ -1,25 +1,66 @@
-Return-Path: <dsterba@suse.cz>
-Date: Thu, 24 May 2018 23:44:41 +0200
-From: David Sterba <dsterba@suse.cz>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH V5 10/33] btrfs: use segment_last_page to get bio's last
- page
-Message-ID: <20180524214441.GL6649@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	linux-btrfs@vger.kernel.org
+Subject: [PATCH V5 10/33] btrfs: use segment_last_page to get bio's last page
+Date: Thu, 24 May 2018 17:01:15 +0800
+Message-Id: <20180524090139.2150-11-ming.lei@redhat.com>
+In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
 References: <20180524090139.2150-1-ming.lei@redhat.com>
- <20180524090139.2150-11-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180524090139.2150-11-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, May 24, 2018 at 05:01:15PM +0800, Ming Lei wrote:
-> Preparing for supporting multipage bvec.
+Preparing for supporting multipage bvec.
 
-Could you please also CC the cover letter so we have a chance to learn
-what multipage bvec means or what are the changes between the
-iterations? I found it in the archives, but a copy to mailinglist would
-be good too. Thanks.
+Cc: Chris Mason <clm@fb.com>
+Cc: Josef Bacik <jbacik@fb.com>
+Cc: David Sterba <dsterba@suse.com>
+Cc: linux-btrfs@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ fs/btrfs/compression.c | 5 ++++-
+ fs/btrfs/extent_io.c   | 5 +++--
+ 2 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+index 4ea718bdfb41..be6b09dfd6a7 100644
+--- a/fs/btrfs/compression.c
++++ b/fs/btrfs/compression.c
+@@ -407,8 +407,11 @@ blk_status_t btrfs_submit_compressed_write(struct inode *inode, u64 start,
+ static u64 bio_end_offset(struct bio *bio)
+ {
+ 	struct bio_vec *last = bio_last_bvec_all(bio);
++	struct bio_vec bv;
+ 
+-	return page_offset(last->bv_page) + last->bv_len + last->bv_offset;
++	segment_last_page(last, &bv);
++
++	return page_offset(bv.bv_page) + bv.bv_len + bv.bv_offset;
+ }
+ 
+ static noinline int add_ra_bio_pages(struct inode *inode,
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index 4f314d87ce4d..3c9c91a1e3e9 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -2731,11 +2731,12 @@ static int __must_check submit_one_bio(struct bio *bio, int mirror_num,
+ {
+ 	blk_status_t ret = 0;
+ 	struct bio_vec *bvec = bio_last_bvec_all(bio);
+-	struct page *page = bvec->bv_page;
++	struct bio_vec bv;
+ 	struct extent_io_tree *tree = bio->bi_private;
+ 	u64 start;
+ 
+-	start = page_offset(page) + bvec->bv_offset;
++	segment_last_page(bvec, &bv);
++	start = page_offset(bv.bv_page) + bv.bv_offset;
+ 
+ 	bio->bi_private = NULL;
+ 
+-- 
+2.9.5
