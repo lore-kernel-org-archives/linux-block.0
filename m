@@ -1,85 +1,38 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	James Smart <james.smart@broadcom.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V5 0/9] nvme: pci: fix & improve timeout handling
-Date: Fri, 11 May 2018 20:29:24 +0800
-Message-Id: <20180511122933.27155-1-ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Two block related fixes for 4.17-rc
+Message-ID: <f4735ff5-4ead-c9ce-d7eb-b2ad9df979d9@kernel.dk>
+Date: Thu, 24 May 2018 06:59:11 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+Hi Linus,
 
-The 1st patch introduces blk_quiesce_timeout() and blk_unquiesce_timeout()
-for NVMe, meantime fixes blk_sync_queue().
+Two fixes that should go into this release:
 
-The 2nd patch covers timeout for admin commands for recovering controller
-for avoiding possible deadlock.
+- A loop writeback error clearing fix from Jeff.
 
-The 3rd and 4th patches avoid to wait_freeze on queues which aren't frozen.
+- The sr sense fix from myself.
 
-The last 5 patches fixes several races wrt. NVMe timeout handler, and
-finally can make blktests block/011 passed. Meantime the NVMe PCI timeout
-mecanism become much more rebost than before.
+Please pull!
 
-gitweb:
-	https://github.com/ming1/linux/commits/v4.17-rc-nvme-timeout.V5
 
-V5:
-	- avoid to remove controller in case of reset failure in inner EHs
-	- make sure that nvme_unfreeze and nvme_start_freeze are paired
+  git://git.kernel.dk/linux-block.git tags/for-linus-20180524
 
-V4:
-	- fixe nvme_init_set_host_mem_cmd()
-	- use nested EH model, and run both nvme_dev_disable() and
-	resetting in one same context
 
-V3:
-	- fix one new race related freezing in patch 4, nvme_reset_work()
-	may hang forever without this patch
-	- rewrite the last 3 patches, and avoid to break nvme_reset_ctrl*()
+----------------------------------------------------------------
+Jeff Layton (1):
+      loop: clear wb_err in bd_inode when detaching backing file
 
-V2:
-	- fix draining timeout work, so no need to change return value from
-	.timeout()
-	- fix race between nvme_start_freeze() and nvme_unfreeze()
-	- cover timeout for admin commands running in EH
+Jens Axboe (1):
+      sr: pass down correctly sized SCSI sense buffer
 
-Ming Lei (9):
-  block: introduce blk_quiesce_timeout() and blk_unquiesce_timeout()
-  nvme: pci: cover timeout for admin commands running in EH
-  nvme: pci: only wait freezing if queue is frozen
-  nvme: pci: freeze queue in nvme_dev_disable() in case of error
-    recovery
-  nvme: pci: prepare for supporting error recovery from resetting
-    context
-  nvme: pci: move error handling out of nvme_reset_dev()
-  nvme: pci: don't unfreeze queue until controller state updating
-    succeeds
-  nvme: core: introduce nvme_force_change_ctrl_state()
-  nvme: pci: support nested EH
+ drivers/block/loop.c    |  1 +
+ drivers/scsi/sr_ioctl.c | 10 ++++++++--
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
- block/blk-core.c         |  21 ++-
- block/blk-mq.c           |   9 ++
- block/blk-timeout.c      |   5 +-
- drivers/nvme/host/core.c |  57 +++++++
- drivers/nvme/host/nvme.h |   7 +
- drivers/nvme/host/pci.c  | 402 +++++++++++++++++++++++++++++++++++++++++------
- include/linux/blkdev.h   |  13 ++
- 7 files changed, 462 insertions(+), 52 deletions(-)
-
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
 -- 
-2.9.5
+Jens Axboe
