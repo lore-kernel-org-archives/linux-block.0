@@ -1,131 +1,54 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 05/34] fs: use ->is_partially_uptodate in page_cache_seek_hole_data
-Date: Fri, 18 May 2018 18:48:01 +0200
-Message-Id: <20180518164830.1552-6-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 14/33] block: loop: pass segments to iov_iter
+Date: Thu, 24 May 2018 17:01:19 +0800
+Message-Id: <20180524090139.2150-15-ming.lei@redhat.com>
+In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
+References: <20180524090139.2150-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This way the implementation doesn't depend on buffer_head internals.
+iov_iter is implemented with bvec itererator, so it is safe to pass
+segment to it, and this way is much more efficient than passing one
+page in each bvec.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/iomap.c | 83 +++++++++++++++++++++++++++---------------------------
- 1 file changed, 42 insertions(+), 41 deletions(-)
+ drivers/block/loop.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/fs/iomap.c b/fs/iomap.c
-index bef5e91d40bf..0fecd5789d7b 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -594,31 +594,54 @@ EXPORT_SYMBOL_GPL(iomap_fiemap);
-  *
-  * Returns the offset within the file on success, and -ENOENT otherwise.
-  */
--static loff_t
--page_seek_hole_data(struct page *page, loff_t lastoff, int whence)
-+static bool
-+page_seek_hole_data(struct inode *inode, struct page *page, loff_t *lastoff,
-+		int whence)
- {
--	loff_t offset = page_offset(page);
--	struct buffer_head *bh, *head;
-+	const struct address_space_operations *ops = inode->i_mapping->a_ops;
-+	unsigned int bsize = i_blocksize(inode), off;
- 	bool seek_data = whence == SEEK_DATA;
-+	loff_t poff = page_offset(page);
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 8d7d5581ca9c..e709c0380566 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -521,7 +521,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		struct bio_vec tmp;
  
--	if (lastoff < offset)
--		lastoff = offset;
--
--	bh = head = page_buffers(page);
--	do {
--		offset += bh->b_size;
--		if (lastoff >= offset)
--			continue;
-+	if (WARN_ON_ONCE(*lastoff >= poff + PAGE_SIZE))
-+		return false;
- 
-+	if (*lastoff < poff) {
- 		/*
--		 * Any buffer with valid data in it should have BH_Uptodate set.
-+		 * Last offset smaller than the start of the page means we found
-+		 * a hole:
+ 		__rq_for_each_bio(bio, rq)
+-			segments += bio_pages(bio);
++			segments += bio_segments(bio);
+ 		bvec = kmalloc(sizeof(struct bio_vec) * segments, GFP_NOIO);
+ 		if (!bvec)
+ 			return -EIO;
+@@ -533,7 +533,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		 * copy bio->bi_iov_vec to new bvec. The rq_for_each_page
+ 		 * API will take care of all details for us.
  		 */
--		if (buffer_uptodate(bh) == seek_data)
--			return lastoff;
-+		if (whence == SEEK_HOLE)
-+			return true;
-+		*lastoff = poff;
-+	}
- 
--		lastoff = offset;
--	} while ((bh = bh->b_this_page) != head);
--	return -ENOENT;
-+	/*
-+	 * Just check the page unless we can and should check block ranges:
-+	 */
-+	if (bsize == PAGE_SIZE || !ops->is_partially_uptodate) {
-+		if (PageUptodate(page) == seek_data)
-+			return true;
-+		return false;
-+	}
-+
-+	lock_page(page);
-+	if (unlikely(page->mapping != inode->i_mapping))
-+		goto out_unlock_not_found;
-+
-+	for (off = 0; off < PAGE_SIZE; off += bsize) {
-+		if ((*lastoff & ~PAGE_MASK) >= off + bsize)
-+			continue;
-+		if (ops->is_partially_uptodate(page, off, bsize) == seek_data) {
-+			unlock_page(page);
-+			return true;
-+		}
-+		*lastoff = poff + off + bsize;
-+	}
-+
-+out_unlock_not_found:
-+	unlock_page(page);
-+	return false;
- }
- 
- /*
-@@ -655,30 +678,8 @@ page_cache_seek_hole_data(struct inode *inode, loff_t offset, loff_t length,
- 		for (i = 0; i < nr_pages; i++) {
- 			struct page *page = pvec.pages[i];
- 
--			/*
--			 * At this point, the page may be truncated or
--			 * invalidated (changing page->mapping to NULL), or
--			 * even swizzled back from swapper_space to tmpfs file
--			 * mapping.  However, page->index will not change
--			 * because we have a reference on the page.
--                         *
--			 * If current page offset is beyond where we've ended,
--			 * we've found a hole.
--                         */
--			if (whence == SEEK_HOLE &&
--			    lastoff < page_offset(page))
-+			if (page_seek_hole_data(inode, page, &lastoff, whence))
- 				goto check_range;
--
--			lock_page(page);
--			if (likely(page->mapping == inode->i_mapping) &&
--			    page_has_buffers(page)) {
--				lastoff = page_seek_hole_data(page, lastoff, whence);
--				if (lastoff >= 0) {
--					unlock_page(page);
--					goto check_range;
--				}
--			}
--			unlock_page(page);
- 			lastoff = page_offset(page) + PAGE_SIZE;
+-		rq_for_each_page(tmp, rq, iter) {
++		rq_for_each_segment(tmp, rq, iter) {
+ 			*bvec = tmp;
+ 			bvec++;
  		}
- 		pagevec_release(&pvec);
+@@ -547,7 +547,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		 */
+ 		offset = bio->bi_iter.bi_bvec_done;
+ 		bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+-		segments = bio_pages(bio);
++		segments = bio_segments(bio);
+ 	}
+ 	atomic_set(&cmd->ref, 2);
+ 
 -- 
-2.17.0
+2.9.5
