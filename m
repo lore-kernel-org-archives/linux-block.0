@@ -1,42 +1,56 @@
-Return-Path: <BATV+a01a3e67072ae75c0352+5392+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>,
-	Lee Duncan <lduncan@suse.com>,
-	Chris Leech <cleech@redhat.com>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 13/14] block: document the blk_eh_timer_return values
-Date: Tue, 29 May 2018 15:52:38 +0200
-Message-Id: <20180529135239.27005-14-hch@lst.de>
-In-Reply-To: <20180529135239.27005-1-hch@lst.de>
-References: <20180529135239.27005-1-hch@lst.de>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 26/33] exofs: conver to bio_for_each_page_all2
+Date: Thu, 24 May 2018 17:01:31 +0800
+Message-Id: <20180524090139.2150-27-ming.lei@redhat.com>
+In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
+References: <20180524090139.2150-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- include/linux/blkdev.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+bio_for_each_page_all() can't be used any more after multipage bvec is
+enabled, so we have to convert to bio_for_each_page_all2().
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d838a89639f2..9f06b29adaa4 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -326,8 +326,8 @@ typedef int (init_rq_fn)(struct request_queue *, struct request *, gfp_t);
- typedef void (exit_rq_fn)(struct request_queue *, struct request *);
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ fs/exofs/ore.c      | 3 ++-
+ fs/exofs/ore_raid.c | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/fs/exofs/ore.c b/fs/exofs/ore.c
+index fe81fd6fe553..2a7e93f21695 100644
+--- a/fs/exofs/ore.c
++++ b/fs/exofs/ore.c
+@@ -406,8 +406,9 @@ static void _clear_bio(struct bio *bio)
+ {
+ 	struct bio_vec *bv;
+ 	unsigned i;
++	struct bvec_iter_all bia;
  
- enum blk_eh_timer_return {
--	BLK_EH_DONE,
--	BLK_EH_RESET_TIMER,
-+	BLK_EH_DONE,		/* drivers has completed the command */
-+	BLK_EH_RESET_TIMER,	/* reset timer and try again */
- };
+-	bio_for_each_page_all(bv, bio, i) {
++	bio_for_each_page_all2(bv, bio, i, bia) {
+ 		unsigned this_count = bv->bv_len;
  
- typedef enum blk_eh_timer_return (rq_timed_out_fn)(struct request *);
+ 		if (likely(PAGE_SIZE == this_count))
+diff --git a/fs/exofs/ore_raid.c b/fs/exofs/ore_raid.c
+index 2c3346cd1b29..bb0cc314a987 100644
+--- a/fs/exofs/ore_raid.c
++++ b/fs/exofs/ore_raid.c
+@@ -433,11 +433,12 @@ static void _mark_read4write_pages_uptodate(struct ore_io_state *ios, int ret)
+ 	/* loop on all devices all pages */
+ 	for (d = 0; d < ios->numdevs; d++) {
+ 		struct bio *bio = ios->per_dev[d].bio;
++		struct bvec_iter_all bia;
+ 
+ 		if (!bio)
+ 			continue;
+ 
+-		bio_for_each_page_all(bv, bio, i) {
++		bio_for_each_page_all2(bv, bio, i, bia) {
+ 			struct page *page = bv->bv_page;
+ 
+ 			SetPageUptodate(page);
 -- 
-2.17.0
+2.9.5
