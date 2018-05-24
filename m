@@ -1,195 +1,59 @@
 Return-Path: <ming.lei@redhat.com>
 From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	James Smart <james.smart@broadcom.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V6 06/11] nvme: pci: freeze queue in nvme_dev_disable() in case of error recovery
-Date: Wed, 16 May 2018 12:03:08 +0800
-Message-Id: <20180516040313.13596-7-ming.lei@redhat.com>
-In-Reply-To: <20180516040313.13596-1-ming.lei@redhat.com>
-References: <20180516040313.13596-1-ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 23/33] ext4: conver to bio_for_each_page_all2
+Date: Thu, 24 May 2018 17:01:28 +0800
+Message-Id: <20180524090139.2150-24-ming.lei@redhat.com>
+In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
+References: <20180524090139.2150-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-When nvme_dev_disable() is used for error recovery, we should always
-freeze queues before shutdown controller:
+bio_for_each_page_all() can't be used any more after multipage bvec is
+enabled, so we have to convert to bio_for_each_page_all2().
 
-- reset handler supposes queues are frozen, and will wait_freeze &
-unfreeze them explicitly, if queues aren't frozen during nvme_dev_disable(),
-reset handler may wait forever even though there isn't any requests
-allocated.
-
-- this way may avoid to cancel lots of requests during error recovery
-
-This patch introduces the parameter of 'freeze_queue' for fixing this
-issue.
-
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/nvme/host/pci.c | 47 ++++++++++++++++++++++++++++++++---------------
- 1 file changed, 32 insertions(+), 15 deletions(-)
+ fs/ext4/page-io.c  | 3 ++-
+ fs/ext4/readpage.c | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 6413dad51107..365d1a5ee1eb 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -69,7 +69,8 @@ struct nvme_dev;
- struct nvme_queue;
- 
- static void nvme_process_cq(struct nvme_queue *nvmeq);
--static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown);
-+static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown, bool
-+		freeze_queue);
- 
- /*
-  * Represents an NVM Express device.  Each nvme_dev is a PCI function.
-@@ -1206,7 +1207,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 	 */
- 	if (nvme_should_reset(dev, csts)) {
- 		nvme_warn_reset(dev, csts);
--		nvme_dev_disable(dev, false);
-+		nvme_dev_disable(dev, false, true);
- 		nvme_reset_ctrl(&dev->ctrl);
- 		return BLK_EH_HANDLED;
- 	}
-@@ -1233,7 +1234,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 		dev_warn(dev->ctrl.device,
- 			 "I/O %d QID %d timeout, disable controller\n",
- 			 req->tag, nvmeq->qid);
--		nvme_dev_disable(dev, false);
-+		nvme_dev_disable(dev, false, false);
- 		nvme_req(req)->flags |= NVME_REQ_CANCELLED;
- 		return BLK_EH_HANDLED;
- 	default:
-@@ -1249,7 +1250,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 		dev_warn(dev->ctrl.device,
- 			 "I/O %d QID %d timeout, reset controller\n",
- 			 req->tag, nvmeq->qid);
--		nvme_dev_disable(dev, false);
-+		nvme_dev_disable(dev, false, true);
- 		nvme_reset_ctrl(&dev->ctrl);
- 
- 		/*
-@@ -2254,19 +2255,35 @@ static void nvme_pci_disable(struct nvme_dev *dev)
- 	}
- }
- 
--static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
-+/*
-+ * Resetting often follows nvme_dev_disable(), so queues need to be frozen
-+ * before resetting.
-+ */
-+static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown, bool
-+		freeze_queue)
+diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
+index 52f2937f5603..b56a733f33c0 100644
+--- a/fs/ext4/page-io.c
++++ b/fs/ext4/page-io.c
+@@ -63,8 +63,9 @@ static void ext4_finish_bio(struct bio *bio)
  {
  	int i;
- 	bool dead = true;
- 	struct pci_dev *pdev = to_pci_dev(dev->dev);
- 	bool frozen = false;
+ 	struct bio_vec *bvec;
++	struct bvec_iter_all bia;
  
-+	/*
-+	 * 'freeze_queue' is only valid for non-shutdown, and we do
-+	 * inline freeze & wait_freeze_timeout for shutdown just for
-+	 * completing as many as possible requests before shutdown
-+	 */
-+	if (shutdown)
-+		freeze_queue = false;
-+
-+	if (freeze_queue)
-+		nvme_start_freeze(&dev->ctrl);
-+
- 	mutex_lock(&dev->shutdown_lock);
- 	if (pci_is_enabled(pdev)) {
- 		u32 csts = readl(dev->bar + NVME_REG_CSTS);
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ #ifdef CONFIG_EXT4_FS_ENCRYPTION
+ 		struct page *data_page = NULL;
+diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
+index 572b6296f709..c46b5ff68fa8 100644
+--- a/fs/ext4/readpage.c
++++ b/fs/ext4/readpage.c
+@@ -72,6 +72,7 @@ static void mpage_end_io(struct bio *bio)
+ {
+ 	struct bio_vec *bv;
+ 	int i;
++	struct bvec_iter_all bia;
  
--		if (dev->ctrl.state == NVME_CTRL_LIVE ||
--		    dev->ctrl.state == NVME_CTRL_RESETTING) {
-+		if (shutdown && (dev->ctrl.state == NVME_CTRL_LIVE ||
-+		    dev->ctrl.state == NVME_CTRL_RESETTING)) {
- 			nvme_start_freeze(&dev->ctrl);
- 			frozen = true;
+ 	if (ext4_bio_encrypted(bio)) {
+ 		if (bio->bi_status) {
+@@ -81,7 +82,7 @@ static void mpage_end_io(struct bio *bio)
+ 			return;
  		}
-@@ -2369,7 +2386,7 @@ static void nvme_remove_dead_ctrl(struct nvme_dev *dev, int status)
- 	dev_warn(dev->ctrl.device, "Removing after probe failure status: %d\n", status);
- 
- 	nvme_get_ctrl(&dev->ctrl);
--	nvme_dev_disable(dev, false);
-+	nvme_dev_disable(dev, false, false);
- 	if (!queue_work(nvme_wq, &dev->remove_work))
- 		nvme_put_ctrl(&dev->ctrl);
- }
-@@ -2390,7 +2407,7 @@ static void nvme_reset_work(struct work_struct *work)
- 	 * moving on.
- 	 */
- 	if (dev->ctrl.ctrl_config & NVME_CC_ENABLE)
--		nvme_dev_disable(dev, false);
-+		nvme_dev_disable(dev, false, false);
- 
- 	/*
- 	 * Introduce CONNECTING state from nvme-fc/rdma transports to mark the
-@@ -2639,7 +2656,7 @@ static int nvme_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- static void nvme_reset_prepare(struct pci_dev *pdev)
- {
- 	struct nvme_dev *dev = pci_get_drvdata(pdev);
--	nvme_dev_disable(dev, false);
-+	nvme_dev_disable(dev, false, true);
- }
- 
- static void nvme_reset_done(struct pci_dev *pdev)
-@@ -2651,7 +2668,7 @@ static void nvme_reset_done(struct pci_dev *pdev)
- static void nvme_shutdown(struct pci_dev *pdev)
- {
- 	struct nvme_dev *dev = pci_get_drvdata(pdev);
--	nvme_dev_disable(dev, true);
-+	nvme_dev_disable(dev, true, false);
- }
- 
- /*
-@@ -2670,13 +2687,13 @@ static void nvme_remove(struct pci_dev *pdev)
- 
- 	if (!pci_device_is_present(pdev)) {
- 		nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_DEAD);
--		nvme_dev_disable(dev, false);
-+		nvme_dev_disable(dev, false, false);
  	}
+-	bio_for_each_page_all(bv, bio, i) {
++	bio_for_each_page_all2(bv, bio, i, bia) {
+ 		struct page *page = bv->bv_page;
  
- 	flush_work(&dev->ctrl.reset_work);
- 	nvme_stop_ctrl(&dev->ctrl);
- 	nvme_remove_namespaces(&dev->ctrl);
--	nvme_dev_disable(dev, true);
-+	nvme_dev_disable(dev, true, false);
- 	nvme_free_host_mem(dev);
- 	nvme_dev_remove_admin(dev);
- 	nvme_free_queues(dev, 0);
-@@ -2710,7 +2727,7 @@ static int nvme_suspend(struct device *dev)
- 	struct pci_dev *pdev = to_pci_dev(dev);
- 	struct nvme_dev *ndev = pci_get_drvdata(pdev);
- 
--	nvme_dev_disable(ndev, true);
-+	nvme_dev_disable(ndev, true, false);
- 	return 0;
- }
- 
-@@ -2742,7 +2759,7 @@ static pci_ers_result_t nvme_error_detected(struct pci_dev *pdev,
- 	case pci_channel_io_frozen:
- 		dev_warn(dev->ctrl.device,
- 			"frozen state error detected, reset controller\n");
--		nvme_dev_disable(dev, false);
-+		nvme_dev_disable(dev, false, true);
- 		return PCI_ERS_RESULT_NEED_RESET;
- 	case pci_channel_io_perm_failure:
- 		dev_warn(dev->ctrl.device,
+ 		if (!bio->bi_status) {
 -- 
 2.9.5
