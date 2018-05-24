@@ -1,42 +1,43 @@
-Return-Path: <BATV+df5a2477ff0fa86e9985+5386+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>,
-	Lee Duncan <lduncan@suse.com>,
-	Chris Leech <cleech@redhat.com>,
-	Rafael David Tinoco <rafael.tinoco@canonical.com>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 11/14] block: document the blk_eh_timer_return values
-Date: Wed, 23 May 2018 14:19:38 +0200
-Message-Id: <20180523121941.8632-12-hch@lst.de>
-In-Reply-To: <20180523121941.8632-1-hch@lst.de>
-References: <20180523121941.8632-1-hch@lst.de>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 11/33] block: implement bio_pages_all() via bio_for_each_page_all()
+Date: Thu, 24 May 2018 17:01:16 +0800
+Message-Id: <20180524090139.2150-12-ming.lei@redhat.com>
+In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
+References: <20180524090139.2150-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/blkdev.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+As multipage bvec will be enabled soon, bio->bi_vcnt isn't same with
+page count in the bio any more, so use bio_for_each_page_all() to
+compute the number.
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 3d9d4da4dedd..3815d9dcfbe0 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -337,8 +337,8 @@ typedef int (init_rq_fn)(struct request_queue *, struct request *, gfp_t);
- typedef void (exit_rq_fn)(struct request_queue *, struct request *);
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ include/linux/bio.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 3d3795b9a353..08af9272687f 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -334,8 +334,14 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
  
- enum blk_eh_timer_return {
--	BLK_EH_DONE,
--	BLK_EH_RESET_TIMER,
-+	BLK_EH_DONE,		/* drivers has completed the command */
-+	BLK_EH_RESET_TIMER,	/* reset timer and try again */
- };
+ static inline unsigned bio_pages_all(struct bio *bio)
+ {
++	unsigned i;
++	struct bio_vec *bv;
++
+ 	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
+-	return bio->bi_vcnt;
++
++	bio_for_each_page_all(bv, bio, i)
++		;
++	return i;
+ }
  
- typedef enum blk_eh_timer_return (rq_timed_out_fn)(struct request *);
+ static inline struct bio_vec *bio_first_bvec_all(struct bio *bio)
 -- 
-2.17.0
+2.9.5
