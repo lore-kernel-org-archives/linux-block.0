@@ -1,282 +1,189 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	axboe@kernel.dk,
-	hch@infradead.org,
-	colyli@suse.de,
-	snitzer@redhat.com,
-	darrick.wong@oracle.com,
-	clm@fb.com,
-	bacik@fb.com,
-	linux-xfs@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	linux-btrfs@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	neilb@suse.com
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Subject: [PATCH 01/12] block: convert bounce, q->bio_split to bioset_init()/mempool_init()
-Date: Sun, 20 May 2018 18:25:47 -0400
-Message-Id: <20180520222558.7053-2-kent.overstreet@gmail.com>
-In-Reply-To: <20180520222558.7053-1-kent.overstreet@gmail.com>
-References: <20180520222558.7053-1-kent.overstreet@gmail.com>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 19/33] block: convert to bio_for_each_page_all2()
+Date: Thu, 24 May 2018 17:01:24 +0800
+Message-Id: <20180524090139.2150-20-ming.lei@redhat.com>
+In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
+References: <20180524090139.2150-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
----
- block/blk-core.c       |  7 ++++---
- block/blk-merge.c      |  8 +++----
- block/blk-sysfs.c      |  3 +--
- block/bounce.c         | 47 ++++++++++++++++++++++--------------------
- drivers/md/dm.c        |  2 +-
- include/linux/bio.h    |  5 +++++
- include/linux/blkdev.h |  2 +-
- 7 files changed, 41 insertions(+), 33 deletions(-)
+We have to convert to bio_for_each_page_all2() for iterating page by
+page.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 43370faee9..a3a7462961 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -998,6 +998,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
- 					   spinlock_t *lock)
+bio_for_each_page_all() can't be used any more after multipage bvec is
+enabled.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/bio.c         | 18 ++++++++++++------
+ block/blk-zoned.c   |  5 +++--
+ block/bounce.c      |  6 ++++--
+ include/linux/bio.h |  3 ++-
+ 4 files changed, 21 insertions(+), 11 deletions(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index a200c42e55dc..a14c854b9111 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1119,8 +1119,9 @@ static int bio_copy_from_iter(struct bio *bio, struct iov_iter *iter)
  {
- 	struct request_queue *q;
-+	int ret;
+ 	int i;
+ 	struct bio_vec *bvec;
++	struct bvec_iter_all bia;
  
- 	q = kmem_cache_alloc_node(blk_requestq_cachep,
- 				gfp_mask | __GFP_ZERO, node_id);
-@@ -1008,8 +1009,8 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
- 	if (q->id < 0)
- 		goto fail_q;
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		ssize_t ret;
  
--	q->bio_split = bioset_create(BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
--	if (!q->bio_split)
-+	ret = bioset_init(&q->bio_split, BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
-+	if (ret)
- 		goto fail_id;
+ 		ret = copy_page_from_iter(bvec->bv_page,
+@@ -1150,8 +1151,9 @@ static int bio_copy_to_iter(struct bio *bio, struct iov_iter iter)
+ {
+ 	int i;
+ 	struct bio_vec *bvec;
++	struct bvec_iter_all bia;
  
- 	q->backing_dev_info = bdi_alloc_node(gfp_mask, node_id);
-@@ -1081,7 +1082,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
- fail_stats:
- 	bdi_put(q->backing_dev_info);
- fail_split:
--	bioset_free(q->bio_split);
-+	bioset_exit(&q->bio_split);
- fail_id:
- 	ida_simple_remove(&blk_queue_ida, q->id);
- fail_q:
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 5573d0fbec..d70ab08820 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -188,16 +188,16 @@ void blk_queue_split(struct request_queue *q, struct bio **bio)
- 	switch (bio_op(*bio)) {
- 	case REQ_OP_DISCARD:
- 	case REQ_OP_SECURE_ERASE:
--		split = blk_bio_discard_split(q, *bio, q->bio_split, &nsegs);
-+		split = blk_bio_discard_split(q, *bio, &q->bio_split, &nsegs);
- 		break;
- 	case REQ_OP_WRITE_ZEROES:
--		split = blk_bio_write_zeroes_split(q, *bio, q->bio_split, &nsegs);
-+		split = blk_bio_write_zeroes_split(q, *bio, &q->bio_split, &nsegs);
- 		break;
- 	case REQ_OP_WRITE_SAME:
--		split = blk_bio_write_same_split(q, *bio, q->bio_split, &nsegs);
-+		split = blk_bio_write_same_split(q, *bio, &q->bio_split, &nsegs);
- 		break;
- 	default:
--		split = blk_bio_segment_split(q, *bio, q->bio_split, &nsegs);
-+		split = blk_bio_segment_split(q, *bio, &q->bio_split, &nsegs);
- 		break;
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		ssize_t ret;
+ 
+ 		ret = copy_page_to_iter(bvec->bv_page,
+@@ -1173,8 +1175,9 @@ void bio_free_pages(struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_page_all(bvec, bio, i)
++	bio_for_each_page_all2(bvec, bio, i, bia)
+ 		__free_page(bvec->bv_page);
+ }
+ EXPORT_SYMBOL(bio_free_pages);
+@@ -1340,6 +1343,7 @@ struct bio *bio_map_user_iov(struct request_queue *q,
+ 	struct bio *bio;
+ 	int ret;
+ 	struct bio_vec *bvec;
++	struct bvec_iter_all bia;
+ 
+ 	if (!iov_iter_count(iter))
+ 		return ERR_PTR(-EINVAL);
+@@ -1413,7 +1417,7 @@ struct bio *bio_map_user_iov(struct request_queue *q,
+ 	return bio;
+ 
+  out_unmap:
+-	bio_for_each_page_all(bvec, bio, j) {
++	bio_for_each_page_all2(bvec, bio, j, bia) {
+ 		put_page(bvec->bv_page);
  	}
- 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index cae525b7aa..18de028c38 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -824,8 +824,7 @@ static void __blk_release_queue(struct work_struct *work)
- 	if (q->mq_ops)
- 		blk_mq_debugfs_unregister(q);
- 
--	if (q->bio_split)
--		bioset_free(q->bio_split);
-+	bioset_exit(&q->bio_split);
- 
- 	ida_simple_remove(&blk_queue_ida, q->id);
- 	call_rcu(&q->rcu_head, blk_free_queue_rcu);
-diff --git a/block/bounce.c b/block/bounce.c
-index fea9c8146d..7a6c4d50b5 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -28,28 +28,29 @@
- #define POOL_SIZE	64
- #define ISA_POOL_SIZE	16
- 
--static struct bio_set *bounce_bio_set, *bounce_bio_split;
--static mempool_t *page_pool, *isa_page_pool;
-+static struct bio_set bounce_bio_set, bounce_bio_split;
-+static mempool_t page_pool, isa_page_pool;
- 
- #if defined(CONFIG_HIGHMEM)
- static __init int init_emergency_pool(void)
+ 	bio_put(bio);
+@@ -1424,11 +1428,12 @@ static void __bio_unmap_user(struct bio *bio)
  {
-+	int ret;
- #if defined(CONFIG_HIGHMEM) && !defined(CONFIG_MEMORY_HOTPLUG)
- 	if (max_pfn <= max_low_pfn)
- 		return 0;
- #endif
- 
--	page_pool = mempool_create_page_pool(POOL_SIZE, 0);
--	BUG_ON(!page_pool);
-+	ret = mempool_init_page_pool(&page_pool, POOL_SIZE, 0);
-+	BUG_ON(ret);
- 	pr_info("pool size: %d pages\n", POOL_SIZE);
- 
--	bounce_bio_set = bioset_create(BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
--	BUG_ON(!bounce_bio_set);
-+	ret = bioset_init(&bounce_bio_set, BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
-+	BUG_ON(ret);
- 	if (bioset_integrity_create(bounce_bio_set, BIO_POOL_SIZE))
- 		BUG_ON(1);
- 
--	bounce_bio_split = bioset_create(BIO_POOL_SIZE, 0, 0);
--	BUG_ON(!bounce_bio_split);
-+	ret = bioset_init(&bounce_bio_split, BIO_POOL_SIZE, 0, 0);
-+	BUG_ON(ret);
- 
- 	return 0;
- }
-@@ -91,12 +92,14 @@ static void *mempool_alloc_pages_isa(gfp_t gfp_mask, void *data)
-  */
- int init_emergency_isa_pool(void)
- {
--	if (isa_page_pool)
-+	int ret;
-+
-+	if (mempool_initialized(&isa_page_pool))
- 		return 0;
- 
--	isa_page_pool = mempool_create(ISA_POOL_SIZE, mempool_alloc_pages_isa,
--				       mempool_free_pages, (void *) 0);
--	BUG_ON(!isa_page_pool);
-+	ret = mempool_init(&isa_page_pool, ISA_POOL_SIZE, mempool_alloc_pages_isa,
-+			   mempool_free_pages, (void *) 0);
-+	BUG_ON(ret);
- 
- 	pr_info("isa pool size: %d pages\n", ISA_POOL_SIZE);
- 	return 0;
-@@ -163,13 +166,13 @@ static void bounce_end_io(struct bio *bio, mempool_t *pool)
- 
- static void bounce_end_io_write(struct bio *bio)
- {
--	bounce_end_io(bio, page_pool);
-+	bounce_end_io(bio, &page_pool);
- }
- 
- static void bounce_end_io_write_isa(struct bio *bio)
- {
- 
--	bounce_end_io(bio, isa_page_pool);
-+	bounce_end_io(bio, &isa_page_pool);
- }
- 
- static void __bounce_end_io_read(struct bio *bio, mempool_t *pool)
-@@ -184,12 +187,12 @@ static void __bounce_end_io_read(struct bio *bio, mempool_t *pool)
- 
- static void bounce_end_io_read(struct bio *bio)
- {
--	__bounce_end_io_read(bio, page_pool);
-+	__bounce_end_io_read(bio, &page_pool);
- }
- 
- static void bounce_end_io_read_isa(struct bio *bio)
- {
--	__bounce_end_io_read(bio, isa_page_pool);
-+	__bounce_end_io_read(bio, &isa_page_pool);
- }
- 
- static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
-@@ -214,13 +217,13 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 		return;
- 
- 	if (!passthrough && sectors < bio_sectors(*bio_orig)) {
--		bio = bio_split(*bio_orig, sectors, GFP_NOIO, bounce_bio_split);
-+		bio = bio_split(*bio_orig, sectors, GFP_NOIO, &bounce_bio_split);
- 		bio_chain(bio, *bio_orig);
- 		generic_make_request(*bio_orig);
- 		*bio_orig = bio;
- 	}
- 	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, passthrough ? NULL :
--			bounce_bio_set);
-+			&bounce_bio_set);
- 
- 	bio_for_each_segment_all(to, bio, i) {
- 		struct page *page = to->bv_page;
-@@ -247,7 +250,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 
- 	bio->bi_flags |= (1 << BIO_BOUNCED);
- 
--	if (pool == page_pool) {
-+	if (pool == &page_pool) {
- 		bio->bi_end_io = bounce_end_io_write;
- 		if (rw == READ)
- 			bio->bi_end_io = bounce_end_io_read;
-@@ -279,10 +282,10 @@ void blk_queue_bounce(struct request_queue *q, struct bio **bio_orig)
- 	if (!(q->bounce_gfp & GFP_DMA)) {
- 		if (q->limits.bounce_pfn >= blk_max_pfn)
- 			return;
--		pool = page_pool;
-+		pool = &page_pool;
- 	} else {
--		BUG_ON(!isa_page_pool);
--		pool = isa_page_pool;
-+		BUG_ON(!mempool_initialized(&isa_page_pool));
-+		pool = &isa_page_pool;
- 	}
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_iter_all bia;
  
  	/*
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 4ea404dbcf..7d98ee1137 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1582,7 +1582,7 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
- 				 * won't be affected by this reassignment.
- 				 */
- 				struct bio *b = bio_clone_bioset(bio, GFP_NOIO,
--								 md->queue->bio_split);
-+								 &md->queue->bio_split);
- 				ci.io->orig_bio = b;
- 				bio_advance(bio, (bio_sectors(bio) - ci.sector_count) << 9);
- 				bio_chain(b, bio);
+ 	 * make sure we dirty pages we wrote to
+ 	 */
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		if (bio_data_dir(bio) == READ)
+ 			set_page_dirty_lock(bvec->bv_page);
+ 
+@@ -1520,8 +1525,9 @@ static void bio_copy_kern_endio_read(struct bio *bio)
+ 	char *p = bio->bi_private;
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		memcpy(p, page_address(bvec->bv_page), bvec->bv_len);
+ 		p += bvec->bv_len;
+ 	}
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 77f3cecfaa7d..a76053d6fd6c 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -123,6 +123,7 @@ int blkdev_report_zones(struct block_device *bdev,
+ 	unsigned int ofst;
+ 	void *addr;
+ 	int ret;
++	struct bvec_iter_all bia;
+ 
+ 	if (!q)
+ 		return -ENXIO;
+@@ -190,7 +191,7 @@ int blkdev_report_zones(struct block_device *bdev,
+ 	n = 0;
+ 	nz = 0;
+ 	nr_rep = 0;
+-	bio_for_each_page_all(bv, bio, i) {
++	bio_for_each_page_all2(bv, bio, i, bia) {
+ 
+ 		if (!bv->bv_page)
+ 			break;
+@@ -223,7 +224,7 @@ int blkdev_report_zones(struct block_device *bdev,
+ 
+ 	*nr_zones = nz;
+ out:
+-	bio_for_each_page_all(bv, bio, i)
++	bio_for_each_page_all2(bv, bio, i, bia)
+ 		__free_page(bv->bv_page);
+ 	bio_put(bio);
+ 
+diff --git a/block/bounce.c b/block/bounce.c
+index f4ee4b81f7a2..8b14683f4061 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -143,11 +143,12 @@ static void bounce_end_io(struct bio *bio, mempool_t *pool)
+ 	struct bio_vec *bvec, orig_vec;
+ 	int i;
+ 	struct bvec_iter orig_iter = bio_orig->bi_iter;
++	struct bvec_iter_all bia;
+ 
+ 	/*
+ 	 * free up bounce indirect pages used
+ 	 */
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		orig_vec = bio_iter_iovec(bio_orig, orig_iter);
+ 		if (bvec->bv_page != orig_vec.bv_page) {
+ 			dec_zone_page_state(bvec->bv_page, NR_BOUNCE);
+@@ -203,6 +204,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
+ 	bool bounce = false;
+ 	int sectors = 0;
+ 	bool passthrough = bio_is_passthrough(*bio_orig);
++	struct bvec_iter_all bia;
+ 
+ 	bio_for_each_page(from, *bio_orig, iter) {
+ 		if (i++ < BIO_MAX_PAGES)
+@@ -222,7 +224,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
+ 	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, passthrough ? NULL :
+ 			bounce_bio_set);
+ 
+-	bio_for_each_page_all(to, bio, i) {
++	bio_for_each_page_all2(to, bio, i, bia) {
+ 		struct page *page = to->bv_page;
+ 
+ 		if (page_to_pfn(page) <= q->limits.bounce_pfn)
 diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 98b175cc00..5e472fcafa 100644
+index 75baad77d9a8..5ae2bc876295 100644
 --- a/include/linux/bio.h
 +++ b/include/linux/bio.h
-@@ -760,6 +760,11 @@ struct biovec_slab {
- 	struct kmem_cache *slab;
- };
+@@ -369,10 +369,11 @@ static inline unsigned bio_pages_all(struct bio *bio)
+ {
+ 	unsigned i;
+ 	struct bio_vec *bv;
++	struct bvec_iter_all bia;
  
-+static inline bool bioset_initialized(struct bio_set *bs)
-+{
-+	return bs->bio_slab != NULL;
-+}
-+
- /*
-  * a small number of entries is fine, not going to be performance critical.
-  * basically we just need to survive
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index f3999719f8..8b4841117f 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -664,7 +664,7 @@ struct request_queue {
+ 	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
  
- 	struct blk_mq_tag_set	*tag_set;
- 	struct list_head	tag_set_list;
--	struct bio_set		*bio_split;
-+	struct bio_set		bio_split;
- 
- #ifdef CONFIG_BLK_DEBUG_FS
- 	struct dentry		*debugfs_dir;
+-	bio_for_each_page_all(bv, bio, i)
++	bio_for_each_page_all2(bv, bio, i, bia)
+ 		;
+ 	return i;
+ }
 -- 
-2.17.0
+2.9.5
