@@ -1,84 +1,38 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:51836 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752469AbeERQuF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 May 2018 12:50:05 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 30/34] xfs: move all writeback buffer_head manipulation into xfs_map_at_offset
-Date: Fri, 18 May 2018 18:48:26 +0200
-Message-Id: <20180518164830.1552-31-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH V4] blk-mq: avoid to starve tag allocation after
+ allocation process migrates
+To: Omar Sandoval <osandov@osandov.com>, Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, stable@vger.kernel.org,
+ Omar Sandoval <osandov@fb.com>
+References: <20180524074910.32020-1-ming.lei@redhat.com>
+ <20180524165216.GG12533@vader>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <8aaf8f1d-9b5b-0b4c-d374-efbdf2c125ba@kernel.dk>
+Date: Thu, 24 May 2018 10:53:37 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180524165216.GG12533@vader>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-This keeps it in a single place so it can be made otional more easily.
+On 5/24/18 10:52 AM, Omar Sandoval wrote:
+> On Thu, May 24, 2018 at 03:49:10PM +0800, Ming Lei wrote:
+>> When the allocation process is scheduled back and the mapped hw queue is
+>> changed, fake one extra wake up on previous queue for compensating wake up
+>> miss, so other allocations on the previous queue won't be starved.
+>>
+>> This patch fixes one request allocation hang issue, which can be
+>> triggered easily in case of very low nr_request.
+>>
+>> Cc: <stable@vger.kernel.org>
+>> Cc: Omar Sandoval <osandov@fb.com>
+> 
+> Reviewed-by: Omar Sandoval <osandov@fb.com>
+> 
+> The longer explanation you gave would be nice to have in the commit
+> message, but maybe Jens can add that when he applies it.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/xfs_aops.c | 22 +++++-----------------
- 1 file changed, 5 insertions(+), 17 deletions(-)
+Exactly, I had planned on augmenting the commit message since I don't
+think the above really explains it. I'll do that and get it applied.
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 592b33b35a30..951b329abb23 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -505,21 +505,6 @@ xfs_imap_valid(
- 		offset < imap->br_startoff + imap->br_blockcount;
- }
- 
--STATIC void
--xfs_start_buffer_writeback(
--	struct buffer_head	*bh)
--{
--	ASSERT(buffer_mapped(bh));
--	ASSERT(buffer_locked(bh));
--	ASSERT(!buffer_delay(bh));
--	ASSERT(!buffer_unwritten(bh));
--
--	bh->b_end_io = NULL;
--	set_buffer_async_write(bh);
--	set_buffer_uptodate(bh);
--	clear_buffer_dirty(bh);
--}
--
- STATIC void
- xfs_start_page_writeback(
- 	struct page		*page,
-@@ -728,6 +713,7 @@ xfs_map_at_offset(
- 	ASSERT(imap->br_startblock != HOLESTARTBLOCK);
- 	ASSERT(imap->br_startblock != DELAYSTARTBLOCK);
- 
-+	lock_buffer(bh);
- 	xfs_map_buffer(inode, bh, imap, offset);
- 	set_buffer_mapped(bh);
- 	clear_buffer_delay(bh);
-@@ -740,6 +726,10 @@ xfs_map_at_offset(
- 	 * set the bdev now.
- 	 */
- 	bh->b_bdev = xfs_find_bdev_for_inode(inode);
-+	bh->b_end_io = NULL;
-+	set_buffer_async_write(bh);
-+	set_buffer_uptodate(bh);
-+	clear_buffer_dirty(bh);
- }
- 
- STATIC void
-@@ -885,11 +875,9 @@ xfs_writepage_map(
- 			continue;
- 		}
- 
--		lock_buffer(bh);
- 		xfs_map_at_offset(inode, bh, &wpc->imap, file_offset);
- 		xfs_add_to_ioend(inode, file_offset, page, wpc, wbc,
- 				&submit_list);
--		xfs_start_buffer_writeback(bh);
- 		count++;
- 	}
- 
 -- 
-2.17.0
+Jens Axboe
