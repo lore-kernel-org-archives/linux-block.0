@@ -1,53 +1,182 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	akpm@linux-foundation.org,
-	linux-mm@kvack.org,
-	hannes@cmpxchg.org,
-	linux-kernel@vger.kernel.org,
-	tj@kernel.org,
-	linux-fsdevel@vger.kernel.org
-Subject: [PATCH 05/13] swap,blkcg: issue swap io with the appropriate context
-Date: Tue, 29 May 2018 17:17:16 -0400
-Message-Id: <20180529211724.4531-6-josef@toxicpanda.com>
-In-Reply-To: <20180529211724.4531-1-josef@toxicpanda.com>
-References: <20180529211724.4531-1-josef@toxicpanda.com>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 06/33] block: use bio_for_each_segment() to compute segments count
+Date: Thu, 24 May 2018 17:01:11 +0800
+Message-Id: <20180524090139.2150-7-ming.lei@redhat.com>
+In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
+References: <20180524090139.2150-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Tejun Heo <tj@kernel.org>
+Firstly it is more efficient to use bio_for_each_segment() in both
+blk_bio_segment_split() and __blk_recalc_rq_segments() to compute how many
+segments there are in the bio.
 
-For backcharging we need to know who the page belongs to when swapping
-it out.
+Secondaly once bio_for_each_segment() is used, the bvec may need to
+be splitted because its length can be very longer than max segment size,
+so we have to split the big bvec into several segments.
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Josef Bacik <jbacik@fb.com>
+Thirdly during splitting multipage bvec into segments, max segment number
+may be reached, then the bio need to be splitted when this happens.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- mm/page_io.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ block/blk-merge.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 76 insertions(+), 14 deletions(-)
 
-diff --git a/mm/page_io.c b/mm/page_io.c
-index a552cb37e220..61e1268e5dbc 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -339,6 +339,16 @@ int __swap_writepage(struct page *page, struct writeback_control *wbc,
- 		goto out;
- 	}
- 	bio->bi_opf = REQ_OP_WRITE | REQ_SWAP | wbc_to_write_flags(wbc);
-+#if defined(CONFIG_MEMCG) && defined(CONFIG_BLK_CGROUP)
-+	if (page->mem_cgroup) {
-+		struct cgroup_subsys_state *blkcg_css;
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 545609fc4905..d157b752d965 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -97,6 +97,62 @@ static inline unsigned get_max_io_size(struct request_queue *q,
+ 	return sectors;
+ }
+ 
++/*
++ * Split the bvec @bv into segments, and update all kinds of
++ * variables.
++ */
++static bool bvec_split_segs(struct request_queue *q, struct bio_vec *bv,
++		unsigned *nsegs, unsigned *last_seg_size,
++		unsigned *front_seg_size, unsigned *sectors)
++{
++	bool need_split = false;
++	unsigned len = bv->bv_len;
++	unsigned total_len = 0;
++	unsigned new_nsegs = 0, seg_size = 0;
 +
-+		blkcg_css = cgroup_get_e_css(page->mem_cgroup->css.cgroup,
-+					     &io_cgrp_subsys);
-+		bio_associate_blkcg(bio, blkcg_css);
-+		css_put(blkcg_css);
++	if ((*nsegs >= queue_max_segments(q)) || !len)
++		return need_split;
++
++	/*
++	 * Multipage bvec may be too big to hold in one segment,
++	 * so the current bvec has to be splitted as multiple
++	 * segments.
++	 */
++	while (new_nsegs + *nsegs < queue_max_segments(q)) {
++		seg_size = min(queue_max_segment_size(q), len);
++
++		new_nsegs++;
++		total_len += seg_size;
++		len -= seg_size;
++
++		if ((queue_virt_boundary(q) && ((bv->bv_offset +
++		    total_len) & queue_virt_boundary(q))) || !len)
++			break;
 +	}
-+#endif
- 	count_swpout_vm_event(page);
- 	set_page_writeback(page);
- 	unlock_page(page);
++
++	/* split in the middle of the bvec */
++	if (len)
++		need_split = true;
++
++	/* update front segment size */
++	if (!*nsegs) {
++		unsigned first_seg_size = seg_size;
++
++		if (new_nsegs > 1)
++			first_seg_size = queue_max_segment_size(q);
++		if (*front_seg_size < first_seg_size)
++			*front_seg_size = first_seg_size;
++	}
++
++	/* update other varibles */
++	*last_seg_size = seg_size;
++	*nsegs += new_nsegs;
++	if (sectors)
++		*sectors += total_len >> 9;
++
++	return need_split;
++}
++
+ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 					 struct bio *bio,
+ 					 struct bio_set *bs,
+@@ -110,7 +166,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 	struct bio *new = NULL;
+ 	const unsigned max_sectors = get_max_io_size(q, bio);
+ 
+-	bio_for_each_page(bv, bio, iter) {
++	bio_for_each_segment(bv, bio, iter) {
+ 		/*
+ 		 * If the queue doesn't support SG gaps and adding this
+ 		 * offset would create a gap, disallow it.
+@@ -125,8 +181,12 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 			 */
+ 			if (nsegs < queue_max_segments(q) &&
+ 			    sectors < max_sectors) {
+-				nsegs++;
+-				sectors = max_sectors;
++				/* split in the middle of bvec */
++				bv.bv_len = (max_sectors - sectors) << 9;
++				bvec_split_segs(q, &bv, &nsegs,
++						&seg_size,
++						&front_seg_size,
++						&sectors);
+ 			}
+ 			goto split;
+ 		}
+@@ -153,11 +213,12 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 		if (nsegs == 1 && seg_size > front_seg_size)
+ 			front_seg_size = seg_size;
+ 
+-		nsegs++;
+ 		bvprv = bv;
+ 		bvprvp = &bvprv;
+-		seg_size = bv.bv_len;
+-		sectors += bv.bv_len >> 9;
++
++		if (bvec_split_segs(q, &bv, &nsegs, &seg_size,
++					&front_seg_size, &sectors))
++			goto split;
+ 
+ 	}
+ 
+@@ -225,6 +286,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+ 	struct bio_vec bv, bvprv = { NULL };
+ 	int cluster, prev = 0;
+ 	unsigned int seg_size, nr_phys_segs;
++	unsigned front_seg_size = bio->bi_seg_front_size;
+ 	struct bio *fbio, *bbio;
+ 	struct bvec_iter iter;
+ 
+@@ -245,7 +307,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+ 	seg_size = 0;
+ 	nr_phys_segs = 0;
+ 	for_each_bio(bio) {
+-		bio_for_each_page(bv, bio, iter) {
++		bio_for_each_segment(bv, bio, iter) {
+ 			/*
+ 			 * If SG merging is disabled, each bio vector is
+ 			 * a segment
+@@ -267,20 +329,20 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+ 				continue;
+ 			}
+ new_segment:
+-			if (nr_phys_segs == 1 && seg_size >
+-			    fbio->bi_seg_front_size)
+-				fbio->bi_seg_front_size = seg_size;
++			if (nr_phys_segs == 1 && seg_size > front_seg_size)
++				front_seg_size = seg_size;
+ 
+-			nr_phys_segs++;
+ 			bvprv = bv;
+ 			prev = 1;
+-			seg_size = bv.bv_len;
++			bvec_split_segs(q, &bv, &nr_phys_segs, &seg_size,
++					&front_seg_size, NULL);
+ 		}
+ 		bbio = bio;
+ 	}
+ 
+-	if (nr_phys_segs == 1 && seg_size > fbio->bi_seg_front_size)
+-		fbio->bi_seg_front_size = seg_size;
++	if (nr_phys_segs == 1 && seg_size > front_seg_size)
++		front_seg_size = seg_size;
++	fbio->bi_seg_front_size = front_seg_size;
+ 	if (seg_size > bbio->bi_seg_back_size)
+ 		bbio->bi_seg_back_size = seg_size;
+ 
 -- 
-2.14.3
+2.9.5
