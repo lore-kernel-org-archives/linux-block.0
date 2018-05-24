@@ -1,68 +1,41 @@
-Return-Path: <cgxu519@gmx.com>
-From: Chengguang Xu <cgxu519@gmx.com>
-To: axboe@kernel.dk
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
-	Chengguang Xu <cgxu519@gmx.com>
-Subject: [PATCH] blk-throttle: return proper bool type to caller instead of 0/1
-Date: Tue, 29 May 2018 18:32:44 +0800
-Message-Id: <1527589964-138223-1-git-send-email-cgxu519@gmx.com>
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 16/33] dm: clone bio via bio_clone_seg_bioset
+Date: Thu, 24 May 2018 17:01:21 +0800
+Message-Id: <20180524090139.2150-17-ming.lei@redhat.com>
+In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
+References: <20180524090139.2150-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Change to return true/false only for bool type return code.
+The incoming bio will become very big after multipage bvec is enabled,
+so we can't clone bio page by page.
 
-Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
+This patch uses the introduced bio_clone_seg_bioset(), so the incoming
+bio can be cloned successfully. This way is safe because device mapping
+won't modify the bio vector on the cloned multipage bio.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-throttle.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ drivers/md/dm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index c5a1316..3155dee 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -821,7 +821,7 @@ static bool throtl_slice_used(struct throtl_grp *tg, bool rw)
- 	if (time_in_range(jiffies, tg->slice_start[rw], tg->slice_end[rw]))
- 		return false;
- 
--	return 1;
-+	return true;
- }
- 
- /* Trim the used slices and adjust slice start accordingly */
-@@ -931,7 +931,7 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
- 
- 	if (wait)
- 		*wait = jiffy_wait;
--	return 0;
-+	return false;
- }
- 
- static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
-@@ -974,7 +974,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
- 	jiffy_wait = jiffy_wait + (jiffy_elapsed_rnd - jiffy_elapsed);
- 	if (wait)
- 		*wait = jiffy_wait;
--	return 0;
-+	return false;
- }
- 
- /*
-@@ -1024,7 +1024,7 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
- 	    tg_with_in_iops_limit(tg, bio, &iops_wait)) {
- 		if (wait)
- 			*wait = 0;
--		return 1;
-+		return true;
- 	}
- 
- 	max_wait = max(bps_wait, iops_wait);
-@@ -1035,7 +1035,7 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
- 	if (time_before(tg->slice_end[rw], jiffies + max_wait))
- 		throtl_extend_slice(tg, rw, jiffies + max_wait);
- 
--	return 0;
-+	return false;
- }
- 
- static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index f1db181e082e..425e99e20f5c 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1581,8 +1581,8 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
+ 				 * the usage of io->orig_bio in dm_remap_zone_report()
+ 				 * won't be affected by this reassignment.
+ 				 */
+-				struct bio *b = bio_clone_bioset(bio, GFP_NOIO,
+-								 md->queue->bio_split);
++				struct bio *b = bio_clone_seg_bioset(bio,
++						GFP_NOIO, md->queue->bio_split);
+ 				ci.io->orig_bio = b;
+ 				bio_advance(bio, (bio_sectors(bio) - ci.sector_count) << 9);
+ 				bio_chain(b, bio);
 -- 
-1.8.3.1
+2.9.5
