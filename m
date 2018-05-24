@@ -1,340 +1,219 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	akpm@linux-foundation.org,
-	linux-mm@kvack.org,
-	hannes@cmpxchg.org,
-	linux-kernel@vger.kernel.org,
-	tj@kernel.org,
-	linux-fsdevel@vger.kernel.org
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 06/13] blkcg: add generic throttling mechanism
-Date: Tue, 29 May 2018 17:17:17 -0400
-Message-Id: <20180529211724.4531-7-josef@toxicpanda.com>
-In-Reply-To: <20180529211724.4531-1-josef@toxicpanda.com>
-References: <20180529211724.4531-1-josef@toxicpanda.com>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Wed, 23 May 2018 22:56:15 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	stable@vger.kernel.org, Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH V3] blk-mq: avoid to starve tag allocation after
+ allocation process migrates
+Message-ID: <20180524055615.GF12533@vader>
+References: <20180524030440.15744-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180524030440.15744-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Josef Bacik <jbacik@fb.com>
+On Thu, May 24, 2018 at 11:04:40AM +0800, Ming Lei wrote:
+> When the allocation process is scheduled back and the mapped hw queue is
+> changed, fake one extra wake up on previous queue for compensating wake up
+> miss, so other allocations on the previous queue won't be starved.
+> 
+> This patch fixes one request allocation hang issue, which can be
+> triggered easily in case of very low nr_request.
 
-Since IO can be issued from literally anywhere it's almost impossible to
-do throttling without having some sort of adverse effect somewhere else
-in the system because of locking or other dependencies.  The best way to
-solve this is to do the throttling when we know we aren't holding any
-other kernel resources.  Do this by tracking throttling in a per-blkg
-basis, and if we require throttling flag the task that it needs to check
-before it returns to user space and possibly sleep there.
+Thanks, Ming, this looks better. One comment below.
 
-This is to address the case where a process is doing work that is
-generating IO that can't be throttled, whether that is directly with a
-lot of REQ_META IO, or indirectly by allocating so much memory that it
-is swamping the disk with REQ_SWAP.  We can't use task_add_work as we
-don't want to induce a memory allocation in the IO path, so simply
-saving the request queue in the task and flagging it to do the
-notify_resume thing achieves the same result without the overhead of a
-memory allocation.
+> Cc: <stable@vger.kernel.org>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+> V3:
+> 	- fix comments as suggested by Jens
+> 	- remove the wrapper as suggested by Omar
+> V2:
+> 	- fix build failure
+> 
+> 
+>  block/blk-mq-tag.c      | 12 ++++++++++++
+>  include/linux/sbitmap.h |  7 +++++++
+>  lib/sbitmap.c           | 22 ++++++++++++----------
+>  3 files changed, 31 insertions(+), 10 deletions(-)
+> 
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 336dde07b230..a4e58fc28a06 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -134,6 +134,8 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+>  	ws = bt_wait_ptr(bt, data->hctx);
+>  	drop_ctx = data->ctx == NULL;
+>  	do {
+> +		struct sbitmap_queue *bt_prev;
+> +
+>  		/*
+>  		 * We're out of tags on this hardware queue, kick any
+>  		 * pending IO submits before going to sleep waiting for
+> @@ -159,6 +161,7 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+>  		if (data->ctx)
+>  			blk_mq_put_ctx(data->ctx);
+>  
+> +		bt_prev = bt;
+>  		io_schedule();
+>  
+>  		data->ctx = blk_mq_get_ctx(data->q);
+> @@ -170,6 +173,15 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+>  			bt = &tags->bitmap_tags;
+>  
+>  		finish_wait(&ws->wait, &wait);
+> +
+> +		/*
+> +		 * If destination hw queue is changed, fake wake up on
+> +		 * previous queue for compensating the wake up miss, so
+> +		 * other allocations on previous queue won't be starved.
+> +		 */
+> +		if (bt != bt_prev)
+> +			sbitmap_queue_wake_up(bt_prev);
+> +
+>  		ws = bt_wait_ptr(bt, data->hctx);
+>  	} while (1);
+>  
+> diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+> index 841585f6e5f2..bba9d80191b7 100644
+> --- a/include/linux/sbitmap.h
+> +++ b/include/linux/sbitmap.h
+> @@ -484,6 +484,13 @@ static inline struct sbq_wait_state *sbq_wait_ptr(struct sbitmap_queue *sbq,
+>  void sbitmap_queue_wake_all(struct sbitmap_queue *sbq);
+>  
+>  /**
+> + * sbitmap_queue_wake_up() - Wake up some of waiters in one waitqueue
+> + * on a &struct sbitmap_queue.
+> + * @sbq: Bitmap queue to wake up.
+> + */
+> +void sbitmap_queue_wake_up(struct sbitmap_queue *sbq);
+> +
+> +/**
+>   * sbitmap_queue_show() - Dump &struct sbitmap_queue information to a &struct
+>   * seq_file.
+>   * @sbq: Bitmap queue to show.
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index e6a9c06ec70c..14e027a33ffa 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -335,8 +335,9 @@ void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
+>  	if (sbq->wake_batch != wake_batch) {
+>  		WRITE_ONCE(sbq->wake_batch, wake_batch);
+>  		/*
+> -		 * Pairs with the memory barrier in sbq_wake_up() to ensure that
+> -		 * the batch size is updated before the wait counts.
+> +		 * Pairs with the memory barrier in sbitmap_queue_wake_up()
+> +		 * to ensure that the batch size is updated before the wait
+> +		 * counts.
+>  		 */
+>  		smp_mb__before_atomic();
+>  		for (i = 0; i < SBQ_WAIT_QUEUES; i++)
+> @@ -425,7 +426,7 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
+>  	return NULL;
+>  }
+>  
+> -static void sbq_wake_up(struct sbitmap_queue *sbq)
+> +void sbitmap_queue_wake_up(struct sbitmap_queue *sbq)
+>  {
+>  	struct sbq_wait_state *ws;
+>  	unsigned int wake_batch;
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- block/blk-cgroup.c          | 135 ++++++++++++++++++++++++++++++++++++++++++++
- include/linux/blk-cgroup.h  |  49 ++++++++++++++++
- include/linux/cgroup-defs.h |   3 +
- include/linux/sched.h       |   5 ++
- include/linux/tracehook.h   |   2 +
- 5 files changed, 194 insertions(+)
+Just after this is:
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 9e767e4a852d..5249059d0cff 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -27,6 +27,7 @@
- #include <linux/atomic.h>
- #include <linux/ctype.h>
- #include <linux/blk-cgroup.h>
-+#include <linux/tracehook.h>
- #include "blk.h"
+	/*
+	 * Pairs with the memory barrier in set_current_state() to ensure the
+	 * proper ordering of clear_bit()/waitqueue_active() in the waker and
+	 * test_and_set_bit_lock()/prepare_to_wait()/finish_wait() in the
+	 * waiter. See the comment on waitqueue_active(). This is __after_atomic
+	 * because we just did clear_bit_unlock() in the caller.
+	 */
+	smp_mb__after_atomic();
+
+But there's no atomic operation before this in blk_mq_get_tag(). I don't
+think this memory barrier is necessary for the blk_mq_get_tag() case, so
+let's move it to sbitmap_queue_clear():
+
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index 14e027a33ffa..537328a98c06 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -432,15 +432,6 @@ void sbitmap_queue_wake_up(struct sbitmap_queue *sbq)
+ 	unsigned int wake_batch;
+ 	int wait_cnt;
  
- #define MAX_KEY_LEN 100
-@@ -1334,6 +1335,13 @@ static void blkcg_bind(struct cgroup_subsys_state *root_css)
- 	mutex_unlock(&blkcg_pol_mutex);
- }
- 
-+static void blkcg_exit(struct task_struct *tsk)
-+{
-+	if (tsk->throttle_queue)
-+		blk_put_queue(tsk->throttle_queue);
-+	tsk->throttle_queue = NULL;
-+}
-+
- struct cgroup_subsys io_cgrp_subsys = {
- 	.css_alloc = blkcg_css_alloc,
- 	.css_offline = blkcg_css_offline,
-@@ -1343,6 +1351,7 @@ struct cgroup_subsys io_cgrp_subsys = {
- 	.dfl_cftypes = blkcg_files,
- 	.legacy_cftypes = blkcg_legacy_files,
- 	.legacy_name = "blkio",
-+	.exit = blkcg_exit,
- #ifdef CONFIG_MEMCG
- 	/*
- 	 * This ensures that, if available, memcg is automatically enabled
-@@ -1593,3 +1602,129 @@ void blkcg_policy_unregister(struct blkcg_policy *pol)
- 	mutex_unlock(&blkcg_pol_register_mutex);
- }
- EXPORT_SYMBOL_GPL(blkcg_policy_unregister);
-+
-+static void blkcg_scale_delay(struct blkcg_gq *blkg, u64 now)
-+{
-+	u64 old = atomic64_read(&blkg->delay_start);
-+
-+	if (old + NSEC_PER_SEC <= now &&
-+	    atomic64_cmpxchg(&blkg->delay_start, old, now) == old) {
-+		u64 cur = atomic64_read(&blkg->delay_nsec);
-+		u64 sub = min_t(u64, blkg->last_delay, now - old);
-+		int cur_use = atomic_read(&blkg->use_delay);
-+
-+		if (cur_use < blkg->last_use)
-+			sub = max_t(u64, sub, blkg->last_delay >> 1);
-+
-+		/* This shouldn't happen, but handle it anyway. */
-+		if (unlikely(cur < sub)) {
-+			atomic64_set(&blkg->delay_nsec, 0);
-+			blkg->last_delay = 0;
-+		} else {
-+			atomic64_sub(sub, &blkg->delay_nsec);
-+			blkg->last_delay = cur - sub;
-+		}
-+		blkg->last_use = cur_use;
-+	}
-+}
-+
-+static void blkcg_maybe_throttle_blkg(struct blkcg_gq *blkg, bool use_memdelay)
-+{
-+	u64 now = ktime_to_ns(ktime_get());
-+	u64 exp;
-+	u64 delay_nsec = 0;
-+	int tok;
-+
-+	while (blkg->parent) {
-+		if (atomic_read(&blkg->use_delay)) {
-+			blkcg_scale_delay(blkg, now);
-+			delay_nsec = max_t(u64, delay_nsec,
-+					   atomic64_read(&blkg->delay_nsec));
-+		}
-+		blkg = blkg->parent;
-+	}
-+
-+	if (!delay_nsec)
-+		return;
-+
-+	/* Let's not sleep for all eternity if we've amassed a huge delay. */
-+	delay_nsec = min_t(u64, delay_nsec, NSEC_PER_SEC);
-+
+-	/*
+-	 * Pairs with the memory barrier in set_current_state() to ensure the
+-	 * proper ordering of clear_bit()/waitqueue_active() in the waker and
+-	 * test_and_set_bit_lock()/prepare_to_wait()/finish_wait() in the
+-	 * waiter. See the comment on waitqueue_active(). This is __after_atomic
+-	 * because we just did clear_bit_unlock() in the caller.
+-	 */
+-	smp_mb__after_atomic();
+-
+ 	ws = sbq_wake_ptr(sbq);
+ 	if (!ws)
+ 		return;
+@@ -472,6 +463,13 @@ void sbitmap_queue_clear(struct sbitmap_queue *sbq, unsigned int nr,
+ 			 unsigned int cpu)
+ {
+ 	sbitmap_clear_bit_unlock(&sbq->sb, nr);
 +	/*
-+	 * TODO: the use_memdelay flag is going to be for the upcoming psi stuff
-+	 * that hasn't landed upstream yet.  Once that stuff is in place we need
-+	 * to do a psi_memstall_enter/leave if memdelay is set.
++	 * Pairs with the memory barrier in set_current_state() to ensure the
++	 * proper ordering of clear_bit_unlock()/waitqueue_active() in the waker
++	 * and test_and_set_bit_lock()/prepare_to_wait()/finish_wait() in the
++	 * waiter. See the comment on waitqueue_active().
 +	 */
-+
-+	exp = ktime_add_ns(now, delay_nsec);
-+	tok = io_schedule_prepare();
-+	do {
-+		__set_current_state(TASK_KILLABLE);
-+		if (!schedule_hrtimeout(&exp, HRTIMER_MODE_ABS))
-+			break;
-+	} while (!fatal_signal_pending(current));
-+	io_schedule_finish(tok);
-+}
-+
-+void blkcg_maybe_throttle_current(void)
-+{
-+	struct request_queue *q = current->throttle_queue;
-+	struct cgroup_subsys_state *css;
-+	struct blkcg *blkcg;
-+	struct blkcg_gq *blkg;
-+	bool use_memdelay = current->use_memdelay;
-+
-+	if (!q)
-+		return;
-+
-+	current->throttle_queue = NULL;
-+	current->use_memdelay = false;
-+
-+	rcu_read_lock();
-+	css = kthread_blkcg();
-+	if (css)
-+		blkcg = css_to_blkcg(css);
-+	else
-+		blkcg = css_to_blkcg(task_css(current, io_cgrp_id));
-+
-+	if (!blkcg)
-+		goto out;
-+	blkg = blkg_lookup(blkcg, q);
-+	if (!blkg)
-+		goto out;
-+	blkg_get(blkg);
-+	rcu_read_unlock();
-+	blk_put_queue(q);
-+
-+	blkcg_maybe_throttle_blkg(blkg, use_memdelay);
-+	blkg_put(blkg);
-+	return;
-+out:
-+	rcu_read_unlock();
-+	blk_put_queue(q);
-+}
-+EXPORT_SYMBOL_GPL(blkcg_maybe_throttle_current);
-+
-+void blkcg_schedule_throttle(struct request_queue *q, bool use_memdelay)
-+{
-+	if (unlikely(current->flags & PF_KTHREAD))
-+		return;
-+
-+	if (!blk_get_queue(q))
-+		return;
-+
-+	if (current->throttle_queue)
-+		blk_put_queue(current->throttle_queue);
-+	current->throttle_queue = q;
-+	if (use_memdelay)
-+		current->use_memdelay = use_memdelay;
-+	set_notify_resume(current);
-+}
-+EXPORT_SYMBOL_GPL(blkcg_schedule_throttle);
-+
-+void blkcg_add_delay(struct blkcg_gq *blkg, u64 now, u64 delta)
-+{
-+	blkcg_scale_delay(blkg, now);
-+	atomic64_add(delta, &blkg->delay_nsec);
-+}
-+EXPORT_SYMBOL_GPL(blkcg_add_delay);
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index a8f9ba8f33a4..fd73e2b4ea5f 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -136,6 +136,12 @@ struct blkcg_gq {
- 	struct blkg_policy_data		*pd[BLKCG_MAX_POLS];
- 
- 	struct rcu_head			rcu_head;
-+
-+	atomic_t			use_delay;
-+	atomic64_t			delay_nsec;
-+	atomic64_t			delay_start;
-+	u64				last_delay;
-+	int				last_use;
- };
- 
- typedef struct blkcg_policy_data *(blkcg_pol_alloc_cpd_fn)(gfp_t gfp);
-@@ -734,6 +740,45 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 	return !throtl;
- }
- 
-+static inline void blkcg_use_delay(struct blkcg_gq *blkg)
-+{
-+	if (atomic_inc_and_test(&blkg->use_delay))
-+		atomic_inc(&blkg->blkcg->css.cgroup->congestion_count);
-+}
-+
-+static inline int blkcg_unuse_delay(struct blkcg_gq *blkg)
-+{
-+	int old = atomic_read(&blkg->use_delay);
-+
-+	if (old == 0)
-+		return 0;
-+
-+	while (old) {
-+		int cur = atomic_cmpxchg(&blkg->use_delay, old, old - 1);
-+		if (cur == old)
-+			break;
-+		cur = old;
-+	}
-+
-+	if (old == 0)
-+		return 0;
-+	if (old == 1)
-+		atomic_dec(&blkg->blkcg->css.cgroup->congestion_count);
-+	return 1;
-+}
-+
-+static inline void blkcg_clear_delay(struct blkcg_gq *blkg)
-+{
-+	int old = atomic_read(&blkg->use_delay);
-+	if (!old)
-+		return;
-+	if (atomic_cmpxchg(&blkg->use_delay, old, 0) == old)
-+		atomic_dec(&blkg->blkcg->css.cgroup->congestion_count);
-+}
-+
-+void blkcg_add_delay(struct blkcg_gq *blkg, u64 now, u64 delta);
-+void blkcg_schedule_throttle(struct request_queue *q, bool use_memdelay);
-+void blkcg_maybe_throttle_current(void);
- #else	/* CONFIG_BLK_CGROUP */
- 
- struct blkcg {
-@@ -753,8 +798,12 @@ struct blkcg_policy {
- 
- #define blkcg_root_css	((struct cgroup_subsys_state *)ERR_PTR(-EINVAL))
- 
-+static inline void blkcg_maybe_throttle_current(void) { }
-+
- #ifdef CONFIG_BLOCK
- 
-+static inline void blkcg_schedule_throttle(struct request_queue *q, bool use_memdelay) { }
-+
- static inline struct blkcg_gq *blkg_lookup(struct blkcg *blkcg, void *key) { return NULL; }
- static inline int blkcg_init_queue(struct request_queue *q) { return 0; }
- static inline void blkcg_drain_queue(struct request_queue *q) { }
-diff --git a/include/linux/cgroup-defs.h b/include/linux/cgroup-defs.h
-index dc5b70449dc6..b3ab17d53f3d 100644
---- a/include/linux/cgroup-defs.h
-+++ b/include/linux/cgroup-defs.h
-@@ -427,6 +427,9 @@ struct cgroup {
- 	/* used to store eBPF programs */
- 	struct cgroup_bpf bpf;
- 
-+	/* If there is block congestion on this cgroup. */
-+	atomic_t congestion_count;
-+
- 	/* ids of the ancestors at each level including self */
- 	int ancestor_ids[];
- };
-diff --git a/include/linux/sched.h b/include/linux/sched.h
-index b3d697f3b573..b672ead16518 100644
---- a/include/linux/sched.h
-+++ b/include/linux/sched.h
-@@ -1099,6 +1099,11 @@ struct task_struct {
- 	unsigned int			memcg_nr_pages_over_high;
- #endif
- 
-+#ifdef CONFIG_BLK_CGROUP
-+	struct request_queue		*throttle_queue;
-+	bool				use_memdelay;
-+#endif
-+
- #ifdef CONFIG_UPROBES
- 	struct uprobe_task		*utask;
- #endif
-diff --git a/include/linux/tracehook.h b/include/linux/tracehook.h
-index 26c152122a42..4e24930306b9 100644
---- a/include/linux/tracehook.h
-+++ b/include/linux/tracehook.h
-@@ -51,6 +51,7 @@
- #include <linux/security.h>
- #include <linux/task_work.h>
- #include <linux/memcontrol.h>
-+#include <linux/blk-cgroup.h>
- struct linux_binprm;
- 
- /*
-@@ -191,6 +192,7 @@ static inline void tracehook_notify_resume(struct pt_regs *regs)
- 		task_work_run();
- 
- 	mem_cgroup_handle_over_high();
-+	blkcg_maybe_throttle_current();
- }
- 
- #endif	/* <linux/tracehook.h> */
--- 
-2.14.3
++	smp_mb__after_atomic();
+ 	sbitmap_queue_wake_up(sbq);
+ 	if (likely(!sbq->round_robin && nr < sbq->sb.depth))
+ 		*per_cpu_ptr(sbq->alloc_hint, cpu) = nr;
+
+That comment also mentioned clear_bit() but we do clear_bit_unlock()
+now, so we can update that at the same time.
+
+> @@ -454,23 +455,24 @@ static void sbq_wake_up(struct sbitmap_queue *sbq)
+>  		 */
+>  		smp_mb__before_atomic();
+>  		/*
+> -		 * If there are concurrent callers to sbq_wake_up(), the last
+> -		 * one to decrement the wait count below zero will bump it back
+> -		 * up. If there is a concurrent resize, the count reset will
+> -		 * either cause the cmpxchg to fail or overwrite after the
+> -		 * cmpxchg.
+> +		 * If there are concurrent callers to sbitmap_queue_wake_up(),
+> +		 * the last one to decrement the wait count below zero will
+> +		 * bump it back up. If there is a concurrent resize, the count
+> +		 * reset will either cause the cmpxchg to fail or overwrite
+> +		 * after the cmpxchg.
+>  		 */
+>  		atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wait_cnt + wake_batch);
+>  		sbq_index_atomic_inc(&sbq->wake_index);
+>  		wake_up_nr(&ws->wait, wake_batch);
+>  	}
+>  }
+> +EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up);
+>  
+>  void sbitmap_queue_clear(struct sbitmap_queue *sbq, unsigned int nr,
+>  			 unsigned int cpu)
+>  {
+>  	sbitmap_clear_bit_unlock(&sbq->sb, nr);
+> -	sbq_wake_up(sbq);
+> +	sbitmap_queue_wake_up(sbq);
+>  	if (likely(!sbq->round_robin && nr < sbq->sb.depth))
+>  		*per_cpu_ptr(sbq->alloc_hint, cpu) = nr;
+>  }
+> @@ -482,7 +484,7 @@ void sbitmap_queue_wake_all(struct sbitmap_queue *sbq)
+>  
+>  	/*
+>  	 * Pairs with the memory barrier in set_current_state() like in
+> -	 * sbq_wake_up().
+> +	 * sbitmap_queue_wake_up().
+>  	 */
+>  	smp_mb();
+>  	wake_index = atomic_read(&sbq->wake_index);
+> -- 
+> 2.9.5
+> 
