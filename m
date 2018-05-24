@@ -3,103 +3,46 @@ From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 31/33] block: bio: pass segments to bio if bio_add_page() is bypassed
-Date: Thu, 24 May 2018 17:01:36 +0800
-Message-Id: <20180524090139.2150-32-ming.lei@redhat.com>
+Subject: [PATCH V5 28/33] block: kill bio_for_each_page_all()
+Date: Thu, 24 May 2018 17:01:33 +0800
+Message-Id: <20180524090139.2150-29-ming.lei@redhat.com>
 In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
 References: <20180524090139.2150-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Under some situations, such as block direct I/O, we can't use
-bio_add_page() for merging pages into multipage bvec, so
-a new function is implemented for converting page array into one
-segment array, then these cases can benefit from multipage bvec
-too.
+No one uses it any more, so kill it and we can reuse this helper
+name.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bio.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 48 insertions(+), 6 deletions(-)
+ include/linux/bio.h | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index bc3992f52fe8..b7d9089cb28f 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -913,6 +913,41 @@ int bio_add_page(struct bio *bio, struct page *page,
- }
- EXPORT_SYMBOL(bio_add_page);
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 5ae2bc876295..c5e692d43f23 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -159,8 +159,10 @@ static inline void *bio_data(struct bio *bio)
+ /*
+  * drivers should _never_ use the all version - the bio may have been split
+  * before it got to the driver and the driver won't own all of it
++ *
++ * This helper iterates bio segment by segment.
+  */
+-#define bio_for_each_page_all(bvl, bio, i)				\
++#define bio_for_each_segment_all(bvl, bio, i)				\
+ 	for (i = 0, bvl = (bio)->bi_io_vec; i < (bio)->bi_vcnt; i++, bvl++)
  
-+static unsigned convert_to_segs(struct bio* bio, struct page **pages,
-+				unsigned char *page_cnt,
-+				unsigned nr_pages)
-+{
-+
-+	unsigned idx;
-+	unsigned nr_seg = 0;
-+	struct request_queue *q = NULL;
-+
-+	if (bio->bi_disk)
-+		q = bio->bi_disk->queue;
-+
-+	if (!q || !blk_queue_cluster(q)) {
-+		memset(page_cnt, 0, nr_pages);
-+		return nr_pages;
-+	}
-+
-+	page_cnt[nr_seg] = 0;
-+	for (idx = 1; idx < nr_pages; idx++) {
-+		struct page *pg_s = pages[nr_seg];
-+		struct page *pg = pages[idx];
-+
-+		if (page_to_pfn(pg_s) + page_cnt[nr_seg] + 1 ==
-+		    page_to_pfn(pg)) {
-+			page_cnt[nr_seg]++;
-+		} else {
-+			page_cnt[++nr_seg] = 0;
-+			if (nr_seg < idx)
-+				pages[nr_seg] = pg;
-+		}
-+	}
-+
-+	return nr_seg + 1;
-+}
-+
- /**
-  * bio_iov_iter_get_pages - pin user or kernel pages and add them to a bio
-  * @bio: bio to add pages to
-@@ -928,6 +963,8 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	struct page **pages = (struct page **)bv;
- 	size_t offset, diff;
- 	ssize_t size;
-+	unsigned short nr_segs;
-+	unsigned char page_cnt[nr_pages];	/* at most 256 pages */
+ static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+@@ -225,9 +227,6 @@ static inline bool bio_rewind_iter(struct bio *bio, struct bvec_iter *iter,
+ #define bio_for_each_segment(bvl, bio, iter)			\
+ 	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
  
- 	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
- 	if (unlikely(size <= 0))
-@@ -943,13 +980,18 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	 * need to be reflected here as well.
- 	 */
- 	bio->bi_iter.bi_size += size;
--	bio->bi_vcnt += nr_pages;
+-#define bio_for_each_segment_all(bvl, bio, i) \
+-	bio_for_each_page_all((bvl), (bio), (i))
 -
- 	diff = (nr_pages * PAGE_SIZE - offset) - size;
--	while (nr_pages--) {
--		bv[nr_pages].bv_page = pages[nr_pages];
--		bv[nr_pages].bv_len = PAGE_SIZE;
--		bv[nr_pages].bv_offset = 0;
-+
-+	/* convert into segments */
-+	nr_segs = convert_to_segs(bio, pages, page_cnt, nr_pages);
-+	bio->bi_vcnt += nr_segs;
-+
-+	while (nr_segs--) {
-+		unsigned cnt = (unsigned)page_cnt[nr_segs] + 1;
-+
-+		bv[nr_segs].bv_page = pages[nr_segs];
-+		bv[nr_segs].bv_len = PAGE_SIZE * cnt;
-+		bv[nr_segs].bv_offset = 0;
- 	}
- 
- 	bv[0].bv_offset += offset;
+ /*
+  * This helper returns singlepage bvec to caller, and the sp bvec is
+  * generated in-flight from multipage bvec stored in bvec table. So we
 -- 
 2.9.5
