@@ -1,142 +1,75 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	axboe@kernel.dk,
-	hch@infradead.org,
-	colyli@suse.de,
-	snitzer@redhat.com,
-	darrick.wong@oracle.com,
-	clm@fb.com,
-	bacik@fb.com,
-	linux-xfs@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	linux-btrfs@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	neilb@suse.com
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Subject: [PATCH 12/12] block: Drop bioset_create()
-Date: Sun, 20 May 2018 18:25:58 -0400
-Message-Id: <20180520222558.7053-13-kent.overstreet@gmail.com>
-In-Reply-To: <20180520222558.7053-1-kent.overstreet@gmail.com>
-References: <20180520222558.7053-1-kent.overstreet@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:34238 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S964867AbeEXITE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 May 2018 04:19:04 -0400
+Received: by mail-pf0-f196.google.com with SMTP id a14-v6so492732pfi.1
+        for <linux-block@vger.kernel.org>; Thu, 24 May 2018 01:19:04 -0700 (PDT)
+Subject: Re: [PATCH 2/2] lightnvm: pblk: handle case when device expose
+ mw_cunits equal to 0
+To: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
+Cc: linux-block@vger.kernel.org,
+        Igor Konopko <igor.j.konopko@intel.com>
+References: <1527088640-13062-1-git-send-email-marcin.dziegielewski@intel.com>
+ <1527088640-13062-3-git-send-email-marcin.dziegielewski@intel.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <add2c8b9-b900-f165-b783-500ca53100be@lightnvm.io>
+Date: Thu, 24 May 2018 10:18:59 +0200
+MIME-Version: 1.0
+In-Reply-To: <1527088640-13062-3-git-send-email-marcin.dziegielewski@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-All users have been converted to bioset_init()
+On 05/23/2018 05:17 PM, Marcin Dziegielewski wrote:
+> Some devices can expose mw_cunits equal to 0, it can cause creation of too
+> small write buffer and in consecuence performance drop on write workloads.
+> 
+> To handle that, in such case we are using default value for MLC and
+> beacause it covers both 1.2 and 2.0 OC specification, setting up mw_cunits
+> in nvme_nvm_setup_12 function isn't longer necessary.
+> 
+> Signed-off-by: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
+> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+> ---
+>   drivers/lightnvm/pblk-init.c | 10 +++++++++-
+>   drivers/nvme/host/lightnvm.c |  1 -
+>   2 files changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+> index 9a7213e..42190de 100644
+> --- a/drivers/lightnvm/pblk-init.c
+> +++ b/drivers/lightnvm/pblk-init.c
+> @@ -366,7 +366,15 @@ static int pblk_core_init(struct pblk *pblk)
+>   	atomic64_set(&pblk->nr_flush, 0);
+>   	pblk->nr_flush_rst = 0;
+>   
+> -	pblk->pgs_in_buffer = geo->mw_cunits * geo->all_luns;
+> +	if (geo->mw_cunits) {
+> +		pblk->pgs_in_buffer = geo->mw_cunits * geo->all_luns;
+> +	} else {
+> +		pblk->pgs_in_buffer = (geo->ws_opt << 3) * geo->all_luns;
+> +		/*
+> +		 * Some devices can expose mw_cunits equal to 0, so let's use
+> +		 * here default safe value for MLC.
+> +		 */
+> +	}
+>   
+>   	pblk->min_write_pgs = geo->ws_opt * (geo->csecs / PAGE_SIZE);
+>   	max_write_ppas = pblk->min_write_pgs * geo->all_luns;
+> diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+> index 41279da..c747792 100644
+> --- a/drivers/nvme/host/lightnvm.c
+> +++ b/drivers/nvme/host/lightnvm.c
+> @@ -338,7 +338,6 @@ static int nvme_nvm_setup_12(struct nvme_nvm_id12 *id,
+>   
+>   	geo->ws_min = sec_per_pg;
+>   	geo->ws_opt = sec_per_pg;
+> -	geo->mw_cunits = geo->ws_opt << 3;	/* default to MLC safe values */
+>   
+>   	/* Do not impose values for maximum number of open blocks as it is
+>   	 * unspecified in 1.2. Users of 1.2 must be aware of this and eventually
+> 
 
-Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
----
- block/bio.c         | 61 ++++++++++-----------------------------------
- include/linux/bio.h |  6 ++---
- 2 files changed, 15 insertions(+), 52 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 0a4df92cd6..595663e028 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1908,22 +1908,26 @@ void bioset_exit(struct bio_set *bs)
- }
- EXPORT_SYMBOL(bioset_exit);
- 
--void bioset_free(struct bio_set *bs)
--{
--	bioset_exit(bs);
--	kfree(bs);
--}
--EXPORT_SYMBOL(bioset_free);
--
- /**
-  * bioset_init - Initialize a bio_set
-+ * @bs:		pool to initialize
-  * @pool_size:	Number of bio and bio_vecs to cache in the mempool
-  * @front_pad:	Number of bytes to allocate in front of the returned bio
-  * @flags:	Flags to modify behavior, currently %BIOSET_NEED_BVECS
-  *              and %BIOSET_NEED_RESCUER
-  *
-- * Similar to bioset_create(), but initializes a passed-in bioset instead of
-- * separately allocating it.
-+ * Description:
-+ *    Set up a bio_set to be used with @bio_alloc_bioset. Allows the caller
-+ *    to ask for a number of bytes to be allocated in front of the bio.
-+ *    Front pad allocation is useful for embedding the bio inside
-+ *    another structure, to avoid allocating extra data to go with the bio.
-+ *    Note that the bio must be embedded at the END of that structure always,
-+ *    or things will break badly.
-+ *    If %BIOSET_NEED_BVECS is set in @flags, a separate pool will be allocated
-+ *    for allocating iovecs.  This pool is not needed e.g. for bio_clone_fast().
-+ *    If %BIOSET_NEED_RESCUER is set, a workqueue is created which can be used to
-+ *    dispatch queued requests when the mempool runs out of space.
-+ *
-  */
- int bioset_init(struct bio_set *bs,
- 		unsigned int pool_size,
-@@ -1963,45 +1967,6 @@ int bioset_init(struct bio_set *bs,
- }
- EXPORT_SYMBOL(bioset_init);
- 
--/**
-- * bioset_create  - Create a bio_set
-- * @pool_size:	Number of bio and bio_vecs to cache in the mempool
-- * @front_pad:	Number of bytes to allocate in front of the returned bio
-- * @flags:	Flags to modify behavior, currently %BIOSET_NEED_BVECS
-- *              and %BIOSET_NEED_RESCUER
-- *
-- * Description:
-- *    Set up a bio_set to be used with @bio_alloc_bioset. Allows the caller
-- *    to ask for a number of bytes to be allocated in front of the bio.
-- *    Front pad allocation is useful for embedding the bio inside
-- *    another structure, to avoid allocating extra data to go with the bio.
-- *    Note that the bio must be embedded at the END of that structure always,
-- *    or things will break badly.
-- *    If %BIOSET_NEED_BVECS is set in @flags, a separate pool will be allocated
-- *    for allocating iovecs.  This pool is not needed e.g. for bio_clone_fast().
-- *    If %BIOSET_NEED_RESCUER is set, a workqueue is created which can be used to
-- *    dispatch queued requests when the mempool runs out of space.
-- *
-- */
--struct bio_set *bioset_create(unsigned int pool_size,
--			      unsigned int front_pad,
--			      int flags)
--{
--	struct bio_set *bs;
--
--	bs = kzalloc(sizeof(*bs), GFP_KERNEL);
--	if (!bs)
--		return NULL;
--
--	if (bioset_init(bs, pool_size, front_pad, flags)) {
--		kfree(bs);
--		return NULL;
--	}
--
--	return bs;
--}
--EXPORT_SYMBOL(bioset_create);
--
- #ifdef CONFIG_BLK_CGROUP
- 
- /**
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 5e472fcafa..810a8bee8f 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -410,14 +410,12 @@ static inline struct bio *bio_next_split(struct bio *bio, int sectors,
- 	return bio_split(bio, sectors, gfp, bs);
- }
- 
--extern int bioset_init(struct bio_set *, unsigned int, unsigned int, int flags);
--extern void bioset_exit(struct bio_set *);
--extern struct bio_set *bioset_create(unsigned int, unsigned int, int flags);
- enum {
- 	BIOSET_NEED_BVECS = BIT(0),
- 	BIOSET_NEED_RESCUER = BIT(1),
- };
--extern void bioset_free(struct bio_set *);
-+extern int bioset_init(struct bio_set *, unsigned int, unsigned int, int flags);
-+extern void bioset_exit(struct bio_set *);
- extern int biovec_init_pool(mempool_t *pool, int pool_entries);
- 
- extern struct bio *bio_alloc_bioset(gfp_t, unsigned int, struct bio_set *);
--- 
-2.17.0
+Thanks Marcin. Applied for 4.18.
