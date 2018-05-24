@@ -1,42 +1,44 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:49886 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752176AbeERQtJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 May 2018 12:49:09 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 12/34] iomap: use __bio_add_page in iomap_dio_zero
-Date: Fri, 18 May 2018 18:48:08 +0200
-Message-Id: <20180518164830.1552-13-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+Date: Thu, 24 May 2018 09:52:30 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@linux.intel.com>
+Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@intel.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [RFC PATCH 3/3] blk-mq: Remove generation seqeunce
+Message-ID: <20180524015229.GA15354@ming.t460p>
+References: <20180521231131.6685-1-keith.busch@intel.com>
+ <20180521231131.6685-4-keith.busch@intel.com>
+ <20180522161704.GA20000@lst.de>
+ <20180523003446.GC31196@ming.t460p>
+ <20180523143539.GA10882@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180523143539.GA10882@localhost.localdomain>
+List-ID: <linux-block@vger.kernel.org>
 
-We don't need any merging logic, and this also replaces a BUG_ON with a
-WARN_ON_ONCE inside __bio_add_page for the impossible overflow condition.
+On Wed, May 23, 2018 at 08:35:40AM -0600, Keith Busch wrote:
+> On Wed, May 23, 2018 at 08:34:48AM +0800, Ming Lei wrote:
+> > Let's consider the normal NVMe timeout code path:
+> > 
+> > 1) one request is timed out;
+> > 
+> > 2) controller is shutdown, this timed-out request is requeued from
+> > nvme_cancel_request(), but can't dispatch because queues are quiesced
+> > 
+> > 3) reset is done from another context, and this request is dispatched
+> > again, and completed exactly before returning EH_HANDLED to blk-mq, but
+> > its state isn't updated to COMPLETE yet.
+> > 
+> > 4) then double completions are done from both normal completion and timeout
+> > path.
+> 
+> We're definitely fixing this, but I must admit that's an impressive
+> cognitive traversal across 5 thread contexts to arrive at that race. :)
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/iomap.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+It can be only 2 thread contexts if requeue is done on polled request
+from nvme_timeout(), :-)
 
-diff --git a/fs/iomap.c b/fs/iomap.c
-index a859e15d7bec..6427627a247f 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -957,8 +957,7 @@ iomap_dio_zero(struct iomap_dio *dio, struct iomap *iomap, loff_t pos,
- 	bio->bi_end_io = iomap_dio_bio_end_io;
- 
- 	get_page(page);
--	if (bio_add_page(bio, page, len, 0) != len)
--		BUG();
-+	__bio_add_page(bio, page, len, 0);
- 	bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC | REQ_IDLE);
- 
- 	atomic_inc(&dio->ref);
--- 
-2.17.0
+Thanks,
+Ming
