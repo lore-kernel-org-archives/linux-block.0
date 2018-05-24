@@ -1,102 +1,157 @@
-Return-Path: <keescook@chromium.org>
-Return-Path: <keescook@chromium.org>
-From: Kees Cook <keescook@chromium.org>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Kees Cook <keescook@chromium.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Tejun Heo <tj@kernel.org>,
-	Borislav Petkov <bp@alien8.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
-	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
-	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
-	linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 6/6] scsi: Check sense buffer size at build time
-Date: Tue, 22 May 2018 11:15:12 -0700
-Message-Id: <20180522181512.39316-7-keescook@chromium.org>
-In-Reply-To: <20180522181512.39316-1-keescook@chromium.org>
-References: <20180522181512.39316-1-keescook@chromium.org>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 22/33] btrfs: conver to bio_for_each_page_all2
+Date: Thu, 24 May 2018 17:01:27 +0800
+Message-Id: <20180524090139.2150-23-ming.lei@redhat.com>
+In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
+References: <20180524090139.2150-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-To avoid introducing problems like those fixed in commit f7068114d45e
-("sr: pass down correctly sized SCSI sense buffer"), this creates a macro
-wrapper for scsi_execute() that verifies the size of the sense buffer
-similar to what was done for command string sizes in commit 3756f6401c30
-("exec: avoid gcc-8 warning for get_task_comm").
+bio_for_each_page_all() can't be used any more after multipage bvec is
+enabled, so we have to convert to bio_for_each_page_all2().
 
-Another solution could be to add another argument to scsi_execute(),
-but this function already takes a lot of arguments and Jens was not fond
-of that approach. As there was only a pair of dynamically allocated sense
-buffers, this also moves those 96 bytes onto the stack to avoid triggering
-the sizeof() check.
-
-Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/scsi/scsi_lib.c    |  6 +++---
- include/scsi/scsi_device.h | 12 +++++++++++-
- 2 files changed, 14 insertions(+), 4 deletions(-)
+ fs/btrfs/compression.c | 3 ++-
+ fs/btrfs/disk-io.c     | 3 ++-
+ fs/btrfs/extent_io.c   | 9 ++++++---
+ fs/btrfs/inode.c       | 6 ++++--
+ fs/btrfs/raid56.c      | 3 ++-
+ 5 files changed, 16 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index e9b4f279d29c..718c2bec4516 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -238,7 +238,7 @@ void scsi_queue_insert(struct scsi_cmnd *cmd, int reason)
+diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+index be6b09dfd6a7..4cfe38feae3b 100644
+--- a/fs/btrfs/compression.c
++++ b/fs/btrfs/compression.c
+@@ -166,13 +166,14 @@ static void end_compressed_bio_read(struct bio *bio)
+ 	} else {
+ 		int i;
+ 		struct bio_vec *bvec;
++		struct bvec_iter_all bia;
  
+ 		/*
+ 		 * we have verified the checksum already, set page
+ 		 * checked so the end_io handlers know about it
+ 		 */
+ 		ASSERT(!bio_flagged(bio, BIO_CLONED));
+-		bio_for_each_page_all(bvec, cb->orig_bio, i)
++		bio_for_each_page_all2(bvec, cb->orig_bio, i, bia)
+ 			SetPageChecked(bvec->bv_page);
  
- /**
-- * scsi_execute - insert request and wait for the result
-+ * __scsi_execute - insert request and wait for the result
-  * @sdev:	scsi device
-  * @cmd:	scsi command
-  * @data_direction: data direction
-@@ -255,7 +255,7 @@ void scsi_queue_insert(struct scsi_cmnd *cmd, int reason)
-  * Returns the scsi_cmnd result field if a command was executed, or a negative
-  * Linux error code if we didn't get that far.
-  */
--int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
-+int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 		 int data_direction, void *buffer, unsigned bufflen,
- 		 unsigned char *sense, struct scsi_sense_hdr *sshdr,
- 		 int timeout, int retries, u64 flags, req_flags_t rq_flags,
-@@ -309,7 +309,7 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 		bio_endio(cb->orig_bio);
+diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
+index c6dc8a636413..ef78fd71c2f7 100644
+--- a/fs/btrfs/disk-io.c
++++ b/fs/btrfs/disk-io.c
+@@ -829,9 +829,10 @@ static blk_status_t btree_csum_one_bio(struct bio *bio)
+ 	struct bio_vec *bvec;
+ 	struct btrfs_root *root;
+ 	int i, ret = 0;
++	struct bvec_iter_all bia;
  
- 	return ret;
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		root = BTRFS_I(bvec->bv_page->mapping->host)->root;
+ 		ret = csum_dirty_buffer(root->fs_info, bvec->bv_page);
+ 		if (ret)
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index 3c9c91a1e3e9..383db7a7e5a4 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -2456,9 +2456,10 @@ static void end_bio_extent_writepage(struct bio *bio)
+ 	u64 start;
+ 	u64 end;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ 		struct inode *inode = page->mapping->host;
+ 		struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
+@@ -2527,9 +2528,10 @@ static void end_bio_extent_readpage(struct bio *bio)
+ 	int mirror;
+ 	int ret;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ 		struct inode *inode = page->mapping->host;
+ 		struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
+@@ -3681,9 +3683,10 @@ static void end_bio_extent_buffer_writepage(struct bio *bio)
+ 	struct bio_vec *bvec;
+ 	struct extent_buffer *eb;
+ 	int i, done;
++	struct bvec_iter_all bia;
+ 
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ 
+ 		eb = (struct extent_buffer *)page->private;
+diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+index 9d816dc725c4..8a73b26915bc 100644
+--- a/fs/btrfs/inode.c
++++ b/fs/btrfs/inode.c
+@@ -7883,6 +7883,7 @@ static void btrfs_retry_endio_nocsum(struct bio *bio)
+ 	struct bio_vec *bvec;
+ 	struct extent_io_tree *io_tree, *failure_tree;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+ 	if (bio->bi_status)
+ 		goto end;
+@@ -7894,7 +7895,7 @@ static void btrfs_retry_endio_nocsum(struct bio *bio)
+ 
+ 	done->uptodate = 1;
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+-	bio_for_each_page_all(bvec, bio, i)
++	bio_for_each_page_all2(bvec, bio, i, bia)
+ 		clean_io_failure(BTRFS_I(inode)->root->fs_info, failure_tree,
+ 				 io_tree, done->start, bvec->bv_page,
+ 				 btrfs_ino(BTRFS_I(inode)), 0);
+@@ -7973,6 +7974,7 @@ static void btrfs_retry_endio(struct bio *bio)
+ 	int uptodate;
+ 	int ret;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+ 	if (bio->bi_status)
+ 		goto end;
+@@ -7986,7 +7988,7 @@ static void btrfs_retry_endio(struct bio *bio)
+ 	failure_tree = &BTRFS_I(inode)->io_failure_tree;
+ 
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		ret = __readpage_endio_check(inode, io_bio, i, bvec->bv_page,
+ 					     bvec->bv_offset, done->start,
+ 					     bvec->bv_len);
+diff --git a/fs/btrfs/raid56.c b/fs/btrfs/raid56.c
+index ab9d80f79ffe..955fa4dbecee 100644
+--- a/fs/btrfs/raid56.c
++++ b/fs/btrfs/raid56.c
+@@ -1445,10 +1445,11 @@ static void set_bio_pages_uptodate(struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+ 
+-	bio_for_each_page_all(bvec, bio, i)
++	bio_for_each_page_all2(bvec, bio, i, bia)
+ 		SetPageUptodate(bvec->bv_page);
  }
--EXPORT_SYMBOL(scsi_execute);
-+EXPORT_SYMBOL(__scsi_execute);
  
- /*
-  * Function:    scsi_init_cmd_errh()
-diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
-index 7ae177c8e399..1bb87b6c0ad2 100644
---- a/include/scsi/scsi_device.h
-+++ b/include/scsi/scsi_device.h
-@@ -426,11 +426,21 @@ extern const char *scsi_device_state_name(enum scsi_device_state);
- extern int scsi_is_sdev_device(const struct device *);
- extern int scsi_is_target_device(const struct device *);
- extern void scsi_sanitize_inquiry_string(unsigned char *s, int len);
--extern int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
-+extern int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 			int data_direction, void *buffer, unsigned bufflen,
- 			unsigned char *sense, struct scsi_sense_hdr *sshdr,
- 			int timeout, int retries, u64 flags,
- 			req_flags_t rq_flags, int *resid);
-+/* Make sure any sense buffer is the correct size. */
-+#define scsi_execute(sdev, cmd, data_direction, buffer, bufflen, sense,	\
-+		     sshdr, timeout, retries, flags, rq_flags, resid)	\
-+({									\
-+	BUILD_BUG_ON((sense) != NULL &&					\
-+		     sizeof(sense) != SCSI_SENSE_BUFFERSIZE);		\
-+	__scsi_execute(sdev, cmd, data_direction, buffer, bufflen,	\
-+		       sense, sshdr, timeout, retries, flags, rq_flags,	\
-+		       resid);						\
-+})
- static inline int scsi_execute_req(struct scsi_device *sdev,
- 	const unsigned char *cmd, int data_direction, void *buffer,
- 	unsigned bufflen, struct scsi_sense_hdr *sshdr, int timeout,
 -- 
-2.17.0
+2.9.5
