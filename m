@@ -1,79 +1,63 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:49912 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751395AbeERQtM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 May 2018 12:49:12 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 13/34] iomap: add a iomap_sector helper
-Date: Fri, 18 May 2018 18:48:09 +0200
-Message-Id: <20180518164830.1552-14-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 33/33] block: document usage of bio iterator helpers
+Date: Thu, 24 May 2018 17:01:38 +0800
+Message-Id: <20180524090139.2150-34-ming.lei@redhat.com>
+In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
+References: <20180524090139.2150-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Factor the repeated calculation of the on-disk sector for a given logical
-block into a littler helper.
+Now multipage bvec is supported, and some helpers may return page by
+page, and some may return segment by segment, this patch documents the
+usage for helping us use them correctly.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/iomap.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ Documentation/block/biovecs.txt | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 6427627a247f..44259eadb69d 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -97,6 +97,12 @@ iomap_apply(struct inode *inode, loff_t pos, loff_t length, unsigned flags,
- 	return written ? written : ret;
- }
- 
-+static sector_t
-+iomap_sector(struct iomap *iomap, loff_t pos)
-+{
-+	return (iomap->addr + pos - iomap->offset) >> SECTOR_SHIFT;
-+}
+diff --git a/Documentation/block/biovecs.txt b/Documentation/block/biovecs.txt
+index b4d238b8d9fc..32a6643caeca 100644
+--- a/Documentation/block/biovecs.txt
++++ b/Documentation/block/biovecs.txt
+@@ -117,3 +117,35 @@ Other implications:
+    size limitations and the limitations of the underlying devices. Thus
+    there's no need to define ->merge_bvec_fn() callbacks for individual block
+    drivers.
 +
- static void
- iomap_write_failed(struct inode *inode, loff_t pos, unsigned len)
- {
-@@ -354,11 +360,8 @@ static int iomap_zero(struct inode *inode, loff_t pos, unsigned offset,
- static int iomap_dax_zero(loff_t pos, unsigned offset, unsigned bytes,
- 		struct iomap *iomap)
- {
--	sector_t sector = (iomap->addr +
--			   (pos & PAGE_MASK) - iomap->offset) >> 9;
--
--	return __dax_zero_page_range(iomap->bdev, iomap->dax_dev, sector,
--			offset, bytes);
-+	return __dax_zero_page_range(iomap->bdev, iomap->dax_dev,
-+			iomap_sector(iomap, pos & PAGE_MASK), offset, bytes);
- }
- 
- static loff_t
-@@ -951,8 +954,7 @@ iomap_dio_zero(struct iomap_dio *dio, struct iomap *iomap, loff_t pos,
- 
- 	bio = bio_alloc(GFP_KERNEL, 1);
- 	bio_set_dev(bio, iomap->bdev);
--	bio->bi_iter.bi_sector =
--		(iomap->addr + pos - iomap->offset) >> 9;
-+	bio->bi_iter.bi_sector = iomap_sector(iomap, pos);
- 	bio->bi_private = dio;
- 	bio->bi_end_io = iomap_dio_bio_end_io;
- 
-@@ -1046,8 +1048,7 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
- 
- 		bio = bio_alloc(GFP_KERNEL, nr_pages);
- 		bio_set_dev(bio, iomap->bdev);
--		bio->bi_iter.bi_sector =
--			(iomap->addr + pos - iomap->offset) >> 9;
-+		bio->bi_iter.bi_sector = iomap_sector(iomap, pos);
- 		bio->bi_write_hint = dio->iocb->ki_hint;
- 		bio->bi_private = dio;
- 		bio->bi_end_io = iomap_dio_bio_end_io;
++Usage of helpers:
++=================
++
++* The following helpers which name has suffix of "_all" can only be used on
++non-BIO_CLONED bio, and ususally they are used by filesystem code, and driver
++shouldn't use them becasue bio may have been splitted before they got to the
++driver:
++
++	bio_for_each_segment_all()
++	bio_for_each_page_all()
++	bio_pages_all()
++	bio_first_bvec_all()
++	bio_first_page_all()
++	bio_last_bvec_all()
++	segment_for_each_page_all()
++
++* The following helpers iterate bio page by page, and the local variable of
++'struct bio_vec' or the reference records single page io vector during the
++itearation:
++
++	bio_for_each_page()
++	bio_for_each_page_all()
++	segment_for_each_page_all()
++
++* The following helpers iterate bio segment by segment, and each segment may
++include multiple physically contiguous pages, and the local variable of
++'struct bio_vec' or the reference records multi page io vector during the
++itearation:
++
++	bio_for_each_segment()
++	bio_for_each_segment_all()
 -- 
-2.17.0
+2.9.5
