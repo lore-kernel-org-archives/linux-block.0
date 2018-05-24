@@ -1,41 +1,38 @@
-Return-Path: <BATV+7138d8dfc060164c836f+5389+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-nvme@lists.infradead.org
+Return-Path: <BATV+7c38cfb39597af86d9de+5387+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Thu, 24 May 2018 07:11:44 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Kees Cook <keescook@chromium.org>
 Cc: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 14/14] nvme: limit warnings from nvme_identify_ns
-Date: Sat, 26 May 2018 12:27:35 +0200
-Message-Id: <20180526102735.31404-15-hch@lst.de>
-In-Reply-To: <20180526102735.31404-1-hch@lst.de>
-References: <20180526102735.31404-1-hch@lst.de>
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Tejun Heo <tj@kernel.org>, Borislav Petkov <bp@alien8.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
+	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
+	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
+	linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 6/6] scsi: Check sense buffer size at build time
+Message-ID: <20180524141144.GA19629@infradead.org>
+References: <20180522181512.39316-1-keescook@chromium.org>
+ <20180522181512.39316-7-keescook@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180522181512.39316-7-keescook@chromium.org>
 List-ID: <linux-block@vger.kernel.org>
 
-When rescanning namespaces after an AEN we will issue Identify Namespace
-comands to namespaces that have gone away, so don't warn for this specific
-case.
+> +/* Make sure any sense buffer is the correct size. */
+> +#define scsi_execute(sdev, cmd, data_direction, buffer, bufflen, sense,	\
+> +		     sshdr, timeout, retries, flags, rq_flags, resid)	\
+> +({									\
+> +	BUILD_BUG_ON((sense) != NULL &&					\
+> +		     sizeof(sense) != SCSI_SENSE_BUFFERSIZE);		\
+> +	__scsi_execute(sdev, cmd, data_direction, buffer, bufflen,	\
+> +		       sense, sshdr, timeout, retries, flags, rq_flags,	\
+> +		       resid);						\
+> +})
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/core.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 1ae77428a1a5..7ad3cfc9d4e1 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -984,7 +984,9 @@ static struct nvme_id_ns *nvme_identify_ns(struct nvme_ctrl *ctrl,
- 
- 	error = nvme_submit_sync_cmd(ctrl->admin_q, &c, id, sizeof(*id));
- 	if (error) {
--		dev_warn(ctrl->device, "Identify namespace failed\n");
-+		/* don't warn on a namespace that has gone away */
-+		if (error < 0 || ((error & ~NVME_SC_DNR) != NVME_SC_INVALID_NS))
-+			dev_warn(ctrl->device, "Identify namespace failed\n");
- 		kfree(id);
- 		return NULL;
- 	}
--- 
-2.17.0
+This macro gets evaluated in the scsi_execute_req inline function just
+below.  So either we need to include scsi_sense.h/scsi_common.h in
+scsi_device.h, or just move scsi_execute_req out of line.  The latter
+sounds better to me a it's not really used in a fast path.
