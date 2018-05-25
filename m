@@ -1,112 +1,85 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 28/33] xfs: refactor the tail of xfs_writepage_map
-Date: Wed,  9 May 2018 09:48:25 +0200
-Message-Id: <20180509074830.16196-29-hch@lst.de>
-In-Reply-To: <20180509074830.16196-1-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de>
+Date: Fri, 25 May 2018 00:42:27 -0400
+From: Kent Overstreet <kent.overstreet@gmail.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        David Sterba <dsterba@suse.cz>,
+        Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>
+Subject: Re: [RESEND PATCH V5 12/33] block: introduce bio_segments()
+Message-ID: <20180525044227.GA8740@kmo-pixel>
+References: <20180525034621.31147-1-ming.lei@redhat.com>
+ <20180525034621.31147-13-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180525034621.31147-13-ming.lei@redhat.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Rejuggle how we deal with the different error vs non-error and have
-ioends vs not have ioend cases to keep the fast path streamlined, and
-the duplicate code at a minimum.
+On Fri, May 25, 2018 at 11:46:00AM +0800, Ming Lei wrote:
+> There are still cases in which we need to use bio_segments() for get the
+> number of segment, so introduce it.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  include/linux/bio.h | 25 ++++++++++++++++++++-----
+>  1 file changed, 20 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index 08af9272687f..b24c00f99c9c 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -227,9 +227,9 @@ static inline bool bio_rewind_iter(struct bio *bio, struct bvec_iter *iter,
+>  
+>  #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
+>  
+> -static inline unsigned bio_pages(struct bio *bio)
+> +static inline unsigned __bio_elements(struct bio *bio, bool seg)
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/xfs_aops.c | 65 +++++++++++++++++++++++------------------------
- 1 file changed, 32 insertions(+), 33 deletions(-)
+This is a rather silly helper function, there isn't any actual code that's
+shared, everything's behind an if () statement. Just open code it in bio_pages()
+and bio_segments()
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 6b39792270aa..dc82d4e71a64 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -906,7 +906,14 @@ xfs_writepage_map(
- 	 * submission of outstanding ioends on the writepage context so they are
- 	 * treated correctly on error.
- 	 */
--	if (count) {
-+	if (unlikely(error)) {
-+		if (!count) {
-+			xfs_aops_discard_page(page);
-+			ClearPageUptodate(page);
-+			unlock_page(page);
-+			goto done;
-+		}
-+
- 		/*
- 		 * If the page was not fully cleaned, we need to ensure that the
- 		 * higher layers come back to it correctly.  That means we need
-@@ -915,43 +922,35 @@ xfs_writepage_map(
- 		 * so another attempt to write this page in this writeback sweep
- 		 * will be made.
- 		 */
--		if (error) {
--			set_page_writeback_keepwrite(page);
--		} else {
--			clear_page_dirty_for_io(page);
--			set_page_writeback(page);
--		}
--		unlock_page(page);
--
--		/*
--		 * Preserve the original error if there was one, otherwise catch
--		 * submission errors here and propagate into subsequent ioend
--		 * submissions.
--		 */
--		list_for_each_entry_safe(ioend, next, &submit_list, io_list) {
--			int error2;
--
--			list_del_init(&ioend->io_list);
--			error2 = xfs_submit_ioend(wbc, ioend, error);
--			if (error2 && !error)
--				error = error2;
--		}
--	} else if (error) {
--		xfs_aops_discard_page(page);
--		ClearPageUptodate(page);
--		unlock_page(page);
-+		set_page_writeback_keepwrite(page);
- 	} else {
--		/*
--		 * We can end up here with no error and nothing to write if we
--		 * race with a partial page truncate on a sub-page block sized
--		 * filesystem. In that case we need to mark the page clean.
--		 */
- 		clear_page_dirty_for_io(page);
- 		set_page_writeback(page);
--		unlock_page(page);
--		end_page_writeback(page);
- 	}
- 
-+	unlock_page(page);
-+
-+	/*
-+	 * Preserve the original error if there was one, otherwise catch
-+	 * submission errors here and propagate into subsequent ioend
-+	 * submissions.
-+	 */
-+	list_for_each_entry_safe(ioend, next, &submit_list, io_list) {
-+		int error2;
-+
-+		list_del_init(&ioend->io_list);
-+		error2 = xfs_submit_ioend(wbc, ioend, error);
-+		if (error2 && !error)
-+			error = error2;
-+	}
-+
-+	/*
-+	 * We can end up here with no error and nothing to write if we race with
-+	 * a partial page truncate on a sub-page block sized filesystem.
-+	 */
-+	if (!count)
-+		end_page_writeback(page);
-+done:
- 	mapping_set_error(page->mapping, error);
- 	return error;
- }
--- 
-2.17.0
+>  {
+> -	unsigned segs = 0;
+> +	unsigned elems = 0;
+>  	struct bio_vec bv;
+>  	struct bvec_iter iter;
+>  
+> @@ -249,10 +249,25 @@ static inline unsigned bio_pages(struct bio *bio)
+>  		break;
+>  	}
+>  
+> -	bio_for_each_page(bv, bio, iter)
+> -		segs++;
+> +	if (!seg) {
+> +		bio_for_each_page(bv, bio, iter)
+> +			elems++;
+> +	} else {
+> +		bio_for_each_segment(bv, bio, iter)
+> +			elems++;
+> +	}
+> +
+> +	return elems;
+> +}
+> +
+> +static inline unsigned bio_pages(struct bio *bio)
+> +{
+> +	return __bio_elements(bio, false);
+> +}
+>  
+> -	return segs;
+> +static inline unsigned bio_segments(struct bio *bio)
+> +{
+> +	return __bio_elements(bio, true);
+>  }
+>  
+>  /*
+> -- 
+> 2.9.5
+> 
