@@ -1,111 +1,165 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	sapienza.dav@gmail.com,
-	177992@studenti.unimore.it,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENTS 4/4] block, bfq: prevent soft_rt_next_start from being stuck at infinity
-Date: Thu, 31 May 2018 16:45:08 +0200
-Message-Id: <20180531144508.3927-5-paolo.valente@linaro.org>
-In-Reply-To: <20180531144508.3927-1-paolo.valente@linaro.org>
-References: <20180531144508.3927-1-paolo.valente@linaro.org>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [RESEND PATCH V5 22/33] btrfs: conver to bio_for_each_page_all2
+Date: Fri, 25 May 2018 11:46:10 +0800
+Message-Id: <20180525034621.31147-23-ming.lei@redhat.com>
+In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
+References: <20180525034621.31147-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Davide Sapienza <sapienza.dav@gmail.com>
+bio_for_each_page_all() can't be used any more after multipage bvec is
+enabled, so we have to convert to bio_for_each_page_all2().
 
-BFQ can deem a bfq_queue as soft real-time only if the queue
-- periodically becomes completely idle, i.e., empty and with
-  no still-outstanding I/O request;
-- after becoming idle, gets new I/O only after a special reference
-  time soft_rt_next_start.
-
-In this respect, after commit "block, bfq: consider also past I/O in
-soft real-time detection", the value of soft_rt_next_start can never
-decrease. This causes a problem with the following special updating
-case for soft_rt_next_start: to prevent queues that are not completely
-idle to be wrongly detected as soft real-time (when they become
-non-empty again), soft_rt_next_start is temporarily set to infinity
-for empty queues with still outstanding I/O requests. But, if such an
-update is actually performed, then, because of the above commit,
-soft_rt_next_start will be stuck at infinity forever, and the queue
-will have no more chance to be considered soft real-time.
-
-On slow systems, this problem does cause actual soft real-time
-applications to be occasionally not detected as such.
-
-This commit addresses this issue by eliminating the pushing of
-soft_rt_next_start to infinity, and by changing the way non-empty
-queues are prevented from being wrongly detected as soft
-real-time. Simply, a queue that becomes non-empty again can now be
-detected as soft real-time only if it has no outstanding I/O request.
-
-Signed-off-by: Davide Sapienza <sapienza.dav@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bfq-iosched.c | 29 ++---------------------------
- 1 file changed, 2 insertions(+), 27 deletions(-)
+ fs/btrfs/compression.c | 3 ++-
+ fs/btrfs/disk-io.c     | 3 ++-
+ fs/btrfs/extent_io.c   | 9 ++++++---
+ fs/btrfs/inode.c       | 6 ++++--
+ fs/btrfs/raid56.c      | 3 ++-
+ 5 files changed, 16 insertions(+), 8 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 31ce089d54eb..37cadc643c56 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -1416,15 +1416,6 @@ static bool bfq_bfqq_update_budg_for_activation(struct bfq_data *bfqd,
- 	return wr_or_deserves_wr;
+diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+index be6b09dfd6a7..4cfe38feae3b 100644
+--- a/fs/btrfs/compression.c
++++ b/fs/btrfs/compression.c
+@@ -166,13 +166,14 @@ static void end_compressed_bio_read(struct bio *bio)
+ 	} else {
+ 		int i;
+ 		struct bio_vec *bvec;
++		struct bvec_iter_all bia;
+ 
+ 		/*
+ 		 * we have verified the checksum already, set page
+ 		 * checked so the end_io handlers know about it
+ 		 */
+ 		ASSERT(!bio_flagged(bio, BIO_CLONED));
+-		bio_for_each_page_all(bvec, cb->orig_bio, i)
++		bio_for_each_page_all2(bvec, cb->orig_bio, i, bia)
+ 			SetPageChecked(bvec->bv_page);
+ 
+ 		bio_endio(cb->orig_bio);
+diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
+index c6dc8a636413..ef78fd71c2f7 100644
+--- a/fs/btrfs/disk-io.c
++++ b/fs/btrfs/disk-io.c
+@@ -829,9 +829,10 @@ static blk_status_t btree_csum_one_bio(struct bio *bio)
+ 	struct bio_vec *bvec;
+ 	struct btrfs_root *root;
+ 	int i, ret = 0;
++	struct bvec_iter_all bia;
+ 
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		root = BTRFS_I(bvec->bv_page->mapping->host)->root;
+ 		ret = csum_dirty_buffer(root->fs_info, bvec->bv_page);
+ 		if (ret)
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index 3c9c91a1e3e9..383db7a7e5a4 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -2456,9 +2456,10 @@ static void end_bio_extent_writepage(struct bio *bio)
+ 	u64 start;
+ 	u64 end;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ 		struct inode *inode = page->mapping->host;
+ 		struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
+@@ -2527,9 +2528,10 @@ static void end_bio_extent_readpage(struct bio *bio)
+ 	int mirror;
+ 	int ret;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ 		struct inode *inode = page->mapping->host;
+ 		struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
+@@ -3681,9 +3683,10 @@ static void end_bio_extent_buffer_writepage(struct bio *bio)
+ 	struct bio_vec *bvec;
+ 	struct extent_buffer *eb;
+ 	int i, done;
++	struct bvec_iter_all bia;
+ 
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ 
+ 		eb = (struct extent_buffer *)page->private;
+diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+index 9d816dc725c4..8a73b26915bc 100644
+--- a/fs/btrfs/inode.c
++++ b/fs/btrfs/inode.c
+@@ -7883,6 +7883,7 @@ static void btrfs_retry_endio_nocsum(struct bio *bio)
+ 	struct bio_vec *bvec;
+ 	struct extent_io_tree *io_tree, *failure_tree;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+ 	if (bio->bi_status)
+ 		goto end;
+@@ -7894,7 +7895,7 @@ static void btrfs_retry_endio_nocsum(struct bio *bio)
+ 
+ 	done->uptodate = 1;
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+-	bio_for_each_page_all(bvec, bio, i)
++	bio_for_each_page_all2(bvec, bio, i, bia)
+ 		clean_io_failure(BTRFS_I(inode)->root->fs_info, failure_tree,
+ 				 io_tree, done->start, bvec->bv_page,
+ 				 btrfs_ino(BTRFS_I(inode)), 0);
+@@ -7973,6 +7974,7 @@ static void btrfs_retry_endio(struct bio *bio)
+ 	int uptodate;
+ 	int ret;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+ 	if (bio->bi_status)
+ 		goto end;
+@@ -7986,7 +7988,7 @@ static void btrfs_retry_endio(struct bio *bio)
+ 	failure_tree = &BTRFS_I(inode)->io_failure_tree;
+ 
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		ret = __readpage_endio_check(inode, io_bio, i, bvec->bv_page,
+ 					     bvec->bv_offset, done->start,
+ 					     bvec->bv_len);
+diff --git a/fs/btrfs/raid56.c b/fs/btrfs/raid56.c
+index ab9d80f79ffe..955fa4dbecee 100644
+--- a/fs/btrfs/raid56.c
++++ b/fs/btrfs/raid56.c
+@@ -1445,10 +1445,11 @@ static void set_bio_pages_uptodate(struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+ 
+-	bio_for_each_page_all(bvec, bio, i)
++	bio_for_each_page_all2(bvec, bio, i, bia)
+ 		SetPageUptodate(bvec->bv_page);
  }
  
--/*
-- * Return the farthest future time instant according to jiffies
-- * macros.
-- */
--static unsigned long bfq_greatest_from_now(void)
--{
--	return jiffies + MAX_JIFFY_OFFSET;
--}
--
- /*
-  * Return the farthest past time instant according to jiffies
-  * macros.
-@@ -1569,7 +1560,8 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
- 	in_burst = bfq_bfqq_in_large_burst(bfqq);
- 	soft_rt = bfqd->bfq_wr_max_softrt_rate > 0 &&
- 		!in_burst &&
--		time_is_before_jiffies(bfqq->soft_rt_next_start);
-+		time_is_before_jiffies(bfqq->soft_rt_next_start) &&
-+		bfqq->dispatched == 0;
- 	*interactive = !in_burst && idle_for_long_time;
- 	wr_or_deserves_wr = bfqd->low_latency &&
- 		(bfqq->wr_coeff > 1 ||
-@@ -3272,23 +3264,6 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
- 			bfqq->soft_rt_next_start =
- 				bfq_bfqq_softrt_next_start(bfqd, bfqq);
- 		else {
--			/*
--			 * The application is still waiting for the
--			 * completion of one or more requests:
--			 * prevent it from possibly being incorrectly
--			 * deemed as soft real-time by setting its
--			 * soft_rt_next_start to infinity. In fact,
--			 * without this assignment, the application
--			 * would be incorrectly deemed as soft
--			 * real-time if:
--			 * 1) it issued a new request before the
--			 *    completion of all its in-flight
--			 *    requests, and
--			 * 2) at that time, its soft_rt_next_start
--			 *    happened to be in the past.
--			 */
--			bfqq->soft_rt_next_start =
--				bfq_greatest_from_now();
- 			/*
- 			 * Schedule an update of soft_rt_next_start to when
- 			 * the task may be discovered to be isochronous.
 -- 
-2.16.1
+2.9.5
