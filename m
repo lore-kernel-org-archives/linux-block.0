@@ -1,74 +1,53 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 09/33] iomap: add a iomap_sector helper
-Date: Wed,  9 May 2018 09:48:06 +0200
-Message-Id: <20180509074830.16196-10-hch@lst.de>
-In-Reply-To: <20180509074830.16196-1-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41438 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S935358AbeEYDtz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 May 2018 23:49:55 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [RESEND PATCH V5 16/33] dm: clone bio via bio_clone_seg_bioset
+Date: Fri, 25 May 2018 11:46:04 +0800
+Message-Id: <20180525034621.31147-17-ming.lei@redhat.com>
+In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
+References: <20180525034621.31147-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Factor the repeated calculation of the on-disk sector for a given logical
-block into a littler helper.
+The incoming bio will become very big after multipage bvec is enabled,
+so we can't clone bio page by page.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+This patch uses the introduced bio_clone_seg_bioset(), so the incoming
+bio can be cloned successfully. This way is safe because device mapping
+won't modify the bio vector on the cloned multipage bio.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/iomap.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ drivers/md/dm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 58bb39bac72b..af525cb47339 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -96,6 +96,12 @@ iomap_apply(struct inode *inode, loff_t pos, loff_t length, unsigned flags,
- 	return written ? written : ret;
- }
- 
-+static sector_t
-+iomap_sector(struct iomap *iomap, loff_t pos)
-+{
-+	return (iomap->addr + pos - iomap->offset) >> SECTOR_SHIFT;
-+}
-+
- static void
- iomap_write_failed(struct inode *inode, loff_t pos, unsigned len)
- {
-@@ -353,11 +359,8 @@ static int iomap_zero(struct inode *inode, loff_t pos, unsigned offset,
- static int iomap_dax_zero(loff_t pos, unsigned offset, unsigned bytes,
- 		struct iomap *iomap)
- {
--	sector_t sector = (iomap->addr +
--			   (pos & PAGE_MASK) - iomap->offset) >> 9;
--
--	return __dax_zero_page_range(iomap->bdev, iomap->dax_dev, sector,
--			offset, bytes);
-+	return __dax_zero_page_range(iomap->bdev, iomap->dax_dev,
-+			iomap_sector(iomap, pos & PAGE_MASK), offset, bytes);
- }
- 
- static loff_t
-@@ -945,8 +948,7 @@ iomap_dio_zero(struct iomap_dio *dio, struct iomap *iomap, loff_t pos,
- 
- 	bio = bio_alloc(GFP_KERNEL, 1);
- 	bio_set_dev(bio, iomap->bdev);
--	bio->bi_iter.bi_sector =
--		(iomap->addr + pos - iomap->offset) >> 9;
-+	bio->bi_iter.bi_sector = iomap_sector(iomap, pos);
- 	bio->bi_private = dio;
- 	bio->bi_end_io = iomap_dio_bio_end_io;
- 
-@@ -1027,8 +1029,7 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
- 
- 		bio = bio_alloc(GFP_KERNEL, nr_pages);
- 		bio_set_dev(bio, iomap->bdev);
--		bio->bi_iter.bi_sector =
--			(iomap->addr + pos - iomap->offset) >> 9;
-+		bio->bi_iter.bi_sector = iomap_sector(iomap, pos);
- 		bio->bi_write_hint = dio->iocb->ki_hint;
- 		bio->bi_private = dio;
- 		bio->bi_end_io = iomap_dio_bio_end_io;
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index f1db181e082e..425e99e20f5c 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1581,8 +1581,8 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
+ 				 * the usage of io->orig_bio in dm_remap_zone_report()
+ 				 * won't be affected by this reassignment.
+ 				 */
+-				struct bio *b = bio_clone_bioset(bio, GFP_NOIO,
+-								 md->queue->bio_split);
++				struct bio *b = bio_clone_seg_bioset(bio,
++						GFP_NOIO, md->queue->bio_split);
+ 				ci.io->orig_bio = b;
+ 				bio_advance(bio, (bio_sectors(bio) - ci.sector_count) << 9);
+ 				bio_chain(b, bio);
 -- 
-2.17.0
+2.9.5
