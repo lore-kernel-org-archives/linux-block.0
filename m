@@ -1,113 +1,70 @@
-Return-Path: <BATV+a01a3e67072ae75c0352+5392+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>,
-	Lee Duncan <lduncan@suse.com>,
-	Chris Leech <cleech@redhat.com>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 05/14] nvme: return BLK_EH_DONE from ->timeout
-Date: Tue, 29 May 2018 15:52:30 +0200
-Message-Id: <20180529135239.27005-6-hch@lst.de>
-In-Reply-To: <20180529135239.27005-1-hch@lst.de>
-References: <20180529135239.27005-1-hch@lst.de>
+Return-Path: <jmoyer@redhat.com>
+From: Jeff Moyer <jmoyer@redhat.com>
+To: Damien.LeMoal@wdc.com,
+	axboe@kernel.dk,
+	linux-block@vger.kernel.org
+Cc: bgurney@redhat.com,
+	Jeff Moyer <jmoyer@redhat.com>
+Subject: [PATCH 1/2] block: __elevator_change: add try_loading parameter
+Date: Fri, 25 May 2018 17:14:31 -0400
+Message-Id: <20180525211432.20359-2-jmoyer@redhat.com>
+In-Reply-To: <20180525211432.20359-1-jmoyer@redhat.com>
+References: <20180525211432.20359-1-jmoyer@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-NVMe always completes the request before returning from ->timeout, either
-by polling for it, or by disabling the controller.  Return BLK_EH_DONE so
-that the block layer doesn't even try to complete it again.
+The next patch will add a caller that can't trigger module loads.
+Also export this function for that caller.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Jeff Moyer <jmoyer@redhat.com>
 ---
- drivers/nvme/host/pci.c    | 14 +++++---------
- drivers/nvme/host/rdma.c   |  2 +-
- drivers/nvme/target/loop.c |  2 +-
- 3 files changed, 7 insertions(+), 11 deletions(-)
+ block/blk.h      | 2 ++
+ block/elevator.c | 7 ++++---
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 917e1714f7d9..31525324b79f 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1205,7 +1205,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 		nvme_warn_reset(dev, csts);
- 		nvme_dev_disable(dev, false);
- 		nvme_reset_ctrl(&dev->ctrl);
--		return BLK_EH_HANDLED;
-+		return BLK_EH_DONE;
- 	}
+diff --git a/block/blk.h b/block/blk.h
+index b034fd2..f6c3cc1 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -233,6 +233,8 @@ static inline void elv_deactivate_rq(struct request_queue *q, struct request *rq
  
- 	/*
-@@ -1215,14 +1215,14 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 		dev_warn(dev->ctrl.device,
- 			 "I/O %d QID %d timeout, completion polled\n",
- 			 req->tag, nvmeq->qid);
--		return BLK_EH_HANDLED;
-+		return BLK_EH_DONE;
- 	}
+ int elv_register_queue(struct request_queue *q);
+ void elv_unregister_queue(struct request_queue *q);
++int __elevator_change(struct request_queue *q, const char *name,
++		      bool try_loading);
  
- 	/*
- 	 * Shutdown immediately if controller times out while starting. The
- 	 * reset work will see the pci device disabled when it gets the forced
- 	 * cancellation error. All outstanding requests are completed on
--	 * shutdown, so we return BLK_EH_HANDLED.
-+	 * shutdown, so we return BLK_EH_DONE.
- 	 */
- 	switch (dev->ctrl.state) {
- 	case NVME_CTRL_CONNECTING:
-@@ -1232,7 +1232,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 			 req->tag, nvmeq->qid);
- 		nvme_dev_disable(dev, false);
- 		nvme_req(req)->flags |= NVME_REQ_CANCELLED;
--		return BLK_EH_HANDLED;
-+		return BLK_EH_DONE;
- 	default:
- 		break;
- 	}
-@@ -1249,12 +1249,8 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 		nvme_dev_disable(dev, false);
- 		nvme_reset_ctrl(&dev->ctrl);
+ struct hd_struct *__disk_get_part(struct gendisk *disk, int partno);
  
--		/*
--		 * Mark the request as handled, since the inline shutdown
--		 * forces all outstanding requests to complete.
--		 */
- 		nvme_req(req)->flags |= NVME_REQ_CANCELLED;
--		return BLK_EH_HANDLED;
-+		return BLK_EH_DONE;
- 	}
+diff --git a/block/elevator.c b/block/elevator.c
+index e87e9b4..5a91a43 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -1075,7 +1075,8 @@ static int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
+ /*
+  * Switch this queue to the given IO scheduler.
+  */
+-static int __elevator_change(struct request_queue *q, const char *name)
++int __elevator_change(struct request_queue *q, const char *name,
++		      bool try_loading)
+ {
+ 	char elevator_name[ELV_NAME_MAX];
+ 	struct elevator_type *e;
+@@ -1091,7 +1092,7 @@ static int __elevator_change(struct request_queue *q, const char *name)
+ 		return elevator_switch(q, NULL);
  
- 	if (atomic_dec_return(&dev->ctrl.abort_limit) < 0) {
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 1eb4438a8763..ac7462cd7f0f 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -1598,7 +1598,7 @@ nvme_rdma_timeout(struct request *rq, bool reserved)
- 	/* fail with DNR on cmd timeout */
- 	nvme_req(rq)->status = NVME_SC_ABORT_REQ | NVME_SC_DNR;
+ 	strlcpy(elevator_name, name, sizeof(elevator_name));
+-	e = elevator_get(q, strstrip(elevator_name), true);
++	e = elevator_get(q, strstrip(elevator_name), try_loading);
+ 	if (!e)
+ 		return -EINVAL;
  
--	return BLK_EH_HANDLED;
-+	return BLK_EH_DONE;
- }
+@@ -1119,7 +1120,7 @@ ssize_t elv_iosched_store(struct request_queue *q, const char *name,
+ 	if (!(q->mq_ops || q->request_fn) || !elv_support_iosched(q))
+ 		return count;
  
- static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
-diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
-index 27a8561c0cb9..22e3627bf16b 100644
---- a/drivers/nvme/target/loop.c
-+++ b/drivers/nvme/target/loop.c
-@@ -146,7 +146,7 @@ nvme_loop_timeout(struct request *rq, bool reserved)
- 	/* fail with DNR on admin cmd timeout */
- 	nvme_req(rq)->status = NVME_SC_ABORT_REQ | NVME_SC_DNR;
+-	ret = __elevator_change(q, name);
++	ret = __elevator_change(q, name, true);
+ 	if (!ret)
+ 		return count;
  
--	return BLK_EH_HANDLED;
-+	return BLK_EH_DONE;
- }
- 
- static blk_status_t nvme_loop_queue_rq(struct blk_mq_hw_ctx *hctx,
 -- 
-2.17.0
+2.8.2.335.g4bb51ae
