@@ -1,92 +1,56 @@
-Return-Path: <BATV+df5a2477ff0fa86e9985+5386+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>,
-	Lee Duncan <lduncan@suse.com>,
-	Chris Leech <cleech@redhat.com>,
-	Rafael David Tinoco <rafael.tinoco@canonical.com>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 10/14] block: remove BLK_EH_HANDLED
-Date: Wed, 23 May 2018 14:19:37 +0200
-Message-Id: <20180523121941.8632-11-hch@lst.de>
-In-Reply-To: <20180523121941.8632-1-hch@lst.de>
-References: <20180523121941.8632-1-hch@lst.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [RESEND PATCH V5 28/33] block: kill bio_for_each_page_all()
+Date: Fri, 25 May 2018 11:46:16 +0800
+Message-Id: <20180525034621.31147-29-ming.lei@redhat.com>
+In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
+References: <20180525034621.31147-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- Documentation/scsi/scsi_eh.txt | 11 -----------
- block/blk-mq.c                 |  3 ---
- block/blk-timeout.c            |  3 ---
- include/linux/blkdev.h         |  1 -
- 4 files changed, 18 deletions(-)
+No one uses it any more, so kill it and we can reuse this helper
+name.
 
-diff --git a/Documentation/scsi/scsi_eh.txt b/Documentation/scsi/scsi_eh.txt
-index 3ae8419e72cf..1b7436932a2b 100644
---- a/Documentation/scsi/scsi_eh.txt
-+++ b/Documentation/scsi/scsi_eh.txt
-@@ -82,17 +82,6 @@ function
-  1. invokes optional hostt->eh_timed_out() callback.  Return value can
-     be one of
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ include/linux/bio.h | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 5ae2bc876295..c5e692d43f23 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -159,8 +159,10 @@ static inline void *bio_data(struct bio *bio)
+ /*
+  * drivers should _never_ use the all version - the bio may have been split
+  * before it got to the driver and the driver won't own all of it
++ *
++ * This helper iterates bio segment by segment.
+  */
+-#define bio_for_each_page_all(bvl, bio, i)				\
++#define bio_for_each_segment_all(bvl, bio, i)				\
+ 	for (i = 0, bvl = (bio)->bi_io_vec; i < (bio)->bi_vcnt; i++, bvl++)
  
--    - BLK_EH_HANDLED
--	This indicates that eh_timed_out() dealt with the timeout.
--	The command is passed back to the block layer and completed
--	via __blk_complete_requests().
+ static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+@@ -225,9 +227,6 @@ static inline bool bio_rewind_iter(struct bio *bio, struct bvec_iter *iter,
+ #define bio_for_each_segment(bvl, bio, iter)			\
+ 	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
+ 
+-#define bio_for_each_segment_all(bvl, bio, i) \
+-	bio_for_each_page_all((bvl), (bio), (i))
 -
--	*NOTE* After returning BLK_EH_HANDLED the SCSI layer is
--	assumed to be finished with the command, and no other
--	functions from the SCSI layer will be called. So this
--	should typically only be returned if the eh_timed_out()
--	handler raced with normal completion.
--
-     - BLK_EH_RESET_TIMER
- 	This indicates that more time is required to finish the
- 	command.  Timer is restarted.  This action is counted as a
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 546acc8cb201..22ab2a148a9b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -844,9 +844,6 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
- 		ret = ops->timeout(req, reserved);
- 
- 	switch (ret) {
--	case BLK_EH_HANDLED:
--		__blk_mq_complete_request(req);
--		break;
- 	case BLK_EH_RESET_TIMER:
- 		/*
- 		 * As nothing prevents from completion happening while
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index 3c622335811f..aae8f233341b 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -86,9 +86,6 @@ static void blk_rq_timed_out(struct request *req)
- 	if (q->rq_timed_out_fn)
- 		ret = q->rq_timed_out_fn(req);
- 	switch (ret) {
--	case BLK_EH_HANDLED:
--		__blk_complete_request(req);
--		break;
- 	case BLK_EH_RESET_TIMER:
- 		blk_add_timer(req);
- 		blk_clear_rq_complete(req);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index ba0844c176f2..3d9d4da4dedd 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -338,7 +338,6 @@ typedef void (exit_rq_fn)(struct request_queue *, struct request *);
- 
- enum blk_eh_timer_return {
- 	BLK_EH_DONE,
--	BLK_EH_HANDLED,
- 	BLK_EH_RESET_TIMER,
- };
- 
+ /*
+  * This helper returns singlepage bvec to caller, and the sp bvec is
+  * generated in-flight from multipage bvec stored in bvec table. So we
 -- 
-2.17.0
+2.9.5
