@@ -1,273 +1,190 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 16/34] iomap: add initial support for writes without buffer heads
-Date: Fri, 18 May 2018 18:48:12 +0200
-Message-Id: <20180518164830.1552-17-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [RESEND PATCH V5 06/33] block: use bio_for_each_segment() to compute segments count
+Date: Fri, 25 May 2018 11:45:54 +0800
+Message-Id: <20180525034621.31147-7-ming.lei@redhat.com>
+In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
+References: <20180525034621.31147-1-ming.lei@redhat.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-For now just limited to blocksize == PAGE_SIZE, where we can simply read
-in the full page in write begin, and just set the whole page dirty after
-copying data into it.  This code is enabled by default and XFS will now
-be feed pages without buffer heads in ->writepage and ->writepages.
+Firstly it is more efficient to use bio_for_each_segment() in both
+blk_bio_segment_split() and __blk_recalc_rq_segments() to compute how many
+segments there are in the bio.
 
-If a file system sets the IOMAP_F_BUFFER_HEAD flag on the iomap the old
-path will still be used, this both helps the transition in XFS and
-prepares for the gfs2 migration to the iomap infrastructure.
+Secondaly once bio_for_each_segment() is used, the bvec may need to
+be splitted because its length can be very longer than max segment size,
+so we have to split the big bvec into several segments.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Thirdly during splitting multipage bvec into segments, max segment number
+may be reached, then the bio need to be splitted when this happens.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/iomap.c            | 132 ++++++++++++++++++++++++++++++++++++++----
- fs/xfs/xfs_iomap.c    |   6 +-
- include/linux/iomap.h |   2 +
- 3 files changed, 127 insertions(+), 13 deletions(-)
+ block/blk-merge.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 76 insertions(+), 14 deletions(-)
 
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 821671af2618..cd4c563db80a 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -314,6 +314,58 @@ iomap_write_failed(struct inode *inode, loff_t pos, unsigned len)
- 		truncate_pagecache_range(inode, max(pos, i_size), pos + len);
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 545609fc4905..d157b752d965 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -97,6 +97,62 @@ static inline unsigned get_max_io_size(struct request_queue *q,
+ 	return sectors;
  }
  
-+static int
-+iomap_read_page_sync(struct inode *inode, loff_t block_start, struct page *page,
-+		unsigned poff, unsigned plen, struct iomap *iomap)
++/*
++ * Split the bvec @bv into segments, and update all kinds of
++ * variables.
++ */
++static bool bvec_split_segs(struct request_queue *q, struct bio_vec *bv,
++		unsigned *nsegs, unsigned *last_seg_size,
++		unsigned *front_seg_size, unsigned *sectors)
 +{
-+	struct bio_vec bvec;
-+	struct bio bio;
-+	int ret;
++	bool need_split = false;
++	unsigned len = bv->bv_len;
++	unsigned total_len = 0;
++	unsigned new_nsegs = 0, seg_size = 0;
 +
-+	bio_init(&bio, &bvec, 1);
-+	bio.bi_opf = REQ_OP_READ;
-+	bio.bi_iter.bi_sector = iomap_sector(iomap, block_start);
-+	bio_set_dev(&bio, iomap->bdev);
-+	__bio_add_page(&bio, page, plen, poff);
-+	ret = submit_bio_wait(&bio);
-+	if (ret < 0 && iomap_block_needs_zeroing(inode, block_start, iomap))
-+		zero_user(page, poff, plen);
-+	return ret;
-+}
-+
-+static int
-+__iomap_write_begin(struct inode *inode, loff_t pos, unsigned len,
-+		struct page *page, struct iomap *iomap)
-+{
-+	loff_t block_size = i_blocksize(inode);
-+	loff_t block_start = pos & ~(block_size - 1);
-+	loff_t block_end = (pos + len + block_size - 1) & ~(block_size - 1);
-+	unsigned poff = block_start & (PAGE_SIZE - 1);
-+	unsigned plen = min_t(loff_t, PAGE_SIZE - poff, block_end - block_start);
-+	int status;
-+
-+	WARN_ON_ONCE(i_blocksize(inode) < PAGE_SIZE);
-+
-+	if (PageUptodate(page))
-+		return 0;
-+
-+	if (iomap_block_needs_zeroing(inode, block_start, iomap)) {
-+		unsigned from = pos & (PAGE_SIZE - 1), to = from + len;
-+		unsigned pend = poff + plen;
-+
-+		if (poff < from || pend > to)
-+			zero_user_segments(page, poff, from, to, pend);
-+	} else {
-+		status = iomap_read_page_sync(inode, block_start, page,
-+				poff, plen, iomap);
-+		if (status < 0)
-+			return status;
-+		SetPageUptodate(page);
-+	}
-+
-+	return 0;
-+}
-+
- static int
- iomap_write_begin(struct inode *inode, loff_t pos, unsigned len, unsigned flags,
- 		struct page **pagep, struct iomap *iomap)
-@@ -331,7 +383,10 @@ iomap_write_begin(struct inode *inode, loff_t pos, unsigned len, unsigned flags,
- 	if (!page)
- 		return -ENOMEM;
- 
--	status = __block_write_begin_int(page, pos, len, NULL, iomap);
-+	if (iomap->flags & IOMAP_F_BUFFER_HEAD)
-+		status = __block_write_begin_int(page, pos, len, NULL, iomap);
-+	else
-+		status = __iomap_write_begin(inode, pos, len, page, iomap);
- 	if (unlikely(status)) {
- 		unlock_page(page);
- 		put_page(page);
-@@ -344,14 +399,63 @@ iomap_write_begin(struct inode *inode, loff_t pos, unsigned len, unsigned flags,
- 	return status;
- }
- 
-+int
-+iomap_set_page_dirty(struct page *page)
-+{
-+	struct address_space *mapping = page_mapping(page);
-+	int newly_dirty;
-+
-+	if (unlikely(!mapping))
-+		return !TestSetPageDirty(page);
++	if ((*nsegs >= queue_max_segments(q)) || !len)
++		return need_split;
 +
 +	/*
-+	 * Lock out page->mem_cgroup migration to keep PageDirty
-+	 * synchronized with per-memcg dirty page counters.
++	 * Multipage bvec may be too big to hold in one segment,
++	 * so the current bvec has to be splitted as multiple
++	 * segments.
 +	 */
-+	lock_page_memcg(page);
-+	newly_dirty = !TestSetPageDirty(page);
-+	if (newly_dirty)
-+		__set_page_dirty(page, mapping, 0);
-+	unlock_page_memcg(page);
++	while (new_nsegs + *nsegs < queue_max_segments(q)) {
++		seg_size = min(queue_max_segment_size(q), len);
 +
-+	if (newly_dirty)
-+		__mark_inode_dirty(mapping->host, I_DIRTY_PAGES);
-+	return newly_dirty;
-+}
-+EXPORT_SYMBOL_GPL(iomap_set_page_dirty);
++		new_nsegs++;
++		total_len += seg_size;
++		len -= seg_size;
 +
-+static int
-+__iomap_write_end(struct inode *inode, loff_t pos, unsigned len,
-+		unsigned copied, struct page *page, struct iomap *iomap)
-+{
-+	unsigned start = pos & (PAGE_SIZE - 1);
-+
-+	if (unlikely(copied < len)) {
-+		/* see block_write_end() for an explanation */
-+		if (!PageUptodate(page))
-+			copied = 0;
-+		if (iomap_block_needs_zeroing(inode, pos, iomap))
-+			zero_user(page, start + copied, len - copied);
++		if ((queue_virt_boundary(q) && ((bv->bv_offset +
++		    total_len) & queue_virt_boundary(q))) || !len)
++			break;
 +	}
 +
-+	flush_dcache_page(page);
-+	SetPageUptodate(page);
-+	iomap_set_page_dirty(page);
-+	return __generic_write_end(inode, pos, copied, page);
++	/* split in the middle of the bvec */
++	if (len)
++		need_split = true;
++
++	/* update front segment size */
++	if (!*nsegs) {
++		unsigned first_seg_size = seg_size;
++
++		if (new_nsegs > 1)
++			first_seg_size = queue_max_segment_size(q);
++		if (*front_seg_size < first_seg_size)
++			*front_seg_size = first_seg_size;
++	}
++
++	/* update other varibles */
++	*last_seg_size = seg_size;
++	*nsegs += new_nsegs;
++	if (sectors)
++		*sectors += total_len >> 9;
++
++	return need_split;
 +}
 +
- static int
- iomap_write_end(struct inode *inode, loff_t pos, unsigned len,
--		unsigned copied, struct page *page)
-+		unsigned copied, struct page *page, struct iomap *iomap)
- {
- 	int ret;
+ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 					 struct bio *bio,
+ 					 struct bio_set *bs,
+@@ -110,7 +166,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 	struct bio *new = NULL;
+ 	const unsigned max_sectors = get_max_io_size(q, bio);
  
--	ret = generic_write_end(NULL, inode->i_mapping, pos, len,
--			copied, page, NULL);
-+	if (iomap->flags & IOMAP_F_BUFFER_HEAD)
-+		ret = generic_write_end(NULL, inode->i_mapping, pos, len,
-+				copied, page, NULL);
-+	else
-+		ret = __iomap_write_end(inode, pos, len, copied, page, iomap);
+-	bio_for_each_page(bv, bio, iter) {
++	bio_for_each_segment(bv, bio, iter) {
+ 		/*
+ 		 * If the queue doesn't support SG gaps and adding this
+ 		 * offset would create a gap, disallow it.
+@@ -125,8 +181,12 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 			 */
+ 			if (nsegs < queue_max_segments(q) &&
+ 			    sectors < max_sectors) {
+-				nsegs++;
+-				sectors = max_sectors;
++				/* split in the middle of bvec */
++				bv.bv_len = (max_sectors - sectors) << 9;
++				bvec_split_segs(q, &bv, &nsegs,
++						&seg_size,
++						&front_seg_size,
++						&sectors);
+ 			}
+ 			goto split;
+ 		}
+@@ -153,11 +213,12 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 		if (nsegs == 1 && seg_size > front_seg_size)
+ 			front_seg_size = seg_size;
+ 
+-		nsegs++;
+ 		bvprv = bv;
+ 		bvprvp = &bvprv;
+-		seg_size = bv.bv_len;
+-		sectors += bv.bv_len >> 9;
 +
- 	if (ret < len)
- 		iomap_write_failed(inode, pos, len);
- 	return ret;
-@@ -406,7 +510,8 @@ iomap_write_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
++		if (bvec_split_segs(q, &bv, &nsegs, &seg_size,
++					&front_seg_size, &sectors))
++			goto split;
  
- 		flush_dcache_page(page);
+ 	}
  
--		status = iomap_write_end(inode, pos, bytes, copied, page);
-+		status = iomap_write_end(inode, pos, bytes, copied, page,
-+				iomap);
- 		if (unlikely(status < 0))
- 			break;
- 		copied = status;
-@@ -500,7 +605,7 @@ iomap_dirty_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
+@@ -225,6 +286,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+ 	struct bio_vec bv, bvprv = { NULL };
+ 	int cluster, prev = 0;
+ 	unsigned int seg_size, nr_phys_segs;
++	unsigned front_seg_size = bio->bi_seg_front_size;
+ 	struct bio *fbio, *bbio;
+ 	struct bvec_iter iter;
  
- 		WARN_ON_ONCE(!PageUptodate(page));
+@@ -245,7 +307,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+ 	seg_size = 0;
+ 	nr_phys_segs = 0;
+ 	for_each_bio(bio) {
+-		bio_for_each_page(bv, bio, iter) {
++		bio_for_each_segment(bv, bio, iter) {
+ 			/*
+ 			 * If SG merging is disabled, each bio vector is
+ 			 * a segment
+@@ -267,20 +329,20 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+ 				continue;
+ 			}
+ new_segment:
+-			if (nr_phys_segs == 1 && seg_size >
+-			    fbio->bi_seg_front_size)
+-				fbio->bi_seg_front_size = seg_size;
++			if (nr_phys_segs == 1 && seg_size > front_seg_size)
++				front_seg_size = seg_size;
  
--		status = iomap_write_end(inode, pos, bytes, bytes, page);
-+		status = iomap_write_end(inode, pos, bytes, bytes, page, iomap);
- 		if (unlikely(status <= 0)) {
- 			if (WARN_ON_ONCE(status == 0))
- 				return -EIO;
-@@ -552,7 +657,7 @@ static int iomap_zero(struct inode *inode, loff_t pos, unsigned offset,
- 	zero_user(page, offset, bytes);
- 	mark_page_accessed(page);
+-			nr_phys_segs++;
+ 			bvprv = bv;
+ 			prev = 1;
+-			seg_size = bv.bv_len;
++			bvec_split_segs(q, &bv, &nr_phys_segs, &seg_size,
++					&front_seg_size, NULL);
+ 		}
+ 		bbio = bio;
+ 	}
  
--	return iomap_write_end(inode, pos, bytes, bytes, page);
-+	return iomap_write_end(inode, pos, bytes, bytes, page, iomap);
- }
+-	if (nr_phys_segs == 1 && seg_size > fbio->bi_seg_front_size)
+-		fbio->bi_seg_front_size = seg_size;
++	if (nr_phys_segs == 1 && seg_size > front_seg_size)
++		front_seg_size = seg_size;
++	fbio->bi_seg_front_size = front_seg_size;
+ 	if (seg_size > bbio->bi_seg_back_size)
+ 		bbio->bi_seg_back_size = seg_size;
  
- static int iomap_dax_zero(loff_t pos, unsigned offset, unsigned bytes,
-@@ -638,11 +743,16 @@ iomap_page_mkwrite_actor(struct inode *inode, loff_t pos, loff_t length,
- 	struct page *page = data;
- 	int ret;
- 
--	ret = __block_write_begin_int(page, pos, length, NULL, iomap);
--	if (ret)
--		return ret;
-+	if (iomap->flags & IOMAP_F_BUFFER_HEAD) {
-+		ret = __block_write_begin_int(page, pos, length, NULL, iomap);
-+		if (ret)
-+			return ret;
-+		block_commit_write(page, 0, length);
-+	} else {
-+		WARN_ON_ONCE(!PageUptodate(page));
-+		WARN_ON_ONCE(i_blocksize(inode) < PAGE_SIZE);
-+	}
- 
--	block_commit_write(page, 0, length);
- 	return length;
- }
- 
-diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
-index c6ce6f9335b6..da6d1995e460 100644
---- a/fs/xfs/xfs_iomap.c
-+++ b/fs/xfs/xfs_iomap.c
-@@ -638,7 +638,7 @@ xfs_file_iomap_begin_delay(
- 	 * Flag newly allocated delalloc blocks with IOMAP_F_NEW so we punch
- 	 * them out if the write happens to fail.
- 	 */
--	iomap->flags = IOMAP_F_NEW;
-+	iomap->flags |= IOMAP_F_NEW;
- 	trace_xfs_iomap_alloc(ip, offset, count, 0, &got);
- done:
- 	if (isnullstartblock(got.br_startblock))
-@@ -1031,6 +1031,8 @@ xfs_file_iomap_begin(
- 	if (XFS_FORCED_SHUTDOWN(mp))
- 		return -EIO;
- 
-+	iomap->flags |= IOMAP_F_BUFFER_HEAD;
-+
- 	if (((flags & (IOMAP_WRITE | IOMAP_DIRECT)) == IOMAP_WRITE) &&
- 			!IS_DAX(inode) && !xfs_get_extsz_hint(ip)) {
- 		/* Reserve delalloc blocks for regular writeback. */
-@@ -1131,7 +1133,7 @@ xfs_file_iomap_begin(
- 	if (error)
- 		return error;
- 
--	iomap->flags = IOMAP_F_NEW;
-+	iomap->flags |= IOMAP_F_NEW;
- 	trace_xfs_iomap_alloc(ip, offset, length, 0, &imap);
- 
- out_finish:
-diff --git a/include/linux/iomap.h b/include/linux/iomap.h
-index 7300d30ca495..4d3d9d0cd69f 100644
---- a/include/linux/iomap.h
-+++ b/include/linux/iomap.h
-@@ -30,6 +30,7 @@ struct vm_fault;
-  */
- #define IOMAP_F_NEW		0x01	/* blocks have been newly allocated */
- #define IOMAP_F_DIRTY		0x02	/* uncommitted metadata */
-+#define IOMAP_F_BUFFER_HEAD	0x04	/* file system requires buffer heads */
- 
- /*
-  * Flags that only need to be reported for IOMAP_REPORT requests:
-@@ -92,6 +93,7 @@ ssize_t iomap_file_buffered_write(struct kiocb *iocb, struct iov_iter *from,
- int iomap_readpage(struct page *page, const struct iomap_ops *ops);
- int iomap_readpages(struct address_space *mapping, struct list_head *pages,
- 		unsigned nr_pages, const struct iomap_ops *ops);
-+int iomap_set_page_dirty(struct page *page);
- int iomap_file_dirty(struct inode *inode, loff_t pos, loff_t len,
- 		const struct iomap_ops *ops);
- int iomap_zero_range(struct inode *inode, loff_t pos, loff_t len,
 -- 
-2.17.0
+2.9.5
