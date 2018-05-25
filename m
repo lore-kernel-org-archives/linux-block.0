@@ -1,53 +1,80 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:57240 "EHLO imap.thunk.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752188AbeETB3J (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 19 May 2018 21:29:09 -0400
-Date: Sat, 19 May 2018 21:29:01 -0400
-From: "Theodore Y. Ts'o" <tytso@mit.edu>
-To: Goldwyn Rodrigues <rgoldwyn@suse.de>
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: Re: [PATCH v7 2/2] Return bytes transferred for partial direct I/O
-Message-ID: <20180520012901.GA5805@thunk.org>
-References: <20180208185948.26827-1-rgoldwyn@suse.de>
- <20180208185948.26827-2-rgoldwyn@suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180208185948.26827-2-rgoldwyn@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [RESEND PATCH V5 27/33] gfs2: conver to bio_for_each_page_all2
+Date: Fri, 25 May 2018 11:46:15 +0800
+Message-Id: <20180525034621.31147-28-ming.lei@redhat.com>
+In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
+References: <20180525034621.31147-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Feb 08, 2018 at 12:59:48PM -0600, Goldwyn Rodrigues wrote:
-> From: Goldwyn Rodrigues <rgoldwyn@suse.com>
-> 
-> In case direct I/O encounters an error midway, it returns the error.
-> Instead it should be returning the number of bytes transferred so far.
-> 
-> Test case for filesystems (with ENOSPC):
-> 1. Create an almost full filesystem
-> 2. Create a file, say /mnt/lastfile, until the filesystem is full.
-> 3. Direct write() with count > sizeof /mnt/lastfile.
-> 
-> Result: write() returns -ENOSPC. However, file content has data written
-> in step 3.
-> 
-> Added a sysctl entry: dio_short_writes which is on by default. This is
-> to support applications which expect either and error or the bytes submitted
-> as a return value for the write calls.
-> 
-> This fixes fstest generic/472.
-> 
-> Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+bio_for_each_page_all() can't be used any more after multipage bvec is
+enabled, so we have to convert to bio_for_each_page_all2().
 
-Hi,
+Given bvec can't be changed inside bio_for_each_page_all2(), this patch
+marks the bvec parameter as 'const' for gfs2_end_log_write_bh().
 
-I was wondering if you could give an update regarding what's up with
-this patch?
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ fs/gfs2/lops.c    | 6 ++++--
+ fs/gfs2/meta_io.c | 3 ++-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-There doesn't seem to be any movement on this patch in a while, and so
-I still have xfstests generic/472 suppressed in {kvm,gce}-xfstests.
-
-Thanks,
-
-						- Ted
+diff --git a/fs/gfs2/lops.c b/fs/gfs2/lops.c
+index a31b9b028957..0284cd66089c 100644
+--- a/fs/gfs2/lops.c
++++ b/fs/gfs2/lops.c
+@@ -168,7 +168,8 @@ u64 gfs2_log_bmap(struct gfs2_sbd *sdp)
+  * that is pinned in the pagecache.
+  */
+ 
+-static void gfs2_end_log_write_bh(struct gfs2_sbd *sdp, struct bio_vec *bvec,
++static void gfs2_end_log_write_bh(struct gfs2_sbd *sdp,
++				  const struct bio_vec *bvec,
+ 				  blk_status_t error)
+ {
+ 	struct buffer_head *bh, *next;
+@@ -207,6 +208,7 @@ static void gfs2_end_log_write(struct bio *bio)
+ 	struct bio_vec *bvec;
+ 	struct page *page;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+ 	if (bio->bi_status) {
+ 		fs_err(sdp, "Error %d writing to journal, jid=%u\n",
+@@ -214,7 +216,7 @@ static void gfs2_end_log_write(struct bio *bio)
+ 		wake_up(&sdp->sd_logd_waitq);
+ 	}
+ 
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		page = bvec->bv_page;
+ 		if (page_has_buffers(page))
+ 			gfs2_end_log_write_bh(sdp, bvec, bio->bi_status);
+diff --git a/fs/gfs2/meta_io.c b/fs/gfs2/meta_io.c
+index 1d720352310a..a945c9fa1dc6 100644
+--- a/fs/gfs2/meta_io.c
++++ b/fs/gfs2/meta_io.c
+@@ -190,8 +190,9 @@ static void gfs2_meta_read_endio(struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ 		struct buffer_head *bh = page_buffers(page);
+ 		unsigned int len = bvec->bv_len;
+-- 
+2.9.5
