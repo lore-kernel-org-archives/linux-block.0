@@ -1,126 +1,117 @@
-Return-Path: <helgaas@kernel.org>
-Date: Mon, 7 May 2018 18:20:29 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Logan Gunthorpe <logang@deltatee.com>
-Cc: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org, linux-block@vger.kernel.org,
-	Stephen Bates <sbates@raithlin.com>, Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH v4 06/14] PCI/P2PDMA: Add P2P DMA driver writer's
- documentation
-Message-ID: <20180507232029.GH161390@bhelgaas-glaptop.roam.corp.google.com>
-References: <20180423233046.21476-1-logang@deltatee.com>
- <20180423233046.21476-7-logang@deltatee.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180423233046.21476-7-logang@deltatee.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38128 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S934999AbeEYDwa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 May 2018 23:52:30 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [RESEND PATCH V5 31/33] block: bio: pass segments to bio if bio_add_page() is bypassed
+Date: Fri, 25 May 2018 11:46:19 +0800
+Message-Id: <20180525034621.31147-32-ming.lei@redhat.com>
+In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
+References: <20180525034621.31147-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Mon, Apr 23, 2018 at 05:30:38PM -0600, Logan Gunthorpe wrote:
-> Add a restructured text file describing how to write drivers
-> with support for P2P DMA transactions. The document describes
-> how to use the APIs that were added in the previous few
-> commits.
-> 
-> Also adds an index for the PCI documentation tree even though this
-> is the only PCI document that has been converted to restructured text
-> at this time.
-> 
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> ---
->  Documentation/PCI/index.rst             |  14 +++
->  Documentation/driver-api/pci/index.rst  |   1 +
->  Documentation/driver-api/pci/p2pdma.rst | 166 ++++++++++++++++++++++++++++++++
->  Documentation/index.rst                 |   3 +-
->  4 files changed, 183 insertions(+), 1 deletion(-)
->  create mode 100644 Documentation/PCI/index.rst
->  create mode 100644 Documentation/driver-api/pci/p2pdma.rst
-> 
-> diff --git a/Documentation/PCI/index.rst b/Documentation/PCI/index.rst
-> new file mode 100644
-> index 000000000000..2fdc4b3c291d
-> --- /dev/null
-> +++ b/Documentation/PCI/index.rst
-> @@ -0,0 +1,14 @@
-> +==================================
-> +Linux PCI Driver Developer's Guide
-> +==================================
-> +
-> +.. toctree::
-> +
-> +   p2pdma
-> +
-> +.. only::  subproject and html
-> +
-> +   Indices
-> +   =======
-> +
-> +   * :ref:`genindex`
-> diff --git a/Documentation/driver-api/pci/index.rst b/Documentation/driver-api/pci/index.rst
-> index 03b57cbf8cc2..d12eeafbfc90 100644
-> --- a/Documentation/driver-api/pci/index.rst
-> +++ b/Documentation/driver-api/pci/index.rst
-> @@ -10,6 +10,7 @@ The Linux PCI driver implementer's API guide
->     :maxdepth: 2
->  
->     pci
-> +   p2pdma
->  
->  .. only::  subproject and html
->  
-> diff --git a/Documentation/driver-api/pci/p2pdma.rst b/Documentation/driver-api/pci/p2pdma.rst
-> new file mode 100644
-> index 000000000000..49a512c405b2
-> --- /dev/null
-> +++ b/Documentation/driver-api/pci/p2pdma.rst
-> @@ -0,0 +1,166 @@
-> +============================
-> +PCI Peer-to-Peer DMA Support
-> +============================
-> +
-> +The PCI bus has pretty decent support for performing DMA transfers
-> +between two endpoints on the bus. This type of transaction is
+Under some situations, such as block direct I/O, we can't use
+bio_add_page() for merging pages into multipage bvec, so
+a new function is implemented for converting page array into one
+segment array, then these cases can benefit from multipage bvec
+too.
 
-s/endpoints/devices/
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/bio.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 48 insertions(+), 6 deletions(-)
 
-> +henceforth called Peer-to-Peer (or P2P). However, there are a number of
-> +issues that make P2P transactions tricky to do in a perfectly safe way.
-> +
-> +One of the biggest issues is that PCI Root Complexes are not required
-
-s/PCI Root Complexes .../
-  PCI doesn't require forwarding transactions between hierarchy domains,
-and in PCIe, each Root Port defines a separate hierarchy domain./
-
-> +to support forwarding packets between Root Ports. To make things worse,
-> +there is no simple way to determine if a given Root Complex supports
-> +this or not. (See PCIe r4.0, sec 1.3.1). Therefore, as of this writing,
-> +the kernel only supports doing P2P when the endpoints involved are all
-> +behind the same PCIe root port as the spec guarantees that all
-> +packets will always be routable but does not require routing between
-> +root ports.
-
-s/endpoints involved .../
-  devices involved are all behind the same PCI bridge, as such devices are
-  all in the same PCI hierarchy domain, and the spec guarantees that all
-  transactions within the hierarchy will be routable, but it does not
-  require routing between hierarchies./
-
-> +
-> +The second issue is that to make use of existing interfaces in Linux,
-> +memory that is used for P2P transactions needs to be backed by struct
-> +pages. However, PCI BARs are not typically cache coherent so there are
-> +a few corner case gotchas with these pages so developers need to
-> +be careful about what they do with them.
+diff --git a/block/bio.c b/block/bio.c
+index bc3992f52fe8..b7d9089cb28f 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -913,6 +913,41 @@ int bio_add_page(struct bio *bio, struct page *page,
+ }
+ EXPORT_SYMBOL(bio_add_page);
+ 
++static unsigned convert_to_segs(struct bio* bio, struct page **pages,
++				unsigned char *page_cnt,
++				unsigned nr_pages)
++{
++
++	unsigned idx;
++	unsigned nr_seg = 0;
++	struct request_queue *q = NULL;
++
++	if (bio->bi_disk)
++		q = bio->bi_disk->queue;
++
++	if (!q || !blk_queue_cluster(q)) {
++		memset(page_cnt, 0, nr_pages);
++		return nr_pages;
++	}
++
++	page_cnt[nr_seg] = 0;
++	for (idx = 1; idx < nr_pages; idx++) {
++		struct page *pg_s = pages[nr_seg];
++		struct page *pg = pages[idx];
++
++		if (page_to_pfn(pg_s) + page_cnt[nr_seg] + 1 ==
++		    page_to_pfn(pg)) {
++			page_cnt[nr_seg]++;
++		} else {
++			page_cnt[++nr_seg] = 0;
++			if (nr_seg < idx)
++				pages[nr_seg] = pg;
++		}
++	}
++
++	return nr_seg + 1;
++}
++
+ /**
+  * bio_iov_iter_get_pages - pin user or kernel pages and add them to a bio
+  * @bio: bio to add pages to
+@@ -928,6 +963,8 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	struct page **pages = (struct page **)bv;
+ 	size_t offset, diff;
+ 	ssize_t size;
++	unsigned short nr_segs;
++	unsigned char page_cnt[nr_pages];	/* at most 256 pages */
+ 
+ 	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
+ 	if (unlikely(size <= 0))
+@@ -943,13 +980,18 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	 * need to be reflected here as well.
+ 	 */
+ 	bio->bi_iter.bi_size += size;
+-	bio->bi_vcnt += nr_pages;
+-
+ 	diff = (nr_pages * PAGE_SIZE - offset) - size;
+-	while (nr_pages--) {
+-		bv[nr_pages].bv_page = pages[nr_pages];
+-		bv[nr_pages].bv_len = PAGE_SIZE;
+-		bv[nr_pages].bv_offset = 0;
++
++	/* convert into segments */
++	nr_segs = convert_to_segs(bio, pages, page_cnt, nr_pages);
++	bio->bi_vcnt += nr_segs;
++
++	while (nr_segs--) {
++		unsigned cnt = (unsigned)page_cnt[nr_segs] + 1;
++
++		bv[nr_segs].bv_page = pages[nr_segs];
++		bv[nr_segs].bv_len = PAGE_SIZE * cnt;
++		bv[nr_segs].bv_offset = 0;
+ 	}
+ 
+ 	bv[0].bv_offset += offset;
+-- 
+2.9.5
