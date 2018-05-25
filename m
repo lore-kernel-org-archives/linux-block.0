@@ -1,70 +1,63 @@
-Return-Path: <ming.lei@redhat.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	James Smart <james.smart@broadcom.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>
-Subject: [PATCH V5 7/9] nvme: pci: don't unfreeze queue until controller state updating succeeds
-Date: Fri, 11 May 2018 20:29:31 +0800
-Message-Id: <20180511122933.27155-8-ming.lei@redhat.com>
-In-Reply-To: <20180511122933.27155-1-ming.lei@redhat.com>
-References: <20180511122933.27155-1-ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [RESEND PATCH V5 25/33] xfs: conver to bio_for_each_page_all2
+Date: Fri, 25 May 2018 11:46:13 +0800
+Message-Id: <20180525034621.31147-26-ming.lei@redhat.com>
+In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
+References: <20180525034621.31147-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-If it fails to update controller state into LIVE or ADMIN_ONLY, the
-controller will be removed, so not necessary to unfreeze queue any
-more.
+bio_for_each_page_all() can't be used any more after multipage bvec is
+enabled, so we have to convert to bio_for_each_page_all2().
 
-This way will make the following patch easier to not leak the
-freeze couner.
+Given bvec can't be changed under bio_for_each_page_all2(), this patch
+marks the bvec parameter as 'const' for xfs_finish_page_writeback().
 
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: Laurence Oberman <loberman@redhat.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/nvme/host/pci.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ fs/xfs/xfs_aops.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index d880356feee2..b79c7f016489 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2370,6 +2370,7 @@ static int nvme_reset_dev(struct nvme_dev *dev)
- 	bool was_suspend = !!(dev->ctrl.ctrl_config & NVME_CC_SHN_NORMAL);
- 	int result = -ENODEV;
- 	enum nvme_ctrl_state new_state = NVME_CTRL_LIVE;
-+	bool unfreeze_queue = false;
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 13e2c167aec3..b5077eb4df51 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -107,7 +107,7 @@ xfs_find_daxdev_for_inode(
+ static void
+ xfs_finish_page_writeback(
+ 	struct inode		*inode,
+-	struct bio_vec		*bvec,
++	const struct bio_vec	*bvec,
+ 	int			error)
+ {
+ 	struct buffer_head	*head = page_buffers(bvec->bv_page), *bh = head;
+@@ -169,6 +169,7 @@ xfs_destroy_ioend(
+ 	for (bio = &ioend->io_inline_bio; bio; bio = next) {
+ 		struct bio_vec	*bvec;
+ 		int		i;
++		struct bvec_iter_all bia;
  
- 	lockdep_assert_held(&dev->ctrl.reset_lock);
+ 		/*
+ 		 * For the last bio, bi_private points to the ioend, so we
+@@ -180,7 +181,7 @@ xfs_destroy_ioend(
+ 			next = bio->bi_private;
  
-@@ -2456,7 +2457,7 @@ static int nvme_reset_dev(struct nvme_dev *dev)
- 		/* hit this only when allocate tagset fails */
- 		if (nvme_dev_add(dev))
- 			new_state = NVME_CTRL_ADMIN_ONLY;
--		nvme_unfreeze(&dev->ctrl);
-+		unfreeze_queue = true;
- 	}
+ 		/* walk each page on bio, ending page IO on them */
+-		bio_for_each_page_all(bvec, bio, i)
++		bio_for_each_page_all2(bvec, bio, i, bia)
+ 			xfs_finish_page_writeback(inode, bvec, error);
  
- 	result = -ENODEV;
-@@ -2471,6 +2472,9 @@ static int nvme_reset_dev(struct nvme_dev *dev)
- 	}
- 
- 	nvme_start_ctrl(&dev->ctrl);
-+
-+	if (unfreeze_queue)
-+		nvme_unfreeze(&dev->ctrl);
- 	return 0;
- 
-  out:
+ 		bio_put(bio);
 -- 
 2.9.5
