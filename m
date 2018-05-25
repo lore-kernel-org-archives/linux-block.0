@@ -1,50 +1,45 @@
-Return-Path: <BATV+a01a3e67072ae75c0352+5392+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>,
-	Lee Duncan <lduncan@suse.com>,
-	Chris Leech <cleech@redhat.com>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 10/14] mmc: complete requests from ->timeout
-Date: Tue, 29 May 2018 15:52:35 +0200
-Message-Id: <20180529135239.27005-11-hch@lst.de>
-In-Reply-To: <20180529135239.27005-1-hch@lst.de>
-References: <20180529135239.27005-1-hch@lst.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [RESEND PATCH V5 13/33] block: introduce rq_for_each_segment()
+Date: Fri, 25 May 2018 11:46:01 +0800
+Message-Id: <20180525034621.31147-14-ming.lei@redhat.com>
+In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
+References: <20180525034621.31147-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-By completing the request entirely in the driver we can remove the
-BLK_EH_HANDLED return value and thus the split responsibility between the
-driver and the block layer that has been causing trouble.
+There are still cases in which rq_for_each_segment() is required, for
+example, loop.
 
-[While this keeps existing behavior it seems to mismatch the comment,
- maintainers please chime in!]
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/mmc/core/queue.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ include/linux/blkdev.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index 56e9a803db21..648eb6743ed5 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -111,8 +111,9 @@ static enum blk_eh_timer_return mmc_cqe_timed_out(struct request *req)
- 				__mmc_cqe_recovery_notifier(mq);
- 			return BLK_EH_RESET_TIMER;
- 		}
--		/* No timeout */
--		return BLK_EH_HANDLED;
-+		/* No timeout (XXX: huh? comment doesn't make much sense) */
-+		blk_mq_complete_request(req);
-+		return BLK_EH_DONE;
- 	default:
- 		/* Timeout is handled by mmc core */
- 		return BLK_EH_RESET_TIMER;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 1e8e9b430008..0b15bc625bd7 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -953,6 +953,10 @@ struct req_iterator {
+ 	__rq_for_each_bio(_iter.bio, _rq)			\
+ 		bio_for_each_page(bvl, _iter.bio, _iter.iter)
+ 
++#define rq_for_each_segment(bvl, _rq, _iter)			\
++	__rq_for_each_bio(_iter.bio, _rq)			\
++		bio_for_each_segment(bvl, _iter.bio, _iter.iter)
++
+ #define rq_iter_last(bvec, _iter)				\
+ 		(_iter.bio->bi_next == NULL &&			\
+ 		 bio_iter_last(bvec, _iter.iter))
 -- 
-2.17.0
+2.9.5
