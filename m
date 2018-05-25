@@ -1,48 +1,166 @@
-Return-Path: <ming.lei@redhat.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37884 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1755319AbeEYDru (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 May 2018 23:47:50 -0400
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 28/33] block: kill bio_for_each_page_all()
-Date: Thu, 24 May 2018 17:01:33 +0800
-Message-Id: <20180524090139.2150-29-ming.lei@redhat.com>
-In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
-References: <20180524090139.2150-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [RESEND PATCH V5 05/33] block: introduce bio_for_each_segment()
+Date: Fri, 25 May 2018 11:45:53 +0800
+Message-Id: <20180525034621.31147-6-ming.lei@redhat.com>
+In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
+References: <20180525034621.31147-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-No one uses it any more, so kill it and we can reuse this helper
-name.
+This helper is used to iterate multipage bvec for bio spliting/merge,
+and it is required in bio_clone_bioset() too, so introduce it.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- include/linux/bio.h | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ include/linux/bio.h  | 34 +++++++++++++++++++++++++++++++---
+ include/linux/bvec.h | 36 ++++++++++++++++++++++++++++++++----
+ 2 files changed, 63 insertions(+), 7 deletions(-)
 
 diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 5ae2bc876295..c5e692d43f23 100644
+index 7f92af1299ad..3d3795b9a353 100644
 --- a/include/linux/bio.h
 +++ b/include/linux/bio.h
-@@ -159,8 +159,10 @@ static inline void *bio_data(struct bio *bio)
+@@ -80,6 +80,9 @@
+ #define bio_data_dir(bio) \
+ 	(op_is_write(bio_op(bio)) ? WRITE : READ)
+ 
++#define bio_iter_seg_iovec(bio, iter)				\
++	bvec_iter_segment_bvec((bio)->bi_io_vec, (iter))
++
  /*
-  * drivers should _never_ use the all version - the bio may have been split
-  * before it got to the driver and the driver won't own all of it
-+ *
-+ * This helper iterates bio segment by segment.
+  * Check whether this bio carries any data or not. A NULL bio is allowed.
   */
--#define bio_for_each_page_all(bvl, bio, i)				\
-+#define bio_for_each_segment_all(bvl, bio, i)				\
+@@ -160,8 +163,8 @@ static inline void *bio_data(struct bio *bio)
+ #define bio_for_each_page_all(bvl, bio, i)				\
  	for (i = 0, bvl = (bio)->bi_io_vec; i < (bio)->bi_vcnt; i++, bvl++)
  
- static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
-@@ -225,9 +227,6 @@ static inline bool bio_rewind_iter(struct bio *bio, struct bvec_iter *iter,
- #define bio_for_each_segment(bvl, bio, iter)			\
- 	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
+-static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+-				    unsigned bytes)
++static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
++				      unsigned bytes, bool seg)
+ {
+ 	iter->bi_sector += bytes >> 9;
  
--#define bio_for_each_segment_all(bvl, bio, i) \
--	bio_for_each_page_all((bvl), (bio), (i))
--
- /*
-  * This helper returns singlepage bvec to caller, and the sp bvec is
-  * generated in-flight from multipage bvec stored in bvec table. So we
+@@ -169,11 +172,26 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+ 		iter->bi_size -= bytes;
+ 		iter->bi_done += bytes;
+ 	} else {
+-		bvec_iter_advance(bio->bi_io_vec, iter, bytes);
++		if (!seg)
++			bvec_iter_advance(bio->bi_io_vec, iter, bytes);
++		else
++			bvec_iter_seg_advance(bio->bi_io_vec, iter, bytes);
+ 		/* TODO: It is reasonable to complete bio with error here. */
+ 	}
+ }
+ 
++static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
++				    unsigned bytes)
++{
++	__bio_advance_iter(bio, iter, bytes, false);
++}
++
++static inline void bio_advance_seg_iter(struct bio *bio, struct bvec_iter *iter,
++				       unsigned bytes)
++{
++	__bio_advance_iter(bio, iter, bytes, true);
++}
++
+ static inline bool bio_rewind_iter(struct bio *bio, struct bvec_iter *iter,
+ 		unsigned int bytes)
+ {
+@@ -197,6 +215,16 @@ static inline bool bio_rewind_iter(struct bio *bio, struct bvec_iter *iter,
+ #define bio_for_each_page(bvl, bio, iter)				\
+ 	__bio_for_each_page(bvl, bio, iter, (bio)->bi_iter)
+ 
++#define __bio_for_each_segment(bvl, bio, iter, start)		\
++	for (iter = (start);						\
++	     (iter).bi_size &&						\
++		((bvl = bio_iter_seg_iovec((bio), (iter))), 1);		\
++	     bio_advance_seg_iter((bio), &(iter), (bvl).bv_len))
++
++/* returns one real segment(multipage bvec) each time */
++#define bio_for_each_segment(bvl, bio, iter)			\
++	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
++
+ #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
+ 
+ static inline unsigned bio_pages(struct bio *bio)
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 2433c73fa5ea..84c395feed49 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -126,8 +126,16 @@ struct bvec_iter {
+ 	.bv_offset	= bvec_iter_offset((bvec), (iter)),	\
+ })
+ 
+-static inline bool bvec_iter_advance(const struct bio_vec *bv,
+-		struct bvec_iter *iter, unsigned bytes)
++#define bvec_iter_segment_bvec(bvec, iter)				\
++((struct bio_vec) {							\
++	.bv_page	= bvec_iter_segment_page((bvec), (iter)),	\
++	.bv_len		= bvec_iter_segment_len((bvec), (iter)),	\
++	.bv_offset	= bvec_iter_segment_offset((bvec), (iter)),	\
++})
++
++static inline bool __bvec_iter_advance(const struct bio_vec *bv,
++				       struct bvec_iter *iter,
++				       unsigned bytes, bool segment)
+ {
+ 	if (WARN_ONCE(bytes > iter->bi_size,
+ 		     "Attempted to advance past end of bvec iter\n")) {
+@@ -136,8 +144,14 @@ static inline bool bvec_iter_advance(const struct bio_vec *bv,
+ 	}
+ 
+ 	while (bytes) {
+-		unsigned iter_len = bvec_iter_len(bv, *iter);
+-		unsigned len = min(bytes, iter_len);
++		unsigned len;
++
++		if (segment)
++			len = bvec_iter_segment_len(bv, *iter);
++		else
++			len = bvec_iter_len(bv, *iter);
++
++		len = min(bytes, len);
+ 
+ 		bytes -= len;
+ 		iter->bi_size -= len;
+@@ -176,6 +190,20 @@ static inline bool bvec_iter_rewind(const struct bio_vec *bv,
+ 	return true;
+ }
+ 
++static inline bool bvec_iter_advance(const struct bio_vec *bv,
++				     struct bvec_iter *iter,
++				     unsigned bytes)
++{
++	return __bvec_iter_advance(bv, iter, bytes, false);
++}
++
++static inline bool bvec_iter_seg_advance(const struct bio_vec *bv,
++					 struct bvec_iter *iter,
++					 unsigned bytes)
++{
++	return __bvec_iter_advance(bv, iter, bytes, true);
++}
++
+ #define for_each_bvec(bvl, bio_vec, iter, start)			\
+ 	for (iter = (start);						\
+ 	     (iter).bi_size &&						\
 -- 
 2.9.5
