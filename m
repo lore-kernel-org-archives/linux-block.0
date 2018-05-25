@@ -1,114 +1,86 @@
-Return-Path: <BATV+df5a2477ff0fa86e9985+5386+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>,
-	Lee Duncan <lduncan@suse.com>,
-	Chris Leech <cleech@redhat.com>,
-	Rafael David Tinoco <rafael.tinoco@canonical.com>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 01/14] libata: remove ata_scsi_timed_out
-Date: Wed, 23 May 2018 14:19:28 +0200
-Message-Id: <20180523121941.8632-2-hch@lst.de>
-In-Reply-To: <20180523121941.8632-1-hch@lst.de>
-References: <20180523121941.8632-1-hch@lst.de>
+Return-Path: <penguin-kernel@i-love.sakura.ne.jp>
+To: jack@suse.cz
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        axboe@kernel.dk, tj@kernel.org, david@fromorbit.com
+Subject: Re: [PATCH] bdi: Fix oops in wb_workfn()
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+References: <20180503162626.27753-1-jack@suse.cz>
+	<201805040735.ADG57320.VFOQOJMOLHFStF@I-love.SAKURA.ne.jp>
+	<201805192327.JIF05779.OQFJFStOOMLFVH@I-love.SAKURA.ne.jp>
+	<20180521093823.kjj5tk7ko244jv4d@quack2.suse.cz>
+In-Reply-To: <20180521093823.kjj5tk7ko244jv4d@quack2.suse.cz>
+Message-Id: <201805251915.FGH64517.HVFJOOLFFMQStO@I-love.SAKURA.ne.jp>
+Date: Fri, 25 May 2018 19:15:32 +0900
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-block@vger.kernel.org>
 
-As far as I can tell this function can't even be called any more, given
-that ATA implements its own eh_strategy_handler with ata_scsi_error, which
-never calls ->eh_timed_out.
+Jan Kara wrote:
+> > void delayed_work_timer_fn(struct timer_list *t)
+> > {
+> > 	struct delayed_work *dwork = from_timer(dwork, t, timer);
+> > 
+> > 	/* should have been called from irqsafe timer with irq already off */
+> > 	__queue_work(dwork->cpu, dwork->wq, &dwork->work);
+> > }
+> > 
+> > Then, wb_workfn() is after all scheduled even if we check for
+> > WB_registered bit, isn't it?
+> 
+> It can be queued after WB_registered bit is cleared but it cannot be queued
+> after mod_delayed_work(bdi_wq, &wb->dwork, 0) has finished. That function
+> deletes the pending timer (the timer cannot be armed again because
+> WB_registered is cleared) and queues what should be the last round of
+> wb_workfn().
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/ata/libata-eh.c | 51 -----------------------------------------
- include/linux/libata.h  |  2 --
- 2 files changed, 53 deletions(-)
+mod_delayed_work() deletes the pending timer but does not wait for already
+invoked timer handler to complete because it is using del_timer() rather than
+del_timer_sync(). Then, what happens if __queue_work() is almost concurrently
+executed from two CPUs, one from mod_delayed_work(bdi_wq, &wb->dwork, 0) from
+wb_shutdown() path (which is called without spin_lock_bh(&wb->work_lock)) and
+the other from delayed_work_timer_fn() path (which is called without checking
+WB_registered bit under spin_lock_bh(&wb->work_lock)) ?
 
-diff --git a/drivers/ata/libata-eh.c b/drivers/ata/libata-eh.c
-index c016829a38fd..e87785dec151 100644
---- a/drivers/ata/libata-eh.c
-+++ b/drivers/ata/libata-eh.c
-@@ -500,57 +500,6 @@ void ata_eh_release(struct ata_port *ap)
- 	mutex_unlock(&ap->host->eh_mutex);
- }
- 
--/**
-- *	ata_scsi_timed_out - SCSI layer time out callback
-- *	@cmd: timed out SCSI command
-- *
-- *	Handles SCSI layer timeout.  We race with normal completion of
-- *	the qc for @cmd.  If the qc is already gone, we lose and let
-- *	the scsi command finish (EH_HANDLED).  Otherwise, the qc has
-- *	timed out and EH should be invoked.  Prevent ata_qc_complete()
-- *	from finishing it by setting EH_SCHEDULED and return
-- *	EH_NOT_HANDLED.
-- *
-- *	TODO: kill this function once old EH is gone.
-- *
-- *	LOCKING:
-- *	Called from timer context
-- *
-- *	RETURNS:
-- *	EH_HANDLED or EH_NOT_HANDLED
-- */
--enum blk_eh_timer_return ata_scsi_timed_out(struct scsi_cmnd *cmd)
--{
--	struct Scsi_Host *host = cmd->device->host;
--	struct ata_port *ap = ata_shost_to_port(host);
--	unsigned long flags;
--	struct ata_queued_cmd *qc;
--	enum blk_eh_timer_return ret;
--
--	DPRINTK("ENTER\n");
--
--	if (ap->ops->error_handler) {
--		ret = BLK_EH_NOT_HANDLED;
--		goto out;
--	}
--
--	ret = BLK_EH_HANDLED;
--	spin_lock_irqsave(ap->lock, flags);
--	qc = ata_qc_from_tag(ap, ap->link.active_tag);
--	if (qc) {
--		WARN_ON(qc->scsicmd != cmd);
--		qc->flags |= ATA_QCFLAG_EH_SCHEDULED;
--		qc->err_mask |= AC_ERR_TIMEOUT;
--		ret = BLK_EH_NOT_HANDLED;
--	}
--	spin_unlock_irqrestore(ap->lock, flags);
--
-- out:
--	DPRINTK("EXIT, ret=%d\n", ret);
--	return ret;
--}
--EXPORT_SYMBOL(ata_scsi_timed_out);
--
- static void ata_eh_unload(struct ata_port *ap)
- {
- 	struct ata_link *link;
-diff --git a/include/linux/libata.h b/include/linux/libata.h
-index 1795fecdea17..1c113134c98f 100644
---- a/include/linux/libata.h
-+++ b/include/linux/libata.h
-@@ -1133,7 +1133,6 @@ extern int ata_sas_port_start(struct ata_port *ap);
- extern void ata_sas_port_stop(struct ata_port *ap);
- extern int ata_sas_slave_configure(struct scsi_device *, struct ata_port *);
- extern int ata_sas_queuecmd(struct scsi_cmnd *cmd, struct ata_port *ap);
--extern enum blk_eh_timer_return ata_scsi_timed_out(struct scsi_cmnd *cmd);
- extern int sata_scr_valid(struct ata_link *link);
- extern int sata_scr_read(struct ata_link *link, int reg, u32 *val);
- extern int sata_scr_write(struct ata_link *link, int reg, u32 val);
-@@ -1359,7 +1358,6 @@ extern struct device_attribute *ata_common_sdev_attrs[];
- 	.proc_name		= drv_name,			\
- 	.slave_configure	= ata_scsi_slave_config,	\
- 	.slave_destroy		= ata_scsi_slave_destroy,	\
--	.eh_timed_out		= ata_scsi_timed_out,		\
- 	.bios_param		= ata_std_bios_param,		\
- 	.unlock_native_capacity	= ata_scsi_unlock_native_capacity, \
- 	.sdev_attrs		= ata_common_sdev_attrs
--- 
-2.17.0
+wb_wakeup_delayed() {
+  spin_lock_bh(&wb->work_lock);
+  if (test_bit(WB_registered, &wb->state)) // succeeds
+    queue_delayed_work(bdi_wq, &wb->d_work, timeout) {
+      queue_delayed_work_on(WORK_CPU_UNBOUND, bdi_wq, &wb->d_work, timeout) {
+         if (!test_and_set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(&wb->d_work.work))) { // succeeds
+           __queue_delayed_work(WORK_CPU_UNBOUND, bdi_wq, &wb->d_work, timeout) {
+             add_timer(timer); // schedules for delayed_work_timer_fn()
+           }
+         }
+      }
+    }
+  spin_unlock_bh(&wb->work_lock);
+}
+
+delayed_work_timer_fn() {
+  // del_timer() already returns false at this point because this timer
+  // is already inside handler. But something took long here enough to
+  // wait for __queue_work() from wb_shutdown() path to finish?
+  __queue_work(WORK_CPU_UNBOUND, bdi_wq, &wb->d_work.work) {
+    insert_work(pwq, work, worklist, work_flags);
+  }
+}
+
+wb_shutdown() {
+  mod_delayed_work(bdi_wq, &wb->dwork, 0) {
+    mod_delayed_work_on(WORK_CPU_UNBOUND, bdi_wq, &wb->dwork, 0) {
+      ret = try_to_grab_pending(&wb->dwork.work, true, &flags) {
+        if (likely(del_timer(&wb->dwork.timer))) // fails because already in delayed_work_timer_fn()
+          return 1;
+        if (!test_and_set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(&wb->dwork.work))) // fails because already set by queue_delayed_work()
+          return 0;
+        // Returns 1 or -ENOENT after doing something?
+      }
+      if (ret >= 0)
+        __queue_delayed_work(WORK_CPU_UNBOUND, bdi_wq, &wb->dwork, 0) {
+          __queue_work(WORK_CPU_UNBOUND, bdi_wq, &wb->dwork.work) {
+            insert_work(pwq, work, worklist, work_flags);
+          }
+        }
+    }
+  }
+}
