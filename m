@@ -1,239 +1,145 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Ingo Molnar <mingo@kernel.org>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Subject: [PATCH 01/10] mempool: Add mempool_init()/mempool_exit()
-Date: Tue,  8 May 2018 21:33:49 -0400
-Message-Id: <20180509013358.16399-2-kent.overstreet@gmail.com>
-In-Reply-To: <20180509013358.16399-1-kent.overstreet@gmail.com>
-References: <20180509013358.16399-1-kent.overstreet@gmail.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [RESEND PATCH V5 18/33] block: deal with dirtying pages for multipage bvec
+Date: Fri, 25 May 2018 11:46:06 +0800
+Message-Id: <20180525034621.31147-19-ming.lei@redhat.com>
+In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
+References: <20180525034621.31147-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Allows mempools to be embedded in other structs, getting rid of a
-pointer indirection from allocation fastpaths.
+In bio_check_pages_dirty(), bvec->bv_page is used as flag for marking
+if the page has been dirtied & released, and if no, it will be dirtied
+in deferred workqueue.
 
-mempool_exit() is safe to call on an uninitialized but zeroed mempool.
+With multipage bvec, we can't do that any more, so change the logic into
+checking all pages in one mp bvec, and only release all these pages if all
+are dirtied, otherwise dirty them all in deferred wrokqueue.
 
-Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
+This patch introduces segment_for_each_page_all() to deal with the case
+a bit easier.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- include/linux/mempool.h |  34 +++++++++++++
- mm/mempool.c            | 108 ++++++++++++++++++++++++++++++----------
- 2 files changed, 115 insertions(+), 27 deletions(-)
+ block/bio.c          | 45 +++++++++++++++++++++++++++++++++++++--------
+ include/linux/bvec.h |  7 +++++++
+ 2 files changed, 44 insertions(+), 8 deletions(-)
 
-diff --git a/include/linux/mempool.h b/include/linux/mempool.h
-index b51f5c430c..0c964ac107 100644
---- a/include/linux/mempool.h
-+++ b/include/linux/mempool.h
-@@ -25,6 +25,18 @@ typedef struct mempool_s {
- 	wait_queue_head_t wait;
- } mempool_t;
+diff --git a/block/bio.c b/block/bio.c
+index 63d4fe85f42e..a200c42e55dc 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1630,8 +1630,9 @@ void bio_set_pages_dirty(struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_iter_all bia;
  
-+static inline bool mempool_initialized(mempool_t *pool)
-+{
-+	return pool->elements != NULL;
-+}
-+
-+void mempool_exit(mempool_t *pool);
-+int mempool_init_node(mempool_t *pool, int min_nr, mempool_alloc_t *alloc_fn,
-+		      mempool_free_t *free_fn, void *pool_data,
-+		      gfp_t gfp_mask, int node_id);
-+int mempool_init(mempool_t *pool, int min_nr, mempool_alloc_t *alloc_fn,
-+		 mempool_free_t *free_fn, void *pool_data);
-+
- extern mempool_t *mempool_create(int min_nr, mempool_alloc_t *alloc_fn,
- 			mempool_free_t *free_fn, void *pool_data);
- extern mempool_t *mempool_create_node(int min_nr, mempool_alloc_t *alloc_fn,
-@@ -43,6 +55,14 @@ extern void mempool_free(void *element, mempool_t *pool);
-  */
- void *mempool_alloc_slab(gfp_t gfp_mask, void *pool_data);
- void mempool_free_slab(void *element, void *pool_data);
-+
-+static inline int
-+mempool_init_slab_pool(mempool_t *pool, int min_nr, struct kmem_cache *kc)
-+{
-+	return mempool_init(pool, min_nr, mempool_alloc_slab,
-+			    mempool_free_slab, (void *) kc);
-+}
-+
- static inline mempool_t *
- mempool_create_slab_pool(int min_nr, struct kmem_cache *kc)
- {
-@@ -56,6 +76,13 @@ mempool_create_slab_pool(int min_nr, struct kmem_cache *kc)
-  */
- void *mempool_kmalloc(gfp_t gfp_mask, void *pool_data);
- void mempool_kfree(void *element, void *pool_data);
-+
-+static inline int mempool_init_kmalloc_pool(mempool_t *pool, int min_nr, size_t size)
-+{
-+	return mempool_init(pool, min_nr, mempool_kmalloc,
-+			    mempool_kfree, (void *) size);
-+}
-+
- static inline mempool_t *mempool_create_kmalloc_pool(int min_nr, size_t size)
- {
- 	return mempool_create(min_nr, mempool_kmalloc, mempool_kfree,
-@@ -68,6 +95,13 @@ static inline mempool_t *mempool_create_kmalloc_pool(int min_nr, size_t size)
-  */
- void *mempool_alloc_pages(gfp_t gfp_mask, void *pool_data);
- void mempool_free_pages(void *element, void *pool_data);
-+
-+static inline int mempool_init_page_pool(mempool_t *pool, int min_nr, int order)
-+{
-+	return mempool_init(pool, min_nr, mempool_alloc_pages,
-+			    mempool_free_pages, (void *)(long)order);
-+}
-+
- static inline mempool_t *mempool_create_page_pool(int min_nr, int order)
- {
- 	return mempool_create(min_nr, mempool_alloc_pages, mempool_free_pages,
-diff --git a/mm/mempool.c b/mm/mempool.c
-index 5c9dce3471..df90ace400 100644
---- a/mm/mempool.c
-+++ b/mm/mempool.c
-@@ -137,6 +137,28 @@ static void *remove_element(mempool_t *pool, gfp_t flags)
- 	return element;
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ 
+ 		if (page && !PageCompound(page))
+@@ -1640,16 +1641,26 @@ void bio_set_pages_dirty(struct bio *bio)
  }
+ EXPORT_SYMBOL_GPL(bio_set_pages_dirty);
  
-+/**
-+ * mempool_destroy - exit a mempool initialized with mempool_init()
-+ * @pool:      pointer to the memory pool which was initialized with
-+ *             mempool_init().
-+ *
-+ * Free all reserved elements in @pool and @pool itself.  This function
-+ * only sleeps if the free_fn() function sleeps.
-+ *
-+ * May be called on a zeroed but uninitialized mempool (i.e. allocated with
-+ * kzalloc()).
-+ */
-+void mempool_exit(mempool_t *pool)
++static inline void release_mp_bvec_pages(struct bio_vec *bvec)
 +{
-+	while (pool->curr_nr) {
-+		void *element = remove_element(pool, GFP_KERNEL);
-+		pool->free(element, pool->pool_data);
-+	}
-+	kfree(pool->elements);
-+	pool->elements = NULL;
++	struct bio_vec bv;
++	struct bvec_iter iter;
++
++	segment_for_each_page_all(bv, bvec, iter)
++		put_page(bv.bv_page);
 +}
-+EXPORT_SYMBOL(mempool_exit);
 +
- /**
-  * mempool_destroy - deallocate a memory pool
-  * @pool:      pointer to the memory pool which was allocated via
-@@ -150,15 +172,65 @@ void mempool_destroy(mempool_t *pool)
- 	if (unlikely(!pool))
- 		return;
- 
--	while (pool->curr_nr) {
--		void *element = remove_element(pool, GFP_KERNEL);
--		pool->free(element, pool->pool_data);
--	}
--	kfree(pool->elements);
-+	mempool_exit(pool);
- 	kfree(pool);
- }
- EXPORT_SYMBOL(mempool_destroy);
- 
-+int mempool_init_node(mempool_t *pool, int min_nr, mempool_alloc_t *alloc_fn,
-+		      mempool_free_t *free_fn, void *pool_data,
-+		      gfp_t gfp_mask, int node_id)
-+{
-+	spin_lock_init(&pool->lock);
-+	pool->min_nr	= min_nr;
-+	pool->pool_data = pool_data;
-+	pool->alloc	= alloc_fn;
-+	pool->free	= free_fn;
-+	init_waitqueue_head(&pool->wait);
-+
-+	pool->elements = kmalloc_array_node(min_nr, sizeof(void *),
-+					    gfp_mask, node_id);
-+	if (!pool->elements)
-+		return -ENOMEM;
-+
-+	/*
-+	 * First pre-allocate the guaranteed number of buffers.
-+	 */
-+	while (pool->curr_nr < pool->min_nr) {
-+		void *element;
-+
-+		element = pool->alloc(gfp_mask, pool->pool_data);
-+		if (unlikely(!element)) {
-+			mempool_exit(pool);
-+			return -ENOMEM;
-+		}
-+		add_element(pool, element);
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(mempool_init_node);
-+
-+/**
-+ * mempool_init - initialize a memory pool
-+ * @min_nr:    the minimum number of elements guaranteed to be
-+ *             allocated for this pool.
-+ * @alloc_fn:  user-defined element-allocation function.
-+ * @free_fn:   user-defined element-freeing function.
-+ * @pool_data: optional private data available to the user-defined functions.
-+ *
-+ * Like mempool_create(), but initializes the pool in (i.e. embedded in another
-+ * structure).
-+ */
-+int mempool_init(mempool_t *pool, int min_nr, mempool_alloc_t *alloc_fn,
-+		 mempool_free_t *free_fn, void *pool_data)
-+{
-+	return mempool_init_node(pool, min_nr, alloc_fn, free_fn,
-+				 pool_data, GFP_KERNEL, NUMA_NO_NODE);
-+
-+}
-+EXPORT_SYMBOL(mempool_init);
-+
- /**
-  * mempool_create - create a memory pool
-  * @min_nr:    the minimum number of elements guaranteed to be
-@@ -186,35 +258,17 @@ mempool_t *mempool_create_node(int min_nr, mempool_alloc_t *alloc_fn,
- 			       gfp_t gfp_mask, int node_id)
+ static void bio_release_pages(struct bio *bio)
  {
- 	mempool_t *pool;
-+
- 	pool = kzalloc_node(sizeof(*pool), gfp_mask, node_id);
- 	if (!pool)
- 		return NULL;
--	pool->elements = kmalloc_array_node(min_nr, sizeof(void *),
--				      gfp_mask, node_id);
--	if (!pool->elements) {
-+
-+	if (mempool_init_node(pool, min_nr, alloc_fn, free_fn, pool_data,
-+			      gfp_mask, node_id)) {
- 		kfree(pool);
- 		return NULL;
+ 	struct bio_vec *bvec;
+ 	int i;
+ 
+-	bio_for_each_page_all(bvec, bio, i) {
++	/* iterate each mp bvec */
++	bio_for_each_segment_all(bvec, bio, i) {
+ 		struct page *page = bvec->bv_page;
+ 
+ 		if (page)
+-			put_page(page);
++			release_mp_bvec_pages(bvec);
  	}
--	spin_lock_init(&pool->lock);
--	pool->min_nr = min_nr;
--	pool->pool_data = pool_data;
--	init_waitqueue_head(&pool->wait);
--	pool->alloc = alloc_fn;
--	pool->free = free_fn;
- 
--	/*
--	 * First pre-allocate the guaranteed number of buffers.
--	 */
--	while (pool->curr_nr < pool->min_nr) {
--		void *element;
--
--		element = pool->alloc(gfp_mask, pool->pool_data);
--		if (unlikely(!element)) {
--			mempool_destroy(pool);
--			return NULL;
--		}
--		add_element(pool, element);
--	}
- 	return pool;
  }
- EXPORT_SYMBOL(mempool_create_node);
+ 
+@@ -1693,20 +1704,38 @@ static void bio_dirty_fn(struct work_struct *work)
+ 	}
+ }
+ 
++static inline void check_mp_bvec_pages(struct bio_vec *bvec,
++		int *nr_dirty, int *nr_pages)
++{
++	struct bio_vec bv;
++	struct bvec_iter iter;
++
++	segment_for_each_page_all(bv, bvec, iter) {
++		struct page *page = bv.bv_page;
++
++		if (PageDirty(page) || PageCompound(page))
++			(*nr_dirty)++;
++		(*nr_pages)++;
++	}
++}
++
+ void bio_check_pages_dirty(struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+ 	int nr_clean_pages = 0;
+ 	int i;
+ 
+-	bio_for_each_page_all(bvec, bio, i) {
+-		struct page *page = bvec->bv_page;
++	bio_for_each_segment_all(bvec, bio, i) {
++		int nr_dirty = 0, nr_pages = 0;
++
++		check_mp_bvec_pages(bvec, &nr_dirty, &nr_pages);
+ 
+-		if (PageDirty(page) || PageCompound(page)) {
+-			put_page(page);
++		/* release all pages in the mp bvec if all are dirtied */
++		if (nr_dirty == nr_pages) {
++			release_mp_bvec_pages(bvec);
+ 			bvec->bv_page = NULL;
+ 		} else {
+-			nr_clean_pages++;
++			nr_clean_pages += nr_pages;
+ 		}
+ 	}
+ 
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 2deee87b823e..893e8fef0dd0 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -225,6 +225,13 @@ static inline bool bvec_iter_seg_advance(const struct bio_vec *bv,
+ 	.bi_bvec_done	= 0,						\
+ }
+ 
++#define segment_for_each_page_all(pg_bvl, seg_bvec, iter)		\
++	for (iter = BVEC_ITER_ALL_INIT,					\
++	     (iter).bi_size = (seg_bvec)->bv_len  - (iter).bi_bvec_done;\
++	     (iter).bi_size &&						\
++		((pg_bvl = bvec_iter_bvec((seg_bvec), (iter))), 1);	\
++	     bvec_iter_advance((seg_bvec), &(iter), (pg_bvl).bv_len))
++
+ /* get the last page from the multipage bvec and store it in @pg */
+ static inline void segment_last_page(const struct bio_vec *seg,
+ 		struct bio_vec *pg)
 -- 
-2.17.0
+2.9.5
