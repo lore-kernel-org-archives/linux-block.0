@@ -1,62 +1,64 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH 5/6] bcache: set dc->io_disable to true in conditional_stop_bcache_device()
-Date: Wed,  2 May 2018 22:46:58 +0800
-Message-Id: <20180502144659.118628-6-colyli@suse.de>
-In-Reply-To: <20180502144659.118628-1-colyli@suse.de>
-References: <20180502144659.118628-1-colyli@suse.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [RESEND PATCH V5 26/33] exofs: conver to bio_for_each_page_all2
+Date: Fri, 25 May 2018 11:46:14 +0800
+Message-Id: <20180525034621.31147-27-ming.lei@redhat.com>
+In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
+References: <20180525034621.31147-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Commit 7e027ca4b534b ("bcache: add stop_when_cache_set_failed option to
-backing device") adds stop_when_cache_set_failed option and stops bcache
-device if stop_when_cache_set_failed is auto and there is dirty data on
-broken cache device. There might exists a small time gap that the cache
-set is released and set to NULL but bcache device is not released yet
-(because they are released in parallel). During this time gap, dc->c is
-NULL so CACHE_SET_IO_DISABLE won't be checked, and dc->io_disable is still
-false, so new coming I/O requests will be accepted and directly go into
-backing device as no cache set attached to. If there is dirty data on
-cache device, this behavior may introduce potential inconsistent data.
+bio_for_each_page_all() can't be used any more after multipage bvec is
+enabled, so we have to convert to bio_for_each_page_all2().
 
-This patch sets dc->io_disable to true before calling bcache_device_stop()
-to make sure the backing device will reject new coming I/O request as
-well, so even in the small time gap no I/O will directly go into backing
-device to corrupt data consistency.
-
-Fixes: 7e027ca4b534b ("bcache: add stop_when_cache_set_failed option to backing device")
-Signed-off-by: Coly Li <colyli@suse.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/super.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ fs/exofs/ore.c      | 3 ++-
+ fs/exofs/ore_raid.c | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index a0d5a3ccc7d0..507755fcac5a 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1556,6 +1556,20 @@ static void conditional_stop_bcache_device(struct cache_set *c,
- 		 */
- 		pr_warn("stop_when_cache_set_failed of %s is \"auto\" and cache is dirty, stop it to avoid potential data corruption.",
- 			d->disk->disk_name);
-+			/*
-+			 * There might be a small time gap that cache set is
-+			 * released but bcache device is not. Inside this time
-+			 * gap, regular I/O requests will directly go into
-+			 * backing device as no cache set attached to. This
-+			 * behavior may also introduce potential inconsistence
-+			 * data in writeback mode while cache is dirty.
-+			 * Therefore before calling bcache_device_stop() due
-+			 * to a broken cache device, dc->io_disable should be
-+			 * explicitly set to true.
-+			 */
-+			dc->io_disable = true;
-+			/* make others know io_disable is true earlier */
-+			smp_mb();
- 			bcache_device_stop(d);
- 	} else {
- 		/*
+diff --git a/fs/exofs/ore.c b/fs/exofs/ore.c
+index fe81fd6fe553..2a7e93f21695 100644
+--- a/fs/exofs/ore.c
++++ b/fs/exofs/ore.c
+@@ -406,8 +406,9 @@ static void _clear_bio(struct bio *bio)
+ {
+ 	struct bio_vec *bv;
+ 	unsigned i;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_page_all(bv, bio, i) {
++	bio_for_each_page_all2(bv, bio, i, bia) {
+ 		unsigned this_count = bv->bv_len;
+ 
+ 		if (likely(PAGE_SIZE == this_count))
+diff --git a/fs/exofs/ore_raid.c b/fs/exofs/ore_raid.c
+index 2c3346cd1b29..bb0cc314a987 100644
+--- a/fs/exofs/ore_raid.c
++++ b/fs/exofs/ore_raid.c
+@@ -433,11 +433,12 @@ static void _mark_read4write_pages_uptodate(struct ore_io_state *ios, int ret)
+ 	/* loop on all devices all pages */
+ 	for (d = 0; d < ios->numdevs; d++) {
+ 		struct bio *bio = ios->per_dev[d].bio;
++		struct bvec_iter_all bia;
+ 
+ 		if (!bio)
+ 			continue;
+ 
+-		bio_for_each_page_all(bv, bio, i) {
++		bio_for_each_page_all2(bv, bio, i, bia) {
+ 			struct page *page = bv->bv_page;
+ 
+ 			SetPageUptodate(page);
 -- 
-2.16.3
+2.9.5
