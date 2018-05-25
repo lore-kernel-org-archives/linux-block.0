@@ -1,66 +1,54 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	axboe@kernel.dk,
-	hch@infradead.org,
-	colyli@suse.de,
-	snitzer@redhat.com,
-	darrick.wong@oracle.com,
-	clm@fb.com,
-	bacik@fb.com,
-	linux-xfs@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	linux-btrfs@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	neilb@suse.com
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Subject: [PATCH 09/12] fs: convert block_dev.c to bioset_init()
-Date: Sun, 20 May 2018 18:25:55 -0400
-Message-Id: <20180520222558.7053-10-kent.overstreet@gmail.com>
-In-Reply-To: <20180520222558.7053-1-kent.overstreet@gmail.com>
-References: <20180520222558.7053-1-kent.overstreet@gmail.com>
+Return-Path: <BATV+5cb9c4fab7748cb05a15+5388+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Fri, 25 May 2018 07:48:05 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Tejun Heo <tj@kernel.org>, Borislav Petkov <bp@alien8.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
+	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
+	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
+	linux-block <linux-block@vger.kernel.org>,
+	linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 3/6] block: Create scsi_sense.h for SCSI and ATAPI
+Message-ID: <20180525144805.GA7929@infradead.org>
+References: <CAGXu5j+mgGZkTDS6EDRspJKKbU=vMT4ehv9T-SekPba=ESoGDg@mail.gmail.com>
+ <9A0BC289-4203-4C77-A012-AAB07F42061F@kernel.dk>
+ <CAGXu5jJsGWDsZNDJvUUqncSaAcvond_B_J7=BbvVW0X3r6Sxww@mail.gmail.com>
+ <aa150272-ffeb-fb8f-7303-0d9502cf9a71@kernel.dk>
+ <20180523142545.GA16248@infradead.org>
+ <24d36869-e037-042d-cb16-20a81b34eb76@kernel.dk>
+ <CAGXu5jJn=1Rz=D8VUwv_VoaGoLtaD=+tcPZxQxntweZoZwFa5Q@mail.gmail.com>
+ <f4eb4cd5-8976-3990-69b0-26cca054aa45@kernel.dk>
+ <20180524080015.GA2866@infradead.org>
+ <CAGXu5j+pRUWgny+h5ToVQXBP8nANjreVhnXjk5TVgy84ufNsRg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAGXu5j+pRUWgny+h5ToVQXBP8nANjreVhnXjk5TVgy84ufNsRg@mail.gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
----
- fs/block_dev.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+On Thu, May 24, 2018 at 10:06:59AM -0700, Kees Cook wrote:
+> On Thu, May 24, 2018 at 1:00 AM, Christoph Hellwig <hch@infradead.org> wrote:
+> > On Wed, May 23, 2018 at 03:14:19PM -0600, Jens Axboe wrote:
+> >> Ugh, so that would necessitate a change there too. As I said before,
+> >> I don't really care where it lives. I know the SCSI folks seem bothered
+> >> by moving it, but in reality, it's not like this stuff will likely ever
+> >> really change. Of the two choices (select entire SCSI stack, or just move
+> >> this little bit), I know what I would consider the saner option...
+> >
+> > Oh well.  How about something like this respin of Kees' series?
+> >
+> > http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/sense-cleanup
+> 
+> Does the CONFIG_PCMCIA in drivers/scsi/Makefile now get exposed in
+> weird config cases?
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 7ec920e270..b550ae280f 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -272,7 +272,7 @@ struct blkdev_dio {
- 	struct bio		bio;
- };
- 
--static struct bio_set *blkdev_dio_pool __read_mostly;
-+static struct bio_set blkdev_dio_pool;
- 
- static void blkdev_bio_end_io(struct bio *bio)
- {
-@@ -334,7 +334,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 	    (bdev_logical_block_size(bdev) - 1))
- 		return -EINVAL;
- 
--	bio = bio_alloc_bioset(GFP_KERNEL, nr_pages, blkdev_dio_pool);
-+	bio = bio_alloc_bioset(GFP_KERNEL, nr_pages, &blkdev_dio_pool);
- 	bio_get(bio); /* extra ref for the completion handler */
- 
- 	dio = container_of(bio, struct blkdev_dio, bio);
-@@ -432,10 +432,7 @@ blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
- 
- static __init int blkdev_init(void)
- {
--	blkdev_dio_pool = bioset_create(4, offsetof(struct blkdev_dio, bio), BIOSET_NEED_BVECS);
--	if (!blkdev_dio_pool)
--		return -ENOMEM;
--	return 0;
-+	return bioset_init(&blkdev_dio_pool, 4, offsetof(struct blkdev_dio, bio), BIOSET_NEED_BVECS);
- }
- module_init(blkdev_init);
- 
--- 
-2.17.0
+That just includes drivers/scsi/pcmcia/Makefile, which only
+has three conditional modules in it, so it should be fine.
+
+> Otherwise, yeah, looks good to me. Thanks!
+
+Can you pick up my tweaks and ressend?
