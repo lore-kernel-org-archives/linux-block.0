@@ -1,26 +1,74 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Mon, 28 May 2018 08:57:03 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-nvme@lists.infradead.org, Jens Axboe <axboe@kernel.dk>,
+Return-Path: <BATV+7138d8dfc060164c836f+5389+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-nvme@lists.infradead.org
+Cc: Jens Axboe <axboe@kernel.dk>,
 	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>, Hannes Reinecke <hare@suse.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
 	linux-block@vger.kernel.org
-Subject: Re: [PATCH 12/14] nvme: mark nvme_queue_scan static
-Message-ID: <20180528065703.7gxmopdgdeoafmtp@linux-x5ow.site>
+Subject: [PATCH 12/14] nvme: mark nvme_queue_scan static
+Date: Sat, 26 May 2018 12:27:33 +0200
+Message-Id: <20180526102735.31404-13-hch@lst.de>
+In-Reply-To: <20180526102735.31404-1-hch@lst.de>
 References: <20180526102735.31404-1-hch@lst.de>
- <20180526102735.31404-13-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20180526102735.31404-13-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+And move it toward the top of the file to avoid a forward declaration.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/nvme/host/core.c | 19 +++++++++----------
+ drivers/nvme/host/nvme.h |  1 -
+ 2 files changed, 9 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index c0bc76d98194..06cd04dcffbc 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -100,6 +100,15 @@ static struct class *nvme_subsys_class;
+ static void nvme_ns_remove(struct nvme_ns *ns);
+ static int nvme_revalidate_disk(struct gendisk *disk);
+ 
++static void nvme_queue_scan(struct nvme_ctrl *ctrl)
++{
++	/*
++	 * Only new queue scan work when admin and IO queues are both alive
++	 */
++	if (ctrl->state == NVME_CTRL_LIVE)
++		queue_work(nvme_wq, &ctrl->scan_work);
++}
++
+ int nvme_reset_ctrl(struct nvme_ctrl *ctrl)
+ {
+ 	if (!nvme_change_ctrl_state(ctrl, NVME_CTRL_RESETTING))
+@@ -3214,16 +3223,6 @@ static void nvme_scan_work(struct work_struct *work)
+ 	kfree(id);
+ }
+ 
+-void nvme_queue_scan(struct nvme_ctrl *ctrl)
+-{
+-	/*
+-	 * Only new queue scan work when admin and IO queues are both alive
+-	 */
+-	if (ctrl->state == NVME_CTRL_LIVE)
+-		queue_work(nvme_wq, &ctrl->scan_work);
+-}
+-EXPORT_SYMBOL_GPL(nvme_queue_scan);
+-
+ /*
+  * This function iterates the namespace list unlocked to allow recovery from
+  * controller failure. It is up to the caller to ensure the namespace list is
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index dcf9e9592c1a..11681278fdf6 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -395,7 +395,6 @@ void nvme_stop_ctrl(struct nvme_ctrl *ctrl);
+ void nvme_put_ctrl(struct nvme_ctrl *ctrl);
+ int nvme_init_identify(struct nvme_ctrl *ctrl);
+ 
+-void nvme_queue_scan(struct nvme_ctrl *ctrl);
+ void nvme_remove_namespaces(struct nvme_ctrl *ctrl);
+ 
+ int nvme_sec_submit(void *data, u16 spsp, u8 secp, void *buffer, size_t len,
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.17.0
