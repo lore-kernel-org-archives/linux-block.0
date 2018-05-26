@@ -1,26 +1,101 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Mon, 28 May 2018 08:35:18 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-nvme@lists.infradead.org, Jens Axboe <axboe@kernel.dk>,
+Return-Path: <BATV+7138d8dfc060164c836f+5389+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-nvme@lists.infradead.org
+Cc: Jens Axboe <axboe@kernel.dk>,
 	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>, Hannes Reinecke <hare@suse.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
 	linux-block@vger.kernel.org
-Subject: Re: [PATCH 03/14] nvme.h: untangle AEN notice definitions
-Message-ID: <20180528063518.zjxedqu3yvurh46g@linux-x5ow.site>
+Subject: [PATCH 03/14] nvme.h: untangle AEN notice definitions
+Date: Sat, 26 May 2018 12:27:24 +0200
+Message-Id: <20180526102735.31404-4-hch@lst.de>
+In-Reply-To: <20180526102735.31404-1-hch@lst.de>
 References: <20180526102735.31404-1-hch@lst.de>
- <20180526102735.31404-4-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20180526102735.31404-4-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Stop including the event type in the definitions for the notice type.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/nvme/host/core.c | 30 ++++++++++++++++++------------
+ include/linux/nvme.h     |  8 ++++++--
+ 2 files changed, 24 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 2c4cf65641a6..86cb78653155 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -3321,6 +3321,21 @@ static void nvme_fw_act_work(struct work_struct *work)
+ 	nvme_get_fw_slot_info(ctrl);
+ }
+ 
++static void nvme_handle_aen_notice(struct nvme_ctrl *ctrl, u32 result)
++{
++	switch ((result & 0xff00) >> 8) {
++	case NVME_AER_NOTICE_NS_CHANGED:
++		dev_info(ctrl->device, "rescanning\n");
++		nvme_queue_scan(ctrl);
++		break;
++	case NVME_AER_NOTICE_FW_ACT_STARTING:
++		queue_work(nvme_wq, &ctrl->fw_act_work);
++		break;
++	default:
++		dev_warn(ctrl->device, "async event result %08x\n", result);
++	}
++}
++
+ void nvme_complete_async_event(struct nvme_ctrl *ctrl, __le16 status,
+ 		volatile union nvme_result *res)
+ {
+@@ -3330,6 +3345,9 @@ void nvme_complete_async_event(struct nvme_ctrl *ctrl, __le16 status,
+ 		return;
+ 
+ 	switch (result & 0x7) {
++	case NVME_AER_NOTICE:
++		nvme_handle_aen_notice(ctrl, result);
++		break;
+ 	case NVME_AER_ERROR:
+ 	case NVME_AER_SMART:
+ 	case NVME_AER_CSS:
+@@ -3339,18 +3357,6 @@ void nvme_complete_async_event(struct nvme_ctrl *ctrl, __le16 status,
+ 	default:
+ 		break;
+ 	}
+-
+-	switch (result & 0xff07) {
+-	case NVME_AER_NOTICE_NS_CHANGED:
+-		dev_info(ctrl->device, "rescanning\n");
+-		nvme_queue_scan(ctrl);
+-		break;
+-	case NVME_AER_NOTICE_FW_ACT_STARTING:
+-		queue_work(nvme_wq, &ctrl->fw_act_work);
+-		break;
+-	default:
+-		dev_warn(ctrl->device, "async event result %08x\n", result);
+-	}
+ 	queue_work(nvme_wq, &ctrl->async_event_work);
+ }
+ EXPORT_SYMBOL_GPL(nvme_complete_async_event);
+diff --git a/include/linux/nvme.h b/include/linux/nvme.h
+index 4112e2bd747f..c37103a4ad38 100644
+--- a/include/linux/nvme.h
++++ b/include/linux/nvme.h
+@@ -436,10 +436,14 @@ enum {
+ enum {
+ 	NVME_AER_ERROR			= 0,
+ 	NVME_AER_SMART			= 1,
++	NVME_AER_NOTICE			= 2,
+ 	NVME_AER_CSS			= 6,
+ 	NVME_AER_VS			= 7,
+-	NVME_AER_NOTICE_NS_CHANGED	= 0x0002,
+-	NVME_AER_NOTICE_FW_ACT_STARTING = 0x0102,
++};
++
++enum {
++	NVME_AER_NOTICE_NS_CHANGED	= 0x00,
++	NVME_AER_NOTICE_FW_ACT_STARTING = 0x01,
+ };
+ 
+ struct nvme_lba_range_type {
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.17.0
