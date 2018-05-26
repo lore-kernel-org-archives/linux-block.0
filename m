@@ -1,26 +1,85 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Mon, 28 May 2018 08:56:34 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-nvme@lists.infradead.org, Jens Axboe <axboe@kernel.dk>,
+Return-Path: <BATV+7138d8dfc060164c836f+5389+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-nvme@lists.infradead.org
+Cc: Jens Axboe <axboe@kernel.dk>,
 	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>, Hannes Reinecke <hare@suse.de>,
-	linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
-Subject: Re: [PATCH 11/14] nvme: submit AEN event configuration on startup
-Message-ID: <20180528065634.fqavjju4qn2qf7ng@linux-x5ow.site>
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	linux-block@vger.kernel.org,
+	Hannes Reinecke <hare@suse.com>
+Subject: [PATCH 11/14] nvme: submit AEN event configuration on startup
+Date: Sat, 26 May 2018 12:27:32 +0200
+Message-Id: <20180526102735.31404-12-hch@lst.de>
+In-Reply-To: <20180526102735.31404-1-hch@lst.de>
 References: <20180526102735.31404-1-hch@lst.de>
- <20180526102735.31404-12-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20180526102735.31404-12-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+
+We should register for AEN events; some law-abiding targets might
+not be sending us AENs otherwise.
+
+Signed-off-by: Hannes Reinecke <hare@suse.com>
+[hch: slight cleanups]
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/nvme/host/core.c | 17 +++++++++++++++++
+ drivers/nvme/host/nvme.h |  1 +
+ 2 files changed, 18 insertions(+)
+
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 86cb78653155..c0bc76d98194 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -1030,6 +1030,21 @@ int nvme_set_queue_count(struct nvme_ctrl *ctrl, int *count)
+ }
+ EXPORT_SYMBOL_GPL(nvme_set_queue_count);
+ 
++#define NVME_AEN_SUPPORTED \
++	(NVME_AEN_CFG_NS_ATTR | NVME_AEN_CFG_FW_ACT)
++
++static void nvme_enable_aen(struct nvme_ctrl *ctrl)
++{
++	u32 result;
++	int status;
++
++	status = nvme_set_features(ctrl, NVME_FEAT_ASYNC_EVENT,
++			ctrl->oaes & NVME_AEN_SUPPORTED, NULL, 0, &result);
++	if (status)
++		dev_warn(ctrl->device, "Failed to configure AEN (cfg %x)\n",
++			 ctrl->oaes & NVME_AEN_SUPPORTED);
++}
++
+ static int nvme_submit_io(struct nvme_ns *ns, struct nvme_user_io __user *uio)
+ {
+ 	struct nvme_user_io io;
+@@ -2347,6 +2362,7 @@ int nvme_init_identify(struct nvme_ctrl *ctrl)
+ 
+ 	ctrl->oacs = le16_to_cpu(id->oacs);
+ 	ctrl->oncs = le16_to_cpup(&id->oncs);
++	ctrl->oaes = le32_to_cpu(id->oaes);
+ 	atomic_set(&ctrl->abort_limit, id->acl + 1);
+ 	ctrl->vwc = id->vwc;
+ 	ctrl->cntlid = le16_to_cpup(&id->cntlid);
+@@ -3379,6 +3395,7 @@ void nvme_start_ctrl(struct nvme_ctrl *ctrl)
+ 
+ 	if (ctrl->queue_count > 1) {
+ 		nvme_queue_scan(ctrl);
++		nvme_enable_aen(ctrl);
+ 		queue_work(nvme_wq, &ctrl->async_event_work);
+ 		nvme_start_queues(ctrl);
+ 	}
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index ec6e4acc4d48..dcf9e9592c1a 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -176,6 +176,7 @@ struct nvme_ctrl {
+ 	u16 kas;
+ 	u8 npss;
+ 	u8 apsta;
++	u32 oaes;
+ 	u32 aen_result;
+ 	unsigned int shutdown_timeout;
+ 	unsigned int kato;
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.17.0
