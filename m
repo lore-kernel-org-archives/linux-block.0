@@ -1,47 +1,26 @@
-Return-Path: <daniel.verkamp@intel.com>
-From: "Verkamp, Daniel" <daniel.verkamp@intel.com>
-To: Christoph Hellwig <hch@lst.de>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>
-CC: Jens Axboe <axboe@kernel.dk>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, Hannes Reinecke <hare@suse.com>, Sagi Grimberg
-	<sagi@grimberg.me>, "Busch, Keith" <keith.busch@intel.com>, Hannes Reinecke
-	<hare@suse.de>
-Subject: RE: [PATCH 09/14] nvmet: Add AEN configuration support
-Date: Tue, 29 May 2018 17:15:34 +0000
-Message-ID: <A5F28D4A728A7E41839CDC5C3B5A01E8B74D2557@FMSMSX103.amr.corp.intel.com>
+Return-Path: <jthumshirn@suse.de>
+Date: Mon, 28 May 2018 08:54:44 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-nvme@lists.infradead.org, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>, Hannes Reinecke <hare@suse.de>,
+	linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH 09/14] nvmet: Add AEN configuration support
+Message-ID: <20180528065444.d5nxb5b3riliebys@linux-x5ow.site>
 References: <20180526102735.31404-1-hch@lst.de>
  <20180526102735.31404-10-hch@lst.de>
-In-Reply-To: <20180526102735.31404-10-hch@lst.de>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Return-Path: daniel.verkamp@intel.com
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180526102735.31404-10-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-[...]
-> diff --git a/drivers/nvme/target/admin-cmd.c b/drivers/nvme/target/admin-
-> cmd.c
-> index 82d521f60a43..20d9ce5064f8 100644
-> --- a/drivers/nvme/target/admin-cmd.c
-> +++ b/drivers/nvme/target/admin-cmd.c
-> @@ -432,6 +432,16 @@ static void nvmet_execute_set_features(struct
-> nvmet_req *req)
->  		req->sq->ctrl->kato =3D DIV_ROUND_UP(val32, 1000);
->  		nvmet_set_result(req, req->sq->ctrl->kato);
->  		break;
-> +		val32 =3D le32_to_cpu(req->cmd->common.cdw10[1]);
-> +		if (val32 & ~NVMET_AEN_SUPPORTED) {
-> +			status =3D NVME_SC_INVALID_FIELD | NVME_SC_DNR;
-> +			break;
-> +		}
-
-This looks overly restrictive - a host sending a Set Features with e.g. the=
- health critical warning bits set in CDW11 will get a failure.  As far as I=
- can tell, this isn't allowed by the spec;  Set Features - Asynchronous Eve=
-nt Configuration and the health log page have been mandatory since NVMe 1.0=
-, and presumably support for the corresponding health log page related AER =
-bits is also mandatory (these were the only bits available in NVMe 1.0).  I=
- think it should be fine to just allow the user to set any (valid) combinat=
-ion of bits here, while still only triggering the NS Changed notification.
-
-Thanks,
--- Daniel
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
