@@ -1,102 +1,162 @@
-Return-Path: <prvs=673f59626=adam.manzanares@wdc.com>
-From: adam.manzanares@wdc.com
-To: viro@zeniv.linux.org.uk,
-	linux-fsdevel@vger.kernel.org,
-	axboe@kernel.dk,
-	bcrl@kvack.org
-Cc: tglx@linutronix.de,
-	mingo@kernel.org,
-	pombredanne@nexb.com,
-	kstewart@linuxfoundation.org,
-	gregkh@linuxfoundation.org,
-	bigeasy@linutronix.de,
-	jack@suse.cz,
-	darrick.wong@oracle.com,
-	rgoldwyn@suse.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-aio@kvack.org,
-	linux-api@vger.kernel.org,
-	hch@infradread.org,
-	jmoyer@redhat.com,
-	Adam Manzanares <adam.manzanares@wdc.com>
-Subject: [PATCH v6 1/5] block: add ioprio_check_cap function
-Date: Tue, 22 May 2018 08:07:33 -0700
-Message-Id: <20180522150737.9893-2-adam.manzanares@wdc.com>
-In-Reply-To: <20180522150737.9893-1-adam.manzanares@wdc.com>
-References: <20180522150737.9893-1-adam.manzanares@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:33250 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1033218AbeE1PWW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 May 2018 11:22:22 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Michael Lyle <mlyle@lyle.org>,
+        Junhui Tang <tang.junhui@zte.com.cn>
+Subject: [PATCH 1/4] bcache: stop bcache device when backing device is offline
+Date: Mon, 28 May 2018 15:37:41 +0800
+Message-Id: <20180528073744.71258-2-colyli@suse.de>
+In-Reply-To: <20180528073744.71258-1-colyli@suse.de>
+References: <20180528073744.71258-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Adam Manzanares <adam.manzanares@wdc.com>
+Currently bcache does not handle backing device failure, if backing
+device is offline and disconnected from system, its bcache device can still
+be accessible. If the bcache device is in writeback mode, I/O requests even
+can success if the requests hit on cache device. That is to say, when and
+how bcache handles offline backing device is undefined.
 
-Aio per command iopriority support introduces a second interface between
-userland and the kernel capable of passing iopriority. The aio interface also
-needs the ability to verify that the submitting context has sufficient
-privileges to submit IOPRIO_RT commands. This patch creates the
-ioprio_check_cap function to be used by the ioprio_set system call and also by
-the aio interface.
+This patch tries to handle backing device offline in a rather simple way,
+- Add cached_dev->status_update_thread kernel thread to update backing
+  device status in every 1 second.
+- Add cached_dev->offline_seconds to record how many seconds the backing
+  device is observed to be offline. If the backing device is offline for
+  BACKING_DEV_OFFLINE_TIMEOUT (30) seconds, set dc->io_disable to 1 and
+  call bcache_device_stop() to stop the bache device which linked to the
+  offline backing device.
 
-Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
+Now if a backing device is offline for BACKING_DEV_OFFLINE_TIMEOUT seconds,
+its bcache device will be removed, then user space application writing on
+it will get error immediately, and handler the device failure in time.
+
+This patch is quite simple, does not handle more complicated situations.
+Once the bcache device is stopped, users need to recovery the backing
+device, register and attach it manually.
+
+Changelog:
+v3: call wait_for_kthread_stop() before exits kernel thread.
+v2: remove "bcache: " prefix when calling pr_warn().
+v1: initial version.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
 ---
- block/ioprio.c         | 22 ++++++++++++++++------
- include/linux/ioprio.h |  2 ++
- 2 files changed, 18 insertions(+), 6 deletions(-)
+ drivers/md/bcache/bcache.h |  2 ++
+ drivers/md/bcache/super.c  | 53 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 55 insertions(+)
 
-diff --git a/block/ioprio.c b/block/ioprio.c
-index 6f5d0b6625e3..f9821080c92c 100644
---- a/block/ioprio.c
-+++ b/block/ioprio.c
-@@ -61,15 +61,10 @@ int set_task_ioprio(struct task_struct *task, int ioprio)
- }
- EXPORT_SYMBOL_GPL(set_task_ioprio);
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 3a0cfb237af9..ba98547c4ca0 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -345,6 +345,7 @@ struct cached_dev {
  
--SYSCALL_DEFINE3(ioprio_set, int, which, int, who, int, ioprio)
-+int ioprio_check_cap(int ioprio)
+ 	struct keybuf		writeback_keys;
+ 
++	struct task_struct	*status_update_thread;
+ 	/*
+ 	 * Order the write-half of writeback operations strongly in dispatch
+ 	 * order.  (Maintain LBA order; don't allow reads completing out of
+@@ -392,6 +393,7 @@ struct cached_dev {
+ #define DEFAULT_CACHED_DEV_ERROR_LIMIT	64
+ 	atomic_t		io_errors;
+ 	unsigned		error_limit;
++	unsigned		offline_seconds;
+ 
+ 	char			backing_dev_name[BDEVNAME_SIZE];
+ };
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 3dea06b41d43..a16b5b1df62a 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -654,6 +654,11 @@ static int ioctl_dev(struct block_device *b, fmode_t mode,
+ 		     unsigned int cmd, unsigned long arg)
  {
- 	int class = IOPRIO_PRIO_CLASS(ioprio);
- 	int data = IOPRIO_PRIO_DATA(ioprio);
--	struct task_struct *p, *g;
--	struct user_struct *user;
--	struct pid *pgrp;
--	kuid_t uid;
--	int ret;
+ 	struct bcache_device *d = b->bd_disk->private_data;
++	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
++
++	if (dc->io_disable)
++		return -EIO;
++
+ 	return d->ioctl(d, mode, cmd, arg);
+ }
  
- 	switch (class) {
- 		case IOPRIO_CLASS_RT:
-@@ -92,6 +87,21 @@ SYSCALL_DEFINE3(ioprio_set, int, which, int, who, int, ioprio)
- 			return -EINVAL;
- 	}
+@@ -864,6 +869,44 @@ static void calc_cached_dev_sectors(struct cache_set *c)
+ 	c->cached_dev_sectors = sectors;
+ }
  
++#define BACKING_DEV_OFFLINE_TIMEOUT 5
++static int cached_dev_status_update(void *arg)
++{
++	struct cached_dev *dc = arg;
++	struct request_queue *q;
++
++	/*
++	 * If this delayed worker is stopping outside, directly quit here.
++	 * dc->io_disable might be set via sysfs interface, so check it
++	 * here too.
++	 */
++	while (!kthread_should_stop() && !dc->io_disable) {
++		q = bdev_get_queue(dc->bdev);
++		if (blk_queue_dying(q))
++			dc->offline_seconds++;
++		else
++			dc->offline_seconds = 0;
++
++		if (dc->offline_seconds >= BACKING_DEV_OFFLINE_TIMEOUT) {
++			pr_err("%s: device offline for %d seconds",
++			       dc->backing_dev_name,
++			       BACKING_DEV_OFFLINE_TIMEOUT);
++			pr_err("%s: disable I/O request due to backing "
++			       "device offline", dc->disk.name);
++			dc->io_disable = true;
++			/* let others know earlier that io_disable is true */
++			smp_mb();
++			bcache_device_stop(&dc->disk);
++			break;
++		}
++		schedule_timeout_interruptible(HZ);
++	}
++
++	wait_for_kthread_stop();
 +	return 0;
 +}
 +
-+SYSCALL_DEFINE3(ioprio_set, int, which, int, who, int, ioprio)
-+{
-+	struct task_struct *p, *g;
-+	struct user_struct *user;
-+	struct pid *pgrp;
-+	kuid_t uid;
-+	int ret;
 +
-+	ret = ioprio_check_cap(ioprio);
-+	if (ret)
-+		return ret;
+ void bch_cached_dev_run(struct cached_dev *dc)
+ {
+ 	struct bcache_device *d = &dc->disk;
+@@ -906,6 +949,14 @@ void bch_cached_dev_run(struct cached_dev *dc)
+ 	if (sysfs_create_link(&d->kobj, &disk_to_dev(d->disk)->kobj, "dev") ||
+ 	    sysfs_create_link(&disk_to_dev(d->disk)->kobj, &d->kobj, "bcache"))
+ 		pr_debug("error creating sysfs link");
 +
- 	ret = -ESRCH;
- 	rcu_read_lock();
- 	switch (which) {
-diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
-index 627efac73e6d..4a28cec49ec3 100644
---- a/include/linux/ioprio.h
-+++ b/include/linux/ioprio.h
-@@ -77,4 +77,6 @@ extern int ioprio_best(unsigned short aprio, unsigned short bprio);
++	dc->status_update_thread = kthread_run(cached_dev_status_update,
++					       dc, "bcache_status_update");
++	if (IS_ERR(dc->status_update_thread)) {
++		pr_warn("failed to create bcache_status_update kthread, "
++			"continue to run without monitoring backing "
++			"device status");
++	}
+ }
  
- extern int set_task_ioprio(struct task_struct *task, int ioprio);
+ /*
+@@ -1139,6 +1190,8 @@ static void cached_dev_free(struct closure *cl)
+ 		kthread_stop(dc->writeback_thread);
+ 	if (dc->writeback_write_wq)
+ 		destroy_workqueue(dc->writeback_write_wq);
++	if (!IS_ERR_OR_NULL(dc->status_update_thread))
++		kthread_stop(dc->status_update_thread);
  
-+extern int ioprio_check_cap(int ioprio);
-+
- #endif
+ 	if (atomic_read(&dc->running))
+ 		bd_unlink_disk_holder(dc->bdev, dc->disk.disk);
 -- 
-2.15.1
+2.17.0
