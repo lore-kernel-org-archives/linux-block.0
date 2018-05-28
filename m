@@ -1,328 +1,134 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH 1/6] bcache: store disk name in struct cache and struct cached_dev
-Date: Wed,  2 May 2018 22:46:54 +0800
-Message-Id: <20180502144659.118628-2-colyli@suse.de>
-In-Reply-To: <20180502144659.118628-1-colyli@suse.de>
-References: <20180502144659.118628-1-colyli@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from verein.lst.de ([213.95.11.211]:47136 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751085AbeE1Gog (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 May 2018 02:44:36 -0400
+Date: Mon, 28 May 2018 08:50:37 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Brian Foster <bfoster@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 1/2] iomap: add support for sub-pagesize buffered I/O
+        without buffer heads
+Message-ID: <20180528065037.GA4849@lst.de>
+References: <20180523144646.19159-1-hch@lst.de> <20180523144646.19159-2-hch@lst.de> <20180525171701.GA92502@bfoster.bfoster>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180525171701.GA92502@bfoster.bfoster>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Current code uses bdevname() or bio_devname() to reference gendisk
-disk name when bcache needs to display the disk names in kernel message.
-It was safe before bcache device failure handling patch set merged in,
-because when devices are failed, there was deadlock to prevent bcache
-printing error messages with gendisk disk name. But after the failure
-handling patch set merged, the deadlock is fixed, so it is possible
-that the gendisk structure bdev->hd_disk is released when bdevname() is
-called to reference bdev->bd_disk->disk_name[]. This is why I receive
-bug report of NULL pointers deference panic.
+On Fri, May 25, 2018 at 01:17:02PM -0400, Brian Foster wrote:
+> > +static struct iomap_page *
+> > +iomap_page_create(struct inode *inode, struct page *page)
+> > +{
+> > +	struct iomap_page *iop = to_iomap_page(page);
+> > +
+> > +	if (iop || i_blocksize(inode) == PAGE_SIZE)
+> > +		return iop;
+> > +
+> > +	iop = kmalloc(sizeof(*iop), GFP_NOFS | __GFP_NOFAIL);
+> > +	atomic_set(&iop->read_count, 0);
+> > +	atomic_set(&iop->write_count, 0);
+> > +	bitmap_zero(iop->uptodate, PAGE_SIZE / SECTOR_SIZE);
+> > +	set_page_private(page, (unsigned long)iop);
+> > +	SetPagePrivate(page);
+> 
+> The buffer head implementation does a get/put page when the private
+> state is set. I'm not quite sure why that is tbh, but do you know
+> whether we need that here or not?
 
-This patch stores gendisk disk name in a buffer inside struct cache and
-struct cached_dev, then print out the offline device name won't reference
-bdev->hd_disk anymore. And this patch also avoids extra function calls
-of bdevname() and bio_devnmae().
+I don't really see any good reason why that would be needed, as we need
+a successfull ->releasepage return to drop the page from the page cache.
+I'll look around a little more if there is any other reason for it -
+adding get/put page pair here would be easy to do, so maybe we should just
+cargo-cult it in to be on the safe side.
 
-Changelog:
-v2, call bdevname() earlier in register_bdev()
-v1, first version with segguestion from Junhui Tang.
+> > -	return plen;
+> > +	return pos - orig_pos + plen;
+> 
+> A brief comment here (or above the adjust_read_range() call) to explain
+> the final length calculation would be helpful. E.g., it looks like
+> leading uptodate blocks are part of the read while trailing uptodate
+> blocks can be truncated by the above call.
 
-Fixes: c7b7bd07404c5 ("bcache: add io_disable to struct cached_dev")
-Fixes: 5138ac6748e38 ("bcache: fix misleading error message in bch_count_io_errors()")
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/bcache.h  |  4 ++++
- drivers/md/bcache/debug.c   |  3 +--
- drivers/md/bcache/io.c      |  8 +++-----
- drivers/md/bcache/request.c |  5 +----
- drivers/md/bcache/super.c   | 44 +++++++++++++++++++++-----------------------
- 5 files changed, 30 insertions(+), 34 deletions(-)
+Ok.
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index d338b7086013..3a0cfb237af9 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -392,6 +392,8 @@ struct cached_dev {
- #define DEFAULT_CACHED_DEV_ERROR_LIMIT	64
- 	atomic_t		io_errors;
- 	unsigned		error_limit;
-+
-+	char			backing_dev_name[BDEVNAME_SIZE];
- };
- 
- enum alloc_reserve {
-@@ -464,6 +466,8 @@ struct cache {
- 	atomic_long_t		meta_sectors_written;
- 	atomic_long_t		btree_sectors_written;
- 	atomic_long_t		sectors_written;
-+
-+	char			cache_dev_name[BDEVNAME_SIZE];
- };
- 
- struct gc_stat {
-diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
-index 028f7b386e01..4e63c6f6c04d 100644
---- a/drivers/md/bcache/debug.c
-+++ b/drivers/md/bcache/debug.c
-@@ -106,7 +106,6 @@ void bch_btree_verify(struct btree *b)
- 
- void bch_data_verify(struct cached_dev *dc, struct bio *bio)
- {
--	char name[BDEVNAME_SIZE];
- 	struct bio *check;
- 	struct bio_vec bv, cbv;
- 	struct bvec_iter iter, citer = { 0 };
-@@ -134,7 +133,7 @@ void bch_data_verify(struct cached_dev *dc, struct bio *bio)
- 					bv.bv_len),
- 				 dc->disk.c,
- 				 "verify failed at dev %s sector %llu",
--				 bdevname(dc->bdev, name),
-+				 dc->backing_dev_name,
- 				 (uint64_t) bio->bi_iter.bi_sector);
- 
- 		kunmap_atomic(p1);
-diff --git a/drivers/md/bcache/io.c b/drivers/md/bcache/io.c
-index 7fac97ae036e..2ddf8515e6a5 100644
---- a/drivers/md/bcache/io.c
-+++ b/drivers/md/bcache/io.c
-@@ -52,7 +52,6 @@ void bch_submit_bbio(struct bio *bio, struct cache_set *c,
- /* IO errors */
- void bch_count_backing_io_errors(struct cached_dev *dc, struct bio *bio)
- {
--	char buf[BDEVNAME_SIZE];
- 	unsigned errors;
- 
- 	WARN_ONCE(!dc, "NULL pointer of struct cached_dev");
-@@ -60,7 +59,7 @@ void bch_count_backing_io_errors(struct cached_dev *dc, struct bio *bio)
- 	errors = atomic_add_return(1, &dc->io_errors);
- 	if (errors < dc->error_limit)
- 		pr_err("%s: IO error on backing device, unrecoverable",
--			bio_devname(bio, buf));
-+			dc->backing_dev_name);
- 	else
- 		bch_cached_dev_error(dc);
- }
-@@ -105,19 +104,18 @@ void bch_count_io_errors(struct cache *ca,
- 	}
- 
- 	if (error) {
--		char buf[BDEVNAME_SIZE];
- 		unsigned errors = atomic_add_return(1 << IO_ERROR_SHIFT,
- 						    &ca->io_errors);
- 		errors >>= IO_ERROR_SHIFT;
- 
- 		if (errors < ca->set->error_limit)
- 			pr_err("%s: IO error on %s%s",
--			       bdevname(ca->bdev, buf), m,
-+			       ca->cache_dev_name, m,
- 			       is_read ? ", recovering." : ".");
- 		else
- 			bch_cache_set_error(ca->set,
- 					    "%s: too many IO errors %s",
--					    bdevname(ca->bdev, buf), m);
-+					    ca->cache_dev_name, m);
- 	}
- }
- 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index a65e3365eeb9..8e3e8655ed63 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -649,11 +649,8 @@ static void backing_request_endio(struct bio *bio)
- 		 */
- 		if (unlikely(s->iop.writeback &&
- 			     bio->bi_opf & REQ_PREFLUSH)) {
--			char buf[BDEVNAME_SIZE];
--
--			bio_devname(bio, buf);
- 			pr_err("Can't flush %s: returned bi_status %i",
--				buf, bio->bi_status);
-+				dc->backing_dev_name, bio->bi_status);
- 		} else {
- 			/* set to orig_bio->bi_status in bio_complete() */
- 			s->iop.status = bio->bi_status;
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index d90d9e59ca00..8196b19fada2 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -936,7 +936,6 @@ static void cancel_writeback_rate_update_dwork(struct cached_dev *dc)
- static void cached_dev_detach_finish(struct work_struct *w)
- {
- 	struct cached_dev *dc = container_of(w, struct cached_dev, detach);
--	char buf[BDEVNAME_SIZE];
- 	struct closure cl;
- 	closure_init_stack(&cl);
- 
-@@ -967,7 +966,7 @@ static void cached_dev_detach_finish(struct work_struct *w)
- 
- 	mutex_unlock(&bch_register_lock);
- 
--	pr_info("Caching disabled for %s", bdevname(dc->bdev, buf));
-+	pr_info("Caching disabled for %s", dc->backing_dev_name);
- 
- 	/* Drop ref we took in cached_dev_detach() */
- 	closure_put(&dc->disk.cl);
-@@ -999,29 +998,28 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
- {
- 	uint32_t rtime = cpu_to_le32(get_seconds());
- 	struct uuid_entry *u;
--	char buf[BDEVNAME_SIZE];
- 	struct cached_dev *exist_dc, *t;
- 
--	bdevname(dc->bdev, buf);
--
- 	if ((set_uuid && memcmp(set_uuid, c->sb.set_uuid, 16)) ||
- 	    (!set_uuid && memcmp(dc->sb.set_uuid, c->sb.set_uuid, 16)))
- 		return -ENOENT;
- 
- 	if (dc->disk.c) {
--		pr_err("Can't attach %s: already attached", buf);
-+		pr_err("Can't attach %s: already attached",
-+		       dc->backing_dev_name);
- 		return -EINVAL;
- 	}
- 
- 	if (test_bit(CACHE_SET_STOPPING, &c->flags)) {
--		pr_err("Can't attach %s: shutting down", buf);
-+		pr_err("Can't attach %s: shutting down",
-+		       dc->backing_dev_name);
- 		return -EINVAL;
- 	}
- 
- 	if (dc->sb.block_size < c->sb.block_size) {
- 		/* Will die */
- 		pr_err("Couldn't attach %s: block size less than set's block size",
--		       buf);
-+		       dc->backing_dev_name);
- 		return -EINVAL;
- 	}
- 
-@@ -1029,7 +1027,7 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
- 	list_for_each_entry_safe(exist_dc, t, &c->cached_devs, list) {
- 		if (!memcmp(dc->sb.uuid, exist_dc->sb.uuid, 16)) {
- 			pr_err("Tried to attach %s but duplicate UUID already attached",
--				buf);
-+				dc->backing_dev_name);
- 
- 			return -EINVAL;
- 		}
-@@ -1047,13 +1045,15 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
- 
- 	if (!u) {
- 		if (BDEV_STATE(&dc->sb) == BDEV_STATE_DIRTY) {
--			pr_err("Couldn't find uuid for %s in set", buf);
-+			pr_err("Couldn't find uuid for %s in set",
-+			       dc->backing_dev_name);
- 			return -ENOENT;
- 		}
- 
- 		u = uuid_find_empty(c);
- 		if (!u) {
--			pr_err("Not caching %s, no room for UUID", buf);
-+			pr_err("Not caching %s, no room for UUID",
-+			       dc->backing_dev_name);
- 			return -EINVAL;
- 		}
- 	}
-@@ -1112,7 +1112,8 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
- 	up_write(&dc->writeback_lock);
- 
- 	pr_info("Caching %s as %s on set %pU",
--		bdevname(dc->bdev, buf), dc->disk.disk->disk_name,
-+		dc->backing_dev_name,
-+		dc->disk.disk->disk_name,
- 		dc->disk.c->sb.set_uuid);
- 	return 0;
- }
-@@ -1225,10 +1226,10 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
- 				 struct block_device *bdev,
- 				 struct cached_dev *dc)
- {
--	char name[BDEVNAME_SIZE];
- 	const char *err = "cannot allocate memory";
- 	struct cache_set *c;
- 
-+	bdevname(bdev, dc->backing_dev_name);
- 	memcpy(&dc->sb, sb, sizeof(struct cache_sb));
- 	dc->bdev = bdev;
- 	dc->bdev->bd_holder = dc;
-@@ -1237,6 +1238,7 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
- 	bio_first_bvec_all(&dc->sb_bio)->bv_page = sb_page;
- 	get_page(sb_page);
- 
-+
- 	if (cached_dev_init(dc, sb->block_size << 9))
- 		goto err;
- 
-@@ -1247,7 +1249,7 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
- 	if (bch_cache_accounting_add_kobjs(&dc->accounting, &dc->disk.kobj))
- 		goto err;
- 
--	pr_info("registered backing device %s", bdevname(bdev, name));
-+	pr_info("registered backing device %s", dc->backing_dev_name);
- 
- 	list_add(&dc->list, &uncached_devices);
- 	list_for_each_entry(c, &bch_cache_sets, list)
-@@ -1259,7 +1261,7 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
- 
- 	return;
- err:
--	pr_notice("error %s: %s", bdevname(bdev, name), err);
-+	pr_notice("error %s: %s", dc->backing_dev_name, err);
- 	bcache_device_stop(&dc->disk);
- }
- 
-@@ -1367,8 +1369,6 @@ int bch_flash_dev_create(struct cache_set *c, uint64_t size)
- 
- bool bch_cached_dev_error(struct cached_dev *dc)
- {
--	char name[BDEVNAME_SIZE];
--
- 	if (!dc || test_bit(BCACHE_DEV_CLOSING, &dc->disk.flags))
- 		return false;
- 
-@@ -1377,7 +1377,7 @@ bool bch_cached_dev_error(struct cached_dev *dc)
- 	smp_mb();
- 
- 	pr_err("stop %s: too many IO errors on backing device %s\n",
--		dc->disk.disk->disk_name, bdevname(dc->bdev, name));
-+		dc->disk.disk->disk_name, dc->backing_dev_name);
- 
- 	bcache_device_stop(&dc->disk);
- 	return true;
-@@ -2003,12 +2003,10 @@ static int cache_alloc(struct cache *ca)
- static int register_cache(struct cache_sb *sb, struct page *sb_page,
- 				struct block_device *bdev, struct cache *ca)
- {
--	char name[BDEVNAME_SIZE];
- 	const char *err = NULL; /* must be set for any error case */
- 	int ret = 0;
- 
--	bdevname(bdev, name);
--
-+	bdevname(bdev, ca->cache_dev_name);
- 	memcpy(&ca->sb, sb, sizeof(struct cache_sb));
- 	ca->bdev = bdev;
- 	ca->bdev->bd_holder = ca;
-@@ -2045,14 +2043,14 @@ static int register_cache(struct cache_sb *sb, struct page *sb_page,
- 		goto out;
- 	}
- 
--	pr_info("registered cache device %s", name);
-+	pr_info("registered cache device %s", ca->cache_dev_name);
- 
- out:
- 	kobject_put(&ca->kobj);
- 
- err:
- 	if (err)
--		pr_notice("error %s: %s", name, err);
-+		pr_notice("error %s: %s", ca->cache_dev_name, err);
- 
- 	return ret;
- }
--- 
-2.16.3
+> > +int
+> > +iomap_is_partially_uptodate(struct page *page, unsigned long from,
+> > +		unsigned long count)
+> > +{
+> > +	struct iomap_page *iop = to_iomap_page(page);
+> > +	struct inode *inode = page->mapping->host;
+> > +	unsigned first = from >> inode->i_blkbits;
+> > +	unsigned last = (from + count - 1) >> inode->i_blkbits;
+> > +	unsigned i;
+> > +
+> 
+> block_is_partially_uptodate() has this check:
+> 
+>         if (from < blocksize && to > PAGE_SIZE - blocksize)
+>                 return 0;
+> 
+> ... which looks like it checks that the range is actually partial wrt to
+> block size. The only callers check the page first, but I'm still not
+> sure why it returns 0 in that case. Any idea?
+
+The calling convention is generally pretty insane.  I plan to clean
+this up, but didn't want to grow my XFS-related series even more.
+
+> > +{
+> > +	/*
+> > +	 * If we are invalidating the entire page, clear the dirty state from it
+> > +	 * and release it to avoid unnecessary buildup of the LRU.
+> > +	 */
+> > +	if (offset == 0 && len == PAGE_SIZE) {
+> > +		cancel_dirty_page(page);
+> > +		iomap_releasepage(page, GFP_NOIO);
+> 
+> Seems like this should probably be calling ->releasepage().
+
+Not really.  I don't want the fs in the loop here.  My other option
+was to have a iomap_page_free helper called here and in ->releasepage.
+Maybe I'll move back to that is it is less confusing.
+
+> > @@ -333,6 +529,7 @@ static int
+> >  __iomap_write_begin(struct inode *inode, loff_t pos, unsigned len,
+> >  		struct page *page, struct iomap *iomap)
+> >  {
+> > +	struct iomap_page *iop = iomap_page_create(inode, page);
+> >  	loff_t block_size = i_blocksize(inode);
+> >  	loff_t block_start = pos & ~(block_size - 1);
+> >  	loff_t block_end = (pos + len + block_size - 1) & ~(block_size - 1);
+> > @@ -340,15 +537,29 @@ __iomap_write_begin(struct inode *inode, loff_t pos, unsigned len,
+> >  	unsigned plen = min_t(loff_t, PAGE_SIZE - poff, block_end - block_start);
+> 
+> poff/plen are now initialized here and in iomap_adjust_read_range().
+> Perhaps drop this one so the semantic of these being set by the latter
+> is a bit more clear?
+
+Yes, will do.
+
+> > +
+> > +	do {
+> > +		iomap_adjust_read_range(inode, iop, &block_start,
+> > +				block_end - block_start, &poff, &plen);
+> > +		if (plen == 0)
+> > +			break;
+> > +
+> > +		if ((from > poff && from < poff + plen) ||
+> > +		    (to > poff && to < poff + plen)) {
+> > +			status = iomap_read_page_sync(inode, block_start, page,
+> > +					poff, plen, from, to, iomap);
+> > +			if (status)
+> > +				return status;
+> > +		}
+> > +
+> > +		block_start += plen;
+> > +	} while (poff + plen < PAGE_SIZE);
+> 
+> Something like while (block_start < block_end) would seem a bit more
+> clear here as well.
+
+I'll look into it.
