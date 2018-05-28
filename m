@@ -1,125 +1,26 @@
-Return-Path: <BATV+67dfbb8f664e29ec4bbc+5394+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <damien.lemoal@wdc.com>,
+Return-Path: <jthumshirn@suse.de>
+Date: Mon, 28 May 2018 08:38:42 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-nvme@lists.infradead.org, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>, Hannes Reinecke <hare@suse.de>,
 	linux-block@vger.kernel.org
-Subject: [PATCH 6/6] blk-mq: defer I/O scheduler initialization until add_disk
-Date: Thu, 31 May 2018 19:11:41 +0200
-Message-Id: <20180531171141.18478-7-hch@lst.de>
-In-Reply-To: <20180531171141.18478-1-hch@lst.de>
-References: <20180531171141.18478-1-hch@lst.de>
+Subject: Re: [PATCH 07/14] nvmet: split log page implementation
+Message-ID: <20180528063842.h5f2xqdez3fwaf5u@linux-x5ow.site>
+References: <20180526102735.31404-1-hch@lst.de>
+ <20180526102735.31404-8-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180526102735.31404-8-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-No need for I/O scheduling during probe, and this cleans up the
-code nicely by converging on the switch path.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
-Tested-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/blk-mq.c    |  9 ---------
- block/blk-sysfs.c | 25 ++++++++++++++-----------
- block/elevator.c  | 21 ++++++---------------
- 3 files changed, 20 insertions(+), 35 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 6332940ca118..cc42bdf54eb0 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2569,15 +2569,6 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	blk_mq_init_cpu_queues(q, set->nr_hw_queues);
- 	blk_mq_add_queue_tag_set(set, q);
- 	blk_mq_map_swqueue(q);
--
--	if (!(set->flags & BLK_MQ_F_NO_SCHED)) {
--		int ret;
--
--		ret = elevator_init_mq(q);
--		if (ret)
--			return ERR_PTR(ret);
--	}
--
- 	return q;
- 
- err_hctxs:
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 94987b1f69e1..f3b24c6c3dac 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -907,21 +907,24 @@ int blk_register_queue(struct gendisk *disk)
- 
- 	blk_throtl_register_queue(q);
- 
--	if (q->request_fn || (q->mq_ops && q->elevator)) {
-+	if (q->request_fn)
- 		ret = elv_register_queue(q);
--		if (ret) {
--			mutex_unlock(&q->sysfs_lock);
--			kobject_uevent(&q->kobj, KOBJ_REMOVE);
--			kobject_del(&q->kobj);
--			blk_trace_remove_sysfs(dev);
--			kobject_put(&dev->kobj);
--			return ret;
--		}
--	}
--	ret = 0;
-+	else if (q->mq_ops && q->elevator)
-+		ret = elevator_init_mq(q);
-+	else
-+		ret = 0;
-+	if (ret)
-+		goto out_cleanup_queue;
- unlock:
- 	mutex_unlock(&q->sysfs_lock);
- 	return ret;
-+out_cleanup_queue:
-+	mutex_unlock(&q->sysfs_lock);
-+	kobject_uevent(&q->kobj, KOBJ_REMOVE);
-+	kobject_del(&q->kobj);
-+	blk_trace_remove_sysfs(dev);
-+	kobject_put(&dev->kobj);
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(blk_register_queue);
- 
-diff --git a/block/elevator.c b/block/elevator.c
-index fa828b5bfd4b..df87468c6dbe 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -981,28 +981,19 @@ static int elevator_switch_mq(struct request_queue *q,
- int elevator_init_mq(struct request_queue *q)
- {
- 	struct elevator_type *e;
--	int err = 0;
-+	int err;
- 
--	if (q->nr_hw_queues != 1)
--		return 0;
-+	lockdep_assert_held(&q->sysfs_lock);
- 
--	/*
--	 * q->sysfs_lock must be held to provide mutual exclusion between
--	 * elevator_switch() and here.
--	 */
--	mutex_lock(&q->sysfs_lock);
--	if (unlikely(q->elevator))
--		goto out_unlock;
-+	if (q->nr_hw_queues != 1 || (q->tag_set->flags & BLK_MQ_F_NO_SCHED))
-+		return 0;
- 
- 	e = elevator_get(q, "mq-deadline", false);
- 	if (!e)
--		goto out_unlock;
--
--	err = blk_mq_init_sched(q, e);
-+		return 0;
-+	err = elevator_switch_mq(q, e);
- 	if (err)
- 		elevator_put(e);
--out_unlock:
--	mutex_unlock(&q->sysfs_lock);
- 	return err;
- }
- 
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.17.0
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
