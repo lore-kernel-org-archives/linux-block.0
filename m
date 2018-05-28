@@ -1,102 +1,65 @@
-Return-Path: <penguin-kernel@i-love.sakura.ne.jp>
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Subject: Re: general protection fault in wb_workfn (2)
-To: Jan Kara <jack@suse.cz>
+Return-Path: <jack@suse.cz>
+Date: Mon, 28 May 2018 15:35:03 +0200
+From: Jan Kara <jack@suse.cz>
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 Cc: syzbot <syzbot+4a7438e774b21ddd8eca@syzkaller.appspotmail.com>,
-        syzkaller-bugs@googlegroups.com, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        tj@kernel.org, david@fromorbit.com, linux-block@vger.kernel.org
+	syzkaller-bugs@googlegroups.com, jack@suse.cz,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	viro@zeniv.linux.org.uk, axboe@kernel.dk, tj@kernel.org,
+	david@fromorbit.com, linux-block@vger.kernel.org
+Subject: Re: general protection fault in wb_workfn (2)
+Message-ID: <20180528133503.awomzj6djozbo5bv@quack2.suse.cz>
 References: <000000000000cbd959056d1851ca@google.com>
  <0c7c5dea-7312-8a59-9d1b-5467f69719bf@I-love.SAKURA.ne.jp>
- <20180528133503.awomzj6djozbo5bv@quack2.suse.cz>
-Message-ID: <2dda7a11-3f6b-bdba-a68a-7c0694806cc4@I-love.SAKURA.ne.jp>
-Date: Thu, 31 May 2018 01:00:08 +0900
 MIME-Version: 1.0
-In-Reply-To: <20180528133503.awomzj6djozbo5bv@quack2.suse.cz>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <0c7c5dea-7312-8a59-9d1b-5467f69719bf@I-love.SAKURA.ne.jp>
 List-ID: <linux-block@vger.kernel.org>
 
-So, we have no idea what is happening...
-Then, what about starting from temporary debug printk() patch shown below?
+On Sun 27-05-18 09:47:54, Tetsuo Handa wrote:
+> Forwarding http://lkml.kernel.org/r/201805251915.FGH64517.HVFJOOLFFMQStO@I-love.SAKURA.ne.jp .
+> 
+> Jan Kara wrote:
+> > > void delayed_work_timer_fn(struct timer_list *t)
+> > > {
+> > > 	struct delayed_work *dwork = from_timer(dwork, t, timer);
+> > > 
+> > > 	/* should have been called from irqsafe timer with irq already off */
+> > > 	__queue_work(dwork->cpu, dwork->wq, &dwork->work);
+> > > }
+> > > 
+> > > Then, wb_workfn() is after all scheduled even if we check for
+> > > WB_registered bit, isn't it?
+> > 
+> > It can be queued after WB_registered bit is cleared but it cannot be queued
+> > after mod_delayed_work(bdi_wq, &wb->dwork, 0) has finished. That function
+> > deletes the pending timer (the timer cannot be armed again because
+> > WB_registered is cleared) and queues what should be the last round of
+> > wb_workfn().
+> 
+> mod_delayed_work() deletes the pending timer but does not wait for already
+> invoked timer handler to complete because it is using del_timer() rather than
+> del_timer_sync(). Then, what happens if __queue_work() is almost concurrently
+> executed from two CPUs, one from mod_delayed_work(bdi_wq, &wb->dwork, 0) from
+> wb_shutdown() path (which is called without spin_lock_bh(&wb->work_lock)) and
+> the other from delayed_work_timer_fn() path (which is called without checking
+> WB_registered bit under spin_lock_bh(&wb->work_lock)) ?
 
->>From 4f70f72ad3c9ae6ce1678024ef740aca4958e5b0 Mon Sep 17 00:00:00 2001
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Date: Wed, 30 May 2018 09:57:10 +0900
-Subject: [PATCH] bdi: Add temporary config for debugging wb_workfn() versus
- bdi_unregister() race bug.
+In this case, work should still be queued only once. The synchronization in
+this case should be provided by the WORK_STRUCT_PENDING_BIT. When a delayed
+work is queued by mod_delayed_work(), this bit is set, and gets cleared
+only once the work is started on some CPU. But admittedly this code is
+rather convoluted so I may be missing something.
 
-syzbot is hitting NULL pointer dereference at wb_workfn() [1]. But due to
-limitations that syzbot cannot find reproducer for this bug (frequency is
-once or twice per a day) nor we can't capture vmcore in the environment
-which syzbot is using, for now we need to rely on printk() debugging.
+Also you should note that flush_delayed_work() which follows
+mod_delayed_work() in wb_shutdown() does del_timer_sync() so I don't see
+how anything could get past that. In fact mod_delayed_work() is in
+wb_shutdown() path to make sure wb_workfn() gets executed at least once
+before the bdi_writeback structure gets cleaned up so that all queued items
+are finished. We do not rely on it to remove pending timers or queued
+wb_workfn() executions.
 
-[1] https://syzkaller.appspot.com/bug?id=e0818ccb7e46190b3f1038b0c794299208ed4206
-
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
- block/Kconfig     |  7 +++++++
- fs/fs-writeback.c | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+)
-
-diff --git a/block/Kconfig b/block/Kconfig
-index 28ec557..fbce13e 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -139,6 +139,13 @@ config BLK_CMDLINE_PARSER
- 
- 	See Documentation/block/cmdline-partition.txt for more information.
- 
-+config BLK_DEBUG_WB_WORKFN_RACE
-+	bool "Dump upon hitting wb_workfn() versus bdi_unregister() race bug."
-+	default n
-+	---help---
-+	This is a temporary option used for obtaining information for
-+	specific bug. This option will be removed after the bug is fixed.
-+
- config BLK_WBT
- 	bool "Enable support for block device writeback throttling"
- 	default n
-diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-index 471d863..b4dd078 100644
---- a/fs/fs-writeback.c
-+++ b/fs/fs-writeback.c
-@@ -1934,6 +1934,37 @@ void wb_workfn(struct work_struct *work)
- 						struct bdi_writeback, dwork);
- 	long pages_written;
- 
-+#ifdef CONFIG_BLK_DEBUG_WB_WORKFN_RACE
-+	if (!wb->bdi->dev) {
-+		pr_warn("WARNING: %s: device is NULL\n", __func__);
-+		pr_warn("wb->state=%lx\n", wb->state);
-+		pr_warn("list_empty(&wb->work_list)=%u\n",
-+			list_empty(&wb->work_list));
-+		if (!wb->bdi)
-+			pr_warn("wb->bdi == NULL\n");
-+		else {
-+			pr_warn("list_empty(&wb->bdi->bdi_list)=%u\n",
-+				list_empty(&wb->bdi->bdi_list));
-+			pr_warn("wb->bdi->wb.state=%lx\n", wb->bdi->wb.state);
-+		}
-+		if (!wb->congested)
-+			pr_warn("wb->congested == NULL\n");
-+#ifdef CONFIG_CGROUP_WRITEBACK
-+		else if (!wb->congested->__bdi)
-+			pr_warn("wb->congested->__bdi == NULL\n");
-+		else {
-+			pr_warn("(wb->congested->__bdi == wb->bdi)=%u\n",
-+				wb->congested->__bdi == wb->bdi);
-+			pr_warn("list_empty(&wb->congested->__bdi->bdi_list)=%u\n",
-+				list_empty(&wb->congested->__bdi->bdi_list));
-+			pr_warn("wb->congested->__bdi->wb.state=%lx\n",
-+				wb->congested->__bdi->wb.state);
-+		}
-+#endif
-+		/* Will halt shortly due to NULL pointer dereference... */
-+	}
-+#endif
-+
- 	set_worker_desc("flush-%s", dev_name(wb->bdi->dev));
- 	current->flags |= PF_SWAPWRITE;
- 
+								Honza
 -- 
-1.8.3.1
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
