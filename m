@@ -1,34 +1,27 @@
-Return-Path: <BATV+a01a3e67072ae75c0352+5392+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 1/2] block: unexport check_disk_size_change
-Date: Tue, 29 May 2018 16:42:58 +0200
-Message-Id: <20180529144259.29819-2-hch@lst.de>
-In-Reply-To: <20180529144259.29819-1-hch@lst.de>
-References: <20180529144259.29819-1-hch@lst.de>
+Return-Path: <jthumshirn@suse.de>
+Date: Mon, 28 May 2018 08:34:46 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-nvme@lists.infradead.org, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>, Hannes Reinecke <hare@suse.de>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 02/14] block: don't print a message when the device went
+ away
+Message-ID: <20180528063445.jfb4hc5lsspxhotb@linux-x5ow.site>
+References: <20180526102735.31404-1-hch@lst.de>
+ <20180526102735.31404-3-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180526102735.31404-3-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Only used in block_dev.c and the partitions code, and it should remain
-that way..
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Looks good,
 Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- fs/block_dev.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 7ec920e27065..771ddfa29dc9 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1342,7 +1342,6 @@ void check_disk_size_change(struct gendisk *disk, struct block_device *bdev)
- 			flush_disk(bdev, false);
- 	}
- }
--EXPORT_SYMBOL(check_disk_size_change);
- 
- /**
-  * revalidate_disk - wrapper for lower-level driver's revalidate_disk call-back
 -- 
-2.17.0
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
