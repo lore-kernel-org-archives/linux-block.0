@@ -1,56 +1,26 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [RESEND PATCH V5 28/33] block: kill bio_for_each_page_all()
-Date: Fri, 25 May 2018 11:46:16 +0800
-Message-Id: <20180525034621.31147-29-ming.lei@redhat.com>
-In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
-References: <20180525034621.31147-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <jthumshirn@suse.de>
+Date: Mon, 28 May 2018 08:35:18 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-nvme@lists.infradead.org, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>, Hannes Reinecke <hare@suse.de>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 03/14] nvme.h: untangle AEN notice definitions
+Message-ID: <20180528063518.zjxedqu3yvurh46g@linux-x5ow.site>
+References: <20180526102735.31404-1-hch@lst.de>
+ <20180526102735.31404-4-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180526102735.31404-4-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-No one uses it any more, so kill it and we can reuse this helper
-name.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- include/linux/bio.h | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
-
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 5ae2bc876295..c5e692d43f23 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -159,8 +159,10 @@ static inline void *bio_data(struct bio *bio)
- /*
-  * drivers should _never_ use the all version - the bio may have been split
-  * before it got to the driver and the driver won't own all of it
-+ *
-+ * This helper iterates bio segment by segment.
-  */
--#define bio_for_each_page_all(bvl, bio, i)				\
-+#define bio_for_each_segment_all(bvl, bio, i)				\
- 	for (i = 0, bvl = (bio)->bi_io_vec; i < (bio)->bi_vcnt; i++, bvl++)
- 
- static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
-@@ -225,9 +227,6 @@ static inline bool bio_rewind_iter(struct bio *bio, struct bvec_iter *iter,
- #define bio_for_each_segment(bvl, bio, iter)			\
- 	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
- 
--#define bio_for_each_segment_all(bvl, bio, i) \
--	bio_for_each_page_all((bvl), (bio), (i))
--
- /*
-  * This helper returns singlepage bvec to caller, and the sp bvec is
-  * generated in-flight from multipage bvec stored in bvec table. So we
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.9.5
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
