@@ -1,83 +1,28 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	akpm@linux-foundation.org,
-	linux-mm@kvack.org,
-	hannes@cmpxchg.org,
-	linux-kernel@vger.kernel.org,
-	tj@kernel.org,
-	linux-fsdevel@vger.kernel.org
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 04/13] blk: introduce REQ_SWAP
-Date: Tue, 29 May 2018 17:17:15 -0400
-Message-Id: <20180529211724.4531-5-josef@toxicpanda.com>
-In-Reply-To: <20180529211724.4531-1-josef@toxicpanda.com>
-References: <20180529211724.4531-1-josef@toxicpanda.com>
+Return-Path: <jthumshirn@suse.de>
+Date: Tue, 29 May 2018 16:19:54 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Ming Lei <ming.lei@redhat.com>, Josef Bacik <josef@toxicpanda.com>,
+	Tejun Heo <tj@kernel.org>, Lee Duncan <lduncan@suse.com>,
+	Chris Leech <cleech@redhat.com>, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 14/14] blk-mq: simplify blk_mq_rq_timed_out
+Message-ID: <20180529141954.5ajn5ncij7bv2o4i@linux-x5ow.site>
+References: <20180529135239.27005-1-hch@lst.de>
+ <20180529135239.27005-15-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180529135239.27005-15-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Josef Bacik <jbacik@fb.com>
-
-Just like REQ_META, it's important to know the IO coming down is swap
-in order to guard against potential IO priority inversion issues with
-cgroups.  Add REQ_SWAP and use it for all swap IO, and add it to our
-bio_issue_as_root_blkg helper.
-
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- include/linux/blk-cgroup.h | 2 +-
- include/linux/blk_types.h  | 3 ++-
- mm/page_io.c               | 2 +-
- 3 files changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index b41292726c0f..a8f9ba8f33a4 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -254,7 +254,7 @@ static inline struct blkcg *bio_blkcg(struct bio *bio)
-  */
- static inline bool bio_issue_as_root_blkg(struct bio *bio)
- {
--	return (bio->bi_opf & REQ_META);
-+	return (bio->bi_opf & (REQ_META | REQ_SWAP)) != 0;
- }
- 
- /**
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index ff181df8c195..4f7ba397d37d 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -327,7 +327,7 @@ enum req_flag_bits {
- 
- 	/* for driver use */
- 	__REQ_DRV,
--
-+	__REQ_SWAP,		/* swapping request. */
- 	__REQ_NR_BITS,		/* stops here */
- };
- 
-@@ -349,6 +349,7 @@ enum req_flag_bits {
- #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
- 
- #define REQ_DRV			(1ULL << __REQ_DRV)
-+#define REQ_SWAP		(1ULL << __REQ_SWAP)
- 
- #define REQ_FAILFAST_MASK \
- 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
-diff --git a/mm/page_io.c b/mm/page_io.c
-index b41cf9644585..a552cb37e220 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -338,7 +338,7 @@ int __swap_writepage(struct page *page, struct writeback_control *wbc,
- 		ret = -ENOMEM;
- 		goto out;
- 	}
--	bio->bi_opf = REQ_OP_WRITE | wbc_to_write_flags(wbc);
-+	bio->bi_opf = REQ_OP_WRITE | REQ_SWAP | wbc_to_write_flags(wbc);
- 	count_swpout_vm_event(page);
- 	set_page_writeback(page);
- 	unlock_page(page);
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.14.3
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
