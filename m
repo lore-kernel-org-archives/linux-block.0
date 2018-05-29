@@ -1,80 +1,32 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 17/33] block: bio: introduce bio_for_each_page_all2 and bio_for_each_segment_all
-Date: Thu, 24 May 2018 17:01:22 +0800
-Message-Id: <20180524090139.2150-18-ming.lei@redhat.com>
-In-Reply-To: <20180524090139.2150-1-ming.lei@redhat.com>
-References: <20180524090139.2150-1-ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: remove parent device reference from struct
+ bsg_class_device
+To: Christoph Hellwig <hch@lst.de>
+Cc: glagolig@gmail.com, fujita.tomonori@lab.ntt.co.jp,
+ linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+References: <20180529064023.9239-1-hch@lst.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <f3fbbb60-99cf-3bf4-0b36-654d5b3895ec@kernel.dk>
+Date: Tue, 29 May 2018 13:16:19 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180529064023.9239-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This patch introduces bio_for_each_page_all2(), which is for replacing
-bio_for_each_page_all() in case that the returned bvec has to be single
-page bvec.
+On 5/29/18 12:40 AM, Christoph Hellwig wrote:
+> Bsg holding a reference to the parent device may result in a crash if a
+> bsg file handle is closed after the parent device driver has unloaded.
+> 
+> Holding a reference is not really needed: the parent device must exist
+> between bsg_register_queue and bsg_unregister_queue.  Before the device
+> goes away the caller does blk_cleanup_queue so that all in-flight
+> requests to the device are gone and all new requests cannot pass beyond
+> the queue.  The queue itself is a refcounted object and it will stay
+> alive with a bsg file.
+> 
+> Based on analysis, previous patch and changelog from Anatoliy Glagolev.
 
-Given the interface type has to be changed for passing one local iterator
-variable of 'bvec_iter_all', and doing all changes in one single patch
-isn't realistic, so use the name of bio_for_each_page_all2() temporarily
-for conversion, and once all bio_for_each_page_all() is converted, the
-original name of bio_for_each_page_all() will be recovered finally.
+Applied, thanks.
 
-This patch introduce bio_for_each_segment_all too, which is used for
-updating bvec table directly, and users should be carful about this
-helper since it returns real multipage segment now.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- include/linux/bio.h  | 18 ++++++++++++++++++
- include/linux/bvec.h |  6 ++++++
- 2 files changed, 24 insertions(+)
-
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 61a04c131641..75baad77d9a8 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -225,6 +225,24 @@ static inline bool bio_rewind_iter(struct bio *bio, struct bvec_iter *iter,
- #define bio_for_each_segment(bvl, bio, iter)			\
- 	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
- 
-+#define bio_for_each_segment_all(bvl, bio, i) \
-+	bio_for_each_page_all((bvl), (bio), (i))
-+
-+/*
-+ * This helper returns singlepage bvec to caller, and the sp bvec is
-+ * generated in-flight from multipage bvec stored in bvec table. So we
-+ * can _not_ change the bvec stored in bio->bi_io_vec[] via this helper.
-+ *
-+ * If bvec need to be updated in the table, please use
-+ * bio_for_each_segment_all() and make sure it is correctly used since
-+ * bvec may points to one multipage bvec.
-+ */
-+#define bio_for_each_page_all2(bvl, bio, i, bi)			\
-+	for ((bi).iter = BVEC_ITER_ALL_INIT, i = 0, bvl = &(bi).bv;	\
-+	     (bi).iter.bi_idx < (bio)->bi_vcnt &&			\
-+		(((bi).bv = bio_iter_iovec((bio), (bi).iter)), 1);	\
-+	     bio_advance_iter((bio), &(bi).iter, (bi).bv.bv_len), i++)
-+
- #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
- 
- static inline unsigned __bio_elements(struct bio *bio, bool seg)
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 217afcd83a15..2deee87b823e 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -84,6 +84,12 @@ struct bvec_iter {
- 						   current bvec */
- };
- 
-+/* this iter is only for implementing bio_for_each_page_all2() */
-+struct bvec_iter_all {
-+	struct bvec_iter	iter;
-+	struct bio_vec		bv;      /* in-flight singlepage bvec */
-+};
-+
- /*
-  * various member access, note that bio_data should of course not be used
-  * on highmem page vectors
 -- 
-2.9.5
+Jens Axboe
