@@ -1,197 +1,110 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [RESEND PATCH V5 19/33] block: convert to bio_for_each_page_all2()
-Date: Fri, 25 May 2018 11:46:07 +0800
-Message-Id: <20180525034621.31147-20-ming.lei@redhat.com>
-In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
-References: <20180525034621.31147-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Tue, 29 May 2018 11:55:41 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: axboe@kernel.dk, holger@applied-asynchrony.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V2 1/2] blk-mq: abstract out blk-mq-sched rq list
+ iteration bio merge helper
+Message-ID: <20180529185541.GB23487@vader>
+References: <1527057202-2802-1-git-send-email-jianchao.w.wang@oracle.com>
+ <1527057202-2802-2-git-send-email-jianchao.w.wang@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1527057202-2802-2-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-We have to convert to bio_for_each_page_all2() for iterating page by
-page.
+On Wed, May 23, 2018 at 02:33:21PM +0800, Jianchao Wang wrote:
+> From: Jens Axboe <axboe@kernel.dk>
+> 
+> No functional changes in this patch, just a prep patch for utilizing
+> this in an IO scheduler.
 
-bio_for_each_page_all() can't be used any more after multipage bvec is
-enabled.
+Reviewed-by: Omar Sandoval <osandov@fb.com>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bio.c         | 18 ++++++++++++------
- block/blk-zoned.c   |  5 +++--
- block/bounce.c      |  6 ++++--
- include/linux/bio.h |  3 ++-
- 4 files changed, 21 insertions(+), 11 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index a200c42e55dc..a14c854b9111 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1119,8 +1119,9 @@ static int bio_copy_from_iter(struct bio *bio, struct iov_iter *iter)
- {
- 	int i;
- 	struct bio_vec *bvec;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		ssize_t ret;
- 
- 		ret = copy_page_from_iter(bvec->bv_page,
-@@ -1150,8 +1151,9 @@ static int bio_copy_to_iter(struct bio *bio, struct iov_iter iter)
- {
- 	int i;
- 	struct bio_vec *bvec;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		ssize_t ret;
- 
- 		ret = copy_page_to_iter(bvec->bv_page,
-@@ -1173,8 +1175,9 @@ void bio_free_pages(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_page_all(bvec, bio, i)
-+	bio_for_each_page_all2(bvec, bio, i, bia)
- 		__free_page(bvec->bv_page);
- }
- EXPORT_SYMBOL(bio_free_pages);
-@@ -1340,6 +1343,7 @@ struct bio *bio_map_user_iov(struct request_queue *q,
- 	struct bio *bio;
- 	int ret;
- 	struct bio_vec *bvec;
-+	struct bvec_iter_all bia;
- 
- 	if (!iov_iter_count(iter))
- 		return ERR_PTR(-EINVAL);
-@@ -1413,7 +1417,7 @@ struct bio *bio_map_user_iov(struct request_queue *q,
- 	return bio;
- 
-  out_unmap:
--	bio_for_each_page_all(bvec, bio, j) {
-+	bio_for_each_page_all2(bvec, bio, j, bia) {
- 		put_page(bvec->bv_page);
- 	}
- 	bio_put(bio);
-@@ -1424,11 +1428,12 @@ static void __bio_unmap_user(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
- 
- 	/*
- 	 * make sure we dirty pages we wrote to
- 	 */
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		if (bio_data_dir(bio) == READ)
- 			set_page_dirty_lock(bvec->bv_page);
- 
-@@ -1520,8 +1525,9 @@ static void bio_copy_kern_endio_read(struct bio *bio)
- 	char *p = bio->bi_private;
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		memcpy(p, page_address(bvec->bv_page), bvec->bv_len);
- 		p += bvec->bv_len;
- 	}
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 77f3cecfaa7d..a76053d6fd6c 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -123,6 +123,7 @@ int blkdev_report_zones(struct block_device *bdev,
- 	unsigned int ofst;
- 	void *addr;
- 	int ret;
-+	struct bvec_iter_all bia;
- 
- 	if (!q)
- 		return -ENXIO;
-@@ -190,7 +191,7 @@ int blkdev_report_zones(struct block_device *bdev,
- 	n = 0;
- 	nz = 0;
- 	nr_rep = 0;
--	bio_for_each_page_all(bv, bio, i) {
-+	bio_for_each_page_all2(bv, bio, i, bia) {
- 
- 		if (!bv->bv_page)
- 			break;
-@@ -223,7 +224,7 @@ int blkdev_report_zones(struct block_device *bdev,
- 
- 	*nr_zones = nz;
- out:
--	bio_for_each_page_all(bv, bio, i)
-+	bio_for_each_page_all2(bv, bio, i, bia)
- 		__free_page(bv->bv_page);
- 	bio_put(bio);
- 
-diff --git a/block/bounce.c b/block/bounce.c
-index f4ee4b81f7a2..8b14683f4061 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -143,11 +143,12 @@ static void bounce_end_io(struct bio *bio, mempool_t *pool)
- 	struct bio_vec *bvec, orig_vec;
- 	int i;
- 	struct bvec_iter orig_iter = bio_orig->bi_iter;
-+	struct bvec_iter_all bia;
- 
- 	/*
- 	 * free up bounce indirect pages used
- 	 */
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		orig_vec = bio_iter_iovec(bio_orig, orig_iter);
- 		if (bvec->bv_page != orig_vec.bv_page) {
- 			dec_zone_page_state(bvec->bv_page, NR_BOUNCE);
-@@ -203,6 +204,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 	bool bounce = false;
- 	int sectors = 0;
- 	bool passthrough = bio_is_passthrough(*bio_orig);
-+	struct bvec_iter_all bia;
- 
- 	bio_for_each_page(from, *bio_orig, iter) {
- 		if (i++ < BIO_MAX_PAGES)
-@@ -222,7 +224,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, passthrough ? NULL :
- 			bounce_bio_set);
- 
--	bio_for_each_page_all(to, bio, i) {
-+	bio_for_each_page_all2(to, bio, i, bia) {
- 		struct page *page = to->bv_page;
- 
- 		if (page_to_pfn(page) <= q->limits.bounce_pfn)
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 75baad77d9a8..5ae2bc876295 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -369,10 +369,11 @@ static inline unsigned bio_pages_all(struct bio *bio)
- {
- 	unsigned i;
- 	struct bio_vec *bv;
-+	struct bvec_iter_all bia;
- 
- 	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
- 
--	bio_for_each_page_all(bv, bio, i)
-+	bio_for_each_page_all2(bv, bio, i, bia)
- 		;
- 	return i;
- }
--- 
-2.9.5
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  block/blk-mq-sched.c   | 34 ++++++++++++++++++++++++----------
+>  include/linux/blk-mq.h |  3 ++-
+>  2 files changed, 26 insertions(+), 11 deletions(-)
+> 
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index 25c14c5..b0f2c2a 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -268,19 +268,16 @@ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+>  EXPORT_SYMBOL_GPL(blk_mq_sched_try_merge);
+>  
+>  /*
+> - * Reverse check our software queue for entries that we could potentially
+> - * merge with. Currently includes a hand-wavy stop count of 8, to not spend
+> - * too much time checking for merges.
+> + * Iterate list of requests and see if we can merge this bio with any
+> + * of them.
+>   */
+> -static bool blk_mq_attempt_merge(struct request_queue *q,
+> -				 struct blk_mq_ctx *ctx, struct bio *bio)
+> +bool blk_mq_bio_list_merge(struct request_queue *q, struct list_head *list,
+> +			   struct bio *bio)
+>  {
+>  	struct request *rq;
+>  	int checked = 8;
+>  
+> -	lockdep_assert_held(&ctx->lock);
+> -
+> -	list_for_each_entry_reverse(rq, &ctx->rq_list, queuelist) {
+> +	list_for_each_entry_reverse(rq, list, queuelist) {
+>  		bool merged = false;
+>  
+>  		if (!checked--)
+> @@ -305,13 +302,30 @@ static bool blk_mq_attempt_merge(struct request_queue *q,
+>  			continue;
+>  		}
+>  
+> -		if (merged)
+> -			ctx->rq_merged++;
+>  		return merged;
+>  	}
+>  
+>  	return false;
+>  }
+> +EXPORT_SYMBOL_GPL(blk_mq_bio_list_merge);
+> +
+> +/*
+> + * Reverse check our software queue for entries that we could potentially
+> + * merge with. Currently includes a hand-wavy stop count of 8, to not spend
+> + * too much time checking for merges.
+> + */
+> +static bool blk_mq_attempt_merge(struct request_queue *q,
+> +				 struct blk_mq_ctx *ctx, struct bio *bio)
+> +{
+> +	lockdep_assert_held(&ctx->lock);
+> +
+> +	if (blk_mq_bio_list_merge(q, &ctx->rq_list, bio)) {
+> +		ctx->rq_merged++;
+> +		return true;
+> +	}
+> +
+> +	return false;
+> +}
+>  
+>  bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
+>  {
+> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> index ebc34a5..fb35517 100644
+> --- a/include/linux/blk-mq.h
+> +++ b/include/linux/blk-mq.h
+> @@ -259,7 +259,8 @@ void blk_mq_add_to_requeue_list(struct request *rq, bool at_head,
+>  void blk_mq_kick_requeue_list(struct request_queue *q);
+>  void blk_mq_delay_kick_requeue_list(struct request_queue *q, unsigned long msecs);
+>  void blk_mq_complete_request(struct request *rq);
+> -
+> +bool blk_mq_bio_list_merge(struct request_queue *q, struct list_head *list,
+> +			   struct bio *bio);
+>  bool blk_mq_queue_stopped(struct request_queue *q);
+>  void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx);
+>  void blk_mq_start_hw_queue(struct blk_mq_hw_ctx *hctx);
+> -- 
+> 2.7.4
+> 
