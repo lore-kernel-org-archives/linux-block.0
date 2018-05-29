@@ -1,70 +1,47 @@
-Return-Path: <roman.penyaev@profitbricks.com>
-Return-Path: <roman.penyaev@profitbricks.com>
-From: Roman Pen <roman.penyaev@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Or Gerlitz <ogerlitz@mellanox.com>,
-	Doug Ledford <dledford@redhat.com>,
-	Swapnil Ingle <swapnil.ingle@profitbricks.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>,
-	Jack Wang <jinpu.wang@profitbricks.com>,
-	Roman Pen <roman.penyaev@profitbricks.com>,
-	"Paul E . McKenney" <paulmck@linux.vnet.ibm.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 01/26] rculist: introduce list_next_or_null_rr_rcu()
-Date: Fri, 18 May 2018 15:03:48 +0200
-Message-Id: <20180518130413.16997-2-roman.penyaev@profitbricks.com>
-In-Reply-To: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
-References: <20180518130413.16997-1-roman.penyaev@profitbricks.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 29 May 2018 08:50:24 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Josef Bacik <josef@toxicpanda.com>, Tejun Heo <tj@kernel.org>,
+	Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
+	Rafael David Tinoco <rafael.tinoco@canonical.com>,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 03/14] nvme: return BLK_EH_DONE from ->timeout
+Message-ID: <20180529005023.GA8818@ming.t460p>
+References: <20180523121941.8632-1-hch@lst.de>
+ <20180523121941.8632-4-hch@lst.de>
+ <20180524044510.GA22751@ming.t460p>
+ <20180528114425.GA12779@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180528114425.GA12779@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Function is going to be used in transport over RDMA module
-in subsequent patches.
+On Mon, May 28, 2018 at 01:44:25PM +0200, Christoph Hellwig wrote:
+> On Thu, May 24, 2018 at 12:45:15PM +0800, Ming Lei wrote:
+> > This change should have been done after '[PATCH 13/14] blk-mq: Remove
+> > generation seqeunce', otherwise the timed-out request won't be completed
+> > by nvme_cancel_request() at all because we always marked this request as
+> > 'COMPLETE' before calling .timeout().
+> 
+> Yes.  Or we should start out with reverting the whole series introducing
+> the gstate.  I think it has shown to create much more problems than it
+> solved, and starting from a clean state without it will allow us to
+> iterate much saner.
 
-Function returns next element in round-robin fashion,
-i.e. head will be skipped.  NULL will be returned if list
-is observed as empty.
+It may not help for this case by reverting the series introducing the gstate.
 
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Cc: Paul E. McKenney <paulmck@linux.vnet.ibm.com>
-Cc: linux-kernel@vger.kernel.org
----
- include/linux/rculist.h | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+This behaviour has been used from the beginning, such as, the code
+becomes the following after the revert:
 
-diff --git a/include/linux/rculist.h b/include/linux/rculist.h
-index 127f534fec94..b0840d5ab25a 100644
---- a/include/linux/rculist.h
-+++ b/include/linux/rculist.h
-@@ -339,6 +339,25 @@ static inline void list_splice_tail_init_rcu(struct list_head *list,
- })
- 
- /**
-+ * list_next_or_null_rr_rcu - get next list element in round-robin fashion.
-+ * @head:	the head for the list.
-+ * @ptr:        the list head to take the next element from.
-+ * @type:       the type of the struct this is embedded in.
-+ * @memb:       the name of the list_head within the struct.
-+ *
-+ * Next element returned in round-robin fashion, i.e. head will be skipped,
-+ * but if list is observed as empty, NULL will be returned.
-+ *
-+ * This primitive may safely run concurrently with the _rcu list-mutation
-+ * primitives such as list_add_rcu() as long as it's guarded by rcu_read_lock().
-+ */
-+#define list_next_or_null_rr_rcu(head, ptr, type, memb) \
-+({ \
-+	list_next_or_null_rcu(head, ptr, type, memb) ?: \
-+		list_next_or_null_rcu(head, READ_ONCE((ptr)->next), type, memb); \
-+})
-+
-+/**
-  * list_for_each_entry_rcu	-	iterate over rcu list of given type
-  * @pos:	the type * to use as a loop cursor.
-  * @head:	the head for your list.
--- 
-2.13.1
+                if (!blk_mark_rq_complete(rq))
+                        blk_mq_rq_timed_out(rq, reserved);
+
+Given the patch 13("blk-mq: Remove generation seqeunce") is the 1st one
+to change the behaviour, we should put this patch and other related ones
+after patch 13 for avoiding to break 'git bisect'.
+
+Thanks,
+Ming
