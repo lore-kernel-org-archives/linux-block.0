@@ -1,92 +1,80 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	kernel-team@fb.com,
+	linux-block@vger.kernel.org,
+	akpm@linux-foundation.org,
+	linux-mm@kvack.org,
+	hannes@cmpxchg.org,
 	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	filippo.muzzini@outlook.it,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX 2/3] block, bfq: remove wrong check in bfq_requests_merged
-Date: Thu, 31 May 2018 15:23:12 +0200
-Message-Id: <20180531132313.2986-3-paolo.valente@linaro.org>
-In-Reply-To: <20180531132313.2986-1-paolo.valente@linaro.org>
-References: <20180531132313.2986-1-paolo.valente@linaro.org>
+	tj@kernel.org,
+	linux-fsdevel@vger.kernel.org
+Subject: [PATCH 00/13] Introdue io.latency io controller for cgroups
+Date: Tue, 29 May 2018 17:17:11 -0400
+Message-Id: <20180529211724.4531-1-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The request rq passed to the function bfq_requests_merged is always in
-a bfq_queue, so the check !RB_EMPTY_NODE(&rq->rb_node) at the
-beginning of bfq_requests_merged always succeeds, and the control
-flow systematically skips to the end of the function.  This implies
-that the body of the function is never executed, i.e., the
-repositioning of rq is never performed.
+This series adds a latency based io controller for cgroups.  It is based on the
+same concept as the writeback throttling code, which is watching the overall
+total latency of IO's in a given window and then adjusting the queue depth of
+the group accordingly.  This is meant to be a workload protection controller, so
+whoever has the lowest latency target gets the preferential treatment with no
+thought to fairness or proportionality.  It is meant to be work conserving, so
+as long as nobody is missing their latency targets the disk is fair game.
 
-On the opposite end, a control is missing in the body of the function:
-'next' must be removed only if it is inside a bfq_queue.
+We have been testing this in production for several months now to get the
+behavior right and we are finally at the point that it is working well in all of
+our test cases.  With this patch we protect our main workload (the web server)
+and isolate out the system services (chef/yum/etc).  This works well in the
+normal case, smoothing out weird request per second (RPS) dips that we would see
+when one of the system services would run and compete for IO resources.  This
+also works incredibly well in the runaway task case.
 
-This commit removes the wrong check on rq, and adds the missing check
-on 'next'. In addition, this commit adds comments on
-bfq_requests_merged.
+The runaway task usecase is where we have some task that slowly eats up all of
+the memory on the system (think a memory leak).  Previously this sort of
+workload would push the box into a swapping/oom death spiral that was only
+recovered by rebooting the box.  With this patchset and proper configuration of
+the memory.low and io.latency controllers we're able to survive this test with a
+at most 20% dip in RPS.
 
-Signed-off-by: Filippo Muzzini <filippo.muzzini@outlook.it>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 26 ++++++++++++++++++++------
- 1 file changed, 20 insertions(+), 6 deletions(-)
+There are a lot of extra patches in here to set everything up.  The following
+are just infrastructure that should be relatively uncontroversial
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 1f0951d36424..df2a9633cf4a 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -1891,14 +1891,27 @@ static void bfq_request_merged(struct request_queue *q, struct request *req,
- 	}
- }
- 
-+/*
-+ * This function is called to notify the scheduler that the requests
-+ * rq and 'next' have been merged, with 'next' going away.  BFQ
-+ * exploits this hook to address the following issue: if 'next' has a
-+ * fifo_time lower that rq, then the fifo_time of rq must be set to
-+ * the value of 'next', to not forget the greater age of 'next'.
-+ * Moreover 'next' may be in a bfq_queue, in this case it must be
-+ * removed.
-+ *
-+ * NOTE: in this function we assume that rq is in a bfq_queue, basing
-+ * on that rq is picked from the hash table q->elevator->hash, which,
-+ * in its turn, is filled only with I/O requests present in
-+ * bfq_queues, while BFQ is in use for the request queue q. In fact,
-+ * the function that fills this hash table (elv_rqhash_add) is called
-+ * only by bfq_insert_request.
-+ */
- static void bfq_requests_merged(struct request_queue *q, struct request *rq,
- 				struct request *next)
- {
- 	struct bfq_queue *bfqq = RQ_BFQQ(rq), *next_bfqq = RQ_BFQQ(next);
- 
--	if (!RB_EMPTY_NODE(&rq->rb_node))
--		goto end;
--
- 	/*
- 	 * If next and rq belong to the same bfq_queue and next is older
- 	 * than rq, then reposition rq in the fifo (by substituting next
-@@ -1919,10 +1932,11 @@ static void bfq_requests_merged(struct request_queue *q, struct request *rq,
- 	if (bfqq->next_rq == next)
- 		bfqq->next_rq = rq;
- 
--	bfq_remove_request(q, next);
--	bfqg_stats_update_io_remove(bfqq_group(bfqq), next->cmd_flags);
-+	if (!RB_EMPTY_NODE(&next->rb_node)) {
-+		bfq_remove_request(q, next);
-+		bfqg_stats_update_io_remove(bfqq_group(bfqq), next->cmd_flags);
-+	}
- 
--end:
- 	bfqg_stats_update_io_merged(bfqq_group(bfqq), next->cmd_flags);
- }
- 
--- 
-2.16.1
+[PATCH 01/13] block: add bi_blkg to the bio for cgroups
+[PATCH 02/13] block: introduce bio_issue_as_root_blkg
+[PATCH 03/13] blk-cgroup: allow controllers to output their own stats
+
+The following simply allow us to tag swap IO and assign the appropriate cgroup
+to the bio's so we can do the appropriate accounting inside the io controller
+
+[PATCH 04/13] blk: introduce REQ_SWAP
+[PATCH 05/13] swap,blkcg: issue swap io with the appropriate context
+
+This is so that we can induce delays.  The io controller mostly throttles based
+on queue depth, however for cases like REQ_SWAP/REQ_META where we cannot
+throttle without inducing a priority inversion we have a mechanism to "back
+charge" groups for this IO by inducing an artificial delay at user space return
+time.
+
+[PATCH 06/13] blkcg: add generic throttling mechanism
+[PATCH 07/13] memcontrol: schedule throttling if we are congested
+
+This is more moving things around and refactoring, Jens you may want to pay
+close attention to this to make sure I didn't break anything.
+
+[PATCH 08/13] blk-stat: export helpers for modifying blk_rq_stat
+[PATCH 09/13] blk-rq-qos: refactor out common elements of blk-wbt
+[PATCH 10/13] block: remove external dependency on wbt_flags
+[PATCH 11/13] rq-qos: introduce dio_bio callback
+
+And this is the meat of the controller and it's documentation.
+
+[PATCH 12/13] block: introduce blk-iolatency io controller
+[PATCH 13/13] Documentation: add a doc for blk-iolatency
+
+Jens, I'm sending this through your tree since it's mostly block related,
+however there are the two mm related patches, so if somebody from mm could weigh
+in on how we want to handle those that would be great.  Thanks,
+
+Josef
