@@ -1,73 +1,56 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <BATV+a01a3e67072ae75c0352+5392+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 23/34] xfs: remove the now unused XFS_BMAPI_IGSTATE flag
-Date: Fri, 18 May 2018 18:48:19 +0200
-Message-Id: <20180518164830.1552-24-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Tejun Heo <tj@kernel.org>,
+	Lee Duncan <lduncan@suse.com>,
+	Chris Leech <cleech@redhat.com>,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Subject: [PATCH 08/14] null_blk: complete requests from ->timeout
+Date: Tue, 29 May 2018 15:52:33 +0200
+Message-Id: <20180529135239.27005-9-hch@lst.de>
+In-Reply-To: <20180529135239.27005-1-hch@lst.de>
+References: <20180529135239.27005-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/libxfs/xfs_bmap.c | 6 ++----
- fs/xfs/libxfs/xfs_bmap.h | 3 ---
- 2 files changed, 2 insertions(+), 7 deletions(-)
+By completing the request entirely in the driver we can remove the
+BLK_EH_HANDLED return value and thus the split responsibility between the
+driver and the block layer that has been causing trouble.
 
-diff --git a/fs/xfs/libxfs/xfs_bmap.c b/fs/xfs/libxfs/xfs_bmap.c
-index 7b0e2b551e23..4b5e014417d2 100644
---- a/fs/xfs/libxfs/xfs_bmap.c
-+++ b/fs/xfs/libxfs/xfs_bmap.c
-@@ -3799,8 +3799,7 @@ xfs_bmapi_update_map(
- 		   mval[-1].br_startblock != HOLESTARTBLOCK &&
- 		   mval->br_startblock == mval[-1].br_startblock +
- 					  mval[-1].br_blockcount &&
--		   ((flags & XFS_BMAPI_IGSTATE) ||
--			mval[-1].br_state == mval->br_state)) {
-+		   mval[-1].br_state == mval->br_state) {
- 		ASSERT(mval->br_startoff ==
- 		       mval[-1].br_startoff + mval[-1].br_blockcount);
- 		mval[-1].br_blockcount += mval->br_blockcount;
-@@ -3845,7 +3844,7 @@ xfs_bmapi_read(
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ drivers/block/null_blk.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index b4d368e3ddcd..2bdadd7f1454 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -1365,7 +1365,8 @@ static blk_qc_t null_queue_bio(struct request_queue *q, struct bio *bio)
+ static enum blk_eh_timer_return null_rq_timed_out_fn(struct request *rq)
+ {
+ 	pr_info("null: rq %p timed out\n", rq);
+-	return BLK_EH_HANDLED;
++	blk_mq_complete_request(rq);
++	return BLK_EH_DONE;
+ }
  
- 	ASSERT(*nmap >= 1);
- 	ASSERT(!(flags & ~(XFS_BMAPI_ATTRFORK|XFS_BMAPI_ENTIRE|
--			   XFS_BMAPI_IGSTATE|XFS_BMAPI_COWFORK)));
-+			   XFS_BMAPI_COWFORK)));
- 	ASSERT(xfs_isilocked(ip, XFS_ILOCK_SHARED|XFS_ILOCK_EXCL));
+ static int null_rq_prep_fn(struct request_queue *q, struct request *req)
+@@ -1427,7 +1428,8 @@ static void null_request_fn(struct request_queue *q)
+ static enum blk_eh_timer_return null_timeout_rq(struct request *rq, bool res)
+ {
+ 	pr_info("null: rq %p timed out\n", rq);
+-	return BLK_EH_HANDLED;
++	blk_mq_complete_request(rq);
++	return BLK_EH_DONE;
+ }
  
- 	if (unlikely(XFS_TEST_ERROR(
-@@ -4290,7 +4289,6 @@ xfs_bmapi_write(
- 
- 	ASSERT(*nmap >= 1);
- 	ASSERT(*nmap <= XFS_BMAP_MAX_NMAP);
--	ASSERT(!(flags & XFS_BMAPI_IGSTATE));
- 	ASSERT(tp != NULL ||
- 	       (flags & (XFS_BMAPI_CONVERT | XFS_BMAPI_COWFORK)) ==
- 			(XFS_BMAPI_CONVERT | XFS_BMAPI_COWFORK));
-diff --git a/fs/xfs/libxfs/xfs_bmap.h b/fs/xfs/libxfs/xfs_bmap.h
-index 2c233f9f1a26..a845fe57d1b5 100644
---- a/fs/xfs/libxfs/xfs_bmap.h
-+++ b/fs/xfs/libxfs/xfs_bmap.h
-@@ -80,8 +80,6 @@ struct xfs_extent_free_item
- #define XFS_BMAPI_METADATA	0x002	/* mapping metadata not user data */
- #define XFS_BMAPI_ATTRFORK	0x004	/* use attribute fork not data */
- #define XFS_BMAPI_PREALLOC	0x008	/* preallocation op: unwritten space */
--#define XFS_BMAPI_IGSTATE	0x010	/* Ignore state - */
--					/* combine contig. space */
- #define XFS_BMAPI_CONTIG	0x020	/* must allocate only one extent */
- /*
-  * unwritten extent conversion - this needs write cache flushing and no additional
-@@ -128,7 +126,6 @@ struct xfs_extent_free_item
- 	{ XFS_BMAPI_METADATA,	"METADATA" }, \
- 	{ XFS_BMAPI_ATTRFORK,	"ATTRFORK" }, \
- 	{ XFS_BMAPI_PREALLOC,	"PREALLOC" }, \
--	{ XFS_BMAPI_IGSTATE,	"IGSTATE" }, \
- 	{ XFS_BMAPI_CONTIG,	"CONTIG" }, \
- 	{ XFS_BMAPI_CONVERT,	"CONVERT" }, \
- 	{ XFS_BMAPI_ZERO,	"ZERO" }, \
+ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
 -- 
 2.17.0
