@@ -1,86 +1,85 @@
-Return-Path: <prvs=681b715ac=Damien.LeMoal@wdc.com>
-From: Damien Le Moal <Damien.LeMoal@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>, Jeff Moyer <jmoyer@redhat.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"bgurney@redhat.com" <bgurney@redhat.com>
-Subject: Re: [PATCH 0/2][RFC] block: default to deadline for SMR devices
-Date: Wed, 30 May 2018 06:22:04 +0000
-Message-ID: <122bc1d9-a074-7282-6812-aba26f4868f4@wdc.com>
-References: <20180525211432.20359-1-jmoyer@redhat.com>
- <9756f816-cea7-52cc-e616-54cd7b7d8c75@kernel.dk>
- <x49tvqvz8eb.fsf@segfault.boston.devel.redhat.com>
- <a0bdfb0c-8ed3-12ac-e11b-6204fe3bb665@kernel.dk>
-In-Reply-To: <a0bdfb0c-8ed3-12ac-e11b-6204fe3bb665@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <bgurney@redhat.com>
 MIME-Version: 1.0
+In-Reply-To: <a0bdfb0c-8ed3-12ac-e11b-6204fe3bb665@kernel.dk>
+References: <20180525211432.20359-1-jmoyer@redhat.com> <9756f816-cea7-52cc-e616-54cd7b7d8c75@kernel.dk>
+ <x49tvqvz8eb.fsf@segfault.boston.devel.redhat.com> <a0bdfb0c-8ed3-12ac-e11b-6204fe3bb665@kernel.dk>
+From: Bryan Gurney <bgurney@redhat.com>
+Date: Tue, 29 May 2018 08:14:20 -0400
+Message-ID: <CAHhmqcQfVM28jkbtFHGpYHVRkQCejbyycja-JbNQ_dMRkVj86w@mail.gmail.com>
+Subject: Re: [PATCH 0/2][RFC] block: default to deadline for SMR devices
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Jeff Moyer <jmoyer@redhat.com>, Damien.LeMoal@wdc.com, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-SmVucywNCg0KT24gNS8yNi8xOCAxMzowMSwgSmVucyBBeGJvZSB3cm90ZToNCj4gT24gNS8yNS8x
-OCA0OjE4IFBNLCBKZWZmIE1veWVyIHdyb3RlOg0KPj4gSGksIEplbnMsDQo+Pg0KPj4gSmVucyBB
-eGJvZSA8YXhib2VAa2VybmVsLmRrPiB3cml0ZXM6DQo+Pg0KPj4+IE9uIDUvMjUvMTggMzoxNCBQ
-TSwgSmVmZiBNb3llciB3cm90ZToNCj4+Pj4gQnJ5YW4gR3VybmV5IHJlcG9ydGVkIEkvTyBlcnJv
-cnMgd2hlbiB1c2luZyBkbS16b25lZCB3aXRoIGEgaG9zdC1tYW5hZ2VkDQo+Pj4+IFNNUiBkZXZp
-Y2UuICBJdCB0dXJucyBvdXQgaGUgd2FzIHVzaW5nIENGUSwgd2hpY2ggaXMgdGhlIGRlZmF1bHQu
-DQo+Pj4+IFVuZm9ydHVuYXRlbHksIGFzIG9mIHY0LjE2LCBvbmx5IHRoZSBkZWFkbGluZSBzY2hl
-ZHVsZXJzIHdvcmsgd2VsbCB3aXRoDQo+Pj4+IGhvc3QtbWFuYWdlZCBTTVIgZGV2aWNlcy4gIFRo
-aXMgc2VyaWVzIGFhdGVtcHRzIHRvIHN3aXRjaCB0aGUgZWxldmF0b3INCj4+Pj4gdG8gZGVhZGxp
-bmUgZm9yIHRob3NlIGRldmljZXMuDQo+Pj4+DQo+Pj4+IE5PVEU6IEknbSBub3Qgc3VwZXIgaGFw
-cHkgd2l0aCBzZXR0aW5nIHVwIG9uZSBpb3NjaGVkIGFuZCB0aGVuDQo+Pj4+IGltbWVkaWF0ZWx5
-IHRlYXJpbmcgaXQgZG93bi4gIEknbSBvcGVuIHRvIHN1Z2dlc3Rpb25zIG9uIGJldHRlciB3YXlz
-DQo+Pj4+IHRvIGFjY29tcGxpc2ggdGhpcyBnb2FsLg0KPj4+DQo+Pj4gTGV0J3MgcGxlYXNlIG5v
-dCBkbyB0aGlzLCBhIGZldyB5ZWFycyBhZ28gSSBmaW5hbGx5IG1hbmFnZWQgdG8ga2lsbA0KPj4+
-IGRyaXZlcnMgY2hhbmdpbmcgdGhlIHNjaGVkdWxlciBtYW51YWxseS4gV2h5IGNhbid0IHRoaXMg
-Z28gaW50byBhDQo+Pj4gdWRldiAob3Igc2ltaWxhcikgcnVsZT8gVGhhdCdzIHdoZXJlIGl0IGJl
-bG9uZ3MsIGltaG8uDQo+Pg0KPj4gV2UgY291bGQgZG8gdGhhdC4gIFRoZSBkb3duc2lkZSBpcyB0
-aGF0IGRpc3Ryb3Mgd2lsbCBoYXZlIHRvIHBpY2sgdXANCj4+IHVkZXYgcnVsZXMsIHdoaWNoIHRo
-ZXkgaGF2ZW4ndCBkb25lIHlldCwgYW5kIHRoZSB1ZGV2IHJ1bGVzIHdpbGwgaGF2ZSB0bw0KPj4g
-YmUga2VybmVsIHZlcnNpb24gZGVwZW5kZW50LiAgQW5kIHRoZW4gbGF0ZXIsIHdoZW4gdGhpcyBy
-ZXN0cmljdGlvbiBpcw0KPj4gbGlmdGVkLCB3ZSdsbCBoYXZlIHRvIHVwZGF0ZSB0aGUgdWRldiBy
-dWxlcy4gIFRoYXQgYWxzbyBzb3VuZHMgYXdmdWwgdG8NCj4+IG1lLg0KPiANCj4gVGhleSBvbmx5
-IGhhdmUgdG8gYmUgZmVhdHVyZSBkZXBlbmRlbnQsIHdoaWNoIGlzbid0IHRoYXQgaGFyZC4gQW5k
-IGlmIEkNCj4gaGFkIHRvIHBpY2sgYmV0d2VlbiBhIGtlcm5lbCB1cGdyYWRlIGFuZCBhIHVkZXYg
-cnVsZSBwYWNrYWdlIHVwZGF0ZSwgdGhlDQo+IGNob2ljZSBpcyBwcmV0dHkgY2xlYXIuDQoNCkN1
-cnJlbnRseSwgYSBxdWV1ZSBlbGV2YXRvciBpcyBmaXJzdCBpbml0aWFsaXplZCB3aXRoIGEgY2Fs
-bCB0bw0KZWxldmF0b3JfaW5pdCgpIGZyb20gZWl0aGVyIGJsa19tcV9pbml0X2FsbG9jYXRlZF9x
-dWV1ZSgpIG9yDQpibGtfaW5pdF9hbGxvY2F0ZWRfcXVldWUoKS4gV2hlbiB0aGVzZSBhcmUgY2Fs
-bGVkLCB0aGUgZGV2aWNlIGhhcyBub3QNCnlldCBiZWVuIHByb2JlZCBhbmQgbm8gaW5mb3JtYXRp
-b24gaXMgYXZhaWxhYmxlLiBEbyB5b3UgdGhpbmsgaXQgaXMNCnJlYXNvbmFibGUgdG8gZGVsYXkg
-dGhlIGRlZmF1bHQgZWxldmF0b3IgYnJpbmctdXAgdG8gYWZ0ZXIgc29tZQ0KaW5mb3JtYXRpb24g
-YWJvdXQgdGhlIGRldmljZSBpcyBvYnRhaW5lZCA/DQoNClRoYXQgd291bGQgbmVjZXNzaXRhdGUg
-c3BsaXR0aW5nIGVsZXZhdG9yX2luaXQoKSBpbnRvIGEgZ2VuZXJpYyBlbGV2YXRvcg0KaW5pdGlh
-bGl6YXRpb24gZnVuY3Rpb24gc2V0dGluZyB1cCB0aGUgZWxldmF0b3IgcmVsYXRlZCBmaWVsZHMg
-b2YgdGhlDQpyZXF1ZXN0IHF1ZXVlIGFuZCBhIHNlY29uZCBwYXJ0IHNldHRpbmcgdXAgdGhlIGRl
-ZmF1bHQgZWxldmF0b3IgKGUuZy4NCmVsZXZhdG9yX3NldF9kZWZhdWx0KCkpLiBEb2luZyBzbywg
-dGhlIGZ1bmN0aW9uIGVsZXZhdG9yX3NldF9kZWZhdWx0KCkNCmNvdWxkIGJlIGNhbGxlZCBsYXRl
-ciBpbiB0aGUgZGV2aWNlIGluaXRpYWxpemF0aW9uIHNlcXVlbmNlLCBhZnRlcg0KaW5mb3JtYXRp
-b24gZnJvbSB0aGUgZGV2aWNlIGhhcyBiZWVuIG9idGFpbmVkLiBJdCB3b3VsZCBtYWtlIGNob29z
-aW5nIGENCnNhbmUgZGVmYXVsdCBlbGV2YXRvciBtdWNoIGNsZWFuZXIuDQoNCkdyYW50ZWQsIHRo
-YXQgaXMgaW4gZWZmZWN0IHZlcnkgc2ltaWxhciB0byB3aGF0IEplZmYncyBwYXRjaGVzIGRvLiBC
-dXQNCmluIGEgc2Vuc2UsIHRoZSBjdXJyZW50IGNvZGUgYWxyZWFkeSBjb25zaWRlciBzb21lIG9m
-IHRoZSBkZXZpY2UNCmNoYXJhY3RlcmlzdGljcyB3aGVuIHNldHRpbmcgdGhlIGRlZmF1bHQgZWxl
-dmF0b3IuIFRoYXQgaXMsIGlmIHRoZQ0KZGV2aWNlIGlzIG1xIG9yIG5vdC4gV291bGQgaXQgYmUg
-YSBzdHJldGNoIHRvIGFkZCAiaXNfem9uZWQiIGFzIGFub3RoZXINCmNoYXJhY3RlcmlzdGljIHRo
-YXQgaXMgbG9va2VkIGF0ID8NCg0KT24gYW5vdGhlciBub3RlLCBJIG5vdGljZWQgdGhhdCB0aGUg
-b25seSB0d28gY2FsbGVycyBvZiBlbGV2YXRvcl9pbml0KCkNCmFyZSBibGtfbXFfaW5pdF9hbGxv
-Y2F0ZWRfcXVldWUoKSBhbmQgYmxrX2luaXRfYWxsb2NhdGVkX3F1ZXVlKCkuIEJvdGgNCmNhbGwg
-ZWxldmF0b3JfaW5pdCgpIHdpdGggYSBOVUxMIG5hbWUuIEkgd29uZGVyIHRoZSB1c2VmdWxuZXNz
-IG9mIHRoYXQNCmFyZ3VtZW50LiBGdXJ0aGVybW9yZSwgZWxldmF0b3JfaW5pdCgpIGlzIGFsc28g
-ZXhwb3J0ZWQgYnV0IEkgZG8gbm90IHNlZQ0KYW55IGV4dGVybmFsIG1vZHVsZSB1c2VyLiBJcyB0
-aGlzIGluIHB1cnBvc2Ugb3IgaXMgaXQgdGhlIHJlbW5hbnQgb2YNCm9sZGVyIHVzZSBvZiBpdCA/
-IEkgY2FuIHNlbmQgYSBwYXRjaCBjbGVhbmluZyB0aGF0IHVwIGlmIHlvdSBmZWVsIHRoYXQNCm5l
-ZWRzIHNvIGNsZWFudXAuDQoNCj4gDQo+PiBJIHVuZGVyc3RhbmQgd2h5IHlvdSBkb24ndCBsaWtl
-IHRoaXMgcGF0Y2ggc2V0LCBidXQgSSBoYXBwZW4gdG8gdGhpbmsNCj4+IHRoZSBhbHRlcm5hdGl2
-ZSBpcyB3b3JzZS4gIEZZSSwgaW4gQnJ5YW4ncyBjYXNlLCBoaXMgc3lzdGVtIGFjdHVhbGx5IGdv
-dA0KPj4gYnJpY2tlZCAobGlrZWx5IGR1ZSB0byBidWdneSBmaXJtd2FyZSkuDQo+IA0KPiBJIGRp
-c2FncmVlLCBJIHRoaW5rIHRoZSBydWxlIGFwcHJvYWNoIGlzIG11Y2ggZWFzaWVyLiBJZiB0aGUg
-d3Jvbmcgd3JpdGUNCj4gbG9jYXRpb24gYnJpY2tlZCB0aGUgZHJpdmUsIHRoZW4gSSB0aGluayB0
-aGF0IHVzZXIgaGFzIG11Y2ggbGFyZ2VyDQo+IGlzc3Vlcy4uLiBUaGF0IHNlZW1zIGxpa2UgYSB0
-cml2aWFsIGlzc3VlIHRoYXQgc2hvdWxkIGhhdmUgYmVlbiBjYXVnaHQNCj4gaW4gYmFzaWMgdGVz
-dGluZywgSSB3b3VsZCBub3QgdHJ1c3QgdGhhdCBkcml2ZSB3aXRoIGFueSBkYXRhIGlmIGl0DQo+
-IGJyaWNrcyB0aGF0IGVhc2lseS4NCg0KSSB0aGluayB0aGF0IHRoZSBidWcgaW4gdGhpcyBwYXJ0
-aWN1bGFyIGNhc2Ugd2FzIHdpdGggdGhlIEJJT1MgKHByb2JhYmx5DQpVRUZJKSwgbm90IHRoZSBk
-aXNrLiBEaXNrcyBvbmx5IGFuc3dlciB0byB0cml2aWFsIHJlcXVlc3RzIHdoZW4gcHJvYmVkDQpv
-biBib290LCB1bmxlc3MgdGhlIEJJT1MgaXMgdG9vIHNtYXJ0IGZvciBpdHMgb3duIGdvb2QgYW5k
-IGRvaW5nIHZlcnkNCndlaXJkIHRoaW5ncy4gRGlmZmVyZW50IGlzc3VlIGFueXdheSwgbm90IHJl
-bGF0ZWQgdG8gdGhlIGtlcm5lbC4NCg0KQmVzdCByZWdhcmRzLg0KDQotLSANCkRhbWllbiBMZSBN
-b2FsLA0KV2VzdGVybiBEaWdpdGFs
+On Sat, May 26, 2018 at 12:01 AM, Jens Axboe <axboe@kernel.dk> wrote:
+> On 5/25/18 4:18 PM, Jeff Moyer wrote:
+>> Hi, Jens,
+>>
+>> Jens Axboe <axboe@kernel.dk> writes:
+>>
+>>> On 5/25/18 3:14 PM, Jeff Moyer wrote:
+>>>> Bryan Gurney reported I/O errors when using dm-zoned with a host-managed
+>>>> SMR device.  It turns out he was using CFQ, which is the default.
+>>>> Unfortunately, as of v4.16, only the deadline schedulers work well with
+>>>> host-managed SMR devices.  This series aatempts to switch the elevator
+>>>> to deadline for those devices.
+>>>>
+>>>> NOTE: I'm not super happy with setting up one iosched and then
+>>>> immediately tearing it down.  I'm open to suggestions on better ways
+>>>> to accomplish this goal.
+>>>
+>>> Let's please not do this, a few years ago I finally managed to kill
+>>> drivers changing the scheduler manually. Why can't this go into a
+>>> udev (or similar) rule? That's where it belongs, imho.
+>>
+>> We could do that.  The downside is that distros will have to pick up
+>> udev rules, which they haven't done yet, and the udev rules will have to
+>> be kernel version dependent.  And then later, when this restriction is
+>> lifted, we'll have to update the udev rules.  That also sounds awful to
+>> me.
+>
+> They only have to be feature dependent, which isn't that hard. And if I
+> had to pick between a kernel upgrade and a udev rule package update, the
+> choice is pretty clear.
+>
+>> I understand why you don't like this patch set, but I happen to think
+>> the alternative is worse.  FYI, in Bryan's case, his system actually got
+>> bricked (likely due to buggy firmware).
+>
+> I disagree, I think the rule approach is much easier. If the wrong write
+> location bricked the drive, then I think that user has much larger
+> issues... That seems like a trivial issue that should have been caught
+> in basic testing, I would not trust that drive with any data if it
+> bricks that easily.
+
+To set the record straight, it wasn't the drive that "bricked"; it was
+the system motherboard BIOS.
+
+I set up a test to copy some data onto an SMR drive over a weekend
+(one of two on the system), and when I came back on Monday morning, I
+was greeted with "kernel BUG at block/bio.c:1720!" (which would be
+"BUG_ON(atomic_read(&bio->__bi_remaining <= 0);").
+
+After taking a picture of the kernel bug screen, I power cycled the
+system, and it just sat there, with fans running, but no power light,
+and no other activity (not even a blinking network activity light).
+
+I transplanted the drive and HBA to another test system with identical
+hardware, and saw that the SMR drives were running properly.  I
+decided to reset the test, thinking, "That _can't_ happen again..."
+
+It happened again.  Same kernel bug, same "fans running, but power
+light is off" behavior.  I had two catatonic Xeon workstations in
+front of me, which were thankfully both revived with the help of a
+chip programmer writing the binary file of the latest BIOS update.
+
+After reaching out to Damien regarding the large amount of "Aborted
+command" senses that I was seeing prior to the kernel bug, he
+recommended using the "deadline" scheduler for kernel 4.16 and
+greater.
+
+
+Thanks,
+
+Bryan
