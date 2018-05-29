@@ -1,57 +1,46 @@
-Return-Path: <keith.busch@intel.com>
-From: Keith Busch <keith.busch@intel.com>
-To: Omar Sandoval <osandov@osandov.com>,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Cc: Johannes Thumshirn <jthumshirn@suse.de>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Ming Lei <ming.lei@redhat.com>,
-	Keith Busch <keith.busch@intel.com>
-Subject: [PATCH blktests] Fix block/011 to not use sysfs for device disabling
-Date: Fri, 18 May 2018 11:42:47 -0600
-Message-Id: <20180518174247.31098-1-keith.busch@intel.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:60894 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754646AbeE2Goa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 29 May 2018 02:44:30 -0400
+Date: Tue, 29 May 2018 08:44:28 +0200
+From: Hannes Reinecke <hare@suse.de>
+To: Coly Li <colyli@suse.de>
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: Re: [PATCH 2/4] bcache: Move couple of string arrays to sysfs.c
+Message-ID: <20180529084428.3a84957f@pentland.suse.de>
+In-Reply-To: <20180528073744.71258-3-colyli@suse.de>
+References: <20180528073744.71258-1-colyli@suse.de>
+        <20180528073744.71258-3-colyli@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The PCI sysfs interface may not be a dependable method for toggling the
-PCI device state to trigger the timeouts. This patch goes directly to
-the config space to make device failure occur.
+On Mon, 28 May 2018 15:37:42 +0800
+Coly Li <colyli@suse.de> wrote:
 
-The success of this test is still senstive to timing, as it may disable
-IO memory when a driver is trying to bring it online. This can look like
-a permanent device failure from the driver's perspective.
+> From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> 
+> There is couple of string arrays that are used exclusively in sysfs.c.
+> Move it to there and make them static.
+> 
+> Besides above, it will allow further clean up.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Signed-off-by: Coly Li <colyli@suse.de>
+> ---
+>  drivers/md/bcache/bcache.h |  2 --
+>  drivers/md/bcache/super.c  | 18 ------------------
+>  drivers/md/bcache/sysfs.c  | 18 ++++++++++++++++++
+>  3 files changed, 18 insertions(+), 20 deletions(-)
+> 
 
-Signed-off-by: Keith Busch <keith.busch@intel.com>
----
- tests/block/011 | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-diff --git a/tests/block/011 b/tests/block/011
-index 62e89f7..2fc0ffb 100755
---- a/tests/block/011
-+++ b/tests/block/011
-@@ -21,7 +21,7 @@ DESCRIPTION="disable PCI device while doing I/O"
- TIMED=1
- 
- requires() {
--	_have_fio
-+	_have_fio && _have_program setpci
- }
- 
- device_requires() {
-@@ -43,10 +43,11 @@ test_device() {
- 	_run_fio_rand_io --filename="$TEST_DEV" --size="$size" \
- 			--ignore_error=EIO,ENXIO,ENODEV &
- 
-+	# toggle PCI Command Register's Memory and Bus Master enabling
- 	while kill -0 $! 2>/dev/null; do
--		echo 0 > "/sys/bus/pci/devices/${pdev}/enable"
-+		setpci -s "${pdev}" 4.w=0:6
- 		sleep .2
--		echo 1 > "/sys/bus/pci/devices/${pdev}/enable"
-+		setpci -s "${pdev}" 4.w=6:6
- 		sleep .2
- 	done
- 
--- 
-2.14.3
+Cheers,
+
+Hannes
