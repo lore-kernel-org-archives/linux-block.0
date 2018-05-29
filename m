@@ -1,54 +1,56 @@
-Return-Path: <BATV+e0efdd19ce80d487e3da+5372+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <BATV+a01a3e67072ae75c0352+5392+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "Ed L. Cashin" <ed.cashin@acm.org>,
-	Geoff Levand <geoff@infradead.org>,
-	Maxim Levitsky <maximlevitsky@gmail.com>,
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Tejun Heo <tj@kernel.org>,
+	Lee Duncan <lduncan@suse.com>,
+	Chris Leech <cleech@redhat.com>,
 	linux-block@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-mtd@lists.infradead.org,
-	sparclinux@vger.kernel.org
-Subject: [PATCH 5/7] aoe: handle highmem pages
-Date: Wed,  9 May 2018 15:59:46 +0200
-Message-Id: <20180509135948.20329-6-hch@lst.de>
-In-Reply-To: <20180509135948.20329-1-hch@lst.de>
-References: <20180509135948.20329-1-hch@lst.de>
+	linux-scsi@vger.kernel.org
+Subject: [PATCH 06/14] nbd: complete requests from ->timeout
+Date: Tue, 29 May 2018 15:52:31 +0200
+Message-Id: <20180529135239.27005-7-hch@lst.de>
+In-Reply-To: <20180529135239.27005-1-hch@lst.de>
+References: <20180529135239.27005-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Use kmap_atomic when copying out of a bio_vec.
+By completing the request entirely in the driver we can remove the
+BLK_EH_HANDLED return value and thus the split responsibility between the
+driver and the block layer that has been causing trouble.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- drivers/block/aoe/aoeblk.c | 1 -
- drivers/block/aoe/aoecmd.c | 3 ++-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/block/nbd.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
-index 6797e6c23c8a..027b876370bc 100644
---- a/drivers/block/aoe/aoeblk.c
-+++ b/drivers/block/aoe/aoeblk.c
-@@ -388,7 +388,6 @@ aoeblk_gdalloc(void *vp)
- 			d->aoemajor, d->aoeminor);
- 		goto err_mempool;
- 	}
--	blk_queue_bounce_limit(q, BLK_BOUNCE_HIGH);
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 88ae833aabe9..8860b24098bc 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -304,7 +304,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
  
- 	spin_lock_irqsave(&d->lock, flags);
- 	WARN_ON(!(d->flags & DEVFL_GD_NOW));
-diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
-index 540bb60cd071..096882e54095 100644
---- a/drivers/block/aoe/aoecmd.c
-+++ b/drivers/block/aoe/aoecmd.c
-@@ -1032,8 +1032,9 @@ bvcpy(struct sk_buff *skb, struct bio *bio, struct bvec_iter iter, long cnt)
- 	iter.bi_size = cnt;
- 
- 	__bio_for_each_segment(bv, bio, iter, iter) {
--		char *p = page_address(bv.bv_page) + bv.bv_offset;
-+		char *p = kmap_atomic(bv.bv_page) + bv.bv_offset;
- 		skb_copy_bits(skb, soff, p, bv.bv_len);
-+		kunmap_atomic(p);
- 		soff += bv.bv_len;
+ 	if (!refcount_inc_not_zero(&nbd->config_refs)) {
+ 		cmd->status = BLK_STS_TIMEOUT;
+-		return BLK_EH_HANDLED;
++		goto done;
  	}
+ 	config = nbd->config;
+ 
+@@ -342,8 +342,9 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
+ 	cmd->status = BLK_STS_IOERR;
+ 	sock_shutdown(nbd);
+ 	nbd_config_put(nbd);
+-
+-	return BLK_EH_HANDLED;
++done:
++	blk_mq_complete_request(req);
++	return BLK_EH_DONE;
  }
+ 
+ /*
 -- 
 2.17.0
