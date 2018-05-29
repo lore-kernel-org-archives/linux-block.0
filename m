@@ -1,47 +1,101 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:32983 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1034185AbeE1PWR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 May 2018 11:22:17 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v2 0/4] bcache patches for 4.18
-Date: Mon, 28 May 2018 15:37:40 +0800
-Message-Id: <20180528073744.71258-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+a01a3e67072ae75c0352+5392+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 2/2] block: don't print a message when the device went away
+Date: Tue, 29 May 2018 16:42:59 +0200
+Message-Id: <20180529144259.29819-3-hch@lst.de>
+In-Reply-To: <20180529144259.29819-1-hch@lst.de>
+References: <20180529144259.29819-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+The information about a size change in this case just creates confusion.
 
-Here are the first wave bcache patches for linux v4.18, not too much
-changes.
-
-- Andy Shevchenko contributes several clean up patches for bcache.
-- A reviewed patch from me, about the bcache device failure improvement
-  series.
-
-There are still some patches waiting for peer review. Once they get
-reviewed and it is still in good timing, I will submit them in next waves.
-
-Thanks in advance.
-
-Coly Li 
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 ---
-Andy Shevchenko (3):
-  bcache: Move couple of string arrays to sysfs.c
-  bcache: Move couple of functions to sysfs.c
-  bcache: Replace bch_read_string_list() by __sysfs_match_string()
+ block/partition-generic.c |  4 ++--
+ fs/block_dev.c            | 14 +++++++++-----
+ include/linux/fs.h        |  2 +-
+ 3 files changed, 12 insertions(+), 8 deletions(-)
 
-Coly Li (1):
-  bcache: stop bcache device when backing device is offline
-
- drivers/md/bcache/bcache.h |  4 +--
- drivers/md/bcache/super.c  | 71 ++++++++++++++++++++++++++++----------
- drivers/md/bcache/sysfs.c  | 51 ++++++++++++++++++++-------
- drivers/md/bcache/util.c   | 35 -------------------
- drivers/md/bcache/util.h   |  5 ---
- 5 files changed, 94 insertions(+), 72 deletions(-)
-
+diff --git a/block/partition-generic.c b/block/partition-generic.c
+index 93ef8ce568a1..3dcfd4ec0e11 100644
+--- a/block/partition-generic.c
++++ b/block/partition-generic.c
+@@ -516,7 +516,7 @@ int rescan_partitions(struct gendisk *disk, struct block_device *bdev)
+ 
+ 	if (disk->fops->revalidate_disk)
+ 		disk->fops->revalidate_disk(disk);
+-	check_disk_size_change(disk, bdev);
++	check_disk_size_change(disk, bdev, true);
+ 	bdev->bd_invalidated = 0;
+ 	if (!get_capacity(disk) || !(state = check_partition(disk, bdev)))
+ 		return 0;
+@@ -641,7 +641,7 @@ int invalidate_partitions(struct gendisk *disk, struct block_device *bdev)
+ 		return res;
+ 
+ 	set_capacity(disk, 0);
+-	check_disk_size_change(disk, bdev);
++	check_disk_size_change(disk, bdev, false);
+ 	bdev->bd_invalidated = 0;
+ 	/* tell userspace that the media / partition table may have changed */
+ 	kobject_uevent(&disk_to_dev(disk)->kobj, KOBJ_CHANGE);
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 771ddfa29dc9..81c57c14fae8 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1322,21 +1322,25 @@ static void flush_disk(struct block_device *bdev, bool kill_dirty)
+  * check_disk_size_change - checks for disk size change and adjusts bdev size.
+  * @disk: struct gendisk to check
+  * @bdev: struct bdev to adjust.
++ * @verbose: if %true log a message about a size change if there is any
+  *
+  * This routine checks to see if the bdev size does not match the disk size
+  * and adjusts it if it differs. When shrinking the bdev size, its all caches
+  * are freed.
+  */
+-void check_disk_size_change(struct gendisk *disk, struct block_device *bdev)
++void check_disk_size_change(struct gendisk *disk, struct block_device *bdev,
++		bool verbose)
+ {
+ 	loff_t disk_size, bdev_size;
+ 
+ 	disk_size = (loff_t)get_capacity(disk) << 9;
+ 	bdev_size = i_size_read(bdev->bd_inode);
+ 	if (disk_size != bdev_size) {
+-		printk(KERN_INFO
+-		       "%s: detected capacity change from %lld to %lld\n",
+-		       disk->disk_name, bdev_size, disk_size);
++		if (verbose) {
++			printk(KERN_INFO
++			       "%s: detected capacity change from %lld to %lld\n",
++			       disk->disk_name, bdev_size, disk_size);
++		}
+ 		i_size_write(bdev->bd_inode, disk_size);
+ 		if (bdev_size > disk_size)
+ 			flush_disk(bdev, false);
+@@ -1363,7 +1367,7 @@ int revalidate_disk(struct gendisk *disk)
+ 		return ret;
+ 
+ 	mutex_lock(&bdev->bd_mutex);
+-	check_disk_size_change(disk, bdev);
++	check_disk_size_change(disk, bdev, ret == 0);
+ 	bdev->bd_invalidated = 0;
+ 	mutex_unlock(&bdev->bd_mutex);
+ 	bdput(bdev);
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 760d8da1b6c7..d8d4831af9ff 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2570,7 +2570,7 @@ extern bool is_bad_inode(struct inode *);
+ 
+ #ifdef CONFIG_BLOCK
+ extern void check_disk_size_change(struct gendisk *disk,
+-				   struct block_device *bdev);
++		struct block_device *bdev, bool verbose);
+ extern int revalidate_disk(struct gendisk *);
+ extern int check_disk_change(struct block_device *);
+ extern int __invalidate_device(struct block_device *, bool);
 -- 
 2.17.0
