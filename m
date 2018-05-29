@@ -1,145 +1,114 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <BATV+a01a3e67072ae75c0352+5392+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 33/33] fs: remove __block_write_begin and iomap_to_bh
-Date: Wed,  9 May 2018 09:48:30 +0200
-Message-Id: <20180509074830.16196-34-hch@lst.de>
-In-Reply-To: <20180509074830.16196-1-hch@lst.de>
-References: <20180509074830.16196-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Tejun Heo <tj@kernel.org>,
+	Lee Duncan <lduncan@suse.com>,
+	Chris Leech <cleech@redhat.com>,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Subject: [PATCH 01/14] libata: remove ata_scsi_timed_out
+Date: Tue, 29 May 2018 15:52:26 +0200
+Message-Id: <20180529135239.27005-2-hch@lst.de>
+In-Reply-To: <20180529135239.27005-1-hch@lst.de>
+References: <20180529135239.27005-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Now that the iomap buffered write code stopped using bufferheads these
-aren't used anymore.
+As far as I can tell this function can't even be called any more, given
+that ATA implements its own eh_strategy_handler with ata_scsi_error, which
+never calls ->eh_timed_out.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- fs/buffer.c   | 76 ++++-----------------------------------------------
- fs/internal.h |  2 --
- 2 files changed, 5 insertions(+), 73 deletions(-)
+ drivers/ata/libata-eh.c | 51 -----------------------------------------
+ include/linux/libata.h  |  2 --
+ 2 files changed, 53 deletions(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 71ea9a29e9d5..5cdcaa6230ed 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -22,7 +22,6 @@
- #include <linux/sched/signal.h>
- #include <linux/syscalls.h>
- #include <linux/fs.h>
--#include <linux/iomap.h>
- #include <linux/mm.h>
- #include <linux/percpu.h>
- #include <linux/slab.h>
-@@ -1863,62 +1862,8 @@ void page_zero_new_buffers(struct page *page, unsigned from, unsigned to)
+diff --git a/drivers/ata/libata-eh.c b/drivers/ata/libata-eh.c
+index c016829a38fd..e87785dec151 100644
+--- a/drivers/ata/libata-eh.c
++++ b/drivers/ata/libata-eh.c
+@@ -500,57 +500,6 @@ void ata_eh_release(struct ata_port *ap)
+ 	mutex_unlock(&ap->host->eh_mutex);
  }
- EXPORT_SYMBOL(page_zero_new_buffers);
  
--static void
--iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
--		struct iomap *iomap)
+-/**
+- *	ata_scsi_timed_out - SCSI layer time out callback
+- *	@cmd: timed out SCSI command
+- *
+- *	Handles SCSI layer timeout.  We race with normal completion of
+- *	the qc for @cmd.  If the qc is already gone, we lose and let
+- *	the scsi command finish (EH_HANDLED).  Otherwise, the qc has
+- *	timed out and EH should be invoked.  Prevent ata_qc_complete()
+- *	from finishing it by setting EH_SCHEDULED and return
+- *	EH_NOT_HANDLED.
+- *
+- *	TODO: kill this function once old EH is gone.
+- *
+- *	LOCKING:
+- *	Called from timer context
+- *
+- *	RETURNS:
+- *	EH_HANDLED or EH_NOT_HANDLED
+- */
+-enum blk_eh_timer_return ata_scsi_timed_out(struct scsi_cmnd *cmd)
 -{
--	loff_t offset = block << inode->i_blkbits;
+-	struct Scsi_Host *host = cmd->device->host;
+-	struct ata_port *ap = ata_shost_to_port(host);
+-	unsigned long flags;
+-	struct ata_queued_cmd *qc;
+-	enum blk_eh_timer_return ret;
 -
--	bh->b_bdev = iomap->bdev;
+-	DPRINTK("ENTER\n");
 -
--	/*
--	 * Block points to offset in file we need to map, iomap contains
--	 * the offset at which the map starts. If the map ends before the
--	 * current block, then do not map the buffer and let the caller
--	 * handle it.
--	 */
--	BUG_ON(offset >= iomap->offset + iomap->length);
--
--	switch (iomap->type) {
--	case IOMAP_HOLE:
--		/*
--		 * If the buffer is not up to date or beyond the current EOF,
--		 * we need to mark it as new to ensure sub-block zeroing is
--		 * executed if necessary.
--		 */
--		if (!buffer_uptodate(bh) ||
--		    (offset >= i_size_read(inode)))
--			set_buffer_new(bh);
--		break;
--	case IOMAP_DELALLOC:
--		if (!buffer_uptodate(bh) ||
--		    (offset >= i_size_read(inode)))
--			set_buffer_new(bh);
--		set_buffer_uptodate(bh);
--		set_buffer_mapped(bh);
--		set_buffer_delay(bh);
--		break;
--	case IOMAP_UNWRITTEN:
--		/*
--		 * For unwritten regions, we always need to ensure that
--		 * sub-block writes cause the regions in the block we are not
--		 * writing to are zeroed. Set the buffer as new to ensure this.
--		 */
--		set_buffer_new(bh);
--		set_buffer_unwritten(bh);
--		/* FALLTHRU */
--	case IOMAP_MAPPED:
--		if (offset >= i_size_read(inode))
--			set_buffer_new(bh);
--		bh->b_blocknr = (iomap->addr + offset - iomap->offset) >>
--				inode->i_blkbits;
--		set_buffer_mapped(bh);
--		break;
+-	if (ap->ops->error_handler) {
+-		ret = BLK_EH_NOT_HANDLED;
+-		goto out;
 -	}
--}
 -
--int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
--		get_block_t *get_block, struct iomap *iomap)
-+int __block_write_begin(struct page *page, loff_t pos, unsigned len,
-+		get_block_t *get_block)
+-	ret = BLK_EH_HANDLED;
+-	spin_lock_irqsave(ap->lock, flags);
+-	qc = ata_qc_from_tag(ap, ap->link.active_tag);
+-	if (qc) {
+-		WARN_ON(qc->scsicmd != cmd);
+-		qc->flags |= ATA_QCFLAG_EH_SCHEDULED;
+-		qc->err_mask |= AC_ERR_TIMEOUT;
+-		ret = BLK_EH_NOT_HANDLED;
+-	}
+-	spin_unlock_irqrestore(ap->lock, flags);
+-
+- out:
+-	DPRINTK("EXIT, ret=%d\n", ret);
+-	return ret;
+-}
+-EXPORT_SYMBOL(ata_scsi_timed_out);
+-
+ static void ata_eh_unload(struct ata_port *ap)
  {
- 	unsigned from = pos & (PAGE_SIZE - 1);
- 	unsigned to = from + len;
-@@ -1954,14 +1899,9 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
- 			clear_buffer_new(bh);
- 		if (!buffer_mapped(bh)) {
- 			WARN_ON(bh->b_size != blocksize);
--			if (get_block) {
--				err = get_block(inode, block, bh, 1);
--				if (err)
--					break;
--			} else {
--				iomap_to_bh(inode, block, bh, iomap);
--			}
--
-+			err = get_block(inode, block, bh, 1);
-+			if (err)
-+				break;
- 			if (buffer_new(bh)) {
- 				clean_bdev_bh_alias(bh);
- 				if (PageUptodate(page)) {
-@@ -2001,12 +1941,6 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
- 		page_zero_new_buffers(page, from, to);
- 	return err;
- }
--
--int __block_write_begin(struct page *page, loff_t pos, unsigned len,
--		get_block_t *get_block)
--{
--	return __block_write_begin_int(page, pos, len, get_block, NULL);
--}
- EXPORT_SYMBOL(__block_write_begin);
- 
- static int __block_commit_write(struct inode *inode, struct page *page,
-diff --git a/fs/internal.h b/fs/internal.h
-index b955232d3d49..47764f739075 100644
---- a/fs/internal.h
-+++ b/fs/internal.h
-@@ -41,8 +41,6 @@ static inline int __sync_blockdev(struct block_device *bdev, int wait)
-  * buffer.c
-  */
- extern void guard_bio_eod(int rw, struct bio *bio);
--extern int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
--		get_block_t *get_block, struct iomap *iomap);
- int __generic_write_end(struct inode *inode, loff_t pos, unsigned copied,
- 		struct page *page);
- 
+ 	struct ata_link *link;
+diff --git a/include/linux/libata.h b/include/linux/libata.h
+index 1795fecdea17..1c113134c98f 100644
+--- a/include/linux/libata.h
++++ b/include/linux/libata.h
+@@ -1133,7 +1133,6 @@ extern int ata_sas_port_start(struct ata_port *ap);
+ extern void ata_sas_port_stop(struct ata_port *ap);
+ extern int ata_sas_slave_configure(struct scsi_device *, struct ata_port *);
+ extern int ata_sas_queuecmd(struct scsi_cmnd *cmd, struct ata_port *ap);
+-extern enum blk_eh_timer_return ata_scsi_timed_out(struct scsi_cmnd *cmd);
+ extern int sata_scr_valid(struct ata_link *link);
+ extern int sata_scr_read(struct ata_link *link, int reg, u32 *val);
+ extern int sata_scr_write(struct ata_link *link, int reg, u32 val);
+@@ -1359,7 +1358,6 @@ extern struct device_attribute *ata_common_sdev_attrs[];
+ 	.proc_name		= drv_name,			\
+ 	.slave_configure	= ata_scsi_slave_config,	\
+ 	.slave_destroy		= ata_scsi_slave_destroy,	\
+-	.eh_timed_out		= ata_scsi_timed_out,		\
+ 	.bios_param		= ata_std_bios_param,		\
+ 	.unlock_native_capacity	= ata_scsi_unlock_native_capacity, \
+ 	.sdev_attrs		= ata_common_sdev_attrs
 -- 
 2.17.0
