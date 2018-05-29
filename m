@@ -1,44 +1,48 @@
-Return-Path: <BATV+1f4557cc97fec8e307c5+5393+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <BATV+a01a3e67072ae75c0352+5392+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: linux-nvme@lists.infradead.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 02/12] nvme.h: add the changed namespace list log
-Date: Wed, 30 May 2018 18:45:50 +0200
-Message-Id: <20180530164600.26856-3-hch@lst.de>
-In-Reply-To: <20180530164600.26856-1-hch@lst.de>
-References: <20180530164600.26856-1-hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Tejun Heo <tj@kernel.org>,
+	Lee Duncan <lduncan@suse.com>,
+	Chris Leech <cleech@redhat.com>,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Subject: [PATCH 02/14] blk-mq: Fix timeout and state order
+Date: Tue, 29 May 2018 15:52:27 +0200
+Message-Id: <20180529135239.27005-3-hch@lst.de>
+In-Reply-To: <20180529135239.27005-1-hch@lst.de>
+References: <20180529135239.27005-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- include/linux/nvme.h | 3 +++
- 1 file changed, 3 insertions(+)
+From: Keith Busch <keith.busch@intel.com>
 
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index c37103a4ad38..7ce0f3cf4409 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -751,6 +751,7 @@ enum {
- 	NVME_LOG_ERROR		= 0x01,
- 	NVME_LOG_SMART		= 0x02,
- 	NVME_LOG_FW_SLOT	= 0x03,
-+	NVME_LOG_CHANGED_NS	= 0x04,
- 	NVME_LOG_CMD_EFFECTS	= 0x05,
- 	NVME_LOG_DISC		= 0x70,
- 	NVME_LOG_RESERVATION	= 0x80,
-@@ -759,6 +760,8 @@ enum {
- 	NVME_FWACT_ACTV		= (2 << 3),
- };
+The block layer had been setting the state to in-flight prior to updating
+the timer. This is the wrong order since the timeout handler could observe
+the in-flight state with the older timeout, believing the request had
+expired when in fact it is just getting started.
+
+Signed-off-by: Keith Busch <keith.busch@intel.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+---
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index df928200b17e..3581a1e5c8a7 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -697,8 +697,8 @@ void blk_mq_start_request(struct request *rq)
+ 	preempt_disable();
+ 	write_seqcount_begin(&rq->gstate_seq);
  
-+#define NVME_MAX_CHANGED_NAMESPACES	1024
-+
- struct nvme_identify {
- 	__u8			opcode;
- 	__u8			flags;
+-	blk_mq_rq_update_state(rq, MQ_RQ_IN_FLIGHT);
+ 	blk_add_timer(rq);
++	blk_mq_rq_update_state(rq, MQ_RQ_IN_FLIGHT);
+ 
+ 	write_seqcount_end(&rq->gstate_seq);
+ 	preempt_enable();
 -- 
 2.17.0
