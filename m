@@ -1,137 +1,19 @@
-Return-Path: <BATV+67dfbb8f664e29ec4bbc+5394+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <damien.lemoal@wdc.com>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 4/6] block: move sysfs_lock into elevator_init
-Date: Thu, 31 May 2018 19:11:39 +0200
-Message-Id: <20180531171141.18478-5-hch@lst.de>
-In-Reply-To: <20180531171141.18478-1-hch@lst.de>
-References: <20180531171141.18478-1-hch@lst.de>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: [PATCH 10/12] nvme: mark nvme_queue_scan static
+To: Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+ Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org
+References: <20180530164600.26856-1-hch@lst.de>
+ <20180530164600.26856-11-hch@lst.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <1e8a139e-e525-6e53-77be-57f13d4bd514@grimberg.me>
+Date: Thu, 31 May 2018 00:31:45 +0300
+MIME-Version: 1.0
+In-Reply-To: <20180530164600.26856-11-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Both callers take just around so function call, so move it in.
-Also remove the now pointless blk_mq_sched_init wrapper.
+Looks good,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
-Tested-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/blk-core.c     | 10 +---------
- block/blk-mq-sched.c | 11 -----------
- block/blk-mq-sched.h |  2 --
- block/blk-mq.c       |  2 +-
- block/elevator.c     | 11 ++++++-----
- 5 files changed, 8 insertions(+), 28 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 18b691c93b63..cd573a33a6f3 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1175,16 +1175,8 @@ int blk_init_allocated_queue(struct request_queue *q)
- 
- 	q->sg_reserved_size = INT_MAX;
- 
--	/* Protect q->elevator from elevator_change */
--	mutex_lock(&q->sysfs_lock);
--
--	/* init elevator */
--	if (elevator_init(q)) {
--		mutex_unlock(&q->sysfs_lock);
-+	if (elevator_init(q))
- 		goto out_exit_flush_rq;
--	}
--
--	mutex_unlock(&q->sysfs_lock);
- 	return 0;
- 
- out_exit_flush_rq:
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index fd4f68d61df0..b1f06088cee5 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -647,14 +647,3 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
- 	blk_mq_sched_tags_teardown(q);
- 	q->elevator = NULL;
- }
--
--int blk_mq_sched_init(struct request_queue *q)
--{
--	int ret;
--
--	mutex_lock(&q->sysfs_lock);
--	ret = elevator_init(q);
--	mutex_unlock(&q->sysfs_lock);
--
--	return ret;
--}
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 1e9c9018ace1..0cb8f938dff9 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -33,8 +33,6 @@ int blk_mq_sched_init_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
- void blk_mq_sched_exit_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
- 			    unsigned int hctx_idx);
- 
--int blk_mq_sched_init(struct request_queue *q);
--
- static inline bool
- blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
- {
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3d3952301b3e..858d6edff4d3 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2573,7 +2573,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	if (!(set->flags & BLK_MQ_F_NO_SCHED)) {
- 		int ret;
- 
--		ret = blk_mq_sched_init(q);
-+		ret = elevator_init(q);
- 		if (ret)
- 			return ERR_PTR(ret);
- 	}
-diff --git a/block/elevator.c b/block/elevator.c
-index 9276540af2a1..d6480e70816e 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -202,16 +202,15 @@ static void elevator_release(struct kobject *kobj)
- int elevator_init(struct request_queue *q)
- {
- 	struct elevator_type *e = NULL;
--	int err;
-+	int err = 0;
- 
- 	/*
- 	 * q->sysfs_lock must be held to provide mutual exclusion between
- 	 * elevator_switch() and here.
- 	 */
--	lockdep_assert_held(&q->sysfs_lock);
--
-+	mutex_lock(&q->sysfs_lock);
- 	if (unlikely(q->elevator))
--		return 0;
-+		goto out_unlock;
- 
- 	/*
- 	 * Use the default elevator specified by config boot param for
-@@ -237,7 +236,7 @@ int elevator_init(struct request_queue *q)
- 			if (q->nr_hw_queues == 1)
- 				e = elevator_get(q, "mq-deadline", false);
- 			if (!e)
--				return 0;
-+				goto out_unlock;
- 		} else
- 			e = elevator_get(q, CONFIG_DEFAULT_IOSCHED, false);
- 
-@@ -255,6 +254,8 @@ int elevator_init(struct request_queue *q)
- 		err = e->ops.sq.elevator_init_fn(q, e);
- 	if (err)
- 		elevator_put(e);
-+out_unlock:
-+	mutex_unlock(&q->sysfs_lock);
- 	return err;
- }
- 
--- 
-2.17.0
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
