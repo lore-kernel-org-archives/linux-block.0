@@ -1,62 +1,101 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	filippo.muzzini@outlook.it,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX 3/3] block, bfq: remove the removal of 'next' rq in bfq_requests_merged
-Date: Thu, 31 May 2018 15:23:13 +0200
-Message-Id: <20180531132313.2986-4-paolo.valente@linaro.org>
-In-Reply-To: <20180531132313.2986-1-paolo.valente@linaro.org>
-References: <20180531132313.2986-1-paolo.valente@linaro.org>
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
+To: axboe@kernel.dk, osandov@osandov.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH V3 1/2] blk-mq: abstract out blk-mq-sched rq list iteration bio merge helper
+Date: Wed, 30 May 2018 15:26:07 +0800
+Message-Id: <1527665168-1965-2-git-send-email-jianchao.w.wang@oracle.com>
+In-Reply-To: <1527665168-1965-1-git-send-email-jianchao.w.wang@oracle.com>
+References: <1527665168-1965-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Filippo Muzzini <filippo.muzzini@outlook.it>
+From: Jens Axboe <axboe@kernel.dk>
 
-Since bfq_finish_request() is always called on the request 'next',
-after bfq_requests_merged() is finished, and bfq_finish_request()
-removes 'next' from its bfq_queue if needed, it isn't necessary to do
-such a removal in advance in bfq_merged_requests().
+No functional changes in this patch, just a prep patch for utilizing
+this in an IO scheduler.
 
-This commit removes such a useless 'next' removal.
-
-Signed-off-by: Filippo Muzzini <filippo.muzzini@outlook.it>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
 ---
- block/bfq-iosched.c | 7 -------
- 1 file changed, 7 deletions(-)
+ block/blk-mq-sched.c   | 34 ++++++++++++++++++++++++----------
+ include/linux/blk-mq.h |  3 ++-
+ 2 files changed, 26 insertions(+), 11 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index df2a9633cf4a..f71a5846b629 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -1897,8 +1897,6 @@ static void bfq_request_merged(struct request_queue *q, struct request *req,
-  * exploits this hook to address the following issue: if 'next' has a
-  * fifo_time lower that rq, then the fifo_time of rq must be set to
-  * the value of 'next', to not forget the greater age of 'next'.
-- * Moreover 'next' may be in a bfq_queue, in this case it must be
-- * removed.
-  *
-  * NOTE: in this function we assume that rq is in a bfq_queue, basing
-  * on that rq is picked from the hash table q->elevator->hash, which,
-@@ -1932,11 +1930,6 @@ static void bfq_requests_merged(struct request_queue *q, struct request *rq,
- 	if (bfqq->next_rq == next)
- 		bfqq->next_rq = rq;
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 25c14c5..b0f2c2a 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -268,19 +268,16 @@ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+ EXPORT_SYMBOL_GPL(blk_mq_sched_try_merge);
  
--	if (!RB_EMPTY_NODE(&next->rb_node)) {
--		bfq_remove_request(q, next);
--		bfqg_stats_update_io_remove(bfqq_group(bfqq), next->cmd_flags);
--	}
+ /*
+- * Reverse check our software queue for entries that we could potentially
+- * merge with. Currently includes a hand-wavy stop count of 8, to not spend
+- * too much time checking for merges.
++ * Iterate list of requests and see if we can merge this bio with any
++ * of them.
+  */
+-static bool blk_mq_attempt_merge(struct request_queue *q,
+-				 struct blk_mq_ctx *ctx, struct bio *bio)
++bool blk_mq_bio_list_merge(struct request_queue *q, struct list_head *list,
++			   struct bio *bio)
+ {
+ 	struct request *rq;
+ 	int checked = 8;
+ 
+-	lockdep_assert_held(&ctx->lock);
 -
- 	bfqg_stats_update_io_merged(bfqq_group(bfqq), next->cmd_flags);
- }
+-	list_for_each_entry_reverse(rq, &ctx->rq_list, queuelist) {
++	list_for_each_entry_reverse(rq, list, queuelist) {
+ 		bool merged = false;
  
+ 		if (!checked--)
+@@ -305,13 +302,30 @@ static bool blk_mq_attempt_merge(struct request_queue *q,
+ 			continue;
+ 		}
+ 
+-		if (merged)
+-			ctx->rq_merged++;
+ 		return merged;
+ 	}
+ 
+ 	return false;
+ }
++EXPORT_SYMBOL_GPL(blk_mq_bio_list_merge);
++
++/*
++ * Reverse check our software queue for entries that we could potentially
++ * merge with. Currently includes a hand-wavy stop count of 8, to not spend
++ * too much time checking for merges.
++ */
++static bool blk_mq_attempt_merge(struct request_queue *q,
++				 struct blk_mq_ctx *ctx, struct bio *bio)
++{
++	lockdep_assert_held(&ctx->lock);
++
++	if (blk_mq_bio_list_merge(q, &ctx->rq_list, bio)) {
++		ctx->rq_merged++;
++		return true;
++	}
++
++	return false;
++}
+ 
+ bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
+ {
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index ebc34a5..fb35517 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -259,7 +259,8 @@ void blk_mq_add_to_requeue_list(struct request *rq, bool at_head,
+ void blk_mq_kick_requeue_list(struct request_queue *q);
+ void blk_mq_delay_kick_requeue_list(struct request_queue *q, unsigned long msecs);
+ void blk_mq_complete_request(struct request *rq);
+-
++bool blk_mq_bio_list_merge(struct request_queue *q, struct list_head *list,
++			   struct bio *bio);
+ bool blk_mq_queue_stopped(struct request_queue *q);
+ void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx);
+ void blk_mq_start_hw_queue(struct blk_mq_hw_ctx *hctx);
 -- 
-2.16.1
+2.7.4
