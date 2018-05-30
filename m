@@ -1,39 +1,38 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	nbd@other.debian.org,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 1/5] block: fix MAINTAINERS email for nbd
-Date: Wed, 16 May 2018 14:36:01 -0400
-Message-Id: <20180516183605.16159-1-josef@toxicpanda.com>
+Return-Path: <BATV+1f4557cc97fec8e307c5+5393+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-nvme@lists.infradead.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	linux-block@vger.kernel.org
+Subject: nvme/nvmet AEN and log page fixups v2
+Date: Wed, 30 May 2018 18:45:48 +0200
+Message-Id: <20180530164600.26856-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Josef Bacik <jbacik@fb.com>
+Hi all,
 
-I've been missing stuff because it's been going into my work email which
-is a black hole.  Update to the email I actually use so I stop missing
-patches and bug reports.
+this series started as prep work for ANA, but has grown a lot.
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The idea is to make the AEN handling in the target closer to what
+the standard says, and implement the changed namespaces list log page,
+which is required to clear the namespace attribute notice event.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index df6e9bb2559a..10eca48b11b4 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -9700,7 +9700,7 @@ S:	Maintained
- F:	drivers/net/ethernet/netronome/
- 
- NETWORK BLOCK DEVICE (NBD)
--M:	Josef Bacik <jbacik@fb.com>
-+M:	Josef Bacik <josef@toxicpanda.com>
- S:	Maintained
- L:	linux-block@vger.kernel.org
- L:	nbd@other.debian.org
--- 
-2.14.3
+One the host side this just makes sure we actually have the events
+we handle enabled using Set Features, and it fixes the handling of
+the namespace attribute notice event so that it actually does get
+cleared by issuing the log page.
+
+Last but not last two block cleanups are thrown in so that we don't
+print a pointless message when we delete a namespaces, and also
+unexport the function printing said message as it should only be
+called from the core code.
+
+Changes from v1:
+ - don't copy garbage when more then 1024 namespaces changed
+ - filter out duplicates in the changed namespace list log page
+ - use the proper define for the supported events to initialize
+   OAES
+ - add the nvmet_aen_disabled helper from the ANA series
+ - allow the mandatory smart AENs in Set Features
