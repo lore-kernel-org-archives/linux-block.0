@@ -1,42 +1,59 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	nbd@other.debian.org,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 3/5] nbd: clear_sock on netlink disconnect
-Date: Wed, 16 May 2018 14:36:03 -0400
-Message-Id: <20180516183605.16159-3-josef@toxicpanda.com>
-In-Reply-To: <20180516183605.16159-1-josef@toxicpanda.com>
-References: <20180516183605.16159-1-josef@toxicpanda.com>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 30 May 2018 09:40:39 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Josef Bacik <josef@toxicpanda.com>
+Cc: axboe@kernel.dk, kernel-team@fb.com, linux-block@vger.kernel.org,
+	akpm@linux-foundation.org, linux-mm@kvack.org, hannes@cmpxchg.org,
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	Josef Bacik <jbacik@fb.com>
+Subject: Re: [PATCH 12/13] block: introduce blk-iolatency io controller
+Message-ID: <20180530164039.GP1351649@devbig577.frc2.facebook.com>
+References: <20180529211724.4531-1-josef@toxicpanda.com>
+ <20180529211724.4531-13-josef@toxicpanda.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180529211724.4531-13-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Josef Bacik <jbacik@fb.com>
+Hello,
 
-This is what the ioctl based nbd disconnect does as well.  Without this
-the device will just sit there and wait for the connection to go away
-(or IO to occur) before the device gets torn down.  Instead clear
-everything up on our end so the configuration goes away as quickly as
-possible.
+Just interface nits.
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- drivers/block/nbd.c | 1 +
- 1 file changed, 1 insertion(+)
+On Tue, May 29, 2018 at 05:17:23PM -0400, Josef Bacik wrote:
+...
+> +static size_t iolatency_pd_stat(struct blkg_policy_data *pd, char *buf,
+> +				size_t size)
+> +{
+> +	struct iolatency_grp *iolat = pd_to_lat(pd);
+> +	struct blkcg_gq *blkg = pd_to_blkg(pd);
+> +	unsigned use_delay = atomic_read(&blkg->use_delay);
+> +
+> +	if (!iolat->min_lat_nsec)
+> +		return 0;
+> +
+> +	return snprintf(buf, size,
+> +			" depth=%u delay=%llu use_delay=%u total_lat_avg=%llu",
+> +			iolat->rq_depth.max_depth,
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 7e83d6364b35..bc47bae9697a 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1765,6 +1765,7 @@ static int nbd_genl_disconnect(struct sk_buff *skb, struct genl_info *info)
- 	}
- 	mutex_lock(&nbd->config_lock);
- 	nbd_disconnect(nbd);
-+	nbd_clear_sock(nbd);
- 	mutex_unlock(&nbd->config_lock);
- 	if (test_and_clear_bit(NBD_HAS_CONFIG_REF,
- 			       &nbd->config->runtime_flags))
+Can we please use "max" as depth value when there is no restriction?
+
+> +			(unsigned long long)(use_delay ?
+> +				atomic64_read(&blkg->delay_nsec) /
+> +				NSEC_PER_USEC : 0),
+> +			use_delay,
+> +			(unsigned long long)iolat->total_lat_avg /
+> +			NSEC_PER_USEC);
+
+and "avg_lat".
+
+I'm a bit worried about exposing anything other than avg_lat given
+that they're inherently implementation details.  I think it might be a
+good idea to gate them behind a kernel boot param (which hopefully can
+be turned on/off while the system is running).
+
+Thanks.
+
 -- 
-2.14.3
+tejun
