@@ -1,61 +1,48 @@
-Return-Path: <BATV+a01a3e67072ae75c0352+5392+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>,
-	Lee Duncan <lduncan@suse.com>,
-	Chris Leech <cleech@redhat.com>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 14/14] blk-mq: simplify blk_mq_rq_timed_out
-Date: Tue, 29 May 2018 15:52:39 +0200
-Message-Id: <20180529135239.27005-15-hch@lst.de>
-In-Reply-To: <20180529135239.27005-1-hch@lst.de>
-References: <20180529135239.27005-1-hch@lst.de>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 30 May 2018 08:49:33 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Josef Bacik <josef@toxicpanda.com>
+Cc: axboe@kernel.dk, kernel-team@fb.com, linux-block@vger.kernel.org,
+	akpm@linux-foundation.org, linux-mm@kvack.org, hannes@cmpxchg.org,
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	Josef Bacik <jbacik@fb.com>
+Subject: Re: [PATCH 01/13] block: add bi_blkg to the bio for cgroups
+Message-ID: <20180530154933.GI1351649@devbig577.frc2.facebook.com>
+References: <20180529211724.4531-1-josef@toxicpanda.com>
+ <20180529211724.4531-2-josef@toxicpanda.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180529211724.4531-2-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq.c | 22 ++++++++--------------
- 1 file changed, 8 insertions(+), 14 deletions(-)
+On Tue, May 29, 2018 at 05:17:12PM -0400, Josef Bacik wrote:
+> From: Josef Bacik <jbacik@fb.com>
+> 
+> Currently io.low uses a bi_cg_private to stash its private data for the
+> blkg, however other blkcg policies may want to use this as well.  Since
+> we can get the private data out of the blkg, move this to bi_blkg in the
+> bio and make it generic, then we can use bio_associate_blkg() to attach
+> the blkg to the bio.
+> 
+> Theoretically we could simply replace the bi_css with this since we can
+> get to all the same information from the blkg, however you have to
+> lookup the blkg, so for example wbc_init_bio() would have to lookup and
+> possibly allocate the blkg for the css it was trying to attach to the
+> bio.  This could be problematic and result in us either not attaching
+> the css at all to the bio, or falling back to the root blkcg if we are
+> unable to allocate the corresponding blkg.
+> 
+> So for now do this, and in the future if possible we could just replace
+> the bi_css with bi_blkg and update the helpers to do the correct
+> translation.
+> 
+> Signed-off-by: Josef Bacik <jbacik@fb.com>
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d898de8841a0..ba6f30a67027 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -770,22 +770,16 @@ EXPORT_SYMBOL(blk_mq_tag_to_rq);
- 
- static void blk_mq_rq_timed_out(struct request *req, bool reserved)
- {
--	const struct blk_mq_ops *ops = req->q->mq_ops;
--	enum blk_eh_timer_return ret = BLK_EH_RESET_TIMER;
-+	if (req->q->mq_ops->timeout) {
-+		enum blk_eh_timer_return ret;
- 
--	if (ops->timeout)
--		ret = ops->timeout(req, reserved);
--
--	switch (ret) {
--	case BLK_EH_RESET_TIMER:
--		blk_add_timer(req);
--		break;
--	case BLK_EH_DONE:
--		break;
--	default:
--		printk(KERN_ERR "block: bad eh return: %d\n", ret);
--		break;
-+		ret = req->q->mq_ops->timeout(req, reserved);
-+		if (ret == BLK_EH_DONE)
-+			return;
-+		WARN_ON_ONCE(ret != BLK_EH_RESET_TIMER);
- 	}
-+
-+	blk_add_timer(req);
- }
- 
- static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
+Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
 -- 
-2.17.0
+tejun
