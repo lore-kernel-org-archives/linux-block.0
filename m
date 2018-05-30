@@ -1,157 +1,33 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: osandov@fb.com,
-	efault@gmx.de,
-	paolo.valente@linaro.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 3/7] bfq: calculate shallow depths at init time
-Date: Wed,  9 May 2018 14:49:23 -0600
-Message-Id: <1525898967-13425-4-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1525898967-13425-1-git-send-email-axboe@kernel.dk>
-References: <1525898967-13425-1-git-send-email-axboe@kernel.dk>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 30 May 2018 09:31:18 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Josef Bacik <josef@toxicpanda.com>
+Cc: axboe@kernel.dk, kernel-team@fb.com, linux-block@vger.kernel.org,
+	akpm@linux-foundation.org, linux-mm@kvack.org, hannes@cmpxchg.org,
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	Josef Bacik <jbacik@fb.com>
+Subject: Re: [PATCH 08/13] blk-stat: export helpers for modifying blk_rq_stat
+Message-ID: <20180530163118.GO1351649@devbig577.frc2.facebook.com>
+References: <20180529211724.4531-1-josef@toxicpanda.com>
+ <20180529211724.4531-9-josef@toxicpanda.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180529211724.4531-9-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-It doesn't change, so don't put it in the per-IO hot path.
+On Tue, May 29, 2018 at 05:17:19PM -0400, Josef Bacik wrote:
+> From: Josef Bacik <jbacik@fb.com>
+> 
+> We need to use blk_rq_stat in the blkcg qos stuff, so export some of
+> these helpers so they can be used by other things.
+> 
+> Signed-off-by: Josef Bacik <jbacik@fb.com>
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/bfq-iosched.c | 97 +++++++++++++++++++++++++++--------------------------
- 1 file changed, 50 insertions(+), 47 deletions(-)
+Acked-by: Tejun Heo <tj@kernel.org>
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 246ae25a5f34..b7722668e295 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -487,46 +487,6 @@ static struct request *bfq_choose_req(struct bfq_data *bfqd,
- }
- 
- /*
-- * See the comments on bfq_limit_depth for the purpose of
-- * the depths set in the function.
-- */
--static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
--{
--	bfqd->sb_shift = bt->sb.shift;
--
--	/*
--	 * In-word depths if no bfq_queue is being weight-raised:
--	 * leaving 25% of tags only for sync reads.
--	 *
--	 * In next formulas, right-shift the value
--	 * (1U<<bfqd->sb_shift), instead of computing directly
--	 * (1U<<(bfqd->sb_shift - something)), to be robust against
--	 * any possible value of bfqd->sb_shift, without having to
--	 * limit 'something'.
--	 */
--	/* no more than 50% of tags for async I/O */
--	bfqd->word_depths[0][0] = max((1U<<bfqd->sb_shift)>>1, 1U);
--	/*
--	 * no more than 75% of tags for sync writes (25% extra tags
--	 * w.r.t. async I/O, to prevent async I/O from starving sync
--	 * writes)
--	 */
--	bfqd->word_depths[0][1] = max(((1U<<bfqd->sb_shift) * 3)>>2, 1U);
--
--	/*
--	 * In-word depths in case some bfq_queue is being weight-
--	 * raised: leaving ~63% of tags for sync reads. This is the
--	 * highest percentage for which, in our tests, application
--	 * start-up times didn't suffer from any regression due to tag
--	 * shortage.
--	 */
--	/* no more than ~18% of tags for async I/O */
--	bfqd->word_depths[1][0] = max(((1U<<bfqd->sb_shift) * 3)>>4, 1U);
--	/* no more than ~37% of tags for sync writes (~20% extra tags) */
--	bfqd->word_depths[1][1] = max(((1U<<bfqd->sb_shift) * 6)>>4, 1U);
--}
--
--/*
-  * Async I/O can easily starve sync I/O (both sync reads and sync
-  * writes), by consuming all tags. Similarly, storms of sync writes,
-  * such as those that sync(2) may trigger, can starve sync reads.
-@@ -535,18 +495,11 @@ static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
-  */
- static void bfq_limit_depth(unsigned int op, struct blk_mq_alloc_data *data)
- {
--	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
- 	struct bfq_data *bfqd = data->q->elevator->elevator_data;
--	struct sbitmap_queue *bt;
- 
- 	if (op_is_sync(op) && !op_is_write(op))
- 		return;
- 
--	bt = &tags->bitmap_tags;
--
--	if (unlikely(bfqd->sb_shift != bt->sb.shift))
--		bfq_update_depths(bfqd, bt);
--
- 	data->shallow_depth =
- 		bfqd->word_depths[!!bfqd->wr_busy_queues][op_is_sync(op)];
- 
-@@ -5098,6 +5051,55 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
- 	__bfq_put_async_bfqq(bfqd, &bfqg->async_idle_bfqq);
- }
- 
-+/*
-+ * See the comments on bfq_limit_depth for the purpose of
-+ * the depths set in the function.
-+ */
-+static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
-+{
-+	bfqd->sb_shift = bt->sb.shift;
-+
-+	/*
-+	 * In-word depths if no bfq_queue is being weight-raised:
-+	 * leaving 25% of tags only for sync reads.
-+	 *
-+	 * In next formulas, right-shift the value
-+	 * (1U<<bfqd->sb_shift), instead of computing directly
-+	 * (1U<<(bfqd->sb_shift - something)), to be robust against
-+	 * any possible value of bfqd->sb_shift, without having to
-+	 * limit 'something'.
-+	 */
-+	/* no more than 50% of tags for async I/O */
-+	bfqd->word_depths[0][0] = max((1U<<bfqd->sb_shift)>>1, 1U);
-+	/*
-+	 * no more than 75% of tags for sync writes (25% extra tags
-+	 * w.r.t. async I/O, to prevent async I/O from starving sync
-+	 * writes)
-+	 */
-+	bfqd->word_depths[0][1] = max(((1U<<bfqd->sb_shift) * 3)>>2, 1U);
-+
-+	/*
-+	 * In-word depths in case some bfq_queue is being weight-
-+	 * raised: leaving ~63% of tags for sync reads. This is the
-+	 * highest percentage for which, in our tests, application
-+	 * start-up times didn't suffer from any regression due to tag
-+	 * shortage.
-+	 */
-+	/* no more than ~18% of tags for async I/O */
-+	bfqd->word_depths[1][0] = max(((1U<<bfqd->sb_shift) * 3)>>4, 1U);
-+	/* no more than ~37% of tags for sync writes (~20% extra tags) */
-+	bfqd->word_depths[1][1] = max(((1U<<bfqd->sb_shift) * 6)>>4, 1U);
-+}
-+
-+static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
-+{
-+	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
-+	struct blk_mq_tags *tags = hctx->sched_tags;
-+
-+	bfq_update_depths(bfqd, &tags->bitmap_tags);
-+	return 0;
-+}
-+
- static void bfq_exit_queue(struct elevator_queue *e)
- {
- 	struct bfq_data *bfqd = e->elevator_data;
-@@ -5519,6 +5521,7 @@ static struct elevator_type iosched_bfq_mq = {
- 		.requests_merged	= bfq_requests_merged,
- 		.request_merged		= bfq_request_merged,
- 		.has_work		= bfq_has_work,
-+		.init_hctx		= bfq_init_hctx,
- 		.init_sched		= bfq_init_queue,
- 		.exit_sched		= bfq_exit_queue,
- 	},
+Thanks.
+
 -- 
-2.7.4
+tejun
