@@ -1,63 +1,57 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [RESEND PATCH V5 30/33] block: enable multipage bvecs
-Date: Fri, 25 May 2018 11:46:18 +0800
-Message-Id: <20180525034621.31147-31-ming.lei@redhat.com>
-In-Reply-To: <20180525034621.31147-1-ming.lei@redhat.com>
-References: <20180525034621.31147-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <msnitzer@redhat.com>
+Date: Wed, 30 May 2018 15:27:48 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Kent Overstreet <kent.overstreet@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	axboe@kernel.dk, hch@infradead.org, colyli@suse.de,
+	darrick.wong@oracle.com, clm@fb.com, bacik@fb.com,
+	linux-xfs@vger.kernel.org, drbd-dev@lists.linbit.com,
+	linux-btrfs@vger.kernel.org, linux-raid@vger.kernel.org,
+	neilb@suse.com
+Subject: Re: [PATCH 07/12] dm: convert to bioset_init()/mempool_init()
+Message-ID: <20180530192747.GA6568@redhat.com>
+References: <20180520222558.7053-1-kent.overstreet@gmail.com>
+ <20180520222558.7053-8-kent.overstreet@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180520222558.7053-8-kent.overstreet@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch pulls the trigger for multipage bvecs.
+On Sun, May 20 2018 at  6:25pm -0400,
+Kent Overstreet <kent.overstreet@gmail.com> wrote:
 
-Now any request queue which supports queue cluster will see multipage
-bvecs.
+> Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
+> ---
+>  drivers/md/dm-bio-prison-v1.c      | 13 ++++---
+>  drivers/md/dm-bio-prison-v2.c      | 13 ++++---
+>  drivers/md/dm-cache-target.c       | 25 ++++++-------
+>  drivers/md/dm-core.h               |  4 +-
+>  drivers/md/dm-crypt.c              | 60 ++++++++++++++----------------
+>  drivers/md/dm-integrity.c          | 15 ++++----
+>  drivers/md/dm-io.c                 | 29 ++++++++-------
+>  drivers/md/dm-kcopyd.c             | 22 ++++++-----
+>  drivers/md/dm-log-userspace-base.c | 19 +++++-----
+>  drivers/md/dm-region-hash.c        | 23 ++++++------
+>  drivers/md/dm-rq.c                 |  2 +-
+>  drivers/md/dm-snap.c               | 17 ++++-----
+>  drivers/md/dm-thin.c               | 32 ++++++++--------
+>  drivers/md/dm-verity-fec.c         | 55 +++++++++++++--------------
+>  drivers/md/dm-verity-fec.h         |  8 ++--
+>  drivers/md/dm-zoned-target.c       | 13 +++----
+>  drivers/md/dm.c                    | 53 ++++++++++++--------------
+>  17 files changed, 197 insertions(+), 206 deletions(-)
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bio.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+In general I think each of these driver patches in the series needs a
+one-line summary in the description, e.g.:
+Embed bioset and mempool_t to avoid pointer indirection in the fast IO path.
 
-diff --git a/block/bio.c b/block/bio.c
-index c160c143cc1b..bc3992f52fe8 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -876,6 +876,11 @@ int bio_add_page(struct bio *bio, struct page *page,
- 	 * a consecutive offset.  Optimize this special case.
- 	 */
- 	if (bio->bi_vcnt > 0) {
-+		struct request_queue *q = NULL;
-+
-+		if (bio->bi_disk)
-+			q = bio->bi_disk->queue;
-+
- 		bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
- 
- 		if (page == bv->bv_page &&
-@@ -883,6 +888,14 @@ int bio_add_page(struct bio *bio, struct page *page,
- 			bv->bv_len += len;
- 			goto done;
- 		}
-+
-+		/* disable multipage bvec too if cluster isn't enabled */
-+		if (q && blk_queue_cluster(q) &&
-+		    (bvec_to_phys(bv) + bv->bv_len ==
-+		     page_to_phys(page) + offset)) {
-+			bv->bv_len += len;
-+			goto done;
-+		}
- 	}
- 
- 	if (bio->bi_vcnt >= bio->bi_max_vecs)
--- 
-2.9.5
+But that aside, on a code level, I had to double check bioset_exit() is
+safe to call even if bioset_init() failed.  AFter confirming it is (and
+double checking by chatting with Kent) I like how the code is simpler
+(not having to check if the bioset is set before calling it).
+
+Nice job Kent, like you said: mostly mechnical.  But even the changes
+that weren't purely mechnical (e.g. passing r to ERR_PTR, rather than
+using old hardcode) were fixed up nicely.
+
+Acked-by: Mike Snitzer <snitzer@redhat.com>
