@@ -1,18 +1,20 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+Date: Wed, 30 May 2018 13:28:51 -0400
+From: Josef Bacik <josef@toxicpanda.com>
+To: kvigor@gmail.com
+Cc: linux-block@vger.kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+	Kevin Vigor <kvigor@fb.com>
 Subject: Re: [PATCH] nbd: clear DISCONNECT_REQUESTED flag once disconnection
  occurs.
-To: kvigor@gmail.com, linux-block@vger.kernel.org
-Cc: josef@toxicpanda.com, Kevin Vigor <kvigor@fb.com>
+Message-ID: <20180530172850.a2cqzrl6rltlxmni@destiny>
 References: <1527698711-14919-1-git-send-email-kvigor@gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <1b462c26-1a10-58b8-8459-9d9fa3fb4413@kernel.dk>
-Date: Wed, 30 May 2018 11:31:05 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <1527698711-14919-1-git-send-email-kvigor@gmail.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 5/30/18 10:45 AM, kvigor@gmail.com wrote:
+On Wed, May 30, 2018 at 10:45:11AM -0600, kvigor@gmail.com wrote:
 > From: Kevin Vigor <kvigor@fb.com>
 > 
 > When a userspace client requests a NBD device be disconnected, the
@@ -26,8 +28,17 @@ On 5/30/18 10:45 AM, kvigor@gmail.com wrote:
 > 
 > Fix by clearing the DISCONNECT_REQUESTED flag (and setting the
 > DISCONNECTED flag) once all connections are closed.
+> 
+> Changes relative to v1 (https://marc.info/?l=linux-block&m=152763540418902):
+> 
+> * remove pointless wake_up() -> wake_up_all() change.
+> 
 
-Applied, thanks Kevin.
+Usually you want to put the changelog after the --- bit below so we can all see
+it but it doesn't end up in the git changelog.
 
--- 
-Jens Axboe
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+
+Thanks,
+
+Josef
