@@ -1,24 +1,28 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+Date: Wed, 30 May 2018 13:27:32 -0400
+From: Josef Bacik <josef@toxicpanda.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, keith.busch@intel.com, josef@toxicpanda.com,
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
 Subject: Re: [PATCH] blk-mq: only iterate over inflight requests in
  blk_mq_tagset_busy_iter
-To: Christoph Hellwig <hch@lst.de>
-Cc: keith.busch@intel.com, josef@toxicpanda.com, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org
+Message-ID: <20180530172731.md54u3wuri3qmfbv@destiny>
 References: <20180530165100.31186-1-hch@lst.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <4c37d268-7676-03ad-2276-d6dcd25b8d8c@kernel.dk>
-Date: Wed, 30 May 2018 11:32:09 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180530165100.31186-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 5/30/18 10:51 AM, Christoph Hellwig wrote:
+On Wed, May 30, 2018 at 06:51:00PM +0200, Christoph Hellwig wrote:
 > We already check for started commands in all callbacks, but we should
 > also protect against already completed commands.  Do this by taking
 > the checks to common code.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Looks good, applied.
+Acked-by: Josef Bacik <josef@toxicpanda.com>
 
--- 
-Jens Axboe
+for the nbd portion.  Thanks,
+
+Josef
