@@ -1,22 +1,56 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
-Subject: Re: [PATCH 04/12] nvmet: add a new nvmet_zero_sgl helper
-To: Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
- Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org
+Return-Path: <BATV+1f4557cc97fec8e307c5+5393+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-nvme@lists.infradead.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	linux-block@vger.kernel.org
+Subject: [PATCH 04/12] nvmet: add a new nvmet_zero_sgl helper
+Date: Wed, 30 May 2018 18:45:52 +0200
+Message-Id: <20180530164600.26856-5-hch@lst.de>
+In-Reply-To: <20180530164600.26856-1-hch@lst.de>
 References: <20180530164600.26856-1-hch@lst.de>
- <20180530164600.26856-5-hch@lst.de>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <5f65f72b-682d-e08b-6bbb-4863b868313c@grimberg.me>
-Date: Thu, 31 May 2018 00:24:21 +0300
-MIME-Version: 1.0
-In-Reply-To: <20180530164600.26856-5-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
+Zeroes the SGL in the payload.
 
-> +u16 nvmet_zero_sgl(struct nvmet_req *req, off_t off, size_t len)
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ drivers/nvme/target/core.c  | 7 +++++++
+ drivers/nvme/target/nvmet.h | 1 +
+ 2 files changed, 8 insertions(+)
 
-Would personally prefer nvmet_clear_sgl, but not hard headed on it,
-
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
+index 800aaf96ddcd..55c4bc693aa2 100644
+--- a/drivers/nvme/target/core.c
++++ b/drivers/nvme/target/core.c
+@@ -57,6 +57,13 @@ u16 nvmet_copy_from_sgl(struct nvmet_req *req, off_t off, void *buf, size_t len)
+ 	return 0;
+ }
+ 
++u16 nvmet_zero_sgl(struct nvmet_req *req, off_t off, size_t len)
++{
++	if (sg_zero_buffer(req->sg, req->sg_cnt, len, off) != len)
++		return NVME_SC_SGL_INVALID_DATA | NVME_SC_DNR;
++	return 0;
++}
++
+ static unsigned int nvmet_max_nsid(struct nvmet_subsys *subsys)
+ {
+ 	struct nvmet_ns *ns;
+diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+index 32ebffcf464c..768abe203298 100644
+--- a/drivers/nvme/target/nvmet.h
++++ b/drivers/nvme/target/nvmet.h
+@@ -330,6 +330,7 @@ u16 nvmet_copy_to_sgl(struct nvmet_req *req, off_t off, const void *buf,
+ 		size_t len);
+ u16 nvmet_copy_from_sgl(struct nvmet_req *req, off_t off, void *buf,
+ 		size_t len);
++u16 nvmet_zero_sgl(struct nvmet_req *req, off_t off, size_t len);
+ 
+ u32 nvmet_get_log_page_len(struct nvme_command *cmd);
+ 
+-- 
+2.17.0
