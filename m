@@ -1,141 +1,22 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	sapienza.dav@gmail.com,
-	177992@studenti.unimore.it,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENTS 1/4] block, bfq: add description of weight-raising heuristics
-Date: Thu, 31 May 2018 16:45:05 +0200
-Message-Id: <20180531144508.3927-2-paolo.valente@linaro.org>
-In-Reply-To: <20180531144508.3927-1-paolo.valente@linaro.org>
-References: <20180531144508.3927-1-paolo.valente@linaro.org>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: [PATCH 04/12] nvmet: add a new nvmet_zero_sgl helper
+To: Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+ Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org
+References: <20180530164600.26856-1-hch@lst.de>
+ <20180530164600.26856-5-hch@lst.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <5f65f72b-682d-e08b-6bbb-4863b868313c@grimberg.me>
+Date: Thu, 31 May 2018 00:24:21 +0300
+MIME-Version: 1.0
+In-Reply-To: <20180530164600.26856-5-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-A description of how weight raising works is missing in BFQ
-sources. In addition, the code for handling weight raising is
-scattered across a few functions. This makes it rather hard to
-understand the mechanism and its rationale. This commits adds such a
-description at the beginning of the main source file.
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 80 +++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 56 insertions(+), 24 deletions(-)
+> +u16 nvmet_zero_sgl(struct nvmet_req *req, off_t off, size_t len)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index f71a5846b629..f3703e7431aa 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -49,9 +49,39 @@
-  *
-  * In particular, to provide these low-latency guarantees, BFQ
-  * explicitly privileges the I/O of two classes of time-sensitive
-- * applications: interactive and soft real-time. This feature enables
-- * BFQ to provide applications in these classes with a very low
-- * latency. Finally, BFQ also features additional heuristics for
-+ * applications: interactive and soft real-time. In more detail, BFQ
-+ * behaves this way if the low_latency parameter is set (default
-+ * configuration). This feature enables BFQ to provide applications in
-+ * these classes with a very low latency.
-+ *
-+ * To implement this feature, BFQ constantly tries to detect whether
-+ * the I/O requests in a bfq_queue come from an interactive or a soft
-+ * real-time application. For brevity, in these cases, the queue is
-+ * said to be interactive or soft real-time. In both cases, BFQ
-+ * privileges the service of the queue, over that of non-interactive
-+ * and non-soft-real-time queues. This privileging is performed,
-+ * mainly, by raising the weight of the queue. So, for brevity, we
-+ * call just weight-raising periods the time periods during which a
-+ * queue is privileged, because deemed interactive or soft real-time.
-+ *
-+ * The detection of soft real-time queues/applications is described in
-+ * detail in the comments on the function
-+ * bfq_bfqq_softrt_next_start. On the other hand, the detection of an
-+ * interactive queue works as follows: a queue is deemed interactive
-+ * if it is constantly non empty only for a limited time interval,
-+ * after which it does become empty. The queue may be deemed
-+ * interactive again (for a limited time), if it restarts being
-+ * constantly non empty, provided that this happens only after the
-+ * queue has remained empty for a given minimum idle time.
-+ *
-+ * By default, BFQ computes automatically the above maximum time
-+ * interval, i.e., the time interval after which a constantly
-+ * non-empty queue stops being deemed interactive. Since a queue is
-+ * weight-raised while it is deemed interactive, this maximum time
-+ * interval happens to coincide with the (maximum) duration of the
-+ * weight-raising for interactive queues.
-+ *
-+ * Finally, BFQ also features additional heuristics for
-  * preserving both a low latency and a high throughput on NCQ-capable,
-  * rotational or flash-based devices, and to get the job done quickly
-  * for applications consisting in many I/O-bound processes.
-@@ -61,14 +91,14 @@
-  * all low-latency heuristics for that device, by setting low_latency
-  * to 0.
-  *
-- * BFQ is described in [1], where also a reference to the initial, more
-- * theoretical paper on BFQ can be found. The interested reader can find
-- * in the latter paper full details on the main algorithm, as well as
-- * formulas of the guarantees and formal proofs of all the properties.
-- * With respect to the version of BFQ presented in these papers, this
-- * implementation adds a few more heuristics, such as the one that
-- * guarantees a low latency to soft real-time applications, and a
-- * hierarchical extension based on H-WF2Q+.
-+ * BFQ is described in [1], where also a reference to the initial,
-+ * more theoretical paper on BFQ can be found. The interested reader
-+ * can find in the latter paper full details on the main algorithm, as
-+ * well as formulas of the guarantees and formal proofs of all the
-+ * properties.  With respect to the version of BFQ presented in these
-+ * papers, this implementation adds a few more heuristics, such as the
-+ * ones that guarantee a low latency to interactive and soft real-time
-+ * applications, and a hierarchical extension based on H-WF2Q+.
-  *
-  * B-WF2Q+ is based on WF2Q+, which is described in [2], together with
-  * H-WF2Q+, while the augmented tree used here to implement B-WF2Q+
-@@ -218,21 +248,23 @@ static struct kmem_cache *bfq_pool;
- #define BFQ_RATE_SHIFT		16
- 
- /*
-- * By default, BFQ computes the duration of the weight raising for
-- * interactive applications automatically, using the following formula:
-- * duration = (R / r) * T, where r is the peak rate of the device, and
-- * R and T are two reference parameters.
-- * In particular, R is the peak rate of the reference device (see
-- * below), and T is a reference time: given the systems that are
-- * likely to be installed on the reference device according to its
-- * speed class, T is about the maximum time needed, under BFQ and
-+ * When configured for computing the duration of the weight-raising
-+ * for interactive queues automatically (see the comments at the
-+ * beginning of this file), BFQ does it using the following formula:
-+ * duration = (R / r) * T,
-+ * where r is the peak rate of the device, and R
-+ * and T are two reference parameters.	In particular,
-+ * R is the peak rate of the reference device (see below), and
-+ * T is a reference time: given the systems that are likely
-+ * to be installed on the reference device according to its speed
-+ * class, T is about the maximum time needed, under BFQ and
-  * while reading two files in parallel, to load typical large
-  * applications on these systems (see the comments on
-- * max_service_from_wr below, for more details on how T is obtained).
-- * In practice, the slower/faster the device at hand is, the more/less
-- * it takes to load applications with respect to the reference device.
-- * Accordingly, the longer/shorter BFQ grants weight raising to
-- * interactive applications.
-+ * max_service_from_wr below, for more details on how T is
-+ * obtained).  In practice, the slower/faster the device at hand is,
-+ * the more/less it takes to load applications with respect to the
-+ * reference device.  Accordingly, the longer/shorter BFQ grants
-+ * weight raising to interactive applications.
-  *
-  * BFQ uses four different reference pairs (R, T), depending on:
-  * . whether the device is rotational or non-rotational;
--- 
-2.16.1
+Would personally prefer nvmet_clear_sgl, but not hard headed on it,
+
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
