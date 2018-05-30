@@ -1,117 +1,83 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	axboe@kernel.dk,
-	hch@infradead.org,
-	colyli@suse.de,
-	snitzer@redhat.com,
-	darrick.wong@oracle.com,
-	clm@fb.com,
-	bacik@fb.com,
-	linux-xfs@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	linux-btrfs@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	neilb@suse.com
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Subject: [PATCH 10/12] btrfs: convert to bioset_init()/mempool_init()
-Date: Sun, 20 May 2018 18:25:56 -0400
-Message-Id: <20180520222558.7053-11-kent.overstreet@gmail.com>
-In-Reply-To: <20180520222558.7053-1-kent.overstreet@gmail.com>
-References: <20180520222558.7053-1-kent.overstreet@gmail.com>
+Return-Path: <hannes@cmpxchg.org>
+Date: Wed, 30 May 2018 10:15:33 -0400
+From: Johannes Weiner <hannes@cmpxchg.org>
+To: Josef Bacik <josef@toxicpanda.com>
+Cc: axboe@kernel.dk, kernel-team@fb.com, linux-block@vger.kernel.org,
+	akpm@linux-foundation.org, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, tj@kernel.org,
+	linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 07/13] memcontrol: schedule throttling if we are congested
+Message-ID: <20180530141533.GC4035@cmpxchg.org>
+References: <20180529211724.4531-1-josef@toxicpanda.com>
+ <20180529211724.4531-8-josef@toxicpanda.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180529211724.4531-8-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
----
- fs/btrfs/extent_io.c | 25 +++++++++++--------------
- 1 file changed, 11 insertions(+), 14 deletions(-)
+On Tue, May 29, 2018 at 05:17:18PM -0400, Josef Bacik wrote:
+> @@ -5458,6 +5458,30 @@ int mem_cgroup_try_charge(struct page *page, struct mm_struct *mm,
+>  	return ret;
+>  }
+>  
+> +int mem_cgroup_try_charge_delay(struct page *page, struct mm_struct *mm,
+> +			  gfp_t gfp_mask, struct mem_cgroup **memcgp,
+> +			  bool compound)
+> +{
+> +	struct mem_cgroup *memcg;
+> +	struct block_device *bdev;
+> +	int ret;
+> +
+> +	ret = mem_cgroup_try_charge(page, mm, gfp_mask, memcgp, compound);
+> +	memcg = *memcgp;
+> +
+> +	if (!(gfp_mask & __GFP_IO) || !memcg)
+> +		return ret;
+> +#if defined(CONFIG_BLOCK) && defined(CONFIG_SWAP)
+> +	if (atomic_read(&memcg->css.cgroup->congestion_count) &&
+> +	    has_usable_swap()) {
+> +		map_swap_page(page, &bdev);
 
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index e99b329002..56d32bb462 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -26,7 +26,7 @@
- 
- static struct kmem_cache *extent_state_cache;
- static struct kmem_cache *extent_buffer_cache;
--static struct bio_set *btrfs_bioset;
-+static struct bio_set btrfs_bioset;
- 
- static inline bool extent_state_in_tree(const struct extent_state *state)
- {
-@@ -162,20 +162,18 @@ int __init extent_io_init(void)
- 	if (!extent_buffer_cache)
- 		goto free_state_cache;
- 
--	btrfs_bioset = bioset_create(BIO_POOL_SIZE,
--				     offsetof(struct btrfs_io_bio, bio),
--				     BIOSET_NEED_BVECS);
--	if (!btrfs_bioset)
-+	if (bioset_init(&btrfs_bioset, BIO_POOL_SIZE,
-+			offsetof(struct btrfs_io_bio, bio),
-+			BIOSET_NEED_BVECS))
- 		goto free_buffer_cache;
- 
--	if (bioset_integrity_create(btrfs_bioset, BIO_POOL_SIZE))
-+	if (bioset_integrity_create(&btrfs_bioset, BIO_POOL_SIZE))
- 		goto free_bioset;
- 
- 	return 0;
- 
- free_bioset:
--	bioset_free(btrfs_bioset);
--	btrfs_bioset = NULL;
-+	bioset_exit(&btrfs_bioset);
- 
- free_buffer_cache:
- 	kmem_cache_destroy(extent_buffer_cache);
-@@ -198,8 +196,7 @@ void __cold extent_io_exit(void)
- 	rcu_barrier();
- 	kmem_cache_destroy(extent_state_cache);
- 	kmem_cache_destroy(extent_buffer_cache);
--	if (btrfs_bioset)
--		bioset_free(btrfs_bioset);
-+	bioset_exit(&btrfs_bioset);
- }
- 
- void extent_io_tree_init(struct extent_io_tree *tree,
-@@ -2679,7 +2676,7 @@ struct bio *btrfs_bio_alloc(struct block_device *bdev, u64 first_byte)
- {
- 	struct bio *bio;
- 
--	bio = bio_alloc_bioset(GFP_NOFS, BIO_MAX_PAGES, btrfs_bioset);
-+	bio = bio_alloc_bioset(GFP_NOFS, BIO_MAX_PAGES, &btrfs_bioset);
- 	bio_set_dev(bio, bdev);
- 	bio->bi_iter.bi_sector = first_byte >> 9;
- 	btrfs_io_bio_init(btrfs_io_bio(bio));
-@@ -2692,7 +2689,7 @@ struct bio *btrfs_bio_clone(struct bio *bio)
- 	struct bio *new;
- 
- 	/* Bio allocation backed by a bioset does not fail */
--	new = bio_clone_fast(bio, GFP_NOFS, btrfs_bioset);
-+	new = bio_clone_fast(bio, GFP_NOFS, &btrfs_bioset);
- 	btrfs_bio = btrfs_io_bio(new);
- 	btrfs_io_bio_init(btrfs_bio);
- 	btrfs_bio->iter = bio->bi_iter;
-@@ -2704,7 +2701,7 @@ struct bio *btrfs_io_bio_alloc(unsigned int nr_iovecs)
- 	struct bio *bio;
- 
- 	/* Bio allocation backed by a bioset does not fail */
--	bio = bio_alloc_bioset(GFP_NOFS, nr_iovecs, btrfs_bioset);
-+	bio = bio_alloc_bioset(GFP_NOFS, nr_iovecs, &btrfs_bioset);
- 	btrfs_io_bio_init(btrfs_io_bio(bio));
- 	return bio;
- }
-@@ -2715,7 +2712,7 @@ struct bio *btrfs_bio_clone_partial(struct bio *orig, int offset, int size)
- 	struct btrfs_io_bio *btrfs_bio;
- 
- 	/* this will never fail when it's backed by a bioset */
--	bio = bio_clone_fast(orig, GFP_NOFS, btrfs_bioset);
-+	bio = bio_clone_fast(orig, GFP_NOFS, &btrfs_bioset);
- 	ASSERT(bio);
- 
- 	btrfs_bio = btrfs_io_bio(bio);
--- 
-2.17.0
+This doesn't work, unfortunately - or only works on accident.
+
+It goes through page_private(), which is only valid for pages in the
+swapcache. The newly allocated pages you call it against aren't in the
+swapcache, but their page_private() is 0, which is incorrectly
+interpreted as "first swap slot on the first swap device" - which
+happens to make sense if you have only one swap device.
+
+> +		blkcg_schedule_throttle(bdev_get_queue(bdev), true);
+
+By the time we allocate, we simply cannot know which swap device the
+page will end up on. However, we know what's likely: swap_avail_heads
+is sorted by order in which we try to allocate swap slots; the first
+device on there is where swap io will go. If we walk this list and
+throttle on the first device that has built-up delay debt, we'll
+throttle against the device that probably gets the current bulk of the
+swap writes.
+
+Also, if we have two swap devices with the same priority, swap
+allocation will re-order the list for us automatically in order to do
+round-robin loading of the devices. See get_swap_pages(). That should
+work out nicely for throttling as well.
+
+You can use page_to_nid() on the newly allocated page to index into
+swap_avail_heads[].
+
+On an unrelated note, mem_cgroup_try_charge_delay() isn't the most
+descriptive name. Since it's not too page specific, we might want to
+move the throttling part out of the charge function and do something
+simliar to a stand-alone balance_dirty_pages() function.
+
+mem_cgroup_balance_anon_pages()?
+
+mem_cgroup_throttle_swaprate()?
+
+mem_cgroup_anon_throttle()?
+
+mem_cgroup_anon_allocwait()?
+
+Something like that. I personally like balance_anon_pages the best;
+not because it is the best name by itself, but because in the MM it
+has the notion of throttling the creation of IO liabilities to the
+write rate, which is what we're doing here as well.
