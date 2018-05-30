@@ -1,73 +1,19 @@
-Return-Path: <BATV+67dfbb8f664e29ec4bbc+5394+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <damien.lemoal@wdc.com>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 2/6] block: unexport elevator_init/exit
-Date: Thu, 31 May 2018 19:11:37 +0200
-Message-Id: <20180531171141.18478-3-hch@lst.de>
-In-Reply-To: <20180531171141.18478-1-hch@lst.de>
-References: <20180531171141.18478-1-hch@lst.de>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: [PATCH 05/12] nvmet: split log page implementation
+To: Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+ Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org
+References: <20180530164600.26856-1-hch@lst.de>
+ <20180530164600.26856-6-hch@lst.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <4a298070-79e3-51f4-22fc-bcb4ec7ee0f4@grimberg.me>
+Date: Thu, 31 May 2018 00:25:26 +0300
+MIME-Version: 1.0
+In-Reply-To: <20180530164600.26856-6-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-These are only used by the block core.  Also move the declarations to
-block/blk.h.
+Looks good,
 
-Reported-by: Damien Le Moal <Damien.LeMoal@wdc.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
-Tested-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/blk.h              | 2 ++
- block/elevator.c         | 2 --
- include/linux/elevator.h | 2 --
- 3 files changed, 2 insertions(+), 4 deletions(-)
-
-diff --git a/block/blk.h b/block/blk.h
-index eaf1a8e87d11..a559c0532347 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -231,6 +231,8 @@ static inline void elv_deactivate_rq(struct request_queue *q, struct request *rq
- 		e->type->ops.sq.elevator_deactivate_req_fn(q, rq);
- }
- 
-+int elevator_init(struct request_queue *, char *);
-+void elevator_exit(struct request_queue *, struct elevator_queue *);
- int elv_register_queue(struct request_queue *q);
- void elv_unregister_queue(struct request_queue *q);
- 
-diff --git a/block/elevator.c b/block/elevator.c
-index 8b64f92e029a..a7baa4687b28 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -263,7 +263,6 @@ int elevator_init(struct request_queue *q, char *name)
- 		elevator_put(e);
- 	return err;
- }
--EXPORT_SYMBOL(elevator_init);
- 
- void elevator_exit(struct request_queue *q, struct elevator_queue *e)
- {
-@@ -276,7 +275,6 @@ void elevator_exit(struct request_queue *q, struct elevator_queue *e)
- 
- 	kobject_put(&e->kobj);
- }
--EXPORT_SYMBOL(elevator_exit);
- 
- static inline void __elv_rqhash_del(struct request *rq)
- {
-diff --git a/include/linux/elevator.h b/include/linux/elevator.h
-index 6d9e230dffd2..a02deea30185 100644
---- a/include/linux/elevator.h
-+++ b/include/linux/elevator.h
-@@ -218,8 +218,6 @@ extern void elv_unregister(struct elevator_type *);
- extern ssize_t elv_iosched_show(struct request_queue *, char *);
- extern ssize_t elv_iosched_store(struct request_queue *, const char *, size_t);
- 
--extern int elevator_init(struct request_queue *, char *);
--extern void elevator_exit(struct request_queue *, struct elevator_queue *);
- extern bool elv_bio_merge_ok(struct request *, struct bio *);
- extern struct elevator_queue *elevator_alloc(struct request_queue *,
- 					struct elevator_type *);
--- 
-2.17.0
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
