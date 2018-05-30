@@ -1,50 +1,31 @@
-Return-Path: <BATV+df5a2477ff0fa86e9985+5386+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>,
-	Lee Duncan <lduncan@suse.com>,
-	Chris Leech <cleech@redhat.com>,
-	Rafael David Tinoco <rafael.tinoco@canonical.com>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 08/14] mmc: complete requests from ->timeout
-Date: Wed, 23 May 2018 14:19:35 +0200
-Message-Id: <20180523121941.8632-9-hch@lst.de>
-In-Reply-To: <20180523121941.8632-1-hch@lst.de>
-References: <20180523121941.8632-1-hch@lst.de>
+Return-Path: <prvs=968830f389=clm@fb.com>
+From: Chris Mason <clm@fb.com>
+To: Kent Overstreet <kent.overstreet@gmail.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <axboe@kernel.dk>, <hch@infradead.org>, <colyli@suse.de>,
+        <snitzer@redhat.com>, <darrick.wong@oracle.com>, <bacik@fb.com>,
+        <linux-xfs@vger.kernel.org>, <drbd-dev@lists.linbit.com>,
+        <linux-btrfs@vger.kernel.org>, <linux-raid@vger.kernel.org>,
+        <neilb@suse.com>
+Subject: Re: [PATCH 10/12] btrfs: convert to bioset_init()/mempool_init()
+Date: Wed, 30 May 2018 17:30:35 -0400
+Message-ID: <630E6353-552E-433D-8022-D1FAA93B0209@fb.com>
+In-Reply-To: <20180520222558.7053-11-kent.overstreet@gmail.com>
+References: <20180520222558.7053-1-kent.overstreet@gmail.com>
+ <20180520222558.7053-11-kent.overstreet@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-By completing the request entirely in the driver we can remove the
-BLK_EH_HANDLED return value and thus the split responsibility between the
-driver and the block layer that has been causing trouble.
+On 20 May 2018, at 18:25, Kent Overstreet wrote:
 
-[While this keeps existing behavior it seems to mismatch the comment,
- maintainers please chime in!]
+> Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
+> ---
+>  fs/btrfs/extent_io.c | 25 +++++++++++--------------
+>  1 file changed, 11 insertions(+), 14 deletions(-)
+>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/mmc/core/queue.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Assuming the rest of the comments/questions for the series get worked 
+out, the btrfs side of this looks fine.
 
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index 56e9a803db21..648eb6743ed5 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -111,8 +111,9 @@ static enum blk_eh_timer_return mmc_cqe_timed_out(struct request *req)
- 				__mmc_cqe_recovery_notifier(mq);
- 			return BLK_EH_RESET_TIMER;
- 		}
--		/* No timeout */
--		return BLK_EH_HANDLED;
-+		/* No timeout (XXX: huh? comment doesn't make much sense) */
-+		blk_mq_complete_request(req);
-+		return BLK_EH_DONE;
- 	default:
- 		/* Timeout is handled by mmc core */
- 		return BLK_EH_RESET_TIMER;
--- 
-2.17.0
+Acked-by: Chris Mason <clm@fb.com>
