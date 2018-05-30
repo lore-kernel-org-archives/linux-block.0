@@ -1,15 +1,14 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 30 May 2018 09:05:27 -0700
-From: Tejun Heo <tj@kernel.org>
+Return-Path: <hannes@cmpxchg.org>
+Date: Wed, 30 May 2018 09:06:48 -0400
+From: Johannes Weiner <hannes@cmpxchg.org>
 To: Josef Bacik <josef@toxicpanda.com>
 Cc: axboe@kernel.dk, kernel-team@fb.com, linux-block@vger.kernel.org,
-	akpm@linux-foundation.org, linux-mm@kvack.org, hannes@cmpxchg.org,
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
+	akpm@linux-foundation.org, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, tj@kernel.org,
+	linux-fsdevel@vger.kernel.org
 Subject: Re: [PATCH 05/13] swap,blkcg: issue swap io with the appropriate
  context
-Message-ID: <20180530160527.GM1351649@devbig577.frc2.facebook.com>
+Message-ID: <20180530130648.GA4035@cmpxchg.org>
 References: <20180529211724.4531-1-josef@toxicpanda.com>
  <20180529211724.4531-6-josef@toxicpanda.com>
 MIME-Version: 1.0
@@ -48,15 +47,6 @@ On Tue, May 29, 2018 at 05:17:16PM -0400, Josef Bacik wrote:
 > +	}
 > +#endif
 
-So, this ignores the cases where bdev_write_page() is the one which
-does the writes.  If my reading is correct, only brd, zram, btt and
-pmem implement bdev_ops->rw_page() and take bdev_write_page() path, so
-it shouldn't be a problem in majority of cases.
+This looks reasonable, but it probably warrants a helper function.
 
-I don't think we need to address ->rw_page() case right now but it
-might be a good idea to add a comment explaining the ommission.
-
-Thanks.
-
--- 
-tejun
+bio_associate_blkcg_from_page() or something?
