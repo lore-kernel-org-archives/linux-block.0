@@ -1,161 +1,33 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:33108 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1034221AbeE1PWT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 May 2018 11:22:19 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Coly Li <colyli@suse.de>
-Subject: [PATCH 4/4] bcache: Replace bch_read_string_list() by __sysfs_match_string()
-Date: Mon, 28 May 2018 15:37:44 +0800
-Message-Id: <20180528073744.71258-5-colyli@suse.de>
-In-Reply-To: <20180528073744.71258-1-colyli@suse.de>
-References: <20180528073744.71258-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] nbd: clear DISCONNECT_REQUESTED flag once disconnection
+ occurs.
+To: kvigor@gmail.com, linux-block@vger.kernel.org
+Cc: josef@toxicpanda.com, Kevin Vigor <kvigor@fb.com>
+References: <1527698711-14919-1-git-send-email-kvigor@gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <1b462c26-1a10-58b8-8459-9d9fa3fb4413@kernel.dk>
+Date: Wed, 30 May 2018 11:31:05 -0600
+MIME-Version: 1.0
+In-Reply-To: <1527698711-14919-1-git-send-email-kvigor@gmail.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+On 5/30/18 10:45 AM, kvigor@gmail.com wrote:
+> From: Kevin Vigor <kvigor@fb.com>
+> 
+> When a userspace client requests a NBD device be disconnected, the
+> DISCONNECT_REQUESTED flag is set. While this flag is set, the driver
+> will not inform userspace when a connection is closed.
+> 
+> Unfortunately the flag was never cleared, so once a disconnect was
+> requested the driver would thereafter never tell userspace about a
+> closed connection. Thus when connections failed due to timeout, no
+> attempt to reconnect was made and eventually the device would fail.
+> 
+> Fix by clearing the DISCONNECT_REQUESTED flag (and setting the
+> DISCONNECTED flag) once all connections are closed.
 
-Kernel library has a common function to match user input from sysfs
-against an array of strings. Thus, replace bch_read_string_list() by
-__sysfs_match_string().
+Applied, thanks Kevin.
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/sysfs.c | 44 ++++++++-------------------------------
- 1 file changed, 9 insertions(+), 35 deletions(-)
-
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index 36f4396dbd63..8ccbc8f3b3af 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -18,7 +18,6 @@
- 
- /* Default is -1; we skip past it for struct cached_dev's cache mode */
- static const char * const bch_cache_modes[] = {
--	"default",
- 	"writethrough",
- 	"writeback",
- 	"writearound",
-@@ -28,7 +27,6 @@ static const char * const bch_cache_modes[] = {
- 
- /* Default is -1; we skip past it for stop_when_cache_set_failed */
- static const char * const bch_stop_on_failure_modes[] = {
--	"default",
- 	"auto",
- 	"always",
- 	NULL
-@@ -146,27 +144,6 @@ static ssize_t bch_snprint_string_list(char *buf, size_t size, const char * cons
- 	return out - buf;
- }
- 
--static ssize_t bch_read_string_list(const char *buf, const char * const list[])
--{
--	size_t i;
--	char *s, *d = kstrndup(buf, PAGE_SIZE - 1, GFP_KERNEL);
--	if (!d)
--		return -ENOMEM;
--
--	s = strim(d);
--
--	for (i = 0; list[i]; i++)
--		if (!strcmp(list[i], s))
--			break;
--
--	kfree(d);
--
--	if (!list[i])
--		return -EINVAL;
--
--	return i;
--}
--
- SHOW(__bch_cached_dev)
- {
- 	struct cached_dev *dc = container_of(kobj, struct cached_dev,
-@@ -177,12 +154,12 @@ SHOW(__bch_cached_dev)
- 
- 	if (attr == &sysfs_cache_mode)
- 		return bch_snprint_string_list(buf, PAGE_SIZE,
--					       bch_cache_modes + 1,
-+					       bch_cache_modes,
- 					       BDEV_CACHE_MODE(&dc->sb));
- 
- 	if (attr == &sysfs_stop_when_cache_set_failed)
- 		return bch_snprint_string_list(buf, PAGE_SIZE,
--					       bch_stop_on_failure_modes + 1,
-+					       bch_stop_on_failure_modes,
- 					       dc->stop_when_cache_set_failed);
- 
- 
-@@ -306,8 +283,7 @@ STORE(__cached_dev)
- 		bch_cached_dev_run(dc);
- 
- 	if (attr == &sysfs_cache_mode) {
--		v = bch_read_string_list(buf, bch_cache_modes + 1);
--
-+		v = __sysfs_match_string(bch_cache_modes, -1, buf);
- 		if (v < 0)
- 			return v;
- 
-@@ -318,8 +294,7 @@ STORE(__cached_dev)
- 	}
- 
- 	if (attr == &sysfs_stop_when_cache_set_failed) {
--		v = bch_read_string_list(buf, bch_stop_on_failure_modes + 1);
--
-+		v = __sysfs_match_string(bch_stop_on_failure_modes, -1, buf);
- 		if (v < 0)
- 			return v;
- 
-@@ -688,6 +663,7 @@ SHOW_LOCKED(bch_cache_set)
- STORE(__bch_cache_set)
- {
- 	struct cache_set *c = container_of(kobj, struct cache_set, kobj);
-+	ssize_t v;
- 
- 	if (attr == &sysfs_unregister)
- 		bch_cache_set_unregister(c);
-@@ -751,8 +727,7 @@ STORE(__bch_cache_set)
- 		      c->congested_write_threshold_us);
- 
- 	if (attr == &sysfs_errors) {
--		ssize_t v = bch_read_string_list(buf, error_actions);
--
-+		v = __sysfs_match_string(error_actions, -1, buf);
- 		if (v < 0)
- 			return v;
- 
-@@ -767,8 +742,7 @@ STORE(__bch_cache_set)
- 		c->error_decay = strtoul_or_return(buf) / 88;
- 
- 	if (attr == &sysfs_io_disable) {
--		int v = strtoul_or_return(buf);
--
-+		v = strtoul_or_return(buf);
- 		if (v) {
- 			if (test_and_set_bit(CACHE_SET_IO_DISABLE,
- 					     &c->flags))
-@@ -982,6 +956,7 @@ SHOW_LOCKED(bch_cache)
- STORE(__bch_cache)
- {
- 	struct cache *ca = container_of(kobj, struct cache, kobj);
-+	ssize_t v;
- 
- 	if (attr == &sysfs_discard) {
- 		bool v = strtoul_or_return(buf);
-@@ -996,8 +971,7 @@ STORE(__bch_cache)
- 	}
- 
- 	if (attr == &sysfs_cache_replacement_policy) {
--		ssize_t v = bch_read_string_list(buf, cache_replacement_policies);
--
-+		v = __sysfs_match_string(cache_replacement_policies, -1, buf);
- 		if (v < 0)
- 			return v;
- 
 -- 
-2.17.0
+Jens Axboe
