@@ -1,164 +1,45 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:52178 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752528AbeERQuQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 May 2018 12:50:16 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 34/34] xfs: allow writeback on pages without buffer heads
-Date: Fri, 18 May 2018 18:48:30 +0200
-Message-Id: <20180518164830.1552-35-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Tue, 29 May 2018 22:47:42 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Omar Sandoval <osandov@fb.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH] block/020: not pass shared_tags to null_blk
+Message-ID: <20180530054742.GA19332@vader>
+References: <20180530051038.9192-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180530051038.9192-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Disable the IOMAP_F_BUFFER_HEAD flag on file systems with a block size
-equal to the page size, and deal with pages without buffer heads in
-writeback.  Thanks to the previous refactoring this is basically trivial
-now.
+On Wed, May 30, 2018 at 01:10:38PM +0800, Ming Lei wrote:
+> The issue isn't related with shared tag, and it can be
+> triggered in case 'shared_tags' is set as 0.
+> 
+> Remove this so that this test can be run in older kernel, and
+> avoid to cause misunderstanding.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/xfs_aops.c  | 47 +++++++++++++++++++++++++++++++++-------------
- fs/xfs/xfs_iomap.c |  3 ++-
- 2 files changed, 36 insertions(+), 14 deletions(-)
+Thanks, Ming, applied.
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 492f4a4b1deb..efa2cbb27d67 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -91,6 +91,19 @@ xfs_find_daxdev_for_inode(
- 		return mp->m_ddev_targp->bt_daxdev;
- }
- 
-+static void
-+xfs_finish_page_writeback(
-+	struct inode		*inode,
-+	struct bio_vec		*bvec,
-+	int			error)
-+{
-+	if (error) {
-+		SetPageError(bvec->bv_page);
-+		mapping_set_error(inode->i_mapping, -EIO);
-+	}
-+	end_page_writeback(bvec->bv_page);
-+}
-+
- /*
-  * We're now finished for good with this page.  Update the page state via the
-  * associated buffer_heads, paying attention to the start and end offsets that
-@@ -103,7 +116,7 @@ xfs_find_daxdev_for_inode(
-  * and buffers potentially freed after every call to end_buffer_async_write.
-  */
- static void
--xfs_finish_page_writeback(
-+xfs_finish_buffer_writeback(
- 	struct inode		*inode,
- 	struct bio_vec		*bvec,
- 	int			error)
-@@ -178,9 +191,12 @@ xfs_destroy_ioend(
- 			next = bio->bi_private;
- 
- 		/* walk each page on bio, ending page IO on them */
--		bio_for_each_segment_all(bvec, bio, i)
--			xfs_finish_page_writeback(inode, bvec, error);
--
-+		bio_for_each_segment_all(bvec, bio, i) {
-+			if (page_has_buffers(bvec->bv_page))
-+				xfs_finish_buffer_writeback(inode, bvec, error);
-+			else
-+				xfs_finish_page_writeback(inode, bvec, error);
-+		}
- 		bio_put(bio);
- 	}
- 
-@@ -792,13 +808,16 @@ xfs_writepage_map(
- {
- 	LIST_HEAD(submit_list);
- 	struct xfs_ioend	*ioend, *next;
--	struct buffer_head	*bh;
-+	struct buffer_head	*bh = NULL;
- 	ssize_t			len = i_blocksize(inode);
- 	int			error = 0;
- 	int			count = 0;
- 	loff_t			file_offset;	/* file offset of page */
- 	unsigned		poffset;	/* offset into page */
- 
-+	if (page_has_buffers(page))
-+		bh = page_buffers(page);
-+
- 	/*
- 	 * Walk the blocks on the page, and we we run off then end of the
- 	 * current map or find the current map invalid, grab a new one.
-@@ -807,11 +826,9 @@ xfs_writepage_map(
- 	 * replace the bufferhead with some other state tracking mechanism in
- 	 * future.
- 	 */
--	file_offset = page_offset(page);
--	bh = page_buffers(page);
--	for (poffset = 0;
-+	for (poffset = 0, file_offset = page_offset(page);
- 	     poffset < PAGE_SIZE;
--	     poffset += len, file_offset += len, bh = bh->b_this_page) {
-+	     poffset += len, file_offset += len) {
- 		/* past the range we are writing, so nothing more to write. */
- 		if (file_offset >= end_offset)
- 			break;
-@@ -819,9 +836,10 @@ xfs_writepage_map(
- 		/*
- 		 * Block does not contain valid data, skip it.
- 		 */
--		if (!buffer_uptodate(bh)) {
-+		if (bh && !buffer_uptodate(bh)) {
- 			if (PageUptodate(page))
- 				ASSERT(buffer_mapped(bh));
-+			bh = bh->b_this_page;
- 			continue;
- 		}
- 
-@@ -846,10 +864,15 @@ xfs_writepage_map(
- 			 * meaningless for holes (!mapped && uptodate), so check we did
- 			 * have a buffer covering a hole here and continue.
- 			 */
-+			if (bh)
-+				bh = bh->b_this_page;
- 			continue;
- 		}
- 
--		xfs_map_at_offset(inode, bh, &wpc->imap, file_offset);
-+		if (bh) {
-+			xfs_map_at_offset(inode, bh, &wpc->imap, file_offset);
-+			bh = bh->b_this_page;
-+		}
- 		xfs_add_to_ioend(inode, file_offset, page, wpc, wbc,
- 				&submit_list);
- 		count++;
-@@ -949,8 +972,6 @@ xfs_do_writepage(
- 
- 	trace_xfs_writepage(inode, page, 0, 0);
- 
--	ASSERT(page_has_buffers(page));
--
- 	/*
- 	 * Refuse to write the page out if we are called from reclaim context.
- 	 *
-diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
-index f949f0dd7382..93c40da3378a 100644
---- a/fs/xfs/xfs_iomap.c
-+++ b/fs/xfs/xfs_iomap.c
-@@ -1031,7 +1031,8 @@ xfs_file_iomap_begin(
- 	if (XFS_FORCED_SHUTDOWN(mp))
- 		return -EIO;
- 
--	iomap->flags |= IOMAP_F_BUFFER_HEAD;
-+	if (i_blocksize(inode) < PAGE_SIZE)
-+		iomap->flags |= IOMAP_F_BUFFER_HEAD;
- 
- 	if (((flags & (IOMAP_WRITE | IOMAP_DIRECT)) == IOMAP_WRITE) &&
- 			!IS_DAX(inode) && !xfs_get_extsz_hint(ip)) {
--- 
-2.17.0
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  tests/block/020 | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tests/block/020 b/tests/block/020
+> index 40a8151c90a8..36140136369b 100755
+> --- a/tests/block/020
+> +++ b/tests/block/020
+> @@ -31,7 +31,7 @@ test() {
+>  
+>  	modprobe -r null_blk
+>  	modprobe null_blk queue_mode=2 irqmode=2 completion_nsec=2000000 \
+> -		shared_tags=1 submit_queues=4 hw_queue_depth=1
+> +		submit_queues=4 hw_queue_depth=1
+>  
+>  	local scheds
+>  	# shellcheck disable=SC2207
+> -- 
+> 2.9.5
+> 
