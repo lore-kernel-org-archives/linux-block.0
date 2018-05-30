@@ -1,12 +1,9 @@
-Return-Path: <prvs=6829f6511=Damien.LeMoal@wdc.com>
-From: Damien Le Moal <Damien.LeMoal@wdc.com>
-To: Jeff Moyer <jmoyer@redhat.com>, Jens Axboe <axboe@kernel.dk>
-CC: Christoph Hellwig <hch@infradead.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "bgurney@redhat.com" <bgurney@redhat.com>,
-	Hannes Reinecke <hare@suse.de>, Colin Ian King <colin.king@canonical.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH 0/2][RFC] block: default to deadline for SMR devices
-Date: Thu, 31 May 2018 03:04:08 +0000
-Message-ID: <d921b9a9-4e5f-cc8a-4a15-dd955335814e@wdc.com>
+To: Jeff Moyer <jmoyer@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Damien.LeMoal@wdc.com,
+ linux-block@vger.kernel.org, bgurney@redhat.com,
+ Hannes Reinecke <hare@suse.de>, Colin Ian King <colin.king@canonical.com>
 References: <20180525211432.20359-1-jmoyer@redhat.com>
  <9756f816-cea7-52cc-e616-54cd7b7d8c75@kernel.dk>
  <x49tvqvz8eb.fsf@segfault.boston.devel.redhat.com>
@@ -16,104 +13,103 @@ References: <20180525211432.20359-1-jmoyer@redhat.com>
  <x496035mbcy.fsf@segfault.boston.devel.redhat.com>
  <191bbfcd-68f3-b93f-b29a-db72331010b6@kernel.dk>
  <x49sh69kuyw.fsf@segfault.boston.devel.redhat.com>
-In-Reply-To: <x49sh69kuyw.fsf@segfault.boston.devel.redhat.com>
-Content-Type: text/plain; charset="utf-8"
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <368b2fef-7067-2e5c-8196-0d49aac61a0b@kernel.dk>
+Date: Wed, 30 May 2018 09:52:58 -0600
 MIME-Version: 1.0
+In-Reply-To: <x49sh69kuyw.fsf@segfault.boston.devel.redhat.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-DQpPbiA1LzMxLzE4IDAwOjQ1LCBKZWZmIE1veWVyIHdyb3RlOg0KPiBKZW5zIEF4Ym9lIDxheGJv
-ZUBrZXJuZWwuZGs+IHdyaXRlczoNCj4+IEJ1dCB3aGF0J3MgdGhlIHJlZ3Jlc3Npb24/IDQuMTUg
-aGFkIG5vIHpvbmUgd3JpdGUgbG9ja2luZyBhdCBhbGwuDQo+IA0KPiBUaGUgem9uZSB3cml0ZSBs
-b2NraW5nIHdhcyBkb25lIGluIHRoZSBzZCBkcml2ZXIgcHJpb3IgdG8gNC4xNi4gIFNlZQ0KPiBj
-b21taXQgMzkwNTFkZDg1ZjI4NyAoInNjc2k6IHNkOiBSZW1vdmUgem9uZSB3cml0ZSBsb2NraW5n
-IikgZm9yIHdoZXJlDQo+IGl0IHdhcyByZW1vdmVkLiAgVGhhdCBtZWFucyB0aGVzZSBkZXZpY2Vz
-ICJqdXN0IHdvcmtlZCIgd2l0aCBhbGwgSS9PDQo+IHNjaGVkdWxlcnMuDQoNClllcyB0aGV5IGRp
-ZCAianVzdCB3b3JrIiwgYnV0IHRoYXQgd2FzIG5vdCBhbiBpZGVhbCBzb2x1dGlvbiBlaXRoZXIN
-CmJlY2F1c2Ugb2YgdGhlIHBlcmZvcm1hbmNlIGltcGxpY2F0aW9uczogc2VxdWVudGlhbCB3cml0
-ZXMgdG8gYSBzaW5nbGUNCnpvbmUgd2hlcmUgc3RhbGxpbmcgdGhlIGRpc3BhdGNoIHF1ZXVlIHdh
-aXRpbmcgZm9yIHRoZSBkaXNwYXRjaGVkIHdyaXRlDQp0byB0aGUgbG9ja2VkIHpvbmUgdG8gY29t
-cGxldGUuIFRoYXQgd2FzIG5vdCBvcHRpbWFsIGF0IGFsbCAoc3VyZSwgdGhlDQpkcml2ZSBzaWRl
-IHdyaXRlIGNhY2hpbmcgd2FzIGhpZGluZyB0aGlzIGEgYml0LCBidXQgc3RpbGwpDQoNCj4+PiBN
-b3Zpbmcgb24sIGFzc3VtaW5nIHlvdXIgbWluZCBpcyBtYWRlIHVwLi4uDQo+Pj4NCj4+PiBJJ20g
-bm90IHN1cmUgaG93IG11Y2ggbG9naWMgc2hvdWxkIGdvIGludG8gdGhlIHVkZXYgcnVsZS4gIEFz
-IG1lbnRpb25lZCwNCj4+PiB0aGlzIGxpbWl0YXRpb24gd2FzIGludHJvZHVjZWQgaW4gNC4xNiwg
-YW5kIERhbWllbiBoYXMgcGxhbnMgdG8gbGlmdCB0aGUNCj4+PiByZXN0cmljdGlvbiBpbiBmdXR1
-cmUga2VybmVscy4gIEJlY2F1c2UgZGlzdHJpYnV0aW9ucyB0ZW5kIHRvIGNoZXJyeQ0KPj4+IHBp
-Y2sgY2hhbmdlcywgbWFraW5nIGRlY2lzaW9ucyBvbiB3aGV0aGVyIGEgZmVhdHVyZSBleGlzdHMg
-YmFzZWQgc29sZWx5DQo+Pj4gb24ga2VybmVsIHZlcnNpb24gaXMgdXN1YWxseSBub3QgYSBncmVh
-dCB0aGluZy4gIE15IGluY2xpbmF0aW9uIHdvdWxkIGJlDQo+Pj4gdG8ganVzdCBhbHdheXMgZm9y
-Y2UgZGVhZGxpbmUgZm9yIGhvc3QtbWFuYWdlZCBTTVIgZHJpdmVzLiAgVGhlc2UgZHJpdmVzDQo+
-Pj4gYXJlbid0IHRoYXQgcG9wdWxhciwgYWZ0ZXIgYWxsLiAgQW55IG9waW5pb25zIG9uIHRoaXM/
-DQo+Pg0KPj4gVGhlIHByb2JsZW0gaXMgdGhhdCBpdCdzIHRpZWQgdG8gYW4gSU8gc2NoZWR1bGVy
-LCB3aGljaCBlbmRzIHVwIGNhdXNpbmcNCj4+IGlzc3VlcyBsaWtlIHRoaXMsIHNpbmNlIHVzZXJz
-IGFyZSBmcmVlIHRvIHNlbGVjdCBhIGRpZmZlcmVudCBzY2hlZHVsZXIuDQo+PiBUaGVuIHRoaW5n
-cyBicmVhay4gR3JhbnRlZCwgaW4gdGhpcyBjYXNlLCBzb21lIGV4dHJhb3JkaW5hcmlseSBzaGl0
-dHkNCj4+IGhhcmR3YXJlIGV2ZW4gYnJva2UuIFRoYXQgaXMgb24gdGhlIGhhcmR3YXJlLCBub3Qg
-dGhlIGtlcm5lbCwgdGhhdA0KPj4ga2luZCBvZiBicmVha2FnZSBzaG91bGQgbm90IG9jY3VyLg0K
-PiANCj4gSWYgdGhlIGZpcm13YXJlIHByb2JsZW0gd2FzIHdpZGVzcHJlYWQsIEkgdGhpbmsgd2Un
-ZCB0cnkgdG8gYXZvaWQgaXQuICBJDQo+IGhhdmUgbm8gcmVhc29uIHRvIGJlbGlldmUgdGhhdCBp
-cyB0aGUgY2FzZSwgdGhvdWdoLg0KDQpGaXJzdCB0aW1lIGluIG15IGNhcmVlciB0aGF0IEkgaGVh
-cmQgb2YgYSBkaXNrIGJyZWFraW5nIGEgc3lzdGVtIEJJT1MuIEkNCndpbGwgbm90aWZ5IG91ciBz
-eXN0ZW0gdGVzdCBsYWIgdG8gaW52ZXN0aWdhdGUgdGhpcy4gSmVmZiwgbGV0J3MgdGFrZQ0KdGhp
-cyBkaXNjdXNzaW9uIG9mZi1saXN0IHNpbmNlIHRoYXQgaXMgbm90IGtlcm5lbCByZWxhdGVkLg0K
-DQo+IERhbWllbiBtYWRlIHRoZSBhcmd1bWVudCB0aGF0IHRoZSB1c2VyIHNob3VsZCBiZSBhYmxl
-IHRvIHNlbGVjdCBhbiBJL08NCj4gc2NoZWR1bGVyIHRoYXQgZG9lc24ndCBwZXJmb3JtIHRoZSB3
-cml0ZSBsb2NraW5nLCBiZWNhdXNlIGEgd2VsbC1iZWhhdmVkDQo+IGFwcGxpY2F0aW9uIGNvdWxk
-IHRoZW9yZXRpY2FsbHkgbWFrZSB1c2Ugb2YgaXQuICBJIHRoaW5rIHRoaXMgaXMgYSB3ZWFrDQo+
-IGFyZ3VtZW50LCBnaXZlbiB0aGF0IGRtLXpvbmVkIGRvZXNuJ3QgZXZlbiBzdXBwb3J0IHN1Y2gg
-YSBtb2RlLg0KDQpZZXMsIGEgbGl0dGxlIHdlZWsuIFRoYXQgaXMgZGVmaW5pdGVseSBub3QgdGhl
-IG1haW4gdXNlIGNhc2UgSSBhbSBzZWVpbmcNCndpdGggY3VzdG9tZXJzLiBUaGF0IHNhaWQsIHRo
-ZXNlIGRyaXZlcyBhcmUgc3RhcnRpbmcgdG8gYmUgdXNlZCB3aXRoDQpvdGhlciBmZWF0dXJlIHNl
-dHMgYmVpbmcgZW5hYmxlZCBsaWtlIEkvTyBwcmlvcml0aWVzLiBDb25zaWRlcmluZyB0aGVyZQ0K
-c2l6ZSwgdGhpcyBpcyBhIHZlcnkgaW50ZXJlc3RpbmcgZmVhdHVyZSB0byBjb250cm9sIGFjY2Vz
-cyBsYXRlbmN5Lg0KRGVhZGxpbmUgYW5kIG1xLWRlYWRsaW5lIHdpbGwgbm90IGFjdCBvbiBJL08g
-cHJpb3JpdGllcywgY2ZxIChhbmQgYmZxID8pDQp3aWxsLiBQb3RlbnRpYWxseSBiZXR0ZXIgcmVz
-dWx0cyBjYW4gYmUgYWNoaWV2ZWQsIGJ1dCBhcyB0aGVzZQ0Kc2NoZWR1bGVycyBkbyBub3Qgc3Vw
-cG9ydCB6b25lIHdyaXRlIGxvY2tpbmcsIHRoZSBhcHBsaWNhdGlvbiBuZWVkcyB0bw0KYmUgY2Fy
-ZWZ1bCB3aXRoIGl0cyBwZXItem9uZSB3cml0ZSBxdWV1ZSBkZXB0aCBhbmQgZG9pbmcgc28gYXZv
-aWQNCnRyaXBwaW5nIG92ZXIga2VybmVsIGxldmVsIGNvbW1hbmQgdW5pbnRlbmRlZCByZW9yZGVy
-aW5nLiBJIHNlZSB0aGlzIGFzDQphIHZhbGlkIGVub3VnaCB1c2UgY2FzZSB0byBub3QgImxvY2st
-ZG93biIgdGhlIHNjaGVkdWxlciB0byBkZWFkbGluZQ0Kb25seSBhbmQgYWxsb3cgb3RoZXJzIHNj
-aGVkdWxlcnMgdG9vLiBZZXQsIGRlYWRsaW5lIHNob3VsZCBiZSB0aGUNCmRlZmF1bHQgdW50aWwg
-YW4gYXBwbGljYXRpb24gYXNrcyBmb3Igc29tZXRoaW5nIGVsc2UgaWYgbmVlZGVkLg0KDQpkbS16
-b25lZCBvciBmMmZzIChidHJmcyBpbiB0aGUgbGFiIHRvbykgImFzc3VtZSIgdGhhdCB0aGUgdW5k
-ZXJseWluZw0Kc3RhY2sgZG9lcyB0aGUgcmlnaHQgdGhpbmcuIFRoYXQgaXMgb2YgY291cnNlIHRy
-dWUgKGZvciBub3cpIG9ubHkgaWYgdGhlDQpkZWFkbGluZSBzY2hlZHVsZXIgaXMgZW5hYmxlZC4g
-QSBzYW5lIGRlZmF1bHQgc2V0IG9uIGRldmljZQ0KaW5pdGlhbGl6YXRpb24gd291bGQgYmUgbmlj
-ZSB0byBoYXZlIGFuZCBhdm9pZCBwb3RlbnRpYWwgaGVhZGFjaGVzIHdpdGgNCnJ1bGUgb3JkZXJp
-bmcgd2l0aCByZWdhcmQgdG8gY29tcG9uZW50cyBpbml0aWFsaXphdGlvbiAobm90IHRvIG1lbnRp
-b24NCnRoYXQgdGhpcyB3b3VsZCBtYWtlIGJvb3RpbmcgZnJvbSB0aGVzZSBkaXNrcyBwb3NzaWJs
-ZSkuDQoNCj4gSSBkZWZpbml0ZWx5IHNlZSB0aGlzIHVkZXYgcnVsZSBhcyBhIHRlbXBvcmFyeSB3
-b3JrYXJvdW5kLg0KDQpJIGFncmVlLiBJbiBmYWN0IEkgc2VlIHRoZSBkZWFkbGluZSBiYXNlZCB6
-b25lIHdyaXRlIGxvY2tpbmcgaXRzZWxmIGFzIGENCnRlbXBvcmFyeSB3b3JrYXJvdW5kLiBGb3Ig
-bm93LCBJIGRvIG5vdCBzZWUgYW55IG90aGVyIGNsZWFuIG1ldGhvZCB0aGF0DQpjb3ZlcnMgYm90
-aCBtcSBhbmQgbGVnYWN5IHBhdGguIENvbnNpZGVyaW5nIG9ubHkgbXEsIHdlIGRpc2N1c3NlZA0K
-aW50ZXJlc3RpbmcgcG9zc2liaWxpdGllcyBhdCBMU0ZNTSB1c2luZyBkZWRpY2F0ZWQgd3JpdGUg
-cXVldWVzLiBUaGF0DQpjb3VsZCBiZSBoYW5kbGVkIGdlbmVyaWNhbGx5IGFuZCByZW1vdmUgdGhl
-IGRlcGVuZGVuY3kgb24gdGhlIHNjaGVkdWxlcg0Kd2hpbGUgYWxzbyBpbmNyZWFzaW5nIGNvdmVy
-YWdlIG9mIHRoZSBzdXBwb3J0IHRvIG9wZW4gY2hhbm5lbCBTU0RzIGFzIHdlbGwuDQoNCk15IGd1
-ZXNzIGlzIHRoYXQgbm8gbWFqb3IgY2hhbmdlIGZvciB0aGlzIHdyaXRlIGxvY2tpbmcgd2lsbCBo
-YXBwZW4gb24NCnRoZSBsZWdhY3kgcGF0aCwgd2hpY2ggaG9wZWZ1bGx5IHdpbGwgZ28gYXdheSBz
-b29uICg/KS4gQnV0IHRoZXJlIGFyZQ0Kb3B0aW9ucyBmb3J3YXJkIHdpdGggYmxrLW1xLg0KDQo+
-PiBTbyBub3cgd2UncmUgc3R1Y2sgd2l0aCB0aGlzIHRlbXBvcmFyeSBzaXR1YXRpb24gd2hpY2gg
-bmVlZHMgYSB3b3JrLWFyb3VuZC4NCj4+IEkgZG9uJ3QgdGhpbmsgaXQncyBhIHRlcnJpYmxlIGlk
-ZWEgdG8gaGF2ZSBhIHJ1bGUgdGhhdCBqdXN0IHNldHMNCj4+IGRlYWRsaW5lL21xLWRlYWRsaW5l
-IGZvciBhbiBTTVIgZGV2aWNlIHJlZ2FyZGxlc3Mgb2Ygd2hhdCBrZXJuZWwgaXQgaXMNCj4+IHJ1
-bm5pbmcgb24uIEl0J2xsIHByb2JhYmx5IG5ldmVyIGJlIGEgYmFkIGRlZmF1bHQuDQoNCkkgYWdy
-ZWUuIEJ1dCBzaW5jZSB0aGVyZSBhcmUgb3RoZXIga2VybmVsIGNvbXBvbmVudHMgKGRtLXpvbmVk
-LCBGU2VzIGFuZA0KdGhlIGVudGlyZSBmcy9ibG9jay1kZXYuYyBkaXJlY3QgSS9PIHdyaXRlIHBh
-dGgpIGRlcGVuZGluZyBvbiB0aGUNCnNjaGVkdWxlciB0byBiZSBzZXQgdG8gc29tZXRoaW5nIHNh
-bmUsIHNldHRpbmcgdGhhdCBlYXJseSBvbiBpbiB0aGUNCmRldmljZSBpbml0aWFsaXphdGlvbiBi
-ZWZvcmUgaXQgaXMgZ3JhYmJlZCBieSBhbiBGUyBvciBhIGRldmljZSBtYXBwZXINCndvdWxkIGRl
-ZmluaXRlbHkgYmUgbmljZSB0byBoYXZlLg0KDQo+IA0KPiBPSy4gIEJhcnJpbmcgZnV0dXJlIGlu
-cHV0IHRvIHRoZSBjb250cmFyeSwgSSdsbCB3b3JrIHRvIGdldCB1cGRhdGVzIGludG8NCj4gZmVk
-b3JhLCBhdCBsZWFzdC4gIEkndmUgQ0MnZCBDb2xpbiBhbmQgSGFubmVzLiAgSSdtIG5vdCBzdXJl
-IHdobyBlbHNlIHRvDQo+IGluY2x1ZGUuDQo+IA0KPiBGWUksIGJlbG93IGlzIHRoZSB1ZGV2IHJ1
-bGUgRGFtaWVuIGhhZCBwcm92aWRlZCB0byBCcnlhbi4gIEknbSBub3Qgc3VyZQ0KPiBhYm91dCB0
-aGUgS0VSTkVMPT0ic2RbYS16XSIgYml0LCB0aGF0IG1heSBuZWVkIG1vZGlmaWNhdGlvbi4gIE5v
-dGU6IEknbQ0KPiBubyB1ZGV2IGV4cGVydC4NCg0KSXQgcHJvYmFibHkgbmVlZHMgdG8gYmUgc29t
-ZXRoaW5nIGxpa2UgS0VSTkVMPT0ic2QqIiB0byBhbGxvdyBtb3JlIHRoYW4NCjI2IGRyaXZlcy4N
-Cg0KQmVzdCByZWdhcmRzLg0KDQo+IA0KPiBDaGVlcnMsDQo+IEplZmYNCj4gDQo+IEFDVElPTj09
-ImFkZHxjaGFuZ2UiLCBLRVJORUw9PSJzZFthLXpdIiwNCj4gQVRUUlN7cXVldWUvem9uZWR9PT0i
-aG9zdC1tYW5hZ2VkIiwgQVRUUntxdWV1ZS9zY2hlZHVsZXJ9PSJkZWFkbGluZSINCj4gDQoNCi0t
-IA0KRGFtaWVuIExlIE1vYWwsDQpXZXN0ZXJuIERpZ2l0YWw=
+On 5/30/18 9:45 AM, Jeff Moyer wrote:
+> Jens Axboe <axboe@kernel.dk> writes:
+> 
+>> On 5/30/18 9:06 AM, Jeff Moyer wrote:
+>>> Hi, Jens,
+>>>
+>>> Jens Axboe <axboe@kernel.dk> writes:
+>>>
+>>>> On 5/30/18 2:49 AM, Christoph Hellwig wrote:
+>>>>> While I really don't want drivers to change the I/O schedule themselves
+>>>>> we have a class of devices (zoned) that don't work at all with certain
+>>>>> I/O schedulers.  The kernel not chosing something sane and requiring
+>>>>> user workarounds is just silly.
+>>>>
+>>>> They work just fine for probing and reading purposes. There's absolutely
+>>>> no reason why we can't handle these special snowflakes with a udev rule.
+>>>
+>>> udev rules aren't shipped with the kernel, so it makes it hard to keep
+>>> them in sync.  In this instance, I'm not sure anyone made an effort to
+>>> notify distributions that a udev rule was even necessary.  (Is there a
+>>> way of notifying distributions about kernel changes that require new
+>>> udev rules, other than emailing each list individually?)
+>>>
+>>> From a technical standpoint, I totally agree with you, Jens.  However, I
+>>> think the user experience sucks.  4.15 worked by default, 4.16 doesn't.
+>>> The result will be bug reports from users (to the drive vendors,
+>>> distribution bugzillas, here, etc.).
+>>
+>> I would imagine that most folks get their updates from a distro of some
+>> sort, in which case there's absolutely nothing stopping the distro from
+>> shipping updated rules for the 4.16 kernel update.
+> 
+> The problem is distros have already shipped that kernel.  :)
+
+Ship an update, then! I'm sure that most people would prefer a simple
+rule update over a kernel update. And you have to do one of them, to
+resolve this anyway.
+
+>> But what's the regression? 4.15 had no zone write locking at all.
+> 
+> The zone write locking was done in the sd driver prior to 4.16.  See
+> commit 39051dd85f287 ("scsi: sd: Remove zone write locking") for where
+> it was removed.  That means these devices "just worked" with all I/O
+> schedulers.
+
+Gotcha, makes sense.
+
+>>> Moving on, assuming your mind is made up...
+>>>
+>>> I'm not sure how much logic should go into the udev rule.  As mentioned,
+>>> this limitation was introduced in 4.16, and Damien has plans to lift the
+>>> restriction in future kernels.  Because distributions tend to cherry
+>>> pick changes, making decisions on whether a feature exists based solely
+>>> on kernel version is usually not a great thing.  My inclination would be
+>>> to just always force deadline for host-managed SMR drives.  These drives
+>>> aren't that popular, after all.  Any opinions on this?
+>>
+>> The problem is that it's tied to an IO scheduler, which ends up causing
+>> issues like this, since users are free to select a different scheduler.
+>> Then things break. Granted, in this case, some extraordinarily shitty
+>> hardware even broke. That is on the hardware, not the kernel, that
+>> kind of breakage should not occur.
+> 
+> If the firmware problem was widespread, I think we'd try to avoid it.  I
+> have no reason to believe that is the case, though.
+> 
+> Damien made the argument that the user should be able to select an I/O
+> scheduler that doesn't perform the write locking, because a well-behaved
+> application could theoretically make use of it.  I think this is a weak
+> argument, given that dm-zoned doesn't even support such a mode.
+
+Sure, the user should be able to select whatever they want. Maybe they
+are strictly using it through bsg or a similar interface, in which
+case no scheduler or kernel support is really neeeded to drive it.
+
+>> So now we're stuck with this temporary situation which needs a work-around.
+>> I don't think it's a terrible idea to have a rule that just sets
+>> deadline/mq-deadline for an SMR device regardless of what kernel it is
+>> running on. It'll probably never be a bad default.
+> 
+> OK.  Barring future input to the contrary, I'll work to get updates into
+> fedora, at least.  I've CC'd Colin and Hannes.  I'm not sure who else to
+> include.
+> 
+> FYI, below is the udev rule Damien had provided to Bryan.  I'm not sure
+> about the KERNEL=="sd[a-z]" bit, that may need modification.  Note: I'm
+> no udev expert.
+
+Rule looks fine to me, but I'm also no udev expert.
+
+-- 
+Jens Axboe
