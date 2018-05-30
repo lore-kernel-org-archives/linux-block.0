@@ -1,56 +1,21 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: <linux-fsdevel@vger.kernel.org>
-Cc: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Jan Kara <jack@suse.cz>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	Tejun Heo <tj@kernel.org>
-Subject: [PATCH] bdi: Fix oops in wb_workfn()
-Date: Thu,  3 May 2018 18:26:26 +0200
-Message-Id: <20180503162626.27753-1-jack@suse.cz>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-throttle: return proper bool type to caller instead
+ of 0/1
+To: Chengguang Xu <cgxu519@gmx.com>
+Cc: linux-block@vger.kernel.org
+References: <1527589964-138223-1-git-send-email-cgxu519@gmx.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <1cf0f593-4ed7-f171-7f9b-85d5149e2830@kernel.dk>
+Date: Wed, 30 May 2018 12:48:36 -0600
+MIME-Version: 1.0
+In-Reply-To: <1527589964-138223-1-git-send-email-cgxu519@gmx.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Syzbot has reported that it can hit a NULL pointer dereference in
-wb_workfn() due to wb->bdi->dev being NULL. This indicates that
-wb_workfn() was called for an already unregistered bdi which should not
-happen as wb_shutdown() called from bdi_unregister() should make sure
-all pending writeback works are completed before bdi is unregistered.
-Except that wb_workfn() itself can requeue the work with:
+On 5/29/18 4:32 AM, Chengguang Xu wrote:
+> Change to return true/false only for bool type return code.
 
-	mod_delayed_work(bdi_wq, &wb->dwork, 0);
+Looks good, applied.
 
-and if this happens while wb_shutdown() is waiting in:
-
-	flush_delayed_work(&wb->dwork);
-
-the dwork can get executed after wb_shutdown() has finished and
-bdi_unregister() has cleared wb->bdi->dev.
-
-Make wb_workfn() use wakeup_wb() for requeueing the work which takes all
-the necessary precautions against racing with bdi unregistration.
-
-CC: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-CC: Tejun Heo <tj@kernel.org>
-Fixes: 839a8e8660b6777e7fe4e80af1a048aebe2b5977
-Reported-by: syzbot <syzbot+9873874c735f2892e7e9@syzkaller.appspotmail.com>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- fs/fs-writeback.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-index 47d7c151fcba..471d863958bc 100644
---- a/fs/fs-writeback.c
-+++ b/fs/fs-writeback.c
-@@ -1961,7 +1961,7 @@ void wb_workfn(struct work_struct *work)
- 	}
- 
- 	if (!list_empty(&wb->work_list))
--		mod_delayed_work(bdi_wq, &wb->dwork, 0);
-+		wb_wakeup(wb);
- 	else if (wb_has_dirty_io(wb) && dirty_writeback_interval)
- 		wb_wakeup_delayed(wb);
- 
 -- 
-2.13.6
+Jens Axboe
