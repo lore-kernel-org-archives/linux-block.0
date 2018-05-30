@@ -1,47 +1,102 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:47316 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S935385AbeE3H0z (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 May 2018 03:26:55 -0400
-Date: Wed, 30 May 2018 03:26:54 -0400 (EDT)
-From: Yi Zhang <yi.zhang@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: ming.lei@redhat.com, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, osandov@osandov.com
-Message-ID: <1858098161.4693883.1527665214701.JavaMail.zimbra@redhat.com>
-In-Reply-To: <838678680.4693215.1527664726174.JavaMail.zimbra@redhat.com>
-Subject: blktests block/019 lead system hang
+Received: from mail-io0-f171.google.com ([209.85.223.171]:46572 "EHLO
+        mail-io0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753734AbeE3Xcx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 May 2018 19:32:53 -0400
+Received: by mail-io0-f171.google.com with SMTP id d22-v6so9115308iof.13
+        for <linux-block@vger.kernel.org>; Wed, 30 May 2018 16:32:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180529181616.GB28689@cmpxchg.org>
+References: <20180507210135.1823-1-hannes@cmpxchg.org> <CAJuCfpF4q+1aSg4WQn_p-1-zEDhh-iqST6dc1DkxnDofSPBKGw@mail.gmail.com>
+ <20180529181616.GB28689@cmpxchg.org>
+From: Suren Baghdasaryan <surenb@google.com>
+Date: Wed, 30 May 2018 16:32:52 -0700
+Message-ID: <CAJuCfpGXSyu3SOky6jMhKjix=bbaPccg05VcepbvuJiv+bQgzw@mail.gmail.com>
+Subject: Re: [PATCH 0/7] psi: pressure stall information for CPU, memory, and IO
+To: Johannes Weiner <hannes@cmpxchg.org>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andrew Morton <akpm@linuxfoundation.org>,
+        Tejun Heo <tj@kernel.org>,
+        Balbir Singh <bsingharora@gmail.com>,
+        Mike Galbraith <efault@gmx.de>,
+        Oliver Yang <yangoliver@me.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        xxx xxx <x.qendo@gmail.com>,
+        Taras Kondratiuk <takondra@cisco.com>,
+        Daniel Walker <danielwa@cisco.com>,
+        Vinayak Menon <vinmenon@codeaurora.org>,
+        Ruslan Ruslichenko <rruslich@cisco.com>, kernel-team@fb.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Keith
-I found blktest block/019 also can lead my NVMe server hang with 4.17.0-rc7, let me know if you need more info, thanks. 
+On Tue, May 29, 2018 at 11:16 AM, Johannes Weiner <hannes@cmpxchg.org> wrote:
+> Hi Suren,
+>
+> On Fri, May 25, 2018 at 05:29:30PM -0700, Suren Baghdasaryan wrote:
+>> Hi Johannes,
+>> I tried your previous memdelay patches before this new set was posted
+>> and results were promising for predicting when Android system is close
+>> to OOM. I'm definitely going to try this one after I backport it to
+>> 4.9.
+>
+> I'm happy to hear that!
+>
+>> Would it make sense to split CONFIG_PSI into CONFIG_PSI_CPU,
+>> CONFIG_PSI_MEM and CONFIG_PSI_IO since one might need only specific
+>> subset of this feature?
+>
+> Yes, that should be doable. I'll split them out in the next version.
+>
+>> > The total= value gives the absolute stall time in microseconds. This
+>> > allows detecting latency spikes that might be too short to sway the
+>> > running averages. It also allows custom time averaging in case the
+>> > 10s/1m/5m windows aren't adequate for the usecase (or are too coarse
+>> > with future hardware).
+>>
+>> Any reasons these specific windows were chosen (empirical
+>> data/historical reasons)? I'm worried that with the smallest window
+>> being 10s the signal might be too inert to detect fast memory pressure
+>> buildup before OOM kill happens. I'll have to experiment with that
+>> first, however if you have some insights into this already please
+>> share them.
+>
+> They were chosen empirically. We started out with the loadavg window
+> sizes, but had to reduce them for exactly the reason you mention -
+> they're way too coarse to detect acute pressure buildup.
+>
+> 10s has been working well for us. We could make it smaller, but there
+> is some worry that we don't have enough samples then and the average
+> becomes too erratic - whereas monitoring total= directly would allow
+> you to detect accute spikes and handle this erraticness explicitly.
 
-Server: Dell R730xd
-NVMe SSD: 85:00.0 Non-Volatile memory controller: Samsung Electronics Co Ltd NVMe SSD Controller 172X (rev 01)
+Unfortunately total= field is now updated only at 2sec intervals which
+might be too late to react to mounting memory pressure. With previous
+memdelay patchset md->aggregate which is reported as "total" was
+calculated directly from inside memdelay_task_change, so it was always
+up-to-date. Now group->some and group->full are updated from inside
+psi_clock with up to 2sec delay. This prevents us from detecting these
+acute pressure spikes immediately. I understand why you moved these
+calculations out of the hot path but maybe we could keep updating
+"total" inside psi_group_update? This would allow for custom averaging
+and eliminate this delay for detecting spikes in the pressure signal.
+More conceptually I would love to have a way to monitor the averages
+at a slow rate and when they rise and cross some threshold to increase
+the monitoring rate and react quickly in case they shoot up. Current
+2sec delay poses a problem for doing that.
 
-Console log:
-Kernel 4.17.0-rc7 on an x86_64
+>
+> Let me know how it works out in your tests.
 
-storageqe-62 login: [ 6043.121834] run blktests block/019 at 2018-05-30 03:16:34
-[ 6049.108476] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 3
-[ 6049.108478] {1}[Hardware Error]: event severity: fatal
-[ 6049.108479] {1}[Hardware Error]:  Error 0, type: fatal
-[ 6049.108481] {1}[Hardware Error]:   section_type: PCIe error
-[ 6049.108482] {1}[Hardware Error]:   port_type: 6, downstream switch port
-[ 6049.108483] {1}[Hardware Error]:   version: 1.16
-[ 6049.108484] {1}[Hardware Error]:   command: 0x0407, status: 0x0010
-[ 6049.108485] {1}[Hardware Error]:   device_id: 0000:83:05.0
-[ 6049.108486] {1}[Hardware Error]:   slot: 0
-[ 6049.108487] {1}[Hardware Error]:   secondary_bus: 0x85
-[ 6049.108488] {1}[Hardware Error]:   vendor_id: 0x10b5, device_id: 0x8734
-[ 6049.108489] {1}[Hardware Error]:   class_code: 000406
-[ 6049.108489] {1}[Hardware Error]:   bridge: secondary_status: 0x0000, control: 0x0003
-[ 6049.108491] Kernel panic - not syncing: Fatal hardware error!
-[ 6049.108514] Kernel Offset: 0x25800000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+I've done the backporting to 4.9 and running the tests but the 2sec
+delay is problematic for getting a detailed look at the signal and its
+usefulness. Thinking about workarounds if only for data collection but
+don't want to deviate too much from your baseline. Would love to hear
+from you if a good compromise can be reached here.
 
-
-Best Regards,
-  Yi Zhang
+>
+> Thanks for your feedback.
