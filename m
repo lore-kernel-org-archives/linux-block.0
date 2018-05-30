@@ -1,45 +1,35 @@
-Return-Path: <BATV+a01a3e67072ae75c0352+5392+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>,
-	Lee Duncan <lduncan@suse.com>,
-	Chris Leech <cleech@redhat.com>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 07/14] mtip32xx: complete requests from ->timeout
-Date: Tue, 29 May 2018 15:52:32 +0200
-Message-Id: <20180529135239.27005-8-hch@lst.de>
-In-Reply-To: <20180529135239.27005-1-hch@lst.de>
-References: <20180529135239.27005-1-hch@lst.de>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 30 May 2018 08:58:24 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Josef Bacik <josef@toxicpanda.com>
+Cc: axboe@kernel.dk, kernel-team@fb.com, linux-block@vger.kernel.org,
+	akpm@linux-foundation.org, linux-mm@kvack.org, hannes@cmpxchg.org,
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	Josef Bacik <jbacik@fb.com>
+Subject: Re: [PATCH 04/13] blk: introduce REQ_SWAP
+Message-ID: <20180530155824.GL1351649@devbig577.frc2.facebook.com>
+References: <20180529211724.4531-1-josef@toxicpanda.com>
+ <20180529211724.4531-5-josef@toxicpanda.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180529211724.4531-5-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-By completing the request entirely in the driver we can remove the
-BLK_EH_HANDLED return value and thus the split responsibility between the
-driver and the block layer that has been causing trouble.
+On Tue, May 29, 2018 at 05:17:15PM -0400, Josef Bacik wrote:
+> From: Josef Bacik <jbacik@fb.com>
+> 
+> Just like REQ_META, it's important to know the IO coming down is swap
+> in order to guard against potential IO priority inversion issues with
+> cgroups.  Add REQ_SWAP and use it for all swap IO, and add it to our
+> bio_issue_as_root_blkg helper.
+> 
+> Signed-off-by: Josef Bacik <jbacik@fb.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- drivers/block/mtip32xx/mtip32xx.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Acked-by: Tejun Heo <tj@kernel.org>
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index e873daca9d13..95657b814543 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -3719,7 +3719,8 @@ static enum blk_eh_timer_return mtip_cmd_timeout(struct request *req,
- 		struct mtip_cmd *cmd = blk_mq_rq_to_pdu(req);
- 
- 		cmd->status = BLK_STS_TIMEOUT;
--		return BLK_EH_HANDLED;
-+		blk_mq_complete_request(req);
-+		return BLK_EH_DONE;
- 	}
- 
- 	if (test_bit(req->tag, dd->port->cmds_to_issue))
+Thanks.
+
 -- 
-2.17.0
+tejun
