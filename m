@@ -1,101 +1,72 @@
-Return-Path: <BATV+7138d8dfc060164c836f+5389+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-nvme@lists.infradead.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 03/14] nvme.h: untangle AEN notice definitions
-Date: Sat, 26 May 2018 12:27:24 +0200
-Message-Id: <20180526102735.31404-4-hch@lst.de>
-In-Reply-To: <20180526102735.31404-1-hch@lst.de>
-References: <20180526102735.31404-1-hch@lst.de>
+Return-Path: <adrian.hunter@intel.com>
+Subject: Re: [PATCH 10/14] mmc: complete requests from ->timeout
+To: Shawn Lin <shawn.lin@rock-chips.com>, Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+ Bart Van Assche <bart.vanassche@wdc.com>, Ming Lei <ming.lei@redhat.com>,
+ Josef Bacik <josef@toxicpanda.com>, Tejun Heo <tj@kernel.org>,
+ Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
+ linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ Ulf Hansson <ulf.hansson@linaro.org>, linux-mmc <linux-mmc@vger.kernel.org>
+References: <20180529135239.27005-1-hch@lst.de>
+ <20180529135239.27005-11-hch@lst.de>
+ <4625bce6-0f93-ef84-0d55-b084f37c97ce@rock-chips.com>
+From: Adrian Hunter <adrian.hunter@intel.com>
+Message-ID: <a3afbaf2-250c-8ab9-1162-28aa29d8e413@intel.com>
+Date: Wed, 30 May 2018 11:09:35 +0300
+MIME-Version: 1.0
+In-Reply-To: <4625bce6-0f93-ef84-0d55-b084f37c97ce@rock-chips.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Stop including the event type in the definitions for the notice type.
+On 29/05/18 17:55, Shawn Lin wrote:
+> [+ Ulf, Adrian, linux-mmc, as linux-mmc and folks are missing in the
+> recipient list.]
+> 
+> On 2018/5/29 21:52, Christoph Hellwig wrote:
+>> By completing the request entirely in the driver we can remove the
+>> BLK_EH_HANDLED return value and thus the split responsibility between the
+>> driver and the block layer that has been causing trouble.
+>>
+>> [While this keeps existing behavior it seems to mismatch the comment,
+>>   maintainers please chime in!]
+> 
+> The comment means the timeout doesn't happen for the current in-flight
+> request which command queue is doing, and the request is finished
+> previously(correct me if I'm wrong). So mmc defers the complete stuff to
+> blk_timeout_work to help. Maybe the comment should gone as well.
+> 
+> Reviewed-by: Shawn Lin <shawn.lin@rock-chips.com>
+> 
+>>
+>> Signed-off-by: Christoph Hellwig <hch@lst.de>
+>> Reviewed-by: Hannes Reinecke <hare@suse.com>
+>> ---
+>>   drivers/mmc/core/queue.c | 5 +++--
+>>   1 file changed, 3 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+>> index 56e9a803db21..648eb6743ed5 100644
+>> --- a/drivers/mmc/core/queue.c
+>> +++ b/drivers/mmc/core/queue.c
+>> @@ -111,8 +111,9 @@ static enum blk_eh_timer_return
+>> mmc_cqe_timed_out(struct request *req)
+>>                   __mmc_cqe_recovery_notifier(mq);
+>>               return BLK_EH_RESET_TIMER;
+>>           }
+>> -        /* No timeout */
+>> -        return BLK_EH_HANDLED;
+>> +        /* No timeout (XXX: huh? comment doesn't make much sense) */
+>> +        blk_mq_complete_request(req);
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/core.c | 30 ++++++++++++++++++------------
- include/linux/nvme.h     |  8 ++++++--
- 2 files changed, 24 insertions(+), 14 deletions(-)
+It seems the block layer timeout handler no longer castrates the completion
+path, in which case blk_mq_complete_request() is not needed here.
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 2c4cf65641a6..86cb78653155 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -3321,6 +3321,21 @@ static void nvme_fw_act_work(struct work_struct *work)
- 	nvme_get_fw_slot_info(ctrl);
- }
- 
-+static void nvme_handle_aen_notice(struct nvme_ctrl *ctrl, u32 result)
-+{
-+	switch ((result & 0xff00) >> 8) {
-+	case NVME_AER_NOTICE_NS_CHANGED:
-+		dev_info(ctrl->device, "rescanning\n");
-+		nvme_queue_scan(ctrl);
-+		break;
-+	case NVME_AER_NOTICE_FW_ACT_STARTING:
-+		queue_work(nvme_wq, &ctrl->fw_act_work);
-+		break;
-+	default:
-+		dev_warn(ctrl->device, "async event result %08x\n", result);
-+	}
-+}
-+
- void nvme_complete_async_event(struct nvme_ctrl *ctrl, __le16 status,
- 		volatile union nvme_result *res)
- {
-@@ -3330,6 +3345,9 @@ void nvme_complete_async_event(struct nvme_ctrl *ctrl, __le16 status,
- 		return;
- 
- 	switch (result & 0x7) {
-+	case NVME_AER_NOTICE:
-+		nvme_handle_aen_notice(ctrl, result);
-+		break;
- 	case NVME_AER_ERROR:
- 	case NVME_AER_SMART:
- 	case NVME_AER_CSS:
-@@ -3339,18 +3357,6 @@ void nvme_complete_async_event(struct nvme_ctrl *ctrl, __le16 status,
- 	default:
- 		break;
- 	}
--
--	switch (result & 0xff07) {
--	case NVME_AER_NOTICE_NS_CHANGED:
--		dev_info(ctrl->device, "rescanning\n");
--		nvme_queue_scan(ctrl);
--		break;
--	case NVME_AER_NOTICE_FW_ACT_STARTING:
--		queue_work(nvme_wq, &ctrl->fw_act_work);
--		break;
--	default:
--		dev_warn(ctrl->device, "async event result %08x\n", result);
--	}
- 	queue_work(nvme_wq, &ctrl->async_event_work);
- }
- EXPORT_SYMBOL_GPL(nvme_complete_async_event);
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index 4112e2bd747f..c37103a4ad38 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -436,10 +436,14 @@ enum {
- enum {
- 	NVME_AER_ERROR			= 0,
- 	NVME_AER_SMART			= 1,
-+	NVME_AER_NOTICE			= 2,
- 	NVME_AER_CSS			= 6,
- 	NVME_AER_VS			= 7,
--	NVME_AER_NOTICE_NS_CHANGED	= 0x0002,
--	NVME_AER_NOTICE_FW_ACT_STARTING = 0x0102,
-+};
-+
-+enum {
-+	NVME_AER_NOTICE_NS_CHANGED	= 0x00,
-+	NVME_AER_NOTICE_FW_ACT_STARTING = 0x01,
- };
- 
- struct nvme_lba_range_type {
--- 
-2.17.0
+The "No timeout" comment can be removed.
+
+>> +        return BLK_EH_DONE;
+>>       default:
+>>           /* Timeout is handled by mmc core */
+>>           return BLK_EH_RESET_TIMER;
+>>
+> 
+> 
