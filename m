@@ -1,21 +1,44 @@
-Return-Path: <BATV+e0efdd19ce80d487e3da+5372+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: Bart.VanAssche@wdc.com,
-	willy@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: fix confusion around GFP_* flags and blk_get_request
-Date: Wed,  9 May 2018 09:54:02 +0200
-Message-Id: <20180509075408.16388-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 00/13] convert block layer to bioset_init()/mempool_init()
+To: Kent Overstreet <kent.overstreet@gmail.com>,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ hch@infradead.org, colyli@suse.de, snitzer@redhat.com,
+ darrick.wong@oracle.com, clm@fb.com, bacik@fb.com,
+ linux-xfs@vger.kernel.org, drbd-dev@lists.linbit.com,
+ linux-btrfs@vger.kernel.org, linux-raid@vger.kernel.org, neilb@suse.com
+References: <20180520222558.7053-1-kent.overstreet@gmail.com>
+Message-ID: <234774e0-38d8-77ea-ca40-88da8b3c5ec6@kernel.dk>
+Date: Wed, 30 May 2018 16:24:03 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180520222558.7053-1-kent.overstreet@gmail.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
+On 5/20/18 4:25 PM, Kent Overstreet wrote:
+> Jens - this series does the rest of the conversions that Christoph wanted, and
+> drops bioset_create().
+> 
+> Only lightly tested, but the changes are pretty mechanical. Based on your
+> for-next tree.
+> 
+> It's also in the for-jens branch at https://evilpiepirate.org/git/bcachefs.git
+> 
+> Kent Overstreet (12):
+>   block: convert bounce, q->bio_split to bioset_init()/mempool_init()
+>   drbd: convert to bioset_init()/mempool_init()
+>   pktcdvd: convert to bioset_init()/mempool_init()
+>   lightnvm: convert to bioset_init()/mempool_init()
+>   bcache: convert to bioset_init()/mempool_init()
+>   md: convert to bioset_init()/mempool_init()
+>   dm: convert to bioset_init()/mempool_init()
+>   target: convert to bioset_init()/mempool_init()
+>   fs: convert block_dev.c to bioset_init()
+>   btrfs: convert to bioset_init()/mempool_init()
+>   xfs: convert to bioset_init()/mempool_init()
+>   block: Drop bioset_create()
 
-this series sorts out the mess around how we use gfp flags in the
-block layer get_request interface.
+With the reviews, I've queued this up for 4.18.
 
-Changes since RFC:
-  - don't switch to GFP_NOIO for allocations in blk_get_request.
-    blk_get_request is used by the multipath code in potentially dead lock
-    prone areas, so this will need a separate audit and maybe a flag.
+-- 
+Jens Axboe
