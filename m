@@ -1,56 +1,57 @@
-Return-Path: <BATV+1f4557cc97fec8e307c5+5393+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <BATV+67dfbb8f664e29ec4bbc+5394+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: linux-nvme@lists.infradead.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Damien Le Moal <damien.lemoal@wdc.com>,
 	linux-block@vger.kernel.org
-Subject: [PATCH 04/12] nvmet: add a new nvmet_zero_sgl helper
-Date: Wed, 30 May 2018 18:45:52 +0200
-Message-Id: <20180530164600.26856-5-hch@lst.de>
-In-Reply-To: <20180530164600.26856-1-hch@lst.de>
-References: <20180530164600.26856-1-hch@lst.de>
+Subject: [PATCH 1/6] block: move initialization of elevator-related fields to blk_alloc_queue_node
+Date: Thu, 31 May 2018 19:11:36 +0200
+Message-Id: <20180531171141.18478-2-hch@lst.de>
+In-Reply-To: <20180531171141.18478-1-hch@lst.de>
+References: <20180531171141.18478-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Zeroes the SGL in the payload.
+No point in doing this in elevator_init.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reported-by: Damien Le Moal <Damien.LeMoal@wdc.com>
+Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+Tested-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- drivers/nvme/target/core.c  | 7 +++++++
- drivers/nvme/target/nvmet.h | 1 +
- 2 files changed, 8 insertions(+)
+ block/blk-core.c | 5 +++++
+ block/elevator.c | 5 -----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
-index 800aaf96ddcd..55c4bc693aa2 100644
---- a/drivers/nvme/target/core.c
-+++ b/drivers/nvme/target/core.c
-@@ -57,6 +57,13 @@ u16 nvmet_copy_from_sgl(struct nvmet_req *req, off_t off, void *buf, size_t len)
- 	return 0;
- }
+diff --git a/block/blk-core.c b/block/blk-core.c
+index a295b3c159b2..b00e7e6340ca 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -999,6 +999,11 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
+ 	if (!q)
+ 		return NULL;
  
-+u16 nvmet_zero_sgl(struct nvmet_req *req, off_t off, size_t len)
-+{
-+	if (sg_zero_buffer(req->sg, req->sg_cnt, len, off) != len)
-+		return NVME_SC_SGL_INVALID_DATA | NVME_SC_DNR;
-+	return 0;
-+}
++	INIT_LIST_HEAD(&q->queue_head);
++	q->last_merge = NULL;
++	q->end_sector = 0;
++	q->boundary_rq = NULL;
 +
- static unsigned int nvmet_max_nsid(struct nvmet_subsys *subsys)
- {
- 	struct nvmet_ns *ns;
-diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
-index 32ebffcf464c..768abe203298 100644
---- a/drivers/nvme/target/nvmet.h
-+++ b/drivers/nvme/target/nvmet.h
-@@ -330,6 +330,7 @@ u16 nvmet_copy_to_sgl(struct nvmet_req *req, off_t off, const void *buf,
- 		size_t len);
- u16 nvmet_copy_from_sgl(struct nvmet_req *req, off_t off, void *buf,
- 		size_t len);
-+u16 nvmet_zero_sgl(struct nvmet_req *req, off_t off, size_t len);
+ 	q->id = ida_simple_get(&blk_queue_ida, 0, 0, gfp_mask);
+ 	if (q->id < 0)
+ 		goto fail_q;
+diff --git a/block/elevator.c b/block/elevator.c
+index e87e9b43aba0..8b64f92e029a 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -213,11 +213,6 @@ int elevator_init(struct request_queue *q, char *name)
+ 	if (unlikely(q->elevator))
+ 		return 0;
  
- u32 nvmet_get_log_page_len(struct nvme_command *cmd);
- 
+-	INIT_LIST_HEAD(&q->queue_head);
+-	q->last_merge = NULL;
+-	q->end_sector = 0;
+-	q->boundary_rq = NULL;
+-
+ 	if (name) {
+ 		e = elevator_get(q, name, true);
+ 		if (!e)
 -- 
 2.17.0
