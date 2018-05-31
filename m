@@ -1,42 +1,29 @@
-Return-Path: <BATV+1f4557cc97fec8e307c5+5393+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-nvme@lists.infradead.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 12/12] nvme: limit warnings from nvme_identify_ns
-Date: Wed, 30 May 2018 18:46:00 +0200
-Message-Id: <20180530164600.26856-13-hch@lst.de>
-In-Reply-To: <20180530164600.26856-1-hch@lst.de>
-References: <20180530164600.26856-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH BUGFIX/IMPROVEMENTS 0/4] bfq: fix regressions on slow
+ virtual machines
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ulf.hansson@linaro.org, broonie@kernel.org, linus.walleij@linaro.org,
+ bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
+ sapienza.dav@gmail.com, 177992@studenti.unimore.it
+References: <20180531144508.3927-1-paolo.valente@linaro.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <2e19f92d-5319-f023-7f4c-89ee81c58348@kernel.dk>
+Date: Thu, 31 May 2018 08:56:04 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180531144508.3927-1-paolo.valente@linaro.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-When rescanning namespaces after an AEN we will issue Identify Namespace
-comands to namespaces that have gone away, so don't warn for this specific
-case.
+On 5/31/18 8:45 AM, Paolo Valente wrote:
+> Hi,
+> we have bumped into some BFQ latency regressions on slow virtual
+> machines. The patches in this series fix all these regressions, apart
+> from the first patch, which provides an indirect contribution, by
+> improving the description of the mechanisms affected by these
+> regressions.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/nvme/host/core.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Pulled for 4.18, thanks Paolo.
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 1ae77428a1a5..7ad3cfc9d4e1 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -984,7 +984,9 @@ static struct nvme_id_ns *nvme_identify_ns(struct nvme_ctrl *ctrl,
- 
- 	error = nvme_submit_sync_cmd(ctrl->admin_q, &c, id, sizeof(*id));
- 	if (error) {
--		dev_warn(ctrl->device, "Identify namespace failed\n");
-+		/* don't warn on a namespace that has gone away */
-+		if (error < 0 || ((error & ~NVME_SC_DNR) != NVME_SC_INVALID_NS))
-+			dev_warn(ctrl->device, "Identify namespace failed\n");
- 		kfree(id);
- 		return NULL;
- 	}
 -- 
-2.17.0
+Jens Axboe
