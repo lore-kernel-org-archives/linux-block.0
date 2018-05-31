@@ -1,101 +1,111 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk, osandov@osandov.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH V3 1/2] blk-mq: abstract out blk-mq-sched rq list iteration bio merge helper
-Date: Wed, 30 May 2018 15:26:07 +0800
-Message-Id: <1527665168-1965-2-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1527665168-1965-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1527665168-1965-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	linus.walleij@linaro.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	sapienza.dav@gmail.com,
+	177992@studenti.unimore.it,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENTS 4/4] block, bfq: prevent soft_rt_next_start from being stuck at infinity
+Date: Thu, 31 May 2018 16:45:08 +0200
+Message-Id: <20180531144508.3927-5-paolo.valente@linaro.org>
+In-Reply-To: <20180531144508.3927-1-paolo.valente@linaro.org>
+References: <20180531144508.3927-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jens Axboe <axboe@kernel.dk>
+From: Davide Sapienza <sapienza.dav@gmail.com>
 
-No functional changes in this patch, just a prep patch for utilizing
-this in an IO scheduler.
+BFQ can deem a bfq_queue as soft real-time only if the queue
+- periodically becomes completely idle, i.e., empty and with
+  no still-outstanding I/O request;
+- after becoming idle, gets new I/O only after a special reference
+  time soft_rt_next_start.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Reviewed-by: Omar Sandoval <osandov@fb.com>
+In this respect, after commit "block, bfq: consider also past I/O in
+soft real-time detection", the value of soft_rt_next_start can never
+decrease. This causes a problem with the following special updating
+case for soft_rt_next_start: to prevent queues that are not completely
+idle to be wrongly detected as soft real-time (when they become
+non-empty again), soft_rt_next_start is temporarily set to infinity
+for empty queues with still outstanding I/O requests. But, if such an
+update is actually performed, then, because of the above commit,
+soft_rt_next_start will be stuck at infinity forever, and the queue
+will have no more chance to be considered soft real-time.
+
+On slow systems, this problem does cause actual soft real-time
+applications to be occasionally not detected as such.
+
+This commit addresses this issue by eliminating the pushing of
+soft_rt_next_start to infinity, and by changing the way non-empty
+queues are prevented from being wrongly detected as soft
+real-time. Simply, a queue that becomes non-empty again can now be
+detected as soft real-time only if it has no outstanding I/O request.
+
+Signed-off-by: Davide Sapienza <sapienza.dav@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/blk-mq-sched.c   | 34 ++++++++++++++++++++++++----------
- include/linux/blk-mq.h |  3 ++-
- 2 files changed, 26 insertions(+), 11 deletions(-)
+ block/bfq-iosched.c | 29 ++---------------------------
+ 1 file changed, 2 insertions(+), 27 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 25c14c5..b0f2c2a 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -268,19 +268,16 @@ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
- EXPORT_SYMBOL_GPL(blk_mq_sched_try_merge);
- 
- /*
-- * Reverse check our software queue for entries that we could potentially
-- * merge with. Currently includes a hand-wavy stop count of 8, to not spend
-- * too much time checking for merges.
-+ * Iterate list of requests and see if we can merge this bio with any
-+ * of them.
-  */
--static bool blk_mq_attempt_merge(struct request_queue *q,
--				 struct blk_mq_ctx *ctx, struct bio *bio)
-+bool blk_mq_bio_list_merge(struct request_queue *q, struct list_head *list,
-+			   struct bio *bio)
- {
- 	struct request *rq;
- 	int checked = 8;
- 
--	lockdep_assert_held(&ctx->lock);
--
--	list_for_each_entry_reverse(rq, &ctx->rq_list, queuelist) {
-+	list_for_each_entry_reverse(rq, list, queuelist) {
- 		bool merged = false;
- 
- 		if (!checked--)
-@@ -305,13 +302,30 @@ static bool blk_mq_attempt_merge(struct request_queue *q,
- 			continue;
- 		}
- 
--		if (merged)
--			ctx->rq_merged++;
- 		return merged;
- 	}
- 
- 	return false;
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 31ce089d54eb..37cadc643c56 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -1416,15 +1416,6 @@ static bool bfq_bfqq_update_budg_for_activation(struct bfq_data *bfqd,
+ 	return wr_or_deserves_wr;
  }
-+EXPORT_SYMBOL_GPL(blk_mq_bio_list_merge);
-+
-+/*
-+ * Reverse check our software queue for entries that we could potentially
-+ * merge with. Currently includes a hand-wavy stop count of 8, to not spend
-+ * too much time checking for merges.
-+ */
-+static bool blk_mq_attempt_merge(struct request_queue *q,
-+				 struct blk_mq_ctx *ctx, struct bio *bio)
-+{
-+	lockdep_assert_held(&ctx->lock);
-+
-+	if (blk_mq_bio_list_merge(q, &ctx->rq_list, bio)) {
-+		ctx->rq_merged++;
-+		return true;
-+	}
-+
-+	return false;
-+}
  
- bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
- {
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index ebc34a5..fb35517 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -259,7 +259,8 @@ void blk_mq_add_to_requeue_list(struct request *rq, bool at_head,
- void blk_mq_kick_requeue_list(struct request_queue *q);
- void blk_mq_delay_kick_requeue_list(struct request_queue *q, unsigned long msecs);
- void blk_mq_complete_request(struct request *rq);
+-/*
+- * Return the farthest future time instant according to jiffies
+- * macros.
+- */
+-static unsigned long bfq_greatest_from_now(void)
+-{
+-	return jiffies + MAX_JIFFY_OFFSET;
+-}
 -
-+bool blk_mq_bio_list_merge(struct request_queue *q, struct list_head *list,
-+			   struct bio *bio);
- bool blk_mq_queue_stopped(struct request_queue *q);
- void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx);
- void blk_mq_start_hw_queue(struct blk_mq_hw_ctx *hctx);
+ /*
+  * Return the farthest past time instant according to jiffies
+  * macros.
+@@ -1569,7 +1560,8 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
+ 	in_burst = bfq_bfqq_in_large_burst(bfqq);
+ 	soft_rt = bfqd->bfq_wr_max_softrt_rate > 0 &&
+ 		!in_burst &&
+-		time_is_before_jiffies(bfqq->soft_rt_next_start);
++		time_is_before_jiffies(bfqq->soft_rt_next_start) &&
++		bfqq->dispatched == 0;
+ 	*interactive = !in_burst && idle_for_long_time;
+ 	wr_or_deserves_wr = bfqd->low_latency &&
+ 		(bfqq->wr_coeff > 1 ||
+@@ -3272,23 +3264,6 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
+ 			bfqq->soft_rt_next_start =
+ 				bfq_bfqq_softrt_next_start(bfqd, bfqq);
+ 		else {
+-			/*
+-			 * The application is still waiting for the
+-			 * completion of one or more requests:
+-			 * prevent it from possibly being incorrectly
+-			 * deemed as soft real-time by setting its
+-			 * soft_rt_next_start to infinity. In fact,
+-			 * without this assignment, the application
+-			 * would be incorrectly deemed as soft
+-			 * real-time if:
+-			 * 1) it issued a new request before the
+-			 *    completion of all its in-flight
+-			 *    requests, and
+-			 * 2) at that time, its soft_rt_next_start
+-			 *    happened to be in the past.
+-			 */
+-			bfqq->soft_rt_next_start =
+-				bfq_greatest_from_now();
+ 			/*
+ 			 * Schedule an update of soft_rt_next_start to when
+ 			 * the task may be discovered to be isochronous.
 -- 
-2.7.4
+2.16.1
