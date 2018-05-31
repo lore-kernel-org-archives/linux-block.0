@@ -1,47 +1,55 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:25419 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932070AbeEWMas (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 May 2018 08:30:48 -0400
-From: Igor Konopko <igor.j.konopko@intel.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, marcin.dziegielewski@intel.com,
-        Igor Konopko <igor.j.konopko@intel.com>
-Subject: [PATCH 2/3] lightnvm: Handling when whole line is bad
-Date: Wed, 23 May 2018 14:29:55 +0200
-Message-Id: <20180523122956.24137-3-igor.j.konopko@intel.com>
-In-Reply-To: <20180523122956.24137-1-igor.j.konopko@intel.com>
-References: <20180523122956.24137-1-igor.j.konopko@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
+Subject: Re: [PATCH BUGFIX 0/3] three fixes for the function
+ bfq_requests_merged
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <d2f92f58-598f-d75c-8120-71cf269738fe@kernel.dk>
+Date: Thu, 31 May 2018 16:50:46 +0200
+Cc: linux-block <linux-block@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ Mark Brown <broonie@kernel.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ 'Paolo Valente' via bfq-iosched <bfq-iosched@googlegroups.com>,
+ oleksandr@natalenko.name,
+ filippo.muzzini@outlook.it
+Message-Id: <3C2F9AF5-C988-4D53-A24C-2D69A71F9F29@linaro.org>
+References: <20180531132313.2986-1-paolo.valente@linaro.org>
+ <d2f92f58-598f-d75c-8120-71cf269738fe@kernel.dk>
+To: Jens Axboe <axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-When all the blocks (chunks) in line are marked as bad (offline)
-we shouldn't try to read smeta during init process.
 
-Currently we are trying to do so by passing -1 as PPA address,
-what causes multiple warnings, that we issuing IOs to out-of-bound PPAs.
 
-Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
-Signed-off-by: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
----
- drivers/lightnvm/pblk-core.c | 5 +++++
- 1 file changed, 5 insertions(+)
+> Il giorno 31 mag 2018, alle ore 16:48, Jens Axboe <axboe@kernel.dk> ha =
+scritto:
+>=20
+> On 5/31/18 7:23 AM, Paolo Valente wrote:
+>> Hi Jens,
+>> this series fixes three bugs in bfq_requests_merged. In more detail:
+>>=20
+>> - two linked bugs, with the first (critical: wrong lock) hidden by =
+the
+>>  second (less critical: wrong check that made the body of the
+>>  function not be executed at all)
+>> - a rather minor bug: superflous code
+>=20
+> Patch #2 doesn't apply on for-4.18/block.
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 6d21f9dbca5f..5d197f19b77b 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -867,6 +867,11 @@ int pblk_line_read_smeta(struct pblk *pblk, struct pblk_line *line)
- {
- 	u64 bpaddr = pblk_line_smeta_start(pblk, line);
- 
-+	if (bpaddr == -1) {
-+		/* Whole line is bad - do not try to read smeta. */
-+		return 1;
-+	}
-+
- 	return pblk_line_submit_smeta_io(pblk, line, bpaddr, PBLK_READ_RECOV);
- }
- 
--- 
-2.14.3
+Yep, it gave some problems to me too, because we happened to move this
+patch around by email.
+
+> I hand applied it, all
+> 3 are queued up now.
+>=20
+
+Thanks for the patience and for queueing these fixes.
+
+Paolo
+
+> --=20
+> Jens Axboe
+>=20
