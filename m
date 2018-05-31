@@ -1,69 +1,60 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: osandov@fb.com,
-	efault@gmx.de,
-	paolo.valente@linaro.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 7/9] bfq-iosched: update shallow depth to smallest one used
-Date: Thu, 10 May 2018 10:24:25 -0600
-Message-Id: <1525969467-12476-8-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1525969467-12476-1-git-send-email-axboe@kernel.dk>
-References: <1525969467-12476-1-git-send-email-axboe@kernel.dk>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	linus.walleij@linaro.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	filippo.muzzini@outlook.it,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX 1/3] block, bfq: remove wrong lock in bfq_requests_merged
+Date: Thu, 31 May 2018 15:23:11 +0200
+Message-Id: <20180531132313.2986-2-paolo.valente@linaro.org>
+In-Reply-To: <20180531132313.2986-1-paolo.valente@linaro.org>
+References: <20180531132313.2986-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-If our shallow depth is smaller than the wake batching of sbitmap,
-we can introduce hangs. Ensure that sbitmap knows how low we'll go.
+From: Filippo Muzzini <filippo.muzzini@outlook.it>
 
-Acked-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+In bfq_requests_merged(), there is a deadlock because the lock on
+bfqq->bfqd->lock is held by the calling function, but the code of
+this function tries to grab the lock again.
+
+This deadlock is currently hidden by another bug (fixed by next commit
+for this source file), which causes the body of bfq_requests_merged()
+to be never executed.
+
+This commit removes the deadlock by removing the lock/unlock pair.
+
+Signed-off-by: Filippo Muzzini <filippo.muzzini@outlook.it>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/bfq-iosched.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+ block/bfq-iosched.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 10294124d597..b622e73a326a 100644
+index 771ae9730ac6..1f0951d36424 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -5081,10 +5081,13 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
+@@ -1898,7 +1898,6 @@ static void bfq_requests_merged(struct request_queue *q, struct request *rq,
  
- /*
-  * See the comments on bfq_limit_depth for the purpose of
-- * the depths set in the function.
-+ * the depths set in the function. Return minimum shallow depth we'll use.
-  */
--static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
-+static unsigned int bfq_update_depths(struct bfq_data *bfqd,
-+				      struct sbitmap_queue *bt)
- {
-+	unsigned int i, j, min_shallow = UINT_MAX;
-+
+ 	if (!RB_EMPTY_NODE(&rq->rb_node))
+ 		goto end;
+-	spin_lock_irq(&bfqq->bfqd->lock);
+ 
  	/*
- 	 * In-word depths if no bfq_queue is being weight-raised:
- 	 * leaving 25% of tags only for sync reads.
-@@ -5115,14 +5118,22 @@ static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
- 	bfqd->word_depths[1][0] = max(((1U << bt->sb.shift) * 3) >> 4, 1U);
- 	/* no more than ~37% of tags for sync writes (~20% extra tags) */
- 	bfqd->word_depths[1][1] = max(((1U << bt->sb.shift) * 6) >> 4, 1U);
-+
-+	for (i = 0; i < 2; i++)
-+		for (j = 0; j < 2; j++)
-+			min_shallow = min(min_shallow, bfqd->word_depths[i][j]);
-+
-+	return min_shallow;
+ 	 * If next and rq belong to the same bfq_queue and next is older
+@@ -1923,7 +1922,6 @@ static void bfq_requests_merged(struct request_queue *q, struct request *rq,
+ 	bfq_remove_request(q, next);
+ 	bfqg_stats_update_io_remove(bfqq_group(bfqq), next->cmd_flags);
+ 
+-	spin_unlock_irq(&bfqq->bfqd->lock);
+ end:
+ 	bfqg_stats_update_io_merged(bfqq_group(bfqq), next->cmd_flags);
  }
- 
- static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
- {
- 	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
- 	struct blk_mq_tags *tags = hctx->sched_tags;
-+	unsigned int min_shallow;
- 
--	bfq_update_depths(bfqd, &tags->bitmap_tags);
-+	min_shallow = bfq_update_depths(bfqd, &tags->bitmap_tags);
-+	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, min_shallow);
- 	return 0;
- }
- 
 -- 
-2.7.4
+2.16.1
