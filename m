@@ -1,87 +1,141 @@
-Return-Path: <penguin-kernel@i-love.sakura.ne.jp>
-Subject: Re: general protection fault in wb_workfn (2)
-To: syzbot <syzbot+4a7438e774b21ddd8eca@syzkaller.appspotmail.com>,
-        syzkaller-bugs@googlegroups.com, jack@suse.cz
-References: <000000000000cbd959056d1851ca@google.com>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        viro@zeniv.linux.org.uk, axboe@kernel.dk, tj@kernel.org,
-        david@fromorbit.com, linux-block@vger.kernel.org
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Message-ID: <0c7c5dea-7312-8a59-9d1b-5467f69719bf@I-love.SAKURA.ne.jp>
-Date: Sun, 27 May 2018 09:47:54 +0900
-MIME-Version: 1.0
-In-Reply-To: <000000000000cbd959056d1851ca@google.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	linus.walleij@linaro.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	sapienza.dav@gmail.com,
+	177992@studenti.unimore.it,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENTS 1/4] block, bfq: add description of weight-raising heuristics
+Date: Thu, 31 May 2018 16:45:05 +0200
+Message-Id: <20180531144508.3927-2-paolo.valente@linaro.org>
+In-Reply-To: <20180531144508.3927-1-paolo.valente@linaro.org>
+References: <20180531144508.3927-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Forwarding http://lkml.kernel.org/r/201805251915.FGH64517.HVFJOOLFFMQStO@I-love.SAKURA.ne.jp .
+A description of how weight raising works is missing in BFQ
+sources. In addition, the code for handling weight raising is
+scattered across a few functions. This makes it rather hard to
+understand the mechanism and its rationale. This commits adds such a
+description at the beginning of the main source file.
 
-Jan Kara wrote:
-> > void delayed_work_timer_fn(struct timer_list *t)
-> > {
-> > 	struct delayed_work *dwork = from_timer(dwork, t, timer);
-> > 
-> > 	/* should have been called from irqsafe timer with irq already off */
-> > 	__queue_work(dwork->cpu, dwork->wq, &dwork->work);
-> > }
-> > 
-> > Then, wb_workfn() is after all scheduled even if we check for
-> > WB_registered bit, isn't it?
-> 
-> It can be queued after WB_registered bit is cleared but it cannot be queued
-> after mod_delayed_work(bdi_wq, &wb->dwork, 0) has finished. That function
-> deletes the pending timer (the timer cannot be armed again because
-> WB_registered is cleared) and queues what should be the last round of
-> wb_workfn().
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+---
+ block/bfq-iosched.c | 80 +++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 56 insertions(+), 24 deletions(-)
 
-mod_delayed_work() deletes the pending timer but does not wait for already
-invoked timer handler to complete because it is using del_timer() rather than
-del_timer_sync(). Then, what happens if __queue_work() is almost concurrently
-executed from two CPUs, one from mod_delayed_work(bdi_wq, &wb->dwork, 0) from
-wb_shutdown() path (which is called without spin_lock_bh(&wb->work_lock)) and
-the other from delayed_work_timer_fn() path (which is called without checking
-WB_registered bit under spin_lock_bh(&wb->work_lock)) ?
-
-wb_wakeup_delayed() {
-  spin_lock_bh(&wb->work_lock);
-  if (test_bit(WB_registered, &wb->state)) // succeeds
-    queue_delayed_work(bdi_wq, &wb->d_work, timeout) {
-      queue_delayed_work_on(WORK_CPU_UNBOUND, bdi_wq, &wb->d_work, timeout) {
-         if (!test_and_set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(&wb->d_work.work))) { // succeeds
-           __queue_delayed_work(WORK_CPU_UNBOUND, bdi_wq, &wb->d_work, timeout) {
-             add_timer(timer); // schedules for delayed_work_timer_fn()
-           }
-         }
-      }
-    }
-  spin_unlock_bh(&wb->work_lock);
-}
-
-delayed_work_timer_fn() {
-  // del_timer() already returns false at this point because this timer
-  // is already inside handler. But something took long here enough to
-  // wait for __queue_work() from wb_shutdown() path to finish?
-  __queue_work(WORK_CPU_UNBOUND, bdi_wq, &wb->d_work.work) {
-    insert_work(pwq, work, worklist, work_flags);
-  }
-}
-
-wb_shutdown() {
-  mod_delayed_work(bdi_wq, &wb->dwork, 0) {
-    mod_delayed_work_on(WORK_CPU_UNBOUND, bdi_wq, &wb->dwork, 0) {
-      ret = try_to_grab_pending(&wb->dwork.work, true, &flags) {
-        if (likely(del_timer(&wb->dwork.timer))) // fails because already in delayed_work_timer_fn()
-          return 1;
-        if (!test_and_set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(&wb->dwork.work))) // fails because already set by queue_delayed_work()
-          return 0;
-        // Returns 1 or -ENOENT after doing something?
-      }
-      if (ret >= 0)
-        __queue_delayed_work(WORK_CPU_UNBOUND, bdi_wq, &wb->dwork, 0) {
-          __queue_work(WORK_CPU_UNBOUND, bdi_wq, &wb->dwork.work) {
-            insert_work(pwq, work, worklist, work_flags);
-          }
-        }
-    }
-  }
-}
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index f71a5846b629..f3703e7431aa 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -49,9 +49,39 @@
+  *
+  * In particular, to provide these low-latency guarantees, BFQ
+  * explicitly privileges the I/O of two classes of time-sensitive
+- * applications: interactive and soft real-time. This feature enables
+- * BFQ to provide applications in these classes with a very low
+- * latency. Finally, BFQ also features additional heuristics for
++ * applications: interactive and soft real-time. In more detail, BFQ
++ * behaves this way if the low_latency parameter is set (default
++ * configuration). This feature enables BFQ to provide applications in
++ * these classes with a very low latency.
++ *
++ * To implement this feature, BFQ constantly tries to detect whether
++ * the I/O requests in a bfq_queue come from an interactive or a soft
++ * real-time application. For brevity, in these cases, the queue is
++ * said to be interactive or soft real-time. In both cases, BFQ
++ * privileges the service of the queue, over that of non-interactive
++ * and non-soft-real-time queues. This privileging is performed,
++ * mainly, by raising the weight of the queue. So, for brevity, we
++ * call just weight-raising periods the time periods during which a
++ * queue is privileged, because deemed interactive or soft real-time.
++ *
++ * The detection of soft real-time queues/applications is described in
++ * detail in the comments on the function
++ * bfq_bfqq_softrt_next_start. On the other hand, the detection of an
++ * interactive queue works as follows: a queue is deemed interactive
++ * if it is constantly non empty only for a limited time interval,
++ * after which it does become empty. The queue may be deemed
++ * interactive again (for a limited time), if it restarts being
++ * constantly non empty, provided that this happens only after the
++ * queue has remained empty for a given minimum idle time.
++ *
++ * By default, BFQ computes automatically the above maximum time
++ * interval, i.e., the time interval after which a constantly
++ * non-empty queue stops being deemed interactive. Since a queue is
++ * weight-raised while it is deemed interactive, this maximum time
++ * interval happens to coincide with the (maximum) duration of the
++ * weight-raising for interactive queues.
++ *
++ * Finally, BFQ also features additional heuristics for
+  * preserving both a low latency and a high throughput on NCQ-capable,
+  * rotational or flash-based devices, and to get the job done quickly
+  * for applications consisting in many I/O-bound processes.
+@@ -61,14 +91,14 @@
+  * all low-latency heuristics for that device, by setting low_latency
+  * to 0.
+  *
+- * BFQ is described in [1], where also a reference to the initial, more
+- * theoretical paper on BFQ can be found. The interested reader can find
+- * in the latter paper full details on the main algorithm, as well as
+- * formulas of the guarantees and formal proofs of all the properties.
+- * With respect to the version of BFQ presented in these papers, this
+- * implementation adds a few more heuristics, such as the one that
+- * guarantees a low latency to soft real-time applications, and a
+- * hierarchical extension based on H-WF2Q+.
++ * BFQ is described in [1], where also a reference to the initial,
++ * more theoretical paper on BFQ can be found. The interested reader
++ * can find in the latter paper full details on the main algorithm, as
++ * well as formulas of the guarantees and formal proofs of all the
++ * properties.  With respect to the version of BFQ presented in these
++ * papers, this implementation adds a few more heuristics, such as the
++ * ones that guarantee a low latency to interactive and soft real-time
++ * applications, and a hierarchical extension based on H-WF2Q+.
+  *
+  * B-WF2Q+ is based on WF2Q+, which is described in [2], together with
+  * H-WF2Q+, while the augmented tree used here to implement B-WF2Q+
+@@ -218,21 +248,23 @@ static struct kmem_cache *bfq_pool;
+ #define BFQ_RATE_SHIFT		16
+ 
+ /*
+- * By default, BFQ computes the duration of the weight raising for
+- * interactive applications automatically, using the following formula:
+- * duration = (R / r) * T, where r is the peak rate of the device, and
+- * R and T are two reference parameters.
+- * In particular, R is the peak rate of the reference device (see
+- * below), and T is a reference time: given the systems that are
+- * likely to be installed on the reference device according to its
+- * speed class, T is about the maximum time needed, under BFQ and
++ * When configured for computing the duration of the weight-raising
++ * for interactive queues automatically (see the comments at the
++ * beginning of this file), BFQ does it using the following formula:
++ * duration = (R / r) * T,
++ * where r is the peak rate of the device, and R
++ * and T are two reference parameters.	In particular,
++ * R is the peak rate of the reference device (see below), and
++ * T is a reference time: given the systems that are likely
++ * to be installed on the reference device according to its speed
++ * class, T is about the maximum time needed, under BFQ and
+  * while reading two files in parallel, to load typical large
+  * applications on these systems (see the comments on
+- * max_service_from_wr below, for more details on how T is obtained).
+- * In practice, the slower/faster the device at hand is, the more/less
+- * it takes to load applications with respect to the reference device.
+- * Accordingly, the longer/shorter BFQ grants weight raising to
+- * interactive applications.
++ * max_service_from_wr below, for more details on how T is
++ * obtained).  In practice, the slower/faster the device at hand is,
++ * the more/less it takes to load applications with respect to the
++ * reference device.  Accordingly, the longer/shorter BFQ grants
++ * weight raising to interactive applications.
+  *
+  * BFQ uses four different reference pairs (R, T), depending on:
+  * . whether the device is rotational or non-rotational;
+-- 
+2.16.1
