@@ -1,56 +1,162 @@
-Return-Path: <BATV+df5a2477ff0fa86e9985+5386+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <BATV+67dfbb8f664e29ec4bbc+5394+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Tejun Heo <tj@kernel.org>,
-	Lee Duncan <lduncan@suse.com>,
-	Chris Leech <cleech@redhat.com>,
-	Rafael David Tinoco <rafael.tinoco@canonical.com>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 04/14] nbd: complete requests from ->timeout
-Date: Wed, 23 May 2018 14:19:31 +0200
-Message-Id: <20180523121941.8632-5-hch@lst.de>
-In-Reply-To: <20180523121941.8632-1-hch@lst.de>
-References: <20180523121941.8632-1-hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Damien Le Moal <damien.lemoal@wdc.com>,
+	linux-block@vger.kernel.org
+Subject: [PATCH 5/6] block: split the blk-mq case from elevator_init
+Date: Thu, 31 May 2018 19:11:40 +0200
+Message-Id: <20180531171141.18478-6-hch@lst.de>
+In-Reply-To: <20180531171141.18478-1-hch@lst.de>
+References: <20180531171141.18478-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-By completing the request entirely in the driver we can remove the
-BLK_EH_HANDLED return value and thus the split responsibility between the
-driver and the block layer that has been causing trouble.
+There is almost no shared logic, which leads to a very confusing code
+flow.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+Tested-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- drivers/block/nbd.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ block/blk-mq.c   |  2 +-
+ block/blk.h      |  1 +
+ block/elevator.c | 77 +++++++++++++++++++++++++++++-------------------
+ 3 files changed, 48 insertions(+), 32 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 09d9959287fe..30a851b8a99c 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -300,7 +300,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 858d6edff4d3..6332940ca118 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2573,7 +2573,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	if (!(set->flags & BLK_MQ_F_NO_SCHED)) {
+ 		int ret;
  
- 	if (!refcount_inc_not_zero(&nbd->config_refs)) {
- 		cmd->status = BLK_STS_TIMEOUT;
--		return BLK_EH_HANDLED;
-+		goto done;
+-		ret = elevator_init(q);
++		ret = elevator_init_mq(q);
+ 		if (ret)
+ 			return ERR_PTR(ret);
  	}
- 	config = nbd->config;
- 
-@@ -338,8 +338,9 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 	cmd->status = BLK_STS_IOERR;
- 	sock_shutdown(nbd);
- 	nbd_config_put(nbd);
--
--	return BLK_EH_HANDLED;
-+done:
-+	blk_mq_complete_request(req);
-+	return BLK_EH_DONE;
+diff --git a/block/blk.h b/block/blk.h
+index ab5ec2dadc7b..8d23aea96ce9 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -232,6 +232,7 @@ static inline void elv_deactivate_rq(struct request_queue *q, struct request *rq
  }
  
+ int elevator_init(struct request_queue *);
++int elevator_init_mq(struct request_queue *q);
+ void elevator_exit(struct request_queue *, struct elevator_queue *);
+ int elv_register_queue(struct request_queue *q);
+ void elv_unregister_queue(struct request_queue *q);
+diff --git a/block/elevator.c b/block/elevator.c
+index d6480e70816e..fa828b5bfd4b 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -199,6 +199,11 @@ static void elevator_release(struct kobject *kobj)
+ 	kfree(e);
+ }
+ 
++/*
++ * Use the default elevator specified by config boot param for non-mq devices,
++ * or by config option.  Don't try to load modules as we could be running off
++ * async and request_module() isn't allowed from async.
++ */
+ int elevator_init(struct request_queue *q)
+ {
+ 	struct elevator_type *e = NULL;
+@@ -212,46 +217,22 @@ int elevator_init(struct request_queue *q)
+ 	if (unlikely(q->elevator))
+ 		goto out_unlock;
+ 
+-	/*
+-	 * Use the default elevator specified by config boot param for
+-	 * non-mq devices, or by config option. Don't try to load modules
+-	 * as we could be running off async and request_module() isn't
+-	 * allowed from async.
+-	 */
+-	if (!q->mq_ops && *chosen_elevator) {
++	if (*chosen_elevator) {
+ 		e = elevator_get(q, chosen_elevator, false);
+ 		if (!e)
+ 			printk(KERN_ERR "I/O scheduler %s not found\n",
+ 							chosen_elevator);
+ 	}
+ 
++	if (!e)
++		e = elevator_get(q, CONFIG_DEFAULT_IOSCHED, false);
+ 	if (!e) {
+-		/*
+-		 * For blk-mq devices, we default to using mq-deadline,
+-		 * if available, for single queue devices. If deadline
+-		 * isn't available OR we have multiple queues, default
+-		 * to "none".
+-		 */
+-		if (q->mq_ops) {
+-			if (q->nr_hw_queues == 1)
+-				e = elevator_get(q, "mq-deadline", false);
+-			if (!e)
+-				goto out_unlock;
+-		} else
+-			e = elevator_get(q, CONFIG_DEFAULT_IOSCHED, false);
+-
+-		if (!e) {
+-			printk(KERN_ERR
+-				"Default I/O scheduler not found. " \
+-				"Using noop.\n");
+-			e = elevator_get(q, "noop", false);
+-		}
++		printk(KERN_ERR
++			"Default I/O scheduler not found. Using noop.\n");
++		e = elevator_get(q, "noop", false);
+ 	}
+ 
+-	if (e->uses_mq)
+-		err = blk_mq_init_sched(q, e);
+-	else
+-		err = e->ops.sq.elevator_init_fn(q, e);
++	err = e->ops.sq.elevator_init_fn(q, e);
+ 	if (err)
+ 		elevator_put(e);
+ out_unlock:
+@@ -992,6 +973,40 @@ static int elevator_switch_mq(struct request_queue *q,
+ 	return ret;
+ }
+ 
++/*
++ * For blk-mq devices, we default to using mq-deadline, if available, for single
++ * queue devices.  If deadline isn't available OR we have multiple queues,
++ * default to "none".
++ */
++int elevator_init_mq(struct request_queue *q)
++{
++	struct elevator_type *e;
++	int err = 0;
++
++	if (q->nr_hw_queues != 1)
++		return 0;
++
++	/*
++	 * q->sysfs_lock must be held to provide mutual exclusion between
++	 * elevator_switch() and here.
++	 */
++	mutex_lock(&q->sysfs_lock);
++	if (unlikely(q->elevator))
++		goto out_unlock;
++
++	e = elevator_get(q, "mq-deadline", false);
++	if (!e)
++		goto out_unlock;
++
++	err = blk_mq_init_sched(q, e);
++	if (err)
++		elevator_put(e);
++out_unlock:
++	mutex_unlock(&q->sysfs_lock);
++	return err;
++}
++
++
  /*
+  * switch to new_e io scheduler. be careful not to introduce deadlocks -
+  * we don't free the old io scheduler, before we have allocated what we
 -- 
 2.17.0
