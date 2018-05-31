@@ -1,176 +1,98 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Ingo Molnar <mingo@kernel.org>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Subject: [PATCH 03/10] block: Add bioset_init()/bioset_exit()
-Date: Fri, 18 May 2018 03:49:03 -0400
-Message-Id: <20180518074918.13816-6-kent.overstreet@gmail.com>
-In-Reply-To: <20180518074918.13816-1-kent.overstreet@gmail.com>
-References: <20180518074918.13816-1-kent.overstreet@gmail.com>
+Return-Path: <BATV+67dfbb8f664e29ec4bbc+5394+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Damien Le Moal <damien.lemoal@wdc.com>,
+	linux-block@vger.kernel.org
+Subject: [PATCH 3/6] block: remove the always unused name argument to elevator_init
+Date: Thu, 31 May 2018 19:11:38 +0200
+Message-Id: <20180531171141.18478-4-hch@lst.de>
+In-Reply-To: <20180531171141.18478-1-hch@lst.de>
+References: <20180531171141.18478-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Similarly to mempool_init()/mempool_exit(), take a pointer indirection
-out of allocation/freeing by allowing biosets to be embedded in other
-structs.
-
-Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
+Reported-by: Damien Le Moal <Damien.LeMoal@wdc.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+Tested-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- block/bio.c         | 93 +++++++++++++++++++++++++++++++--------------
- include/linux/bio.h |  2 +
- 2 files changed, 67 insertions(+), 28 deletions(-)
+ block/blk-core.c     |  2 +-
+ block/blk-mq-sched.c |  2 +-
+ block/blk.h          |  2 +-
+ block/elevator.c     | 10 ++--------
+ 4 files changed, 5 insertions(+), 11 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 360e9bcea5..980befd919 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1856,21 +1856,83 @@ int biovec_init_pool(mempool_t *pool, int pool_entries)
- 	return mempool_init_slab_pool(pool, pool_entries, bp->slab);
- }
+diff --git a/block/blk-core.c b/block/blk-core.c
+index b00e7e6340ca..18b691c93b63 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1179,7 +1179,7 @@ int blk_init_allocated_queue(struct request_queue *q)
+ 	mutex_lock(&q->sysfs_lock);
  
--void bioset_free(struct bio_set *bs)
-+/*
-+ * bioset_exit - exit a bioset initialized with bioset_init()
-+ *
-+ * May be called on a zeroed but uninitialized bioset (i.e. allocated with
-+ * kzalloc()).
-+ */
-+void bioset_exit(struct bio_set *bs)
- {
- 	if (bs->rescue_workqueue)
- 		destroy_workqueue(bs->rescue_workqueue);
-+	bs->rescue_workqueue = NULL;
- 
- 	mempool_exit(&bs->bio_pool);
- 	mempool_exit(&bs->bvec_pool);
- 
- 	bioset_integrity_free(bs);
--	bio_put_slab(bs);
-+	if (bs->bio_slab)
-+		bio_put_slab(bs);
-+	bs->bio_slab = NULL;
-+}
-+EXPORT_SYMBOL(bioset_exit);
- 
-+void bioset_free(struct bio_set *bs)
-+{
-+	bioset_exit(bs);
- 	kfree(bs);
- }
- EXPORT_SYMBOL(bioset_free);
- 
-+/**
-+ * bioset_init - Initialize a bio_set
-+ * @pool_size:	Number of bio and bio_vecs to cache in the mempool
-+ * @front_pad:	Number of bytes to allocate in front of the returned bio
-+ * @flags:	Flags to modify behavior, currently %BIOSET_NEED_BVECS
-+ *              and %BIOSET_NEED_RESCUER
-+ *
-+ * Similar to bioset_create(), but initializes a passed-in bioset instead of
-+ * separately allocating it.
-+ */
-+int bioset_init(struct bio_set *bs,
-+		unsigned int pool_size,
-+		unsigned int front_pad,
-+		int flags)
-+{
-+	unsigned int back_pad = BIO_INLINE_VECS * sizeof(struct bio_vec);
-+
-+	bs->front_pad = front_pad;
-+
-+	spin_lock_init(&bs->rescue_lock);
-+	bio_list_init(&bs->rescue_list);
-+	INIT_WORK(&bs->rescue_work, bio_alloc_rescue);
-+
-+	bs->bio_slab = bio_find_or_create_slab(front_pad + back_pad);
-+	if (!bs->bio_slab)
-+		return -ENOMEM;
-+
-+	if (mempool_init_slab_pool(&bs->bio_pool, pool_size, bs->bio_slab))
-+		goto bad;
-+
-+	if ((flags & BIOSET_NEED_BVECS) &&
-+	    biovec_init_pool(&bs->bvec_pool, pool_size))
-+		goto bad;
-+
-+	if (!(flags & BIOSET_NEED_RESCUER))
-+		return 0;
-+
-+	bs->rescue_workqueue = alloc_workqueue("bioset", WQ_MEM_RECLAIM, 0);
-+	if (!bs->rescue_workqueue)
-+		goto bad;
-+
-+	return 0;
-+bad:
-+	bioset_exit(bs);
-+	return -ENOMEM;
-+}
-+EXPORT_SYMBOL(bioset_init);
-+
- /**
-  * bioset_create  - Create a bio_set
-  * @pool_size:	Number of bio and bio_vecs to cache in the mempool
-@@ -1895,43 +1957,18 @@ struct bio_set *bioset_create(unsigned int pool_size,
- 			      unsigned int front_pad,
- 			      int flags)
- {
--	unsigned int back_pad = BIO_INLINE_VECS * sizeof(struct bio_vec);
- 	struct bio_set *bs;
- 
- 	bs = kzalloc(sizeof(*bs), GFP_KERNEL);
- 	if (!bs)
- 		return NULL;
- 
--	bs->front_pad = front_pad;
--
--	spin_lock_init(&bs->rescue_lock);
--	bio_list_init(&bs->rescue_list);
--	INIT_WORK(&bs->rescue_work, bio_alloc_rescue);
--
--	bs->bio_slab = bio_find_or_create_slab(front_pad + back_pad);
--	if (!bs->bio_slab) {
-+	if (bioset_init(bs, pool_size, front_pad, flags)) {
- 		kfree(bs);
- 		return NULL;
+ 	/* init elevator */
+-	if (elevator_init(q, NULL)) {
++	if (elevator_init(q)) {
+ 		mutex_unlock(&q->sysfs_lock);
+ 		goto out_exit_flush_rq;
  	}
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index b0f2c2a40a0c..fd4f68d61df0 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -653,7 +653,7 @@ int blk_mq_sched_init(struct request_queue *q)
+ 	int ret;
  
--	if (mempool_init_slab_pool(&bs->bio_pool, pool_size, bs->bio_slab))
--		goto bad;
--
--	if ((flags & BIOSET_NEED_BVECS) &&
--	    biovec_init_pool(&bs->bvec_pool, pool_size))
--		goto bad;
--
--	if (!(flags & BIOSET_NEED_RESCUER))
--		return bs;
--
--	bs->rescue_workqueue = alloc_workqueue("bioset", WQ_MEM_RECLAIM, 0);
--	if (!bs->rescue_workqueue)
--		goto bad;
--
- 	return bs;
--bad:
--	bioset_free(bs);
--	return NULL;
- }
- EXPORT_SYMBOL(bioset_create);
+ 	mutex_lock(&q->sysfs_lock);
+-	ret = elevator_init(q, NULL);
++	ret = elevator_init(q);
+ 	mutex_unlock(&q->sysfs_lock);
  
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 720f7261d0..fa3cf94a50 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -406,6 +406,8 @@ static inline struct bio *bio_next_split(struct bio *bio, int sectors,
- 	return bio_split(bio, sectors, gfp, bs);
+ 	return ret;
+diff --git a/block/blk.h b/block/blk.h
+index a559c0532347..ab5ec2dadc7b 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -231,7 +231,7 @@ static inline void elv_deactivate_rq(struct request_queue *q, struct request *rq
+ 		e->type->ops.sq.elevator_deactivate_req_fn(q, rq);
  }
  
-+extern int bioset_init(struct bio_set *, unsigned int, unsigned int, int flags);
-+extern void bioset_exit(struct bio_set *);
- extern struct bio_set *bioset_create(unsigned int, unsigned int, int flags);
- enum {
- 	BIOSET_NEED_BVECS = BIT(0),
+-int elevator_init(struct request_queue *, char *);
++int elevator_init(struct request_queue *);
+ void elevator_exit(struct request_queue *, struct elevator_queue *);
+ int elv_register_queue(struct request_queue *q);
+ void elv_unregister_queue(struct request_queue *q);
+diff --git a/block/elevator.c b/block/elevator.c
+index a7baa4687b28..9276540af2a1 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -199,7 +199,7 @@ static void elevator_release(struct kobject *kobj)
+ 	kfree(e);
+ }
+ 
+-int elevator_init(struct request_queue *q, char *name)
++int elevator_init(struct request_queue *q)
+ {
+ 	struct elevator_type *e = NULL;
+ 	int err;
+@@ -213,19 +213,13 @@ int elevator_init(struct request_queue *q, char *name)
+ 	if (unlikely(q->elevator))
+ 		return 0;
+ 
+-	if (name) {
+-		e = elevator_get(q, name, true);
+-		if (!e)
+-			return -EINVAL;
+-	}
+-
+ 	/*
+ 	 * Use the default elevator specified by config boot param for
+ 	 * non-mq devices, or by config option. Don't try to load modules
+ 	 * as we could be running off async and request_module() isn't
+ 	 * allowed from async.
+ 	 */
+-	if (!e && !q->mq_ops && *chosen_elevator) {
++	if (!q->mq_ops && *chosen_elevator) {
+ 		e = elevator_get(q, chosen_elevator, false);
+ 		if (!e)
+ 			printk(KERN_ERR "I/O scheduler %s not found\n",
 -- 
 2.17.0
