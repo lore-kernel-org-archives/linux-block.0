@@ -1,82 +1,89 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:38900 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934164AbeEIJJB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 May 2018 05:09:01 -0400
-Received: by mail-pf0-f195.google.com with SMTP id o76so25321996pfi.5
-        for <linux-block@vger.kernel.org>; Wed, 09 May 2018 02:09:01 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
-Subject: [PATCH v3 0/7] block: consolidate struct request timestamp fields
-Date: Wed,  9 May 2018 02:08:46 -0700
-Message-Id: <cover.1525856630.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	linus.walleij@linaro.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	sapienza.dav@gmail.com,
+	177992@studenti.unimore.it,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENTS 3/4] block, bfq: increase weight-raising duration for interactive apps
+Date: Thu, 31 May 2018 16:45:07 +0200
+Message-Id: <20180531144508.3927-4-paolo.valente@linaro.org>
+In-Reply-To: <20180531144508.3927-1-paolo.valente@linaro.org>
+References: <20180531144508.3927-1-paolo.valente@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+From: Davide Sapienza <sapienza.dav@gmail.com>
 
-Here's the timestamp field rework rebased on for-4.18/block. The only
-conflict was the blk stat bits, which this series removes in favor of
-rq->wbt_flags. No other changes since v2.
+The maximum possible duration of the weight-raising period for
+interactive applications is limited to 13 seconds, as this is the time
+needed to load the largest application that we considered when tuning
+weight raising. Unfortunately, in such an evaluation, we did not
+consider the case of very slow virtual machines.
 
-Cover letter from v1:
+For example, on a QEMU/KVM virtual machine
+- running in a slow PC;
+- with a virtual disk stacked on a slow low-end 5400rpm HDD;
+- serving a heavy I/O workload, such as the sequential reading of
+several files;
+mplayer takes 23 seconds to start, if constantly weight-raised.
 
-Currently, struct request has four timestamp fields:
+To address this issue, this commit conservatively sets the upper limit
+for weight-raising duration to 25 seconds.
 
-- start_time (jiffies), marked at get_request() time and used for
-  iostats
-- issue_stat (ktime nanoseconds, with some bits shared with wbt and
-  io.low), marked at start_request() time and used for accounting the
-  time spent in the device for blk-stats (i.e., wbt, kyber, hybrid
-  polling)
-- start_time_ns (sched_clock nanoseconds), also marked at get_request()
-  time, used for CFQ and BFQ cgroups support
-- io_start_time_ns (sched_clock nanoseconds), also marked at
-  start_request() time and also used for CFQ and BFQ
+Signed-off-by: Davide Sapienza <sapienza.dav@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+---
+ block/bfq-iosched.c | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
 
-Clearly, there's some redundancy here. This patch series consolidates
-these four timestamps into two, both of which are in ktime nanoseconds.
-This shaves off up to 16 bytes from struct request, gets rid of the
-usage of sched_clock(), and actually removes lines of code.
-
-Patches 1 and 2 do some prep in wbt. Patch 3 does some prep in io.low.
-Patch 4 splits up issue_stat into just a timestamp and separate fields
-to fill a hole in struct request. Patch 5 does some prep in CFQ and BFQ.
-Patch 6 allows us to save a call to ktime_get(). Patch 7 does the final
-consolidation.
-
-Please take a look. I added a blktest (block/018) to sanity check
-iostats, but other stuff is harder to test so it could use some eyes.
-Thanks!
-
-Omar Sandoval (7):
-  block: move some wbt helpers to blk-wbt.c
-  block: pass struct request instead of struct blk_issue_stat to wbt
-  block: replace bio->bi_issue_stat with bio-specific type
-  block: get rid of struct blk_issue_stat
-  block: use ktime_get_ns() instead of sched_clock() for cfq and bfq
-  block: move blk_stat_add() to __blk_mq_end_request()
-  block: consolidate struct request timestamp fields
-
- block/bfq-cgroup.c        | 40 ++++++++++++------------
- block/bfq-iosched.c       |  4 +--
- block/bfq-iosched.h       | 10 +++---
- block/blk-core.c          | 32 +++++++++++---------
- block/blk-merge.c         | 11 +++----
- block/blk-mq.c            | 33 +++++++++++---------
- block/blk-stat.c          | 10 ++----
- block/blk-stat.h          | 45 +--------------------------
- block/blk-throttle.c      | 22 ++++++--------
- block/blk-wbt.c           | 59 +++++++++++++++++++++++-------------
- block/blk-wbt.h           | 47 +++++++++-------------------
- block/blk.h               |  2 +-
- block/cfq-iosched.c       | 64 ++++++++++++++++++---------------------
- block/kyber-iosched.c     |  6 ++--
- drivers/md/dm-rq.c        |  2 +-
- include/linux/blk_types.h | 49 ++++++++++++++++++++++++++++--
- include/linux/blkdev.h    | 61 +++++++++----------------------------
- 17 files changed, 228 insertions(+), 269 deletions(-)
-
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 262c929e24ee..31ce089d54eb 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -930,22 +930,26 @@ static unsigned int bfq_wr_duration(struct bfq_data *bfqd)
+ 	do_div(dur, bfqd->peak_rate);
+ 
+ 	/*
+-	 * Limit duration between 3 and 13 seconds. Tests show that
+-	 * higher values than 13 seconds often yield the opposite of
+-	 * the desired result, i.e., worsen responsiveness by letting
+-	 * non-interactive and non-soft-real-time applications
+-	 * preserve weight raising for a too long time interval.
++	 * Limit duration between 3 and 25 seconds. The upper limit
++	 * has been conservatively set after the following worst case:
++	 * on a QEMU/KVM virtual machine
++	 * - running in a slow PC
++	 * - with a virtual disk stacked on a slow low-end 5400rpm HDD
++	 * - serving a heavy I/O workload, such as the sequential reading
++	 *   of several files
++	 * mplayer took 23 seconds to start, if constantly weight-raised.
++	 *
++	 * As for higher values than that accomodating the above bad
++	 * scenario, tests show that higher values would often yield
++	 * the opposite of the desired result, i.e., would worsen
++	 * responsiveness by allowing non-interactive applications to
++	 * preserve weight raising for too long.
+ 	 *
+ 	 * On the other end, lower values than 3 seconds make it
+ 	 * difficult for most interactive tasks to complete their jobs
+ 	 * before weight-raising finishes.
+ 	 */
+-	if (dur > msecs_to_jiffies(13000))
+-		dur = msecs_to_jiffies(13000);
+-	else if (dur < msecs_to_jiffies(3000))
+-		dur = msecs_to_jiffies(3000);
+-
+-	return dur;
++	return clamp_val(dur, msecs_to_jiffies(3000), msecs_to_jiffies(25000));
+ }
+ 
+ /* switch back from soft real-time to interactive weight raising */
 -- 
-2.17.0
+2.16.1
