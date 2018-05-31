@@ -1,69 +1,281 @@
-Return-Path: <faiz_abbas@ti.com>
-From: Faiz Abbas <faiz_abbas@ti.com>
-Subject: mmc filesystem performance decreased on the first write after
- filesystem creation
-To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-omap
-	<linux-omap@vger.kernel.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-CC: Christoph Hellwig <hch@lst.de>, Ulf Hansson <ulf.hansson@linaro.org>,
-        Jens
- Axboe <axboe@kernel.dk>
-Message-ID: <a976e20a-3ed1-43d0-4665-f570ef496d02@ti.com>
-Date: Tue, 22 May 2018 20:48:31 +0530
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	linus.walleij@linaro.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	sapienza.dav@gmail.com,
+	177992@studenti.unimore.it,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENTS 2/4] block, bfq: remove slow-system class
+Date: Thu, 31 May 2018 16:45:06 +0200
+Message-Id: <20180531144508.3927-3-paolo.valente@linaro.org>
+In-Reply-To: <20180531144508.3927-1-paolo.valente@linaro.org>
+References: <20180531144508.3927-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+BFQ computes the duration of weight raising for interactive
+applications automatically, using some reference parameters. In
+particular, BFQ uses the best durations (see comments in the code for
+how these durations have been assessed) for two classes of systems:
+slow and fast ones. Examples of slow systems are old phones or systems
+using micro HDDs. Fast systems are all the remaining ones. Using these
+parameters, BFQ computes the actual duration of the weight raising,
+for the system at hand, as a function of the relative speed of the
+system w.r.t. the speed of a reference system, belonging to the same
+class of systems as the system at hand.
 
-I am debugging a performance reduction in ext2 filesystems on an mmc
-device in TI's am335x evm board.
+This slow vs fast differentiation proved to be useful in the past, but
+happens to have little meaning with current hardware. Even worse, it
+does cause problems in virtual systems, where the speed of the system
+can vary frequently, and so widely to just confuse the class-detection
+mechanism, and, as we have verified experimentally, to cause BFQ to
+compute non-sensical weight-raising durations.
 
-I see that the performance is reduced on the first write after making a
-new filesystem using mkfs.ext2 on one of the mmc partitions. The
-performance comes back to normal after the first write.
+This commit addresses this issue by removing the slow class and the
+class-detection mechanism.
 
-commands used:
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+---
+ block/bfq-iosched.c | 137 ++++++++++++++++------------------------------------
+ block/bfq-iosched.h |  14 ++----
+ 2 files changed, 46 insertions(+), 105 deletions(-)
 
-=> umount /dev/mmcblk1p2
-
-=> mkfs.ext2 -F  /dev/mmcblk1p2
-
-=> mount -t ext2 -o async /dev/mmcblk1p2 /mnt/partition_mmc
-
-=> dd if=/dev/urandom of=/dev/shm/srctest_file_mmc_1184 bs=1M count=10
-
-=> ./filesystem_tests -write -src_file /dev/shm/srctest_file_mmc_1184
--srcfile_size 10 -file /mnt/partition_mmc/test_file_1184 -buffer_size
-102400 -file_size 100 -performance
-
-The filesystem_tests write utility reads from the file generated at
-/dev/shm/srctest_file_mmc_1184, memory maps the file to a buffer, and
-then writes it into the newly created /mnt/partition_mmc in multiples of
-buffer_size while measuring write performance.
-
-See here for the implementation of filesystem_tests write utility:
-http://arago-project.org/git/projects/?p=test-automation/ltp-ddt.git;a=blob;f=testcases/ddt/filesystem_test_suite/src/testcases/st_filesystem_write_to_file.c;h=80e8e244d7eaa9f0dbd9b21ea705445156c36bef;hb=f7fc06c290333ce08a7d4fba104eee0f0f1d942b
-
-Complete log with multiple calls to filesystem_tests:
-https://pastebin.ubuntu.com/p/BckmTJpqPv/
-
-Notice that the first run of filesystem_tests has a lower throughput
-reported.
-
-I was able to bisect the issue to this commit:
-5d1429fead5b (mmc: remove the discard_zeroes_data flag)
-
-I would assume that after this flag is removed, the filesystem creation
-command would explicitly write zeroes to the device which might explain
-the performance fall. However, then the mkfs.ext2 command itself should
-take more time rather than the first file write after that.
-
-It would be nice if someone could help me understand why this is happening.
-
-Thanks for your help.
-
-Regards,
-Faiz
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index f3703e7431aa..262c929e24ee 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -251,55 +251,43 @@ static struct kmem_cache *bfq_pool;
+  * When configured for computing the duration of the weight-raising
+  * for interactive queues automatically (see the comments at the
+  * beginning of this file), BFQ does it using the following formula:
+- * duration = (R / r) * T,
+- * where r is the peak rate of the device, and R
+- * and T are two reference parameters.	In particular,
+- * R is the peak rate of the reference device (see below), and
+- * T is a reference time: given the systems that are likely
+- * to be installed on the reference device according to its speed
+- * class, T is about the maximum time needed, under BFQ and
+- * while reading two files in parallel, to load typical large
+- * applications on these systems (see the comments on
+- * max_service_from_wr below, for more details on how T is
+- * obtained).  In practice, the slower/faster the device at hand is,
+- * the more/less it takes to load applications with respect to the
++ * duration = (ref_rate / r) * ref_wr_duration,
++ * where r is the peak rate of the device, and ref_rate and
++ * ref_wr_duration are two reference parameters.  In particular,
++ * ref_rate is the peak rate of the reference storage device (see
++ * below), and ref_wr_duration is about the maximum time needed, with
++ * BFQ and while reading two files in parallel, to load typical large
++ * applications on the reference device (see the comments on
++ * max_service_from_wr below, for more details on how ref_wr_duration
++ * is obtained).  In practice, the slower/faster the device at hand
++ * is, the more/less it takes to load applications with respect to the
+  * reference device.  Accordingly, the longer/shorter BFQ grants
+  * weight raising to interactive applications.
+  *
+- * BFQ uses four different reference pairs (R, T), depending on:
+- * . whether the device is rotational or non-rotational;
+- * . whether the device is slow, such as old or portable HDDs, as well as
+- *   SD cards, or fast, such as newer HDDs and SSDs.
++ * BFQ uses two different reference pairs (ref_rate, ref_wr_duration),
++ * depending on whether the device is rotational or non-rotational.
+  *
+- * The device's speed class is dynamically (re)detected in
+- * bfq_update_peak_rate() every time the estimated peak rate is updated.
++ * In the following definitions, ref_rate[0] and ref_wr_duration[0]
++ * are the reference values for a rotational device, whereas
++ * ref_rate[1] and ref_wr_duration[1] are the reference values for a
++ * non-rotational device. The reference rates are not the actual peak
++ * rates of the devices used as a reference, but slightly lower
++ * values. The reason for using slightly lower values is that the
++ * peak-rate estimator tends to yield slightly lower values than the
++ * actual peak rate (it can yield the actual peak rate only if there
++ * is only one process doing I/O, and the process does sequential
++ * I/O).
+  *
+- * In the following definitions, R_slow[0]/R_fast[0] and
+- * T_slow[0]/T_fast[0] are the reference values for a slow/fast
+- * rotational device, whereas R_slow[1]/R_fast[1] and
+- * T_slow[1]/T_fast[1] are the reference values for a slow/fast
+- * non-rotational device. Finally, device_speed_thresh are the
+- * thresholds used to switch between speed classes. The reference
+- * rates are not the actual peak rates of the devices used as a
+- * reference, but slightly lower values. The reason for using these
+- * slightly lower values is that the peak-rate estimator tends to
+- * yield slightly lower values than the actual peak rate (it can yield
+- * the actual peak rate only if there is only one process doing I/O,
+- * and the process does sequential I/O).
+- *
+- * Both the reference peak rates and the thresholds are measured in
+- * sectors/usec, left-shifted by BFQ_RATE_SHIFT.
++ * The reference peak rates are measured in sectors/usec, left-shifted
++ * by BFQ_RATE_SHIFT.
+  */
+-static int R_slow[2] = {1000, 10700};
+-static int R_fast[2] = {14000, 33000};
++static int ref_rate[2] = {14000, 33000};
+ /*
+- * To improve readability, a conversion function is used to initialize the
+- * following arrays, which entails that they can be initialized only in a
+- * function.
++ * To improve readability, a conversion function is used to initialize
++ * the following array, which entails that the array can be
++ * initialized only in a function.
+  */
+-static int T_slow[2];
+-static int T_fast[2];
+-static int device_speed_thresh[2];
++static int ref_wr_duration[2];
+ 
+ /*
+  * BFQ uses the above-detailed, time-based weight-raising mechanism to
+@@ -938,7 +926,7 @@ static unsigned int bfq_wr_duration(struct bfq_data *bfqd)
+ 	if (bfqd->bfq_wr_max_time > 0)
+ 		return bfqd->bfq_wr_max_time;
+ 
+-	dur = bfqd->RT_prod;
++	dur = bfqd->rate_dur_prod;
+ 	do_div(dur, bfqd->peak_rate);
+ 
+ 	/*
+@@ -2543,37 +2531,15 @@ static unsigned long bfq_calc_max_budget(struct bfq_data *bfqd)
+ /*
+  * Update parameters related to throughput and responsiveness, as a
+  * function of the estimated peak rate. See comments on
+- * bfq_calc_max_budget(), and on T_slow and T_fast arrays.
++ * bfq_calc_max_budget(), and on the ref_wr_duration array.
+  */
+ static void update_thr_responsiveness_params(struct bfq_data *bfqd)
+ {
+-	int dev_type = blk_queue_nonrot(bfqd->queue);
+-
+-	if (bfqd->bfq_user_max_budget == 0)
++	if (bfqd->bfq_user_max_budget == 0) {
+ 		bfqd->bfq_max_budget =
+ 			bfq_calc_max_budget(bfqd);
+-
+-	if (bfqd->device_speed == BFQ_BFQD_FAST &&
+-	    bfqd->peak_rate < device_speed_thresh[dev_type]) {
+-		bfqd->device_speed = BFQ_BFQD_SLOW;
+-		bfqd->RT_prod = R_slow[dev_type] *
+-			T_slow[dev_type];
+-	} else if (bfqd->device_speed == BFQ_BFQD_SLOW &&
+-		   bfqd->peak_rate > device_speed_thresh[dev_type]) {
+-		bfqd->device_speed = BFQ_BFQD_FAST;
+-		bfqd->RT_prod = R_fast[dev_type] *
+-			T_fast[dev_type];
++		bfq_log(bfqd, "new max_budget = %d", bfqd->bfq_max_budget);
+ 	}
+-
+-	bfq_log(bfqd,
+-"dev_type %s dev_speed_class = %s (%llu sects/sec), thresh %llu setcs/sec",
+-		dev_type == 0 ? "ROT" : "NONROT",
+-		bfqd->device_speed == BFQ_BFQD_FAST ? "FAST" : "SLOW",
+-		bfqd->device_speed == BFQ_BFQD_FAST ?
+-		(USEC_PER_SEC*(u64)R_fast[dev_type])>>BFQ_RATE_SHIFT :
+-		(USEC_PER_SEC*(u64)R_slow[dev_type])>>BFQ_RATE_SHIFT,
+-		(USEC_PER_SEC*(u64)device_speed_thresh[dev_type])>>
+-		BFQ_RATE_SHIFT);
+ }
+ 
+ static void bfq_reset_rate_computation(struct bfq_data *bfqd,
+@@ -5279,14 +5245,12 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 	bfqd->wr_busy_queues = 0;
+ 
+ 	/*
+-	 * Begin by assuming, optimistically, that the device is a
+-	 * high-speed one, and that its peak rate is equal to 2/3 of
+-	 * the highest reference rate.
++	 * Begin by assuming, optimistically, that the device peak
++	 * rate is equal to 2/3 of the highest reference rate.
+ 	 */
+-	bfqd->RT_prod = R_fast[blk_queue_nonrot(bfqd->queue)] *
+-			T_fast[blk_queue_nonrot(bfqd->queue)];
+-	bfqd->peak_rate = R_fast[blk_queue_nonrot(bfqd->queue)] * 2 / 3;
+-	bfqd->device_speed = BFQ_BFQD_FAST;
++	bfqd->rate_dur_prod = ref_rate[blk_queue_nonrot(bfqd->queue)] *
++		ref_wr_duration[blk_queue_nonrot(bfqd->queue)];
++	bfqd->peak_rate = ref_rate[blk_queue_nonrot(bfqd->queue)] * 2 / 3;
+ 
+ 	spin_lock_init(&bfqd->lock);
+ 
+@@ -5593,8 +5557,8 @@ static int __init bfq_init(void)
+ 	/*
+ 	 * Times to load large popular applications for the typical
+ 	 * systems installed on the reference devices (see the
+-	 * comments before the definitions of the next two
+-	 * arrays). Actually, we use slightly slower values, as the
++	 * comments before the definition of the next
++	 * array). Actually, we use slightly lower values, as the
+ 	 * estimated peak rate tends to be smaller than the actual
+ 	 * peak rate.  The reason for this last fact is that estimates
+ 	 * are computed over much shorter time intervals than the long
+@@ -5603,25 +5567,8 @@ static int __init bfq_init(void)
+ 	 * scheduler cannot rely on a peak-rate-evaluation workload to
+ 	 * be run for a long time.
+ 	 */
+-	T_slow[0] = msecs_to_jiffies(3500); /* actually 4 sec */
+-	T_slow[1] = msecs_to_jiffies(6000); /* actually 6.5 sec */
+-	T_fast[0] = msecs_to_jiffies(7000); /* actually 8 sec */
+-	T_fast[1] = msecs_to_jiffies(2500); /* actually 3 sec */
+-
+-	/*
+-	 * Thresholds that determine the switch between speed classes
+-	 * (see the comments before the definition of the array
+-	 * device_speed_thresh). These thresholds are biased towards
+-	 * transitions to the fast class. This is safer than the
+-	 * opposite bias. In fact, a wrong transition to the slow
+-	 * class results in short weight-raising periods, because the
+-	 * speed of the device then tends to be higher that the
+-	 * reference peak rate. On the opposite end, a wrong
+-	 * transition to the fast class tends to increase
+-	 * weight-raising periods, because of the opposite reason.
+-	 */
+-	device_speed_thresh[0] = (4 * R_slow[0]) / 3;
+-	device_speed_thresh[1] = (4 * R_slow[1]) / 3;
++	ref_wr_duration[0] = msecs_to_jiffies(7000); /* actually 8 sec */
++	ref_wr_duration[1] = msecs_to_jiffies(2500); /* actually 3 sec */
+ 
+ 	ret = elv_register(&iosched_bfq_mq);
+ 	if (ret)
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index ae2f3dadec44..b5678cc8cfa1 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -399,11 +399,6 @@ struct bfq_io_cq {
+ 	struct bfq_ttime saved_ttime;
+ };
+ 
+-enum bfq_device_speed {
+-	BFQ_BFQD_FAST,
+-	BFQ_BFQD_SLOW,
+-};
+-
+ /**
+  * struct bfq_data - per-device data structure.
+  *
+@@ -611,12 +606,11 @@ struct bfq_data {
+ 	/* Max service-rate for a soft real-time queue, in sectors/sec */
+ 	unsigned int bfq_wr_max_softrt_rate;
+ 	/*
+-	 * Cached value of the product R*T, used for computing the
+-	 * maximum duration of weight raising automatically.
++	 * Cached value of the product ref_rate*ref_wr_duration, used
++	 * for computing the maximum duration of weight raising
++	 * automatically.
+ 	 */
+-	u64 RT_prod;
+-	/* device-speed class for the low-latency heuristic */
+-	enum bfq_device_speed device_speed;
++	u64 rate_dur_prod;
+ 
+ 	/* fallback dummy bfqq for extreme OOM conditions */
+ 	struct bfq_queue oom_bfqq;
+-- 
+2.16.1
