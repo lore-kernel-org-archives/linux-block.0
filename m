@@ -1,93 +1,43 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:49878 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752149AbeERQtG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 May 2018 12:49:06 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 11/34] iomap: move IOMAP_F_BOUNDARY to gfs2
-Date: Fri, 18 May 2018 18:48:07 +0200
-Message-Id: <20180518164830.1552-12-hch@lst.de>
-In-Reply-To: <20180518164830.1552-1-hch@lst.de>
-References: <20180518164830.1552-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <daniel.verkamp@intel.com>
+Subject: Re: [PATCH 06/12] nvmet: implement the changed namespaces log
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-nvme@lists.infradead.org, Jens Axboe <axboe@kernel.dk>,
+ Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+ Sagi Grimberg <sagi@grimberg.me>, Hannes Reinecke <hare@suse.de>
+References: <20180530164600.26856-1-hch@lst.de>
+ <20180530164600.26856-7-hch@lst.de>
+ <0c4cc53d-1c28-0bf5-d454-df6c9ef9335b@intel.com>
+ <20180531162514.GA30839@lst.de>
+From: Daniel Verkamp <daniel.verkamp@intel.com>
+Message-ID: <9d27c145-b5b8-efe0-1308-c962be4add80@intel.com>
+Date: Thu, 31 May 2018 09:36:58 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180531162514.GA30839@lst.de>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Just define a range of fs specific flags and use that in gfs2 instead of
-exposing this internal flag flobally.
+On 05/31/2018 09:25 AM, Christoph Hellwig wrote:
+> On Wed, May 30, 2018 at 10:33:49AM -0700, Daniel Verkamp wrote:
+>> Minor nitpick here: if ctrlr->nr_changed_ns is exactly
+>> NVME_MAX_CHANGED_NAMESPACES and the new nsid is already in the list,
+>> this will skip down to the 0xffffffff case below, even though it could
+>> have just left the list as-is.
+>>
+>> I don't know if this is a problem in practice; reporting 0xffffffff is
+>> probably always safe, since the host will presumably treat that as
+>> "rescan everything".
+> 
+> It probably doesn't matter, but it turns doing this propely actually
+> looks cleaner as well:
+> 
+> ---
+> From d4baf4068220a90ecf67309d01ece5d0aadd952e Mon Sep 17 00:00:00 2001
+> From: Christoph Hellwig <hch@lst.de>
+> Date: Fri, 25 May 2018 17:16:09 +0200
+> Subject: nvmet: implement the changed namespaces log
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/gfs2/bmap.c        | 8 +++++---
- include/linux/iomap.h | 9 +++++++--
- 2 files changed, 12 insertions(+), 5 deletions(-)
+Agreed, this version looks good to me:
+Reviewed-by: Daniel Verkamp <daniel.verkamp@intel.com>
 
-diff --git a/fs/gfs2/bmap.c b/fs/gfs2/bmap.c
-index cbeedd3cfb36..8efa6297e19c 100644
---- a/fs/gfs2/bmap.c
-+++ b/fs/gfs2/bmap.c
-@@ -683,6 +683,8 @@ static void gfs2_stuffed_iomap(struct inode *inode, struct iomap *iomap)
- 	iomap->type = IOMAP_INLINE;
- }
- 
-+#define IOMAP_F_GFS2_BOUNDARY IOMAP_F_PRIVATE
-+
- /**
-  * gfs2_iomap_begin - Map blocks from an inode to disk blocks
-  * @inode: The inode
-@@ -774,7 +776,7 @@ int gfs2_iomap_begin(struct inode *inode, loff_t pos, loff_t length,
- 	bh = mp.mp_bh[ip->i_height - 1];
- 	len = gfs2_extent_length(bh->b_data, bh->b_size, ptr, lend - lblock, &eob);
- 	if (eob)
--		iomap->flags |= IOMAP_F_BOUNDARY;
-+		iomap->flags |= IOMAP_F_GFS2_BOUNDARY;
- 	iomap->length = (u64)len << inode->i_blkbits;
- 
- out_release:
-@@ -846,12 +848,12 @@ int gfs2_block_map(struct inode *inode, sector_t lblock,
- 
- 	if (iomap.length > bh_map->b_size) {
- 		iomap.length = bh_map->b_size;
--		iomap.flags &= ~IOMAP_F_BOUNDARY;
-+		iomap.flags &= ~IOMAP_F_GFS2_BOUNDARY;
- 	}
- 	if (iomap.addr != IOMAP_NULL_ADDR)
- 		map_bh(bh_map, inode->i_sb, iomap.addr >> inode->i_blkbits);
- 	bh_map->b_size = iomap.length;
--	if (iomap.flags & IOMAP_F_BOUNDARY)
-+	if (iomap.flags & IOMAP_F_GFS2_BOUNDARY)
- 		set_buffer_boundary(bh_map);
- 	if (iomap.flags & IOMAP_F_NEW)
- 		set_buffer_new(bh_map);
-diff --git a/include/linux/iomap.h b/include/linux/iomap.h
-index 13d19b4c29a9..819e0cd2a950 100644
---- a/include/linux/iomap.h
-+++ b/include/linux/iomap.h
-@@ -27,8 +27,7 @@ struct vm_fault;
-  * written data and requires fdatasync to commit them to persistent storage.
-  */
- #define IOMAP_F_NEW		0x01	/* blocks have been newly allocated */
--#define IOMAP_F_BOUNDARY	0x02	/* mapping ends at metadata boundary */
--#define IOMAP_F_DIRTY		0x04	/* uncommitted metadata */
-+#define IOMAP_F_DIRTY		0x02	/* uncommitted metadata */
- 
- /*
-  * Flags that only need to be reported for IOMAP_REPORT requests:
-@@ -36,6 +35,12 @@ struct vm_fault;
- #define IOMAP_F_MERGED		0x10	/* contains multiple blocks/extents */
- #define IOMAP_F_SHARED		0x20	/* block shared with another file */
- 
-+/*
-+ * Flags from 0x1000 up are for file system specific usage:
-+ */
-+#define IOMAP_F_PRIVATE		0x1000
-+
-+
- /*
-  * Magic value for addr:
-  */
--- 
-2.17.0
+Thanks,
+-- Daniel
