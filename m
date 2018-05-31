@@ -1,57 +1,46 @@
-Return-Path: <BATV+67dfbb8f664e29ec4bbc+5394+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <damien.lemoal@wdc.com>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 1/6] block: move initialization of elevator-related fields to blk_alloc_queue_node
-Date: Thu, 31 May 2018 19:11:36 +0200
-Message-Id: <20180531171141.18478-2-hch@lst.de>
-In-Reply-To: <20180531171141.18478-1-hch@lst.de>
-References: <20180531171141.18478-1-hch@lst.de>
+Return-Path: <prvs=6829f6511=Damien.LeMoal@wdc.com>
+From: Damien Le Moal <Damien.LeMoal@wdc.com>
+To: Christoph Hellwig <hch@infradead.org>
+CC: Jens Axboe <axboe@kernel.dk>, Jeff Moyer <jmoyer@redhat.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"bgurney@redhat.com" <bgurney@redhat.com>
+Subject: Re: [PATCH 0/2][RFC] block: default to deadline for SMR devices
+Date: Thu, 31 May 2018 05:36:38 +0000
+Message-ID: <cf7e8e2b-ab4c-77bb-4ce4-92e2e075d3cd@wdc.com>
+References: <20180525211432.20359-1-jmoyer@redhat.com>
+ <9756f816-cea7-52cc-e616-54cd7b7d8c75@kernel.dk>
+ <x49tvqvz8eb.fsf@segfault.boston.devel.redhat.com>
+ <a0bdfb0c-8ed3-12ac-e11b-6204fe3bb665@kernel.dk>
+ <122bc1d9-a074-7282-6812-aba26f4868f4@wdc.com>
+ <20180530084753.GA29413@infradead.org>
+In-Reply-To: <20180530084753.GA29413@infradead.org>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-No point in doing this in elevator_init.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reported-by: Damien Le Moal <Damien.LeMoal@wdc.com>
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
-Tested-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/blk-core.c | 5 +++++
- block/elevator.c | 5 -----
- 2 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index a295b3c159b2..b00e7e6340ca 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -999,6 +999,11 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
- 	if (!q)
- 		return NULL;
- 
-+	INIT_LIST_HEAD(&q->queue_head);
-+	q->last_merge = NULL;
-+	q->end_sector = 0;
-+	q->boundary_rq = NULL;
-+
- 	q->id = ida_simple_get(&blk_queue_ida, 0, 0, gfp_mask);
- 	if (q->id < 0)
- 		goto fail_q;
-diff --git a/block/elevator.c b/block/elevator.c
-index e87e9b43aba0..8b64f92e029a 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -213,11 +213,6 @@ int elevator_init(struct request_queue *q, char *name)
- 	if (unlikely(q->elevator))
- 		return 0;
- 
--	INIT_LIST_HEAD(&q->queue_head);
--	q->last_merge = NULL;
--	q->end_sector = 0;
--	q->boundary_rq = NULL;
--
- 	if (name) {
- 		e = elevator_get(q, name, true);
- 		if (!e)
--- 
-2.17.0
+Q2hyaXN0b3BoLA0KDQpPbiA1LzMwLzE4IDE3OjQ3LCBDaHJpc3RvcGggSGVsbHdpZyB3cm90ZToN
+Cj4gT24gV2VkLCBNYXkgMzAsIDIwMTggYXQgMDY6MjI6MDRBTSArMDAwMCwgRGFtaWVuIExlIE1v
+YWwgd3JvdGU6DQo+PiBUaGF0IHdvdWxkIG5lY2Vzc2l0YXRlIHNwbGl0dGluZyBlbGV2YXRvcl9p
+bml0KCkgaW50byBhIGdlbmVyaWMgZWxldmF0b3INCj4+IGluaXRpYWxpemF0aW9uIGZ1bmN0aW9u
+IHNldHRpbmcgdXAgdGhlIGVsZXZhdG9yIHJlbGF0ZWQgZmllbGRzIG9mIHRoZQ0KPj4gcmVxdWVz
+dCBxdWV1ZSBhbmQgYSBzZWNvbmQgcGFydCBzZXR0aW5nIHVwIHRoZSBkZWZhdWx0IGVsZXZhdG9y
+IChlLmcuDQo+PiBlbGV2YXRvcl9zZXRfZGVmYXVsdCgpKS4gRG9pbmcgc28sIHRoZSBmdW5jdGlv
+biBlbGV2YXRvcl9zZXRfZGVmYXVsdCgpDQo+PiBjb3VsZCBiZSBjYWxsZWQgbGF0ZXIgaW4gdGhl
+IGRldmljZSBpbml0aWFsaXphdGlvbiBzZXF1ZW5jZSwgYWZ0ZXINCj4+IGluZm9ybWF0aW9uIGZy
+b20gdGhlIGRldmljZSBoYXMgYmVlbiBvYnRhaW5lZC4gSXQgd291bGQgbWFrZSBjaG9vc2luZyBh
+DQo+PiBzYW5lIGRlZmF1bHQgZWxldmF0b3IgbXVjaCBjbGVhbmVyLg0KPiANCj4gRm9yIGJsay1t
+cSB0aGlzIG1ha2VzIGVudGlyZWx5IHNlbnNlLCB1bnRlc3RlZCBzZXJpZXMgaGVyZToNCj4gDQo+
+IAlodHRwOi8vZ2l0LmluZnJhZGVhZC5vcmcvdXNlcnMvaGNoL2Jsb2NrLmdpdC9zaG9ydGxvZy9y
+ZWZzL2hlYWRzL2VsZXZhdG9yX2luaXQNCg0KSnVzdCByZXZpZXdlZCBhbmQgdHJpZWQgdGhlIHNl
+cmllcy4gTG9va3MgT0sgdG8gbWUuDQpGZWVsIGZyZWUgdG8gcG9zdCBhZGRpbmc6DQpSZXZpZXdl
+ZC1ieTogRGFtaWVuIExlIE1vYWwgPGRhbWllbi5sZW1vYWxAd2RjLmNvbT4NClRlc3RlZC1ieTog
+RGFtaWVuIExlIE1vYWwgPGRhbWllbi5sZW1vYWxAd2RjLmNvbT4NCg0KPiBGb3IgdGhlIGxlZ2Fj
+eSBjYXNlIHdlIGFsd2F5cyBuZWVkIGF0IGxlYXN0IHNvbWUgSS9PIHNjaGVkdWxlciwNCj4gc28g
+d2UgY2FuJ3QganVzdCBkZWZlciBpdC4gIEJ1dCBJIHRoaW5rIHdlIGNvdWxkIHN0aWxsIHN3aXRj
+aCB0bw0KPiBkZWFkbGluZSBpbiBibGtfcmVnaXN0ZXJfcXVldWUgaWYgd2UgZm91bmQgYSB6b25l
+ZCBkZXZpY2UuDQoNCkFycmcuLi4gWWVzLCBJIGZvcmdvdCB0aGF0LiBBdCBsZWFzdCBub29wIHdv
+dWxkIGJlIG5lZWRlZC4gU28gbm8gcmVhbA0KcG9pbnQgaW4gY2hhbmdpbmcgYW55dGhpbmcgSSBn
+dWVzcy4NCg0KRm9yIHRoZSBzd2l0Y2ggdG8gZGVhZGxpbmUgb25jZSB0aGUgZGV2aWNlIGlzIGlk
+ZW50aWZpZWQgYXMgem9uZWQsIEkNCndvdWxkIGxpa2UgdG8gc2VlIHRoYXQgYWRkZWQuIEplbnMg
+ZGVjaXNpb24gb24gdGhpcyB0aG91Z2guDQoNCkJlc3QuDQoNCi0tIA0KRGFtaWVuIExlIE1vYWws
+DQpXZXN0ZXJuIERpZ2l0YWw=
