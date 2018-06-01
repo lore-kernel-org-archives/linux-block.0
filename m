@@ -1,10 +1,10 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:43967 "EHLO
-        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752091AbeFAOn6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 10:43:58 -0400
-Received: by mail-lf0-f66.google.com with SMTP id n18-v6so15183278lfh.10
-        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 07:43:57 -0700 (PDT)
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:40755 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752156AbeFANFM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 09:05:12 -0400
+Received: by mail-lf0-f65.google.com with SMTP id q11-v6so14743644lfc.7
+        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 06:05:11 -0700 (PDT)
 From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
 To: axboe@fb.com
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -12,11 +12,11 @@ Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         marcin.dziegielewski@intel.com,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 03/10] lightnvm: pblk: fix smeta write error path
-Date: Fri,  1 Jun 2018 16:41:07 +0200
-Message-Id: <20180601144114.17490-4-mb@lightnvm.io>
-In-Reply-To: <20180601144114.17490-1-mb@lightnvm.io>
-References: <20180601144114.17490-1-mb@lightnvm.io>
+Subject: [GIT PULL 14/18] lightnvm: pblk: fix smeta write error path
+Date: Fri,  1 Jun 2018 15:04:28 +0200
+Message-Id: <20180601130432.30866-15-mb@lightnvm.io>
+In-Reply-To: <20180601130432.30866-1-mb@lightnvm.io>
+References: <20180601130432.30866-1-mb@lightnvm.io>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
@@ -37,7 +37,7 @@ Signed-off-by: Matias Bjørling <mb@lightnvm.io>
  1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index e81a70cf9e9b..549341b24e3c 100644
+index 263da2e43567..e43093e27084 100644
 --- a/drivers/lightnvm/pblk-core.c
 +++ b/drivers/lightnvm/pblk-core.c
 @@ -849,9 +849,10 @@ static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
