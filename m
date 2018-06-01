@@ -1,113 +1,76 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 17/30] block: introduce bio_for_each_chunk_all and bio_for_each_chunk_segment_all
-Date: Sat,  9 Jun 2018 20:30:01 +0800
-Message-Id: <20180609123014.8861-18-ming.lei@redhat.com>
-In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
-References: <20180609123014.8861-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULL v3 00/10] lightnvm updates for 4.18
+To: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ javier@cnexlabs.com, igor.j.konopko@intel.com, marcin.dziegielewski@intel.com
+References: <20180601144114.17490-1-mb@lightnvm.io>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <166defee-d9a7-dcec-8c77-b7e9d4e0d78e@kernel.dk>
+Date: Fri, 1 Jun 2018 09:03:32 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180601144114.17490-1-mb@lightnvm.io>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This patch introduces bio_for_each_chunk_all() and bio_for_each_chunk_segment_all(),
-which are for replacing the current bio_for_each_segment_all().
+On 6/1/18 8:41 AM, Matias Bjørling wrote:
+> Hi Jens,
+> 
+> Please pick up the following patches.
+> 
+> Changes since v2:
+> 
+>  Rebased write error recovery patch on top of latest
+>  for-4.18/block
+> 
+>  Added (missed the first round)
+>   lightnvm: pblk: only try to recover lines with written smeta
+>   lightnvm: pblk: kick writer on new flush points
+>   lightnvm: pblk: take bitmap alloc. out of critical section
+> 
+> Changes since v1:
+> 
+>  Removed
+>   lightnvm: pblk: sync RB and RL states during GC
+>   lightnvm: error handling when whole line is bad
+>   lightnvm: pblk: handle case when mw_cunits equals to 0
+> 
+>  Added
+>   lightnvm: pblk: remove unnecessary bio_get/put
+> 
+> Thanks!
+> 
+> Hans Holmberg (5):
+>   lightnvm: pblk: rework write error recovery path
+>   lightnvm: pblk: garbage collect lines with failed writes
+>   lightnvm: pblk: fix smeta write error path
+>   lightnvm: pblk: only try to recover lines with written smeta
+>   lightnvm: pblk: kick writer on new flush points
+> 
+> Igor Konopko (2):
+>   lightnvm: proper error handling for pblk_bio_add_pages
+>   lightnvm: fix partial read error path
+> 
+> Javier González (2):
+>   lightnvm: pblk: remove unnecessary bio_get/put
+>   lightnvm: pblk: take bitmap alloc. out of critical section
+> 
+> Marcin Dziegielewski (1):
+>   lightnvm: pblk: add possibility to set write buffer size manually
+> 
+>  drivers/lightnvm/pblk-cache.c    |  10 +-
+>  drivers/lightnvm/pblk-core.c     | 157 +++++++++++++++-------
+>  drivers/lightnvm/pblk-gc.c       | 102 ++++++++------
+>  drivers/lightnvm/pblk-init.c     |  62 ++++++---
+>  drivers/lightnvm/pblk-rb.c       |  43 +-----
+>  drivers/lightnvm/pblk-read.c     |  69 +++++-----
+>  drivers/lightnvm/pblk-recovery.c | 121 +++--------------
+>  drivers/lightnvm/pblk-rl.c       |  29 +++-
+>  drivers/lightnvm/pblk-sysfs.c    |  15 ++-
+>  drivers/lightnvm/pblk-write.c    | 281 +++++++++++++++++++++++++--------------
+>  drivers/lightnvm/pblk.h          |  37 ++++--
+>  11 files changed, 524 insertions(+), 402 deletions(-)
 
-bio_for_each_chunk_all() will iterate one chunk by chunk, which is multipage based.
+Applied, thanks.
 
-bio_for_each_chunk_segment_all() will iterate one segment by segment, which is
-singlepage based.
-
-For using bio_for_each_chunk_segment_all(), one 24-bytes extra local variable has to
-be introduced.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- include/linux/bio.h  | 13 +++++++++++++
- include/linux/bvec.h | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 44 insertions(+)
-
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 0fa1035dde38..f21384be9b51 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -168,6 +168,19 @@ static inline bool bio_full(struct bio *bio)
- #define bio_for_each_segment_all(bvl, bio, i)				\
- 	for (i = 0, bvl = (bio)->bi_io_vec; i < (bio)->bi_vcnt; i++, bvl++)
- 
-+#define bio_for_each_chunk_all(bvl, bio, i)		\
-+	bio_for_each_segment_all(bvl, bio, i)
-+
-+#define chunk_for_each_segment(bv, bvl, i, citer)			\
-+	for (bv = bvec_init_chunk_iter(&citer);				\
-+		(citer.done < (bvl)->bv_len) &&				\
-+		((chunk_next_segment((bvl), &citer)), 1);		\
-+		citer.done += bv->bv_len, i += 1)
-+
-+#define bio_for_each_chunk_segment_all(bvl, bio, i, citer)		\
-+	for (i = 0, citer.idx = 0; citer.idx < (bio)->bi_vcnt; citer.idx++)	\
-+		chunk_for_each_segment(bvl, &((bio)->bi_io_vec[citer.idx]), i, citer)
-+
- static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
- 				      unsigned bytes, bool chunk)
- {
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index aac75d87d884..d4eaa0c26bb5 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -84,6 +84,12 @@ struct bvec_iter {
- 						   current bvec */
- };
- 
-+struct bvec_chunk_iter {
-+	struct bio_vec	bv;
-+	int		idx;
-+	unsigned	done;
-+};
-+
- /*
-  * various member access, note that bio_data should of course not be used
-  * on highmem page vectors
-@@ -219,6 +225,31 @@ static inline bool bvec_iter_chunk_advance(const struct bio_vec *bv,
- 	.bi_bvec_done	= 0,						\
- }
- 
-+static inline struct bio_vec *bvec_init_chunk_iter(struct bvec_chunk_iter *citer)
-+{
-+	citer->bv.bv_page = NULL;
-+	citer->done = 0;
-+
-+	return &citer->bv;
-+}
-+
-+/* used for chunk_for_each_segment */
-+static inline void chunk_next_segment(const struct bio_vec *chunk,
-+		struct bvec_chunk_iter *iter)
-+{
-+	struct bio_vec *bv = &iter->bv;
-+
-+	if (bv->bv_page) {
-+		bv->bv_page += 1;
-+		bv->bv_offset = 0;
-+	} else {
-+		bv->bv_page = chunk->bv_page;
-+		bv->bv_offset = chunk->bv_offset;
-+	}
-+	bv->bv_len = min_t(unsigned int, PAGE_SIZE - bv->bv_offset,
-+			chunk->bv_len - iter->done);
-+}
-+
- /*
-  * Get the last singlepage segment from the multipage bvec and store it
-  * in @seg
 -- 
-2.9.5
+Jens Axboe
