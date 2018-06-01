@@ -1,50 +1,60 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 16/30] dm: clone bio via bio_clone_chunk_bioset
-Date: Sat,  9 Jun 2018 20:30:00 +0800
-Message-Id: <20180609123014.8861-17-ming.lei@redhat.com>
-In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
-References: <20180609123014.8861-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:34281 "EHLO
+        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752162AbeFANFE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 09:05:04 -0400
+Received: by mail-lf0-f67.google.com with SMTP id o9-v6so14736777lfk.1
+        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 06:05:03 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        javier@cnexlabs.com, igor.j.konopko@intel.com,
+        marcin.dziegielewski@intel.com,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 09/18] lightnvm: pblk: check for chunk size before allocating it
+Date: Fri,  1 Jun 2018 15:04:23 +0200
+Message-Id: <20180601130432.30866-10-mb@lightnvm.io>
+In-Reply-To: <20180601130432.30866-1-mb@lightnvm.io>
+References: <20180601130432.30866-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The incoming bio will become very big after multipage bvec is enabled,
-so we can't clone bio page by page.
+From: Javier González <javier@javigon.com>
 
-This patch uses the introduced bio_clone_chunk_bioset(), so the incoming
-bio can be cloned successfully. This way is safe because device mapping
-won't modify the bio vector on the cloned multipage bio.
+Do the check for the chunk state after making sure that the chunk type
+is supported.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Fixes: 32ef9412c114 ("lightnvm: pblk: implement get log report chunk")
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- drivers/md/dm.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/lightnvm/pblk-init.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 98dff36b89a3..13ca3574d972 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1582,8 +1582,8 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
- 				 * the usage of io->orig_bio in dm_remap_zone_report()
- 				 * won't be affected by this reassignment.
- 				 */
--				struct bio *b = bio_clone_bioset(bio, GFP_NOIO,
--								 &md->queue->bio_split);
-+				struct bio *b = bio_clone_chunk_bioset(bio, GFP_NOIO,
-+								       &md->queue->bio_split);
- 				ci.io->orig_bio = b;
- 				bio_advance(bio, (bio_sectors(bio) - ci.sector_count) << 9);
- 				bio_chain(b, bio);
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index b52855f9336b..9e3a43346d4c 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -751,14 +751,14 @@ static int pblk_setup_line_meta_20(struct pblk *pblk, struct pblk_line *line,
+ 		chunk->cnlb = chunk_meta->cnlb;
+ 		chunk->wp = chunk_meta->wp;
+ 
+-		if (!(chunk->state & NVM_CHK_ST_OFFLINE))
+-			continue;
+-
+ 		if (chunk->type & NVM_CHK_TP_SZ_SPEC) {
+ 			WARN_ONCE(1, "pblk: custom-sized chunks unsupported\n");
+ 			continue;
+ 		}
+ 
++		if (!(chunk->state & NVM_CHK_ST_OFFLINE))
++			continue;
++
+ 		set_bit(pos, line->blk_bitmap);
+ 		nr_bad_chks++;
+ 	}
 -- 
-2.9.5
+2.11.0
