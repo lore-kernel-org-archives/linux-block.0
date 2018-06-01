@@ -1,97 +1,70 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Mel Gorman <mgorman@suse.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH] brd: Allow ramdisk to be allocated on selected NUMA node
-Date: Thu, 14 Jun 2018 15:38:32 +0200
-Message-Id: <20180614133832.110947-1-hare@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:42101 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752154AbeFANFC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 09:05:02 -0400
+Received: by mail-lf0-f66.google.com with SMTP id v135-v6so14744091lfa.9
+        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 06:05:01 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        javier@cnexlabs.com, igor.j.konopko@intel.com,
+        marcin.dziegielewski@intel.com,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 07/18] lightnvm: pblk: remove unnecessary indirection
+Date: Fri,  1 Jun 2018 15:04:21 +0200
+Message-Id: <20180601130432.30866-8-mb@lightnvm.io>
+In-Reply-To: <20180601130432.30866-1-mb@lightnvm.io>
+References: <20180601130432.30866-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-For performance reasons we should be able to allocate all memory
-from a given NUMA node, so this patch adds a new parameter
-'rd_numa_node' to allow the user to specify the NUMA node id.
-When restricing fio to use the same NUMA node I'm seeing a performance
-boost of more than 200%.
+From: Javier González <javier@javigon.com>
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
+Call nvm_submit_io directly and remove an unnecessary indirection on the
+read path.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- drivers/block/brd.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ drivers/lightnvm/pblk-read.c | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index bb976598ee43..7142d836539e 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -36,6 +36,7 @@
-  */
- struct brd_device {
- 	int		brd_number;
-+	int		brd_numa_node;
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index b201fc486adb..a2e678de428f 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -102,16 +102,6 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ #endif
+ }
  
- 	struct request_queue	*brd_queue;
- 	struct gendisk		*brd_disk;
-@@ -103,7 +104,7 @@ static struct page *brd_insert_page(struct brd_device *brd, sector_t sector)
- 	 * restriction might be able to be lifted.
- 	 */
- 	gfp_flags = GFP_NOIO | __GFP_ZERO;
--	page = alloc_page(gfp_flags);
-+	page = alloc_pages_node(brd->brd_numa_node, gfp_flags, 0);
- 	if (!page)
- 		return NULL;
+-static int pblk_submit_read_io(struct pblk *pblk, struct nvm_rq *rqd)
+-{
+-	int err;
+-
+-	err = pblk_submit_io(pblk, rqd);
+-	if (err)
+-		return NVM_IO_ERR;
+-
+-	return NVM_IO_OK;
+-}
  
-@@ -342,6 +343,10 @@ static int max_part = 1;
- module_param(max_part, int, 0444);
- MODULE_PARM_DESC(max_part, "Num Minors to reserve between devices");
+ static void pblk_read_check_seq(struct pblk *pblk, struct nvm_rq *rqd,
+ 				sector_t blba)
+@@ -485,9 +475,9 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 		rqd->bio = int_bio;
+ 		r_ctx->private = bio;
  
-+static int rd_numa_node = NUMA_NO_NODE;
-+module_param(rd_numa_node, int, 0444);
-+MODULE_PARM_DESC(rd_numa_node, "NUMA node number to allocate RAM disk on.");
-+
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_BLOCKDEV_MAJOR(RAMDISK_MAJOR);
- MODULE_ALIAS("rd");
-@@ -363,7 +368,7 @@ __setup("ramdisk_size=", ramdisk_size);
- static LIST_HEAD(brd_devices);
- static DEFINE_MUTEX(brd_devices_mutex);
- 
--static struct brd_device *brd_alloc(int i)
-+static struct brd_device *brd_alloc(int i, int node)
- {
- 	struct brd_device *brd;
- 	struct gendisk *disk;
-@@ -372,10 +377,11 @@ static struct brd_device *brd_alloc(int i)
- 	if (!brd)
- 		goto out;
- 	brd->brd_number		= i;
-+	brd->brd_numa_node = node;
- 	spin_lock_init(&brd->brd_lock);
- 	INIT_RADIX_TREE(&brd->brd_pages, GFP_ATOMIC);
- 
--	brd->brd_queue = blk_alloc_queue(GFP_KERNEL);
-+	brd->brd_queue = blk_alloc_queue_node(GFP_KERNEL, node, NULL);
- 	if (!brd->brd_queue)
- 		goto out_free_dev;
- 
-@@ -434,7 +440,7 @@ static struct brd_device *brd_init_one(int i, bool *new)
- 			goto out;
- 	}
- 
--	brd = brd_alloc(i);
-+	brd = brd_alloc(i, rd_numa_node);
- 	if (brd) {
- 		add_disk(brd->brd_disk);
- 		list_add_tail(&brd->brd_list, &brd_devices);
-@@ -495,7 +501,7 @@ static int __init brd_init(void)
- 		max_part = 1;
- 
- 	for (i = 0; i < rd_nr; i++) {
--		brd = brd_alloc(i);
-+		brd = brd_alloc(i, rd_numa_node);
- 		if (!brd)
- 			goto out_free;
- 		list_add_tail(&brd->brd_list, &brd_devices);
+-		ret = pblk_submit_read_io(pblk, rqd);
+-		if (ret) {
++		if (pblk_submit_io(pblk, rqd)) {
+ 			pr_err("pblk: read IO submission failed\n");
++			ret = NVM_IO_ERR;
+ 			if (int_bio)
+ 				bio_put(int_bio);
+ 			goto fail_end_io;
 -- 
-2.12.3
+2.11.0
