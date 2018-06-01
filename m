@@ -1,21 +1,21 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f49.google.com ([209.85.215.49]:33976 "EHLO
-        mail-lf0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752108AbeFAOoA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 10:44:00 -0400
-Received: by mail-lf0-f49.google.com with SMTP id o9-v6so15205273lfk.1
-        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 07:44:00 -0700 (PDT)
+Received: from mail-lf0-f51.google.com ([209.85.215.51]:42415 "EHLO
+        mail-lf0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752437AbeFANFP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 09:05:15 -0400
+Received: by mail-lf0-f51.google.com with SMTP id v135-v6so14745119lfa.9
+        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 06:05:14 -0700 (PDT)
 From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
 To: axboe@fb.com
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         javier@cnexlabs.com, igor.j.konopko@intel.com,
         marcin.dziegielewski@intel.com,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 05/10] lightnvm: fix partial read error path
-Date: Fri,  1 Jun 2018 16:41:09 +0200
-Message-Id: <20180601144114.17490-6-mb@lightnvm.io>
-In-Reply-To: <20180601144114.17490-1-mb@lightnvm.io>
-References: <20180601144114.17490-1-mb@lightnvm.io>
+Subject: [GIT PULL 16/18] lightnvm: fix partial read error path
+Date: Fri,  1 Jun 2018 15:04:30 +0200
+Message-Id: <20180601130432.30866-17-mb@lightnvm.io>
+In-Reply-To: <20180601130432.30866-1-mb@lightnvm.io>
+References: <20180601130432.30866-1-mb@lightnvm.io>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
@@ -34,7 +34,7 @@ Signed-off-by: Matias Bjørling <mb@lightnvm.io>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index 38f89a84ce5e..f770fd113ffe 100644
+index a2e678de428f..fa7b60f852d9 100644
 --- a/drivers/lightnvm/pblk-read.c
 +++ b/drivers/lightnvm/pblk-read.c
 @@ -256,7 +256,7 @@ static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
