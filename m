@@ -1,150 +1,249 @@
-Return-Path: <roman.penyaev@profitbricks.com>
-Return-Path: <roman.penyaev@profitbricks.com>
-From: Roman Pen <roman.penyaev@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Or Gerlitz <ogerlitz@mellanox.com>,
-	Doug Ledford <dledford@redhat.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>,
-	Jack Wang <jinpu.wang@profitbricks.com>,
-	Roman Pen <roman.penyaev@profitbricks.com>
-Subject: [PATCH v3 11/25] ibtrs: server: statistics functions
-Date: Wed,  6 Jun 2018 17:25:01 +0200
-Message-Id: <20180606152515.25807-12-roman.penyaev@profitbricks.com>
-In-Reply-To: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
-References: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] lightnvm: pblk: remove unnecessary bio_get/put
+To: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>,
+ =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@cnexlabs.com>
+References: <1527854506-8708-1-git-send-email-javier@cnexlabs.com>
+ <1527854506-8708-2-git-send-email-javier@cnexlabs.com>
+ <f1579a62-0e85-b58d-ca33-a9635dd0ebaa@lightnvm.io>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <162341d7-83b1-6bb3-9e00-f7bbc14f99f0@kernel.dk>
+Date: Fri, 1 Jun 2018 07:47:16 -0600
+MIME-Version: 1.0
+In-Reply-To: <f1579a62-0e85-b58d-ca33-a9635dd0ebaa@lightnvm.io>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This introduces set of functions used on server side to account
-statistics of RDMA data sent/received.
+On 6/1/18 6:05 AM, Matias Bjørling wrote:
+> On 06/01/2018 02:01 PM, Javier González wrote:
+>> In the read path, pblk gets a reference to the incoming bio and puts it
+>> after ending the bio. Though this behavior is correct, it is unnecessary
+>> since pblk is the one putting the bio, therefore, it cannot disappear
+>> underneath it.
+>>
+>> Removing this reference, allows to clean up rqd->bio and avoids pointer
+>> bouncing for the different read paths. Now, the incoming bio always
+>> resides in the read context and pblk's internal bios (if any) reside in
+>> rqd->bio.
+>>
+>> Signed-off-by: Javier González <javier@cnexlabs.com>
+>> ---
+>>   drivers/lightnvm/pblk-read.c | 65 +++++++++++++++++++-------------------------
+>>   1 file changed, 28 insertions(+), 37 deletions(-)
+>>
+>> diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+>> index fa7b60f852d9..38360de23d4e 100644
+>> --- a/drivers/lightnvm/pblk-read.c
+>> +++ b/drivers/lightnvm/pblk-read.c
+>> @@ -39,10 +39,10 @@ static int pblk_read_from_cache(struct pblk *pblk, struct bio *bio,
+>>   }
+>>   
+>>   static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
+>> -				 sector_t blba, unsigned long *read_bitmap)
+>> +				 struct bio *bio, sector_t blba,
+>> +				 unsigned long *read_bitmap)
+>>   {
+>>   	struct pblk_sec_meta *meta_list = rqd->meta_list;
+>> -	struct bio *bio = rqd->bio;
+>>   	struct ppa_addr ppas[PBLK_MAX_REQ_ADDRS];
+>>   	int nr_secs = rqd->nr_ppas;
+>>   	bool advanced_bio = false;
+>> @@ -189,7 +189,6 @@ static void pblk_end_user_read(struct bio *bio)
+>>   	WARN_ONCE(bio->bi_status, "pblk: corrupted read bio\n");
+>>   #endif
+>>   	bio_endio(bio);
+>> -	bio_put(bio);
+>>   }
+>>   
+>>   static void __pblk_end_io_read(struct pblk *pblk, struct nvm_rq *rqd,
+>> @@ -197,23 +196,18 @@ static void __pblk_end_io_read(struct pblk *pblk, struct nvm_rq *rqd,
+>>   {
+>>   	struct nvm_tgt_dev *dev = pblk->dev;
+>>   	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
+>> -	struct bio *bio = rqd->bio;
+>> +	struct bio *int_bio = rqd->bio;
+>>   	unsigned long start_time = r_ctx->start_time;
+>>   
+>>   	generic_end_io_acct(dev->q, READ, &pblk->disk->part0, start_time);
+>>   
+>>   	if (rqd->error)
+>>   		pblk_log_read_err(pblk, rqd);
+>> -#ifdef CONFIG_NVM_DEBUG
+>> -	else
+>> -		WARN_ONCE(bio->bi_status, "pblk: corrupted read error\n");
+>> -#endif
+>>   
+>>   	pblk_read_check_seq(pblk, rqd, r_ctx->lba);
+>>   
+>> -	bio_put(bio);
+>> -	if (r_ctx->private)
+>> -		pblk_end_user_read((struct bio *)r_ctx->private);
+>> +	if (int_bio)
+>> +		bio_put(int_bio);
+>>   
+>>   	if (put_line)
+>>   		pblk_read_put_rqd_kref(pblk, rqd);
+>> @@ -230,16 +224,19 @@ static void __pblk_end_io_read(struct pblk *pblk, struct nvm_rq *rqd,
+>>   static void pblk_end_io_read(struct nvm_rq *rqd)
+>>   {
+>>   	struct pblk *pblk = rqd->private;
+>> +	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
+>> +	struct bio *bio = (struct bio *)r_ctx->private;
+>>   
+>> +	pblk_end_user_read(bio);
+>>   	__pblk_end_io_read(pblk, rqd, true);
+>>   }
+>>   
+>> -static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+>> -				 unsigned int bio_init_idx,
+>> -				 unsigned long *read_bitmap)
+>> +static int pblk_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
+>> +			     struct bio *orig_bio, unsigned int bio_init_idx,
+>> +			     unsigned long *read_bitmap)
+>>   {
+>> -	struct bio *new_bio, *bio = rqd->bio;
+>>   	struct pblk_sec_meta *meta_list = rqd->meta_list;
+>> +	struct bio *new_bio;
+>>   	struct bio_vec src_bv, dst_bv;
+>>   	void *ppa_ptr = NULL;
+>>   	void *src_p, *dst_p;
+>> @@ -256,11 +253,11 @@ static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+>>   	new_bio = bio_alloc(GFP_KERNEL, nr_holes);
+>>   
+>>   	if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
+>> -		goto err_add_pages;
+>> +		goto fail_add_pages;
+>>   
+>>   	if (nr_holes != new_bio->bi_vcnt) {
+>>   		pr_err("pblk: malformed bio\n");
+>> -		goto err;
+>> +		goto fail;
+>>   	}
+>>   
+>>   	for (i = 0; i < nr_secs; i++)
+>> @@ -283,7 +280,7 @@ static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+>>   	if (ret) {
+>>   		bio_put(rqd->bio);
+>>   		pr_err("pblk: sync read IO submission failed\n");
+>> -		goto err;
+>> +		goto fail;
+>>   	}
+>>   
+>>   	if (rqd->error) {
+>> @@ -319,7 +316,7 @@ static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+>>   		meta_list[hole].lba = lba_list_media[i];
+>>   
+>>   		src_bv = new_bio->bi_io_vec[i++];
+>> -		dst_bv = bio->bi_io_vec[bio_init_idx + hole];
+>> +		dst_bv = orig_bio->bi_io_vec[bio_init_idx + hole];
+>>   
+>>   		src_p = kmap_atomic(src_bv.bv_page);
+>>   		dst_p = kmap_atomic(dst_bv.bv_page);
+>> @@ -338,28 +335,26 @@ static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+>>   
+>>   	bio_put(new_bio);
+>>   
+>> -	/* Complete the original bio and associated request */
+>> -	bio_endio(bio);
+>> -	rqd->bio = bio;
+>> +	/* restore original request */
+>> +	rqd->bio = NULL;
+>>   	rqd->nr_ppas = nr_secs;
+>>   
+>>   	__pblk_end_io_read(pblk, rqd, false);
+>> -	return NVM_IO_OK;
+>> +	return NVM_IO_DONE;
+>>   
+>> -err:
+>> +fail:
+>>   	/* Free allocated pages in new bio */
+>>   	pblk_bio_free_pages(pblk, new_bio, 0, new_bio->bi_vcnt);
+>> -err_add_pages:
+>> +fail_add_pages:
+>>   	pr_err("pblk: failed to perform partial read\n");
+>>   	__pblk_end_io_read(pblk, rqd, false);
+>>   	return NVM_IO_ERR;
+>>   }
+>>   
+>> -static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
+>> +static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd, struct bio *bio,
+>>   			 sector_t lba, unsigned long *read_bitmap)
+>>   {
+>>   	struct pblk_sec_meta *meta_list = rqd->meta_list;
+>> -	struct bio *bio = rqd->bio;
+>>   	struct ppa_addr ppa;
+>>   
+>>   	pblk_lookup_l2p_seq(pblk, &ppa, lba, 1);
+>> @@ -423,14 +418,15 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+>>   	rqd = pblk_alloc_rqd(pblk, PBLK_READ);
+>>   
+>>   	rqd->opcode = NVM_OP_PREAD;
+>> -	rqd->bio = bio;
+>>   	rqd->nr_ppas = nr_secs;
+>> +	rqd->bio = NULL; /* cloned bio if needed */
+>>   	rqd->private = pblk;
+>>   	rqd->end_io = pblk_end_io_read;
+>>   
+>>   	r_ctx = nvm_rq_to_pdu(rqd);
+>>   	r_ctx->start_time = jiffies;
+>>   	r_ctx->lba = blba;
+>> +	r_ctx->private = bio; /* original bio */
+>>   
+>>   	/* Save the index for this bio's start. This is needed in case
+>>   	 * we need to fill a partial read.
+>> @@ -448,17 +444,15 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+>>   		rqd->ppa_list = rqd->meta_list + pblk_dma_meta_size;
+>>   		rqd->dma_ppa_list = rqd->dma_meta_list + pblk_dma_meta_size;
+>>   
+>> -		pblk_read_ppalist_rq(pblk, rqd, blba, &read_bitmap);
+>> +		pblk_read_ppalist_rq(pblk, rqd, bio, blba, &read_bitmap);
+>>   	} else {
+>> -		pblk_read_rq(pblk, rqd, blba, &read_bitmap);
+>> +		pblk_read_rq(pblk, rqd, bio, blba, &read_bitmap);
+>>   	}
+>>   
+>> -	bio_get(bio);
+>>   	if (bitmap_full(&read_bitmap, nr_secs)) {
+>> -		bio_endio(bio);
+>>   		atomic_inc(&pblk->inflight_io);
+>>   		__pblk_end_io_read(pblk, rqd, false);
+>> -		return NVM_IO_OK;
+>> +		return NVM_IO_DONE;
+>>   	}
+>>   
+>>   	/* All sectors are to be read from the device */
+>> @@ -473,13 +467,10 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+>>   		}
+>>   
+>>   		rqd->bio = int_bio;
+>> -		r_ctx->private = bio;
+>>   
+>>   		if (pblk_submit_io(pblk, rqd)) {
+>>   			pr_err("pblk: read IO submission failed\n");
+>>   			ret = NVM_IO_ERR;
+>> -			if (int_bio)
+>> -				bio_put(int_bio);
+>>   			goto fail_end_io;
+>>   		}
+>>   
+>> @@ -489,7 +480,7 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+>>   	/* The read bio request could be partially filled by the write buffer,
+>>   	 * but there are some holes that need to be read from the drive.
+>>   	 */
+>> -	return pblk_partial_read_bio(pblk, rqd, bio_init_idx, &read_bitmap);
+>> +	return pblk_partial_read(pblk, rqd, bio, bio_init_idx, &read_bitmap);
+>>   
+>>   fail_rqd_free:
+>>   	pblk_free_rqd(pblk, rqd, PBLK_READ);
+>>
+> 
+> Hi Jens,
+> 
+> Would you please pick this up as well?
 
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
-Cc: Jack Wang <jinpu.wang@profitbricks.com>
----
- drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c | 110 +++++++++++++++++++++++++
- 1 file changed, 110 insertions(+)
- create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c
+Please just make it part of your updated series, it doesn't apply
+to what I currently have.
 
-diff --git a/drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c b/drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c
-new file mode 100644
-index 000000000000..5933cfc03f95
---- /dev/null
-+++ b/drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c
-@@ -0,0 +1,110 @@
-+/*
-+ * InfiniBand Transport Layer
-+ *
-+ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Fabian Holler <mail@fholler.de>
-+ *          Jack Wang <jinpu.wang@profitbricks.com>
-+ *          Kleber Souza <kleber.souza@profitbricks.com>
-+ *          Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *          Milind Dumbare <Milind.dumbare@gmail.com>
-+ *
-+ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#undef pr_fmt
-+#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
-+
-+#include "ibtrs-srv.h"
-+
-+void ibtrs_srv_update_rdma_stats(struct ibtrs_srv_stats *s,
-+				 size_t size, int d)
-+{
-+	atomic64_inc(&s->rdma_stats.dir[d].cnt);
-+	atomic64_add(size, &s->rdma_stats.dir[d].size_total);
-+}
-+
-+void ibtrs_srv_update_wc_stats(struct ibtrs_srv_stats *s)
-+{
-+	atomic64_inc(&s->wc_comp.calls);
-+	atomic64_inc(&s->wc_comp.total_wc_cnt);
-+}
-+
-+int ibtrs_srv_reset_rdma_stats(struct ibtrs_srv_stats *stats, bool enable)
-+{
-+	if (enable) {
-+		struct ibtrs_srv_stats_rdma_stats *r = &stats->rdma_stats;
-+
-+		memset(r, 0, sizeof(*r));
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+ssize_t ibtrs_srv_stats_rdma_to_str(struct ibtrs_srv_stats *stats,
-+				    char *page, size_t len)
-+{
-+	struct ibtrs_srv_stats_rdma_stats *r = &stats->rdma_stats;
-+	struct ibtrs_srv_sess *sess;
-+
-+	sess = container_of(stats, typeof(*sess), stats);
-+
-+	return scnprintf(page, len, "%lld %lld %lld %lld %u\n",
-+			 (s64)atomic64_read(&r->dir[READ].cnt),
-+			 (s64)atomic64_read(&r->dir[READ].size_total),
-+			 (s64)atomic64_read(&r->dir[WRITE].cnt),
-+			 (s64)atomic64_read(&r->dir[WRITE].size_total),
-+			 atomic_read(&sess->ids_inflight));
-+}
-+
-+int ibtrs_srv_reset_wc_completion_stats(struct ibtrs_srv_stats *stats,
-+					bool enable)
-+{
-+	if (enable) {
-+		memset(&stats->wc_comp, 0, sizeof(stats->wc_comp));
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+int ibtrs_srv_stats_wc_completion_to_str(struct ibtrs_srv_stats *stats,
-+					 char *buf, size_t len)
-+{
-+	return snprintf(buf, len, "%lld %lld\n",
-+			(s64)atomic64_read(&stats->wc_comp.total_wc_cnt),
-+			(s64)atomic64_read(&stats->wc_comp.calls));
-+}
-+
-+ssize_t ibtrs_srv_reset_all_help(struct ibtrs_srv_stats *stats,
-+				 char *page, size_t len)
-+{
-+	return scnprintf(page, PAGE_SIZE, "echo 1 to reset all statistics\n");
-+}
-+
-+int ibtrs_srv_reset_all_stats(struct ibtrs_srv_stats *stats, bool enable)
-+{
-+	if (enable) {
-+		ibtrs_srv_reset_wc_completion_stats(stats, enable);
-+		ibtrs_srv_reset_rdma_stats(stats, enable);
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
 -- 
-2.13.1
+Jens Axboe
