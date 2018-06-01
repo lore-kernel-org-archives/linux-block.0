@@ -1,21 +1,21 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:36529 "EHLO
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:42129 "EHLO
         mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751554AbeFAOn7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 10:43:59 -0400
-Received: by mail-lf0-f68.google.com with SMTP id u4-v6so15206312lff.3
-        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 07:43:58 -0700 (PDT)
+        with ESMTP id S1752365AbeFANFN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 09:05:13 -0400
+Received: by mail-lf0-f68.google.com with SMTP id v135-v6so14745018lfa.9
+        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 06:05:13 -0700 (PDT)
 From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
 To: axboe@fb.com
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         javier@cnexlabs.com, igor.j.konopko@intel.com,
         marcin.dziegielewski@intel.com,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 04/10] lightnvm: proper error handling for pblk_bio_add_pages
-Date: Fri,  1 Jun 2018 16:41:08 +0200
-Message-Id: <20180601144114.17490-5-mb@lightnvm.io>
-In-Reply-To: <20180601144114.17490-1-mb@lightnvm.io>
-References: <20180601144114.17490-1-mb@lightnvm.io>
+Subject: [GIT PULL 15/18] lightnvm: proper error handling for pblk_bio_add_pages
+Date: Fri,  1 Jun 2018 15:04:29 +0200
+Message-Id: <20180601130432.30866-16-mb@lightnvm.io>
+In-Reply-To: <20180601130432.30866-1-mb@lightnvm.io>
+References: <20180601130432.30866-1-mb@lightnvm.io>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
@@ -40,7 +40,7 @@ Signed-off-by: Matias Bjørling <mb@lightnvm.io>
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 549341b24e3c..99036befb571 100644
+index e43093e27084..a20b41c355c5 100644
 --- a/drivers/lightnvm/pblk-core.c
 +++ b/drivers/lightnvm/pblk-core.c
 @@ -278,7 +278,9 @@ void pblk_free_rqd(struct pblk *pblk, struct nvm_rq *rqd, int type)
