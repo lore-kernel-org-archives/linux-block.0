@@ -1,21 +1,21 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:34634 "EHLO
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:44409 "EHLO
         mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752132AbeFAOoC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 10:44:02 -0400
-Received: by mail-lf0-f68.google.com with SMTP id o9-v6so15205381lfk.1
-        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 07:44:01 -0700 (PDT)
+        with ESMTP id S1752498AbeFANFQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 09:05:16 -0400
+Received: by mail-lf0-f68.google.com with SMTP id 36-v6so12794091lfr.11
+        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 06:05:15 -0700 (PDT)
 From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
 To: axboe@fb.com
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         javier@cnexlabs.com, igor.j.konopko@intel.com,
         marcin.dziegielewski@intel.com,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 06/10] lightnvm: pblk: add possibility to set write buffer size manually
-Date: Fri,  1 Jun 2018 16:41:10 +0200
-Message-Id: <20180601144114.17490-7-mb@lightnvm.io>
-In-Reply-To: <20180601144114.17490-1-mb@lightnvm.io>
-References: <20180601144114.17490-1-mb@lightnvm.io>
+Subject: [GIT PULL 17/18] lightnvm: pblk: add possibility to set write buffer size manually
+Date: Fri,  1 Jun 2018 15:04:31 +0200
+Message-Id: <20180601130432.30866-18-mb@lightnvm.io>
+In-Reply-To: <20180601130432.30866-1-mb@lightnvm.io>
+References: <20180601130432.30866-1-mb@lightnvm.io>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
@@ -35,7 +35,7 @@ Signed-off-by: Matias Bjørling <mb@lightnvm.io>
  1 file changed, 12 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 783887b891b7..ce561f5d48ce 100644
+index d65d2f972ccf..c890493e0e49 100644
 --- a/drivers/lightnvm/pblk-init.c
 +++ b/drivers/lightnvm/pblk-init.c
 @@ -20,6 +20,11 @@
