@@ -1,151 +1,67 @@
-Return-Path: <prvs=970446e0dd=doronrk@fb.com>
-From: Doron Roberts-Kedes <doronrk@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <josef@toxicpanda.com>, <axboe@kernel.dk>,
-        Doron Roberts-Kedes
-	<doronrk@fb.com>
-Subject: [PATCH] nbd: Add the nbd NBD_DISCONNECT_ON_CLOSE config flag.
-Date: Fri, 15 Jun 2018 14:05:32 -0700
-Message-ID: <20180615210532.499516-1-doronrk@fb.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:36529 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751554AbeFAOn7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 10:43:59 -0400
+Received: by mail-lf0-f68.google.com with SMTP id u4-v6so15206312lff.3
+        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 07:43:58 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        javier@cnexlabs.com, igor.j.konopko@intel.com,
+        marcin.dziegielewski@intel.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 04/10] lightnvm: proper error handling for pblk_bio_add_pages
+Date: Fri,  1 Jun 2018 16:41:08 +0200
+Message-Id: <20180601144114.17490-5-mb@lightnvm.io>
+In-Reply-To: <20180601144114.17490-1-mb@lightnvm.io>
+References: <20180601144114.17490-1-mb@lightnvm.io>
 MIME-Version: 1.0
-Content-Type: text/plain
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-If NBD_DISCONNECT_ON_CLOSE is set on a device, then the driver will
-issue a disconnect from nbd_release if the device has no remaining
-bdev->bd_openers.
+From: Igor Konopko <igor.j.konopko@intel.com>
 
-Fix ret val so reconfigure with only setting the flag succeeds.
+Currently in case of error caused by bio_pc_add_page in
+pblk_bio_add_pages two issues occur when calling from
+pblk_rb_read_to_bio(). First one is in pblk_bio_free_pages, since we
+are trying to free pages not allocated from our mempool. Second one
+is the warn from dma_pool_free, that we are trying to free NULL
+pointer dma.
 
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
-Signed-off-by: Doron Roberts-Kedes <doronrk@fb.com>
+This commit fix both issues.
+
+Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+Signed-off-by: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- drivers/block/nbd.c      | 42 ++++++++++++++++++++++++++++++++++--------
- include/uapi/linux/nbd.h |  3 +++
- 2 files changed, 37 insertions(+), 8 deletions(-)
+ drivers/lightnvm/pblk-core.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 3ed1ef8..ee27a25 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -76,6 +76,7 @@ struct link_dead_args {
- #define NBD_HAS_CONFIG_REF		4
- #define NBD_BOUND			5
- #define NBD_DESTROY_ON_DISCONNECT	6
-+#define NBD_DISCONNECT_ON_CLOSE 	7
- 
- struct nbd_config {
- 	u32 flags;
-@@ -138,6 +139,7 @@ static void nbd_config_put(struct nbd_device *nbd);
- static void nbd_connect_reply(struct genl_info *info, int index);
- static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info);
- static void nbd_dead_link_work(struct work_struct *work);
-+static void nbd_disconnect_and_put(struct nbd_device *nbd);
- 
- static inline struct device *nbd_to_dev(struct nbd_device *nbd)
- {
-@@ -1303,6 +1305,12 @@ static int nbd_open(struct block_device *bdev, fmode_t mode)
- static void nbd_release(struct gendisk *disk, fmode_t mode)
- {
- 	struct nbd_device *nbd = disk->private_data;
-+	struct block_device *bdev = bdget_disk(disk, 0);
-+
-+	if (test_bit(NBD_DISCONNECT_ON_CLOSE, &nbd->config->runtime_flags) &&
-+			bdev->bd_openers == 0)
-+		nbd_disconnect_and_put(nbd);
-+
- 	nbd_config_put(nbd);
- 	nbd_put(nbd);
- }
-@@ -1702,6 +1710,10 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 				&config->runtime_flags);
- 			put_dev = true;
- 		}
-+		if (flags & NBD_CFLAG_DISCONNECT_ON_CLOSE) {
-+			set_bit(NBD_DISCONNECT_ON_CLOSE,
-+				&config->runtime_flags);
-+		}
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 549341b24e3c..99036befb571 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -278,7 +278,9 @@ void pblk_free_rqd(struct pblk *pblk, struct nvm_rq *rqd, int type)
+ 		return;
  	}
  
- 	if (info->attrs[NBD_ATTR_SOCKETS]) {
-@@ -1746,6 +1758,17 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 	return ret;
+-	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
++	if (rqd->meta_list)
++		nvm_dev_dma_free(dev->parent, rqd->meta_list,
++				rqd->dma_meta_list);
+ 	mempool_free(rqd, pool);
  }
  
-+static void nbd_disconnect_and_put(struct nbd_device *nbd)
-+{
-+	mutex_lock(&nbd->config_lock);
-+	nbd_disconnect(nbd);
-+	nbd_clear_sock(nbd);
-+	mutex_unlock(&nbd->config_lock);
-+	if (test_and_clear_bit(NBD_HAS_CONFIG_REF,
-+			       &nbd->config->runtime_flags))
-+		nbd_config_put(nbd);
-+}
-+
- static int nbd_genl_disconnect(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct nbd_device *nbd;
-@@ -1778,13 +1801,7 @@ static int nbd_genl_disconnect(struct sk_buff *skb, struct genl_info *info)
- 		nbd_put(nbd);
- 		return 0;
- 	}
--	mutex_lock(&nbd->config_lock);
--	nbd_disconnect(nbd);
--	nbd_clear_sock(nbd);
--	mutex_unlock(&nbd->config_lock);
--	if (test_and_clear_bit(NBD_HAS_CONFIG_REF,
--			       &nbd->config->runtime_flags))
--		nbd_config_put(nbd);
-+	nbd_disconnect_and_put(nbd);
- 	nbd_config_put(nbd);
- 	nbd_put(nbd);
+@@ -316,7 +318,7 @@ int pblk_bio_add_pages(struct pblk *pblk, struct bio *bio, gfp_t flags,
+ 
  	return 0;
-@@ -1795,7 +1812,7 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
- 	struct nbd_device *nbd = NULL;
- 	struct nbd_config *config;
- 	int index;
--	int ret = -EINVAL;
-+	int ret = 0;
- 	bool put_dev = false;
- 
- 	if (!netlink_capable(skb, CAP_SYS_ADMIN))
-@@ -1835,6 +1852,7 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
- 	    !nbd->task_recv) {
- 		dev_err(nbd_to_dev(nbd),
- 			"not configured, cannot reconfigure\n");
-+		ret = -EINVAL;
- 		goto out;
- 	}
- 
-@@ -1859,6 +1877,14 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
- 					       &config->runtime_flags))
- 				refcount_inc(&nbd->refs);
- 		}
-+
-+		if (flags & NBD_CFLAG_DISCONNECT_ON_CLOSE) {
-+			set_bit(NBD_DISCONNECT_ON_CLOSE,
-+					&config->runtime_flags);
-+		} else {
-+			clear_bit(NBD_DISCONNECT_ON_CLOSE,
-+					&config->runtime_flags);
-+		}
- 	}
- 
- 	if (info->attrs[NBD_ATTR_SOCKETS]) {
-diff --git a/include/uapi/linux/nbd.h b/include/uapi/linux/nbd.h
-index 85a3fb6..20d6cc9 100644
---- a/include/uapi/linux/nbd.h
-+++ b/include/uapi/linux/nbd.h
-@@ -53,6 +53,9 @@ enum {
- /* These are client behavior specific flags. */
- #define NBD_CFLAG_DESTROY_ON_DISCONNECT	(1 << 0) /* delete the nbd device on
- 						    disconnect. */
-+#define NBD_CFLAG_DISCONNECT_ON_CLOSE (1 << 1) /* disconnect the nbd device on
-+						*  close by last opener.
-+						*/
- 
- /* userspace doesn't need the nbd_device structure */
+ err:
+-	pblk_bio_free_pages(pblk, bio, 0, i - 1);
++	pblk_bio_free_pages(pblk, bio, (bio->bi_vcnt - i), i);
+ 	return -1;
+ }
  
 -- 
-2.9.5
+2.11.0
