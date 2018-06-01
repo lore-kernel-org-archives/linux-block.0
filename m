@@ -1,10 +1,10 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:40216 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751946AbeFAOn5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 10:43:57 -0400
-Received: by mail-lf0-f65.google.com with SMTP id q11-v6so15212276lfc.7
-        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 07:43:56 -0700 (PDT)
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:39004 "EHLO
+        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752314AbeFANFK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 09:05:10 -0400
+Received: by mail-lf0-f67.google.com with SMTP id t134-v6so14734245lff.6
+        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 06:05:09 -0700 (PDT)
 From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
 To: axboe@fb.com
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -12,11 +12,11 @@ Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         marcin.dziegielewski@intel.com,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 02/10] lightnvm: pblk: garbage collect lines with failed writes
-Date: Fri,  1 Jun 2018 16:41:06 +0200
-Message-Id: <20180601144114.17490-3-mb@lightnvm.io>
-In-Reply-To: <20180601144114.17490-1-mb@lightnvm.io>
-References: <20180601144114.17490-1-mb@lightnvm.io>
+Subject: [GIT PULL 13/18] lightnvm: pblk: garbage collect lines with failed writes
+Date: Fri,  1 Jun 2018 15:04:27 +0200
+Message-Id: <20180601130432.30866-14-mb@lightnvm.io>
+In-Reply-To: <20180601130432.30866-1-mb@lightnvm.io>
+References: <20180601130432.30866-1-mb@lightnvm.io>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
@@ -51,7 +51,7 @@ Signed-off-by: Matias Bjørling <mb@lightnvm.io>
  7 files changed, 200 insertions(+), 64 deletions(-)
 
 diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 56e3934712f9..e81a70cf9e9b 100644
+index 5dae72e8b46b..263da2e43567 100644
 --- a/drivers/lightnvm/pblk-core.c
 +++ b/drivers/lightnvm/pblk-core.c
 @@ -373,7 +373,13 @@ struct list_head *pblk_line_gc_list(struct pblk *pblk, struct pblk_line *line)
@@ -132,7 +132,7 @@ index 56e3934712f9..e81a70cf9e9b 100644
 +		pblk_save_lba_list(pblk, line);
  
  	pblk_line_close(pblk, line);
- 	mempool_free(line_ws, &pblk->gen_ws_pool);
+ 	mempool_free(line_ws, pblk->gen_ws_pool);
 diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
 index b0cc277bf972..df88f1bdd921 100644
 --- a/drivers/lightnvm/pblk-gc.c
@@ -303,7 +303,7 @@ index b0cc277bf972..df88f1bdd921 100644
  
  void pblk_gc_free_full_lines(struct pblk *pblk)
 diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 2a3302f7e853..783887b891b7 100644
+index 6f06727afcf6..d65d2f972ccf 100644
 --- a/drivers/lightnvm/pblk-init.c
 +++ b/drivers/lightnvm/pblk-init.c
 @@ -493,11 +493,17 @@ static void pblk_line_mg_free(struct pblk *pblk)
@@ -503,7 +503,7 @@ index e61909af23a5..88a0a7c407aa 100644
  
  	sz += snprintf(page + sz, PAGE_SIZE - sz,
 diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 7f9491bc64b5..f353e52941f5 100644
+index f62e432f7c91..f33c2c3993f0 100644
 --- a/drivers/lightnvm/pblk-write.c
 +++ b/drivers/lightnvm/pblk-write.c
 @@ -136,6 +136,7 @@ static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa)
@@ -523,7 +523,7 @@ index 7f9491bc64b5..f353e52941f5 100644
  
  	sync = atomic_add_return(rqd->nr_ppas, &emeta->sync);
 diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 043a851a8e6c..725bc1bfa849 100644
+index a75ffae53a0d..7fbdfdc809d3 100644
 --- a/drivers/lightnvm/pblk.h
 +++ b/drivers/lightnvm/pblk.h
 @@ -89,12 +89,14 @@ struct pblk_sec_meta {
