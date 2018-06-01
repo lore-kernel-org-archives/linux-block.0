@@ -1,73 +1,64 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>, Chris Mason <clm@fb.com>,
-        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
-        linux-btrfs@vger.kernel.org
-Subject: [PATCH V6 10/30] btrfs: use chunk_last_segment to get bio's last page
-Date: Sat,  9 Jun 2018 20:29:54 +0800
-Message-Id: <20180609123014.8861-11-ming.lei@redhat.com>
-In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
-References: <20180609123014.8861-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f49.google.com ([209.85.215.49]:33976 "EHLO
+        mail-lf0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752108AbeFAOoA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 10:44:00 -0400
+Received: by mail-lf0-f49.google.com with SMTP id o9-v6so15205273lfk.1
+        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 07:44:00 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        javier@cnexlabs.com, igor.j.konopko@intel.com,
+        marcin.dziegielewski@intel.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 05/10] lightnvm: fix partial read error path
+Date: Fri,  1 Jun 2018 16:41:09 +0200
+Message-Id: <20180601144114.17490-6-mb@lightnvm.io>
+In-Reply-To: <20180601144114.17490-1-mb@lightnvm.io>
+References: <20180601144114.17490-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Preparing for supporting multipage bvec.
+From: Igor Konopko <igor.j.konopko@intel.com>
 
-Cc: Chris Mason <clm@fb.com>
-Cc: Josef Bacik <jbacik@fb.com>
-Cc: David Sterba <dsterba@suse.com>
-Cc: linux-btrfs@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+When error occurs during bio_add_page on partial read path, pblk
+tries to free pages twice.
+
+Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+Signed-off-by: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- fs/btrfs/compression.c | 5 ++++-
- fs/btrfs/extent_io.c   | 5 +++--
- 2 files changed, 7 insertions(+), 3 deletions(-)
+ drivers/lightnvm/pblk-read.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
-index d3e447b45bf7..02da66acc57d 100644
---- a/fs/btrfs/compression.c
-+++ b/fs/btrfs/compression.c
-@@ -407,8 +407,11 @@ blk_status_t btrfs_submit_compressed_write(struct inode *inode, u64 start,
- static u64 bio_end_offset(struct bio *bio)
- {
- 	struct bio_vec *last = bio_last_bvec_all(bio);
-+	struct bio_vec bv;
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index 38f89a84ce5e..f770fd113ffe 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -256,7 +256,7 @@ static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 	new_bio = bio_alloc(GFP_KERNEL, nr_holes);
  
--	return page_offset(last->bv_page) + last->bv_len + last->bv_offset;
-+	chunk_last_segment(last, &bv);
-+
-+	return page_offset(bv.bv_page) + bv.bv_len + bv.bv_offset;
+ 	if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
+-		goto err;
++		goto err_add_pages;
+ 
+ 	if (nr_holes != new_bio->bi_vcnt) {
+ 		pr_err("pblk: malformed bio\n");
+@@ -347,10 +347,10 @@ static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 	return NVM_IO_OK;
+ 
+ err:
+-	pr_err("pblk: failed to perform partial read\n");
+-
+ 	/* Free allocated pages in new bio */
+-	pblk_bio_free_pages(pblk, bio, 0, new_bio->bi_vcnt);
++	pblk_bio_free_pages(pblk, new_bio, 0, new_bio->bi_vcnt);
++err_add_pages:
++	pr_err("pblk: failed to perform partial read\n");
+ 	__pblk_end_io_read(pblk, rqd, false);
+ 	return NVM_IO_ERR;
  }
- 
- static noinline int add_ra_bio_pages(struct inode *inode,
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index 51fc015c7d2c..efb8db0fd73c 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -2728,11 +2728,12 @@ static int __must_check submit_one_bio(struct bio *bio, int mirror_num,
- {
- 	blk_status_t ret = 0;
- 	struct bio_vec *bvec = bio_last_bvec_all(bio);
--	struct page *page = bvec->bv_page;
-+	struct bio_vec bv;
- 	struct extent_io_tree *tree = bio->bi_private;
- 	u64 start;
- 
--	start = page_offset(page) + bvec->bv_offset;
-+	chunk_last_segment(bvec, &bv);
-+	start = page_offset(bv.bv_page) + bv.bv_offset;
- 
- 	bio->bi_private = NULL;
- 
 -- 
-2.9.5
+2.11.0
