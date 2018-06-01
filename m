@@ -1,10 +1,10 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:41082 "EHLO
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:40744 "EHLO
         mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751792AbeFAOnz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 10:43:55 -0400
-Received: by mail-lf0-f67.google.com with SMTP id d24-v6so15213194lfa.8
-        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 07:43:54 -0700 (PDT)
+        with ESMTP id S1752154AbeFANFJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 09:05:09 -0400
+Received: by mail-lf0-f67.google.com with SMTP id q11-v6so14743402lfc.7
+        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 06:05:08 -0700 (PDT)
 From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
 To: axboe@fb.com
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -12,11 +12,11 @@ Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         marcin.dziegielewski@intel.com,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 01/10] lightnvm: pblk: rework write error recovery path
-Date: Fri,  1 Jun 2018 16:41:05 +0200
-Message-Id: <20180601144114.17490-2-mb@lightnvm.io>
-In-Reply-To: <20180601144114.17490-1-mb@lightnvm.io>
-References: <20180601144114.17490-1-mb@lightnvm.io>
+Subject: [GIT PULL 12/18] lightnvm: pblk: rework write error recovery path
+Date: Fri,  1 Jun 2018 15:04:26 +0200
+Message-Id: <20180601130432.30866-13-mb@lightnvm.io>
+In-Reply-To: <20180601130432.30866-1-mb@lightnvm.io>
+References: <20180601130432.30866-1-mb@lightnvm.io>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
@@ -47,7 +47,7 @@ Signed-off-by: Matias Bjørling <mb@lightnvm.io>
  5 files changed, 187 insertions(+), 235 deletions(-)
 
 diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index f47e95c0e5da..2a3302f7e853 100644
+index bfc488d0dda9..6f06727afcf6 100644
 --- a/drivers/lightnvm/pblk-init.c
 +++ b/drivers/lightnvm/pblk-init.c
 @@ -426,6 +426,7 @@ static int pblk_core_init(struct pblk *pblk)
@@ -117,7 +117,7 @@ index 58946ffebe81..1b74ec51a4ad 100644
   * copy, a page reference to the write buffer is used to be added to the bio.
   *
 diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 364ad52a5bfb..788dce87043e 100644
+index 3e079c2afa6e..788dce87043e 100644
 --- a/drivers/lightnvm/pblk-recovery.c
 +++ b/drivers/lightnvm/pblk-recovery.c
 @@ -16,97 +16,6 @@
@@ -168,7 +168,7 @@ index 364ad52a5bfb..788dce87043e 100644
 -		goto err;
 -	}
 -
--	mempool_free(recovery, &pblk->rec_pool);
+-	mempool_free(recovery, pblk->rec_pool);
 -	return;
 -
 -err:
@@ -219,7 +219,7 @@ index 364ad52a5bfb..788dce87043e 100644
  {
  	u32 crc;
 diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index aef7fa2d401d..7f9491bc64b5 100644
+index 3e6f1ebd743a..f62e432f7c91 100644
 --- a/drivers/lightnvm/pblk-write.c
 +++ b/drivers/lightnvm/pblk-write.c
 @@ -103,68 +103,149 @@ static void pblk_complete_write(struct pblk *pblk, struct nvm_rq *rqd,
@@ -354,7 +354,7 @@ index aef7fa2d401d..7f9491bc64b5 100644
 +							c_ctx->nr_padded);
 +	bio_put(rqd->bio);
 +	pblk_free_rqd(pblk, rqd, PBLK_WRITE);
-+	mempool_free(recovery, &pblk->rec_pool);
++	mempool_free(recovery, pblk->rec_pool);
 +
 +	atomic_dec(&pblk->inflight_io);
 +}
@@ -373,7 +373,7 @@ index aef7fa2d401d..7f9491bc64b5 100644
 -	if (unlikely(nr_ppas == 1))
 -		ppa_list = &rqd->ppa_addr;
  
- 	recovery = mempool_alloc(&pblk->rec_pool, GFP_ATOMIC);
+ 	recovery = mempool_alloc(pblk->rec_pool, GFP_ATOMIC);
 -
 -	INIT_LIST_HEAD(&recovery->failed);
 -
@@ -385,7 +385,7 @@ index aef7fa2d401d..7f9491bc64b5 100644
 -		/* Logic error */
 -		if (bit > c_ctx->nr_valid) {
 -			WARN_ONCE(1, "pblk: corrupted write request\n");
--			mempool_free(recovery, &pblk->rec_pool);
+-			mempool_free(recovery, pblk->rec_pool);
 -			goto out;
 -		}
 -
@@ -393,7 +393,7 @@ index aef7fa2d401d..7f9491bc64b5 100644
 -		entry = pblk_rb_sync_scan_entry(&pblk->rwb, &ppa);
 -		if (!entry) {
 -			pr_err("pblk: could not scan entry on write failure\n");
--			mempool_free(recovery, &pblk->rec_pool);
+-			mempool_free(recovery, pblk->rec_pool);
 -			goto out;
 -		}
 -
@@ -410,7 +410,7 @@ index aef7fa2d401d..7f9491bc64b5 100644
 -	ret = pblk_recov_setup_rq(pblk, c_ctx, recovery, comp_bits, c_entries);
 -	if (ret) {
 -		pr_err("pblk: could not recover from write failure\n");
--		mempool_free(recovery, &pblk->rec_pool);
+-		mempool_free(recovery, pblk->rec_pool);
 -		goto out;
 -	}
 +	recovery->pblk = pblk;
@@ -550,7 +550,7 @@ index aef7fa2d401d..7f9491bc64b5 100644
  
  	bio->bi_iter.bi_sector = 0; /* internal bio */
 diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 9f22bbb54a6d..043a851a8e6c 100644
+index 5a4daf0b949d..a75ffae53a0d 100644
 --- a/drivers/lightnvm/pblk.h
 +++ b/drivers/lightnvm/pblk.h
 @@ -128,7 +128,6 @@ struct pblk_pad_rq {
@@ -568,9 +568,9 @@ index 9f22bbb54a6d..043a851a8e6c 100644
 +	spinlock_t resubmit_lock;	 /* Resubmit list lock */
 +	struct list_head resubmit_list; /* Resubmit list for failed writes*/
 +
- 	mempool_t page_bio_pool;
- 	mempool_t gen_ws_pool;
- 	mempool_t rec_pool;
+ 	mempool_t *page_bio_pool;
+ 	mempool_t *gen_ws_pool;
+ 	mempool_t *rec_pool;
 @@ -713,9 +715,6 @@ void pblk_rb_sync_l2p(struct pblk_rb *rb);
  unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
  				 unsigned int pos, unsigned int nr_entries,
