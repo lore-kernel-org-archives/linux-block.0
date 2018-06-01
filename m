@@ -1,57 +1,67 @@
-Return-Path: <BATV+94b2d661b7de03f6cf2e+5413+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Boaz Harrosh <ooo@electrozaur.com>,
-	linux-block@vger.kernel.org,
-	linux-bcache@vger.kernel.org,
-	dm-devel@redhat.com,
-	Mike Snitzer <snitzer@redhat.com>,
-	stable@vger.kernel.org
-Subject: [PATCH 1/6] dm: use bio_split() when splitting out the already processed bio
-Date: Tue, 19 Jun 2018 06:52:11 +0200
-Message-Id: <20180619045216.21130-2-hch@lst.de>
-In-Reply-To: <20180619045216.21130-1-hch@lst.de>
-References: <20180619045216.21130-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:33238 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752167AbeFANFH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 09:05:07 -0400
+Received: by mail-lf0-f65.google.com with SMTP id y20-v6so14737549lfy.0
+        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 06:05:06 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        javier@cnexlabs.com, igor.j.konopko@intel.com,
+        marcin.dziegielewski@intel.com,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 11/18] lightnvm: pblk: remove dead function
+Date: Fri,  1 Jun 2018 15:04:25 +0200
+Message-Id: <20180601130432.30866-12-mb@lightnvm.io>
+In-Reply-To: <20180601130432.30866-1-mb@lightnvm.io>
+References: <20180601130432.30866-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Mike Snitzer <snitzer@redhat.com>
+From: Javier González <javier@javigon.com>
 
-Use of bio_clone_bioset() is inefficient if there is no need to clone
-the original bio's bio_vec array.  Best to use the bio_clone_fast()
-variant.  Also, just using bio_advance() is only part of what is needed
-to properly setup the clone -- it doesn't account for the various
-bio_integrity() related work that also needs to be performed (see
-bio_split).
+Remove dead function for manual sync. I/O
 
-Address both of these issues by switching from bio_clone_bioset() to
-bio_split().
-
-Fixes: 18a25da8 ("dm: ensure bio submission follows a depth-first tree walk")
-Cc: stable@vger.kernel.org # 4.15+, requires removal of '&' before md->queue->bio_split
-Reported-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: NeilBrown <neilb@suse.com>
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- drivers/md/dm.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/lightnvm/pblk-core.c | 7 -------
+ drivers/lightnvm/pblk.h      | 1 -
+ 2 files changed, 8 deletions(-)
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index e65429a29c06..a3b103e8e3ce 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1606,10 +1606,9 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
- 				 * the usage of io->orig_bio in dm_remap_zone_report()
- 				 * won't be affected by this reassignment.
- 				 */
--				struct bio *b = bio_clone_bioset(bio, GFP_NOIO,
--								 &md->queue->bio_split);
-+				struct bio *b = bio_split(bio, bio_sectors(bio) - ci.sector_count,
-+							  GFP_NOIO, &md->queue->bio_split);
- 				ci.io->orig_bio = b;
--				bio_advance(bio, (bio_sectors(bio) - ci.sector_count) << 9);
- 				bio_chain(b, bio);
- 				ret = generic_make_request(bio);
- 				break;
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 5f1e5b1b3094..5dae72e8b46b 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -342,13 +342,6 @@ void pblk_write_should_kick(struct pblk *pblk)
+ 		pblk_write_kick(pblk);
+ }
+ 
+-void pblk_end_io_sync(struct nvm_rq *rqd)
+-{
+-	struct completion *waiting = rqd->private;
+-
+-	complete(waiting);
+-}
+-
+ static void pblk_wait_for_meta(struct pblk *pblk)
+ {
+ 	do {
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 0c69eb880f56..5a4daf0b949d 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -796,7 +796,6 @@ void pblk_down_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
+ void pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas);
+ void pblk_up_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
+ 		unsigned long *lun_bitmap);
+-void pblk_end_io_sync(struct nvm_rq *rqd);
+ int pblk_bio_add_pages(struct pblk *pblk, struct bio *bio, gfp_t flags,
+ 		       int nr_pages);
+ void pblk_bio_free_pages(struct pblk *pblk, struct bio *bio, int off,
 -- 
-2.17.1
+2.11.0
