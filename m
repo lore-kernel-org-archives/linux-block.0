@@ -1,27 +1,40 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] blk-mq: update nr_requests when switching to 'none'
- scheduler
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, Marco Patalano <mpatalan@redhat.com>,
- "Ewan D. Milne" <emilne@redhat.com>
-References: <20180602071809.4277-1-ming.lei@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <12c6487b-9bb6-d208-35a3-e8fadbd2acf2@kernel.dk>
-Date: Sat, 2 Jun 2018 14:08:15 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180602071809.4277-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Marco Patalano <mpatalan@redhat.com>,
+	"Ewan D. Milne" <emilne@redhat.com>
+Subject: [PATCH] blk-mq: update nr_requests when switching to 'none' scheduler
+Date: Sat,  2 Jun 2018 15:18:09 +0800
+Message-Id: <20180602071809.4277-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 6/2/18 1:18 AM, Ming Lei wrote:
-> Now we setup q->nr_requests when switching to one new scheduler,
-> but not do it for 'none', then q->nr_requests may not be correct
-> for 'none'.
-> 
-> This patch fixes this issue by always updating 'nr_requests' when
-> switching to 'none'.
+Now we setup q->nr_requests when switching to one new scheduler,
+but not do it for 'none', then q->nr_requests may not be correct
+for 'none'.
 
-Looks fine, applied.
+This patch fixes this issue by always updating 'nr_requests' when
+switching to 'none'.
 
+Cc: Marco Patalano <mpatalan@redhat.com>
+Cc: "Ewan D. Milne" <emilne@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-sched.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index b0f2c2a40a0c..b087d8884a08 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -585,6 +585,7 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+ 
+ 	if (!e) {
+ 		q->elevator = NULL;
++		q->nr_requests = q->tag_set->queue_depth;
+ 		return 0;
+ 	}
+ 
 -- 
-Jens Axboe
+2.9.5
