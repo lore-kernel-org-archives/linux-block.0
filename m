@@ -1,60 +1,58 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH RESENT] blk-mq-debugfs: invoke queue_for_each_hw_ctx under sysfs_lock
-Date: Mon, 25 Jun 2018 14:23:35 +0800
-Message-Id: <1529907815-2170-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <prvs=68697a2c8=adam.manzanares@wdc.com>
+From: adam.manzanares@wdc.com
+To: viro@zeniv.linux.org.uk,
+	linux-fsdevel@vger.kernel.org
+Cc: axboe@kernel.dk,
+	bcrl@kvack.org,
+	mingo@kernel.org,
+	tglx@linutronix.de,
+	kstewart@linuxfoundation.org,
+	peterz@infradead.org,
+	pombredanne@nexb.com,
+	gregkh@linuxfoundation.org,
+	bigeasy@linutronix.de,
+	rgoldwyn@suse.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-aio@kvack.org,
+	linux-api@vger.kernel.org,
+	hch@infradread.org,
+	jmoyer@redhat.com,
+	willy@infradead.org,
+	smfrench@gmail.com,
+	Adam Manzanares <adam.manzanares@wdc.com>
+Subject: [PATCH 1/2] fs: aio ioprio add explicit block layer dependence
+Date: Mon,  4 Jun 2018 10:59:56 -0700
+Message-Id: <20180604175957.2647-1-adam.manzanares@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-blk_mq_run_hw_queues and blk_mq_start_stopped_hw_queues in
-queue_state_write will invoke queue_for_each_hw_ctx. It will race
-with blk_mq_realloc_hw_ctxs and incur NULL pointer reference. Put
-them under sysfs_lock to serialize the accessing to queue_hw_ctx
-and nr_hw_queues.
+From: Adam Manzanares <adam.manzanares@wdc.com>
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+Previously, the ioprio_check_cap function was only defined when CONFIG_BLOCK
+was set. Make this relationship explicit and add a stub for !CONFIG_BLOCK.
+
+Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
 ---
- block/blk-mq-debugfs.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ include/linux/ioprio.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index ffa6223..2e0c444 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -151,6 +151,7 @@ static ssize_t queue_state_write(void *data, const char __user *buf,
- {
- 	struct request_queue *q = data;
- 	char opbuf[16] = { }, *op;
-+	int res;
+diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
+index 4a28cec49ec3..9e30ed6443db 100644
+--- a/include/linux/ioprio.h
++++ b/include/linux/ioprio.h
+@@ -77,6 +77,13 @@ extern int ioprio_best(unsigned short aprio, unsigned short bprio);
  
- 	/*
- 	 * The "state" attribute is removed after blk_cleanup_queue() has called
-@@ -169,9 +170,17 @@ static ssize_t queue_state_write(void *data, const char __user *buf,
- 		return -EFAULT;
- 	op = strstrip(opbuf);
- 	if (strcmp(op, "run") == 0) {
-+		res = mutex_lock_interruptible(&q->sysfs_lock);
-+		if (res)
-+			goto out;
- 		blk_mq_run_hw_queues(q, true);
-+		mutex_unlock(&q->sysfs_lock);
- 	} else if (strcmp(op, "start") == 0) {
-+		res = mutex_lock_interruptible(&q->sysfs_lock);
-+		if (res)
-+			goto out;
- 		blk_mq_start_stopped_hw_queues(q, true);
-+		mutex_unlock(&q->sysfs_lock);
- 	} else if (strcmp(op, "kick") == 0) {
- 		blk_mq_kick_requeue_list(q);
- 	} else {
-@@ -180,6 +189,7 @@ static ssize_t queue_state_write(void *data, const char __user *buf,
- 		pr_err("%s: use 'run', 'start' or 'kick'\n", __func__);
- 		return -EINVAL;
- 	}
-+out:
- 	return count;
- }
+ extern int set_task_ioprio(struct task_struct *task, int ioprio);
  
++#ifdef CONFIG_BLOCK
+ extern int ioprio_check_cap(int ioprio);
++#else
++static inline int ioprio_check_cap(int ioprio)
++{
++	return -ENOTBLK;
++}
++#endif /* CONFIG_BLOCK */
+ 
+ #endif
 -- 
-2.7.4
+2.17.0
