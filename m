@@ -1,39 +1,49 @@
-Return-Path: <hch@lst.de>
-Date: Mon, 4 Jun 2018 15:42:45 +0200
-From: "hch@lst.de" <hch@lst.de>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>,
-	"keith.busch@intel.com" <keith.busch@intel.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"tj@kernel.org" <tj@kernel.org>,
-	"lduncan@suse.com" <lduncan@suse.com>,
+Return-Path: <prvs=686e31ba0=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>, "keith.busch@intel.com"
+	<keith.busch@intel.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, "tj@kernel.org"
+	<tj@kernel.org>, "lduncan@suse.com" <lduncan@suse.com>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"cleech@redhat.com" <cleech@redhat.com>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>
+	"josef@toxicpanda.com" <josef@toxicpanda.com>, "cleech@redhat.com"
+	<cleech@redhat.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>
 Subject: Re: [PATCH 03/14] blk-mq: Remove generation seqeunce
-Message-ID: <20180604134245.GA31895@lst.de>
-References: <20180529135239.27005-1-hch@lst.de> <20180529135239.27005-4-hch@lst.de> <fe09917b6159988b168a9ef25240e0082c7c352f.camel@wdc.com>
+Date: Mon, 4 Jun 2018 06:56:22 +0000
+Message-ID: <fe09917b6159988b168a9ef25240e0082c7c352f.camel@wdc.com>
+References: <20180529135239.27005-1-hch@lst.de>
+	 <20180529135239.27005-4-hch@lst.de>
+In-Reply-To: <20180529135239.27005-4-hch@lst.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <fe09917b6159988b168a9ef25240e0082c7c352f.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jun 04, 2018 at 06:56:22AM +0000, Bart Van Assche wrote:
-> Can you explain why you prefer this approach? I think this patch introduces
-> more new atomic operations in the hot path than the approach I had proposed
-> ("blk-mq: Rework blk-mq timeout handling again"). In other words, I think the
-> patch that I had proposed will yield better performance.
-
-Primarily because the generation counter is fundamentally the wrong
-thing to do.  If we know the tag has some pending action on it we
-should not reuse it insted of working around races that stem from the
-fact that we reuse it.
-
-We can look at the performance numbers and tune as needed, but for now
-we need to get the high level approach right first.  I think once
-we've done a proper audit of the SCSI EH code and blk_abort_request
-users we can probably drop the cmpxchg and only have a single
-atomic_dec_and_test left, which in terms of atomic operations isn't
-the world.
+T24gVHVlLCAyMDE4LTA1LTI5IGF0IDE1OjUyICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
+ZToNCj4gRnJvbTogS2VpdGggQnVzY2ggPGtlaXRoLmJ1c2NoQGludGVsLmNvbT4NCj4gDQo+IFRo
+aXMgcGF0Y2ggc2ltcGxpZmllcyB0aGUgdGltZW91dCBoYW5kbGluZyBieSByZWx5aW5nIG9uIHRo
+ZSByZXF1ZXN0DQo+IHJlZmVyZW5jZSBjb3VudGluZyB0byBlbnN1cmUgdGhlIGl0ZXJhdG9yIGlz
+IG9wZXJhdGluZyBvbiBhbiBpbmZsaWdodA0KPiBhbmQgdHJ1bHkgdGltZWQgb3V0IHJlcXVlc3Qu
+IFNpbmNlIHRoZSByZWZlcmVuY2UgY291bnRpbmcgcHJldmVudHMgdGhlDQo+IHRhZyBmcm9tIGJl
+aW5nIHJlYWxsb2NhdGVkLCB0aGUgYmxvY2sgbGF5ZXIgbm8gbG9uZ2VyIG5lZWRzIHRvIHByZXZl
+bnQNCj4gZHJpdmVycyBmcm9tIGNvbXBsZXRpbmcgdGhlaXIgcmVxdWVzdHMgd2hpbGUgdGhlIHRp
+bWVvdXQgaGFuZGxlciBpcw0KPiBvcGVyYXRpbmcgb24gaXQ6IGEgZHJpdmVyIGNvbXBsZXRpbmcg
+YSByZXF1ZXN0IGlzIGFsbG93ZWQgdG8gcHJvY2VlZCB0bw0KPiB0aGUgbmV4dCBzdGF0ZSB3aXRo
+b3V0IGFkZGl0aW9uYWwgc3luY3Jvbml6YXRpb24gd2l0aCB0aGUgYmxvY2sgbGF5ZXIuDQo+IA0K
+PiBUaGlzIGFsc28gcmVtb3ZlcyBhbnkgbmVlZCBmb3IgZ2VuZXJhdGlvbiBzZXF1ZW5jZSBudW1i
+ZXJzIHNpbmNlIHRoZQ0KPiByZXF1ZXN0IGxpZmV0aW1lIGlzIHByZXZlbnRlZCBmcm9tIGJlaW5n
+IHJlYWxsb2NhdGVkIGFzIGEgbmV3IHNlcXVlbmNlDQo+IHdoaWxlIHRpbWVvdXQgaGFuZGxpbmcg
+aXMgb3BlcmF0aW5nIG9uIGl0Lg0KPiANCj4gVG8gZW5hYmxlcyB0aGlzIGEgcmVmY291bnQgaXMg
+YWRkZWQgdG8gc3RydWN0IHJlcXVlc3Qgc28gdGhhdCByZXF1ZXN0DQo+IHVzZXJzIGNhbiBiZSBz
+dXJlIHRoZXkncmUgb3BlcmF0aW5nIG9uIHRoZSBzYW1lIHJlcXVlc3Qgd2l0aG91dCBpdA0KPiBj
+aGFuZ2luZyB3aGlsZSB0aGV5J3JlIHByb2Nlc3NpbmcgaXQuICBUaGUgcmVxdWVzdCdzIHRhZyB3
+b24ndCBiZQ0KPiByZWxlYXNlZCBmb3IgcmV1c2UgdW50aWwgYm90aCB0aGUgdGltZW91dCBoYW5k
+bGVyIGFuZCB0aGUgY29tcGxldGlvbg0KPiBhcmUgZG9uZSB3aXRoIGl0Lg0KPiANCj4gU2lnbmVk
+LW9mZi1ieTogS2VpdGggQnVzY2ggPGtlaXRoLmJ1c2NoQGludGVsLmNvbT4NCj4gW2hjaDogc2xp
+Z2h0IGNsZWFudXBzLCBhZGRlZCBiYWNrIHN1Ym1pc3Npb24gc2lkZSBoY3R4IGxvY2ssIHVzZSBj
+bXB4Y2hnDQo+ICBmb3IgY29tcGxldGlvbnNdDQo+IFNpZ25lZC1vZmYtYnk6IENocmlzdG9waCBI
+ZWxsd2lnIDxoY2hAbHN0LmRlPg0KDQpIZWxsbyBDaHJpc3RvcGgsDQoNCkNhbiB5b3UgZXhwbGFp
+biB3aHkgeW91IHByZWZlciB0aGlzIGFwcHJvYWNoPyBJIHRoaW5rIHRoaXMgcGF0Y2ggaW50cm9k
+dWNlcw0KbW9yZSBuZXcgYXRvbWljIG9wZXJhdGlvbnMgaW4gdGhlIGhvdCBwYXRoIHRoYW4gdGhl
+IGFwcHJvYWNoIEkgaGFkIHByb3Bvc2VkDQooImJsay1tcTogUmV3b3JrIGJsay1tcSB0aW1lb3V0
+IGhhbmRsaW5nIGFnYWluIikuIEluIG90aGVyIHdvcmRzLCBJIHRoaW5rIHRoZQ0KcGF0Y2ggdGhh
+dCBJIGhhZCBwcm9wb3NlZCB3aWxsIHlpZWxkIGJldHRlciBwZXJmb3JtYW5jZS4NCg0KVGhhbmtz
+LA0KDQpCYXJ0Lg0KDQoNCg==
