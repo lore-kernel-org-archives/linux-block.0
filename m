@@ -1,65 +1,55 @@
-Return-Path: <prvs=68736c82a=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "kent.overstreet@gmail.com" <kent.overstreet@gmail.com>
-CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <kent.overstreet@gmail.com>
+Return-Path: <kent.overstreet@gmail.com>
+Date: Mon, 4 Jun 2018 18:41:43 -0400
+From: Kent Overstreet <kent.overstreet@gmail.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH] Revert "block: Add warning for bi_next not NULL in
  bio_endio()"
-Date: Tue, 5 Jun 2018 14:38:23 +0000
-Message-ID: <a506e7feb70350fa5cbe39162489b95cede90a39.camel@wdc.com>
+Message-ID: <20180604224143.GC30325@kmo-pixel>
 References: <20180522235505.20937-1-bart.vanassche@wdc.com>
-	 <20180523013020.GA12391@kmo-pixel>
-	 <65261494f966d140a7542fb1533a4dd2f7fd02a1.camel@wdc.com>
-	 <20180523021607.GB12391@kmo-pixel>
-	 <f9d3387040d554fdcb07e32737c56f14e61151b1.camel@wdc.com>
-	 <20180604224143.GC30325@kmo-pixel>
-In-Reply-To: <20180604224143.GC30325@kmo-pixel>
-Content-Type: text/plain; charset="utf-8"
+ <20180523013020.GA12391@kmo-pixel>
+ <65261494f966d140a7542fb1533a4dd2f7fd02a1.camel@wdc.com>
+ <20180523021607.GB12391@kmo-pixel>
+ <f9d3387040d554fdcb07e32737c56f14e61151b1.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <f9d3387040d554fdcb07e32737c56f14e61151b1.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE4LTA2LTA0IGF0IDE4OjQxIC0wNDAwLCBLZW50IE92ZXJzdHJlZXQgd3JvdGU6
-DQo+IE9uIE1vbiwgSnVuIDA0LCAyMDE4IGF0IDA4OjU5OjM5QU0gKzAwMDAsIEJhcnQgVmFuIEFz
-c2NoZSB3cm90ZToNCj4gPiBQbGVhc2UgY29tbWVudCBvdXQgdGhlIGdldHVpZF9jYWxsb3V0IGxp
-bmUgZnJvbSAvZXRjL211bHRpcGF0aC5jb25mIGFuZCB0cnkgYWdhaW4uDQo+ID4gQ2hhbmdpbmcg
-dGhlICIvLi4uIiBwYXJ0IGludG8gdGhlIHBhdGggb2YgdGhlIHNycC10ZXN0IHNvZnR3YXJlIHNo
-b3VsZCBhbHNvIGhlbHAuDQo+ID4gVGhhdCBsaW5lIGlzIGEgbGVmdC1vdmVyIGZyb20gdGhlIHRp
-bWUgd2hlbiB0aGUgTlZNZSBpbml0aWF0b3IgZHJpdmVycyBzdXBwb3J0ZWQNCj4gPiBkbS1tdWx0
-aXBhdGguIEkgd2lsbCB1cGRhdGUgdGhlIHNycC10ZXN0IFJFQURNRS5tZCB0byBtYWtlIHRoaXMg
-bW9yZSBjbGVhci4NCj4gDQo+IERlbGV0ZWQgdGhhdCBsaW5lIGFuZCBpdCBzdGlsbCBkb2Vzbid0
-IHdvcmsgKEkgYWxzbyB0cmllZCBmaXhpbmcgdGhhdCBsaW5lIHNvDQo+IHRoZSBwYXRoIHdhcyBj
-b3JyZWN0LCBidXQgZ290IHRoZSBzYW1lIG91dHB1dCBhcyB3aGF0IEkgc2VudCB5b3UgZWFybGll
-cikuIFdpdGgNCj4gdGhhdCBsaW5lIGRlbGV0ZWQsIHRoZSBvdXRwdXQgaXMgZGlmZmVyZW50LiB0
-ZXN0IG91dHB1dCBzdGlsbCBzYXlzIFNSUCBsb2dpbg0KPiBmYWlsZWQsIHN5c2xvZyBzYXlzOg0K
-PiANCj4gSnVuIDA0IDE4OjM1OjMxIG1vcmlhLWt2bS1rdm0ta3ZtLWt2bS1rdm0gbXVsdGlwYXRo
-ZFs0NTNdOiAtLS0tLS0tLXN0YXJ0IHVwLS0tLS0tLS0NCj4gSnVuIDA0IDE4OjM1OjMxIG1vcmlh
-LWt2bS1rdm0ta3ZtLWt2bS1rdm0gbXVsdGlwYXRoZFs0NTNdOiByZWFkIC9ldGMvbXVsdGlwYXRo
-LmNvbmYNCj4gSnVuIDA0IDE4OjM1OjMxIG1vcmlhLWt2bS1rdm0ta3ZtLWt2bS1rdm0gbXVsdGlw
-YXRoZFs0NTNdOiBwYXRoIGNoZWNrZXJzIHN0YXJ0IHVwDQo+IEp1biAwNCAxODozNTozMSBtb3Jp
-YS1rdm0ta3ZtLWt2bS1rdm0ta3ZtIG11bHRpcGF0aGRbNDUzXTogc2RhOiBmYWlsIHRvIGdldCBz
-ZXJpYWwNCj4gSnVuIDA0IDE4OjM1OjMxIG1vcmlhLWt2bS1rdm0ta3ZtLWt2bS1rdm0gbXVsdGlw
-YXRoZFs0NTNdOiBzZGI6IGZhaWwgdG8gZ2V0IHNlcmlhbA0KPiBKdW4gMDQgMTg6MzU6MzEgbW9y
-aWEta3ZtLWt2bS1rdm0ta3ZtLWt2bSBtdWx0aXBhdGhkWzQ1M106IG5iZDA6IEhESU9fR0VUR0VP
-IGZhaWxlZCB3aXRoIDI1DQo+IEp1biAwNCAxODozNTozMSBtb3JpYS1rdm0ta3ZtLWt2bS1rdm0t
-a3ZtIG11bHRpcGF0aGRbNDUzXTogbmJkMDogZmFpbGVkIHRvIGdldCB1ZGV2IHVpZDogSW52YWxp
-ZCBhcmd1bWVudA0KPiBKdW4gMDQgMTg6MzU6MzEgbW9yaWEta3ZtLWt2bS1rdm0ta3ZtLWt2bSBt
-dWx0aXBhdGhkWzQ1M106IG5iZDE6IEhESU9fR0VUR0VPIGZhaWxlZCB3aXRoIDI1DQo+IEp1biAw
-NCAxODozNTozMSBtb3JpYS1rdm0ta3ZtLWt2bS1rdm0ta3ZtIG11bHRpcGF0aGRbNDUzXTogbmJk
-MTogZmFpbGVkIHRvIGdldCB1ZGV2IHVpZDogSW52YWxpZCBhcmd1bWVudA0KPiBKdW4gMDQgMTg6
-MzU6MzEgbW9yaWEta3ZtLWt2bS1rdm0ta3ZtLWt2bSBtdWx0aXBhdGhkWzQ1M106IG5iZDEwOiBI
-RElPX0dFVEdFTyBmYWlsZWQgd2l0aCAyNQ0KDQpUaGFua3MgZm9yIGhhdmluZyBzaGFyZWQgdGhp
-cyBvdXRwdXQuIEluIHRoZSBtdWx0aXBhdGhkIHNvdXJjZSBjb2RlIEkgZm91bmQgdGhhdA0KdGhl
-IGVycm9yIG1lc3NhZ2UgImZhaWwgdG8gZ2V0IHNlcmlhbCIgaXMgcHJvZHVjZWQgYnkgdGhlIGZv
-bGxvd2luZyBjb2RlOg0KDQoJaWYgKGdldF92cGRfc3lzZnMocGFyZW50LCAweDgwLCBwcC0+c2Vy
-aWFsLCBTRVJJQUxfU0laRSkgPD0gMCkgew0KCQlpZiAoZ2V0X3NlcmlhbChwcC0+c2VyaWFsLCBT
-RVJJQUxfU0laRSwgcHAtPmZkKSkgew0KCQkJY29uZGxvZygyLCAiJXM6IGZhaWwgdG8gZ2V0IHNl
-cmlhbCIsIHBwLT5kZXYpOw0KCQkJcmV0dXJuIDA7DQoJCX0NCgl9DQoNClRoZSBtZXNzYWdlICJm
-YWlsIHRvIGdldCBzZXJpYWwiIGlzIG9ubHkgbG9nZ2VkIGlmIHJlYWRpbmcNCi9zeXMvY2xhc3Mv
-c2NzaV9kZXZpY2UvKi8qLyovKi92cGRfcGc4MCBmYWlscyAqYW5kKiBzdWJtaXR0aW5nIGEgU0NT
-SSBJTlFVSVJZDQpjb21tYW5kIHRocm91Z2ggdGhlIFNHX0lPIGludGVyZmFjZSBmYWlscy4gVGhp
-cyBpcyBzb21ldGhpbmcgSSBoYXZlbid0IGVuY291bnRlcmVkDQpiZWZvcmUuIElzIHRoZXJlIHNv
-bWV0aGluZyBzcGVjaWFsIGFib3V0IHRoZSBWTT8gV2FzIGUuZy4gbXVsdGlwYXRoZCBjb25maWd1
-cmVkDQp0byBydW4gYXMgYW5vdGhlciB1c2VyIHRoYW4gcm9vdD8gSGF2ZSBzb21lIHNlY3VyaXR5
-IHNldHRpbmdzIGJlZW4gY29uZmlndXJlZCB0aGF0DQpwcmV2ZW50IG11bHRpcGF0aGQgZnJvbSBh
-Y2Nlc3Npbmcgc3lzZnMgYXR0cmlidXRlcz8gV2FzIFNDU0kgZ2VuZXJpYyBzdXBwb3J0DQpkaXNh
-YmxlZCAoQ0hSX0RFVl9TRyk/DQoNClRoYW5rcywNCg0KQmFydC4NCg0KDQoNCg==
+On Mon, Jun 04, 2018 at 08:59:39AM +0000, Bart Van Assche wrote:
+> On Tue, 2018-05-22 at 22:16 -0400, Kent Overstreet wrote:
+> > May 22 22:13:46 moria-kvm-kvm-kvm-kvm multipathd[387]: sda: fail to get serial
+> > May 22 22:13:46 moria-kvm-kvm-kvm-kvm multipathd[387]: sda: using deprecated
+> > getuid callout
+> > May 22 22:13:46 moria-kvm-kvm-kvm-kvm multipathd[387]:
+> > /.../srp-test/bin/getuid_callout exited with 255
+> 
+> (back from traveling)
+> 
+> Hello Kent,
+> 
+> Please comment out the getuid_callout line from /etc/multipath.conf and try again.
+> Changing the "/..." part into the path of the srp-test software should also help.
+> That line is a left-over from the time when the NVMe initiator drivers supported
+> dm-multipath. I will update the srp-test README.md to make this more clear.
+
+Deleted that line and it still doesn't work (I also tried fixing that line so
+the path was correct, but got the same output as what I sent you earlier). With
+that line deleted, the output is different. test output still says SRP login
+failed, syslog says:
+
+Jun 04 18:35:31 moria-kvm-kvm-kvm-kvm-kvm multipathd[453]: --------start up--------
+Jun 04 18:35:31 moria-kvm-kvm-kvm-kvm-kvm multipathd[453]: read /etc/multipath.conf
+Jun 04 18:35:31 moria-kvm-kvm-kvm-kvm-kvm multipathd[453]: path checkers start up
+Jun 04 18:35:31 moria-kvm-kvm-kvm-kvm-kvm multipathd[453]: sda: fail to get serial
+Jun 04 18:35:31 moria-kvm-kvm-kvm-kvm-kvm multipathd[453]: sdb: fail to get serial
+Jun 04 18:35:31 moria-kvm-kvm-kvm-kvm-kvm multipathd[453]: nbd0: HDIO_GETGEO failed with 25
+Jun 04 18:35:31 moria-kvm-kvm-kvm-kvm-kvm multipathd[453]: nbd0: failed to get udev uid: Invalid argument
+Jun 04 18:35:31 moria-kvm-kvm-kvm-kvm-kvm multipathd[453]: nbd1: HDIO_GETGEO failed with 25
+Jun 04 18:35:31 moria-kvm-kvm-kvm-kvm-kvm multipathd[453]: nbd1: failed to get udev uid: Invalid argument
+Jun 04 18:35:31 moria-kvm-kvm-kvm-kvm-kvm multipathd[453]: nbd10: HDIO_GETGEO failed with 25
+
+etc.
