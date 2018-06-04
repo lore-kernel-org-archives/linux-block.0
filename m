@@ -1,105 +1,174 @@
 Return-Path: <danil.kipnis@profitbricks.com>
 MIME-Version: 1.0
 References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
- <1517591106.2675.28.camel@sandisk.com> <CAMGffEkhqR9Z5bkMfnVn8an2OUM8k+jYoR5EFdtv3k9en1bh=w@mail.gmail.com>
- <1517847408.3764.5.camel@wdc.com> <alpine.DEB.2.20.1802071031590.21957@nuc-kabylake>
- <CAJrWOzBrbV0yJvCvKxAK2Arujf7wiCx_Xoo9jdiwDRj93Lq7Yg@mail.gmail.com>
- <1518024719.2870.39.camel@wdc.com> <CAHg0HuxRz4=fhX1P3yk9sQ+q_MUXoj=062aQ9fcwP8awjm09jA@mail.gmail.com>
- <1518113395.3611.54.camel@wdc.com>
-In-Reply-To: <1518113395.3611.54.camel@wdc.com>
+ <1517587623.2675.8.camel@sandisk.com> <1517589637.3936.16.camel@redhat.com>
+In-Reply-To: <1517589637.3936.16.camel@redhat.com>
 From: Danil Kipnis <danil.kipnis@profitbricks.com>
-Date: Mon, 4 Jun 2018 14:27:12 +0200
-Message-ID: <CAHg0HuziOZm-+1wPwWHZirUPiPATjM1P26c4fUOiXVtTdo0qTw@mail.gmail.com>
+Date: Mon, 4 Jun 2018 14:14:08 +0200
+Message-ID: <CAHg0HuwhyWXHPhr-91vNxLsyFS8Ka9OtxS-yud7jQmK0Bc48-w@mail.gmail.com>
 Subject: Re: [PATCH 00/24] InfiniBand Transport (IBTRS) and Network Block
  Device (IBNBD)
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-	linux-rdma@vger.kernel.org, Roman Penyaev <roman.penyaev@profitbricks.com>,
-	Jack Wang <jinpu.wang@profitbricks.com>, ogerlitz@mellanox.com,
-	Sagi Grimberg <sagi@grimberg.me>, axboe@kernel.dk, cl@linux.com
-Content-Type: text/plain; charset="UTF-8"
+To: dledford@redhat.com
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>, Roman Penyaev <roman.penyaev@profitbricks.com>,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>, ogerlitz@mellanox.com,
+	Jack Wang <jinpu.wang@profitbricks.com>, axboe@kernel.dk,
+	Sagi Grimberg <sagi@grimberg.me>
+Content-Type: multipart/alternative; boundary="0000000000008ddbbe056dcfdf32"
 List-ID: <linux-block@vger.kernel.org>
+
+--0000000000008ddbbe056dcfdf32
+Content-Type: text/plain; charset="UTF-8"
 
 Hi Doug,
 
-thanks for the feedback. You read the cover letter correctly: our
-transport library implements multipath (load balancing and failover)
-on top of RDMA API. Its name "IBTRS" is slightly misleading in that
-regard: it can sit on top of ROCE as well. The library allows for
-"bundling" multiple rdma "paths" (source addr - destination addr pair)
-into one "session". So our session consists of one or more paths and
-each path under the hood consists of as many QPs (each connecting
-source with destination) as there are CPUs on the client system. The
-user load (In our case IBNBD is a block device and generates some
-block requests) is load-balanced on per cpu-basis.
-I understand, this is something very different to what smc-r is doing.
-Am I right? Do you know what stage MP-RDMA development currently is?
+thanks for the feedback. You read the cover letter correctly: our transport
+library implements multipath (load balancing and failover) on top of RDMA
+API. Its name "IBTRS" is slightly misleading in that regard: it can sit on
+top of ROCE as well. The library allows for "bundling" multiple rdma
+"paths" (source addr - destination addr pair) into one "session". So our
+session consists of one or more paths and each path under the hood consists
+of as many QPs (each connecting source with destination) as there are CPUs
+on the client system. The user load (In our case IBNBD is a block device
+and generates some block requests) is load-balanced on per cpu-basis.
+I understand, this is something very different to what smc-r is doing. Am I
+right? Do you know what stage MP-RDMA development currently is?
 
 Best,
 
 Danil Kipnis.
 
-P.S. Sorry for the duplicate if any, first mail was returned cause of html.
+On Fri, Feb 2, 2018 at 5:40 PM Doug Ledford <dledford@redhat.com> wrote:
 
-On Thu, Feb 8, 2018 at 7:10 PM Bart Van Assche <Bart.VanAssche@wdc.com> wro=
-te:
+> On Fri, 2018-02-02 at 16:07 +0000, Bart Van Assche wrote:
+> > On Fri, 2018-02-02 at 15:08 +0100, Roman Pen wrote:
+> > > Since the first version the following was changed:
+> > >
+> > >    - Load-balancing and IO fail-over using multipath features were
+> added.
+> > >    - Major parts of the code were rewritten, simplified and overall
+> code
+> > >      size was reduced by a quarter.
+> >
+> > That is interesting to know, but what happened to the feedback that Sagi
+> and
+> > I provided on v1? Has that feedback been addressed? See also
+> > https://www.spinics.net/lists/linux-rdma/msg47819.html and
+> > https://www.spinics.net/lists/linux-rdma/msg47879.html.
+> >
+> > Regarding multipath support: there are already two multipath
+> implementations
+> > upstream (dm-mpath and the multipath implementation in the NVMe
+> initiator).
+> > I'm not sure we want a third multipath implementation in the Linux
+> kernel.
 >
-> On Thu, 2018-02-08 at 18:38 +0100, Danil Kipnis wrote:
-> > thanks for the link to the article. To the best of my understanding,
-> > the guys suggest to authenticate the devices first and only then
-> > authenticate the users who use the devices in order to get access to a
-> > corporate service. They also mention in the presentation the current
-> > trend of moving corporate services into the cloud. But I think this is
-> > not about the devices from which that cloud is build of. Isn't a cloud
-> > first build out of devices connected via IB and then users (and their
-> > devices) are provided access to the services of that cloud as a whole?
-> > If a malicious user already plugged his device into an IB switch of a
-> > cloud internal infrastructure, isn't it game over anyway? Can't he
-> > just take the hard drives instead of mapping them?
+> There's more than that.  There was also md-multipath, and smc-r includes
+> another version of multipath, plus I assume we support mptcp as well.
 >
-> Hello Danil,
+> But, to be fair, the different multipaths in this list serve different
+> purposes and I'm not sure they could all be generalized out and served
+> by a single multipath code.  Although, fortunately, md-multipath is
+> deprecated, so no need to worry about it, and it is only dm-multipath
+> and nvme multipath that deal directly with block devices and assume
+> block semantics.  If I read the cover letter right (and I haven't dug
+> into the code to confirm this), the ibtrs multipath has much more in
+> common with smc-r multipath, where it doesn't really assume a block
+> layer device sits on top of it, it's more of a pure network multipath,
+> which the implementation of smc-r is and mptcp would be too.  I would
+> like to see a core RDMA multipath implementation soon that would
+> abstract out some of these multipath tasks, at least across RDMA links,
+> and that didn't have the current limitations (smc-r only supports RoCE
+> links, and it sounds like ibtrs only supports IB like links, but maybe
+> I'm wrong there, I haven't looked at the patches yet).
 >
-> It seems like we each have been focussing on different aspects of the art=
-icle.
-> The reason I referred to that article is because I read the following in
-> that article: "Unlike the conventional perimeter security model, BeyondCo=
-rp
-> doesn=E2=80=99t gate access to services and tools based on a user=E2=80=
-=99s physical location
-> or the originating network [ ... ] The zero trust architecture spells tro=
-uble
-> for traditional attacks that rely on penetrating a tough perimeter to wal=
-tz
-> freely within an open internal network." Suppose e.g. that an organizatio=
-n
-> decides to use RoCE or iWARP for connectivity between block storage initi=
-ator
-> systems and block storage target systems and that it has a single company=
--
-> wide Ethernet network. If the target system does not restrict access base=
-d
-> on initiator IP address then any penetrator would be able to access all t=
-he
-> block devices exported by the target after a SoftRoCE or SoftiWARP initia=
-tor
-> driver has been loaded. If the target system however restricts access bas=
-ed
-> on the initiator IP address then that would make it harder for a penetrat=
-or
-> to access the exported block storage devices. Instead of just penetrating=
- the
-> network access, IP address spoofing would have to be used or access would
-> have to be obtained to a system that has been granted access to the targe=
-t
-> system.
->
-> Thanks,
->
-> Bart.
->
->
+> --
+> Doug Ledford <dledford@redhat.com>
+>     GPG KeyID: B826A3330E572FDD
+>     Key fingerprint = AE6B 1BDA 122B 23B4 265B  1274 B826 A333 0E57 2FDD
 
+--0000000000008ddbbe056dcfdf32
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---=20
-Danil Kipnis
-Linux Kernel Developer
+<div dir=3D"ltr">Hi Doug,<div><br></div><div>thanks for the feedback. You r=
+ead the cover letter correctly: our transport library implements multipath =
+(load balancing and failover) on top of RDMA API. Its name &quot;IBTRS&quot=
+; is slightly misleading in that regard: it can sit on top of ROCE as well.=
+ The library allows for &quot;bundling&quot; multiple rdma &quot;paths&quot=
+; (source addr - destination addr pair) into one &quot;session&quot;. So ou=
+r session consists of one or more paths and each path under the hood consis=
+ts of as many QPs (each connecting source with destination) as there are CP=
+Us on the client system. The user load (In our case IBNBD is a block device=
+ and generates some block requests) is load-balanced on per cpu-basis.</div=
+><div>I understand, this is something very different to what smc-r is doing=
+. Am I right? Do you know what stage MP-RDMA development currently is?</div=
+><div><br></div><div>Best,</div><div><br></div><div>Danil Kipnis.=C2=A0</di=
+v><br><div class=3D"gmail_quote"><div dir=3D"ltr">On Fri, Feb 2, 2018 at 5:=
+40 PM Doug Ledford &lt;<a href=3D"mailto:dledford@redhat.com">dledford@redh=
+at.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">On Fri, 2018-=
+02-02 at 16:07 +0000, Bart Van Assche wrote:<br>
+&gt; On Fri, 2018-02-02 at 15:08 +0100, Roman Pen wrote:<br>
+&gt; &gt; Since the first version the following was changed:<br>
+&gt; &gt; <br>
+&gt; &gt;=C2=A0 =C2=A0 - Load-balancing and IO fail-over using multipath fe=
+atures were added.<br>
+&gt; &gt;=C2=A0 =C2=A0 - Major parts of the code were rewritten, simplified=
+ and overall code<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 size was reduced by a quarter.<br>
+&gt; <br>
+&gt; That is interesting to know, but what happened to the feedback that Sa=
+gi and<br>
+&gt; I provided on v1? Has that feedback been addressed? See also<br>
+&gt; <a href=3D"https://www.spinics.net/lists/linux-rdma/msg47819.html" rel=
+=3D"noreferrer" target=3D"_blank">https://www.spinics.net/lists/linux-rdma/=
+msg47819.html</a> and<br>
+&gt; <a href=3D"https://www.spinics.net/lists/linux-rdma/msg47879.html" rel=
+=3D"noreferrer" target=3D"_blank">https://www.spinics.net/lists/linux-rdma/=
+msg47879.html</a>.<br>
+&gt; <br>
+&gt; Regarding multipath support: there are already two multipath implement=
+ations<br>
+&gt; upstream (dm-mpath and the multipath implementation in the NVMe initia=
+tor).<br>
+&gt; I&#39;m not sure we want a third multipath implementation in the Linux=
+ kernel.<br>
+<br>
+There&#39;s more than that.=C2=A0 There was also md-multipath, and smc-r in=
+cludes<br>
+another version of multipath, plus I assume we support mptcp as well.<br>
+<br>
+But, to be fair, the different multipaths in this list serve different<br>
+purposes and I&#39;m not sure they could all be generalized out and served<=
+br>
+by a single multipath code.=C2=A0 Although, fortunately, md-multipath is<br=
+>
+deprecated, so no need to worry about it, and it is only dm-multipath<br>
+and nvme multipath that deal directly with block devices and assume<br>
+block semantics.=C2=A0 If I read the cover letter right (and I haven&#39;t =
+dug<br>
+into the code to confirm this), the ibtrs multipath has much more in<br>
+common with smc-r multipath, where it doesn&#39;t really assume a block<br>
+layer device sits on top of it, it&#39;s more of a pure network multipath,<=
+br>
+which the implementation of smc-r is and mptcp would be too.=C2=A0 I would<=
+br>
+like to see a core RDMA multipath implementation soon that would<br>
+abstract out some of these multipath tasks, at least across RDMA links,<br>
+and that didn&#39;t have the current limitations (smc-r only supports RoCE<=
+br>
+links, and it sounds like ibtrs only supports IB like links, but maybe<br>
+I&#39;m wrong there, I haven&#39;t looked at the patches yet).<br>
+<br>
+-- <br>
+Doug Ledford &lt;<a href=3D"mailto:dledford@redhat.com" target=3D"_blank">d=
+ledford@redhat.com</a>&gt;<br>
+=C2=A0 =C2=A0 GPG KeyID: B826A3330E572FDD<br>
+=C2=A0 =C2=A0 Key fingerprint =3D AE6B 1BDA 122B 23B4 265B=C2=A0 1274 B826 =
+A333 0E57 2FDD</blockquote></div><div dir=3D"ltr" class=3D"gmail_signature"=
+ data-smartmail=3D"gmail_signature"><div dir=3D"ltr"><div><div dir=3D"ltr">=
+<div dir=3D"ltr"><div dir=3D"ltr"><font face=3D"tahoma, sans-serif"><br></f=
+ont></div></div></div></div></div></div></div>
+
+--0000000000008ddbbe056dcfdf32--
