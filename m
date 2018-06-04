@@ -1,338 +1,52 @@
-Return-Path: <roman.penyaev@profitbricks.com>
-Return-Path: <roman.penyaev@profitbricks.com>
-From: Roman Pen <roman.penyaev@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Or Gerlitz <ogerlitz@mellanox.com>,
-	Doug Ledford <dledford@redhat.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>,
-	Jack Wang <jinpu.wang@profitbricks.com>,
-	Roman Pen <roman.penyaev@profitbricks.com>
-Subject: [PATCH v3 24/25] ibnbd: a bit of documentation
-Date: Wed,  6 Jun 2018 17:25:14 +0200
-Message-Id: <20180606152515.25807-25-roman.penyaev@profitbricks.com>
-In-Reply-To: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
-References: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
+Return-Path: <prvs=686e31ba0=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "ming.lei@redhat.com"
+	<ming.lei@redhat.com>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, "josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"lduncan@suse.com" <lduncan@suse.com>, "tj@kernel.org" <tj@kernel.org>,
+	"keith.busch@intel.com" <keith.busch@intel.com>, "cleech@redhat.com"
+	<cleech@redhat.com>
+Subject: Re: [PATCH 03/14] blk-mq: Remove generation seqeunce
+Date: Mon, 4 Jun 2018 14:13:12 +0000
+Message-ID: <9308aaa2af8e8ecad764f8568586a6e91e91b357.camel@wdc.com>
+References: <20180529135239.27005-1-hch@lst.de>
+	 <20180529135239.27005-4-hch@lst.de>
+	 <fe09917b6159988b168a9ef25240e0082c7c352f.camel@wdc.com>
+	 <20180604134245.GA31895@lst.de>
+In-Reply-To: <20180604134245.GA31895@lst.de>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-README with description of major sysfs entries.
-
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
-Cc: Jack Wang <jinpu.wang@profitbricks.com>
----
- drivers/block/ibnbd/README | 299 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 299 insertions(+)
- create mode 100644 drivers/block/ibnbd/README
-
-diff --git a/drivers/block/ibnbd/README b/drivers/block/ibnbd/README
-new file mode 100644
-index 000000000000..bbaddd02c1c5
---- /dev/null
-+++ b/drivers/block/ibnbd/README
-@@ -0,0 +1,299 @@
-+***************************************
-+Infiniband Network Block Device (IBNBD)
-+***************************************
-+
-+Introduction
-+------------
-+
-+IBNBD (InfiniBand Network Block Device) is a pair of kernel modules
-+(client and server) that allow for remote access of a block device on
-+the server over IBTRS protocol using the RDMA (InfiniBand, RoCE, iWarp)
-+transport. After being mapped, the remote block devices can be accessed
-+on the client side as local block devices.
-+
-+I/O is transfered between client and server by the IBTRS transport
-+modules. The administration of IBNBD and IBTRS modules is done via
-+sysfs entries.
-+
-+Requirements
-+------------
-+
-+  IBTRS kernel modules
-+
-+Quick Start
-+-----------
-+
-+Server side:
-+  # modprobe ibnbd_server
-+
-+Client side:
-+  # modprobe ibnbd_client
-+  # echo "sessname=blya path=ip:10.50.100.66 device_path=/dev/ram0" > \
-+            /sys/devices/virtual/ibnbd-client/ctl/map_device
-+
-+  Where "sessname=" is a session name, a string to identify the session
-+  on client and on server sides; "path=" is a destination IP address or
-+  a pair of a source and a destination IPs, separated by comma.  Multiple
-+  "path=" options can be specified in order to use multipath  (see IBTRS
-+  description for details); "device_path=" is the block device to be
-+  mapped from the server side. After the session to the server machine is
-+  established, the mapped device will appear on the client side under
-+  /dev/ibnbd<N>.
-+
-+
-+======================
-+Client Sysfs Interface
-+======================
-+
-+All sysfs files that are not read-only provide the usage information on read:
-+
-+Example:
-+  # cat /sys/devices/virtual/ibnbd-client/ctl/map_device
-+
-+  > Usage: echo "sessname=<name of the ibtrs session> path=<[srcaddr,]dstaddr>
-+  > [path=<[srcaddr,]dstaddr>] device_path=<full path on remote side>
-+  > [access_mode=<ro|rw|migration>]
-+  > [io_mode=<fileio|blockio>]" > map_device
-+  >
-+  > addr ::= [ ip:<ipv4> | ip:<ipv6> | gid:<gid> ]
-+
-+Entries under /sys/devices/virtual/ibnbd-client/ctl/
-+=======================================
-+
-+map_device (RW)
-+---------------
-+
-+Expected format is the following:
-+
-+    sessname=<name of the ibtrs session>
-+    path=<[srcaddr,]dstaddr> [path=<[srcaddr,]dstaddr> ...]
-+    device_path=<full path on remote side>
-+    [access_mode=<ro|rw|migration>]
-+    [io_mode=<fileio|blockio>]
-+
-+Where:
-+
-+sessname: accepts a string not bigger than 256 chars, which identifies
-+          a given session on the client and on the server.
-+          I.e. "clt_hostname-srv_hostname" could be a natural choice.
-+
-+path:     describes a connection between the client and the server by
-+      specifying destination and, when required, the source address.
-+      The addresses are to be provided in the following format:
-+
-+            ip:<IPv6>
-+            ip:<IPv4>
-+            gid:<GID>
-+
-+          for example:
-+
-+          path=ip:10.0.0.66
-+                         The single addr is treated as the destination.
-+                         The connection will be established to this
-+                         server from any client IP address.
-+
-+          path=ip:10.0.0.66,ip:10.0.1.66
-+                         First addr is the source address and the second
-+                         is the destination.
-+
-+          If multiple "path=" options are specified multiple connection
-+          will be established and data will be sent according to
-+          the selected multipath policy (see IBTRS mp_policy sysfs entry
-+          description).
-+
-+device_path: Path to the block device on the server side. Path is specified
-+         relative to the directory on server side configured in the
-+         'dev_search_path' module parameter of the ibnbd_server.
-+         The ibnbd_server prepends the <device_path> received from client
-+         with <dev_search_path> and tries to open the
-+         <dev_search_path>/<device_path> block device.  On success,
-+         a /dev/ibnbd<N> device file, a /sys/block/ibnbd_client/ibnbd<N>/
-+         directory and an entry in /sys/devices/virtual/ibnbd-client/ctl/devices
-+         will be created.
-+
-+         If 'dev_search_path' contains '%SESSNAME%', then each session can
-+         have different devices namespace, e.g. server was configured with
-+         the following parameter "dev_search_path=/run/ibnbd-devs/%SESSNAME%",
-+         client has this string "sessname=blya device_path=sda", then server
-+         will try to open: /run/ibnbd-devs/blya/sda.
-+
-+access_mode: the access_mode parameter specifies if the device is to be
-+             mapped as "ro" read-only or "rw" read-write. The server allows
-+             a device to be exported in rw mode only once. The "migration"
-+             access mode has to be specified if a second mapping in read-write
-+             mode is desired.
-+
-+             By default "rw" is used.
-+
-+io_mode:  the io_mode parameter specifies if the device on the server
-+          will be opened as block device "blockio" or as file "fileio".
-+          When the device is opened as file, the VFS page cache is used
-+          for read I/O operations, write I/O operations bypass the page
-+          cache and go directly to disk (except meta updates, like file
-+          access time).
-+
-+          By default "blockio" mode is used.
-+
-+Exit Codes:
-+
-+If the device is already mapped it will fail with EEXIST. If the input
-+has an invalid format it will return EINVAL. If the device path cannot
-+be found on the server, it will fail with ENOENT.
-+
-+Finding device file after mapping
-+---------------------------------
-+
-+After mapping, the device file can be found by:
-+ o  The symlink /sys/devices/virtual/ibnbd-client/ctl/devices/<device_id>
-+    points to /sys/block/<dev-name>. The last part of the symlink destination
-+    is the same as the device name.  By extracting the last part of the
-+    path the path to the device /dev/<dev-name> can be build.
-+
-+ o /dev/block/$(cat /sys/devices/virtual/ibnbd-client/ctl/devices/<device_id>/dev)
-+
-+How to find the <device_id> of the device is described on the next
-+section.
-+
-+Entries under /sys/devices/virtual/ibnbd-client/ctl/devices/
-+============================================================
-+
-+For each device mapped on the client a new symbolic link is created as
-+/sys/devices/virtual/ibnbd-client/ctl/devices/<device_id>, which points
-+to the block device created by ibnbd (/sys/block/ibnbd<N>/).
-+The <device_id> of each device is created as follows:
-+
-+- If the 'device_path' provided during mapping contains slashes ("/"),
-+  they are replaced by exclamation mark ("!") and used as as the
-+  <device_id>. Otherwise, the <device_id> will be the same as the
-+  "device_path" provided.
-+
-+Entries under /sys/block/ibnbd<N>/ibnbd_client/
-+===============================================
-+
-+unmap_device (RW)
-+-----------------
-+
-+To unmap a volume, "normal" or "force" has to be written to:
-+  /sys/block/ibnbd<N>/ibnbd_client/unmap_device
-+
-+When "normal" is used, the operation will fail with EBUSY if any process
-+is using the device.  When "force" is used, the device is also unmapped
-+when device is in use.  All I/Os that are in progress will fail.
-+
-+Example:
-+
-+   # echo "normal" > /sys/block/ibnbd0/ibnbd/unmap_device
-+
-+state (RO)
-+----------
-+
-+The file contains the current state of the block device. The state file
-+returns "open" when the device is successfully mapped from the server
-+and accepting I/O requests. When the connection to the server gets
-+disconnected in case of an error (e.g. link failure), the state file
-+returns "closed" and all I/O requests submitted to it will fail with -EIO.
-+
-+session (RO)
-+------------
-+
-+IBNBD uses IBTRS session to transport the data between client and
-+server.  The entry "session" contains the name of the session, that
-+was used to establish the IBTRS session.  It's the same name that
-+was passed as server parameter to the map_device entry.
-+
-+mapping_path (RO)
-+-----------------
-+
-+Contains the path that was passed as "device_path" to the map_device
-+operation.
-+
-+======================
-+Server Sysfs Interface
-+======================
-+
-+Entries under /sys/devices/virtual/ibnbd-server/ctl/
-+====================================================
-+
-+When a client maps a device, a directory entry with the name of the
-+block device is created under /sys/devices/virtual/ibnbd-server/ctl/devices/.
-+
-+Entries under /sys/devices/virtual/ibnbd-server/ctl/devices/<device_name>/
-+==========================================================================
-+
-+block_dev (link)
-+---------------
-+
-+Is a symlink to the sysfs entry of the exported device.
-+
-+Example:
-+
-+  block_dev -> ../../../../devices/virtual/block/ram0
-+
-+Entries under /sys/devices/virtual/ibnbd-server/ctl/devices/<device_name>/sessions/
-+===================================================================================
-+
-+For each client a particular device is exported to, following directory will be
-+created:
-+
-+/sys/devices/virtual/ibnbd-server/ctl/devices/<device_name>/sessions/<session-name>/
-+
-+When the device is unmapped by that client, the directory will be removed.
-+
-+Entries under /sys/devices/virtual/ibnbd-server/ctl/devices/<device_name>/sessions/<session-name>
-+=================================================================================================
-+
-+read_only (RO)
-+--------------
-+
-+Contains '1' if device is mapped read-only, otherwise '0'.
-+
-+mapping_path (RO)
-+-----------------
-+
-+Contains the relative device path provided by the user during mapping.
-+
-+==============================
-+IBNBD-Server Module Parameters
-+==============================
-+
-+dev_search_path
-+---------------
-+
-+When a device is mapped from the client, the server generates the path
-+to the block device on the server side by concatenating dev_search_path
-+and the "device_path" that was specified in the map_device operation.
-+
-+The default dev_search_path is: "/".
-+
-+dev_search_path option can also contain %SESSNAME% in order to provide
-+different deviec namespaces for different sessions.  See "device_path"
-+option for details.
-+
-+==============================
-+Protocol (ibnbd/ibnbd-proto.h)
-+==============================
-+
-+1. Before mapping first device from a given server, client sends an
-+IBNBD_MSG_SESS_INFO to the server. Server responds with
-+IBNBD_MSG_SESS_INFO_RSP. Currently the messages only contain the protocol
-+version for backward compatibility.
-+
-+2. Client requests to open a device by sending IBNBD_MSG_OPEN message. This
-+contains the path to the device, access mode (read-only or writable), and
-+io_mode which specifies if the device should be opened as block device or
-+using file io. Server responds to the message with IBNBD_MSG_OPEN_RSP. This
-+contains a 32 bit device id to be used for  IOs and device "geometry" related
-+information: side, max_hw_sectors, etc.
-+
-+3. Client attaches IBNBD_MSG_IO to each IO message send to a device. This
-+message contains device id, provided by server in his ibnbd_msg_open_rsp,
-+sector to be accessed, read-write flags and bi_size.
-+
-+4. Client closes a device by sending IBNBD_MSG_CLOSE which contains only the
-+device id provided by the server.
-+
-+
-+Contact
-+-------
-+
-+Mailing list: "IBNBD/IBTRS Storage Team" <ibnbd@profitbricks.com>
--- 
-2.13.1
+T24gTW9uLCAyMDE4LTA2LTA0IGF0IDE1OjQyICswMjAwLCBoY2hAbHN0LmRlIHdyb3RlOg0KPiBP
+biBNb24sIEp1biAwNCwgMjAxOCBhdCAwNjo1NjoyMkFNICswMDAwLCBCYXJ0IFZhbiBBc3NjaGUg
+d3JvdGU6DQo+ID4gQ2FuIHlvdSBleHBsYWluIHdoeSB5b3UgcHJlZmVyIHRoaXMgYXBwcm9hY2g/
+IEkgdGhpbmsgdGhpcyBwYXRjaCBpbnRyb2R1Y2VzDQo+ID4gbW9yZSBuZXcgYXRvbWljIG9wZXJh
+dGlvbnMgaW4gdGhlIGhvdCBwYXRoIHRoYW4gdGhlIGFwcHJvYWNoIEkgaGFkIHByb3Bvc2VkDQo+
+ID4gKCJibGstbXE6IFJld29yayBibGstbXEgdGltZW91dCBoYW5kbGluZyBhZ2FpbiIpLiBJbiBv
+dGhlciB3b3JkcywgSSB0aGluayB0aGUNCj4gPiBwYXRjaCB0aGF0IEkgaGFkIHByb3Bvc2VkIHdp
+bGwgeWllbGQgYmV0dGVyIHBlcmZvcm1hbmNlLg0KPiANCj4gUHJpbWFyaWx5IGJlY2F1c2UgdGhl
+IGdlbmVyYXRpb24gY291bnRlciBpcyBmdW5kYW1lbnRhbGx5IHRoZSB3cm9uZw0KPiB0aGluZyB0
+byBkby4gIElmIHdlIGtub3cgdGhlIHRhZyBoYXMgc29tZSBwZW5kaW5nIGFjdGlvbiBvbiBpdCB3
+ZQ0KPiBzaG91bGQgbm90IHJldXNlIGl0IGluc3RlZCBvZiB3b3JraW5nIGFyb3VuZCByYWNlcyB0
+aGF0IHN0ZW0gZnJvbSB0aGUNCj4gZmFjdCB0aGF0IHdlIHJldXNlIGl0Lg0KDQpXZSBtYXkgZWFj
+aCBoYXZlIGEgZGlmZmVyZW50IG9waW5pb24gYWJvdXQgdGhpcy4gQW55d2F5LCBsZXQncyBub3Qg
+Z2V0DQpkaXN0cmFjdGVkIGJ5IGEgZGlzY3Vzc2lvbiBhYm91dCB0aGVvcmV0aWNhbCBhcmd1bWVu
+dHMuDQoNCj4gV2UgY2FuIGxvb2sgYXQgdGhlIHBlcmZvcm1hbmNlIG51bWJlcnMgYW5kIHR1bmUg
+YXMgbmVlZGVkLCBidXQgZm9yIG5vdw0KPiB3ZSBuZWVkIHRvIGdldCB0aGUgaGlnaCBsZXZlbCBh
+cHByb2FjaCByaWdodCBmaXJzdC4gIEkgdGhpbmsgb25jZQ0KPiB3ZSd2ZSBkb25lIGEgcHJvcGVy
+IGF1ZGl0IG9mIHRoZSBTQ1NJIEVIIGNvZGUgYW5kIGJsa19hYm9ydF9yZXF1ZXN0DQo+IHVzZXJz
+IHdlIGNhbiBwcm9iYWJseSBkcm9wIHRoZSBjbXB4Y2hnIGFuZCBvbmx5IGhhdmUgYSBzaW5nbGUN
+Cj4gYXRvbWljX2RlY19hbmRfdGVzdCBsZWZ0LCB3aGljaCBpbiB0ZXJtcyBvZiBhdG9taWMgb3Bl
+cmF0aW9ucyBpc24ndA0KPiB0aGUgd29ybGQuDQoNCkkgdGhpbmsgdGhhdCB0aGUgcmFjZSBiZXR3
+ZWVuIHJlcXVlc3QgY29tcGxldGlvbiBhbmQgcmVxdWVzdCB0aW1lb3V0DQpoYW5kbGluZyBpcyBm
+dW5kYW1lbnRhbCBzbyBJJ20gbm90IHN1cmUgdGhhdCBpdCBpcyBwb3NzaWJsZSB0byBlbGltaW5h
+dGUNCnRoZSBjbXB4Y2hnKCkgY2FsbHMuIEFkZGl0aW9uYWxseSwgZXZlbiBpZiB0aGUgY21weGNo
+ZygpIGNhbGxzIHdvdWxkIGJlDQplbGltaW5hdGVkLCBzdHJ1Y3QgcmVxdWVzdCB3aWxsIHN0aWxs
+IGhhdmUgdHdvIHZhcmlhYmxlcyB0aGF0IHJlcHJlc2VudA0KdGhlIHJlcXVlc3Qgc3RhdGUgKHJx
+LT5zdGF0ZSBhbmQgcnEtPnJlZikgYW5kIHRoYXQgYXJlIHVwZGF0ZWQgc2VwYXJhdGVseS4NCldp
+dGggbXkgYXBwcm9hY2ggYWxsIHJlcXVlc3Qgc3RhdGUgaW5mb3JtYXRpb24gaXMgc3RvcmVkIGlu
+IGEgc2luZ2xlDQp2YXJpYWJsZSB3aGljaCBtYWtlcyBpdCBlYXN5IHRvIHVwZGF0ZSB0aGUgaW5k
+aXZpZHVhbCBmaWVsZHMgb2YgdGhhdA0KdmFyaWFibGUgc2ltdWx0YW5lb3VzbHkuDQoNCkJhcnQu
