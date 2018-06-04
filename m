@@ -1,26 +1,20 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <prvs=686e31ba0=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>, "jianchao.w.wang@oracle.com"
+	<jianchao.w.wang@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: [PATCH] blk-mq: return when BLK_MQ_S_STOPPED in
  blk_mq_run_work_fn
-To: Jianchao Wang <jianchao.w.wang@oracle.com>, ming.lei@redhat.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Mon, 4 Jun 2018 11:36:54 +0000
+Message-ID: <c8f8ad2989f641187091a5d917538dc30085bf71.camel@wdc.com>
 References: <1528103035-8009-1-git-send-email-jianchao.w.wang@oracle.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <d6cee6a0-d20a-0055-24f7-a3e625c2f5b3@kernel.dk>
-Date: Mon, 4 Jun 2018 10:21:14 -0600
-MIME-Version: 1.0
 In-Reply-To: <1528103035-8009-1-git-send-email-jianchao.w.wang@oracle.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On 6/4/18 3:03 AM, Jianchao Wang wrote:
-> if hctx is stopped, don't run the queue in blk_mq_run_work_fn.
-
-I was puzzled, so had to look up those changes. That's definitely
-a regression caused by 15fe8a9, as you highlighted. Looks good to
-me, I'll apply it.
-
-BTW, this should have been explained in the commit message. I'll
-change it a bit.
-
--- 
-Jens Axboe
+T24gTW9uLCAyMDE4LTA2LTA0IGF0IDE3OjAzICswODAwLCBKaWFuY2hhbyBXYW5nIHdyb3RlOg0K
+PiBpZiBoY3R4IGlzIHN0b3BwZWQsIGRvbid0IHJ1biB0aGUgcXVldWUgaW4gYmxrX21xX3J1bl93
+b3JrX2ZuLg0KDQpSZXZpZXdlZC1ieTogQmFydCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2NoZUB3
+ZGMuY29tPg0KDQoNCg0K
