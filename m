@@ -1,34 +1,26 @@
-Return-Path: <hare@suse.de>
-Date: Mon, 4 Jun 2018 08:17:06 +0200
-From: Hannes Reinecke <hare@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-nvme@lists.infradead.org, Jens Axboe <axboe@kernel.dk>, Keith
- Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
- linux-block@vger.kernel.org
-Subject: Re: [PATCH 12/12] nvme: limit warnings from nvme_identify_ns
-Message-ID: <20180604081706.7be35b3e@pentland.suse.de>
-In-Reply-To: <20180530164600.26856-13-hch@lst.de>
-References: <20180530164600.26856-1-hch@lst.de>
-	<20180530164600.26856-13-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-mq: return when BLK_MQ_S_STOPPED in
+ blk_mq_run_work_fn
+To: Jianchao Wang <jianchao.w.wang@oracle.com>, ming.lei@redhat.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1528103035-8009-1-git-send-email-jianchao.w.wang@oracle.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <d6cee6a0-d20a-0055-24f7-a3e625c2f5b3@kernel.dk>
+Date: Mon, 4 Jun 2018 10:21:14 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1528103035-8009-1-git-send-email-jianchao.w.wang@oracle.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, 30 May 2018 18:46:00 +0200
-Christoph Hellwig <hch@lst.de> wrote:
+On 6/4/18 3:03 AM, Jianchao Wang wrote:
+> if hctx is stopped, don't run the queue in blk_mq_run_work_fn.
 
-> When rescanning namespaces after an AEN we will issue Identify
-> Namespace comands to namespaces that have gone away, so don't warn
-> for this specific case.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-> ---
->  drivers/nvme/host/core.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+I was puzzled, so had to look up those changes. That's definitely
+a regression caused by 15fe8a9, as you highlighted. Looks good to
+me, I'll apply it.
 
-Cheers,
+BTW, this should have been explained in the commit message. I'll
+change it a bit.
 
-Hannes
+-- 
+Jens Axboe
