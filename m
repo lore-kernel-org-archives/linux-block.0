@@ -1,83 +1,67 @@
-Return-Path: <linus971@gmail.com>
-MIME-Version: 1.0
-References: <11b01169-8e11-34ed-8137-aa5cd50a39c2@kernel.dk>
- <CA+55aFy6_+90WKyDAbhh0NcN22N11AyaCaJu0nrafmf49+h6tQ@mail.gmail.com> <52aaf207-ef5d-a886-66fe-566de9d9bbee@kernel.dk>
-In-Reply-To: <52aaf207-ef5d-a886-66fe-566de9d9bbee@kernel.dk>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Mon, 4 Jun 2018 09:24:28 -0700
-Message-ID: <CA+55aFz_iLabbCcCEWY8j5KcKCDsC7074f4EDi8mxB7-FrBHwA@mail.gmail.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [GIT PULL] Block changes for 4.18-rc
-To: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>, linux-block <linux-block@vger.kernel.org>,
-	NeilBrown <neilb@suse.com>, Arnd Bergmann <arnd@arndb.de>
-Content-Type: text/plain; charset="UTF-8"
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+ Kent Overstreet <kent.overstreet@gmail.com>
+Cc: linux-block <linux-block@vger.kernel.org>, NeilBrown <neilb@suse.com>,
+ Arnd Bergmann <arnd@arndb.de>
+References: <11b01169-8e11-34ed-8137-aa5cd50a39c2@kernel.dk>
+ <CA+55aFy6_+90WKyDAbhh0NcN22N11AyaCaJu0nrafmf49+h6tQ@mail.gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <52aaf207-ef5d-a886-66fe-566de9d9bbee@kernel.dk>
+Date: Mon, 4 Jun 2018 09:54:16 -0600
+MIME-Version: 1.0
+In-Reply-To: <CA+55aFy6_+90WKyDAbhh0NcN22N11AyaCaJu0nrafmf49+h6tQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jun 4, 2018 at 8:54 AM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 6/4/18 9:51 AM, Linus Torvalds wrote:
-> >
-> > Why the hell doesn't it just do bioset_exit() on the originals instead,
-> > before freeing the mddev?
->
-> CC'ing Neil to get his input on how best to clean that up, I'd
-> be much more comfortable with that logic improved rather than
-> just catering to the stack usage issue. Also include Arnd, as
-> he had a test patch for it.
+On 6/4/18 9:51 AM, Linus Torvalds wrote:
+> On Sun, Jun 3, 2018 at 5:42 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>>  drivers/md/md.c                                 |  61 +--
+>>  drivers/md/md.h                                 |   4 +-
+> 
+> So I've pulled this, but I get a new warning:
+> 
+>   drivers/md/md.c: In function ‘mddev_put’:
+>   drivers/md/md.c:543:1: warning: the frame size of 2112 bytes is
+> larger than 2048 bytes [-Wframe-larger-than=]
+> 
+> which seems to be due to commit afeee514ce7f ("md: convert to
+> bioset_init()/mempool_init()").
+> 
+> As of that commit, mddev_put() now allocates *two* "struct bio_set"
+> structures on the stack, and those really aren't small. Yes, part of
+> it is that I do my test-builds with all that debug stuff, but those
+> structures have several embedded mempool_t members, and they really
+> are pretty sizable.
+> 
+> And I _really_ do not think it's acceptable to have that kind of stack
+> usage in there. I'm not sure you can trigger mddev_put() in the IO
+> paths, but even without that I don't think it's acceptable.
+> 
+> Also, the code simply looks like complete and utter garbage. It does
+> 
+>                 bs = mddev->bio_set;
+>                 sync_bs = mddev->sync_set;
+> 
+> to _copy_ those structures, and then does bioset_exit() on them. WTF?
+> 
+> Why the hell doesn't it just do biset_exit() on the originals instead,
+> before freeing the mddev?
+> 
+> I've pulled this, but this needs to be fixed. That is just broken
+> garbage right now. No way in hell is it acceptable to waste 2kB of
+> stack space on something idiotic like this.
 
-Also adding Tejun, because the only reason for that odd sequencing
-seems to be that
+Works is already underway to get this fixed up. I agree that the
+excessive stack usage isn't great, but the code in that function
+is pretty miserable, as you say. That's not new with the patch,
+the conversion just carried that forward.
 
- - we want to queue the deletion work *inside* the spinlock, because
-it actually has synchronization between the workqueue and the
-'all_mddevs_lock' spinlock.
+CC'ing Neil to get his input on how best to clean that up, I'd
+be much more comfortable with that logic improved rather than
+just catering to the stack usage issue. Also include Arnd, as
+he had a test patch for it.
 
- - we want to bioset_exit() the fields *outside* the spinlock.
-
-So what it does now is to copy those big 'struct bio_set' fields
-because they might go away from under it.
-
-Tejun, the code in question is mddev_put() in drivers/md/md.c, and it
-basically does
-
-                INIT_WORK(&mddev->del_work, mddev_delayed_delete);
-                queue_work(md_misc_wq, &mddev->del_work);
-
-inside a spinlock, but then wants to do some stuff *outside* the
-spinlock before that mddev_delayed_delete() thing actually gets
-called.
-
-Is there some way to "half-queue" the work - enough that a
-flush_workqueue() will wait for it, but still guaranteeing that it
-won't actually run until released?
-
-IOW, what I think that code really wants to do is perhaps something like
-
-        /* under  &all_mddevs_lock spinlock */
-        .. remove from all lists so that it can't be found ..
-
-        .. but add it to the md_misc_wq so that people will wait for it ..
-
-                INIT_WORK_LOCKED(&mddev->del_work, mddev_delayed_delete);
-                queue_work(md_misc_wq, &mddev->del_work);
-        ...
-
-        spin_unlock(&all_mddevs_lock);
-
-        /* mddev is still guaranteed live */
-        bioset_exit(&mddev->bio_set);
-        bioset_exit(&mddev->sync_set);
-
-        /* NOW we can release it */
-        if (queued)
-                unlock_work(&mddev->del_work);
-        else
-                kfree(mddev);
-
-or something like that?
-
-The above is *ENTIRELY* hand-wavy garbage - don't take it seriously
-per se, consider it just pseudo-code for documentation reasons, not
-serious in any other way.
-
-             Linus
+-- 
+Jens Axboe
