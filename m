@@ -1,12 +1,12 @@
 Return-Path: <hare@suse.de>
-Date: Mon, 4 Jun 2018 08:13:25 +0200
+Date: Mon, 4 Jun 2018 08:13:01 +0200
 From: Hannes Reinecke <hare@suse.de>
 To: Christoph Hellwig <hch@lst.de>
 Cc: linux-nvme@lists.infradead.org, Jens Axboe <axboe@kernel.dk>, Keith
  Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
  linux-block@vger.kernel.org
 Subject: Re: [PATCH 01/12] nvme.h: untangle AEN notice definitions
-Message-ID: <20180604081325.3f68253e@pentland.suse.de>
+Message-ID: <20180604081301.2a6ecec5@pentland.suse.de>
 In-Reply-To: <20180530164600.26856-2-hch@lst.de>
 References: <20180530164600.26856-1-hch@lst.de>
 	<20180530164600.26856-2-hch@lst.de>
