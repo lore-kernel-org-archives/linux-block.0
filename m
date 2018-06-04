@@ -1,58 +1,34 @@
-Return-Path: <prvs=68697a2c8=adam.manzanares@wdc.com>
-From: adam.manzanares@wdc.com
-To: viro@zeniv.linux.org.uk,
-	linux-fsdevel@vger.kernel.org
-Cc: axboe@kernel.dk,
-	bcrl@kvack.org,
-	mingo@kernel.org,
-	tglx@linutronix.de,
-	kstewart@linuxfoundation.org,
-	peterz@infradead.org,
-	pombredanne@nexb.com,
-	gregkh@linuxfoundation.org,
-	bigeasy@linutronix.de,
-	rgoldwyn@suse.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-aio@kvack.org,
-	linux-api@vger.kernel.org,
-	hch@infradread.org,
-	jmoyer@redhat.com,
-	willy@infradead.org,
-	smfrench@gmail.com,
-	Adam Manzanares <adam.manzanares@wdc.com>
-Subject: [PATCH 1/2] fs: aio ioprio add explicit block layer dependence
-Date: Mon,  4 Jun 2018 10:59:56 -0700
-Message-Id: <20180604175957.2647-1-adam.manzanares@wdc.com>
+Return-Path: <hare@suse.de>
+Date: Mon, 4 Jun 2018 08:17:06 +0200
+From: Hannes Reinecke <hare@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-nvme@lists.infradead.org, Jens Axboe <axboe@kernel.dk>, Keith
+ Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+ linux-block@vger.kernel.org
+Subject: Re: [PATCH 12/12] nvme: limit warnings from nvme_identify_ns
+Message-ID: <20180604081706.7be35b3e@pentland.suse.de>
+In-Reply-To: <20180530164600.26856-13-hch@lst.de>
+References: <20180530164600.26856-1-hch@lst.de>
+	<20180530164600.26856-13-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-From: Adam Manzanares <adam.manzanares@wdc.com>
+On Wed, 30 May 2018 18:46:00 +0200
+Christoph Hellwig <hch@lst.de> wrote:
 
-Previously, the ioprio_check_cap function was only defined when CONFIG_BLOCK
-was set. Make this relationship explicit and add a stub for !CONFIG_BLOCK.
+> When rescanning namespaces after an AEN we will issue Identify
+> Namespace comands to namespaces that have gone away, so don't warn
+> for this specific case.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>  drivers/nvme/host/core.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
----
- include/linux/ioprio.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+Cheers,
 
-diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
-index 4a28cec49ec3..9e30ed6443db 100644
---- a/include/linux/ioprio.h
-+++ b/include/linux/ioprio.h
-@@ -77,6 +77,13 @@ extern int ioprio_best(unsigned short aprio, unsigned short bprio);
- 
- extern int set_task_ioprio(struct task_struct *task, int ioprio);
- 
-+#ifdef CONFIG_BLOCK
- extern int ioprio_check_cap(int ioprio);
-+#else
-+static inline int ioprio_check_cap(int ioprio)
-+{
-+	return -ENOTBLK;
-+}
-+#endif /* CONFIG_BLOCK */
- 
- #endif
--- 
-2.17.0
+Hannes
