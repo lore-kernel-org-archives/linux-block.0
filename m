@@ -1,34 +1,24 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:39207 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751042AbeFEALY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jun 2018 20:11:24 -0400
-Received: by mail-pg0-f67.google.com with SMTP id w12-v6so254160pgc.6
-        for <linux-block@vger.kernel.org>; Mon, 04 Jun 2018 17:11:24 -0700 (PDT)
-Date: Mon, 4 Jun 2018 17:11:22 -0700
-From: Omar Sandoval <osandov@osandov.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: linux-block@vger.kernel.org,
-        Johannes Thumshirn <jthumshirn@suse.de>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [blktests PATCHv2] Fix block/011 to not use sysfs for device
  disabling
-Message-ID: <20180605001122.GA16585@vader>
+To: Keith Busch <keith.busch@intel.com>, Omar Sandoval <osandov@osandov.com>,
+ linux-block@vger.kernel.org
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 References: <20180604225141.8950-1-keith.busch@intel.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <53d14589-3c2d-8627-0a3d-5f91dd6f7ff6@kernel.dk>
+Date: Mon, 4 Jun 2018 17:26:36 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180604225141.8950-1-keith.busch@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jun 04, 2018 at 04:51:41PM -0600, Keith Busch wrote:
+On 6/4/18 4:51 PM, Keith Busch wrote:
 > The PCI sysfs interface may not be a dependable method for toggling the
 > PCI device state to trigger the timeouts. This patch goes directly to
 > the config space to make device failure occur.
-> 
-> Signed-off-by: Keith Busch <keith.busch@intel.com>
-> ---
-> v1 -> v2:
-> 
->   Toggling only PCI Command Register BME bit, rather than including MEM.
 
-Thanks, Keith, applied.
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
+
+-- 
+Jens Axboe
