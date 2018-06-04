@@ -1,116 +1,104 @@
-Return-Path: <neilb@suse.com>
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@kernel.dk>, Linus Torvalds <torvalds@linux-foundation.org>, Kent Overstreet <kent.overstreet@gmail.com>
-Date: Tue, 05 Jun 2018 07:16:51 +1000
-Cc: linux-block <linux-block@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>
+Return-Path: <kent.overstreet@gmail.com>
+Return-Path: <kent.overstreet@gmail.com>
+Date: Mon, 4 Jun 2018 15:04:28 -0400
+From: Kent Overstreet <kent.overstreet@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Tejun Heo <tj@kernel.org>,
+	linux-block <linux-block@vger.kernel.org>,
+	NeilBrown <neilb@suse.com>, Arnd Bergmann <arnd@arndb.de>
 Subject: Re: [GIT PULL] Block changes for 4.18-rc
-In-Reply-To: <52aaf207-ef5d-a886-66fe-566de9d9bbee@kernel.dk>
-References: <11b01169-8e11-34ed-8137-aa5cd50a39c2@kernel.dk> <CA+55aFy6_+90WKyDAbhh0NcN22N11AyaCaJu0nrafmf49+h6tQ@mail.gmail.com> <52aaf207-ef5d-a886-66fe-566de9d9bbee@kernel.dk>
-cc: Shaohua Li <shli@kernel.org>
-Message-ID: <87efhmp7zw.fsf@notabene.neil.brown.name>
+Message-ID: <20180604190428.GA30325@kmo-pixel>
+References: <11b01169-8e11-34ed-8137-aa5cd50a39c2@kernel.dk>
+ <CA+55aFy6_+90WKyDAbhh0NcN22N11AyaCaJu0nrafmf49+h6tQ@mail.gmail.com>
+ <52aaf207-ef5d-a886-66fe-566de9d9bbee@kernel.dk>
+ <CA+55aFz_iLabbCcCEWY8j5KcKCDsC7074f4EDi8mxB7-FrBHwA@mail.gmail.com>
+ <20180604182017.GA1351649@devbig577.frc2.facebook.com>
+ <CA+55aFwOjtyPODy2U9vBQjxjXYq=veRzvMS2Uwdt8f1erRXe1A@mail.gmail.com>
+ <f35436ab-bdac-5277-d0d2-b8432c620aff@kernel.dk>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha256; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <f35436ab-bdac-5277-d0d2-b8432c620aff@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
---=-=-=
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Jun 04, 2018 at 12:25:54PM -0600, Jens Axboe wrote:
+> On 6/4/18 12:22 PM, Linus Torvalds wrote:
+> > On Mon, Jun 4, 2018 at 11:20 AM Tejun Heo <tj@kernel.org> wrote:
+> >>
+> >>
+> >> Looking at the code, the fundamental problem seems to be that it's
+> >> weaving different parts of sync and async paths.  I don't understand
+> >> why it'd punt the destructin of mddev but destroy biosets
+> >> synchronously.  Can't it do sth like the following?
+> > 
+> > Yeah, that looks like the right thing to do.
+> > 
+> > Jens/Kent?
+> 
+> I agree with Tejun, we already discussed this offline.
 
-On Mon, Jun 04 2018, Jens Axboe wrote:
+I don't see any good reason for the exit path to have two or three variations,
+depending on how you count. My preference would be for a patch that does this:
 
-> On 6/4/18 9:51 AM, Linus Torvalds wrote:
->> On Sun, Jun 3, 2018 at 5:42 PM Jens Axboe <axboe@kernel.dk> wrote:
->>>
->>>  drivers/md/md.c                                 |  61 +--
->>>  drivers/md/md.h                                 |   4 +-
->>=20
->> So I've pulled this, but I get a new warning:
->>=20
->>   drivers/md/md.c: In function =E2=80=98mddev_put=E2=80=99:
->>   drivers/md/md.c:543:1: warning: the frame size of 2112 bytes is
->> larger than 2048 bytes [-Wframe-larger-than=3D]
->>=20
->> which seems to be due to commit afeee514ce7f ("md: convert to
->> bioset_init()/mempool_init()").
->>=20
->> As of that commit, mddev_put() now allocates *two* "struct bio_set"
->> structures on the stack, and those really aren't small. Yes, part of
->> it is that I do my test-builds with all that debug stuff, but those
->> structures have several embedded mempool_t members, and they really
->> are pretty sizable.
->>=20
->> And I _really_ do not think it's acceptable to have that kind of stack
->> usage in there. I'm not sure you can trigger mddev_put() in the IO
->> paths, but even without that I don't think it's acceptable.
->>=20
->> Also, the code simply looks like complete and utter garbage. It does
->>=20
->>                 bs =3D mddev->bio_set;
->>                 sync_bs =3D mddev->sync_set;
->>=20
->> to _copy_ those structures, and then does bioset_exit() on them. WTF?
->>=20
->> Why the hell doesn't it just do biset_exit() on the originals instead,
->> before freeing the mddev?
->>=20
->> I've pulled this, but this needs to be fixed. That is just broken
->> garbage right now. No way in hell is it acceptable to waste 2kB of
->> stack space on something idiotic like this.
->
-> Works is already underway to get this fixed up. I agree that the
-> excessive stack usage isn't great, but the code in that function
-> is pretty miserable, as you say. That's not new with the patch,
-> the conversion just carried that forward.
->
-> CC'ing Neil to get his input on how best to clean that up, I'd
-> be much more comfortable with that logic improved rather than
-> just catering to the stack usage issue. Also include Arnd, as
-> he had a test patch for it.
 
-Cc:ing Shaohua as well, as he is the current maintainer, and authored
-=20=20
-  Commit: 7184ef8bab0c ("MD: fix sleep in atomic")
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index fc692b7128..f18d783785 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -510,36 +510,24 @@ static void mddev_delayed_delete(struct work_struct *ws);
+ 
+ static void mddev_put(struct mddev *mddev)
+ {
+-	struct bio_set bs, sync_bs;
+-
+-	memset(&bs, 0, sizeof(bs));
+-	memset(&sync_bs, 0, sizeof(sync_bs));
+-
+ 	if (!atomic_dec_and_lock(&mddev->active, &all_mddevs_lock))
+ 		return;
++
+ 	if (!mddev->raid_disks && list_empty(&mddev->disks) &&
+ 	    mddev->ctime == 0 && !mddev->hold_active) {
+ 		/* Array is not configured at all, and not held active,
+ 		 * so destroy it */
+ 		list_del_init(&mddev->all_mddevs);
+-		bs = mddev->bio_set;
+-		sync_bs = mddev->sync_set;
+-		memset(&mddev->bio_set, 0, sizeof(mddev->bio_set));
+-		memset(&mddev->sync_set, 0, sizeof(mddev->sync_set));
+-		if (mddev->gendisk) {
+-			/* We did a probe so need to clean up.  Call
+-			 * queue_work inside the spinlock so that
+-			 * flush_workqueue() after mddev_find will
+-			 * succeed in waiting for the work to be done.
+-			 */
+-			INIT_WORK(&mddev->del_work, mddev_delayed_delete);
+-			queue_work(md_misc_wq, &mddev->del_work);
+-		} else
+-			kfree(mddev);
++
++		/* We did a probe so need to clean up.  Call
++		 * queue_work inside the spinlock so that
++		 * flush_workqueue() after mddev_find will
++		 * succeed in waiting for the work to be done.
++		 */
++		INIT_WORK(&mddev->del_work, mddev_delayed_delete);
++		queue_work(md_misc_wq, &mddev->del_work);
+ 	}
+ 	spin_unlock(&all_mddevs_lock);
+-	bioset_exit(&bs);
+-	bioset_exit(&sync_bs);
+ }
+ 
+ static void md_safemode_timeout(struct timer_list *t);
 
-which seems most relevant.
-The justification given in that patch is that bioset_free() will take a
-mutex.
-This must have been in destory_workqueue() when destroying
-bs->rescue_workqueue.
-md biosets don't have a work queue (BIOSET_NEED_RESCUER isn't set),
-so these calls will no longer take a mutex.  So this commit
-can now be reverted.  I think that will clean up this code suitably.
+However, that's not correct as is because mddev_delayed_put() calls
+kobject_put(), and the kobject isn't initialized when the mddev is first
+allocated, it's initialized when the gendisk is allocated... that isn't hard to
+fix but that's getting into real refactoring that I'll need to put actual work
+into testing.
 
-I really should get back to BIOSET_NEED_RESCUER and see if I can discard
-it completely.
-Kent - the only remaining user is bcache, and the main reason I haven't
-removed it is that I cannot follow the code (or at least, I couldn't
-last time I tried).  Are you able to see if it is still needed?
-
-Thanks,
-NeilBrown
-
->
-> --=20
-> Jens Axboe
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAlsVrEMACgkQOeye3VZi
-gbm8HxAAkmbP3cOvoWUll1daGq0hKObfo9fiYce4VwjQfw4N+GoiezMMbnzNP444
-jZbHFu+albrf2OHLPHph6PezzeTiNdRmBh2M35tuJVm0NVFBVHlNVdIrhvphGh64
-Q5RJbjDzv4oYyn6OlOupRCwoQ00r3HehjUXZ5mbuVS8J7I/o2mJUkkBbr5WPXvFK
-Af/HXFN0+uC9swixuq+Lizvid5Ko9xuozpZiyHO+HrS3uYlO/iY0qX13mI0GlITR
-bDJelpzKxHYEyDYJ2vdo4qcy28XU5hUe3VFHlMgPYMXZnRPrmyRo1Ee2m/Xn1dHd
-LRWI1DfdQ09URcMxY8AgT0aFSBdePrkZc2jkiY58RP0es0PRdvbYZJblE/hcJ0Ll
-gEoULLk/1n8Lkl0qq+E/p/RMEDmQ/Y13E5YlLO7B96g1Prqc8cegKsgwEJSr9T3l
-faUr+bEMqt5+ndtAIupt2u68PXB1mCjFnaW5hhyKwsYAP/2eXsNYaNow9X8qpUb3
-eueFEcELuWNdl2DNFtGoBYmVYzWvyOutfbjTnQFcuCMp6Xcuk4v5ufHaUnuyEyHY
-d4hTXk48RYdMPs8I/APwEWsSi4wF7ysJDbqyLnhwbfYBfxMBTa45H3I1CVCqvaY2
-H+p+T42ZMOwNBkGA7JBZ8GsPoZ9z1RwzE0+6TEFSS2Z/CPoiMC8=
-=XLnb
------END PGP SIGNATURE-----
---=-=-=--
+However, I have looked at where mddev_put() is called from and I think the stack
+usage is fine for now - unless I've missed something it's not called from e.g.
+under generic_make_request() anywhere, it's just called from sysfs code and
+ioctls and things like that, where the stack is going to be pretty much empty.
