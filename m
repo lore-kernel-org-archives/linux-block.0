@@ -1,67 +1,47 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 5 Jun 2018 11:28:47 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 28/30] block: enable multipage bvecs
-Date: Sat,  9 Jun 2018 20:30:12 +0800
-Message-Id: <20180609123014.8861-29-ming.lei@redhat.com>
-In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
-References: <20180609123014.8861-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/3] block: bio_set_pages_dirty can't see NULL bv_page in
+ a valid bio_vec
+Message-ID: <20180605032845.GE28826@ming.t460p>
+References: <20180604135853.30972-1-hch@lst.de>
+ <20180604135853.30972-3-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180604135853.30972-3-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch pulls the trigger for multipage bvecs.
+On Mon, Jun 04, 2018 at 03:58:52PM +0200, Christoph Hellwig wrote:
+> So don't bother handling it.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/bio.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 50941c1c9118..d95fab72acb5 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -1578,10 +1578,8 @@ void bio_set_pages_dirty(struct bio *bio)
+>  	int i;
+>  
+>  	bio_for_each_segment_all(bvec, bio, i) {
+> -		struct page *page = bvec->bv_page;
+> -
+> -		if (page && !PageCompound(page))
+> -			set_page_dirty_lock(page);
+> +		if (!PageCompound(bvec->bv_page))
+> +			set_page_dirty_lock(bvec->bv_page);
+>  	}
+>  }
 
-Now any request queue which supports queue cluster will see multipage
-bvecs.
+Looks reasonable:
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bio.c | 23 +++++++++++++++++------
- 1 file changed, 17 insertions(+), 6 deletions(-)
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-diff --git a/block/bio.c b/block/bio.c
-index 276fc35ec559..284085ab97e7 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -870,12 +870,23 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
- 
- 	if (bio->bi_vcnt > 0) {
- 		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
--
--		if (page == bv->bv_page && off == bv->bv_offset + bv->bv_len) {
--			bv->bv_len += len;
--			bio->bi_iter.bi_size += len;
--			return true;
--		}
-+		struct request_queue *q = NULL;
-+
-+		if (page == bv->bv_page && off == bv->bv_offset + bv->bv_len)
-+			goto merge;
-+
-+		if (bio->bi_disk)
-+			q = bio->bi_disk->queue;
-+
-+		/* disable multipage bvec too if cluster isn't enabled */
-+		if (!q || !blk_queue_cluster(q) ||
-+		    (bvec_to_phys(bv) + bv->bv_len !=
-+		     page_to_phys(page) + off))
-+			return false;
-+ merge:
-+		bv->bv_len += len;
-+		bio->bi_iter.bi_size += len;
-+		return true;
- 	}
- 	return false;
- }
--- 
-2.9.5
+
+Thanks,
+Ming
