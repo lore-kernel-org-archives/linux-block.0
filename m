@@ -1,244 +1,116 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58644 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751876AbeFXOEN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 24 Jun 2018 10:04:13 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: linux-scsi@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Don Brace <don.brace@microsemi.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Laurence Oberman <loberman@redhat.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH V2 1/2] scsi: read host_busy via scsi_host_busy()
-Date: Sun, 24 Jun 2018 22:03:26 +0800
-Message-Id: <20180624140327.28146-2-ming.lei@redhat.com>
-In-Reply-To: <20180624140327.28146-1-ming.lei@redhat.com>
-References: <20180624140327.28146-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <mb@lightnvm.io>
+Return-Path: <mb@lightnvm.io>
+Subject: Re: [PATCH 4/6] block: Add and use op_stat_group() for indexing
+ disk_stat fields.
+To: Tejun Heo <tj@kernel.org>, axboe@kernel.dk
+Cc: michaelcallahan@fb.com, newella@fb.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-team@fb.com,
+ Minchan Kim <minchan@kernel.org>, Dan Williams <dan.j.williams@intel.com>,
+ Joshua Morris <josh.h.morris@us.ibm.com>,
+ Philipp Reisner <philipp.reisner@linbit.com>,
+ Kent Overstreet <kent.overstreet@gmail.com>, Alasdair Kergon <agk@redhat.com>
+References: <20180605180120.2726113-1-tj@kernel.org>
+ <20180605180120.2726113-5-tj@kernel.org>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <664313c6-3cb9-e4fd-ba57-e9b7ff5bcb78@lightnvm.io>
+Date: Tue, 5 Jun 2018 20:07:09 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180605180120.2726113-5-tj@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-No functional change.
+On 06/05/2018 08:01 PM, Tejun Heo wrote:
+> From: Michael Callahan <michaelcallahan@fb.com>
+> 
+> Add and use a new op_stat_group() function for indexing partition stat
+> fields rather than indexing them by rq_data_dir() or bio_data_dir().
+> This function works similarly to op_is_sync() in that it takes the
+> request::cmd_flags or bio::bi_opf flags and determines which stats
+> should et updated.
+> 
+> In addition, the second parameter to generic_start_io_acct() and
+> generic_end_io_acct() is now a REQ_OP rather than simply a read or
+> write bit and it uses op_stat_group() on the parameter to determine
+> the stat group.
+> 
+> Note that the partition in_flight counts are not part of the per-cpu
+> statistics and as such are not indexed via this function.  It's now
+> indexed by op_is_write().
+> 
+> tj: Refreshed on top of v4.17.  Updated to pass around REQ_OP.
+> 
+> Signed-off-by: Michael Callahan <michaelcallahan@fb.com>
+> Signed-off-by: Tejun Heo <tj@kernel.org>
+> Cc: Minchan Kim <minchan@kernel.org>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Joshua Morris <josh.h.morris@us.ibm.com>
+> Cc: Philipp Reisner <philipp.reisner@linbit.com>
+> Cc: Matias Bjorling <mb@lightnvm.io>
+> Cc: Kent Overstreet <kent.overstreet@gmail.com>
+> Cc: Alasdair Kergon <agk@redhat.com>
+> ---
+>   block/bio.c                   | 16 +++++++++-------
+>   block/blk-core.c              | 12 ++++++------
+>   drivers/block/drbd/drbd_req.c |  4 ++--
+>   drivers/block/rsxx/dev.c      |  6 +++---
+>   drivers/block/zram/zram_drv.c |  5 ++---
+>   drivers/lightnvm/pblk-cache.c |  5 +++--
+>   drivers/lightnvm/pblk-read.c  |  5 +++--
+>   drivers/md/bcache/request.c   | 13 +++++--------
+>   drivers/md/dm.c               |  6 ++++--
+>   drivers/md/md.c               |  5 +++--
+>   drivers/nvdimm/nd.h           |  7 +++----
+>   include/linux/bio.h           |  4 ++--
+>   include/linux/blk_types.h     |  5 +++++
+>   13 files changed, 50 insertions(+), 43 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+....
+> diff --git a/drivers/lightnvm/pblk-cache.c b/drivers/lightnvm/pblk-cache.c
+> index b1c6d7e..643e276 100644
+> --- a/drivers/lightnvm/pblk-cache.c
+> +++ b/drivers/lightnvm/pblk-cache.c
+> @@ -27,7 +27,8 @@ int pblk_write_to_cache(struct pblk *pblk, struct bio *bio, unsigned long flags)
+>   	int nr_entries = pblk_get_secs(bio);
+>   	int i, ret;
+>   
+> -	generic_start_io_acct(q, WRITE, bio_sectors(bio), &pblk->disk->part0);
+> +	generic_start_io_acct(q, REQ_OP_WRITE, bio_sectors(bio),
+> +			      &pblk->disk->part0);
+>   
+>   	/* Update the write buffer head (mem) with the entries that we can
+>   	 * write. The write in itself cannot fail, so there is no need to
+> @@ -75,7 +76,7 @@ int pblk_write_to_cache(struct pblk *pblk, struct bio *bio, unsigned long flags)
+>   	pblk_rl_inserted(&pblk->rl, nr_entries);
+>   
+>   out:
+> -	generic_end_io_acct(q, WRITE, &pblk->disk->part0, start_time);
+> +	generic_end_io_acct(q, REQ_OP_WRITE, &pblk->disk->part0, start_time);
+>   	pblk_write_should_kick(pblk);
+>   	return ret;
+>   }
+> diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+> index 1869469..cf90cee 100644
+> --- a/drivers/lightnvm/pblk-read.c
+> +++ b/drivers/lightnvm/pblk-read.c
+> @@ -199,7 +199,7 @@ static void __pblk_end_io_read(struct pblk *pblk, struct nvm_rq *rqd,
+>   	struct bio *int_bio = rqd->bio;
+>   	unsigned long start_time = r_ctx->start_time;
+>   
+> -	generic_end_io_acct(dev->q, READ, &pblk->disk->part0, start_time);
+> +	generic_end_io_acct(dev->q, REQ_OP_READ, &pblk->disk->part0, start_time);
+>   
+>   	if (rqd->error)
+>   		pblk_log_read_err(pblk, rqd);
+> @@ -411,7 +411,8 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+>   		return NVM_IO_ERR;
+>   	}
+>   
+> -	generic_start_io_acct(q, READ, bio_sectors(bio), &pblk->disk->part0);
+> +	generic_start_io_acct(q, REQ_OP_READ, bio_sectors(bio),
+> +			      &pblk->disk->part0);
+>   
+>   	bitmap_zero(&read_bitmap, nr_secs);
+>   
 
-Just introduce scsi_host_busy() and replace the direct read of
-scsi_host->host_busy with this new API.
-
-Cc: Omar Sandoval <osandov@fb.com>,
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Don Brace <don.brace@microsemi.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Laurence Oberman <loberman@redhat.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/advansys.c                   |  8 ++++----
- drivers/scsi/hosts.c                      | 10 ++++++++++
- drivers/scsi/libsas/sas_scsi_host.c       |  4 ++--
- drivers/scsi/megaraid/megaraid_sas_base.c |  2 +-
- drivers/scsi/mpt3sas/mpt3sas_base.c       |  4 ++--
- drivers/scsi/qlogicpti.c                  |  2 +-
- drivers/scsi/scsi.c                       |  2 +-
- drivers/scsi/scsi_error.c                 |  6 +++---
- drivers/scsi/scsi_sysfs.c                 |  2 +-
- include/scsi/scsi_host.h                  |  1 +
- 10 files changed, 26 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/scsi/advansys.c b/drivers/scsi/advansys.c
-index c9a52905070e..713f69033f20 100644
---- a/drivers/scsi/advansys.c
-+++ b/drivers/scsi/advansys.c
-@@ -2416,8 +2416,8 @@ static void asc_prt_scsi_host(struct Scsi_Host *s)
- 	struct asc_board *boardp = shost_priv(s);
- 
- 	printk("Scsi_Host at addr 0x%p, device %s\n", s, dev_name(boardp->dev));
--	printk(" host_busy %u, host_no %d,\n",
--	       atomic_read(&s->host_busy), s->host_no);
-+	printk(" host_busy %d, host_no %d,\n",
-+	       scsi_host_busy(s), s->host_no);
- 
- 	printk(" base 0x%lx, io_port 0x%lx, irq %d,\n",
- 	       (ulong)s->base, (ulong)s->io_port, boardp->irq);
-@@ -3182,8 +3182,8 @@ static void asc_prt_driver_conf(struct seq_file *m, struct Scsi_Host *shost)
- 		shost->host_no);
- 
- 	seq_printf(m,
--		   " host_busy %u, max_id %u, max_lun %llu, max_channel %u\n",
--		   atomic_read(&shost->host_busy), shost->max_id,
-+		   " host_busy %d, max_id %u, max_lun %llu, max_channel %u\n",
-+		   scsi_host_busy(shost), shost->max_id,
- 		   shost->max_lun, shost->max_channel);
- 
- 	seq_printf(m,
-diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
-index 3771e59a9fae..ea4b0bb0c1cd 100644
---- a/drivers/scsi/hosts.c
-+++ b/drivers/scsi/hosts.c
-@@ -564,6 +564,16 @@ struct Scsi_Host *scsi_host_get(struct Scsi_Host *shost)
- EXPORT_SYMBOL(scsi_host_get);
- 
- /**
-+ * scsi_host_busy - Return the host busy counter
-+ * @shost:	Pointer to Scsi_Host to inc.
-+ **/
-+int scsi_host_busy(struct Scsi_Host *shost)
-+{
-+	return atomic_read(&shost->host_busy);
-+}
-+EXPORT_SYMBOL(scsi_host_busy);
-+
-+/**
-  * scsi_host_put - dec a Scsi_Host ref count
-  * @shost:	Pointer to Scsi_Host to dec.
-  **/
-diff --git a/drivers/scsi/libsas/sas_scsi_host.c b/drivers/scsi/libsas/sas_scsi_host.c
-index ceab5e5c41c2..33229348dcb6 100644
---- a/drivers/scsi/libsas/sas_scsi_host.c
-+++ b/drivers/scsi/libsas/sas_scsi_host.c
-@@ -759,7 +759,7 @@ void sas_scsi_recover_host(struct Scsi_Host *shost)
- 	spin_unlock_irq(shost->host_lock);
- 
- 	SAS_DPRINTK("Enter %s busy: %d failed: %d\n",
--		    __func__, atomic_read(&shost->host_busy), shost->host_failed);
-+		    __func__, scsi_host_busy(shost), shost->host_failed);
- 	/*
- 	 * Deal with commands that still have SAS tasks (i.e. they didn't
- 	 * complete via the normal sas_task completion mechanism),
-@@ -801,7 +801,7 @@ void sas_scsi_recover_host(struct Scsi_Host *shost)
- 		goto retry;
- 
- 	SAS_DPRINTK("--- Exit %s: busy: %d failed: %d tries: %d\n",
--		    __func__, atomic_read(&shost->host_busy),
-+		    __func__, scsi_host_busy(shost),
- 		    shost->host_failed, tries);
- }
- 
-diff --git a/drivers/scsi/megaraid/megaraid_sas_base.c b/drivers/scsi/megaraid/megaraid_sas_base.c
-index e6ba02793610..9aa9590c5373 100644
---- a/drivers/scsi/megaraid/megaraid_sas_base.c
-+++ b/drivers/scsi/megaraid/megaraid_sas_base.c
-@@ -2834,7 +2834,7 @@ static int megasas_reset_bus_host(struct scsi_cmnd *scmd)
- 		"SCSI command pointer: (%p)\t SCSI host state: %d\t"
- 		" SCSI host busy: %d\t FW outstanding: %d\n",
- 		scmd, scmd->device->host->shost_state,
--		atomic_read((atomic_t *)&scmd->device->host->host_busy),
-+		scsi_host_busy(scmd->device->host),
- 		atomic_read(&instance->fw_outstanding));
- 
- 	/*
-diff --git a/drivers/scsi/mpt3sas/mpt3sas_base.c b/drivers/scsi/mpt3sas/mpt3sas_base.c
-index 2053970fc9f8..dc41bd3de08a 100644
---- a/drivers/scsi/mpt3sas/mpt3sas_base.c
-+++ b/drivers/scsi/mpt3sas/mpt3sas_base.c
-@@ -3250,7 +3250,7 @@ _base_recovery_check(struct MPT3SAS_ADAPTER *ioc)
- 	 * See _wait_for_commands_to_complete() call with regards to this code.
- 	 */
- 	if (ioc->shost_recovery && ioc->pending_io_count) {
--		ioc->pending_io_count = atomic_read(&ioc->shost->host_busy);
-+		ioc->pending_io_count = scsi_host_busy(ioc->shost);
- 		if (ioc->pending_io_count == 0)
- 			wake_up(&ioc->reset_wq);
- 	}
-@@ -6857,7 +6857,7 @@ mpt3sas_wait_for_commands_to_complete(struct MPT3SAS_ADAPTER *ioc)
- 		return;
- 
- 	/* pending command count */
--	ioc->pending_io_count = atomic_read(&ioc->shost->host_busy);
-+	ioc->pending_io_count = scsi_host_busy(ioc->shost);
- 
- 	if (!ioc->pending_io_count)
- 		return;
-diff --git a/drivers/scsi/qlogicpti.c b/drivers/scsi/qlogicpti.c
-index 8578e566ab41..9d09228eee28 100644
---- a/drivers/scsi/qlogicpti.c
-+++ b/drivers/scsi/qlogicpti.c
-@@ -959,7 +959,7 @@ static inline void update_can_queue(struct Scsi_Host *host, u_int in_ptr, u_int
- 	/* Temporary workaround until bug is found and fixed (one bug has been found
- 	   already, but fixing it makes things even worse) -jj */
- 	int num_free = QLOGICPTI_REQ_QUEUE_LEN - REQ_QUEUE_DEPTH(in_ptr, out_ptr) - 64;
--	host->can_queue = atomic_read(&host->host_busy) + num_free;
-+	host->can_queue = scsi_host_busy(host) + num_free;
- 	host->sg_tablesize = QLOGICPTI_MAX_SG(num_free);
- }
- 
-diff --git a/drivers/scsi/scsi.c b/drivers/scsi/scsi.c
-index 4c60c260c5da..a15d078321a2 100644
---- a/drivers/scsi/scsi.c
-+++ b/drivers/scsi/scsi.c
-@@ -167,7 +167,7 @@ void scsi_log_completion(struct scsi_cmnd *cmd, int disposition)
- 			if (level > 3)
- 				scmd_printk(KERN_INFO, cmd,
- 					    "scsi host busy %d failed %d\n",
--					    atomic_read(&cmd->device->host->host_busy),
-+					    scsi_host_busy(cmd->device->host),
- 					    cmd->device->host->host_failed);
- 		}
- 	}
-diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-index 8932ae81a15a..6a014fd15fe9 100644
---- a/drivers/scsi/scsi_error.c
-+++ b/drivers/scsi/scsi_error.c
-@@ -66,7 +66,7 @@ void scsi_eh_wakeup(struct Scsi_Host *shost)
- {
- 	lockdep_assert_held(shost->host_lock);
- 
--	if (atomic_read(&shost->host_busy) == shost->host_failed) {
-+	if (scsi_host_busy(shost) == shost->host_failed) {
- 		trace_scsi_eh_wakeup(shost);
- 		wake_up_process(shost->ehandler);
- 		SCSI_LOG_ERROR_RECOVERY(5, shost_printk(KERN_INFO, shost,
-@@ -2155,7 +2155,7 @@ int scsi_error_handler(void *data)
- 			break;
- 
- 		if ((shost->host_failed == 0 && shost->host_eh_scheduled == 0) ||
--		    shost->host_failed != atomic_read(&shost->host_busy)) {
-+		    shost->host_failed != scsi_host_busy(shost)) {
- 			SCSI_LOG_ERROR_RECOVERY(1,
- 				shost_printk(KERN_INFO, shost,
- 					     "scsi_eh_%d: sleeping\n",
-@@ -2170,7 +2170,7 @@ int scsi_error_handler(void *data)
- 				     "scsi_eh_%d: waking up %d/%d/%d\n",
- 				     shost->host_no, shost->host_eh_scheduled,
- 				     shost->host_failed,
--				     atomic_read(&shost->host_busy)));
-+				     scsi_host_busy(shost)));
- 
- 		/*
- 		 * We have a host that is failing for some reason.  Figure out
-diff --git a/drivers/scsi/scsi_sysfs.c b/drivers/scsi/scsi_sysfs.c
-index 7943b762c12d..de122354d09a 100644
---- a/drivers/scsi/scsi_sysfs.c
-+++ b/drivers/scsi/scsi_sysfs.c
-@@ -382,7 +382,7 @@ static ssize_t
- show_host_busy(struct device *dev, struct device_attribute *attr, char *buf)
- {
- 	struct Scsi_Host *shost = class_to_shost(dev);
--	return snprintf(buf, 20, "%d\n", atomic_read(&shost->host_busy));
-+	return snprintf(buf, 20, "%d\n", scsi_host_busy(shost));
- }
- static DEVICE_ATTR(host_busy, S_IRUGO, show_host_busy, NULL);
- 
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index 53b485fe9b67..5ea06d310a25 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -758,6 +758,7 @@ extern void scsi_scan_host(struct Scsi_Host *);
- extern void scsi_rescan_device(struct device *);
- extern void scsi_remove_host(struct Scsi_Host *);
- extern struct Scsi_Host *scsi_host_get(struct Scsi_Host *);
-+extern int scsi_host_busy(struct Scsi_Host *shost);
- extern void scsi_host_put(struct Scsi_Host *t);
- extern struct Scsi_Host *scsi_host_lookup(unsigned short);
- extern const char *scsi_host_state_name(enum scsi_host_state);
--- 
-2.9.5
+Looks good to me. Thanks.
