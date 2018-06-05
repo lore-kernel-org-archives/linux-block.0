@@ -1,83 +1,171 @@
-Return-Path: <linus971@gmail.com>
-MIME-Version: 1.0
+Return-Path: <kent.overstreet@gmail.com>
+Return-Path: <kent.overstreet@gmail.com>
+Date: Mon, 4 Jun 2018 20:34:22 -0400
+From: Kent Overstreet <kent.overstreet@gmail.com>
+To: NeilBrown <neilb@suse.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-block <linux-block@vger.kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>, Shaohua Li <shli@kernel.org>
+Subject: Re: [GIT PULL] Block changes for 4.18-rc
+Message-ID: <20180605003422.GD30325@kmo-pixel>
 References: <11b01169-8e11-34ed-8137-aa5cd50a39c2@kernel.dk>
  <CA+55aFy6_+90WKyDAbhh0NcN22N11AyaCaJu0nrafmf49+h6tQ@mail.gmail.com>
- <52aaf207-ef5d-a886-66fe-566de9d9bbee@kernel.dk> <CA+55aFz_iLabbCcCEWY8j5KcKCDsC7074f4EDi8mxB7-FrBHwA@mail.gmail.com>
- <20180604182017.GA1351649@devbig577.frc2.facebook.com> <CA+55aFwOjtyPODy2U9vBQjxjXYq=veRzvMS2Uwdt8f1erRXe1A@mail.gmail.com>
- <f35436ab-bdac-5277-d0d2-b8432c620aff@kernel.dk> <20180604190428.GA30325@kmo-pixel>
-In-Reply-To: <20180604190428.GA30325@kmo-pixel>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Mon, 4 Jun 2018 17:42:04 -0700
-Message-ID: <CA+55aFyv5v7S_Qj0WwxE0foK69p+WVeDrq1ZKD9EJfP20sJboQ@mail.gmail.com>
-Subject: Re: [GIT PULL] Block changes for 4.18-rc
-To: Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-	linux-block <linux-block@vger.kernel.org>, NeilBrown <neilb@suse.com>,
-	Arnd Bergmann <arnd@arndb.de>
-Content-Type: multipart/mixed; boundary="0000000000006fa25b056dda5297"
+ <52aaf207-ef5d-a886-66fe-566de9d9bbee@kernel.dk>
+ <87efhmp7zw.fsf@notabene.neil.brown.name>
+ <20180604212100.GB30325@kmo-pixel>
+ <8736y2p3kf.fsf@notabene.neil.brown.name>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <8736y2p3kf.fsf@notabene.neil.brown.name>
 List-ID: <linux-block@vger.kernel.org>
 
---0000000000006fa25b056dda5297
-Content-Type: text/plain; charset="UTF-8"
+On Tue, Jun 05, 2018 at 08:52:32AM +1000, NeilBrown wrote:
+> On Mon, Jun 04 2018, Kent Overstreet wrote:
+> 
+> > On Tue, Jun 05, 2018 at 07:16:51AM +1000, NeilBrown wrote:
+> >> I really should get back to BIOSET_NEED_RESCUER and see if I can discard
+> >> it completely.
+> >> Kent - the only remaining user is bcache, and the main reason I haven't
+> >> removed it is that I cannot follow the code (or at least, I couldn't
+> >> last time I tried).  Are you able to see if it is still needed?
+> >
+> > Oh man, rescueurs make my head hurt. I remember you changed something so that
+> > they weren't needed most of the time, but I can't remember what you did - can
+> > you remind me what that was and whatever else you can remember offhand?
+> 
+> (and closures make my head hurt :-)
 
-On Mon, Jun 4, 2018 at 12:04 PM Kent Overstreet
-<kent.overstreet@gmail.com> wrote:
->
-> However, that's not correct as is because mddev_delayed_put() calls
-> kobject_put(), and the kobject isn't initialized when the mddev is first
-> allocated, it's initialized when the gendisk is allocated... that isn't hard to
-> fix but that's getting into real refactoring that I'll need to put actual work
-> into testing.
+Fair enough :)
 
-Well, it also removes the bioset_exit() calls entirely.
+> There were two closely related changes.
+> One is make sure that generic_make_request processed bios strictly
+> in a depth-first order.  The other is to ensure that all (stacking)
+> block device drivers never block in their make_request_fn waiting
+> for something that have themselves submitted.
+> 
+> Together these mean that a thread in generic_make_request will never
+> block waiting for a bio that might be queued in current->bio_list.
+> The bio chosen by generic_make_request will be a leaf and won't depend
+> on anything else in the list, and the handler for that request won't
+> block after submitting a lower-level request.
+> 
+> The  second property is the important one for drivers and the one we
+> need to ensure that bcache follows.
+> A common bad pattern is something like:
+> 
+>  while (too_big(bio)) {
+>     split = bio_spilt(bio,...))
+>     process(split)
+>  }
+>  process(bio)
+> 
+> That needs to be more like
+>   if (too_big(bio)) {
+>      split = bio_split(bio,...);
+>      generic_make_request(bio);
+>      bio = split;
+>   }
+>   process(bio)
+> 
+> so that generic_make_request() gets to do that while-loop
+> and can control the order in which bios are handled.
+> 
+> I cannot convince myself that bcache doesn't have something similar to
+> that while loop (structured with closures).
 
-How about just the attached?
+Oh yeah, it's all coming back to me...
 
-It simply does it as two different cases, and adds the bioset_exit()
-calls to mddev_delayed_delete().
+so, the problem isn't really closures, it's that we don't know where we have to
+split until after we've already allocated all our state for the request and done
+almost all our work for the request - also, the state we allocate is per
+_incoming_ bio, not per split we submit.
 
-Hmm?
+So for the read side, it looks like
+ - allocate a struct search (man, so much of the naming in bcache is crap, it's
+   painful going back from bcachefs)
+ - traverse the btree to the start of this request
+ - iterate over extents, splitting and submitting for each extent the original
+   bio overlaps with
 
-                 Linus
+so, converting it to your 2nd pattern would mean changing that code so that when
+we walk the btree and find an extent we overlap with, if the extent doesn't
+cover the whole bio, we split, submit the split, resubmit the original bio - and
+then return and _restart the entire btree traversal_, for each split. ouch.
 
---0000000000006fa25b056dda5297
-Content-Type: text/x-patch; charset="US-ASCII"; name="patch.diff"
-Content-Disposition: attachment; filename="patch.diff"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ji0yl1ug0>
-X-Attachment-Id: f_ji0yl1ug0
+the write path is different, but the problem is roughly the same in that we
+don't know where we're going to need to split until we're deep inside the write
+path, allocating space for where the write will go - we split if the bucket
+we're currently writing to doesn't have enough space. But again, we don't find
+that out until well after allocating data structures for that write, taking
+locks for space allocation, etc. etc...
 
-IGRyaXZlcnMvbWQvbWQuYyB8IDIzICsrKysrKysrKystLS0tLS0tLS0tLS0tCiAxIGZpbGUgY2hh
-bmdlZCwgMTAgaW5zZXJ0aW9ucygrKSwgMTMgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZHJp
-dmVycy9tZC9tZC5jIGIvZHJpdmVycy9tZC9tZC5jCmluZGV4IGZjNjkyYjcxMjhiYi4uNmEyNDk0
-MDY1YWIyIDEwMDY0NAotLS0gYS9kcml2ZXJzL21kL21kLmMKKysrIGIvZHJpdmVycy9tZC9tZC5j
-CkBAIC01MTAsMTEgKzUxMCw2IEBAIHN0YXRpYyB2b2lkIG1kZGV2X2RlbGF5ZWRfZGVsZXRlKHN0
-cnVjdCB3b3JrX3N0cnVjdCAqd3MpOwogCiBzdGF0aWMgdm9pZCBtZGRldl9wdXQoc3RydWN0IG1k
-ZGV2ICptZGRldikKIHsKLQlzdHJ1Y3QgYmlvX3NldCBicywgc3luY19iczsKLQotCW1lbXNldCgm
-YnMsIDAsIHNpemVvZihicykpOwotCW1lbXNldCgmc3luY19icywgMCwgc2l6ZW9mKHN5bmNfYnMp
-KTsKLQogCWlmICghYXRvbWljX2RlY19hbmRfbG9jaygmbWRkZXYtPmFjdGl2ZSwgJmFsbF9tZGRl
-dnNfbG9jaykpCiAJCXJldHVybjsKIAlpZiAoIW1kZGV2LT5yYWlkX2Rpc2tzICYmIGxpc3RfZW1w
-dHkoJm1kZGV2LT5kaXNrcykgJiYKQEAgLTUyMiwxMCArNTE3LDYgQEAgc3RhdGljIHZvaWQgbWRk
-ZXZfcHV0KHN0cnVjdCBtZGRldiAqbWRkZXYpCiAJCS8qIEFycmF5IGlzIG5vdCBjb25maWd1cmVk
-IGF0IGFsbCwgYW5kIG5vdCBoZWxkIGFjdGl2ZSwKIAkJICogc28gZGVzdHJveSBpdCAqLwogCQls
-aXN0X2RlbF9pbml0KCZtZGRldi0+YWxsX21kZGV2cyk7Ci0JCWJzID0gbWRkZXYtPmJpb19zZXQ7
-Ci0JCXN5bmNfYnMgPSBtZGRldi0+c3luY19zZXQ7Ci0JCW1lbXNldCgmbWRkZXYtPmJpb19zZXQs
-IDAsIHNpemVvZihtZGRldi0+YmlvX3NldCkpOwotCQltZW1zZXQoJm1kZGV2LT5zeW5jX3NldCwg
-MCwgc2l6ZW9mKG1kZGV2LT5zeW5jX3NldCkpOwogCQlpZiAobWRkZXYtPmdlbmRpc2spIHsKIAkJ
-CS8qIFdlIGRpZCBhIHByb2JlIHNvIG5lZWQgdG8gY2xlYW4gdXAuICBDYWxsCiAJCQkgKiBxdWV1
-ZV93b3JrIGluc2lkZSB0aGUgc3BpbmxvY2sgc28gdGhhdApAQCAtNTM0LDEyICs1MjUsMTUgQEAg
-c3RhdGljIHZvaWQgbWRkZXZfcHV0KHN0cnVjdCBtZGRldiAqbWRkZXYpCiAJCQkgKi8KIAkJCUlO
-SVRfV09SSygmbWRkZXYtPmRlbF93b3JrLCBtZGRldl9kZWxheWVkX2RlbGV0ZSk7CiAJCQlxdWV1
-ZV93b3JrKG1kX21pc2Nfd3EsICZtZGRldi0+ZGVsX3dvcmspOwotCQl9IGVsc2UKLQkJCWtmcmVl
-KG1kZGV2KTsKKwkJCXNwaW5fdW5sb2NrKCZhbGxfbWRkZXZzX2xvY2spOworCQkJcmV0dXJuOwor
-CQl9CiAJfQogCXNwaW5fdW5sb2NrKCZhbGxfbWRkZXZzX2xvY2spOwotCWJpb3NldF9leGl0KCZi
-cyk7Ci0JYmlvc2V0X2V4aXQoJnN5bmNfYnMpOworCisJYmlvc2V0X2V4aXQoJm1kZGV2LT5iaW9f
-c2V0KTsKKwliaW9zZXRfZXhpdCgmbWRkZXYtPnN5bmNfc2V0KTsKKwlrZnJlZShtZGRldik7CiB9
-CiAKIHN0YXRpYyB2b2lkIG1kX3NhZmVtb2RlX3RpbWVvdXQoc3RydWN0IHRpbWVyX2xpc3QgKnQp
-OwpAQCAtNTIzNCw2ICs1MjI4LDkgQEAgc3RhdGljIHZvaWQgbWRkZXZfZGVsYXllZF9kZWxldGUo
-c3RydWN0IHdvcmtfc3RydWN0ICp3cykKIHsKIAlzdHJ1Y3QgbWRkZXYgKm1kZGV2ID0gY29udGFp
-bmVyX29mKHdzLCBzdHJ1Y3QgbWRkZXYsIGRlbF93b3JrKTsKIAorCWJpb3NldF9leGl0KCZtZGRl
-di0+YmlvX3NldCk7CisJYmlvc2V0X2V4aXQoJm1kZGV2LT5zeW5jX3NldCk7CisKIAlzeXNmc19y
-ZW1vdmVfZ3JvdXAoJm1kZGV2LT5rb2JqLCAmbWRfYml0bWFwX2dyb3VwKTsKIAlrb2JqZWN0X2Rl
-bCgmbWRkZXYtPmtvYmopOwogCWtvYmplY3RfcHV0KCZtZGRldi0+a29iaik7Cg==
---0000000000006fa25b056dda5297--
+So the approach of just resubmitting the rest of the bio just flat out won't
+work, we've already allocated our data structures and they're tied to that
+bio... it would require massive changes and deep surgery on how the entire
+control flow works...
+
+Also unconditionally doing this for every bio split (bailing out and restarting
+the btree traversal/write path) would be pretty crappy performance wise, e.g.
+when doing big sequential reads of data that was written all with random 4k
+writes...
+
+but...
+
+the problem we're trying to avoid is just blocking while allocating memory,
+while we've got bios blocked on current->bio_list, right?
+
+So another approach would be to checking when we're allocating a bio split if
+that allocation might deadlock - if so, do it with GFP_NOWAIT, and if it fails -
+just punt the read or write request to workqueue.
+
+this is something the code can actually do the way it's structured now... making
+use of closures :)
+
+cache_lookup() calls bch_btree_map_keys() to walk the extents the request
+covers, and restarts itself if cache_lookup_fn() returns -EAGAIN - this is
+because the btree lookup might require reading in btree nodes, so we can't block
+on a btree node read while running under generic_make_request().
+
+So this (untested!) patch should be sufficient for the read side:
+
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index ae67f5fa80..9aed34d050 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -538,6 +538,14 @@ static int cache_lookup_fn(struct btree_op *op, struct btree *b, struct bkey *k)
+ 	if (!KEY_SIZE(k))
+ 		return MAP_CONTINUE;
+ 
++	n = bio_next_split(bio, min_t(uint64_t, INT_MAX,
++				      KEY_OFFSET(k) - bio->bi_iter.bi_sector),
++		!current->bio_list || bio_list_empty(current->bio_list)
++		? GFP_NOIO : GFP_NOWAIT,
++		&s->d->bio_split);
++	if (!n)
++		return -EAGAIN;
++
+ 	/* XXX: figure out best pointer - for multiple cache devices */
+ 	ptr = 0;
+ 
+@@ -546,10 +554,6 @@ static int cache_lookup_fn(struct btree_op *op, struct btree *b, struct bkey *k)
+ 	if (KEY_DIRTY(k))
+ 		s->read_dirty_data = true;
+ 
+-	n = bio_next_split(bio, min_t(uint64_t, INT_MAX,
+-				      KEY_OFFSET(k) - bio->bi_iter.bi_sector),
+-			   GFP_NOIO, &s->d->bio_split);
+-
+ 	bio_key = &container_of(n, struct bbio, bio)->key;
+ 	bch_bkey_copy_single_ptr(bio_key, k, ptr);
+ 
+
+It's a bit more complicated for the write path - right now, we split after
+allocating space (bch_data_insert_start() -> bch_alloc_sectors()). To be able to
+punt to workqueue if the split fails, bch_alloc_sectors() needs to be broken up
+into bch_alloc_sectors_start() to pick and lock a write point and allocate a
+bucket if necessary, so that bch_data_insert_start() can find out how much space
+there is available and attempt the split before actually consuming that space.
+
+That's how the sector allocator already works in bcachefs though, so it's a
+straightforward change...
