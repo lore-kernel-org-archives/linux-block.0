@@ -1,242 +1,174 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f68.google.com ([209.85.160.68]:36646 "EHLO
-        mail-pl0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934956AbeF1JMj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jun 2018 05:12:39 -0400
-Received: by mail-pl0-f68.google.com with SMTP id a7-v6so2464798plp.3
-        for <linux-block@vger.kernel.org>; Thu, 28 Jun 2018 02:12:38 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: hans.holmberg@cnexlabs.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH] lightnvm: pblk: recover chunk state on 1.2 devices
-Date: Thu, 28 Jun 2018 11:12:01 +0200
-Message-Id: <1530177121-24908-2-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1530177121-24908-1-git-send-email-javier@cnexlabs.com>
-References: <1530177121-24908-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+From: Tejun Heo <tj@kernel.org>
+To: axboe@kernel.dk
+Cc: michaelcallahan@fb.com,
+	newella@fb.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel-team@fb.com
+Subject: [PATCHSET v2] block: Separating discards from writes in Linux IO statistics
+Date: Tue,  5 Jun 2018 11:01:14 -0700
+Message-Id: <20180605180120.2726113-1-tj@kernel.org>
+List-ID: <linux-block@vger.kernel.org>
 
-The Open-Channel 1.2 spec does not define a mechanism for the host to
-recover the block (chunk) state. As a consequence, a newly format device
-will need to reconstruct the state. Currently, pblk assumes that blocks
-are not erased, which might cause double-erases in case that the device
-does not protect itself against them (which is not specified in the spec
-either).
+This patchset was originally posted by Michael Callahan.
 
-This patch, reconstructs the state based on read errors. If the first
-sector of a block returns and empty page (NVM_RSP_ERR_EMPTYPAGE), then
-the block s marked free, i.e., erased and ready to be used
-(NVM_CHK_ST_FREE). Otherwise, the block is marked as closed
-(NVM_CHK_ST_CLOSED). Note that even if a block is open and not fully
-written, it has to be erased in order to be used again.
+  https://marc.info/?l=linux-block&m=146541910129172&w=2
 
-One caveat of this approach is that blocks that have been erased at a
-moment in time, will always be considered as erased. However, some media
-might become unstable if blocks are not erased before usage. Since pblk
-would follow this principle after the state of all blocks fall under
-pblk's domain, we can consider this as an initialization problem. The
-trade-off would be to fall back to the old behavior and risk premature
-media wearing.
+The patchset is refreshed on top of the current git master
+v4.17-1306-g716a685 and a patch was added to add discard stats for
+cgroup io.stat.  The original patchset description from Michael
+follows.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-init.c | 138 ++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 124 insertions(+), 14 deletions(-)
+This patch set separates block layer statistics for discards from
+writes.  Discards are currently bundled with writes in the various
+/sys/block/*/stat files as well as in /proc/diskstats.  However
+discards are nearly always used to mark storage that is no longer in
+use.  There are many reasons having discard not counted with writes is
+useful:
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 3b8aa4a64cac..ce25f1473d8e 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -697,47 +697,138 @@ static void pblk_set_provision(struct pblk *pblk, long nr_free_blks)
- 	atomic_set(&pblk->rl.free_user_blocks, nr_free_blks);
- }
- 
-+static void pblk_state_complete(struct kref *ref)
-+{
-+	struct pblk_pad_rq *pad_rq = container_of(ref, struct pblk_pad_rq, ref);
-+
-+	complete(&pad_rq->wait);
-+}
-+
-+static void pblk_end_io_state(struct nvm_rq *rqd)
-+{
-+	struct pblk_pad_rq *pad_rq = rqd->private;
-+	struct pblk *pblk = pad_rq->pblk;
-+	struct nvm_tgt_dev *dev = pblk->dev;
-+	struct nvm_geo *geo = &dev->geo;
-+	struct pblk_line *line;
-+	struct nvm_chk_meta *chunk;
-+	int pos;
-+
-+	line = &pblk->lines[pblk_ppa_to_line(rqd->ppa_addr)];
-+	pos = pblk_ppa_to_pos(geo, rqd->ppa_addr);
-+
-+	chunk = &line->chks[pos];
-+
-+	if (rqd->error == NVM_RSP_ERR_EMPTYPAGE)
-+		chunk->state = NVM_CHK_ST_FREE;
-+	else
-+		chunk->state = NVM_CHK_ST_CLOSED;
-+
-+	bio_put(rqd->bio);
-+	pblk_free_rqd(pblk, rqd, PBLK_READ);
-+	kref_put(&pad_rq->ref, pblk_state_complete);
-+}
-+
-+static int pblk_check_chunk_state(struct pblk *pblk, struct nvm_chk_meta *chunk,
-+				struct ppa_addr ppa, struct pblk_pad_rq *pad_rq)
-+{
-+	struct nvm_rq *rqd;
-+	struct bio *bio;
-+	int ret;
-+
-+	bio = bio_alloc(GFP_KERNEL, 1);
-+
-+	if (pblk_bio_add_pages(pblk, bio, GFP_KERNEL, 1))
-+		goto fail_free_bio;
-+
-+	rqd = pblk_alloc_rqd(pblk, PBLK_READ);
-+
-+	rqd->bio = bio;
-+	rqd->opcode = NVM_OP_PREAD;
-+	rqd->flags = pblk_set_read_mode(pblk, PBLK_READ_SEQUENTIAL);
-+	rqd->nr_ppas = 1;
-+	rqd->ppa_addr = ppa;
-+	rqd->end_io = pblk_end_io_state;
-+	rqd->private = pad_rq;
-+
-+	kref_get(&pad_rq->ref);
-+
-+	ret = pblk_submit_io(pblk, rqd);
-+	if (ret) {
-+		pr_err("pblk: I/O submissin failed: %d\n", ret);
-+		goto fail_free_rqd;
-+	}
-+
-+	return NVM_IO_OK;
-+
-+fail_free_rqd:
-+	pblk_free_rqd(pblk, rqd, PBLK_READ);
-+	pblk_bio_free_pages(pblk, bio, 0, bio->bi_vcnt);
-+fail_free_bio:
-+	bio_put(bio);
-+
-+	return NVM_IO_ERR;
-+}
-+
- static int pblk_setup_line_meta_12(struct pblk *pblk, struct pblk_line *line,
- 				   void *chunk_meta)
- {
- 	struct nvm_tgt_dev *dev = pblk->dev;
- 	struct nvm_geo *geo = &dev->geo;
- 	struct pblk_line_meta *lm = &pblk->lm;
-+	struct pblk_pad_rq *pad_rq;
- 	int i, chk_per_lun, nr_bad_chks = 0;
- 
-+	pad_rq = kmalloc(sizeof(struct pblk_pad_rq), GFP_KERNEL);
-+	if (!pad_rq)
-+		return -1;
-+
-+	pad_rq->pblk = pblk;
-+	init_completion(&pad_rq->wait);
-+	kref_init(&pad_rq->ref);
-+
- 	chk_per_lun = geo->num_chk * geo->pln_mode;
- 
- 	for (i = 0; i < lm->blk_per_line; i++) {
- 		struct pblk_lun *rlun = &pblk->luns[i];
- 		struct nvm_chk_meta *chunk;
--		int pos = pblk_ppa_to_pos(geo, rlun->bppa);
-+		struct ppa_addr ppa = rlun->bppa;
-+		int pos = pblk_ppa_to_pos(geo, ppa);
- 		u8 *lun_bb_meta = chunk_meta + pos * chk_per_lun;
- 
- 		chunk = &line->chks[pos];
- 
--		/*
--		 * In 1.2 spec. chunk state is not persisted by the device. Thus
--		 * some of the values are reset each time pblk is instantiated,
--		 * so we have to assume that the block is closed.
--		 */
--		if (lun_bb_meta[line->id] == NVM_BLK_T_FREE)
--			chunk->state =  NVM_CHK_ST_CLOSED;
--		else
--			chunk->state = NVM_CHK_ST_OFFLINE;
--
- 		chunk->type = NVM_CHK_TP_W_SEQ;
- 		chunk->wi = 0;
- 		chunk->slba = -1;
- 		chunk->cnlb = geo->clba;
- 		chunk->wp = 0;
- 
--		if (!(chunk->state & NVM_CHK_ST_OFFLINE))
-+		if (lun_bb_meta[line->id] != NVM_BLK_T_FREE) {
-+			chunk->state = NVM_CHK_ST_OFFLINE;
-+			set_bit(pos, line->blk_bitmap);
-+			nr_bad_chks++;
-+
- 			continue;
-+		}
- 
--		set_bit(pos, line->blk_bitmap);
--		nr_bad_chks++;
-+		/*
-+		 * In 1.2 spec. chunk state is not persisted by the device.
-+		 * Recover the state based on media response.
-+		 */
-+		ppa.g.blk = line->id;
-+		pblk_check_chunk_state(pblk, chunk, ppa, pad_rq);
- 	}
- 
-+	kref_put(&pad_rq->ref, pblk_state_complete);
-+
-+	if (!wait_for_completion_io_timeout(&pad_rq->wait,
-+				msecs_to_jiffies(PBLK_COMMAND_TIMEOUT_MS))) {
-+		pr_err("pblk: state recovery timed out\n");
-+		return -1;
-+	}
-+
-+	kfree(pad_rq);
- 	return nr_bad_chks;
- }
- 
-@@ -1036,6 +1127,23 @@ static int pblk_line_meta_init(struct pblk *pblk)
- 	return 0;
- }
- 
-+static void check_meta(struct pblk *pblk, struct pblk_line *line)
-+{
-+	struct nvm_tgt_dev *dev = pblk->dev;
-+	struct nvm_geo *geo = &dev->geo;
-+	struct pblk_line_meta *lm = &pblk->lm;
-+	int i;
-+
-+	for (i = 0; i < lm->blk_per_line; i++) {
-+		struct pblk_lun *rlun = &pblk->luns[i];
-+		struct nvm_chk_meta *chunk;
-+		struct ppa_addr ppa = rlun->bppa;
-+		int pos = pblk_ppa_to_pos(geo, ppa);
-+
-+		chunk = &line->chks[pos];
-+	}
-+}
-+
- static int pblk_lines_init(struct pblk *pblk)
- {
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
-@@ -1077,6 +1185,8 @@ static int pblk_lines_init(struct pblk *pblk)
- 			goto fail_free_lines;
- 
- 		nr_free_chks += pblk_setup_line_meta(pblk, line, chunk_meta, i);
-+
-+		check_meta(pblk, line);
- 	}
- 
- 	if (!nr_free_chks) {
--- 
-2.7.4
+1) For many non volatile memory devices it is just nice to know
+   that discards are enabled and working properly.
+
+2) Discards have different performance characteristics than
+   writes.  They are generally much faster and larger and bundling
+   them makes performance statistics less meaningful.
+
+3) Discards are not writes in terms of tracking device lifetime.
+   If a device supports six device writes per day it is nice to know
+   how many writes have actually been written to the device as
+   discards do not count against that total.
+
+Separation of discard statistics is accomplished by expanding the
+struct diskstat arrays to 3 entries for STAT_READ, STAT_WRITE,
+and STAT_DISCARD.  A new rw_stat_group function is then used to
+convert from rw_flags (cmd_flags from requests, bi_rw from bios)
+into the appropriate stat group which is then tracked as before.
+Lastly the new statistics are appended to the current
+/sys/bloc/*/stat and /proc/diskstats on output such that they are
+the last four entries of each.  These are analogous to the four
+read and write statistics.
+
+ * Number of discard ios completed
+ * Number of discard ios merged
+ * Number of discard sectors completed
+ * Milliseconds spent on discard requests.
+
+[before ~]# cat sys/block/nvme0/stat
+296550701        0 2372405688 67317193 19672752        0 7972237312
+9375167        0  2787238 79718726
+
+[after ~]# cat sys/block/nvme0/stat
+296550701        0 2372405688 67317193 18034352        0 4616794112
+9125902        0  2787238 79718726  1638400        0 3355443200
+249265
+
+Note that the discards have moved out of the write fields to the
+end and that the write fields are now smaller by the difference.
+
+Adding the new statistics to the end of /sys/block/*/stat and
+/proc/diskstats is backwards compatible with both iostat and
+vmstat which pick up just the old fields:
+
+[root@after ~]# iostat -x
+Linux 4.5.0_68319_ge5065f4-dirty (##hostname###)        05/17/2016
+ _x86_64_        (48 CPU)
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           0.41    0.00    0.23    0.01    0.00   99.35
+
+Device:         rrqm/s   wrqm/s     r/s     w/s   rsec/s   wsec/s
+avgrq-sz avgqu-sz   await  svctm  %util
+sda               0.01     7.50    0.20    3.61    16.65   708.41
+190.03     0.09   22.53   1.16   0.44
+nvme0n1           0.00     0.00  587.03   35.70  4696.25  9139.08
+22.22     0.16    0.24   0.01   0.55
+
+
+[root@after ~]# vmstat -d
+disk- ------------reads------------ ------------writes----------- -----IO------
+       total merged sectors      ms  total merged sectors      ms    cur    sec
+ram0       0      0       0       0      0      0       0       0      0      0
+ram1       0      0       0       0      0      0       0       0      0      0
+ram2       0      0       0       0      0      0       0       0      0      0
+ram3       0      0       0       0      0      0       0       0      0      0
+ram4       0      0       0       0      0      0       0       0      0      0
+ram5       0      0       0       0      0      0       0       0      0      0
+ram6       0      0       0       0      0      0       0       0      0      0
+ram7       0      0       0       0      0      0       0       0      0      0
+ram8       0      0       0       0      0      0       0       0      0      0
+ram9       0      0       0       0      0      0       0       0      0      0
+ram10      0      0       0       0      0      0       0       0      0      0
+ram11      0      0       0       0      0      0       0       0      0      0
+ram12      0      0       0       0      0      0       0       0      0      0
+ram13      0      0       0       0      0      0       0       0      0      0
+ram14      0      0       0       0      0      0       0       0      0      0
+ram15      0      0       0       0      0      0       0       0      0      0
+sda   102903   5247 8408420   47424 1820306 3782041 357153613 43320121
+     0   2228
+nvme0n1 145633279      0 1165066312 18981333 13107200      0
+3355443200 6663655      0   1796
+loop0      0      0       0       0      0      0       0       0      0      0
+loop1      0      0       0       0      0      0       0       0      0      0
+  [chop rest of loop devices]
+
+
+[root@after ~]# cat /sys/fs/cgroup/user.slice/io.stat
+8:0 rbytes=3534848 wbytes=4096 rios=723 wios=1 dbytes=20592091136 dios=16189
+
+
+This patchset contains the following six patches.
+
+ 0001-block-make-bdev_ops-rw_page-take-a-REQ_OP-instead-of.patch
+ 0002-block-Add-part_stat_read_accum-to-read-across-field-.patch
+ 0003-block-Define-and-use-STAT_READ-and-STAT_WRITE.patch
+ 0004-block-Add-and-use-op_stat_group-for-indexing-disk_st.patch
+ 0005-block-Track-DISCARD-statistics-and-output-them-in-st.patch
+ 0006-blkcg-Track-DISCARD-statistics-and-output-them-in-cg.patch
+
+and also available in the following git branch.
+
+ git://git.kernel.org/pub/scm/linux/kernel/git/tj/misc.git block-discard-stat
+
+diffstat follows.  Thanks.
+
+ Documentation/ABI/testing/procfs-diskstats |   10 ++++++++++
+ Documentation/admin-guide/cgroup-v2.rst    |   10 ++++++----
+ Documentation/block/stat.txt               |   28 ++++++++++++++++------------
+ Documentation/iostats.txt                  |   15 +++++++++++++++
+ block/bio.c                                |   16 +++++++++-------
+ block/blk-cgroup.c                         |   14 ++++++++++----
+ block/blk-core.c                           |   12 ++++++------
+ block/genhd.c                              |   29 ++++++++++++++++++-----------
+ block/partition-generic.c                  |   25 +++++++++++++++----------
+ drivers/block/brd.c                        |   14 +++++++-------
+ drivers/block/drbd/drbd_receiver.c         |    3 +--
+ drivers/block/drbd/drbd_req.c              |    4 ++--
+ drivers/block/drbd/drbd_worker.c           |    4 +---
+ drivers/block/rsxx/dev.c                   |    6 +++---
+ drivers/block/zram/zram_drv.c              |   19 +++++++++----------
+ drivers/lightnvm/pblk-cache.c              |    5 +++--
+ drivers/lightnvm/pblk-read.c               |    5 +++--
+ drivers/md/bcache/request.c                |   13 +++++--------
+ drivers/md/dm.c                            |    6 ++++--
+ drivers/md/md.c                            |    8 ++++----
+ drivers/nvdimm/btt.c                       |   12 ++++++------
+ drivers/nvdimm/nd.h                        |    7 +++----
+ drivers/nvdimm/pmem.c                      |   13 ++++++-------
+ fs/block_dev.c                             |    6 ++++--
+ fs/ext4/super.c                            |    5 +++--
+ fs/ext4/sysfs.c                            |    6 ++++--
+ fs/f2fs/f2fs.h                             |    2 +-
+ fs/f2fs/super.c                            |    3 ++-
+ fs/mpage.c                                 |    4 ++--
+ include/linux/bio.h                        |    4 ++--
+ include/linux/blk-cgroup.h                 |    5 ++++-
+ include/linux/blk_types.h                  |   20 ++++++++++++++++++++
+ include/linux/blkdev.h                     |    2 +-
+ include/linux/genhd.h                      |   14 ++++++++++----
+ 34 files changed, 215 insertions(+), 134 deletions(-)
+
+--
+tejun
