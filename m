@@ -1,72 +1,104 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:44409 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752498AbeFANFQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 09:05:16 -0400
-Received: by mail-lf0-f68.google.com with SMTP id 36-v6so12794091lfr.11
-        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 06:05:15 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        javier@cnexlabs.com, igor.j.konopko@intel.com,
-        marcin.dziegielewski@intel.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 17/18] lightnvm: pblk: add possibility to set write buffer size manually
-Date: Fri,  1 Jun 2018 15:04:31 +0200
-Message-Id: <20180601130432.30866-18-mb@lightnvm.io>
-In-Reply-To: <20180601130432.30866-1-mb@lightnvm.io>
-References: <20180601130432.30866-1-mb@lightnvm.io>
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 5 Jun 2018 11:42:35 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 3/3] block: use bio_add_page in bio_iov_iter_get_pages
+Message-ID: <20180605034234.GG28826@ming.t460p>
+References: <20180604135853.30972-1-hch@lst.de>
+ <20180604135853.30972-4-hch@lst.de>
+ <20180605034117.GF28826@ming.t460p>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180605034117.GF28826@ming.t460p>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
+On Tue, Jun 05, 2018 at 11:41:19AM +0800, Ming Lei wrote:
+> On Mon, Jun 04, 2018 at 03:58:53PM +0200, Christoph Hellwig wrote:
+> > Replace a nasty hack with a different nasty hack to prepare for multipage
+> > bio_vecs.  By moving the temporary page array as far up as possible in
+> > the space allocated for the bio_vec array we can iterate forward over it
+> > and thus use bio_add_page.  Using bio_add_page means we'll be able to
+> > merge physically contiguous pages once support for multipath bio_vecs is
+> > merged.
+> > 
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > ---
+> >  block/bio.c | 45 +++++++++++++++++++++------------------------
+> >  1 file changed, 21 insertions(+), 24 deletions(-)
+> > 
+> > diff --git a/block/bio.c b/block/bio.c
+> > index d95fab72acb5..b09c133a1e24 100644
+> > --- a/block/bio.c
+> > +++ b/block/bio.c
+> > @@ -871,6 +871,8 @@ int bio_add_page(struct bio *bio, struct page *page,
+> >  }
+> >  EXPORT_SYMBOL(bio_add_page);
+> >  
+> > +#define PAGE_PTRS_PER_BVEC	(sizeof(struct bio_vec) / sizeof(struct page *))
+> > +
+> >  /**
+> >   * bio_iov_iter_get_pages - pin user or kernel pages and add them to a bio
+> >   * @bio: bio to add pages to
+> > @@ -882,38 +884,33 @@ EXPORT_SYMBOL(bio_add_page);
+> >  int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+> >  {
+> >  	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
+> > +	unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
+> >  	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
+> >  	struct page **pages = (struct page **)bv;
+> > -	size_t offset, diff;
+> > -	ssize_t size;
+> > +	ssize_t size, left;
+> > +	unsigned len, i;
+> > +	size_t offset;
+> > +
+> > +	/*
+> > +	 * Move page array up in the allocated memory for the bio vecs as
+> > +	 * far as possible so that we can start filling biovecs from the
+> > +	 * beginning without overwriting the temporary page array.
+> > +	 */
+> > +	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
+> > +	pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
+> >  
+> >  	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
+> >  	if (unlikely(size <= 0))
+> >  		return size ? size : -EFAULT;
+> > -	nr_pages = (size + offset + PAGE_SIZE - 1) / PAGE_SIZE;
+> >  
+> > -	/*
+> > -	 * Deep magic below:  We need to walk the pinned pages backwards
+> > -	 * because we are abusing the space allocated for the bio_vecs
+> > -	 * for the page array.  Because the bio_vecs are larger than the
+> > -	 * page pointers by definition this will always work.  But it also
+> > -	 * means we can't use bio_add_page, so any changes to it's semantics
+> > -	 * need to be reflected here as well.
+> > -	 */
+> > -	bio->bi_iter.bi_size += size;
+> > -	bio->bi_vcnt += nr_pages;
+> > -
+> > -	diff = (nr_pages * PAGE_SIZE - offset) - size;
+> > -	while (nr_pages--) {
+> > -		bv[nr_pages].bv_page = pages[nr_pages];
+> > -		bv[nr_pages].bv_len = PAGE_SIZE;
+> > -		bv[nr_pages].bv_offset = 0;
+> > -	}
+> > +	for (left = size, i = 0; left > 0; left -= len, i++) {
+> > +		struct page *page = pages[i];
+> >  
+> > -	bv[0].bv_offset += offset;
+> > -	bv[0].bv_len -= offset;
+> > -	if (diff)
+> > -		bv[bio->bi_vcnt - 1].bv_len -= diff;
+> > +		len = min_t(size_t, PAGE_SIZE - offset, left);
+> > +		if (WARN_ON_ONCE(bio_add_page(bio, page, len, offset) != len))
+> > +			return -EINVAL;
+> > +		offset = 0;
+> > +	}
+> 
+> One invariant is that the page index 'i' is always <= bvec index
 
-In some cases, users can want set write buffer size manually, e.g. to
-adjust it to specific workload. This patch provides the possibility
-to set write buffer size via module parameter feature.
+oops, the above "<=" should have been ">=".
 
-Signed-off-by: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
-Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
----
- drivers/lightnvm/pblk-init.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index d65d2f972ccf..c890493e0e49 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -20,6 +20,11 @@
- 
- #include "pblk.h"
- 
-+unsigned int write_buffer_size;
-+
-+module_param(write_buffer_size, uint, 0644);
-+MODULE_PARM_DESC(write_buffer_size, "number of entries in a write buffer");
-+
- static struct kmem_cache *pblk_ws_cache, *pblk_rec_cache, *pblk_g_rq_cache,
- 				*pblk_w_rq_cache;
- static DECLARE_RWSEM(pblk_lock);
-@@ -172,10 +177,15 @@ static int pblk_rwb_init(struct pblk *pblk)
- 	struct nvm_tgt_dev *dev = pblk->dev;
- 	struct nvm_geo *geo = &dev->geo;
- 	struct pblk_rb_entry *entries;
--	unsigned long nr_entries;
-+	unsigned long nr_entries, buffer_size;
- 	unsigned int power_size, power_seg_sz;
- 
--	nr_entries = pblk_rb_calculate_size(pblk->pgs_in_buffer);
-+	if (write_buffer_size && (write_buffer_size > pblk->pgs_in_buffer))
-+		buffer_size = write_buffer_size;
-+	else
-+		buffer_size = pblk->pgs_in_buffer;
-+
-+	nr_entries = pblk_rb_calculate_size(buffer_size);
- 
- 	entries = vzalloc(nr_entries * sizeof(struct pblk_rb_entry));
- 	if (!entries)
--- 
-2.11.0
+Thanks,
+Ming
