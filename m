@@ -1,44 +1,32 @@
-Return-Path: <prvs=70988ebf6=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH] block: Make __bio_clone_fast() copy bi_vcnt
-Date: Wed, 27 Jun 2018 13:12:31 -0700
-Message-Id: <20180627201231.15641-1-bart.vanassche@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v5] block: add verifier for cmdline partition
+To: Wang YanQing <udknight@gmail.com>, gregkh@linuxfoundation.org,
+ pombredanne@nexb.com, tglx@linutronix.de, caizhiyong@hisilicon.com,
+ rdunlap@infradead.org, jiangheng@hisilicon.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20180510030637.GA25734@udknight>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <b23c64e5-6768-9387-517c-59deded8a331@kernel.dk>
+Date: Tue, 5 Jun 2018 09:21:15 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180510030637.GA25734@udknight>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Although __bio_clone_fast() copies bi_io_vec, it does not copy bi_vcnt,
-the number of elements in bi_io_vec[] that contains data. Copy bi_vcnt
-such that code that needs this member behaves identically for original
-and for cloned requests.
+On 5/9/18 9:06 PM, Wang YanQing wrote:
+> I meet strange filesystem corruption issue recently, the reason
+> is there are overlaps partitions in cmdline partition argument.
+> 
+> This patch add verifier for cmdline partition, then if there are
+> overlaps partitions, cmdline_partition will log a warning. We don't
+> treat overlaps partition as a error:
+> "
+> Caizhiyong <caizhiyong@hisilicon.com> said:
+> Partition overlap was intentionally designed in this cmdline partition.
+> reference http://lists.infradead.org/pipermail/linux-mtd/2013-August/048092.html
+> "
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/bio.c | 1 +
- 1 file changed, 1 insertion(+)
+Applied, thanks.
 
-diff --git a/block/bio.c b/block/bio.c
-index f7e3d88bd0b6..55f8e0dedd69 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -605,6 +605,7 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
- 	bio->bi_opf = bio_src->bi_opf;
- 	bio->bi_write_hint = bio_src->bi_write_hint;
- 	bio->bi_iter = bio_src->bi_iter;
-+	bio->bi_vcnt = bio_src->bi_vcnt;
- 	bio->bi_io_vec = bio_src->bi_io_vec;
- 
- 	bio_clone_blkcg_association(bio, bio_src);
 -- 
-2.17.1
+Jens Axboe
