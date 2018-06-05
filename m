@@ -1,33 +1,28 @@
-Return-Path: <hare@suse.de>
-Date: Mon, 4 Jun 2018 08:16:17 +0200
-From: Hannes Reinecke <hare@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-nvme@lists.infradead.org, Jens Axboe <axboe@kernel.dk>, Keith
- Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH][next] lightnvm: pblk: fix resource leak of invalid_bitmap
+To: Colin King <colin.king@canonical.com>, Matias Bjorling <mb@lightnvm.io>,
  linux-block@vger.kernel.org
-Subject: Re: [PATCH 10/12] nvme: mark nvme_queue_scan static
-Message-ID: <20180604081617.01da7284@pentland.suse.de>
-In-Reply-To: <20180530164600.26856-11-hch@lst.de>
-References: <20180530164600.26856-1-hch@lst.de>
-	<20180530164600.26856-11-hch@lst.de>
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20180605151456.20359-1-colin.king@canonical.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <5b0a3b83-5e7d-679e-f2a4-a9305da7c472@kernel.dk>
+Date: Tue, 5 Jun 2018 09:20:14 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180605151456.20359-1-colin.king@canonical.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, 30 May 2018 18:45:58 +0200
-Christoph Hellwig <hch@lst.de> wrote:
-
-> And move it toward the top of the file to avoid a forward declaration.
+On 6/5/18 9:14 AM, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-> ---
->  drivers/nvme/host/core.c | 19 +++++++++----------
->  drivers/nvme/host/nvme.h |  1 -
->  2 files changed, 9 insertions(+), 11 deletions(-)
+> Currently the error exit path when the emeta could not be
+> interpreted is via fail_free_ws and this fails to free
+> invalid_bitmap.  Fix this by adding another exit label and
+> exiting via this to kfree invalid_bitmap.
 > 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+> Detected by CoverityScan, CID#1469659 ("Resource leak")
 
-Cheers,
+Looks good, applied.
 
-Hannes
+-- 
+Jens Axboe
