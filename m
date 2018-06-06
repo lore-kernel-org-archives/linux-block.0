@@ -1,224 +1,600 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:38048 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752522AbeFAOoI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 10:44:08 -0400
-Received: by mail-lf0-f65.google.com with SMTP id i83-v6so3035781lfh.5
-        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 07:44:06 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        javier@cnexlabs.com, igor.j.konopko@intel.com,
-        marcin.dziegielewski@intel.com,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 10/10] lightnvm: pblk: take bitmap alloc. out of critical section
-Date: Fri,  1 Jun 2018 16:41:14 +0200
-Message-Id: <20180601144114.17490-11-mb@lightnvm.io>
-In-Reply-To: <20180601144114.17490-1-mb@lightnvm.io>
-References: <20180601144114.17490-1-mb@lightnvm.io>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Doug Ledford <dledford@redhat.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH v3 08/25] ibtrs: client: sysfs interface functions
+Date: Wed,  6 Jun 2018 17:24:58 +0200
+Message-Id: <20180606152515.25807-9-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
+References: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@javigon.com>
+This is the sysfs interface to IBTRS sessions on client side:
 
-pblk allocates line bitmaps within the line lock unnecessarily. In order
-to take pressure out of the fast patch, allocate line bitmaps outside
-of this lock and refactor accordingly.
+  /sys/devices/virtual/ibtrs-client/<SESS-NAME>/
+    *** IBTRS session created by ibtrs_clt_open() API call
+    |
+    |- max_reconnect_attempts
+    |  *** number of reconnect attempts for session
+    |
+    |- add_path
+    |  *** adds another connection path into IBTRS session
+    |
+    |- paths/<SRC@DST>/
+       *** established paths to server in a session
+       |
+       |- disconnect
+       |  *** disconnect path
+       |
+       |- reconnect
+       |  *** reconnect path
+       |
+       |- remove_path
+       |  *** remove current path
+       |
+       |- state
+       |  *** retrieve current path state
+       |
+       |- hca_port
+       |  *** HCA port number
+       |
+       |- hca_name
+       |  *** HCA name
+       |
+       |- stats/
+          *** current path statistics
+          |
+	  |- cpu_migration
+	  |- rdma
+	  |- rdma_lat
+	  |- reconnects
+	  |- reset_all
+	  |- sg_entries
+	  |- wc_completions
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jack Wang <jinpu.wang@profitbricks.com>
 ---
- drivers/lightnvm/pblk-core.c | 97 +++++++++++++++++++++++++-------------------
- 1 file changed, 56 insertions(+), 41 deletions(-)
+ drivers/infiniband/ulp/ibtrs/ibtrs-clt-sysfs.c | 520 +++++++++++++++++++++++++
+ 1 file changed, 520 insertions(+)
+ create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-clt-sysfs.c
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index a5750534efed..ed9cc977c8b3 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1067,6 +1067,25 @@ static int pblk_line_init_metadata(struct pblk *pblk, struct pblk_line *line,
- 	return 1;
- }
- 
-+static int pblk_line_alloc_bitmaps(struct pblk *pblk, struct pblk_line *line)
+diff --git a/drivers/infiniband/ulp/ibtrs/ibtrs-clt-sysfs.c b/drivers/infiniband/ulp/ibtrs/ibtrs-clt-sysfs.c
+new file mode 100644
+index 000000000000..a25763a29a17
+--- /dev/null
++++ b/drivers/infiniband/ulp/ibtrs/ibtrs-clt-sysfs.c
+@@ -0,0 +1,520 @@
++/*
++ * InfiniBand Transport Layer
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler <mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *          Kleber Souza <kleber.souza@profitbricks.com>
++ *          Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
++ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#undef pr_fmt
++#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
++
++#include "ibtrs-pri.h"
++#include "ibtrs-clt.h"
++#include "ibtrs-log.h"
++
++#define MIN_MAX_RECONN_ATT -1
++#define MAX_MAX_RECONN_ATT 9999
++
++static struct kobj_type ktype = {
++	.sysfs_ops = &kobj_sysfs_ops,
++};
++
++static ssize_t max_reconnect_attempts_show(struct device *dev,
++					   struct device_attribute *attr,
++					   char *page)
 +{
-+	struct pblk_line_meta *lm = &pblk->lm;
++	struct ibtrs_clt *clt;
 +
-+	line->map_bitmap = kzalloc(lm->sec_bitmap_len, GFP_KERNEL);
-+	if (!line->map_bitmap)
-+		return -ENOMEM;
++	clt = container_of(dev, struct ibtrs_clt, dev);
 +
-+	/* will be initialized using bb info from map_bitmap */
-+	line->invalid_bitmap = kmalloc(lm->sec_bitmap_len, GFP_KERNEL);
-+	if (!line->invalid_bitmap) {
-+		kfree(line->map_bitmap);
-+		line->map_bitmap = NULL;
-+		return -ENOMEM;
++	return sprintf(page, "%d\n", ibtrs_clt_get_max_reconnect_attempts(clt));
++}
++
++static ssize_t max_reconnect_attempts_store(struct device *dev,
++					    struct device_attribute *attr,
++					    const char *buf,
++					    size_t count)
++{
++	struct ibtrs_clt *clt;
++	int value;
++	int ret;
++
++	clt = container_of(dev, struct ibtrs_clt, dev);
++
++	ret = kstrtoint(buf, 10, &value);
++	if (unlikely(ret)) {
++		ibtrs_err(clt, "%s: failed to convert string '%s' to int\n",
++			  attr->attr.name, buf);
++		return ret;
++	}
++	if (unlikely(value > MAX_MAX_RECONN_ATT ||
++		     value < MIN_MAX_RECONN_ATT)) {
++		ibtrs_err(clt, "%s: invalid range"
++			  " (provided: '%s', accepted: min: %d, max: %d)\n",
++			  attr->attr.name, buf, MIN_MAX_RECONN_ATT,
++			  MAX_MAX_RECONN_ATT);
++		return -EINVAL;
++	}
++	ibtrs_clt_set_max_reconnect_attempts(clt, value);
++
++	return count;
++}
++
++static DEVICE_ATTR_RW(max_reconnect_attempts);
++
++static ssize_t mpath_policy_show(struct device *dev,
++				 struct device_attribute *attr,
++				 char *page)
++{
++	struct ibtrs_clt *clt;
++
++	clt = container_of(dev, struct ibtrs_clt, dev);
++
++	switch (clt->mp_policy) {
++	case MP_POLICY_RR:
++		return sprintf(page, "round-robin (RR: %d)\n", clt->mp_policy);
++	case MP_POLICY_MIN_INFLIGHT:
++		return sprintf(page, "min-inflight (MI: %d)\n", clt->mp_policy);
++	default:
++		return sprintf(page, "Unknown (%d)\n", clt->mp_policy);
++	}
++}
++
++static ssize_t mpath_policy_store(struct device *dev,
++				  struct device_attribute *attr,
++				  const char *buf,
++				  size_t count)
++{
++	struct ibtrs_clt *clt;
++	int value;
++	int ret;
++
++	clt = container_of(dev, struct ibtrs_clt, dev);
++
++	ret = kstrtoint(buf, 10, &value);
++	if (!ret && (value == MP_POLICY_RR || value == MP_POLICY_MIN_INFLIGHT)) {
++		clt->mp_policy = value;
++		return count;
++	}
++
++	if (!strncasecmp(buf, "round-robin", 11) ||
++	    !strncasecmp(buf, "rr", 2))
++		clt->mp_policy = MP_POLICY_RR;
++	else if (!strncasecmp(buf, "min-inflight", 12) ||
++		 !strncasecmp(buf, "mi", 2))
++		clt->mp_policy = MP_POLICY_MIN_INFLIGHT;
++	else
++		return -EINVAL;
++
++	return count;
++}
++
++static DEVICE_ATTR_RW(mpath_policy);
++
++static ssize_t add_path_show(struct device *dev,
++			     struct device_attribute *attr, char *page)
++{
++	return scnprintf(page, PAGE_SIZE, "Usage: echo"
++			 " [<source addr>,]<destination addr> > %s\n\n"
++			"*addr ::= [ ip:<ipv4|ipv6> | gid:<gid> ]\n",
++			 attr->attr.name);
++}
++
++static ssize_t add_path_store(struct device *dev,
++			      struct device_attribute *attr,
++			      const char *buf, size_t count)
++{
++	struct sockaddr_storage srcaddr, dstaddr;
++	struct ibtrs_addr addr = {
++		.src = &srcaddr,
++		.dst = &dstaddr
++	};
++	struct ibtrs_clt *clt;
++	const char *nl;
++	size_t len;
++	int err;
++
++	clt = container_of(dev, struct ibtrs_clt, dev);
++
++	nl = strchr(buf, '\n');
++	if (nl)
++		len = nl - buf;
++	else
++		len = count;
++	err = ibtrs_addr_to_sockaddr(buf, len, clt->port, &addr);
++	if (unlikely(err))
++		return -EINVAL;
++
++	err = ibtrs_clt_create_path_from_sysfs(clt, &addr);
++	if (unlikely(err))
++		return err;
++
++	return count;
++}
++
++static DEVICE_ATTR_RW(add_path);
++
++static ssize_t ibtrs_clt_state_show(struct kobject *kobj,
++				    struct kobj_attribute *attr, char *page)
++{
++	struct ibtrs_clt_sess *sess;
++
++	sess = container_of(kobj, struct ibtrs_clt_sess, kobj);
++	if (ibtrs_clt_sess_is_connected(sess))
++		return sprintf(page, "connected\n");
++
++	return sprintf(page, "disconnected\n");
++}
++
++static struct kobj_attribute ibtrs_clt_state_attr =
++	__ATTR(state, 0444, ibtrs_clt_state_show, NULL);
++
++static ssize_t ibtrs_clt_reconnect_show(struct kobject *kobj,
++					struct kobj_attribute *attr,
++					char *page)
++{
++	return scnprintf(page, PAGE_SIZE, "Usage: echo 1 > %s\n",
++			 attr->attr.name);
++}
++
++static ssize_t ibtrs_clt_reconnect_store(struct kobject *kobj,
++					 struct kobj_attribute *attr,
++					 const char *buf, size_t count)
++{
++	struct ibtrs_clt_sess *sess;
++	int ret;
++
++	sess = container_of(kobj, struct ibtrs_clt_sess, kobj);
++	if (!sysfs_streq(buf, "1")) {
++		ibtrs_err(sess, "%s: unknown value: '%s'\n",
++			  attr->attr.name, buf);
++		return -EINVAL;
++	}
++	ret = ibtrs_clt_reconnect_from_sysfs(sess);
++	if (unlikely(ret))
++		return ret;
++
++	return count;
++}
++
++static struct kobj_attribute ibtrs_clt_reconnect_attr =
++	__ATTR(reconnect, 0644, ibtrs_clt_reconnect_show,
++	       ibtrs_clt_reconnect_store);
++
++static ssize_t ibtrs_clt_disconnect_show(struct kobject *kobj,
++					 struct kobj_attribute *attr,
++					 char *page)
++{
++	return scnprintf(page, PAGE_SIZE, "Usage: echo 1 > %s\n",
++			 attr->attr.name);
++}
++
++static ssize_t ibtrs_clt_disconnect_store(struct kobject *kobj,
++					  struct kobj_attribute *attr,
++					  const char *buf, size_t count)
++{
++	struct ibtrs_clt_sess *sess;
++	int ret;
++
++	sess = container_of(kobj, struct ibtrs_clt_sess, kobj);
++	if (!sysfs_streq(buf, "1")) {
++		ibtrs_err(sess, "%s: unknown value: '%s'\n",
++			  attr->attr.name, buf);
++		return -EINVAL;
++	}
++	ret = ibtrs_clt_disconnect_from_sysfs(sess);
++	if (unlikely(ret))
++		return ret;
++
++	return count;
++}
++
++static struct kobj_attribute ibtrs_clt_disconnect_attr =
++	__ATTR(disconnect, 0644, ibtrs_clt_disconnect_show,
++	       ibtrs_clt_disconnect_store);
++
++static ssize_t ibtrs_clt_remove_path_show(struct kobject *kobj,
++					  struct kobj_attribute *attr,
++					  char *page)
++{
++	return scnprintf(page, PAGE_SIZE, "Usage: echo 1 > %s\n",
++			 attr->attr.name);
++}
++
++static ssize_t ibtrs_clt_remove_path_store(struct kobject *kobj,
++					   struct kobj_attribute *attr,
++					   const char *buf, size_t count)
++{
++	struct ibtrs_clt_sess *sess;
++	int ret;
++
++	sess = container_of(kobj, struct ibtrs_clt_sess, kobj);
++	if (!sysfs_streq(buf, "1")) {
++		ibtrs_err(sess, "%s: unknown value: '%s'\n",
++			  attr->attr.name, buf);
++		return -EINVAL;
++	}
++	ret = ibtrs_clt_remove_path_from_sysfs(sess, &attr->attr);
++	if (unlikely(ret))
++		return ret;
++
++	return count;
++}
++
++static struct kobj_attribute ibtrs_clt_remove_path_attr =
++	__ATTR(remove_path, 0644, ibtrs_clt_remove_path_show,
++	       ibtrs_clt_remove_path_store);
++
++STAT_ATTR(struct ibtrs_clt_sess, cpu_migration,
++	  ibtrs_clt_stats_migration_cnt_to_str,
++	  ibtrs_clt_reset_cpu_migr_stats);
++
++STAT_ATTR(struct ibtrs_clt_sess, sg_entries,
++	  ibtrs_clt_stats_sg_list_distr_to_str,
++	  ibtrs_clt_reset_sg_list_distr_stats);
++
++STAT_ATTR(struct ibtrs_clt_sess, reconnects,
++	  ibtrs_clt_stats_reconnects_to_str,
++	  ibtrs_clt_reset_reconnects_stat);
++
++STAT_ATTR(struct ibtrs_clt_sess, rdma_lat,
++	  ibtrs_clt_stats_rdma_lat_distr_to_str,
++	  ibtrs_clt_reset_rdma_lat_distr_stats);
++
++STAT_ATTR(struct ibtrs_clt_sess, wc_completion,
++	  ibtrs_clt_stats_wc_completion_to_str,
++	  ibtrs_clt_reset_wc_comp_stats);
++
++STAT_ATTR(struct ibtrs_clt_sess, rdma,
++	  ibtrs_clt_stats_rdma_to_str,
++	  ibtrs_clt_reset_rdma_stats);
++
++STAT_ATTR(struct ibtrs_clt_sess, reset_all,
++	  ibtrs_clt_reset_all_help,
++	  ibtrs_clt_reset_all_stats);
++
++static struct attribute *ibtrs_clt_stats_attrs[] = {
++	&sg_entries_attr.attr,
++	&cpu_migration_attr.attr,
++	&reconnects_attr.attr,
++	&rdma_lat_attr.attr,
++	&wc_completion_attr.attr,
++	&rdma_attr.attr,
++	&reset_all_attr.attr,
++	NULL,
++};
++
++static struct attribute_group ibtrs_clt_stats_attr_group = {
++	.attrs = ibtrs_clt_stats_attrs,
++};
++
++static int ibtrs_clt_create_stats_files(struct kobject *kobj,
++					struct kobject *kobj_stats)
++{
++	int ret;
++
++	ret = kobject_init_and_add(kobj_stats, &ktype, kobj, "stats");
++	if (ret) {
++		pr_err("Failed to init and add stats kobject, err: %d\n",
++		       ret);
++		return ret;
++	}
++
++	ret = sysfs_create_group(kobj_stats, &ibtrs_clt_stats_attr_group);
++	if (ret) {
++		pr_err("failed to create stats sysfs group, err: %d\n",
++		       ret);
++		goto err;
 +	}
 +
 +	return 0;
++
++err:
++	kobject_del(kobj_stats);
++	kobject_put(kobj_stats);
++
++	return ret;
 +}
 +
- /* For now lines are always assumed full lines. Thus, smeta former and current
-  * lun bitmaps are omitted.
-  */
-@@ -1171,18 +1190,7 @@ static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
- {
- 	struct pblk_line_meta *lm = &pblk->lm;
- 	int blk_in_line = atomic_read(&line->blk_in_line);
--	int blk_to_erase, ret;
--
--	line->map_bitmap = kzalloc(lm->sec_bitmap_len, GFP_ATOMIC);
--	if (!line->map_bitmap)
--		return -ENOMEM;
--
--	/* will be initialized using bb info from map_bitmap */
--	line->invalid_bitmap = kmalloc(lm->sec_bitmap_len, GFP_ATOMIC);
--	if (!line->invalid_bitmap) {
--		ret = -ENOMEM;
--		goto fail_free_map_bitmap;
--	}
-+	int blk_to_erase;
- 
- 	/* Bad blocks do not need to be erased */
- 	bitmap_copy(line->erase_bitmap, line->blk_bitmap, lm->blk_per_line);
-@@ -1200,15 +1208,15 @@ static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
- 	}
- 
- 	if (blk_in_line < lm->min_blk_line) {
--		ret = -EAGAIN;
--		goto fail_free_invalid_bitmap;
-+		spin_unlock(&line->lock);
-+		return -EAGAIN;
- 	}
- 
- 	if (line->state != PBLK_LINESTATE_FREE) {
- 		WARN(1, "pblk: corrupted line %d, state %d\n",
- 							line->id, line->state);
--		ret = -EINTR;
--		goto fail_free_invalid_bitmap;
-+		spin_unlock(&line->lock);
-+		return -EINTR;
- 	}
- 
- 	line->state = PBLK_LINESTATE_OPEN;
-@@ -1222,16 +1230,6 @@ static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
- 	kref_init(&line->ref);
- 
- 	return 0;
--
--fail_free_invalid_bitmap:
--	spin_unlock(&line->lock);
--	kfree(line->invalid_bitmap);
--	line->invalid_bitmap = NULL;
--fail_free_map_bitmap:
--	kfree(line->map_bitmap);
--	line->map_bitmap = NULL;
--
--	return ret;
- }
- 
- int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line)
-@@ -1251,13 +1249,16 @@ int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line)
- 	}
- 	spin_unlock(&l_mg->free_lock);
- 
--	pblk_rl_free_lines_dec(&pblk->rl, line, true);
-+	ret = pblk_line_alloc_bitmaps(pblk, line);
-+	if (ret)
-+		return ret;
- 
- 	if (!pblk_line_init_bb(pblk, line, 0)) {
- 		list_add(&line->list, &l_mg->free_list);
- 		return -EINTR;
- 	}
- 
-+	pblk_rl_free_lines_dec(&pblk->rl, line, true);
- 	return 0;
- }
- 
-@@ -1269,6 +1270,24 @@ void pblk_line_recov_close(struct pblk *pblk, struct pblk_line *line)
- 	line->emeta = NULL;
- }
- 
-+static void pblk_line_reinit(struct pblk_line *line)
++static ssize_t ibtrs_clt_hca_port_show(struct kobject *kobj,
++				       struct kobj_attribute *attr,
++				       char *page)
 +{
-+	*line->vsc = cpu_to_le32(EMPTY_ENTRY);
++	struct ibtrs_clt_sess *sess;
 +
-+	line->map_bitmap = NULL;
-+	line->invalid_bitmap = NULL;
-+	line->smeta = NULL;
-+	line->emeta = NULL;
++	sess = container_of(kobj, typeof(*sess), kobj);
++
++	return scnprintf(page, PAGE_SIZE, "%u\n", sess->hca_port);
 +}
 +
-+void pblk_line_free(struct pblk_line *line)
++static struct kobj_attribute ibtrs_clt_hca_port_attr =
++	__ATTR(hca_port, 0444, ibtrs_clt_hca_port_show, NULL);
++
++static ssize_t ibtrs_clt_hca_name_show(struct kobject *kobj,
++				       struct kobj_attribute *attr,
++				       char *page)
 +{
-+	kfree(line->map_bitmap);
-+	kfree(line->invalid_bitmap);
++	struct ibtrs_clt_sess *sess;
 +
-+	pblk_line_reinit(line);
++	sess = container_of(kobj, struct ibtrs_clt_sess, kobj);
++
++	return scnprintf(page, PAGE_SIZE, "%s\n", sess->hca_name);
 +}
 +
- struct pblk_line *pblk_line_get(struct pblk *pblk)
- {
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
-@@ -1335,11 +1354,14 @@ static struct pblk_line *pblk_line_retry(struct pblk *pblk,
- 		return NULL;
- 	}
- 
-+	retry_line->map_bitmap = line->map_bitmap;
-+	retry_line->invalid_bitmap = line->invalid_bitmap;
- 	retry_line->smeta = line->smeta;
- 	retry_line->emeta = line->emeta;
- 	retry_line->meta_line = line->meta_line;
- 
--	pblk_line_free(line);
-+	pblk_line_reinit(line);
++static struct kobj_attribute ibtrs_clt_hca_name_attr =
++	__ATTR(hca_name, 0444, ibtrs_clt_hca_name_show, NULL);
 +
- 	l_mg->data_line = retry_line;
- 	spin_unlock(&l_mg->free_lock);
- 
-@@ -1392,6 +1414,9 @@ struct pblk_line *pblk_line_get_first_data(struct pblk *pblk)
- 	}
- 	spin_unlock(&l_mg->free_lock);
- 
-+	if (pblk_line_alloc_bitmaps(pblk, line))
-+		return NULL;
++static ssize_t ibtrs_clt_src_addr_show(struct kobject *kobj,
++				       struct kobj_attribute *attr,
++				       char *page)
++{
++	struct ibtrs_clt_sess *sess;
++	int cnt;
 +
- 	if (pblk_line_erase(pblk, line)) {
- 		line = pblk_line_retry(pblk, line);
- 		if (!line)
-@@ -1536,6 +1561,9 @@ struct pblk_line *pblk_line_replace_data(struct pblk *pblk)
- 		goto retry_erase;
- 	}
- 
-+	if (pblk_line_alloc_bitmaps(pblk, new))
-+		return NULL;
++	sess = container_of(kobj, struct ibtrs_clt_sess, kobj);
++	cnt = sockaddr_to_str((struct sockaddr *)&sess->s.src_addr,
++			      page, PAGE_SIZE);
++	return cnt + scnprintf(page + cnt, PAGE_SIZE - cnt, "\n");
++}
 +
- retry_setup:
- 	if (!pblk_line_init_metadata(pblk, new, cur)) {
- 		new = pblk_line_retry(pblk, new);
-@@ -1575,19 +1603,6 @@ struct pblk_line *pblk_line_replace_data(struct pblk *pblk)
- 	return new;
- }
- 
--void pblk_line_free(struct pblk_line *line)
--{
--	kfree(line->map_bitmap);
--	kfree(line->invalid_bitmap);
--
--	*line->vsc = cpu_to_le32(EMPTY_ENTRY);
--
--	line->map_bitmap = NULL;
--	line->invalid_bitmap = NULL;
--	line->smeta = NULL;
--	line->emeta = NULL;
--}
--
- static void __pblk_line_put(struct pblk *pblk, struct pblk_line *line)
- {
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
++static struct kobj_attribute ibtrs_clt_src_addr_attr =
++	__ATTR(src_addr, 0444, ibtrs_clt_src_addr_show, NULL);
++
++static ssize_t ibtrs_clt_dst_addr_show(struct kobject *kobj,
++				       struct kobj_attribute *attr,
++				       char *page)
++{
++	struct ibtrs_clt_sess *sess;
++	int cnt;
++
++	sess = container_of(kobj, struct ibtrs_clt_sess, kobj);
++	cnt = sockaddr_to_str((struct sockaddr *)&sess->s.dst_addr,
++			      page, PAGE_SIZE);
++	return cnt + scnprintf(page + cnt, PAGE_SIZE - cnt, "\n");
++}
++
++static struct kobj_attribute ibtrs_clt_dst_addr_attr =
++	__ATTR(dst_addr, 0444, ibtrs_clt_dst_addr_show, NULL);
++
++static struct attribute *ibtrs_clt_sess_attrs[] = {
++	&ibtrs_clt_hca_name_attr.attr,
++	&ibtrs_clt_hca_port_attr.attr,
++	&ibtrs_clt_src_addr_attr.attr,
++	&ibtrs_clt_dst_addr_attr.attr,
++	&ibtrs_clt_state_attr.attr,
++	&ibtrs_clt_reconnect_attr.attr,
++	&ibtrs_clt_disconnect_attr.attr,
++	&ibtrs_clt_remove_path_attr.attr,
++	NULL,
++};
++
++static struct attribute_group ibtrs_clt_sess_attr_group = {
++	.attrs = ibtrs_clt_sess_attrs,
++};
++
++int ibtrs_clt_create_sess_files(struct ibtrs_clt_sess *sess)
++{
++	struct ibtrs_clt *clt = sess->clt;
++	char str[NAME_MAX];
++	int err, cnt;
++
++	cnt = sockaddr_to_str((struct sockaddr *)&sess->s.src_addr,
++			      str, sizeof(str));
++	cnt += scnprintf(str + cnt, sizeof(str) - cnt, "@");
++	sockaddr_to_str((struct sockaddr *)&sess->s.dst_addr,
++			str + cnt, sizeof(str) - cnt);
++
++	err = kobject_init_and_add(&sess->kobj, &ktype, &clt->kobj_paths,
++				   "%s", str);
++	if (unlikely(err)) {
++		pr_err("kobject_init_and_add: %d\n", err);
++		return err;
++	}
++	err = sysfs_create_group(&sess->kobj, &ibtrs_clt_sess_attr_group);
++	if (unlikely(err)) {
++		pr_err("sysfs_create_group(): %d\n", err);
++		goto put_kobj;
++	}
++	err = ibtrs_clt_create_stats_files(&sess->kobj, &sess->kobj_stats);
++	if (unlikely(err))
++		goto put_kobj;
++
++	return 0;
++
++put_kobj:
++	kobject_del(&sess->kobj);
++	kobject_put(&sess->kobj);
++
++	return err;
++}
++
++void ibtrs_clt_destroy_sess_files(struct ibtrs_clt_sess *sess,
++				  const struct attribute *sysfs_self)
++{
++	if (sess->kobj.state_in_sysfs) {
++		kobject_del(&sess->kobj_stats);
++		kobject_put(&sess->kobj_stats);
++		if (sysfs_self)
++			/* To avoid deadlock firstly commit suicide */
++			sysfs_remove_file_self(&sess->kobj, sysfs_self);
++		kobject_del(&sess->kobj);
++		kobject_put(&sess->kobj);
++	}
++}
++
++static struct attribute *ibtrs_clt_attrs[] = {
++	&dev_attr_max_reconnect_attempts.attr,
++	&dev_attr_mpath_policy.attr,
++	&dev_attr_add_path.attr,
++	NULL,
++};
++
++static struct attribute_group ibtrs_clt_attr_group = {
++	.attrs = ibtrs_clt_attrs,
++};
++
++int ibtrs_clt_create_sysfs_root_folders(struct ibtrs_clt *clt)
++{
++	return kobject_init_and_add(&clt->kobj_paths, &ktype,
++				    &clt->dev.kobj, "paths");
++}
++
++int ibtrs_clt_create_sysfs_root_files(struct ibtrs_clt *clt)
++{
++	return sysfs_create_group(&clt->dev.kobj, &ibtrs_clt_attr_group);
++}
++
++void ibtrs_clt_destroy_sysfs_root_folders(struct ibtrs_clt *clt)
++{
++	if (clt->kobj_paths.state_in_sysfs) {
++		kobject_del(&clt->kobj_paths);
++		kobject_put(&clt->kobj_paths);
++	}
++}
++
++void ibtrs_clt_destroy_sysfs_root_files(struct ibtrs_clt *clt)
++{
++	sysfs_remove_group(&clt->dev.kobj, &ibtrs_clt_attr_group);
++}
 -- 
-2.11.0
+2.13.1
