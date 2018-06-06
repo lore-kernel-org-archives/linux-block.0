@@ -1,62 +1,109 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:37097 "EHLO
-        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754278AbeFLKai (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Jun 2018 06:30:38 -0400
-Received: by mail-lf0-f67.google.com with SMTP id g21-v6so33219846lfb.4
-        for <linux-block@vger.kernel.org>; Tue, 12 Jun 2018 03:30:38 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: igor.j.konopko@intel.com, marcin.dziegielewski@intel.com,
-        javier@cnexlabs.com, hans.holmberg@cnexlabs.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [PATCH] lightnvm: pblk: limit get chk meta request size
-Date: Tue, 12 Jun 2018 12:30:08 +0200
-Message-Id: <20180612103008.19436-1-mb@lightnvm.io>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from synology.com ([59.124.61.242]:51948 "EHLO synology.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932262AbeFFII5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 6 Jun 2018 04:08:57 -0400
+From: bingjingc <bingjingc@synology.com>
+To: linux-block@vger.kernel.org
+Cc: bingjingc@synology.com, cccheng@synology.com
+Subject: [PATCH blktests 3/9] blktests: add a regression test for raid10 creation resync
+Date: Wed,  6 Jun 2018 16:08:50 +0800
+Message-Id: <1528272530-13534-1-git-send-email-bingjingc@synology.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-For devices that does not specify a limit on its transfer size, the
-get_chk_meta command may send down a single I/O retrieving the full
-chunk metadata table. Resulting in large 2-4MB I/O requests. Instead,
-split up the I/Os to a maximum of 256KB and issue them separately to
-improve I/O latency.
-
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+Reviewed-by: Chung-Chiang Cheng <cccheng@synology.com>
+Signed-off-by: BingJing Chang <bingjingc@synology.com>
 ---
- drivers/nvme/host/lightnvm.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ tests/md/002     | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/md/002.out |  4 ++++
+ 2 files changed, 72 insertions(+)
+ create mode 100755 tests/md/002
+ create mode 100644 tests/md/002.out
 
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index b9989717418d..3b644b0e9713 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -583,7 +583,13 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
- 	struct ppa_addr ppa;
- 	size_t left = nchks * sizeof(struct nvme_nvm_chk_meta);
- 	size_t log_pos, offset, len;
--	int ret, i;
-+	int ret, i, max_len;
+diff --git a/tests/md/002 b/tests/md/002
+new file mode 100755
+index 0000000..9da322a
+--- /dev/null
++++ b/tests/md/002
+@@ -0,0 +1,68 @@
++#!/bin/bash
++#
++# Create a raid10 (nearcopy=2) device of all given devices, and check
++# theirs are all in-sync afterwards.
++#
++# Copyright (C) 2018 Synology Inc.
++#
++# This program is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation, either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 +
-+	/*
-+	 * limit requests to maximum 256K to avoid issuing arbitrary large
-+	 * requests when the device does not specific a maximum transfer size.
-+	 */
-+	max_len = min_t(unsigned int, ctrl->max_hw_sectors << 9, 256 * 1024);
- 
- 	/* Normalize lba address space to obtain log offset */
- 	ppa.ppa = slba;
-@@ -596,7 +602,7 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
- 	offset = log_pos * sizeof(struct nvme_nvm_chk_meta);
- 
- 	while (left) {
--		len = min_t(unsigned int, left, ctrl->max_hw_sectors << 9);
-+		len = min_t(unsigned int, left, max_len);
- 
- 		ret = nvme_get_log_ext(ctrl, ns, NVME_NVM_LOG_REPORT_CHUNK,
- 				dev_meta, len, offset);
++. common/md
++
++DESCRIPTION="run raid10 (nearcopy=2) creation resync test"
++QUICK=1
++
++requires() {
++	_check_md_devname_available /dev/md/blktests2 && \
++	    _check_raid_devs_available && _meet_raid10_requirement
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	local size=${#RAID_DEVS[@]}
++	local devices=( "${RAID_DEVS[@]}" )
++
++	if [ $((size % 2)) -eq 1 ]; then
++		unset "devices[${#devices[@]}-1]"
++		size=$((size - 1))
++	fi
++
++	if [ -n "$LIMIT_DEV_SIZE" ]; then
++		mdadm -C /dev/md/blktests2 -R -l10 "-n$size" -pn2 \
++		    "${devices[@]}" -z "$LIMIT_DEV_SIZE" 2>&1 | grep started
++	else
++		mdadm -C /dev/md/blktests2 -R -l10 "-n$size" -pn2 \
++		    "${devices[@]}" 2>&1 | grep started
++	fi
++	if [ $? -ne 0 ]; then
++		echo "Array is not started."
++		return
++	fi
++
++	local md
++	md=$(basename "$(readlink /dev/md/blktests2)")
++	_wait_sync_completed "$md"
++
++	local mismatched
++	_check_integrity "$md"
++	mismatched=$(cat /sys/block/"$md"/md/mismatch_cnt)
++	mdadm -S /dev/md/blktests2
++
++	if [ "$mismatched" -ne 0 ]; then
++		echo "Array is not synced."
++	fi
++
++	echo "Test complete"
++}
+diff --git a/tests/md/002.out b/tests/md/002.out
+new file mode 100644
+index 0000000..356f3fe
+--- /dev/null
++++ b/tests/md/002.out
+@@ -0,0 +1,4 @@
++Running md/002
++mdadm: array /dev/md/blktests2 started.
++mdadm: stopped /dev/md/blktests2
++Test complete
 -- 
-2.11.0
+2.7.4
