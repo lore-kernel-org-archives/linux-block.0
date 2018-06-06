@@ -1,153 +1,744 @@
-Return-Path: <dvyukov@google.com>
-MIME-Version: 1.0
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Sat, 9 Jun 2018 11:34:11 +0200
-Message-ID: <CACT4Y+ZmRj61ia-WQBC=M72o=OZWk5LSnzf2qOEuOLHAa4do_A@mail.gmail.com>
-Subject: mainline boot is broken: KASAN: use-after-free in blk_flush_complete_seq
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Doug Ledford <dledford@redhat.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH v3 18/25] ibnbd: client: sysfs interface functions
+Date: Wed,  6 Jun 2018 17:25:08 +0200
+Message-Id: <20180606152515.25807-19-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
+References: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+This is the sysfs interface to IBNBD block devices on client side:
 
-Boot of mainline kernel is currently broken.
-On commit 7d3bf613e99abbd96ac7b90ee3694a246c975021.
-Config:
-https://gist.githubusercontent.com/dvyukov/9f7f1fd9e477efd85b221b3a21036c20/raw/7c56ede0840494b26045976960866f2b265c6f64/gistfile1.txt
-Should have been introduced very recently.
+  /sys/devices/virtual/ibnbd-client/ctl/
+    |- map_device
+    |  *** maps remote device
+    |
+    |- devices/
+       *** all mapped devices
 
-You may need to also patch "umh: fix race condition", because that's
-another boot crasher currently present in tree.
+  /sys/block/ibnbd<N>/ibnbd_client/
+    |- unmap_device
+    |  *** unmaps device
+    |
+    |- state
+    |  *** device state
+    |
+    |- session
+    |  *** session name
+    |
+    |- mapping_path
+       *** path of the dev that was mapped on server
 
-==================================================================
-BUG: KASAN: use-after-free in blk_flush_complete_seq+0xfde/0x1810
-block/blk-flush.c:215
-Read of size 4 at addr ffff880063f876d4 by task swapper/2/0
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jack Wang <jinpu.wang@profitbricks.com>
+---
+ drivers/block/ibnbd/ibnbd-clt-sysfs.c | 685 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 685 insertions(+)
+ create mode 100644 drivers/block/ibnbd/ibnbd-clt-sysfs.c
 
-CPU: 2 PID: 0 Comm: swapper/2 Not tainted 4.17.0+ #1
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
-Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x1a7/0x275 lib/dump_stack.c:113
- print_address_description+0x73/0x250 mm/kasan/report.c:256
- kasan_report_error mm/kasan/report.c:354 [inline]
- kasan_report+0x23c/0x360 mm/kasan/report.c:412
- __asan_report_load4_noabort+0x14/0x20 mm/kasan/report.c:432
- blk_flush_complete_seq+0xfde/0x1810 block/blk-flush.c:215
- flush_end_io+0x523/0xb50 block/blk-flush.c:257
- blk_finish_request+0x3fa/0x6a0 block/blk-core.c:3209
- scsi_end_request+0x3d3/0x820 drivers/scsi/scsi_lib.c:715
- scsi_io_completion+0x1869/0x1910 drivers/scsi/scsi_lib.c:898
- scsi_finish_command+0x4de/0x8d0 drivers/scsi/scsi.c:248
- scsi_softirq_done+0x3ad/0x4b0 drivers/scsi/scsi_lib.c:1683
- blk_done_softirq+0x48c/0x700 block/blk-softirq.c:37
- __do_softirq+0x2e0/0xb94 kernel/softirq.c:284
- invoke_softirq kernel/softirq.c:364 [inline]
- irq_exit+0x1cc/0x200 kernel/softirq.c:404
- exiting_irq arch/x86/include/asm/apic.h:525 [inline]
- do_IRQ+0xf1/0x190 arch/x86/kernel/irq.c:257
- common_interrupt+0xf/0xf arch/x86/entry/entry_64.S:642
- </IRQ>
-RIP: 0010:native_safe_halt+0x6/0x10 arch/x86/include/asm/irqflags.h:54
-Code: 48 89 df e8 5c 88 a3 fa e9 51 ff ff ff 4c 89 ef e8 4f 88 a3 fa
-eb 9b 90 90 90 90 90 90 90 90 90 90 90 90 90 55 48 89 e5 fb f4 <5d> c3
-0f 1f 84 00 00 00 00 00 55 48 89 e5 f4 5d c3 90 90 90 90 90
-RSP: 0000:ffff88006bdcfc38 EFLAGS: 00000282 ORIG_RAX: ffffffffffffffde
-RAX: dffffc0000000000 RBX: 1ffff1000d7b9f8a RCX: 0000000000000000
-RDX: 1ffffffff10e2b78 RSI: 0000000000000001 RDI: ffffffff88715bc0
-RBP: ffff88006bdcfc38 R08: ffffed000d9246d7 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000002
-R13: ffff88006bdcfcf0 R14: 0000000000000000 R15: ffffffff88715bb0
- arch_safe_halt arch/x86/include/asm/paravirt.h:94 [inline]
- default_idle+0xbf/0x440 arch/x86/kernel/process.c:500
- arch_cpu_idle+0x10/0x20 arch/x86/kernel/process.c:491
- default_idle_call+0x36/0x90 kernel/sched/idle.c:93
- cpuidle_idle_call kernel/sched/idle.c:153 [inline]
- do_idle+0x345/0x560 kernel/sched/idle.c:262
- cpu_startup_entry+0x104/0x120 kernel/sched/idle.c:368
- start_secondary+0x42b/0x5b0 arch/x86/kernel/smpboot.c:265
- secondary_startup_64+0xa5/0xb0 arch/x86/kernel/head_64.S:242
-
-Allocated by task 1:
- save_stack+0x43/0xd0 mm/kasan/kasan.c:448
- set_track mm/kasan/kasan.c:460 [inline]
- kasan_kmalloc+0xad/0xe0 mm/kasan/kasan.c:553
- __do_kmalloc_node mm/slab.c:3682 [inline]
- __kmalloc_node+0x47/0x70 mm/slab.c:3689
- kmalloc_node include/linux/slab.h:555 [inline]
- alloc_request_size+0x80/0x120 block/blk-core.c:844
- mempool_alloc+0x16c/0x4b0 mm/mempool.c:384
- __get_request block/blk-core.c:1424 [inline]
- get_request+0xe04/0x2480 block/blk-core.c:1535
- blk_queue_bio+0x5e9/0x1980 block/blk-core.c:2054
- generic_make_request+0x919/0x1540 block/blk-core.c:2447
- submit_bio+0x19a/0x4d0 block/blk-core.c:2555
- submit_bio_wait+0x137/0x1e0 block/bio.c:977
- blkdev_issue_flush+0x204/0x2f0 block/blk-flush.c:551
- jbd2_journal_recover+0x3f3/0x4b0 fs/jbd2/recovery.c:289
- jbd2_journal_load+0x256/0xca0 fs/jbd2/journal.c:1686
- ext4_load_journal fs/ext4/super.c:4704 [inline]
- ext4_fill_super+0x8e60/0xb700 fs/ext4/super.c:4076
- mount_bdev+0x2ba/0x370 fs/super.c:1174
- ext4_mount+0x34/0x40 fs/ext4/super.c:5771
- mount_fs+0x6b/0x2d0 fs/super.c:1277
- vfs_kern_mount.part.26+0xc6/0x4a0 fs/namespace.c:1037
- vfs_kern_mount fs/namespace.c:2515 [inline]
- do_new_mount fs/namespace.c:2518 [inline]
- do_mount+0xea4/0x2bd0 fs/namespace.c:2848
- ksys_mount+0xab/0x120 fs/namespace.c:3064
- do_mount_root init/do_mounts.c:366 [inline]
- mount_block_root+0x381/0x685 init/do_mounts.c:395
- mount_root+0x287/0x2bb init/do_mounts.c:540
- prepare_namespace+0x1cf/0x20c init/do_mounts.c:599
- kernel_init_freeable+0x53f/0x55d init/main.c:1154
- kernel_init+0x13/0x180 init/main.c:1061
- ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:412
-
-Freed by task 0:
- save_stack+0x43/0xd0 mm/kasan/kasan.c:448
- set_track mm/kasan/kasan.c:460 [inline]
- __kasan_slab_free+0x11a/0x170 mm/kasan/kasan.c:521
- kasan_slab_free+0xe/0x10 mm/kasan/kasan.c:528
- __cache_free mm/slab.c:3498 [inline]
- kfree+0xd9/0x260 mm/slab.c:3813
- free_request_size+0x5b/0x70 block/blk-core.c:859
- mempool_free+0xda/0x350 mm/mempool.c:493
- blk_free_request block/blk-core.c:1210 [inline]
- __blk_put_request+0x513/0xc70 block/blk-core.c:1768
- blk_finish_request+0x349/0x6a0 block/blk-core.c:3214
- __blk_end_bidi_request+0xeb/0x1e0 block/blk-core.c:3278
- __blk_end_request_all+0x129/0x270 block/blk-core.c:3368
- blk_flush_complete_seq+0xf92/0x1810 block/blk-flush.c:208
- flush_end_io+0x523/0xb50 block/blk-flush.c:257
- blk_finish_request+0x3fa/0x6a0 block/blk-core.c:3209
- scsi_end_request+0x3d3/0x820 drivers/scsi/scsi_lib.c:715
- scsi_io_completion+0x1869/0x1910 drivers/scsi/scsi_lib.c:898
- scsi_finish_command+0x4de/0x8d0 drivers/scsi/scsi.c:248
- scsi_softirq_done+0x3ad/0x4b0 drivers/scsi/scsi_lib.c:1683
- blk_done_softirq+0x48c/0x700 block/blk-softirq.c:37
- __do_softirq+0x2e0/0xb94 kernel/softirq.c:284
-
-The buggy address belongs to the object at ffff880063f876c0
- which belongs to the cache kmalloc-1024 of size 1024
-The buggy address is located 20 bytes inside of
- 1024-byte region [ffff880063f876c0, ffff880063f87ac0)
-The buggy address belongs to the page:
-page:ffffea00018fe180 count:1 mapcount:0 mapping:ffff88006c400ac0
-index:0x0 compound_mapcount: 0
-flags: 0x1fffc0000008100(slab|head)
-raw: 01fffc0000008100 ffffea00018fe108 ffff88006c401848 ffff88006c400ac0
-raw: 0000000000000000 ffff880063f86040 0000000100000007 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff880063f87580: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff880063f87600: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff880063f87680: fc fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb
-                                                 ^
- ffff880063f87700: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff880063f87780: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
+diff --git a/drivers/block/ibnbd/ibnbd-clt-sysfs.c b/drivers/block/ibnbd/ibnbd-clt-sysfs.c
+new file mode 100644
+index 000000000000..3d3659a74e94
+--- /dev/null
++++ b/drivers/block/ibnbd/ibnbd-clt-sysfs.c
+@@ -0,0 +1,685 @@
++/*
++ * InfiniBand Network Block Driver
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler <mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *          Kleber Souza <kleber.souza@profitbricks.com>
++ *          Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
++ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *          Swapnil Ingle <swapnil.ingle@profitbricks.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#undef pr_fmt
++#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
++
++#include <linux/types.h>
++#include <linux/ctype.h>
++#include <linux/parser.h>
++#include <linux/module.h>
++#include <linux/in6.h>
++#include <linux/fs.h>
++#include <linux/uaccess.h>
++#include <linux/device.h>
++#include <rdma/ib.h>
++#include <rdma/rdma_cm.h>
++
++#include "ibnbd-clt.h"
++
++static struct device *ibnbd_dev;
++static struct class *ibnbd_dev_class;
++static struct kobject *ibnbd_devs_kobj;
++
++enum {
++	IBNBD_OPT_ERR		= 0,
++	IBNBD_OPT_PATH		= 1 << 0,
++	IBNBD_OPT_DEV_PATH	= 1 << 1,
++	IBNBD_OPT_ACCESS_MODE	= 1 << 3,
++	IBNBD_OPT_IO_MODE	= 1 << 5,
++	IBNBD_OPT_SESSNAME	= 1 << 6,
++};
++
++static unsigned int ibnbd_opt_mandatory[] = {
++	IBNBD_OPT_PATH,
++	IBNBD_OPT_DEV_PATH,
++	IBNBD_OPT_SESSNAME,
++};
++
++static const match_table_t ibnbd_opt_tokens = {
++	{	IBNBD_OPT_PATH,		"path=%s"		},
++	{	IBNBD_OPT_DEV_PATH,	"device_path=%s"	},
++	{	IBNBD_OPT_ACCESS_MODE,	"access_mode=%s"	},
++	{	IBNBD_OPT_IO_MODE,	"io_mode=%s"		},
++	{	IBNBD_OPT_SESSNAME,	"sessname=%s"		},
++	{	IBNBD_OPT_ERR,		NULL			},
++};
++
++/* remove new line from string */
++static void strip(char *s)
++{
++	char *p = s;
++
++	while (*s != '\0') {
++		if (*s != '\n')
++			*p++ = *s++;
++		else
++			++s;
++	}
++	*p = '\0';
++}
++
++static int ibnbd_clt_parse_map_options(const char *buf,
++				       char *sessname,
++				       struct ibtrs_addr *paths,
++				       size_t *path_cnt,
++				       size_t max_path_cnt,
++				       char *pathname,
++				       enum ibnbd_access_mode *access_mode,
++				       enum ibnbd_io_mode *io_mode)
++{
++	char *options, *sep_opt;
++	char *p;
++	substring_t args[MAX_OPT_ARGS];
++	int opt_mask = 0;
++	int token;
++	int ret = -EINVAL;
++	int i;
++	int p_cnt = 0;
++
++	options = kstrdup(buf, GFP_KERNEL);
++	if (!options)
++		return -ENOMEM;
++
++	sep_opt = strstrip(options);
++	strip(sep_opt);
++	while ((p = strsep(&sep_opt, " ")) != NULL) {
++		if (!*p)
++			continue;
++
++		token = match_token(p, ibnbd_opt_tokens, args);
++		opt_mask |= token;
++
++		switch (token) {
++		case IBNBD_OPT_SESSNAME:
++			p = match_strdup(args);
++			if (!p) {
++				ret = -ENOMEM;
++				goto out;
++			}
++			if (strlen(p) > NAME_MAX) {
++				pr_err("map_device: sessname too long\n");
++				ret = -EINVAL;
++				kfree(p);
++				goto out;
++			}
++			strlcpy(sessname, p, NAME_MAX);
++			kfree(p);
++			break;
++
++		case IBNBD_OPT_PATH:
++			if (p_cnt >= max_path_cnt) {
++				pr_err("map_device: too many (> %zu) paths "
++				       "provided\n", max_path_cnt);
++				ret = -ENOMEM;
++				goto out;
++			}
++			p = match_strdup(args);
++			if (!p) {
++				ret = -ENOMEM;
++				goto out;
++			}
++
++			ret = ibtrs_addr_to_sockaddr(p, strlen(p), IBTRS_PORT,
++						     &paths[p_cnt]);
++			if (ret) {
++				pr_err("Can't parse path %s: %d\n", p, ret);
++				kfree(p);
++				goto out;
++			}
++
++			p_cnt++;
++
++			kfree(p);
++			break;
++
++		case IBNBD_OPT_DEV_PATH:
++			p = match_strdup(args);
++			if (!p) {
++				ret = -ENOMEM;
++				goto out;
++			}
++			if (strlen(p) > NAME_MAX) {
++				pr_err("map_device: Device path too long\n");
++				ret = -EINVAL;
++				kfree(p);
++				goto out;
++			}
++			strlcpy(pathname, p, NAME_MAX);
++			kfree(p);
++			break;
++
++		case IBNBD_OPT_ACCESS_MODE:
++			p = match_strdup(args);
++			if (!p) {
++				ret = -ENOMEM;
++				goto out;
++			}
++
++			if (!strcmp(p, "ro")) {
++				*access_mode = IBNBD_ACCESS_RO;
++			} else if (!strcmp(p, "rw")) {
++				*access_mode = IBNBD_ACCESS_RW;
++			} else if (!strcmp(p, "migration")) {
++				*access_mode = IBNBD_ACCESS_MIGRATION;
++			} else {
++				pr_err("map_device: Invalid access_mode:"
++				       " '%s'\n", p);
++				ret = -EINVAL;
++				kfree(p);
++				goto out;
++			}
++
++			kfree(p);
++			break;
++
++		case IBNBD_OPT_IO_MODE:
++			p = match_strdup(args);
++			if (!p) {
++				ret = -ENOMEM;
++				goto out;
++			}
++			if (!strcmp(p, "blockio")) {
++				*io_mode = IBNBD_BLOCKIO;
++			} else if (!strcmp(p, "fileio")) {
++				*io_mode = IBNBD_FILEIO;
++			} else {
++				pr_err("map_device: Invalid io_mode: '%s'.\n",
++				       p);
++				ret = -EINVAL;
++				kfree(p);
++				goto out;
++			}
++			kfree(p);
++			break;
++
++		default:
++			pr_err("map_device: Unknown parameter or missing value"
++			       " '%s'\n", p);
++			ret = -EINVAL;
++			goto out;
++		}
++	}
++
++	for (i = 0; i < ARRAY_SIZE(ibnbd_opt_mandatory); i++) {
++		if ((opt_mask & ibnbd_opt_mandatory[i])) {
++			ret = 0;
++		} else {
++			pr_err("map_device: Parameters missing\n");
++			ret = -EINVAL;
++			break;
++		}
++	}
++
++out:
++	*path_cnt = p_cnt;
++	kfree(options);
++	return ret;
++}
++
++static ssize_t ibnbd_clt_state_show(struct kobject *kobj,
++				    struct kobj_attribute *attr, char *page)
++{
++	struct ibnbd_clt_dev *dev;
++
++	dev = container_of(kobj, struct ibnbd_clt_dev, kobj);
++
++	switch (dev->dev_state) {
++	case (DEV_STATE_INIT):
++		return scnprintf(page, PAGE_SIZE, "init\n");
++	case (DEV_STATE_MAPPED):
++		/* TODO fix cli tool before changing to proper state */
++		return scnprintf(page, PAGE_SIZE, "open\n");
++	case (DEV_STATE_MAPPED_DISCONNECTED):
++		/* TODO fix cli tool before changing to proper state */
++		return scnprintf(page, PAGE_SIZE, "closed\n");
++	case (DEV_STATE_UNMAPPED):
++		return scnprintf(page, PAGE_SIZE, "unmapped\n");
++	default:
++		return scnprintf(page, PAGE_SIZE, "unknown\n");
++	}
++}
++
++static struct kobj_attribute ibnbd_clt_state_attr =
++	__ATTR(state, 0444, ibnbd_clt_state_show, NULL);
++
++static ssize_t ibnbd_clt_mapping_path_show(struct kobject *kobj,
++					   struct kobj_attribute *attr,
++					   char *page)
++{
++	struct ibnbd_clt_dev *dev;
++
++	dev = container_of(kobj, struct ibnbd_clt_dev, kobj);
++
++	return scnprintf(page, PAGE_SIZE, "%s\n", dev->pathname);
++}
++
++static struct kobj_attribute ibnbd_clt_mapping_path_attr =
++	__ATTR(mapping_path, 0444, ibnbd_clt_mapping_path_show, NULL);
++
++static ssize_t ibnbd_clt_io_mode_show(struct kobject *kobj,
++				      struct kobj_attribute *attr, char *page)
++{
++	struct ibnbd_clt_dev *dev;
++
++	dev = container_of(kobj, struct ibnbd_clt_dev, kobj);
++
++	return scnprintf(page, PAGE_SIZE, "%s\n",
++			 ibnbd_io_mode_str(dev->remote_io_mode));
++}
++
++static struct kobj_attribute ibnbd_clt_io_mode =
++	__ATTR(io_mode, 0444, ibnbd_clt_io_mode_show, NULL);
++
++static ssize_t ibnbd_clt_unmap_dev_show(struct kobject *kobj,
++					struct kobj_attribute *attr, char *page)
++{
++	return scnprintf(page, PAGE_SIZE, "Usage: echo <normal|force> > %s\n",
++			 attr->attr.name);
++}
++
++static ssize_t ibnbd_clt_unmap_dev_store(struct kobject *kobj,
++					 struct kobj_attribute *attr,
++					 const char *buf, size_t count)
++{
++	struct ibnbd_clt_dev *dev;
++	char *opt, *options;
++	bool force;
++	int err;
++
++	opt = kstrdup(buf, GFP_KERNEL);
++	if (!opt)
++		return -ENOMEM;
++
++	options = strstrip(opt);
++	strip(options);
++
++	dev = container_of(kobj, struct ibnbd_clt_dev, kobj);
++
++	if (sysfs_streq(options, "normal")) {
++		force = false;
++	} else if (sysfs_streq(options, "force")) {
++		force = true;
++	} else {
++		ibnbd_err(dev, "unmap_device: Invalid value: %s\n", options);
++		err = -EINVAL;
++		goto out;
++	}
++
++	ibnbd_info(dev, "Unmapping device, option: %s.\n",
++		   force ? "force" : "normal");
++
++	/*
++	 * We take explicit module reference only for one reason: do not
++	 * race with lockless ibnbd_destroy_sessions().
++	 */
++	if (!try_module_get(THIS_MODULE)) {
++		err = -ENODEV;
++		goto out;
++	}
++	err = ibnbd_clt_unmap_device(dev, force, &attr->attr);
++	if (unlikely(err)) {
++		if (unlikely(err != -EALREADY))
++			ibnbd_err(dev, "unmap_device: %d\n",  err);
++		goto module_put;
++	}
++
++	/*
++	 * Here device can be vanished!
++	 */
++
++	err = count;
++
++module_put:
++	module_put(THIS_MODULE);
++out:
++	kfree(opt);
++
++	return err;
++}
++
++static struct kobj_attribute ibnbd_clt_unmap_device_attr =
++	__ATTR(unmap_device, 0644, ibnbd_clt_unmap_dev_show,
++	       ibnbd_clt_unmap_dev_store);
++
++static ssize_t ibnbd_clt_resize_dev_show(struct kobject *kobj,
++					 struct kobj_attribute *attr,
++					 char *page)
++{
++	return scnprintf(page, PAGE_SIZE,
++			 "Usage: echo <new size in sectors> > %s\n",
++			 attr->attr.name);
++}
++
++static ssize_t ibnbd_clt_resize_dev_store(struct kobject *kobj,
++					  struct kobj_attribute *attr,
++					  const char *buf, size_t count)
++{
++	int ret;
++	unsigned long sectors;
++	struct ibnbd_clt_dev *dev;
++
++	dev = container_of(kobj, struct ibnbd_clt_dev, kobj);
++
++	ret = kstrtoul(buf, 0, &sectors);
++	if (ret)
++		return ret;
++
++	ret = ibnbd_clt_resize_disk(dev, (size_t)sectors);
++	if (ret)
++		return ret;
++
++	return count;
++}
++
++static struct kobj_attribute ibnbd_clt_resize_dev_attr =
++	__ATTR(resize, 0644, ibnbd_clt_resize_dev_show,
++	       ibnbd_clt_resize_dev_store);
++
++static ssize_t ibnbd_clt_remap_dev_show(struct kobject *kobj,
++					struct kobj_attribute *attr, char *page)
++{
++	return scnprintf(page, PAGE_SIZE, "Usage: echo <1> > %s\n",
++			 attr->attr.name);
++}
++
++static ssize_t ibnbd_clt_remap_dev_store(struct kobject *kobj,
++					 struct kobj_attribute *attr,
++					 const char *buf, size_t count)
++{
++	struct ibnbd_clt_dev *dev;
++	char *opt, *options;
++	int err;
++
++	opt = kstrdup(buf, GFP_KERNEL);
++	if (!opt)
++		return -ENOMEM;
++
++	options = strstrip(opt);
++	strip(options);
++
++	dev = container_of(kobj, struct ibnbd_clt_dev, kobj);
++	if (!sysfs_streq(options, "1")) {
++		ibnbd_err(dev, "remap_device: Invalid value: %s\n", options);
++		err = -EINVAL;
++		goto out;
++	}
++	err = ibnbd_clt_remap_device(dev);
++	if (likely(!err))
++		err = count;
++
++out:
++	kfree(opt);
++
++	return err;
++}
++
++static struct kobj_attribute ibnbd_clt_remap_device_attr =
++	__ATTR(remap_device, 0644, ibnbd_clt_remap_dev_show,
++	       ibnbd_clt_remap_dev_store);
++
++static ssize_t ibnbd_clt_session_show(struct kobject *kobj,
++				      struct kobj_attribute *attr,
++				      char *page)
++{
++	struct ibnbd_clt_dev *dev;
++
++	dev = container_of(kobj, struct ibnbd_clt_dev, kobj);
++
++	return scnprintf(page, PAGE_SIZE, "%s\n", dev->sess->sessname);
++}
++
++static struct kobj_attribute ibnbd_clt_session_attr =
++	__ATTR(session, 0444, ibnbd_clt_session_show, NULL);
++
++static struct attribute *ibnbd_dev_attrs[] = {
++	&ibnbd_clt_unmap_device_attr.attr,
++	&ibnbd_clt_resize_dev_attr.attr,
++	&ibnbd_clt_remap_device_attr.attr,
++	&ibnbd_clt_mapping_path_attr.attr,
++	&ibnbd_clt_state_attr.attr,
++	&ibnbd_clt_session_attr.attr,
++	&ibnbd_clt_io_mode.attr,
++	NULL,
++};
++
++void ibnbd_clt_remove_dev_symlink(struct ibnbd_clt_dev *dev)
++{
++	/*
++	 * The module_is_live() check is crucial and helps to avoid annoying
++	 * sysfs warning raised in sysfs_remove_link(), when the whole sysfs
++	 * path was just removed, see ibnbd_close_sessions().
++	 */
++	if (strlen(dev->blk_symlink_name) && module_is_live(THIS_MODULE))
++		sysfs_remove_link(ibnbd_devs_kobj, dev->blk_symlink_name);
++}
++
++static struct kobj_type ibnbd_dev_ktype = {
++	.sysfs_ops      = &kobj_sysfs_ops,
++	.default_attrs  = ibnbd_dev_attrs,
++};
++
++static int ibnbd_clt_add_dev_kobj(struct ibnbd_clt_dev *dev)
++{
++	int ret;
++	struct kobject *gd_kobj = &disk_to_dev(dev->gd)->kobj;
++
++	ret = kobject_init_and_add(&dev->kobj, &ibnbd_dev_ktype, gd_kobj, "%s",
++				   "ibnbd");
++	if (ret)
++		ibnbd_err(dev, "Failed to create device sysfs dir, err: %d\n",
++			  ret);
++
++	return ret;
++}
++
++static ssize_t ibnbd_clt_map_device_show(struct kobject *kobj,
++					 struct kobj_attribute *attr,
++					 char *page)
++{
++	return scnprintf(page, PAGE_SIZE, "Usage: echo \""
++			 "sessname=<name of the ibtrs session>"
++			 " path=<[srcaddr,]dstaddr>"
++			 " [path=<[srcaddr,]dstaddr>]"
++			 " device_path=<full path on remote side>"
++			 " [access_mode=<ro|rw|migration>]"
++			 " [io_mode=<fileio|blockio>]\" > %s\n\n"
++			 "addr ::= [ ip:<ipv4> | ip:<ipv6> | gid:<gid> ]\n",
++			 attr->attr.name);
++}
++
++static int ibnbd_clt_get_path_name(struct ibnbd_clt_dev *dev, char *buf,
++				   size_t len)
++{
++	int ret;
++	char pathname[NAME_MAX], *s;
++
++	strlcpy(pathname, dev->pathname, sizeof(pathname));
++	while ((s = strchr(pathname, '/')))
++		s[0] = '!';
++
++	ret = snprintf(buf, len, "%s", pathname);
++	if (ret >= len)
++		return -ENAMETOOLONG;
++
++	return 0;
++}
++
++static int ibnbd_clt_add_dev_symlink(struct ibnbd_clt_dev *dev)
++{
++	struct kobject *gd_kobj = &disk_to_dev(dev->gd)->kobj;
++	int ret;
++
++	ret = ibnbd_clt_get_path_name(dev, dev->blk_symlink_name,
++				      sizeof(dev->blk_symlink_name));
++	if (ret) {
++		ibnbd_err(dev, "Failed to get /sys/block symlink path, err: %d\n",
++			  ret);
++		goto out_err;
++	}
++
++	ret = sysfs_create_link(ibnbd_devs_kobj, gd_kobj,
++				dev->blk_symlink_name);
++	if (ret) {
++		ibnbd_err(dev, "Creating /sys/block symlink failed, err: %d\n",
++			  ret);
++		goto out_err;
++	}
++
++	return 0;
++
++out_err:
++	dev->blk_symlink_name[0] = '\0';
++	return ret;
++}
++
++static ssize_t ibnbd_clt_map_device_store(struct kobject *kobj,
++					  struct kobj_attribute *attr,
++					  const char *buf, size_t count)
++{
++	struct ibnbd_clt_dev *dev;
++	int ret;
++	char pathname[NAME_MAX];
++	char sessname[NAME_MAX];
++	enum ibnbd_access_mode access_mode = IBNBD_ACCESS_RW;
++	enum ibnbd_io_mode io_mode = IBNBD_AUTOIO;
++
++	struct sockaddr_storage *addrs;
++	struct ibtrs_addr paths[6];
++	size_t path_cnt;
++
++	addrs = kcalloc(ARRAY_SIZE(paths) * 2, sizeof(*addrs), GFP_KERNEL);
++	if (!addrs) {
++		pr_err("Can't alloc memory for addresses\n");
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	for (path_cnt = 0; path_cnt < ARRAY_SIZE(paths); path_cnt++) {
++		paths[path_cnt].src = &addrs[path_cnt * 2];
++		paths[path_cnt].dst = &addrs[path_cnt * 2 + 1];
++	}
++
++	ret = ibnbd_clt_parse_map_options(buf, sessname, paths,
++					  &path_cnt, ARRAY_SIZE(paths),
++					  pathname, &access_mode, &io_mode);
++	if (ret)
++		 goto out;
++
++	pr_info("Mapping device %s on session %s, (access_mode: %s, "
++		"io_mode: %s)\n", pathname, sessname,
++		ibnbd_access_mode_str(access_mode), ibnbd_io_mode_str(io_mode));
++
++	dev = ibnbd_clt_map_device(sessname, paths, path_cnt, pathname,
++				   access_mode, io_mode);
++	if (unlikely(IS_ERR(dev))) {
++		ret = PTR_ERR(dev);
++		goto out;
++	}
++
++	ret = ibnbd_clt_add_dev_kobj(dev);
++	if (unlikely(ret))
++		goto unmap_dev;
++
++	ret = ibnbd_clt_add_dev_symlink(dev);
++	if (ret)
++		goto unmap_dev;
++
++	kfree(addrs);
++	return count;
++
++unmap_dev:
++	ibnbd_clt_unmap_device(dev, true, NULL);
++out:
++	kfree(addrs);
++	return ret;
++}
++
++static struct kobj_attribute ibnbd_clt_map_device_attr =
++	__ATTR(map_device, 0644,
++	       ibnbd_clt_map_device_show, ibnbd_clt_map_device_store);
++
++static struct attribute *default_attrs[] = {
++	&ibnbd_clt_map_device_attr.attr,
++	NULL,
++};
++
++static struct attribute_group default_attr_group = {
++	.attrs = default_attrs,
++};
++
++int ibnbd_clt_create_sysfs_files(void)
++{
++	int err;
++
++	ibnbd_dev_class = class_create(THIS_MODULE, "ibnbd-client");
++	if (unlikely(IS_ERR(ibnbd_dev_class)))
++		return PTR_ERR(ibnbd_dev_class);
++
++	ibnbd_dev = device_create(ibnbd_dev_class, NULL,
++				  MKDEV(0, 0), NULL, "ctl");
++	if (unlikely(IS_ERR(ibnbd_dev))) {
++		err = PTR_ERR(ibnbd_dev);
++		goto cls_destroy;
++	}
++	ibnbd_devs_kobj = kobject_create_and_add("devices", &ibnbd_dev->kobj);
++	if (unlikely(!ibnbd_devs_kobj)) {
++		err = -ENOMEM;
++		goto dev_destroy;
++	}
++	err = sysfs_create_group(&ibnbd_dev->kobj, &default_attr_group);
++	if (unlikely(err))
++		goto put_devs_kobj;
++
++	return 0;
++
++put_devs_kobj:
++	kobject_del(ibnbd_devs_kobj);
++	kobject_put(ibnbd_devs_kobj);
++dev_destroy:
++	device_destroy(ibnbd_dev_class, MKDEV(0, 0));
++cls_destroy:
++	class_destroy(ibnbd_dev_class);
++
++	return err;
++}
++
++void ibnbd_clt_destroy_default_group(void)
++{
++	sysfs_remove_group(&ibnbd_dev->kobj, &default_attr_group);
++}
++
++void ibnbd_clt_destroy_sysfs_files(void)
++{
++	kobject_del(ibnbd_devs_kobj);
++	kobject_put(ibnbd_devs_kobj);
++	device_destroy(ibnbd_dev_class, MKDEV(0, 0));
++	class_destroy(ibnbd_dev_class);
++}
+-- 
+2.13.1
