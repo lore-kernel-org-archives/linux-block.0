@@ -1,18 +1,24 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
-Subject: Re: [PATCH] block: pass failfast and driver-specific flags to flush
- requests
-To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@intel.com>,
- linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
- Hannes Reinecke <hare@suse.com>
+Return-Path: <hch@lst.de>
+Date: Wed, 6 Jun 2018 16:42:08 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <keith.busch@intel.com>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH] block: pass failfast and driver-specific flags to
+	flush requests
+Message-ID: <20180606144208.GA20487@lst.de>
 References: <20180606142140.64146-1-hare@suse.de>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <0c24bdc3-70c9-d21f-a8cb-5bf53e66bc0e@grimberg.me>
-Date: Thu, 7 Jun 2018 11:48:46 +0300
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180606142140.64146-1-hare@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+On Wed, Jun 06, 2018 at 04:21:40PM +0200, Hannes Reinecke wrote:
+> If flush requests are being sent to the device we need to inherit the
+> failfast and driver-specific flags, too, otherwise I/O will fail.
+
+Looks fine,
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
