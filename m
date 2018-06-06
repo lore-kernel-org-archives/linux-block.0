@@ -1,258 +1,106 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-From: Tejun Heo <tj@kernel.org>
-To: axboe@kernel.dk
-Cc: michaelcallahan@fb.com,
-	newella@fb.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel-team@fb.com,
-	Tejun Heo <tj@kernel.org>
-Subject: [PATCH 5/6] block: Track DISCARD statistics and output them in stat and diskstat
-Date: Tue,  5 Jun 2018 11:01:19 -0700
-Message-Id: <20180605180120.2726113-6-tj@kernel.org>
-In-Reply-To: <20180605180120.2726113-1-tj@kernel.org>
-References: <20180605180120.2726113-1-tj@kernel.org>
+Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Doug Ledford <dledford@redhat.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH v3 23/25] ibnbd: include client and server modules into kernel compilation
+Date: Wed,  6 Jun 2018 17:25:13 +0200
+Message-Id: <20180606152515.25807-24-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
+References: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Michael Callahan <michaelcallahan@fb.com>
+Add IBNBD Makefile, Kconfig and also corresponding lines into upper
+block layer files.
 
-Add tracking of REQ_OP_DISCARD ios to the partition statistics and
-append them to the various stat files in /sys as well as
-/proc/diskstats.  These are tracked with the same four stats as reads
-and writes:
-
-Number of discard ios completed.
-Number of discard ios merged
-Number of discard sectors completed
-Milliseconds spent on discard requests
-
-This is done via adding a new STAT_DISCARD define to genhd.h and then
-using it to index that stat field for discard requests.
-
-tj: Refreshed on top of v4.17 and other previous updates.
-
-Signed-off-by: Michael Callahan <michaelcallahan@fb.com>
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Cc: Andy Newell <newella@fb.com>
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jack Wang <jinpu.wang@profitbricks.com>
 ---
- Documentation/ABI/testing/procfs-diskstats | 10 ++++++++++
- Documentation/block/stat.txt               | 28 ++++++++++++++++------------
- Documentation/iostats.txt                  | 15 +++++++++++++++
- block/genhd.c                              | 13 ++++++++++---
- block/partition-generic.c                  |  9 +++++++--
- include/linux/blk_types.h                  |  8 ++++++++
- include/linux/genhd.h                      |  3 ++-
- 7 files changed, 68 insertions(+), 18 deletions(-)
+ drivers/block/Kconfig        |  2 ++
+ drivers/block/Makefile       |  1 +
+ drivers/block/ibnbd/Kconfig  | 22 ++++++++++++++++++++++
+ drivers/block/ibnbd/Makefile | 11 +++++++++++
+ 4 files changed, 36 insertions(+)
+ create mode 100644 drivers/block/ibnbd/Kconfig
+ create mode 100644 drivers/block/ibnbd/Makefile
 
-diff --git a/Documentation/ABI/testing/procfs-diskstats b/Documentation/ABI/testing/procfs-diskstats
-index f91a973..abac31d 100644
---- a/Documentation/ABI/testing/procfs-diskstats
-+++ b/Documentation/ABI/testing/procfs-diskstats
-@@ -5,6 +5,7 @@ Contact:	Jerome Marchand <jmarchan@redhat.com>
- 		The /proc/diskstats file displays the I/O statistics
- 		of block devices. Each line contains the following 14
- 		fields:
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index ad9b687a236a..d8c1590411c8 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -481,4 +481,6 @@ config BLK_DEV_RSXX
+ 	  To compile this driver as a module, choose M here: the
+ 	  module will be called rsxx.
+ 
++source "drivers/block/ibnbd/Kconfig"
 +
- 		 1 - major number
- 		 2 - minor mumber
- 		 3 - device name
-@@ -19,4 +20,13 @@ Contact:	Jerome Marchand <jmarchan@redhat.com>
- 		12 - I/Os currently in progress
- 		13 - time spent doing I/Os (ms)
- 		14 - weighted time spent doing I/Os (ms)
+ endif # BLK_DEV
+diff --git a/drivers/block/Makefile b/drivers/block/Makefile
+index dc061158b403..65346a1d0b1a 100644
+--- a/drivers/block/Makefile
++++ b/drivers/block/Makefile
+@@ -38,6 +38,7 @@ obj-$(CONFIG_BLK_DEV_PCIESSD_MTIP32XX)	+= mtip32xx/
+ obj-$(CONFIG_BLK_DEV_RSXX) += rsxx/
+ obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk.o
+ obj-$(CONFIG_ZRAM) += zram/
++obj-$(CONFIG_BLK_DEV_IBNBD)	+= ibnbd/
+ 
+ skd-y		:= skd_main.o
+ swim_mod-y	:= swim.o swim_asm.o
+diff --git a/drivers/block/ibnbd/Kconfig b/drivers/block/ibnbd/Kconfig
+new file mode 100644
+index 000000000000..b381c6c084d2
+--- /dev/null
++++ b/drivers/block/ibnbd/Kconfig
+@@ -0,0 +1,22 @@
++config BLK_DEV_IBNBD
++	bool
 +
-+		Kernel 4.18+ appends four more fields for discard
-+		tracking putting the total at 18:
++config BLK_DEV_IBNBD_CLIENT
++	tristate "Network block device driver on top of IBTRS transport"
++	depends on INFINIBAND_IBTRS_CLIENT
++	select BLK_DEV_IBNBD
++	help
++	  IBNBD client allows for mapping of a remote block devices over
++	  IBTRS protocol from a target system where IBNBD server is running.
 +
-+		15 - discards completed successfully
-+		16 - discards merged
-+		17 - sectors discarded
-+		18 - time spent discarding
++	  If unsure, say N.
 +
- 		For more details refer to Documentation/iostats.txt
-diff --git a/Documentation/block/stat.txt b/Documentation/block/stat.txt
-index 0dbc946..0aace9c 100644
---- a/Documentation/block/stat.txt
-+++ b/Documentation/block/stat.txt
-@@ -31,28 +31,32 @@ write ticks     milliseconds  total wait time for write requests
- in_flight       requests      number of I/Os currently in flight
- io_ticks        milliseconds  total time this block device has been active
- time_in_queue   milliseconds  total wait time for all requests
-+discard I/Os    requests      number of discard I/Os processed
-+discard merges  requests      number of discard I/Os merged with in-queue I/O
-+discard sectors sectors       number of sectors discarded
-+discard ticks   milliseconds  total wait time for discard requests
- 
--read I/Os, write I/Os
--=====================
-+read I/Os, write I/Os, discard I/0s
-+===================================
- 
- These values increment when an I/O request completes.
- 
--read merges, write merges
--=========================
-+read merges, write merges, discard merges
-+=========================================
- 
- These values increment when an I/O request is merged with an
- already-queued I/O request.
- 
--read sectors, write sectors
--===========================
-+read sectors, write sectors, discard_sectors
-+============================================
- 
--These values count the number of sectors read from or written to this
--block device.  The "sectors" in question are the standard UNIX 512-byte
--sectors, not any device- or filesystem-specific block size.  The
--counters are incremented when the I/O completes.
-+These values count the number of sectors read from, written to, or
-+discarded from this block device.  The "sectors" in question are the
-+standard UNIX 512-byte sectors, not any device- or filesystem-specific
-+block size.  The counters are incremented when the I/O completes.
- 
--read ticks, write ticks
--=======================
-+read ticks, write ticks, discard ticks
-+======================================
- 
- These values count the number of milliseconds that I/O requests have
- waited on this block device.  If there are multiple I/O requests waiting,
-diff --git a/Documentation/iostats.txt b/Documentation/iostats.txt
-index 04d394a..49df45f 100644
---- a/Documentation/iostats.txt
-+++ b/Documentation/iostats.txt
-@@ -31,6 +31,9 @@ and so should not differ.
-       3    0   hda 446216 784926 9550688 4382310 424847 312726 5922052 19310380 0 3376340 23705160
-       3    1   hda1 35486 38030 38030 38030
- 
-+   4.18+ diskstats:
-+      3    0   hda 446216 784926 9550688 4382310 424847 312726 5922052 19310380 0 3376340 23705160 0 0 0 0
++config BLK_DEV_IBNBD_SERVER
++	tristate "Network block device over RDMA Infiniband server support"
++	depends on INFINIBAND_IBTRS_SERVER
++	select BLK_DEV_IBNBD
++	help
++	  IBNBD server allows for exporting local block devices to a remote client
++	  over IBTRS protocol.
 +
- On 2.4 you might execute ``grep 'hda ' /proc/partitions``. On 2.6+, you have
- a choice of ``cat /sys/block/hda/stat`` or ``grep 'hda ' /proc/diskstats``.
- 
-@@ -101,6 +104,18 @@ Field 11 -- weighted # of milliseconds spent doing I/Os
-     last update of this field.  This can provide an easy measure of both
-     I/O completion time and the backlog that may be accumulating.
- 
-+Field 12 -- # of discards completed
-+    This is the total number of discards completed successfully.
++	  If unsure, say N.
+diff --git a/drivers/block/ibnbd/Makefile b/drivers/block/ibnbd/Makefile
+new file mode 100644
+index 000000000000..ac906036310e
+--- /dev/null
++++ b/drivers/block/ibnbd/Makefile
+@@ -0,0 +1,11 @@
++ccflags-y := -Idrivers/infiniband/ulp/ibtrs
 +
-+Field 13 -- # of discards merged
-+    See the description of field 2
++ibnbd-client-y := ibnbd-clt.o \
++		  ibnbd-clt-sysfs.o
 +
-+Field 14 -- # of sectors discarded
-+    This is the total number of sectors discarded successfully.
++ibnbd-server-y := ibnbd-srv.o \
++		  ibnbd-srv-dev.o \
++		  ibnbd-srv-sysfs.o
 +
-+Field 15 -- # of milliseconds spent discarding
-+    This is the total number of milliseconds spent by all discards (as
-+    measured from __make_request() to end_that_request_last()).
- 
- To avoid introducing performance bottlenecks, no locks are held while
- modifying these counters.  This implies that minor inaccuracies may be
-diff --git a/block/genhd.c b/block/genhd.c
-index 0711a80..8cc719a3 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1333,8 +1333,11 @@ static int diskstats_show(struct seq_file *seqf, void *v)
- 		part_round_stats(gp->queue, cpu, hd);
- 		part_stat_unlock();
- 		part_in_flight(gp->queue, hd, inflight);
--		seq_printf(seqf, "%4d %7d %s %lu %lu %lu "
--			   "%u %lu %lu %lu %u %u %u %u\n",
-+		seq_printf(seqf, "%4d %7d %s "
-+			   "%lu %lu %lu %u "
-+			   "%lu %lu %lu %u "
-+			   "%u %u %u "
-+			   "%lu %lu %lu %u\n",
- 			   MAJOR(part_devt(hd)), MINOR(part_devt(hd)),
- 			   disk_name(gp, hd->partno, buf),
- 			   part_stat_read(hd, ios[STAT_READ]),
-@@ -1347,7 +1350,11 @@ static int diskstats_show(struct seq_file *seqf, void *v)
- 			   jiffies_to_msecs(part_stat_read(hd, ticks[STAT_WRITE])),
- 			   inflight[0],
- 			   jiffies_to_msecs(part_stat_read(hd, io_ticks)),
--			   jiffies_to_msecs(part_stat_read(hd, time_in_queue))
-+			   jiffies_to_msecs(part_stat_read(hd, time_in_queue)),
-+			   part_stat_read(hd, ios[STAT_DISCARD]),
-+			   part_stat_read(hd, merges[STAT_DISCARD]),
-+			   part_stat_read(hd, sectors[STAT_DISCARD]),
-+			   jiffies_to_msecs(part_stat_read(hd, ticks[STAT_DISCARD]))
- 			);
- 	}
- 	disk_part_iter_exit(&piter);
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 0ddb067..5a8975a 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -130,7 +130,8 @@ ssize_t part_stat_show(struct device *dev,
- 	return sprintf(buf,
- 		"%8lu %8lu %8llu %8u "
- 		"%8lu %8lu %8llu %8u "
--		"%8u %8u %8u"
-+		"%8u %8u %8u "
-+		"%8lu %8lu %8llu %8u"
- 		"\n",
- 		part_stat_read(p, ios[STAT_READ]),
- 		part_stat_read(p, merges[STAT_READ]),
-@@ -142,7 +143,11 @@ ssize_t part_stat_show(struct device *dev,
- 		jiffies_to_msecs(part_stat_read(p, ticks[STAT_WRITE])),
- 		inflight[0],
- 		jiffies_to_msecs(part_stat_read(p, io_ticks)),
--		jiffies_to_msecs(part_stat_read(p, time_in_queue)));
-+		jiffies_to_msecs(part_stat_read(p, time_in_queue)),
-+		part_stat_read(p, ios[STAT_DISCARD]),
-+		part_stat_read(p, merges[STAT_DISCARD]),
-+		(unsigned long long)part_stat_read(p, sectors[STAT_DISCARD]),
-+		jiffies_to_msecs(part_stat_read(p, ticks[STAT_DISCARD])));
- }
- 
- ssize_t part_inflight_show(struct device *dev, struct device_attribute *attr,
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 698890a..6d72eb2 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -361,6 +361,7 @@ enum req_flag_bits {
- enum stat_group {
- 	STAT_READ,
- 	STAT_WRITE,
-+	STAT_DISCARD,
- 
- 	NR_STAT_GROUPS
- };
-@@ -402,8 +403,15 @@ static inline bool op_is_sync(unsigned int op)
- 		(op & (REQ_SYNC | REQ_FUA | REQ_PREFLUSH));
- }
- 
-+static inline bool op_is_discard(unsigned int op)
-+{
-+	return (op & REQ_OP_MASK) == REQ_OP_DISCARD;
-+}
-+
- static inline int op_stat_group(unsigned int op)
- {
-+	if (op_is_discard(op))
-+		return STAT_DISCARD;
- 	return op_is_write(op);
- }
- 
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index a754454..5786442 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -356,7 +356,8 @@ static inline void free_part_stats(struct hd_struct *part)
- 
- #define part_stat_read_accum(part, field)				\
- 	(part_stat_read(part, field[STAT_READ]) +			\
--	 part_stat_read(part, field[STAT_WRITE]))
-+	 part_stat_read(part, field[STAT_WRITE]) +			\
-+	 part_stat_read(part, field[STAT_DISCARD]))
- 
- #define part_stat_add(cpu, part, field, addnd)	do {			\
- 	__part_stat_add((cpu), (part), field, addnd);			\
++obj-$(CONFIG_BLK_DEV_IBNBD_CLIENT) += ibnbd-client.o
++obj-$(CONFIG_BLK_DEV_IBNBD_SERVER) += ibnbd-server.o
 -- 
-2.9.5
+2.13.1
