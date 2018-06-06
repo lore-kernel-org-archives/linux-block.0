@@ -1,72 +1,113 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51548 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S932110AbeFIMev (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 9 Jun 2018 08:34:51 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 22/30] ext4: conver to bio_for_each_chunk_segment_all
-Date: Sat,  9 Jun 2018 20:30:06 +0800
-Message-Id: <20180609123014.8861-23-ming.lei@redhat.com>
-In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
-References: <20180609123014.8861-1-ming.lei@redhat.com>
+Received: from synology.com ([59.124.61.242]:54164 "EHLO synology.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932316AbeFFIKt (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 6 Jun 2018 04:10:49 -0400
+From: bingjingc <bingjingc@synology.com>
+To: linux-block@vger.kernel.org
+Cc: bingjingc@synology.com, cccheng@synology.com
+Subject: [PATCH blktests 6/9] blktests: add a regression test for raid1 recovery
+Date: Wed,  6 Jun 2018 16:10:43 +0800
+Message-Id: <1528272643-18963-1-git-send-email-bingjingc@synology.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-bio_for_each_segment_all() can't be used any more after multipage bvec is
-enabled, so we have to convert to bio_for_each_chunk_segment_all().
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Chung-Chiang Cheng <cccheng@synology.com>
+Signed-off-by: BingJing Chang <bingjingc@synology.com>
 ---
- fs/ext4/page-io.c  | 3 ++-
- fs/ext4/readpage.c | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ tests/md/005     | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/md/005.out |  4 ++++
+ 2 files changed, 76 insertions(+)
+ create mode 100755 tests/md/005
+ create mode 100644 tests/md/005.out
 
-diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
-index db7590178dfc..d4e737e51176 100644
---- a/fs/ext4/page-io.c
-+++ b/fs/ext4/page-io.c
-@@ -63,8 +63,9 @@ static void ext4_finish_bio(struct bio *bio)
- {
- 	int i;
- 	struct bio_vec *bvec;
-+	struct bvec_chunk_iter citer;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
- 		struct page *page = bvec->bv_page;
- #ifdef CONFIG_EXT4_FS_ENCRYPTION
- 		struct page *data_page = NULL;
-diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
-index 9ffa6fad18db..234e4486a90c 100644
---- a/fs/ext4/readpage.c
-+++ b/fs/ext4/readpage.c
-@@ -72,6 +72,7 @@ static void mpage_end_io(struct bio *bio)
- {
- 	struct bio_vec *bv;
- 	int i;
-+	struct bvec_chunk_iter citer;
- 
- 	if (ext4_bio_encrypted(bio)) {
- 		if (bio->bi_status) {
-@@ -81,7 +82,7 @@ static void mpage_end_io(struct bio *bio)
- 			return;
- 		}
- 	}
--	bio_for_each_segment_all(bv, bio, i) {
-+	bio_for_each_chunk_segment_all(bv, bio, i, citer) {
- 		struct page *page = bv->bv_page;
- 
- 		if (!bio->bi_status) {
+diff --git a/tests/md/005 b/tests/md/005
+new file mode 100755
+index 0000000..e526e74
+--- /dev/null
++++ b/tests/md/005
+@@ -0,0 +1,72 @@
++#!/bin/bash
++#
++# RAID1 recovery test
++#
++# Copyright (C) 2018 Synology Inc.
++#
++# This program is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation, either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++. common/md
++
++DESCRIPTION="run raid1 recovery test"
++QUICK=1
++
++requires() {
++	_check_md_devname_available /dev/md/blktests5 && \
++	    _have_program cmp && _have_spares && _meet_raid1_requirement && \
++	    _check_raid_devs_available && _check_raid_spares_available
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	if [ -n "$LIMIT_DEV_SIZE" ]; then
++		mdadm -C /dev/md/blktests5 -R -l1 "-n${#RAID_DEVS[@]}" \
++		    "${RAID_DEVS[@]}" -z "$LIMIT_DEV_SIZE" 2>&1 | grep started
++	else
++		mdadm -C /dev/md/blktests5 -R -l1 "-n${#RAID_DEVS[@]}" \
++		    "${RAID_DEVS[@]}" 2>&1 | grep started
++	fi
++	if [ $? -ne 0 ]; then
++		echo "Array is not started."
++		return
++	fi
++
++	local md
++	md=$(basename "$(readlink /dev/md/blktests5)")
++	_wait_sync_completed "$md"
++
++	# blktests doesn't support regex on *.out, so ignore the result.
++	mdadm /dev/md/blktests5 -f "${RAID_DEVS[0]}" 2>/dev/null
++	mdadm /dev/md/blktests5 -r "${RAID_DEVS[0]}" 2>/dev/null
++	mdadm /dev/md/blktests5 -a "${RAID_SPARE_DEVS[0]}" 2>/dev/null
++	_wait_recovery_completed "$md"
++
++	local skip1
++	local skip2
++	local size
++	skip1=$(mdadm -E "${RAID_DEVS[0]}" | grep "Data Offset" | \
++	    grep -o "[0-9]*")
++	skip2=$(mdadm -E "${RAID_SPARE_DEVS[0]}" | grep "Data Offset" | \
++	    grep -o "[0-9]*")
++	size=$(cat /sys/block/"$md"/md/component_size)
++	mdadm -S /dev/md/blktests5
++	skip1=$((skip1 * 512))
++	skip2=$((skip2 * 512))
++	size=$((size * 1024))
++	cmp -i "$skip1:$skip2" -n "$size" "${RAID_DEVS[0]}" \
++	    "${RAID_SPARE_DEVS[0]}"
++
++	echo "Test complete"
++}
+diff --git a/tests/md/005.out b/tests/md/005.out
+new file mode 100644
+index 0000000..ec5b2bd
+--- /dev/null
++++ b/tests/md/005.out
+@@ -0,0 +1,4 @@
++Running md/005
++mdadm: array /dev/md/blktests5 started.
++mdadm: stopped /dev/md/blktests5
++Test complete
 -- 
-2.9.5
+2.7.4
