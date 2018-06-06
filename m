@@ -1,29 +1,102 @@
-Return-Path: <keith.busch@linux.intel.com>
-Date: Mon, 4 Jun 2018 13:38:56 -0600
-From: Keith Busch <keith.busch@linux.intel.com>
-To: Omar Sandoval <osandov@osandov.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Yi Zhang <yi.zhang@redhat.com>, linux-nvme@lists.infradead.org,
-	Ming Lei <ming.lei@redhat.com>, Keith Busch <keith.busch@intel.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH blktests] Fix block/011 to not use sysfs for device
- disabling
-Message-ID: <20180604193856.GA8205@localhost.localdomain>
-References: <20180518174247.31098-1-keith.busch@intel.com>
- <1352065975.3088816.1526884676038.JavaMail.zimbra@redhat.com>
- <20180521140821.GB5528@localhost.localdomain>
- <20180529195428.GE23487@vader>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180529195428.GE23487@vader>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from synology.com ([59.124.61.242]:53441 "EHLO synology.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932316AbeFFIKR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 6 Jun 2018 04:10:17 -0400
+From: bingjingc <bingjingc@synology.com>
+To: linux-block@vger.kernel.org
+Cc: bingjingc@synology.com, cccheng@synology.com
+Subject: [PATCH blktests 5/9] blktests: add a regression test for raid6 creation resync
+Date: Wed,  6 Jun 2018 16:10:10 +0800
+Message-Id: <1528272610-17338-1-git-send-email-bingjingc@synology.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Tue, May 29, 2018 at 12:54:28PM -0700, Omar Sandoval wrote:
-> What's the plan for this test? Do you have a v2 coming?
+Reviewed-by: Chung-Chiang Cheng <cccheng@synology.com>
+Signed-off-by: BingJing Chang <bingjingc@synology.com>
+---
+ tests/md/004     | 60 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/md/004.out |  4 ++++
+ 2 files changed, 64 insertions(+)
+ create mode 100755 tests/md/004
+ create mode 100644 tests/md/004.out
 
-Sorry for the delay. I've been out on holiday, but I'm catching up
-quickly and will send a v2 shortly.
-
-Thanks,
-Keith
+diff --git a/tests/md/004 b/tests/md/004
+new file mode 100755
+index 0000000..591e096
+--- /dev/null
++++ b/tests/md/004
+@@ -0,0 +1,60 @@
++#!/bin/bash
++#
++# Create a raid6 device of all given devices, and check theirs are
++# all in-sync afterwards.
++#
++# Copyright (C) 2018 Synology Inc.
++#
++# This program is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation, either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++. common/md
++
++DESCRIPTION="run raid6 creation resync test"
++QUICK=1
++
++requires() {
++	_check_md_devname_available /dev/md/blktests4 && \
++	    _check_raid_devs_available && _meet_raid6_requirement
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	if [ -n "$LIMIT_DEV_SIZE" ]; then
++		mdadm -C /dev/md/blktests4 -R -l6 "-n${#RAID_DEVS[@]}"\
++		    "${RAID_DEVS[@]}" -z "$LIMIT_DEV_SIZE" 2>&1 | grep started
++	else
++		mdadm -C /dev/md/blktests4 -R -l6 "-n${#RAID_DEVS[@]}"\
++		    "${RAID_DEVS[@]}" 2>&1 | grep started
++	fi
++	if [ $? -ne 0 ]; then
++		echo "Array is not started."
++		return
++	fi
++
++	local md
++	md=$(basename "$(readlink /dev/md/blktests4)")
++	_wait_sync_completed "$md"
++
++	local mismatched
++	_check_integrity "$md"
++	mismatched=$(cat /sys/block/"$md"/md/mismatch_cnt)
++	mdadm -S /dev/md/blktests4
++
++	if [ "$mismatched" -ne 0 ]; then
++		echo "Array is not synced."
++	fi
++
++	echo "Test complete"
++}
+\ No newline at end of file
+diff --git a/tests/md/004.out b/tests/md/004.out
+new file mode 100644
+index 0000000..1c9b7a8
+--- /dev/null
++++ b/tests/md/004.out
+@@ -0,0 +1,4 @@
++Running md/004
++mdadm: array /dev/md/blktests4 started.
++mdadm: stopped /dev/md/blktests4
++Test complete
+-- 
+2.7.4
