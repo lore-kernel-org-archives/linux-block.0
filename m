@@ -1,63 +1,484 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:61433 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935781AbeFMPgo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jun 2018 11:36:44 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "stable@vger.kernel.org" <stable@vger.kernel.org>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>
-Subject: [Backport request] blkdev_report_zones_ioctl(): Use vmalloc() to
- allocate large buffers
-Date: Wed, 13 Jun 2018 15:36:42 +0000
-Message-ID: <021c1029a42253c749a182a38d9709c2cd8db0df.camel@wdc.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Doug Ledford <dledford@redhat.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH v3 15/25] ibnbd: private headers with IBNBD protocol structs and helpers
+Date: Wed,  6 Jun 2018 17:25:05 +0200
+Message-Id: <20180606152515.25807-16-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
+References: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
+List-ID: <linux-block@vger.kernel.org>
 
-SGVsbG8gc3RhYmxlIGtlcm5lbCBtYWludGFpbmVycywNCg0KUGxlYXNlIGJhY2twb3J0IHBhdGNo
-IDMyN2VhNGFkY2ZhMyAoImJsa2Rldl9yZXBvcnRfem9uZXNfaW9jdGwoKToNClVzZSB2bWFsbG9j
-KCkgdG8gYWxsb2NhdGUgbGFyZ2UgYnVmZmVycyIpIHRvIGF0IGxlYXN0IHRoZSB2NC4xNy54IGFu
-ZA0KdjQuMTQueSBzdGFibGUga2VybmVsIHNlcmllcy4gVGhhdCBwYXRjaCBmaXhlcyBhIGJ1ZyBp
-bnRyb2R1Y2VkIGluDQprZXJuZWwgdjQuMTAuIFRoZSBlbnRpcmUgcGF0Y2ggaXMgc2hvd24gYmVs
-b3cuDQoNClRoYW5rcywNCg0KQmFydC4NCg0KDQpjb21taXQgY2YwMTEwNjk4ODQ2ZmM1YTkzZGY4
-OWViMjBhYzdjYzcwYTg2MGMxNw0KQXV0aG9yOiBCYXJ0IFZhbiBBc3NjaGUgPGJhcnQudmFuYXNz
-Y2hlQHdkYy5jb20+DQpEYXRlOiAgIFR1ZSBNYXkgMjIgMDg6Mjc6MjIgMjAxOCAtMDcwMA0KDQog
-ICAgYmxrZGV2X3JlcG9ydF96b25lc19pb2N0bCgpOiBVc2Ugdm1hbGxvYygpIHRvIGFsbG9jYXRl
-IGxhcmdlIGJ1ZmZlcnMNCiAgICANCiAgICBBdm9pZCB0aGF0IGNvbXBsYWludHMgc2ltaWxhciB0
-byB0aGUgZm9sbG93aW5nIGFwcGVhciBpbiB0aGUga2VybmVsIGxvZw0KICAgIGlmIHRoZSBudW1i
-ZXIgb2Ygem9uZXMgaXMgc3VmZmljaWVudGx5IGxhcmdlOg0KICAgIA0KICAgICAgZmlvOiBwYWdl
-IGFsbG9jYXRpb24gZmFpbHVyZTogb3JkZXI6OSwgbW9kZToweDE0MGMwYzAoR0ZQX0tFUk5FTHxf
-X0dGUF9DT01QfF9fR0ZQX1pFUk8pLCBub2RlbWFzaz0obnVsbCkNCiAgICAgIENhbGwgVHJhY2U6
-DQogICAgICBkdW1wX3N0YWNrKzB4NjMvMHg4OA0KICAgICAgd2Fybl9hbGxvYysweGY1LzB4MTkw
-DQogICAgICBfX2FsbG9jX3BhZ2VzX3Nsb3dwYXRoKzB4OGYwLzB4YjBkDQogICAgICBfX2FsbG9j
-X3BhZ2VzX25vZGVtYXNrKzB4MjQyLzB4MjYwDQogICAgICBhbGxvY19wYWdlc19jdXJyZW50KzB4
-NmEvMHhiMA0KICAgICAga21hbGxvY19vcmRlcisweDE4LzB4NTANCiAgICAgIGttYWxsb2Nfb3Jk
-ZXJfdHJhY2UrMHgyNi8weGIwDQogICAgICBfX2ttYWxsb2MrMHgyMGUvMHgyMjANCiAgICAgIGJs
-a2Rldl9yZXBvcnRfem9uZXNfaW9jdGwrMHhhNS8weDFhMA0KICAgICAgYmxrZGV2X2lvY3RsKzB4
-MWJhLzB4OTMwDQogICAgICBibG9ja19pb2N0bCsweDQxLzB4NTANCiAgICAgIGRvX3Zmc19pb2N0
-bCsweGFhLzB4NjEwDQogICAgICBTeVNfaW9jdGwrMHg3OS8weDkwDQogICAgICBkb19zeXNjYWxs
-XzY0KzB4NzkvMHgxYjANCiAgICAgIGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJfaHdmcmFtZSsweDNk
-LzB4YTINCiAgICANCiAgICBGaXhlczogM2VkMDVhOTg3ZTBmICgiYmxrLXpvbmVkOiBpbXBsZW1l
-bnQgaW9jdGxzIikNCiAgICBTaWduZWQtb2ZmLWJ5OiBCYXJ0IFZhbiBBc3NjaGUgPGJhcnQudmFu
-YXNzY2hlQHdkYy5jb20+DQogICAgQ2M6IFNoYXVuIFRhbmNoZWZmIDxzaGF1bi50YW5jaGVmZkBz
-ZWFnYXRlLmNvbT4NCiAgICBDYzogRGFtaWVuIExlIE1vYWwgPGRhbWllbi5sZW1vYWxAaGdzdC5j
-b20+DQogICAgQ2M6IENocmlzdG9waCBIZWxsd2lnIDxoY2hAbHN0LmRlPg0KICAgIENjOiBNYXJ0
-aW4gSy4gUGV0ZXJzZW4gPG1hcnRpbi5wZXRlcnNlbkBvcmFjbGUuY29tPg0KICAgIENjOiBIYW5u
-ZXMgUmVpbmVja2UgPGhhcmVAc3VzZS5jb20+DQogICAgQ2M6IDxzdGFibGVAdmdlci5rZXJuZWwu
-b3JnPg0KICAgIFNpZ25lZC1vZmYtYnk6IEplbnMgQXhib2UgPGF4Ym9lQGtlcm5lbC5kaz4NCg0K
-ZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay16b25lZC5jIGIvYmxvY2svYmxrLXpvbmVkLmMNCmluZGV4
-IDA4ZTg0ZWYyYmMwNS4uM2QwOGRjODRkYjE2IDEwMDY0NA0KLS0tIGEvYmxvY2svYmxrLXpvbmVk
-LmMNCisrKyBiL2Jsb2NrL2Jsay16b25lZC5jDQpAQCAtMzI4LDcgKzMyOCwxMSBAQCBpbnQgYmxr
-ZGV2X3JlcG9ydF96b25lc19pb2N0bChzdHJ1Y3QgYmxvY2tfZGV2aWNlICpiZGV2LCBmbW9kZV90
-IG1vZGUsDQogCWlmICghcmVwLm5yX3pvbmVzKQ0KIAkJcmV0dXJuIC1FSU5WQUw7DQogDQotCXpv
-bmVzID0ga2NhbGxvYyhyZXAubnJfem9uZXMsIHNpemVvZihzdHJ1Y3QgYmxrX3pvbmUpLCBHRlBf
-S0VSTkVMKTsNCisJaWYgKHJlcC5ucl96b25lcyA+IElOVF9NQVggLyBzaXplb2Yoc3RydWN0IGJs
-a196b25lKSkNCisJCXJldHVybiAtRVJBTkdFOw0KKw0KKwl6b25lcyA9IGt2bWFsbG9jKHJlcC5u
-cl96b25lcyAqIHNpemVvZihzdHJ1Y3QgYmxrX3pvbmUpLA0KKwkJCUdGUF9LRVJORUwgfCBfX0dG
-UF9aRVJPKTsNCiAJaWYgKCF6b25lcykNCiAJCXJldHVybiAtRU5PTUVNOw0KIA0KQEAgLTM1MCw3
-ICszNTQsNyBAQCBpbnQgYmxrZGV2X3JlcG9ydF96b25lc19pb2N0bChzdHJ1Y3QgYmxvY2tfZGV2
-aWNlICpiZGV2LCBmbW9kZV90IG1vZGUsDQogCX0NCiANCiAgb3V0Og0KLQlrZnJlZSh6b25lcyk7
-DQorCWt2ZnJlZSh6b25lcyk7DQogDQogCXJldHVybiByZXQ7DQogfQ==
+These are common private headers with IBNBD protocol structures,
+logging, sysfs and other helper functions, which are used on
+both client and server sides.
+
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jack Wang <jinpu.wang@profitbricks.com>
+---
+ drivers/block/ibnbd/ibnbd-log.h   |  71 ++++++++
+ drivers/block/ibnbd/ibnbd-proto.h | 364 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 435 insertions(+)
+ create mode 100644 drivers/block/ibnbd/ibnbd-log.h
+ create mode 100644 drivers/block/ibnbd/ibnbd-proto.h
+
+diff --git a/drivers/block/ibnbd/ibnbd-log.h b/drivers/block/ibnbd/ibnbd-log.h
+new file mode 100644
+index 000000000000..489343a61171
+--- /dev/null
++++ b/drivers/block/ibnbd/ibnbd-log.h
+@@ -0,0 +1,71 @@
++/*
++ * InfiniBand Network Block Driver
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler <mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *          Kleber Souza <kleber.souza@profitbricks.com>
++ *          Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
++ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef IBNBD_LOG_H
++#define IBNBD_LOG_H
++
++#include "ibnbd-clt.h"
++#include "ibnbd-srv.h"
++
++#define ibnbd_diskname(dev) ({						\
++	struct gendisk *gd = ((struct ibnbd_clt_dev *)dev)->gd;		\
++	gd ? gd->disk_name : "<no dev>";				\
++})
++
++void unknown_type(void);
++
++#define ibnbd_log(fn, dev, fmt, ...) ({					\
++	__builtin_choose_expr(						\
++		__builtin_types_compatible_p(				\
++			typeof(dev), struct ibnbd_clt_dev *),		\
++		fn("<%s@%s> %s: " fmt, (dev)->pathname,		\
++		   (dev)->sess->sessname, ibnbd_diskname(dev),		\
++		   ##__VA_ARGS__),					\
++		__builtin_choose_expr(					\
++			__builtin_types_compatible_p(typeof(dev),	\
++					struct ibnbd_srv_sess_dev *),	\
++			fn("<%s@%s>: " fmt, (dev)->pathname,	\
++			   (dev)->sess->sessname, ##__VA_ARGS__),		\
++			unknown_type()));				\
++})
++
++#define ibnbd_err(dev, fmt, ...)	\
++	ibnbd_log(pr_err, dev, fmt, ##__VA_ARGS__)
++#define ibnbd_err_rl(dev, fmt, ...)	\
++	ibnbd_log(pr_err_ratelimited, dev, fmt, ##__VA_ARGS__)
++#define ibnbd_wrn(dev, fmt, ...)	\
++	ibnbd_log(pr_warn, dev, fmt, ##__VA_ARGS__)
++#define ibnbd_wrn_rl(dev, fmt, ...) \
++	ibnbd_log(pr_warn_ratelimited, dev, fmt, ##__VA_ARGS__)
++#define ibnbd_info(dev, fmt, ...) \
++	ibnbd_log(pr_info, dev, fmt, ##__VA_ARGS__)
++#define ibnbd_info_rl(dev, fmt, ...) \
++	ibnbd_log(pr_info_ratelimited, dev, fmt, ##__VA_ARGS__)
++
++#endif /* IBNBD_LOG_H */
+diff --git a/drivers/block/ibnbd/ibnbd-proto.h b/drivers/block/ibnbd/ibnbd-proto.h
+new file mode 100644
+index 000000000000..050d3fa4c1bf
+--- /dev/null
++++ b/drivers/block/ibnbd/ibnbd-proto.h
+@@ -0,0 +1,364 @@
++/*
++ * InfiniBand Network Block Driver
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler <mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *          Kleber Souza <kleber.souza@profitbricks.com>
++ *          Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
++ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef IBNBD_PROTO_H
++#define IBNBD_PROTO_H
++
++#include <linux/types.h>
++#include <linux/blkdev.h>
++#include <linux/limits.h>
++#include <linux/inet.h>
++#include <linux/in.h>
++#include <linux/in6.h>
++#include <rdma/ib.h>
++
++#define IBNBD_PROTO_VER_MAJOR 1
++#define IBNBD_PROTO_VER_MINOR 0
++
++#define IBNBD_PROTO_VER_STRING __stringify(IBNBD_PROTO_VER_MAJOR) "." \
++			       __stringify(IBNBD_PROTO_VER_MINOR)
++
++#ifndef IBNBD_VER_STRING
++#define IBNBD_VER_STRING __stringify(IBNBD_PROTO_VER_MAJOR) "." \
++			 __stringify(IBNBD_PROTO_VER_MINOR)
++#endif
++
++/* TODO: should be configurable */
++#define IBTRS_PORT 1234
++
++/**
++ * enum ibnbd_msg_types - IBNBD message types
++ * @IBNBD_MSG_SESS_INFO:	initial session info from client to server
++ * @IBNBD_MSG_SESS_INFO_RSP:	initial session info from server to client
++ * @IBNBD_MSG_OPEN:		open (map) device request
++ * @IBNBD_MSG_OPEN_RSP:		response to an @IBNBD_MSG_OPEN
++ * @IBNBD_MSG_IO:		block IO request operation
++ * @IBNBD_MSG_CLOSE:		close (unmap) device request
++ */
++enum ibnbd_msg_type {
++	IBNBD_MSG_SESS_INFO,
++	IBNBD_MSG_SESS_INFO_RSP,
++	IBNBD_MSG_OPEN,
++	IBNBD_MSG_OPEN_RSP,
++	IBNBD_MSG_IO,
++	IBNBD_MSG_CLOSE,
++};
++
++/**
++ * struct ibnbd_msg_hdr - header of IBNBD messages
++ * @type:	Message type, valid values see: enum ibnbd_msg_types
++ */
++struct ibnbd_msg_hdr {
++	__le16		type;
++	__le16		__padding;
++};
++
++enum ibnbd_access_mode {
++	IBNBD_ACCESS_RO,
++	IBNBD_ACCESS_RW,
++	IBNBD_ACCESS_MIGRATION,
++};
++
++#define _IBNBD_FILEIO  0
++#define _IBNBD_BLOCKIO 1
++#define _IBNBD_AUTOIO  2
++
++enum ibnbd_io_mode {
++	IBNBD_FILEIO = _IBNBD_FILEIO,
++	IBNBD_BLOCKIO = _IBNBD_BLOCKIO,
++	IBNBD_AUTOIO = _IBNBD_AUTOIO,
++};
++
++/**
++ * struct ibnbd_msg_sess_info - initial session info from client to server
++ * @hdr:		message header
++ * @ver:		IBNBD protocol version
++ */
++struct ibnbd_msg_sess_info {
++	struct ibnbd_msg_hdr hdr;
++	u8		ver;
++	u8		reserved[31];
++};
++
++/**
++ * struct ibnbd_msg_sess_info_rsp - initial session info from server to client
++ * @hdr:		message header
++ * @ver:		IBNBD protocol version
++ */
++struct ibnbd_msg_sess_info_rsp {
++	struct ibnbd_msg_hdr hdr;
++	u8		ver;
++	u8		reserved[31];
++};
++
++/**
++ * struct ibnbd_msg_open - request to open a remote device.
++ * @hdr:		message header
++ * @access_mode:	the mode to open remote device, valid values see:
++ *			enum ibnbd_access_mode
++ * @io_mode:		Open volume on server as block device or as file
++ * @device_name:	device path on remote side
++ */
++struct ibnbd_msg_open {
++	struct ibnbd_msg_hdr hdr;
++	u8		access_mode;
++	u8		io_mode;
++	s8		dev_name[NAME_MAX];
++	u8		__padding[3];
++};
++
++/**
++ * struct ibnbd_msg_close - request to close a remote device.
++ * @hdr:	message header
++ * @device_id:	device_id on server side to identify the device
++ */
++struct ibnbd_msg_close {
++	struct ibnbd_msg_hdr hdr;
++	__le32		device_id;
++};
++
++/**
++ * struct ibnbd_msg_open_rsp - response message to IBNBD_MSG_OPEN
++ * @hdr:		message header
++ * @nsectors:		number of sectors
++ * @device_id:		device_id on server side to identify the device
++ * @queue_flags:	queue_flags of the device on server side
++ * @max_hw_sectors:	max hardware sectors in the usual 512b unit
++ * @max_write_same_sectors: max sectors for WRITE SAME in the 512b unit
++ * @max_discard_sectors: max. sectors that can be discarded at once
++ * @discard_granularity: size of the internal discard allocation unit
++ * @discard_alignment: offset from internal allocation assignment
++ * @physical_block_size: physical block size device supports
++ * @logical_block_size: logical block size device supports
++ * @max_segments:	max segments hardware support in one transfer
++ * @secure_discard:	supports secure discard
++ * @rotation:		is a rotational disc?
++ * @io_mode:		io_mode device is opened.
++ */
++struct ibnbd_msg_open_rsp {
++	struct ibnbd_msg_hdr	hdr;
++	__le32			device_id;
++	__le64			nsectors;
++	__le32			max_hw_sectors;
++	__le32			max_write_same_sectors;
++	__le32			max_discard_sectors;
++	__le32			discard_granularity;
++	__le32			discard_alignment;
++	__le16			physical_block_size;
++	__le16			logical_block_size;
++	__le16			max_segments;
++	__le16			secure_discard;
++	u8			rotational;
++	u8			io_mode;
++	u8			__padding[10];
++};
++
++/**
++ * struct ibnbd_msg_io - message for I/O read/write
++ * @hdr:	message header
++ * @device_id:	device_id on server side to find the right device
++ * @sector:	bi_sector attribute from struct bio
++ * @rw:		bitmask, valid values are defined in enum ibnbd_io_flags
++ * @bi_size:   number of bytes for I/O read/write
++ */
++struct ibnbd_msg_io {
++	struct ibnbd_msg_hdr hdr;
++	__le32		device_id;
++	__le64		sector;
++	__le32		rw;
++	__le32		bi_size;
++};
++
++#define IBNBD_OP_BITS  8
++#define IBNBD_OP_MASK  ((1 << IBNBD_OP_BITS) - 1)
++
++/**
++ * enum ibnbd_io_flags - IBNBD request types from rq_flag_bits
++ * @IBNBD_OP_READ:	     read sectors from the device
++ * @IBNBD_OP_WRITE:	     write sectors to the device
++ * @IBNBD_OP_FLUSH:	     flush the volatile write cache
++ * @IBNBD_OP_DISCARD:        discard sectors
++ * @IBNBD_OP_SECURE_ERASE:   securely erase sectors
++ * @IBNBD_OP_WRITE_SAME:     write the same sectors many times
++
++ * @IBNBD_F_SYNC:	     request is sync (sync write or read)
++ * @IBNBD_F_FUA:             forced unit access
++ */
++enum ibnbd_io_flags {
++
++	/* Operations */
++
++	IBNBD_OP_READ		= 0,
++	IBNBD_OP_WRITE		= 1,
++	IBNBD_OP_FLUSH		= 2,
++	IBNBD_OP_DISCARD	= 3,
++	IBNBD_OP_SECURE_ERASE	= 4,
++	IBNBD_OP_WRITE_SAME	= 5,
++
++	IBNBD_OP_LAST,
++
++	/* Flags */
++
++	IBNBD_F_SYNC  = 1<<(IBNBD_OP_BITS + 0),
++	IBNBD_F_FUA   = 1<<(IBNBD_OP_BITS + 1),
++
++	IBNBD_F_ALL   = (IBNBD_F_SYNC | IBNBD_F_FUA)
++
++};
++
++static inline u32 ibnbd_op(u32 flags)
++{
++	return (flags & IBNBD_OP_MASK);
++}
++
++static inline u32 ibnbd_flags(u32 flags)
++{
++	return (flags & ~IBNBD_OP_MASK);
++}
++
++static inline bool ibnbd_flags_supported(u32 flags)
++{
++	u32 op;
++
++	op = ibnbd_op(flags);
++	flags = ibnbd_flags(flags);
++
++	if (op >= IBNBD_OP_LAST)
++		return false;
++	if (flags & ~IBNBD_F_ALL)
++		return false;
++
++	return true;
++}
++
++static inline u32 ibnbd_to_bio_flags(u32 ibnbd_flags)
++{
++	u32 bio_flags;
++
++	switch (ibnbd_op(ibnbd_flags)) {
++	case IBNBD_OP_READ:
++		bio_flags = REQ_OP_READ;
++		break;
++	case IBNBD_OP_WRITE:
++		bio_flags = REQ_OP_WRITE;
++		break;
++	case IBNBD_OP_FLUSH:
++		bio_flags = REQ_OP_FLUSH | REQ_PREFLUSH;
++		break;
++	case IBNBD_OP_DISCARD:
++		bio_flags = REQ_OP_DISCARD;
++		break;
++	case IBNBD_OP_SECURE_ERASE:
++		bio_flags = REQ_OP_SECURE_ERASE;
++		break;
++	case IBNBD_OP_WRITE_SAME:
++		bio_flags = REQ_OP_WRITE_SAME;
++		break;
++	default:
++		WARN(1, "Unknown IBNBD type: %d (flags %d)\n",
++		     ibnbd_op(ibnbd_flags), ibnbd_flags);
++		bio_flags = 0;
++	}
++
++	if (ibnbd_flags & IBNBD_F_SYNC)
++		bio_flags |= REQ_SYNC;
++
++	if (ibnbd_flags & IBNBD_F_FUA)
++		bio_flags |= REQ_FUA;
++
++	return bio_flags;
++}
++
++static inline u32 rq_to_ibnbd_flags(struct request *rq)
++{
++	u32 ibnbd_flags;
++
++	switch (req_op(rq)) {
++	case REQ_OP_READ:
++		ibnbd_flags = IBNBD_OP_READ;
++		break;
++	case REQ_OP_WRITE:
++		ibnbd_flags = IBNBD_OP_WRITE;
++		break;
++	case REQ_OP_DISCARD:
++		ibnbd_flags = IBNBD_OP_DISCARD;
++		break;
++	case REQ_OP_SECURE_ERASE:
++		ibnbd_flags = IBNBD_OP_SECURE_ERASE;
++		break;
++	case REQ_OP_WRITE_SAME:
++		ibnbd_flags = IBNBD_OP_WRITE_SAME;
++		break;
++	case REQ_OP_FLUSH:
++		ibnbd_flags = IBNBD_OP_FLUSH;
++		break;
++	default:
++		WARN(1, "Unknown request type %d (flags %llu)\n",
++		     req_op(rq), (unsigned long long)rq->cmd_flags);
++		ibnbd_flags = 0;
++	}
++
++	if (op_is_sync(rq->cmd_flags))
++		ibnbd_flags |= IBNBD_F_SYNC;
++
++	if (op_is_flush(rq->cmd_flags))
++		ibnbd_flags |= IBNBD_F_FUA;
++
++	return ibnbd_flags;
++}
++
++static inline const char *ibnbd_io_mode_str(enum ibnbd_io_mode mode)
++{
++	switch (mode) {
++	case IBNBD_FILEIO:
++		return "fileio";
++	case IBNBD_BLOCKIO:
++		return "blockio";
++	case IBNBD_AUTOIO:
++		return "autoio";
++	default:
++		return "unknown";
++	}
++}
++
++static inline const char *ibnbd_access_mode_str(enum ibnbd_access_mode mode)
++{
++	switch (mode) {
++	case IBNBD_ACCESS_RO:
++		return "ro";
++	case IBNBD_ACCESS_RW:
++		return "rw";
++	case IBNBD_ACCESS_MIGRATION:
++		return "migration";
++	default:
++		return "unknown";
++	}
++}
++
++#endif /* IBNBD_PROTO_H */
+-- 
+2.13.1
