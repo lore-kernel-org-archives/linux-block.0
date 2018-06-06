@@ -1,139 +1,368 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 15/30] block: introduce bio_clone_chunk_bioset()
-Date: Sat,  9 Jun 2018 20:29:59 +0800
-Message-Id: <20180609123014.8861-16-ming.lei@redhat.com>
-In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
-References: <20180609123014.8861-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Doug Ledford <dledford@redhat.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH v3 12/25] ibtrs: server: sysfs interface functions
+Date: Wed,  6 Jun 2018 17:25:02 +0200
+Message-Id: <20180606152515.25807-13-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
+References: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
 List-ID: <linux-block@vger.kernel.org>
 
-There is one use case(DM) which requires to clone bio chunk by
-chunk, so introduce this API.
+This is the sysfs interface to IBTRS sessions on server side:
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+  /sys/devices/virtual/ibtrs-server/<SESS-NAME>/
+    *** IBTRS session accepted from a client peer
+    |
+    |- paths/<SRC@DST>/
+       *** established paths from a client in a session
+       |
+       |- disconnect
+       |  *** disconnect path
+       |
+       |- hca_name
+       |  *** HCA name
+       |
+       |- hca_port
+       |  *** HCA port
+       |
+       |- stats/
+          *** current path statistics
+          |
+	  |- rdma
+	  |- reset_all
+	  |- wc_completions
+
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jack Wang <jinpu.wang@profitbricks.com>
 ---
- block/bio.c         | 56 +++++++++++++++++++++++++++++++++++++++--------------
- include/linux/bio.h |  1 +
- 2 files changed, 43 insertions(+), 14 deletions(-)
+ drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c | 307 +++++++++++++++++++++++++
+ 1 file changed, 307 insertions(+)
+ create mode 100644 drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c
 
-diff --git a/block/bio.c b/block/bio.c
-index cb0f46e2752b..60219f82ddab 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -644,21 +644,13 @@ struct bio *bio_clone_fast(struct bio *bio, gfp_t gfp_mask, struct bio_set *bs)
- }
- EXPORT_SYMBOL(bio_clone_fast);
- 
--/**
-- * 	bio_clone_bioset - clone a bio
-- * 	@bio_src: bio to clone
-- *	@gfp_mask: allocation priority
-- *	@bs: bio_set to allocate from
-- *
-- *	Clone bio. Caller will own the returned bio, but not the actual data it
-- *	points to. Reference count of returned bio will be one.
-- */
--struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
--			     struct bio_set *bs)
-+static struct bio *__bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
-+				      struct bio_set *bs, bool seg)
- {
- 	struct bvec_iter iter;
- 	struct bio_vec bv;
- 	struct bio *bio;
-+	int nr_vecs = seg ? bio_segments(bio_src) : bio_chunks(bio_src);
- 
- 	/*
- 	 * Pre immutable biovecs, __bio_clone() used to just do a memcpy from
-@@ -682,7 +674,7 @@ struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
- 	 *    __bio_clone_fast() anyways.
- 	 */
- 
--	bio = bio_alloc_bioset(gfp_mask, bio_segments(bio_src), bs);
-+	bio = bio_alloc_bioset(gfp_mask, nr_vecs, bs);
- 	if (!bio)
- 		return NULL;
- 	bio->bi_disk		= bio_src->bi_disk;
-@@ -700,8 +692,13 @@ struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
- 		bio->bi_io_vec[bio->bi_vcnt++] = bio_src->bi_io_vec[0];
- 		break;
- 	default:
--		bio_for_each_segment(bv, bio_src, iter)
--			bio->bi_io_vec[bio->bi_vcnt++] = bv;
-+		if (seg) {
-+			bio_for_each_segment(bv, bio_src, iter)
-+				bio->bi_io_vec[bio->bi_vcnt++] = bv;
-+		} else {
-+			bio_for_each_chunk(bv, bio_src, iter)
-+				bio->bi_io_vec[bio->bi_vcnt++] = bv;
-+		}
- 		break;
- 	}
- 
-@@ -719,9 +716,40 @@ struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
- 
- 	return bio;
- }
-+
-+/**
-+ * 	bio_clone_bioset - clone a bio
-+ * 	@bio_src: bio to clone
-+ *	@gfp_mask: allocation priority
-+ *	@bs: bio_set to allocate from
+diff --git a/drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c b/drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c
+new file mode 100644
+index 000000000000..91f664b7eb66
+--- /dev/null
++++ b/drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c
+@@ -0,0 +1,307 @@
++/*
++ * InfiniBand Transport Layer
 + *
-+ *	Clone bio. Caller will own the returned bio, but not the actual data it
-+ *	points to. Reference count of returned bio will be one.
-+ */
-+struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
-+			     struct bio_set *bs)
-+{
-+	return __bio_clone_bioset(bio_src, gfp_mask, bs, true);
-+}
- EXPORT_SYMBOL(bio_clone_bioset);
- 
- /**
-+ * 	bio_clone_seg_bioset - clone a bio segment by segment
-+ * 	@bio_src: bio to clone
-+ *	@gfp_mask: allocation priority
-+ *	@bs: bio_set to allocate from
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler <mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *          Kleber Souza <kleber.souza@profitbricks.com>
++ *          Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
 + *
-+ *	Clone bio. Caller will own the returned bio, but not the actual data it
-+ *	points to. Reference count of returned bio will be one.
++ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
++ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
 + */
-+struct bio *bio_clone_chunk_bioset(struct bio *bio_src, gfp_t gfp_mask,
-+				   struct bio_set *bs)
-+{
-+	return __bio_clone_bioset(bio_src, gfp_mask, bs, false);
-+}
-+EXPORT_SYMBOL(bio_clone_chunk_bioset);
 +
-+/**
-  *	bio_add_pc_page	-	attempt to add page to bio
-  *	@q: the target queue
-  *	@bio: destination bio
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 13fd7bc30390..0fa1035dde38 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -483,6 +483,7 @@ extern void bio_put(struct bio *);
- extern void __bio_clone_fast(struct bio *, struct bio *);
- extern struct bio *bio_clone_fast(struct bio *, gfp_t, struct bio_set *);
- extern struct bio *bio_clone_bioset(struct bio *, gfp_t, struct bio_set *bs);
-+extern struct bio *bio_clone_chunk_bioset(struct bio *, gfp_t, struct bio_set *bs);
- 
- extern struct bio_set fs_bio_set;
- 
++#undef pr_fmt
++#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
++
++#include "ibtrs-pri.h"
++#include "ibtrs-srv.h"
++#include "ibtrs-log.h"
++
++static struct kobj_type ktype = {
++	.sysfs_ops	= &kobj_sysfs_ops,
++};
++
++static ssize_t ibtrs_srv_disconnect_show(struct kobject *kobj,
++					 struct kobj_attribute *attr,
++					 char *page)
++{
++	return scnprintf(page, PAGE_SIZE, "Usage: echo 1 > %s\n",
++			 attr->attr.name);
++}
++
++static ssize_t ibtrs_srv_disconnect_store(struct kobject *kobj,
++					  struct kobj_attribute *attr,
++					  const char *buf, size_t count)
++{
++	struct ibtrs_srv_sess *sess;
++	char str[MAXHOSTNAMELEN];
++
++	sess = container_of(kobj, struct ibtrs_srv_sess, kobj);
++	if (!sysfs_streq(buf, "1")) {
++		ibtrs_err(sess, "%s: invalid value: '%s'\n",
++			  attr->attr.name, buf);
++		return -EINVAL;
++	}
++
++	sockaddr_to_str((struct sockaddr *)&sess->s.dst_addr, str, sizeof(str));
++
++	ibtrs_info(sess, "disconnect for path %s requested\n", str);
++	ibtrs_srv_queue_close(sess);
++
++	return count;
++}
++
++static struct kobj_attribute ibtrs_srv_disconnect_attr =
++	__ATTR(disconnect, 0644,
++	       ibtrs_srv_disconnect_show, ibtrs_srv_disconnect_store);
++
++static ssize_t ibtrs_srv_hca_port_show(struct kobject *kobj,
++				       struct kobj_attribute *attr,
++				       char *page)
++{
++	struct ibtrs_srv_sess *sess;
++	struct ibtrs_con *usr_con;
++
++	sess = container_of(kobj, typeof(*sess), kobj);
++	usr_con = sess->s.con[0];
++
++	return scnprintf(page, PAGE_SIZE, "%u\n",
++			 usr_con->cm_id->port_num);
++}
++
++static struct kobj_attribute ibtrs_srv_hca_port_attr =
++	__ATTR(hca_port, 0444, ibtrs_srv_hca_port_show, NULL);
++
++static ssize_t ibtrs_srv_hca_name_show(struct kobject *kobj,
++				       struct kobj_attribute *attr,
++				       char *page)
++{
++	struct ibtrs_srv_sess *sess;
++
++	sess = container_of(kobj, struct ibtrs_srv_sess, kobj);
++
++	return scnprintf(page, PAGE_SIZE, "%s\n",
++			 sess->s.dev->ib_dev->name);
++}
++
++static struct kobj_attribute ibtrs_srv_hca_name_attr =
++	__ATTR(hca_name, 0444, ibtrs_srv_hca_name_show, NULL);
++
++static ssize_t ibtrs_srv_src_addr_show(struct kobject *kobj,
++				       struct kobj_attribute *attr,
++				       char *page)
++{
++	struct ibtrs_srv_sess *sess;
++	int cnt;
++
++	sess = container_of(kobj, struct ibtrs_srv_sess, kobj);
++	cnt = sockaddr_to_str((struct sockaddr *)&sess->s.dst_addr,
++			      page, PAGE_SIZE);
++	return cnt + scnprintf(page + cnt, PAGE_SIZE - cnt, "\n");
++}
++
++static struct kobj_attribute ibtrs_srv_src_addr_attr =
++	__ATTR(src_addr, 0444, ibtrs_srv_src_addr_show, NULL);
++
++static ssize_t ibtrs_srv_dst_addr_show(struct kobject *kobj,
++				       struct kobj_attribute *attr,
++				       char *page)
++{
++	struct ibtrs_srv_sess *sess;
++	int cnt;
++
++	sess = container_of(kobj, struct ibtrs_srv_sess, kobj);
++	cnt = sockaddr_to_str((struct sockaddr *)&sess->s.src_addr,
++			      page, PAGE_SIZE);
++	return cnt + scnprintf(page + cnt, PAGE_SIZE - cnt, "\n");
++}
++
++static struct kobj_attribute ibtrs_srv_dst_addr_attr =
++	__ATTR(dst_addr, 0444, ibtrs_srv_dst_addr_show, NULL);
++
++static struct attribute *ibtrs_srv_sess_attrs[] = {
++	&ibtrs_srv_hca_name_attr.attr,
++	&ibtrs_srv_hca_port_attr.attr,
++	&ibtrs_srv_src_addr_attr.attr,
++	&ibtrs_srv_dst_addr_attr.attr,
++	&ibtrs_srv_disconnect_attr.attr,
++	NULL,
++};
++
++static struct attribute_group ibtrs_srv_sess_attr_group = {
++	.attrs = ibtrs_srv_sess_attrs,
++};
++
++STAT_ATTR(struct ibtrs_srv_sess, rdma,
++	  ibtrs_srv_stats_rdma_to_str,
++	  ibtrs_srv_reset_rdma_stats);
++
++STAT_ATTR(struct ibtrs_srv_sess, wc_completion,
++	  ibtrs_srv_stats_wc_completion_to_str,
++	  ibtrs_srv_reset_wc_completion_stats);
++
++STAT_ATTR(struct ibtrs_srv_sess, reset_all,
++	  ibtrs_srv_reset_all_help,
++	  ibtrs_srv_reset_all_stats);
++
++static struct attribute *ibtrs_srv_stats_attrs[] = {
++	&rdma_attr.attr,
++	&wc_completion_attr.attr,
++	&reset_all_attr.attr,
++	NULL,
++};
++
++static struct attribute_group ibtrs_srv_stats_attr_group = {
++	.attrs = ibtrs_srv_stats_attrs,
++};
++
++static void ibtrs_srv_dev_release(struct device *dev)
++{
++	/* Nobody plays with device references, so nop */
++}
++
++static int ibtrs_srv_create_once_sysfs_root_folders(struct ibtrs_srv_sess *sess)
++{
++	struct ibtrs_srv *srv = sess->srv;
++	int err = 0;
++
++	mutex_lock(&srv->paths_mutex);
++	if (srv->dev_ref++) {
++		/*
++		 * Just increase device reference.  We can't use get_device()
++		 * because we need to unregister device when ref goes to 0,
++		 * not just to put it.
++		 */
++		goto unlock;
++	}
++	srv->dev.class = ibtrs_dev_class;
++	srv->dev.release = ibtrs_srv_dev_release;
++	dev_set_name(&srv->dev, "%s", sess->s.sessname);
++
++	err = device_register(&srv->dev);
++	if (unlikely(err)) {
++		pr_err("device_register(): %d\n", err);
++		goto unlock;
++	}
++	err = kobject_init_and_add(&srv->kobj_paths, &ktype,
++				   &srv->dev.kobj, "paths");
++	if (unlikely(err)) {
++		pr_err("kobject_init_and_add(): %d\n", err);
++		device_unregister(&srv->dev);
++		goto unlock;
++	}
++unlock:
++	mutex_unlock(&srv->paths_mutex);
++
++	return err;
++}
++
++static void ibtrs_srv_destroy_once_sysfs_root_folders(struct ibtrs_srv_sess *sess)
++{
++	struct ibtrs_srv *srv = sess->srv;
++
++	mutex_lock(&srv->paths_mutex);
++	if (!--srv->dev_ref) {
++		kobject_put(&srv->kobj_paths);
++		device_unregister(&srv->dev);
++	}
++	mutex_unlock(&srv->paths_mutex);
++}
++
++static int ibtrs_srv_create_stats_files(struct ibtrs_srv_sess *sess)
++{
++	int err;
++
++	err = kobject_init_and_add(&sess->kobj_stats, &ktype,
++				   &sess->kobj, "stats");
++	if (unlikely(err)) {
++		ibtrs_err(sess, "kobject_init_and_add(): %d\n", err);
++		return err;
++	}
++	err = sysfs_create_group(&sess->kobj_stats,
++				 &ibtrs_srv_stats_attr_group);
++	if (unlikely(err)) {
++		ibtrs_err(sess, "sysfs_create_group(): %d\n", err);
++		goto err;
++	}
++
++	return 0;
++
++err:
++	kobject_put(&sess->kobj_stats);
++
++	return err;
++}
++
++int ibtrs_srv_create_sess_files(struct ibtrs_srv_sess *sess)
++{
++	struct ibtrs_srv *srv = sess->srv;
++	char str[NAME_MAX];
++	int err, cnt;
++
++	cnt = sockaddr_to_str((struct sockaddr *)&sess->s.dst_addr,
++			      str, sizeof(str));
++	cnt += scnprintf(str + cnt, sizeof(str) - cnt, "@");
++	sockaddr_to_str((struct sockaddr *)&sess->s.src_addr,
++			str + cnt, sizeof(str) - cnt);
++
++	err = ibtrs_srv_create_once_sysfs_root_folders(sess);
++	if (unlikely(err))
++		return err;
++
++	err = kobject_init_and_add(&sess->kobj, &ktype, &srv->kobj_paths,
++				   "%s", str);
++	if (unlikely(err)) {
++		ibtrs_err(sess, "kobject_init_and_add(): %d\n", err);
++		goto destroy_root;
++	}
++	err = sysfs_create_group(&sess->kobj, &ibtrs_srv_sess_attr_group);
++	if (unlikely(err)) {
++		ibtrs_err(sess, "sysfs_create_group(): %d\n", err);
++		goto put_kobj;
++	}
++	err = ibtrs_srv_create_stats_files(sess);
++	if (unlikely(err))
++		goto remove_group;
++
++	return 0;
++
++remove_group:
++	sysfs_remove_group(&sess->kobj, &ibtrs_srv_sess_attr_group);
++put_kobj:
++	kobject_del(&sess->kobj);
++	kobject_put(&sess->kobj);
++destroy_root:
++	ibtrs_srv_destroy_once_sysfs_root_folders(sess);
++
++	return err;
++}
++
++void ibtrs_srv_destroy_sess_files(struct ibtrs_srv_sess *sess)
++{
++	if (sess->kobj.state_in_sysfs) {
++		kobject_del(&sess->kobj_stats);
++		kobject_put(&sess->kobj_stats);
++		kobject_del(&sess->kobj);
++		kobject_put(&sess->kobj);
++
++		ibtrs_srv_destroy_once_sysfs_root_folders(sess);
++	}
++}
 -- 
-2.9.5
+2.13.1
