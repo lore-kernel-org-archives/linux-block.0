@@ -1,100 +1,429 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX 2/4] block, bfq: do not expire a queue that will deserve dispatch plugging
-Date: Mon, 25 Jun 2018 21:48:04 +0200
-Message-Id: <20180625194806.7619-3-paolo.valente@linaro.org>
-In-Reply-To: <20180625194806.7619-1-paolo.valente@linaro.org>
-References: <20180625194806.7619-1-paolo.valente@linaro.org>
+Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Doug Ledford <dledford@redhat.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH v3 14/25] ibtrs: a bit of documentation
+Date: Wed,  6 Jun 2018 17:25:04 +0200
+Message-Id: <20180606152515.25807-15-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
+References: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
 List-ID: <linux-block@vger.kernel.org>
 
-For some bfq_queues, BFQ plugs I/O dispatching when the queue becomes
-idle, and keeps the plug until a new request of the queue arrives, or
-a timeout fires. BFQ does so either to boost throughput or to preserve
-service guarantees for the queue.
+README with description of major sysfs entries.
 
-More precisely, for such a queue, plugging starts when the queue
-happens to have either no request enqueued, or no request in flight,
-that is, no request already dispatched but not yet completed.
-
-On the opposite end, BFQ may happen to expire a queue with no request
-enqueued, without doing any plugging, if the queue still has some
-request in flight. Unfortunately, such a premature expiration causes
-the queue to lose its chance to enjoy dispatch plugging a moment
-later, i.e., when its in-flight requests finally get completed. This
-breaks service guarantees for the queue.
-
-This commit prevents BFQ from expiring an empty queue if the latter
-still has in-flight requests.
-
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jack Wang <jinpu.wang@profitbricks.com>
 ---
- block/bfq-iosched.c | 36 +++++++++++++++++++++++++++++++++---
- 1 file changed, 33 insertions(+), 3 deletions(-)
+ drivers/infiniband/ulp/ibtrs/README | 390 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 390 insertions(+)
+ create mode 100644 drivers/infiniband/ulp/ibtrs/README
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 3f32e88c7e9b..4fd4f1996498 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -3597,8 +3597,14 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
- 
- 	bfq_log_bfqq(bfqd, bfqq, "select_queue: already in-service queue");
- 
-+	/*
-+	 * Do not expire bfqq for budget timeout if bfqq may be about
-+	 * to enjoy device idling. The reason why, in this case, we
-+	 * prevent bfqq from expiring is the same as in the comments
-+	 * on the case where bfq_bfqq_must_idle() returns true, in
-+	 * bfq_completed_request().
-+	 */
- 	if (bfq_may_expire_for_budg_timeout(bfqq) &&
--	    !bfq_bfqq_wait_request(bfqq) &&
- 	    !bfq_bfqq_must_idle(bfqq))
- 		goto expire;
- 
-@@ -4674,8 +4680,32 @@ static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
- 	 * or if we want to idle in case it has no pending requests.
- 	 */
- 	if (bfqd->in_service_queue == bfqq) {
--		if (bfqq->dispatched == 0 && bfq_bfqq_must_idle(bfqq)) {
--			bfq_arm_slice_timer(bfqd);
-+		if (bfq_bfqq_must_idle(bfqq)) {
-+			if (bfqq->dispatched == 0)
-+				bfq_arm_slice_timer(bfqd);
-+			/*
-+			 * If we get here, we do not expire bfqq, even
-+			 * if bfqq was in budget timeout or had no
-+			 * more requests (as controlled in the next
-+			 * conditional instructions). The reason for
-+			 * not expiring bfqq is as follows.
-+			 *
-+			 * Here bfqq->dispatched > 0 holds, but
-+			 * bfq_bfqq_must_idle() returned true. This
-+			 * implies that, even if no request arrives
-+			 * for bfqq before bfqq->dispatched reaches 0,
-+			 * bfqq will, however, not be expired on the
-+			 * completion event that causes bfqq->dispatch
-+			 * to reach zero. In contrast, on this event,
-+			 * bfqq will start enjoying device idling
-+			 * (I/O-dispatch plugging).
-+			 *
-+			 * But, if we expired bfqq here, bfqq would
-+			 * not have the chance to enjoy device idling
-+			 * when bfqq->dispatched finally reaches
-+			 * zero. This would expose bfqq to violation
-+			 * of its reserved service guarantees.
-+			 */
- 			return;
- 		} else if (bfq_may_expire_for_budg_timeout(bfqq))
- 			bfq_bfqq_expire(bfqd, bfqq, false,
+diff --git a/drivers/infiniband/ulp/ibtrs/README b/drivers/infiniband/ulp/ibtrs/README
+new file mode 100644
+index 000000000000..d9d8cd69d44f
+--- /dev/null
++++ b/drivers/infiniband/ulp/ibtrs/README
+@@ -0,0 +1,390 @@
++****************************
++InfiniBand Transport (IBTRS)
++****************************
++
++IBTRS (InfiniBand Transport) is a reliable high speed transport library
++which provides support to establish optimal number of connections
++between client and server machines using RDMA (InfiniBand, RoCE, iWarp)
++transport. It is optimized to transfer (read/write) IO blocks.
++
++In its core interface it follows the BIO semantics of providing the
++possibility to either write data from an sg list to the remote side
++or to request ("read") data transfer from the remote side into a given
++sg list.
++
++IBTRS provides I/O fail-over and load-balancing capabilities by using
++multipath I/O (see "add_path" and "mp_policy" configuration entries).
++
++IBTRS is used by the IBNBD (Infiniband Network Block Device) modules.
++
++======================
++Client Sysfs Interface
++======================
++
++This chapter describes only the most important files of sysfs interface
++on client side.
++
++Entries under /sys/devices/virtual/ibtrs-client/
++================================================
++
++When a user of IBTRS API creates a new session, a directory entry with
++the name of that session is created.
++
++Entries under /sys/devices/virtual/ibtrs-client/<session-name>/
++===============================================================
++
++add_path (RW)
++-------------
++
++Adds a new path (connection) to an existing session. Expected format is the
++following:
++
++  <[source addr,]destination addr>
++
++  *addr ::= [ ip:<ipv4|ipv6> | gid:<gid> ]
++
++max_reconnect_attempts (RW)
++---------------------------
++
++Maximum number reconnect attempts the client should make before giving up
++after connection breaks unexpectedly.
++
++mp_policy (RW)
++--------------
++
++Multipath policy specifies which path should be selected on each IO:
++
++   round-robin (0):
++       select path in per CPU round-robin manner.
++
++   min-inflight (1):
++       select path with minimum inflights.
++
++Entries under /sys/devices/virtual/ibtrs-client/<session-name>/paths/
++=====================================================================
++
++
++Each path belonging to a given session is listed here by its source and
++destination address. When a new path is added to a session by writing to
++the "add_path" entry, a directory <src@dst> is created.
++
++Entries under /sys/devices/virtual/ibtrs-client/<session-name>/paths/<src@dst>/
++===============================================================================
++
++state (R)
++---------
++
++Contains "connected" if the session is connected to the peer and fully
++functional.  Otherwise the file contains "disconnected"
++
++reconnect (RW)
++--------------
++
++Write "1" to the file in order to reconnect the path.
++Operation is blocking and returns 0 if reconnect was successful.
++
++disconnect (RW)
++---------------
++
++Write "1" to the file in order to disconnect the path.
++Operation blocks until IBTRS path is disconnected.
++
++remove_path (RW)
++----------------
++
++Write "1" to the file in order to disconnected and remove the path
++from the session.  Operation blocks until the path is disconnected
++and removed from the session.
++
++hca_name (R)
++------------
++
++Contains the the name of HCA the connection established on.
++
++hca_port (R)
++------------
++
++Contains the port number of active port traffic is going through.
++
++src_addr (R)
++------------
++
++Contains the source address of the path
++
++dst_addr (R)
++------------
++
++Contains the destination address of the path
++
++
++Entries under /sys/devices/virtual/ibtrs-client/<session-name>/paths/<src@dst>/stats/
++=====================================================================================
++
++Write "0" to any file in that directory to reset corresponding statistics.
++
++reset_all (RW)
++--------------
++
++Read will return usage help, write 0 will clear all the statistics.
++
++sg_entries (RW)
++---------------
++
++Data to be transferred via RDMA is passed to IBTRS as scatter-gather
++list. A scatter-gather list can contain multiple entries.
++Scatter-gather list with less entries require less processing power
++and can therefore transferred faster. The file sg_entries outputs a
++per-CPU distribution table for the number of entries in the
++scatter-gather lists, that were passed to the IBTRS API function
++ibtrs_clt_request (READ or WRITE).
++
++cpu_migration (RW)
++------------------
++
++IBTRS expects that each HCA IRQ is pinned to a separate CPU. If it's
++not the case, the processing of an I/O response could be processed on a
++different CPU than where it was originally submitted.  This file shows
++how many interrupts where generated on a non expected CPU.
++"from:" is the CPU on which the IRQ was expected, but not generated.
++"to:" is the CPU on which the IRQ was generated, but not expected.
++
++reconnects (RW)
++---------------
++
++Contains 2 unsigned int values, the first one records number of successful
++reconnects in the path lifetime, the second one records number of failed
++reconnects in the path lifetime.
++
++rdma_lat (RW)
++-------------
++
++Latency distribution of IBTRS requests.
++The format is:
++   1 ms: <CNT-LAT-READ> <CNT-LAT-WRITE>
++   2 ms: <CNT-LAT-READ> <CNT-LAT-WRITE>
++   4 ms: <CNT-LAT-READ> <CNT-LAT-WRITE>
++   8 ms: <CNT-LAT-READ> <CNT-LAT-WRITE>
++  16 ms: <CNT-LAT-READ> <CNT-LAT-WRITE>
++  ...
++  65536 ms: <CNT-LAT-READ> <CNT-LAT-WRITE>
++  >= 65536 ms: <CNT-LAT-READ> <CNT-LAT-WRITE>
++  maximum ms: <CNT-LAT-READ> <CNT-LAT-WRITE>
++
++wc_completion (RW)
++------------------
++
++Contains 2 unsigned int values, the first one records max number of work
++requests processed in work_completion in session lifetime, the second
++one records average number of work requests processed in work_completion
++in session lifetime.
++
++rdma (RW)
++---------
++
++Contains statistics regarding rdma operations and inflight operations.
++The output consists of 6 values:
++
++<read-count> <read-total-size> <write-count> <write-total-size> \
++<inflights> <failovered>
++
++======================
++Server Sysfs Interface
++======================
++
++Entries under /sys/devices/virtual/ibtrs-server/
++================================================
++
++When a user of IBTRS API creates a new session on a client side, a
++directory entry with the name of that session is created in here.
++
++Entries under /sys/devices/virtual/ibtrs-server/<session-name>/paths/
++=====================================================================
++
++When new path is created by writing to "add_path" entry on client side,
++a directory entry named as <source address>@<destination address> is created
++on server.
++
++Entries under /sys/devices/virtual/ibtrs-server/<session-name>/paths/<src@dst>/
++===============================================================================
++
++disconnect (RW)
++---------------
++
++When "1" is written to the file, the IBTRS session is being disconnected.
++Operations is non-blocking and returns control immediately to the caller.
++
++hca_name (R)
++------------
++
++Contains the the name of HCA the connection established on.
++
++hca_port (R)
++------------
++
++Contains the port number of active port traffic is going through.
++
++src_addr (R)
++------------
++
++Contains the source address of the path
++
++dst_addr (R)
++------------
++
++Contains the destination address of the path
++
++Entries under /sys/devices/virtual/ibtrs-server/<session-name>/paths/<src@dst>/stats/
++=====================================================================================
++
++When "0" is written to a file in this directory, the corresponding counters
++will be reset.
++
++reset_all (RW)
++--------------
++
++Read will return usage help, write 0 will clear all the counters about
++stats.
++
++rdma (RW)
++---------
++
++Contains statistics regarding rdma operations and inflight operations.
++The output consists of 5 values:
++
++<read-count> <read-total-size> <write-count> <write-total-size> <inflights>
++
++wc_completion (RW)
++------------------
++
++Contains 3 values, the first one is int, records max number of work
++requests processed in work_completion in session lifetime, the second
++one long int records total number of work requests processed in
++work_completion in session lifetime and the 3rd one long int records
++total number of calls to the cq completion handler. Division of 2nd
++number through 3rd gives the average number of completions processed
++in completion handler.
++
++==================
++Transport protocol
++==================
++
++Overview
++--------
++An established connection between a client and a server is called ibtrs
++session. A session is associated with a set of memory chunks reserved on the
++server side for a given client for rdma transfer. A session
++consists of multiple paths, each representing a separate physical link
++between client and server. Those are used for load balancing and failover.
++Each path consists of as many connections (QPs) as there are cpus on
++the client.
++
++When processing an incoming rdma write or read request ibtrs client uses memory
++chunks reserved for him on the server side. Their number, size and addresses
++need to be exchanged between client and server during the connection
++establishment phase. Apart from the memory related information client needs to
++inform the server about the session name and identify each path and connection
++individually.
++
++On an established session client sends to server write or read messages.
++Server uses immediate field to tell the client which request is being
++acknowledged and for errno. Client uses immediate field to tell the server
++which of the memory chunks has been accessed and at which offset the message
++can be found.
++
++Connection establishment
++------------------------
++
++1. Client starts establishing connections belonging to a path of a session one
++by one via attaching IBTRS_MSG_CON_REQ messages to the rdma_connect requests.
++Those include uuid of the session and uuid of the path to be
++established. They are used by the server to find a persisting session/path or
++to create a new one when necessary. The message also contains the protocol
++version and magic for compatibility, total number of connections per session
++(as many as cpus on the client), the id of the current connection and
++the reconnect counter, which is used to resolve the situations where
++client is trying to reconnect a path, while server is still destroying the old
++one.
++
++2. Server accepts the connection requests one by one and attaches
++IBTRS_MSG_CONN_RSP messages to the rdma_accept. Apart from magic and
++protocol version, the messages include error code, queue depth supported by
++the server (number of memory chunks which are going to be allocated for that
++session) and the maximum size of one io.
++
++3. After all connections of a path are established client sends to server the
++IBTRS_MSG_INFO_REQ message, containing the name of the session. This message
++requests the address information from the server.
++
++4. Server replies to the session info request message with IBTRS_MSG_INFO_RSP,
++which contains the addresses and keys of the RDMA buffers allocated for that
++session.
++
++5. Session becomes connected after all paths to be established are connected
++(i.e. steps 1-4 finished for all paths requested for a session)
++
++6. Server and client exchange periodically heartbeat messages (empty rdma
++messages with an immediate field) which are used to detect a crash on remote
++side or network outage in an absence of IO.
++
++7. On any RDMA related error or in the case of a heartbeat timeout, the
++corresponding path is disconnected, all the inflight IO are failed over to a
++healthy path, if any, and the reconnect mechanism is triggered.
++
++CLT                                     SRV
++*for each connection belonging to a path and for each path:
++IBTRS_MSG_CON_REQ  ------------------->
++                   <------------------- IBTRS_MSG_CON_RSP
++...
++*after all connections are established:
++IBTRS_MSG_INFO_REQ ------------------->
++                   <------------------- IBTRS_MSG_INFO_RSP
++*heartbeat is started from both sides:
++                   -------------------> [IBTRS_HB_MSG_IMM]
++[IBTRS_HB_MSG_ACK] <-------------------
++[IBTRS_HB_MSG_IMM] <-------------------
++                   -------------------> [IBTRS_HB_MSG_ACK]
++
++IO path
++-------
++
++* Write *
++
++1. When processing a write request client selects one of the memory chunks
++on the server side and rdma writes there the user data, user header and the
++IBTRS_MSG_RDMA_WRITE message. Apart from the type (write), the message only
++contains size of the user header. The client tells the server which chunk has
++been accessed and at what offset the IBTRS_MSG_RDMA_WRITE can be found by
++using the IMM field.
++
++2. When confirming a write request server sends an "empty" rdma message with
++an immediate field. The 32 bit field is used to specify the outstanding
++inflight IO and for the error code.
++
++CLT                                                          SRV
++usr_data + usr_hdr + ibtrs_msg_rdma_write -----------------> [IBTRS_IO_REQ_IMM]
++[IBTRS_IO_RSP_IMM]                        <----------------- (id + errno)
++
++* Read *
++
++1. When processing a read request client selects one of the memory chunks
++on the server side and rdma writes there the user header and the
++IBTRS_MSG_RDMA_READ message. This message contains the type (read), size of
++the user header, flags (specifying if memory invalidation is necessary) and the
++list of addresses along with keys for the data to be read into.
++
++2. When confirming a read request server transfers the requested data first,
++attaches an invalidation message if requested and finally an "empty" rdma
++message with an immediate field. The 32 bit field is used to specify the
++outstanding inflight IO and the error code.
++
++CLT                                           SRV
++usr_hdr + ibtrs_msg_rdma_read --------------> [IBTRS_IO_REQ_IMM]
++[IBTRS_IO_RSP_IMM]            <-------------- usr_data + (id + errno)
++or in case client requested invalidation:
++[IBTRS_IO_RSP_IMM_W_INV]      <-------------- usr_data + (INV) + (id + errno)
++
++
++Contact
++-------
++
++Mailing list: "IBNBD/IBTRS Storage Team" <ibnbd@profitbricks.com>
 -- 
-2.16.1
+2.13.1
