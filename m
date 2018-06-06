@@ -1,78 +1,294 @@
-Return-Path: <lars.ellenberg@linbit.com>
-From: Lars Ellenberg <lars.ellenberg@linbit.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>
-Subject: [PATCH] drbd: fix access after free
-Date: Mon, 25 Jun 2018 11:39:52 +0200
-Message-Id: <20180625093952.20220-1-lars.ellenberg@linbit.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Doug Ledford <dledford@redhat.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH v3 22/25] ibnbd: server: sysfs interface functions
+Date: Wed,  6 Jun 2018 17:25:12 +0200
+Message-Id: <20180606152515.25807-23-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
+References: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
 List-ID: <linux-block@vger.kernel.org>
 
-We have
-  struct drbd_requests { ... struct bio *private_bio;  ... }
-to hold a bio clone for local submission.
+This is the sysfs interface to IBNBD mapped devices on server side:
 
-On local IO completion, we put that bio, and in case we want to use the
-result later, we overload that member to hold the ERR_PTR() of the
-completion result,
+  /sys/devices/virtual/ibnbd-server/ctl/devices/<device_name>/
+    |- block_dev
+    |  *** link pointing to the corresponding block device sysfs entry
+    |
+    |- sessions/<session-name>/
+    |  *** sessions directory
+       |
+       |- read_only
+       |  *** is devices mapped as read only
+       |
+       |- mapping_path
+          *** relative device path provided by the client during mapping
 
-Which, before v4.3, used to be the passed in "int error",
-so we could first bio_put(), then assign.
-
-v4.3-rc1~100^2~21 4246a0b63bd8 block: add a bi_error field to struct bio
-changed that:
-  	bio_put(req->private_bio);
- -	req->private_bio = ERR_PTR(error);
- +	req->private_bio = ERR_PTR(bio->bi_error);
-
-Which introduces an access after free,
-because it was non obvious that req->private_bio == bio.
-
-Impact of that was mostly unnoticable, because we only use that value
-in a multiple-failure case, and even then map any "unexpected" error
-code to EIO, so worst case we could potentially mask a more specific
-error with EIO in a multiple failure case.
-
-Unless the pointed to memory region was unmapped, as is the case with
-CONFIG_DEBUG_PAGEALLOC, in which case this results in
-
-  BUG: unable to handle kernel paging request
-
-v4.13-rc1~70^2~75 4e4cbee93d56 block: switch bios to blk_status_t
-changes it further to
-  	bio_put(req->private_bio);
-  	req->private_bio = ERR_PTR(blk_status_to_errno(bio->bi_status));
-
-And blk_status_to_errno() now contains a WARN_ON_ONCE() for unexpected
-values, which catches this "sometimes", if the memory has been reused
-quickly enough for other things.
-
-Should also go into stable since 4.3, with the trivial change around 4.13.
-
-Cc: stable@vger.kernel.org
-Fixes: 4246a0b63bd8 block: add a bi_error field to struct bio
-Reported-by: Sarah Newman <srn@prgmr.com>
-Signed-off-by: Lars Ellenberg <lars.ellenberg@linbit.com>
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jack Wang <jinpu.wang@profitbricks.com>
 ---
- drivers/block/drbd/drbd_worker.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/ibnbd/ibnbd-srv-sysfs.c | 242 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 242 insertions(+)
+ create mode 100644 drivers/block/ibnbd/ibnbd-srv-sysfs.c
 
-diff --git a/drivers/block/drbd/drbd_worker.c b/drivers/block/drbd/drbd_worker.c
-index 1476cb3439f4..5e793dd7adfb 100644
---- a/drivers/block/drbd/drbd_worker.c
-+++ b/drivers/block/drbd/drbd_worker.c
-@@ -282,8 +282,8 @@ void drbd_request_endio(struct bio *bio)
- 		what = COMPLETED_OK;
- 	}
- 
--	bio_put(req->private_bio);
- 	req->private_bio = ERR_PTR(blk_status_to_errno(bio->bi_status));
-+	bio_put(bio);
- 
- 	/* not req_mod(), we need irqsave here! */
- 	spin_lock_irqsave(&device->resource->req_lock, flags);
+diff --git a/drivers/block/ibnbd/ibnbd-srv-sysfs.c b/drivers/block/ibnbd/ibnbd-srv-sysfs.c
+new file mode 100644
+index 000000000000..5bf77cdb09c8
+--- /dev/null
++++ b/drivers/block/ibnbd/ibnbd-srv-sysfs.c
+@@ -0,0 +1,242 @@
++/*
++ * InfiniBand Network Block Driver
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler <mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *          Kleber Souza <kleber.souza@profitbricks.com>
++ *          Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
++ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#undef pr_fmt
++#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
++
++#include <uapi/linux/limits.h>
++#include <linux/kobject.h>
++#include <linux/sysfs.h>
++#include <linux/stat.h>
++#include <linux/genhd.h>
++#include <linux/list.h>
++#include <linux/moduleparam.h>
++#include <linux/device.h>
++
++#include "ibnbd-srv.h"
++
++static struct device *ibnbd_dev;
++static struct class *ibnbd_dev_class;
++static struct kobject *ibnbd_devs_kobj;
++
++static struct attribute *ibnbd_srv_default_dev_attrs[] = {
++	NULL,
++};
++
++static struct attribute_group ibnbd_srv_default_dev_attr_group = {
++	.attrs = ibnbd_srv_default_dev_attrs,
++};
++
++static struct kobj_type ktype = {
++	.sysfs_ops	= &kobj_sysfs_ops,
++};
++
++int ibnbd_srv_create_dev_sysfs(struct ibnbd_srv_dev *dev,
++			       struct block_device *bdev,
++			       const char *dir_name)
++{
++	struct kobject *bdev_kobj;
++	int ret;
++
++	ret = kobject_init_and_add(&dev->dev_kobj, &ktype,
++				   ibnbd_devs_kobj, dir_name);
++	if (ret)
++		return ret;
++
++	ret = kobject_init_and_add(&dev->dev_sessions_kobj,
++				   &ktype,
++				   &dev->dev_kobj, "sessions");
++	if (ret)
++		goto err;
++
++	ret = sysfs_create_group(&dev->dev_kobj,
++				 &ibnbd_srv_default_dev_attr_group);
++	if (ret)
++		goto err2;
++
++	bdev_kobj = &disk_to_dev(bdev->bd_disk)->kobj;
++	ret = sysfs_create_link(&dev->dev_kobj, bdev_kobj, "block_dev");
++	if (ret)
++		goto err3;
++
++	return 0;
++
++err3:
++	sysfs_remove_group(&dev->dev_kobj,
++			   &ibnbd_srv_default_dev_attr_group);
++err2:
++	kobject_del(&dev->dev_sessions_kobj);
++	kobject_put(&dev->dev_sessions_kobj);
++err:
++	kobject_del(&dev->dev_kobj);
++	kobject_put(&dev->dev_kobj);
++	return ret;
++}
++
++void ibnbd_srv_destroy_dev_sysfs(struct ibnbd_srv_dev *dev)
++{
++	sysfs_remove_link(&dev->dev_kobj, "block_dev");
++	sysfs_remove_group(&dev->dev_kobj, &ibnbd_srv_default_dev_attr_group);
++	kobject_del(&dev->dev_sessions_kobj);
++	kobject_put(&dev->dev_sessions_kobj);
++	kobject_del(&dev->dev_kobj);
++	kobject_put(&dev->dev_kobj);
++}
++
++static ssize_t ibnbd_srv_dev_session_ro_show(struct kobject *kobj,
++					     struct kobj_attribute *attr,
++					     char *page)
++{
++	struct ibnbd_srv_sess_dev *sess_dev;
++
++	sess_dev = container_of(kobj, struct ibnbd_srv_sess_dev, kobj);
++
++	return scnprintf(page, PAGE_SIZE, "%s\n",
++			 (sess_dev->open_flags & FMODE_WRITE) ? "0" : "1");
++}
++
++static struct kobj_attribute ibnbd_srv_dev_session_ro_attr =
++	__ATTR(read_only, 0444,
++	       ibnbd_srv_dev_session_ro_show,
++	       NULL);
++
++static ssize_t
++ibnbd_srv_dev_session_mapping_path_show(struct kobject *kobj,
++					struct kobj_attribute *attr, char *page)
++{
++	struct ibnbd_srv_sess_dev *sess_dev;
++
++	sess_dev = container_of(kobj, struct ibnbd_srv_sess_dev, kobj);
++
++	return scnprintf(page, PAGE_SIZE, "%s\n", sess_dev->pathname);
++}
++
++static struct kobj_attribute ibnbd_srv_dev_session_mapping_path_attr =
++	__ATTR(mapping_path, 0444,
++	       ibnbd_srv_dev_session_mapping_path_show,
++	       NULL);
++
++static struct attribute *ibnbd_srv_default_dev_sessions_attrs[] = {
++	&ibnbd_srv_dev_session_ro_attr.attr,
++	&ibnbd_srv_dev_session_mapping_path_attr.attr,
++	NULL,
++};
++
++static struct attribute_group ibnbd_srv_default_dev_session_attr_group = {
++	.attrs = ibnbd_srv_default_dev_sessions_attrs,
++};
++
++void ibnbd_srv_destroy_dev_session_sysfs(struct ibnbd_srv_sess_dev *sess_dev)
++{
++	DECLARE_COMPLETION_ONSTACK(sysfs_compl);
++
++	sysfs_remove_group(&sess_dev->kobj,
++			   &ibnbd_srv_default_dev_session_attr_group);
++
++	sess_dev->sysfs_release_compl = &sysfs_compl;
++	kobject_del(&sess_dev->kobj);
++	kobject_put(&sess_dev->kobj);
++	wait_for_completion(&sysfs_compl);
++}
++
++static void ibnbd_srv_sess_dev_release(struct kobject *kobj)
++{
++	struct ibnbd_srv_sess_dev *sess_dev;
++
++	sess_dev = container_of(kobj, struct ibnbd_srv_sess_dev, kobj);
++	if (sess_dev->sysfs_release_compl)
++		complete_all(sess_dev->sysfs_release_compl);
++}
++
++static struct kobj_type ibnbd_srv_sess_dev_ktype = {
++	.sysfs_ops	= &kobj_sysfs_ops,
++	.release	= ibnbd_srv_sess_dev_release,
++};
++
++int ibnbd_srv_create_dev_session_sysfs(struct ibnbd_srv_sess_dev *sess_dev)
++{
++	int ret;
++
++	ret = kobject_init_and_add(&sess_dev->kobj, &ibnbd_srv_sess_dev_ktype,
++				   &sess_dev->dev->dev_sessions_kobj, "%s",
++				   sess_dev->sess->sessname);
++	if (ret)
++		return ret;
++
++	ret = sysfs_create_group(&sess_dev->kobj,
++				 &ibnbd_srv_default_dev_session_attr_group);
++	if (ret)
++		goto err;
++
++	return 0;
++
++err:
++	kobject_del(&sess_dev->kobj);
++	kobject_put(&sess_dev->kobj);
++
++	return ret;
++}
++
++int ibnbd_srv_create_sysfs_files(void)
++{
++	int err;
++
++	ibnbd_dev_class = class_create(THIS_MODULE, "ibnbd-server");
++	if (unlikely(IS_ERR(ibnbd_dev_class)))
++		return PTR_ERR(ibnbd_dev_class);
++
++	ibnbd_dev = device_create(ibnbd_dev_class, NULL,
++				  MKDEV(0, 0), NULL, "ctl");
++	if (unlikely(IS_ERR(ibnbd_dev))) {
++		err = PTR_ERR(ibnbd_dev);
++		goto cls_destroy;
++	}
++	ibnbd_devs_kobj = kobject_create_and_add("devices", &ibnbd_dev->kobj);
++	if (unlikely(!ibnbd_devs_kobj)) {
++		err = -ENOMEM;
++		goto dev_destroy;
++	}
++
++	return 0;
++
++dev_destroy:
++	device_destroy(ibnbd_dev_class, MKDEV(0, 0));
++cls_destroy:
++	class_destroy(ibnbd_dev_class);
++
++	return err;
++}
++
++void ibnbd_srv_destroy_sysfs_files(void)
++{
++	kobject_del(ibnbd_devs_kobj);
++	kobject_put(ibnbd_devs_kobj);
++	device_destroy(ibnbd_dev_class, MKDEV(0, 0));
++	class_destroy(ibnbd_dev_class);
++}
 -- 
-2.17.1
+2.13.1
