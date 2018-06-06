@@ -1,208 +1,338 @@
-Return-Path: <prvs=70988ebf6=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Omar Sandoval <osandov@fb.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v2] blk-mq: Fix a race condition in blk_mq_mark_tag_wait()
-Date: Wed, 27 Jun 2018 13:02:12 -0700
-Message-Id: <20180627200212.14435-1-bart.vanassche@wdc.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Doug Ledford <dledford@redhat.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH v3 24/25] ibnbd: a bit of documentation
+Date: Wed,  6 Jun 2018 17:25:14 +0200
+Message-Id: <20180606152515.25807-25-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
+References: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Because the hctx lock is not held around the only
-blk_mq_tag_wakeup_all() call in the block layer, the wait queue
-entry removal in blk_mq_dispatch_wake() is protected by the wait
-queue lock only. Since the hctx->dispatch_wait entry can occur on
-any of the SBQ_WAIT_QUEUES, the wait queue presence check, adding
-.dispatch_wait to a wait queue and removing the wait queue entry
-must all be protected by both the hctx lock and the wait queue
-lock.
+README with description of major sysfs entries.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jack Wang <jinpu.wang@profitbricks.com>
 ---
+ drivers/block/ibnbd/README | 299 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 299 insertions(+)
+ create mode 100644 drivers/block/ibnbd/README
 
-Changes compared to v1: made sure that the hctx lock is also held around the
-   list_del() call in blk_mq_dispatch_wake().
-
- block/blk-mq-debugfs.c |  4 ++--
- block/blk-mq-sched.c   |  8 +++----
- block/blk-mq.c         | 48 ++++++++++++++++++++++++------------------
- 3 files changed, 34 insertions(+), 26 deletions(-)
-
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 1c4532e92938..05fd98fad820 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -399,7 +399,7 @@ static void *hctx_dispatch_start(struct seq_file *m, loff_t *pos)
- {
- 	struct blk_mq_hw_ctx *hctx = m->private;
- 
--	spin_lock(&hctx->lock);
-+	spin_lock_irq(&hctx->lock);
- 	return seq_list_start(&hctx->dispatch, *pos);
- }
- 
-@@ -415,7 +415,7 @@ static void hctx_dispatch_stop(struct seq_file *m, void *v)
- {
- 	struct blk_mq_hw_ctx *hctx = m->private;
- 
--	spin_unlock(&hctx->lock);
-+	spin_unlock_irq(&hctx->lock);
- }
- 
- static const struct seq_operations hctx_dispatch_seq_ops = {
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 56c493c6cd90..07dd6fe9f134 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -190,10 +190,10 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 * more fair dispatch.
- 	 */
- 	if (!list_empty_careful(&hctx->dispatch)) {
--		spin_lock(&hctx->lock);
-+		spin_lock_irq(&hctx->lock);
- 		if (!list_empty(&hctx->dispatch))
- 			list_splice_init(&hctx->dispatch, &rq_list);
--		spin_unlock(&hctx->lock);
-+		spin_unlock_irq(&hctx->lock);
- 	}
- 
- 	/*
-@@ -368,9 +368,9 @@ static bool blk_mq_sched_bypass_insert(struct blk_mq_hw_ctx *hctx,
- {
- 	/* dispatch flush rq directly */
- 	if (rq->rq_flags & RQF_FLUSH_SEQ) {
--		spin_lock(&hctx->lock);
-+		spin_lock_irq(&hctx->lock);
- 		list_add(&rq->queuelist, &hctx->dispatch);
--		spin_unlock(&hctx->lock);
-+		spin_unlock_irq(&hctx->lock);
- 		return true;
- 	}
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b6888ff556cf..e04321e91116 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1003,7 +1003,10 @@ static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
- 
- 	hctx = container_of(wait, struct blk_mq_hw_ctx, dispatch_wait);
- 
-+	spin_lock_irq(&hctx->lock);
- 	list_del_init(&wait->entry);
-+	spin_unlock_irq(&hctx->lock);
+diff --git a/drivers/block/ibnbd/README b/drivers/block/ibnbd/README
+new file mode 100644
+index 000000000000..bbaddd02c1c5
+--- /dev/null
++++ b/drivers/block/ibnbd/README
+@@ -0,0 +1,299 @@
++***************************************
++Infiniband Network Block Device (IBNBD)
++***************************************
 +
- 	blk_mq_run_hw_queue(hctx, true);
- 	return 1;
- }
-@@ -1020,7 +1023,7 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx **hctx,
- 	struct blk_mq_hw_ctx *this_hctx = *hctx;
- 	struct sbq_wait_state *ws;
- 	wait_queue_entry_t *wait;
--	bool ret;
-+	bool ret = false;
- 
- 	if (!(this_hctx->flags & BLK_MQ_F_TAG_SHARED)) {
- 		if (!test_bit(BLK_MQ_S_SCHED_RESTART, &this_hctx->state))
-@@ -1041,14 +1044,20 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx **hctx,
- 	if (!list_empty_careful(&wait->entry))
- 		return false;
- 
-+	ws = bt_wait_ptr(&this_hctx->tags->bitmap_tags, this_hctx);
++Introduction
++------------
 +
-+	/*
-+	 * Since hctx->dispatch_wait can already be on any of the
-+	 * SBQ_WAIT_QUEUES number of wait queues, serialize the check and
-+	 * add_wait_queue() calls below with this_hctx->lock.
-+	 */
-+	spin_lock_irq(&ws->wait.lock);
- 	spin_lock(&this_hctx->lock);
--	if (!list_empty(&wait->entry)) {
--		spin_unlock(&this_hctx->lock);
--		return false;
--	}
-+	if (!list_empty(&wait->entry))
-+		goto unlock;
- 
--	ws = bt_wait_ptr(&this_hctx->tags->bitmap_tags, this_hctx);
--	add_wait_queue(&ws->wait, wait);
-+	wait->flags &= ~WQ_FLAG_EXCLUSIVE;
-+	__add_wait_queue(&ws->wait, wait);
- 
- 	/*
- 	 * It's possible that a tag was freed in the window between the
-@@ -1056,21 +1065,20 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx **hctx,
- 	 * queue.
- 	 */
- 	ret = blk_mq_get_driver_tag(rq, hctx, false);
--	if (!ret) {
--		spin_unlock(&this_hctx->lock);
--		return false;
--	}
-+	if (!ret)
-+		goto unlock;
- 
- 	/*
- 	 * We got a tag, remove ourselves from the wait queue to ensure
- 	 * someone else gets the wakeup.
- 	 */
--	spin_lock_irq(&ws->wait.lock);
- 	list_del_init(&wait->entry);
--	spin_unlock_irq(&ws->wait.lock);
++IBNBD (InfiniBand Network Block Device) is a pair of kernel modules
++(client and server) that allow for remote access of a block device on
++the server over IBTRS protocol using the RDMA (InfiniBand, RoCE, iWarp)
++transport. After being mapped, the remote block devices can be accessed
++on the client side as local block devices.
 +
-+unlock:
- 	spin_unlock(&this_hctx->lock);
-+	spin_unlock_irq(&ws->wait.lock);
- 
--	return true;
-+	return ret;
- }
- 
- #define BLK_MQ_RESOURCE_DELAY	3		/* ms units */
-@@ -1171,9 +1179,9 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 	if (!list_empty(list)) {
- 		bool needs_restart;
- 
--		spin_lock(&hctx->lock);
-+		spin_lock_irq(&hctx->lock);
- 		list_splice_init(list, &hctx->dispatch);
--		spin_unlock(&hctx->lock);
-+		spin_unlock_irq(&hctx->lock);
- 
- 		/*
- 		 * If SCHED_RESTART was set by the caller of this function and
-@@ -1520,9 +1528,9 @@ void blk_mq_request_bypass_insert(struct request *rq, bool run_queue)
- 	struct blk_mq_ctx *ctx = rq->mq_ctx;
- 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(rq->q, ctx->cpu);
- 
--	spin_lock(&hctx->lock);
-+	spin_lock_irq(&hctx->lock);
- 	list_add_tail(&rq->queuelist, &hctx->dispatch);
--	spin_unlock(&hctx->lock);
-+	spin_unlock_irq(&hctx->lock);
- 
- 	if (run_queue)
- 		blk_mq_run_hw_queue(hctx, false);
-@@ -2048,9 +2056,9 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
- 	if (list_empty(&tmp))
- 		return 0;
- 
--	spin_lock(&hctx->lock);
-+	spin_lock_irq(&hctx->lock);
- 	list_splice_tail_init(&tmp, &hctx->dispatch);
--	spin_unlock(&hctx->lock);
-+	spin_unlock_irq(&hctx->lock);
- 
- 	blk_mq_run_hw_queue(hctx, true);
- 	return 0;
++I/O is transfered between client and server by the IBTRS transport
++modules. The administration of IBNBD and IBTRS modules is done via
++sysfs entries.
++
++Requirements
++------------
++
++  IBTRS kernel modules
++
++Quick Start
++-----------
++
++Server side:
++  # modprobe ibnbd_server
++
++Client side:
++  # modprobe ibnbd_client
++  # echo "sessname=blya path=ip:10.50.100.66 device_path=/dev/ram0" > \
++            /sys/devices/virtual/ibnbd-client/ctl/map_device
++
++  Where "sessname=" is a session name, a string to identify the session
++  on client and on server sides; "path=" is a destination IP address or
++  a pair of a source and a destination IPs, separated by comma.  Multiple
++  "path=" options can be specified in order to use multipath  (see IBTRS
++  description for details); "device_path=" is the block device to be
++  mapped from the server side. After the session to the server machine is
++  established, the mapped device will appear on the client side under
++  /dev/ibnbd<N>.
++
++
++======================
++Client Sysfs Interface
++======================
++
++All sysfs files that are not read-only provide the usage information on read:
++
++Example:
++  # cat /sys/devices/virtual/ibnbd-client/ctl/map_device
++
++  > Usage: echo "sessname=<name of the ibtrs session> path=<[srcaddr,]dstaddr>
++  > [path=<[srcaddr,]dstaddr>] device_path=<full path on remote side>
++  > [access_mode=<ro|rw|migration>]
++  > [io_mode=<fileio|blockio>]" > map_device
++  >
++  > addr ::= [ ip:<ipv4> | ip:<ipv6> | gid:<gid> ]
++
++Entries under /sys/devices/virtual/ibnbd-client/ctl/
++=======================================
++
++map_device (RW)
++---------------
++
++Expected format is the following:
++
++    sessname=<name of the ibtrs session>
++    path=<[srcaddr,]dstaddr> [path=<[srcaddr,]dstaddr> ...]
++    device_path=<full path on remote side>
++    [access_mode=<ro|rw|migration>]
++    [io_mode=<fileio|blockio>]
++
++Where:
++
++sessname: accepts a string not bigger than 256 chars, which identifies
++          a given session on the client and on the server.
++          I.e. "clt_hostname-srv_hostname" could be a natural choice.
++
++path:     describes a connection between the client and the server by
++      specifying destination and, when required, the source address.
++      The addresses are to be provided in the following format:
++
++            ip:<IPv6>
++            ip:<IPv4>
++            gid:<GID>
++
++          for example:
++
++          path=ip:10.0.0.66
++                         The single addr is treated as the destination.
++                         The connection will be established to this
++                         server from any client IP address.
++
++          path=ip:10.0.0.66,ip:10.0.1.66
++                         First addr is the source address and the second
++                         is the destination.
++
++          If multiple "path=" options are specified multiple connection
++          will be established and data will be sent according to
++          the selected multipath policy (see IBTRS mp_policy sysfs entry
++          description).
++
++device_path: Path to the block device on the server side. Path is specified
++         relative to the directory on server side configured in the
++         'dev_search_path' module parameter of the ibnbd_server.
++         The ibnbd_server prepends the <device_path> received from client
++         with <dev_search_path> and tries to open the
++         <dev_search_path>/<device_path> block device.  On success,
++         a /dev/ibnbd<N> device file, a /sys/block/ibnbd_client/ibnbd<N>/
++         directory and an entry in /sys/devices/virtual/ibnbd-client/ctl/devices
++         will be created.
++
++         If 'dev_search_path' contains '%SESSNAME%', then each session can
++         have different devices namespace, e.g. server was configured with
++         the following parameter "dev_search_path=/run/ibnbd-devs/%SESSNAME%",
++         client has this string "sessname=blya device_path=sda", then server
++         will try to open: /run/ibnbd-devs/blya/sda.
++
++access_mode: the access_mode parameter specifies if the device is to be
++             mapped as "ro" read-only or "rw" read-write. The server allows
++             a device to be exported in rw mode only once. The "migration"
++             access mode has to be specified if a second mapping in read-write
++             mode is desired.
++
++             By default "rw" is used.
++
++io_mode:  the io_mode parameter specifies if the device on the server
++          will be opened as block device "blockio" or as file "fileio".
++          When the device is opened as file, the VFS page cache is used
++          for read I/O operations, write I/O operations bypass the page
++          cache and go directly to disk (except meta updates, like file
++          access time).
++
++          By default "blockio" mode is used.
++
++Exit Codes:
++
++If the device is already mapped it will fail with EEXIST. If the input
++has an invalid format it will return EINVAL. If the device path cannot
++be found on the server, it will fail with ENOENT.
++
++Finding device file after mapping
++---------------------------------
++
++After mapping, the device file can be found by:
++ o  The symlink /sys/devices/virtual/ibnbd-client/ctl/devices/<device_id>
++    points to /sys/block/<dev-name>. The last part of the symlink destination
++    is the same as the device name.  By extracting the last part of the
++    path the path to the device /dev/<dev-name> can be build.
++
++ o /dev/block/$(cat /sys/devices/virtual/ibnbd-client/ctl/devices/<device_id>/dev)
++
++How to find the <device_id> of the device is described on the next
++section.
++
++Entries under /sys/devices/virtual/ibnbd-client/ctl/devices/
++============================================================
++
++For each device mapped on the client a new symbolic link is created as
++/sys/devices/virtual/ibnbd-client/ctl/devices/<device_id>, which points
++to the block device created by ibnbd (/sys/block/ibnbd<N>/).
++The <device_id> of each device is created as follows:
++
++- If the 'device_path' provided during mapping contains slashes ("/"),
++  they are replaced by exclamation mark ("!") and used as as the
++  <device_id>. Otherwise, the <device_id> will be the same as the
++  "device_path" provided.
++
++Entries under /sys/block/ibnbd<N>/ibnbd_client/
++===============================================
++
++unmap_device (RW)
++-----------------
++
++To unmap a volume, "normal" or "force" has to be written to:
++  /sys/block/ibnbd<N>/ibnbd_client/unmap_device
++
++When "normal" is used, the operation will fail with EBUSY if any process
++is using the device.  When "force" is used, the device is also unmapped
++when device is in use.  All I/Os that are in progress will fail.
++
++Example:
++
++   # echo "normal" > /sys/block/ibnbd0/ibnbd/unmap_device
++
++state (RO)
++----------
++
++The file contains the current state of the block device. The state file
++returns "open" when the device is successfully mapped from the server
++and accepting I/O requests. When the connection to the server gets
++disconnected in case of an error (e.g. link failure), the state file
++returns "closed" and all I/O requests submitted to it will fail with -EIO.
++
++session (RO)
++------------
++
++IBNBD uses IBTRS session to transport the data between client and
++server.  The entry "session" contains the name of the session, that
++was used to establish the IBTRS session.  It's the same name that
++was passed as server parameter to the map_device entry.
++
++mapping_path (RO)
++-----------------
++
++Contains the path that was passed as "device_path" to the map_device
++operation.
++
++======================
++Server Sysfs Interface
++======================
++
++Entries under /sys/devices/virtual/ibnbd-server/ctl/
++====================================================
++
++When a client maps a device, a directory entry with the name of the
++block device is created under /sys/devices/virtual/ibnbd-server/ctl/devices/.
++
++Entries under /sys/devices/virtual/ibnbd-server/ctl/devices/<device_name>/
++==========================================================================
++
++block_dev (link)
++---------------
++
++Is a symlink to the sysfs entry of the exported device.
++
++Example:
++
++  block_dev -> ../../../../devices/virtual/block/ram0
++
++Entries under /sys/devices/virtual/ibnbd-server/ctl/devices/<device_name>/sessions/
++===================================================================================
++
++For each client a particular device is exported to, following directory will be
++created:
++
++/sys/devices/virtual/ibnbd-server/ctl/devices/<device_name>/sessions/<session-name>/
++
++When the device is unmapped by that client, the directory will be removed.
++
++Entries under /sys/devices/virtual/ibnbd-server/ctl/devices/<device_name>/sessions/<session-name>
++=================================================================================================
++
++read_only (RO)
++--------------
++
++Contains '1' if device is mapped read-only, otherwise '0'.
++
++mapping_path (RO)
++-----------------
++
++Contains the relative device path provided by the user during mapping.
++
++==============================
++IBNBD-Server Module Parameters
++==============================
++
++dev_search_path
++---------------
++
++When a device is mapped from the client, the server generates the path
++to the block device on the server side by concatenating dev_search_path
++and the "device_path" that was specified in the map_device operation.
++
++The default dev_search_path is: "/".
++
++dev_search_path option can also contain %SESSNAME% in order to provide
++different deviec namespaces for different sessions.  See "device_path"
++option for details.
++
++==============================
++Protocol (ibnbd/ibnbd-proto.h)
++==============================
++
++1. Before mapping first device from a given server, client sends an
++IBNBD_MSG_SESS_INFO to the server. Server responds with
++IBNBD_MSG_SESS_INFO_RSP. Currently the messages only contain the protocol
++version for backward compatibility.
++
++2. Client requests to open a device by sending IBNBD_MSG_OPEN message. This
++contains the path to the device, access mode (read-only or writable), and
++io_mode which specifies if the device should be opened as block device or
++using file io. Server responds to the message with IBNBD_MSG_OPEN_RSP. This
++contains a 32 bit device id to be used for  IOs and device "geometry" related
++information: side, max_hw_sectors, etc.
++
++3. Client attaches IBNBD_MSG_IO to each IO message send to a device. This
++message contains device id, provided by server in his ibnbd_msg_open_rsp,
++sector to be accessed, read-write flags and bi_size.
++
++4. Client closes a device by sending IBNBD_MSG_CLOSE which contains only the
++device id provided by the server.
++
++
++Contact
++-------
++
++Mailing list: "IBNBD/IBTRS Storage Team" <ibnbd@profitbricks.com>
 -- 
-2.17.1
+2.13.1
