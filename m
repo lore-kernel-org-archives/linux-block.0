@@ -1,92 +1,28 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Sun, 24 Jun 2018 18:16:17 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bart.vanassche@wdc.com>,
-	Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-	Omar Sandoval <osandov@fb.com>, Andrew Jones <drjones@redhat.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [blk-mq Bug] race on removing hctx->dispatch_wait from wait queue
-Message-ID: <20180624101605.GA32610@ming.t460p>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCHv2] block: always set partition number to '0' in
+ blk_partition_remap()
+To: Hannes Reinecke <hare@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+ Keith Busch <keith.busch@intel.com>, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
+References: <20180607082944.41676-1-hare@suse.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <3d45f792-f00e-0955-3acf-466e73050a9c@kernel.dk>
+Date: Thu, 7 Jun 2018 06:56:14 -0600
 MIME-Version: 1.0
+In-Reply-To: <20180607082944.41676-1-hare@suse.de>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Guys,
+On 6/7/18 2:29 AM, Hannes Reinecke wrote:
+> blk_partition_remap() will only clear bi_partno if an actual remapping
+> has happened. But flush request et al don't have an actual size, so
+> the remapping doesn't happen and bi_partno is never cleared.
+> So for stacked devices blk_partition_remap() will be called on each level.
+> If (as is the case for native nvme multipathing) one of the lower-level
+> devices do _not_support partitioning a spurious I/O error is generated.
 
-Recently, I am figuring out solutions for removing synchronize_rcu() from
-blk_cleanup_queue() so that no long delay is caused during SCSI lun probe[1],
-especially from blk_mq_del_queue_tag_set(). This synchronize_rcu() is added
-by commit 705cda97ee3abb6ea(blk-mq: Make it safe to use RCU to iterate over
-blk_mq_tag_set.tag_list), and commit 6d8c6c0f97ad ("blk-mq: Restart a single
-queue if tag sets are shared"), and call this as 'TAG_SHARED in restart'.
+That's better, applied.
 
-Basically speaking, the synchronize_rcu() can't be removed if we have
-to restart all tags-shared queues in current way('TAG_SHARED in restart')
-when one request is completed. Meantime blk-mq has used blk_mq_mark_tag_wait()
-to deal with cross-queue driver tag allocation, which means the two mechanism
-are  highly overlapped. Also SCSI has built-in RESTART, and not need
-'TAG_SHARED in restart'.
-
-We tried to remove shared-tag restart in 358a3a6bccb7 (blk-mq: don't handle
-TAG_SHARED in restart) before, but it is reverted in commit 05b79413946d
-(Revert "blk-mq: don't handle TAG_SHARED in restart") because it causes
-regression in Bart's SRP test.
-
-Now I am revisiting 'TAG_SHARED in restart' again for the long delay issue
-of SCSI LUN probe. And found there is one bug in blk_mq_mark_tag_wait():
-
-- hctx->dispatch_wait is added to wait queue by holding hctx->lock and
-the wait queue's lock
-
-- no hctx->lock is held when removing hctx->dispatch_wait from wait
-  queue.
-
-- so the two actions(add, remove) may happen meantime since
-  hctx->dispatch_wait can be added to different wait queues.
-
-Turns out this issue can be observed easily by applying the patches[2],
-which is for removing 'TAG_SHARED in restart', then run simple shared-tag
-null_blk test[4].
-
-But if the hctx->lock is held in blk_mq_dispatch_wake(), as done in
-patch [3], there isn't such issue at all, so it shows this issue is
-related with hctx->lock, and adding/removing hctx->dispatch_wait to
-wait queue. But the way of holding hctx->lock in irq context may not
-be one accepted solution, since it has been avoided from the beginning
-of blk-mq.
-
-So does anyone have better ideas for this issue?
-
-So far, follows what I thought of:
-
-1) fix the mechanism of blk_mq_mark_tag_wait(), and removing
-'TAG_SHARED in restart', then we can fix the long delay issue of
-SCSI LUN probe, meantime performance can got improved, as I observed,
-this way may improve IOPS by 20~30% in multi-LUN scsi_debug test.
-But the issue is how to fix?
-
-2) keep 'TAG_SHARED in restart' and let it cover the issue of
-blk_mq_mark_tag_wait() as now, then try to improve 'TAG_SHARED in restart'
-in another way, so that performance can be better, and synchronize_rcu()
-can be removed from blk_mq_del_queue_tag_set(), then SCSI LUN probe long
-delay can be fixed. I had wrote patches to do that last year. If anyone
-is interested, I may post it out.
-
-Or other ideas, any comments & ideas are welcome!
-
-
-[1] [PATCH] blk-mq: avoid to synchronize rcu inside blk_cleanup_queue() 
-	https://marc.info/?t=152948737900041&r=1&w=2
-
-[2] [PATCH] blk-mq: remove synchronize_rcu() from blk_mq_del_queue_tag_set() 
-	https://github.com/ming1/linux/commit/36a0ff197531e02a955472059acfc436b8ed97e7
-
-[3] [PATCH] blk-mq: holding hctx->lock when removing hctx->dispatch_wait from wai… 
-	https://github.com/ming1/linux/commit/cb7c822d663552da62479942458444c5081149a1
-
-[4] test script
-	http://people.redhat.com/minlei/tests/tools/null_blk_test-restart
-
-Thanks,
-Ming
+-- 
+Jens Axboe
