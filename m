@@ -1,65 +1,93 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 08/30] block: introduce chunk_last_segment()
-Date: Sat,  9 Jun 2018 20:29:52 +0800
-Message-Id: <20180609123014.8861-9-ming.lei@redhat.com>
-In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
-References: <20180609123014.8861-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Cc: snitzer@redhat.com,
+	kent.overstreet@gmail.com,
+	liwang@redhat.com,
+	vrbagal1@linux.vnet.ibm.com,
+	chuhu.ncepu@gmail.com,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 2/2] dm: use bioset_init_from_src() to copy bio_set
+Date: Thu,  7 Jun 2018 14:45:41 -0600
+Message-Id: <20180607204541.13491-3-axboe@kernel.dk>
+In-Reply-To: <20180607204541.13491-1-axboe@kernel.dk>
+References: <20180607204541.13491-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-BTRFS and guard_bio_eod() need to get the last singlepage segment
-from one multipage chunk, so introduce this helper to make them happy.
+We can't just copy and clear a bio_set, use the bio helper to
+setup a new bio_set with the settings from another one.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Fixes: 6f1c819c219f ("dm: convert to bioset_init()/mempool_init()")
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- include/linux/bvec.h | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ drivers/md/dm.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 9e082d023392..aac75d87d884 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -219,4 +219,29 @@ static inline bool bvec_iter_chunk_advance(const struct bio_vec *bv,
- 	.bi_bvec_done	= 0,						\
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 98dff36b89a3..20a8d63754bf 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1953,9 +1953,10 @@ static void free_dev(struct mapped_device *md)
+ 	kvfree(md);
  }
  
-+/*
-+ * Get the last singlepage segment from the multipage bvec and store it
-+ * in @seg
-+ */
-+static inline void chunk_last_segment(const struct bio_vec *bvec,
-+		struct bio_vec *seg)
-+{
-+	unsigned total = bvec->bv_offset + bvec->bv_len;
-+	unsigned last_page = total / PAGE_SIZE;
-+
-+	if (last_page * PAGE_SIZE == total)
-+		last_page--;
-+
-+	seg->bv_page = nth_page(bvec->bv_page, last_page);
-+
-+	/* the whole segment is inside the last page */
-+	if (bvec->bv_offset >= last_page * PAGE_SIZE) {
-+		seg->bv_offset = bvec->bv_offset % PAGE_SIZE;
-+		seg->bv_len = bvec->bv_len;
-+	} else {
-+		seg->bv_offset = 0;
-+		seg->bv_len = total - last_page * PAGE_SIZE;
+-static void __bind_mempools(struct mapped_device *md, struct dm_table *t)
++static int __bind_mempools(struct mapped_device *md, struct dm_table *t)
+ {
+ 	struct dm_md_mempools *p = dm_table_get_md_mempools(t);
++	int ret = 0;
+ 
+ 	if (dm_table_bio_based(t)) {
+ 		/*
+@@ -1982,13 +1983,16 @@ static void __bind_mempools(struct mapped_device *md, struct dm_table *t)
+ 	       bioset_initialized(&md->bs) ||
+ 	       bioset_initialized(&md->io_bs));
+ 
+-	md->bs = p->bs;
+-	memset(&p->bs, 0, sizeof(p->bs));
+-	md->io_bs = p->io_bs;
+-	memset(&p->io_bs, 0, sizeof(p->io_bs));
++	ret = bioset_init_from_src(&md->bs, &p->bs);
++	if (ret)
++		goto out;
++	ret = bioset_init_from_src(&md->io_bs, &p->io_bs);
++	if (ret)
++		bioset_exit(&md->bs);
+ out:
+ 	/* mempool bind completed, no longer need any mempools in the table */
+ 	dm_table_free_md_mempools(t);
++	return ret;
+ }
+ 
+ /*
+@@ -2033,6 +2037,7 @@ static struct dm_table *__bind(struct mapped_device *md, struct dm_table *t,
+ 	struct request_queue *q = md->queue;
+ 	bool request_based = dm_table_request_based(t);
+ 	sector_t size;
++	int ret;
+ 
+ 	lockdep_assert_held(&md->suspend_lock);
+ 
+@@ -2068,7 +2073,11 @@ static struct dm_table *__bind(struct mapped_device *md, struct dm_table *t,
+ 		md->immutable_target = dm_table_get_immutable_target(t);
+ 	}
+ 
+-	__bind_mempools(md, t);
++	ret = __bind_mempools(md, t);
++	if (ret) {
++		old_map = ERR_PTR(ret);
++		goto out;
 +	}
-+}
-+
- #endif /* __LINUX_BVEC_ITER_H */
+ 
+ 	old_map = rcu_dereference_protected(md->map, lockdep_is_held(&md->suspend_lock));
+ 	rcu_assign_pointer(md->map, (void *)t);
+@@ -2078,6 +2087,7 @@ static struct dm_table *__bind(struct mapped_device *md, struct dm_table *t,
+ 	if (old_map)
+ 		dm_sync_table(md);
+ 
++out:
+ 	return old_map;
+ }
+ 
 -- 
-2.9.5
+2.17.1
