@@ -1,32 +1,68 @@
 Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block flush handling fix
-Message-ID: <b3bbb473-6518-506f-0fae-dedf26d472cb@kernel.dk>
-Date: Sun, 10 Jun 2018 10:32:14 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+To: linux-block@vger.kernel.org
+Cc: snitzer@redhat.com,
+	kent.overstreet@gmail.com,
+	liwang@redhat.com,
+	vrbagal1@linux.vnet.ibm.com,
+	chuhu.ncepu@gmail.com,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 1/2] block: add bioset_init_from_src() helper
+Date: Thu,  7 Jun 2018 14:45:40 -0600
+Message-Id: <20180607204541.13491-2-axboe@kernel.dk>
+In-Reply-To: <20180607204541.13491-1-axboe@kernel.dk>
+References: <20180607204541.13491-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+Add a helper that allows a caller to initialize a new bio_set,
+using the settings from an existing bio_set.
 
-Single fix that we should merge now, fixing a regression in
-queuing flush request, accessing request flags after calling
-the end_request handler.
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ block/bio.c         | 18 ++++++++++++++++++
+ include/linux/bio.h |  1 +
+ 2 files changed, 19 insertions(+)
 
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20180610
-
-
-----------------------------------------------------------------
-Jens Axboe (1):
-      block: fix use-after-free in block flush handling
-
- block/blk-flush.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
+diff --git a/block/bio.c b/block/bio.c
+index 595663e0281a..bf516d873ce9 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1967,6 +1967,24 @@ int bioset_init(struct bio_set *bs,
+ }
+ EXPORT_SYMBOL(bioset_init);
+ 
++/*
++ * Initialize and setup a new bio_set, based on the settings from
++ * another bio_set.
++ */
++int bioset_init_from_src(struct bio_set *bs, struct bio_set *src)
++{
++	int flags;
++
++	flags = 0;
++	if (src->bvec_pool.min_nr)
++		flags |= BIOSET_NEED_BVECS;
++	if (src->rescue_workqueue)
++		flags |= BIOSET_NEED_RESCUER;
++
++	return bioset_init(bs, src->bio_pool.min_nr, src->front_pad, flags);
++}
++EXPORT_SYMBOL(bioset_init_from_src);
++
+ #ifdef CONFIG_BLK_CGROUP
+ 
+ /**
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 810a8bee8f85..84abd1706dcb 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -417,6 +417,7 @@ enum {
+ extern int bioset_init(struct bio_set *, unsigned int, unsigned int, int flags);
+ extern void bioset_exit(struct bio_set *);
+ extern int biovec_init_pool(mempool_t *pool, int pool_entries);
++extern int bioset_init_from_src(struct bio_set *bs, struct bio_set *src);
+ 
+ extern struct bio *bio_alloc_bioset(gfp_t, unsigned int, struct bio_set *);
+ extern void bio_put(struct bio *);
 -- 
-Jens Axboe
+2.17.1
