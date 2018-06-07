@@ -1,102 +1,67 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from synology.com ([59.124.61.242]:52675 "EHLO synology.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932316AbeFFIJi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 6 Jun 2018 04:09:38 -0400
-From: bingjingc <bingjingc@synology.com>
-To: linux-block@vger.kernel.org
-Cc: bingjingc@synology.com, cccheng@synology.com
-Subject: [PATCH blktests 4/9] blktests: add a regression test for raid5 creation resync
-Date: Wed,  6 Jun 2018 16:09:32 +0800
-Message-Id: <1528272572-15711-1-git-send-email-bingjingc@synology.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Ladvine.DAlmeida@synopsys.com>
+From: Ladvine D Almeida <Ladvine.DAlmeida@synopsys.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Ladvine D Almeida <Ladvine.DAlmeida@synopsys.com>,
+	Christoph Hellwig <hch@infradead.org>
+CC: Hannes Reinecke <hare@suse.com>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Manjunath M Bettegowda <Manjunath.MB@synopsys.com>,
+	Prabu Thangamuthu <Prabu.T@synopsys.com>,
+	Tejas Joglekar <Tejas.Joglekar@synopsys.com>,
+	Joao Pinto <Joao.Pinto@synopsys.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	"Milan Broz" <gmazyland@gmail.com>, Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	device-mapper development <dm-devel@redhat.com>,
+	"Eric Biggers" <ebiggers3@gmail.com>, Theodore Ts'o <tytso@mit.edu>,
+	Jaegeuk Kim <jaegeuk@kernel.org>
+Subject: Re: [PATCH] block: Add block level changes for inline encryption
+Date: Thu, 7 Jun 2018 06:55:42 +0000
+Message-ID: <BD7FB879CC136E419544C8E2AE7B9C3020C7FA@IN01WEMBXA.internal.synopsys.com>
+References: <d3624fab-e6fc-f14d-c780-db703c809068@synopsys.com>
+ <20180601081330.GA13067@infradead.org>
+ <BD7FB879CC136E419544C8E2AE7B9C3020C566@IN01WEMBXA.internal.synopsys.com>
+ <918609fa-8721-0ee1-801e-4c29b64ac9ae@kernel.dk>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-Reviewed-by: Chung-Chiang Cheng <cccheng@synology.com>
-Signed-off-by: BingJing Chang <bingjingc@synology.com>
----
- tests/md/003     | 60 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/md/003.out |  4 ++++
- 2 files changed, 64 insertions(+)
- create mode 100755 tests/md/003
- create mode 100644 tests/md/003.out
-
-diff --git a/tests/md/003 b/tests/md/003
-new file mode 100755
-index 0000000..71c2e56
---- /dev/null
-+++ b/tests/md/003
-@@ -0,0 +1,60 @@
-+#!/bin/bash
-+#
-+# Create a raid5 device of all given devices, and check theirs are
-+# all in-sync afterwards.
-+#
-+# Copyright (C) 2018 Synology Inc.
-+#
-+# This program is free software: you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation, either version 3 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+
-+. common/md
-+
-+DESCRIPTION="run raid5 creation resync test"
-+QUICK=1
-+
-+requires() {
-+	_check_md_devname_available /dev/md/blktests3 && \
-+	    _check_raid_devs_available && _meet_raid5_requirement
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	if [ -n "$LIMIT_DEV_SIZE" ]; then
-+		mdadm -C /dev/md/blktests3 -R --force -l5 "-n${#RAID_DEVS[@]}"\
-+		    "${RAID_DEVS[@]}" -z "$LIMIT_DEV_SIZE" 2>&1 | grep started
-+	else
-+		mdadm -C /dev/md/blktests3 -R --force -l5 "-n${#RAID_DEVS[@]}"\
-+		    "${RAID_DEVS[@]}" 2>&1 | grep started
-+	fi
-+	if [ $? -ne 0 ]; then
-+		echo "Array is not started."
-+		return
-+	fi
-+
-+	local md
-+	md=$(basename "$(readlink /dev/md/blktests3)")
-+	_wait_sync_completed "$md"
-+
-+	local mismatched
-+	_check_integrity "$md"
-+	mismatched=$(cat /sys/block/"$md"/md/mismatch_cnt)
-+	mdadm -S /dev/md/blktests3
-+
-+	if [ "$mismatched" -ne 0 ]; then
-+		echo "Array is not synced."
-+	fi
-+
-+	echo "Test complete"
-+}
-\ No newline at end of file
-diff --git a/tests/md/003.out b/tests/md/003.out
-new file mode 100644
-index 0000000..ae7c984
---- /dev/null
-+++ b/tests/md/003.out
-@@ -0,0 +1,4 @@
-+Running md/003
-+mdadm: array /dev/md/blktests3 started.
-+mdadm: stopped /dev/md/blktests3
-+Test complete
--- 
-2.7.4
+On Thursday 07 June 2018 02:53 AM, Jens Axboe wrote:=0A=
+> On 6/6/18 1:35 AM, Ladvine D Almeida wrote:=0A=
+>> On Friday 01 June 2018 09:13 AM, Christoph Hellwig wrote:=0A=
+>>> On Mon, May 28, 2018 at 02:43:09PM +0100, Ladvine D Almeida wrote:=0A=
+>>>> This patch introduces new variable under bio structure to=0A=
+>>>> facilitate inline encryption. This variable is used to=0A=
+>>>> associate I/O requests to crypto information.=0A=
+>>> This seems to be missing a whole lot of context.  Where is the whole=0A=
+>>> series showing what you are trying to do?=0A=
+>>>=0A=
+>> Christoph,=0A=
+>>=0A=
+>> The patches are generated in the below > manner, with a thought of=0A=
+>> sending separately to the MAINTAINERS responsible for each.=0A=
+> What both Christoph and I have said is that it's _impossible_ to review=
+=0A=
+> changes when you don't know what is being built on top of it. The block=
+=0A=
+> change, by itself, is utterly useless. The use case needs to be seen.=0A=
+> But apart from that, my comments on why it's doing it completely=0A=
+> backwards still apply, and I've outlined how you need to fix it. The=0A=
+> patch, in its current form, isn't going anywhere.=0A=
+>=0A=
+Jens,=0A=
+=0A=
+Since there are implementation level concerns on both device mapper layer a=
+nd block layer, I will investigate=0A=
+=0A=
+more and work on those lines. I can send the full patch series to the relev=
+ant maintainers after addressing the=0A=
+=0A=
+issues.=0A=
+=0A=
+Regards,=0A=
+=0A=
+Ladvine=0A=
+=0A=
