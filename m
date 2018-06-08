@@ -1,112 +1,32 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:35556 "EHLO
-        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752091AbeFAOoG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 10:44:06 -0400
-Received: by mail-lf0-f67.google.com with SMTP id y72-v6so15199051lfd.2
-        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 07:44:05 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        javier@cnexlabs.com, igor.j.konopko@intel.com,
-        marcin.dziegielewski@intel.com,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 09/10] lightnvm: pblk: kick writer on new flush points
-Date: Fri,  1 Jun 2018 16:41:13 +0200
-Message-Id: <20180601144114.17490-10-mb@lightnvm.io>
-In-Reply-To: <20180601144114.17490-1-mb@lightnvm.io>
-References: <20180601144114.17490-1-mb@lightnvm.io>
+Return-Path: <elviskitone@gmail.com>
+Return-Path: <elviskitone@gmail.com>
+Date: Fri, 8 Jun 2018 18:47:31 +0300
+From: Kitone Elvis Peter <elviskitone@gmail.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+Subject: REMOVE DELETION ERROR
+Message-ID: <20180608154731.GA1969@kitone-HP-ProBook-4530s>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
-
-Unless we kick the writer directly when setting a new flush point, the
-user risks having to wait for up to one second (the default timeout for
-the write thread to be kicked) for the IO to complete.
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+Corrected the modified variable in  previous commit
 ---
- drivers/lightnvm/pblk-cache.c | 10 ++++++----
- drivers/lightnvm/pblk-core.c  |  2 +-
- drivers/lightnvm/pblk-rb.c    |  4 ++--
- drivers/lightnvm/pblk.h       |  1 +
- 4 files changed, 10 insertions(+), 7 deletions(-)
+ block/partitions/acorn.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/lightnvm/pblk-cache.c b/drivers/lightnvm/pblk-cache.c
-index 29a23111b31c..b1c6d7eb6115 100644
---- a/drivers/lightnvm/pblk-cache.c
-+++ b/drivers/lightnvm/pblk-cache.c
-@@ -44,13 +44,15 @@ int pblk_write_to_cache(struct pblk *pblk, struct bio *bio, unsigned long flags)
- 		goto out;
+diff --git a/block/partitions/acorn.c b/block/partitions/acorn.c
+index 3bfe39d..358b05e 100644
+--- a/block/partitions/acorn.c
++++ b/block/partitions/acorn.c
+@@ -152,7 +152,7 @@ static int linux_partition(struct parsed_partitions *state,
+ 		put_partition(state, slot++, first_sect +
+ 				 le32_to_cpu(linuxp->start_sect),
+ 				 le32_to_cpu(linuxp->nr_sects));
+-		linux++;
++		linuxp++;
  	}
+ 	strlcat(state->pp_buf, " >", PAGE_SIZE);
  
--	if (unlikely(!bio_has_data(bio)))
--		goto out;
--
- 	pblk_ppa_set_empty(&w_ctx.ppa);
- 	w_ctx.flags = flags;
--	if (bio->bi_opf & REQ_PREFLUSH)
-+	if (bio->bi_opf & REQ_PREFLUSH) {
- 		w_ctx.flags |= PBLK_FLUSH_ENTRY;
-+		pblk_write_kick(pblk);
-+	}
-+
-+	if (unlikely(!bio_has_data(bio)))
-+		goto out;
- 
- 	for (i = 0; i < nr_entries; i++) {
- 		void *data = bio_data(bio);
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 99036befb571..a5750534efed 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -322,7 +322,7 @@ int pblk_bio_add_pages(struct pblk *pblk, struct bio *bio, gfp_t flags,
- 	return -1;
- }
- 
--static void pblk_write_kick(struct pblk *pblk)
-+void pblk_write_kick(struct pblk *pblk)
- {
- 	wake_up_process(pblk->writer_ts);
- 	mod_timer(&pblk->wtimer, jiffies + msecs_to_jiffies(1000));
-diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
-index 1b74ec51a4ad..00cd1f20a196 100644
---- a/drivers/lightnvm/pblk-rb.c
-+++ b/drivers/lightnvm/pblk-rb.c
-@@ -349,7 +349,7 @@ void pblk_rb_write_entry_gc(struct pblk_rb *rb, void *data,
- }
- 
- static int pblk_rb_flush_point_set(struct pblk_rb *rb, struct bio *bio,
--				  unsigned int pos)
-+				   unsigned int pos)
- {
- 	struct pblk_rb_entry *entry;
- 	unsigned int sync, flush_point;
-@@ -419,7 +419,7 @@ void pblk_rb_flush(struct pblk_rb *rb)
- 	if (pblk_rb_flush_point_set(rb, NULL, mem))
- 		return;
- 
--	pblk_write_should_kick(pblk);
-+	pblk_write_kick(pblk);
- }
- 
- static int pblk_rb_may_write_flush(struct pblk_rb *rb, unsigned int nr_entries,
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 725bc1bfa849..34cc1d64a9d4 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -851,6 +851,7 @@ void pblk_map_rq(struct pblk *pblk, struct nvm_rq *rqd, unsigned int sentry,
- int pblk_write_ts(void *data);
- void pblk_write_timer_fn(struct timer_list *t);
- void pblk_write_should_kick(struct pblk *pblk);
-+void pblk_write_kick(struct pblk *pblk);
- 
- /*
-  * pblk read path
 -- 
-2.11.0
+2.7.4
