@@ -1,72 +1,35 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Marco Patalano <mpatalan@redhat.com>,
-	"Ewan D. Milne" <emilne@redhat.com>
-Subject: [PATCH] blk-mq: fix read/write 'nr_requests' in case of 'none' scheduler
-Date: Sat,  2 Jun 2018 12:59:21 +0800
-Message-Id: <20180602045921.20603-1-ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 0/2] Fix bio_set copy
+To: Li Wang <liwang@redhat.com>
+Cc: linux-block@vger.kernel.org, snitzer@redhat.com,
+ Kent Overstreet <kent.overstreet@gmail.com>, vrbagal1@linux.vnet.ibm.com,
+ chuhu.ncepu@gmail.com
+References: <20180607204541.13491-1-axboe@kernel.dk>
+ <CAEemH2fcvMh2jS2zF0uvUuCrpL79LoBHFEQ84_bsbYkzsvMRmQ@mail.gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <d4ccd010-00ab-3915-d359-322a14cdfa18@kernel.dk>
+Date: Fri, 8 Jun 2018 07:13:30 -0600
+MIME-Version: 1.0
+In-Reply-To: <CAEemH2fcvMh2jS2zF0uvUuCrpL79LoBHFEQ84_bsbYkzsvMRmQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-If the current io scheduler is 'none', the max allowed 'nr_requests'
-should be from set->queue_depth, instead of the tags's depth, which
-can be adjusted before.
+On 6/8/18 12:12 AM, Li Wang wrote:
+> Jens Axboe <axboe@kernel.dk <mailto:axboe@kernel.dk>> wrote:
+> 
+>     After a recent change, dm ends up doing a straight copy of a
+>     bio_set. This breaks for various items in that bio_set,
+>     most notably lists. Provide a proper helper for it, and use it.
+> 
+> ​
+> 
+> I can confirm that the issue[1] was gone with this patchset applied.
+> 
+> 
+>    Tested-by: Li Wang <liwang@redhat.com <mailto:liwang@redhat.com>>
 
-This patch fixes this issue by using set->queue_depth as the max
-allowed 'nr_requests', meantime updating q->nr_requests when switching
-to 'none' scheduler.
+Thanks for testing, both of you, and reporting. I'll get this pushed
+upstream.
 
-Cc: Marco Patalano <mpatalan@redhat.com>
-Cc: "Ewan D. Milne" <emilne@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-
-This issue can be reproduced by the blktests block/021, which will
-be posted soon.
-
-
- block/blk-mq-sched.c | 1 +
- block/blk-mq-tag.c   | 6 ++++--
- 2 files changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index b0f2c2a40a0c..b087d8884a08 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -585,6 +585,7 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
- 
- 	if (!e) {
- 		q->elevator = NULL;
-+		q->nr_requests = q->tag_set->queue_depth;
- 		return 0;
- 	}
- 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index a4e58fc28a06..a178d862a29a 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -423,7 +423,9 @@ int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
- 			    struct blk_mq_tags **tagsptr, unsigned int tdepth,
- 			    bool can_grow)
- {
-+	struct blk_mq_tag_set *set = hctx->queue->tag_set;
- 	struct blk_mq_tags *tags = *tagsptr;
-+	unsigned int max_depth;
- 
- 	if (tdepth <= tags->nr_reserved_tags)
- 		return -EINVAL;
-@@ -434,8 +436,8 @@ int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
- 	 * If we are allowed to grow beyond the original size, allocate
- 	 * a new set of tags before freeing the old one.
- 	 */
--	if (tdepth > tags->nr_tags) {
--		struct blk_mq_tag_set *set = hctx->queue->tag_set;
-+	max_depth = can_grow ? tags->nr_tags: set->queue_depth;
-+	if (tdepth > max_depth) {
- 		struct blk_mq_tags *new;
- 		bool ret;
- 
 -- 
-2.9.5
+Jens Axboe
