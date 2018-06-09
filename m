@@ -1,45 +1,67 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH] block: always set partition number to '0' in blk_partition_remap()
-Date: Wed,  6 Jun 2018 16:22:18 +0200
-Message-Id: <20180606142218.64220-1-hare@suse.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V6 28/30] block: enable multipage bvecs
+Date: Sat,  9 Jun 2018 20:30:12 +0800
+Message-Id: <20180609123014.8861-29-ming.lei@redhat.com>
+In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
+References: <20180609123014.8861-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-blk_partition_remap() will only clear bi_partno if an actual remapping
-has happened. But flush request et al don't have an actual size, so
-the remapping doesn't happen and bi_partno is never cleared.
-So for stacked devices blk_partition_remap() will be called on each level.
-If (as is the case for native nvme multipathing) one of the lower-level
-devices do _not_support partitioning a spurious I/O error is generated.
+This patch pulls the trigger for multipage bvecs.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
+Now any request queue which supports queue cluster will see multipage
+bvecs.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-core.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ block/bio.c | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index cee03cad99f2..8a2c3a474234 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2225,7 +2225,10 @@ static inline int blk_partition_remap(struct bio *bio)
- 		bio->bi_partno = 0;
- 		trace_block_bio_remap(bio->bi_disk->queue, bio, part_devt(p),
- 				      bio->bi_iter.bi_sector - p->start_sect);
--	}
-+	} else
-+		/* Set partition number to '0' to avoid repetitive calls */
-+		bio->bi_partno = 0;
+diff --git a/block/bio.c b/block/bio.c
+index 276fc35ec559..284085ab97e7 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -870,12 +870,23 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
+ 
+ 	if (bio->bi_vcnt > 0) {
+ 		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
+-
+-		if (page == bv->bv_page && off == bv->bv_offset + bv->bv_len) {
+-			bv->bv_len += len;
+-			bio->bi_iter.bi_size += len;
+-			return true;
+-		}
++		struct request_queue *q = NULL;
 +
- 	ret = 0;
- out:
- 	rcu_read_unlock();
++		if (page == bv->bv_page && off == bv->bv_offset + bv->bv_len)
++			goto merge;
++
++		if (bio->bi_disk)
++			q = bio->bi_disk->queue;
++
++		/* disable multipage bvec too if cluster isn't enabled */
++		if (!q || !blk_queue_cluster(q) ||
++		    (bvec_to_phys(bv) + bv->bv_len !=
++		     page_to_phys(page) + off))
++			return false;
++ merge:
++		bv->bv_len += len;
++		bio->bi_iter.bi_size += len;
++		return true;
+ 	}
+ 	return false;
+ }
 -- 
-2.12.3
+2.9.5
