@@ -1,118 +1,80 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX 3/4] block, bfq: fix service being wrongly set to zero in case of preemption
-Date: Mon, 25 Jun 2018 21:48:05 +0200
-Message-Id: <20180625194806.7619-4-paolo.valente@linaro.org>
-In-Reply-To: <20180625194806.7619-1-paolo.valente@linaro.org>
-References: <20180625194806.7619-1-paolo.valente@linaro.org>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V6 23/30] f2fs: conver to bio_for_each_chunk_segment_all
+Date: Sat,  9 Jun 2018 20:30:07 +0800
+Message-Id: <20180609123014.8861-24-ming.lei@redhat.com>
+In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
+References: <20180609123014.8861-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-If
-- a bfq_queue Q preempts another queue, because one request of Q
-arrives in time,
-- but, after this preemption, Q is not the queue that is set in service,
-then Q->entity.service is set to 0 when Q is eventually set in
-service. But Q should have continued receiving service with its old
-budget (which is why preemption has occurred) and its old service.
+bio_for_each_page_all() can't be used any more after multipage bvec is
+enabled, so we have to convert to bio_for_each_chunk_segment_all().
 
-This commit addresses this issue by resetting service on queue real
-expiration.
-
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bfq-iosched.c | 34 ++++++++++++++++++++++++++++------
- block/bfq-wf2q.c    |  6 ------
- 2 files changed, 28 insertions(+), 12 deletions(-)
+ fs/f2fs/data.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 4fd4f1996498..d579cc8e0db6 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -1382,18 +1382,30 @@ static bool bfq_bfqq_update_budg_for_activation(struct bfq_data *bfqd,
- 		 * remain unchanged after such an expiration, and the
- 		 * following statement therefore assigns to
- 		 * entity->budget the remaining budget on such an
--		 * expiration. For clarity, entity->service is not
--		 * updated on expiration in any case, and, in normal
--		 * operation, is reset only when bfqq is selected for
--		 * service (see bfq_get_next_queue).
-+		 * expiration.
- 		 */
- 		entity->budget = min_t(unsigned long,
- 				       bfq_bfqq_budget_left(bfqq),
- 				       bfqq->max_budget);
+diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
+index 02237d4d91f5..00ee386b902c 100644
+--- a/fs/f2fs/data.c
++++ b/fs/f2fs/data.c
+@@ -54,6 +54,7 @@ static void f2fs_read_end_io(struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_chunk_iter citer;
  
-+		/*
-+		 * At this point, we have used entity->service to get
-+		 * the budget left (needed for updating
-+		 * entity->budget). Thus we finally can, and have to,
-+		 * reset entity->service. The latter must be reset
-+		 * because bfqq would otherwise be charged again for
-+		 * the service it has received during its previous
-+		 * service slot(s).
-+		 */
-+		entity->service = 0;
-+
- 		return true;
+ #ifdef CONFIG_F2FS_FAULT_INJECTION
+ 	if (time_to_inject(F2FS_P_SB(bio_first_page_all(bio)), FAULT_IO)) {
+@@ -71,7 +72,7 @@ static void f2fs_read_end_io(struct bio *bio)
+ 		}
  	}
  
-+	/*
-+	 * We can finally complete expiration, by setting service to 0.
-+	 */
-+	entity->service = 0;
- 	entity->budget = max_t(unsigned long, bfqq->max_budget,
- 			       bfq_serv_to_charge(bfqq->next_rq, bfqq));
- 	bfq_clear_bfqq_non_blocking_wait_rq(bfqq);
-@@ -3271,11 +3283,21 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
- 	ref = bfqq->ref;
- 	__bfq_bfqq_expire(bfqd, bfqq);
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
+ 		struct page *page = bvec->bv_page;
  
-+	if (ref == 1) /* bfqq is gone, no more actions on it */
-+		return;
-+
- 	/* mark bfqq as waiting a request only if a bic still points to it */
--	if (ref > 1 && !bfq_bfqq_busy(bfqq) &&
-+	if (!bfq_bfqq_busy(bfqq) &&
- 	    reason != BFQQE_BUDGET_TIMEOUT &&
--	    reason != BFQQE_BUDGET_EXHAUSTED)
-+	    reason != BFQQE_BUDGET_EXHAUSTED) {
- 		bfq_mark_bfqq_non_blocking_wait_rq(bfqq);
-+		/*
-+		 * Not setting service to 0, because, if the next rq
-+		 * arrives in time, the queue will go on receiving
-+		 * service with this same budget (as if it never expired)
-+		 */
-+	} else
-+		entity->service = 0;
- }
+ 		if (!bio->bi_status) {
+@@ -91,8 +92,9 @@ static void f2fs_write_end_io(struct bio *bio)
+ 	struct f2fs_sb_info *sbi = bio->bi_private;
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_chunk_iter citer;
  
- /*
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 58cf38fcee05..dbc07b456059 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -1544,12 +1544,6 @@ struct bfq_queue *bfq_get_next_queue(struct bfq_data *bfqd)
- 		entity = sd->next_in_service;
- 		sd->in_service_entity = entity;
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
+ 		struct page *page = bvec->bv_page;
+ 		enum count_type type = WB_DATA_TYPE(page);
  
--		/*
--		 * Reset the accumulator of the amount of service that
--		 * the entity is about to receive.
--		 */
--		entity->service = 0;
--
- 		/*
- 		 * If entity is no longer a candidate for next
- 		 * service, then it must be extracted from its active
+@@ -267,6 +269,7 @@ static bool __has_merged_page(struct f2fs_bio_info *io,
+ 	struct bio_vec *bvec;
+ 	struct page *target;
+ 	int i;
++	struct bvec_chunk_iter citer;
+ 
+ 	if (!io->bio)
+ 		return false;
+@@ -274,7 +277,7 @@ static bool __has_merged_page(struct f2fs_bio_info *io,
+ 	if (!inode && !ino)
+ 		return true;
+ 
+-	bio_for_each_segment_all(bvec, io->bio, i) {
++	bio_for_each_chunk_segment_all(bvec, io->bio, i, citer) {
+ 
+ 		if (bvec->bv_page->mapping)
+ 			target = bvec->bv_page;
 -- 
-2.16.1
+2.9.5
