@@ -10,182 +10,100 @@ Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
         "Darrick J . Wong" <darrick.wong@oracle.com>,
         Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
         Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 06/30] block: use bio_for_each_chunk() to compute multipage bvec count
-Date: Sat,  9 Jun 2018 20:29:50 +0800
-Message-Id: <20180609123014.8861-7-ming.lei@redhat.com>
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V6 03/30] block: use bio_add_page in bio_iov_iter_get_pages
+Date: Sat,  9 Jun 2018 20:29:47 +0800
+Message-Id: <20180609123014.8861-4-ming.lei@redhat.com>
 In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
 References: <20180609123014.8861-1-ming.lei@redhat.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Firstly it is more efficient to use bio_for_each_chunk() in both
-blk_bio_segment_split() and __blk_recalc_rq_segments() to compute how many
-multipage bvecs there are in the bio.
+From: Christoph Hellwig <hch@lst.de>
 
-Secondaly once bio_for_each_chunk() is used, the bvec may need to
-be splitted because its length can be very longer than max segment size,
-so we have to split the big bvec into several segments.
+Replace a nasty hack with a different nasty hack to prepare for multipage
+bio_vecs.  By moving the temporary page array as far up as possible in
+the space allocated for the bio_vec array we can iterate forward over it
+and thus use bio_add_page.  Using bio_add_page means we'll be able to
+merge physically contiguous pages once support for multipath bio_vecs is
+merged.
 
-Thirdly during splitting multipage bvec into segments, max segment number
-may be reached, then the bio need to be splitted when this happens.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-merge.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 76 insertions(+), 14 deletions(-)
+ block/bio.c | 45 +++++++++++++++++++++------------------------
+ 1 file changed, 21 insertions(+), 24 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index aaec38cc37b8..2493fe027953 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -97,6 +97,62 @@ static inline unsigned get_max_io_size(struct request_queue *q,
- 	return sectors;
+diff --git a/block/bio.c b/block/bio.c
+index ebd3ca62e037..cb0f46e2752b 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -902,6 +902,8 @@ int bio_add_page(struct bio *bio, struct page *page,
  }
+ EXPORT_SYMBOL(bio_add_page);
  
-+/*
-+ * Split the bvec @bv into segments, and update all kinds of
-+ * variables.
-+ */
-+static bool bvec_split_segs(struct request_queue *q, struct bio_vec *bv,
-+		unsigned *nsegs, unsigned *last_seg_size,
-+		unsigned *front_seg_size, unsigned *sectors)
-+{
-+	bool need_split = false;
-+	unsigned len = bv->bv_len;
-+	unsigned total_len = 0;
-+	unsigned new_nsegs = 0, seg_size = 0;
++#define PAGE_PTRS_PER_BVEC	(sizeof(struct bio_vec) / sizeof(struct page *))
 +
-+	if ((*nsegs >= queue_max_segments(q)) || !len)
-+		return need_split;
+ /**
+  * bio_iov_iter_get_pages - pin user or kernel pages and add them to a bio
+  * @bio: bio to add pages to
+@@ -913,38 +915,33 @@ EXPORT_SYMBOL(bio_add_page);
+ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ {
+ 	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
++	unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
+ 	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
+ 	struct page **pages = (struct page **)bv;
+-	size_t offset, diff;
+-	ssize_t size;
++	ssize_t size, left;
++	unsigned len, i;
++	size_t offset;
 +
 +	/*
-+	 * Multipage bvec may be too big to hold in one segment,
-+	 * so the current bvec has to be splitted as multiple
-+	 * segments.
++	 * Move page array up in the allocated memory for the bio vecs as
++	 * far as possible so that we can start filling biovecs from the
++	 * beginning without overwriting the temporary page array.
 +	 */
-+	while (new_nsegs + *nsegs < queue_max_segments(q)) {
-+		seg_size = min(queue_max_segment_size(q), len);
-+
-+		new_nsegs++;
-+		total_len += seg_size;
-+		len -= seg_size;
-+
-+		if ((queue_virt_boundary(q) && ((bv->bv_offset +
-+		    total_len) & queue_virt_boundary(q))) || !len)
-+			break;
++	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
++	pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
+ 
+ 	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
+ 	if (unlikely(size <= 0))
+ 		return size ? size : -EFAULT;
+-	nr_pages = (size + offset + PAGE_SIZE - 1) / PAGE_SIZE;
+ 
+-	/*
+-	 * Deep magic below:  We need to walk the pinned pages backwards
+-	 * because we are abusing the space allocated for the bio_vecs
+-	 * for the page array.  Because the bio_vecs are larger than the
+-	 * page pointers by definition this will always work.  But it also
+-	 * means we can't use bio_add_page, so any changes to it's semantics
+-	 * need to be reflected here as well.
+-	 */
+-	bio->bi_iter.bi_size += size;
+-	bio->bi_vcnt += nr_pages;
+-
+-	diff = (nr_pages * PAGE_SIZE - offset) - size;
+-	while (nr_pages--) {
+-		bv[nr_pages].bv_page = pages[nr_pages];
+-		bv[nr_pages].bv_len = PAGE_SIZE;
+-		bv[nr_pages].bv_offset = 0;
+-	}
++	for (left = size, i = 0; left > 0; left -= len, i++) {
++		struct page *page = pages[i];
+ 
+-	bv[0].bv_offset += offset;
+-	bv[0].bv_len -= offset;
+-	if (diff)
+-		bv[bio->bi_vcnt - 1].bv_len -= diff;
++		len = min_t(size_t, PAGE_SIZE - offset, left);
++		if (WARN_ON_ONCE(bio_add_page(bio, page, len, offset) != len))
++			return -EINVAL;
++		offset = 0;
 +	}
-+
-+	/* split in the middle of the bvec */
-+	if (len)
-+		need_split = true;
-+
-+	/* update front segment size */
-+	if (!*nsegs) {
-+		unsigned first_seg_size = seg_size;
-+
-+		if (new_nsegs > 1)
-+			first_seg_size = queue_max_segment_size(q);
-+		if (*front_seg_size < first_seg_size)
-+			*front_seg_size = first_seg_size;
-+	}
-+
-+	/* update other varibles */
-+	*last_seg_size = seg_size;
-+	*nsegs += new_nsegs;
-+	if (sectors)
-+		*sectors += total_len >> 9;
-+
-+	return need_split;
-+}
-+
- static struct bio *blk_bio_segment_split(struct request_queue *q,
- 					 struct bio *bio,
- 					 struct bio_set *bs,
-@@ -110,7 +166,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	struct bio *new = NULL;
- 	const unsigned max_sectors = get_max_io_size(q, bio);
  
--	bio_for_each_segment(bv, bio, iter) {
-+	bio_for_each_chunk(bv, bio, iter) {
- 		/*
- 		 * If the queue doesn't support SG gaps and adding this
- 		 * offset would create a gap, disallow it.
-@@ -125,8 +181,12 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 			 */
- 			if (nsegs < queue_max_segments(q) &&
- 			    sectors < max_sectors) {
--				nsegs++;
--				sectors = max_sectors;
-+				/* split in the middle of bvec */
-+				bv.bv_len = (max_sectors - sectors) << 9;
-+				bvec_split_segs(q, &bv, &nsegs,
-+						&seg_size,
-+						&front_seg_size,
-+						&sectors);
- 			}
- 			goto split;
- 		}
-@@ -153,11 +213,12 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 		if (nsegs == 1 && seg_size > front_seg_size)
- 			front_seg_size = seg_size;
- 
--		nsegs++;
- 		bvprv = bv;
- 		bvprvp = &bvprv;
--		seg_size = bv.bv_len;
--		sectors += bv.bv_len >> 9;
-+
-+		if (bvec_split_segs(q, &bv, &nsegs, &seg_size,
-+					&front_seg_size, &sectors))
-+			goto split;
- 
- 	}
- 
-@@ -235,6 +296,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 	struct bio_vec bv, bvprv = { NULL };
- 	int cluster, prev = 0;
- 	unsigned int seg_size, nr_phys_segs;
-+	unsigned front_seg_size = bio->bi_seg_front_size;
- 	struct bio *fbio, *bbio;
- 	struct bvec_iter iter;
- 
-@@ -255,7 +317,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 	seg_size = 0;
- 	nr_phys_segs = 0;
- 	for_each_bio(bio) {
--		bio_for_each_segment(bv, bio, iter) {
-+		bio_for_each_chunk(bv, bio, iter) {
- 			/*
- 			 * If SG merging is disabled, each bio vector is
- 			 * a segment
-@@ -277,20 +339,20 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 				continue;
- 			}
- new_segment:
--			if (nr_phys_segs == 1 && seg_size >
--			    fbio->bi_seg_front_size)
--				fbio->bi_seg_front_size = seg_size;
-+			if (nr_phys_segs == 1 && seg_size > front_seg_size)
-+				front_seg_size = seg_size;
- 
--			nr_phys_segs++;
- 			bvprv = bv;
- 			prev = 1;
--			seg_size = bv.bv_len;
-+			bvec_split_segs(q, &bv, &nr_phys_segs, &seg_size,
-+					&front_seg_size, NULL);
- 		}
- 		bbio = bio;
- 	}
- 
--	if (nr_phys_segs == 1 && seg_size > fbio->bi_seg_front_size)
--		fbio->bi_seg_front_size = seg_size;
-+	if (nr_phys_segs == 1 && seg_size > front_seg_size)
-+		front_seg_size = seg_size;
-+	fbio->bi_seg_front_size = front_seg_size;
- 	if (seg_size > bbio->bi_seg_back_size)
- 		bbio->bi_seg_back_size = seg_size;
- 
+ 	iov_iter_advance(iter, size);
+ 	return 0;
 -- 
 2.9.5
