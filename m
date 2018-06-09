@@ -1,74 +1,113 @@
-Return-Path: <BATV+bdb09ad5f0bc9ee27162+5405+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Coly Li <colyli@suse.de>
-Cc: linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 2/6] bcache: use bio_reuse instead of bio_reinit where applicable
-Date: Mon, 11 Jun 2018 21:48:02 +0200
-Message-Id: <20180611194806.13222-3-hch@lst.de>
-In-Reply-To: <20180611194806.13222-1-hch@lst.de>
-References: <20180611194806.13222-1-hch@lst.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V6 17/30] block: introduce bio_for_each_chunk_all and bio_for_each_chunk_segment_all
+Date: Sat,  9 Jun 2018 20:30:01 +0800
+Message-Id: <20180609123014.8861-18-ming.lei@redhat.com>
+In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
+References: <20180609123014.8861-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Use the bio_reuse helper instead of rebuilding the bio_vecs and
-size for bios that get reused for the same data.
+This patch introduces bio_for_each_chunk_all() and bio_for_each_chunk_segment_all(),
+which are for replacing the current bio_for_each_segment_all().
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+bio_for_each_chunk_all() will iterate one chunk by chunk, which is multipage based.
+
+bio_for_each_chunk_segment_all() will iterate one segment by segment, which is
+singlepage based.
+
+For using bio_for_each_chunk_segment_all(), one 24-bytes extra local variable has to
+be introduced.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/request.c | 5 +----
- drivers/md/bcache/super.c   | 6 ++----
- 2 files changed, 3 insertions(+), 8 deletions(-)
+ include/linux/bio.h  | 13 +++++++++++++
+ include/linux/bvec.h | 31 +++++++++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+)
 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index ae67f5fa8047..cd2505b9bee9 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -810,12 +810,9 @@ static void cached_dev_read_done(struct closure *cl)
- 	 */
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 0fa1035dde38..f21384be9b51 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -168,6 +168,19 @@ static inline bool bio_full(struct bio *bio)
+ #define bio_for_each_segment_all(bvl, bio, i)				\
+ 	for (i = 0, bvl = (bio)->bi_io_vec; i < (bio)->bi_vcnt; i++, bvl++)
  
- 	if (s->iop.bio) {
--		bio_reset(s->iop.bio);
-+		bio_reuse(s->iop.bio);
- 		s->iop.bio->bi_iter.bi_sector = s->cache_miss->bi_iter.bi_sector;
- 		bio_copy_dev(s->iop.bio, s->cache_miss);
--		s->iop.bio->bi_iter.bi_size = s->insert_bio_sectors << 9;
--		bch_bio_map(s->iop.bio, NULL);
--
- 		bio_copy_data(s->cache_miss, s->iop.bio);
++#define bio_for_each_chunk_all(bvl, bio, i)		\
++	bio_for_each_segment_all(bvl, bio, i)
++
++#define chunk_for_each_segment(bv, bvl, i, citer)			\
++	for (bv = bvec_init_chunk_iter(&citer);				\
++		(citer.done < (bvl)->bv_len) &&				\
++		((chunk_next_segment((bvl), &citer)), 1);		\
++		citer.done += bv->bv_len, i += 1)
++
++#define bio_for_each_chunk_segment_all(bvl, bio, i, citer)		\
++	for (i = 0, citer.idx = 0; citer.idx < (bio)->bi_vcnt; citer.idx++)	\
++		chunk_for_each_segment(bvl, &((bio)->bi_io_vec[citer.idx]), i, citer)
++
+ static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+ 				      unsigned bytes, bool chunk)
+ {
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index aac75d87d884..d4eaa0c26bb5 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -84,6 +84,12 @@ struct bvec_iter {
+ 						   current bvec */
+ };
  
- 		bio_put(s->cache_miss);
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index a31e55bcc4e5..cd27eabbab24 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -205,9 +205,7 @@ static void __write_super(struct cache_sb *sb, struct bio *bio)
- 	unsigned i;
++struct bvec_chunk_iter {
++	struct bio_vec	bv;
++	int		idx;
++	unsigned	done;
++};
++
+ /*
+  * various member access, note that bio_data should of course not be used
+  * on highmem page vectors
+@@ -219,6 +225,31 @@ static inline bool bvec_iter_chunk_advance(const struct bio_vec *bv,
+ 	.bi_bvec_done	= 0,						\
+ }
  
- 	bio->bi_iter.bi_sector	= SB_SECTOR;
--	bio->bi_iter.bi_size	= SB_SIZE;
- 	bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC|REQ_META);
--	bch_bio_map(bio, NULL);
- 
- 	out->offset		= cpu_to_le64(sb->offset);
- 	out->version		= cpu_to_le64(sb->version);
-@@ -249,7 +247,7 @@ void bch_write_bdev_super(struct cached_dev *dc, struct closure *parent)
- 	down(&dc->sb_write_mutex);
- 	closure_init(cl, parent);
- 
--	bio_reset(bio);
-+	bio_reuse(bio);
- 	bio_set_dev(bio, dc->bdev);
- 	bio->bi_end_io	= write_bdev_super_endio;
- 	bio->bi_private = dc;
-@@ -298,7 +296,7 @@ void bcache_write_super(struct cache_set *c)
- 
- 		SET_CACHE_SYNC(&ca->sb, CACHE_SYNC(&c->sb));
- 
--		bio_reset(bio);
-+		bio_reuse(bio);
- 		bio_set_dev(bio, ca->bdev);
- 		bio->bi_end_io	= write_super_endio;
- 		bio->bi_private = ca;
++static inline struct bio_vec *bvec_init_chunk_iter(struct bvec_chunk_iter *citer)
++{
++	citer->bv.bv_page = NULL;
++	citer->done = 0;
++
++	return &citer->bv;
++}
++
++/* used for chunk_for_each_segment */
++static inline void chunk_next_segment(const struct bio_vec *chunk,
++		struct bvec_chunk_iter *iter)
++{
++	struct bio_vec *bv = &iter->bv;
++
++	if (bv->bv_page) {
++		bv->bv_page += 1;
++		bv->bv_offset = 0;
++	} else {
++		bv->bv_page = chunk->bv_page;
++		bv->bv_offset = chunk->bv_offset;
++	}
++	bv->bv_len = min_t(unsigned int, PAGE_SIZE - bv->bv_offset,
++			chunk->bv_len - iter->done);
++}
++
+ /*
+  * Get the last singlepage segment from the multipage bvec and store it
+  * in @seg
 -- 
-2.17.1
+2.9.5
