@@ -1,71 +1,72 @@
-Return-Path: <vrbagal1@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Date: Thu, 07 Jun 2018 16:07:23 +0530
-From: vrbagal1 <vrbagal1@linux.vnet.ibm.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>, axboe@kernel.dk,
-        kent.overstreet@gmail.com, snitzer@redhat.com,
-        linux-block@vger.kernel.org
-Cc: linux-scsi@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        sachinp@linux.vnet.ibm.com,
-        Linuxppc-dev
- <linuxppc-dev-bounces+vrbagal1=linux.vnet.ibm.com@lists.ozlabs.org>
-Subject: Re: Fwd: [powerpc/Baremetal]Kernel OOPS while executing memory
- hotplug on Power8 baremetal
-In-Reply-To: <042fc8ee69b74c57815c0edfdbb253495e9d7718.camel@wdc.com>
-References: <ee45ead1d96ad05f77aec1d8d3e39c85@linux.vnet.ibm.com>
- <d5b62afc48ece5aca8d08a80871c8613dd555d17.camel@wdc.com>
- <d011631b-c667-2628-dda8-2c87961329f0@linux.vnet.ibm.com>
- <042fc8ee69b74c57815c0edfdbb253495e9d7718.camel@wdc.com>
-Message-Id: <e01428cf15ab45bd42a45a14424e5384@linux.vnet.ibm.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51548 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S932110AbeFIMev (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 9 Jun 2018 08:34:51 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V6 22/30] ext4: conver to bio_for_each_chunk_segment_all
+Date: Sat,  9 Jun 2018 20:30:06 +0800
+Message-Id: <20180609123014.8861-23-ming.lei@redhat.com>
+In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
+References: <20180609123014.8861-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 2018-06-07 13:12, Bart Van Assche wrote:
-> On Thu, 2018-06-07 at 12:56 +0530, Venkat Rao B wrote:
->> On Thursday 07 June 2018 12:46 PM, Bart Van Assche wrote:
->> > On Thu, 2018-06-07 at 12:38 +0530, vrbagal1 wrote:
->> > > Observing Kernel oops and machine reboots while executing memory hotplug
->> > > test case, on Power8 Baremetal machine.
->> > >
->> > > I see this is introduced some where between rc6 and 4.17.
->> >
->> > Please provide the exact versions (git commit IDs) of the kernel versions
->> > you have tested.
->> 
->> Commit Id ---> 5037be168f
-> 
-> The reason I was asking for the commit ID is because I saw that 
-> clone_endio()
-> occurs in the oops which means that the dm driver is involved. An 
-> important fix
-> for the dm driver went upstream recently, namely d37753540568 ("dm: Use 
-> kzalloc
-> for all structs with embedded biosets/mempools"). Can you double check 
-> whether
-> that commit it present in your tree? If it is not present, please 
-> update to the
-> latest master and retest. If it is present, please report how to 
-> reproduce
-> this oops to Kent Overstreet, Jens Axboe, linux-block and Mike Snitzer.
-> 
-> Thanks,
-> 
-> Bart.
+bio_for_each_segment_all() can't be used any more after multipage bvec is
+enabled, so we have to convert to bio_for_each_chunk_segment_all().
 
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ fs/ext4/page-io.c  | 3 ++-
+ fs/ext4/readpage.c | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-Yes, the fix is present in the tree, which I have tested.
-
-Steps to reproduce:
-
-Step1: Clone and Install avocado git clone 
-https://github.com/avocado-framework/avocado.git
-Step2: Clone 
-https://github.com/avocado-framework-tests/avocado-misc-tests.git
-        Test case is 
-https://github.com/avocado-framework-tests/avocado-misc-tests/blob/master/memory/memhotplug.py
-Step3: Command to run the test is avocado run 
-avocado-misc-tests/memory/memhotplug.py
-
-Regards,
-Venkat.
+diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
+index db7590178dfc..d4e737e51176 100644
+--- a/fs/ext4/page-io.c
++++ b/fs/ext4/page-io.c
+@@ -63,8 +63,9 @@ static void ext4_finish_bio(struct bio *bio)
+ {
+ 	int i;
+ 	struct bio_vec *bvec;
++	struct bvec_chunk_iter citer;
+ 
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
+ 		struct page *page = bvec->bv_page;
+ #ifdef CONFIG_EXT4_FS_ENCRYPTION
+ 		struct page *data_page = NULL;
+diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
+index 9ffa6fad18db..234e4486a90c 100644
+--- a/fs/ext4/readpage.c
++++ b/fs/ext4/readpage.c
+@@ -72,6 +72,7 @@ static void mpage_end_io(struct bio *bio)
+ {
+ 	struct bio_vec *bv;
+ 	int i;
++	struct bvec_chunk_iter citer;
+ 
+ 	if (ext4_bio_encrypted(bio)) {
+ 		if (bio->bi_status) {
+@@ -81,7 +82,7 @@ static void mpage_end_io(struct bio *bio)
+ 			return;
+ 		}
+ 	}
+-	bio_for_each_segment_all(bv, bio, i) {
++	bio_for_each_chunk_segment_all(bv, bio, i, citer) {
+ 		struct page *page = bv->bv_page;
+ 
+ 		if (!bio->bi_status) {
+-- 
+2.9.5
