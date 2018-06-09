@@ -1,106 +1,69 @@
-Return-Path: <roman.penyaev@profitbricks.com>
-Return-Path: <roman.penyaev@profitbricks.com>
-From: Roman Pen <roman.penyaev@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Or Gerlitz <ogerlitz@mellanox.com>,
-	Doug Ledford <dledford@redhat.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>,
-	Jack Wang <jinpu.wang@profitbricks.com>,
-	Roman Pen <roman.penyaev@profitbricks.com>
-Subject: [PATCH v3 23/25] ibnbd: include client and server modules into kernel compilation
-Date: Wed,  6 Jun 2018 17:25:13 +0200
-Message-Id: <20180606152515.25807-24-roman.penyaev@profitbricks.com>
-In-Reply-To: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
-References: <20180606152515.25807-1-roman.penyaev@profitbricks.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51622 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753408AbeFIMfP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 9 Jun 2018 08:35:15 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V6 25/30] exofs: conver to bio_for_each_chunk_segment_all
+Date: Sat,  9 Jun 2018 20:30:09 +0800
+Message-Id: <20180609123014.8861-26-ming.lei@redhat.com>
+In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
+References: <20180609123014.8861-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Add IBNBD Makefile, Kconfig and also corresponding lines into upper
-block layer files.
+bio_for_each_segment_all() can't be used any more after multipage bvec is
+enabled, so we have to convert to bio_for_each_chunk_segment_all()
 
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
-Cc: Jack Wang <jinpu.wang@profitbricks.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/Kconfig        |  2 ++
- drivers/block/Makefile       |  1 +
- drivers/block/ibnbd/Kconfig  | 22 ++++++++++++++++++++++
- drivers/block/ibnbd/Makefile | 11 +++++++++++
- 4 files changed, 36 insertions(+)
- create mode 100644 drivers/block/ibnbd/Kconfig
- create mode 100644 drivers/block/ibnbd/Makefile
+ fs/exofs/ore.c      | 3 ++-
+ fs/exofs/ore_raid.c | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index ad9b687a236a..d8c1590411c8 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -481,4 +481,6 @@ config BLK_DEV_RSXX
- 	  To compile this driver as a module, choose M here: the
- 	  module will be called rsxx.
+diff --git a/fs/exofs/ore.c b/fs/exofs/ore.c
+index ddbf87246898..fe2eb28de358 100644
+--- a/fs/exofs/ore.c
++++ b/fs/exofs/ore.c
+@@ -406,8 +406,9 @@ static void _clear_bio(struct bio *bio)
+ {
+ 	struct bio_vec *bv;
+ 	unsigned i;
++	struct bvec_chunk_iter citer;
  
-+source "drivers/block/ibnbd/Kconfig"
-+
- endif # BLK_DEV
-diff --git a/drivers/block/Makefile b/drivers/block/Makefile
-index dc061158b403..65346a1d0b1a 100644
---- a/drivers/block/Makefile
-+++ b/drivers/block/Makefile
-@@ -38,6 +38,7 @@ obj-$(CONFIG_BLK_DEV_PCIESSD_MTIP32XX)	+= mtip32xx/
- obj-$(CONFIG_BLK_DEV_RSXX) += rsxx/
- obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk.o
- obj-$(CONFIG_ZRAM) += zram/
-+obj-$(CONFIG_BLK_DEV_IBNBD)	+= ibnbd/
+-	bio_for_each_segment_all(bv, bio, i) {
++	bio_for_each_chunk_segment_all(bv, bio, i, citer) {
+ 		unsigned this_count = bv->bv_len;
  
- skd-y		:= skd_main.o
- swim_mod-y	:= swim.o swim_asm.o
-diff --git a/drivers/block/ibnbd/Kconfig b/drivers/block/ibnbd/Kconfig
-new file mode 100644
-index 000000000000..b381c6c084d2
---- /dev/null
-+++ b/drivers/block/ibnbd/Kconfig
-@@ -0,0 +1,22 @@
-+config BLK_DEV_IBNBD
-+	bool
-+
-+config BLK_DEV_IBNBD_CLIENT
-+	tristate "Network block device driver on top of IBTRS transport"
-+	depends on INFINIBAND_IBTRS_CLIENT
-+	select BLK_DEV_IBNBD
-+	help
-+	  IBNBD client allows for mapping of a remote block devices over
-+	  IBTRS protocol from a target system where IBNBD server is running.
-+
-+	  If unsure, say N.
-+
-+config BLK_DEV_IBNBD_SERVER
-+	tristate "Network block device over RDMA Infiniband server support"
-+	depends on INFINIBAND_IBTRS_SERVER
-+	select BLK_DEV_IBNBD
-+	help
-+	  IBNBD server allows for exporting local block devices to a remote client
-+	  over IBTRS protocol.
-+
-+	  If unsure, say N.
-diff --git a/drivers/block/ibnbd/Makefile b/drivers/block/ibnbd/Makefile
-new file mode 100644
-index 000000000000..ac906036310e
---- /dev/null
-+++ b/drivers/block/ibnbd/Makefile
-@@ -0,0 +1,11 @@
-+ccflags-y := -Idrivers/infiniband/ulp/ibtrs
-+
-+ibnbd-client-y := ibnbd-clt.o \
-+		  ibnbd-clt-sysfs.o
-+
-+ibnbd-server-y := ibnbd-srv.o \
-+		  ibnbd-srv-dev.o \
-+		  ibnbd-srv-sysfs.o
-+
-+obj-$(CONFIG_BLK_DEV_IBNBD_CLIENT) += ibnbd-client.o
-+obj-$(CONFIG_BLK_DEV_IBNBD_SERVER) += ibnbd-server.o
+ 		if (likely(PAGE_SIZE == this_count))
+diff --git a/fs/exofs/ore_raid.c b/fs/exofs/ore_raid.c
+index 27cbdb697649..4da3065ce976 100644
+--- a/fs/exofs/ore_raid.c
++++ b/fs/exofs/ore_raid.c
+@@ -433,11 +433,12 @@ static void _mark_read4write_pages_uptodate(struct ore_io_state *ios, int ret)
+ 	/* loop on all devices all pages */
+ 	for (d = 0; d < ios->numdevs; d++) {
+ 		struct bio *bio = ios->per_dev[d].bio;
++		struct bvec_chunk_iter citer;
+ 
+ 		if (!bio)
+ 			continue;
+ 
+-		bio_for_each_segment_all(bv, bio, i) {
++		bio_for_each_chunk_segment_all(bv, bio, i, citer) {
+ 			struct page *page = bv->bv_page;
+ 
+ 			SetPageUptodate(page);
 -- 
-2.13.1
+2.9.5
