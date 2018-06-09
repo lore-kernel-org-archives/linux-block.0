@@ -1,223 +1,166 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
         Kent Overstreet <kent.overstreet@gmail.com>
 Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        Mike Snitzer <snitzer@redhat.com>,
         linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         Theodore Ts'o <tytso@mit.edu>,
         "Darrick J . Wong" <darrick.wong@oracle.com>,
         Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
         Randy Dunlap <rdunlap@infradead.org>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V7 06/24] block: unexport bio_clone_bioset
-Date: Wed, 27 Jun 2018 20:45:30 +0800
-Message-Id: <20180627124548.3456-7-ming.lei@redhat.com>
-In-Reply-To: <20180627124548.3456-1-ming.lei@redhat.com>
-References: <20180627124548.3456-1-ming.lei@redhat.com>
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V6 21/30] btrfs: conver to bio_for_each_chunk_segment_all
+Date: Sat,  9 Jun 2018 20:30:05 +0800
+Message-Id: <20180609123014.8861-22-ming.lei@redhat.com>
+In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
+References: <20180609123014.8861-1-ming.lei@redhat.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Christoph Hellwig <hch@lst.de>
+bio_for_each_segment_all() can't be used any more after multipage bvec is
+enabled, so we have to convert to bio_for_each_chunk_segment_all().
 
-Now only used by the bounce code, so move it there and mark the function
-static.
-
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bio.c         | 77 -----------------------------------------------------
- block/bounce.c      | 69 ++++++++++++++++++++++++++++++++++++++++++++++-
- include/linux/bio.h |  1 -
- 3 files changed, 68 insertions(+), 79 deletions(-)
+ fs/btrfs/compression.c | 3 ++-
+ fs/btrfs/disk-io.c     | 3 ++-
+ fs/btrfs/extent_io.c   | 9 ++++++---
+ fs/btrfs/inode.c       | 6 ++++--
+ fs/btrfs/raid56.c      | 3 ++-
+ 5 files changed, 16 insertions(+), 8 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 9710e275f230..43698bcff737 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -645,83 +645,6 @@ struct bio *bio_clone_fast(struct bio *bio, gfp_t gfp_mask, struct bio_set *bs)
- EXPORT_SYMBOL(bio_clone_fast);
+diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+index 02da66acc57d..388804e9dde6 100644
+--- a/fs/btrfs/compression.c
++++ b/fs/btrfs/compression.c
+@@ -166,13 +166,14 @@ static void end_compressed_bio_read(struct bio *bio)
+ 	} else {
+ 		int i;
+ 		struct bio_vec *bvec;
++		struct bvec_chunk_iter citer;
  
- /**
-- * 	bio_clone_bioset - clone a bio
-- * 	@bio_src: bio to clone
-- *	@gfp_mask: allocation priority
-- *	@bs: bio_set to allocate from
-- *
-- *	Clone bio. Caller will own the returned bio, but not the actual data it
-- *	points to. Reference count of returned bio will be one.
-- */
--struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
--			     struct bio_set *bs)
--{
--	struct bvec_iter iter;
--	struct bio_vec bv;
--	struct bio *bio;
--
--	/*
--	 * Pre immutable biovecs, __bio_clone() used to just do a memcpy from
--	 * bio_src->bi_io_vec to bio->bi_io_vec.
--	 *
--	 * We can't do that anymore, because:
--	 *
--	 *  - The point of cloning the biovec is to produce a bio with a biovec
--	 *    the caller can modify: bi_idx and bi_bvec_done should be 0.
--	 *
--	 *  - The original bio could've had more than BIO_MAX_PAGES biovecs; if
--	 *    we tried to clone the whole thing bio_alloc_bioset() would fail.
--	 *    But the clone should succeed as long as the number of biovecs we
--	 *    actually need to allocate is fewer than BIO_MAX_PAGES.
--	 *
--	 *  - Lastly, bi_vcnt should not be looked at or relied upon by code
--	 *    that does not own the bio - reason being drivers don't use it for
--	 *    iterating over the biovec anymore, so expecting it to be kept up
--	 *    to date (i.e. for clones that share the parent biovec) is just
--	 *    asking for trouble and would force extra work on
--	 *    __bio_clone_fast() anyways.
--	 */
--
--	bio = bio_alloc_bioset(gfp_mask, bio_segments(bio_src), bs);
--	if (!bio)
--		return NULL;
--	bio->bi_disk		= bio_src->bi_disk;
--	bio->bi_opf		= bio_src->bi_opf;
--	bio->bi_write_hint	= bio_src->bi_write_hint;
--	bio->bi_iter.bi_sector	= bio_src->bi_iter.bi_sector;
--	bio->bi_iter.bi_size	= bio_src->bi_iter.bi_size;
--
--	switch (bio_op(bio)) {
--	case REQ_OP_DISCARD:
--	case REQ_OP_SECURE_ERASE:
--	case REQ_OP_WRITE_ZEROES:
--		break;
--	case REQ_OP_WRITE_SAME:
--		bio->bi_io_vec[bio->bi_vcnt++] = bio_src->bi_io_vec[0];
--		break;
--	default:
--		bio_for_each_segment(bv, bio_src, iter)
--			bio->bi_io_vec[bio->bi_vcnt++] = bv;
--		break;
--	}
--
--	if (bio_integrity(bio_src)) {
--		int ret;
--
--		ret = bio_integrity_clone(bio, bio_src, gfp_mask);
--		if (ret < 0) {
--			bio_put(bio);
--			return NULL;
--		}
--	}
--
--	bio_clone_blkcg_association(bio, bio_src);
--
--	return bio;
--}
--EXPORT_SYMBOL(bio_clone_bioset);
--
--/**
-  *	bio_add_pc_page	-	attempt to add page to bio
-  *	@q: the target queue
-  *	@bio: destination bio
-diff --git a/block/bounce.c b/block/bounce.c
-index fd31347b7836..bc63b3a2d18c 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -195,6 +195,73 @@ static void bounce_end_io_read_isa(struct bio *bio)
- 	__bounce_end_io_read(bio, &isa_page_pool);
- }
+ 		/*
+ 		 * we have verified the checksum already, set page
+ 		 * checked so the end_io handlers know about it
+ 		 */
+ 		ASSERT(!bio_flagged(bio, BIO_CLONED));
+-		bio_for_each_segment_all(bvec, cb->orig_bio, i)
++		bio_for_each_chunk_segment_all(bvec, cb->orig_bio, i, citer)
+ 			SetPageChecked(bvec->bv_page);
  
-+static struct bio *bounce_clone_bio(struct bio *bio_src, gfp_t gfp_mask,
-+		struct bio_set *bs)
-+{
-+	struct bvec_iter iter;
-+	struct bio_vec bv;
-+	struct bio *bio;
-+
-+	/*
-+	 * Pre immutable biovecs, __bio_clone() used to just do a memcpy from
-+	 * bio_src->bi_io_vec to bio->bi_io_vec.
-+	 *
-+	 * We can't do that anymore, because:
-+	 *
-+	 *  - The point of cloning the biovec is to produce a bio with a biovec
-+	 *    the caller can modify: bi_idx and bi_bvec_done should be 0.
-+	 *
-+	 *  - The original bio could've had more than BIO_MAX_PAGES biovecs; if
-+	 *    we tried to clone the whole thing bio_alloc_bioset() would fail.
-+	 *    But the clone should succeed as long as the number of biovecs we
-+	 *    actually need to allocate is fewer than BIO_MAX_PAGES.
-+	 *
-+	 *  - Lastly, bi_vcnt should not be looked at or relied upon by code
-+	 *    that does not own the bio - reason being drivers don't use it for
-+	 *    iterating over the biovec anymore, so expecting it to be kept up
-+	 *    to date (i.e. for clones that share the parent biovec) is just
-+	 *    asking for trouble and would force extra work on
-+	 *    __bio_clone_fast() anyways.
-+	 */
-+
-+	bio = bio_alloc_bioset(gfp_mask, bio_segments(bio_src), bs);
-+	if (!bio)
-+		return NULL;
-+	bio->bi_disk		= bio_src->bi_disk;
-+	bio->bi_opf		= bio_src->bi_opf;
-+	bio->bi_write_hint	= bio_src->bi_write_hint;
-+	bio->bi_iter.bi_sector	= bio_src->bi_iter.bi_sector;
-+	bio->bi_iter.bi_size	= bio_src->bi_iter.bi_size;
-+
-+	switch (bio_op(bio)) {
-+	case REQ_OP_DISCARD:
-+	case REQ_OP_SECURE_ERASE:
-+	case REQ_OP_WRITE_ZEROES:
-+		break;
-+	case REQ_OP_WRITE_SAME:
-+		bio->bi_io_vec[bio->bi_vcnt++] = bio_src->bi_io_vec[0];
-+		break;
-+	default:
-+		bio_for_each_segment(bv, bio_src, iter)
-+			bio->bi_io_vec[bio->bi_vcnt++] = bv;
-+		break;
-+	}
-+
-+	if (bio_integrity(bio_src)) {
-+		int ret;
-+
-+		ret = bio_integrity_clone(bio, bio_src, gfp_mask);
-+		if (ret < 0) {
-+			bio_put(bio);
-+			return NULL;
-+		}
-+	}
-+
-+	bio_clone_blkcg_association(bio, bio_src);
-+
-+	return bio;
-+}
-+
- static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 			       mempool_t *pool)
+ 		bio_endio(cb->orig_bio);
+diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
+index 205092dc9390..e9ad3daa3247 100644
+--- a/fs/btrfs/disk-io.c
++++ b/fs/btrfs/disk-io.c
+@@ -829,9 +829,10 @@ static blk_status_t btree_csum_one_bio(struct bio *bio)
+ 	struct bio_vec *bvec;
+ 	struct btrfs_root *root;
+ 	int i, ret = 0;
++	struct bvec_chunk_iter citer;
+ 
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
+ 		root = BTRFS_I(bvec->bv_page->mapping->host)->root;
+ 		ret = csum_dirty_buffer(root->fs_info, bvec->bv_page);
+ 		if (ret)
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index efb8db0fd73c..805bac595f3a 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -2453,9 +2453,10 @@ static void end_bio_extent_writepage(struct bio *bio)
+ 	u64 start;
+ 	u64 end;
+ 	int i;
++	struct bvec_chunk_iter citer;
+ 
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
+ 		struct page *page = bvec->bv_page;
+ 		struct inode *inode = page->mapping->host;
+ 		struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
+@@ -2524,9 +2525,10 @@ static void end_bio_extent_readpage(struct bio *bio)
+ 	int mirror;
+ 	int ret;
+ 	int i;
++	struct bvec_chunk_iter citer;
+ 
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
+ 		struct page *page = bvec->bv_page;
+ 		struct inode *inode = page->mapping->host;
+ 		struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
+@@ -3678,9 +3680,10 @@ static void end_bio_extent_buffer_writepage(struct bio *bio)
+ 	struct bio_vec *bvec;
+ 	struct extent_buffer *eb;
+ 	int i, done;
++	struct bvec_chunk_iter citer;
+ 
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
+ 		struct page *page = bvec->bv_page;
+ 
+ 		eb = (struct extent_buffer *)page->private;
+diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+index 89b208201783..deee00ca8e6d 100644
+--- a/fs/btrfs/inode.c
++++ b/fs/btrfs/inode.c
+@@ -7894,6 +7894,7 @@ static void btrfs_retry_endio_nocsum(struct bio *bio)
+ 	struct bio_vec *bvec;
+ 	struct extent_io_tree *io_tree, *failure_tree;
+ 	int i;
++	struct bvec_chunk_iter citer;
+ 
+ 	if (bio->bi_status)
+ 		goto end;
+@@ -7905,7 +7906,7 @@ static void btrfs_retry_endio_nocsum(struct bio *bio)
+ 
+ 	done->uptodate = 1;
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+-	bio_for_each_segment_all(bvec, bio, i)
++	bio_for_each_chunk_segment_all(bvec, bio, i, citer)
+ 		clean_io_failure(BTRFS_I(inode)->root->fs_info, failure_tree,
+ 				 io_tree, done->start, bvec->bv_page,
+ 				 btrfs_ino(BTRFS_I(inode)), 0);
+@@ -7984,6 +7985,7 @@ static void btrfs_retry_endio(struct bio *bio)
+ 	int uptodate;
+ 	int ret;
+ 	int i;
++	struct bvec_chunk_iter citer;
+ 
+ 	if (bio->bi_status)
+ 		goto end;
+@@ -7997,7 +7999,7 @@ static void btrfs_retry_endio(struct bio *bio)
+ 	failure_tree = &BTRFS_I(inode)->io_failure_tree;
+ 
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
+ 		ret = __readpage_endio_check(inode, io_bio, i, bvec->bv_page,
+ 					     bvec->bv_offset, done->start,
+ 					     bvec->bv_len);
+diff --git a/fs/btrfs/raid56.c b/fs/btrfs/raid56.c
+index 5e4ad134b9ad..c9f21039e1db 100644
+--- a/fs/btrfs/raid56.c
++++ b/fs/btrfs/raid56.c
+@@ -1463,10 +1463,11 @@ static void set_bio_pages_uptodate(struct bio *bio)
  {
-@@ -222,7 +289,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 		generic_make_request(*bio_orig);
- 		*bio_orig = bio;
- 	}
--	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, passthrough ? NULL :
-+	bio = bounce_clone_bio(*bio_orig, GFP_NOIO, passthrough ? NULL :
- 			&bounce_bio_set);
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_chunk_iter citer;
  
- 	bio_for_each_segment_all(to, bio, i) {
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 430807f9f44b..21d07858ddef 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -429,7 +429,6 @@ extern void bio_put(struct bio *);
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
  
- extern void __bio_clone_fast(struct bio *, struct bio *);
- extern struct bio *bio_clone_fast(struct bio *, gfp_t, struct bio_set *);
--extern struct bio *bio_clone_bioset(struct bio *, gfp_t, struct bio_set *bs);
- 
- extern struct bio_set fs_bio_set;
+-	bio_for_each_segment_all(bvec, bio, i)
++	bio_for_each_chunk_segment_all(bvec, bio, i, citer)
+ 		SetPageUptodate(bvec->bv_page);
+ }
  
 -- 
 2.9.5
