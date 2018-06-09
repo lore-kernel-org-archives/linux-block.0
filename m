@@ -1,122 +1,51 @@
-Return-Path: <gregkh@linuxfoundation.org>
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: linux-kernel@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	stable@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Roman Pen <roman.penyaev@profitbricks.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 4.17 42/70] blk-mq: reinit q->tag_set_list entry only after grace period
-Date: Sun, 24 Jun 2018 23:22:34 +0800
-Message-Id: <20180624142743.099167594@linuxfoundation.org>
-In-Reply-To: <20180624142740.481662434@linuxfoundation.org>
-References: <20180624142740.481662434@linuxfoundation.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V6 29/30] block: always define BIO_MAX_PAGES as 256
+Date: Sat,  9 Jun 2018 20:30:13 +0800
+Message-Id: <20180609123014.8861-30-ming.lei@redhat.com>
+In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
+References: <20180609123014.8861-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-4.17-stable review patch.  If anyone has any objections, please let me know.
+Now multipage bvec can cover CONFIG_THP_SWAP, so we don't need to
+increase BIO_MAX_PAGES for it.
 
-------------------
-
-From: Roman Pen <roman.penyaev@profitbricks.com>
-
-commit a347c7ad8edf4c5685154f3fdc3c12fc1db800ba upstream.
-
-It is not allowed to reinit q->tag_set_list list entry while RCU grace
-period has not completed yet, otherwise the following soft lockup in
-blk_mq_sched_restart() happens:
-
-[ 1064.252652] watchdog: BUG: soft lockup - CPU#12 stuck for 23s! [fio:9270]
-[ 1064.254445] task: ffff99b912e8b900 task.stack: ffffa6d54c758000
-[ 1064.254613] RIP: 0010:blk_mq_sched_restart+0x96/0x150
-[ 1064.256510] Call Trace:
-[ 1064.256664]  <IRQ>
-[ 1064.256824]  blk_mq_free_request+0xea/0x100
-[ 1064.256987]  msg_io_conf+0x59/0xd0 [ibnbd_client]
-[ 1064.257175]  complete_rdma_req+0xf2/0x230 [ibtrs_client]
-[ 1064.257340]  ? ibtrs_post_recv_empty+0x4d/0x70 [ibtrs_core]
-[ 1064.257502]  ibtrs_clt_rdma_done+0xd1/0x1e0 [ibtrs_client]
-[ 1064.257669]  ib_create_qp+0x321/0x380 [ib_core]
-[ 1064.257841]  ib_process_cq_direct+0xbd/0x120 [ib_core]
-[ 1064.258007]  irq_poll_softirq+0xb7/0xe0
-[ 1064.258165]  __do_softirq+0x106/0x2a2
-[ 1064.258328]  irq_exit+0x92/0xa0
-[ 1064.258509]  do_IRQ+0x4a/0xd0
-[ 1064.258660]  common_interrupt+0x7a/0x7a
-[ 1064.258818]  </IRQ>
-
-Meanwhile another context frees other queue but with the same set of
-shared tags:
-
-[ 1288.201183] INFO: task bash:5910 blocked for more than 180 seconds.
-[ 1288.201833] bash            D    0  5910   5820 0x00000000
-[ 1288.202016] Call Trace:
-[ 1288.202315]  schedule+0x32/0x80
-[ 1288.202462]  schedule_timeout+0x1e5/0x380
-[ 1288.203838]  wait_for_completion+0xb0/0x120
-[ 1288.204137]  __wait_rcu_gp+0x125/0x160
-[ 1288.204287]  synchronize_sched+0x6e/0x80
-[ 1288.204770]  blk_mq_free_queue+0x74/0xe0
-[ 1288.204922]  blk_cleanup_queue+0xc7/0x110
-[ 1288.205073]  ibnbd_clt_unmap_device+0x1bc/0x280 [ibnbd_client]
-[ 1288.205389]  ibnbd_clt_unmap_dev_store+0x169/0x1f0 [ibnbd_client]
-[ 1288.205548]  kernfs_fop_write+0x109/0x180
-[ 1288.206328]  vfs_write+0xb3/0x1a0
-[ 1288.206476]  SyS_write+0x52/0xc0
-[ 1288.206624]  do_syscall_64+0x68/0x1d0
-[ 1288.206774]  entry_SYSCALL_64_after_hwframe+0x3d/0xa2
-
-What happened is the following:
-
-1. There are several MQ queues with shared tags.
-2. One queue is about to be freed and now task is in
-   blk_mq_del_queue_tag_set().
-3. Other CPU is in blk_mq_sched_restart() and loops over all queues in
-   tag list in order to find hctx to restart.
-
-Because linked list entry was modified in blk_mq_del_queue_tag_set()
-without proper waiting for a grace period, blk_mq_sched_restart()
-never ends, spining in list_for_each_entry_rcu_rr(), thus soft lockup.
-
-Fix is simple: reinit list entry after an RCU grace period elapsed.
-
-Fixes: Fixes: 705cda97ee3a ("blk-mq: Make it safe to use RCU to iterate over blk_mq_tag_set.tag_list")
-Cc: stable@vger.kernel.org
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-block@vger.kernel.org
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c |    3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ include/linux/bio.h | 8 --------
+ 1 file changed, 8 deletions(-)
 
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2473,7 +2473,6 @@ static void blk_mq_del_queue_tag_set(str
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 69ef05dc7019..58838dc12d69 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -38,15 +38,7 @@
+ #define BIO_BUG_ON
+ #endif
  
- 	mutex_lock(&set->tag_list_lock);
- 	list_del_rcu(&q->tag_set_list);
--	INIT_LIST_HEAD(&q->tag_set_list);
- 	if (list_is_singular(&set->tag_list)) {
- 		/* just transitioned to unshared */
- 		set->flags &= ~BLK_MQ_F_TAG_SHARED;
-@@ -2481,8 +2480,8 @@ static void blk_mq_del_queue_tag_set(str
- 		blk_mq_update_tag_set_depth(set, false);
- 	}
- 	mutex_unlock(&set->tag_list_lock);
--
- 	synchronize_rcu();
-+	INIT_LIST_HEAD(&q->tag_set_list);
- }
+-#ifdef CONFIG_THP_SWAP
+-#if HPAGE_PMD_NR > 256
+-#define BIO_MAX_PAGES		HPAGE_PMD_NR
+-#else
+ #define BIO_MAX_PAGES		256
+-#endif
+-#else
+-#define BIO_MAX_PAGES		256
+-#endif
  
- static void blk_mq_add_queue_tag_set(struct blk_mq_tag_set *set,
+ #define bio_prio(bio)			(bio)->bi_ioprio
+ #define bio_set_prio(bio, prio)		((bio)->bi_ioprio = prio)
+-- 
+2.9.5
