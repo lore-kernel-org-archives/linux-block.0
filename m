@@ -1,113 +1,131 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:37011 "EHLO
-        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750850AbeFANEs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 09:04:48 -0400
-Received: by mail-lf0-f67.google.com with SMTP id r2-v6so14721651lff.4
-        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 06:04:47 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        javier@cnexlabs.com, igor.j.konopko@intel.com,
-        marcin.dziegielewski@intel.com,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 03/18] lightnvm: pblk: check read lba on gc path
-Date: Fri,  1 Jun 2018 15:04:17 +0200
-Message-Id: <20180601130432.30866-4-mb@lightnvm.io>
-In-Reply-To: <20180601130432.30866-1-mb@lightnvm.io>
-References: <20180601130432.30866-1-mb@lightnvm.io>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42436 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753388AbeFIMea (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 9 Jun 2018 08:34:30 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V6 20/30] fs: conver to bio_for_each_chunk_segment_all()
+Date: Sat,  9 Jun 2018 20:30:04 +0800
+Message-Id: <20180609123014.8861-21-ming.lei@redhat.com>
+In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
+References: <20180609123014.8861-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Javier González <javier@javigon.com>
+bio_for_each_segment_all() can't be used any more after multipage bvec is
+enabled, so we have to convert to bio_for_each_chunk_segment_all().
 
-Check that the lba stored in the LBA metadata is correct in the GC path
-too. This requires a new helper function to check random reads in the
-vector read.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-read.c | 39 +++++++++++++++++++++++++++++++++------
- 1 file changed, 33 insertions(+), 6 deletions(-)
+ fs/block_dev.c  | 6 ++++--
+ fs/crypto/bio.c | 3 ++-
+ fs/direct-io.c  | 4 +++-
+ fs/iomap.c      | 3 ++-
+ fs/mpage.c      | 3 ++-
+ 5 files changed, 13 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index 9eee10f69df0..1f699c09e0ea 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -113,15 +113,14 @@ static int pblk_submit_read_io(struct pblk *pblk, struct nvm_rq *rqd)
- 	return NVM_IO_OK;
- }
- 
--static void pblk_read_check(struct pblk *pblk, struct nvm_rq *rqd,
--			   sector_t blba)
-+static void pblk_read_check_seq(struct pblk *pblk, void *meta_list,
-+				sector_t blba, int nr_lbas)
- {
--	struct pblk_sec_meta *meta_list = rqd->meta_list;
--	int nr_lbas = rqd->nr_ppas;
-+	struct pblk_sec_meta *meta_lba_list = meta_list;
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index bef6934b6189..6726f8297a7b 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -197,6 +197,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+ 	ssize_t ret;
+ 	blk_qc_t qc;
  	int i;
++	struct bvec_chunk_iter citer;
  
- 	for (i = 0; i < nr_lbas; i++) {
--		u64 lba = le64_to_cpu(meta_list[i].lba);
-+		u64 lba = le64_to_cpu(meta_lba_list[i].lba);
- 
- 		if (lba == ADDR_EMPTY)
- 			continue;
-@@ -130,6 +129,32 @@ static void pblk_read_check(struct pblk *pblk, struct nvm_rq *rqd,
+ 	if ((pos | iov_iter_alignment(iter)) &
+ 	    (bdev_logical_block_size(bdev) - 1))
+@@ -242,7 +243,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
  	}
- }
+ 	__set_current_state(TASK_RUNNING);
  
-+/*
-+ * There can be holes in the lba list.
-+ */
-+static void pblk_read_check_rand(struct pblk *pblk, void *meta_list,
-+				u64 *lba_list, int nr_lbas)
-+{
-+	struct pblk_sec_meta *meta_lba_list = meta_list;
-+	int i, j;
+-	bio_for_each_segment_all(bvec, &bio, i) {
++	bio_for_each_chunk_segment_all(bvec, &bio, i, citer) {
+ 		if (should_dirty && !PageCompound(bvec->bv_page))
+ 			set_page_dirty_lock(bvec->bv_page);
+ 		put_page(bvec->bv_page);
+@@ -309,8 +310,9 @@ static void blkdev_bio_end_io(struct bio *bio)
+ 	} else {
+ 		struct bio_vec *bvec;
+ 		int i;
++		struct bvec_chunk_iter citer;
+ 
+-		bio_for_each_segment_all(bvec, bio, i)
++		bio_for_each_chunk_segment_all(bvec, bio, i, citer)
+ 			put_page(bvec->bv_page);
+ 		bio_put(bio);
+ 	}
+diff --git a/fs/crypto/bio.c b/fs/crypto/bio.c
+index 0d5e6a569d58..13bcbdbf3440 100644
+--- a/fs/crypto/bio.c
++++ b/fs/crypto/bio.c
+@@ -37,8 +37,9 @@ static void completion_pages(struct work_struct *work)
+ 	struct bio *bio = ctx->r.bio;
+ 	struct bio_vec *bv;
+ 	int i;
++	struct bvec_chunk_iter citer;
+ 
+-	bio_for_each_segment_all(bv, bio, i) {
++	bio_for_each_chunk_segment_all(bv, bio, i, citer) {
+ 		struct page *page = bv->bv_page;
+ 		int ret = fscrypt_decrypt_page(page->mapping->host, page,
+ 				PAGE_SIZE, 0, page->index);
+diff --git a/fs/direct-io.c b/fs/direct-io.c
+index 093fb54cd316..8f7fd985450a 100644
+--- a/fs/direct-io.c
++++ b/fs/direct-io.c
+@@ -551,7 +551,9 @@ static blk_status_t dio_bio_complete(struct dio *dio, struct bio *bio)
+ 	if (dio->is_async && dio->op == REQ_OP_READ && dio->should_dirty) {
+ 		bio_check_pages_dirty(bio);	/* transfers ownership */
+ 	} else {
+-		bio_for_each_segment_all(bvec, bio, i) {
++		struct bvec_chunk_iter citer;
 +
-+	for (i = 0, j = 0; i < nr_lbas; i++) {
-+		u64 lba = lba_list[i];
-+		u64 meta_lba;
-+
-+		if (lba == ADDR_EMPTY)
-+			continue;
-+
-+		meta_lba = le64_to_cpu(meta_lba_list[j++].lba);
-+
-+		if (lba != meta_lba) {
-+			pr_err("pblk: corrupted read LBA (%llu/%llu)\n",
-+								lba, meta_lba);
-+			WARN_ON(1);
-+		}
-+	}
-+}
-+
- static void pblk_read_put_rqd_kref(struct pblk *pblk, struct nvm_rq *rqd)
++		bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
+ 			struct page *page = bvec->bv_page;
+ 
+ 			if (dio->op == REQ_OP_READ && !PageCompound(page) &&
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 206539d369a8..dbc35c40a1c4 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -934,8 +934,9 @@ static void iomap_dio_bio_end_io(struct bio *bio)
+ 	} else {
+ 		struct bio_vec *bvec;
+ 		int i;
++		struct bvec_chunk_iter citer;
+ 
+-		bio_for_each_segment_all(bvec, bio, i)
++		bio_for_each_chunk_segment_all(bvec, bio, i, citer)
+ 			put_page(bvec->bv_page);
+ 		bio_put(bio);
+ 	}
+diff --git a/fs/mpage.c b/fs/mpage.c
+index b7e7f570733a..78b372607650 100644
+--- a/fs/mpage.c
++++ b/fs/mpage.c
+@@ -48,8 +48,9 @@ static void mpage_end_io(struct bio *bio)
  {
- 	struct ppa_addr *ppa_list;
-@@ -172,7 +197,7 @@ static void __pblk_end_io_read(struct pblk *pblk, struct nvm_rq *rqd,
- 		WARN_ONCE(bio->bi_status, "pblk: corrupted read error\n");
- #endif
+ 	struct bio_vec *bv;
+ 	int i;
++	struct bvec_chunk_iter citer;
  
--	pblk_read_check(pblk, rqd, r_ctx->lba);
-+	pblk_read_check_seq(pblk, rqd->meta_list, r_ctx->lba, rqd->nr_ppas);
- 
- 	bio_put(bio);
- 	if (r_ctx->private)
-@@ -585,6 +610,8 @@ int pblk_submit_read_gc(struct pblk *pblk, struct pblk_gc_rq *gc_rq)
- 		goto err_free_bio;
- 	}
- 
-+	pblk_read_check_rand(pblk, rqd.meta_list, gc_rq->lba_list, rqd.nr_ppas);
-+
- 	atomic_dec(&pblk->inflight_io);
- 
- 	if (rqd.error) {
+-	bio_for_each_segment_all(bv, bio, i) {
++	bio_for_each_chunk_segment_all(bv, bio, i, citer) {
+ 		struct page *page = bv->bv_page;
+ 		page_endio(page, op_is_write(bio_op(bio)),
+ 				blk_status_to_errno(bio->bi_status));
 -- 
-2.11.0
+2.9.5
