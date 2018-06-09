@@ -11,43 +11,37 @@ Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
         Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
         Randy Dunlap <rdunlap@infradead.org>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 11/30] block: implement bio_pages_all() via bio_for_each_segment_all()
-Date: Sat,  9 Jun 2018 20:29:55 +0800
-Message-Id: <20180609123014.8861-12-ming.lei@redhat.com>
+Subject: [PATCH V6 09/30] fs/buffer.c: use bvec iterator to truncate the bio
+Date: Sat,  9 Jun 2018 20:29:53 +0800
+Message-Id: <20180609123014.8861-10-ming.lei@redhat.com>
 In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
 References: <20180609123014.8861-1-ming.lei@redhat.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-As multipage bvec will be enabled soon, bio->bi_vcnt isn't same with
-page count in the bio any more, so use bio_for_each_segment_all() to
-compute the number because we will keep bio_for_each_segment_all()
-to iterate each page.
+Once multipage bvec is enabled, the last bvec may include more than one
+page, this patch use chunk_last_segment() to truncate the bio.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- include/linux/bio.h | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ fs/buffer.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index e9f74c73bbe6..c17b8f80d650 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -339,8 +339,14 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
+diff --git a/fs/buffer.c b/fs/buffer.c
+index cabc045f483d..630ae3e0238b 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -3021,7 +3021,10 @@ void guard_bio_eod(int op, struct bio *bio)
  
- static inline unsigned bio_pages_all(struct bio *bio)
- {
-+	unsigned i;
-+	struct bio_vec *bv;
+ 	/* ..and clear the end of the buffer for reads */
+ 	if (op == REQ_OP_READ) {
+-		zero_user(bvec->bv_page, bvec->bv_offset + bvec->bv_len,
++		struct bio_vec bv;
 +
- 	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
--	return bio->bi_vcnt;
-+
-+	bio_for_each_segment_all(bv, bio, i)
-+		;
-+	return i;
++		chunk_last_segment(bvec, &bv);
++		zero_user(bv.bv_page, bv.bv_offset + bv.bv_len,
+ 				truncated_bytes);
+ 	}
  }
- 
- static inline struct bio_vec *bio_first_bvec_all(struct bio *bio)
 -- 
 2.9.5
