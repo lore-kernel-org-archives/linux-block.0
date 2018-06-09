@@ -1,93 +1,63 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:44897 "EHLO
-        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752437AbeFAOoF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 10:44:05 -0400
-Received: by mail-lf0-f67.google.com with SMTP id 36-v6so13260924lfr.11
-        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 07:44:04 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        javier@cnexlabs.com, igor.j.konopko@intel.com,
-        marcin.dziegielewski@intel.com,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 08/10] lightnvm: pblk: only try to recover lines with written smeta
-Date: Fri,  1 Jun 2018 16:41:12 +0200
-Message-Id: <20180601144114.17490-9-mb@lightnvm.io>
-In-Reply-To: <20180601144114.17490-1-mb@lightnvm.io>
-References: <20180601144114.17490-1-mb@lightnvm.io>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V6 14/30] block: loop: pass multipage chunks to iov_iter
+Date: Sat,  9 Jun 2018 20:29:58 +0800
+Message-Id: <20180609123014.8861-15-ming.lei@redhat.com>
+In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
+References: <20180609123014.8861-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+iov_iter is implemented with bvec itererator, so it is safe to pass
+multipage chunks to it, and this way is much more efficient than
+passing one page in each bvec.
 
-When switching between different lun configurations, there is no
-guarantee that all lines that contain closed/open chunks have some
-valid data to recover.
-
-Check that the smeta chunk has been written to instead. Also
-skip bad lines (that does not have enough good chunks).
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-recovery.c | 30 +++++++++++++++++++++---------
- 1 file changed, 21 insertions(+), 9 deletions(-)
+ drivers/block/loop.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 788dce87043e..598342833d0d 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -774,18 +774,30 @@ static void pblk_recov_wa_counters(struct pblk *pblk,
- }
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 4838b0dbaad3..c25963a9df00 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -521,7 +521,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		struct bio_vec tmp;
  
- static int pblk_line_was_written(struct pblk_line *line,
--			    struct pblk_line_meta *lm)
-+			    struct pblk *pblk)
- {
+ 		__rq_for_each_bio(bio, rq)
+-			segments += bio_segments(bio);
++			segments += bio_chunks(bio);
+ 		bvec = kmalloc(sizeof(struct bio_vec) * segments, GFP_NOIO);
+ 		if (!bvec)
+ 			return -EIO;
+@@ -533,7 +533,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		 * copy bio->bi_iov_vec to new bvec. The rq_for_each_segment
+ 		 * API will take care of all details for us.
+ 		 */
+-		rq_for_each_segment(tmp, rq, iter) {
++		rq_for_each_chunk(tmp, rq, iter) {
+ 			*bvec = tmp;
+ 			bvec++;
+ 		}
+@@ -547,7 +547,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		 */
+ 		offset = bio->bi_iter.bi_bvec_done;
+ 		bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+-		segments = bio_segments(bio);
++		segments = bio_chunks(bio);
+ 	}
+ 	atomic_set(&cmd->ref, 2);
  
--	int i;
--	int state_mask = NVM_CHK_ST_OFFLINE | NVM_CHK_ST_FREE;
-+	struct pblk_line_meta *lm = &pblk->lm;
-+	struct nvm_tgt_dev *dev = pblk->dev;
-+	struct nvm_geo *geo = &dev->geo;
-+	struct nvm_chk_meta *chunk;
-+	struct ppa_addr bppa;
-+	int smeta_blk;
- 
--	for (i = 0; i < lm->blk_per_line; i++) {
--		if (!(line->chks[i].state & state_mask))
--			return 1;
--	}
-+	if (line->state == PBLK_LINESTATE_BAD)
-+		return 0;
- 
--	return 0;
-+	smeta_blk = find_first_zero_bit(line->blk_bitmap, lm->blk_per_line);
-+	if (smeta_blk >= lm->blk_per_line)
-+		return 0;
-+
-+	bppa = pblk->luns[smeta_blk].bppa;
-+	chunk = &line->chks[pblk_ppa_to_pos(geo, bppa)];
-+
-+	if (chunk->state & NVM_CHK_ST_FREE)
-+		return 0;
-+
-+	return 1;
- }
- 
- struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
-@@ -824,7 +836,7 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
- 		line->lun_bitmap = ((void *)(smeta_buf)) +
- 						sizeof(struct line_smeta);
- 
--		if (!pblk_line_was_written(line, lm))
-+		if (!pblk_line_was_written(line, pblk))
- 			continue;
- 
- 		/* Lines that cannot be read are assumed as not written here */
 -- 
-2.11.0
+2.9.5
