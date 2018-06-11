@@ -1,97 +1,74 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Omar Sandoval <osandov@fb.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Marco Patalano <mpatalan@redhat.com>,
-	"Ewan D. Milne" <emilne@redhat.com>
-Subject: [PATCH] block/021: test setting 'nr_requests'
-Date: Sat,  2 Jun 2018 13:02:04 +0800
-Message-Id: <20180602050204.20786-1-ming.lei@redhat.com>
+Return-Path: <BATV+bdb09ad5f0bc9ee27162+5405+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Coly Li <colyli@suse.de>
+Cc: linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 2/6] bcache: use bio_reuse instead of bio_reinit where applicable
+Date: Mon, 11 Jun 2018 21:48:02 +0200
+Message-Id: <20180611194806.13222-3-hch@lst.de>
+In-Reply-To: <20180611194806.13222-1-hch@lst.de>
+References: <20180611194806.13222-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-'nr_requests' can be a bit different for 'none' scheduler,
-and especially current blk-mq can only decrease this value
-for 'none.'
+Use the bio_reuse helper instead of rebuilding the bio_vecs and
+size for bios that get reused for the same data.
 
-The patch of 'blk-mq: fix read/write 'nr_requests' in case of 'none' scheduler'
-has been sent out for fixing this issue.
-
-Cc: Marco Patalano <mpatalan@redhat.com>
-Cc: "Ewan D. Milne" <emilne@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- tests/block/021     | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/block/021.out |  2 ++
- 2 files changed, 53 insertions(+)
- create mode 100755 tests/block/021
- create mode 100755 tests/block/021.out
+ drivers/md/bcache/request.c | 5 +----
+ drivers/md/bcache/super.c   | 6 ++----
+ 2 files changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/tests/block/021 b/tests/block/021
-new file mode 100755
-index 000000000000..b72d9bd8b41d
---- /dev/null
-+++ b/tests/block/021
-@@ -0,0 +1,51 @@
-+#!/bin/bash
-+#
-+# Test blk-mq request allocation when hardware tags are limited. Regression
-+# test for commit e6fc46498784 ("blk-mq: avoid starving tag allocation after
-+# allocating process migrates").
-+#
-+# Copyright (C) 2018 Ming Lei <ming.lei@redhat.com>
-+#
-+# This program is free software: you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation, either version 3 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+
-+DESCRIPTION="read/write nr_requests on null-blk with different scheduler"
-+QUICK=1
-+
-+requires() {
-+	_have_module null_blk
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	modprobe -r null_blk
-+	modprobe null_blk
-+
-+	local scheds
-+	# shellcheck disable=SC2207
-+	scheds=($(sed 's/[][]//g' /sys/block/nullb0/queue/scheduler))
-+
-+	for sched in "${scheds[@]}"; do
-+		echo "Testing $sched" >> "$FULL"
-+		echo "$sched" > /sys/block/nullb0/queue/scheduler
-+		max_nr=`cat /sys/block/nullb0/queue/nr_requests`
-+		for nr in `seq 4 $max_nr`; do
-+			echo $nr > /sys/block/nullb0/queue/nr_requests
-+		done
-+	done
-+
-+	modprobe -r null_blk
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/block/021.out b/tests/block/021.out
-new file mode 100755
-index 000000000000..3a397c5c8ff5
---- /dev/null
-+++ b/tests/block/021.out
-@@ -0,0 +1,2 @@
-+Running block/021
-+Test complete
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index ae67f5fa8047..cd2505b9bee9 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -810,12 +810,9 @@ static void cached_dev_read_done(struct closure *cl)
+ 	 */
+ 
+ 	if (s->iop.bio) {
+-		bio_reset(s->iop.bio);
++		bio_reuse(s->iop.bio);
+ 		s->iop.bio->bi_iter.bi_sector = s->cache_miss->bi_iter.bi_sector;
+ 		bio_copy_dev(s->iop.bio, s->cache_miss);
+-		s->iop.bio->bi_iter.bi_size = s->insert_bio_sectors << 9;
+-		bch_bio_map(s->iop.bio, NULL);
+-
+ 		bio_copy_data(s->cache_miss, s->iop.bio);
+ 
+ 		bio_put(s->cache_miss);
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index a31e55bcc4e5..cd27eabbab24 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -205,9 +205,7 @@ static void __write_super(struct cache_sb *sb, struct bio *bio)
+ 	unsigned i;
+ 
+ 	bio->bi_iter.bi_sector	= SB_SECTOR;
+-	bio->bi_iter.bi_size	= SB_SIZE;
+ 	bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC|REQ_META);
+-	bch_bio_map(bio, NULL);
+ 
+ 	out->offset		= cpu_to_le64(sb->offset);
+ 	out->version		= cpu_to_le64(sb->version);
+@@ -249,7 +247,7 @@ void bch_write_bdev_super(struct cached_dev *dc, struct closure *parent)
+ 	down(&dc->sb_write_mutex);
+ 	closure_init(cl, parent);
+ 
+-	bio_reset(bio);
++	bio_reuse(bio);
+ 	bio_set_dev(bio, dc->bdev);
+ 	bio->bi_end_io	= write_bdev_super_endio;
+ 	bio->bi_private = dc;
+@@ -298,7 +296,7 @@ void bcache_write_super(struct cache_set *c)
+ 
+ 		SET_CACHE_SYNC(&ca->sb, CACHE_SYNC(&c->sb));
+ 
+-		bio_reset(bio);
++		bio_reuse(bio);
+ 		bio_set_dev(bio, ca->bdev);
+ 		bio->bi_end_io	= write_super_endio;
+ 		bio->bi_private = ca;
 -- 
-2.9.5
+2.17.1
