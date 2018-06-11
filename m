@@ -1,48 +1,86 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
-        keith.busch@intel.com, josef@toxicpanda.com, ulf.hansson@linaro.org
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 0/5]stop normal completion path entering a timeout req
-Date: Wed, 20 Jun 2018 21:22:39 +0800
-Message-Id: <1529500964-28429-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <BATV+bdb09ad5f0bc9ee27162+5405+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Coly Li <colyli@suse.de>
+Cc: linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 4/6] bcache: clean up bio reuse for struct dirty_io
+Date: Mon, 11 Jun 2018 21:48:04 +0200
+Message-Id: <20180611194806.13222-5-hch@lst.de>
+In-Reply-To: <20180611194806.13222-1-hch@lst.de>
+References: <20180611194806.13222-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Dear all
+Instead of reinitializing the bio everytime we can call bio_reuse when
+reusing it.  Also moves the private data initialization out of
+dirty_init, which is renamed to suit the remaining functionality.
 
-scsi timeout and error handler are based on an assumption that normal
-completion mustn't do anything on an timeout request. After 12f5b931
-(blk-mq: Remove generation seqeunce), we lost this. __blk_mq_complete
-request could ensure a request won't be completed twice, but it can
-still complete a timeout request.
-scsi (even other drivers) have been working on this assumption for many
-years, it is dangerous to discard it suddenly. This patch set is to regain this.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/md/bcache/writeback.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-1st patch
- - introduce blk_mq_mark_rq_complete in blk_mq_check_expired and blk_mq_complete_request
-   to avoid the race between them.
- - blk_mq_complete_request cannot complete a timeout request anymore, so have to export
-   __blk_mq_complete_request for LLDD timeout path
-2nd ~ 5th patches
-  replace the blk_mq_complete_request to __blk_mq_complete_request.
-
-Jianchao Wang(5)
-blk-mq: prevent normal completion from entering a timeout request
-nbd: use __blk_mq_complete_request in timeout path
-null_blk: use __blk_mq_complete_request in timeout path
-mmc: use __blk_mq_complete_request in timeout path
-nvme: use __blk_mq_complete_request in timeout path
-
- block/blk-mq.c             | 22 +++++++++++++++-------
- drivers/block/nbd.c        |  2 +-
- drivers/block/null_blk.c   |  2 +-
- drivers/mmc/core/queue.c   |  2 +-
- drivers/nvme/host/pci.c    |  8 ++++++++
- drivers/nvme/host/rdma.c   |  1 +
- drivers/nvme/target/loop.c |  1 +
- include/linux/blk-mq.h     |  1 +
- include/linux/blkdev.h     |  6 ++++++
-
-Thanks
-Jianchao
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index ad45ebe1a74b..986e50f069d6 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -179,19 +179,12 @@ struct dirty_io {
+ 	struct bio		bio;
+ };
+ 
+-static void dirty_init(struct keybuf_key *w)
++static void dirty_init_prio(struct keybuf_key *w)
+ {
+ 	struct dirty_io *io = w->private;
+-	struct bio *bio = &io->bio;
+ 
+-	bio_init(bio, bio->bi_inline_vecs,
+-		 DIV_ROUND_UP(KEY_SIZE(&w->key), PAGE_SECTORS));
+ 	if (!io->dc->writeback_percent)
+-		bio_set_prio(bio, IOPRIO_PRIO_VALUE(IOPRIO_CLASS_IDLE, 0));
+-
+-	bio->bi_iter.bi_size	= KEY_SIZE(&w->key) << 9;
+-	bio->bi_private		= w;
+-	bch_bio_map(bio, NULL);
++		bio_set_prio(&io->bio, IOPRIO_PRIO_VALUE(IOPRIO_CLASS_IDLE, 0));
+ }
+ 
+ static void dirty_io_destructor(struct closure *cl)
+@@ -285,10 +278,12 @@ static void write_dirty(struct closure *cl)
+ 	 * to clean up.
+ 	 */
+ 	if (KEY_DIRTY(&w->key)) {
+-		dirty_init(w);
+-		bio_set_op_attrs(&io->bio, REQ_OP_WRITE, 0);
++		bio_reuse(&io->bio);
++		dirty_init_prio(w);
++		io->bio.bi_opf = REQ_OP_WRITE;
+ 		io->bio.bi_iter.bi_sector = KEY_START(&w->key);
+ 		bio_set_dev(&io->bio, io->dc->bdev);
++		io->bio.bi_private	= w;
+ 		io->bio.bi_end_io	= dirty_endio;
+ 
+ 		/* I/O request sent to backing device */
+@@ -399,13 +394,18 @@ static void read_dirty(struct cached_dev *dc)
+ 			io->dc		= dc;
+ 			io->sequence    = sequence++;
+ 
+-			dirty_init(w);
+-			bio_set_op_attrs(&io->bio, REQ_OP_READ, 0);
++			bio_init(&io->bio, io->bio.bi_inline_vecs,
++				DIV_ROUND_UP(KEY_SIZE(&w->key), PAGE_SECTORS));
++			dirty_init_prio(w);
++			io->bio.bi_opf = REQ_OP_READ;
++			io->bio.bi_iter.bi_size = KEY_SIZE(&w->key) << 9;
+ 			io->bio.bi_iter.bi_sector = PTR_OFFSET(&w->key, 0);
+ 			bio_set_dev(&io->bio,
+ 				    PTR_CACHE(dc->disk.c, &w->key, 0)->bdev);
++			io->bio.bi_private	= w;
+ 			io->bio.bi_end_io	= read_dirty_endio;
+ 
++			bch_bio_map(&io->bio, NULL);
+ 			if (bch_bio_alloc_pages(&io->bio, GFP_KERNEL))
+ 				goto err_free;
+ 
+-- 
+2.17.1
