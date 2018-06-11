@@ -1,12 +1,13 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45682 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753869AbeFLDYi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Jun 2018 23:24:38 -0400
-Date: Tue, 12 Jun 2018 11:24:20 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@fb.com>,
+Received: from bombadil.infradead.org ([198.137.202.133]:59018 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934079AbeFKRT7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Jun 2018 13:19:59 -0400
+Date: Mon, 11 Jun 2018 10:19:38 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         Kent Overstreet <kent.overstreet@gmail.com>,
         David Sterba <dsterba@suse.cz>,
@@ -18,30 +19,19 @@ Cc: Jens Axboe <axboe@fb.com>,
         Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
         Randy Dunlap <rdunlap@infradead.org>
 Subject: Re: [PATCH V6 08/30] block: introduce chunk_last_segment()
-Message-ID: <20180612032419.GB26412@ming.t460p>
+Message-ID: <20180611171938.GA5101@infradead.org>
 References: <20180609123014.8861-1-ming.lei@redhat.com>
  <20180609123014.8861-9-ming.lei@redhat.com>
- <20180611171938.GA5101@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180611171938.GA5101@infradead.org>
+In-Reply-To: <20180609123014.8861-9-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Jun 11, 2018 at 10:19:38AM -0700, Christoph Hellwig wrote:
-> I think both callers would be just as easy to understand by using
-> nth_page() instead of these magic helpers.  E.g. for guard_bio_eod:
-> 
-> 		unsigned offset = (bv.bv_offset + bv.bv_len);
-> 		struct page *page = nth_page(bv.bv_page, offset);
+I think both callers would be just as easy to understand by using
+nth_page() instead of these magic helpers.  E.g. for guard_bio_eod:
 
-The above lines should have been written as:
+		unsigned offset = (bv.bv_offset + bv.bv_len);
+		struct page *page = nth_page(bv.bv_page, offset);
 
-		struct page *page = nth_page(bv.bv_page, offset / PAGE_SIZE)
-
-but this way may cause 'page' points to the next page of bv's last
-page if offset == N * PAGE_SIZE.
-
-
-Thanks,
-Ming
+		zero_user(page, offset & PAGE_MASK, truncated_bytes);
