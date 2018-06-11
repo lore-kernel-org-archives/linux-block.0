@@ -1,81 +1,74 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 26/30] gfs2: conver to bio_for_each_chunk_segment_all
-Date: Sat,  9 Jun 2018 20:30:10 +0800
-Message-Id: <20180609123014.8861-27-ming.lei@redhat.com>
-In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
-References: <20180609123014.8861-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <dvyukov@google.com>
+MIME-Version: 1.0
+In-Reply-To: <1d8de494-0a52-33f5-4c8d-0ec08cfb101c@kernel.dk>
+References: <CACT4Y+ZmRj61ia-WQBC=M72o=OZWk5LSnzf2qOEuOLHAa4do_A@mail.gmail.com>
+ <1d8de494-0a52-33f5-4c8d-0ec08cfb101c@kernel.dk>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Mon, 11 Jun 2018 10:23:43 +0200
+Message-ID: <CACT4Y+b3ZWfOEHdYPCtP3mULz+6PheWv1CRvEME4jcpbjiJirA@mail.gmail.com>
+Subject: Re: mainline boot is broken: KASAN: use-after-free in blk_flush_complete_seq
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-bio_for_each_page_all() can't be used any more after multipage bvec is
-enabled, so we have to convert to bio_for_each_chunk_segment_all()
+On Sat, Jun 9, 2018 at 2:33 PM, Jens Axboe <axboe@kernel.dk> wrote:
+> On 6/9/18 3:34 AM, Dmitry Vyukov wrote:
+>> Hi,
+>>
+>> Boot of mainline kernel is currently broken.
+>> On commit 7d3bf613e99abbd96ac7b90ee3694a246c975021.
+>> Config:
+>> https://gist.githubusercontent.com/dvyukov/9f7f1fd9e477efd85b221b3a21036c20/raw/7c56ede0840494b26045976960866f2b265c6f64/gistfile1.txt
+>> Should have been introduced very recently.
+>
+> Can you try the below?
 
-Given bvec can't be changed inside bio_for_each_chunk_segtment(), this patch
-marks the bvec parameter as 'const' for gfs2_end_log_write_bh().
+Yes, this fixes the use-after-free:
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/gfs2/lops.c    | 6 ++++--
- fs/gfs2/meta_io.c | 3 ++-
- 2 files changed, 6 insertions(+), 3 deletions(-)
+Tested-by: Dmitry Vyukov <dvyukov@google.com>
 
-diff --git a/fs/gfs2/lops.c b/fs/gfs2/lops.c
-index 4d6567990baf..e48f215006dd 100644
---- a/fs/gfs2/lops.c
-+++ b/fs/gfs2/lops.c
-@@ -168,7 +168,8 @@ u64 gfs2_log_bmap(struct gfs2_sbd *sdp)
-  * that is pinned in the pagecache.
-  */
- 
--static void gfs2_end_log_write_bh(struct gfs2_sbd *sdp, struct bio_vec *bvec,
-+static void gfs2_end_log_write_bh(struct gfs2_sbd *sdp,
-+				  const struct bio_vec *bvec,
- 				  blk_status_t error)
- {
- 	struct buffer_head *bh, *next;
-@@ -207,6 +208,7 @@ static void gfs2_end_log_write(struct bio *bio)
- 	struct bio_vec *bvec;
- 	struct page *page;
- 	int i;
-+	struct bvec_chunk_iter citer;
- 
- 	if (bio->bi_status) {
- 		fs_err(sdp, "Error %d writing to journal, jid=%u\n",
-@@ -214,7 +216,7 @@ static void gfs2_end_log_write(struct bio *bio)
- 		wake_up(&sdp->sd_logd_waitq);
- 	}
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
- 		page = bvec->bv_page;
- 		if (page_has_buffers(page))
- 			gfs2_end_log_write_bh(sdp, bvec, bio->bi_status);
-diff --git a/fs/gfs2/meta_io.c b/fs/gfs2/meta_io.c
-index 52de1036d9f9..1448f42f9c91 100644
---- a/fs/gfs2/meta_io.c
-+++ b/fs/gfs2/meta_io.c
-@@ -190,8 +190,9 @@ static void gfs2_meta_read_endio(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_chunk_iter citer;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
- 		struct page *page = bvec->bv_page;
- 		struct buffer_head *bh = page_buffers(page);
- 		unsigned int len = bvec->bv_len;
--- 
-2.9.5
+>> You may need to also patch "umh: fix race condition", because that's
+>> another boot crasher currently present in tree.
+>
+> Not sure that that refers to.
+
+
+Currently there are 2 boot bugs present in upstream tree: this block
+bug and an umh bug. I assumed that anybody who will be fixing the
+block bug will want to first reproduce it and then test the fix
+locally. But if one would try to do it, they will actually hit the umh
+bug first. So I provided the fixing commit for the umh bug to simplify
+things for whoever would be fixing this block bug.
+
+
+> diff --git a/block/blk-flush.c b/block/blk-flush.c
+> index 058abdb50f31..ce41f666de3e 100644
+> --- a/block/blk-flush.c
+> +++ b/block/blk-flush.c
+> @@ -169,9 +169,11 @@ static bool blk_flush_complete_seq(struct request *rq,
+>         struct request_queue *q = rq->q;
+>         struct list_head *pending = &fq->flush_queue[fq->flush_pending_idx];
+>         bool queued = false, kicked;
+> +       unsigned int cmd_flags;
+>
+>         BUG_ON(rq->flush.seq & seq);
+>         rq->flush.seq |= seq;
+> +       cmd_flags = rq->cmd_flags;
+>
+>         if (likely(!error))
+>                 seq = blk_flush_cur_seq(rq);
+> @@ -212,7 +214,7 @@ static bool blk_flush_complete_seq(struct request *rq,
+>                 BUG();
+>         }
+>
+> -       kicked = blk_kick_flush(q, fq, rq->cmd_flags);
+> +       kicked = blk_kick_flush(q, fq, cmd_flags);
+>         return kicked | queued;
+>  }
+>
+>
+> --
+> Jens Axboe
+>
