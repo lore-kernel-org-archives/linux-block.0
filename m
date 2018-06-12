@@ -1,19 +1,17 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-Date: Wed, 13 Jun 2018 05:58:01 -0400
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: Christoph Hellwig <hch@lst.de>, ming.lei@redhat.com
-Cc: Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
-	linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Return-Path: <colyli@suse.de>
 Subject: Re: [RFC] cleanup bcache bio handling
-Message-ID: <20180613095801.GB15100@kmo-pixel>
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
 References: <20180611194806.13222-1-hch@lst.de>
+From: Coly Li <colyli@suse.de>
+Message-ID: <19c69615-821d-fd14-a682-a1ec1ce739eb@suse.de>
+Date: Tue, 12 Jun 2018 12:40:08 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180611194806.13222-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jun 11, 2018 at 09:48:00PM +0200, Christoph Hellwig wrote:
+On 2018/6/12 3:48 AM, Christoph Hellwig wrote:
 > Hi all,
 > 
 > this series cleans up various places where bcache is way too intimate
@@ -28,15 +26,9 @@ On Mon, Jun 11, 2018 at 09:48:00PM +0200, Christoph Hellwig wrote:
 > Also the new bio_reused helper should be useful at least for MD raid,
 > but that work is left for later.
 
-Strong nak on the patch series (except for the patch to not clone in
-bch_data_verify, that patch looks fine).
+Hi Christoph,
 
-Unless something has seriously changed with how multi-page bvecs work since I
-started that code nothing in bcache should be broken by it - Ming, can you
-confirm or deny if that's still correct?
+Thanks for the patches. I will setup a test environment to run bcache
+workload with your patches.
 
-It is true that bch_bio_map() will be suboptimal when multi page bvecs go in,
-but it won't be broken. The way it's used now is really conflating two different
-things, but where it's used for mapping a bio to a single buffer (i.e. not
-before bio_alloc_pages) that can be switched to something that just creates a
-single bvec.
+Coly Li
