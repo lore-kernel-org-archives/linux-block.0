@@ -1,183 +1,149 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:37310 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754223AbeFMBqW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Jun 2018 21:46:22 -0400
-From: Andrew Randrianasulu <randrianasulu@gmail.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: Re: kernel BUG at drivers/scsi/scsi_error.c:197! - git 4.17.0-x64-08428-g7d3bf613e99a
-Date: Wed, 13 Jun 2018 04:28:53 +0300
-Cc: "rdunlap@infradead.org" <rdunlap@infradead.org>,
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "randrianasulu@gmail.com" <randrianasulu@gmail.com>,
+        "rdunlap@infradead.org" <rdunlap@infradead.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "hch@lst.de" <hch@lst.de>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+CC: "hch@lst.de" <hch@lst.de>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <201806091606.51078.randrianasulu@gmail.com> <025bf705-15b0-65e5-4b16-6c91d41c1730@infradead.org> <40617b19667b3c1302f8a903c19f2fa2f409b12a.camel@wdc.com>
-In-Reply-To: <40617b19667b3c1302f8a903c19f2fa2f409b12a.camel@wdc.com>
+Subject: Re: kernel BUG at drivers/scsi/scsi_error.c:197! - git
+ 4.17.0-x64-08428-g7d3bf613e99a
+Date: Tue, 12 Jun 2018 15:28:03 +0000
+Message-ID: <40617b19667b3c1302f8a903c19f2fa2f409b12a.camel@wdc.com>
+References: <201806091606.51078.randrianasulu@gmail.com>
+         <025bf705-15b0-65e5-4b16-6c91d41c1730@infradead.org>
+In-Reply-To: <025bf705-15b0-65e5-4b16-6c91d41c1730@infradead.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <201806130428.54491.randrianasulu@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-=D0=92 =D1=81=D0=BE=D0=BE=D0=B1=D1=89=D0=B5=D0=BD=D0=B8=D0=B8 =D0=BE=D1=82 =
-Tuesday 12 June 2018 18:28:03 Bart Van Assche =D0=BD=D0=B0=D0=BF=D0=B8=D1=
-=81=D0=B0=D0=BB(=D0=B0):
-> On Sat, 2018-06-09 at 08:02 -0700, Randy Dunlap wrote:
-> > On 06/09/2018 06:06 AM, Andrew Randrianasulu wrote:
-> > > Hello, everyone!
-> > >
-> > > I was trying to test not-yet-completed 4.18-rc1, and run into this bu=
-g,
-> > > probably due to HAL (yes, I still use this) trying to poll empty DVD-=
-RW
-> > > drive:
-> > >
-> > > [   35.040167] ------------[ cut here ]------------
-> > > [   35.040171] kernel BUG at drivers/scsi/scsi_error.c:197!
-> > > [   35.040196] invalid opcode: 0000 [#1] SMP NOPTI
-> > > [   35.040210] CPU: 2 PID: 117 Comm: kworker/2:1H Not tainted
-> > > 4.17.0-x64-08428-g7d3bf613e99a-dirty #18
-> > > [   35.040225] Hardware name: MSI MS-7693/970A-G46 (MS-7693), BIOS V2=
-=2E8
-> > > 01/08/2016
-> > > [   35.040244] Workqueue: kblockd blk_mq_timeout_work
-> > > [   35.040283] RIP: 0010:scsi_times_out+0xe9/0x1a6 [scsi_mod]
-> > > [   35.040287] Code: 03 76 18 48 c7 c2 f9 c2 01 a0 48 89 ee 48 c7 c7 =
-14
-> > > be 01 a0 31 c0 e8 76 ad 00 00 48 8b 83 98 01 00 00 a8 01 0f 84 a5 00 =
-00
-> > > 00 <0f> 0b 49 8b 7c 24 38 e8 8f ba 4b e1 41 83 bc 24 2c 01
-> > >  00 00 ff 74
-> > > [   35.040312] RSP: 0018:ffffc90000293d98 EFLAGS: 00010202
-> > > [   35.040318] RAX: ffff88031f240605 RBX: ffff88031eed8500 RCX:
-> > > 00000000fffefd40 [   35.040323] RDX: ffffc90000293e80 RSI:
-> > > 0000000000002007 RDI: ffff88031eed8638 [   35.040327] RBP:
-> > > ffff88031eed8638 R08: ffff88031eed85d8 R09: 0000000000000000 [ =20
-> > > 35.040332] R10: 0000000000000040 R11: fefefefefefefeff R12:
-> > > ffff88031f2a8800 [   35.040336] R13: ffff88031f2a8800 R14:
-> > > ffff88031f29e910 R15: 0000000000000001 [   35.040341] FS:=20
-> > > 0000000000000000(0000) GS:ffff88032ed00000(0000) knlGS:00000000000000=
-00
-> > > [   35.040346] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > [   35.040350] CR2: 00000000f7ea83c0 CR3: 000000031e194000 CR4:
-> > > 00000000000406e0 [   35.040354] Call Trace:
-> > > [   35.040360]  blk_mq_check_expired+0xdc/0x10c
-> > > [   35.040365]  bt_iter+0x42/0x45
-> > > [   35.040369]  __sbitmap_for_each_set.constprop.12+0x83/0xac
-> > > [   35.040374]  ? blk_mq_update_nr_requests+0xad/0xad
-> > > [   35.040595]  ? blk_mq_exit_hctx+0xda/0xda
-> > > [   35.041595]  blk_mq_queue_tag_busy_iter+0xa3/0xb4
-> > > [   35.042578]  ? blk_mq_exit_hctx+0xda/0xda
-> > > [   35.043550]  blk_mq_timeout_work+0x6b/0xca
-> > > [   35.044505]  process_one_work+0x17c/0x2a6
-> > > [   35.045445]  worker_thread+0x19f/0x243
-> > > [   35.046393]  ? rescuer_thread+0x262/0x262
-> > > [   35.047346]  kthread+0x100/0x108
-> > > [   35.048290]  ? kthread_destroy_worker+0x3e/0x3e
-> > > [   35.049242]  ret_from_fork+0x27/0x50
-> > > [   35.050192] Modules linked in: bridge stp llc bnep rfcomm hidp
-> > > snd_aloop ipv6 pcmcia pcmcia_core xfs libcrc32c lp parport f71882fg
-> > > input_leds mousedev hid_generic usbhid hid btusb btintel btbcm btrtl
-> > > bluetooth nouveau ecdh_generic rfkill morus1280_sse2 morus1280_glue
-> > > morus640_sse2 morus640_glue ttm drm_kms_helper ghash_clmulni_intel drm
-> > > crct10dif_pclmul crc32_pclmul drm_panel_orientation_quirks crc32c_int=
-el
-> > > aegis256_aesni cfbcopyarea fb_sys_fops sysimgblt pcbc sysfillrect
-> > > cfbimgblt syscopyarea cfbfillrect aesni_intel glue_helper i2c_algo_bit
-> > > crypto_simd aes_x86_64 ohci_pci snd_hda_codec_realtek aegis128l_aesni
-> > > pktcdvd aegis128_aesni agpgart ohci_hcd snd_hda_codec_generic cryptd
-> > > xhci_pci kvm_amd xhci_hcd ehci_pci snd_hda_intel ehci_hcd snd_hda_cod=
-ec
-> > > kvm usbcore led_class snd_hda_core video usb_common [   35.055814]=20
-> > > backlight irqbypass fb snd_hwdep snd_pcm mxm_wmi r8169 fbdev mac_hid
-> > > fam15h_power k10temp mii snd_timer ccp evdev snd rng_core hwmon wmi
-> > > i2c_piix4 sha1_generic sha256_generic button soundcore font sr_mod
-> > > acpi_cpufreq rtc_cmos sg i2c_core cdrom edac_mce_amd sd_mod ahci
-> > > libahci libata scsi_mod [last unloaded: pcmcia_core]
-> > > [   35.058426] ---[ end trace fdc9e8c678138a75 ]---
-> > > [   35.059725] RIP: 0010:scsi_times_out+0xe9/0x1a6 [scsi_mod]
-> > > [   35.059726] Code: 03 76 18 48 c7 c2 f9 c2 01 a0 48 89 ee 48 c7 c7 =
-14
-> > > be 01 a0 31 c0 e8 76 ad 00 00 48 8b 83 98 01 00 00 a8 01 0f 84 a5 00 =
-00
-> > > 00 <0f> 0b 49 8b 7c 24 38 e8 8f ba 4b e1 41 83 bc 24 2c 01 00 00 ff 74
-> > > [   35.063794] RSP: 0018:ffffc90000293d98 EFLAGS: 00010202
-> > > [   35.063796] RAX: ffff88031f240605 RBX: ffff88031eed8500 RCX:
-> > > 00000000fffefd40 [   35.063797] RDX: ffffc90000293e80 RSI:
-> > > 0000000000002007 RDI: ffff88031eed8638 [   35.063798] RBP:
-> > > ffff88031eed8638 R08: ffff88031eed85d8 R09: 0000000000000000 [ =20
-> > > 35.069198] R10: 0000000000000040 R11: fefefefefefefeff R12:
-> > > ffff88031f2a8800 [   35.069198] R13: ffff88031f2a8800 R14:
-> > > ffff88031f29e910 R15: 0000000000000001 [   35.069200] FS:=20
-> > > 0000000000000000(0000) GS:ffff88032ed00000(0000) knlGS:00000000000000=
-00
-> > > [   35.073191] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > [   35.073192] CR2: 00000000f7ea83c0 CR3: 000000031e194000 CR4:
-> > > 00000000000406e0
-> > >
-> > >
-> > > and this resulted later on in failure to enter suspend-to-ram:
-> > >
-> > > [  181.912985] PM: suspend entry (deep)
-> > > [  181.912993] PM: Syncing filesystems ... done.
-> > > [  182.026561] Freezing user space processes ...
-> > > [  202.029084] Freezing of tasks failed after 20.002 seconds (1 tasks
-> > > refusing to freeze, wq_busy=3D0):
-> > > [  202.029106] hald-addon-stor D    0   909    849 0x20020004
-> > > [  202.029113] Call Trace:
-> > > [  202.029128]  ? __schedule+0x37f/0x57f
-> > > [  202.029134]  ? usleep_range+0x51/0x51
-> > > [  202.029139]  schedule+0x7f/0x89
-> > > [  202.029144]  schedule_timeout+0x21/0xc7
-> > > [  202.029151]  ? check_preempt_curr+0x2e/0x68
-> > > [  202.029157]  do_wait_for_common+0x102/0x133
-> > > [  202.029163]  ? wake_up_q+0x47/0x47
-> > > [  202.029169]  wait_for_common+0x36/0x4e
-> > > [  202.029174]  flush_work+0x12e/0x14b
-> > > [  202.029179]  ? wake_up_worker+0x25/0x25
-> > > [  202.029185]  __cancel_work_timer+0xfb/0x14f
-> > > [  202.029190]  ? kobj_lookup+0xfc/0x130
-> > > [  202.029196]  disk_block_events+0x5f/0x78
-> > > [  202.029202]  __blkdev_get+0xaa/0x3f7
-> > > [  202.029207]  blkdev_get+0x83/0x2a3
-> > > [  202.029211]  ? bdgrab+0x12/0x17
-> > > [  202.029216]  ? bd_acquire+0x3a/0xad
-> > > [  202.029220]  ? bd_acquire+0xad/0xad
-> > > [  202.029226]  do_dentry_open.isra.22+0x16b/0x22d
-> > > [  202.029232]  path_openat+0x98f/0xb27
-> > > [  202.029238]  ? _raw_spin_unlock_irqrestore+0x18/0x23
-> > > [  202.029243]  do_filp_open+0x4d/0xa3
-> > > [  202.029249]  ? __blkdev_put+0x154/0x170
-> > > [  202.029254]  ? _cond_resched+0x25/0x29
-> > > [  202.029260]  ? slab_pre_alloc_hook+0x2d/0x53
-> > > [  202.029265]  ? slab_post_alloc_hook.isra.62+0xa/0x1a
-> > > [  202.029270]  ? kmem_cache_alloc+0xa0/0x10b
-> > > [  202.029277]  ? do_sys_open+0x6a/0xef
-> > > [  202.029281]  do_sys_open+0x6a/0xef
-> > > [  202.029287]  do_int80_syscall_32+0x52/0x5f
-> > > [  202.029293]  entry_INT80_compat+0x85/0x90
-> > > [  202.029316] OOM killer enabled.
-> > > [  202.029318] Restarting tasks ... done.
-> > > [  202.035210] PM: suspend exit
-> > >
-> > > full dmesg attached
-> >
-> > [add linux-scsi m-l]
->
-> (added linux-block)
->
-> Is this something that happens systematically or sporadically?
-> Additionally, have you verified whether or not this can be triggered with
-> kernel v4.17? I'm wondering whether or not this is a regression that was
-> introduced in the merge window.
-
-same system boots ok with 4.17.1-x64
-will re-try mainline git soon ....
-
->
-> Thanks,
->
-> Bart.
+T24gU2F0LCAyMDE4LTA2LTA5IGF0IDA4OjAyIC0wNzAwLCBSYW5keSBEdW5sYXAgd3JvdGU6DQo+
+IE9uIDA2LzA5LzIwMTggMDY6MDYgQU0sIEFuZHJldyBSYW5kcmlhbmFzdWx1IHdyb3RlOg0KPiA+
+IEhlbGxvLCBldmVyeW9uZSENCj4gPiANCj4gPiBJIHdhcyB0cnlpbmcgdG8gdGVzdCBub3QteWV0
+LWNvbXBsZXRlZCA0LjE4LXJjMSwgYW5kIHJ1biBpbnRvIHRoaXMgYnVnLCBwcm9iYWJseSANCj4g
+PiBkdWUgdG8gSEFMICh5ZXMsIEkgc3RpbGwgdXNlIHRoaXMpIHRyeWluZyB0byBwb2xsIGVtcHR5
+IERWRC1SVyBkcml2ZToNCj4gPiANCj4gPiBbICAgMzUuMDQwMTY3XSAtLS0tLS0tLS0tLS1bIGN1
+dCBoZXJlIF0tLS0tLS0tLS0tLS0NCj4gPiBbICAgMzUuMDQwMTcxXSBrZXJuZWwgQlVHIGF0IGRy
+aXZlcnMvc2NzaS9zY3NpX2Vycm9yLmM6MTk3IQ0KPiA+IFsgICAzNS4wNDAxOTZdIGludmFsaWQg
+b3Bjb2RlOiAwMDAwIFsjMV0gU01QIE5PUFRJDQo+ID4gWyAgIDM1LjA0MDIxMF0gQ1BVOiAyIFBJ
+RDogMTE3IENvbW06IGt3b3JrZXIvMjoxSCBOb3QgdGFpbnRlZCANCj4gPiA0LjE3LjAteDY0LTA4
+NDI4LWc3ZDNiZjYxM2U5OWEtZGlydHkgIzE4DQo+ID4gWyAgIDM1LjA0MDIyNV0gSGFyZHdhcmUg
+bmFtZTogTVNJIE1TLTc2OTMvOTcwQS1HNDYgKE1TLTc2OTMpLCBCSU9TIFYyLjggDQo+ID4gMDEv
+MDgvMjAxNg0KPiA+IFsgICAzNS4wNDAyNDRdIFdvcmtxdWV1ZToga2Jsb2NrZCBibGtfbXFfdGlt
+ZW91dF93b3JrDQo+ID4gWyAgIDM1LjA0MDI4M10gUklQOiAwMDEwOnNjc2lfdGltZXNfb3V0KzB4
+ZTkvMHgxYTYgW3Njc2lfbW9kXQ0KPiA+IFsgICAzNS4wNDAyODddIENvZGU6IDAzIDc2IDE4IDQ4
+IGM3IGMyIGY5IGMyIDAxIGEwIDQ4IDg5IGVlIDQ4IGM3IGM3IDE0IGJlIDAxIGEwIA0KPiA+IDMx
+IGMwIGU4IDc2IGFkIDAwIDAwIDQ4IDhiIDgzIDk4IDAxIDAwIDAwIGE4IDAxIDBmIDg0IGE1IDAw
+IDAwIDAwIDwwZj4gMGIgNDkgOGIgDQo+ID4gN2MgMjQgMzggZTggOGYgYmEgNGIgZTEgNDEgODMg
+YmMgMjQgMmMgMDENCj4gPiAgMDAgMDAgZmYgNzQNCj4gPiBbICAgMzUuMDQwMzEyXSBSU1A6IDAw
+MTg6ZmZmZmM5MDAwMDI5M2Q5OCBFRkxBR1M6IDAwMDEwMjAyDQo+ID4gWyAgIDM1LjA0MDMxOF0g
+UkFYOiBmZmZmODgwMzFmMjQwNjA1IFJCWDogZmZmZjg4MDMxZWVkODUwMCBSQ1g6IDAwMDAwMDAw
+ZmZmZWZkNDANCj4gPiBbICAgMzUuMDQwMzIzXSBSRFg6IGZmZmZjOTAwMDAyOTNlODAgUlNJOiAw
+MDAwMDAwMDAwMDAyMDA3IFJESTogZmZmZjg4MDMxZWVkODYzOA0KPiA+IFsgICAzNS4wNDAzMjdd
+IFJCUDogZmZmZjg4MDMxZWVkODYzOCBSMDg6IGZmZmY4ODAzMWVlZDg1ZDggUjA5OiAwMDAwMDAw
+MDAwMDAwMDAwDQo+ID4gWyAgIDM1LjA0MDMzMl0gUjEwOiAwMDAwMDAwMDAwMDAwMDQwIFIxMTog
+ZmVmZWZlZmVmZWZlZmVmZiBSMTI6IGZmZmY4ODAzMWYyYTg4MDANCj4gPiBbICAgMzUuMDQwMzM2
+XSBSMTM6IGZmZmY4ODAzMWYyYTg4MDAgUjE0OiBmZmZmODgwMzFmMjllOTEwIFIxNTogMDAwMDAw
+MDAwMDAwMDAwMQ0KPiA+IFsgICAzNS4wNDAzNDFdIEZTOiAgMDAwMDAwMDAwMDAwMDAwMCgwMDAw
+KSBHUzpmZmZmODgwMzJlZDAwMDAwKDAwMDApIA0KPiA+IGtubEdTOjAwMDAwMDAwMDAwMDAwMDAN
+Cj4gPiBbICAgMzUuMDQwMzQ2XSBDUzogIDAwMTAgRFM6IDAwMDAgRVM6IDAwMDAgQ1IwOiAwMDAw
+MDAwMDgwMDUwMDMzDQo+ID4gWyAgIDM1LjA0MDM1MF0gQ1IyOiAwMDAwMDAwMGY3ZWE4M2MwIENS
+MzogMDAwMDAwMDMxZTE5NDAwMCBDUjQ6IDAwMDAwMDAwMDAwNDA2ZTANCj4gPiBbICAgMzUuMDQw
+MzU0XSBDYWxsIFRyYWNlOg0KPiA+IFsgICAzNS4wNDAzNjBdICBibGtfbXFfY2hlY2tfZXhwaXJl
+ZCsweGRjLzB4MTBjDQo+ID4gWyAgIDM1LjA0MDM2NV0gIGJ0X2l0ZXIrMHg0Mi8weDQ1DQo+ID4g
+WyAgIDM1LjA0MDM2OV0gIF9fc2JpdG1hcF9mb3JfZWFjaF9zZXQuY29uc3Rwcm9wLjEyKzB4ODMv
+MHhhYw0KPiA+IFsgICAzNS4wNDAzNzRdICA/IGJsa19tcV91cGRhdGVfbnJfcmVxdWVzdHMrMHhh
+ZC8weGFkDQo+ID4gWyAgIDM1LjA0MDU5NV0gID8gYmxrX21xX2V4aXRfaGN0eCsweGRhLzB4ZGEN
+Cj4gPiBbICAgMzUuMDQxNTk1XSAgYmxrX21xX3F1ZXVlX3RhZ19idXN5X2l0ZXIrMHhhMy8weGI0
+DQo+ID4gWyAgIDM1LjA0MjU3OF0gID8gYmxrX21xX2V4aXRfaGN0eCsweGRhLzB4ZGENCj4gPiBb
+ICAgMzUuMDQzNTUwXSAgYmxrX21xX3RpbWVvdXRfd29yaysweDZiLzB4Y2ENCj4gPiBbICAgMzUu
+MDQ0NTA1XSAgcHJvY2Vzc19vbmVfd29yaysweDE3Yy8weDJhNg0KPiA+IFsgICAzNS4wNDU0NDVd
+ICB3b3JrZXJfdGhyZWFkKzB4MTlmLzB4MjQzDQo+ID4gWyAgIDM1LjA0NjM5M10gID8gcmVzY3Vl
+cl90aHJlYWQrMHgyNjIvMHgyNjINCj4gPiBbICAgMzUuMDQ3MzQ2XSAga3RocmVhZCsweDEwMC8w
+eDEwOA0KPiA+IFsgICAzNS4wNDgyOTBdICA/IGt0aHJlYWRfZGVzdHJveV93b3JrZXIrMHgzZS8w
+eDNlDQo+ID4gWyAgIDM1LjA0OTI0Ml0gIHJldF9mcm9tX2ZvcmsrMHgyNy8weDUwDQo+ID4gWyAg
+IDM1LjA1MDE5Ml0gTW9kdWxlcyBsaW5rZWQgaW46IGJyaWRnZSBzdHAgbGxjIGJuZXAgcmZjb21t
+IGhpZHAgc25kX2Fsb29wIGlwdjYgDQo+ID4gcGNtY2lhIHBjbWNpYV9jb3JlIHhmcyBsaWJjcmMz
+MmMgbHAgcGFycG9ydCBmNzE4ODJmZyBpbnB1dF9sZWRzIG1vdXNlZGV2IA0KPiA+IGhpZF9nZW5l
+cmljIHVzYmhpZCBoaWQgYnR1c2IgYnRpbnRlbCBidGJjbSBidHJ0bCBibHVldG9vdGggbm91dmVh
+dSBlY2RoX2dlbmVyaWMgDQo+ID4gcmZraWxsIG1vcnVzMTI4MF9zc2UyIG1vcnVzMTI4MF9nbHVl
+IG1vcnVzNjQwX3NzZTIgbW9ydXM2NDBfZ2x1ZSB0dG0gDQo+ID4gZHJtX2ttc19oZWxwZXIgZ2hh
+c2hfY2xtdWxuaV9pbnRlbCBkcm0gY3JjdDEwZGlmX3BjbG11bCBjcmMzMl9wY2xtdWwgDQo+ID4g
+ZHJtX3BhbmVsX29yaWVudGF0aW9uX3F1aXJrcyBjcmMzMmNfaW50ZWwgYWVnaXMyNTZfYWVzbmkg
+Y2ZiY29weWFyZWEgDQo+ID4gZmJfc3lzX2ZvcHMgc3lzaW1nYmx0IHBjYmMgc3lzZmlsbHJlY3Qg
+Y2ZiaW1nYmx0IHN5c2NvcHlhcmVhIGNmYmZpbGxyZWN0IA0KPiA+IGFlc25pX2ludGVsIGdsdWVf
+aGVscGVyIGkyY19hbGdvX2JpdCBjcnlwdG9fc2ltZCBhZXNfeDg2XzY0IG9oY2lfcGNpIA0KPiA+
+IHNuZF9oZGFfY29kZWNfcmVhbHRlayBhZWdpczEyOGxfYWVzbmkgcGt0Y2R2ZCBhZWdpczEyOF9h
+ZXNuaSBhZ3BnYXJ0IG9oY2lfaGNkIA0KPiA+IHNuZF9oZGFfY29kZWNfZ2VuZXJpYyBjcnlwdGQg
+eGhjaV9wY2kga3ZtX2FtZCB4aGNpX2hjZCBlaGNpX3BjaSBzbmRfaGRhX2ludGVsIA0KPiA+IGVo
+Y2lfaGNkIHNuZF9oZGFfY29kZWMga3ZtIHVzYmNvcmUgbGVkX2NsYXNzIHNuZF9oZGFfY29yZSB2
+aWRlbyB1c2JfY29tbW9uDQo+ID4gWyAgIDM1LjA1NTgxNF0gIGJhY2tsaWdodCBpcnFieXBhc3Mg
+ZmIgc25kX2h3ZGVwIHNuZF9wY20gbXhtX3dtaSByODE2OSBmYmRldiANCj4gPiBtYWNfaGlkIGZh
+bTE1aF9wb3dlciBrMTB0ZW1wIG1paSBzbmRfdGltZXIgY2NwIGV2ZGV2IHNuZCBybmdfY29yZSBo
+d21vbiB3bWkgDQo+ID4gaTJjX3BpaXg0IHNoYTFfZ2VuZXJpYyBzaGEyNTZfZ2VuZXJpYyBidXR0
+b24gc291bmRjb3JlIGZvbnQgc3JfbW9kIGFjcGlfY3B1ZnJlcSANCj4gPiBydGNfY21vcyBzZyBp
+MmNfY29yZSBjZHJvbSBlZGFjX21jZV9hbWQgc2RfbW9kIGFoY2kgbGliYWhjaSBsaWJhdGEgc2Nz
+aV9tb2QgDQo+ID4gW2xhc3QgdW5sb2FkZWQ6IHBjbWNpYV9jb3JlXQ0KPiA+IFsgICAzNS4wNTg0
+MjZdIC0tLVsgZW5kIHRyYWNlIGZkYzllOGM2NzgxMzhhNzUgXS0tLQ0KPiA+IFsgICAzNS4wNTk3
+MjVdIFJJUDogMDAxMDpzY3NpX3RpbWVzX291dCsweGU5LzB4MWE2IFtzY3NpX21vZF0NCj4gPiBb
+ICAgMzUuMDU5NzI2XSBDb2RlOiAwMyA3NiAxOCA0OCBjNyBjMiBmOSBjMiAwMSBhMCA0OCA4OSBl
+ZSA0OCBjNyBjNyAxNCBiZSAwMSBhMCANCj4gPiAzMSBjMCBlOCA3NiBhZCAwMCAwMCA0OCA4YiA4
+MyA5OCAwMSAwMCAwMCBhOCAwMSAwZiA4NCBhNSAwMCAwMCAwMCA8MGY+IDBiIDQ5IDhiIA0KPiA+
+IDdjIDI0IDM4IGU4IDhmIGJhIDRiIGUxIDQxIDgzIGJjIDI0IDJjIDAxIDAwIDAwIGZmIDc0DQo+
+ID4gWyAgIDM1LjA2Mzc5NF0gUlNQOiAwMDE4OmZmZmZjOTAwMDAyOTNkOTggRUZMQUdTOiAwMDAx
+MDIwMg0KPiA+IFsgICAzNS4wNjM3OTZdIFJBWDogZmZmZjg4MDMxZjI0MDYwNSBSQlg6IGZmZmY4
+ODAzMWVlZDg1MDAgUkNYOiAwMDAwMDAwMGZmZmVmZDQwDQo+ID4gWyAgIDM1LjA2Mzc5N10gUkRY
+OiBmZmZmYzkwMDAwMjkzZTgwIFJTSTogMDAwMDAwMDAwMDAwMjAwNyBSREk6IGZmZmY4ODAzMWVl
+ZDg2MzgNCj4gPiBbICAgMzUuMDYzNzk4XSBSQlA6IGZmZmY4ODAzMWVlZDg2MzggUjA4OiBmZmZm
+ODgwMzFlZWQ4NWQ4IFIwOTogMDAwMDAwMDAwMDAwMDAwMA0KPiA+IFsgICAzNS4wNjkxOThdIFIx
+MDogMDAwMDAwMDAwMDAwMDA0MCBSMTE6IGZlZmVmZWZlZmVmZWZlZmYgUjEyOiBmZmZmODgwMzFm
+MmE4ODAwDQo+ID4gWyAgIDM1LjA2OTE5OF0gUjEzOiBmZmZmODgwMzFmMmE4ODAwIFIxNDogZmZm
+Zjg4MDMxZjI5ZTkxMCBSMTU6IDAwMDAwMDAwMDAwMDAwMDENCj4gPiBbICAgMzUuMDY5MjAwXSBG
+UzogIDAwMDAwMDAwMDAwMDAwMDAoMDAwMCkgR1M6ZmZmZjg4MDMyZWQwMDAwMCgwMDAwKSANCj4g
+PiBrbmxHUzowMDAwMDAwMDAwMDAwMDAwDQo+ID4gWyAgIDM1LjA3MzE5MV0gQ1M6ICAwMDEwIERT
+OiAwMDAwIEVTOiAwMDAwIENSMDogMDAwMDAwMDA4MDA1MDAzMw0KPiA+IFsgICAzNS4wNzMxOTJd
+IENSMjogMDAwMDAwMDBmN2VhODNjMCBDUjM6IDAwMDAwMDAzMWUxOTQwMDAgQ1I0OiAwMDAwMDAw
+MDAwMDQwNmUwDQo+ID4gDQo+ID4gDQo+ID4gYW5kIHRoaXMgcmVzdWx0ZWQgbGF0ZXIgb24gaW4g
+ZmFpbHVyZSB0byBlbnRlciBzdXNwZW5kLXRvLXJhbToNCj4gPiANCj4gPiBbICAxODEuOTEyOTg1
+XSBQTTogc3VzcGVuZCBlbnRyeSAoZGVlcCkNCj4gPiBbICAxODEuOTEyOTkzXSBQTTogU3luY2lu
+ZyBmaWxlc3lzdGVtcyAuLi4gZG9uZS4NCj4gPiBbICAxODIuMDI2NTYxXSBGcmVlemluZyB1c2Vy
+IHNwYWNlIHByb2Nlc3NlcyAuLi4NCj4gPiBbICAyMDIuMDI5MDg0XSBGcmVlemluZyBvZiB0YXNr
+cyBmYWlsZWQgYWZ0ZXIgMjAuMDAyIHNlY29uZHMgKDEgdGFza3MgcmVmdXNpbmcgDQo+ID4gdG8g
+ZnJlZXplLCB3cV9idXN5PTApOg0KPiA+IFsgIDIwMi4wMjkxMDZdIGhhbGQtYWRkb24tc3RvciBE
+ICAgIDAgICA5MDkgICAgODQ5IDB4MjAwMjAwMDQNCj4gPiBbICAyMDIuMDI5MTEzXSBDYWxsIFRy
+YWNlOg0KPiA+IFsgIDIwMi4wMjkxMjhdICA/IF9fc2NoZWR1bGUrMHgzN2YvMHg1N2YNCj4gPiBb
+ICAyMDIuMDI5MTM0XSAgPyB1c2xlZXBfcmFuZ2UrMHg1MS8weDUxDQo+ID4gWyAgMjAyLjAyOTEz
+OV0gIHNjaGVkdWxlKzB4N2YvMHg4OQ0KPiA+IFsgIDIwMi4wMjkxNDRdICBzY2hlZHVsZV90aW1l
+b3V0KzB4MjEvMHhjNw0KPiA+IFsgIDIwMi4wMjkxNTFdICA/IGNoZWNrX3ByZWVtcHRfY3Vycisw
+eDJlLzB4NjgNCj4gPiBbICAyMDIuMDI5MTU3XSAgZG9fd2FpdF9mb3JfY29tbW9uKzB4MTAyLzB4
+MTMzDQo+ID4gWyAgMjAyLjAyOTE2M10gID8gd2FrZV91cF9xKzB4NDcvMHg0Nw0KPiA+IFsgIDIw
+Mi4wMjkxNjldICB3YWl0X2Zvcl9jb21tb24rMHgzNi8weDRlDQo+ID4gWyAgMjAyLjAyOTE3NF0g
+IGZsdXNoX3dvcmsrMHgxMmUvMHgxNGINCj4gPiBbICAyMDIuMDI5MTc5XSAgPyB3YWtlX3VwX3dv
+cmtlcisweDI1LzB4MjUNCj4gPiBbICAyMDIuMDI5MTg1XSAgX19jYW5jZWxfd29ya190aW1lcisw
+eGZiLzB4MTRmDQo+ID4gWyAgMjAyLjAyOTE5MF0gID8ga29ial9sb29rdXArMHhmYy8weDEzMA0K
+PiA+IFsgIDIwMi4wMjkxOTZdICBkaXNrX2Jsb2NrX2V2ZW50cysweDVmLzB4NzgNCj4gPiBbICAy
+MDIuMDI5MjAyXSAgX19ibGtkZXZfZ2V0KzB4YWEvMHgzZjcNCj4gPiBbICAyMDIuMDI5MjA3XSAg
+YmxrZGV2X2dldCsweDgzLzB4MmEzDQo+ID4gWyAgMjAyLjAyOTIxMV0gID8gYmRncmFiKzB4MTIv
+MHgxNw0KPiA+IFsgIDIwMi4wMjkyMTZdICA/IGJkX2FjcXVpcmUrMHgzYS8weGFkDQo+ID4gWyAg
+MjAyLjAyOTIyMF0gID8gYmRfYWNxdWlyZSsweGFkLzB4YWQNCj4gPiBbICAyMDIuMDI5MjI2XSAg
+ZG9fZGVudHJ5X29wZW4uaXNyYS4yMisweDE2Yi8weDIyZA0KPiA+IFsgIDIwMi4wMjkyMzJdICBw
+YXRoX29wZW5hdCsweDk4Zi8weGIyNw0KPiA+IFsgIDIwMi4wMjkyMzhdICA/IF9yYXdfc3Bpbl91
+bmxvY2tfaXJxcmVzdG9yZSsweDE4LzB4MjMNCj4gPiBbICAyMDIuMDI5MjQzXSAgZG9fZmlscF9v
+cGVuKzB4NGQvMHhhMw0KPiA+IFsgIDIwMi4wMjkyNDldICA/IF9fYmxrZGV2X3B1dCsweDE1NC8w
+eDE3MA0KPiA+IFsgIDIwMi4wMjkyNTRdICA/IF9jb25kX3Jlc2NoZWQrMHgyNS8weDI5DQo+ID4g
+WyAgMjAyLjAyOTI2MF0gID8gc2xhYl9wcmVfYWxsb2NfaG9vaysweDJkLzB4NTMNCj4gPiBbICAy
+MDIuMDI5MjY1XSAgPyBzbGFiX3Bvc3RfYWxsb2NfaG9vay5pc3JhLjYyKzB4YS8weDFhDQo+ID4g
+WyAgMjAyLjAyOTI3MF0gID8ga21lbV9jYWNoZV9hbGxvYysweGEwLzB4MTBiDQo+ID4gWyAgMjAy
+LjAyOTI3N10gID8gZG9fc3lzX29wZW4rMHg2YS8weGVmDQo+ID4gWyAgMjAyLjAyOTI4MV0gIGRv
+X3N5c19vcGVuKzB4NmEvMHhlZg0KPiA+IFsgIDIwMi4wMjkyODddICBkb19pbnQ4MF9zeXNjYWxs
+XzMyKzB4NTIvMHg1Zg0KPiA+IFsgIDIwMi4wMjkyOTNdICBlbnRyeV9JTlQ4MF9jb21wYXQrMHg4
+NS8weDkwDQo+ID4gWyAgMjAyLjAyOTMxNl0gT09NIGtpbGxlciBlbmFibGVkLg0KPiA+IFsgIDIw
+Mi4wMjkzMThdIFJlc3RhcnRpbmcgdGFza3MgLi4uIGRvbmUuDQo+ID4gWyAgMjAyLjAzNTIxMF0g
+UE06IHN1c3BlbmQgZXhpdA0KPiA+IA0KPiA+IGZ1bGwgZG1lc2cgYXR0YWNoZWQNCj4gDQo+IFth
+ZGQgbGludXgtc2NzaSBtLWxdDQoNCihhZGRlZCBsaW51eC1ibG9jaykNCg0KSXMgdGhpcyBzb21l
+dGhpbmcgdGhhdCBoYXBwZW5zIHN5c3RlbWF0aWNhbGx5IG9yIHNwb3JhZGljYWxseT8gQWRkaXRp
+b25hbGx5LA0KaGF2ZSB5b3UgdmVyaWZpZWQgd2hldGhlciBvciBub3QgdGhpcyBjYW4gYmUgdHJp
+Z2dlcmVkIHdpdGgga2VybmVsIHY0LjE3PyBJJ20NCndvbmRlcmluZyB3aGV0aGVyIG9yIG5vdCB0
+aGlzIGlzIGEgcmVncmVzc2lvbiB0aGF0IHdhcyBpbnRyb2R1Y2VkIGluIHRoZSBtZXJnZQ0Kd2lu
+ZG93Lg0KDQpUaGFua3MsDQoNCkJhcnQuDQoNCg0K
