@@ -1,61 +1,75 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 27/30] block: kill bio_for_each_segment_all()
-Date: Sat,  9 Jun 2018 20:30:11 +0800
-Message-Id: <20180609123014.8861-28-ming.lei@redhat.com>
-In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
-References: <20180609123014.8861-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <BATV+1e44ea8f521110dda36c+5407+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Coly Li <colyli@suse.de>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>,
+	linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 2/6] bcache: use bio_reuse instead of bio_reinit where applicable
+Date: Wed, 13 Jun 2018 15:51:54 +0200
+Message-Id: <20180613135158.29477-3-hch@lst.de>
+In-Reply-To: <20180613135158.29477-1-hch@lst.de>
+References: <20180613135158.29477-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-No one uses it any more, so kill it now.
+Use the bio_reuse helper instead of rebuilding the bio_vecs and
+size for bios that get reused for the same data.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- include/linux/bio.h  | 5 +----
- include/linux/bvec.h | 2 +-
- 2 files changed, 2 insertions(+), 5 deletions(-)
+ drivers/md/bcache/request.c | 5 +----
+ drivers/md/bcache/super.c   | 6 ++----
+ 2 files changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index c22b8be961ce..69ef05dc7019 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -165,11 +165,8 @@ static inline bool bio_full(struct bio *bio)
-  * drivers should _never_ use the all version - the bio may have been split
-  * before it got to the driver and the driver won't own all of it
-  */
--#define bio_for_each_segment_all(bvl, bio, i)				\
--	for (i = 0, bvl = (bio)->bi_io_vec; i < (bio)->bi_vcnt; i++, bvl++)
--
- #define bio_for_each_chunk_all(bvl, bio, i)		\
--	bio_for_each_segment_all(bvl, bio, i)
-+	for (i = 0, bvl = (bio)->bi_io_vec; i < (bio)->bi_vcnt; i++, bvl++)
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index ae67f5fa8047..3e699be2e79b 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -810,12 +810,9 @@ static void cached_dev_read_done(struct closure *cl)
+ 	 */
  
- #define chunk_for_each_segment(bv, bvl, i, citer)			\
- 	for (bv = bvec_init_chunk_iter(&citer);				\
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index d4eaa0c26bb5..58267bde111e 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -47,7 +47,7 @@
-  *   page, so we keep the sp interface not changed, for example,
-  *   bio_for_each_segment() still returns bvec with single page
-  *
-- * - bio_for_each_segment_all() will be changed to return singlepage
-+ * - bio_for_each_chunk_all() will be changed to return singlepage
-  *   bvec too
-  *
-  * - during iterating, iterator variable(struct bvec_iter) is always
+ 	if (s->iop.bio) {
+-		bio_reset(s->iop.bio);
++		bio_reuse(s->iop.bio, s->insert_bio_sectors << 9);
+ 		s->iop.bio->bi_iter.bi_sector = s->cache_miss->bi_iter.bi_sector;
+ 		bio_copy_dev(s->iop.bio, s->cache_miss);
+-		s->iop.bio->bi_iter.bi_size = s->insert_bio_sectors << 9;
+-		bch_bio_map(s->iop.bio, NULL);
+-
+ 		bio_copy_data(s->cache_miss, s->iop.bio);
+ 
+ 		bio_put(s->cache_miss);
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index a31e55bcc4e5..56692a451aeb 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -205,9 +205,7 @@ static void __write_super(struct cache_sb *sb, struct bio *bio)
+ 	unsigned i;
+ 
+ 	bio->bi_iter.bi_sector	= SB_SECTOR;
+-	bio->bi_iter.bi_size	= SB_SIZE;
+ 	bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC|REQ_META);
+-	bch_bio_map(bio, NULL);
+ 
+ 	out->offset		= cpu_to_le64(sb->offset);
+ 	out->version		= cpu_to_le64(sb->version);
+@@ -249,7 +247,7 @@ void bch_write_bdev_super(struct cached_dev *dc, struct closure *parent)
+ 	down(&dc->sb_write_mutex);
+ 	closure_init(cl, parent);
+ 
+-	bio_reset(bio);
++	bio_reuse(bio, SB_SIZE);
+ 	bio_set_dev(bio, dc->bdev);
+ 	bio->bi_end_io	= write_bdev_super_endio;
+ 	bio->bi_private = dc;
+@@ -298,7 +296,7 @@ void bcache_write_super(struct cache_set *c)
+ 
+ 		SET_CACHE_SYNC(&ca->sb, CACHE_SYNC(&c->sb));
+ 
+-		bio_reset(bio);
++		bio_reuse(bio, SB_SIZE);
+ 		bio_set_dev(bio, ca->bdev);
+ 		bio->bi_end_io	= write_super_endio;
+ 		bio->bi_private = ca;
 -- 
-2.9.5
+2.17.1
