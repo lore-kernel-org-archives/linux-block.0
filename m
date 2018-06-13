@@ -1,90 +1,35 @@
-Return-Path: <BATV+bdb09ad5f0bc9ee27162+5405+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Coly Li <colyli@suse.de>
-Cc: linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 3/6] bcache: clean up bio reuse for struct moving_io
-Date: Mon, 11 Jun 2018 21:48:03 +0200
-Message-Id: <20180611194806.13222-4-hch@lst.de>
-In-Reply-To: <20180611194806.13222-1-hch@lst.de>
-References: <20180611194806.13222-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:42754 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S934619AbeFMQov (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Jun 2018 12:44:51 -0400
+Date: Wed, 13 Jun 2018 18:44:28 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
+Subject: Re: [Backport request] blkdev_report_zones_ioctl(): Use vmalloc() to
+ allocate large buffers
+Message-ID: <20180613164428.GB19257@kroah.com>
+References: <021c1029a42253c749a182a38d9709c2cd8db0df.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <021c1029a42253c749a182a38d9709c2cd8db0df.camel@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Instead of reinitializing the bio everytime we can call bio_reuse when
-reusing it.  Also removes the remainder of the moving_init helper
-to improve readability.
+On Wed, Jun 13, 2018 at 03:36:42PM +0000, Bart Van Assche wrote:
+> Hello stable kernel maintainers,
+> 
+> Please backport patch 327ea4adcfa3 ("blkdev_report_zones_ioctl():
+> Use vmalloc() to allocate large buffers") to at least the v4.17.x and
+> v4.14.y stable kernel series. That patch fixes a bug introduced in
+> kernel v4.10. The entire patch is shown below.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/bcache/movinggc.c | 40 +++++++++++++++++-------------------
- 1 file changed, 19 insertions(+), 21 deletions(-)
+It's already in my queue to apply, and I normally wait until after it
+shows up in a -rc release before queueing it up.
 
-diff --git a/drivers/md/bcache/movinggc.c b/drivers/md/bcache/movinggc.c
-index a24c3a95b2c0..e59bc04c3d74 100644
---- a/drivers/md/bcache/movinggc.c
-+++ b/drivers/md/bcache/movinggc.c
-@@ -74,29 +74,20 @@ static void read_moving_endio(struct bio *bio)
- 	bch_bbio_endio(io->op.c, bio, bio->bi_status, "reading data to move");
- }
- 
--static void moving_init(struct moving_io *io)
--{
--	struct bio *bio = &io->bio.bio;
--
--	bio_init(bio, bio->bi_inline_vecs,
--		 DIV_ROUND_UP(KEY_SIZE(&io->w->key), PAGE_SECTORS));
--	bio_get(bio);
--	bio_set_prio(bio, IOPRIO_PRIO_VALUE(IOPRIO_CLASS_IDLE, 0));
--
--	bio->bi_iter.bi_size	= KEY_SIZE(&io->w->key) << 9;
--	bio->bi_private		= &io->cl;
--	bch_bio_map(bio, NULL);
--}
--
- static void write_moving(struct closure *cl)
- {
- 	struct moving_io *io = container_of(cl, struct moving_io, cl);
- 	struct data_insert_op *op = &io->op;
- 
- 	if (!op->status) {
--		moving_init(io);
-+		struct bio *bio = &io->bio.bio;
-+
-+		bio_reuse(bio);
-+		bio_get(bio);
-+		bio_set_prio(bio, IOPRIO_PRIO_VALUE(IOPRIO_CLASS_IDLE, 0));
-+		bio->bi_private = &io->cl;
-+		bio->bi_iter.bi_sector = KEY_START(&io->w->key);
- 
--		io->bio.bio.bi_iter.bi_sector = KEY_START(&io->w->key);
- 		op->write_prio		= 1;
- 		op->bio			= &io->bio.bio;
- 
-@@ -156,12 +147,19 @@ static void read_moving(struct cache_set *c)
- 		io->op.c	= c;
- 		io->op.wq	= c->moving_gc_wq;
- 
--		moving_init(io);
- 		bio = &io->bio.bio;
--
--		bio_set_op_attrs(bio, REQ_OP_READ, 0);
--		bio->bi_end_io	= read_moving_endio;
--
-+		bio_init(bio, bio->bi_inline_vecs,
-+			DIV_ROUND_UP(KEY_SIZE(&io->w->key), PAGE_SECTORS));
-+		bio_get(bio);
-+
-+		bio->bi_iter.bi_size = KEY_SIZE(&io->w->key) << 9;
-+		bio->bi_iter.bi_sector = KEY_START(&io->w->key);
-+		bio->bi_opf = REQ_OP_READ;
-+		bio_set_prio(bio, IOPRIO_PRIO_VALUE(IOPRIO_CLASS_IDLE, 0));
-+		bio->bi_private = &io->cl;
-+		bio->bi_end_io = read_moving_endio;
-+
-+		bch_bio_map(bio, NULL);
- 		if (bch_bio_alloc_pages(bio, GFP_KERNEL))
- 			goto err;
- 
--- 
-2.17.1
+But I'll go do so now, thanks.
+
+greg k-h
