@@ -1,104 +1,68 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:46714 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934027AbeF0VtJ (ORCPT
+Received: from esa1.dell-outbound.iphmx.com ([68.232.153.90]:8787 "EHLO
+        esa1.dell-outbound.iphmx.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S935006AbeFMSYQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jun 2018 17:49:09 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Omar Sandoval <osandov@fb.com>
-Cc: linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH blktests v2 0/3] Add SRP initiator driver tests
-Date: Wed, 27 Jun 2018 14:49:05 -0700
-Message-Id: <20180627214908.26379-1-bart.vanassche@wdc.com>
+        Wed, 13 Jun 2018 14:24:16 -0400
+From: <Austin.Bolen@dell.com>
+To: <keith.busch@intel.com>, <Austin.Bolen@dell.com>
+CC: <keith.busch@linux.intel.com>, <yi.zhang@redhat.com>,
+        <linux-block@vger.kernel.org>, <osandov@osandov.com>,
+        <linux-nvme@lists.infradead.org>, <ming.lei@redhat.com>
+Subject: Re: blktests block/019 lead system hang
+Date: Wed, 13 Jun 2018 18:24:14 +0000
+Message-ID: <2bbfd07208a84856a2d4dcb833671a82@AUSX13MPC127.AMER.DELL.COM>
+References: <838678680.4693215.1527664726174.JavaMail.zimbra@redhat.com>
+ <1858098161.4693883.1527665214701.JavaMail.zimbra@redhat.com>
+ <20180605161853.GB16899@localhost.localdomain>
+ <5a3a2565a81543b5837672e01580a5b5@AUSX13MPC127.AMER.DELL.COM>
+ <20180613154415.GC5574@localhost.localdomain>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hello Omar,
-
-As promised during LSF/MM, I have converted the srp-tests software to the
-blktests framework. Please consider this patch series for inclusion in the
-official blktests repository. Note: this patch series is also available as
-a github pull request, namely https://github.com/osandov/blktests/pull/24.
-
-Thanks,
-
-Bart.
-
-Changes compared to v1:
-- Left out the patches from version one of this series that are already
-  upstream.
-- Renamed tests/srp/group into tests/srp/rc.
-- The SRP tests do not start if LIO was already configured (reported by Ming).
-- Documented the SRP test requirements in README.md.
-
-Bart Van Assche (3):
-  src/Makefile: Rename $(TARGETS) into $(C_TARGETS)
-  Add the discontiguous-io test program
-  Add tests for the SRP initiator and target drivers
-
- README.md                |   71 +++
- src/.gitignore           |    1 +
- src/Makefile             |   17 +-
- src/discontiguous-io.cpp |  340 ++++++++++
- tests/srp/001            |   71 +++
- tests/srp/001.out        |    8 +
- tests/srp/002            |   49 ++
- tests/srp/002.out        |    7 +
- tests/srp/003            |   50 ++
- tests/srp/003.out        |    7 +
- tests/srp/004            |   50 ++
- tests/srp/004.out        |    7 +
- tests/srp/005            |   40 ++
- tests/srp/005.out        |    7 +
- tests/srp/006            |   40 ++
- tests/srp/006.out        |    7 +
- tests/srp/007            |   40 ++
- tests/srp/007.out        |    7 +
- tests/srp/008            |   39 ++
- tests/srp/008.out        |    7 +
- tests/srp/009            |   40 ++
- tests/srp/009.out        |    7 +
- tests/srp/010            |   40 ++
- tests/srp/010.out        |    7 +
- tests/srp/011            |   44 ++
- tests/srp/011.out        |    7 +
- tests/srp/012            |   52 ++
- tests/srp/012.out        |    8 +
- tests/srp/013            |   48 ++
- tests/srp/013.out        |    8 +
- tests/srp/functions      | 1288 ++++++++++++++++++++++++++++++++++++++
- tests/srp/rc             |   54 ++
- 32 files changed, 2464 insertions(+), 4 deletions(-)
- create mode 100644 src/discontiguous-io.cpp
- create mode 100755 tests/srp/001
- create mode 100644 tests/srp/001.out
- create mode 100755 tests/srp/002
- create mode 100644 tests/srp/002.out
- create mode 100755 tests/srp/003
- create mode 100644 tests/srp/003.out
- create mode 100755 tests/srp/004
- create mode 100644 tests/srp/004.out
- create mode 100755 tests/srp/005
- create mode 100644 tests/srp/005.out
- create mode 100755 tests/srp/006
- create mode 100644 tests/srp/006.out
- create mode 100755 tests/srp/007
- create mode 100644 tests/srp/007.out
- create mode 100755 tests/srp/008
- create mode 100644 tests/srp/008.out
- create mode 100755 tests/srp/009
- create mode 100644 tests/srp/009.out
- create mode 100755 tests/srp/010
- create mode 100644 tests/srp/010.out
- create mode 100755 tests/srp/011
- create mode 100644 tests/srp/011.out
- create mode 100755 tests/srp/012
- create mode 100644 tests/srp/012.out
- create mode 100755 tests/srp/013
- create mode 100644 tests/srp/013.out
- create mode 100755 tests/srp/functions
- create mode 100755 tests/srp/rc
-
--- 
-2.17.1
+On 6/13/2018 10:41 AM, Keith Busch wrote:=0A=
+> Thanks for the feedback!=0A=
+>=0A=
+> This test does indeed toggle the Link Control Link Disable bit to simulat=
+e=0A=
+> the link failure. The PCIe specification specifically covers this case=0A=
+> in Section 3.2.1, Data Link Control and Management State Machine Rules:=
+=0A=
+>=0A=
+>   If the Link Disable bit has been Set by software, then the subsequent=
+=0A=
+>   transition to DL_Inactive must not be considered an error.=0A=
+Forgot to mention... this PCIe requirement to not treat Link Disable =3D 1=
+=0A=
+as an error is a requirement on PCIe hardware and not from platform=0A=
+side.  So if you want to test this PCIe spec requirement then you need a=0A=
+way to ascertain whether PCIe hardware or platform is causing the=0A=
+error.  Additionally, setting Link Disable is not what is causing the=0A=
+error in this specific case.  The error is coming from a subsequent MMIO=0A=
+that is causing UR since link is down.=0A=
+=0A=
+-Austin=0A=
+=0A=
+=0A=
+> So this test should suppress any Suprise Down Error events, but handling=
+=0A=
+> that particular event wasn't the intent of the test (and as you mentioned=
+,=0A=
+> it ought not occur anyway since the slot is HP Surprise capable).=0A=
+>=0A=
+> The test should not suppress reporting the Data Link Layer State Changed=
+=0A=
+> slot status. And while this doesn't trigger a Slot PDC status, triggering=
+=0A=
+> a DLLSC should occur since the Link Status DLLLA should go to 0 when=0A=
+> state machine goes from DL_Active to DL_Down, regardless of if a Suprise=
+=0A=
+> Down Error was detected.=0A=
+>=0A=
+> The Linux PCIEHP driver handles a DLLSC link-down event the same as=0A=
+> a presence detect remove event, and that's part of what this test was=0A=
+> trying to cover.=0A=
+>=0A=
+=0A=
