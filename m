@@ -1,35 +1,63 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:42754 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934619AbeFMQov (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jun 2018 12:44:51 -0400
-Date: Wed, 13 Jun 2018 18:44:28 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:61433 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935781AbeFMPgo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Jun 2018 11:36:44 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "stable@vger.kernel.org" <stable@vger.kernel.org>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Damien Le Moal <Damien.LeMoal@wdc.com>
-Subject: Re: [Backport request] blkdev_report_zones_ioctl(): Use vmalloc() to
+Subject: [Backport request] blkdev_report_zones_ioctl(): Use vmalloc() to
  allocate large buffers
-Message-ID: <20180613164428.GB19257@kroah.com>
-References: <021c1029a42253c749a182a38d9709c2cd8db0df.camel@wdc.com>
+Date: Wed, 13 Jun 2018 15:36:42 +0000
+Message-ID: <021c1029a42253c749a182a38d9709c2cd8db0df.camel@wdc.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <021c1029a42253c749a182a38d9709c2cd8db0df.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Jun 13, 2018 at 03:36:42PM +0000, Bart Van Assche wrote:
-> Hello stable kernel maintainers,
-> 
-> Please backport patch 327ea4adcfa3 ("blkdev_report_zones_ioctl():
-> Use vmalloc() to allocate large buffers") to at least the v4.17.x and
-> v4.14.y stable kernel series. That patch fixes a bug introduced in
-> kernel v4.10. The entire patch is shown below.
-
-It's already in my queue to apply, and I normally wait until after it
-shows up in a -rc release before queueing it up.
-
-But I'll go do so now, thanks.
-
-greg k-h
+SGVsbG8gc3RhYmxlIGtlcm5lbCBtYWludGFpbmVycywNCg0KUGxlYXNlIGJhY2twb3J0IHBhdGNo
+IDMyN2VhNGFkY2ZhMyAoImJsa2Rldl9yZXBvcnRfem9uZXNfaW9jdGwoKToNClVzZSB2bWFsbG9j
+KCkgdG8gYWxsb2NhdGUgbGFyZ2UgYnVmZmVycyIpIHRvIGF0IGxlYXN0IHRoZSB2NC4xNy54IGFu
+ZA0KdjQuMTQueSBzdGFibGUga2VybmVsIHNlcmllcy4gVGhhdCBwYXRjaCBmaXhlcyBhIGJ1ZyBp
+bnRyb2R1Y2VkIGluDQprZXJuZWwgdjQuMTAuIFRoZSBlbnRpcmUgcGF0Y2ggaXMgc2hvd24gYmVs
+b3cuDQoNClRoYW5rcywNCg0KQmFydC4NCg0KDQpjb21taXQgY2YwMTEwNjk4ODQ2ZmM1YTkzZGY4
+OWViMjBhYzdjYzcwYTg2MGMxNw0KQXV0aG9yOiBCYXJ0IFZhbiBBc3NjaGUgPGJhcnQudmFuYXNz
+Y2hlQHdkYy5jb20+DQpEYXRlOiAgIFR1ZSBNYXkgMjIgMDg6Mjc6MjIgMjAxOCAtMDcwMA0KDQog
+ICAgYmxrZGV2X3JlcG9ydF96b25lc19pb2N0bCgpOiBVc2Ugdm1hbGxvYygpIHRvIGFsbG9jYXRl
+IGxhcmdlIGJ1ZmZlcnMNCiAgICANCiAgICBBdm9pZCB0aGF0IGNvbXBsYWludHMgc2ltaWxhciB0
+byB0aGUgZm9sbG93aW5nIGFwcGVhciBpbiB0aGUga2VybmVsIGxvZw0KICAgIGlmIHRoZSBudW1i
+ZXIgb2Ygem9uZXMgaXMgc3VmZmljaWVudGx5IGxhcmdlOg0KICAgIA0KICAgICAgZmlvOiBwYWdl
+IGFsbG9jYXRpb24gZmFpbHVyZTogb3JkZXI6OSwgbW9kZToweDE0MGMwYzAoR0ZQX0tFUk5FTHxf
+X0dGUF9DT01QfF9fR0ZQX1pFUk8pLCBub2RlbWFzaz0obnVsbCkNCiAgICAgIENhbGwgVHJhY2U6
+DQogICAgICBkdW1wX3N0YWNrKzB4NjMvMHg4OA0KICAgICAgd2Fybl9hbGxvYysweGY1LzB4MTkw
+DQogICAgICBfX2FsbG9jX3BhZ2VzX3Nsb3dwYXRoKzB4OGYwLzB4YjBkDQogICAgICBfX2FsbG9j
+X3BhZ2VzX25vZGVtYXNrKzB4MjQyLzB4MjYwDQogICAgICBhbGxvY19wYWdlc19jdXJyZW50KzB4
+NmEvMHhiMA0KICAgICAga21hbGxvY19vcmRlcisweDE4LzB4NTANCiAgICAgIGttYWxsb2Nfb3Jk
+ZXJfdHJhY2UrMHgyNi8weGIwDQogICAgICBfX2ttYWxsb2MrMHgyMGUvMHgyMjANCiAgICAgIGJs
+a2Rldl9yZXBvcnRfem9uZXNfaW9jdGwrMHhhNS8weDFhMA0KICAgICAgYmxrZGV2X2lvY3RsKzB4
+MWJhLzB4OTMwDQogICAgICBibG9ja19pb2N0bCsweDQxLzB4NTANCiAgICAgIGRvX3Zmc19pb2N0
+bCsweGFhLzB4NjEwDQogICAgICBTeVNfaW9jdGwrMHg3OS8weDkwDQogICAgICBkb19zeXNjYWxs
+XzY0KzB4NzkvMHgxYjANCiAgICAgIGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJfaHdmcmFtZSsweDNk
+LzB4YTINCiAgICANCiAgICBGaXhlczogM2VkMDVhOTg3ZTBmICgiYmxrLXpvbmVkOiBpbXBsZW1l
+bnQgaW9jdGxzIikNCiAgICBTaWduZWQtb2ZmLWJ5OiBCYXJ0IFZhbiBBc3NjaGUgPGJhcnQudmFu
+YXNzY2hlQHdkYy5jb20+DQogICAgQ2M6IFNoYXVuIFRhbmNoZWZmIDxzaGF1bi50YW5jaGVmZkBz
+ZWFnYXRlLmNvbT4NCiAgICBDYzogRGFtaWVuIExlIE1vYWwgPGRhbWllbi5sZW1vYWxAaGdzdC5j
+b20+DQogICAgQ2M6IENocmlzdG9waCBIZWxsd2lnIDxoY2hAbHN0LmRlPg0KICAgIENjOiBNYXJ0
+aW4gSy4gUGV0ZXJzZW4gPG1hcnRpbi5wZXRlcnNlbkBvcmFjbGUuY29tPg0KICAgIENjOiBIYW5u
+ZXMgUmVpbmVja2UgPGhhcmVAc3VzZS5jb20+DQogICAgQ2M6IDxzdGFibGVAdmdlci5rZXJuZWwu
+b3JnPg0KICAgIFNpZ25lZC1vZmYtYnk6IEplbnMgQXhib2UgPGF4Ym9lQGtlcm5lbC5kaz4NCg0K
+ZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay16b25lZC5jIGIvYmxvY2svYmxrLXpvbmVkLmMNCmluZGV4
+IDA4ZTg0ZWYyYmMwNS4uM2QwOGRjODRkYjE2IDEwMDY0NA0KLS0tIGEvYmxvY2svYmxrLXpvbmVk
+LmMNCisrKyBiL2Jsb2NrL2Jsay16b25lZC5jDQpAQCAtMzI4LDcgKzMyOCwxMSBAQCBpbnQgYmxr
+ZGV2X3JlcG9ydF96b25lc19pb2N0bChzdHJ1Y3QgYmxvY2tfZGV2aWNlICpiZGV2LCBmbW9kZV90
+IG1vZGUsDQogCWlmICghcmVwLm5yX3pvbmVzKQ0KIAkJcmV0dXJuIC1FSU5WQUw7DQogDQotCXpv
+bmVzID0ga2NhbGxvYyhyZXAubnJfem9uZXMsIHNpemVvZihzdHJ1Y3QgYmxrX3pvbmUpLCBHRlBf
+S0VSTkVMKTsNCisJaWYgKHJlcC5ucl96b25lcyA+IElOVF9NQVggLyBzaXplb2Yoc3RydWN0IGJs
+a196b25lKSkNCisJCXJldHVybiAtRVJBTkdFOw0KKw0KKwl6b25lcyA9IGt2bWFsbG9jKHJlcC5u
+cl96b25lcyAqIHNpemVvZihzdHJ1Y3QgYmxrX3pvbmUpLA0KKwkJCUdGUF9LRVJORUwgfCBfX0dG
+UF9aRVJPKTsNCiAJaWYgKCF6b25lcykNCiAJCXJldHVybiAtRU5PTUVNOw0KIA0KQEAgLTM1MCw3
+ICszNTQsNyBAQCBpbnQgYmxrZGV2X3JlcG9ydF96b25lc19pb2N0bChzdHJ1Y3QgYmxvY2tfZGV2
+aWNlICpiZGV2LCBmbW9kZV90IG1vZGUsDQogCX0NCiANCiAgb3V0Og0KLQlrZnJlZSh6b25lcyk7
+DQorCWt2ZnJlZSh6b25lcyk7DQogDQogCXJldHVybiByZXQ7DQogfQ==
