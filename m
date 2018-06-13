@@ -1,38 +1,67 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-Date: Wed, 13 Jun 2018 10:49:52 -0400
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
-	linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/6] block: add a bio_reuse helper
-Message-ID: <20180613144952.GA17292@kmo-pixel>
-References: <20180611194806.13222-1-hch@lst.de>
- <20180611194806.13222-2-hch@lst.de>
- <20180612061629.GA19281@kmo-pixel>
- <20180613073204.GA22435@lst.de>
- <20180613085441.GA15100@kmo-pixel>
- <20180613135915.GC32418@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180613135915.GC32418@lst.de>
+Return-Path: <BATV+1e44ea8f521110dda36c+5407+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Coly Li <colyli@suse.de>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>,
+	linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 1/6] block: add a bio_reuse helper
+Date: Wed, 13 Jun 2018 15:51:53 +0200
+Message-Id: <20180613135158.29477-2-hch@lst.de>
+In-Reply-To: <20180613135158.29477-1-hch@lst.de>
+References: <20180613135158.29477-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Jun 13, 2018 at 03:59:15PM +0200, Christoph Hellwig wrote:
-> On Wed, Jun 13, 2018 at 04:54:41AM -0400, Kent Overstreet wrote:
-> > bi_size is not immutable though, it will usually be modified by drivers when you
-> > submit a bio.
-> > 
-> > I see what you're trying to do, but your approach is busted given the way the
-> > block layer works today. You'd have to save bio->bi_iter before submitting the
-> > bio and restore it afterwards for it to work.
-> 
-> For bi_size, agreed this needs fixing.  bi_sector is always restored
-> already by the callers, and the remaining fields are zeroed by bio_reset,
-> which does the right thing.
+This abstracts out a way to reuse a bio without destroying the
+bio vectors containing the data.
 
-This still shouldn't be a new helper. If the caller is restoring bi_sector they
-can restore bi_size as well, and restoring only part of bi_iter should not be
-encouraged as it's not safe in general - it is a quite reasonable thing to want
-to restore a bio to the state it was pre submission (e.g. for bouncing) and what
-you're doing is definitely _not_ safe in general.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/bio.c         | 19 +++++++++++++++++++
+ include/linux/bio.h |  1 +
+ 2 files changed, 20 insertions(+)
+
+diff --git a/block/bio.c b/block/bio.c
+index 70c4e1b6dd45..67393ab9abe0 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -308,6 +308,25 @@ void bio_reset(struct bio *bio)
+ }
+ EXPORT_SYMBOL(bio_reset);
+ 
++/**
++ * bio_reuse - prepare a bio for reuse
++ * @bio:	bio to reuse
++ * @size:	size of the bio 
++ *
++ * Prepares an already setup and possible used bio for reusing it another
++ * time.  Compared to bio_reset() this preserves the setup of the bio
++ * vectors containing the data.
++ */
++void bio_reuse(struct bio *bio, unsigned size)
++{
++	unsigned short vcnt = bio->bi_vcnt;
++
++	bio_reset(bio);
++	bio->bi_iter.bi_size = size;
++	bio->bi_vcnt = vcnt;
++}
++EXPORT_SYMBOL_GPL(bio_reuse);
++
+ static struct bio *__bio_chain_endio(struct bio *bio)
+ {
+ 	struct bio *parent = bio->bi_private;
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index f08f5fe7bd08..d114ccc4bac2 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -475,6 +475,7 @@ extern void bio_init(struct bio *bio, struct bio_vec *table,
+ 		     unsigned short max_vecs);
+ extern void bio_uninit(struct bio *);
+ extern void bio_reset(struct bio *);
++void bio_reuse(struct bio *, unsigned int);
+ void bio_chain(struct bio *, struct bio *);
+ 
+ extern int bio_add_page(struct bio *, struct page *, unsigned int,unsigned int);
+-- 
+2.17.1
