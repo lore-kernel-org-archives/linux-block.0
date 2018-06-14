@@ -1,15 +1,13 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:54476 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752420AbeFNGTI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Jun 2018 02:19:08 -0400
-Date: Wed, 13 Jun 2018 23:18:59 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@fb.com>,
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60918 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S935530AbeFNBVP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Jun 2018 21:21:15 -0400
+Date: Thu, 14 Jun 2018 09:20:53 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
         David Sterba <dsterba@suse.cz>,
         Huang Ying <ying.huang@intel.com>,
         linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
@@ -19,28 +17,29 @@ Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@fb.com>,
         Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
         Randy Dunlap <rdunlap@infradead.org>
 Subject: Re: [PATCH V6 00/30] block: support multipage bvec
-Message-ID: <20180614061858.GA3336@infradead.org>
+Message-ID: <20180614012052.GB19828@ming.t460p>
 References: <20180609123014.8861-1-ming.lei@redhat.com>
- <20180611164806.GA7452@infradead.org>
- <20180612034242.GC26412@ming.t460p>
- <20180613144253.GA4693@infradead.org>
- <20180614011852.GA19828@ming.t460p>
+ <20180613145908.GB17340@kmo-pixel>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180614011852.GA19828@ming.t460p>
+In-Reply-To: <20180613145908.GB17340@kmo-pixel>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Jun 14, 2018 at 09:18:58AM +0800, Ming Lei wrote:
-> This one may cause confusing, since we iterate over pages via
-> bio_for_each_segment(), but the _all version takes another name
-> of page, still iterate over pages.
+On Wed, Jun 13, 2018 at 10:59:08AM -0400, Kent Overstreet wrote:
+> On Sat, Jun 09, 2018 at 08:29:44PM +0800, Ming Lei wrote:
+> > Hi,
+> > 
+> > This patchset brings multipage bvec into block layer:
 > 
-> So could we change it in the following way?
-> 
->  OLD:	    bio_for_each_segment_all
->  NEW(page): bio_for_each_segment_all (update prototype in one tree-wide &
->  			big patch, to be renamed bio_for_each_page_all)
->  NEW(bvec):  (no bvec version needed once bcache is fixed up)	
+> Ming, what's going on with the chunk naming? I haven't been paying attention
+> because it feels like it's turned into bike shedding, but I just saw something
+> about a 3rd way of iterating over bios? (page/segment/chunk...?)
 
-Fine with me, but I thought Jens didn't like that sweeping change?
+This patchset takes the chunk naming.
+
+And 'chunk' represents multipage bvec, and 'segment' represents singlepage bvec
+basically.
+
+Thanks,
+Ming
