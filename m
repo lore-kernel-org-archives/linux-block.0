@@ -1,92 +1,75 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:44334 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751068AbeFANEo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 09:04:44 -0400
-Received: by mail-lf0-f68.google.com with SMTP id 36-v6so12791415lfr.11
-        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 06:04:43 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        javier@cnexlabs.com, igor.j.konopko@intel.com,
-        marcin.dziegielewski@intel.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL v2 00/18] lightnvm updates for 4.18
-Date: Fri,  1 Jun 2018 15:04:14 +0200
-Message-Id: <20180601130432.30866-1-mb@lightnvm.io>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+449e860d3caae2166dba+5408+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	axboe@kernel.dk
+Subject: [PATCH 2/2] blk-mq: remove blk_mq_tagset_iter
+Date: Thu, 14 Jun 2018 14:30:15 +0200
+Message-Id: <20180614123015.5989-3-hch@lst.de>
+In-Reply-To: <20180614123015.5989-1-hch@lst.de>
+References: <20180614123015.5989-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+Unused now that nvme stopped using it.
 
-Please pick up the following patches.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-mq-tag.c     | 29 -----------------------------
+ include/linux/blk-mq.h |  2 --
+ 2 files changed, 31 deletions(-)
 
- - Hans reworked the write error recovery path in pblk.
- - Igor added extra error handling for lines, and fixed a bug in the
-   pblk ringbuffer during GC.
- - Javier refactored the pblk code a bit, added extra error
-   handling, and added checks to verify that data returned from drive
-   is appropriate.
- - Marcin added some extra logic to manage the write buffer. Now
-   MW_CUNITS can be zero and the size of write buffer can be changed
-   at module load time.
-
-Changes since v1:
-
- Removed
-  lightnvm: pblk: sync RB and RL states during GC
-  lightnvm: error handling when whole line is bad
-  lightnvm: pblk: handle case when mw_cunits equals to 0
-
- Added
-  lightnvm: pblk: remove unnecessary bio_get/put
-
-Thanks,
-Matias
-
-
-Hans Holmberg (3):
-  lightnvm: pblk: rework write error recovery path
-  lightnvm: pblk: garbage collect lines with failed writes
-  lightnvm: pblk: fix smeta write error path
-
-Igor Konopko (2):
-  lightnvm: proper error handling for pblk_bio_add_pages
-  lightnvm: fix partial read error path
-
-Javier González (12):
-  lightnvm: pblk: fail gracefully on line alloc. failure
-  lightnvm: pblk: recheck for bad lines at runtime
-  lightnvm: pblk: check read lba on gc path
-  lightnvn: pblk: improve error msg on corrupted LBAs
-  lightnvm: pblk: warn in case of corrupted write buffer
-  lightnvm: pblk: return NVM_ error on failed submission
-  lightnvm: pblk: remove unnecessary indirection
-  lightnvm: pblk: remove unnecessary argument
-  lightnvm: pblk: check for chunk size before allocating it
-  lightnvn: pass flag on graceful teardown to targets
-  lightnvm: pblk: remove dead function
-  lightnvm: pblk: remove unnecessary bio_get/put
-
-Marcin Dziegielewski (1):
-  lightnvm: pblk: add possibility to set write buffer size manually
-
- drivers/lightnvm/core.c          |  10 +-
- drivers/lightnvm/pblk-core.c     | 144 ++++++++++++++------
- drivers/lightnvm/pblk-gc.c       | 112 ++++++++++------
- drivers/lightnvm/pblk-init.c     | 100 +++++++++-----
- drivers/lightnvm/pblk-map.c      |  33 +++--
- drivers/lightnvm/pblk-rb.c       |  44 +-----
- drivers/lightnvm/pblk-read.c     | 144 ++++++++++++--------
- drivers/lightnvm/pblk-recovery.c |  91 -------------
- drivers/lightnvm/pblk-rl.c       |  29 +++-
- drivers/lightnvm/pblk-sysfs.c    |  15 ++-
- drivers/lightnvm/pblk-write.c    | 281 +++++++++++++++++++++++++--------------
- drivers/lightnvm/pblk.h          |  43 +++---
- include/linux/lightnvm.h         |   2 +-
- 13 files changed, 611 insertions(+), 437 deletions(-)
-
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 70356a2a11ab..09b2ee6694fb 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -311,35 +311,6 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ }
+ EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
+ 
+-int blk_mq_tagset_iter(struct blk_mq_tag_set *set, void *data,
+-			 int (fn)(void *, struct request *))
+-{
+-	int i, j, ret = 0;
+-
+-	if (WARN_ON_ONCE(!fn))
+-		goto out;
+-
+-	for (i = 0; i < set->nr_hw_queues; i++) {
+-		struct blk_mq_tags *tags = set->tags[i];
+-
+-		if (!tags)
+-			continue;
+-
+-		for (j = 0; j < tags->nr_tags; j++) {
+-			if (!tags->static_rqs[j])
+-				continue;
+-
+-			ret = fn(data, tags->static_rqs[j]);
+-			if (ret)
+-				goto out;
+-		}
+-	}
+-
+-out:
+-	return ret;
+-}
+-EXPORT_SYMBOL_GPL(blk_mq_tagset_iter);
+-
+ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+ 		void *priv)
+ {
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index fb355173f3c7..e3147eb74222 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -281,8 +281,6 @@ void blk_freeze_queue_start(struct request_queue *q);
+ void blk_mq_freeze_queue_wait(struct request_queue *q);
+ int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
+ 				     unsigned long timeout);
+-int blk_mq_tagset_iter(struct blk_mq_tag_set *set, void *data,
+-		int (reinit_request)(void *, struct request *));
+ 
+ int blk_mq_map_queues(struct blk_mq_tag_set *set);
+ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
 -- 
-2.11.0
+2.17.1
