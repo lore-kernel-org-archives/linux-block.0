@@ -1,68 +1,40 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: snitzer@redhat.com,
-	kent.overstreet@gmail.com,
-	liwang@redhat.com,
-	vrbagal1@linux.vnet.ibm.com,
-	chuhu.ncepu@gmail.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 1/2] block: add bioset_init_from_src() helper
-Date: Thu,  7 Jun 2018 14:45:40 -0600
-Message-Id: <20180607204541.13491-2-axboe@kernel.dk>
-In-Reply-To: <20180607204541.13491-1-axboe@kernel.dk>
-References: <20180607204541.13491-1-axboe@kernel.dk>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Wed, 13 Jun 2018 23:20:22 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@fb.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        David Sterba <dsterba@suse.cz>,
+        Huang Ying <ying.huang@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH V6 11/30] block: implement bio_pages_all() via
+ bio_for_each_segment_all()
+Message-ID: <20180614062022.GB3336@infradead.org>
+References: <20180609123014.8861-1-ming.lei@redhat.com>
+ <20180609123014.8861-12-ming.lei@redhat.com>
+ <20180613144412.GB4693@infradead.org>
+ <20180614012352.GC19828@ming.t460p>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180614012352.GC19828@ming.t460p>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Add a helper that allows a caller to initialize a new bio_set,
-using the settings from an existing bio_set.
+On Thu, Jun 14, 2018 at 09:23:54AM +0800, Ming Lei wrote:
+> On Wed, Jun 13, 2018 at 07:44:12AM -0700, Christoph Hellwig wrote:
+> > Given that we have a single, dubious user of bio_pages_all I'd rather
+> > see it as an opencoded bio_for_each_ loop in the caller.
+> 
+> Yeah, that is fine since there is only one user in btrfs.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/bio.c         | 18 ++++++++++++++++++
- include/linux/bio.h |  1 +
- 2 files changed, 19 insertions(+)
-
-diff --git a/block/bio.c b/block/bio.c
-index 595663e0281a..bf516d873ce9 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1967,6 +1967,24 @@ int bioset_init(struct bio_set *bs,
- }
- EXPORT_SYMBOL(bioset_init);
- 
-+/*
-+ * Initialize and setup a new bio_set, based on the settings from
-+ * another bio_set.
-+ */
-+int bioset_init_from_src(struct bio_set *bs, struct bio_set *src)
-+{
-+	int flags;
-+
-+	flags = 0;
-+	if (src->bvec_pool.min_nr)
-+		flags |= BIOSET_NEED_BVECS;
-+	if (src->rescue_workqueue)
-+		flags |= BIOSET_NEED_RESCUER;
-+
-+	return bioset_init(bs, src->bio_pool.min_nr, src->front_pad, flags);
-+}
-+EXPORT_SYMBOL(bioset_init_from_src);
-+
- #ifdef CONFIG_BLK_CGROUP
- 
- /**
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 810a8bee8f85..84abd1706dcb 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -417,6 +417,7 @@ enum {
- extern int bioset_init(struct bio_set *, unsigned int, unsigned int, int flags);
- extern void bioset_exit(struct bio_set *);
- extern int biovec_init_pool(mempool_t *pool, int pool_entries);
-+extern int bioset_init_from_src(struct bio_set *bs, struct bio_set *src);
- 
- extern struct bio *bio_alloc_bioset(gfp_t, unsigned int, struct bio_set *);
- extern void bio_put(struct bio *);
--- 
-2.17.1
+And I suspect it really is checking for the wrong thing.  I don't
+fully understand that code, but as far as I can tell it really
+needs to know if there is more than a file system block of data in
+the bio, and btrfs conflats pages with blocks.  But I'd need btrfs
+folks to confirm this.
