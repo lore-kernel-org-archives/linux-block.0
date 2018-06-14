@@ -1,150 +1,180 @@
-Return-Path: <prvs=696a68361=Damien.LeMoal@wdc.com>
-From: Damien Le Moal <Damien.LeMoal@wdc.com>
-To: "Luis R. Rodriguez" <mcgrof@kernel.org>
-CC: "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"jaegeuk@kernel.org" <jaegeuk@kernel.org>, "yuchao0@huawei.com"
-	<yuchao0@huawei.com>, "ghe@suse.com" <ghe@suse.com>, "mwilck@suse.com"
-	<mwilck@suse.com>, "tchvatal@suse.com" <tchvatal@suse.com>, "zren@suse.com"
-	<zren@suse.com>, "agk@redhat.com" <agk@redhat.com>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] dm-zoned-tools: add zoned disk udev rules for scheduler /
- dmsetup
-Date: Thu, 14 Jun 2018 10:01:54 +0000
-Message-ID: <791e0a85-be07-4a31-f13d-282a1c94bf22@wdc.com>
-References: <20180614001147.1545-1-mcgrof@kernel.org>
-In-Reply-To: <20180614001147.1545-1-mcgrof@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Return-Path: <mcgrof@kernel.org>
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+To: damien.lemoal@wdc.com
+Cc: hare@suse.de,
+	axboe@kernel.dk,
+	jaegeuk@kernel.org,
+	yuchao0@huawei.com,
+	ghe@suse.com,
+	mwilck@suse.com,
+	tchvatal@suse.com,
+	zren@suse.com,
+	agk@redhat.com,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	"Luis R. Rodriguez" <mcgrof@kernel.org>
+Subject: [PATCH] dm-zoned-tools: add zoned disk udev rules for scheduler / dmsetup
+Date: Wed, 13 Jun 2018 17:11:47 -0700
+Message-Id: <20180614001147.1545-1-mcgrof@kernel.org>
 List-ID: <linux-block@vger.kernel.org>
 
-DQoNCk9uIDYvMTQvMTggMDk6MTEsIEx1aXMgUi4gUm9kcmlndWV6IHdyb3RlOg0KPiBTZXR0aW5n
-IHVwIGEgem9uZWQgZGlza3MgaW4gYSBnZW5lcmljIGZvcm0gaXMgbm90IHNvIHRyaXZpYWwuIFRo
-ZXJlDQo+IGlzIGFsc28gcXVpdGUgYSBiaXQgb2YgdHJpYmFsIGtub3dsZWRnZSB3aXRoIHRoZXNl
-IGRldmljZXMgd2hpY2ggaXMgbm90DQo+IGVhc3kgdG8gZmluZC4NCj4gDQo+IFRoZSBjdXJyZW50
-bHkgc3VwcGxpZWQgZGVtbyBzY3JpcHQgd29ya3MgYnV0IGl0IGlzIG5vdCBnZW5lcmljIGVub3Vn
-aCB0byBiZQ0KPiBwcmFjdGljYWwgZm9yIExpbnV4IGRpc3RyaWJ1dGlvbnMgb3IgZXZlbiBkZXZl
-bG9wZXJzIHdoaWNoIG9mdGVuIG1vdmUNCj4gZnJvbSBvbmUga2VybmVsIHRvIGFub3RoZXIuDQo+
-IA0KPiBUaGlzIHRyaWVzIHRvIHB1dCBhIGJpdCBvZiB0aGlzIHRyaWJhbCBrbm93bGVkZ2UgaW50
-byBhbiBpbml0aWFsIHVkZXYNCj4gcnVsZSBmb3IgZGV2ZWxvcG1lbnQgd2l0aCB0aGUgaG9wZXMg
-TGludXggZGlzdHJpYnV0aW9ucyBjYW4gbGF0ZXINCj4gZGVwbG95LiBUaHJlZSBydWxlIGFyZSBh
-ZGRlZC4gT25lIHJ1bGUgaXMgb3B0aW9uYWwgZm9yIG5vdywgaXQgc2hvdWxkIGJlDQo+IGV4dGVu
-ZGVkIGxhdGVyIHRvIGJlIG1vcmUgZGlzdHJpYnV0aW9uLWZyaWVuZGx5IGFuZCB0aGVuIEkgdGhp
-bmsgdGhpcw0KPiBtYXkgYmUgcmVhZHkgZm9yIGNvbnNpZGVyYXRpb24gZm9yIGludGVncmF0aW9u
-IG9uIGRpc3RyaWJ1dGlvbnMuDQo+IA0KPiAxKSBzY2hlZHVsZXIgc2V0dXANCj4gMikgYmFja2xp
-c3QgZjJmcyBkZXZpY2VzDQo+IDMpIHJ1biBkbXNldHVwIGZvciB0aGUgcmVzdCBvZiBkZXZpY2Vz
-DQo+IA0KPiBOb3RlIHRoYXQgdGhpcyB1ZGV2IHJ1bGUgd2lsbCBub3Qgd29yayB3ZWxsIGlmIHlv
-dSB3YW50IHRvIHVzZSBhIGRpc2sNCj4gd2l0aCBmMmZzIG9uIHBhcnQgb2YgdGhlIGRpc2sgYW5k
-IGFub3RoZXIgZmlsZXN5c3RlbSBvbiBhbm90aGVyIHBhcnQgb2YNCj4gdGhlIGRpc2suIFRoYXQg
-c2V0dXAgd2lsbCByZXF1aXJlIG1hbnVhbCBsb3ZlIHNvIHRoZXNlIHNldHVwcyBjYW4gdXNlDQo+
-IHRoZSBzYW1lIGJhY2tsaXN0IG9uIHJ1bGUgMikuDQo+IA0KPiBJdHMgbm90IHdpZGVseSBrbm93
-biBmb3IgaW5zdGFuY2UgdGhhdCBhcyBvZiB2NC4xNiBpdCBpcyBtYW5kYXRlZCB0byB1c2UNCj4g
-ZWl0aGVyIGRlYWRsaW5lIG9yIHRoZSBtcS1kZWFkbGluZSBzY2hlZHVsZXIgZm9yICphbGwqIFNN
-UiBkcml2ZXJzLiBJdHMNCj4gYWxzbyBiZWVuIGRldGVybWluZWQgdGhhdCB0aGUgTGludXgga2Vy
-bmVsIGlzIG5vdCB0aGUgcGxhY2UgdG8gc2V0IHRoaXMgdXAsDQo+IHNvIGEgdWRldiBydWxlICpp
-cyByZXF1aXJlZCogYXMgcGVyIGxhdGVzdCBkaXNjdXNzaW9ucy4gVGhpcyBpcyB0aGUNCj4gZmly
-c3QgcnVsZSB3ZSBhZGQuDQo+IA0KPiBGdXJ0aGVybW9yZSBpZiB5b3UgYXJlICpub3QqIHVzaW5n
-IGYyZnMgeW91IGFsd2F5cyBoYXZlIHRvIHJ1biBkbXNldHVwLg0KPiBkbXNldHVwcyBkbyBub3Qg
-cGVyc2lzdCwgc28geW91IGN1cnJlbnRseSAqYWx3YXlzKiBoYXZlIHRvIHJ1biBhIGN1c3RvbQ0K
-PiBzb3J0IG9mIHNjcmlwdCwgd2hpY2ggaXMgbm90IGlkZWFsIGZvciBMaW51eCBkaXN0cmlidXRp
-b25zLiBXZSBjYW4gaW52ZXJ0DQo+IHRoaXMgbG9naWMgaW50byBhIHVkZXYgcnVsZSB0byBlbmFi
-bGUgdXNlcnMgdG8gYmxhY2tsaXN0IGRpc2tzIHRoZXkga25vdyB0aGV5DQo+IHdhbnQgdG8gdXNl
-IGYyZnMgZm9yLiBUaGlzIHRoZSBzZWNvbmQgb3B0aW9uYWwgcnVsZS4gVGhpcyBibGFja2xpc3Rp
-bmcNCj4gY2FuIGJlIGdlbmVyYWxpemVkIGZ1cnRoZXIgaW4gdGhlIGZ1dHVyZSB3aXRoIGFuIGV4
-Y2VwdGlvbiBsaXN0IGZpbGUsIGZvcg0KPiBpbnN0YW5jZSB1c2luZyBJTlBVVHtkYn0gb3IgdGhl
-IGxpa2UuDQo+IA0KPiBUaGUgdGhpcmQgYW5kIGZpbmFsIHJ1bGUgYWRkZWQgdGhlbiBydW5zIGRt
-c2V0dXAgZm9yIHRoZSByZXN0IG9mIHRoZSBkaXNrcw0KPiB1c2luZyB0aGUgZGlzayBzZXJpYWwg
-bnVtYmVyIGZvciB0aGUgbmV3IGRldmljZSBtYXBwZXIgbmFtZS4NCj4gDQo+IE5vdGUgdGhhdCBp
-dCBpcyBjdXJyZW50bHkgZWFzeSBmb3IgdXNlcnMgdG8gbWFrZSBhIG1pc3Rha2UgYW5kIHJ1biBt
-a2ZzDQo+IG9uIHRoZSB0aGUgb3JpZ2luYWwgZGlzaywgbm90IHRoZSAvZGV2L21hcHBlci8gZGV2
-aWNlIGZvciBub24gZjJmcw0KPiBhcnJhbmdlbWVudHMuIElmIHRoYXQgaXMgZG9uZSBleHBlcmll
-bmNlIHNob3dzIHRoaW5ncyBjYW4gZWFzaWx5IGZhbGwNCj4gYXBhcnQgd2l0aCBhbGlnbm1lbnQg
-KmV2ZW50dWFsbHkqLiBXZSBoYXZlIG5vIGdlbmVyaWMgd2F5IHRvZGF5IHRvDQo+IGVycm9yIG91
-dCBvbiB0aGlzIGNvbmRpdGlvbiBhbmQgcHJvYWN0aXZlbHkgcHJldmVudCB0aGlzLg0KPiANCj4g
-U2lnbmVkLW9mZi1ieTogTHVpcyBSLiBSb2RyaWd1ZXogPG1jZ3JvZkBrZXJuZWwub3JnPg0KPiAt
-LS0NCj4gIFJFQURNRSAgICAgICAgICAgICAgICAgICAgfCAxMCArKysrKy0NCj4gIHVkZXYvOTkt
-em9uZWQtZGlza3MucnVsZXMgfCA3OCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKw0KPiAgMiBmaWxlcyBjaGFuZ2VkLCA4NyBpbnNlcnRpb25zKCspLCAxIGRl
-bGV0aW9uKC0pDQo+ICBjcmVhdGUgbW9kZSAxMDA2NDQgdWRldi85OS16b25lZC1kaXNrcy5ydWxl
-cw0KPiANCj4gZGlmZiAtLWdpdCBhL1JFQURNRSBiL1JFQURNRQ0KPiBpbmRleCA2NWU5NmMzNGZk
-MDQuLmY0OTU0MWVhYWJjOCAxMDA2NDQNCj4gLS0tIGEvUkVBRE1FDQo+ICsrKyBiL1JFQURNRQ0K
-PiBAQCAtMTY4LDcgKzE2OCwxNSBAQCBPcHRpb25zOg0KPiAgICAgICAgICAgICAgICAgICAgICAg
-cmVjbGFpbWluZyByYW5kb20gem9uZXMgaWYgdGhlIHBlcmNlbnRhZ2Ugb2YNCj4gICAgICAgICAg
-ICAgICAgICAgICAgIGZyZWUgcmFuZG9tIGRhdGEgem9uZXMgZmFsbHMgYmVsb3cgPHBlcmM+Lg0K
-PiAgDQo+IC1WLiBFeGFtcGxlIHNjcmlwdHMNCj4gK1YuIFVkZXYgem9uZSBkaXNrIGRlcGxveW1l
-bnQNCj4gKz09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCj4gKw0KPiArQSB1ZGV2IHJ1bGUg
-aXMgcHJvdmlkZWQgd2hpY2ggZW5hYmxlcyB5b3UgdG8gc2V0IHRoZSBJTyBzY2hlZHVsZXIsIGJs
-YWNrbGlzdA0KPiArZHJpdmVyIHRvIHJ1biBkbXNldHVwLCBhbmQgcnVucyBkbXNldHVwIGZvciB0
-aGUgcmVzdCBvZiB0aGUgem9uZSBkcml2ZXJzLg0KPiArSWYgeW91IHVzZSB0aGlzIHVkZXYgcnVs
-ZSB0aGUgYmVsb3cgc2NyaXB0IGlzIG5vdCBuZWVkZWQuIEJlIHN1cmUgdG8gbWtmcyBvbmx5DQo+
-ICtvbiB0aGUgcmVzdWx0aW5nIC9kZXYvbWFwcGVyL3pvbmUtJHNlcmlhbCBkZXZpY2UgeW91IGVu
-ZCB1cCB3aXRoLg0KPiArDQo+ICtWSS4gRXhhbXBsZSBzY3JpcHRzDQo+ICA9PT09PT09PT09PT09
-PT09PT0NCj4gIA0KPiAgW1sNCj4gZGlmZiAtLWdpdCBhL3VkZXYvOTktem9uZWQtZGlza3MucnVs
-ZXMgYi91ZGV2Lzk5LXpvbmVkLWRpc2tzLnJ1bGVzDQo+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0DQo+
-IGluZGV4IDAwMDAwMDAwMDAwMC4uZTE5YjczOGRjYzBlDQo+IC0tLSAvZGV2L251bGwNCj4gKysr
-IGIvdWRldi85OS16b25lZC1kaXNrcy5ydWxlcw0KPiBAQCAtMCwwICsxLDc4IEBADQo+ICsjIFRv
-IHVzZSBhIHpvbmUgZGlza3MgZmlyc3QgdGhpbmcgeW91IG5lZWQgdG86DQo+ICsjDQo+ICsjIDEp
-IEVuYWJsZSB6b25lIGRpc2sgc3VwcG9ydCBpbiB5b3VyIGtlcm5lbA0KPiArIyAyKSBVc2UgdGhl
-IGRlYWRsaW5lIG9yIG1xLWRlYWRsaW5lIHNjaGVkdWxlciBmb3IgaXQgLSBtYW5kYXRlZCBhcyBv
-ZiB2NC4xNg0KPiArIyAzKSBCbGFja2xpc3QgZGV2aWNlcyBkZWRpY2F0ZWQgZm9yIGYyZnMgYXMg
-b2YgdjQuMTANCj4gKyMgNCkgUnVuIGRtc2V0dXAgb3RoZXIgZGlza3MNCj4gKyMgNSkgQ3JlYXRl
-IHRoZSBmaWxlc3lzdGVtIC0tIE5PVEU6IHVzZSBta2ZzIC9kZXYvbWFwcGVyL3pvbmUtc2VyaWFs
-IGlmDQo+ICsjICAgIHlvdSBlbmFibGVkIHVzZSBkbXNldHVwIG9uIHRoZSBkaXNrLg0KPiArIyA2
-KSBDb25zaWRlciB1c2luZyBub2ZhaWwgbW91bnQgb3B0aW9uIGluIGNhc2UgeW91IHJ1biBhbiBz
-dXBwb3J0ZWQga2VybmVsDQo+ICsjDQo+ICsjIFlvdSBjYW4gdXNlIHRoaXMgdWRldiBydWxlcyBm
-aWxlIGZvciAyKSAzKSBhbmQgNCkuIEZ1cnRoZXIgZGV0YWlscyBiZWxvdy4NCj4gKyMNCj4gKyMg
-MSkgRW5hYmxlIHpvbmUgZGlzayBzdXBwb3J0IGluIHlvdXIga2VybmVsDQo+ICsjDQo+ICsjICAg
-IG8gQ09ORklHX0JMS19ERVZfWk9ORUQNCj4gKyMgICAgbyBDT05GSUdfRE1fWk9ORUQNCj4gKyMN
-Cj4gKyMgVGhpcyB3aWxsIGxldCB0aGUga2VybmVsIGFjdHVhbGx5IHNlZSB0aGVzZSBkZXZpY2Vz
-LCBpZSwgdmlhIGZkaXNrIC9kZXYvc2RhDQo+ICsjIGZvciBpbnN0YW5jZS4gUnVuOg0KPiArIw0K
-PiArIyAJZG16YWRtIC0tZm9ybWF0IC9kZXYvc2RhDQo+ICsNCj4gKyMgMikgU2V0IGRlYWRsaW5l
-IG9yIG1xLWRlYWRsaW5lIGZvciBhbGwgZGlza3Mgd2hpY2ggYXJlIHpvbmVkDQo+ICsjDQo+ICsj
-IFpvbmVkIGRpc2tzIGNhbiBvbmx5IHdvcmsgd2l0aCB0aGUgZGVhZGxpbmUgb3IgbXEtZGVhZGxp
-bmUgc2NoZWR1bGVyLiBUaGlzIGlzDQo+ICsjIG1hbmRhdGVkIGZvciBhbGwgU01SIGRyaXZlcyBz
-aW5jZSB2NC4xNi4gSXQgaGFzIGJlZW4gZGV0ZXJtaW5lZCB0aGlzIG11c3QgYmUNCj4gKyMgZG9u
-ZSB0aHJvdWdoIGEgdWRldiBydWxlLCBhbmQgdGhlIGtlcm5lbCBzaG91bGQgbm90IHNldCB0aGlz
-IHVwIGZvciBkaXNrcy4NCj4gKyMgVGhpcyBtYWdpYyB3aWxsIGhhdmUgdG8gbGl2ZSBmb3IgKmFs
-bCogem9uZWQgZGlza3MuDQo+ICsjIFhYWDogd2hhdCBhYm91dCBkaXN0cmlidXRpb25zIHRoYXQg
-d2FudCBtcS1kZWFkbGluZSA/IFByb2JhYmx5IGVhc3kgZm9yIG5vdw0KPiArIyAgICAgIHRvIGFz
-c3VtZSBkZWFkbGluZSBhbmQgbGF0ZXIgaGF2ZSBhIG1hcHBpbmcgZmlsZSB0byBlbmFibGUNCj4g
-KyMgICAgICBtcS1kZWFkbGluZSBmb3Igc3BlY2lmaWMgc2VyaWFsIGRldmljZXM/DQo+ICtBQ1RJ
-T049PSJhZGR8Y2hhbmdlIiwgS0VSTkVMPT0ic2QqWyEwLTldIiwgQVRUUlN7cXVldWUvem9uZWR9
-PT0iaG9zdC1tYW5hZ2VkIiwgXA0KPiArCUFUVFJ7cXVldWUvc2NoZWR1bGVyfT0iZGVhZGxpbmUi
-DQo+ICsNCj4gKyMgMykgQmxhY2tsaXN0IGYyZnMgZGV2aWNlcyBhcyBvZiB2NC4xMA0KPiArIyBX
-ZSBkb24ndCBoYXZlIHRvIHJ1biBkbXNldHVwIG9uIG9uIGRpc2tzIHdoZXJlIHlvdSB3YW50IHRv
-IHVzZSBmMmZzLCBzbyB5b3UNCj4gKyMgY2FuIHVzZSB0aGlzIHJ1bGUgdG8gc2tpcCBkbXNldHVw
-IGZvciBpdC4gRmlyc3QgZ2V0IHRoZSBzZXJpYWwgc2hvcnQgbnVtYmVyLg0KPiArIw0KPiArIwl1
-ZGV2YWRtIGluZm8gLS1uYW1lPS9kZXYvc2RhICB8IGdyZXAgLWkgc2VyaWFsX3Nob3INCj4gKyMg
-WFhYOiBUbyBnZW5lcmFsaXplIHRoaXMgZm9yIGRpc3RyaWJ1dGlvbnMgY29uc2lkZXIgdXNpbmcg
-SU5QVVR7ZGJ9IHRvIG9yIHNvDQo+ICsjIGFuZCB0aGVuIHVzZSB0aGF0IHRvIGNoZWNrIGlmIHRo
-ZSBzZXJpYWwgbnVtYmVyIG1hdGNoZXMgb25lIG9uIHRoZSBkYXRhYmFzZS4NCj4gKyNBQ1RJT049
-PSJhZGQiLCBTVUJTWVNURU09PSJibG9jayIsIEVOVntJRF9TRVJJQUxfU0hPUlR9PT0iWFhBMVpG
-RkYiLCBHT1RPPSJ6b25lX2Rpc2tfZ3JvdXBfZW5kIg0KPiArDQo+ICsjIDQpIFdlIG5lZWQgdG8g
-cnVuIGRtc2V0dXAgaWYgeW91IHdhbnQgdG8gdXNlIG90aGVyIGZpbGVzeXN0ZW1zDQo+ICsjDQo+
-ICsjIGRtc2V0dXAgaXMgbm90IHBlcnNpc3RlbnQsIHNvIGl0IG5lZWRzIHRvIGJlIHJ1biBvbiB1
-cG9uIGV2ZXJ5IGJvb3QuICBXZSB1c2UNCj4gKyMgdGhlIGRldmljZSBzZXJpYWwgbnVtYmVyIGZv
-ciB0aGUgL2Rldi9tYXBwZXIvIG5hbWUuDQo+ICtBQ1RJT049PSJhZGQiLCBLRVJORUw9PSJzZCpb
-ITAtOV0iLCBBVFRSU3txdWV1ZS96b25lZH09PSJob3N0LW1hbmFnZWQiLCBcDQo+ICsJUlVOKz0i
-L3NiaW4vZG1zZXR1cCBjcmVhdGUgem9uZWQtJGVudntJRF9TRVJJQUxfU0hPUlR9IC0tdGFibGUg
-JzAgJXN7c2l6ZX0gem9uZWQgJGRldm5vZGUnIiwgJGF0dHJ7c2l6ZX0NCj4gKw0KPiArIyA0KSBD
-cmVhdGUgYSBmaWxlc3lzdGVtIGZvciB0aGUgZGV2aWNlDQo+ICsjDQo+ICsjIEJlIDEwMCUgc3Vy
-ZSB5b3UgdXNlIC9kZXYvbWFwcGVyL3pvbmUtJFlPVVJfREVWSUNFX1NFUklBTCBmb3IgdGhlIG1r
-ZnMNCj4gKyMgY29tbWFuZCBhcyBvdGhlcndpc2UgdGhpbmdzIGNhbiBicmVhay4NCj4gKyMNCj4g
-KyMgWFhYOiBwcmV2ZW50aW5nIHRoZSBhYm92ZSBwcm9hY3RpdmVseSBpbiB0aGUga2VybmVsIHdv
-dWxkIGJlIGlkZWFsIGhvd2V2ZXINCj4gKyMgdGhpcyBtYXkgYmUgaGFyZC4NCj4gKyMNCj4gKyMg
-T25jZSB5b3UgY3JlYXRlIHRoZSBmaWxlc3lzdGVtIGl0IHdpbGwgZ2V0IGEgVVVJRC4NCj4gKyMN
-Cj4gKyMgRmluZCBvdXQgd2hhdCBVVUlEIGlzLCB5b3UgY2FuIGRvIHRoaXMgZm9yIGluc3RhbmNl
-IGlmIHlvdXIgem9uZWQgZGlzayBpcw0KPiArIyB5b3VyIHNlY29uZCBkZXZpY2UtbWFwcGVyIGRl
-dmljZSwgaWUgZG0tMSBieToNCj4gKyMNCj4gKyMgCWxzIC1sIC9kZXYvZGlzay9ieS11dWlkL2Rt
-LTENCj4gKyMNCj4gKyMgVG8gZmlndXJlIG91dCB3aGljaCBkbS0kbnVtYmVyIGl0IGlzLCB1c2Ug
-ZG1zZXR1cCBpbmZvLCB0aGUgbWlub3IgbnVtYmVyDQo+ICsjIGlzIHRoZSAkbnVtYmVyLg0KPiAr
-Iw0KPiArIyA1KSBBZGQgYW4gZXRyeSBpbiAvZXRjL2ZzdGFiIHdpdGggbm9mYWlsIGZvciBleGFt
-cGxlOg0KPiArIw0KPiArIyBVVUlEPTk5OTk5OTk5LWFhYWEtYmJiYi1jMTIzNGFhYWFiYmIzMzQ1
-NiAvbWVkaWEvbW9uc3RlciB4ZnMgbm9mYWlsIDAgMA0KPiArIw0KPiArIyBub2ZhaWwgd2lsbCBl
-bnN1cmUgc3lzdGVtIGJvb3RzIGZpbmUgZXZlbiBpZiB5b3UgYm9vdCBpbnRvIGEga2VybmVsIHdo
-aWNoDQo+ICsjIGxhY2tzIHN1cHBvcnQgZm9yIHRoZSBkZXZpY2UgYW5kIHNvIGl0IGlzIG5vdCBm
-b3VuZC4gU2luY2UgdGhlIFVVSUQgd2lsbA0KPiArIyBhbHdheXMgbWF0Y2ggdGhlIGRldmljZSB3
-ZSBkb24ndCBjYXJlIGlmIHRoZSBkZXZpY2UgbW92ZXMgYXJvdW5kIHRoZSBidXMNCj4gKyMgb24g
-dGhlIHN5c3RlbS4gV2UganVzdCBuZWVkIHRvIGdldCB0aGUgVVVJRCBvbmNlLg0KPiArDQo+ICtM
-QUJFTD0iem9uZV9kaXNrX2dyb3VwX2VuZCINCg0KQXBwbGllZC4gVGhhbmtzIEx1aXMgIQ0KDQot
-LSANCkRhbWllbiBMZSBNb2FsLA0KV2VzdGVybiBEaWdpdGFs
+Setting up a zoned disks in a generic form is not so trivial. There
+is also quite a bit of tribal knowledge with these devices which is not
+easy to find.
+
+The currently supplied demo script works but it is not generic enough to be
+practical for Linux distributions or even developers which often move
+from one kernel to another.
+
+This tries to put a bit of this tribal knowledge into an initial udev
+rule for development with the hopes Linux distributions can later
+deploy. Three rule are added. One rule is optional for now, it should be
+extended later to be more distribution-friendly and then I think this
+may be ready for consideration for integration on distributions.
+
+1) scheduler setup
+2) backlist f2fs devices
+3) run dmsetup for the rest of devices
+
+Note that this udev rule will not work well if you want to use a disk
+with f2fs on part of the disk and another filesystem on another part of
+the disk. That setup will require manual love so these setups can use
+the same backlist on rule 2).
+
+Its not widely known for instance that as of v4.16 it is mandated to use
+either deadline or the mq-deadline scheduler for *all* SMR drivers. Its
+also been determined that the Linux kernel is not the place to set this up,
+so a udev rule *is required* as per latest discussions. This is the
+first rule we add.
+
+Furthermore if you are *not* using f2fs you always have to run dmsetup.
+dmsetups do not persist, so you currently *always* have to run a custom
+sort of script, which is not ideal for Linux distributions. We can invert
+this logic into a udev rule to enable users to blacklist disks they know they
+want to use f2fs for. This the second optional rule. This blacklisting
+can be generalized further in the future with an exception list file, for
+instance using INPUT{db} or the like.
+
+The third and final rule added then runs dmsetup for the rest of the disks
+using the disk serial number for the new device mapper name.
+
+Note that it is currently easy for users to make a mistake and run mkfs
+on the the original disk, not the /dev/mapper/ device for non f2fs
+arrangements. If that is done experience shows things can easily fall
+apart with alignment *eventually*. We have no generic way today to
+error out on this condition and proactively prevent this.
+
+Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
+---
+ README                    | 10 +++++-
+ udev/99-zoned-disks.rules | 78 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 87 insertions(+), 1 deletion(-)
+ create mode 100644 udev/99-zoned-disks.rules
+
+diff --git a/README b/README
+index 65e96c34fd04..f49541eaabc8 100644
+--- a/README
++++ b/README
+@@ -168,7 +168,15 @@ Options:
+                      reclaiming random zones if the percentage of
+                      free random data zones falls below <perc>.
+ 
+-V. Example scripts
++V. Udev zone disk deployment
++============================
++
++A udev rule is provided which enables you to set the IO scheduler, blacklist
++driver to run dmsetup, and runs dmsetup for the rest of the zone drivers.
++If you use this udev rule the below script is not needed. Be sure to mkfs only
++on the resulting /dev/mapper/zone-$serial device you end up with.
++
++VI. Example scripts
+ ==================
+ 
+ [[
+diff --git a/udev/99-zoned-disks.rules b/udev/99-zoned-disks.rules
+new file mode 100644
+index 000000000000..e19b738dcc0e
+--- /dev/null
++++ b/udev/99-zoned-disks.rules
+@@ -0,0 +1,78 @@
++# To use a zone disks first thing you need to:
++#
++# 1) Enable zone disk support in your kernel
++# 2) Use the deadline or mq-deadline scheduler for it - mandated as of v4.16
++# 3) Blacklist devices dedicated for f2fs as of v4.10
++# 4) Run dmsetup other disks
++# 5) Create the filesystem -- NOTE: use mkfs /dev/mapper/zone-serial if
++#    you enabled use dmsetup on the disk.
++# 6) Consider using nofail mount option in case you run an supported kernel
++#
++# You can use this udev rules file for 2) 3) and 4). Further details below.
++#
++# 1) Enable zone disk support in your kernel
++#
++#    o CONFIG_BLK_DEV_ZONED
++#    o CONFIG_DM_ZONED
++#
++# This will let the kernel actually see these devices, ie, via fdisk /dev/sda
++# for instance. Run:
++#
++# 	dmzadm --format /dev/sda
++
++# 2) Set deadline or mq-deadline for all disks which are zoned
++#
++# Zoned disks can only work with the deadline or mq-deadline scheduler. This is
++# mandated for all SMR drives since v4.16. It has been determined this must be
++# done through a udev rule, and the kernel should not set this up for disks.
++# This magic will have to live for *all* zoned disks.
++# XXX: what about distributions that want mq-deadline ? Probably easy for now
++#      to assume deadline and later have a mapping file to enable
++#      mq-deadline for specific serial devices?
++ACTION=="add|change", KERNEL=="sd*[!0-9]", ATTRS{queue/zoned}=="host-managed", \
++	ATTR{queue/scheduler}="deadline"
++
++# 3) Blacklist f2fs devices as of v4.10
++# We don't have to run dmsetup on on disks where you want to use f2fs, so you
++# can use this rule to skip dmsetup for it. First get the serial short number.
++#
++#	udevadm info --name=/dev/sda  | grep -i serial_shor
++# XXX: To generalize this for distributions consider using INPUT{db} to or so
++# and then use that to check if the serial number matches one on the database.
++#ACTION=="add", SUBSYSTEM=="block", ENV{ID_SERIAL_SHORT}=="XXA1ZFFF", GOTO="zone_disk_group_end"
++
++# 4) We need to run dmsetup if you want to use other filesystems
++#
++# dmsetup is not persistent, so it needs to be run on upon every boot.  We use
++# the device serial number for the /dev/mapper/ name.
++ACTION=="add", KERNEL=="sd*[!0-9]", ATTRS{queue/zoned}=="host-managed", \
++	RUN+="/sbin/dmsetup create zoned-$env{ID_SERIAL_SHORT} --table '0 %s{size} zoned $devnode'", $attr{size}
++
++# 4) Create a filesystem for the device
++#
++# Be 100% sure you use /dev/mapper/zone-$YOUR_DEVICE_SERIAL for the mkfs
++# command as otherwise things can break.
++#
++# XXX: preventing the above proactively in the kernel would be ideal however
++# this may be hard.
++#
++# Once you create the filesystem it will get a UUID.
++#
++# Find out what UUID is, you can do this for instance if your zoned disk is
++# your second device-mapper device, ie dm-1 by:
++#
++# 	ls -l /dev/disk/by-uuid/dm-1
++#
++# To figure out which dm-$number it is, use dmsetup info, the minor number
++# is the $number.
++#
++# 5) Add an etry in /etc/fstab with nofail for example:
++#
++# UUID=99999999-aaaa-bbbb-c1234aaaabbb33456 /media/monster xfs nofail 0 0
++#
++# nofail will ensure system boots fine even if you boot into a kernel which
++# lacks support for the device and so it is not found. Since the UUID will
++# always match the device we don't care if the device moves around the bus
++# on the system. We just need to get the UUID once.
++
++LABEL="zone_disk_group_end"
+-- 
+2.16.3
