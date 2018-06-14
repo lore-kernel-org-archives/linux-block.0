@@ -1,8 +1,11 @@
-Return-Path: <hare@suse.de>
+Return-Path: <prvs=69620155f=Adam.Manzanares@wdc.com>
+From: Adam Manzanares <Adam.Manzanares@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.de>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Mel Gorman
+	<mgorman@suse.com>, Hannes Reinecke <hare@suse.com>
 Subject: Re: [PATCH] brd: Allow ramdisk to be allocated on selected NUMA node
-To: Adam Manzanares <Adam.Manzanares@wdc.com>, Jens Axboe <axboe@kernel.dk>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Mel Gorman <mgorman@suse.com>, Hannes Reinecke <hare@suse.com>
+Date: Thu, 14 Jun 2018 20:53:22 +0000
+Message-ID: <d68c9052-e9bc-8dc4-04dc-964aff29308b@wdc.com>
 References: <20180614133832.110947-1-hare@suse.de>
  <08318d74-d81c-29e5-5350-525df96eaacb@kernel.dk>
  <20180614172954.79965d13@pentland.suse.de>
@@ -12,36 +15,63 @@ References: <20180614133832.110947-1-hare@suse.de>
  <bb90d333-fe4d-aa97-6c1c-66fb5b88dd6b@kernel.dk>
  <53893c29-febc-14ff-314d-818ac79aa559@wdc.com>
  <5f21f241-0ae0-ed7a-6935-3ef6e65d0950@kernel.dk>
- <d68c9052-e9bc-8dc4-04dc-964aff29308b@wdc.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <a1034506-b50a-40f8-eee2-d353448da2fd@suse.de>
-Date: Fri, 15 Jun 2018 08:06:04 +0200
+In-Reply-To: <5f21f241-0ae0-ed7a-6935-3ef6e65d0950@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <d68c9052-e9bc-8dc4-04dc-964aff29308b@wdc.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/14/2018 10:53 PM, Adam Manzanares wrote:
-[ .. ]
->>>
->>> Then how about a numactl ... dd /dev/ram ... after the modprobe.
->>
->> Yes of course, or you could do that for every application that ends
->> up in the path of the doing IO to it. The point of the option is to
->> just make it explicit, and not have to either NUMA pin each task,
->> or prefill all possible pages.
->>
-> 
-> Makes sense, I have done some similar benchmarking and had to worry
-> about NUMA awareness and the numactl + dd approach seemed to work
-> because I wanted to not take a performance hit for page allocation
-> during the benchmarking.
-> 
-> Would anyone be interested in forcing the allocations to occur during
-> module initialization?
-> 
-YES.
-
-Cheers,
-
-Hannes
+DQoNCk9uIDYvMTQvMTggMTo0NyBQTSwgSmVucyBBeGJvZSB3cm90ZToNCj4gT24gNi8xNC8xOCAy
+OjQxIFBNLCBBZGFtIE1hbnphbmFyZXMgd3JvdGU6DQo+Pg0KPj4NCj4+IE9uIDYvMTQvMTggMToz
+NyBQTSwgSmVucyBBeGJvZSB3cm90ZToNCj4+PiBPbiA2LzE0LzE4IDI6MzIgUE0sIEFkYW0gTWFu
+emFuYXJlcyB3cm90ZToNCj4+Pj4NCj4+Pj4NCj4+Pj4gT24gNi8xNC8xOCA5OjA5IEFNLCBIYW5u
+ZXMgUmVpbmVja2Ugd3JvdGU6DQo+Pj4+PiBPbiBUaHUsIDE0IEp1biAyMDE4IDA5OjMzOjM1IC0w
+NjAwDQo+Pj4+PiBKZW5zIEF4Ym9lIDxheGJvZUBrZXJuZWwuZGs+IHdyb3RlOg0KPj4+Pj4NCj4+
+Pj4+PiBPbiA2LzE0LzE4IDk6MjkgQU0sIEhhbm5lcyBSZWluZWNrZSB3cm90ZToNCj4+Pj4+Pj4g
+T24gVGh1LCAxNCBKdW4gMjAxOCAwODo0NzozMyAtMDYwMA0KPj4+Pj4+PiBKZW5zIEF4Ym9lIDxh
+eGJvZUBrZXJuZWwuZGs+IHdyb3RlOg0KPj4+Pj4+PiAgICAgIA0KPj4+Pj4+Pj4gT24gNi8xNC8x
+OCA3OjM4IEFNLCBIYW5uZXMgUmVpbmVja2Ugd3JvdGU6DQo+Pj4+Pj4+Pj4gRm9yIHBlcmZvcm1h
+bmNlIHJlYXNvbnMgd2Ugc2hvdWxkIGJlIGFibGUgdG8gYWxsb2NhdGUgYWxsIG1lbW9yeQ0KPj4+
+Pj4+Pj4+IGZyb20gYSBnaXZlbiBOVU1BIG5vZGUsIHNvIHRoaXMgcGF0Y2ggYWRkcyBhIG5ldyBw
+YXJhbWV0ZXINCj4+Pj4+Pj4+PiAncmRfbnVtYV9ub2RlJyB0byBhbGxvdyB0aGUgdXNlciB0byBz
+cGVjaWZ5IHRoZSBOVU1BIG5vZGUgaWQuDQo+Pj4+Pj4+Pj4gV2hlbiByZXN0cmljaW5nIGZpbyB0
+byB1c2UgdGhlIHNhbWUgTlVNQSBub2RlIEknbSBzZWVpbmcgYQ0KPj4+Pj4+Pj4+IHBlcmZvcm1h
+bmNlIGJvb3N0IG9mIG1vcmUgdGhhbiAyMDAlLg0KPj4+Pj4+Pj4NCj4+Pj4+Pj4+IExvb2tzIGZp
+bmUgdG8gbWUuIE9uZSBjb21tZW50Lg0KPj4+Pj4+Pj4gICAgIA0KPj4+Pj4+Pj4+IEBAIC0zNDIs
+NiArMzQzLDEwIEBAIHN0YXRpYyBpbnQgbWF4X3BhcnQgPSAxOw0KPj4+Pj4+Pj4+ICAgICBtb2R1
+bGVfcGFyYW0obWF4X3BhcnQsIGludCwgMDQ0NCk7DQo+Pj4+Pj4+Pj4gICAgIE1PRFVMRV9QQVJN
+X0RFU0MobWF4X3BhcnQsICJOdW0gTWlub3JzIHRvIHJlc2VydmUgYmV0d2Vlbg0KPj4+Pj4+Pj4+
+IGRldmljZXMiKTsNCj4+Pj4+Pj4+PiArc3RhdGljIGludCByZF9udW1hX25vZGUgPSBOVU1BX05P
+X05PREU7DQo+Pj4+Pj4+Pj4gK21vZHVsZV9wYXJhbShyZF9udW1hX25vZGUsIGludCwgMDQ0NCk7
+DQo+Pj4+Pj4+Pj4gK01PRFVMRV9QQVJNX0RFU0MocmRfbnVtYV9ub2RlLCAiTlVNQSBub2RlIG51
+bWJlciB0byBhbGxvY2F0ZSBSQU0NCj4+Pj4+Pj4+PiBkaXNrIG9uLiIpOw0KPj4+Pj4+Pj4NCj4+
+Pj4+Pj4+IFRoaXMgY291bGQgZmVhc2libHkgYmUgMDY0NCwgYXMgdGhlcmUgd291bGQgYmUgbm90
+aGluZyB3cm9uZyB3aXRoDQo+Pj4+Pj4+PiBhbHRlcmluZyB0aGlzIGF0IHJ1bnRpbWUuDQo+Pj4+
+Pj4+PiAgICAgDQo+Pj4+Pj4+DQo+Pj4+Pj4+IFdoaWxlIHdlIGNvdWxkIGl0IHdvdWxkIG5vdCBj
+aGFuZ2UgdGhlIGFsbG9jYXRpb24gb2YgX2V4aXN0aW5nXyByYW0NCj4+Pj4+Pj4gZGV2aWNlcywg
+bWFraW5nIGJlaGF2aW91ciByYXRoZXIgdW5wcmVkaWN0YWJsZS4NCj4+Pj4+Pj4gSGVuY2UgSSBk
+aWQgZGVjaWRlIGFnYWluc3QgaXQgKGFuZCB5ZXMsIEkgYWN0dWFsbHkgdGhvdWdodCBhYm91dA0K
+Pj4+Pj4+PiBpdCkuDQo+Pj4+Pj4+DQo+Pj4+Pj4+IEJ1dCBpZiB5b3UgaW5zaXN0IC4uLg0KPj4+
+Pj4+DQo+Pj4+Pj4gUmlnaHQsIGl0IHdvdWxkIGp1c3QgY2hhbmdlIG5ldyBhbGxvY2F0aW9ucy4g
+UHJvYmFibHkgbm90IGEgY29tbW9uIHVzZQ0KPj4+Pj4+IGNhc2UsIGJ1dCB0aGVyZSdzIHJlYWxs
+eSBub3RoaW5nIHRoYXQgcHJldmVudHMgaXQgZnJvbSBiZWluZyBmZWFzaWJsZS4NCj4+Pj4+Pg0K
+Pj4+Pj4+IE5leHQgcXVlc3Rpb24gLSB3aGF0IGRvZXMgdGhlIG1lbW9yeSBhbGxvY2F0b3IgZG8g
+aWYgd2UgcnVuIG91dCBvZg0KPj4+Pj4+IG1lbW9yeSBvbiB0aGUgZ2l2ZW4gbm9kZT8gU2hvdWxk
+IHdlIHB1bnQgdG8gYSBkaWZmZXJlbnQgbm9kZSBpZiB0aGF0DQo+Pj4+Pj4gaGFwcGVucz8gU2xv
+d2VyLCBidXQgZnVuY3Rpb25hbCwgc2VlbXMgcHJlZmVyYWJsZSB0byBub3QgYmVpbmcgYWJsZQ0K
+Pj4+Pj4+IHRvIGdldCBtZW1vcnkuDQo+Pj4+Pj4NCj4+Pj4+DQo+Pj4+PiBIbW0uIFRoYXQgSSBo
+YXZlbid0IGNvbnNpZGVyZWQ7IHllcywgdGhhdCByZWFsbHkgc291bmRzIGxpa2UgYW4gaWRlYS4N
+Cj4+Pj4+IFdpbGwgYmUgc2VuZGluZyBhbiB1cGRhdGVkIHBhdGNoLg0KPj4+Pg0KPj4+PiBXaWxs
+IG51bWFjdGwgLi4uIG1vZHByb2JlIGJyZCAuLi4gc29sdmUgdGhpcyBwcm9ibGVtPw0KPj4+DQo+
+Pj4gSXQgd29uJ3QsIHBhZ2VzIGFyZSBhbGxvY2F0ZWQgYXMgbmVlZGVkLg0KPj4+DQo+Pg0KPj4g
+VGhlbiBob3cgYWJvdXQgYSBudW1hY3RsIC4uLiBkZCAvZGV2L3JhbSAuLi4gYWZ0ZXIgdGhlIG1v
+ZHByb2JlLg0KPiANCj4gWWVzIG9mIGNvdXJzZSwgb3IgeW91IGNvdWxkIGRvIHRoYXQgZm9yIGV2
+ZXJ5IGFwcGxpY2F0aW9uIHRoYXQgZW5kcw0KPiB1cCBpbiB0aGUgcGF0aCBvZiB0aGUgZG9pbmcg
+SU8gdG8gaXQuIFRoZSBwb2ludCBvZiB0aGUgb3B0aW9uIGlzIHRvDQo+IGp1c3QgbWFrZSBpdCBl
+eHBsaWNpdCwgYW5kIG5vdCBoYXZlIHRvIGVpdGhlciBOVU1BIHBpbiBlYWNoIHRhc2ssDQo+IG9y
+IHByZWZpbGwgYWxsIHBvc3NpYmxlIHBhZ2VzLg0KPiANCg0KTWFrZXMgc2Vuc2UsIEkgaGF2ZSBk
+b25lIHNvbWUgc2ltaWxhciBiZW5jaG1hcmtpbmcgYW5kIGhhZCB0byB3b3JyeSANCmFib3V0IE5V
+TUEgYXdhcmVuZXNzIGFuZCB0aGUgbnVtYWN0bCArIGRkIGFwcHJvYWNoIHNlZW1lZCB0byB3b3Jr
+IA0KYmVjYXVzZSBJIHdhbnRlZCB0byBub3QgdGFrZSBhIHBlcmZvcm1hbmNlIGhpdCBmb3IgcGFn
+ZSBhbGxvY2F0aW9uIA0KZHVyaW5nIHRoZSBiZW5jaG1hcmtpbmcuDQoNCldvdWxkIGFueW9uZSBi
+ZSBpbnRlcmVzdGVkIGluIGZvcmNpbmcgdGhlIGFsbG9jYXRpb25zIHRvIG9jY3VyIGR1cmluZyAN
+Cm1vZHVsZSBpbml0aWFsaXphdGlvbj8NCg0K
