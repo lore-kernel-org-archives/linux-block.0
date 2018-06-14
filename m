@@ -1,13 +1,12 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:46756 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752761AbeFNGji (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Jun 2018 02:39:38 -0400
-Date: Wed, 13 Jun 2018 23:39:20 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@fb.com>,
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38196 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S935583AbeFNCB5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Jun 2018 22:01:57 -0400
+Date: Thu, 14 Jun 2018 10:01:38 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@fb.com>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         Kent Overstreet <kent.overstreet@gmail.com>,
         David Sterba <dsterba@suse.cz>,
@@ -19,30 +18,31 @@ Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@fb.com>,
         Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
         Randy Dunlap <rdunlap@infradead.org>
 Subject: Re: [PATCH V6 15/30] block: introduce bio_clone_chunk_bioset()
-Message-ID: <20180614063920.GA10284@infradead.org>
+Message-ID: <20180614020137.GF19828@ming.t460p>
 References: <20180609123014.8861-1-ming.lei@redhat.com>
  <20180609123014.8861-16-ming.lei@redhat.com>
  <20180613145654.GE4693@infradead.org>
- <20180614020137.GF19828@ming.t460p>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180614020137.GF19828@ming.t460p>
+In-Reply-To: <20180613145654.GE4693@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Jun 14, 2018 at 10:01:38AM +0800, Ming Lei wrote:
-> Bounce limits the max pages as 256 will do bio splitting, so won't need
-> this change.
+On Wed, Jun 13, 2018 at 07:56:54AM -0700, Christoph Hellwig wrote:
+> On Sat, Jun 09, 2018 at 08:29:59PM +0800, Ming Lei wrote:
+> > There is one use case(DM) which requires to clone bio chunk by
+> > chunk, so introduce this API.
+> 
+> I don't think DM is the special case here.  The special case is the
+> bounce code that only wants single page bios.  Between that, and the
+> fact that we only have two callers and one of them is inside the
+> block layer I would suggest to fold in the following patch to make
+> bio_clone_bioset clone in multi-page bvecs and make the bounce code
+> use the low-level interface directly:
 
-Behavior for the bounce code does not change with my patch.
+Bounce limits the max pages as 256 will do bio splitting, so won't need
+this change.
 
-The important points are:
 
- - the default interface (bio_clone_bioset in this case) should always
-   operate on full biosets
- - if the bounce code needs bioves limited to single pages it should
-   be treated as the special case
- - given that the bounce code is inside the block layer using the
-   __-prefixed internal interface is perfectly fine
- - last but not least I think the parameter switching the behavior
-   needs a much more descriptive name as suggested in my patch
+Thanks,
+Ming
