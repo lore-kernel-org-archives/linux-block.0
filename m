@@ -1,77 +1,54 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <prvs=69620155f=Adam.Manzanares@wdc.com>
+From: Adam Manzanares <Adam.Manzanares@wdc.com>
+To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Mel Gorman
+	<mgorman@suse.com>, Hannes Reinecke <hare@suse.com>
 Subject: Re: [PATCH] brd: Allow ramdisk to be allocated on selected NUMA node
-To: Adam Manzanares <Adam.Manzanares@wdc.com>, Hannes Reinecke <hare@suse.de>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Mel Gorman <mgorman@suse.com>, Hannes Reinecke <hare@suse.com>
+Date: Thu, 14 Jun 2018 20:32:31 +0000
+Message-ID: <eca17002-e8dc-1a8b-6cc3-5eaf49031636@wdc.com>
 References: <20180614133832.110947-1-hare@suse.de>
  <08318d74-d81c-29e5-5350-525df96eaacb@kernel.dk>
  <20180614172954.79965d13@pentland.suse.de>
  <656e4ab7-7c5c-41af-5596-2e155ffb28e4@kernel.dk>
  <20180614180937.591bb361@pentland.suse.de>
- <eca17002-e8dc-1a8b-6cc3-5eaf49031636@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <bb90d333-fe4d-aa97-6c1c-66fb5b88dd6b@kernel.dk>
-Date: Thu, 14 Jun 2018 14:37:33 -0600
+In-Reply-To: <20180614180937.591bb361@pentland.suse.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <eca17002-e8dc-1a8b-6cc3-5eaf49031636@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 6/14/18 2:32 PM, Adam Manzanares wrote:
-> 
-> 
-> On 6/14/18 9:09 AM, Hannes Reinecke wrote:
->> On Thu, 14 Jun 2018 09:33:35 -0600
->> Jens Axboe <axboe@kernel.dk> wrote:
->>
->>> On 6/14/18 9:29 AM, Hannes Reinecke wrote:
->>>> On Thu, 14 Jun 2018 08:47:33 -0600
->>>> Jens Axboe <axboe@kernel.dk> wrote:
->>>>    
->>>>> On 6/14/18 7:38 AM, Hannes Reinecke wrote:
->>>>>> For performance reasons we should be able to allocate all memory
->>>>>> from a given NUMA node, so this patch adds a new parameter
->>>>>> 'rd_numa_node' to allow the user to specify the NUMA node id.
->>>>>> When restricing fio to use the same NUMA node I'm seeing a
->>>>>> performance boost of more than 200%.
->>>>>
->>>>> Looks fine to me. One comment.
->>>>>   
->>>>>> @@ -342,6 +343,10 @@ static int max_part = 1;
->>>>>>   module_param(max_part, int, 0444);
->>>>>>   MODULE_PARM_DESC(max_part, "Num Minors to reserve between
->>>>>> devices");
->>>>>> +static int rd_numa_node = NUMA_NO_NODE;
->>>>>> +module_param(rd_numa_node, int, 0444);
->>>>>> +MODULE_PARM_DESC(rd_numa_node, "NUMA node number to allocate RAM
->>>>>> disk on.");
->>>>>
->>>>> This could feasibly be 0644, as there would be nothing wrong with
->>>>> altering this at runtime.
->>>>>   
->>>>
->>>> While we could it would not change the allocation of _existing_ ram
->>>> devices, making behaviour rather unpredictable.
->>>> Hence I did decide against it (and yes, I actually thought about
->>>> it).
->>>>
->>>> But if you insist ...
->>>
->>> Right, it would just change new allocations. Probably not a common use
->>> case, but there's really nothing that prevents it from being feasible.
->>>
->>> Next question - what does the memory allocator do if we run out of
->>> memory on the given node? Should we punt to a different node if that
->>> happens? Slower, but functional, seems preferable to not being able
->>> to get memory.
->>>
->>
->> Hmm. That I haven't considered; yes, that really sounds like an idea.
->> Will be sending an updated patch.
-> 
-> Will numactl ... modprobe brd ... solve this problem?
-
-It won't, pages are allocated as needed.
-
--- 
-Jens Axboe
+DQoNCk9uIDYvMTQvMTggOTowOSBBTSwgSGFubmVzIFJlaW5lY2tlIHdyb3RlOg0KPiBPbiBUaHUs
+IDE0IEp1biAyMDE4IDA5OjMzOjM1IC0wNjAwDQo+IEplbnMgQXhib2UgPGF4Ym9lQGtlcm5lbC5k
+az4gd3JvdGU6DQo+IA0KPj4gT24gNi8xNC8xOCA5OjI5IEFNLCBIYW5uZXMgUmVpbmVja2Ugd3Jv
+dGU6DQo+Pj4gT24gVGh1LCAxNCBKdW4gMjAxOCAwODo0NzozMyAtMDYwMA0KPj4+IEplbnMgQXhi
+b2UgPGF4Ym9lQGtlcm5lbC5kaz4gd3JvdGU6DQo+Pj4gICAgDQo+Pj4+IE9uIDYvMTQvMTggNzoz
+OCBBTSwgSGFubmVzIFJlaW5lY2tlIHdyb3RlOg0KPj4+Pj4gRm9yIHBlcmZvcm1hbmNlIHJlYXNv
+bnMgd2Ugc2hvdWxkIGJlIGFibGUgdG8gYWxsb2NhdGUgYWxsIG1lbW9yeQ0KPj4+Pj4gZnJvbSBh
+IGdpdmVuIE5VTUEgbm9kZSwgc28gdGhpcyBwYXRjaCBhZGRzIGEgbmV3IHBhcmFtZXRlcg0KPj4+
+Pj4gJ3JkX251bWFfbm9kZScgdG8gYWxsb3cgdGhlIHVzZXIgdG8gc3BlY2lmeSB0aGUgTlVNQSBu
+b2RlIGlkLg0KPj4+Pj4gV2hlbiByZXN0cmljaW5nIGZpbyB0byB1c2UgdGhlIHNhbWUgTlVNQSBu
+b2RlIEknbSBzZWVpbmcgYQ0KPj4+Pj4gcGVyZm9ybWFuY2UgYm9vc3Qgb2YgbW9yZSB0aGFuIDIw
+MCUuDQo+Pj4+DQo+Pj4+IExvb2tzIGZpbmUgdG8gbWUuIE9uZSBjb21tZW50Lg0KPj4+PiAgIA0K
+Pj4+Pj4gQEAgLTM0Miw2ICszNDMsMTAgQEAgc3RhdGljIGludCBtYXhfcGFydCA9IDE7DQo+Pj4+
+PiAgIG1vZHVsZV9wYXJhbShtYXhfcGFydCwgaW50LCAwNDQ0KTsNCj4+Pj4+ICAgTU9EVUxFX1BB
+Uk1fREVTQyhtYXhfcGFydCwgIk51bSBNaW5vcnMgdG8gcmVzZXJ2ZSBiZXR3ZWVuDQo+Pj4+PiBk
+ZXZpY2VzIik7DQo+Pj4+PiArc3RhdGljIGludCByZF9udW1hX25vZGUgPSBOVU1BX05PX05PREU7
+DQo+Pj4+PiArbW9kdWxlX3BhcmFtKHJkX251bWFfbm9kZSwgaW50LCAwNDQ0KTsNCj4+Pj4+ICtN
+T0RVTEVfUEFSTV9ERVNDKHJkX251bWFfbm9kZSwgIk5VTUEgbm9kZSBudW1iZXIgdG8gYWxsb2Nh
+dGUgUkFNDQo+Pj4+PiBkaXNrIG9uLiIpOw0KPj4+Pg0KPj4+PiBUaGlzIGNvdWxkIGZlYXNpYmx5
+IGJlIDA2NDQsIGFzIHRoZXJlIHdvdWxkIGJlIG5vdGhpbmcgd3Jvbmcgd2l0aA0KPj4+PiBhbHRl
+cmluZyB0aGlzIGF0IHJ1bnRpbWUuDQo+Pj4+ICAgDQo+Pj4NCj4+PiBXaGlsZSB3ZSBjb3VsZCBp
+dCB3b3VsZCBub3QgY2hhbmdlIHRoZSBhbGxvY2F0aW9uIG9mIF9leGlzdGluZ18gcmFtDQo+Pj4g
+ZGV2aWNlcywgbWFraW5nIGJlaGF2aW91ciByYXRoZXIgdW5wcmVkaWN0YWJsZS4NCj4+PiBIZW5j
+ZSBJIGRpZCBkZWNpZGUgYWdhaW5zdCBpdCAoYW5kIHllcywgSSBhY3R1YWxseSB0aG91Z2h0IGFi
+b3V0DQo+Pj4gaXQpLg0KPj4+DQo+Pj4gQnV0IGlmIHlvdSBpbnNpc3QgLi4uDQo+Pg0KPj4gUmln
+aHQsIGl0IHdvdWxkIGp1c3QgY2hhbmdlIG5ldyBhbGxvY2F0aW9ucy4gUHJvYmFibHkgbm90IGEg
+Y29tbW9uIHVzZQ0KPj4gY2FzZSwgYnV0IHRoZXJlJ3MgcmVhbGx5IG5vdGhpbmcgdGhhdCBwcmV2
+ZW50cyBpdCBmcm9tIGJlaW5nIGZlYXNpYmxlLg0KPj4NCj4+IE5leHQgcXVlc3Rpb24gLSB3aGF0
+IGRvZXMgdGhlIG1lbW9yeSBhbGxvY2F0b3IgZG8gaWYgd2UgcnVuIG91dCBvZg0KPj4gbWVtb3J5
+IG9uIHRoZSBnaXZlbiBub2RlPyBTaG91bGQgd2UgcHVudCB0byBhIGRpZmZlcmVudCBub2RlIGlm
+IHRoYXQNCj4+IGhhcHBlbnM/IFNsb3dlciwgYnV0IGZ1bmN0aW9uYWwsIHNlZW1zIHByZWZlcmFi
+bGUgdG8gbm90IGJlaW5nIGFibGUNCj4+IHRvIGdldCBtZW1vcnkuDQo+Pg0KPiANCj4gSG1tLiBU
+aGF0IEkgaGF2ZW4ndCBjb25zaWRlcmVkOyB5ZXMsIHRoYXQgcmVhbGx5IHNvdW5kcyBsaWtlIGFu
+IGlkZWEuDQo+IFdpbGwgYmUgc2VuZGluZyBhbiB1cGRhdGVkIHBhdGNoLg0KDQpXaWxsIG51bWFj
+dGwgLi4uIG1vZHByb2JlIGJyZCAuLi4gc29sdmUgdGhpcyBwcm9ibGVtPw0KDQo+IA0KPiBDaGVl
+cnMsDQo+IA0KPiBIYW5uZXMNCj4g
