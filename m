@@ -1,64 +1,59 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59032 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1754536AbeFNBwn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Jun 2018 21:52:43 -0400
+Date: Thu, 14 Jun 2018 09:52:22 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@fb.com>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        David Sterba <dsterba@suse.cz>,
+        Huang Ying <ying.huang@intel.com>,
         linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         Theodore Ts'o <tytso@mit.edu>,
         "Darrick J . Wong" <darrick.wong@oracle.com>,
         Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 24/30] xfs: conver to bio_for_each_chunk_segment_all
-Date: Sat,  9 Jun 2018 20:30:08 +0800
-Message-Id: <20180609123014.8861-25-ming.lei@redhat.com>
-In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
+        Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH V6 13/30] block: introduce rq_for_each_chunk()
+Message-ID: <20180614015221.GD19828@ming.t460p>
 References: <20180609123014.8861-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+ <20180609123014.8861-14-ming.lei@redhat.com>
+ <20180613144818.GD4693@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180613144818.GD4693@infradead.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-bio_for_each_page_all() can't be used any more after multipage bvec is
-enabled, so we have to convert to bio_for_each_chunk_segment_all().
+On Wed, Jun 13, 2018 at 07:48:18AM -0700, Christoph Hellwig wrote:
+> On Sat, Jun 09, 2018 at 08:29:57PM +0800, Ming Lei wrote:
+> > There are still cases in which rq_for_each_chunk() is required, for
+> > example, loop.
+> > 
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  include/linux/blkdev.h | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> > 
+> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> > index bca3a92eb55f..4eaba73c784a 100644
+> > --- a/include/linux/blkdev.h
+> > +++ b/include/linux/blkdev.h
+> > @@ -941,6 +941,10 @@ struct req_iterator {
+> >  	__rq_for_each_bio(_iter.bio, _rq)			\
+> >  		bio_for_each_segment(bvl, _iter.bio, _iter.iter)
+> >  
+> > +#define rq_for_each_chunk(bvl, _rq, _iter)			\
+> > +	__rq_for_each_bio(_iter.bio, _rq)			\
+> > +		bio_for_each_chunk(bvl, _iter.bio, _iter.iter)
+> 
+> We have a single users of this in the loop driver.  I'd rather
+> see the obvious loop open coded.
 
-Given bvec can't be changed under bio_for_each_chunk_segment_all(), this patch
-marks the bvec parameter as 'const' for xfs_finish_page_writeback().
+OK.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/xfs/xfs_aops.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index ca6903726689..c134db97911d 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -107,7 +107,7 @@ xfs_find_daxdev_for_inode(
- static void
- xfs_finish_page_writeback(
- 	struct inode		*inode,
--	struct bio_vec		*bvec,
-+	const struct bio_vec	*bvec,
- 	int			error)
- {
- 	struct buffer_head	*head = page_buffers(bvec->bv_page), *bh = head;
-@@ -169,6 +169,7 @@ xfs_destroy_ioend(
- 	for (bio = &ioend->io_inline_bio; bio; bio = next) {
- 		struct bio_vec	*bvec;
- 		int		i;
-+		struct bvec_chunk_iter citer;
- 
- 		/*
- 		 * For the last bio, bi_private points to the ioend, so we
-@@ -180,7 +181,7 @@ xfs_destroy_ioend(
- 			next = bio->bi_private;
- 
- 		/* walk each page on bio, ending page IO on them */
--		bio_for_each_segment_all(bvec, bio, i)
-+		bio_for_each_chunk_segment_all(bvec, bio, i, citer)
- 			xfs_finish_page_writeback(inode, bvec, error);
- 
- 		bio_put(bio);
--- 
-2.9.5
+Thanks,
+Ming
