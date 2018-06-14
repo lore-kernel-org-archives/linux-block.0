@@ -1,56 +1,44 @@
-Return-Path: <prvs=696db7385=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: Damien Le Moal <Damien.LeMoal@wdc.com>, "mcgrof@kernel.org"
-	<mcgrof@kernel.org>
-CC: "mwilck@suse.com" <mwilck@suse.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "agk@redhat.com" <agk@redhat.com>,
-	"hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"yuchao0@huawei.com" <yuchao0@huawei.com>, "ghe@suse.com" <ghe@suse.com>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"jaegeuk@kernel.org" <jaegeuk@kernel.org>, "tchvatal@suse.com"
-	<tchvatal@suse.com>, "zren@suse.com" <zren@suse.com>
-Subject: Re: [PATCH] dm-zoned-tools: add zoned disk udev rules for scheduler /
- dmsetup
-Date: Thu, 14 Jun 2018 16:19:23 +0000
-Message-ID: <64d7d5386d6171a9a551f22db86524cf7a595af5.camel@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:46078 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754869AbeFNNmh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Jun 2018 09:42:37 -0400
+Date: Thu, 14 Jun 2018 06:42:35 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "mcgrof@kernel.org" <mcgrof@kernel.org>,
+        "mwilck@suse.com" <mwilck@suse.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "agk@redhat.com" <agk@redhat.com>, "hare@suse.de" <hare@suse.de>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "yuchao0@huawei.com" <yuchao0@huawei.com>,
+        "ghe@suse.com" <ghe@suse.com>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "jaegeuk@kernel.org" <jaegeuk@kernel.org>,
+        "tchvatal@suse.com" <tchvatal@suse.com>,
+        "zren@suse.com" <zren@suse.com>
+Subject: Re: [PATCH] dm-zoned-tools: add zoned disk udev rules for scheduler
+ / dmsetup
+Message-ID: <20180614134235.GA21624@infradead.org>
 References: <20180614001147.1545-1-mcgrof@kernel.org>
-In-Reply-To: <20180614001147.1545-1-mcgrof@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+ <791e0a85-be07-4a31-f13d-282a1c94bf22@wdc.com>
+ <bd7abc194c69bce0f9cc7d08f435449242ae4f8c.camel@wdc.com>
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <bd7abc194c69bce0f9cc7d08f435449242ae4f8c.camel@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-T24gV2VkLCAyMDE4LTA2LTEzIGF0IDE3OjExIC0wNzAwLCBMdWlzIFIuIFJvZHJpZ3VleiB3cm90
-ZToNCj4gVGhpcyB0cmllcyB0byBwdXQgYSBiaXQgb2YgdGhpcyB0cmliYWwga25vd2xlZGdlIGlu
-dG8gYW4gaW5pdGlhbCB1ZGV2DQo+IHJ1bGUgZm9yIGRldmVsb3BtZW50IHdpdGggdGhlIGhvcGVz
-IExpbnV4IGRpc3RyaWJ1dGlvbnMgY2FuIGxhdGVyDQo+IGRlcGxveS4gVGhyZWUgcnVsZSBhcmUg
-YWRkZWQuIE9uZSBydWxlIGlzIG9wdGlvbmFsIGZvciBub3csIGl0IHNob3VsZCBiZQ0KPiBleHRl
-bmRlZCBsYXRlciB0byBiZSBtb3JlIGRpc3RyaWJ1dGlvbi1mcmllbmRseSBhbmQgdGhlbiBJIHRo
-aW5rIHRoaXMNCj4gbWF5IGJlIHJlYWR5IGZvciBjb25zaWRlcmF0aW9uIGZvciBpbnRlZ3JhdGlv
-biBvbiBkaXN0cmlidXRpb25zLg0KPiANCj4gMSkgc2NoZWR1bGVyIHNldHVwDQo+IDIpIGJhY2ts
-aXN0IGYyZnMgZGV2aWNlcw0KPiAzKSBydW4gZG1zZXR1cCBmb3IgdGhlIHJlc3Qgb2YgZGV2aWNl
-cw0KDQpIZWxsbyBMdWlzLA0KDQpJIHRoaW5rIGl0IGlzIHdyb25nIHRvIHBhY2thZ2UgdGhlIHpv
-bmVkIGJsb2NrIGRldmljZSBzY2hlZHVsZXIgcnVsZSBpbiB0aGUNCmRtLXpvbmVkLXRvb2xzIHBh
-Y2thZ2UuIFRoYXQgdWRldiBydWxlIHNob3VsZCBiZSBhY3RpdmF0ZWQgd2hldGhlciBvciBub3Qg
-dGhlDQpkbS16b25lZC10b29scyBwYWNrYWdlIGhhcyBiZWVuIGluc3RhbGxlZC4gSGF2ZSB5b3Ug
-Y29uc2lkZXJlZCB0byBzdWJtaXQgdGhlDQp6b25lZCBibG9jayBkZXZpY2Ugc2NoZWR1bGVyIHJ1
-bGUgdG8gdGhlIHN5c3RlbWQgcHJvamVjdCBzaW5jZSB0b2RheSB0aGF0DQpwcm9qZWN0IGluY2x1
-ZGVzIGFsbCBiYXNlIHVkZXYgcnVsZXM/DQoNCj4gKyMgWm9uZWQgZGlza3MgY2FuIG9ubHkgd29y
-ayB3aXRoIHRoZSBkZWFkbGluZSBvciBtcS1kZWFkbGluZSBzY2hlZHVsZXIuIFRoaXMgaXMNCj4g
-KyMgbWFuZGF0ZWQgZm9yIGFsbCBTTVIgZHJpdmVzIHNpbmNlIHY0LjE2LiBJdCBoYXMgYmVlbiBk
-ZXRlcm1pbmVkIHRoaXMgbXVzdCBiZQ0KPiArIyBkb25lIHRocm91Z2ggYSB1ZGV2IHJ1bGUsIGFu
-ZCB0aGUga2VybmVsIHNob3VsZCBub3Qgc2V0IHRoaXMgdXAgZm9yIGRpc2tzLg0KPiArIyBUaGlz
-IG1hZ2ljIHdpbGwgaGF2ZSB0byBsaXZlIGZvciAqYWxsKiB6b25lZCBkaXNrcy4NCj4gKyMgWFhY
-OiB3aGF0IGFib3V0IGRpc3RyaWJ1dGlvbnMgdGhhdCB3YW50IG1xLWRlYWRsaW5lID8gUHJvYmFi
-bHkgZWFzeSBmb3Igbm93DQo+ICsjICAgICAgdG8gYXNzdW1lIGRlYWRsaW5lIGFuZCBsYXRlciBo
-YXZlIGEgbWFwcGluZyBmaWxlIHRvIGVuYWJsZQ0KPiArIyAgICAgIG1xLWRlYWRsaW5lIGZvciBz
-cGVjaWZpYyBzZXJpYWwgZGV2aWNlcz8NCj4gK0FDVElPTj09ImFkZHxjaGFuZ2UiLCBLRVJORUw9
-PSJzZCpbITAtOV0iLCBBVFRSU3txdWV1ZS96b25lZH09PSJob3N0LW1hbmFnZWQiLCBcDQo+ICsJ
-QVRUUntxdWV1ZS9zY2hlZHVsZXJ9PSJkZWFkbGluZSINCg0KSSB0aGluayBpdCBpcyB3cm9uZyB0
-byBsaW1pdCB0aGlzIHJ1bGUgdG8gU0NTSSBkaXNrcyBvbmx5LiBXb3JrIGlzIG9uZ29pbmcgdG8N
-CmFkZCB6b25lZCBibG9jayBkZXZpY2Ugc3VwcG9ydCB0byB0aGUgbnVsbF9ibGsgZHJpdmVyLiBU
-aGF0IGlzIGEgYmxvY2sgZHJpdmVyDQphbmQgbm90IGEgU0NTSSBkcml2ZXIuIEkgdGhpbmsgdGhl
-IGFib3ZlIHVkZXYgcnVsZSBzaG91bGQgYXBwbHkgdG8gdGhhdCBibG9jaw0KZHJpdmVyIHRvby4N
-Cg0KUmVnYXJkaW5nIGJsay1tcSwgZnJvbSB0aGUgbXEtZGVhZGxpbmUgc291cmNlIGNvZGU6DQoJ
-LmVsZXZhdG9yX2FsaWFzID0gImRlYWRsaW5lIiwNCg0KSW4gb3RoZXIgd29yZHMsIHRoZSBuYW1l
-ICJkZWFkbGluZSIgc2hvdWxkIHdvcmsgYm90aCBmb3IgbGVnYWN5IGFuZCBmb3IgYmxrLW1xDQpi
-bG9jayBkZXZpY2VzLg0KDQpUaGFua3MsDQoNCkJhcnQuDQoNCg0K
+On Thu, Jun 14, 2018 at 01:39:50PM +0000, Bart Van Assche wrote:
+> On Thu, 2018-06-14 at 10:01 +0000, Damien Le Moal wrote:
+> > Applied. Thanks Luis !
+> 
+> Hello Damien,
+> 
+> Can this still be undone? I agree with Mike that it's wrong to invoke
+> "/sbin/dmsetup create ... zoned ..." from a udev rule.
+
+Yes.  We'll really need to verfify the device has dm-zoned metadata
+first.  Preferably including a uuid for stable device naming.
