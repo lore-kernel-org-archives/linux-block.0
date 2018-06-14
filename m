@@ -1,23 +1,75 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] blk-mq: don't time out requests again that are in the
- timeout handler
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-References: <20180614115845.27094-1-hch@lst.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <d3176eee-2025-f401-63e6-d3b68d9108a9@kernel.dk>
-Date: Thu, 14 Jun 2018 08:42:49 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180614115845.27094-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <BATV+449e860d3caae2166dba+5408+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Subject: [PATCH] blk-mq: don't time out requests again that are in the timeout handler
+Date: Thu, 14 Jun 2018 13:58:45 +0200
+Message-Id: <20180614115845.27094-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On 6/14/18 5:58 AM, Christoph Hellwig wrote:
-> We can currently call the timeout handler again on a request that has
-> already been handed over to the timeout handler.  Prevent that with a new
-> flag.
+We can currently call the timeout handler again on a request that has
+already been handed over to the timeout handler.  Prevent that with a new
+flag.
 
-Applied, thanks.
+Fixes: 12f5b931 ("blk-mq: Remove generation seqeunce")
+Reported-by: Andrew Randrianasulu <randrianasulu@gmail.com>
+Tested-by: Andrew Randrianasulu <randrianasulu@gmail.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-mq.c         | 5 +++++
+ include/linux/blkdev.h | 2 ++
+ 2 files changed, 7 insertions(+)
 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e9da5e6a8526..54332db09e5d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -671,6 +671,7 @@ static void __blk_mq_requeue_request(struct request *rq)
+ 
+ 	if (blk_mq_request_started(rq)) {
+ 		WRITE_ONCE(rq->state, MQ_RQ_IDLE);
++		rq->rq_flags &= ~RQF_TIMED_OUT;
+ 		if (q->dma_drain_size && blk_rq_bytes(rq))
+ 			rq->nr_phys_segments--;
+ 	}
+@@ -770,6 +771,7 @@ EXPORT_SYMBOL(blk_mq_tag_to_rq);
+ 
+ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
+ {
++	req->rq_flags |= RQF_TIMED_OUT;
+ 	if (req->q->mq_ops->timeout) {
+ 		enum blk_eh_timer_return ret;
+ 
+@@ -779,6 +781,7 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
+ 		WARN_ON_ONCE(ret != BLK_EH_RESET_TIMER);
+ 	}
+ 
++	req->rq_flags &= ~RQF_TIMED_OUT;
+ 	blk_add_timer(req);
+ }
+ 
+@@ -788,6 +791,8 @@ static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
+ 
+ 	if (blk_mq_rq_state(rq) != MQ_RQ_IN_FLIGHT)
+ 		return false;
++	if (rq->rq_flags & RQF_TIMED_OUT)
++		return false;
+ 
+ 	deadline = blk_rq_deadline(rq);
+ 	if (time_after_eq(jiffies, deadline))
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index bca3a92eb55f..fa6f11751430 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -127,6 +127,8 @@ typedef __u32 __bitwise req_flags_t;
+ #define RQF_ZONE_WRITE_LOCKED	((__force req_flags_t)(1 << 19))
+ /* already slept for hybrid poll */
+ #define RQF_MQ_POLL_SLEPT	((__force req_flags_t)(1 << 20))
++/* ->timeout has been called, don't expire again */
++#define RQF_TIMED_OUT		((__force req_flags_t)(1 << 21))
+ 
+ /* flags that prevent us from merging requests: */
+ #define RQF_NOMERGE_FLAGS \
 -- 
-Jens Axboe
+2.17.1
