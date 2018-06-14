@@ -1,8 +1,12 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Wed, 13 Jun 2018 23:20:22 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@fb.com>,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34024 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1754526AbeFNBYN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Jun 2018 21:24:13 -0400
+Date: Thu, 14 Jun 2018 09:23:54 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@fb.com>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         Kent Overstreet <kent.overstreet@gmail.com>,
         David Sterba <dsterba@suse.cz>,
@@ -15,26 +19,21 @@ Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@fb.com>,
         Randy Dunlap <rdunlap@infradead.org>
 Subject: Re: [PATCH V6 11/30] block: implement bio_pages_all() via
  bio_for_each_segment_all()
-Message-ID: <20180614062022.GB3336@infradead.org>
+Message-ID: <20180614012352.GC19828@ming.t460p>
 References: <20180609123014.8861-1-ming.lei@redhat.com>
  <20180609123014.8861-12-ming.lei@redhat.com>
  <20180613144412.GB4693@infradead.org>
- <20180614012352.GC19828@ming.t460p>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180614012352.GC19828@ming.t460p>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20180613144412.GB4693@infradead.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Thu, Jun 14, 2018 at 09:23:54AM +0800, Ming Lei wrote:
-> On Wed, Jun 13, 2018 at 07:44:12AM -0700, Christoph Hellwig wrote:
-> > Given that we have a single, dubious user of bio_pages_all I'd rather
-> > see it as an opencoded bio_for_each_ loop in the caller.
-> 
-> Yeah, that is fine since there is only one user in btrfs.
+On Wed, Jun 13, 2018 at 07:44:12AM -0700, Christoph Hellwig wrote:
+> Given that we have a single, dubious user of bio_pages_all I'd rather
+> see it as an opencoded bio_for_each_ loop in the caller.
 
-And I suspect it really is checking for the wrong thing.  I don't
-fully understand that code, but as far as I can tell it really
-needs to know if there is more than a file system block of data in
-the bio, and btrfs conflats pages with blocks.  But I'd need btrfs
-folks to confirm this.
+Yeah, that is fine since there is only one user in btrfs.
+
+Thanks,
+Ming
