@@ -1,51 +1,23 @@
-Return-Path: <prvs=703b01b66=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"keith.busch@intel.com" <keith.busch@intel.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH] blk-mq: don't time out requests again that are in the
  timeout handler
-Date: Thu, 21 Jun 2018 18:18:52 +0000
-Message-ID: <b470030beb813a77f07a9899c950d017ed807adb.camel@wdc.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
 References: <20180614115845.27094-1-hch@lst.de>
-In-Reply-To: <20180614115845.27094-1-hch@lst.de>
-Content-Type: text/plain; charset="utf-8"
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <d3176eee-2025-f401-63e6-d3b68d9108a9@kernel.dk>
+Date: Thu, 14 Jun 2018 08:42:49 -0600
 MIME-Version: 1.0
+In-Reply-To: <20180614115845.27094-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVGh1LCAyMDE4LTA2LTE0IGF0IDEzOjU4ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
-ZToNCj4gV2UgY2FuIGN1cnJlbnRseSBjYWxsIHRoZSB0aW1lb3V0IGhhbmRsZXIgYWdhaW4gb24g
-YSByZXF1ZXN0IHRoYXQgaGFzDQo+IGFscmVhZHkgYmVlbiBoYW5kZWQgb3ZlciB0byB0aGUgdGlt
-ZW91dCBoYW5kbGVyLiAgUHJldmVudCB0aGF0IHdpdGggYSBuZXcNCj4gZmxhZy4NCj4gDQo+IEZp
-eGVzOiAxMmY1YjkzMSAoImJsay1tcTogUmVtb3ZlIGdlbmVyYXRpb24gc2VxZXVuY2UiKQ0KPiBS
-ZXBvcnRlZC1ieTogQW5kcmV3IFJhbmRyaWFuYXN1bHUgPHJhbmRyaWFuYXN1bHVAZ21haWwuY29t
-Pg0KPiBUZXN0ZWQtYnk6IEFuZHJldyBSYW5kcmlhbmFzdWx1IDxyYW5kcmlhbmFzdWx1QGdtYWls
-LmNvbT4NCj4gU2lnbmVkLW9mZi1ieTogQ2hyaXN0b3BoIEhlbGx3aWcgPGhjaEBsc3QuZGU+DQo+
-IC0tLQ0KPiAgYmxvY2svYmxrLW1xLmMgICAgICAgICB8IDUgKysrKysNCj4gIGluY2x1ZGUvbGlu
-dXgvYmxrZGV2LmggfCAyICsrDQo+ICAyIGZpbGVzIGNoYW5nZWQsIDcgaW5zZXJ0aW9ucygrKQ0K
-PiANCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1tcS5jIGIvYmxvY2svYmxrLW1xLmMNCj4gaW5k
-ZXggZTlkYTVlNmE4NTI2Li41NDMzMmRiMDllNWQgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Jsay1t
-cS5jDQo+ICsrKyBiL2Jsb2NrL2Jsay1tcS5jDQo+IEBAIC02NzEsNiArNjcxLDcgQEAgc3RhdGlj
-IHZvaWQgX19ibGtfbXFfcmVxdWV1ZV9yZXF1ZXN0KHN0cnVjdCByZXF1ZXN0ICpycSkNCj4gIA0K
-PiAgCWlmIChibGtfbXFfcmVxdWVzdF9zdGFydGVkKHJxKSkgew0KPiAgCQlXUklURV9PTkNFKHJx
-LT5zdGF0ZSwgTVFfUlFfSURMRSk7DQo+ICsJCXJxLT5ycV9mbGFncyAmPSB+UlFGX1RJTUVEX09V
-VDsNCj4gIAkJaWYgKHEtPmRtYV9kcmFpbl9zaXplICYmIGJsa19ycV9ieXRlcyhycSkpDQo+ICAJ
-CQlycS0+bnJfcGh5c19zZWdtZW50cy0tOw0KPiAgCX0NCj4gQEAgLTc3MCw2ICs3NzEsNyBAQCBF
-WFBPUlRfU1lNQk9MKGJsa19tcV90YWdfdG9fcnEpOw0KPiAgDQo+ICBzdGF0aWMgdm9pZCBibGtf
-bXFfcnFfdGltZWRfb3V0KHN0cnVjdCByZXF1ZXN0ICpyZXEsIGJvb2wgcmVzZXJ2ZWQpDQo+ICB7
-DQo+ICsJcmVxLT5ycV9mbGFncyB8PSBSUUZfVElNRURfT1VUOw0KPiAgCWlmIChyZXEtPnEtPm1x
-X29wcy0+dGltZW91dCkgew0KPiAgCQllbnVtIGJsa19laF90aW1lcl9yZXR1cm4gcmV0Ow0KPiAg
-DQo+IEBAIC03NzksNiArNzgxLDcgQEAgc3RhdGljIHZvaWQgYmxrX21xX3JxX3RpbWVkX291dChz
-dHJ1Y3QgcmVxdWVzdCAqcmVxLCBib29sIHJlc2VydmVkKQ0KPiAgCQlXQVJOX09OX09OQ0UocmV0
-ICE9IEJMS19FSF9SRVNFVF9USU1FUik7DQo+ICAJfQ0KPiAgDQo+ICsJcmVxLT5ycV9mbGFncyAm
-PSB+UlFGX1RJTUVEX09VVDsNCj4gIAlibGtfYWRkX3RpbWVyKHJlcSk7DQo+ICB9DQoNCkkgdGhp
-bmsgaXQgaXMgd3JvbmcgdG8gY2xlYXIgdGhlIFJRRl9USU1FRF9PVVQgZmxhZyBmcm9tIGluc2lk
-ZQ0KYmxrX21xX3JxX3RpbWVkX291dCgpLiBUaGF0IGZsYWcgc2hvdWxkIG9ubHkgYmUgY2xlYXJl
-ZCBhZnRlciB0aGUgcmVxdWVzdCB0YWcNCmhhcyBiZWVuIGZyZWVkIG9yIGFmdGVyIHRoZSByZXF1
-ZXN0IGhhcyBiZWVuIHJldXNlZCBhbmQgYSBuZXcgdGltZXIgaXMgc3RhcnRlZA0KZm9yIHRoZSBy
-ZXF1ZXN0LiBJIHRoaW5rIFRlanVuIGdvdCBpdCByaWdodCBpbiBoaXMgcGF0Y2ggY2FsbGVkICJb
-UEFUQ0ggNi84XQ0KYmxrLW1xOiByZW1vdmUgUkVRX0FUT01fQ09NUExFVEUgdXNhZ2VzIGZyb20g
-YmxrLW1xIi4gU2VlIGFsc28NCmh0dHBzOi8vd3d3Lm1haWwtYXJjaGl2ZS5jb20vbGludXgta2Vy
-bmVsQHZnZXIua2VybmVsLm9yZy9tc2cxNTgwNDIwLmh0bWwuDQoNCkJhcnQuDQoNCg0KDQo=
+On 6/14/18 5:58 AM, Christoph Hellwig wrote:
+> We can currently call the timeout handler again on a request that has
+> already been handed over to the timeout handler.  Prevent that with a new
+> flag.
+
+Applied, thanks.
+
+-- 
+Jens Axboe
