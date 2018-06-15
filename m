@@ -1,32 +1,26 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <prvs=697b38d23=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "mgorman@suse.com" <mgorman@suse.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "hare@suse.com" <hare@suse.com>
 Subject: Re: [PATCH] brd: Allow ramdisk to be allocated on selected NUMA node
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
- Mel Gorman <mgorman@suse.com>, Hannes Reinecke <hare@suse.com>
+Date: Fri, 15 Jun 2018 14:07:41 +0000
+Message-ID: <78b2e2924ee3ef28dcb900a3807a78d6d0fe57e0.camel@wdc.com>
 References: <20180614133832.110947-1-hare@suse.de>
- <08318d74-d81c-29e5-5350-525df96eaacb@kernel.dk>
- <20180614172954.79965d13@pentland.suse.de>
- <656e4ab7-7c5c-41af-5596-2e155ffb28e4@kernel.dk>
- <20180615073035.GA15535@infradead.org>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <697e4c1a-3858-d14a-5c01-1ccd0cfd3c00@kernel.dk>
-Date: Fri, 15 Jun 2018 08:12:29 -0600
+In-Reply-To: <20180614133832.110947-1-hare@suse.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20180615073035.GA15535@infradead.org>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 6/15/18 1:30 AM, Christoph Hellwig wrote:
-> On Thu, Jun 14, 2018 at 09:33:35AM -0600, Jens Axboe wrote:
->> Next question - what does the memory allocator do if we run out of
->> memory on the given node? Should we punt to a different node if that
->> happens? Slower, but functional, seems preferable to not being able
->> to get memory.
-> 
-> When using alloc_pages_node the passed in node id is just a hint, the
-> allocator will use all avaiable memory if nedeed.
-
-OK good, that's not a concern then.
-
--- 
-Jens Axboe
+T24gVGh1LCAyMDE4LTA2LTE0IGF0IDE1OjM4ICswMjAwLCBIYW5uZXMgUmVpbmVja2Ugd3JvdGU6
+DQo+IEZvciBwZXJmb3JtYW5jZSByZWFzb25zIHdlIHNob3VsZCBiZSBhYmxlIHRvIGFsbG9jYXRl
+IGFsbCBtZW1vcnkNCj4gZnJvbSBhIGdpdmVuIE5VTUEgbm9kZSwgc28gdGhpcyBwYXRjaCBhZGRz
+IGEgbmV3IHBhcmFtZXRlcg0KPiAncmRfbnVtYV9ub2RlJyB0byBhbGxvdyB0aGUgdXNlciB0byBz
+cGVjaWZ5IHRoZSBOVU1BIG5vZGUgaWQuDQo+IFdoZW4gcmVzdHJpY2luZyBmaW8gdG8gdXNlIHRo
+ZSBzYW1lIE5VTUEgbm9kZSBJJ20gc2VlaW5nIGEgcGVyZm9ybWFuY2UNCj4gYm9vc3Qgb2YgbW9y
+ZSB0aGFuIDIwMCUuDQoNClBhc3NpbmcgdGhpcyBpbmZvcm1hdGlvbiB0aHJvdWdoIGEga2VybmVs
+IG1vZHVsZSBwYXJhbWV0ZXIgdG8gdGhlIGJyZCBrZXJuZWwNCm1vZHVsZSBzZWVtcyB3cm9uZyB0
+byBtZS4gVGhlcmUgY2FuIGJlIG11bHRpcGxlIGJyZCBpbnN0YW5jZXMuIFVzaW5nIGEga2VybmVs
+DQptb2R1bGUgcGFyYW1ldGVyIG1ha2VzIGl0IGltcG9zc2libGUgdG8gc3BlY2lmeSBhIGRpZmZl
+cmVudCBOVU1BIG5vZGUgZm9yDQpkaWZmZXJlbnQgYnJkIGluc3RhbmNlcy4NCg0KQmFydC4NCg0K
+DQoNCg0K
