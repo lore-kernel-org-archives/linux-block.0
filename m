@@ -1,79 +1,29 @@
 Return-Path: <hch@lst.de>
-Date: Tue, 19 Jun 2018 16:09:42 +0200
+Date: Fri, 15 Jun 2018 13:58:19 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: axboe@kernel.dk, hch@lst.de, jejb@linux.vnet.ibm.com,
-	martin.petersen@oracle.com, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: "jianchao.wang" <jianchao.w.wang@oracle.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	James Bottomley <jejb@linux.vnet.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-block <linux-block@vger.kernel.org>,
+	Linux SCSI List <linux-scsi@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH 1/2] block: export __blk_complete_request
-Message-ID: <20180619140942.GA13089@lst.de>
-References: <1529027847-29085-1-git-send-email-jianchao.w.wang@oracle.com>
+Message-ID: <20180615115819.GA25694@lst.de>
+References: <1529027847-29085-1-git-send-email-jianchao.w.wang@oracle.com> <CACVXFVMe4zSvfXfuSn0NFayeQqbmDwBBy1kcso=5iznT6EfpSA@mail.gmail.com> <3dd3f82a-5b68-f039-3a8a-7c5fe4e24c3e@oracle.com> <e5344293-b0b7-d2e0-f2e7-c0700efdfbe4@oracle.com> <CACVXFVMRCM6AvNJjAESbwOeJ_P5AZ+1C-7RfhE9L4u0T=_5h4Q@mail.gmail.com> <3970fdc7-52d9-d05b-4118-059d48bf4f2d@oracle.com> <CACVXFVMPAdFbX3x-KUjHCQhb_rT6p9ROYHg63aUtEqdbitEaKQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1529027847-29085-1-git-send-email-jianchao.w.wang@oracle.com>
+In-Reply-To: <CACVXFVMPAdFbX3x-KUjHCQhb_rT6p9ROYHg63aUtEqdbitEaKQ@mail.gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Does the patch below fix your FC issue?
+On Fri, Jun 15, 2018 at 11:20:40AM +0800, Ming Lei wrote:
+> > but blk_mq_check_expired doesn't do that.
+> > do I miss anything ?
+> 
+> Right, that is the difference between blk-mq and legacy now, then if scsi-mq
+> drivers can work well, they should work well with the following change in the
+> non-mq mode:
 
----
->From 5e5b4fc51c84a0f5c27f2f770be7a4eaed0f6e8c Mon Sep 17 00:00:00 2001
-From: Christoph Hellwig <hch@lst.de>
-Date: Tue, 19 Jun 2018 13:59:52 +0200
-Subject: block: fix timeout changes for legacy request drivers
-
-blk_mq_complete_request can only be called for blk-mq drivers, but when
-removing the BLK_EH_HANDLED return value, two legacy request timeout
-methods incorrectly got switched to call blk_mq_complete_request.
-Call __blk_complete_request instead to reinstance the previous behavior.
-For that __blk_complete_request needs to be exported.
-
-Fixes: 1fc2b62e ("scsi_transport_fc: complete requests from ->timeout")
-Fixes: 0df0bb08 ("null_blk: complete requests from ->timeout")
-Reported-by: Jianchao Wang <jianchao.w.wang@oracle.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-softirq.c              | 1 +
- drivers/block/null_blk.c         | 2 +-
- drivers/scsi/scsi_transport_fc.c | 2 +-
- 3 files changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-softirq.c b/block/blk-softirq.c
-index 01e2b353a2b9..15c1f5e12eb8 100644
---- a/block/blk-softirq.c
-+++ b/block/blk-softirq.c
-@@ -144,6 +144,7 @@ void __blk_complete_request(struct request *req)
- 
- 	local_irq_restore(flags);
- }
-+EXPORT_SYMBOL(__blk_complete_request);
- 
- /**
-  * blk_complete_request - end I/O on a request
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index 7948049f6c43..042c778e5a4e 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -1365,7 +1365,7 @@ static blk_qc_t null_queue_bio(struct request_queue *q, struct bio *bio)
- static enum blk_eh_timer_return null_rq_timed_out_fn(struct request *rq)
- {
- 	pr_info("null: rq %p timed out\n", rq);
--	blk_mq_complete_request(rq);
-+	__blk_complete_request(rq);
- 	return BLK_EH_DONE;
- }
- 
-diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
-index 1da3d71e9f61..13948102ca29 100644
---- a/drivers/scsi/scsi_transport_fc.c
-+++ b/drivers/scsi/scsi_transport_fc.c
-@@ -3592,7 +3592,7 @@ fc_bsg_job_timeout(struct request *req)
- 
- 	/* the blk_end_sync_io() doesn't check the error */
- 	if (inflight)
--		blk_mq_complete_request(req);
-+		__blk_complete_request(req);
- 	return BLK_EH_DONE;
- }
- 
--- 
-2.17.1
+We'll still need referene counting against reuse and/or premature
+freeing of requests.
