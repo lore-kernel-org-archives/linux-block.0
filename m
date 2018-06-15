@@ -1,231 +1,39 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 18/30] block: convert to bio_for_each_chunk_segment_all()
-Date: Sat,  9 Jun 2018 20:30:02 +0800
-Message-Id: <20180609123014.8861-19-ming.lei@redhat.com>
-In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
-References: <20180609123014.8861-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <prvs=697b38d23=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "mgorman@suse.com" <mgorman@suse.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "hare@suse.com" <hare@suse.com>
+Subject: Re: [PATCH] brd: Allow ramdisk to be allocated on selected NUMA node
+Date: Fri, 15 Jun 2018 16:58:59 +0000
+Message-ID: <323802aed4c7e2f84f58f07475a737565121cfde.camel@wdc.com>
+References: <20180614133832.110947-1-hare@suse.de>
+	 <78b2e2924ee3ef28dcb900a3807a78d6d0fe57e0.camel@wdc.com>
+	 <9413635e-c293-d1eb-8edc-96d2e2d45f2d@suse.de>
+In-Reply-To: <9413635e-c293-d1eb-8edc-96d2e2d45f2d@suse.de>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-We have to convert to bio_for_each_chunk_segment_all() for iterating page by
-page.
-
-bio_for_each_segment_all() can't be used any more after multipage bvec is
-enabled.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bio.c         | 27 ++++++++++++++++++---------
- block/blk-zoned.c   |  5 +++--
- block/bounce.c      |  6 ++++--
- include/linux/bio.h |  3 ++-
- 4 files changed, 27 insertions(+), 14 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 60219f82ddab..276fc35ec559 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1146,8 +1146,9 @@ static int bio_copy_from_iter(struct bio *bio, struct iov_iter *iter)
- {
- 	int i;
- 	struct bio_vec *bvec;
-+	struct bvec_chunk_iter citer;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
- 		ssize_t ret;
- 
- 		ret = copy_page_from_iter(bvec->bv_page,
-@@ -1177,8 +1178,9 @@ static int bio_copy_to_iter(struct bio *bio, struct iov_iter iter)
- {
- 	int i;
- 	struct bio_vec *bvec;
-+	struct bvec_chunk_iter citer;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
- 		ssize_t ret;
- 
- 		ret = copy_page_to_iter(bvec->bv_page,
-@@ -1200,8 +1202,9 @@ void bio_free_pages(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_chunk_iter citer;
- 
--	bio_for_each_segment_all(bvec, bio, i)
-+	bio_for_each_chunk_segment_all(bvec, bio, i, citer)
- 		__free_page(bvec->bv_page);
- }
- EXPORT_SYMBOL(bio_free_pages);
-@@ -1367,6 +1370,7 @@ struct bio *bio_map_user_iov(struct request_queue *q,
- 	struct bio *bio;
- 	int ret;
- 	struct bio_vec *bvec;
-+	struct bvec_chunk_iter citer;
- 
- 	if (!iov_iter_count(iter))
- 		return ERR_PTR(-EINVAL);
-@@ -1440,7 +1444,7 @@ struct bio *bio_map_user_iov(struct request_queue *q,
- 	return bio;
- 
-  out_unmap:
--	bio_for_each_segment_all(bvec, bio, j) {
-+	bio_for_each_chunk_segment_all(bvec, bio, j, citer) {
- 		put_page(bvec->bv_page);
- 	}
- 	bio_put(bio);
-@@ -1451,11 +1455,12 @@ static void __bio_unmap_user(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_chunk_iter citer;
- 
- 	/*
- 	 * make sure we dirty pages we wrote to
- 	 */
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
- 		if (bio_data_dir(bio) == READ)
- 			set_page_dirty_lock(bvec->bv_page);
- 
-@@ -1547,8 +1552,9 @@ static void bio_copy_kern_endio_read(struct bio *bio)
- 	char *p = bio->bi_private;
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_chunk_iter citer;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
- 		memcpy(p, page_address(bvec->bv_page), bvec->bv_len);
- 		p += bvec->bv_len;
- 	}
-@@ -1657,8 +1663,9 @@ void bio_set_pages_dirty(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_chunk_iter citer;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
- 		if (!PageCompound(bvec->bv_page))
- 			set_page_dirty_lock(bvec->bv_page);
- 	}
-@@ -1669,8 +1676,9 @@ static void bio_release_pages(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_chunk_iter citer;
- 
--	bio_for_each_segment_all(bvec, bio, i)
-+	bio_for_each_chunk_segment_all(bvec, bio, i, citer)
- 		put_page(bvec->bv_page);
- }
- 
-@@ -1717,8 +1725,9 @@ void bio_check_pages_dirty(struct bio *bio)
- 	struct bio_vec *bvec;
- 	unsigned long flags;
- 	int i;
-+	struct bvec_chunk_iter citer;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
- 		if (!PageDirty(bvec->bv_page) && !PageCompound(bvec->bv_page))
- 			goto defer;
- 	}
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 3d08dc84db16..9223666c845d 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -123,6 +123,7 @@ int blkdev_report_zones(struct block_device *bdev,
- 	unsigned int ofst;
- 	void *addr;
- 	int ret;
-+	struct bvec_chunk_iter citer;
- 
- 	if (!q)
- 		return -ENXIO;
-@@ -190,7 +191,7 @@ int blkdev_report_zones(struct block_device *bdev,
- 	n = 0;
- 	nz = 0;
- 	nr_rep = 0;
--	bio_for_each_segment_all(bv, bio, i) {
-+	bio_for_each_chunk_segment_all(bv, bio, i, citer) {
- 
- 		if (!bv->bv_page)
- 			break;
-@@ -223,7 +224,7 @@ int blkdev_report_zones(struct block_device *bdev,
- 
- 	*nr_zones = nz;
- out:
--	bio_for_each_segment_all(bv, bio, i)
-+	bio_for_each_chunk_segment_all(bv, bio, i, citer)
- 		__free_page(bv->bv_page);
- 	bio_put(bio);
- 
-diff --git a/block/bounce.c b/block/bounce.c
-index fd31347b7836..c6af0bd29ec9 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -146,11 +146,12 @@ static void bounce_end_io(struct bio *bio, mempool_t *pool)
- 	struct bio_vec *bvec, orig_vec;
- 	int i;
- 	struct bvec_iter orig_iter = bio_orig->bi_iter;
-+	struct bvec_chunk_iter citer;
- 
- 	/*
- 	 * free up bounce indirect pages used
- 	 */
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
- 		orig_vec = bio_iter_iovec(bio_orig, orig_iter);
- 		if (bvec->bv_page != orig_vec.bv_page) {
- 			dec_zone_page_state(bvec->bv_page, NR_BOUNCE);
-@@ -206,6 +207,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 	bool bounce = false;
- 	int sectors = 0;
- 	bool passthrough = bio_is_passthrough(*bio_orig);
-+	struct bvec_chunk_iter citer;
- 
- 	bio_for_each_segment(from, *bio_orig, iter) {
- 		if (i++ < BIO_MAX_PAGES)
-@@ -225,7 +227,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, passthrough ? NULL :
- 			&bounce_bio_set);
- 
--	bio_for_each_segment_all(to, bio, i) {
-+	bio_for_each_chunk_segment_all(to, bio, i, citer) {
- 		struct page *page = to->bv_page;
- 
- 		if (page_to_pfn(page) <= q->limits.bounce_pfn)
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index f21384be9b51..c22b8be961ce 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -374,10 +374,11 @@ static inline unsigned bio_pages_all(struct bio *bio)
- {
- 	unsigned i;
- 	struct bio_vec *bv;
-+	struct bvec_chunk_iter citer;
- 
- 	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
- 
--	bio_for_each_segment_all(bv, bio, i)
-+	bio_for_each_chunk_segment_all(bv, bio, i, citer)
- 		;
- 	return i;
- }
--- 
-2.9.5
+T24gRnJpLCAyMDE4LTA2LTE1IGF0IDE4OjU1ICswMjAwLCBIYW5uZXMgUmVpbmVja2Ugd3JvdGU6
+DQo+IE9uIDA2LzE1LzIwMTggMDQ6MDcgUE0sIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gPiBP
+biBUaHUsIDIwMTgtMDYtMTQgYXQgMTU6MzggKzAyMDAsIEhhbm5lcyBSZWluZWNrZSB3cm90ZToN
+Cj4gPiA+IEZvciBwZXJmb3JtYW5jZSByZWFzb25zIHdlIHNob3VsZCBiZSBhYmxlIHRvIGFsbG9j
+YXRlIGFsbCBtZW1vcnkNCj4gPiA+IGZyb20gYSBnaXZlbiBOVU1BIG5vZGUsIHNvIHRoaXMgcGF0
+Y2ggYWRkcyBhIG5ldyBwYXJhbWV0ZXINCj4gPiA+ICdyZF9udW1hX25vZGUnIHRvIGFsbG93IHRo
+ZSB1c2VyIHRvIHNwZWNpZnkgdGhlIE5VTUEgbm9kZSBpZC4NCj4gPiA+IFdoZW4gcmVzdHJpY2lu
+ZyBmaW8gdG8gdXNlIHRoZSBzYW1lIE5VTUEgbm9kZSBJJ20gc2VlaW5nIGEgcGVyZm9ybWFuY2UN
+Cj4gPiA+IGJvb3N0IG9mIG1vcmUgdGhhbiAyMDAlLg0KPiA+IA0KPiA+IFBhc3NpbmcgdGhpcyBp
+bmZvcm1hdGlvbiB0aHJvdWdoIGEga2VybmVsIG1vZHVsZSBwYXJhbWV0ZXIgdG8gdGhlIGJyZCBr
+ZXJuZWwNCj4gPiBtb2R1bGUgc2VlbXMgd3JvbmcgdG8gbWUuIFRoZXJlIGNhbiBiZSBtdWx0aXBs
+ZSBicmQgaW5zdGFuY2VzLiBVc2luZyBhIGtlcm5lbA0KPiA+IG1vZHVsZSBwYXJhbWV0ZXIgbWFr
+ZXMgaXQgaW1wb3NzaWJsZSB0byBzcGVjaWZ5IGEgZGlmZmVyZW50IE5VTUEgbm9kZSBmb3INCj4g
+PiBkaWZmZXJlbnQgYnJkIGluc3RhbmNlcy4NCj4gDQo+IFRoaXMgcGF0Y2ggaGFzIHByaW1hcmls
+eSBkb25lIGZvciBzaW1wbGljaXR5OyBhbGwgdGhlIGV4aXN0aW5nIGJyZCANCj4gcGFyYW1ldGVy
+cyBhZmZlY3QgX2FsbF8gcmFtZGlza3MsIHNvIHRoaXMgcGF0Y2gga2VlcHMgdGhhdCBzdHlsZS4N
+Cj4gDQo+IElmIHlvdSB3YW50IHNvZW10aGluZyBtb3JlIGZpbmUtZ3JhaW5lZCB5b3UgY291bGQg
+dXNlIHRoZSBhcHByb2FjaCANCj4gc3VnZ2VzdGVkIGJ5IE1lbCBHb3JtYW4gYW5kIHVzZSAnbnVt
+YWN0bCcgdG8gcHJlLWZpbGwgdGhlIHJhbWRpc2sgdmlhICdkZCcuDQoNClRoYXQncyBhIGN1bWJl
+cnNvbWUgYXBwcm9hY2gsIGlsbHVzdHJhdGVkIGJ5IHRoZSBmYWN0IHRoYXQgTWVsIGZvcmdvdCB0
+byB1c2UNCmRpcmVjdCB3cml0ZXMgaW4gaGlzIGV4YW1wbGVzLiBJZiBNZWwgb3Zlcmxvb2tlZCB0
+aGF0IG1vcmUgcGVvcGxlIHdpbGwgb3Zlcmxvb2sNCnRvIHVzZSBkaXJlY3Qgd3JpdGVzLg0KDQpC
+YXJ0Lg0KDQoNCg==
