@@ -1,25 +1,47 @@
-Return-Path: <BATV+0eb41a859d58214bb3da+5409+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Fri, 15 Jun 2018 00:30:35 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
-	Mel Gorman <mgorman@suse.com>, Hannes Reinecke <hare@suse.com>
+Return-Path: <hare@suse.de>
 Subject: Re: [PATCH] brd: Allow ramdisk to be allocated on selected NUMA node
-Message-ID: <20180615073035.GA15535@infradead.org>
+To: Adam Manzanares <Adam.Manzanares@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Mel Gorman <mgorman@suse.com>, Hannes Reinecke <hare@suse.com>
 References: <20180614133832.110947-1-hare@suse.de>
  <08318d74-d81c-29e5-5350-525df96eaacb@kernel.dk>
  <20180614172954.79965d13@pentland.suse.de>
  <656e4ab7-7c5c-41af-5596-2e155ffb28e4@kernel.dk>
+ <20180614180937.591bb361@pentland.suse.de>
+ <eca17002-e8dc-1a8b-6cc3-5eaf49031636@wdc.com>
+ <bb90d333-fe4d-aa97-6c1c-66fb5b88dd6b@kernel.dk>
+ <53893c29-febc-14ff-314d-818ac79aa559@wdc.com>
+ <5f21f241-0ae0-ed7a-6935-3ef6e65d0950@kernel.dk>
+ <d68c9052-e9bc-8dc4-04dc-964aff29308b@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <a1034506-b50a-40f8-eee2-d353448da2fd@suse.de>
+Date: Fri, 15 Jun 2018 08:06:04 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <656e4ab7-7c5c-41af-5596-2e155ffb28e4@kernel.dk>
+In-Reply-To: <d68c9052-e9bc-8dc4-04dc-964aff29308b@wdc.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jun 14, 2018 at 09:33:35AM -0600, Jens Axboe wrote:
-> Next question - what does the memory allocator do if we run out of
-> memory on the given node? Should we punt to a different node if that
-> happens? Slower, but functional, seems preferable to not being able
-> to get memory.
+On 06/14/2018 10:53 PM, Adam Manzanares wrote:
+[ .. ]
+>>>
+>>> Then how about a numactl ... dd /dev/ram ... after the modprobe.
+>>
+>> Yes of course, or you could do that for every application that ends
+>> up in the path of the doing IO to it. The point of the option is to
+>> just make it explicit, and not have to either NUMA pin each task,
+>> or prefill all possible pages.
+>>
+> 
+> Makes sense, I have done some similar benchmarking and had to worry
+> about NUMA awareness and the numactl + dd approach seemed to work
+> because I wanted to not take a performance hit for page allocation
+> during the benchmarking.
+> 
+> Would anyone be interested in forcing the allocations to occur during
+> module initialization?
+> 
+YES.
 
-When using alloc_pages_node the passed in node id is just a hint, the
-allocator will use all avaiable memory if nedeed.
+Cheers,
+
+Hannes
