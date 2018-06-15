@@ -1,39 +1,44 @@
-Return-Path: <prvs=697b38d23=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "mgorman@suse.com" <mgorman@suse.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "hare@suse.com" <hare@suse.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:42295 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755405AbeFOQ4D (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Jun 2018 12:56:03 -0400
 Subject: Re: [PATCH] brd: Allow ramdisk to be allocated on selected NUMA node
-Date: Fri, 15 Jun 2018 16:58:59 +0000
-Message-ID: <323802aed4c7e2f84f58f07475a737565121cfde.camel@wdc.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+Cc: "mgorman@suse.com" <mgorman@suse.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "hare@suse.com" <hare@suse.com>
 References: <20180614133832.110947-1-hare@suse.de>
-	 <78b2e2924ee3ef28dcb900a3807a78d6d0fe57e0.camel@wdc.com>
-	 <9413635e-c293-d1eb-8edc-96d2e2d45f2d@suse.de>
-In-Reply-To: <9413635e-c293-d1eb-8edc-96d2e2d45f2d@suse.de>
-Content-Type: text/plain; charset="utf-8"
+ <78b2e2924ee3ef28dcb900a3807a78d6d0fe57e0.camel@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <9413635e-c293-d1eb-8edc-96d2e2d45f2d@suse.de>
+Date: Fri, 15 Jun 2018 18:55:58 +0200
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <78b2e2924ee3ef28dcb900a3807a78d6d0fe57e0.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-T24gRnJpLCAyMDE4LTA2LTE1IGF0IDE4OjU1ICswMjAwLCBIYW5uZXMgUmVpbmVja2Ugd3JvdGU6
-DQo+IE9uIDA2LzE1LzIwMTggMDQ6MDcgUE0sIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gPiBP
-biBUaHUsIDIwMTgtMDYtMTQgYXQgMTU6MzggKzAyMDAsIEhhbm5lcyBSZWluZWNrZSB3cm90ZToN
-Cj4gPiA+IEZvciBwZXJmb3JtYW5jZSByZWFzb25zIHdlIHNob3VsZCBiZSBhYmxlIHRvIGFsbG9j
-YXRlIGFsbCBtZW1vcnkNCj4gPiA+IGZyb20gYSBnaXZlbiBOVU1BIG5vZGUsIHNvIHRoaXMgcGF0
-Y2ggYWRkcyBhIG5ldyBwYXJhbWV0ZXINCj4gPiA+ICdyZF9udW1hX25vZGUnIHRvIGFsbG93IHRo
-ZSB1c2VyIHRvIHNwZWNpZnkgdGhlIE5VTUEgbm9kZSBpZC4NCj4gPiA+IFdoZW4gcmVzdHJpY2lu
-ZyBmaW8gdG8gdXNlIHRoZSBzYW1lIE5VTUEgbm9kZSBJJ20gc2VlaW5nIGEgcGVyZm9ybWFuY2UN
-Cj4gPiA+IGJvb3N0IG9mIG1vcmUgdGhhbiAyMDAlLg0KPiA+IA0KPiA+IFBhc3NpbmcgdGhpcyBp
-bmZvcm1hdGlvbiB0aHJvdWdoIGEga2VybmVsIG1vZHVsZSBwYXJhbWV0ZXIgdG8gdGhlIGJyZCBr
-ZXJuZWwNCj4gPiBtb2R1bGUgc2VlbXMgd3JvbmcgdG8gbWUuIFRoZXJlIGNhbiBiZSBtdWx0aXBs
-ZSBicmQgaW5zdGFuY2VzLiBVc2luZyBhIGtlcm5lbA0KPiA+IG1vZHVsZSBwYXJhbWV0ZXIgbWFr
-ZXMgaXQgaW1wb3NzaWJsZSB0byBzcGVjaWZ5IGEgZGlmZmVyZW50IE5VTUEgbm9kZSBmb3INCj4g
-PiBkaWZmZXJlbnQgYnJkIGluc3RhbmNlcy4NCj4gDQo+IFRoaXMgcGF0Y2ggaGFzIHByaW1hcmls
-eSBkb25lIGZvciBzaW1wbGljaXR5OyBhbGwgdGhlIGV4aXN0aW5nIGJyZCANCj4gcGFyYW1ldGVy
-cyBhZmZlY3QgX2FsbF8gcmFtZGlza3MsIHNvIHRoaXMgcGF0Y2gga2VlcHMgdGhhdCBzdHlsZS4N
-Cj4gDQo+IElmIHlvdSB3YW50IHNvZW10aGluZyBtb3JlIGZpbmUtZ3JhaW5lZCB5b3UgY291bGQg
-dXNlIHRoZSBhcHByb2FjaCANCj4gc3VnZ2VzdGVkIGJ5IE1lbCBHb3JtYW4gYW5kIHVzZSAnbnVt
-YWN0bCcgdG8gcHJlLWZpbGwgdGhlIHJhbWRpc2sgdmlhICdkZCcuDQoNClRoYXQncyBhIGN1bWJl
-cnNvbWUgYXBwcm9hY2gsIGlsbHVzdHJhdGVkIGJ5IHRoZSBmYWN0IHRoYXQgTWVsIGZvcmdvdCB0
-byB1c2UNCmRpcmVjdCB3cml0ZXMgaW4gaGlzIGV4YW1wbGVzLiBJZiBNZWwgb3Zlcmxvb2tlZCB0
-aGF0IG1vcmUgcGVvcGxlIHdpbGwgb3Zlcmxvb2sNCnRvIHVzZSBkaXJlY3Qgd3JpdGVzLg0KDQpC
-YXJ0Lg0KDQoNCg==
+On 06/15/2018 04:07 PM, Bart Van Assche wrote:
+> On Thu, 2018-06-14 at 15:38 +0200, Hannes Reinecke wrote:
+>> For performance reasons we should be able to allocate all memory
+>> from a given NUMA node, so this patch adds a new parameter
+>> 'rd_numa_node' to allow the user to specify the NUMA node id.
+>> When restricing fio to use the same NUMA node I'm seeing a performance
+>> boost of more than 200%.
+> 
+> Passing this information through a kernel module parameter to the brd kernel
+> module seems wrong to me. There can be multiple brd instances. Using a kernel
+> module parameter makes it impossible to specify a different NUMA node for
+> different brd instances.
+> 
+This patch has primarily done for simplicity; all the existing brd 
+parameters affect _all_ ramdisks, so this patch keeps that style.
+
+If you want soemthing more fine-grained you could use the approach 
+suggested by Mel Gorman and use 'numactl' to pre-fill the ramdisk via 'dd'.
+
+Cheers,
+
+Hannes
