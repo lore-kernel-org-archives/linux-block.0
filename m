@@ -1,40 +1,32 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:59818 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933811AbeFVWTs (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:34406 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753988AbeFPPUz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jun 2018 18:19:48 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Omar Sandoval <osandov@fb.com>
-Cc: linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH blktests 05/15] check: Avoid that shellcheck complains that $FULL appears unused
-Date: Fri, 22 Jun 2018 15:19:36 -0700
-Message-Id: <20180622221946.10987-6-bart.vanassche@wdc.com>
-In-Reply-To: <20180622221946.10987-1-bart.vanassche@wdc.com>
-References: <20180622221946.10987-1-bart.vanassche@wdc.com>
+        Sat, 16 Jun 2018 11:20:55 -0400
+Date: Sat, 16 Jun 2018 08:20:52 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>, NeilBrown <neilb@suse.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: why does __split_and_process_bio use bio_clone_bioset?
+Message-ID: <20180616152052.GA7934@infradead.org>
+References: <20180614081947.GA23375@infradead.org>
+ <20180614181245.GA1161@redhat.com>
+ <20180614200808.GA46373@redhat.com>
+ <20180615073846.GA29726@infradead.org>
+ <20180615182631.GA6906@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180615182631.GA6906@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-$FULL is a global variable. Avoid that shellcheck complains about it.
+On Fri, Jun 15, 2018 at 02:26:31PM -0400, Mike Snitzer wrote:
+> Yes.  Already queued, likely won't send to Linus until end of next week
+> though.. unless you want it upstream sooner?
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
----
- check | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/check b/check
-index 1774be4fe1a7..d9ffea6ec1f6 100755
---- a/check
-+++ b/check
-@@ -301,6 +301,8 @@ _call_test() {
- 	local test_func="$1"
- 	local seqres="${RESULTS_DIR}/${TEST_NAME}"
- 	FULL="${seqres}.full"
-+	# Avoid that shellcheck complains that $FULL appears unused.
-+	echo "$FULL" >/dev/null
- 	declare -A TEST_DEV_QUEUE_SAVED
- 
- 	_read_last_test_run
--- 
-2.17.1
+We only really need it as a baseline for the multi-page bio work, so
+no real rush.  I think I'll just include it with my pending cleanup
+series with a big 'DO NOT APPLY, will be in 4.18-rc2' marker.
