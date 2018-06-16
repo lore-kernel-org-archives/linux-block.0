@@ -1,38 +1,34 @@
-Return-Path: <dan.carpenter@oracle.com>
-Date: Wed, 20 Jun 2018 13:44:35 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: "Richard Russon (FlatCap)" <ldm@flatcap.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-ntfs-dev@lists.sourceforge.net,
-        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] partitions/ldm: Off by one in ldm_relative()
-Message-ID: <20180620104433.qegf5bakvcywzuga@kili.mountain>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-1857040130.protonmail.ch ([185.70.40.130]:64809 "EHLO
+        mail-1857040130.protonmail.ch" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S932741AbeFPMoQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 16 Jun 2018 08:44:16 -0400
+Date: Sat, 16 Jun 2018 08:25:56 -0400
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Fedja Beader <fedja@protonmail.ch>
+Reply-To: Fedja Beader <fedja@protonmail.ch>
+Subject: How to reattach a disconnected device with active device-mapper mappings on top
+Message-ID: <0aSIDZ2i1MLsXuBjfmtw40SGD5ohN1QiU-8E52lJXMdmHr0WuR-qJ9FrkUzUA9uMdg6c0QGgPuvuB7OiAWVtkg==@protonmail.ch>
+In-Reply-To: <QwoNd_VO1UTeANHRFO1qxNsb8lVeglvWeu_PohUt2pQqvo3zLMVW9MHwbBnQmC368b1Q4LLoBG5m7o7_kRxmag==@protonmail.ch>
+References: <QwoNd_VO1UTeANHRFO1qxNsb8lVeglvWeu_PohUt2pQqvo3zLMVW9MHwbBnQmC368b1Q4LLoBG5m7o7_kRxmag==@protonmail.ch>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-If base == buflen then we read one character past the end of buffer[].
+(This message was also posted to dm-devel@redhat.com)
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
-This is static analysis.  Not tested.  This code goes back to before the
-start of git.
+I have a hard disk connected to my laptop via an usb-sata bridge that someh=
+ow got disconnected. There is a stack of device-mapper mappings and a mount=
+ed filesystem on top of it that are currently failing all I/O. "dmsetup dep=
+s" reports
+"1 dependencies : (8, 16)".
 
-diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c
-index 0417937dfe99..8f4c302eb11b 100644
---- a/block/partitions/ldm.c
-+++ b/block/partitions/ldm.c
-@@ -636,12 +636,12 @@ static int ldm_relative(const u8 *buffer, int buflen, int base, int offset)
- {
- 
- 	base += offset;
--	if (!buffer || offset < 0 || base > buflen) {
-+	if (!buffer || offset < 0 || base >= buflen) {
- 		if (!buffer)
- 			ldm_error("!buffer");
- 		if (offset < 0)
- 			ldm_error("offset (%d) < 0", offset);
--		if (base > buflen)
-+		if (base >= buflen)
- 			ldm_error("base (%d) > buflen (%d)", base, buflen);
- 		return -1;
- 	}
+The same HDD is now reattached, but as /dev/sdc (8,32) and refuses to be at=
+tached as /dev/sdb, which is now a permanently vacant slot.
+How do I force this hard disk to attach as (8,16) so the whole device-mappe=
+r stack and the filesystem on top of it can resume working?
+
+Thank you,
+Fedja
