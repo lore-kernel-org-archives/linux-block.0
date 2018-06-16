@@ -1,42 +1,24 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:29608 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933738AbeFVWTt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jun 2018 18:19:49 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Omar Sandoval <osandov@fb.com>
-Cc: linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH blktests 08/15] check: Suppress a shellcheck warning about the DMESG_FILTER initialization
-Date: Fri, 22 Jun 2018 15:19:39 -0700
-Message-Id: <20180622221946.10987-9-bart.vanassche@wdc.com>
-In-Reply-To: <20180622221946.10987-1-bart.vanassche@wdc.com>
-References: <20180622221946.10987-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: list_add double add in blk_mq_check_expired()
+To: Borislav Petkov <bp@alien8.de>, linux-block@vger.kernel.org
+Cc: lkml <linux-kernel@vger.kernel.org>
+References: <20180616103605.GA28657@zn.tnic>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <78f4ff73-3b5a-1e1b-2996-b2b16437247c@kernel.dk>
+Date: Sat, 16 Jun 2018 08:46:37 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180616103605.GA28657@zn.tnic>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Avoid that shellcheck reports the following:
+On 6/16/18 4:36 AM, Borislav Petkov wrote:
+> Hi,
+> 
+> just triggered the below in a qemu guest, kernel is Linus' master from
+> yesterday + tip/master. It doesn't fire reliably so it could be some
+> transient thing of the merge window:
 
-check:396:2: warning: Use var=$(command) to assign output (or quote to assign string). [SC2209]
+Should be fixed in my for-linus branch, it'll go out today.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
----
- check | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/check b/check
-index d9ffea6ec1f6..cf2090f546a5 100755
---- a/check
-+++ b/check
-@@ -393,7 +393,7 @@ _call_test() {
- _run_test() {
- 	TEST_NAME="$1"
- 	CHECK_DMESG=1
--	DMESG_FILTER=cat
-+	DMESG_FILTER="cat"
- 
- 	# shellcheck disable=SC1090
- 	. "tests/${TEST_NAME}"
 -- 
-2.17.1
+Jens Axboe
