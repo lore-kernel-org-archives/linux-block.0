@@ -1,38 +1,27 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <prvs=6981406c9=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>
 Subject: Re: [PATCH 0/5] Five small zoned block device patches
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Date: Sat, 16 Jun 2018 20:58:36 +0000
+Message-ID: <1e6d378396dd44b1eb6945acb94b6d3988d4d32f.camel@wdc.com>
 References: <20180615215521.27435-1-bart.vanassche@wdc.com>
- <df519ecb-f945-0600-78ab-b81d55125268@kernel.dk>
- <1e6d378396dd44b1eb6945acb94b6d3988d4d32f.camel@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <dc5afd29-8586-c048-3e00-3a9b17ca861b@kernel.dk>
-Date: Sat, 16 Jun 2018 15:00:13 -0600
+	 <df519ecb-f945-0600-78ab-b81d55125268@kernel.dk>
+In-Reply-To: <df519ecb-f945-0600-78ab-b81d55125268@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1e6d378396dd44b1eb6945acb94b6d3988d4d32f.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 6/16/18 2:58 PM, Bart Van Assche wrote:
-> On Sat, 2018-06-16 at 12:27 -0600, Jens Axboe wrote:
->> On 6/15/18 3:55 PM, Bart Van Assche wrote:
->>> Hello Jens,
->>>
->>> In this patch series there are five patches with small improvements for the
->>> zoned block device code. Please consider these patches for the upstream kernel.
->>
->> Looks fine to me. Are you thinking 4.18 or 4.19?
-> 
-> Hello Jens,
-> 
-> I'm fine with either kernel version. These patches do not change any
-> functionality so queuing these patches is not urgent. However, the sooner
-> these get upstream the lower the change that any bug fixes that touch the
-> same code conflict with this patch series ...
-
-I like them all as cleanups, but as cleanups I think we should queue them
-up for 4.19. I'll do that.
-
--- 
-Jens Axboe
+T24gU2F0LCAyMDE4LTA2LTE2IGF0IDEyOjI3IC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
+biA2LzE1LzE4IDM6NTUgUE0sIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gPiBIZWxsbyBKZW5z
+LA0KPiA+IA0KPiA+IEluIHRoaXMgcGF0Y2ggc2VyaWVzIHRoZXJlIGFyZSBmaXZlIHBhdGNoZXMg
+d2l0aCBzbWFsbCBpbXByb3ZlbWVudHMgZm9yIHRoZQ0KPiA+IHpvbmVkIGJsb2NrIGRldmljZSBj
+b2RlLiBQbGVhc2UgY29uc2lkZXIgdGhlc2UgcGF0Y2hlcyBmb3IgdGhlIHVwc3RyZWFtIGtlcm5l
+bC4NCj4gDQo+IExvb2tzIGZpbmUgdG8gbWUuIEFyZSB5b3UgdGhpbmtpbmcgNC4xOCBvciA0LjE5
+Pw0KDQpIZWxsbyBKZW5zLA0KDQpJJ20gZmluZSB3aXRoIGVpdGhlciBrZXJuZWwgdmVyc2lvbi4g
+VGhlc2UgcGF0Y2hlcyBkbyBub3QgY2hhbmdlIGFueQ0KZnVuY3Rpb25hbGl0eSBzbyBxdWV1aW5n
+IHRoZXNlIHBhdGNoZXMgaXMgbm90IHVyZ2VudC4gSG93ZXZlciwgdGhlIHNvb25lcg0KdGhlc2Ug
+Z2V0IHVwc3RyZWFtIHRoZSBsb3dlciB0aGUgY2hhbmdlIHRoYXQgYW55IGJ1ZyBmaXhlcyB0aGF0
+IHRvdWNoIHRoZQ0Kc2FtZSBjb2RlIGNvbmZsaWN0IHdpdGggdGhpcyBwYXRjaCBzZXJpZXMgLi4u
+DQoNClRoYW5rcywNCg0KQmFydC4NCg0KDQoNCg==
