@@ -1,21 +1,23 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Mon, 18 Jun 2018 10:40:14 -0700
-From: Tejun Heo <tj@kernel.org>
-To: Jan Kara <jack@suse.cz>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Return-Path: <penguin-kernel@i-love.sakura.ne.jp>
 Subject: Re: [PATCH] bdi: Fix another oops in wb_workfn()
-Message-ID: <20180618174014.GY1351649@devbig577.frc2.facebook.com>
+To: Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>
 References: <20180618134658.32302-1-jack@suse.cz>
+From: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <e32deee5-97d4-9cc8-3eac-84e5ad9cc520@i-love.sakura.ne.jp>
+Date: Mon, 18 Jun 2018 23:38:12 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180618134658.32302-1-jack@suse.cz>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jun 18, 2018 at 03:46:58PM +0200, Jan Kara wrote:
+On 2018/06/18 22:46, Jan Kara wrote:
 > syzbot is reporting NULL pointer dereference at wb_workfn() [1] due to
+
+[1] https://syzkaller.appspot.com/bug?id=e0818ccb7e46190b3f1038b0c794299208ed4206
+
+line is missing.
+
 > wb->bdi->dev being NULL. And Dmitry confirmed that wb->state was
 > WB_shutting_down after wb->bdi->dev became NULL. This indicates that
 > unregister_bdi() failed to call wb_shutdown() on one of wb objects.
@@ -50,13 +52,18 @@ On Mon, Jun 18, 2018 at 03:46:58PM +0200, Jan Kara wrote:
 > mutex provides it for CONFIG_CGROUP_WRITEBACK case and without
 > CONFIG_CGROUP_WRITEBACK wb_shutdown() can be called only once from
 > bdi_unregister().
+
+Wow, this patch removes WB_shutting_down.
+
+A bit of worry for me is how long will this mutex_lock() sleep, for
+if there are a lot of wb objects to shutdown, sequentially doing
+wb_shutdown() might block someone's mutex_lock() for longer than
+khungtaskd's timeout period (typically 120 seconds) ?
+
 > 
 > Reported-by: syzbot <syzbot+4a7438e774b21ddd8eca@syzkaller.appspotmail.com>
 > Signed-off-by: Jan Kara <jack@suse.cz>
-
-Acked-by: Tejun Heo <tj@kernel.org>
-
-Thanks.
-
--- 
-tejun
+> ---
+>  include/linux/backing-dev-defs.h |  2 +-
+>  mm/backing-dev.c                 | 20 +++++++-------------
+>  2 files changed, 8 insertions(+), 14 deletions(-)
