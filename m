@@ -1,58 +1,32 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:26982 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933824AbeFVWTt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jun 2018 18:19:49 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Omar Sandoval <osandov@fb.com>
-Cc: linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH blktests 07/15] Avoid passing tests/block/002 arguments to _init_scsi_debug
-Date: Fri, 22 Jun 2018 15:19:38 -0700
-Message-Id: <20180622221946.10987-8-bart.vanassche@wdc.com>
-In-Reply-To: <20180622221946.10987-1-bart.vanassche@wdc.com>
-References: <20180622221946.10987-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <penguin-kernel@i-love.sakura.ne.jp>
+Subject: Re: general protection fault in loop_validate_file
+To: syzbot <syzbot+2f228435b0b9ec0ba068@syzkaller.appspotmail.com>,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <0000000000006a6282056eeb71da@google.com>
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Message-ID: <e9bd0998-b9ea-0028-b429-58baac69b877@I-love.SAKURA.ne.jp>
+Date: Mon, 18 Jun 2018 23:51:30 +0900
+MIME-Version: 1.0
+In-Reply-To: <0000000000006a6282056eeb71da@google.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-This patch avoids that shellcheck reports the following:
+On 2018/06/18 23:33, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following crash on:
+> 
+> HEAD commit:    ce397d215ccd Linux 4.18-rc1
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=129dfccf800000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=f390986c4f7cd566
+> dashboard link: https://syzkaller.appspot.com/bug?extid=2f228435b0b9ec0ba068
+> compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
+> 
+> Unfortunately, I don't have any reproducer for this crash yet.
 
-tests/block/002:34:7: note: Use _init_scsi_debug "$@" if function's $1 should mean script's $1. [SC2119]
+This is a known bug. We are waiting for response from Jens Axboe at
+http://lkml.kernel.org/r/748bce03-afda-4ed2-13b3-1fcd01d57770@kernel.dk .
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
----
- common/scsi_debug | 3 +++
- tests/block/002   | 2 +-
- 2 files changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/common/scsi_debug b/common/scsi_debug
-index e26e85637369..d8e6b71899a3 100644
---- a/common/scsi_debug
-+++ b/common/scsi_debug
-@@ -21,7 +21,10 @@ _have_scsi_debug() {
- 	_have_module scsi_debug
- }
- 
-+# The _init_scsi_debug() argument list is passed to modprobe scsi_debug. "--"
-+# is filtered out from the start of the argument list.
- _init_scsi_debug() {
-+	[ "$1" = "--" ] && shift
- 	if ! modprobe -r scsi_debug || ! modprobe scsi_debug "$@"; then
- 		return 1
- 	fi
-diff --git a/tests/block/002 b/tests/block/002
-index 32a0f818b95b..10e3f157c018 100755
---- a/tests/block/002
-+++ b/tests/block/002
-@@ -31,7 +31,7 @@ requires() {
- test() {
- 	echo "Running ${TEST_NAME}"
- 
--	if ! _init_scsi_debug; then
-+	if ! _init_scsi_debug --; then
- 		return 1
- 	fi
- 
--- 
-2.17.1
+#syz dup: general protection fault in lo_ioctl (2)
