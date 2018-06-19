@@ -1,78 +1,38 @@
-Return-Path: <jianchao.w.wang@oracle.com>
+Return-Path: <prvs=701cef09f=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: [PATCH] blk-mq: use blk_mq_timeout_work to limit the max timeout
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Date: Tue, 19 Jun 2018 15:18:05 +0000
+Message-ID: <884a5cbb5622ca5c890585a8d5dff0e3a1d60cfe.camel@wdc.com>
 References: <1529391610-1654-1-git-send-email-jianchao.w.wang@oracle.com>
- <884a5cbb5622ca5c890585a8d5dff0e3a1d60cfe.camel@wdc.com>
-From: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <dd0484f6-ad41-5607-107f-4c487a739478@oracle.com>
-Date: Wed, 20 Jun 2018 09:28:10 +0800
+In-Reply-To: <1529391610-1654-1-git-send-email-jianchao.w.wang@oracle.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <884a5cbb5622ca5c890585a8d5dff0e3a1d60cfe.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Bart
-
-Thanks for your kindly response.
-
-On 06/19/2018 11:18 PM, Bart Van Assche wrote:
-> On Tue, 2018-06-19 at 15:00 +0800, Jianchao Wang wrote:
->> blk_rq_timeout is needed to limit the max timeout value, otherwise,
->> a idle hctx cannot be deactivated timely in shared-tag case.
->>
->> Fixes: 12f5b931 (blk-mq: Remove generation seqeunce)
->> Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
->> ---
->>  block/blk-mq.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index 70c65bb..ccebe7b 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -868,7 +868,7 @@ static void blk_mq_timeout_work(struct work_struct *work)
->>  	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &next);
->>  
->>  	if (next != 0) {
->> -		mod_timer(&q->timeout, next);
->> +		mod_timer(&q->timeout, blk_rq_timeout(round_jiffies_up(next)));
->>  	} else {
->>  		/*
->>  		 * Request timeouts are handled as a forward rolling timer. If
-> 
-> Hello Jianchao,
-> 
-> What makes you think that it would be necessary to call blk_rq_timeout() from
-> blk_mq_timeout_work()? Have you noticed that blk_add_timer() already calls that
-> function? I think it is not necessary to call blk_rq_timeout() from
-> blk_mq_timeout_work() because it is guaranteed in that function that the next
-> timeout is less than BLK_MAX_TIMEOUT jiffies in the future.
-> 
-
-blk_add_timer will not re-arm the timer if the timer's expire value is before the new rq's expire value.
-
-Let's look at the following scenario.
-
-0                    +30s
-|__________________|___|
-T0                T1   T2
-
-T1 = T2 - 1 jiffies 
-
-T0:  rq_a is issued and q->timer is armed and will expire at T2
-     then rq_a is completed.
-T1:  rq_b is issued and q->timer is not re-armed, because its next expire time is T2 < (T1 + 30s)
-
-T2:  if rq_b have not been completed when timer expires at T2, timer would be re-armed based on the rq_b 
-     If we don't have blk_rq_timerout here, the next expire time is about T2 + 30s.
- 
-This is not good for sharing-tag case.
-
-Thanks
-Jianchao
-
-> 
-> 
+T24gVHVlLCAyMDE4LTA2LTE5IGF0IDE1OjAwICswODAwLCBKaWFuY2hhbyBXYW5nIHdyb3RlOg0K
+PiBibGtfcnFfdGltZW91dCBpcyBuZWVkZWQgdG8gbGltaXQgdGhlIG1heCB0aW1lb3V0IHZhbHVl
+LCBvdGhlcndpc2UsDQo+IGEgaWRsZSBoY3R4IGNhbm5vdCBiZSBkZWFjdGl2YXRlZCB0aW1lbHkg
+aW4gc2hhcmVkLXRhZyBjYXNlLg0KPiANCj4gRml4ZXM6IDEyZjViOTMxIChibGstbXE6IFJlbW92
+ZSBnZW5lcmF0aW9uIHNlcWV1bmNlKQ0KPiBTaWduZWQtb2ZmLWJ5OiBKaWFuY2hhbyBXYW5nIDxq
+aWFuY2hhby53LndhbmdAb3JhY2xlLmNvbT4NCj4gLS0tDQo+ICBibG9jay9ibGstbXEuYyB8IDIg
+Ky0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPiAN
+Cj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1tcS5jIGIvYmxvY2svYmxrLW1xLmMNCj4gaW5kZXgg
+NzBjNjViYi4uY2NlYmU3YiAxMDA2NDQNCj4gLS0tIGEvYmxvY2svYmxrLW1xLmMNCj4gKysrIGIv
+YmxvY2svYmxrLW1xLmMNCj4gQEAgLTg2OCw3ICs4NjgsNyBAQCBzdGF0aWMgdm9pZCBibGtfbXFf
+dGltZW91dF93b3JrKHN0cnVjdCB3b3JrX3N0cnVjdCAqd29yaykNCj4gIAlibGtfbXFfcXVldWVf
+dGFnX2J1c3lfaXRlcihxLCBibGtfbXFfY2hlY2tfZXhwaXJlZCwgJm5leHQpOw0KPiAgDQo+ICAJ
+aWYgKG5leHQgIT0gMCkgew0KPiAtCQltb2RfdGltZXIoJnEtPnRpbWVvdXQsIG5leHQpOw0KPiAr
+CQltb2RfdGltZXIoJnEtPnRpbWVvdXQsIGJsa19ycV90aW1lb3V0KHJvdW5kX2ppZmZpZXNfdXAo
+bmV4dCkpKTsNCj4gIAl9IGVsc2Ugew0KPiAgCQkvKg0KPiAgCQkgKiBSZXF1ZXN0IHRpbWVvdXRz
+IGFyZSBoYW5kbGVkIGFzIGEgZm9yd2FyZCByb2xsaW5nIHRpbWVyLiBJZg0KDQpIZWxsbyBKaWFu
+Y2hhbywNCg0KV2hhdCBtYWtlcyB5b3UgdGhpbmsgdGhhdCBpdCB3b3VsZCBiZSBuZWNlc3Nhcnkg
+dG8gY2FsbCBibGtfcnFfdGltZW91dCgpIGZyb20NCmJsa19tcV90aW1lb3V0X3dvcmsoKT8gSGF2
+ZSB5b3Ugbm90aWNlZCB0aGF0IGJsa19hZGRfdGltZXIoKSBhbHJlYWR5IGNhbGxzIHRoYXQNCmZ1
+bmN0aW9uPyBJIHRoaW5rIGl0IGlzIG5vdCBuZWNlc3NhcnkgdG8gY2FsbCBibGtfcnFfdGltZW91
+dCgpIGZyb20NCmJsa19tcV90aW1lb3V0X3dvcmsoKSBiZWNhdXNlIGl0IGlzIGd1YXJhbnRlZWQg
+aW4gdGhhdCBmdW5jdGlvbiB0aGF0IHRoZSBuZXh0DQp0aW1lb3V0IGlzIGxlc3MgdGhhbiBCTEtf
+TUFYX1RJTUVPVVQgamlmZmllcyBpbiB0aGUgZnV0dXJlLg0KDQpCYXJ0Lg0KDQoNCg0K
