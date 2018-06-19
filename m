@@ -1,43 +1,41 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:51907 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933304AbeFVP3W (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jun 2018 11:29:22 -0400
-Subject: Re: [PATCH 0/3] scsi: scsi-mq: don't hold host_busy in IO path
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Omar Sandoval <osandov@fb.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Don Brace <don.brace@microsemi.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Laurence Oberman <loberman@redhat.com>
-References: <20180420065742.8043-1-ming.lei@redhat.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-Message-ID: <994729bc-7ca4-6671-d454-d4612ce59b25@wdc.com>
-Date: Fri, 22 Jun 2018 08:29:20 -0700
-MIME-Version: 1.0
-In-Reply-To: <20180420065742.8043-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+94b2d661b7de03f6cf2e+5413+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Boaz Harrosh <ooo@electrozaur.com>,
+	linux-block@vger.kernel.org,
+	linux-bcache@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 4/6] block: remove bio_clone_kmalloc
+Date: Tue, 19 Jun 2018 06:52:14 +0200
+Message-Id: <20180619045216.21130-5-hch@lst.de>
+In-Reply-To: <20180619045216.21130-1-hch@lst.de>
+References: <20180619045216.21130-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-On 04/20/18 00:00, Ming Lei wrote:
-> This patches removes the expensive atomic opeation on host-wide counter
-> of .host_busy for scsi-mq, and it is observed that IOPS can be increased by
-> 15% with this change in IO test over scsi_debug.
+Unused now.
 
-Hello Ming,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ include/linux/bio.h | 6 ------
+ 1 file changed, 6 deletions(-)
 
-Do you want to resend these patches to Martin or do you perhaps that I 
-do that myself?
-
-Thanks,
-
-Bart.
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index f08f5fe7bd08..430807f9f44b 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -443,12 +443,6 @@ static inline struct bio *bio_kmalloc(gfp_t gfp_mask, unsigned int nr_iovecs)
+ 	return bio_alloc_bioset(gfp_mask, nr_iovecs, NULL);
+ }
+ 
+-static inline struct bio *bio_clone_kmalloc(struct bio *bio, gfp_t gfp_mask)
+-{
+-	return bio_clone_bioset(bio, gfp_mask, NULL);
+-
+-}
+-
+ extern blk_qc_t submit_bio(struct bio *);
+ 
+ extern void bio_endio(struct bio *);
+-- 
+2.17.1
