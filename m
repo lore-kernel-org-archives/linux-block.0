@@ -1,33 +1,54 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH RESENT] blk-mq: use blk_rq_timeout to limit the max timeout
-Date: Tue, 19 Jun 2018 15:03:16 +0800
-Message-Id: <1529391796-1819-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <colyli@suse.de>
+Subject: Re: [PATCH 2/6] bcache: don't clone bio in bch_data_verify
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>, Boaz Harrosh <ooo@electrozaur.com>,
+ linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+ dm-devel@redhat.com
+References: <20180619045216.21130-1-hch@lst.de>
+ <20180619045216.21130-3-hch@lst.de>
+From: Coly Li <colyli@suse.de>
+Message-ID: <16f9edb8-1884-ef00-b913-f88db1b80695@suse.de>
+Date: Tue, 19 Jun 2018 15:41:43 +0800
+MIME-Version: 1.0
+In-Reply-To: <20180619045216.21130-3-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-blk_rq_timeout is needed to limit the max timeout value, otherwise,
-a idle hctx cannot be deactivated timely in shared-tag case.
+On 2018/6/19 12:52 PM, Christoph Hellwig wrote:
+> We immediately overwrite the biovec array, so instead just allocate
+> a new bio and copy over the disk, setor and size.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Fixes: 12f5b931 (blk-mq: Remove generation seqeunce)
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
----
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+It looks good to me.  Acked-by: Coly Li <colyli@suse.de>
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 70c65bb..ccebe7b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -868,7 +868,7 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &next);
- 
- 	if (next != 0) {
--		mod_timer(&q->timeout, next);
-+		mod_timer(&q->timeout, blk_rq_timeout(round_jiffies_up(next)));
- 	} else {
- 		/*
- 		 * Request timeouts are handled as a forward rolling timer. If
--- 
-2.7.4
+Thanks.
+
+Coly Li
+
+> ---
+>  drivers/md/bcache/debug.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
+> index d030ce3025a6..04d146711950 100644
+> --- a/drivers/md/bcache/debug.c
+> +++ b/drivers/md/bcache/debug.c
+> @@ -110,11 +110,15 @@ void bch_data_verify(struct cached_dev *dc, struct bio *bio)
+>  	struct bio_vec bv, cbv;
+>  	struct bvec_iter iter, citer = { 0 };
+>  
+> -	check = bio_clone_kmalloc(bio, GFP_NOIO);
+> +	check = bio_kmalloc(GFP_NOIO, bio_segments(bio));
+>  	if (!check)
+>  		return;
+> +	check->bi_disk = bio->bi_disk;
+>  	check->bi_opf = REQ_OP_READ;
+> +	check->bi_iter.bi_sector = bio->bi_iter.bi_sector;
+> +	check->bi_iter.bi_size = bio->bi_iter.bi_size;
+>  
+> +	bch_bio_map(check, NULL);
+>  	if (bch_bio_alloc_pages(check, GFP_NOIO))
+>  		goto out_put;
+>  
+> 
