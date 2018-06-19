@@ -1,25 +1,106 @@
-Return-Path: <prvs=701cef09f=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] blk-mq: use mutex_trylock to avoid lock inversion
-Date: Tue, 19 Jun 2018 15:20:39 +0000
-Message-ID: <2409013d789ca266879d24c815b76c2193e23fe3.camel@wdc.com>
-References: <1529391637-1704-1-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1529391637-1704-1-git-send-email-jianchao.w.wang@oracle.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] blk-mq: use mutex_trylock to avoid lock inversion
+Date: Tue, 19 Jun 2018 15:00:37 +0800
+Message-Id: <1529391637-1704-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTA2LTE5IGF0IDE1OjAwICswODAwLCBKaWFuY2hhbyBXYW5nIHdyb3RlOg0K
-PiBDdXJyZW50bHksIHRoZSBrb2JqZWN0X2RlbCBmb3Iga29ianMgb2YgbXEsIGhjdHggYW5kIGN0
-eCBpcyBpbnZva2VkDQo+IHVuZGVyIHN5c2ZzX2xvY2ssIGxvY2sgaW52ZXJzaW9uIHdpbGwgY29t
-ZSB1cCB3aGVuIG90aGVyIG9uZSBpcw0KPiBhY2Vzc2luZyB0aGUgYXNzb2NpYXRlZCBzeXNmcyBm
-aWxlIGFuZCB0cnlpbmcgdG8gYWNxdWlyZSB0aGUNCj4gc3lzZnNfbG9jay4gVG8gZml4IGl0LCB1
-c2UgbXV0ZXhfdHJ5bG9jayBpbiBibGtfbXFfc3lzZnNfb3BzIGFuZA0KPiBibGtfbXFfaHdfc3lz
-ZnNfb3BzLCBpZiB0aGUgbG9jayBpbiBvbiBjb250ZW5kaW5nLCByZXR1cm4gLUVBR0FJTi4NCg0K
-SXMgdGhpcyBhIHRoZW9yZXRpY2FsIGlzc3VlIG9yIHNvbWV0aGluZyB5b3UgYWN0dWFsbHkgcmFu
-IGludG8/IFdoaWNoIGxvY2sNCm90aGVyIHRoYW4gc3lzZnNfbG9jayBkbyB5b3UgdGhpbmsgaXMg
-aW52b2x2ZWQgaW4gdGhlIGxvY2sgaW52ZXJzaW9uPw0KDQpCYXJ0Lg0KDQoNCg0K
+Currently, the kobject_del for kobjs of mq, hctx and ctx is invoked
+under sysfs_lock, lock inversion will come up when other one is
+acessing the associated sysfs file and trying to acquire the
+sysfs_lock. To fix it, use mutex_trylock in blk_mq_sysfs_ops and
+blk_mq_hw_sysfs_ops, if the lock in on contending, return -EAGAIN.
+
+Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+---
+ block/blk-mq-sysfs.c | 52 ++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 32 insertions(+), 20 deletions(-)
+
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index aafb442..210804f 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -53,11 +53,14 @@ static ssize_t blk_mq_sysfs_show(struct kobject *kobj, struct attribute *attr,
+ 	if (!entry->show)
+ 		return -EIO;
+ 
+-	res = -ENOENT;
+-	mutex_lock(&q->sysfs_lock);
+-	if (!blk_queue_dying(q))
+-		res = entry->show(ctx, page);
+-	mutex_unlock(&q->sysfs_lock);
++	res = -EAGAIN;
++	if (mutex_trylock(&q->sysfs_lock)) {
++		if (!blk_queue_dying(q))
++			res = entry->show(ctx, page);
++		else
++			res = -ENOENT;
++		mutex_unlock(&q->sysfs_lock);
++	}
+ 	return res;
+ }
+ 
+@@ -76,11 +79,14 @@ static ssize_t blk_mq_sysfs_store(struct kobject *kobj, struct attribute *attr,
+ 	if (!entry->store)
+ 		return -EIO;
+ 
+-	res = -ENOENT;
+-	mutex_lock(&q->sysfs_lock);
+-	if (!blk_queue_dying(q))
+-		res = entry->store(ctx, page, length);
+-	mutex_unlock(&q->sysfs_lock);
++	res = -EAGAIN;
++	if (mutex_trylock(&q->sysfs_lock)) {
++		if (!blk_queue_dying(q))
++			res = entry->store(ctx, page, length);
++		else
++			res = -ENOENT;
++		mutex_unlock(&q->sysfs_lock);
++	}
+ 	return res;
+ }
+ 
+@@ -99,11 +105,14 @@ static ssize_t blk_mq_hw_sysfs_show(struct kobject *kobj,
+ 	if (!entry->show)
+ 		return -EIO;
+ 
+-	res = -ENOENT;
+-	mutex_lock(&q->sysfs_lock);
+-	if (!blk_queue_dying(q))
+-		res = entry->show(hctx, page);
+-	mutex_unlock(&q->sysfs_lock);
++	res = -EAGAIN;
++	if (mutex_trylock(&q->sysfs_lock)) {
++		if (!blk_queue_dying(q))
++			res = entry->show(hctx, page);
++		else
++			res = -ENOENT;
++		mutex_unlock(&q->sysfs_lock);
++	}
+ 	return res;
+ }
+ 
+@@ -123,11 +132,14 @@ static ssize_t blk_mq_hw_sysfs_store(struct kobject *kobj,
+ 	if (!entry->store)
+ 		return -EIO;
+ 
+-	res = -ENOENT;
+-	mutex_lock(&q->sysfs_lock);
+-	if (!blk_queue_dying(q))
+-		res = entry->store(hctx, page, length);
+-	mutex_unlock(&q->sysfs_lock);
++	res = -EAGAIN;
++	if (mutex_trylock(&q->sysfs_lock)) {
++		if (!blk_queue_dying(q))
++			res = entry->store(hctx, page, length);
++		else
++			res = -ENOENT;
++		mutex_unlock(&q->sysfs_lock);
++	}
+ 	return res;
+ }
+ 
+-- 
+2.7.4
