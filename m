@@ -1,55 +1,57 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:47342 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757233AbeFSUYJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Jun 2018 16:24:09 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Omar Sandoval <osandov@fb.com>
-Cc: linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH 2/9] Annotate include statements in shell scripts where the source file is a variable
-Date: Tue, 19 Jun 2018 13:23:46 -0700
-Message-Id: <20180619202353.23631-3-bart.vanassche@wdc.com>
-In-Reply-To: <20180619202353.23631-1-bart.vanassche@wdc.com>
-References: <20180619202353.23631-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+94b2d661b7de03f6cf2e+5413+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Boaz Harrosh <ooo@electrozaur.com>,
+	linux-block@vger.kernel.org,
+	linux-bcache@vger.kernel.org,
+	dm-devel@redhat.com,
+	Mike Snitzer <snitzer@redhat.com>,
+	stable@vger.kernel.org
+Subject: [PATCH 1/6] dm: use bio_split() when splitting out the already processed bio
+Date: Tue, 19 Jun 2018 06:52:11 +0200
+Message-Id: <20180619045216.21130-2-hch@lst.de>
+In-Reply-To: <20180619045216.21130-1-hch@lst.de>
+References: <20180619045216.21130-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-This causes shellcheck to stop complaining about these include statements.
+From: Mike Snitzer <snitzer@redhat.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Use of bio_clone_bioset() is inefficient if there is no need to clone
+the original bio's bio_vec array.  Best to use the bio_clone_fast()
+variant.  Also, just using bio_advance() is only part of what is needed
+to properly setup the clone -- it doesn't account for the various
+bio_integrity() related work that also needs to be performed (see
+bio_split).
+
+Address both of these issues by switching from bio_clone_bioset() to
+bio_split().
+
+Fixes: 18a25da8 ("dm: ensure bio submission follows a depth-first tree walk")
+Cc: stable@vger.kernel.org # 4.15+, requires removal of '&' before md->queue->bio_split
+Reported-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: NeilBrown <neilb@suse.com>
+Signed-off-by: Mike Snitzer <snitzer@redhat.com>
 ---
- check | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/md/dm.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/check b/check
-index 4baa8dde2436..5e1ba7bc8401 100755
---- a/check
-+++ b/check
-@@ -23,6 +23,7 @@ _found_test() {
- 
- 	unset DESCRIPTION QUICK TIMED requires device_requires test test_device
- 
-+	# shellcheck disable=SC1090
- 	if ! . "tests/${test_name}"; then
- 		return 1
- 	fi
-@@ -392,6 +393,7 @@ _run_test() {
- 	CHECK_DMESG=1
- 	DMESG_FILTER=cat
- 
-+	# shellcheck disable=SC1090
- 	. "tests/${TEST_NAME}"
- 
- 	if declare -fF test >/dev/null; then
-@@ -432,6 +434,7 @@ _run_group() {
- 	local tests=("$@")
- 	local group="${tests[0]%/*}"
- 
-+	# shellcheck disable=SC1090
- 	. "tests/${group}/group"
- 
- 	if declare -fF group_requires >/dev/null && ! group_requires; then
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index e65429a29c06..a3b103e8e3ce 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1606,10 +1606,9 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
+ 				 * the usage of io->orig_bio in dm_remap_zone_report()
+ 				 * won't be affected by this reassignment.
+ 				 */
+-				struct bio *b = bio_clone_bioset(bio, GFP_NOIO,
+-								 &md->queue->bio_split);
++				struct bio *b = bio_split(bio, bio_sectors(bio) - ci.sector_count,
++							  GFP_NOIO, &md->queue->bio_split);
+ 				ci.io->orig_bio = b;
+-				bio_advance(bio, (bio_sectors(bio) - ci.sector_count) << 9);
+ 				bio_chain(b, bio);
+ 				ret = generic_make_request(bio);
+ 				break;
 -- 
 2.17.1
