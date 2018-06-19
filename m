@@ -1,54 +1,46 @@
-Return-Path: <colyli@suse.de>
-Subject: Re: [PATCH 2/6] bcache: don't clone bio in bch_data_verify
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>, Boaz Harrosh <ooo@electrozaur.com>,
- linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
- dm-devel@redhat.com
+Return-Path: <BATV+94b2d661b7de03f6cf2e+5413+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Boaz Harrosh <ooo@electrozaur.com>,
+	linux-block@vger.kernel.org,
+	linux-bcache@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 2/6] bcache: don't clone bio in bch_data_verify
+Date: Tue, 19 Jun 2018 06:52:12 +0200
+Message-Id: <20180619045216.21130-3-hch@lst.de>
+In-Reply-To: <20180619045216.21130-1-hch@lst.de>
 References: <20180619045216.21130-1-hch@lst.de>
- <20180619045216.21130-3-hch@lst.de>
-From: Coly Li <colyli@suse.de>
-Message-ID: <16f9edb8-1884-ef00-b913-f88db1b80695@suse.de>
-Date: Tue, 19 Jun 2018 15:41:43 +0800
-MIME-Version: 1.0
-In-Reply-To: <20180619045216.21130-3-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 2018/6/19 12:52 PM, Christoph Hellwig wrote:
-> We immediately overwrite the biovec array, so instead just allocate
-> a new bio and copy over the disk, setor and size.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+We immediately overwrite the biovec array, so instead just allocate
+a new bio and copy over the disk, setor and size.
 
-It looks good to me.  Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/md/bcache/debug.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Thanks.
-
-Coly Li
-
-> ---
->  drivers/md/bcache/debug.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
-> index d030ce3025a6..04d146711950 100644
-> --- a/drivers/md/bcache/debug.c
-> +++ b/drivers/md/bcache/debug.c
-> @@ -110,11 +110,15 @@ void bch_data_verify(struct cached_dev *dc, struct bio *bio)
->  	struct bio_vec bv, cbv;
->  	struct bvec_iter iter, citer = { 0 };
->  
-> -	check = bio_clone_kmalloc(bio, GFP_NOIO);
-> +	check = bio_kmalloc(GFP_NOIO, bio_segments(bio));
->  	if (!check)
->  		return;
-> +	check->bi_disk = bio->bi_disk;
->  	check->bi_opf = REQ_OP_READ;
-> +	check->bi_iter.bi_sector = bio->bi_iter.bi_sector;
-> +	check->bi_iter.bi_size = bio->bi_iter.bi_size;
->  
-> +	bch_bio_map(check, NULL);
->  	if (bch_bio_alloc_pages(check, GFP_NOIO))
->  		goto out_put;
->  
-> 
+diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
+index d030ce3025a6..04d146711950 100644
+--- a/drivers/md/bcache/debug.c
++++ b/drivers/md/bcache/debug.c
+@@ -110,11 +110,15 @@ void bch_data_verify(struct cached_dev *dc, struct bio *bio)
+ 	struct bio_vec bv, cbv;
+ 	struct bvec_iter iter, citer = { 0 };
+ 
+-	check = bio_clone_kmalloc(bio, GFP_NOIO);
++	check = bio_kmalloc(GFP_NOIO, bio_segments(bio));
+ 	if (!check)
+ 		return;
++	check->bi_disk = bio->bi_disk;
+ 	check->bi_opf = REQ_OP_READ;
++	check->bi_iter.bi_sector = bio->bi_iter.bi_sector;
++	check->bi_iter.bi_size = bio->bi_iter.bi_size;
+ 
++	bch_bio_map(check, NULL);
+ 	if (bch_bio_alloc_pages(check, GFP_NOIO))
+ 		goto out_put;
+ 
+-- 
+2.17.1
