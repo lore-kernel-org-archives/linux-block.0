@@ -1,28 +1,41 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:55382 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754502AbeFYJHw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jun 2018 05:07:52 -0400
-Date: Mon, 25 Jun 2018 11:07:50 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/9] common/rc: Fix _have_tracepoint()
-Message-ID: <20180625090750.qn5uq2jfjeu74bqc@linux-x5ow.site>
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:31673 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757081AbeFSUX4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 Jun 2018 16:23:56 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Omar Sandoval <osandov@fb.com>
+Cc: linux-block@vger.kernel.org,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH 1/9] common/rc: Fix _have_tracepoint()
+Date: Tue, 19 Jun 2018 13:23:45 -0700
+Message-Id: <20180619202353.23631-2-bart.vanassche@wdc.com>
+In-Reply-To: <20180619202353.23631-1-bart.vanassche@wdc.com>
 References: <20180619202353.23631-1-bart.vanassche@wdc.com>
- <20180619202353.23631-2-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20180619202353.23631-2-bart.vanassche@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Make sure that _have_tracepoint() uses the argument passed to that
+function instead of using an undefined variable.
+
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+---
+ common/rc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/common/rc b/common/rc
+index 7f1728025364..7592400dda82 100644
+--- a/common/rc
++++ b/common/rc
+@@ -112,6 +112,8 @@ _have_tracefs() {
+ }
+ 
+ _have_tracepoint() {
++	local event=$1
++
+ 	if [[ ! -d /sys/kernel/debug/tracing/events/${event} ]]; then
+ 		SKIP_REASON="tracepoint ${event} does not exist"
+ 		return 1
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.17.1
