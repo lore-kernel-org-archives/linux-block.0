@@ -1,29 +1,42 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:56538 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754465AbeFYJQP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jun 2018 05:16:15 -0400
-Date: Mon, 25 Jun 2018 11:16:13 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 8/9] check: Suppress a shellcheck warning about the
- DMESG_FILTER initialization
-Message-ID: <20180625091613.6tscwtlfvifiykx4@linux-x5ow.site>
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:43081 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S967265AbeFSUYd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 Jun 2018 16:24:33 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Omar Sandoval <osandov@fb.com>
+Cc: linux-block@vger.kernel.org,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH 8/9] check: Suppress a shellcheck warning about the DMESG_FILTER initialization
+Date: Tue, 19 Jun 2018 13:23:52 -0700
+Message-Id: <20180619202353.23631-9-bart.vanassche@wdc.com>
+In-Reply-To: <20180619202353.23631-1-bart.vanassche@wdc.com>
 References: <20180619202353.23631-1-bart.vanassche@wdc.com>
- <20180619202353.23631-9-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20180619202353.23631-9-bart.vanassche@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Avoid that shellcheck reports the following:
+
+check:396:2: warning: Use var=$(command) to assign output (or quote to assign string). [SC2209]
+
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+---
+ check | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/check b/check
+index f1feb96b293e..e7439e163884 100755
+--- a/check
++++ b/check
+@@ -393,7 +393,7 @@ _call_test() {
+ _run_test() {
+ 	TEST_NAME="$1"
+ 	CHECK_DMESG=1
+-	DMESG_FILTER=cat
++	DMESG_FILTER="cat"
+ 
+ 	# shellcheck disable=SC1090
+ 	. "tests/${TEST_NAME}"
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.17.1
