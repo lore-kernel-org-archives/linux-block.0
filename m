@@ -1,29 +1,55 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:55484 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754314AbeFYJI0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jun 2018 05:08:26 -0400
-Date: Mon, 25 Jun 2018 11:08:25 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/9] Annotate include statements in shell scripts where
- the source file is a variable
-Message-ID: <20180625090825.wocj4kmmahornj4e@linux-x5ow.site>
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:47342 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757233AbeFSUYJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 Jun 2018 16:24:09 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Omar Sandoval <osandov@fb.com>
+Cc: linux-block@vger.kernel.org,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH 2/9] Annotate include statements in shell scripts where the source file is a variable
+Date: Tue, 19 Jun 2018 13:23:46 -0700
+Message-Id: <20180619202353.23631-3-bart.vanassche@wdc.com>
+In-Reply-To: <20180619202353.23631-1-bart.vanassche@wdc.com>
 References: <20180619202353.23631-1-bart.vanassche@wdc.com>
- <20180619202353.23631-3-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20180619202353.23631-3-bart.vanassche@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+This causes shellcheck to stop complaining about these include statements.
+
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+---
+ check | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/check b/check
+index 4baa8dde2436..5e1ba7bc8401 100755
+--- a/check
++++ b/check
+@@ -23,6 +23,7 @@ _found_test() {
+ 
+ 	unset DESCRIPTION QUICK TIMED requires device_requires test test_device
+ 
++	# shellcheck disable=SC1090
+ 	if ! . "tests/${test_name}"; then
+ 		return 1
+ 	fi
+@@ -392,6 +393,7 @@ _run_test() {
+ 	CHECK_DMESG=1
+ 	DMESG_FILTER=cat
+ 
++	# shellcheck disable=SC1090
+ 	. "tests/${TEST_NAME}"
+ 
+ 	if declare -fF test >/dev/null; then
+@@ -432,6 +434,7 @@ _run_group() {
+ 	local tests=("$@")
+ 	local group="${tests[0]%/*}"
+ 
++	# shellcheck disable=SC1090
+ 	. "tests/${group}/group"
+ 
+ 	if declare -fF group_requires >/dev/null && ! group_requires; then
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.17.1
