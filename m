@@ -1,28 +1,58 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:56584 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754465AbeFYJQn (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jun 2018 05:16:43 -0400
-Date: Mon, 25 Jun 2018 11:16:42 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 9/9] Makefile: Do not suppress useful shellcheck warnings
-Message-ID: <20180625091642.553pjlsp3hpg7xli@linux-x5ow.site>
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:8434 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S967224AbeFSUX5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 Jun 2018 16:23:57 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Omar Sandoval <osandov@fb.com>
+Cc: linux-block@vger.kernel.org,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH 9/9] Makefile: Do not suppress useful shellcheck warnings
+Date: Tue, 19 Jun 2018 13:23:53 -0700
+Message-Id: <20180619202353.23631-10-bart.vanassche@wdc.com>
+In-Reply-To: <20180619202353.23631-1-bart.vanassche@wdc.com>
 References: <20180619202353.23631-1-bart.vanassche@wdc.com>
- <20180619202353.23631-10-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20180619202353.23631-10-bart.vanassche@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+All the shellcheck warnings that are currently suppressed are useful.
+Additionally, it is easy to avoid false positives for the currently
+suppressed categories of shellcheck warnings. Hence stop suppressing
+shellcheck warnings. See also commit 17a59e0dc212 ("Fix all shellcheck
+warnings").
+
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+---
+ Makefile | 15 +--------------
+ 1 file changed, 1 insertion(+), 14 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 14ba8341dae5..c4bffa2d3f32 100644
+--- a/Makefile
++++ b/Makefile
+@@ -4,21 +4,8 @@ all:
+ clean:
+ 	$(MAKE) -C src clean
+ 
+-# SC1090: "Can't follow non-constant source". We use variable sources all over
+-# the place.
+-# SC2034: "VARIABLE appears unused". All test scripts use this for the test
+-# metadata, and many helper functions define global variables.
+-# SC2119: "Use foo "$@" if function's $1 should mean script's $1". False
+-# positives on helpers like _init_scsi_debug.
+-# SC2154: "VARIABLE is referenced but not assigned". False positives on
+-# TEST_RUN[foo]=bar.
+-# SC2209: "Use var=$(command) to assign output (or quote to assign string)".
+-# Warns about DMESG_FILTER=cat, which is not going to confuse anyone who knows
+-# how to write shell scripts.
+-SHELLCHECK_EXCLUDE := SC1090,SC2034,SC2119,SC2154,SC2209
+-
+ check:
+-	shellcheck -x -e $(SHELLCHECK_EXCLUDE) -f gcc check new common/* tests/*/[0-9]*[0-9]
++	shellcheck -x -f gcc check new common/* tests/*/[0-9]*[0-9]
+ 	! grep TODO tests/*/[0-9]*[0-9]
+ 
+ .PHONY: all check
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.17.1
