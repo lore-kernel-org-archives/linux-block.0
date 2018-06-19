@@ -1,22 +1,26 @@
 Return-Path: <jack@suse.cz>
-Date: Fri, 22 Jun 2018 10:52:49 +0200
+Date: Tue, 19 Jun 2018 10:41:41 +0200
 From: Jan Kara <jack@suse.cz>
-To: Tejun Heo <tj@kernel.org>
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
 Cc: Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>
 Subject: Re: [PATCH] bdi: Fix another oops in wb_workfn()
-Message-ID: <20180622085249.afwqhomhxkwepq5q@quack2.suse.cz>
+Message-ID: <20180619084141.w6azzcmm2qleyfxw@quack2.suse.cz>
 References: <20180618134658.32302-1-jack@suse.cz>
- <20180618174014.GY1351649@devbig577.frc2.facebook.com>
+ <e32deee5-97d4-9cc8-3eac-84e5ad9cc520@i-love.sakura.ne.jp>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180618174014.GY1351649@devbig577.frc2.facebook.com>
+In-Reply-To: <e32deee5-97d4-9cc8-3eac-84e5ad9cc520@i-love.sakura.ne.jp>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon 18-06-18 10:40:14, Tejun Heo wrote:
-> On Mon, Jun 18, 2018 at 03:46:58PM +0200, Jan Kara wrote:
+On Mon 18-06-18 23:38:12, Tetsuo Handa wrote:
+> On 2018/06/18 22:46, Jan Kara wrote:
 > > syzbot is reporting NULL pointer dereference at wb_workfn() [1] due to
+> 
+> [1] https://syzkaller.appspot.com/bug?id=e0818ccb7e46190b3f1038b0c794299208ed4206
+> 
+> line is missing.
+> 
 > > wb->bdi->dev being NULL. And Dmitry confirmed that wb->state was
 > > WB_shutting_down after wb->bdi->dev became NULL. This indicates that
 > > unregister_bdi() failed to call wb_shutdown() on one of wb objects.
@@ -51,16 +55,21 @@ On Mon 18-06-18 10:40:14, Tejun Heo wrote:
 > > mutex provides it for CONFIG_CGROUP_WRITEBACK case and without
 > > CONFIG_CGROUP_WRITEBACK wb_shutdown() can be called only once from
 > > bdi_unregister().
-> > 
-> > Reported-by: syzbot <syzbot+4a7438e774b21ddd8eca@syzkaller.appspotmail.com>
-> > Signed-off-by: Jan Kara <jack@suse.cz>
 > 
-> Acked-by: Tejun Heo <tj@kernel.org>
+> Wow, this patch removes WB_shutting_down.
 
-OK, Jens, can you please pick up the fix? Thanks!
+Yes.
+
+> A bit of worry for me is how long will this mutex_lock() sleep, for
+> if there are a lot of wb objects to shutdown, sequentially doing
+> wb_shutdown() might block someone's mutex_lock() for longer than
+> khungtaskd's timeout period (typically 120 seconds) ?
+
+That's a good question but since the bdi is going away in this case I
+don't think the flusher work should take long to complete - the device is
+removed from the system at this point so it won't do any IO.
 
 								Honza
-
 -- 
 Jan Kara <jack@suse.com>
 SUSE Labs, CR
