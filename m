@@ -1,25 +1,66 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] block: fix timeout changes for legacy request drivers
-To: Christoph Hellwig <hch@lst.de>
-Cc: jianchao.w.wang@oracle.com, linux-block@vger.kernel.org
-References: <20180619164014.13621-1-hch@lst.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <2534f376-cfa9-71ea-6f7b-92105ced9178@kernel.dk>
-Date: Tue, 19 Jun 2018 11:07:07 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180619164014.13621-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <BATV+94b2d661b7de03f6cf2e+5413+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: jianchao.w.wang@oracle.com,
+	linux-block@vger.kernel.org
+Subject: [PATCH] block: fix timeout changes for legacy request drivers
+Date: Tue, 19 Jun 2018 18:40:14 +0200
+Message-Id: <20180619164014.13621-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On 6/19/18 10:40 AM, Christoph Hellwig wrote:
-> blk_mq_complete_request can only be called for blk-mq drivers, but when
-> removing the BLK_EH_HANDLED return value, two legacy request timeout
-> methods incorrectly got switched to call blk_mq_complete_request.
-> Call __blk_complete_request instead to reinstance the previous behavior.
-> For that __blk_complete_request needs to be exported.
+blk_mq_complete_request can only be called for blk-mq drivers, but when
+removing the BLK_EH_HANDLED return value, two legacy request timeout
+methods incorrectly got switched to call blk_mq_complete_request.
+Call __blk_complete_request instead to reinstance the previous behavior.
+For that __blk_complete_request needs to be exported.
 
-Yikes. Looks like blktests only smoke tests blk-mq timeout handling,
-we should add a test to do the same for !mq.
+Fixes: 1fc2b62e ("scsi_transport_fc: complete requests from ->timeout")
+Fixes: 0df0bb08 ("null_blk: complete requests from ->timeout")
+Reported-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-softirq.c              | 1 +
+ drivers/block/null_blk.c         | 2 +-
+ drivers/scsi/scsi_transport_fc.c | 2 +-
+ 3 files changed, 3 insertions(+), 2 deletions(-)
 
+diff --git a/block/blk-softirq.c b/block/blk-softirq.c
+index 01e2b353a2b9..15c1f5e12eb8 100644
+--- a/block/blk-softirq.c
++++ b/block/blk-softirq.c
+@@ -144,6 +144,7 @@ void __blk_complete_request(struct request *req)
+ 
+ 	local_irq_restore(flags);
+ }
++EXPORT_SYMBOL(__blk_complete_request);
+ 
+ /**
+  * blk_complete_request - end I/O on a request
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index 7948049f6c43..042c778e5a4e 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -1365,7 +1365,7 @@ static blk_qc_t null_queue_bio(struct request_queue *q, struct bio *bio)
+ static enum blk_eh_timer_return null_rq_timed_out_fn(struct request *rq)
+ {
+ 	pr_info("null: rq %p timed out\n", rq);
+-	blk_mq_complete_request(rq);
++	__blk_complete_request(rq);
+ 	return BLK_EH_DONE;
+ }
+ 
+diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
+index 1da3d71e9f61..13948102ca29 100644
+--- a/drivers/scsi/scsi_transport_fc.c
++++ b/drivers/scsi/scsi_transport_fc.c
+@@ -3592,7 +3592,7 @@ fc_bsg_job_timeout(struct request *req)
+ 
+ 	/* the blk_end_sync_io() doesn't check the error */
+ 	if (inflight)
+-		blk_mq_complete_request(req);
++		__blk_complete_request(req);
+ 	return BLK_EH_DONE;
+ }
+ 
 -- 
-Jens Axboe
+2.17.1
