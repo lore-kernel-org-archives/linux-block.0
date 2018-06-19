@@ -1,45 +1,40 @@
-Return-Path: <openosd@gmail.com>
-Return-Path: <openosd@gmail.com>
-Subject: Re: [PATCH 3/6] exofs: use bio_clone_fast in _write_mirror
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Return-Path: <BATV+94b2d661b7de03f6cf2e+5413+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Boaz Harrosh <ooo@electrozaur.com>,
+	linux-block@vger.kernel.org,
+	linux-bcache@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 3/6] exofs: use bio_clone_fast in _write_mirror
+Date: Tue, 19 Jun 2018 06:52:13 +0200
+Message-Id: <20180619045216.21130-4-hch@lst.de>
+In-Reply-To: <20180619045216.21130-1-hch@lst.de>
 References: <20180619045216.21130-1-hch@lst.de>
- <20180619045216.21130-4-hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
- linux-bcache@vger.kernel.org, dm-devel@redhat.com
-From: Boaz Harrosh <ooo@electrozaur.com>
-Message-ID: <8ddd6c9c-0e80-d02c-0539-95566e228841@electrozaur.com>
-Date: Tue, 19 Jun 2018 10:54:27 +0300
-MIME-Version: 1.0
-In-Reply-To: <20180619045216.21130-4-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 19/06/18 07:52, Christoph Hellwig wrote:
-> The mirroring code never changes the bio data or biovecs.  This means
-> we can reuse the biovec allocation easily instead of duplicating it.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+The mirroring code never changes the bio data or biovecs.  This means
+we can reuse the biovec allocation easily instead of duplicating it.
 
-Thank you yes that's much better
-ACK-by Boaz Harrosh <ooo@electrozaur.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/exofs/ore.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> ---
->  fs/exofs/ore.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fs/exofs/ore.c b/fs/exofs/ore.c
-> index 1b8b44637e70..5331a15a61f1 100644
-> --- a/fs/exofs/ore.c
-> +++ b/fs/exofs/ore.c
-> @@ -873,8 +873,8 @@ static int _write_mirror(struct ore_io_state *ios, int cur_comp)
->  			struct bio *bio;
->  
->  			if (per_dev != master_dev) {
-> -				bio = bio_clone_kmalloc(master_dev->bio,
-> -							GFP_KERNEL);
-> +				bio = bio_clone_fast(master_dev->bio,
-> +						     GFP_KERNEL, NULL);
->  				if (unlikely(!bio)) {
->  					ORE_DBGMSG(
->  					      "Failed to allocate BIO size=%u\n",
-> 
+diff --git a/fs/exofs/ore.c b/fs/exofs/ore.c
+index 1b8b44637e70..5331a15a61f1 100644
+--- a/fs/exofs/ore.c
++++ b/fs/exofs/ore.c
+@@ -873,8 +873,8 @@ static int _write_mirror(struct ore_io_state *ios, int cur_comp)
+ 			struct bio *bio;
+ 
+ 			if (per_dev != master_dev) {
+-				bio = bio_clone_kmalloc(master_dev->bio,
+-							GFP_KERNEL);
++				bio = bio_clone_fast(master_dev->bio,
++						     GFP_KERNEL, NULL);
+ 				if (unlikely(!bio)) {
+ 					ORE_DBGMSG(
+ 					      "Failed to allocate BIO size=%u\n",
+-- 
+2.17.1
