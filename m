@@ -1,38 +1,33 @@
-Return-Path: <prvs=701cef09f=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] blk-mq: use blk_mq_timeout_work to limit the max timeout
-Date: Tue, 19 Jun 2018 15:18:05 +0000
-Message-ID: <884a5cbb5622ca5c890585a8d5dff0e3a1d60cfe.camel@wdc.com>
-References: <1529391610-1654-1-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1529391610-1654-1-git-send-email-jianchao.w.wang@oracle.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] blk-mq: use blk_mq_timeout_work to limit the max timeout
+Date: Tue, 19 Jun 2018 15:00:10 +0800
+Message-Id: <1529391610-1654-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTA2LTE5IGF0IDE1OjAwICswODAwLCBKaWFuY2hhbyBXYW5nIHdyb3RlOg0K
-PiBibGtfcnFfdGltZW91dCBpcyBuZWVkZWQgdG8gbGltaXQgdGhlIG1heCB0aW1lb3V0IHZhbHVl
-LCBvdGhlcndpc2UsDQo+IGEgaWRsZSBoY3R4IGNhbm5vdCBiZSBkZWFjdGl2YXRlZCB0aW1lbHkg
-aW4gc2hhcmVkLXRhZyBjYXNlLg0KPiANCj4gRml4ZXM6IDEyZjViOTMxIChibGstbXE6IFJlbW92
-ZSBnZW5lcmF0aW9uIHNlcWV1bmNlKQ0KPiBTaWduZWQtb2ZmLWJ5OiBKaWFuY2hhbyBXYW5nIDxq
-aWFuY2hhby53LndhbmdAb3JhY2xlLmNvbT4NCj4gLS0tDQo+ICBibG9jay9ibGstbXEuYyB8IDIg
-Ky0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPiAN
-Cj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1tcS5jIGIvYmxvY2svYmxrLW1xLmMNCj4gaW5kZXgg
-NzBjNjViYi4uY2NlYmU3YiAxMDA2NDQNCj4gLS0tIGEvYmxvY2svYmxrLW1xLmMNCj4gKysrIGIv
-YmxvY2svYmxrLW1xLmMNCj4gQEAgLTg2OCw3ICs4NjgsNyBAQCBzdGF0aWMgdm9pZCBibGtfbXFf
-dGltZW91dF93b3JrKHN0cnVjdCB3b3JrX3N0cnVjdCAqd29yaykNCj4gIAlibGtfbXFfcXVldWVf
-dGFnX2J1c3lfaXRlcihxLCBibGtfbXFfY2hlY2tfZXhwaXJlZCwgJm5leHQpOw0KPiAgDQo+ICAJ
-aWYgKG5leHQgIT0gMCkgew0KPiAtCQltb2RfdGltZXIoJnEtPnRpbWVvdXQsIG5leHQpOw0KPiAr
-CQltb2RfdGltZXIoJnEtPnRpbWVvdXQsIGJsa19ycV90aW1lb3V0KHJvdW5kX2ppZmZpZXNfdXAo
-bmV4dCkpKTsNCj4gIAl9IGVsc2Ugew0KPiAgCQkvKg0KPiAgCQkgKiBSZXF1ZXN0IHRpbWVvdXRz
-IGFyZSBoYW5kbGVkIGFzIGEgZm9yd2FyZCByb2xsaW5nIHRpbWVyLiBJZg0KDQpIZWxsbyBKaWFu
-Y2hhbywNCg0KV2hhdCBtYWtlcyB5b3UgdGhpbmsgdGhhdCBpdCB3b3VsZCBiZSBuZWNlc3Nhcnkg
-dG8gY2FsbCBibGtfcnFfdGltZW91dCgpIGZyb20NCmJsa19tcV90aW1lb3V0X3dvcmsoKT8gSGF2
-ZSB5b3Ugbm90aWNlZCB0aGF0IGJsa19hZGRfdGltZXIoKSBhbHJlYWR5IGNhbGxzIHRoYXQNCmZ1
-bmN0aW9uPyBJIHRoaW5rIGl0IGlzIG5vdCBuZWNlc3NhcnkgdG8gY2FsbCBibGtfcnFfdGltZW91
-dCgpIGZyb20NCmJsa19tcV90aW1lb3V0X3dvcmsoKSBiZWNhdXNlIGl0IGlzIGd1YXJhbnRlZWQg
-aW4gdGhhdCBmdW5jdGlvbiB0aGF0IHRoZSBuZXh0DQp0aW1lb3V0IGlzIGxlc3MgdGhhbiBCTEtf
-TUFYX1RJTUVPVVQgamlmZmllcyBpbiB0aGUgZnV0dXJlLg0KDQpCYXJ0Lg0KDQoNCg0K
+blk_rq_timeout is needed to limit the max timeout value, otherwise,
+a idle hctx cannot be deactivated timely in shared-tag case.
+
+Fixes: 12f5b931 (blk-mq: Remove generation seqeunce)
+Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+---
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 70c65bb..ccebe7b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -868,7 +868,7 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &next);
+ 
+ 	if (next != 0) {
+-		mod_timer(&q->timeout, next);
++		mod_timer(&q->timeout, blk_rq_timeout(round_jiffies_up(next)));
+ 	} else {
+ 		/*
+ 		 * Request timeouts are handled as a forward rolling timer. If
+-- 
+2.7.4
