@@ -1,109 +1,49 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V6 03/30] block: use bio_add_page in bio_iov_iter_get_pages
-Date: Sat,  9 Jun 2018 20:29:47 +0800
-Message-Id: <20180609123014.8861-4-ming.lei@redhat.com>
-In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
-References: <20180609123014.8861-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <keith.busch@linux.intel.com>
+Date: Wed, 20 Jun 2018 08:49:11 -0600
+From: Keith Busch <keith.busch@linux.intel.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@kernel.dk>,
+	Sagi Grimberg <sagi@grimberg.me>, Ming Lei <tom.leiming@gmail.com>,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: Re: [RFC PATCH] blk-mq: User defined HCTX CPU mapping
+Message-ID: <20180620144911.GA24104@localhost.localdomain>
+References: <20180618173206.19506-1-keith.busch@intel.com>
+ <20180620090805.GA4205@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180620090805.GA4205@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Christoph Hellwig <hch@lst.de>
+On Wed, Jun 20, 2018 at 11:08:05AM +0200, Christoph Hellwig wrote:
+> On Mon, Jun 18, 2018 at 11:32:06AM -0600, Keith Busch wrote:
+> > The default mapping of a cpu to a hardware context is often generally
+> > applicable, however a user may know of a more appropriate mapping for
+> > their specific access usage.
+> > 
+> > This patch allows a user to define their own policy by making the mq hctx
+> > cpu_list writable. The usage allows a user to append a comma separated
+> > and/or range list of CPUs to a given hctx's tag set mapping to reassign
+> > what hctx a cpu may map.
+> > 
+> > While the writable attribute exists under a specific request_queue, the
+> > settings will affect all request queues sharing the same tagset.
+> > 
+> > The user defined setting is lost if the block device is removed and
+> > re-added, or if the driver re-runs the queue mapping.
+> 
+> We can't do this without driver opt-in.  Managed interrupt rely on
+> the fact that we can't generate more interrupts once all cpus mapped
+> to the interrupt line have been offlined.
+>
+> So what exactly is the use case?  What drivers do you care about?
 
-Replace a nasty hack with a different nasty hack to prepare for multipage
-bio_vecs.  By moving the temporary page array as far up as possible in
-the space allocated for the bio_vec array we can iterate forward over it
-and thus use bio_add_page.  Using bio_add_page means we'll be able to
-merge physically contiguous pages once support for multipath bio_vecs is
-merged.
+This patch came at a customer request for NVMe. The controllers have 1:1
+queues to CPUs, so currently a submission on CPU A will interrupt CPU A.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/bio.c | 45 +++++++++++++++++++++------------------------
- 1 file changed, 21 insertions(+), 24 deletions(-)
+The user really wants their application to run in CPU A and have the
+interrupt run in CPU B. We can't change the IRQ affinity, so I thought
+changing the submission affinity would be less intrusive.
 
-diff --git a/block/bio.c b/block/bio.c
-index ebd3ca62e037..cb0f46e2752b 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -902,6 +902,8 @@ int bio_add_page(struct bio *bio, struct page *page,
- }
- EXPORT_SYMBOL(bio_add_page);
- 
-+#define PAGE_PTRS_PER_BVEC	(sizeof(struct bio_vec) / sizeof(struct page *))
-+
- /**
-  * bio_iov_iter_get_pages - pin user or kernel pages and add them to a bio
-  * @bio: bio to add pages to
-@@ -913,38 +915,33 @@ EXPORT_SYMBOL(bio_add_page);
- int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- {
- 	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
-+	unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
- 	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
- 	struct page **pages = (struct page **)bv;
--	size_t offset, diff;
--	ssize_t size;
-+	ssize_t size, left;
-+	unsigned len, i;
-+	size_t offset;
-+
-+	/*
-+	 * Move page array up in the allocated memory for the bio vecs as
-+	 * far as possible so that we can start filling biovecs from the
-+	 * beginning without overwriting the temporary page array.
-+	 */
-+	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
-+	pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
- 
- 	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
- 	if (unlikely(size <= 0))
- 		return size ? size : -EFAULT;
--	nr_pages = (size + offset + PAGE_SIZE - 1) / PAGE_SIZE;
- 
--	/*
--	 * Deep magic below:  We need to walk the pinned pages backwards
--	 * because we are abusing the space allocated for the bio_vecs
--	 * for the page array.  Because the bio_vecs are larger than the
--	 * page pointers by definition this will always work.  But it also
--	 * means we can't use bio_add_page, so any changes to it's semantics
--	 * need to be reflected here as well.
--	 */
--	bio->bi_iter.bi_size += size;
--	bio->bi_vcnt += nr_pages;
--
--	diff = (nr_pages * PAGE_SIZE - offset) - size;
--	while (nr_pages--) {
--		bv[nr_pages].bv_page = pages[nr_pages];
--		bv[nr_pages].bv_len = PAGE_SIZE;
--		bv[nr_pages].bv_offset = 0;
--	}
-+	for (left = size, i = 0; left > 0; left -= len, i++) {
-+		struct page *page = pages[i];
- 
--	bv[0].bv_offset += offset;
--	bv[0].bv_len -= offset;
--	if (diff)
--		bv[bio->bi_vcnt - 1].bv_len -= diff;
-+		len = min_t(size_t, PAGE_SIZE - offset, left);
-+		if (WARN_ON_ONCE(bio_add_page(bio, page, len, offset) != len))
-+			return -EINVAL;
-+		offset = 0;
-+	}
- 
- 	iov_iter_advance(iter, size);
- 	return 0;
--- 
-2.9.5
+I think you're saying this will break if CPU B is offlined. I hadn't
+considered that, so it doesn't sound like this will work.
