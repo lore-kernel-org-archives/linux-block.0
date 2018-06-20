@@ -1,80 +1,34 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <ming.lei@redhat.com>
+Date: Wed, 20 Jun 2018 17:12:06 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 23/30] f2fs: conver to bio_for_each_chunk_segment_all
-Date: Sat,  9 Jun 2018 20:30:07 +0800
-Message-Id: <20180609123014.8861-24-ming.lei@redhat.com>
-In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
-References: <20180609123014.8861-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Boaz Harrosh <ooo@electrozaur.com>,
+	linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: Re: [RFC] kill bio_clone_kmalloc and bio_clone_bioset
+Message-ID: <20180620091204.GA11780@ming.t460p>
+References: <20180619045216.21130-1-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180619045216.21130-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-bio_for_each_page_all() can't be used any more after multipage bvec is
-enabled, so we have to convert to bio_for_each_chunk_segment_all().
+On Tue, Jun 19, 2018 at 06:52:10AM +0200, Christoph Hellwig wrote:
+> Hi all,
+> 
+> this series removes all but one users of the traditional deep bio clone,
+> and then moves bio_clone_bioset to its only caller so that we get rid
+> of the deep bio cloning in the block layer API.
+> 
+> Patch 1 is already in the device mapper queue for 4.18, so we should
+> wait for that to go in before the series is applied.  The series is
+> inteded as preparation work for the multi-page biovecs so that it doesn't
+> have to deal with the difference between single page or larger bio vecs
+> for cloning.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/f2fs/data.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+Looks good cleanup:
 
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index 02237d4d91f5..00ee386b902c 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -54,6 +54,7 @@ static void f2fs_read_end_io(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_chunk_iter citer;
- 
- #ifdef CONFIG_F2FS_FAULT_INJECTION
- 	if (time_to_inject(F2FS_P_SB(bio_first_page_all(bio)), FAULT_IO)) {
-@@ -71,7 +72,7 @@ static void f2fs_read_end_io(struct bio *bio)
- 		}
- 	}
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
- 		struct page *page = bvec->bv_page;
- 
- 		if (!bio->bi_status) {
-@@ -91,8 +92,9 @@ static void f2fs_write_end_io(struct bio *bio)
- 	struct f2fs_sb_info *sbi = bio->bi_private;
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_chunk_iter citer;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
- 		struct page *page = bvec->bv_page;
- 		enum count_type type = WB_DATA_TYPE(page);
- 
-@@ -267,6 +269,7 @@ static bool __has_merged_page(struct f2fs_bio_info *io,
- 	struct bio_vec *bvec;
- 	struct page *target;
- 	int i;
-+	struct bvec_chunk_iter citer;
- 
- 	if (!io->bio)
- 		return false;
-@@ -274,7 +277,7 @@ static bool __has_merged_page(struct f2fs_bio_info *io,
- 	if (!inode && !ino)
- 		return true;
- 
--	bio_for_each_segment_all(bvec, io->bio, i) {
-+	bio_for_each_chunk_segment_all(bvec, io->bio, i, citer) {
- 
- 		if (bvec->bv_page->mapping)
- 			target = bvec->bv_page;
--- 
-2.9.5
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+Thanks,
+Ming
