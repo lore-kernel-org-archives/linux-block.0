@@ -1,257 +1,98 @@
-Return-Path: <keith.busch@intel.com>
-From: Keith Busch <keith.busch@intel.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <tom.leiming@gmail.com>,
-	Keith Busch <keith.busch@intel.com>
-Subject: [RFC PATCH] blk-mq: User defined HCTX CPU mapping
-Date: Mon, 18 Jun 2018 11:32:06 -0600
-Message-Id: <20180618173206.19506-1-keith.busch@intel.com>
+Return-Path: <joe@perches.com>
+Message-ID: <87e66800d9e991499c43c2bcd5b0772f2dfa8ba8.camel@perches.com>
+Subject: Re: [PATCH 4.17.0-rc3 1/1]partition: Remove trailing spaces and
+ correct indenting
+From: Joe Perches <joe@perches.com>
+To: kidega <kidegamoses88@gmail.com>, axboe@kernel.dk
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Date: Wed, 20 Jun 2018 08:41:13 -0700
+In-Reply-To: <20180620161434.GA3513@kidega-PC>
+References: <20180620161434.GA3513@kidega-PC>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-The default mapping of a cpu to a hardware context is often generally
-applicable, however a user may know of a more appropriate mapping for
-their specific access usage.
+On Wed, 2018-06-20 at 19:14 +0300, kidega wrote:
+> Reply-To:
 
-This patch allows a user to define their own policy by making the mq hctx
-cpu_list writable. The usage allows a user to append a comma separated
-and/or range list of CPUs to a given hctx's tag set mapping to reassign
-what hctx a cpu may map.
+It seems this is your first attempt to patch something
+in the linux kernel.
 
-While the writable attribute exists under a specific request_queue, the
-settings will affect all request queues sharing the same tagset.
+You should read https://kernelnewbies.org/ and you
+should start with files in drivers/staging.
 
-The user defined setting is lost if the block device is removed and
-re-added, or if the driver re-runs the queue mapping.
+The Reply-To: line should not exist here
 
-Signed-off-by: Keith Busch <keith.busch@intel.com>
+> > remove trailing spaces
+> > correct indenting 
+
+The leading "> " uses should not exist here.
+
+> Signed-off-by: kidega <kidegamoses88@gmail.com>
+
+You need your full legal name here.
+
+> diff --git a/block/partitions/mac.c b/block/partitions/mac.c
+
+This file probably does not need style changes as
+it's pretty old and unlikely to change.
+
+But if it did:
+
+> @@ -97,16 +97,14 @@ int mac_partition(struct parsed_partitions *state)
+>  			int goodness = 0;
+>  
+>  			mac_fix_string(part->processor, 16);
+> -			mac_fix_string(part->name, 32);
+> -			mac_fix_string(part->type, 32);					
+> -		    
+> +			mac_fix_string(part->name, 32); mac_fix_string(part->type, 32);
+
+This needs separate lines for each single statement.
+
+>  			if ((be32_to_cpu(part->status) & MAC_STATUS_BOOTABLE)
+>  			    && strcasecmp(part->processor, "powerpc") == 0)
+>  				goodness++;
+>  
+>  			if (strcasecmp(part->type, "Apple_UNIX_SVR2") == 0
+> -			    || (strncasecmp(part->type, "Linux", 5) == 0
+> -			        && strcasecmp(part->type, "Linux_swap") != 0)) {
+> +				|| (strncasecmp(part->type, "Linux", 5) == 0
+> +				&& strcasecmp(part->type, "Linux_swap") != 0)) {
+
+This is making the indentation worse as the parenthesized
+sub-test block is now unaligned.
+
+And some would prefer moving the && || to the end of the
+previous line like:
 ---
- block/blk-mq-debugfs.c | 16 ++++++----
- block/blk-mq-debugfs.h | 11 +++++++
- block/blk-mq-sysfs.c   | 80 +++++++++++++++++++++++++++++++++++++++++++++++++-
- block/blk-mq.c         |  9 ------
- block/blk-mq.h         | 12 ++++++++
- 5 files changed, 112 insertions(+), 16 deletions(-)
+ block/partitions/mac.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index ffa622366922..df163a79511c 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -870,18 +870,22 @@ void blk_mq_debugfs_unregister(struct request_queue *q)
- 	q->debugfs_dir = NULL;
- }
+diff --git a/block/partitions/mac.c b/block/partitions/mac.c
+index b6095335636c..897da77e5379 100644
+--- a/block/partitions/mac.c
++++ b/block/partitions/mac.c
+@@ -98,15 +98,15 @@ int mac_partition(struct parsed_partitions *state)
  
--static int blk_mq_debugfs_register_ctx(struct blk_mq_hw_ctx *hctx,
--				       struct blk_mq_ctx *ctx)
-+void blk_mq_debugfs_unregister_ctx(struct blk_mq_ctx *ctx)
-+{
-+	debugfs_remove_recursive(ctx->debugfs_dir);
-+}
+ 			mac_fix_string(part->processor, 16);
+ 			mac_fix_string(part->name, 32);
+-			mac_fix_string(part->type, 32);					
+-		    
+-			if ((be32_to_cpu(part->status) & MAC_STATUS_BOOTABLE)
+-			    && strcasecmp(part->processor, "powerpc") == 0)
++			mac_fix_string(part->type, 32);
 +
-+int blk_mq_debugfs_register_ctx(struct blk_mq_hw_ctx *hctx,
-+				struct blk_mq_ctx *ctx)
- {
--	struct dentry *ctx_dir;
- 	char name[20];
++			if ((be32_to_cpu(part->status) & MAC_STATUS_BOOTABLE) &&
++			    strcasecmp(part->processor, "powerpc") == 0)
+ 				goodness++;
  
- 	snprintf(name, sizeof(name), "cpu%u", ctx->cpu);
--	ctx_dir = debugfs_create_dir(name, hctx->debugfs_dir);
--	if (!ctx_dir)
-+	ctx->debugfs_dir = debugfs_create_dir(name, hctx->debugfs_dir);
-+	if (!ctx->debugfs_dir)
- 		return -ENOMEM;
+-			if (strcasecmp(part->type, "Apple_UNIX_SVR2") == 0
+-			    || (strncasecmp(part->type, "Linux", 5) == 0
+-			        && strcasecmp(part->type, "Linux_swap") != 0)) {
++			if (strcasecmp(part->type, "Apple_UNIX_SVR2") == 0 ||
++			    (strncasecmp(part->type, "Linux", 5) == 0 &&
++			     strcasecmp(part->type, "Linux_swap") != 0)) {
+ 				int i, l;
  
--	if (!debugfs_create_files(ctx_dir, ctx, blk_mq_debugfs_ctx_attrs))
-+	if (!debugfs_create_files(ctx->debugfs_dir, ctx, blk_mq_debugfs_ctx_attrs))
- 		return -ENOMEM;
- 
- 	return 0;
-diff --git a/block/blk-mq-debugfs.h b/block/blk-mq-debugfs.h
-index b9d366e57097..93df02eabf2b 100644
---- a/block/blk-mq-debugfs.h
-+++ b/block/blk-mq-debugfs.h
-@@ -18,6 +18,9 @@ struct blk_mq_debugfs_attr {
- int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq);
- int blk_mq_debugfs_rq_show(struct seq_file *m, void *v);
- 
-+void blk_mq_debugfs_unregister_ctx(struct blk_mq_ctx *ctx);
-+int blk_mq_debugfs_register_ctx(struct blk_mq_hw_ctx *hctx,
-+				struct blk_mq_ctx *ctx);
- int blk_mq_debugfs_register(struct request_queue *q);
- void blk_mq_debugfs_unregister(struct request_queue *q);
- int blk_mq_debugfs_register_hctx(struct request_queue *q,
-@@ -41,6 +44,14 @@ static inline void blk_mq_debugfs_unregister(struct request_queue *q)
- {
- }
- 
-+void blk_mq_debugfs_unregister_ctx(struct blk_mq_ctx *ctx) {}
-+
-+int blk_mq_debugfs_register_ctx(struct blk_mq_hw_ctx *hctx,
-+				struct blk_mq_ctx *ctx)
-+{
-+	return 0;
-+}
-+
- static inline int blk_mq_debugfs_register_hctx(struct request_queue *q,
- 					       struct blk_mq_hw_ctx *hctx)
- {
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index aafb44224c89..ec2a07dd86e9 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -11,6 +11,7 @@
- 
- #include <linux/blk-mq.h>
- #include "blk-mq.h"
-+#include "blk-mq-debugfs.h"
- #include "blk-mq-tag.h"
- 
- static void blk_mq_sysfs_release(struct kobject *kobj)
-@@ -161,6 +162,82 @@ static ssize_t blk_mq_hw_sysfs_cpus_show(struct blk_mq_hw_ctx *hctx, char *page)
- 	return ret;
- }
- 
-+static void blk_mq_reassign_swqueue(unsigned int cpu,  unsigned int new_index,
-+				    struct blk_mq_tag_set *set)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+	struct request_queue *q;
-+	struct blk_mq_ctx *ctx;
-+
-+	if (set->mq_map[cpu] == new_index)
-+		return;
-+
-+	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-+		ctx = per_cpu_ptr(q->queue_ctx, cpu);
-+		blk_mq_debugfs_unregister_ctx(ctx);
-+		kobject_del(&ctx->kobj);
-+
-+		hctx = blk_mq_map_queue(q, cpu);
-+		cpumask_clear_cpu(cpu, hctx->cpumask);
-+		hctx->nr_ctx--;
-+		if (hctx->dispatch_from == ctx)
-+			hctx->dispatch_from = NULL;
-+	}
-+
-+	set->mq_map[cpu] = new_index;
-+
-+	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-+		ctx = per_cpu_ptr(q->queue_ctx, cpu);
-+		hctx = blk_mq_map_queue(q, cpu);
-+		cpumask_set_cpu(cpu, hctx->cpumask);
-+		ctx->index_hw = hctx->nr_ctx;
-+		hctx->ctxs[hctx->nr_ctx++] = ctx;
-+		sbitmap_resize(&hctx->ctx_map, hctx->nr_ctx);
-+		hctx->next_cpu = blk_mq_first_mapped_cpu(hctx);
-+
-+		if (kobject_add(&ctx->kobj, &hctx->kobj, "cpu%u", ctx->cpu))
-+			printk(KERN_WARNING "ctx object failure\n");
-+		blk_mq_debugfs_register_ctx(hctx, ctx);
-+	}
-+}
-+
-+static ssize_t blk_mq_hw_sysfs_cpus_store(struct blk_mq_hw_ctx *hctx,
-+					  const char *page, size_t length)
-+{
-+	unsigned int cpu, queue_index = hctx->queue_num;
-+	struct blk_mq_tag_set *set = hctx->queue->tag_set;
-+	struct request_queue *q;
-+	cpumask_var_t new_value;
-+	int err;
-+
-+	if (!alloc_cpumask_var(&new_value, GFP_KERNEL))
-+		return -ENOMEM;
-+
-+	err = cpulist_parse(page, new_value);
-+	if (err)
-+		goto free_mask;
-+
-+	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-+		if (q != hctx->queue)
-+			mutex_lock(&q->sysfs_lock);
-+		blk_mq_freeze_queue(q);
-+	}
-+
-+	for_each_cpu(cpu, new_value)
-+		blk_mq_reassign_swqueue(cpu, queue_index, set);
-+
-+	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-+		if (q != hctx->queue)
-+			mutex_unlock(&q->sysfs_lock);
-+		blk_mq_unfreeze_queue(q);
-+	}
-+	err = length;
-+
-+ free_mask:
-+	free_cpumask_var(new_value);
-+	return err;
-+}
-+
- static struct attribute *default_ctx_attrs[] = {
- 	NULL,
- };
-@@ -174,8 +251,9 @@ static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_nr_reserved_tags = {
- 	.show = blk_mq_hw_sysfs_nr_reserved_tags_show,
- };
- static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_cpus = {
--	.attr = {.name = "cpu_list", .mode = 0444 },
-+	.attr = {.name = "cpu_list", .mode = 0644 },
- 	.show = blk_mq_hw_sysfs_cpus_show,
-+	.store = blk_mq_hw_sysfs_cpus_store,
- };
- 
- static struct attribute *default_hw_ctx_attrs[] = {
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d2de0a719ab8..a8dde5d70eb6 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1248,15 +1248,6 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- 	hctx_unlock(hctx, srcu_idx);
- }
- 
--static inline int blk_mq_first_mapped_cpu(struct blk_mq_hw_ctx *hctx)
--{
--	int cpu = cpumask_first_and(hctx->cpumask, cpu_online_mask);
--
--	if (cpu >= nr_cpu_ids)
--		cpu = cpumask_first(hctx->cpumask);
--	return cpu;
--}
--
- /*
-  * It'd be great if the workqueue API had a way to pass
-  * in a mask and had some smarts for more clever placement.
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 89231e439b2f..34dc0baf62cc 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -28,6 +28,9 @@ struct blk_mq_ctx {
- 
- 	struct request_queue	*queue;
- 	struct kobject		kobj;
-+#ifdef CONFIG_BLK_DEBUG_FS
-+	struct dentry		*debugfs_dir;
-+#endif
- } ____cacheline_aligned_in_smp;
- 
- void blk_mq_freeze_queue(struct request_queue *q);
-@@ -203,4 +206,13 @@ static inline void blk_mq_put_driver_tag(struct request *rq)
- 	__blk_mq_put_driver_tag(hctx, rq);
- }
- 
-+static inline int blk_mq_first_mapped_cpu(struct blk_mq_hw_ctx *hctx)
-+{
-+	int cpu = cpumask_first_and(hctx->cpumask, cpu_online_mask);
-+
-+	if (cpu >= nr_cpu_ids)
-+		cpu = cpumask_first(hctx->cpumask);
-+	return cpu;
-+}
-+
- #endif
--- 
-2.14.3
+ 				goodness++;
