@@ -1,92 +1,38 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga04.intel.com ([192.55.52.120]:64773 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751933AbeFDKJ3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 Jun 2018 06:09:29 -0400
-From: "Dziegielewski, Marcin" <marcin.dziegielewski@intel.com>
-To: Javier Gonzalez <javier@cnexlabs.com>,
-        Matias Bjorling <mb@lightnvm.io>
-CC: Jens Axboe <axboe@fb.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Konopko, Igor J" <igor.j.konopko@intel.com>
-Subject: RE: [GIT PULL 18/20] lightnvm: pblk: handle case when mw_cunits
- equals to 0
-Date: Mon, 4 Jun 2018 10:09:26 +0000
-Message-ID: <9FC4315EA6BEAA449828D92CF173A10D3E382351@IRSMSX109.ger.corp.intel.com>
-References: <20180528085841.26684-1-mb@lightnvm.io>
- <20180528085841.26684-19-mb@lightnvm.io>
- <54B2CCDB-B869-4087-8AE2-2AC73381B1FF@cnexlabs.com>
-In-Reply-To: <54B2CCDB-B869-4087-8AE2-2AC73381B1FF@cnexlabs.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <dan.carpenter@oracle.com>
+Date: Wed, 20 Jun 2018 13:44:35 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+To: "Richard Russon (FlatCap)" <ldm@flatcap.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-ntfs-dev@lists.sourceforge.net,
+        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH] partitions/ldm: Off by one in ldm_relative()
+Message-ID: <20180620104433.qegf5bakvcywzuga@kili.mountain>
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+List-ID: <linux-block@vger.kernel.org>
 
-DQpGcmlzdCBvZiBhbGwgSSB3YW50IHRvIHNheSBzb3JyeSBmb3IgbGF0ZSByZXNwb25zZSAtIEkg
-d2FzIG9uIGhvbGlkYXkuDQoNCj4gRnJvbTogSmF2aWVyIEdvbnphbGV6IFttYWlsdG86amF2aWVy
-QGNuZXhsYWJzLmNvbV0NCj4gU2VudDogTW9uZGF5LCBNYXkgMjgsIDIwMTggMTowMyBQTQ0KPiBU
-bzogTWF0aWFzIEJqw7hybGluZyA8bWJAbGlnaHRudm0uaW8+DQo+IENjOiBKZW5zIEF4Ym9lIDxh
-eGJvZUBmYi5jb20+OyBsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LQ0KPiBrZXJu
-ZWxAdmdlci5rZXJuZWwub3JnOyBEemllZ2llbGV3c2tpLCBNYXJjaW4NCj4gPG1hcmNpbi5kemll
-Z2llbGV3c2tpQGludGVsLmNvbT47IEtvbm9wa28sIElnb3IgSg0KPiA8aWdvci5qLmtvbm9wa29A
-aW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW0dJVCBQVUxMIDE4LzIwXSBsaWdodG52bTogcGJs
-azogaGFuZGxlIGNhc2Ugd2hlbiBtd19jdW5pdHMNCj4gZXF1YWxzIHRvIDANCj4gDQo+ID4gT24g
-MjggTWF5IDIwMTgsIGF0IDEwLjU4LCBNYXRpYXMgQmrDuHJsaW5nIDxtYkBsaWdodG52bS5pbz4g
-d3JvdGU6DQo+ID4NCj4gPiBGcm9tOiBNYXJjaW4gRHppZWdpZWxld3NraSA8bWFyY2luLmR6aWVn
-aWVsZXdza2lAaW50ZWwuY29tPg0KPiA+DQo+ID4gU29tZSBkZXZpY2VzIGNhbiBleHBvc2UgbXdf
-Y3VuaXRzIGVxdWFsIHRvIDAsIGl0IGNhbiBjYXVzZSBjcmVhdGlvbiBvZg0KPiA+IHRvbyBzbWFs
-bCB3cml0ZSBidWZmZXIgYW5kIGNhdXNlIHBlcmZvcm1hbmNlIHRvIGRyb3Agb24gd3JpdGUNCj4g
-PiB3b3JrbG9hZHMuDQo+ID4NCj4gPiBUbyBoYW5kbGUgdGhhdCwgd2UgdXNlIHRoZSBkZWZhdWx0
-IHZhbHVlIGZvciBNTEMgYW5kIGJlYWNhdXNlIGl0DQo+ID4gY292ZXJzIGJvdGggMS4yIGFuZCAy
-LjAgT0Mgc3BlY2lmaWNhdGlvbiwgc2V0dGluZyB1cCBtd19jdW5pdHMgaW4NCj4gPiBudm1lX252
-bV9zZXR1cF8xMiBmdW5jdGlvbiBpc24ndCBsb25nZXIgbmVjZXNzYXJ5Lg0KPiA+DQo+ID4gU2ln
-bmVkLW9mZi1ieTogTWFyY2luIER6aWVnaWVsZXdza2kgPG1hcmNpbi5kemllZ2llbGV3c2tpQGlu
-dGVsLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBJZ29yIEtvbm9wa28gPGlnb3Iuai5rb25vcGtv
-QGludGVsLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBNYXRpYXMgQmrDuHJsaW5nIDxtYkBsaWdo
-dG52bS5pbz4NCj4gPiAtLS0NCj4gPiBkcml2ZXJzL2xpZ2h0bnZtL3BibGstaW5pdC5jIHwgMTAg
-KysrKysrKysrLQ0KPiA+IGRyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMgfCAgMSAtDQo+ID4g
-MiBmaWxlcyBjaGFuZ2VkLCA5IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+ID4NCj4g
-PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9saWdodG52bS9wYmxrLWluaXQuYw0KPiA+IGIvZHJpdmVy
-cy9saWdodG52bS9wYmxrLWluaXQuYyBpbmRleCBkNjVkMmY5NzJjY2YuLjBmMjc3NzQ0MjY2YiAx
-MDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL2xpZ2h0bnZtL3BibGstaW5pdC5jDQo+ID4gKysrIGIv
-ZHJpdmVycy9saWdodG52bS9wYmxrLWluaXQuYw0KPiA+IEBAIC0zNTYsNyArMzU2LDE1IEBAIHN0
-YXRpYyBpbnQgcGJsa19jb3JlX2luaXQoc3RydWN0IHBibGsgKnBibGspDQo+ID4gCWF0b21pYzY0
-X3NldCgmcGJsay0+bnJfZmx1c2gsIDApOw0KPiA+IAlwYmxrLT5ucl9mbHVzaF9yc3QgPSAwOw0K
-PiA+DQo+ID4gLQlwYmxrLT5wZ3NfaW5fYnVmZmVyID0gZ2VvLT5td19jdW5pdHMgKiBnZW8tPmFs
-bF9sdW5zOw0KPiA+ICsJaWYgKGdlby0+bXdfY3VuaXRzKSB7DQo+ID4gKwkJcGJsay0+cGdzX2lu
-X2J1ZmZlciA9IGdlby0+bXdfY3VuaXRzICogZ2VvLT5hbGxfbHVuczsNCj4gPiArCX0gZWxzZSB7
-DQo+ID4gKwkJcGJsay0+cGdzX2luX2J1ZmZlciA9IChnZW8tPndzX29wdCA8PCAzKSAqIGdlby0+
-YWxsX2x1bnM7DQo+ID4gKwkJLyoNCj4gPiArCQkgKiBTb21lIGRldmljZXMgY2FuIGV4cG9zZSBt
-d19jdW5pdHMgZXF1YWwgdG8gMCwgc28gbGV0J3MNCj4gdXNlDQo+ID4gKwkJICogaGVyZSBkZWZh
-dWx0IHNhZmUgdmFsdWUgZm9yIE1MQy4NCj4gPiArCQkgKi8NCj4gPiArCX0NCj4gPg0KPiA+IAlw
-YmxrLT5taW5fd3JpdGVfcGdzID0gZ2VvLT53c19vcHQgKiAoZ2VvLT5jc2VjcyAvIFBBR0VfU0la
-RSk7DQo+ID4gCW1heF93cml0ZV9wcGFzID0gcGJsay0+bWluX3dyaXRlX3BncyAqIGdlby0+YWxs
-X2x1bnM7IGRpZmYgLS1naXQNCj4gPiBhL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMgYi9k
-cml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jIGluZGV4DQo+ID4gNDEyNzlkYTc5OWVkLi5jNzQ3
-NzkyZGE5MTUgMTAwNjQ0DQo+ID4gLS0tIGEvZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0uYw0K
-PiA+ICsrKyBiL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMNCj4gPiBAQCAtMzM4LDcgKzMz
-OCw2IEBAIHN0YXRpYyBpbnQgbnZtZV9udm1fc2V0dXBfMTIoc3RydWN0DQo+IG52bWVfbnZtX2lk
-MTINCj4gPiAqaWQsDQo+ID4NCj4gPiAJZ2VvLT53c19taW4gPSBzZWNfcGVyX3BnOw0KPiA+IAln
-ZW8tPndzX29wdCA9IHNlY19wZXJfcGc7DQo+ID4gLQlnZW8tPm13X2N1bml0cyA9IGdlby0+d3Nf
-b3B0IDw8IDM7CS8qIGRlZmF1bHQgdG8gTUxDIHNhZmUgdmFsdWVzDQo+ICovDQo+ID4NCj4gPiAJ
-LyogRG8gbm90IGltcG9zZSB2YWx1ZXMgZm9yIG1heGltdW0gbnVtYmVyIG9mIG9wZW4gYmxvY2tz
-IGFzIGl0IGlzDQo+ID4gCSAqIHVuc3BlY2lmaWVkIGluIDEuMi4gVXNlcnMgb2YgMS4yIG11c3Qg
-YmUgYXdhcmUgb2YgdGhpcyBhbmQNCj4gPiBldmVudHVhbGx5DQo+ID4gLS0NCj4gPiAyLjExLjAN
-Cj4gDQo+IEJ5IGRvaW5nIHRoaXMsIDEuMiBmdXR1cmUgdXNlcnMgKGJleW9uZCBwYmxrKSwgd2ls
-bCBmYWlsIHRvIGhhdmUgYSB2YWxpZA0KPiBtd19jdW5pdHMgdmFsdWUuIEl0J3Mgb2sgdG8gZGVh
-bCB3aXRoIHRoZSAwIGNhc2UgaW4gcGJsaywgYnV0IEkgYmVsaWV2ZSB0aGF0IHdlDQo+IHNob3Vs
-ZCBoYXZlIHRoZSBkZWZhdWx0IHZhbHVlIGZvciAxLjIgZWl0aGVyIHdheS4NCg0KSSdtIG5vdCBz
-dXJlLiBGcm9tIG15IHVuZGVyc3RhbmRpbmcsIHNldHRpbmcgb2YgZGVmYXVsdCB2YWx1ZSB3YXMg
-d29ya2Fyb3VuZCBmb3IgcGJsayBjYXNlLCBhbSBJIHJpZ2h0ID8uIEluIG15IG9waW5pb24gYW55
-IHVzZXIgb2YgMS4yIHNwZWMgc2hvdWxkIGJlIGF3YXJlIHRoYXQgdGhlcmUgaXMgbm90IG13X2N1
-bml0IHZhbHVlLiBGcm9tIG15IHBvaW50IG9mIHZpZXcsIGxlYXZpbmcgaGVyZSAwIChhbmQgZGVj
-aXNpb24gd2hhdCBkbyB3aXRoIGl0IHRvIGxpZ2h0bnZtIHVzZXIpIGlzIG1vcmUgc2FmZXIgd2F5
-LCBidXQgbWF5YmUgSSdtIHdyb25nLiBJIGJlbGlldmUgdGhhdCBpdCBpcyB0b3BpYyB0byB3aWRl
-ciBkaXNjdXNzaW9uIHdpdGggbWFpbnRhaW5lcnMuDQoNCj4gDQo+IEEgbW9yZSBnZW5lcmljIHdh
-eSBvZiBkb2luZyB0aGlzIHdvdWxkIGJlIHRvIGhhdmUgYSBkZWZhdWx0IHZhbHVlIGZvcg0KPiAy
-LjAgdG9vLCBpbiBjYXNlIG13X2N1bml0cyBpcyByZXBvcnRlZCBhcyAwLg0KDQpTaW5jZSAwIGlz
-IGNvcnJlY3QgdmFsdWUgYW5kIHVzZXJzIGNhbiBtYWtlIGRpZmZlcmVudCBkZWNpc2lvbnMgYmFz
-ZWQgb24gaXQsIEkgdGhpbmsgd2Ugc2hvdWxkbid0IG92ZXJ3cml0ZSBpdCBieSBkZWZhdWx0IHZh
-bHVlLiBJcyBpdCBtYWtlIHNlbnNlPw0KPiANCj4gSmF2aWVyDQoNClRoYW5rcywNCk1hcmNpbiAN
-Cg==
+If base == buflen then we read one character past the end of buffer[].
+
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+---
+This is static analysis.  Not tested.  This code goes back to before the
+start of git.
+
+diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c
+index 0417937dfe99..8f4c302eb11b 100644
+--- a/block/partitions/ldm.c
++++ b/block/partitions/ldm.c
+@@ -636,12 +636,12 @@ static int ldm_relative(const u8 *buffer, int buflen, int base, int offset)
+ {
+ 
+ 	base += offset;
+-	if (!buffer || offset < 0 || base > buflen) {
++	if (!buffer || offset < 0 || base >= buflen) {
+ 		if (!buffer)
+ 			ldm_error("!buffer");
+ 		if (offset < 0)
+ 			ldm_error("offset (%d) < 0", offset);
+-		if (base > buflen)
++		if (base >= buflen)
+ 			ldm_error("base (%d) > buflen (%d)", base, buflen);
+ 		return -1;
+ 	}
