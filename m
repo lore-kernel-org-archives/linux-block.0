@@ -1,132 +1,91 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39332 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753325AbeF0Mr7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jun 2018 08:47:59 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V7 10/24] block: introduce multipage page bvec helpers
-Date: Wed, 27 Jun 2018 20:45:34 +0800
-Message-Id: <20180627124548.3456-11-ming.lei@redhat.com>
-In-Reply-To: <20180627124548.3456-1-ming.lei@redhat.com>
-References: <20180627124548.3456-1-ming.lei@redhat.com>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:51381 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751691AbeFUIlT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Jun 2018 04:41:19 -0400
+Received: by mail-wm0-f66.google.com with SMTP id r15-v6so3746369wmc.1
+        for <linux-block@vger.kernel.org>; Thu, 21 Jun 2018 01:41:18 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180621011656.GA15427@ming.t460p>
+References: <20180609123014.8861-1-ming.lei@redhat.com> <CAJX1YtaRtCGt7f8H0VEDrDkcOYusB0JoL-CNB_E--MYGhcvbow@mail.gmail.com>
+ <20180621011656.GA15427@ming.t460p>
+From: Gi-Oh Kim <gi-oh.kim@profitbricks.com>
+Date: Thu, 21 Jun 2018 10:40:37 +0200
+Message-ID: <CAJX1YtbmOhXh7rfb72hY=d+EumOfacqCxUY_8t0u39+0R4emcw@mail.gmail.com>
+Subject: Re: [PATCH V6 00/30] block: support multipage bvec
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@fb.com>, hch@infradead.org,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>, dsterba@suse.cz,
+        ying.huang@intel.com, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, "Theodore Ts'o" <tytso@mit.edu>,
+        darrick.wong@oracle.com, colyli@suse.de,
+        Filipe Manana <fdmanana@gmail.com>, rdunlap@infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This patch introduces helpers of 'mp_bvec_iter_*' for multipage
-bvec support.
+On Thu, Jun 21, 2018 at 3:17 AM, Ming Lei <ming.lei@redhat.com> wrote:
+> On Fri, Jun 15, 2018 at 02:59:19PM +0200, Gi-Oh Kim wrote:
+>> >
+>> > - bio size can be increased and it should improve some high-bandwidth =
+IO
+>> > case in theory[4].
+>> >
+>>
+>> Hi,
+>>
+>> I would like to report your patch set works well on my system based on v=
+4.14.48.
+>> I thought the multipage bvec could improve the performance of my system.
+>> (FYI, my system has v4.14.48 and provides KVM-base virtualization servic=
+e.)
+>
+> Thanks for your test!
+>
+>>
+>> So I did back-porting your patches to v4.14.48.
+>> It has done without any serious problem.
+>> I only needed to cherry-pick "blk-merge: compute
+>> bio->bi_seg_front_size efficiently" and
+>> "block: move bio_alloc_pages() to bcache" patches before back-porting
+>> to prevent conflicts.
+>
+> Not sure I understand your point, you have to backport all patches.
 
-The introduced interfaces treate one bvec as real multipage segment,
-for example, .bv_len is the total length of the multipage bvec.
+Never mind.
+I just meant I did backporting for myself and it is still working well.
 
-The existed helpers of bvec_iter_* are interfaces for supporting current
-bvec iterator which is thought as singlepage only by drivers, fs, dm and
-etc. These introduced helpers will build singlepage bvec in flight, so
-users of current bio/bvec iterator still can work well and needn't any
-change even though we store real multipage io vector into bvec table.
+>
+> At least now, BIO_MAX_PAGES can be fixed as 256 in case of CONFIG_THP_SWA=
+P,
+> otherwise 2 pages may be allocated for holding the bvec table, so tests
+> in case of THP_SWAP may be improved.
+>
+> Also filesystem may support IO to/from THP, and multipage bvec should
+> improve this case too.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- include/linux/bvec.h | 63 +++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 60 insertions(+), 3 deletions(-)
+OK, I got it.
+I will find something to use THP_SWAP and run the performance test with it.
+Thank you ;-)
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index fe7a22dd133b..03a12fbb90d8 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -23,6 +23,44 @@
- #include <linux/kernel.h>
- #include <linux/bug.h>
- #include <linux/errno.h>
-+#include <linux/mm.h>
-+
-+/*
-+ * What is multipage bvecs?
-+ *
-+ * - bvec stored in bio->bi_io_vec is always multipage(mp) style
-+ *
-+ * - bvec(struct bio_vec) represents one physically contiguous I/O
-+ *   buffer, now the buffer may include more than one pages since
-+ *   multipage(mp) bvec is supported, and all these pages represented
-+ *   by one bvec is physically contiguous. Before mp support, at most
-+ *   one page can be included in one bvec, we call it singlepage(sp)
-+ *   bvec.
-+ *
-+ * - .bv_page of the bvec represents the 1st page in the mp bvec
-+ *
-+ * - .bv_offset of the bvec represents offset of the buffer in the bvec
-+ *
-+ * The effect on the current drivers/filesystem/dm/bcache/...:
-+ *
-+ * - almost everyone supposes that one bvec only includes one single
-+ *   page, so we keep the sp interface not changed, for example,
-+ *   bio_for_each_segment() still returns bvec with single page
-+ *
-+ * - bio_for_each_segment*() will be changed to return singlepage
-+ *   bvec too
-+ *
-+ * - during iterating, iterator variable(struct bvec_iter) is always
-+ *   updated in multipage bvec style and that means bvec_iter_advance()
-+ *   is kept not changed
-+ *
-+ * - returned(copied) singlepage bvec is generated in flight by bvec
-+ *   helpers from the stored multipage bvec
-+ *
-+ * - In case that some components(such as iov_iter) need to support
-+ *   multipage bvec, we introduce new helpers(mp_bvec_iter_*) for
-+ *   them.
-+ */
- 
- /*
-  * was unsigned short, but we might as well be ready for > 64kB I/O pages
-@@ -52,16 +90,35 @@ struct bvec_iter {
-  */
- #define __bvec_iter_bvec(bvec, iter)	(&(bvec)[(iter).bi_idx])
- 
--#define bvec_iter_page(bvec, iter)				\
-+#define mp_bvec_iter_page(bvec, iter)				\
- 	(__bvec_iter_bvec((bvec), (iter))->bv_page)
- 
--#define bvec_iter_len(bvec, iter)				\
-+#define mp_bvec_iter_len(bvec, iter)				\
- 	min((iter).bi_size,					\
- 	    __bvec_iter_bvec((bvec), (iter))->bv_len - (iter).bi_bvec_done)
- 
--#define bvec_iter_offset(bvec, iter)				\
-+#define mp_bvec_iter_offset(bvec, iter)				\
- 	(__bvec_iter_bvec((bvec), (iter))->bv_offset + (iter).bi_bvec_done)
- 
-+#define mp_bvec_iter_page_idx(bvec, iter)			\
-+	(mp_bvec_iter_offset((bvec), (iter)) / PAGE_SIZE)
-+
-+/*
-+ * <page, offset,length> of singlepage(sp) segment.
-+ *
-+ * This helpers are for building sp bvec in flight.
-+ */
-+#define bvec_iter_offset(bvec, iter)					\
-+	(mp_bvec_iter_offset((bvec), (iter)) % PAGE_SIZE)
-+
-+#define bvec_iter_len(bvec, iter)					\
-+	min_t(unsigned, mp_bvec_iter_len((bvec), (iter)),		\
-+	    (PAGE_SIZE - (bvec_iter_offset((bvec), (iter)))))
-+
-+#define bvec_iter_page(bvec, iter)					\
-+	nth_page(mp_bvec_iter_page((bvec), (iter)),		\
-+		 mp_bvec_iter_page_idx((bvec), (iter)))
-+
- #define bvec_iter_bvec(bvec, iter)				\
- ((struct bio_vec) {						\
- 	.bv_page	= bvec_iter_page((bvec), (iter)),	\
--- 
-2.9.5
+
+--=20
+GIOH KIM
+Linux Kernel Entwickler
+
+ProfitBricks GmbH
+Greifswalder Str. 207
+D - 10405 Berlin
+
+Tel:       +49 176 2697 8962
+Fax:      +49 30 577 008 299
+Email:    gi-oh.kim@profitbricks.com
+URL:      https://www.profitbricks.de
+
+Sitz der Gesellschaft: Berlin
+Registergericht: Amtsgericht Charlottenburg, HRB 125506 B
+Gesch=C3=A4ftsf=C3=BChrer: Achim Weiss, Matthias Steinberg, Christoph Steff=
+ens
