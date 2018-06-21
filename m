@@ -1,80 +1,51 @@
-Return-Path: <willy@infradead.org>
-From: Matthew Wilcox <willy@infradead.org>
-To: linux-kernel@vger.kernel.org
-Cc: Matthew Wilcox <willy@infradead.org>,
-	Joshua Morris <josh.h.morris@us.ibm.com>,
-	Philip Kelleher <pjk1939@linux.vnet.ibm.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 10/26] rsxx: Convert to new IDA API
-Date: Thu, 21 Jun 2018 14:28:19 -0700
-Message-Id: <20180621212835.5636-11-willy@infradead.org>
-In-Reply-To: <20180621212835.5636-1-willy@infradead.org>
-References: <20180621212835.5636-1-willy@infradead.org>
+Return-Path: <prvs=703b01b66=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"keith.busch@intel.com" <keith.busch@intel.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH] blk-mq: don't time out requests again that are in the
+ timeout handler
+Date: Thu, 21 Jun 2018 18:18:52 +0000
+Message-ID: <b470030beb813a77f07a9899c950d017ed807adb.camel@wdc.com>
+References: <20180614115845.27094-1-hch@lst.de>
+In-Reply-To: <20180614115845.27094-1-hch@lst.de>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Eliminate the custom spinlock and the call to ida_pre_get.
-Also add a call to ida_free() in the card remove routine, which I believe
-fixes a bug in this driver.
-
-Signed-off-by: Matthew Wilcox <willy@infradead.org>
----
- drivers/block/rsxx/core.c | 21 +++++----------------
- 1 file changed, 5 insertions(+), 16 deletions(-)
-
-diff --git a/drivers/block/rsxx/core.c b/drivers/block/rsxx/core.c
-index b7d71914a32a..f2c631ce793c 100644
---- a/drivers/block/rsxx/core.c
-+++ b/drivers/block/rsxx/core.c
-@@ -58,7 +58,6 @@ MODULE_PARM_DESC(sync_start, "On by Default: Driver load will not complete "
- 			     "until the card startup has completed.");
- 
- static DEFINE_IDA(rsxx_disk_ida);
--static DEFINE_SPINLOCK(rsxx_ida_lock);
- 
- /* --------------------Debugfs Setup ------------------- */
- 
-@@ -771,19 +770,10 @@ static int rsxx_pci_probe(struct pci_dev *dev,
- 	card->dev = dev;
- 	pci_set_drvdata(dev, card);
- 
--	do {
--		if (!ida_pre_get(&rsxx_disk_ida, GFP_KERNEL)) {
--			st = -ENOMEM;
--			goto failed_ida_get;
--		}
--
--		spin_lock(&rsxx_ida_lock);
--		st = ida_get_new(&rsxx_disk_ida, &card->disk_id);
--		spin_unlock(&rsxx_ida_lock);
--	} while (st == -EAGAIN);
--
--	if (st)
-+	st = ida_alloc(&rsxx_disk_ida, GFP_KERNEL);
-+	if (st < 0)
- 		goto failed_ida_get;
-+	card->disk_id = st;
- 
- 	st = pci_enable_device(dev);
- 	if (st)
-@@ -985,9 +975,7 @@ static int rsxx_pci_probe(struct pci_dev *dev,
- failed_dma_mask:
- 	pci_disable_device(dev);
- failed_enable:
--	spin_lock(&rsxx_ida_lock);
--	ida_remove(&rsxx_disk_ida, card->disk_id);
--	spin_unlock(&rsxx_ida_lock);
-+	ida_free(&rsxx_disk_ida, card->disk_id);
- failed_ida_get:
- 	kfree(card);
- 
-@@ -1050,6 +1038,7 @@ static void rsxx_pci_remove(struct pci_dev *dev)
- 	pci_disable_device(dev);
- 	pci_release_regions(dev);
- 
-+	ida_free(&rsxx_disk_ida, card->disk_id);
- 	kfree(card);
- }
- 
--- 
-2.17.1
+T24gVGh1LCAyMDE4LTA2LTE0IGF0IDEzOjU4ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
+ZToNCj4gV2UgY2FuIGN1cnJlbnRseSBjYWxsIHRoZSB0aW1lb3V0IGhhbmRsZXIgYWdhaW4gb24g
+YSByZXF1ZXN0IHRoYXQgaGFzDQo+IGFscmVhZHkgYmVlbiBoYW5kZWQgb3ZlciB0byB0aGUgdGlt
+ZW91dCBoYW5kbGVyLiAgUHJldmVudCB0aGF0IHdpdGggYSBuZXcNCj4gZmxhZy4NCj4gDQo+IEZp
+eGVzOiAxMmY1YjkzMSAoImJsay1tcTogUmVtb3ZlIGdlbmVyYXRpb24gc2VxZXVuY2UiKQ0KPiBS
+ZXBvcnRlZC1ieTogQW5kcmV3IFJhbmRyaWFuYXN1bHUgPHJhbmRyaWFuYXN1bHVAZ21haWwuY29t
+Pg0KPiBUZXN0ZWQtYnk6IEFuZHJldyBSYW5kcmlhbmFzdWx1IDxyYW5kcmlhbmFzdWx1QGdtYWls
+LmNvbT4NCj4gU2lnbmVkLW9mZi1ieTogQ2hyaXN0b3BoIEhlbGx3aWcgPGhjaEBsc3QuZGU+DQo+
+IC0tLQ0KPiAgYmxvY2svYmxrLW1xLmMgICAgICAgICB8IDUgKysrKysNCj4gIGluY2x1ZGUvbGlu
+dXgvYmxrZGV2LmggfCAyICsrDQo+ICAyIGZpbGVzIGNoYW5nZWQsIDcgaW5zZXJ0aW9ucygrKQ0K
+PiANCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1tcS5jIGIvYmxvY2svYmxrLW1xLmMNCj4gaW5k
+ZXggZTlkYTVlNmE4NTI2Li41NDMzMmRiMDllNWQgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Jsay1t
+cS5jDQo+ICsrKyBiL2Jsb2NrL2Jsay1tcS5jDQo+IEBAIC02NzEsNiArNjcxLDcgQEAgc3RhdGlj
+IHZvaWQgX19ibGtfbXFfcmVxdWV1ZV9yZXF1ZXN0KHN0cnVjdCByZXF1ZXN0ICpycSkNCj4gIA0K
+PiAgCWlmIChibGtfbXFfcmVxdWVzdF9zdGFydGVkKHJxKSkgew0KPiAgCQlXUklURV9PTkNFKHJx
+LT5zdGF0ZSwgTVFfUlFfSURMRSk7DQo+ICsJCXJxLT5ycV9mbGFncyAmPSB+UlFGX1RJTUVEX09V
+VDsNCj4gIAkJaWYgKHEtPmRtYV9kcmFpbl9zaXplICYmIGJsa19ycV9ieXRlcyhycSkpDQo+ICAJ
+CQlycS0+bnJfcGh5c19zZWdtZW50cy0tOw0KPiAgCX0NCj4gQEAgLTc3MCw2ICs3NzEsNyBAQCBF
+WFBPUlRfU1lNQk9MKGJsa19tcV90YWdfdG9fcnEpOw0KPiAgDQo+ICBzdGF0aWMgdm9pZCBibGtf
+bXFfcnFfdGltZWRfb3V0KHN0cnVjdCByZXF1ZXN0ICpyZXEsIGJvb2wgcmVzZXJ2ZWQpDQo+ICB7
+DQo+ICsJcmVxLT5ycV9mbGFncyB8PSBSUUZfVElNRURfT1VUOw0KPiAgCWlmIChyZXEtPnEtPm1x
+X29wcy0+dGltZW91dCkgew0KPiAgCQllbnVtIGJsa19laF90aW1lcl9yZXR1cm4gcmV0Ow0KPiAg
+DQo+IEBAIC03NzksNiArNzgxLDcgQEAgc3RhdGljIHZvaWQgYmxrX21xX3JxX3RpbWVkX291dChz
+dHJ1Y3QgcmVxdWVzdCAqcmVxLCBib29sIHJlc2VydmVkKQ0KPiAgCQlXQVJOX09OX09OQ0UocmV0
+ICE9IEJMS19FSF9SRVNFVF9USU1FUik7DQo+ICAJfQ0KPiAgDQo+ICsJcmVxLT5ycV9mbGFncyAm
+PSB+UlFGX1RJTUVEX09VVDsNCj4gIAlibGtfYWRkX3RpbWVyKHJlcSk7DQo+ICB9DQoNCkkgdGhp
+bmsgaXQgaXMgd3JvbmcgdG8gY2xlYXIgdGhlIFJRRl9USU1FRF9PVVQgZmxhZyBmcm9tIGluc2lk
+ZQ0KYmxrX21xX3JxX3RpbWVkX291dCgpLiBUaGF0IGZsYWcgc2hvdWxkIG9ubHkgYmUgY2xlYXJl
+ZCBhZnRlciB0aGUgcmVxdWVzdCB0YWcNCmhhcyBiZWVuIGZyZWVkIG9yIGFmdGVyIHRoZSByZXF1
+ZXN0IGhhcyBiZWVuIHJldXNlZCBhbmQgYSBuZXcgdGltZXIgaXMgc3RhcnRlZA0KZm9yIHRoZSBy
+ZXF1ZXN0LiBJIHRoaW5rIFRlanVuIGdvdCBpdCByaWdodCBpbiBoaXMgcGF0Y2ggY2FsbGVkICJb
+UEFUQ0ggNi84XQ0KYmxrLW1xOiByZW1vdmUgUkVRX0FUT01fQ09NUExFVEUgdXNhZ2VzIGZyb20g
+YmxrLW1xIi4gU2VlIGFsc28NCmh0dHBzOi8vd3d3Lm1haWwtYXJjaGl2ZS5jb20vbGludXgta2Vy
+bmVsQHZnZXIua2VybmVsLm9yZy9tc2cxNTgwNDIwLmh0bWwuDQoNCkJhcnQuDQoNCg0KDQo=
