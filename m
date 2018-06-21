@@ -1,80 +1,50 @@
 Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] sg, bsg: mitigate read/write abuse, block uaccess in
+ release
+To: Christoph Hellwig <hch@infradead.org>
+Cc: dgilbert@interlog.com, Al Viro <viro@ZenIV.linux.org.uk>,
+ Jann Horn <jannh@google.com>, FUJITA Tomonori
+ <fujita.tomonori@lab.ntt.co.jp>,
+ "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-hardening@lists.openwall.com,
+ security@kernel.org
+References: <20180615152335.208202-1-jannh@google.com>
+ <20180615164009.GD30522@ZenIV.linux.org.uk>
+ <90063ef3-68fa-e983-9b47-838e6076b0f4@interlog.com>
+ <813e817b-bb2f-4a47-6225-9e39f19be278@kernel.dk>
+ <20180621123431.GA558@infradead.org>
 From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.18-rc3
-Message-ID: <9e799234-aaa8-4f29-71e8-7531faa28b0e@kernel.dk>
-Date: Fri, 29 Jun 2018 15:15:59 -0600
+Message-ID: <36a641db-fb1d-6c4c-7f1b-172f2b1cde32@kernel.dk>
+Date: Thu, 21 Jun 2018 08:07:23 -0600
 MIME-Version: 1.0
+In-Reply-To: <20180621123431.GA558@infradead.org>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+On 6/21/18 6:34 AM, Christoph Hellwig wrote:
+> On Mon, Jun 18, 2018 at 09:37:01AM -0600, Jens Axboe wrote:
+>> It was born with that mode, but I don't think anyone ever really used it.
+>> So it might feasible to simply yank it. That said, just doing a prune
+>> mode at ->release() time doesn't seem like such a hard task.
+> 
+> Let's try to kill it.  It is a significant amount of code, which does
+> fishy things and is probably entirely unused:
 
-Small set of fixes for this series. Mostly just minor fixes, the only
-oddball in here is the sg change. This came out of the stall fix for
-NVMe, where we added a mempool and limited us to a single page
-allocation. CONFIG_SG_DEBUG sort-of ruins that, since we'd need to
-account for that. That's actually a generic problem, since lots of
-drivers need to allocate SG lists. I actually added this debug magic
-check back in 2007:
+I'd be fine with that, if we knew that nobody uses it. But that's
+really hard to figure out. I did see Jann's source code scan, which
+even if non-exhaustive, still shows at least one user of it.
 
-commit d6ec084200c37683278c821338f74ddf21ab80f5
-Author: Jens Axboe <jens.axboe@oracle.com>
-Date:   Mon Oct 22 20:01:06 2007 +0200
+How about we just make the write interface sync? Then any copy can
+happen while the we block the task, and the read side is just
+copying the header info back, or dumping it if the task didn't
+read it before it went away.
 
-    Add CONFIG_DEBUG_SG sg validation
-
-when I did the chaining code, to my knowledge it was never useful. Hence
-I'd suggest that we go this route as it'll benefit other drivers too,
-even though this _technically_ should go into the next release. If you
-strongly object, then I can drop it and we'll just have to shrink the
-nvme sg count further for this release.
-
-Anyway, outside of that, this pull contains:
-
-- Clone of request with special payload fix (Bart)
-
-- drbd discard handling fix (Bart)
-
-- SATA blk-mq stall fix (me)
-
-- Chunk size fix (Keith)
-
-- Double free nvme rdma fix (Sagi)
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20180629
-
-
-----------------------------------------------------------------
-Bart Van Assche (2):
-      block: Fix cloning of requests with a special payload
-      drbd: Fix drbd_request_prepare() discard handling
-
-Jens Axboe (3):
-      blk-mq: don't queue more if we get a busy return
-      Merge branch 'nvme-4.18' of git://git.infradead.org/nvme into for-linus
-      sg: remove ->sg_magic member
-
-Keith Busch (1):
-      block: Fix transfer when chunk sectors exceeds max
-
-Sagi Grimberg (1):
-      nvme-rdma: fix possible double free of controller async event buffer
-
- block/blk-core.c                 |  4 ++++
- block/blk-mq.c                   | 12 ++++++++++++
- drivers/block/drbd/drbd_req.c    |  4 ++--
- drivers/gpu/drm/i915/i915_drv.h  |  3 ---
- drivers/nvme/host/rdma.c         |  7 +++++--
- include/linux/blkdev.h           |  4 ++--
- include/linux/scatterlist.h      | 18 ------------------
- lib/scatterlist.c                |  6 ------
- tools/virtio/linux/scatterlist.h | 18 ------------------
- 9 files changed, 25 insertions(+), 51 deletions(-)
+That will still be functional, just not queueable. But that's not
+a huge concern, it won't break any applications. And with pure
+sync issue, most of the code goes away anyway and becomes similar
+to the sync ioctl.
 
 -- 
 Jens Axboe
