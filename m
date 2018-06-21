@@ -1,34 +1,47 @@
-Return-Path: <hch@lst.de>
-Date: Fri, 22 Jun 2018 17:10:43 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@intel.com>,
-	axboe@kernel.dk, martin.petersen@oracle.com, josef@toxicpanda.com,
-	ulf.hansson@linaro.org, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-Path: <prvs=703b01b66=bart.vanassche@wdc.com>
 Subject: Re: [PATCH 0/5]stop normal completion path entering a timeout req
-Message-ID: <20180622151043.GA13470@lst.de>
-References: <1529500964-28429-1-git-send-email-jianchao.w.wang@oracle.com> <20180620181601.GA24145@localhost.localdomain> <e87f5946-bb21-942e-2dcc-b24cee1ad23c@oracle.com> <20180621081900.GA5183@lst.de> <a68ad043-26a1-d3d8-2009-504ba4230e0f@oracle.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+ "jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+ "axboe@kernel.dk" <axboe@kernel.dk>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "josef@toxicpanda.com" <josef@toxicpanda.com>,
+ "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>
+References: <1529500964-28429-1-git-send-email-jianchao.w.wang@oracle.com>
+ <20180620181601.GA24145@localhost.localdomain>
+ <e87f5946-bb21-942e-2dcc-b24cee1ad23c@oracle.com>
+ <20180621081900.GA5183@lst.de>
+ <84a5b54c318b130f47775747d37dc139c27ebda7.camel@wdc.com>
+ <20180621211529.GA27589@localhost.localdomain>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+Message-ID: <fb52d9c5-b392-96eb-c6db-99c603be80d1@wdc.com>
+Date: Thu, 21 Jun 2018 14:30:39 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <a68ad043-26a1-d3d8-2009-504ba4230e0f@oracle.com>
+In-Reply-To: <20180621211529.GA27589@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jun 21, 2018 at 04:22:22PM +0800, jianchao.wang wrote:
-> > Trace, please.  With the latest kernel.  I'm not saying that there
-> > is nothing to fix, but the mode of never completing once timeout
-> > requests as currently done is SCSI is clearly broken.
-> > 
+On 06/21/18 14:12, Keith Busch wrote:
+> On Thu, Jun 21, 2018 at 06:21:09PM +0000, Bart Van Assche wrote:
+>> That's not how the SCSI core works.
 > 
-> I didn't find the existing method to simulate this.
-> So I modified the scsi-debug as following patch as install it as following:
-> modprobe scsi-debug delay=-1 ndelay=-1
-> Both 4.17-rc1 and 4.18-rc1 with this patch set could survive from the test.
+> How does it work? Jianchao is advocating for holes in software
+> to ignore reacting to hardware events and force unnecessary error
+> escalation. Putting holes in kernel software can't possibly be our
+> only recourse.
 
-What tree is this against?  I can't apply it to either current Linus'
-tree or 4.17 for that matter.
+Why were the patch "blk-mq: Remove generation seqeunce" and related 
+patches rushed upstream without having given anyone a chance to review 
+these patches? The approach of these patches is inferior to at least one 
+alternative that was available. The code that is currently upstream
+spreads the request state over multiple (three) variables while an 
+alternative approach was presented that stores the request state in a 
+single variable. I think the number of fix-up patches that is needed for 
+the approach that is currently upstream shows that the upstream approach 
+is inferior. I'm referring to "[PATCH v14] blk-mq: Rework blk-mq timeout 
+handling again" (https://marc.info/?l=linux-block&m=152703042412228).
 
-Also I'm not sure this blk_abort_request call is representative
-of the real world.  Drivers do drain their queues before calling
-it in general, e.g. take a look at ata_eh_set_pending for the
-probably most common user.
+Bart.
