@@ -1,57 +1,80 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:58212 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751624AbeFVUSK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jun 2018 16:18:10 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Jianchao Wang <jianchao.w.wang@oracle.com>,
-        Andrew Randrianasulu <randrianasulu@gmail.com>
-Subject: [PATCH] blk-mq: Fix timeout handling in case the timeout handler returns BLK_EH_DONE
-Date: Fri, 22 Jun 2018 13:18:09 -0700
-Message-Id: <20180622201809.25519-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <willy@infradead.org>
+From: Matthew Wilcox <willy@infradead.org>
+To: linux-kernel@vger.kernel.org
+Cc: Matthew Wilcox <willy@infradead.org>,
+	Joshua Morris <josh.h.morris@us.ibm.com>,
+	Philip Kelleher <pjk1939@linux.vnet.ibm.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: [PATCH 10/26] rsxx: Convert to new IDA API
+Date: Thu, 21 Jun 2018 14:28:19 -0700
+Message-Id: <20180621212835.5636-11-willy@infradead.org>
+In-Reply-To: <20180621212835.5636-1-willy@infradead.org>
+References: <20180621212835.5636-1-willy@infradead.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Make sure that RQF_TIMED_OUT is cleared when a request is reused
-after a block driver timeout handler has returned BLK_EH_DONE.
+Eliminate the custom spinlock and the call to ida_pre_get.
+Also add a call to ida_free() in the card remove routine, which I believe
+fixes a bug in this driver.
 
-Fixes: da6612673988 ("blk-mq: don't time out requests again that are in the timeout handler")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Andrew Randrianasulu <randrianasulu@gmail.com>
+Signed-off-by: Matthew Wilcox <willy@infradead.org>
 ---
- block/blk-mq.c      | 1 -
- block/blk-timeout.c | 1 +
- 2 files changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/rsxx/core.c | 21 +++++----------------
+ 1 file changed, 5 insertions(+), 16 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b97cb6fed3bd..8c00fcd300b9 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -785,7 +785,6 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
- 		WARN_ON_ONCE(ret != BLK_EH_RESET_TIMER);
- 	}
+diff --git a/drivers/block/rsxx/core.c b/drivers/block/rsxx/core.c
+index b7d71914a32a..f2c631ce793c 100644
+--- a/drivers/block/rsxx/core.c
++++ b/drivers/block/rsxx/core.c
+@@ -58,7 +58,6 @@ MODULE_PARM_DESC(sync_start, "On by Default: Driver load will not complete "
+ 			     "until the card startup has completed.");
  
--	req->rq_flags &= ~RQF_TIMED_OUT;
- 	blk_add_timer(req);
+ static DEFINE_IDA(rsxx_disk_ida);
+-static DEFINE_SPINLOCK(rsxx_ida_lock);
+ 
+ /* --------------------Debugfs Setup ------------------- */
+ 
+@@ -771,19 +770,10 @@ static int rsxx_pci_probe(struct pci_dev *dev,
+ 	card->dev = dev;
+ 	pci_set_drvdata(dev, card);
+ 
+-	do {
+-		if (!ida_pre_get(&rsxx_disk_ida, GFP_KERNEL)) {
+-			st = -ENOMEM;
+-			goto failed_ida_get;
+-		}
+-
+-		spin_lock(&rsxx_ida_lock);
+-		st = ida_get_new(&rsxx_disk_ida, &card->disk_id);
+-		spin_unlock(&rsxx_ida_lock);
+-	} while (st == -EAGAIN);
+-
+-	if (st)
++	st = ida_alloc(&rsxx_disk_ida, GFP_KERNEL);
++	if (st < 0)
+ 		goto failed_ida_get;
++	card->disk_id = st;
+ 
+ 	st = pci_enable_device(dev);
+ 	if (st)
+@@ -985,9 +975,7 @@ static int rsxx_pci_probe(struct pci_dev *dev,
+ failed_dma_mask:
+ 	pci_disable_device(dev);
+ failed_enable:
+-	spin_lock(&rsxx_ida_lock);
+-	ida_remove(&rsxx_disk_ida, card->disk_id);
+-	spin_unlock(&rsxx_ida_lock);
++	ida_free(&rsxx_disk_ida, card->disk_id);
+ failed_ida_get:
+ 	kfree(card);
+ 
+@@ -1050,6 +1038,7 @@ static void rsxx_pci_remove(struct pci_dev *dev)
+ 	pci_disable_device(dev);
+ 	pci_release_regions(dev);
+ 
++	ida_free(&rsxx_disk_ida, card->disk_id);
+ 	kfree(card);
  }
  
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index c788255b18ad..d72e9071b17f 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -213,6 +213,7 @@ void blk_add_timer(struct request *req)
- 	if (!req->timeout)
- 		req->timeout = q->rq_timeout;
- 
-+	req->rq_flags &= ~RQF_TIMED_OUT;
- 	blk_rq_set_deadline(req, jiffies + req->timeout);
- 
- 	/*
 -- 
 2.17.1
