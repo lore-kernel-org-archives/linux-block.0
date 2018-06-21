@@ -1,88 +1,223 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: bart.vanassche@wdc.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] block: add helper interface blk_queue_registered
-Date: Fri, 22 Jun 2018 15:11:18 +0800
-Message-Id: <1529651480-1734-2-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1529651480-1734-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1529651480-1734-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <arnd@arndb.de>
+From: Arnd Bergmann <arnd@arndb.de>
+To: Ilya Dryomov <idryomov@gmail.com>,
+	Sage Weil <sage@redhat.com>,
+	"Yan, Zheng" <zyan@redhat.com>
+Cc: y2038@lists.linaro.org,
+	Yan Zheng <ukernel@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Alex Elder <elder@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Chengguang Xu <cgxu519@gmx.com>,
+	ceph-devel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v2 4/5] ceph: use timespec64 for r_mtime
+Date: Thu, 21 Jun 2018 17:46:10 +0200
+Message-Id: <20180621154645.136949-1-arnd@arndb.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Add blk_queue_registered to check whether QUEUE_FLAG_REGISTERED
-is set. And also replace the positions where test it with test_bit
-directly.
+The request mtime field is used all over ceph, and is currently
+represented as a 'timespec' structure in Linux. This changes it to
+timespec64 to allow times beyond 2038, modifying all users at the
+same time.
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- block/blk-sysfs.c      | 4 ++--
- block/blk-wbt.c        | 2 +-
- block/elevator.c       | 2 +-
- include/linux/blkdev.h | 3 +++
- 4 files changed, 7 insertions(+), 4 deletions(-)
+v2: undo an unneeded change pointed out by Yan Zheng.
+    Resending only this patch for now, let me know if you
+    would like to see the entire series reposted instead.
+---
+ drivers/block/rbd.c             |  2 +-
+ fs/ceph/addr.c                  | 12 ++++++------
+ fs/ceph/file.c                  |  8 ++++----
+ include/linux/ceph/osd_client.h |  6 +++---
+ net/ceph/osd_client.c           |  8 ++++----
+ 5 files changed, 18 insertions(+), 18 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 94987b1..159c586 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -863,7 +863,7 @@ int blk_register_queue(struct gendisk *disk)
- 	if (WARN_ON(!q))
- 		return -ENXIO;
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index fa0729c1e776..356936333cd9 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -1452,7 +1452,7 @@ static void rbd_osd_req_format_write(struct rbd_obj_request *obj_request)
+ 	struct ceph_osd_request *osd_req = obj_request->osd_req;
  
--	WARN_ONCE(test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags),
-+	WARN_ONCE(blk_queue_registered(q),
- 		  "%s is registering an already registered queue\n",
- 		  kobject_name(&dev->kobj));
- 	queue_flag_set_unlocked(QUEUE_FLAG_REGISTERED, q);
-@@ -940,7 +940,7 @@ void blk_unregister_queue(struct gendisk *disk)
- 		return;
+ 	osd_req->r_flags = CEPH_OSD_FLAG_WRITE;
+-	ktime_get_real_ts(&osd_req->r_mtime);
++	ktime_get_real_ts64(&osd_req->r_mtime);
+ 	osd_req->r_data_offset = obj_request->ex.oe_off;
+ }
  
- 	/* Return early if disk->queue was never registered. */
--	if (!test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
-+	if (!blk_queue_registered(q))
- 		return;
+diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
+index 292b3d72d725..d44d51e69e76 100644
+--- a/fs/ceph/addr.c
++++ b/fs/ceph/addr.c
+@@ -574,7 +574,7 @@ static u64 get_writepages_data_length(struct inode *inode,
+  */
+ static int writepage_nounlock(struct page *page, struct writeback_control *wbc)
+ {
+-	struct timespec ts;
++	struct timespec64 ts;
+ 	struct inode *inode;
+ 	struct ceph_inode_info *ci;
+ 	struct ceph_fs_client *fsc;
+@@ -625,7 +625,7 @@ static int writepage_nounlock(struct page *page, struct writeback_control *wbc)
+ 		set_bdi_congested(inode_to_bdi(inode), BLK_RW_ASYNC);
  
- 	/*
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 4f89b28..43ae265 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -707,7 +707,7 @@ void wbt_enable_default(struct request_queue *q)
- 		return;
+ 	set_page_writeback(page);
+-	ts = timespec64_to_timespec(inode->i_mtime);
++	ts = inode->i_mtime;
+ 	err = ceph_osdc_writepages(&fsc->client->osdc, ceph_vino(inode),
+ 				   &ci->i_layout, snapc, page_off, len,
+ 				   ceph_wbc.truncate_seq,
+@@ -1134,7 +1134,7 @@ static int ceph_writepages_start(struct address_space *mapping,
+ 			pages = NULL;
+ 		}
  
- 	/* Queue not registered? Maybe shutting down... */
--	if (!test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
-+	if (!blk_queue_registered(q))
- 		return;
+-		req->r_mtime = timespec64_to_timespec(inode->i_mtime);
++		req->r_mtime = inode->i_mtime;
+ 		rc = ceph_osdc_start_request(&fsc->client->osdc, req, true);
+ 		BUG_ON(rc);
+ 		req = NULL;
+@@ -1734,7 +1734,7 @@ int ceph_uninline_data(struct file *filp, struct page *locked_page)
+ 		goto out;
+ 	}
  
- 	if ((q->mq_ops && IS_ENABLED(CONFIG_BLK_WBT_MQ)) ||
-diff --git a/block/elevator.c b/block/elevator.c
-index fa828b5..a574841 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -1084,7 +1084,7 @@ static int __elevator_change(struct request_queue *q, const char *name)
- 	struct elevator_type *e;
+-	req->r_mtime = timespec64_to_timespec(inode->i_mtime);
++	req->r_mtime = inode->i_mtime;
+ 	err = ceph_osdc_start_request(&fsc->client->osdc, req, false);
+ 	if (!err)
+ 		err = ceph_osdc_wait_request(&fsc->client->osdc, req);
+@@ -1776,7 +1776,7 @@ int ceph_uninline_data(struct file *filp, struct page *locked_page)
+ 			goto out_put;
+ 	}
  
- 	/* Make sure queue is not in the middle of being removed */
--	if (!test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
-+	if (!blk_queue_registered(q))
- 		return -ENOENT;
+-	req->r_mtime = timespec64_to_timespec(inode->i_mtime);
++	req->r_mtime = inode->i_mtime;
+ 	err = ceph_osdc_start_request(&fsc->client->osdc, req, false);
+ 	if (!err)
+ 		err = ceph_osdc_wait_request(&fsc->client->osdc, req);
+@@ -1937,7 +1937,7 @@ static int __ceph_pool_perm_get(struct ceph_inode_info *ci,
+ 				     0, false, true);
+ 	err = ceph_osdc_start_request(&fsc->client->osdc, rd_req, false);
  
- 	/*
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 37511c4..d6174ed 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -740,6 +740,9 @@ bool blk_queue_flag_test_and_clear(unsigned int flag, struct request_queue *q);
- #define blk_queue_scsi_passthrough(q)	\
- 	test_bit(QUEUE_FLAG_SCSI_PASSTHROUGH, &(q)->queue_flags)
+-	wr_req->r_mtime = timespec64_to_timespec(ci->vfs_inode.i_mtime);
++	wr_req->r_mtime = ci->vfs_inode.i_mtime;
+ 	err2 = ceph_osdc_start_request(&fsc->client->osdc, wr_req, false);
  
-+#define blk_queue_registered(q) \
-+	test_bit(QUEUE_FLAG_REGISTERED, &(q)->queue_flags)
-+
- #define blk_noretry_request(rq) \
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
- 			     REQ_FAILFAST_DRIVER))
+ 	if (!err)
+diff --git a/fs/ceph/file.c b/fs/ceph/file.c
+index ad0bed99b1d5..2f3a30ca94bf 100644
+--- a/fs/ceph/file.c
++++ b/fs/ceph/file.c
+@@ -721,7 +721,7 @@ struct ceph_aio_request {
+ 	struct list_head osd_reqs;
+ 	unsigned num_reqs;
+ 	atomic_t pending_reqs;
+-	struct timespec mtime;
++	struct timespec64 mtime;
+ 	struct ceph_cap_flush *prealloc_cf;
+ };
+ 
+@@ -923,7 +923,7 @@ ceph_direct_read_write(struct kiocb *iocb, struct iov_iter *iter,
+ 	int num_pages = 0;
+ 	int flags;
+ 	int ret;
+-	struct timespec mtime = timespec64_to_timespec(current_time(inode));
++	struct timespec64 mtime = current_time(inode);
+ 	size_t count = iov_iter_count(iter);
+ 	loff_t pos = iocb->ki_pos;
+ 	bool write = iov_iter_rw(iter) == WRITE;
+@@ -1131,7 +1131,7 @@ ceph_sync_write(struct kiocb *iocb, struct iov_iter *from, loff_t pos,
+ 	int flags;
+ 	int ret;
+ 	bool check_caps = false;
+-	struct timespec mtime = timespec64_to_timespec(current_time(inode));
++	struct timespec64 mtime = current_time(inode);
+ 	size_t count = iov_iter_count(from);
+ 
+ 	if (ceph_snap(file_inode(file)) != CEPH_NOSNAP)
+@@ -1663,7 +1663,7 @@ static int ceph_zero_partial_object(struct inode *inode,
+ 		goto out;
+ 	}
+ 
+-	req->r_mtime = timespec64_to_timespec(inode->i_mtime);
++	req->r_mtime = inode->i_mtime;
+ 	ret = ceph_osdc_start_request(&fsc->client->osdc, req, false);
+ 	if (!ret) {
+ 		ret = ceph_osdc_wait_request(&fsc->client->osdc, req);
+diff --git a/include/linux/ceph/osd_client.h b/include/linux/ceph/osd_client.h
+index 0d6ee04b4c41..2e6611c1e9a0 100644
+--- a/include/linux/ceph/osd_client.h
++++ b/include/linux/ceph/osd_client.h
+@@ -199,7 +199,7 @@ struct ceph_osd_request {
+ 	/* set by submitter */
+ 	u64 r_snapid;                         /* for reads, CEPH_NOSNAP o/w */
+ 	struct ceph_snap_context *r_snapc;    /* for writes */
+-	struct timespec r_mtime;              /* ditto */
++	struct timespec64 r_mtime;            /* ditto */
+ 	u64 r_data_offset;                    /* ditto */
+ 	bool r_linger;                        /* don't resend on failure */
+ 
+@@ -253,7 +253,7 @@ struct ceph_osd_linger_request {
+ 	struct ceph_osd_request_target t;
+ 	u32 map_dne_bound;
+ 
+-	struct timespec mtime;
++	struct timespec64 mtime;
+ 
+ 	struct kref kref;
+ 	struct mutex lock;
+@@ -508,7 +508,7 @@ extern int ceph_osdc_writepages(struct ceph_osd_client *osdc,
+ 				struct ceph_snap_context *sc,
+ 				u64 off, u64 len,
+ 				u32 truncate_seq, u64 truncate_size,
+-				struct timespec *mtime,
++				struct timespec64 *mtime,
+ 				struct page **pages, int nr_pages);
+ 
+ /* watch/notify */
+diff --git a/net/ceph/osd_client.c b/net/ceph/osd_client.c
+index a00c74f1154e..a87a021ca9d0 100644
+--- a/net/ceph/osd_client.c
++++ b/net/ceph/osd_client.c
+@@ -1978,7 +1978,7 @@ static void encode_request_partial(struct ceph_osd_request *req,
+ 	p += sizeof(struct ceph_blkin_trace_info);
+ 
+ 	ceph_encode_32(&p, 0); /* client_inc, always 0 */
+-	ceph_encode_timespec(p, &req->r_mtime);
++	ceph_encode_timespec64(p, &req->r_mtime);
+ 	p += sizeof(struct ceph_timespec);
+ 
+ 	encode_oloc(&p, end, &req->r_t.target_oloc);
+@@ -4512,7 +4512,7 @@ ceph_osdc_watch(struct ceph_osd_client *osdc,
+ 	ceph_oid_copy(&lreq->t.base_oid, oid);
+ 	ceph_oloc_copy(&lreq->t.base_oloc, oloc);
+ 	lreq->t.flags = CEPH_OSD_FLAG_WRITE;
+-	ktime_get_real_ts(&lreq->mtime);
++	ktime_get_real_ts64(&lreq->mtime);
+ 
+ 	lreq->reg_req = alloc_linger_request(lreq);
+ 	if (!lreq->reg_req) {
+@@ -4570,7 +4570,7 @@ int ceph_osdc_unwatch(struct ceph_osd_client *osdc,
+ 	ceph_oid_copy(&req->r_base_oid, &lreq->t.base_oid);
+ 	ceph_oloc_copy(&req->r_base_oloc, &lreq->t.base_oloc);
+ 	req->r_flags = CEPH_OSD_FLAG_WRITE;
+-	ktime_get_real_ts(&req->r_mtime);
++	ktime_get_real_ts64(&req->r_mtime);
+ 	osd_req_op_watch_init(req, 0, lreq->linger_id,
+ 			      CEPH_OSD_WATCH_OP_UNWATCH);
+ 
+@@ -5136,7 +5136,7 @@ int ceph_osdc_writepages(struct ceph_osd_client *osdc, struct ceph_vino vino,
+ 			 struct ceph_snap_context *snapc,
+ 			 u64 off, u64 len,
+ 			 u32 truncate_seq, u64 truncate_size,
+-			 struct timespec *mtime,
++			 struct timespec64 *mtime,
+ 			 struct page **pages, int num_pages)
+ {
+ 	struct ceph_osd_request *req;
 -- 
-2.7.4
+2.9.0
