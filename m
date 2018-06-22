@@ -1,41 +1,40 @@
-Return-Path: <BATV+ddb2dc36ce72650543b9+5395+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Fri, 1 Jun 2018 01:35:57 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Kent Overstreet <kent.overstreet@gmail.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	Theodore Ts'o <tytso@mit.edu>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>,
-	Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>
-Subject: Re: [RESEND PATCH V5 00/33] block: support multipage bvec
-Message-ID: <20180601083557.GA30694@infradead.org>
-References: <20180525034621.31147-1-ming.lei@redhat.com>
- <20180525045306.GB8740@kmo-pixel>
- <8aa4276d-c0bc-3266-aa53-bf08a2e5ab5c@kernel.dk>
- <20180527072332.GA18240@ming.t460p>
- <cc266632-497c-6849-e291-4f042c8d987a@kernel.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <cc266632-497c-6849-e291-4f042c8d987a@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:59818 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933811AbeFVWTs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Jun 2018 18:19:48 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Omar Sandoval <osandov@fb.com>
+Cc: linux-block@vger.kernel.org,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH blktests 05/15] check: Avoid that shellcheck complains that $FULL appears unused
+Date: Fri, 22 Jun 2018 15:19:36 -0700
+Message-Id: <20180622221946.10987-6-bart.vanassche@wdc.com>
+In-Reply-To: <20180622221946.10987-1-bart.vanassche@wdc.com>
+References: <20180622221946.10987-1-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Sun, May 27, 2018 at 07:44:52PM -0600, Jens Axboe wrote:
-> Yes, we discussed exactly this, which is why I'm surprised you went
-> ahead with the same approach. I told you I don't like tree wide renames,
-> if they can be avoided. I'd rather suffer some pain wrt page vs segments
-> naming, and then later do a rename (if it bothers us) once the dust has
-> settled on the interesting part of the changes.
-> 
-> I'm very well away of our current naming and what it signifies.  With
-> #1, you are really splitting hairs, imho. Find a decent name for
-> multiple segment. Chunk?
+$FULL is a global variable. Avoid that shellcheck complains about it.
 
-vec?
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+---
+ check | 2 ++
+ 1 file changed, 2 insertions(+)
 
-bio_for_each_segment (page)
-bio_for_each_vec (whole bvec)
+diff --git a/check b/check
+index 1774be4fe1a7..d9ffea6ec1f6 100755
+--- a/check
++++ b/check
+@@ -301,6 +301,8 @@ _call_test() {
+ 	local test_func="$1"
+ 	local seqres="${RESULTS_DIR}/${TEST_NAME}"
+ 	FULL="${seqres}.full"
++	# Avoid that shellcheck complains that $FULL appears unused.
++	echo "$FULL" >/dev/null
+ 	declare -A TEST_DEV_QUEUE_SAVED
+ 
+ 	_read_last_test_run
+-- 
+2.17.1
