@@ -1,30 +1,58 @@
-Return-Path: <dan.carpenter@oracle.com>
-Date: Wed, 20 Jun 2018 13:45:05 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bart.vanassche@wdc.com>
-Cc: linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] blk-mq-debugfs: Off by one in blk_mq_rq_state_name()
-Message-ID: <20180620104503.nrwlfak3gyxjg7s2@kili.mountain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:26982 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933824AbeFVWTt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Jun 2018 18:19:49 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Omar Sandoval <osandov@fb.com>
+Cc: linux-block@vger.kernel.org,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH blktests 07/15] Avoid passing tests/block/002 arguments to _init_scsi_debug
+Date: Fri, 22 Jun 2018 15:19:38 -0700
+Message-Id: <20180622221946.10987-8-bart.vanassche@wdc.com>
+In-Reply-To: <20180622221946.10987-1-bart.vanassche@wdc.com>
+References: <20180622221946.10987-1-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-If rq_state == ARRAY_SIZE() then we read one element beyond the end of
-the blk_mq_rq_state_name_array[] array.
+This patch avoids that shellcheck reports the following:
 
-Fixes: ec6dcf63c55c ("blk-mq-debugfs: Show more request state information")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+tests/block/002:34:7: note: Use _init_scsi_debug "$@" if function's $1 should mean script's $1. [SC2119]
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index ffa622366922..1c4532e92938 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -356,7 +356,7 @@ static const char *const blk_mq_rq_state_name_array[] = {
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+---
+ common/scsi_debug | 3 +++
+ tests/block/002   | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/common/scsi_debug b/common/scsi_debug
+index e26e85637369..d8e6b71899a3 100644
+--- a/common/scsi_debug
++++ b/common/scsi_debug
+@@ -21,7 +21,10 @@ _have_scsi_debug() {
+ 	_have_module scsi_debug
+ }
  
- static const char *blk_mq_rq_state_name(enum mq_rq_state rq_state)
- {
--	if (WARN_ON_ONCE((unsigned int)rq_state >
-+	if (WARN_ON_ONCE((unsigned int)rq_state >=
- 			 ARRAY_SIZE(blk_mq_rq_state_name_array)))
- 		return "(?)";
- 	return blk_mq_rq_state_name_array[rq_state];
++# The _init_scsi_debug() argument list is passed to modprobe scsi_debug. "--"
++# is filtered out from the start of the argument list.
+ _init_scsi_debug() {
++	[ "$1" = "--" ] && shift
+ 	if ! modprobe -r scsi_debug || ! modprobe scsi_debug "$@"; then
+ 		return 1
+ 	fi
+diff --git a/tests/block/002 b/tests/block/002
+index 32a0f818b95b..10e3f157c018 100755
+--- a/tests/block/002
++++ b/tests/block/002
+@@ -31,7 +31,7 @@ requires() {
+ test() {
+ 	echo "Running ${TEST_NAME}"
+ 
+-	if ! _init_scsi_debug; then
++	if ! _init_scsi_debug --; then
+ 		return 1
+ 	fi
+ 
+-- 
+2.17.1
