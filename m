@@ -1,41 +1,64 @@
-Return-Path: <BATV+94b2d661b7de03f6cf2e+5413+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Boaz Harrosh <ooo@electrozaur.com>,
-	linux-block@vger.kernel.org,
-	linux-bcache@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 4/6] block: remove bio_clone_kmalloc
-Date: Tue, 19 Jun 2018 06:52:14 +0200
-Message-Id: <20180619045216.21130-5-hch@lst.de>
-In-Reply-To: <20180619045216.21130-1-hch@lst.de>
-References: <20180619045216.21130-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULL] nvme fixes for 4.18
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+ Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
+References: <20180622130054.oux3rlmcytua7tff@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <1711249b-abad-7cb2-21b7-790061e4a495@kernel.dk>
+Date: Fri, 22 Jun 2018 08:46:21 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180622130054.oux3rlmcytua7tff@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Unused now.
+On 6/22/18 7:00 AM, Christoph Hellwig wrote:
+> Various relatively small fixes, mostly to fix error handling of various
+> sorts.
+> 
+> 
+> The following changes since commit 9c24c10a2c1e1bb478b6bb70612d9e885aee044f:
+> 
+>   Revert "block: Add warning for bi_next not NULL in bio_endio()" (2018-06-19 11:59:47 -0600)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.infradead.org/nvme.git nvme-4.18
+> 
+> for you to fetch changes up to 943e942e6266f22babee5efeb00f8f672fbff5bd:
+> 
+>   nvme-pci: limit max IO size and segments to avoid high order allocations (2018-06-21 18:59:46 +0200)
+> 
+> ----------------------------------------------------------------
+> Israel Rukshin (1):
+>       nvme-rdma: Fix command completion race at error recovery
+> 
+> James Smart (1):
+>       nvme-fc: release io queues to allow fast fail
+> 
+> Jens Axboe (1):
+>       nvme-pci: limit max IO size and segments to avoid high order allocations
+> 
+> Jianchao Wang (1):
+>       nvme-pci: move nvme_kill_queues to nvme_remove_dead_ctrl
+> 
+> Max Gurtuvoy (1):
+>       nvmet: reset keep alive timer in controller enable
+> 
+> Sagi Grimberg (3):
+>       nvme-rdma: fix possible double free condition when failing to create a controller
+>       nvme-rdma: fix possible free of a non-allocated async event buffer
+>       nvme-rdma: don't override opts->queue_size
+> 
+>  drivers/nvme/host/core.c   |  1 +
+>  drivers/nvme/host/fc.c     |  6 ++--
+>  drivers/nvme/host/nvme.h   |  1 +
+>  drivers/nvme/host/pci.c    | 44 ++++++++++++++++++++++++----
+>  drivers/nvme/host/rdma.c   | 73 +++++++++++++++++++++++-----------------------
+>  drivers/nvme/target/core.c |  8 +++++
+>  6 files changed, 88 insertions(+), 45 deletions(-)
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/bio.h | 6 ------
- 1 file changed, 6 deletions(-)
+Pulled, thanks.
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index f08f5fe7bd08..430807f9f44b 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -443,12 +443,6 @@ static inline struct bio *bio_kmalloc(gfp_t gfp_mask, unsigned int nr_iovecs)
- 	return bio_alloc_bioset(gfp_mask, nr_iovecs, NULL);
- }
- 
--static inline struct bio *bio_clone_kmalloc(struct bio *bio, gfp_t gfp_mask)
--{
--	return bio_clone_bioset(bio, gfp_mask, NULL);
--
--}
--
- extern blk_qc_t submit_bio(struct bio *);
- 
- extern void bio_endio(struct bio *);
 -- 
-2.17.1
+Jens Axboe
