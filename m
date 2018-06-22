@@ -1,75 +1,100 @@
-Return-Path: <BATV+449e860d3caae2166dba+5408+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
 To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH] blk-mq: don't time out requests again that are in the timeout handler
-Date: Thu, 14 Jun 2018 13:58:45 +0200
-Message-Id: <20180614115845.27094-1-hch@lst.de>
+Cc: bart.vanassche@wdc.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 2/3] blk-mq: cleanup blk_mq_register_dev
+Date: Fri, 22 Jun 2018 15:11:19 +0800
+Message-Id: <1529651480-1734-3-git-send-email-jianchao.w.wang@oracle.com>
+In-Reply-To: <1529651480-1734-1-git-send-email-jianchao.w.wang@oracle.com>
+References: <1529651480-1734-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-We can currently call the timeout handler again on a request that has
-already been handed over to the timeout handler.  Prevent that with a new
-flag.
+nobody invokes blk_mq_register_dev, remove it and change
+__blk_mq_register_dev to blk_mq_register_dev. In addition, move
+the declaration of blk_mq_register/unregister_dev to block/blk-mq.h
+because they are only used by block layer.
 
-Fixes: 12f5b931 ("blk-mq: Remove generation seqeunce")
-Reported-by: Andrew Randrianasulu <randrianasulu@gmail.com>
-Tested-by: Andrew Randrianasulu <randrianasulu@gmail.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
 ---
- block/blk-mq.c         | 5 +++++
- include/linux/blkdev.h | 2 ++
- 2 files changed, 7 insertions(+)
+ block/blk-mq-sysfs.c   | 14 +-------------
+ block/blk-mq.h         |  3 +++
+ block/blk-sysfs.c      |  2 +-
+ include/linux/blk-mq.h |  3 ---
+ 4 files changed, 5 insertions(+), 17 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e9da5e6a8526..54332db09e5d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -671,6 +671,7 @@ static void __blk_mq_requeue_request(struct request *rq)
- 
- 	if (blk_mq_request_started(rq)) {
- 		WRITE_ONCE(rq->state, MQ_RQ_IDLE);
-+		rq->rq_flags &= ~RQF_TIMED_OUT;
- 		if (q->dma_drain_size && blk_rq_bytes(rq))
- 			rq->nr_phys_segments--;
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index aafb442..ec26745 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -295,7 +295,7 @@ void blk_mq_sysfs_init(struct request_queue *q)
  	}
-@@ -770,6 +771,7 @@ EXPORT_SYMBOL(blk_mq_tag_to_rq);
- 
- static void blk_mq_rq_timed_out(struct request *req, bool reserved)
- {
-+	req->rq_flags |= RQF_TIMED_OUT;
- 	if (req->q->mq_ops->timeout) {
- 		enum blk_eh_timer_return ret;
- 
-@@ -779,6 +781,7 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
- 		WARN_ON_ONCE(ret != BLK_EH_RESET_TIMER);
- 	}
- 
-+	req->rq_flags &= ~RQF_TIMED_OUT;
- 	blk_add_timer(req);
  }
  
-@@ -788,6 +791,8 @@ static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
+-int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
++int blk_mq_register_dev(struct device *dev, struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int ret, i;
+@@ -330,18 +330,6 @@ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
+ 	return ret;
+ }
  
- 	if (blk_mq_rq_state(rq) != MQ_RQ_IN_FLIGHT)
- 		return false;
-+	if (rq->rq_flags & RQF_TIMED_OUT)
-+		return false;
+-int blk_mq_register_dev(struct device *dev, struct request_queue *q)
+-{
+-	int ret;
+-
+-	mutex_lock(&q->sysfs_lock);
+-	ret = __blk_mq_register_dev(dev, q);
+-	mutex_unlock(&q->sysfs_lock);
+-
+-	return ret;
+-}
+-EXPORT_SYMBOL_GPL(blk_mq_register_dev);
+-
+ void blk_mq_sysfs_unregister(struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 89231e4..7f87e03 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -30,6 +30,9 @@ struct blk_mq_ctx {
+ 	struct kobject		kobj;
+ } ____cacheline_aligned_in_smp;
  
- 	deadline = blk_rq_deadline(rq);
- 	if (time_after_eq(jiffies, deadline))
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index bca3a92eb55f..fa6f11751430 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -127,6 +127,8 @@ typedef __u32 __bitwise req_flags_t;
- #define RQF_ZONE_WRITE_LOCKED	((__force req_flags_t)(1 << 19))
- /* already slept for hybrid poll */
- #define RQF_MQ_POLL_SLEPT	((__force req_flags_t)(1 << 20))
-+/* ->timeout has been called, don't expire again */
-+#define RQF_TIMED_OUT		((__force req_flags_t)(1 << 21))
++int blk_mq_register_dev(struct device *dev, struct request_queue *q);
++void blk_mq_unregister_dev(struct device *dev, struct request_queue *q);
++
+ void blk_mq_freeze_queue(struct request_queue *q);
+ void blk_mq_free_queue(struct request_queue *q);
+ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 159c586..96dcbb9 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -897,7 +897,7 @@ int blk_register_queue(struct gendisk *disk)
+ 	}
  
- /* flags that prevent us from merging requests: */
- #define RQF_NOMERGE_FLAGS \
+ 	if (q->mq_ops) {
+-		__blk_mq_register_dev(dev, q);
++		blk_mq_register_dev(dev, q);
+ 		blk_mq_debugfs_register(q);
+ 	}
+ 
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 0a509ae..61b3833 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -201,9 +201,6 @@ enum {
+ struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *);
+ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 						  struct request_queue *q);
+-int blk_mq_register_dev(struct device *, struct request_queue *);
+-void blk_mq_unregister_dev(struct device *, struct request_queue *);
+-
+ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set);
+ void blk_mq_free_tag_set(struct blk_mq_tag_set *set);
+ 
 -- 
-2.17.1
+2.7.4
