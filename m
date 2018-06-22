@@ -1,82 +1,39 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V7 18/24] block: introduce bio_bvecs()
-Date: Wed, 27 Jun 2018 20:45:42 +0800
-Message-Id: <20180627124548.3456-19-ming.lei@redhat.com>
-In-Reply-To: <20180627124548.3456-1-ming.lei@redhat.com>
-References: <20180627124548.3456-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:29608 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933824AbeFVWTx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Jun 2018 18:19:53 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Omar Sandoval <osandov@fb.com>
+Cc: linux-block@vger.kernel.org,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH blktests 11/15] make check: Also check tests/*/group files
+Date: Fri, 22 Jun 2018 15:19:42 -0700
+Message-Id: <20180622221946.10987-12-bart.vanassche@wdc.com>
+In-Reply-To: <20180622221946.10987-1-bart.vanassche@wdc.com>
+References: <20180622221946.10987-1-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-There are still cases in which we need to use bio_bvecs() for get the
-number of multipage segment, so introduce it.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 ---
- include/linux/bio.h | 30 +++++++++++++++++++++++++-----
- 1 file changed, 25 insertions(+), 5 deletions(-)
+ Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 551444bd9795..083c1ee9c6c8 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -242,7 +242,6 @@ static inline unsigned bio_segments(struct bio *bio)
- 	 * We special case discard/write same/write zeroes, because they
- 	 * interpret bi_size differently:
- 	 */
--
- 	switch (bio_op(bio)) {
- 	case REQ_OP_DISCARD:
- 	case REQ_OP_SECURE_ERASE:
-@@ -251,13 +250,34 @@ static inline unsigned bio_segments(struct bio *bio)
- 	case REQ_OP_WRITE_SAME:
- 		return 1;
- 	default:
--		break;
-+		bio_for_each_segment(bv, bio, iter)
-+			segs++;
-+		return segs;
- 	}
-+}
+diff --git a/Makefile b/Makefile
+index c4bffa2d3f32..8031d2ed0eca 100644
+--- a/Makefile
++++ b/Makefile
+@@ -5,7 +5,8 @@ clean:
+ 	$(MAKE) -C src clean
  
--	bio_for_each_segment(bv, bio, iter)
--		segs++;
-+static inline unsigned bio_bvecs(struct bio *bio)
-+{
-+	unsigned bvecs = 0;
-+	struct bio_vec bv;
-+	struct bvec_iter iter;
+ check:
+-	shellcheck -x -f gcc check new common/* tests/*/[0-9]*[0-9]
++	shellcheck -x -f gcc check new common/* tests/*/group \
++	    tests/*/[0-9]*[0-9]
+ 	! grep TODO tests/*/[0-9]*[0-9]
  
--	return segs;
-+	/*
-+	 * We special case discard/write same/write zeroes, because they
-+	 * interpret bi_size differently:
-+	 */
-+	switch (bio_op(bio)) {
-+	case REQ_OP_DISCARD:
-+	case REQ_OP_SECURE_ERASE:
-+	case REQ_OP_WRITE_ZEROES:
-+		return 0;
-+	case REQ_OP_WRITE_SAME:
-+		return 1;
-+	default:
-+		bio_for_each_bvec(bv, bio, iter)
-+			bvecs++;
-+		return bvecs;
-+	}
- }
- 
- /*
+ .PHONY: all check
 -- 
-2.9.5
+2.17.1
