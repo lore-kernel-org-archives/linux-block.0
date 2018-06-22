@@ -1,69 +1,23 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Omar Sandoval <osandov@fb.com>,
-	Andrew Jones <drjones@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	linux-scsi@vger.kernel.org,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 5/5] blk-mq: avoid to synchronize rcu inside blk_cleanup_queue()
-Date: Mon, 25 Jun 2018 19:31:49 +0800
-Message-Id: <20180625113149.29449-6-ming.lei@redhat.com>
-In-Reply-To: <20180625113149.29449-1-ming.lei@redhat.com>
-References: <20180625113149.29449-1-ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 3/3] block: Change simple_strtol() to kstrtol()
+To: Kitone Elvis Peter <elviskitone@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20180622113918.GA6633@kitone-HP-ProBook-4530s>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <58db0446-1e25-d2ba-3d47-33d5e19beecc@kernel.dk>
+Date: Fri, 22 Jun 2018 13:51:42 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180622113918.GA6633@kitone-HP-ProBook-4530s>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-SCSI probing may synchronously create and destroy a lot of request_queues
-for non-existent devices. Any synchronize_rcu() in queue creation or
-destroy path may introduce long latency during booting, see detailed
-description in comment of blk_register_queue().
+On 6/22/18 5:39 AM, Kitone Elvis Peter wrote:
+> The usage of simple_strtol is discouraged, because
+> strtol() is obsolete. Instead kstrtol() should be 
+> used to convert a string into a long integer.
 
-This patch removes one synchronize_rcu() inside blk_cleanup_queue()
-for this case, commit c2856ae2f315d75(blk-mq: quiesce queue before freeing queue)
-needs synchronize_rcu() for implementing blk_mq_quiesce_queue(), but
-when queue isn't initialized, it isn't necessary to do that since
-only pass-through requests are involved, no original issue in
-scsi_execute() at all.
+My patience is running pretty thin with you. Don't send untested
+crap, you haven't even compiled this.
 
-Without this patch and previous one, it may take more 20+ seconds for
-virtio-scsi to complete disk probe. With the two patches, the time becomes
-less than 100ms.
-
-Fixes: c2856ae2f315d75 ("blk-mq: quiesce queue before freeing queue")
-Reported-by: Andrew Jones <drjones@redhat.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Andrew Jones <drjones@redhat.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: linux-scsi@vger.kernel.org
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-core.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index afd2596ea3d3..222d4fc0e524 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -762,9 +762,13 @@ void blk_cleanup_queue(struct request_queue *q)
- 	 * make sure all in-progress dispatch are completed because
- 	 * blk_freeze_queue() can only complete all requests, and
- 	 * dispatch may still be in-progress since we dispatch requests
--	 * from more than one contexts
-+	 * from more than one contexts.
-+	 *
-+	 * No need to quiesce queue if it isn't initialized yet since
-+	 * blk_freeze_queue() should be enough for cases of passthrough
-+	 * request.
- 	 */
--	if (q->mq_ops)
-+	if (q->mq_ops && blk_queue_init_done(q))
- 		blk_mq_quiesce_queue(q);
- 
- 	/* for synchronous bio-based driver finish in-flight integrity i/o */
 -- 
-2.9.5
+Jens Axboe
