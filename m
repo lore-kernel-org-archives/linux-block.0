@@ -1,88 +1,52 @@
-Return-Path: <axboe@kernel.dk>
-Received: from ?IPv6:2620:10d:c081:1132::1032? ([2620:10d:c090:180::1:981b])
-        by smtp.gmail.com with ESMTPSA id d6-v6sm11069129pgc.38.2018.06.22.12.26.11
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 22 Jun 2018 12:26:12 -0700 (PDT)
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] blk-wbt: fix indefinite background writeback sleep
-Message-ID: <0fa9cc9f-7d34-2490-cdaf-fe7a761e4790@kernel.dk>
-Date: Fri, 22 Jun 2018 13:26:10 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:26982 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933858AbeFVWTv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Jun 2018 18:19:51 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Omar Sandoval <osandov@fb.com>
+Cc: linux-block@vger.kernel.org,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH blktests 10/15] tests/meta/group: Fix shellcheck complaints
+Date: Fri, 22 Jun 2018 15:19:41 -0700
+Message-Id: <20180622221946.10987-11-bart.vanassche@wdc.com>
+In-Reply-To: <20180622221946.10987-1-bart.vanassche@wdc.com>
+References: <20180622221946.10987-1-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-blk-wbt adds waiters to the tail of the waitqueue, and factors in the
-task placement in its decision making on whether or not the current task
-can proceed. This can cause issues for the lowest class of writers,
-since they can get woken up, denied access, and then put back to sleep
-at the end of the waitqueue.
+Avoid that shellcheck complains about unused global variables.
+Avoid that shellcheck complains about using cat instead of
+redirection.
 
-Fix this so that we only utilize the tail add for the initial sleep, and
-we don't factor in the wait queue placement after we've slept (and are
-now using the head addition).
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+---
+ tests/meta/group | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Fixes: e34cbd307477 ("blk-wbt: add general throttling mechanism")
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 4f89b28fa652..7beeabd05f4a 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -550,7 +550,7 @@ static inline bool may_queue(struct rq_wb *rwb, struct rq_wait *rqw,
- 	 * If the waitqueue is already active and we are not the next
- 	 * in line to be woken up, wait for our turn.
- 	 */
--	if (waitqueue_active(&rqw->wait) &&
-+	if (wait && waitqueue_active(&rqw->wait) &&
- 	    rqw->wait.head.next != &wait->entry)
- 		return false;
+diff --git a/tests/meta/group b/tests/meta/group
+index 4281ea175a78..bae91281c493 100644
+--- a/tests/meta/group
++++ b/tests/meta/group
+@@ -17,6 +17,8 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
  
-@@ -567,16 +567,27 @@ static void __wbt_wait(struct rq_wb *rwb, enum wbt_flags wb_acct,
- 	__acquires(lock)
- {
- 	struct rq_wait *rqw = get_rq_wait(rwb, wb_acct);
-+	struct wait_queue_entry *waitptr = NULL;
- 	DEFINE_WAIT(wait);
- 
--	if (may_queue(rwb, rqw, &wait, rw))
-+	if (may_queue(rwb, rqw, waitptr, rw))
- 		return;
- 
-+	waitptr = &wait;
- 	do {
--		prepare_to_wait_exclusive(&rqw->wait, &wait,
-+		/*
-+		 * Don't add ourselves to the wq tail if we've already
-+		 * slept. Otherwise we can penalize background writes
-+		 * indefinitely.
-+		 */
-+		if (waitptr)
-+			prepare_to_wait_exclusive(&rqw->wait, &wait,
-+							TASK_UNINTERRUPTIBLE);
-+		else
-+			prepare_to_wait(&rqw->wait, &wait,
- 						TASK_UNINTERRUPTIBLE);
- 
--		if (may_queue(rwb, rqw, &wait, rw))
-+		if (may_queue(rwb, rqw, waitptr, rw))
- 			break;
- 
- 		if (lock) {
-@@ -585,6 +596,12 @@ static void __wbt_wait(struct rq_wb *rwb, enum wbt_flags wb_acct,
- 			spin_lock_irq(lock);
- 		} else
- 			io_schedule();
++. common/shellcheck
 +
-+		/*
-+		 * After we've slept, we don't want to factor in wq head
-+		 * placement anymore for may_queue().
-+		 */
-+		waitptr = NULL;
- 	} while (1);
+ group_requires() {
+ 	if [[ -v META_REQUIRES_SKIP ]]; then
+ 		SKIP_REASON="META_REQUIRES_SKIP was set"
+@@ -76,7 +78,7 @@ RIP: blk_dev_init+0x4/0x6 RSP: ffffc9000031fe70
+ ---[ end trace d9ab35f734a89f58 ]---
+ EOF
  
- 	finish_wait(&rqw->wait, &wait);
-
+-	cat "$TMPDIR/dmesg" | while IFS= read -r line; do
++	while IFS= read -r line; do
+ 		echo "$line" >> /dev/kmsg
+-	done
++	done < "$TMPDIR/dmesg"
+ }
 -- 
-Jens Axboe
+2.17.1
