@@ -1,103 +1,88 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.18-rc2
-Message-ID: <4860d1d6-db7e-75b8-1e6d-abcb53ffc287@kernel.dk>
-Date: Sat, 23 Jun 2018 10:30:40 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
+To: axboe@kernel.dk
+Cc: bart.vanassche@wdc.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 1/3] block: add helper interface blk_queue_registered
+Date: Fri, 22 Jun 2018 15:11:18 +0800
+Message-Id: <1529651480-1734-2-git-send-email-jianchao.w.wang@oracle.com>
+In-Reply-To: <1529651480-1734-1-git-send-email-jianchao.w.wang@oracle.com>
+References: <1529651480-1734-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+Add blk_queue_registered to check whether QUEUE_FLAG_REGISTERED
+is set. And also replace the positions where test it with test_bit
+directly.
 
-A set of fixes that should go into this merge window. Note that I just
-dropped a patch from the series, so the top most commit will look like
-it just went in minutes ago.
+Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+---
+ block/blk-sysfs.c      | 4 ++--
+ block/blk-wbt.c        | 2 +-
+ block/elevator.c       | 2 +-
+ include/linux/blkdev.h | 3 +++
+ 4 files changed, 7 insertions(+), 4 deletions(-)
 
-This pull request contains:
-
-- Further timeout fixes. We aren't quite there yet, so expect another
-  round of fixes for that to completely close some of the IRQ vs
-  completion races. (Christoph/Bart).
-
-- Set of NVMe fixes from the usual suspects, mostly error handling.
-
-- Two off-by-one fixes (Dan).
-
-- Another bdi race fix (Jan).
-
-- Fix nbd reconfigure with NBD_DISCONNECT_ON_CLOSE (Doron).
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20180623
-
-
-----------------------------------------------------------------
-Bart Van Assche (2):
-      Revert "block: Add warning for bi_next not NULL in bio_endio()"
-      blk-mq: Fix timeout handling in case the timeout handler returns BLK_EH_DONE
-
-Christoph Hellwig (1):
-      block: fix timeout changes for legacy request drivers
-
-Dan Carpenter (2):
-      blk-mq-debugfs: Off by one in blk_mq_rq_state_name()
-      block: sed-opal: Fix a couple off by one bugs
-
-Doron Roberts-Kedes (1):
-      nbd: Add the nbd NBD_DISCONNECT_ON_CLOSE config flag.
-
-Geert Uytterhoeven (1):
-      lightnvm: Remove depends on HAS_DMA in case of platform dependency
-
-Israel Rukshin (1):
-      nvme-rdma: Fix command completion race at error recovery
-
-James Smart (1):
-      nvme-fc: release io queues to allow fast fail
-
-Jan Kara (1):
-      bdi: Fix another oops in wb_workfn()
-
-Jens Axboe (2):
-      nvme-pci: limit max IO size and segments to avoid high order allocations
-      Merge branch 'nvme-4.18' of git://git.infradead.org/nvme into for-linus
-
-Jianchao Wang (1):
-      nvme-pci: move nvme_kill_queues to nvme_remove_dead_ctrl
-
-Max Gurtuvoy (1):
-      nvmet: reset keep alive timer in controller enable
-
-Sagi Grimberg (3):
-      nvme-rdma: fix possible double free condition when failing to create a controller
-      nvme-rdma: fix possible free of a non-allocated async event buffer
-      nvme-rdma: don't override opts->queue_size
-
- block/bio.c                      |  3 --
- block/blk-core.c                 |  8 +----
- block/blk-mq-debugfs.c           |  2 +-
- block/blk-mq.c                   |  1 -
- block/blk-softirq.c              |  1 +
- block/blk-timeout.c              |  1 +
- block/sed-opal.c                 |  4 +--
- drivers/block/nbd.c              | 42 ++++++++++++++++++-----
- drivers/block/null_blk.c         |  2 +-
- drivers/lightnvm/Kconfig         |  2 +-
- drivers/nvme/host/core.c         |  1 +
- drivers/nvme/host/fc.c           |  6 ++--
- drivers/nvme/host/nvme.h         |  1 +
- drivers/nvme/host/pci.c          | 44 ++++++++++++++++++++----
- drivers/nvme/host/rdma.c         | 73 ++++++++++++++++++++--------------------
- drivers/nvme/target/core.c       |  8 +++++
- drivers/scsi/scsi_transport_fc.c |  2 +-
- include/linux/backing-dev-defs.h |  2 +-
- include/uapi/linux/nbd.h         |  3 ++
- mm/backing-dev.c                 | 20 ++++-------
- 20 files changed, 142 insertions(+), 84 deletions(-)
-
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 94987b1..159c586 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -863,7 +863,7 @@ int blk_register_queue(struct gendisk *disk)
+ 	if (WARN_ON(!q))
+ 		return -ENXIO;
+ 
+-	WARN_ONCE(test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags),
++	WARN_ONCE(blk_queue_registered(q),
+ 		  "%s is registering an already registered queue\n",
+ 		  kobject_name(&dev->kobj));
+ 	queue_flag_set_unlocked(QUEUE_FLAG_REGISTERED, q);
+@@ -940,7 +940,7 @@ void blk_unregister_queue(struct gendisk *disk)
+ 		return;
+ 
+ 	/* Return early if disk->queue was never registered. */
+-	if (!test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
++	if (!blk_queue_registered(q))
+ 		return;
+ 
+ 	/*
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 4f89b28..43ae265 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -707,7 +707,7 @@ void wbt_enable_default(struct request_queue *q)
+ 		return;
+ 
+ 	/* Queue not registered? Maybe shutting down... */
+-	if (!test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
++	if (!blk_queue_registered(q))
+ 		return;
+ 
+ 	if ((q->mq_ops && IS_ENABLED(CONFIG_BLK_WBT_MQ)) ||
+diff --git a/block/elevator.c b/block/elevator.c
+index fa828b5..a574841 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -1084,7 +1084,7 @@ static int __elevator_change(struct request_queue *q, const char *name)
+ 	struct elevator_type *e;
+ 
+ 	/* Make sure queue is not in the middle of being removed */
+-	if (!test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
++	if (!blk_queue_registered(q))
+ 		return -ENOENT;
+ 
+ 	/*
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 37511c4..d6174ed 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -740,6 +740,9 @@ bool blk_queue_flag_test_and_clear(unsigned int flag, struct request_queue *q);
+ #define blk_queue_scsi_passthrough(q)	\
+ 	test_bit(QUEUE_FLAG_SCSI_PASSTHROUGH, &(q)->queue_flags)
+ 
++#define blk_queue_registered(q) \
++	test_bit(QUEUE_FLAG_REGISTERED, &(q)->queue_flags)
++
+ #define blk_noretry_request(rq) \
+ 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
+ 			     REQ_FAILFAST_DRIVER))
 -- 
-Jens Axboe
+2.7.4
