@@ -1,39 +1,26 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:29608 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933824AbeFVWTx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jun 2018 18:19:53 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Omar Sandoval <osandov@fb.com>
-Cc: linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH blktests 11/15] make check: Also check tests/*/group files
-Date: Fri, 22 Jun 2018 15:19:42 -0700
-Message-Id: <20180622221946.10987-12-bart.vanassche@wdc.com>
-In-Reply-To: <20180622221946.10987-1-bart.vanassche@wdc.com>
-References: <20180622221946.10987-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-mq: Fix timeout handling in case the timeout handler
+ returns BLK_EH_DONE
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Jianchao Wang <jianchao.w.wang@oracle.com>,
+ Andrew Randrianasulu <randrianasulu@gmail.com>
+References: <20180622201809.25519-1-bart.vanassche@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <3eb3aa0a-06ce-1a35-c990-878ae3c814b7@kernel.dk>
+Date: Fri, 22 Jun 2018 14:32:56 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180622201809.25519-1-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
----
- Makefile | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On 6/22/18 2:18 PM, Bart Van Assche wrote:
+> Make sure that RQF_TIMED_OUT is cleared when a request is reused
+> after a block driver timeout handler has returned BLK_EH_DONE.
 
-diff --git a/Makefile b/Makefile
-index c4bffa2d3f32..8031d2ed0eca 100644
---- a/Makefile
-+++ b/Makefile
-@@ -5,7 +5,8 @@ clean:
- 	$(MAKE) -C src clean
- 
- check:
--	shellcheck -x -f gcc check new common/* tests/*/[0-9]*[0-9]
-+	shellcheck -x -f gcc check new common/* tests/*/group \
-+	    tests/*/[0-9]*[0-9]
- 	! grep TODO tests/*/[0-9]*[0-9]
- 
- .PHONY: all check
+Thanks Bart, I think this looks good. I'm going to try and take some
+time to go over the timeout parts, to ensure that we're good for
+4.18.
+
 -- 
-2.17.1
+Jens Axboe
