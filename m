@@ -1,186 +1,103 @@
-Return-Path: <chenxiang66@hisilicon.com>
-To: "axboe@kernel.dk" <axboe@kernel.dk>, "axboe@fb.com" <axboe@fb.com>, "Bart
- Van Assche" <Bart.VanAssche@wdc.com>
-From: "chenxiang (M)" <chenxiang66@hisilicon.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, John Garry
-	<john.garry@huawei.com>, <linuxarm@huawei.com>
-Subject: The number of fio jobs decrease after long time test
-Message-ID: <74ffbb36-a06a-9875-7c87-f3fd5ab508c1@hisilicon.com>
-Date: Wed, 20 Jun 2018 10:49:20 +0800
+Return-Path: <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 4.18-rc2
+Message-ID: <4860d1d6-db7e-75b8-1e6d-abcb53ffc287@kernel.dk>
+Date: Sat, 23 Jun 2018 10:30:40 -0600
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="------------671C10ABE7A2C531A7DC9072"
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
---------------671C10ABE7A2C531A7DC9072
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi Linus,
 
-Hi Jens,
+A set of fixes that should go into this merge window. Note that I just
+dropped a patch from the series, so the top most commit will look like
+it just went in minutes ago.
 
-When i use fio to test 4k READ for 19 disks which are connected with a 
-expander, and find a issue:
-the numbers of jobs decrease after some times, after about 2 days or 3 
-days, there is only one job
-left, but there is no another exception. Part of log is as follows (the 
-attachment is the script i use to run fio
-(./creat_fio_task.sh 4k read 64)):
+This pull request contains:
 
-Jobs: 19 (f=19): [RRRRRRRRRRRRRRRRRRR] [2.5% done] [7016M/0K /s] 
-[1713K/0  iops] [eta 02d:08h:19m:55s]
-Jobs: 19 (f=19): [RRRRRRRRRRRRRRRRRRR] [2.5% done] [6978M/0K /s] 
-[1704K/0  iops] [eta 02d:08h:19m:55s]
-Jobs: 19 (f=19): [RRRRRRRRRRRRRRRRRRR] [2.5% done] [7008M/0K /s] 
-[1711K/0  iops] [eta 02d:08h:19m:54s]
-Jobs: 18 (f=18): [RRRR_RRRRRRRRRRRRRR] [2.5% done] [5800M/0K /s] 
-[1416K/0  iops] [eta 02d:08h:19m:53s]
-Jobs: 18 (f=18): [RRRR_RRRRRRRRRRRRRR] [2.5% done] [5325M/0K /s] 
-[1300K/0  iops] [eta 02d:08h:19m:51s]
-Jobs: 18 (f=18): [RRRR_RRRRRRRRRRRRRR] [2.5% done] [5354M/0K /s] 
-[1307K/0  iops] [eta 02d:08h:19m:49s]
-Jobs: 18 (f=18): [RRRR_RRRRRRRRRRRRRR] [2.5% done] [5405M/0K /s] 
-[1320K/0  iops] [eta 02d:08h:19m:49s]
-Jobs: 18 (f=18): [RRRR_RRRRRRRRRRRRRR] [2.5% done] [5411M/0K /s] 
-[1321K/0  iops] [eta 02d:08h:19m:48s]
-Jobs: 18 (f=18): [RRRR_RRRRRRRRRRRRRR] [2.5% done] [5525M/0K /s] 
-[1349K/0  iops] [eta 02d:08h:19m:48s]
-Jobs: 18 (f=18): [RRRR_RRRRRRRRRRRRRR] [2.5% done] [5519M/0K /s] 
-[1347K/0  iops] [eta 02d:08h:19m:49s]
-Jobs: 17 (f=17): [RR_R_RRRRRRRRRRRRRR] [2.5% done] [5236M/0K /s] 
-[1278K/0  iops] [eta 02d:08h:19m:49s]
-Jobs: 17 (f=17): [RR_R_RRRRRRRRRRRRRR] [2.5% done] [5085M/0K /s] 
-[1241K/0  iops] [eta 02d:08h:19m:50s]
-Jobs: 17 (f=17): [RR_R_RRRRRRRRRRRRRR] [2.5% done] [5072M/0K /s] 
-[1238K/0  iops] [eta 02d:08h:19m:50s]
-Jobs: 17 (f=17): [RR_R_RRRRRRRRRRRRRR] [2.5% done] [5077M/0K /s] 
-[1240K/0  iops] [eta 02d:08h:19m:51s]
-Jobs: 17 (f=17): [RR_R_RRRRRRRRRRRRRR] [2.5% done] [5373M/0K /s] 
-[1312K/0  iops] [eta 02d:08h:19m:53s]
-Jobs: 17 (f=17): [RR_R_RRRRRRRRRRRRRR] [2.5% done] [5649M/0K /s] 
-[1379K/0  iops] [eta 02d:08h:19m:53s]
-Jobs: 17 (f=17): [RR_R_RRRRRRRRRRRRRR] [2.5% done] [5656M/0K /s] 
-[1381K/0  iops] [eta 02d:08h:19m:54s]
-Jobs: 17 (f=17): [RR_R_RRRRRRRRRRRRRR] [2.5% done] [5595M/0K /s] 
-[1366K/0  iops] [eta 02d:08h:19m:54s]
-Jobs: 17 (f=17): [RR_R_RRRRRRRRRRRRRR] [2.5% done] [4995M/0K /s] 
-[1219K/0  iops] [eta 02d:08h:19m:54s]
-Jobs: 17 (f=17): [RR_R_RRRRRRRRRRRRRR] [2.5% done] [4976M/0K /s] 
-[1215K/0  iops] [eta 02d:08h:19m:52s]
-Jobs: 17 (f=17): [RR_R_RRRRRRRRRRRRRR] [2.5% done] [4996M/0K /s] 
-[1220K/0  iops] [eta 02d:08h:19m:51s]
-Jobs: 17 (f=17): [RR_R_RRRRRRRRRRRRRR] [2.5% done] [4980M/0K /s] 
-[1216K/0  iops] [eta 02d:08h:19m:50s]
-Jobs: 17 (f=17): [RR_R_RRRRRRRRRRRRRR] [2.5% done] [4990M/0K /s] 
-[1218K/0  iops] [eta 02d:08h:19m:51s]
-Jobs: 17 (f=17): [RR_R_RRRRRRRRRRRRRR] [2.5% done] [5007M/0K /s] 
-[1222K/0  iops] [eta 02d:08h:19m:52s]
-Jobs: 17 (f=17): [RR_R_RRRRRRRRRRRRRR] [2.5% done] [5012M/0K /s] 
-[1224K/0  iops] [eta 02d:08h:19m:53s]
-Jobs: 17 (f=17): [RR_R_RRRRRRRRRRRRRR] [2.5% done] [5075M/0K /s] 
-[1239K/0  iops] [eta 02d:08h:19m:54s]
-Jobs: 17 (f=17): [RR_R_RRRRRRRRRRRRRR] [2.5% done] [4994M/0K /s] 
-[1219K/0  iops] [eta 02d:08h:19m:55s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4893M/0K /s] 
-[1195K/0  iops] [eta 02d:08h:20m:34s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4620M/0K /s] 
-[1128K/0  iops] [eta 02d:08h:20m:35s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4600M/0K /s] 
-[1123K/0  iops] [eta 02d:08h:20m:35s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4595M/0K /s] 
-[1122K/0  iops] [eta 02d:08h:20m:34s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4600M/0K /s] 
-[1123K/0  iops] [eta 02d:08h:20m:33s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4603M/0K /s] 
-[1124K/0  iops] [eta 02d:08h:20m:32s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4625M/0K /s] 
-[1129K/0  iops] [eta 02d:08h:20m:31s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4638M/0K /s] 
-[1132K/0  iops] [eta 02d:08h:20m:29s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4626M/0K /s] 
-[1129K/0  iops] [eta 02d:08h:20m:27s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4616M/0K /s] 
-[1127K/0  iops] [eta 02d:08h:20m:26s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4615M/0K /s] 
-[1127K/0  iops] [eta 02d:08h:20m:25s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4624M/0K /s] 
-[1129K/0  iops] [eta 02d:08h:20m:25s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4634M/0K /s] 
-[1131K/0  iops] [eta 02d:08h:20m:25s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4635M/0K /s] 
-[1132K/0  iops] [eta 02d:08h:20m:25s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4626M/0K /s] 
-[1129K/0  iops] [eta 02d:08h:20m:25s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4614M/0K /s] 
-[1127K/0  iops] [eta 02d:08h:20m:26s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4606M/0K /s] 
-[1125K/0  iops] [eta 02d:08h:20m:27s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4595M/0K /s] 
-[1122K/0  iops] [eta 02d:08h:20m:28s]
-Jobs: 16 (f=16): [RR_R_RR_RRRRRRRRRRR] [2.5% done] [4631M/0K /s] 
-[1131K/0  iops] [eta 02d:08h:20m:28s]
-......
+- Further timeout fixes. We aren't quite there yet, so expect another
+  round of fixes for that to completely close some of the IRQ vs
+  completion races. (Christoph/Bart).
 
-Is it normal or exception like that? If exception, do you know why?
+- Set of NVMe fixes from the usual suspects, mostly error handling.
 
-Thanks,
-shawn
+- Two off-by-one fixes (Dan).
 
---------------671C10ABE7A2C531A7DC9072
-Content-Type: application/x-sh; name="creat_fio_task.sh"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment; filename="creat_fio_task.sh"
+- Another bdi race fix (Jan).
 
-#!/bin/bash
-#
-#
-#echo "$1_$2_$3_test" > $filename
-echo "
-[global]
-rw=$2
-direct=1
-ramp_time=10
-ioengine=libaio
-iodepth=$3
-numjobs=1
-bs=$1
+- Fix nbd reconfigure with NBD_DISCONNECT_ON_CLOSE (Doron).
 
-;size=102400m
-;zero_buffers=1
-group_reporting=1
-group_reporting=1
-ioscheduler=noop
-cpus_allowed=0-15
-;gtod_reduce=1
-;iodepth_batch=2
-;iodepth_batch_complete=2
-runtime=1800000
-;thread
-loops = 10
-" > $1_$2_depth$3_fiotest 
+Please pull!
 
-declare -i new_count=1
 
-fdisk -l |grep "Disk /dev/sd" > fdiskinfo
-cat fdiskinfo |awk '{print $2}' |awk -F ":" '{print $1}'  > devinfo
-new_num=`sed -n '$=' devinfo`
+  git://git.kernel.dk/linux-block.git tags/for-linus-20180623
 
-while [ $new_count -le $new_num ]
-do
-    new_disk=`sed -n "$new_count"p devinfo`
-	((new_count++))
-	if [ "$new_disk" = "/dev/sd" ]; then
-	continue
-	fi
-    echo "[job1]" >> $1_$2_depth$3_fiotest
-	echo "filename=$new_disk" >> $1_$2_depth$3_fiotest 
-    
-done
 
-echo "Creat $1_$2_depth$3_fiotest file sucessfully"
+----------------------------------------------------------------
+Bart Van Assche (2):
+      Revert "block: Add warning for bi_next not NULL in bio_endio()"
+      blk-mq: Fix timeout handling in case the timeout handler returns BLK_EH_DONE
 
-#cp liba*  /lib64/
-chmod +x fio
-fio $1_$2_depth$3_fiotest 
+Christoph Hellwig (1):
+      block: fix timeout changes for legacy request drivers
 
---------------671C10ABE7A2C531A7DC9072--
+Dan Carpenter (2):
+      blk-mq-debugfs: Off by one in blk_mq_rq_state_name()
+      block: sed-opal: Fix a couple off by one bugs
+
+Doron Roberts-Kedes (1):
+      nbd: Add the nbd NBD_DISCONNECT_ON_CLOSE config flag.
+
+Geert Uytterhoeven (1):
+      lightnvm: Remove depends on HAS_DMA in case of platform dependency
+
+Israel Rukshin (1):
+      nvme-rdma: Fix command completion race at error recovery
+
+James Smart (1):
+      nvme-fc: release io queues to allow fast fail
+
+Jan Kara (1):
+      bdi: Fix another oops in wb_workfn()
+
+Jens Axboe (2):
+      nvme-pci: limit max IO size and segments to avoid high order allocations
+      Merge branch 'nvme-4.18' of git://git.infradead.org/nvme into for-linus
+
+Jianchao Wang (1):
+      nvme-pci: move nvme_kill_queues to nvme_remove_dead_ctrl
+
+Max Gurtuvoy (1):
+      nvmet: reset keep alive timer in controller enable
+
+Sagi Grimberg (3):
+      nvme-rdma: fix possible double free condition when failing to create a controller
+      nvme-rdma: fix possible free of a non-allocated async event buffer
+      nvme-rdma: don't override opts->queue_size
+
+ block/bio.c                      |  3 --
+ block/blk-core.c                 |  8 +----
+ block/blk-mq-debugfs.c           |  2 +-
+ block/blk-mq.c                   |  1 -
+ block/blk-softirq.c              |  1 +
+ block/blk-timeout.c              |  1 +
+ block/sed-opal.c                 |  4 +--
+ drivers/block/nbd.c              | 42 ++++++++++++++++++-----
+ drivers/block/null_blk.c         |  2 +-
+ drivers/lightnvm/Kconfig         |  2 +-
+ drivers/nvme/host/core.c         |  1 +
+ drivers/nvme/host/fc.c           |  6 ++--
+ drivers/nvme/host/nvme.h         |  1 +
+ drivers/nvme/host/pci.c          | 44 ++++++++++++++++++++----
+ drivers/nvme/host/rdma.c         | 73 ++++++++++++++++++++--------------------
+ drivers/nvme/target/core.c       |  8 +++++
+ drivers/scsi/scsi_transport_fc.c |  2 +-
+ include/linux/backing-dev-defs.h |  2 +-
+ include/uapi/linux/nbd.h         |  3 ++
+ mm/backing-dev.c                 | 20 ++++-------
+ 20 files changed, 142 insertions(+), 84 deletions(-)
+
+-- 
+Jens Axboe
