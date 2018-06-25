@@ -10,11 +10,11 @@ Cc: linux-block@vger.kernel.org,
 	bfq-iosched@googlegroups.com,
 	oleksandr@natalenko.name,
 	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX RESEND 1/4] block, bfq: add/remove entity weights correctly
-Date: Mon, 25 Jun 2018 21:55:34 +0200
-Message-Id: <20180625195537.7769-2-paolo.valente@linaro.org>
-In-Reply-To: <20180625195537.7769-1-paolo.valente@linaro.org>
-References: <20180625195537.7769-1-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX 1/4] block, bfq: add/remove entity weights correctly
+Date: Mon, 25 Jun 2018 21:48:03 +0200
+Message-Id: <20180625194806.7619-2-paolo.valente@linaro.org>
+In-Reply-To: <20180625194806.7619-1-paolo.valente@linaro.org>
+References: <20180625194806.7619-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
 To keep I/O throughput high as often as possible, BFQ performs
