@@ -10,11 +10,11 @@ Cc: linux-block@vger.kernel.org,
 	bfq-iosched@googlegroups.com,
 	oleksandr@natalenko.name,
 	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX RESEND 2/4] block, bfq: do not expire a queue that will deserve dispatch plugging
-Date: Mon, 25 Jun 2018 21:55:35 +0200
-Message-Id: <20180625195537.7769-3-paolo.valente@linaro.org>
-In-Reply-To: <20180625195537.7769-1-paolo.valente@linaro.org>
-References: <20180625195537.7769-1-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX 2/4] block, bfq: do not expire a queue that will deserve dispatch plugging
+Date: Mon, 25 Jun 2018 21:48:04 +0200
+Message-Id: <20180625194806.7619-3-paolo.valente@linaro.org>
+In-Reply-To: <20180625194806.7619-1-paolo.valente@linaro.org>
+References: <20180625194806.7619-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
 For some bfq_queues, BFQ plugs I/O dispatching when the queue becomes
