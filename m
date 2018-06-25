@@ -1,113 +1,185 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:61047 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S967197AbeFSUYQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Jun 2018 16:24:16 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Omar Sandoval <osandov@fb.com>
-Cc: linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 6/9] Multiple tests: remove unused and undefined variables
-Date: Tue, 19 Jun 2018 13:23:50 -0700
-Message-Id: <20180619202353.23631-7-bart.vanassche@wdc.com>
-In-Reply-To: <20180619202353.23631-1-bart.vanassche@wdc.com>
-References: <20180619202353.23631-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	kernel-team@fb.com,
+	akpm@linux-foundation.org,
+	hannes@cmpxchg.org,
+	linux-kernel@vger.kernel.org,
+	tj@kernel.org,
+	linux-fsdevel@vger.kernel.org
+Cc: Josef Bacik <jbacik@fb.com>
+Subject: [PATCH 01/15] block: add bi_blkg to the bio for cgroups
+Date: Mon, 25 Jun 2018 11:12:29 -0400
+Message-Id: <20180625151243.2132-2-josef@toxicpanda.com>
+In-Reply-To: <20180625151243.2132-1-josef@toxicpanda.com>
+References: <20180625151243.2132-1-josef@toxicpanda.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+From: Josef Bacik <jbacik@fb.com>
+
+Currently io.low uses a bi_cg_private to stash its private data for the
+blkg, however other blkcg policies may want to use this as well.  Since
+we can get the private data out of the blkg, move this to bi_blkg in the
+bio and make it generic, then we can use bio_associate_blkg() to attach
+the blkg to the bio.
+
+Theoretically we could simply replace the bi_css with this since we can
+get to all the same information from the blkg, however you have to
+lookup the blkg, so for example wbc_init_bio() would have to lookup and
+possibly allocate the blkg for the css it was trying to attach to the
+bio.  This could be problematic and result in us either not attaching
+the css at all to the bio, or falling back to the root blkcg if we are
+unable to allocate the corresponding blkg.
+
+So for now do this, and in the future if possible we could just replace
+the bi_css with bi_blkg and update the helpers to do the correct
+translation.
+
+Signed-off-by: Josef Bacik <jbacik@fb.com>
+Acked-by: Tejun Heo <tj@kernel.org>
 ---
- tests/loop/003 | 3 ---
- tests/nvme/010 | 3 +--
- tests/nvme/011 | 3 +--
- tests/nvme/012 | 1 -
- tests/nvme/013 | 1 -
- 5 files changed, 2 insertions(+), 9 deletions(-)
+ block/bio.c               | 23 +++++++++++++++++++++++
+ block/blk-throttle.c      | 21 +++++++--------------
+ include/linux/bio.h       |  1 +
+ include/linux/blk_types.h |  2 +-
+ 4 files changed, 32 insertions(+), 15 deletions(-)
 
-diff --git a/tests/loop/003 b/tests/loop/003
-index 353d4fcfa33c..6f6fa8d18ebe 100755
---- a/tests/loop/003
-+++ b/tests/loop/003
-@@ -28,11 +28,8 @@ requires() {
+diff --git a/block/bio.c b/block/bio.c
+index 0a4df92cd689..57c4b1986e76 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -28,6 +28,7 @@
+ #include <linux/mempool.h>
+ #include <linux/workqueue.h>
+ #include <linux/cgroup.h>
++#include <linux/blk-cgroup.h>
+ 
+ #include <trace/events/block.h>
+ #include "blk.h"
+@@ -2026,6 +2027,24 @@ int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css)
+ }
+ EXPORT_SYMBOL_GPL(bio_associate_blkcg);
+ 
++/**
++ * bio_associate_blkg - associate a bio with the specified blkg
++ * @bio: target bio
++ * @blkg: the blkg to associate
++ *
++ * Associate @bio with the blkg specified by @blkg.  This is the queue specific
++ * blkcg information associated with the @bio, a reference will be taken on the
++ * @blkg and will be freed when the bio is freed.
++ */
++int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg)
++{
++	if (unlikely(bio->bi_blkg))
++		return -EBUSY;
++	blkg_get(blkg);
++	bio->bi_blkg = blkg;
++	return 0;
++}
++
+ /**
+  * bio_disassociate_task - undo bio_associate_current()
+  * @bio: target bio
+@@ -2040,6 +2059,10 @@ void bio_disassociate_task(struct bio *bio)
+ 		css_put(bio->bi_css);
+ 		bio->bi_css = NULL;
+ 	}
++	if (bio->bi_blkg) {
++		blkg_put(bio->bi_blkg);
++		bio->bi_blkg = NULL;
++	}
  }
  
- test() {
--	local loop_dev
- 	echo "Running ${TEST_NAME}"
+ /**
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index f63d88c92c3a..5112cef3166b 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -2131,12 +2131,8 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
+ static void blk_throtl_assoc_bio(struct throtl_grp *tg, struct bio *bio)
+ {
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+-	if (bio->bi_css) {
+-		if (bio->bi_cg_private)
+-			blkg_put(tg_to_blkg(bio->bi_cg_private));
+-		bio->bi_cg_private = tg;
+-		blkg_get(tg_to_blkg(tg));
+-	}
++	if (bio->bi_css)
++		bio_associate_blkg(bio, tg_to_blkg(tg));
+ 	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
+ #endif
+ }
+@@ -2284,6 +2280,7 @@ void blk_throtl_stat_add(struct request *rq, u64 time_ns)
  
--	loop_dev="$(losetup -f)"
+ void blk_throtl_bio_endio(struct bio *bio)
+ {
++	struct blkcg_gq *blkg;
+ 	struct throtl_grp *tg;
+ 	u64 finish_time_ns;
+ 	unsigned long finish_time;
+@@ -2291,20 +2288,18 @@ void blk_throtl_bio_endio(struct bio *bio)
+ 	unsigned long lat;
+ 	int rw = bio_data_dir(bio);
+ 
+-	tg = bio->bi_cg_private;
+-	if (!tg)
++	blkg = bio->bi_blkg;
++	if (!blkg)
+ 		return;
+-	bio->bi_cg_private = NULL;
++	tg = blkg_to_tg(blkg);
+ 
+ 	finish_time_ns = ktime_get_ns();
+ 	tg->last_finish_time = finish_time_ns >> 10;
+ 
+ 	start_time = bio_issue_time(&bio->bi_issue) >> 10;
+ 	finish_time = __bio_issue_time(finish_time_ns) >> 10;
+-	if (!start_time || finish_time <= start_time) {
+-		blkg_put(tg_to_blkg(tg));
++	if (!start_time || finish_time <= start_time)
+ 		return;
+-	}
+ 
+ 	lat = finish_time - start_time;
+ 	/* this is only for bio based driver */
+@@ -2333,8 +2328,6 @@ void blk_throtl_bio_endio(struct bio *bio)
+ 		tg->bio_cnt /= 2;
+ 		tg->bad_bio_cnt /= 2;
+ 	}
 -
- 	# In a subshell so TIMEFORMAT doesn't get clobbered.
- 	(
- 	TIMEFORMAT="Test took %0R seconds"
-diff --git a/tests/nvme/010 b/tests/nvme/010
-index 956c6597a374..b6849dbad375 100755
---- a/tests/nvme/010
-+++ b/tests/nvme/010
-@@ -38,7 +38,6 @@ test() {
- 	modprobe nvme-loop
+-	blkg_put(tg_to_blkg(tg));
+ }
+ #endif
  
- 	local port
--	local ret=0
- 	local nvmedev
- 	local loop_dev
- 	local file_path="${TMPDIR}/img"
-@@ -70,7 +69,7 @@ test() {
- 	losetup -d "${loop_dev}"
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 98b175cc00d5..f2f3f1428e81 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -547,6 +547,7 @@ do {						\
  
- 	rm "${file_path}"
--	rm -f local*verify*state "${fio_out}"
-+	rm -f local*verify*state
- 
- 	modprobe -r nvme_loop
- 	modprobe -r nvmet
-diff --git a/tests/nvme/011 b/tests/nvme/011
-index 872a99af4f8c..f26eb155809c 100755
---- a/tests/nvme/011
-+++ b/tests/nvme/011
-@@ -37,7 +37,6 @@ test() {
- 	modprobe nvme-loop
- 
- 	local port
--	local ret=0
- 	local nvmedev
- 	local file_path
- 	local file_path="${TMPDIR}/img"
-@@ -65,7 +64,7 @@ test() {
- 	_remove_nvmet_port "${port}"
- 
- 	rm "${file_path}"
--	rm -f local-write-and-verify*state "${fio_out}"
-+	rm -f local-write-and-verify*state
- 
- 	modprobe -r nvme_loop
- 	modprobe -r nvmet
-diff --git a/tests/nvme/012 b/tests/nvme/012
-index 8f632b30734d..e570793dd5db 100755
---- a/tests/nvme/012
-+++ b/tests/nvme/012
-@@ -38,7 +38,6 @@ test() {
- 	modprobe nvme-loop
- 
- 	local port
--	local ret=0
- 	local nvmedev
- 	local loop_dev
- 	local mount_dir="/mnt/blktests"
-diff --git a/tests/nvme/013 b/tests/nvme/013
-index 0ccb083b175b..247fe9f252fa 100755
---- a/tests/nvme/013
-+++ b/tests/nvme/013
-@@ -38,7 +38,6 @@ test() {
- 	modprobe nvme-loop
- 
- 	local port
--	local ret=0
- 	local nvmedev
- 	local mount_dir="/mnt/blktests/"
- 	local file_path="${TMPDIR}/img"
+ #ifdef CONFIG_BLK_CGROUP
+ int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css);
++int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg);
+ void bio_disassociate_task(struct bio *bio);
+ void bio_clone_blkcg_association(struct bio *dst, struct bio *src);
+ #else	/* CONFIG_BLK_CGROUP */
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 4cb970cdcd11..ff181df8c195 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -179,8 +179,8 @@ struct bio {
+ 	 */
+ 	struct io_context	*bi_ioc;
+ 	struct cgroup_subsys_state *bi_css;
++	struct blkcg_gq		*bi_blkg;
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+-	void			*bi_cg_private;
+ 	struct bio_issue	bi_issue;
+ #endif
+ #endif
 -- 
-2.17.1
+2.14.3
