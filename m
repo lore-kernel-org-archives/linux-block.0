@@ -1,57 +1,100 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga12.intel.com ([192.55.52.136]:15769 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751734AbeFEQQN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 5 Jun 2018 12:16:13 -0400
-Date: Tue, 5 Jun 2018 10:18:53 -0600
-From: Keith Busch <keith.busch@linux.intel.com>
-To: Yi Zhang <yi.zhang@redhat.com>
-Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-        osandov@osandov.com, linux-nvme@lists.infradead.org,
-        ming.lei@redhat.com
-Subject: Re: blktests block/019 lead system hang
-Message-ID: <20180605161853.GB16899@localhost.localdomain>
-References: <838678680.4693215.1527664726174.JavaMail.zimbra@redhat.com>
- <1858098161.4693883.1527665214701.JavaMail.zimbra@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1858098161.4693883.1527665214701.JavaMail.zimbra@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	linus.walleij@linaro.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX RESEND 2/4] block, bfq: do not expire a queue that will deserve dispatch plugging
+Date: Mon, 25 Jun 2018 21:55:35 +0200
+Message-Id: <20180625195537.7769-3-paolo.valente@linaro.org>
+In-Reply-To: <20180625195537.7769-1-paolo.valente@linaro.org>
+References: <20180625195537.7769-1-paolo.valente@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-On Wed, May 30, 2018 at 03:26:54AM -0400, Yi Zhang wrote:
-> Hi Keith
-> I found blktest block/019 also can lead my NVMe server hang with 4.17.0-rc7, let me know if you need more info, thanks. 
-> 
-> Server: Dell R730xd
-> NVMe SSD: 85:00.0 Non-Volatile memory controller: Samsung Electronics Co Ltd NVMe SSD Controller 172X (rev 01)
-> 
-> Console log:
-> Kernel 4.17.0-rc7 on an x86_64
-> 
-> storageqe-62 login: [ 6043.121834] run blktests block/019 at 2018-05-30 03:16:34
-> [ 6049.108476] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 3
-> [ 6049.108478] {1}[Hardware Error]: event severity: fatal
-> [ 6049.108479] {1}[Hardware Error]:  Error 0, type: fatal
-> [ 6049.108481] {1}[Hardware Error]:   section_type: PCIe error
-> [ 6049.108482] {1}[Hardware Error]:   port_type: 6, downstream switch port
-> [ 6049.108483] {1}[Hardware Error]:   version: 1.16
-> [ 6049.108484] {1}[Hardware Error]:   command: 0x0407, status: 0x0010
-> [ 6049.108485] {1}[Hardware Error]:   device_id: 0000:83:05.0
-> [ 6049.108486] {1}[Hardware Error]:   slot: 0
-> [ 6049.108487] {1}[Hardware Error]:   secondary_bus: 0x85
-> [ 6049.108488] {1}[Hardware Error]:   vendor_id: 0x10b5, device_id: 0x8734
-> [ 6049.108489] {1}[Hardware Error]:   class_code: 000406
-> [ 6049.108489] {1}[Hardware Error]:   bridge: secondary_status: 0x0000, control: 0x0003
-> [ 6049.108491] Kernel panic - not syncing: Fatal hardware error!
-> [ 6049.108514] Kernel Offset: 0x25800000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+For some bfq_queues, BFQ plugs I/O dispatching when the queue becomes
+idle, and keeps the plug until a new request of the queue arrives, or
+a timeout fires. BFQ does so either to boost throughput or to preserve
+service guarantees for the queue.
 
-Sounds like your platform fundamentally doesn't support surprise link
-down if it considers the event a fatal error. That's sort of what this
-test was supposed to help catch so we know what platforms can do this
-vs ones that can't.
+More precisely, for such a queue, plugging starts when the queue
+happens to have either no request enqueued, or no request in flight,
+that is, no request already dispatched but not yet completed.
 
-The test does check that the slot is hotplug capable before running,
-so it's supposed to only run the test on slots that claim to be capable
-of handling the event. I just don't know of a good way to query platform
-firmware to know what it will do in response to such an event.
+On the opposite end, BFQ may happen to expire a queue with no request
+enqueued, without doing any plugging, if the queue still has some
+request in flight. Unfortunately, such a premature expiration causes
+the queue to lose its chance to enjoy dispatch plugging a moment
+later, i.e., when its in-flight requests finally get completed. This
+breaks service guarantees for the queue.
+
+This commit prevents BFQ from expiring an empty queue if the latter
+still has in-flight requests.
+
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+---
+ block/bfq-iosched.c | 36 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 33 insertions(+), 3 deletions(-)
+
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 3f32e88c7e9b..4fd4f1996498 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -3597,8 +3597,14 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
+ 
+ 	bfq_log_bfqq(bfqd, bfqq, "select_queue: already in-service queue");
+ 
++	/*
++	 * Do not expire bfqq for budget timeout if bfqq may be about
++	 * to enjoy device idling. The reason why, in this case, we
++	 * prevent bfqq from expiring is the same as in the comments
++	 * on the case where bfq_bfqq_must_idle() returns true, in
++	 * bfq_completed_request().
++	 */
+ 	if (bfq_may_expire_for_budg_timeout(bfqq) &&
+-	    !bfq_bfqq_wait_request(bfqq) &&
+ 	    !bfq_bfqq_must_idle(bfqq))
+ 		goto expire;
+ 
+@@ -4674,8 +4680,32 @@ static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
+ 	 * or if we want to idle in case it has no pending requests.
+ 	 */
+ 	if (bfqd->in_service_queue == bfqq) {
+-		if (bfqq->dispatched == 0 && bfq_bfqq_must_idle(bfqq)) {
+-			bfq_arm_slice_timer(bfqd);
++		if (bfq_bfqq_must_idle(bfqq)) {
++			if (bfqq->dispatched == 0)
++				bfq_arm_slice_timer(bfqd);
++			/*
++			 * If we get here, we do not expire bfqq, even
++			 * if bfqq was in budget timeout or had no
++			 * more requests (as controlled in the next
++			 * conditional instructions). The reason for
++			 * not expiring bfqq is as follows.
++			 *
++			 * Here bfqq->dispatched > 0 holds, but
++			 * bfq_bfqq_must_idle() returned true. This
++			 * implies that, even if no request arrives
++			 * for bfqq before bfqq->dispatched reaches 0,
++			 * bfqq will, however, not be expired on the
++			 * completion event that causes bfqq->dispatch
++			 * to reach zero. In contrast, on this event,
++			 * bfqq will start enjoying device idling
++			 * (I/O-dispatch plugging).
++			 *
++			 * But, if we expired bfqq here, bfqq would
++			 * not have the chance to enjoy device idling
++			 * when bfqq->dispatched finally reaches
++			 * zero. This would expose bfqq to violation
++			 * of its reserved service guarantees.
++			 */
+ 			return;
+ 		} else if (bfq_may_expire_for_budg_timeout(bfqq))
+ 			bfq_bfqq_expire(bfqd, bfqq, false,
+-- 
+2.16.1
