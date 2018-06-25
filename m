@@ -1,91 +1,207 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.18-rc1
-Message-ID: <4cf76676-3c44-fdc5-7aa5-451810aba666@kernel.dk>
-Date: Sat, 16 Jun 2018 09:05:01 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Omar Sandoval <osandov@fb.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org,
+	Andrew Jones <drjones@redhat.com>
+Subject: [PATCH 4/5] blk-mq: remove synchronize_rcu() from blk_mq_del_queue_tag_set()
+Date: Mon, 25 Jun 2018 19:31:48 +0800
+Message-Id: <20180625113149.29449-5-ming.lei@redhat.com>
+In-Reply-To: <20180625113149.29449-1-ming.lei@redhat.com>
+References: <20180625113149.29449-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+We have to remove synchronize_rcu() from blk_queue_cleanup(),
+otherwise long delay can be caused during lun probe. For removing
+it, we have to avoid to iterate the set->tag_list in IO path, eg,
+blk_mq_sched_restart().
 
-Collection of fixes that should go into -rc1. This pull request
-contains:
+This patch reverts 5b79413946d (Revert "blk-mq: don't handle
+TAG_SHARED in restart"). Given we have fixed enough IO hang issue,
+and there isn't any reason to restart all queues in one tags any more,
+see the following reasons:
 
-- bsg_open vs bsg_unregister race fix (Anatoliy)
+1) blk-mq core can deal with shared-tags case well via blk_mq_get_driver_tag(),
+which can wake up queues waiting for driver tag.
 
-- NVMe pull request from Christoph, with fixes for regressions in this
-  window, FC connect/reconnect path code unification, and a trace point
-  addition.
+2) SCSI is a bit special because it may return BLK_STS_RESOURCE if queue,
+target or host is ready, but SCSI built-in restart can cover all these well,
+see scsi_end_request(), queue will be rerun after any request initiated from
+this host/target is completed.
 
-- Timeout fix (Christoph)
+In my test on scsi_debug(8 luns), this patch may improve IOPS by 20% ~ 30%
+when running I/O on these 8 luns concurrently.
 
-- Removal of a few unused functions (Christoph)
+Fixes: 705cda97ee3a ("blk-mq: Make it safe to use RCU to iterate over blk_mq_tag_set.tag_list")
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org
+Reported-by: Andrew Jones <drjones@redhat.com>
+Cc: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-sched.c   | 85 +++-----------------------------------------------
+ block/blk-mq.c         | 10 ++----
+ include/linux/blkdev.h |  2 --
+ 3 files changed, 7 insertions(+), 90 deletions(-)
 
-- blk-mq tag_set reinit fix (Roman)
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20180616
-
-
-----------------------------------------------------------------
-Anatoliy Glagolev (1):
-      bsg: fix race of bsg_open and bsg_unregister
-
-Chaitanya Kulkarni (1):
-      nvmet: free smart-log buffer after use
-
-Christoph Hellwig (8):
-      nvme: don't rely on the changed namespace list log
-      blk-mq: don't time out requests again that are in the timeout handler
-      nvme: remove nvme_reinit_tagset
-      blk-mq: remove blk_mq_tagset_iter
-      nvme-fabrics: refactor queue ready check
-      nvme-fabrics: handle the admin-only case properly in nvmf_check_ready
-      nvme-fabrics: fix and refine state checks in __nvmf_check_ready
-      block: remov blk_queue_invalidate_tags
-
-Hannes Reinecke (1):
-      nvme: add bio remapping tracepoint
-
-Israel Rukshin (1):
-      nvme: fix NULL pointer dereference in nvme_init_subsystem
-
-James Smart (3):
-      nvme-fc: change controllers first connect to use reconnect path
-      nvme-fc: remove reinit_request routine
-      nvme-fc: fix nulling of queue data on reconnect
-
-Jens Axboe (1):
-      Merge branch 'nvme-4.18' of git://git.infradead.org/nvme into for-linus
-
-Max Gurtovoy (1):
-      nvme-rdma: fix error flow during mapping request data
-
-Roman Pen (1):
-      blk-mq: reinit q->tag_set_list entry only after grace period
-
- Documentation/block/biodoc.txt  |  15 +----
- block/blk-mq-tag.c              |  29 --------
- block/blk-mq.c                  |   8 ++-
- block/blk-tag.c                 |  22 ------
- block/bsg.c                     |  22 +++---
- drivers/nvme/host/core.c        |  48 ++++----------
- drivers/nvme/host/fabrics.c     |  86 +++++++++++-------------
- drivers/nvme/host/fabrics.h     |  14 +++-
- drivers/nvme/host/fc.c          | 144 ++++++++++++++++------------------------
- drivers/nvme/host/multipath.c   |   4 ++
- drivers/nvme/host/nvme.h        |   2 -
- drivers/nvme/host/rdma.c        |  38 ++++++++---
- drivers/nvme/target/admin-cmd.c |   4 +-
- drivers/nvme/target/loop.c      |   7 +-
- include/linux/blk-mq.h          |   2 -
- include/linux/blkdev.h          |   4 +-
- 16 files changed, 174 insertions(+), 275 deletions(-)
-
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 56c493c6cd90..4e027f6108ae 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -59,29 +59,16 @@ static void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx)
+ 	if (test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
+ 		return;
+ 
+-	if (hctx->flags & BLK_MQ_F_TAG_SHARED) {
+-		struct request_queue *q = hctx->queue;
+-
+-		if (!test_and_set_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
+-			atomic_inc(&q->shared_hctx_restart);
+-	} else
+-		set_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
++	set_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
+ }
+ 
+-static bool blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
++void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
+ {
+ 	if (!test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
+-		return false;
+-
+-	if (hctx->flags & BLK_MQ_F_TAG_SHARED) {
+-		struct request_queue *q = hctx->queue;
+-
+-		if (test_and_clear_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
+-			atomic_dec(&q->shared_hctx_restart);
+-	} else
+-		clear_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
++		return;
++	clear_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
+ 
+-	return blk_mq_run_hw_queue(hctx, true);
++	blk_mq_run_hw_queue(hctx, true);
+ }
+ 
+ /*
+@@ -380,68 +367,6 @@ static bool blk_mq_sched_bypass_insert(struct blk_mq_hw_ctx *hctx,
+ 	return false;
+ }
+ 
+-/**
+- * list_for_each_entry_rcu_rr - iterate in a round-robin fashion over rcu list
+- * @pos:    loop cursor.
+- * @skip:   the list element that will not be examined. Iteration starts at
+- *          @skip->next.
+- * @head:   head of the list to examine. This list must have at least one
+- *          element, namely @skip.
+- * @member: name of the list_head structure within typeof(*pos).
+- */
+-#define list_for_each_entry_rcu_rr(pos, skip, head, member)		\
+-	for ((pos) = (skip);						\
+-	     (pos = (pos)->member.next != (head) ? list_entry_rcu(	\
+-			(pos)->member.next, typeof(*pos), member) :	\
+-	      list_entry_rcu((pos)->member.next->next, typeof(*pos), member)), \
+-	     (pos) != (skip); )
+-
+-/*
+- * Called after a driver tag has been freed to check whether a hctx needs to
+- * be restarted. Restarts @hctx if its tag set is not shared. Restarts hardware
+- * queues in a round-robin fashion if the tag set of @hctx is shared with other
+- * hardware queues.
+- */
+-void blk_mq_sched_restart(struct blk_mq_hw_ctx *const hctx)
+-{
+-	struct blk_mq_tags *const tags = hctx->tags;
+-	struct blk_mq_tag_set *const set = hctx->queue->tag_set;
+-	struct request_queue *const queue = hctx->queue, *q;
+-	struct blk_mq_hw_ctx *hctx2;
+-	unsigned int i, j;
+-
+-	if (set->flags & BLK_MQ_F_TAG_SHARED) {
+-		/*
+-		 * If this is 0, then we know that no hardware queues
+-		 * have RESTART marked. We're done.
+-		 */
+-		if (!atomic_read(&queue->shared_hctx_restart))
+-			return;
+-
+-		rcu_read_lock();
+-		list_for_each_entry_rcu_rr(q, queue, &set->tag_list,
+-					   tag_set_list) {
+-			queue_for_each_hw_ctx(q, hctx2, i)
+-				if (hctx2->tags == tags &&
+-				    blk_mq_sched_restart_hctx(hctx2))
+-					goto done;
+-		}
+-		j = hctx->queue_num + 1;
+-		for (i = 0; i < queue->nr_hw_queues; i++, j++) {
+-			if (j == queue->nr_hw_queues)
+-				j = 0;
+-			hctx2 = queue->queue_hw_ctx[j];
+-			if (hctx2->tags == tags &&
+-			    blk_mq_sched_restart_hctx(hctx2))
+-				break;
+-		}
+-done:
+-		rcu_read_unlock();
+-	} else {
+-		blk_mq_sched_restart_hctx(hctx);
+-	}
+-}
+-
+ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
+ 				 bool run_queue, bool async)
+ {
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index ff3ff191ff0b..c8c6c0373bee 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2323,15 +2323,10 @@ static void queue_set_hctx_shared(struct request_queue *q, bool shared)
+ 	int i;
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+-		if (shared) {
+-			if (test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
+-				atomic_inc(&q->shared_hctx_restart);
++		if (shared)
+ 			hctx->flags |= BLK_MQ_F_TAG_SHARED;
+-		} else {
+-			if (test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
+-				atomic_dec(&q->shared_hctx_restart);
++		else
+ 			hctx->flags &= ~BLK_MQ_F_TAG_SHARED;
+-		}
+ 	}
+ }
+ 
+@@ -2362,7 +2357,6 @@ static void blk_mq_del_queue_tag_set(struct request_queue *q)
+ 		blk_mq_update_tag_set_depth(set, false);
+ 	}
+ 	mutex_unlock(&set->tag_list_lock);
+-	synchronize_rcu();
+ 	INIT_LIST_HEAD(&q->tag_set_list);
+ }
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 9154570edf29..ca40c7419edd 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -442,8 +442,6 @@ struct request_queue {
+ 	int			nr_rqs[2];	/* # allocated [a]sync rqs */
+ 	int			nr_rqs_elvpriv;	/* # allocated rqs w/ elvpriv */
+ 
+-	atomic_t		shared_hctx_restart;
+-
+ 	struct blk_queue_stats	*stats;
+ 	struct rq_wb		*rq_wb;
+ 
 -- 
-Jens Axboe
+2.9.5
