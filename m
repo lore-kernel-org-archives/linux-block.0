@@ -10,11 +10,11 @@ Cc: linux-block@vger.kernel.org,
 	bfq-iosched@googlegroups.com,
 	oleksandr@natalenko.name,
 	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX RESEND 3/4] block, bfq: fix service being wrongly set to zero in case of preemption
-Date: Mon, 25 Jun 2018 21:55:36 +0200
-Message-Id: <20180625195537.7769-4-paolo.valente@linaro.org>
-In-Reply-To: <20180625195537.7769-1-paolo.valente@linaro.org>
-References: <20180625195537.7769-1-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX 4/4] block, bfq: fix service being wrongly set to zero in case of preemption
+Date: Mon, 25 Jun 2018 21:48:06 +0200
+Message-Id: <20180625194806.7619-5-paolo.valente@linaro.org>
+In-Reply-To: <20180625194806.7619-1-paolo.valente@linaro.org>
+References: <20180625194806.7619-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
 If
@@ -30,89 +30,72 @@ expiration.
 
 Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/bfq-iosched.c | 34 ++++++++++++++++++++++++++++------
- block/bfq-wf2q.c    |  6 ------
- 2 files changed, 28 insertions(+), 12 deletions(-)
+ block/bfq-iosched.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 4fd4f1996498..d579cc8e0db6 100644
+index d579cc8e0db6..41d9036b1822 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -1382,18 +1382,30 @@ static bool bfq_bfqq_update_budg_for_activation(struct bfq_data *bfqd,
- 		 * remain unchanged after such an expiration, and the
- 		 * following statement therefore assigns to
- 		 * entity->budget the remaining budget on such an
--		 * expiration. For clarity, entity->service is not
--		 * updated on expiration in any case, and, in normal
--		 * operation, is reset only when bfqq is selected for
--		 * service (see bfq_get_next_queue).
-+		 * expiration.
- 		 */
- 		entity->budget = min_t(unsigned long,
- 				       bfq_bfqq_budget_left(bfqq),
- 				       bfqq->max_budget);
- 
-+		/*
-+		 * At this point, we have used entity->service to get
-+		 * the budget left (needed for updating
-+		 * entity->budget). Thus we finally can, and have to,
-+		 * reset entity->service. The latter must be reset
-+		 * because bfqq would otherwise be charged again for
-+		 * the service it has received during its previous
-+		 * service slot(s).
-+		 */
-+		entity->service = 0;
-+
- 		return true;
- 	}
- 
-+	/*
-+	 * We can finally complete expiration, by setting service to 0.
-+	 */
-+	entity->service = 0;
- 	entity->budget = max_t(unsigned long, bfqq->max_budget,
- 			       bfq_serv_to_charge(bfqq->next_rq, bfqq));
- 	bfq_clear_bfqq_non_blocking_wait_rq(bfqq);
-@@ -3271,11 +3283,21 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
- 	ref = bfqq->ref;
- 	__bfq_bfqq_expire(bfqd, bfqq);
- 
-+	if (ref == 1) /* bfqq is gone, no more actions on it */
-+		return;
-+
- 	/* mark bfqq as waiting a request only if a bic still points to it */
--	if (ref > 1 && !bfq_bfqq_busy(bfqq) &&
-+	if (!bfq_bfqq_busy(bfqq) &&
- 	    reason != BFQQE_BUDGET_TIMEOUT &&
--	    reason != BFQQE_BUDGET_EXHAUSTED)
-+	    reason != BFQQE_BUDGET_EXHAUSTED) {
- 		bfq_mark_bfqq_non_blocking_wait_rq(bfqq);
-+		/*
-+		 * Not setting service to 0, because, if the next rq
-+		 * arrives in time, the queue will go on receiving
-+		 * service with this same budget (as if it never expired)
-+		 */
-+	} else
-+		entity->service = 0;
+@@ -634,7 +634,7 @@ static bool bfq_differentiated_weights(struct bfq_data *bfqd)
+  * The following function returns true if every queue must receive the
+  * same share of the throughput (this condition is used when deciding
+  * whether idling may be disabled, see the comments in the function
+- * bfq_bfqq_may_idle()).
++ * bfq_better_to_idle()).
+  *
+  * Such a scenario occurs when:
+  * 1) all active queues have the same weight,
+@@ -3355,7 +3355,7 @@ static bool bfq_may_expire_for_budg_timeout(struct bfq_queue *bfqq)
+  * issues taken into account are not trivial. We discuss these issues
+  * individually while introducing the variables.
+  */
+-static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
++static bool bfq_better_to_idle(struct bfq_queue *bfqq)
+ {
+ 	struct bfq_data *bfqd = bfqq->bfqd;
+ 	bool rot_without_queueing =
+@@ -3588,19 +3588,19 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
  }
  
  /*
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 58cf38fcee05..dbc07b456059 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -1544,12 +1544,6 @@ struct bfq_queue *bfq_get_next_queue(struct bfq_data *bfqd)
- 		entity = sd->next_in_service;
- 		sd->in_service_entity = entity;
+- * If the in-service queue is empty but the function bfq_bfqq_may_idle
++ * If the in-service queue is empty but the function bfq_better_to_idle
+  * returns true, then:
+  * 1) the queue must remain in service and cannot be expired, and
+  * 2) the device must be idled to wait for the possible arrival of a new
+  *    request for the queue.
+- * See the comments on the function bfq_bfqq_may_idle for the reasons
++ * See the comments on the function bfq_better_to_idle for the reasons
+  * why performing device idling is the best choice to boost the throughput
+- * and preserve service guarantees when bfq_bfqq_may_idle itself
++ * and preserve service guarantees when bfq_better_to_idle itself
+  * returns true.
+  */
+ static bool bfq_bfqq_must_idle(struct bfq_queue *bfqq)
+ {
+-	return RB_EMPTY_ROOT(&bfqq->sort_list) && bfq_bfqq_may_idle(bfqq);
++	return RB_EMPTY_ROOT(&bfqq->sort_list) && bfq_better_to_idle(bfqq);
+ }
  
--		/*
--		 * Reset the accumulator of the amount of service that
--		 * the entity is about to receive.
--		 */
--		entity->service = 0;
--
- 		/*
- 		 * If entity is no longer a candidate for next
- 		 * service, then it must be extracted from its active
+ /*
+@@ -3686,7 +3686,7 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
+ 	 * may idle after their completion, then keep it anyway.
+ 	 */
+ 	if (bfq_bfqq_wait_request(bfqq) ||
+-	    (bfqq->dispatched != 0 && bfq_bfqq_may_idle(bfqq))) {
++	    (bfqq->dispatched != 0 && bfq_better_to_idle(bfqq))) {
+ 		bfqq = NULL;
+ 		goto keep_queue;
+ 	}
+@@ -4734,7 +4734,7 @@ static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
+ 					BFQQE_BUDGET_TIMEOUT);
+ 		else if (RB_EMPTY_ROOT(&bfqq->sort_list) &&
+ 			 (bfqq->dispatched == 0 ||
+-			  !bfq_bfqq_may_idle(bfqq)))
++			  !bfq_better_to_idle(bfqq)))
+ 			bfq_bfqq_expire(bfqd, bfqq, false,
+ 					BFQQE_NO_MORE_REQUESTS);
+ 	}
 -- 
 2.16.1
