@@ -1,180 +1,146 @@
-Return-Path: <prvs=701cef09f=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Kent Overstreet <kent.overstreet@gmail.com>,
-	Mike Snitzer <snitzer@redhat.com>
-Subject: [PATCH v2] Revert "block: Add warning for bi_next not NULL in bio_endio()"
-Date: Tue, 19 Jun 2018 10:26:40 -0700
-Message-Id: <20180619172640.15246-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:42659 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935141AbeFYTtA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Jun 2018 15:49:00 -0400
+Received: by mail-pf0-f195.google.com with SMTP id w7-v6so6931453pfn.9
+        for <linux-block@vger.kernel.org>; Mon, 25 Jun 2018 12:48:59 -0700 (PDT)
+Date: Mon, 25 Jun 2018 12:48:57 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/9] blktests: Re-enable shellcheck warnings
+Message-ID: <20180625194857.GC1218@vader>
+References: <20180619202353.23631-1-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180619202353.23631-1-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Commit 0ba99ca4838b ("block: Add warning for bi_next not NULL in
-bio_endio()") breaks the dm driver. end_clone_bio() detects whether
-or not a bio is the last bio associated with a request by checking
-the .bi_next field. Commit 0ba99ca4838b clears that field before
-end_clone_bio() has had a chance to inspect that field. Hence revert
-commit 0ba99ca4838b.
+On Tue, Jun 19, 2018 at 01:23:44PM -0700, Bart Van Assche wrote:
+> Hello Omar,
+> 
+> Since I noticed that several useful shellcheck warnings are suppressed in the
+> blktests project, I came up with this patch series that reenables all
+> shellcheck warnings and also suppresses false positive shellcheck reports. It
+> would be appreciated if you could have a look at this patch series.
+> 
+> Thanks,
+> 
+> Bart.
 
-This patch avoids that KASAN reports the following complaint when
-running the srp-test software (srp-test/run_tests -c -d -r 10 -t 02-mq):
+> Bart Van Assche (9):
 
-==================================================================
-BUG: KASAN: use-after-free in bio_advance+0x11b/0x1d0
-Read of size 4 at addr ffff8801300e06d0 by task ksoftirqd/0/9
+>   common/rc: Fix _have_tracepoint()
+>   Annotate include statements in shell scripts where the source file is
+>     a variable
+>   check, tests/meta/012: Use array["index"] instead of array[index]
 
-CPU: 0 PID: 9 Comm: ksoftirqd/0 Not tainted 4.18.0-rc1-dbg+ #1
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.0.0-prebuilt.qemu-project.org 04/01/2014
-Call Trace:
- dump_stack+0xa4/0xf5
- print_address_description+0x6f/0x270
- kasan_report+0x241/0x360
- __asan_load4+0x78/0x80
- bio_advance+0x11b/0x1d0
- blk_update_request+0xa7/0x5b0
- scsi_end_request+0x56/0x320 [scsi_mod]
- scsi_io_completion+0x7d6/0xb20 [scsi_mod]
- scsi_finish_command+0x1c0/0x280 [scsi_mod]
- scsi_softirq_done+0x19a/0x230 [scsi_mod]
- blk_mq_complete_request+0x160/0x240
- scsi_mq_done+0x50/0x1a0 [scsi_mod]
- srp_recv_done+0x515/0x1330 [ib_srp]
- __ib_process_cq+0xa0/0xf0 [ib_core]
- ib_poll_handler+0x38/0xa0 [ib_core]
- irq_poll_softirq+0xe8/0x1f0
- __do_softirq+0x128/0x60d
- run_ksoftirqd+0x3f/0x60
- smpboot_thread_fn+0x352/0x460
- kthread+0x1c1/0x1e0
- ret_from_fork+0x24/0x30
+Applied these.
 
-Allocated by task 1918:
- save_stack+0x43/0xd0
- kasan_kmalloc+0xad/0xe0
- kasan_slab_alloc+0x11/0x20
- kmem_cache_alloc+0xfe/0x350
- mempool_alloc_slab+0x15/0x20
- mempool_alloc+0xfb/0x270
- bio_alloc_bioset+0x244/0x350
- submit_bh_wbc+0x9c/0x2f0
- __block_write_full_page+0x299/0x5a0
- block_write_full_page+0x16b/0x180
- blkdev_writepage+0x18/0x20
- __writepage+0x42/0x80
- write_cache_pages+0x376/0x8a0
- generic_writepages+0xbe/0x110
- blkdev_writepages+0xe/0x10
- do_writepages+0x9b/0x180
- __filemap_fdatawrite_range+0x178/0x1c0
- file_write_and_wait_range+0x59/0xc0
- blkdev_fsync+0x46/0x80
- vfs_fsync_range+0x66/0x100
- do_fsync+0x3d/0x70
- __x64_sys_fsync+0x21/0x30
- do_syscall_64+0x77/0x230
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
+>   Suppress shellcheck complaints about global variables
+>   check: Avoid that shellcheck complains that $FULL appears unused
 
-Freed by task 9:
- save_stack+0x43/0xd0
- __kasan_slab_free+0x137/0x190
- kasan_slab_free+0xe/0x10
- kmem_cache_free+0xd3/0x380
- mempool_free_slab+0x17/0x20
- mempool_free+0x63/0x160
- bio_free+0x81/0xa0
- bio_put+0x59/0x60
- end_bio_bh_io_sync+0x5d/0x70
- bio_endio+0x1a7/0x360
- blk_update_request+0xd0/0x5b0
- end_clone_bio+0xa3/0xd0 [dm_mod]
- bio_endio+0x1a7/0x360
- blk_update_request+0xd0/0x5b0
- scsi_end_request+0x56/0x320 [scsi_mod]
- scsi_io_completion+0x7d6/0xb20 [scsi_mod]
- scsi_finish_command+0x1c0/0x280 [scsi_mod]
- scsi_softirq_done+0x19a/0x230 [scsi_mod]
- blk_mq_complete_request+0x160/0x240
- scsi_mq_done+0x50/0x1a0 [scsi_mod]
- srp_recv_done+0x515/0x1330 [ib_srp]
- __ib_process_cq+0xa0/0xf0 [ib_core]
- ib_poll_handler+0x38/0xa0 [ib_core]
- irq_poll_softirq+0xe8/0x1f0
- __do_softirq+0x128/0x60d
+These are definitely useful warnings that would be good to reenable, but
+I'm not a huge fan of this fix. Adding boilerplate for the sake of
+appeasing the linter is... meh. I think what we can do is make the
+tests/foo/group and common/rc sourcing explicit and put the workaround
+stuff in common/rc. Still boilerplate but it at least appears to serve a
+real purpose. I'll work on that.
 
-The buggy address belongs to the object at ffff8801300e0640
- which belongs to the cache bio-0 of size 200
-The buggy address is located 144 bytes inside of
- 200-byte region [ffff8801300e0640, ffff8801300e0708)
-The buggy address belongs to the page:
-page:ffffea0004c03800 count:1 mapcount:0 mapping:ffff88015a563a00 index:0x0 compound_mapcount: 0
-flags: 0x8000000000008100(slab|head)
-raw: 8000000000008100 dead000000000100 dead000000000200 ffff88015a563a00
-raw: 0000000000000000 0000000000330033 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
+>   Multiple tests: remove unused and undefined variables
 
-Memory state around the buggy address:
- ffff8801300e0580: fb fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc
- ffff8801300e0600: fc fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb
->ffff8801300e0680: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                                 ^
- ffff8801300e0700: fb fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff8801300e0780: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-==================================================================
+Applied this one.
 
-Fixes: 0ba99ca4838b ("block: Add warning for bi_next not NULL in bio_endio()")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
----
+>   Avoid passing tests/block/002 arguments to _init_scsi_debug
 
-Changes in v2 compared to v1: improved patch description.
+This warning is stupid, I'd prefer to keep it disabled.
 
- block/bio.c      | 3 ---
- block/blk-core.c | 8 +-------
- 2 files changed, 1 insertion(+), 10 deletions(-)
+>   check: Suppress a shellcheck warning about the DMESG_FILTER
+>     initialization
 
-diff --git a/block/bio.c b/block/bio.c
-index 595663e0281a..accf68a5aa1e 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1777,9 +1777,6 @@ void bio_endio(struct bio *bio)
- 	if (!bio_integrity_endio(bio))
- 		return;
- 
--	if (WARN_ONCE(bio->bi_next, "driver left bi_next not NULL"))
--		bio->bi_next = NULL;
--
- 	/*
- 	 * Need to have a real endio function for chained bios, otherwise
- 	 * various corner cases will break (like stacking block devices that
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 7b7f237b13d5..49475e008e38 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -274,10 +274,6 @@ static void req_bio_endio(struct request *rq, struct bio *bio,
- 	bio_advance(bio, nbytes);
- 
- 	/* don't actually finish bio if it's part of flush sequence */
--	/*
--	 * XXX this code looks suspicious - it's not consistent with advancing
--	 * req->bio in caller
--	 */
- 	if (bio->bi_iter.bi_size == 0 && !(rq->rq_flags & RQF_FLUSH_SEQ))
- 		bio_endio(bio);
- }
-@@ -3112,10 +3108,8 @@ bool blk_update_request(struct request *req, blk_status_t error,
- 		struct bio *bio = req->bio;
- 		unsigned bio_bytes = min(bio->bi_iter.bi_size, nr_bytes);
- 
--		if (bio_bytes == bio->bi_iter.bi_size) {
-+		if (bio_bytes == bio->bi_iter.bi_size)
- 			req->bio = bio->bi_next;
--			bio->bi_next = NULL;
--		}
- 
- 		/* Completion has already been traced */
- 		bio_clear_flag(bio, BIO_TRACE_COMPLETION);
--- 
-2.17.1
+This warning is also pretty pointless, but the fix is so trivial that I
+applied it anyways.
+
+>   Makefile: Do not suppress useful shellcheck warnings
+
+Of course, I had to replace this patch since I kept some of the warnings
+in.
+
+Thanks for the cleanup!
+
+>  Makefile          | 15 +-------------
+>  check             | 53 ++++++++++++++++++++++++++---------------------
+>  common/cpuhotplug |  2 ++
+>  common/fio        |  2 ++
+>  common/iopoll     |  2 ++
+>  common/loop       |  1 +
+>  common/nbd        |  2 ++
+>  common/nvme       |  2 ++
+>  common/rc         |  2 ++
+>  common/scsi       |  2 ++
+>  common/scsi_debug |  3 +++
+>  common/shellcheck |  4 ++++
+>  new               |  1 +
+>  tests/block/001   |  1 +
+>  tests/block/002   |  3 ++-
+>  tests/block/003   |  2 ++
+>  tests/block/004   |  2 ++
+>  tests/block/005   |  2 ++
+>  tests/block/006   |  2 ++
+>  tests/block/007   |  1 +
+>  tests/block/009   |  1 +
+>  tests/block/010   |  2 ++
+>  tests/block/011   |  2 ++
+>  tests/block/012   |  2 ++
+>  tests/block/013   |  2 ++
+>  tests/block/014   |  2 ++
+>  tests/block/015   |  2 ++
+>  tests/block/016   |  2 ++
+>  tests/block/017   |  2 ++
+>  tests/block/018   |  2 ++
+>  tests/block/019   |  2 ++
+>  tests/block/020   |  2 ++
+>  tests/block/021   |  2 ++
+>  tests/loop/001    |  2 ++
+>  tests/loop/003    |  5 ++---
+>  tests/loop/005    |  2 ++
+>  tests/meta/001    |  2 ++
+>  tests/meta/002    |  2 ++
+>  tests/meta/003    |  2 ++
+>  tests/meta/004    |  2 ++
+>  tests/meta/005    |  2 ++
+>  tests/meta/006    |  2 ++
+>  tests/meta/007    |  2 ++
+>  tests/meta/008    |  2 ++
+>  tests/meta/009    |  2 ++
+>  tests/meta/010    |  2 ++
+>  tests/meta/011    |  2 ++
+>  tests/meta/012    |  6 ++++--
+>  tests/nbd/001     |  2 ++
+>  tests/nbd/002     |  2 ++
+>  tests/nvme/001    |  2 ++
+>  tests/nvme/002    |  2 ++
+>  tests/nvme/003    |  2 ++
+>  tests/nvme/004    |  2 ++
+>  tests/nvme/005    |  2 ++
+>  tests/nvme/006    |  2 ++
+>  tests/nvme/007    |  2 ++
+>  tests/nvme/008    |  2 ++
+>  tests/nvme/009    |  2 ++
+>  tests/nvme/010    |  5 +++--
+>  tests/nvme/011    |  5 +++--
+>  tests/nvme/012    |  3 ++-
+>  tests/nvme/013    |  3 ++-
+>  tests/scsi/001    |  2 ++
+>  tests/scsi/002    |  2 ++
+>  tests/scsi/003    |  2 ++
+>  tests/scsi/004    |  1 +
+>  67 files changed, 161 insertions(+), 50 deletions(-)
+>  create mode 100644 common/shellcheck
+> 
+> -- 
+> 2.17.1
+> 
