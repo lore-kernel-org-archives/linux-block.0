@@ -1,28 +1,60 @@
-Return-Path: <prvs=708eb8c04=bart.vanassche@wdc.com>
-Subject: Re: [PATCH] blk-mq-fs: invoke queue_for_each_hw_ctx under sysfs_lock
-To: Jianchao Wang <jianchao.w.wang@oracle.com>,
- "axboe@kernel.dk" <axboe@kernel.dk>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <1529907699-2054-1-git-send-email-jianchao.w.wang@oracle.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-Message-ID: <d7b196bf-be18-a8f0-29ce-4f705689babe@wdc.com>
-Date: Tue, 26 Jun 2018 08:29:33 -0700
-MIME-Version: 1.0
-In-Reply-To: <1529907699-2054-1-git-send-email-jianchao.w.wang@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] blk-mq-fs: invoke queue_for_each_hw_ctx under sysfs_lock
+Date: Mon, 25 Jun 2018 14:21:39 +0800
+Message-Id: <1529907699-2054-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/24/18 23:20, Jianchao Wang wrote:
-> blk_mq_run_hw_queues and blk_mq_start_stopped_hw_queues in
-> queue_state_write will invoke queue_for_each_hw_ctx. It will race
-> with blk_mq_realloc_hw_ctxs and incur NULL pointer reference. Put
-> them under sysfs_lock to serialize the accessing to queue_hw_ctx
-> and nr_hw_queues.
+blk_mq_run_hw_queues and blk_mq_start_stopped_hw_queues in
+queue_state_write will invoke queue_for_each_hw_ctx. It will race
+with blk_mq_realloc_hw_ctxs and incur NULL pointer reference. Put
+them under sysfs_lock to serialize the accessing to queue_hw_ctx
+and nr_hw_queues.
 
-The above looks wrong to me. blk_mq_realloc_hw_ctxs() starts with 
-calling blk_mq_unregister_hctx(). That last function uses kobject_del() 
-and kobject_del() waits until all pending sysfs callback functions for 
-the deleted objects have finished.
+Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+---
+ block/blk-mq-debugfs.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Bart.
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index ffa6223..2e0c444 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -151,6 +151,7 @@ static ssize_t queue_state_write(void *data, const char __user *buf,
+ {
+ 	struct request_queue *q = data;
+ 	char opbuf[16] = { }, *op;
++	int res;
+ 
+ 	/*
+ 	 * The "state" attribute is removed after blk_cleanup_queue() has called
+@@ -169,9 +170,17 @@ static ssize_t queue_state_write(void *data, const char __user *buf,
+ 		return -EFAULT;
+ 	op = strstrip(opbuf);
+ 	if (strcmp(op, "run") == 0) {
++		res = mutex_lock_interruptible(&q->sysfs_lock);
++		if (res)
++			goto out;
+ 		blk_mq_run_hw_queues(q, true);
++		mutex_unlock(&q->sysfs_lock);
+ 	} else if (strcmp(op, "start") == 0) {
++		res = mutex_lock_interruptible(&q->sysfs_lock);
++		if (res)
++			goto out;
+ 		blk_mq_start_stopped_hw_queues(q, true);
++		mutex_unlock(&q->sysfs_lock);
+ 	} else if (strcmp(op, "kick") == 0) {
+ 		blk_mq_kick_requeue_list(q);
+ 	} else {
+@@ -180,6 +189,7 @@ static ssize_t queue_state_write(void *data, const char __user *buf,
+ 		pr_err("%s: use 'run', 'start' or 'kick'\n", __func__);
+ 		return -EINVAL;
+ 	}
++out:
+ 	return count;
+ }
+ 
+-- 
+2.7.4
