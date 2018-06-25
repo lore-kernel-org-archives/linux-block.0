@@ -1,248 +1,29 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:45141 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752233AbeFAOoD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jun 2018 10:44:03 -0400
-Received: by mail-lf0-f65.google.com with SMTP id n3-v6so15211525lfe.12
-        for <linux-block@vger.kernel.org>; Fri, 01 Jun 2018 07:44:02 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        javier@cnexlabs.com, igor.j.konopko@intel.com,
-        marcin.dziegielewski@intel.com,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 07/10] lightnvm: pblk: remove unnecessary bio_get/put
-Date: Fri,  1 Jun 2018 16:41:11 +0200
-Message-Id: <20180601144114.17490-8-mb@lightnvm.io>
-In-Reply-To: <20180601144114.17490-1-mb@lightnvm.io>
-References: <20180601144114.17490-1-mb@lightnvm.io>
+Received: from mx2.suse.de ([195.135.220.15]:56538 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754465AbeFYJQP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Jun 2018 05:16:15 -0400
+Date: Mon, 25 Jun 2018 11:16:13 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 8/9] check: Suppress a shellcheck warning about the
+ DMESG_FILTER initialization
+Message-ID: <20180625091613.6tscwtlfvifiykx4@linux-x5ow.site>
+References: <20180619202353.23631-1-bart.vanassche@wdc.com>
+ <20180619202353.23631-9-bart.vanassche@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180619202353.23631-9-bart.vanassche@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Javier González <javier@javigon.com>
-
-In the read path, pblk gets a reference to the incoming bio and puts it
-after ending the bio. Though this behavior is correct, it is unnecessary
-since pblk is the one putting the bio, therefore, it cannot disappear
-underneath it.
-
-Removing this reference, allows to clean up rqd->bio and avoids pointer
-bouncing for the different read paths. Now, the incoming bio always
-resides in the read context and pblk's internal bios (if any) reside in
-rqd->bio.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
----
- drivers/lightnvm/pblk-read.c | 65 +++++++++++++++++++-------------------------
- 1 file changed, 28 insertions(+), 37 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index f770fd113ffe..18694694e5f0 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -39,10 +39,10 @@ static int pblk_read_from_cache(struct pblk *pblk, struct bio *bio,
- }
- 
- static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
--				 sector_t blba, unsigned long *read_bitmap)
-+				 struct bio *bio, sector_t blba,
-+				 unsigned long *read_bitmap)
- {
- 	struct pblk_sec_meta *meta_list = rqd->meta_list;
--	struct bio *bio = rqd->bio;
- 	struct ppa_addr ppas[PBLK_MAX_REQ_ADDRS];
- 	int nr_secs = rqd->nr_ppas;
- 	bool advanced_bio = false;
-@@ -189,7 +189,6 @@ static void pblk_end_user_read(struct bio *bio)
- 	WARN_ONCE(bio->bi_status, "pblk: corrupted read bio\n");
- #endif
- 	bio_endio(bio);
--	bio_put(bio);
- }
- 
- static void __pblk_end_io_read(struct pblk *pblk, struct nvm_rq *rqd,
-@@ -197,23 +196,18 @@ static void __pblk_end_io_read(struct pblk *pblk, struct nvm_rq *rqd,
- {
- 	struct nvm_tgt_dev *dev = pblk->dev;
- 	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
--	struct bio *bio = rqd->bio;
-+	struct bio *int_bio = rqd->bio;
- 	unsigned long start_time = r_ctx->start_time;
- 
- 	generic_end_io_acct(dev->q, READ, &pblk->disk->part0, start_time);
- 
- 	if (rqd->error)
- 		pblk_log_read_err(pblk, rqd);
--#ifdef CONFIG_NVM_DEBUG
--	else
--		WARN_ONCE(bio->bi_status, "pblk: corrupted read error\n");
--#endif
- 
- 	pblk_read_check_seq(pblk, rqd, r_ctx->lba);
- 
--	bio_put(bio);
--	if (r_ctx->private)
--		pblk_end_user_read((struct bio *)r_ctx->private);
-+	if (int_bio)
-+		bio_put(int_bio);
- 
- 	if (put_line)
- 		pblk_read_put_rqd_kref(pblk, rqd);
-@@ -230,16 +224,19 @@ static void __pblk_end_io_read(struct pblk *pblk, struct nvm_rq *rqd,
- static void pblk_end_io_read(struct nvm_rq *rqd)
- {
- 	struct pblk *pblk = rqd->private;
-+	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
-+	struct bio *bio = (struct bio *)r_ctx->private;
- 
-+	pblk_end_user_read(bio);
- 	__pblk_end_io_read(pblk, rqd, true);
- }
- 
--static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
--				 unsigned int bio_init_idx,
--				 unsigned long *read_bitmap)
-+static int pblk_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
-+			     struct bio *orig_bio, unsigned int bio_init_idx,
-+			     unsigned long *read_bitmap)
- {
--	struct bio *new_bio, *bio = rqd->bio;
- 	struct pblk_sec_meta *meta_list = rqd->meta_list;
-+	struct bio *new_bio;
- 	struct bio_vec src_bv, dst_bv;
- 	void *ppa_ptr = NULL;
- 	void *src_p, *dst_p;
-@@ -256,11 +253,11 @@ static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 	new_bio = bio_alloc(GFP_KERNEL, nr_holes);
- 
- 	if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
--		goto err_add_pages;
-+		goto fail_add_pages;
- 
- 	if (nr_holes != new_bio->bi_vcnt) {
- 		pr_err("pblk: malformed bio\n");
--		goto err;
-+		goto fail;
- 	}
- 
- 	for (i = 0; i < nr_secs; i++)
-@@ -283,7 +280,7 @@ static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 	if (ret) {
- 		bio_put(rqd->bio);
- 		pr_err("pblk: sync read IO submission failed\n");
--		goto err;
-+		goto fail;
- 	}
- 
- 	if (rqd->error) {
-@@ -319,7 +316,7 @@ static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 		meta_list[hole].lba = lba_list_media[i];
- 
- 		src_bv = new_bio->bi_io_vec[i++];
--		dst_bv = bio->bi_io_vec[bio_init_idx + hole];
-+		dst_bv = orig_bio->bi_io_vec[bio_init_idx + hole];
- 
- 		src_p = kmap_atomic(src_bv.bv_page);
- 		dst_p = kmap_atomic(dst_bv.bv_page);
-@@ -338,28 +335,26 @@ static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 
- 	bio_put(new_bio);
- 
--	/* Complete the original bio and associated request */
--	bio_endio(bio);
--	rqd->bio = bio;
-+	/* restore original request */
-+	rqd->bio = NULL;
- 	rqd->nr_ppas = nr_secs;
- 
- 	__pblk_end_io_read(pblk, rqd, false);
--	return NVM_IO_OK;
-+	return NVM_IO_DONE;
- 
--err:
-+fail:
- 	/* Free allocated pages in new bio */
- 	pblk_bio_free_pages(pblk, new_bio, 0, new_bio->bi_vcnt);
--err_add_pages:
-+fail_add_pages:
- 	pr_err("pblk: failed to perform partial read\n");
- 	__pblk_end_io_read(pblk, rqd, false);
- 	return NVM_IO_ERR;
- }
- 
--static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
-+static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd, struct bio *bio,
- 			 sector_t lba, unsigned long *read_bitmap)
- {
- 	struct pblk_sec_meta *meta_list = rqd->meta_list;
--	struct bio *bio = rqd->bio;
- 	struct ppa_addr ppa;
- 
- 	pblk_lookup_l2p_seq(pblk, &ppa, lba, 1);
-@@ -423,14 +418,15 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
- 	rqd = pblk_alloc_rqd(pblk, PBLK_READ);
- 
- 	rqd->opcode = NVM_OP_PREAD;
--	rqd->bio = bio;
- 	rqd->nr_ppas = nr_secs;
-+	rqd->bio = NULL; /* cloned bio if needed */
- 	rqd->private = pblk;
- 	rqd->end_io = pblk_end_io_read;
- 
- 	r_ctx = nvm_rq_to_pdu(rqd);
- 	r_ctx->start_time = jiffies;
- 	r_ctx->lba = blba;
-+	r_ctx->private = bio; /* original bio */
- 
- 	/* Save the index for this bio's start. This is needed in case
- 	 * we need to fill a partial read.
-@@ -448,17 +444,15 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
- 		rqd->ppa_list = rqd->meta_list + pblk_dma_meta_size;
- 		rqd->dma_ppa_list = rqd->dma_meta_list + pblk_dma_meta_size;
- 
--		pblk_read_ppalist_rq(pblk, rqd, blba, &read_bitmap);
-+		pblk_read_ppalist_rq(pblk, rqd, bio, blba, &read_bitmap);
- 	} else {
--		pblk_read_rq(pblk, rqd, blba, &read_bitmap);
-+		pblk_read_rq(pblk, rqd, bio, blba, &read_bitmap);
- 	}
- 
--	bio_get(bio);
- 	if (bitmap_full(&read_bitmap, nr_secs)) {
--		bio_endio(bio);
- 		atomic_inc(&pblk->inflight_io);
- 		__pblk_end_io_read(pblk, rqd, false);
--		return NVM_IO_OK;
-+		return NVM_IO_DONE;
- 	}
- 
- 	/* All sectors are to be read from the device */
-@@ -473,13 +467,10 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
- 		}
- 
- 		rqd->bio = int_bio;
--		r_ctx->private = bio;
- 
- 		if (pblk_submit_io(pblk, rqd)) {
- 			pr_err("pblk: read IO submission failed\n");
- 			ret = NVM_IO_ERR;
--			if (int_bio)
--				bio_put(int_bio);
- 			goto fail_end_io;
- 		}
- 
-@@ -489,7 +480,7 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
- 	/* The read bio request could be partially filled by the write buffer,
- 	 * but there are some holes that need to be read from the drive.
- 	 */
--	return pblk_partial_read_bio(pblk, rqd, bio_init_idx, &read_bitmap);
-+	return pblk_partial_read(pblk, rqd, bio, bio_init_idx, &read_bitmap);
- 
- fail_rqd_free:
- 	pblk_free_rqd(pblk, rqd, PBLK_READ);
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.11.0
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
