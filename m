@@ -1,46 +1,96 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:5235 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754204AbeFYWvb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jun 2018 18:51:31 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>
-Subject: [PATCH] drbd: Fix drbd_request_prepare() discard handling
-Date: Mon, 25 Jun 2018 15:51:30 -0700
-Message-Id: <20180625225130.4447-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	linus.walleij@linaro.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX RESEND 4/4] block, bfq: give a better name to bfq_bfqq_may_idle
+Date: Mon, 25 Jun 2018 21:55:37 +0200
+Message-Id: <20180625195537.7769-5-paolo.valente@linaro.org>
+In-Reply-To: <20180625195537.7769-1-paolo.valente@linaro.org>
+References: <20180625195537.7769-1-paolo.valente@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Fix the test that verifies whether bio_op(bio) represents a discard
-or write zeroes operation. Compile-tested only.
+The actual goal of the function bfq_bfqq_may_idle is to tell whether
+it is better to perform device idling (more precisely: I/O-dispatch
+plugging) for the input bfq_queue, either to boost throughput or to
+preserve service guarantees. This commit improves the name of the
+function accordingly.
 
-Fixes: 7435e9018f91 ("drbd: zero-out partial unaligned discards on local backend")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>
-Cc: Lars Ellenberg <lars.ellenberg@linbit.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- drivers/block/drbd/drbd_req.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ block/bfq-iosched.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
-index 24f0884ec01f..a8e7d7318e37 100644
---- a/drivers/block/drbd/drbd_req.c
-+++ b/drivers/block/drbd/drbd_req.c
-@@ -1244,8 +1244,8 @@ drbd_request_prepare(struct drbd_device *device, struct bio *bio, unsigned long
- 	_drbd_start_io_acct(device, req);
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index d579cc8e0db6..41d9036b1822 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -634,7 +634,7 @@ static bool bfq_differentiated_weights(struct bfq_data *bfqd)
+  * The following function returns true if every queue must receive the
+  * same share of the throughput (this condition is used when deciding
+  * whether idling may be disabled, see the comments in the function
+- * bfq_bfqq_may_idle()).
++ * bfq_better_to_idle()).
+  *
+  * Such a scenario occurs when:
+  * 1) all active queues have the same weight,
+@@ -3355,7 +3355,7 @@ static bool bfq_may_expire_for_budg_timeout(struct bfq_queue *bfqq)
+  * issues taken into account are not trivial. We discuss these issues
+  * individually while introducing the variables.
+  */
+-static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
++static bool bfq_better_to_idle(struct bfq_queue *bfqq)
+ {
+ 	struct bfq_data *bfqd = bfqq->bfqd;
+ 	bool rot_without_queueing =
+@@ -3588,19 +3588,19 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ }
  
- 	/* process discards always from our submitter thread */
--	if ((bio_op(bio) & REQ_OP_WRITE_ZEROES) ||
--	    (bio_op(bio) & REQ_OP_DISCARD))
-+	if (bio_op(bio) == REQ_OP_WRITE_ZEROES ||
-+	    bio_op(bio) == REQ_OP_DISCARD)
- 		goto queue_for_submitter_thread;
+ /*
+- * If the in-service queue is empty but the function bfq_bfqq_may_idle
++ * If the in-service queue is empty but the function bfq_better_to_idle
+  * returns true, then:
+  * 1) the queue must remain in service and cannot be expired, and
+  * 2) the device must be idled to wait for the possible arrival of a new
+  *    request for the queue.
+- * See the comments on the function bfq_bfqq_may_idle for the reasons
++ * See the comments on the function bfq_better_to_idle for the reasons
+  * why performing device idling is the best choice to boost the throughput
+- * and preserve service guarantees when bfq_bfqq_may_idle itself
++ * and preserve service guarantees when bfq_better_to_idle itself
+  * returns true.
+  */
+ static bool bfq_bfqq_must_idle(struct bfq_queue *bfqq)
+ {
+-	return RB_EMPTY_ROOT(&bfqq->sort_list) && bfq_bfqq_may_idle(bfqq);
++	return RB_EMPTY_ROOT(&bfqq->sort_list) && bfq_better_to_idle(bfqq);
+ }
  
- 	if (rw == WRITE && req->private_bio && req->i.size
+ /*
+@@ -3686,7 +3686,7 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
+ 	 * may idle after their completion, then keep it anyway.
+ 	 */
+ 	if (bfq_bfqq_wait_request(bfqq) ||
+-	    (bfqq->dispatched != 0 && bfq_bfqq_may_idle(bfqq))) {
++	    (bfqq->dispatched != 0 && bfq_better_to_idle(bfqq))) {
+ 		bfqq = NULL;
+ 		goto keep_queue;
+ 	}
+@@ -4734,7 +4734,7 @@ static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
+ 					BFQQE_BUDGET_TIMEOUT);
+ 		else if (RB_EMPTY_ROOT(&bfqq->sort_list) &&
+ 			 (bfqq->dispatched == 0 ||
+-			  !bfq_bfqq_may_idle(bfqq)))
++			  !bfq_better_to_idle(bfqq)))
+ 			bfq_bfqq_expire(bfqd, bfqq, false,
+ 					BFQQE_NO_MORE_REQUESTS);
+ 	}
 -- 
-2.17.1
+2.16.1
