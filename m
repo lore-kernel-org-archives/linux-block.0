@@ -1,19 +1,29 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: snitzer@redhat.com,
-	kent.overstreet@gmail.com,
-	liwang@redhat.com,
-	vrbagal1@linux.vnet.ibm.com,
-	chuhu.ncepu@gmail.com
-Subject: [PATCH 0/2] Fix bio_set copy
-Date: Thu,  7 Jun 2018 14:45:39 -0600
-Message-Id: <20180607204541.13491-1-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:56526 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754512AbeFYJQD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Jun 2018 05:16:03 -0400
+Date: Mon, 25 Jun 2018 11:16:01 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 7/9] Avoid passing tests/block/002 arguments to
+ _init_scsi_debug
+Message-ID: <20180625091601.i3bteqnn2rv6z6za@linux-x5ow.site>
+References: <20180619202353.23631-1-bart.vanassche@wdc.com>
+ <20180619202353.23631-8-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180619202353.23631-8-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-After a recent change, dm ends up doing a straight copy of a
-bio_set. This breaks for various items in that bio_set,
-most notably lists. Provide a proper helper for it, and use it.
-
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-Jens Axboe
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
