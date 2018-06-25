@@ -1,143 +1,28 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com,
-	akpm@linux-foundation.org,
-	hannes@cmpxchg.org,
-	linux-kernel@vger.kernel.org,
-	tj@kernel.org,
-	linux-fsdevel@vger.kernel.org
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 03/15] blk-cgroup: allow controllers to output their own stats
-Date: Mon, 25 Jun 2018 11:12:31 -0400
-Message-Id: <20180625151243.2132-4-josef@toxicpanda.com>
-In-Reply-To: <20180625151243.2132-1-josef@toxicpanda.com>
-References: <20180625151243.2132-1-josef@toxicpanda.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:55787 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754582AbeFYJJ7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Jun 2018 05:09:59 -0400
+Date: Mon, 25 Jun 2018 11:09:58 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 4/9] Suppress shellcheck complaints about global variables
+Message-ID: <20180625090958.qzqukirr3wgkw3il@linux-x5ow.site>
+References: <20180619202353.23631-1-bart.vanassche@wdc.com>
+ <20180619202353.23631-5-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180619202353.23631-5-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Josef Bacik <jbacik@fb.com>
-
-blk-iolatency has a few stats that it would like to print out, and
-instead of adding a bunch of crap to the generic code just provide a
-helper so that controllers can add stuff to the stat line if they want
-to.
-
-Hide it behind a boot option since it changes the output of io.stat from
-normal, and these stats are only interesting to developers.
-
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- block/blk-cgroup.c         | 49 +++++++++++++++++++++++++++++++++++++++++++---
- include/linux/blk-cgroup.h |  3 +++
- 2 files changed, 49 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index eb85cb87c40f..b3460f623fca 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -50,6 +50,8 @@ static struct blkcg_policy *blkcg_policy[BLKCG_MAX_POLS];
- 
- static LIST_HEAD(all_blkcgs);		/* protected by blkcg_pol_mutex */
- 
-+static bool blkcg_debug_stats = false;
-+
- static bool blkcg_policy_enabled(struct request_queue *q,
- 				 const struct blkcg_policy *pol)
- {
-@@ -954,13 +956,25 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
- 
- 	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
- 		const char *dname;
-+		char *buf;
- 		struct blkg_rwstat rwstat;
- 		u64 rbytes, wbytes, rios, wios;
-+		size_t size = seq_get_buf(sf, &buf), off = 0;
-+		int i;
-+		bool has_stats = false;
- 
- 		dname = blkg_dev_name(blkg);
- 		if (!dname)
- 			continue;
- 
-+		/*
-+		 * Hooray string manipulation, count is the size written NOT
-+		 * INCLUDING THE \0, so size is now count+1 less than what we
-+		 * had before, but we want to start writing the next bit from
-+		 * the \0 so we only add count to buf.
-+		 */
-+		off += scnprintf(buf+off, size-off, "%s ", dname);
-+
- 		spin_lock_irq(blkg->q->queue_lock);
- 
- 		rwstat = blkg_rwstat_recursive_sum(blkg, NULL,
-@@ -975,9 +989,35 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
- 
- 		spin_unlock_irq(blkg->q->queue_lock);
- 
--		if (rbytes || wbytes || rios || wios)
--			seq_printf(sf, "%s rbytes=%llu wbytes=%llu rios=%llu wios=%llu\n",
--				   dname, rbytes, wbytes, rios, wios);
-+		if (rbytes || wbytes || rios || wios) {
-+			has_stats = true;
-+			off += scnprintf(buf+off, size-off,
-+					 "rbytes=%llu wbytes=%llu rios=%llu wios=%llu",
-+					 rbytes, wbytes, rios, wios);
-+		}
-+
-+		if (!blkcg_debug_stats)
-+			goto next;
-+
-+		mutex_lock(&blkcg_pol_mutex);
-+		for (i = 0; i < BLKCG_MAX_POLS; i++) {
-+			struct blkcg_policy *pol = blkcg_policy[i];
-+			size_t written;
-+
-+			if (!blkg->pd[i] || !pol->pd_stat_fn)
-+				continue;
-+
-+			written = pol->pd_stat_fn(blkg->pd[i], buf+off, size-off);
-+			if (written)
-+				has_stats = true;
-+			off += written;
-+		}
-+		mutex_unlock(&blkcg_pol_mutex);
-+next:
-+		if (has_stats) {
-+			off += scnprintf(buf+off, size-off, "\n");
-+			seq_commit(sf, off);
-+		}
- 	}
- 
- 	rcu_read_unlock();
-@@ -1547,3 +1587,6 @@ void blkcg_policy_unregister(struct blkcg_policy *pol)
- 	mutex_unlock(&blkcg_pol_register_mutex);
- }
- EXPORT_SYMBOL_GPL(blkcg_policy_unregister);
-+
-+module_param(blkcg_debug_stats, bool, 0644);
-+MODULE_PARM_DESC(blkcg_debug_stats, "True if you want debug stats, false if not");
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 69aa71dc0c04..b41292726c0f 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -148,6 +148,8 @@ typedef void (blkcg_pol_online_pd_fn)(struct blkg_policy_data *pd);
- typedef void (blkcg_pol_offline_pd_fn)(struct blkg_policy_data *pd);
- typedef void (blkcg_pol_free_pd_fn)(struct blkg_policy_data *pd);
- typedef void (blkcg_pol_reset_pd_stats_fn)(struct blkg_policy_data *pd);
-+typedef size_t (blkcg_pol_stat_pd_fn)(struct blkg_policy_data *pd, char *buf,
-+				      size_t size);
- 
- struct blkcg_policy {
- 	int				plid;
-@@ -167,6 +169,7 @@ struct blkcg_policy {
- 	blkcg_pol_offline_pd_fn		*pd_offline_fn;
- 	blkcg_pol_free_pd_fn		*pd_free_fn;
- 	blkcg_pol_reset_pd_stats_fn	*pd_reset_stats_fn;
-+	blkcg_pol_stat_pd_fn		*pd_stat_fn;
- };
- 
- extern struct blkcg blkcg_root;
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.14.3
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
