@@ -1,21 +1,23 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <drjones@redhat.com>
+Date: Mon, 25 Jun 2018 17:23:23 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Omar Sandoval <osandov@fb.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	linux-scsi@vger.kernel.org,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Christoph Hellwig <hch@lst.de>
 Subject: Re: [PATCH 0/5] blk-mq: dispatch related cleanup, fix and
  optimization
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
- Andrew Jones <drjones@redhat.com>, Bart Van Assche <bart.vanassche@wdc.com>,
- linux-scsi@vger.kernel.org, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Christoph Hellwig <hch@lst.de>
+Message-ID: <20180625152323.jisvuxxx2v6vvtp5@kamzik.brq.redhat.com>
 References: <20180625113149.29449-1-ming.lei@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <33a6764d-7fc8-fc46-65ae-33310a627abd@kernel.dk>
-Date: Thu, 28 Jun 2018 13:21:16 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180625113149.29449-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 6/25/18 5:31 AM, Ming Lei wrote:
+On Mon, Jun 25, 2018 at 07:31:44PM +0800, Ming Lei wrote:
 > Hi,
 > 
 > The 1st two patches cleanes up blk_mq_get_driver_tag() and
@@ -32,8 +34,34 @@ On 6/25/18 5:31 AM, Ming Lei wrote:
 > The 5th patch avoids to synchronizing rcu in blk_cleanup_queue() when
 > queue isn't initialized, so long delay can be avoided during SCSI LUN
 > probe too.
+> 
+> Ming Lei (5):
+>   blk-mq: cleanup blk_mq_get_driver_tag()
+>   blk-mq: don't pass **hctx to blk_mq_mark_tag_wait()
+>   blk-mq: introduce new lock for protecting hctx->dispatch_wait
+>   blk-mq: remove synchronize_rcu() from blk_mq_del_queue_tag_set()
+>   blk-mq: avoid to synchronize rcu inside blk_cleanup_queue()
+> 
+>  block/blk-core.c       |  8 +++--
+>  block/blk-mq-sched.c   | 85 +++-----------------------------------------------
+>  block/blk-mq.c         | 68 +++++++++++++++++++---------------------
+>  block/blk-mq.h         |  3 +-
+>  include/linux/blk-mq.h |  1 +
+>  include/linux/blkdev.h |  2 --
+>  6 files changed, 45 insertions(+), 122 deletions(-)
+> 
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Andrew Jones <drjones@redhat.com>
+> Cc: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: linux-scsi@vger.kernel.org
+> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> 
+>
 
-Looks good to me, applied for 4.19.
+I gave the series a test run and it worked for me. So
 
--- 
-Jens Axboe
+Tested-by: Andrew Jones <drjones@redhat.com>
+
+Thanks,
+drew 
