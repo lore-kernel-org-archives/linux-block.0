@@ -1,102 +1,64 @@
-Return-Path: <3nsInWwkbBaETZaLBMMFSBQQJE.HPPHMFVTFSDPOUFOU.DPNBYCPFLFSOFM.EL@M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com>
-MIME-Version: 1.0
-Date: Mon, 18 Jun 2018 07:33:02 -0700
-Message-ID: <0000000000006a6282056eeb71da@google.com>
-Subject: general protection fault in loop_validate_file
-From: syzbot <syzbot+2f228435b0b9ec0ba068@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	kernel-team@fb.com,
+	akpm@linux-foundation.org,
+	hannes@cmpxchg.org,
+	linux-kernel@vger.kernel.org,
+	tj@kernel.org,
+	linux-fsdevel@vger.kernel.org
+Cc: Josef Bacik <jbacik@fb.com>
+Subject: [PATCH 02/15] block: introduce bio_issue_as_root_blkg
+Date: Mon, 25 Jun 2018 11:12:30 -0400
+Message-Id: <20180625151243.2132-3-josef@toxicpanda.com>
+In-Reply-To: <20180625151243.2132-1-josef@toxicpanda.com>
+References: <20180625151243.2132-1-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
+From: Josef Bacik <jbacik@fb.com>
 
-syzbot found the following crash on:
+Instead of forcing all file systems to get the right context on their
+bio's, simply check for REQ_META to see if we need to issue as the root
+blkg.  We don't want to force all bio's to have the root blkg associated
+with them if REQ_META is set, as some controllers (blk-iolatency) need
+to know who the originating cgroup is so it can backcharge them for the
+work they are doing.  This helper will make sure that the controllers do
+the proper thing wrt the IO priority and backcharging.
 
-HEAD commit:    ce397d215ccd Linux 4.18-rc1
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=129dfccf800000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f390986c4f7cd566
-dashboard link: https://syzkaller.appspot.com/bug?extid=2f228435b0b9ec0ba068
-compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
-
-Unfortunately, I don't have any reproducer for this crash yet.
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+2f228435b0b9ec0ba068@syzkaller.appspotmail.com
-
-kasan: CONFIG_KASAN_INLINE enabled
-kasan: GPF could be caused by NULL-ptr deref or user memory access
-general protection fault: 0000 [#1] SMP KASAN
-CPU: 0 PID: 16780 Comm: syz-executor1 Not tainted 4.18.0-rc1+ #107
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-RIP: 0010:loop_validate_file+0x247/0x470 drivers/block/loop.c:664
-Code: 00 00 48 89 f8 48 c1 e8 03 80 3c 18 00 0f 85 2e 02 00 00 4d 8b a4 24  
-f0 00 00 00 49 8d bc 24 b8 01 00 00 48 89 f8 48 c1 e8 03 <80> 3c 18 00 0f  
-85 03 02 00 00 4d 8b a4 24 b8 01 00 00 4c 89 e0 48
-RSP: 0018:ffff8801b2f2f8f8 EFLAGS: 00010202
-RAX: 0000000000000037 RBX: dffffc0000000000 RCX: ffffc90002a12000
-RDX: 0000000000000047 RSI: ffffffff84c20bf7 RDI: 00000000000001b8
-RBP: ffff8801b2f2f918 R08: ffff8801c9498380 R09: ffffed003b5c46d6
-R10: 0000000000000003 R11: 0000000000000001 R12: 0000000000000000
-R13: ffff8801b38f71c0 R14: 0000000000000002 R15: ffff8801cfb60500
-FS:  00007f40b01d1700(0000) GS:ffff8801dae00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b2f222000 CR3: 00000001c542a000 CR4: 00000000001406f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
-  loop_set_fd drivers/block/loop.c:928 [inline]
-  lo_ioctl+0x54d/0x1d10 drivers/block/loop.c:1411
-  __blkdev_driver_ioctl block/ioctl.c:303 [inline]
-  blkdev_ioctl+0x9cd/0x2030 block/ioctl.c:601
-  block_ioctl+0xee/0x130 fs/block_dev.c:1880
-  vfs_ioctl fs/ioctl.c:46 [inline]
-  file_ioctl fs/ioctl.c:500 [inline]
-  do_vfs_ioctl+0x1de/0x1720 fs/ioctl.c:684
-  ksys_ioctl+0xa9/0xd0 fs/ioctl.c:701
-  __do_sys_ioctl fs/ioctl.c:708 [inline]
-  __se_sys_ioctl fs/ioctl.c:706 [inline]
-  __x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:706
-  do_syscall_64+0x1b9/0x820 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x455b29
-Code: 1d ba fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7  
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
-ff 0f 83 eb b9 fb ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007f40b01d0c68 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f40b01d16d4 RCX: 0000000000455b29
-RDX: 0000000000000014 RSI: 0000000000004c00 RDI: 0000000000000015
-RBP: 000000000072bea0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00000000ffffffff
-R13: 00000000004be118 R14: 00000000004cc118 R15: 0000000000000000
-Modules linked in:
-Dumping ftrace buffer:
-    (ftrace buffer empty)
----[ end trace 3a5a065777b1499b ]---
-RIP: 0010:loop_validate_file+0x247/0x470 drivers/block/loop.c:664
-Code: 00 00 48 89 f8 48 c1 e8 03 80 3c 18 00 0f 85 2e 02 00 00 4d 8b a4 24  
-f0 00 00 00 49 8d bc 24 b8 01 00 00 48 89 f8 48 c1 e8 03 <80> 3c 18 00 0f  
-85 03 02 00 00 4d 8b a4 24 b8 01 00 00 4c 89 e0 48
-RSP: 0018:ffff8801b2f2f8f8 EFLAGS: 00010202
-RAX: 0000000000000037 RBX: dffffc0000000000 RCX: ffffc90002a12000
-RDX: 0000000000000047 RSI: ffffffff84c20bf7 RDI: 00000000000001b8
-RBP: ffff8801b2f2f918 R08: ffff8801c9498380 R09: ffffed003b5c46d6
-R10: 0000000000000003 R11: 0000000000000001 R12: 0000000000000000
-R13: ffff8801b38f71c0 R14: 0000000000000002 R15: ffff8801cfb60500
-FS:  00007f40b01d1700(0000) GS:ffff8801dae00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b2f222000 CR3: 00000001c542a000 CR4: 00000000001406f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-
-
+Signed-off-by: Josef Bacik <jbacik@fb.com>
+Acked-by: Tejun Heo <tj@kernel.org>
 ---
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ include/linux/blk-cgroup.h | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
-syzbot.
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 6c666fd7de3c..69aa71dc0c04 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -238,6 +238,22 @@ static inline struct blkcg *bio_blkcg(struct bio *bio)
+ 	return css_to_blkcg(task_css(current, io_cgrp_id));
+ }
+ 
++/**
++ * bio_issue_as_root_blkg - see if this bio needs to be issued as root blkg
++ * @return: true if this bio needs to be submitted with the root blkg context.
++ *
++ * In order to avoid priority inversions we sometimes need to issue a bio as if
++ * it were attached to the root blkg, and then backcharge to the actual owning
++ * blkg.  The idea is we do bio_blkcg() to look up the actual context for the
++ * bio and attach the appropriate blkg to the bio.  Then we call this helper and
++ * if it is true run with the root blkg for that queue and then do any
++ * backcharging to the originating cgroup once the io is complete.
++ */
++static inline bool bio_issue_as_root_blkg(struct bio *bio)
++{
++	return (bio->bi_opf & REQ_META);
++}
++
+ /**
+  * blkcg_parent - get the parent of a blkcg
+  * @blkcg: blkcg of interest
+-- 
+2.14.3
