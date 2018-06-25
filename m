@@ -1,131 +1,57 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42436 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753388AbeFIMea (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 9 Jun 2018 08:34:30 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 20/30] fs: conver to bio_for_each_chunk_segment_all()
-Date: Sat,  9 Jun 2018 20:30:04 +0800
-Message-Id: <20180609123014.8861-21-ming.lei@redhat.com>
-In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
-References: <20180609123014.8861-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH 0/5]stop normal completion path entering a timeout req
+To: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <keith.busch@intel.com>, axboe@kernel.dk,
+        martin.petersen@oracle.com, josef@toxicpanda.com,
+        ulf.hansson@linaro.org, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1529500964-28429-1-git-send-email-jianchao.w.wang@oracle.com>
+ <20180620181601.GA24145@localhost.localdomain>
+ <e87f5946-bb21-942e-2dcc-b24cee1ad23c@oracle.com>
+ <20180621081900.GA5183@lst.de>
+ <a68ad043-26a1-d3d8-2009-504ba4230e0f@oracle.com>
+ <20180622151043.GA13470@lst.de>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <8438fb8b-564b-1208-7c88-8061552e1dcb@oracle.com>
+Date: Mon, 25 Jun 2018 09:29:19 +0800
+MIME-Version: 1.0
+In-Reply-To: <20180622151043.GA13470@lst.de>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-bio_for_each_segment_all() can't be used any more after multipage bvec is
-enabled, so we have to convert to bio_for_each_chunk_segment_all().
+Hi Christoph
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/block_dev.c  | 6 ++++--
- fs/crypto/bio.c | 3 ++-
- fs/direct-io.c  | 4 +++-
- fs/iomap.c      | 3 ++-
- fs/mpage.c      | 3 ++-
- 5 files changed, 13 insertions(+), 6 deletions(-)
+Sorry for delayed response.
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index bef6934b6189..6726f8297a7b 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -197,6 +197,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 	ssize_t ret;
- 	blk_qc_t qc;
- 	int i;
-+	struct bvec_chunk_iter citer;
- 
- 	if ((pos | iov_iter_alignment(iter)) &
- 	    (bdev_logical_block_size(bdev) - 1))
-@@ -242,7 +243,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 	}
- 	__set_current_state(TASK_RUNNING);
- 
--	bio_for_each_segment_all(bvec, &bio, i) {
-+	bio_for_each_chunk_segment_all(bvec, &bio, i, citer) {
- 		if (should_dirty && !PageCompound(bvec->bv_page))
- 			set_page_dirty_lock(bvec->bv_page);
- 		put_page(bvec->bv_page);
-@@ -309,8 +310,9 @@ static void blkdev_bio_end_io(struct bio *bio)
- 	} else {
- 		struct bio_vec *bvec;
- 		int i;
-+		struct bvec_chunk_iter citer;
- 
--		bio_for_each_segment_all(bvec, bio, i)
-+		bio_for_each_chunk_segment_all(bvec, bio, i, citer)
- 			put_page(bvec->bv_page);
- 		bio_put(bio);
- 	}
-diff --git a/fs/crypto/bio.c b/fs/crypto/bio.c
-index 0d5e6a569d58..13bcbdbf3440 100644
---- a/fs/crypto/bio.c
-+++ b/fs/crypto/bio.c
-@@ -37,8 +37,9 @@ static void completion_pages(struct work_struct *work)
- 	struct bio *bio = ctx->r.bio;
- 	struct bio_vec *bv;
- 	int i;
-+	struct bvec_chunk_iter citer;
- 
--	bio_for_each_segment_all(bv, bio, i) {
-+	bio_for_each_chunk_segment_all(bv, bio, i, citer) {
- 		struct page *page = bv->bv_page;
- 		int ret = fscrypt_decrypt_page(page->mapping->host, page,
- 				PAGE_SIZE, 0, page->index);
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index 093fb54cd316..8f7fd985450a 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -551,7 +551,9 @@ static blk_status_t dio_bio_complete(struct dio *dio, struct bio *bio)
- 	if (dio->is_async && dio->op == REQ_OP_READ && dio->should_dirty) {
- 		bio_check_pages_dirty(bio);	/* transfers ownership */
- 	} else {
--		bio_for_each_segment_all(bvec, bio, i) {
-+		struct bvec_chunk_iter citer;
-+
-+		bio_for_each_chunk_segment_all(bvec, bio, i, citer) {
- 			struct page *page = bvec->bv_page;
- 
- 			if (dio->op == REQ_OP_READ && !PageCompound(page) &&
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 206539d369a8..dbc35c40a1c4 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -934,8 +934,9 @@ static void iomap_dio_bio_end_io(struct bio *bio)
- 	} else {
- 		struct bio_vec *bvec;
- 		int i;
-+		struct bvec_chunk_iter citer;
- 
--		bio_for_each_segment_all(bvec, bio, i)
-+		bio_for_each_chunk_segment_all(bvec, bio, i, citer)
- 			put_page(bvec->bv_page);
- 		bio_put(bio);
- 	}
-diff --git a/fs/mpage.c b/fs/mpage.c
-index b7e7f570733a..78b372607650 100644
---- a/fs/mpage.c
-+++ b/fs/mpage.c
-@@ -48,8 +48,9 @@ static void mpage_end_io(struct bio *bio)
- {
- 	struct bio_vec *bv;
- 	int i;
-+	struct bvec_chunk_iter citer;
- 
--	bio_for_each_segment_all(bv, bio, i) {
-+	bio_for_each_chunk_segment_all(bv, bio, i, citer) {
- 		struct page *page = bv->bv_page;
- 		page_endio(page, op_is_write(bio_op(bio)),
- 				blk_status_to_errno(bio->bi_status));
--- 
-2.9.5
+On 06/22/2018 11:10 PM, Christoph Hellwig wrote:
+> On Thu, Jun 21, 2018 at 04:22:22PM +0800, jianchao.wang wrote:
+>>> Trace, please.  With the latest kernel.  I'm not saying that there
+>>> is nothing to fix, but the mode of never completing once timeout
+>>> requests as currently done is SCSI is clearly broken.
+>>>
+>>
+>> I didn't find the existing method to simulate this.
+>> So I modified the scsi-debug as following patch as install it as following:
+>> modprobe scsi-debug delay=-1 ndelay=-1
+>> Both 4.17-rc1 and 4.18-rc1 with this patch set could survive from the test.
+> 
+> What tree is this against?  I can't apply it to either current Linus'
+> tree or 4.17 for that matter.
+
+Ｉ made the patch against 4.18.rc1.
+
+> Also I'm not sure this blk_abort_request call is representative
+> of the real world.  Drivers do drain their queues before calling
+> it in general, e.g. take a look at ata_eh_set_pending for the
+> probably most common user.
+> 
+
+This blk_abort_request here is to force request timed out and simulate the
+scenario where timeout path and io completion path could occur concurrently.
+It is hard for me to trigger this scenario in real world, so I made  this patch
+which may looks bad. What I want is to trigger the io completion and timeout path
+concurrently.
+
+
+Thanks
+Jianchao
