@@ -1,67 +1,83 @@
-Return-Path: <BATV+bdb09ad5f0bc9ee27162+5405+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Coly Li <colyli@suse.de>
-Cc: linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 1/6] block: add a bio_reuse helper
-Date: Mon, 11 Jun 2018 21:48:01 +0200
-Message-Id: <20180611194806.13222-2-hch@lst.de>
-In-Reply-To: <20180611194806.13222-1-hch@lst.de>
-References: <20180611194806.13222-1-hch@lst.de>
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	kernel-team@fb.com,
+	akpm@linux-foundation.org,
+	hannes@cmpxchg.org,
+	linux-kernel@vger.kernel.org,
+	tj@kernel.org,
+	linux-fsdevel@vger.kernel.org
+Cc: Josef Bacik <jbacik@fb.com>
+Subject: [PATCH 04/15] blk: introduce REQ_SWAP
+Date: Mon, 25 Jun 2018 11:12:32 -0400
+Message-Id: <20180625151243.2132-5-josef@toxicpanda.com>
+In-Reply-To: <20180625151243.2132-1-josef@toxicpanda.com>
+References: <20180625151243.2132-1-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This abstracts out a way to reuse a bio without destroying the
-data pointers.
+From: Josef Bacik <jbacik@fb.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Just like REQ_META, it's important to know the IO coming down is swap
+in order to guard against potential IO priority inversion issues with
+cgroups.  Add REQ_SWAP and use it for all swap IO, and add it to our
+bio_issue_as_root_blkg helper.
+
+Signed-off-by: Josef Bacik <jbacik@fb.com>
+Acked-by: Tejun Heo <tj@kernel.org>
 ---
- block/bio.c         | 20 ++++++++++++++++++++
- include/linux/bio.h |  1 +
- 2 files changed, 21 insertions(+)
+ include/linux/blk-cgroup.h | 2 +-
+ include/linux/blk_types.h  | 3 ++-
+ mm/page_io.c               | 2 +-
+ 3 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 70c4e1b6dd45..fa1b7ab50784 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -308,6 +308,26 @@ void bio_reset(struct bio *bio)
- }
- EXPORT_SYMBOL(bio_reset);
- 
-+/**
-+ * bio_reuse - prepare a bio for reuse
-+ * @bio:	bio to reuse
-+ *
-+ * Prepares an already setup and possible used bio for reusing it another
-+ * time.  Compared to bio_reset() this preserves the bio size and the
-+ * layout and contents of the bio vectors.
-+ */
-+void bio_reuse(struct bio *bio)
-+{
-+	unsigned int size = bio->bi_iter.bi_size;
-+	unsigned short vcnt = bio->bi_vcnt;
-+
-+	bio_reset(bio);
-+
-+	bio->bi_iter.bi_size = size;
-+	bio->bi_vcnt = vcnt;
-+}
-+EXPORT_SYMBOL_GPL(bio_reuse);
-+
- static struct bio *__bio_chain_endio(struct bio *bio)
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index b41292726c0f..a8f9ba8f33a4 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -254,7 +254,7 @@ static inline struct blkcg *bio_blkcg(struct bio *bio)
+  */
+ static inline bool bio_issue_as_root_blkg(struct bio *bio)
  {
- 	struct bio *parent = bio->bi_private;
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index f08f5fe7bd08..15c871ab50db 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -475,6 +475,7 @@ extern void bio_init(struct bio *bio, struct bio_vec *table,
- 		     unsigned short max_vecs);
- extern void bio_uninit(struct bio *);
- extern void bio_reset(struct bio *);
-+void bio_reuse(struct bio *);
- void bio_chain(struct bio *, struct bio *);
+-	return (bio->bi_opf & REQ_META);
++	return (bio->bi_opf & (REQ_META | REQ_SWAP)) != 0;
+ }
  
- extern int bio_add_page(struct bio *, struct page *, unsigned int,unsigned int);
+ /**
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index ff181df8c195..4f7ba397d37d 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -327,7 +327,7 @@ enum req_flag_bits {
+ 
+ 	/* for driver use */
+ 	__REQ_DRV,
+-
++	__REQ_SWAP,		/* swapping request. */
+ 	__REQ_NR_BITS,		/* stops here */
+ };
+ 
+@@ -349,6 +349,7 @@ enum req_flag_bits {
+ #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+ 
+ #define REQ_DRV			(1ULL << __REQ_DRV)
++#define REQ_SWAP		(1ULL << __REQ_SWAP)
+ 
+ #define REQ_FAILFAST_MASK \
+ 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
+diff --git a/mm/page_io.c b/mm/page_io.c
+index b41cf9644585..a552cb37e220 100644
+--- a/mm/page_io.c
++++ b/mm/page_io.c
+@@ -338,7 +338,7 @@ int __swap_writepage(struct page *page, struct writeback_control *wbc,
+ 		ret = -ENOMEM;
+ 		goto out;
+ 	}
+-	bio->bi_opf = REQ_OP_WRITE | wbc_to_write_flags(wbc);
++	bio->bi_opf = REQ_OP_WRITE | REQ_SWAP | wbc_to_write_flags(wbc);
+ 	count_swpout_vm_event(page);
+ 	set_page_writeback(page);
+ 	unlock_page(page);
 -- 
-2.17.1
+2.14.3
