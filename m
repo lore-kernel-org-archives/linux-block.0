@@ -1,96 +1,129 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39310 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S932312AbeF0Mtr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jun 2018 08:49:47 -0400
+Return-Path: <ming.lei@redhat.com>
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V7 19/24] block: loop: pass multipage bvec to iov_iter
-Date: Wed, 27 Jun 2018 20:45:43 +0800
-Message-Id: <20180627124548.3456-20-ming.lei@redhat.com>
-In-Reply-To: <20180627124548.3456-1-ming.lei@redhat.com>
-References: <20180627124548.3456-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Andrew Jones <drjones@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Omar Sandoval <osandov@fb.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH 3/5] blk-mq: introduce new lock for protecting hctx->dispatch_wait
+Date: Mon, 25 Jun 2018 19:31:47 +0800
+Message-Id: <20180625113149.29449-4-ming.lei@redhat.com>
+In-Reply-To: <20180625113149.29449-1-ming.lei@redhat.com>
+References: <20180625113149.29449-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-iov_iter is implemented with bvec itererator, so it is safe to pass
-multipage bvec to it, and this way is much more efficient than
-passing one page in each bvec.
+Now hctx->lock is only acquired when adding hctx->dispatch_wait to
+one wait queue, but not held when removing it from the wait queue.
 
+IO hang can be observed easily if SCHED RESTART is disabled, that means
+now RESTART exits just for fixing the issue in blk_mq_mark_tag_wait().
+
+This patch fixes the issue by introducing hctx->dispatch_wait_lock and
+holding it for removing hctx->dispatch_wait in blk_mq_dispatch_wake(),
+since we need to avoid acquiring hctx->lock in irq context.
+
+Fixes: eb619fdb2d4cb8b3d3419 ("blk-mq: fix issue with shared tag queue re-running")
+Cc: Andrew Jones <drjones@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/loop.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+ block/blk-mq.c         | 26 +++++++++++++++++---------
+ include/linux/blk-mq.h |  1 +
+ 2 files changed, 18 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index d6b6f434fd4b..a350b323e891 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -515,16 +515,16 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	struct bio *bio = rq->bio;
- 	struct file *file = lo->lo_backing_file;
- 	unsigned int offset;
--	int segments = 0;
-+	int nr_bvec = 0;
- 	int ret;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index db2814eb050f..ff3ff191ff0b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -998,7 +998,10 @@ static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
  
- 	if (rq->bio != rq->biotail) {
--		struct req_iterator iter;
-+		struct bvec_iter iter;
- 		struct bio_vec tmp;
+ 	hctx = container_of(wait, struct blk_mq_hw_ctx, dispatch_wait);
  
- 		__rq_for_each_bio(bio, rq)
--			segments += bio_segments(bio);
--		bvec = kmalloc_array(segments, sizeof(struct bio_vec),
-+			nr_bvec += bio_bvecs(bio);
-+		bvec = kmalloc_array(nr_bvec, sizeof(struct bio_vec),
- 				     GFP_NOIO);
- 		if (!bvec)
- 			return -EIO;
-@@ -533,13 +533,14 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 		/*
- 		 * The bios of the request may be started from the middle of
- 		 * the 'bvec' because of bio splitting, so we can't directly
--		 * copy bio->bi_iov_vec to new bvec. The rq_for_each_segment
-+		 * copy bio->bi_iov_vec to new bvec. The bio_for_each_bvec
- 		 * API will take care of all details for us.
- 		 */
--		rq_for_each_segment(tmp, rq, iter) {
--			*bvec = tmp;
--			bvec++;
--		}
-+		__rq_for_each_bio(bio, rq)
-+			bio_for_each_bvec(tmp, bio, iter) {
-+				*bvec = tmp;
-+				bvec++;
-+			}
- 		bvec = cmd->bvec;
- 		offset = 0;
- 	} else {
-@@ -550,12 +551,11 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 		 */
- 		offset = bio->bi_iter.bi_bvec_done;
- 		bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
--		segments = bio_segments(bio);
-+		nr_bvec = bio_bvecs(bio);
++	spin_lock(&hctx->dispatch_wait_lock);
+ 	list_del_init(&wait->entry);
++	spin_unlock(&hctx->dispatch_wait_lock);
++
+ 	blk_mq_run_hw_queue(hctx, true);
+ 	return 1;
+ }
+@@ -1012,7 +1015,7 @@ static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
+ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
+ 				 struct request *rq)
+ {
+-	struct sbq_wait_state *ws;
++	struct wait_queue_head *wq;
+ 	wait_queue_entry_t *wait;
+ 	bool ret;
+ 
+@@ -1035,14 +1038,18 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
+ 	if (!list_empty_careful(&wait->entry))
+ 		return false;
+ 
+-	spin_lock(&hctx->lock);
++	wq = &bt_wait_ptr(&hctx->tags->bitmap_tags, hctx)->wait;
++
++	spin_lock_irq(&wq->lock);
++	spin_lock(&hctx->dispatch_wait_lock);
+ 	if (!list_empty(&wait->entry)) {
+-		spin_unlock(&hctx->lock);
++		spin_unlock(&hctx->dispatch_wait_lock);
++		spin_unlock_irq(&wq->lock);
+ 		return false;
  	}
- 	atomic_set(&cmd->ref, 2);
  
--	iov_iter_bvec(&iter, ITER_BVEC | rw, bvec,
--		      segments, blk_rq_bytes(rq));
-+	iov_iter_bvec(&iter, ITER_BVEC | rw, bvec, nr_bvec, blk_rq_bytes(rq));
- 	iter.iov_offset = offset;
+-	ws = bt_wait_ptr(&hctx->tags->bitmap_tags, hctx);
+-	add_wait_queue(&ws->wait, wait);
++	wait->flags &= ~WQ_FLAG_EXCLUSIVE;
++	__add_wait_queue(wq, wait);
  
- 	cmd->iocb.ki_pos = pos;
+ 	/*
+ 	 * It's possible that a tag was freed in the window between the
+@@ -1051,7 +1058,8 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
+ 	 */
+ 	ret = blk_mq_get_driver_tag(rq);
+ 	if (!ret) {
+-		spin_unlock(&hctx->lock);
++		spin_unlock(&hctx->dispatch_wait_lock);
++		spin_unlock_irq(&wq->lock);
+ 		return false;
+ 	}
+ 
+@@ -1059,10 +1067,9 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
+ 	 * We got a tag, remove ourselves from the wait queue to ensure
+ 	 * someone else gets the wakeup.
+ 	 */
+-	spin_lock_irq(&ws->wait.lock);
+ 	list_del_init(&wait->entry);
+-	spin_unlock_irq(&ws->wait.lock);
+-	spin_unlock(&hctx->lock);
++	spin_unlock(&hctx->dispatch_wait_lock);
++	spin_unlock_irq(&wq->lock);
+ 
+ 	return true;
+ }
+@@ -2130,6 +2137,7 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 
+ 	hctx->nr_ctx = 0;
+ 
++	spin_lock_init(&hctx->dispatch_wait_lock);
+ 	init_waitqueue_func_entry(&hctx->dispatch_wait, blk_mq_dispatch_wake);
+ 	INIT_LIST_HEAD(&hctx->dispatch_wait.entry);
+ 
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index e3147eb74222..ea690254dab7 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -39,6 +39,7 @@ struct blk_mq_hw_ctx {
+ 	struct blk_mq_ctx	**ctxs;
+ 	unsigned int		nr_ctx;
+ 
++	spinlock_t		dispatch_wait_lock;
+ 	wait_queue_entry_t	dispatch_wait;
+ 	atomic_t		wait_index;
+ 
 -- 
 2.9.5
