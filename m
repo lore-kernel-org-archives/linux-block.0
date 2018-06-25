@@ -1,96 +1,57 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX RESEND 4/4] block, bfq: give a better name to bfq_bfqq_may_idle
-Date: Mon, 25 Jun 2018 21:55:37 +0200
-Message-Id: <20180625195537.7769-5-paolo.valente@linaro.org>
-In-Reply-To: <20180625195537.7769-1-paolo.valente@linaro.org>
-References: <20180625195537.7769-1-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:36014 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752363AbeFYWyt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Jun 2018 18:54:49 -0400
+Received: by mail-pf0-f193.google.com with SMTP id u16-v6so3359995pfh.3
+        for <linux-block@vger.kernel.org>; Mon, 25 Jun 2018 15:54:48 -0700 (PDT)
+Date: Mon, 25 Jun 2018 15:54:47 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH blktests 13/15] src/Makefile: Fix pattern rule
+Message-ID: <20180625225447.GD1218@vader>
+References: <20180622221946.10987-1-bart.vanassche@wdc.com>
+ <20180622221946.10987-14-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180622221946.10987-14-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The actual goal of the function bfq_bfqq_may_idle is to tell whether
-it is better to perform device idling (more precisely: I/O-dispatch
-plugging) for the input bfq_queue, either to boost throughput or to
-preserve service guarantees. This commit improves the name of the
-function accordingly.
+On Fri, Jun 22, 2018 at 03:19:44PM -0700, Bart Van Assche wrote:
+> According to the GNU make documentation, the syntax for pattern rules
+> is as follows:
+> 
+> <target pattern>+: <source pattern>
+> 	<rule>
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+That's because this is a static pattern rule:
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index d579cc8e0db6..41d9036b1822 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -634,7 +634,7 @@ static bool bfq_differentiated_weights(struct bfq_data *bfqd)
-  * The following function returns true if every queue must receive the
-  * same share of the throughput (this condition is used when deciding
-  * whether idling may be disabled, see the comments in the function
-- * bfq_bfqq_may_idle()).
-+ * bfq_better_to_idle()).
-  *
-  * Such a scenario occurs when:
-  * 1) all active queues have the same weight,
-@@ -3355,7 +3355,7 @@ static bool bfq_may_expire_for_budg_timeout(struct bfq_queue *bfqq)
-  * issues taken into account are not trivial. We discuss these issues
-  * individually while introducing the variables.
-  */
--static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
-+static bool bfq_better_to_idle(struct bfq_queue *bfqq)
- {
- 	struct bfq_data *bfqd = bfqq->bfqd;
- 	bool rot_without_queueing =
-@@ -3588,19 +3588,19 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- }
- 
- /*
-- * If the in-service queue is empty but the function bfq_bfqq_may_idle
-+ * If the in-service queue is empty but the function bfq_better_to_idle
-  * returns true, then:
-  * 1) the queue must remain in service and cannot be expired, and
-  * 2) the device must be idled to wait for the possible arrival of a new
-  *    request for the queue.
-- * See the comments on the function bfq_bfqq_may_idle for the reasons
-+ * See the comments on the function bfq_better_to_idle for the reasons
-  * why performing device idling is the best choice to boost the throughput
-- * and preserve service guarantees when bfq_bfqq_may_idle itself
-+ * and preserve service guarantees when bfq_better_to_idle itself
-  * returns true.
-  */
- static bool bfq_bfqq_must_idle(struct bfq_queue *bfqq)
- {
--	return RB_EMPTY_ROOT(&bfqq->sort_list) && bfq_bfqq_may_idle(bfqq);
-+	return RB_EMPTY_ROOT(&bfqq->sort_list) && bfq_better_to_idle(bfqq);
- }
- 
- /*
-@@ -3686,7 +3686,7 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
- 	 * may idle after their completion, then keep it anyway.
- 	 */
- 	if (bfq_bfqq_wait_request(bfqq) ||
--	    (bfqq->dispatched != 0 && bfq_bfqq_may_idle(bfqq))) {
-+	    (bfqq->dispatched != 0 && bfq_better_to_idle(bfqq))) {
- 		bfqq = NULL;
- 		goto keep_queue;
- 	}
-@@ -4734,7 +4734,7 @@ static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
- 					BFQQE_BUDGET_TIMEOUT);
- 		else if (RB_EMPTY_ROOT(&bfqq->sort_list) &&
- 			 (bfqq->dispatched == 0 ||
--			  !bfq_bfqq_may_idle(bfqq)))
-+			  !bfq_better_to_idle(bfqq)))
- 			bfq_bfqq_expire(bfqd, bfqq, false,
- 					BFQQE_NO_MORE_REQUESTS);
- 	}
--- 
-2.16.1
+https://www.gnu.org/software/make/manual/html_node/Static-Usage.html
+
+So calling this a fix isn't accurate :) I'll fold this change into the
+change adding the C++ program.
+
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> ---
+>  src/Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/src/Makefile b/src/Makefile
+> index 612282d14af8..d7ae832fc4fd 100644
+> --- a/src/Makefile
+> +++ b/src/Makefile
+> @@ -13,7 +13,7 @@ all: $(TARGETS)
+>  clean:
+>  	rm -f $(TARGETS)
+>  
+> -$(TARGETS): %: %.c
+> +%: %.c
+>  	$(CC) -Wall -o $@ $(CPPFLAGS) $(CFLAGS) $^
+>  
+>  .PHONY: all clean
+> -- 
+> 2.17.1
+> 
