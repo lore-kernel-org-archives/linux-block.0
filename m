@@ -1,38 +1,28 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
-        keith.busch@intel.com, josef@toxicpanda.com, ulf.hansson@linaro.org
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 2/5] nbd: use __blk_mq_complete_request in timeout path
-Date: Wed, 20 Jun 2018 21:22:41 +0800
-Message-Id: <1529500964-28429-3-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1529500964-28429-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1529500964-28429-1-git-send-email-jianchao.w.wang@oracle.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:55382 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754502AbeFYJHw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Jun 2018 05:07:52 -0400
+Date: Mon, 25 Jun 2018 11:07:50 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/9] common/rc: Fix _have_tracepoint()
+Message-ID: <20180625090750.qn5uq2jfjeu74bqc@linux-x5ow.site>
+References: <20180619202353.23631-1-bart.vanassche@wdc.com>
+ <20180619202353.23631-2-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180619202353.23631-2-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-To regain the capability to prevent normal completion path from
-entering a timeout request, blk_mq_mark_rq_complete is introduced
-in blk_mq_complete_request. Have to use __blk_mq_complete_request
-in timeout path to complete a timeout request.
-
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
----
- drivers/block/nbd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 3b7083b..d7e533a 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -354,7 +354,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 	sock_shutdown(nbd);
- 	nbd_config_put(nbd);
- done:
--	blk_mq_complete_request(req);
-+	__blk_mq_complete_request(req);
- 	return BLK_EH_DONE;
- }
- 
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.7.4
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
