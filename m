@@ -1,71 +1,218 @@
-Return-Path: <schmitzmic@gmail.com>
-Subject: Subject: [PATCH RFC] block: fix Amiga RDB partition support for disks >= 2 TB
-From: schmitzmic@gmail.com
-CC: <geert@linux-m68k.org-r>,<jdow@earthlink.net>,<martin@lichtvoll.de>,<linux-m68k@lists.linux-m68k.org>,<linux-block@vger.kernel.org>
-To: <schmitzmic@gmail.com>,<axboe@kernel.dk>
-Message-Id: <20180627012421.80B8F24E094@nmr-admin>
-Date: Wed, 27 Jun 2018 13:24:21 +1200 (NZST)
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	linus.walleij@linaro.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX RESEND 1/4] block, bfq: add/remove entity weights correctly
+Date: Mon, 25 Jun 2018 21:55:34 +0200
+Message-Id: <20180625195537.7769-2-paolo.valente@linaro.org>
+In-Reply-To: <20180625195537.7769-1-paolo.valente@linaro.org>
+References: <20180625195537.7769-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
->From 5299e0e64dfb33ac3a1f3137b42178734ce20087 Mon Sep 17 00:00:00 2001
+To keep I/O throughput high as often as possible, BFQ performs
+I/O-dispatch plugging (aka device idling) only when beneficial exactly
+for throughput, or when needed for service guarantees (low latency,
+fairness). An important case where the latter condition holds is when
+the scenario is 'asymmetric' in terms of weights: i.e., when some
+bfq_queue or whole group of queues has a higher weight, and thus has
+to receive more service, than other queues or groups. Without dispatch
+plugging, lower-weight queues/groups may unjustly steal bandwidth to
+higher-weight queues/groups.
 
-The Amiga RDB partition parser module uses int for partition sector
-address and count, which will overflow for disks 2 TB and larger.
+To detect asymmetric scenarios, BFQ checks some sufficient
+conditions. One of these conditions is that active groups have
+different weights. BFQ controls this condition by maintaining a
+special set of unique weights of active groups
+(group_weights_tree). To this purpose, in the function
+bfq_active_insert/bfq_active_extract BFQ adds/removes the weight of a
+group to/from this set.
 
-Use sector_t as type for sector address and size (as expected by
-put_partition) to allow using such disks without danger of data
-corruption.
+Unfortunately, the function bfq_active_extract may happen to be
+invoked also for a group that is still active (to preserve the correct
+update of the next queue to serve, see comments in function
+bfq_no_longer_next_in_service() for details). In this case, removing
+the weight of the group makes the set group_weights_tree
+inconsistent. Service-guarantee violations follow.
 
-This bug was reported originally in 2012 by Martin Steigerwald
-<Martin@lichtvoll.de>, and the fix was created by the RDB author,
-Joanne Dow <jdow@earthlink.net>. The patch had been discussed and
-reviewed on linux-m68k at that time but never officially submitted.
+This commit addresses this issue by moving group_weights_tree
+insertions from their previous location (in bfq_active_insert) into
+the function __bfq_activate_entity, and by moving group_weights_tree
+extractions from bfq_active_extract to when the entity that represents
+a group remains throughly idle, i.e., with no request either enqueued
+or dispatched.
 
-Following a stern warning by Joanne, a warning is printed if any
-partition is found to overflow the old 32 bit calculations, on the
-grounds that such a partition would be misparses on legacy 32 bit
-systems (other than Linux).
-
-Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=43511
-Reported-by: Martin Steigerwald <Martin@lichtvoll.de>
-Message-ID: <201206192146.09327.Martin@lichtvoll.de>
-Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
-Tested-by: Martin Steigerwald <Martin@lichtvoll.de>
-Tested-by: Michael Schmitz <schmitzmic@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/partitions/amiga.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ block/bfq-iosched.c | 45 +++++++++++++++++++++++++++++++++++++++++----
+ block/bfq-iosched.h |  7 +++++--
+ block/bfq-wf2q.c    | 24 +++++++++++++-----------
+ 3 files changed, 59 insertions(+), 17 deletions(-)
 
-diff --git a/block/partitions/amiga.c b/block/partitions/amiga.c
-index 5609366..42c3f38 100644
---- a/block/partitions/amiga.c
-+++ b/block/partitions/amiga.c
-@@ -32,7 +32,8 @@ int amiga_partition(struct parsed_partitions *state)
- 	unsigned char *data;
- 	struct RigidDiskBlock *rdb;
- 	struct PartitionBlock *pb;
--	int start_sect, nr_sects, blk, part, res = 0;
-+	sector_t start_sect, nr_sects;
-+	int blk, part, res = 0;
- 	int blksize = 1;	/* Multiplier for disk block size */
- 	int slot = 1;
- 	char b[BDEVNAME_SIZE];
-@@ -111,6 +112,16 @@ int amiga_partition(struct parsed_partitions *state)
- 			     be32_to_cpu(pb->pb_Environment[3]) *
- 			     be32_to_cpu(pb->pb_Environment[5]) *
- 			     blksize;
-+		if (start_sect > INT_MAX || nr_sects > INT_MAX
-+			|| (start_sect + nr_sects) > INT_MAX) {
-+			pr_err("%s: Warning: RDB partition overflow!\n",
-+				bdevname(state->bdev, b));
-+			pr_err("%s: start 0x%llX size 0x%llX\n",
-+				bdevname(state->bdev, b), start_sect,
-+				nr_sects);
-+			pr_err("%s: partition incompatible with 32 bit OS\n",
-+				bdevname(state->bdev, b));
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 495b9ddb3355..3f32e88c7e9b 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -742,8 +742,9 @@ void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_entity *entity,
+  * See the comments to the function bfq_weights_tree_add() for considerations
+  * about overhead.
+  */
+-void bfq_weights_tree_remove(struct bfq_data *bfqd, struct bfq_entity *entity,
+-			     struct rb_root *root)
++void __bfq_weights_tree_remove(struct bfq_data *bfqd,
++			       struct bfq_entity *entity,
++			       struct rb_root *root)
+ {
+ 	if (!entity->weight_counter)
+ 		return;
+@@ -759,6 +760,43 @@ void bfq_weights_tree_remove(struct bfq_data *bfqd, struct bfq_entity *entity,
+ 	entity->weight_counter = NULL;
+ }
+ 
++/*
++ * Invoke __bfq_weights_tree_remove on bfqq and all its inactive
++ * parent entities.
++ */
++void bfq_weights_tree_remove(struct bfq_data *bfqd,
++			     struct bfq_queue *bfqq)
++{
++	struct bfq_entity *entity = bfqq->entity.parent;
++
++	__bfq_weights_tree_remove(bfqd, &bfqq->entity,
++				  &bfqd->queue_weights_tree);
++
++	for_each_entity(entity) {
++		struct bfq_sched_data *sd = entity->my_sched_data;
++
++		if (sd->next_in_service || sd->in_service_entity) {
++			/*
++			 * entity is still active, because either
++			 * next_in_service or in_service_entity is not
++			 * NULL (see the comments on the definition of
++			 * next_in_service for details on why
++			 * in_service_entity must be checked too).
++			 *
++			 * As a consequence, the weight of entity is
++			 * not to be removed. In addition, if entity
++			 * is active, then its parent entities are
++			 * active as well, and thus their weights are
++			 * not to be removed either. In the end, this
++			 * loop must stop here.
++			 */
++			break;
 +		}
- 		put_partition(state,slot++,start_sect,nr_sects);
- 		{
- 			/* Be even more informative to aid mounting */
++		__bfq_weights_tree_remove(bfqd, entity,
++					  &bfqd->group_weights_tree);
++	}
++}
++
+ /*
+  * Return expired entry, or NULL to just start from scratch in rbtree.
+  */
+@@ -4582,8 +4620,7 @@ static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
+ 		 */
+ 		bfqq->budget_timeout = jiffies;
+ 
+-		bfq_weights_tree_remove(bfqd, &bfqq->entity,
+-					&bfqd->queue_weights_tree);
++		bfq_weights_tree_remove(bfqd, bfqq);
+ 	}
+ 
+ 	now_ns = ktime_get_ns();
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 0f712e03b035..a8a2e5aca4d4 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -827,8 +827,11 @@ struct bfq_data *bic_to_bfqd(struct bfq_io_cq *bic);
+ void bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq);
+ void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_entity *entity,
+ 			  struct rb_root *root);
+-void bfq_weights_tree_remove(struct bfq_data *bfqd, struct bfq_entity *entity,
+-			     struct rb_root *root);
++void __bfq_weights_tree_remove(struct bfq_data *bfqd,
++			       struct bfq_entity *entity,
++			       struct rb_root *root);
++void bfq_weights_tree_remove(struct bfq_data *bfqd,
++			     struct bfq_queue *bfqq);
+ void bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 		     bool compensate, enum bfqq_expiration reason);
+ void bfq_put_queue(struct bfq_queue *bfqq);
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index 4498c43245e2..58cf38fcee05 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -499,9 +499,6 @@ static void bfq_active_insert(struct bfq_service_tree *st,
+ 	if (bfqq)
+ 		list_add(&bfqq->bfqq_list, &bfqq->bfqd->active_list);
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
+-	else /* bfq_group */
+-		bfq_weights_tree_add(bfqd, entity, &bfqd->group_weights_tree);
+-
+ 	if (bfqg != bfqd->root_group)
+ 		bfqg->active_entities++;
+ #endif
+@@ -601,10 +598,6 @@ static void bfq_active_extract(struct bfq_service_tree *st,
+ 	if (bfqq)
+ 		list_del(&bfqq->bfqq_list);
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
+-	else /* bfq_group */
+-		bfq_weights_tree_remove(bfqd, entity,
+-					&bfqd->group_weights_tree);
+-
+ 	if (bfqg != bfqd->root_group)
+ 		bfqg->active_entities--;
+ #endif
+@@ -799,7 +792,7 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
+ 		if (prev_weight != new_weight) {
+ 			root = bfqq ? &bfqd->queue_weights_tree :
+ 				      &bfqd->group_weights_tree;
+-			bfq_weights_tree_remove(bfqd, entity, root);
++			__bfq_weights_tree_remove(bfqd, entity, root);
+ 		}
+ 		entity->weight = new_weight;
+ 		/*
+@@ -971,7 +964,7 @@ static void bfq_update_fin_time_enqueue(struct bfq_entity *entity,
+  * one of its children receives a new request.
+  *
+  * Basically, this function updates the timestamps of entity and
+- * inserts entity into its active tree, ater possibly extracting it
++ * inserts entity into its active tree, after possibly extracting it
+  * from its idle tree.
+  */
+ static void __bfq_activate_entity(struct bfq_entity *entity,
+@@ -1015,6 +1008,16 @@ static void __bfq_activate_entity(struct bfq_entity *entity,
+ 		entity->on_st = true;
+ 	}
+ 
++#ifdef BFQ_GROUP_IOSCHED_ENABLED
++	if (!bfq_entity_to_bfqq(entity)) { /* bfq_group */
++		struct bfq_group *bfqg =
++			container_of(entity, struct bfq_group, entity);
++
++		bfq_weights_tree_add(bfqg->bfqd, entity,
++				     &bfqd->group_weights_tree);
++	}
++#endif
++
+ 	bfq_update_fin_time_enqueue(entity, st, backshifted);
+ }
+ 
+@@ -1664,8 +1667,7 @@ void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 	bfqd->busy_queues--;
+ 
+ 	if (!bfqq->dispatched)
+-		bfq_weights_tree_remove(bfqd, &bfqq->entity,
+-					&bfqd->queue_weights_tree);
++		bfq_weights_tree_remove(bfqd, bfqq);
+ 
+ 	if (bfqq->wr_coeff > 1)
+ 		bfqd->wr_busy_queues--;
 -- 
-1.9.1
+2.16.1
