@@ -1,28 +1,29 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qt0-f194.google.com ([209.85.216.194]:35366 "EHLO
-        mail-qt0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932392AbeFFIlJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jun 2018 04:41:09 -0400
-Date: Wed, 6 Jun 2018 04:41:05 -0400
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: Li Wang <liwang@redhat.com>
-Cc: Coly Li <colyli@suse.de>, hch@lst.de, darrick.wong@oracle.com,
-        snitzer@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: Block IO issue in kernel-v4.17
-Message-ID: <20180606084105.GA10720@kmo-pixel>
-References: <CAEemH2fbPv2wphVBHxSSS+KEK5S-rercXhvgLJ7YMOZnrTpexg@mail.gmail.com>
+Received: from mx2.suse.de ([195.135.220.15]:55720 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754449AbeFYJJl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Jun 2018 05:09:41 -0400
+Date: Mon, 25 Jun 2018 11:09:39 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 3/9] check, tests/meta/012: Use array["index"] instead of
+ array[index]
+Message-ID: <20180625090939.xa3gf77hpjvbvmqw@linux-x5ow.site>
+References: <20180619202353.23631-1-bart.vanassche@wdc.com>
+ <20180619202353.23631-4-bart.vanassche@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAEemH2fbPv2wphVBHxSSS+KEK5S-rercXhvgLJ7YMOZnrTpexg@mail.gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180619202353.23631-4-bart.vanassche@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Jun 06, 2018 at 04:37:25PM +0800, Li Wang wrote:
-> Hi BIO experts,
-> 
-> I catch this panic issue on some kind of arches(x86_64, ppc64,
-> ppc64le..), it seems the root cause is very probably from BIO changes
-> from kernel-4.17-rc7. Plz take a look.
-
-That's the bioset changes, the fix is out and on its way in
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
