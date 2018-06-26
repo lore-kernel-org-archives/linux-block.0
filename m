@@ -1,17 +1,17 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:41765 "EHLO
-        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754530AbeFZTB4 (ORCPT
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:33173 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751901AbeFZSro (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jun 2018 15:01:56 -0400
-Received: by mail-wr0-f194.google.com with SMTP id h10-v6so18280143wrq.8
-        for <linux-block@vger.kernel.org>; Tue, 26 Jun 2018 12:01:55 -0700 (PDT)
+        Tue, 26 Jun 2018 14:47:44 -0400
+Received: by mail-wm0-f66.google.com with SMTP id z6-v6so16086207wma.0
+        for <linux-block@vger.kernel.org>; Tue, 26 Jun 2018 11:47:43 -0700 (PDT)
 MIME-Version: 1.0
 References: <1529344568-2794-1-git-send-email-hlitz@ucsc.edu> <25ed47dd-033a-7181-01c5-09ee359ee962@lightnvm.io>
 In-Reply-To: <25ed47dd-033a-7181-01c5-09ee359ee962@lightnvm.io>
 From: Heiner Litz <hlitz@ucsc.edu>
-Date: Tue, 26 Jun 2018 12:01:38 -0700
-Message-ID: <CAJbgVnVpoWLUO1R=YHju+_Woo8xjEznV+YE3TC0q8nEmqsCESA@mail.gmail.com>
+Date: Tue, 26 Jun 2018 11:47:31 -0700
+Message-ID: <CAJbgVnVjxKjePHwh4C3XBFn26aUGwYMMwD5b8Pmtv7e0Fpv0Ow@mail.gmail.com>
 Subject: Re: [RESEND PATCH] lightnvm: pblk: add asynchronous partial read
 To: =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>
 Cc: linux-block@vger.kernel.org, Javier Gonzalez <javier@cnexlabs.com>,
@@ -19,12 +19,6 @@ Cc: linux-block@vger.kernel.org, Javier Gonzalez <javier@cnexlabs.com>,
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
-
-> Guarantees that this is at least 32bit, but this should be at least 64
-> bit right?
-
-All 64-bit bitmaps in pblk are unsigned long. If we want to change to
-u64 this should be part of a different patch
 
 On Fri, Jun 22, 2018 at 11:17 AM Matias Bj=C3=B8rling <mb@lightnvm.io> wrot=
 e:
@@ -193,23 +187,36 @@ qd,
 >
 >
 > new_bio can return NULL.
+
+see Jens's email
+
 >
 > > +
 > > +     if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
 > > +             goto fail;
 >
 > goto bio_put?
+
+do you only want the label to be changed? sure
+
 > > +
 > > +     if (nr_holes !=3D new_bio->bi_vcnt) {
 > > +             pr_err("pblk: malformed bio\n");
 >
 > I don't think there is a need for an error message here. In which case
 > would this happen?
+
+This is taken over from the original partial read path. Maybe Javier
+knows why it was put in there in the first place.
+
 >
 > > +             goto fail_pages;
 > > +     }
 >
 > goto free_pages?
+
+sure I can change the label
+
 >
 > > +
 > > +     pr_ctx =3D kmalloc(sizeof(struct pblk_pr_ctx), GFP_KERNEL);
