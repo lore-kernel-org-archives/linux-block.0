@@ -1,69 +1,67 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51622 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753408AbeFIMfP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 9 Jun 2018 08:35:15 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 25/30] exofs: conver to bio_for_each_chunk_segment_all
-Date: Sat,  9 Jun 2018 20:30:09 +0800
-Message-Id: <20180609123014.8861-26-ming.lei@redhat.com>
-In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
-References: <20180609123014.8861-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=708eb8c04=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 2/3] sd: Remove the __data_len hack for WRITE SAME again
+Date: Mon, 25 Jun 2018 17:10:08 -0700
+Message-Id: <20180626001009.16557-3-bart.vanassche@wdc.com>
+In-Reply-To: <20180626001009.16557-1-bart.vanassche@wdc.com>
+References: <20180626001009.16557-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-bio_for_each_segment_all() can't be used any more after multipage bvec is
-enabled, so we have to convert to bio_for_each_chunk_segment_all()
+Now that blk_rq_payload_bytes() has been fixed, remove the __data_len
+hack again from sd_setup_write_same_cmnd(), the function that handles
+REQ_OP_WRITE_SAME. See also commit 08965c2eba13 ("Revert "sd: remove
+__data_len hack for WRITE SAME""). See also commit f80de881d8df ("sd:
+remove __data_len hack for WRITE SAME").
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
 ---
- fs/exofs/ore.c      | 3 ++-
- fs/exofs/ore_raid.c | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ drivers/scsi/sd.c | 18 +-----------------
+ 1 file changed, 1 insertion(+), 17 deletions(-)
 
-diff --git a/fs/exofs/ore.c b/fs/exofs/ore.c
-index ddbf87246898..fe2eb28de358 100644
---- a/fs/exofs/ore.c
-+++ b/fs/exofs/ore.c
-@@ -406,8 +406,9 @@ static void _clear_bio(struct bio *bio)
- {
- 	struct bio_vec *bv;
- 	unsigned i;
-+	struct bvec_chunk_iter citer;
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index 9421d9877730..89da86308aaf 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -947,8 +947,6 @@ static int sd_setup_write_same_cmnd(struct scsi_cmnd *cmd)
+ 	struct bio *bio = rq->bio;
+ 	sector_t sector = blk_rq_pos(rq);
+ 	unsigned int nr_sectors = blk_rq_sectors(rq);
+-	unsigned int nr_bytes = blk_rq_bytes(rq);
+-	int ret;
  
--	bio_for_each_segment_all(bv, bio, i) {
-+	bio_for_each_chunk_segment_all(bv, bio, i, citer) {
- 		unsigned this_count = bv->bv_len;
+ 	if (sdkp->device->no_write_same)
+ 		return BLKPREP_INVALID;
+@@ -975,21 +973,7 @@ static int sd_setup_write_same_cmnd(struct scsi_cmnd *cmd)
+ 	cmd->transfersize = sdp->sector_size;
+ 	cmd->allowed = SD_MAX_RETRIES;
  
- 		if (likely(PAGE_SIZE == this_count))
-diff --git a/fs/exofs/ore_raid.c b/fs/exofs/ore_raid.c
-index 27cbdb697649..4da3065ce976 100644
---- a/fs/exofs/ore_raid.c
-+++ b/fs/exofs/ore_raid.c
-@@ -433,11 +433,12 @@ static void _mark_read4write_pages_uptodate(struct ore_io_state *ios, int ret)
- 	/* loop on all devices all pages */
- 	for (d = 0; d < ios->numdevs; d++) {
- 		struct bio *bio = ios->per_dev[d].bio;
-+		struct bvec_chunk_iter citer;
+-	/*
+-	 * For WRITE SAME the data transferred via the DATA OUT buffer is
+-	 * different from the amount of data actually written to the target.
+-	 *
+-	 * We set up __data_len to the amount of data transferred via the
+-	 * DATA OUT buffer so that blk_rq_map_sg sets up the proper S/G list
+-	 * to transfer a single sector of data first, but then reset it to
+-	 * the amount of data to be written right after so that the I/O path
+-	 * knows how much to actually write.
+-	 */
+-	rq->__data_len = sdp->sector_size;
+-	ret = scsi_init_io(cmd);
+-	rq->__data_len = nr_bytes;
+-
+-	return ret;
++	return scsi_init_io(cmd);
+ }
  
- 		if (!bio)
- 			continue;
- 
--		bio_for_each_segment_all(bv, bio, i) {
-+		bio_for_each_chunk_segment_all(bv, bio, i, citer) {
- 			struct page *page = bv->bv_page;
- 
- 			SetPageUptodate(page);
+ static int sd_setup_flush_cmnd(struct scsi_cmnd *cmd)
 -- 
-2.9.5
+2.17.1
