@@ -1,48 +1,33 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:32452 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756429AbeFOW1S (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Jun 2018 18:27:18 -0400
-From: Igor Konopko <igor.j.konopko@intel.com>
-To: mb@lightnvm.io, javier@cnexlabs.com
-Cc: linux-block@vger.kernel.org, michal.sorn@intel.com,
-        marcin.dziegielewski@intel.com, igor.j.konopko@intel.com
-Subject: [PATCH 0/5] lightnvm: More flexible approach to metadata
-Date: Sat, 16 Jun 2018 00:27:01 +0200
-Message-Id: <20180615222706.3801-1-igor.j.konopko@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <penguin-kernel@i-love.sakura.ne.jp>
+Subject: Re: [PATCH v3] block/loop: Serialize ioctl operations.
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzbot
+ <syzbot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>,
+        syzbot <syzbot+bf89c128e05dd6c62523@syzkaller.appspotmail.com>
+References: <1527297408-4428-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp>
+ <ce5ce21a-5865-36c5-a110-eed11f785ab2@I-love.SAKURA.ne.jp>
+ <748bce03-afda-4ed2-13b3-1fcd01d57770@kernel.dk>
+From: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <9a9209af-c841-6034-4b4f-46d93aa0c037@i-love.sakura.ne.jp>
+Date: Tue, 26 Jun 2018 23:34:52 +0900
+MIME-Version: 1.0
+In-Reply-To: <748bce03-afda-4ed2-13b3-1fcd01d57770@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-This series of patches introduce some more flexibility in pblk
-related to OOB meta:
--ability to use different sizes of metadata (previously fixed 16b)
--ability to use pblk on drives without metadata
--ensuring that extended (interleaved) metadata is not in use
+Did you get any idea?
 
-I belive that most of this patches, maybe except of number 4 (Support
-for packed metadata) are rather simple, so waiting for comments
-especially about this one.
-
-Igor Konopko (5):
-  lightnvm: pblk: Helpers for OOB metadata
-  lightnvm: pblk: Remove resv field for sec meta
-  lightnvm: Flexible DMA pool entry size
-  lightnvm: pblk: Support for packed metadata in pblk.
-  lightnvm: pblk: Disable interleaved metadata in pblk
-
- drivers/lightnvm/core.c          | 33 ++++++++++-----
- drivers/lightnvm/pblk-core.c     | 86 +++++++++++++++++++++++++++++++---------
- drivers/lightnvm/pblk-init.c     | 52 +++++++++++++++++++++++-
- drivers/lightnvm/pblk-map.c      | 21 ++++++----
- drivers/lightnvm/pblk-rb.c       |  3 ++
- drivers/lightnvm/pblk-read.c     | 85 +++++++++++++++++++++++++--------------
- drivers/lightnvm/pblk-recovery.c | 67 +++++++++++++++++++++----------
- drivers/lightnvm/pblk-sysfs.c    |  7 ++++
- drivers/lightnvm/pblk-write.c    | 22 ++++++----
- drivers/lightnvm/pblk.h          | 46 +++++++++++++++++++--
- drivers/nvme/host/lightnvm.c     |  7 +++-
- include/linux/lightnvm.h         |  9 +++--
- 12 files changed, 333 insertions(+), 105 deletions(-)
-
--- 
-2.14.3
+On 2018/06/05 3:13, Jens Axboe wrote:
+> On 6/4/18 5:19 AM, Tetsuo Handa wrote:
+>> This problem was already ignored for 8 months. Unless we boost priority,
+>> this problem will be ignored for years. Jens, can we test this patch?
+> 
+> Sorry, it's just that I _really_ hate this patch. We're making up
+> a weird locking primitive that tracks the process, with a weird
+> unlock helper that only unlocks if it's the process that is
+> holding the mutex.
+> 
+> I'll try and think about this a bit, it would be nice if we had
+> a better alternative than the above.
+> 
