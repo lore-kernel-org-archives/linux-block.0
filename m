@@ -1,34 +1,23 @@
-Return-Path: <elviskitone@gmail.com>
-Return-Path: <elviskitone@gmail.com>
-Date: Fri, 8 Jun 2018 12:07:37 +0300
-From: Kitone Elvis Peter <elviskitone@gmail.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH] Signed-off-by: Kitone Elvis Peter <elviskitone@gmail.com>
-Message-ID: <20180608090737.GA5653@kitone-HP-ProBook-4530s>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: Fix transfer when chuck sectors exceeds max
+To: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org
+Cc: linux-nvme@lists.infradead.org,
+ Jitendra Bhivare <jitendra.bhivare@broadcom.com>, stable@vger.kernel.org
+References: <20180626151458.6675-1-keith.busch@intel.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <599a0ffd-66dc-9604-856e-cfa0210ebc51@kernel.dk>
+Date: Tue, 26 Jun 2018 12:18:49 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180626151458.6675-1-keith.busch@intel.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Subject: REMOVE DELETION ERROR
+On 6/26/18 9:14 AM, Keith Busch wrote:
+> A device may have boundary restrictions where the number of sectors
+> between boundaries exceeds its max transfer size. In this case, we need
+> to cap the max size to the smaller of the two limits.
 
-Corrected the modified variable in  previous commit
----
- block/partitions/acorn.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Applied, with the subject typo fixed.
 
-diff --git a/block/partitions/acorn.c b/block/partitions/acorn.c
-index 3bfe39d..358b05e 100644
---- a/block/partitions/acorn.c
-+++ b/block/partitions/acorn.c
-@@ -152,7 +152,7 @@ static int linux_partition(struct parsed_partitions *state,
- 		put_partition(state, slot++, first_sect +
- 				 le32_to_cpu(linuxp->start_sect),
- 				 le32_to_cpu(linuxp->nr_sects));
--		linux++;
-+		linuxp++;
- 	}
- 	strlcat(state->pp_buf, " >", PAGE_SIZE);
- 
 -- 
-2.7.4
+Jens Axboe
