@@ -1,23 +1,28 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <martin.petersen@oracle.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org,
+        Jitendra Bhivare <jitendra.bhivare@broadcom.com>,
+        stable@vger.kernel.org
 Subject: Re: [PATCH] block: Fix transfer when chuck sectors exceeds max
-To: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org,
- Jitendra Bhivare <jitendra.bhivare@broadcom.com>, stable@vger.kernel.org
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
 References: <20180626151458.6675-1-keith.busch@intel.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <599a0ffd-66dc-9604-856e-cfa0210ebc51@kernel.dk>
-Date: Tue, 26 Jun 2018 12:18:49 -0600
+Date: Tue, 26 Jun 2018 11:54:18 -0400
+In-Reply-To: <20180626151458.6675-1-keith.busch@intel.com> (Keith Busch's
+	message of "Tue, 26 Jun 2018 09:14:58 -0600")
+Message-ID: <yq160255ys5.fsf@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20180626151458.6675-1-keith.busch@intel.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-On 6/26/18 9:14 AM, Keith Busch wrote:
+
+Keith,
+
 > A device may have boundary restrictions where the number of sectors
 > between boundaries exceeds its max transfer size. In this case, we need
 > to cap the max size to the smaller of the two limits.
 
-Applied, with the subject typo fixed.
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
 -- 
-Jens Axboe
+Martin K. Petersen	Oracle Linux Engineering
