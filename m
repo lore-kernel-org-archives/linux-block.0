@@ -1,220 +1,333 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0079.outbound.protection.outlook.com ([104.47.41.79]:13568
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751911AbeFZUCl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jun 2018 16:02:41 -0400
-From: Javier Gonzalez <javier@cnexlabs.com>
-To: Heiner Litz <hlitz@ucsc.edu>
-CC: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "marcin.dziegielewski@intel.com" <marcin.dziegielewski@intel.com>,
-        "igor.j.konopko@intel.com" <igor.j.konopko@intel.com>
-Subject: Re: [RESEND PATCH] lightnvm: pblk: add asynchronous partial read
-Date: Tue, 26 Jun 2018 20:02:37 +0000
-Message-ID: <A609C737-818C-4CD1-A3BA-5C0E348951E3@cnexlabs.com>
-References: <1529344568-2794-1-git-send-email-hlitz@ucsc.edu>
- <25ed47dd-033a-7181-01c5-09ee359ee962@lightnvm.io>,<CAJbgVnVjxKjePHwh4C3XBFn26aUGwYMMwD5b8Pmtv7e0Fpv0Ow@mail.gmail.com>
-In-Reply-To: <CAJbgVnVjxKjePHwh4C3XBFn26aUGwYMMwD5b8Pmtv7e0Fpv0Ow@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Received: from mail-wr0-f194.google.com ([209.85.128.194]:41765 "EHLO
+        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754530AbeFZTB4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Jun 2018 15:01:56 -0400
+Received: by mail-wr0-f194.google.com with SMTP id h10-v6so18280143wrq.8
+        for <linux-block@vger.kernel.org>; Tue, 26 Jun 2018 12:01:55 -0700 (PDT)
 MIME-Version: 1.0
+References: <1529344568-2794-1-git-send-email-hlitz@ucsc.edu> <25ed47dd-033a-7181-01c5-09ee359ee962@lightnvm.io>
+In-Reply-To: <25ed47dd-033a-7181-01c5-09ee359ee962@lightnvm.io>
+From: Heiner Litz <hlitz@ucsc.edu>
+Date: Tue, 26 Jun 2018 12:01:38 -0700
+Message-ID: <CAJbgVnVpoWLUO1R=YHju+_Woo8xjEznV+YE3TC0q8nEmqsCESA@mail.gmail.com>
+Subject: Re: [RESEND PATCH] lightnvm: pblk: add asynchronous partial read
+To: =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>
+Cc: linux-block@vger.kernel.org, Javier Gonzalez <javier@cnexlabs.com>,
+        marcin.dziegielewski@intel.com, igor.j.konopko@intel.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-DQo+IE9uIDI2IEp1biAyMDE4LCBhdCAyMC40NywgSGVpbmVyIExpdHogPGhsaXR6QHVjc2MuZWR1
-PiB3cm90ZToNCj4gDQo+PiBPbiBGcmksIEp1biAyMiwgMjAxOCBhdCAxMToxNyBBTSBNYXRpYXMg
-QmrDuHJsaW5nIDxtYkBsaWdodG52bS5pbz4gd3JvdGU6DQo+PiANCj4+PiBPbiAwNi8xOC8yMDE4
-IDA3OjU2IFBNLCBIZWluZXIgTGl0eiB3cm90ZToNCj4+PiBJbiB0aGUgcmVhZCBwYXRoLCBwYXJ0
-aWFsIHJlYWRzIGFyZSBjdXJyZW50bHkgcGVyZm9ybWVkIHN5bmNocm9ub3VzbHkNCj4+PiB3aGlj
-aCBhZmZlY3RzIHBlcmZvcm1hbmNlIGZvciB3b3JrbG9hZHMgdGhhdCBnZW5lcmF0ZSBtYW55IHBh
-cnRpYWwNCj4+PiByZWFkcy4gVGhpcyBwYXRjaCBhZGRzIGFuIGFzeW5jaHJvbm91cyBwYXJ0aWFs
-IHJlYWQgcGF0aCBhcyB3ZWxsIGFzDQo+Pj4gdGhlIHJlcXVpcmVkIHBhcnRpYWwgcmVhZCBjdHgu
-DQo+Pj4gDQo+Pj4gU2lnbmVkLW9mZi1ieTogSGVpbmVyIExpdHogPGhsaXR6QHVjc2MuZWR1Pg0K
-Pj4+IC0tLQ0KPj4+ICBkcml2ZXJzL2xpZ2h0bnZtL3BibGstcmVhZC5jIHwgMTgzICsrKysrKysr
-KysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0NCj4+PiAgZHJpdmVycy9saWdodG52
-bS9wYmxrLmggICAgICB8ICAxMCArKysNCj4+PiAgMiBmaWxlcyBjaGFuZ2VkLCAxMzAgaW5zZXJ0
-aW9ucygrKSwgNjMgZGVsZXRpb25zKC0pDQo+Pj4gDQo+Pj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMv
-bGlnaHRudm0vcGJsay1yZWFkLmMgYi9kcml2ZXJzL2xpZ2h0bnZtL3BibGstcmVhZC5jDQo+Pj4g
-aW5kZXggNmU5M2M0OC4uODI4ZGY5OCAxMDA2NDQNCj4+PiAtLS0gYS9kcml2ZXJzL2xpZ2h0bnZt
-L3BibGstcmVhZC5jDQo+Pj4gKysrIGIvZHJpdmVycy9saWdodG52bS9wYmxrLXJlYWQuYw0KPj4+
-IEBAIC0yMzEsNzQgKzIzMSwzNiBAQCBzdGF0aWMgdm9pZCBwYmxrX2VuZF9pb19yZWFkKHN0cnVj
-dCBudm1fcnEgKnJxZCkNCj4+PiAgICAgIF9fcGJsa19lbmRfaW9fcmVhZChwYmxrLCBycWQsIHRy
-dWUpOw0KPj4+ICB9DQo+Pj4gDQo+Pj4gLXN0YXRpYyBpbnQgcGJsa19wYXJ0aWFsX3JlYWQoc3Ry
-dWN0IHBibGsgKnBibGssIHN0cnVjdCBudm1fcnEgKnJxZCwNCj4+PiAtICAgICAgICAgICAgICAg
-ICAgICAgICAgICBzdHJ1Y3QgYmlvICpvcmlnX2JpbywgdW5zaWduZWQgaW50IGJpb19pbml0X2lk
-eCwNCj4+PiAtICAgICAgICAgICAgICAgICAgICAgICAgICB1bnNpZ25lZCBsb25nICpyZWFkX2Jp
-dG1hcCkNCj4+PiArc3RhdGljIHZvaWQgcGJsa19lbmRfcGFydGlhbF9yZWFkKHN0cnVjdCBudm1f
-cnEgKnJxZCkNCj4+PiAgew0KPj4+IC0gICAgIHN0cnVjdCBwYmxrX3NlY19tZXRhICptZXRhX2xp
-c3QgPSBycWQtPm1ldGFfbGlzdDsNCj4+PiAtICAgICBzdHJ1Y3QgYmlvICpuZXdfYmlvOw0KPj4+
-ICsgICAgIHN0cnVjdCBwYmxrICpwYmxrID0gcnFkLT5wcml2YXRlOw0KPj4+ICsgICAgIHN0cnVj
-dCBwYmxrX2dfY3R4ICpyX2N0eCA9IG52bV9ycV90b19wZHUocnFkKTsNCj4+PiArICAgICBzdHJ1
-Y3QgcGJsa19wcl9jdHggKnByX2N0eCA9IHJfY3R4LT5wcml2YXRlOw0KPj4+ICsgICAgIHN0cnVj
-dCBiaW8gKm5ld19iaW8gPSBycWQtPmJpbzsNCj4+PiArICAgICBzdHJ1Y3QgYmlvICpiaW8gPSBw
-cl9jdHgtPm9yaWdfYmlvOw0KPj4+ICAgICAgc3RydWN0IGJpb192ZWMgc3JjX2J2LCBkc3RfYnY7
-DQo+Pj4gLSAgICAgdm9pZCAqcHBhX3B0ciA9IE5VTEw7DQo+Pj4gLSAgICAgdm9pZCAqc3JjX3As
-ICpkc3RfcDsNCj4+PiAtICAgICBkbWFfYWRkcl90IGRtYV9wcGFfbGlzdCA9IDA7DQo+Pj4gLSAg
-ICAgX19sZTY0ICpsYmFfbGlzdF9tZW0sICpsYmFfbGlzdF9tZWRpYTsNCj4+PiAtICAgICBpbnQg
-bnJfc2VjcyA9IHJxZC0+bnJfcHBhczsNCj4+PiArICAgICBzdHJ1Y3QgcGJsa19zZWNfbWV0YSAq
-bWV0YV9saXN0ID0gcnFkLT5tZXRhX2xpc3Q7DQo+Pj4gKyAgICAgaW50IGJpb19pbml0X2lkeCA9
-IHByX2N0eC0+YmlvX2luaXRfaWR4Ow0KPj4+ICsgICAgIHVuc2lnbmVkIGxvbmcgKnJlYWRfYml0
-bWFwID0gJnByX2N0eC0+Yml0bWFwOw0KPj4+ICsgICAgIGludCBucl9zZWNzID0gcHJfY3R4LT5v
-cmlnX25yX3NlY3M7DQo+Pj4gICAgICBpbnQgbnJfaG9sZXMgPSBucl9zZWNzIC0gYml0bWFwX3dl
-aWdodChyZWFkX2JpdG1hcCwgbnJfc2Vjcyk7DQo+Pj4gLSAgICAgaW50IGksIHJldCwgaG9sZTsN
-Cj4+PiAtDQo+Pj4gLSAgICAgLyogUmUtdXNlIGFsbG9jYXRlZCBtZW1vcnkgZm9yIGludGVybWVk
-aWF0ZSBsYmFzICovDQo+Pj4gLSAgICAgbGJhX2xpc3RfbWVtID0gKCgodm9pZCAqKXJxZC0+cHBh
-X2xpc3QpICsgcGJsa19kbWFfcHBhX3NpemUpOw0KPj4+IC0gICAgIGxiYV9saXN0X21lZGlhID0g
-KCgodm9pZCAqKXJxZC0+cHBhX2xpc3QpICsgMiAqIHBibGtfZG1hX3BwYV9zaXplKTsNCj4+PiAt
-DQo+Pj4gLSAgICAgbmV3X2JpbyA9IGJpb19hbGxvYyhHRlBfS0VSTkVMLCBucl9ob2xlcyk7DQo+
-Pj4gLQ0KPj4+IC0gICAgIGlmIChwYmxrX2Jpb19hZGRfcGFnZXMocGJsaywgbmV3X2JpbywgR0ZQ
-X0tFUk5FTCwgbnJfaG9sZXMpKQ0KPj4+IC0gICAgICAgICAgICAgZ290byBmYWlsX2FkZF9wYWdl
-czsNCj4+PiAtDQo+Pj4gLSAgICAgaWYgKG5yX2hvbGVzICE9IG5ld19iaW8tPmJpX3ZjbnQpIHsN
-Cj4+PiAtICAgICAgICAgICAgIHByX2VycigicGJsazogbWFsZm9ybWVkIGJpb1xuIik7DQo+Pj4g
-LSAgICAgICAgICAgICBnb3RvIGZhaWw7DQo+Pj4gLSAgICAgfQ0KPj4+IC0NCj4+PiAtICAgICBm
-b3IgKGkgPSAwOyBpIDwgbnJfc2VjczsgaSsrKQ0KPj4+IC0gICAgICAgICAgICAgbGJhX2xpc3Rf
-bWVtW2ldID0gbWV0YV9saXN0W2ldLmxiYTsNCj4+PiAtDQo+Pj4gLSAgICAgbmV3X2Jpby0+Ymlf
-aXRlci5iaV9zZWN0b3IgPSAwOyAvKiBpbnRlcm5hbCBiaW8gKi8NCj4+PiAtICAgICBiaW9fc2V0
-X29wX2F0dHJzKG5ld19iaW8sIFJFUV9PUF9SRUFELCAwKTsNCj4+PiAtDQo+Pj4gLSAgICAgcnFk
-LT5iaW8gPSBuZXdfYmlvOw0KPj4+IC0gICAgIHJxZC0+bnJfcHBhcyA9IG5yX2hvbGVzOw0KPj4+
-IC0gICAgIHJxZC0+ZmxhZ3MgPSBwYmxrX3NldF9yZWFkX21vZGUocGJsaywgUEJMS19SRUFEX1JB
-TkRPTSk7DQo+Pj4gLQ0KPj4+IC0gICAgIGlmICh1bmxpa2VseShucl9ob2xlcyA9PSAxKSkgew0K
-Pj4+IC0gICAgICAgICAgICAgcHBhX3B0ciA9IHJxZC0+cHBhX2xpc3Q7DQo+Pj4gLSAgICAgICAg
-ICAgICBkbWFfcHBhX2xpc3QgPSBycWQtPmRtYV9wcGFfbGlzdDsNCj4+PiAtICAgICAgICAgICAg
-IHJxZC0+cHBhX2FkZHIgPSBycWQtPnBwYV9saXN0WzBdOw0KPj4+IC0gICAgIH0NCj4+PiAtDQo+
-Pj4gLSAgICAgcmV0ID0gcGJsa19zdWJtaXRfaW9fc3luYyhwYmxrLCBycWQpOw0KPj4+IC0gICAg
-IGlmIChyZXQpIHsNCj4+PiAtICAgICAgICAgICAgIGJpb19wdXQocnFkLT5iaW8pOw0KPj4+IC0g
-ICAgICAgICAgICAgcHJfZXJyKCJwYmxrOiBzeW5jIHJlYWQgSU8gc3VibWlzc2lvbiBmYWlsZWRc
-biIpOw0KPj4+IC0gICAgICAgICAgICAgZ290byBmYWlsOw0KPj4+IC0gICAgIH0NCj4+PiAtDQo+
-Pj4gLSAgICAgaWYgKHJxZC0+ZXJyb3IpIHsNCj4+PiAtICAgICAgICAgICAgIGF0b21pY19sb25n
-X2luYygmcGJsay0+cmVhZF9mYWlsZWQpOw0KPj4+IC0jaWZkZWYgQ09ORklHX05WTV9QQkxLX0RF
-QlVHDQo+Pj4gLSAgICAgICAgICAgICBwYmxrX3ByaW50X2ZhaWxlZF9ycWQocGJsaywgcnFkLCBy
-cWQtPmVycm9yKTsNCj4+PiAtI2VuZGlmDQo+Pj4gLSAgICAgfQ0KPj4+ICsgICAgIF9fbGU2NCAq
-bGJhX2xpc3RfbWVtLCAqbGJhX2xpc3RfbWVkaWE7DQo+Pj4gKyAgICAgdm9pZCAqc3JjX3AsICpk
-c3RfcDsNCj4+PiArICAgICBpbnQgaG9sZSwgaTsNCj4+PiANCj4+PiAgICAgIGlmICh1bmxpa2Vs
-eShucl9ob2xlcyA9PSAxKSkgew0KPj4+ICAgICAgICAgICAgICBzdHJ1Y3QgcHBhX2FkZHIgcHBh
-Ow0KPj4+IA0KPj4+ICAgICAgICAgICAgICBwcGEgPSBycWQtPnBwYV9hZGRyOw0KPj4+IC0gICAg
-ICAgICAgICAgcnFkLT5wcGFfbGlzdCA9IHBwYV9wdHI7DQo+Pj4gLSAgICAgICAgICAgICBycWQt
-PmRtYV9wcGFfbGlzdCA9IGRtYV9wcGFfbGlzdDsNCj4+PiArICAgICAgICAgICAgIHJxZC0+cHBh
-X2xpc3QgPSBwcl9jdHgtPnBwYV9wdHI7DQo+Pj4gKyAgICAgICAgICAgICBycWQtPmRtYV9wcGFf
-bGlzdCA9IHByX2N0eC0+ZG1hX3BwYV9saXN0Ow0KPj4+ICAgICAgICAgICAgICBycWQtPnBwYV9s
-aXN0WzBdID0gcHBhOw0KPj4+ICAgICAgfQ0KPj4+IA0KPj4+ICsgICAgIC8qIFJlLXVzZSBhbGxv
-Y2F0ZWQgbWVtb3J5IGZvciBpbnRlcm1lZGlhdGUgbGJhcyAqLw0KPj4+ICsgICAgIGxiYV9saXN0
-X21lbSA9ICgoKHZvaWQgKilycWQtPnBwYV9saXN0KSArIHBibGtfZG1hX3BwYV9zaXplKTsNCj4+
-PiArICAgICBsYmFfbGlzdF9tZWRpYSA9ICgoKHZvaWQgKilycWQtPnBwYV9saXN0KSArIDIgKiBw
-YmxrX2RtYV9wcGFfc2l6ZSk7DQo+Pj4gKw0KPj4+ICAgICAgZm9yIChpID0gMDsgaSA8IG5yX3Nl
-Y3M7IGkrKykgew0KPj4+ICAgICAgICAgICAgICBsYmFfbGlzdF9tZWRpYVtpXSA9IG1ldGFfbGlz
-dFtpXS5sYmE7DQo+Pj4gICAgICAgICAgICAgIG1ldGFfbGlzdFtpXS5sYmEgPSBsYmFfbGlzdF9t
-ZW1baV07DQo+Pj4gQEAgLTMxNiw3ICsyNzgsNyBAQCBzdGF0aWMgaW50IHBibGtfcGFydGlhbF9y
-ZWFkKHN0cnVjdCBwYmxrICpwYmxrLCBzdHJ1Y3QgbnZtX3JxICpycWQsDQo+Pj4gICAgICAgICAg
-ICAgIG1ldGFfbGlzdFtob2xlXS5sYmEgPSBsYmFfbGlzdF9tZWRpYVtpXTsNCj4+PiANCj4+PiAg
-ICAgICAgICAgICAgc3JjX2J2ID0gbmV3X2Jpby0+YmlfaW9fdmVjW2krK107DQo+Pj4gLSAgICAg
-ICAgICAgICBkc3RfYnYgPSBvcmlnX2Jpby0+YmlfaW9fdmVjW2Jpb19pbml0X2lkeCArIGhvbGVd
-Ow0KPj4+ICsgICAgICAgICAgICAgZHN0X2J2ID0gYmlvLT5iaV9pb192ZWNbYmlvX2luaXRfaWR4
-ICsgaG9sZV07DQo+Pj4gDQo+Pj4gICAgICAgICAgICAgIHNyY19wID0ga21hcF9hdG9taWMoc3Jj
-X2J2LmJ2X3BhZ2UpOw0KPj4+ICAgICAgICAgICAgICBkc3RfcCA9IGttYXBfYXRvbWljKGRzdF9i
-di5idl9wYWdlKTsNCj4+PiBAQCAtMzM0LDE5ICsyOTYsMTA3IEBAIHN0YXRpYyBpbnQgcGJsa19w
-YXJ0aWFsX3JlYWQoc3RydWN0IHBibGsgKnBibGssIHN0cnVjdCBudm1fcnEgKnJxZCwNCj4+PiAg
-ICAgIH0gd2hpbGUgKGhvbGUgPCBucl9zZWNzKTsNCj4+PiANCj4+PiAgICAgIGJpb19wdXQobmV3
-X2Jpbyk7DQo+Pj4gKyAgICAga2ZyZWUocHJfY3R4KTsNCj4+PiANCj4+PiAgICAgIC8qIHJlc3Rv
-cmUgb3JpZ2luYWwgcmVxdWVzdCAqLw0KPj4+ICAgICAgcnFkLT5iaW8gPSBOVUxMOw0KPj4+ICAg
-ICAgcnFkLT5ucl9wcGFzID0gbnJfc2VjczsNCj4+PiANCj4+PiArICAgICBiaW9fZW5kaW8oYmlv
-KTsNCj4+PiAgICAgIF9fcGJsa19lbmRfaW9fcmVhZChwYmxrLCBycWQsIGZhbHNlKTsNCj4+PiAt
-ICAgICByZXR1cm4gTlZNX0lPX0RPTkU7DQo+Pj4gK30NCj4+PiANCj4+PiAtZmFpbDoNCj4+PiAt
-ICAgICAvKiBGcmVlIGFsbG9jYXRlZCBwYWdlcyBpbiBuZXcgYmlvICovDQo+Pj4gK3N0YXRpYyBp
-bnQgcGJsa19zZXR1cF9wYXJ0aWFsX3JlYWQoc3RydWN0IHBibGsgKnBibGssIHN0cnVjdCBudm1f
-cnEgKnJxZCwNCj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgIHVuc2lnbmVkIGludCBiaW9f
-aW5pdF9pZHgsDQo+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICB1bnNpZ25lZCBsb25nICpy
-ZWFkX2JpdG1hcCwNCj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgIGludCBucl9ob2xlcykN
-Cj4+PiArew0KPj4+ICsgICAgIHN0cnVjdCBwYmxrX3NlY19tZXRhICptZXRhX2xpc3QgPSBycWQt
-Pm1ldGFfbGlzdDsNCj4+PiArICAgICBzdHJ1Y3QgcGJsa19nX2N0eCAqcl9jdHggPSBudm1fcnFf
-dG9fcGR1KHJxZCk7DQo+Pj4gKyAgICAgc3RydWN0IHBibGtfcHJfY3R4ICpwcl9jdHg7DQo+Pj4g
-KyAgICAgc3RydWN0IGJpbyAqbmV3X2JpbywgKmJpbyA9IHJfY3R4LT5wcml2YXRlOw0KPj4+ICsg
-ICAgIF9fbGU2NCAqbGJhX2xpc3RfbWVtOw0KPj4+ICsgICAgIGludCBucl9zZWNzID0gcnFkLT5u
-cl9wcGFzOw0KPj4+ICsgICAgIGludCBpOw0KPj4+ICsNCj4+PiArICAgICAvKiBSZS11c2UgYWxs
-b2NhdGVkIG1lbW9yeSBmb3IgaW50ZXJtZWRpYXRlIGxiYXMgKi8NCj4+PiArICAgICBsYmFfbGlz
-dF9tZW0gPSAoKCh2b2lkICopcnFkLT5wcGFfbGlzdCkgKyBwYmxrX2RtYV9wcGFfc2l6ZSk7DQo+
-Pj4gKw0KPj4+ICsgICAgIG5ld19iaW8gPSBiaW9fYWxsb2MoR0ZQX0tFUk5FTCwgbnJfaG9sZXMp
-Ow0KPj4gDQo+PiANCj4+IG5ld19iaW8gY2FuIHJldHVybiBOVUxMLg0KPiANCj4gc2VlIEplbnMn
-cyBlbWFpbA0KDQpZZXMsIHRoaXMgaXMgdGhlIHNhbWUgYXMgaW4gdGhlIG9yaWdpbmFsIHBhcnRp
-YWwgcGF0aA0KPiANCj4+IA0KPj4+ICsNCj4+PiArICAgICBpZiAocGJsa19iaW9fYWRkX3BhZ2Vz
-KHBibGssIG5ld19iaW8sIEdGUF9LRVJORUwsIG5yX2hvbGVzKSkNCj4+PiArICAgICAgICAgICAg
-IGdvdG8gZmFpbDsNCj4+IA0KPj4gZ290byBiaW9fcHV0Pw0KPiANCj4gZG8geW91IG9ubHkgd2Fu
-dCB0aGUgbGFiZWwgdG8gYmUgY2hhbmdlZD8gc3VyZQ0KDQpUbyBiZSBjb25zaXN0ZW50IHdpdGgg
-dGhlIHJlc3Qgb2YgcGJsaywgdGhlIGxhYmVsIHNob3VsZCBiZSBmYWlsX2Jpb19wdXQuIA0KPiAN
-Cj4+PiArDQo+Pj4gKyAgICAgaWYgKG5yX2hvbGVzICE9IG5ld19iaW8tPmJpX3ZjbnQpIHsNCj4+
-PiArICAgICAgICAgICAgIHByX2VycigicGJsazogbWFsZm9ybWVkIGJpb1xuIik7DQo+PiANCj4+
-IEkgZG9uJ3QgdGhpbmsgdGhlcmUgaXMgYSBuZWVkIGZvciBhbiBlcnJvciBtZXNzYWdlIGhlcmUu
-IEluIHdoaWNoIGNhc2UNCj4+IHdvdWxkIHRoaXMgaGFwcGVuPw0KPiANCj4gVGhpcyBpcyB0YWtl
-biBvdmVyIGZyb20gdGhlIG9yaWdpbmFsIHBhcnRpYWwgcmVhZCBwYXRoLiBNYXliZSBKYXZpZXIN
-Cj4ga25vd3Mgd2h5IGl0IHdhcyBwdXQgaW4gdGhlcmUgaW4gdGhlIGZpcnN0IHBsYWNlLg0KDQpU
-aGlzIHNob3VsZCBub3QgaGFwcGVuIGFuZCBpdOKAmXMgYSBwYmxrIGludGVybmFsIGVycm9yLiBJ
-4oCZbSBvayB3aXRoIG1ha2luZyBpdCBhIFdBUk5fT05DRSgpDQo+IA0KPj4gDQo+Pj4gKyAgICAg
-ICAgICAgICBnb3RvIGZhaWxfcGFnZXM7DQo+Pj4gKyAgICAgfQ0KPj4gDQo+PiBnb3RvIGZyZWVf
-cGFnZXM/DQoNClNhbWUgYXMgYWJvdmUgZmFpbF9mcmVlX3BhZ2VzDQo+IA0KPiBzdXJlIEkgY2Fu
-IGNoYW5nZSB0aGUgbGFiZWwNCj4gDQo+PiANCj4+PiArDQo+Pj4gKyAgICAgcHJfY3R4ID0ga21h
-bGxvYyhzaXplb2Yoc3RydWN0IHBibGtfcHJfY3R4KSwgR0ZQX0tFUk5FTCk7DQo+Pj4gKyAgICAg
-aWYgKCFwcl9jdHgpDQo+Pj4gKyAgICAgICAgICAgICBnb3RvIGZhaWxfcGFnZXM7DQo+Pj4gKw0K
-Pj4+ICsgICAgIGZvciAoaSA9IDA7IGkgPCBucl9zZWNzOyBpKyspDQo+Pj4gKyAgICAgICAgICAg
-ICBsYmFfbGlzdF9tZW1baV0gPSBtZXRhX2xpc3RbaV0ubGJhOw0KPj4+ICsNCj4+PiArICAgICBu
-ZXdfYmlvLT5iaV9pdGVyLmJpX3NlY3RvciA9IDA7IC8qIGludGVybmFsIGJpbyAqLw0KPj4+ICsg
-ICAgIGJpb19zZXRfb3BfYXR0cnMobmV3X2JpbywgUkVRX09QX1JFQUQsIDApOw0KPj4+ICsNCj4+
-PiArICAgICBycWQtPmJpbyA9IG5ld19iaW87DQo+Pj4gKyAgICAgcnFkLT5ucl9wcGFzID0gbnJf
-aG9sZXM7DQo+Pj4gKyAgICAgcnFkLT5mbGFncyA9IHBibGtfc2V0X3JlYWRfbW9kZShwYmxrLCBQ
-QkxLX1JFQURfUkFORE9NKTsNCj4+PiArDQo+Pj4gKyAgICAgcHJfY3R4LT5wcGFfcHRyID0gTlVM
-TDsNCj4+PiArICAgICBwcl9jdHgtPm9yaWdfYmlvID0gYmlvOw0KPj4+ICsgICAgIHByX2N0eC0+
-Yml0bWFwID0gKnJlYWRfYml0bWFwOw0KPj4+ICsgICAgIHByX2N0eC0+YmlvX2luaXRfaWR4ID0g
-YmlvX2luaXRfaWR4Ow0KPj4+ICsgICAgIHByX2N0eC0+b3JpZ19ucl9zZWNzID0gbnJfc2VjczsN
-Cj4+PiArICAgICByX2N0eC0+cHJpdmF0ZSA9IHByX2N0eDsNCj4+PiArDQo+Pj4gKyAgICAgaWYg
-KHVubGlrZWx5KG5yX2hvbGVzID09IDEpKSB7DQo+Pj4gKyAgICAgICAgICAgICBwcl9jdHgtPnBw
-YV9wdHIgPSBycWQtPnBwYV9saXN0Ow0KPj4+ICsgICAgICAgICAgICAgcHJfY3R4LT5kbWFfcHBh
-X2xpc3QgPSBycWQtPmRtYV9wcGFfbGlzdDsNCj4+PiArICAgICAgICAgICAgIHJxZC0+cHBhX2Fk
-ZHIgPSBycWQtPnBwYV9saXN0WzBdOw0KPj4+ICsgICAgIH0NCj4+PiArICAgICByZXR1cm4gMDsN
-Cj4+PiArDQo+Pj4gK2ZhaWxfcGFnZXM6DQo+Pj4gICAgICBwYmxrX2Jpb19mcmVlX3BhZ2VzKHBi
-bGssIG5ld19iaW8sIDAsIG5ld19iaW8tPmJpX3ZjbnQpOw0KPj4+IC1mYWlsX2FkZF9wYWdlczoN
-Cj4+PiArZmFpbDoNCj4+PiArICAgICBiaW9fcHV0KG5ld19iaW8pOw0KPj4+ICsNCj4+PiArICAg
-ICByZXR1cm4gLUVOT01FTTsNCj4+PiArfQ0KPj4+ICsNCj4+PiArc3RhdGljIGludCBwYmxrX3Bh
-cnRpYWxfcmVhZF9iaW8oc3RydWN0IHBibGsgKnBibGssIHN0cnVjdCBudm1fcnEgKnJxZCwNCj4+
-PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdW5zaWduZWQgaW50IGJpb19pbml0X2lk
-eCwNCj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdW5zaWduZWQgbG9uZyAqcmVh
-ZF9iaXRtYXAsIGludCBucl9zZWNzKQ0KPj4+ICt7DQo+Pj4gKyAgICAgaW50IG5yX2hvbGVzOw0K
-Pj4+ICsgICAgIGludCByZXQ7DQo+Pj4gKw0KPj4+ICsgICAgIG5yX2hvbGVzID0gbnJfc2VjcyAt
-IGJpdG1hcF93ZWlnaHQocmVhZF9iaXRtYXAsIG5yX3NlY3MpOw0KPj4+ICsNCj4+PiArICAgICBp
-ZiAocGJsa19zZXR1cF9wYXJ0aWFsX3JlYWQocGJsaywgcnFkLCBiaW9faW5pdF9pZHgsIHJlYWRf
-Yml0bWFwLA0KPj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBucl9ob2xlcykp
-DQo+Pj4gKyAgICAgICAgICAgICByZXR1cm4gTlZNX0lPX0VSUjsNCj4+PiArDQo+Pj4gKyAgICAg
-cnFkLT5lbmRfaW8gPSBwYmxrX2VuZF9wYXJ0aWFsX3JlYWQ7DQo+Pj4gKw0KPj4+ICsgICAgIHJl
-dCA9IHBibGtfc3VibWl0X2lvKHBibGssIHJxZCk7DQo+Pj4gKyAgICAgaWYgKHJldCkgew0KPj4+
-ICsgICAgICAgICAgICAgYmlvX3B1dChycWQtPmJpbyk7DQo+Pj4gKyAgICAgICAgICAgICBwcl9l
-cnIoInBibGs6IHBhcnRpYWwgcmVhZCBJTyBzdWJtaXNzaW9uIGZhaWxlZFxuIik7DQo+Pj4gKyAg
-ICAgICAgICAgICBnb3RvIGVycjsNCj4+PiArICAgICB9DQo+Pj4gKw0KPj4+ICsgICAgIHJldHVy
-biBOVk1fSU9fT0s7DQo+Pj4gKw0KPj4+ICtlcnI6DQo+Pj4gICAgICBwcl9lcnIoInBibGs6IGZh
-aWxlZCB0byBwZXJmb3JtIHBhcnRpYWwgcmVhZFxuIik7DQo+Pj4gKw0KPj4+ICsgICAgIC8qIEZy
-ZWUgYWxsb2NhdGVkIHBhZ2VzIGluIG5ldyBiaW8gKi8NCj4+PiArICAgICBwYmxrX2Jpb19mcmVl
-X3BhZ2VzKHBibGssIHJxZC0+YmlvLCAwLCBycWQtPmJpby0+YmlfdmNudCk7DQo+Pj4gICAgICBf
-X3BibGtfZW5kX2lvX3JlYWQocGJsaywgcnFkLCBmYWxzZSk7DQo+Pj4gICAgICByZXR1cm4gTlZN
-X0lPX0VSUjsNCj4+PiAgfQ0KPj4+IEBAIC00ODAsOCArNTMwLDE1IEBAIGludCBwYmxrX3N1Ym1p
-dF9yZWFkKHN0cnVjdCBwYmxrICpwYmxrLCBzdHJ1Y3QgYmlvICpiaW8pDQo+Pj4gICAgICAvKiBU
-aGUgcmVhZCBiaW8gcmVxdWVzdCBjb3VsZCBiZSBwYXJ0aWFsbHkgZmlsbGVkIGJ5IHRoZSB3cml0
-ZSBidWZmZXIsDQo+Pj4gICAgICAgKiBidXQgdGhlcmUgYXJlIHNvbWUgaG9sZXMgdGhhdCBuZWVk
-IHRvIGJlIHJlYWQgZnJvbSB0aGUgZHJpdmUuDQo+Pj4gICAgICAgKi8NCj4+PiAtICAgICByZXR1
-cm4gcGJsa19wYXJ0aWFsX3JlYWQocGJsaywgcnFkLCBiaW8sIGJpb19pbml0X2lkeCwgJnJlYWRf
-Yml0bWFwKTsNCj4+PiArICAgICByZXQgPSBwYmxrX3BhcnRpYWxfcmVhZF9iaW8ocGJsaywgcnFk
-LCBiaW9faW5pdF9pZHgsICZyZWFkX2JpdG1hcCwNCj4+PiArICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgbnJfc2Vjcyk7DQo+Pj4gKyAgICAgaWYgKHJldCkNCj4+PiArICAgICAgICAg
-ICAgIGdvdG8gZmFpbF9tZXRhX2ZyZWU7DQo+Pj4gKw0KPj4+ICsgICAgIHJldHVybiBOVk1fSU9f
-T0s7DQo+Pj4gDQo+Pj4gK2ZhaWxfbWV0YV9mcmVlOg0KPj4+ICsgICAgIG52bV9kZXZfZG1hX2Zy
-ZWUoZGV2LT5wYXJlbnQsIHJxZC0+bWV0YV9saXN0LCBycWQtPmRtYV9tZXRhX2xpc3QpOw0KPj4+
-ICBmYWlsX3JxZF9mcmVlOg0KPj4+ICAgICAgcGJsa19mcmVlX3JxZChwYmxrLCBycWQsIFBCTEtf
-UkVBRCk7DQo+Pj4gICAgICByZXR1cm4gcmV0Ow0KPj4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2xp
-Z2h0bnZtL3BibGsuaCBiL2RyaXZlcnMvbGlnaHRudm0vcGJsay5oDQo+Pj4gaW5kZXggYzA3Mjk1
-NS4uMWM3YWMwNiAxMDA2NDQNCj4+PiAtLS0gYS9kcml2ZXJzL2xpZ2h0bnZtL3BibGsuaA0KPj4+
-ICsrKyBiL2RyaXZlcnMvbGlnaHRudm0vcGJsay5oDQo+Pj4gQEAgLTExOSw2ICsxMTksMTYgQEAg
-c3RydWN0IHBibGtfZ19jdHggew0KPj4+ICAgICAgdTY0IGxiYTsNCj4+PiAgfTsNCj4+PiANCj4+
-PiArLyogcGFydGlhbCByZWFkIGNvbnRleHQgKi8NCj4+PiArc3RydWN0IHBibGtfcHJfY3R4IHsN
-Cj4+PiArICAgICBzdHJ1Y3QgYmlvICpvcmlnX2JpbzsNCj4+PiArICAgICB1bnNpZ25lZCBsb25n
-IGJpdG1hcDsNCj4+IA0KPj4gR3VhcmFudGVlcyB0aGF0IHRoaXMgaXMgYXQgbGVhc3QgMzJiaXQs
-IGJ1dCB0aGlzIHNob3VsZCBiZSBhdCBsZWFzdCA2NA0KPj4gYml0IHJpZ2h0Pw0KPj4gDQo+Pj4g
-KyAgICAgdW5zaWduZWQgaW50IG9yaWdfbnJfc2VjczsNCj4+PiArICAgICB1bnNpZ25lZCBpbnQg
-YmlvX2luaXRfaWR4Ow0KPj4+ICsgICAgIHZvaWQgKnBwYV9wdHI7DQo+Pj4gKyAgICAgZG1hX2Fk
-ZHJfdCBkbWFfcHBhX2xpc3Q7DQo+Pj4gK307DQo+Pj4gKw0KPj4+ICAvKiBQYWQgY29udGV4dCAq
-Lw0KPj4+ICBzdHJ1Y3QgcGJsa19wYWRfcnEgew0KPj4+ICAgICAgc3RydWN0IHBibGsgKnBibGs7
-DQo+Pj4gDQo+PiANCg==
+> Guarantees that this is at least 32bit, but this should be at least 64
+> bit right?
+
+All 64-bit bitmaps in pblk are unsigned long. If we want to change to
+u64 this should be part of a different patch
+
+On Fri, Jun 22, 2018 at 11:17 AM Matias Bj=C3=B8rling <mb@lightnvm.io> wrot=
+e:
+>
+> On 06/18/2018 07:56 PM, Heiner Litz wrote:
+> > In the read path, partial reads are currently performed synchronously
+> > which affects performance for workloads that generate many partial
+> > reads. This patch adds an asynchronous partial read path as well as
+> > the required partial read ctx.
+> >
+> > Signed-off-by: Heiner Litz <hlitz@ucsc.edu>
+> > ---
+> >   drivers/lightnvm/pblk-read.c | 183 ++++++++++++++++++++++++++++------=
+---------
+> >   drivers/lightnvm/pblk.h      |  10 +++
+> >   2 files changed, 130 insertions(+), 63 deletions(-)
+> >
+> > diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.=
+c
+> > index 6e93c48..828df98 100644
+> > --- a/drivers/lightnvm/pblk-read.c
+> > +++ b/drivers/lightnvm/pblk-read.c
+> > @@ -231,74 +231,36 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
+> >       __pblk_end_io_read(pblk, rqd, true);
+> >   }
+> >
+> > -static int pblk_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
+> > -                          struct bio *orig_bio, unsigned int bio_init_=
+idx,
+> > -                          unsigned long *read_bitmap)
+> > +static void pblk_end_partial_read(struct nvm_rq *rqd)
+> >   {
+> > -     struct pblk_sec_meta *meta_list =3D rqd->meta_list;
+> > -     struct bio *new_bio;
+> > +     struct pblk *pblk =3D rqd->private;
+> > +     struct pblk_g_ctx *r_ctx =3D nvm_rq_to_pdu(rqd);
+> > +     struct pblk_pr_ctx *pr_ctx =3D r_ctx->private;
+> > +     struct bio *new_bio =3D rqd->bio;
+> > +     struct bio *bio =3D pr_ctx->orig_bio;
+> >       struct bio_vec src_bv, dst_bv;
+> > -     void *ppa_ptr =3D NULL;
+> > -     void *src_p, *dst_p;
+> > -     dma_addr_t dma_ppa_list =3D 0;
+> > -     __le64 *lba_list_mem, *lba_list_media;
+> > -     int nr_secs =3D rqd->nr_ppas;
+> > +     struct pblk_sec_meta *meta_list =3D rqd->meta_list;
+> > +     int bio_init_idx =3D pr_ctx->bio_init_idx;
+> > +     unsigned long *read_bitmap =3D &pr_ctx->bitmap;
+> > +     int nr_secs =3D pr_ctx->orig_nr_secs;
+> >       int nr_holes =3D nr_secs - bitmap_weight(read_bitmap, nr_secs);
+> > -     int i, ret, hole;
+> > -
+> > -     /* Re-use allocated memory for intermediate lbas */
+> > -     lba_list_mem =3D (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
+> > -     lba_list_media =3D (((void *)rqd->ppa_list) + 2 * pblk_dma_ppa_si=
+ze);
+> > -
+> > -     new_bio =3D bio_alloc(GFP_KERNEL, nr_holes);
+> > -
+> > -     if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
+> > -             goto fail_add_pages;
+> > -
+> > -     if (nr_holes !=3D new_bio->bi_vcnt) {
+> > -             pr_err("pblk: malformed bio\n");
+> > -             goto fail;
+> > -     }
+> > -
+> > -     for (i =3D 0; i < nr_secs; i++)
+> > -             lba_list_mem[i] =3D meta_list[i].lba;
+> > -
+> > -     new_bio->bi_iter.bi_sector =3D 0; /* internal bio */
+> > -     bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
+> > -
+> > -     rqd->bio =3D new_bio;
+> > -     rqd->nr_ppas =3D nr_holes;
+> > -     rqd->flags =3D pblk_set_read_mode(pblk, PBLK_READ_RANDOM);
+> > -
+> > -     if (unlikely(nr_holes =3D=3D 1)) {
+> > -             ppa_ptr =3D rqd->ppa_list;
+> > -             dma_ppa_list =3D rqd->dma_ppa_list;
+> > -             rqd->ppa_addr =3D rqd->ppa_list[0];
+> > -     }
+> > -
+> > -     ret =3D pblk_submit_io_sync(pblk, rqd);
+> > -     if (ret) {
+> > -             bio_put(rqd->bio);
+> > -             pr_err("pblk: sync read IO submission failed\n");
+> > -             goto fail;
+> > -     }
+> > -
+> > -     if (rqd->error) {
+> > -             atomic_long_inc(&pblk->read_failed);
+> > -#ifdef CONFIG_NVM_PBLK_DEBUG
+> > -             pblk_print_failed_rqd(pblk, rqd, rqd->error);
+> > -#endif
+> > -     }
+> > +     __le64 *lba_list_mem, *lba_list_media;
+> > +     void *src_p, *dst_p;
+> > +     int hole, i;
+> >
+> >       if (unlikely(nr_holes =3D=3D 1)) {
+> >               struct ppa_addr ppa;
+> >
+> >               ppa =3D rqd->ppa_addr;
+> > -             rqd->ppa_list =3D ppa_ptr;
+> > -             rqd->dma_ppa_list =3D dma_ppa_list;
+> > +             rqd->ppa_list =3D pr_ctx->ppa_ptr;
+> > +             rqd->dma_ppa_list =3D pr_ctx->dma_ppa_list;
+> >               rqd->ppa_list[0] =3D ppa;
+> >       }
+> >
+> > +     /* Re-use allocated memory for intermediate lbas */
+> > +     lba_list_mem =3D (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
+> > +     lba_list_media =3D (((void *)rqd->ppa_list) + 2 * pblk_dma_ppa_si=
+ze);
+> > +
+> >       for (i =3D 0; i < nr_secs; i++) {
+> >               lba_list_media[i] =3D meta_list[i].lba;
+> >               meta_list[i].lba =3D lba_list_mem[i];
+> > @@ -316,7 +278,7 @@ static int pblk_partial_read(struct pblk *pblk, str=
+uct nvm_rq *rqd,
+> >               meta_list[hole].lba =3D lba_list_media[i];
+> >
+> >               src_bv =3D new_bio->bi_io_vec[i++];
+> > -             dst_bv =3D orig_bio->bi_io_vec[bio_init_idx + hole];
+> > +             dst_bv =3D bio->bi_io_vec[bio_init_idx + hole];
+> >
+> >               src_p =3D kmap_atomic(src_bv.bv_page);
+> >               dst_p =3D kmap_atomic(dst_bv.bv_page);
+> > @@ -334,19 +296,107 @@ static int pblk_partial_read(struct pblk *pblk, =
+struct nvm_rq *rqd,
+> >       } while (hole < nr_secs);
+> >
+> >       bio_put(new_bio);
+> > +     kfree(pr_ctx);
+> >
+> >       /* restore original request */
+> >       rqd->bio =3D NULL;
+> >       rqd->nr_ppas =3D nr_secs;
+> >
+> > +     bio_endio(bio);
+> >       __pblk_end_io_read(pblk, rqd, false);
+> > -     return NVM_IO_DONE;
+> > +}
+> >
+> > -fail:
+> > -     /* Free allocated pages in new bio */
+> > +static int pblk_setup_partial_read(struct pblk *pblk, struct nvm_rq *r=
+qd,
+> > +                         unsigned int bio_init_idx,
+> > +                         unsigned long *read_bitmap,
+> > +                         int nr_holes)
+> > +{
+> > +     struct pblk_sec_meta *meta_list =3D rqd->meta_list;
+> > +     struct pblk_g_ctx *r_ctx =3D nvm_rq_to_pdu(rqd);
+> > +     struct pblk_pr_ctx *pr_ctx;
+> > +     struct bio *new_bio, *bio =3D r_ctx->private;
+> > +     __le64 *lba_list_mem;
+> > +     int nr_secs =3D rqd->nr_ppas;
+> > +     int i;
+> > +
+> > +     /* Re-use allocated memory for intermediate lbas */
+> > +     lba_list_mem =3D (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
+> > +
+> > +     new_bio =3D bio_alloc(GFP_KERNEL, nr_holes);
+>
+>
+> new_bio can return NULL.
+>
+> > +
+> > +     if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
+> > +             goto fail;
+>
+> goto bio_put?
+> > +
+> > +     if (nr_holes !=3D new_bio->bi_vcnt) {
+> > +             pr_err("pblk: malformed bio\n");
+>
+> I don't think there is a need for an error message here. In which case
+> would this happen?
+>
+> > +             goto fail_pages;
+> > +     }
+>
+> goto free_pages?
+>
+> > +
+> > +     pr_ctx =3D kmalloc(sizeof(struct pblk_pr_ctx), GFP_KERNEL);
+> > +     if (!pr_ctx)
+> > +             goto fail_pages;
+> > +
+> > +     for (i =3D 0; i < nr_secs; i++)
+> > +             lba_list_mem[i] =3D meta_list[i].lba;
+> > +
+> > +     new_bio->bi_iter.bi_sector =3D 0; /* internal bio */
+> > +     bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
+> > +
+> > +     rqd->bio =3D new_bio;
+> > +     rqd->nr_ppas =3D nr_holes;
+> > +     rqd->flags =3D pblk_set_read_mode(pblk, PBLK_READ_RANDOM);
+> > +
+> > +     pr_ctx->ppa_ptr =3D NULL;
+> > +     pr_ctx->orig_bio =3D bio;
+> > +     pr_ctx->bitmap =3D *read_bitmap;
+> > +     pr_ctx->bio_init_idx =3D bio_init_idx;
+> > +     pr_ctx->orig_nr_secs =3D nr_secs;
+> > +     r_ctx->private =3D pr_ctx;
+> > +
+> > +     if (unlikely(nr_holes =3D=3D 1)) {
+> > +             pr_ctx->ppa_ptr =3D rqd->ppa_list;
+> > +             pr_ctx->dma_ppa_list =3D rqd->dma_ppa_list;
+> > +             rqd->ppa_addr =3D rqd->ppa_list[0];
+> > +     }
+> > +     return 0;
+> > +
+> > +fail_pages:
+> >       pblk_bio_free_pages(pblk, new_bio, 0, new_bio->bi_vcnt);
+> > -fail_add_pages:
+> > +fail:
+> > +     bio_put(new_bio);
+> > +
+> > +     return -ENOMEM;
+> > +}
+> > +
+> > +static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd=
+,
+> > +                              unsigned int bio_init_idx,
+> > +                              unsigned long *read_bitmap, int nr_secs)
+> > +{
+> > +     int nr_holes;
+> > +     int ret;
+> > +
+> > +     nr_holes =3D nr_secs - bitmap_weight(read_bitmap, nr_secs);
+> > +
+> > +     if (pblk_setup_partial_read(pblk, rqd, bio_init_idx, read_bitmap,
+> > +                                 nr_holes))
+> > +             return NVM_IO_ERR;
+> > +
+> > +     rqd->end_io =3D pblk_end_partial_read;
+> > +
+> > +     ret =3D pblk_submit_io(pblk, rqd);
+> > +     if (ret) {
+> > +             bio_put(rqd->bio);
+> > +             pr_err("pblk: partial read IO submission failed\n");
+> > +             goto err;
+> > +     }
+> > +
+> > +     return NVM_IO_OK;
+> > +
+> > +err:
+> >       pr_err("pblk: failed to perform partial read\n");
+> > +
+> > +     /* Free allocated pages in new bio */
+> > +     pblk_bio_free_pages(pblk, rqd->bio, 0, rqd->bio->bi_vcnt);
+> >       __pblk_end_io_read(pblk, rqd, false);
+> >       return NVM_IO_ERR;
+> >   }
+> > @@ -480,8 +530,15 @@ int pblk_submit_read(struct pblk *pblk, struct bio=
+ *bio)
+> >       /* The read bio request could be partially filled by the write bu=
+ffer,
+> >        * but there are some holes that need to be read from the drive.
+> >        */
+> > -     return pblk_partial_read(pblk, rqd, bio, bio_init_idx, &read_bitm=
+ap);
+> > +     ret =3D pblk_partial_read_bio(pblk, rqd, bio_init_idx, &read_bitm=
+ap,
+> > +                                 nr_secs);
+> > +     if (ret)
+> > +             goto fail_meta_free;
+> > +
+> > +     return NVM_IO_OK;
+> >
+> > +fail_meta_free:
+> > +     nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list)=
+;
+> >   fail_rqd_free:
+> >       pblk_free_rqd(pblk, rqd, PBLK_READ);
+> >       return ret;
+> > diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+> > index c072955..1c7ac06 100644
+> > --- a/drivers/lightnvm/pblk.h
+> > +++ b/drivers/lightnvm/pblk.h
+> > @@ -119,6 +119,16 @@ struct pblk_g_ctx {
+> >       u64 lba;
+> >   };
+> >
+> > +/* partial read context */
+> > +struct pblk_pr_ctx {
+> > +     struct bio *orig_bio;
+> > +     unsigned long bitmap;
+>
+> Guarantees that this is at least 32bit, but this should be at least 64
+> bit right?
+>
+> > +     unsigned int orig_nr_secs;
+> > +     unsigned int bio_init_idx;
+> > +     void *ppa_ptr;
+> > +     dma_addr_t dma_ppa_list;
+> > +};
+> > +
+> >   /* Pad context */
+> >   struct pblk_pad_rq {
+> >       struct pblk *pblk;
+> >
+>
