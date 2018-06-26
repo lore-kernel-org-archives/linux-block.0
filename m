@@ -1,65 +1,72 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55424 "EHLO mx1.redhat.com"
+Received: from mail-by2nam01on0051.outbound.protection.outlook.com ([104.47.34.51]:56000
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S964963AbeF0MqQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jun 2018 08:46:16 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>, stable@vger.kernel.org
-Subject: [PATCH V7 01/24] dm: use bio_split() when splitting out the already processed bio
-Date: Wed, 27 Jun 2018 20:45:25 +0800
-Message-Id: <20180627124548.3456-2-ming.lei@redhat.com>
-In-Reply-To: <20180627124548.3456-1-ming.lei@redhat.com>
-References: <20180627124548.3456-1-ming.lei@redhat.com>
+        id S1754771AbeFZUOb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Jun 2018 16:14:31 -0400
+From: Javier Gonzalez <javier@cnexlabs.com>
+To: Heiner Litz <hlitz@ucsc.edu>
+CC: =?iso-8859-1?Q?Matias_Bj=F8rling?= <mb@lightnvm.io>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "marcin.dziegielewski@intel.com" <marcin.dziegielewski@intel.com>,
+        "Konopko, Igor J" <igor.j.konopko@intel.com>
+Subject: Re: [RESEND PATCH] lightnvm: pblk: add asynchronous partial read
+Date: Tue, 26 Jun 2018 20:14:28 +0000
+Message-ID: <53245EEE-901D-4966-86DE-F1EC1FD77C21@cnexlabs.com>
+References: <1529344568-2794-1-git-send-email-hlitz@ucsc.edu>
+ <25ed47dd-033a-7181-01c5-09ee359ee962@lightnvm.io>
+ <CAJbgVnVpoWLUO1R=YHju+_Woo8xjEznV+YE3TC0q8nEmqsCESA@mail.gmail.com>
+In-Reply-To: <CAJbgVnVpoWLUO1R=YHju+_Woo8xjEznV+YE3TC0q8nEmqsCESA@mail.gmail.com>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_E3DAA4D0-6CCD-45B7-A5C9-86F6EE8C7999";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha512
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Mike Snitzer <snitzer@redhat.com>
+--Apple-Mail=_E3DAA4D0-6CCD-45B7-A5C9-86F6EE8C7999
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+	charset=us-ascii
 
-Use of bio_clone_bioset() is inefficient if there is no need to clone
-the original bio's bio_vec array.  Best to use the bio_clone_fast()
-variant.  Also, just using bio_advance() is only part of what is needed
-to properly setup the clone -- it doesn't account for the various
-bio_integrity() related work that also needs to be performed (see
-bio_split).
 
-Address both of these issues by switching from bio_clone_bioset() to
-bio_split().
 
-Fixes: 18a25da8 ("dm: ensure bio submission follows a depth-first tree walk")
-Cc: stable@vger.kernel.org
-Reported-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: NeilBrown <neilb@suse.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
----
- drivers/md/dm.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+> On 26 Jun 2018, at 21.01, Heiner Litz <hlitz@ucsc.edu> wrote:
+> 
+>> Guarantees that this is at least 32bit, but this should be at least 64
+>> bit right?
+> 
+> All 64-bit bitmaps in pblk are unsigned long. If we want to change to
+> u64 this should be part of a different patch
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index e65429a29c06..a3b103e8e3ce 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1606,10 +1606,9 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
- 				 * the usage of io->orig_bio in dm_remap_zone_report()
- 				 * won't be affected by this reassignment.
- 				 */
--				struct bio *b = bio_clone_bioset(bio, GFP_NOIO,
--								 &md->queue->bio_split);
-+				struct bio *b = bio_split(bio, bio_sectors(bio) - ci.sector_count,
-+							  GFP_NOIO, &md->queue->bio_split);
- 				ci.io->orig_bio = b;
--				bio_advance(bio, (bio_sectors(bio) - ci.sector_count) << 9);
- 				bio_chain(b, bio);
- 				ret = generic_make_request(bio);
- 				break;
--- 
-2.9.5
+It makes sense to me.
+
+Javier
+
+--Apple-Mail=_E3DAA4D0-6CCD-45B7-A5C9-86F6EE8C7999
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAlsynqEACgkQIX4xUKFR
+nnT7dA//Xy6GzNyAqv7vzbvrjOOfT5R8RY8cwog7Pv1FCX1moHS4YHEyt4e6Ypnp
+UJkjMBP6WYCVcZlpsLCWd+5w9L2zId7jIIzDuFiiTgRDOvZW0X3e0y6BZdJMiEbI
+v9Az61Mzhy7gUrzLpcBeI+aNaoAj1KipcW5fJ52Coc7E9rdj/e2Ckak5qZ11ANRW
+MTBIzN5mvXOh01YSHBR2iPTGpEwmWmMMy72MzYikF5wlAdr5aWQKYqURSf2SsC7T
+Jz8MDew1ZyC9IgfEUulu7d9CxX2TH8wck9dJLFwklFeOW9GOCaqiNzWtFl9InTQu
+5JDW5HJx5O4gcQvW4d4hDYx3gdHHCmPFUyj9+zb5N4akBDuy9SLO6tzcHybj7d6K
+1NAjrYSxH1cmb9JSdybKxkMxSnrcRZPBC+MBTvhsS12gEMAENou+PnGSLpB8nm2W
+ONuxNLl6XLfTqz8g6S1XqNtkx7+9iqpOyzNpnOB7whShFviGb56PXTYxygVqqFjU
+zhu6Fu3XHt7zh52dua3aJKIWSu+SWW5y9EYVcQjXwKgH1AOjsu1f6CbxoiDAubC6
+pXzcRGPV657417S9J0pikgHePPkKqfla4bdPMgbB57AqfWHdmCMdClF1GuiqUj+8
+uXGJ5B0XiZAMB4+SnhXcwxxLyN3eZie3VBa0XFkTlf7CR5PpAEY=
+=/te6
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_E3DAA4D0-6CCD-45B7-A5C9-86F6EE8C7999--
