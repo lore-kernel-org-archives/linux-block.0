@@ -1,40 +1,49 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:31673 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757248AbeFSUYJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Jun 2018 16:24:09 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Omar Sandoval <osandov@fb.com>
-Cc: linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH 5/9] check: Avoid that shellcheck complains that $FULL appears unused
-Date: Tue, 19 Jun 2018 13:23:49 -0700
-Message-Id: <20180619202353.23631-6-bart.vanassche@wdc.com>
-In-Reply-To: <20180619202353.23631-1-bart.vanassche@wdc.com>
-References: <20180619202353.23631-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V7 05/24] md: remove a bogus comment
+Date: Wed, 27 Jun 2018 20:45:29 +0800
+Message-Id: <20180627124548.3456-6-ming.lei@redhat.com>
+In-Reply-To: <20180627124548.3456-1-ming.lei@redhat.com>
+References: <20180627124548.3456-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-$FULL is a global variable. Avoid that shellcheck complains about it.
+From: Christoph Hellwig <hch@lst.de>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+The function name mentioned doesn't exist, and the code next to it
+doesn't match the description either.
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- check | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/md/md.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/check b/check
-index 5f53fa105f72..f1feb96b293e 100755
---- a/check
-+++ b/check
-@@ -301,6 +301,8 @@ _call_test() {
- 	local test_func="$1"
- 	local seqres="${RESULTS_DIR}/${TEST_NAME}"
- 	FULL="${seqres}.full"
-+	# Avoid that shellcheck complains that $FULL appears unused.
-+	echo "$FULL" >/dev/null
- 	declare -A TEST_DEV_QUEUE_SAVED
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 29b0cd9ec951..81f458514ac0 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -204,10 +204,6 @@ static int start_readonly;
+  */
+ static bool create_on_open = true;
  
- 	_read_last_test_run
+-/* bio_clone_mddev
+- * like bio_clone_bioset, but with a local bio set
+- */
+-
+ struct bio *bio_alloc_mddev(gfp_t gfp_mask, int nr_iovecs,
+ 			    struct mddev *mddev)
+ {
 -- 
-2.17.1
+2.9.5
