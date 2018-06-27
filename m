@@ -1,76 +1,96 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga12.intel.com ([192.55.52.136]:29553 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933220AbeFGQP2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 7 Jun 2018 12:15:28 -0400
-From: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, javier@cnexlabs.com,
-        michal.sorn@intel.com,
-        Marcin Dziegielewski <marcin.dziegielewski@intel.com>,
-        Igor Konopko <igor.j.konopko@intel.com>
-Subject: [PATCH v2] lightnvm: pblk: handle case when mw_cunits equals to 0
-Date: Thu,  7 Jun 2018 18:15:23 +0200
-Message-Id: <1528388123-14193-1-git-send-email-marcin.dziegielewski@intel.com>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39310 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S932312AbeF0Mtr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Jun 2018 08:49:47 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V7 19/24] block: loop: pass multipage bvec to iov_iter
+Date: Wed, 27 Jun 2018 20:45:43 +0800
+Message-Id: <20180627124548.3456-20-ming.lei@redhat.com>
+In-Reply-To: <20180627124548.3456-1-ming.lei@redhat.com>
+References: <20180627124548.3456-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Some devices can expose mw_cunits equal to 0, it can cause the creation of too small write buffer and cause performance to drop on write workloads.
+iov_iter is implemented with bvec itererator, so it is safe to pass
+multipage bvec to it, and this way is much more efficient than
+passing one page in each bvec.
 
-Additionally, write buffer size must cover openchannel write data requirements, such as WS_MIN and MW_CUNITS - it must be greater than or equal to the larger one multipled by number of luns. However, for the performance reason, we are using WS_OPT value to calculation instead of WS_MIN.
-
-Because the place where buffer size is calculated was changed, this patch also removes pgs_in_buffer filed in pblk structure.
-
-Signed-off-by: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
-Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-init.c | 9 +++++----
- drivers/lightnvm/pblk.h      | 3 ---
- 2 files changed, 5 insertions(+), 7 deletions(-)
+ drivers/block/loop.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index a27b28d..2f94832 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -179,11 +179,14 @@ static int pblk_rwb_init(struct pblk *pblk)
- 	struct pblk_rb_entry *entries;
- 	unsigned long nr_entries, buffer_size;
- 	unsigned int power_size, power_seg_sz;
-+	int pgs_in_buffer;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index d6b6f434fd4b..a350b323e891 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -515,16 +515,16 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 	struct bio *bio = rq->bio;
+ 	struct file *file = lo->lo_backing_file;
+ 	unsigned int offset;
+-	int segments = 0;
++	int nr_bvec = 0;
+ 	int ret;
  
--	if (write_buffer_size && (write_buffer_size > pblk->pgs_in_buffer))
-+	pgs_in_buffer = max(geo->mw_cunits, geo->ws_opt) * geo->all_luns;
-+
-+	if (write_buffer_size && (write_buffer_size > pgs_in_buffer))
- 		buffer_size = write_buffer_size;
- 	else
--		buffer_size = pblk->pgs_in_buffer;
-+		buffer_size = pgs_in_buffer;
+ 	if (rq->bio != rq->biotail) {
+-		struct req_iterator iter;
++		struct bvec_iter iter;
+ 		struct bio_vec tmp;
  
- 	nr_entries = pblk_rb_calculate_size(buffer_size);
+ 		__rq_for_each_bio(bio, rq)
+-			segments += bio_segments(bio);
+-		bvec = kmalloc_array(segments, sizeof(struct bio_vec),
++			nr_bvec += bio_bvecs(bio);
++		bvec = kmalloc_array(nr_bvec, sizeof(struct bio_vec),
+ 				     GFP_NOIO);
+ 		if (!bvec)
+ 			return -EIO;
+@@ -533,13 +533,14 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		/*
+ 		 * The bios of the request may be started from the middle of
+ 		 * the 'bvec' because of bio splitting, so we can't directly
+-		 * copy bio->bi_iov_vec to new bvec. The rq_for_each_segment
++		 * copy bio->bi_iov_vec to new bvec. The bio_for_each_bvec
+ 		 * API will take care of all details for us.
+ 		 */
+-		rq_for_each_segment(tmp, rq, iter) {
+-			*bvec = tmp;
+-			bvec++;
+-		}
++		__rq_for_each_bio(bio, rq)
++			bio_for_each_bvec(tmp, bio, iter) {
++				*bvec = tmp;
++				bvec++;
++			}
+ 		bvec = cmd->bvec;
+ 		offset = 0;
+ 	} else {
+@@ -550,12 +551,11 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		 */
+ 		offset = bio->bi_iter.bi_bvec_done;
+ 		bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+-		segments = bio_segments(bio);
++		nr_bvec = bio_bvecs(bio);
+ 	}
+ 	atomic_set(&cmd->ref, 2);
  
-@@ -366,8 +369,6 @@ static int pblk_core_init(struct pblk *pblk)
- 	atomic64_set(&pblk->nr_flush, 0);
- 	pblk->nr_flush_rst = 0;
+-	iov_iter_bvec(&iter, ITER_BVEC | rw, bvec,
+-		      segments, blk_rq_bytes(rq));
++	iov_iter_bvec(&iter, ITER_BVEC | rw, bvec, nr_bvec, blk_rq_bytes(rq));
+ 	iter.iov_offset = offset;
  
--	pblk->pgs_in_buffer = geo->mw_cunits * geo->all_luns;
--
- 	pblk->min_write_pgs = geo->ws_opt * (geo->csecs / PAGE_SIZE);
- 	max_write_ppas = pblk->min_write_pgs * geo->all_luns;
- 	pblk->max_write_pgs = min_t(int, max_write_ppas, NVM_MAX_VLBA);
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 7fbdfdc..b62fc3e 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -608,9 +608,6 @@ struct pblk {
- 
- 	int min_write_pgs; /* Minimum amount of pages required by controller */
- 	int max_write_pgs; /* Maximum amount of pages supported by controller */
--	int pgs_in_buffer; /* Number of pages that need to be held in buffer to
--			    * guarantee successful reads.
--			    */
- 
- 	sector_t capacity; /* Device capacity when bad blocks are subtracted */
- 
+ 	cmd->iocb.ki_pos = pos;
 -- 
-1.8.3.1
+2.9.5
