@@ -1,67 +1,94 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com,
-	akpm@linux-foundation.org,
-	hannes@cmpxchg.org,
-	linux-kernel@vger.kernel.org,
-	tj@kernel.org,
-	linux-fsdevel@vger.kernel.org
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 14/15] skip readahead if the cgroup is congested
-Date: Mon, 25 Jun 2018 11:12:42 -0400
-Message-Id: <20180625151243.2132-15-josef@toxicpanda.com>
-In-Reply-To: <20180625151243.2132-1-josef@toxicpanda.com>
-References: <20180625151243.2132-1-josef@toxicpanda.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Subject: Re: [PATCH V7 24/24] block: document usage of bio iterator helpers
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@fb.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>
+References: <20180627124548.3456-1-ming.lei@redhat.com>
+ <20180627124548.3456-25-ming.lei@redhat.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <98d6ba9d-ec7a-b05b-94bb-e798ad0e0ea7@infradead.org>
+Date: Wed, 27 Jun 2018 11:13:45 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180627124548.3456-25-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Josef Bacik <jbacik@fb.com>
+On 06/27/2018 05:45 AM, Ming Lei wrote:
+> Now multipage bvec is supported, and some helpers may return page by
+> page, and some may return segment by segment, this patch documents the
+> usage for helping us use them correctly.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  Documentation/block/biovecs.txt | 27 +++++++++++++++++++++++++++
+>  1 file changed, 27 insertions(+)
+> 
+> diff --git a/Documentation/block/biovecs.txt b/Documentation/block/biovecs.txt
+> index 25689584e6e0..f63af564ae89 100644
+> --- a/Documentation/block/biovecs.txt
+> +++ b/Documentation/block/biovecs.txt
+> @@ -117,3 +117,30 @@ Other implications:
+>     size limitations and the limitations of the underlying devices. Thus
+>     there's no need to define ->merge_bvec_fn() callbacks for individual block
+>     drivers.
+> +
+> +Usage of helpers:
+> +=================
+> +
+> +* The following helpers which name has suffix of "_all" can only be used on
 
-We noticed in testing we'd get pretty bad latency stalls under heavy
-pressure because read ahead would try to do its thing while the cgroup
-was under severe pressure.  If we're under this much pressure we want to
-do as little IO as possible so we can still make progress on real work
-if we're a throttled cgroup, so just skip readahead if our group is
-under pressure.
+                   helpers whose names have the suffix of "_all" can only be used on
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- mm/readahead.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+> +non-BIO_CLONED bio, and ususally they are used by filesystem code, and driver
 
-diff --git a/mm/readahead.c b/mm/readahead.c
-index 539bbb6c1fad..cda6b09e0a59 100644
---- a/mm/readahead.c
-+++ b/mm/readahead.c
-@@ -19,6 +19,7 @@
- #include <linux/syscalls.h>
- #include <linux/file.h>
- #include <linux/mm_inline.h>
-+#include <linux/blk-cgroup.h>
- 
- #include "internal.h"
- 
-@@ -500,6 +501,9 @@ void page_cache_sync_readahead(struct address_space *mapping,
- 	if (!ra->ra_pages)
- 		return;
- 
-+	if (blk_cgroup_congested())
-+		return;
-+
- 	/* be dumb */
- 	if (filp && (filp->f_mode & FMODE_RANDOM)) {
- 		force_page_cache_readahead(mapping, filp, offset, req_size);
-@@ -550,6 +554,9 @@ page_cache_async_readahead(struct address_space *mapping,
- 	if (inode_read_congested(mapping->host))
- 		return;
- 
-+	if (blk_cgroup_congested())
-+		return;
-+
- 	/* do read-ahead */
- 	ondemand_readahead(mapping, ra, filp, true, offset, req_size);
- }
+                           usually
+
+> +shouldn't use them becasue bio may have been splitted before they got to the
+
+                      because                   split
+
+> +driver:
+> +
+> +	bio_for_each_segment_all()
+> +	bio_first_bvec_all()
+> +	bio_first_page_all()
+> +	bio_last_bvec_all()
+> +
+> +* The following helpers iterate over singlepage bvec, and the local
+
+                   preferably:          single-page
+
+> +variable of 'struct bio_vec' or the reference records single page io
+
+                                                                     IO or I/O
+
+> +vector during the itearation:
+> +
+> +	bio_for_each_segment()
+> +	bio_for_each_segment_all()
+> +
+> +* The following helper iterates over multipage bvec, and each bvec may
+
+                          preferably:   multi-page
+
+> +include multiple physically contiguous pages, and the local variable of
+> +'struct bio_vec' or the reference records multi page io vector during the
+
+                                             multi-page IO or I/O
+
+> +itearation:
+> +
+> +	bio_for_each_bvec()
+> 
+
+
 -- 
-2.14.3
+~Randy
