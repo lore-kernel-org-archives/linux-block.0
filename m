@@ -1,55 +1,104 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:40698 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756548AbeFSJHi (ORCPT
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:46714 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934027AbeF0VtJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Jun 2018 05:07:38 -0400
-Received: by mail-wm0-f68.google.com with SMTP id n5-v6so20534466wmc.5
-        for <linux-block@vger.kernel.org>; Tue, 19 Jun 2018 02:07:38 -0700 (PDT)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Javier Gonzales <javier@cnexlabs.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH] lightnvm: pblk: assume that chunks are closed on 1.2 devices
-Date: Tue, 19 Jun 2018 11:06:29 +0200
-Message-Id: <1529399189-3239-1-git-send-email-hans.ml.holmberg@owltronix.com>
+        Wed, 27 Jun 2018 17:49:09 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Omar Sandoval <osandov@fb.com>
+Cc: linux-block@vger.kernel.org,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH blktests v2 0/3] Add SRP initiator driver tests
+Date: Wed, 27 Jun 2018 14:49:05 -0700
+Message-Id: <20180627214908.26379-1-bart.vanassche@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Hello Omar,
 
-We can't know if a block is closed or not on 1.2 devices, so assume
-closed state to make sure that blocks are erased before writing.
+As promised during LSF/MM, I have converted the srp-tests software to the
+blktests framework. Please consider this patch series for inclusion in the
+official blktests repository. Note: this patch series is also available as
+a github pull request, namely https://github.com/osandov/blktests/pull/24.
 
-Fixes: 32ef9412c114 ("lightnvm: pblk: implement get log report chunk")
+Thanks,
 
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
----
+Bart.
 
-This patch applies on:
-ssh://github.com/OpenChannelSSD/linux branch for-4.19/core
+Changes compared to v1:
+- Left out the patches from version one of this series that are already
+  upstream.
+- Renamed tests/srp/group into tests/srp/rc.
+- The SRP tests do not start if LIO was already configured (reported by Ming).
+- Documented the SRP test requirements in README.md.
 
- drivers/lightnvm/pblk-init.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Bart Van Assche (3):
+  src/Makefile: Rename $(TARGETS) into $(C_TARGETS)
+  Add the discontiguous-io test program
+  Add tests for the SRP initiator and target drivers
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index aa24264..3b8aa4a 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -717,10 +717,11 @@ static int pblk_setup_line_meta_12(struct pblk *pblk, struct pblk_line *line,
- 
- 		/*
- 		 * In 1.2 spec. chunk state is not persisted by the device. Thus
--		 * some of the values are reset each time pblk is instantiated.
-+		 * some of the values are reset each time pblk is instantiated,
-+		 * so we have to assume that the block is closed.
- 		 */
- 		if (lun_bb_meta[line->id] == NVM_BLK_T_FREE)
--			chunk->state =  NVM_CHK_ST_FREE;
-+			chunk->state =  NVM_CHK_ST_CLOSED;
- 		else
- 			chunk->state = NVM_CHK_ST_OFFLINE;
- 
+ README.md                |   71 +++
+ src/.gitignore           |    1 +
+ src/Makefile             |   17 +-
+ src/discontiguous-io.cpp |  340 ++++++++++
+ tests/srp/001            |   71 +++
+ tests/srp/001.out        |    8 +
+ tests/srp/002            |   49 ++
+ tests/srp/002.out        |    7 +
+ tests/srp/003            |   50 ++
+ tests/srp/003.out        |    7 +
+ tests/srp/004            |   50 ++
+ tests/srp/004.out        |    7 +
+ tests/srp/005            |   40 ++
+ tests/srp/005.out        |    7 +
+ tests/srp/006            |   40 ++
+ tests/srp/006.out        |    7 +
+ tests/srp/007            |   40 ++
+ tests/srp/007.out        |    7 +
+ tests/srp/008            |   39 ++
+ tests/srp/008.out        |    7 +
+ tests/srp/009            |   40 ++
+ tests/srp/009.out        |    7 +
+ tests/srp/010            |   40 ++
+ tests/srp/010.out        |    7 +
+ tests/srp/011            |   44 ++
+ tests/srp/011.out        |    7 +
+ tests/srp/012            |   52 ++
+ tests/srp/012.out        |    8 +
+ tests/srp/013            |   48 ++
+ tests/srp/013.out        |    8 +
+ tests/srp/functions      | 1288 ++++++++++++++++++++++++++++++++++++++
+ tests/srp/rc             |   54 ++
+ 32 files changed, 2464 insertions(+), 4 deletions(-)
+ create mode 100644 src/discontiguous-io.cpp
+ create mode 100755 tests/srp/001
+ create mode 100644 tests/srp/001.out
+ create mode 100755 tests/srp/002
+ create mode 100644 tests/srp/002.out
+ create mode 100755 tests/srp/003
+ create mode 100644 tests/srp/003.out
+ create mode 100755 tests/srp/004
+ create mode 100644 tests/srp/004.out
+ create mode 100755 tests/srp/005
+ create mode 100644 tests/srp/005.out
+ create mode 100755 tests/srp/006
+ create mode 100644 tests/srp/006.out
+ create mode 100755 tests/srp/007
+ create mode 100644 tests/srp/007.out
+ create mode 100755 tests/srp/008
+ create mode 100644 tests/srp/008.out
+ create mode 100755 tests/srp/009
+ create mode 100644 tests/srp/009.out
+ create mode 100755 tests/srp/010
+ create mode 100644 tests/srp/010.out
+ create mode 100755 tests/srp/011
+ create mode 100644 tests/srp/011.out
+ create mode 100755 tests/srp/012
+ create mode 100644 tests/srp/012.out
+ create mode 100755 tests/srp/013
+ create mode 100644 tests/srp/013.out
+ create mode 100755 tests/srp/functions
+ create mode 100755 tests/srp/rc
+
 -- 
-2.7.4
+2.17.1
