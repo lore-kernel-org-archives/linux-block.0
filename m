@@ -1,30 +1,51 @@
-Return-Path: <elviskitone@gmail.com>
-Return-Path: <elviskitone@gmail.com>
-Date: Tue, 19 Jun 2018 17:27:38 +0300
-From: Kitone Elvis Peter <elviskitone@gmail.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: REMOVE CODING STYLE WARNING
-Message-ID: <20180619142738.GA12449@kitone-HP-ProBook-4530s>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V7 23/24] block: always define BIO_MAX_PAGES as 256
+Date: Wed, 27 Jun 2018 20:45:47 +0800
+Message-Id: <20180627124548.3456-24-ming.lei@redhat.com>
+In-Reply-To: <20180627124548.3456-1-ming.lei@redhat.com>
+References: <20180627124548.3456-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Added a license identifier for this file to remove the malformed
-license warning. This will specify which license the file is
-using.
----
- block/blk-stat.c | 1 +
- 1 file changed, 1 insertion(+)
+Now multipage bvec can cover CONFIG_THP_SWAP, so we don't need to
+increase BIO_MAX_PAGES for it.
 
-diff --git a/block/blk-stat.c b/block/blk-stat.c
-index bd365a9..83220b9 100644
---- a/block/blk-stat.c
-+++ b/block/blk-stat.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * Block stat tracking code
-  *
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ include/linux/bio.h | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index b44f9a40bb8b..3412947e42f2 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -38,15 +38,7 @@
+ #define BIO_BUG_ON
+ #endif
+ 
+-#ifdef CONFIG_THP_SWAP
+-#if HPAGE_PMD_NR > 256
+-#define BIO_MAX_PAGES		HPAGE_PMD_NR
+-#else
+ #define BIO_MAX_PAGES		256
+-#endif
+-#else
+-#define BIO_MAX_PAGES		256
+-#endif
+ 
+ #define bio_prio(bio)			(bio)->bi_ioprio
+ #define bio_set_prio(bio, prio)		((bio)->bi_ioprio = prio)
 -- 
-2.7.4
+2.9.5
