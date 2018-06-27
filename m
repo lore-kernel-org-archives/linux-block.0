@@ -1,21 +1,30 @@
-Return-Path: <hch@lst.de>
-Date: Thu, 28 Jun 2018 16:31:39 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Mike Snitzer <snitzer@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>, stable@vger.kernel.org
+Return-Path: <prvs=70988ebf6=bart.vanassche@wdc.com>
 Subject: Re: [PATCH] block: Fix cloning of requests with a special payload
-Message-ID: <20180628143139.GA16624@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Mike Snitzer <snitzer@redhat.com>,
+ Hannes Reinecke <hare@suse.com>, Johannes Thumshirn <jthumshirn@suse.de>,
+ "stable@vger.kernel.org" <stable@vger.kernel.org>
 References: <20180627195518.13958-1-bart.vanassche@wdc.com>
+ <20180627234154.GD7583@ming.t460p>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+Message-ID: <1298ed24-e1a4-d141-21f1-68e2b8bb7f04@wdc.com>
+Date: Wed, 27 Jun 2018 16:43:52 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180627195518.13958-1-bart.vanassche@wdc.com>
+In-Reply-To: <20180627234154.GD7583@ming.t460p>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Thanks,
+On 06/27/18 16:42, Ming Lei wrote:
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> 
+> BTW, if possible, could you please make a block test to catch this issue?
 
-this looks good:
+Hello Ming,
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Thanks for the review.
+
+I ran into this while testing the blktests port of the SRP tests scripts.
+
+Bart.
