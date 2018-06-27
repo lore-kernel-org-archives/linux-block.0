@@ -1,289 +1,163 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:36135 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935347AbeFRR4i (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jun 2018 13:56:38 -0400
-Received: by mail-pg0-f66.google.com with SMTP id m5-v6so7879191pgd.3
-        for <linux-block@vger.kernel.org>; Mon, 18 Jun 2018 10:56:38 -0700 (PDT)
-From: Heiner Litz <hlitz@ucsc.edu>
-To: linux-block@vger.kernel.org
-Cc: javier@cnexlabs.com, mb@lightnvm.io,
-        marcin.dziegielewski@intel.com, igor.j.konopko@intel.com,
-        Heiner Litz <hlitz@ucsc.edu>
-Subject: [RESEND PATCH] lightnvm: pblk: add asynchronous partial read
-Date: Mon, 18 Jun 2018 10:56:08 -0700
-Message-Id: <1529344568-2794-1-git-send-email-hlitz@ucsc.edu>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V7 11/24] block: introduce bio_for_each_bvec()
+Date: Wed, 27 Jun 2018 20:45:35 +0800
+Message-Id: <20180627124548.3456-12-ming.lei@redhat.com>
+In-Reply-To: <20180627124548.3456-1-ming.lei@redhat.com>
+References: <20180627124548.3456-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-In the read path, partial reads are currently performed synchronously
-which affects performance for workloads that generate many partial
-reads. This patch adds an asynchronous partial read path as well as
-the required partial read ctx.
+This helper is used for iterating over multipage bvec for bio
+splitting/merge,
 
-Signed-off-by: Heiner Litz <hlitz@ucsc.edu>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-read.c | 183 ++++++++++++++++++++++++++++---------------
- drivers/lightnvm/pblk.h      |  10 +++
- 2 files changed, 130 insertions(+), 63 deletions(-)
+ include/linux/bio.h  | 34 +++++++++++++++++++++++++++++++---
+ include/linux/bvec.h | 36 ++++++++++++++++++++++++++++++++----
+ 2 files changed, 63 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index 6e93c48..828df98 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -231,74 +231,36 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
- 	__pblk_end_io_read(pblk, rqd, true);
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 21d07858ddef..551444bd9795 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -80,6 +80,9 @@
+ #define bio_data_dir(bio) \
+ 	(op_is_write(bio_op(bio)) ? WRITE : READ)
+ 
++#define bio_iter_mp_iovec(bio, iter)				\
++	mp_bvec_iter_bvec((bio)->bi_io_vec, (iter))
++
+ /*
+  * Check whether this bio carries any data or not. A NULL bio is allowed.
+  */
+@@ -165,8 +168,8 @@ static inline bool bio_full(struct bio *bio)
+ #define bio_for_each_segment_all(bvl, bio, i)				\
+ 	for (i = 0, bvl = (bio)->bi_io_vec; i < (bio)->bi_vcnt; i++, bvl++)
+ 
+-static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+-				    unsigned bytes)
++static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
++				      unsigned bytes, bool mp)
+ {
+ 	iter->bi_sector += bytes >> 9;
+ 
+@@ -174,11 +177,26 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+ 		iter->bi_size -= bytes;
+ 		iter->bi_done += bytes;
+ 	} else {
+-		bvec_iter_advance(bio->bi_io_vec, iter, bytes);
++		if (!mp)
++			bvec_iter_advance(bio->bi_io_vec, iter, bytes);
++		else
++			mp_bvec_iter_advance(bio->bi_io_vec, iter, bytes);
+ 		/* TODO: It is reasonable to complete bio with error here. */
+ 	}
  }
  
--static int pblk_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
--			     struct bio *orig_bio, unsigned int bio_init_idx,
--			     unsigned long *read_bitmap)
-+static void pblk_end_partial_read(struct nvm_rq *rqd)
++static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
++				    unsigned bytes)
++{
++	__bio_advance_iter(bio, iter, bytes, false);
++}
++
++static inline void bio_advance_mp_iter(struct bio *bio, struct bvec_iter *iter,
++				       unsigned bytes)
++{
++	__bio_advance_iter(bio, iter, bytes, true);
++}
++
+ static inline bool bio_rewind_iter(struct bio *bio, struct bvec_iter *iter,
+ 		unsigned int bytes)
  {
--	struct pblk_sec_meta *meta_list = rqd->meta_list;
--	struct bio *new_bio;
-+	struct pblk *pblk = rqd->private;
-+	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
-+	struct pblk_pr_ctx *pr_ctx = r_ctx->private;
-+	struct bio *new_bio = rqd->bio;
-+	struct bio *bio = pr_ctx->orig_bio;
- 	struct bio_vec src_bv, dst_bv;
--	void *ppa_ptr = NULL;
--	void *src_p, *dst_p;
--	dma_addr_t dma_ppa_list = 0;
--	__le64 *lba_list_mem, *lba_list_media;
--	int nr_secs = rqd->nr_ppas;
-+	struct pblk_sec_meta *meta_list = rqd->meta_list;
-+	int bio_init_idx = pr_ctx->bio_init_idx;
-+	unsigned long *read_bitmap = &pr_ctx->bitmap;
-+	int nr_secs = pr_ctx->orig_nr_secs;
- 	int nr_holes = nr_secs - bitmap_weight(read_bitmap, nr_secs);
--	int i, ret, hole;
--
--	/* Re-use allocated memory for intermediate lbas */
--	lba_list_mem = (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
--	lba_list_media = (((void *)rqd->ppa_list) + 2 * pblk_dma_ppa_size);
--
--	new_bio = bio_alloc(GFP_KERNEL, nr_holes);
--
--	if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
--		goto fail_add_pages;
--
--	if (nr_holes != new_bio->bi_vcnt) {
--		pr_err("pblk: malformed bio\n");
--		goto fail;
--	}
--
--	for (i = 0; i < nr_secs; i++)
--		lba_list_mem[i] = meta_list[i].lba;
--
--	new_bio->bi_iter.bi_sector = 0; /* internal bio */
--	bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
--
--	rqd->bio = new_bio;
--	rqd->nr_ppas = nr_holes;
--	rqd->flags = pblk_set_read_mode(pblk, PBLK_READ_RANDOM);
--
--	if (unlikely(nr_holes == 1)) {
--		ppa_ptr = rqd->ppa_list;
--		dma_ppa_list = rqd->dma_ppa_list;
--		rqd->ppa_addr = rqd->ppa_list[0];
--	}
--
--	ret = pblk_submit_io_sync(pblk, rqd);
--	if (ret) {
--		bio_put(rqd->bio);
--		pr_err("pblk: sync read IO submission failed\n");
--		goto fail;
--	}
--
--	if (rqd->error) {
--		atomic_long_inc(&pblk->read_failed);
--#ifdef CONFIG_NVM_PBLK_DEBUG
--		pblk_print_failed_rqd(pblk, rqd, rqd->error);
--#endif
--	}
-+	__le64 *lba_list_mem, *lba_list_media;
-+	void *src_p, *dst_p;
-+	int hole, i;
+@@ -202,6 +220,16 @@ static inline bool bio_rewind_iter(struct bio *bio, struct bvec_iter *iter,
+ #define bio_for_each_segment(bvl, bio, iter)				\
+ 	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
  
- 	if (unlikely(nr_holes == 1)) {
- 		struct ppa_addr ppa;
++#define __bio_for_each_bvec(bvl, bio, iter, start)		\
++	for (iter = (start);						\
++	     (iter).bi_size &&						\
++		((bvl = bio_iter_mp_iovec((bio), (iter))), 1);	\
++	     bio_advance_mp_iter((bio), &(iter), (bvl).bv_len))
++
++/* returns one real segment(multipage bvec) each time */
++#define bio_for_each_bvec(bvl, bio, iter)			\
++	__bio_for_each_bvec(bvl, bio, iter, (bio)->bi_iter)
++
+ #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
  
- 		ppa = rqd->ppa_addr;
--		rqd->ppa_list = ppa_ptr;
--		rqd->dma_ppa_list = dma_ppa_list;
-+		rqd->ppa_list = pr_ctx->ppa_ptr;
-+		rqd->dma_ppa_list = pr_ctx->dma_ppa_list;
- 		rqd->ppa_list[0] = ppa;
+ static inline unsigned bio_segments(struct bio *bio)
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 03a12fbb90d8..417d44cf1e82 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -126,8 +126,16 @@ struct bvec_iter {
+ 	.bv_offset	= bvec_iter_offset((bvec), (iter)),	\
+ })
+ 
+-static inline bool bvec_iter_advance(const struct bio_vec *bv,
+-		struct bvec_iter *iter, unsigned bytes)
++#define mp_bvec_iter_bvec(bvec, iter)				\
++((struct bio_vec) {							\
++	.bv_page	= mp_bvec_iter_page((bvec), (iter)),	\
++	.bv_len		= mp_bvec_iter_len((bvec), (iter)),	\
++	.bv_offset	= mp_bvec_iter_offset((bvec), (iter)),	\
++})
++
++static inline bool __bvec_iter_advance(const struct bio_vec *bv,
++				       struct bvec_iter *iter,
++				       unsigned bytes, bool mp)
+ {
+ 	if (WARN_ONCE(bytes > iter->bi_size,
+ 		     "Attempted to advance past end of bvec iter\n")) {
+@@ -136,8 +144,14 @@ static inline bool bvec_iter_advance(const struct bio_vec *bv,
  	}
  
-+	/* Re-use allocated memory for intermediate lbas */
-+	lba_list_mem = (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
-+	lba_list_media = (((void *)rqd->ppa_list) + 2 * pblk_dma_ppa_size);
+ 	while (bytes) {
+-		unsigned iter_len = bvec_iter_len(bv, *iter);
+-		unsigned len = min(bytes, iter_len);
++		unsigned len;
 +
- 	for (i = 0; i < nr_secs; i++) {
- 		lba_list_media[i] = meta_list[i].lba;
- 		meta_list[i].lba = lba_list_mem[i];
-@@ -316,7 +278,7 @@ static int pblk_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
- 		meta_list[hole].lba = lba_list_media[i];
++		if (mp)
++			len = mp_bvec_iter_len(bv, *iter);
++		else
++			len = bvec_iter_len(bv, *iter);
++
++		len = min(bytes, len);
  
- 		src_bv = new_bio->bi_io_vec[i++];
--		dst_bv = orig_bio->bi_io_vec[bio_init_idx + hole];
-+		dst_bv = bio->bi_io_vec[bio_init_idx + hole];
- 
- 		src_p = kmap_atomic(src_bv.bv_page);
- 		dst_p = kmap_atomic(dst_bv.bv_page);
-@@ -334,19 +296,107 @@ static int pblk_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
- 	} while (hole < nr_secs);
- 
- 	bio_put(new_bio);
-+	kfree(pr_ctx);
- 
- 	/* restore original request */
- 	rqd->bio = NULL;
- 	rqd->nr_ppas = nr_secs;
- 
-+	bio_endio(bio);
- 	__pblk_end_io_read(pblk, rqd, false);
--	return NVM_IO_DONE;
-+}
- 
--fail:
--	/* Free allocated pages in new bio */
-+static int pblk_setup_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
-+			    unsigned int bio_init_idx,
-+			    unsigned long *read_bitmap,
-+			    int nr_holes)
-+{
-+	struct pblk_sec_meta *meta_list = rqd->meta_list;
-+	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
-+	struct pblk_pr_ctx *pr_ctx;
-+	struct bio *new_bio, *bio = r_ctx->private;
-+	__le64 *lba_list_mem;
-+	int nr_secs = rqd->nr_ppas;
-+	int i;
-+
-+	/* Re-use allocated memory for intermediate lbas */
-+	lba_list_mem = (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
-+
-+	new_bio = bio_alloc(GFP_KERNEL, nr_holes);
-+
-+	if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
-+		goto fail;
-+
-+	if (nr_holes != new_bio->bi_vcnt) {
-+		pr_err("pblk: malformed bio\n");
-+		goto fail_pages;
-+	}
-+
-+	pr_ctx = kmalloc(sizeof(struct pblk_pr_ctx), GFP_KERNEL);
-+	if (!pr_ctx)
-+		goto fail_pages;
-+
-+	for (i = 0; i < nr_secs; i++)
-+		lba_list_mem[i] = meta_list[i].lba;
-+
-+	new_bio->bi_iter.bi_sector = 0; /* internal bio */
-+	bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
-+
-+	rqd->bio = new_bio;
-+	rqd->nr_ppas = nr_holes;
-+	rqd->flags = pblk_set_read_mode(pblk, PBLK_READ_RANDOM);
-+
-+	pr_ctx->ppa_ptr = NULL;
-+	pr_ctx->orig_bio = bio;
-+	pr_ctx->bitmap = *read_bitmap;
-+	pr_ctx->bio_init_idx = bio_init_idx;
-+	pr_ctx->orig_nr_secs = nr_secs;
-+	r_ctx->private = pr_ctx;
-+
-+	if (unlikely(nr_holes == 1)) {
-+		pr_ctx->ppa_ptr = rqd->ppa_list;
-+		pr_ctx->dma_ppa_list = rqd->dma_ppa_list;
-+		rqd->ppa_addr = rqd->ppa_list[0];
-+	}
-+	return 0;
-+
-+fail_pages:
- 	pblk_bio_free_pages(pblk, new_bio, 0, new_bio->bi_vcnt);
--fail_add_pages:
-+fail:
-+	bio_put(new_bio);
-+
-+	return -ENOMEM;
-+}
-+
-+static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
-+				 unsigned int bio_init_idx,
-+				 unsigned long *read_bitmap, int nr_secs)
-+{
-+	int nr_holes;
-+	int ret;
-+
-+	nr_holes = nr_secs - bitmap_weight(read_bitmap, nr_secs);
-+
-+	if (pblk_setup_partial_read(pblk, rqd, bio_init_idx, read_bitmap,
-+				    nr_holes))
-+		return NVM_IO_ERR;
-+
-+	rqd->end_io = pblk_end_partial_read;
-+
-+	ret = pblk_submit_io(pblk, rqd);
-+	if (ret) {
-+		bio_put(rqd->bio);
-+		pr_err("pblk: partial read IO submission failed\n");
-+		goto err;
-+	}
-+
-+	return NVM_IO_OK;
-+
-+err:
- 	pr_err("pblk: failed to perform partial read\n");
-+
-+	/* Free allocated pages in new bio */
-+	pblk_bio_free_pages(pblk, rqd->bio, 0, rqd->bio->bi_vcnt);
- 	__pblk_end_io_read(pblk, rqd, false);
- 	return NVM_IO_ERR;
+ 		bytes -= len;
+ 		iter->bi_size -= len;
+@@ -176,6 +190,20 @@ static inline bool bvec_iter_rewind(const struct bio_vec *bv,
+ 	return true;
  }
-@@ -480,8 +530,15 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
- 	/* The read bio request could be partially filled by the write buffer,
- 	 * but there are some holes that need to be read from the drive.
- 	 */
--	return pblk_partial_read(pblk, rqd, bio, bio_init_idx, &read_bitmap);
-+	ret = pblk_partial_read_bio(pblk, rqd, bio_init_idx, &read_bitmap,
-+				    nr_secs);
-+	if (ret)
-+		goto fail_meta_free;
-+
-+	return NVM_IO_OK;
  
-+fail_meta_free:
-+	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
- fail_rqd_free:
- 	pblk_free_rqd(pblk, rqd, PBLK_READ);
- 	return ret;
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index c072955..1c7ac06 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -119,6 +119,16 @@ struct pblk_g_ctx {
- 	u64 lba;
- };
- 
-+/* partial read context */
-+struct pblk_pr_ctx {
-+	struct bio *orig_bio;
-+	unsigned long bitmap;
-+	unsigned int orig_nr_secs;
-+	unsigned int bio_init_idx;
-+	void *ppa_ptr;
-+	dma_addr_t dma_ppa_list;
-+};
++static inline bool bvec_iter_advance(const struct bio_vec *bv,
++				     struct bvec_iter *iter,
++				     unsigned bytes)
++{
++	return __bvec_iter_advance(bv, iter, bytes, false);
++}
 +
- /* Pad context */
- struct pblk_pad_rq {
- 	struct pblk *pblk;
++static inline bool mp_bvec_iter_advance(const struct bio_vec *bv,
++					struct bvec_iter *iter,
++					unsigned bytes)
++{
++	return __bvec_iter_advance(bv, iter, bytes, true);
++}
++
+ #define for_each_bvec(bvl, bio_vec, iter, start)			\
+ 	for (iter = (start);						\
+ 	     (iter).bi_size &&						\
 -- 
-2.7.4
+2.9.5
