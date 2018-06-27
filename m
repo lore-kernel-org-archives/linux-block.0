@@ -1,121 +1,77 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from synology.com ([59.124.61.242]:55916 "EHLO synology.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932316AbeFFILi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 6 Jun 2018 04:11:38 -0400
-From: bingjingc <bingjingc@synology.com>
-To: linux-block@vger.kernel.org
-Cc: bingjingc@synology.com, cccheng@synology.com
-Subject: [PATCH blktests 7/9] blktests: add a regression test for raid10 recovery
-Date: Wed,  6 Jun 2018 16:11:32 +0800
-Message-Id: <1528272692-21639-1-git-send-email-bingjingc@synology.com>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60934 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S933970AbeF0MtO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Jun 2018 08:49:14 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>, Chris Mason <clm@fb.com>,
+        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
+        linux-btrfs@vger.kernel.org
+Subject: [PATCH V7 16/24] btrfs: use bvec_last_segment to get bio's last page
+Date: Wed, 27 Jun 2018 20:45:40 +0800
+Message-Id: <20180627124548.3456-17-ming.lei@redhat.com>
+In-Reply-To: <20180627124548.3456-1-ming.lei@redhat.com>
+References: <20180627124548.3456-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Reviewed-by: Chung-Chiang Cheng <cccheng@synology.com>
-Signed-off-by: BingJing Chang <bingjingc@synology.com>
----
- tests/md/006     | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/md/006.out |  4 +++
- 2 files changed, 84 insertions(+)
- create mode 100755 tests/md/006
- create mode 100644 tests/md/006.out
+Preparing for supporting multipage bvec.
 
-diff --git a/tests/md/006 b/tests/md/006
-new file mode 100755
-index 0000000..c124913
---- /dev/null
-+++ b/tests/md/006
-@@ -0,0 +1,80 @@
-+#!/bin/bash
-+#
-+# RAID10 recovery test
-+#
-+# Copyright (C) 2018 Synology Inc.
-+#
-+# This program is free software: you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation, either version 3 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+Cc: Chris Mason <clm@fb.com>
+Cc: Josef Bacik <jbacik@fb.com>
+Cc: David Sterba <dsterba@suse.com>
+Cc: linux-btrfs@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ fs/btrfs/compression.c | 5 ++++-
+ fs/btrfs/extent_io.c   | 5 +++--
+ 2 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+index d3e447b45bf7..22b9e0e56c7e 100644
+--- a/fs/btrfs/compression.c
++++ b/fs/btrfs/compression.c
+@@ -407,8 +407,11 @@ blk_status_t btrfs_submit_compressed_write(struct inode *inode, u64 start,
+ static u64 bio_end_offset(struct bio *bio)
+ {
+ 	struct bio_vec *last = bio_last_bvec_all(bio);
++	struct bio_vec bv;
+ 
+-	return page_offset(last->bv_page) + last->bv_len + last->bv_offset;
++	bvec_last_segment(last, &bv);
 +
-+. common/md
-+
-+DESCRIPTION="run raid10 recovery test"
-+QUICK=1
-+
-+requires() {
-+	_check_md_devname_available /dev/md/blktests6 && \
-+	    _have_program cmp && _have_spares && _meet_raid10_requirement && \
-+	    _check_raid_devs_available && _check_raid_spares_available
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	local size=${#RAID_DEVS[@]}
-+	local devices=( "${RAID_DEVS[@]}" )
-+
-+	if [ $((size % 2)) -eq 1 ]; then
-+		unset "devices[${#devices[@]}-1]"
-+		size=$((size - 1))
-+	fi
-+
-+	if [ -n "$LIMIT_DEV_SIZE" ]; then
-+		mdadm -C /dev/md/blktests6 -R -l10 "-n$size" -pn2 \
-+		    "${devices[@]}" -z "$LIMIT_DEV_SIZE" 2>&1 | grep started
-+	else
-+		mdadm -C /dev/md/blktests6 -R -l10 "-n$size" -pn2 \
-+		    "${devices[@]}" 2>&1 | grep started
-+	fi
-+	if [ $? -ne 0 ]; then
-+		echo "Array is not started."
-+		return
-+	fi
-+
-+	local md
-+	md=$(basename "$(readlink /dev/md/blktests6)")
-+	_wait_sync_completed "$md"
-+
-+	# blktests doesn't support regex on *.out, so ignore the result.
-+	mdadm /dev/md/blktests6 -f "${RAID_DEVS[0]}" 2>/dev/null
-+	mdadm /dev/md/blktests6 -r "${RAID_DEVS[0]}" 2>/dev/null
-+	mdadm /dev/md/blktests6 -a "${RAID_SPARE_DEVS[0]}" 2>/dev/null
-+	_wait_recovery_completed "$md"
-+
-+	local skip1
-+	local skip2
-+	local size
-+	skip1=$(mdadm -E "${RAID_DEVS[0]}" | grep "Data Offset" | \
-+	    grep -o "[0-9]*")
-+	skip2=$(mdadm -E "${RAID_SPARE_DEVS[0]}" | grep "Data Offset" | \
-+	    grep -o "[0-9]*")
-+	size=$(cat /sys/block/"$md"/md/component_size)
-+	mdadm -S /dev/md/blktests6
-+	skip1=$((skip1 * 512))
-+	skip2=$((skip2 * 512))
-+	size=$((size * 1024))
-+	cmp -i "$skip1:$skip2" -n "$size" "${RAID_DEVS[0]}" \
-+	    "${RAID_SPARE_DEVS[0]}"
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/md/006.out b/tests/md/006.out
-new file mode 100644
-index 0000000..2eff0b1
---- /dev/null
-+++ b/tests/md/006.out
-@@ -0,0 +1,4 @@
-+Running md/006
-+mdadm: array /dev/md/blktests6 started.
-+mdadm: stopped /dev/md/blktests6
-+Test complete
++	return page_offset(bv.bv_page) + bv.bv_len + bv.bv_offset;
+ }
+ 
+ static noinline int add_ra_bio_pages(struct inode *inode,
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index cce6087d6880..0b5e07723f5f 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -2728,11 +2728,12 @@ static int __must_check submit_one_bio(struct bio *bio, int mirror_num,
+ {
+ 	blk_status_t ret = 0;
+ 	struct bio_vec *bvec = bio_last_bvec_all(bio);
+-	struct page *page = bvec->bv_page;
++	struct bio_vec bv;
+ 	struct extent_io_tree *tree = bio->bi_private;
+ 	u64 start;
+ 
+-	start = page_offset(page) + bvec->bv_offset;
++	bvec_last_segment(bvec, &bv);
++	start = page_offset(bv.bv_page) + bv.bv_offset;
+ 
+ 	bio->bi_private = NULL;
+ 
 -- 
-2.7.4
+2.9.5
