@@ -1,16 +1,12 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:28283 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752937AbeF0QAk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jun 2018 12:00:40 -0400
-Date: Wed, 27 Jun 2018 23:59:37 +0800
-From: kbuild test robot <lkp@intel.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: kbuild-all@01.org, Jens Axboe <axboe@fb.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        David Sterba <dsterba@suse.cz>,
-        Huang Ying <ying.huang@intel.com>,
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39332 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753325AbeF0Mr7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Jun 2018 08:47:59 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
         Mike Snitzer <snitzer@redhat.com>,
         linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
@@ -19,176 +15,118 @@ Cc: kbuild-all@01.org, Jens Axboe <axboe@fb.com>,
         Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
         Randy Dunlap <rdunlap@infradead.org>,
         Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH V7 10/24] block: introduce multipage page bvec helpers
-Message-ID: <201806272319.0p98i2TZ%fengguang.wu@intel.com>
-References: <20180627124548.3456-11-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180627124548.3456-11-ming.lei@redhat.com>
+Subject: [PATCH V7 10/24] block: introduce multipage page bvec helpers
+Date: Wed, 27 Jun 2018 20:45:34 +0800
+Message-Id: <20180627124548.3456-11-ming.lei@redhat.com>
+In-Reply-To: <20180627124548.3456-1-ming.lei@redhat.com>
+References: <20180627124548.3456-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Ming,
+This patch introduces helpers of 'mp_bvec_iter_*' for multipage
+bvec support.
 
-Thank you for the patch! Perhaps something to improve:
+The introduced interfaces treate one bvec as real multipage segment,
+for example, .bv_len is the total length of the multipage bvec.
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v4.18-rc2]
-[cannot apply to next-20180627]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+The existed helpers of bvec_iter_* are interfaces for supporting current
+bvec iterator which is thought as singlepage only by drivers, fs, dm and
+etc. These introduced helpers will build singlepage bvec in flight, so
+users of current bio/bvec iterator still can work well and needn't any
+change even though we store real multipage io vector into bvec table.
 
-url:    https://github.com/0day-ci/linux/commits/Ming-Lei/block-support-multipage-bvec/20180627-214022
-reproduce:
-        # apt-get install sparse
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF=-D__CHECK_ENDIAN__
-
-
-sparse warnings: (new ones prefixed by >>)
-
-   net/ceph/messenger.c:842:25: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:842:25: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:847:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:847:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:847:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:847:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:847:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:847:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:847:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:847:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:847:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:847:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:847:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:847:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:847:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:847:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:848:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:848:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:848:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:848:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:848:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:848:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:848:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:848:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:848:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:848:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:848:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:848:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:848:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:848:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:855:29: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:855:29: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:855:29: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:855:29: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:855:29: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:855:29: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:855:29: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:855:29: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:855:29: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:855:29: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:855:29: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:855:29: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:855:29: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:855:29: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:869:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:869:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:869:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:869:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:869:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:869:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:869:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:869:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:869:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:869:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:869:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:869:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:869:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:869:9: sparse: expression using sizeof(void)
-   include/linux/bvec.h:139:37: sparse: expression using sizeof(void)
-   include/linux/bvec.h:139:37: sparse: expression using sizeof(void)
-   include/linux/bvec.h:139:37: sparse: expression using sizeof(void)
-   include/linux/bvec.h:139:37: sparse: expression using sizeof(void)
-   include/linux/bvec.h:139:37: sparse: expression using sizeof(void)
-   include/linux/bvec.h:139:37: sparse: expression using sizeof(void)
-   include/linux/bvec.h:139:37: sparse: expression using sizeof(void)
-   include/linux/bvec.h:139:37: sparse: expression using sizeof(void)
-   include/linux/bvec.h:139:37: sparse: expression using sizeof(void)
-   include/linux/bvec.h:139:37: sparse: expression using sizeof(void)
-   include/linux/bvec.h:139:37: sparse: expression using sizeof(void)
-   include/linux/bvec.h:139:37: sparse: expression using sizeof(void)
-   include/linux/bvec.h:139:37: sparse: expression using sizeof(void)
-   include/linux/bvec.h:139:37: sparse: expression using sizeof(void)
-   include/linux/bvec.h:140:32: sparse: expression using sizeof(void)
-   include/linux/bvec.h:140:32: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:889:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:889:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:889:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:889:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:889:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:889:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:889:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:889:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:889:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:889:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:889:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:889:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:889:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:889:9: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:890:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:890:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:890:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:890:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:890:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:890:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:890:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:890:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:890:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:890:47: sparse: expression using sizeof(void)
-   net/ceph/messenger.c:890:47: sparse: expression using sizeof(void)
->> net/ceph/messenger.c:890:47: sparse: too many warnings
-
-vim +890 net/ceph/messenger.c
-
-6aaa4511 Alex Elder      2013-03-06  862  
-8ae4f4f5 Alex Elder      2013-03-14  863  static bool ceph_msg_data_bio_advance(struct ceph_msg_data_cursor *cursor,
-8ae4f4f5 Alex Elder      2013-03-14  864  					size_t bytes)
-6aaa4511 Alex Elder      2013-03-06  865  {
-5359a17d Ilya Dryomov    2018-01-20  866  	struct ceph_bio_iter *it = &cursor->bio_iter;
-6aaa4511 Alex Elder      2013-03-06  867  
-5359a17d Ilya Dryomov    2018-01-20  868  	BUG_ON(bytes > cursor->resid);
-5359a17d Ilya Dryomov    2018-01-20  869  	BUG_ON(bytes > bio_iter_len(it->bio, it->iter));
-25aff7c5 Alex Elder      2013-03-11  870  	cursor->resid -= bytes;
-5359a17d Ilya Dryomov    2018-01-20  871  	bio_advance_iter(it->bio, &it->iter, bytes);
-f38a5181 Kent Overstreet 2013-08-07  872  
-5359a17d Ilya Dryomov    2018-01-20  873  	if (!cursor->resid) {
-5359a17d Ilya Dryomov    2018-01-20  874  		BUG_ON(!cursor->last_piece);
-5359a17d Ilya Dryomov    2018-01-20  875  		return false;   /* no more data */
-5359a17d Ilya Dryomov    2018-01-20  876  	}
-f38a5181 Kent Overstreet 2013-08-07  877  
-5359a17d Ilya Dryomov    2018-01-20  878  	if (!bytes || (it->iter.bi_size && it->iter.bi_bvec_done))
-6aaa4511 Alex Elder      2013-03-06  879  		return false;	/* more bytes to process in this segment */
-6aaa4511 Alex Elder      2013-03-06  880  
-5359a17d Ilya Dryomov    2018-01-20  881  	if (!it->iter.bi_size) {
-5359a17d Ilya Dryomov    2018-01-20  882  		it->bio = it->bio->bi_next;
-5359a17d Ilya Dryomov    2018-01-20  883  		it->iter = it->bio->bi_iter;
-5359a17d Ilya Dryomov    2018-01-20  884  		if (cursor->resid < it->iter.bi_size)
-5359a17d Ilya Dryomov    2018-01-20  885  			it->iter.bi_size = cursor->resid;
-25aff7c5 Alex Elder      2013-03-11  886  	}
-6aaa4511 Alex Elder      2013-03-06  887  
-5359a17d Ilya Dryomov    2018-01-20  888  	BUG_ON(cursor->last_piece);
-5359a17d Ilya Dryomov    2018-01-20  889  	BUG_ON(cursor->resid < bio_iter_len(it->bio, it->iter));
-5359a17d Ilya Dryomov    2018-01-20 @890  	cursor->last_piece = cursor->resid == bio_iter_len(it->bio, it->iter);
-6aaa4511 Alex Elder      2013-03-06  891  	return true;
-6aaa4511 Alex Elder      2013-03-06  892  }
-ea96571f Alex Elder      2013-04-05  893  #endif /* CONFIG_BLOCK */
-df6ad1f9 Alex Elder      2012-06-11  894  
-
-:::::: The code at line 890 was first introduced by commit
-:::::: 5359a17d2706b86da2af83027343d5eb256f7670 libceph, rbd: new bio handling code (aka don't clone bios)
-
-:::::: TO: Ilya Dryomov <idryomov@gmail.com>
-:::::: CC: Ilya Dryomov <idryomov@gmail.com>
-
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+ include/linux/bvec.h | 63 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 60 insertions(+), 3 deletions(-)
+
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index fe7a22dd133b..03a12fbb90d8 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -23,6 +23,44 @@
+ #include <linux/kernel.h>
+ #include <linux/bug.h>
+ #include <linux/errno.h>
++#include <linux/mm.h>
++
++/*
++ * What is multipage bvecs?
++ *
++ * - bvec stored in bio->bi_io_vec is always multipage(mp) style
++ *
++ * - bvec(struct bio_vec) represents one physically contiguous I/O
++ *   buffer, now the buffer may include more than one pages since
++ *   multipage(mp) bvec is supported, and all these pages represented
++ *   by one bvec is physically contiguous. Before mp support, at most
++ *   one page can be included in one bvec, we call it singlepage(sp)
++ *   bvec.
++ *
++ * - .bv_page of the bvec represents the 1st page in the mp bvec
++ *
++ * - .bv_offset of the bvec represents offset of the buffer in the bvec
++ *
++ * The effect on the current drivers/filesystem/dm/bcache/...:
++ *
++ * - almost everyone supposes that one bvec only includes one single
++ *   page, so we keep the sp interface not changed, for example,
++ *   bio_for_each_segment() still returns bvec with single page
++ *
++ * - bio_for_each_segment*() will be changed to return singlepage
++ *   bvec too
++ *
++ * - during iterating, iterator variable(struct bvec_iter) is always
++ *   updated in multipage bvec style and that means bvec_iter_advance()
++ *   is kept not changed
++ *
++ * - returned(copied) singlepage bvec is generated in flight by bvec
++ *   helpers from the stored multipage bvec
++ *
++ * - In case that some components(such as iov_iter) need to support
++ *   multipage bvec, we introduce new helpers(mp_bvec_iter_*) for
++ *   them.
++ */
+ 
+ /*
+  * was unsigned short, but we might as well be ready for > 64kB I/O pages
+@@ -52,16 +90,35 @@ struct bvec_iter {
+  */
+ #define __bvec_iter_bvec(bvec, iter)	(&(bvec)[(iter).bi_idx])
+ 
+-#define bvec_iter_page(bvec, iter)				\
++#define mp_bvec_iter_page(bvec, iter)				\
+ 	(__bvec_iter_bvec((bvec), (iter))->bv_page)
+ 
+-#define bvec_iter_len(bvec, iter)				\
++#define mp_bvec_iter_len(bvec, iter)				\
+ 	min((iter).bi_size,					\
+ 	    __bvec_iter_bvec((bvec), (iter))->bv_len - (iter).bi_bvec_done)
+ 
+-#define bvec_iter_offset(bvec, iter)				\
++#define mp_bvec_iter_offset(bvec, iter)				\
+ 	(__bvec_iter_bvec((bvec), (iter))->bv_offset + (iter).bi_bvec_done)
+ 
++#define mp_bvec_iter_page_idx(bvec, iter)			\
++	(mp_bvec_iter_offset((bvec), (iter)) / PAGE_SIZE)
++
++/*
++ * <page, offset,length> of singlepage(sp) segment.
++ *
++ * This helpers are for building sp bvec in flight.
++ */
++#define bvec_iter_offset(bvec, iter)					\
++	(mp_bvec_iter_offset((bvec), (iter)) % PAGE_SIZE)
++
++#define bvec_iter_len(bvec, iter)					\
++	min_t(unsigned, mp_bvec_iter_len((bvec), (iter)),		\
++	    (PAGE_SIZE - (bvec_iter_offset((bvec), (iter)))))
++
++#define bvec_iter_page(bvec, iter)					\
++	nth_page(mp_bvec_iter_page((bvec), (iter)),		\
++		 mp_bvec_iter_page_idx((bvec), (iter)))
++
+ #define bvec_iter_bvec(bvec, iter)				\
+ ((struct bio_vec) {						\
+ 	.bv_page	= bvec_iter_page((bvec), (iter)),	\
+-- 
+2.9.5
