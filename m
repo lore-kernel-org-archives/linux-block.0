@@ -1,125 +1,109 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it0-f67.google.com ([209.85.214.67]:52902 "EHLO
-        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752241AbeFGAq2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jun 2018 20:46:28 -0400
-Received: by mail-it0-f67.google.com with SMTP id m194-v6so10648660itg.2
-        for <linux-block@vger.kernel.org>; Wed, 06 Jun 2018 17:46:28 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180507210135.1823-7-hannes@cmpxchg.org>
-References: <20180507210135.1823-7-hannes@cmpxchg.org>
-From: Suren Baghdasaryan <surenb@google.com>
-Date: Wed, 6 Jun 2018 17:46:26 -0700
-Message-ID: <CAJuCfpHAqYZN++CSEMa3fd00ZBB-2Lxu5QW2b_kccrWrRzD+7w@mail.gmail.com>
-Subject: Re: [PATCH 6/7] psi: pressure stall information for CPU, memory, and IO
-To: Johannes Weiner <hannes@cmpxchg.org>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andrew Morton <akpm@linuxfoundation.org>,
-        Tejun Heo <tj@kernel.org>,
-        Balbir Singh <bsingharora@gmail.com>,
-        Mike Galbraith <efault@gmx.de>,
-        Oliver Yang <yangoliver@me.com>,
-        Shakeel Butt <shakeelb@google.com>,
-        xxx xxx <x.qendo@gmail.com>,
-        Taras Kondratiuk <takondra@cisco.com>,
-        Daniel Walker <danielwa@cisco.com>,
-        Vinayak Menon <vinmenon@codeaurora.org>,
-        Ruslan Ruslichenko <rruslich@cisco.com>, kernel-team@fb.com
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V7 09/24] block: use bio_add_page in bio_iov_iter_get_pages
+Date: Wed, 27 Jun 2018 20:45:33 +0800
+Message-Id: <20180627124548.3456-10-ming.lei@redhat.com>
+In-Reply-To: <20180627124548.3456-1-ming.lei@redhat.com>
+References: <20180627124548.3456-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Johannes,
+From: Christoph Hellwig <hch@lst.de>
 
+Replace a nasty hack with a different nasty hack to prepare for multipage
+bio_vecs.  By moving the temporary page array as far up as possible in
+the space allocated for the bio_vec array we can iterate forward over it
+and thus use bio_add_page.  Using bio_add_page means we'll be able to
+merge physically contiguous pages once support for multipath bio_vecs is
+merged.
 
-On Mon, May 7, 2018 at 2:01 PM, Johannes Weiner <hannes@cmpxchg.org> wrote:
-> +static void psi_clock(struct work_struct *work)
-> +{
-> +       u64 some[NR_PSI_RESOURCES] = { 0, };
-> +       u64 full[NR_PSI_RESOURCES] = { 0, };
-> +       unsigned long nonidle_total = 0;
-> +       unsigned long missed_periods;
-> +       struct delayed_work *dwork;
-> +       struct psi_group *group;
-> +       unsigned long expires;
-> +       int cpu;
-> +       int r;
-> +
-> +       dwork = to_delayed_work(work);
-> +       group = container_of(dwork, struct psi_group, clock_work);
-> +
-> +       /*
-> +        * Calculate the sampling period. The clock might have been
-> +        * stopped for a while.
-> +        */
-> +       expires = group->period_expires;
-> +       missed_periods = (jiffies - expires) / MY_LOAD_FREQ;
-> +       group->period_expires = expires + ((1 + missed_periods) * MY_LOAD_FREQ);
-> +
-> +       /*
-> +        * Aggregate the per-cpu state into a global state. Each CPU
-> +        * is weighted by its non-idle time in the sampling period.
-> +        */
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/bio.c | 45 +++++++++++++++++++++------------------------
+ 1 file changed, 21 insertions(+), 24 deletions(-)
 
-Would it be possible to move this aggregation code (excluding
-calc_avgs()) into a separate function which is called from here as
-well as from psi_show() before group->some[] and group->full[] are
-reported? This would not affect the performance if the information is
-not requested and at the same time would keep at least the "total"
-field up-to-date when the data is requested. For calc_avgs() I think
-we would have to calculate the change in nonidle_total, group->some[]
-and group->full[] fields differently because a call to psi_show() in
-the middle of two psi_clock() calls would refresh these fields before
-2secs expire, however calculating that change is trivial if we store
-previous group->some[], group->full[] and nonidle_total values inside
-psi_clock(). This would require new fields in psi_group struct to
-store these previous values but the upside is that we would eliminate
-the problem with reporting potentially stale data (up to 2sec update
-delay) and provide a function one can use to refresh group->some[] and
-group->full[] and implement custom averaging.
-
-> +       for_each_online_cpu(cpu) {
-> +               struct psi_group_cpu *groupc = per_cpu_ptr(group->cpus, cpu);
-> +               unsigned long nonidle;
-> +
-> +               nonidle = nsecs_to_jiffies(groupc->nonidle_time);
-> +               groupc->nonidle_time = 0;
-> +               nonidle_total += nonidle;
-> +
-> +               for (r = 0; r < NR_PSI_RESOURCES; r++) {
-> +                       struct psi_resource *res = &groupc->res[r];
-> +
-> +                       some[r] += (res->times[0] + res->times[1]) * nonidle;
-> +                       full[r] += res->times[1] * nonidle;
-> +
-> +                       /* It's racy, but we can tolerate some error */
-> +                       res->times[0] = 0;
-> +                       res->times[1] = 0;
-> +               }
-> +       }
-> +
-> +       for (r = 0; r < NR_PSI_RESOURCES; r++) {
-> +               /* Finish the weighted aggregation */
-> +               some[r] /= max(nonidle_total, 1UL);
-> +               full[r] /= max(nonidle_total, 1UL);
-> +
-> +               /* Accumulate stall time */
-> +               group->some[r] += some[r];
-> +               group->full[r] += full[r];
-> +
-> +               /* Calculate recent pressure averages */
-> +               calc_avgs(group->avg_some[r], some[r], missed_periods);
-> +               calc_avgs(group->avg_full[r], full[r], missed_periods);
-> +       }
-> +
-> +       /* Keep the clock ticking only when there is action */
-> +       if (nonidle_total)
-> +               schedule_delayed_work(dwork, MY_LOAD_FREQ);
-> +}
-> +
-
-Thanks,
-Suren.
+diff --git a/block/bio.c b/block/bio.c
+index de6cbaedfb65..80ea0c8878bd 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -825,6 +825,8 @@ int bio_add_page(struct bio *bio, struct page *page,
+ }
+ EXPORT_SYMBOL(bio_add_page);
+ 
++#define PAGE_PTRS_PER_BVEC	(sizeof(struct bio_vec) / sizeof(struct page *))
++
+ /**
+  * bio_iov_iter_get_pages - pin user or kernel pages and add them to a bio
+  * @bio: bio to add pages to
+@@ -836,38 +838,33 @@ EXPORT_SYMBOL(bio_add_page);
+ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ {
+ 	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
++	unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
+ 	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
+ 	struct page **pages = (struct page **)bv;
+-	size_t offset, diff;
+-	ssize_t size;
++	ssize_t size, left;
++	unsigned len, i;
++	size_t offset;
++
++	/*
++	 * Move page array up in the allocated memory for the bio vecs as
++	 * far as possible so that we can start filling biovecs from the
++	 * beginning without overwriting the temporary page array.
++	 */
++	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
++	pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
+ 
+ 	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
+ 	if (unlikely(size <= 0))
+ 		return size ? size : -EFAULT;
+-	nr_pages = (size + offset + PAGE_SIZE - 1) / PAGE_SIZE;
+ 
+-	/*
+-	 * Deep magic below:  We need to walk the pinned pages backwards
+-	 * because we are abusing the space allocated for the bio_vecs
+-	 * for the page array.  Because the bio_vecs are larger than the
+-	 * page pointers by definition this will always work.  But it also
+-	 * means we can't use bio_add_page, so any changes to it's semantics
+-	 * need to be reflected here as well.
+-	 */
+-	bio->bi_iter.bi_size += size;
+-	bio->bi_vcnt += nr_pages;
+-
+-	diff = (nr_pages * PAGE_SIZE - offset) - size;
+-	while (nr_pages--) {
+-		bv[nr_pages].bv_page = pages[nr_pages];
+-		bv[nr_pages].bv_len = PAGE_SIZE;
+-		bv[nr_pages].bv_offset = 0;
+-	}
++	for (left = size, i = 0; left > 0; left -= len, i++) {
++		struct page *page = pages[i];
+ 
+-	bv[0].bv_offset += offset;
+-	bv[0].bv_len -= offset;
+-	if (diff)
+-		bv[bio->bi_vcnt - 1].bv_len -= diff;
++		len = min_t(size_t, PAGE_SIZE - offset, left);
++		if (WARN_ON_ONCE(bio_add_page(bio, page, len, offset) != len))
++			return -EINVAL;
++		offset = 0;
++	}
+ 
+ 	iov_iter_advance(iter, size);
+ 	return 0;
+-- 
+2.9.5
