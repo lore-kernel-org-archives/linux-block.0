@@ -1,80 +1,78 @@
 Return-Path: <martin@lichtvoll.de>
 From: Martin Steigerwald <martin@lichtvoll.de>
-To: Michael Schmitz <schmitzmic@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Geert Uytterhoeven <geert@linux-m68k.org>, Joanne Dow <jdow@earthlink.net>, Linux/m68k <linux-m68k@lists.linux-m68k.org>, linux-block@vger.kernel.org
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Michael Schmitz <schmitzmic@gmail.com>, Jens Axboe <axboe@kernel.dk>, jdow <jdow@earthlink.net>, linux-m68k <linux-m68k@lists.linux-m68k.org>, linux-block@vger.kernel.org
 Subject: Re: Subject: [PATCH RFC] block: fix Amiga RDB partition support for disks >= 2 TB
-Date: Thu, 28 Jun 2018 09:28:59 +0200
-Message-ID: <1604984.EVDKEPedqG@merkaba>
-In-Reply-To: <b39c2bf0-de19-ef6e-75bf-b9fae33255c6@gmail.com>
-References: <20180627012421.80B8F24E094@nmr-admin> <3488210.nMeMqUQulA@merkaba> <b39c2bf0-de19-ef6e-75bf-b9fae33255c6@gmail.com>
+Date: Thu, 28 Jun 2018 09:13:09 +0200
+Message-ID: <3681004.ZGfTzPZDUK@merkaba>
+In-Reply-To: <CAMuHMdVtvv1Cxxuf__TUKGUJiuTUohGx5XvY_3nQ7vD5J_BBAw@mail.gmail.com>
+References: <20180627012421.80B8F24E094@nmr-admin> <b39c2bf0-de19-ef6e-75bf-b9fae33255c6@gmail.com> <CAMuHMdVtvv1Cxxuf__TUKGUJiuTUohGx5XvY_3nQ7vD5J_BBAw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="iso-8859-1"
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Michael.
+Hi Geert.
 
-Probably I was right with not submitting a patch myself. I=C2=B4d likely=20
-would have been overwhelmed by the discussion and feedback :)
-
-Michael Schmitz - 28.06.18, 06:58:
-[=E2=80=A6]
-> >> In the interest of least surprises, we have to fix the 32 bit
-> >> overflow (so we can even detect that it would have happened), and
-> >> give the user the chance to carefully consider whether to accept
-> >> the new behaviour. That means refusing to make available any
-> >> partition that would have been affected by such overflow.
+Geert Uytterhoeven - 28.06.18, 08:45:=20
+> On Thu, Jun 28, 2018 at 6:59 AM Michael Schmitz <schmitzmic@gmail.com>=20
+wrote:
+> > Am 28.06.2018 um 09:20 schrieb Martin Steigerwald:
+> > >>> And as stated in my other reply to the patch:
+> > >>> partition needs 64 bit disk device support in AmigaOS or AmigaOS
+> > >>> like
+> > >>> operating systems (NSD64, TD64 or SCSI direct)
+> > >>=20
+> > >> I'd probably leave it at 'disk needs 64 bit disk device support
+> > >> on
+> > >> native OS', and only print that warning once.
+> > >=20
+> > > This is fine with me.
 > >=20
-> > That is acceptable for me as I told before. Either mount or refuse
-> > to
-> > mount, but do not overflow and mount nonetheless :)
+> > OK, I'll go with that.
+>=20
+> Do we really need the warning?
+> Once the parsing is fixed doing 64-bit math, it does not matter for
+> Linux anymore.
+
+Well, irony of this is: In my case the RDB has been created on a machine=20
+with a native OS. So Linux warns me about something I already did so on=20
+the native OS without any warning. In this case AmigaOS 4.0.
+=20
+> Won't it make more sense to have the warning in the tool that created
+> the partition table in the first place?
+
+Well that would be up to the AmigaOS developers to decide.
+
+And well for amiga-fdisk or parted developers if they ever choose to=20
+support this or already do. (I doubt that amiga-fdisk can handle this.)
+
+> > > I would not name the kernel option "eat_my_rdb", but use a less
+> > > dramatizing name.
+> > >=20
+> > > Maybe just: "allow_64bit_rdb" or something like that.
 > >=20
-> > Mind you, I am not using my Amiga machines either at the moment. And
-> > I repurposed the 2 TB disk years ago.
+> > I don't expect to get away with that :-)
 >=20
-> That's fine - I understand the 'profile' image was a true binary copy
-> of the RDB, and placing that file at offset 0 in an image file is a
-> legitimate use?
+> I still fail to see what's the added value of the kernel option...
+> Either the partition is usable, or not.
 
-You actually ask me to remember about what that 'profile' image was? :)
+Well, I could try to contact some of the current AmigaOS developers=20
+about that and ask them whether they would like to give me a statement=20
+about this that I am allowed to post here.
 
-Well, in the attachment note on the bug report I wrote: "should be just=20
-a binary copy", so I did not know exactly back then either. However the=20
-file starts with "RDSK" and then it has "PART" headers and so on. That=20
-looks pretty much like a binary copy of an RDB. I am a bit surprised by=20
-its small size of 2 KiB. But I see three partitions in there. According=20
-to the screenshot I also provided, the disk had three partitions. So=20
-probably Media Toolbox has been intelligent enough to just copy the used=20
-space of the reserved RDB area. Cause I think the reserved space must=20
-have been higher than 2 KiB. However the RDB/disk geometry editing=20
-screen does not display it and off hand I do not know where to look=20
-inside the RDB to see how much space has been reserved. Interestingly=20
-the "Total sectors" value in that Media Toolbox window also overflowed.=20
-But from my memory this was just a cosmetic issue in Media Toolbox. The=20
-"*.device" device drivers, the filesystems and the RDB handling code in=20
-AmigaOS do their own math. That is what NSD64 / TD64 was about.
+I would not know whether they answer and it may take a time. My offer=20
+stands, but I would only do this, if you really like to have that=20
+official feedback.
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D43511
+Again, I am pretty sure that what I did is safe on AmigaOS 4 at least,=20
+but I bet also on AmigaOS <4 with NSD64 or TD64 (except for the=20
+filesystem sizes, but AmigaOS < 4 does not have JXFS anyway, and did not=20
+have SFS2 as well, maybe that is available now, I don=B4t know).
 
-> > I would not name the kernel option "eat_my_rdb", but use a less
-> > dramatizing name.
-> >=20
-> > Maybe just: "allow_64bit_rdb" or something like that.
->=20
-> I don't expect to get away with that :-)
-
-Heh. :)
-
-> > How does the user come to know about this kernel option? Will you
-> > print its name in kernel log?
->=20
-> Depends on how easy we want to make it for users. If I put a BUG()
-> trap with the check, the resulting log section will point to a
-> specific line in block/partitions/amiga.c, from which the override
-> option will be obvious. But that might be a little too opaque for
-> some...
-
-kernel-parameters.txt or mentioning in the warning would also be an=20
-option.
+However Joanne is without doubt an authority on RDBs, but she has not=20
+been involved with AmigaOS development for quite some time and, correct=20
+me if this is wrong, Joanne, does not know as much about the recent=20
+versions, as I or even more so as current AmigaOS developers know.
 
 Thanks,
 =2D-=20
