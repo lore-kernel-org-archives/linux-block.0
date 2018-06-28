@@ -1,218 +1,122 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX 1/4] block, bfq: add/remove entity weights correctly
-Date: Mon, 25 Jun 2018 21:48:03 +0200
-Message-Id: <20180625194806.7619-2-paolo.valente@linaro.org>
-In-Reply-To: <20180625194806.7619-1-paolo.valente@linaro.org>
-References: <20180625194806.7619-1-paolo.valente@linaro.org>
+	Ming Lei <ming.lei@redhat.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Laurence Oberman <loberman@redhat.com>,
+	Omar Sandoval <osandov@fb.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 3/3] blk-mq: dequeue request one by one from sw queue iff hctx is busy
+Date: Thu, 28 Jun 2018 11:19:18 +0800
+Message-Id: <20180628031918.17694-4-ming.lei@redhat.com>
+In-Reply-To: <20180628031918.17694-1-ming.lei@redhat.com>
+References: <20180628031918.17694-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-To keep I/O throughput high as often as possible, BFQ performs
-I/O-dispatch plugging (aka device idling) only when beneficial exactly
-for throughput, or when needed for service guarantees (low latency,
-fairness). An important case where the latter condition holds is when
-the scenario is 'asymmetric' in terms of weights: i.e., when some
-bfq_queue or whole group of queues has a higher weight, and thus has
-to receive more service, than other queues or groups. Without dispatch
-plugging, lower-weight queues/groups may unjustly steal bandwidth to
-higher-weight queues/groups.
+It won't be efficient to dequeue request one by one from sw queue,
+but we have to do that when queue is busy for better merge performance.
 
-To detect asymmetric scenarios, BFQ checks some sufficient
-conditions. One of these conditions is that active groups have
-different weights. BFQ controls this condition by maintaining a
-special set of unique weights of active groups
-(group_weights_tree). To this purpose, in the function
-bfq_active_insert/bfq_active_extract BFQ adds/removes the weight of a
-group to/from this set.
+This patch takes EWMA to figure out if queue is busy, then only dequeue
+request one by one from sw queue when queue is busy.
 
-Unfortunately, the function bfq_active_extract may happen to be
-invoked also for a group that is still active (to preserve the correct
-update of the next queue to serve, see comments in function
-bfq_no_longer_next_in_service() for details). In this case, removing
-the weight of the group makes the set group_weights_tree
-inconsistent. Service-guarantee violations follow.
+Kashyap verified that this patch basically brings back rand IO perf
+on megasas_raid in case of none io scheduler. Meantime I tried this
+patch on HDD, and not see obvious performance loss on sequential IO
+test too.
 
-This commit addresses this issue by moving group_weights_tree
-insertions from their previous location (in bfq_active_insert) into
-the function __bfq_activate_entity, and by moving group_weights_tree
-extractions from bfq_active_extract to when the entity that represents
-a group remains throughly idle, i.e., with no request either enqueued
-or dispatched.
-
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Fixes: b347689ffbca ("blk-mq-sched: improve dispatching from sw queue")
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Laurence Oberman <loberman@redhat.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Reported-by: Kashyap Desai <kashyap.desai@broadcom.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bfq-iosched.c | 45 +++++++++++++++++++++++++++++++++++++++++----
- block/bfq-iosched.h |  7 +++++--
- block/bfq-wf2q.c    | 24 +++++++++++++-----------
- 3 files changed, 59 insertions(+), 17 deletions(-)
+ block/blk-mq-sched.c   | 11 ++---------
+ block/blk-mq.c         | 24 +++++++++++++++++++++++-
+ include/linux/blk-mq.h |  1 +
+ 3 files changed, 26 insertions(+), 10 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 495b9ddb3355..3f32e88c7e9b 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -742,8 +742,9 @@ void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_entity *entity,
-  * See the comments to the function bfq_weights_tree_add() for considerations
-  * about overhead.
-  */
--void bfq_weights_tree_remove(struct bfq_data *bfqd, struct bfq_entity *entity,
--			     struct rb_root *root)
-+void __bfq_weights_tree_remove(struct bfq_data *bfqd,
-+			       struct bfq_entity *entity,
-+			       struct rb_root *root)
- {
- 	if (!entity->weight_counter)
- 		return;
-@@ -759,6 +760,43 @@ void bfq_weights_tree_remove(struct bfq_data *bfqd, struct bfq_entity *entity,
- 	entity->weight_counter = NULL;
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index f5745acc2d98..8fbf3db32666 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -219,15 +219,8 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 		}
+ 	} else if (has_sched_dispatch) {
+ 		blk_mq_do_dispatch_sched(hctx);
+-	} else if (q->mq_ops->get_budget) {
+-		/*
+-		 * If we need to get budget before queuing request, we
+-		 * dequeue request one by one from sw queue for avoiding
+-		 * to mess up I/O merge when dispatch runs out of resource.
+-		 *
+-		 * TODO: get more budgets, and dequeue more requests in
+-		 * one time.
+-		 */
++	} else if (READ_ONCE(hctx->busy)) {
++		/* dequeue request one by one from sw queue if queue is busy */
+ 		blk_mq_do_dispatch_ctx(hctx);
+ 	} else {
+ 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 20b0519cb3b8..2f20c9e3efda 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1074,6 +1074,25 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx **hctx,
+ 	return true;
  }
  
-+/*
-+ * Invoke __bfq_weights_tree_remove on bfqq and all its inactive
-+ * parent entities.
-+ */
-+void bfq_weights_tree_remove(struct bfq_data *bfqd,
-+			     struct bfq_queue *bfqq)
++/* update queue busy with EWMA (7/8 * ewma(t)  + 1/8 * busy(t + 1)) */
++static void blk_mq_update_hctx_busy(struct blk_mq_hw_ctx *hctx, unsigned int busy)
 +{
-+	struct bfq_entity *entity = bfqq->entity.parent;
++	const unsigned weight = 8;
++	const unsigned factor = 4;
++	unsigned int ewma;
 +
-+	__bfq_weights_tree_remove(bfqd, &bfqq->entity,
-+				  &bfqd->queue_weights_tree);
++	if (hctx->queue->elevator)
++		return;
 +
-+	for_each_entity(entity) {
-+		struct bfq_sched_data *sd = entity->my_sched_data;
++	ewma = READ_ONCE(hctx->busy);
 +
-+		if (sd->next_in_service || sd->in_service_entity) {
-+			/*
-+			 * entity is still active, because either
-+			 * next_in_service or in_service_entity is not
-+			 * NULL (see the comments on the definition of
-+			 * next_in_service for details on why
-+			 * in_service_entity must be checked too).
-+			 *
-+			 * As a consequence, the weight of entity is
-+			 * not to be removed. In addition, if entity
-+			 * is active, then its parent entities are
-+			 * active as well, and thus their weights are
-+			 * not to be removed either. In the end, this
-+			 * loop must stop here.
-+			 */
-+			break;
-+		}
-+		__bfq_weights_tree_remove(bfqd, entity,
-+					  &bfqd->group_weights_tree);
-+	}
++	ewma *= weight - 1;
++	ewma += busy << factor;
++	ewma /= weight;
++
++	WRITE_ONCE(hctx->busy, ewma);
 +}
 +
- /*
-  * Return expired entry, or NULL to just start from scratch in rbtree.
-  */
-@@ -4582,8 +4620,7 @@ static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
- 		 */
- 		bfqq->budget_timeout = jiffies;
+ #define BLK_MQ_RESOURCE_DELAY	3		/* ms units */
  
--		bfq_weights_tree_remove(bfqd, &bfqq->entity,
--					&bfqd->queue_weights_tree);
-+		bfq_weights_tree_remove(bfqd, bfqq);
- 	}
- 
- 	now_ns = ktime_get_ns();
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 0f712e03b035..a8a2e5aca4d4 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -827,8 +827,11 @@ struct bfq_data *bic_to_bfqd(struct bfq_io_cq *bic);
- void bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq);
- void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_entity *entity,
- 			  struct rb_root *root);
--void bfq_weights_tree_remove(struct bfq_data *bfqd, struct bfq_entity *entity,
--			     struct rb_root *root);
-+void __bfq_weights_tree_remove(struct bfq_data *bfqd,
-+			       struct bfq_entity *entity,
-+			       struct rb_root *root);
-+void bfq_weights_tree_remove(struct bfq_data *bfqd,
-+			     struct bfq_queue *bfqq);
- void bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 		     bool compensate, enum bfqq_expiration reason);
- void bfq_put_queue(struct bfq_queue *bfqq);
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 4498c43245e2..58cf38fcee05 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -499,9 +499,6 @@ static void bfq_active_insert(struct bfq_service_tree *st,
- 	if (bfqq)
- 		list_add(&bfqq->bfqq_list, &bfqq->bfqd->active_list);
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
--	else /* bfq_group */
--		bfq_weights_tree_add(bfqd, entity, &bfqd->group_weights_tree);
--
- 	if (bfqg != bfqd->root_group)
- 		bfqg->active_entities++;
- #endif
-@@ -601,10 +598,6 @@ static void bfq_active_extract(struct bfq_service_tree *st,
- 	if (bfqq)
- 		list_del(&bfqq->bfqq_list);
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
--	else /* bfq_group */
--		bfq_weights_tree_remove(bfqd, entity,
--					&bfqd->group_weights_tree);
--
- 	if (bfqg != bfqd->root_group)
- 		bfqg->active_entities--;
- #endif
-@@ -799,7 +792,7 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
- 		if (prev_weight != new_weight) {
- 			root = bfqq ? &bfqd->queue_weights_tree :
- 				      &bfqd->group_weights_tree;
--			bfq_weights_tree_remove(bfqd, entity, root);
-+			__bfq_weights_tree_remove(bfqd, entity, root);
- 		}
- 		entity->weight = new_weight;
- 		/*
-@@ -971,7 +964,7 @@ static void bfq_update_fin_time_enqueue(struct bfq_entity *entity,
-  * one of its children receives a new request.
-  *
-  * Basically, this function updates the timestamps of entity and
-- * inserts entity into its active tree, ater possibly extracting it
-+ * inserts entity into its active tree, after possibly extracting it
-  * from its idle tree.
-  */
- static void __bfq_activate_entity(struct bfq_entity *entity,
-@@ -1015,6 +1008,16 @@ static void __bfq_activate_entity(struct bfq_entity *entity,
- 		entity->on_st = true;
- 	}
- 
-+#ifdef BFQ_GROUP_IOSCHED_ENABLED
-+	if (!bfq_entity_to_bfqq(entity)) { /* bfq_group */
-+		struct bfq_group *bfqg =
-+			container_of(entity, struct bfq_group, entity);
+ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+@@ -1206,7 +1225,10 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 			blk_mq_run_hw_queue(hctx, true);
+ 		else if (needs_restart && (ret == BLK_STS_RESOURCE))
+ 			blk_mq_delay_run_hw_queue(hctx, BLK_MQ_RESOURCE_DELAY);
+-	}
 +
-+		bfq_weights_tree_add(bfqg->bfqd, entity,
-+				     &bfqd->group_weights_tree);
-+	}
-+#endif
-+
- 	bfq_update_fin_time_enqueue(entity, st, backshifted);
++		blk_mq_update_hctx_busy(hctx, 1);
++	} else
++		blk_mq_update_hctx_busy(hctx, 0);
+ 
+ 	return (queued + errors) != 0;
  }
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index e3147eb74222..a5113e22d720 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -34,6 +34,7 @@ struct blk_mq_hw_ctx {
  
-@@ -1664,8 +1667,7 @@ void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 	bfqd->busy_queues--;
+ 	struct sbitmap		ctx_map;
  
- 	if (!bfqq->dispatched)
--		bfq_weights_tree_remove(bfqd, &bfqq->entity,
--					&bfqd->queue_weights_tree);
-+		bfq_weights_tree_remove(bfqd, bfqq);
++	unsigned int		busy;
+ 	struct blk_mq_ctx	*dispatch_from;
  
- 	if (bfqq->wr_coeff > 1)
- 		bfqd->wr_busy_queues--;
+ 	struct blk_mq_ctx	**ctxs;
 -- 
-2.16.1
+2.9.5
