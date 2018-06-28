@@ -1,10 +1,11 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Fri, 29 Jun 2018 09:59:01 +0800
-From: Ming Lei <ming.lei@redhat.com>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Thu, 28 Jun 2018 10:37:35 -0700
+From: Omar Sandoval <osandov@osandov.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: [PATCH] blk-mq: don't queue more if we get a busy return
-Message-ID: <20180629015848.GA28069@ming.t460p>
+Message-ID: <20180628173735.GA14953@vader>
 References: <2167f1fb-68b0-c302-88d9-964be5fe3bb3@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -27,7 +28,8 @@ On Thu, Jun 28, 2018 at 09:46:50AM -0600, Jens Axboe wrote:
 > we get a BUSY return. This should also be more optimal in terms of
 > letting requests stay in the scheduler for as long as possible, if we
 > get a BUSY due to the regular out-of-tags condition.
-> 
+
+Reviewed-by: Omar Sandoval <osandov@fb.com>
 > Signed-off-by: Jens Axboe <axboe@kernel.dk>
 > 
 > diff --git a/block/blk-mq.c b/block/blk-mq.c
@@ -58,10 +60,10 @@ On Thu, Jun 28, 2018 at 09:46:50AM -0600, Jens Axboe wrote:
 > +	 */
 > +	if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
 > +		return false;
-
-The above change may not be needed since one invariant is that
-!list_empty(list) becomes true if either BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE
-is returned from .queue_rq().
-
-Thanks,
-Ming
+> +
+>  	return (queued + errors) != 0;
+>  }
+>  
+> -- 
+> Jens Axboe
+>  
