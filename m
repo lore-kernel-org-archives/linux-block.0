@@ -1,62 +1,28 @@
-Return-Path: <prvs=70988ebf6=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	stable@vger.kernel.org
-Subject: [PATCH] block: Fix cloning of requests with a special payload
-Date: Wed, 27 Jun 2018 12:55:18 -0700
-Message-Id: <20180627195518.13958-1-bart.vanassche@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH BUGFIX RESEND 0/4] bfq: fix bugs breaking bandwidth
+ guarantees occasionally
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ulf.hansson@linaro.org, broonie@kernel.org, linus.walleij@linaro.org,
+ bfq-iosched@googlegroups.com, oleksandr@natalenko.name
+References: <20180625195537.7769-1-paolo.valente@linaro.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <359b2f24-f680-2e76-d6e1-3b8b67fcacc7@kernel.dk>
+Date: Thu, 28 Jun 2018 13:17:19 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180625195537.7769-1-paolo.valente@linaro.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This patch avoids that removing a path controlled by the dm-mpath driver
-while mkfs is running triggers the following kernel bug:
+On 6/25/18 1:55 PM, Paolo Valente wrote:
+> Hi,
+> during some bandwidth tests, I found some occasional but severe
+> malfunctions (losses of bandwidth control). The first three patches in
+> this series fix the bugs that caused these malfunctions. The last
+> patch is a fix/improvement of the name of one of the functions
+> involved with these bugs.
 
-    kernel BUG at block/blk-core.c:3347!
-    invalid opcode: 0000 [#1] PREEMPT SMP KASAN
-    CPU: 20 PID: 24369 Comm: mkfs.ext4 Not tainted 4.18.0-rc1-dbg+ #2
-    RIP: 0010:blk_end_request_all+0x68/0x70
-    Call Trace:
-     <IRQ>
-     dm_softirq_done+0x326/0x3d0 [dm_mod]
-     blk_done_softirq+0x19b/0x1e0
-     __do_softirq+0x128/0x60d
-     irq_exit+0x100/0x110
-     smp_call_function_single_interrupt+0x90/0x330
-     call_function_single_interrupt+0xf/0x20
-     </IRQ>
+Applied for 4.19, thanks.
 
-Fixes: f9d03f96b988 ("block: improve handling of the magic discard payload")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: <stable@vger.kernel.org>
----
- block/blk-core.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 118dd17eb71f..f1e07ed1513c 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -3529,6 +3529,10 @@ static void __blk_rq_prep_clone(struct request *dst, struct request *src)
- 	dst->cpu = src->cpu;
- 	dst->__sector = blk_rq_pos(src);
- 	dst->__data_len = blk_rq_bytes(src);
-+	if (src->rq_flags & RQF_SPECIAL_PAYLOAD) {
-+		dst->rq_flags |= RQF_SPECIAL_PAYLOAD;
-+		dst->special_vec = src->special_vec;
-+	}
- 	dst->nr_phys_segments = src->nr_phys_segments;
- 	dst->ioprio = src->ioprio;
- 	dst->extra_len = src->extra_len;
 -- 
-2.17.1
+Jens Axboe
