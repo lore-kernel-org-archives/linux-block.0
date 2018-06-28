@@ -1,20 +1,20 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f49.google.com ([209.85.215.49]:41727 "EHLO
-        mail-lf0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S966207AbeF1NnO (ORCPT
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:35577 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753571AbeF1MqD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jun 2018 09:43:14 -0400
-Received: by mail-lf0-f49.google.com with SMTP id y127-v6so4246020lfc.8
-        for <linux-block@vger.kernel.org>; Thu, 28 Jun 2018 06:43:13 -0700 (PDT)
+        Thu, 28 Jun 2018 08:46:03 -0400
+Received: by mail-lj1-f196.google.com with SMTP id i125-v6so4403659lji.2
+        for <linux-block@vger.kernel.org>; Thu, 28 Jun 2018 05:46:02 -0700 (PDT)
 From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
 To: igor.j.konopko@intel.com, marcin.dziegielewski@intel.com,
         javier@cnexlabs.com, hans.holmberg@cnexlabs.com, hlitz@ucsc.edu,
         youngtack.jin@circuitblvd.com
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [PATCH v2] lightnvm: pblk: expose generic disk name on pr_* msgs
-Date: Thu, 28 Jun 2018 15:43:05 +0200
-Message-Id: <20180628134305.26910-1-mb@lightnvm.io>
+Subject: [PATCH] lightnvm: pblk: expose generic disk name on pr_* msgs
+Date: Thu, 28 Jun 2018 14:45:48 +0200
+Message-Id: <20180628124548.3886-1-mb@lightnvm.io>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
@@ -26,21 +26,17 @@ instance it belongs to, and also prefix it with pblk, so we know
 the message comes from the pblk module.
 
 Signed-off-by: Matias Bjørling <mb@lightnvm.io>
-
 ---
-
-Forgot to test with NVM_PBLK_DEBUG on. Fixed up the broken code.
----
- drivers/lightnvm/pblk-core.c     | 51 +++++++++++++-------------
- drivers/lightnvm/pblk-gc.c       | 32 ++++++++---------
- drivers/lightnvm/pblk-init.c     | 78 ++++++++++++++++++++--------------------
- drivers/lightnvm/pblk-rb.c       |  8 ++---
- drivers/lightnvm/pblk-read.c     | 25 ++++++-------
- drivers/lightnvm/pblk-recovery.c | 44 +++++++++++------------
- drivers/lightnvm/pblk-sysfs.c    |  5 ++-
- drivers/lightnvm/pblk-write.c    | 21 +++++------
- drivers/lightnvm/pblk.h          | 29 ++++++++++-----
- 9 files changed, 153 insertions(+), 140 deletions(-)
+ drivers/lightnvm/pblk-core.c     | 51 ++++++++++++++++++------------------
+ drivers/lightnvm/pblk-gc.c       | 32 +++++++++++------------
+ drivers/lightnvm/pblk-init.c     | 56 ++++++++++++++++++++--------------------
+ drivers/lightnvm/pblk-rb.c       |  8 +++---
+ drivers/lightnvm/pblk-read.c     | 25 +++++++++---------
+ drivers/lightnvm/pblk-recovery.c | 44 +++++++++++++++----------------
+ drivers/lightnvm/pblk-sysfs.c    |  5 ++--
+ drivers/lightnvm/pblk-write.c    | 21 ++++++++-------
+ drivers/lightnvm/pblk.h          | 29 ++++++++++++++-------
+ 9 files changed, 142 insertions(+), 129 deletions(-)
 
 diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
 index 66ab1036f2fb..b829460fe827 100644
@@ -417,7 +413,7 @@ index ec56f581397b..93e06b613b6b 100644
  		goto fail_free_reader_line_wq;
  	}
 diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index aa2426403171..d87d38f063fa 100644
+index aa2426403171..a0413fba9572 100644
 --- a/drivers/lightnvm/pblk-init.c
 +++ b/drivers/lightnvm/pblk-init.c
 @@ -117,13 +117,13 @@ static int pblk_l2p_recover(struct pblk *pblk, bool factory_init)
@@ -559,47 +555,25 @@ index aa2426403171..d87d38f063fa 100644
  #endif
  
  	pblk_free(pblk);
-@@ -1190,20 +1192,6 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+@@ -1190,16 +1192,15 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
  	struct pblk *pblk;
  	int ret;
  
 -	/* pblk supports 1.2 and 2.0 versions */
--	if (!(geo->version == NVM_OCSSD_SPEC_12 ||
--					geo->version == NVM_OCSSD_SPEC_20)) {
+ 	if (!(geo->version == NVM_OCSSD_SPEC_12 ||
+ 					geo->version == NVM_OCSSD_SPEC_20)) {
 -		pr_err("pblk: OCSSD version not supported (%u)\n",
--							geo->version);
--		return ERR_PTR(-EINVAL);
--	}
--
--	if (geo->version == NVM_OCSSD_SPEC_12 && geo->dom & NVM_RSP_L2P) {
--		pr_err("pblk: host-side L2P table not supported. (%x)\n",
--							geo->dom);
--		return ERR_PTR(-EINVAL);
--	}
--
- 	pblk = kzalloc(sizeof(struct pblk), GFP_KERNEL);
- 	if (!pblk)
- 		return ERR_PTR(-ENOMEM);
-@@ -1213,6 +1201,19 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 	pblk->state = PBLK_STATE_RUNNING;
- 	pblk->gc.gc_enabled = 0;
- 
-+	if (!(geo->version == NVM_OCSSD_SPEC_12 ||
-+					geo->version == NVM_OCSSD_SPEC_20)) {
 +		pblk_err(pblk, "OCSSD version not supported (%u)\n",
-+							geo->version);
-+		return ERR_PTR(-EINVAL);
-+	}
-+
-+	if (geo->version == NVM_OCSSD_SPEC_12 && geo->dom & NVM_RSP_L2P) {
+ 							geo->version);
+ 		return ERR_PTR(-EINVAL);
+ 	}
+ 
+ 	if (geo->version == NVM_OCSSD_SPEC_12 && geo->dom & NVM_RSP_L2P) {
+-		pr_err("pblk: host-side L2P table not supported. (%x)\n",
 +		pblk_err(pblk, "host-side L2P table not supported. (%x)\n",
-+							geo->dom);
-+		return ERR_PTR(-EINVAL);
-+	}
-+
- 	spin_lock_init(&pblk->resubmit_lock);
- 	spin_lock_init(&pblk->trans_lock);
- 	spin_lock_init(&pblk->lock);
+ 							geo->dom);
+ 		return ERR_PTR(-EINVAL);
+ 	}
 @@ -1242,38 +1243,38 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
  
  	ret = pblk_core_init(pblk);
@@ -1098,7 +1072,7 @@ index 5f44df999aed..ee774a86cf1e 100644
  	}
  
 diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index c072955d72c2..5c6904eb8557 100644
+index c072955d72c2..395498018d6d 100644
 --- a/drivers/lightnvm/pblk.h
 +++ b/drivers/lightnvm/pblk.h
 @@ -703,6 +703,15 @@ struct pblk_line_ws {
@@ -1125,7 +1099,7 @@ index c072955d72c2..5c6904eb8557 100644
 +static inline void print_ppa(struct pblk *pblk, struct ppa_addr *p,
  			     char *msg, int error)
  {
-+	struct nvm_geo *geo = &pblk->dev->geo;
++	nvm_geo *geo = &pblk->dev->geo;
 +
  	if (p->c.is_cached) {
 -		pr_err("ppa: (%s: %x) cache line: %llu\n",
