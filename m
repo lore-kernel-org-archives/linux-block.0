@@ -1,253 +1,123 @@
-Return-Path: <3CtojWwUKBS0SJWWQPXXPUN.LXVJgKXNTNaWNU.MT@flex--jannh.bounces.google.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: Oops in kmem_cache_free() via bioset_exit() (was Re:
+ [next-20180601][nvme][ppc] Kernel Oops is triggered when creating lvm
+ snapshots on nvme disks)
+To: Michael Ellerman <mpe@ellerman.id.au>,
+ Abdul Haleem <abdhalee@linux.vnet.ibm.com>
+Cc: linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+ linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+ linux-next <linux-next@vger.kernel.org>,
+ linux-kernel <linux-kernel@vger.kernel.org>,
+ linux-scsi <linux-scsi@vger.kernel.org>,
+ Stephen Rothwell <sfr@canb.auug.org.au>, sachinp
+ <sachinp@linux.vnet.ibm.com>, sim <sim@linux.vnet.ibm.com>,
+ manvanth <manvanth@linux.vnet.ibm.com>,
+ Brian King <brking@linux.vnet.ibm.com>, linux-block@vger.kernel.org,
+ Kent Overstreet <kent.overstreet@gmail.com>
+References: <1530003645.24245.7.camel@abdul.in.ibm.com>
+ <87d0wd7jph.fsf@concordia.ellerman.id.au>
+ <1530176707.24245.12.camel@abdul.in.ibm.com>
+ <87a7rf55vy.fsf@concordia.ellerman.id.au>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <32e06233-3e58-10af-40d9-a22d9e5c4e96@kernel.dk>
+Date: Thu, 28 Jun 2018 13:57:55 -0600
 MIME-Version: 1.0
-Date: Fri, 15 Jun 2018 17:23:35 +0200
-Message-Id: <20180615152335.208202-1-jannh@google.com>
-Subject: [PATCH] sg, bsg: mitigate read/write abuse, block uaccess in release
-From: Jann Horn <jannh@google.com>
-To: Jens Axboe <axboe@kernel.dk>, FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
-	Doug Gilbert <dgilbert@interlog.com>, "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org, jannh@google.com
-Cc: linux-kernel@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>,
-	kernel-hardening@lists.openwall.com, security@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <87a7rf55vy.fsf@concordia.ellerman.id.au>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-As Al Viro noted in commit 128394eff343 ("sg_write()/bsg_write() is not fit
-to be called under KERNEL_DS"), sg and bsg improperly access userspace
-memory outside the provided buffer, permitting kernel memory corruption via
-splice().
-But they don't just do it on ->write(), also on ->read() and (in the case
-of bsg) even on ->release().
+On 6/28/18 8:42 AM, Michael Ellerman wrote:
+> Kent, Jens,
+> 
+> This looks like it might be related to the recent bioset changes?
+> 
+> cheers
+> 
+> Abdul Haleem <abdhalee@linux.vnet.ibm.com> writes:
+>> On Tue, 2018-06-26 at 23:36 +1000, Michael Ellerman wrote:
+>>> Abdul Haleem <abdhalee@linux.vnet.ibm.com> writes:
+> ...
+>> I was able to reproduce again with slub_debug=FZP and DEBUG_INFO enabled
+>> on 4.17.0-rc7-next-20180601, but not much traces other than the Oops stack trace
+> 
+> Are you still testing on that revision? It's nearly a month old.
+> 
+> Please try to reproduce on mainline or today's linux-next.
+> 
+> 
+>> the faulty instruction points to below code path :
+>>
+>> gdb -batch vmlinux -ex 'list *(0xc000000000304fe0)'
+>> 0xc000000000304fe0 is in kmem_cache_free (mm/slab.h:231).
+>> 226	}
+>> 227	
+>> 228	static inline bool slab_equal_or_root(struct kmem_cache *s,
+>> 229					      struct kmem_cache *p)
+>> 230	{
+>> 231		return p == s || p == s->memcg_params.root_cache;
+>> 232	}
+> 
+> And s is NULL.
+> 
+> Called via:
+>   kmem_cache_free+0x210/0x2a0
+>   mempool_free_slab+0x24/0x40
+>   mempool_exit+0x50/0x90
+>   bioset_exit+0x40/0x1d0
+>   dm_io_client_destroy+0x2c/0x50
+>   dm_bufio_client_destroy+0x1fc/0x2d0 [dm_bufio]
+>   persistent_read_metadata+0x430/0x660 [dm_snapshot]
+>   snapshot_ctr+0x5c8/0x7a0 [dm_snapshot]
+>   dm_table_add_target+0x19c/0x3c0
+>   table_load+0x104/0x450
+>   ctl_ioctl+0x1f8/0x570
+>   dm_ctl_ioctl+0x18/0x30
+>   do_vfs_ioctl+0xcc/0x9e0
+>   ksys_ioctl+0x5c/0xe0
+>   sys_ioctl+0x20/0x80
+>   system_call+0x58/0x6c
+> 
+> So looks like we did:
+> 
+>   kmem_cache_free(NULL
+> 
+> Probably a bad error path that frees before the cache has been allocated.
+> 
+> mempool_init_node() calls mempool_exit() on a partially initialised
+> mempool, which looks fishy, though you're not hitting that patch AFAICS.
 
-As a band-aid, make sure that the ->read() and ->write() handlers can not
-be called in weird contexts (kernel context or credentials different from
-file opener), like for ib_safe_file_access().
-Also, completely prevent user memory accesses from ->release().
+The slab cache is setup elsewhere, it's pending_cache. So if pending_cache
+is NULL, then yeah and exit there will barf. I'd try something like the
+below, but from the trace, we already basically see the path.
 
-If someone needs to use these interfaces from different security contexts,
-a new interface should be written that goes through the ->ioctl() handler.
 
-I've mostly copypasted ib_safe_file_access() over as
-scsi_safe_file_access() because I couldn't find a good common header -
-please tell me if you know a better way.
-The duplicate pr_err_once() calls are so that each of them fires once;
-otherwise, this would probably have to be a macro.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Jann Horn <jannh@google.com>
----
-
-I'm CC-ing security@ on this patch in case someone cares a lot, but
-since you already need to have some pretty high privileges to use these
-devices in the first place, I think this can be handled publicly.
-
-In case anyone is interested in how I found these: I was looking at a
-reverse callgraph of __might_fault and spotted the ->release handler of
-block/bsg.c in there.
-
- block/bsg-lib.c          |  5 ++++-
- block/bsg.c              | 29 +++++++++++++++++++++--------
- drivers/scsi/sg.c        | 11 ++++++++++-
- include/linux/bsg.h      |  3 ++-
- include/scsi/scsi_cmnd.h | 19 +++++++++++++++++++
- 5 files changed, 56 insertions(+), 11 deletions(-)
-
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index 9419def8c017..cf5d4fdddbeb 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -53,7 +53,8 @@ static int bsg_transport_fill_hdr(struct request *rq, struct sg_io_v4 *hdr,
- 	return 0;
- }
- 
--static int bsg_transport_complete_rq(struct request *rq, struct sg_io_v4 *hdr)
-+static int bsg_transport_complete_rq(struct request *rq, struct sg_io_v4 *hdr,
-+		bool cleaning_up)
+diff --git a/include/linux/mempool.h b/include/linux/mempool.h
+index 0c964ac107c2..ebfa2f89ffdd 100644
+--- a/include/linux/mempool.h
++++ b/include/linux/mempool.h
+@@ -59,6 +59,7 @@ void mempool_free_slab(void *element, void *pool_data);
+ static inline int
+ mempool_init_slab_pool(mempool_t *pool, int min_nr, struct kmem_cache *kc)
  {
- 	struct bsg_job *job = blk_mq_rq_to_pdu(rq);
- 	int ret = 0;
-@@ -79,6 +80,8 @@ static int bsg_transport_complete_rq(struct request *rq, struct sg_io_v4 *hdr)
- 	if (job->reply_len && hdr->response) {
- 		int len = min(hdr->max_response_len, job->reply_len);
- 
-+		if (unlikely(cleaning_up))
-+			ret = -EINVAL;
- 		if (copy_to_user(uptr64(hdr->response), job->reply, len))
- 			ret = -EFAULT;
- 		else
-diff --git a/block/bsg.c b/block/bsg.c
-index 132e657e2d91..e64ef807d2d0 100644
---- a/block/bsg.c
-+++ b/block/bsg.c
-@@ -159,7 +159,8 @@ static int bsg_scsi_fill_hdr(struct request *rq, struct sg_io_v4 *hdr,
- 	return 0;
++	BUG_ON(!kc);
+ 	return mempool_init(pool, min_nr, mempool_alloc_slab,
+ 			    mempool_free_slab, (void *) kc);
  }
- 
--static int bsg_scsi_complete_rq(struct request *rq, struct sg_io_v4 *hdr)
-+static int bsg_scsi_complete_rq(struct request *rq, struct sg_io_v4 *hdr,
-+		bool cleaning_up)
+diff --git a/mm/mempool.c b/mm/mempool.c
+index b54f2c20e5e0..060f44acd0df 100644
+--- a/mm/mempool.c
++++ b/mm/mempool.c
+@@ -508,7 +508,9 @@ EXPORT_SYMBOL(mempool_alloc_slab);
+ void mempool_free_slab(void *element, void *pool_data)
  {
- 	struct scsi_request *sreq = scsi_req(rq);
- 	int ret = 0;
-@@ -179,7 +180,9 @@ static int bsg_scsi_complete_rq(struct request *rq, struct sg_io_v4 *hdr)
- 		int len = min_t(unsigned int, hdr->max_response_len,
- 					sreq->sense_len);
- 
--		if (copy_to_user(uptr64(hdr->response), sreq->sense, len))
-+		if (cleaning_up)
-+			ret = -EINVAL;
-+		else if (copy_to_user(uptr64(hdr->response), sreq->sense, len))
- 			ret = -EFAULT;
- 		else
- 			hdr->response_len = len;
-@@ -383,11 +386,12 @@ static struct bsg_command *bsg_get_done_cmd(struct bsg_device *bd)
+ 	struct kmem_cache *mem = pool_data;
+-	kmem_cache_free(mem, element);
++
++	if (!WARN_ON(!mem))
++		kmem_cache_free(mem, element);
  }
+ EXPORT_SYMBOL(mempool_free_slab);
  
- static int blk_complete_sgv4_hdr_rq(struct request *rq, struct sg_io_v4 *hdr,
--				    struct bio *bio, struct bio *bidi_bio)
-+				    struct bio *bio, struct bio *bidi_bio,
-+				    bool cleaning_up)
- {
- 	int ret;
- 
--	ret = rq->q->bsg_dev.ops->complete_rq(rq, hdr);
-+	ret = rq->q->bsg_dev.ops->complete_rq(rq, hdr, cleaning_up);
- 
- 	if (rq->next_rq) {
- 		blk_rq_unmap_user(bidi_bio);
-@@ -453,7 +457,7 @@ static int bsg_complete_all_commands(struct bsg_device *bd)
- 			break;
- 
- 		tret = blk_complete_sgv4_hdr_rq(bc->rq, &bc->hdr, bc->bio,
--						bc->bidi_bio);
-+						bc->bidi_bio, true);
- 		if (!ret)
- 			ret = tret;
- 
-@@ -488,7 +492,7 @@ __bsg_read(char __user *buf, size_t count, struct bsg_device *bd,
- 		 * bsg_complete_work() cannot do that for us
- 		 */
- 		ret = blk_complete_sgv4_hdr_rq(bc->rq, &bc->hdr, bc->bio,
--					       bc->bidi_bio);
-+					       bc->bidi_bio, false);
- 
- 		if (copy_to_user(buf, &bc->hdr, sizeof(bc->hdr)))
- 			ret = -EFAULT;
-@@ -532,6 +536,12 @@ bsg_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
- 	int ret;
- 	ssize_t bytes_read;
- 
-+	if (!scsi_safe_file_access(file)) {
-+		pr_err_once("%s: process %d (%s) changed security contexts after opening file descriptor, this is not allowed.\n",
-+			__func__, task_tgid_vnr(current), current->comm);
-+		return -EINVAL;
-+	}
-+
- 	bsg_dbg(bd, "read %zd bytes\n", count);
- 
- 	bsg_set_block(bd, file);
-@@ -608,8 +618,11 @@ bsg_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
- 
- 	bsg_dbg(bd, "write %zd bytes\n", count);
- 
--	if (unlikely(uaccess_kernel()))
-+	if (!scsi_safe_file_access(file)) {
-+		pr_err_once("%s: process %d (%s) changed security contexts after opening file descriptor, this is not allowed.\n",
-+			__func__, task_tgid_vnr(current), current->comm);
- 		return -EINVAL;
-+	}
- 
- 	bsg_set_block(bd, file);
- 
-@@ -859,7 +872,7 @@ static long bsg_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
- 
- 		at_head = (0 == (hdr.flags & BSG_FLAG_Q_AT_TAIL));
- 		blk_execute_rq(bd->queue, NULL, rq, at_head);
--		ret = blk_complete_sgv4_hdr_rq(rq, &hdr, bio, bidi_bio);
-+		ret = blk_complete_sgv4_hdr_rq(rq, &hdr, bio, bidi_bio, false);
- 
- 		if (copy_to_user(uarg, &hdr, sizeof(hdr)))
- 			return -EFAULT;
-diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
-index 53ae52dbff84..997e06a22527 100644
---- a/drivers/scsi/sg.c
-+++ b/drivers/scsi/sg.c
-@@ -393,6 +393,12 @@ sg_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
- 	struct sg_header *old_hdr = NULL;
- 	int retval = 0;
- 
-+	if (!scsi_safe_file_access(filp)) {
-+		pr_err_once("%s: process %d (%s) changed security contexts after opening file descriptor, this is not allowed.\n",
-+			__func__, task_tgid_vnr(current), current->comm);
-+		return -EINVAL;
-+	}
-+
- 	if ((!(sfp = (Sg_fd *) filp->private_data)) || (!(sdp = sfp->parentdp)))
- 		return -ENXIO;
- 	SCSI_LOG_TIMEOUT(3, sg_printk(KERN_INFO, sdp,
-@@ -581,8 +587,11 @@ sg_write(struct file *filp, const char __user *buf, size_t count, loff_t * ppos)
- 	sg_io_hdr_t *hp;
- 	unsigned char cmnd[SG_MAX_CDB_SIZE];
- 
--	if (unlikely(uaccess_kernel()))
-+	if (!scsi_safe_file_access(filp)) {
-+		pr_err_once("%s: process %d (%s) changed security contexts after opening file descriptor, this is not allowed.\n",
-+			__func__, task_tgid_vnr(current), current->comm);
- 		return -EINVAL;
-+	}
- 
- 	if ((!(sfp = (Sg_fd *) filp->private_data)) || (!(sdp = sfp->parentdp)))
- 		return -ENXIO;
-diff --git a/include/linux/bsg.h b/include/linux/bsg.h
-index dac37b6e00ec..c22bc359552a 100644
---- a/include/linux/bsg.h
-+++ b/include/linux/bsg.h
-@@ -11,7 +11,8 @@ struct bsg_ops {
- 	int	(*check_proto)(struct sg_io_v4 *hdr);
- 	int	(*fill_hdr)(struct request *rq, struct sg_io_v4 *hdr,
- 				fmode_t mode);
--	int	(*complete_rq)(struct request *rq, struct sg_io_v4 *hdr);
-+	int	(*complete_rq)(struct request *rq, struct sg_io_v4 *hdr,
-+				bool cleaning_up);
- 	void	(*free_rq)(struct request *rq);
- };
- 
-diff --git a/include/scsi/scsi_cmnd.h b/include/scsi/scsi_cmnd.h
-index aaf1e971c6a3..d22118a38aa4 100644
---- a/include/scsi/scsi_cmnd.h
-+++ b/include/scsi/scsi_cmnd.h
-@@ -8,6 +8,8 @@
- #include <linux/types.h>
- #include <linux/timer.h>
- #include <linux/scatterlist.h>
-+#include <linux/cred.h> /* for scsi_safe_file_access() */
-+#include <linux/fs.h> /* for scsi_safe_file_access() */
- #include <scsi/scsi_device.h>
- #include <scsi/scsi_request.h>
- 
-@@ -363,4 +365,21 @@ static inline unsigned scsi_transfer_length(struct scsi_cmnd *scmd)
- 	return xfer_len;
- }
- 
-+/*
-+ * The SCSI interfaces that use read() and write() as an asynchronous variant of
-+ * ioctl(..., SG_IO, ...) are fundamentally unsafe, since there are lots of ways
-+ * to trigger read() and write() calls from various contexts with elevated
-+ * privileges. This can lead to kernel memory corruption (e.g. if these
-+ * interfaces are called through splice()) and privilege escalation inside
-+ * userspace (e.g. if a process with access to such a device passes a file
-+ * descriptor to a SUID binary as stdin/stdout/stderr).
-+ *
-+ * This function provides protection for the legacy API by restricting the
-+ * calling context.
-+ */
-+static inline bool scsi_safe_file_access(struct file *filp)
-+{
-+	return filp->f_cred == current_cred() && !uaccess_kernel();
-+}
-+
- #endif /* _SCSI_SCSI_CMND_H */
+
 -- 
-2.18.0.rc1.244.gcf134e6275-goog
+Jens Axboe
