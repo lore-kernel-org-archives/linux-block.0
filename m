@@ -1,70 +1,65 @@
-Return-Path: <schmitzmic@gmail.com>
-Return-Path: <schmitzmic@gmail.com>
+Return-Path: <jdow@earthlink.net>
 Subject: Re: Subject: [PATCH RFC] block: fix Amiga RDB partition support for
  disks >= 2 TB
-To: Martin Steigerwald <martin@lichtvoll.de>
+To: Martin Steigerwald <martin@lichtvoll.de>, schmitzmic@gmail.com
+Cc: axboe@kernel.dk, geert@linux-m68k.org, linux-m68k@lists.linux-m68k.org,
+ linux-block@vger.kernel.org
 References: <20180627012421.80B8F24E094@nmr-admin>
  <2157764.1gpVE8K9i5@merkaba>
- <CAOmrzkLZCE7jPHVP0Et7L7=8UAAG80v7gpYrKpZVJADQz6PeaA@mail.gmail.com>
- <3488210.nMeMqUQulA@merkaba>
-Cc: Jens Axboe <axboe@kernel.dk>, Geert Uytterhoeven <geert@linux-m68k.org>,
- Joanne Dow <jdow@earthlink.net>, Linux/m68k
- <linux-m68k@lists.linux-m68k.org>, linux-block@vger.kernel.org
-From: Michael Schmitz <schmitzmic@gmail.com>
-Message-ID: <b39c2bf0-de19-ef6e-75bf-b9fae33255c6@gmail.com>
-Date: Thu, 28 Jun 2018 16:58:52 +1200
+From: jdow <jdow@earthlink.net>
+Message-ID: <0f756cf4-9af9-cb34-f832-5dd206e77a7f@earthlink.net>
+Date: Wed, 27 Jun 2018 20:49:58 -0700
 MIME-Version: 1.0
-In-Reply-To: <3488210.nMeMqUQulA@merkaba>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <2157764.1gpVE8K9i5@merkaba>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Martin,
+Error NNNN: Conventional RDBs cannot define more than 4,294,967,296 blocks.
+or
+Error NNNN: Conventional RDB block count overflow.
 
-Am 28.06.2018 um 09:20 schrieb Martin Steigerwald:
->>> And as stated in my other reply to the patch:
->>>
->>> partition needs 64 bit disk device support in AmigaOS or AmigaOS
->>> like
->>> operating systems (NSD64, TD64 or SCSI direct)
->>
->> I'd probably leave it at 'disk needs 64 bit disk device support on
->> native OS', and only print that warning once.
->
-> This is fine with me.
+That is a HARD limit. The documentation for error NNNN should suggest larger 
+logical block (cluster, whatever) sizes as a way out. Of course, block size 
+"could" go up to at least 65536 bytes (if the nonsense size 0 is reinterpreted). 
+Then Bob's your uncle up to 281 TB. It should also include a dry notation that 
+you are best off with a power of 2 block size larger than or equal to the disk's 
+actual sector size, if you can learn that.
 
-OK, I'll go with that.
+{^_^}
+(Get everybody)
 
->> In the interest of least surprises, we have to fix the 32 bit overflow
->> (so we can even detect that it would have happened), and give the
->> user the chance to carefully consider whether to accept the new
->> behaviour. That means refusing to make available any partition that
->> would have been affected by such overflow.
->
-> That is acceptable for me as I told before. Either mount or refuse to
-> mount, but do not overflow and mount nonetheless :)
->
-> Mind you, I am not using my Amiga machines either at the moment. And I
-> repurposed the 2 TB disk years ago.
-
-That's fine - I understand the 'profile' image was a true binary copy of 
-the RDB, and placing that file at offset 0 in an image file is a 
-legitimate use?
-
-> I would not name the kernel option "eat_my_rdb", but use a less
-> dramatizing name.
->
-> Maybe just: "allow_64bit_rdb" or something like that.
-
-I don't expect to get away with that :-)
-
-> How does the user come to know about this kernel option? Will you print
-> its name in kernel log?
-
-Depends on how easy we want to make it for users. If I put a BUG() trap 
-with the check, the resulting log section will point to a specific line 
-in block/partitions/amiga.c, from which the override option will be 
-obvious. But that might be a little too opaque for some...
-
-Cheers,
-
-	Michael
+On 20180627 01:24, Martin Steigerwald wrote:
+> Thanks a lot again for your patch.
+> 
+> schmitzmic@gmail.com - 27.06.18, 03:24:
+>> +               if (start_sect > INT_MAX || nr_sects > INT_MAX
+>> +                       || (start_sect + nr_sects) > INT_MAX) {
+>> +                       pr_err("%s: Warning: RDB partition
+>> overflow!\n", +                               bdevname(state->bdev,
+> 
+> I´d word this:
+> 
+> Warning: RDB partition 32-bit overflow
+> 
+> AmigaOS developers can do 64 bit math on a 32 bit operating system. Just
+> like Linux can.
+> 
+>> b));
+>> +                       pr_err("%s: start 0x%llX size 0x%llX\n",
+>> +                               bdevname(state->bdev, b), start_sect,
+>> +                               nr_sects);
+>> +                       pr_err("%s: partition incompatible with 32 bit
+>> OS\n", +                               bdevname(state->bdev, b));
+>> +               }
+> 
+> And as stated in my other reply to the patch:
+> 
+> partition needs 64 bit disk device support in AmigaOS or AmigaOS like
+> operating systems (NSD64, TD64 or SCSI direct)
+> 
+> see my other reply to the patch and my other mails in the
+> "Re: moving affs + RDB partition support to staging?" thread as to why.
+> And for references.
+> 
+> Thanks,
+> 
