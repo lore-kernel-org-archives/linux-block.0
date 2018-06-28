@@ -1,87 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:59311 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752077AbeFLJ5N (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Jun 2018 05:57:13 -0400
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Omar Sandoval <osandov@osandov.com>
-Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH blktests] check: add command line switch to test device drivers only
-Date: Tue, 12 Jun 2018 11:57:06 +0200
-Message-Id: <20180612095706.4831-1-jthumshirn@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+Date: Thu, 28 Jun 2018 08:08:47 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] block: Simplify the bio cloning implementation
+Message-ID: <20180628000846.GF7583@ming.t460p>
+References: <20180626222624.11739-1-bart.vanassche@wdc.com>
+ <20180627011259.GC9970@ming.t460p>
+ <5766ea06-4016-6ad1-a18a-b2c9f31788cf@wdc.com>
+ <20180627232039.GA7583@ming.t460p>
+ <6d9bb0d0-52fd-8f16-6443-dcd8867bdb7c@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <6d9bb0d0-52fd-8f16-6443-dcd8867bdb7c@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Sometimes it's useful to only run tests which exercise a device
-special driver to verify a patch for the driver doesn't introduce a
-regression.
+On Wed, Jun 27, 2018 at 04:55:20PM -0700, Bart Van Assche wrote:
+> On 06/27/18 16:21, Ming Lei wrote:
+> > What we need to do is to only copy the 1st bvec for WRITE_SAME, your patch
+> > changes to copy (bio->bi_iter.bi_size / block size) bvecs, then memory corruption
+> > may be triggered. So bio_for_each_segment() can't be used here.
+> 
+> Has it been considered to use memcpy() to copy the bi_vcnt bio_vecs instead
+> of using bio_for_each_segment() in bio_clone_bioset()? That will in this
+> context probably be even faster than using bio_for_each_segment().
 
-Running the whole test-suite is just a waste of time in this case, so
-provide a way to only run tests which have a test_device() function
-set and not a test() function.
+After immutable bvec is introduced:
 
-Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- check | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+1) there is little chance in which bvec table need to copy, so performance
+may not be a issue, as you see, bio_clone_bioset() is going to die now.
 
-diff --git a/check b/check
-index 4baa8dde2436..639fcc43f09d 100755
---- a/check
-+++ b/check
-@@ -395,6 +395,12 @@ _run_test() {
- 	. "tests/${TEST_NAME}"
- 
- 	if declare -fF test >/dev/null; then
-+		if [[ -v DEVICE_ONLY ]]; then
-+			SKIP_REASON="test excluded by user"
-+			_output_notrun "$TEST_NAME"
-+			return 0
-+		fi
-+
- 		if declare -fF requires >/dev/null && ! requires; then
- 			_output_notrun "$TEST_NAME"
- 			return 0
-@@ -546,6 +552,9 @@ Test runs:
-   -x, --exclude=TEST     exclude a test (or test group) from the list of
- 			 tests to run
- 
-+  -d --device-only       only run test which use a test device from the
-+                         TEST_DEV config setting
-+
- Miscellaneous:
-   -h, --help             display this help message and exit"
- 
-@@ -570,6 +579,7 @@ unset TEMP
- 
- # Default configuration.
- QUICK_RUN=0
-+DEVICE_ONLY=0
- EXCLUDE=()
- TEST_DEVS=()
- 
-@@ -592,6 +602,10 @@ while true; do
- 			EXCLUDE+=("$2")
- 			shift 2
- 			;;
-+		'-d'|'--device-only')
-+			DEVICE_ONLY=1
-+			shift 2
-+			;;
- 		'-h'|'--help')
- 			usage out
- 			;;
-@@ -609,6 +623,10 @@ if [[ QUICK_RUN -ne 0 && ! -v TIMEOUT ]]; then
- 	_error "QUICK_RUN specified without TIMEOUT"
- fi
- 
-+if [[ DEVICE_ONLY -ne 0 && ${#TEST_DEVS[@]} -eq 0 ]]; then
-+	_error "DEVICE_ONLY specified without TEST_DEVS"
-+fi
-+
- # Convert the exclude list to an associative array.
- TEMP_EXCLUDE=("${EXCLUDE[@]}")
- unset EXCLUDE
--- 
-2.16.4
+2) bi_vcnt/bi_io_vec can't be used directly on fast-cloned bio
+
+2) code is simplified a lot by using iterator helper since bio can be
+advanced in unit of byte. In theory, we may cook a special helper to
+speed up the copy, but still depends on use cases.
+
+thanks,
+Ming
