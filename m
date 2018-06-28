@@ -1,127 +1,129 @@
 Return-Path: <jdow@earthlink.net>
 Subject: Re: Subject: [PATCH RFC] block: fix Amiga RDB partition support for
  disks >= 2 TB
-To: Martin Steigerwald <martin@lichtvoll.de>,
+To: Geert Uytterhoeven <geert@linux-m68k.org>,
  Michael Schmitz <schmitzmic@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Geert Uytterhoeven <geert@linux-m68k.org>,
- Linux/m68k <linux-m68k@lists.linux-m68k.org>, linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, geert@linux-m68k.org-r,
+ Martin Steigerwald <martin@lichtvoll.de>,
+ linux-m68k <linux-m68k@lists.linux-m68k.org>, linux-block@vger.kernel.org
 References: <20180627012421.80B8F24E094@nmr-admin>
- <2157764.1gpVE8K9i5@merkaba>
- <CAOmrzkLZCE7jPHVP0Et7L7=8UAAG80v7gpYrKpZVJADQz6PeaA@mail.gmail.com>
- <3488210.nMeMqUQulA@merkaba>
+ <CAMuHMdUOGdF-bm8j59Om8JNV0mFqK0yixGifgLAjxGwOGLoyqQ@mail.gmail.com>
 From: jdow <jdow@earthlink.net>
-Message-ID: <0ccecc00-b603-0cbc-f9d4-01db4031f448@earthlink.net>
-Date: Wed, 27 Jun 2018 20:48:10 -0700
+Message-ID: <da9795b2-991b-ded7-dfbc-f31472bafdb1@earthlink.net>
+Date: Wed, 27 Jun 2018 20:45:18 -0700
 MIME-Version: 1.0
-In-Reply-To: <3488210.nMeMqUQulA@merkaba>
+In-Reply-To: <CAMuHMdUOGdF-bm8j59Om8JNV0mFqK0yixGifgLAjxGwOGLoyqQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Um. new 64 bit stuff must be invisible to old 32 bit stuff.
-{^_^}
+Oops! It MUST be 64 bit or everything go boom.
 
-On 20180627 14:20, Martin Steigerwald wrote:
-> Hi Michael.
+{O.O}
+
+On 20180627 06:30, Geert Uytterhoeven wrote:
+> Hi Michael,
 > 
-> Michael Schmitz - 27.06.18, 22:13:
->> On Wed, Jun 27, 2018 at 8:24 PM, Martin Steigerwald
-> <martin@lichtvoll.de> wrote:
->>> Thanks a lot again for your patch.
->>>
->>> schmitzmic@gmail.com - 27.06.18, 03:24:
->>>> +               if (start_sect > INT_MAX || nr_sects > INT_MAX
->>>> +                       || (start_sect + nr_sects) > INT_MAX) {
->>>> +                       pr_err("%s: Warning: RDB partition
->>>> overflow!\n", +                               bdevname(state->bdev,
->>>
->>> I´d word this:
->>>
->>> Warning: RDB partition 32-bit overflow
->>>
->>> AmigaOS developers can do 64 bit math on a 32 bit operating system.
->>> Just like Linux can.
+> Thanks for your patch!
+> 
+> On Wed, Jun 27, 2018 at 4:47 AM <schmitzmic@gmail.com> wrote:
+>>  From 5299e0e64dfb33ac3a1f3137b42178734ce20087 Mon Sep 17 00:00:00 2001
+> 
+> ??
+> 
+>> The Amiga RDB partition parser module uses int for partition sector
+>> address and count, which will overflow for disks 2 TB and larger.
 >>
->> Yes, I realize that. I hadn't gone back through all the mails on the
->> subject to find out what the exact requrements are on the AmigaOS
->> side.
+>> Use sector_t as type for sector address and size (as expected by
+>> put_partition) to allow using such disks without danger of data
+>> corruption.
+> 
+> Note that sector_t is not guaranteed to be 64-bit:
+> 
+>      #ifdef CONFIG_LBDAF
+>      typedef u64 sector_t;
+>      typedef u64 blkcnt_t;
+>      #else
+>      typedef unsigned long sector_t;
+>      typedef unsigned long blkcnt_t;
+>      #endif
+> 
+> And it seems CONFIG_LBDAF can still be disabled on 32-bit...
+> 
+>> This bug was reported originally in 2012 by Martin Steigerwald
+>> <Martin@lichtvoll.de>, and the fix was created by the RDB author,
+>> Joanne Dow <jdow@earthlink.net>. The patch had been discussed and
+>> reviewed on linux-m68k at that time but never officially submitted.
 >>
->> Just trying to be as terse as possible to keep checkpatch happy :-(
+>> Following a stern warning by Joanne, a warning is printed if any
+>> partition is found to overflow the old 32 bit calculations, on the
+>> grounds that such a partition would be misparses on legacy 32 bit
+>> systems (other than Linux).
 >>
->>>> b));
->>>> +                       pr_err("%s: start 0x%llX size 0x%llX\n",
->>>> +                               bdevname(state->bdev, b),
->>>> start_sect,
->>>> +                               nr_sects);
->>>> +                       pr_err("%s: partition incompatible with 32
->>>> bit OS\n", +                               bdevname(state->bdev,
->>>> b)); +               }
->>>
->>> And as stated in my other reply to the patch:
->>>
->>> partition needs 64 bit disk device support in AmigaOS or AmigaOS
->>> like
->>> operating systems (NSD64, TD64 or SCSI direct)
+>> Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=43511
+>> Reported-by: Martin Steigerwald <Martin@lichtvoll.de>
+>> Message-ID: <201206192146.09327.Martin@lichtvoll.de>
+>> Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
+>> Tested-by: Martin Steigerwald <Martin@lichtvoll.de>
+>> Tested-by: Michael Schmitz <schmitzmic@gmail.com>
+>> ---
+>>   block/partitions/amiga.c | 13 ++++++++++++-
+>>   1 file changed, 12 insertions(+), 1 deletion(-)
 >>
->> I'd probably leave it at 'disk needs 64 bit disk device support on
->> native OS', and only print that warning once.
+>> diff --git a/block/partitions/amiga.c b/block/partitions/amiga.c
+>> index 5609366..42c3f38 100644
+>> --- a/block/partitions/amiga.c
+>> +++ b/block/partitions/amiga.c
+>> @@ -32,7 +32,8 @@ int amiga_partition(struct parsed_partitions *state)
+>>          unsigned char *data;
+>>          struct RigidDiskBlock *rdb;
+>>          struct PartitionBlock *pb;
+>> -       int start_sect, nr_sects, blk, part, res = 0;
+>> +       sector_t start_sect, nr_sects;
 > 
-> This is fine with me.
+> As sector_t can still be 32-bit, I think you should use an explicit u64 here.
 > 
->> Geert has raised another important point about 64 bt device support -
->> all this is moot when the Linux kernel wasn't built with large block
->> device support enabled (you'd get the same buggy behaviour as before
->> the patch there).
->>
->>> see my other reply to the patch and my other mails in the
->>> "Re: moving affs + RDB partition support to staging?" thread as to
->>> why. And for references.
->>
->> Thanks for collating all the references. Please understand that I
->> can't read all of that, and as a simple patch mechanic I won't even
->> try to grasp all the subtleties of RDB (I don't even own an Amiga so I
->> am quite unlikey to ever use this code path).
+>> +       int blk, part, res = 0;
+>>          int blksize = 1;        /* Multiplier for disk block size */
+>>          int slot = 1;
+>>          char b[BDEVNAME_SIZE];
+>> @@ -111,6 +112,16 @@ int amiga_partition(struct parsed_partitions *state)
+>>                               be32_to_cpu(pb->pb_Environment[3]) *
+>>                               be32_to_cpu(pb->pb_Environment[5]) *
+>>                               blksize;
 > 
-> I understand that.
+> Without adding any unsigned long long or ULL stuff to the calculations
+> for start_sect and nr_sects above, the math will still be done using 32-bit
+> arithmetic. Or am I missing something?
 > 
->> But please also understand that for that reason, I take Joanne's
->> advice about backwards compatibility very serious. My patch (actually
->> Joanne's originally) changes kernel behaviour from what we consider
->> broken (allowing 32 bit overflow in partition address calculations) to
->> what we think is the right thing to do. But there might be someone
->> out there who used the current behaviour to craft a RDB that aliows
->> two separate sets of partitions to coexist on the same disk (one set
->> visible to 32 bit disk drivers, before the 32 bit overflow mark, and
->> a second set above that mark, visible only to 64 bit drivers.
->> Silently changing our parser behaviour might cause said user to now
->> trash data past the overflow mark.). This is a little contrived, and
->> perhaps I am overcomplicating matters (again), but can't be ruled
->> out.
->>
->> In the interest of least surprises, we have to fix the 32 bit overflow
->> (so we can even detect that it would have happened), and give the
->> user the chance to carefully consider whether to accept the new
->> behaviour. That means refusing to make available any partition that
->> would have been affected by such overflow.
+>> +               if (start_sect > INT_MAX || nr_sects > INT_MAX
+>> +                       || (start_sect + nr_sects) > INT_MAX) {
+>> +                       pr_err("%s: Warning: RDB partition overflow!\n",
+>> +                               bdevname(state->bdev, b));
+>> +                       pr_err("%s: start 0x%llX size 0x%llX\n",
+>> +                               bdevname(state->bdev, b), start_sect,
+>> +                               nr_sects);
+>> +                       pr_err("%s: partition incompatible with 32 bit OS\n",
+>> +                               bdevname(state->bdev, b));
+>> +               }
 > 
-> That is acceptable for me as I told before. Either mount or refuse to
-> mount, but do not overflow and mount nonetheless :)
+> I don't know if the check above is really needed here.
+> There's also int vs. unsigned int. But see below.
 > 
-> Mind you, I am not using my Amiga machines either at the moment. And I
-> repurposed the 2 TB disk years ago.
->   
->> The user has then all options available - force old behaviour by using
->> an older kernel, override the parser to force new behaviour (which we
->> all assume is correct), or leave the disk well alone.
+>>                  put_partition(state,slot++,start_sect,nr_sects);
 > 
-> Sure.
+> Given sector_t may be 32-bit, values may be truncated when calling
+> put_partition(), so you need to check for that.
 > 
-> I would not name the kernel option "eat_my_rdb", but use a less
-> dramatizing name.
+> Interestingly, even partition parsers that do use u64 (efi, ldm) or loff_t
+> (ibm) do not have such checks.
 > 
-> Maybe just: "allow_64bit_rdb" or something like that.
+> Perhaps put_partition() should take u64, and print a warning and ignore the
+> partition if conversion to sector_t involves truncation?
 > 
-> How does the user come to know about this kernel option? Will you print
-> its name in kernel log?
+>>                  {
+>>                          /* Be even more informative to aid mounting */
 > 
-> Thanks,
+> Gr{oetje,eeting}s,
+> 
+>                          Geert
 > 
