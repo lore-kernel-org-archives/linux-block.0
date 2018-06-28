@@ -1,46 +1,65 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Thu, 28 Jun 2018 09:27:08 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
 	Kashyap Desai <kashyap.desai@broadcom.com>,
 	Laurence Oberman <loberman@redhat.com>,
-	Omar Sandoval <osandov@fb.com>, Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH 1/3] blk-mq: use list_splice_tail() to insert requests
-Message-ID: <20180628072708.o2l56feqtdfbqail@linux-x5ow.site>
+	Omar Sandoval <osandov@fb.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH 1/3] blk-mq: use list_splice_tail() to insert requests
+Date: Thu, 28 Jun 2018 11:19:16 +0800
+Message-Id: <20180628031918.17694-2-ming.lei@redhat.com>
+In-Reply-To: <20180628031918.17694-1-ming.lei@redhat.com>
 References: <20180628031918.17694-1-ming.lei@redhat.com>
- <20180628031918.17694-2-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20180628031918.17694-2-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Ming,
+list_splice_tail() is much more faster than inserting each
+request one by one, given all requets in 'list' belong to
+same sw queue and ctx->lock is required to insert requests.
 
-On Thu, Jun 28, 2018 at 11:19:16AM +0800, Ming Lei wrote:
-> +	list_for_each_entry(rq, list, queuelist) {
->  		BUG_ON(rq->mq_ctx != ctx);
-> -		list_del_init(&rq->queuelist);
-> -		__blk_mq_insert_req_list(hctx, rq, false);
-> +		trace_block_rq_insert(hctx->queue, rq);
->  	}
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Laurence Oberman <loberman@redhat.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Reported-by: Kashyap Desai <kashyap.desai@broadcom.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-I wonder if we really need the above loop unconditionally. It does
-some BUG_ON() sanity checking (which I hate but it was already there
-so not your problem) and tracing of the request insertion.
-
-So can we maybe only run this loop if tracing is enabled? Not sure if
-this is possible though. Maybe Steven (Cced) can help here.
-
-Byte,
-     Johannes
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 70c65bb6c013..20b0519cb3b8 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1533,19 +1533,19 @@ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+ 			    struct list_head *list)
+ 
+ {
++	struct request *rq;
++
+ 	/*
+ 	 * preemption doesn't flush plug list, so it's possible ctx->cpu is
+ 	 * offline now
+ 	 */
+-	spin_lock(&ctx->lock);
+-	while (!list_empty(list)) {
+-		struct request *rq;
+-
+-		rq = list_first_entry(list, struct request, queuelist);
++	list_for_each_entry(rq, list, queuelist) {
+ 		BUG_ON(rq->mq_ctx != ctx);
+-		list_del_init(&rq->queuelist);
+-		__blk_mq_insert_req_list(hctx, rq, false);
++		trace_block_rq_insert(hctx->queue, rq);
+ 	}
++
++	spin_lock(&ctx->lock);
++	list_splice_tail(list, &ctx->rq_list);
+ 	blk_mq_hctx_mark_pending(hctx, ctx);
+ 	spin_unlock(&ctx->lock);
+ }
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.9.5
