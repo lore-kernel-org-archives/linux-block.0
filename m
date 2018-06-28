@@ -1,52 +1,39 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:26982 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933858AbeFVWTv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jun 2018 18:19:51 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Omar Sandoval <osandov@fb.com>
-Cc: linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH blktests 10/15] tests/meta/group: Fix shellcheck complaints
-Date: Fri, 22 Jun 2018 15:19:41 -0700
-Message-Id: <20180622221946.10987-11-bart.vanassche@wdc.com>
-In-Reply-To: <20180622221946.10987-1-bart.vanassche@wdc.com>
-References: <20180622221946.10987-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 0/5] blk-mq: dispatch related cleanup, fix and
+ optimization
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+ Andrew Jones <drjones@redhat.com>, Bart Van Assche <bart.vanassche@wdc.com>,
+ linux-scsi@vger.kernel.org, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, Christoph Hellwig <hch@lst.de>
+References: <20180625113149.29449-1-ming.lei@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <33a6764d-7fc8-fc46-65ae-33310a627abd@kernel.dk>
+Date: Thu, 28 Jun 2018 13:21:16 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180625113149.29449-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Avoid that shellcheck complains about unused global variables.
-Avoid that shellcheck complains about using cat instead of
-redirection.
+On 6/25/18 5:31 AM, Ming Lei wrote:
+> Hi,
+> 
+> The 1st two patches cleanes up blk_mq_get_driver_tag() and
+> blk_mq_mark_tag_wait().
+> 
+> The 3rd patch fixes one race between adding hctx->dispatch_wait to
+> wq and removing it from wq.
+> 
+> The 4th patch avoids to iterate on all queues which share same tags
+> after completing one request, so that we can kill the synchronize_rcu()
+> in patch of queue cleanup, then long delay can be avoided during SCSI LUN
+> probe. Meantime IO performance can be improved.
+> 
+> The 5th patch avoids to synchronizing rcu in blk_cleanup_queue() when
+> queue isn't initialized, so long delay can be avoided during SCSI LUN
+> probe too.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
----
- tests/meta/group | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Looks good to me, applied for 4.19.
 
-diff --git a/tests/meta/group b/tests/meta/group
-index 4281ea175a78..bae91281c493 100644
---- a/tests/meta/group
-+++ b/tests/meta/group
-@@ -17,6 +17,8 @@
- # You should have received a copy of the GNU General Public License
- # along with this program.  If not, see <http://www.gnu.org/licenses/>.
- 
-+. common/shellcheck
-+
- group_requires() {
- 	if [[ -v META_REQUIRES_SKIP ]]; then
- 		SKIP_REASON="META_REQUIRES_SKIP was set"
-@@ -76,7 +78,7 @@ RIP: blk_dev_init+0x4/0x6 RSP: ffffc9000031fe70
- ---[ end trace d9ab35f734a89f58 ]---
- EOF
- 
--	cat "$TMPDIR/dmesg" | while IFS= read -r line; do
-+	while IFS= read -r line; do
- 		echo "$line" >> /dev/kmsg
--	done
-+	done < "$TMPDIR/dmesg"
- }
 -- 
-2.17.1
+Jens Axboe
