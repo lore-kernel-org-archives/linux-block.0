@@ -1,20 +1,22 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] block: Fix cloning of requests with a special payload
+Return-Path: <msnitzer@redhat.com>
+Date: Thu, 28 Jun 2018 11:33:11 -0400
+From: Mike Snitzer <snitzer@redhat.com>
 To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Mike Snitzer <snitzer@redhat.com>, Ming Lei <ming.lei@redhat.com>,
- Hannes Reinecke <hare@suse.com>, Johannes Thumshirn <jthumshirn@suse.de>,
- stable@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>, stable@vger.kernel.org
+Subject: Re: block: Fix cloning of requests with a special payload
+Message-ID: <20180628153311.GB17723@redhat.com>
 References: <20180627195518.13958-1-bart.vanassche@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <78b15945-3457-f09f-4c67-0fcfdb9b78a2@kernel.dk>
-Date: Thu, 28 Jun 2018 09:51:41 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180627195518.13958-1-bart.vanassche@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 6/27/18 1:55 PM, Bart Van Assche wrote:
+On Wed, Jun 27 2018 at  3:55pm -0400,
+Bart Van Assche <bart.vanassche@wdc.com> wrote:
+
 > This patch avoids that removing a path controlled by the dm-mpath driver
 > while mkfs is running triggers the following kernel bug:
 > 
@@ -31,8 +33,14 @@ On 6/27/18 1:55 PM, Bart Van Assche wrote:
 >      smp_call_function_single_interrupt+0x90/0x330
 >      call_function_single_interrupt+0xf/0x20
 >      </IRQ>
+> 
+> Fixes: f9d03f96b988 ("block: improve handling of the magic discard payload")
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Mike Snitzer <snitzer@redhat.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> Cc: <stable@vger.kernel.org>
 
-Thanks Bart, applied for 4.18.
-
--- 
-Jens Axboe
+Acked-by: Mike Snitzer <snitzer@redhat.com>
