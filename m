@@ -1,36 +1,28 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk, hch@lst.de
-Cc: jejb@linux.vnet.ibm.com, martin.petersen@oracle.com,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] block: export __blk_complete_request
-Date: Fri, 15 Jun 2018 09:57:26 +0800
-Message-Id: <1529027847-29085-1-git-send-email-jianchao.w.wang@oracle.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:34275 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751344AbeF1Gmh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Jun 2018 02:42:37 -0400
+Date: Thu, 28 Jun 2018 08:42:35 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH blktests v2 2/3] Add the discontiguous-io test program
+Message-ID: <20180628064235.nmejhdtnb6x2q37e@linux-x5ow.site>
+References: <20180627214908.26379-1-bart.vanassche@wdc.com>
+ <20180627214908.26379-3-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180627214908.26379-3-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-After f6e7d48 (block: remove BLK_EH_HANDLED), LLDD is responsible
-to complete the timed out request, however, for blk-legacy, the
-'complete' is still marked, blk_complete_request will do nothing,
-we export __blk_complete_request for LLDD to complete the request
-in timeout path.
-
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
----
- block/blk-softirq.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/block/blk-softirq.c b/block/blk-softirq.c
-index 01e2b35..15c1f5e 100644
---- a/block/blk-softirq.c
-+++ b/block/blk-softirq.c
-@@ -144,6 +144,7 @@ void __blk_complete_request(struct request *req)
- 
- 	local_irq_restore(flags);
- }
-+EXPORT_SYMBOL(__blk_complete_request);
- 
- /**
-  * blk_complete_request - end I/O on a request
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.7.4
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
