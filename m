@@ -1,49 +1,29 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V7 05/24] md: remove a bogus comment
-Date: Wed, 27 Jun 2018 20:45:29 +0800
-Message-Id: <20180627124548.3456-6-ming.lei@redhat.com>
-In-Reply-To: <20180627124548.3456-1-ming.lei@redhat.com>
-References: <20180627124548.3456-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:34065 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753340AbeF1Gla (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Jun 2018 02:41:30 -0400
+Date: Thu, 28 Jun 2018 08:41:28 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH blktests v2 1/3] src/Makefile: Rename $(TARGETS) into
+ $(C_TARGETS)
+Message-ID: <20180628064128.vjx7vn5glnsxz5a5@linux-x5ow.site>
+References: <20180627214908.26379-1-bart.vanassche@wdc.com>
+ <20180627214908.26379-2-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180627214908.26379-2-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
-
-The function name mentioned doesn't exist, and the code next to it
-doesn't match the description either.
-
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/md.c | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 29b0cd9ec951..81f458514ac0 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -204,10 +204,6 @@ static int start_readonly;
-  */
- static bool create_on_open = true;
- 
--/* bio_clone_mddev
-- * like bio_clone_bioset, but with a local bio set
-- */
--
- struct bio *bio_alloc_mddev(gfp_t gfp_mask, int nr_iovecs,
- 			    struct mddev *mddev)
- {
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.9.5
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
