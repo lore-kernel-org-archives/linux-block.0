@@ -1,11 +1,7 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:53132 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750962AbeF1CBw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jun 2018 22:01:52 -0400
-Subject: Re: [PATCH V7 20/24] bcache: avoid to use bio_for_each_segment_all()
- in bch_bio_alloc_pages()
-To: Ming Lei <ming.lei@redhat.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Thu, 28 Jun 2018 09:28:18 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Coly Li <colyli@suse.de>
 Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
         Kent Overstreet <kent.overstreet@gmail.com>,
         David Sterba <dsterba@suse.cz>,
@@ -18,69 +14,62 @@ Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
         Filipe Manana <fdmanana@gmail.com>,
         Randy Dunlap <rdunlap@infradead.org>,
         linux-bcache@vger.kernel.org
+Subject: Re: [PATCH V7 20/24] bcache: avoid to use bio_for_each_segment_all()
+ in bch_bio_alloc_pages()
+Message-ID: <20180628012816.GH7583@ming.t460p>
 References: <20180627124548.3456-1-ming.lei@redhat.com>
  <20180627124548.3456-21-ming.lei@redhat.com>
  <e1499d87-62b8-40a8-75a5-d9d1d81ce9c5@suse.de>
- <20180628012816.GH7583@ming.t460p>
-From: Coly Li <colyli@suse.de>
-Message-ID: <92ae1547-39b1-472c-efbe-c0a6430fc3f6@suse.de>
-Date: Thu, 28 Jun 2018 10:01:39 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180628012816.GH7583@ming.t460p>
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <e1499d87-62b8-40a8-75a5-d9d1d81ce9c5@suse.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On 2018/6/28 9:28 AM, Ming Lei wrote:
-> On Wed, Jun 27, 2018 at 11:55:33PM +0800, Coly Li wrote:
->> On 2018/6/27 8:45 PM, Ming Lei wrote:
->>> bch_bio_alloc_pages() is always called on one new bio, so it is safe
->>> to access the bvec table directly. Given it is the only kind of this
->>> case, open code the bvec table access since bio_for_each_segment_all()
->>> will be changed to support for iterating over multipage bvec.
->>>
->>> Cc: Coly Li <colyli@suse.de>
->>> Cc: linux-bcache@vger.kernel.org
->>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->>> ---
->>>  drivers/md/bcache/util.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
->>> index fc479b026d6d..9f2a6fd5dfc9 100644
->>> --- a/drivers/md/bcache/util.c
->>> +++ b/drivers/md/bcache/util.c
->>> @@ -268,7 +268,7 @@ int bch_bio_alloc_pages(struct bio *bio, gfp_t gfp_mask)
->>>  	int i;
->>>  	struct bio_vec *bv;
->>>
->>
->> Hi Ming,
->>
->>> -	bio_for_each_segment_all(bv, bio, i) {
->>> +	for (i = 0, bv = bio->bi_io_vec; i < bio->bi_vcnt; bv++) {
->>
->>
->> Is it possible to treat this as a special condition of
->> bio_for_each_segement_all() ? I mean only iterate one time in
->> bvec_for_each_segment(). I hope the above change is not our last choice
->> before I reply an Acked-by :-)
+On Wed, Jun 27, 2018 at 11:55:33PM +0800, Coly Li wrote:
+> On 2018/6/27 8:45 PM, Ming Lei wrote:
+> > bch_bio_alloc_pages() is always called on one new bio, so it is safe
+> > to access the bvec table directly. Given it is the only kind of this
+> > case, open code the bvec table access since bio_for_each_segment_all()
+> > will be changed to support for iterating over multipage bvec.
+> > 
+> > Cc: Coly Li <colyli@suse.de>
+> > Cc: linux-bcache@vger.kernel.org
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  drivers/md/bcache/util.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
+> > index fc479b026d6d..9f2a6fd5dfc9 100644
+> > --- a/drivers/md/bcache/util.c
+> > +++ b/drivers/md/bcache/util.c
+> > @@ -268,7 +268,7 @@ int bch_bio_alloc_pages(struct bio *bio, gfp_t gfp_mask)
+> >  	int i;
+> >  	struct bio_vec *bv;
+> > 
 > 
-> Now the bvec from bio_for_each_segement_all() can't be changed any more
-> since the referenced 'bvec' is generated in-flight given we store
-> real multipage bvec.
+> Hi Ming,
 > 
-> BTW, this way is actually suggested by Christoph for saving one new
-> helper of bio_for_each_bvec_all() as done in V6, and per previous discussion,
-> seems both Kent and Christoph agrees to convert bcache into bio_add_page()
-> finally.
+> > -	bio_for_each_segment_all(bv, bio, i) {
+> > +	for (i = 0, bv = bio->bi_io_vec; i < bio->bi_vcnt; bv++) {
 > 
-> So I guess this open code style should be fine.
+> 
+> Is it possible to treat this as a special condition of
+> bio_for_each_segement_all() ? I mean only iterate one time in
+> bvec_for_each_segment(). I hope the above change is not our last choice
+> before I reply an Acked-by :-)
 
-Hi Ming,
+Now the bvec from bio_for_each_segement_all() can't be changed any more
+since the referenced 'bvec' is generated in-flight given we store
+real multipage bvec.
 
-I see, thanks for the hint.
+BTW, this way is actually suggested by Christoph for saving one new
+helper of bio_for_each_bvec_all() as done in V6, and per previous discussion,
+seems both Kent and Christoph agrees to convert bcache into bio_add_page()
+finally.
 
-Acked-by: Coly Li <colyli@suse.de>
+So I guess this open code style should be fine.
 
-Coly Li
+Thanks,
+Ming
