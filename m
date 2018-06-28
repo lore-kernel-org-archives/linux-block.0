@@ -1,128 +1,86 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com,
-	akpm@linux-foundation.org,
-	hannes@cmpxchg.org,
-	linux-kernel@vger.kernel.org,
-	tj@kernel.org,
-	linux-fsdevel@vger.kernel.org
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 13/15] Documentation: add a doc for blk-iolatency
-Date: Mon, 25 Jun 2018 11:12:41 -0400
-Message-Id: <20180625151243.2132-14-josef@toxicpanda.com>
-In-Reply-To: <20180625151243.2132-1-josef@toxicpanda.com>
-References: <20180625151243.2132-1-josef@toxicpanda.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:53132 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750962AbeF1CBw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Jun 2018 22:01:52 -0400
+Subject: Re: [PATCH V7 20/24] bcache: avoid to use bio_for_each_segment_all()
+ in bch_bio_alloc_pages()
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        David Sterba <dsterba@suse.cz>,
+        Huang Ying <ying.huang@intel.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Filipe Manana <fdmanana@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        linux-bcache@vger.kernel.org
+References: <20180627124548.3456-1-ming.lei@redhat.com>
+ <20180627124548.3456-21-ming.lei@redhat.com>
+ <e1499d87-62b8-40a8-75a5-d9d1d81ce9c5@suse.de>
+ <20180628012816.GH7583@ming.t460p>
+From: Coly Li <colyli@suse.de>
+Message-ID: <92ae1547-39b1-472c-efbe-c0a6430fc3f6@suse.de>
+Date: Thu, 28 Jun 2018 10:01:39 +0800
+MIME-Version: 1.0
+In-Reply-To: <20180628012816.GH7583@ming.t460p>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Josef Bacik <jbacik@fb.com>
+On 2018/6/28 9:28 AM, Ming Lei wrote:
+> On Wed, Jun 27, 2018 at 11:55:33PM +0800, Coly Li wrote:
+>> On 2018/6/27 8:45 PM, Ming Lei wrote:
+>>> bch_bio_alloc_pages() is always called on one new bio, so it is safe
+>>> to access the bvec table directly. Given it is the only kind of this
+>>> case, open code the bvec table access since bio_for_each_segment_all()
+>>> will be changed to support for iterating over multipage bvec.
+>>>
+>>> Cc: Coly Li <colyli@suse.de>
+>>> Cc: linux-bcache@vger.kernel.org
+>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>>> ---
+>>>  drivers/md/bcache/util.c | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
+>>> index fc479b026d6d..9f2a6fd5dfc9 100644
+>>> --- a/drivers/md/bcache/util.c
+>>> +++ b/drivers/md/bcache/util.c
+>>> @@ -268,7 +268,7 @@ int bch_bio_alloc_pages(struct bio *bio, gfp_t gfp_mask)
+>>>  	int i;
+>>>  	struct bio_vec *bv;
+>>>
+>>
+>> Hi Ming,
+>>
+>>> -	bio_for_each_segment_all(bv, bio, i) {
+>>> +	for (i = 0, bv = bio->bi_io_vec; i < bio->bi_vcnt; bv++) {
+>>
+>>
+>> Is it possible to treat this as a special condition of
+>> bio_for_each_segement_all() ? I mean only iterate one time in
+>> bvec_for_each_segment(). I hope the above change is not our last choice
+>> before I reply an Acked-by :-)
+> 
+> Now the bvec from bio_for_each_segement_all() can't be changed any more
+> since the referenced 'bvec' is generated in-flight given we store
+> real multipage bvec.
+> 
+> BTW, this way is actually suggested by Christoph for saving one new
+> helper of bio_for_each_bvec_all() as done in V6, and per previous discussion,
+> seems both Kent and Christoph agrees to convert bcache into bio_add_page()
+> finally.
+> 
+> So I guess this open code style should be fine.
 
-A basic documentation to describe the interface, statistics, and
-behavior of io.latency.
+Hi Ming,
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- Documentation/cgroup-v2.txt | 79 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 79 insertions(+)
+I see, thanks for the hint.
 
-diff --git a/Documentation/cgroup-v2.txt b/Documentation/cgroup-v2.txt
-index 74cdeaed9f7a..f6684ec99720 100644
---- a/Documentation/cgroup-v2.txt
-+++ b/Documentation/cgroup-v2.txt
-@@ -51,6 +51,9 @@ v1 is available under Documentation/cgroup-v1/.
-      5-3. IO
-        5-3-1. IO Interface Files
-        5-3-2. Writeback
-+       5-3-3. IO Latency
-+         5-3-3-1. How IO Latency Throttling Works
-+         5-3-3-2. IO Latency Interface Files
-      5-4. PID
-        5-4-1. PID Interface Files
-      5-5. Device
-@@ -1395,6 +1398,82 @@ writeback as follows.
- 	vm.dirty[_background]_ratio.
- 
- 
-+IO Latency
-+~~~~~~~~~~
-+
-+This is a cgroup v2 controller for IO workload protection.  You provide a group
-+with a latency target, and if the average latency exceeds that target the
-+controller will throttle any peers that have a lower latency target than the
-+protected workload.
-+
-+The limits are only applied at the peer level in the hierarchy.  This means that
-+in the diagram below, only groups A, B, and C will influence each other, and
-+groups D and F will influence each other.  Group G will influence nobody.
-+
-+			[root]
-+		/	   |		\
-+		A	   B		C
-+	       /  \        |
-+	      D    F	   G
-+
-+
-+So the ideal way to configure this is to set io.latency in groups A, B, and C.
-+Generally you do not want to set a value lower than the latency your device
-+supports.  Experiment to find the value that works best for your workload, start
-+at higher than the expected latency for your device and watch the total_lat_avg
-+value in io.stat for your workload group to get an idea of the latency you see
-+during normal operation.  Use this value as a basis for your real setting,
-+setting at 10-15% higher than the value in io.stat.  Experimentation is key here
-+because total_lat_avg is a running total, so is the "statistics" portion of
-+"lies, damned lies, and statistics."
-+
-+How IO Latency Throttling Works
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+io.latency is work conserving, so as long as everybody is meeting their latency
-+target the controller doesn't do anything.  Once a group starts missing it's
-+target it begins throttling any peer group that has a higher target than itself.
-+This throttling takes 2 forms:
-+
-+- Queue depth throttling.  This is the number of outstanding IO's a group is
-+  allowed to have.  We will clamp down relatively quickly, starting at no limit
-+  and going all the way down to 1 IO at a time.
-+
-+- Artificial delay induction.  There are certain types of IO that cannot be
-+  throttled without possibly adversely affecting higher priority groups.  This
-+  includes swapping and metadata IO.  These types of IO are allowed to occur
-+  normally, however they are "charged" to the originating group.  If the
-+  originating group is being throttled you will see the use_delay and delay
-+  fields in io.stat increase.  The delay value is how many microseconds that are
-+  being added to any process that runs in this group.  Because this number can
-+  grow quite large if there is a lot of swapping or metadata IO occurring we
-+  limit the individual delay events to 1 second at a time.
-+
-+Once the victimized group starts meeting it's latency target again it will start
-+unthrottling any peer groups that were throttled previously.  If the victimized
-+group simply stops doing IO the global counter will unthrottle appropriately.
-+
-+IO Latency Interface Files
-+~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+  io.latency
-+	This takes a similar format as the other controllers.
-+
-+		"MAJOR:MINOR target=<target time in microseconds"
-+
-+  io.stat
-+	If the controller is enabled you will see extra stats in io.stat in
-+	addition to the normal ones.
-+
-+	  depth
-+		This is the current queue depth for the group.
-+
-+	  avg_lat
-+		The running average IO latency for this group in microseconds.
-+		Running average is generally flawed, but will give an
-+		administrator a general idea of the overall latency they can
-+		expect for their workload on the given disk.
-+
- PID
- ---
- 
--- 
-2.14.3
+Acked-by: Coly Li <colyli@suse.de>
+
+Coly Li
