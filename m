@@ -1,86 +1,32 @@
-Return-Path: <minwoo.im.dev@gmail.com>
-Return-Path: <minwoo.im.dev@gmail.com>
-From: Minwoo Im <minwoo.im.dev@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Minwoo Im <minwoo.im.dev@gmail.com>
-Subject: [PATCH] blk-mq: code clean-up by adding an API to clear set->mq_map
-Date: Sun,  1 Jul 2018 01:21:39 +0900
-Message-Id: <1530375699-20461-1-git-send-email-minwoo.im.dev@gmail.com>
+Return-Path: <hch@lst.de>
+Date: Fri, 29 Jun 2018 10:35:02 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Laurence Oberman <loberman@redhat.com>,
+	Omar Sandoval <osandov@fb.com>, Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: Re: [PATCH V2 2/3] blk-mq: only attempt to merge bio if there is
+	rq in sw queue
+Message-ID: <20180629083502.GD15870@lst.de>
+References: <20180629081252.13836-1-ming.lei@redhat.com> <20180629081252.13836-3-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180629081252.13836-3-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-set->mq_map is now currently cleared if something goes wrong when
-establishing a queue map in blk-mq-pci.c.  It's also cleared before
-updating a queue map in blk_mq_update_queue_map().
+On Fri, Jun 29, 2018 at 04:12:51PM +0800, Ming Lei wrote:
+> Only attempt to merge bio iff the ctx->rq_list isn't empty, because:
+> 
+> 1) for high-performance SSD, most of times dispatch may succeed, then
+> there may be nothing left in ctx->rq_list, so don't try to merge over
+> sw queue if it is empty, then we can save one acquiring of ctx->lock
+> 
+> 2) we can't expect good merge performance on per-cpu sw queue, and missing
+> one merge on sw queue won't be a big deal since tasks can be scheduled from
+> one CPU to another.
 
-This patch provides an API to clear set->mq_map to make it clear.
+Looks good,
 
-Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
----
- block/blk-mq-pci.c     |  3 +--
- block/blk-mq.c         | 13 ++++++++++---
- include/linux/blk-mq.h |  1 +
- 3 files changed, 12 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-mq-pci.c b/block/blk-mq-pci.c
-index e233996..ccb9d7e 100644
---- a/block/blk-mq-pci.c
-+++ b/block/blk-mq-pci.c
-@@ -48,8 +48,7 @@ int blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev,
- 
- fallback:
- 	WARN_ON_ONCE(set->nr_hw_queues > 1);
--	for_each_possible_cpu(cpu)
--		set->mq_map[cpu] = 0;
-+	blk_mq_clear_mq_map(set);
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(blk_mq_pci_map_queues);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b429d51..c5f9ee1 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2672,10 +2672,18 @@ static int blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
- 	return 0;
- }
- 
-+void blk_mq_clear_mq_map(struct blk_mq_tag_set *set)
-+{
-+	int cpu;
-+
-+	for_each_possible_cpu(cpu)
-+		set->mq_map[cpu] = 0;
-+}
-+EXPORT_SYMBOL(blk_mq_clear_mq_map);
-+
- static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
- {
- 	if (set->ops->map_queues) {
--		int cpu;
- 		/*
- 		 * transport .map_queues is usually done in the following
- 		 * way:
-@@ -2690,8 +2698,7 @@ static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
- 		 * killing stale mapping since one CPU may not be mapped
- 		 * to any hw queue.
- 		 */
--		for_each_possible_cpu(cpu)
--			set->mq_map[cpu] = 0;
-+		blk_mq_clear_mq_map(set);
- 
- 		return set->ops->map_queues(set);
- 	} else
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index e3147eb..18390dc 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -204,6 +204,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- int blk_mq_register_dev(struct device *, struct request_queue *);
- void blk_mq_unregister_dev(struct device *, struct request_queue *);
- 
-+void blk_mq_clear_mq_map(struct blk_mq_tag_set *set);
- int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set);
- void blk_mq_free_tag_set(struct blk_mq_tag_set *set);
- 
--- 
-2.7.4
+Reviewed-by: Christoph Hellwig <hch@lst.de>
