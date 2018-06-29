@@ -1,23 +1,19 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] drbd: Do not redefine __must_hold()
+Return-Path: <hch@lst.de>
+Date: Fri, 29 Jun 2018 10:58:44 +0200
+From: Christoph Hellwig <hch@lst.de>
 To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Philipp Reisner <philipp.reisner@linbit.com>,
- Lars Ellenberg <lars.ellenberg@linbit.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>
+Subject: Re: [PATCH] drbd: Do not redefine __must_hold()
+Message-ID: <20180629085844.GB16441@lst.de>
 References: <20180625225100.4352-1-bart.vanassche@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <45765861-eb01-842a-3dac-cd2d606b22a2@kernel.dk>
-Date: Fri, 29 Jun 2018 07:58:12 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180625225100.4352-1-bart.vanassche@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 6/25/18 4:51 PM, Bart Van Assche wrote:
-> Since __must_hold() is defined in <linux/compiler_types.h>, do not
-> redefine it in DRBD. Compile-tested only.
+Looks good,
 
-Applied for 4.19, thanks.
-
--- 
-Jens Axboe
+Reviewed-by: Christoph Hellwig <hch@lst.de>
