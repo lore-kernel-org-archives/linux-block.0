@@ -1,50 +1,46 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <ming.lei@redhat.com>
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V7 08/24] block: bio_set_pages_dirty can't see NULL bv_page in a valid bio_vec
-Date: Wed, 27 Jun 2018 20:45:32 +0800
-Message-Id: <20180627124548.3456-9-ming.lei@redhat.com>
-In-Reply-To: <20180627124548.3456-1-ming.lei@redhat.com>
-References: <20180627124548.3456-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Laurence Oberman <loberman@redhat.com>,
+	Omar Sandoval <osandov@fb.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>
+Subject: [PATCH V2 0/3] blk-mq: improve IO perf in case of none io sched
+Date: Fri, 29 Jun 2018 16:12:49 +0800
+Message-Id: <20180629081252.13836-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Christoph Hellwig <hch@lst.de>
+Hi,
 
-So don't bother handling it.
+The 1st 2 patch improves ctx->lock uses, and it is observed that IOPS
+may be improved by ~5% in rand IO test on MegaRaid SAS run by Kashyap.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/bio.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+The 3rd patch fixes rand IO performance regression on MegaRaid SAS
+test, still reported by Kashyap.
 
-diff --git a/block/bio.c b/block/bio.c
-index 77f991688810..de6cbaedfb65 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1557,10 +1557,8 @@ void bio_set_pages_dirty(struct bio *bio)
- 	int i;
- 
- 	bio_for_each_segment_all(bvec, bio, i) {
--		struct page *page = bvec->bv_page;
--
--		if (page && !PageCompound(page))
--			set_page_dirty_lock(page);
-+		if (!PageCompound(bvec->bv_page))
-+			set_page_dirty_lock(bvec->bv_page);
- 	}
- }
- EXPORT_SYMBOL_GPL(bio_set_pages_dirty);
+V2:
+	- fix list corruption in patch 1/3
+
+Ming Lei (3):
+  blk-mq: use list_splice_tail_init() to insert requests
+  blk-mq: only attempt to merge bio if there is rq in sw queue
+  blk-mq: dequeue request one by one from sw queue iff hctx is busy
+
+ block/blk-mq-sched.c   | 14 ++++----------
+ block/blk-mq.c         | 38 ++++++++++++++++++++++++++++++--------
+ include/linux/blk-mq.h |  1 +
+ 3 files changed, 35 insertions(+), 18 deletions(-)
+
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Laurence Oberman <loberman@redhat.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Hannes Reinecke <hare@suse.de>
+
 -- 
 2.9.5
