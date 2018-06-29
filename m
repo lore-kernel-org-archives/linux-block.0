@@ -1,54 +1,80 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Laurence Oberman <loberman@redhat.com>,
-	Omar Sandoval <osandov@fb.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH V2 2/3] blk-mq: only attempt to merge bio if there is rq in sw queue
-Date: Fri, 29 Jun 2018 16:12:51 +0800
-Message-Id: <20180629081252.13836-3-ming.lei@redhat.com>
-In-Reply-To: <20180629081252.13836-1-ming.lei@redhat.com>
-References: <20180629081252.13836-1-ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 4.18-rc3
+Message-ID: <9e799234-aaa8-4f29-71e8-7531faa28b0e@kernel.dk>
+Date: Fri, 29 Jun 2018 15:15:59 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Only attempt to merge bio iff the ctx->rq_list isn't empty, because:
+Hi Linus,
 
-1) for high-performance SSD, most of times dispatch may succeed, then
-there may be nothing left in ctx->rq_list, so don't try to merge over
-sw queue if it is empty, then we can save one acquiring of ctx->lock
+Small set of fixes for this series. Mostly just minor fixes, the only
+oddball in here is the sg change. This came out of the stall fix for
+NVMe, where we added a mempool and limited us to a single page
+allocation. CONFIG_SG_DEBUG sort-of ruins that, since we'd need to
+account for that. That's actually a generic problem, since lots of
+drivers need to allocate SG lists. I actually added this debug magic
+check back in 2007:
 
-2) we can't expect good merge performance on per-cpu sw queue, and missing
-one merge on sw queue won't be a big deal since tasks can be scheduled from
-one CPU to another.
+commit d6ec084200c37683278c821338f74ddf21ab80f5
+Author: Jens Axboe <jens.axboe@oracle.com>
+Date:   Mon Oct 22 20:01:06 2007 +0200
 
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Laurence Oberman <loberman@redhat.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Reported-by: Kashyap Desai <kashyap.desai@broadcom.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+    Add CONFIG_DEBUG_SG sg validation
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 56c493c6cd90..f5745acc2d98 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -339,7 +339,8 @@ bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
- 		return e->type->ops.mq.bio_merge(hctx, bio);
- 	}
- 
--	if (hctx->flags & BLK_MQ_F_SHOULD_MERGE) {
-+	if ((hctx->flags & BLK_MQ_F_SHOULD_MERGE) &&
-+			!list_empty_careful(&ctx->rq_list)) {
- 		/* default per sw-queue merge */
- 		spin_lock(&ctx->lock);
- 		ret = blk_mq_attempt_merge(q, ctx, bio);
+when I did the chaining code, to my knowledge it was never useful. Hence
+I'd suggest that we go this route as it'll benefit other drivers too,
+even though this _technically_ should go into the next release. If you
+strongly object, then I can drop it and we'll just have to shrink the
+nvme sg count further for this release.
+
+Anyway, outside of that, this pull contains:
+
+- Clone of request with special payload fix (Bart)
+
+- drbd discard handling fix (Bart)
+
+- SATA blk-mq stall fix (me)
+
+- Chunk size fix (Keith)
+
+- Double free nvme rdma fix (Sagi)
+
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git tags/for-linus-20180629
+
+
+----------------------------------------------------------------
+Bart Van Assche (2):
+      block: Fix cloning of requests with a special payload
+      drbd: Fix drbd_request_prepare() discard handling
+
+Jens Axboe (3):
+      blk-mq: don't queue more if we get a busy return
+      Merge branch 'nvme-4.18' of git://git.infradead.org/nvme into for-linus
+      sg: remove ->sg_magic member
+
+Keith Busch (1):
+      block: Fix transfer when chunk sectors exceeds max
+
+Sagi Grimberg (1):
+      nvme-rdma: fix possible double free of controller async event buffer
+
+ block/blk-core.c                 |  4 ++++
+ block/blk-mq.c                   | 12 ++++++++++++
+ drivers/block/drbd/drbd_req.c    |  4 ++--
+ drivers/gpu/drm/i915/i915_drv.h  |  3 ---
+ drivers/nvme/host/rdma.c         |  7 +++++--
+ include/linux/blkdev.h           |  4 ++--
+ include/linux/scatterlist.h      | 18 ------------------
+ lib/scatterlist.c                |  6 ------
+ tools/virtio/linux/scatterlist.h | 18 ------------------
+ 9 files changed, 25 insertions(+), 51 deletions(-)
+
 -- 
-2.9.5
+Jens Axboe
