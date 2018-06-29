@@ -1,60 +1,57 @@
 Return-Path: <martin@lichtvoll.de>
 From: Martin Steigerwald <martin@lichtvoll.de>
-To: Michael Schmitz <schmitzmic@gmail.com>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>, jdow <jdow@earthlink.net>, linux-m68k <linux-m68k@lists.linux-m68k.org>, linux-block@vger.kernel.org
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Michael Schmitz <schmitzmic@gmail.com>, Jens Axboe <axboe@kernel.dk>, jdow <jdow@earthlink.net>, linux-m68k <linux-m68k@lists.linux-m68k.org>, linux-block@vger.kernel.org
 Subject: Re: Subject: [PATCH RFC] block: fix Amiga RDB partition support for disks >= 2 TB
-Date: Fri, 29 Jun 2018 23:24:36 +0200
-Message-ID: <2499668.52U9LxLmUp@merkaba>
-In-Reply-To: <76bf5b8d-6ee1-8e77-4c2a-e0b5a095992b@gmail.com>
-References: <20180627012421.80B8F24E094@nmr-admin> <CAMuHMdXqkQLtcUFxxhMYiGxMfLyuYVSxFfOpnu7_qn3+0eOt=w@mail.gmail.com> <76bf5b8d-6ee1-8e77-4c2a-e0b5a095992b@gmail.com>
+Date: Fri, 29 Jun 2018 23:17:59 +0200
+Message-ID: <2831908.UM38Rgggmb@merkaba>
+In-Reply-To: <CAMuHMdXqkQLtcUFxxhMYiGxMfLyuYVSxFfOpnu7_qn3+0eOt=w@mail.gmail.com>
+References: <20180627012421.80B8F24E094@nmr-admin> <102c5f41-7fa8-267c-973a-176d3c3d4f57@gmail.com> <CAMuHMdXqkQLtcUFxxhMYiGxMfLyuYVSxFfOpnu7_qn3+0eOt=w@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Michael.
+Hi,
 
-Michael Schmitz - 29.06.18, 11:07:
-> > But it's up to the person (which is not Linux) formatting the disk
-> > to
-> > not try to use
-> > it on systems that cannot handle it, and may destroy it.
-> >=20
-> >>> Let me clarify: what exactly would the kernel option allow? When
-> >>> to use it?>>=20
-> >> Whether to use it if safe (on Linux). But whatever Linux does
-> >> (after
-> >> this patch), access will go to the right area of the disk (as
-> >> specified by the RDB) so Linux won't any longer stomp on anything
-> >> that would have mattered to 32 bit disk drivers. So it really
-> >> should be safe.>=20
-> > Personally, I see no reason to depend on a kernel option, if it is
-> > safe to use. Just use it.
+Geert Uytterhoeven - 29.06.18, 10:51:
+> On Fri, Jun 29, 2018 at 10:43 AM Michael Schmitz=20
+<schmitzmic@gmail.com> wrote:
+> > Am 28.06.18 um 21:25 schrieb Geert Uytterhoeven:
+> > >>> Do we really need the warning?
+> > >>> Once the parsing is fixed doing 64-bit math, it does not matter
+> > >>> for
+> > >>> Linux anymore.
+> > >>=20
+> > >> Well, irony of this is: In my case the RDB has been created on a
+> > >> machine with a native OS. So Linux warns me about something I
+> > >> already did so on the native OS without any warning. In this
+> > >> case AmigaOS 4.0.> >=20
+> > > Exactly.
+> > >=20
+> > > So moving a disk partitioned under AmigaOS 4.0 to a system running
+> > > an
+> > > older version of AmigaOS can fail miserably. Not a Linux issue.
+> > > Linux also doesn't warn about disks with GPT failing to work on
+> > > old MSDOS.>=20
+> > Would MSDOS recognize the GPT partition as 'probably FAT', and
+> > attempt to use it?
 >=20
-> So to recap - someone partitions a disk on AmigaOS 4.x, taking
-> advantage of the large block device support there.
-> Using that disk on AmigaOS 3.1, data loss ensues. Whether or not Linux
-> (patched) ever touched the disk has no impact on that outcome.
+> No idea...
+>=20
+> Probably some old Windows or MacOS versions will just suggest to
+> format your "new" disk ;-)
 
-I am not even completely sure about that. Frankly I have no idea what=20
-would happen when using such a disk on AmigaOS 3.1 *without* NSDPatch or=20
-TD64 support (I think you could patch AmigaOS 3.1 with 64 Bit support=20
-already and some 3rd party harddisk controllers by Phase 5 hat TD64=20
-support at that time already). Unless I try it, which I won=C2=B4t at the=20
-moment, I=C2=B4d say the behaviour is largely undefined.
-
-But hey, undefined means it may just overwrite start overwriting from=20
-the beginning of the disk beyond 32 bit. And I think that is quite=20
-likely. It could also crash, but if its an overflow I don=C2=B4t think why =
-it=20
-would crash. Anyway, I never tried this out.
-
-But in any way: This would happen or not happen no matter whether Linux=20
-parsed the RDB or not.
-
-I still think that the native OS warning really does not hurt=E2=80=A6 but =
-I=C2=B4d=20
-spare myself the kernel option. Having the warning without the kernel=20
-option would be a compromise between being cautious and being bold :).
+Heh=E2=80=A6 MacOS X last I saw it just offers to initialize any disk it do=
+es=20
+not know about. I had this with a friend who uses Mac quite some years=20
+ago with an external harddrive with Linux filesystems. I told him Mac OS=20
+X would not understand it, but he did not believe me. Well luckily=20
+enough I have been quick enough to unplug the USB cable before he could=20
+hit the initialize button. And yes, that is right, Mac OS X at that time=20
+did not even tell the user that initializing means *formatting the disk=20
+and making all data that was previously on it unavailable*. I did not=20
+even believe it that they had no stern warning about initializing in the=20
+dialog window. I hope they improved the wording meanwhile.
 
 Thanks,
 =2D-=20
