@@ -1,129 +1,23 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Andrew Jones <drjones@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Omar Sandoval <osandov@fb.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH 3/5] blk-mq: introduce new lock for protecting hctx->dispatch_wait
-Date: Mon, 25 Jun 2018 19:31:47 +0800
-Message-Id: <20180625113149.29449-4-ming.lei@redhat.com>
-In-Reply-To: <20180625113149.29449-1-ming.lei@redhat.com>
-References: <20180625113149.29449-1-ming.lei@redhat.com>
+Return-Path: <hch@lst.de>
+Date: Fri, 29 Jun 2018 10:34:04 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] include/trace/events/wbt.h: Suppress a compiler warning
+Message-ID: <20180629083404.GB15870@lst.de>
+References: <20180627202234.17670-1-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180627202234.17670-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Now hctx->lock is only acquired when adding hctx->dispatch_wait to
-one wait queue, but not held when removing it from the wait queue.
+On Wed, Jun 27, 2018 at 01:22:34PM -0700, Bart Van Assche wrote:
+> This patch avoids that the following warning appears when building
+> with gcc 8 and W=1:
+> 
+> ./include/trace/events/wbt.h:36:3: warning: 'strncpy' specified bound 32 equals destination size [-Wstringop-truncation]
 
-IO hang can be observed easily if SCHED RESTART is disabled, that means
-now RESTART exits just for fixing the issue in blk_mq_mark_tag_wait().
-
-This patch fixes the issue by introducing hctx->dispatch_wait_lock and
-holding it for removing hctx->dispatch_wait in blk_mq_dispatch_wake(),
-since we need to avoid acquiring hctx->lock in irq context.
-
-Fixes: eb619fdb2d4cb8b3d3419 ("blk-mq: fix issue with shared tag queue re-running")
-Cc: Andrew Jones <drjones@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c         | 26 +++++++++++++++++---------
- include/linux/blk-mq.h |  1 +
- 2 files changed, 18 insertions(+), 9 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index db2814eb050f..ff3ff191ff0b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -998,7 +998,10 @@ static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
- 
- 	hctx = container_of(wait, struct blk_mq_hw_ctx, dispatch_wait);
- 
-+	spin_lock(&hctx->dispatch_wait_lock);
- 	list_del_init(&wait->entry);
-+	spin_unlock(&hctx->dispatch_wait_lock);
-+
- 	blk_mq_run_hw_queue(hctx, true);
- 	return 1;
- }
-@@ -1012,7 +1015,7 @@ static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
- static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
- 				 struct request *rq)
- {
--	struct sbq_wait_state *ws;
-+	struct wait_queue_head *wq;
- 	wait_queue_entry_t *wait;
- 	bool ret;
- 
-@@ -1035,14 +1038,18 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
- 	if (!list_empty_careful(&wait->entry))
- 		return false;
- 
--	spin_lock(&hctx->lock);
-+	wq = &bt_wait_ptr(&hctx->tags->bitmap_tags, hctx)->wait;
-+
-+	spin_lock_irq(&wq->lock);
-+	spin_lock(&hctx->dispatch_wait_lock);
- 	if (!list_empty(&wait->entry)) {
--		spin_unlock(&hctx->lock);
-+		spin_unlock(&hctx->dispatch_wait_lock);
-+		spin_unlock_irq(&wq->lock);
- 		return false;
- 	}
- 
--	ws = bt_wait_ptr(&hctx->tags->bitmap_tags, hctx);
--	add_wait_queue(&ws->wait, wait);
-+	wait->flags &= ~WQ_FLAG_EXCLUSIVE;
-+	__add_wait_queue(wq, wait);
- 
- 	/*
- 	 * It's possible that a tag was freed in the window between the
-@@ -1051,7 +1058,8 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
- 	 */
- 	ret = blk_mq_get_driver_tag(rq);
- 	if (!ret) {
--		spin_unlock(&hctx->lock);
-+		spin_unlock(&hctx->dispatch_wait_lock);
-+		spin_unlock_irq(&wq->lock);
- 		return false;
- 	}
- 
-@@ -1059,10 +1067,9 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
- 	 * We got a tag, remove ourselves from the wait queue to ensure
- 	 * someone else gets the wakeup.
- 	 */
--	spin_lock_irq(&ws->wait.lock);
- 	list_del_init(&wait->entry);
--	spin_unlock_irq(&ws->wait.lock);
--	spin_unlock(&hctx->lock);
-+	spin_unlock(&hctx->dispatch_wait_lock);
-+	spin_unlock_irq(&wq->lock);
- 
- 	return true;
- }
-@@ -2130,6 +2137,7 @@ static int blk_mq_init_hctx(struct request_queue *q,
- 
- 	hctx->nr_ctx = 0;
- 
-+	spin_lock_init(&hctx->dispatch_wait_lock);
- 	init_waitqueue_func_entry(&hctx->dispatch_wait, blk_mq_dispatch_wake);
- 	INIT_LIST_HEAD(&hctx->dispatch_wait.entry);
- 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index e3147eb74222..ea690254dab7 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -39,6 +39,7 @@ struct blk_mq_hw_ctx {
- 	struct blk_mq_ctx	**ctxs;
- 	unsigned int		nr_ctx;
- 
-+	spinlock_t		dispatch_wait_lock;
- 	wait_queue_entry_t	dispatch_wait;
- 	atomic_t		wait_index;
- 
--- 
-2.9.5
+I really don't think this is the right fix.  Note that the trace
+code allows for dynamic arrays using __dynamic_array(), so the best idea
+might be to switch to that.
