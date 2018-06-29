@@ -7,58 +7,68 @@ Cc: Martin Steigerwald <martin@lichtvoll.de>, Jens Axboe <axboe@kernel.dk>,
  jdow <jdow@earthlink.net>, linux-m68k <linux-m68k@lists.linux-m68k.org>,
  linux-block@vger.kernel.org
 References: <20180627012421.80B8F24E094@nmr-admin>
- <b39c2bf0-de19-ef6e-75bf-b9fae33255c6@gmail.com>
+ <2157764.1gpVE8K9i5@merkaba>
+ <CAOmrzkLZCE7jPHVP0Et7L7=8UAAG80v7gpYrKpZVJADQz6PeaA@mail.gmail.com>
+ <3488210.nMeMqUQulA@merkaba> <b39c2bf0-de19-ef6e-75bf-b9fae33255c6@gmail.com>
  <CAMuHMdVtvv1Cxxuf__TUKGUJiuTUohGx5XvY_3nQ7vD5J_BBAw@mail.gmail.com>
- <3681004.ZGfTzPZDUK@merkaba>
- <CAMuHMdXqzQFTNjWrRrgUrEO5XVy+X_ztnnCEZo3vYXVCJp4n8w@mail.gmail.com>
- <102c5f41-7fa8-267c-973a-176d3c3d4f57@gmail.com>
- <CAMuHMdXqkQLtcUFxxhMYiGxMfLyuYVSxFfOpnu7_qn3+0eOt=w@mail.gmail.com>
- <76bf5b8d-6ee1-8e77-4c2a-e0b5a095992b@gmail.com>
- <CAMuHMdX-YigDa4JeNk164OKB7xOdxTEPARkmgSGWMwJzsAq+Ew@mail.gmail.com>
+ <a5d6cf31-db2f-0db7-d8ef-2b904a614790@gmail.com>
+ <CAMuHMdWSwHeijOeoNO6qERgbnPNHxEC43atK0RFr298=cDHGiw@mail.gmail.com>
 From: Michael Schmitz <schmitzmic@gmail.com>
-Message-ID: <429b11a2-35e5-74b5-62f7-303436781c1b@gmail.com>
-Date: Fri, 29 Jun 2018 21:25:01 +1200
+Message-ID: <578af177-c036-33a1-a54f-f615436dbb25@gmail.com>
+Date: Fri, 29 Jun 2018 21:19:19 +1200
 MIME-Version: 1.0
-In-Reply-To: <CAMuHMdX-YigDa4JeNk164OKB7xOdxTEPARkmgSGWMwJzsAq+Ew@mail.gmail.com>
+In-Reply-To: <CAMuHMdWSwHeijOeoNO6qERgbnPNHxEC43atK0RFr298=cDHGiw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
 Hi Geert,
 
-Am 29.06.18 um 21:12 schrieb Geert Uytterhoeven:
-> Hi Michael,
+
+Am 29.06.18 um 21:10 schrieb Geert Uytterhoeven:
 >
-> On Fri, Jun 29, 2018 at 11:08 AM Michael Schmitz <schmitzmic@gmail.com> wrote:
->> Am 29.06.18 um 20:51 schrieb Geert Uytterhoeven:
->>>> Would MSDOS recognize the GPT partition as 'probably FAT', and attempt
->>>> to use it?
->>> No idea...
->>>
->>> Probably some old Windows or MacOS versions will just suggest to
->>> format your "new" disk ;-)
->> Yep, that's what I'd expect. Windows even used to trash the LILO boot
->> code in the MBR if you just happened to boot to it by accident. Did we
->> complain?
-> Those days Linux users just knew not to use Windows ;-)
+>> The question is - can writes to the disk cause any damage to data on the
+>> disk, as seen by old OS versions? If the answer is no, we won't need the
+>> option after all.
+> You mean someone relying on the parameters of his RDB to overflow using
+> 32-bit calculations, and still have valid offsets on the disk so it's usable?
+> I think that would need hand-crafting an RDB, if possible at all.
+> And writing to it on AmigaOS 4.0 or any other OS doing proper 64-bit
+> calculations would write to the wrong locations, too.
+> IMHO not something to consider.
 
-For good reason. But that happened on a couple of instrument control PCs
-I converted from Win2k. Never mount a scratch monkey... 
+Something like that. But I haven't stopped for long enough to work out
+if that was even possible.
 
->>> Personally, I see no reason to depend on a kernel option, if it is safe to use.
->>> Just use it.
->> So to recap - someone partitions a disk on AmigaOS 4.x, taking advantage
->> of the large block device support there.
->> Using that disk on AmigaOS 3.1, data loss ensues. Whether or not Linux
->> (patched) ever touched the disk has no impact on that outcome.
->>
->> Right?
-> That's my understanding, too.
+>
+>>>>> How does the user come to know about this kernel option? Will you print
+>>>>> its name in kernel log?
+>>>> Depends on how easy we want to make it for users. If I put a BUG() trap
+>>>> with the check, the resulting log section will point to a specific line
+>>>> in block/partitions/amiga.c, from which the override option will be
+>>>> obvious. But that might be a little too opaque for some...
+>>> Please don't use BUG(), unless your goal is to attract attention (from
+>>> Linus, who dislikes BUG()!).
+>> I'd rather not abuse his patience. Thanks for the hint.
+>>> Using BUG() would be a nice way to DoS someones machine by plugging in
+>>> a USB stick with a malformed RDB.
+>> I guess I deserved that. But BUG() doesn't panic now, does it? The ones
+>> I saw did allow the kernel to happily carry on.
+> The one in asm-generic does call panic().
 
-OK, that decides it.
+Ouch - that explains Linus's aversion.
+
+> The m68k one calls __builtin_trap(), which may cause a trap (and panic?) or
+> do nothing, depending on gcc version, I think.
+
+The trap doesn't cause a panic for me. Might rely on the trap vector
+being set up right (which we can rely on at partition scan time), and
+the context though. But if m68k is the odd one out in gracefully
+handling BUG(), better leave it.
 
 Cheers,
 
     Michael
+>
 > Gr{oetje,eeting}s,
 >
 >                         Geert
