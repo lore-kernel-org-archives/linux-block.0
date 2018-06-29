@@ -1,94 +1,68 @@
-Return-Path: <schmitzmic@gmail.com>
-Return-Path: <schmitzmic@gmail.com>
+Return-Path: <jdow@earthlink.net>
 Subject: Re: Subject: [PATCH RFC] block: fix Amiga RDB partition support for
  disks >= 2 TB
 To: Martin Steigerwald <martin@lichtvoll.de>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>,
- jdow <jdow@earthlink.net>, linux-m68k <linux-m68k@lists.linux-m68k.org>,
- linux-block@vger.kernel.org
+Cc: Michael Schmitz <schmitzmic@gmail.com>,
+ Geert Uytterhoeven <geert@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-m68k <linux-m68k@lists.linux-m68k.org>, linux-block@vger.kernel.org
 References: <20180627012421.80B8F24E094@nmr-admin>
- <CAMuHMdXqkQLtcUFxxhMYiGxMfLyuYVSxFfOpnu7_qn3+0eOt=w@mail.gmail.com>
- <76bf5b8d-6ee1-8e77-4c2a-e0b5a095992b@gmail.com> <2499668.52U9LxLmUp@merkaba>
-From: Michael Schmitz <schmitzmic@gmail.com>
-Message-ID: <e52c09b3-da8e-6c20-aea0-f9a8f28c6736@gmail.com>
-Date: Sat, 30 Jun 2018 11:24:44 +1200
+ <102c5f41-7fa8-267c-973a-176d3c3d4f57@gmail.com>
+ <a0974de4-da1f-3991-8d44-4108a81a0014@earthlink.net>
+ <1770345.glHoxEKBYS@merkaba>
+From: jdow <jdow@earthlink.net>
+Message-ID: <6047aaa9-dfb4-46b5-48e2-67dbdf10bdb0@earthlink.net>
+Date: Fri, 29 Jun 2018 16:24:46 -0700
 MIME-Version: 1.0
-In-Reply-To: <2499668.52U9LxLmUp@merkaba>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1770345.glHoxEKBYS@merkaba>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Martin,
 
+On 20180629 14:45, Martin Steigerwald wrote:
+ > Beware: Essay ahead which proofs it to the point that there is no
+ > overflow in RDB before 96 bits maximum value of sectors:
 
-Am 30.06.18 um 09:24 schrieb Martin Steigerwald:
-> Hi Michael.
->
-> Michael Schmitz - 29.06.18, 11:07:
->>> But it's up to the person (which is not Linux) formatting the disk
->>> to
->>> not try to use
->>> it on systems that cannot handle it, and may destroy it.
->>>
->>>>> Let me clarify: what exactly would the kernel option allow? When
->>>>> to use it?>> 
->>>> Whether to use it if safe (on Linux). But whatever Linux does
->>>> (after
->>>> this patch), access will go to the right area of the disk (as
->>>> specified by the RDB) so Linux won't any longer stomp on anything
->>>> that would have mattered to 32 bit disk drivers. So it really
->>>> should be safe.> 
->>> Personally, I see no reason to depend on a kernel option, if it is
->>> safe to use. Just use it.
->> So to recap - someone partitions a disk on AmigaOS 4.x, taking
->> advantage of the large block device support there.
->> Using that disk on AmigaOS 3.1, data loss ensues. Whether or not Linux
->> (patched) ever touched the disk has no impact on that outcome.
-> I am not even completely sure about that. Frankly I have no idea what 
-> would happen when using such a disk on AmigaOS 3.1 *without* NSDPatch or 
-> TD64 support (I think you could patch AmigaOS 3.1 with 64 Bit support 
-> already and some 3rd party harddisk controllers by Phase 5 hat TD64 
-> support at that time already). Unless I try it, which I won´t at the 
-> moment, I´d say the behaviour is largely undefined.
-The problem that still remains is with unpatched legacy versions. RDB
-does support large enough partitions out of the box, due to C/H/S all
-using u32. We all agree there. The question is with file systems and
-device drivers - someone, at some point, has to recast the block offset
-at filesystem level to an offset expressed in the devices's native block
-size (regardless of block size used by RDB and filesystem). There are
-MOs that use 2k block sizes natively, but as far as I am aware, disks
-are usually 512 byte block size (the last disk system I remember where
-you could chose block size at the hardware level, at format time, was an
-Emulex disk controller on  MicroVax II).
+Time to go into more detail on RDBs. It isn't as simple as it started to appear.
 
-I've dug through a few specs to get a better handle on this. SCSI-2 used
-a maximum of 4 bytes for block addresses. IDE used 6 bytes, so at the
-time these systems were designed, there already was a way of requesting
-data at offsets beyond what can be expressed in 32 bits. I would hope
-that any system supporting IDE would have done offset calculations in 64
-bits. Is that too optimistic?
-> But hey, undefined means it may just overwrite start overwriting from 
-> the beginning of the disk beyond 32 bit. And I think that is quite 
-> likely. It could also crash, but if its an overflow I don´t think why it 
-> would crash. Anyway, I never tried this out.
-If offsets are calculated in 32 bits, excess bits are truncated (I don't
-think integer overflows ever trapped?). That wraps the offset to
-somewhere within the first 2 TB of the disk (maybe less if signed int
-was used, like in our parser).
-> But in any way: This would happen or not happen no matter whether Linux 
-> parsed the RDB or not.
->
-> I still think that the native OS warning really does not hurt… but I´d 
-> spare myself the kernel option. Having the warning without the kernel 
-> option would be a compromise between being cautious and being bold :).
-Yep, I've come around to that conclusion, too. Just need to test it
-properly. And I still need to check what will happen if we allow such a
-large partition table to parse on a kernel without LBD support (i.e.,
-are there any downstream checks in place to refuse partitions larger
-than what can be handled by 32 bit).
+extract from hardblocks.h RDSK block definition
+===8<---
+     ULONG   rdb_BlockBytes;	/* size of disk blocks */
+...
+     ULONG   rdb_Cylinders;	/* number of drive cylinders */
+     ULONG   rdb_Sectors;	/* sectors per track */
+     ULONG   rdb_Heads;		/* number of drive heads */
+     ...
+     ULONG   rdb_LoCylinder;	/* low cylinder of partitionable disk area */
+     ULONG   rdb_HiCylinder;	/* high cylinder of partitionable data area */
+     ULONG   rdb_CylBlocks;	/* number of blocks available per cylinder */
+===8<---
+This has the hard limit embodied within it, unfortunately.
 
-Cheers,
+The first four values above give you hope for 2^128 bytes. The next three may 
+trash some of it when all three are considered.
 
-    Michael
+Since a cylinder is sectors times heads we have 2^64 blocks capacity embodied in 
+rdb_LoCylinder and rdb_HiCylinder. But, our hopes are deftly dashed by the last 
+value rdb_CylBlocks which places a hard limit on the product of rdb_Heads and 
+rdb_Sectors of 2^32. But, that still allows is a fairly large disk. 2^32-1 
+blocks per cylinder times block size, rdb_BlockBytes, of 2^32, although the 
+larger block sizes are um er sort of putrid to use. Similar limitations exist 
+within dos.h in the InfoData and DosEnvec structure, among other likely places.
 
+Approaches "exist" to allowing large partitions. Some of them are unattractive, 
+probably all of them as a matter of fact.
+1) For large disks move to GPT and be done with it.
+2) "lie" and teach the filesystems to ignore rdb_CylBlocks and similar values 
+elsewhere. Then the sky is the limit.
+3) Invent a "PA64" 64 bit RDB entry and the other internal structures to make it 
+work, InfoData64, DosEnvec64, and so on.
 
-> Thanks,
+Solution 2 might be the least disruptive way to do it. BUT, a whole host of 
+utilities like "info" will have to be tweaked to handle "rdb_CylBlocks" becoming 
+meaningless.
+
+So this is what happened with some simple includes mining while I am playing 
+hooky from doing some real work.
+
+Good luck, gentlemen.
+{^_^}
