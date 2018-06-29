@@ -1,68 +1,124 @@
-Return-Path: <jdow@earthlink.net>
-Subject: Re: Subject: [PATCH RFC] block: fix Amiga RDB partition support for
- disks >= 2 TB
-To: Martin Steigerwald <martin@lichtvoll.de>
-Cc: Michael Schmitz <schmitzmic@gmail.com>,
- Geert Uytterhoeven <geert@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>,
- linux-m68k <linux-m68k@lists.linux-m68k.org>, linux-block@vger.kernel.org
-References: <20180627012421.80B8F24E094@nmr-admin>
- <102c5f41-7fa8-267c-973a-176d3c3d4f57@gmail.com>
- <a0974de4-da1f-3991-8d44-4108a81a0014@earthlink.net>
- <1770345.glHoxEKBYS@merkaba>
-From: jdow <jdow@earthlink.net>
-Message-ID: <6047aaa9-dfb4-46b5-48e2-67dbdf10bdb0@earthlink.net>
-Date: Fri, 29 Jun 2018 16:24:46 -0700
+Return-Path: <martin@lichtvoll.de>
+From: Martin Steigerwald <martin@lichtvoll.de>
+To: jdow <jdow@earthlink.net>
+Cc: Michael Schmitz <schmitzmic@gmail.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>, linux-m68k <linux-m68k@lists.linux-m68k.org>, linux-block@vger.kernel.org
+Subject: Re: Subject: [PATCH RFC] block: fix Amiga RDB partition support for disks >= 2 TB
+Date: Fri, 29 Jun 2018 23:45:20 +0200
+Message-ID: <1770345.glHoxEKBYS@merkaba>
+In-Reply-To: <a0974de4-da1f-3991-8d44-4108a81a0014@earthlink.net>
+References: <20180627012421.80B8F24E094@nmr-admin> <102c5f41-7fa8-267c-973a-176d3c3d4f57@gmail.com> <a0974de4-da1f-3991-8d44-4108a81a0014@earthlink.net>
 MIME-Version: 1.0
-In-Reply-To: <1770345.glHoxEKBYS@merkaba>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-
-On 20180629 14:45, Martin Steigerwald wrote:
- > Beware: Essay ahead which proofs it to the point that there is no
- > overflow in RDB before 96 bits maximum value of sectors:
-
-Time to go into more detail on RDBs. It isn't as simple as it started to appear.
-
-extract from hardblocks.h RDSK block definition
-===8<---
-     ULONG   rdb_BlockBytes;	/* size of disk blocks */
-...
-     ULONG   rdb_Cylinders;	/* number of drive cylinders */
-     ULONG   rdb_Sectors;	/* sectors per track */
-     ULONG   rdb_Heads;		/* number of drive heads */
-     ...
-     ULONG   rdb_LoCylinder;	/* low cylinder of partitionable disk area */
-     ULONG   rdb_HiCylinder;	/* high cylinder of partitionable data area */
-     ULONG   rdb_CylBlocks;	/* number of blocks available per cylinder */
-===8<---
-This has the hard limit embodied within it, unfortunately.
-
-The first four values above give you hope for 2^128 bytes. The next three may 
-trash some of it when all three are considered.
-
-Since a cylinder is sectors times heads we have 2^64 blocks capacity embodied in 
-rdb_LoCylinder and rdb_HiCylinder. But, our hopes are deftly dashed by the last 
-value rdb_CylBlocks which places a hard limit on the product of rdb_Heads and 
-rdb_Sectors of 2^32. But, that still allows is a fairly large disk. 2^32-1 
-blocks per cylinder times block size, rdb_BlockBytes, of 2^32, although the 
-larger block sizes are um er sort of putrid to use. Similar limitations exist 
-within dos.h in the InfoData and DosEnvec structure, among other likely places.
-
-Approaches "exist" to allowing large partitions. Some of them are unattractive, 
-probably all of them as a matter of fact.
-1) For large disks move to GPT and be done with it.
-2) "lie" and teach the filesystems to ignore rdb_CylBlocks and similar values 
-elsewhere. Then the sky is the limit.
-3) Invent a "PA64" 64 bit RDB entry and the other internal structures to make it 
-work, InfoData64, DosEnvec64, and so on.
-
-Solution 2 might be the least disruptive way to do it. BUT, a whole host of 
-utilities like "info" will have to be tweaked to handle "rdb_CylBlocks" becoming 
-meaningless.
-
-So this is what happened with some simple includes mining while I am playing 
-hooky from doing some real work.
-
-Good luck, gentlemen.
-{^_^}
+QmV3YXJlOiBFc3NheSBhaGVhZCB3aGljaCBwcm9vZnMgaXQgdG8gdGhlIHBvaW50IHRoYXQgdGhl
+cmUgaXMgbm8gCm92ZXJmbG93IGluIFJEQiBiZWZvcmUgOTYgYml0cyBtYXhpbXVtIHZhbHVlIG9m
+IHNlY3RvcnM6CgpqZG93IC0gMjkuMDYuMTgsIDExOjMyOgo+IE9uIDIwMTgwNjI5IDAxOjQyLCBN
+aWNoYWVsIFNjaG1pdHogd3JvdGU6Cj4gPiBIaSBHZWVydCwKPiA+IAo+ID4gQW0gMjguMDYuMTgg
+dW0gMjE6MjUgc2NocmllYiBHZWVydCBVeXR0ZXJob2V2ZW46Cj4gPj4+PiBEbyB3ZSByZWFsbHkg
+bmVlZCB0aGUgd2FybmluZz8KPiA+Pj4+IE9uY2UgdGhlIHBhcnNpbmcgaXMgZml4ZWQgZG9pbmcg
+NjQtYml0IG1hdGgsIGl0IGRvZXMgbm90IG1hdHRlcgo+ID4+Pj4gZm9yCj4gPj4+PiBMaW51eCBh
+bnltb3JlLgo+ID4+PiAKPiA+Pj4gV2VsbCwgaXJvbnkgb2YgdGhpcyBpczogSW4gbXkgY2FzZSB0
+aGUgUkRCIGhhcyBiZWVuIGNyZWF0ZWQgb24gYQo+ID4+PiBtYWNoaW5lIHdpdGggYSBuYXRpdmUg
+T1MuIFNvIExpbnV4IHdhcm5zIG1lIGFib3V0IHNvbWV0aGluZyBJCj4gPj4+IGFscmVhZHkgZGlk
+IHNvIG9uIHRoZSBuYXRpdmUgT1Mgd2l0aG91dCBhbnkgd2FybmluZy4gSW4gdGhpcyBjYXNlCj4g
+Pj4+IEFtaWdhT1MgNC4wLj4+IAo+ID4+IEV4YWN0bHkuCj4gPj4gCj4gPj4gU28gbW92aW5nIGEg
+ZGlzayBwYXJ0aXRpb25lZCB1bmRlciBBbWlnYU9TIDQuMCB0byBhIHN5c3RlbSBydW5uaW5nCj4g
+Pj4gYW4KPiA+PiBvbGRlciB2ZXJzaW9uIG9mIEFtaWdhT1MgY2FuIGZhaWwgbWlzZXJhYmx5LiBO
+b3QgYSBMaW51eCBpc3N1ZS4KPiA+PiBMaW51eCBhbHNvIGRvZXNuJ3Qgd2FybiBhYm91dCBkaXNr
+cyB3aXRoIEdQVCBmYWlsaW5nIHRvIHdvcmsgb24gb2xkCj4gPj4gTVNET1MuPiAKPiA+IFdvdWxk
+IE1TRE9TIHJlY29nbml6ZSB0aGUgR1BUIHBhcnRpdGlvbiBhcyAncHJvYmFibHkgRkFUJywgYW5k
+Cj4gPiBhdHRlbXB0IHRvIHVzZSBpdD8KPiAKPiBJIGJlbGlldmUgaXQgd291bGQgZmFpbCB0byBt
+b3VudCBpdCBhbmQgc3VnZ2VzdCBmb3JtYXR0aW5nIGl0LiBUaGUga2V5Cj4gaXMgdG8gZmFpbCB0
+aGUgbW91bnQgYW5kIG5vdCByaXNrIGRhbWFnZSB0byB0aGUgZGF0YSBvbiBpdC4KPiAKPiA+PiBM
+ZXQgbWUgY2xhcmlmeTogd2hhdCBleGFjdGx5IHdvdWxkIHRoZSBrZXJuZWwgb3B0aW9uIGFsbG93
+PyBXaGVuIHRvCj4gPj4gdXNlIGl0Pz4gCj4gPiBXaGV0aGVyIHRvIHVzZSBpdCBpZiBzYWZlIChv
+biBMaW51eCkuIEJ1dCB3aGF0ZXZlciBMaW51eCBkb2VzIChhZnRlcgo+ID4gdGhpcyBwYXRjaCks
+IGFjY2VzcyB3aWxsIGdvIHRvIHRoZSByaWdodCBhcmVhIG9mIHRoZSBkaXNrIChhcwo+ID4gc3Bl
+Y2lmaWVkIGJ5IHRoZSBSREIpIHNvIExpbnV4IHdvbid0IGFueSBsb25nZXIgc3RvbXAgb24gYW55
+dGhpbmcKPiA+IHRoYXQgd291bGQgaGF2ZSBtYXR0ZXJlZCB0byAzMiBiaXQgZGlzayBkcml2ZXJz
+LiBTbyBpdCByZWFsbHkKPiA+IHNob3VsZCBiZSBzYWZlLgo+IE1hcnRpbiBwb2ludGVkIG91dCBz
+b21ldGhpbmcgcHJpdmF0ZWx5IGFib3V0IFJEQnMgSSdkIGZvcmdvdHRlbiBvdmVyCj4gdGhlIGFy
+Y2hlb2xvZ2ljYWwgZXJhcyBnb25lIHBhc3QuIFRoZSBSREIgdmFsdWVzIGFyZSBhbGwgMzIgYml0
+Cj4gdW5zaWduZWQgbG9uZ3MuIFRoYXQgbWVhbnMgYXMgbG9uZyBhcyB0aGV5IGFyZSBwcm9wZXJs
+eSBwcm9tb3RlZCBBTkQKPiB0aGUgZmlsZSBzeXN0ZW0gZG9lcyBub3QgYmFyZiBmcm9tIGEgZ3Jv
+c3Mgb3ZlcmZlZWRpbmcgZGlza3MgdXAgdG8KPiBhYm91dCAyXjEyOCBieXRlcyBjYW4gYmUgc3Vw
+cG9ydGVkLiBCdXQgeW91IG5lZWQgYSBuZXcgdWludDEyOF90Cj4gZGF0YXR5cGUuIFNvIGZvciBB
+bWlnYXMgb3IgTGludXggdGhlIHJlYWwgbGltaXRhdGlvbiBpcyB0aGUgZGF0YSB0eXBlCj4gYW5k
+IHNpZ25pZmljYW5jZSB0aGF0IGZsb3dzIGJldHdlZW4gdGhlIFJEQiBwYXJzZXIgYW5kIHRoZSBm
+aWxlCj4gc3lzdGVtLiBUaGF0IGlzIHRoZSB2YWx1ZSB0aGF0IGhhcyB0byBiZSBjb25zaWRlcmVk
+LiBUaGVuIGlmIHRoZQo+IGZpbGVzeXN0ZW0gc29tZXdoZXJlIGluc2lkZSBjb3VnaHMgdXAgYSBo
+YWlyYmFsbCBvdmVyIHNvbWUgaW50ZXJuYWwKPiBvdmVyZmxvdyBvciBvdGhlciBhbmQgY2Fubm90
+IGFjY2VwdCBzYXkgYSBmdWxsIHVpbnQ2NF90IG1heGltdW0gdmFsdWUKPiBvZiBieXRlcyB3aXRo
+IGdyYWNlIGFuZCBwb2xpc2ggaXQgc2hvdWxkIGVycm9yIG91dCB3aGVuIGl0IHNlZXMgYW4KPiBp
+bmNvbWluZyBkaXNrIHBvc2l0aW9ucyBvZmYgaXRzIGludGVybmFsbHkgYWNjZXB0YWJsZSByYW5n
+ZS4KCkkgdGhpbmsgSSBwb2ludGVkIGl0IG91dCBwdWJsaWNhbGx5IGFzIHdlbGwuCgpJIGRpZCBp
+biB0aGUgb3RoZXIgdGhyZWFkICJSZTogQW1pZ2EgUkRCIHBhcnRpdGlvbiBzdXBwb3J0IGZvciBk
+aXNrcyA+PSAKMiBUQiIuIEp1c3QgZm9yIHRoZSByZWNvcmQgaW4gYW4gcmVwbHkgdG8geW91ciBw
+YXRjaCwgTWljaGFlbCwgSSBjb3B5IGl0IApvdmVyOgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpCdXQgeWVh
+aCwgYXMgbWVudGlvbmVkIEkgcmVzZWFyY2hlZCB0aGUgdG9waWMgYmVmb3JlLiBBbmQgSSB0aGlu
+ayB0aGVyZSAKaGFzIG5vdCBldmVuIGJlZW4gYW4gb3ZlcmZsb3cgd2l0aGluIHRoZSBSREI6Cgo+
+IFRoZSByYXcsIHRoZW9yZXRpY2FsIGxpbWl0IG9uIHRoZSBtYXhpbXVtIGRldmljZSBjYXBhY2l0
+eSBpcyBhYm91dAo+IDJeMTA1IGJ5dGVzOgo+Cj4gMzIgYml0IHJkYl9DeWxpbmRlcnMgKiAzMiBi
+aXQgcmRiX0hlYWRzICogMzIgYml0IHJkYl9TZWN0b3JzICogNTEyCj4gYnl0ZXMvc2VjdG9yIGZv
+ciB0aGUgSEQgc2l6ZSBpbiBzdHJ1Y3QgUmlnaWREaXNrQmxvY2sKCmh0dHA6Ly93aWtpLmFtaWdh
+b3MubmV0L3dpa2kvUkRCXyhBbWlnYV9SaWdpZF9EaXNrX0Jsb2NrKQoKQ29uZmlybWVkIGJ5OgoK
+VGhlIC5BREYgKEFtaWdhIERpc2sgRmlsZSkgZm9ybWF0IEZBUToKaHR0cDovL2xjbGV2eS5mcmVl
+LmZyL2FkZmxpYi9hZGZfaW5mby5odG1sI3A2CgpCdXQgd2hhdCBkbyBJIHdyaXRlLCB5b3Uga25v
+dyB0aGUgUkRCIGZvcm1hdCAKClNvIGp1c3QgZG8gdGhlIGNhbGN1bGF0aW9uIGluIDk2IEJpdCBh
+bmQgeW91IGFsbCBhcmUgc2V0IAoKTm93IHRoYXQgaXMgYSByZWFzb24gZm9yIDEyOCBCaXQgQ1BV
+cyA6KS4KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKPiBIZXJlIGFyZSB0aGUgcmVsZXZhbnQgcGllY2VzIG9m
+IHRoZSBBREYgZm9ybWF0IEZBUToKPiAgNi4xIFdoYXQgaXMgdGhlIFJpZ2lkIERpc2sgQmxvY2sg
+Pwo+IAo+ICogUmlnaWQgRGlzayBibG9jayAoMjU2IGJ5dGVzKSBtdXN0IGV4aXN0IHdpdGhpbiB0
+aGUgZmlyc3QgMTYgYmxvY2tzCj4gW+KApl0KPiAKPiAJUGh5c2ljYWwgZHJpdmUgY2FyYWN0ZXJp
+c3RpY3MKPiAKPiA2NC80MAl1bG9uZyAJMSAJY3lsaW5kZXJzIAludW1iZXIgb2YgZHJpdmUgY3ls
+aW5kZXIKPiA2OC80NCAJdWxvbmcgCTEgCXNlY3RvcnMgCXNlY3RvcnMgcGVyIHRyYWNrCj4gNzIv
+NDgJdWxvbmcgCTEgCWhlYWRzIAkJbnVtYmVyIG9mIGRyaXZlIGhlYWRzCj4gW+KApl0KClVMT05H
+IGlzIDMyLWJpdCB1bnNpZ25lZC4gU2VlOgoKaHR0cDovL3dpa2kuYW1pZ2Fvcy5uZXQvd2lraS9G
+dW5kYW1lbnRhbF9UeXBlcwoKU28gd2UgYmFzaWNhbGx5IGhhdmUgOTYgYml0cyBoZXJlICsgYXQg
+bGVhc3QgOSBiaXRzICg1MTIgYnl0ZXMgc2VjdG9yIApzaXplKSBpZiB5b3UgY2FsY3VsYXRlIGJ5
+IGJ5dGVzLiBBbmQgYXMgbm90ZWQgYnkgSm9hbm5lOiBJbiBjYXNlIHlvdSAKd291bGQgdXNlIGxh
+cmdlIHNlY3RvciBzaXplc+KApiB5b3UgY291bGQgYWRkcmVzcyByZWFsbHkgZXZlbiBtb3JlIAoq
+aW5zYW5lKiBhbW91bnRzIG9mIGNhcGFjaXR5LgoKU2VlIHdoeSBJIHN0aWxsIHRoaW5rIFJEQsK0
+cyBpcyBxdWl0ZSBicmlsbGlhbnQ/CgpNYXliZSB1c2luZyBVTE9ORyB3YXMganVzdCBieSBhY2Np
+ZGVudCwgYnV0IHdlbGwgaXQgbWFkZSBSRELCtHMgZnV0dXJlIApwcm9vZiBmb3IgYWNjZXNzaW5n
+IGxhcmdlciBkaXNrcyB0aGFuIGFueXRoaW5nIHRoYXQgaXMgaW4gdGhlIG1hcmtldCAKdG9kYXkg
+YW5kIEkgYmV0IGZvciBhIGxvbmcgdGltZSB0byBjb21lIDopCgpBbmQgZm9yIHBhcnRpdGlvbnMg
+dGhpcyB3b3JrcyBhcyB3ZWxsOgoKPiAgNi4zIEhvdyBhcmUgcGFydGl0aW9ucyBzdG9yZWQ/Cj4g
+Cj4gMTY0L2E0IAl1bG9uZyAJMSAJTG93Q3lsCQlmaXJzdCBjeWxpbmRlciBvZiBhIHBhcnRpdGlv
+biAKPiAoaW5jbHVzaXZlKQo+IDE2OC9hOCAJdWxvbmcgCTEgCUhpZ2hDeWwJCWxhc3QgY3lsaW5k
+ZXIgb2YgYSBwYXJ0aXRpb24gCj4gKGluY2x1c2l2ZSkACgpTbyB0byBzdW1tYXJpemU6IEkgdGhp
+bmsgUkRCwrRzIGNhbiBjb21wZXRlIHdpdGggR1BUIHJlZ2FyZGluZyBtYXhpbXVtIApjYXBhY2l0
+eSBuaWNlbHkgZW5vdWdoLiBEZXNwaXRlIEpvYW5uZSBpbnZlbnRlZCBSREIgYXQgbGVhc3QgYSBk
+ZWNhZGUgCmJlZm9yZSBzb21lb25lIGludmVudGVkIEdQVC4gQW1pZ2FPUyBoYWQgYW5kIGhhcyBh
+IHRvbiBvZiBmbGF3cyBidXQgaXQgCmhhcyBiZWVuIG1hZGUgYnkgZ2VuaXVzwrRlcyBhbmQgaXQg
+aXMgYSBsb3Qgb2YgYnJpbGxpYW50IGlkZWFzIGluIGl0LgoKT2theSwgSSB0aGluayBhZnRlciB0
+aGlzIGVzc2F5IGl0IHNob3VsZCByZWFsbHkgYmUgY2xlYXIgdGhhdCB0aGUgUkRCIAppdHNlbGYg
+Y2FuIGhhbmRsZSBpbnNhbmUgYW1vdW50cyBvZiBjYXBhY2l0eSBpbiBhbnkgY2FzZS4KCj4gVGhp
+cyBtZWFucyB0aGF0IGFueSBlcnJvcnMgYW5kIGZhaWx1cmVzIHRvIG1vdW50IHNob3VsZCBsaWUg
+d2l0aCB0aGUKPiBSREIgUGFyc2VyLCB0aGUgZmlsZXN5c3RlbSwgdGhlIGRldmljZSBkcml2ZXIs
+IGFuZCBhbnkgaW50ZXJ2ZW5pbmcKPiBjb2RlIGJldHdlZW4gdGhlIHRocmVlLiBUaGUgUkRCcyBj
+YW4gZXhwcmVzcyBhIHZhbHVlIGZhciBncmVhdGVyIHRoYW4KPiB0aGUgbnVtYmVyIG9mIGF0b21z
+IGVzdGltYXRlZCB0byBleGlzdCBpbiB0aGUgb2JzZXJ2YWJsZSB1bml2ZXJzZS4gU28KPiBSREJz
+IHdvbid0IGV2ZXIgbmVlZCBhIGNoYW5nZSBmb3IgZGlzayBzaXplIGNvbnNpZGVyYXRpb25zLiBU
+aGUKPiBwYXJzZXIgYW5kIGZpbGVzeXN0ZW1zIHByb2JhYmx5IGFuZCBwb3NzaWJseSwgcmVzcGVj
+dGl2ZWx5LCB3aWxsLgoKRXhhY3RseSB0aGF0LgoKRmlsZXN5c3RlbXMgaGF2ZSBvdGhlciBsaW1p
+dHMuIEFuZCB0aGV5IG5lZWQgdG8gYmFpbCBvdXQgYmVmb3JlIG1vdW50aW5nIAphbnl0aGluZyBi
+ZXlvbmQgdGhlaXIgbGltaXRzLgoKU28gdGhlIFJEQiBwYXJzZXIgaXMganVzdCBmaW5lIHdpdGgg
+YXQgbGVhc3QgNjQgYml0IGNhbGN1bGF0aW9ucy4gT2YgCmNvdXJzZSBpdCBzaG91bGQgYmFpbCBv
+dXQgYmlnIHRpbWUgaWYgaXQgZXZlciBjb21lcyBhY3Jvc3MgYSBSREIgd2hlcmUgCgozMiBiaXQg
+cmRiX0N5bGluZGVycyAqIDMyIGJpdCByZGJfSGVhZHMgKiAzMiBiaXQgcmRiX1NlY3RvcnMKCmRv
+ZXMgbm90IGZpdCB3aXRoaW4gNjQgQml0LiBVbmxlc3MgaXQgdXNlcyA5NiBvciBldmVuIDEyOCBi
+aXQgCmNhbGN1bGF0aW9ucyA6KS4gRXZlbiB0b3VnaCBJIHRoaW5rIGl0IGlzIHVubGlrZWx5IHRo
+YXQgdGhlcmUgZXZlciB3b3VsZCAKYmUgc3VjaCBhbiBSREIsIEkgd291bGQgcmF0aGVyIHBsYXkg
+aXQgdmVyeSBzYWZlIHdpdGggYW55dGhpbmcgcmVnYXJkaW5nIApwYXJ0aXRpb25pbmcgYW5kIGFk
+ZHJlc3NpbmcgY2FwYWNpdHkgb24gZGlza3MuIE5ldmVyIGV2ZXIgb3ZlcmZsb3cgCndpdGhvdXQg
+YmFpbGluZyBvdXQuIE9yIHRvIGhhdmUgaXQgd2l0aCBKb2FubmXCtHMgd29yZHM6Cgo+IEVycm9y
+IG91dCBhbmQgZG9uJ3QgbW91bnQgZGlza3Mgb3IgcGFydGl0aW9ucyB0aGF0IGFyZSBvdXRzaWRl
+IHRoZQo+IHNpemUgcmFuZ2UgeW91ciBlbGVtZW50IG9mIHRoZSBkYXRhcGF0aCBmcm9tIGRpc2sg
+dG8gdXNlcidzIHByb2dyYW0KPiBjYW4gaGFuZGxlIGF0IHRoZSBmaXJzdCBwbGFjZSB0aGlzIGNh
+biBiZSBkZXRlY3RlZC4gSXQncyB0aGUgcG9saXRlCj4gdGhpbmcgdG8gZG8gdG8gYSB1c2VyJ3Mg
+ZGF0YSByYXRoZXIgdGhhbiB0aGUgTWF4aW5lIFdhdGVycyB0aGluZyB0bwo+IGRvLgoKRnVsbHkg
+YWdyZWVkLgoKQW1lbiwKLS0gCk1hcnRpbg==
