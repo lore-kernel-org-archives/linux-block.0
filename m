@@ -1,42 +1,86 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:55055 "EHLO
-        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1754451AbeFUDHV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Jun 2018 23:07:21 -0400
-From: Liu Bo <bo.liu@linux.alibaba.com>
-To: <linux-block@vger.kernel.org>
-Subject: [PATCH] Block: initialize bio_cnt_ret_time for the first time
-Date: Thu, 21 Jun 2018 11:07:04 +0800
-Message-Id: <1529550424-105210-1-git-send-email-bo.liu@linux.alibaba.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <minwoo.im.dev@gmail.com>
+Return-Path: <minwoo.im.dev@gmail.com>
+From: Minwoo Im <minwoo.im.dev@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: [PATCH] blk-mq: code clean-up by adding an API to clear set->mq_map
+Date: Sun,  1 Jul 2018 01:21:39 +0900
+Message-Id: <1530375699-20461-1-git-send-email-minwoo.im.dev@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-When a new tg is created, tg->bio_cnt_ret_time is 0, so if the first
-IO going thru this tg turns out to be a bad one, we fail to record it
-in tg->bad_bio_cnt as
+set->mq_map is now currently cleared if something goes wrong when
+establishing a queue map in blk-mq-pci.c.  It's also cleared before
+updating a queue map in blk_mq_update_queue_map().
 
-if (jiffies > bio_cnt_ret_time) {
-	tg->bad_bio_cnt /= 2;
-}
+This patch provides an API to clear set->mq_map to make it clear.
 
-Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
+Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
 ---
- block/blk-throttle.c | 2 ++
- 1 file changed, 2 insertions(+)
+ block/blk-mq-pci.c     |  3 +--
+ block/blk-mq.c         | 13 ++++++++++---
+ include/linux/blk-mq.h |  1 +
+ 3 files changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 82282e6fdcf8..8bd54118dc0a 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2329,6 +2329,8 @@ void blk_throtl_bio_endio(struct bio *bio)
- 		tg->bio_cnt++;
- 	}
+diff --git a/block/blk-mq-pci.c b/block/blk-mq-pci.c
+index e233996..ccb9d7e 100644
+--- a/block/blk-mq-pci.c
++++ b/block/blk-mq-pci.c
+@@ -48,8 +48,7 @@ int blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev,
  
-+	if (unlikely(!tg->bio_cnt_reset_time))
-+		tg->bio_cnt_reset_time = jiffies;
- 	if (time_after(jiffies, tg->bio_cnt_reset_time) || tg->bio_cnt > 1024) {
- 		tg->bio_cnt_reset_time = tg->td->throtl_slice + jiffies;
- 		tg->bio_cnt /= 2;
+ fallback:
+ 	WARN_ON_ONCE(set->nr_hw_queues > 1);
+-	for_each_possible_cpu(cpu)
+-		set->mq_map[cpu] = 0;
++	blk_mq_clear_mq_map(set);
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_pci_map_queues);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b429d51..c5f9ee1 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2672,10 +2672,18 @@ static int blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+ 	return 0;
+ }
+ 
++void blk_mq_clear_mq_map(struct blk_mq_tag_set *set)
++{
++	int cpu;
++
++	for_each_possible_cpu(cpu)
++		set->mq_map[cpu] = 0;
++}
++EXPORT_SYMBOL(blk_mq_clear_mq_map);
++
+ static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
+ {
+ 	if (set->ops->map_queues) {
+-		int cpu;
+ 		/*
+ 		 * transport .map_queues is usually done in the following
+ 		 * way:
+@@ -2690,8 +2698,7 @@ static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
+ 		 * killing stale mapping since one CPU may not be mapped
+ 		 * to any hw queue.
+ 		 */
+-		for_each_possible_cpu(cpu)
+-			set->mq_map[cpu] = 0;
++		blk_mq_clear_mq_map(set);
+ 
+ 		return set->ops->map_queues(set);
+ 	} else
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index e3147eb..18390dc 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -204,6 +204,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ int blk_mq_register_dev(struct device *, struct request_queue *);
+ void blk_mq_unregister_dev(struct device *, struct request_queue *);
+ 
++void blk_mq_clear_mq_map(struct blk_mq_tag_set *set);
+ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set);
+ void blk_mq_free_tag_set(struct blk_mq_tag_set *set);
+ 
 -- 
-1.8.3.1
+2.7.4
