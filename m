@@ -1,65 +1,77 @@
 Return-Path: <schmitzmic@gmail.com>
 Return-Path: <schmitzmic@gmail.com>
-From: Michael Schmitz <schmitzmic@gmail.com>
-Subject: Subject: [PATCH RFC] block: fix Amiga RDB partition support for disks
- >= 2 TB
-To: Martin Steigerwald <martin@lichtvoll.de>, jdow <jdow@earthlink.net>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>,
- linux-m68k <linux-m68k@lists.linux-m68k.org>, linux-block@vger.kernel.org
+Subject: Re: Subject: [PATCH RFC] block: fix Amiga RDB partition support for
+ disks >= 2 TB
+To: Geert Uytterhoeven <geert@linux-m68k.org>
 References: <20180627012421.80B8F24E094@nmr-admin>
- <b8c29f74-9ba1-a697-b1f8-1a116b317a54@gmail.com>
- <af252a47-a22e-5f40-f412-e5dbfaa6858c@earthlink.net>
- <4908196.8QWSOAbfO6@merkaba>
-Message-ID: <fdf0808f-f53c-95c7-ff36-5dbac5826948@gmail.com>
-Date: Sun, 1 Jul 2018 14:43:01 +1200
+ <CAMuHMdUOGdF-bm8j59Om8JNV0mFqK0yixGifgLAjxGwOGLoyqQ@mail.gmail.com>
+ <ab97678c-ad67-8020-73d4-c0a5eed2f9f7@gmail.com>
+ <CAMuHMdV035mVe1g6sm0wA8LCG7Z9cdnRXrHNtVTCr97tu-yo0Q@mail.gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, jdow <jdow@earthlink.net>,
+ Martin Steigerwald <martin@lichtvoll.de>,
+ linux-m68k <linux-m68k@lists.linux-m68k.org>, linux-block@vger.kernel.org
+From: Michael Schmitz <schmitzmic@gmail.com>
+Message-ID: <26c4b7c8-4cc8-8304-524f-2af73366a676@gmail.com>
+Date: Sun, 1 Jul 2018 09:26:42 +1200
 MIME-Version: 1.0
-In-Reply-To: <4908196.8QWSOAbfO6@merkaba>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAMuHMdV035mVe1g6sm0wA8LCG7Z9cdnRXrHNtVTCr97tu-yo0Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Martin,
+Hi Geert,
 
-Am 30.06.18 um 19:49 schrieb Martin Steigerwald:
-> I am really inclined to point some AmigaOS 4 developers to this
-> discussion and just looked for an archive. Unfortunately there does not 
-> appear to be a working one. The one mentioned on
+Am 01.07.2018 um 09:10 schrieb Geert Uytterhoeven:
+> Hi Michael,
 >
-> http://www.linux-m68k.org/mail.html
+> On Fri, Jun 29, 2018 at 11:12 AM Michael Schmitz <schmitzmic@gmail.com> wrote:
+>> Am 28.06.18 um 01:30 schrieb Geert Uytterhoeven:
+>>> On Wed, Jun 27, 2018 at 4:47 AM <schmitzmic@gmail.com> wrote:
+>>>> From 5299e0e64dfb33ac3a1f3137b42178734ce20087 Mon Sep 17 00:00:00 2001
+>>> ??
+>>>
+>>>> The Amiga RDB partition parser module uses int for partition sector
+>>>> address and count, which will overflow for disks 2 TB and larger.
+>>>>
+>>>> Use sector_t as type for sector address and size (as expected by
+>>>> put_partition) to allow using such disks without danger of data
+>>>> corruption.
+>>> Note that sector_t is not guaranteed to be 64-bit:
+>>>
+>>>     #ifdef CONFIG_LBDAF
+>>>     typedef u64 sector_t;
+>>>     typedef u64 blkcnt_t;
+>>>     #else
+>>>     typedef unsigned long sector_t;
+>>>     typedef unsigned long blkcnt_t;
+>>>     #endif
+>>>
+>>> And it seems CONFIG_LBDAF can still be disabled on 32-bit...
+>>>
+>>
+>> What are the ramifications of using a 2 TB disk on a kernel without
+>> CONFIG_LBDAF? Are there any safeguards after the partition scan stage
+>> that would prevent the kernel from using partitions on such a disk?
+>>
+>> Trying to decide whether we absolutely have to bail if sector_t is 32
+>> bit ...
 >
-> http://aire.ncl.ac.uk/Atari/Mailing-Lists/Linux-680x0-vger-List.index.html
->
-> does not send an answer within the HTTP / TCP timeout limit.
+> Sorry, I don't know.
 
-Most of the information found online on m68k will be several years out
-of date, I'd expect. The page you appear to have found will be several
-decades out of date (any mention of the FTP server at Uni Saarbruecken
-for list archives is a dead giveaway). The internet doesn't forget, but
-that can be a curse rather than a blessing at times.
+Not to worry - I'll find out one way or another. I've added some more 
+checks to spot both 32 bit and 64 bit overflows following what we 
+discussed in the past days (though the latter really shouldn't happen). 
+I'm quite sure that will throw everyone on linux-block in a laughing 
+fit, but I'm sure someone will point out a better way of doing this 
+during review (or prove it won't be necessary).
 
-Anyway, vger sez:
-
-https://marc.info/?l=linux-m68k&r=1&w=2
-and
-https://www.spinics.net/lists/linux-m68k/
-
-which work for me.
->
-> I also did not find any archive for linux-block mailing list
-
-https://marc.info/?l=linux-block works for me.
-
-> .
->
-> And lore.kernel.org only seems to archive LKML itself which is patch and 
-> the discussion we have here is not CC´d to.
-
-And I'm glad we didn't.
+Pending final test, I'll submit the result today or tomorrow.
 
 Cheers,
 
-    Michael
+	Michael
 
 >
-> Any advice?
+> Gr{oetje,eeting}s,
 >
-> Thanks,
+>                         Geert
+>
