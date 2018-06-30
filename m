@@ -1,41 +1,55 @@
 Return-Path: <geert.uytterhoeven@gmail.com>
 MIME-Version: 1.0
-References: <20180627012421.80B8F24E094@nmr-admin> <b39c2bf0-de19-ef6e-75bf-b9fae33255c6@gmail.com>
- <CAMuHMdVtvv1Cxxuf__TUKGUJiuTUohGx5XvY_3nQ7vD5J_BBAw@mail.gmail.com>
- <3681004.ZGfTzPZDUK@merkaba> <CAMuHMdXqzQFTNjWrRrgUrEO5XVy+X_ztnnCEZo3vYXVCJp4n8w@mail.gmail.com>
- <102c5f41-7fa8-267c-973a-176d3c3d4f57@gmail.com> <87po09bw4v.fsf@igel.home>
-In-Reply-To: <87po09bw4v.fsf@igel.home>
+References: <20180627012421.80B8F24E094@nmr-admin> <CAMuHMdUOGdF-bm8j59Om8JNV0mFqK0yixGifgLAjxGwOGLoyqQ@mail.gmail.com>
+ <ab97678c-ad67-8020-73d4-c0a5eed2f9f7@gmail.com>
+In-Reply-To: <ab97678c-ad67-8020-73d4-c0a5eed2f9f7@gmail.com>
 From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Sat, 30 Jun 2018 23:21:30 +0200
-Message-ID: <CAMuHMdW_sy+Ojs2Rq-7ZVohUkBt550iTpQNPPmMg+3-tm09TbA@mail.gmail.com>
+Date: Sat, 30 Jun 2018 23:10:44 +0200
+Message-ID: <CAMuHMdV035mVe1g6sm0wA8LCG7Z9cdnRXrHNtVTCr97tu-yo0Q@mail.gmail.com>
 Subject: Re: Subject: [PATCH RFC] block: fix Amiga RDB partition support for
  disks >= 2 TB
-To: Andreas Schwab <schwab@linux-m68k.org>
-Cc: Michael Schmitz <schmitzmic@gmail.com>, Martin Steigerwald <martin@lichtvoll.de>,
-	Jens Axboe <axboe@kernel.dk>, jdow <jdow@earthlink.net>,
-	linux-m68k <linux-m68k@lists.linux-m68k.org>, linux-block@vger.kernel.org
+To: Michael Schmitz <schmitzmic@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, geert@linux-m68k.org-r, jdow <jdow@earthlink.net>,
+	Martin Steigerwald <martin@lichtvoll.de>, linux-m68k <linux-m68k@lists.linux-m68k.org>,
+	linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Andreas,
+Hi Michael,
 
-On Fri, Jun 29, 2018 at 3:26 PM Andreas Schwab <schwab@linux-m68k.org> wrote:
-> On Jun 29 2018, Michael Schmitz <schmitzmic@gmail.com> wrote:
-> > Would MSDOS recognize the GPT partition as 'probably FAT', and attempt
-> > to use it?
+On Fri, Jun 29, 2018 at 11:12 AM Michael Schmitz <schmitzmic@gmail.com> wrote:
+> Am 28.06.18 um 01:30 schrieb Geert Uytterhoeven:
+> > On Wed, Jun 27, 2018 at 4:47 AM <schmitzmic@gmail.com> wrote:
+> >> From 5299e0e64dfb33ac3a1f3137b42178734ce20087 Mon Sep 17 00:00:00 2001
+> > ??
+> >
+> >> The Amiga RDB partition parser module uses int for partition sector
+> >> address and count, which will overflow for disks 2 TB and larger.
+> >>
+> >> Use sector_t as type for sector address and size (as expected by
+> >> put_partition) to allow using such disks without danger of data
+> >> corruption.
+> > Note that sector_t is not guaranteed to be 64-bit:
+> >
+> >     #ifdef CONFIG_LBDAF
+> >     typedef u64 sector_t;
+> >     typedef u64 blkcnt_t;
+> >     #else
+> >     typedef unsigned long sector_t;
+> >     typedef unsigned long blkcnt_t;
+> >     #endif
+> >
+> > And it seems CONFIG_LBDAF can still be disabled on 32-bit...
+> >
 >
-> GPT has the concept of a protective MBR which should prevent such errors.
+> What are the ramifications of using a 2 TB disk on a kernel without
+> CONFIG_LBDAF? Are there any safeguards after the partition scan stage
+> that would prevent the kernel from using partitions on such a disk?
+>
+> Trying to decide whether we absolutely have to bail if sector_t is 32
+> bit ...
 
-Thanks, good to know.
-
-So it looks like GPT and RDSK can coexist on the same disk: an RDSK header
-in block 0 (pointing to PART blocks located after the GPT), and GPT in
-blocks 1-33.
-
-That means for very large disks, you can have an RDSK describing the
-partitions that fit in the first part of the disk that can be accessed by
-e.g. AmigaOS 3.0, and a GPT that describes all partitions on the disk,
-right?
+Sorry, I don't know.
 
 Gr{oetje,eeting}s,
 
