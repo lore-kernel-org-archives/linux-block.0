@@ -1,49 +1,52 @@
-Return-Path: <prvs=686e31ba0=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@lst.de" <hch@lst.de>, "keith.busch@intel.com"
-	<keith.busch@intel.com>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, "tj@kernel.org"
-	<tj@kernel.org>, "lduncan@suse.com" <lduncan@suse.com>,
+Return-Path: <kent.overstreet@gmail.com>
+Return-Path: <kent.overstreet@gmail.com>
+Date: Sat, 30 Jun 2018 19:38:30 -0400
+From: Kent Overstreet <kent.overstreet@gmail.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Ming Lei <tom.leiming@gmail.com>, Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>, "cleech@redhat.com"
-	<cleech@redhat.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>
-Subject: Re: [PATCH 03/14] blk-mq: Remove generation seqeunce
-Date: Mon, 4 Jun 2018 06:56:22 +0000
-Message-ID: <fe09917b6159988b168a9ef25240e0082c7c352f.camel@wdc.com>
-References: <20180529135239.27005-1-hch@lst.de>
-	 <20180529135239.27005-4-hch@lst.de>
-In-Reply-To: <20180529135239.27005-4-hch@lst.de>
-Content-Type: text/plain; charset="utf-8"
+	Christoph Hellwig <hch@lst.de>, Mike Snitzer <snitzer@redhat.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: Re: [PATCH] block: Make __bio_clone_fast() copy bi_vcnt
+Message-ID: <20180630233830.GC31305@kmo-pixel>
+References: <20180627201231.15641-1-bart.vanassche@wdc.com>
+ <20180627235005.GE7583@ming.t460p>
+ <4995fc0c-e9d7-d747-7331-67396827a596@wdc.com>
+ <20180628003007.GG7583@ming.t460p>
+ <5e78949d-6169-5a5a-869b-731a3468e2de@wdc.com>
+ <CACVXFVNzb9j_KwJLor4O=T_fgRRR12KOkZ2DXtniYp=u3Ru3bg@mail.gmail.com>
+ <20180628231616.GA31305@kmo-pixel>
+ <dc3a20ab-b72a-46c9-1f93-7f835b24b854@wdc.com>
+ <20180629000424.GB31305@kmo-pixel>
+ <914493fc-d2c0-19a1-533e-c9e72340c8e9@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <914493fc-d2c0-19a1-533e-c9e72340c8e9@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTA1LTI5IGF0IDE1OjUyICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
-ZToNCj4gRnJvbTogS2VpdGggQnVzY2ggPGtlaXRoLmJ1c2NoQGludGVsLmNvbT4NCj4gDQo+IFRo
-aXMgcGF0Y2ggc2ltcGxpZmllcyB0aGUgdGltZW91dCBoYW5kbGluZyBieSByZWx5aW5nIG9uIHRo
-ZSByZXF1ZXN0DQo+IHJlZmVyZW5jZSBjb3VudGluZyB0byBlbnN1cmUgdGhlIGl0ZXJhdG9yIGlz
-IG9wZXJhdGluZyBvbiBhbiBpbmZsaWdodA0KPiBhbmQgdHJ1bHkgdGltZWQgb3V0IHJlcXVlc3Qu
-IFNpbmNlIHRoZSByZWZlcmVuY2UgY291bnRpbmcgcHJldmVudHMgdGhlDQo+IHRhZyBmcm9tIGJl
-aW5nIHJlYWxsb2NhdGVkLCB0aGUgYmxvY2sgbGF5ZXIgbm8gbG9uZ2VyIG5lZWRzIHRvIHByZXZl
-bnQNCj4gZHJpdmVycyBmcm9tIGNvbXBsZXRpbmcgdGhlaXIgcmVxdWVzdHMgd2hpbGUgdGhlIHRp
-bWVvdXQgaGFuZGxlciBpcw0KPiBvcGVyYXRpbmcgb24gaXQ6IGEgZHJpdmVyIGNvbXBsZXRpbmcg
-YSByZXF1ZXN0IGlzIGFsbG93ZWQgdG8gcHJvY2VlZCB0bw0KPiB0aGUgbmV4dCBzdGF0ZSB3aXRo
-b3V0IGFkZGl0aW9uYWwgc3luY3Jvbml6YXRpb24gd2l0aCB0aGUgYmxvY2sgbGF5ZXIuDQo+IA0K
-PiBUaGlzIGFsc28gcmVtb3ZlcyBhbnkgbmVlZCBmb3IgZ2VuZXJhdGlvbiBzZXF1ZW5jZSBudW1i
-ZXJzIHNpbmNlIHRoZQ0KPiByZXF1ZXN0IGxpZmV0aW1lIGlzIHByZXZlbnRlZCBmcm9tIGJlaW5n
-IHJlYWxsb2NhdGVkIGFzIGEgbmV3IHNlcXVlbmNlDQo+IHdoaWxlIHRpbWVvdXQgaGFuZGxpbmcg
-aXMgb3BlcmF0aW5nIG9uIGl0Lg0KPiANCj4gVG8gZW5hYmxlcyB0aGlzIGEgcmVmY291bnQgaXMg
-YWRkZWQgdG8gc3RydWN0IHJlcXVlc3Qgc28gdGhhdCByZXF1ZXN0DQo+IHVzZXJzIGNhbiBiZSBz
-dXJlIHRoZXkncmUgb3BlcmF0aW5nIG9uIHRoZSBzYW1lIHJlcXVlc3Qgd2l0aG91dCBpdA0KPiBj
-aGFuZ2luZyB3aGlsZSB0aGV5J3JlIHByb2Nlc3NpbmcgaXQuICBUaGUgcmVxdWVzdCdzIHRhZyB3
-b24ndCBiZQ0KPiByZWxlYXNlZCBmb3IgcmV1c2UgdW50aWwgYm90aCB0aGUgdGltZW91dCBoYW5k
-bGVyIGFuZCB0aGUgY29tcGxldGlvbg0KPiBhcmUgZG9uZSB3aXRoIGl0Lg0KPiANCj4gU2lnbmVk
-LW9mZi1ieTogS2VpdGggQnVzY2ggPGtlaXRoLmJ1c2NoQGludGVsLmNvbT4NCj4gW2hjaDogc2xp
-Z2h0IGNsZWFudXBzLCBhZGRlZCBiYWNrIHN1Ym1pc3Npb24gc2lkZSBoY3R4IGxvY2ssIHVzZSBj
-bXB4Y2hnDQo+ICBmb3IgY29tcGxldGlvbnNdDQo+IFNpZ25lZC1vZmYtYnk6IENocmlzdG9waCBI
-ZWxsd2lnIDxoY2hAbHN0LmRlPg0KDQpIZWxsbyBDaHJpc3RvcGgsDQoNCkNhbiB5b3UgZXhwbGFp
-biB3aHkgeW91IHByZWZlciB0aGlzIGFwcHJvYWNoPyBJIHRoaW5rIHRoaXMgcGF0Y2ggaW50cm9k
-dWNlcw0KbW9yZSBuZXcgYXRvbWljIG9wZXJhdGlvbnMgaW4gdGhlIGhvdCBwYXRoIHRoYW4gdGhl
-IGFwcHJvYWNoIEkgaGFkIHByb3Bvc2VkDQooImJsay1tcTogUmV3b3JrIGJsay1tcSB0aW1lb3V0
-IGhhbmRsaW5nIGFnYWluIikuIEluIG90aGVyIHdvcmRzLCBJIHRoaW5rIHRoZQ0KcGF0Y2ggdGhh
-dCBJIGhhZCBwcm9wb3NlZCB3aWxsIHlpZWxkIGJldHRlciBwZXJmb3JtYW5jZS4NCg0KVGhhbmtz
-LA0KDQpCYXJ0Lg0KDQoNCg==
+On Fri, Jun 29, 2018 at 01:00:33PM -0700, Bart Van Assche wrote:
+> On 06/28/18 17:04, Kent Overstreet wrote:
+> > On Thu, Jun 28, 2018 at 04:54:44PM -0700, Bart Van Assche wrote:
+> > > Thanks for chiming in. The linux-block mailing list is archived by multiple
+> > > websites. The entire e-mail thread is available on e.g.
+> > > https://www.mail-archive.com/linux-block@vger.kernel.org/msg23006.html.
+> > > 
+> > > I have a question for you: at least in kernel v4.17 bio_clone_bioset()
+> > > copies bi_vcnt from the source to the destination bio. However,
+> > > __bio_clone_fast() doesn't copy bi_vcnt. Isn't that an inconsistency?
+> > 
+> > No - when you use bio_clone_bioset() you get a bio that you own and can do
+> > whatever you want with, so it does make sense for it to initialize bi_vcnt.
+> > 
+> > e.g. you could use bio_clone_bioset() when you're going to be bouncing a bio,
+> > iterating over each bvec and allocating a new page and copying data from the old
+> > page to the new page.
+> 
+> Hello Kent,
+> 
+> Have you considered to explain this in a comment above __bio_clone_fast() to
+> avoid that the next person who reads that function gets confused?
+
+Well, there is a large comment in bio_clone_bioset() that you must have found...
