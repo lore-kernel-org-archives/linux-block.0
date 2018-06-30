@@ -1,215 +1,235 @@
 Return-Path: <martin@lichtvoll.de>
 From: Martin Steigerwald <martin@lichtvoll.de>
-To: jdow <jdow@earthlink.net>
-Cc: Michael Schmitz <schmitzmic@gmail.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>, linux-m68k <linux-m68k@lists.linux-m68k.org>, linux-block@vger.kernel.org
+To: Michael Schmitz <schmitzmic@gmail.com>
+Cc: jdow <jdow@earthlink.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>, linux-m68k <linux-m68k@lists.linux-m68k.org>, linux-block@vger.kernel.org
 Subject: Re: Subject: [PATCH RFC] block: fix Amiga RDB partition support for disks >= 2 TB
-Date: Sat, 30 Jun 2018 11:07:09 +0200
-Message-ID: <2821568.nu49EmH9g5@merkaba>
-In-Reply-To: <765b1a05-752b-7736-ac56-8235b432969c@earthlink.net>
-References: <20180627012421.80B8F24E094@nmr-admin> <c02bbd73-d946-9d1b-7f10-03aacae1f1ee@gmail.com> <765b1a05-752b-7736-ac56-8235b432969c@earthlink.net>
+Date: Sat, 30 Jun 2018 10:48:49 +0200
+Message-ID: <8748093.MpWLty1hLz@merkaba>
+In-Reply-To: <c02bbd73-d946-9d1b-7f10-03aacae1f1ee@gmail.com>
+References: <20180627012421.80B8F24E094@nmr-admin> <af252a47-a22e-5f40-f412-e5dbfaa6858c@earthlink.net> <c02bbd73-d946-9d1b-7f10-03aacae1f1ee@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-jdow - 30.06.18, 08:47:
-> Let's get everybody:
->=20
-> On 20180629 22:26, Michael Schmitz wrote:
->  > Joanne,
->  >=20
->  > Am 30.06.18 um 15:56 schrieb jdow:
->  >>>>> As far as I can guess from the code, pb_Environment[3] (number
->  >>>>> of
->  >>>>=20
->  >>>> heads)
->  >>>>=20
->  >>>>> and pb_Environment[5] (number of sectors per cylinder) are
->  >>>>> abitrarily
->  >>>>> chosen so the partition size can be expressed as a difference
->  >>>>> between
->  >>>>> pb_Environment[9] and pb_Environment[10] (low and high cylinder
->  >>>>> addresses), which places restrictions on both partition size
->  >>>>> and
->  >>>>> alignment that depend on where on the disk a partition is
->  >>>>> placed?
->  >>>>=20
->  >>>> If you do not teach the OS to ignore Cylinder Blocks type
->  >>>> entries and
->  >>>> use some math on heads and blocks per track the disk size is
->  >>>> relatively stuck modulo using large blocks.
->  >>>=20
->  >>> As long as AmigaOS and Linux agree on how to express start and
->  >>> end
->  >>> offset for the partitions, that's fine.
->  >>>=20
->  >>> But I read your other mail to mean that we're stuck to 2 TB disks
->  >>> for
->  >>> now. I don't follow that - we can have partitions of 2 TB each by
->  >>=20
->  >> maxing
->  >>=20
->  >>> out rdb_CylBlocks as long as we use 512 bytes per block (since
->  >>> the
->  >>> product of cylinders and blocks per cylinder is limited to 32
->  >>> bits) and using one cylinder per partition (32 bits available
->  >>> there as well)?
->  >>>=20
->  >>> But the rdb_CylBlocks limit also means we're safe with 64 bit
->  >>> sector_t in Linux. Best add a check in the parser to warn us if
->  >>> the product of head count and sectors per cylinder overflows 32
->  >>> bit though.
->  >>>=20
->  >>> Cheers,
->  >>>=20
->  >>>        Michael
->  >>=20
->  >> How long did it tale s to get to 10 TB disks from 2 TB disks. And
->  >> a
->  >> new SD Card spec allows for 128 TB disks. Block sizes get sort of
->  >> ridiculous as you get past about 8k bytes or about 32 TB or about
->  >> two
->  >> years from now.
->  >=20
->  > I get that - I just don't get why 32 bits for cylinders plus 32
->  > bits for blocks per cylinder equals 2 TB (4G of 512 byte blocks).
->  > But I don't know what other limits exist that may restrict the
->  > total number of blocks to 32 bits.
->=20
-> It overflows uint32_t cylinder blocks aka blocks per cylinder. Linux
-> doesn't care. AmigaDOS surely does. If YOU make partitions really
-> large for yourself that's OK. If Joe Amigoid does it the potential
-> for an angry red turning to purple face is high.
-
-Ok, let get this straight:
-
-Do you think that is the responsibility of the RDB parser within the=20
-Linux kernel to protect the user from anything whatever partitioning=20
-tool has created?
-
-If so, how would you make sure the Linux kernel knows about whatever any=20
-partitioning tool used by Amiga users can come up with?=20
-
-I=C2=B4d say: Don=C2=B4t bother. It is not the job of the RDB parser to imp=
-ose=20
-limits on what partitioning tools can create. If native OS tools don=C2=B4t=
-=20
-create such thing, you don=C2=B4t need to check for it. If someone managed =
-to=20
-create it with amiga-fdisk or parted, the tool needs to be fixed. *Not*=20
-the kernel.
-
-Anyway, that 2 TB disk that started all this *worked* on AmigaOS 4. And=20
-I am pretty sure while I cannot proof it, that even a larger disk would=20
-work. There is a limit for the boot partition on AmigaOS 4 Classic,=20
-which uses AmigaOS 3.1 to bootstrap AmigaOS 4 on Classic Amiga computers=20
-like an Amiga 1200 or Amiga 4000 with PowerPC extension card. But=20
-according to
-
-Hard drive setup for AmigaOS 4.1 Classic
-http://blog.hyperion-entertainment.biz/?p=3D210
-
-AmigaOS classic (i.e. < 4) would crash.
-
->  >> Do you want to create disks that will fail on AmigaDOS? AmigaDOS,
->  >> as
->  >> far as I know, makes heavy use of Cylinder Blocks values. It
->  >> calculating Cylinder Blocks overflows when creating the disk's
->  >> RDBs
->  >> the user MUST be informed it is
->  >=20
->  > I'm not at all planning to create disks for AmigaDOS. I just need
->  > to
->  > know what combinations of cylinders, heads and sectors are possible
->  > to encounter on disks that have been created with native tools.
->  > Well, assuming sufficient amounts of braindamage in the
->  > corresponding Linux tools, knowing the absolute outer limits of
->  > what these tools could do would be nice as well, but someone using
->  > amiga-fdisk to create a RDSK block for a 10 TB disk fully deserves
->  > any punishment that invites.
-> Native AmigaDOS tools SHOULD NOT be able to create something that
-> overflows CylinderBlocks values. However, if it can that creates an
-
-There you have it.
-
-Then *why* bother, Joanne?
-
-> interesting test case to see what various tools, like the AmigaDOS
-> "info" command, do when they they are run on such a disk. I don't
-> have OS source to perform searches. And I am not setup to feed the
-> system something obscene.
->=20
->  > (Actually, I lied there. I do plan to create a RDSK block for a 2
->  > TB
->  > disk image where cylinder, head and sector counts all approach the
->  > 32
->  > bit limit, just to see that my overflow checks work as intended.
->  > But
->  > that's strictly for Linux testing).
->  >=20
->  >> unsafe to put on a real Amiga. (I'd also suggest teaching Linux to
->  >> understand RDSL, which would be RDSK++ sort of. Then use that if
->  >> Cylinder Blocks overflows.) The value you will not be able to fill
->  >> in
->  >>=20
->  >> the DosEnvec structure is:
->  >>      ULONG de_HighCyl;         /* max cylinder. drive specific */
->  >=20
->  > OK, so Cylinder Blocks overflowing is a red flag, and requires to
->  > abort parsing the partition table right away? And HighCyl really
->  > means the max. number of logical blocks, not cylinders (which
->  > would have nr_heads*nr_sects many blocks)? That's probably the
->  > cause for my confusion.
-> I think I picked the wrong value. In RDSK itself this value is what
-> overflows: ULONG   rdb_CylBlocks;    /* number of blocks available
-> per cylinder */ And I think that floats around the system in many
-> places with different names. As mentioned the "info" command is one
-> item to test. If no crashes are found then AmigaDOS may be clean up
-> to obscene sizes. At the moment I do not remember what
-> hdwrench.library does with that value other than pass it along as
-> read. Nor am I sure what it generates as any suggested values. I
-> don't at this time have a disk I can mount as a disk on WinUAE that
-> is more than 2TB. And my Amigas speak SCSI so I have no disk for
-> them, either, even if they still boot.
->  >> So accessing larger disks once you hit 2 TB means you must
->  >> increase
->  >> the logical block size. And eventually that will waste HUGE
->  >> amounts of files when small files are being stored.
->  >=20
->  > Just like small inodes wastes huge amounts of space for metadata.
->  > It's a tradeoff, and AFFS on a RDSK format disk probably isn't the
->  > right choice for huge disks. Never mind that - if someone _does_
->  > go that way, we need to make sure we can parse the RDSK
->  > information correctly. And if such a disk causes the 64 bit
->  > sector_t in Linux to overflow, I'd like the parser to spot that,
->  > too.
->  >=20
->  > Thanks for your immense patience in explaining all these subtleties
->  > to me.
-[=E2=80=A6]
->  >      Michael
->=20
-> And I'm rushing too much so I'm sorry I am making errors. This stuff
-> is 25 years in the past since I last looked at it seriously.
-
-I think its important to focus on what can overflow can happen within=20
-calculations the RDB parser (and as a second step the AFFS file system)=20
-in the kernel kernel in order to keep this discussion to a manageable=20
-size. Be conservative about overflows, but otherwise accept. With a=20
-warning if a calculated exceed 32 bit.
-
-As for values in the RDB. If its there, accept it. Some tool has written=20
-it there. We don=C2=B4t know whether it did this right or wrong. We don=C2=
-=B4t=20
-know what the developer of the tool thought when writing it, well except=20
-for hdwrench.library I=C2=B4d say as far as you remember. :) And it is not=
-=20
-our job within the kernel to check that.
-
-There is a ton of more or less legacy software out there on native OS=20
-which does something to or with RDBs. I=C2=B4d say it is impossible to say=
-=20
-what RDB a user may come up with.
-
-Thanks,
-=2D-=20
-Martin
+TWljaGFlbC4gSm9hbm5lLgoKSSBkbyB0aGluayB0aGlzIGRpc2N1c3Npb24gaXMgc2xpZ2h0bHkg
+Z2V0dGluZyBvdXQgb2YgaGFuZOKApiBzbyBJIHN1Z2dlc3QgCnRvIGZvY3VzIG9uIHdoYXQgaXRz
+IHVwIHRvIHRoZSBrZXJuZWwgdG8gZG8gYW5kIHdoYXQgaXMgbm90LiBBbmQgdG8gCmZvY3VzIG9u
+bHkgb24gd2hhdCBpcyB1cCB0byB0aGUgUkRCIHBhcnNlciwgY2F1c2UgdGhlIHBhdGNoIGlzIG9u
+IApjaGFuZ2luZyB0aGF0LiBUaGUgUkRCIHBhcnNlciBpcyBub3QgcmVzcG9uc2libGUgZm9yIHdo
+YXQgYW55IGZpbGUgCnN5c3RlbSBtYXkgZG8uIFNlY3VyaW5nIEFGRlMgd291bGQgYmUgYSBkaWZm
+ZXJlbnQsIGltcG9ydGFudCwgdG9waWMuCgpXaXRoIHRoYXQgbWFpbCBJIGFtIHByb2JhYmx5IG91
+dCBhcyB0aGlzIGRpc2N1c3Npb24gdG9vayBhbHJlYWR5IHF1aXRlIGEgCmJpdCBvZiB0aW1lLgoK
+QnV0IGZvciBkZXRhaWxzLCByZWFkIG9uOgoKTWljaGFlbCBTY2htaXR6IC0gMzAuMDYuMTgsIDA3
+OjI2Ogo+IEFtIDMwLjA2LjE4IHVtIDE1OjU2IHNjaHJpZWIgamRvdzoKPiA+ID4+PiBBcyBmYXIg
+YXMgSSBjYW4gZ3Vlc3MgZnJvbSB0aGUgY29kZSwgcGJfRW52aXJvbm1lbnRbM10gKG51bWJlcgo+
+ID4gPj4+IG9mCj4gPiA+PiAKPiA+ID4+IGhlYWRzKQo+ID4gPj4gCj4gPiA+Pj4gYW5kIHBiX0Vu
+dmlyb25tZW50WzVdIChudW1iZXIgb2Ygc2VjdG9ycyBwZXIgY3lsaW5kZXIpIGFyZQo+ID4gPj4+
+IGFiaXRyYXJpbHkKPiA+ID4+PiBjaG9zZW4gc28gdGhlIHBhcnRpdGlvbiBzaXplIGNhbiBiZSBl
+eHByZXNzZWQgYXMgYSBkaWZmZXJlbmNlCj4gPiA+Pj4gYmV0d2Vlbgo+ID4gPj4+IHBiX0Vudmly
+b25tZW50WzldIGFuZCBwYl9FbnZpcm9ubWVudFsxMF0gKGxvdyBhbmQgaGlnaCBjeWxpbmRlcgo+
+ID4gPj4+IGFkZHJlc3NlcyksIHdoaWNoIHBsYWNlcyByZXN0cmljdGlvbnMgb24gYm90aCBwYXJ0
+aXRpb24gc2l6ZSBhbmQKPiA+ID4+PiBhbGlnbm1lbnQgdGhhdCBkZXBlbmQgb24gd2hlcmUgb24g
+dGhlIGRpc2sgYSBwYXJ0aXRpb24gaXMKPiA+ID4+PiBwbGFjZWQ/Cj4gPiA+PiAKPiA+ID4+IElm
+IHlvdSBkbyBub3QgdGVhY2ggdGhlIE9TIHRvIGlnbm9yZSBDeWxpbmRlciBCbG9ja3MgdHlwZSBl
+bnRyaWVzCj4gPiA+PiBhbmQKPiA+ID4+IHVzZSBzb21lIG1hdGggb24gaGVhZHMgYW5kIGJsb2Nr
+cyBwZXIgdHJhY2sgdGhlIGRpc2sgc2l6ZSBpcwo+ID4gPj4gcmVsYXRpdmVseSBzdHVjayBtb2R1
+bG8gdXNpbmcgbGFyZ2UgYmxvY2tzLgo+ID4gPiAKPiA+ID4gQXMgbG9uZyBhcyBBbWlnYU9TIGFu
+ZCBMaW51eCBhZ3JlZSBvbiBob3cgdG8gZXhwcmVzcyBzdGFydCBhbmQgZW5kCj4gPiA+IG9mZnNl
+dCBmb3IgdGhlIHBhcnRpdGlvbnMsIHRoYXQncyBmaW5lLgo+ID4gPiAKPiA+ID4gQnV0IEkgcmVh
+ZCB5b3VyIG90aGVyIG1haWwgdG8gbWVhbiB0aGF0IHdlJ3JlIHN0dWNrIHRvIDIgVEIgZGlza3MK
+PiA+ID4gZm9yCj4gPiA+IG5vdy4gSSBkb24ndCBmb2xsb3cgdGhhdCAtIHdlIGNhbiBoYXZlIHBh
+cnRpdGlvbnMgb2YgMiBUQiBlYWNoIGJ5Cj4gPiAKPiA+IG1heGluZwo+ID4gCj4gPiA+IG91dCBy
+ZGJfQ3lsQmxvY2tzIGFzIGxvbmcgYXMgd2UgdXNlIDUxMiBieXRlcyBwZXIgYmxvY2sgKHNpbmNl
+IHRoZQo+ID4gPiBwcm9kdWN0IG9mIGN5bGluZGVycyBhbmQgYmxvY2tzIHBlciBjeWxpbmRlciBp
+cyBsaW1pdGVkIHRvIDMyCj4gPiA+IGJpdHMpIGFuZCB1c2luZyBvbmUgY3lsaW5kZXIgcGVyIHBh
+cnRpdGlvbiAoMzIgYml0cyBhdmFpbGFibGUKPiA+ID4gdGhlcmUgYXMgd2VsbCk/Cj4gPiA+IAo+
+ID4gPiBCdXQgdGhlIHJkYl9DeWxCbG9ja3MgbGltaXQgYWxzbyBtZWFucyB3ZSdyZSBzYWZlIHdp
+dGggNjQgYml0Cj4gPiA+IHNlY3Rvcl90IGluIExpbnV4LiBCZXN0IGFkZCBhIGNoZWNrIGluIHRo
+ZSBwYXJzZXIgdG8gd2FybiB1cyBpZgo+ID4gPiB0aGUgcHJvZHVjdCBvZiBoZWFkIGNvdW50IGFu
+ZCBzZWN0b3JzIHBlciBjeWxpbmRlciBvdmVyZmxvd3MgMzIKPiA+ID4gYml0IHRob3VnaC4KPiA+
+ID4gCj4gPiA+IENoZWVycywKPiA+ID4KPiA+ID4gICAgICBNaWNoYWVsCj4gPiAKPiA+IEhvdyBs
+b25nIGRpZCBpdCB0YWxlIHMgdG8gZ2V0IHRvIDEwIFRCIGRpc2tzIGZyb20gMiBUQiBkaXNrcy4g
+QW5kIGEKPiA+IG5ldyBTRCBDYXJkIHNwZWMgYWxsb3dzIGZvciAxMjggVEIgZGlza3MuIEJsb2Nr
+IHNpemVzIGdldCBzb3J0IG9mCj4gPiByaWRpY3Vsb3VzIGFzIHlvdSBnZXQgcGFzdCBhYm91dCA4
+ayBieXRlcyBvciBhYm91dCAzMiBUQiBvciBhYm91dAo+ID4gdHdvCj4gPiB5ZWFycyBmcm9tIG5v
+dy4KPiAKPiBJIGdldCB0aGF0IC0gSSBqdXN0IGRvbid0IGdldCB3aHkgMzIgYml0cyBmb3IgY3ls
+aW5kZXJzIHBsdXMgMzIgYml0cwo+IGZvciBibG9ja3MgcGVyIGN5bGluZGVyIGVxdWFscyAyIFRC
+ICg0RyBvZiA1MTIgYnl0ZSBibG9ja3MpLiBCdXQgSQo+IGRvbid0IGtub3cgd2hhdCBvdGhlciBs
+aW1pdHMgZXhpc3QgdGhhdCBtYXkgcmVzdHJpY3QgdGhlIHRvdGFsIG51bWJlcgo+IG9mIGJsb2Nr
+cyB0byAzMiBiaXRzLgoKSSB0aGluayBmb3IgdGhlIHRvdGFsIGRldmljZSBzaXplOgoKPiBUaGUg
+cmF3LCB0aGVvcmV0aWNhbCBsaW1pdCBvbiB0aGUgbWF4aW11bSBkZXZpY2UgY2FwYWNpdHkgaXMg
+YWJvdXQKPiAyXjEwNSBieXRlczoKPiAKPiAzMiBiaXQgcmRiX0N5bGluZGVycyAqIDMyIGJpdCBy
+ZGJfSGVhZHMgKiAzMiBiaXQgcmRiX1NlY3RvcnMgKiA1MTIKPiBieXRlcy9zZWN0b3IgZm9yIHRo
+ZSBIRCBzaXplIGluIHN0cnVjdCBSaWdpZERpc2tCbG9jawAKCmlzIGNvcnJlY3QuIERvIHlvdSBh
+Z3JlZSwgSm9hbm5lPwoKaHR0cDovL3dpa2kuYW1pZ2Fvcy5uZXQvd2lraS9SREIKCklmIHNvLCB3
+ZSBjYW4gcmVtb3ZlIHRoYXQgbGltaXQgZnJvbSB0aGUgZGlzY3Vzc2lvbiBhbmQgZm9jdXMgb24g
+d2hhdCAKcmVtYWlucy4KCgpBcyBmb3IgdGhlIHBhcnRpdGlvbiBzaXplcywgaG93IGFib3V0Cgo+
+IFBhcnRpdGlvbiBzaXplCj4gCj4gRm9yIHRoZSBwYXJ0aXRpb25zIHRoZSBtYXhpbXVtIHNpemUg
+aXM6AAo+IDMyIGJpdCAoZGVfSGlnaEN5bCArIDEgLSBkZV9Mb3dDeWwpICh0byBnZXQgdGhlIHBh
+cnRpdGlvbiBzaXplKSAqIDMyCj4gYml0IGRlX1N1cmZhY2VzICogMzIgYml0IGRlX1NlY3RvcnNQ
+ZXJUcmFjayAqIDUxMiBieXRlcy9zZWN0b3IgaW4KPiBzdHJ1Y3QgRG9zRW52ZWMgKD1wYl9FbnZp
+cm9ubWVudFtdKSBpbiBzdHJ1Y3QgUGFydGl0aW9uQmxvY2suAAo+Cj4gVGhhdCdzIGZyb20gdGhl
+IHBoeXNpY2FsIGRyaXZlIHBhcnQsIHRoZSBhY3R1YWwgZGlzayBzaXplIGxpbWl0IGZvciA+IAo+
+IHRoZSBwYXJ0aXRpb25zIG1heSBiZSBtdWNoIHNtYWxsZXIgZGVwZW5kaW5nIG9uIHRoZSBwYXJ0
+aXRpb25pbmcKPiBzb2Z0d2FyZSwgaWYgaXQncyBvbmx5IHVzaW5nIHRoZSBsb2dpY2FsIHNpemVz
+IGluc3RlYWQsIHdoaWNoIGlzCj4gbGlrZWx5IHRoZSBjYXNlLCBpdCdzIG9ubHkgOCBaaUIgd2l0
+aCA1MTIgYnl0ZXMvc2VjdG9yOiAzMiBiaXQKPiByZGJfSGlDeWxpbmRlciAqIDMyIGJpdCByZGJf
+Q3lsQmxvY2tzICogNTEyIGJ5dGVzL3NlY3RvciA9IDJeNzMKPiBieXRlcy4gRm9yIHVzaW5nIHRo
+ZSBsb2dpY2FsIHNpemVzIHVzaW5nIHNpbXBsZSB1aW50NjQgY2FsY3VsYXRpb25zCj4gKHdpdGgg
+c29tZSBvdmVyZmxvdyBjaGVja3MpIHNob3VsZCBiZSBlbm91Z2gsIGZvciBtb3JlIGEgbWF0aCBs
+aWJyYXJ5Cj4gd2l0aCBzdXBwb3J0IGZvciBsYXJnZXIgaW50ZWdlcnMgbmVlZHMgdG8gYmUgdXNl
+ZCB3aGljaCBwcm9iYWJseSBubwo+IHBhcnRpdGlvbmluZyBzb2Z0d2FyZSBkb2VzLgAKCnRha2Vu
+IGZyb20gdGhlIHNhbWUgd2lraSBwYWdlPwoKSSBob3dldmVyIGRvIG5vdCBnZXQgd2hhdCBpdCBt
+ZWFucyB3aXRoICJsb2dpY2FsIHNpemVzIi4KCkpvYW5uZSwgd2hhdCBpcyB5b3VyIGZlZWRiYWNr
+IG9uIHRoaXM/Cgo+ID4gRG8geW91IHdhbnQgdG8gY3JlYXRlIGRpc2tzIHRoYXQgd2lsbCBmYWls
+IG9uIEFtaWdhRE9TPyBBbWlnYURPUywgYXMKPiA+IGZhciBhcyBJIGtub3csIG1ha2VzIGhlYXZ5
+IHVzZSBvZiBDeWxpbmRlciBCbG9ja3MgdmFsdWVzLiBJdAo+ID4gY2FsY3VsYXRpbmcgQ3lsaW5k
+ZXIgQmxvY2tzIG92ZXJmbG93cyB3aGVuIGNyZWF0aW5nIHRoZSBkaXNrJ3MgUkRCcwo+ID4gdGhl
+IHVzZXIgTVVTVCBiZSBpbmZvcm1lZCBpdCBpcwo+IAo+IEknbSBub3QgYXQgYWxsIHBsYW5uaW5n
+IHRvIGNyZWF0ZSBkaXNrcyBmb3IgQW1pZ2FET1MuIEkganVzdCBuZWVkIHRvCj4ga25vdyB3aGF0
+IGNvbWJpbmF0aW9ucyBvZiBjeWxpbmRlcnMsIGhlYWRzIGFuZCBzZWN0b3JzIGFyZSBwb3NzaWJs
+ZSB0bwo+IGVuY291bnRlciBvbiBkaXNrcyB0aGF0IGhhdmUgYmVlbiBjcmVhdGVkIHdpdGggbmF0
+aXZlIHRvb2xzLiBXZWxsLAoKRG8gd2UgcmVhbGx5IG5lZWQgdG8gYWRkIGNoZWNrcyB0byB0aG9z
+ZSBwb3NzaWJsZSBjb21iaW5hdGlvbnMgdmFsdWVzLCAKSm9hbm5lPyBDYXVzZSwgaWYgd2UgZG8s
+IGhvdyBkbyB3ZSBmaW5kIG91dD8KCkFnYWluLCB0aGUgTGludXggUkRCIHBhcnNlciBqdXN0ICpy
+ZWFkcyogdGhlIFJEQi4KCkFuZCBhbHJlYWR5IG9uIHRoZSBBbWlnYSBzaWRlIGl0IGNhbiBoYXBw
+ZW4gdGhhdCBvbmUgcGFydGl0aW9uaW5nIHRvb2wgCmRvZXMgbm90IHVuZGVyc3RhbmQgdGhlIG90
+aGVyLiBUaGF0IFJpZ2lkIERpc2sgQmxvY2sgaXMgbm90IHF1aXRlIGFzIApyaWdpZCBhcyB0aGUg
+bmFtZSB3b3VsZCBzdWdnZXN0LCB5b3UgYWxyZWFkeSBzYWlkIGl0cyB2ZXJ5IGZsZXhpYmxlIGFu
+ZCAKdGhhdCBpcyBub3QgYWx3YXlzIGEgZ29vZCB0aGluZy4gSSBoYXZlIHNlZW4gYSBQaGFzZSA1
+IFJEQiBwYXJ0aXRpb25pbmcgCnRvb2wgKmNydXNoKiBhbiBSREIgY3JlYXRlZCBieSBIRFRvb2xC
+b3ggY2F1c2Ugb25lIGNhbGN1bGF0ZWQgZnJvbSAwIGFuZCAKb25lIGZyb20gemVyby4KCkkgZG8g
+dGhpbmsgaXMgbmVpdGhlciB0aGUgZHV0eSBub3IgdGhlIHJlc3BvbnNpYmlsaXR5IG9mIHRoZSBM
+aW51eCAKa2VybmVsIHRvIGNoZWNrIGZvciBzdWNoIGNyYXAuCgpFc3BlY2lhbGx5IGFzLCBhcyBJ
+IHdpbGwgcG9pbnQgb3V0IGZ1cnRoZXIgZG93biBpbiB0aGUgbWFpbCwgaXQgaXMgCmRpZmZpY3Vs
+dCB0byBpbXBvc3NpYmxlIHRvIGFjdHVhbGx5IGtub3cgZm9yIHN1cmUgd2hpY2ggY29tYmluYXRp
+b25zIGFueSAKb2YgdGhlIHBhcnRpdGlvbmluZyB0b29scyBvbiBuYXRpdmUgb3PCtHMgYWxsb3dl
+ZC4KCkV2ZW4gaWYgd2XCtGQgZmluZCBvdXQgdGhlIHBvc3NpYmxlIGNvbWJpbmF0aW9ucyBvZiB0
+aGUgb2ZmaWNpYWwgdG9vbHMsIAp0aGVyZSBhcmUgUkRCIHRvb2xzIGxpa2UgUkRCU2FsdiBhbmQg
+d2hhdCBub3QuCgpJwrRkIHNheSBpdCBpcyBpbXBvcnRhbnQgdG8gYXZvaWQgb3ZlciBjb21wbGlj
+YXRpbmcgdGhpbmdzLiBXZSBjYW5ub3QgCmZ1bGZpbGwgYW5kIGl0IGlzIG5vdCBvdXIgcmVzcG9u
+c2liaWxpdHkgdG8gc2F2ZSB0aGUgdXNlciBmcm9tIGFueSBicmFpbiAKZGFtYWdlIGFueSBwYXJ0
+aXRpb25pbmcgdG9vbCBvbiBlaXRoZXIgbmF0aXZlIE9TIG9yIExpbnV4IGNyZWF0ZWQgCip3aXRo
+aW4qIHRoZSBrZXJuZWwuCgpTbyBJwrRkIHJlY29tbWVuZDogCgotIE1ha2UgdGhlIGNhbGN1bGF0
+aW9ucyBiYWlsIG91dCBvbiBvdmVyZmxvd3MgYW5kIHJlZnVzZSB0byBsb2FkIHRoZSBSREIgCmlm
+IGFueSBjYWxjdWxhdGlvbiBvdmVyZmxvd3MuCgotIElkZWFsbHkgYWxzbyBzZWN1cmUgQUZGUyB0
+aGlzIHdheS4KCi0gSGF2ZSB0aGUgd2FybmluZyBhYm91dCA2NCBiaXQgZGlzayBzdXBwb3J0IG9u
+IG5hdGl2ZSBPUwoKYW5kICpiZSBkb25lIHdpdGggaXQqLiBGb3IgdGhlIGtlcm5lbC4KCj4gYXNz
+dW1pbmcgc3VmZmljaWVudCBhbW91bnRzIG9mIGJyYWluZGFtYWdlIGluIHRoZSBjb3JyZXNwb25k
+aW5nIExpbnV4Cj4gdG9vbHMsIGtub3dpbmcgdGhlIGFic29sdXRlIG91dGVyIGxpbWl0cyBvZiB3
+aGF0IHRoZXNlIHRvb2xzIGNvdWxkIGRvCj4gd291bGQgYmUgbmljZSBhcyB3ZWxsLCBidXQgc29t
+ZW9uZSB1c2luZyBhbWlnYS1mZGlzayB0byBjcmVhdGUgYSBSRFNLCj4gYmxvY2sgZm9yIGEgMTAg
+VEIgZGlzayBmdWxseSBkZXNlcnZlcyBhbnkgcHVuaXNobWVudCB0aGF0IGludml0ZXMuCgpJZiB0
+aGVyZSBpcyBhbnkgd2FybmluZyBkdWUgdG8gdXNpbmcgbGltaXRzIHRoYXQgZXhjZWVkIHdoYXQg
+SERUb29sQm94IAooQW1pZ2FPUyB1cHRvIDMuMSksIEhEVG9vbGJveCB1c2luZyBoZHdyZW5jaC5s
+aWJyYXJ5IChBbWlnYU9TIDMuNSAKb253YXJkcyksIE1lZGlhIFRvb2xib3ggdXNpbmcgU1BfZW5n
+aW5lIChBbWlnYU9TIDQgb253YXJkcykgYXMgd2VsbCBhcyAKYWxsIHRoZSB0b29scyBpbiBNb3Jw
+aG9zLCBBUk9TIGFuZCBvbiBBbWlOZXQgd291bCB1c2UsIGl0IHdvdWxkIGJlIHVwIHRvIAphbWln
+YS1mZGlzayBhbmQgcGFydGVkIHRvIGlzc3VlIHN1Y2ggYSB3YXJuaW5nLgoKQXMgZm9yIHRoZSBS
+REIgcGFyc2VyLCBJwrRkIGdvIHdpdGggcm9idXN0bmVzcyBwcmluY2lwbGU6CgpCZSBjb25zZXJ2
+YXRpdmUgaW4gd2hhdCB5b3Ugc2VuZCwgYmUgbGliZXJhbCBpbiB3aGF0IHlvdSBhY2NlcHQuCgpo
+dHRwczovL2VuLndpa2lwZWRpYS5vcmcvd2lraS9Sb2J1c3RuZXNzX3ByaW5jaXBsZQoKU28gd2hh
+dCBldmVyIGNyYXAgb3Igbm9uIGNyYXAgYW55IHBhcnRpdGlvbmluZyB0b29sIGNyZWF0ZXMsIGNo
+ZWNrIGZvciAKYW55IG92ZXJmbG93IGluIGNhbGN1bGF0aW9ucyBhbmQgb25seSByZWZ1c2UgdG8g
+YWNjZXB0IHRoZSByZXN1bHQgaW4gCmNhc2UgdGhlcmUgaGF2ZSBiZWVuIGFuIG92ZXJmbG93IGlu
+IGNhbGN1bGF0aW9ucy4KCklmIGEgdmFsdWUgaXMgYW4gVUxPTkcsIGFjY2VwdCB0aGUgZnVsbCAz
+MiBiaXQgdW5zaWduZWQgaW50ZWdlci4gQ2F1c2UgCmlmIHlvdSBkb27CtHQsIGl0IGNvdWxkIG1l
+YW4gdGhlIHVzZXIgaXMgbm90IGFibGUgdG8gYWNjZXNzIHRoZSBkaXNrIHdpdGggCnRoYXQgUkRC
+LgoKUGFydGl0aW9uaW5nIHRvb2xzIGhvd2V2ZXIgY2FuIGltcG9zZSBhbnkgdGhleSB0aGluayBt
+YWtlIHNlbnNlLgoKQXMgZm9yIGxpbWl0cyB3aXRoIGluIG5hdGl2ZSBPUyBwYXJ0aXRpb25pbmcg
+dG9vbHMsIGZvciBIRFRvb2xib3ggd2l0aCAKYW5kIHdpdGhvdXQgaGR3cmVuY2gubGlicmFyeSB5
+b3UgcHJvYmFibHkgcmVtZW1iZXIsIEpvYW5uZS4gQXMgZm9yIE1lZGlhIApUb29sYm94IHdlwrRk
+IGhhdmUgdG8gYXNrIEFtaWdhT1MgZGV2ZWxvcGVycy4gUmVtZW1iZXIgQW1pZ2FPUyBhbmQgCk1v
+cnBob3MgZGV2ZWxvcG1lbnQgYXJlIHN0aWxsIGNsb3NlZCBzb3VyY2UuIFNvIHRoZXJlIGlzIG5v
+dGhpbmcgZXhjZXB0IAp0aGUgU0RLcyBhbmQgdGhlaXIgRG9jdW1lbnRhdGlvbiB3aGljaCB3ZSBj
+YW4gdXNlIHRvIGtub3cgZm9yIHN1cmUuCgpUaGUgbGF0ZXN0IEFtaWdhT1MgNC4xIGRldmVsb3Bt
+ZW50IGtpdCBhcHBlYXJzIHRvIGJlIHZlcnNpb24gNTMuMzAsIApmb3VuZCBhdC4gSXQgaXMgZm9y
+IEFtaWdhT1MgNC4xIEZpbmFsIEVkaXRpb246CgpodHRwczovL3d3dy5oeXBlcmlvbi1lbnRlcnRh
+aW5tZW50LmJpei9pbmRleC5waHAvZG93bmxvYWRzPwp2aWV3PWZpbGVzJnBhcmVudD0zMAoKKHlv
+dSBuZWVkIHRvIGNsaWNrIHRoZSBsaW5rIHRvIGFycml2ZSBhbiBhbiBleHRyYSBwYWdlIGFuZCBj
+bGljayB0aGUgCmxpbmsgdGhlcmUpCgpiYXNlLmxoYSBpbiBTREtfSW5zdGFsbCBjb250YWlucyB0
+aGUgZG9jdW1lbnRhdGlvbi4gSSB3YXMgYWJsZSB0byB1bnBhY2sgCml0IHdpdGggbGhhIHggb24g
+TGludXguIEhvd2V2ZXIgSSBoYXZlIG5vIGlkZWEgd2hlcmUgdGhhdCBsaGEgY29tbWFuZCBvbiAK
+bXkgRGViaWFuIEdOVS9TaWQgc2V0dXAgY2FtZSBmcm9tOgoKJSBMQU5HPUMgZHBrZyAtUyAvdXNy
+L2Jpbi9saGEKZHBrZy1xdWVyeTogbm8gcGF0aCBmb3VuZCBtYXRjaGluZyBwYXR0ZXJuIC91c3Iv
+YmluL2xoYQoKSSBiZXQgdGhlcmUgaXMgc29tZSBMaW51eCBsaGEgZG93bmxvYWRhYmxlIHNvbWV3
+aGVyZSwgaWYgbmVlZCBiZSBJIGNhbiAKZGlnIGZvciBpdC4KCkhvd2V2ZXIgSSB1c2VkIGdyZXAg
+YW5kIGZpbmQgb24gdmFyaW91cyB2YXJpYXRpb25zIG9mIE1lZGlhIFRvb2xib3gsIApTUF9Fbmdp
+bmUgYW5kIFJEQiBhcyB3ZWxsIGFzIFJpZ2lkIERpc2sgQmxvY2sgYW5kIGZvdW5kIG5vdGhpbmcg
+b2YgCmludGVyZXN0IGZvciBvdXIgdG9waWMuCgpTbyBpdCBhcHBlYXJzIHRoYXQgdGhlIHdvcmtp
+bmdzIG9mIFNQX0VuZ2luZSBhcmUgYnVyaWVkIGluIHNvdXJjZSBjb2RlIAp3ZSBkb27CtHQgaGF2
+ZSBhY2Nlc3MgdG8uIEFuZCB3ZWxsIEkgd29uwrR0IGJhc2UgYW55IGxpbWl0IGNoZWNraW5nIG9u
+IAphc3N1bXB0aW9ucy4gU28gSSB3b27CtHQgc2V0IGFueSBhZGRpdGlvbmFsIGxpbWl0cyB0aGFu
+IHRoZSBjaGVjayBmb3IgCm92ZXJmbG93aW5nIGNhbGN1bGF0aW9ucy4KClRoZSBBbWlnYU9TIDMu
+OSBOREsgc3RpbGwgYXBwZWFycyB0byBiZSBhdmFpbGFibGUgb24gdGhlIHdlYnNpdGUgb2YgbXkg
+CmZvcm1lciBlbXBsb3llZSBIQUFHRSZQQVJUTkVSIEdtYkg6CgpodHRwczovL3d3dy5oYWFnZS1w
+YXJ0bmVyLmRlL2Rvd25sb2FkL0FtaWdhT1MvTkRLMzkubGhhCgpUaGlzIG9uZSBpbmNsdWRlZCB0
+aGUgaGR3cmVuY2gubGlicmFyeSBhdXRvZG9jcyBhbmQgcmVsZWFzZW5vdGVzLiBJIGRvIApub3Qg
+a25vdyB3aGV0aGVyIHRoZXkgaGF2ZSBzb21ldGhpbmcgYWJvdXQgbGltaXRzLiBIb3dldmVyLCBp
+dCBkb2VzIG5vdCAKYXBwZWFyIHNvOgoKPiBb4oCmXSBOREtfMy45L0RvY3VtZW50YXRpb24lIGdy
+ZXAgbGltaXQgQXV0b2RvY3MvaGR3cmVuY2guZG9jCj4gCj4gICAgIFRoaXMgZnVuY3Rpb24gaXMg
+aW50ZW50aW9uYWxseSBsaW1pdGVkIHdyaXRpbmcgb25seSB0byB0aGUgbG93ZXIKPiAgICAgYmxv
+Y2sKClRoaXMgaXMgYSBsaW1pdCBhYm91dCB3cml0aW5nIHRoZSBkYXRhIHNlY3Rpb24gb2YgYSBC
+b290QmxvY2ssIHNvIAp1bnJlbGF0ZWQgdG8gb3VyIHRvcGljLgoKPiBb4oCmXSBOREtfMy45L0Rv
+Y3VtZW50YXRpb24lIGdyZXAgbGltaXQKPiBSZWxlYXNlbm90ZXMvaGR3cmVuY2hfbGliX3JlbG5v
+dGVzAAoKTWljaGFlbDoKPiAoQWN0dWFsbHksIEkgbGllZCB0aGVyZS4gSSBkbyBwbGFuIHRvIGNy
+ZWF0ZSBhIFJEU0sgYmxvY2sgZm9yIGEgMiBUQgo+IGRpc2sgaW1hZ2Ugd2hlcmUgY3lsaW5kZXIs
+IGhlYWQgYW5kIHNlY3RvciBjb3VudHMgYWxsIGFwcHJvYWNoIHRoZSAzMgo+IGJpdCBsaW1pdCwg
+anVzdCB0byBzZWUgdGhhdCBteSBvdmVyZmxvdyBjaGVja3Mgd29yayBhcyBpbnRlbmRlZC4gQnV0
+Cj4gdGhhdCdzIHN0cmljdGx5IGZvciBMaW51eCB0ZXN0aW5nKS4KCkkgdGhpbmsgdGhhdCBpcyBh
+IGdvb2QgdGVzdCBmb3IgdGhlIHBhdGNoLiBJIGFtIGltcHJlc3NlZCB5b3UgYXJlIAp3aWxsaW5n
+IHRvIHB1dCB0aGUgZWZmb3J0IGZvciB0aGF0IGludG8gdGhpcyB3b3JrLgoKT2theSwgdGhhdCBp
+cyB3aGF0IEkgd2FzIGFibGUgdG8gZGlnIG91dCBvbiB3aGF0IGlzIG9mZmljaWFsbHkgCmF2YWls
+YWJsZS4gSXQgYXBwZWFycyB0aGF0IHRoZSBvZmZpY2lhbCBkZXZlbG9wZXIgZG9jdW1lbnRhdGlv
+biBmb3IgCkFtaWdhT1MgaXMgcHJldHR5IHNwYXJzZSBvbiBhbnkgb2YgdGhhdC4gRm9yIGFueXRo
+aW5nIGVsc2UgScK0ZCBuZWVkIHRvIApjb250YWN0IGN1cnJlbnQgQW1pZ2FPUyBkZXZlbG9wZXJz
+LiBJIGFtIG5vIGxvbmdlciBhIG1lbWJlciBvZiB0aGUgCkFtaWdhT1MgdGVhbS4KCk1heWJlIHRo
+ZSBBREYgRm9ybWF0IEZBUSBJIG1lbnRpb25lZCBoYXMgYSBiaXQgbW9yZSwgYnV0IEkgZGlkIG5v
+dCBmaW5kIAphbnl0aGluZyBvYnZpb3VzIG9uIGEgc2hvcnQgZ2xhbmNlCgpodHRwOi8vbGNsZXZ5
+LmZyZWUuZnIvYWRmbGliL2FkZl9pbmZvLmh0bWwKCkFsc28gaXQgaXMgYSB0aGlyZCBwYXJ0eSBz
+b3VyY2UuCgo+ID4gdW5zYWZlIHRvIHB1dCBvbiBhIHJlYWwgQW1pZ2EuIChJJ2QgYWxzbyBzdWdn
+ZXN0IHRlYWNoaW5nIExpbnV4IHRvCj4gPiB1bmRlcnN0YW5kIFJEU0wsIHdoaWNoIHdvdWxkIGJl
+IFJEU0srKyBzb3J0IG9mLiBUaGVuIHVzZSB0aGF0IGlmCj4gPiBDeWxpbmRlciBCbG9ja3Mgb3Zl
+cmZsb3dzLikgVGhlIHZhbHVlIHlvdSB3aWxsIG5vdCBiZSBhYmxlIHRvIGZpbGwKPiA+IGluCj4g
+PiB0aGUgRG9zRW52ZWMgc3RydWN0dXJlIGlzOgo+ID4gICAgIFVMT05HIGRlX0hpZ2hDeWw7ICAg
+ICAgICAgLyogbWF4IGN5bGluZGVyLiBkcml2ZSBzcGVjaWZpYyAqLwo+IAo+IE9LLCBzbyBDeWxp
+bmRlciBCbG9ja3Mgb3ZlcmZsb3dpbmcgaXMgYSByZWQgZmxhZywgYW5kIHJlcXVpcmVzIHRvCj4g
+YWJvcnQgcGFyc2luZyB0aGUgcGFydGl0aW9uIHRhYmxlIHJpZ2h0IGF3YXk/IEFuZCBIaWdoQ3ls
+IHJlYWxseQo+IG1lYW5zIHRoZSBtYXguIG51bWJlciBvZiBsb2dpY2FsIGJsb2Nrcywgbm90IGN5
+bGluZGVycyAod2hpY2ggd291bGQKPiBoYXZlIG5yX2hlYWRzKm5yX3NlY3RzIG1hbnkgYmxvY2tz
+KT8gVGhhdCdzIHByb2JhYmx5IHRoZSBjYXVzZSBmb3IgbXkKPiBjb25mdXNpb24uCgpXaGVuIGNh
+biB0aGV5IGFjdHVhbGx5IG92ZXJmbG93PyBIb3cgYXJlIHRoZXkgY2FsY3VsYXRlZD8KCklmIHRo
+ZXJlIGlzIG5vIGNhbGN1bGF0aW9uIHRvIGNhbGN1bGF0ZSBpdCBhbmQgaXQgaXMganVzdCBhIHN0
+YXRpYyB2YWx1ZSAKd2l0aGluIHRoZSBSREIsIEnCtGQgYWNjZXB0IHdoYXQgZXZlciB0aGUgdmFs
+dWUgaXMgaW4gdGhlIFJEQiwgdW5sZXNzIGEgCmNhbGN1bGF0aW9uIGJhc2VkIG9uIGl0IG92ZXJm
+bG93cy4KCkFnYWluLCBrZWVwIGl0IHNpbXBsZS4KCkkgdGhpbmsgaXQgZG9lcyBub3QgbWFrZSBz
+ZW5zZSBmb3IgdGhlIExpbnV4IGtlcm5lbCB0byB0cnkgdG8gb3V0c21hcnQgCnRoZSB1c2VyIG9y
+IGFueSBvZiB0aGUgcGFydGl0aW9uaW5nIHRvb2xzIG91dCB0aGVyZS4KClRoZSBvbmx5IHF1ZXN0
+aW9uIGlzOgoKQ2FuIHRoZSBwYXJ0aXRpb25zIGJlIGNhbGN1bGF0ZWQgaW4gYSB3YXkgdGhhdCBp
+dCBpcyBzYWZlIHRvIGFjY2VzcyAKdGhlbSwgaS5lLiB0aGF0IHRoZWlyIGNhbGN1bGF0ZWQgc3Rh
+cnQgYW5kIGVuZCBpcyByZWFsbHkgYXQgdGhlIGxvY2F0aW9uIAp0aGUgc3RhcnQgYW5kIGVuZCBp
+cyBvbiB0aGUgZGlzaz8gVGhlbiBhY2NlcHQgaXQuCgpGb3IgdGhlIGZpbGUgc3lzdGVtczogQ2Fu
+IHRoZSBmaWxlIHN5c3RlbSBzYWZlbHkgYWNjZXNzIHRoaXM/IFRoZW4gCmFjY2VwdC4gSWYgbm90
+LCB0aGVuIGRlY2xpbmUuICpJbiB0aGUgZmlsZXN5c3RlbSouIFRoaXMgaXMgbm90aGluZyBmb3Ig
+CnRoZSBSREIgcGFyc2VyIHRvIGNoZWNrIHNvIG91dCBvZiBzY29wZSBmb3IgdGhlIGRpc2N1c3Np
+b24gb2YgdGhpcyAKcGF0Y2guCgo+ID4gU28gYWNjZXNzaW5nIGxhcmdlciBkaXNrcyBvbmNlIHlv
+dSBoaXQgMiBUQiBtZWFucyB5b3UgbXVzdCBpbmNyZWFzZQo+ID4gdGhlIGxvZ2ljYWwgYmxvY2sg
+c2l6ZS4gQW5kIGV2ZW50dWFsbHkgdGhhdCB3aWxsIHdhc3RlIEhVR0UgYW1vdW50cwo+ID4gb2Yg
+ZmlsZXMgd2hlbiBzbWFsbCBmaWxlcyBhcmUgYmVpbmcgc3RvcmVkLgo+IAo+IEp1c3QgbGlrZSBz
+bWFsbCBpbm9kZXMgd2FzdGVzIGh1Z2UgYW1vdW50cyBvZiBzcGFjZSBmb3IgbWV0YWRhdGEuIEl0
+J3MKPiBhIHRyYWRlb2ZmLCBhbmQgQUZGUyBvbiBhIFJEU0sgZm9ybWF0IGRpc2sgcHJvYmFibHkg
+aXNuJ3QgdGhlIHJpZ2h0Cj4gY2hvaWNlIGZvciBodWdlIGRpc2tzLiBOZXZlciBtaW5kIHRoYXQg
+LSBpZiBzb21lb25lIF9kb2VzXyBnbyB0aGF0Cj4gd2F5LCB3ZSBuZWVkIHRvIG1ha2Ugc3VyZSB3
+ZSBjYW4gcGFyc2UgdGhlIFJEU0sgaW5mb3JtYXRpb24KPiBjb3JyZWN0bHkuIEFuZCBpZiBzdWNo
+IGEgZGlzayBjYXVzZXMgdGhlIDY0IGJpdCBzZWN0b3JfdCBpbiBMaW51eCB0bwo+IG92ZXJmbG93
+LCBJJ2QgbGlrZSB0aGUgcGFyc2VyIHRvIHNwb3QgdGhhdCwgdG9vLgo+IAo+IFRoYW5rcyBmb3Ig
+eW91ciBpbW1lbnNlIHBhdGllbmNlIGluIGV4cGxhaW5pbmcgYWxsIHRoZXNlIHN1YnRsZXRpZXMg
+dG8KPiBtZS4KPgo+IENoZWVycywKPiAKPiAgICAgTWljaGFlbAo+IAo+ID4gQW55IHNvbHV0aW9u
+IHdpbGwgcmVxdWlyZSBhY3Rpb24gb24gdGhlIHBhcnQgb2YgdGhlIHBlb3BsZQo+ID4gZGV2ZWxv
+cGluZwo+ID4gQW1pZ2FET1MgZm9sbG93LW9ucy4gWW91IG1pZ2h0IHdhbnQgdG8gZ2V0IHRoZW0g
+bW90aXZhdGVkLCBzb21laG93LAo+ID4gYW5kIHByb2NlZWQgZnJvbSB0aGVyZSB3aXRoIGEgcmVx
+dWVzdCB0byBiZSBpbmZvcm1lZCBvZiBhbnkgUkRCCj4gPiBjaGFuZ2VzLiBJJ2Qgc3VnZ2VzdCB0
+byB0aGVtIHRoYXQgcmVtb3Zpbmcgc2Vuc2l0aXZpdHkgdG8gQ3lsaW5kZXIKPiA+IEJsb2NrcyBz
+b3J0cyBvZiB2YWx1ZXMgZnJvbSB0aGUgZW50aXJlIHN5c3RlbSBwcm9iYWJseSB3b3VsZCBiZQo+
+ID4gcGFpbmZ1bCBidXQgdGhlIHNpbXBsZXN0IHNvbHV0aW9uLgo+ID4gCj4gPiB7Xl9efQpb4oCm
+XQoKLS0gCk1hcnRpbg==
