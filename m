@@ -1,9 +1,5 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57286 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S932784AbeF3Bar (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Jun 2018 21:30:47 -0400
-Date: Sat, 30 Jun 2018 09:30:30 +0800
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Sat, 30 Jun 2018 09:12:19 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Guenter Roeck <linux@roeck-us.net>
 Cc: linux-scsi@vger.kernel.org, Jens Axboe <axboe@fb.com>,
@@ -19,14 +15,14 @@ Cc: linux-scsi@vger.kernel.org, Jens Axboe <axboe@fb.com>,
         Bart Van Assche <bart.vanassche@wdc.com>
 Subject: Re: [V2, 2/2] scsi: avoid to hold host-wide counter of host_busy for
  scsi_mq
-Message-ID: <20180630013028.GB12152@ming.t460p>
+Message-ID: <20180630011213.GA12152@ming.t460p>
 References: <20180624140327.28146-3-ming.lei@redhat.com>
  <20180629162054.GA19036@roeck-us.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180629162054.GA19036@roeck-us.net>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
 On Fri, Jun 29, 2018 at 09:20:54AM -0700, Guenter Roeck wrote:
 > Hi,
@@ -75,8 +71,13 @@ On Fri, Jun 29, 2018 at 09:20:54AM -0700, Guenter Roeck wrote:
 > 
 > Reverting the patch fixes the problem. Bisect log is attached.
 
-Please test the patch of 'scsi: fix scsi_host_queue_ready', which has
-been posted on linux-scsi list and CCed to you.
+Hi Guenter,
+
+Thanks for your test & report!
+
+This looks a bit weird, I need to take a close look given this
+patch supposes to be nop for non-blk-mq, which is exactly your
+case.
 
 Thanks,
 Ming
