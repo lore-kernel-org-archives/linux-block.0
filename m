@@ -1,86 +1,34 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38866 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753332AbeFIMdF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 9 Jun 2018 08:33:05 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: David Sterba <dsterba@suse.cz>, Huang Ying <ying.huang@intel.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 12/30] block: introduce bio_chunks()
-Date: Sat,  9 Jun 2018 20:29:56 +0800
-Message-Id: <20180609123014.8861-13-ming.lei@redhat.com>
-In-Reply-To: <20180609123014.8861-1-ming.lei@redhat.com>
-References: <20180609123014.8861-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <minwoo.im.dev@gmail.com>
+Return-Path: <minwoo.im.dev@gmail.com>
+From: Minwoo Im <minwoo.im.dev@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: [PATCH] blk-mq: fix typo in a function comment
+Date: Sat, 30 Jun 2018 22:12:41 +0900
+Message-Id: <1530364361-5026-1-git-send-email-minwoo.im.dev@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-There are still cases in which we need to use bio_chunks() for get the
-number of multipage segment, so introduce it.
+Fix typo in a function blk_mq_alloc_tag_set() comment.
+if if it too large -> if it's too large.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
 ---
- include/linux/bio.h | 30 +++++++++++++++++++++++++-----
- 1 file changed, 25 insertions(+), 5 deletions(-)
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index c17b8f80d650..13fd7bc30390 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -242,7 +242,6 @@ static inline unsigned bio_segments(struct bio *bio)
- 	 * We special case discard/write same/write zeroes, because they
- 	 * interpret bi_size differently:
- 	 */
--
- 	switch (bio_op(bio)) {
- 	case REQ_OP_DISCARD:
- 	case REQ_OP_SECURE_ERASE:
-@@ -251,13 +250,34 @@ static inline unsigned bio_segments(struct bio *bio)
- 	case REQ_OP_WRITE_SAME:
- 		return 1;
- 	default:
--		break;
-+		bio_for_each_segment(bv, bio, iter)
-+			segs++;
-+		return segs;
- 	}
-+}
- 
--	bio_for_each_segment(bv, bio, iter)
--		segs++;
-+static inline unsigned bio_chunks(struct bio *bio)
-+{
-+	unsigned chunks = 0;
-+	struct bio_vec bv;
-+	struct bvec_iter iter;
- 
--	return segs;
-+	/*
-+	 * We special case discard/write same/write zeroes, because they
-+	 * interpret bi_size differently:
-+	 */
-+	switch (bio_op(bio)) {
-+	case REQ_OP_DISCARD:
-+	case REQ_OP_SECURE_ERASE:
-+	case REQ_OP_WRITE_ZEROES:
-+		return 0;
-+	case REQ_OP_WRITE_SAME:
-+		return 1;
-+	default:
-+		bio_for_each_chunk(bv, bio, iter)
-+			chunks++;
-+		return chunks;
-+	}
- }
- 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b429d51..706f35e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2701,7 +2701,7 @@ static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
  /*
+  * Alloc a tag set to be associated with one or more request queues.
+  * May fail with EINVAL for various error conditions. May adjust the
+- * requested depth down, if if it too large. In that case, the set
++ * requested depth down, if it's too large. In that case, the set
+  * value will be stored in set->queue_depth.
+  */
+ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
 -- 
-2.9.5
+2.7.4
