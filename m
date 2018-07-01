@@ -1,88 +1,69 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	linux-pm@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH RFC 2/4] blk-mq: introduce blk_mq_pm_queue_idle()
-Date: Thu, 12 Jul 2018 00:29:04 +0800
-Message-Id: <20180711162906.14271-3-ming.lei@redhat.com>
-In-Reply-To: <20180711162906.14271-1-ming.lei@redhat.com>
-References: <20180711162906.14271-1-ming.lei@redhat.com>
+Return-Path: <martin@lichtvoll.de>
+From: Martin Steigerwald <martin@lichtvoll.de>
+To: Michael Schmitz <schmitzmic@gmail.com>
+Cc: jdow <jdow@earthlink.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Jens Axboe <axboe@kernel.dk>, linux-m68k <linux-m68k@lists.linux-m68k.org>, linux-block@vger.kernel.org
+Subject: Re: Subject: [PATCH RFC] block: fix Amiga RDB partition support for disks >= 2 TB
+Date: Sun, 01 Jul 2018 14:26:09 +0200
+Message-ID: <2912295.ZOUXmTqsBm@merkaba>
+In-Reply-To: <fdf0808f-f53c-95c7-ff36-5dbac5826948@gmail.com>
+References: <20180627012421.80B8F24E094@nmr-admin> <4908196.8QWSOAbfO6@merkaba> <fdf0808f-f53c-95c7-ff36-5dbac5826948@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
 List-ID: <linux-block@vger.kernel.org>
 
-This helper will be used to decide if this block device can be
-put into runtime suspend.
+Michael.
 
-Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: linux-pm@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 22 ++++++++++++++++++++++
- block/blk-mq.h |  3 +++
- 2 files changed, 25 insertions(+)
+Michael Schmitz - 01.07.18, 04:43:
+> Am 30.06.18 um 19:49 schrieb Martin Steigerwald:
+> > I am really inclined to point some AmigaOS 4 developers to this
+> > discussion and just looked for an archive. Unfortunately there does
+> > not appear to be a working one. The one mentioned on
+> >=20
+> > http://www.linux-m68k.org/mail.html
+> >=20
+> > http://aire.ncl.ac.uk/Atari/Mailing-Lists/Linux-680x0-vger-List.inde
+> > x.html
+> >=20
+> > does not send an answer within the HTTP / TCP timeout limit.
+>=20
+> Most of the information found online on m68k will be several years out
+> of date, I'd expect. The page you appear to have found will be
+> several decades out of date (any mention of the FTP server at Uni
+> Saarbruecken for list archives is a dead giveaway). The internet
+> doesn't forget, but that can be a curse rather than a blessing at
+> times.
+>=20
+> Anyway, vger sez:
+>=20
+> https://marc.info/?l=3Dlinux-m68k&r=3D1&w=3D2
+> and
+> https://www.spinics.net/lists/linux-m68k/
+>=20
+> which work for me.
+>=20
+> > I also did not find any archive for linux-block mailing list
+>=20
+> https://marc.info/?l=3Dlinux-block works for me.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 73a43b81b17d..3a78fed87959 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -58,6 +58,28 @@ static int blk_mq_poll_stats_bkt(const struct request *rq)
- 	return bucket;
- }
- 
-+static void blk_mq_pm_check_idle(struct blk_mq_hw_ctx *hctx,
-+		struct request *rq, void *priv, bool reserved)
-+{
-+	unsigned long *cnt = priv;
-+
-+	if (!(rq->rq_flags & RQF_PM))
-+		(*cnt)++;
-+}
-+
-+bool blk_mq_pm_queue_idle(struct request_queue *q)
-+{
-+	unsigned long idle_cnt;
-+
-+	if (!blk_mq_support_runtime_pm(q))
-+		return false;
-+
-+	idle_cnt = 0;
-+	blk_mq_queue_tag_busy_iter(q, blk_mq_pm_check_idle, &idle_cnt);
-+
-+	return idle_cnt == 0;
-+}
-+
- /*
-  * Check if any of the ctx's have pending work in this hardware queue
-  */
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index bc2b24735ed4..b64f6f69176a 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -88,6 +88,9 @@ extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
- 
- void blk_mq_release(struct request_queue *q);
- 
-+/* blk-mq pm helpers */
-+bool blk_mq_pm_queue_idle(struct request_queue *q);
-+
- /**
-  * blk_mq_rq_state() - read the current MQ_RQ_* state of a request
-  * @rq: target request.
--- 
-2.9.5
+Ah, I thought marc.info was down, but well now I remember that someone=20
+took over or something like that.
+
+Did not think of spinics.net.
+
+Well I wrote a mail to some AmigaOS 4 developers. Whether I get a=20
+response remains to be seen. However, in any case I=B4d continue with=20
+developing the patch. I=B4d I not make the Linux fix dependent on this.
+
+If they share something with me to forward it regarding the Linux patch,=20
+I=B4d share that with you.
+
+> > And lore.kernel.org only seems to archive LKML itself which is patch
+> > and the discussion we have here is not CC=B4d to.
+>=20
+> And I'm glad we didn't.
+
+:)
+
+Thanks,
+=2D-=20
+Martin
