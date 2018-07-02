@@ -1,46 +1,35 @@
-Return-Path: <minwoo.im.dev@gmail.com>
-Return-Path: <minwoo.im.dev@gmail.com>
-Message-ID: <1530536157.13674.4.camel@gmail.com>
+Return-Path: <jthumshirn@suse.de>
+Date: Mon, 2 Jul 2018 10:15:39 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Minwoo Im <minwoo.im.dev@gmail.com>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
 Subject: Re: [PATCH] blk-mq: code clean-up by adding an API to clear
  set->mq_map
-From: Minwoo Im <minwoo.im.dev@gmail.com>
-To: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Date: Mon, 02 Jul 2018 21:55:57 +0900
-In-Reply-To: <20180702081539.z5rj6wfh6v4zz6bv@linux-x5ow.site>
+Message-ID: <20180702081539.z5rj6wfh6v4zz6bv@linux-x5ow.site>
 References: <1530375699-20461-1-git-send-email-minwoo.im.dev@gmail.com>
-	 <20180702081539.z5rj6wfh6v4zz6bv@linux-x5ow.site>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1530375699-20461-1-git-send-email-minwoo.im.dev@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Johannes,
-
-Thanks for you kindly comment.
-
-On Mon, 2018-07-02 at 10:15 +0200, Johannes Thumshirn wrote:
-> On Sun, Jul 01, 2018 at 01:21:39AM +0900, Minwoo Im wrote:
-> > 
-> > set->mq_map is now currently cleared if something goes wrong when
-> > establishing a queue map in blk-mq-pci.c.  It's also cleared before
-> > updating a queue map in blk_mq_update_queue_map().
-> > 
-> > This patch provides an API to clear set->mq_map to make it clear.
-> Is there a follow up patch to this which justifies the change?
+On Sun, Jul 01, 2018 at 01:21:39AM +0900, Minwoo Im wrote:
+> set->mq_map is now currently cleared if something goes wrong when
+> establishing a queue map in blk-mq-pci.c.  It's also cleared before
+> updating a queue map in blk_mq_update_queue_map().
 > 
-> With no 2nd consumer of the function I fear this will be disregarded
-> as useless code churn.
+> This patch provides an API to clear set->mq_map to make it clear.
 
-No 2nd follow-up patch will be there.  I thought these two parts are
-using a same unit-function to clear the set->mq-map.  Also thought it
-would be great for the future use when it needs to be cleared.
-However, as you mentioned, I totally agree with your point.  It seems
-just churns for churns' sake with no more usage for now.
+Is there a follow up patch to this which justifies the change?
 
-Thanks for your comment, again.
+With no 2nd consumer of the function I fear this will be disregarded
+as useless code churn.
 
-	Minwoo Im
-
-> 
-> Byte,
-> 	Johannes
+Byte,
+	Johannes
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
