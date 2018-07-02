@@ -1,53 +1,28 @@
-Return-Path: <prvs=735483b7d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Matias Bjorling <matias.bjorling@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Damien Le Moal <damien.lemoal@wdc.com>
-Subject: [PATCH] block: Rename the null_blk_mod kernel module back into null_blk
-Date: Mon, 23 Jul 2018 14:18:33 -0700
-Message-Id: <20180723211833.15498-1-bart.vanassche@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] paride: remove redundant variable n
+To: Colin King <colin.king@canonical.com>, Tim Waugh <tim@cyberelk.net>,
+ linux-block@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20180702081419.12207-1-colin.king@canonical.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <213e1e8a-d962-c4bf-cfbe-69ebb5628747@kernel.dk>
+Date: Mon, 2 Jul 2018 08:28:50 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180702081419.12207-1-colin.king@canonical.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Commit ca4b2a011948 ("null_blk: add zone support") breaks several
-blktests scripts because it renamed the null_blk kernel module into
-null_blk_mod. Hence rename null_blk_mod back into null_blk.
+On 7/2/18 2:14 AM, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
+> 
+> Variable n is being assigned but is never used hence it is redundant
+> and can be removed. Also put spacing between variables in declaration
+> to clean up checkpatch warnings.
+> 
+> Cleans up clang warning:
+> warning: variable 'n' set but not used [-Wunused-but-set-variable]
 
-Fixes: ca4b2a011948 ("null_blk: add zone support")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Matias Bjorling <matias.bjorling@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Damien Le Moal <damien.lemoal@wdc.com>
----
- drivers/block/Makefile                        | 6 +++---
- drivers/block/{null_blk.c => null_blk_main.c} | 0
- 2 files changed, 3 insertions(+), 3 deletions(-)
- rename drivers/block/{null_blk.c => null_blk_main.c} (100%)
+Applied for 4.19, thanks.
 
-diff --git a/drivers/block/Makefile b/drivers/block/Makefile
-index a0d88aa0c05d..8566b188368b 100644
---- a/drivers/block/Makefile
-+++ b/drivers/block/Makefile
-@@ -38,9 +38,9 @@ obj-$(CONFIG_BLK_DEV_PCIESSD_MTIP32XX)	+= mtip32xx/
- obj-$(CONFIG_BLK_DEV_RSXX) += rsxx/
- obj-$(CONFIG_ZRAM) += zram/
- 
--obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk_mod.o
--null_blk_mod-objs	:= null_blk.o
--null_blk_mod-$(CONFIG_BLK_DEV_ZONED) += null_blk_zoned.o
-+obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk.o
-+null_blk-objs	:= null_blk_main.o
-+null_blk-$(CONFIG_BLK_DEV_ZONED) += null_blk_zoned.o
- 
- skd-y		:= skd_main.o
- swim_mod-y	:= swim.o swim_asm.o
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk_main.c
-similarity index 100%
-rename from drivers/block/null_blk.c
-rename to drivers/block/null_blk_main.c
 -- 
-2.18.0
+Jens Axboe
