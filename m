@@ -1,34 +1,39 @@
-Return-Path: <tom.leiming@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <20180702125422.GA600@infradead.org>
-References: <20180702050642.26265-1-ming.lei@redhat.com> <20180702125422.GA600@infradead.org>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Mon, 2 Jul 2018 21:13:35 +0800
-Message-ID: <CACVXFVPn5VJraoidihjA5_hzuRBU_JBJAtRsNr_x9Cc3iWwaAw@mail.gmail.com>
-Subject: Re: [PATCH] scsi: scsi_debug: introduce module parameter of 'use_blk_mq'
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Mon, 2 Jul 2018 15:08:05 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
 To: Christoph Hellwig <hch@infradead.org>
 Cc: Ming Lei <ming.lei@redhat.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Linux SCSI List <linux-scsi@vger.kernel.org>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>, linux-block <linux-block@vger.kernel.org>,
-	Douglas Gilbert <dgilbert@interlog.com>, Bart Van Assche <bart.vanassche@wdc.com>,
-	Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>
-Content-Type: text/plain; charset="UTF-8"
+        James Bottomley <James.Bottomley@HansenPartnership.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org,
+        Douglas Gilbert <dgilbert@interlog.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH] scsi: scsi_debug: introduce module parameter of
+ 'use_blk_mq'
+Message-ID: <20180702130805.e2glvr5rx5vcnmzl@linux-x5ow.site>
+References: <20180702050642.26265-1-ming.lei@redhat.com>
+ <20180702125422.GA600@infradead.org>
+ <20180702125652.jxjcig63xvljfqow@linux-x5ow.site>
+ <20180702130310.GA19610@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180702130310.GA19610@infradead.org>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jul 2, 2018 at 8:54 PM, Christoph Hellwig <hch@infradead.org> wrote:
-> On Mon, Jul 02, 2018 at 01:06:42PM +0800, Ming Lei wrote:
->> With the introduced module parameter of 'use_blk_mq', it is easy
->> to switch between 'blk_mq' and 'non_blk_mq' by reloading scsi_debug
->> module, so that we can test scsi_mq/blk_mq related regressions easily.
->
-> No.  We should not make a per driver choice.
+On Mon, Jul 02, 2018 at 06:03:10AM -0700, Christoph Hellwig wrote:
+> Yes, totally.  We'll just need to sort out the error handling with
+> scsi and mq first (for 4.18 in fact).
 
-Could you share us why we can't?
+Sure.
 
-BTW, this patch can make scsi_mq/blk_mq regression tests to
-be implemented very easily, such as, run one test in non-mq mode,
-and run it in mq mode, then compare the two.
-
-Thanks,
-Ming Lei
+	Johannes
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
