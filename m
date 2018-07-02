@@ -1,56 +1,65 @@
-Return-Path: <hare@suse.de>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>
-From: Hannes Reinecke <hare@suse.de>
-Subject: Silent data corruption in blkdev_direct_IO()
-Cc: Christoph Hellwig <hch@lst.de>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Martin Wilck <mwilck@suse.com>
-Message-ID: <e36f28d8-0eb8-1600-f327-8b066eeaf45c@suse.de>
-Date: Thu, 12 Jul 2018 16:36:41 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Laurence Oberman <loberman@redhat.com>,
+	Omar Sandoval <osandov@fb.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH V3 1/3] blk-mq: use list_splice_tail_init() to insert requests
+Date: Mon,  2 Jul 2018 17:35:58 +0800
+Message-Id: <20180702093600.10315-2-ming.lei@redhat.com>
+In-Reply-To: <20180702093600.10315-1-ming.lei@redhat.com>
+References: <20180702093600.10315-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens, Christoph,
+list_splice_tail_init() is much more faster than inserting each
+request one by one, given all requets in 'list' belong to
+same sw queue and ctx->lock is required to insert requests.
 
-we're currently hunting down a silent data corruption occurring due to
-commit 72ecad22d9f1 ("block: support a full bio worth of IO for
-simplified bdev direct-io").
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Laurence Oberman <loberman@redhat.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-While the whole thing is still hazy on the details, the one thing we've
-found is that reverting that patch fixes the data corruption.
-
-And looking closer, I've found this:
-
-static ssize_t
-blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
-{
-	int nr_pages;
-
-	nr_pages = iov_iter_npages(iter, BIO_MAX_PAGES + 1);
-	if (!nr_pages)
-		return 0;
-	if (is_sync_kiocb(iocb) && nr_pages <= BIO_MAX_PAGES)
-		return __blkdev_direct_IO_simple(iocb, iter, nr_pages);
-
-	return __blkdev_direct_IO(iocb, iter, min(nr_pages, BIO_MAX_PAGES));
-}
-
-When checking the call path
-__blkdev_direct_IO()->bio_alloc_bioset()->bvec_alloc()
-I found that bvec_alloc() will fail if nr_pages > BIO_MAX_PAGES.
-
-So why is there the check for 'nr_pages <= BIO_MAX_PAGES' ?
-It's not that we can handle it in __blkdev_direct_IO() ...
-
-Thanks for any clarification.
-
-Cheers,
-
-Hannes
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 95919268564b..174637d09923 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1544,19 +1544,19 @@ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+ 			    struct list_head *list)
+ 
+ {
++	struct request *rq;
++
+ 	/*
+ 	 * preemption doesn't flush plug list, so it's possible ctx->cpu is
+ 	 * offline now
+ 	 */
+-	spin_lock(&ctx->lock);
+-	while (!list_empty(list)) {
+-		struct request *rq;
+-
+-		rq = list_first_entry(list, struct request, queuelist);
++	list_for_each_entry(rq, list, queuelist) {
+ 		BUG_ON(rq->mq_ctx != ctx);
+-		list_del_init(&rq->queuelist);
+-		__blk_mq_insert_req_list(hctx, rq, false);
++		trace_block_rq_insert(hctx->queue, rq);
+ 	}
++
++	spin_lock(&ctx->lock);
++	list_splice_tail_init(list, &ctx->rq_list);
+ 	blk_mq_hctx_mark_pending(hctx, ctx);
+ 	spin_unlock(&ctx->lock);
+ }
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.9.5
