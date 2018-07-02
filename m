@@ -1,26 +1,23 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <jthumshirn@suse.de>
+Date: Mon, 2 Jul 2018 15:56:43 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Minwoo Im <minwoo.im.dev@gmail.com>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
 Subject: Re: [PATCH V2] blk-mq: code clean-up by adding an API to clear
  set->mq_map
-To: Minwoo Im <minwoo.im.dev@gmail.com>, linux-block@vger.kernel.org
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Message-ID: <20180702135643.ph666smfv4lih5mi@linux-x5ow.site>
 References: <1530539150-9591-1-git-send-email-minwoo.im.dev@gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <12de6f1b-8a0b-89ac-7900-b78be605ad63@kernel.dk>
-Date: Mon, 2 Jul 2018 08:31:19 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 In-Reply-To: <1530539150-9591-1-git-send-email-minwoo.im.dev@gmail.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 7/2/18 7:45 AM, Minwoo Im wrote:
-> set->mq_map is now currently cleared if something goes wrong when
-> establishing a queue map in blk-mq-pci.c.  It's also cleared before
-> updating a queue map in blk_mq_update_queue_map().
-> 
-> This patch provides an API to clear set->mq_map to make it clear.
-
-I'm fine with this change, but the declaration should go into
-block/blk-mq.h, it's not a driver API.
-
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-Jens Axboe
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
