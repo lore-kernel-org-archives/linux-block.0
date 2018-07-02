@@ -1,23 +1,82 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Mon, 2 Jul 2018 15:56:43 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Minwoo Im <minwoo.im.dev@gmail.com>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH V2] blk-mq: code clean-up by adding an API to clear
- set->mq_map
-Message-ID: <20180702135643.ph666smfv4lih5mi@linux-x5ow.site>
-References: <1530539150-9591-1-git-send-email-minwoo.im.dev@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1530539150-9591-1-git-send-email-minwoo.im.dev@gmail.com>
+Return-Path: <minwoo.im.dev@gmail.com>
+Return-Path: <minwoo.im.dev@gmail.com>
+From: Minwoo Im <minwoo.im.dev@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: [PATCH V2] blk-mq: code clean-up by adding an API to clear set->mq_map
+Date: Mon,  2 Jul 2018 22:45:50 +0900
+Message-Id: <1530539150-9591-1-git-send-email-minwoo.im.dev@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+set->mq_map is now currently cleared if something goes wrong when
+establishing a queue map in blk-mq-pci.c.  It's also cleared before
+updating a queue map in blk_mq_update_queue_map().
+
+This patch provides an API to clear set->mq_map to make it clear.
+
+Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
+---
+ block/blk-mq-pci.c     | 3 +--
+ block/blk-mq.c         | 4 +---
+ include/linux/blk-mq.h | 8 ++++++++
+ 3 files changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/block/blk-mq-pci.c b/block/blk-mq-pci.c
+index e233996..ccb9d7e 100644
+--- a/block/blk-mq-pci.c
++++ b/block/blk-mq-pci.c
+@@ -48,8 +48,7 @@ int blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev,
+ 
+ fallback:
+ 	WARN_ON_ONCE(set->nr_hw_queues > 1);
+-	for_each_possible_cpu(cpu)
+-		set->mq_map[cpu] = 0;
++	blk_mq_clear_mq_map(set);
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_pci_map_queues);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b429d51..c6bab3f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2675,7 +2675,6 @@ static int blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+ static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
+ {
+ 	if (set->ops->map_queues) {
+-		int cpu;
+ 		/*
+ 		 * transport .map_queues is usually done in the following
+ 		 * way:
+@@ -2690,8 +2689,7 @@ static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
+ 		 * killing stale mapping since one CPU may not be mapped
+ 		 * to any hw queue.
+ 		 */
+-		for_each_possible_cpu(cpu)
+-			set->mq_map[cpu] = 0;
++		blk_mq_clear_mq_map(set);
+ 
+ 		return set->ops->map_queues(set);
+ 	} else
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index e3147eb..a8ac78f 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -237,6 +237,14 @@ enum {
+ 
+ u32 blk_mq_unique_tag(struct request *rq);
+ 
++static inline void blk_mq_clear_mq_map(struct blk_mq_tag_set *set)
++{
++	int cpu;
++
++	for_each_possible_cpu(cpu)
++		set->mq_map[cpu] = 0;
++}
++
+ static inline u16 blk_mq_unique_tag_to_hwq(u32 unique_tag)
+ {
+ 	return unique_tag >> BLK_MQ_UNIQUE_TAG_BITS;
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.7.4
