@@ -1,57 +1,55 @@
-Return-Path: <mpatocka@redhat.com>
-Date: Tue, 3 Jul 2018 13:34:22 -0400 (EDT)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Axboe <axboe@kernel.dk>
-cc: linux-block@vger.kernel.org, Zdenek Kabelac <zkabelac@redhat.com>,
-        Mike Snitzer <msnitzer@redhat.com>, dm-devel@redhat.com
-Subject: [PATCH] block: fix infinite loop if the device loses discard
- capability
-Message-ID: <alpine.LRH.2.02.1807031332250.22443@file01.intranet.prod.int.rdu2.redhat.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Laurence Oberman <loberman@redhat.com>,
+	Omar Sandoval <osandov@fb.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH V3 2/3] blk-mq: only attempt to merge bio if there is rq in sw queue
+Date: Mon,  2 Jul 2018 17:35:59 +0800
+Message-Id: <20180702093600.10315-3-ming.lei@redhat.com>
+In-Reply-To: <20180702093600.10315-1-ming.lei@redhat.com>
+References: <20180702093600.10315-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-If __blkdev_issue_discard is in progress and a device mapper device is
-reloaded with a table that doesn't support discard,
-q->limits.max_discard_sectors is set to zero. This results in infinite
-loop in __blkdev_issue_discard.
+Only attempt to merge bio iff the ctx->rq_list isn't empty, because:
 
-This patch checks if max_discard_sectors is zero and aborts with
--EOPNOTSUPP.
+1) for high-performance SSD, most of times dispatch may succeed, then
+there may be nothing left in ctx->rq_list, so don't try to merge over
+sw queue if it is empty, then we can save one acquiring of ctx->lock
 
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-Tested-by: Zdenek Kabelac <mpatocka@redhat.com>
-Cc: stable@vger.kernel.org
+2) we can't expect good merge performance on per-cpu sw queue, and missing
+one merge on sw queue won't be a big deal since tasks can be scheduled from
+one CPU to another.
 
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Laurence Oberman <loberman@redhat.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Reported-by: Kashyap Desai <kashyap.desai@broadcom.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-lib.c |   10 ++++++++++
- 1 file changed, 10 insertions(+)
+ block/blk-mq-sched.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Index: linux-2.6/block/blk-lib.c
-===================================================================
---- linux-2.6.orig/block/blk-lib.c	2018-06-18 01:08:49.500000000 +0200
-+++ linux-2.6/block/blk-lib.c	2018-06-29 20:09:27.670000000 +0200
-@@ -68,6 +68,8 @@ int __blkdev_issue_discard(struct block_
- 		 */
- 		req_sects = min_t(sector_t, nr_sects,
- 					q->limits.max_discard_sectors);
-+		if (!req_sects)
-+			goto fail;
- 		if (req_sects > UINT_MAX >> 9)
- 			req_sects = UINT_MAX >> 9;
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 56c493c6cd90..f5745acc2d98 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -339,7 +339,8 @@ bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
+ 		return e->type->ops.mq.bio_merge(hctx, bio);
+ 	}
  
-@@ -105,6 +107,14 @@ int __blkdev_issue_discard(struct block_
- 
- 	*biop = bio;
- 	return 0;
-+
-+fail:
-+	if (bio) {
-+		submit_bio_wait(bio);
-+		bio_put(bio);
-+	}
-+	*biop = NULL;
-+	return -EOPNOTSUPP;
- }
- EXPORT_SYMBOL(__blkdev_issue_discard);
- 
+-	if (hctx->flags & BLK_MQ_F_SHOULD_MERGE) {
++	if ((hctx->flags & BLK_MQ_F_SHOULD_MERGE) &&
++			!list_empty_careful(&ctx->rq_list)) {
+ 		/* default per sw-queue merge */
+ 		spin_lock(&ctx->lock);
+ 		ret = blk_mq_attempt_merge(q, ctx, bio);
+-- 
+2.9.5
