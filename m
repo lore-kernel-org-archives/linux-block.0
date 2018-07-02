@@ -1,55 +1,77 @@
-Return-Path: <jinb.park7@gmail.com>
-Return-Path: <jinb.park7@gmail.com>
-Date: Sat, 28 Jul 2018 11:30:58 +0900
-From: Jinbum Park <jinb.park7@gmail.com>
-To: axboe@kernel.dk, bart.vanassche@wdc.com, jiufei.xue@linux.alibaba.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	gustavo@embeddedor.com
-Subject: [PATCH v2] pktcdvd: Fix possible Spectre-v1 for pkt_devs
-Message-ID: <20180728023058.GA21103@pjb1027-Latitude-E5410>
+Return-Path: <kashyap.desai@broadcom.com>
+From: Kashyap Desai <kashyap.desai@broadcom.com>
+References: <20180702093600.10315-1-ming.lei@redhat.com> <1530531681.8954.1.camel@redhat.com>
+In-Reply-To: <1530531681.8954.1.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Date: Mon, 2 Jul 2018 17:59:47 +0530
+Message-ID: <2f75692a43952064c238a6aa070b0bf6@mail.gmail.com>
+Subject: RE: [PATCH V3 0/3] blk-mq: improve IO perf in case of none io sched
+To: Laurence Oberman <loberman@redhat.com>, Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+	Christoph Hellwig <hch@lst.de>, Bart Van Assche <bart.vanassche@wdc.com>, Hannes Reinecke <hare@suse.de>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-User controls @dev_minor which to be used as index of pkt_devs.
-So, It can be exploited via Spectre-like attack. (speculative execution)
+> -----Original Message-----
+> From: Laurence Oberman [mailto:loberman@redhat.com]
+> Sent: Monday, July 2, 2018 5:11 PM
+> To: Ming Lei; Jens Axboe
+> Cc: linux-block@vger.kernel.org; Kashyap Desai; Omar Sandoval; Christoph
+> Hellwig; Bart Van Assche; Hannes Reinecke
+> Subject: Re: [PATCH V3 0/3] blk-mq: improve IO perf in case of none io
+> sched
+>
+> On Mon, 2018-07-02 at 17:35 +0800, Ming Lei wrote:
+> > Hi,
+> >
+> > The 1st 2 patch improves ctx->lock uses, and it is observed that IOPS
+> > may be improved by ~5% in rand IO test on MegaRaid SAS run by
+> > Kashyap.
+> >
+> > The 3rd patch fixes rand IO performance regression on MegaRaid SAS
+> > test, still reported by Kashyap.
+> >
+> > V3:
+> > 	- export dispatch busy from debugfs as suggested by Jens
+> > 	- add comment on blk_mq_update_hctx_busy() as suggested by
+> > Christoph
+> >
+> > V2:
+> > 	- fix list corruption in patch 1/3
+> >
+> >
+> > Ming Lei (3):
+> >   blk-mq: use list_splice_tail_init() to insert requests
+> >   blk-mq: only attempt to merge bio if there is rq in sw queue
+> >   blk-mq: dequeue request one by one from sw queue iff hctx is busy
+>
+>
+> >
+> >  block/blk-mq-debugfs.c |  9 +++++++++
+> >  block/blk-mq-sched.c   | 14 ++++----------
+> >  block/blk-mq.c         | 44 ++++++++++++++++++++++++++++++++++++--
+> > ------
+> >  include/linux/blk-mq.h |  3 ++-
+> >  4 files changed, 51 insertions(+), 19 deletions(-)
+> >
+> > Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+> > Cc: Laurence Oberman <loberman@redhat.com>
+> > Cc: Omar Sandoval <osandov@fb.com>
+> > Cc: Christoph Hellwig <hch@lst.de>
+> > Cc: Bart Van Assche <bart.vanassche@wdc.com>
+> > Cc: Hannes Reinecke <hare@suse.de>
+> >
+>
+> Thanks Ming, I repaired my MSA50 shelf so will functional test.
+> I have 6 SSD drives working in there now.
+> I know its already been tested by Kashyap.
 
-This kind of attack leaks address of pkt_devs, [1]
-It leads an attacker to bypass security mechanism such as KASLR.
+Performance is back to 1.6M IOPS which was earlier 1.3M IOPs on SSD based VD
+@MegaRaid controller setup.
 
-So sanitize @dev_minor before using it to prevent attack.
+Tested-by: Kashyap Desai <kashyap.desai@broadcom.com>
 
-[1] https://github.com/jinb-park/linux-exploit/
-tree/master/exploit-remaining-spectre-gadget/leak_pkt_devs.c
-
-Signed-off-by: Jinbum Park <jinb.park7@gmail.com>
----
-v2: Fix coding style by Gustavo.
-
- drivers/block/pktcdvd.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index c61d20c..8ec2eaa 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -67,8 +67,8 @@
- #include <scsi/scsi.h>
- #include <linux/debugfs.h>
- #include <linux/device.h>
--
- #include <linux/uaccess.h>
-+#include <linux/nospec.h>
- 
- #define DRIVER_NAME	"pktcdvd"
- 
-@@ -2231,6 +2231,7 @@ static struct pktcdvd_device *pkt_find_dev_from_minor(unsigned int dev_minor)
- {
- 	if (dev_minor >= MAX_WRITERS)
- 		return NULL;
-+	dev_minor = array_index_nospec(dev_minor, MAX_WRITERS);
- 	return pkt_devs[dev_minor];
- }
- 
--- 
-1.9.1
+>
+> Regards
+> Laurence
