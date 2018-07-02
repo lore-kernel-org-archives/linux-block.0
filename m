@@ -1,87 +1,36 @@
-Return-Path: <mwilck@suse.com>
-From: Martin Wilck <mwilck@suse.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jan Kara <jack@suse.com>
-Cc: Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Christoph Hellwig <hch@lst.de>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Kent Overstreet <kent.overstreet@gmail.com>,
-	linux-block@vger.kernel.org,
-	Martin Wilck <mwilck@suse.com>
-Subject: [PATCH v3 1/3] block: bio_iov_iter_get_pages: fix size of last iovec
-Date: Thu, 19 Jul 2018 23:01:56 +0200
-Message-Id: <20180719210158.25923-2-mwilck@suse.com>
-In-Reply-To: <20180719210158.25923-1-mwilck@suse.com>
-References: <20180719210158.25923-1-mwilck@suse.com>
+Return-Path: <jthumshirn@suse.de>
+Date: Mon, 2 Jul 2018 15:41:39 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Minwoo Im <minwoo.im.dev@gmail.com>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-mq: code clean-up by adding an API to clear
+ set->mq_map
+Message-ID: <20180702134139.veht7lob5xc2y7b4@linux-x5ow.site>
+References: <1530375699-20461-1-git-send-email-minwoo.im.dev@gmail.com>
+ <20180702081539.z5rj6wfh6v4zz6bv@linux-x5ow.site>
+ <1530536157.13674.4.camel@gmail.com>
+ <20180702130227.gjpblurxccjqechl@linux-x5ow.site>
+ <1530537603.13674.8.camel@gmail.com>
+ <20180702132704.3nwi4y6ex6fn5z67@linux-x5ow.site>
+ <1530538459.13674.12.camel@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1530538459.13674.12.camel@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-If the last page of the bio is not "full", the length of the last
-vector slot needs to be corrected. This slot has the index
-(bio->bi_vcnt - 1), but only in bio->bi_io_vec. In the "bv" helper
-array, which is shifted by the value of bio->bi_vcnt at function
-invocation, the correct index is (nr_pages - 1).
+On Mon, Jul 02, 2018 at 10:34:19PM +0900, Minwoo Im wrote:
+> I was wondering you did mean 'inline' or not because the function in the
+> previous mail only with 'static' without 'inline' keyword :)
+> That's why I asked it one more time to figure out what you really mean.
 
-v2: improved readability following suggestions from Ming Lei.
-v3: followed a formatting suggestion from Christoph Hellwig.
+Ah sorry. I'm juggling too much things in parallel currently. Sorry
+for that.
 
-Fixes: 2cefe4dbaadf ("block: add bio_iov_iter_get_pages()")
-Signed-off-by: Martin Wilck <mwilck@suse.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- block/bio.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 67eff5e..489a430 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -912,16 +912,16 @@ EXPORT_SYMBOL(bio_add_page);
-  */
- int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- {
--	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
-+	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt, idx;
- 	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
- 	struct page **pages = (struct page **)bv;
--	size_t offset, diff;
-+	size_t offset;
- 	ssize_t size;
- 
- 	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
- 	if (unlikely(size <= 0))
- 		return size ? size : -EFAULT;
--	nr_pages = (size + offset + PAGE_SIZE - 1) / PAGE_SIZE;
-+	idx = nr_pages = (size + offset + PAGE_SIZE - 1) / PAGE_SIZE;
- 
- 	/*
- 	 * Deep magic below:  We need to walk the pinned pages backwards
-@@ -934,17 +934,15 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	bio->bi_iter.bi_size += size;
- 	bio->bi_vcnt += nr_pages;
- 
--	diff = (nr_pages * PAGE_SIZE - offset) - size;
--	while (nr_pages--) {
--		bv[nr_pages].bv_page = pages[nr_pages];
--		bv[nr_pages].bv_len = PAGE_SIZE;
--		bv[nr_pages].bv_offset = 0;
-+	while (idx--) {
-+		bv[idx].bv_page = pages[idx];
-+		bv[idx].bv_len = PAGE_SIZE;
-+		bv[idx].bv_offset = 0;
- 	}
- 
- 	bv[0].bv_offset += offset;
- 	bv[0].bv_len -= offset;
--	if (diff)
--		bv[bio->bi_vcnt - 1].bv_len -= diff;
-+	bv[nr_pages - 1].bv_len -= nr_pages * PAGE_SIZE - offset - size;
- 
- 	iov_iter_advance(iter, size);
- 	return 0;
+   Johannes
 -- 
-2.17.1
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
