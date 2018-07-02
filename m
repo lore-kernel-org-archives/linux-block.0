@@ -1,144 +1,26 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>,
-	Michael Tsirkin <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>
-Subject: [PATCH 6/6] virtio-blk: modernize sysfs attribute creation
-Date: Mon, 30 Jul 2018 09:12:27 +0200
-Message-Id: <20180730071227.22887-7-hare@suse.de>
-In-Reply-To: <20180730071227.22887-1-hare@suse.de>
-References: <20180730071227.22887-1-hare@suse.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] drbd: mark expected switch fall-throughs
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+ Philipp Reisner <philipp.reisner@linbit.com>,
+ Lars Ellenberg <lars.ellenberg@linbit.com>
+Cc: drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20180702174902.GA18713@embeddedor.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <d776672f-3173-037e-81fc-5c2619177682@kernel.dk>
+Date: Mon, 2 Jul 2018 15:11:03 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180702174902.GA18713@embeddedor.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Use new-style DEVICE_ATTR_RO/DEVICE_ATTR_RW to create the sysfs attributes
-and register the disk with default sysfs attribute groups.
+On 7/2/18 11:49 AM, Gustavo A. R. Silva wrote:
+> In preparation to enabling -Wimplicit-fallthrough, mark switch cases
+> where we are expecting to fall through.
+> 
+> Warning level 2 was used in this case: -Wimplicit-fallthrough=2
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-Cc: Michael Tsirkin <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
----
- drivers/block/virtio_blk.c | 68 ++++++++++++++++++++++++++--------------------
- 1 file changed, 39 insertions(+), 29 deletions(-)
+Applied, thanks.
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index fe80560000a1..086c6bb12baa 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -351,8 +351,8 @@ static int minor_to_index(int minor)
- 	return minor >> PART_BITS;
- }
- 
--static ssize_t virtblk_serial_show(struct device *dev,
--				struct device_attribute *attr, char *buf)
-+static ssize_t serial_show(struct device *dev,
-+			   struct device_attribute *attr, char *buf)
- {
- 	struct gendisk *disk = dev_to_disk(dev);
- 	int err;
-@@ -371,7 +371,7 @@ static ssize_t virtblk_serial_show(struct device *dev,
- 	return err;
- }
- 
--static DEVICE_ATTR(serial, 0444, virtblk_serial_show, NULL);
-+static DEVICE_ATTR_RO(serial);
- 
- /* The queue's logical block size must be set before calling this */
- static void virtblk_update_capacity(struct virtio_blk *vblk, bool resize)
-@@ -545,8 +545,8 @@ static const char *const virtblk_cache_types[] = {
- };
- 
- static ssize_t
--virtblk_cache_type_store(struct device *dev, struct device_attribute *attr,
--			 const char *buf, size_t count)
-+cache_type_store(struct device *dev, struct device_attribute *attr,
-+		 const char *buf, size_t count)
- {
- 	struct gendisk *disk = dev_to_disk(dev);
- 	struct virtio_blk *vblk = disk->private_data;
-@@ -564,8 +564,7 @@ virtblk_cache_type_store(struct device *dev, struct device_attribute *attr,
- }
- 
- static ssize_t
--virtblk_cache_type_show(struct device *dev, struct device_attribute *attr,
--			 char *buf)
-+cache_type_show(struct device *dev, struct device_attribute *attr, char *buf)
- {
- 	struct gendisk *disk = dev_to_disk(dev);
- 	struct virtio_blk *vblk = disk->private_data;
-@@ -575,12 +574,38 @@ virtblk_cache_type_show(struct device *dev, struct device_attribute *attr,
- 	return snprintf(buf, 40, "%s\n", virtblk_cache_types[writeback]);
- }
- 
--static const struct device_attribute dev_attr_cache_type_ro =
--	__ATTR(cache_type, 0444,
--	       virtblk_cache_type_show, NULL);
--static const struct device_attribute dev_attr_cache_type_rw =
--	__ATTR(cache_type, 0644,
--	       virtblk_cache_type_show, virtblk_cache_type_store);
-+static DEVICE_ATTR_RW(cache_type);
-+
-+static struct attribute *virtblk_attrs[] = {
-+	&dev_attr_serial.attr,
-+	&dev_attr_cache_type.attr,
-+	NULL,
-+};
-+
-+static umode_t virtblk_attrs_are_visible(struct kobject *kobj,
-+		struct attribute *a, int n)
-+{
-+	struct device *dev = container_of(kobj, struct device, kobj);
-+	struct gendisk *disk = dev_to_disk(dev);
-+	struct virtio_blk *vblk = disk->private_data;
-+	struct virtio_device *vdev = vblk->vdev;
-+
-+	if (a == &dev_attr_cache_type.attr &&
-+	    !virtio_has_feature(vdev, VIRTIO_BLK_F_CONFIG_WCE))
-+		return S_IRUGO;
-+
-+	return a->mode;
-+}
-+
-+static const struct attribute_group virtblk_attr_group = {
-+	.attrs = virtblk_attrs,
-+	.is_visible = virtblk_attrs_are_visible,
-+};
-+
-+static const struct attribute_group *virtblk_attr_groups[] = {
-+	&virtblk_attr_group,
-+	NULL,
-+};
- 
- static int virtblk_init_request(struct blk_mq_tag_set *set, struct request *rq,
- 		unsigned int hctx_idx, unsigned int numa_node)
-@@ -780,24 +805,9 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	virtblk_update_capacity(vblk, false);
- 	virtio_device_ready(vdev);
- 
--	device_add_disk(&vdev->dev, vblk->disk, NULL);
--	err = device_create_file(disk_to_dev(vblk->disk), &dev_attr_serial);
--	if (err)
--		goto out_del_disk;
--
--	if (virtio_has_feature(vdev, VIRTIO_BLK_F_CONFIG_WCE))
--		err = device_create_file(disk_to_dev(vblk->disk),
--					 &dev_attr_cache_type_rw);
--	else
--		err = device_create_file(disk_to_dev(vblk->disk),
--					 &dev_attr_cache_type_ro);
--	if (err)
--		goto out_del_disk;
-+	device_add_disk(&vdev->dev, vblk->disk, virtblk_attr_groups);
- 	return 0;
- 
--out_del_disk:
--	del_gendisk(vblk->disk);
--	blk_cleanup_queue(vblk->disk->queue);
- out_free_tags:
- 	blk_mq_free_tag_set(&vblk->tag_set);
- out_put_disk:
 -- 
-2.12.3
+Jens Axboe
