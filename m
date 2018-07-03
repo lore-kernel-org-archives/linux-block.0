@@ -1,47 +1,83 @@
-Return-Path: <BATV+c9ebeb9e9cafa2a765ab+5448+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Boaz Harrosh <ooo@electrozaur.com>,
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	linux-kernel@vger.kernel.org,
+	akpm@linux-foundation.org,
+	hannes@cmpxchg.org,
+	tj@kernel.org,
+	linux-fsdevel@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	linux-bcache@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 1/5] bcache: don't clone bio in bch_data_verify
-Date: Tue, 24 Jul 2018 09:52:30 +0200
-Message-Id: <20180724075234.26861-2-hch@lst.de>
-In-Reply-To: <20180724075234.26861-1-hch@lst.de>
-References: <20180724075234.26861-1-hch@lst.de>
+	kernel-team@fb.com
+Cc: Josef Bacik <jbacik@fb.com>
+Subject: [PATCH 04/14] blk: introduce REQ_SWAP
+Date: Tue,  3 Jul 2018 11:14:53 -0400
+Message-Id: <20180703151503.2549-5-josef@toxicpanda.com>
+In-Reply-To: <20180703151503.2549-1-josef@toxicpanda.com>
+References: <20180703151503.2549-1-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-We immediately overwrite the biovec array, so instead just allocate
-a new bio and copy over the disk, setor and size.
+From: Josef Bacik <jbacik@fb.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Acked-by: Coly Li <colyli@suse.de>
+Just like REQ_META, it's important to know the IO coming down is swap
+in order to guard against potential IO priority inversion issues with
+cgroups.  Add REQ_SWAP and use it for all swap IO, and add it to our
+bio_issue_as_root_blkg helper.
+
+Signed-off-by: Josef Bacik <jbacik@fb.com>
+Acked-by: Tejun Heo <tj@kernel.org>
 ---
- drivers/md/bcache/debug.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ include/linux/blk-cgroup.h | 2 +-
+ include/linux/blk_types.h  | 3 ++-
+ mm/page_io.c               | 2 +-
+ 3 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
-index d030ce3025a6..04d146711950 100644
---- a/drivers/md/bcache/debug.c
-+++ b/drivers/md/bcache/debug.c
-@@ -110,11 +110,15 @@ void bch_data_verify(struct cached_dev *dc, struct bio *bio)
- 	struct bio_vec bv, cbv;
- 	struct bvec_iter iter, citer = { 0 };
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index b41292726c0f..a8f9ba8f33a4 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -254,7 +254,7 @@ static inline struct blkcg *bio_blkcg(struct bio *bio)
+  */
+ static inline bool bio_issue_as_root_blkg(struct bio *bio)
+ {
+-	return (bio->bi_opf & REQ_META);
++	return (bio->bi_opf & (REQ_META | REQ_SWAP)) != 0;
+ }
  
--	check = bio_clone_kmalloc(bio, GFP_NOIO);
-+	check = bio_kmalloc(GFP_NOIO, bio_segments(bio));
- 	if (!check)
- 		return;
-+	check->bi_disk = bio->bi_disk;
- 	check->bi_opf = REQ_OP_READ;
-+	check->bi_iter.bi_sector = bio->bi_iter.bi_sector;
-+	check->bi_iter.bi_size = bio->bi_iter.bi_size;
+ /**
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 3364d42ebe08..0ffc34c5cc83 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -329,7 +329,7 @@ enum req_flag_bits {
  
-+	bch_bio_map(check, NULL);
- 	if (bch_bio_alloc_pages(check, GFP_NOIO))
- 		goto out_put;
+ 	/* for driver use */
+ 	__REQ_DRV,
+-
++	__REQ_SWAP,		/* swapping request. */
+ 	__REQ_NR_BITS,		/* stops here */
+ };
  
+@@ -351,6 +351,7 @@ enum req_flag_bits {
+ #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+ 
+ #define REQ_DRV			(1ULL << __REQ_DRV)
++#define REQ_SWAP		(1ULL << __REQ_SWAP)
+ 
+ #define REQ_FAILFAST_MASK \
+ 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
+diff --git a/mm/page_io.c b/mm/page_io.c
+index b41cf9644585..a552cb37e220 100644
+--- a/mm/page_io.c
++++ b/mm/page_io.c
+@@ -338,7 +338,7 @@ int __swap_writepage(struct page *page, struct writeback_control *wbc,
+ 		ret = -ENOMEM;
+ 		goto out;
+ 	}
+-	bio->bi_opf = REQ_OP_WRITE | wbc_to_write_flags(wbc);
++	bio->bi_opf = REQ_OP_WRITE | REQ_SWAP | wbc_to_write_flags(wbc);
+ 	count_swpout_vm_event(page);
+ 	set_page_writeback(page);
+ 	unlock_page(page);
 -- 
-2.18.0
+2.14.3
