@@ -1,63 +1,55 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
+Return-Path: <axboe@kernel.dk>
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH V3 3/3] blk-mq: dequeue request one by one from sw queue iff hctx is busy
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20180703012346.GA24254@ming.t460p>
+Date: Mon, 2 Jul 2018 19:52:27 -0600
 Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Kent Overstreet <kent.overstreet@gmail.com>
-Subject: [PATCH 0/3] block: fix mismatch of figuring out physical segment number
-Date: Tue, 31 Jul 2018 18:49:11 +0800
-Message-Id: <20180731104914.17249-1-ming.lei@redhat.com>
+ Kashyap Desai <kashyap.desai@broadcom.com>,
+ Laurence Oberman <loberman@redhat.com>, Omar Sandoval <osandov@fb.com>,
+ Christoph Hellwig <hch@lst.de>, Bart Van Assche <bart.vanassche@wdc.com>,
+ Hannes Reinecke <hare@suse.de>
+Message-Id: <8EB84C90-DD18-41D7-BFA9-882D79D13BC3@kernel.dk>
+References: <20180702093600.10315-1-ming.lei@redhat.com> <20180702093600.10315-4-ming.lei@redhat.com> <f120df41-a378-23e5-3dab-28398cd49d4e@kernel.dk> <20180703012346.GA24254@ming.t460p>
+To: Ming Lei <ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+On Jul 2, 2018, at 7:23 PM, Ming Lei <ming.lei@redhat.com> wrote:
+>=20
+>> On Mon, Jul 02, 2018 at 11:30:17AM -0600, Jens Axboe wrote:
+>>> On 7/2/18 3:36 AM, Ming Lei wrote:
+>>> It won't be efficient to dequeue request one by one from sw queue,
+>>> but we have to do that when queue is busy for better merge performance.
+>>>=20
+>>> This patch takes EWMA to figure out if queue is busy, then only dequeue
+>>> request one by one from sw queue when queue is busy.
+>>=20
+>> Just one minor comment, since you're going to be updating this one
+>> anyway:
+>>=20
+>>> @@ -1209,8 +1234,11 @@ bool blk_mq_dispatch_rq_list(struct request_queue=
+ *q, struct list_head *list,
+>>>        else if (needs_restart && (ret =3D=3D BLK_STS_RESOURCE))
+>>>            blk_mq_delay_run_hw_queue(hctx, BLK_MQ_RESOURCE_DELAY);
+>>>=20
+>>> +        blk_mq_update_hctx_busy(hctx, true);
+>>> +
+>>>        return false;
+>>=20
+>> Kill that newline between update and return.
+>>=20
+>> Rest looks fine to me now, though I do agree with Christophs comments on
+>> making the weight and factor in caps.
+>>=20
+>> Applying 1-2/3 so far.
+>=20
+> Hi Jens,
+>=20
+> Not sure if 3 is applied now given your for-4.19/block isn't public yet.
+> So please let me know if you need me to re-send 3.
 
-This patchset fixes one issue related with physical segment computation,
-which is found by Mike. In case of dm-rq, the warning of 'blk_cloned_rq_check_limits:
-over max segments limit' can be triggered easily.
-
-Follows the cause:
-
-1) in IO fast path(blk_queue_split()), we always figure out physical segment number
-no matter the flag of QUEUE_FLAG_NO_SG_MERGE is set or not.
-
-2) only blk_recount_segments() and blk_recalc_rq_segments() uses the flag of
-QUEUE_FLAG_NO_SG_MERGE, but the two are only called in some unusual
-cases, such as request clone in dm-rq.
-
-3) the above two computation don't match, and cause the warning of
-"blk_cloned_rq_check_limits: over max segments limit".
-
-This patchset fixes this issue by killing the queue flag since it is basically
-bypassed since v4.4, and no one complains that at all. Also multipage bvec will
-come soon, and it doesn't make sense to keep QUEUE_FLAG_NO_SG_MERGE any more.
-
-
-Ming Lei (3):
-  block: don't use bio->bi_vcnt to figure out segment number
-  block: kill QUEUE_FLAG_NO_SG_MERGE
-  block: kill BLK_MQ_F_SG_MERGE
-
- block/blk-merge.c            | 39 +++++++--------------------------------
- block/blk-mq-debugfs.c       |  2 --
- block/blk-mq.c               |  3 ---
- drivers/block/loop.c         |  2 +-
- drivers/block/nbd.c          |  2 +-
- drivers/block/rbd.c          |  2 +-
- drivers/block/skd_main.c     |  1 -
- drivers/block/xen-blkfront.c |  2 +-
- drivers/md/dm-rq.c           |  2 +-
- drivers/md/dm-table.c        | 13 -------------
- drivers/mmc/core/queue.c     |  3 +--
- drivers/scsi/scsi_lib.c      |  2 +-
- include/linux/blk-mq.h       |  1 -
- include/linux/blkdev.h       |  1 -
- 14 files changed, 14 insertions(+), 61 deletions(-)
-
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-
--- 
-2.9.5
+Please send a new 3/3, didn=E2=80=99t apply it yet. I haven=E2=80=99t pushed=
+ out my 4.19 branch yet, since I may have to rebase it. It=E2=80=99ll come o=
+ut soon.=20
