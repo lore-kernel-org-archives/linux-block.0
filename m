@@ -1,200 +1,112 @@
-Return-Path: <schmitzmic@gmail.com>
-Return-Path: <schmitzmic@gmail.com>
-From: Michael Schmitz <schmitzmic@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: linux-m68k@vger.kernel.org,
-	axboe@kernel.dk,
-	geert@linux-m68k.org,
-	jdow@earthlink.net,
-	martin@lichtvoll.de,
-	jongk@linux-m68k.org,
-	Michael Schmitz <schmitzmic@gmail.com>
-Subject: [PATCH v3] block: fix Amiga partition support for disks >= 1 TB
-Date: Wed,  4 Jul 2018 07:39:18 +1200
-Message-Id: <1530646758-30513-1-git-send-email-schmitzmic@gmail.com>
-In-Reply-To: <1530509350-25410-1-git-send-email-schmitzmic@gmail.com>
-References: <1530509350-25410-1-git-send-email-schmitzmic@gmail.com>
+Return-Path: <jdow@earthlink.net>
+Subject: Re: [PATCH] block: fix Amiga partition support for disks >= 1 TB
+To: Geert Uytterhoeven <geert@linux-m68k.org>,
+ Michael Schmitz <schmitzmic@gmail.com>
+Cc: linux-block@vger.kernel.org, Linux/m68k <linux-m68k@vger.kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Martin Steigerwald <martin@lichtvoll.de>
+References: <20180627012421.80B8F24E094@nmr-admin>
+ <1530509350-25410-1-git-send-email-schmitzmic@gmail.com>
+ <CAMuHMdXgYyQxuBru_oFeBdYaCMSg9fpYaXDpUrNy08Qps5HM-w@mail.gmail.com>
+ <CAOmrzkK5M9Gjpd9K5Hccu-bYK758UVxei5FtO2veY2FVy1kO_A@mail.gmail.com>
+ <CAMuHMdUHnx41fooeSdvJDGVHkZrWeY9TYqubARo8XwFRdMwCAg@mail.gmail.com>
+From: jdow <jdow@earthlink.net>
+Message-ID: <19c60bc1-fa11-ab38-fd7c-0dee7de9c7f3@earthlink.net>
+Date: Tue, 3 Jul 2018 03:02:16 -0700
+MIME-Version: 1.0
+In-Reply-To: <CAMuHMdUHnx41fooeSdvJDGVHkZrWeY9TYqubARo8XwFRdMwCAg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-The Amiga partition parser module uses signed int for partition sector
-address and count, which will overflow for disks larger than 1 TB.
+On 20180703 00:22, Geert Uytterhoeven wrote:
+> Hi Michael,
+> 
+> On Tue, Jul 3, 2018 at 1:58 AM Michael Schmitz <schmitzmic@gmail.com> wrote:
+>> On Mon, Jul 2, 2018 at 8:29 PM, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+>>>> +
+>>>> +               /* Warn user if start_sect or nr_sects overflow u32 */
+>>>> +               if ((nr_sects > UINT_MAX || start_sect > UINT_MAX ||
+>>>> +                   (start_sect + nr_sects) > UINT_MAX) && !did_warn) {
+>>>
+>>> I guess "start_sect + nr_sects > UINT_MAX" is sufficient?
+>>
+>> No, we need to catch any partition address overflowing. nr_sects >
+>> UINT_MAX may be redundant though.
+> 
+> The three tests may have been needed when both variables were 32-bit,
+> but when using unsigned 64-bit arithmetic, it shouldn't matter: if any of the
+> two values doesn't fit in 32-bit, the sum also doesn't.
+> Or is this also used to catch 64-bit add overflow? In that case, please use
+> check_add_overflow().
 
-Use u64 as type for sector address and size to allow using disks up to
-2 TB without LBD support, and disks larger than 2 TB with LBD. The RBD
-format allows to specify disk sizes up to 2^128 bytes (though native
-OS limitations reduce this somewhat, to max 2^68 bytes), so check for
-u64 overflow carefully to protect against overflowing sector_t.
+Um, both values can be high 32 bits with the sum being greater than 32 bits. 
+Seems to me, though, that the only test needed is whether the sum is greater 
+than 32 bits. If either number is greater the sum certainly is. (Of course, 
+either a comment to that effect or code that pounds the concept into the code's 
+future reader should appear.) The 2TB issue is one that may surprise old hands 
+given the appearance of the RDBs being able to support absurdly large, NSA 
+pleasing, disks. It's hard to decide where warnings should appear. (And it's 
+difficult to justify them in the RDB parser unless it overflows the interface to 
+the Linux OS. The mkfs-(RDB reading Amiga filesystem) took should be where the 
+warnings are posted.
 
-Bail out if sector addresses overflow 32 bits on kernels without LBD
-support.
+>>> I would remove the did_warn check, as multiple partitions may be affected.
+>>
+>> Any partition overflowing means danger lurks (in AmigaDOS of
+>> sufficient vintage, that is)
+> 
+> Yes, that's what I meant: dropping the did_warn check means always printing
+> the warning, not just for the first "unusable" partition.
 
-This bug was reported originally in 2012, and the fix was created by
-the RDB author, Joanne Dow <jdow@earthlink.net>. A patch had been
-discussed and reviewed on linux-m68k at that time but never officially
-submitted. This patch adds additional error checking and warning messages.
+Actually anything greater than 2 gigabytes may be a problem on some versions of 
+AmigaDOS that spoke to hard disks of one kind or another. A newcomer to the 
+surprisingly active Amiga scene could get distressed by that error. Old timers 
+know of the fixes that circulated. Those fixes appear to work with greater than 
+2TB disks to some limited degree. There are probably some official "Commodore" 
+OS utilities which will blow their little minds at 2TB if not sooner. That's one 
+that can be protected for in the partitioning tool. The RDB parser should warn 
+if it gets confused or overflows its interface into the OS. Ideally it should 
+back out of mounting partitions it does not understand.
 
-Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=43511
-Reported-by: Martin Steigerwald <Martin@lichtvoll.de>
-Message-ID: <201206192146.09327.Martin@lichtvoll.de>
-Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
-Tested-by: Martin Steigerwald <Martin@lichtvoll.de>
+Note that the original RDB parser patch I made was part of patch to allow 2k 
+physical block size to match some 640 megabyte Fujitsu magneto-optical drives. I 
+hope the OS can still cope with that situation. (I don't know if I can recover 
+the actual data written to the disk. I can't remember if I limited the LSEG 
+data, which Linux should ignore anyway, to 512 bytes or not when I built the low 
+level partitioning tools. So LONG ago and a mind with a 7 in front of its age 
+gets tad flaky remembering such ancient history.)
 
----
+>>> Also, RDB doesn't enforce partition ordering, IIRC, so e.g. partitions 1
+>>> and 3 could be outside the 2 TiB area, while 2 could be within.
+>>
+>> The first partition (partly) outside 2 TB will warn. But the point
+>> about partition ordering later is well taken.
+>>>
+>>>> +                       pr_err("Dev %s: partition 32 bit overflow! ",
+>>>
+>>> pr_warn()
+>>
+>> OK.
+>>
+>>>
+>>>> +                               bdevname(state->bdev, b));
+>>>> +                       pr_cont("start_sect 0x%llX, nr_sects 0x%llx\n",
+>>>> +                                start_sect, nr_sects);
+>>>
+>>> No need for pr_cont(), just merge the two statements.
+>>
+>> Checkpatch catch-22 (thou shalt not exceed 80 cols, thou shalt not
+>> split string consts over multiple lines, and thou shalt not use
+>> pr_cont() without good cause). I'll ignore the 80 cols error then.
+> 
+> That's the sane thing to do: single pr_warn() statement, and ignoring the 80
+> columns error if it would mean splitting the string, so people can easily
+> grep for it when they see the message on their consoles.
+> 
+> Gr{oetje,eeting}s,
+> 
+>                          Geert
 
-Changes from RFC:
+And thank you for your work with the Linux community, Geert. I've noticed and 
+admired it.
 
-- use u64 instead of sector_t, since that may be u32 without LBD support
-- check multiplication overflows each step - 3 u32 values may exceed u64!
-- warn against use on AmigaDOS if partition data overflow u32 sector count.
-- warn if partition CylBlocks larger than what's stored in the RDSK header.
-- bail out if we were to overflow sector_t (32 or 64 bit).
-
-Changes from v1:
-
-Kars de Jong:
-- use defines for magic offsets in DosEnvec struct
-
-Geert Uytterhoeven:
-- use u64 cast for multiplications of u32 numbers
-- use array3_size for overflow checks
-- change pr_err to pr_warn
-- discontinue use of pr_cont
-- reword log messages
-- drop redundant nr_sects overflow test
-- warn against 32 bit overflow for each affected partition
-- skip partitions that overflow sector_t size instead of aborting scan
-
-Changes from v2:
-
-- further trim 32 bit overflow test
-- correct duplicate types.h inclusion introduced in v2
-
----
- block/partitions/amiga.c |   89 ++++++++++++++++++++++++++++++++++++++++-----
- 1 files changed, 79 insertions(+), 10 deletions(-)
-
-diff --git a/block/partitions/amiga.c b/block/partitions/amiga.c
-index 5609366..4e6e478 100644
---- a/block/partitions/amiga.c
-+++ b/block/partitions/amiga.c
-@@ -11,11 +11,19 @@
- #define pr_fmt(fmt) fmt
- 
- #include <linux/types.h>
-+#include <linux/mm_types.h>
-+#include <linux/overflow.h>
- #include <linux/affs_hardblocks.h>
- 
- #include "check.h"
- #include "amiga.h"
- 
-+/* magic offsets in partition DosEnvVec */
-+#define NR_HD	3
-+#define NR_SECT	5
-+#define LO_CYL	9
-+#define	HI_CYL	10
-+
- static __inline__ u32
- checksum_block(__be32 *m, int size)
- {
-@@ -32,7 +40,9 @@ int amiga_partition(struct parsed_partitions *state)
- 	unsigned char *data;
- 	struct RigidDiskBlock *rdb;
- 	struct PartitionBlock *pb;
--	int start_sect, nr_sects, blk, part, res = 0;
-+	u64 start_sect, nr_sects;
-+	u64 cylblk;		/* rdb_CylBlocks = nr_heads*sect_per_track */
-+	int blk, part, res = 0;
- 	int blksize = 1;	/* Multiplier for disk block size */
- 	int slot = 1;
- 	char b[BDEVNAME_SIZE];
-@@ -98,19 +108,78 @@ int amiga_partition(struct parsed_partitions *state)
- 		if (checksum_block((__be32 *)pb, be32_to_cpu(pb->pb_SummedLongs) & 0x7F) != 0 )
- 			continue;
- 
-+		/* RDB gives us more than enough rope to hang ourselves with,
-+		 * many times over (2^128 bytes if all fields max out).
-+		 * Some careful checks are in order.
-+		 */
-+
-+		/* CylBlocks is total number of blocks per cylinder */
-+		cylblk = be32_to_cpu(pb->pb_Environment[NR_HD]) *
-+			 be32_to_cpu(pb->pb_Environment[NR_SECT]);
-+
-+		/* check for consistency with RDB defined CylBlocks */
-+		if (cylblk > be32_to_cpu(rdb->rdb_CylBlocks)) {
-+			pr_warn("Dev %s: cylblk %llu > rdb_CylBlocks 0x%x!\n",
-+				bdevname(state->bdev, b), cylblk,
-+				be32_to_cpu(rdb->rdb_CylBlocks));
-+		}
-+
-+		/* check for potential overflows - we are going to multiply
-+		 * three 32 bit numbers to one 64 bit result later!
-+		 * Condition 1: nr_heads * sects_per_track must fit u32!
-+		 * NB: This is a HARD limit for AmigaDOS. We just warn.
-+		 */
-+
-+		if (cylblk > UINT_MAX) {
-+			pr_warn("Dev %s: heads*sects %llu > UINT_MAX!\n",
-+				bdevname(state->bdev, b), cylblk);
-+		}
-+
-+		/* Condition 2: even if CylBlocks did not overflow, the end
-+		 * result must still fit u64!
-+		 */
-+
-+		if (array3_size(be32_to_cpu(pb->pb_Environment[LO_CYL]),
-+			cylblk, blksize) == SIZE_MAX) {
-+			pr_err("Dev %s: partition %u start overflows u64, skipping partition!\n",
-+				bdevname(state->bdev, b), part);
-+			continue;
-+		}
-+
-+		if (array3_size(be32_to_cpu(pb->pb_Environment[HI_CYL]),
-+			cylblk, blksize) == SIZE_MAX) {
-+			pr_err("Dev %s: partition %u end overflows u64, skipping partition!\n",
-+				bdevname(state->bdev, b), part);
-+			continue;
-+		}
-+
- 		/* Tell Kernel about it */
- 
--		nr_sects = (be32_to_cpu(pb->pb_Environment[10]) + 1 -
--			    be32_to_cpu(pb->pb_Environment[9])) *
--			   be32_to_cpu(pb->pb_Environment[3]) *
--			   be32_to_cpu(pb->pb_Environment[5]) *
--			   blksize;
-+		nr_sects = (u64)((be32_to_cpu(pb->pb_Environment[HI_CYL]) + 1 -
-+			    be32_to_cpu(pb->pb_Environment[LO_CYL])) *
-+			   be32_to_cpu(pb->pb_Environment[NR_HD]) *
-+			   be32_to_cpu(pb->pb_Environment[NR_SECT]) *
-+			   blksize);
- 		if (!nr_sects)
- 			continue;
--		start_sect = be32_to_cpu(pb->pb_Environment[9]) *
--			     be32_to_cpu(pb->pb_Environment[3]) *
--			     be32_to_cpu(pb->pb_Environment[5]) *
--			     blksize;
-+		start_sect = (u64)(be32_to_cpu(pb->pb_Environment[LO_CYL]) *
-+			     be32_to_cpu(pb->pb_Environment[NR_HD]) *
-+			     be32_to_cpu(pb->pb_Environment[NR_SECT]) *
-+			     blksize);
-+
-+		/* Warn user if start_sect or nr_sects overflow u32 */
-+		if ((start_sect + nr_sects) > UINT_MAX) {
-+			pr_warn("Dev %s: partition %u (%llu-%llu) needs 64 bit device support!\n",
-+				bdevname(state->bdev, b), part,
-+				start_sect, nr_sects);
-+			/* Without LBD support, better bail out */
-+			if (!IS_ENABLED(CONFIG_LBDAF)) {
-+				pr_err("Dev %s: no LBD support, skipping partition %u!",
-+					bdevname(state->bdev, b), part);
-+				continue;
-+			}
-+		}
-+
- 		put_partition(state,slot++,start_sect,nr_sects);
- 		{
- 			/* Be even more informative to aid mounting */
--- 
-1.7.0.4
+{^_^}   Joanne Dow (Her just cruseing face.)
