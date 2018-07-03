@@ -2,47 +2,63 @@ Return-Path: <josef@toxicpanda.com>
 Return-Path: <josef@toxicpanda.com>
 From: Josef Bacik <josef@toxicpanda.com>
 To: axboe@kernel.dk,
+	linux-kernel@vger.kernel.org,
+	akpm@linux-foundation.org,
+	hannes@cmpxchg.org,
+	tj@kernel.org,
+	linux-fsdevel@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	kernel-team@fb.com
 Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 2/2] blk-iolatency: truncate our current time
-Date: Mon, 16 Jul 2018 12:12:23 -0400
-Message-Id: <20180716161223.21486-2-josef@toxicpanda.com>
-In-Reply-To: <20180716161223.21486-1-josef@toxicpanda.com>
-References: <20180716161223.21486-1-josef@toxicpanda.com>
+Subject: [PATCH 02/14] block: introduce bio_issue_as_root_blkg
+Date: Tue,  3 Jul 2018 11:14:51 -0400
+Message-Id: <20180703151503.2549-3-josef@toxicpanda.com>
+In-Reply-To: <20180703151503.2549-1-josef@toxicpanda.com>
+References: <20180703151503.2549-1-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
 From: Josef Bacik <jbacik@fb.com>
 
-In our longer tests we noticed that some boxes would degrade to the
-point of uselessness.  This is because we truncate the current time when
-saving it in our bio, but I was using the raw current time to subtract
-from.  So once the box had been up a certain amount of time it would
-appear as if our IO's were taking several years to complete.  Fix this
-by truncating the current time so it matches the issue time.  Verified
-this worked by running with this patch for a week on our test tier.
+Instead of forcing all file systems to get the right context on their
+bio's, simply check for REQ_META to see if we need to issue as the root
+blkg.  We don't want to force all bio's to have the root blkg associated
+with them if REQ_META is set, as some controllers (blk-iolatency) need
+to know who the originating cgroup is so it can backcharge them for the
+work they are doing.  This helper will make sure that the controllers do
+the proper thing wrt the IO priority and backcharging.
 
 Signed-off-by: Josef Bacik <jbacik@fb.com>
+Acked-by: Tejun Heo <tj@kernel.org>
 ---
- block/blk-iolatency.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ include/linux/blk-cgroup.h | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 893f888eebb1..bb59b2929e0d 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -425,6 +425,12 @@ static void iolatency_record_time(struct iolatency_grp *iolat,
- 	u64 start = bio_issue_time(issue);
- 	u64 req_time;
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 6c666fd7de3c..69aa71dc0c04 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -238,6 +238,22 @@ static inline struct blkcg *bio_blkcg(struct bio *bio)
+ 	return css_to_blkcg(task_css(current, io_cgrp_id));
+ }
  
-+	/*
-+	 * Have to do this so we are truncated to the correct time that our
-+	 * issue is truncated to.
-+	 */
-+	now = __bio_issue_time(now);
++/**
++ * bio_issue_as_root_blkg - see if this bio needs to be issued as root blkg
++ * @return: true if this bio needs to be submitted with the root blkg context.
++ *
++ * In order to avoid priority inversions we sometimes need to issue a bio as if
++ * it were attached to the root blkg, and then backcharge to the actual owning
++ * blkg.  The idea is we do bio_blkcg() to look up the actual context for the
++ * bio and attach the appropriate blkg to the bio.  Then we call this helper and
++ * if it is true run with the root blkg for that queue and then do any
++ * backcharging to the originating cgroup once the io is complete.
++ */
++static inline bool bio_issue_as_root_blkg(struct bio *bio)
++{
++	return (bio->bi_opf & REQ_META);
++}
 +
- 	if (now <= start)
- 		return;
- 
+ /**
+  * blkcg_parent - get the parent of a blkcg
+  * @blkcg: blkcg of interest
 -- 
 2.14.3
