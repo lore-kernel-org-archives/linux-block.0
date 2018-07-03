@@ -1,95 +1,185 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f68.google.com ([209.85.160.68]:32916 "EHLO
-        mail-pl0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726202AbeGMJCw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jul 2018 05:02:52 -0400
-Received: by mail-pl0-f68.google.com with SMTP id 6-v6so11919134plb.0
-        for <linux-block@vger.kernel.org>; Fri, 13 Jul 2018 01:49:12 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        bart.vanassche@wdc.com, hans.holmberg@cnexlabs.com,
-        javier@cnexlabs.com, hlitz@ucsc.edu, igor.j.konopko@intel.com,
-        marcin.dziegielewski@intel.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 01/10] lightnvm: pblk: handle case when mw_cunits equals to 0
-Date: Fri, 13 Jul 2018 10:48:36 +0200
-Message-Id: <20180713084845.19511-2-mb@lightnvm.io>
-In-Reply-To: <20180713084845.19511-1-mb@lightnvm.io>
-References: <20180713084845.19511-1-mb@lightnvm.io>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	linux-kernel@vger.kernel.org,
+	akpm@linux-foundation.org,
+	hannes@cmpxchg.org,
+	tj@kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	kernel-team@fb.com
+Cc: Josef Bacik <jbacik@fb.com>
+Subject: [PATCH 01/14] block: add bi_blkg to the bio for cgroups
+Date: Tue,  3 Jul 2018 11:14:50 -0400
+Message-Id: <20180703151503.2549-2-josef@toxicpanda.com>
+In-Reply-To: <20180703151503.2549-1-josef@toxicpanda.com>
+References: <20180703151503.2549-1-josef@toxicpanda.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
+From: Josef Bacik <jbacik@fb.com>
 
-Some devices can expose mw_cunits equal to 0, it can cause the
-creation of too small write buffer and cause performance to drop
-on write workloads.
+Currently io.low uses a bi_cg_private to stash its private data for the
+blkg, however other blkcg policies may want to use this as well.  Since
+we can get the private data out of the blkg, move this to bi_blkg in the
+bio and make it generic, then we can use bio_associate_blkg() to attach
+the blkg to the bio.
 
-Additionally, write buffer size must cover write data requirements,
-such as WS_MIN and MW_CUNITS - it must be greater than or equal to
-the larger one multiplied by the number of PUs. However, for
-performance reasons, use the WS_OPT value to calculation instead of
-WS_MIN.
+Theoretically we could simply replace the bi_css with this since we can
+get to all the same information from the blkg, however you have to
+lookup the blkg, so for example wbc_init_bio() would have to lookup and
+possibly allocate the blkg for the css it was trying to attach to the
+bio.  This could be problematic and result in us either not attaching
+the css at all to the bio, or falling back to the root blkcg if we are
+unable to allocate the corresponding blkg.
 
-Because the place where buffer size is calculated was changed, this
-patch also removes pgs_in_buffer filed in pblk structure.
+So for now do this, and in the future if possible we could just replace
+the bi_css with bi_blkg and update the helpers to do the correct
+translation.
 
-Signed-off-by: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
-Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
-Reviewed-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+Signed-off-by: Josef Bacik <jbacik@fb.com>
+Acked-by: Tejun Heo <tj@kernel.org>
 ---
- drivers/lightnvm/pblk-init.c | 9 +++++----
- drivers/lightnvm/pblk.h      | 3 ---
- 2 files changed, 5 insertions(+), 7 deletions(-)
+ block/bio.c               | 23 +++++++++++++++++++++++
+ block/blk-throttle.c      | 21 +++++++--------------
+ include/linux/bio.h       |  1 +
+ include/linux/blk_types.h |  2 +-
+ 4 files changed, 32 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index b57f764d6a16..ef8d8dea7b6b 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -179,11 +179,14 @@ static int pblk_rwb_init(struct pblk *pblk)
- 	struct pblk_rb_entry *entries;
- 	unsigned long nr_entries, buffer_size;
- 	unsigned int power_size, power_seg_sz;
-+	int pgs_in_buffer;
+diff --git a/block/bio.c b/block/bio.c
+index f7e3d88bd0b6..c9072a54395e 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -28,6 +28,7 @@
+ #include <linux/mempool.h>
+ #include <linux/workqueue.h>
+ #include <linux/cgroup.h>
++#include <linux/blk-cgroup.h>
  
--	if (write_buffer_size && (write_buffer_size > pblk->pgs_in_buffer))
-+	pgs_in_buffer = max(geo->mw_cunits, geo->ws_opt) * geo->all_luns;
+ #include <trace/events/block.h>
+ #include "blk.h"
+@@ -2036,6 +2037,24 @@ int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css)
+ }
+ EXPORT_SYMBOL_GPL(bio_associate_blkcg);
+ 
++/**
++ * bio_associate_blkg - associate a bio with the specified blkg
++ * @bio: target bio
++ * @blkg: the blkg to associate
++ *
++ * Associate @bio with the blkg specified by @blkg.  This is the queue specific
++ * blkcg information associated with the @bio, a reference will be taken on the
++ * @blkg and will be freed when the bio is freed.
++ */
++int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg)
++{
++	if (unlikely(bio->bi_blkg))
++		return -EBUSY;
++	blkg_get(blkg);
++	bio->bi_blkg = blkg;
++	return 0;
++}
 +
-+	if (write_buffer_size && (write_buffer_size > pgs_in_buffer))
- 		buffer_size = write_buffer_size;
- 	else
--		buffer_size = pblk->pgs_in_buffer;
-+		buffer_size = pgs_in_buffer;
+ /**
+  * bio_disassociate_task - undo bio_associate_current()
+  * @bio: target bio
+@@ -2050,6 +2069,10 @@ void bio_disassociate_task(struct bio *bio)
+ 		css_put(bio->bi_css);
+ 		bio->bi_css = NULL;
+ 	}
++	if (bio->bi_blkg) {
++		blkg_put(bio->bi_blkg);
++		bio->bi_blkg = NULL;
++	}
+ }
  
- 	nr_entries = pblk_rb_calculate_size(buffer_size);
+ /**
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 82282e6fdcf8..06f42b92fe10 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -2132,12 +2132,8 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
+ static void blk_throtl_assoc_bio(struct throtl_grp *tg, struct bio *bio)
+ {
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+-	if (bio->bi_css) {
+-		if (bio->bi_cg_private)
+-			blkg_put(tg_to_blkg(bio->bi_cg_private));
+-		bio->bi_cg_private = tg;
+-		blkg_get(tg_to_blkg(tg));
+-	}
++	if (bio->bi_css)
++		bio_associate_blkg(bio, tg_to_blkg(tg));
+ 	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
+ #endif
+ }
+@@ -2285,6 +2281,7 @@ void blk_throtl_stat_add(struct request *rq, u64 time_ns)
  
-@@ -366,8 +369,6 @@ static int pblk_core_init(struct pblk *pblk)
- 	atomic64_set(&pblk->nr_flush, 0);
- 	pblk->nr_flush_rst = 0;
+ void blk_throtl_bio_endio(struct bio *bio)
+ {
++	struct blkcg_gq *blkg;
+ 	struct throtl_grp *tg;
+ 	u64 finish_time_ns;
+ 	unsigned long finish_time;
+@@ -2292,20 +2289,18 @@ void blk_throtl_bio_endio(struct bio *bio)
+ 	unsigned long lat;
+ 	int rw = bio_data_dir(bio);
  
--	pblk->pgs_in_buffer = geo->mw_cunits * geo->all_luns;
+-	tg = bio->bi_cg_private;
+-	if (!tg)
++	blkg = bio->bi_blkg;
++	if (!blkg)
+ 		return;
+-	bio->bi_cg_private = NULL;
++	tg = blkg_to_tg(blkg);
+ 
+ 	finish_time_ns = ktime_get_ns();
+ 	tg->last_finish_time = finish_time_ns >> 10;
+ 
+ 	start_time = bio_issue_time(&bio->bi_issue) >> 10;
+ 	finish_time = __bio_issue_time(finish_time_ns) >> 10;
+-	if (!start_time || finish_time <= start_time) {
+-		blkg_put(tg_to_blkg(tg));
++	if (!start_time || finish_time <= start_time)
+ 		return;
+-	}
+ 
+ 	lat = finish_time - start_time;
+ 	/* this is only for bio based driver */
+@@ -2334,8 +2329,6 @@ void blk_throtl_bio_endio(struct bio *bio)
+ 		tg->bio_cnt /= 2;
+ 		tg->bad_bio_cnt /= 2;
+ 	}
 -
- 	pblk->min_write_pgs = geo->ws_opt * (geo->csecs / PAGE_SIZE);
- 	max_write_ppas = pblk->min_write_pgs * geo->all_luns;
- 	pblk->max_write_pgs = min_t(int, max_write_ppas, NVM_MAX_VLBA);
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 34cc1d64a9d4..9d1a0e86e082 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -608,9 +608,6 @@ struct pblk {
+-	blkg_put(tg_to_blkg(tg));
+ }
+ #endif
  
- 	int min_write_pgs; /* Minimum amount of pages required by controller */
- 	int max_write_pgs; /* Maximum amount of pages supported by controller */
--	int pgs_in_buffer; /* Number of pages that need to be held in buffer to
--			    * guarantee successful reads.
--			    */
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index f08f5fe7bd08..a279ba384da9 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -555,6 +555,7 @@ do {						\
  
- 	sector_t capacity; /* Device capacity when bad blocks are subtracted */
- 
+ #ifdef CONFIG_BLK_CGROUP
+ int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css);
++int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg);
+ void bio_disassociate_task(struct bio *bio);
+ void bio_clone_blkcg_association(struct bio *dst, struct bio *src);
+ #else	/* CONFIG_BLK_CGROUP */
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 3c4f390aea4b..3364d42ebe08 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -179,8 +179,8 @@ struct bio {
+ 	 */
+ 	struct io_context	*bi_ioc;
+ 	struct cgroup_subsys_state *bi_css;
++	struct blkcg_gq		*bi_blkg;
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+-	void			*bi_cg_private;
+ 	struct bio_issue	bi_issue;
+ #endif
+ #endif
 -- 
-2.11.0
+2.14.3
