@@ -1,74 +1,39 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:54262 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727618AbeGPRXg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Jul 2018 13:23:36 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-kernel@vger.kernel.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Coly Li <colyli@suse.de>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Luis R . Rodriguez" <mcgrof@suse.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Michael Lyle <mlyle@lyle.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Kate Stewart <kstewart@linuxfoundation.org>
-Subject: [PATCH 0/4] add crc64 calculation as kernel library 
-Date: Tue, 17 Jul 2018 00:55:03 +0800
-Message-Id: <20180716165507.23100-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 05/14] swap,blkcg: issue swap io with the appropriate
+ context
+To: Randy Dunlap <rdunlap@infradead.org>, Josef Bacik <josef@toxicpanda.com>,
+ linux-kernel@vger.kernel.org, akpm@linux-foundation.org, hannes@cmpxchg.org,
+ tj@kernel.org, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ kernel-team@fb.com
+References: <20180703151503.2549-1-josef@toxicpanda.com>
+ <20180703151503.2549-6-josef@toxicpanda.com>
+ <da01afa9-ee89-3c54-9e41-b10875ff0787@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <e871d2ac-1c63-071a-a61d-df22b94fe89c@kernel.dk>
+Date: Tue, 3 Jul 2018 13:32:45 -0600
+MIME-Version: 1.0
+In-Reply-To: <da01afa9-ee89-3c54-9e41-b10875ff0787@infradead.org>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-This patch set adds basic implementation of crc64 calculation as Linux
-kernel library. Since bcache already does crc64 by itself, this patch
-set also modifies bcache code to use the new crc64 library routine.
+On 7/3/18 1:27 PM, Randy Dunlap wrote:
+> On 07/03/2018 08:14 AM, Josef Bacik wrote:
+>> From: Tejun Heo <tj@kernel.org>
+>>
+>> For backcharging we need to know who the page belongs to when swapping
+>> it out.  We don't worry about things that do ->rw_page (zram etc) at the
+>> moment, we're only worried about pages that actually go to a block
+>> device.
+>>
+>> Signed-off-by: Tejun Heo <tj@kernel.org>
+>> Signed-off-by: Josef Bacik <jbacik@fb.com>
+>> Acked-by: Johannes Weiner <hannes@cmpxchg.org>
+>> cked-by: Andrew Morton <akpm@linux-foundation.org>
+> 
+> Checked-by:  ?  :)
+> copy-pasto
 
-bcache uses crc64 as storage checksum, if a change of crc lib routines
-results an inconsistent result, the unmatched checksum may make bcache
-'think' the on-disk is corrupted, such change should be avoided or
-detected as early as possible. Therefore the last patch in this series
-adds a crc test framework, to check consistency of different calculations.
-
-Coly Li
-
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Luis R. Rodriguez <mcgrof@suse.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Kate Stewart <kstewart@linuxfoundation.org>
----
-Andy Shevchenko (1):
-  lib/crc64: add crc64 option to lib/Kconfig
-
-Coly Li (3):
-  lib: add crc64 calculation routines
-  bcache: use routines from lib/crc64.c for CRC64 calculation
-  lib/test_crc: Add test cases for crc calculation
-
- drivers/md/bcache/bcache.h  |   7 +-
- drivers/md/bcache/btree.c   |   2 +-
- drivers/md/bcache/request.c |   2 +-
- drivers/md/bcache/super.c   |   5 +-
- drivers/md/bcache/util.c    | 131 ----------------------------------
- drivers/md/bcache/util.h    |   5 +-
- include/linux/crc64.h       |  15 ++++
- lib/.gitignore              |   2 +
- lib/Kconfig                 |   8 +++
- lib/Kconfig.debug           |  11 +++
- lib/Makefile                |  12 ++++
- lib/crc64.c                 |  71 +++++++++++++++++++
- lib/gen_crc64table.c        |  76 ++++++++++++++++++++
- lib/test_crc.c              | 136 ++++++++++++++++++++++++++++++++++++
- 14 files changed, 341 insertions(+), 142 deletions(-)
- create mode 100644 include/linux/crc64.h
- create mode 100644 lib/crc64.c
- create mode 100644 lib/gen_crc64table.c
- create mode 100644 lib/test_crc.c
+I fixed that one up.
 
 -- 
-2.17.1
+Jens Axboe
