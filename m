@@ -1,93 +1,81 @@
-Return-Path: <prvs=7421cc28f=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Tejun Heo <tj@kernel.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alexandru Moise <00moses.alexander00@gmail.com>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v4 2/2] block: Ensure that a request queue is dissociated from the cgroup controller
-Date: Mon, 30 Jul 2018 14:10:56 -0700
-Message-Id: <20180730211056.18570-3-bart.vanassche@wdc.com>
-In-Reply-To: <20180730211056.18570-1-bart.vanassche@wdc.com>
-References: <20180730211056.18570-1-bart.vanassche@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH V4] blk-mq: dequeue request one by one from sw queue iff
+ hctx is busy
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, Kashyap Desai <kashyap.desai@broadcom.com>,
+ Laurence Oberman <loberman@redhat.com>, Omar Sandoval <osandov@fb.com>,
+ Christoph Hellwig <hch@lst.de>, Bart Van Assche <bart.vanassche@wdc.com>,
+ Hannes Reinecke <hare@suse.de>
+References: <20180703083452.4909-1-ming.lei@redhat.com>
+ <45df84ca-e201-a9e1-543c-ebbf15185d40@kernel.dk>
+ <20180703141106.GA7755@ming.t460p>
+ <01585e10-e0c1-716e-1b6c-785301896109@kernel.dk>
+ <20180703143424.GB7755@ming.t460p>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <63aefd91-4c2c-929d-389f-b122f44c2457@kernel.dk>
+Date: Tue, 3 Jul 2018 08:36:29 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180703143424.GB7755@ming.t460p>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Several block drivers call alloc_disk() followed by put_disk() if
-something fails before device_add_disk() is called without calling
-blk_cleanup_queue(). Make sure that also for this scenario a request
-queue is dissociated from the cgroup controller. This patch avoids
-that loading the parport_pc, paride and pf drivers triggers the
-following kernel crash:
+On 7/3/18 8:34 AM, Ming Lei wrote:
+> On Tue, Jul 03, 2018 at 08:13:45AM -0600, Jens Axboe wrote:
+>> On 7/3/18 8:11 AM, Ming Lei wrote:
+>>> On Tue, Jul 03, 2018 at 08:03:23AM -0600, Jens Axboe wrote:
+>>>> On 7/3/18 2:34 AM, Ming Lei wrote:
+>>>>> It won't be efficient to dequeue request one by one from sw queue,
+>>>>> but we have to do that when queue is busy for better merge performance.
+>>>>>
+>>>>> This patch takes the Exponential Weighted Moving Average(EWMA) to figure
+>>>>> out if queue is busy, then only dequeue request one by one from sw queue
+>>>>> when queue is busy.
+>>>>
+>>>> I've started to come around to the approach, but can we add something
+>>>> that only triggers this busy tracking if we've even seen a BUSY
+>>>> condition? Basically, this:
+>>>>
+>>>> blk_mq_update_dispatch_busy(hctx, false);
+>>>>
+>>>> should be a no-op, if we've never called:
+>>>>
+>>>> blk_mq_update_dispatch_busy(hctx, true);
+>>>>
+>>>> Something ala the below, with the BLK_MQ_S_EWMA bit added, of course.
+>>>>
+>>>> static void __blk_mq_update_dispatch_busy(struct blk_mq_hw_ctx *hctx, bool busy)
+>>>> {
+>>>> 	unsigned int ewma = READ_ONCE(hctx->dispatch_busy);
+>>>>
+>>>> 	ewma *= BLK_MQ_DISPATCH_BUSY_EWMA_WEIGHT - 1;
+>>>> 	if (busy)
+>>>> 		ewma += 1 << BLK_MQ_DISPATCH_BUSY_EWMA_FACTOR;
+>>>> 	ewma /= BLK_MQ_DISPATCH_BUSY_EWMA_WEIGHT;
+>>>>
+>>>> 	WRITE_ONCE(hctx->dispatch_busy, ewma);
+>>>> }
+>>>
+>>> How about doing it in the following(simpler) way? By adding the check
+>>> at the entry of __blk_mq_update_dispatch_busy().
+>>>
+>>> 	if (!ewma && !busy)
+>>> 		return;
+>>
+>> That might be better indeed, though still would need the read once.
+>> The test_bit, for a constant bit, is basically free.
+> 
+> We can remove both READ_ONCE() and WRITE_ONCE(), I used it just for
+> document benefit since there is concurrent access on this shared variable,
+> but looks smp_read_barrier_depends() is added to READ_ONCE() recently.
+> 
+> Both the 32-bit read/write on hctx->dispatch_busy is atomic, meantime
+> not see any problem can be caused if compiler optimization is involved
+> on this read/write.
+> 
+> So I will remove READ_ONCE()/WRITE_ONCE() in V5, and add the above check
+> if you don't object.
 
-BUG: KASAN: null-ptr-deref in pi_init+0x42e/0x580 [paride]
-Read of size 4 at addr 0000000000000008 by task modprobe/744
-Call Trace:
-dump_stack+0x9a/0xeb
-kasan_report+0x139/0x350
-pi_init+0x42e/0x580 [paride]
-pf_init+0x2bb/0x1000 [pf]
-do_one_initcall+0x8e/0x405
-do_init_module+0xd9/0x2f2
-load_module+0x3ab4/0x4700
-SYSC_finit_module+0x176/0x1a0
-do_syscall_64+0xee/0x2b0
-entry_SYSCALL_64_after_hwframe+0x42/0xb7
+Yep, that sounds great to me.
 
-Reported-by: Alexandru Moise <00moses.alexander00@gmail.com>
-Fixes: a063057d7c73 ("block: Fix a race between request queue removal and the block cgroup controller") # v4.17
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Tested-by: Alexandru Moise <00moses.alexander00@gmail.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Alexandru Moise <00moses.alexander00@gmail.com>
-Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
-Cc: <stable@vger.kernel.org>
----
- block/blk-sysfs.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
-
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index ca1984ecbdeb..26275d9babcb 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -802,6 +802,31 @@ static void __blk_release_queue(struct work_struct *work)
- 		blk_stat_remove_callback(q, q->poll_cb);
- 	blk_stat_free_callback(q->poll_cb);
- 
-+	if (!blk_queue_dead(q)) {
-+		/*
-+		 * Last reference was dropped without having called
-+		 * blk_cleanup_queue().
-+		 */
-+		WARN_ONCE(blk_queue_init_done(q),
-+			  "request queue %p has been registered but blk_cleanup_queue() has not been called for that queue\n",
-+			  q);
-+		blk_exit_queue(q);
-+	}
-+
-+#ifdef CONFIG_BLK_CGROUP
-+	{
-+		struct blkcg_gq *blkg;
-+
-+		rcu_read_lock();
-+		blkg = blkg_lookup(&blkcg_root, q);
-+		rcu_read_unlock();
-+
-+		WARN(blkg,
-+		     "request queue %p is being released but it has not yet been removed from the blkcg controller\n",
-+		     q);
-+	}
-+#endif
-+
- 	blk_free_queue_stats(q->stats);
- 
- 	blk_exit_rl(q, &q->root_rl);
 -- 
-2.18.0
+Jens Axboe
