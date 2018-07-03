@@ -1,58 +1,23 @@
-Return-Path: <abdhalee@linux.vnet.ibm.com>
-Subject: Re: Oops in kmem_cache_free() via bioset_exit() (was Re:
- [next-20180601][nvme][ppc] Kernel Oops is triggered when creating lvm
- snapshots on nvme disks)
-From: Abdul Haleem <abdhalee@linux.vnet.ibm.com>
-To: Michael Ellerman <mpe@ellerman.id.au>
-Cc: linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-fsdevel
- <linux-fsdevel@vger.kernel.org>,
-        linux-next <linux-next@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-scsi
- <linux-scsi@vger.kernel.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        sachinp <sachinp@linux.vnet.ibm.com>, sim <sim@linux.vnet.ibm.com>,
-        manvanth <manvanth@linux.vnet.ibm.com>,
-        Brian King
- <brking@linux.vnet.ibm.com>, linux-block@vger.kernel.org,
-        Kent Overstreet
- <kent.overstreet@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>
-Date: Tue, 03 Jul 2018 22:09:06 +0530
-In-Reply-To: <87a7rf55vy.fsf@concordia.ellerman.id.au>
-References: <1530003645.24245.7.camel@abdul.in.ibm.com>
-	 <87d0wd7jph.fsf@concordia.ellerman.id.au>
-	 <1530176707.24245.12.camel@abdul.in.ibm.com>
-	 <87a7rf55vy.fsf@concordia.ellerman.id.au>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Message-Id: <1530635946.24245.15.camel@abdul.in.ibm.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] loop: Add LOOP_SET_BLOCK_SIZE in compat ioctl
+To: Evan Green <evgreen@chromium.org>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Sam Hurst <shurst@google.com>
+References: <20180702230346.72350-1-evgreen@chromium.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <c507d876-baa9-8294-f8f9-790be3bae3db@kernel.dk>
+Date: Tue, 3 Jul 2018 07:52:51 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180702230346.72350-1-evgreen@chromium.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, 2018-06-29 at 00:42 +1000, Michael Ellerman wrote:
-> Kent, Jens,
-> 
-> This looks like it might be related to the recent bioset changes?
-> 
-> cheers
-> 
-> Abdul Haleem <abdhalee@linux.vnet.ibm.com> writes:
-> > On Tue, 2018-06-26 at 23:36 +1000, Michael Ellerman wrote:
-> >> Abdul Haleem <abdhalee@linux.vnet.ibm.com> writes:
-> ...
-> > I was able to reproduce again with slub_debug=FZP and DEBUG_INFO enabled
-> > on 4.17.0-rc7-next-20180601, but not much traces other than the Oops stack trace
-> 
-> Are you still testing on that revision? It's nearly a month old.
-> 
-> Please try to reproduce on mainline or today's linux-next.
+On 7/2/18 5:03 PM, Evan Green wrote:
+> This change adds LOOP_SET_BLOCK_SIZE as one of the supported ioctls
+> in lo_compat_ioctl. It only takes an unsigned long argument, and
+> in practice a 32-bit value works fine.
 
-Problem is not reproducible on 4.18.0-rc3 mainline and today's next
-kernel
+Applied for 4.18, thanks.
 
 -- 
-Regard's
-
-Abdul Haleem
-IBM Linux Technology Centre
+Jens Axboe
