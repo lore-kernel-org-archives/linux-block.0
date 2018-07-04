@@ -1,31 +1,36 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:6339 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753657AbeGESN4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Jul 2018 14:13:56 -0400
-Subject: Re: [PATCH blktests] dir-locals: fix indenation with Emacs
-To: Johannes Thumshirn <jthumshirn@suse.de>,
-        Omar Sandoval <osandov@osandov.com>
-Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>
-References: <20180704115938.15060-1-jthumshirn@suse.de>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-Message-ID: <70824b8f-a6e3-41a4-3ac9-bbf5b2e6618f@wdc.com>
-Date: Thu, 5 Jul 2018 11:13:48 -0700
-MIME-Version: 1.0
-In-Reply-To: <20180704115938.15060-1-jthumshirn@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Received: from mx2.suse.de ([195.135.220.15]:40418 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S932997AbeGDL7l (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Jul 2018 07:59:41 -0400
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
+        Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH blktests] dir-locals: fix indenation with Emacs
+Date: Wed,  4 Jul 2018 13:59:38 +0200
+Message-Id: <20180704115938.15060-1-jthumshirn@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 07/04/18 04:59, Johannes Thumshirn wrote:
-> A recent update of Emacs broke .dir-locals.el's shell indendation
-> setting.
+A recent update of Emacs broke .dir-locals.el's shell indendation
+setting.
 
-Please fix the spelling of "indentation" in the subject and in the above 
-sentence. Additionally, the previous patch for this file had 
-"dir-locals.el:" as subject-prefix. Should this patch have the same 
-subject prefix?
+Also set 'sh-indendation' not just 'sh-basic-offset' for this.
 
-Anyway:
+Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ .dir-locals.el | 1 +
+ 1 file changed, 1 insertion(+)
 
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+diff --git a/.dir-locals.el b/.dir-locals.el
+index f64c48202910..46961929fac9 100644
+--- a/.dir-locals.el
++++ b/.dir-locals.el
+@@ -1,3 +1,4 @@
+ ((sh-mode . ((sh-basic-offset . 8)
++	     (sh-indentation . 8)
+ 	     (fill-column . 80)
+ 	     (indent-tabs-mode . t))))
+-- 
+2.16.4
