@@ -1,2426 +1,421 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:35639 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754018AbeGIW4q (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jul 2018 18:56:46 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Omar Sandoval <osandov@fb.com>
-Cc: linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH blktests v3 6/6] Add tests for the SRP initiator and target drivers
-Date: Mon,  9 Jul 2018 15:56:43 -0700
-Message-Id: <20180709225643.10537-7-bart.vanassche@wdc.com>
-In-Reply-To: <20180709225643.10537-1-bart.vanassche@wdc.com>
-References: <20180709225643.10537-1-bart.vanassche@wdc.com>
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:40933 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934056AbeGFRjS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jul 2018 13:39:18 -0400
+Received: by mail-lj1-f195.google.com with SMTP id a6-v6so9722746ljj.7
+        for <linux-block@vger.kernel.org>; Fri, 06 Jul 2018 10:39:17 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        bart.vanassche@wdc.com, damien.lemoal@wdc.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias.bjorling@wdc.com>
+Subject: [PATCH 2/2] null_blk: add zone support
+Date: Fri,  6 Jul 2018 19:38:39 +0200
+Message-Id: <20180706173839.28355-3-mb@lightnvm.io>
+In-Reply-To: <20180706173839.28355-1-mb@lightnvm.io>
+References: <20180706173839.28355-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This patch adds the following tests:
-001: Create and remove LUNs
-002: File I/O on top of multipath concurrently with logout and login (mq)
-003: File I/O on top of multipath concurrently with logout and login (sq)
-004: File I/O on top of multipath concurrently with logout and login (sq-on-mq)
-005: Direct I/O with large transfer sizes, cmd_sg_entries=255 and bs=4M
-006: Direct I/O with large transfer sizes, cmd_sg_entries=255 and bs=8M
-007: Direct I/O with large transfer sizes, cmd_sg_entries=1 and bs=4M
-008: Direct I/O with large transfer sizes, cmd_sg_entries=1 and bs=8M
-009: Buffered I/O with large transfer sizes, cmd_sg_entries=255 and bs=4M
-010: Buffered I/O with large transfer sizes, cmd_sg_entries=255 and bs=8M
-011: Block I/O on top of multipath concurrently with logout and login
-012: dm-mpath on top of multiple I/O schedulers
-013: Direct I/O using a discontiguous buffer
+From: Matias Bjørling <matias.bjorling@wdc.com>
 
-Other changes in this patch are:
-- Document how to install multipath.conf in README.md.
-- Add function _have_kernel_option to common/rc.
-- Add file tests/srp/rc with shell functions that are used by multiple SRP
-  tests.
+Adds support for exposing a null_blk device through the zone device
+interface.
 
+The interface is managed with the parameters zoned and zone_size.
+If zoned is set, the null_blk instance registers as a zoned block
+device. The zone_size parameter defines how big each zone will be.
+
+Signed-off-by: Matias Bjørling <matias.bjorling@wdc.com>
 Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- README.md                |   13 +
- common/rc                |   17 +
- tests/srp/001            |   73 ++
- tests/srp/001.out        |    3 +
- tests/srp/002            |   50 ++
- tests/srp/002.out        |    2 +
- tests/srp/003            |   50 ++
- tests/srp/003.out        |    2 +
- tests/srp/004            |   50 ++
- tests/srp/004.out        |    2 +
- tests/srp/005            |   41 ++
- tests/srp/005.out        |    2 +
- tests/srp/006            |   41 ++
- tests/srp/006.out        |    2 +
- tests/srp/007            |   41 ++
- tests/srp/007.out        |    2 +
- tests/srp/008            |   40 ++
- tests/srp/008.out        |    2 +
- tests/srp/009            |   41 ++
- tests/srp/009.out        |    2 +
- tests/srp/010            |   41 ++
- tests/srp/010.out        |    2 +
- tests/srp/011            |   46 ++
- tests/srp/011.out        |    2 +
- tests/srp/012            |   53 ++
- tests/srp/012.out        |    2 +
- tests/srp/013            |   49 ++
- tests/srp/013.out        |    3 +
- tests/srp/multipath.conf |   27 +
- tests/srp/rc             | 1433 ++++++++++++++++++++++++++++++++++++++
- 30 files changed, 2134 insertions(+)
- create mode 100755 tests/srp/001
- create mode 100644 tests/srp/001.out
- create mode 100755 tests/srp/002
- create mode 100644 tests/srp/002.out
- create mode 100755 tests/srp/003
- create mode 100644 tests/srp/003.out
- create mode 100755 tests/srp/004
- create mode 100644 tests/srp/004.out
- create mode 100755 tests/srp/005
- create mode 100644 tests/srp/005.out
- create mode 100755 tests/srp/006
- create mode 100644 tests/srp/006.out
- create mode 100755 tests/srp/007
- create mode 100644 tests/srp/007.out
- create mode 100755 tests/srp/008
- create mode 100644 tests/srp/008.out
- create mode 100755 tests/srp/009
- create mode 100644 tests/srp/009.out
- create mode 100755 tests/srp/010
- create mode 100644 tests/srp/010.out
- create mode 100755 tests/srp/011
- create mode 100644 tests/srp/011.out
- create mode 100755 tests/srp/012
- create mode 100644 tests/srp/012.out
- create mode 100755 tests/srp/013
- create mode 100644 tests/srp/013.out
- create mode 100644 tests/srp/multipath.conf
- create mode 100755 tests/srp/rc
+ Documentation/block/null_blk.txt |   7 ++
+ drivers/block/Makefile           |   5 +-
+ drivers/block/null_blk.c         |  48 ++++++++++++-
+ drivers/block/null_blk.h         |  28 ++++++++
+ drivers/block/null_blk_zoned.c   | 149 +++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 234 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/block/null_blk_zoned.c
 
-diff --git a/README.md b/README.md
-index 78a41567416e..7e913e330e66 100644
---- a/README.md
-+++ b/README.md
-@@ -13,6 +13,19 @@ The dependencies are minimal, but make sure you have them installed:
- - GNU awk
- - util-linux
- - fio
-+- gcc
-+- make
-+- multipath-tools (Debian, openSUSE) or device-mapper-multipath (Fedora)
-+- dmsetup (Debian) or device-mapper (Fedora, openSUSE, Arch Linux)
-+- e2fsprogs and xfsprogs
+diff --git a/Documentation/block/null_blk.txt b/Documentation/block/null_blk.txt
+index 07f147381f32..ea2dafe49ae8 100644
+--- a/Documentation/block/null_blk.txt
++++ b/Documentation/block/null_blk.txt
+@@ -85,3 +85,10 @@ shared_tags=[0/1]: Default: 0
+   0: Tag set is not shared.
+   1: Tag set shared between devices for blk-mq. Only makes sense with
+      nr_devices > 1, otherwise there's no tag set to share.
 +
-+For the SRP tests, tell multipathd to use the SRP multipath configuration
-+file:
++zoned=[0/1]: Default: 0
++  0: Block device is exposed as a random-access block device.
++  1: Block device is exposed as a host-managed zoned block device.
 +
-+```pushd /etc
-+ln -s ${BLKTESTS_PATH}/tests/srp/multipath.conf
-+popd
-+```
++zone_size=[MB]: Default: 256
++  Per zone size when exposed as a zoned block device. Must be a power of two.
+diff --git a/drivers/block/Makefile b/drivers/block/Makefile
+index dc061158b403..a0d88aa0c05d 100644
+--- a/drivers/block/Makefile
++++ b/drivers/block/Makefile
+@@ -36,8 +36,11 @@ obj-$(CONFIG_BLK_DEV_RBD)     += rbd.o
+ obj-$(CONFIG_BLK_DEV_PCIESSD_MTIP32XX)	+= mtip32xx/
  
- Add the list of block devices you want to test on in a file named `config`:
+ obj-$(CONFIG_BLK_DEV_RSXX) += rsxx/
+-obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk.o
+ obj-$(CONFIG_ZRAM) += zram/
  
-diff --git a/common/rc b/common/rc
-index 57e1c501c81d..a6de59d9f9c5 100644
---- a/common/rc
-+++ b/common/rc
-@@ -94,6 +94,23 @@ _have_configfs() {
- 	return 0
++obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk_mod.o
++null_blk_mod-objs	:= null_blk.o
++null_blk_mod-$(CONFIG_BLK_DEV_ZONED) += null_blk_zoned.o
++
+ skd-y		:= skd_main.o
+ swim_mod-y	:= swim.o swim_asm.o
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index cd4b0849d3b4..99b6bfe7abd1 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -180,6 +180,14 @@ static bool g_use_per_node_hctx;
+ module_param_named(use_per_node_hctx, g_use_per_node_hctx, bool, 0444);
+ MODULE_PARM_DESC(use_per_node_hctx, "Use per-node allocation for hardware context queues. Default: false");
+ 
++static bool g_zoned;
++module_param_named(zoned, g_zoned, bool, S_IRUGO);
++MODULE_PARM_DESC(zoned, "Make device as a host-managed zoned block device. Default: false");
++
++static unsigned long g_zone_size = 256;
++module_param_named(zone_size, g_zone_size, ulong, S_IRUGO);
++MODULE_PARM_DESC(zone_size, "Zone size in MB when block device is zoned. Must be power-of-two: Default: 256");
++
+ static struct nullb_device *null_alloc_dev(void);
+ static void null_free_dev(struct nullb_device *dev);
+ static void null_del_dev(struct nullb *nullb);
+@@ -283,6 +291,8 @@ NULLB_DEVICE_ATTR(memory_backed, bool);
+ NULLB_DEVICE_ATTR(discard, bool);
+ NULLB_DEVICE_ATTR(mbps, uint);
+ NULLB_DEVICE_ATTR(cache_size, ulong);
++NULLB_DEVICE_ATTR(zoned, bool);
++NULLB_DEVICE_ATTR(zone_size, ulong);
+ 
+ static ssize_t nullb_device_power_show(struct config_item *item, char *page)
+ {
+@@ -394,6 +404,8 @@ static struct configfs_attribute *nullb_device_attrs[] = {
+ 	&nullb_device_attr_mbps,
+ 	&nullb_device_attr_cache_size,
+ 	&nullb_device_attr_badblocks,
++	&nullb_device_attr_zoned,
++	&nullb_device_attr_zone_size,
+ 	NULL,
+ };
+ 
+@@ -446,7 +458,7 @@ nullb_group_drop_item(struct config_group *group, struct config_item *item)
+ 
+ static ssize_t memb_group_features_show(struct config_item *item, char *page)
+ {
+-	return snprintf(page, PAGE_SIZE, "memory_backed,discard,bandwidth,cache,badblocks\n");
++	return snprintf(page, PAGE_SIZE, "memory_backed,discard,bandwidth,cache,badblocks,zoned,zone_size\n");
  }
  
-+_have_kernel_option() {
-+	local f opt=$1
-+
-+	SKIP_REASON="Kernel $(uname -r) config not found"
-+	for f in /proc/config.gz /boot/config-$(uname -r); do
-+		[ -e "$f" ] || continue
-+		if zgrep -q "^CONFIG_${opt}=[my]$" "$f"; then
-+			SKIP_REASON=""
-+			return 0
-+		else
-+			SKIP_REASON="Kernel option $opt has not been enabled"
-+		fi
-+	done
-+
-+	return 1
-+}
-+
- _have_tracefs() {
- 	stat /sys/kernel/debug/tracing/trace > /dev/null 2>&1
- 	if ! findmnt -t tracefs /sys/kernel/debug/tracing >/dev/null; then
-diff --git a/tests/srp/001 b/tests/srp/001
-new file mode 100755
-index 000000000000..7dee21334a82
---- /dev/null
-+++ b/tests/srp/001
-@@ -0,0 +1,73 @@
-+#!/bin/bash
-+#
-+# Copyright (c) 2016-2018 Western Digital Corporation or its affiliates
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License
-+# as published by the Free Software Foundation; either version 2
-+# of the License, or (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write to the Free Software
-+# Foundation, Inc.
-+
-+. tests/srp/rc
-+
-+DESCRIPTION="Create and remove LUNs"
-+QUICK=1
-+
-+# Count the number of LUNs created by start_srpt() from the initiator side.
-+count_srp_luns() {
-+	local h luns=0 p
-+
-+	for p in /sys/class/srp_remote_ports/*; do
-+		[ -e "$p" ] || continue
-+		h="${p##*/}"; h="${h#port-}"; h="${h%:1}";
-+		for d in "/sys/class/scsi_device/${h}:"*; do
-+			[ -e "$d" ] && ((luns++))
-+		done
-+		[ "$luns" -gt 0 ] && break
-+	done
-+	echo $luns
-+}
-+
-+count_nvme_devs() {
-+	local d devs=0
-+
-+	for d in /sys/class/nvme-fabrics/ctl/*/*/device; do
-+		[ -d "$d" ] && ((devs++))
-+	done
-+	echo $devs
-+}
-+
-+count_luns() {
-+	if [ -n "$nvme" ]; then
-+		count_nvme_devs
-+	else
-+		count_srp_luns
-+	fi
-+}
-+
-+wait_for_luns() {
-+	local i luns
-+
-+	use_blk_mq y y || return $?
-+	for ((i=0;i<100;i++)); do
-+		luns=$(count_luns)
-+		[ "$luns" -ge ${#vdev_path[@]} ] && break
-+		sleep .1
-+	done
-+	echo "count_luns(): $luns <> ${#vdev_path[@]}" >>"$FULL"
-+	echo "count_luns(): $luns <> ${#vdev_path[@]}"
-+	[ "$luns" -ge ${#vdev_path[@]} ]
-+}
-+
-+test() {
-+	trap 'trap "" EXIT; teardown' EXIT
-+	setup && wait_for_luns && echo Passed
-+}
-diff --git a/tests/srp/001.out b/tests/srp/001.out
-new file mode 100644
-index 000000000000..d10439d4ca77
---- /dev/null
-+++ b/tests/srp/001.out
-@@ -0,0 +1,3 @@
-+Configured SRP target driver
-+count_luns(): 3 <> 3
-+Passed
-diff --git a/tests/srp/002 b/tests/srp/002
-new file mode 100755
-index 000000000000..c07e76fa6f5a
---- /dev/null
-+++ b/tests/srp/002
-@@ -0,0 +1,50 @@
-+#!/bin/bash
-+#
-+# Copyright (c) 2016-2018 Western Digital Corporation or its affiliates
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License
-+# as published by the Free Software Foundation; either version 2
-+# of the License, or (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write to the Free Software
-+# Foundation, Inc.
-+
-+. tests/srp/rc
-+
-+DESCRIPTION="File I/O on top of multipath concurrently with logout and login (mq)"
-+TIMED=1
-+
-+test_disconnect_repeatedly() {
-+	local dev fio_status m
-+
-+	use_blk_mq y y || return $?
-+	dev=$(get_bdev 0) || return $?
-+	m=$(mountpoint 0) || return $?
-+	create_filesystem "$dev" || return $?
-+	mount_and_check "$dev" "$m" || return $?
-+	# shellcheck disable=SC2064
-+	trap "unmount_and_check $m" RETURN
-+	simulate_network_failure_loop "$dev" "$TIMEOUT" &
-+	run_fio --verify=md5 --rw=randwrite --bs=4K --loops=$((10**6)) \
-+		--iodepth=64 --group_reporting --sync=1 --direct=1 \
-+		--ioengine=libaio --directory="$m" --runtime="${TIMEOUT}" \
-+		--name=data-integrity-test-mq --thread --numjobs=16 \
-+		--output="${RESULTS_DIR}/srp/fio-output-002.txt" \
-+		>>"$FULL"
-+	fio_status=$?
-+	wait
-+	[ -z "$nvme" ] && log_in
-+	return $fio_status
-+}
-+
-+test() {
-+	trap 'trap "" EXIT; teardown' EXIT
-+	setup && test_disconnect_repeatedly && echo Passed
-+}
-diff --git a/tests/srp/002.out b/tests/srp/002.out
-new file mode 100644
-index 000000000000..5e25d8e8672d
---- /dev/null
-+++ b/tests/srp/002.out
-@@ -0,0 +1,2 @@
-+Configured SRP target driver
-+Passed
-diff --git a/tests/srp/003 b/tests/srp/003
-new file mode 100755
-index 000000000000..fc85e29afe41
---- /dev/null
-+++ b/tests/srp/003
-@@ -0,0 +1,50 @@
-+#!/bin/bash
-+#
-+# Copyright (c) 2016-2018 Western Digital Corporation or its affiliates
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License
-+# as published by the Free Software Foundation; either version 2
-+# of the License, or (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write to the Free Software
-+# Foundation, Inc.
-+
-+. tests/srp/rc
-+
-+DESCRIPTION="File I/O on top of multipath concurrently with logout and login (sq)"
-+TIMED=1
-+
-+test_disconnect_repeatedly() {
-+	local dev fio_status m
-+
-+	use_blk_mq n n || return $?
-+	dev=$(get_bdev 0) || return $?
-+	m=$(mountpoint 0) || return $?
-+	create_filesystem "$dev" || return $?
-+	mount_and_check "$dev" "$m" || return $?
-+	# shellcheck disable=SC2064
-+	trap "unmount_and_check $m" RETURN
-+	simulate_network_failure_loop "$dev" "$TIMEOUT" &
-+	run_fio --verify=md5 --rw=randwrite --bs=4K --loops=$((10**6)) \
-+		--iodepth=64 --group_reporting --sync=1 --direct=1 \
-+		--ioengine=libaio --directory="$m" --runtime="${TIMEOUT}" \
-+		--name=data-integrity-test-sq --thread --numjobs=16 \
-+		--output="${RESULTS_DIR}/srp/fio-output-003.txt" \
-+		>>"$FULL"
-+	fio_status=$?
-+	wait
-+	[ -z "$nvme" ] && log_in
-+	return $fio_status
-+}
-+
-+test() {
-+	trap 'trap "" EXIT; teardown' EXIT
-+	setup && test_disconnect_repeatedly && echo Passed
-+}
-diff --git a/tests/srp/003.out b/tests/srp/003.out
-new file mode 100644
-index 000000000000..5e25d8e8672d
---- /dev/null
-+++ b/tests/srp/003.out
-@@ -0,0 +1,2 @@
-+Configured SRP target driver
-+Passed
-diff --git a/tests/srp/004 b/tests/srp/004
-new file mode 100755
-index 000000000000..9c37fd2e8f5a
---- /dev/null
-+++ b/tests/srp/004
-@@ -0,0 +1,50 @@
-+#!/bin/bash
-+#
-+# Copyright (c) 2016-2018 Western Digital Corporation or its affiliates
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License
-+# as published by the Free Software Foundation; either version 2
-+# of the License, or (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write to the Free Software
-+# Foundation, Inc.
-+
-+. tests/srp/rc
-+
-+DESCRIPTION="File I/O on top of multipath concurrently with logout and login (sq-on-mq)"
-+TIMED=1
-+
-+test_disconnect_repeatedly() {
-+	local dev fio_status m
-+
-+	use_blk_mq n y || return $?
-+	dev=$(get_bdev 0) || return $?
-+	m=$(mountpoint 0) || return $?
-+	create_filesystem "$dev" || return $?
-+	mount_and_check "$dev" "$m" || return $?
-+	# shellcheck disable=SC2064
-+	trap "unmount_and_check $m" RETURN
-+	simulate_network_failure_loop "$dev" "$TIMEOUT" &
-+	run_fio --verify=md5 --rw=randwrite --bs=4K --loops=$((10**6)) \
-+		--iodepth=64 --group_reporting --sync=1 --direct=1 \
-+		--ioengine=libaio --directory="$m" \
-+		--name=data-integrity-test-02-sq-on-mq --thread \
-+		--numjobs=16 --runtime="${TIMEOUT}" \
-+		--output="${RESULTS_DIR}/srp/fio-output-004.txt" >>"$FULL"
-+	fio_status=$?
-+	wait
-+	[ -z "$nvme" ] && log_in
-+	return $fio_status
-+}
-+
-+test() {
-+	trap 'trap "" EXIT; teardown' EXIT
-+	setup && test_disconnect_repeatedly && echo Passed
-+}
-diff --git a/tests/srp/004.out b/tests/srp/004.out
-new file mode 100644
-index 000000000000..5e25d8e8672d
---- /dev/null
-+++ b/tests/srp/004.out
-@@ -0,0 +1,2 @@
-+Configured SRP target driver
-+Passed
-diff --git a/tests/srp/005 b/tests/srp/005
-new file mode 100755
-index 000000000000..10809f69af61
---- /dev/null
-+++ b/tests/srp/005
-@@ -0,0 +1,41 @@
-+#!/bin/bash
-+#
-+# Copyright (c) 2016-2018 Western Digital Corporation or its affiliates
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License
-+# as published by the Free Software Foundation; either version 2
-+# of the License, or (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write to the Free Software
-+# Foundation, Inc.
-+
-+. tests/srp/rc
-+
-+DESCRIPTION="Direct I/O with large transfer sizes, cmd_sg_entries=255 and bs=4M"
-+QUICK=1
-+
-+test_large_transfer_size() {
-+	local dev m
-+
-+	srp_login_params+=ch_count=1,queue_size=32,max_cmd_per_lun=32,max_sect=$((1<<17))
-+	use_blk_mq y y cmd_sg_entries=255 || return $?
-+	dev=$(get_bdev 0) || return $?
-+	run_fio --verify=md5 --rw=randwrite --bs=4M --loops=$((10**6)) \
-+		--iodepth=4 --group_reporting --sync=1 --direct=1 \
-+		--ioengine=libaio \
-+		--filename="$dev" --name=large-io-test --thread --numjobs=1 \
-+		--runtime=10 --output="${RESULTS_DIR}/srp/fio-output-005.txt" \
-+		>>"$FULL"
-+}
-+
-+test() {
-+	trap 'trap "" EXIT; teardown' EXIT
-+	setup && test_large_transfer_size && echo Passed
-+}
-diff --git a/tests/srp/005.out b/tests/srp/005.out
-new file mode 100644
-index 000000000000..5e25d8e8672d
---- /dev/null
-+++ b/tests/srp/005.out
-@@ -0,0 +1,2 @@
-+Configured SRP target driver
-+Passed
-diff --git a/tests/srp/006 b/tests/srp/006
-new file mode 100755
-index 000000000000..c64098d541da
---- /dev/null
-+++ b/tests/srp/006
-@@ -0,0 +1,41 @@
-+#!/bin/bash
-+#
-+# Copyright (c) 2016-2018 Western Digital Corporation or its affiliates
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License
-+# as published by the Free Software Foundation; either version 2
-+# of the License, or (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write to the Free Software
-+# Foundation, Inc.
-+
-+. tests/srp/rc
-+
-+DESCRIPTION="Direct I/O with large transfer sizes, cmd_sg_entries=255 and bs=8M"
-+QUICK=1
-+
-+test_large_transfer_size() {
-+	local dev m
-+
-+	srp_login_params+=ch_count=1,queue_size=32,max_cmd_per_lun=32,max_sect=$((1<<17))
-+	use_blk_mq y y cmd_sg_entries=255 || return $?
-+	dev=$(get_bdev 0) || return $?
-+	run_fio --verify=md5 --rw=randwrite --bs=8M --loops=$((10**6)) \
-+		--iodepth=4 --group_reporting --sync=1 --direct=1 \
-+		--ioengine=libaio \
-+		--filename="$dev" --name=large-io-test --thread --numjobs=1 \
-+		--runtime=10 --output="${RESULTS_DIR}/srp/fio-output-006.txt" \
-+		>>"$FULL"
-+}
-+
-+test() {
-+	trap 'trap "" EXIT; teardown' EXIT
-+	setup && test_large_transfer_size && echo Passed
-+}
-diff --git a/tests/srp/006.out b/tests/srp/006.out
-new file mode 100644
-index 000000000000..5e25d8e8672d
---- /dev/null
-+++ b/tests/srp/006.out
-@@ -0,0 +1,2 @@
-+Configured SRP target driver
-+Passed
-diff --git a/tests/srp/007 b/tests/srp/007
-new file mode 100755
-index 000000000000..541f677f9db6
---- /dev/null
-+++ b/tests/srp/007
-@@ -0,0 +1,41 @@
-+#!/bin/bash
-+#
-+# Copyright (c) 2016-2018 Western Digital Corporation or its affiliates
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License
-+# as published by the Free Software Foundation; either version 2
-+# of the License, or (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write to the Free Software
-+# Foundation, Inc.
-+
-+. tests/srp/rc
-+
-+DESCRIPTION="Direct I/O with large transfer sizes, cmd_sg_entries=1 and bs=4M"
-+QUICK=1
-+
-+test_low_sg_size() {
-+	local dev m
-+
-+	srp_login_params+=ch_count=1
-+	use_blk_mq y y "cmd_sg_entries=1" || return $?
-+	dev=$(get_bdev 0) || return $?
-+	run_fio --verify=md5 --rw=randwrite --bs=4M --loops=$((10**6)) \
-+		--iodepth=4 --group_reporting --sync=1 --direct=1 \
-+		--ioengine=libaio \
-+		--filename="$dev" --name=low-sg-test --thread --numjobs=1 \
-+		--size=${ramdisk_size} --runtime=10 \
-+		--output="${RESULTS_DIR}/srp/fio-output-007.txt" >>"$FULL"
-+}
-+
-+test() {
-+	trap 'trap "" EXIT; teardown' EXIT
-+	setup && test_low_sg_size && echo Passed
-+}
-diff --git a/tests/srp/007.out b/tests/srp/007.out
-new file mode 100644
-index 000000000000..5e25d8e8672d
---- /dev/null
-+++ b/tests/srp/007.out
-@@ -0,0 +1,2 @@
-+Configured SRP target driver
-+Passed
-diff --git a/tests/srp/008 b/tests/srp/008
-new file mode 100755
-index 000000000000..c0892b795568
---- /dev/null
-+++ b/tests/srp/008
-@@ -0,0 +1,40 @@
-+#!/bin/bash
-+#
-+# Copyright (c) 2016-2018 Western Digital Corporation or its affiliates
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License
-+# as published by the Free Software Foundation; either version 2
-+# of the License, or (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write to the Free Software
-+# Foundation, Inc.
-+
-+. tests/srp/rc
-+
-+DESCRIPTION="Direct I/O with large transfer sizes, cmd_sg_entries=1 and bs=8M"
-+QUICK=1
-+
-+test_low_sg_size() {
-+	local dev m
-+
-+	srp_login_params+=ch_count=1
-+	use_blk_mq y y "cmd_sg_entries=1" || return $?
-+	dev=$(get_bdev 0) || return $?
-+	run_fio --verify=md5 --rw=randwrite --bs=8M --loops=$((10**6)) \
-+		--iodepth=4 --group_reporting --sync=1 --direct=1 \
-+		--ioengine=libaio --size=${ramdisk_size} --runtime=10 \
-+		--filename="$dev" --name=low-sg-test --thread --numjobs=1 \
-+		--output="${RESULTS_DIR}/srp/fio-output-008.txt" >>"$FULL"
-+}
-+
-+test() {
-+	trap 'trap "" EXIT; teardown' EXIT
-+	setup && test_low_sg_size && echo Passed
-+}
-diff --git a/tests/srp/008.out b/tests/srp/008.out
-new file mode 100644
-index 000000000000..5e25d8e8672d
---- /dev/null
-+++ b/tests/srp/008.out
-@@ -0,0 +1,2 @@
-+Configured SRP target driver
-+Passed
-diff --git a/tests/srp/009 b/tests/srp/009
-new file mode 100755
-index 000000000000..1f9df4c01d81
---- /dev/null
-+++ b/tests/srp/009
-@@ -0,0 +1,41 @@
-+#!/bin/bash
-+#
-+# Copyright (c) 2016-2018 Western Digital Corporation or its affiliates
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License
-+# as published by the Free Software Foundation; either version 2
-+# of the License, or (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write to the Free Software
-+# Foundation, Inc.
-+
-+. tests/srp/rc
-+
-+DESCRIPTION="Buffered I/O with large transfer sizes, cmd_sg_entries=255 and bs=4M"
-+QUICK=1
-+
-+test_large_transfer_size() {
-+	local dev m
-+
-+	srp_login_params+=ch_count=1,queue_size=32,max_cmd_per_lun=32,max_sect=$((1<<17))
-+	use_blk_mq y y cmd_sg_entries=255 || return $?
-+	dev=$(get_bdev 0) || return $?
-+	run_fio --verify=md5 --rw=randwrite --bs=4M --loops=$((10**6)) \
-+		--iodepth=4 --group_reporting --sync=1 --direct=0 \
-+		--ioengine=libaio \
-+		--filename="$dev" --name=large-io-test --thread --numjobs=1 \
-+		--runtime=10 --output="${RESULTS_DIR}/srp/fio-output-009.txt" \
-+		>>"$FULL"
-+}
-+
-+test() {
-+	trap 'trap "" EXIT; teardown' EXIT
-+	setup && test_large_transfer_size && echo Passed
-+}
-diff --git a/tests/srp/009.out b/tests/srp/009.out
-new file mode 100644
-index 000000000000..5e25d8e8672d
---- /dev/null
-+++ b/tests/srp/009.out
-@@ -0,0 +1,2 @@
-+Configured SRP target driver
-+Passed
-diff --git a/tests/srp/010 b/tests/srp/010
-new file mode 100755
-index 000000000000..c63d53ff6dc8
---- /dev/null
-+++ b/tests/srp/010
-@@ -0,0 +1,41 @@
-+#!/bin/bash
-+#
-+# Copyright (c) 2016-2018 Western Digital Corporation or its affiliates
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License
-+# as published by the Free Software Foundation; either version 2
-+# of the License, or (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write to the Free Software
-+# Foundation, Inc.
-+
-+. tests/srp/rc
-+
-+DESCRIPTION="Buffered I/O with large transfer sizes, cmd_sg_entries=255 and bs=8M"
-+QUICK=1
-+
-+test_large_transfer_size() {
-+	local dev m
-+
-+	srp_login_params+=ch_count=1,queue_size=32,max_cmd_per_lun=32,max_sect=$((1<<17))
-+	use_blk_mq y y cmd_sg_entries=255 || return $?
-+	dev=$(get_bdev 0) || return $?
-+	run_fio --verify=md5 --rw=randwrite --bs=8M --loops=$((10**6)) \
-+		--iodepth=4 --group_reporting --sync=1 --direct=0 \
-+		--ioengine=libaio \
-+		--filename="$dev" --name=large-io-test --thread --numjobs=1 \
-+		--runtime=10 --output="${RESULTS_DIR}/srp/fio-output-010.txt" \
-+		>>"$FULL"
-+}
-+
-+test() {
-+	trap 'trap "" EXIT; teardown' EXIT
-+	setup && test_large_transfer_size && echo Passed
-+}
-diff --git a/tests/srp/010.out b/tests/srp/010.out
-new file mode 100644
-index 000000000000..5e25d8e8672d
---- /dev/null
-+++ b/tests/srp/010.out
-@@ -0,0 +1,2 @@
-+Configured SRP target driver
-+Passed
-diff --git a/tests/srp/011 b/tests/srp/011
-new file mode 100755
-index 000000000000..3561662dd963
---- /dev/null
-+++ b/tests/srp/011
-@@ -0,0 +1,46 @@
-+#!/bin/bash
-+#
-+# Copyright (c) 2016-2018 Western Digital Corporation or its affiliates
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License
-+# as published by the Free Software Foundation; either version 2
-+# of the License, or (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write to the Free Software
-+# Foundation, Inc.
-+
-+. tests/srp/rc
-+
-+DESCRIPTION="Block I/O on top of multipath concurrently with logout and login"
-+TIMED=1
-+
-+test_disconnect_repeatedly() {
-+	local dev fio_status m
-+
-+	use_blk_mq y y || return $?
-+	dev=$(get_bdev 0) || return $?
-+	simulate_network_failure_loop "$dev" "$TIMEOUT" &
-+	run_fio --verify=md5 --rw=randwrite --bs=4K --loops=10000 \
-+		--ioengine=libaio --iodepth=64 --iodepth_batch=32 \
-+		--group_reporting --sync=1 --direct=1 --filename="$dev" \
-+		--name=data-integrity-test-06 --thread --numjobs=1 \
-+		--runtime="${TIMEOUT}" \
-+		--output="${RESULTS_DIR}/srp/fio-output-011.txt" \
-+		>>"$FULL"
-+	fio_status=$?
-+	wait
-+	[ -z "$nvme" ] && log_in
-+	return $fio_status
-+}
-+
-+test() {
-+	trap 'trap "" EXIT; teardown' EXIT
-+	setup && test_disconnect_repeatedly && echo Passed
-+}
-diff --git a/tests/srp/011.out b/tests/srp/011.out
-new file mode 100644
-index 000000000000..5e25d8e8672d
---- /dev/null
-+++ b/tests/srp/011.out
-@@ -0,0 +1,2 @@
-+Configured SRP target driver
-+Passed
-diff --git a/tests/srp/012 b/tests/srp/012
-new file mode 100755
-index 000000000000..239f51ae137a
---- /dev/null
-+++ b/tests/srp/012
-@@ -0,0 +1,53 @@
-+#!/bin/bash
-+#
-+# Copyright (c) 2018 Western Digital Corporation or its affiliates
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License
-+# as published by the Free Software Foundation; either version 2
-+# of the License, or (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write to the Free Software
-+# Foundation, Inc.
-+
-+. tests/srp/rc
-+
-+DESCRIPTION="dm-mpath on top of multiple I/O schedulers"
-+QUICK=1
-+
-+test_io_schedulers() {
-+	local dev m
-+
-+	# Load all I/O scheduler kernel modules
-+	for m in "/lib/modules/$(uname -r)/kernel/block/"*.ko; do
-+		modprobe "$(basename "$m")" >&/dev/null
-+	done
-+	for mq in y n; do
-+		use_blk_mq ${mq} ${mq} || return $?
-+		dev=$(get_bdev 0) || return $?
-+		for sched in noop deadline bfq cfq; do
-+			set_scheduler "$(basename "$(readlink -f "${dev}")")" $sched \
-+				      >>"$FULL" 2>&1 || continue
-+			echo "I/O scheduler: $sched; use_blk_mq: $mq" >>"$FULL"
-+			run_fio --verify=md5 --rw=randwrite --bs=4K --size=64K \
-+				--ioengine=libaio --iodepth=64 \
-+				--iodepth_batch=32 --group_reporting --sync=1 \
-+				--direct=1 --filename="$dev" \
-+				--name=${sched} --thread --numjobs=1 \
-+				--output="${RESULTS_DIR}/srp/012-${sched}-${mq}.txt" \
-+				>>"$FULL" ||
-+				return $?
-+		done
-+	done
-+}
-+
-+test() {
-+	trap 'trap "" EXIT; teardown' EXIT
-+	setup && test_io_schedulers && echo Passed
-+}
-diff --git a/tests/srp/012.out b/tests/srp/012.out
-new file mode 100644
-index 000000000000..5e25d8e8672d
---- /dev/null
-+++ b/tests/srp/012.out
-@@ -0,0 +1,2 @@
-+Configured SRP target driver
-+Passed
-diff --git a/tests/srp/013 b/tests/srp/013
-new file mode 100755
-index 000000000000..3b13bf80e4b4
---- /dev/null
-+++ b/tests/srp/013
-@@ -0,0 +1,49 @@
-+#!/bin/bash
-+#
-+# Copyright (c) 2018 Western Digital Corporation or its affiliates
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License
-+# as published by the Free Software Foundation; either version 2
-+# of the License, or (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write to the Free Software
-+# Foundation, Inc.
-+
-+. tests/srp/rc
-+
-+DESCRIPTION="Direct I/O using a discontiguous buffer"
-+QUICK=1
-+
-+discontiguous_io() {
-+	local byte bytes dev m
-+
-+	use_blk_mq y y || return $?
-+	dev=$(get_bdev 0) || return $?
-+	dd if="${dev}" bs=512 count=1 iflag=direct status=none |
-+		od -An -v -tu1 -w1 |
-+		while read -r byte; do
-+			# shellcheck disable=SC2059
-+			printf "\\x$(printf "%x" $((byte ^ 0xa5)))"
-+		done >"${TMPDIR}/data_block"
-+	wc -c < "${TMPDIR}/data_block"
-+	src/discontiguous-io -s -w "${dev}" <"${TMPDIR}/data_block" >>"$FULL" ||
-+		return $?
-+	dd if="${dev}" bs=512 count=1 iflag=direct status=none |
-+		cmp - "${TMPDIR}/data_block" ||
-+		return $?
-+	src/discontiguous-io -s "${dev}" 2>>"$FULL" |
-+		cmp - "${TMPDIR}/data_block" ||
-+		return $?
-+}
-+
-+test() {
-+	trap 'trap "" EXIT; teardown' EXIT
-+	setup && discontiguous_io && echo Passed
-+}
-diff --git a/tests/srp/013.out b/tests/srp/013.out
-new file mode 100644
-index 000000000000..e36812823797
---- /dev/null
-+++ b/tests/srp/013.out
-@@ -0,0 +1,3 @@
-+Configured SRP target driver
-+512
-+Passed
-diff --git a/tests/srp/multipath.conf b/tests/srp/multipath.conf
-new file mode 100644
-index 000000000000..d6e1f1bd4bcb
---- /dev/null
-+++ b/tests/srp/multipath.conf
-@@ -0,0 +1,27 @@
-+defaults {
-+	find_multipaths		no
-+	user_friendly_names	yes
-+	queue_without_daemon	no
-+}
-+devices {
-+	device {
-+		vendor		"LIO-ORG|SCST_BIO|FUSIONIO"
-+		product		".*"
-+		features	"1 queue_if_no_path"
-+		path_checker	tur
+ CONFIGFS_ATTR_RO(memb_group_, features);
+@@ -505,6 +517,8 @@ static struct nullb_device *null_alloc_dev(void)
+ 	dev->hw_queue_depth = g_hw_queue_depth;
+ 	dev->blocking = g_blocking;
+ 	dev->use_per_node_hctx = g_use_per_node_hctx;
++	dev->zoned = g_zoned;
++	dev->zone_size = g_zone_size;
+ 	return dev;
+ }
+ 
+@@ -513,6 +527,7 @@ static void null_free_dev(struct nullb_device *dev)
+ 	if (!dev)
+ 		return;
+ 
++	null_zone_exit(dev);
+ 	badblocks_exit(&dev->badblocks);
+ 	kfree(dev);
+ }
+@@ -1145,6 +1160,11 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd)
+ 	struct nullb *nullb = dev->nullb;
+ 	int err = 0;
+ 
++	if (req_op(cmd->rq) == REQ_OP_ZONE_REPORT) {
++		cmd->error = null_zone_report(nullb, cmd);
++		goto out;
 +	}
-+}
-+blacklist {
-+	device {
-+		vendor	"ATA|QEMU"
++
+ 	if (test_bit(NULLB_DEV_FL_THROTTLED, &dev->flags)) {
+ 		struct request *rq = cmd->rq;
+ 
+@@ -1209,6 +1229,13 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd)
+ 		}
+ 	}
+ 	cmd->error = errno_to_blk_status(err);
++
++	if (!cmd->error && dev->zoned) {
++		if (req_op(cmd->rq) == REQ_OP_WRITE)
++			null_zone_write(cmd);
++		else if (req_op(cmd->rq) == REQ_OP_ZONE_RESET)
++			null_zone_reset(cmd);
 +	}
-+	device {
-+		vendor	"Linux"
-+		product	"scsi_debug"
+ out:
+ 	/* Complete IO by inline, softirq or timer */
+ 	switch (dev->irqmode) {
+@@ -1736,6 +1763,15 @@ static int null_add_dev(struct nullb_device *dev)
+ 		blk_queue_flush_queueable(nullb->q, true);
+ 	}
+ 
++	if (dev->zoned) {
++		rv = null_zone_init(dev);
++		if (rv)
++			goto out_cleanup_blk_queue;
++
++		blk_queue_chunk_sectors(nullb->q, dev->zone_size_sects);
++		nullb->q->limits.zoned = BLK_ZONED_HM;
 +	}
-+	devnode	"^nullb.*"
++
+ 	nullb->q->queuedata = nullb;
+ 	blk_queue_flag_set(QUEUE_FLAG_NONROT, nullb->q);
+ 	blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, nullb->q);
+@@ -1754,13 +1790,16 @@ static int null_add_dev(struct nullb_device *dev)
+ 
+ 	rv = null_gendisk_register(nullb);
+ 	if (rv)
+-		goto out_cleanup_blk_queue;
++		goto out_cleanup_zone;
+ 
+ 	mutex_lock(&lock);
+ 	list_add_tail(&nullb->list, &nullb_list);
+ 	mutex_unlock(&lock);
+ 
+ 	return 0;
++out_cleanup_zone:
++	if (dev->zoned)
++		null_zone_exit(dev);
+ out_cleanup_blk_queue:
+ 	blk_cleanup_queue(nullb->q);
+ out_cleanup_tags:
+@@ -1787,6 +1826,11 @@ static int __init null_init(void)
+ 		g_bs = PAGE_SIZE;
+ 	}
+ 
++	if (!is_power_of_2(g_zone_size)) {
++		pr_err("null_blk: zone_size must be power-of-two\n");
++		return -EINVAL;
++	}
++
+ 	if (g_queue_mode == NULL_Q_MQ && g_use_per_node_hctx) {
+ 		if (g_submit_queues != nr_online_nodes) {
+ 			pr_warn("null_blk: submit_queues param is set to %u.\n",
+diff --git a/drivers/block/null_blk.h b/drivers/block/null_blk.h
+index d82c5501806d..d81781f22dba 100644
+--- a/drivers/block/null_blk.h
++++ b/drivers/block/null_blk.h
+@@ -41,9 +41,14 @@ struct nullb_device {
+ 	unsigned int curr_cache;
+ 	struct badblocks badblocks;
+ 
++	unsigned int nr_zones;
++	struct blk_zone *zones;
++	sector_t zone_size_sects;
++
+ 	unsigned long size; /* device size in MB */
+ 	unsigned long completion_nsec; /* time in ns to complete a request */
+ 	unsigned long cache_size; /* disk cache size in MB */
++	unsigned long zone_size; /* zone size in MB if device is zoned */
+ 	unsigned int submit_queues; /* number of submission queues */
+ 	unsigned int home_node; /* home node for the device */
+ 	unsigned int queue_mode; /* block interface */
+@@ -57,6 +62,7 @@ struct nullb_device {
+ 	bool power; /* power on/off the device */
+ 	bool memory_backed; /* if data is stored in memory */
+ 	bool discard; /* if support discard */
++	bool zoned; /* if device is zoned */
+ };
+ 
+ struct nullb {
+@@ -77,4 +83,26 @@ struct nullb {
+ 	unsigned int nr_queues;
+ 	char disk_name[DISK_NAME_LEN];
+ };
++
++#ifdef CONFIG_BLK_DEV_ZONED
++int null_zone_init(struct nullb_device *dev);
++void null_zone_exit(struct nullb_device *dev);
++blk_status_t null_zone_report(struct nullb *nullb,
++					    struct nullb_cmd *cmd);
++void null_zone_write(struct nullb_cmd *cmd);
++void null_zone_reset(struct nullb_cmd *cmd);
++#else
++static inline int null_zone_init(struct nullb_device *dev)
++{
++	return -EINVAL;
 +}
-+blacklist_exceptions {
-+	property	".*"
-+	devnode		"^nvme"
++static inline void null_zone_exit(struct nullb_device *dev) {}
++static inline blk_status_t null_zone_report(struct nullb *nullb,
++					    struct nullb_cmd *cmd)
++{
++	return BLK_STS_NOTSUPP;
 +}
-diff --git a/tests/srp/rc b/tests/srp/rc
-new file mode 100755
-index 000000000000..0bdce55e222d
++static inline void null_zone_write(struct nullb_cmd *cmd) {}
++static inline void null_zone_reset(struct nullb_cmd *cmd) {}
++#endif /* CONFIG_BLK_DEV_ZONED */
+ #endif /* __NULL_BLK_H */
+diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
+new file mode 100644
+index 000000000000..a979ca00d7be
 --- /dev/null
-+++ b/tests/srp/rc
-@@ -0,0 +1,1433 @@
-+#!/bin/bash
-+#
-+# Copyright (c) 2018 Western Digital Corporation or its affiliates
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License
-+# as published by the Free Software Foundation; either version 2
-+# of the License, or (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write to the Free Software
-+# Foundation, Inc.
++++ b/drivers/block/null_blk_zoned.c
+@@ -0,0 +1,149 @@
++// SPDX-License-Identifier: GPL-2.0
++#include <linux/vmalloc.h>
++#include "null_blk.h"
 +
-+. common/rc
++/* zone_size in MBs to sectors. */
++#define ZONE_SIZE_SHIFT		11
 +
-+vdev_path=(/dev/nullb0 /dev/nullb1 scsi_debug_dev_path_will_be_set_later)
-+vdevs=(iblock_0/vdev0 iblock_1/vdev1 iblock_2/vdev2)
-+scsi_serial=(nullb0 nullb1 scsidbg)
-+memtotal=$(sed -n 's/^MemTotal:[[:blank:]]*\([0-9]*\)[[:blank:]]*kB$/\1/p' /proc/meminfo)
-+max_ramdisk_size=$((1<<25))
-+ramdisk_size=$((memtotal*(1024/16)))  # in bytes
-+if [ $ramdisk_size -gt $max_ramdisk_size ]; then
-+	ramdisk_size=$max_ramdisk_size
-+fi
-+debug=
-+elevator=none
-+filesystem_type=ext4
-+fio_aux_path=/tmp/fio-state-files
-+nvme=
-+nvme_subsysnqn="nvme-test"
-+nvme_port=7777
-+scsi_timeout=1
-+srp_login_params=
-+srp_rdma_cm_port=5555
-+
-+is_lio_configured() {
-+	(
-+		cd /sys/kernel/config/target >&/dev/null || return 1
-+		for e in target/* core/fileio* core/iblock* core/pscsi*; do
-+			if [ -d "$e" ] && [ "$e" != core ]; then
-+				return 0
-+			fi
-+		done
-+	)
-+
-+	return 1
++static inline unsigned int null_zone_no(struct nullb_device *dev, sector_t sect)
++{
++	return sect >> ilog2(dev->zone_size_sects);
 +}
 +
-+group_requires() {
-+	local m name p required_modules
++int null_zone_init(struct nullb_device *dev)
++{
++	sector_t dev_size = (sector_t)dev->size * 1024 * 1024;
++	sector_t sector = 0;
++	unsigned int i;
 +
-+	if [ ! -e /etc/multipath.conf ]; then
-+		SKIP_REASON="Could not find /etc/multipath.conf"
-+		return 1
-+	fi
-+	_have_configfs || return $?
-+	if is_lio_configured; then
-+		SKIP_REASON="LIO must be unloaded before the SRP tests are run"
-+		return 1
-+	fi
-+	required_modules=(
-+		dm_multipath
-+		dm_queue_length
-+		dm_service_time
-+		ib_srp
-+		ib_srpt
-+		sd_mod
-+		null_blk
-+		sd_mod
-+		sg
-+		rdma_cm
-+		ib_ipoib
-+		ib_umad
-+		rdma_rxe
-+		scsi_debug
-+		scsi_dh_alua
-+		scsi_dh_emc
-+		scsi_dh_rdac
-+		target_core_mod
-+		target_core_iblock
-+	)
-+	for m in "${required_modules[@]}"; do
-+		_have_module "$m" || return $?
-+	done
++	if (!is_power_of_2(dev->zone_size)) {
++		pr_err("null_blk: zone_size must be power-of-two\n");
++		return -EINVAL;
++	}
 +
-+	for p in mkfs.ext4 mkfs.xfs multipath multipathd pidof sg_reset; do
-+		_have_program "$p" || return $?
-+	done
++	dev->zone_size_sects = dev->zone_size << ZONE_SIZE_SHIFT;
++	dev->nr_zones = dev_size >>
++				(SECTOR_SHIFT + ilog2(dev->zone_size_sects));
++	dev->zones = kvmalloc_array(dev->nr_zones, sizeof(struct blk_zone),
++			GFP_KERNEL | __GFP_ZERO);
++	if (!dev->zones)
++		return -ENOMEM;
 +
-+	_have_root || return $?
++	for (i = 0; i < dev->nr_zones; i++) {
++		struct blk_zone *zone = &dev->zones[i];
 +
-+	_have_src_program discontiguous-io || return $?
++		zone->start = zone->wp = sector;
++		zone->len = dev->zone_size_sects;
++		zone->type = BLK_ZONE_TYPE_SEQWRITE_REQ;
++		zone->cond = BLK_ZONE_COND_EMPTY;
 +
-+	_have_kernel_option DM_UEVENT || return $?
++		sector += dev->zone_size_sects;
++	}
 +
-+	for name in srp_daemon multipathd; do
-+		if pidof "$name" >/dev/null; then
-+			SKIP_REASON="$name must be stopped before the SRP tests are run"
-+			return 1
-+		fi
-+	done
++	return 0;
 +}
 +
-+# Log out, set dm and SCSI use_blk_mq parameters and log in. $1: device mapper
-+# use_blk_mq mode; $2: SCSI use_blk_mq mode; $3..${$#}: SRP kernel module
-+# parameters.
-+use_blk_mq() {
-+	local dm_mode=$1 scsi_mode=$2 kmod_params
-+
-+	shift
-+	shift
-+	kmod_params=("$@")
-+
-+	(
-+		cd /sys/module/dm_mod/parameters || return $?
-+		if [ -e use_blk_mq ]; then
-+			echo "$dm_mode" >use_blk_mq || return $?
-+		fi
-+	)
-+	(
-+		cd /sys/module/scsi_mod/parameters || return $?
-+		echo "$scsi_mode" >use_blk_mq || return $?
-+	)
-+
-+	log_out &&
-+		remove_mpath_devs &&
-+		stop_client &&
-+		start_client indirect_sg_entries=2048 "${kmod_params[@]}" &&
-+		log_in
++void null_zone_exit(struct nullb_device *dev)
++{
++	kvfree(dev->zones);
 +}
 +
-+get_ipv4_addr() {
-+	ip -4 -o addr show dev "$1" |
-+		sed -n 's/.*[[:blank:]]inet[[:blank:]]*\([^[:blank:]/]*\).*/\1/p'
-+}
-+
-+# Convert e.g. ::1 into 0000:0000:0000:0000:0000:0000:0000:0001.
-+expand_ipv6_addr() {
-+	awk -F : 'BEGIN{left=1} { for(i=1;i<=NF;i++) { a=substr("0000", 1+length($i)) $i; if ($i == "") left=0; else if (left) pre = pre ":" a; else suf = suf ":" a }; mid=substr(":0000:0000:0000:0000:0000:0000:0000:0000", (pre!="")+length(pre)+length(suf)); print substr(pre,2) mid suf}'
-+}
-+
-+get_ipv6_addr() {
-+	ip -6 -o addr show dev "$1" |
-+		sed -n 's/.*[[:blank:]]inet6[[:blank:]]*\([^[:blank:]/]*\).*/\1/p'
-+}
-+
-+# Write SRP login string $1 into SRP login sysfs attribute $2.
-+srp_single_login() {
-+	{
-+		echo "echo $1 > $PWD/$2"
-+		echo "$1" >"$2"
-+	} &>>"$FULL"
-+}
-+
-+# Tell the SRP initiator to log in to an SRP target using the IB/CM.
-+# Arguments: $1: SRP target IOC GUID; $2: IB device to log in to; $3: IB device
-+# port to log in to; $4: additional login parameters.
-+do_ib_cm_login() {
-+	local add_param gid ibdev ioc_guid p port
-+
-+	ioc_guid=$1
-+	ibdev=$2
-+	port=$3
-+	add_param=$4
-+	gid=$(<"/sys/class/infiniband/$ibdev/ports/$port/gids/0")
-+	gid=${gid//:}
-+	for p in /sys/class/infiniband_srp/*; do
-+		[ -e "$p" ] || continue
-+		srp_single_login "id_ext=$ioc_guid,ioc_guid=$ioc_guid,dgid=$gid,pkey=7fff,service_id=$ioc_guid,$add_param" "$p/add_target"
-+	done
-+}
-+
-+# Tell the SRP initiator to log in to an SRP target using the RDMA/CM.
-+# Arguments: $1: SRP target IOC GUID; $2: IB device to log in to; $3: additional
-+# login parameters.
-+do_rdma_cm_login() {
-+	local a b add_param d dest dests ibdev ioc_guid pd
-+
-+	ioc_guid=$1
-+	ibdev=$2
-+	add_param=$3
-+	pd=/sys/class/infiniband/$ibdev/parent
-+	if [ -e "$pd" ]; then
-+		d=$(<"$pd")
-+		a=$(get_ipv4_addr "$(basename "$d")")
-+		b=$(get_ipv6_addr "$(basename "$d")")
-+	fi
-+	[ -n "$a$b" ] || return 1
-+	dests=()
-+	[ -n "$a" ] && dests+=("${a}:${srp_rdma_cm_port}")
-+	[ -n "$b" ] && dests+=("[${b}]:${srp_rdma_cm_port}")
-+	for dest in "${dests[@]}"; do
-+		for p in /sys/class/infiniband_srp/*; do
-+			[ -e "$p" ] || continue
-+			srp_single_login "id_ext=$ioc_guid,ioc_guid=$ioc_guid,dest=$dest,$add_param" "$p/add_target"
-+		done
-+	done
-+}
-+
-+show_srp_connections() {
-+	local d f h hd scsi_devs srp_luns p s
-+
-+	for p in /sys/class/scsi_host/*/orig_dgid; do
-+		[ -e "$p" ] || continue
-+		hd=${p%/orig_dgid}
-+		h=${hd#/sys/class/scsi_host/host}
-+		{ s=$(<"$hd/sgid"); } 2>/dev/null
-+		s=${s#fe80:0000:0000:0000:}
-+		s=${s:-?}
-+		d=$(<"$p")
-+		d=${d#fe80:0000:0000:0000:}
-+		d=${d:-?}
-+		srp_luns=()
-+		for f in "/sys/class/scsi_device/${h}:"*; do
-+			[ -e "$f" ] || continue
-+			srp_luns+=("$f")
-+		done
-+		scsi_devs=()
-+		for dev in "/sys/class/scsi_device/${h}:"*/device/block/*; do
-+			[ -e "$dev" ] || continue
-+			scsi_devs+=("${dev/*\/}")
-+		done
-+		echo "SCSI host $h: src GUID $s dst GUID $d ${#srp_luns[@]} LUNS; scsi devs: ${scsi_devs[*]}"
-+	done
-+}
-+
-+# Make the SRP initiator driver log in to each SRP target port that exists
-+# on the local host. $1 are additional SRP login parameters.
-+srp_log_in() {
-+	local a add_param=$1 d dest gid ibdev ioc_guid port p sysfsdir
-+
-+	ioc_guid=$(</sys/module/ib_srpt/parameters/srpt_service_guid)
-+
-+	for ((i=0;i<10;i++)); do
-+		for d in /sys/class/infiniband_mad/umad*; do
-+			[ -e "$d" ] || continue
-+			sysfsdir=/sys/class/infiniband_mad/$(basename "$d")
-+			ibdev=$(<"$sysfsdir/ibdev")
-+			port=$(<"$sysfsdir/port")
-+			link_layer=$(<"/sys/class/infiniband/$ibdev/ports/$port/link_layer")
-+			case $link_layer in
-+				InfiniBand)
-+					do_ib_cm_login   "$ioc_guid" "$ibdev" "$port" "$add_param" ||
-+						do_rdma_cm_login "$ioc_guid" "$ibdev" "$add_param";;
-+				*)
-+					do_rdma_cm_login "$ioc_guid" "$ibdev" "$add_param";;
-+			esac || break
-+		done
-+
-+		for p in /sys/class/scsi_host/*/orig_dgid; do
-+			if [ -e "$p" ]; then
-+				show_srp_connections &>>"$FULL"
-+				return 0
-+			fi
-+		done
-+		sleep .1
-+	done
-+
-+	echo "SRP login failed"
-+
-+	return 1
-+}
-+
-+# Tell the SRP initiator driver to log out.
-+srp_log_out() {
-+	local p
-+
-+	if [ -e /sys/class/srp_remote_ports ]; then
-+		for p in /sys/class/srp_remote_ports/*; do
-+			[ -e "$p" ] && echo 1 >"$p/delete" &
-+		done
-+	fi
-+	wait
-+}
-+
-+# Whether or not $1 is a number.
-+is_number() {
-+	[ "$1" -eq "0$1" ] 2>/dev/null
-+}
-+
-+# Check whether a device is an RDMA device. An example argument:
-+# /sys/devices/pci0000:00/0000:00:03.0/0000:04:00.0
-+is_rdma_device() {
-+	local d i inode1 inode2
-+
-+	inode1=$(stat -c %i "$1")
-+	# echo "inode1 = $inode1"
-+	for i in /sys/class/infiniband/*; do
-+		d=/sys/class/infiniband/"$(readlink "$i")"
-+		d=$(dirname "$(dirname "$d")")
-+		inode2=$(stat -c %i "$d")
-+		# echo "inode2 = $inode2"
-+		if [ "$inode1" = "$inode2" ]; then
-+			return
-+		fi
-+	done
-+	false
-+}
-+
-+# Lists RDMA capable network interface names, e.g. ib0 ib1.
-+rdma_network_interfaces() {
-+	(
-+		cd /sys/class/net &&
-+			for i in *; do
-+				[ -e "$i" ] || continue
-+				# Skip IPoIB (ARPHRD_INFINIBAND) network
-+				# interfaces.
-+				[ "$(<"$i"/type)" = 32 ] && continue
-+				[ -L "$i/device" ] || continue
-+				d=$(readlink "$i/device" 2>/dev/null)
-+				if [ -n "$d" ] && is_rdma_device "$i/$d"; then
-+					echo "$i"
-+				fi
-+			done
-+	)
-+}
-+
-+nvme_log_in() {
-+	local i ipv4_addr
-+
-+	[ -c /dev/nvme-fabrics ] &&
-+		for i in $(rdma_network_interfaces); do
-+			ipv4_addr=$(get_ipv4_addr "$i")
-+			if [ -n "${ipv4_addr}" ]; then
-+				echo -n "transport=rdma,traddr=${ipv4_addr},trsvcid=${nvme_port},nqn=$nvme_subsysnqn" > /dev/nvme-fabrics
-+			fi
-+		done &&
-+		echo reconfigure | multipathd -k >&/dev/null
-+}
-+
-+nvme_log_out() {
-+	local c
-+
-+	for c in /sys/class/nvme-fabrics/ctl/*/delete_controller; do
-+		[ -e "$c" ] && echo 1 > "$c" &
-+	done
-+	wait
-+}
-+
-+# Log in.
-+log_in() {
-+	if [ -n "$nvme" ]; then
-+		nvme_log_in
-+	else
-+		srp_log_in "${srp_login_params}"
-+	fi
-+}
-+
-+log_out() {
-+	if [ -n "$nvme" ]; then
-+		nvme_log_out
-+	else
-+		srp_log_out
-+	fi
-+}
-+
-+# Check whether any stacked block device holds block device $1. If so, echo
-+# the name of the holder.
-+held_by() {
-+	local d e dev=$1
-+
-+	while [ -L "$dev" ]; do
-+		dev=$(realpath "$dev")
-+	done
-+	dev=${dev%/dev/}
-+	for d in /sys/class/block/*/holders/*; do
-+		[ -e "$d" ] || continue
-+		e=$(basename "$d")
-+		if [ "$e" = "$dev" ]; then
-+			echo "/dev/$(basename "$(dirname "$(dirname "$d")")")"
-+		fi
-+	done
-+}
-+
-+# System uptime in seconds.
-+uptime_s() {
-+	local a b
-+
-+	echo "$(</proc/uptime)" | { read -r a b && echo "${a%%.*}"; }
-+}
-+
-+# Sleep until either $1 seconds have elapsed or until the deadline $2 has been
-+# reached. Return 1 if and only if the deadline has been met.
-+sleep_until() {
-+	local duration=$1 deadline=$2 u
-+
-+	u=$(uptime_s)
-+	if [ $((u + duration)) -le "$deadline" ]; then
-+		sleep "$duration"
-+	else
-+		[ "$deadline" -gt "$u" ] && sleep $((deadline - u))
-+		return 1
-+	fi
-+}
-+
-+# Simulate network failures for device $1 during $2 seconds.
-+simulate_network_failure_loop() {
-+	local d dev="$1" duration="$2" deadline i rc=0 s
-+
-+	[ -e "$dev" ] || return $?
-+	[ -n "$duration" ] || return $?
-+	deadline=$(($(uptime_s) + duration))
-+	s=5
-+	while [ $rc = 0 ]; do
-+		sleep_until 5 ${deadline} || break
-+		if [ -n "$nvme" ]; then
-+			for d in $(held_by "$dev"); do
-+				echo 1 >"$d/device/reset_controller"
-+			done
-+		else
-+			log_out
-+			sleep_until $s ${deadline}
-+			rc=$?
-+			s=$(((((s + 5) & 0xff) ^ 0xa6) * scsi_timeout / 60))
-+			log_in
-+		fi
-+	done
-+
-+	for ((i=0;i<5;i++)); do
-+		log_in && break
-+		sleep 1
-+	done
-+}
-+
-+# Kill all processes that have opened block device $1.
-+stop_bdev_users() {
-+	[ -n "$1" ] || return $?
-+	lsof -F p "$1" 2>/dev/null | while read -r line; do
-+		p="${line#p}"
-+		if [ "$p" != "$line" ]; then
-+			echo -n " (pid $p)" >>"$FULL"
-+			kill -9 "$p"
-+		fi
-+	done
-+}
-+
-+# RHEL 6 dmsetup accepts mpath<n> but not /dev/dm-<n> as its first argument.
-+# Hence this function that converts /dev/dm-<n> into mpath<n>.
-+dev_to_mpath() {
-+	local d e mm
-+
-+	d="${1#/dev/mapper/}";
-+	if [ "$d" != "$1" ]; then
-+		echo "$d"
-+		return 0
-+	fi
-+
-+	[ -e "$1" ] || return $?
-+
-+	if [ -L "$1" ]; then
-+		e=$(readlink -f "$1")
-+	else
-+		e="$1"
-+	fi
-+	if ! mm=$(stat -c %t:%T "$e"); then
-+		echo "stat $1 -> $e failed"
-+		return 1
-+	fi
-+
-+	for d in /dev/mapper/mpath*; do
-+		if [ -L "$d" ]; then
-+			e=$(readlink -f "$d")
-+		elif [ -e "$d" ]; then
-+			e="$d"
-+		else
-+			continue
-+		fi
-+		if [ "$(stat -c %t:%T "$e")" = "$mm" ]; then
-+			basename "$d"
-+			return 0
-+		fi
-+	done
-+	return 1
-+}
-+
-+# Modify mpath device $1 to fail_if_no_path mode, unmount the filesystem on top
-+# of it and remove the mpath device.
-+remove_mpath_dev() {
-+	local cmd dm i output t1 t2
-+
-+	{
-+		for ((i=10;i>0;i--)); do
-+			cmd="dm=\$(dev_to_mpath \"$1\")"
-+			if ! eval "$cmd"; then
-+				echo "$cmd: failed"
-+			else
-+				t1=$(dmsetup table "$dm")
-+				cmd="dmsetup message $dm 0 fail_if_no_path"
-+				if ! eval "$cmd"; then
-+					echo "$cmd: failed"
-+				else
-+					t2=$(dmsetup table "$dm")
-+					if echo "$t2" | grep -qw queue_if_no_path; then
-+						echo "$dm: $t1 -> $t2"
-+					fi
-+					echo "Attempting to unmount /dev/mapper/$dm"
-+					umount "/dev/mapper/$dm"
-+					cmd="dmsetup remove $dm"
-+					if ! output=$(eval "$cmd" 2>&1); then
-+						echo "$cmd: $output; retrying"
-+					else
-+						echo "done"
-+						break
-+					fi
-+				fi
-+			fi
-+			if [ ! -e "$1" ]; then
-+				break
-+			fi
-+			ls -l "$1"
-+			stop_bdev_users "$(readlink -f "$1")"
-+			sleep .5
-+		done
-+		if [ $i = 0 ]; then
-+			echo "failed"
-+			return 1
-+		fi
-+	} &>>"$FULL"
-+}
-+
-+# Check whether one or more arguments contain stale device nodes (/dev/...).
-+mpath_has_stale_dev() {
-+	local d
-+
-+	for d in "$@"; do
-+		if [ "${d/://}" != "$d" ]; then
-+			grep -qw "$d" /sys/class/block/*/dev 2>/dev/null ||
-+				return 0
-+		fi
-+	done
-+
-+	return 1
-+}
-+
-+# Check whether multipath definition $1 includes the queue_if_no_path keyword.
-+is_qinp_def() {
-+	case "$1" in
-+		" 3 queue_if_no_path queue_mode mq ")
-+			return 0;;
-+		" 1 queue_if_no_path ")
-+			return 0;;
-+		*)
-+			return 1;;
-+	esac
-+}
-+
-+# Remove all mpath devices that refer to one or more SRP devices or that refer
-+# to an already deleted block device.
-+remove_srp_mpath_devs() {
-+	local b d dm h p s
-+
-+	{
-+		echo "Examining all SRP LUNs"
-+		for p in /sys/class/srp_remote_ports/*; do
-+			[ -e "$p" ] || continue
-+			h="${p##*/}"; h="${h#port-}"; h="${h%:1}"
-+			for d in "/sys/class/scsi_device/${h}:"*/device/block/*; do
-+				[ -e "$d" ] || continue
-+				s=$(dirname "$(dirname "$(dirname "$d")")")
-+				s=$(basename "$s")
-+				b=$(basename "$d")
-+				for h in "/sys/class/block/$b/holders/"*; do
-+					[ -e "$h" ] || continue
-+					dm=/dev/$(basename "$h")
-+					{
-+						echo -n "SRP LUN $s / $b: removing $dm: "
-+						if ! remove_mpath_dev "$dm"; then
-+							echo "failed"
-+							[ -z "$debug" ] || return 1
-+						fi
-+					}
-+				done
-+			done
-+		done
-+		# Find all multipaths with one or more deleted devices and remove these
-+		echo "Examining all multipaths"
-+		dmsetup table | while read -r mpdev fs ls type def; do
-+			echo "$fs $ls" >/dev/null
-+			# shellcheck disable=SC2086
-+			if [ "$type" = multipath ] &&
-+				   { is_qinp_def "$def" || mpath_has_stale_dev $def; }; then
-+				echo "${mpdev%:}"
-+			fi
-+		done |
-+			sort -u |
-+			while read -r mpdev; do
-+				mpdev="/dev/mapper/$mpdev"
-+				echo -n "removing $mpdev: "
-+				if ! remove_mpath_dev "$mpdev"; then
-+					echo "failed"
-+					[ -z "$debug" ] || return 1
-+				fi
-+			done
-+		echo "Finished examining multipaths"
-+	} &>> "$FULL"
-+}
-+
-+remove_nvme_mpath_devs() {
-+	local dm h
-+
-+	for h in /sys/class/block/nvme*/holders/*; do
-+		[ -e "$h" ] || continue
-+		d=$(basename "$(dirname "$(dirname "$h")")")
-+		dm=/dev/$(basename "$h")
-+		{
-+			echo -n "NVME dev $d: removing $dm: "
-+			dmsetup remove "$(dev_to_mpath "$dm")" && echo "done"
-+		} &>> "$FULL"
-+	done
-+}
-+
-+remove_mpath_devs() {
-+	if [ -n "$nvme" ]; then
-+		remove_nvme_mpath_devs
-+	else
-+		remove_srp_mpath_devs
-+	fi
-+}
-+
-+# Arguments: module to unload ($1) and retry count ($2).
-+unload_module() {
-+	local i m=$1 rc=${2:-1}
-+
-+	[ ! -e "/sys/module/$m" ] && return 0
-+	for ((i=rc;i>0;i--)); do
-+		modprobe -r "$m"
-+		[ ! -e "/sys/module/$m" ] && return 0
-+		sleep .1
-+	done
-+	return 1
-+}
-+
-+# Load the SRP initiator driver with kernel module parameters $1..$n.
-+start_srp() {
-+	modprobe scsi_transport_srp || return $?
-+	modprobe ib_srp "$@" dyndbg=+pmf || return $?
-+}
-+
-+# Unload the SRP initiator driver.
-+stop_srp() {
-+	local i
-+
-+	srp_log_out
-+	for ((i=40;i>=0;i--)); do
-+		remove_mpath_devs || return $?
-+		unload_module ib_srp >/dev/null 2>&1 && break
-+		sleep 1
-+	done
-+	if [ -e /sys/module/ib_srp ]; then
-+		echo "Error: unloading kernel module ib_srp failed"
-+		return 1
-+	fi
-+	unload_module scsi_transport_srp || return $?
-+}
-+
-+start_nvme_client() {
-+	modprobe nvme dyndbg=+pmf &&
-+		modprobe nvme-core dyndbg=+pmf &&
-+		modprobe nvme-fabrics dyndbg=+pmf &&
-+		modprobe nvme-rdma dyndbg=+pmf
-+}
-+
-+stop_nvme_client() {
-+	unload_module nvme_rdma &&
-+		unload_module nvme
-+}
-+
-+# Load the initiator kernel driver with kernel module parameters $1..$n.
-+start_client() {
-+	if [ -n "$nvme" ]; then
-+		start_nvme_client "$@"
-+	else
-+		start_srp "$@"
-+	fi
-+}
-+
-+stop_client() {
-+	if [ -n "$nvme" ]; then
-+		stop_nvme_client
-+	else
-+		stop_srp
-+	fi
-+}
-+
-+# Load the configfs kernel module and mount it.
-+mount_configfs() {
-+	if [ ! -e /sys/module/configfs ]; then
-+		modprobe configfs || return $?
-+	fi
-+	if ! mount | grep -qw configfs; then
-+		mount -t configfs none /sys/kernel/config || return $?
-+	fi
-+}
-+
-+# Associate the LIO device with name $1/$2 with file $3 and SCSI serial $4.
-+configure_lio_vdev() {
-+	local dirname=$1 vdev=$2 path=$3 serial=$4
-+
-+	(
-+		cd /sys/kernel/config/target/core &&
-+			mkdir "$dirname" &&
-+			cd "$dirname" &&
-+			mkdir "$vdev" &&
-+			cd "$vdev" &&
-+			if [ -b "$(readlink -f "$path")" ]; then
-+				echo "udev_path=$path," >control
-+			elif [ -e "$path" ]; then
-+				size=$(stat -c %s "${path}") &&
-+					[ "$size" -gt 0 ] &&
-+					echo "fd_dev_name=$path,fd_dev_size=$size," >control
-+			else
-+				{
-+					ls -l "$path"
-+					readlink -f "$path"
-+				} &>>"$FULL"
-+				false
-+			fi &&
-+			echo "${serial}" >wwn/vpd_unit_serial &&
-+			echo 1 > enable
-+	)
-+}
-+
-+# Return the multipath ID of LIO device $1. $1 is an index in the $scsi_serial
-+# array.
-+lio_scsi_mpath_id() {
-+	local i=$1 hs
-+
-+	is_number "$i" || return $?
-+	hs=$(echo -n "${scsi_serial[i]}" | od -v -tx1 -w99 |
-+		     { read -r offset bytes;
-+		       echo "${bytes// }";
-+		       echo "$offset" > /dev/null
-+		     })
-+	while [ ${#hs} -lt 25 ]; do
-+		hs="${hs}0"
-+	done
-+	# See also spc_emulate_evpd_83() in drivers/target/target_core_spc.c.
-+	echo "36001405$hs"
-+}
-+
-+scsi_mpath_id() {
-+	lio_scsi_mpath_id "$@"
-+}
-+
-+get_nvme_bdev() {
-+	local i=$1 j=0
-+
-+	for d in /sys/class/nvme-fabrics/ctl/*/*/device; do
-+		[ -d "$d" ] || continue
-+		if [ $j -ge "$i" ]; then
-+			echo "/dev/$(basename "$(dirname "$d")")"
-+			return 0
-+		fi
-+		((j++))
-+	done
-+	return 1
-+}
-+
-+# Get a the uuid or wwid of LIO device $1. $1 is an index in the $scsi_serial
-+# array.
-+get_bdev_uid() {
-+	local i=$1
-+
-+	is_number "$i" || return $?
-+	if [ -n "$nvme" ]; then
-+		bdev=$(get_nvme_bdev "$i") || return $?
-+		wwid=$(<"/sys/block/${bdev#/dev/}/wwid")
-+		wwid=${wwid#nvme.0000-}
-+		echo "${wwid%-4c696e75780000000000000000000000000000000000000000000000000000000000000000000000-00000001}"
-+	else
-+		scsi_mpath_id "$i"
-+	fi
-+}
-+
-+# Set scheduler of block device $1 to $2.
-+set_scheduler() {
-+	local b=$1 p s=$2
-+
-+	p=/sys/class/block/$b/queue/scheduler
-+	if [ -e "/sys/block/$b/mq" ]; then
-+		case "$s" in
-+			noop)        s=none;;
-+			deadline)    s=mq-deadline;;
-+			bfq)         s=bfq;;
-+		esac
-+	else
-+		case "$s" in
-+			none)        s=noop;;
-+			mq-deadline) s=deadline;;
-+			bfq-mq)      s=bfq;;
-+		esac
-+	fi
-+	if ! echo "$s" > "$p"; then
-+		echo "Changing scheduler of $b from $(<"$p") into $s failed"
-+		return 1
-+	fi
-+}
-+
-+# Get a /dev/... path that points at dm device number $1. $1 is an index in
-+# the $scsi_serial.
-+get_bdev() {
-+	local b d dev h i=$1 j realdev
-+
-+	is_number "$i" || return $?
-+	echo reconfigure | multipathd -k >&/dev/null
-+	dev="/dev/disk/by-id/dm-uuid-mpath-$(get_bdev_uid "$i")" || return $?
-+	for ((j=0;j<50;j++)); do
-+		[ -e "$dev" ] && break
-+		sleep .1
-+	done
-+	if [ ! -e "$dev" ]; then
-+		echo "$dev: not found"
-+		return 1
-+	fi
-+	if [ ! -L "$dev" ]; then
-+		echo "$dev: not a soft link"
-+		return 1
-+	fi
-+	realdev=$(readlink "$dev" 2>/dev/null || echo "?")
-+	echo "Using $dev -> ${realdev}" >>"$FULL"
-+	for ((j=0; j<50; j++)); do
-+		blockdev --getbsz "$dev" >&/dev/null && break
-+		echo reconfigure | multipathd -k >& /dev/null
-+		sleep .1
-+	done
-+	if ! blockdev --getbsz "$dev" >&/dev/null; then
-+		return 1
-+	fi
-+	b=$(basename "$realdev")
-+	set_scheduler "$b" "${elevator}"
-+	for d in /sys/class/block/*"/holders/$b"; do
-+		[ -e "$d" ] || continue
-+		h="$(basename "$(dirname "$(dirname "$d")")")"
-+		set_scheduler "$h" "${elevator}"
-+		if [ -e "/sys/class/block/$h/device/timeout" ]; then
-+			echo $scsi_timeout > "/sys/class/block/$h/device/timeout"
-+		fi
-+	done
-+	echo "$dev"
-+}
-+
-+# Configure zero or more target ports such that these accept connections from
-+# zero or more initiator ports. Target and initiator port lists are separated
-+# by "--".
-+configure_target_ports() {
-+	local i ini initiators target_port target_ports
-+
-+	target_ports=()
-+	while [ $# -gt 0 ]; do
-+		if [ "$1" = "--" ]; then
-+			shift
-+			break
-+		fi
-+		target_ports+=("$1")
-+		shift
-+	done
-+
-+	initiators=()
-+	while [ $# -gt 0 ]; do
-+		initiators+=("$1")
-+		shift
-+	done
-+
-+	for target_port in "${target_ports[@]}"; do
-+		mkdir "$target_port" || return $?
-+		[ -e "$target_port" ] || continue
-+		#echo "$target_port"
-+		mkdir "$target_port/$target_port" || continue
-+		i=0
-+		for v in "${vdevs[@]}"; do
-+			mkdir "$target_port/$target_port/lun/lun_$i" || return $?
-+			(
-+				cd "$target_port/$target_port/lun/lun_$i" &&
-+					ln -s "../../../../../core/$v" .
-+			) || return $?
-+			i=$((i+1))
-+		done
-+		for ini in "${initiators[@]}"; do
-+			(
-+				cd "$target_port/$target_port/acls" &&
-+					mkdir "${ini}" &&
-+					cd "${ini}" &&
-+					for ((i = 0; i < ${#vdevs[@]}; i++)) do
-+					    (
-+						    mkdir lun_$i &&
-+							    cd lun_$i &&
-+							    ln -s ../../../lun/lun_$i .
-+					    ) || return $?
-+					done
-+			) || return $?
-+		done
-+		echo 1 >"$target_port/$target_port/enable"
-+	done
-+}
-+
-+function mountpoint() {
-+	if [ -z "$TMPDIR" ]; then
-+		echo "Error: \$TMPDIR has not been set." 1>&2
-+		exit 1
-+	fi
-+	if [ -z "$1" ]; then
-+		echo "Error: missing argument" 1>&2
-+		exit 1
-+	fi
-+	echo "$TMPDIR/mnt$1"
-+}
-+
-+all_primary_gids() {
-+	find /sys/devices -name infiniband | while read -r p; do
-+		cat "$p"/*/ports/*/gids/0
-+	done | grep -v ':0000:0000:0000:0000$'
-+}
-+
-+# Load LIO and configure the SRP target driver and LUNs.
-+start_lio_srpt() {
-+	local b d gid guid i ini_gids ini_guids opts p target_gids target_guids vdev
-+
-+	# shellcheck disable=SC2207
-+	target_guids=($(all_primary_gids | sed 's/^fe80:0000:0000:0000://'))
-+	# shellcheck disable=SC2207
-+	target_gids=($(all_primary_gids | sed 's/^/0x/;s/://g'))
-+	for p in /sys/class/infiniband/*/ports/*; do
-+		[ -e "$p" ] || continue
-+		link_layer=$(<"$p/link_layer")
-+		case "$link_layer" in
-+			InfiniBand)
-+				guid=$(<"$p/gids/0")
-+				gid=$(echo "${guid}" | sed 's/^fe8/0x000/;s/://g')
-+				guid=${guid#fe80:0000:0000:0000:}
-+				[ "$guid" = "0000:0000:0000:0000" ] && continue
-+				ini_guids+=("$guid")
-+				ini_gids+=("$gid")
-+				;;
-+			*)
-+				d=$(<"$(dirname "$(dirname "$p")")/parent")
-+				for b in $(get_ipv4_addr "$d") \
-+						 $(get_ipv6_addr "$d"|expand_ipv6_addr); do
-+					ini_guids+=("$b")
-+					ini_gids+=("$b")
-+				done
-+				;;
-+		esac
-+	done
-+	mount_configfs || return $?
-+	modprobe target_core_mod || return $?
-+	modprobe target_core_iblock || return $?
-+	opts=("srp_max_req_size=4200" "dyndbg=+pmf")
-+	if modinfo ib_srpt | grep -q '^parm:[[:blank:]]*rdma_cm_port:'; then
-+		opts+=("rdma_cm_port=${srp_rdma_cm_port}")
-+	fi
-+	insmod "/lib/modules/$(uname -r)/kernel/drivers/infiniband/ulp/srpt/ib_srpt.ko" "${opts[@]}" || return $?
-+	i=0
-+	for r in "${vdev_path[@]}"; do
-+		if [ -b "$(readlink -f "$r")" ]; then
-+			oflag=oflag=direct
-+		else
-+			oflag=
-+		fi
-+		echo -n "Zero-initializing $r ... " >>"$FULL"
-+		dd if=/dev/zero of="${r}" bs=1M count=$((ramdisk_size>>20)) ${oflag} >/dev/null 2>&1 || return $?
-+		echo "done" >>"$FULL"
-+		mkdir -p "$(mountpoint $i)" || return $?
-+		((i++))
-+	done
-+	for ((i=0; i < ${#vdevs[@]}; i++)); do
-+		d="$(dirname "${vdevs[i]}")"
-+		b="$(basename "${vdevs[i]}")"
-+		hs=$(lio_scsi_mpath_id "$i")
-+		hs=${hs#36001405}
-+		configure_lio_vdev "$d" "$b" "${vdev_path[i]}" "$hs" ||
-+			return $?
-+	done
-+	(
-+		cd /sys/kernel/config/target || return $?
-+		mkdir srpt || return $?
-+		cd srpt || return $?
-+		if [ -e discovery_auth/rdma_cm_port ]; then
-+			echo "${srp_rdma_cm_port}" > discovery_auth/rdma_cm_port ||
-+				return $?
-+		fi
-+		configure_target_ports "${target_guids[@]}" -- "${ini_guids[@]}" || {
-+			echo "Retrying with old port name format"
-+			configure_target_ports "${target_gids[@]}" -- "${ini_gids[@]}"
++static void null_zone_fill_rq(struct nullb_device *dev, struct request *rq,
++			      unsigned int zno, unsigned int nr_zones)
++{
++	struct blk_zone_report_hdr *hdr = NULL;
++	struct bio_vec bvec;
++	struct bvec_iter iter;
++	void *addr;
++	unsigned int zones_to_cpy;
++
++	bio_for_each_segment(bvec, rq->bio, iter) {
++		addr = kmap_atomic(bvec.bv_page);
++
++		zones_to_cpy = bvec.bv_len / sizeof(struct blk_zone);
++
++		if (!hdr) {
++			hdr = (struct blk_zone_report_hdr *)addr;
++			hdr->nr_zones = nr_zones;
++			zones_to_cpy--;
++			addr += sizeof(struct blk_zone_report_hdr);
 +		}
-+	)
-+}
 +
-+# Check whether or not an rdma_rxe instance has been associated with network
-+# interface $1.
-+has_rdma_rxe() {
-+	local f
++		zones_to_cpy = min_t(unsigned int, zones_to_cpy, nr_zones);
 +
-+	for f in /sys/class/infiniband/*/parent; do
-+		if [ -e "$f" ] && [ "$(<"$f")" = "$1" ]; then
-+			return 0
-+		fi
-+	done
++		memcpy(addr, &dev->zones[zno],
++				zones_to_cpy * sizeof(struct blk_zone));
 +
-+	return 1
-+}
++		kunmap_atomic(addr);
 +
-+# Load the rdma_rxe kernel module and associate it with all network interfaces.
-+start_rdma_rxe() {
-+	{
-+		modprobe rdma_rxe || return $?
-+		(
-+			cd /sys/class/net &&
-+				for i in *; do
-+					if [ -e "$i" ] && ! has_rdma_rxe "$i"; then
-+						echo "$i" > /sys/module/rdma_rxe/parameters/add
-+					fi
-+				done
-+		)
-+	} >>"$FULL"
-+}
++		nr_zones -= zones_to_cpy;
++		zno += zones_to_cpy;
 +
-+# Dissociate the rdma_rxe kernel module from all network interfaces and unload
-+# the rdma_rxe kernel module.
-+stop_rdma_rxe() {
-+	(
-+		cd /sys/class/net &&
-+			for i in *; do
-+				if [ -e "$i" ] && has_rdma_rxe "$i"; then
-+					{ echo "$i" > /sys/module/rdma_rxe/parameters/remove; } \
-+						2>/dev/null
-+				fi
-+			done
-+	)
-+	if ! unload_module rdma_rxe; then
-+		echo "Unloading rdma_rxe failed"
-+		return 1
-+	fi
-+}
-+
-+scsi_debug_dev_path() {
-+	local bd="" d
-+
-+	for d in /sys/bus/pseudo/drivers/scsi_debug/adapter*/host*/target*/*/block/*; do
-+		[ -e "$d" ] || continue
-+		bd=${d/*\//}
-+	done
-+	[ -n "$bd" ] || return 1
-+	echo "/dev/$bd"
-+}
-+
-+# Unload the LIO SRP target driver.
-+stop_lio_srpt() {
-+	local e m
-+
-+	mkdir -p /etc/target
-+	for e in /sys/kernel/config/target/srpt/*/*/enable; do
-+		if [ -e "$e" ]; then
-+			echo 0 >"$e"
-+		fi
-+	done
-+
-+	if [ -e /sys/kernel/config/target/srpt ]; then
-+		(
-+			cd /sys/kernel/config/target/srpt && (
-+				for d in */*/acls/*/*/lun*; do [ -L "$d" ] && rm "$d"; done
-+				for d in */*/acls/*/lun*; do [ -d "$d" ] && rmdir "$d"; done
-+				for d in */*/acls/*; do [ -d "$d" ] && rmdir "$d"; done
-+				for d in */*/lun/lun*/*; do [ -L "$d" ] && rm "$d"; done
-+				for d in */*/lun/lun*; do [ -d "$d" ] && rmdir "$d"; done
-+				for d in */*; do [ -e "$d/lun" ] && rmdir "$d"; done
-+				for d in *; do [ -e "$d/fabric_statistics" ] && rmdir "$d"; done
-+				true
-+			) &&
-+				cd .. &&
-+				for ((i=0;i<10;i++)); do
-+					rmdir srpt
-+					[ -e srpt ] || break
-+					sleep .1
-+				done &&
-+				[ ! -e srpt ] &&
-+				unload_module ib_srpt 10
-+		) || return $?
-+	fi
-+
-+	rmdir /sys/kernel/config/target/core/*/* >&/dev/null
-+	rmdir /sys/kernel/config/target/core/* >&/dev/null
-+
-+	for m in ib_srpt target_core_pscsi target_core_iblock target_core_file \
-+			 target_core_stgt target_core_user target_core_mod
-+	do
-+		unload_module $m 10 || return $?
-+	done
-+}
-+
-+# Load and configure the SRP target driver
-+start_srpt() {
-+	local bd i
-+
-+	modprobe scsi_debug delay=0 dif=3 dix=1 dev_size_mb=$((ramdisk_size>>20))
-+	for ((i=0;i<10;i++)); do
-+		bd=$(scsi_debug_dev_path) && break
-+		sleep .1
-+	done
-+	if [ -z "$bd" ]; then
-+		echo "scsi_debug device instance not found"
-+		return 1
-+	fi
-+	vdev_path[2]=$bd
-+	modprobe ib_uverbs
-+	modprobe ib_umad
-+	modprobe rdma_cm
-+	start_lio_srpt || return $?
-+	echo "Configured SRP target driver"
-+}
-+
-+# Unload the SRP target driver.
-+stop_srpt() {
-+	stop_lio_srpt || return $?
-+	unload_module scsi_debug
-+}
-+
-+configure_nvmet_port() {
-+	local p=$1 ipv4_addr=$2 i
-+
-+	echo "Configuring $p with address $ipv4_addr as an NVMeOF target port" \
-+	     >>"$FULL"
-+	(
-+		cd /sys/kernel/config/nvmet/ports &&
-+			for ((i=1;1;i++)); do [ -e "$i" ] || break; done &&
-+			mkdir "$i" &&
-+			cd "$i" &&
-+			echo ipv4            > addr_adrfam &&
-+			echo rdma            > addr_trtype &&
-+			echo -n "$ipv4_addr" > addr_traddr &&
-+			echo -n ${nvme_port} > addr_trsvcid
-+	)
-+}
-+
-+start_nvme_target() {
-+	local d i ipv4_addr num_ports=0 nvme_dev=1
-+
-+	if have_brd; then
-+		modprobe brd rd_nr=${#vdev_path[@]} rd_size=$((ramdisk_size>>10))
-+	fi &&
-+		modprobe nvme dyndbg=+pmf &&
-+		modprobe nvmet-rdma dyndbg=+pmf &&
-+		sleep .1 &&
-+		(
-+			cd /sys/kernel/config/nvmet/subsystems &&
-+				mkdir ${nvme_subsysnqn} &&
-+				cd ${nvme_subsysnqn} &&
-+				cd namespaces &&
-+				mkdir "${nvme_dev}" &&
-+				cd "${nvme_dev}" &&
-+				echo 00000000-0000-0000-0000-000000000000 >device_nguid &&
-+				echo -n /dev/ram0 >device_path &&
-+				echo 1 >enable &&
-+				cd ../.. &&
-+				echo 1 >attr_allow_any_host
-+		) && for i in $(rdma_network_interfaces); do
-+			ipv4_addr=$(get_ipv4_addr "$i")
-+			if [ -n "${ipv4_addr}" ]; then
-+				configure_nvmet_port "$i" "${ipv4_addr}"
-+				((num_ports++))
-+				true
-+			fi
-+		done &&
-+		if [ $num_ports = 0 ]; then
-+			echo "No NVMeOF target ports"
-+			false
-+		fi && (
-+			cd /sys/kernel/config/nvmet/ports &&
-+				for i in *; do
-+					[ -e "$i" ] && (
-+						cd "$i/subsystems" &&
-+							ln -s "../../../subsystems/${nvme_subsysnqn}" .
-+					)
-+				done
-+		)
-+}
-+
-+stop_nvme_target() {
-+	local d
-+
-+	(
-+		cd /sys/kernel/config/nvmet 2>/dev/null &&
-+			rm -f -- ports/*/subsystems/* &&
-+			for d in {*/*/*/*,*/*}; do
-+				[ -e "$d" ] && rmdir "$d"
-+			done
-+	)
-+	unload_module nvmet_rdma &&
-+		unload_module nvmet &&
-+		have_brd && unload_module brd
-+}
-+
-+start_target() {
-+	start_rdma_rxe
-+	(
-+		echo "RDMA interfaces:"
-+		cd /sys/class/infiniband &&
-+			for i in *; do
-+				[ -e "$i" ] || continue
-+				for p in "$i/ports/"*; do
-+					echo "$i, port $(basename "$p"): $(<"$p/gids/0")"
-+				done
-+			done
-+	) &>>"$FULL"
-+	if [ -n "$nvme" ]; then
-+		start_nvme_target
-+	else
-+		start_srpt
-+	fi
-+}
-+
-+stop_target() {
-+	if [ -n "$nvme" ]; then
-+		stop_nvme_target
-+	else
-+		stop_srpt
-+	fi
-+	stop_rdma_rxe || return $?
-+}
-+
-+# Look up the block device below the filesystem for directory $1.
-+block_dev_of_dir() {
-+	df "$1" | {
-+		read -r header
-+		echo "$header" >/dev/null
-+		read -r blockdev rest
-+		echo "$blockdev"
++		if (!nr_zones)
++			break;
 +	}
 +}
 +
-+create_filesystem() {
-+	local dev=$1
++blk_status_t null_zone_report(struct nullb *nullb,
++				     struct nullb_cmd *cmd)
++{
++	struct nullb_device *dev = nullb->dev;
++	struct request *rq = cmd->rq;
++	unsigned int zno = null_zone_no(dev, blk_rq_pos(rq));
++	unsigned int nr_zones = dev->nr_zones - zno;
++	unsigned int max_zones = (blk_rq_bytes(rq) /
++					sizeof(struct blk_zone)) - 1;
 +
-+	case "$filesystem_type" in
-+		ext4)
-+			mkfs.ext4 -F -O ^has_journal -q "$dev";;
-+		xfs)
-+			mkfs.xfs -f -q "$dev";;
-+		*)
-+			return 1;;
-+	esac
++	nr_zones = min_t(unsigned int, nr_zones, max_zones);
++
++	null_zone_fill_rq(nullb->dev, rq, zno, nr_zones);
++
++	return BLK_STS_OK;
 +}
 +
-+is_mountpoint() {
-+	[ -n "$1" ] &&
-+		[ -d "$1" ] &&
-+		[ "$(block_dev_of_dir "$1")" != \
-+					     "$(block_dev_of_dir "$(dirname "$1")")" ]
++void null_zone_write(struct nullb_cmd *cmd)
++{
++	struct nullb_device *dev = cmd->nq->dev;
++	struct request *rq = cmd->rq;
++	sector_t sector = blk_rq_pos(rq);
++	unsigned int rq_sectors = blk_rq_sectors(rq);
++	unsigned int zno = null_zone_no(dev, sector);
++	struct blk_zone *zone = &dev->zones[zno];
++
++	switch (zone->cond) {
++	case BLK_ZONE_COND_FULL:
++		/* Cannot write to a full zone */
++		cmd->error = BLK_STS_IOERR;
++		break;
++	case BLK_ZONE_COND_EMPTY:
++	case BLK_ZONE_COND_IMP_OPEN:
++		/* Writes must be at the write pointer position */
++		if (blk_rq_pos(rq) != zone->wp) {
++			cmd->error = BLK_STS_IOERR;
++			break;
++		}
++
++		if (zone->cond == BLK_ZONE_COND_EMPTY)
++			zone->cond = BLK_ZONE_COND_IMP_OPEN;
++
++		zone->wp += rq_sectors;
++		if (zone->wp == zone->start + zone->len)
++			zone->cond = BLK_ZONE_COND_FULL;
++		break;
++	default:
++		/* Invalid zone condition */
++		cmd->error = BLK_STS_IOERR;
++		break;
++	}
 +}
 +
-+# Execute mount "$@" and check whether the mount command has succeeded by
-+# verifying whether after mount has finished that ${$#} is a mountpoint.
-+mount_and_check() {
-+	local dir last
++void null_zone_reset(struct nullb_cmd *cmd)
++{
++	struct nullb_device *dev = cmd->nq->dev;
++	struct request *rq = cmd->rq;
++	unsigned int zno = null_zone_no(dev, blk_rq_pos(rq));
++	struct blk_zone *zone = &dev->zones[zno];
 +
-+	dir=$(for last; do :; done; echo "$last")
-+	mount "$@"
-+	if ! is_mountpoint "$dir"; then
-+		echo "Error: mount $* failed"
-+		return 1
-+	fi
-+}
-+
-+# Unmount the filesystem mounted at mountpoint $1. In contrast with the umount
-+# command, this function does not accept a block device as argument.
-+unmount_and_check() {
-+	local bd m=$1 mp
-+
-+	if is_mountpoint "$m"; then
-+		bd=$(block_dev_of_dir "$m")
-+		mp=$(dev_to_mpath "$bd") 2>/dev/null
-+		if [ -n "$mp" ]; then
-+			dmsetup message "$mp" 0 fail_if_no_path
-+		fi
-+		stop_bdev_users "$bd"
-+		echo "Unmounting $m from $bd" >> "$FULL"
-+		umount "$m" || umount --lazy "$m"
-+	fi
-+	if is_mountpoint "$m"; then
-+		echo "Error: unmounting $m failed"
-+		return 1
-+	fi
-+}
-+
-+# Test whether fio supports command-line options "$@"
-+test_fio_opt() {
-+	local opt
-+
-+	for opt in "$@"; do
-+		opt=${opt//=*}
-+		fio --help |& grep -q -- "${opt}=" && continue
-+		opt=${opt#--}
-+		fio --cmdhelp=all |& grep -q "^${opt}[[:blank:]]" && continue
-+		return 1
-+	done
-+}
-+
-+run_fio() {
-+	local a args avail_kb="" bd="" d="" j opt output
-+
-+	args=("$@")
-+	j=1
-+	for opt in "${args[@]}"; do
-+		case "$opt" in
-+			--directory=*) d="${opt#--directory=}";;
-+			--filename=*)  bd="${opt#--filename=}";;
-+			--numjobs=*)   j="${opt#--numjobs=}";;
-+			--output=*)    output="${opt#--output=}";;
-+		esac
-+	done
-+	if [ -n "$d" ]; then
-+		a=$(df "$d" | grep "^/" |
-+			    {
-+				    if read -r fs blocks used avail use mnt; then
-+					    echo "$avail"
-+					    echo "$fs $blocks $used $use $mnt" >/dev/null
-+				    fi
-+			    }
-+		 )
-+		avail_kb=$a
-+	fi
-+	if [ -n "$bd" ]; then
-+		avail_kb=$(("$(blockdev --getsz "$bd")" / 2))
-+	fi
-+	if [ -n "$avail_kb" ]; then
-+		args+=("--size=$(((avail_kb * 1024 * 7 / 10) / j & ~4095))")
-+	fi
-+	for opt in --exitall_on_error=1 --gtod_reduce=1 --aux-path=${fio_aux_path}
-+	do
-+		if test_fio_opt "$opt"; then
-+			args+=("$opt")
-+		fi
-+	done
-+	mkdir -p "${fio_aux_path}"
-+	echo "fio ${args[*]}" >>"$FULL"
-+	fio "${args[@]}" 2>&1 || return $?
-+	if [ -n "$output" ]; then
-+		# Return exit code 1 if no I/O has been performed.
-+		grep -q ', io=[0-9].*, run=[0-9]' "$output"
-+	fi
-+}
-+
-+# Configure two null_blk instances.
-+configure_null_blk() {
-+	local i
-+
-+	(
-+		cd /sys/kernel/config/nullb || return $?
-+		for i in nullb0 nullb1; do (
-+			{ mkdir -p $i &&
-+				  cd $i &&
-+				  echo 0 > completion_nsec &&
-+				  echo 512 > blocksize &&
-+				  echo $((ramdisk_size>>20)) > size &&
-+				  echo 1 > memory_backed &&
-+				  echo 1 > power; } || exit $?
-+		) done
-+	)
-+	ls -l /dev/nullb* &>>"$FULL"
-+}
-+
-+unload_null_blk() {
-+	local d
-+
-+	for d in /sys/kernel/config/nullb/*; do [ -d "$d" ] && rmdir "$d"; done
-+	unload_module null_blk
-+}
-+
-+shutdown_client() {
-+	remove_mpath_devs &&
-+		log_out &&
-+		stop_client
-+}
-+
-+# Undo setup()
-+teardown() {
-+	killall -9 multipathd >&/dev/null
-+	stop_target
-+	unload_null_blk
-+}
-+
-+# Set up test configuration
-+setup() {
-+	local i m modules
-+
-+	set -u
-+
-+	shutdown_client || return $?
-+
-+	if ! teardown; then
-+		echo "teardown() failed"
-+		return 1
-+	fi
-+
-+	modules=(
-+		configfs
-+		dm-multipath
-+		dm_mod
-+		scsi_dh_alua
-+		scsi_dh_emc
-+		scsi_dh_rdac
-+		scsi_mod
-+	)
-+	for m in "${modules[@]}"; do
-+		[ -e "/sys/module/$m" ] || modprobe "$m" || return $?
-+	done
-+
-+	modprobe null_blk nr_devices=0 || return $?
-+
-+	configure_null_blk
-+
-+	multipathd
-+
-+	# Load the I/O scheduler kernel modules
-+	(
-+		cd "/lib/modules/$(uname -r)/kernel/block" &&
-+			for m in *.ko; do
-+				[ -e "$m" ] && modprobe "${m%.ko}"
-+			done
-+	)
-+
-+	if [ -d /sys/kernel/debug/dynamic_debug ]; then
-+		for m in ; do
-+			echo "module $m +pmf" >/sys/kernel/debug/dynamic_debug/control
-+		done
-+	fi
-+
-+	start_target
++	zone->cond = BLK_ZONE_COND_EMPTY;
++	zone->wp = zone->start;
 +}
 -- 
-2.18.0
+2.11.0
