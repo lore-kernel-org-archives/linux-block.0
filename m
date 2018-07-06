@@ -1,55 +1,39 @@
-Return-Path: <gustavo@embeddedor.com>
-Date: Mon, 2 Jul 2018 12:49:02 -0500
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To: Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] drbd: mark expected switch fall-throughs
-Message-ID: <20180702174902.GA18713@embeddedor.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:58398 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753069AbeGFIVI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 6 Jul 2018 04:21:08 -0400
+Date: Fri, 6 Jul 2018 10:21:06 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Omar Sandoval <osandov@osandov.com>,
+        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>
+Subject: Re: [PATCH blktests] dir-locals: fix indenation with Emacs
+Message-ID: <20180706082106.gbo3332lkvcssdib@linux-x5ow.site>
+References: <20180704115938.15060-1-jthumshirn@suse.de>
+ <70824b8f-a6e3-41a4-3ac9-bbf5b2e6618f@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <70824b8f-a6e3-41a4-3ac9-bbf5b2e6618f@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-In preparation to enabling -Wimplicit-fallthrough, mark switch cases
-where we are expecting to fall through.
+On Thu, Jul 05, 2018 at 11:13:48AM -0700, Bart Van Assche wrote:
+> On 07/04/18 04:59, Johannes Thumshirn wrote:
+> > A recent update of Emacs broke .dir-locals.el's shell indendation
+> > setting.
+> 
+> Please fix the spelling of "indentation" in the subject and in the above
+> sentence. Additionally, the previous patch for this file had
+> "dir-locals.el:" as subject-prefix. Should this patch have the same subject
+> prefix?
 
-Warning level 2 was used in this case: -Wimplicit-fallthrough=2
+Yup, done.
 
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
----
- drivers/block/drbd/drbd_receiver.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index be9450f..a36a307 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -2790,6 +2790,7 @@ static int receive_DataRequest(struct drbd_connection *connection, struct packet
- 		   then we would do something smarter here than reading
- 		   the block... */
- 		peer_req->flags |= EE_RS_THIN_REQ;
-+		/* fall through */
- 	case P_RS_DATA_REQUEST:
- 		peer_req->w.cb = w_e_end_rsdata_req;
- 		fault_type = DRBD_FAULT_RS_RD;
-@@ -2968,6 +2969,7 @@ static int drbd_asb_recover_0p(struct drbd_peer_device *peer_device) __must_hold
- 		/* Else fall through to one of the other strategies... */
- 		drbd_warn(device, "Discard younger/older primary did not find a decision\n"
- 		     "Using discard-least-changes instead\n");
-+		/* fall through */
- 	case ASB_DISCARD_ZERO_CHG:
- 		if (ch_peer == 0 && ch_self == 0) {
- 			rv = test_bit(RESOLVE_CONFLICTS, &peer_device->connection->flags)
-@@ -2979,6 +2981,7 @@ static int drbd_asb_recover_0p(struct drbd_peer_device *peer_device) __must_hold
- 		}
- 		if (after_sb_0p == ASB_DISCARD_ZERO_CHG)
- 			break;
-+		/* else: fall through */
- 	case ASB_DISCARD_LEAST_CHG:
- 		if	(ch_self < ch_peer)
- 			rv = -1;
 -- 
-2.7.4
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
