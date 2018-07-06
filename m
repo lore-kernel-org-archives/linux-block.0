@@ -1,137 +1,224 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	linux-kernel@vger.kernel.org,
-	akpm@linux-foundation.org,
-	hannes@cmpxchg.org,
-	tj@kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Subject: [PATCH 0/14][V6] Introduce io.latency io controller for cgroups
-Date: Tue,  3 Jul 2018 11:14:49 -0400
-Message-Id: <20180703151503.2549-1-josef@toxicpanda.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:37446 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933733AbeGFRjQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Jul 2018 13:39:16 -0400
+Received: by mail-lf0-f66.google.com with SMTP id j8-v6so10423577lfb.4
+        for <linux-block@vger.kernel.org>; Fri, 06 Jul 2018 10:39:15 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        bart.vanassche@wdc.com, damien.lemoal@wdc.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias.bjorling@wdc.com>
+Subject: [PATCH 1/2] null_blk: move shared definitions to header file
+Date: Fri,  6 Jul 2018 19:38:38 +0200
+Message-Id: <20180706173839.28355-2-mb@lightnvm.io>
+In-Reply-To: <20180706173839.28355-1-mb@lightnvm.io>
+References: <20180706173839.28355-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-kbuild test bot took a while to tell me I had a problem.
+From: Matias Bjørling <matias.bjorling@wdc.com>
 
-v5->v6:
-- fix a !CONFIG_BLOCK compile error.
-- added some commenting around the scale cookie change stuff.
-- rebased onto Jens's for-linus branch.
+Split the null_blk device driver, such that it can prepare for
+zoned block interface support.
 
-v4->v5:
-- fix lockdep mess with the stat stuff I hadn't noticed until now.
-- fixed the wait loop so it would actually break properly.
-- fixed a problem where unconfigured groups weren't being throttled.
-- fixed some spelling mistakes.
+Signed-off-by: Matias Bjørling <matias.bjorling@wdc.com>
+---
+ drivers/block/null_blk.c | 76 +--------------------------------------------
+ drivers/block/null_blk.h | 80 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 81 insertions(+), 75 deletions(-)
+ create mode 100644 drivers/block/null_blk.h
 
-v3->v4:
-- deal with a child having a configuration but the parent not.
-- fix use of setup_timer, there was an API change between the kernel I
-  wrote/tested these patches on and the current kernel.
-- change the initialization location for iolatency.
-- fix some spelling mistakes in the documentation.
-
-v2->v3:
-- added "skip readahead if the cgroup is congested".  During testing we would
-  see stalls on taking mmap_sem because something was doing 'ps' or some other
-  such thing and getting stuck because the throttled group was getting hit
-  particularly hard trying to do readahead.  This is a weird sort of priority
-  inversion, fixed it by skipping readahead if we're currently congested to not
-  only help the overall latency of the throttled group, but reduce the priority
-  inversion associated with higher priority tasks getting stuck trying to read
-  /proc files for tasks that are stuck.
-- added "block: use irq variant for blkcg->lock" to address a lockdep warning
-  seen during testing.
-- add a blk_cgroup_congested() helper to check for congestion in a hierarchical
-  way.
-- Fixed some assumptions related to accessing blkg out of band that resulted in
-  panics.
-- Made the throttling stuff only throttle if the group has done a decent amount
-  of IO in the last window.
-- Fix the wake up logic to reduce the thundering herd issues we saw in testing.
-- Put a limit on how much of a hole we can dig into the artificial delay stuff.
-  We were seeing in multiple back to back tests that we'd get so deep into the
-  delay count that we'd take hours to unthrottle.  This stuff was originally
-  introduced to keep us from flapping from delay to no delay if we had bursty
-  behavior from the misbehaving group, so capping this keeps that protection
-  while also keeping us from throttling forever.
-- Limit the maximum delay to 250ms from 1 second.  There was a bug in the
-  congestion checking stuff, it wasn't taking into account the hierarchy so we
-  would sometimes not throttle when we needed to, which led me to have a 1
-  second maximum.  However when that bug was fixed it turned out 1 second was
-  too much, so limit to 250ms like balance dirty pages does.
-
-v1->v2:
-- fix how we get the swap device for the page when doing the swap throttling.
-- add a bunch of comments how the throttling works.
-- move the documentation to cgroup-v2.txt
-- address the various other comments.
-
-==== Original message =====
-
-This series adds a latency based io controller for cgroups.  It is based on the
-same concept as the writeback throttling code, which is watching the overall
-total latency of IO's in a given window and then adjusting the queue depth of
-the group accordingly.  This is meant to be a workload protection controller, so
-whoever has the lowest latency target gets the preferential treatment with no
-thought to fairness or proportionality.  It is meant to be work conserving, so
-as long as nobody is missing their latency targets the disk is fair game.
-
-We have been testing this in production for several months now to get the
-behavior right and we are finally at the point that it is working well in all of
-our test cases.  With this patch we protect our main workload (the web server)
-and isolate out the system services (chef/yum/etc).  This works well in the
-normal case, smoothing out weird request per second (RPS) dips that we would see
-when one of the system services would run and compete for IO resources.  This
-also works incredibly well in the runaway task case.
-
-The runaway task usecase is where we have some task that slowly eats up all of
-the memory on the system (think a memory leak).  Previously this sort of
-workload would push the box into a swapping/oom death spiral that was only
-recovered by rebooting the box.  With this patchset and proper configuration of
-the memory.low and io.latency controllers we're able to survive this test with a
-at most 20% dip in RPS.
-
-There are a lot of extra patches in here to set everything up.  The following
-are just infrastructure that should be relatively uncontroversial
-
-[PATCH 01/13] block: add bi_blkg to the bio for cgroups
-[PATCH 02/13] block: introduce bio_issue_as_root_blkg
-[PATCH 03/13] blk-cgroup: allow controllers to output their own stats
-
-The following simply allow us to tag swap IO and assign the appropriate cgroup
-to the bio's so we can do the appropriate accounting inside the io controller
-
-[PATCH 04/13] blk: introduce REQ_SWAP
-[PATCH 05/13] swap,blkcg: issue swap io with the appropriate context
-
-This is so that we can induce delays.  The io controller mostly throttles based
-on queue depth, however for cases like REQ_SWAP/REQ_META where we cannot
-throttle without inducing a priority inversion we have a mechanism to "back
-charge" groups for this IO by inducing an artificial delay at user space return
-time.
-
-[PATCH 06/13] blkcg: add generic throttling mechanism
-[PATCH 07/13] memcontrol: schedule throttling if we are congested
-
-This is more moving things around and refactoring, Jens you may want to pay
-close attention to this to make sure I didn't break anything.
-
-[PATCH 08/13] blk-stat: export helpers for modifying blk_rq_stat
-[PATCH 09/13] blk-rq-qos: refactor out common elements of blk-wbt
-[PATCH 10/13] block: remove external dependency on wbt_flags
-[PATCH 11/13] rq-qos: introduce dio_bio callback
-
-And this is the meat of the controller and it's documentation.
-
-[PATCH 12/13] block: introduce blk-iolatency io controller
-[PATCH 13/13] Documentation: add a doc for blk-iolatency
-
-Jens, I'm sending this through your tree since it's mostly block related,
-however there are the two mm related patches, so if somebody from mm could weigh
-in on how we want to handle those that would be great.  Thanks,
-
-Josef
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index 042c778e5a4e..cd4b0849d3b4 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -7,14 +7,8 @@
+ #include <linux/moduleparam.h>
+ #include <linux/sched.h>
+ #include <linux/fs.h>
+-#include <linux/blkdev.h>
+ #include <linux/init.h>
+-#include <linux/slab.h>
+-#include <linux/blk-mq.h>
+-#include <linux/hrtimer.h>
+-#include <linux/configfs.h>
+-#include <linux/badblocks.h>
+-#include <linux/fault-inject.h>
++#include "null_blk.h"
+ 
+ #define PAGE_SECTORS_SHIFT	(PAGE_SHIFT - SECTOR_SHIFT)
+ #define PAGE_SECTORS		(1 << PAGE_SECTORS_SHIFT)
+@@ -35,28 +29,6 @@ static inline u64 mb_per_tick(int mbps)
+ 	return (1 << 20) / TICKS_PER_SEC * ((u64) mbps);
+ }
+ 
+-struct nullb_cmd {
+-	struct list_head list;
+-	struct llist_node ll_list;
+-	struct __call_single_data csd;
+-	struct request *rq;
+-	struct bio *bio;
+-	unsigned int tag;
+-	blk_status_t error;
+-	struct nullb_queue *nq;
+-	struct hrtimer timer;
+-};
+-
+-struct nullb_queue {
+-	unsigned long *tag_map;
+-	wait_queue_head_t wait;
+-	unsigned int queue_depth;
+-	struct nullb_device *dev;
+-	unsigned int requeue_selection;
+-
+-	struct nullb_cmd *cmds;
+-};
+-
+ /*
+  * Status flags for nullb_device.
+  *
+@@ -92,52 +64,6 @@ struct nullb_page {
+ #define NULLB_PAGE_LOCK (MAP_SZ - 1)
+ #define NULLB_PAGE_FREE (MAP_SZ - 2)
+ 
+-struct nullb_device {
+-	struct nullb *nullb;
+-	struct config_item item;
+-	struct radix_tree_root data; /* data stored in the disk */
+-	struct radix_tree_root cache; /* disk cache data */
+-	unsigned long flags; /* device flags */
+-	unsigned int curr_cache;
+-	struct badblocks badblocks;
+-
+-	unsigned long size; /* device size in MB */
+-	unsigned long completion_nsec; /* time in ns to complete a request */
+-	unsigned long cache_size; /* disk cache size in MB */
+-	unsigned int submit_queues; /* number of submission queues */
+-	unsigned int home_node; /* home node for the device */
+-	unsigned int queue_mode; /* block interface */
+-	unsigned int blocksize; /* block size */
+-	unsigned int irqmode; /* IRQ completion handler */
+-	unsigned int hw_queue_depth; /* queue depth */
+-	unsigned int index; /* index of the disk, only valid with a disk */
+-	unsigned int mbps; /* Bandwidth throttle cap (in MB/s) */
+-	bool blocking; /* blocking blk-mq device */
+-	bool use_per_node_hctx; /* use per-node allocation for hardware context */
+-	bool power; /* power on/off the device */
+-	bool memory_backed; /* if data is stored in memory */
+-	bool discard; /* if support discard */
+-};
+-
+-struct nullb {
+-	struct nullb_device *dev;
+-	struct list_head list;
+-	unsigned int index;
+-	struct request_queue *q;
+-	struct gendisk *disk;
+-	struct blk_mq_tag_set *tag_set;
+-	struct blk_mq_tag_set __tag_set;
+-	unsigned int queue_depth;
+-	atomic_long_t cur_bytes;
+-	struct hrtimer bw_timer;
+-	unsigned long cache_flush_pos;
+-	spinlock_t lock;
+-
+-	struct nullb_queue *queues;
+-	unsigned int nr_queues;
+-	char disk_name[DISK_NAME_LEN];
+-};
+-
+ static LIST_HEAD(nullb_list);
+ static struct mutex lock;
+ static int null_major;
+diff --git a/drivers/block/null_blk.h b/drivers/block/null_blk.h
+new file mode 100644
+index 000000000000..d82c5501806d
+--- /dev/null
++++ b/drivers/block/null_blk.h
+@@ -0,0 +1,80 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __BLK_NULL_BLK_H
++#define __BLK_NULL_BLK_H
++
++#include <linux/blkdev.h>
++#include <linux/slab.h>
++#include <linux/blk-mq.h>
++#include <linux/hrtimer.h>
++#include <linux/configfs.h>
++#include <linux/badblocks.h>
++#include <linux/fault-inject.h>
++
++struct nullb_cmd {
++	struct list_head list;
++	struct llist_node ll_list;
++	struct __call_single_data csd;
++	struct request *rq;
++	struct bio *bio;
++	unsigned int tag;
++	blk_status_t error;
++	struct nullb_queue *nq;
++	struct hrtimer timer;
++};
++
++struct nullb_queue {
++	unsigned long *tag_map;
++	wait_queue_head_t wait;
++	unsigned int queue_depth;
++	struct nullb_device *dev;
++	unsigned int requeue_selection;
++
++	struct nullb_cmd *cmds;
++};
++
++struct nullb_device {
++	struct nullb *nullb;
++	struct config_item item;
++	struct radix_tree_root data; /* data stored in the disk */
++	struct radix_tree_root cache; /* disk cache data */
++	unsigned long flags; /* device flags */
++	unsigned int curr_cache;
++	struct badblocks badblocks;
++
++	unsigned long size; /* device size in MB */
++	unsigned long completion_nsec; /* time in ns to complete a request */
++	unsigned long cache_size; /* disk cache size in MB */
++	unsigned int submit_queues; /* number of submission queues */
++	unsigned int home_node; /* home node for the device */
++	unsigned int queue_mode; /* block interface */
++	unsigned int blocksize; /* block size */
++	unsigned int irqmode; /* IRQ completion handler */
++	unsigned int hw_queue_depth; /* queue depth */
++	unsigned int index; /* index of the disk, only valid with a disk */
++	unsigned int mbps; /* Bandwidth throttle cap (in MB/s) */
++	bool blocking; /* blocking blk-mq device */
++	bool use_per_node_hctx; /* use per-node allocation for hardware context */
++	bool power; /* power on/off the device */
++	bool memory_backed; /* if data is stored in memory */
++	bool discard; /* if support discard */
++};
++
++struct nullb {
++	struct nullb_device *dev;
++	struct list_head list;
++	unsigned int index;
++	struct request_queue *q;
++	struct gendisk *disk;
++	struct blk_mq_tag_set *tag_set;
++	struct blk_mq_tag_set __tag_set;
++	unsigned int queue_depth;
++	atomic_long_t cur_bytes;
++	struct hrtimer bw_timer;
++	unsigned long cache_flush_pos;
++	spinlock_t lock;
++
++	struct nullb_queue *queues;
++	unsigned int nr_queues;
++	char disk_name[DISK_NAME_LEN];
++};
++#endif /* __NULL_BLK_H */
+-- 
+2.11.0
