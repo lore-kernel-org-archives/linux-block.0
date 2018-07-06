@@ -1,34 +1,32 @@
-Return-Path: <gedwards@ddn.com>
-From: Greg Edwards <gedwards@ddn.com>
-To: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>
-CC: Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen"
-	<martin.petersen@oracle.com>, Greg Edwards <gedwards@ddn.com>
-Subject: [PATCH 0/2] virtio_scsi pi_bytes{out,in} miscalculated on 4 KiB devices
-Date: Wed, 25 Jul 2018 10:22:57 -0400
-Message-ID: <20180725142259.20562-1-gedwards@ddn.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] null_blk: remove NULLB_DEV_FL_CONFIGURED on turning off
+ nullb device
+To: Liu Bo <bo.liu@linux.alibaba.com>, linux-block@vger.kernel.org
+References: <1530817633-128360-1-git-send-email-bo.liu@linux.alibaba.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <49a67d84-f6a5-193a-f9ce-e6dd72927913@kernel.dk>
+Date: Fri, 6 Jul 2018 07:47:38 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: gedwards@ddn.com
+In-Reply-To: <1530817633-128360-1-git-send-email-bo.liu@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-When the VIRTIO_SCSI_F_T10_PI feature bit is enabled, the virtio_scsi driver
-does not correctly calculate pi_bytes{out,in} when the underlying device has a
-4 KiB logical block size.  The current code assumes a 512 byte logical block
-size and protection interval exponent of 0 (512 bytes + 8 bytes PI).
+On 7/5/18 1:07 PM, Liu Bo wrote:
+> Currently mbps knob could only be set once before switching power knob to
+> on, after power knob has been set at least once, there is no way to set
+> mbps knob again due to -EBUSY.
+> 
+> As nullb is mainly used for testing, in order to make it flexible, this
+> removes the flag NULLB_DEV_FL_CONFIGURED so that mbps knob can be reset
+> when power knob is off, e.g.
+> 
+> echo 0 > /config/nullb/a/power
+> echo 40 > /config/nullb/a/mbps
+> echo 1 > /config/nullb/a/power
+> 
+> So does other knobs under /config/nullb/a.
 
-The first patch moves bio_integrity_intervals() and bio_integrity_bytes() into
-blkdev.h so drivers can make use of them.  The second patch modifies
-virtio_scsi to call bio_integrity_bytes() to get the values for
-pi_bytes{out,in}.
-
-Greg Edwards (2):
-  block: move bio_integrity_{intervals,bytes} into blkdev.h
-  scsi: virtio_scsi: fix pi_bytes{out,in} on 4 KiB block size devices
-
- block/bio-integrity.c      | 22 ----------------------
- drivers/scsi/virtio_scsi.c |  8 ++++----
- include/linux/blkdev.h     | 34 ++++++++++++++++++++++++++++++++++
- 3 files changed, 38 insertions(+), 26 deletions(-)
+Applied for 4.19, thanks.
 
 -- 
-2.17.1
+Jens Axboe
