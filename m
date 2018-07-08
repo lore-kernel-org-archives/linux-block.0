@@ -1,67 +1,61 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f67.google.com ([209.85.160.67]:46970 "EHLO
-        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725930AbeGMJDN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jul 2018 05:03:13 -0400
-Received: by mail-pl0-f67.google.com with SMTP id 30-v6so11915319pld.13
-        for <linux-block@vger.kernel.org>; Fri, 13 Jul 2018 01:49:34 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        bart.vanassche@wdc.com, hans.holmberg@cnexlabs.com,
-        javier@cnexlabs.com, hlitz@ucsc.edu, igor.j.konopko@intel.com,
-        marcin.dziegielewski@intel.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 06/10] lightnvm: limit get chunk meta request size
-Date: Fri, 13 Jul 2018 10:48:41 +0200
-Message-Id: <20180713084845.19511-7-mb@lightnvm.io>
-In-Reply-To: <20180713084845.19511-1-mb@lightnvm.io>
-References: <20180713084845.19511-1-mb@lightnvm.io>
+Received: from bombadil.infradead.org ([198.137.202.133]:35948 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754234AbeGHUZg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Jul 2018 16:25:36 -0400
+Received: from [208.118.126.250] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1fcGFS-0002UD-De
+        for linux-block@vger.kernel.org; Sun, 08 Jul 2018 20:25:34 +0000
+Date: Sun, 8 Jul 2018 14:25:33 -0600
+From: Christoph Hellwig <hch@infradead.org>
+To: linux-block@vger.kernel.org
+Subject: [ANNOUNCE] Alpine Linux Persistence and Storage Summit
+Message-ID: <20180708202533.GA18160@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-For devices that does not specify a limit on its transfer size, the
-get_chk_meta command may send down a single I/O retrieving the full
-chunk metadata table. Resulting in large 2-4MB I/O requests. Instead,
-split up the I/Os to a maximum of 256KB and issue them separately to
-reduce memory requirements.
+We proudly announce the second Alpine Linux Persistence and Storage
+Summit (ALPSS), which will be held September 11-14 at the Lizumerhuette
+[1][2] in Austria .
 
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
-Reviewed-by: Javier González <javier@cnexlabs.com>
----
- drivers/nvme/host/lightnvm.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+The goal of this conference is to discuss the hot topics in Linux storage
+and file systems, such as persistent memory, NVMe, multi-pathing, raw or
+open channel flash and I/O scheduling in a cool and relaxed setting with
+spectacular views in the Austrian alps.
 
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index a76db8820f1c..d9e4cccd5b66 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -583,7 +583,13 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
- 	struct ppa_addr ppa;
- 	size_t left = nchks * sizeof(struct nvme_nvm_chk_meta);
- 	size_t log_pos, offset, len;
--	int ret, i;
-+	int ret, i, max_len;
-+
-+	/*
-+	 * limit requests to maximum 256K to avoid issuing arbitrary large
-+	 * requests when the device does not specific a maximum transfer size.
-+	 */
-+	max_len = min_t(unsigned int, ctrl->max_hw_sectors << 9, 256 * 1024);
- 
- 	/* Normalize lba address space to obtain log offset */
- 	ppa.ppa = slba;
-@@ -596,7 +602,7 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
- 	offset = log_pos * sizeof(struct nvme_nvm_chk_meta);
- 
- 	while (left) {
--		len = min_t(unsigned int, left, ctrl->max_hw_sectors << 9);
-+		len = min_t(unsigned int, left, max_len);
- 
- 		ret = nvme_get_log_ext(ctrl, ns, NVME_NVM_LOG_REPORT_CHUNK,
- 				dev_meta, len, offset);
--- 
-2.11.0
+We plan to have a small selection of short and to the point talks with
+lots of room for discussion in small groups, as well as ample downtime
+to enjoy the surrounding.
+
+Attendance is free except for the accommodation and food at the lodge [3],
+but the number of seats is strictly limited.  If you are interested in
+attending please reserve a seat by mailing your favorite topic(s) to:
+
+	alpss-pc@lists.infradead.org
+
+If you are interested in giving a short and crisp talk please also send
+an abstract to the same address.
+
+Note: The Lizumerhuette is an Alpine Society lodge in a high alpine
+environment.  A hike of approximately 2 hours is required to the lodge,
+and no other accommodations are available within walking distance.
+
+More details will eventually be available on our website:
+
+        http://www.alpss.at/
+
+Thank you on behalf of the program committee:
+
+    Stephen Bates
+    Sagi Grimberg
+    Christoph Hellwig
+    Johannes Thumshirn
+    Richard Weinberger
+
+[1] http://www.tyrol.com/things-to-do/sports/hiking/refuge-huts/a-lizumer-hut
+[2] https://www.glungezer.at/l-i-z-u-m-e-r-h-%C3%BC-t-t-e/
+[3] approx. EUR 40-60 per person and night, depending on the room
+    category
