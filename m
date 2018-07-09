@@ -1,69 +1,55 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:35639 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754508AbeGIW4p (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jul 2018 18:56:45 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Omar Sandoval <osandov@fb.com>
 Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	linux-pm@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH RFC 1/4] blk-mq: introduce blk_mq_support_runtime_pm()
-Date: Thu, 12 Jul 2018 00:29:03 +0800
-Message-Id: <20180711162906.14271-2-ming.lei@redhat.com>
-In-Reply-To: <20180711162906.14271-1-ming.lei@redhat.com>
-References: <20180711162906.14271-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH blktests v3 3/6] src/Makefile: Introduce the C_TARGETS variable
+Date: Mon,  9 Jul 2018 15:56:40 -0700
+Message-Id: <20180709225643.10537-4-bart.vanassche@wdc.com>
+In-Reply-To: <20180709225643.10537-1-bart.vanassche@wdc.com>
+References: <20180709225643.10537-1-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-A bit cost has to be added in fast IO path for supporting runtime PM, and
-introduce this helper so that drivers incapable of runtime PM may not be
-affected by this feature.
+This patch does not change any functionality but will make it easier
+to add support for building C++ code.
 
-Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: linux-pm@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 ---
- include/linux/blk-mq.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ src/Makefile | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index d710e92874cc..998ad6602448 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -180,6 +180,7 @@ enum {
- 	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
- 	BLK_MQ_F_TAG_SHARED	= 1 << 1,
- 	BLK_MQ_F_SG_MERGE	= 1 << 2,
-+	BLK_MQ_F_SUPPORT_RPM	= 1 << 3,
- 	BLK_MQ_F_BLOCKING	= 1 << 5,
- 	BLK_MQ_F_NO_SCHED	= 1 << 6,
- 	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
-@@ -249,6 +250,15 @@ static inline u16 blk_mq_unique_tag_to_tag(u32 unique_tag)
- 	return unique_tag & BLK_MQ_UNIQUE_TAG_MASK;
- }
+diff --git a/src/Makefile b/src/Makefile
+index 612282d14af8..7d15d115f6df 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -1,4 +1,4 @@
+-TARGETS := \
++C_TARGETS := \
+ 	loblksize \
+ 	loop_get_status_null \
+ 	openclose \
+@@ -6,6 +6,8 @@ TARGETS := \
+ 	sg/syzkaller1 \
+ 	nbdsetsize
  
-+static inline bool blk_mq_support_runtime_pm(struct request_queue *q)
-+{
-+	struct blk_mq_tag_set *set = q->tag_set;
++TARGETS := $(C_TARGETS)
 +
-+	if (!q->dev || !set || !(set->flags & BLK_MQ_F_SUPPORT_RPM))
-+		return false;
-+
-+	return true;
-+}
+ CFLAGS := -O2
  
- int blk_mq_request_started(struct request *rq);
- void blk_mq_start_request(struct request *rq);
+ all: $(TARGETS)
+@@ -13,7 +15,7 @@ all: $(TARGETS)
+ clean:
+ 	rm -f $(TARGETS)
+ 
+-$(TARGETS): %: %.c
++$(C_TARGETS): %: %.c
+ 	$(CC) -Wall -o $@ $(CPPFLAGS) $(CFLAGS) $^
+ 
+ .PHONY: all clean
 -- 
-2.9.5
+2.18.0
