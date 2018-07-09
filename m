@@ -1,55 +1,39 @@
-Return-Path: <gedwards@ddn.com>
-From: Greg Edwards <gedwards@ddn.com>
-To: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>
-CC: Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen"
-	<martin.petersen@oracle.com>, Greg Edwards <gedwards@ddn.com>
-Subject: [PATCH 2/2] scsi: virtio_scsi: fix pi_bytes{out,in} on 4 KiB block size devices
-Date: Wed, 25 Jul 2018 10:22:59 -0400
-Message-ID: <20180725142259.20562-3-gedwards@ddn.com>
-In-Reply-To: <20180725142259.20562-1-gedwards@ddn.com>
-References: <20180725142259.20562-1-gedwards@ddn.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:57502 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750996AbeGIHPr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 9 Jul 2018 03:15:47 -0400
+Date: Mon, 9 Jul 2018 09:15:45 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>
+Subject: Re: [PATCH blktests v2] dir-locals.el: fix indenation with Emacs
+Message-ID: <20180709071545.yudgrft6e55ijunb@linux-x5ow.site>
+References: <20180706082128.11537-1-jthumshirn@suse.de>
+ <20180706211744.GE25954@vader>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: gedwards@ddn.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180706211744.GE25954@vader>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The current calculation for pi_bytes{out,in} assumes a 512 byte logical
-block size and a protection interval exponent of 0, i.e. 512 bytes data
-+ 8 bytes PI.  When run on a 4 KiB logical block size device with a
-protection interval exponent of 0, i.e. 4096 bytes data + 8 bytes PI,
-the driver miscalculates the pi_bytes{out,in} by a factor of 8x (64
-bytes).
+On Fri, Jul 06, 2018 at 02:17:44PM -0700, Omar Sandoval wrote:
+> On Fri, Jul 06, 2018 at 10:21:28AM +0200, Johannes Thumshirn wrote:
+> > A recent update of Emacs broke .dir-locals.el's shell indentation
+> > setting.
+> > 
+> > Also set 'sh-indendation' not just 'sh-basic-offset' for this.
+> 
+> Another typo ;) fixed and applied, thanks.
 
-This leads to errors on all reads and writes on 4 KiB logical block size
-devices when CONFIG_BLK_DEV_INTEGRITY is enabled and the
-VIRTIO_SCSI_F_T10_PI feature bit has been negotiated.
+*gah*
+Thanks :-)
 
-Fixes: e6dc783a38ec0 ("virtio-scsi: Enable DIF/DIX modes in SCSI host LLD")
-Signed-off-by: Greg Edwards <gedwards@ddn.com>
----
- drivers/scsi/virtio_scsi.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/scsi/virtio_scsi.c b/drivers/scsi/virtio_scsi.c
-index 6dc8891ccb74..a1e85ab76f74 100644
---- a/drivers/scsi/virtio_scsi.c
-+++ b/drivers/scsi/virtio_scsi.c
-@@ -513,12 +513,12 @@ static void virtio_scsi_init_hdr_pi(struct virtio_device *vdev,
- 
- 	if (sc->sc_data_direction == DMA_TO_DEVICE)
- 		cmd_pi->pi_bytesout = cpu_to_virtio32(vdev,
--							blk_rq_sectors(rq) *
--							bi->tuple_size);
-+							bio_integrity_bytes(bi,
-+							blk_rq_sectors(rq)));
- 	else if (sc->sc_data_direction == DMA_FROM_DEVICE)
- 		cmd_pi->pi_bytesin = cpu_to_virtio32(vdev,
--						       blk_rq_sectors(rq) *
--						       bi->tuple_size);
-+							bio_integrity_bytes(bi,
-+							blk_rq_sectors(rq)));
- }
- #endif
- 
 -- 
-2.17.1
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
