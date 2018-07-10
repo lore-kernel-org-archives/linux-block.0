@@ -1,143 +1,28 @@
-Return-Path: <maxg@mellanox.com>
-From: Max Gurtovoy <maxg@mellanox.com>
-To: keith.busch@intel.com, linux-nvme@lists.infradead.org, sagi@grimberg.me,
-        hch@lst.de, martin.petersen@oracle.com, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-Cc: vladimirk@mellanox.com, Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH v5 1/3] block: move ref_tag calculation func to the block layer
-Date: Mon, 30 Jul 2018 00:15:31 +0300
-Message-Id: <1532898933-3366-1-git-send-email-maxg@mellanox.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: iolatency: avoid 64-bit division
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Tejun Heo <tj@kernel.org>, Josef Bacik <jbacik@fb.com>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20180710152146.2371336-1-arnd@arndb.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <d9014b7b-2eca-97ba-7e04-4f7f99e88c9b@kernel.dk>
+Date: Tue, 10 Jul 2018 12:28:09 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180710152146.2371336-1-arnd@arndb.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Currently this function is implemented in the scsi layer, but it's
-actual place should be the block layer since T10-PI is a general
-data integrity feature that is used in the nvme protocol as well.
+On 7/10/18 9:21 AM, Arnd Bergmann wrote:
+> On 32-bit architectures, dividing a 64-bit number needs to use the
+> do_div() function or something like it to avoid a link failure:
+> 
+> block/blk-iolatency.o: In function `iolatency_prfill_limit':
+> blk-iolatency.c:(.text+0x8cc): undefined reference to `__aeabi_uldivmod'
+> 
+> Using div_u64() gives us the best output and avoids the need for an
+> explicit cast.
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
----
+Applied, thanks Arnd.
 
-changes from v4:
- - fix failures in case kernel configured with !CONFIG_BLK_DEV_INTEGRITY
-
----
- drivers/infiniband/ulp/iser/iser_memory.c |  2 +-
- drivers/nvme/host/core.c                  |  3 +--
- drivers/scsi/mpt3sas/mpt3sas_scsih.c      |  2 +-
- drivers/scsi/sd_dif.c                     |  4 ++--
- include/linux/t10-pi.h                    | 10 ++++++++++
- include/scsi/scsi_cmnd.h                  |  7 +------
- 6 files changed, 16 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/infiniband/ulp/iser/iser_memory.c b/drivers/infiniband/ulp/iser/iser_memory.c
-index ca844a9..130bf16 100644
---- a/drivers/infiniband/ulp/iser/iser_memory.c
-+++ b/drivers/infiniband/ulp/iser/iser_memory.c
-@@ -311,7 +311,7 @@ void iser_unreg_mem_fastreg(struct iscsi_iser_task *iser_task,
- {
- 	domain->sig_type = IB_SIG_TYPE_T10_DIF;
- 	domain->sig.dif.pi_interval = scsi_prot_interval(sc);
--	domain->sig.dif.ref_tag = scsi_prot_ref_tag(sc);
-+	domain->sig.dif.ref_tag = t10_pi_ref_tag(sc->request);
- 	/*
- 	 * At the moment we hard code those, but in the future
- 	 * we will take them from sc.
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index bf65501..191177b 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -627,8 +627,7 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 		case NVME_NS_DPS_PI_TYPE2:
- 			control |= NVME_RW_PRINFO_PRCHK_GUARD |
- 					NVME_RW_PRINFO_PRCHK_REF;
--			cmnd->rw.reftag = cpu_to_le32(
--					nvme_block_nr(ns, blk_rq_pos(req)));
-+			cmnd->rw.reftag = cpu_to_le32(t10_pi_ref_tag(req));
- 			break;
- 		}
- 	}
-diff --git a/drivers/scsi/mpt3sas/mpt3sas_scsih.c b/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-index b8d131a..dd738ae 100644
---- a/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-+++ b/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-@@ -4568,7 +4568,7 @@ static int _scsih_set_satl_pending(struct scsi_cmnd *scmd, bool pending)
- 		    MPI2_SCSIIO_EEDPFLAGS_CHECK_REFTAG |
- 		    MPI2_SCSIIO_EEDPFLAGS_CHECK_GUARD;
- 		mpi_request->CDB.EEDP32.PrimaryReferenceTag =
--		    cpu_to_be32(scsi_prot_ref_tag(scmd));
-+		    cpu_to_be32(t10_pi_ref_tag(scmd->request));
- 		break;
- 
- 	case SCSI_PROT_DIF_TYPE3:
-diff --git a/drivers/scsi/sd_dif.c b/drivers/scsi/sd_dif.c
-index 9035380..d8de43d 100644
---- a/drivers/scsi/sd_dif.c
-+++ b/drivers/scsi/sd_dif.c
-@@ -124,7 +124,7 @@ void sd_dif_prepare(struct scsi_cmnd *scmd)
- 	if (sdkp->protection_type == T10_PI_TYPE3_PROTECTION)
- 		return;
- 
--	phys = scsi_prot_ref_tag(scmd);
-+	phys = t10_pi_ref_tag(scmd->request);
- 
- 	__rq_for_each_bio(bio, scmd->request) {
- 		struct bio_integrity_payload *bip = bio_integrity(bio);
-@@ -176,7 +176,7 @@ void sd_dif_complete(struct scsi_cmnd *scmd, unsigned int good_bytes)
- 		return;
- 
- 	intervals = good_bytes / scsi_prot_interval(scmd);
--	phys = scsi_prot_ref_tag(scmd);
-+	phys = t10_pi_ref_tag(scmd->request);
- 
- 	__rq_for_each_bio(bio, scmd->request) {
- 		struct bio_integrity_payload *bip = bio_integrity(bio);
-diff --git a/include/linux/t10-pi.h b/include/linux/t10-pi.h
-index c6aa8a3..c40511f 100644
---- a/include/linux/t10-pi.h
-+++ b/include/linux/t10-pi.h
-@@ -37,6 +37,16 @@ struct t10_pi_tuple {
- #define T10_PI_APP_ESCAPE cpu_to_be16(0xffff)
- #define T10_PI_REF_ESCAPE cpu_to_be32(0xffffffff)
- 
-+static inline u32 t10_pi_ref_tag(struct request *rq)
-+{
-+#ifdef CONFIG_BLK_DEV_INTEGRITY
-+	return blk_rq_pos(rq) >>
-+		(rq->q->integrity.interval_exp - 9) & 0xffffffff;
-+#else
-+	return -1U;
-+#endif
-+}
-+
- extern const struct blk_integrity_profile t10_pi_type1_crc;
- extern const struct blk_integrity_profile t10_pi_type1_ip;
- extern const struct blk_integrity_profile t10_pi_type3_crc;
-diff --git a/include/scsi/scsi_cmnd.h b/include/scsi/scsi_cmnd.h
-index aaf1e97..cae229b 100644
---- a/include/scsi/scsi_cmnd.h
-+++ b/include/scsi/scsi_cmnd.h
-@@ -4,6 +4,7 @@
- 
- #include <linux/dma-mapping.h>
- #include <linux/blkdev.h>
-+#include <linux/t10-pi.h>
- #include <linux/list.h>
- #include <linux/types.h>
- #include <linux/timer.h>
-@@ -313,12 +314,6 @@ static inline unsigned int scsi_prot_interval(struct scsi_cmnd *scmd)
- 	return scmd->device->sector_size;
- }
- 
--static inline u32 scsi_prot_ref_tag(struct scsi_cmnd *scmd)
--{
--	return blk_rq_pos(scmd->request) >>
--		(ilog2(scsi_prot_interval(scmd)) - 9) & 0xffffffff;
--}
--
- static inline unsigned scsi_prot_sg_count(struct scsi_cmnd *cmd)
- {
- 	return cmd->prot_sdb ? cmd->prot_sdb->table.nents : 0;
 -- 
-1.8.3.1
+Jens Axboe
