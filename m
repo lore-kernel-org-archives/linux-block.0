@@ -1,87 +1,69 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Omar Sandoval <osandov@fb.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH] blktests: Add '--outdir' to store results in a different directory
-Date: Tue, 17 Jul 2018 15:27:50 +0200
-Message-Id: <20180717132750.38767-1-hare@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from out30-131.freemail.mail.aliyun.com ([115.124.30.131]:38747 "EHLO
+        out30-131.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732337AbeGJTQU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Jul 2018 15:16:20 -0400
+From: Liu Bo <bo.liu@linux.alibaba.com>
+To: <linux-block@vger.kernel.org>
+Subject: [PATCH] Block: blk-throttle: skip wait time calculation if not asked
+Date: Wed, 11 Jul 2018 03:15:29 +0800
+Message-Id: <1531250129-18354-1-git-send-email-bo.liu@linux.alibaba.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Adding an option '--outdir' to store results in a different
-director so as not to clutter the git repository itself.
+tg_may_dispatch() uses @wait to retrieve how long the next bio can be
+dispatched, but if it doesn't ask for that, it's OK for
+tg_with_in_{bps,iops}_limit() to return immediately.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
 ---
- check | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ block/blk-throttle.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/check b/check
-index a635531..42d07f8 100755
---- a/check
-+++ b/check
-@@ -334,7 +334,7 @@ _call_test() {
- 	fi
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 423551f92b2c..c70aa396a793 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -954,6 +954,9 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
+ 		return true;
+ 	}
  
- 	trap _cleanup EXIT
--	if ! TMPDIR="$(mktemp --tmpdir -p "$PWD/results" -d "tmpdir.${TEST_NAME//\//.}.XXX")"; then
-+	if ! TMPDIR="$(mktemp --tmpdir -p "$RESULTS_DIR" -d "tmpdir.${TEST_NAME//\//.}.XXX")"; then
- 		return
- 	fi
++	if (!wait)
++		return false;
++
+ 	/* Calc approx time to dispatch */
+ 	jiffy_wait = ((tg->io_disp[rw] + 1) * HZ) / tg_iops_limit(tg, rw) + 1;
  
-@@ -415,7 +415,7 @@ _run_test() {
- 			return 0
- 		fi
- 
--		RESULTS_DIR="results/nodev"
-+		RESULTS_DIR="${OUT_DIR}/results/nodev"
- 		_call_test test
+@@ -962,8 +965,7 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
  	else
- 		if [[ ${#TEST_DEVS[@]} -eq 0 ]]; then
-@@ -434,7 +434,7 @@ _run_test() {
- 				_output_notrun "$TEST_NAME => $(basename "$TEST_DEV")"
- 				continue
- 			fi
--			RESULTS_DIR="results/$(basename "$TEST_DEV")"
-+			RESULTS_DIR="${OUT_DIR}/results/$(basename "$TEST_DEV")"
- 			if ! _call_test test_device; then
- 				ret=1
- 			fi
-@@ -567,6 +567,7 @@ Test runs:
- 			 tests to run
+ 		jiffy_wait = 1;
  
- Miscellaneous:
-+  -o, --outdir=OUTDIR    write results into the specified directory
-   -h, --help             display this help message and exit"
- 
- 	case "$1" in
-@@ -581,12 +582,13 @@ Miscellaneous:
- 	esac
+-	if (wait)
+-		*wait = jiffy_wait;
++	*wait = jiffy_wait;
+ 	return false;
  }
  
--if ! TEMP=$(getopt -o 'dq::x:h' --long 'quick::,exclude:,help' -n "$0" -- "$@"); then
-+if ! TEMP=$(getopt -o 'dq::o:x:h' --long 'quick::,exclude:,outdir:,help' -n "$0" -- "$@"); then
- 	exit 1
- fi
+@@ -995,6 +997,9 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 		return true;
+ 	}
  
- eval set -- "$TEMP"
- unset TEMP
-+OUT_DIR="."
++	if (!wait)
++		return false;
++
+ 	/* Calc approx time to dispatch */
+ 	extra_bytes = tg->bytes_disp[rw] + bio_size - bytes_allowed;
+ 	jiffy_wait = div64_u64(extra_bytes * HZ, tg_bps_limit(tg, rw));
+@@ -1007,8 +1012,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 	 * up we did. Add that time also.
+ 	 */
+ 	jiffy_wait = jiffy_wait + (jiffy_elapsed_rnd - jiffy_elapsed);
+-	if (wait)
+-		*wait = jiffy_wait;
++	*wait = jiffy_wait;
+ 	return false;
+ }
  
- if [[ -r config ]]; then
- 	# shellcheck disable=SC1091
-@@ -629,6 +631,10 @@ while true; do
- 			EXCLUDE+=("$2")
- 			shift 2
- 			;;
-+		'-o'|'--outdir')
-+			OUT_DIR="${2:-${OUT_DIR:-.}}"
-+			shift 2
-+			;;
- 		'-h'|'--help')
- 			usage out
- 			;;
 -- 
-2.12.3
+1.8.3.1
