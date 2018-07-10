@@ -1,81 +1,69 @@
-Return-Path: <prvs=72206ecb6=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "mb@lightnvm.io" <mb@lightnvm.io>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"loberman@redhat.com" <loberman@redhat.com>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
-	<Damien.LeMoal@wdc.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH 0/2] null_blk: zone support
-Date: Tue, 10 Jul 2018 16:47:32 +0000
-Message-ID: <a183979f10fda180176f671702f69efe338f56e7.camel@wdc.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>, "mb@lightnvm.io"
+ <mb@lightnvm.io>, "loberman@redhat.com" <loberman@redhat.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Damien Le Moal <Damien.LeMoal@wdc.com>
 References: <20180706173839.28355-1-mb@lightnvm.io>
-	 <1530899118.31977.1.camel@redhat.com>
-	 <296d2d14-0bf6-e0a2-84dc-7d6e819625c1@lightnvm.io>
-	 <4421a151-85d9-52e4-2233-03ed7f17528a@kernel.dk>
-	 <8d8ae6c620217db92b95b6561345d7bdf7c7cdfa.camel@wdc.com>
-	 <229911cb-7eb1-1729-46f1-35aba81d98d1@kernel.dk>
-In-Reply-To: <229911cb-7eb1-1729-46f1-35aba81d98d1@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
+ <1530899118.31977.1.camel@redhat.com>
+ <296d2d14-0bf6-e0a2-84dc-7d6e819625c1@lightnvm.io>
+ <4421a151-85d9-52e4-2233-03ed7f17528a@kernel.dk>
+ <8d8ae6c620217db92b95b6561345d7bdf7c7cdfa.camel@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <229911cb-7eb1-1729-46f1-35aba81d98d1@kernel.dk>
+Date: Tue, 10 Jul 2018 08:46:41 -0600
 MIME-Version: 1.0
+In-Reply-To: <8d8ae6c620217db92b95b6561345d7bdf7c7cdfa.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTA3LTEwIGF0IDA4OjQ2IC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
-biA3LzkvMTggNjowNSBQTSwgQmFydCBWYW4gQXNzY2hlIHdyb3RlOg0KPiA+IE9uIE1vbiwgMjAx
-OC0wNy0wOSBhdCAxMDozNCAtMDYwMCwgSmVucyBBeGJvZSB3cm90ZToNCj4gPiA+IEluIHRoZSBz
-cGlyaXQgb2YgbWFraW5nIHNvbWUgcHJvZ3Jlc3Mgb24gdGhpcywgSSBqdXN0IGRvbid0IGxpa2Ug
-aG93DQo+ID4gPiBpdCdzIGRvbmUuIEZvciBleGFtcGxlLCBpdCBzaG91bGQgbm90IGJlIG5lY2Vz
-c2FyeSB0byBhZGp1c3Qgd2hhdA0KPiA+ID4gY29tZXMgb3V0IG9mIHRoZSBibG9jayBnZW5lcmF0
-b3IsIGluc3RlYWQgdGhlIGJsb2NrIGdlbmVyYXRvciBzaG91bGQNCj4gPiA+IGJlIHRvbGQgdG8g
-ZG8gd2hhdCB3ZSBuZWVkIG9uIHpiYy4gVGhpcyBpcyBhIGtleSBjb25jZXB0LiBUaGUgd29ya2xv
-YWQNCj4gPiA+IHNob3VsZCBiZSBkZWZpbmVkIGFzIHN1Y2ggdGhhdCBpdCB3b3JrcyBmb3Igem9u
-ZWQgZGV2aWNlcy4NCj4gPiANCj4gPiBIb3cgd291bGQgeW91IGxpa2UgdG8gc2VlIGJsb2NrIGdl
-bmVyYXRpb24gd29yaz8gSSBkb24ndCBzZWUgYW4NCj4gPiBhbHRlcm5hdGl2ZSBmb3IgcmFuZG9t
-IEkvTyBvdGhlciBzdGFydGluZyBmcm9tIHRoZSBvdXRwdXQgb2YgYSByYW5kb20NCj4gPiBnZW5l
-cmF0b3IgYW5kIHRyYW5zbGF0aW5nIHRoYXQgb3V0cHV0IGludG8gc29tZXRoaW5nIHRoYXQgaXMN
-Cj4gPiBhcHByb3ByaWF0ZSBmb3IgYSB6b25lZCBibG9jayBkZXZpY2UuIFJhbmRvbSByZWFkcyBt
-dXN0IGhhcHBlbiBiZWxvdw0KPiA+IHRoZSB6b25lIHBvaW50ZXIgaWYgZmlvIGlzIGNvbmZpZ3Vy
-ZWQgdG8gcmVhZCBiZWxvdyB0aGUgem9uZSBwb2ludGVyLg0KPiA+IFJhbmRvbSB3cml0ZXMgbXVz
-dCBoYXBwZW4gYXQgdGhlIHdyaXRlIHBvaW50ZXIuIFRoZSBvbmx5IHdheSBJIHNlZSB0bw0KPiA+
-IGltcGxlbWVudCBzdWNoIGFuIEkvTyBwYXR0ZXJuIGlzIHRvIHN0YXJ0IGZyb20gdGhlIG91dHB1
-dCBvZiBhIHJhbmRvbQ0KPiA+IGdlbmVyYXRvciBhbmQgdG8gYWRqdXN0IHRoZSBvdXRwdXQgb2Yg
-dGhhdCByYW5kb20gZ2VuZXJhdG9yLiBIb3dldmVyLA0KPiA+IEkgZG9uJ3QgaGF2ZSBhIHN0cm9u
-ZyBvcGluaW9uIHdoZXRoZXIgYWRqdXN0aW5nIHRoZSBvdXRwdXQgb2YgYSByYW5kb20NCj4gPiBn
-ZW5lcmF0b3Igc2hvdWxkIGhhcHBlbiBieSB0aGUgY2FsbGVyIG9mIGdldF9uZXh0X2J1Zmxlbigp
-IG9yIGluc2lkZQ0KPiA+IGdldF9uZXh0X2J1ZmxlbigpLiBPciBpcyB5b3VyIGNvbmNlcm4gcGVy
-aGFwcyB0aGF0IHRoZSBjdXJyZW50DQo+ID4gYXBwcm9hY2ggaW50ZXJmZXJlcyB3aXRoIGZpbyBq
-b2Igb3B0aW9ucyBsaWtlIGJzX3VuYWxpZ25lZD8NCj4gDQo+IFRoZSBtYWluIGlzc3VlIEkgaGF2
-ZSB3aXRoIHRoYXQgYXBwcm9hY2ggaXMgdGhhdCB0aGUgY29yZSBvZiBmaW8gaXMNCj4gZ2VuZXJh
-dGluZyB0aGUgSU8gcGF0dGVybnMsIGFuZCB0aGVuIHlvdSBhcmUganVzdCBjaGFuZ2luZyB0aGVt
-IGFzIHlvdQ0KPiBzZWUgZml0LiBUaGlzIG1lYW5zIHRoYXQgdGhlIHdvcmtsb2FkIGRlZmluaXRp
-b24gYW5kIHRoZSByZXN1bHRpbmcgSU8NCj4gb3BlcmF0aW9ucyBhcmUgbm8gbG9uZ2VyIG1hdGNo
-ZWQgdXAsIHNpbmNlIHRoZXkgbm93IGFsc28gZGVwZW5kIG9uIHdoYXQNCj4geW91IGFyZSBydW5u
-aW5nIG9uLiBJZiBJIHRha2Ugb25lIHdvcmtsb2FkIGFuZCBydW4gaXQgb24gYSB6b25lZCBkcml2
-ZSwNCj4gYW5kIHRoZW4gcnVuIGl0IG9uIGEgbm9uLXpvbmVkIGRyaXZlLCBJIGNhbid0IGNvbXBh
-cmUgdGhlIHJlc3VsdHMgYXQNCj4gYWxsLiBUaGlzIGlzIGEgc2hvd3N0b3BwZXIuDQo+IA0KPiBU
-aGVyZSBzaG91bGQgYmUgbm8gYWRqdXN0aW5nIG9mIHRoZSBvdXRwdXQsIHJhdGhlciBpdCBzaG91
-bGQgYmUgcG9zc2libGUNCj4gdG8gd3JpdGUgem9uZWQgZnJpZW5kbHkgam9iIGRlZmluaXRpb25z
-LiBJdCBzaG91bGQgYmUgcG9zc2libGUgdG8gcnVuDQo+IHRoZSBzYW1lIGpvYiBvbiBhIG5vbi16
-b25lZCBkcml2ZSwgYW5kIHZpY2UgdmVyc2EsIGFuZCB0aGUgcmVzdWx0aW5nIElPDQo+IHBhdHRl
-cm5zIG11c3QgYmUgdGhlIHNhbWUuDQo+IA0KPiBGaW8gYWxyZWFkeSBoYXMgc29tZSBub3Rpb24g
-b2Ygem9uZXMuIE1heWJlIHRoYXQgY291bGQgYmUgZXh0ZW5kZWQgdG8NCj4gaGFyZCB6b25lcywg
-YW5kIHNvbWUgY29udHJvbCBvZiBvcGVuIHpvbmVzLCBhbmQgcGF0dGVybnMgd2l0aGluIHRob3Nl
-DQo+IHpvbmVzPw0KDQpIZWxsbyBKZW5zLA0KDQpIb3cgYWJvdXQgYWRkaW5nIGEgam9iIG9wdGlv
-biB0aGF0IG1ha2VzIGl0IHBvc3NpYmxlIHRvIHVzZSB0aGUgem9uZWQNCmJsb2NrIGRldmljZSAo
-WkJEKSBJL08gcGF0dGVybiBvbiBub24tWkJEIGRldmljZXMsIHJlcXVpcmluZyB0aGF0IHRoZQ0K
-em9uZSBzaXplIGlzIHNldCBleHBsaWNpdGx5IGZvciBub24tWkJEIGRldmljZXMgYW5kIG1haW50
-YWluaW5nIGEgd3JpdGUNCnBvaW50ZXIgbm90IG9ubHkgd2hlbiBwZXJmb3JtaW5nIEkvTyB0byBh
-IFpCRCBkZXZpY2UgYnV0IGFsc28gaWYgYQ0KWkJELXN0eWxlIEkvTyBwYXR0ZXJuIGlzIGFwcGxp
-ZWQgdG8gYSBub24tWkJEIGRpc2s/IFRoaXMgc2hvdWxkIGFsbG93IHRvDQphcHBseSBleGFjdGx5
-IHRoZSBzYW1lIHdvcmtsb2FkIHRvIGEgbm9uLVpCRCBkaXNrIGFzIHRvIGEgWkJEIGRpc2suDQoN
-CldoYXQgSSBkZXJpdmVkIGZyb20gdGhlIGZpbyBzb3VyY2UgY29kZSBpcyBhcyBmb2xsb3dzIChw
-bGVhc2UgY29ycmVjdCBtZQ0KaWYgSSBnb3QgYW55dGhpbmcgd3JvbmcpOg0KKiBUaGUgcHVycG9z
-ZSBvZiB0aGUgem9uZXNpemUsIHpvbmVyYW5nZSBhbmQgem9uZXNraXAgam9iIG9wdGlvbnMgaXMg
-dG8NCiAgbGltaXQgdGhlIEkvTyByYW5nZSB0byBhIHNpbmdsZSB6b25lIHdpdGggc2l6ZSAiem9u
-ZXNpemUiLiBUaGUgSS9PDQogIHBhdHRlcm4gZm9yIHpvbmVkIGJsb2NrIGRldmljZXMgaXMgZGlm
-ZmVyZW50OiBJL08gaGFwcGVucyBpbiBtdWx0aXBsZQ0KICB6b25lcyBzaW11bHRhbmVvdXNseS4g
-VGhlIG51bWJlciBvZiB6b25lcyB0byB3aGljaCBJL08gaGFwcGVucyBpcw0KICBjYWxsZWQgdGhl
-IG51bWJlciBvZiBvcGVuIHpvbmVzLg0KKiBUaGUgcHVycG9zZSBvZiB0aGUgcmFuZG9tX2Rpc3Ry
-aWJ1dGlvbj16b25lZHtfYWJzfSBqb2Igb3B0aW9uIGlzIHRvDQogIGFsbG93IHRoZSB1c2VyIHRv
-IHNrZXcgYSB1bmlmb3JtIHJhbmRvbSBkaXN0cmlidXRpb24uIFRoaXMgaXMgYW5vdGhlcg0KICB3
-b3JrbG9hZCBwYXR0ZXJuIHRoYW4gdGhlIHR5cGljYWwgcGF0dGVybiBmb3IgWkJEIGRyaXZlcy4N
-Cg0KVGhhbmtzLA0KDQpCYXJ0Lg0KDQoNCg0KDQoNCg==
+On 7/9/18 6:05 PM, Bart Van Assche wrote:
+> On Mon, 2018-07-09 at 10:34 -0600, Jens Axboe wrote:
+>> On 7/9/18 1:54 AM, Matias Bjørling wrote:
+>>> For fio, you can use the zone support here:
+>>>
+>>>    https://github.com/bvanassche/fio
+>>>
+>>> It is in the process of being upstreamed.
+>>
+>> In the spirit of making some progress on this, I just don't like how
+>> it's done. For example, it should not be necessary to adjust what
+>> comes out of the block generator, instead the block generator should
+>> be told to do what we need on zbc. This is a key concept. The workload
+>> should be defined as such that it works for zoned devices.
+> 
+> Hello Jens,
+> 
+> How would you like to see block generation work? I don't see an
+> alternative for random I/O other starting from the output of a random
+> generator and translating that output into something that is
+> appropriate for a zoned block device. Random reads must happen below
+> the zone pointer if fio is configured to read below the zone pointer.
+> Random writes must happen at the write pointer. The only way I see to
+> implement such an I/O pattern is to start from the output of a random
+> generator and to adjust the output of that random generator. However,
+> I don't have a strong opinion whether adjusting the output of a random
+> generator should happen by the caller of get_next_buflen() or inside
+> get_next_buflen(). Or is your concern perhaps that the current
+> approach interferes with fio job options like bs_unaligned?
+
+The main issue I have with that approach is that the core of fio is
+generating the IO patterns, and then you are just changing them as you
+see fit. This means that the workload definition and the resulting IO
+operations are no longer matched up, since they now also depend on what
+you are running on. If I take one workload and run it on a zoned drive,
+and then run it on a non-zoned drive, I can't compare the results at
+all. This is a showstopper.
+
+There should be no adjusting of the output, rather it should be possible
+to write zoned friendly job definitions. It should be possible to run
+the same job on a non-zoned drive, and vice versa, and the resulting IO
+patterns must be the same.
+
+Fio already has some notion of zones. Maybe that could be extended to
+hard zones, and some control of open zones, and patterns within those
+zones?
+
+-- 
+Jens Axboe
