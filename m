@@ -1,69 +1,52 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <prvs=72206ecb6=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "mb@lightnvm.io" <mb@lightnvm.io>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"loberman@redhat.com" <loberman@redhat.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
+	<Damien.LeMoal@wdc.com>
 Subject: Re: [PATCH 0/2] null_blk: zone support
-To: Bart Van Assche <Bart.VanAssche@wdc.com>, "mb@lightnvm.io"
- <mb@lightnvm.io>, "loberman@redhat.com" <loberman@redhat.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Damien Le Moal <Damien.LeMoal@wdc.com>
+Date: Tue, 10 Jul 2018 00:05:38 +0000
+Message-ID: <8d8ae6c620217db92b95b6561345d7bdf7c7cdfa.camel@wdc.com>
 References: <20180706173839.28355-1-mb@lightnvm.io>
- <1530899118.31977.1.camel@redhat.com>
- <296d2d14-0bf6-e0a2-84dc-7d6e819625c1@lightnvm.io>
- <4421a151-85d9-52e4-2233-03ed7f17528a@kernel.dk>
- <8d8ae6c620217db92b95b6561345d7bdf7c7cdfa.camel@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <229911cb-7eb1-1729-46f1-35aba81d98d1@kernel.dk>
-Date: Tue, 10 Jul 2018 08:46:41 -0600
+	 <1530899118.31977.1.camel@redhat.com>
+	 <296d2d14-0bf6-e0a2-84dc-7d6e819625c1@lightnvm.io>
+	 <4421a151-85d9-52e4-2233-03ed7f17528a@kernel.dk>
+In-Reply-To: <4421a151-85d9-52e4-2233-03ed7f17528a@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <8d8ae6c620217db92b95b6561345d7bdf7c7cdfa.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 7/9/18 6:05 PM, Bart Van Assche wrote:
-> On Mon, 2018-07-09 at 10:34 -0600, Jens Axboe wrote:
->> On 7/9/18 1:54 AM, Matias Bjørling wrote:
->>> For fio, you can use the zone support here:
->>>
->>>    https://github.com/bvanassche/fio
->>>
->>> It is in the process of being upstreamed.
->>
->> In the spirit of making some progress on this, I just don't like how
->> it's done. For example, it should not be necessary to adjust what
->> comes out of the block generator, instead the block generator should
->> be told to do what we need on zbc. This is a key concept. The workload
->> should be defined as such that it works for zoned devices.
-> 
-> Hello Jens,
-> 
-> How would you like to see block generation work? I don't see an
-> alternative for random I/O other starting from the output of a random
-> generator and translating that output into something that is
-> appropriate for a zoned block device. Random reads must happen below
-> the zone pointer if fio is configured to read below the zone pointer.
-> Random writes must happen at the write pointer. The only way I see to
-> implement such an I/O pattern is to start from the output of a random
-> generator and to adjust the output of that random generator. However,
-> I don't have a strong opinion whether adjusting the output of a random
-> generator should happen by the caller of get_next_buflen() or inside
-> get_next_buflen(). Or is your concern perhaps that the current
-> approach interferes with fio job options like bs_unaligned?
-
-The main issue I have with that approach is that the core of fio is
-generating the IO patterns, and then you are just changing them as you
-see fit. This means that the workload definition and the resulting IO
-operations are no longer matched up, since they now also depend on what
-you are running on. If I take one workload and run it on a zoned drive,
-and then run it on a non-zoned drive, I can't compare the results at
-all. This is a showstopper.
-
-There should be no adjusting of the output, rather it should be possible
-to write zoned friendly job definitions. It should be possible to run
-the same job on a non-zoned drive, and vice versa, and the resulting IO
-patterns must be the same.
-
-Fio already has some notion of zones. Maybe that could be extended to
-hard zones, and some control of open zones, and patterns within those
-zones?
-
--- 
-Jens Axboe
+T24gTW9uLCAyMDE4LTA3LTA5IGF0IDEwOjM0IC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
+biA3LzkvMTggMTo1NCBBTSwgTWF0aWFzIEJqw7hybGluZyB3cm90ZToNCj4gPiBGb3IgZmlvLCB5
+b3UgY2FuIHVzZSB0aGUgem9uZSBzdXBwb3J0IGhlcmU6DQo+ID4gDQo+ID4gICAgaHR0cHM6Ly9n
+aXRodWIuY29tL2J2YW5hc3NjaGUvZmlvDQo+ID4gDQo+ID4gSXQgaXMgaW4gdGhlIHByb2Nlc3Mg
+b2YgYmVpbmcgdXBzdHJlYW1lZC4NCj4gDQo+IEluIHRoZSBzcGlyaXQgb2YgbWFraW5nIHNvbWUg
+cHJvZ3Jlc3Mgb24gdGhpcywgSSBqdXN0IGRvbid0IGxpa2UgaG93DQo+IGl0J3MgZG9uZS4gRm9y
+IGV4YW1wbGUsIGl0IHNob3VsZCBub3QgYmUgbmVjZXNzYXJ5IHRvIGFkanVzdCB3aGF0DQo+IGNv
+bWVzIG91dCBvZiB0aGUgYmxvY2sgZ2VuZXJhdG9yLCBpbnN0ZWFkIHRoZSBibG9jayBnZW5lcmF0
+b3Igc2hvdWxkDQo+IGJlIHRvbGQgdG8gZG8gd2hhdCB3ZSBuZWVkIG9uIHpiYy4gVGhpcyBpcyBh
+IGtleSBjb25jZXB0LiBUaGUgd29ya2xvYWQNCj4gc2hvdWxkIGJlIGRlZmluZWQgYXMgc3VjaCB0
+aGF0IGl0IHdvcmtzIGZvciB6b25lZCBkZXZpY2VzLg0KDQpIZWxsbyBKZW5zLA0KDQpIb3cgd291
+bGQgeW91IGxpa2UgdG8gc2VlIGJsb2NrIGdlbmVyYXRpb24gd29yaz8gSSBkb24ndCBzZWUgYW4g
+YWx0ZXJuYXRpdmUNCmZvciByYW5kb20gSS9PIG90aGVyIHN0YXJ0aW5nIGZyb20gdGhlIG91dHB1
+dCBvZiBhIHJhbmRvbSBnZW5lcmF0b3IgYW5kDQp0cmFuc2xhdGluZyB0aGF0IG91dHB1dCBpbnRv
+IHNvbWV0aGluZyB0aGF0IGlzIGFwcHJvcHJpYXRlIGZvciBhIHpvbmVkIGJsb2NrDQpkZXZpY2Uu
+IFJhbmRvbSByZWFkcyBtdXN0IGhhcHBlbiBiZWxvdyB0aGUgem9uZSBwb2ludGVyIGlmIGZpbyBp
+cyBjb25maWd1cmVkDQp0byByZWFkIGJlbG93IHRoZSB6b25lIHBvaW50ZXIuIFJhbmRvbSB3cml0
+ZXMgbXVzdCBoYXBwZW4gYXQgdGhlIHdyaXRlDQpwb2ludGVyLiBUaGUgb25seSB3YXkgSSBzZWUg
+dG8gaW1wbGVtZW50IHN1Y2ggYW4gSS9PIHBhdHRlcm4gaXMgdG8gc3RhcnQNCmZyb20gdGhlIG91
+dHB1dCBvZiBhIHJhbmRvbSBnZW5lcmF0b3IgYW5kIHRvIGFkanVzdCB0aGUgb3V0cHV0IG9mIHRo
+YXQNCnJhbmRvbSBnZW5lcmF0b3IuIEhvd2V2ZXIsIEkgZG9uJ3QgaGF2ZSBhIHN0cm9uZyBvcGlu
+aW9uIHdoZXRoZXIgYWRqdXN0aW5nDQp0aGUgb3V0cHV0IG9mIGEgcmFuZG9tIGdlbmVyYXRvciBz
+aG91bGQgaGFwcGVuIGJ5IHRoZSBjYWxsZXIgb2YNCmdldF9uZXh0X2J1ZmxlbigpIG9yIGluc2lk
+ZSBnZXRfbmV4dF9idWZsZW4oKS4gT3IgaXMgeW91ciBjb25jZXJuIHBlcmhhcHMNCnRoYXQgdGhl
+IGN1cnJlbnQgYXBwcm9hY2ggaW50ZXJmZXJlcyB3aXRoIGZpbyBqb2Igb3B0aW9ucyBsaWtlIGJz
+X3VuYWxpZ25lZD8NCg0KPiBUaGUgdHJpbSBhcyB6b25lIHJlc2V0cyBzZWVtcyBvZGQuIFdoYXQg
+aGFwcGVucyBpZiB5b3UgZW5kIHVwIHdpdGggYQ0KPiB6b25lZCBmbGFzaCBkZXZpY2UgaW4gdGhl
+IGZ1dHVyZT8NCg0KV2UgY2FuIGxlYXZlIG91dCB0aGUgY29kZSB0aGF0IHRyYW5zbGF0ZXMgdHJp
+bSBpbnRvIHpvbmUgcmVzZXRzIGZyb20gZmlvDQphbmQgZGlzY3VzcyBsYXRlciBob3cgdG8gaGFu
+ZGxlIHRoaXMuIE9uZSBwb3NzaWJpbGl0eSBpcyB0byBtb2RpZnkgdGhlIHNkDQpkcml2ZXIgc3Vj
+aCB0aGF0IGl0IHRyYW5zbGF0ZXMgUkVRX09QX0RJU0NBUkQgaW50byB6b25lIHJlc2V0cyB3aGVu
+DQphcHByb3ByaWF0ZS4gVGhlcmUgbWF5IGJlIGJldHRlciBhbHRlcm5hdGl2ZXMuDQoNCkJhcnQu
+DQoNCg0KDQoNCg==
