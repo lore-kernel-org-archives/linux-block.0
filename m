@@ -1,86 +1,38 @@
-Return-Path: <mwilck@suse.com>
-From: Martin Wilck <mwilck@suse.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Jan Kara <jack@suse.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Kent Overstreet <kent.overstreet@gmail.com>,
-	linux-block@vger.kernel.org,
-	Martin Wilck <mwilck@suse.com>
-Subject: [PATCH v4 1/4] block: bio_iov_iter_get_pages: fix size of last iovec
-Date: Fri, 20 Jul 2018 15:05:49 +0200
-Message-Id: <20180720130552.21432-2-mwilck@suse.com>
-In-Reply-To: <20180720130552.21432-1-mwilck@suse.com>
-References: <20180720130552.21432-1-mwilck@suse.com>
+Return-Path: <BATV+7dae7aff98f6b03f0ec2+5435+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Tue, 10 Jul 2018 23:33:07 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jann Horn <jannh@google.com>
+Cc: Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
+	Douglas Gilbert <dgilbert@interlog.com>,
+	Al Viro <viro@zeniv.linux.org.uk>, fujita.tomonori@lab.ntt.co.jp,
+	jejb@linux.vnet.ibm.com, martin.petersen@oracle.com,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	kernel list <linux-kernel@vger.kernel.org>,
+	Kernel Hardening <kernel-hardening@lists.openwall.com>,
+	security@kernel.org
+Subject: Re: [PATCH] sg, bsg: mitigate read/write abuse, block uaccess in
+ release
+Message-ID: <20180711063307.GA31127@infradead.org>
+References: <20180615152335.208202-1-jannh@google.com>
+ <20180615164009.GD30522@ZenIV.linux.org.uk>
+ <90063ef3-68fa-e983-9b47-838e6076b0f4@interlog.com>
+ <813e817b-bb2f-4a47-6225-9e39f19be278@kernel.dk>
+ <20180621123431.GA558@infradead.org>
+ <36a641db-fb1d-6c4c-7f1b-172f2b1cde32@kernel.dk>
+ <20180708145840.GA22949@infradead.org>
+ <CAG48ez0ahgHZAEYHt_J_MAanRNX+PXN+2MwtR-VM=gm8Ym30kg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAG48ez0ahgHZAEYHt_J_MAanRNX+PXN+2MwtR-VM=gm8Ym30kg@mail.gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-If the last page of the bio is not "full", the length of the last
-vector slot needs to be corrected. This slot has the index
-(bio->bi_vcnt - 1), but only in bio->bi_io_vec. In the "bv" helper
-array, which is shifted by the value of bio->bi_vcnt at function
-invocation, the correct index is (nr_pages - 1).
+On Tue, Jul 10, 2018 at 01:53:02PM -0700, Jann Horn wrote:
+> With the error messages like in my sg patch or like with Linus'
+> proposed patch (https://lore.kernel.org/lkml/CA+55aFwg-2GP4ASTdd1pusmZkF7c8AN9febVDCaioDxzYJSLfw@mail.gmail.com/)
+> applied?
 
-v2: improved readability following suggestions from Ming Lei.
-v3: followed a formatting suggestion from Christoph Hellwig.
+I guess we should follows Linus' suggestions.
 
-Fixes: 2cefe4dbaadf ("block: add bio_iov_iter_get_pages()")
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Martin Wilck <mwilck@suse.com>
----
- block/bio.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 67eff5e..489a430 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -912,16 +912,16 @@ EXPORT_SYMBOL(bio_add_page);
-  */
- int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- {
--	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
-+	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt, idx;
- 	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
- 	struct page **pages = (struct page **)bv;
--	size_t offset, diff;
-+	size_t offset;
- 	ssize_t size;
- 
- 	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
- 	if (unlikely(size <= 0))
- 		return size ? size : -EFAULT;
--	nr_pages = (size + offset + PAGE_SIZE - 1) / PAGE_SIZE;
-+	idx = nr_pages = (size + offset + PAGE_SIZE - 1) / PAGE_SIZE;
- 
- 	/*
- 	 * Deep magic below:  We need to walk the pinned pages backwards
-@@ -934,17 +934,15 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	bio->bi_iter.bi_size += size;
- 	bio->bi_vcnt += nr_pages;
- 
--	diff = (nr_pages * PAGE_SIZE - offset) - size;
--	while (nr_pages--) {
--		bv[nr_pages].bv_page = pages[nr_pages];
--		bv[nr_pages].bv_len = PAGE_SIZE;
--		bv[nr_pages].bv_offset = 0;
-+	while (idx--) {
-+		bv[idx].bv_page = pages[idx];
-+		bv[idx].bv_len = PAGE_SIZE;
-+		bv[idx].bv_offset = 0;
- 	}
- 
- 	bv[0].bv_offset += offset;
- 	bv[0].bv_len -= offset;
--	if (diff)
--		bv[bio->bi_vcnt - 1].bv_len -= diff;
-+	bv[nr_pages - 1].bv_len -= nr_pages * PAGE_SIZE - offset - size;
- 
- 	iov_iter_advance(iter, size);
- 	return 0;
--- 
-2.17.1
+Note that he also seems to agree with me to just remove the read/write
+interface.  Compared to sg bsg really is unused for the read/write
+interface.  But lets get your fix in first..
