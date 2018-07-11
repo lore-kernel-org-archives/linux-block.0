@@ -1,8 +1,9 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Thu, 12 Jul 2018 17:58:29 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+Return-Path: <hch@lst.de>
+Date: Wed, 11 Jul 2018 19:19:08 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
 	Alan Stern <stern@rowland.harvard.edu>, linux-pm@vger.kernel.org,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Christoph Hellwig <hch@lst.de>,
@@ -11,44 +12,13 @@ Cc: linux-block@vger.kernel.org, "Rafael J. Wysocki" <rjw@rjwysocki.net>,
 	"Martin K. Petersen" <martin.petersen@oracle.com>,
 	linux-scsi@vger.kernel.org
 Subject: Re: [PATCH RFC 3/4] blk-mq: prepare for supporting runtime PM
-Message-ID: <20180712095828.GA2422@ming.t460p>
-References: <20180711162906.14271-1-ming.lei@redhat.com>
- <20180711162906.14271-4-ming.lei@redhat.com>
+Message-ID: <20180711171908.GD3500@lst.de>
+References: <20180711162906.14271-1-ming.lei@redhat.com> <20180711162906.14271-4-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180711162906.14271-4-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jul 12, 2018 at 12:29:05AM +0800, Ming Lei wrote:
-> This patch introduces blk_mq_pm_add_request() which is called after
-> allocating one request. Also blk_mq_pm_put_request() is introduced
-> and called after one request is freed.
-> 
-> For blk-mq, it can be quite expensive to accounting in-flight IOs,
-> so this patch calls pm_runtime_mark_last_busy() simply after each IO
-> is done, instead of doing that only after the last in-flight IO is done.
-> This way is still workable, since the active non-PM IO will be checked
-> in blk_pre_runtime_suspend(), and runtime suspend will be prevented
-> if there is any active non-PM IO.
-> 
-> Also makes blk_post_runtime_resume() to cover blk-mq.
-> 
-> Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-> Cc: Alan Stern <stern@rowland.harvard.edu>
-> Cc: linux-pm@vger.kernel.org
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Bart Van Assche <bart.vanassche@wdc.com>
-> Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-> Cc: linux-scsi@vger.kernel.org
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-core.c | 12 ++++++++++--
->  block/blk-mq.c   | 24 ++++++++++++++++++++++++
->  2 files changed, 34 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
 > index c4b57d8806fe..bf66d561980d 100644
 > --- a/block/blk-core.c
 > +++ b/block/blk-core.c
@@ -68,14 +38,28 @@ On Thu, Jul 12, 2018 at 12:29:05AM +0800, Ming Lei wrote:
 > +	else
 > +		active = !blk_mq_pm_queue_idle(q);
 > +	if (active) {
->  		ret = -EBUSY;
->  		pm_runtime_mark_last_busy(q->dev);
->  	} else {
 
-Looks there is one big issue, one new IO may come just after reading
-'active' and before writing RPM_SUSPENDING to q->rpm_status, and both
-the suspending and the new IO may be in-progress at the same time.
+We shouldn't really need queue_lock for blk-mq.  Also the !! is not
+really needed when assigning to a bool.
 
+> +static void blk_mq_pm_add_request(struct request_queue *q, struct request *rq)
+> +{
+> +	if (!blk_mq_support_runtime_pm(q))
+> +		return;
+> +
+> +	if (q->dev && !(rq->rq_flags & RQF_PM) &&
+> +	    (q->rpm_status == RPM_SUSPENDED || q->rpm_status == RPM_SUSPENDING))
+> +		pm_request_resume(q->dev);
 
-Thanks,
-Ming
+blk_mq_support_runtime_pm already checks for q->dev.   Also to mee
+it sems just opencoding blk_mq_pm_add_request / blk_mq_pm_put_request
+in the callers would seems more obvious.
+
+> @@ -1841,6 +1863,8 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+>  
+>  	rq_qos_track(q, rq, bio);
+>  
+> +	blk_mq_pm_add_request(q, rq);
+
+This doesn't seem to handle passthrough requests and not actually
+pair with blk_mq_free_request, is that intentional?
