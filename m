@@ -1,82 +1,28 @@
-Return-Path: <mwilck@suse.com>
-From: Martin Wilck <mwilck@suse.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jan Kara <jack@suse.com>
-Cc: Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Kent Overstreet <kent.overstreet@gmail.com>,
+Return-Path: <hch@lst.de>
+Date: Wed, 11 Jul 2018 19:10:54 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Alan Stern <stern@rowland.harvard.edu>, linux-pm@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Christoph Hellwig <hch@lst.de>,
-	linux-block@vger.kernel.org,
-	Martin Wilck <mwilck@suse.com>
-Subject: [PATCH 1/2] block: bio_iov_iter_get_pages: fix size of last iovec
-Date: Thu, 19 Jul 2018 11:39:17 +0200
-Message-Id: <20180719093918.28876-2-mwilck@suse.com>
-In-Reply-To: <20180719093918.28876-1-mwilck@suse.com>
-References: <20180718075440.GA15254@ming.t460p>
- <20180719093918.28876-1-mwilck@suse.com>
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org
+Subject: Re: [PATCH RFC 1/4] blk-mq: introduce blk_mq_support_runtime_pm()
+Message-ID: <20180711171054.GA3500@lst.de>
+References: <20180711162906.14271-1-ming.lei@redhat.com> <20180711162906.14271-2-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180711162906.14271-2-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-If the last page of the bio is not "full", the length of the last
-vector slot needs to be corrected. This slot has the index
-(bio->bi_vcnt - 1), but only in bio->bi_io_vec. In the "bv" helper
-array, which is shifted by the value of bio->bi_vcnt at function
-invocation, the correct index is (nr_pages - 1).
+On Thu, Jul 12, 2018 at 12:29:03AM +0800, Ming Lei wrote:
+> A bit cost has to be added in fast IO path for supporting runtime PM, and
+> introduce this helper so that drivers incapable of runtime PM may not be
+> affected by this feature.
 
-V2: improved readability following suggestions from Ming Lei.
-
-Fixes: 2cefe4dbaadf ("block: add bio_iov_iter_get_pages()")
-Signed-off-by: Martin Wilck <mwilck@suse.com>
----
- block/bio.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 67eff5e..0964328 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -912,16 +912,16 @@ EXPORT_SYMBOL(bio_add_page);
-  */
- int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- {
--	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
-+	unsigned short idx, nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
- 	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
- 	struct page **pages = (struct page **)bv;
--	size_t offset, diff;
-+	size_t offset;
- 	ssize_t size;
- 
- 	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
- 	if (unlikely(size <= 0))
- 		return size ? size : -EFAULT;
--	nr_pages = (size + offset + PAGE_SIZE - 1) / PAGE_SIZE;
-+	idx = nr_pages = (size + offset + PAGE_SIZE - 1) / PAGE_SIZE;
- 
- 	/*
- 	 * Deep magic below:  We need to walk the pinned pages backwards
-@@ -934,17 +934,15 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	bio->bi_iter.bi_size += size;
- 	bio->bi_vcnt += nr_pages;
- 
--	diff = (nr_pages * PAGE_SIZE - offset) - size;
--	while (nr_pages--) {
--		bv[nr_pages].bv_page = pages[nr_pages];
--		bv[nr_pages].bv_len = PAGE_SIZE;
--		bv[nr_pages].bv_offset = 0;
-+	while (idx--) {
-+		bv[idx].bv_page = pages[idx];
-+		bv[idx].bv_len = PAGE_SIZE;
-+		bv[idx].bv_offset = 0;
- 	}
- 
- 	bv[0].bv_offset += offset;
- 	bv[0].bv_len -= offset;
--	if (diff)
--		bv[bio->bi_vcnt - 1].bv_len -= diff;
-+	bv[nr_pages - 1].bv_len -= nr_pages * PAGE_SIZE - offset - size;
- 
- 	iov_iter_advance(iter, size);
- 	return 0;
--- 
-2.17.1
+I don't think this is useful on it's own and should go with the
+patch that uses it.
