@@ -1,65 +1,50 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Thu, 12 Jul 2018 09:36:49 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Alan Stern <stern@rowland.harvard.edu>, linux-pm@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
+Return-Path: <stern+5b5b8f2e@rowland.harvard.edu>
+Date: Wed, 11 Jul 2018 13:28:21 -0400 (EDT)
+From: Alan Stern <stern@rowland.harvard.edu>
+To: Ming Lei <ming.lei@redhat.com>
+cc: Jens Axboe <axboe@kernel.dk>,  <linux-block@vger.kernel.org>,
+    "Rafael J. Wysocki" <rjw@rjwysocki.net>,  <linux-pm@vger.kernel.org>,
+    Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+    Christoph Hellwig <hch@lst.de>, Bart Van Assche <bart.vanassche@wdc.com>,
+    "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+    "Martin K. Petersen" <martin.petersen@oracle.com>,
+     <linux-scsi@vger.kernel.org>
 Subject: Re: [PATCH RFC 4/4] scsi_mq: enable runtime PM
-Message-ID: <20180712013642.GA15593@ming.t460p>
-References: <20180711162906.14271-1-ming.lei@redhat.com>
- <20180711162906.14271-5-ming.lei@redhat.com>
- <20180711171409.GC3500@lst.de>
+In-Reply-To: <20180711162906.14271-5-ming.lei@redhat.com>
+Message-ID: <Pine.LNX.4.44L0.1807111327110.1436-100000@iolanthe.rowland.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180711171409.GC3500@lst.de>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Christoph,
+On Thu, 12 Jul 2018, Ming Lei wrote:
 
-On Wed, Jul 11, 2018 at 07:14:09PM +0200, Christoph Hellwig wrote:
-> > @@ -3770,7 +3770,7 @@ EXPORT_SYMBOL(blk_finish_plug);
-> >  void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
-> >  {
-> >  	/* not support for RQF_PM and ->rpm_status in blk-mq yet */
-> > -	if (q->mq_ops)
-> > +	if (q->mq_ops && !(q->tag_set->flags & BLK_MQ_F_SUPPORT_RPM))
-> >  		return;
-> >  
-> >  	q->dev = dev;
+> Usually SCSI supports runtime PM, so pass BLK_MQ_F_SUPPORT_RPM to blk-mq
+> core for enabling block runtime PM.
 > 
-> This should go into a block layer patch, not a scsi one.
-
-OK.
-
+> Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+> Cc: Alan Stern <stern@rowland.harvard.edu>
+> Cc: linux-pm@vger.kernel.org
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
+> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+> Cc: linux-scsi@vger.kernel.org
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-core.c        | 2 +-
+>  drivers/scsi/scsi_lib.c | 3 ++-
+>  2 files changed, 3 insertions(+), 2 deletions(-)
 > 
-> > diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-> > index 41e9ac9fc138..fa4667aa4732 100644
-> > --- a/drivers/scsi/scsi_lib.c
-> > +++ b/drivers/scsi/scsi_lib.c
-> > @@ -2306,7 +2306,8 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
-> >  	shost->tag_set.queue_depth = shost->can_queue;
-> >  	shost->tag_set.cmd_size = cmd_size;
-> >  	shost->tag_set.numa_node = NUMA_NO_NODE;
-> > -	shost->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_SG_MERGE;
-> > +	shost->tag_set.flags = BLK_MQ_F_SHOULD_MERGE |
-> > +		BLK_MQ_F_SG_MERGE | BLK_MQ_F_SUPPORT_RPM;
-> 
-> As far as I can tell only ufs and libata support runtime PM, so
-> we should probably only enable it for those.
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index bf66d561980d..9e47205366ab 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -3770,7 +3770,7 @@ EXPORT_SYMBOL(blk_finish_plug);
+>  void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
+>  {
+>  	/* not support for RQF_PM and ->rpm_status in blk-mq yet */
 
-For legacy path, blk_pm_runtime_init() is always run for all SCSI devices,
-and this patch just follows the old way, so that we can keep runtime PM
-behaviour not changed from user view. That means if we want to only enable
-for ufs & libata, it should be in another standalone patch, instead of
-this one.
+Shouldn't that comment be removed?
 
-I will address all your other comments and Alan's in V2.
-
-Thanks,
-Ming
+Alan Stern
