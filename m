@@ -1,41 +1,39 @@
-Return-Path: <BATV+c9ebeb9e9cafa2a765ab+5448+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
+Return-Path: <penguin-kernel@i-love.sakura.ne.jp>
+Subject: Re: [PATCH v3] block/loop: Serialize ioctl operations.
+From: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Boaz Harrosh <ooo@electrozaur.com>,
-	linux-block@vger.kernel.org,
-	linux-bcache@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 2/5] exofs: use bio_clone_fast in _write_mirror
-Date: Tue, 24 Jul 2018 09:52:31 +0200
-Message-Id: <20180724075234.26861-3-hch@lst.de>
-In-Reply-To: <20180724075234.26861-1-hch@lst.de>
-References: <20180724075234.26861-1-hch@lst.de>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzbot
+ <syzbot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>,
+        syzbot <syzbot+bf89c128e05dd6c62523@syzkaller.appspotmail.com>
+References: <1527297408-4428-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp>
+ <ce5ce21a-5865-36c5-a110-eed11f785ab2@I-love.SAKURA.ne.jp>
+ <748bce03-afda-4ed2-13b3-1fcd01d57770@kernel.dk>
+ <9a9209af-c841-6034-4b4f-46d93aa0c037@i-love.sakura.ne.jp>
+Message-ID: <92bffcc8-c25d-2297-80b3-24ba99075cd6@i-love.sakura.ne.jp>
+Date: Wed, 11 Jul 2018 23:29:35 +0900
+MIME-Version: 1.0
+In-Reply-To: <9a9209af-c841-6034-4b4f-46d93aa0c037@i-love.sakura.ne.jp>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-The mirroring code never changes the bio data or biovecs.  This means
-we can reuse the biovec allocation easily instead of duplicating it.
+Since syzbot restarted testing linux-next.git , it is a good chance
+to test this patch for unexpected regressions (until you come up with
+a good alternative).
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by Boaz Harrosh <ooo@electrozaur.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
----
- fs/exofs/ore.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/fs/exofs/ore.c b/fs/exofs/ore.c
-index 1b8b44637e70..5331a15a61f1 100644
---- a/fs/exofs/ore.c
-+++ b/fs/exofs/ore.c
-@@ -873,8 +873,8 @@ static int _write_mirror(struct ore_io_state *ios, int cur_comp)
- 			struct bio *bio;
- 
- 			if (per_dev != master_dev) {
--				bio = bio_clone_kmalloc(master_dev->bio,
--							GFP_KERNEL);
-+				bio = bio_clone_fast(master_dev->bio,
-+						     GFP_KERNEL, NULL);
- 				if (unlikely(!bio)) {
- 					ORE_DBGMSG(
- 					      "Failed to allocate BIO size=%u\n",
--- 
-2.18.0
+On 2018/06/26 23:34, Tetsuo Handa wrote:
+> Did you get any idea?
+> 
+> On 2018/06/05 3:13, Jens Axboe wrote:
+>> On 6/4/18 5:19 AM, Tetsuo Handa wrote:
+>>> This problem was already ignored for 8 months. Unless we boost priority,
+>>> this problem will be ignored for years. Jens, can we test this patch?
+>>
+>> Sorry, it's just that I _really_ hate this patch. We're making up
+>> a weird locking primitive that tracks the process, with a weird
+>> unlock helper that only unlocks if it's the process that is
+>> holding the mutex.
+>>
+>> I'll try and think about this a bit, it would be nice if we had
+>> a better alternative than the above.
+>>
