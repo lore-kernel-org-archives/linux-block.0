@@ -1,25 +1,25 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:61824 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732449AbeGLUqm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Jul 2018 16:46:42 -0400
 Subject: Re: [PATCH] block: skd: Use %pad printk format for dma_addr_t values
-To: Helge Deller <deller@gmx.de>, Bart Van Assche <bart.vanassche@wdc.com>,
- linux-block@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
+To: Helge Deller <deller@gmx.de>, linux-block@vger.kernel.org,
+        Arnd Bergmann <arnd@arndb.de>
 Cc: linux-parisc@vger.kernel.org
 References: <20180712202916.GA32416@ls3530.fritz.box>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <b8229402-5d73-8737-4260-b1a55c43919e@kernel.dk>
-Date: Thu, 12 Jul 2018 15:01:40 -0600
+From: Bart Van Assche <bart.vanassche@wdc.com>
+Message-ID: <ad3b2585-2b36-2078-4a67-93cf05b70824@wdc.com>
+Date: Thu, 12 Jul 2018 13:35:24 -0700
 MIME-Version: 1.0
 In-Reply-To: <20180712202916.GA32416@ls3530.fritz.box>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 7/12/18 2:29 PM, Helge Deller wrote:
+On 07/12/18 13:29, Helge Deller wrote:
 > Use the existing %pad printk format to print dma_addr_t values.
 > This avoids the following warnings when compiling on the parisc64 platform:
-> 
-> drivers/block/skd_main.c: In function 'skd_preop_sg_list':
-> drivers/block/skd_main.c:660:4: warning: format '%llx' expects argument of type 'long long unsigned int', but argument 6 has type 'dma_addr_t {aka unsigned int}' [-Wformat=]
 
-Applied, thanks.
-
--- 
-Jens Axboe
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
