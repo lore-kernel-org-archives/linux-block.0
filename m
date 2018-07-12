@@ -1,57 +1,72 @@
-Return-Path: <prvs=72400c35d=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "keith.busch@linux.intel.com" <keith.busch@linux.intel.com>
-CC: "hch@lst.de" <hch@lst.de>, "keith.busch@intel.com"
-	<keith.busch@intel.com>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
+Return-Path: <keith.busch@linux.intel.com>
+Date: Thu, 12 Jul 2018 13:24:37 -0600
+From: Keith Busch <keith.busch@linux.intel.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+	"keith.busch@intel.com" <keith.busch@intel.com>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
 	"ming.lei@redhat.com" <ming.lei@redhat.com>
 Subject: Re: [RFC PATCH 3/3] blk-mq: Remove generation seqeunce
-Date: Thu, 12 Jul 2018 22:24:42 +0000
-Message-ID: <7cad25b821c3a640e036f28ff1bbe51e7362d25d.camel@wdc.com>
+Message-ID: <20180712192437.GA16839@localhost.localdomain>
 References: <20180521231131.6685-1-keith.busch@intel.com>
-	 <20180521231131.6685-4-keith.busch@intel.com>
-	 <c42d13289e38df93bb35e9876b803420e40b03d3.camel@wdc.com>
-	 <20180712192437.GA16839@localhost.localdomain>
-In-Reply-To: <20180712192437.GA16839@localhost.localdomain>
-Content-Type: text/plain; charset="utf-8"
+ <20180521231131.6685-4-keith.busch@intel.com>
+ <c42d13289e38df93bb35e9876b803420e40b03d3.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <c42d13289e38df93bb35e9876b803420e40b03d3.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVGh1LCAyMDE4LTA3LTEyIGF0IDEzOjI0IC0wNjAwLCBLZWl0aCBCdXNjaCB3cm90ZToNCj4g
-T24gVGh1LCBKdWwgMTIsIDIwMTggYXQgMDY6MTY6MTJQTSArMDAwMCwgQmFydCBWYW4gQXNzY2hl
-IHdyb3RlOg0KPiA+IFdoYXQgcHJldmVudHMgdGhhdCBhIHJlcXVlc3QgZmluaXNoZXMgYW5kIGdl
-dHMgcmV1c2VkIGFmdGVyIHRoZQ0KPiA+IGJsa19tcV9yZXFfZXhwaXJlZCgpIGNhbGwgaGFzIGZp
-bmlzaGVkIGFuZCBiZWZvcmUga3JlZl9nZXRfdW5sZXNzX3plcm8oKSBpcw0KPiA+IGNhbGxlZD8g
-SXMgdGhpcyBwZXJoYXBzIGEgcmFjZSBjb25kaXRpb24gdGhhdCBoYXMgbm90IHlldCBiZWVuIHRy
-aWdnZXJlZCBieQ0KPiA+IGFueSBleGlzdGluZyBibG9jayBsYXllciB0ZXN0PyBQbGVhc2Ugbm90
-ZSB0aGF0IHRoZXJlIGlzIG5vIHN1Y2ggcmFjZQ0KPiA+IGNvbmRpdGlvbiBpbiB0aGUgcGF0Y2gg
-SSBoYWQgcG9zdGVkICgiYmxrLW1xOiBSZXdvcmsgYmxrLW1xIHRpbWVvdXQgaGFuZGxpbmcNCj4g
-PiBhZ2FpbiIgLSBodHRwczovL3d3dy5zcGluaWNzLm5ldC9saXN0cy9saW51eC1ibG9jay9tc2cy
-NjQ4OS5odG1sKS4NCj4gDQo+IEkgZG9uJ3QgdGhpbmsgdGhlcmUncyBhbnkgc3VjaCByYWNlIGlu
-IHRoZSBtZXJnZWQgaW1wbGVtZW50YXRpb24NCj4gZWl0aGVyLiBJZiB0aGUgcmVxdWVzdCBpcyBy
-ZWFsbG9jYXRlZCwgdGhlbiB0aGUga3JlZiBjaGVjayBtYXkgc3VjY2VlZCwNCj4gYnV0IHRoZSBi
-bGtfbXFfcmVxX2V4cGlyZWQoKSBjaGVjayB3b3VsZCBzdXJlbHkgZmFpbCwgYWxsb3dpbmcgdGhl
-DQo+IHJlcXVlc3QgdG8gcHJvY2VlZCBhcyBub3JtYWwuIFRoZSBjb2RlIGNvbW1lbnRzIGF0IGxl
-YXN0IHNheSBhcyBtdWNoLg0KDQpIZWxsbyBLZWl0aCwNCg0KQmVmb3JlIGNvbW1pdCAxMmY1Yjkz
-MTQ1NDUgKCJibGstbXE6IFJlbW92ZSBnZW5lcmF0aW9uIHNlcWV1bmNlIiksIGlmIGENCnJlcXVl
-c3QgY29tcGxldGlvbiB3YXMgcmVwb3J0ZWQgYWZ0ZXIgcmVxdWVzdCB0aW1lb3V0IHByb2Nlc3Np
-bmcgaGFkDQpzdGFydGVkLCBjb21wbGV0aW9uIGhhbmRsaW5nIHdhcyBza2lwcGVkLiBUaGUgZm9s
-bG93aW5nIGNvZGUgaW4NCmJsa19tcV9jb21wbGV0ZV9yZXF1ZXN0KCkgcmVhbGl6ZWQgdGhhdDoN
-Cg0KCWlmIChibGtfbXFfcnFfYWJvcnRlZF9nc3RhdGUocnEpICE9IHJxLT5nc3RhdGUpDQoJCV9f
-YmxrX21xX2NvbXBsZXRlX3JlcXVlc3QocnEpOw0KDQpTaW5jZSBjb21taXQgMTJmNWI5MzE0NTQ1
-LCBpZiBhIGNvbXBsZXRpb24gb2NjdXJzIGFmdGVyIHJlcXVlc3QgdGltZW91dA0KcHJvY2Vzc2lu
-ZyBoYXMgc3RhcnRlZCwgdGhhdCBjb21wbGV0aW9uIGlzIHByb2Nlc3NlZCBpZiB0aGUgcmVxdWVz
-dCBoYXMgdGhlDQpzdGF0ZSBNUV9SUV9JTl9GTElHSFQuIGJsa19tcV9ycV90aW1lZF9vdXQoKSBk
-b2VzIG5vdCBtb2RpZnkgdGhlIHJlcXVlc3QNCnN0YXRlIHVubGVzcyB0aGUgYmxvY2sgZHJpdmVy
-IHRpbWVvdXQgaGFuZGxlciBtb2RpZmllcyBpdCwgZS5nLiBieSBjYWxsaW5nDQpibGtfbXFfZW5k
-X3JlcXVlc3QoKSBvciBieSBjYWxsaW5nIGJsa19tcV9yZXF1ZXVlX3JlcXVlc3QoKS4gVGhlIHR5
-cGljYWwNCmJlaGF2aW9yIG9mIHNjc2lfdGltZXNfb3V0KCkgaXMgdG8gcXVldWUgc2VuZGluZyBv
-ZiBhIFNDU0kgYWJvcnQgYW5kIGhlbmNlDQpub3QgdG8gY2hhbmdlIHRoZSByZXF1ZXN0IHN0YXRl
-IGltbWVkaWF0ZWx5LiBJbiBvdGhlciB3b3JkcywgaWYgYSByZXF1ZXN0DQpjb21wbGV0aW9uIG9j
-Y3VycyBkdXJpbmcgb3Igc2hvcnRseSBhZnRlciBhIHRpbWVvdXQgb2NjdXJyZWQgdGhlbg0KYmxr
-X21xX2NvbXBsZXRlX3JlcXVlc3QoKSB3aWxsIGNhbGwgX19ibGtfbXFfY29tcGxldGVfcmVxdWVz
-dCgpIGFuZCB3aWxsDQpjb21wbGV0ZSB0aGUgcmVxdWVzdCwgYWx0aG91Z2ggdGhhdCBpcyBub3Qg
-YWxsb3dlZCBiZWNhdXNlIHRpbWVvdXQgaGFuZGxpbmcNCmhhcyBhbHJlYWR5IHN0YXJ0ZWQuIERv
-IHlvdSBhZ3JlZSB3aXRoIHRoaXMgYW5hbHlzaXM/DQoNClRoYW5rcywNCg0KQmFydC4NCg0KDQoN
-Cg0KDQoNCg0KDQo=
+On Thu, Jul 12, 2018 at 06:16:12PM +0000, Bart Van Assche wrote:
+> On Mon, 2018-05-21 at 17:11 -0600, Keith Busch wrote:
+> >  	/*
+> > -	 * We marked @rq->aborted_gstate and waited for RCU.  If there were
+> > -	 * completions that we lost to, they would have finished and
+> > -	 * updated @rq->gstate by now; otherwise, the completion path is
+> > -	 * now guaranteed to see @rq->aborted_gstate and yield.  If
+> > -	 * @rq->aborted_gstate still matches @rq->gstate, @rq is ours.
+> > +	 * Just do a quick check if it is expired before locking the request in
+> > +	 * so we're not unnecessarilly synchronizing across CPUs.
+> >  	 */
+> > -	if (!(rq->rq_flags & RQF_MQ_TIMEOUT_EXPIRED) &&
+> > -	    READ_ONCE(rq->gstate) == rq->aborted_gstate)
+> > +	if (!blk_mq_req_expired(rq, next))
+> > +		return;
+> > +
+> > +	/*
+> > +	 * We have reason to believe the request may be expired. Take a
+> > +	 * reference on the request to lock this request lifetime into its
+> > +	 * currently allocated context to prevent it from being reallocated in
+> > +	 * the event the completion by-passes this timeout handler.
+> > +	 * 
+> > +	 * If the reference was already released, then the driver beat the
+> > +	 * timeout handler to posting a natural completion.
+> > +	 */
+> > +	if (!kref_get_unless_zero(&rq->ref))
+> > +		return;
+> > +
+> > +	/*
+> > +	 * The request is now locked and cannot be reallocated underneath the
+> > +	 * timeout handler's processing. Re-verify this exact request is truly
+> > +	 * expired; if it is not expired, then the request was completed and
+> > +	 * reallocated as a new request.
+> > +	 */
+> > +	if (blk_mq_req_expired(rq, next))
+> >  		blk_mq_rq_timed_out(rq, reserved);
+> > +	blk_mq_put_request(rq);
+> >  }
+> 
+> Hello Keith and Christoph,
+> 
+> What prevents that a request finishes and gets reused after the
+> blk_mq_req_expired() call has finished and before kref_get_unless_zero() is
+> called? Is this perhaps a race condition that has not yet been triggered by
+> any existing block layer test? Please note that there is no such race
+> condition in the patch I had posted ("blk-mq: Rework blk-mq timeout handling
+> again" - https://www.spinics.net/lists/linux-block/msg26489.html).
+
+I don't think there's any such race in the merged implementation
+either. If the request is reallocated, then the kref check may succeed,
+but the blk_mq_req_expired() check would surely fail, allowing the
+request to proceed as normal. The code comments at least say as much.
