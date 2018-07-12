@@ -1,56 +1,43 @@
-Return-Path: <BATV+8b936f0259a3f6fbcbd3+5432+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Sun, 8 Jul 2018 07:58:40 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@infradead.org>, dgilbert@interlog.com,
-	Al Viro <viro@ZenIV.linux.org.uk>, Jann Horn <jannh@google.com>,
-	FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-hardening@lists.openwall.com,
-	security@kernel.org
-Subject: Re: [PATCH] sg, bsg: mitigate read/write abuse, block uaccess in
- release
-Message-ID: <20180708145840.GA22949@infradead.org>
-References: <20180615152335.208202-1-jannh@google.com>
- <20180615164009.GD30522@ZenIV.linux.org.uk>
- <90063ef3-68fa-e983-9b47-838e6076b0f4@interlog.com>
- <813e817b-bb2f-4a47-6225-9e39f19be278@kernel.dk>
- <20180621123431.GA558@infradead.org>
- <36a641db-fb1d-6c4c-7f1b-172f2b1cde32@kernel.dk>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] bsg: remove read/write support
+To: Christoph Hellwig <hch@lst.de>
+Cc: torvalds@linux-foundation.org, tonyb@cybernetics.com, jannh@google.com,
+ linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20180712080959.21180-1-hch@lst.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <7882dce2-4dca-3af6-7aea-7acd9997f3e9@kernel.dk>
+Date: Thu, 12 Jul 2018 08:04:29 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <36a641db-fb1d-6c4c-7f1b-172f2b1cde32@kernel.dk>
+In-Reply-To: <20180712080959.21180-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jun 21, 2018 at 08:07:23AM -0600, Jens Axboe wrote:
-> I'd be fine with that, if we knew that nobody uses it. But that's
-> really hard to figure out. I did see Jann's source code scan, which
-> even if non-exhaustive, still shows at least one user of it.
+On 7/12/18 2:09 AM, Christoph Hellwig wrote:
+> The code poses a security risk due to user memory access in ->release
+> and had an API that can't be used reliably.  As far as we know it was
+> never used for real, but if that turns out wrong we'll have to revert
+> this commit and come up with a band aid.
+> 
+> Jann Horn did look software archives for users of this interface,
+> and the only users found were example code in sg3_utils, and optional
+> support in an optional module of the tgt user space iscsi target,
+> which looks like a proof of concept extension of the /dev/sg
+> read/write support.
+> 
+> Tony Battersby chimes in that the code is basically unsafe to use in
+> general:
+> 
+>   The read/write interface on /dev/bsg is impossible to use safely
+>   because the list of completed commands is per-device (bd->done_list)
+>   rather than per-fd like it is with /dev/sg.  So if program A and
+>   program B are both using the write/read interface on the same bsg
+>   device, then their command responses will get mixed up, and program
+>   A will read() some command results from program B and vice versa.
+>   So no, I don't use read/write on /dev/bsg.  From a security standpoint,
+>   it should definitely be fixed or removed.
 
-One is an example, and the other looks very close to an example,
-as far as I can tell it was Nic doing a bsg read/write WIP for a
-tgt module without anyone every picking up on it.  I did add the tgt
-list to Cc and no one seemed to care about the bsg read/write support.
-Adding the tgt list back, but I doubt anyone ever actually used it.
+Applied for 4.19.
 
-> How about we just make the write interface sync? Then any copy can
-> happen while the we block the task, and the read side is just
-> copying the header info back, or dumping it if the task didn't
-> read it before it went away.
-
-How is that going to work?  As far as I can tell each I/O using
-bsg read/write needs a write and a read, so they need to pair
-and thus can't be a purely sync interface.
-
-It also doesn't help with the issue that bsg_write may possible
-write to user memory, which is highly unusal and asking for security
-issues itself.
-
-Either way, we should probably at very least apply a respun version
-of the patch from Jann to 4.18-rc and -stable while we keep discussing
-this.
-
-Jann, can you respin the bsg patch with the same changes as the now
-included sg one?
+-- 
+Jens Axboe
