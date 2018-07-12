@@ -1,66 +1,43 @@
-Return-Path: <rdunlap@infradead.org>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- axboe <axboe@kernel.dk>
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH] block/DAC960.c: fix defined but not used build warnings
-Cc: LKML <linux-kernel@vger.kernel.org>
-Message-ID: <880681dd-f72f-6687-d2cc-59116acd5216@infradead.org>
-Date: Fri, 6 Jul 2018 20:49:19 -0700
+Return-Path: <ming.lei@redhat.com>
+Date: Thu, 12 Jul 2018 20:21:09 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Alan Stern <stern@rowland.harvard.edu>, linux-pm@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org
+Subject: Re: [PATCH RFC 4/4] scsi_mq: enable runtime PM
+Message-ID: <20180712122108.GB2422@ming.t460p>
+References: <20180711162906.14271-1-ming.lei@redhat.com>
+ <20180711162906.14271-5-ming.lei@redhat.com>
+ <20180711171409.GC3500@lst.de>
+ <20180712013642.GA15593@ming.t460p>
+ <20180712071758.GB15624@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180712071758.GB15624@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Randy Dunlap <rdunlap@infradead.org>
+On Thu, Jul 12, 2018 at 09:17:58AM +0200, Christoph Hellwig wrote:
+> On Thu, Jul 12, 2018 at 09:36:49AM +0800, Ming Lei wrote:
+> > > As far as I can tell only ufs and libata support runtime PM, so
+> > > we should probably only enable it for those.
+> > 
+> > For legacy path, blk_pm_runtime_init() is always run for all SCSI devices,
+> > and this patch just follows the old way, so that we can keep runtime PM
+> > behaviour not changed from user view. That means if we want to only enable
+> > for ufs & libata, it should be in another standalone patch, instead of
+> > this one.
+> 
+> Please add this to the series as a separate patch then.
 
-Fix build warnings in DAC960.c when CONFIG_PROC_FS is not enabled
-by marking the unused functions as __maybe_unused.
+blk_pm_runtime_init() is called from sd/sr, that means all sd/sr device
+may support runtime PM. And the command of START_STOP will be run for
+runtime suspend/resume at least even though the host isn't involved.
 
-../drivers/block/DAC960.c:6429:12: warning: 'dac960_proc_show' defined but not used [-Wunused-function]
-../drivers/block/DAC960.c:6449:12: warning: 'dac960_initial_status_proc_show' defined but not used [-Wunused-function]
-../drivers/block/DAC960.c:6456:12: warning: 'dac960_current_status_proc_show' defined but not used [-Wunused-function]
-
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
----
- drivers/block/DAC960.c |    9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
-
---- linux-next-20180706.orig/drivers/block/DAC960.c
-+++ linux-next-20180706/drivers/block/DAC960.c
-@@ -21,6 +21,7 @@
- #define DAC960_DriverDate			"21 Aug 2007"
- 
- 
-+#include <linux/compiler.h>
- #include <linux/module.h>
- #include <linux/types.h>
- #include <linux/miscdevice.h>
-@@ -6426,7 +6427,7 @@ static bool DAC960_V2_ExecuteUserCommand
-   return true;
- }
- 
--static int dac960_proc_show(struct seq_file *m, void *v)
-+static int __maybe_unused dac960_proc_show(struct seq_file *m, void *v)
- {
-   unsigned char *StatusMessage = "OK\n";
-   int ControllerNumber;
-@@ -6446,14 +6447,16 @@ static int dac960_proc_show(struct seq_f
-   return 0;
- }
- 
--static int dac960_initial_status_proc_show(struct seq_file *m, void *v)
-+static int __maybe_unused dac960_initial_status_proc_show(struct seq_file *m,
-+							  void *v)
- {
- 	DAC960_Controller_T *Controller = (DAC960_Controller_T *)m->private;
- 	seq_printf(m, "%.*s", Controller->InitialStatusLength, Controller->CombinedStatusBuffer);
- 	return 0;
- }
- 
--static int dac960_current_status_proc_show(struct seq_file *m, void *v)
-+static int __maybe_unused dac960_current_status_proc_show(struct seq_file *m,
-+							  void *v)
- {
-   DAC960_Controller_T *Controller = (DAC960_Controller_T *) m->private;
-   unsigned char *StatusMessage =
+Thanks,
+Ming
