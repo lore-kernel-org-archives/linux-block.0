@@ -1,84 +1,57 @@
-Return-Path: <jianchao.w.wang@oracle.com>
+Return-Path: <prvs=72400c35d=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "keith.busch@linux.intel.com" <keith.busch@linux.intel.com>
+CC: "hch@lst.de" <hch@lst.de>, "keith.busch@intel.com"
+	<keith.busch@intel.com>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>
 Subject: Re: [RFC PATCH 3/3] blk-mq: Remove generation seqeunce
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "keith.busch@linux.intel.com" <keith.busch@linux.intel.com>
-Cc: "hch@lst.de" <hch@lst.de>,
-        "keith.busch@intel.com"
- <keith.busch@intel.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
+Date: Thu, 12 Jul 2018 22:24:42 +0000
+Message-ID: <7cad25b821c3a640e036f28ff1bbe51e7362d25d.camel@wdc.com>
 References: <20180521231131.6685-1-keith.busch@intel.com>
- <20180521231131.6685-4-keith.busch@intel.com>
- <c42d13289e38df93bb35e9876b803420e40b03d3.camel@wdc.com>
- <20180712192437.GA16839@localhost.localdomain>
- <7cad25b821c3a640e036f28ff1bbe51e7362d25d.camel@wdc.com>
-From: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <19017b48-c6ff-b13c-75ca-32dd173ef0cd@oracle.com>
-Date: Fri, 13 Jul 2018 09:12:39 +0800
+	 <20180521231131.6685-4-keith.busch@intel.com>
+	 <c42d13289e38df93bb35e9876b803420e40b03d3.camel@wdc.com>
+	 <20180712192437.GA16839@localhost.localdomain>
+In-Reply-To: <20180712192437.GA16839@localhost.localdomain>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <7cad25b821c3a640e036f28ff1bbe51e7362d25d.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-
-
-On 07/13/2018 06:24 AM, Bart Van Assche wrote:
-> On Thu, 2018-07-12 at 13:24 -0600, Keith Busch wrote:
->> On Thu, Jul 12, 2018 at 06:16:12PM +0000, Bart Van Assche wrote:
->>> What prevents that a request finishes and gets reused after the
->>> blk_mq_req_expired() call has finished and before kref_get_unless_zero() is
->>> called? Is this perhaps a race condition that has not yet been triggered by
->>> any existing block layer test? Please note that there is no such race
->>> condition in the patch I had posted ("blk-mq: Rework blk-mq timeout handling
->>> again" - https://urldefense.proofpoint.com/v2/url?u=https-3A__www.spinics.net_lists_linux-2Dblock_msg26489.html&d=DwIGaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=7WdAxUBeiTUTCy8v-7zXyr4qk7sx26ATvfo6QSTvZyQ&m=zqZd2myYLkxjU6DWtRKpls-gvzEGEB4vv8bdYq5CiBs&s=-d79KAhEM83ShMp8xCHKoE6Dp5Gxf98L94DuamLEAaU&e=).
->>
->> I don't think there's any such race in the merged implementation
->> either. If the request is reallocated, then the kref check may succeed,
->> but the blk_mq_req_expired() check would surely fail, allowing the
->> request to proceed as normal. The code comments at least say as much.
-> 
-> Hello Keith,
-> 
-> Before commit 12f5b9314545 ("blk-mq: Remove generation seqeunce"), if a
-> request completion was reported after request timeout processing had
-> started, completion handling was skipped. The following code in
-> blk_mq_complete_request() realized that:
-> 
-> 	if (blk_mq_rq_aborted_gstate(rq) != rq->gstate)
-> 		__blk_mq_complete_request(rq);
-> 
-> Since commit 12f5b9314545, if a completion occurs after request timeout
-> processing has started, that completion is processed if the request has the
-> state MQ_RQ_IN_FLIGHT. blk_mq_rq_timed_out() does not modify the request
-> state unless the block driver timeout handler modifies it, e.g. by calling
-> blk_mq_end_request() or by calling blk_mq_requeue_request(). The typical
-> behavior of scsi_times_out() is to queue sending of a SCSI abort and hence
-> not to change the request state immediately. In other words, if a request
-> completion occurs during or shortly after a timeout occurred then
-> blk_mq_complete_request() will call __blk_mq_complete_request() and will
-> complete the request, although that is not allowed because timeout handling
-> has already started. Do you agree with this analysis?
->
-
-Oh, thanks gods for hearing Bart said this.
-I was always saying the same thing in the mail
-https://marc.info/?l=linux-block&m=152950093831738&w=2
-Even though my voice is tiny, I support Bart's point definitely.
-
-Thanks
-Jianchao
- 
-> Thanks,
-> 
-> Bart.
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
+T24gVGh1LCAyMDE4LTA3LTEyIGF0IDEzOjI0IC0wNjAwLCBLZWl0aCBCdXNjaCB3cm90ZToNCj4g
+T24gVGh1LCBKdWwgMTIsIDIwMTggYXQgMDY6MTY6MTJQTSArMDAwMCwgQmFydCBWYW4gQXNzY2hl
+IHdyb3RlOg0KPiA+IFdoYXQgcHJldmVudHMgdGhhdCBhIHJlcXVlc3QgZmluaXNoZXMgYW5kIGdl
+dHMgcmV1c2VkIGFmdGVyIHRoZQ0KPiA+IGJsa19tcV9yZXFfZXhwaXJlZCgpIGNhbGwgaGFzIGZp
+bmlzaGVkIGFuZCBiZWZvcmUga3JlZl9nZXRfdW5sZXNzX3plcm8oKSBpcw0KPiA+IGNhbGxlZD8g
+SXMgdGhpcyBwZXJoYXBzIGEgcmFjZSBjb25kaXRpb24gdGhhdCBoYXMgbm90IHlldCBiZWVuIHRy
+aWdnZXJlZCBieQ0KPiA+IGFueSBleGlzdGluZyBibG9jayBsYXllciB0ZXN0PyBQbGVhc2Ugbm90
+ZSB0aGF0IHRoZXJlIGlzIG5vIHN1Y2ggcmFjZQ0KPiA+IGNvbmRpdGlvbiBpbiB0aGUgcGF0Y2gg
+SSBoYWQgcG9zdGVkICgiYmxrLW1xOiBSZXdvcmsgYmxrLW1xIHRpbWVvdXQgaGFuZGxpbmcNCj4g
+PiBhZ2FpbiIgLSBodHRwczovL3d3dy5zcGluaWNzLm5ldC9saXN0cy9saW51eC1ibG9jay9tc2cy
+NjQ4OS5odG1sKS4NCj4gDQo+IEkgZG9uJ3QgdGhpbmsgdGhlcmUncyBhbnkgc3VjaCByYWNlIGlu
+IHRoZSBtZXJnZWQgaW1wbGVtZW50YXRpb24NCj4gZWl0aGVyLiBJZiB0aGUgcmVxdWVzdCBpcyBy
+ZWFsbG9jYXRlZCwgdGhlbiB0aGUga3JlZiBjaGVjayBtYXkgc3VjY2VlZCwNCj4gYnV0IHRoZSBi
+bGtfbXFfcmVxX2V4cGlyZWQoKSBjaGVjayB3b3VsZCBzdXJlbHkgZmFpbCwgYWxsb3dpbmcgdGhl
+DQo+IHJlcXVlc3QgdG8gcHJvY2VlZCBhcyBub3JtYWwuIFRoZSBjb2RlIGNvbW1lbnRzIGF0IGxl
+YXN0IHNheSBhcyBtdWNoLg0KDQpIZWxsbyBLZWl0aCwNCg0KQmVmb3JlIGNvbW1pdCAxMmY1Yjkz
+MTQ1NDUgKCJibGstbXE6IFJlbW92ZSBnZW5lcmF0aW9uIHNlcWV1bmNlIiksIGlmIGENCnJlcXVl
+c3QgY29tcGxldGlvbiB3YXMgcmVwb3J0ZWQgYWZ0ZXIgcmVxdWVzdCB0aW1lb3V0IHByb2Nlc3Np
+bmcgaGFkDQpzdGFydGVkLCBjb21wbGV0aW9uIGhhbmRsaW5nIHdhcyBza2lwcGVkLiBUaGUgZm9s
+bG93aW5nIGNvZGUgaW4NCmJsa19tcV9jb21wbGV0ZV9yZXF1ZXN0KCkgcmVhbGl6ZWQgdGhhdDoN
+Cg0KCWlmIChibGtfbXFfcnFfYWJvcnRlZF9nc3RhdGUocnEpICE9IHJxLT5nc3RhdGUpDQoJCV9f
+YmxrX21xX2NvbXBsZXRlX3JlcXVlc3QocnEpOw0KDQpTaW5jZSBjb21taXQgMTJmNWI5MzE0NTQ1
+LCBpZiBhIGNvbXBsZXRpb24gb2NjdXJzIGFmdGVyIHJlcXVlc3QgdGltZW91dA0KcHJvY2Vzc2lu
+ZyBoYXMgc3RhcnRlZCwgdGhhdCBjb21wbGV0aW9uIGlzIHByb2Nlc3NlZCBpZiB0aGUgcmVxdWVz
+dCBoYXMgdGhlDQpzdGF0ZSBNUV9SUV9JTl9GTElHSFQuIGJsa19tcV9ycV90aW1lZF9vdXQoKSBk
+b2VzIG5vdCBtb2RpZnkgdGhlIHJlcXVlc3QNCnN0YXRlIHVubGVzcyB0aGUgYmxvY2sgZHJpdmVy
+IHRpbWVvdXQgaGFuZGxlciBtb2RpZmllcyBpdCwgZS5nLiBieSBjYWxsaW5nDQpibGtfbXFfZW5k
+X3JlcXVlc3QoKSBvciBieSBjYWxsaW5nIGJsa19tcV9yZXF1ZXVlX3JlcXVlc3QoKS4gVGhlIHR5
+cGljYWwNCmJlaGF2aW9yIG9mIHNjc2lfdGltZXNfb3V0KCkgaXMgdG8gcXVldWUgc2VuZGluZyBv
+ZiBhIFNDU0kgYWJvcnQgYW5kIGhlbmNlDQpub3QgdG8gY2hhbmdlIHRoZSByZXF1ZXN0IHN0YXRl
+IGltbWVkaWF0ZWx5LiBJbiBvdGhlciB3b3JkcywgaWYgYSByZXF1ZXN0DQpjb21wbGV0aW9uIG9j
+Y3VycyBkdXJpbmcgb3Igc2hvcnRseSBhZnRlciBhIHRpbWVvdXQgb2NjdXJyZWQgdGhlbg0KYmxr
+X21xX2NvbXBsZXRlX3JlcXVlc3QoKSB3aWxsIGNhbGwgX19ibGtfbXFfY29tcGxldGVfcmVxdWVz
+dCgpIGFuZCB3aWxsDQpjb21wbGV0ZSB0aGUgcmVxdWVzdCwgYWx0aG91Z2ggdGhhdCBpcyBub3Qg
+YWxsb3dlZCBiZWNhdXNlIHRpbWVvdXQgaGFuZGxpbmcNCmhhcyBhbHJlYWR5IHN0YXJ0ZWQuIERv
+IHlvdSBhZ3JlZSB3aXRoIHRoaXMgYW5hbHlzaXM/DQoNClRoYW5rcywNCg0KQmFydC4NCg0KDQoN
+Cg0KDQoNCg0KDQo=
