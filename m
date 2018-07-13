@@ -1,61 +1,80 @@
 Return-Path: <axboe@kernel.dk>
 Subject: Re: Silent data corruption in blkdev_direct_IO()
-To: Ming Lei <tom.leiming@gmail.com>, Hannes Reinecke <hare@suse.de>
-Cc: Christoph Hellwig <hch@lst.de>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Martin Wilck <mwilck@suse.com>
-References: <e36f28d8-0eb8-1600-f327-8b066eeaf45c@suse.de>
- <CACVXFVPVb_8pUkGXPt5joDE4JRu0b4kgTQy7Pd0sL+kXDwys+A@mail.gmail.com>
 From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <c5073ab4-6b06-16bd-f358-d4c18e18b3e0@kernel.dk>
-Date: Fri, 13 Jul 2018 12:54:52 -0600
+To: Martin Wilck <mwilck@suse.com>, Hannes Reinecke <hare@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <e36f28d8-0eb8-1600-f327-8b066eeaf45c@suse.de>
+ <3419a3ae-da82-9c20-26e1-7c9ed14ff8ed@kernel.dk>
+ <a1679897-ed41-1ceb-f94f-bd1be537ce4e@suse.de>
+ <57a2b121-9805-8337-fb97-67943670f250@kernel.dk>
+ <a0b0e59b-60cd-9933-6752-4c21a7a975fe@kernel.dk>
+ <2311947c2f0f368bd10474edb0f0f5b51dde6b7d.camel@suse.com>
+ <b85c5eff-d6dc-e43c-8e2c-608249ae81a2@kernel.dk>
+Message-ID: <6ba0d73a-aaf7-f283-88e7-eb151caa8628@kernel.dk>
+Date: Fri, 13 Jul 2018 12:50:23 -0600
 MIME-Version: 1.0
-In-Reply-To: <CACVXFVPVb_8pUkGXPt5joDE4JRu0b4kgTQy7Pd0sL+kXDwys+A@mail.gmail.com>
+In-Reply-To: <b85c5eff-d6dc-e43c-8e2c-608249ae81a2@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 7/12/18 5:29 PM, Ming Lei wrote:
-> On Thu, Jul 12, 2018 at 10:36 PM, Hannes Reinecke <hare@suse.de> wrote:
->> Hi Jens, Christoph,
+On 7/13/18 12:00 PM, Jens Axboe wrote:
+> On 7/13/18 10:56 AM, Martin Wilck wrote:
+>> On Thu, 2018-07-12 at 10:42 -0600, Jens Axboe wrote:
+>>>
+>>> Hence the patch I sent is wrong, the code actually looks fine. Which
+>>> means we're back to trying to figure out what is going on here. It'd
+>>> be great with a test case...
 >>
->> we're currently hunting down a silent data corruption occurring due to
->> commit 72ecad22d9f1 ("block: support a full bio worth of IO for
->> simplified bdev direct-io").
+>> We don't have an easy test case yet. But the customer has confirmed
+>> that the problem occurs with upstream 4.17.5, too. We also confirmed
+>> again that the problem occurs when the kernel uses the kmalloc() code
+>> path in __blkdev_direct_IO_simple().
 >>
->> While the whole thing is still hazy on the details, the one thing we've
->> found is that reverting that patch fixes the data corruption.
->>
->> And looking closer, I've found this:
->>
->> static ssize_t
->> blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
->> {
->>         int nr_pages;
->>
->>         nr_pages = iov_iter_npages(iter, BIO_MAX_PAGES + 1);
->>         if (!nr_pages)
->>                 return 0;
->>         if (is_sync_kiocb(iocb) && nr_pages <= BIO_MAX_PAGES)
->>                 return __blkdev_direct_IO_simple(iocb, iter, nr_pages);
->>
->>         return __blkdev_direct_IO(iocb, iter, min(nr_pages, BIO_MAX_PAGES));
->> }
->>
->> When checking the call path
->> __blkdev_direct_IO()->bio_alloc_bioset()->bvec_alloc()
->> I found that bvec_alloc() will fail if nr_pages > BIO_MAX_PAGES.
->>
->> So why is there the check for 'nr_pages <= BIO_MAX_PAGES' ?
->> It's not that we can handle it in __blkdev_direct_IO() ...
->>
->> Thanks for any clarification.
+>> My personal suggestion would be to ditch __blkdev_direct_IO_simple()
+>> altogether. After all, it's not _that_ much simpler thatn
+>> __blkdev_direct_IO(), and it seems to be broken in a subtle way.
 > 
-> Maybe you can try the following patch from Christoph to see if it makes a
-> difference:
+> That's not a great suggestion at all, we need to find out why we're
+> hitting the issue. For all you know, the bug could be elsewhere and
+> we're just going to be hitting it differently some other way. The
+> head-in-the-sand approach is rarely a win long term.
 > 
-> https://marc.info/?l=linux-kernel&m=153013977816825&w=2
+> It's saving an allocation per IO, that's definitely measurable on
+> the faster storage. For reads, it's also not causing a context
+> switch for dirtying pages. I'm not a huge fan of multiple cases
+> in general, but this one is definitely warranted in an era where
+> 1 usec is a lot of extra time for an IO.
+> 
+>> However, so far I've only identified a minor problem, see below - it
+>> doesn't explain the data corruption we're seeing.
+> 
+> What would help is trying to boil down a test case. So far it's a lot
+> of hand waving, and nothing that can really help narrow down what is
+> going on here.
 
-That's not a bad idea.
+When someone reports to you that some kind of data corruption occurs,
+you need to find out as many details you can. Ideally they can give you
+a test case, but if they can't, you ask as many questions as possible to
+help YOU make a test case.
+
+- What is the nature of the corruption? Is it reads or writes? Is it
+  zeroes, random data, or data from somewhere else? How big is the
+  corrupted area?
+
+- What does the workload look like that reproduces it? If they don't
+  really know and they can't give you a reproducer, you help them with
+  tracing to give you the information you need.
+
+Those are a great start. Right now we have zero information, other than
+reverting that patch fixes it. This means that we're likely dealing with
+IO that is larger than 16k, since we're going to be hitting the same
+path for <= 16k ios with the patch reverted. We also know it's less than
+1MB. But that's it. I don't even know if it's writes, since your (and
+Hannes's) report has no details at all.
+
+Go look at what you ask customers to provide for bug reports, then apply
+some of that to this case...
 
 -- 
 Jens Axboe
