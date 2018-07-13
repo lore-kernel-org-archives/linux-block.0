@@ -1,92 +1,118 @@
-Return-Path: <hch@lst.de>
-Date: Tue, 17 Jul 2018 15:23:12 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+Return-Path: <ming.lei@redhat.com>
+Date: Sat, 14 Jul 2018 06:47:00 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Alan Stern <stern@rowland.harvard.edu>,
+	Ming Lei <tom.leiming@gmail.com>,
+	linux-block <linux-block@vger.kernel.org>,
 	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Alan Stern <stern@rowland.harvard.edu>, linux-pm@vger.kernel.org,
+	Linux PM List <linux-pm@vger.kernel.org>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Christoph Hellwig <hch@lst.de>,
 	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Adrian Hunter <adrian.hunter@intel.com>,
 	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
 	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: Re: [PATCH RFC V2 2/3] blk-mq: prepare for supporting runtime PM
-Message-ID: <20180717132312.GH13582@lst.de>
-References: <20180713080602.31602-1-ming.lei@redhat.com> <20180713080602.31602-3-ming.lei@redhat.com>
+	Linux SCSI List <linux-scsi@vger.kernel.org>
+Subject: Re: [PATCH RFC 3/4] blk-mq: prepare for supporting runtime PM
+Message-ID: <20180713224653.GA6589@ming.t460p>
+References: <Pine.LNX.4.44L0.1807131618160.10216-100000@netrider.rowland.org>
+ <2b92c400-b299-d2d8-5c7b-94614179522c@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180713080602.31602-3-ming.lei@redhat.com>
+In-Reply-To: <2b92c400-b299-d2d8-5c7b-94614179522c@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Jul 13, 2018 at 04:06:01PM +0800, Ming Lei wrote:
-> This patch introduces blk_mq_pm_add_request() which is called after
-> allocating one request. Also blk_mq_pm_put_request() is introduced
-> and called after one request is freed.
+On Fri, Jul 13, 2018 at 02:39:15PM -0600, Jens Axboe wrote:
+> On 7/13/18 2:27 PM, Alan Stern wrote:
+> > On Fri, 13 Jul 2018, Jens Axboe wrote:
+> > 
+> >>>>> Any idea for avoiding the race without using sync like seqlock or others?
+> >>>>
+> >>>> I just don't want anything like this in the hot path. Why can't we
+> >>>> handle this similarly to how we handle request timeouts? It'll
+> >>>> potentially delay the suspend by a few seconds, but surely that can't be
+> >>>> a big deal. I don't see why we need to track this on a per-request
+> >>>> basis.
+> >>>
+> >>> For legacy path, there is the queue lock, so no the race mentioned.
+> >>>
+> >>> I guess you mean why we can't use RCU style to deal with this issue, so
+> >>> we don't introduce cost in fast path, but the problem is that IO has
+> >>> to be submitted to one active hardware, that is one invariant of runtime
+> >>> PM.
+> >>>
+> >>> So RCU/SRCU won't fix this issue because the rcu_read_lock sync nothing,
+> >>> and we have to make sure that hardware is ready before dispatching IO to
+> >>> hardware/driver. That is why I think sort of sync is required in IO path.
+> >>
+> >> That's not what I meant at all. As I wrote above, I don't want it in the
+> >> hot path at all, and certainly not as a per-request thing. We already
+> >> have a timer on blk-mq that runs while requests are pending, by
+> >> definition the last time that timer triggers, the device is idle. If you
+> >> need to do heavier lifting to ensure we only runtime suspend at that
+> >> point, then THAT'S the place to do it, not adding extra code per
+> >> request. I don't care how cheap the perceived locking is, it's still
+> >> extra code and checks for each and every request. That is what I am
+> >> objecting to.
+> > 
+> > The problem occurs on the opposite side: when a new request is added,
+> > we don't want it to race with a just-started suspend transition.  Can
+> > you suggest a way to prevent this without adding any overhead to the
+> > hot path?
+> > 
+> > For that matter, we also have the issue of checking whether the device
+> > is already suspended when a request is added; in that case we have to
+> > resume the device before issuing the request.  I'm not aware of any way
+> > to avoid performing this check in the hot path.
 > 
-> For blk-mq, it can be quite expensive to accounting in-flight IOs,
-> so this patch calls pm_runtime_mark_last_busy() simply after each IO
-> is done, instead of doing that only after the last in-flight IO is done.
-> This way is still workable, since the active non-PM IO will be checked
-> in blk_pre_runtime_suspend(), and runtime suspend will be prevented
-> if there is any active non-PM IO.
-> 
-> Turns out that sync between runtime PM and IO path has to be done
-> for avoiding race, this patch applies one seqlock for this purpose.
-> So the cost introduced in fast IO path can be minimized given seqlock
-> is often used in fast path, such as reading jiffies &tick, or d_walk(),
-> ...
-> 
-> Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-> Cc: Alan Stern <stern@rowland.harvard.edu>
-> Cc: linux-pm@vger.kernel.org
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Bart Van Assche <bart.vanassche@wdc.com>
-> Cc: Hannes Reinecke <hare@suse.de>
-> Cc: Johannes Thumshirn <jthumshirn@suse.de>
-> Cc: Adrian Hunter <adrian.hunter@intel.com>
-> Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-> Cc: linux-scsi@vger.kernel.org
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-core.c       | 121 +++++++++++++++++++++++++++++++++++++++++--------
->  block/blk-mq.c         |  71 +++++++++++++++++++++++++++++
->  block/blk-mq.h         |  10 ++++
->  include/linux/blk-mq.h |   1 +
->  include/linux/blkdev.h |   1 +
->  5 files changed, 186 insertions(+), 18 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 1087a58590f1..cd73db90d1e3 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -3775,7 +3775,10 @@ static void __blk_post_runtime_resume(struct request_queue *q, int err)
->  {
->  	if (!err) {
->  		q->rpm_status = RPM_ACTIVE;
-> -		__blk_run_queue(q);
-> +		if (!q->mq_ops)
-> +			__blk_run_queue(q);
-> +		else
-> +			blk_mq_run_hw_queues(q, true);
->  		pm_runtime_mark_last_busy(q->dev);
->  		pm_request_autosuspend(q->dev);
->  	} else {
-> @@ -3790,6 +3793,69 @@ static void __blk_set_runtime_active(struct request_queue *q)
->  	pm_request_autosuspend(q->dev);
->  }
->  
-> +static bool blk_mq_support_runtime_pm(struct request_queue *q)
-> +{
-> +	if (!q->tag_set || !(q->tag_set->flags & BLK_MQ_F_SUPPORT_RPM))
-> +		return false;
-> +	return true;
+> The issue is on both sides, of course. The problem, to me, appears to be
+> attempting to retrofit the old pre-suspend checking to blk-mq, where it
+> could be done a lot more optimally by having the suspend side be driven
+> by the timeout timer, and
 
-	return q->tag_set && (q->tag_set->flags & BLK_MQ_F_SUPPORT_RPM);
+Timeout timer won't be one accepted way from user view since the default
+timeout is 30s, but autosuspend delay may be just several seconds, but
+that isn't the current problem.
 
-?
+Now the problem isn't in suspend side, I did think about this way.
+The issue is that we could enter suspending when queue isn't idle, like
+there are only RQF_PM requests pended.
+
+> resume could be driven by first request entering on an idle queue.
+
+The 1st request may be RQF_PM request.
+
+> 
+> Doing a per-request inc/dec type of tracking with synchronization is the
+> easy approach/lazy approach, but it's also woefully inefficient. Any
+> sort of per-queue tracking for blk-mq is not a great idea.
+> 
+> > Is there already some synchronization in place for plugging or stopping 
+> > a request queue?  If there is, could the runtime-PM code make use of 
+> > it?  We might need to add a state in which a queue is blocked for 
+> > normal requests but allows PM-related request to run.
+> 
+> Sure, blk-mq has a plethora of helpers for that, since we use it in
+> other places as well. And it might not be a bad idea to extend that to
+> cover this case as well. See blk_queue_enter() and the queue freeze and
+> queuescing. This is already per-request overhead we're paying.
+
+Before entering runtime suspend, there can't be any normal in-flight IO, so
+quiesce won't work since quiesce only prevents new dispatching and doesn't
+drain queue.
+
+Freeze might work, but blk_queue_enter() will becomes a bit complicated:
+
+1) queue freeze can be done before runtime suspending
+
+2) when any new IO comes, the queue has to be unfrozen.
+
+3) when any RQF_PM request comes, the queue has to be kept in freezing,
+and allows this request to be crossed.
+
+I will think about this approach further and see if it can be done in
+easy way.
+
+
+Thanks,
+Ming
