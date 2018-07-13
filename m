@@ -1,53 +1,46 @@
-Return-Path: <prvs=725264dfc=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "keith.busch@linux.intel.com" <keith.busch@linux.intel.com>
-CC: "hch@lst.de" <hch@lst.de>, "keith.busch@intel.com"
-	<keith.busch@intel.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>
+Return-Path: <keith.busch@linux.intel.com>
+Date: Fri, 13 Jul 2018 09:43:46 -0600
+From: Keith Busch <keith.busch@linux.intel.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"keith.busch@intel.com" <keith.busch@intel.com>,
+	"hch@lst.de" <hch@lst.de>
 Subject: Re: [RFC PATCH 3/3] blk-mq: Remove generation seqeunce
-Date: Fri, 13 Jul 2018 15:52:38 +0000
-Message-ID: <a32b251bd3c0a186e5c5ba82656a85fbdcc0c5e4.camel@wdc.com>
+Message-ID: <20180713154346.GA18955@localhost.localdomain>
 References: <20180521231131.6685-1-keith.busch@intel.com>
-	 <20180521231131.6685-4-keith.busch@intel.com>
-	 <c42d13289e38df93bb35e9876b803420e40b03d3.camel@wdc.com>
-	 <20180712192437.GA16839@localhost.localdomain>
-	 <7cad25b821c3a640e036f28ff1bbe51e7362d25d.camel@wdc.com>
-	 <20180713154346.GA18955@localhost.localdomain>
-In-Reply-To: <20180713154346.GA18955@localhost.localdomain>
-Content-Type: text/plain; charset="utf-8"
+ <20180521231131.6685-4-keith.busch@intel.com>
+ <c42d13289e38df93bb35e9876b803420e40b03d3.camel@wdc.com>
+ <20180712192437.GA16839@localhost.localdomain>
+ <7cad25b821c3a640e036f28ff1bbe51e7362d25d.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <7cad25b821c3a640e036f28ff1bbe51e7362d25d.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE4LTA3LTEzIGF0IDA5OjQzIC0wNjAwLCBLZWl0aCBCdXNjaCB3cm90ZToNCj4g
-T24gVGh1LCBKdWwgMTIsIDIwMTggYXQgMTA6MjQ6NDJQTSArMDAwMCwgQmFydCBWYW4gQXNzY2hl
-IHdyb3RlOg0KPiA+IEJlZm9yZSBjb21taXQgMTJmNWI5MzE0NTQ1ICgiYmxrLW1xOiBSZW1vdmUg
-Z2VuZXJhdGlvbiBzZXFldW5jZSIpLCBpZiBhDQo+ID4gcmVxdWVzdCBjb21wbGV0aW9uIHdhcyBy
-ZXBvcnRlZCBhZnRlciByZXF1ZXN0IHRpbWVvdXQgcHJvY2Vzc2luZyBoYWQNCj4gPiBzdGFydGVk
-LCBjb21wbGV0aW9uIGhhbmRsaW5nIHdhcyBza2lwcGVkLiBUaGUgZm9sbG93aW5nIGNvZGUgaW4N
-Cj4gPiBibGtfbXFfY29tcGxldGVfcmVxdWVzdCgpIHJlYWxpemVkIHRoYXQ6DQo+ID4gDQo+ID4g
-CWlmIChibGtfbXFfcnFfYWJvcnRlZF9nc3RhdGUocnEpICE9IHJxLT5nc3RhdGUpDQo+ID4gCQlf
-X2Jsa19tcV9jb21wbGV0ZV9yZXF1ZXN0KHJxKTsNCj4gPiANCj4gPiBTaW5jZSBjb21taXQgMTJm
-NWI5MzE0NTQ1LCBpZiBhIGNvbXBsZXRpb24gb2NjdXJzIGFmdGVyIHJlcXVlc3QgdGltZW91dA0K
-PiA+IHByb2Nlc3NpbmcgaGFzIHN0YXJ0ZWQsIHRoYXQgY29tcGxldGlvbiBpcyBwcm9jZXNzZWQg
-aWYgdGhlIHJlcXVlc3QgaGFzIHRoZQ0KPiA+IHN0YXRlIE1RX1JRX0lOX0ZMSUdIVC4gYmxrX21x
-X3JxX3RpbWVkX291dCgpIGRvZXMgbm90IG1vZGlmeSB0aGUgcmVxdWVzdA0KPiA+IHN0YXRlIHVu
-bGVzcyB0aGUgYmxvY2sgZHJpdmVyIHRpbWVvdXQgaGFuZGxlciBtb2RpZmllcyBpdCwgZS5nLiBi
-eSBjYWxsaW5nDQo+ID4gYmxrX21xX2VuZF9yZXF1ZXN0KCkgb3IgYnkgY2FsbGluZyBibGtfbXFf
-cmVxdWV1ZV9yZXF1ZXN0KCkuIFRoZSB0eXBpY2FsDQo+ID4gYmVoYXZpb3Igb2Ygc2NzaV90aW1l
-c19vdXQoKSBpcyB0byBxdWV1ZSBzZW5kaW5nIG9mIGEgU0NTSSBhYm9ydCBhbmQgaGVuY2UNCj4g
-PiBub3QgdG8gY2hhbmdlIHRoZSByZXF1ZXN0IHN0YXRlIGltbWVkaWF0ZWx5LiBJbiBvdGhlciB3
-b3JkcywgaWYgYSByZXF1ZXN0DQo+ID4gY29tcGxldGlvbiBvY2N1cnMgZHVyaW5nIG9yIHNob3J0
-bHkgYWZ0ZXIgYSB0aW1lb3V0IG9jY3VycmVkIHRoZW4NCj4gPiBibGtfbXFfY29tcGxldGVfcmVx
-dWVzdCgpIHdpbGwgY2FsbCBfX2Jsa19tcV9jb21wbGV0ZV9yZXF1ZXN0KCkgYW5kIHdpbGwNCj4g
-PiBjb21wbGV0ZSB0aGUgcmVxdWVzdCwgYWx0aG91Z2ggdGhhdCBpcyBub3QgYWxsb3dlZCBiZWNh
-dXNlIHRpbWVvdXQgaGFuZGxpbmcNCj4gPiBoYXMgYWxyZWFkeSBzdGFydGVkLiBEbyB5b3UgYWdy
-ZWUgd2l0aCB0aGlzIGFuYWx5c2lzPw0KPiANCj4gWWVzLCBpdCdzIGRpZmZlcmVudCwgYW5kIHRo
-YXQgd2FzIHRoZSB3aG9sZSBwb2ludC4gTm8gb25lIG1hZGUgdGhhdCBhDQo+IHNlY3JldCBlaXRo
-ZXIuIEFyZSB5b3Ugc2F5aW5nIHlvdSB3YW50IHRpbWVvdXQgc29mdHdhcmUgdG8gdGFrZSBwcmlv
-cml0eQ0KPiBvdmVyIGhhbmRsaW5nIGhhcmR3YXJlIGV2ZW50cz8NCg0KTm8uIFdoYXQgSSdtIHNh
-eWluZyBpcyB0aGF0IGEgYmVoYXZpb3IgY2hhbmdlIGhhcyBiZWVuIGludHJvZHVjZWQgaW4gdGhl
-IGJsb2NrDQpsYXllciB0aGF0IHdhcyBub3QgZG9jdW1lbnRlZCBpbiB0aGUgcGF0Y2ggZGVzY3Jp
-cHRpb24uIEkgdGhpbmsgdGhhdCBiZWhhdmlvcg0KY2hhbmdlIGV2ZW4gY2FuIHRyaWdnZXIgYSBr
-ZXJuZWwgY3Jhc2guDQoNCkJhcnQuDQoNCg0KDQoNCg==
+On Thu, Jul 12, 2018 at 10:24:42PM +0000, Bart Van Assche wrote:
+> Before commit 12f5b9314545 ("blk-mq: Remove generation seqeunce"), if a
+> request completion was reported after request timeout processing had
+> started, completion handling was skipped. The following code in
+> blk_mq_complete_request() realized that:
+> 
+> 	if (blk_mq_rq_aborted_gstate(rq) != rq->gstate)
+> 		__blk_mq_complete_request(rq);
+> 
+> Since commit 12f5b9314545, if a completion occurs after request timeout
+> processing has started, that completion is processed if the request has the
+> state MQ_RQ_IN_FLIGHT. blk_mq_rq_timed_out() does not modify the request
+> state unless the block driver timeout handler modifies it, e.g. by calling
+> blk_mq_end_request() or by calling blk_mq_requeue_request(). The typical
+> behavior of scsi_times_out() is to queue sending of a SCSI abort and hence
+> not to change the request state immediately. In other words, if a request
+> completion occurs during or shortly after a timeout occurred then
+> blk_mq_complete_request() will call __blk_mq_complete_request() and will
+> complete the request, although that is not allowed because timeout handling
+> has already started. Do you agree with this analysis?
+
+Yes, it's different, and that was the whole point. No one made that a
+secret either. Are you saying you want timeout software to take priority
+over handling hardware events?
