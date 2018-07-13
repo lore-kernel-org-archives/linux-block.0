@@ -1,85 +1,57 @@
-Return-Path: <jack.wang.usish@gmail.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:35763 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731427AbeGMJDb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Jul 2018 05:03:31 -0400
+Received: by mail-pg1-f193.google.com with SMTP id e6-v6so4788619pgv.2
+        for <linux-block@vger.kernel.org>; Fri, 13 Jul 2018 01:49:52 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        bart.vanassche@wdc.com, hans.holmberg@cnexlabs.com,
+        javier@cnexlabs.com, hlitz@ucsc.edu, igor.j.konopko@intel.com,
+        marcin.dziegielewski@intel.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 10/10] lightnvm: pblk: assume that chunks are closed on 1.2 devices
+Date: Fri, 13 Jul 2018 10:48:45 +0200
+Message-Id: <20180713084845.19511-11-mb@lightnvm.io>
+In-Reply-To: <20180713084845.19511-1-mb@lightnvm.io>
+References: <20180713084845.19511-1-mb@lightnvm.io>
 MIME-Version: 1.0
-References: <1532352285-13589-1-git-send-email-jinpuwang@gmail.com> <20180723133356.GA1333@kroah.com>
-In-Reply-To: <20180723133356.GA1333@kroah.com>
-From: Jack Wang <jack.wang.usish@gmail.com>
-Date: Mon, 23 Jul 2018 17:00:08 +0200
-Message-ID: <CA+res+TE5-mgnQys67zQ8cqRyv+dgNPpTFLOEq81t2izpq1dsw@mail.gmail.com>
-Subject: Re: [stable-4.14 00/23] block/scsi multiqueue performance enhancement and
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc: Wang Jinpu <xjtuwjp@gmail.com>, stable@vger.kernel.org,
-	Jinpu Wang <jinpu.wang@profitbricks.com>
-Content-Type: text/plain; charset="UTF-8"
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Greg,
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-Thanks for quick reply. Please see reply inline.
+We can't know if a block is closed or not on 1.2 devices, so assume
+closed state to make sure that blocks are erased before writing.
 
+Fixes: 32ef9412c114 ("lightnvm: pblk: implement get log report chunk")
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+---
+ drivers/lightnvm/pblk-init.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-
-Greg KH <gregkh@linuxfoundation.org> =E4=BA=8E2018=E5=B9=B47=E6=9C=8823=E6=
-=97=A5=E5=91=A8=E4=B8=80 =E4=B8=8B=E5=8D=883:34=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Mon, Jul 23, 2018 at 03:24:22PM +0200, Jack Wang wrote:
-> > Hi Greg,
-> >
-> > Please consider this patchset, which include block/scsi multiqueue perf=
-ormance
-> > enhancement and bugfix.
->
-> What exactly is the performance enhancement?  How can you measure it?
-> How did you measure it?
-I'm testing on SRP/IBNBD using fio, I've seen +10% with mix IO load,
-and 50% improvement on small IO (bs=3D512.) with the patchset.
-
->
-> Which one(s) are the bugfixes in this series?  Why not just submit those
-> separately as they should be "obvious fixes", right?
-We had queue stall problem on shared hctx restart, my colleague Roman
-reported to upstream:
-https://lkml.org/lkml/2017/10/18/263
-the patch wasn't taken by upstream, and a bigger patchset from Lei
-Ming was accepted instread with revert and further bugfix later on.
-
-following patches meant for improving performance on scsi-mq, and also
-contains the attempt to fix the queue stall problem
- 358a3a6bccb7 ("blk-mq: don't handle TAG_SHARED in restart")
-  blk-mq-sched: move actual dispatching into one helper
-  blk-mq: introduce .get_budget and .put_budget in blk_mq_ops
-  sbitmap: introduce __sbitmap_for_each_set()
-  blk-mq-sched: improve dispatching from sw queue
-  scsi: allow passing in null rq to scsi_prep_state_check()
-  scsi: implement .get_budget and .put_budget for blk-mq
-  SCSI: don't get target/host busy_count in scsi_mq_get_budget()
-  blk-mq: don't handle TAG_SHARED in restart
-  blk-mq: don't restart queue when .get_budget returns BLK_STS_RESOURCE
-  blk-mq: don't handle failure in .get_budget
-
-Following is independent fix:
-blk-mq: quiesce queue during switching io sched and updating nr_requests
-blk-mq: fix issue with shared tag queue re-running
-
-These are clearup for flush request handling:
-  blk-flush: don't run queue for requests bypassing flush
-  block: pass 'run_queue' to blk_mq_request_bypass_insert
-  blk-flush: use blk_mq_request_bypass_insert()
-  blk-mq-sched: decide how to handle flush rq via RQF_FLUSH_SEQ
-  blk-mq: move blk_mq_put_driver_tag*() into blk-mq.h
-  blk-mq: don't allocate driver tag upfront for flush rq
-
-The left are following up fixes.
->
-> And why didn't you cc: the subsystem maintainer and mailing list here?
-> I need their ack before I could take these.
-Sorry, my mistake, now add Jens, linux-block, ilnux-scsi in reply.
-
-Sorry for confusion.
->
-> thanks,
->
-> greg k-h
-
-Regards,
-Jack Wang
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index d023ea6116bc..537e98f2b24a 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -719,10 +719,11 @@ static int pblk_setup_line_meta_12(struct pblk *pblk, struct pblk_line *line,
+ 
+ 		/*
+ 		 * In 1.2 spec. chunk state is not persisted by the device. Thus
+-		 * some of the values are reset each time pblk is instantiated.
++		 * some of the values are reset each time pblk is instantiated,
++		 * so we have to assume that the block is closed.
+ 		 */
+ 		if (lun_bb_meta[line->id] == NVM_BLK_T_FREE)
+-			chunk->state =  NVM_CHK_ST_FREE;
++			chunk->state =  NVM_CHK_ST_CLOSED;
+ 		else
+ 			chunk->state = NVM_CHK_ST_OFFLINE;
+ 
+-- 
+2.11.0
