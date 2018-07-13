@@ -1,120 +1,57 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	nbd@other.debian.org,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Subject: [PATCH 1/2] nbd: don't requeue the same request twice.
-Date: Mon, 16 Jul 2018 12:11:34 -0400
-Message-Id: <20180716161136.21222-1-josef@toxicpanda.com>
+Return-Path: <yuehaibing@huawei.com>
+Subject: Re: [PATCH] DAC960: hide unused procfs helpers
+To: <axboe@kernel.dk>
+References: <20180713071610.14276-1-yuehaibing@huawei.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
+From: YueHaibing <yuehaibing@huawei.com>
+Message-ID: <052d5583-8b72-e052-36f9-2156df2be4f5@huawei.com>
+Date: Fri, 13 Jul 2018 17:19:48 +0800
+MIME-Version: 1.0
+In-Reply-To: <20180713071610.14276-1-yuehaibing@huawei.com>
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-block@vger.kernel.org>
 
-We can race with the snd timeout and the per-request timeout and end up
-requeuing the same request twice.  We can't use the send_complete
-completion to tell if everything is ok because we hold the tx_lock
-during send, so the timeout stuff will block waiting to mark the socket
-dead, and we could be marked complete and still requeue.  Instead add a
-flag to the socket so we know whether we've been requeued yet.
+Pls ignore this, there has a fix.
 
-Signed-off-by: Josef Bacik <josef@toxicpanda.com>
----
- drivers/block/nbd.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+[PATCH] block/DAC960.c: fix defined but not used build warnings
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 74a05561b620..f8cf7d4cca7f 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -112,12 +112,15 @@ struct nbd_device {
- 	struct task_struct *task_setup;
- };
- 
-+#define NBD_CMD_REQUEUED	1
-+
- struct nbd_cmd {
- 	struct nbd_device *nbd;
- 	int index;
- 	int cookie;
- 	struct completion send_complete;
- 	blk_status_t status;
-+	unsigned long flags;
- };
- 
- #if IS_ENABLED(CONFIG_DEBUG_FS)
-@@ -146,6 +149,14 @@ static inline struct device *nbd_to_dev(struct nbd_device *nbd)
- 	return disk_to_dev(nbd->disk);
- }
- 
-+static void nbd_requeue_cmd(struct nbd_cmd *cmd)
-+{
-+	struct request *req = blk_mq_rq_from_pdu(cmd);
-+
-+	if (!test_and_set_bit(NBD_CMD_REQUEUED, &cmd->flags))
-+		blk_mq_requeue_request(req, true);
-+}
-+
- static const char *nbdcmd_to_ascii(int cmd)
- {
- 	switch (cmd) {
-@@ -343,7 +354,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 					nbd_mark_nsock_dead(nbd, nsock, 1);
- 				mutex_unlock(&nsock->tx_lock);
- 			}
--			blk_mq_requeue_request(req, true);
-+			nbd_requeue_cmd(cmd);
- 			nbd_config_put(nbd);
- 			return BLK_EH_DONE;
- 		}
-@@ -500,6 +511,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 				nsock->pending = req;
- 				nsock->sent = sent;
- 			}
-+			set_bit(NBD_CMD_REQUEUED, &cmd->flags);
- 			return BLK_STS_RESOURCE;
- 		}
- 		dev_err_ratelimited(disk_to_dev(nbd->disk),
-@@ -541,6 +553,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 					 */
- 					nsock->pending = req;
- 					nsock->sent = sent;
-+					set_bit(NBD_CMD_REQUEUED, &cmd->flags);
- 					return BLK_STS_RESOURCE;
- 				}
- 				dev_err(disk_to_dev(nbd->disk),
-@@ -805,7 +818,7 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
- 	 */
- 	blk_mq_start_request(req);
- 	if (unlikely(nsock->pending && nsock->pending != req)) {
--		blk_mq_requeue_request(req, true);
-+		nbd_requeue_cmd(cmd);
- 		ret = 0;
- 		goto out;
- 	}
-@@ -818,7 +831,7 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
- 		dev_err_ratelimited(disk_to_dev(nbd->disk),
- 				    "Request send failed, requeueing\n");
- 		nbd_mark_nsock_dead(nbd, nsock, 1);
--		blk_mq_requeue_request(req, true);
-+		nbd_requeue_cmd(cmd);
- 		ret = 0;
- 	}
- out:
-@@ -843,6 +856,7 @@ static blk_status_t nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	 * done sending everything over the wire.
- 	 */
- 	init_completion(&cmd->send_complete);
-+	clear_bit(NBD_CMD_REQUEUED, &cmd->flags);
- 
- 	/* We can be called directly from the user space process, which means we
- 	 * could possibly have signals pending so our sendmsg will fail.  In
-@@ -1460,6 +1474,7 @@ static int nbd_init_request(struct blk_mq_tag_set *set, struct request *rq,
- {
- 	struct nbd_cmd *cmd = blk_mq_rq_to_pdu(rq);
- 	cmd->nbd = set->driver_data;
-+	cmd->flags = 0;
- 	return 0;
- }
- 
--- 
-2.14.3
+On 2018/7/13 15:16, YueHaibing wrote:
+> When CONFIG_PROC_FS isn't set, gcc warning this:
+> 
+> drivers/block/DAC960.c:6429:12: warning: ‘dac960_proc_show’ defined but not used [-Wunused-function]
+>  static int dac960_proc_show(struct seq_file *m, void *v)
+>             ^
+> drivers/block/DAC960.c:6449:12: warning: ‘dac960_initial_status_proc_show’ defined but not used [-Wunused-function]
+>  static int dac960_initial_status_proc_show(struct seq_file *m, void *v)
+>             ^
+> drivers/block/DAC960.c:6456:12: warning: ‘dac960_current_status_proc_show’ defined but not used [-Wunused-function]
+>  static int dac960_current_status_proc_show(struct seq_file *m, void *v)
+>             ^
+> fix this by adding #ifdef around them.
+> 
+> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> ---
+>  drivers/block/DAC960.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/block/DAC960.c b/drivers/block/DAC960.c
+> index f651806..7a05831 100644
+> --- a/drivers/block/DAC960.c
+> +++ b/drivers/block/DAC960.c
+> @@ -6426,6 +6426,7 @@ static bool DAC960_V2_ExecuteUserCommand(DAC960_Controller_T *Controller,
+>    return true;
+>  }
+>  
+> +#ifdef CONFIG_PROC_FS
+>  static int dac960_proc_show(struct seq_file *m, void *v)
+>  {
+>    unsigned char *StatusMessage = "OK\n";
+> @@ -6485,6 +6486,7 @@ static int dac960_current_status_proc_show(struct seq_file *m, void *v)
+>  	seq_printf(m, "%.*s", Controller->CurrentStatusLength, Controller->CurrentStatusBuffer);
+>  	return 0;
+>  }
+> +#endif
+>  
+>  static int dac960_user_command_proc_show(struct seq_file *m, void *v)
+>  {
+> 
