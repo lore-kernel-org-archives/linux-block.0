@@ -1,68 +1,40 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
+Return-Path: <asmadeus@notk.org>
+Date: Fri, 13 Jul 2018 17:31:19 +0200
+From: Dominique Martinet <asmadeus@codewreck.org>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	linux-pm@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH RFC 4/4] scsi_mq: enable runtime PM
-Date: Thu, 12 Jul 2018 00:29:06 +0800
-Message-Id: <20180711162906.14271-5-ming.lei@redhat.com>
-In-Reply-To: <20180711162906.14271-1-ming.lei@redhat.com>
-References: <20180711162906.14271-1-ming.lei@redhat.com>
+Cc: "Ed L. Cashin" <ed.cashin@acm.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org
+Subject: Re: [PATCH 02/18] block/aoenet: change strncpy+truncation to strlcpy
+Message-ID: <20180713153119.GC14190@nautica>
+References: <1531444483-17338-1-git-send-email-asmadeus@codewreck.org>
+ <1531445105-18941-1-git-send-email-asmadeus@codewreck.org>
+ <41bf49e3-70a5-4362-7389-55752ebc6c02@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <41bf49e3-70a5-4362-7389-55752ebc6c02@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Usually SCSI supports runtime PM, so pass BLK_MQ_F_SUPPORT_RPM to blk-mq
-core for enabling block runtime PM.
+Jens Axboe wrote on Fri, Jul 13, 2018:
+> This is a weird combination in terms of a single patch, why is
+> it patching aoe and gpiolib in one patch?
 
-Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: linux-pm@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-core.c        | 2 +-
- drivers/scsi/scsi_lib.c | 3 ++-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+I must have failed some git add command, I didn't realize they were
+together until you pointed it out just now.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index bf66d561980d..9e47205366ab 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -3770,7 +3770,7 @@ EXPORT_SYMBOL(blk_finish_plug);
- void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
- {
- 	/* not support for RQF_PM and ->rpm_status in blk-mq yet */
--	if (q->mq_ops)
-+	if (q->mq_ops && !(q->tag_set->flags & BLK_MQ_F_SUPPORT_RPM))
- 		return;
- 
- 	q->dev = dev;
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 41e9ac9fc138..fa4667aa4732 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2306,7 +2306,8 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
- 	shost->tag_set.queue_depth = shost->can_queue;
- 	shost->tag_set.cmd_size = cmd_size;
- 	shost->tag_set.numa_node = NUMA_NO_NODE;
--	shost->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_SG_MERGE;
-+	shost->tag_set.flags = BLK_MQ_F_SHOULD_MERGE |
-+		BLK_MQ_F_SG_MERGE | BLK_MQ_F_SUPPORT_RPM;
- 	shost->tag_set.flags |=
- 		BLK_ALLOC_POLICY_TO_MQ_FLAG(shost->hostt->tag_alloc_policy);
- 	shost->tag_set.driver_data = shost;
+This has been discussed more lengthly on the netdev side but the whole
+patch serie has been (quite) a bit too hasty; on one side I've been
+given some interesting feedback that I would not have gotten just
+sending the coccinelle patch first but I really should have waited for
+that to land first and most importantly spend more time on each
+individual patch, this was rude of me.
+
+I will make sure they are split in a v2, and send them individually
+(well, per big component) as self-explaining patches rather than as a
+block, once the coccinelle patch has been accepted. 
+
+
+Thank you for the review,
 -- 
-2.9.5
+Dominique Martinet
