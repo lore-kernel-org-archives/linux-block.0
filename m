@@ -1,101 +1,299 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from smtp.infotech.no ([82.134.31.41]:38321 "EHLO smtp.infotech.no"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388096AbeGTUBm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Jul 2018 16:01:42 -0400
-From: Douglas Gilbert <dgilbert@interlog.com>
-Subject: [ANNOUNCE] lsscsi version 0.30 released
-Reply-To: dgilbert@interlog.com
-To: SCSI development list <linux-scsi@vger.kernel.org>
-Cc: linux-kernel <linux-kernel@vger.kernel.org>,
-        David Sommerseth <davids@redhat.com>,
-        Hannes Reinecke <hare@suse.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Message-ID: <4ef33405-fc6d-f046-8a5e-a565e122b92d@interlog.com>
-Date: Fri, 20 Jul 2018 15:11:48 -0400
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:38395 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726364AbeGMJD1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Jul 2018 05:03:27 -0400
+Received: by mail-pf0-f193.google.com with SMTP id v15-v6so2269452pff.5
+        for <linux-block@vger.kernel.org>; Fri, 13 Jul 2018 01:49:47 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        bart.vanassche@wdc.com, hans.holmberg@cnexlabs.com,
+        javier@cnexlabs.com, hlitz@ucsc.edu, igor.j.konopko@intel.com,
+        marcin.dziegielewski@intel.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 09/10] lightnvm: pblk: add asynchronous partial read
+Date: Fri, 13 Jul 2018 10:48:44 +0200
+Message-Id: <20180713084845.19511-10-mb@lightnvm.io>
+In-Reply-To: <20180713084845.19511-1-mb@lightnvm.io>
+References: <20180713084845.19511-1-mb@lightnvm.io>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-lsscsi is a command line utility that probes sysfs in Linux 2.6, 3
-and 4 series kernels in order to list information about SCSI
-devices and SCSI hosts. The default format is one device (e.g. disk)
-per line. Other storage devices that use the SCSI subsystem such as
-SATA disks and USB keys are also listed.
+From: Heiner Litz <hlitz@ucsc.edu>
 
-Version 0.30 adds listing of NVMe devices following SCSI devices.
-NVMe namespaces (e.g. /dev/nvme0n1) are listed with SCSI devices
-(LUs) and have tuples that start with 'N' (e.g. "[N:0:1:1]"). NVMe
-controllers (e.g. /dev/nvme0) are listed with SCSI hosts
-(initiators).
+In the read path, partial reads are currently performed synchronously
+which affects performance for workloads that generate many partial
+reads. This patch adds an asynchronous partial read path as well as
+the required partial read ctx.
 
-lsblk differences:
-   - lsblk lists disk partitions; lsscsi does not
-   - lsblk lists storage devices that don't use the SCSI and NVMe
-     subsystems; lsscsi does not. Example: non-USB connected
-     SD cards with device names like /dev/mmcblk0...
-   - lsscsi lists SCSI hosts (initiators) and NVMe controllers;
-     lsblk does not
-   - lsscsi lists pass-through devices (e.g. /dev/nvme0) which are
-     typically character devices; lsblk does not
-   - lsscsi lists meta storage devices such as tape robots and disk
-     enclosures
+Signed-off-by: Heiner Litz <hlitz@ucsc.edu>
+Reviewed-by: Igor Konopko <igor.j.konopko@intel.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+---
+ drivers/lightnvm/pblk-read.c | 183 ++++++++++++++++++++++++++++---------------
+ drivers/lightnvm/pblk.h      |  10 +++
+ 2 files changed, 130 insertions(+), 63 deletions(-)
 
-Version 0.30 is available at:
-     http://sg.danny.cz/scsi/lsscsi.html
-More information can be found on that page including examples
-plus a Download and Build information section containing
-tarballs, rpm and deb packages.
-
-ChangeLog:
-Version 0.30 2018/06/12 [svn: r154]
-   - add support for NVMe devices and controllers
-     - to build without: ./configure --disable-nvme-supp
-     - deselect at runtime: lsscsi --no-nvme
-     - deselect SCSI devices at runtime: lsscsi N
-   - add --brief for tuple + device_name(s) only
-   - add --pdt (-D) for device type in hex
-   - extend --size (-s) so when given three times
-     the size as a logical block count is output
-   - add --sz-lbs (-S) that is equivalent to '-sss'
-     when used twice adds comma then logical block size
-   - '-w' now decodes 128 bit WWN without truncation
-   - /dev/disk/by-id/wwn- is not guaranteed to be
-     persistent (or stable); instead use
-     /dev/disk/by-id/scsi-
-   - '-t' on a FC host was not printing the comma
-     separator resulting in garbled output, fix
-   - debian: bump compat file contents from 7 to 10
-
-Version 0.29 2016/05/14 [svn: r137]
-   - '-u' now decodes locally assigned UUIDs (spc5r08)
-   - as last try use T10 Vendor ID for lu name
-   - if no lu name found, print 'none'
-   - change '-uuu' to output the full lu name followed
-     by the normal fields (which were skipped before)
-   - add 'U' option, same action as '-uuu'
-   - '-UU' prefixes lu names with 'eui.', 'naa.', etc
-   - if '-s' given twice, lu size is base 2 related
-   - if very long [h:c:t:l] then append space
-   - print_enclosure_device() for FCP may be useless,
-     comment out while checking ...
-   - with '-t' print 0x0000000000000000 for non-SAS
-     device in SAS domain
-   - autogen.sh: upgrade to 20091223 version
-   - automake: upgrade to 1.15 (ubuntu 16.04)
-
-Version 0.28 2014/09/30 [svn: r120]
-...
-
-Examples:
-$ lsscsi -gs
-[0:0:0:0]  disk Linux    scsi_debug       0188  /dev/sda   /dev/sg0    419MB
-[0:0:0:1]  disk Linux    scsi_debug       0188  /dev/sdb   /dev/sg1    419MB
-[N:0:1:1]  disk INTEL SSDPEKKF256G7L__1                    /dev/nvme0n1   256GB
-
-$ lsscsi -H
-[0]    scsi_debug
-[N:0]  /dev/nvme0  INTEL SSDPEKKF256G7L           BTPY00000AU6256D    123P
-
-Douglas Gilbert
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index 9c9362b20861..26d414ae25b6 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -231,74 +231,36 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
+ 	__pblk_end_io_read(pblk, rqd, true);
+ }
+ 
+-static int pblk_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
+-			     struct bio *orig_bio, unsigned int bio_init_idx,
+-			     unsigned long *read_bitmap)
++static void pblk_end_partial_read(struct nvm_rq *rqd)
+ {
+-	struct pblk_sec_meta *meta_list = rqd->meta_list;
+-	struct bio *new_bio;
++	struct pblk *pblk = rqd->private;
++	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
++	struct pblk_pr_ctx *pr_ctx = r_ctx->private;
++	struct bio *new_bio = rqd->bio;
++	struct bio *bio = pr_ctx->orig_bio;
+ 	struct bio_vec src_bv, dst_bv;
+-	void *ppa_ptr = NULL;
+-	void *src_p, *dst_p;
+-	dma_addr_t dma_ppa_list = 0;
+-	__le64 *lba_list_mem, *lba_list_media;
+-	int nr_secs = rqd->nr_ppas;
++	struct pblk_sec_meta *meta_list = rqd->meta_list;
++	int bio_init_idx = pr_ctx->bio_init_idx;
++	unsigned long *read_bitmap = pr_ctx->bitmap;
++	int nr_secs = pr_ctx->orig_nr_secs;
+ 	int nr_holes = nr_secs - bitmap_weight(read_bitmap, nr_secs);
+-	int i, ret, hole;
+-
+-	/* Re-use allocated memory for intermediate lbas */
+-	lba_list_mem = (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
+-	lba_list_media = (((void *)rqd->ppa_list) + 2 * pblk_dma_ppa_size);
+-
+-	new_bio = bio_alloc(GFP_KERNEL, nr_holes);
+-
+-	if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
+-		goto fail_add_pages;
+-
+-	if (nr_holes != new_bio->bi_vcnt) {
+-		pblk_err(pblk, "malformed bio\n");
+-		goto fail;
+-	}
+-
+-	for (i = 0; i < nr_secs; i++)
+-		lba_list_mem[i] = meta_list[i].lba;
+-
+-	new_bio->bi_iter.bi_sector = 0; /* internal bio */
+-	bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
+-
+-	rqd->bio = new_bio;
+-	rqd->nr_ppas = nr_holes;
+-	rqd->flags = pblk_set_read_mode(pblk, PBLK_READ_RANDOM);
+-
+-	if (unlikely(nr_holes == 1)) {
+-		ppa_ptr = rqd->ppa_list;
+-		dma_ppa_list = rqd->dma_ppa_list;
+-		rqd->ppa_addr = rqd->ppa_list[0];
+-	}
+-
+-	ret = pblk_submit_io_sync(pblk, rqd);
+-	if (ret) {
+-		bio_put(rqd->bio);
+-		pblk_err(pblk, "sync read IO submission failed\n");
+-		goto fail;
+-	}
+-
+-	if (rqd->error) {
+-		atomic_long_inc(&pblk->read_failed);
+-#ifdef CONFIG_NVM_PBLK_DEBUG
+-		pblk_print_failed_rqd(pblk, rqd, rqd->error);
+-#endif
+-	}
++	__le64 *lba_list_mem, *lba_list_media;
++	void *src_p, *dst_p;
++	int hole, i;
+ 
+ 	if (unlikely(nr_holes == 1)) {
+ 		struct ppa_addr ppa;
+ 
+ 		ppa = rqd->ppa_addr;
+-		rqd->ppa_list = ppa_ptr;
+-		rqd->dma_ppa_list = dma_ppa_list;
++		rqd->ppa_list = pr_ctx->ppa_ptr;
++		rqd->dma_ppa_list = pr_ctx->dma_ppa_list;
+ 		rqd->ppa_list[0] = ppa;
+ 	}
+ 
++	/* Re-use allocated memory for intermediate lbas */
++	lba_list_mem = (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
++	lba_list_media = (((void *)rqd->ppa_list) + 2 * pblk_dma_ppa_size);
++
+ 	for (i = 0; i < nr_secs; i++) {
+ 		lba_list_media[i] = meta_list[i].lba;
+ 		meta_list[i].lba = lba_list_mem[i];
+@@ -316,7 +278,7 @@ static int pblk_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
+ 		meta_list[hole].lba = lba_list_media[i];
+ 
+ 		src_bv = new_bio->bi_io_vec[i++];
+-		dst_bv = orig_bio->bi_io_vec[bio_init_idx + hole];
++		dst_bv = bio->bi_io_vec[bio_init_idx + hole];
+ 
+ 		src_p = kmap_atomic(src_bv.bv_page);
+ 		dst_p = kmap_atomic(dst_bv.bv_page);
+@@ -334,19 +296,107 @@ static int pblk_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
+ 	} while (hole < nr_secs);
+ 
+ 	bio_put(new_bio);
++	kfree(pr_ctx);
+ 
+ 	/* restore original request */
+ 	rqd->bio = NULL;
+ 	rqd->nr_ppas = nr_secs;
+ 
++	bio_endio(bio);
+ 	__pblk_end_io_read(pblk, rqd, false);
+-	return NVM_IO_DONE;
++}
+ 
+-fail:
+-	/* Free allocated pages in new bio */
++static int pblk_setup_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
++			    unsigned int bio_init_idx,
++			    unsigned long *read_bitmap,
++			    int nr_holes)
++{
++	struct pblk_sec_meta *meta_list = rqd->meta_list;
++	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
++	struct pblk_pr_ctx *pr_ctx;
++	struct bio *new_bio, *bio = r_ctx->private;
++	__le64 *lba_list_mem;
++	int nr_secs = rqd->nr_ppas;
++	int i;
++
++	/* Re-use allocated memory for intermediate lbas */
++	lba_list_mem = (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
++
++	new_bio = bio_alloc(GFP_KERNEL, nr_holes);
++
++	if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
++		goto fail_bio_put;
++
++	if (nr_holes != new_bio->bi_vcnt) {
++		WARN_ONCE(1, "pblk: malformed bio\n");
++		goto fail_free_pages;
++	}
++
++	pr_ctx = kmalloc(sizeof(struct pblk_pr_ctx), GFP_KERNEL);
++	if (!pr_ctx)
++		goto fail_free_pages;
++
++	for (i = 0; i < nr_secs; i++)
++		lba_list_mem[i] = meta_list[i].lba;
++
++	new_bio->bi_iter.bi_sector = 0; /* internal bio */
++	bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
++
++	rqd->bio = new_bio;
++	rqd->nr_ppas = nr_holes;
++	rqd->flags = pblk_set_read_mode(pblk, PBLK_READ_RANDOM);
++
++	pr_ctx->ppa_ptr = NULL;
++	pr_ctx->orig_bio = bio;
++	bitmap_copy(pr_ctx->bitmap, read_bitmap, NVM_MAX_VLBA);
++	pr_ctx->bio_init_idx = bio_init_idx;
++	pr_ctx->orig_nr_secs = nr_secs;
++	r_ctx->private = pr_ctx;
++
++	if (unlikely(nr_holes == 1)) {
++		pr_ctx->ppa_ptr = rqd->ppa_list;
++		pr_ctx->dma_ppa_list = rqd->dma_ppa_list;
++		rqd->ppa_addr = rqd->ppa_list[0];
++	}
++	return 0;
++
++fail_free_pages:
+ 	pblk_bio_free_pages(pblk, new_bio, 0, new_bio->bi_vcnt);
+-fail_add_pages:
++fail_bio_put:
++	bio_put(new_bio);
++
++	return -ENOMEM;
++}
++
++static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
++				 unsigned int bio_init_idx,
++				 unsigned long *read_bitmap, int nr_secs)
++{
++	int nr_holes;
++	int ret;
++
++	nr_holes = nr_secs - bitmap_weight(read_bitmap, nr_secs);
++
++	if (pblk_setup_partial_read(pblk, rqd, bio_init_idx, read_bitmap,
++				    nr_holes))
++		return NVM_IO_ERR;
++
++	rqd->end_io = pblk_end_partial_read;
++
++	ret = pblk_submit_io(pblk, rqd);
++	if (ret) {
++		bio_put(rqd->bio);
++		pblk_err(pblk, "partial read IO submission failed\n");
++		goto err;
++	}
++
++	return NVM_IO_OK;
++
++err:
+ 	pblk_err(pblk, "failed to perform partial read\n");
++
++	/* Free allocated pages in new bio */
++	pblk_bio_free_pages(pblk, rqd->bio, 0, rqd->bio->bi_vcnt);
+ 	__pblk_end_io_read(pblk, rqd, false);
+ 	return NVM_IO_ERR;
+ }
+@@ -480,8 +530,15 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 	/* The read bio request could be partially filled by the write buffer,
+ 	 * but there are some holes that need to be read from the drive.
+ 	 */
+-	return pblk_partial_read(pblk, rqd, bio, bio_init_idx, read_bitmap);
++	ret = pblk_partial_read_bio(pblk, rqd, bio_init_idx, read_bitmap,
++				    nr_secs);
++	if (ret)
++		goto fail_meta_free;
+ 
++	return NVM_IO_OK;
++
++fail_meta_free:
++	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
+ fail_rqd_free:
+ 	pblk_free_rqd(pblk, rqd, PBLK_READ);
+ 	return ret;
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 5c6904eb8557..4760af7b6499 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -119,6 +119,16 @@ struct pblk_g_ctx {
+ 	u64 lba;
+ };
+ 
++/* partial read context */
++struct pblk_pr_ctx {
++	struct bio *orig_bio;
++	DECLARE_BITMAP(bitmap, NVM_MAX_VLBA);
++	unsigned int orig_nr_secs;
++	unsigned int bio_init_idx;
++	void *ppa_ptr;
++	dma_addr_t dma_ppa_list;
++};
++
+ /* Pad context */
+ struct pblk_pad_rq {
+ 	struct pblk *pblk;
+-- 
+2.11.0
