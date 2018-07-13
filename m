@@ -1,54 +1,51 @@
-Return-Path: <colin.king@canonical.com>
-From: Colin King <colin.king@canonical.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Josef Bacik <jbacik@fb.com>
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][block-next] block: iolatency: fix comparison of unsigned int max_depth with a (u64)-1
-Date: Wed, 11 Jul 2018 15:21:48 +0100
-Message-Id: <20180711142148.3949-1-colin.king@canonical.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:35979 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731021AbeGMJDX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Jul 2018 05:03:23 -0400
+Received: by mail-pg1-f195.google.com with SMTP id m19-v6so4789637pgv.3
+        for <linux-block@vger.kernel.org>; Fri, 13 Jul 2018 01:49:43 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        bart.vanassche@wdc.com, hans.holmberg@cnexlabs.com,
+        javier@cnexlabs.com, hlitz@ucsc.edu, igor.j.konopko@intel.com,
+        marcin.dziegielewski@intel.com,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 08/10] lightnvm: pblk: mark expected switch fall-through
+Date: Fri, 13 Jul 2018 10:48:43 +0200
+Message-Id: <20180713084845.19511-9-mb@lightnvm.io>
+In-Reply-To: <20180713084845.19511-1-mb@lightnvm.io>
+References: <20180713084845.19511-1-mb@lightnvm.io>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
 
-The comparison max_depth != (u64)-1 is always true as max_depth is a
-unsigned int and so its upper 32 bits are 0. Fix this by using the
-a comparison of (unsigned int)-1 to ensure like types are compared.
-Note, if max_depth is changed to a wider type then this will need
-fixing again.
+In preparation to enabling -Wimplicit-fallthrough, mark switch cases
+where we are expecting to fall through.
 
-Detected by CoverityScan, CID#1471763 ("Operands don't affect result")
-
-Fixes: commit d70675121546 ("block: introduce blk-iolatency io controller")
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- block/blk-iolatency.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/lightnvm/pblk-core.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 56ddb2c68752..9a6427372da0 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -434,7 +434,7 @@ static void iolatency_record_time(struct iolatency_grp *iolat,
- 	 * We don't want to count issue_as_root bio's in the cgroups latency
- 	 * statistics as it could skew the numbers downwards.
- 	 */
--	if (unlikely(issue_as_root && iolat->rq_depth.max_depth != (u64)-1)) {
-+	if (unlikely(issue_as_root && iolat->rq_depth.max_depth != (unsigned int)-1)) {
- 		u64 sub = iolat->min_lat_nsec;
- 		if (req_time < sub)
- 			blkcg_add_delay(lat_to_blkg(iolat), now, sub - req_time);
-@@ -816,7 +816,7 @@ static size_t iolatency_pd_stat(struct blkg_policy_data *pd, char *buf,
- 	struct iolatency_grp *iolat = pd_to_lat(pd);
- 	unsigned long long avg_lat = div64_u64(iolat->total_lat_avg, NSEC_PER_USEC);
- 
--	if (iolat->rq_depth.max_depth == (u64)-1)
-+	if (iolat->rq_depth.max_depth == (unsigned int)-1)
- 		return scnprintf(buf, size, " depth=max avg_lat=%llu",
- 				 avg_lat);
- 
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index b829460fe827..00984b486fea 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -264,6 +264,7 @@ void pblk_free_rqd(struct pblk *pblk, struct nvm_rq *rqd, int type)
+ 	switch (type) {
+ 	case PBLK_WRITE:
+ 		kfree(((struct pblk_c_ctx *)nvm_rq_to_pdu(rqd))->lun_bitmap);
++		/* fall through */
+ 	case PBLK_WRITE_INT:
+ 		pool = &pblk->w_rq_pool;
+ 		break;
 -- 
-2.17.1
+2.11.0
