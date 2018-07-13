@@ -1,37 +1,67 @@
-Return-Path: <raghuhack78@gmail.com>
-Return-Path: <raghuhack78@gmail.com>
-From: RAGHU Halharvi <raghuhack78@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: RAGHU Halharvi <raghuhack78@gmail.com>,
-	axboe@kernel.dk
-Subject: [PATCH] pktcdvd:checkpatch:remove static initialise null
-Date: Tue, 17 Jul 2018 23:04:01 +0530
-Message-Id: <20180717173401.18024-1-raghuhack78@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:46970 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725930AbeGMJDN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Jul 2018 05:03:13 -0400
+Received: by mail-pl0-f67.google.com with SMTP id 30-v6so11915319pld.13
+        for <linux-block@vger.kernel.org>; Fri, 13 Jul 2018 01:49:34 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        bart.vanassche@wdc.com, hans.holmberg@cnexlabs.com,
+        javier@cnexlabs.com, hlitz@ucsc.edu, igor.j.konopko@intel.com,
+        marcin.dziegielewski@intel.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 06/10] lightnvm: limit get chunk meta request size
+Date: Fri, 13 Jul 2018 10:48:41 +0200
+Message-Id: <20180713084845.19511-7-mb@lightnvm.io>
+In-Reply-To: <20180713084845.19511-1-mb@lightnvm.io>
+References: <20180713084845.19511-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-* Remove checkpatch error due to initialization of static variables to
-NULL
+For devices that does not specify a limit on its transfer size, the
+get_chk_meta command may send down a single I/O retrieving the full
+chunk metadata table. Resulting in large 2-4MB I/O requests. Instead,
+split up the I/Os to a maximum of 256KB and issue them separately to
+reduce memory requirements.
 
-Signed-off-by: RAGHU Halharvi <raghuhack78@gmail.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+Reviewed-by: Javier González <javier@cnexlabs.com>
 ---
- drivers/block/pktcdvd.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/nvme/host/lightnvm.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 426e54a9d574..59fb66c0e064 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -100,8 +100,8 @@ static struct mutex ctl_mutex;	/* Serialize open/close/setup/teardown */
- static mempool_t *psd_pool;
- static struct bio_set *pkt_bio_set;
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index a76db8820f1c..d9e4cccd5b66 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -583,7 +583,13 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
+ 	struct ppa_addr ppa;
+ 	size_t left = nchks * sizeof(struct nvme_nvm_chk_meta);
+ 	size_t log_pos, offset, len;
+-	int ret, i;
++	int ret, i, max_len;
++
++	/*
++	 * limit requests to maximum 256K to avoid issuing arbitrary large
++	 * requests when the device does not specific a maximum transfer size.
++	 */
++	max_len = min_t(unsigned int, ctrl->max_hw_sectors << 9, 256 * 1024);
  
--static struct class	*class_pktcdvd = NULL;    /* /sys/class/pktcdvd */
--static struct dentry	*pkt_debugfs_root = NULL; /* /sys/kernel/debug/pktcdvd */
-+static struct class	*class_pktcdvd;    /* /sys/class/pktcdvd */
-+static struct dentry	*pkt_debugfs_root; /* /sys/kernel/debug/pktcdvd */
+ 	/* Normalize lba address space to obtain log offset */
+ 	ppa.ppa = slba;
+@@ -596,7 +602,7 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
+ 	offset = log_pos * sizeof(struct nvme_nvm_chk_meta);
  
- /* forward declaration */
- static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev);
+ 	while (left) {
+-		len = min_t(unsigned int, left, ctrl->max_hw_sectors << 9);
++		len = min_t(unsigned int, left, max_len);
+ 
+ 		ret = nvme_get_log_ext(ctrl, ns, NVME_NVM_LOG_REPORT_CHUNK,
+ 				dev_meta, len, offset);
 -- 
-2.17.1
+2.11.0
