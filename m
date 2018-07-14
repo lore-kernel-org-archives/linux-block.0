@@ -1,70 +1,71 @@
-Return-Path: <prvs=72862f5cb=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
-CC: "jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-pm@vger.kernel.org"
-	<linux-pm@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "hare@suse.de"
-	<hare@suse.de>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"rjw@rjwysocki.net" <rjw@rjwysocki.net>, "stern@rowland.harvard.edu"
-	<stern@rowland.harvard.edu>, "gregkh@linuxfoundation.org"
-	<gregkh@linuxfoundation.org>, "jejb@linux.vnet.ibm.com"
-	<jejb@linux.vnet.ibm.com>, "adrian.hunter@intel.com"
-	<adrian.hunter@intel.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH RFC V2 0/3] blk-mq: support runtime PM
-Date: Mon, 16 Jul 2018 16:03:04 +0000
-Message-ID: <9acf7af08c9a517d0783277c655fa29a0fc07573.camel@wdc.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+ Alan Stern <stern@rowland.harvard.edu>, linux-pm@vger.kernel.org,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Christoph Hellwig <hch@lst.de>, Bart Van Assche <bart.vanassche@wdc.com>,
+ Hannes Reinecke <hare@suse.de>, Johannes Thumshirn <jthumshirn@suse.de>,
+ Adrian Hunter <adrian.hunter@intel.com>,
+ "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>, linux-scsi@vger.kernel.org
 References: <20180713080602.31602-1-ming.lei@redhat.com>
-	 <c4147a47-876f-0ced-6c9d-1c3792d09858@kernel.dk>
-	 <20180714023740.GA8402@ming.t460p>
-In-Reply-To: <20180714023740.GA8402@ming.t460p>
-Content-Type: text/plain; charset="utf-7"
+ <c4147a47-876f-0ced-6c9d-1c3792d09858@kernel.dk>
+ <20180714023740.GA8402@ming.t460p>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <27bc4ec8-dd63-2b6f-84ef-4c4c0fc7f9e9@kernel.dk>
+Date: Fri, 13 Jul 2018 20:54:35 -0600
 MIME-Version: 1.0
+In-Reply-To: <20180714023740.GA8402@ming.t460p>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Sat, 2018-07-14 at 10:37 +-0800, Ming Lei wrote:
-+AD4- OK, I am thinking another idea for addressing this issue.
-+AD4-=20
-+AD4- We may introduce one logical admin(pm) request queue for each scsi+AF=
-8-device,
-+AD4- and this queue shares tag with IO queue, with NO+AF8-SCHED set, and a=
-lways
-+AD4- use atomic mode of the queue usage refcounter. Then we may send PM
-+AD4- command to device after the IO queue is frozen.
-+AD4-=20
-+AD4- Also PREEMPT+AF8-ONLY can be removed too in this way.
-+AD4-=20
-+AD4- Even in future, all pass-through commands may be sent to this admin q=
-ueue.
-+AD4-=20
-+AD4- If no one objects, I will cook patches towards this direction.
+On 7/13/18 8:37 PM, Ming Lei wrote:
+> On Fri, Jul 13, 2018 at 08:21:09AM -0600, Jens Axboe wrote:
+>> On 7/13/18 2:05 AM, Ming Lei wrote:
+>>> Hi Guys,
+>>>
+>>> Runtime PM is usually enabled for SCSI devices, and we are switching to
+>>> SCSI_MQ recently, but runtime PM isn't supported yet by blk-mq, and
+>>> people may complain that.
+>>>
+>>> This patch tries to support runtime PM for blk-mq. And one chanllenge is
+>>> that it can be quite expensive to account the active in-flight IOs for
+>>> figuring out when to mark the last busy. This patch simply marks busy
+>>> after each non-PM IO is done, and this way is workable because:
+>>>
+>>> 1) pm_runtime_mark_last_busy() is very cheap
+>>>
+>>> 2) in-flight non-PM IO is checked in blk_pre_runtime_suspend(), so
+>>> if there is any IO queued, the device will be prevented from being
+>>> suspened.
+>>>
+>>> 3) Generally speaking, autosuspend_delay_ms is often big, and should
+>>> be in unit of second, so it shouldn't be a big deal to check if queue
+>>> is idle in blk_pre_runtime_suspend().
+>>>
+>>>
+>>> V2:
+>>> 	- re-organize code as suggested by Christoph
+>>> 	- use seqlock to sync runtime PM and IO path
+>>
+>> See other mail on why this is not going to be acceptable.
+> 
+> OK, I am thinking another idea for addressing this issue.
+> 
+> We may introduce one logical admin(pm) request queue for each scsi_device,
+> and this queue shares tag with IO queue, with NO_SCHED set, and always
+> use atomic mode of the queue usage refcounter. Then we may send PM
+> command to device after the IO queue is frozen.
+> 
+> Also PREEMPT_ONLY can be removed too in this way.
+> 
+> Even in future, all pass-through commands may be sent to this admin queue.
+> 
+> If no one objects, I will cook patches towards this direction.
 
-Wouldn't it be overkill to introduce a separate admin queue for SCSI device=
-s?
-Will that new queue be visible under /sys/block as a request queue? If so,
-how many scripts will break due to that sysfs change? If the new queue won'=
-t
-be visible under /sys/block, how many changes will have to be made to the
-block layer to avoid that it becomes visible?
+Yes, this seems like a fine idea. It's essentially the same as handling
+the enter differently, but the abstraction is nicer.
 
-Regarding the device+AF8-busy, device+AF8-blocked, cmd+AF8-list and other a=
-ttributes in
-struct scsi+AF8-device: will the SCSI commands submitted to the admin queue=
- affect
-these attributes? If not, which assumptions in the SCSI core will break? An=
-d
-if SCSI commands submitted to the admin queue will affect these attributes,
-how will these attributes be shared between the regular and the admin reque=
-st
-queues?
-
-Since the power management core guarantees that runtime PM operations do no=
-t
-occur during suspend nor during resume operations: has it been considered t=
-o
-drop the RQF+AF8-PM flag and to use the RQF+AF8-PREEMPT flag instead and al=
-so to
-set and reset QUEUE+AF8-FLAG+AF8-PREEMPT+AF8-ONLY as needed?
-
-Bart.
+-- 
+Jens Axboe
