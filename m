@@ -1,356 +1,234 @@
-Return-Path: <maxg@mellanox.com>
-From: Max Gurtovoy <maxg@mellanox.com>
-To: keith.busch@intel.com, linux-nvme@lists.infradead.org, sagi@grimberg.me,
-        hch@lst.de, martin.petersen@oracle.com, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-Cc: vladimirk@mellanox.com, Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH v4 2/3] block: move dif_prepare/dif_complete functions to block layer
-Date: Wed, 25 Jul 2018 18:46:16 +0300
-Message-Id: <1532533577-1600-2-git-send-email-maxg@mellanox.com>
-In-Reply-To: <1532533577-1600-1-git-send-email-maxg@mellanox.com>
-References: <1532533577-1600-1-git-send-email-maxg@mellanox.com>
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	nbd@other.debian.org,
+	linux-block@vger.kernel.org,
+	kernel-team@fb.com
+Subject: [PATCH 2/2] nbd: handle unexpected replies better
+Date: Mon, 16 Jul 2018 12:11:35 -0400
+Message-Id: <20180716161136.21222-2-josef@toxicpanda.com>
+In-Reply-To: <20180716161136.21222-1-josef@toxicpanda.com>
+References: <20180716161136.21222-1-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Currently these functions are implemented in the scsi layer, but their
-actual place should be the block layer since T10-PI is a general data
-integrity feature that is used in the nvme protocol as well. Also, use
-the tuple size from the integrity profile since it may vary between
-integrity types.
+If the server or network is misbehaving and we get an unexpected reply
+we can sometimes miss the request not being started and wait on a
+request and never get a response, or even double complete the same
+request.  Fix this by replacing the send_complete completion with just a
+per command lock.  Add a per command cookie as well so that we can know
+if we're getting a double completion for a previous event.  Also check
+to make sure we dont have REQUEUED set as that means we raced with the
+timeout handler and need to just let the retry occur.
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
+Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 ---
+ drivers/block/nbd.c | 75 +++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 61 insertions(+), 14 deletions(-)
 
-changes from v3:
- - kmap_atomic/kunmap_atomic the same address
- - declare pi struct inside the inner for loop
- - check "intervals" inside the for loop condition
-
-changes from v2:
- - convert comments to kerneldoc format
- - removed SCSI specific comment
- - fix kmap_atomic/kunmap_atomic addresses
- - fix iteration over t10_pi_tuple's
-
-changes from v1 (Christoph, Martin and Keith comments):
- - moved the functions to t10-pi.c
- - updated tuple size
- - changed local variables scope
- - remove/add new lines
-
----
- block/t10-pi.c         | 110 +++++++++++++++++++++++++++++++++++++++++++++++
- drivers/scsi/sd.c      |   8 ++--
- drivers/scsi/sd.h      |   9 ----
- drivers/scsi/sd_dif.c  | 113 -------------------------------------------------
- include/linux/t10-pi.h |   3 ++
- 5 files changed, 118 insertions(+), 125 deletions(-)
-
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index a98db38..62aed77 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -184,3 +184,113 @@ static blk_status_t t10_pi_type3_verify_ip(struct blk_integrity_iter *iter)
- 	.verify_fn		= t10_pi_type3_verify_ip,
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index f8cf7d4cca7f..3fb95c8d9fd8 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -116,11 +116,12 @@ struct nbd_device {
+ 
+ struct nbd_cmd {
+ 	struct nbd_device *nbd;
++	struct mutex lock;
+ 	int index;
+ 	int cookie;
+-	struct completion send_complete;
+ 	blk_status_t status;
+ 	unsigned long flags;
++	u32 cmd_cookie;
  };
- EXPORT_SYMBOL(t10_pi_type3_ip);
-+
-+/**
-+ * t10_pi_prepare - prepare PI prior submitting request to device
-+ * @rq:              request with PI that should be prepared
-+ * @protection_type: PI type (Type 1/Type 2/Type 3)
-+ *
-+ * For Type 1/Type 2, the virtual start sector is the one that was
-+ * originally submitted by the block layer for the ref_tag usage. Due to
-+ * partitioning, MD/DM cloning, etc. the actual physical start sector is
-+ * likely to be different. Remap protection information to match the
-+ * physical LBA.
-+ *
-+ * Type 3 does not have a reference tag so no remapping is required.
-+ */
-+void t10_pi_prepare(struct request *rq, u8 protection_type)
-+{
-+	const int tuple_sz = rq->q->integrity.tuple_size;
-+	u32 ref_tag = t10_pi_ref_tag(rq);
-+	struct bio *bio;
-+
-+	if (protection_type == T10_PI_TYPE3_PROTECTION)
-+		return;
-+
-+	__rq_for_each_bio(bio, rq) {
-+		struct bio_integrity_payload *bip = bio_integrity(bio);
-+		u32 virt = bip_get_seed(bip) & 0xffffffff;
-+		struct bio_vec iv;
-+		struct bvec_iter iter;
-+
-+		/* Already remapped? */
-+		if (bip->bip_flags & BIP_MAPPED_INTEGRITY)
-+			break;
-+
-+		bip_for_each_vec(iv, bip, iter) {
-+			void *p, *pmap;
-+			unsigned int j;
-+
-+			pmap = kmap_atomic(iv.bv_page);
-+			p = pmap + iv.bv_offset;
-+			for (j = 0; j < iv.bv_len; j += tuple_sz) {
-+				struct t10_pi_tuple *pi = p;
-+
-+				if (be32_to_cpu(pi->ref_tag) == virt)
-+					pi->ref_tag = cpu_to_be32(ref_tag);
-+				virt++;
-+				ref_tag++;
-+				p += tuple_sz;
-+			}
-+
-+			kunmap_atomic(pmap);
-+		}
-+
-+		bip->bip_flags |= BIP_MAPPED_INTEGRITY;
-+	}
-+}
-+EXPORT_SYMBOL(t10_pi_prepare);
-+
-+/**
-+ * t10_pi_complete - prepare PI prior returning request to the block layer
-+ * @rq:              request with PI that should be prepared
-+ * @protection_type: PI type (Type 1/Type 2/Type 3)
-+ * @intervals:       total elements to prepare
-+ *
-+ * For Type 1/Type 2, the virtual start sector is the one that was
-+ * originally submitted by the block layer for the ref_tag usage. Due to
-+ * partitioning, MD/DM cloning, etc. the actual physical start sector is
-+ * likely to be different. Since the physical start sector was submitted
-+ * to the device, we should remap it back to virtual values expected by the
-+ * block layer.
-+ *
-+ * Type 3 does not have a reference tag so no remapping is required.
-+ */
-+void t10_pi_complete(struct request *rq, u8 protection_type,
-+		     unsigned int intervals)
-+{
-+	const int tuple_sz = rq->q->integrity.tuple_size;
-+	u32 ref_tag = t10_pi_ref_tag(rq);
-+	struct bio *bio;
-+
-+	if (protection_type == T10_PI_TYPE3_PROTECTION)
-+		return;
-+
-+	__rq_for_each_bio(bio, rq) {
-+		struct bio_integrity_payload *bip = bio_integrity(bio);
-+		u32 virt = bip_get_seed(bip) & 0xffffffff;
-+		struct bio_vec iv;
-+		struct bvec_iter iter;
-+
-+		bip_for_each_vec(iv, bip, iter) {
-+			void *p, *pmap;
-+			unsigned int j;
-+
-+			pmap = kmap_atomic(iv.bv_page);
-+			p = pmap + iv.bv_offset;
-+			for (j = 0; j < iv.bv_len && intervals; j += tuple_sz) {
-+				struct t10_pi_tuple *pi = p;
-+
-+				if (be32_to_cpu(pi->ref_tag) == ref_tag)
-+					pi->ref_tag = cpu_to_be32(virt);
-+				virt++;
-+				ref_tag++;
-+				intervals--;
-+				p += tuple_sz;
-+			}
-+
-+			kunmap_atomic(pmap);
-+		}
-+	}
-+}
-+EXPORT_SYMBOL(t10_pi_complete);
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 9421d98..bbebdc3 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -1119,7 +1119,7 @@ static int sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
- 		SCpnt->cmnd[0] = WRITE_6;
  
- 		if (blk_integrity_rq(rq))
--			sd_dif_prepare(SCpnt);
-+			t10_pi_prepare(SCpnt->request, sdkp->protection_type);
- 
- 	} else if (rq_data_dir(rq) == READ) {
- 		SCpnt->cmnd[0] = READ_6;
-@@ -2047,8 +2047,10 @@ static int sd_done(struct scsi_cmnd *SCpnt)
- 					   "sd_done: completed %d of %d bytes\n",
- 					   good_bytes, scsi_bufflen(SCpnt)));
- 
--	if (rq_data_dir(SCpnt->request) == READ && scsi_prot_sg_count(SCpnt))
--		sd_dif_complete(SCpnt, good_bytes);
-+	if (rq_data_dir(SCpnt->request) == READ && scsi_prot_sg_count(SCpnt) &&
-+	    good_bytes)
-+		t10_pi_complete(SCpnt->request, sdkp->protection_type,
-+				good_bytes / scsi_prot_interval(SCpnt));
- 
- 	return good_bytes;
+ #if IS_ENABLED(CONFIG_DEBUG_FS)
+@@ -157,6 +158,27 @@ static void nbd_requeue_cmd(struct nbd_cmd *cmd)
+ 		blk_mq_requeue_request(req, true);
  }
-diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-index 392c7d0..a7d4f50 100644
---- a/drivers/scsi/sd.h
-+++ b/drivers/scsi/sd.h
-@@ -254,21 +254,12 @@ static inline unsigned int sd_prot_flag_mask(unsigned int prot_op)
- #ifdef CONFIG_BLK_DEV_INTEGRITY
  
- extern void sd_dif_config_host(struct scsi_disk *);
--extern void sd_dif_prepare(struct scsi_cmnd *scmd);
--extern void sd_dif_complete(struct scsi_cmnd *, unsigned int);
- 
- #else /* CONFIG_BLK_DEV_INTEGRITY */
- 
- static inline void sd_dif_config_host(struct scsi_disk *disk)
++#define NBD_COOKIE_BITS 32
++
++static u64 nbd_cmd_handle(struct nbd_cmd *cmd)
++{
++	struct request *req = blk_mq_rq_from_pdu(cmd);
++	u32 tag = blk_mq_unique_tag(req);
++	u64 cookie = cmd->cmd_cookie;
++
++	return (cookie << NBD_COOKIE_BITS) | tag;
++}
++
++static u32 nbd_handle_to_tag(u64 handle)
++{
++	return (u32)handle;
++}
++
++static u32 nbd_handle_to_cookie(u64 handle)
++{
++	return (u32)(handle >> NBD_COOKIE_BITS);
++}
++
+ static const char *nbdcmd_to_ascii(int cmd)
  {
+ 	switch (cmd) {
+@@ -330,6 +352,9 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
+ 	}
+ 	config = nbd->config;
+ 
++	if (!mutex_trylock(&cmd->lock))
++		return BLK_EH_RESET_TIMER;
++
+ 	if (config->num_connections > 1) {
+ 		dev_err_ratelimited(nbd_to_dev(nbd),
+ 				    "Connection timed out, retrying (%d/%d alive)\n",
+@@ -354,6 +379,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
+ 					nbd_mark_nsock_dead(nbd, nsock, 1);
+ 				mutex_unlock(&nsock->tx_lock);
+ 			}
++			mutex_unlock(&cmd->lock);
+ 			nbd_requeue_cmd(cmd);
+ 			nbd_config_put(nbd);
+ 			return BLK_EH_DONE;
+@@ -364,6 +390,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
+ 	}
+ 	set_bit(NBD_TIMEDOUT, &config->runtime_flags);
+ 	cmd->status = BLK_STS_IOERR;
++	mutex_unlock(&cmd->lock);
+ 	sock_shutdown(nbd);
+ 	nbd_config_put(nbd);
+ done:
+@@ -441,9 +468,9 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+ 	struct iov_iter from;
+ 	unsigned long size = blk_rq_bytes(req);
+ 	struct bio *bio;
++	u64 handle;
+ 	u32 type;
+ 	u32 nbd_cmd_flags = 0;
+-	u32 tag = blk_mq_unique_tag(req);
+ 	int sent = nsock->sent, skip = 0;
+ 
+ 	iov_iter_kvec(&from, WRITE | ITER_KVEC, &iov, 1, sizeof(request));
+@@ -485,6 +512,8 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+ 			goto send_pages;
+ 		}
+ 		iov_iter_advance(&from, sent);
++	} else {
++		cmd->cmd_cookie++;
+ 	}
+ 	cmd->index = index;
+ 	cmd->cookie = nsock->cookie;
+@@ -493,7 +522,8 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+ 		request.from = cpu_to_be64((u64)blk_rq_pos(req) << 9);
+ 		request.len = htonl(size);
+ 	}
+-	memcpy(request.handle, &tag, sizeof(tag));
++	handle = nbd_cmd_handle(cmd);
++	memcpy(request.handle, &handle, sizeof(handle));
+ 
+ 	dev_dbg(nbd_to_dev(nbd), "request %p: sending control (%s@%llu,%uB)\n",
+ 		req, nbdcmd_to_ascii(type),
+@@ -586,10 +616,12 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+ 	struct nbd_reply reply;
+ 	struct nbd_cmd *cmd;
+ 	struct request *req = NULL;
++	u64 handle;
+ 	u16 hwq;
+ 	u32 tag;
+ 	struct kvec iov = {.iov_base = &reply, .iov_len = sizeof(reply)};
+ 	struct iov_iter to;
++	int ret = 0;
+ 
+ 	reply.magic = 0;
+ 	iov_iter_kvec(&to, READ | ITER_KVEC, &iov, 1, sizeof(reply));
+@@ -607,8 +639,8 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+ 		return ERR_PTR(-EPROTO);
+ 	}
+ 
+-	memcpy(&tag, reply.handle, sizeof(u32));
+-
++	memcpy(&handle, reply.handle, sizeof(handle));
++	tag = nbd_handle_to_tag(handle);
+ 	hwq = blk_mq_unique_tag_to_hwq(tag);
+ 	if (hwq < nbd->tag_set.nr_hw_queues)
+ 		req = blk_mq_tag_to_rq(nbd->tag_set.tags[hwq],
+@@ -619,11 +651,25 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+ 		return ERR_PTR(-ENOENT);
+ 	}
+ 	cmd = blk_mq_rq_to_pdu(req);
++
++	mutex_lock(&cmd->lock);
++	if (cmd->cmd_cookie != nbd_handle_to_cookie(handle)) {
++		dev_err(disk_to_dev(nbd->disk), "Double reply on req %p, cmd_cookie %u, handle cookie %u\n",
++			req, cmd->cmd_cookie, nbd_handle_to_cookie(handle));
++		ret = -ENOENT;
++		goto out;
++	}
++	if (test_bit(NBD_CMD_REQUEUED, &cmd->flags)) {
++		dev_err(disk_to_dev(nbd->disk), "Raced with timeout on req %p\n",
++			req);
++		ret = -ENOENT;
++		goto out;
++	}
+ 	if (ntohl(reply.error)) {
+ 		dev_err(disk_to_dev(nbd->disk), "Other side returned error (%d)\n",
+ 			ntohl(reply.error));
+ 		cmd->status = BLK_STS_IOERR;
+-		return cmd;
++		goto out;
+ 	}
+ 
+ 	dev_dbg(nbd_to_dev(nbd), "request %p: got reply\n", req);
+@@ -648,18 +694,18 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+ 				if (nbd_disconnected(config) ||
+ 				    config->num_connections <= 1) {
+ 					cmd->status = BLK_STS_IOERR;
+-					return cmd;
++					goto out;
+ 				}
+-				return ERR_PTR(-EIO);
++				ret = -EIO;
++				goto out;
+ 			}
+ 			dev_dbg(nbd_to_dev(nbd), "request %p: got %d bytes data\n",
+ 				req, bvec.bv_len);
+ 		}
+-	} else {
+-		/* See the comment in nbd_queue_rq. */
+-		wait_for_completion(&cmd->send_complete);
+ 	}
+-	return cmd;
++out:
++	mutex_unlock(&cmd->lock);
++	return ret ? ERR_PTR(ret) : cmd;
  }
--static inline int sd_dif_prepare(struct scsi_cmnd *scmd)
--{
--	return 0;
--}
--static inline void sd_dif_complete(struct scsi_cmnd *cmd, unsigned int a)
--{
--}
  
- #endif /* CONFIG_BLK_DEV_INTEGRITY */
+ static void recv_work(struct work_struct *work)
+@@ -855,7 +901,7 @@ static blk_status_t nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	 * that the server is misbehaving (or there was an error) before we're
+ 	 * done sending everything over the wire.
+ 	 */
+-	init_completion(&cmd->send_complete);
++	mutex_lock(&cmd->lock);
+ 	clear_bit(NBD_CMD_REQUEUED, &cmd->flags);
  
-diff --git a/drivers/scsi/sd_dif.c b/drivers/scsi/sd_dif.c
-index d8de43d..db72c82 100644
---- a/drivers/scsi/sd_dif.c
-+++ b/drivers/scsi/sd_dif.c
-@@ -95,116 +95,3 @@ void sd_dif_config_host(struct scsi_disk *sdkp)
- 	blk_integrity_register(disk, &bi);
+ 	/* We can be called directly from the user space process, which means we
+@@ -868,7 +914,7 @@ static blk_status_t nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		ret = BLK_STS_IOERR;
+ 	else if (!ret)
+ 		ret = BLK_STS_OK;
+-	complete(&cmd->send_complete);
++	mutex_unlock(&cmd->lock);
+ 
+ 	return ret;
+ }
+@@ -1475,6 +1521,7 @@ static int nbd_init_request(struct blk_mq_tag_set *set, struct request *rq,
+ 	struct nbd_cmd *cmd = blk_mq_rq_to_pdu(rq);
+ 	cmd->nbd = set->driver_data;
+ 	cmd->flags = 0;
++	mutex_init(&cmd->lock);
+ 	return 0;
  }
  
--/*
-- * The virtual start sector is the one that was originally submitted
-- * by the block layer.	Due to partitioning, MD/DM cloning, etc. the
-- * actual physical start sector is likely to be different.  Remap
-- * protection information to match the physical LBA.
-- *
-- * From a protocol perspective there's a slight difference between
-- * Type 1 and 2.  The latter uses 32-byte CDBs exclusively, and the
-- * reference tag is seeded in the CDB.  This gives us the potential to
-- * avoid virt->phys remapping during write.  However, at read time we
-- * don't know whether the virt sector is the same as when we wrote it
-- * (we could be reading from real disk as opposed to MD/DM device.  So
-- * we always remap Type 2 making it identical to Type 1.
-- *
-- * Type 3 does not have a reference tag so no remapping is required.
-- */
--void sd_dif_prepare(struct scsi_cmnd *scmd)
--{
--	const int tuple_sz = sizeof(struct t10_pi_tuple);
--	struct bio *bio;
--	struct scsi_disk *sdkp;
--	struct t10_pi_tuple *pi;
--	u32 phys, virt;
--
--	sdkp = scsi_disk(scmd->request->rq_disk);
--
--	if (sdkp->protection_type == T10_PI_TYPE3_PROTECTION)
--		return;
--
--	phys = t10_pi_ref_tag(scmd->request);
--
--	__rq_for_each_bio(bio, scmd->request) {
--		struct bio_integrity_payload *bip = bio_integrity(bio);
--		struct bio_vec iv;
--		struct bvec_iter iter;
--		unsigned int j;
--
--		/* Already remapped? */
--		if (bip->bip_flags & BIP_MAPPED_INTEGRITY)
--			break;
--
--		virt = bip_get_seed(bip) & 0xffffffff;
--
--		bip_for_each_vec(iv, bip, iter) {
--			pi = kmap_atomic(iv.bv_page) + iv.bv_offset;
--
--			for (j = 0; j < iv.bv_len; j += tuple_sz, pi++) {
--
--				if (be32_to_cpu(pi->ref_tag) == virt)
--					pi->ref_tag = cpu_to_be32(phys);
--
--				virt++;
--				phys++;
--			}
--
--			kunmap_atomic(pi);
--		}
--
--		bip->bip_flags |= BIP_MAPPED_INTEGRITY;
--	}
--}
--
--/*
-- * Remap physical sector values in the reference tag to the virtual
-- * values expected by the block layer.
-- */
--void sd_dif_complete(struct scsi_cmnd *scmd, unsigned int good_bytes)
--{
--	const int tuple_sz = sizeof(struct t10_pi_tuple);
--	struct scsi_disk *sdkp;
--	struct bio *bio;
--	struct t10_pi_tuple *pi;
--	unsigned int j, intervals;
--	u32 phys, virt;
--
--	sdkp = scsi_disk(scmd->request->rq_disk);
--
--	if (sdkp->protection_type == T10_PI_TYPE3_PROTECTION || good_bytes == 0)
--		return;
--
--	intervals = good_bytes / scsi_prot_interval(scmd);
--	phys = t10_pi_ref_tag(scmd->request);
--
--	__rq_for_each_bio(bio, scmd->request) {
--		struct bio_integrity_payload *bip = bio_integrity(bio);
--		struct bio_vec iv;
--		struct bvec_iter iter;
--
--		virt = bip_get_seed(bip) & 0xffffffff;
--
--		bip_for_each_vec(iv, bip, iter) {
--			pi = kmap_atomic(iv.bv_page) + iv.bv_offset;
--
--			for (j = 0; j < iv.bv_len; j += tuple_sz, pi++) {
--
--				if (intervals == 0) {
--					kunmap_atomic(pi);
--					return;
--				}
--
--				if (be32_to_cpu(pi->ref_tag) == phys)
--					pi->ref_tag = cpu_to_be32(virt);
--
--				virt++;
--				phys++;
--				intervals--;
--			}
--
--			kunmap_atomic(pi);
--		}
--	}
--}
--
-diff --git a/include/linux/t10-pi.h b/include/linux/t10-pi.h
-index 635855e..81ae4c4 100644
---- a/include/linux/t10-pi.h
-+++ b/include/linux/t10-pi.h
-@@ -47,5 +47,8 @@ static inline u32 t10_pi_ref_tag(struct request *rq)
- extern const struct blk_integrity_profile t10_pi_type1_ip;
- extern const struct blk_integrity_profile t10_pi_type3_crc;
- extern const struct blk_integrity_profile t10_pi_type3_ip;
-+extern void t10_pi_prepare(struct request *rq, u8 protection_type);
-+extern void t10_pi_complete(struct request *rq, u8 protection_type,
-+			    unsigned int intervals);
- 
- #endif
 -- 
-1.8.3.1
+2.14.3
