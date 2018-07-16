@@ -1,29 +1,29 @@
-Return-Path: <linus971@gmail.com>
+Return-Path: <jannh@google.com>
 MIME-Version: 1.0
 References: <20180716165154.58794-1-jannh@google.com> <CA+55aFy21E78DTF-3+1P3bTtX_89-nFUSpYHUELT0WCOZ-ccjw@mail.gmail.com>
- <CAG48ez3HEcp-hE=JF4T+7wjLju_NtLXqh8fvroEPBmx1P2D9Hw@mail.gmail.com>
-In-Reply-To: <CAG48ez3HEcp-hE=JF4T+7wjLju_NtLXqh8fvroEPBmx1P2D9Hw@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Mon, 16 Jul 2018 10:19:19 -0700
-Message-ID: <CA+55aFxeJxC0SNv9o4RYZkwmRA15SBg0cw=kHgO-omAjg2RDgQ@mail.gmail.com>
+In-Reply-To: <CA+55aFy21E78DTF-3+1P3bTtX_89-nFUSpYHUELT0WCOZ-ccjw@mail.gmail.com>
+From: Jann Horn <jannh@google.com>
+Date: Mon, 16 Jul 2018 18:57:34 +0200
+Message-ID: <CAG48ez3HEcp-hE=JF4T+7wjLju_NtLXqh8fvroEPBmx1P2D9Hw@mail.gmail.com>
 Subject: Re: [PATCH v4] bsg: mitigate read/write abuse, block uaccess in release
-To: Jann Horn <jannh@google.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>, linux-block <linux-block@vger.kernel.org>,
-	Linux SCSI List <linux-scsi@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Doug Gilbert <dgilbert@interlog.com>,
-	Al Viro <viro@zeniv.linux.org.uk>, James Bottomley <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk, fujita.tomonori@lab.ntt.co.jp,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	kernel list <linux-kernel@vger.kernel.org>, Douglas Gilbert <dgilbert@interlog.com>,
+	Al Viro <viro@zeniv.linux.org.uk>, jejb@linux.vnet.ibm.com,
+	martin.petersen@oracle.com,
 	Kernel Hardening <kernel-hardening@lists.openwall.com>, security@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jul 16, 2018 at 9:58 AM Jann Horn <jannh@google.com> wrote:
+On Mon, Jul 16, 2018 at 6:55 PM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 >
-> I thought Christoph wanted this one for stable. Maybe I misunderstood.
+> On Mon, Jul 16, 2018 at 9:52 AM Jann Horn <jannh@google.com> wrote:
+> >
+> > But bsg doesn't just do it on ->write(), also on ->read() and ->release().
+>
+> I think Jens already applied Christoph's patch to just remove the bsg
+> read/write entirely into the 4.19 tree.
 
-If we can remove it in mainline, we should remove it in stable too.
-There's no situation where compatibility would matter in stable but
-not in mainline.
-
-            Linus
+I thought Christoph wanted this one for stable. Maybe I misunderstood.
