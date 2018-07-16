@@ -1,61 +1,26 @@
-Return-Path: <lars.ellenberg@linbit.com>
-Return-Path: <lars.ellenberg@linbit.com>
-Date: Mon, 2 Jul 2018 13:27:21 +0200
-From: Lars Ellenberg <lars.ellenberg@linbit.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Philipp Reisner <philipp.reisner@linbit.com>
-Subject: Re: [PATCH] drbd: fix access after free
-Message-ID: <20180702112703.GA10994@soda.linbit>
-References: <20180625093952.20220-1-lars.ellenberg@linbit.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 1/2] blk-iolatency: don't change the latency window
+To: Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org,
+ kernel-team@fb.com
+Cc: Josef Bacik <jbacik@fb.com>
+References: <20180716161223.21486-1-josef@toxicpanda.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <5822cf6b-075e-3140-415e-74ea86734b81@kernel.dk>
+Date: Mon, 16 Jul 2018 10:16:43 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180625093952.20220-1-lars.ellenberg@linbit.com>
+In-Reply-To: <20180716161223.21486-1-josef@toxicpanda.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Jens, I had hoped you'd apply this "oneliner" into 4.18 already?
-Did you miss it?
-
-Cheers,
-
-	Lars
-
-
-On Mon, Jun 25, 2018 at 11:39:52AM +0200, Lars Ellenberg wrote:
->   	bio_put(req->private_bio);
->  -	req->private_bio = ERR_PTR(error);
->  +	req->private_bio = ERR_PTR(bio->bi_error);
+On 7/16/18 10:12 AM, Josef Bacik wrote:
+> From: Josef Bacik <jbacik@fb.com>
 > 
-> Which introduces an access after free,
-> because it was non obvious that req->private_bio == bio.
+> Early versions of these patches had us waiting for seconds at a time
+> during submission, so we had to adjust the timing window we monitored
+> for latency.  Now we don't do things like that so this is unnecessary
+> code.
 
->   	bio_put(req->private_bio);
->   	req->private_bio = ERR_PTR(blk_status_to_errno(bio->bi_status));
+Applied 1-2 for 4.19.
 
-> Should also go into stable since 4.3, with the trivial change around 4.13.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 4246a0b63bd8 block: add a bi_error field to struct bio
-> Reported-by: Sarah Newman <srn@prgmr.com>
-> Signed-off-by: Lars Ellenberg <lars.ellenberg@linbit.com>
-> ---
->  drivers/block/drbd/drbd_worker.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/drbd/drbd_worker.c b/drivers/block/drbd/drbd_worker.c
-> index 1476cb3439f4..5e793dd7adfb 100644
-> --- a/drivers/block/drbd/drbd_worker.c
-> +++ b/drivers/block/drbd/drbd_worker.c
-> @@ -282,8 +282,8 @@ void drbd_request_endio(struct bio *bio)
->  		what = COMPLETED_OK;
->  	}
->  
-> -	bio_put(req->private_bio);
->  	req->private_bio = ERR_PTR(blk_status_to_errno(bio->bi_status));
-> +	bio_put(bio);
->  
->  	/* not req_mod(), we need irqsave here! */
->  	spin_lock_irqsave(&device->resource->req_lock, flags);
-> -- 
-> 2.17.1
+-- 
+Jens Axboe
