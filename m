@@ -1,50 +1,77 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga17.intel.com ([192.55.52.151]:4744 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727796AbeGQJJZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Jul 2018 05:09:25 -0400
-Message-ID: <b85806d5a6085f67fb430ca0808b286d0d4d737e.camel@linux.intel.com>
-Subject: Re: [PATCH 0/4] add crc64 calculation as kernel library
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Coly Li <colyli@suse.de>, Hannes Reinecke <hare@suse.de>,
-        linux-kernel@vger.kernel.org
+Received: from mx2.suse.de ([195.135.220.15]:49390 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727481AbeGQH22 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Jul 2018 03:28:28 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-kernel@vger.kernel.org
 Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Coly Li <colyli@suse.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Luis R . Rodriguez" <mcgrof@suse.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Michael Lyle <mlyle@lyle.org>,
         Kent Overstreet <kent.overstreet@gmail.com>,
         Kate Stewart <kstewart@linuxfoundation.org>
-Date: Tue, 17 Jul 2018 11:37:34 +0300
-In-Reply-To: <608100d7-6e98-13ec-57ab-5c672131e332@suse.de>
-References: <20180716165507.23100-1-colyli@suse.de>
-         <8538b45b-bf30-926a-50fb-700b4bf1c636@suse.de>
-         <608100d7-6e98-13ec-57ab-5c672131e332@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: [PATCH 0/4] add crc64 calculation as kernel library 
+Date: Tue, 17 Jul 2018 14:57:08 +0800
+Message-Id: <20180717065711.28281-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, 2018-07-17 at 14:19 +0800, Coly Li wrote:
-> On 2018/7/17 1:46 PM, Hannes Reinecke wrote:
+This patch set adds basic implementation of crc64 calculation as Linux
+kernel library. Since bcache already does crc64 by itself, this patch
+set also modifies bcache code to use the new crc64 library routine.
 
-> > Actually, I would merge patch 1 & 2 together (pointless to introduce
-> > an
-> > option for which no code exists).
-> 
+bcache uses crc64 as storage checksum, if a change of crc lib routines
+results an inconsistent result, the unmatched checksum may make bcache
+'think' the on-disk is corrupted, such change should be avoided or
+detected as early as possible. Therefore the last patch in this series
+adds a crc test framework, to check consistency of different calculations.
 
-I was just about to say the same.
+Changelog:
+v2: combine first two patches into one
+    fixes all review commennts of v1
+v1: initial version.
 
-> The patch 1 was originally from Andy Shevchenko, and I want to keep
-> his
-> contribute. If it seems not a good idea from me, I will merge them
-> into
-> 1 patch in v2 series.
+Coly Li
 
-We have Co-developed-by tag, for example, which you may use here (if you
-choose this way, leave my SoB as well).
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Kate Stewart <kstewart@linuxfoundation.org>
+---
+Andy Shevchenko (1):
+  lib/crc64: add crc64 option to lib/Kconfig
+
+Coly Li (3):
+  lib: add crc64 calculation routines
+  bcache: use routines from lib/crc64.c for CRC64 calculation
+  lib/test_crc: Add test cases for crc calculation
+
+ drivers/md/bcache/bcache.h  |   7 +-
+ drivers/md/bcache/btree.c   |   2 +-
+ drivers/md/bcache/request.c |   2 +-
+ drivers/md/bcache/super.c   |   5 +-
+ drivers/md/bcache/util.c    | 131 ----------------------------------
+ drivers/md/bcache/util.h    |   5 +-
+ include/linux/crc64.h       |  15 ++++
+ lib/.gitignore              |   2 +
+ lib/Kconfig                 |   8 +++
+ lib/Kconfig.debug           |  11 +++
+ lib/Makefile                |  12 ++++
+ lib/crc64.c                 |  71 +++++++++++++++++++
+ lib/gen_crc64table.c        |  76 ++++++++++++++++++++
+ lib/test_crc.c              | 136 ++++++++++++++++++++++++++++++++++++
+ 14 files changed, 341 insertions(+), 142 deletions(-)
+ create mode 100644 include/linux/crc64.h
+ create mode 100644 lib/crc64.c
+ create mode 100644 lib/gen_crc64table.c
+ create mode 100644 lib/test_crc.c
 
 -- 
-Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Intel Finland Oy
+2.17.1
