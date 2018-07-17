@@ -1,55 +1,37 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:35639 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754508AbeGIW4p (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jul 2018 18:56:45 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Omar Sandoval <osandov@fb.com>
-Cc: linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH blktests v3 3/6] src/Makefile: Introduce the C_TARGETS variable
-Date: Mon,  9 Jul 2018 15:56:40 -0700
-Message-Id: <20180709225643.10537-4-bart.vanassche@wdc.com>
-In-Reply-To: <20180709225643.10537-1-bart.vanassche@wdc.com>
-References: <20180709225643.10537-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <raghuhack78@gmail.com>
+Return-Path: <raghuhack78@gmail.com>
+From: RAGHU Halharvi <raghuhack78@gmail.com>
+To: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: RAGHU Halharvi <raghuhack78@gmail.com>,
+	axboe@kernel.dk
+Subject: [PATCH] pktcdvd:checkpatch:remove static initialise null
+Date: Tue, 17 Jul 2018 23:04:01 +0530
+Message-Id: <20180717173401.18024-1-raghuhack78@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-This patch does not change any functionality but will make it easier
-to add support for building C++ code.
+* Remove checkpatch error due to initialization of static variables to
+NULL
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Signed-off-by: RAGHU Halharvi <raghuhack78@gmail.com>
 ---
- src/Makefile | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/block/pktcdvd.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/Makefile b/src/Makefile
-index 612282d14af8..7d15d115f6df 100644
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -1,4 +1,4 @@
--TARGETS := \
-+C_TARGETS := \
- 	loblksize \
- 	loop_get_status_null \
- 	openclose \
-@@ -6,6 +6,8 @@ TARGETS := \
- 	sg/syzkaller1 \
- 	nbdsetsize
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index 426e54a9d574..59fb66c0e064 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -100,8 +100,8 @@ static struct mutex ctl_mutex;	/* Serialize open/close/setup/teardown */
+ static mempool_t *psd_pool;
+ static struct bio_set *pkt_bio_set;
  
-+TARGETS := $(C_TARGETS)
-+
- CFLAGS := -O2
+-static struct class	*class_pktcdvd = NULL;    /* /sys/class/pktcdvd */
+-static struct dentry	*pkt_debugfs_root = NULL; /* /sys/kernel/debug/pktcdvd */
++static struct class	*class_pktcdvd;    /* /sys/class/pktcdvd */
++static struct dentry	*pkt_debugfs_root; /* /sys/kernel/debug/pktcdvd */
  
- all: $(TARGETS)
-@@ -13,7 +15,7 @@ all: $(TARGETS)
- clean:
- 	rm -f $(TARGETS)
- 
--$(TARGETS): %: %.c
-+$(C_TARGETS): %: %.c
- 	$(CC) -Wall -o $@ $(CPPFLAGS) $(CFLAGS) $^
- 
- .PHONY: all clean
+ /* forward declaration */
+ static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev);
 -- 
-2.18.0
+2.17.1
