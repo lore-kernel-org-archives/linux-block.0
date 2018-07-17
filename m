@@ -1,78 +1,70 @@
-Return-Path: <keescook@chromium.org>
-Return-Path: <keescook@chromium.org>
-From: Kees Cook <keescook@chromium.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Kees Cook <keescook@chromium.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Eric Biggers <ebiggers@google.com>,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-	Alasdair Kergon <agk@redhat.com>,
-	Rabin Vincent <rabinv@axis.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Pavel Machek <pavel@ucw.cz>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	x86@kernel.org,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Paul Mackerras <paulus@samba.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	David Howells <dhowells@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
-	Jia-Ju Bai <baijiaju1990@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Will Deacon <will.deacon@arm.com>,
-	dm-devel@redhat.com,
-	linux-pm@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
-	qat-linux@intel.com,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devel@driverdev.osuosl.org,
-	linux-afs@lists.infradead.org,
-	linux-wireless@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v6 18/18] crypto: Remove AHASH_REQUEST_ON_STACK
-Date: Tue, 24 Jul 2018 09:49:36 -0700
-Message-Id: <20180724164936.37477-19-keescook@chromium.org>
-In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
-References: <20180724164936.37477-1-keescook@chromium.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:58678 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729952AbeGQDqi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Jul 2018 23:46:38 -0400
+Subject: Re: [PATCH 1/4] lib/crc64: add crc64 option to lib/Kconfig
+To: Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Luis R . Rodriguez" <mcgrof@suse.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Kate Stewart <kstewart@linuxfoundation.org>
+References: <20180716165507.23100-1-colyli@suse.de>
+ <20180716165507.23100-2-colyli@suse.de>
+ <9a57ba5a-ec33-b275-43f8-1fa103966d1d@infradead.org>
+From: Coly Li <colyli@suse.de>
+Message-ID: <d692a9c4-9d25-0e8e-f2db-756a3ae0a0b0@suse.de>
+Date: Tue, 17 Jul 2018 11:16:06 +0800
+MIME-Version: 1.0
+In-Reply-To: <9a57ba5a-ec33-b275-43f8-1fa103966d1d@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-All users of AHASH_REQUEST_ON_STACK have been removed from the kernel, so
-drop it entirely so no VLAs get reintroduced by future users.
+On 2018/7/17 1:48 AM, Randy Dunlap wrote:
+> On 07/16/2018 09:55 AM, Coly Li wrote:
+>> From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+>>
+>> This patch adds crc64 option entry in lib/Kconfig. This patch is part of
+>> a patch originally written by Andy Shevchenko, Coly Li cherry-picks it
+>> and compose the commit log for a re-written crc64 source code.
+>>
+>> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+>> Signed-off-by: Coly Li <colyli@suse.de>
+>> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+>> Cc: Luis R. Rodriguez <mcgrof@suse.com>
+>> Cc: Linus Torvalds <torvalds@linux-foundation.org>
+>> Cc: Thomas Gleixner <tglx@linutronix.de>
+>> Cc: Kate Stewart <kstewart@linuxfoundation.org>
+>> ---
+>>  lib/Kconfig | 8 ++++++++
+>>  1 file changed, 8 insertions(+)
+>>
+>> diff --git a/lib/Kconfig b/lib/Kconfig
+>> index 706836ec314d..4059df9ec4c7 100644
+>> --- a/lib/Kconfig
+>> +++ b/lib/Kconfig
+>> @@ -170,6 +170,14 @@ config CRC32_BIT
+>>  
+>>  endchoice
+>>  
+>> +config CRC64
+>> +	tristate "CRC64 functions"
+>> +	help
+>> +	  This option is provided for the case where no in-kernel-tree
+>> +	  modules require CRC64 functions, but a module built outside
+>> +	  the kernel tree does. Such modules that use library CRC64
+>> +	  functions require M he
+> 
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- include/crypto/hash.h | 5 -----
- 1 file changed, 5 deletions(-)
+Hi Randy,
 
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index 21587011ab0f..fca3e28c77a4 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -64,11 +64,6 @@ struct ahash_request {
- 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
- };
- 
--#define AHASH_REQUEST_ON_STACK(name, ahash) \
--	char __##name##_desc[sizeof(struct ahash_request) + \
--		crypto_ahash_reqsize(ahash)] CRYPTO_MINALIGN_ATTR; \
--	struct ahash_request *name = (void *)__##name##_desc
--
- /**
-  * struct ahash_alg - asynchronous message digest definition
-  * @init: **[mandatory]** Initialize the transformation context. Intended only to initialize the
--- 
-2.17.1
+> eh?  missing something here.
+> 
+
+Fix it in v2 series. Thanks.
+
+Coly Li
