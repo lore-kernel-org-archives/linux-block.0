@@ -1,103 +1,68 @@
-Return-Path: <keescook@chromium.org>
-Return-Path: <keescook@chromium.org>
-From: Kees Cook <keescook@chromium.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Kees Cook <keescook@chromium.org>,
-	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Eric Biggers <ebiggers@google.com>,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-	Alasdair Kergon <agk@redhat.com>,
-	Rabin Vincent <rabinv@axis.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Pavel Machek <pavel@ucw.cz>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	x86@kernel.org,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Paul Mackerras <paulus@samba.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	David Howells <dhowells@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
-	Jia-Ju Bai <baijiaju1990@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Will Deacon <will.deacon@arm.com>,
-	dm-devel@redhat.com,
-	linux-pm@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
-	qat-linux@intel.com,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devel@driverdev.osuosl.org,
-	linux-afs@lists.infradead.org,
-	linux-wireless@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v6 17/18] crypto: ccm: Remove VLA usage
-Date: Tue, 24 Jul 2018 09:49:35 -0700
-Message-Id: <20180724164936.37477-18-keescook@chromium.org>
-In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
-References: <20180724164936.37477-1-keescook@chromium.org>
+Return-Path: <raghuhack78@gmail.com>
+Return-Path: <raghuhack78@gmail.com>
+From: RAGHU Halharvi <raghuhack78@gmail.com>
+To: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: RAGHU Halharvi <raghuhack78@gmail.com>,
+	axboe@kernel.dk
+Subject: [PATCH] pktcdvd:checkpatch:fix pointer declaration
+Date: Tue, 17 Jul 2018 23:31:53 +0530
+Message-Id: <20180717180153.19386-1-raghuhack78@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+* Fix all pointer declaration which causes
+   "ERROR: "foo* bar" should be "foo *bar""
 
-In the quest to remove all stack VLA usage from the kernel[1], this
-drops AHASH_REQUEST_ON_STACK by preallocated the ahash request area
-with the skcipher area (which are not used at the same time).
-
-[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
-
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: RAGHU Halharvi <raghuhack78@gmail.com>
 ---
- crypto/ccm.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ drivers/block/pktcdvd.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/crypto/ccm.c b/crypto/ccm.c
-index 0a083342ec8c..b242fd0d3262 100644
---- a/crypto/ccm.c
-+++ b/crypto/ccm.c
-@@ -50,7 +50,10 @@ struct crypto_ccm_req_priv_ctx {
- 	u32 flags;
- 	struct scatterlist src[3];
- 	struct scatterlist dst[3];
--	struct skcipher_request skreq;
-+	union {
-+		struct ahash_request ahreq;
-+		struct skcipher_request skreq;
-+	};
- };
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index 59fb66c0e064..50a574049144 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -104,7 +104,7 @@ static struct class	*class_pktcdvd;    /* /sys/class/pktcdvd */
+ static struct dentry	*pkt_debugfs_root; /* /sys/kernel/debug/pktcdvd */
  
- struct cbcmac_tfm_ctx {
-@@ -181,7 +184,7 @@ static int crypto_ccm_auth(struct aead_request *req, struct scatterlist *plain,
- 	struct crypto_ccm_req_priv_ctx *pctx = crypto_ccm_reqctx(req);
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
- 	struct crypto_ccm_ctx *ctx = crypto_aead_ctx(aead);
--	AHASH_REQUEST_ON_STACK(ahreq, ctx->mac);
-+	struct ahash_request *ahreq = &pctx->ahreq;
- 	unsigned int assoclen = req->assoclen;
- 	struct scatterlist sg[3];
- 	u8 *odata = pctx->odata;
-@@ -427,7 +430,7 @@ static int crypto_ccm_init_tfm(struct crypto_aead *tfm)
- 	crypto_aead_set_reqsize(
- 		tfm,
- 		align + sizeof(struct crypto_ccm_req_priv_ctx) +
--		crypto_skcipher_reqsize(ctr));
-+		max(crypto_ahash_reqsize(mac), crypto_skcipher_reqsize(ctr)));
+ /* forward declaration */
+-static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev);
++static int pkt_setup_dev(dev_t dev, dev_t *pkt_dev);
+ static int pkt_remove_dev(dev_t pkt_dev);
+ static int pkt_seq_show(struct seq_file *m, void *p);
  
- 	return 0;
+@@ -116,10 +116,10 @@ static sector_t get_zone(sector_t sector, struct pktcdvd_device *pd)
+ /*
+  * create and register a pktcdvd kernel object.
+  */
+-static struct pktcdvd_kobj* pkt_kobj_create(struct pktcdvd_device *pd,
+-					const char* name,
+-					struct kobject* parent,
+-					struct kobj_type* ktype)
++static struct pktcdvd_kobj *pkt_kobj_create(struct pktcdvd_device *pd,
++					const char *name,
++					struct kobject *parent,
++					struct kobj_type *ktype)
+ {
+ 	struct pktcdvd_kobj *p;
+ 	int error;
+@@ -246,7 +246,7 @@ static ssize_t kobj_pkt_show(struct kobject *kobj,
+ 	return n;
+ }
  
+-static void init_write_congestion_marks(int* lo, int* hi)
++static void init_write_congestion_marks(int *lo, int *hi)
+ {
+ 	if (*hi > 0) {
+ 		*hi = max(*hi, 500);
+@@ -2708,7 +2708,7 @@ static char *pktcdvd_devnode(struct gendisk *gd, umode_t *mode)
+ /*
+  * Set up mapping from pktcdvd device to CD-ROM device.
+  */
+-static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev)
++static int pkt_setup_dev(dev_t dev, dev_t *pkt_dev)
+ {
+ 	int idx;
+ 	int ret = -ENOMEM;
 -- 
 2.17.1
