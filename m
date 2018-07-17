@@ -1,8 +1,8 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:53600 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:49438 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731617AbeGQP2p (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Jul 2018 11:28:45 -0400
+        id S1727978AbeGQH2i (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Jul 2018 03:28:38 -0400
 From: Coly Li <colyli@suse.de>
 To: linux-kernel@vger.kernel.org
 Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
@@ -13,11 +13,11 @@ Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Kate Stewart <kstewart@linuxfoundation.org>
-Subject: [PATCH v3 2/3] bcache: use routines from lib/crc64.c for CRC64 calculation
-Date: Tue, 17 Jul 2018 22:55:24 +0800
-Message-Id: <20180717145525.50852-3-colyli@suse.de>
-In-Reply-To: <20180717145525.50852-1-colyli@suse.de>
-References: <20180717145525.50852-1-colyli@suse.de>
+Subject: [PATCH v2 2/3] bcache: use routines from lib/crc64.c for CRC64 calculation
+Date: Tue, 17 Jul 2018 14:57:10 +0800
+Message-Id: <20180717065711.28281-3-colyli@suse.de>
+In-Reply-To: <20180717065711.28281-1-colyli@suse.de>
+References: <20180717065711.28281-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
@@ -56,7 +56,7 @@ index 17bf109c58e9..af247298409a 100644
  	Allows a block device to be used as cache for other devices; uses
  	a btree for indexing and the layout is optimized for SSDs.
 diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index d6bf294f3907..6d4d2356c3cc 100644
+index d6bf294f3907..3f7934f56648 100644
 --- a/drivers/md/bcache/bcache.h
 +++ b/drivers/md/bcache/bcache.h
 @@ -189,6 +189,7 @@
@@ -74,14 +74,14 @@ index d6bf294f3907..6d4d2356c3cc 100644
 -	bch_crc64(((void *) (i)) + sizeof(uint64_t),			\
 -		  ((void *) bset_bkey_last(i)) -			\
 -		  (((void *) (i)) + sizeof(uint64_t)))
-+	crc64_bch(((void *) (i)) + sizeof(uint64_t),			\
++	crc64_le_bch(((void *) (i)) + sizeof(uint64_t),			\
 +		   ((void *) bset_bkey_last(i)) -			\
 +		   (((void *) (i)) + sizeof(uint64_t)))
  
  /* Error handling macros */
  
 diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 547c9eedc2f4..72619508c928 100644
+index 547c9eedc2f4..378dd6688d26 100644
 --- a/drivers/md/bcache/btree.c
 +++ b/drivers/md/bcache/btree.c
 @@ -194,7 +194,7 @@ static uint64_t btree_csum_set(struct btree *b, struct bset *i)
@@ -89,12 +89,12 @@ index 547c9eedc2f4..72619508c928 100644
  	void *data = (void *) i + 8, *end = bset_bkey_last(i);
  
 -	crc = bch_crc64_update(crc, data, end - data);
-+	crc = crc64_update(crc, data, end - data);
++	crc = crc64_le_update(crc, data, end - data);
  	return crc ^ 0xffffffffffffffffULL;
  }
  
 diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index ae67f5fa8047..28b2fb11a3d5 100644
+index ae67f5fa8047..4efe6550df94 100644
 --- a/drivers/md/bcache/request.c
 +++ b/drivers/md/bcache/request.c
 @@ -45,7 +45,7 @@ static void bio_csum(struct bio *bio, struct bkey *k)
@@ -102,12 +102,12 @@ index ae67f5fa8047..28b2fb11a3d5 100644
  	bio_for_each_segment(bv, bio, iter) {
  		void *d = kmap(bv.bv_page) + bv.bv_offset;
 -		csum = bch_crc64_update(csum, d, bv.bv_len);
-+		csum = crc64_update(csum, d, bv.bv_len);
++		csum = crc64_le_update(csum, d, bv.bv_len);
  		kunmap(bv.bv_page);
  	}
  
 diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index fa4058e43202..c425c52f0c42 100644
+index fa4058e43202..61beb68b9048 100644
 --- a/drivers/md/bcache/super.c
 +++ b/drivers/md/bcache/super.c
 @@ -549,7 +549,7 @@ void bch_prio_write(struct cache *ca)
@@ -115,7 +115,7 @@ index fa4058e43202..c425c52f0c42 100644
  		p->next_bucket	= ca->prio_buckets[i + 1];
  		p->magic	= pset_magic(&ca->sb);
 -		p->csum		= bch_crc64(&p->magic, bucket_bytes(ca) - 8);
-+		p->csum		= crc64_bch(&p->magic, bucket_bytes(ca) - 8);
++		p->csum		= crc64_le_bch(&p->magic, bucket_bytes(ca) - 8);
  
  		bucket = bch_bucket_alloc(ca, RESERVE_PRIO, true);
  		BUG_ON(bucket == -1);
@@ -124,7 +124,7 @@ index fa4058e43202..c425c52f0c42 100644
  			prio_io(ca, bucket, REQ_OP_READ, 0);
  
 -			if (p->csum != bch_crc64(&p->magic, bucket_bytes(ca) - 8))
-+			if (p->csum != crc64_bch(&p->magic,
++			if (p->csum != crc64_le_bch(&p->magic,
 +						   bucket_bytes(ca) - 8))
  				pr_warn("bad csum reading priorities");
  
