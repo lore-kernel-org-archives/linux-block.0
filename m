@@ -1,42 +1,43 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qt0-f196.google.com ([209.85.216.196]:39043 "EHLO
-        mail-qt0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389459AbeG0Whu (ORCPT
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:18358 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730063AbeGRAYl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Jul 2018 18:37:50 -0400
-Received: by mail-qt0-f196.google.com with SMTP id q12-v6so6490176qtp.6
-        for <linux-block@vger.kernel.org>; Fri, 27 Jul 2018 14:14:09 -0700 (PDT)
-From: Josef Bacik <josef@toxicpanda.com>
-To: linux-block@vger.kernel.org, kernel-team@fb.com
-Subject: [PATCH] block: don't do cgroup accounting for split bio's
-Date: Fri, 27 Jul 2018 17:14:07 -0400
-Message-Id: <20180727211407.24318-1-josef@toxicpanda.com>
+        Tue, 17 Jul 2018 20:24:41 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH 0/3] blk-mq: Enable runtime power management
+Date: Tue, 17 Jul 2018 16:49:37 -0700
+Message-Id: <20180717234940.11231-1-bart.vanassche@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-We need to check in blkcg_bio_issue_check if the bio is flagged as
-QUEUE_ENTERED, because if it is then we've already accounted for the IO
-in the cgroup stats.
+Hello Jens,
 
-Reported-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Josef Bacik <josef@toxicpanda.com>
----
- include/linux/blk-cgroup.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+This patch series not only enables runtime power management for blk-mq but also
+simplifies power management for the legacy block layer. Please consider this
+patch series for kernel v4.19 (I am aware that you are on vacation).
 
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 3bed5e02a873..a977c31688ae 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -767,7 +767,8 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 
- 	throtl = blk_throtl_bio(q, blkg, bio);
- 
--	if (!throtl) {
-+	if (!throtl &&
-+	    !bio_flagged(bio, BIO_QUEUE_ENTERED)) {
- 		blkg = blkg ?: q->root_blkg;
- 		blkg_rwstat_add(&blkg->stat_bytes, bio->bi_opf,
- 				bio->bi_iter.bi_size);
+Thanks,
+
+Bart.
+
+Bart Van Assche (3):
+  block: Fix a comment in a header file
+  block, scsi: Rework runtime power management
+  blk-mq: Enable support for runtime power management
+
+ block/blk-core.c          | 60 ++++++++++++++++-----------------------
+ block/blk-mq-debugfs.c    |  1 -
+ block/blk-mq.c            | 12 ++++----
+ block/elevator.c          | 11 +------
+ drivers/scsi/sd.c         |  4 +--
+ drivers/scsi/ufs/ufshcd.c | 10 +++----
+ include/linux/blk-mq.h    |  1 +
+ include/linux/blkdev.h    |  9 ++----
+ 8 files changed, 42 insertions(+), 66 deletions(-)
+
 -- 
-2.14.3
+2.18.0
