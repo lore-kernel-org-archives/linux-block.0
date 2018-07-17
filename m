@@ -1,224 +1,105 @@
-Return-Path: <keith.busch@intel.com>
-From: Keith Busch <keith.busch@intel.com>
-To: Linux NVMe <linux-nvme@lists.infradead.org>,
-	Linux Block <linux-block@vger.kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Keith Busch <keith.busch@intel.com>
-Subject: [RFC PATCH] blk-mq: move timeout handling from queue to tagset
-Date: Wed, 18 Jul 2018 11:00:18 -0600
-Message-Id: <20180718170018.31395-1-keith.busch@intel.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 17 Jul 2018 09:12:06 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
+	"jthumshirn@suse.de" <jthumshirn@suse.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+	"hch@lst.de" <hch@lst.de>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"hare@suse.de" <hare@suse.de>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"rjw@rjwysocki.net" <rjw@rjwysocki.net>,
+	"stern@rowland.harvard.edu" <stern@rowland.harvard.edu>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+	"adrian.hunter@intel.com" <adrian.hunter@intel.com>
+Subject: Re: [PATCH RFC V2 0/3] blk-mq: support runtime PM
+Message-ID: <20180717011204.GA22593@ming.t460p>
+References: <20180713080602.31602-1-ming.lei@redhat.com>
+ <c4147a47-876f-0ced-6c9d-1c3792d09858@kernel.dk>
+ <20180714023740.GA8402@ming.t460p>
+ <9acf7af08c9a517d0783277c655fa29a0fc07573.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <9acf7af08c9a517d0783277c655fa29a0fc07573.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch removes the per-request_queue timeout handling and uses the
-tagset instead. This simplifies the timeout handling since a shared tag
-set can handle all timed out requests in a single work queue rather than
-iterate the same set in different work for all the users of that set.
+On Mon, Jul 16, 2018 at 04:03:04PM +0000, Bart Van Assche wrote:
+> On Sat, 2018-07-14 at 10:37 +0800, Ming Lei wrote:
+> > OK, I am thinking another idea for addressing this issue.
+> > 
+> > We may introduce one logical admin(pm) request queue for each scsi_device,
+> > and this queue shares tag with IO queue, with NO_SCHED set, and always
+> > use atomic mode of the queue usage refcounter. Then we may send PM
+> > command to device after the IO queue is frozen.
+> > 
+> > Also PREEMPT_ONLY can be removed too in this way.
+> > 
+> > Even in future, all pass-through commands may be sent to this admin queue.
+> > 
+> > If no one objects, I will cook patches towards this direction.
+> 
+> Wouldn't it be overkill to introduce a separate admin queue for SCSI devices?
+> Will that new queue be visible under /sys/block as a request queue? If so,
 
-The long term objective of this is to aid blk-mq drivers with shared
-tagsets. These drivers typically want their timeout error handling to be
-single threaded, and this patch provides that context so they wouldn't
-need to sync with other request queues requiring the same error handling.
+The admin queue won't be visible under /sys/block because there isn't
+disk attached to it.
 
-Timeout handling per-queue was a bit racy with completions anyway:
-a tag active for one request_queue while iterating could be freed
-and reallocated to a different request_queue, so a queue's timeout
-handler may be operating on a request allocated to a different queue.
-Though no real harm was done with how the callbacks used those requests,
-this patch fixes that race.
+> how many scripts will break due to that sysfs change? If the new queue won't
+> be visible under /sys/block, how many changes will have to be made to the
+> block layer to avoid that it becomes visible?
 
-And since the timeout code takes a reference on requests, the request
-can never exit the queue while timeout code is considering. We no
-longer need to enter each request_queue in the timeout work so this
-patch removes that unnecessary code.
+That is easy enough, please see NVMe's admin queue. And the concept is
+actually from NVMe. The difference is just that NVMe's admin queue has
+standalone tags, but it is easy to solve with TAG_SHARED for scsi.
 
-Signed-off-by: Keith Busch <keith.busch@intel.com>
----
- block/blk-core.c       |  5 ++---
- block/blk-mq.c         | 45 ++++++++++++++++++++-------------------------
- block/blk-timeout.c    | 16 ++++++++++------
- include/linux/blk-mq.h |  2 ++
- 4 files changed, 34 insertions(+), 34 deletions(-)
+> 
+> Regarding the device_busy, device_blocked, cmd_list and other attributes in
+> struct scsi_device: will the SCSI commands submitted to the admin queue affect
+> these attributes? If not, which assumptions in the SCSI core will break? And
+> if SCSI commands submitted to the admin queue will affect these attributes,
+> how will these attributes be shared between the regular and the admin request
+> queues?
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index f84a9b7b6f5a..9cf7ff6baba0 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -404,9 +404,6 @@ EXPORT_SYMBOL(blk_stop_queue);
-  */
- void blk_sync_queue(struct request_queue *q)
- {
--	del_timer_sync(&q->timeout);
--	cancel_work_sync(&q->timeout_work);
--
- 	if (q->mq_ops) {
- 		struct blk_mq_hw_ctx *hctx;
- 		int i;
-@@ -415,6 +412,8 @@ void blk_sync_queue(struct request_queue *q)
- 		queue_for_each_hw_ctx(q, hctx, i)
- 			cancel_delayed_work_sync(&hctx->run_work);
- 	} else {
-+		del_timer_sync(&q->timeout);
-+		cancel_work_sync(&q->timeout_work);
- 		cancel_delayed_work_sync(&q->delay_work);
- 	}
- }
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 95919268564b..22326612a5d3 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -804,8 +804,7 @@ static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
- 	return false;
- }
- 
--static void blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
--		struct request *rq, void *priv, bool reserved)
-+static void blk_mq_check_expired(struct request *rq, void *priv, bool reserved)
- {
- 	unsigned long *next = priv;
- 
-@@ -842,33 +841,21 @@ static void blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
- 
- static void blk_mq_timeout_work(struct work_struct *work)
- {
--	struct request_queue *q =
--		container_of(work, struct request_queue, timeout_work);
-+	struct blk_mq_tag_set *set =
-+		container_of(work, struct blk_mq_tag_set, timeout_work);
-+	struct request_queue *q;
- 	unsigned long next = 0;
- 	struct blk_mq_hw_ctx *hctx;
- 	int i;
- 
--	/* A deadlock might occur if a request is stuck requiring a
--	 * timeout at the same time a queue freeze is waiting
--	 * completion, since the timeout code would not be able to
--	 * acquire the queue reference here.
--	 *
--	 * That's why we don't use blk_queue_enter here; instead, we use
--	 * percpu_ref_tryget directly, because we need to be able to
--	 * obtain a reference even in the short window between the queue
--	 * starting to freeze, by dropping the first reference in
--	 * blk_freeze_queue_start, and the moment the last request is
--	 * consumed, marked by the instant q_usage_counter reaches
--	 * zero.
--	 */
--	if (!percpu_ref_tryget(&q->q_usage_counter))
--		return;
--
--	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &next);
-+	blk_mq_tagset_busy_iter(set, blk_mq_check_expired, &next);
- 
- 	if (next != 0) {
--		mod_timer(&q->timeout, next);
--	} else {
-+		mod_timer(&set->timer, next);
-+		return;
-+	}
-+
-+	list_for_each_entry(q, &set->tag_list, tag_set_list) {
- 		/*
- 		 * Request timeouts are handled as a forward rolling timer. If
- 		 * we end up here it means that no requests are pending and
-@@ -881,7 +868,6 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 				blk_mq_tag_idle(hctx);
- 		}
- 	}
--	blk_queue_exit(q);
- }
- 
- struct flush_busy_ctx_data {
-@@ -2548,7 +2534,6 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	if (!q->nr_hw_queues)
- 		goto err_hctxs;
- 
--	INIT_WORK(&q->timeout_work, blk_mq_timeout_work);
- 	blk_queue_rq_timeout(q, set->timeout ? set->timeout : 30 * HZ);
- 
- 	q->nr_queues = nr_cpu_ids;
-@@ -2710,6 +2695,13 @@ static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
- 		return blk_mq_map_queues(set);
- }
- 
-+static void blk_mq_timed_out_timer(struct timer_list *t)
-+{
-+	struct blk_mq_tag_set *set = from_timer(set, t, timer);
-+
-+	kblockd_schedule_work(&set->timeout_work);
-+}
-+
- /*
-  * Alloc a tag set to be associated with one or more request queues.
-  * May fail with EINVAL for various error conditions. May adjust the
-@@ -2778,6 +2770,9 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
- 	mutex_init(&set->tag_list_lock);
- 	INIT_LIST_HEAD(&set->tag_list);
- 
-+	timer_setup(&set->timer, blk_mq_timed_out_timer, 0);
-+	INIT_WORK(&set->timeout_work, blk_mq_timeout_work);
-+
- 	return 0;
- 
- out_free_mq_map:
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index f2cfd56e1606..fe26aa5305c9 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -193,9 +193,13 @@ void blk_add_timer(struct request *req)
- {
- 	struct request_queue *q = req->q;
- 	unsigned long expiry;
-+	struct timer_list *timer;
- 
--	if (!q->mq_ops)
-+	if (!q->mq_ops) {
- 		lockdep_assert_held(q->queue_lock);
-+		timer = &q->timeout;
-+	} else
-+		timer = &q->tag_set->timer;
- 
- 	/* blk-mq has its own handler, so we don't need ->rq_timed_out_fn */
- 	if (!q->mq_ops && !q->rq_timed_out_fn)
-@@ -227,9 +231,9 @@ void blk_add_timer(struct request *req)
- 	 */
- 	expiry = blk_rq_timeout(round_jiffies_up(blk_rq_deadline(req)));
- 
--	if (!timer_pending(&q->timeout) ||
--	    time_before(expiry, q->timeout.expires)) {
--		unsigned long diff = q->timeout.expires - expiry;
-+	if (!timer_pending(timer) ||
-+	    time_before(expiry, timer->expires)) {
-+		unsigned long diff = timer->expires - expiry;
- 
- 		/*
- 		 * Due to added timer slack to group timers, the timer
-@@ -238,8 +242,8 @@ void blk_add_timer(struct request *req)
- 		 * modifying the timer because expires for value X
- 		 * will be X + something.
- 		 */
--		if (!timer_pending(&q->timeout) || (diff >= HZ / 2))
--			mod_timer(&q->timeout, expiry);
-+		if (!timer_pending(timer) || (diff >= HZ / 2))
-+			mod_timer(timer, expiry);
- 	}
- 
- }
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index e3147eb74222..9b0fd11ce89a 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -86,6 +86,8 @@ struct blk_mq_tag_set {
- 
- 	struct blk_mq_tags	**tags;
- 
-+	struct timer_list	timer;
-+	struct work_struct	timeout_work;
- 	struct mutex		tag_list_lock;
- 	struct list_head	tag_list;
- };
--- 
-2.14.4
+Per my current design, requests submitted to one scsi_device via admin
+queue will share this scsi_device attributes just for sake of easy
+implementation.
+
+Sharing won't be very difficult, and one way is to pass 'scsi_device'
+via scsi_request from scsi_execute().
+
+BTW, I am trying to make the admin queue per-host first.
+
+> 
+> Since the power management core guarantees that runtime PM operations do not
+> occur during suspend nor during resume operations: has it been considered to
+> drop the RQF_PM flag and to use the RQF_PREEMPT flag instead and also to
+> set and reset QUEUE_FLAG_PREEMPT_ONLY as needed?
+
+That can't work on runtime PM which requires new IO to wakeup queue, if
+we add this to blk_queue_enter(), which will become quite complicated:
+
+1) queue freeze has to be done before runtime suspending
+
+2) when any new IO comes, the queue has to be unfrozen.
+
+3) when any RQF_PM request comes, the queue has to be kept in freezing,
+and allows this request to be crossed.
+
+
+There are at least two benefits with this suggested approach:
+
+1) simplifying blk_queue_enter() for using freezing IO queue before
+runtime suspend. We can simply freeze IO queue before suspend.
+
+2) solve the RQF_PM request starvation issue in simple way
+Now blk_pm_add_request() is called from __elv_add_request(), but at
+that time, the request pool may have been consumed up already.
+
+Also separating admin requests from IO queue may cause make chance to
+simplify & optimize IO path in future too.
+
+Thanks,
+Ming
