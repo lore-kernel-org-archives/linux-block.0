@@ -1,33 +1,68 @@
-Return-Path: <prvs=730b8c8b8=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"raghuhack78@gmail.com" <raghuhack78@gmail.com>
-CC: "axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH] pktcdvd:checkpatch:fix pointer declaration
-Date: Wed, 18 Jul 2018 18:06:42 +0000
-Message-ID: <5ad3cf3212c434e73375eeb22d2f67fd70702744.camel@wdc.com>
-References: <20180718155855.4949-1-raghuhack78@gmail.com>
-In-Reply-To: <20180718155855.4949-1-raghuhack78@gmail.com>
-Content-Type: text/plain; charset="utf-7"
-MIME-Version: 1.0
+Return-Path: <raghuhack78@gmail.com>
+Return-Path: <raghuhack78@gmail.com>
+From: RAGHU Halharvi <raghuhack78@gmail.com>
+To: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: axboe@kernel.dk,
+	RAGHU Halharvi <raghuhack78@gmail.com>
+Subject: [PATCH] pktcdvd:checkpatch:fix pointer declaration
+Date: Wed, 18 Jul 2018 21:28:55 +0530
+Message-Id: <20180718155855.4949-1-raghuhack78@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, 2018-07-18 at 21:28 +-0530, RAGHU Halharvi wrote:
-+AD4- +ACo- Fix all pointer declaration which causes
-+AD4-    +ACI-ERROR: +ACI-foo+ACo- bar+ACI- should be +ACI-foo +ACo-bar+ACI=
-AIg-
+* Fix all pointer declaration which causes
+   "ERROR: "foo* bar" should be "foo *bar""
 
-Hello Raghu,
+Signed-off-by: RAGHU Halharvi <raghuhack78@gmail.com>
+---
+ drivers/block/pktcdvd.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-If you would not be aware of this, checkpatch is a tool that is intended to
-verify patches before submission and not to verify code that is already
-upstream. A detailed explanation of why patches like this one should not be
-submitted is available in +ACI-A quick guide to why stand-alone checkpatch
-patches suck+ACI-
-(https://lists.kernelnewbies.org/pipermail/kernelnewbies/2014-September/012=
-296.html).
-
-Thanks,
-
-Bart.=
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index 59fb66c0e064..50a574049144 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -104,7 +104,7 @@ static struct class	*class_pktcdvd;    /* /sys/class/pktcdvd */
+ static struct dentry	*pkt_debugfs_root; /* /sys/kernel/debug/pktcdvd */
+ 
+ /* forward declaration */
+-static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev);
++static int pkt_setup_dev(dev_t dev, dev_t *pkt_dev);
+ static int pkt_remove_dev(dev_t pkt_dev);
+ static int pkt_seq_show(struct seq_file *m, void *p);
+ 
+@@ -116,10 +116,10 @@ static sector_t get_zone(sector_t sector, struct pktcdvd_device *pd)
+ /*
+  * create and register a pktcdvd kernel object.
+  */
+-static struct pktcdvd_kobj* pkt_kobj_create(struct pktcdvd_device *pd,
+-					const char* name,
+-					struct kobject* parent,
+-					struct kobj_type* ktype)
++static struct pktcdvd_kobj *pkt_kobj_create(struct pktcdvd_device *pd,
++					const char *name,
++					struct kobject *parent,
++					struct kobj_type *ktype)
+ {
+ 	struct pktcdvd_kobj *p;
+ 	int error;
+@@ -246,7 +246,7 @@ static ssize_t kobj_pkt_show(struct kobject *kobj,
+ 	return n;
+ }
+ 
+-static void init_write_congestion_marks(int* lo, int* hi)
++static void init_write_congestion_marks(int *lo, int *hi)
+ {
+ 	if (*hi > 0) {
+ 		*hi = max(*hi, 500);
+@@ -2708,7 +2708,7 @@ static char *pktcdvd_devnode(struct gendisk *gd, umode_t *mode)
+ /*
+  * Set up mapping from pktcdvd device to CD-ROM device.
+  */
+-static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev)
++static int pkt_setup_dev(dev_t dev, dev_t *pkt_dev)
+ {
+ 	int idx;
+ 	int ret = -ENOMEM;
+-- 
+2.17.1
