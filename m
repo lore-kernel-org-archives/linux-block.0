@@ -1,67 +1,87 @@
-Return-Path: <prvs=730b8c8b8=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "keith.busch@linux.intel.com" <keith.busch@linux.intel.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+Return-Path: <keith.busch@linux.intel.com>
+Date: Wed, 18 Jul 2018 11:45:34 -0600
+From: Keith Busch <keith.busch@linux.intel.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "keith.busch@intel.com" <keith.busch@intel.com>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
 	"sagi@grimberg.me" <sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>, "jianchao.w.wang@oracle.com"
-	<jianchao.w.wang@oracle.com>, "keith.busch@intel.com" <keith.busch@intel.com>
+	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>
 Subject: Re: [RFC PATCH] blk-mq: move timeout handling from queue to tagset
-Date: Wed, 18 Jul 2018 18:34:07 +0000
-Message-ID: <adbe32bb3da7b0d405a57a176888be40f76581cb.camel@wdc.com>
+Message-ID: <20180718174534.GC30873@localhost.localdomain>
 References: <20180718170018.31395-1-keith.busch@intel.com>
-	 <11f7a7aff754b9bb0e4243ac4502319f376378c3.camel@wdc.com>
-	 <20180718174534.GC30873@localhost.localdomain>
-In-Reply-To: <20180718174534.GC30873@localhost.localdomain>
-Content-Type: text/plain; charset="utf-7"
+ <11f7a7aff754b9bb0e4243ac4502319f376378c3.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <11f7a7aff754b9bb0e4243ac4502319f376378c3.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, 2018-07-18 at 11:45 -0600, Keith Busch wrote:
-+AD4- On Wed, Jul 18, 2018 at 05:18:45PM +-0000, Bart Van Assche wrote:
-+AD4- +AD4- On Wed, 2018-07-18 at 11:00 -0600, Keith Busch wrote:
-+AD4- +AD4- +AD4- -	cancel+AF8-work+AF8-sync(+ACY-q-+AD4-timeout+AF8-work)+=
-ADs-
-+AD4- +AD4- +AD4- -
-+AD4- +AD4- +AD4-  	if (q-+AD4-mq+AF8-ops) +AHs-
-+AD4- +AD4- +AD4-  		struct blk+AF8-mq+AF8-hw+AF8-ctx +ACo-hctx+ADs-
-+AD4- +AD4- +AD4-  		int i+ADs-
-+AD4- +AD4- +AD4- +AEAAQA- -415,6 +-412,8 +AEAAQA- void blk+AF8-sync+AF8-qu=
-eue(struct request+AF8-queue +ACo-q)
-+AD4- +AD4- +AD4-  		queue+AF8-for+AF8-each+AF8-hw+AF8-ctx(q, hctx, i)
-+AD4- +AD4- +AD4-  			cancel+AF8-delayed+AF8-work+AF8-sync(+ACY-hctx-+AD4-r=
-un+AF8-work)+ADs-
-+AD4- +AD4- +AD4-  	+AH0- else +AHs-
-+AD4- +AD4- +AD4- +-		del+AF8-timer+AF8-sync(+ACY-q-+AD4-timeout)+ADs-
-+AD4- +AD4- +AD4- +-		cancel+AF8-work+AF8-sync(+ACY-q-+AD4-timeout+AF8-work=
-)+ADs-
-+AD4- +AD4- +AD4-  		cancel+AF8-delayed+AF8-work+AF8-sync(+ACY-q-+AD4-delay=
-+AF8-work)+ADs-
-+AD4- +AD4- +AD4-  	+AH0-
-+AD4- +AD4- +AD4-  +AH0-
-+AD4- +AD4-=20
-+AD4- +AD4- What is the impact of this change on the md driver, which is th=
-e only driver
-+AD4- +AD4- that calls blk+AF8-sync+AF8-queue() directly? What will happen =
-if timeout processing
-+AD4- +AD4- happens concurrently with or after blk+AF8-sync+AF8-queue() has=
- returned?
-+AD4-=20
-+AD4- That's a make+AF8-request+AF8-fn stacking driver, right? There should=
- be
-+AD4- no impact in that case, since the change above affects only mq.
-+AD4-=20
-+AD4- I'm actually a little puzzled why md calls blk+AF8-sync+AF8-queue. Ar=
-e the
-+AD4- queue timers ever used for bio-based drivers?
+On Wed, Jul 18, 2018 at 05:18:45PM +0000, Bart Van Assche wrote:
+> On Wed, 2018-07-18 at 11:00 -0600, Keith Busch wrote:
+> > -	cancel_work_sync(&q->timeout_work);
+> > -
+> >  	if (q->mq_ops) {
+> >  		struct blk_mq_hw_ctx *hctx;
+> >  		int i;
+> > @@ -415,6 +412,8 @@ void blk_sync_queue(struct request_queue *q)
+> >  		queue_for_each_hw_ctx(q, hctx, i)
+> >  			cancel_delayed_work_sync(&hctx->run_work);
+> >  	} else {
+> > +		del_timer_sync(&q->timeout);
+> > +		cancel_work_sync(&q->timeout_work);
+> >  		cancel_delayed_work_sync(&q->delay_work);
+> >  	}
+> >  }
+> 
+> What is the impact of this change on the md driver, which is the only driver
+> that calls blk_sync_queue() directly? What will happen if timeout processing
+> happens concurrently with or after blk_sync_queue() has returned?
 
-Hello Keith,
+That's a make_request_fn stacking driver, right? There should be
+no impact in that case, since the change above affects only mq.
 
-For all md drivers that I verified calling md+AF8-make+AF8-request() trigge=
-rs one or
-more generic+AF8-make+AF8-request() calls for the underlying devices. So it=
-'s not
-clear to me why the md driver calls blk+AF8-sync+AF8-queue().
+I'm actually a little puzzled why md calls blk_sync_queue. Are the
+queue timers ever used for bio-based drivers?
+ 
+> > +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+> >  		/*
+> >  		 * Request timeouts are handled as a forward rolling timer. If
+> >  		 * we end up here it means that no requests are pending and
+> > @@ -881,7 +868,6 @@ static void blk_mq_timeout_work(struct work_struct *work)
+> >  				blk_mq_tag_idle(hctx);
+> >  		}
+> >  	}
+> > -	blk_queue_exit(q);
+> >  }
+> 
+> What prevents that a request queue is removed from set->tag_list while the above
+> loop examines tag_list? Can blk_cleanup_queue() queue be called from the context
+> of another thread while this loop is examining hardware queues?
 
-Bart.=
+Good point. I missed that this needs to hold the tag_list_lock.
+  
+> > +	timer_setup(&set->timer, blk_mq_timed_out_timer, 0);
+> > +	INIT_WORK(&set->timeout_work, blk_mq_timeout_work);
+> > [ ... ]
+> > --- a/include/linux/blk-mq.h
+> > +++ b/include/linux/blk-mq.h
+> > @@ -86,6 +86,8 @@ struct blk_mq_tag_set {
+> >  
+> >  	struct blk_mq_tags	**tags;
+> >  
+> > +	struct timer_list	timer;
+> > +	struct work_struct	timeout_work;
+> 
+> Can the timer and timeout_work data structures be replaced by a single
+> delayed_work instance?
+
+I think so. I wanted to keep blk_add_timer relatively unchanged for this
+proposal, so I followed the existing pattern with the timer kicking the
+work. I don't see why that extra indirection is necessary, so I think
+it's a great idea. Unless anyone knows a reason not to, we can collapse
+this into a single delayed work for both mq and legacy as a prep patch
+before this one.
+
+Thanks for the feedback!
