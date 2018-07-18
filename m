@@ -1,77 +1,124 @@
-Return-Path: <prvs=730b8c8b8=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "tom.leiming@gmail.com" <tom.leiming@gmail.com>
-CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "jthumshirn@suse.de" <jthumshirn@suse.de>,
-	"stern@rowland.harvard.edu" <stern@rowland.harvard.edu>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "ming.lei@redhat.com" <ming.lei@redhat.com>
-Subject: Re: [PATCH 2/3] block, scsi: Rework runtime power management
-Date: Wed, 18 Jul 2018 15:45:15 +0000
-Message-ID: <60ce50f281bf41483b53246d509697f6d95360f8.camel@wdc.com>
-References: <20180717234940.11231-1-bart.vanassche@wdc.com>
-	 <20180717234940.11231-3-bart.vanassche@wdc.com>
-	 <CACVXFVPP6bY9YijDSyQg9OOR4ge9LyR+naWNDeLGOS=WFL_7CA@mail.gmail.com>
-In-Reply-To: 
- <CACVXFVPP6bY9YijDSyQg9OOR4ge9LyR+naWNDeLGOS=WFL_7CA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-7"
+Return-Path: <tom.leiming@gmail.com>
 MIME-Version: 1.0
+In-Reply-To: <20180717234940.11231-3-bart.vanassche@wdc.com>
+References: <20180717234940.11231-1-bart.vanassche@wdc.com> <20180717234940.11231-3-bart.vanassche@wdc.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Wed, 18 Jul 2018 20:16:59 +0800
+Message-ID: <CACVXFVPP6bY9YijDSyQg9OOR4ge9LyR+naWNDeLGOS=WFL_7CA@mail.gmail.com>
+Subject: Re: [PATCH 2/3] block, scsi: Rework runtime power management
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>,
+	Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>, Alan Stern <stern@rowland.harvard.edu>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, 2018-07-18 at 20:16 +-0800, Ming Lei wrote:
-+AD4- On Wed, Jul 18, 2018 at 7:49 AM, Bart Van Assche +ADw-bart.vanassche+=
-AEA-wdc.com+AD4- wrote:
-+AD4- +AD4- +AEAAQA- -3801,8 +-3778,11 +AEAAQA- int blk+AF8-pre+AF8-runtime=
-+AF8-suspend(struct request+AF8-queue +ACo-q)
-+AD4- +AD4-         if (+ACE-q-+AD4-dev)
-+AD4- +AD4-                 return ret+ADs-
-+AD4- +AD4-=20
-+AD4- +AD4- +-       blk+AF8-set+AF8-preempt+AF8-only(q)+ADs-
-+AD4- +AD4- +-       blk+AF8-freeze+AF8-queue+AF8-start(q)+ADs-
-+AD4- +AD4- +-
-+AD4- +AD4-         spin+AF8-lock+AF8-irq(q-+AD4-queue+AF8-lock)+ADs-
-+AD4- +AD4- -       if (q-+AD4-nr+AF8-pending) +AHs-
-+AD4- +AD4- +-       if (+ACE-percpu+AF8-ref+AF8-is+AF8-zero(+ACY-q-+AD4-q+=
-AF8-usage+AF8-counter)) +AHs-
-+AD4-=20
-+AD4- This way can't work reliably because the percpu ref isn't in atomic m=
-ode
-+AD4- yet after blk+AF8-freeze+AF8-queue+AF8-start() returns, then percpu+A=
-F8-ref+AF8-is+AF8-zero() won't
-+AD4- see accurate value of the counter, finally the device may be put down=
- before
-+AD4- in-flight requests are completed by hardware.
+On Wed, Jul 18, 2018 at 7:49 AM, Bart Van Assche <bart.vanassche@wdc.com> wrote:
+> Instead of allowing requests that are not power management requests
+> to enter the queue in runtime suspended status (RPM_SUSPENDED), make
+> the blk_get_request() caller block. This change fixes a starvation
+> issue: it is now guaranteed that power management requests will be
+> executed no matter how many blk_get_request() callers are waiting.
+> Instead of maintaining the q->nr_pending counter, rely on
+> q->q_usage_counter. Call pm_runtime_mark_last_busy() every time a
+> request finishes instead of only if the queue depth drops to zero.
+> Use RQF_PREEMPT to mark power management requests instead of RQF_PM.
+> This is safe because the power management core serializes system-wide
+> suspend/resume and runtime power management state changes.
+>
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Alan Stern <stern@rowland.harvard.edu>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>  block/blk-core.c          | 56 +++++++++++++++++----------------------
+>  block/blk-mq-debugfs.c    |  1 -
+>  block/blk-mq.c            | 12 ++++-----
+>  block/elevator.c          | 11 +-------
+>  drivers/scsi/sd.c         |  4 +--
+>  drivers/scsi/ufs/ufshcd.c | 10 +++----
+>  include/linux/blk-mq.h    |  1 +
+>  include/linux/blkdev.h    |  7 ++---
+>  8 files changed, 41 insertions(+), 61 deletions(-)
+>
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index f84a9b7b6f5a..65d7f27c8c22 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1719,7 +1719,7 @@ EXPORT_SYMBOL_GPL(part_round_stats);
+>  #ifdef CONFIG_PM
+>  static void blk_pm_put_request(struct request *rq)
+>  {
+> -       if (rq->q->dev && !(rq->rq_flags & RQF_PM) && !--rq->q->nr_pending)
+> +       if (rq->q->dev && !(rq->rq_flags & RQF_PREEMPT))
+>                 pm_runtime_mark_last_busy(rq->q->dev);
+>  }
+>  #else
+> @@ -2737,30 +2737,6 @@ void blk_account_io_done(struct request *req, u64 now)
+>         }
+>  }
+>
+> -#ifdef CONFIG_PM
+> -/*
+> - * Don't process normal requests when queue is suspended
+> - * or in the process of suspending/resuming
+> - */
+> -static bool blk_pm_allow_request(struct request *rq)
+> -{
+> -       switch (rq->q->rpm_status) {
+> -       case RPM_RESUMING:
+> -       case RPM_SUSPENDING:
+> -               return rq->rq_flags & RQF_PM;
+> -       case RPM_SUSPENDED:
+> -               return false;
+> -       }
+> -
+> -       return true;
+> -}
+> -#else
+> -static bool blk_pm_allow_request(struct request *rq)
+> -{
+> -       return true;
+> -}
+> -#endif
+> -
+>  void blk_account_io_start(struct request *rq, bool new_io)
+>  {
+>         struct hd_struct *part;
+> @@ -2806,11 +2782,12 @@ static struct request *elv_next_request(struct request_queue *q)
+>
+>         while (1) {
+>                 list_for_each_entry(rq, &q->queue_head, queuelist) {
+> -                       if (blk_pm_allow_request(rq))
+> -                               return rq;
+> -
+> -                       if (rq->rq_flags & RQF_SOFTBARRIER)
+> -                               break;
+> +                       /*
+> +                        * If a request gets queued in state RPM_SUSPENDED
+> +                        * then that's a kernel bug.
+> +                        */
+> +                       WARN_ON_ONCE(q->rpm_status == RPM_SUSPENDED);
+> +                       return rq;
+>                 }
+>
+>                 /*
+> @@ -3801,8 +3778,11 @@ int blk_pre_runtime_suspend(struct request_queue *q)
+>         if (!q->dev)
+>                 return ret;
+>
+> +       blk_set_preempt_only(q);
+> +       blk_freeze_queue_start(q);
+> +
+>         spin_lock_irq(q->queue_lock);
+> -       if (q->nr_pending) {
+> +       if (!percpu_ref_is_zero(&q->q_usage_counter)) {
 
-Hello Ming,
+This way can't work reliably because the percpu ref isn't in atomic mode
+yet after blk_freeze_queue_start() returns, then percpu_ref_is_zero() won't
+see accurate value of the counter, finally the device may be put down before
+in-flight requests are completed by hardware.
 
-The blk+AF8-freeze+AF8-queue+AF8-start() implementation is as follows:
-
-void blk+AF8-freeze+AF8-queue+AF8-start(struct request+AF8-queue +ACo-q)
-+AHs-
-	int freeze+AF8-depth+ADs-
-
-	freeze+AF8-depth +AD0- atomic+AF8-inc+AF8-return(+ACY-q-+AD4-mq+AF8-freeze=
-+AF8-depth)+ADs-
-	if (freeze+AF8-depth +AD0APQ- 1) +AHs-
-		percpu+AF8-ref+AF8-kill(+ACY-q-+AD4-q+AF8-usage+AF8-counter)+ADs-
-		if (q-+AD4-mq+AF8-ops)
-			blk+AF8-mq+AF8-run+AF8-hw+AF8-queues(q, false)+ADs-
-	+AH0-
-+AH0-
-
->From the documentation header in include/linux/percpu-refcount.h above
-percpu+AF8-ref+AF8-kill():
-
- +ACo- Switches +AEA-ref into atomic mode before gathering up the percpu co=
-unters
- +ACo- and dropping the initial ref.
-
-In other words, I think that after blk+AF8-freeze+AF8-queue+AF8-start() ret=
-urns that it is
-guaranteed that q-+AD4-q+AF8-usage+AF8-counter is in atomic mode. However, =
-we may need to
-serialize concurrent blk+AF8-freeze+AF8-queue+AF8-start() calls to guarante=
-e that this is
-always the case if multiple threads call blk+AF8-freeze+AF8-queue+AF8-start=
-() concurrently.
-
-Bart.=
+Thanks,
+Ming Lei
