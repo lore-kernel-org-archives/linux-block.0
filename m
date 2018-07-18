@@ -3,11 +3,11 @@ Return-Path: <raghuhack78@gmail.com>
 From: RAGHU Halharvi <raghuhack78@gmail.com>
 To: linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org
-Cc: axboe@kernel.dk,
-	RAGHU Halharvi <raghuhack78@gmail.com>
+Cc: RAGHU Halharvi <raghuhack78@gmail.com>,
+	axboe@kernel.dk
 Subject: [PATCH] pktcdvd:checkpatch:fix pointer declaration
-Date: Wed, 18 Jul 2018 21:28:55 +0530
-Message-Id: <20180718155855.4949-1-raghuhack78@gmail.com>
+Date: Wed, 18 Jul 2018 20:29:00 +0530
+Message-Id: <20180718145900.4048-1-raghuhack78@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
 * Fix all pointer declaration which causes
