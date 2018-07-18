@@ -1,111 +1,138 @@
-Return-Path: <mpatocka@redhat.com>
-Date: Tue, 3 Jul 2018 13:35:49 -0400 (EDT)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Axboe <axboe@kernel.dk>
-cc: linux-block@vger.kernel.org, Zdenek Kabelac <zkabelac@redhat.com>,
-        Mike Snitzer <msnitzer@redhat.com>, dm-devel@redhat.com
-Subject: [PATCH] block: make discard killable
-Message-ID: <alpine.LRH.2.02.1807031334400.22443@file01.intranet.prod.int.rdu2.redhat.com>
+Return-Path: <jack@suse.cz>
+Date: Wed, 18 Jul 2018 13:57:52 +0200
+From: Jan Kara <jack@suse.cz>
+To: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Ming Lei <ming.lei@redhat.com>, Martin Wilck <mwilck@suse.com>,
+	Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+	Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	jack@suse.com, kent.overstreet@gmail.com
+Subject: Re: Silent data corruption in blkdev_direct_IO()
+Message-ID: <20180718115752.zowmgk7yndk6l73y@quack2.suse.cz>
+References: <CACVXFVPVb_8pUkGXPt5joDE4JRu0b4kgTQy7Pd0sL+kXDwys+A@mail.gmail.com>
+ <c5073ab4-6b06-16bd-f358-d4c18e18b3e0@kernel.dk>
+ <f6f3f16b66622a9b16acd0d8be7ef311e4da807a.camel@suse.com>
+ <CACVXFVPV1ckFvvh3m61QSPCtEY19ussRsMtKoptUbY3LLHKz8A@mail.gmail.com>
+ <ff0fc8c44f205453a203e88676942507339f6829.camel@suse.com>
+ <20180718024758.GB11151@ming.t460p>
+ <54436062eee1e10644b536ae3c8c40f94da3ccbd.camel@suse.com>
+ <20180718075440.GA15254@ming.t460p>
+ <20180718092014.65k4dvg2ezrpbnzn@linux-x5ow.site>
+ <20180718114007.huwriszokmcksqs6@quack2.suse.cz>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: multipart/mixed; boundary="axdivdrb2ifsubo5"
+In-Reply-To: <20180718114007.huwriszokmcksqs6@quack2.suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Discarding can take very long time for some device mapper targets, this
-patch makes it possible to kill a process that issues the BLKDISCARD
-ioctl.
 
-Note that some filesystems call blkdev_issue_discard or
-__blkdev_issue_discard directly, they may not be prepared to handle the
-failure, so this patch introduces a flag BLKDEV_DISCARD_KILLABLE that is
-only set when the discard is initiated by an ioctl.
+--axdivdrb2ifsubo5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+On Wed 18-07-18 13:40:07, Jan Kara wrote:
+> On Wed 18-07-18 11:20:15, Johannes Thumshirn wrote:
+> > On Wed, Jul 18, 2018 at 03:54:46PM +0800, Ming Lei wrote:
+> > > Please go ahead and take care of it since you have the test cases.
+> > 
+> > Speaking of which, do we already know how it is triggered and can we
+> > cook up a blktests testcase for it? This would be more than helpful
+> > for all parties.
+> 
+> Using multiple iovecs with writev / readv trivially triggers the case of IO
+> that is done partly as direct and partly as buffered. Neither me nor Martin
+> were able to trigger the data corruption the customer is seeing with KVM
+> though (since the generic code tries to maintain data integrity even if the
+> IO is mixed). It should be possible to trigger the corruption by having two
+> processes doing write to the same PAGE_SIZE region of a block device, just at
+> different offsets. And if the first process happens to use direct IO while
+> the second ends up doing read-modify-write cycle through page cache, the
+> first write could end up being lost. I'll try whether something like this
+> is able to see the corruption...
 
----
- block/blk-lib.c        |   13 +++++++++++--
- block/ioctl.c          |    4 ++--
- include/linux/blkdev.h |    1 +
- 3 files changed, 14 insertions(+), 4 deletions(-)
+OK, when I run attached test program like:
 
-Index: linux-2.6/block/blk-lib.c
-===================================================================
---- linux-2.6.orig/block/blk-lib.c	2018-06-29 20:10:55.540000000 +0200
-+++ linux-2.6/block/blk-lib.c	2018-06-29 23:12:24.520000000 +0200
-@@ -7,6 +7,7 @@
- #include <linux/bio.h>
- #include <linux/blkdev.h>
- #include <linux/scatterlist.h>
-+#include <linux/sched/signal.h>
- 
- #include "blk.h"
- 
-@@ -33,6 +34,7 @@ int __blkdev_issue_discard(struct block_
- 	unsigned int op;
- 	int alignment;
- 	sector_t bs_mask;
-+	int r;
- 
- 	if (!q)
- 		return -ENXIO;
-@@ -68,8 +70,10 @@ int __blkdev_issue_discard(struct block_
- 		 */
- 		req_sects = min_t(sector_t, nr_sects,
- 					q->limits.max_discard_sectors);
--		if (!req_sects)
-+		if (!req_sects) {
-+			r = -EOPNOTSUPP;
- 			goto fail;
-+		}
- 		if (req_sects > UINT_MAX >> 9)
- 			req_sects = UINT_MAX >> 9;
- 
-@@ -96,6 +100,11 @@ int __blkdev_issue_discard(struct block_
- 		nr_sects -= req_sects;
- 		sector = end_sect;
- 
-+		if (flags & BLKDEV_DISCARD_KILLABLE && fatal_signal_pending(current)) {
-+			r = -EINTR;
-+			goto fail;
-+		}
-+
- 		/*
- 		 * We can loop for a long time in here, if someone does
- 		 * full device discards (like mkfs). Be nice and allow
-@@ -114,7 +123,7 @@ fail:
- 		bio_put(bio);
- 	}
- 	*biop = NULL;
--	return -EOPNOTSUPP;
-+	return r;
- }
- EXPORT_SYMBOL(__blkdev_issue_discard);
- 
-Index: linux-2.6/block/ioctl.c
-===================================================================
---- linux-2.6.orig/block/ioctl.c	2018-05-31 18:04:38.068000000 +0200
-+++ linux-2.6/block/ioctl.c	2018-06-29 23:06:07.180000000 +0200
-@@ -522,10 +522,10 @@ int blkdev_ioctl(struct block_device *bd
- 	case BLKROSET:
- 		return blkdev_roset(bdev, mode, cmd, arg);
- 	case BLKDISCARD:
--		return blk_ioctl_discard(bdev, mode, arg, 0);
-+		return blk_ioctl_discard(bdev, mode, arg, BLKDEV_DISCARD_KILLABLE);
- 	case BLKSECDISCARD:
- 		return blk_ioctl_discard(bdev, mode, arg,
--				BLKDEV_DISCARD_SECURE);
-+				BLKDEV_DISCARD_SECURE | BLKDEV_DISCARD_KILLABLE);
- 	case BLKZEROOUT:
- 		return blk_ioctl_zeroout(bdev, mode, arg);
- 	case BLKREPORTZONE:
-Index: linux-2.6/include/linux/blkdev.h
-===================================================================
---- linux-2.6.orig/include/linux/blkdev.h	2018-06-18 01:09:22.040000000 +0200
-+++ linux-2.6/include/linux/blkdev.h	2018-06-29 23:09:50.010000000 +0200
-@@ -1390,6 +1390,7 @@ extern int blkdev_issue_write_same(struc
- 		sector_t nr_sects, gfp_t gfp_mask, struct page *page);
- 
- #define BLKDEV_DISCARD_SECURE	(1 << 0)	/* issue a secure erase */
-+#define BLKDEV_DISCARD_KILLABLE	(1 << 1)	/* allow killing the process */
- 
- extern int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 		sector_t nr_sects, gfp_t gfp_mask, unsigned long flags);
+blkdev-dio-test /dev/loop0 0 &
+blkdev-dio-test /dev/loop0 2048 &
+
+One of them reports lost write almost immediately. On kernel with my fix
+the test program runs for quite a while without problems.
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
+
+--axdivdrb2ifsubo5
+Content-Type: text/x-c; charset=us-ascii
+Content-Disposition: attachment; filename="blkdev-dio-test.c"
+
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/uio.h>
+
+#define PAGE_SIZE 4096
+#define SECT_SIZE 512
+#define BUF_OFF (2*SECT_SIZE)
+
+int main(int argc, char **argv)
+{
+	int fd = open(argv[1], O_RDWR | O_DIRECT);
+	int ret;
+	char *buf;
+	loff_t off;
+	struct iovec iov[2];
+	unsigned int seq;
+
+	if (fd < 0) {
+		perror("open");
+		return 1;
+	}
+
+	off = strtol(argv[2], NULL, 10);
+
+	buf = aligned_alloc(PAGE_SIZE, PAGE_SIZE);
+
+	iov[0].iov_base = buf;
+	iov[0].iov_len = SECT_SIZE;
+	iov[1].iov_base = buf + BUF_OFF;
+	iov[1].iov_len = SECT_SIZE;
+
+	seq = 0;
+	memset(buf, 0, PAGE_SIZE);
+	while (1) {
+		*(unsigned int *)buf = seq;
+		*(unsigned int *)(buf + BUF_OFF) = seq;
+		ret = pwritev(fd, iov, 2, off);
+		if (ret < 0) {
+			perror("pwritev");
+			return 1;
+		}
+		if (ret != 2*SECT_SIZE) {
+			fprintf(stderr, "Short pwritev: %d\n", ret);
+			return 1;
+		}
+		ret = pread(fd, buf, PAGE_SIZE, off);
+		if (ret < 0) {
+			perror("pread");
+			return 1;
+		}
+		if (ret != PAGE_SIZE) {
+			fprintf(stderr, "Short read: %d\n", ret);
+			return 1;
+		}
+		if (*(unsigned int *)buf != seq ||
+		    *(unsigned int *)(buf + SECT_SIZE) != seq) {
+			printf("Lost write %u: %u %u\n", seq, *(unsigned int *)buf, *(unsigned int *)(buf + SECT_SIZE));
+			return 1;
+		}
+		seq++;
+	}
+
+	return 0;
+}
+
+--axdivdrb2ifsubo5--
