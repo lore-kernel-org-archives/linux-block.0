@@ -1,65 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from smtp2.provo.novell.com ([137.65.250.81]:36416 "EHLO
-        smtp2.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731652AbeGTO3c (ORCPT
-        <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
-        Fri, 20 Jul 2018 10:29:32 -0400
-From: Martin Wilck <mwilck@suse.com>
-To: Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.com>,
-        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        linux-block@vger.kernel.org, Martin Wilck <mwilck@suse.com>
-Subject: [PATCH v4 0/4] Fix silent data corruption in blkdev_direct_IO()
-Date: Fri, 20 Jul 2018 15:05:48 +0200
-Message-Id: <20180720130552.21432-1-mwilck@suse.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <raghuhack78@gmail.com>
+Return-Path: <raghuhack78@gmail.com>
+Date: Wed, 18 Jul 2018 23:25:53 +0530
+From: RAGHU H <raghuhack78@gmail.com>
+To: Joe Perches <joe@perches.com>, m=@raghu-VirtualBox,
+	Bart.VanAssche@wdc.com
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH] pktcdvd:checkpatch:fix pointer declaration
+Message-ID: <20180718175553.GA5532@raghu-VirtualBox>
+References: <20180718155855.4949-1-raghuhack78@gmail.com>
+ <5ad3cf3212c434e73375eeb22d2f67fd70702744.camel@wdc.com>
+ <47fc6920ec365a11b06f7c44f4a3f8d73d177e67.camel@perches.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <47fc6920ec365a11b06f7c44f4a3f8d73d177e67.camel@perches.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens, Ming, Jan, and all others,
+Bart,
 
-the following patches have been verified by a customer to fix a silent data
-corruption which he has been seeing since "72ecad2 block: support a full bio
-worth of IO for simplified bdev direct-io".
+I'm starter in kernel contribution & I guess cleanup of certain files
+which have more than 50+ checkpatch errors is good start.
 
-The patches are based on our observation that the corruption is only
-observed if the __blkdev_direct_IO_simple() code path is executed,
-and if that happens, "short writes" are observed in this code path,
-which causes a fallback to buffered IO, while the application continues
-submitting direct IO requests.
+Also one of the patch was accepted by Jens Axboe & he responded back to
+resend one of the patch which was not getting applied.
 
-In v4, I've separated out the "get as many pages as the bio can hold"
-functionality into a new helper. This way other callers can migrate to the new
-helper if deemed appropriate. Changing the semantics of
-bio_iov_iter_get_pages() for all callers, as Ming originally suggested, seems
-too intrusive to me at this time.
+But I get your point ,I'll restrict my checkpatch fixes to drivers/staging files
 
-Regards,
-Martin
+Thanks Joe for followup.
 
-Changes wrt v1:
- - 1/3: minor formatting change (Christoph)
- - 2/3: split off the leak fix (Ming)
- - 3/3: give up if bio_iov_iter_get_pages() returns an error (Jan)
- - 3/3: warn if space in bio exhausted (Jan)
- - 3/3: add comments
-
-Changes wrt v3:
- - split previous 3/3 into two patches (3/4, 4/4).
- - 3/4: add a new helper to retrieve as many pages as possible (Ming)
- - 3/4: put pages in case of error (Ming)
-
-Martin Wilck (4):
-  block: bio_iov_iter_get_pages: fix size of last iovec
-  blkdev: __blkdev_direct_IO_simple: fix leak in error case
-  block: add bio_iov_iter_get_all_pages() helper
-  blkdev: __blkdev_direct_IO_simple: make sure to fill up the bio
-
- block/bio.c         | 61 +++++++++++++++++++++++++++++++++++++--------
- fs/block_dev.c      | 18 +++++++++----
- include/linux/bio.h |  1 +
- 3 files changed, 64 insertions(+), 16 deletions(-)
-
--- 
-2.17.1
+On Wed, Jul 18, 2018 at 11:43:11AM -0700, Joe Perches wrote:
+> On Wed, 2018-07-18 at 18:06 +0000, Bart Van Assche wrote:
+> > On Wed, 2018-07-18 at 21:28 +0530, RAGHU Halharvi wrote:
+> > > * Fix all pointer declaration which causes
+> > >    "ERROR: "foo* bar" should be "foo *bar""
+> > 
+> > Hello Raghu,
+> > 
+> > If you would not be aware of this, checkpatch is a tool that is intended to
+> > verify patches before submission and not to verify code that is already
+> > upstream. A detailed explanation of why patches like this one should not be
+> > submitted is available in "A quick guide to why stand-alone checkpatch
+> > patches suck"
+> > (https://lists.kernelnewbies.org/pipermail/kernelnewbies/2014-September/012296.html).
+> 
+> Read more of the whole thread.
+> Varying opinions exist.
+> 
