@@ -1,35 +1,37 @@
-Return-Path: <scott.bauer@intel.com>
-From: Scott Bauer <scott.bauer@intel.com>
-To: axboe@kernel.dk
-Cc: jonathan.derrick@intel.com,
-	linux-block@vger.kernel.org,
-	Scott Bauer <scott.bauer@intel.com>,
-	Scott Bauer <sbauer@plzdonthack.me>
-Subject: [PATCH] MAINTAINERS: Change Email for sed-opal sbauer.
-Date: Fri, 27 Jul 2018 12:52:09 -0600
-Message-Id: <20180727185209.18894-2-scott.bauer@intel.com>
-In-Reply-To: <20180727185209.18894-1-scott.bauer@intel.com>
-References: <20180727185209.18894-1-scott.bauer@intel.com>
+Return-Path: <raghuhack78@gmail.com>
+Return-Path: <raghuhack78@gmail.com>
+From: RAGHU Halharvi <raghuhack78@gmail.com>
+To: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: RAGHU Halharvi <raghuhack78@gmail.com>,
+	axboe@kernel.dk
+Subject: [PATCH] pktcdvd:checkpatch:remove static initialise null
+Date: Wed, 18 Jul 2018 20:25:50 +0530
+Message-Id: <20180718145550.3894-1-raghuhack78@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Scott Bauer <scott.bauer@intel.com>
-Signed-off-by: Scott Bauer <sbauer@plzdonthack.me>
----
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+*  Remove checkpatch error due to initialization of static variables to
+NULL
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0fe4228f78cb..239ebc8f1ea1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -12764,7 +12764,7 @@ S:	Maintained
- F:	drivers/mmc/host/sdhci-omap.c
+Signed-off-by: RAGHU Halharvi <raghuhack78@gmail.com>
+---
+ drivers/block/pktcdvd.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index a4b4d524c3af..a7dbb7157115 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -100,8 +100,8 @@ static struct mutex ctl_mutex;	/* Serialize open/close/setup/teardown */
+ static mempool_t psd_pool;
+ static struct bio_set pkt_bio_set;
  
- SECURE ENCRYPTING DEVICE (SED) OPAL DRIVER
--M:	Scott Bauer <scott.bauer@intel.com>
-+M:	Scott Bauer <sbauer@plzdonthack.me>
- M:	Jonathan Derrick <jonathan.derrick@intel.com>
- L:	linux-block@vger.kernel.org
- S:	Supported
+-static struct class	*class_pktcdvd = NULL;    /* /sys/class/pktcdvd */
+-static struct dentry	*pkt_debugfs_root = NULL; /* /sys/kernel/debug/pktcdvd */
++static struct class	*class_pktcdvd;    /* /sys/class/pktcdvd */
++static struct dentry	*pkt_debugfs_root; /* /sys/kernel/debug/pktcdvd */
+ 
+ /* forward declaration */
+ static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev);
 -- 
 2.17.1
