@@ -1,156 +1,59 @@
-Return-Path: <keescook@chromium.org>
-Return-Path: <keescook@chromium.org>
-From: Kees Cook <keescook@chromium.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Kees Cook <keescook@chromium.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Eric Biggers <ebiggers@google.com>,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-	Alasdair Kergon <agk@redhat.com>,
-	Rabin Vincent <rabinv@axis.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Pavel Machek <pavel@ucw.cz>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	x86@kernel.org,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Paul Mackerras <paulus@samba.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	David Howells <dhowells@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
-	Jia-Ju Bai <baijiaju1990@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Will Deacon <will.deacon@arm.com>,
-	dm-devel@redhat.com,
-	linux-pm@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
-	qat-linux@intel.com,
-	linux-ppp@vger.kernel.org,
+Return-Path: <stephen@networkplumber.org>
+Return-Path: <stephen@networkplumber.org>
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: josef@toxicpanda.com,
+	axboe@kernel.dk,
+	pablo@netfilter.org,
+	laforge@gnumonks.org
+Cc: linux-block@vger.kernel.org,
+	nbd@other.debian.org,
+	osmocom-net-gprs@lists.osmocom.org,
 	netdev@vger.kernel.org,
-	devel@driverdev.osuosl.org,
-	linux-afs@lists.infradead.org,
-	linux-wireless@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v6 16/18] rxrpc: Reuse SKCIPHER_REQUEST_ON_STACK buffer
-Date: Tue, 24 Jul 2018 09:49:34 -0700
-Message-Id: <20180724164936.37477-17-keescook@chromium.org>
-In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
-References: <20180724164936.37477-1-keescook@chromium.org>
+	Stephen Hemminger <sthemmin@microsoft.com>,
+	Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH net-next 1/2] nbd: constify nla_policy
+Date: Wed, 18 Jul 2018 09:32:43 -0700
+Message-Id: <20180718163244.1590-2-sthemmin@microsoft.com>
+In-Reply-To: <20180718163244.1590-1-sthemmin@microsoft.com>
+References: <20180718163244.1590-1-sthemmin@microsoft.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The use of SKCIPHER_REQUEST_ON_STACK() will trigger FRAME_WARN warnings
-(when less than 2048) once the VLA is no longer hidden from the check:
+The netlink policy should be const like other drivers.
 
-net/rxrpc/rxkad.c:398:1: warning: the frame size of 1152 bytes is larger than 1024 bytes [-Wframe-larger-than=]
-net/rxrpc/rxkad.c:242:1: warning: the frame size of 1152 bytes is larger than 1024 bytes [-Wframe-larger-than=]
-
-This passes the initial SKCIPHER_REQUEST_ON_STACK allocation to the leaf
-functions for reuse. Two requests allocated on the stack is not needed
-when only one is used at a time.
-
-Signed-off-by: Kees Cook <keescook@chromium.org>
-Acked-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
- net/rxrpc/rxkad.c | 25 +++++++++++++------------
- 1 file changed, 13 insertions(+), 12 deletions(-)
+ drivers/block/nbd.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
-index 278ac0807a60..6393391fac86 100644
---- a/net/rxrpc/rxkad.c
-+++ b/net/rxrpc/rxkad.c
-@@ -146,10 +146,10 @@ static int rxkad_prime_packet_security(struct rxrpc_connection *conn)
- static int rxkad_secure_packet_auth(const struct rxrpc_call *call,
- 				    struct sk_buff *skb,
- 				    u32 data_size,
--				    void *sechdr)
-+				    void *sechdr,
-+				    struct skcipher_request *req)
- {
- 	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
--	SKCIPHER_REQUEST_ON_STACK(req, call->conn->cipher);
- 	struct rxkad_level1_hdr hdr;
- 	struct rxrpc_crypt iv;
- 	struct scatterlist sg;
-@@ -183,12 +183,12 @@ static int rxkad_secure_packet_auth(const struct rxrpc_call *call,
- static int rxkad_secure_packet_encrypt(const struct rxrpc_call *call,
- 				       struct sk_buff *skb,
- 				       u32 data_size,
--				       void *sechdr)
-+				       void *sechdr,
-+				       struct skcipher_request *req)
- {
- 	const struct rxrpc_key_token *token;
- 	struct rxkad_level2_hdr rxkhdr;
- 	struct rxrpc_skb_priv *sp;
--	SKCIPHER_REQUEST_ON_STACK(req, call->conn->cipher);
- 	struct rxrpc_crypt iv;
- 	struct scatterlist sg[16];
- 	struct sk_buff *trailer;
-@@ -296,11 +296,12 @@ static int rxkad_secure_packet(struct rxrpc_call *call,
- 		ret = 0;
- 		break;
- 	case RXRPC_SECURITY_AUTH:
--		ret = rxkad_secure_packet_auth(call, skb, data_size, sechdr);
-+		ret = rxkad_secure_packet_auth(call, skb, data_size, sechdr,
-+					       req);
- 		break;
- 	case RXRPC_SECURITY_ENCRYPT:
- 		ret = rxkad_secure_packet_encrypt(call, skb, data_size,
--						  sechdr);
-+						  sechdr, req);
- 		break;
- 	default:
- 		ret = -EPERM;
-@@ -316,10 +317,10 @@ static int rxkad_secure_packet(struct rxrpc_call *call,
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 74a05561b620..e07401d3901d 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1571,7 +1571,7 @@ static int find_free_cb(int id, void *ptr, void *data)
+ }
+ 
+ /* Netlink interface. */
+-static struct nla_policy nbd_attr_policy[NBD_ATTR_MAX + 1] = {
++static const struct nla_policy nbd_attr_policy[NBD_ATTR_MAX + 1] = {
+ 	[NBD_ATTR_INDEX]		=	{ .type = NLA_U32 },
+ 	[NBD_ATTR_SIZE_BYTES]		=	{ .type = NLA_U64 },
+ 	[NBD_ATTR_BLOCK_SIZE_BYTES]	=	{ .type = NLA_U64 },
+@@ -1583,14 +1583,14 @@ static struct nla_policy nbd_attr_policy[NBD_ATTR_MAX + 1] = {
+ 	[NBD_ATTR_DEVICE_LIST]		=	{ .type = NLA_NESTED},
+ };
+ 
+-static struct nla_policy nbd_sock_policy[NBD_SOCK_MAX + 1] = {
++static const struct nla_policy nbd_sock_policy[NBD_SOCK_MAX + 1] = {
+ 	[NBD_SOCK_FD]			=	{ .type = NLA_U32 },
+ };
+ 
+ /* We don't use this right now since we don't parse the incoming list, but we
+  * still want it here so userspace knows what to expect.
   */
- static int rxkad_verify_packet_1(struct rxrpc_call *call, struct sk_buff *skb,
- 				 unsigned int offset, unsigned int len,
--				 rxrpc_seq_t seq)
-+				 rxrpc_seq_t seq,
-+				 struct skcipher_request *req)
- {
- 	struct rxkad_level1_hdr sechdr;
--	SKCIPHER_REQUEST_ON_STACK(req, call->conn->cipher);
- 	struct rxrpc_crypt iv;
- 	struct scatterlist sg[16];
- 	struct sk_buff *trailer;
-@@ -402,11 +403,11 @@ static int rxkad_verify_packet_1(struct rxrpc_call *call, struct sk_buff *skb,
-  */
- static int rxkad_verify_packet_2(struct rxrpc_call *call, struct sk_buff *skb,
- 				 unsigned int offset, unsigned int len,
--				 rxrpc_seq_t seq)
-+				 rxrpc_seq_t seq,
-+				 struct skcipher_request *req)
- {
- 	const struct rxrpc_key_token *token;
- 	struct rxkad_level2_hdr sechdr;
--	SKCIPHER_REQUEST_ON_STACK(req, call->conn->cipher);
- 	struct rxrpc_crypt iv;
- 	struct scatterlist _sg[4], *sg;
- 	struct sk_buff *trailer;
-@@ -549,9 +550,9 @@ static int rxkad_verify_packet(struct rxrpc_call *call, struct sk_buff *skb,
- 	case RXRPC_SECURITY_PLAIN:
- 		return 0;
- 	case RXRPC_SECURITY_AUTH:
--		return rxkad_verify_packet_1(call, skb, offset, len, seq);
-+		return rxkad_verify_packet_1(call, skb, offset, len, seq, req);
- 	case RXRPC_SECURITY_ENCRYPT:
--		return rxkad_verify_packet_2(call, skb, offset, len, seq);
-+		return rxkad_verify_packet_2(call, skb, offset, len, seq, req);
- 	default:
- 		return -ENOANO;
- 	}
+-static struct nla_policy __attribute__((unused))
++static const struct nla_policy __attribute__((unused))
+ nbd_device_policy[NBD_DEVICE_ATTR_MAX + 1] = {
+ 	[NBD_DEVICE_INDEX]		=	{ .type = NLA_U32 },
+ 	[NBD_DEVICE_CONNECTED]		=	{ .type = NLA_U8 },
 -- 
-2.17.1
+2.18.0
