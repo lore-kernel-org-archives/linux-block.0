@@ -1,85 +1,41 @@
 Return-Path: <keith.busch@linux.intel.com>
-Date: Wed, 18 Jul 2018 16:53:11 -0600
+Date: Wed, 18 Jul 2018 15:33:21 -0600
 From: Keith Busch <keith.busch@linux.intel.com>
-To: "hch@lst.de" <hch@lst.de>
-Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>,
 	"keith.busch@intel.com" <keith.busch@intel.com>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
 	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>,
-	jianchao.w.wang@oracle.com
+	"ming.lei@redhat.com" <ming.lei@redhat.com>
 Subject: Re: [RFC PATCH 3/3] blk-mq: Remove generation seqeunce
-Message-ID: <20180718225311.GD32160@localhost.localdomain>
-References: <c42d13289e38df93bb35e9876b803420e40b03d3.camel@wdc.com>
- <20180712192437.GA16839@localhost.localdomain>
- <7cad25b821c3a640e036f28ff1bbe51e7362d25d.camel@wdc.com>
- <20180713154346.GA18955@localhost.localdomain>
+Message-ID: <20180718213321.GC32160@localhost.localdomain>
+References: <20180713154346.GA18955@localhost.localdomain>
  <a32b251bd3c0a186e5c5ba82656a85fbdcc0c5e4.camel@wdc.com>
  <20180713184712.GA19419@localhost.localdomain>
  <291a13b35af1b65fbbe99a3a9cfc7d570a620cd9.camel@wdc.com>
  <20180713235807.GA19967@localhost.localdomain>
  <20180718195650.GA20336@lst.de>
- <20180718203936.GA21011@lst.de>
+ <20180718205321.GA32160@localhost.localdomain>
+ <c67f3da64914a436bc76f3ec0bc261ee6178cd14.camel@wdc.com>
+ <20180718211711.GB32160@localhost.localdomain>
+ <3f0f26c5503bbe3c3222129d758aa2f85c14fb45.camel@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180718203936.GA21011@lst.de>
+In-Reply-To: <3f0f26c5503bbe3c3222129d758aa2f85c14fb45.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Jul 18, 2018 at 10:39:36PM +0200, hch@lst.de wrote:
-> On Wed, Jul 18, 2018 at 09:56:50PM +0200, hch@lst.de wrote:
-> > On Fri, Jul 13, 2018 at 05:58:08PM -0600, Keith Busch wrote:
-> > > Of the two you mentioned, yours is preferable IMO. While I appreciate
-> > > Jianchao's detailed analysis, it's hard to take a proposal seriously
-> > > that so colourfully calls everyone else "dangerous" while advocating
-> > > for silently losing requests on purpose.
-> > > 
-> > > But where's the option that fixes scsi to handle hardware completions
-> > > concurrently with arbitrary timeout software? Propping up that house of
-> > > cards can't be the only recourse.
-> > 
-> > The important bit is that we need to fix this issue quickly.  We are
-> > past -rc5 so I'm rather concerned about anything too complicated.
-> > 
-> > I'm not even sure SCSI has a problem with multiple completions happening
-> > at the same time, but it certainly has a problem with bypassing
-> > blk_mq_complete_request from the EH path.
-> > 
-> > I think we can solve this properly, but I also think we are way to late
-> > in the 4.18 cycle to fix it properly.  For now I fear we'll just have
-> > to revert the changes and try again for 4.19 or even 4.20 if we don't
-> > act quickly enough.
+On Wed, Jul 18, 2018 at 09:30:11PM +0000, Bart Van Assche wrote:
+> On Wed, 2018-07-18 at 15:17 -0600, Keith Busch wrote:
+> > There are not that many blk-mq drivers, so we can go through them all.
 > 
-> So here is a quick attempt at the revert while also trying to keep
-> nvme working.  Keith, Bart, Jianchao - does this looks reasonable
-> as a 4.18 band aid?
-> 
-> http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/blk-eh-revert
+> I'm not sure that's the right approach. I think it is the responsibility of
+> the block layer to handle races between completion handling and timeout
+> handling and that this is not the responsibility of e.g. a block driver. If
+> you look at e.g. the legacy block layer then you will see that it takes care
+> of this race and that legacy block drivers do not have to worry about this
+> race.
 
-Hm, I not really a fan. The far majority of blk-mq drivers don't even
-implement a timeout, and reverting it will lose their requests forever
-if they complete at the same time as a timeout.
-
-Of the remaining drivers, most of those don't want the reverted behavior
-either. It actually looks like scsi is the only mq driver that wants
-to block completions. In the short term, scsi can make that happen with
-just three lines of code.
-
----
-diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-index 8932ae81a15a..03986af3076c 100644
---- a/drivers/scsi/scsi_error.c
-+++ b/drivers/scsi/scsi_error.c
-@@ -286,6 +286,10 @@ enum blk_eh_timer_return scsi_times_out(struct request *req)
- 	enum blk_eh_timer_return rtn = BLK_EH_DONE;
- 	struct Scsi_Host *host = scmd->device->host;
-
-+	if (req->q->mq_ops && cmpxchg(&rq->state, MQ_RQ_IN_FLIGHT, MQ_RQ_COMPLETE) !=
-+							MQ_RQ_IN_FLIGHT);
-+		return rtn;
-+
-	trace_scsi_dispatch_cmd_timeout(scmd);
-	scsi_log_completion(scmd, TIMEOUT_ERROR);
-
-
--- 
+Reverting doesn't handle the race at all. It just ignores completions
+and puts the responsibility on the drivers to handle the race because
+that's what scsi wants to happen.
