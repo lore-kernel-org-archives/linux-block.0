@@ -1,43 +1,25 @@
-Return-Path: <stephen@networkplumber.org>
-Return-Path: <stephen@networkplumber.org>
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: josef@toxicpanda.com,
-	axboe@kernel.dk,
-	pablo@netfilter.org,
-	laforge@gnumonks.org
-Cc: linux-block@vger.kernel.org,
-	nbd@other.debian.org,
-	osmocom-net-gprs@lists.osmocom.org,
-	netdev@vger.kernel.org,
-	Stephen Hemminger <sthemmin@microsoft.com>,
-	Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH net-next 2/2] gtp: constify nla_policy
-Date: Wed, 18 Jul 2018 09:32:44 -0700
-Message-Id: <20180718163244.1590-3-sthemmin@microsoft.com>
-In-Reply-To: <20180718163244.1590-1-sthemmin@microsoft.com>
-References: <20180718163244.1590-1-sthemmin@microsoft.com>
+Return-Path: <jthumshirn@suse.de>
+Date: Wed, 18 Jul 2018 08:47:59 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+	Alan Stern <stern@rowland.harvard.edu>
+Subject: Re: [PATCH 1/3] block: Fix a comment in a header file
+Message-ID: <20180718064758.nnstevk4tqvlxv64@linux-x5ow.site>
+References: <20180717234940.11231-1-bart.vanassche@wdc.com>
+ <20180717234940.11231-2-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180717234940.11231-2-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The netlink policy structure can be constant like other
-drivers.
-
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
----
- drivers/net/gtp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index ec629a730005..7a145172d503 100644
---- a/drivers/net/gtp.c
-+++ b/drivers/net/gtp.c
-@@ -1255,7 +1255,7 @@ static int gtp_genl_dump_pdp(struct sk_buff *skb,
- 	return skb->len;
- }
- 
--static struct nla_policy gtp_genl_policy[GTPA_MAX + 1] = {
-+static const struct nla_policy gtp_genl_policy[GTPA_MAX + 1] = {
- 	[GTPA_LINK]		= { .type = NLA_U32, },
- 	[GTPA_VERSION]		= { .type = NLA_U32, },
- 	[GTPA_TID]		= { .type = NLA_U64, },
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.18.0
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
