@@ -1,30 +1,28 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Thu, 19 Jul 2018 07:08:46 +0800
-From: Ming Lei <ming.lei@redhat.com>
+Return-Path: <stern+5b5b8f2e@rowland.harvard.edu>
+Date: Wed, 18 Jul 2018 14:46:10 -0400 (EDT)
+From: Alan Stern <stern@rowland.harvard.edu>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Alan Stern <stern@rowland.harvard.edu>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Ming Lei <tom.leiming@gmail.com>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>, "hch@lst.de" <hch@lst.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"hare@suse.de" <hare@suse.de>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"rjw@rjwysocki.net" <rjw@rjwysocki.net>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-	"adrian.hunter@intel.com" <adrian.hunter@intel.com>
+cc: Johannes Thumshirn <jthumshirn@suse.de>, Ming Lei <tom.leiming@gmail.com>,
+    Ming Lei <ming.lei@redhat.com>, Bart Van Assche <Bart.VanAssche@wdc.com>,
+    "hch@lst.de" <hch@lst.de>,
+    "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+    "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+    "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+    "hare@suse.de" <hare@suse.de>,
+    "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+    "rjw@rjwysocki.net" <rjw@rjwysocki.net>,
+    "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+    "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+    "adrian.hunter@intel.com" <adrian.hunter@intel.com>
 Subject: Re: [PATCH RFC V2 3/3] scsi_mq: enable runtime PM
-Message-ID: <20180718230845.GB15589@ming.t460p>
-References: <Pine.LNX.4.44L0.1807181010390.29549-100000@netrider.rowland.org>
- <651898d4-f0ab-4bba-dacb-b5e32400fd3a@kernel.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <651898d4-f0ab-4bba-dacb-b5e32400fd3a@kernel.dk>
+Message-ID: <Pine.LNX.4.44L0.1807181438470.1382-100000@iolanthe.rowland.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Jul 18, 2018 at 08:50:39AM -0600, Jens Axboe wrote:
+On Wed, 18 Jul 2018, Jens Axboe wrote:
+
 > On 7/18/18 8:12 AM, Alan Stern wrote:
 > > On Wed, 18 Jul 2018, Johannes Thumshirn wrote:
 > > 
@@ -51,22 +49,22 @@ On Wed, Jul 18, 2018 at 08:50:39AM -0600, Jens Axboe wrote:
 > me. If we have the implementation, it needs to be fast enough to be on
 > by default. No "well just turn off the option if you think the overhead
 > is too high". Never.
-> 
+
+I certainly agree that it needs to be fast enough to be on by default.  
+That was never an issue, and it is the goal we are working toward.
+
+But that isn't what Johannes wrote.  To rule out all improvements that
+carry even the smallest runtime overhead is an extreme attitude.  It
+does have its place, though -- and people who are in that place can
+afford to build their own kernels with their own configurations.
+
 > That's exactly why I didn't like the first implementation that Ming did.
 
-Hi Jens,
+Fine.  I'm happy to leave the technical details up to the two of you,
+since I'm not really up to speed on this part of the kernel and Ming 
+does have a keen understanding of the runtime PM implementation.  And
+hopefully -- perhaps with a little outside brainstorming inspiration --
+you'll be able to come up with something that is acceptable to
+everyone.
 
-As far as I can think of, pm_runtime_mark_last_busy() may has to do when
-completing request for helping to figure out if queue is idle. Is
-this kind of cost you can accept?
-
-static inline void pm_runtime_mark_last_busy(struct device *dev)
-{
-        WRITE_ONCE(dev->power.last_busy, jiffies);
-}
-
-BTW, last time, you mentioned that we may reuse the way used in timeout
-for deciding idle, but that period is too big.
-
-Thanks,
-Ming
+Alan Stern
