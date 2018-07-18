@@ -1,14 +1,14 @@
-Return-Path: <jack@suse.cz>
-Date: Wed, 18 Jul 2018 13:40:07 +0200
-From: Jan Kara <jack@suse.cz>
-To: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Ming Lei <ming.lei@redhat.com>, Martin Wilck <mwilck@suse.com>,
-	Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-	Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+Return-Path: <jthumshirn@suse.de>
+Date: Wed, 18 Jul 2018 11:20:15 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Martin Wilck <mwilck@suse.com>, Ming Lei <tom.leiming@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.de>,
+	Christoph Hellwig <hch@lst.de>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	jack@suse.com, kent.overstreet@gmail.com
 Subject: Re: Silent data corruption in blkdev_direct_IO()
-Message-ID: <20180718114007.huwriszokmcksqs6@quack2.suse.cz>
+Message-ID: <20180718092014.65k4dvg2ezrpbnzn@linux-x5ow.site>
 References: <e36f28d8-0eb8-1600-f327-8b066eeaf45c@suse.de>
  <CACVXFVPVb_8pUkGXPt5joDE4JRu0b4kgTQy7Pd0sL+kXDwys+A@mail.gmail.com>
  <c5073ab4-6b06-16bd-f358-d4c18e18b3e0@kernel.dk>
@@ -18,32 +18,24 @@ References: <e36f28d8-0eb8-1600-f327-8b066eeaf45c@suse.de>
  <20180718024758.GB11151@ming.t460p>
  <54436062eee1e10644b536ae3c8c40f94da3ccbd.camel@suse.com>
  <20180718075440.GA15254@ming.t460p>
- <20180718092014.65k4dvg2ezrpbnzn@linux-x5ow.site>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180718092014.65k4dvg2ezrpbnzn@linux-x5ow.site>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180718075440.GA15254@ming.t460p>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed 18-07-18 11:20:15, Johannes Thumshirn wrote:
-> On Wed, Jul 18, 2018 at 03:54:46PM +0800, Ming Lei wrote:
-> > Please go ahead and take care of it since you have the test cases.
-> 
-> Speaking of which, do we already know how it is triggered and can we
-> cook up a blktests testcase for it? This would be more than helpful
-> for all parties.
+On Wed, Jul 18, 2018 at 03:54:46PM +0800, Ming Lei wrote:
+> Please go ahead and take care of it since you have the test cases.
 
-Using multiple iovecs with writev / readv trivially triggers the case of IO
-that is done partly as direct and partly as buffered. Neither me nor Martin
-were able to trigger the data corruption the customer is seeing with KVM
-though (since the generic code tries to maintain data integrity even if the
-IO is mixed). It should be possible to trigger the corruption by having two
-processes doing write to the same PAGE_SIZE region of a block device, just at
-different offsets. And if the first process happens to use direct IO while
-the second ends up doing read-modify-write cycle through page cache, the
-first write could end up being lost. I'll try whether something like this
-is able to see the corruption...
+Speaking of which, do we already know how it is triggered and can we
+cook up a blktests testcase for it? This would be more than helpful
+for all parties.
 
-								Honza
+Thanks,
+	Johannes
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
