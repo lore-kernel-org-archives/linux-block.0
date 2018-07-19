@@ -1,49 +1,74 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:15076 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730205AbeG0RnU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Jul 2018 13:43:20 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Jianchao Wang <jianchao.w.wang@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 2/5] block: Remove a superfluous #include directive
-Date: Fri, 27 Jul 2018 09:20:39 -0700
-Message-Id: <20180727162042.13425-3-bart.vanassche@wdc.com>
-In-Reply-To: <20180727162042.13425-1-bart.vanassche@wdc.com>
-References: <20180727162042.13425-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jianchao.w.wang@oracle.com>
+Subject: Re: [RFC PATCH] blk-mq: move timeout handling from queue to tagset
+To: Keith Busch <keith.busch@linux.intel.com>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "keith.busch@intel.com" <keith.busch@intel.com>,
+        "hch@lst.de" <hch@lst.de>
+References: <20180718170018.31395-1-keith.busch@intel.com>
+ <11f7a7aff754b9bb0e4243ac4502319f376378c3.camel@wdc.com>
+ <20180718174534.GC30873@localhost.localdomain>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <8c7c5d05-c5aa-8553-2ae4-c9fa5a11a32a@oracle.com>
+Date: Thu, 19 Jul 2018 17:15:46 +0800
+MIME-Version: 1.0
+In-Reply-To: <20180718174534.GC30873@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Commit 12f5b9314545 ("blk-mq: Remove generation seqeunce") removed the
-only u64_stats_sync instance from <linux/blkdev.h> but did not remove
-the corresponding #include directive. Since the #include directive is
-no longer needed, remove it.
+Hi Keith
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <keith.busch@intel.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- include/linux/blkdev.h | 1 -
- 1 file changed, 1 deletion(-)
+On 07/19/2018 01:45 AM, Keith Busch wrote:
+>>> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+>>>  		/*
+>>>  		 * Request timeouts are handled as a forward rolling timer. If
+>>>  		 * we end up here it means that no requests are pending and
+>>> @@ -881,7 +868,6 @@ static void blk_mq_timeout_work(struct work_struct *work)
+>>>  				blk_mq_tag_idle(hctx);
+>>>  		}
+>>>  	}
+>>> -	blk_queue_exit(q);
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d5d31b7b6ba8..8244a5a1aa5b 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -28,7 +28,6 @@
- #include <linux/scatterlist.h>
- #include <linux/blkzoned.h>
- #include <linux/seqlock.h>
--#include <linux/u64_stats_sync.h>
- 
- struct module;
- struct scsi_ioctl_command;
--- 
-2.18.0
+The tags sharing fairness mechanism between different request_queues cannot work well here.
+When timer is per-request_queue, if there is no request on one request_queue,
+it could be idled. But now, with per-tagset timer, we cannot detect the idle one at all.
+
+
+>   
+>>> +	timer_setup(&set->timer, blk_mq_timed_out_timer, 0);
+>>> +	INIT_WORK(&set->timeout_work, blk_mq_timeout_work);
+>>> [ ... ]
+>>> --- a/include/linux/blk-mq.h
+>>> +++ b/include/linux/blk-mq.h
+>>> @@ -86,6 +86,8 @@ struct blk_mq_tag_set {
+>>>  
+>>>  	struct blk_mq_tags	**tags;
+>>>  
+>>> +	struct timer_list	timer;
+>>> +	struct work_struct	timeout_work;
+>> Can the timer and timeout_work data structures be replaced by a single
+>> delayed_work instance?
+> I think so. I wanted to keep blk_add_timer relatively unchanged for this
+> proposal, so I followed the existing pattern with the timer kicking the
+> work. I don't see why that extra indirection is necessary, so I think
+> it's a great idea. Unless anyone knows a reason not to, we can collapse
+> this into a single delayed work for both mq and legacy as a prep patch
+> before this one.
+
+mod_delayed_work_on is very tricky in our scenario. It will grab the pending
+work entry and queue it again.
+
+delayed_work.timer trigger
+queue_work timeout_work          delayed_work.timer not pending
+                                 mod_delayed_work_on
+                                   grab the pending timeout_work
+                                 re-arm the timer
+
+The timeout_work would not be run.
+
+Thanks
+Jianchao
