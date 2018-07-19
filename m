@@ -1,69 +1,68 @@
 Return-Path: <mwilck@suse.com>
+Message-ID: <69a408d71cd99e50858805c5f51f9e1ee4ecd3d0.camel@suse.com>
+Subject: Re: [PATCH 2/2] blkdev: __blkdev_direct_IO_simple: make sure to
+ fill up the bio
 From: Martin Wilck <mwilck@suse.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jan Kara <jack@suse.com>
-Cc: Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Christoph Hellwig <hch@lst.de>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Kent Overstreet <kent.overstreet@gmail.com>,
-	linux-block@vger.kernel.org,
-	Martin Wilck <mwilck@suse.com>
-Subject: [PATCH v3 3/3] blkdev: __blkdev_direct_IO_simple: make sure to fill up the bio
-Date: Thu, 19 Jul 2018 23:01:58 +0200
-Message-Id: <20180719210158.25923-4-mwilck@suse.com>
-In-Reply-To: <20180719210158.25923-1-mwilck@suse.com>
-References: <20180719210158.25923-1-mwilck@suse.com>
+To: Jan Kara <jack@suse.cz>
+Cc: Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>, Jan Kara
+ <jack@suse.com>, Hannes Reinecke <hare@suse.de>, Johannes Thumshirn
+ <jthumshirn@suse.de>, Kent Overstreet <kent.overstreet@gmail.com>,
+ Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org
+Date: Thu, 19 Jul 2018 22:01:55 +0200
+In-Reply-To: <20180719151521.7ysnjr4ahj5wg4x2@quack2.suse.cz>
+References: <20180718075440.GA15254@ming.t460p>
+	 <20180719093918.28876-1-mwilck@suse.com>
+	 <20180719093918.28876-3-mwilck@suse.com>
+	 <20180719104551.jqndys6uxgglsbfh@quack2.suse.cz>
+	 <f0945524222b06bee92e969b9d36f00d5b1a0800.camel@suse.com>
+	 <20180719151521.7ysnjr4ahj5wg4x2@quack2.suse.cz>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-When bio_iov_iter_get_pages() is called from  __blkdev_direct_IO_simple(),
-we already know that the content of the input iov_iter fits into a single
-bio, so we expect iov_iter_count(iter) to drop to 0. But in a single invocation,
-bio_iov_iter_get_pages() may add less bytes then we expect. For iov_iters with
-multiple segments (generated e.g. by writev()), it behaves like an iterator's
-next() function, taking only one step (segment) at a time. Furthermore, MM may
-fail or refuse to pin all requested pages. The latter may signify an error condition
-(in which case eventually an error code will be returned), the former does not. 
+On Thu, 2018-07-19 at 17:15 +0200, Jan Kara wrote:
+> On Thu 19-07-18 14:23:53, Martin Wilck wrote:
+> > On Thu, 2018-07-19 at 12:45 +0200, Jan Kara wrote:
+> > > Secondly, I don't think it is good to discard error from
+> > > bio_iov_iter_get_pages() here and just submit partial IO. It will
+> > > again
+> > > lead to part of IO being done as direct and part attempted to be
+> > > done
+> > > as
+> > > buffered. Also the "slow" direct IO path in __blkdev_direct_IO()
+> > > behaves
+> > > differently - it aborts and returns error if
+> > > bio_iov_iter_get_pages()
+> > > ever
+> > > returned error. IMO we should do the same here.
+> > 
+> > Well, it aborts the loop, but then (in the sync case) it still
+> > waits
+> > for the already submitted IOs to finish. Here, too, I'd find it
+> > more
+> > logical to return the number of successfully transmitted bytes
+> > rather
+> > than an error code. In the async case, the submitted bios are left
+> > in
+> > place, and will probably sooner or later finish, changing iocb-
+> > >ki_pos.
+> 
+> Well, both these behaviors make sense, just traditionally (defined by
+> our
+> implementation) DIO returns error even if part of IO has actually
+> been
+> successfully submitted. Making a userspace visible change like you
+> suggest
+> thus has to be very carefully analyzed and frankly I don't think it's
+> worth
+> the bother.
 
-Call bio_iov_iter_get_pages() repeatedly to avoid short reads or writes.
-Otherwise, __generic_file_write_iter() falls back to buffered writes, which
-has been observed to cause data corruption in certain workloads.
+OK, maybe not.
+I'll rework the treatment of the error case.
 
-Fixes: 72ecad22d9f1 ("block: support a full bio worth of IO for simplified bdev direct-io")
-Signed-off-by: Martin Wilck <mwilck@suse.com>
----
- fs/block_dev.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+Martin
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index aba2541..561c34e 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -222,6 +222,24 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 	ret = bio_iov_iter_get_pages(&bio, iter);
- 	if (unlikely(ret))
- 		goto out;
-+
-+	/*
-+	 * bio_iov_iter_get_pages() may add less bytes than we expect:
-+	 * - for multi-segment iov_iters, as it only adds one segment at a time
-+	 * - if MM refuses or fails to pin all requested pages. In this case,
-+	 *   an error is returned eventually if no progress can be made.
-+	 */
-+	while (iov_iter_count(iter) > 0 && bio.bi_vcnt < bio.bi_max_vecs) {
-+		ret = bio_iov_iter_get_pages(&bio, iter);
-+		if (unlikely(ret))
-+			goto out;
-+	}
-+	/*
-+	 * Our bi_io_vec should be big enough to hold all data from the
-+	 * iov_iter, as this has been checked before calling this function.
-+	 */
-+	WARN_ON_ONCE(iov_iter_count(iter) > 0);
-+
- 	ret = bio.bi_iter.bi_size;
- 
- 	if (iov_iter_rw(iter) == READ) {
 -- 
-2.17.1
+Dr. Martin Wilck <mwilck@suse.com>, Tel. +49 (0)911 74053 2107
+SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
