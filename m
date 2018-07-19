@@ -1,61 +1,57 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:35948 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754234AbeGHUZg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Jul 2018 16:25:36 -0400
-Received: from [208.118.126.250] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1fcGFS-0002UD-De
-        for linux-block@vger.kernel.org; Sun, 08 Jul 2018 20:25:34 +0000
-Date: Sun, 8 Jul 2018 14:25:33 -0600
-From: Christoph Hellwig <hch@infradead.org>
-To: linux-block@vger.kernel.org
-Subject: [ANNOUNCE] Alpine Linux Persistence and Storage Summit
-Message-ID: <20180708202533.GA18160@infradead.org>
+Received: from mx2.suse.de ([195.135.220.15]:50304 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730383AbeGSD1A (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Jul 2018 23:27:00 -0400
+Subject: Re: [PATCH v3 0/3] add crc64 calculation as kernel library
+Cc: linux-kernel@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Michael Lyle <mlyle@lyle.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Kate Stewart <kstewart@linuxfoundation.org>
+References: <20180717145525.50852-1-colyli@suse.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Noah Massey <noah.massey@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Hannes Reinecke <hare@suse.de>,
+        Andrew Morton <akpm@linux-foundation.org>
+From: Coly Li <colyli@suse.de>
+Message-ID: <bfbd0932-1bd1-7198-62e7-d920daa1bb58@suse.de>
+Date: Thu, 19 Jul 2018 10:45:55 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180717145525.50852-1-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-We proudly announce the second Alpine Linux Persistence and Storage
-Summit (ALPSS), which will be held September 11-14 at the Lizumerhuette
-[1][2] in Austria .
+On 2018/7/17 10:55 PM, Coly Li wrote:
+> This patch set adds basic implementation of crc64 calculation as Linux
+> kernel library. Since bcache already does crc64 by itself, this patch
+> set also modifies bcache code to use the new crc64 library routine.
+> 
+> bcache uses crc64 as storage checksum, if a change of crc lib routines
+> results an inconsistent result, the unmatched checksum may make bcache
+> 'think' the on-disk is corrupted, such change should be avoided or
+> detected as early as possible. Therefore the last patch in this series
+> adds a crc test framework, to check consistency of different calculations.
+> 
+> Changelog:
+> v3: Remove little endian restriction and remove 'le' from function names.
+>     Fixes all review comments of v2
+> v2: Combine first two patches into one
+>     Fixes all review comments of v1
+> v1: Initial version.
+> 
+> Coly Li
 
-The goal of this conference is to discuss the hot topics in Linux storage
-and file systems, such as persistent memory, NVMe, multi-pathing, raw or
-open channel flash and I/O scheduling in a cool and relaxed setting with
-spectacular views in the Austrian alps.
 
-We plan to have a small selection of short and to the point talks with
-lots of room for discussion in small groups, as well as ample downtime
-to enjoy the surrounding.
+Hi folks,
 
-Attendance is free except for the accommodation and food at the lodge [3],
-but the number of seats is strictly limited.  If you are interested in
-attending please reserve a seat by mailing your favorite topic(s) to:
+Many thanks for your review and comments, I do appreciate for your help.
+Also thank Andrew to pick up the patches.
 
-	alpss-pc@lists.infradead.org
-
-If you are interested in giving a short and crisp talk please also send
-an abstract to the same address.
-
-Note: The Lizumerhuette is an Alpine Society lodge in a high alpine
-environment.  A hike of approximately 2 hours is required to the lodge,
-and no other accommodations are available within walking distance.
-
-More details will eventually be available on our website:
-
-        http://www.alpss.at/
-
-Thank you on behalf of the program committee:
-
-    Stephen Bates
-    Sagi Grimberg
-    Christoph Hellwig
-    Johannes Thumshirn
-    Richard Weinberger
-
-[1] http://www.tyrol.com/things-to-do/sports/hiking/refuge-huts/a-lizumer-hut
-[2] https://www.glungezer.at/l-i-z-u-m-e-r-h-%C3%BC-t-t-e/
-[3] approx. EUR 40-60 per person and night, depending on the room
-    category
+Coly Li
