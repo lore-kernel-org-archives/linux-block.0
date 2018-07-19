@@ -1,58 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f65.google.com ([209.85.160.65]:41350 "EHLO
-        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729676AbeGMJDB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jul 2018 05:03:01 -0400
-Received: by mail-pl0-f65.google.com with SMTP id w8-v6so11931371ply.8
-        for <linux-block@vger.kernel.org>; Fri, 13 Jul 2018 01:49:21 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        bart.vanassche@wdc.com, hans.holmberg@cnexlabs.com,
-        javier@cnexlabs.com, hlitz@ucsc.edu, igor.j.konopko@intel.com,
-        marcin.dziegielewski@intel.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 03/10] lightnvm: pblk: enable line minor version detection
-Date: Fri, 13 Jul 2018 10:48:38 +0200
-Message-Id: <20180713084845.19511-4-mb@lightnvm.io>
-In-Reply-To: <20180713084845.19511-1-mb@lightnvm.io>
-References: <20180713084845.19511-1-mb@lightnvm.io>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <mwilck@suse.com>
+From: Martin Wilck <mwilck@suse.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Ming Lei <ming.lei@redhat.com>,
+	Jan Kara <jack@suse.com>
+Cc: Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Christoph Hellwig <hch@lst.de>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Kent Overstreet <kent.overstreet@gmail.com>,
+	linux-block@vger.kernel.org,
+	Martin Wilck <mwilck@suse.com>
+Subject: [PATCH v3 0/3] Fix silent data corruption in blkdev_direct_IO()
+Date: Thu, 19 Jul 2018 23:01:55 +0200
+Message-Id: <20180719210158.25923-1-mwilck@suse.com>
+List-ID: <linux-block@vger.kernel.org>
 
-When recovering a line, an extra check was added when debugging was
-active, such that minor version where also checked. Unfortunately,
-this used the ifdef NVM_DEBUG, which is not correct.
+Hello Jens, Ming, Jan, and all others,
 
-Instead use the proper DEBUG def, and now that it compiles, also fix
-the variable.
+the following patches have been verified by a customer to fix a silent data
+corruption which he has been seeing since "72ecad2 block: support a full bio
+worth of IO for simplified bdev direct-io".
 
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
-Fixes: d0ab0b1ab991f ("lightnvm: pblk: check data lines version on recovery")
-Reviewed-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-recovery.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+The patches are based on our observation that the corruption is only
+observed if the __blkdev_direct_IO_simple() code path is executed,
+and if that happens, "short writes" are observed in this code path,
+which causes a fallback to buffered IO, while the application continues
+submitting direct IO requests.
 
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 3a5069183859..d83466b3821b 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -742,9 +742,10 @@ static int pblk_recov_check_line_version(struct pblk *pblk,
- 		return 1;
- 	}
- 
--#ifdef NVM_DEBUG
-+#ifdef CONFIG_NVM_PBLK_DEBUG
- 	if (header->version_minor > EMETA_VERSION_MINOR)
--		pr_info("pblk: newer line minor version found: %d\n", line_v);
-+		pr_info("pblk: newer line minor version found: %d\n",
-+				header->version_minor);
- #endif
- 
- 	return 0;
+I called this v3 because the first patch was at v2 already in the previous
+submission.
+
+Changes wrt v1:
+ - 1/3: minor formatting change (Christoph)
+ - 2/3: split off the leak fix (Ming)
+ - 3/3: give up if bio_iov_iter_get_pages() returns an error (Jan)
+ - 3/3: warn if space in bio exhausted (Jan)
+ - 3/3: add comments
+
+Martin Wilck (3):
+  block: bio_iov_iter_get_pages: fix size of last iovec
+  blkdev: __blkdev_direct_IO_simple: fix leak in error case
+  blkdev: __blkdev_direct_IO_simple: make sure to fill up the bio
+
+ block/bio.c    | 18 ++++++++----------
+ fs/block_dev.c | 27 +++++++++++++++++++++++----
+ 2 files changed, 31 insertions(+), 14 deletions(-)
+
 -- 
-2.11.0
+2.17.1
