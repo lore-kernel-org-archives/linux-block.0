@@ -1,51 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:35979 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731021AbeGMJDX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jul 2018 05:03:23 -0400
-Received: by mail-pg1-f195.google.com with SMTP id m19-v6so4789637pgv.3
-        for <linux-block@vger.kernel.org>; Fri, 13 Jul 2018 01:49:43 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        bart.vanassche@wdc.com, hans.holmberg@cnexlabs.com,
-        javier@cnexlabs.com, hlitz@ucsc.edu, igor.j.konopko@intel.com,
-        marcin.dziegielewski@intel.com,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 08/10] lightnvm: pblk: mark expected switch fall-through
-Date: Fri, 13 Jul 2018 10:48:43 +0200
-Message-Id: <20180713084845.19511-9-mb@lightnvm.io>
-In-Reply-To: <20180713084845.19511-1-mb@lightnvm.io>
-References: <20180713084845.19511-1-mb@lightnvm.io>
+Return-Path: <hch@lst.de>
+Date: Thu, 19 Jul 2018 16:52:57 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Martin Wilck <mwilck@suse.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+	Jan Kara <jack@suse.com>, Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Kent Overstreet <kent.overstreet@gmail.com>,
+	Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/2] block: bio_iov_iter_get_pages: fix size of last
+	iovec
+Message-ID: <20180719145257.GC21000@lst.de>
+References: <20180718075440.GA15254@ming.t460p> <20180719093918.28876-1-mwilck@suse.com> <20180719093918.28876-2-mwilck@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180719093918.28876-2-mwilck@suse.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+On Thu, Jul 19, 2018 at 11:39:17AM +0200, Martin Wilck wrote:
+> If the last page of the bio is not "full", the length of the last
+> vector slot needs to be corrected. This slot has the index
+> (bio->bi_vcnt - 1), but only in bio->bi_io_vec. In the "bv" helper
+> array, which is shifted by the value of bio->bi_vcnt at function
+> invocation, the correct index is (nr_pages - 1).
+> 
+> V2: improved readability following suggestions from Ming Lei.
+> 
+> Fixes: 2cefe4dbaadf ("block: add bio_iov_iter_get_pages()")
+> Signed-off-by: Martin Wilck <mwilck@suse.com>
+> ---
+>  block/bio.c | 18 ++++++++----------
+>  1 file changed, 8 insertions(+), 10 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 67eff5e..0964328 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -912,16 +912,16 @@ EXPORT_SYMBOL(bio_add_page);
+>   */
+>  int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+>  {
+> -	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
+> +	unsigned short idx, nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
 
-In preparation to enabling -Wimplicit-fallthrough, mark switch cases
-where we are expecting to fall through.
+Nipick: I prefer to keep the variable(s) that are initialized first on
+any given line.
 
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
----
- drivers/lightnvm/pblk-core.c | 1 +
- 1 file changed, 1 insertion(+)
+Otherwise this looks fine:
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index b829460fe827..00984b486fea 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -264,6 +264,7 @@ void pblk_free_rqd(struct pblk *pblk, struct nvm_rq *rqd, int type)
- 	switch (type) {
- 	case PBLK_WRITE:
- 		kfree(((struct pblk_c_ctx *)nvm_rq_to_pdu(rqd))->lun_bitmap);
-+		/* fall through */
- 	case PBLK_WRITE_INT:
- 		pool = &pblk->w_rq_pool;
- 		break;
--- 
-2.11.0
+Reviewed-by: Christoph Hellwig <hch@lst.de>
