@@ -1,87 +1,40 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 1/6] genhd: drop 'bool' argument from __device_add_disk()
-Date: Mon, 30 Jul 2018 09:12:22 +0200
-Message-Id: <20180730071227.22887-2-hare@suse.de>
-In-Reply-To: <20180730071227.22887-1-hare@suse.de>
-References: <20180730071227.22887-1-hare@suse.de>
+Return-Path: <jthumshirn@suse.de>
+Date: Thu, 19 Jul 2018 16:43:57 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Alan Stern <stern@rowland.harvard.edu>
+Cc: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+	Ming Lei <ming.lei@redhat.com>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>, "hch@lst.de" <hch@lst.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"hare@suse.de" <hare@suse.de>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"rjw@rjwysocki.net" <rjw@rjwysocki.net>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+	"adrian.hunter@intel.com" <adrian.hunter@intel.com>
+Subject: Re: [PATCH RFC V2 3/3] scsi_mq: enable runtime PM
+Message-ID: <20180719144357.xqdnr7tsw7gplz3h@linux-x5ow.site>
+References: <20180719064124.fsi6au7x3vd2g7md@linux-x5ow.site>
+ <Pine.LNX.4.44L0.1807191033200.1491-100000@iolanthe.rowland.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <Pine.LNX.4.44L0.1807191033200.1491-100000@iolanthe.rowland.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Split off the last part of __device_add_disk() and move it into the
-caller.
+On Thu, Jul 19, 2018 at 10:35:39AM -0400, Alan Stern wrote:
+> On Thu, 19 Jul 2018, Johannes Thumshirn wrote:
+> 
+> The performance affect of runtime PM ought to be less than 1%.  If it
+> is larger, we'll figure out a different approach.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
----
- block/genhd.c | 28 +++++++++++++++++-----------
- 1 file changed, 17 insertions(+), 11 deletions(-)
+OK, let's see then.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 8cc719a37b32..62aba3d8ae19 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -647,15 +647,13 @@ static void register_disk(struct device *parent, struct gendisk *disk)
-  * __device_add_disk - add disk information to kernel list
-  * @parent: parent device for the disk
-  * @disk: per-device partitioning information
-- * @register_queue: register the queue if set to true
-  *
-  * This function registers the partitioning information in @disk
-  * with the kernel.
-  *
-  * FIXME: error handling
-  */
--static void __device_add_disk(struct device *parent, struct gendisk *disk,
--			      bool register_queue)
-+static void __device_add_disk(struct device *parent, struct gendisk *disk)
- {
- 	dev_t devt;
- 	int retval;
-@@ -699,8 +697,13 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
- 				    exact_match, exact_lock, disk);
- 	}
- 	register_disk(parent, disk);
--	if (register_queue)
--		blk_register_queue(disk);
-+}
-+
-+void device_add_disk(struct device *parent, struct gendisk *disk)
-+{
-+	__device_add_disk(parent, disk);
-+
-+	blk_register_queue(disk);
- 
- 	/*
- 	 * Take an extra ref on queue which will be put on disk_release()
-@@ -711,16 +714,19 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
- 	disk_add_events(disk);
- 	blk_integrity_add(disk);
- }
--
--void device_add_disk(struct device *parent, struct gendisk *disk)
--{
--	__device_add_disk(parent, disk, true);
--}
- EXPORT_SYMBOL(device_add_disk);
- 
- void device_add_disk_no_queue_reg(struct device *parent, struct gendisk *disk)
- {
--	__device_add_disk(parent, disk, false);
-+	__device_add_disk(parent, disk);
-+	/*
-+	 * Take an extra ref on queue which will be put on disk_release()
-+	 * so that it sticks around as long as @disk is there.
-+	 */
-+	WARN_ON_ONCE(!blk_get_queue(disk->queue));
-+
-+	disk_add_events(disk);
-+	blk_integrity_add(disk);
- }
- EXPORT_SYMBOL(device_add_disk_no_queue_reg);
- 
 -- 
-2.12.3
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
