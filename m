@@ -1,108 +1,101 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: colyli@suse.de,
-	axboe@kernel.dk,
-	linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Tang Junhui <tang.junhui@zte.com.cn>
-Subject: [PATCH 3/9] bcache: calculate the number of incremental GC nodes according to the total of btree nodes
-Date: Thu, 26 Jul 2018 12:17:35 +0800
-Message-Id: <20180726041741.1669-4-colyli@suse.de>
-In-Reply-To: <20180726041741.1669-1-colyli@suse.de>
-References: <20180726041741.1669-1-colyli@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from smtp.infotech.no ([82.134.31.41]:38321 "EHLO smtp.infotech.no"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388096AbeGTUBm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Jul 2018 16:01:42 -0400
+From: Douglas Gilbert <dgilbert@interlog.com>
+Subject: [ANNOUNCE] lsscsi version 0.30 released
+Reply-To: dgilbert@interlog.com
+To: SCSI development list <linux-scsi@vger.kernel.org>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>,
+        David Sommerseth <davids@redhat.com>,
+        Hannes Reinecke <hare@suse.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-ID: <4ef33405-fc6d-f046-8a5e-a565e122b92d@interlog.com>
+Date: Fri, 20 Jul 2018 15:11:48 -0400
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+lsscsi is a command line utility that probes sysfs in Linux 2.6, 3
+and 4 series kernels in order to list information about SCSI
+devices and SCSI hosts. The default format is one device (e.g. disk)
+per line. Other storage devices that use the SCSI subsystem such as
+SATA disks and USB keys are also listed.
 
-This patch base on "[PATCH] bcache: finish incremental GC".
+Version 0.30 adds listing of NVMe devices following SCSI devices.
+NVMe namespaces (e.g. /dev/nvme0n1) are listed with SCSI devices
+(LUs) and have tuples that start with 'N' (e.g. "[N:0:1:1]"). NVMe
+controllers (e.g. /dev/nvme0) are listed with SCSI hosts
+(initiators).
 
-Since incremental GC would stop 100ms when front side I/O comes, so when
-there are many btree nodes, if GC only processes constant (100) nodes each
-time, GC would last a long time, and the front I/Os would run out of the
-buckets (since no new bucket can be allocated during GC), and I/Os be
-blocked again.
+lsblk differences:
+   - lsblk lists disk partitions; lsscsi does not
+   - lsblk lists storage devices that don't use the SCSI and NVMe
+     subsystems; lsscsi does not. Example: non-USB connected
+     SD cards with device names like /dev/mmcblk0...
+   - lsscsi lists SCSI hosts (initiators) and NVMe controllers;
+     lsblk does not
+   - lsscsi lists pass-through devices (e.g. /dev/nvme0) which are
+     typically character devices; lsblk does not
+   - lsscsi lists meta storage devices such as tape robots and disk
+     enclosures
 
-So GC should not process constant nodes, but varied nodes according to the
-number of btree nodes. In this patch, GC is divided into constant (100)
-times, so when there are many btree nodes, GC can process more nodes each
-time, otherwise GC will process less nodes each time (but no less than
-MIN_GC_NODES).
+Version 0.30 is available at:
+     http://sg.danny.cz/scsi/lsscsi.html
+More information can be found on that page including examples
+plus a Download and Build information section containing
+tarballs, rpm and deb packages.
 
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/btree.c | 37 +++++++++++++++++++++++++++++++++++--
- 1 file changed, 35 insertions(+), 2 deletions(-)
+ChangeLog:
+Version 0.30 2018/06/12 [svn: r154]
+   - add support for NVMe devices and controllers
+     - to build without: ./configure --disable-nvme-supp
+     - deselect at runtime: lsscsi --no-nvme
+     - deselect SCSI devices at runtime: lsscsi N
+   - add --brief for tuple + device_name(s) only
+   - add --pdt (-D) for device type in hex
+   - extend --size (-s) so when given three times
+     the size as a logical block count is output
+   - add --sz-lbs (-S) that is equivalent to '-sss'
+     when used twice adds comma then logical block size
+   - '-w' now decodes 128 bit WWN without truncation
+   - /dev/disk/by-id/wwn- is not guaranteed to be
+     persistent (or stable); instead use
+     /dev/disk/by-id/scsi-
+   - '-t' on a FC host was not printing the comma
+     separator resulting in garbled output, fix
+   - debian: bump compat file contents from 7 to 10
 
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index b4407ba12667..475008fbbaab 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -90,6 +90,7 @@
- 
- #define MAX_NEED_GC		64
- #define MAX_SAVE_PRIO		72
-+#define MAX_GC_TIMES		100
- #define MIN_GC_NODES		100
- #define GC_SLEEP_MS		100
- 
-@@ -1522,6 +1523,32 @@ static unsigned btree_gc_count_keys(struct btree *b)
- 	return ret;
- }
- 
-+static size_t btree_gc_min_nodes(struct cache_set *c)
-+{
-+	size_t min_nodes;
-+
-+	/*
-+	 * Since incremental GC would stop 100ms when front
-+	 * side I/O comes, so when there are many btree nodes,
-+	 * if GC only processes constant (100) nodes each time,
-+	 * GC would last a long time, and the front side I/Os
-+	 * would run out of the buckets (since no new bucket
-+	 * can be allocated during GC), and be blocked again.
-+	 * So GC should not process constant nodes, but varied
-+	 * nodes according to the number of btree nodes, which
-+	 * realized by dividing GC into constant(100) times,
-+	 * so when there are many btree nodes, GC can process
-+	 * more nodes each time, otherwise, GC will process less
-+	 * nodes each time (but no less than MIN_GC_NODES)
-+	 */
-+	min_nodes = c->gc_stats.nodes / MAX_GC_TIMES;
-+	if (min_nodes < MIN_GC_NODES)
-+		min_nodes = MIN_GC_NODES;
-+
-+	return min_nodes;
-+}
-+
-+
- static int btree_gc_recurse(struct btree *b, struct btree_op *op,
- 			    struct closure *writes, struct gc_stat *gc)
- {
-@@ -1588,7 +1615,7 @@ static int btree_gc_recurse(struct btree *b, struct btree_op *op,
- 		r->b = NULL;
- 
- 		if (atomic_read(&b->c->search_inflight) &&
--		    gc->nodes >= gc->nodes_pre + MIN_GC_NODES) {
-+		    gc->nodes >= gc->nodes_pre + btree_gc_min_nodes(b->c)) {
- 			gc->nodes_pre =  gc->nodes;
- 			ret = -EAGAIN;
- 			break;
-@@ -1846,8 +1873,14 @@ static int bch_btree_check_recurse(struct btree *b, struct btree_op *op)
- 		do {
- 			k = bch_btree_iter_next_filter(&iter, &b->keys,
- 						       bch_ptr_bad);
--			if (k)
-+			if (k) {
- 				btree_node_prefetch(b, k);
-+				/*
-+				 * initiallize c->gc_stats.nodes
-+				 * for incremental GC
-+				 */
-+				b->c->gc_stats.nodes++;
-+			}
- 
- 			if (p)
- 				ret = btree(check_recurse, p, b, op);
--- 
-2.17.1
+Version 0.29 2016/05/14 [svn: r137]
+   - '-u' now decodes locally assigned UUIDs (spc5r08)
+   - as last try use T10 Vendor ID for lu name
+   - if no lu name found, print 'none'
+   - change '-uuu' to output the full lu name followed
+     by the normal fields (which were skipped before)
+   - add 'U' option, same action as '-uuu'
+   - '-UU' prefixes lu names with 'eui.', 'naa.', etc
+   - if '-s' given twice, lu size is base 2 related
+   - if very long [h:c:t:l] then append space
+   - print_enclosure_device() for FCP may be useless,
+     comment out while checking ...
+   - with '-t' print 0x0000000000000000 for non-SAS
+     device in SAS domain
+   - autogen.sh: upgrade to 20091223 version
+   - automake: upgrade to 1.15 (ubuntu 16.04)
+
+Version 0.28 2014/09/30 [svn: r120]
+...
+
+Examples:
+$ lsscsi -gs
+[0:0:0:0]  disk Linux    scsi_debug       0188  /dev/sda   /dev/sg0    419MB
+[0:0:0:1]  disk Linux    scsi_debug       0188  /dev/sdb   /dev/sg1    419MB
+[N:0:1:1]  disk INTEL SSDPEKKF256G7L__1                    /dev/nvme0n1   256GB
+
+$ lsscsi -H
+[0]    scsi_debug
+[N:0]  /dev/nvme0  INTEL SSDPEKKF256G7L           BTPY00000AU6256D    123P
+
+Douglas Gilbert
