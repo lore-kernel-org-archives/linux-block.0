@@ -1,101 +1,149 @@
-Return-Path: <pgwipeout@gmail.com>
-Return-Path: <pgwipeout@gmail.com>
-To: ming.lei@redhat.com
-From: Peter Geis <pgwipeout@gmail.com>
-Subject: [Regression] Linux-Next Merge 25Jul2018 breaks mmc on Tegra.
-Cc: linux-block@vger.kernel.org,
- "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>, axboe@kernel.dk
-Message-ID: <dacd3c28-2bfc-dd42-18a2-641217848126@gmail.com>
-Date: Wed, 25 Jul 2018 13:28:27 -0400
+Return-Path: <ming.lei@redhat.com>
+Date: Sat, 21 Jul 2018 07:48:29 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Martin Wilck <mwilck@suse.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.com>,
+	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Kent Overstreet <kent.overstreet@gmail.com>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH v4 3/4] block: add bio_iov_iter_get_all_pages() helper
+Message-ID: <20180720234822.GA9105@ming.t460p>
+References: <20180720130552.21432-1-mwilck@suse.com>
+ <20180720130552.21432-4-mwilck@suse.com>
+ <20180720161656.GC7438@ming.t460p>
+ <0966ba4de782bf6e1af19311f0aa67f0e29fa43b.camel@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <0966ba4de782bf6e1af19311f0aa67f0e29fa43b.camel@suse.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Good Afternoon,
+On Fri, Jul 20, 2018 at 06:54:48PM +0200, Martin Wilck wrote:
+> On Sat, 2018-07-21 at 00:16 +0800, Ming Lei wrote:
+> > On Fri, Jul 20, 2018 at 03:05:51PM +0200, Martin Wilck wrote:
+> > > bio_iov_iter_get_pages() only adds pages for the next non-zero
+> > > segment from the iov_iter to the bio. Some callers prefer to
+> > > obtain as many pages as would fit into the bio, with proper
+> > > rollback in case of failure. Add bio_iov_iter_get_all_pages()
+> > > for this purpose.
+> > > 
+> > > Signed-off-by: Martin Wilck <mwilck@suse.com>
+> > > ---
+> > >  block/bio.c         | 43
+> > > ++++++++++++++++++++++++++++++++++++++++++-
+> > >  include/linux/bio.h |  1 +
+> > >  2 files changed, 43 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/block/bio.c b/block/bio.c
+> > > index 489a430..693eb3b 100644
+> > > --- a/block/bio.c
+> > > +++ b/block/bio.c
+> > > @@ -907,8 +907,10 @@ EXPORT_SYMBOL(bio_add_page);
+> > >   * @bio: bio to add pages to
+> > >   * @iter: iov iterator describing the region to be mapped
+> > >   *
+> > > - * Pins as many pages from *iter and appends them to @bio's bvec
+> > > array. The
+> > > + * Pins pages from *iter and appends them to @bio's bvec array.
+> > > The
+> > >   * pages will have to be released using put_page() when done.
+> > > + * For multi-segment *iter, this function only adds pages from the
+> > > + * the next non-empty segment of the iov iterator.
+> > >   */
+> > >  int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+> > >  {
+> > > @@ -949,6 +951,45 @@ int bio_iov_iter_get_pages(struct bio *bio,
+> > > struct iov_iter *iter)
+> > >  }
+> > >  EXPORT_SYMBOL_GPL(bio_iov_iter_get_pages);
+> > >  
+> > > +/**
+> > > + * bio_iov_iter_get_all_pages - pin user or kernel pages and add
+> > > them to a bio
+> > > + * @bio: bio to add pages to
+> > > + * @iter: iov iterator describing the region to be mapped
+> > > + *
+> > > + * Pins pages from *iter and appends them to @bio's bvec array.
+> > > The
+> > > + * pages will have to be released using put_page() when done.
+> > > + * This function adds as many pages as possible to a bio.
+> > > + * If this function encounters an error, it unpins the pages it
+> > > has
+> > > + * pinned before, leaving previously pinned pages untouched.
+> > > + */
+> > > +int bio_iov_iter_get_all_pages(struct bio *bio, struct iov_iter
+> > > *iter)
+> > > +{
+> > > +	unsigned short orig_vcnt = bio->bi_vcnt;
+> > > +
+> > > +	do {
+> > > +		int ret = bio_iov_iter_get_pages(bio, iter);
+> > > +
+> > > +		if (unlikely(ret)) {
+> > > +			struct bio_vec *bvec;
+> > > +			unsigned short i;
+> > > +
+> > > +			bio_for_each_segment_all(bvec, bio, i) {
+> > > +				if (i >= orig_vcnt) {
+> > > +					put_page(bvec->bv_page);
+> > > +					bvec->bv_page = NULL;
+> > > +					bvec->bv_len = 0;
+> > > +					bvec->bv_offset = 0;
+> > > +				}
+> > > +			}
+> > > +			bio->bi_vcnt = orig_vcnt;
+> > > +			return ret;
+> > > +		}
+> > > +	} while (iov_iter_count(iter) && !bio_full(bio));
+> > 
+> > The failure handling part(release pages) may be moved out of this
+> > helper, so usage of this helper can be aligned with
+> > bio_iov_iter_get_pages().
+> 
+> I wrote the failure handling precisely for being compatible with
+> bio_iov_iter_get_pages(), which requires no rollback if it returns an
+> error. If we don't do this, we have to add extra error handling code to
+> every caller. It was the issue you raised with my v3 submission...
+> apparently I misunderstood you.
+> 
+> What should happen if the new handler encounters an error from
+> bio_iov_iter_get_pages() in the 2nd or later iteration?
+> 
+>  1 return success, so that the caller doesn't realize there was a
+> problem,
+>  2 return error and roll back bio changes, as I implemented it here,
+>  3 return error and keep the already allocated pages.
+> 
+> You seem to support option 3. But that leaves it to the caller to 
+> differentiate this from a failure with zero allocated pages, and clean
+> up appropriately. I not sure if that's wise, and it's for sure
+> different from bio_iov_iter_get_pages()' behavior. Or what am I
+> missing?
+> > BTW, I agree with Christoph, we may just fix/improve
+> > bio_iov_iter_get_pages()
+> > for all users.
+> 
+> Ok, thanks for confirming.
 
-I have encountered an issue on both Tegra 2 and Tegra 3 devices 
-accessing emmc following the 25 July 2018 remote tracking merge.
+OK, if you follow this suggestion, the pinned pages may be released
+in bio_iov_iter_get_pages() like what this patch does, but the bio_endio(bio)
+in failure handler of __blkdev_direct_IO() has to be handled in the
+following way for avoiding double release:
 
-The offending commit is:
-6ce3dd6eec114930cf2035a8bcb1e80477ed79a8
-blk-mq: issue directly if hw queue isn't busy in case of 'none'.
+1) if this bio is allocated from &blkdev_dio_pool, the bio_endio() need
+to be removed
 
-Reverting this commit corrects the issue, but the issue has left the 
-file system in a corrupted state.
+2) otherwise, the bio_endio() need to be replaced with bio_put().
 
-The issue causes the following error message when the file system is 
-remounted RW:
-[    3.173189] ------------[ cut here ]------------
-[    3.177907] WARNING: CPU: 0 PID: 114 at drivers/mmc/host/sdhci.c:1203 
-sdhci_send_command+0x6d0/0xeb4
-[    3.187059] Modules linked in: ip_tables x_tables autofs4
-[    3.192503] CPU: 0 PID: 114 Comm: (direxec) Not tainted 
-4.18.0-rc6-next-20180723+ #9
-[    3.200228] Hardware name: NVIDIA Tegra SoC (Flattened Device Tree)
-[    3.206511] [<c0114828>] (unwind_backtrace) from [<c010eae0>] 
-(show_stack+0x20/0x24)
-[    3.214248] [<c010eae0>] (show_stack) from [<c09e30cc>] 
-(dump_stack+0x80/0x94)
-[    3.221468] [<c09e30cc>] (dump_stack) from [<c012f56c>] 
-(__warn+0xf0/0x108)
-[    3.228420] [<c012f56c>] (__warn) from [<c012f6bc>] 
-(warn_slowpath_null+0x50/0x58)
-[    3.235981] [<c012f6bc>] (warn_slowpath_null) from [<c078dec8>] 
-(sdhci_send_command+0x6d0/0xeb4)
-[    3.244754] [<c078dec8>] (sdhci_send_command) from [<c078ea5c>] 
-(sdhci_request+0x84/0xe0)
-[    3.252924] [<c078ea5c>] (sdhci_request) from [<c076a084>] 
-(__mmc_start_request+0x88/0x1c4)
-[    3.261263] [<c076a084>] (__mmc_start_request) from [<c076adcc>] 
-(mmc_start_request+0xa4/0xc8)
-[    3.269871] [<c076adcc>] (mmc_start_request) from [<c077f648>] 
-(mmc_blk_mq_issue_rq+0x648/0x8c8)
-[    3.278644] [<c077f648>] (mmc_blk_mq_issue_rq) from [<c077fd5c>] 
-(mmc_mq_queue_rq+0x124/0x218)
-[    3.287247] [<c077fd5c>] (mmc_mq_queue_rq) from [<c0508864>] 
-(__blk_mq_try_issue_directly+0x148/0x1dc)
-[    3.296538] [<c0508864>] (__blk_mq_try_issue_directly) from 
-[<c0509cf0>] (blk_mq_request_issue_directly+0x68/0x98)
-[    3.306869] [<c0509cf0>] (blk_mq_request_issue_directly) from 
-[<c0509d68>] (blk_mq_try_issue_list_directly+0x48/0x80)
-[    3.317466] [<c0509d68>] (blk_mq_try_issue_list_directly) from 
-[<c050dedc>] (blk_mq_sched_insert_requests+0x9c/0xbc)
-[    3.327971] [<c050dedc>] (blk_mq_sched_insert_requests) from 
-[<c0509bb0>] (blk_mq_flush_plug_list+0x258/0x330)
-[    3.337960] [<c0509bb0>] (blk_mq_flush_plug_list) from [<c04fcb90>] 
-(blk_flush_plug_list+0xec/0x22c)
-[    3.347078] [<c04fcb90>] (blk_flush_plug_list) from [<c04fd22c>] 
-(blk_finish_plug+0x3c/0x54)
-[    3.355507] [<c04fd22c>] (blk_finish_plug) from [<c02b0c00>] 
-(read_pages+0x78/0x17c)
-[    3.363240] [<c02b0c00>] (read_pages) from [<c02b0ef8>] 
-(__do_page_cache_readahead+0x1f4/0x214)
-[    3.371925] [<c02b0ef8>] (__do_page_cache_readahead) from 
-[<c02b1078>] (ondemand_readahead+0x160/0x298)
-[    3.381302] [<c02b1078>] (ondemand_readahead) from [<c02b1474>] 
-(page_cache_sync_readahead+0xb4/0x104)
-[    3.390598] [<c02b1474>] (page_cache_sync_readahead) from 
-[<c02a03b4>] (generic_file_read_iter+0x7d0/0xb28)
-[    3.400336] [<c02a03b4>] (generic_file_read_iter) from [<c03c9528>] 
-(ext4_file_read_iter+0x48/0x54)
-[    3.409373] [<c03c9528>] (ext4_file_read_iter) from [<c031b45c>] 
-(__vfs_read+0x10c/0x16c)
-[    3.417538] [<c031b45c>] (__vfs_read) from [<c031b558>] 
-(vfs_read+0x9c/0x168)
-[    3.424659] [<c031b558>] (vfs_read) from [<c031b658>] 
-(kernel_read+0x34/0x44)
-[    3.431784] [<c031b658>] (kernel_read) from [<c0322bd8>] 
-(prepare_binprm+0xf4/0x198)
-[    3.439515] [<c0322bd8>] (prepare_binprm) from [<c0324250>] 
-(__do_execve_file+0x5d0/0x894)
-[    3.447766] [<c0324250>] (__do_execve_file) from [<c03247e4>] 
-(sys_execve+0x44/0x4c)
-[    3.455495] [<c03247e4>] (sys_execve) from [<c0101000>] 
-(ret_fast_syscall+0x0/0x54)
-[    3.463134] Exception stack(0xeda61fa8 to 0xeda61ff0)
-[    3.468176] 1fa0:                   b67c64e0 ffffffff 008078c0 
-bef74b60 bef74f0c b6f9cb94
-[    3.476335] 1fc0: b67c64e0 ffffffff 00000000 0000000b 008052f0 
-008078c0 00000000 ffffffff
-[    3.484494] 1fe0: b6ea3b08 bef74ae4 b6dd7313 b6f1aba8
-[    3.489535] ---[ end trace 4eb4571f10ae8bad ]---
+Frankly speaking, after your patch is in, seems it is fine to allocate
+single bio for doing the dio in __blkdev_direct_IO(), given the passed
+'max_pages' is <= BIO_MAX_PAGES. Then __blkdev_direct_IO() can be
+simplified much.
+
+But, both current __blkdev_direct_IO() and iomap_dio_actor() supports
+short dio, do you think there is same issue in the two with yours? Or
+do we need to support it in the new bio_iov_iter_get_pages()?
+
+
+Thanks,
+Ming
