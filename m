@@ -1,22 +1,65 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] blk-rq-qos: make depth comparisons unsigned
-To: Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org,
- kernel-team@fb.com
-References: <20180720014213.28772-1-josef@toxicpanda.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <27dd9a4e-e5d9-d26c-f29a-c5bcbed44cd0@kernel.dk>
-Date: Sun, 22 Jul 2018 11:31:20 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180720014213.28772-1-josef@toxicpanda.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	kernel-team@fb.com
+Subject: [PATCH] blk-rq-qos: make depth comparisons unsigned
+Date: Thu, 19 Jul 2018 21:42:13 -0400
+Message-Id: <20180720014213.28772-1-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 7/19/18 7:42 PM, Josef Bacik wrote:
-> With the change to use UINT_MAX I broke the depth check as any value of
-> inflight (ie 0) would be less than (int)UINT_MAX.  Fix this by changing
-> everything to unsigned int to match the depth.
+With the change to use UINT_MAX I broke the depth check as any value of
+inflight (ie 0) would be less than (int)UINT_MAX.  Fix this by changing
+everything to unsigned int to match the depth.
 
-Applied, thanks.
+Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+---
+ block/blk-rq-qos.c | 8 ++++----
+ block/blk-rq-qos.h | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+index 5134b24482f6..0005dfd568dd 100644
+--- a/block/blk-rq-qos.c
++++ b/block/blk-rq-qos.c
+@@ -4,12 +4,12 @@
+  * Increment 'v', if 'v' is below 'below'. Returns true if we succeeded,
+  * false if 'v' + 1 would be bigger than 'below'.
+  */
+-static bool atomic_inc_below(atomic_t *v, int below)
++static bool atomic_inc_below(atomic_t *v, unsigned int below)
+ {
+-	int cur = atomic_read(v);
++	unsigned int cur = atomic_read(v);
+ 
+ 	for (;;) {
+-		int old;
++		unsigned int old;
+ 
+ 		if (cur >= below)
+ 			return false;
+@@ -22,7 +22,7 @@ static bool atomic_inc_below(atomic_t *v, int below)
+ 	return true;
+ }
+ 
+-bool rq_wait_inc_below(struct rq_wait *rq_wait, int limit)
++bool rq_wait_inc_below(struct rq_wait *rq_wait, unsigned int limit)
+ {
+ 	return atomic_inc_below(&rq_wait->inflight, limit);
+ }
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index d5e2f68fe41e..32b02efbfa66 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -93,7 +93,7 @@ static inline void rq_qos_del(struct request_queue *q, struct rq_qos *rqos)
+ 	}
+ }
+ 
+-bool rq_wait_inc_below(struct rq_wait *rq_wait, int limit);
++bool rq_wait_inc_below(struct rq_wait *rq_wait, unsigned int limit);
+ void rq_depth_scale_up(struct rq_depth *rqd);
+ void rq_depth_scale_down(struct rq_depth *rqd, bool hard_throttle);
+ bool rq_depth_calc_max_depth(struct rq_depth *rqd);
 -- 
-Jens Axboe
+2.14.3
