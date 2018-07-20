@@ -1,158 +1,65 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	linux-pm@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH RFC V2 1/3] block: put runtime PM code into common helpers
-Date: Fri, 13 Jul 2018 16:06:00 +0800
-Message-Id: <20180713080602.31602-2-ming.lei@redhat.com>
-In-Reply-To: <20180713080602.31602-1-ming.lei@redhat.com>
-References: <20180713080602.31602-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from smtp2.provo.novell.com ([137.65.250.81]:36416 "EHLO
+        smtp2.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731652AbeGTO3c (ORCPT
+        <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
+        Fri, 20 Jul 2018 10:29:32 -0400
+From: Martin Wilck <mwilck@suse.com>
+To: Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.com>,
+        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        linux-block@vger.kernel.org, Martin Wilck <mwilck@suse.com>
+Subject: [PATCH v4 0/4] Fix silent data corruption in blkdev_direct_IO()
+Date: Fri, 20 Jul 2018 15:05:48 +0200
+Message-Id: <20180720130552.21432-1-mwilck@suse.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-So that the following patch can reuse these helpers for supporting
-runtime PM on blk-mq.
+Hello Jens, Ming, Jan, and all others,
 
-No function change.
+the following patches have been verified by a customer to fix a silent data
+corruption which he has been seeing since "72ecad2 block: support a full bio
+worth of IO for simplified bdev direct-io".
 
-Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: linux-pm@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Adrian Hunter <adrian.hunter@intel.com>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-core.c | 71 ++++++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 48 insertions(+), 23 deletions(-)
+The patches are based on our observation that the corruption is only
+observed if the __blkdev_direct_IO_simple() code path is executed,
+and if that happens, "short writes" are observed in this code path,
+which causes a fallback to buffered IO, while the application continues
+submitting direct IO requests.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index c4b57d8806fe..1087a58590f1 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -3746,6 +3746,50 @@ void blk_finish_plug(struct blk_plug *plug)
- EXPORT_SYMBOL(blk_finish_plug);
- 
- #ifdef CONFIG_PM
-+static int __blk_pre_runtime_suspend(struct request_queue *q, bool active)
-+{
-+	int ret;
-+
-+	if (active) {
-+		ret = -EBUSY;
-+		pm_runtime_mark_last_busy(q->dev);
-+	} else {
-+		ret = 0;
-+		q->rpm_status = RPM_SUSPENDING;
-+	}
-+
-+	return ret;
-+}
-+
-+static void __blk_post_runtime_suspend(struct request_queue *q, int err)
-+{
-+	if (!err) {
-+		q->rpm_status = RPM_SUSPENDED;
-+	} else {
-+		q->rpm_status = RPM_ACTIVE;
-+		pm_runtime_mark_last_busy(q->dev);
-+	}
-+}
-+
-+static void __blk_post_runtime_resume(struct request_queue *q, int err)
-+{
-+	if (!err) {
-+		q->rpm_status = RPM_ACTIVE;
-+		__blk_run_queue(q);
-+		pm_runtime_mark_last_busy(q->dev);
-+		pm_request_autosuspend(q->dev);
-+	} else {
-+		q->rpm_status = RPM_SUSPENDED;
-+	}
-+}
-+
-+static void __blk_set_runtime_active(struct request_queue *q)
-+{
-+	q->rpm_status = RPM_ACTIVE;
-+	pm_runtime_mark_last_busy(q->dev);
-+	pm_request_autosuspend(q->dev);
-+}
-+
- /**
-  * blk_pm_runtime_init - Block layer runtime PM initialization routine
-  * @q: the queue of the device
-@@ -3809,12 +3853,7 @@ int blk_pre_runtime_suspend(struct request_queue *q)
- 		return ret;
- 
- 	spin_lock_irq(q->queue_lock);
--	if (q->nr_pending) {
--		ret = -EBUSY;
--		pm_runtime_mark_last_busy(q->dev);
--	} else {
--		q->rpm_status = RPM_SUSPENDING;
--	}
-+	ret = __blk_pre_runtime_suspend(q, q->nr_pending);
- 	spin_unlock_irq(q->queue_lock);
- 	return ret;
- }
-@@ -3839,12 +3878,7 @@ void blk_post_runtime_suspend(struct request_queue *q, int err)
- 		return;
- 
- 	spin_lock_irq(q->queue_lock);
--	if (!err) {
--		q->rpm_status = RPM_SUSPENDED;
--	} else {
--		q->rpm_status = RPM_ACTIVE;
--		pm_runtime_mark_last_busy(q->dev);
--	}
-+	__blk_post_runtime_suspend(q, err);
- 	spin_unlock_irq(q->queue_lock);
- }
- EXPORT_SYMBOL(blk_post_runtime_suspend);
-@@ -3891,14 +3925,7 @@ void blk_post_runtime_resume(struct request_queue *q, int err)
- 		return;
- 
- 	spin_lock_irq(q->queue_lock);
--	if (!err) {
--		q->rpm_status = RPM_ACTIVE;
--		__blk_run_queue(q);
--		pm_runtime_mark_last_busy(q->dev);
--		pm_request_autosuspend(q->dev);
--	} else {
--		q->rpm_status = RPM_SUSPENDED;
--	}
-+	__blk_post_runtime_resume(q, err);
- 	spin_unlock_irq(q->queue_lock);
- }
- EXPORT_SYMBOL(blk_post_runtime_resume);
-@@ -3920,9 +3947,7 @@ EXPORT_SYMBOL(blk_post_runtime_resume);
- void blk_set_runtime_active(struct request_queue *q)
- {
- 	spin_lock_irq(q->queue_lock);
--	q->rpm_status = RPM_ACTIVE;
--	pm_runtime_mark_last_busy(q->dev);
--	pm_request_autosuspend(q->dev);
-+	__blk_set_runtime_active(q);
- 	spin_unlock_irq(q->queue_lock);
- }
- EXPORT_SYMBOL(blk_set_runtime_active);
+In v4, I've separated out the "get as many pages as the bio can hold"
+functionality into a new helper. This way other callers can migrate to the new
+helper if deemed appropriate. Changing the semantics of
+bio_iov_iter_get_pages() for all callers, as Ming originally suggested, seems
+too intrusive to me at this time.
+
+Regards,
+Martin
+
+Changes wrt v1:
+ - 1/3: minor formatting change (Christoph)
+ - 2/3: split off the leak fix (Ming)
+ - 3/3: give up if bio_iov_iter_get_pages() returns an error (Jan)
+ - 3/3: warn if space in bio exhausted (Jan)
+ - 3/3: add comments
+
+Changes wrt v3:
+ - split previous 3/3 into two patches (3/4, 4/4).
+ - 3/4: add a new helper to retrieve as many pages as possible (Ming)
+ - 3/4: put pages in case of error (Ming)
+
+Martin Wilck (4):
+  block: bio_iov_iter_get_pages: fix size of last iovec
+  blkdev: __blkdev_direct_IO_simple: fix leak in error case
+  block: add bio_iov_iter_get_all_pages() helper
+  blkdev: __blkdev_direct_IO_simple: make sure to fill up the bio
+
+ block/bio.c         | 61 +++++++++++++++++++++++++++++++++++++--------
+ fs/block_dev.c      | 18 +++++++++----
+ include/linux/bio.h |  1 +
+ 3 files changed, 64 insertions(+), 16 deletions(-)
+
 -- 
-2.9.5
+2.17.1
