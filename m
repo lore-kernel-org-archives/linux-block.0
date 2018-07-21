@@ -1,116 +1,106 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <keith.busch@intel.com>
-Subject: [PATCH 3/6] nvme: register ns_id attributes as default sysfs groups
-Date: Mon, 30 Jul 2018 09:12:24 +0200
-Message-Id: <20180730071227.22887-4-hare@suse.de>
-In-Reply-To: <20180730071227.22887-1-hare@suse.de>
-References: <20180730071227.22887-1-hare@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:46326 "EHLO
+        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728305AbeGUBUT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Jul 2018 21:20:19 -0400
+From: Liu Bo <bo.liu@linux.alibaba.com>
+To: <linux-block@vger.kernel.org>
+Subject: [PATCH] Blk-throttle: reduce tail io latency when iops limit is enforced
+Date: Sat, 21 Jul 2018 08:29:20 +0800
+Message-Id: <1532132960-44970-1-git-send-email-bo.liu@linux.alibaba.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We should be registering the ns_id attribute as default sysfs
-attribute groups, otherwise we have a race condition between
-the uevent and the attributes appearing in sysfs.
+When an application's iops has exceeded its cgroup's iops limit, surely it
+is throttled and kernel will set a timer for dispatching, thus IO latency
+includes the delay.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: Keith Busch <keith.busch@intel.com>
+However, the dispatch delay which is calculated by the limit and the
+elapsed jiffies is suboptimal.  As the dispatch delay is only calculated
+once the application's iops is (iops limit + 1), it doesn't need to wait
+any longer than the remaining time of the current slice.
+
+The difference can be proved by the following fio job and cgroup iops
+setting,
+-----
+$ echo 4 > /mnt/config/nullb/disk1/mbps    # limit nullb's bandwidth to 4MB/s for testing.
+$ echo "253:1 riops=100 rbps=max" > /sys/fs/cgroup/unified/cg1/io.max
+$ cat r2.job
+[global]
+name=fio-rand-read
+filename=/dev/nullb1
+rw=randread
+bs=4k
+direct=1
+numjobs=1
+time_based=1
+runtime=60
+group_reporting=1
+
+[file1]
+size=4G
+ioengine=libaio
+iodepth=1
+rate_iops=50000
+norandommap=1
+thinktime=4ms
+-----
+
+wo patch:
+file1: (g=0): rw=randread, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 4096B-4096B, ioengine=libaio, iodepth=1
+fio-3.7-66-gedfc
+Starting 1 process
+
+   read: IOPS=99, BW=400KiB/s (410kB/s)(23.4MiB/60001msec)
+    slat (usec): min=10, max=336, avg=27.71, stdev=17.82
+    clat (usec): min=2, max=28887, avg=5929.81, stdev=7374.29
+     lat (usec): min=24, max=28901, avg=5958.73, stdev=7366.22
+    clat percentiles (usec):
+     |  1.00th=[    4],  5.00th=[    4], 10.00th=[    4], 20.00th=[    4],
+     | 30.00th=[    4], 40.00th=[    4], 50.00th=[    6], 60.00th=[11731],
+     | 70.00th=[11863], 80.00th=[11994], 90.00th=[12911], 95.00th=[22676],
+     | 99.00th=[23725], 99.50th=[23987], 99.90th=[23987], 99.95th=[25035],
+     | 99.99th=[28967]
+
+w/ patch:
+file1: (g=0): rw=randread, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 4096B-4096B, ioengine=libaio, iodepth=1
+fio-3.7-66-gedfc
+Starting 1 process
+
+   read: IOPS=100, BW=400KiB/s (410kB/s)(23.4MiB/60005msec)
+    slat (usec): min=10, max=155, avg=23.24, stdev=16.79
+    clat (usec): min=2, max=12393, avg=5961.58, stdev=5959.25
+     lat (usec): min=23, max=12412, avg=5985.91, stdev=5951.92
+    clat percentiles (usec):
+     |  1.00th=[    3],  5.00th=[    3], 10.00th=[    4], 20.00th=[    4],
+     | 30.00th=[    4], 40.00th=[    5], 50.00th=[   47], 60.00th=[11863],
+     | 70.00th=[11994], 80.00th=[11994], 90.00th=[11994], 95.00th=[11994],
+     | 99.00th=[11994], 99.50th=[11994], 99.90th=[12125], 99.95th=[12125],
+     | 99.99th=[12387]
+
+Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
 ---
- drivers/nvme/host/core.c      | 13 ++++++-------
- drivers/nvme/host/multipath.c | 15 ++++-----------
- drivers/nvme/host/nvme.h      |  2 +-
- 3 files changed, 11 insertions(+), 19 deletions(-)
+ block/blk-throttle.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index f1b61ebceaf1..39bdfe806d1b 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2696,6 +2696,11 @@ const struct attribute_group nvme_ns_id_attr_group = {
- 	.is_visible	= nvme_ns_id_attrs_are_visible,
- };
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 26ddbe5286f8..3ca9a98748be 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -956,12 +956,7 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
+ 		return false;
  
-+const struct attribute_group *nvme_ns_id_attr_groups[] = {
-+	&nvme_ns_id_attr_group,
-+	NULL,
-+};
-+
- #define nvme_show_str_function(field)						\
- static ssize_t  field##_show(struct device *dev,				\
- 			    struct device_attribute *attr, char *buf)		\
-@@ -3061,11 +3066,7 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
+ 	/* Calc approx time to dispatch */
+-	jiffy_wait = ((tg->io_disp[rw] + 1) * HZ) / tg_iops_limit(tg, rw) + 1;
+-
+-	if (jiffy_wait > jiffy_elapsed)
+-		jiffy_wait = jiffy_wait - jiffy_elapsed;
+-	else
+-		jiffy_wait = 1;
++	jiffy_wait = jiffy_elapsed_rnd - jiffy_elapsed;
  
- 	nvme_get_ctrl(ctrl);
- 
--	device_add_disk(ctrl->device, ns->disk, NULL);
--	if (sysfs_create_group(&disk_to_dev(ns->disk)->kobj,
--					&nvme_ns_id_attr_group))
--		pr_warn("%s: failed to create sysfs group for identification\n",
--			ns->disk->disk_name);
-+	device_add_disk(ctrl->device, ns->disk, nvme_ns_id_attr_groups);
- 	if (ns->ndev && nvme_nvm_register_sysfs(ns))
- 		pr_warn("%s: failed to register lightnvm sysfs group for identification\n",
- 			ns->disk->disk_name);
-@@ -3094,8 +3095,6 @@ static void nvme_ns_remove(struct nvme_ns *ns)
- 
- 	nvme_fault_inject_fini(ns);
- 	if (ns->disk && ns->disk->flags & GENHD_FL_UP) {
--		sysfs_remove_group(&disk_to_dev(ns->disk)->kobj,
--					&nvme_ns_id_attr_group);
- 		if (ns->ndev)
- 			nvme_nvm_unregister_sysfs(ns);
- 		del_gendisk(ns->disk);
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index e4d786467129..7d3c30324da9 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -281,13 +281,9 @@ static void nvme_mpath_set_live(struct nvme_ns *ns)
- 	if (!head->disk)
- 		return;
- 
--	if (!(head->disk->flags & GENHD_FL_UP)) {
--		device_add_disk(&head->subsys->dev, head->disk, NULL);
--		if (sysfs_create_group(&disk_to_dev(head->disk)->kobj,
--				&nvme_ns_id_attr_group))
--			dev_warn(&head->subsys->dev,
--				 "failed to create id group.\n");
--	}
-+	if (!(head->disk->flags & GENHD_FL_UP))
-+		device_add_disk(&head->subsys->dev, head->disk,
-+				nvme_ns_id_attr_groups);
- 
- 	kblockd_schedule_work(&ns->head->requeue_work);
- }
-@@ -493,11 +489,8 @@ void nvme_mpath_remove_disk(struct nvme_ns_head *head)
- {
- 	if (!head->disk)
- 		return;
--	if (head->disk->flags & GENHD_FL_UP) {
--		sysfs_remove_group(&disk_to_dev(head->disk)->kobj,
--				   &nvme_ns_id_attr_group);
-+	if (head->disk->flags & GENHD_FL_UP)
- 		del_gendisk(head->disk);
--	}
- 	blk_set_queue_dying(head->disk->queue);
- 	/* make sure all pending bios are cleaned up */
- 	kblockd_schedule_work(&head->requeue_work);
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 8b356f1d941c..7f156367bd18 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -466,7 +466,7 @@ int nvme_delete_ctrl_sync(struct nvme_ctrl *ctrl);
- int nvme_get_log(struct nvme_ctrl *ctrl, u32 nsid, u8 log_page, u8 lsp,
- 		void *log, size_t size, u64 offset);
- 
--extern const struct attribute_group nvme_ns_id_attr_group;
-+extern const struct attribute_group *nvme_ns_id_attr_groups[];
- extern const struct block_device_operations nvme_ns_head_ops;
- 
- #ifdef CONFIG_NVME_MULTIPATH
+ 	*wait = jiffy_wait;
+ 	return false;
 -- 
-2.12.3
+1.8.3.1
