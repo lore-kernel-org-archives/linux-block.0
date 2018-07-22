@@ -1,38 +1,30 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qt0-f176.google.com ([209.85.216.176]:40793 "EHLO
-        mail-qt0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388075AbeG0RKO (ORCPT
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:37874 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728192AbeGVNVL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Jul 2018 13:10:14 -0400
-Received: by mail-qt0-f176.google.com with SMTP id h4-v6so5483831qtj.7
-        for <linux-block@vger.kernel.org>; Fri, 27 Jul 2018 08:47:44 -0700 (PDT)
-Date: Fri, 27 Jul 2018 11:47:42 -0400
-From: Josef Bacik <josef@toxicpanda.com>
+        Sun, 22 Jul 2018 09:21:11 -0400
+From: Josef Bacik <jbacik@fb.com>
 To: Ming Lei <ming.lei@redhat.com>
-Cc: Josef Bacik <jbacik@fb.com>, Ming Lei <tom.leiming@gmail.com>,
+CC: Ming Lei <tom.leiming@gmail.com>,
         linux-block <linux-block@vger.kernel.org>
 Subject: Re: [Bug] block/for-next: IO hang in rq_qos_throttle
-Message-ID: <20180727154741.v2ubbwerblyug43a@destiny>
+Date: Sun, 22 Jul 2018 12:24:14 +0000
+Message-ID: <F822F61E-0B79-494E-B989-6012F6490056@fb.com>
 References: <CACVXFVNKAhGkievaHXDvPngw7xW5hWg_0oOSLXD1R4uaxSJs3w@mail.gmail.com>
- <83C56CD1-93E0-41E3-AF41-27C4F33851FE@fb.com>
- <20180722072804.GA955@ming.t460p>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+ <83C56CD1-93E0-41E3-AF41-27C4F33851FE@fb.com>,<20180722072804.GA955@ming.t460p>
 In-Reply-To: <20180722072804.GA955@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Sun, Jul 22, 2018 at 03:28:05PM +0800, Ming Lei wrote:
-> On Sun, Jul 22, 2018 at 02:15:38AM +0000, Josef Bacik wrote:
-> > Yup I sent a patch for this on Thursday, sorry about that,
-> > 
-> 
-> I just applied the patch of 'blk-rq-qos: make depth comparisons unsigned',
-> looks the same IO hang can be triggered too.
-
-Ok I'm back from vacation and I'm trying to reproduce but it's not happening for
-me.  What testing infrastructure is this?  blktests and xfstests don't have a
-sanity/ in their test suites.  I'm wondering if there's something else about the
-test that I'm missing.  Thanks,
-
-Josef
+VWdoIGNyYXAgaXTigJlzIGluIHdidC4gIEnigJlsbCB0YWtlIGEgbG9vayB3aGVuIEnigJltIGJh
+Y2sgZnJvbSB2YWNhdGlvbi4gIFRoYW5rcywNCg0KSm9zZWYNCg0KU2VudCBmcm9tIG15IGlQaG9u
+ZQ0KDQo+IE9uIEp1bCAyMiwgMjAxOCwgYXQgMzoyOCBBTSwgTWluZyBMZWkgPG1pbmcubGVpQHJl
+ZGhhdC5jb20+IHdyb3RlOg0KPiANCj4+IE9uIFN1biwgSnVsIDIyLCAyMDE4IGF0IDAyOjE1OjM4
+QU0gKzAwMDAsIEpvc2VmIEJhY2lrIHdyb3RlOg0KPj4gWXVwIEkgc2VudCBhIHBhdGNoIGZvciB0
+aGlzIG9uIFRodXJzZGF5LCBzb3JyeSBhYm91dCB0aGF0LA0KPj4gDQo+IA0KPiBJIGp1c3QgYXBw
+bGllZCB0aGUgcGF0Y2ggb2YgJ2Jsay1ycS1xb3M6IG1ha2UgZGVwdGggY29tcGFyaXNvbnMgdW5z
+aWduZWQnLA0KPiBsb29rcyB0aGUgc2FtZSBJTyBoYW5nIGNhbiBiZSB0cmlnZ2VyZWQgdG9vLg0K
+PiANCj4gVGhhbmtzLA0KPiBNaW5nDQo=
