@@ -1,59 +1,80 @@
-Return-Path: <stephen@networkplumber.org>
-Return-Path: <stephen@networkplumber.org>
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: josef@toxicpanda.com,
-	axboe@kernel.dk,
-	pablo@netfilter.org,
-	laforge@gnumonks.org
-Cc: linux-block@vger.kernel.org,
-	nbd@other.debian.org,
-	osmocom-net-gprs@lists.osmocom.org,
-	netdev@vger.kernel.org,
-	Stephen Hemminger <sthemmin@microsoft.com>,
-	Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH net-next 1/2] nbd: constify nla_policy
-Date: Wed, 18 Jul 2018 09:32:43 -0700
-Message-Id: <20180718163244.1590-2-sthemmin@microsoft.com>
-In-Reply-To: <20180718163244.1590-1-sthemmin@microsoft.com>
-References: <20180718163244.1590-1-sthemmin@microsoft.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:58898 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2387871AbeGWOkv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Jul 2018 10:40:51 -0400
+Subject: Re: [PATCH] bcache: set max writeback rate when I/O request is idle
+To: Kai Krakow <kai@kaishome.de>
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        stable@vger.kernel.org, Michael Lyle <mlyle@lyle.org>
+References: <20180722161316.2347-1-colyli@suse.de>
+ <CAC2ZOYvhJnMFm2-wFo1xPkJFTtB_xYo7EbfUZyvw07mvG5+Ahg@mail.gmail.com>
+From: Coly Li <colyli@suse.de>
+Message-ID: <b535d904-7d8a-15c3-c85b-d915ae2ceb18@suse.de>
+Date: Mon, 23 Jul 2018 21:39:19 +0800
+MIME-Version: 1.0
+In-Reply-To: <CAC2ZOYvhJnMFm2-wFo1xPkJFTtB_xYo7EbfUZyvw07mvG5+Ahg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The netlink policy should be const like other drivers.
+On 2018/7/23 9:14 PM, Kai Krakow wrote:
+> 2018-07-22 18:13 GMT+02:00 Coly Li <colyli@suse.de>:
+>> Commit b1092c9af9ed ("bcache: allow quick writeback when backing idle")
+>> allows the writeback rate to be faster if there is no I/O request on a
+>> bcache device. It works well if there is only one bcache device attached
+>> to the cache set. If there are many bcache devices attached to a cache
+>> set, it may introduce performance regression because multiple faster
+>> writeback threads of the idle bcache devices will compete the btree level
+>> locks with the bcache device who have I/O requests coming.
+>>
+>> This patch fixes the above issue by only permitting fast writebac when
+>> all bcache devices attached on the cache set are idle. And if one of the
+>> bcache devices has new I/O request coming, minimized all writeback
+>> throughput immediately and let PI controller __update_writeback_rate()
+>> to decide the upcoming writeback rate for each bcache device.
+>>
+>> Also when all bcache devices are idle, limited wrieback rate to a small
+>> number is wast of thoughput, especially when backing devices are slower
+>> non-rotation devices (e.g. SATA SSD). This patch sets a max writeback
+>> rate for each backing device if the whole cache set is idle. A faster
+>> writeback rate in idle time means new I/Os may have more available space
+>> for dirty data, and people may observe a better write performance then.
+>>
+>> Please note bcache may change its cache mode in run time, and this patch
+>> still works if the cache mode is switched from writeback mode and there
+>> is still dirty data on cache.
+> 
+> Running with this patch on 4.17, I see reduced IO lags in desktop
+> usage during heavy writes. The reduction is minor but noticeable. The
+> small short IO lags seem to be fixed with this but I still see the
+> stalls with long lags in desktop usage. I don't address those to
+> bcache, tho. This seems more like an issue resulting from using bees
+> on btrfs.
+> 
+> 
+>> Fixes: Commit b1092c9af9ed ("bcache: allow quick writeback when backing idle")
+>> Cc: stable@vger.kernel.org #4.16+
+>> Signed-off-by: Coly Li <colyli@suse.de>
+>> Cc: Michael Lyle <mlyle@lyle.org>
+> 
 
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
----
- drivers/block/nbd.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Hi Kai,
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 74a05561b620..e07401d3901d 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1571,7 +1571,7 @@ static int find_free_cb(int id, void *ptr, void *data)
- }
- 
- /* Netlink interface. */
--static struct nla_policy nbd_attr_policy[NBD_ATTR_MAX + 1] = {
-+static const struct nla_policy nbd_attr_policy[NBD_ATTR_MAX + 1] = {
- 	[NBD_ATTR_INDEX]		=	{ .type = NLA_U32 },
- 	[NBD_ATTR_SIZE_BYTES]		=	{ .type = NLA_U64 },
- 	[NBD_ATTR_BLOCK_SIZE_BYTES]	=	{ .type = NLA_U64 },
-@@ -1583,14 +1583,14 @@ static struct nla_policy nbd_attr_policy[NBD_ATTR_MAX + 1] = {
- 	[NBD_ATTR_DEVICE_LIST]		=	{ .type = NLA_NESTED},
- };
- 
--static struct nla_policy nbd_sock_policy[NBD_SOCK_MAX + 1] = {
-+static const struct nla_policy nbd_sock_policy[NBD_SOCK_MAX + 1] = {
- 	[NBD_SOCK_FD]			=	{ .type = NLA_U32 },
- };
- 
- /* We don't use this right now since we don't parse the incoming list, but we
-  * still want it here so userspace knows what to expect.
-  */
--static struct nla_policy __attribute__((unused))
-+static const struct nla_policy __attribute__((unused))
- nbd_device_policy[NBD_DEVICE_ATTR_MAX + 1] = {
- 	[NBD_DEVICE_INDEX]		=	{ .type = NLA_U32 },
- 	[NBD_DEVICE_CONNECTED]		=	{ .type = NLA_U8 },
--- 
-2.18.0
+> Tested-by: Kai Krakow <kai@kaishome.de>
+> 
+
+Thank you for the testing and information sharing, very helpful :-)
+
+Coly Li
+
+> 
+>> ---
+>>  drivers/md/bcache/bcache.h    |  9 +---
+>>  drivers/md/bcache/request.c   | 42 ++++++++++++++-
+>>  drivers/md/bcache/sysfs.c     | 14 +++--
+>>  drivers/md/bcache/util.c      |  2 +-
+>>  drivers/md/bcache/util.h      |  2 +-
+>>  drivers/md/bcache/writeback.c | 98 +++++++++++++++++++++++++----------
+>>  6 files changed, 126 insertions(+), 41 deletions(-)
+[snip]
