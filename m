@@ -1,45 +1,60 @@
-Return-Path: <prvs=7421cc28f=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v4 0/2] Ensure that a request queue is dissociated from the cgroup controller
-Date: Mon, 30 Jul 2018 14:10:54 -0700
-Message-Id: <20180730211056.18570-1-bart.vanassche@wdc.com>
+Return-Path: <keescook@google.com>
+MIME-Version: 1.0
+Sender: keescook@google.com
+In-Reply-To: <1bdc706ae86039c4ffcff39698251424d54af116.camel@perches.com>
+References: <20180724164936.37477-1-keescook@chromium.org> <20180724164936.37477-19-keescook@chromium.org>
+ <1bdc706ae86039c4ffcff39698251424d54af116.camel@perches.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Tue, 24 Jul 2018 10:53:26 -0700
+Message-ID: <CAGXu5j+gTpZFkXE8XSNgYPEpBT4+hCb1kzv8s8KrSTerHyKp6w@mail.gmail.com>
+Subject: Re: [PATCH v6 18/18] crypto: Remove AHASH_REQUEST_ON_STACK
+To: Joe Perches <joe@perches.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Arnd Bergmann <arnd@arndb.de>,
+	Eric Biggers <ebiggers@google.com>, "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	Alasdair Kergon <agk@redhat.com>, Rabin Vincent <rabinv@axis.com>, Tim Chen <tim.c.chen@linux.intel.com>,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>, Pavel Machek <pavel@ucw.cz>, Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>,
+	Philipp Reisner <philipp.reisner@linbit.com>, Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>, Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Mike Snitzer <snitzer@redhat.com>, Paul Mackerras <paulus@samba.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, David Howells <dhowells@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>, Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+	Jia-Ju Bai <baijiaju1990@gmail.com>, Andrew Morton <akpm@linux-foundation.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>, Josh Poimboeuf <jpoimboe@redhat.com>,
+	David Woodhouse <dwmw@amazon.co.uk>, Will Deacon <will.deacon@arm.com>,
+	device-mapper development <dm-devel@redhat.com>, Linux PM list <linux-pm@vger.kernel.org>,
+	linux-crypto <linux-crypto@vger.kernel.org>, drbd-dev@lists.linbit.com,
+	linux-block <linux-block@vger.kernel.org>, qat-linux@intel.com,
+	linux-ppp@vger.kernel.org, Network Development <netdev@vger.kernel.org>,
+	"open list:ANDROID DRIVERS" <devel@driverdev.osuosl.org>, linux-afs@lists.infradead.org,
+	linux-wireless <linux-wireless@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
+On Tue, Jul 24, 2018 at 10:31 AM, Joe Perches <joe@perches.com> wrote:
+> On Tue, 2018-07-24 at 09:49 -0700, Kees Cook wrote:
+>> All users of AHASH_REQUEST_ON_STACK have been removed from the kernel, so
+>> drop it entirely so no VLAs get reintroduced by future users.
+>
+> checkpatch has a test for that.
+> It could now be removed as well.
+> ---
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index 34e4683de7a3..a3517334d661 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -796,7 +796,7 @@ our $declaration_macros = qr{(?x:
+>         (?:$Storage\s+)?(?:[A-Z_][A-Z0-9]*_){0,2}(?:DEFINE|DECLARE)(?:_[A-Z0-9]+){1,6}\s*\(|
+>         (?:$Storage\s+)?[HLP]?LIST_HEAD\s*\(|
+>         (?:$Storage\s+)?${Type}\s+uninitialized_var\s*\(|
+> -       (?:SKCIPHER_REQUEST|SHASH_DESC|AHASH_REQUEST)_ON_STACK\s*\(
+> +       (?:SKCIPHER_REQUEST|SHASH_DESC)_ON_STACK\s*\(
+>  )};
 
-Several block drivers call alloc_disk() followed by put_disk() if something
-fails before device_add_disk() is called without calling blk_cleanup_queue().
-Make sure that also for this scenario a request queue is dissociated from the
-cgroup controller. This patch avoids that loading the parport_pc, paride and
-pf drivers trigger a kernel crash. Since this patch series fixes a regression,
-please consider these patches for kernel v4.19.
+Ah! Cool. I've added this now.
 
-Thanks,
-
-Bart.
-
-Changes between v3 and v4:
-- Added "Cc: stable" tags.
-
-Changes between v2 and v3:
-- Avoid code duplication by introducing a new helper function.
-
-Changes between v1 and v2:
-- Fixed the build for CONFIG_BLK_CGROUP=n.
-
-Bart Van Assche (2):
-  block: Introduce blk_exit_queue()
-  block: Ensure that a request queue is dissociated from the cgroup
-    controller
-
- block/blk-core.c  | 54 ++++++++++++++++++++++++++---------------------
- block/blk-sysfs.c | 25 ++++++++++++++++++++++
- block/blk.h       |  1 +
- 3 files changed, 56 insertions(+), 24 deletions(-)
+-Kees
 
 -- 
-2.18.0
+Kees Cook
+Pixel Security
