@@ -1,101 +1,172 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
+Return-Path: <keescook@chromium.org>
+Return-Path: <keescook@chromium.org>
+From: Kees Cook <keescook@chromium.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Kees Cook <keescook@chromium.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Eric Biggers <ebiggers@google.com>,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	Alasdair Kergon <agk@redhat.com>,
+	Rabin Vincent <rabinv@axis.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Pavel Machek <pavel@ucw.cz>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	x86@kernel.org,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Paul Mackerras <paulus@samba.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	David Howells <dhowells@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+	Jia-Ju Bai <baijiaju1990@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Will Deacon <will.deacon@arm.com>,
+	dm-devel@redhat.com,
+	linux-pm@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
 	linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>,
-	"Ed L . Cachin" <ed.cashin@acm.org>
-Subject: [PATCH 4/6] aoe: use device_add_disk_with_groups()
-Date: Mon, 30 Jul 2018 09:12:25 +0200
-Message-Id: <20180730071227.22887-5-hare@suse.de>
-In-Reply-To: <20180730071227.22887-1-hare@suse.de>
-References: <20180730071227.22887-1-hare@suse.de>
+	qat-linux@intel.com,
+	linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devel@driverdev.osuosl.org,
+	linux-afs@lists.infradead.org,
+	linux-wireless@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v6 09/18] ppp: mppe: Remove VLA usage
+Date: Tue, 24 Jul 2018 09:49:27 -0700
+Message-Id: <20180724164936.37477-10-keescook@chromium.org>
+In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
+References: <20180724164936.37477-1-keescook@chromium.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Use device_add_disk_with_groups() to avoid a race condition with
-udev during startup.
+In the quest to remove all stack VLA usage from the kernel[1], this
+removes the discouraged use of AHASH_REQUEST_ON_STACK (and associated
+VLA) by switching to shash directly and keeping the associated descriptor
+allocated with the regular state on the heap.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-Cc: Ed L. Cachin <ed.cashin@acm.org>
+[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Acked-by: Arnd Bergmann <arnd@arndb.de>
 ---
- drivers/block/aoe/aoe.h    |  1 -
- drivers/block/aoe/aoeblk.c | 21 +++++++--------------
- drivers/block/aoe/aoedev.c |  1 -
- 3 files changed, 7 insertions(+), 16 deletions(-)
+ drivers/net/ppp/ppp_mppe.c | 56 ++++++++++++++++++++------------------
+ 1 file changed, 30 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/block/aoe/aoe.h b/drivers/block/aoe/aoe.h
-index c0ebda1283cc..015c68017a1c 100644
---- a/drivers/block/aoe/aoe.h
-+++ b/drivers/block/aoe/aoe.h
-@@ -201,7 +201,6 @@ int aoeblk_init(void);
- void aoeblk_exit(void);
- void aoeblk_gdalloc(void *);
- void aoedisk_rm_debugfs(struct aoedev *d);
--void aoedisk_rm_sysfs(struct aoedev *d);
- 
- int aoechr_init(void);
- void aoechr_exit(void);
-diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
-index 429ebb84b592..ff770e7d9e52 100644
---- a/drivers/block/aoe/aoeblk.c
-+++ b/drivers/block/aoe/aoeblk.c
-@@ -177,10 +177,15 @@ static struct attribute *aoe_attrs[] = {
- 	NULL,
- };
- 
--static const struct attribute_group attr_group = {
-+static const struct attribute_group aoe_attr_group = {
- 	.attrs = aoe_attrs,
- };
- 
-+static const struct attribute_group *aoe_attr_groups[] = {
-+	&aoe_attr_group,
-+	NULL,
-+};
-+
- static const struct file_operations aoe_debugfs_fops = {
- 	.open = aoe_debugfs_open,
- 	.read = seq_read,
-@@ -220,17 +225,6 @@ aoedisk_rm_debugfs(struct aoedev *d)
+diff --git a/drivers/net/ppp/ppp_mppe.c b/drivers/net/ppp/ppp_mppe.c
+index 6c7fd98cb00a..a205750b431b 100644
+--- a/drivers/net/ppp/ppp_mppe.c
++++ b/drivers/net/ppp/ppp_mppe.c
+@@ -96,7 +96,7 @@ static inline void sha_pad_init(struct sha_pad *shapad)
+  */
+ struct ppp_mppe_state {
+ 	struct crypto_skcipher *arc4;
+-	struct crypto_ahash *sha1;
++	struct shash_desc *sha1;
+ 	unsigned char *sha1_digest;
+ 	unsigned char master_key[MPPE_MAX_KEY_LEN];
+ 	unsigned char session_key[MPPE_MAX_KEY_LEN];
+@@ -136,25 +136,16 @@ struct ppp_mppe_state {
+  */
+ static void get_new_key_from_sha(struct ppp_mppe_state * state)
+ {
+-	AHASH_REQUEST_ON_STACK(req, state->sha1);
+-	struct scatterlist sg[4];
+-	unsigned int nbytes;
+-
+-	sg_init_table(sg, 4);
+-
+-	nbytes = setup_sg(&sg[0], state->master_key, state->keylen);
+-	nbytes += setup_sg(&sg[1], sha_pad->sha_pad1,
+-			   sizeof(sha_pad->sha_pad1));
+-	nbytes += setup_sg(&sg[2], state->session_key, state->keylen);
+-	nbytes += setup_sg(&sg[3], sha_pad->sha_pad2,
+-			   sizeof(sha_pad->sha_pad2));
+-
+-	ahash_request_set_tfm(req, state->sha1);
+-	ahash_request_set_callback(req, 0, NULL, NULL);
+-	ahash_request_set_crypt(req, sg, state->sha1_digest, nbytes);
+-
+-	crypto_ahash_digest(req);
+-	ahash_request_zero(req);
++	crypto_shash_init(state->sha1);
++	crypto_shash_update(state->sha1, state->master_key,
++			    state->keylen);
++	crypto_shash_update(state->sha1, sha_pad->sha_pad1,
++			    sizeof(sha_pad->sha_pad1));
++	crypto_shash_update(state->sha1, state->session_key,
++			    state->keylen);
++	crypto_shash_update(state->sha1, sha_pad->sha_pad2,
++			    sizeof(sha_pad->sha_pad2));
++	crypto_shash_final(state->sha1, state->sha1_digest);
  }
  
- static int
--aoedisk_add_sysfs(struct aoedev *d)
--{
--	return sysfs_create_group(&disk_to_dev(d->gd)->kobj, &attr_group);
--}
--void
--aoedisk_rm_sysfs(struct aoedev *d)
--{
--	sysfs_remove_group(&disk_to_dev(d->gd)->kobj, &attr_group);
--}
--
--static int
- aoeblk_open(struct block_device *bdev, fmode_t mode)
+ /*
+@@ -200,6 +191,7 @@ static void mppe_rekey(struct ppp_mppe_state * state, int initial_key)
+ static void *mppe_alloc(unsigned char *options, int optlen)
  {
- 	struct aoedev *d = bdev->bd_disk->private_data;
-@@ -417,8 +411,7 @@ aoeblk_gdalloc(void *vp)
+ 	struct ppp_mppe_state *state;
++	struct crypto_shash *shash;
+ 	unsigned int digestsize;
  
- 	spin_unlock_irqrestore(&d->lock, flags);
+ 	if (optlen != CILEN_MPPE + sizeof(state->master_key) ||
+@@ -217,13 +209,21 @@ static void *mppe_alloc(unsigned char *options, int optlen)
+ 		goto out_free;
+ 	}
  
--	add_disk(gd);
--	aoedisk_add_sysfs(d);
-+	device_add_disk(NULL, gd, aoe_attr_groups);
- 	aoedisk_add_debugfs(d);
+-	state->sha1 = crypto_alloc_ahash("sha1", 0, CRYPTO_ALG_ASYNC);
+-	if (IS_ERR(state->sha1)) {
+-		state->sha1 = NULL;
++	shash = crypto_alloc_shash("sha1", 0, 0);
++	if (IS_ERR(shash))
++		goto out_free;
++
++	state->sha1 = kmalloc(sizeof(*state->sha1) +
++				     crypto_shash_descsize(shash),
++			      GFP_KERNEL);
++	if (!state->sha1) {
++		crypto_free_shash(shash);
+ 		goto out_free;
+ 	}
++	state->sha1->tfm = shash;
++	state->sha1->flags = 0;
  
- 	spin_lock_irqsave(&d->lock, flags);
-diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
-index 697f735b07a4..d92fa1fe3580 100644
---- a/drivers/block/aoe/aoedev.c
-+++ b/drivers/block/aoe/aoedev.c
-@@ -275,7 +275,6 @@ freedev(struct aoedev *d)
- 	del_timer_sync(&d->timer);
- 	if (d->gd) {
- 		aoedisk_rm_debugfs(d);
--		aoedisk_rm_sysfs(d);
- 		del_gendisk(d->gd);
- 		put_disk(d->gd);
- 		blk_cleanup_queue(d->blkq);
+-	digestsize = crypto_ahash_digestsize(state->sha1);
++	digestsize = crypto_shash_digestsize(shash);
+ 	if (digestsize < MPPE_MAX_KEY_LEN)
+ 		goto out_free;
+ 
+@@ -246,7 +246,10 @@ static void *mppe_alloc(unsigned char *options, int optlen)
+ 
+ out_free:
+ 	kfree(state->sha1_digest);
+-	crypto_free_ahash(state->sha1);
++	if (state->sha1) {
++		crypto_free_shash(state->sha1->tfm);
++		kzfree(state->sha1);
++	}
+ 	crypto_free_skcipher(state->arc4);
+ 	kfree(state);
+ out:
+@@ -261,7 +264,8 @@ static void mppe_free(void *arg)
+ 	struct ppp_mppe_state *state = (struct ppp_mppe_state *) arg;
+ 	if (state) {
+ 		kfree(state->sha1_digest);
+-		crypto_free_ahash(state->sha1);
++		crypto_free_shash(state->sha1->tfm);
++		kzfree(state->sha1);
+ 		crypto_free_skcipher(state->arc4);
+ 		kfree(state);
+ 	}
 -- 
-2.12.3
+2.17.1
