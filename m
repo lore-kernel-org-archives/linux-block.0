@@ -1,134 +1,156 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:52596 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754018AbeGIW4o (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jul 2018 18:56:44 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Omar Sandoval <osandov@fb.com>
-Cc: linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH blktests v3 0/6] Add SRP initiator driver tests
-Date: Mon,  9 Jul 2018 15:56:37 -0700
-Message-Id: <20180709225643.10537-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <keescook@chromium.org>
+Return-Path: <keescook@chromium.org>
+From: Kees Cook <keescook@chromium.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Kees Cook <keescook@chromium.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Eric Biggers <ebiggers@google.com>,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	Alasdair Kergon <agk@redhat.com>,
+	Rabin Vincent <rabinv@axis.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Pavel Machek <pavel@ucw.cz>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	x86@kernel.org,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Paul Mackerras <paulus@samba.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	David Howells <dhowells@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+	Jia-Ju Bai <baijiaju1990@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Will Deacon <will.deacon@arm.com>,
+	dm-devel@redhat.com,
+	linux-pm@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	linux-block@vger.kernel.org,
+	qat-linux@intel.com,
+	linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devel@driverdev.osuosl.org,
+	linux-afs@lists.infradead.org,
+	linux-wireless@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v6 16/18] rxrpc: Reuse SKCIPHER_REQUEST_ON_STACK buffer
+Date: Tue, 24 Jul 2018 09:49:34 -0700
+Message-Id: <20180724164936.37477-17-keescook@chromium.org>
+In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
+References: <20180724164936.37477-1-keescook@chromium.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Hello Omar,
+The use of SKCIPHER_REQUEST_ON_STACK() will trigger FRAME_WARN warnings
+(when less than 2048) once the VLA is no longer hidden from the check:
 
-As promised during LSF/MM, I have converted the srp-tests software to the
-blktests framework. Please consider this patch series for inclusion in the
-official blktests repository. This patch series is also available as a
-github pull request, namely https://github.com/osandov/blktests/pull/24.
+net/rxrpc/rxkad.c:398:1: warning: the frame size of 1152 bytes is larger than 1024 bytes [-Wframe-larger-than=]
+net/rxrpc/rxkad.c:242:1: warning: the frame size of 1152 bytes is larger than 1024 bytes [-Wframe-larger-than=]
 
-Thanks,
+This passes the initial SKCIPHER_REQUEST_ON_STACK allocation to the leaf
+functions for reuse. Two requests allocated on the stack is not needed
+when only one is used at a time.
 
-Bart.
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Acked-by: Arnd Bergmann <arnd@arndb.de>
+---
+ net/rxrpc/rxkad.c | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
 
-Changes compared to v2:
-- Instead of documenting which kernel configuration options are required in
-  README.md, skip the SRP tests if not all required kernel configuration
-  options have been set.
-- Renamed tests/srp/functions into tests/srp/rc.
-- Made sure that the SRP test cleanup code is run if a test is interrupted
-  with Ctrl-C.
-- Fixed the syntax of the fio command line: changed -rw=... into --rw=...
-- Suppressed the "Unloaded the ... kernel module" messages.
-- Moved the multipath configuration data from README.md into
-  tests/srp/multipath.conf. With this change /etc/multipath.conf can be a
-  soft link and copy/pasting multipath configuration data is no longer required.
-- multipathd is now started and stopped during each test instead of requiring
-  that it is started before running any tests.
-- Added "find_multipaths no" to multipath.conf for Arch Linux.
-- The null_blk driver is now used instead of brd.
-- If a PCI RDMA adapter is present in the test system, the SRP initiator not
-  only connects over the rdma_rxe driver but also uses the loopback
-  functionality of the PCI RDMA adapter.
-- A list of which SRP connections have been created is written into the $FULL
-  file.
-- It is no longer attempted to associate the rdma_rxe driver with IPoIB network
-  interfaces.
-
-Changes compared to v1:
-- Left out the patches from version one of this series that are already
-  upstream.
-- Renamed tests/srp/group into tests/srp/rc.
-- The SRP tests do not start if LIO was already configured (reported by Ming).
-- Documented the SRP test requirements in README.md.
-
-Bart Van Assche (6):
-  dir-locals.el: Add c-mode settings
-  check: Make $FULL an absolute path
-  src/Makefile: Introduce the C_TARGETS variable
-  src/Makefile: Move -Wall from the C compilation rule to the $(CFLAGS)
-    variable
-  Add the discontiguous-io test program
-  Add tests for the SRP initiator and target drivers
-
- .dir-locals.el           |    6 +-
- README.md                |   13 +
- check                    |    2 +-
- common/rc                |   17 +
- src/.gitignore           |    1 +
- src/Makefile             |   17 +-
- src/discontiguous-io.cpp |  340 +++++++++
- tests/srp/001            |   73 ++
- tests/srp/001.out        |    3 +
- tests/srp/002            |   50 ++
- tests/srp/002.out        |    2 +
- tests/srp/003            |   50 ++
- tests/srp/003.out        |    2 +
- tests/srp/004            |   50 ++
- tests/srp/004.out        |    2 +
- tests/srp/005            |   41 ++
- tests/srp/005.out        |    2 +
- tests/srp/006            |   41 ++
- tests/srp/006.out        |    2 +
- tests/srp/007            |   41 ++
- tests/srp/007.out        |    2 +
- tests/srp/008            |   40 ++
- tests/srp/008.out        |    2 +
- tests/srp/009            |   41 ++
- tests/srp/009.out        |    2 +
- tests/srp/010            |   41 ++
- tests/srp/010.out        |    2 +
- tests/srp/011            |   46 ++
- tests/srp/011.out        |    2 +
- tests/srp/012            |   53 ++
- tests/srp/012.out        |    2 +
- tests/srp/013            |   49 ++
- tests/srp/013.out        |    3 +
- tests/srp/multipath.conf |   27 +
- tests/srp/rc             | 1433 ++++++++++++++++++++++++++++++++++++++
- 35 files changed, 2493 insertions(+), 7 deletions(-)
- create mode 100644 src/discontiguous-io.cpp
- create mode 100755 tests/srp/001
- create mode 100644 tests/srp/001.out
- create mode 100755 tests/srp/002
- create mode 100644 tests/srp/002.out
- create mode 100755 tests/srp/003
- create mode 100644 tests/srp/003.out
- create mode 100755 tests/srp/004
- create mode 100644 tests/srp/004.out
- create mode 100755 tests/srp/005
- create mode 100644 tests/srp/005.out
- create mode 100755 tests/srp/006
- create mode 100644 tests/srp/006.out
- create mode 100755 tests/srp/007
- create mode 100644 tests/srp/007.out
- create mode 100755 tests/srp/008
- create mode 100644 tests/srp/008.out
- create mode 100755 tests/srp/009
- create mode 100644 tests/srp/009.out
- create mode 100755 tests/srp/010
- create mode 100644 tests/srp/010.out
- create mode 100755 tests/srp/011
- create mode 100644 tests/srp/011.out
- create mode 100755 tests/srp/012
- create mode 100644 tests/srp/012.out
- create mode 100755 tests/srp/013
- create mode 100644 tests/srp/013.out
- create mode 100644 tests/srp/multipath.conf
- create mode 100755 tests/srp/rc
-
+diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
+index 278ac0807a60..6393391fac86 100644
+--- a/net/rxrpc/rxkad.c
++++ b/net/rxrpc/rxkad.c
+@@ -146,10 +146,10 @@ static int rxkad_prime_packet_security(struct rxrpc_connection *conn)
+ static int rxkad_secure_packet_auth(const struct rxrpc_call *call,
+ 				    struct sk_buff *skb,
+ 				    u32 data_size,
+-				    void *sechdr)
++				    void *sechdr,
++				    struct skcipher_request *req)
+ {
+ 	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
+-	SKCIPHER_REQUEST_ON_STACK(req, call->conn->cipher);
+ 	struct rxkad_level1_hdr hdr;
+ 	struct rxrpc_crypt iv;
+ 	struct scatterlist sg;
+@@ -183,12 +183,12 @@ static int rxkad_secure_packet_auth(const struct rxrpc_call *call,
+ static int rxkad_secure_packet_encrypt(const struct rxrpc_call *call,
+ 				       struct sk_buff *skb,
+ 				       u32 data_size,
+-				       void *sechdr)
++				       void *sechdr,
++				       struct skcipher_request *req)
+ {
+ 	const struct rxrpc_key_token *token;
+ 	struct rxkad_level2_hdr rxkhdr;
+ 	struct rxrpc_skb_priv *sp;
+-	SKCIPHER_REQUEST_ON_STACK(req, call->conn->cipher);
+ 	struct rxrpc_crypt iv;
+ 	struct scatterlist sg[16];
+ 	struct sk_buff *trailer;
+@@ -296,11 +296,12 @@ static int rxkad_secure_packet(struct rxrpc_call *call,
+ 		ret = 0;
+ 		break;
+ 	case RXRPC_SECURITY_AUTH:
+-		ret = rxkad_secure_packet_auth(call, skb, data_size, sechdr);
++		ret = rxkad_secure_packet_auth(call, skb, data_size, sechdr,
++					       req);
+ 		break;
+ 	case RXRPC_SECURITY_ENCRYPT:
+ 		ret = rxkad_secure_packet_encrypt(call, skb, data_size,
+-						  sechdr);
++						  sechdr, req);
+ 		break;
+ 	default:
+ 		ret = -EPERM;
+@@ -316,10 +317,10 @@ static int rxkad_secure_packet(struct rxrpc_call *call,
+  */
+ static int rxkad_verify_packet_1(struct rxrpc_call *call, struct sk_buff *skb,
+ 				 unsigned int offset, unsigned int len,
+-				 rxrpc_seq_t seq)
++				 rxrpc_seq_t seq,
++				 struct skcipher_request *req)
+ {
+ 	struct rxkad_level1_hdr sechdr;
+-	SKCIPHER_REQUEST_ON_STACK(req, call->conn->cipher);
+ 	struct rxrpc_crypt iv;
+ 	struct scatterlist sg[16];
+ 	struct sk_buff *trailer;
+@@ -402,11 +403,11 @@ static int rxkad_verify_packet_1(struct rxrpc_call *call, struct sk_buff *skb,
+  */
+ static int rxkad_verify_packet_2(struct rxrpc_call *call, struct sk_buff *skb,
+ 				 unsigned int offset, unsigned int len,
+-				 rxrpc_seq_t seq)
++				 rxrpc_seq_t seq,
++				 struct skcipher_request *req)
+ {
+ 	const struct rxrpc_key_token *token;
+ 	struct rxkad_level2_hdr sechdr;
+-	SKCIPHER_REQUEST_ON_STACK(req, call->conn->cipher);
+ 	struct rxrpc_crypt iv;
+ 	struct scatterlist _sg[4], *sg;
+ 	struct sk_buff *trailer;
+@@ -549,9 +550,9 @@ static int rxkad_verify_packet(struct rxrpc_call *call, struct sk_buff *skb,
+ 	case RXRPC_SECURITY_PLAIN:
+ 		return 0;
+ 	case RXRPC_SECURITY_AUTH:
+-		return rxkad_verify_packet_1(call, skb, offset, len, seq);
++		return rxkad_verify_packet_1(call, skb, offset, len, seq, req);
+ 	case RXRPC_SECURITY_ENCRYPT:
+-		return rxkad_verify_packet_2(call, skb, offset, len, seq);
++		return rxkad_verify_packet_2(call, skb, offset, len, seq, req);
+ 	default:
+ 		return -ENOANO;
+ 	}
 -- 
-2.18.0
+2.17.1
