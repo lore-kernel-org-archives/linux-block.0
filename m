@@ -1,120 +1,19 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: colyli@suse.de,
-	axboe@kernel.dk,
-	linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 9/9] bcache: stop using the deprecated get_seconds()
-Date: Thu, 26 Jul 2018 12:17:41 +0800
-Message-Id: <20180726041741.1669-10-colyli@suse.de>
-In-Reply-To: <20180726041741.1669-1-colyli@suse.de>
-References: <20180726041741.1669-1-colyli@suse.de>
+Return-Path: <hch@lst.de>
+Date: Tue, 24 Jul 2018 15:56:27 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Max Gurtovoy <maxg@mellanox.com>
+Cc: keith.busch@intel.com, linux-nvme@lists.infradead.org, sagi@grimberg.me,
+	hch@lst.de, martin.petersen@oracle.com, linux-block@vger.kernel.org,
+	axboe@kernel.dk, vladimirk@mellanox.com
+Subject: Re: [PATCH 3/3] nvme: use blk API to remap ref tags for IOs with
+	metadata
+Message-ID: <20180724135627.GC29918@lst.de>
+References: <1532439222-5668-1-git-send-email-maxg@mellanox.com> <1532439222-5668-3-git-send-email-maxg@mellanox.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1532439222-5668-3-git-send-email-maxg@mellanox.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Arnd Bergmann <arnd@arndb.de>
+Looks good,
 
-The get_seconds function is deprecated now since it returns a 32-bit
-value that will eventually overflow, and we are replacing it throughout
-the kernel with ktime_get_seconds() or ktime_get_real_seconds() that
-return a time64_t.
-
-bcache uses get_seconds() to read the current system time and store it in
-the superblock as well as in uuid_entry structures that are user visible.
-
-Unfortunately, the two structures in are still limited to 32 bits, so this
-won't fix any real problems but will still overflow in year 2106. Let's
-at least document that properly, in case we get an updated format in the
-future it can be fixed. We still have a long time before the overflow
-and checking the tools at https://github.com/koverstreet/bcache-tools
-reveals no access to any of them.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/super.c   | 12 ++++++------
- include/uapi/linux/bcache.h |  4 ++--
- 2 files changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 40fe26fef00f..e0a92104ca23 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -181,7 +181,7 @@ static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
- 		goto err;
- 	}
- 
--	sb->last_mount = get_seconds();
-+	sb->last_mount = (u32)ktime_get_real_seconds();
- 	err = NULL;
- 
- 	get_page(bh->b_page);
-@@ -701,7 +701,7 @@ static void bcache_device_detach(struct bcache_device *d)
- 
- 		SET_UUID_FLASH_ONLY(u, 0);
- 		memcpy(u->uuid, invalid_uuid, 16);
--		u->invalidated = cpu_to_le32(get_seconds());
-+		u->invalidated = cpu_to_le32((u32)ktime_get_real_seconds());
- 		bch_uuid_write(d->c);
- 	}
- 
-@@ -1033,7 +1033,7 @@ void bch_cached_dev_detach(struct cached_dev *dc)
- int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
- 			  uint8_t *set_uuid)
- {
--	uint32_t rtime = cpu_to_le32(get_seconds());
-+	uint32_t rtime = cpu_to_le32((u32)ktime_get_real_seconds());
- 	struct uuid_entry *u;
- 	struct cached_dev *exist_dc, *t;
- 
-@@ -1076,7 +1076,7 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
- 	    (BDEV_STATE(&dc->sb) == BDEV_STATE_STALE ||
- 	     BDEV_STATE(&dc->sb) == BDEV_STATE_NONE)) {
- 		memcpy(u->uuid, invalid_uuid, 16);
--		u->invalidated = cpu_to_le32(get_seconds());
-+		u->invalidated = cpu_to_le32((u32)ktime_get_real_seconds());
- 		u = NULL;
- 	}
- 
-@@ -1398,7 +1398,7 @@ int bch_flash_dev_create(struct cache_set *c, uint64_t size)
- 
- 	get_random_bytes(u->uuid, 16);
- 	memset(u->label, 0, 32);
--	u->first_reg = u->last_reg = cpu_to_le32(get_seconds());
-+	u->first_reg = u->last_reg = cpu_to_le32((u32)ktime_get_real_seconds());
- 
- 	SET_UUID_FLASH_ONLY(u, 1);
- 	u->sectors = size >> 9;
-@@ -1902,7 +1902,7 @@ static void run_cache_set(struct cache_set *c)
- 		goto err;
- 
- 	closure_sync(&cl);
--	c->sb.last_mount = get_seconds();
-+	c->sb.last_mount = (u32)ktime_get_real_seconds();
- 	bcache_write_super(c);
- 
- 	list_for_each_entry_safe(dc, t, &uncached_devices, list)
-diff --git a/include/uapi/linux/bcache.h b/include/uapi/linux/bcache.h
-index 821f71a2e48f..8d19e02d752a 100644
---- a/include/uapi/linux/bcache.h
-+++ b/include/uapi/linux/bcache.h
-@@ -195,7 +195,7 @@ struct cache_sb {
- 	};
- 	};
- 
--	__u32			last_mount;	/* time_t */
-+	__u32			last_mount;	/* time overflow in y2106 */
- 
- 	__u16			first_bucket;
- 	union {
-@@ -318,7 +318,7 @@ struct uuid_entry {
- 		struct {
- 			__u8	uuid[16];
- 			__u8	label[32];
--			__u32	first_reg;
-+			__u32	first_reg; /* time overflow in y2106 */
- 			__u32	last_reg;
- 			__u32	invalidated;
- 
--- 
-2.17.1
+Reviewed-by: Christoph Hellwig <hch@lst.de>
