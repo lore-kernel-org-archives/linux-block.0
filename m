@@ -1,99 +1,41 @@
-Return-Path: <keescook@chromium.org>
-Return-Path: <keescook@chromium.org>
-From: Kees Cook <keescook@chromium.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Kees Cook <keescook@chromium.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Eric Biggers <ebiggers@google.com>,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-	Alasdair Kergon <agk@redhat.com>,
-	Rabin Vincent <rabinv@axis.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Pavel Machek <pavel@ucw.cz>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	x86@kernel.org,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Paul Mackerras <paulus@samba.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	David Howells <dhowells@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
-	Jia-Ju Bai <baijiaju1990@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Will Deacon <will.deacon@arm.com>,
-	dm-devel@redhat.com,
-	linux-pm@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
+Return-Path: <BATV+c9ebeb9e9cafa2a765ab+5448+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Boaz Harrosh <ooo@electrozaur.com>,
 	linux-block@vger.kernel.org,
-	qat-linux@intel.com,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devel@driverdev.osuosl.org,
-	linux-afs@lists.infradead.org,
-	linux-wireless@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v6 01/18] crypto: xcbc: Remove VLA usage
-Date: Tue, 24 Jul 2018 09:49:19 -0700
-Message-Id: <20180724164936.37477-2-keescook@chromium.org>
-In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
-References: <20180724164936.37477-1-keescook@chromium.org>
+	linux-bcache@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 3/5] block: remove bio_clone_kmalloc
+Date: Tue, 24 Jul 2018 09:52:32 +0200
+Message-Id: <20180724075234.26861-4-hch@lst.de>
+In-Reply-To: <20180724075234.26861-1-hch@lst.de>
+References: <20180724075234.26861-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-In the quest to remove all stack VLA usage from the kernel[1], this uses
-the maximum blocksize and adds a sanity check. For xcbc, the blocksize
-must always be 16, so use that, since it's already being enforced during
-instantiation.
+Unused now.
 
-[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
-
-Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 ---
- crypto/xcbc.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ include/linux/bio.h | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/crypto/xcbc.c b/crypto/xcbc.c
-index 25c75af50d3f..c055f57fab11 100644
---- a/crypto/xcbc.c
-+++ b/crypto/xcbc.c
-@@ -57,15 +57,17 @@ struct xcbc_desc_ctx {
- 	u8 ctx[];
- };
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index ab221c517f4e..b861baa59454 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -443,12 +443,6 @@ static inline struct bio *bio_kmalloc(gfp_t gfp_mask, unsigned int nr_iovecs)
+ 	return bio_alloc_bioset(gfp_mask, nr_iovecs, NULL);
+ }
  
-+#define XCBC_BLOCKSIZE	16
-+
- static int crypto_xcbc_digest_setkey(struct crypto_shash *parent,
- 				     const u8 *inkey, unsigned int keylen)
- {
- 	unsigned long alignmask = crypto_shash_alignmask(parent);
- 	struct xcbc_tfm_ctx *ctx = crypto_shash_ctx(parent);
--	int bs = crypto_shash_blocksize(parent);
- 	u8 *consts = PTR_ALIGN(&ctx->ctx[0], alignmask + 1);
- 	int err = 0;
--	u8 key1[bs];
-+	u8 key1[XCBC_BLOCKSIZE];
-+	int bs = sizeof(key1);
+-static inline struct bio *bio_clone_kmalloc(struct bio *bio, gfp_t gfp_mask)
+-{
+-	return bio_clone_bioset(bio, gfp_mask, NULL);
+-
+-}
+-
+ extern blk_qc_t submit_bio(struct bio *);
  
- 	if ((err = crypto_cipher_setkey(ctx->child, inkey, keylen)))
- 		return err;
-@@ -212,7 +214,7 @@ static int xcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- 		return PTR_ERR(alg);
- 
- 	switch(alg->cra_blocksize) {
--	case 16:
-+	case XCBC_BLOCKSIZE:
- 		break;
- 	default:
- 		goto out_put_alg;
+ extern void bio_endio(struct bio *);
 -- 
-2.17.1
+2.18.0
