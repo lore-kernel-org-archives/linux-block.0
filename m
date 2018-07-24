@@ -43,65 +43,147 @@ Cc: Kees Cook <keescook@chromium.org>,
 	linux-afs@lists.infradead.org,
 	linux-wireless@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v6 05/18] crypto alg: Introduce generic max blocksize and alignmask
-Date: Tue, 24 Jul 2018 09:49:23 -0700
-Message-Id: <20180724164936.37477-6-keescook@chromium.org>
+Subject: [PATCH v6 15/18] staging: rtl8192e: ieee80211: Convert from ahash to shash
+Date: Tue, 24 Jul 2018 09:49:33 -0700
+Message-Id: <20180724164936.37477-16-keescook@chromium.org>
 In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
 References: <20180724164936.37477-1-keescook@chromium.org>
 List-ID: <linux-block@vger.kernel.org>
 
-In the quest to remove all stack VLA usage from the kernel[1], this
-exposes a new general upper bound on crypto blocksize and alignmask
-(higher than for the existing cipher limits) for VLA removal,
-and introduces new checks.
-
-At present, the highest cra_alignmask in the kernel is 63. The highest
-cra_blocksize is 144 (SHA3_224_BLOCK_SIZE, 18 8-byte words). For the
-new blocksize limit, I went with 160 (20 8-byte words).
+This is an identical change to the wireless/lib80211 of the same name.
+In preparing to remove all stack VLA usage from the kernel[1], this
+removes the discouraged use of AHASH_REQUEST_ON_STACK in favor of
+the smaller SHASH_DESC_ON_STACK by converting from ahash-wrapped-shash
+to direct shash. By removing a layer of indirection this both improves
+performance and reduces stack usage. The stack allocation will be made
+a fixed size in a later patch to the crypto subsystem.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- crypto/algapi.c         | 7 ++++++-
- include/crypto/algapi.h | 4 +++-
- 2 files changed, 9 insertions(+), 2 deletions(-)
+ drivers/staging/rtl8192e/rtllib_crypt_tkip.c | 56 ++++++++++----------
+ 1 file changed, 28 insertions(+), 28 deletions(-)
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index c0755cf4f53f..496fc51bf215 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -57,9 +57,14 @@ static int crypto_check_alg(struct crypto_alg *alg)
- 	if (alg->cra_alignmask & (alg->cra_alignmask + 1))
- 		return -EINVAL;
+diff --git a/drivers/staging/rtl8192e/rtllib_crypt_tkip.c b/drivers/staging/rtl8192e/rtllib_crypt_tkip.c
+index ae103b0b7a2a..9f18be14dda6 100644
+--- a/drivers/staging/rtl8192e/rtllib_crypt_tkip.c
++++ b/drivers/staging/rtl8192e/rtllib_crypt_tkip.c
+@@ -50,9 +50,9 @@ struct rtllib_tkip_data {
  
--	if (alg->cra_blocksize > PAGE_SIZE / 8)
-+	/* General maximums for all algs. */
-+	if (alg->cra_alignmask > MAX_ALGAPI_ALIGNMASK)
- 		return -EINVAL;
+ 	int key_idx;
+ 	struct crypto_skcipher *rx_tfm_arc4;
+-	struct crypto_ahash *rx_tfm_michael;
++	struct crypto_shash *rx_tfm_michael;
+ 	struct crypto_skcipher *tx_tfm_arc4;
+-	struct crypto_ahash *tx_tfm_michael;
++	struct crypto_shash *tx_tfm_michael;
+ 	/* scratch buffers for virt_to_page() (crypto API) */
+ 	u8 rx_hdr[16];
+ 	u8 tx_hdr[16];
+@@ -74,8 +74,7 @@ static void *rtllib_tkip_init(int key_idx)
+ 		goto fail;
+ 	}
  
-+	if (alg->cra_blocksize > MAX_ALGAPI_BLOCKSIZE)
-+		return -EINVAL;
+-	priv->tx_tfm_michael = crypto_alloc_ahash("michael_mic", 0,
+-						  CRYPTO_ALG_ASYNC);
++	priv->tx_tfm_michael = crypto_alloc_shash("michael_mic", 0, 0);
+ 	if (IS_ERR(priv->tx_tfm_michael)) {
+ 		pr_debug("Could not allocate crypto API michael_mic\n");
+ 		priv->tx_tfm_michael = NULL;
+@@ -90,8 +89,7 @@ static void *rtllib_tkip_init(int key_idx)
+ 		goto fail;
+ 	}
+ 
+-	priv->rx_tfm_michael = crypto_alloc_ahash("michael_mic", 0,
+-						  CRYPTO_ALG_ASYNC);
++	priv->rx_tfm_michael = crypto_alloc_shash("michael_mic", 0, 0);
+ 	if (IS_ERR(priv->rx_tfm_michael)) {
+ 		pr_debug("Could not allocate crypto API michael_mic\n");
+ 		priv->rx_tfm_michael = NULL;
+@@ -101,9 +99,9 @@ static void *rtllib_tkip_init(int key_idx)
+ 
+ fail:
+ 	if (priv) {
+-		crypto_free_ahash(priv->tx_tfm_michael);
++		crypto_free_shash(priv->tx_tfm_michael);
+ 		crypto_free_skcipher(priv->tx_tfm_arc4);
+-		crypto_free_ahash(priv->rx_tfm_michael);
++		crypto_free_shash(priv->rx_tfm_michael);
+ 		crypto_free_skcipher(priv->rx_tfm_arc4);
+ 		kfree(priv);
+ 	}
+@@ -117,9 +115,9 @@ static void rtllib_tkip_deinit(void *priv)
+ 	struct rtllib_tkip_data *_priv = priv;
+ 
+ 	if (_priv) {
+-		crypto_free_ahash(_priv->tx_tfm_michael);
++		crypto_free_shash(_priv->tx_tfm_michael);
+ 		crypto_free_skcipher(_priv->tx_tfm_arc4);
+-		crypto_free_ahash(_priv->rx_tfm_michael);
++		crypto_free_shash(_priv->rx_tfm_michael);
+ 		crypto_free_skcipher(_priv->rx_tfm_arc4);
+ 	}
+ 	kfree(priv);
+@@ -504,29 +502,31 @@ static int rtllib_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
+ }
+ 
+ 
+-static int michael_mic(struct crypto_ahash *tfm_michael, u8 *key, u8 *hdr,
++static int michael_mic(struct crypto_shash *tfm_michael, u8 *key, u8 *hdr,
+ 		       u8 *data, size_t data_len, u8 *mic)
+ {
+-	AHASH_REQUEST_ON_STACK(req, tfm_michael);
+-	struct scatterlist sg[2];
++	SHASH_DESC_ON_STACK(desc, tfm_michael);
+ 	int err;
+ 
+-	if (tfm_michael == NULL) {
+-		pr_warn("michael_mic: tfm_michael == NULL\n");
+-		return -1;
+-	}
+-	sg_init_table(sg, 2);
+-	sg_set_buf(&sg[0], hdr, 16);
+-	sg_set_buf(&sg[1], data, data_len);
++	desc->tfm = tfm_michael;
++	desc->flags = 0;
+ 
+-	if (crypto_ahash_setkey(tfm_michael, key, 8))
++	if (crypto_shash_setkey(tfm_michael, key, 8))
+ 		return -1;
+ 
+-	ahash_request_set_tfm(req, tfm_michael);
+-	ahash_request_set_callback(req, 0, NULL, NULL);
+-	ahash_request_set_crypt(req, sg, mic, data_len + 16);
+-	err = crypto_ahash_digest(req);
+-	ahash_request_zero(req);
++	err = crypto_shash_init(desc);
++	if (err)
++		goto out;
++	err = crypto_shash_update(desc, hdr, 16);
++	if (err)
++		goto out;
++	err = crypto_shash_update(desc, data, data_len);
++	if (err)
++		goto out;
++	err = crypto_shash_final(desc, mic);
 +
-+	/* Lower maximums for specific alg types. */
- 	if (!alg->cra_type && (alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
- 			       CRYPTO_ALG_TYPE_CIPHER) {
- 		if (alg->cra_alignmask > MAX_CIPHER_ALIGNMASK)
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index bd5e8ccf1687..21371ac8f355 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -20,8 +20,10 @@
- /*
-  * Maximum values for blocksize and alignmask, used to allocate
-  * static buffers that are big enough for any combination of
-- * ciphers and architectures.
-+ * algs and architectures. Ciphers have a lower maximum size.
-  */
-+#define MAX_ALGAPI_BLOCKSIZE		160
-+#define MAX_ALGAPI_ALIGNMASK		63
- #define MAX_CIPHER_BLOCKSIZE		16
- #define MAX_CIPHER_ALIGNMASK		15
++out:
++	shash_desc_zero(desc);
+ 	return err;
+ }
  
+@@ -663,9 +663,9 @@ static int rtllib_tkip_set_key(void *key, int len, u8 *seq, void *priv)
+ {
+ 	struct rtllib_tkip_data *tkey = priv;
+ 	int keyidx;
+-	struct crypto_ahash *tfm = tkey->tx_tfm_michael;
++	struct crypto_shash *tfm = tkey->tx_tfm_michael;
+ 	struct crypto_skcipher *tfm2 = tkey->tx_tfm_arc4;
+-	struct crypto_ahash *tfm3 = tkey->rx_tfm_michael;
++	struct crypto_shash *tfm3 = tkey->rx_tfm_michael;
+ 	struct crypto_skcipher *tfm4 = tkey->rx_tfm_arc4;
+ 
+ 	keyidx = tkey->key_idx;
 -- 
 2.17.1
