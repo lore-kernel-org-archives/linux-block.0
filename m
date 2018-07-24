@@ -1,189 +1,68 @@
-Return-Path: <keescook@chromium.org>
-Return-Path: <keescook@chromium.org>
-From: Kees Cook <keescook@chromium.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Kees Cook <keescook@chromium.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Eric Biggers <ebiggers@google.com>,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-	Alasdair Kergon <agk@redhat.com>,
-	Rabin Vincent <rabinv@axis.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Pavel Machek <pavel@ucw.cz>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	x86@kernel.org,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Paul Mackerras <paulus@samba.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	David Howells <dhowells@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
-	Jia-Ju Bai <baijiaju1990@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Will Deacon <will.deacon@arm.com>,
-	dm-devel@redhat.com,
-	linux-pm@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
-	qat-linux@intel.com,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devel@driverdev.osuosl.org,
-	linux-afs@lists.infradead.org,
-	linux-wireless@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v6 13/18] wireless/lib80211: Convert from ahash to shash
-Date: Tue, 24 Jul 2018 09:49:31 -0700
-Message-Id: <20180724164936.37477-14-keescook@chromium.org>
-In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
-References: <20180724164936.37477-1-keescook@chromium.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-by2nam01on0081.outbound.protection.outlook.com ([104.47.34.81]:32724
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2388351AbeGXI7t (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Jul 2018 04:59:49 -0400
+From: Javier Gonzalez <javier@cnexlabs.com>
+To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
+CC: Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] lightnvm: pblk: recover chunk state on 1.2 devices
+Date: Tue, 24 Jul 2018 07:54:33 +0000
+Message-ID: <D6AFE2C1-D273-4945-9A12-D4A0A57FD108@cnexlabs.com>
+References: <1530177121-24908-1-git-send-email-javier@cnexlabs.com>
+ <1530177121-24908-2-git-send-email-javier@cnexlabs.com>
+ <e42e5ab4-48c7-e822-618d-dc28c25262ed@lightnvm.io>
+ <43D7E3C4-765F-46AB-9B84-27E37FCAE016@cnexlabs.com>
+ <19b2f125-d373-cf2b-43c7-140b3872cd64@lightnvm.io>
+In-Reply-To: <19b2f125-d373-cf2b-43c7-140b3872cd64@lightnvm.io>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-In preparing to remove all stack VLA usage from the kernel[1], this
-removes the discouraged use of AHASH_REQUEST_ON_STACK in favor of
-the smaller SHASH_DESC_ON_STACK by converting from ahash-wrapped-shash
-to direct shash. By removing a layer of indirection this both improves
-performance and reduces stack usage. The stack allocation will be made
-a fixed size in a later patch to the crypto subsystem.
-
-[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
-
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- net/wireless/lib80211_crypt_tkip.c | 58 +++++++++++++++---------------
- 1 file changed, 29 insertions(+), 29 deletions(-)
-
-diff --git a/net/wireless/lib80211_crypt_tkip.c b/net/wireless/lib80211_crypt_tkip.c
-index ba0a1f398ce5..21040aba3a81 100644
---- a/net/wireless/lib80211_crypt_tkip.c
-+++ b/net/wireless/lib80211_crypt_tkip.c
-@@ -65,9 +65,9 @@ struct lib80211_tkip_data {
- 	int key_idx;
- 
- 	struct crypto_skcipher *rx_tfm_arc4;
--	struct crypto_ahash *rx_tfm_michael;
-+	struct crypto_shash *rx_tfm_michael;
- 	struct crypto_skcipher *tx_tfm_arc4;
--	struct crypto_ahash *tx_tfm_michael;
-+	struct crypto_shash *tx_tfm_michael;
- 
- 	/* scratch buffers for virt_to_page() (crypto API) */
- 	u8 rx_hdr[16], tx_hdr[16];
-@@ -106,8 +106,7 @@ static void *lib80211_tkip_init(int key_idx)
- 		goto fail;
- 	}
- 
--	priv->tx_tfm_michael = crypto_alloc_ahash("michael_mic", 0,
--						  CRYPTO_ALG_ASYNC);
-+	priv->tx_tfm_michael = crypto_alloc_shash("michael_mic", 0, 0);
- 	if (IS_ERR(priv->tx_tfm_michael)) {
- 		priv->tx_tfm_michael = NULL;
- 		goto fail;
-@@ -120,8 +119,7 @@ static void *lib80211_tkip_init(int key_idx)
- 		goto fail;
- 	}
- 
--	priv->rx_tfm_michael = crypto_alloc_ahash("michael_mic", 0,
--						  CRYPTO_ALG_ASYNC);
-+	priv->rx_tfm_michael = crypto_alloc_shash("michael_mic", 0, 0);
- 	if (IS_ERR(priv->rx_tfm_michael)) {
- 		priv->rx_tfm_michael = NULL;
- 		goto fail;
-@@ -131,9 +129,9 @@ static void *lib80211_tkip_init(int key_idx)
- 
-       fail:
- 	if (priv) {
--		crypto_free_ahash(priv->tx_tfm_michael);
-+		crypto_free_shash(priv->tx_tfm_michael);
- 		crypto_free_skcipher(priv->tx_tfm_arc4);
--		crypto_free_ahash(priv->rx_tfm_michael);
-+		crypto_free_shash(priv->rx_tfm_michael);
- 		crypto_free_skcipher(priv->rx_tfm_arc4);
- 		kfree(priv);
- 	}
-@@ -145,9 +143,9 @@ static void lib80211_tkip_deinit(void *priv)
- {
- 	struct lib80211_tkip_data *_priv = priv;
- 	if (_priv) {
--		crypto_free_ahash(_priv->tx_tfm_michael);
-+		crypto_free_shash(_priv->tx_tfm_michael);
- 		crypto_free_skcipher(_priv->tx_tfm_arc4);
--		crypto_free_ahash(_priv->rx_tfm_michael);
-+		crypto_free_shash(_priv->rx_tfm_michael);
- 		crypto_free_skcipher(_priv->rx_tfm_arc4);
- 	}
- 	kfree(priv);
-@@ -510,29 +508,31 @@ static int lib80211_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
- 	return keyidx;
- }
- 
--static int michael_mic(struct crypto_ahash *tfm_michael, u8 * key, u8 * hdr,
--		       u8 * data, size_t data_len, u8 * mic)
-+static int michael_mic(struct crypto_shash *tfm_michael, u8 *key, u8 *hdr,
-+		       u8 *data, size_t data_len, u8 *mic)
- {
--	AHASH_REQUEST_ON_STACK(req, tfm_michael);
--	struct scatterlist sg[2];
-+	SHASH_DESC_ON_STACK(desc, tfm_michael);
- 	int err;
- 
--	if (tfm_michael == NULL) {
--		pr_warn("%s(): tfm_michael == NULL\n", __func__);
--		return -1;
--	}
--	sg_init_table(sg, 2);
--	sg_set_buf(&sg[0], hdr, 16);
--	sg_set_buf(&sg[1], data, data_len);
-+	desc->tfm = tfm_michael;
-+	desc->flags = 0;
- 
--	if (crypto_ahash_setkey(tfm_michael, key, 8))
-+	if (crypto_shash_setkey(tfm_michael, key, 8))
- 		return -1;
- 
--	ahash_request_set_tfm(req, tfm_michael);
--	ahash_request_set_callback(req, 0, NULL, NULL);
--	ahash_request_set_crypt(req, sg, mic, data_len + 16);
--	err = crypto_ahash_digest(req);
--	ahash_request_zero(req);
-+	err = crypto_shash_init(desc);
-+	if (err)
-+		goto out;
-+	err = crypto_shash_update(desc, hdr, 16);
-+	if (err)
-+		goto out;
-+	err = crypto_shash_update(desc, data, data_len);
-+	if (err)
-+		goto out;
-+	err = crypto_shash_final(desc, mic);
-+
-+out:
-+	shash_desc_zero(desc);
- 	return err;
- }
- 
-@@ -654,9 +654,9 @@ static int lib80211_tkip_set_key(void *key, int len, u8 * seq, void *priv)
- {
- 	struct lib80211_tkip_data *tkey = priv;
- 	int keyidx;
--	struct crypto_ahash *tfm = tkey->tx_tfm_michael;
-+	struct crypto_shash *tfm = tkey->tx_tfm_michael;
- 	struct crypto_skcipher *tfm2 = tkey->tx_tfm_arc4;
--	struct crypto_ahash *tfm3 = tkey->rx_tfm_michael;
-+	struct crypto_shash *tfm3 = tkey->rx_tfm_michael;
- 	struct crypto_skcipher *tfm4 = tkey->rx_tfm_arc4;
- 
- 	keyidx = tkey->key_idx;
--- 
-2.17.1
+PiBPbiAyOSBKdW4gMjAxOCwgYXQgMTMuMjgsIE1hdGlhcyBCasO4cmxpbmcgPG1iQGxpZ2h0bnZt
+LmlvPiB3cm90ZToNCj4gDQo+IE9uIDA2LzI5LzIwMTggMDE6MjIgUE0sIEphdmllciBHb256YWxl
+eiB3cm90ZToNCj4+PiBPbiAyOSBKdW4gMjAxOCwgYXQgMTMuMTQsIE1hdGlhcyBCasO4cmxpbmcg
+PG1iQGxpZ2h0bnZtLmlvPiB3cm90ZToNCj4+PiANCj4+PiBPbiAwNi8yOC8yMDE4IDExOjEyIEFN
+LCBKYXZpZXIgR29uesOhbGV6IHdyb3RlOg0KPj4+PiBUaGUgT3Blbi1DaGFubmVsIDEuMiBzcGVj
+IGRvZXMgbm90IGRlZmluZSBhIG1lY2hhbmlzbSBmb3IgdGhlIGhvc3QgdG8NCj4+Pj4gcmVjb3Zl
+ciB0aGUgYmxvY2sgKGNodW5rKSBzdGF0ZS4gQXMgYSBjb25zZXF1ZW5jZSwgYSBuZXdseSBmb3Jt
+YXQgZGV2aWNlDQo+Pj4+IHdpbGwgbmVlZCB0byByZWNvbnN0cnVjdCB0aGUgc3RhdGUuIEN1cnJl
+bnRseSwgcGJsayBhc3N1bWVzIHRoYXQgYmxvY2tzDQo+Pj4+IGFyZSBub3QgZXJhc2VkLCB3aGlj
+aCBtaWdodCBjYXVzZSBkb3VibGUtZXJhc2VzIGluIGNhc2UgdGhhdCB0aGUgZGV2aWNlDQo+Pj4+
+IGRvZXMgbm90IHByb3RlY3QgaXRzZWxmIGFnYWluc3QgdGhlbSAod2hpY2ggaXMgbm90IHNwZWNp
+ZmllZCBpbiB0aGUgc3BlYw0KPj4+PiBlaXRoZXIpLg0KPj4+IA0KPj4+IEl0IHNob3VsZCBub3Qg
+YmUgc3BlY2lmaWVkIGluIHRoZSBzcGVjLiBJdCBpcyB1cCB0byB0aGUgZGV2aWNlIHRvIGhhbmRs
+ZQ0KPj4+IGRvdWJsZSBlcmFzZXMgYW5kIG5vdCBkbyBpdC4NCj4+PiANCj4+Pj4gVGhpcyBwYXRj
+aCwgcmVjb25zdHJ1Y3RzIHRoZSBzdGF0ZSBiYXNlZCBvbiByZWFkIGVycm9ycy4gSWYgdGhlIGZp
+cnN0DQo+Pj4+IHNlY3RvciBvZiBhIGJsb2NrIHJldHVybnMgYW5kIGVtcHR5IHBhZ2UgKE5WTV9S
+U1BfRVJSX0VNUFRZUEFHRSksIHRoZW4NCj4+Pj4gdGhlIGJsb2NrIHMgbWFya2VkIGZyZWUsIGku
+ZS4sIGVyYXNlZCBhbmQgcmVhZHkgdG8gYmUgdXNlZA0KPj4+PiAoTlZNX0NIS19TVF9GUkVFKS4g
+T3RoZXJ3aXNlLCB0aGUgYmxvY2sgaXMgbWFya2VkIGFzIGNsb3NlZA0KPj4+PiAoTlZNX0NIS19T
+VF9DTE9TRUQpLiBOb3RlIHRoYXQgZXZlbiBpZiBhIGJsb2NrIGlzIG9wZW4gYW5kIG5vdCBmdWxs
+eQ0KPj4+PiB3cml0dGVuLCBpdCBoYXMgdG8gYmUgZXJhc2VkIGluIG9yZGVyIHRvIGJlIHVzZWQg
+YWdhaW4uDQo+Pj4gDQo+Pj4gU2hvdWxkIHdlIGV4dGVuZCBpdCB0byBkbyB0aGUgc2NhbiwgYW5k
+IHVwZGF0ZSB0aGUgd3JpdGUgcG9pbnRlciBhcw0KPj4+IHdlbGw/IEkgdGhpbmsgdGhpcyBraW5k
+IG9mIGZlYXR1cmUgYWxyZWFkeSBpcyBiYWtlZCBpbnRvIHBibGs/DQo+PiBUaGlzIGlzIGFscmVh
+ZHkgaW4gcGxhY2U6IHdlIHNjYW4gdW50aWwgZW1wdHkgcGFnZSBhbmQgdGFrZSBpdCBmcm9tDQo+
+PiB0aGVyZS4gVGhpcyBwYXRjaCBpcyBvbmx5IGZvciB0aGUgY2FzZSBpbiB3aGljaCB3ZSBzdGFy
+dCBhIHBibGsgaW5zdGFuY2UNCj4+IGZvcm0gc2NyYXRjaC4gT24gYSBkZXZpY2UgYWxyZWFkeSBv
+d25lZCBieSBwYmxrLCB3ZSB3b3VsZCBub3QgaGF2ZSB0aGUNCj4+IHByb2JsZW0gd2UgYXJlIHRy
+eWluZyB0byBzb2x2ZSBoZXJlIGJlY2F1c2Ugd2Uga25vdyB0aGUgc3RhdGUuDQo+IA0KPiBBZ3Jl
+ZS4gV2hhdCBJIG1lYW50IHdhcyB0aGF0IHdoZW4gd2UgYW55d2F5IGFyZSByZWNvdmVyaW5nIHRo
+ZSBzdGF0ZSwNCj4gd2UgY291bGQganVzdCBhcyB3ZWxsIHVwZGF0ZSAtPndwIGFuZCBzZXQgdG8g
+TlZNX0NIS19TVF9PUEVOIGFuZCBzbw0KPiBmb3J0aCBmb3IgdGhlIGluaXRpYWxpemF0aW9uIHBo
+YXNlLg0KPiANCg0KSW4gMS4yIHRoZSB1c2Ugb2YgY2h1bmsgbWV0YWRhdGEgaXMgcHVyZWx5IGZp
+Y3Rpb25hbC4gV2UgcmVzcGVjdCB0aGUNCmNodW5rIHN0YXRlIG1hY2hpbmUgYXMgd2UgdHJhbnNp
+dGlvbiBsaW5lcywgYnV0IGFsbCB0aGUgd3JpdGUgcG9pbnRlcnMNCmFyZSBpZ25vcmVkLiBJbnN0
+ZWFkLCB3ZSB1c2UgdGhlIGxpbmUgYml0bWFwIHRvIHBvaW50IHRvIHRoZSBuZXh0DQp3cml0YWJs
+ZSBlbnRyeS4gVGhpcyBpcyBCVFcgdGhlIHNhbWUgd2F5IHdlIGl0IGluIG9wZW4gbGluZXMgb24g
+Mi4wIHRvby4NCg0KQ2h1bmsgbWV0YWRhdGEgaXMgb25seSB1c2VkIHRvIHNldHVwIHRoZSBiaXRt
+YXBzIG9uIGluaXQvcmVjb3ZlcnkuIEZyb20NCmhlcmUgb24sIHdlIHVzZSB0aGUgYml0bWFwIHRv
+IGZpbmQgdGhlIG5leHQgd3JpdGFibGUgc2VjdG9yLCB3aXRob3V0DQp3b3JyeWluZyBhYm91dCB0
+aGUgc3BlY2lmaWMgcGVyLWNodW5rIHdyaXRlIHBvaW50ZXIuIFRodXMsIHVwZGF0aW5nDQpjaHVu
+ayBtZXRhZGF0YSBoZXJlIGhhcyBubyBlZmZlY3QuDQoNCkRvZXMgdGhpcyBtYWtlIHNlbnNlIHRv
+IHlvdT8NCg0KSmF2aWVy
