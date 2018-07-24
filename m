@@ -1,335 +1,64 @@
 Return-Path: <maxg@mellanox.com>
+Subject: Re: [PATCH 1/2] block: move dif_prepare/dif_complete functions to
+ block layer
+To: "Martin K. Petersen" <martin.petersen@oracle.com>, Christoph Hellwig
+	<hch@lst.de>
+CC: <linux-block@vger.kernel.org>, <axboe@kernel.dk>, <keith.busch@intel.com>,
+	<linux-nvme@lists.infradead.org>, <sagi@grimberg.me>
+References: <1532252998-2375-1-git-send-email-maxg@mellanox.com>
+ <20180723072854.GA18365@lst.de> <yq1bmax5rfl.fsf@oracle.com>
 From: Max Gurtovoy <maxg@mellanox.com>
-To: keith.busch@intel.com, linux-nvme@lists.infradead.org, sagi@grimberg.me,
-        hch@lst.de, martin.petersen@oracle.com, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-Cc: vladimirk@mellanox.com, Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH 2/3] block: move dif_prepare/dif_complete functions to block layer
-Date: Tue, 24 Jul 2018 16:33:41 +0300
-Message-Id: <1532439222-5668-2-git-send-email-maxg@mellanox.com>
-In-Reply-To: <1532439222-5668-1-git-send-email-maxg@mellanox.com>
-References: <1532439222-5668-1-git-send-email-maxg@mellanox.com>
+Message-ID: <68bc2c0d-b32b-2f18-e0f3-648f9d7a9259@mellanox.com>
+Date: Tue, 24 Jul 2018 15:01:31 +0300
+MIME-Version: 1.0
+In-Reply-To: <yq1bmax5rfl.fsf@oracle.com>
+Content-Type: text/plain; charset="windows-1255"; format=flowed
+Return-Path: maxg@mellanox.com
 List-ID: <linux-block@vger.kernel.org>
 
-Currently these functions are implemented in the scsi layer, but their
-actual place should be the block layer since T10-PI is a general data
-integrity feature that is used in the nvme protocol as well. Also, use
-the tuple size from the integrity profile since it may vary between
-integrity types.
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
----
 
-changes from v1 (Christoph, Martin and Keith comments):
- - moved the functions to t10-pi.c
- - updated tuple size
- - changed local variables scope
- - remove/add new lines
+On 7/24/2018 4:54 AM, Martin K. Petersen wrote:
+> 
+> Christoph,
+> 
+>>> +void blk_integrity_dif_prepare(struct request *rq, u8 protection_type,
+>>> +			       u32 ref_tag)
+>>> +{
+>>
+>> Maybe call this blk_t10_pi_prepare?
+> 
+> The rest of these functions have a blk_integrity_ prefix. So either
+> stick with that or put the functions in t10-pi.c and use a t10_pi_
+> prefix.
+> 
+> I'm a bit torn on placement since the integrity metadata could contain
+> other stuff than T10 PI. But the remapping is very specific to T10 PI.
+> 
+>>> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+>>> index 9421d9877730..4186bf027c59 100644
+>>> --- a/drivers/scsi/sd.c
+>>> +++ b/drivers/scsi/sd.c
+>>> @@ -1119,7 +1119,9 @@ static int sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
+>>>   		SCpnt->cmnd[0] = WRITE_6;
+>>>   
+>>>   		if (blk_integrity_rq(rq))
+>>> -			sd_dif_prepare(SCpnt);
+>>> +			blk_integrity_dif_prepare(SCpnt->request,
+>>> +						  sdkp->protection_type,
+>>> +						  scsi_prot_ref_tag(SCpnt));
+>>
+>> scsi_prot_ref_tag could be move to the block layer as it only uses
+>> the sector in the eequest and the sector size, which we can get
+>> from the gendisk as well.  We then don't need to pass it to the function.
+> 
+> For Type 2, the PI can be at intervals different from the logical block
+> size (although we don't support that yet). We should use the
+> blk_integrity profile interval instead of assuming sector size.
+> 
+> And wrt. Keith's comment: The tuple_size should be the one from the
+> integrity profile as well, not sizeof(struct t10_pi_tuple).
+> 
 
----
- block/t10-pi.c         | 100 +++++++++++++++++++++++++++++++++++++++++++
- drivers/scsi/sd.c      |   8 ++--
- drivers/scsi/sd.h      |   9 ----
- drivers/scsi/sd_dif.c  | 113 -------------------------------------------------
- include/linux/t10-pi.h |   3 ++
- 5 files changed, 108 insertions(+), 125 deletions(-)
-
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index a98db38..5f2a177 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -184,3 +184,103 @@ static blk_status_t t10_pi_type3_verify_ip(struct blk_integrity_iter *iter)
- 	.verify_fn		= t10_pi_type3_verify_ip,
- };
- EXPORT_SYMBOL(t10_pi_type3_ip);
-+
-+/*
-+ * The virtual start sector is the one that was originally submitted
-+ * by the block layer.	Due to partitioning, MD/DM cloning, etc. the
-+ * actual physical start sector is likely to be different.  Remap
-+ * protection information to match the physical LBA.
-+ *
-+ * From SCSI protocol perspective there's a slight difference between
-+ * Type 1 and 2.  The latter uses command's 32-byte exclusively, and the
-+ * reference tag is seeded in the command.  This gives us the potential to
-+ * avoid virt->phys remapping during write.  However, at read time we
-+ * don't know whether the virt sector is the same as when we wrote it
-+ * (we could be reading from real disk as opposed to MD/DM device.  So
-+ * we always remap Type 2 making it identical to Type 1.
-+ *
-+ * Type 3 does not have a reference tag so no remapping is required.
-+ */
-+void t10_pi_prepare(struct request *rq, u8 protection_type)
-+{
-+	const int tuple_sz = rq->q->integrity.tuple_size;
-+	u32 ref_tag = t10_pi_ref_tag(rq);
-+	struct bio *bio;
-+
-+	if (protection_type == T10_PI_TYPE3_PROTECTION)
-+		return;
-+
-+	__rq_for_each_bio(bio, rq) {
-+		struct bio_integrity_payload *bip = bio_integrity(bio);
-+		u32 virt = bip_get_seed(bip) & 0xffffffff;
-+		struct bio_vec iv;
-+		struct bvec_iter iter;
-+
-+		/* Already remapped? */
-+		if (bip->bip_flags & BIP_MAPPED_INTEGRITY)
-+			break;
-+
-+		bip_for_each_vec(iv, bip, iter) {
-+			struct t10_pi_tuple *pi = kmap_atomic(iv.bv_page) +
-+						iv.bv_offset;
-+			unsigned int j;
-+
-+			for (j = 0; j < iv.bv_len; j += tuple_sz) {
-+				if (be32_to_cpu(pi->ref_tag) == virt)
-+					pi->ref_tag = cpu_to_be32(ref_tag);
-+				virt++;
-+				ref_tag++;
-+				pi += tuple_sz;
-+			}
-+
-+			kunmap_atomic(pi);
-+		}
-+
-+		bip->bip_flags |= BIP_MAPPED_INTEGRITY;
-+	}
-+}
-+EXPORT_SYMBOL(t10_pi_prepare);
-+
-+/*
-+ * Remap physical sector values in the reference tag to the virtual
-+ * values expected by the block layer.
-+ */
-+void t10_pi_complete(struct request *rq, u8 protection_type,
-+			 unsigned int intervals)
-+{
-+	const int tuple_sz = rq->q->integrity.tuple_size;
-+	u32 ref_tag = t10_pi_ref_tag(rq);
-+	struct bio *bio;
-+
-+	if (protection_type == T10_PI_TYPE3_PROTECTION)
-+		return;
-+
-+	__rq_for_each_bio(bio, rq) {
-+		struct bio_integrity_payload *bip = bio_integrity(bio);
-+		u32 virt = bip_get_seed(bip) & 0xffffffff;
-+		struct bio_vec iv;
-+		struct bvec_iter iter;
-+
-+		bip_for_each_vec(iv, bip, iter) {
-+			struct t10_pi_tuple *pi = kmap_atomic(iv.bv_page) +
-+						iv.bv_offset;
-+			unsigned int j;
-+
-+			for (j = 0; j < iv.bv_len; j += tuple_sz) {
-+				if (intervals == 0) {
-+					kunmap_atomic(pi);
-+					return;
-+				}
-+				if (be32_to_cpu(pi->ref_tag) == ref_tag)
-+					pi->ref_tag = cpu_to_be32(virt);
-+				virt++;
-+				ref_tag++;
-+				intervals--;
-+				pi += tuple_sz;
-+			}
-+
-+			kunmap_atomic(pi);
-+		}
-+	}
-+}
-+EXPORT_SYMBOL(t10_pi_complete);
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 9421d98..bbebdc3 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -1119,7 +1119,7 @@ static int sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
- 		SCpnt->cmnd[0] = WRITE_6;
- 
- 		if (blk_integrity_rq(rq))
--			sd_dif_prepare(SCpnt);
-+			t10_pi_prepare(SCpnt->request, sdkp->protection_type);
- 
- 	} else if (rq_data_dir(rq) == READ) {
- 		SCpnt->cmnd[0] = READ_6;
-@@ -2047,8 +2047,10 @@ static int sd_done(struct scsi_cmnd *SCpnt)
- 					   "sd_done: completed %d of %d bytes\n",
- 					   good_bytes, scsi_bufflen(SCpnt)));
- 
--	if (rq_data_dir(SCpnt->request) == READ && scsi_prot_sg_count(SCpnt))
--		sd_dif_complete(SCpnt, good_bytes);
-+	if (rq_data_dir(SCpnt->request) == READ && scsi_prot_sg_count(SCpnt) &&
-+	    good_bytes)
-+		t10_pi_complete(SCpnt->request, sdkp->protection_type,
-+				good_bytes / scsi_prot_interval(SCpnt));
- 
- 	return good_bytes;
- }
-diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-index 392c7d0..a7d4f50 100644
---- a/drivers/scsi/sd.h
-+++ b/drivers/scsi/sd.h
-@@ -254,21 +254,12 @@ static inline unsigned int sd_prot_flag_mask(unsigned int prot_op)
- #ifdef CONFIG_BLK_DEV_INTEGRITY
- 
- extern void sd_dif_config_host(struct scsi_disk *);
--extern void sd_dif_prepare(struct scsi_cmnd *scmd);
--extern void sd_dif_complete(struct scsi_cmnd *, unsigned int);
- 
- #else /* CONFIG_BLK_DEV_INTEGRITY */
- 
- static inline void sd_dif_config_host(struct scsi_disk *disk)
- {
- }
--static inline int sd_dif_prepare(struct scsi_cmnd *scmd)
--{
--	return 0;
--}
--static inline void sd_dif_complete(struct scsi_cmnd *cmd, unsigned int a)
--{
--}
- 
- #endif /* CONFIG_BLK_DEV_INTEGRITY */
- 
-diff --git a/drivers/scsi/sd_dif.c b/drivers/scsi/sd_dif.c
-index d8de43d..db72c82 100644
---- a/drivers/scsi/sd_dif.c
-+++ b/drivers/scsi/sd_dif.c
-@@ -95,116 +95,3 @@ void sd_dif_config_host(struct scsi_disk *sdkp)
- 	blk_integrity_register(disk, &bi);
- }
- 
--/*
-- * The virtual start sector is the one that was originally submitted
-- * by the block layer.	Due to partitioning, MD/DM cloning, etc. the
-- * actual physical start sector is likely to be different.  Remap
-- * protection information to match the physical LBA.
-- *
-- * From a protocol perspective there's a slight difference between
-- * Type 1 and 2.  The latter uses 32-byte CDBs exclusively, and the
-- * reference tag is seeded in the CDB.  This gives us the potential to
-- * avoid virt->phys remapping during write.  However, at read time we
-- * don't know whether the virt sector is the same as when we wrote it
-- * (we could be reading from real disk as opposed to MD/DM device.  So
-- * we always remap Type 2 making it identical to Type 1.
-- *
-- * Type 3 does not have a reference tag so no remapping is required.
-- */
--void sd_dif_prepare(struct scsi_cmnd *scmd)
--{
--	const int tuple_sz = sizeof(struct t10_pi_tuple);
--	struct bio *bio;
--	struct scsi_disk *sdkp;
--	struct t10_pi_tuple *pi;
--	u32 phys, virt;
--
--	sdkp = scsi_disk(scmd->request->rq_disk);
--
--	if (sdkp->protection_type == T10_PI_TYPE3_PROTECTION)
--		return;
--
--	phys = t10_pi_ref_tag(scmd->request);
--
--	__rq_for_each_bio(bio, scmd->request) {
--		struct bio_integrity_payload *bip = bio_integrity(bio);
--		struct bio_vec iv;
--		struct bvec_iter iter;
--		unsigned int j;
--
--		/* Already remapped? */
--		if (bip->bip_flags & BIP_MAPPED_INTEGRITY)
--			break;
--
--		virt = bip_get_seed(bip) & 0xffffffff;
--
--		bip_for_each_vec(iv, bip, iter) {
--			pi = kmap_atomic(iv.bv_page) + iv.bv_offset;
--
--			for (j = 0; j < iv.bv_len; j += tuple_sz, pi++) {
--
--				if (be32_to_cpu(pi->ref_tag) == virt)
--					pi->ref_tag = cpu_to_be32(phys);
--
--				virt++;
--				phys++;
--			}
--
--			kunmap_atomic(pi);
--		}
--
--		bip->bip_flags |= BIP_MAPPED_INTEGRITY;
--	}
--}
--
--/*
-- * Remap physical sector values in the reference tag to the virtual
-- * values expected by the block layer.
-- */
--void sd_dif_complete(struct scsi_cmnd *scmd, unsigned int good_bytes)
--{
--	const int tuple_sz = sizeof(struct t10_pi_tuple);
--	struct scsi_disk *sdkp;
--	struct bio *bio;
--	struct t10_pi_tuple *pi;
--	unsigned int j, intervals;
--	u32 phys, virt;
--
--	sdkp = scsi_disk(scmd->request->rq_disk);
--
--	if (sdkp->protection_type == T10_PI_TYPE3_PROTECTION || good_bytes == 0)
--		return;
--
--	intervals = good_bytes / scsi_prot_interval(scmd);
--	phys = t10_pi_ref_tag(scmd->request);
--
--	__rq_for_each_bio(bio, scmd->request) {
--		struct bio_integrity_payload *bip = bio_integrity(bio);
--		struct bio_vec iv;
--		struct bvec_iter iter;
--
--		virt = bip_get_seed(bip) & 0xffffffff;
--
--		bip_for_each_vec(iv, bip, iter) {
--			pi = kmap_atomic(iv.bv_page) + iv.bv_offset;
--
--			for (j = 0; j < iv.bv_len; j += tuple_sz, pi++) {
--
--				if (intervals == 0) {
--					kunmap_atomic(pi);
--					return;
--				}
--
--				if (be32_to_cpu(pi->ref_tag) == phys)
--					pi->ref_tag = cpu_to_be32(virt);
--
--				virt++;
--				phys++;
--				intervals--;
--			}
--
--			kunmap_atomic(pi);
--		}
--	}
--}
--
-diff --git a/include/linux/t10-pi.h b/include/linux/t10-pi.h
-index 635855e..81ae4c4 100644
---- a/include/linux/t10-pi.h
-+++ b/include/linux/t10-pi.h
-@@ -47,5 +47,8 @@ static inline u32 t10_pi_ref_tag(struct request *rq)
- extern const struct blk_integrity_profile t10_pi_type1_ip;
- extern const struct blk_integrity_profile t10_pi_type3_crc;
- extern const struct blk_integrity_profile t10_pi_type3_ip;
-+extern void t10_pi_prepare(struct request *rq, u8 protection_type);
-+extern void t10_pi_complete(struct request *rq, u8 protection_type,
-+			    unsigned int intervals);
- 
- #endif
--- 
-1.8.3.1
+Ok so I'll use rq->q->integrity.tuple_size as the tuple_sz and increment 
+j and pi according to it, right ?
