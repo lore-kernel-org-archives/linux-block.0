@@ -1,90 +1,80 @@
-Return-Path: <threeearcat@gmail.com>
-Return-Path: <threeearcat@gmail.com>
-Date: Fri, 27 Jul 2018 10:46:06 +0900
-From: "Dae R. Jeong" <threeearcat@gmail.com>
-To: jikos@kernel.org, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	lifeasageek@gmail.com, kt0755@gmail.com
-Subject: WARNING: possible recursive locking detected
-Message-ID: <20180727014606.GA2786@dragonet>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <keescook@chromium.org>
+Return-Path: <keescook@chromium.org>
+From: Kees Cook <keescook@chromium.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Kees Cook <keescook@chromium.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Eric Biggers <ebiggers@google.com>,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	Alasdair Kergon <agk@redhat.com>,
+	Rabin Vincent <rabinv@axis.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Pavel Machek <pavel@ucw.cz>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	x86@kernel.org,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Paul Mackerras <paulus@samba.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	David Howells <dhowells@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+	Jia-Ju Bai <baijiaju1990@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Will Deacon <will.deacon@arm.com>,
+	dm-devel@redhat.com,
+	linux-pm@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	linux-block@vger.kernel.org,
+	qat-linux@intel.com,
+	linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devel@driverdev.osuosl.org,
+	linux-afs@lists.infradead.org,
+	linux-wireless@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v6 02/18] crypto: cbc: Remove VLA usage
+Date: Tue, 24 Jul 2018 09:49:20 -0700
+Message-Id: <20180724164936.37477-3-keescook@chromium.org>
+In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
+References: <20180724164936.37477-1-keescook@chromium.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Reporting the crash: WARNING: possible recursive locking detected
+In the quest to remove all stack VLA usage from the kernel[1], this
+uses the upper bounds on blocksize. Since this is always a cipher
+blocksize, use the existing cipher max blocksize.
 
-This crash has been found in v4.18 using a modified version of
-Syzkaller, which focus on exploring hard-to-reach coverages.
+[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-C repro code:
-https://kiwi.cs.purdue.edu/static/alexkkid-fuzzer/repro-8659a5.c
-Kernel config:
-https://kiwi.cs.purdue.edu/static/alexkkid-fuzzer/config-8659a5
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ include/crypto/cbc.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Crash log:
-============================================
-WARNING: possible recursive locking detected
-4.18.0-rc4 #1 Not tainted
---------------------------------------------
-kworker/u4:3/1039 is trying to acquire lock:
-0000000060a8cf4f ((wq_completion)"floppy"){+.+.}, at: start_flush_work kernel/workqueue.c:2888 [inline]
-0000000060a8cf4f ((wq_completion)"floppy"){+.+.}, at: flush_work+0x316/0x690 kernel/workqueue.c:2917
-
-but task is already holding lock:
-0000000060a8cf4f ((wq_completion)"floppy"){+.+.}, at: __write_once_size include/linux/compiler.h:215 [inline]
-0000000060a8cf4f ((wq_completion)"floppy"){+.+.}, at: arch_atomic64_set arch/x86/include/asm/atomic64_64.h:34 [inline]
-0000000060a8cf4f ((wq_completion)"floppy"){+.+.}, at: atomic64_set include/asm-generic/atomic-instrumented.h:40 [inline]
-0000000060a8cf4f ((wq_completion)"floppy"){+.+.}, at: atomic_long_set include/asm-generic/atomic-long.h:59 [inline]
-0000000060a8cf4f ((wq_completion)"floppy"){+.+.}, at: set_work_data kernel/workqueue.c:617 [inline]
-0000000060a8cf4f ((wq_completion)"floppy"){+.+.}, at: set_work_pool_and_clear_pending kernel/workqueue.c:644 [inline]
-0000000060a8cf4f ((wq_completion)"floppy"){+.+.}, at: process_one_work+0x857/0x1a30 kernel/workqueue.c:2124
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock((wq_completion)"floppy");
-  lock((wq_completion)"floppy");
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-2 locks held by kworker/u4:3/1039:
- #0: 0000000060a8cf4f ((wq_completion)"floppy"){+.+.}, at: __write_once_size include/linux/compiler.h:215 [inline]
- #0: 0000000060a8cf4f ((wq_completion)"floppy"){+.+.}, at: arch_atomic64_set arch/x86/include/asm/atomic64_64.h:34 [inline]
- #0: 0000000060a8cf4f ((wq_completion)"floppy"){+.+.}, at: atomic64_set include/asm-generic/atomic-instrumented.h:40 [inline]
- #0: 0000000060a8cf4f ((wq_completion)"floppy"){+.+.}, at: atomic_long_set include/asm-generic/atomic-long.h:59 [inline]
- #0: 0000000060a8cf4f ((wq_completion)"floppy"){+.+.}, at: set_work_data kernel/workqueue.c:617 [inline]
- #0: 0000000060a8cf4f ((wq_completion)"floppy"){+.+.}, at: set_work_pool_and_clear_pending kernel/workqueue.c:644 [inline]
- #0: 0000000060a8cf4f ((wq_completion)"floppy"){+.+.}, at: process_one_work+0x857/0x1a30 kernel/workqueue.c:2124
- #1: 000000002682ab21 (floppy_work){+.+.}, at: process_one_work+0x88e/0x1a30 kernel/workqueue.c:2128
-
-stack backtrace:
-CPU: 0 PID: 1039 Comm: kworker/u4:3 Not tainted 4.18.0-rc4 #1
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Bochs 01/01/2011
-Workqueue: floppy floppy_work_workfn
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x122/0x198 lib/dump_stack.c:113
- print_deadlock_bug kernel/locking/lockdep.c:1765 [inline]
- check_deadlock kernel/locking/lockdep.c:1809 [inline]
- validate_chain kernel/locking/lockdep.c:2405 [inline]
- __lock_acquire+0xfd2/0x39f0 kernel/locking/lockdep.c:3435
- lock_acquire+0x170/0x510 kernel/locking/lockdep.c:3924
- start_flush_work kernel/workqueue.c:2889 [inline]
- flush_work+0x33b/0x690 kernel/workqueue.c:2917
- __cancel_work_timer+0x298/0x3a0 kernel/workqueue.c:2989
- cancel_work_sync+0x1c/0x20 kernel/workqueue.c:3025
- cancel_activity drivers/block/floppy.c:1003 [inline]
- fd_watchdog+0xfe/0x160 drivers/block/floppy.c:1014
- setup_rw_floppy+0x76a/0xa80 drivers/block/floppy.c:1512
- seek_floppy drivers/block/floppy.c:1608 [inline]
- floppy_ready+0x4dd/0x18f0 drivers/block/floppy.c:1920
- floppy_start+0x250/0x2d0 drivers/block/floppy.c:1936
- floppy_work_workfn+0x1a/0x20 drivers/block/floppy.c:977
- process_one_work+0x98d/0x1a30 kernel/workqueue.c:2153
- worker_thread+0x8f/0xcf0 kernel/workqueue.c:2296
- kthread+0x3d5/0x4b0 kernel/kthread.c:246
- ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:412
+diff --git a/include/crypto/cbc.h b/include/crypto/cbc.h
+index f5b8bfc22e6d..47db0aac2ab9 100644
+--- a/include/crypto/cbc.h
++++ b/include/crypto/cbc.h
+@@ -113,7 +113,9 @@ static inline int crypto_cbc_decrypt_inplace(
+ 	unsigned int bsize = crypto_skcipher_blocksize(tfm);
+ 	unsigned int nbytes = walk->nbytes;
+ 	u8 *src = walk->src.virt.addr;
+-	u8 last_iv[bsize];
++	u8 last_iv[MAX_CIPHER_BLOCKSIZE];
++
++	BUG_ON(bsize > sizeof(last_iv));
+ 
+ 	/* Start of the last block. */
+ 	src += nbytes - (nbytes & (bsize - 1)) - bsize;
+-- 
+2.17.1
