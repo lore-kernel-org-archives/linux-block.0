@@ -1,174 +1,129 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mailrelay.collogia.de ([194.8.207.98]:22223 "HELO
-        mailrelay.collogia.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1729904AbeGYV20 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Jul 2018 17:28:26 -0400
-From: Markus Stockhausen <stockhausen@collogia.de>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: BUG? ondemand_readahead() exeeds bdi->io_pages
-Date: Wed, 25 Jul 2018 20:10:04 +0000
-Message-ID: <64c052b0-b23c-4b0c-8535-ae050b82c2cd@email.android.com>
-Content-Type: multipart/mixed;
-        boundary="----=_NextPartTM-000-acc3eece-c90e-45ad-b5fc-5b0b21eccee1"
-MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+c9ebeb9e9cafa2a765ab+5448+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 1/2] block: simplify bio_check_pages_dirty
+Date: Tue, 24 Jul 2018 14:04:12 +0200
+Message-Id: <20180724120413.15689-2-hch@lst.de>
+In-Reply-To: <20180724120413.15689-1-hch@lst.de>
+References: <20180724120413.15689-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
+bio_check_pages_dirty currently inviolates the invariant that bv_page of
+a bio_vec inside bi_vcnt shouldn't be zero, and that is going to become
+really annoying with multpath biovecs.  Fortunately there isn't any
+all that good reason for it - once we decide to defer freeing the bio
+to a workqueue holding onto a few additional pages isn't really an
+issue anymore.  So just check if there is a clean page that needs
+dirtying in the first path, and do a second pass to free them if there
+was none, while the cache is still hot.
 
-------=_NextPartTM-000-acc3eece-c90e-45ad-b5fc-5b0b21eccee1
-Content-Type: multipart/alternative;
-	boundary="_000_64c052b0b23c4b0c8535ae050b82c2cdemailandroidcom_"
+Also use the chance to micro-optimize bio_dirty_fn a bit by not saving
+irq state - we know we are called from a workqueue.
 
---_000_64c052b0b23c4b0c8535ae050b82c2cdemailandroidcom_
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/bio.c | 56 ++++++++++++++++++++---------------------------------
+ 1 file changed, 21 insertions(+), 35 deletions(-)
 
-SGkgdGhlcmUsDQoNCkknbSBpbnZlc3RpZ2F0aW5nIGFuIHByb2JsZW0gd2hlcmUgSSBzZWUgYmxv
-Y2sgSS9PIHR3aWNlIHRoZSBtYXhpbXVtDQphbGxvd2VkIHNpemUgaW4gbWF4X2h3X3NlY3RvcnNf
-a2IuIEluIG15IGNhc2UgdGhlIGRldmljZSBkcml2ZXIgc2ltcGx5DQpmYWlscy4gSSBoYXZlIHRv
-IGludmVzdGlnYXRlIHRoYXQgcGFydCBmdXJ0aGVyLi4uIE5ldmVydGhlbGVzcyBJIHRoaW5rIHRo
-ZXJlDQptaWdodCBiZSBzb21lIHN0cmFuZ2UgY2FsY3VsYXRpb24gYnVnIGluIG9uZGVtYW5kX3Jl
-YWRhaGVhZCgpLg0KDQpBc3N1bWUgdXNlciByZWFkcyAxTSBvZiBkYXRhIGFuZCB0aGUgZGV2aWNl
-IGRyaXZlciBjYW4gb25seSBoYW5kbGUNCnRoaXMgMU0uIEluIGluaXRpYWxfcmVhZGFoZWFkIHdl
-IHdpbGwgc2V0IHJhLT5zaXplIHRvIDFNIGFuZCBhc3luYyBzaXplDQp0byAxTSB0b28uDQoNCmlu
-aXRpYWxfcmVhZGFoZWFkOg0KICByYS0+c3RhcnQgPSBvZmZzZXQ7DQogIHJhLT5zaXplID0gZ2V0
-X2luaXRfcmFfc2l6ZShyZXFfc2l6ZSwgbWF4X3BhZ2VzKTsNCiAgcmEtPmFzeW5jX3NpemUgPSBy
-YS0+c2l6ZSA+IHJlcV9zaXplID8gcmEtPnNpemUgLSByZXFfc2l6ZSA6IHJhLT5zaXplOw0KDQpJ
-biB0aGUgcmVhZGl0IHBhcnQgdGhlIGNoZWNrIHN1Y2NlZWRzIGFuZCB0aGUgZnVuY3Rpb24gd2ls
-bCBkb3VibGUNCnRoZSBhbW91bnQgdG8gcmVhZCBhaGVhZC4NCg0KcmVhZGl0Og0KICAvKg0KICAg
-KiBXaWxsIHRoaXMgcmVhZCBoaXQgdGhlIHJlYWRhaGVhZCBtYXJrZXIgbWFkZSBieSBpdHNlbGY/
-DQogICAqIElmIHNvLCB0cmlnZ2VyIHRoZSByZWFkYWhlYWQgbWFya2VyIGhpdCBub3csIGFuZCBt
-ZXJnZQ0KICAgKiB0aGUgcmVzdWx0ZWQgbmV4dCByZWFkYWhlYWQgd2luZG93IGludG8gdGhlIGN1
-cnJlbnQgb25lLg0KICAgKi8NCiAgaWYgKG9mZnNldCA9PSByYS0+c3RhcnQgJiYgcmEtPnNpemUg
-PT0gcmEtPmFzeW5jX3NpemUpIHsNCiAgICByYS0+YXN5bmNfc2l6ZSA9IGdldF9uZXh0X3JhX3Np
-emUocmEsIG1heF9wYWdlcyk7DQogICAgcmEtPnNpemUgKz0gcmEtPmFzeW5jX3NpemU7DQogIH0N
-Cg0KQnRyYWNlIG9mIGRkIGlmPS9kZXYvZmlvYTEgb2Y9L2Rldi9udWxsIGJzPTFNIGNvdW50PTEg
-Z2l2ZXM6DQoNCjI1MywwICAgMjAgICAgICAgIDEgICAgIDAuMDAwMDAwMDAwIDE5Nzg0ICBBICAg
-UiAyMDQ4ICsgNDA5NiA8LSAoMjUzLDEpIDANCjI1MywwICAgMjAgICAgICAgIDIgICAgIDAuMDAw
-MDAzMzMwIDE5Nzg0ICBRICAgUiAyMDQ4ICsgNDA5NiBbZGRdDQoyNTMsMCAgIDIwICAgICAgICAz
-ICAgICAwLjAwMDIzNTgzMyAxOTc4NCAgQyAgIFIgMjA0OCArIDQwOTYgWzBdDQoNCkluaXRpYWwg
-Y29tbWl0IHdhcyAxMjJhMjFkMTEuLi4gKHJlYWRhaGVhZDogb24tZGVtYW5kIHJlYWRhaGVhZA0K
-bG9naWMpIGFuZCB0aGUgcmVhZGl0IHBhcnQgd2FzIGV4dGVuZGVkIGJ5IDUxZGFhODhlYi4uLiAo
-cmVhZGFoZWFkOg0KcmVtb3ZlIHN5bmMvYXN5bmMgcmVhZGFoZWFkIGNhbGwgZGVwZW5kZW5jeSkN
-Cg0KSSdtIGxvc3Qgd2hlcmUgb25lIHNob3VsZCBpbXBsZW1lbnQgYSBmaXguIEluIHRoZSBmaXJz
-dCBwYXJ0IG9mDQp0aGUgY2FsY3VsYXRpb24gb3IgdGhlIHNlY29uZD8gT3IgYW0gSSB0b3RhbGx5
-IHdyb25nPw0KDQpUaGFua3MgZm9yIHlvdXIgaGVscCBhbmQgYmVzdCByZWdhcmRzLg0KDQpNYXJr
-dXMNCg0K
-
---_000_64c052b0b23c4b0c8535ae050b82c2cdemailandroidcom_
-Content-Type: text/html; charset="utf-8"
-Content-ID: <004BF49DFB049E40A45DEA447CCF8510@collogia.de>
-Content-Transfer-Encoding: base64
-
-PGh0bWw+DQo8aGVhZD4NCjxtZXRhIGh0dHAtZXF1aXY9IkNvbnRlbnQtVHlwZSIgY29udGVudD0i
-dGV4dC9odG1sOyBjaGFyc2V0PXV0Zi04Ij4NCjwvaGVhZD4NCjxib2R5Pg0KPGRpdiBkaXI9ImF1
-dG8iPg0KPGRpdiBkaXI9ImF1dG8iIGNsYXNzPSJlbGlkZWQtdGV4dCI+DQo8ZGl2IHN0eWxlPSJm
-b250LWZhbWlseTogc2Fucy1zZXJpZjsgZm9udC1zaXplOiAxMi44cHg7IiBkaXI9ImF1dG8iPg0K
-PGRpdiBzdHlsZT0ibWFyZ2luOiAxNnB4IDBweDsiPg0KPGRpdj4NCjxkaXY+PGZvbnQgc2l6ZT0i
-MiI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZToxMHB0Ij4NCjxkaXY+SGkgdGhlcmUsPGJyPg0KPGJy
-Pg0KSSdtIGludmVzdGlnYXRpbmcgYW4gcHJvYmxlbSB3aGVyZSBJIHNlZSBibG9jayBJL08gdHdp
-Y2UgdGhlIG1heGltdW0mbmJzcDs8YnI+DQphbGxvd2VkIHNpemUgaW4gbWF4X2h3X3NlY3RvcnNf
-a2IuIEluIG15IGNhc2UgdGhlIGRldmljZSBkcml2ZXIgc2ltcGx5PGJyPg0KZmFpbHMuIEkgaGF2
-ZSB0byBpbnZlc3RpZ2F0ZSB0aGF0IHBhcnQgZnVydGhlci4uLiBOZXZlcnRoZWxlc3MgSSB0aGlu
-ayB0aGVyZTxicj4NCm1pZ2h0IGJlIHNvbWUgc3RyYW5nZSBjYWxjdWxhdGlvbiBidWcgaW4gb25k
-ZW1hbmRfcmVhZGFoZWFkKCkuPGJyPg0KPGJyPg0KQXNzdW1lIHVzZXIgcmVhZHMgMU0gb2YgZGF0
-YSBhbmQgdGhlIGRldmljZSBkcml2ZXIgY2FuIG9ubHkgaGFuZGxlPGJyPg0KdGhpcyAxTS4gSW4g
-aW5pdGlhbF9yZWFkYWhlYWQgd2Ugd2lsbCBzZXQgcmEtJmd0O3NpemUgdG8gMU0gYW5kIGFzeW5j
-IHNpemU8YnI+DQp0byAxTSB0b28uPGJyPg0KPGJyPg0KaW5pdGlhbF9yZWFkYWhlYWQ6PGJyPg0K
-Jm5ic3A7IHJhLSZndDtzdGFydCA9IG9mZnNldDs8YnI+DQombmJzcDsgcmEtJmd0O3NpemUgPSBn
-ZXRfaW5pdF9yYV9zaXplKHJlcV9zaXplLCBtYXhfcGFnZXMpOzxicj4NCiZuYnNwOyByYS0mZ3Q7
-YXN5bmNfc2l6ZSA9IHJhLSZndDtzaXplICZndDsgcmVxX3NpemUgPyByYS0mZ3Q7c2l6ZSAtIHJl
-cV9zaXplIDogcmEtJmd0O3NpemU7PGJyPg0KPGJyPg0KSW4gdGhlIHJlYWRpdCBwYXJ0IHRoZSBj
-aGVjayBzdWNjZWVkcyBhbmQgdGhlIGZ1bmN0aW9uIHdpbGwgZG91YmxlPGJyPg0KdGhlIGFtb3Vu
-dCB0byByZWFkIGFoZWFkLiZuYnNwOzxicj4NCjxicj4NCnJlYWRpdDo8YnI+DQombmJzcDsgLyo8
-YnI+DQombmJzcDsmbmJzcDsgKiBXaWxsIHRoaXMgcmVhZCBoaXQgdGhlIHJlYWRhaGVhZCBtYXJr
-ZXIgbWFkZSBieSBpdHNlbGY/PGJyPg0KJm5ic3A7Jm5ic3A7ICogSWYgc28sIHRyaWdnZXIgdGhl
-IHJlYWRhaGVhZCBtYXJrZXIgaGl0IG5vdywgYW5kIG1lcmdlPGJyPg0KJm5ic3A7Jm5ic3A7ICog
-dGhlIHJlc3VsdGVkIG5leHQgcmVhZGFoZWFkIHdpbmRvdyBpbnRvIHRoZSBjdXJyZW50IG9uZS48
-YnI+DQombmJzcDsmbmJzcDsgKi88YnI+DQombmJzcDsgaWYgKG9mZnNldCA9PSByYS0mZ3Q7c3Rh
-cnQgJmFtcDsmYW1wOyByYS0mZ3Q7c2l6ZSA9PSByYS0mZ3Q7YXN5bmNfc2l6ZSkgezwhLS0gLS0+
-PGJyPg0KJm5ic3A7Jm5ic3A7Jm5ic3A7IHJhLSZndDthc3luY19zaXplID0gZ2V0X25leHRfcmFf
-c2l6ZShyYSwgbWF4X3BhZ2VzKTs8YnI+DQombmJzcDsmbmJzcDsmbmJzcDsgcmEtJmd0O3NpemUg
-JiM0Mzs9IHJhLSZndDthc3luY19zaXplOzxicj4NCiZuYnNwOyB9PGJyPg0KPGJyPg0KQnRyYWNl
-IG9mIGRkIGlmPS9kZXYvZmlvYTEgb2Y9L2Rldi9udWxsIGJzPTFNIGNvdW50PTEgZ2l2ZXM6PGJy
-Pg0KPGJyPg0KMjUzLDAmbmJzcDsmbmJzcDsgMjAmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsgMSZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAwLjAwMDAwMDAwMCAxOTc4
-NCZuYnNwOyBBJm5ic3A7Jm5ic3A7IFIgMjA0OCAmIzQzOyA0MDk2ICZsdDstICgyNTMsMSkgMDxi
-cj4NCjI1MywwJm5ic3A7Jm5ic3A7IDIwJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7IDImbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgMC4wMDAwMDMzMzAgMTk3ODQmbmJz
-cDsgUSZuYnNwOyZuYnNwOyBSIDIwNDggJiM0MzsgNDA5NiBbZGRdPGJyPg0KMjUzLDAmbmJzcDsm
-bmJzcDsgMjAmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgMyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyAwLjAwMDIzNTgzMyAxOTc4NCZuYnNwOyBDJm5ic3A7Jm5ic3A7
-IFIgMjA0OCAmIzQzOyA0MDk2IFswXTxicj4NCjxicj4NCkluaXRpYWwgY29tbWl0IHdhcyAxMjJh
-MjFkMTEuLi4gKHJlYWRhaGVhZDogb24tZGVtYW5kIHJlYWRhaGVhZCZuYnNwOzxicj4NCmxvZ2lj
-KSBhbmQgdGhlIHJlYWRpdCBwYXJ0IHdhcyBleHRlbmRlZCBieSA1MWRhYTg4ZWIuLi4gKHJlYWRh
-aGVhZDombmJzcDs8YnI+DQpyZW1vdmUgc3luYy9hc3luYyByZWFkYWhlYWQgY2FsbCBkZXBlbmRl
-bmN5KTxicj4NCjxicj4NCkknbSBsb3N0IHdoZXJlIG9uZSBzaG91bGQgaW1wbGVtZW50IGEgZml4
-LiBJbiB0aGUgZmlyc3QgcGFydCBvZjxicj4NCnRoZSBjYWxjdWxhdGlvbiBvciB0aGUgc2Vjb25k
-PyBPciBhbSBJIHRvdGFsbHkgd3Jvbmc/PGJyPg0KPGJyPg0KVGhhbmtzIGZvciB5b3VyIGhlbHAg
-YW5kIGJlc3QgcmVnYXJkcy48YnI+DQo8YnI+DQpNYXJrdXM8YnI+DQo8L2Rpdj4NCjwvc3Bhbj48
-L2ZvbnQ+PC9kaXY+DQo8L2Rpdj4NCjwvZGl2Pg0KPGRpdiBzdHlsZT0iaGVpZ2h0OiAwcHg7Ij48
-L2Rpdj4NCjwvZGl2Pg0KPGJyPg0KPC9kaXY+DQo8L2Rpdj4NCjwvYm9keT4NCjwvaHRtbD4NCg==
-
---_000_64c052b0b23c4b0c8535ae050b82c2cdemailandroidcom_--
-
-------=_NextPartTM-000-acc3eece-c90e-45ad-b5fc-5b0b21eccee1
-Content-Type: text/plain;
-	name="InterScan_Disclaimer.txt"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="InterScan_Disclaimer.txt"
-
-****************************************************************************
-Diese E-Mail enthält vertrauliche und/oder rechtlich geschützte
-Informationen. Wenn Sie nicht der richtige Adressat sind oder diese E-Mail
-irrtümlich erhalten haben, informieren Sie bitte sofort den Absender und
-vernichten Sie diese Mail. Das unerlaubte Kopieren sowie die unbefugte
-Weitergabe dieser Mail ist nicht gestattet.
-
-Über das Internet versandte E-Mails können unter fremden Namen erstellt oder
-manipuliert werden. Deshalb ist diese als E-Mail verschickte Nachricht keine
-rechtsverbindliche Willenserklärung.
-
-Collogia AG
-Ubierring 11
-D-50678 Köln
-
-Vorstand:
-Kadir Akin
-Dr. Michael Höhnerbach
-
-Vorsitzender des Aufsichtsrates:
-Hans Kristian Langva
-
-Registergericht: Amtsgericht Köln
-Registernummer: HRB 52 497
-
-This e-mail may contain confidential and/or privileged information. If you
-are not the intended recipient (or have received this e-mail in error)
-please notify the sender immediately and destroy this e-mail. Any
-unauthorized copying, disclosure or distribution of the material in this
-e-mail is strictly forbidden.
-
-e-mails sent over the internet may have been written under a wrong name or
-been manipulated. That is why this message sent as an e-mail is not a
-legally binding declaration of intention.
-
-Collogia AG
-Ubierring 11
-D-50678 Köln
-
-executive board:
-Kadir Akin
-Dr. Michael Höhnerbach
-
-President of the supervisory board:
-Hans Kristian Langva
-
-Registry office: district court Cologne
-Register number: HRB 52 497
-
-****************************************************************************
-
-------=_NextPartTM-000-acc3eece-c90e-45ad-b5fc-5b0b21eccee1--
+diff --git a/block/bio.c b/block/bio.c
+index 8ecc95615941..504b42278099 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1649,19 +1649,15 @@ static void bio_release_pages(struct bio *bio)
+ 	struct bio_vec *bvec;
+ 	int i;
+ 
+-	bio_for_each_segment_all(bvec, bio, i) {
+-		struct page *page = bvec->bv_page;
+-
+-		if (page)
+-			put_page(page);
+-	}
++	bio_for_each_segment_all(bvec, bio, i)
++		put_page(bvec->bv_page);
+ }
+ 
+ /*
+  * bio_check_pages_dirty() will check that all the BIO's pages are still dirty.
+  * If they are, then fine.  If, however, some pages are clean then they must
+  * have been written out during the direct-IO read.  So we take another ref on
+- * the BIO and the offending pages and re-dirty the pages in process context.
++ * the BIO and re-dirty the pages in process context.
+  *
+  * It is expected that bio_check_pages_dirty() will wholly own the BIO from
+  * here on.  It will run one put_page() against each page and will run one
+@@ -1679,52 +1675,42 @@ static struct bio *bio_dirty_list;
+  */
+ static void bio_dirty_fn(struct work_struct *work)
+ {
+-	unsigned long flags;
+-	struct bio *bio;
++	struct bio *bio, *next;
+ 
+-	spin_lock_irqsave(&bio_dirty_lock, flags);
+-	bio = bio_dirty_list;
++	spin_lock_irq(&bio_dirty_lock);
++	next = bio_dirty_list;
+ 	bio_dirty_list = NULL;
+-	spin_unlock_irqrestore(&bio_dirty_lock, flags);
++	spin_unlock_irq(&bio_dirty_lock);
+ 
+-	while (bio) {
+-		struct bio *next = bio->bi_private;
++	while ((bio = next) != NULL) {
++		next = bio->bi_private;
+ 
+ 		bio_set_pages_dirty(bio);
+ 		bio_release_pages(bio);
+ 		bio_put(bio);
+-		bio = next;
+ 	}
+ }
+ 
+ void bio_check_pages_dirty(struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+-	int nr_clean_pages = 0;
++	unsigned long flags;
+ 	int i;
+ 
+ 	bio_for_each_segment_all(bvec, bio, i) {
+-		struct page *page = bvec->bv_page;
+-
+-		if (PageDirty(page) || PageCompound(page)) {
+-			put_page(page);
+-			bvec->bv_page = NULL;
+-		} else {
+-			nr_clean_pages++;
+-		}
++		if (!PageDirty(bvec->bv_page) && !PageCompound(bvec->bv_page))
++			goto defer;
+ 	}
+ 
+-	if (nr_clean_pages) {
+-		unsigned long flags;
+-
+-		spin_lock_irqsave(&bio_dirty_lock, flags);
+-		bio->bi_private = bio_dirty_list;
+-		bio_dirty_list = bio;
+-		spin_unlock_irqrestore(&bio_dirty_lock, flags);
+-		schedule_work(&bio_dirty_work);
+-	} else {
+-		bio_put(bio);
+-	}
++	bio_release_pages(bio);
++	bio_put(bio);
++	return;
++defer:
++	spin_lock_irqsave(&bio_dirty_lock, flags);
++	bio->bi_private = bio_dirty_list;
++	bio_dirty_list = bio;
++	spin_unlock_irqrestore(&bio_dirty_lock, flags);
++	schedule_work(&bio_dirty_work);
+ }
+ EXPORT_SYMBOL_GPL(bio_check_pages_dirty);
+ 
+-- 
+2.18.0
