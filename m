@@ -1,54 +1,176 @@
-Return-Path: <prvs=72400c35d=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@lst.de" <hch@lst.de>, "keith.busch@intel.com"
-	<keith.busch@intel.com>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>
-Subject: Re: [RFC PATCH 3/3] blk-mq: Remove generation seqeunce
-Date: Thu, 12 Jul 2018 18:16:12 +0000
-Message-ID: <c42d13289e38df93bb35e9876b803420e40b03d3.camel@wdc.com>
-References: <20180521231131.6685-1-keith.busch@intel.com>
-	 <20180521231131.6685-4-keith.busch@intel.com>
-In-Reply-To: <20180521231131.6685-4-keith.busch@intel.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Return-Path: <keescook@chromium.org>
+Return-Path: <keescook@chromium.org>
+From: Kees Cook <keescook@chromium.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Kees Cook <keescook@chromium.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Eric Biggers <ebiggers@google.com>,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	Alasdair Kergon <agk@redhat.com>,
+	Rabin Vincent <rabinv@axis.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Pavel Machek <pavel@ucw.cz>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	x86@kernel.org,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Paul Mackerras <paulus@samba.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	David Howells <dhowells@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+	Jia-Ju Bai <baijiaju1990@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Will Deacon <will.deacon@arm.com>,
+	dm-devel@redhat.com,
+	linux-pm@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	linux-block@vger.kernel.org,
+	qat-linux@intel.com,
+	linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devel@driverdev.osuosl.org,
+	linux-afs@lists.infradead.org,
+	linux-wireless@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v6 11/18] dm crypt: Convert essiv from ahash to shash
+Date: Tue, 24 Jul 2018 09:49:29 -0700
+Message-Id: <20180724164936.37477-12-keescook@chromium.org>
+In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
+References: <20180724164936.37477-1-keescook@chromium.org>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE4LTA1LTIxIGF0IDE3OjExIC0wNjAwLCBLZWl0aCBCdXNjaCB3cm90ZToNCj4g
-IAkvKg0KPiAtCSAqIFdlIG1hcmtlZCBAcnEtPmFib3J0ZWRfZ3N0YXRlIGFuZCB3YWl0ZWQgZm9y
-IFJDVS4gIElmIHRoZXJlIHdlcmUNCj4gLQkgKiBjb21wbGV0aW9ucyB0aGF0IHdlIGxvc3QgdG8s
-IHRoZXkgd291bGQgaGF2ZSBmaW5pc2hlZCBhbmQNCj4gLQkgKiB1cGRhdGVkIEBycS0+Z3N0YXRl
-IGJ5IG5vdzsgb3RoZXJ3aXNlLCB0aGUgY29tcGxldGlvbiBwYXRoIGlzDQo+IC0JICogbm93IGd1
-YXJhbnRlZWQgdG8gc2VlIEBycS0+YWJvcnRlZF9nc3RhdGUgYW5kIHlpZWxkLiAgSWYNCj4gLQkg
-KiBAcnEtPmFib3J0ZWRfZ3N0YXRlIHN0aWxsIG1hdGNoZXMgQHJxLT5nc3RhdGUsIEBycSBpcyBv
-dXJzLg0KPiArCSAqIEp1c3QgZG8gYSBxdWljayBjaGVjayBpZiBpdCBpcyBleHBpcmVkIGJlZm9y
-ZSBsb2NraW5nIHRoZSByZXF1ZXN0IGluDQo+ICsJICogc28gd2UncmUgbm90IHVubmVjZXNzYXJp
-bGx5IHN5bmNocm9uaXppbmcgYWNyb3NzIENQVXMuDQo+ICAJICovDQo+IC0JaWYgKCEocnEtPnJx
-X2ZsYWdzICYgUlFGX01RX1RJTUVPVVRfRVhQSVJFRCkgJiYNCj4gLQkgICAgUkVBRF9PTkNFKHJx
-LT5nc3RhdGUpID09IHJxLT5hYm9ydGVkX2dzdGF0ZSkNCj4gKwlpZiAoIWJsa19tcV9yZXFfZXhw
-aXJlZChycSwgbmV4dCkpDQo+ICsJCXJldHVybjsNCj4gKw0KPiArCS8qDQo+ICsJICogV2UgaGF2
-ZSByZWFzb24gdG8gYmVsaWV2ZSB0aGUgcmVxdWVzdCBtYXkgYmUgZXhwaXJlZC4gVGFrZSBhDQo+
-ICsJICogcmVmZXJlbmNlIG9uIHRoZSByZXF1ZXN0IHRvIGxvY2sgdGhpcyByZXF1ZXN0IGxpZmV0
-aW1lIGludG8gaXRzDQo+ICsJICogY3VycmVudGx5IGFsbG9jYXRlZCBjb250ZXh0IHRvIHByZXZl
-bnQgaXQgZnJvbSBiZWluZyByZWFsbG9jYXRlZCBpbg0KPiArCSAqIHRoZSBldmVudCB0aGUgY29t
-cGxldGlvbiBieS1wYXNzZXMgdGhpcyB0aW1lb3V0IGhhbmRsZXIuDQo+ICsJICogDQo+ICsJICog
-SWYgdGhlIHJlZmVyZW5jZSB3YXMgYWxyZWFkeSByZWxlYXNlZCwgdGhlbiB0aGUgZHJpdmVyIGJl
-YXQgdGhlDQo+ICsJICogdGltZW91dCBoYW5kbGVyIHRvIHBvc3RpbmcgYSBuYXR1cmFsIGNvbXBs
-ZXRpb24uDQo+ICsJICovDQo+ICsJaWYgKCFrcmVmX2dldF91bmxlc3NfemVybygmcnEtPnJlZikp
-DQo+ICsJCXJldHVybjsNCj4gKw0KPiArCS8qDQo+ICsJICogVGhlIHJlcXVlc3QgaXMgbm93IGxv
-Y2tlZCBhbmQgY2Fubm90IGJlIHJlYWxsb2NhdGVkIHVuZGVybmVhdGggdGhlDQo+ICsJICogdGlt
-ZW91dCBoYW5kbGVyJ3MgcHJvY2Vzc2luZy4gUmUtdmVyaWZ5IHRoaXMgZXhhY3QgcmVxdWVzdCBp
-cyB0cnVseQ0KPiArCSAqIGV4cGlyZWQ7IGlmIGl0IGlzIG5vdCBleHBpcmVkLCB0aGVuIHRoZSBy
-ZXF1ZXN0IHdhcyBjb21wbGV0ZWQgYW5kDQo+ICsJICogcmVhbGxvY2F0ZWQgYXMgYSBuZXcgcmVx
-dWVzdC4NCj4gKwkgKi8NCj4gKwlpZiAoYmxrX21xX3JlcV9leHBpcmVkKHJxLCBuZXh0KSkNCj4g
-IAkJYmxrX21xX3JxX3RpbWVkX291dChycSwgcmVzZXJ2ZWQpOw0KPiArCWJsa19tcV9wdXRfcmVx
-dWVzdChycSk7DQo+ICB9DQoNCkhlbGxvIEtlaXRoIGFuZCBDaHJpc3RvcGgsDQoNCldoYXQgcHJl
-dmVudHMgdGhhdCBhIHJlcXVlc3QgZmluaXNoZXMgYW5kIGdldHMgcmV1c2VkIGFmdGVyIHRoZQ0K
-YmxrX21xX3JlcV9leHBpcmVkKCkgY2FsbCBoYXMgZmluaXNoZWQgYW5kIGJlZm9yZSBrcmVmX2dl
-dF91bmxlc3NfemVybygpIGlzDQpjYWxsZWQ/IElzIHRoaXMgcGVyaGFwcyBhIHJhY2UgY29uZGl0
-aW9uIHRoYXQgaGFzIG5vdCB5ZXQgYmVlbiB0cmlnZ2VyZWQgYnkNCmFueSBleGlzdGluZyBibG9j
-ayBsYXllciB0ZXN0PyBQbGVhc2Ugbm90ZSB0aGF0IHRoZXJlIGlzIG5vIHN1Y2ggcmFjZQ0KY29u
-ZGl0aW9uIGluIHRoZSBwYXRjaCBJIGhhZCBwb3N0ZWQgKCJibGstbXE6IFJld29yayBibGstbXEg
-dGltZW91dCBoYW5kbGluZw0KYWdhaW4iIC0gaHR0cHM6Ly93d3cuc3Bpbmljcy5uZXQvbGlzdHMv
-bGludXgtYmxvY2svbXNnMjY0ODkuaHRtbCkuDQoNClRoYW5rcywNCg0KQmFydC4NCg0KDQoNCg0K
+In preparing to remove all stack VLA usage from the kernel[1], this
+removes the discouraged use of AHASH_REQUEST_ON_STACK in favor of the
+smaller SHASH_DESC_ON_STACK by converting from ahash-wrapped-shash to
+direct shash. By removing a layer of indirection this both improves
+performance and reduces stack usage. The stack allocation will be made
+a fixed size in a later patch to the crypto subsystem.
+
+[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Eric Biggers <ebiggers@google.com>
+---
+ drivers/md/dm-crypt.c | 31 ++++++++++++++-----------------
+ 1 file changed, 14 insertions(+), 17 deletions(-)
+
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index b61b069c33af..c4c922990090 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -99,7 +99,7 @@ struct crypt_iv_operations {
+ };
+ 
+ struct iv_essiv_private {
+-	struct crypto_ahash *hash_tfm;
++	struct crypto_shash *hash_tfm;
+ 	u8 *salt;
+ };
+ 
+@@ -327,25 +327,22 @@ static int crypt_iv_plain64be_gen(struct crypt_config *cc, u8 *iv,
+ static int crypt_iv_essiv_init(struct crypt_config *cc)
+ {
+ 	struct iv_essiv_private *essiv = &cc->iv_gen_private.essiv;
+-	AHASH_REQUEST_ON_STACK(req, essiv->hash_tfm);
+-	struct scatterlist sg;
++	SHASH_DESC_ON_STACK(desc, essiv->hash_tfm);
+ 	struct crypto_cipher *essiv_tfm;
+ 	int err;
+ 
+-	sg_init_one(&sg, cc->key, cc->key_size);
+-	ahash_request_set_tfm(req, essiv->hash_tfm);
+-	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
+-	ahash_request_set_crypt(req, &sg, essiv->salt, cc->key_size);
++	desc->tfm = essiv->hash_tfm;
++	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
+ 
+-	err = crypto_ahash_digest(req);
+-	ahash_request_zero(req);
++	err = crypto_shash_digest(desc, cc->key, cc->key_size, essiv->salt);
++	shash_desc_zero(desc);
+ 	if (err)
+ 		return err;
+ 
+ 	essiv_tfm = cc->iv_private;
+ 
+ 	err = crypto_cipher_setkey(essiv_tfm, essiv->salt,
+-			    crypto_ahash_digestsize(essiv->hash_tfm));
++			    crypto_shash_digestsize(essiv->hash_tfm));
+ 	if (err)
+ 		return err;
+ 
+@@ -356,7 +353,7 @@ static int crypt_iv_essiv_init(struct crypt_config *cc)
+ static int crypt_iv_essiv_wipe(struct crypt_config *cc)
+ {
+ 	struct iv_essiv_private *essiv = &cc->iv_gen_private.essiv;
+-	unsigned salt_size = crypto_ahash_digestsize(essiv->hash_tfm);
++	unsigned salt_size = crypto_shash_digestsize(essiv->hash_tfm);
+ 	struct crypto_cipher *essiv_tfm;
+ 	int r, err = 0;
+ 
+@@ -408,7 +405,7 @@ static void crypt_iv_essiv_dtr(struct crypt_config *cc)
+ 	struct crypto_cipher *essiv_tfm;
+ 	struct iv_essiv_private *essiv = &cc->iv_gen_private.essiv;
+ 
+-	crypto_free_ahash(essiv->hash_tfm);
++	crypto_free_shash(essiv->hash_tfm);
+ 	essiv->hash_tfm = NULL;
+ 
+ 	kzfree(essiv->salt);
+@@ -426,7 +423,7 @@ static int crypt_iv_essiv_ctr(struct crypt_config *cc, struct dm_target *ti,
+ 			      const char *opts)
+ {
+ 	struct crypto_cipher *essiv_tfm = NULL;
+-	struct crypto_ahash *hash_tfm = NULL;
++	struct crypto_shash *hash_tfm = NULL;
+ 	u8 *salt = NULL;
+ 	int err;
+ 
+@@ -436,14 +433,14 @@ static int crypt_iv_essiv_ctr(struct crypt_config *cc, struct dm_target *ti,
+ 	}
+ 
+ 	/* Allocate hash algorithm */
+-	hash_tfm = crypto_alloc_ahash(opts, 0, CRYPTO_ALG_ASYNC);
++	hash_tfm = crypto_alloc_shash(opts, 0, 0);
+ 	if (IS_ERR(hash_tfm)) {
+ 		ti->error = "Error initializing ESSIV hash";
+ 		err = PTR_ERR(hash_tfm);
+ 		goto bad;
+ 	}
+ 
+-	salt = kzalloc(crypto_ahash_digestsize(hash_tfm), GFP_KERNEL);
++	salt = kzalloc(crypto_shash_digestsize(hash_tfm), GFP_KERNEL);
+ 	if (!salt) {
+ 		ti->error = "Error kmallocing salt storage in ESSIV";
+ 		err = -ENOMEM;
+@@ -454,7 +451,7 @@ static int crypt_iv_essiv_ctr(struct crypt_config *cc, struct dm_target *ti,
+ 	cc->iv_gen_private.essiv.hash_tfm = hash_tfm;
+ 
+ 	essiv_tfm = alloc_essiv_cipher(cc, ti, salt,
+-				       crypto_ahash_digestsize(hash_tfm));
++				       crypto_shash_digestsize(hash_tfm));
+ 	if (IS_ERR(essiv_tfm)) {
+ 		crypt_iv_essiv_dtr(cc);
+ 		return PTR_ERR(essiv_tfm);
+@@ -465,7 +462,7 @@ static int crypt_iv_essiv_ctr(struct crypt_config *cc, struct dm_target *ti,
+ 
+ bad:
+ 	if (hash_tfm && !IS_ERR(hash_tfm))
+-		crypto_free_ahash(hash_tfm);
++		crypto_free_shash(hash_tfm);
+ 	kfree(salt);
+ 	return err;
+ }
+-- 
+2.17.1
