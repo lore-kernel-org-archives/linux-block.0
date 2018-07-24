@@ -1,34 +1,24 @@
-Return-Path: <gustavo@embeddedor.com>
-Date: Mon, 2 Jul 2018 12:52:06 -0500
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] block/loop: mark expected switch fall-through
-Message-ID: <20180702175206.GA18848@embeddedor.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCHv2 1/2] blk-mq: export setting request completion state
+To: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org
+Cc: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+ Jianchao Wang <jianchao.w.wang@oracle.com>,
+ Bart Van Assche <bart.vanassche@wdc.com>
+References: <20180723143751.10843-1-keith.busch@intel.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <90649cd7-6e8a-c87c-4773-eb6881e85d72@kernel.dk>
+Date: Tue, 24 Jul 2018 13:42:19 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180723143751.10843-1-keith.busch@intel.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-In preparation to enabling -Wimplicit-fallthrough, mark switch cases
-where we are expecting to fall through.
+On 7/23/18 7:37 AM, Keith Busch wrote:
+> This is preparing for drivers that want to directly alter the state of
+> their requests. No functional change here.
 
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
----
- drivers/block/loop.c | 1 +
- 1 file changed, 1 insertion(+)
+Added this (and 2/2) for 4.18...
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index d6b6f43..ac47c23 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1611,6 +1611,7 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
- 	case LOOP_GET_STATUS64:
- 	case LOOP_SET_STATUS64:
- 		arg = (unsigned long) compat_ptr(arg);
-+		/* fall through */
- 	case LOOP_SET_FD:
- 	case LOOP_CHANGE_FD:
- 		err = lo_ioctl(bdev, mode, cmd, arg);
 -- 
-2.7.4
+Jens Axboe
