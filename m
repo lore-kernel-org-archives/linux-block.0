@@ -1,14 +1,12 @@
-Return-Path: <keescook@google.com>
+Return-Path: <ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
-Sender: keescook@google.com
-In-Reply-To: <CAKv+Gu-D9FrOrFU0EmkPA52vrywCGZkFP9vUsyEovdby9dLj0g@mail.gmail.com>
+In-Reply-To: <20180724164936.37477-18-keescook@chromium.org>
 References: <20180724164936.37477-1-keescook@chromium.org> <20180724164936.37477-18-keescook@chromium.org>
- <CAKv+Gu-D9FrOrFU0EmkPA52vrywCGZkFP9vUsyEovdby9dLj0g@mail.gmail.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Tue, 24 Jul 2018 10:51:27 -0700
-Message-ID: <CAGXu5j+-AwHdGZ7Be854WyEQoK2p57JPuTgSXcFq7GOzUtJGEA@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Tue, 24 Jul 2018 18:57:44 +0200
+Message-ID: <CAKv+Gu-D9FrOrFU0EmkPA52vrywCGZkFP9vUsyEovdby9dLj0g@mail.gmail.com>
 Subject: Re: [PATCH v6 17/18] crypto: ccm: Remove VLA usage
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Kees Cook <keescook@chromium.org>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>, Arnd Bergmann <arnd@arndb.de>,
 	Eric Biggers <ebiggers@google.com>, "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
 	Alasdair Kergon <agk@redhat.com>, Rabin Vincent <rabinv@axis.com>, Tim Chen <tim.c.chen@linux.intel.com>,
@@ -25,8 +23,7 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>, Arnd Bergmann <arnd@arndb.de>,
 	Will Deacon <will.deacon@arm.com>, device-mapper development <dm-devel@redhat.com>,
 	linux-pm <linux-pm@vger.kernel.org>,
 	"open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>, drbd-dev@lists.linbit.com,
-	linux-block <linux-block@vger.kernel.org>, qat-linux@intel.com,
-	linux-ppp@vger.kernel.org,
+	linux-block@vger.kernel.org, qat-linux@intel.com, linux-ppp@vger.kernel.org,
 	"<netdev@vger.kernel.org>" <netdev@vger.kernel.org>,
 	"open list:ANDROID DRIVERS" <devel@driverdev.osuosl.org>, linux-afs@lists.infradead.org,
 	"<linux-wireless@vger.kernel.org>" <linux-wireless@vger.kernel.org>,
@@ -34,22 +31,58 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>, Arnd Bergmann <arnd@arndb.de>,
 Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Jul 24, 2018 at 9:57 AM, Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
-> On 24 July 2018 at 18:49, Kees Cook <keescook@chromium.org> wrote:
->> From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->>
->> In the quest to remove all stack VLA usage from the kernel[1], this
->> drops AHASH_REQUEST_ON_STACK by preallocated the ahash request area
->> with the skcipher area (which are not used at the same time).
->>
+On 24 July 2018 at 18:49, Kees Cook <keescook@chromium.org> wrote:
+> From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 >
-> -EGRAMMAR
+> In the quest to remove all stack VLA usage from the kernel[1], this
+> drops AHASH_REQUEST_ON_STACK by preallocated the ahash request area
+> with the skcipher area (which are not used at the same time).
+>
 
-Whoops. Will fix my poor sentence merging. :)
+-EGRAMMAR
 
--Kees
-
--- 
-Kees Cook
-Pixel Security
+> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+>  crypto/ccm.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+>
+> diff --git a/crypto/ccm.c b/crypto/ccm.c
+> index 0a083342ec8c..b242fd0d3262 100644
+> --- a/crypto/ccm.c
+> +++ b/crypto/ccm.c
+> @@ -50,7 +50,10 @@ struct crypto_ccm_req_priv_ctx {
+>         u32 flags;
+>         struct scatterlist src[3];
+>         struct scatterlist dst[3];
+> -       struct skcipher_request skreq;
+> +       union {
+> +               struct ahash_request ahreq;
+> +               struct skcipher_request skreq;
+> +       };
+>  };
+>
+>  struct cbcmac_tfm_ctx {
+> @@ -181,7 +184,7 @@ static int crypto_ccm_auth(struct aead_request *req, struct scatterlist *plain,
+>         struct crypto_ccm_req_priv_ctx *pctx = crypto_ccm_reqctx(req);
+>         struct crypto_aead *aead = crypto_aead_reqtfm(req);
+>         struct crypto_ccm_ctx *ctx = crypto_aead_ctx(aead);
+> -       AHASH_REQUEST_ON_STACK(ahreq, ctx->mac);
+> +       struct ahash_request *ahreq = &pctx->ahreq;
+>         unsigned int assoclen = req->assoclen;
+>         struct scatterlist sg[3];
+>         u8 *odata = pctx->odata;
+> @@ -427,7 +430,7 @@ static int crypto_ccm_init_tfm(struct crypto_aead *tfm)
+>         crypto_aead_set_reqsize(
+>                 tfm,
+>                 align + sizeof(struct crypto_ccm_req_priv_ctx) +
+> -               crypto_skcipher_reqsize(ctr));
+> +               max(crypto_ahash_reqsize(mac), crypto_skcipher_reqsize(ctr)));
+>
+>         return 0;
+>
+> --
+> 2.17.1
+>
