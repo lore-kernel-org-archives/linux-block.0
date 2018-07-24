@@ -1,139 +1,41 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Laurence Oberman <loberman@redhat.com>,
-	Omar Sandoval <osandov@fb.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH] blk-mq: issue directly if hw queue isn't busy in case of 'none'
-Date: Tue, 10 Jul 2018 09:03:31 +0800
-Message-Id: <20180710010331.27479-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:39922 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388414AbeGXSuS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Jul 2018 14:50:18 -0400
+Date: Tue, 24 Jul 2018 10:42:41 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com
+Subject: Re: data corruption with 'splt' workload to XFS on DM cache with its
+ 3 underlying devices being on same NVMe device
+Message-ID: <20180724174241.GA828@infradead.org>
+References: <20180723163357.GA29658@redhat.com>
+ <e761830f-e3f7-3e88-1697-b4b150e84e5f@suse.de>
+ <20180724130703.GA30804@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180724130703.GA30804@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-In case of 'none' io scheduler, when hw queue isn't busy, it isn't
-necessary to enqueue request to sw queue and dequeue it from
-sw queue because request may be submitted to hw queue asap without
-extra cost, meantime there shouldn't be much request in sw queue,
-and we don't need to worry about effect on IO merge.
+On Tue, Jul 24, 2018 at 09:07:03AM -0400, Mike Snitzer wrote:
+> True.  We only ever support mapping the partitions ontop of
+> request-based multipath (via dm-linear volumes created by kpartx).
+> 
+> > So, have you tested that request-based multipathing works on a
+> > partition _at all_? I'm not sure if partition mapping is done
+> > correctly here; we never remap the start of the request (nor bio,
+> > come to speak of it), so it looks as if we would be doing the wrong
+> > things here.
+> > 
+> > Have you checked that partition remapping is done correctly?
+> 
+> It clearly doesn't work.  Not quite following why but...
 
-There are still some single hw queue SCSI HBAs(HPSA, megaraid_sas, ...)
-which may connect high performance devices, so 'none' is often required
-for obtaining good performance.
-
-This patch improves IOPS and decreases CPU unilization on megaraid_sas,
-per Kashyap's test.
-
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Laurence Oberman <loberman@redhat.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Reported-by: Kashyap Desai <kashyap.desai@broadcom.com>
-Tested-by: Kashyap Desai <kashyap.desai@broadcom.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c | 13 ++++++++++++-
- block/blk-mq.c       | 23 ++++++++++++++++++++++-
- block/blk-mq.h       |  2 ++
- 3 files changed, 36 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index fdc129e64cc4..cf9c66c6d35a 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -405,8 +405,19 @@ void blk_mq_sched_insert_requests(struct request_queue *q,
- 
- 	if (e && e->type->ops.mq.insert_requests)
- 		e->type->ops.mq.insert_requests(hctx, list, false);
--	else
-+	else {
-+		/*
-+		 * try to issue requests directly if the hw queue isn't
-+		 * busy in case of 'none' scheduler, and this way may save
-+		 * us one extra enqueue & dequeue to sw queue.
-+		 */
-+		if (!hctx->dispatch_busy && !e && !run_queue_async) {
-+			blk_mq_try_issue_list_directly(hctx, list);
-+			if (list_empty(list))
-+				return;
-+		}
- 		blk_mq_insert_requests(hctx, ctx, list);
-+	}
- 
- 	blk_mq_run_hw_queue(hctx, run_queue_async);
- }
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d7e09d35d1fb..86c1a90319ae 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1691,13 +1691,16 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	ret = q->mq_ops->queue_rq(hctx, &bd);
- 	switch (ret) {
- 	case BLK_STS_OK:
-+		blk_mq_update_dispatch_busy(hctx, false);
- 		*cookie = new_cookie;
- 		break;
- 	case BLK_STS_RESOURCE:
- 	case BLK_STS_DEV_RESOURCE:
-+		blk_mq_update_dispatch_busy(hctx, true);
- 		__blk_mq_requeue_request(rq);
- 		break;
- 	default:
-+		blk_mq_update_dispatch_busy(hctx, false);
- 		*cookie = BLK_QC_T_NONE;
- 		break;
- 	}
-@@ -1780,6 +1783,23 @@ blk_status_t blk_mq_request_issue_directly(struct request *rq)
- 	return ret;
- }
- 
-+void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
-+		struct list_head *list)
-+{
-+	while (!list_empty(list)) {
-+		blk_status_t ret;
-+		struct request *rq = list_first_entry(list, struct request,
-+				queuelist);
-+
-+		list_del_init(&rq->queuelist);
-+		ret = blk_mq_request_issue_directly(rq);
-+		if (ret != BLK_STS_OK) {
-+			list_add(&rq->queuelist, list);
-+			break;
-+		}
-+	}
-+}
-+
- static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- {
- 	const int is_sync = op_is_sync(bio->bi_opf);
-@@ -1881,7 +1901,8 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 			blk_mq_try_issue_directly(data.hctx, same_queue_rq,
- 					&cookie);
- 		}
--	} else if (q->nr_hw_queues > 1 && is_sync) {
-+	} else if ((q->nr_hw_queues > 1 && is_sync) || (!q->elevator &&
-+			!data.hctx->dispatch_busy)) {
- 		blk_mq_put_ctx(data.ctx);
- 		blk_mq_bio_to_request(rq, bio);
- 		blk_mq_try_issue_directly(data.hctx, rq, &cookie);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 23659f41bf2c..114fa28da44c 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -64,6 +64,8 @@ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
- 
- /* Used by blk_insert_cloned_request() to issue request directly */
- blk_status_t blk_mq_request_issue_directly(struct request *rq);
-+void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
-+				    struct list_head *list);
- 
- /*
-  * CPU -> queue mappings
--- 
-2.9.5
+blk_insert_cloned_request seems to be missing a call to
+blk_partition_remap.  Given that no one but dm-multipath uses this
+request clone insert helper, and people generally run multipath on
+the whole device this is a code path that is almost never exercised.
