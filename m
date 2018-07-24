@@ -1,220 +1,99 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk, ming.lei@redhat.com, bart.vanassche@wdc.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC] blk-mq: clean up the hctx restart
-Date: Tue, 31 Jul 2018 12:02:15 +0800
-Message-Id: <1533009735-2221-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <keescook@chromium.org>
+Return-Path: <keescook@chromium.org>
+From: Kees Cook <keescook@chromium.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Kees Cook <keescook@chromium.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Eric Biggers <ebiggers@google.com>,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	Alasdair Kergon <agk@redhat.com>,
+	Rabin Vincent <rabinv@axis.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Pavel Machek <pavel@ucw.cz>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	x86@kernel.org,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Paul Mackerras <paulus@samba.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	David Howells <dhowells@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+	Jia-Ju Bai <baijiaju1990@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Will Deacon <will.deacon@arm.com>,
+	dm-devel@redhat.com,
+	linux-pm@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	linux-block@vger.kernel.org,
+	qat-linux@intel.com,
+	linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devel@driverdev.osuosl.org,
+	linux-afs@lists.infradead.org,
+	linux-wireless@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v6 01/18] crypto: xcbc: Remove VLA usage
+Date: Tue, 24 Jul 2018 09:49:19 -0700
+Message-Id: <20180724164936.37477-2-keescook@chromium.org>
+In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
+References: <20180724164936.37477-1-keescook@chromium.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Currently, we will always set SCHED_RESTART whenever there are
-requests in hctx->dispatch, then when request is completed and
-freed the hctx queues will be restarted to avoid IO hang. This
-is unnecessary most of time. Especially when there are lots of
-LUNs attached to one host, the RR restart loop could be very
-expensive.
+In the quest to remove all stack VLA usage from the kernel[1], this uses
+the maximum blocksize and adds a sanity check. For xcbc, the blocksize
+must always be 16, so use that, since it's already being enforced during
+instantiation.
 
-Requests will be queued on hctx dispath list due to:
- - flush and cpu hotplug cases
- - no driver tag w/ io scheduler
- - LLDD returns BLK_STS_RESOURCE/BLK_STS_DEV_RESOURCE
- - no driver budget
-We needn't care about the 1st case, it is normal insert.
-Regarding the 2nd case, if tags are shared, the sbitmap_queue
-wakeup hook will work and hctx_may_queue will avoid starvation of
-other ones, otherwise, hctx restart is employed, but it is done
-by blk_mq_mark_tag_wait. We need hctx restart for the 3rd and 4th
-case to rerun the hctx queue when some LLDD limits are lifted due
-to in-flight requests are completed.
+[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-So we remove the blk_mq_sched_mark_restart_hctx from
-blk_mq_sched_dispatch_requests and only use it when LLDD returns
-BLK_STS_DEV_RESOURCE and no driver budget. In addition, there some
-race conditions fixed in this patch. More details please refer to
-comment of blk_mq_dispatch_rq_list.
-
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- block/blk-mq-sched.c |  7 ++---
- block/blk-mq-sched.h |  1 +
- block/blk-mq.c       | 82 +++++++++++++++++++++++++++++++---------------------
- 3 files changed, 52 insertions(+), 38 deletions(-)
+ crypto/xcbc.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 56c493c..3270ad0 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -54,7 +54,7 @@ void blk_mq_sched_assign_ioc(struct request *rq, struct bio *bio)
-  * Mark a hardware queue as needing a restart. For shared queues, maintain
-  * a count of how many hardware queues are marked for restart.
-  */
--static void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx)
-+void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx)
+diff --git a/crypto/xcbc.c b/crypto/xcbc.c
+index 25c75af50d3f..c055f57fab11 100644
+--- a/crypto/xcbc.c
++++ b/crypto/xcbc.c
+@@ -57,15 +57,17 @@ struct xcbc_desc_ctx {
+ 	u8 ctx[];
+ };
+ 
++#define XCBC_BLOCKSIZE	16
++
+ static int crypto_xcbc_digest_setkey(struct crypto_shash *parent,
+ 				     const u8 *inkey, unsigned int keylen)
  {
- 	if (test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
- 		return;
-@@ -202,15 +202,13 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 * we only ever dispatch a fraction of the requests available because
- 	 * of low device queue depth. Once we pull requests out of the IO
- 	 * scheduler, we can no longer merge or sort them. So it's best to
--	 * leave them there for as long as we can. Mark the hw queue as
--	 * needing a restart in that case.
-+	 * leave them there for as long as we can.
- 	 *
- 	 * We want to dispatch from the scheduler if there was nothing
- 	 * on the dispatch list or we were able to dispatch from the
- 	 * dispatch list.
- 	 */
- 	if (!list_empty(&rq_list)) {
--		blk_mq_sched_mark_restart_hctx(hctx);
- 		if (blk_mq_dispatch_rq_list(q, &rq_list, false)) {
- 			if (has_sched_dispatch)
- 				blk_mq_do_dispatch_sched(hctx);
-@@ -417,7 +415,6 @@ void blk_mq_sched_restart(struct blk_mq_hw_ctx *const hctx)
- 		 */
- 		if (!atomic_read(&queue->shared_hctx_restart))
- 			return;
--
- 		rcu_read_lock();
- 		list_for_each_entry_rcu_rr(q, queue, &set->tag_list,
- 					   tag_set_list) {
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 0cb8f93..650cbfc 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -32,6 +32,7 @@ int blk_mq_sched_init_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
- 			   unsigned int hctx_idx);
- void blk_mq_sched_exit_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
- 			    unsigned int hctx_idx);
-+void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx);
+ 	unsigned long alignmask = crypto_shash_alignmask(parent);
+ 	struct xcbc_tfm_ctx *ctx = crypto_shash_ctx(parent);
+-	int bs = crypto_shash_blocksize(parent);
+ 	u8 *consts = PTR_ALIGN(&ctx->ctx[0], alignmask + 1);
+ 	int err = 0;
+-	u8 key1[bs];
++	u8 key1[XCBC_BLOCKSIZE];
++	int bs = sizeof(key1);
  
- static inline bool
- blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 45df734..b47627a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1086,6 +1086,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 	bool no_tag = false;
- 	int errors, queued;
- 	blk_status_t ret = BLK_STS_OK;
-+	bool marked = false;
+ 	if ((err = crypto_cipher_setkey(ctx->child, inkey, keylen)))
+ 		return err;
+@@ -212,7 +214,7 @@ static int xcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 		return PTR_ERR(alg);
  
- 	if (list_empty(list))
- 		return false;
-@@ -1096,6 +1097,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 	 * Now process all the entries, sending them to the driver.
- 	 */
- 	errors = queued = 0;
-+retry:
- 	do {
- 		struct blk_mq_queue_data bd;
- 
-@@ -1115,12 +1117,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 			 */
- 			if (!blk_mq_mark_tag_wait(&hctx, rq)) {
- 				blk_mq_put_dispatch_budget(hctx);
--				/*
--				 * For non-shared tags, the RESTART check
--				 * will suffice.
--				 */
--				if (hctx->flags & BLK_MQ_F_TAG_SHARED)
--					no_tag = true;
-+				no_tag = true;
- 				break;
- 			}
- 		}
-@@ -1172,42 +1169,61 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 	 * that is where we will continue on next queue run.
- 	 */
- 	if (!list_empty(list)) {
--		bool needs_restart;
-+		bool run_queue = false;
-+
-+		if (!no_tag && (ret != BLK_STS_RESOURCE) && !marked) {
-+			blk_mq_sched_mark_restart_hctx(hctx);
-+			marked = true;
-+			/*
-+			 * .queue_rq will put the budget, so we need to get it again.
-+			 */
-+			got_budget = false;
-+			goto retry;
-+		}
- 
- 		spin_lock(&hctx->lock);
- 		list_splice_init(list, &hctx->dispatch);
- 		spin_unlock(&hctx->lock);
- 
- 		/*
--		 * If SCHED_RESTART was set by the caller of this function and
--		 * it is no longer set that means that it was cleared by another
--		 * thread and hence that a queue rerun is needed.
-+		 * The reason for why we reach here could be:
-+		 *  - No driver tag
-+		 *    For the shared-tags case, the tag wakeup hook will work
-+		 *    and hctx_may_queue will avoid starvation of other ones.
-+		 *    For the non-shared-tags case, hctx restart is employed.
- 		 *
--		 * If 'no_tag' is set, that means that we failed getting
--		 * a driver tag with an I/O scheduler attached. If our dispatch
--		 * waitqueue is no longer active, ensure that we run the queue
--		 * AFTER adding our entries back to the list.
-+		 *    Because reqs have not been queued to hctx->dispatch list
-+		 *    when blk_mq_mark_tag_wait, both of two conditions will be
-+		 *    triggered w/ an empty hctx->dispatch and do nothing finally.
-+		 *    So recheck them here and rerun the queue if needed.
- 		 *
--		 * If no I/O scheduler has been configured it is possible that
--		 * the hardware queue got stopped and restarted before requests
--		 * were pushed back onto the dispatch list. Rerun the queue to
--		 * avoid starvation. Notes:
--		 * - blk_mq_run_hw_queue() checks whether or not a queue has
--		 *   been stopped before rerunning a queue.
--		 * - Some but not all block drivers stop a queue before
--		 *   returning BLK_STS_RESOURCE. Two exceptions are scsi-mq
--		 *   and dm-rq.
--		 *
--		 * If driver returns BLK_STS_RESOURCE and SCHED_RESTART
--		 * bit is set, run queue after a delay to avoid IO stalls
--		 * that could otherwise occur if the queue is idle.
-+		 *  - BLK_STS_DEV_RESOURCE/no budget
-+		 *    Employ the hctx restart mechanism to restart the queue.
-+		 *    The LLDD resources could be released:
-+		 *     - before mark SCHED_RESTART. We retry to dispatch to fix
-+		 *       this case.
-+		 *     - after mark SCHED_RESTART before queue requests on
-+		 *       hctx->dispatch. we recheck the SCHED_RESTART, if not there,
-+		 *       rerun the hctx.
-+		 *  - BLK_STS_RESOURCE
-+		 *    Run queue after a delay to avoid IO stalls.
-+		 *    More details please refer to comment of BLK_STS_DEV_RESOURCE.
- 		 */
--		needs_restart = blk_mq_sched_needs_restart(hctx);
--		if (!needs_restart ||
--		    (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
--			blk_mq_run_hw_queue(hctx, true);
--		else if (needs_restart && (ret == BLK_STS_RESOURCE))
--			blk_mq_delay_run_hw_queue(hctx, BLK_MQ_RESOURCE_DELAY);
-+
-+		if (no_tag) {
-+			if (hctx->flags & BLK_MQ_F_TAG_SHARED)
-+				run_queue = list_empty_careful(&hctx->dispatch_wait.entry);
-+			else
-+				run_queue = !blk_mq_sched_needs_restart(hctx);
-+			if (run_queue)
-+				blk_mq_run_hw_queue(hctx, true);
-+		} else if (ret == BLK_STS_RESOURCE){
-+			if (blk_mq_sched_needs_restart(hctx))
-+				blk_mq_delay_run_hw_queue(hctx, BLK_MQ_RESOURCE_DELAY);
-+		} else {
-+			if (!blk_mq_sched_needs_restart(hctx))
-+				blk_mq_run_hw_queue(hctx, true);
-+		}
- 
- 		return false;
- 	}
+ 	switch(alg->cra_blocksize) {
+-	case 16:
++	case XCBC_BLOCKSIZE:
+ 		break;
+ 	default:
+ 		goto out_put_alg;
 -- 
-2.7.4
+2.17.1
