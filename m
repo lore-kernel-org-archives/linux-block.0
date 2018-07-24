@@ -1,134 +1,500 @@
-Return-Path: <maxg@mellanox.com>
-From: Max Gurtovoy <maxg@mellanox.com>
-To: keith.busch@intel.com, linux-nvme@lists.infradead.org, sagi@grimberg.me,
-        hch@lst.de, martin.petersen@oracle.com, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-Cc: vladimirk@mellanox.com, Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH v3 1/3] block: move ref_tag calculation func to the block layer
-Date: Wed, 25 Jul 2018 11:46:59 +0300
-Message-Id: <1532508421-2711-1-git-send-email-maxg@mellanox.com>
+Return-Path: <keescook@chromium.org>
+Return-Path: <keescook@chromium.org>
+From: Kees Cook <keescook@chromium.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Kees Cook <keescook@chromium.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Eric Biggers <ebiggers@google.com>,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	Alasdair Kergon <agk@redhat.com>,
+	Rabin Vincent <rabinv@axis.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Pavel Machek <pavel@ucw.cz>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	x86@kernel.org,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Paul Mackerras <paulus@samba.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	David Howells <dhowells@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+	Jia-Ju Bai <baijiaju1990@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Will Deacon <will.deacon@arm.com>,
+	dm-devel@redhat.com,
+	linux-pm@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	linux-block@vger.kernel.org,
+	qat-linux@intel.com,
+	linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devel@driverdev.osuosl.org,
+	linux-afs@lists.infradead.org,
+	linux-wireless@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v6 12/18] drbd: Convert from ahash to shash
+Date: Tue, 24 Jul 2018 09:49:30 -0700
+Message-Id: <20180724164936.37477-13-keescook@chromium.org>
+In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
+References: <20180724164936.37477-1-keescook@chromium.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Currently this function is implemented in the scsi layer, but it's
-actual place should be the block layer since T10-PI is a general
-data integrity feature that is used in the nvme protocol as well.
+In preparing to remove all stack VLA usage from the kernel[1], this
+removes the discouraged use of AHASH_REQUEST_ON_STACK in favor of
+the smaller SHASH_DESC_ON_STACK by converting from ahash-wrapped-shash
+to direct shash. By removing a layer of indirection this both improves
+performance and reduces stack usage. The stack allocation will be made
+a fixed size in a later patch to the crypto subsystem.
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
+[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+
+Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/infiniband/ulp/iser/iser_memory.c | 2 +-
- drivers/nvme/host/core.c                  | 3 +--
- drivers/scsi/mpt3sas/mpt3sas_scsih.c      | 2 +-
- drivers/scsi/sd_dif.c                     | 4 ++--
- include/linux/t10-pi.h                    | 6 ++++++
- include/scsi/scsi_cmnd.h                  | 7 +------
- 6 files changed, 12 insertions(+), 12 deletions(-)
+ drivers/block/drbd/drbd_int.h      | 13 +++----
+ drivers/block/drbd/drbd_main.c     | 14 ++++----
+ drivers/block/drbd/drbd_nl.c       | 39 +++++++--------------
+ drivers/block/drbd/drbd_receiver.c | 35 ++++++++++---------
+ drivers/block/drbd/drbd_worker.c   | 56 +++++++++++++-----------------
+ 5 files changed, 69 insertions(+), 88 deletions(-)
 
-diff --git a/drivers/infiniband/ulp/iser/iser_memory.c b/drivers/infiniband/ulp/iser/iser_memory.c
-index ca844a9..130bf16 100644
---- a/drivers/infiniband/ulp/iser/iser_memory.c
-+++ b/drivers/infiniband/ulp/iser/iser_memory.c
-@@ -311,7 +311,7 @@ void iser_unreg_mem_fastreg(struct iscsi_iser_task *iser_task,
- {
- 	domain->sig_type = IB_SIG_TYPE_T10_DIF;
- 	domain->sig.dif.pi_interval = scsi_prot_interval(sc);
--	domain->sig.dif.ref_tag = scsi_prot_ref_tag(sc);
-+	domain->sig.dif.ref_tag = t10_pi_ref_tag(sc->request);
- 	/*
- 	 * At the moment we hard code those, but in the future
- 	 * we will take them from sc.
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index bf65501..191177b 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -627,8 +627,7 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 		case NVME_NS_DPS_PI_TYPE2:
- 			control |= NVME_RW_PRINFO_PRCHK_GUARD |
- 					NVME_RW_PRINFO_PRCHK_REF;
--			cmnd->rw.reftag = cpu_to_le32(
--					nvme_block_nr(ns, blk_rq_pos(req)));
-+			cmnd->rw.reftag = cpu_to_le32(t10_pi_ref_tag(req));
- 			break;
- 		}
- 	}
-diff --git a/drivers/scsi/mpt3sas/mpt3sas_scsih.c b/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-index b8d131a..dd738ae 100644
---- a/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-+++ b/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-@@ -4568,7 +4568,7 @@ static int _scsih_set_satl_pending(struct scsi_cmnd *scmd, bool pending)
- 		    MPI2_SCSIIO_EEDPFLAGS_CHECK_REFTAG |
- 		    MPI2_SCSIIO_EEDPFLAGS_CHECK_GUARD;
- 		mpi_request->CDB.EEDP32.PrimaryReferenceTag =
--		    cpu_to_be32(scsi_prot_ref_tag(scmd));
-+		    cpu_to_be32(t10_pi_ref_tag(scmd->request));
- 		break;
+diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
+index bc4ed2ed40a2..97d8e290c2be 100644
+--- a/drivers/block/drbd/drbd_int.h
++++ b/drivers/block/drbd/drbd_int.h
+@@ -726,10 +726,10 @@ struct drbd_connection {
+ 	struct list_head transfer_log;	/* all requests not yet fully processed */
  
- 	case SCSI_PROT_DIF_TYPE3:
-diff --git a/drivers/scsi/sd_dif.c b/drivers/scsi/sd_dif.c
-index 9035380..d8de43d 100644
---- a/drivers/scsi/sd_dif.c
-+++ b/drivers/scsi/sd_dif.c
-@@ -124,7 +124,7 @@ void sd_dif_prepare(struct scsi_cmnd *scmd)
- 	if (sdkp->protection_type == T10_PI_TYPE3_PROTECTION)
- 		return;
+ 	struct crypto_shash *cram_hmac_tfm;
+-	struct crypto_ahash *integrity_tfm;  /* checksums we compute, updates protected by connection->data->mutex */
+-	struct crypto_ahash *peer_integrity_tfm;  /* checksums we verify, only accessed from receiver thread  */
+-	struct crypto_ahash *csums_tfm;
+-	struct crypto_ahash *verify_tfm;
++	struct crypto_shash *integrity_tfm;  /* checksums we compute, updates protected by connection->data->mutex */
++	struct crypto_shash *peer_integrity_tfm;  /* checksums we verify, only accessed from receiver thread  */
++	struct crypto_shash *csums_tfm;
++	struct crypto_shash *verify_tfm;
+ 	void *int_dig_in;
+ 	void *int_dig_vv;
  
--	phys = scsi_prot_ref_tag(scmd);
-+	phys = t10_pi_ref_tag(scmd->request);
- 
- 	__rq_for_each_bio(bio, scmd->request) {
- 		struct bio_integrity_payload *bip = bio_integrity(bio);
-@@ -176,7 +176,7 @@ void sd_dif_complete(struct scsi_cmnd *scmd, unsigned int good_bytes)
- 		return;
- 
- 	intervals = good_bytes / scsi_prot_interval(scmd);
--	phys = scsi_prot_ref_tag(scmd);
-+	phys = t10_pi_ref_tag(scmd->request);
- 
- 	__rq_for_each_bio(bio, scmd->request) {
- 		struct bio_integrity_payload *bip = bio_integrity(bio);
-diff --git a/include/linux/t10-pi.h b/include/linux/t10-pi.h
-index c6aa8a3..635855e 100644
---- a/include/linux/t10-pi.h
-+++ b/include/linux/t10-pi.h
-@@ -37,6 +37,12 @@ struct t10_pi_tuple {
- #define T10_PI_APP_ESCAPE cpu_to_be16(0xffff)
- #define T10_PI_REF_ESCAPE cpu_to_be32(0xffffffff)
- 
-+static inline u32 t10_pi_ref_tag(struct request *rq)
-+{
-+	return blk_rq_pos(rq) >>
-+		(rq->q->integrity.interval_exp - 9) & 0xffffffff;
-+}
-+
- extern const struct blk_integrity_profile t10_pi_type1_crc;
- extern const struct blk_integrity_profile t10_pi_type1_ip;
- extern const struct blk_integrity_profile t10_pi_type3_crc;
-diff --git a/include/scsi/scsi_cmnd.h b/include/scsi/scsi_cmnd.h
-index aaf1e97..cae229b 100644
---- a/include/scsi/scsi_cmnd.h
-+++ b/include/scsi/scsi_cmnd.h
-@@ -4,6 +4,7 @@
- 
- #include <linux/dma-mapping.h>
- #include <linux/blkdev.h>
-+#include <linux/t10-pi.h>
- #include <linux/list.h>
- #include <linux/types.h>
- #include <linux/timer.h>
-@@ -313,12 +314,6 @@ static inline unsigned int scsi_prot_interval(struct scsi_cmnd *scmd)
- 	return scmd->device->sector_size;
+@@ -1533,8 +1533,9 @@ static inline void ov_out_of_sync_print(struct drbd_device *device)
  }
  
--static inline u32 scsi_prot_ref_tag(struct scsi_cmnd *scmd)
+ 
+-extern void drbd_csum_bio(struct crypto_ahash *, struct bio *, void *);
+-extern void drbd_csum_ee(struct crypto_ahash *, struct drbd_peer_request *, void *);
++extern void drbd_csum_bio(struct crypto_shash *, struct bio *, void *);
++extern void drbd_csum_ee(struct crypto_shash *, struct drbd_peer_request *,
++			 void *);
+ /* worker callbacks */
+ extern int w_e_end_data_req(struct drbd_work *, int);
+ extern int w_e_end_rsdata_req(struct drbd_work *, int);
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index a80809bd3057..ccb54791d39c 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -1377,7 +1377,7 @@ void drbd_send_ack_dp(struct drbd_peer_device *peer_device, enum drbd_packet cmd
+ 		      struct p_data *dp, int data_size)
+ {
+ 	if (peer_device->connection->peer_integrity_tfm)
+-		data_size -= crypto_ahash_digestsize(peer_device->connection->peer_integrity_tfm);
++		data_size -= crypto_shash_digestsize(peer_device->connection->peer_integrity_tfm);
+ 	_drbd_send_ack(peer_device, cmd, dp->sector, cpu_to_be32(data_size),
+ 		       dp->block_id);
+ }
+@@ -1690,7 +1690,7 @@ int drbd_send_dblock(struct drbd_peer_device *peer_device, struct drbd_request *
+ 	sock = &peer_device->connection->data;
+ 	p = drbd_prepare_command(peer_device, sock);
+ 	digest_size = peer_device->connection->integrity_tfm ?
+-		      crypto_ahash_digestsize(peer_device->connection->integrity_tfm) : 0;
++		      crypto_shash_digestsize(peer_device->connection->integrity_tfm) : 0;
+ 
+ 	if (!p)
+ 		return -EIO;
+@@ -1796,7 +1796,7 @@ int drbd_send_block(struct drbd_peer_device *peer_device, enum drbd_packet cmd,
+ 	p = drbd_prepare_command(peer_device, sock);
+ 
+ 	digest_size = peer_device->connection->integrity_tfm ?
+-		      crypto_ahash_digestsize(peer_device->connection->integrity_tfm) : 0;
++		      crypto_shash_digestsize(peer_device->connection->integrity_tfm) : 0;
+ 
+ 	if (!p)
+ 		return -EIO;
+@@ -2561,11 +2561,11 @@ void conn_free_crypto(struct drbd_connection *connection)
+ {
+ 	drbd_free_sock(connection);
+ 
+-	crypto_free_ahash(connection->csums_tfm);
+-	crypto_free_ahash(connection->verify_tfm);
++	crypto_free_shash(connection->csums_tfm);
++	crypto_free_shash(connection->verify_tfm);
+ 	crypto_free_shash(connection->cram_hmac_tfm);
+-	crypto_free_ahash(connection->integrity_tfm);
+-	crypto_free_ahash(connection->peer_integrity_tfm);
++	crypto_free_shash(connection->integrity_tfm);
++	crypto_free_shash(connection->peer_integrity_tfm);
+ 	kfree(connection->int_dig_in);
+ 	kfree(connection->int_dig_vv);
+ 
+diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+index b4f02768ba47..d15703b1ffe8 100644
+--- a/drivers/block/drbd/drbd_nl.c
++++ b/drivers/block/drbd/drbd_nl.c
+@@ -2303,10 +2303,10 @@ check_net_options(struct drbd_connection *connection, struct net_conf *new_net_c
+ }
+ 
+ struct crypto {
+-	struct crypto_ahash *verify_tfm;
+-	struct crypto_ahash *csums_tfm;
++	struct crypto_shash *verify_tfm;
++	struct crypto_shash *csums_tfm;
+ 	struct crypto_shash *cram_hmac_tfm;
+-	struct crypto_ahash *integrity_tfm;
++	struct crypto_shash *integrity_tfm;
+ };
+ 
+ static int
+@@ -2324,36 +2324,21 @@ alloc_shash(struct crypto_shash **tfm, char *tfm_name, int err_alg)
+ 	return NO_ERROR;
+ }
+ 
+-static int
+-alloc_ahash(struct crypto_ahash **tfm, char *tfm_name, int err_alg)
 -{
--	return blk_rq_pos(scmd->request) >>
--		(ilog2(scsi_prot_interval(scmd)) - 9) & 0xffffffff;
+-	if (!tfm_name[0])
+-		return NO_ERROR;
+-
+-	*tfm = crypto_alloc_ahash(tfm_name, 0, CRYPTO_ALG_ASYNC);
+-	if (IS_ERR(*tfm)) {
+-		*tfm = NULL;
+-		return err_alg;
+-	}
+-
+-	return NO_ERROR;
 -}
 -
- static inline unsigned scsi_prot_sg_count(struct scsi_cmnd *cmd)
+ static enum drbd_ret_code
+ alloc_crypto(struct crypto *crypto, struct net_conf *new_net_conf)
  {
- 	return cmd->prot_sdb ? cmd->prot_sdb->table.nents : 0;
+ 	char hmac_name[CRYPTO_MAX_ALG_NAME];
+ 	enum drbd_ret_code rv;
+ 
+-	rv = alloc_ahash(&crypto->csums_tfm, new_net_conf->csums_alg,
++	rv = alloc_shash(&crypto->csums_tfm, new_net_conf->csums_alg,
+ 			 ERR_CSUMS_ALG);
+ 	if (rv != NO_ERROR)
+ 		return rv;
+-	rv = alloc_ahash(&crypto->verify_tfm, new_net_conf->verify_alg,
++	rv = alloc_shash(&crypto->verify_tfm, new_net_conf->verify_alg,
+ 			 ERR_VERIFY_ALG);
+ 	if (rv != NO_ERROR)
+ 		return rv;
+-	rv = alloc_ahash(&crypto->integrity_tfm, new_net_conf->integrity_alg,
++	rv = alloc_shash(&crypto->integrity_tfm, new_net_conf->integrity_alg,
+ 			 ERR_INTEGRITY_ALG);
+ 	if (rv != NO_ERROR)
+ 		return rv;
+@@ -2371,9 +2356,9 @@ alloc_crypto(struct crypto *crypto, struct net_conf *new_net_conf)
+ static void free_crypto(struct crypto *crypto)
+ {
+ 	crypto_free_shash(crypto->cram_hmac_tfm);
+-	crypto_free_ahash(crypto->integrity_tfm);
+-	crypto_free_ahash(crypto->csums_tfm);
+-	crypto_free_ahash(crypto->verify_tfm);
++	crypto_free_shash(crypto->integrity_tfm);
++	crypto_free_shash(crypto->csums_tfm);
++	crypto_free_shash(crypto->verify_tfm);
+ }
+ 
+ int drbd_adm_net_opts(struct sk_buff *skb, struct genl_info *info)
+@@ -2450,17 +2435,17 @@ int drbd_adm_net_opts(struct sk_buff *skb, struct genl_info *info)
+ 	rcu_assign_pointer(connection->net_conf, new_net_conf);
+ 
+ 	if (!rsr) {
+-		crypto_free_ahash(connection->csums_tfm);
++		crypto_free_shash(connection->csums_tfm);
+ 		connection->csums_tfm = crypto.csums_tfm;
+ 		crypto.csums_tfm = NULL;
+ 	}
+ 	if (!ovr) {
+-		crypto_free_ahash(connection->verify_tfm);
++		crypto_free_shash(connection->verify_tfm);
+ 		connection->verify_tfm = crypto.verify_tfm;
+ 		crypto.verify_tfm = NULL;
+ 	}
+ 
+-	crypto_free_ahash(connection->integrity_tfm);
++	crypto_free_shash(connection->integrity_tfm);
+ 	connection->integrity_tfm = crypto.integrity_tfm;
+ 	if (connection->cstate >= C_WF_REPORT_PARAMS && connection->agreed_pro_version >= 100)
+ 		/* Do this without trying to take connection->data.mutex again.  */
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index be9450f5ad1c..76243e9ef277 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -1732,7 +1732,7 @@ static int receive_Barrier(struct drbd_connection *connection, struct packet_inf
+ }
+ 
+ /* quick wrapper in case payload size != request_size (write same) */
+-static void drbd_csum_ee_size(struct crypto_ahash *h,
++static void drbd_csum_ee_size(struct crypto_shash *h,
+ 			      struct drbd_peer_request *r, void *d,
+ 			      unsigned int payload_size)
+ {
+@@ -1769,7 +1769,7 @@ read_in_block(struct drbd_peer_device *peer_device, u64 id, sector_t sector,
+ 
+ 	digest_size = 0;
+ 	if (!trim && peer_device->connection->peer_integrity_tfm) {
+-		digest_size = crypto_ahash_digestsize(peer_device->connection->peer_integrity_tfm);
++		digest_size = crypto_shash_digestsize(peer_device->connection->peer_integrity_tfm);
+ 		/*
+ 		 * FIXME: Receive the incoming digest into the receive buffer
+ 		 *	  here, together with its struct p_data?
+@@ -1905,7 +1905,7 @@ static int recv_dless_read(struct drbd_peer_device *peer_device, struct drbd_req
+ 
+ 	digest_size = 0;
+ 	if (peer_device->connection->peer_integrity_tfm) {
+-		digest_size = crypto_ahash_digestsize(peer_device->connection->peer_integrity_tfm);
++		digest_size = crypto_shash_digestsize(peer_device->connection->peer_integrity_tfm);
+ 		err = drbd_recv_all_warn(peer_device->connection, dig_in, digest_size);
+ 		if (err)
+ 			return err;
+@@ -3540,7 +3540,7 @@ static int receive_protocol(struct drbd_connection *connection, struct packet_in
+ 	int p_proto, p_discard_my_data, p_two_primaries, cf;
+ 	struct net_conf *nc, *old_net_conf, *new_net_conf = NULL;
+ 	char integrity_alg[SHARED_SECRET_MAX] = "";
+-	struct crypto_ahash *peer_integrity_tfm = NULL;
++	struct crypto_shash *peer_integrity_tfm = NULL;
+ 	void *int_dig_in = NULL, *int_dig_vv = NULL;
+ 
+ 	p_proto		= be32_to_cpu(p->protocol);
+@@ -3621,7 +3621,7 @@ static int receive_protocol(struct drbd_connection *connection, struct packet_in
+ 		 * change.
+ 		 */
+ 
+-		peer_integrity_tfm = crypto_alloc_ahash(integrity_alg, 0, CRYPTO_ALG_ASYNC);
++		peer_integrity_tfm = crypto_alloc_shash(integrity_alg, 0, CRYPTO_ALG_ASYNC);
+ 		if (IS_ERR(peer_integrity_tfm)) {
+ 			peer_integrity_tfm = NULL;
+ 			drbd_err(connection, "peer data-integrity-alg %s not supported\n",
+@@ -3629,7 +3629,7 @@ static int receive_protocol(struct drbd_connection *connection, struct packet_in
+ 			goto disconnect;
+ 		}
+ 
+-		hash_size = crypto_ahash_digestsize(peer_integrity_tfm);
++		hash_size = crypto_shash_digestsize(peer_integrity_tfm);
+ 		int_dig_in = kmalloc(hash_size, GFP_KERNEL);
+ 		int_dig_vv = kmalloc(hash_size, GFP_KERNEL);
+ 		if (!(int_dig_in && int_dig_vv)) {
+@@ -3659,7 +3659,7 @@ static int receive_protocol(struct drbd_connection *connection, struct packet_in
+ 	mutex_unlock(&connection->resource->conf_update);
+ 	mutex_unlock(&connection->data.mutex);
+ 
+-	crypto_free_ahash(connection->peer_integrity_tfm);
++	crypto_free_shash(connection->peer_integrity_tfm);
+ 	kfree(connection->int_dig_in);
+ 	kfree(connection->int_dig_vv);
+ 	connection->peer_integrity_tfm = peer_integrity_tfm;
+@@ -3677,7 +3677,7 @@ static int receive_protocol(struct drbd_connection *connection, struct packet_in
+ disconnect_rcu_unlock:
+ 	rcu_read_unlock();
+ disconnect:
+-	crypto_free_ahash(peer_integrity_tfm);
++	crypto_free_shash(peer_integrity_tfm);
+ 	kfree(int_dig_in);
+ 	kfree(int_dig_vv);
+ 	conn_request_state(connection, NS(conn, C_DISCONNECTING), CS_HARD);
+@@ -3689,15 +3689,16 @@ static int receive_protocol(struct drbd_connection *connection, struct packet_in
+  * return: NULL (alg name was "")
+  *         ERR_PTR(error) if something goes wrong
+  *         or the crypto hash ptr, if it worked out ok. */
+-static struct crypto_ahash *drbd_crypto_alloc_digest_safe(const struct drbd_device *device,
++static struct crypto_shash *drbd_crypto_alloc_digest_safe(
++		const struct drbd_device *device,
+ 		const char *alg, const char *name)
+ {
+-	struct crypto_ahash *tfm;
++	struct crypto_shash *tfm;
+ 
+ 	if (!alg[0])
+ 		return NULL;
+ 
+-	tfm = crypto_alloc_ahash(alg, 0, CRYPTO_ALG_ASYNC);
++	tfm = crypto_alloc_shash(alg, 0, 0);
+ 	if (IS_ERR(tfm)) {
+ 		drbd_err(device, "Can not allocate \"%s\" as %s (reason: %ld)\n",
+ 			alg, name, PTR_ERR(tfm));
+@@ -3750,8 +3751,8 @@ static int receive_SyncParam(struct drbd_connection *connection, struct packet_i
+ 	struct drbd_device *device;
+ 	struct p_rs_param_95 *p;
+ 	unsigned int header_size, data_size, exp_max_sz;
+-	struct crypto_ahash *verify_tfm = NULL;
+-	struct crypto_ahash *csums_tfm = NULL;
++	struct crypto_shash *verify_tfm = NULL;
++	struct crypto_shash *csums_tfm = NULL;
+ 	struct net_conf *old_net_conf, *new_net_conf = NULL;
+ 	struct disk_conf *old_disk_conf = NULL, *new_disk_conf = NULL;
+ 	const int apv = connection->agreed_pro_version;
+@@ -3898,14 +3899,14 @@ static int receive_SyncParam(struct drbd_connection *connection, struct packet_i
+ 			if (verify_tfm) {
+ 				strcpy(new_net_conf->verify_alg, p->verify_alg);
+ 				new_net_conf->verify_alg_len = strlen(p->verify_alg) + 1;
+-				crypto_free_ahash(peer_device->connection->verify_tfm);
++				crypto_free_shash(peer_device->connection->verify_tfm);
+ 				peer_device->connection->verify_tfm = verify_tfm;
+ 				drbd_info(device, "using verify-alg: \"%s\"\n", p->verify_alg);
+ 			}
+ 			if (csums_tfm) {
+ 				strcpy(new_net_conf->csums_alg, p->csums_alg);
+ 				new_net_conf->csums_alg_len = strlen(p->csums_alg) + 1;
+-				crypto_free_ahash(peer_device->connection->csums_tfm);
++				crypto_free_shash(peer_device->connection->csums_tfm);
+ 				peer_device->connection->csums_tfm = csums_tfm;
+ 				drbd_info(device, "using csums-alg: \"%s\"\n", p->csums_alg);
+ 			}
+@@ -3949,9 +3950,9 @@ static int receive_SyncParam(struct drbd_connection *connection, struct packet_i
+ 	mutex_unlock(&connection->resource->conf_update);
+ 	/* just for completeness: actually not needed,
+ 	 * as this is not reached if csums_tfm was ok. */
+-	crypto_free_ahash(csums_tfm);
++	crypto_free_shash(csums_tfm);
+ 	/* but free the verify_tfm again, if csums_tfm did not work out */
+-	crypto_free_ahash(verify_tfm);
++	crypto_free_shash(verify_tfm);
+ 	conn_request_state(peer_device->connection, NS(conn, C_DISCONNECTING), CS_HARD);
+ 	return -EIO;
+ }
+diff --git a/drivers/block/drbd/drbd_worker.c b/drivers/block/drbd/drbd_worker.c
+index 1476cb3439f4..62dd3700dd84 100644
+--- a/drivers/block/drbd/drbd_worker.c
++++ b/drivers/block/drbd/drbd_worker.c
+@@ -295,60 +295,54 @@ void drbd_request_endio(struct bio *bio)
+ 		complete_master_bio(device, &m);
+ }
+ 
+-void drbd_csum_ee(struct crypto_ahash *tfm, struct drbd_peer_request *peer_req, void *digest)
++void drbd_csum_ee(struct crypto_shash *tfm, struct drbd_peer_request *peer_req, void *digest)
+ {
+-	AHASH_REQUEST_ON_STACK(req, tfm);
+-	struct scatterlist sg;
++	SHASH_DESC_ON_STACK(desc, tfm);
+ 	struct page *page = peer_req->pages;
+ 	struct page *tmp;
+ 	unsigned len;
+ 
+-	ahash_request_set_tfm(req, tfm);
+-	ahash_request_set_callback(req, 0, NULL, NULL);
++	desc->tfm = tfm;
++	desc->flags = 0;
+ 
+-	sg_init_table(&sg, 1);
+-	crypto_ahash_init(req);
++	crypto_shash_init(desc);
+ 
+ 	while ((tmp = page_chain_next(page))) {
+ 		/* all but the last page will be fully used */
+-		sg_set_page(&sg, page, PAGE_SIZE, 0);
+-		ahash_request_set_crypt(req, &sg, NULL, sg.length);
+-		crypto_ahash_update(req);
++		crypto_shash_update(desc, page_to_virt(page), PAGE_SIZE);
+ 		page = tmp;
+ 	}
+ 	/* and now the last, possibly only partially used page */
+ 	len = peer_req->i.size & (PAGE_SIZE - 1);
+-	sg_set_page(&sg, page, len ?: PAGE_SIZE, 0);
+-	ahash_request_set_crypt(req, &sg, digest, sg.length);
+-	crypto_ahash_finup(req);
+-	ahash_request_zero(req);
++	crypto_shash_update(desc, page_to_virt(page), len ?: PAGE_SIZE);
++
++	crypto_shash_final(desc, digest);
++	shash_desc_zero(desc);
+ }
+ 
+-void drbd_csum_bio(struct crypto_ahash *tfm, struct bio *bio, void *digest)
++void drbd_csum_bio(struct crypto_shash *tfm, struct bio *bio, void *digest)
+ {
+-	AHASH_REQUEST_ON_STACK(req, tfm);
+-	struct scatterlist sg;
++	SHASH_DESC_ON_STACK(desc, tfm);
+ 	struct bio_vec bvec;
+ 	struct bvec_iter iter;
+ 
+-	ahash_request_set_tfm(req, tfm);
+-	ahash_request_set_callback(req, 0, NULL, NULL);
++	desc->tfm = tfm;
++	desc->flags = 0;
+ 
+-	sg_init_table(&sg, 1);
+-	crypto_ahash_init(req);
++	crypto_shash_init(desc);
+ 
+ 	bio_for_each_segment(bvec, bio, iter) {
+-		sg_set_page(&sg, bvec.bv_page, bvec.bv_len, bvec.bv_offset);
+-		ahash_request_set_crypt(req, &sg, NULL, sg.length);
+-		crypto_ahash_update(req);
++		crypto_shash_update(desc, (u8 *)page_to_virt(bvec.bv_page) +
++					  bvec.bv_offset,
++				    bvec.bv_len);
++
+ 		/* REQ_OP_WRITE_SAME has only one segment,
+ 		 * checksum the payload only once. */
+ 		if (bio_op(bio) == REQ_OP_WRITE_SAME)
+ 			break;
+ 	}
+-	ahash_request_set_crypt(req, NULL, digest, 0);
+-	crypto_ahash_final(req);
+-	ahash_request_zero(req);
++	crypto_shash_final(desc, digest);
++	shash_desc_zero(desc);
+ }
+ 
+ /* MAYBE merge common code with w_e_end_ov_req */
+@@ -367,7 +361,7 @@ static int w_e_send_csum(struct drbd_work *w, int cancel)
+ 	if (unlikely((peer_req->flags & EE_WAS_ERROR) != 0))
+ 		goto out;
+ 
+-	digest_size = crypto_ahash_digestsize(peer_device->connection->csums_tfm);
++	digest_size = crypto_shash_digestsize(peer_device->connection->csums_tfm);
+ 	digest = kmalloc(digest_size, GFP_NOIO);
+ 	if (digest) {
+ 		sector_t sector = peer_req->i.sector;
+@@ -1205,7 +1199,7 @@ int w_e_end_csum_rs_req(struct drbd_work *w, int cancel)
+ 		 * a real fix would be much more involved,
+ 		 * introducing more locking mechanisms */
+ 		if (peer_device->connection->csums_tfm) {
+-			digest_size = crypto_ahash_digestsize(peer_device->connection->csums_tfm);
++			digest_size = crypto_shash_digestsize(peer_device->connection->csums_tfm);
+ 			D_ASSERT(device, digest_size == di->digest_size);
+ 			digest = kmalloc(digest_size, GFP_NOIO);
+ 		}
+@@ -1255,7 +1249,7 @@ int w_e_end_ov_req(struct drbd_work *w, int cancel)
+ 	if (unlikely(cancel))
+ 		goto out;
+ 
+-	digest_size = crypto_ahash_digestsize(peer_device->connection->verify_tfm);
++	digest_size = crypto_shash_digestsize(peer_device->connection->verify_tfm);
+ 	digest = kmalloc(digest_size, GFP_NOIO);
+ 	if (!digest) {
+ 		err = 1;	/* terminate the connection in case the allocation failed */
+@@ -1327,7 +1321,7 @@ int w_e_end_ov_reply(struct drbd_work *w, int cancel)
+ 	di = peer_req->digest;
+ 
+ 	if (likely((peer_req->flags & EE_WAS_ERROR) == 0)) {
+-		digest_size = crypto_ahash_digestsize(peer_device->connection->verify_tfm);
++		digest_size = crypto_shash_digestsize(peer_device->connection->verify_tfm);
+ 		digest = kmalloc(digest_size, GFP_NOIO);
+ 		if (digest) {
+ 			drbd_csum_ee(peer_device->connection->verify_tfm, peer_req, digest);
 -- 
-1.8.3.1
+2.17.1
