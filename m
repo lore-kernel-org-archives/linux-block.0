@@ -1,68 +1,101 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: James Bottomley <James.Bottomley@HansenPartnership.com>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Douglas Gilbert <dgilbert@interlog.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
+Return-Path: <keescook@chromium.org>
+Return-Path: <keescook@chromium.org>
+From: Kees Cook <keescook@chromium.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Kees Cook <keescook@chromium.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Eric Biggers <ebiggers@google.com>,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	Alasdair Kergon <agk@redhat.com>,
+	Rabin Vincent <rabinv@axis.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Pavel Machek <pavel@ucw.cz>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	x86@kernel.org,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
 	Jens Axboe <axboe@kernel.dk>,
-	Omar Sandoval <osandov@fb.com>
-Subject: [PATCH] scsi: scsi_debug: introduce module parameter of 'use_blk_mq'
-Date: Mon,  2 Jul 2018 13:06:42 +0800
-Message-Id: <20180702050642.26265-1-ming.lei@redhat.com>
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Paul Mackerras <paulus@samba.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	David Howells <dhowells@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+	Jia-Ju Bai <baijiaju1990@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Will Deacon <will.deacon@arm.com>,
+	dm-devel@redhat.com,
+	linux-pm@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	linux-block@vger.kernel.org,
+	qat-linux@intel.com,
+	linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devel@driverdev.osuosl.org,
+	linux-afs@lists.infradead.org,
+	linux-wireless@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v6 08/18] crypto: skcipher: Remove VLA usage for SKCIPHER_REQUEST_ON_STACK
+Date: Tue, 24 Jul 2018 09:49:26 -0700
+Message-Id: <20180724164936.37477-9-keescook@chromium.org>
+In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
+References: <20180724164936.37477-1-keescook@chromium.org>
 List-ID: <linux-block@vger.kernel.org>
 
-With the introduced module parameter of 'use_blk_mq', it is easy
-to switch between 'blk_mq' and 'non_blk_mq' by reloading scsi_debug
-module, so that we can test scsi_mq/blk_mq related regressions easily.
+In the quest to remove all stack VLA usage from the kernel[1], this
+caps the skcipher request size similar to other limits and adds a sanity
+check at registration. Looking at instrumented tcrypt output, the largest
+is for lrw:
 
-Cc: Douglas Gilbert <dgilbert@interlog.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+	crypt: testing lrw(aes)
+	crypto_skcipher_set_reqsize: 8
+	crypto_skcipher_set_reqsize: 88
+	crypto_skcipher_set_reqsize: 472
+
+[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+
+Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/scsi/scsi_debug.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ include/crypto/internal/skcipher.h | 1 +
+ include/crypto/skcipher.h          | 4 +++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-index 24d7496cd9e2..236cfb669df3 100644
---- a/drivers/scsi/scsi_debug.c
-+++ b/drivers/scsi/scsi_debug.c
-@@ -144,6 +144,7 @@ static const char *sdebug_version_date = "20180128";
- #define DEF_SUBMIT_QUEUES 1
- #define DEF_UUID_CTL 0
- #define JDELAY_OVERRIDDEN -9999
-+#define DEF_USE_BLK_MQ  0
+diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
+index e42f7063f245..5035482cbe68 100644
+--- a/include/crypto/internal/skcipher.h
++++ b/include/crypto/internal/skcipher.h
+@@ -130,6 +130,7 @@ static inline struct crypto_skcipher *crypto_spawn_skcipher(
+ static inline void crypto_skcipher_set_reqsize(
+ 	struct crypto_skcipher *skcipher, unsigned int reqsize)
+ {
++	BUG_ON(reqsize > SKCIPHER_MAX_REQSIZE);
+ 	skcipher->reqsize = reqsize;
+ }
  
- #define SDEBUG_LUN_0_VAL 0
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index 2f327f090c3e..c48e194438cf 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -139,9 +139,11 @@ struct skcipher_alg {
+ 	struct crypto_alg base;
+ };
  
-@@ -671,6 +672,7 @@ static bool sdebug_verbose;
- static bool have_dif_prot;
- static bool write_since_sync;
- static bool sdebug_statistics = DEF_STATISTICS;
-+static bool sdebug_use_blk_mq = DEF_USE_BLK_MQ;
++#define SKCIPHER_MAX_REQSIZE	472
++
+ #define SKCIPHER_REQUEST_ON_STACK(name, tfm) \
+ 	char __##name##_desc[sizeof(struct skcipher_request) + \
+-		crypto_skcipher_reqsize(tfm)] CRYPTO_MINALIGN_ATTR; \
++		SKCIPHER_MAX_REQSIZE] CRYPTO_MINALIGN_ATTR; \
+ 	struct skcipher_request *name = (void *)__##name##_desc
  
- static unsigned int sdebug_store_sectors;
- static sector_t sdebug_capacity;	/* in sectors */
-@@ -4537,6 +4539,7 @@ module_param_named(vpd_use_hostno, sdebug_vpd_use_hostno, int,
- 		   S_IRUGO | S_IWUSR);
- module_param_named(write_same_length, sdebug_write_same_length, int,
- 		   S_IRUGO | S_IWUSR);
-+module_param_named(use_blk_mq, sdebug_use_blk_mq, bool, S_IRUGO | S_IWUSR);
- 
- MODULE_AUTHOR("Eric Youngdale + Douglas Gilbert");
- MODULE_DESCRIPTION("SCSI debug adapter driver");
-@@ -5849,6 +5852,8 @@ static int sdebug_driver_probe(struct device *dev)
- 	sdebug_driver_template.can_queue = sdebug_max_queue;
- 	if (sdebug_clustering)
- 		sdebug_driver_template.use_clustering = ENABLE_CLUSTERING;
-+	if (sdebug_use_blk_mq)
-+		sdebug_driver_template.force_blk_mq = 1;
- 	hpnt = scsi_host_alloc(&sdebug_driver_template, sizeof(sdbg_host));
- 	if (NULL == hpnt) {
- 		pr_err("scsi_host_alloc failed\n");
+ /**
 -- 
-2.9.5
+2.17.1
