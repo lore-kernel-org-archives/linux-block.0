@@ -1,113 +1,157 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: colyli@suse.de,
-	axboe@kernel.dk,
-	linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Tang Junhui <tang.junhui@zte.com.cn>
-Subject: [PATCH 1/9] bcache: simplify the calculation of the total amount of flash dirty data
-Date: Thu, 26 Jul 2018 12:17:33 +0800
-Message-Id: <20180726041741.1669-2-colyli@suse.de>
-In-Reply-To: <20180726041741.1669-1-colyli@suse.de>
-References: <20180726041741.1669-1-colyli@suse.de>
+Return-Path: <keescook@chromium.org>
+Return-Path: <keescook@chromium.org>
+From: Kees Cook <keescook@chromium.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Kees Cook <keescook@chromium.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Eric Biggers <ebiggers@google.com>,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	Alasdair Kergon <agk@redhat.com>,
+	Rabin Vincent <rabinv@axis.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Pavel Machek <pavel@ucw.cz>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	x86@kernel.org,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Paul Mackerras <paulus@samba.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	David Howells <dhowells@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+	Jia-Ju Bai <baijiaju1990@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Will Deacon <will.deacon@arm.com>,
+	dm-devel@redhat.com,
+	linux-pm@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	linux-block@vger.kernel.org,
+	qat-linux@intel.com,
+	linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devel@driverdev.osuosl.org,
+	linux-afs@lists.infradead.org,
+	linux-wireless@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v6 04/18] dm: Remove VLA usage from hashes
+Date: Tue, 24 Jul 2018 09:49:22 -0700
+Message-Id: <20180724164936.37477-5-keescook@chromium.org>
+In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
+References: <20180724164936.37477-1-keescook@chromium.org>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+In the quest to remove all stack VLA usage from the kernel[1], this uses
+the new HASH_MAX_DIGESTSIZE from the crypto layer to allocate the upper
+bounds on stack usage.
 
-Currently we calculate the total amount of flash only devices dirty data
-by adding the dirty data of each flash only device under registering
-locker. It is very inefficient.
+[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-In this patch, we add a member flash_dev_dirty_sectors in struct cache_set
-to record the total amount of flash only devices dirty data in real time,
-so we didn't need to calculate the total amount of dirty data any more.
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Signed-off-by: Coly Li <colyli@suse.de>
+Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/md/bcache/bcache.h    |  1 +
- drivers/md/bcache/super.c     |  2 ++
- drivers/md/bcache/writeback.c |  5 ++++-
- drivers/md/bcache/writeback.h | 19 -------------------
- 4 files changed, 7 insertions(+), 20 deletions(-)
+ drivers/md/dm-integrity.c  | 23 +++++++++++++++++------
+ drivers/md/dm-verity-fec.c |  5 ++++-
+ 2 files changed, 21 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index d6bf294f3907..3226d38bf859 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -525,6 +525,7 @@ struct cache_set {
- 	unsigned		devices_max_used;
- 	struct list_head	cached_devs;
- 	uint64_t		cached_dev_sectors;
-+	atomic_long_t		flash_dev_dirty_sectors;
- 	struct closure		caching;
- 
- 	struct closure		sb_write;
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index fa4058e43202..cea2a42ea276 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1311,6 +1311,8 @@ static void flash_dev_free(struct closure *cl)
- {
- 	struct bcache_device *d = container_of(cl, struct bcache_device, cl);
- 	mutex_lock(&bch_register_lock);
-+	atomic_long_sub(bcache_dev_sectors_dirty(d),
-+			&d->c->flash_dev_dirty_sectors);
- 	bcache_device_free(d);
- 	mutex_unlock(&bch_register_lock);
- 	kobject_put(&d->kobj);
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index ad45ebe1a74b..0d2a05074a81 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -27,7 +27,7 @@ static uint64_t __calc_target_rate(struct cached_dev *dc)
- 	 * flash-only devices
- 	 */
- 	uint64_t cache_sectors = c->nbuckets * c->sb.bucket_size -
--				bcache_flash_devs_sectors_dirty(c);
-+				atomic_long_read(&c->flash_dev_dirty_sectors);
- 
- 	/*
- 	 * Unfortunately there is no control of global dirty data.  If the
-@@ -476,6 +476,9 @@ void bcache_dev_sectors_dirty_add(struct cache_set *c, unsigned inode,
- 	if (!d)
- 		return;
- 
-+	if (UUID_FLASH_ONLY(&c->uuids[inode]))
-+		atomic_long_add(nr_sectors, &c->flash_dev_dirty_sectors);
+diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
+index 86438b2f10dd..884edd7cf1d0 100644
+--- a/drivers/md/dm-integrity.c
++++ b/drivers/md/dm-integrity.c
+@@ -521,7 +521,12 @@ static void section_mac(struct dm_integrity_c *ic, unsigned section, __u8 result
+ 		}
+ 		memset(result + size, 0, JOURNAL_MAC_SIZE - size);
+ 	} else {
+-		__u8 digest[size];
++		__u8 digest[HASH_MAX_DIGESTSIZE];
 +
- 	stripe = offset_to_stripe(d, offset);
- 	stripe_offset = offset & (d->stripe_size - 1);
++		if (WARN_ON(size > sizeof(digest))) {
++			dm_integrity_io_error(ic, "digest_size", -EINVAL);
++			goto err;
++		}
+ 		r = crypto_shash_final(desc, digest);
+ 		if (unlikely(r)) {
+ 			dm_integrity_io_error(ic, "crypto_shash_final", r);
+@@ -1244,7 +1249,7 @@ static void integrity_metadata(struct work_struct *w)
+ 		struct bio *bio = dm_bio_from_per_bio_data(dio, sizeof(struct dm_integrity_io));
+ 		char *checksums;
+ 		unsigned extra_space = unlikely(digest_size > ic->tag_size) ? digest_size - ic->tag_size : 0;
+-		char checksums_onstack[ic->tag_size + extra_space];
++		char checksums_onstack[HASH_MAX_DIGESTSIZE];
+ 		unsigned sectors_to_process = dio->range.n_sectors;
+ 		sector_t sector = dio->range.logical_sector;
  
-diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
-index 610fb01de629..3745d7004c47 100644
---- a/drivers/md/bcache/writeback.h
-+++ b/drivers/md/bcache/writeback.h
-@@ -28,25 +28,6 @@ static inline uint64_t bcache_dev_sectors_dirty(struct bcache_device *d)
- 	return ret;
- }
+@@ -1253,8 +1258,14 @@ static void integrity_metadata(struct work_struct *w)
  
--static inline uint64_t  bcache_flash_devs_sectors_dirty(struct cache_set *c)
--{
--	uint64_t i, ret = 0;
--
--	mutex_lock(&bch_register_lock);
--
--	for (i = 0; i < c->devices_max_used; i++) {
--		struct bcache_device *d = c->devices[i];
--
--		if (!d || !UUID_FLASH_ONLY(&c->uuids[i]))
--			continue;
--		ret += bcache_dev_sectors_dirty(d);
--	}
--
--	mutex_unlock(&bch_register_lock);
--
--	return ret;
--}
--
- static inline unsigned offset_to_stripe(struct bcache_device *d,
- 					uint64_t offset)
- {
+ 		checksums = kmalloc((PAGE_SIZE >> SECTOR_SHIFT >> ic->sb->log2_sectors_per_block) * ic->tag_size + extra_space,
+ 				    GFP_NOIO | __GFP_NORETRY | __GFP_NOWARN);
+-		if (!checksums)
++		if (!checksums) {
+ 			checksums = checksums_onstack;
++			if (WARN_ON(extra_space &&
++				    digest_size > sizeof(checksums_onstack))) {
++				r = -EINVAL;
++				goto error;
++			}
++		}
+ 
+ 		__bio_for_each_segment(bv, bio, iter, dio->orig_bi_iter) {
+ 			unsigned pos;
+@@ -1466,7 +1477,7 @@ static bool __journal_read_write(struct dm_integrity_io *dio, struct bio *bio,
+ 				} while (++s < ic->sectors_per_block);
+ #ifdef INTERNAL_VERIFY
+ 				if (ic->internal_hash) {
+-					char checksums_onstack[max(crypto_shash_digestsize(ic->internal_hash), ic->tag_size)];
++					char checksums_onstack[max(HASH_MAX_DIGESTSIZE, MAX_TAG_SIZE)];
+ 
+ 					integrity_sector_checksum(ic, logical_sector, mem + bv.bv_offset, checksums_onstack);
+ 					if (unlikely(memcmp(checksums_onstack, journal_entry_tag(ic, je), ic->tag_size))) {
+@@ -1516,7 +1527,7 @@ static bool __journal_read_write(struct dm_integrity_io *dio, struct bio *bio,
+ 				if (ic->internal_hash) {
+ 					unsigned digest_size = crypto_shash_digestsize(ic->internal_hash);
+ 					if (unlikely(digest_size > ic->tag_size)) {
+-						char checksums_onstack[digest_size];
++						char checksums_onstack[HASH_MAX_DIGESTSIZE];
+ 						integrity_sector_checksum(ic, logical_sector, (char *)js, checksums_onstack);
+ 						memcpy(journal_entry_tag(ic, je), checksums_onstack, ic->tag_size);
+ 					} else
+@@ -1937,7 +1948,7 @@ static void do_journal_write(struct dm_integrity_c *ic, unsigned write_start,
+ 				    unlikely(from_replay) &&
+ #endif
+ 				    ic->internal_hash) {
+-					char test_tag[max(crypto_shash_digestsize(ic->internal_hash), ic->tag_size)];
++					char test_tag[max_t(size_t, HASH_MAX_DIGESTSIZE, MAX_TAG_SIZE)];
+ 
+ 					integrity_sector_checksum(ic, sec + ((l - j) << ic->sb->log2_sectors_per_block),
+ 								  (char *)access_journal_data(ic, i, l), test_tag);
+diff --git a/drivers/md/dm-verity-fec.c b/drivers/md/dm-verity-fec.c
+index 684af08d0747..0ce04e5b4afb 100644
+--- a/drivers/md/dm-verity-fec.c
++++ b/drivers/md/dm-verity-fec.c
+@@ -212,12 +212,15 @@ static int fec_read_bufs(struct dm_verity *v, struct dm_verity_io *io,
+ 	struct dm_verity_fec_io *fio = fec_io(io);
+ 	u64 block, ileaved;
+ 	u8 *bbuf, *rs_block;
+-	u8 want_digest[v->digest_size];
++	u8 want_digest[HASH_MAX_DIGESTSIZE];
+ 	unsigned n, k;
+ 
+ 	if (neras)
+ 		*neras = 0;
+ 
++	if (WARN_ON(v->digest_size > sizeof(want_digest)))
++		return -EINVAL;
++
+ 	/*
+ 	 * read each of the rsn data blocks that are part of the RS block, and
+ 	 * interleave contents to available bufs
 -- 
 2.17.1
