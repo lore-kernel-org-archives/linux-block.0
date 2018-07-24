@@ -1,106 +1,190 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:47212 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728337AbeGYHiy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Jul 2018 03:38:54 -0400
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org,
-        Martin Wilck <martin.wilck@suse.com>,
-        Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 4/5] aoe: use device_add_disk_with_groups()
-Date: Wed, 25 Jul 2018 08:28:39 +0200
-Message-Id: <20180725062840.94114-5-hare@suse.de>
-In-Reply-To: <20180725062840.94114-1-hare@suse.de>
-References: <20180725062840.94114-1-hare@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <keescook@chromium.org>
+Return-Path: <keescook@chromium.org>
+From: Kees Cook <keescook@chromium.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Kees Cook <keescook@chromium.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Eric Biggers <ebiggers@google.com>,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	Alasdair Kergon <agk@redhat.com>,
+	Rabin Vincent <rabinv@axis.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Pavel Machek <pavel@ucw.cz>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	x86@kernel.org,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Paul Mackerras <paulus@samba.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	David Howells <dhowells@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+	Jia-Ju Bai <baijiaju1990@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Will Deacon <will.deacon@arm.com>,
+	dm-devel@redhat.com,
+	linux-pm@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	linux-block@vger.kernel.org,
+	qat-linux@intel.com,
+	linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devel@driverdev.osuosl.org,
+	linux-afs@lists.infradead.org,
+	linux-wireless@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v6 14/18] staging: rtl8192u: ieee80211: Convert from ahash to shash
+Date: Tue, 24 Jul 2018 09:49:32 -0700
+Message-Id: <20180724164936.37477-15-keescook@chromium.org>
+In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
+References: <20180724164936.37477-1-keescook@chromium.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Use device_add_disk_with_groups() to avoid a race condition with
-udev during startup.
+This is an identical change to the wireless/lib80211 of the same name.
+In preparing to remove all stack VLA usage from the kernel[1], this
+removes the discouraged use of AHASH_REQUEST_ON_STACK in favor of
+the smaller SHASH_DESC_ON_STACK by converting from ahash-wrapped-shash
+to direct shash. By removing a layer of indirection this both improves
+performance and reduces stack usage. The stack allocation will be made
+a fixed size in a later patch to the crypto subsystem.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
+[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+
+Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/block/aoe/aoe.h    |  1 -
- drivers/block/aoe/aoeblk.c | 21 +++++++--------------
- drivers/block/aoe/aoedev.c |  1 -
- 3 files changed, 7 insertions(+), 16 deletions(-)
+ .../rtl8192u/ieee80211/ieee80211_crypt_tkip.c | 57 +++++++++----------
+ 1 file changed, 28 insertions(+), 29 deletions(-)
 
-diff --git a/drivers/block/aoe/aoe.h b/drivers/block/aoe/aoe.h
-index c0ebda1283cc..015c68017a1c 100644
---- a/drivers/block/aoe/aoe.h
-+++ b/drivers/block/aoe/aoe.h
-@@ -201,7 +201,6 @@ int aoeblk_init(void);
- void aoeblk_exit(void);
- void aoeblk_gdalloc(void *);
- void aoedisk_rm_debugfs(struct aoedev *d);
--void aoedisk_rm_sysfs(struct aoedev *d);
+diff --git a/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_tkip.c b/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_tkip.c
+index a7efaae4e25a..1088fa0aee0e 100644
+--- a/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_tkip.c
++++ b/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_tkip.c
+@@ -54,9 +54,9 @@ struct ieee80211_tkip_data {
+ 	int key_idx;
  
- int aoechr_init(void);
- void aoechr_exit(void);
-diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
-index 429ebb84b592..b9d30150ce20 100644
---- a/drivers/block/aoe/aoeblk.c
-+++ b/drivers/block/aoe/aoeblk.c
-@@ -177,10 +177,15 @@ static struct attribute *aoe_attrs[] = {
- 	NULL,
- };
+ 	struct crypto_skcipher *rx_tfm_arc4;
+-	struct crypto_ahash *rx_tfm_michael;
++	struct crypto_shash *rx_tfm_michael;
+ 	struct crypto_skcipher *tx_tfm_arc4;
+-	struct crypto_ahash *tx_tfm_michael;
++	struct crypto_shash *tx_tfm_michael;
  
--static const struct attribute_group attr_group = {
-+static const struct attribute_group aoe_attr_group = {
- 	.attrs = aoe_attrs,
- };
+ 	/* scratch buffers for virt_to_page() (crypto API) */
+ 	u8 rx_hdr[16], tx_hdr[16];
+@@ -80,8 +80,7 @@ static void *ieee80211_tkip_init(int key_idx)
+ 		goto fail;
+ 	}
  
-+static const struct attribute_group *aoe_attr_groups[] = {
-+	&aoe_attr_group,
-+	NULL,
-+};
-+
- static const struct file_operations aoe_debugfs_fops = {
- 	.open = aoe_debugfs_open,
- 	.read = seq_read,
-@@ -220,17 +225,6 @@ aoedisk_rm_debugfs(struct aoedev *d)
+-	priv->tx_tfm_michael = crypto_alloc_ahash("michael_mic", 0,
+-			CRYPTO_ALG_ASYNC);
++	priv->tx_tfm_michael = crypto_alloc_shash("michael_mic", 0, 0);
+ 	if (IS_ERR(priv->tx_tfm_michael)) {
+ 		printk(KERN_DEBUG "ieee80211_crypt_tkip: could not allocate "
+ 				"crypto API michael_mic\n");
+@@ -98,8 +97,7 @@ static void *ieee80211_tkip_init(int key_idx)
+ 		goto fail;
+ 	}
+ 
+-	priv->rx_tfm_michael = crypto_alloc_ahash("michael_mic", 0,
+-			CRYPTO_ALG_ASYNC);
++	priv->rx_tfm_michael = crypto_alloc_shash("michael_mic", 0, 0);
+ 	if (IS_ERR(priv->rx_tfm_michael)) {
+ 		printk(KERN_DEBUG "ieee80211_crypt_tkip: could not allocate "
+ 				"crypto API michael_mic\n");
+@@ -111,9 +109,9 @@ static void *ieee80211_tkip_init(int key_idx)
+ 
+ fail:
+ 	if (priv) {
+-		crypto_free_ahash(priv->tx_tfm_michael);
++		crypto_free_shash(priv->tx_tfm_michael);
+ 		crypto_free_skcipher(priv->tx_tfm_arc4);
+-		crypto_free_ahash(priv->rx_tfm_michael);
++		crypto_free_shash(priv->rx_tfm_michael);
+ 		crypto_free_skcipher(priv->rx_tfm_arc4);
+ 		kfree(priv);
+ 	}
+@@ -127,9 +125,9 @@ static void ieee80211_tkip_deinit(void *priv)
+ 	struct ieee80211_tkip_data *_priv = priv;
+ 
+ 	if (_priv) {
+-		crypto_free_ahash(_priv->tx_tfm_michael);
++		crypto_free_shash(_priv->tx_tfm_michael);
+ 		crypto_free_skcipher(_priv->tx_tfm_arc4);
+-		crypto_free_ahash(_priv->rx_tfm_michael);
++		crypto_free_shash(_priv->rx_tfm_michael);
+ 		crypto_free_skcipher(_priv->rx_tfm_arc4);
+ 	}
+ 	kfree(priv);
+@@ -500,30 +498,31 @@ static int ieee80211_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
+ 	return keyidx;
  }
  
- static int
--aoedisk_add_sysfs(struct aoedev *d)
--{
--	return sysfs_create_group(&disk_to_dev(d->gd)->kobj, &attr_group);
--}
--void
--aoedisk_rm_sysfs(struct aoedev *d)
--{
--	sysfs_remove_group(&disk_to_dev(d->gd)->kobj, &attr_group);
--}
--
--static int
- aoeblk_open(struct block_device *bdev, fmode_t mode)
+-static int michael_mic(struct crypto_ahash *tfm_michael, u8 *key, u8 *hdr,
++static int michael_mic(struct crypto_shash *tfm_michael, u8 *key, u8 *hdr,
+ 		       u8 *data, size_t data_len, u8 *mic)
  {
- 	struct aoedev *d = bdev->bd_disk->private_data;
-@@ -417,8 +411,7 @@ aoeblk_gdalloc(void *vp)
+-	AHASH_REQUEST_ON_STACK(req, tfm_michael);
+-	struct scatterlist sg[2];
++	SHASH_DESC_ON_STACK(desc, tfm_michael);
+ 	int err;
  
- 	spin_unlock_irqrestore(&d->lock, flags);
+-	if (tfm_michael == NULL) {
+-		printk(KERN_WARNING "michael_mic: tfm_michael == NULL\n");
+-		return -1;
+-	}
+-
+-	sg_init_table(sg, 2);
+-	sg_set_buf(&sg[0], hdr, 16);
+-	sg_set_buf(&sg[1], data, data_len);
++	desc->tfm = tfm_michael;
++	desc->flags = 0;
  
--	add_disk(gd);
--	aoedisk_add_sysfs(d);
-+	device_add_disk_with_groups(NULL, gd, aoe_attr_groups);
- 	aoedisk_add_debugfs(d);
+-	if (crypto_ahash_setkey(tfm_michael, key, 8))
++	if (crypto_shash_setkey(tfm_michael, key, 8))
+ 		return -1;
  
- 	spin_lock_irqsave(&d->lock, flags);
-diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
-index 697f735b07a4..d92fa1fe3580 100644
---- a/drivers/block/aoe/aoedev.c
-+++ b/drivers/block/aoe/aoedev.c
-@@ -275,7 +275,6 @@ freedev(struct aoedev *d)
- 	del_timer_sync(&d->timer);
- 	if (d->gd) {
- 		aoedisk_rm_debugfs(d);
--		aoedisk_rm_sysfs(d);
- 		del_gendisk(d->gd);
- 		put_disk(d->gd);
- 		blk_cleanup_queue(d->blkq);
+-	ahash_request_set_tfm(req, tfm_michael);
+-	ahash_request_set_callback(req, 0, NULL, NULL);
+-	ahash_request_set_crypt(req, sg, mic, data_len + 16);
+-	err = crypto_ahash_digest(req);
+-	ahash_request_zero(req);
++	err = crypto_shash_init(desc);
++	if (err)
++		goto out;
++	err = crypto_shash_update(desc, hdr, 16);
++	if (err)
++		goto out;
++	err = crypto_shash_update(desc, data, data_len);
++	if (err)
++		goto out;
++	err = crypto_shash_final(desc, mic);
++
++out:
++	shash_desc_zero(desc);
+ 	return err;
+ }
+ 
+@@ -663,9 +662,9 @@ static int ieee80211_tkip_set_key(void *key, int len, u8 *seq, void *priv)
+ {
+ 	struct ieee80211_tkip_data *tkey = priv;
+ 	int keyidx;
+-	struct crypto_ahash *tfm = tkey->tx_tfm_michael;
++	struct crypto_shash *tfm = tkey->tx_tfm_michael;
+ 	struct crypto_skcipher *tfm2 = tkey->tx_tfm_arc4;
+-	struct crypto_ahash *tfm3 = tkey->rx_tfm_michael;
++	struct crypto_shash *tfm3 = tkey->rx_tfm_michael;
+ 	struct crypto_skcipher *tfm4 = tkey->rx_tfm_arc4;
+ 
+ 	keyidx = tkey->key_idx;
 -- 
-2.12.3
+2.17.1
