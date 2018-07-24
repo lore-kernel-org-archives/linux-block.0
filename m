@@ -1,140 +1,107 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:60740 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730293AbeGZPkE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jul 2018 11:40:04 -0400
-From: Coly Li <colyli@suse.de>
-To: colyli@suse.de, linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Kai Krakow <kai@kaishome.de>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Subject: [PATCH 1/9] bcache: do not check return value of debugfs_create_dir()
-Date: Thu, 26 Jul 2018 22:22:31 +0800
-Message-Id: <20180726142239.44669-2-colyli@suse.de>
-In-Reply-To: <20180726142239.44669-1-colyli@suse.de>
-References: <20180726142239.44669-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <keescook@chromium.org>
+Return-Path: <keescook@chromium.org>
+From: Kees Cook <keescook@chromium.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Kees Cook <keescook@chromium.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Eric Biggers <ebiggers@google.com>,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	Alasdair Kergon <agk@redhat.com>,
+	Rabin Vincent <rabinv@axis.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Pavel Machek <pavel@ucw.cz>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	x86@kernel.org,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Paul Mackerras <paulus@samba.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	David Howells <dhowells@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+	Jia-Ju Bai <baijiaju1990@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Will Deacon <will.deacon@arm.com>,
+	dm-devel@redhat.com,
+	linux-pm@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	linux-block@vger.kernel.org,
+	qat-linux@intel.com,
+	linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devel@driverdev.osuosl.org,
+	linux-afs@lists.infradead.org,
+	linux-wireless@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v6 05/18] crypto alg: Introduce generic max blocksize and alignmask
+Date: Tue, 24 Jul 2018 09:49:23 -0700
+Message-Id: <20180724164936.37477-6-keescook@chromium.org>
+In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
+References: <20180724164936.37477-1-keescook@chromium.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Greg KH suggests that normal code should not care about debugfs. Therefore
-no matter successful or failed of debugfs_create_dir() execution, it is
-unncessary to check its return value.
+In the quest to remove all stack VLA usage from the kernel[1], this
+exposes a new general upper bound on crypto blocksize and alignmask
+(higher than for the existing cipher limits) for VLA removal,
+and introduces new checks.
 
-There are two functions called debugfs_create_dir() and check the return
-value, which are bch_debug_init() and closure_debug_init(). This patch
-changes these two functions from int to void type, and ignore return values
-of debugfs_create_dir().
+At present, the highest cra_alignmask in the kernel is 63. The highest
+cra_blocksize is 144 (SHA3_224_BLOCK_SIZE, 18 8-byte words). For the
+new blocksize limit, I went with 160 (20 8-byte words).
 
-This patch does not fix exact bug, just makes things work as they should.
+[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Kai Krakow <kai@kaishome.de>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/md/bcache/bcache.h  |  2 +-
- drivers/md/bcache/closure.c | 13 +++++++++----
- drivers/md/bcache/closure.h |  4 ++--
- drivers/md/bcache/debug.c   | 11 ++++++-----
- drivers/md/bcache/super.c   |  4 +++-
- 5 files changed, 21 insertions(+), 13 deletions(-)
+ crypto/algapi.c         | 7 ++++++-
+ include/crypto/algapi.h | 4 +++-
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 872ef4d67711..a44bd427e5ba 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -1001,7 +1001,7 @@ void bch_open_buckets_free(struct cache_set *);
- int bch_cache_allocator_start(struct cache *ca);
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index c0755cf4f53f..496fc51bf215 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -57,9 +57,14 @@ static int crypto_check_alg(struct crypto_alg *alg)
+ 	if (alg->cra_alignmask & (alg->cra_alignmask + 1))
+ 		return -EINVAL;
  
- void bch_debug_exit(void);
--int bch_debug_init(struct kobject *);
-+void bch_debug_init(struct kobject *);
- void bch_request_exit(void);
- int bch_request_init(void);
+-	if (alg->cra_blocksize > PAGE_SIZE / 8)
++	/* General maximums for all algs. */
++	if (alg->cra_alignmask > MAX_ALGAPI_ALIGNMASK)
+ 		return -EINVAL;
  
-diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
-index 0e14969182c6..618253683d40 100644
---- a/drivers/md/bcache/closure.c
-+++ b/drivers/md/bcache/closure.c
-@@ -199,11 +199,16 @@ static const struct file_operations debug_ops = {
- 	.release	= single_release
- };
- 
--int __init closure_debug_init(void)
-+void  __init closure_debug_init(void)
- {
--	closure_debug = debugfs_create_file("closures",
--				0400, bcache_debug, NULL, &debug_ops);
--	return IS_ERR_OR_NULL(closure_debug);
-+	if (!IS_ERR_OR_NULL(bcache_debug))
-+		/*
-+		 * it is unnecessary to check return value of
-+		 * debugfs_create_file(), we should not care
-+		 * about this.
-+		 */
-+		closure_debug = debugfs_create_file(
-+			"closures", 0400, bcache_debug, NULL, &debug_ops);
- }
- #endif
- 
-diff --git a/drivers/md/bcache/closure.h b/drivers/md/bcache/closure.h
-index 71427eb5fdae..7c2c5bc7c88b 100644
---- a/drivers/md/bcache/closure.h
-+++ b/drivers/md/bcache/closure.h
-@@ -186,13 +186,13 @@ static inline void closure_sync(struct closure *cl)
- 
- #ifdef CONFIG_BCACHE_CLOSURES_DEBUG
- 
--int closure_debug_init(void);
-+void closure_debug_init(void);
- void closure_debug_create(struct closure *cl);
- void closure_debug_destroy(struct closure *cl);
- 
- #else
- 
--static inline int closure_debug_init(void) { return 0; }
-+static inline void closure_debug_init(void) {}
- static inline void closure_debug_create(struct closure *cl) {}
- static inline void closure_debug_destroy(struct closure *cl) {}
- 
-diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
-index d030ce3025a6..57f8f5aeee55 100644
---- a/drivers/md/bcache/debug.c
-+++ b/drivers/md/bcache/debug.c
-@@ -248,11 +248,12 @@ void bch_debug_exit(void)
- 		debugfs_remove_recursive(bcache_debug);
- }
- 
--int __init bch_debug_init(struct kobject *kobj)
-+void __init bch_debug_init(struct kobject *kobj)
- {
--	if (!IS_ENABLED(CONFIG_DEBUG_FS))
--		return 0;
--
-+	/*
-+	 * it is unnecessary to check return value of
-+	 * debugfs_create_file(), we should not care
-+	 * about this.
-+	 */
- 	bcache_debug = debugfs_create_dir("bcache", NULL);
--	return IS_ERR_OR_NULL(bcache_debug);
- }
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index e0a92104ca23..c7ffa6ef3f82 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -2345,10 +2345,12 @@ static int __init bcache_init(void)
- 		goto err;
- 
- 	if (bch_request_init() ||
--	    bch_debug_init(bcache_kobj) || closure_debug_init() ||
- 	    sysfs_create_files(bcache_kobj, files))
- 		goto err;
- 
-+	bch_debug_init(bcache_kobj);
-+	closure_debug_init();
++	if (alg->cra_blocksize > MAX_ALGAPI_BLOCKSIZE)
++		return -EINVAL;
 +
- 	return 0;
- err:
- 	bcache_exit();
++	/* Lower maximums for specific alg types. */
+ 	if (!alg->cra_type && (alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
+ 			       CRYPTO_ALG_TYPE_CIPHER) {
+ 		if (alg->cra_alignmask > MAX_CIPHER_ALIGNMASK)
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index bd5e8ccf1687..21371ac8f355 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -20,8 +20,10 @@
+ /*
+  * Maximum values for blocksize and alignmask, used to allocate
+  * static buffers that are big enough for any combination of
+- * ciphers and architectures.
++ * algs and architectures. Ciphers have a lower maximum size.
+  */
++#define MAX_ALGAPI_BLOCKSIZE		160
++#define MAX_ALGAPI_ALIGNMASK		63
+ #define MAX_CIPHER_BLOCKSIZE		16
+ #define MAX_CIPHER_ALIGNMASK		15
+ 
 -- 
 2.17.1
