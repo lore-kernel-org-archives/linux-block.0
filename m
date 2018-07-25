@@ -1,45 +1,42 @@
-Return-Path: <jin.xiao@intel.com>
-From: xiao jin <jin.xiao@intel.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: yanmin.zhang@intel.com,
-	jin.xiao@intel.com
-Subject: [PATCH] blk_init_allocated_queue() set q->fq as NULL in the fail case
-Date: Mon, 30 Jul 2018 10:03:17 +0800
-Message-Id: <1532916197-14950-1-git-send-email-jin.xiao@intel.com>
+Return-Path: <prvs=737f04b27=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Alan Stern <stern@rowland.harvard.edu>
+Subject: [PATCH v2 1/5] block: Fix a comment in a header file
+Date: Wed, 25 Jul 2018 15:26:03 -0700
+Message-Id: <20180725222607.8854-2-bart.vanassche@wdc.com>
+In-Reply-To: <20180725222607.8854-1-bart.vanassche@wdc.com>
+References: <20180725222607.8854-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-We find the memory use-after-free issue in __blk_drain_queue()
-on the kernel 4.14. After read the latest kernel 4.18-rc6 we
-think it has the same problem.
+Since the REQ_PREEMPT flag has been renamed into RQF_PREEMPT, update the
+comment that refers to that flag.
 
-Memory is allocated for q->fq in the blk_init_allocated_queue().
-If the elevator init function called with error return, it will
-run into the fail case to free the q->fq.
-
-Then the __blk_drain_queue() uses the same memory after the free
-of the q->fq, it will lead to the unpredictable event.
-
-The patch is to set q->fq as NULL in the fail case of
-blk_init_allocated_queue().
-
-Signed-off-by: xiao jin <jin.xiao@intel.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Alan Stern <stern@rowland.harvard.edu>
 ---
- block/blk-core.c |    1 +
- 1 file changed, 1 insertion(+)
+ include/linux/blkdev.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index b888175..52635e2 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1072,6 +1072,7 @@ int blk_init_allocated_queue(struct request_queue *q)
- 		q->exit_rq_fn(q, q->fq->flush_rq);
- out_free_flush_queue:
- 	blk_free_flush_queue(q->fq);
-+	q->fq = NULL;
- 	return -ENOMEM;
- }
- EXPORT_SYMBOL(blk_init_allocated_queue);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 331a6cb8805f..763482037c9b 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -700,7 +700,7 @@ struct request_queue {
+ #define QUEUE_FLAG_REGISTERED  26	/* queue has been registered to a disk */
+ #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
+ #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
+-#define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
++#define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process RQF_PREEMPT requests */
+ 
+ #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+ 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
 -- 
-1.7.9.5
+2.18.0
