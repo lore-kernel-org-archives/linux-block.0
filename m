@@ -1,234 +1,86 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	nbd@other.debian.org,
+Return-Path: <mwilck@suse.com>
+From: Martin Wilck <mwilck@suse.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Jan Kara <jack@suse.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Ming Lei <ming.lei@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Kent Overstreet <kent.overstreet@gmail.com>,
 	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Subject: [PATCH 2/2] nbd: handle unexpected replies better
-Date: Mon, 16 Jul 2018 12:11:35 -0400
-Message-Id: <20180716161136.21222-2-josef@toxicpanda.com>
-In-Reply-To: <20180716161136.21222-1-josef@toxicpanda.com>
-References: <20180716161136.21222-1-josef@toxicpanda.com>
+	Martin Wilck <mwilck@suse.com>
+Subject: [PATCH v5 1/3] block: bio_iov_iter_get_pages: fix size of last iovec
+Date: Wed, 25 Jul 2018 23:15:07 +0200
+Message-Id: <20180725211509.13592-2-mwilck@suse.com>
+In-Reply-To: <20180725211509.13592-1-mwilck@suse.com>
+References: <20180725211509.13592-1-mwilck@suse.com>
 List-ID: <linux-block@vger.kernel.org>
 
-If the server or network is misbehaving and we get an unexpected reply
-we can sometimes miss the request not being started and wait on a
-request and never get a response, or even double complete the same
-request.  Fix this by replacing the send_complete completion with just a
-per command lock.  Add a per command cookie as well so that we can know
-if we're getting a double completion for a previous event.  Also check
-to make sure we dont have REQUEUED set as that means we raced with the
-timeout handler and need to just let the retry occur.
+If the last page of the bio is not "full", the length of the last
+vector slot needs to be corrected. This slot has the index
+(bio->bi_vcnt - 1), but only in bio->bi_io_vec. In the "bv" helper
+array, which is shifted by the value of bio->bi_vcnt at function
+invocation, the correct index is (nr_pages - 1).
 
-Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+v2: improved readability following suggestions from Ming Lei.
+v3: followed a formatting suggestion from Christoph Hellwig.
+
+Fixes: 2cefe4dbaadf ("block: add bio_iov_iter_get_pages()")
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Martin Wilck <mwilck@suse.com>
 ---
- drivers/block/nbd.c | 75 +++++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 61 insertions(+), 14 deletions(-)
+ block/bio.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index f8cf7d4cca7f..3fb95c8d9fd8 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -116,11 +116,12 @@ struct nbd_device {
- 
- struct nbd_cmd {
- 	struct nbd_device *nbd;
-+	struct mutex lock;
- 	int index;
- 	int cookie;
--	struct completion send_complete;
- 	blk_status_t status;
- 	unsigned long flags;
-+	u32 cmd_cookie;
- };
- 
- #if IS_ENABLED(CONFIG_DEBUG_FS)
-@@ -157,6 +158,27 @@ static void nbd_requeue_cmd(struct nbd_cmd *cmd)
- 		blk_mq_requeue_request(req, true);
- }
- 
-+#define NBD_COOKIE_BITS 32
-+
-+static u64 nbd_cmd_handle(struct nbd_cmd *cmd)
-+{
-+	struct request *req = blk_mq_rq_from_pdu(cmd);
-+	u32 tag = blk_mq_unique_tag(req);
-+	u64 cookie = cmd->cmd_cookie;
-+
-+	return (cookie << NBD_COOKIE_BITS) | tag;
-+}
-+
-+static u32 nbd_handle_to_tag(u64 handle)
-+{
-+	return (u32)handle;
-+}
-+
-+static u32 nbd_handle_to_cookie(u64 handle)
-+{
-+	return (u32)(handle >> NBD_COOKIE_BITS);
-+}
-+
- static const char *nbdcmd_to_ascii(int cmd)
+diff --git a/block/bio.c b/block/bio.c
+index 67eff5e..489a430 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -912,16 +912,16 @@ EXPORT_SYMBOL(bio_add_page);
+  */
+ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
  {
- 	switch (cmd) {
-@@ -330,6 +352,9 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 	}
- 	config = nbd->config;
+-	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
++	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt, idx;
+ 	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
+ 	struct page **pages = (struct page **)bv;
+-	size_t offset, diff;
++	size_t offset;
+ 	ssize_t size;
  
-+	if (!mutex_trylock(&cmd->lock))
-+		return BLK_EH_RESET_TIMER;
-+
- 	if (config->num_connections > 1) {
- 		dev_err_ratelimited(nbd_to_dev(nbd),
- 				    "Connection timed out, retrying (%d/%d alive)\n",
-@@ -354,6 +379,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 					nbd_mark_nsock_dead(nbd, nsock, 1);
- 				mutex_unlock(&nsock->tx_lock);
- 			}
-+			mutex_unlock(&cmd->lock);
- 			nbd_requeue_cmd(cmd);
- 			nbd_config_put(nbd);
- 			return BLK_EH_DONE;
-@@ -364,6 +390,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 	}
- 	set_bit(NBD_TIMEDOUT, &config->runtime_flags);
- 	cmd->status = BLK_STS_IOERR;
-+	mutex_unlock(&cmd->lock);
- 	sock_shutdown(nbd);
- 	nbd_config_put(nbd);
- done:
-@@ -441,9 +468,9 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 	struct iov_iter from;
- 	unsigned long size = blk_rq_bytes(req);
- 	struct bio *bio;
-+	u64 handle;
- 	u32 type;
- 	u32 nbd_cmd_flags = 0;
--	u32 tag = blk_mq_unique_tag(req);
- 	int sent = nsock->sent, skip = 0;
+ 	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
+ 	if (unlikely(size <= 0))
+ 		return size ? size : -EFAULT;
+-	nr_pages = (size + offset + PAGE_SIZE - 1) / PAGE_SIZE;
++	idx = nr_pages = (size + offset + PAGE_SIZE - 1) / PAGE_SIZE;
  
- 	iov_iter_kvec(&from, WRITE | ITER_KVEC, &iov, 1, sizeof(request));
-@@ -485,6 +512,8 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 			goto send_pages;
- 		}
- 		iov_iter_advance(&from, sent);
-+	} else {
-+		cmd->cmd_cookie++;
- 	}
- 	cmd->index = index;
- 	cmd->cookie = nsock->cookie;
-@@ -493,7 +522,8 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 		request.from = cpu_to_be64((u64)blk_rq_pos(req) << 9);
- 		request.len = htonl(size);
- 	}
--	memcpy(request.handle, &tag, sizeof(tag));
-+	handle = nbd_cmd_handle(cmd);
-+	memcpy(request.handle, &handle, sizeof(handle));
+ 	/*
+ 	 * Deep magic below:  We need to walk the pinned pages backwards
+@@ -934,17 +934,15 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	bio->bi_iter.bi_size += size;
+ 	bio->bi_vcnt += nr_pages;
  
- 	dev_dbg(nbd_to_dev(nbd), "request %p: sending control (%s@%llu,%uB)\n",
- 		req, nbdcmd_to_ascii(type),
-@@ -586,10 +616,12 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
- 	struct nbd_reply reply;
- 	struct nbd_cmd *cmd;
- 	struct request *req = NULL;
-+	u64 handle;
- 	u16 hwq;
- 	u32 tag;
- 	struct kvec iov = {.iov_base = &reply, .iov_len = sizeof(reply)};
- 	struct iov_iter to;
-+	int ret = 0;
- 
- 	reply.magic = 0;
- 	iov_iter_kvec(&to, READ | ITER_KVEC, &iov, 1, sizeof(reply));
-@@ -607,8 +639,8 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
- 		return ERR_PTR(-EPROTO);
+-	diff = (nr_pages * PAGE_SIZE - offset) - size;
+-	while (nr_pages--) {
+-		bv[nr_pages].bv_page = pages[nr_pages];
+-		bv[nr_pages].bv_len = PAGE_SIZE;
+-		bv[nr_pages].bv_offset = 0;
++	while (idx--) {
++		bv[idx].bv_page = pages[idx];
++		bv[idx].bv_len = PAGE_SIZE;
++		bv[idx].bv_offset = 0;
  	}
  
--	memcpy(&tag, reply.handle, sizeof(u32));
--
-+	memcpy(&handle, reply.handle, sizeof(handle));
-+	tag = nbd_handle_to_tag(handle);
- 	hwq = blk_mq_unique_tag_to_hwq(tag);
- 	if (hwq < nbd->tag_set.nr_hw_queues)
- 		req = blk_mq_tag_to_rq(nbd->tag_set.tags[hwq],
-@@ -619,11 +651,25 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
- 		return ERR_PTR(-ENOENT);
- 	}
- 	cmd = blk_mq_rq_to_pdu(req);
-+
-+	mutex_lock(&cmd->lock);
-+	if (cmd->cmd_cookie != nbd_handle_to_cookie(handle)) {
-+		dev_err(disk_to_dev(nbd->disk), "Double reply on req %p, cmd_cookie %u, handle cookie %u\n",
-+			req, cmd->cmd_cookie, nbd_handle_to_cookie(handle));
-+		ret = -ENOENT;
-+		goto out;
-+	}
-+	if (test_bit(NBD_CMD_REQUEUED, &cmd->flags)) {
-+		dev_err(disk_to_dev(nbd->disk), "Raced with timeout on req %p\n",
-+			req);
-+		ret = -ENOENT;
-+		goto out;
-+	}
- 	if (ntohl(reply.error)) {
- 		dev_err(disk_to_dev(nbd->disk), "Other side returned error (%d)\n",
- 			ntohl(reply.error));
- 		cmd->status = BLK_STS_IOERR;
--		return cmd;
-+		goto out;
- 	}
+ 	bv[0].bv_offset += offset;
+ 	bv[0].bv_len -= offset;
+-	if (diff)
+-		bv[bio->bi_vcnt - 1].bv_len -= diff;
++	bv[nr_pages - 1].bv_len -= nr_pages * PAGE_SIZE - offset - size;
  
- 	dev_dbg(nbd_to_dev(nbd), "request %p: got reply\n", req);
-@@ -648,18 +694,18 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
- 				if (nbd_disconnected(config) ||
- 				    config->num_connections <= 1) {
- 					cmd->status = BLK_STS_IOERR;
--					return cmd;
-+					goto out;
- 				}
--				return ERR_PTR(-EIO);
-+				ret = -EIO;
-+				goto out;
- 			}
- 			dev_dbg(nbd_to_dev(nbd), "request %p: got %d bytes data\n",
- 				req, bvec.bv_len);
- 		}
--	} else {
--		/* See the comment in nbd_queue_rq. */
--		wait_for_completion(&cmd->send_complete);
- 	}
--	return cmd;
-+out:
-+	mutex_unlock(&cmd->lock);
-+	return ret ? ERR_PTR(ret) : cmd;
- }
- 
- static void recv_work(struct work_struct *work)
-@@ -855,7 +901,7 @@ static blk_status_t nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	 * that the server is misbehaving (or there was an error) before we're
- 	 * done sending everything over the wire.
- 	 */
--	init_completion(&cmd->send_complete);
-+	mutex_lock(&cmd->lock);
- 	clear_bit(NBD_CMD_REQUEUED, &cmd->flags);
- 
- 	/* We can be called directly from the user space process, which means we
-@@ -868,7 +914,7 @@ static blk_status_t nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		ret = BLK_STS_IOERR;
- 	else if (!ret)
- 		ret = BLK_STS_OK;
--	complete(&cmd->send_complete);
-+	mutex_unlock(&cmd->lock);
- 
- 	return ret;
- }
-@@ -1475,6 +1521,7 @@ static int nbd_init_request(struct blk_mq_tag_set *set, struct request *rq,
- 	struct nbd_cmd *cmd = blk_mq_rq_to_pdu(rq);
- 	cmd->nbd = set->driver_data;
- 	cmd->flags = 0;
-+	mutex_init(&cmd->lock);
+ 	iov_iter_advance(iter, size);
  	return 0;
- }
- 
 -- 
-2.14.3
+2.17.1
