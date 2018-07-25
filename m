@@ -1,361 +1,106 @@
-Return-Path: <maxg@mellanox.com>
-From: Max Gurtovoy <maxg@mellanox.com>
-To: keith.busch@intel.com, linux-nvme@lists.infradead.org, sagi@grimberg.me,
-        hch@lst.de, martin.petersen@oracle.com, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-Cc: vladimirk@mellanox.com, Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH v5 2/3] block: move dif_prepare/dif_complete functions to block layer
-Date: Mon, 30 Jul 2018 00:15:32 +0300
-Message-Id: <1532898933-3366-2-git-send-email-maxg@mellanox.com>
-In-Reply-To: <1532898933-3366-1-git-send-email-maxg@mellanox.com>
-References: <1532898933-3366-1-git-send-email-maxg@mellanox.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:47212 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728337AbeGYHiy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Jul 2018 03:38:54 -0400
+From: Hannes Reinecke <hare@suse.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org,
+        Martin Wilck <martin.wilck@suse.com>,
+        Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>
+Subject: [PATCH 4/5] aoe: use device_add_disk_with_groups()
+Date: Wed, 25 Jul 2018 08:28:39 +0200
+Message-Id: <20180725062840.94114-5-hare@suse.de>
+In-Reply-To: <20180725062840.94114-1-hare@suse.de>
+References: <20180725062840.94114-1-hare@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Currently these functions are implemented in the scsi layer, but their
-actual place should be the block layer since T10-PI is a general data
-integrity feature that is used in the nvme protocol as well. Also, use
-the tuple size from the integrity profile since it may vary between
-integrity types.
+Use device_add_disk_with_groups() to avoid a race condition with
+udev during startup.
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
+Signed-off-by: Hannes Reinecke <hare@suse.com>
 ---
+ drivers/block/aoe/aoe.h    |  1 -
+ drivers/block/aoe/aoeblk.c | 21 +++++++--------------
+ drivers/block/aoe/aoedev.c |  1 -
+ 3 files changed, 7 insertions(+), 16 deletions(-)
 
-changes from v4:
- - added Martin's Reviewed-by.
-
-changes from v3:
- - kmap_atomic/kunmap_atomic the same address
- - declare pi struct inside the inner for loop
- - check "intervals" inside the for loop condition
-
-changes from v2:
- - convert comments to kerneldoc format
- - removed SCSI specific comment
- - fix kmap_atomic/kunmap_atomic addresses
- - fix iteration over t10_pi_tuple's
-
-changes from v1 (Christoph, Martin and Keith comments):
- - moved the functions to t10-pi.c
- - updated tuple size
- - changed local variables scope
- - remove/add new lines
-
----
-
- block/t10-pi.c         | 110 +++++++++++++++++++++++++++++++++++++++++++++++
- drivers/scsi/sd.c      |   8 ++--
- drivers/scsi/sd.h      |   9 ----
- drivers/scsi/sd_dif.c  | 113 -------------------------------------------------
- include/linux/t10-pi.h |   3 ++
- 5 files changed, 118 insertions(+), 125 deletions(-)
-
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index a98db38..62aed77 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -184,3 +184,113 @@ static blk_status_t t10_pi_type3_verify_ip(struct blk_integrity_iter *iter)
- 	.verify_fn		= t10_pi_type3_verify_ip,
+diff --git a/drivers/block/aoe/aoe.h b/drivers/block/aoe/aoe.h
+index c0ebda1283cc..015c68017a1c 100644
+--- a/drivers/block/aoe/aoe.h
++++ b/drivers/block/aoe/aoe.h
+@@ -201,7 +201,6 @@ int aoeblk_init(void);
+ void aoeblk_exit(void);
+ void aoeblk_gdalloc(void *);
+ void aoedisk_rm_debugfs(struct aoedev *d);
+-void aoedisk_rm_sysfs(struct aoedev *d);
+ 
+ int aoechr_init(void);
+ void aoechr_exit(void);
+diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
+index 429ebb84b592..b9d30150ce20 100644
+--- a/drivers/block/aoe/aoeblk.c
++++ b/drivers/block/aoe/aoeblk.c
+@@ -177,10 +177,15 @@ static struct attribute *aoe_attrs[] = {
+ 	NULL,
  };
- EXPORT_SYMBOL(t10_pi_type3_ip);
-+
-+/**
-+ * t10_pi_prepare - prepare PI prior submitting request to device
-+ * @rq:              request with PI that should be prepared
-+ * @protection_type: PI type (Type 1/Type 2/Type 3)
-+ *
-+ * For Type 1/Type 2, the virtual start sector is the one that was
-+ * originally submitted by the block layer for the ref_tag usage. Due to
-+ * partitioning, MD/DM cloning, etc. the actual physical start sector is
-+ * likely to be different. Remap protection information to match the
-+ * physical LBA.
-+ *
-+ * Type 3 does not have a reference tag so no remapping is required.
-+ */
-+void t10_pi_prepare(struct request *rq, u8 protection_type)
-+{
-+	const int tuple_sz = rq->q->integrity.tuple_size;
-+	u32 ref_tag = t10_pi_ref_tag(rq);
-+	struct bio *bio;
-+
-+	if (protection_type == T10_PI_TYPE3_PROTECTION)
-+		return;
-+
-+	__rq_for_each_bio(bio, rq) {
-+		struct bio_integrity_payload *bip = bio_integrity(bio);
-+		u32 virt = bip_get_seed(bip) & 0xffffffff;
-+		struct bio_vec iv;
-+		struct bvec_iter iter;
-+
-+		/* Already remapped? */
-+		if (bip->bip_flags & BIP_MAPPED_INTEGRITY)
-+			break;
-+
-+		bip_for_each_vec(iv, bip, iter) {
-+			void *p, *pmap;
-+			unsigned int j;
-+
-+			pmap = kmap_atomic(iv.bv_page);
-+			p = pmap + iv.bv_offset;
-+			for (j = 0; j < iv.bv_len; j += tuple_sz) {
-+				struct t10_pi_tuple *pi = p;
-+
-+				if (be32_to_cpu(pi->ref_tag) == virt)
-+					pi->ref_tag = cpu_to_be32(ref_tag);
-+				virt++;
-+				ref_tag++;
-+				p += tuple_sz;
-+			}
-+
-+			kunmap_atomic(pmap);
-+		}
-+
-+		bip->bip_flags |= BIP_MAPPED_INTEGRITY;
-+	}
-+}
-+EXPORT_SYMBOL(t10_pi_prepare);
-+
-+/**
-+ * t10_pi_complete - prepare PI prior returning request to the block layer
-+ * @rq:              request with PI that should be prepared
-+ * @protection_type: PI type (Type 1/Type 2/Type 3)
-+ * @intervals:       total elements to prepare
-+ *
-+ * For Type 1/Type 2, the virtual start sector is the one that was
-+ * originally submitted by the block layer for the ref_tag usage. Due to
-+ * partitioning, MD/DM cloning, etc. the actual physical start sector is
-+ * likely to be different. Since the physical start sector was submitted
-+ * to the device, we should remap it back to virtual values expected by the
-+ * block layer.
-+ *
-+ * Type 3 does not have a reference tag so no remapping is required.
-+ */
-+void t10_pi_complete(struct request *rq, u8 protection_type,
-+		     unsigned int intervals)
-+{
-+	const int tuple_sz = rq->q->integrity.tuple_size;
-+	u32 ref_tag = t10_pi_ref_tag(rq);
-+	struct bio *bio;
-+
-+	if (protection_type == T10_PI_TYPE3_PROTECTION)
-+		return;
-+
-+	__rq_for_each_bio(bio, rq) {
-+		struct bio_integrity_payload *bip = bio_integrity(bio);
-+		u32 virt = bip_get_seed(bip) & 0xffffffff;
-+		struct bio_vec iv;
-+		struct bvec_iter iter;
-+
-+		bip_for_each_vec(iv, bip, iter) {
-+			void *p, *pmap;
-+			unsigned int j;
-+
-+			pmap = kmap_atomic(iv.bv_page);
-+			p = pmap + iv.bv_offset;
-+			for (j = 0; j < iv.bv_len && intervals; j += tuple_sz) {
-+				struct t10_pi_tuple *pi = p;
-+
-+				if (be32_to_cpu(pi->ref_tag) == ref_tag)
-+					pi->ref_tag = cpu_to_be32(virt);
-+				virt++;
-+				ref_tag++;
-+				intervals--;
-+				p += tuple_sz;
-+			}
-+
-+			kunmap_atomic(pmap);
-+		}
-+	}
-+}
-+EXPORT_SYMBOL(t10_pi_complete);
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 9421d98..bbebdc3 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -1119,7 +1119,7 @@ static int sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
- 		SCpnt->cmnd[0] = WRITE_6;
  
- 		if (blk_integrity_rq(rq))
--			sd_dif_prepare(SCpnt);
-+			t10_pi_prepare(SCpnt->request, sdkp->protection_type);
+-static const struct attribute_group attr_group = {
++static const struct attribute_group aoe_attr_group = {
+ 	.attrs = aoe_attrs,
+ };
  
- 	} else if (rq_data_dir(rq) == READ) {
- 		SCpnt->cmnd[0] = READ_6;
-@@ -2047,8 +2047,10 @@ static int sd_done(struct scsi_cmnd *SCpnt)
- 					   "sd_done: completed %d of %d bytes\n",
- 					   good_bytes, scsi_bufflen(SCpnt)));
- 
--	if (rq_data_dir(SCpnt->request) == READ && scsi_prot_sg_count(SCpnt))
--		sd_dif_complete(SCpnt, good_bytes);
-+	if (rq_data_dir(SCpnt->request) == READ && scsi_prot_sg_count(SCpnt) &&
-+	    good_bytes)
-+		t10_pi_complete(SCpnt->request, sdkp->protection_type,
-+				good_bytes / scsi_prot_interval(SCpnt));
- 
- 	return good_bytes;
++static const struct attribute_group *aoe_attr_groups[] = {
++	&aoe_attr_group,
++	NULL,
++};
++
+ static const struct file_operations aoe_debugfs_fops = {
+ 	.open = aoe_debugfs_open,
+ 	.read = seq_read,
+@@ -220,17 +225,6 @@ aoedisk_rm_debugfs(struct aoedev *d)
  }
-diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-index 392c7d0..a7d4f50 100644
---- a/drivers/scsi/sd.h
-+++ b/drivers/scsi/sd.h
-@@ -254,21 +254,12 @@ static inline unsigned int sd_prot_flag_mask(unsigned int prot_op)
- #ifdef CONFIG_BLK_DEV_INTEGRITY
  
- extern void sd_dif_config_host(struct scsi_disk *);
--extern void sd_dif_prepare(struct scsi_cmnd *scmd);
--extern void sd_dif_complete(struct scsi_cmnd *, unsigned int);
- 
- #else /* CONFIG_BLK_DEV_INTEGRITY */
- 
- static inline void sd_dif_config_host(struct scsi_disk *disk)
+ static int
+-aoedisk_add_sysfs(struct aoedev *d)
+-{
+-	return sysfs_create_group(&disk_to_dev(d->gd)->kobj, &attr_group);
+-}
+-void
+-aoedisk_rm_sysfs(struct aoedev *d)
+-{
+-	sysfs_remove_group(&disk_to_dev(d->gd)->kobj, &attr_group);
+-}
+-
+-static int
+ aoeblk_open(struct block_device *bdev, fmode_t mode)
  {
- }
--static inline int sd_dif_prepare(struct scsi_cmnd *scmd)
--{
--	return 0;
--}
--static inline void sd_dif_complete(struct scsi_cmnd *cmd, unsigned int a)
--{
--}
+ 	struct aoedev *d = bdev->bd_disk->private_data;
+@@ -417,8 +411,7 @@ aoeblk_gdalloc(void *vp)
  
- #endif /* CONFIG_BLK_DEV_INTEGRITY */
+ 	spin_unlock_irqrestore(&d->lock, flags);
  
-diff --git a/drivers/scsi/sd_dif.c b/drivers/scsi/sd_dif.c
-index d8de43d..db72c82 100644
---- a/drivers/scsi/sd_dif.c
-+++ b/drivers/scsi/sd_dif.c
-@@ -95,116 +95,3 @@ void sd_dif_config_host(struct scsi_disk *sdkp)
- 	blk_integrity_register(disk, &bi);
- }
+-	add_disk(gd);
+-	aoedisk_add_sysfs(d);
++	device_add_disk_with_groups(NULL, gd, aoe_attr_groups);
+ 	aoedisk_add_debugfs(d);
  
--/*
-- * The virtual start sector is the one that was originally submitted
-- * by the block layer.	Due to partitioning, MD/DM cloning, etc. the
-- * actual physical start sector is likely to be different.  Remap
-- * protection information to match the physical LBA.
-- *
-- * From a protocol perspective there's a slight difference between
-- * Type 1 and 2.  The latter uses 32-byte CDBs exclusively, and the
-- * reference tag is seeded in the CDB.  This gives us the potential to
-- * avoid virt->phys remapping during write.  However, at read time we
-- * don't know whether the virt sector is the same as when we wrote it
-- * (we could be reading from real disk as opposed to MD/DM device.  So
-- * we always remap Type 2 making it identical to Type 1.
-- *
-- * Type 3 does not have a reference tag so no remapping is required.
-- */
--void sd_dif_prepare(struct scsi_cmnd *scmd)
--{
--	const int tuple_sz = sizeof(struct t10_pi_tuple);
--	struct bio *bio;
--	struct scsi_disk *sdkp;
--	struct t10_pi_tuple *pi;
--	u32 phys, virt;
--
--	sdkp = scsi_disk(scmd->request->rq_disk);
--
--	if (sdkp->protection_type == T10_PI_TYPE3_PROTECTION)
--		return;
--
--	phys = t10_pi_ref_tag(scmd->request);
--
--	__rq_for_each_bio(bio, scmd->request) {
--		struct bio_integrity_payload *bip = bio_integrity(bio);
--		struct bio_vec iv;
--		struct bvec_iter iter;
--		unsigned int j;
--
--		/* Already remapped? */
--		if (bip->bip_flags & BIP_MAPPED_INTEGRITY)
--			break;
--
--		virt = bip_get_seed(bip) & 0xffffffff;
--
--		bip_for_each_vec(iv, bip, iter) {
--			pi = kmap_atomic(iv.bv_page) + iv.bv_offset;
--
--			for (j = 0; j < iv.bv_len; j += tuple_sz, pi++) {
--
--				if (be32_to_cpu(pi->ref_tag) == virt)
--					pi->ref_tag = cpu_to_be32(phys);
--
--				virt++;
--				phys++;
--			}
--
--			kunmap_atomic(pi);
--		}
--
--		bip->bip_flags |= BIP_MAPPED_INTEGRITY;
--	}
--}
--
--/*
-- * Remap physical sector values in the reference tag to the virtual
-- * values expected by the block layer.
-- */
--void sd_dif_complete(struct scsi_cmnd *scmd, unsigned int good_bytes)
--{
--	const int tuple_sz = sizeof(struct t10_pi_tuple);
--	struct scsi_disk *sdkp;
--	struct bio *bio;
--	struct t10_pi_tuple *pi;
--	unsigned int j, intervals;
--	u32 phys, virt;
--
--	sdkp = scsi_disk(scmd->request->rq_disk);
--
--	if (sdkp->protection_type == T10_PI_TYPE3_PROTECTION || good_bytes == 0)
--		return;
--
--	intervals = good_bytes / scsi_prot_interval(scmd);
--	phys = t10_pi_ref_tag(scmd->request);
--
--	__rq_for_each_bio(bio, scmd->request) {
--		struct bio_integrity_payload *bip = bio_integrity(bio);
--		struct bio_vec iv;
--		struct bvec_iter iter;
--
--		virt = bip_get_seed(bip) & 0xffffffff;
--
--		bip_for_each_vec(iv, bip, iter) {
--			pi = kmap_atomic(iv.bv_page) + iv.bv_offset;
--
--			for (j = 0; j < iv.bv_len; j += tuple_sz, pi++) {
--
--				if (intervals == 0) {
--					kunmap_atomic(pi);
--					return;
--				}
--
--				if (be32_to_cpu(pi->ref_tag) == phys)
--					pi->ref_tag = cpu_to_be32(virt);
--
--				virt++;
--				phys++;
--				intervals--;
--			}
--
--			kunmap_atomic(pi);
--		}
--	}
--}
--
-diff --git a/include/linux/t10-pi.h b/include/linux/t10-pi.h
-index c40511f..5a427c2 100644
---- a/include/linux/t10-pi.h
-+++ b/include/linux/t10-pi.h
-@@ -51,5 +51,8 @@ static inline u32 t10_pi_ref_tag(struct request *rq)
- extern const struct blk_integrity_profile t10_pi_type1_ip;
- extern const struct blk_integrity_profile t10_pi_type3_crc;
- extern const struct blk_integrity_profile t10_pi_type3_ip;
-+extern void t10_pi_prepare(struct request *rq, u8 protection_type);
-+extern void t10_pi_complete(struct request *rq, u8 protection_type,
-+			    unsigned int intervals);
- 
- #endif
+ 	spin_lock_irqsave(&d->lock, flags);
+diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
+index 697f735b07a4..d92fa1fe3580 100644
+--- a/drivers/block/aoe/aoedev.c
++++ b/drivers/block/aoe/aoedev.c
+@@ -275,7 +275,6 @@ freedev(struct aoedev *d)
+ 	del_timer_sync(&d->timer);
+ 	if (d->gd) {
+ 		aoedisk_rm_debugfs(d);
+-		aoedisk_rm_sysfs(d);
+ 		del_gendisk(d->gd);
+ 		put_disk(d->gd);
+ 		blk_cleanup_queue(d->blkq);
 -- 
-1.8.3.1
+2.12.3
