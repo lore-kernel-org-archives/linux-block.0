@@ -4,11 +4,11 @@ To: keith.busch@intel.com, linux-nvme@lists.infradead.org, sagi@grimberg.me,
         hch@lst.de, martin.petersen@oracle.com, linux-block@vger.kernel.org,
         axboe@kernel.dk
 Cc: vladimirk@mellanox.com, Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH v4 3/3] nvme: use blk API to remap ref tags for IOs with metadata
-Date: Wed, 25 Jul 2018 18:46:17 +0300
-Message-Id: <1532533577-1600-3-git-send-email-maxg@mellanox.com>
-In-Reply-To: <1532533577-1600-1-git-send-email-maxg@mellanox.com>
-References: <1532533577-1600-1-git-send-email-maxg@mellanox.com>
+Subject: [PATCH v3 3/3] nvme: use blk API to remap ref tags for IOs with metadata
+Date: Wed, 25 Jul 2018 11:47:01 +0300
+Message-Id: <1532508421-2711-3-git-send-email-maxg@mellanox.com>
+In-Reply-To: <1532508421-2711-1-git-send-email-maxg@mellanox.com>
+References: <1532508421-2711-1-git-send-email-maxg@mellanox.com>
 List-ID: <linux-block@vger.kernel.org>
 
 Also moved the logic of the remapping to the nvme core driver instead
@@ -17,9 +17,17 @@ transport drivers will benefit from it (in case they'll implement metadata
 support).
 
 Suggested-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Cc: Jens Axboe <axboe@kernel.dk>
 Cc: Martin K. Petersen <martin.petersen@oracle.com>
 Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
+---
+
+changes from v2:
+ - add Reviewed-by tag
+changes from v1:
+ - check status of nvme_req instead of converting to BLK_STS
+
 ---
  drivers/nvme/host/core.c | 18 ++++++++++++
  drivers/nvme/host/nvme.h |  9 +-----
