@@ -1,39 +1,50 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Subject: [PATCH 2/3] blk-cgroup: hold the queue ref during throttling
-Date: Tue, 31 Jul 2018 12:39:03 -0400
-Message-Id: <20180731163904.21856-3-josef@toxicpanda.com>
-In-Reply-To: <20180731163904.21856-1-josef@toxicpanda.com>
-References: <20180731163904.21856-1-josef@toxicpanda.com>
+Return-Path: <prvs=737f04b27=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH v2 0/5] blk-mq: Enable runtime power management
+Date: Wed, 25 Jul 2018 15:26:02 -0700
+Message-Id: <20180725222607.8854-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The blkg lifetime is protected by the queue lifetime, so we need to put
-the queue _after_ we're done using the blkg.
+Hello Jens,
 
-Signed-off-by: Josef Bacik <josef@toxicpanda.com>
----
- block/blk-cgroup.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This patch series not only enables runtime power management for blk-mq but also
+simplifies power management for the legacy block layer. Please consider this
+patch series for kernel v4.19.
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 1942357d7165..694595b29b8f 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1759,10 +1759,10 @@ void blkcg_maybe_throttle_current(void)
- 	if (!blkg)
- 		goto out;
- 	rcu_read_unlock();
--	blk_put_queue(q);
- 
- 	blkcg_maybe_throttle_blkg(blkg, use_memdelay);
- 	blkg_put(blkg);
-+	blk_put_queue(q);
- 	return;
- out:
- 	rcu_read_unlock();
+Thanks,
+
+Bart.
+
+Changes compared to v1:
+- Moved the runtime power management code into a separate file.
+- Addressed Ming's feedback.
+
+Bart Van Assche (5):
+  block: Fix a comment in a header file
+  block: Move power management functions into new source files
+  block: Serialize queue freezing and blk_pre_runtime_suspend()
+  block, scsi: Rework runtime power management
+  blk-mq: Enable support for runtime power management
+
+ block/Makefile            |   1 +
+ block/blk-core.c          | 237 ++++----------------------------------
+ block/blk-mq-debugfs.c    |   1 -
+ block/blk-mq.c            |   3 +
+ block/blk-pm.c            | 235 +++++++++++++++++++++++++++++++++++++
+ block/elevator.c          |  11 +-
+ drivers/scsi/scsi_pm.c    |   1 +
+ drivers/scsi/sd.c         |   5 +-
+ drivers/scsi/sr.c         |   1 +
+ drivers/scsi/ufs/ufshcd.c |  10 +-
+ include/linux/blk-pm.h    |  28 +++++
+ include/linux/blkdev.h    |  36 ++----
+ 12 files changed, 309 insertions(+), 260 deletions(-)
+ create mode 100644 block/blk-pm.c
+ create mode 100644 include/linux/blk-pm.h
+
 -- 
-2.14.3
+2.18.0
