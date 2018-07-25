@@ -4,9 +4,9 @@ To: keith.busch@intel.com, linux-nvme@lists.infradead.org, sagi@grimberg.me,
         hch@lst.de, martin.petersen@oracle.com, linux-block@vger.kernel.org,
         axboe@kernel.dk
 Cc: vladimirk@mellanox.com, Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH v4 1/3] block: move ref_tag calculation func to the block layer
-Date: Wed, 25 Jul 2018 18:46:15 +0300
-Message-Id: <1532533577-1600-1-git-send-email-maxg@mellanox.com>
+Subject: [PATCH v3 1/3] block: move ref_tag calculation func to the block layer
+Date: Wed, 25 Jul 2018 11:46:59 +0300
+Message-Id: <1532508421-2711-1-git-send-email-maxg@mellanox.com>
 List-ID: <linux-block@vger.kernel.org>
 
 Currently this function is implemented in the scsi layer, but it's
