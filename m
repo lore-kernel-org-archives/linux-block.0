@@ -1,213 +1,537 @@
-Return-Path: <maxg@mellanox.com>
-From: Max Gurtovoy <maxg@mellanox.com>
-To: martin.petersen@oracle.com, linux-block@vger.kernel.org, axboe@kernel.dk,
-        keith.busch@intel.com, linux-nvme@lists.infradead.org,
-        sagi@grimberg.me, hch@lst.de
-Cc: Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH 2/2] nvme: use blk API to remap ref tags for IOs with metadata
-Date: Sun, 22 Jul 2018 12:49:58 +0300
-Message-Id: <1532252998-2375-2-git-send-email-maxg@mellanox.com>
-In-Reply-To: <1532252998-2375-1-git-send-email-maxg@mellanox.com>
-References: <1532252998-2375-1-git-send-email-maxg@mellanox.com>
+Return-Path: <prvs=737f04b27=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Alan Stern <stern@rowland.harvard.edu>
+Subject: [PATCH v2 2/5] block: Move power management functions into new source files
+Date: Wed, 25 Jul 2018 15:26:04 -0700
+Message-Id: <20180725222607.8854-3-bart.vanassche@wdc.com>
+In-Reply-To: <20180725222607.8854-1-bart.vanassche@wdc.com>
+References: <20180725222607.8854-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Also moved the logic of the remapping to the nvme core driver instead
-of implementing it in the nvme pci driver. This way all the other nvme
-transport drivers will benefit from it (in case they'll implement metadata
-support).
+Move the code for runtime power management from blk-core.c into the
+new source file blk-pm.c. Move the declarations of the moved functions
+from <linux/blkdev.h> into <linux/blk-pm.h>. For CONFIG_PM=n, leave
+out the declarations of the functions that are not used in that mode.
+This patch not only reduces the number of #ifdefs in the block layer
+core code but also reduces the size of header file <linux/blkdev.h>
+and hence should help to reduce the build time of the Linux kernel
+if CONFIG_PM is not defined.
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Alan Stern <stern@rowland.harvard.edu>
 ---
- drivers/nvme/host/core.c | 23 +++++++++++++--
- drivers/nvme/host/nvme.h |  9 +-----
- drivers/nvme/host/pci.c  | 75 +-----------------------------------------------
- 3 files changed, 23 insertions(+), 84 deletions(-)
+ block/Makefile         |   1 +
+ block/blk-core.c       | 183 ----------------------------------------
+ block/blk-pm.c         | 186 +++++++++++++++++++++++++++++++++++++++++
+ drivers/scsi/scsi_pm.c |   1 +
+ drivers/scsi/sd.c      |   1 +
+ drivers/scsi/sr.c      |   1 +
+ include/linux/blk-pm.h |  21 +++++
+ include/linux/blkdev.h |  23 -----
+ 8 files changed, 211 insertions(+), 206 deletions(-)
+ create mode 100644 block/blk-pm.c
+ create mode 100644 include/linux/blk-pm.h
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 46df030b2c3f..0d94d3eb641c 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -591,6 +591,7 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 		nvme_assign_write_stream(ctrl, req, &control, &dsmgmt);
- 
- 	if (ns->ms) {
-+		u32 ref_tag = nvme_block_nr(ns, blk_rq_pos(req));
- 		/*
- 		 * If formated with metadata, the block layer always provides a
- 		 * metadata buffer if CONFIG_BLK_DEV_INTEGRITY is enabled.  Else
-@@ -601,6 +602,8 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 			if (WARN_ON_ONCE(!nvme_ns_has_pi(ns)))
- 				return BLK_STS_NOTSUPP;
- 			control |= NVME_RW_PRINFO_PRACT;
-+		} else if (req_op(req) == REQ_OP_WRITE) {
-+			blk_integrity_dif_prepare(req, ns->pi_type, ref_tag);
- 		}
- 
- 		switch (ns->pi_type) {
-@@ -611,8 +614,7 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 		case NVME_NS_DPS_PI_TYPE2:
- 			control |= NVME_RW_PRINFO_PRCHK_GUARD |
- 					NVME_RW_PRINFO_PRCHK_REF;
--			cmnd->rw.reftag = cpu_to_le32(
--					nvme_block_nr(ns, blk_rq_pos(req)));
-+			cmnd->rw.reftag = cpu_to_le32(ref_tag);
- 			break;
- 		}
- 	}
-@@ -622,6 +624,23 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 	return 0;
+diff --git a/block/Makefile b/block/Makefile
+index 572b33f32c07..9dac9393bd4e 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -37,3 +37,4 @@ obj-$(CONFIG_BLK_WBT)		+= blk-wbt.o
+ obj-$(CONFIG_BLK_DEBUG_FS)	+= blk-mq-debugfs.o
+ obj-$(CONFIG_BLK_DEBUG_FS_ZONED)+= blk-mq-debugfs-zoned.o
+ obj-$(CONFIG_BLK_SED_OPAL)	+= sed-opal.o
++obj-$(CONFIG_PM)		+= blk-pm.o
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 03a4ea93a5f3..14c28197ea42 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -3745,189 +3745,6 @@ void blk_finish_plug(struct blk_plug *plug)
  }
+ EXPORT_SYMBOL(blk_finish_plug);
  
-+void nvme_cleanup_cmd(struct request *req)
-+{
-+	if (blk_integrity_rq(req) && req_op(req) == REQ_OP_READ &&
-+	    nvme_error_status(req) == BLK_STS_OK) {
-+		struct nvme_ns *ns = req->rq_disk->private_data;
-+
-+		blk_integrity_dif_complete(req, ns->pi_type,
-+					   nvme_block_nr(ns, blk_rq_pos(req)),
-+					   blk_rq_bytes(req) >> ns->lba_shift);
-+	}
-+	if (req->rq_flags & RQF_SPECIAL_PAYLOAD) {
-+		kfree(page_address(req->special_vec.bv_page) +
-+		      req->special_vec.bv_offset);
-+	}
-+}
-+EXPORT_SYMBOL_GPL(nvme_cleanup_cmd);
-+
- blk_status_t nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
- 		struct nvme_command *cmd)
- {
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 0c4a33df3b2f..dfc01ffb30df 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -356,14 +356,6 @@ static inline u64 nvme_block_nr(struct nvme_ns *ns, sector_t sector)
- 	return (sector >> (ns->lba_shift - 9));
- }
- 
--static inline void nvme_cleanup_cmd(struct request *req)
+-#ifdef CONFIG_PM
+-/**
+- * blk_pm_runtime_init - Block layer runtime PM initialization routine
+- * @q: the queue of the device
+- * @dev: the device the queue belongs to
+- *
+- * Description:
+- *    Initialize runtime-PM-related fields for @q and start auto suspend for
+- *    @dev. Drivers that want to take advantage of request-based runtime PM
+- *    should call this function after @dev has been initialized, and its
+- *    request queue @q has been allocated, and runtime PM for it can not happen
+- *    yet(either due to disabled/forbidden or its usage_count > 0). In most
+- *    cases, driver should call this function before any I/O has taken place.
+- *
+- *    This function takes care of setting up using auto suspend for the device,
+- *    the autosuspend delay is set to -1 to make runtime suspend impossible
+- *    until an updated value is either set by user or by driver. Drivers do
+- *    not need to touch other autosuspend settings.
+- *
+- *    The block layer runtime PM is request based, so only works for drivers
+- *    that use request as their IO unit instead of those directly use bio's.
+- */
+-void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
 -{
--	if (req->rq_flags & RQF_SPECIAL_PAYLOAD) {
--		kfree(page_address(req->special_vec.bv_page) +
--		      req->special_vec.bv_offset);
--	}
--}
+-	/* not support for RQF_PM and ->rpm_status in blk-mq yet */
+-	if (q->mq_ops)
+-		return;
 -
- static inline void nvme_end_request(struct request *req, __le16 status,
- 		union nvme_result result)
- {
-@@ -420,6 +412,7 @@ void nvme_start_freeze(struct nvme_ctrl *ctrl);
- #define NVME_QID_ANY -1
- struct request *nvme_alloc_request(struct request_queue *q,
- 		struct nvme_command *cmd, blk_mq_req_flags_t flags, int qid);
-+void nvme_cleanup_cmd(struct request *req);
- blk_status_t nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
- 		struct nvme_command *cmd);
- int nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index ba943f211687..20851d17acf3 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -535,73 +535,6 @@ static void nvme_free_iod(struct nvme_dev *dev, struct request *req)
- 		mempool_free(iod->sg, dev->iod_mempool);
- }
- 
--#ifdef CONFIG_BLK_DEV_INTEGRITY
--static void nvme_dif_prep(u32 p, u32 v, struct t10_pi_tuple *pi)
--{
--	if (be32_to_cpu(pi->ref_tag) == v)
--		pi->ref_tag = cpu_to_be32(p);
+-	q->dev = dev;
+-	q->rpm_status = RPM_ACTIVE;
+-	pm_runtime_set_autosuspend_delay(q->dev, -1);
+-	pm_runtime_use_autosuspend(q->dev);
 -}
--
--static void nvme_dif_complete(u32 p, u32 v, struct t10_pi_tuple *pi)
--{
--	if (be32_to_cpu(pi->ref_tag) == p)
--		pi->ref_tag = cpu_to_be32(v);
--}
+-EXPORT_SYMBOL(blk_pm_runtime_init);
 -
 -/**
-- * nvme_dif_remap - remaps ref tags to bip seed and physical lba
+- * blk_pre_runtime_suspend - Pre runtime suspend check
+- * @q: the queue of the device
 - *
-- * The virtual start sector is the one that was originally submitted by the
-- * block layer.	Due to partitioning, MD/DM cloning, etc. the actual physical
-- * start sector may be different. Remap protection information to match the
-- * physical LBA on writes, and back to the original seed on reads.
+- * Description:
+- *    This function will check if runtime suspend is allowed for the device
+- *    by examining if there are any requests pending in the queue. If there
+- *    are requests pending, the device can not be runtime suspended; otherwise,
+- *    the queue's status will be updated to SUSPENDING and the driver can
+- *    proceed to suspend the device.
 - *
-- * Type 0 and 3 do not have a ref tag, so no remapping required.
+- *    For the not allowed case, we mark last busy for the device so that
+- *    runtime PM core will try to autosuspend it some time later.
+- *
+- *    This function should be called near the start of the device's
+- *    runtime_suspend callback.
+- *
+- * Return:
+- *    0		- OK to runtime suspend the device
+- *    -EBUSY	- Device should not be runtime suspended
 - */
--static void nvme_dif_remap(struct request *req,
--			void (*dif_swap)(u32 p, u32 v, struct t10_pi_tuple *pi))
+-int blk_pre_runtime_suspend(struct request_queue *q)
 -{
--	struct nvme_ns *ns = req->rq_disk->private_data;
--	struct bio_integrity_payload *bip;
--	struct t10_pi_tuple *pi;
--	void *p, *pmap;
--	u32 i, nlb, ts, phys, virt;
+-	int ret = 0;
 -
--	if (!ns->pi_type || ns->pi_type == NVME_NS_DPS_PI_TYPE3)
--		return;
+-	if (!q->dev)
+-		return ret;
 -
--	bip = bio_integrity(req->bio);
--	if (!bip)
--		return;
--
--	pmap = kmap_atomic(bip->bip_vec->bv_page) + bip->bip_vec->bv_offset;
--
--	p = pmap;
--	virt = bip_get_seed(bip);
--	phys = nvme_block_nr(ns, blk_rq_pos(req));
--	nlb = (blk_rq_bytes(req) >> ns->lba_shift);
--	ts = ns->disk->queue->integrity.tuple_size;
--
--	for (i = 0; i < nlb; i++, virt++, phys++) {
--		pi = (struct t10_pi_tuple *)p;
--		dif_swap(phys, virt, pi);
--		p += ts;
+-	spin_lock_irq(q->queue_lock);
+-	if (q->nr_pending) {
+-		ret = -EBUSY;
+-		pm_runtime_mark_last_busy(q->dev);
+-	} else {
+-		q->rpm_status = RPM_SUSPENDING;
 -	}
--	kunmap_atomic(pmap);
+-	spin_unlock_irq(q->queue_lock);
+-	return ret;
 -}
--#else /* CONFIG_BLK_DEV_INTEGRITY */
--static void nvme_dif_remap(struct request *req,
--			void (*dif_swap)(u32 p, u32 v, struct t10_pi_tuple *pi))
+-EXPORT_SYMBOL(blk_pre_runtime_suspend);
+-
+-/**
+- * blk_post_runtime_suspend - Post runtime suspend processing
+- * @q: the queue of the device
+- * @err: return value of the device's runtime_suspend function
+- *
+- * Description:
+- *    Update the queue's runtime status according to the return value of the
+- *    device's runtime suspend function and mark last busy for the device so
+- *    that PM core will try to auto suspend the device at a later time.
+- *
+- *    This function should be called near the end of the device's
+- *    runtime_suspend callback.
+- */
+-void blk_post_runtime_suspend(struct request_queue *q, int err)
 -{
+-	if (!q->dev)
+-		return;
+-
+-	spin_lock_irq(q->queue_lock);
+-	if (!err) {
+-		q->rpm_status = RPM_SUSPENDED;
+-	} else {
+-		q->rpm_status = RPM_ACTIVE;
+-		pm_runtime_mark_last_busy(q->dev);
+-	}
+-	spin_unlock_irq(q->queue_lock);
 -}
--static void nvme_dif_prep(u32 p, u32 v, struct t10_pi_tuple *pi)
+-EXPORT_SYMBOL(blk_post_runtime_suspend);
+-
+-/**
+- * blk_pre_runtime_resume - Pre runtime resume processing
+- * @q: the queue of the device
+- *
+- * Description:
+- *    Update the queue's runtime status to RESUMING in preparation for the
+- *    runtime resume of the device.
+- *
+- *    This function should be called near the start of the device's
+- *    runtime_resume callback.
+- */
+-void blk_pre_runtime_resume(struct request_queue *q)
 -{
+-	if (!q->dev)
+-		return;
+-
+-	spin_lock_irq(q->queue_lock);
+-	q->rpm_status = RPM_RESUMING;
+-	spin_unlock_irq(q->queue_lock);
 -}
--static void nvme_dif_complete(u32 p, u32 v, struct t10_pi_tuple *pi)
+-EXPORT_SYMBOL(blk_pre_runtime_resume);
+-
+-/**
+- * blk_post_runtime_resume - Post runtime resume processing
+- * @q: the queue of the device
+- * @err: return value of the device's runtime_resume function
+- *
+- * Description:
+- *    Update the queue's runtime status according to the return value of the
+- *    device's runtime_resume function. If it is successfully resumed, process
+- *    the requests that are queued into the device's queue when it is resuming
+- *    and then mark last busy and initiate autosuspend for it.
+- *
+- *    This function should be called near the end of the device's
+- *    runtime_resume callback.
+- */
+-void blk_post_runtime_resume(struct request_queue *q, int err)
 -{
+-	if (!q->dev)
+-		return;
+-
+-	spin_lock_irq(q->queue_lock);
+-	if (!err) {
+-		q->rpm_status = RPM_ACTIVE;
+-		__blk_run_queue(q);
+-		pm_runtime_mark_last_busy(q->dev);
+-		pm_request_autosuspend(q->dev);
+-	} else {
+-		q->rpm_status = RPM_SUSPENDED;
+-	}
+-	spin_unlock_irq(q->queue_lock);
 -}
+-EXPORT_SYMBOL(blk_post_runtime_resume);
+-
+-/**
+- * blk_set_runtime_active - Force runtime status of the queue to be active
+- * @q: the queue of the device
+- *
+- * If the device is left runtime suspended during system suspend the resume
+- * hook typically resumes the device and corrects runtime status
+- * accordingly. However, that does not affect the queue runtime PM status
+- * which is still "suspended". This prevents processing requests from the
+- * queue.
+- *
+- * This function can be used in driver's resume hook to correct queue
+- * runtime PM status and re-enable peeking requests from the queue. It
+- * should be called before first request is added to the queue.
+- */
+-void blk_set_runtime_active(struct request_queue *q)
+-{
+-	spin_lock_irq(q->queue_lock);
+-	q->rpm_status = RPM_ACTIVE;
+-	pm_runtime_mark_last_busy(q->dev);
+-	pm_request_autosuspend(q->dev);
+-	spin_unlock_irq(q->queue_lock);
+-}
+-EXPORT_SYMBOL(blk_set_runtime_active);
 -#endif
 -
- static void nvme_print_sgl(struct scatterlist *sgl, int nents)
+ int __init blk_dev_init(void)
  {
- 	int i;
-@@ -827,9 +760,6 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
- 		if (blk_rq_map_integrity_sg(q, req->bio, &iod->meta_sg) != 1)
- 			goto out_unmap;
+ 	BUILD_BUG_ON(REQ_OP_LAST >= (1 << REQ_OP_BITS));
+diff --git a/block/blk-pm.c b/block/blk-pm.c
+new file mode 100644
+index 000000000000..08d7222d4757
+--- /dev/null
++++ b/block/blk-pm.c
+@@ -0,0 +1,186 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include <linux/blk-pm.h>
++#include <linux/blkdev.h>
++#include <linux/pm_runtime.h>
++
++/**
++ * blk_pm_runtime_init - Block layer runtime PM initialization routine
++ * @q: the queue of the device
++ * @dev: the device the queue belongs to
++ *
++ * Description:
++ *    Initialize runtime-PM-related fields for @q and start auto suspend for
++ *    @dev. Drivers that want to take advantage of request-based runtime PM
++ *    should call this function after @dev has been initialized, and its
++ *    request queue @q has been allocated, and runtime PM for it can not happen
++ *    yet(either due to disabled/forbidden or its usage_count > 0). In most
++ *    cases, driver should call this function before any I/O has taken place.
++ *
++ *    This function takes care of setting up using auto suspend for the device,
++ *    the autosuspend delay is set to -1 to make runtime suspend impossible
++ *    until an updated value is either set by user or by driver. Drivers do
++ *    not need to touch other autosuspend settings.
++ *
++ *    The block layer runtime PM is request based, so only works for drivers
++ *    that use request as their IO unit instead of those directly use bio's.
++ */
++void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
++{
++	/* not support for RQF_PM and ->rpm_status in blk-mq yet */
++	if (q->mq_ops)
++		return;
++
++	q->dev = dev;
++	q->rpm_status = RPM_ACTIVE;
++	pm_runtime_set_autosuspend_delay(q->dev, -1);
++	pm_runtime_use_autosuspend(q->dev);
++}
++EXPORT_SYMBOL(blk_pm_runtime_init);
++
++/**
++ * blk_pre_runtime_suspend - Pre runtime suspend check
++ * @q: the queue of the device
++ *
++ * Description:
++ *    This function will check if runtime suspend is allowed for the device
++ *    by examining if there are any requests pending in the queue. If there
++ *    are requests pending, the device can not be runtime suspended; otherwise,
++ *    the queue's status will be updated to SUSPENDING and the driver can
++ *    proceed to suspend the device.
++ *
++ *    For the not allowed case, we mark last busy for the device so that
++ *    runtime PM core will try to autosuspend it some time later.
++ *
++ *    This function should be called near the start of the device's
++ *    runtime_suspend callback.
++ *
++ * Return:
++ *    0		- OK to runtime suspend the device
++ *    -EBUSY	- Device should not be runtime suspended
++ */
++int blk_pre_runtime_suspend(struct request_queue *q)
++{
++	int ret = 0;
++
++	if (!q->dev)
++		return ret;
++
++	spin_lock_irq(q->queue_lock);
++	if (q->nr_pending) {
++		ret = -EBUSY;
++		pm_runtime_mark_last_busy(q->dev);
++	} else {
++		q->rpm_status = RPM_SUSPENDING;
++	}
++	spin_unlock_irq(q->queue_lock);
++	return ret;
++}
++EXPORT_SYMBOL(blk_pre_runtime_suspend);
++
++/**
++ * blk_post_runtime_suspend - Post runtime suspend processing
++ * @q: the queue of the device
++ * @err: return value of the device's runtime_suspend function
++ *
++ * Description:
++ *    Update the queue's runtime status according to the return value of the
++ *    device's runtime suspend function and mark last busy for the device so
++ *    that PM core will try to auto suspend the device at a later time.
++ *
++ *    This function should be called near the end of the device's
++ *    runtime_suspend callback.
++ */
++void blk_post_runtime_suspend(struct request_queue *q, int err)
++{
++	if (!q->dev)
++		return;
++
++	spin_lock_irq(q->queue_lock);
++	if (!err) {
++		q->rpm_status = RPM_SUSPENDED;
++	} else {
++		q->rpm_status = RPM_ACTIVE;
++		pm_runtime_mark_last_busy(q->dev);
++	}
++	spin_unlock_irq(q->queue_lock);
++}
++EXPORT_SYMBOL(blk_post_runtime_suspend);
++
++/**
++ * blk_pre_runtime_resume - Pre runtime resume processing
++ * @q: the queue of the device
++ *
++ * Description:
++ *    Update the queue's runtime status to RESUMING in preparation for the
++ *    runtime resume of the device.
++ *
++ *    This function should be called near the start of the device's
++ *    runtime_resume callback.
++ */
++void blk_pre_runtime_resume(struct request_queue *q)
++{
++	if (!q->dev)
++		return;
++
++	spin_lock_irq(q->queue_lock);
++	q->rpm_status = RPM_RESUMING;
++	spin_unlock_irq(q->queue_lock);
++}
++EXPORT_SYMBOL(blk_pre_runtime_resume);
++
++/**
++ * blk_post_runtime_resume - Post runtime resume processing
++ * @q: the queue of the device
++ * @err: return value of the device's runtime_resume function
++ *
++ * Description:
++ *    Update the queue's runtime status according to the return value of the
++ *    device's runtime_resume function. If it is successfully resumed, process
++ *    the requests that are queued into the device's queue when it is resuming
++ *    and then mark last busy and initiate autosuspend for it.
++ *
++ *    This function should be called near the end of the device's
++ *    runtime_resume callback.
++ */
++void blk_post_runtime_resume(struct request_queue *q, int err)
++{
++	if (!q->dev)
++		return;
++
++	spin_lock_irq(q->queue_lock);
++	if (!err) {
++		q->rpm_status = RPM_ACTIVE;
++		__blk_run_queue(q);
++		pm_runtime_mark_last_busy(q->dev);
++		pm_request_autosuspend(q->dev);
++	} else {
++		q->rpm_status = RPM_SUSPENDED;
++	}
++	spin_unlock_irq(q->queue_lock);
++}
++EXPORT_SYMBOL(blk_post_runtime_resume);
++
++/**
++ * blk_set_runtime_active - Force runtime status of the queue to be active
++ * @q: the queue of the device
++ *
++ * If the device is left runtime suspended during system suspend the resume
++ * hook typically resumes the device and corrects runtime status
++ * accordingly. However, that does not affect the queue runtime PM status
++ * which is still "suspended". This prevents processing requests from the
++ * queue.
++ *
++ * This function can be used in driver's resume hook to correct queue
++ * runtime PM status and re-enable peeking requests from the queue. It
++ * should be called before first request is added to the queue.
++ */
++void blk_set_runtime_active(struct request_queue *q)
++{
++	spin_lock_irq(q->queue_lock);
++	q->rpm_status = RPM_ACTIVE;
++	pm_runtime_mark_last_busy(q->dev);
++	pm_request_autosuspend(q->dev);
++	spin_unlock_irq(q->queue_lock);
++}
++EXPORT_SYMBOL(blk_set_runtime_active);
+diff --git a/drivers/scsi/scsi_pm.c b/drivers/scsi/scsi_pm.c
+index b44c1bb687a2..a2b4179bfdf7 100644
+--- a/drivers/scsi/scsi_pm.c
++++ b/drivers/scsi/scsi_pm.c
+@@ -8,6 +8,7 @@
+ #include <linux/pm_runtime.h>
+ #include <linux/export.h>
+ #include <linux/async.h>
++#include <linux/blk-pm.h>
  
--		if (req_op(req) == REQ_OP_WRITE)
--			nvme_dif_remap(req, nvme_dif_prep);
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_device.h>
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index 9421d9877730..e60cd8480a03 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -45,6 +45,7 @@
+ #include <linux/init.h>
+ #include <linux/blkdev.h>
+ #include <linux/blkpg.h>
++#include <linux/blk-pm.h>
+ #include <linux/delay.h>
+ #include <linux/mutex.h>
+ #include <linux/string_helpers.h>
+diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
+index 3f3cb72e0c0c..de4413e66eca 100644
+--- a/drivers/scsi/sr.c
++++ b/drivers/scsi/sr.c
+@@ -43,6 +43,7 @@
+ #include <linux/interrupt.h>
+ #include <linux/init.h>
+ #include <linux/blkdev.h>
++#include <linux/blk-pm.h>
+ #include <linux/mutex.h>
+ #include <linux/slab.h>
+ #include <linux/pm_runtime.h>
+diff --git a/include/linux/blk-pm.h b/include/linux/blk-pm.h
+new file mode 100644
+index 000000000000..fe3f4e8efbe9
+--- /dev/null
++++ b/include/linux/blk-pm.h
+@@ -0,0 +1,21 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++#ifndef _BLK_PM_H_
++#define _BLK_PM_H_
++
++/*
++ * block layer runtime pm functions
++ */
++#ifdef CONFIG_PM
++extern void blk_pm_runtime_init(struct request_queue *q, struct device *dev);
++extern int blk_pre_runtime_suspend(struct request_queue *q);
++extern void blk_post_runtime_suspend(struct request_queue *q, int err);
++extern void blk_pre_runtime_resume(struct request_queue *q);
++extern void blk_post_runtime_resume(struct request_queue *q, int err);
++extern void blk_set_runtime_active(struct request_queue *q);
++#else
++static inline void blk_pm_runtime_init(struct request_queue *q,
++				       struct device *dev) {}
++#endif
++
++#endif /* _BLK_PM_H_ */
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 763482037c9b..a0cf2e352a31 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1282,29 +1282,6 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
+ extern void blk_put_queue(struct request_queue *);
+ extern void blk_set_queue_dying(struct request_queue *);
+ 
+-/*
+- * block layer runtime pm functions
+- */
+-#ifdef CONFIG_PM
+-extern void blk_pm_runtime_init(struct request_queue *q, struct device *dev);
+-extern int blk_pre_runtime_suspend(struct request_queue *q);
+-extern void blk_post_runtime_suspend(struct request_queue *q, int err);
+-extern void blk_pre_runtime_resume(struct request_queue *q);
+-extern void blk_post_runtime_resume(struct request_queue *q, int err);
+-extern void blk_set_runtime_active(struct request_queue *q);
+-#else
+-static inline void blk_pm_runtime_init(struct request_queue *q,
+-	struct device *dev) {}
+-static inline int blk_pre_runtime_suspend(struct request_queue *q)
+-{
+-	return -ENOSYS;
+-}
+-static inline void blk_post_runtime_suspend(struct request_queue *q, int err) {}
+-static inline void blk_pre_runtime_resume(struct request_queue *q) {}
+-static inline void blk_post_runtime_resume(struct request_queue *q, int err) {}
+-static inline void blk_set_runtime_active(struct request_queue *q) {}
+-#endif
 -
- 		if (!dma_map_sg(dev->dev, &iod->meta_sg, 1, dma_dir))
- 			goto out_unmap;
- 	}
-@@ -852,11 +782,8 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
- 
- 	if (iod->nents) {
- 		dma_unmap_sg(dev->dev, iod->sg, iod->nents, dma_dir);
--		if (blk_integrity_rq(req)) {
--			if (req_op(req) == REQ_OP_READ)
--				nvme_dif_remap(req, nvme_dif_complete);
-+		if (blk_integrity_rq(req))
- 			dma_unmap_sg(dev->dev, &iod->meta_sg, 1, dma_dir);
--		}
- 	}
- 
- 	nvme_cleanup_cmd(req);
+ /*
+  * blk_plug permits building a queue of related requests by holding the I/O
+  * fragments for a short period. This allows merging of sequential requests
 -- 
-2.16.3
+2.18.0
