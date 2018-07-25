@@ -1,119 +1,113 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:25831 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730205AbeG0RnU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Jul 2018 13:43:20 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
+Return-Path: <hare@suse.de>
+From: Hannes Reinecke <hare@suse.de>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Jianchao Wang <jianchao.w.wang@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 4/5] block: Simplify blk_add_timer() and blk_mq_add_timer()
-Date: Fri, 27 Jul 2018 09:20:41 -0700
-Message-Id: <20180727162042.13425-5-bart.vanassche@wdc.com>
-In-Reply-To: <20180727162042.13425-1-bart.vanassche@wdc.com>
-References: <20180727162042.13425-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Martin Wilck <martin.wilck@suse.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Hannes Reinecke <hare@suse.com>
+Subject: [PATCH 3/5] nvme: register ns_id attributes as default sysfs groups
+Date: Wed, 25 Jul 2018 08:28:38 +0200
+Message-Id: <20180725062840.94114-4-hare@suse.de>
+In-Reply-To: <20180725062840.94114-1-hare@suse.de>
+References: <20180725062840.94114-1-hare@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Use the fact that q->mq_ops == NULL for the legacy block layer and
-also that q->mq_ops != NULL for blk-mq to simplify blk_add_timer and
-blk_mq_add_timer(). This patch does not change any functionality.
+We should be registering the ns_id attribute as default sysfs
+attribute groups, otherwise we have a race condition between
+the uevent and the attributes appearing in sysfs.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <keith.busch@intel.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-timeout.c | 54 +++++++++------------------------------------
- 1 file changed, 11 insertions(+), 43 deletions(-)
+ drivers/nvme/host/core.c      | 14 +++++++-------
+ drivers/nvme/host/multipath.c | 12 +++---------
+ drivers/nvme/host/nvme.h      |  2 +-
+ 3 files changed, 11 insertions(+), 17 deletions(-)
 
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index 527670f2f985..02d7e3427369 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -219,34 +219,21 @@ static void __blk_add_timer(struct request *req, unsigned long deadline)
- void blk_add_timer(struct request *req)
- {
- 	struct request_queue *q = req->q;
-+	unsigned long deadline;
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index e77e6418a21c..45dab8d4aff2 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2689,6 +2689,11 @@ const struct attribute_group nvme_ns_id_attr_group = {
+ 	.is_visible	= nvme_ns_id_attrs_are_visible,
+ };
  
--	if (!q->mq_ops)
--		lockdep_assert_held(q->queue_lock);
-+	lockdep_assert_held(q->queue_lock);
++const struct attribute_group *nvme_ns_id_attr_groups[] = {
++	&nvme_ns_id_attr_group,
++	NULL,
++};
++
+ #define nvme_show_str_function(field)						\
+ static ssize_t  field##_show(struct device *dev,				\
+ 			    struct device_attribute *attr, char *buf)		\
+@@ -3056,11 +3061,8 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
  
--	/* blk-mq has its own handler, so we don't need ->rq_timed_out_fn */
--	if (!q->mq_ops && !q->rq_timed_out_fn)
-+	if (!q->rq_timed_out_fn)
+ 	kfree(id);
+ 
+-	device_add_disk(ctrl->device, ns->disk);
+-	if (sysfs_create_group(&disk_to_dev(ns->disk)->kobj,
+-					&nvme_ns_id_attr_group))
+-		pr_warn("%s: failed to create sysfs group for identification\n",
+-			ns->disk->disk_name);
++	device_add_disk_with_groups(ctrl->device, ns->disk,
++				    nvme_ns_id_attr_groups);
+ 	if (ns->ndev && nvme_nvm_register_sysfs(ns))
+ 		pr_warn("%s: failed to register lightnvm sysfs group for identification\n",
+ 			ns->disk->disk_name);
+@@ -3087,8 +3089,6 @@ static void nvme_ns_remove(struct nvme_ns *ns)
+ 
+ 	nvme_fault_inject_fini(ns);
+ 	if (ns->disk && ns->disk->flags & GENHD_FL_UP) {
+-		sysfs_remove_group(&disk_to_dev(ns->disk)->kobj,
+-					&nvme_ns_id_attr_group);
+ 		if (ns->ndev)
+ 			nvme_nvm_unregister_sysfs(ns);
+ 		del_gendisk(ns->disk);
+diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
+index 1ffd3e8b13a1..2f57ff69e26d 100644
+--- a/drivers/nvme/host/multipath.c
++++ b/drivers/nvme/host/multipath.c
+@@ -226,13 +226,9 @@ void nvme_mpath_add_disk(struct nvme_ns_head *head)
  		return;
--
--	BUG_ON(!list_empty(&req->timeout_list));
--
--	/*
--	 * Some LLDs, like scsi, peek at the timeout to prevent a
--	 * command from being retried forever.
--	 */
- 	if (!req->timeout)
- 		req->timeout = q->rq_timeout;
  
- 	req->rq_flags &= ~RQF_TIMED_OUT;
--	blk_rq_set_deadline(req, jiffies + req->timeout);
-+	deadline = jiffies + req->timeout;
-+	blk_rq_set_deadline(req, deadline);
-+	list_add_tail(&req->timeout_list, &req->q->timeout_list);
- 
--	/*
--	 * Only the non-mq case needs to add the request to a protected list.
--	 * For the mq case we simply scan the tag map.
--	 */
--	if (!q->mq_ops)
--		list_add_tail(&req->timeout_list, &req->q->timeout_list);
--
--	__blk_add_timer(req, blk_rq_deadline(req));
-+	__blk_add_timer(req, deadline);
+ 	mutex_lock(&head->subsys->lock);
+-	if (!(head->disk->flags & GENHD_FL_UP)) {
+-		device_add_disk(&head->subsys->dev, head->disk);
+-		if (sysfs_create_group(&disk_to_dev(head->disk)->kobj,
+-				&nvme_ns_id_attr_group))
+-			pr_warn("%s: failed to create sysfs group for identification\n",
+-				head->disk->disk_name);
+-	}
++	if (!(head->disk->flags & GENHD_FL_UP))
++		device_add_disk_with_groups(&head->subsys->dev, head->disk,
++					    nvme_ns_id_attr_groups);
+ 	mutex_unlock(&head->subsys->lock);
  }
  
- /**
-@@ -259,32 +246,13 @@ void blk_add_timer(struct request *req)
- void blk_mq_add_timer(struct request *req)
+@@ -240,8 +236,6 @@ void nvme_mpath_remove_disk(struct nvme_ns_head *head)
  {
- 	struct request_queue *q = req->q;
-+	unsigned long deadline;
+ 	if (!head->disk)
+ 		return;
+-	sysfs_remove_group(&disk_to_dev(head->disk)->kobj,
+-			   &nvme_ns_id_attr_group);
+ 	del_gendisk(head->disk);
+ 	blk_set_queue_dying(head->disk->queue);
+ 	/* make sure all pending bios are cleaned up */
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 4ad0c8ad2a27..4b911274150d 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -446,7 +446,7 @@ int nvme_delete_ctrl_sync(struct nvme_ctrl *ctrl);
+ int nvme_get_log_ext(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+ 		u8 log_page, void *log, size_t size, u64 offset);
  
--	if (!q->mq_ops)
--		lockdep_assert_held(q->queue_lock);
--
--	/* blk-mq has its own handler, so we don't need ->rq_timed_out_fn */
--	if (!q->mq_ops && !q->rq_timed_out_fn)
--		return;
--
--	BUG_ON(!list_empty(&req->timeout_list));
--
--	/*
--	 * Some LLDs, like scsi, peek at the timeout to prevent a
--	 * command from being retried forever.
--	 */
- 	if (!req->timeout)
- 		req->timeout = q->rq_timeout;
+-extern const struct attribute_group nvme_ns_id_attr_group;
++extern const struct attribute_group *nvme_ns_id_attr_groups[];
+ extern const struct block_device_operations nvme_ns_head_ops;
  
- 	req->rq_flags &= ~RQF_TIMED_OUT;
--	blk_rq_set_deadline(req, jiffies + req->timeout);
--
--	/*
--	 * Only the non-mq case needs to add the request to a protected list.
--	 * For the mq case we simply scan the tag map.
--	 */
--	if (!q->mq_ops)
--		list_add_tail(&req->timeout_list, &req->q->timeout_list);
--
--	__blk_add_timer(req, blk_rq_deadline(req));
-+	deadline = jiffies + req->timeout;
-+	blk_rq_set_deadline(req, deadline);
-+	__blk_add_timer(req, deadline);
- }
+ #ifdef CONFIG_NVME_MULTIPATH
 -- 
-2.18.0
+2.12.3
