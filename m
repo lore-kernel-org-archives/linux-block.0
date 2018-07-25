@@ -1,106 +1,61 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:46326 "EHLO
-        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728305AbeGUBUT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Jul 2018 21:20:19 -0400
-From: Liu Bo <bo.liu@linux.alibaba.com>
-To: <linux-block@vger.kernel.org>
-Subject: [PATCH] Blk-throttle: reduce tail io latency when iops limit is enforced
-Date: Sat, 21 Jul 2018 08:29:20 +0800
-Message-Id: <1532132960-44970-1-git-send-email-bo.liu@linux.alibaba.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <keescook@google.com>
+MIME-Version: 1.0
+Sender: keescook@google.com
+In-Reply-To: <CAJZ5v0gVDotjufLKUW0YuQu2vA4fmU_gqia=ZA4DocW4XHxx0w@mail.gmail.com>
+References: <20180724164936.37477-1-keescook@chromium.org> <20180724164936.37477-11-keescook@chromium.org>
+ <CAJZ5v0gVDotjufLKUW0YuQu2vA4fmU_gqia=ZA4DocW4XHxx0w@mail.gmail.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Wed, 25 Jul 2018 11:01:47 -0700
+Message-ID: <CAGXu5j+NPCc2hq5x7JUwgKYvY6zKN28YdtHbHVapnpgC3GwCsg@mail.gmail.com>
+Subject: Re: [PATCH v6 10/18] x86/power/64: Remove VLA usage
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Arnd Bergmann <arnd@arndb.de>,
+	Eric Biggers <ebiggers@google.com>, "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	Alasdair Kergon <agk@redhat.com>, Rabin Vincent <rabinv@axis.com>, Tim Chen <tim.c.chen@linux.intel.com>,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>, Pavel Machek <pavel@ucw.cz>, Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>,
+	"the arch/x86 maintainers" <x86@kernel.org>, Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>, Jens Axboe <axboe@kernel.dk>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Mike Snitzer <snitzer@redhat.com>,
+	Paul Mackerras <paulus@samba.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	David Howells <dhowells@redhat.com>, Johannes Berg <johannes@sipsolutions.net>,
+	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>, Jia-Ju Bai <baijiaju1990@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>, Geert Uytterhoeven <geert@linux-m68k.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>, David Woodhouse <dwmw@amazon.co.uk>,
+	Will Deacon <will.deacon@arm.com>, device-mapper development <dm-devel@redhat.com>,
+	Linux PM <linux-pm@vger.kernel.org>, linux-crypto <linux-crypto@vger.kernel.org>,
+	drbd-dev@lists.linbit.com, linux-block <linux-block@vger.kernel.org>,
+	qat-linux@intel.com, linux-ppp@vger.kernel.org,
+	netdev <netdev@vger.kernel.org>,
+	"open list:ANDROID DRIVERS" <devel@driverdev.osuosl.org>, linux-afs@lists.infradead.org,
+	"open list:NETWORKING DRIVERS (WIRELESS)" <linux-wireless@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+List-ID: <linux-block@vger.kernel.org>
 
-When an application's iops has exceeded its cgroup's iops limit, surely it
-is throttled and kernel will set a timer for dispatching, thus IO latency
-includes the delay.
+On Wed, Jul 25, 2018 at 4:32 AM, Rafael J. Wysocki <rafael@kernel.org> wrote:
+> On Tue, Jul 24, 2018 at 6:49 PM, Kees Cook <keescook@chromium.org> wrote:
+>> In the quest to remove all stack VLA usage from the kernel[1], this
+>> removes the discouraged use of AHASH_REQUEST_ON_STACK by switching to
+>> shash directly and allocating the descriptor in heap memory (which should
+>> be fine: the tfm has already been allocated there too).
+>>
+>> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+>>
+>> Signed-off-by: Kees Cook <keescook@chromium.org>
+>> Acked-by: Pavel Machek <pavel@ucw.cz>
+>
+> I think I can queue this up if there are no objections from others.
+>
+> Do you want me to do that?
 
-However, the dispatch delay which is calculated by the limit and the
-elapsed jiffies is suboptimal.  As the dispatch delay is only calculated
-once the application's iops is (iops limit + 1), it doesn't need to wait
-any longer than the remaining time of the current slice.
+Sure thing. It looks like the other stand-alone patches like this one
+are getting taken into the non-crypto trees, so that's fine.
 
-The difference can be proved by the following fio job and cgroup iops
-setting,
------
-$ echo 4 > /mnt/config/nullb/disk1/mbps    # limit nullb's bandwidth to 4MB/s for testing.
-$ echo "253:1 riops=100 rbps=max" > /sys/fs/cgroup/unified/cg1/io.max
-$ cat r2.job
-[global]
-name=fio-rand-read
-filename=/dev/nullb1
-rw=randread
-bs=4k
-direct=1
-numjobs=1
-time_based=1
-runtime=60
-group_reporting=1
+Thanks!
 
-[file1]
-size=4G
-ioengine=libaio
-iodepth=1
-rate_iops=50000
-norandommap=1
-thinktime=4ms
------
+-Kees
 
-wo patch:
-file1: (g=0): rw=randread, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 4096B-4096B, ioengine=libaio, iodepth=1
-fio-3.7-66-gedfc
-Starting 1 process
-
-   read: IOPS=99, BW=400KiB/s (410kB/s)(23.4MiB/60001msec)
-    slat (usec): min=10, max=336, avg=27.71, stdev=17.82
-    clat (usec): min=2, max=28887, avg=5929.81, stdev=7374.29
-     lat (usec): min=24, max=28901, avg=5958.73, stdev=7366.22
-    clat percentiles (usec):
-     |  1.00th=[    4],  5.00th=[    4], 10.00th=[    4], 20.00th=[    4],
-     | 30.00th=[    4], 40.00th=[    4], 50.00th=[    6], 60.00th=[11731],
-     | 70.00th=[11863], 80.00th=[11994], 90.00th=[12911], 95.00th=[22676],
-     | 99.00th=[23725], 99.50th=[23987], 99.90th=[23987], 99.95th=[25035],
-     | 99.99th=[28967]
-
-w/ patch:
-file1: (g=0): rw=randread, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 4096B-4096B, ioengine=libaio, iodepth=1
-fio-3.7-66-gedfc
-Starting 1 process
-
-   read: IOPS=100, BW=400KiB/s (410kB/s)(23.4MiB/60005msec)
-    slat (usec): min=10, max=155, avg=23.24, stdev=16.79
-    clat (usec): min=2, max=12393, avg=5961.58, stdev=5959.25
-     lat (usec): min=23, max=12412, avg=5985.91, stdev=5951.92
-    clat percentiles (usec):
-     |  1.00th=[    3],  5.00th=[    3], 10.00th=[    4], 20.00th=[    4],
-     | 30.00th=[    4], 40.00th=[    5], 50.00th=[   47], 60.00th=[11863],
-     | 70.00th=[11994], 80.00th=[11994], 90.00th=[11994], 95.00th=[11994],
-     | 99.00th=[11994], 99.50th=[11994], 99.90th=[12125], 99.95th=[12125],
-     | 99.99th=[12387]
-
-Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
----
- block/blk-throttle.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 26ddbe5286f8..3ca9a98748be 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -956,12 +956,7 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
- 		return false;
- 
- 	/* Calc approx time to dispatch */
--	jiffy_wait = ((tg->io_disp[rw] + 1) * HZ) / tg_iops_limit(tg, rw) + 1;
--
--	if (jiffy_wait > jiffy_elapsed)
--		jiffy_wait = jiffy_wait - jiffy_elapsed;
--	else
--		jiffy_wait = 1;
-+	jiffy_wait = jiffy_elapsed_rnd - jiffy_elapsed;
- 
- 	*wait = jiffy_wait;
- 	return false;
 -- 
-1.8.3.1
+Kees Cook
+Pixel Security
