@@ -1,83 +1,80 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Martin Wilck <martin.wilck@suse.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 1/5] genhd: drop 'bool' argument from __device_add_disk()
-Date: Wed, 25 Jul 2018 08:28:36 +0200
-Message-Id: <20180725062840.94114-2-hare@suse.de>
-In-Reply-To: <20180725062840.94114-1-hare@suse.de>
-References: <20180725062840.94114-1-hare@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:43636 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728652AbeGZGtP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Jul 2018 02:49:15 -0400
+From: Coly Li <colyli@suse.de>
+To: colyli@suse.de, akpm@linux-foundation.org,
+        linux-kernel@vger.kernel.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Michael Lyle <mlyle@lyle.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Kate Stewart <kstewart@linuxfoundation.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Eric Biggers <ebiggers3@gmail.com>
+Subject: [PATCH v5 0/2] add crc64 calculation as kernel library 
+Date: Thu, 26 Jul 2018 13:33:50 +0800
+Message-Id: <20180726053352.2781-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Split off the last part of __device_add_disk() into __device_get_disk().
-With that we can drop the 'bool' argument and streamline the function.
+This patch set adds basic implementation of crc64 calculation as Linux
+kernel library. Since bcache already does crc64 by itself, this patch
+set also modifies bcache code to use the new crc64 library routine.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
+Currently bcache is the only user of crc64 calculation, another potential
+user is bcachefs which is on the way to be in mainline kernel. Therefore
+it makes sense to make crc64 calculation to be a public library.
+
+CRC calculation consistency testing is not trvial, it will be another
+separated patch set and not in this series any more.
+
+Coly Li
+
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Kate Stewart <kstewart@linuxfoundation.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Randy Dunlap <rdunlap@infradead.org>
+Cc: Eric Biggers <ebiggers3@gmail.com>
 ---
- block/genhd.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+Changelog:
+v5: Remove test_crc patch from this series, it will be another separated
+    patch set. Fixes review comments from v4.
+v4: Only keep crc64_be() in lib/crc64.c, tested bcache specific stuffs 
+    moved back to bcache code.
+    Fixes all review comments of v3.
+v3: Remove little endian restriction and remove 'le' from function names.
+    Fixes all review comments of v2
+v2: Combine first two patches into one
+    Fixes all review comments of v1
+v1: Initial version.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index f1543a45e73b..cfa7f4f78435 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -647,15 +647,13 @@ static void register_disk(struct device *parent, struct gendisk *disk)
-  * __device_add_disk - add disk information to kernel list
-  * @parent: parent device for the disk
-  * @disk: per-device partitioning information
-- * @register_queue: register the queue if set to true
-  *
-  * This function registers the partitioning information in @disk
-  * with the kernel.
-  *
-  * FIXME: error handling
-  */
--static void __device_add_disk(struct device *parent, struct gendisk *disk,
--			      bool register_queue)
-+static void __device_add_disk(struct device *parent, struct gendisk *disk)
- {
- 	dev_t devt;
- 	int retval;
-@@ -699,9 +697,10 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
- 				    exact_match, exact_lock, disk);
- 	}
- 	register_disk(parent, disk);
--	if (register_queue)
--		blk_register_queue(disk);
-+}
- 
-+void __device_get_disk(struct gendisk *disk)
-+{
- 	/*
- 	 * Take an extra ref on queue which will be put on disk_release()
- 	 * so that it sticks around as long as @disk is there.
-@@ -714,13 +713,18 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
- 
- void device_add_disk(struct device *parent, struct gendisk *disk)
- {
--	__device_add_disk(parent, disk, true);
-+	__device_add_disk(parent, disk);
-+
-+	blk_register_queue(disk);
-+
-+	__device_get_disk(disk);
- }
- EXPORT_SYMBOL(device_add_disk);
- 
- void device_add_disk_no_queue_reg(struct device *parent, struct gendisk *disk)
- {
--	__device_add_disk(parent, disk, false);
-+	__device_add_disk(parent, disk);
-+	__device_get_disk(disk);
- }
- EXPORT_SYMBOL(device_add_disk_no_queue_reg);
- 
+Coly Li (2):
+  lib: add crc64 calculation routines
+  bcache: use routines from lib/crc64.c for CRC64 calculation
+
+ drivers/md/bcache/Kconfig |   1 +
+ drivers/md/bcache/util.c  | 131 --------------------------------------
+ drivers/md/bcache/util.h  |  21 ++++--
+ include/linux/crc64.h     |  11 ++++
+ lib/.gitignore            |   2 +
+ lib/Kconfig               |   8 +++
+ lib/Makefile              |  11 ++++
+ lib/crc64.c               |  56 ++++++++++++++++
+ lib/gen_crc64table.c      |  68 ++++++++++++++++++++
+ 9 files changed, 174 insertions(+), 135 deletions(-)
+ create mode 100644 include/linux/crc64.h
+ create mode 100644 lib/crc64.c
+ create mode 100644 lib/gen_crc64table.c
+
 -- 
-2.12.3
+2.17.1
