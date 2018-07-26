@@ -1,120 +1,124 @@
-Return-Path: <prvs=7421cc28f=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: colyli@suse.de,
+	axboe@kernel.dk,
+	linux-bcache@vger.kernel.org
 Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Omar Sandoval <osandov@fb.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alexandru Moise <00moses.alexander00@gmail.com>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v4 1/2] block: Introduce blk_exit_queue()
-Date: Mon, 30 Jul 2018 14:10:55 -0700
-Message-Id: <20180730211056.18570-2-bart.vanassche@wdc.com>
-In-Reply-To: <20180730211056.18570-1-bart.vanassche@wdc.com>
-References: <20180730211056.18570-1-bart.vanassche@wdc.com>
+	Tang Junhui <tang.junhui@zte.com.cn>
+Subject: [PATCH 2/9] bcache: finish incremental GC
+Date: Thu, 26 Jul 2018 12:17:34 +0800
+Message-Id: <20180726041741.1669-3-colyli@suse.de>
+In-Reply-To: <20180726041741.1669-1-colyli@suse.de>
+References: <20180726041741.1669-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch does not change any functionality.
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Alexandru Moise <00moses.alexander00@gmail.com>
-Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
-Cc: <stable@vger.kernel.org>
+In GC thread, we record the latest GC key in gc_done, which is expected
+to be used for incremental GC, but in currently code, we didn't realize
+it. When GC runs, front side IO would be blocked until the GC over, it
+would be a long time if there is a lot of btree nodes.
+
+This patch realizes incremental GC, the main ideal is that, when there
+are front side I/Os, after GC some nodes (100), we stop GC, release locker
+of the btree node, and go to process the front side I/Os for some times
+(100 ms), then go back to GC again.
+
+By this patch, when we doing GC, I/Os are not blocked all the time, and
+there is no obvious I/Os zero jump problem any more.
+
+Patch v2: Rename some variables and macros name as Coly suggested.
+
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
- block/blk-core.c | 54 +++++++++++++++++++++++++++---------------------
- block/blk.h      |  1 +
- 2 files changed, 31 insertions(+), 24 deletions(-)
+ drivers/md/bcache/bcache.h  |  5 +++++
+ drivers/md/bcache/btree.c   | 14 +++++++++++++-
+ drivers/md/bcache/request.c |  3 +++
+ 3 files changed, 21 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 7c65e297a4f1..5fbfa8484c95 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -719,6 +719,35 @@ void blk_set_queue_dying(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_set_queue_dying);
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 3226d38bf859..872ef4d67711 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -474,6 +474,7 @@ struct cache {
  
-+/* Unconfigure the I/O scheduler and dissociate from the cgroup controller. */
-+void blk_exit_queue(struct request_queue *q)
-+{
-+	/*
-+	 * Since the I/O scheduler exit code may access cgroup information,
-+	 * perform I/O scheduler exit before disassociating from the block
-+	 * cgroup controller.
-+	 */
-+	if (q->elevator) {
-+		ioc_clear_queue(q);
-+		elevator_exit(q, q->elevator);
-+		q->elevator = NULL;
-+	}
-+
-+	/*
-+	 * Remove all references to @q from the block cgroup controller before
-+	 * restoring @q->queue_lock to avoid that restoring this pointer causes
-+	 * e.g. blkcg_print_blkgs() to crash.
-+	 */
-+	blkcg_exit_queue(q);
-+
-+	/*
-+	 * Since the cgroup code may dereference the @q->backing_dev_info
-+	 * pointer, only decrease its reference count after having removed the
-+	 * association with the block cgroup controller.
-+	 */
-+	bdi_put(q->backing_dev_info);
-+}
-+
- /**
-  * blk_cleanup_queue - shutdown a request queue
-  * @q: request queue to shutdown
-@@ -788,30 +817,7 @@ void blk_cleanup_queue(struct request_queue *q)
+ struct gc_stat {
+ 	size_t			nodes;
++	size_t			nodes_pre;
+ 	size_t			key_bytes;
+ 
+ 	size_t			nkeys;
+@@ -603,6 +604,10 @@ struct cache_set {
+ 	 * rescale; when it hits 0 we rescale all the bucket priorities.
  	 */
- 	WARN_ON_ONCE(q->kobj.state_in_sysfs);
+ 	atomic_t		rescale;
++	/*
++	 * used for GC, identify if any front side I/Os is inflight
++	 */
++	atomic_t		search_inflight;
+ 	/*
+ 	 * When we invalidate buckets, we use both the priority and the amount
+ 	 * of good data to determine which buckets to reuse first - to weight
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index 547c9eedc2f4..b4407ba12667 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -90,6 +90,8 @@
  
--	/*
--	 * Since the I/O scheduler exit code may access cgroup information,
--	 * perform I/O scheduler exit before disassociating from the block
--	 * cgroup controller.
--	 */
--	if (q->elevator) {
--		ioc_clear_queue(q);
--		elevator_exit(q, q->elevator);
--		q->elevator = NULL;
--	}
--
--	/*
--	 * Remove all references to @q from the block cgroup controller before
--	 * restoring @q->queue_lock to avoid that restoring this pointer causes
--	 * e.g. blkcg_print_blkgs() to crash.
--	 */
--	blkcg_exit_queue(q);
--
--	/*
--	 * Since the cgroup code may dereference the @q->backing_dev_info
--	 * pointer, only decrease its reference count after having removed the
--	 * association with the block cgroup controller.
--	 */
--	bdi_put(q->backing_dev_info);
-+	blk_exit_queue(q);
+ #define MAX_NEED_GC		64
+ #define MAX_SAVE_PRIO		72
++#define MIN_GC_NODES		100
++#define GC_SLEEP_MS		100
  
- 	if (q->mq_ops)
- 		blk_mq_free_queue(q);
-diff --git a/block/blk.h b/block/blk.h
-index 6adae8f94279..aeb8026f4d7b 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -130,6 +130,7 @@ void blk_free_flush_queue(struct blk_flush_queue *q);
- int blk_init_rl(struct request_list *rl, struct request_queue *q,
- 		gfp_t gfp_mask);
- void blk_exit_rl(struct request_queue *q, struct request_list *rl);
-+void blk_exit_queue(struct request_queue *q);
- void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
- 			struct bio *bio);
- void blk_queue_bypass_start(struct request_queue *q);
+ #define PTR_DIRTY_BIT		(((uint64_t) 1 << 36))
+ 
+@@ -1585,6 +1587,13 @@ static int btree_gc_recurse(struct btree *b, struct btree_op *op,
+ 		memmove(r + 1, r, sizeof(r[0]) * (GC_MERGE_NODES - 1));
+ 		r->b = NULL;
+ 
++		if (atomic_read(&b->c->search_inflight) &&
++		    gc->nodes >= gc->nodes_pre + MIN_GC_NODES) {
++			gc->nodes_pre =  gc->nodes;
++			ret = -EAGAIN;
++			break;
++		}
++
+ 		if (need_resched()) {
+ 			ret = -EAGAIN;
+ 			break;
+@@ -1753,7 +1762,10 @@ static void bch_btree_gc(struct cache_set *c)
+ 		closure_sync(&writes);
+ 		cond_resched();
+ 
+-		if (ret && ret != -EAGAIN)
++		if (ret == -EAGAIN)
++			schedule_timeout_interruptible(msecs_to_jiffies
++						       (GC_SLEEP_MS));
++		else if (ret)
+ 			pr_warn("gc failed!");
+ 	} while (ret && !test_bit(CACHE_SET_IO_DISABLE, &c->flags));
+ 
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index ae67f5fa8047..8eece9ef9f46 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -702,6 +702,8 @@ static void search_free(struct closure *cl)
+ {
+ 	struct search *s = container_of(cl, struct search, cl);
+ 
++	atomic_dec(&s->d->c->search_inflight);
++
+ 	if (s->iop.bio)
+ 		bio_put(s->iop.bio);
+ 
+@@ -719,6 +721,7 @@ static inline struct search *search_alloc(struct bio *bio,
+ 
+ 	closure_init(&s->cl, NULL);
+ 	do_bio_hook(s, bio, request_endio);
++	atomic_inc(&d->c->search_inflight);
+ 
+ 	s->orig_bio		= bio;
+ 	s->cache_miss		= NULL;
 -- 
-2.18.0
+2.17.1
