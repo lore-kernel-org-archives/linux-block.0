@@ -1,66 +1,178 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	linux-pm@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH RFC 0/4] blk-mq: support runtime PM
-Date: Thu, 12 Jul 2018 00:29:02 +0800
-Message-Id: <20180711162906.14271-1-ming.lei@redhat.com>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH] blktests: Add '--outdir' to store results in a different
+ directory
+To: Omar Sandoval <osandov@osandov.com>
+Cc: Omar Sandoval <osandov@fb.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
+References: <20180717132750.38767-1-hare@suse.de>
+ <20180725212301.GC16847@vader>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <629a4958-2aeb-28d0-a744-6ac74ec4a7cf@suse.de>
+Date: Thu, 26 Jul 2018 15:56:09 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180725212301.GC16847@vader>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Guys,
+On 07/25/2018 11:23 PM, Omar Sandoval wrote:
+> On Tue, Jul 17, 2018 at 03:27:50PM +0200, Hannes Reinecke wrote:
+>> Adding an option '--outdir' to store results in a different
+>> director so as not to clutter the git repository itself.
+>>
+>> Signed-off-by: Hannes Reinecke <hare@suse.com>
+>> ---
+>>  check | 14 ++++++++++----
+>>  1 file changed, 10 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/check b/check
+>> index a635531..42d07f8 100755
+>> --- a/check
+>> +++ b/check
+>> @@ -334,7 +334,7 @@ _call_test() {
+>>  	fi
+>>  
+>>  	trap _cleanup EXIT
+>> -	if ! TMPDIR="$(mktemp --tmpdir -p "$PWD/results" -d "tmpdir.${TEST_NAME//\//.}.XXX")"; then
+>> +	if ! TMPDIR="$(mktemp --tmpdir -p "$RESULTS_DIR" -d "tmpdir.${TEST_NAME//\//.}.XXX")"; then
+>>  		return
+>>  	fi
+>>  
+>> @@ -415,7 +415,7 @@ _run_test() {
+>>  			return 0
+>>  		fi
+>>  
+>> -		RESULTS_DIR="results/nodev"
+>> +		RESULTS_DIR="${OUT_DIR}/results/nodev"
+>>  		_call_test test
+>>  	else
+>>  		if [[ ${#TEST_DEVS[@]} -eq 0 ]]; then
+>> @@ -434,7 +434,7 @@ _run_test() {
+>>  				_output_notrun "$TEST_NAME => $(basename "$TEST_DEV")"
+>>  				continue
+>>  			fi
+>> -			RESULTS_DIR="results/$(basename "$TEST_DEV")"
+>> +			RESULTS_DIR="${OUT_DIR}/results/$(basename "$TEST_DEV")"
+>>  			if ! _call_test test_device; then
+>>  				ret=1
+>>  			fi
+>> @@ -567,6 +567,7 @@ Test runs:
+>>  			 tests to run
+>>  
+>>  Miscellaneous:
+>> +  -o, --outdir=OUTDIR    write results into the specified directory
+>>    -h, --help             display this help message and exit"
+>>  
+>>  	case "$1" in
+>> @@ -581,12 +582,13 @@ Miscellaneous:
+>>  	esac
+>>  }
+>>  
+>> -if ! TEMP=$(getopt -o 'dq::x:h' --long 'quick::,exclude:,help' -n "$0" -- "$@"); then
+>> +if ! TEMP=$(getopt -o 'dq::o:x:h' --long 'quick::,exclude:,outdir:,help' -n "$0" -- "$@"); then
+>>  	exit 1
+>>  fi
+>>  
+>>  eval set -- "$TEMP"
+>>  unset TEMP
+>> +OUT_DIR="."
+> 
+> This doesn't allow setting it from the config file. How about this?
+> 
+> diff --git a/check b/check
+> index 5f4461f..5e99415 100755
+> --- a/check
+> +++ b/check
+> @@ -313,7 +313,7 @@ _call_test() {
+>  	local test_func="$1"
+>  	local seqres="${RESULTS_DIR}/${TEST_NAME}"
+>  	# shellcheck disable=SC2034
+> -	FULL="$PWD/${seqres}.full"
+> +	FULL="${seqres}.full"
+>  	declare -A TEST_DEV_QUEUE_SAVED
+>  
+>  	_read_last_test_run
+> @@ -334,7 +334,7 @@ _call_test() {
+>  	fi
+>  
+>  	trap _cleanup EXIT
+> -	if ! TMPDIR="$(mktemp --tmpdir -p "$PWD/results" -d "tmpdir.${TEST_NAME//\//.}.XXX")"; then
+> +	if ! TMPDIR="$(mktemp --tmpdir -p "$OUTPUT" -d "tmpdir.${TEST_NAME//\//.}.XXX")"; then
+>  		return
+>  	fi
+>  
+> @@ -415,7 +415,7 @@ _run_test() {
+>  			return 0
+>  		fi
+>  
+> -		RESULTS_DIR="results/nodev"
+> +		RESULTS_DIR="$OUTPUT/nodev"
+>  		_call_test test
+>  	else
+>  		if [[ ${#TEST_DEVS[@]} -eq 0 ]]; then
+> @@ -434,7 +434,7 @@ _run_test() {
+>  				_output_notrun "$TEST_NAME => $(basename "$TEST_DEV")"
+>  				continue
+>  			fi
+> -			RESULTS_DIR="results/$(basename "$TEST_DEV")"
+> +			RESULTS_DIR="$OUTPUT/$(basename "$TEST_DEV")"
+>  			if ! _call_test test_device; then
+>  				ret=1
+>  			fi
+> @@ -559,6 +559,9 @@ Test runs:
+>    -d, --device-only	 only run tests which use a test device from the
+>  			 TEST_DEVS config setting
+>  
+> +  -o, --output=DIR	 output results to the given directory (the default is
+> +			 ./results)
+> +
+>    -q, --quick=SECONDS	 do a quick run (only run quick tests and limit the
+>  			 runtime of longer tests to the given timeout,
+>  			 defaulting to 30 seconds)
+> @@ -581,7 +584,7 @@ Miscellaneous:
+>  	esac
+>  }
+>  
+> -if ! TEMP=$(getopt -o 'dq::x:h' --long 'quick::,exclude:,help' -n "$0" -- "$@"); then
+> +if ! TEMP=$(getopt -o 'do:q::x:h' --long 'quick::,exclude:,output:,help' -n "$0" -- "$@"); then
+>  	exit 1
+>  fi
+>  
+> @@ -596,6 +599,7 @@ fi
+>  # Default configuration.
+>  : "${DEVICE_ONLY:=0}"
+>  : "${QUICK_RUN:=0}"
+> +: "${OUTPUT:=results}"
+>  if [[ -v EXCLUDE ]] && ! declare -p EXCLUDE | grep -q '^declare -a'; then
+>  	# If EXCLUDE was not defined as an array, convert it to one.
+>  	# shellcheck disable=SC2190,SC2206
+> @@ -617,6 +621,10 @@ while true; do
+>  			DEVICE_ONLY=1
+>  			shift
+>  			;;
+> +		'-o'|'--output')
+> +			OUTPUT="$2"
+> +			shift 2
+> +			;;
+>  		'-q'|'--quick')
+>  			QUICK_RUN=1
+>  			# Use the timeout specified on the command line, from
+> @@ -659,4 +667,7 @@ for filter in "${TEMP_EXCLUDE[@]}"; do
+>  done
+>  unset TEMP_EXCLUDE
+>  
+> +mkdir -p "$OUTPUT"
+> +OUTPUT="$(realpath "$OUTPUT")"
+> +
+>  _check "$@"
+> 
+Yep, should work as well.
 
-Runtime PM is usually enabled for SCSI devices, and we are switching to
-SCSI_MQ recently, but runtime PM isn't supported yet by blk-mq, and
-people may complain that.
+Cheers,
 
-This patch tries to support runtime PM for blk-mq. And one chanllenge is
-that it can be quite expensive to account the active in-flight IOs for
-figuring out when to mark the last busy. This patch simply marks busy
-after each non-PM IO is done, and this way is workable because:
-
-1) pm_runtime_mark_last_busy() is very cheap
-
-2) in-flight non-PM IO is checked in blk_pre_runtime_suspend(), so
-if there is any IO queued, the device will be prevented from being
-suspened.
-
-3) Generally speaking, autosuspend_delay_ms is often big, and should
-be in unit of second, so it shouldn't be a big deal to check if queue
-is idle in blk_pre_runtime_suspend().
-
-Ming Lei (4):
-  blk-mq: introduce blk_mq_support_runtime_pm()
-  blk-mq: introduce blk_mq_pm_queue_idle()
-  blk-mq: prepare for supporting runtime PM
-  scsi_mq: enable runtime PM
-
- block/blk-core.c        | 14 +++++++++++---
- block/blk-mq.c          | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- block/blk-mq.h          |  3 +++
- drivers/scsi/scsi_lib.c |  3 ++-
- include/linux/blk-mq.h  | 10 ++++++++++
- 5 files changed, 72 insertions(+), 4 deletions(-)
-
-Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: linux-pm@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-
-
+Hannes
 -- 
-2.9.5
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
