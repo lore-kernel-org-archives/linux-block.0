@@ -1,108 +1,30 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mailrelay.collogia.de ([194.8.207.98]:2019 "HELO
-        mailrelay.collogia.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1729227AbeG1Uoo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Jul 2018 16:44:44 -0400
-Date: Sat, 28 Jul 2018 21:17:06 +0200
-From: <stockhausen@collogia.de>
-To: <linux-block@vger.kernel.org>
-Subject: [PATCH 0/2] direct IO: respect backing device max IO size
-Message-ID: <5b5cc132.ZRg3eYC3DaoOBtul%stockhausen@collogia.de>
+Return-Path: <martin.petersen@oracle.com>
+To: Max Gurtovoy <maxg@mellanox.com>
+Cc: keith.busch@intel.com, linux-nvme@lists.infradead.org, sagi@grimberg.me,
+        hch@lst.de, martin.petersen@oracle.com, linux-block@vger.kernel.org,
+        axboe@kernel.dk, vladimirk@mellanox.com
+Subject: Re: [PATCH v4 2/3] block: move dif_prepare/dif_complete functions to block layer
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1532533577-1600-1-git-send-email-maxg@mellanox.com>
+	<1532533577-1600-2-git-send-email-maxg@mellanox.com>
+Date: Wed, 25 Jul 2018 21:12:27 -0400
+In-Reply-To: <1532533577-1600-2-git-send-email-maxg@mellanox.com> (Max
+	Gurtovoy's message of "Wed, 25 Jul 2018 18:46:16 +0300")
+Message-ID: <yq1k1pi3imc.fsf@oracle.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-        boundary="----=_NextPartTM-000-a52f1283-2e8b-423a-8427-1e42079968b7"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
 
-This is a multi-part message in MIME format.
+Max,
 
-------=_NextPartTM-000-a52f1283-2e8b-423a-8427-1e42079968b7
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+> Currently these functions are implemented in the scsi layer, but their
+> actual place should be the block layer since T10-PI is a general data
+> integrity feature that is used in the nvme protocol as well. Also, use
+> the tuple size from the integrity profile since it may vary between
+> integrity types.
 
-Running older FusionIO cards with newer linux kernels turns out to be
-a headache. First of all their driver is a mix of open sources and
-proprietary object parts. Second we get only support for kernels up
-to ~4.0. Trying to get this to work with 4.9 longterm was successful
-but 4.14 renders the driver totally useless.
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-Searching the reason for lost data it turned out that the driver has 
-a hard 1024K or 257 page IO limit and silently drops any request that 
-is too large. Of course this might be a driver only problem but at 
-least it discloses the real source of a bad chain reaction.
-
-blkdev_direct_IO() sets the maximum allowed IO size to BIO_MAX_PAGES.
-With 225311a4 ("mm: test code to write THP to swap device as a whole")
-its value changed from 256 to 512. Indepedant of its value the choice
-is arbitrary and can be driver agnostic as long as breakdown of bios
-happens later on.
-
-We already have sufficent info about backing device properties and 
-can packetize the IO into sane values to avoid hassle later on. If
-bdi->io_pages is set and lower than BIO_MAX_PAGES reduce the package
-size appropriately.
-
-Ths patch consists of two parts. The first is only a cosmetic change
-to avoid double coding in the second one.
-
-------=_NextPartTM-000-a52f1283-2e8b-423a-8427-1e42079968b7
-Content-Type: text/plain;
-	name="InterScan_Disclaimer.txt"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="InterScan_Disclaimer.txt"
-
-****************************************************************************
-Diese E-Mail enthält vertrauliche und/oder rechtlich geschützte
-Informationen. Wenn Sie nicht der richtige Adressat sind oder diese E-Mail
-irrtümlich erhalten haben, informieren Sie bitte sofort den Absender und
-vernichten Sie diese Mail. Das unerlaubte Kopieren sowie die unbefugte
-Weitergabe dieser Mail ist nicht gestattet.
-
-Über das Internet versandte E-Mails können unter fremden Namen erstellt oder
-manipuliert werden. Deshalb ist diese als E-Mail verschickte Nachricht keine
-rechtsverbindliche Willenserklärung.
-
-Collogia AG
-Ubierring 11
-D-50678 Köln
-
-Vorstand:
-Kadir Akin
-Dr. Michael Höhnerbach
-
-Vorsitzender des Aufsichtsrates:
-Hans Kristian Langva
-
-Registergericht: Amtsgericht Köln
-Registernummer: HRB 52 497
-
-This e-mail may contain confidential and/or privileged information. If you
-are not the intended recipient (or have received this e-mail in error)
-please notify the sender immediately and destroy this e-mail. Any
-unauthorized copying, disclosure or distribution of the material in this
-e-mail is strictly forbidden.
-
-e-mails sent over the internet may have been written under a wrong name or
-been manipulated. That is why this message sent as an e-mail is not a
-legally binding declaration of intention.
-
-Collogia AG
-Ubierring 11
-D-50678 Köln
-
-executive board:
-Kadir Akin
-Dr. Michael Höhnerbach
-
-President of the supervisory board:
-Hans Kristian Langva
-
-Registry office: district court Cologne
-Register number: HRB 52 497
-
-****************************************************************************
-
-------=_NextPartTM-000-a52f1283-2e8b-423a-8427-1e42079968b7--
+-- 
+Martin K. Petersen	Oracle Linux Engineering
