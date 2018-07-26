@@ -1,45 +1,38 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:52596 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754529AbeGIW4p (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jul 2018 18:56:45 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Omar Sandoval <osandov@fb.com>
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: colyli@suse.de,
+	axboe@kernel.dk,
+	linux-bcache@vger.kernel.org
 Cc: linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH blktests v3 4/6] src/Makefile: Move -Wall from the C compilation rule to the $(CFLAGS) variable
-Date: Mon,  9 Jul 2018 15:56:41 -0700
-Message-Id: <20180709225643.10537-5-bart.vanassche@wdc.com>
-In-Reply-To: <20180709225643.10537-1-bart.vanassche@wdc.com>
-References: <20180709225643.10537-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+	Shenghui Wang <shhuiw@foxmail.com>
+Subject: [PATCH 6/9] bcache: free heap cache_set->flush_btree in bch_journal_free
+Date: Thu, 26 Jul 2018 12:17:38 +0800
+Message-Id: <20180726041741.1669-7-colyli@suse.de>
+In-Reply-To: <20180726041741.1669-1-colyli@suse.de>
+References: <20180726041741.1669-1-colyli@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+From: Shenghui Wang <shhuiw@foxmail.com>
+
+Free the cache_set->flush_bree heap memory on journal free.
+
+Signed-off-by: Wang Sheng-Hui <shhuiw@foxmail.com>
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
- src/Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/md/bcache/journal.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/src/Makefile b/src/Makefile
-index 7d15d115f6df..efbf393f4c58 100644
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -8,7 +8,7 @@ C_TARGETS := \
+diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+index 18f1b5239620..10748c626a1d 100644
+--- a/drivers/md/bcache/journal.c
++++ b/drivers/md/bcache/journal.c
+@@ -828,6 +828,7 @@ void bch_journal_free(struct cache_set *c)
+ 	free_pages((unsigned long) c->journal.w[1].data, JSET_BITS);
+ 	free_pages((unsigned long) c->journal.w[0].data, JSET_BITS);
+ 	free_fifo(&c->journal.pin);
++	free_heap(&c->flush_btree);
+ }
  
- TARGETS := $(C_TARGETS)
- 
--CFLAGS := -O2
-+CFLAGS := -O2 -Wall
- 
- all: $(TARGETS)
- 
-@@ -16,6 +16,6 @@ clean:
- 	rm -f $(TARGETS)
- 
- $(C_TARGETS): %: %.c
--	$(CC) -Wall -o $@ $(CPPFLAGS) $(CFLAGS) $^
-+	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $^
- 
- .PHONY: all clean
+ int bch_journal_alloc(struct cache_set *c)
 -- 
-2.18.0
+2.17.1
