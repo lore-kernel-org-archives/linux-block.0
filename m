@@ -1,47 +1,52 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from userp2120.oracle.com ([156.151.31.85]:42404 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726289AbeGKJOS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jul 2018 05:14:18 -0400
-Date: Wed, 11 Jul 2018 12:10:37 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: jbacik@fb.com
+Received: from mx2.suse.de ([195.135.220.15]:60704 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729923AbeGZPj5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Jul 2018 11:39:57 -0400
+From: Coly Li <colyli@suse.de>
+To: colyli@suse.de, linux-bcache@vger.kernel.org
 Cc: linux-block@vger.kernel.org
-Subject: [bug report] block: introduce blk-iolatency io controller
-Message-ID: <20180711091036.v23v536aq45o23s2@kili.mountain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: [PATCH 0/9] Pending bcache patches for review
+Date: Thu, 26 Jul 2018 22:22:30 +0800
+Message-Id: <20180726142239.44669-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hello Josef Bacik,
+Hi folks,
 
-The patch d70675121546: "block: introduce blk-iolatency io
-controller" from Jul 3, 2018, leads to the following static checker
-warning:
+I ask for help to review these patches, some of them are posted for months.
+They are OK with my test for a while, still tt would be great to have more
+reviewer before these patches go into v4.19.
 
-	block/blk-iolatency.c:820 iolatency_pd_stat()
-	warn: impossible condition '(iolat->rq_depth.max_depth == -1) => (0-u32max == u64max)'
+Thanks in advance. 
 
-block/blk-iolatency.c
-   813  static size_t iolatency_pd_stat(struct blkg_policy_data *pd, char *buf,
-   814                                  size_t size)
-   815  {
-   816          struct iolatency_grp *iolat = pd_to_lat(pd);
-   817          unsigned long long avg_lat = div64_u64(iolat->total_lat_avg, NSEC_PER_USEC);
-   818  
-   819          if (iolat->rq_depth.max_depth == (u64)-1)
-                                    ^^^^^^^^^
-This is a u32.
+Coly Li
+---
+Coly Li (9):
+  bcache: do not check return value of debugfs_create_dir()
+  bcache: display rate debug parameters to 0 when writeback is not
+    running
+  bcache: avoid unncessary cache prefetch bch_btree_node_get()
+  bcache: add a comment in register_bdev()
+  bcache: fix mistaken code comments in struct cache
+  bcache: fix mistaken comments in bch_keylist_realloc()
+  bcache: add code comments for bset.c
+  bcache: initiate bcache_debug to NULL
+  bcache: set max writeback rate when I/O request is idle
 
-   820                  return scnprintf(buf, size, " depth=max avg_lat=%llu",
-   821                                   avg_lat);
-   822  
-   823          return scnprintf(buf, size, " depth=%u avg_lat=%llu",
-   824                           iolat->rq_depth.max_depth, avg_lat);
-   825  }
+ drivers/md/bcache/bcache.h    | 16 +++---
+ drivers/md/bcache/bset.c      | 63 ++++++++++++++++++++++++
+ drivers/md/bcache/btree.c     | 14 +++---
+ drivers/md/bcache/closure.c   | 13 +++--
+ drivers/md/bcache/closure.h   |  4 +-
+ drivers/md/bcache/debug.c     | 13 ++---
+ drivers/md/bcache/request.c   | 56 ++++++++++++++++++++-
+ drivers/md/bcache/super.c     |  9 +++-
+ drivers/md/bcache/sysfs.c     | 37 +++++++++-----
+ drivers/md/bcache/util.c      |  2 +-
+ drivers/md/bcache/util.h      |  2 +-
+ drivers/md/bcache/writeback.c | 91 +++++++++++++++++++++++------------
+ 12 files changed, 244 insertions(+), 76 deletions(-)
 
-
-regards,
-dan carpenter
+-- 
+2.17.1
