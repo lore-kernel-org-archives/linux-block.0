@@ -1,47 +1,80 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 1/2] blk-iolatency: don't change the latency window
-Date: Mon, 16 Jul 2018 12:12:22 -0400
-Message-Id: <20180716161223.21486-1-josef@toxicpanda.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:60758 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730236AbeGZPkH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Jul 2018 11:40:07 -0400
+From: Coly Li <colyli@suse.de>
+To: colyli@suse.de, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 2/9] bcache: display rate debug parameters to 0 when writeback is not running
+Date: Thu, 26 Jul 2018 22:22:32 +0800
+Message-Id: <20180726142239.44669-3-colyli@suse.de>
+In-Reply-To: <20180726142239.44669-1-colyli@suse.de>
+References: <20180726142239.44669-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Josef Bacik <jbacik@fb.com>
+When writeback is not running, writeback rate should be 0, other value is
+misleading. And the following dyanmic writeback rate debug parameters
+should be 0 too,
+	rate, proportional, integral, change
+otherwise they are misleading when writeback is not running.
 
-Early versions of these patches had us waiting for seconds at a time
-during submission, so we had to adjust the timing window we monitored
-for latency.  Now we don't do things like that so this is unnecessary
-code.
-
-Signed-off-by: Josef Bacik <jbacik@fb.com>
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
- block/blk-iolatency.c | 10 ----------
- 1 file changed, 10 deletions(-)
+ drivers/md/bcache/sysfs.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index b59e5451680b..893f888eebb1 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -468,16 +468,6 @@ static void iolatency_check_latencies(struct iolatency_grp *iolat, u64 now)
- 	}
- 	preempt_enable();
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index 225b15aa0340..3e9d3459a224 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -149,6 +149,7 @@ SHOW(__bch_cached_dev)
+ 	struct cached_dev *dc = container_of(kobj, struct cached_dev,
+ 					     disk.kobj);
+ 	const char *states[] = { "no cache", "clean", "dirty", "inconsistent" };
++	int wb = dc->writeback_running;
  
--	/*
--	 * Our average exceeded our window, scale up our window so we are more
--	 * accurate, but not more than the global timer.
--	 */
--	if (stat.mean > iolat->cur_win_nsec) {
--		iolat->cur_win_nsec <<= 1;
--		iolat->cur_win_nsec =
--			max_t(u64, iolat->cur_win_nsec, NSEC_PER_SEC);
--	}
+ #define var(stat)		(dc->stat)
+ 
+@@ -170,7 +171,7 @@ SHOW(__bch_cached_dev)
+ 	var_printf(writeback_running,	"%i");
+ 	var_print(writeback_delay);
+ 	var_print(writeback_percent);
+-	sysfs_hprint(writeback_rate,	dc->writeback_rate.rate << 9);
++	sysfs_hprint(writeback_rate,	wb ? dc->writeback_rate.rate << 9 : 0);
+ 	sysfs_hprint(io_errors,		atomic_read(&dc->io_errors));
+ 	sysfs_printf(io_error_limit,	"%i", dc->error_limit);
+ 	sysfs_printf(io_disable,	"%i", dc->io_disable);
+@@ -188,15 +189,20 @@ SHOW(__bch_cached_dev)
+ 		char change[20];
+ 		s64 next_io;
+ 
+-		bch_hprint(rate,	dc->writeback_rate.rate << 9);
+-		bch_hprint(dirty,	bcache_dev_sectors_dirty(&dc->disk) << 9);
+-		bch_hprint(target,	dc->writeback_rate_target << 9);
+-		bch_hprint(proportional,dc->writeback_rate_proportional << 9);
+-		bch_hprint(integral,	dc->writeback_rate_integral_scaled << 9);
+-		bch_hprint(change,	dc->writeback_rate_change << 9);
 -
- 	parent = blkg_to_lat(blkg->parent);
- 	if (!parent)
- 		return;
+-		next_io = div64_s64(dc->writeback_rate.next - local_clock(),
+-				    NSEC_PER_MSEC);
++		/*
++		 * Except for dirty and target, other values should
++		 * be 0 if writeback is not running.
++		 */
++		bch_hprint(rate, wb ? dc->writeback_rate.rate << 9 : 0);
++		bch_hprint(dirty, bcache_dev_sectors_dirty(&dc->disk) << 9);
++		bch_hprint(target, dc->writeback_rate_target << 9);
++		bch_hprint(proportional,
++			   wb ? dc->writeback_rate_proportional << 9 : 0);
++		bch_hprint(integral,
++			   wb ? dc->writeback_rate_integral_scaled << 9 : 0);
++		bch_hprint(change, wb ? dc->writeback_rate_change << 9 : 0);
++		next_io = wb ? div64_s64(dc->writeback_rate.next-local_clock(),
++					 NSEC_PER_MSEC) : 0;
+ 
+ 		return sprintf(buf,
+ 			       "rate:\t\t%s/sec\n"
 -- 
-2.14.3
+2.17.1
