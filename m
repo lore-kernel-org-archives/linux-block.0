@@ -1,199 +1,113 @@
-Return-Path: <maxg@mellanox.com>
-From: Max Gurtovoy <maxg@mellanox.com>
-To: keith.busch@intel.com, linux-nvme@lists.infradead.org, sagi@grimberg.me,
-        hch@lst.de, martin.petersen@oracle.com, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-Cc: vladimirk@mellanox.com, Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH 3/3] nvme: use blk API to remap ref tags for IOs with metadata
-Date: Tue, 24 Jul 2018 16:33:42 +0300
-Message-Id: <1532439222-5668-3-git-send-email-maxg@mellanox.com>
-In-Reply-To: <1532439222-5668-1-git-send-email-maxg@mellanox.com>
-References: <1532439222-5668-1-git-send-email-maxg@mellanox.com>
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: colyli@suse.de,
+	axboe@kernel.dk,
+	linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Tang Junhui <tang.junhui@zte.com.cn>
+Subject: [PATCH 1/9] bcache: simplify the calculation of the total amount of flash dirty data
+Date: Thu, 26 Jul 2018 12:17:33 +0800
+Message-Id: <20180726041741.1669-2-colyli@suse.de>
+In-Reply-To: <20180726041741.1669-1-colyli@suse.de>
+References: <20180726041741.1669-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Also moved the logic of the remapping to the nvme core driver instead
-of implementing it in the nvme pci driver. This way all the other nvme
-transport drivers will benefit from it (in case they'll implement metadata
-support).
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
+Currently we calculate the total amount of flash only devices dirty data
+by adding the dirty data of each flash only device under registering
+locker. It is very inefficient.
+
+In this patch, we add a member flash_dev_dirty_sectors in struct cache_set
+to record the total amount of flash only devices dirty data in real time,
+so we didn't need to calculate the total amount of dirty data any more.
+
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
+ drivers/md/bcache/bcache.h    |  1 +
+ drivers/md/bcache/super.c     |  2 ++
+ drivers/md/bcache/writeback.c |  5 ++++-
+ drivers/md/bcache/writeback.h | 19 -------------------
+ 4 files changed, 7 insertions(+), 20 deletions(-)
 
-changes from v1:
- - check status of nvme_req instead of converting to BLK_STS
-
----
- drivers/nvme/host/core.c | 18 ++++++++++++
- drivers/nvme/host/nvme.h |  9 +-----
- drivers/nvme/host/pci.c  | 75 +-----------------------------------------------
- 3 files changed, 20 insertions(+), 82 deletions(-)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 191177b..b57abe5 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -617,6 +617,8 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 			if (WARN_ON_ONCE(!nvme_ns_has_pi(ns)))
- 				return BLK_STS_NOTSUPP;
- 			control |= NVME_RW_PRINFO_PRACT;
-+		} else if (req_op(req) == REQ_OP_WRITE) {
-+			t10_pi_prepare(req, ns->pi_type);
- 		}
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index d6bf294f3907..3226d38bf859 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -525,6 +525,7 @@ struct cache_set {
+ 	unsigned		devices_max_used;
+ 	struct list_head	cached_devs;
+ 	uint64_t		cached_dev_sectors;
++	atomic_long_t		flash_dev_dirty_sectors;
+ 	struct closure		caching;
  
- 		switch (ns->pi_type) {
-@@ -637,6 +639,22 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 	return 0;
- }
+ 	struct closure		sb_write;
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index fa4058e43202..cea2a42ea276 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1311,6 +1311,8 @@ static void flash_dev_free(struct closure *cl)
+ {
+ 	struct bcache_device *d = container_of(cl, struct bcache_device, cl);
+ 	mutex_lock(&bch_register_lock);
++	atomic_long_sub(bcache_dev_sectors_dirty(d),
++			&d->c->flash_dev_dirty_sectors);
+ 	bcache_device_free(d);
+ 	mutex_unlock(&bch_register_lock);
+ 	kobject_put(&d->kobj);
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index ad45ebe1a74b..0d2a05074a81 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -27,7 +27,7 @@ static uint64_t __calc_target_rate(struct cached_dev *dc)
+ 	 * flash-only devices
+ 	 */
+ 	uint64_t cache_sectors = c->nbuckets * c->sb.bucket_size -
+-				bcache_flash_devs_sectors_dirty(c);
++				atomic_long_read(&c->flash_dev_dirty_sectors);
  
-+void nvme_cleanup_cmd(struct request *req)
-+{
-+	if (blk_integrity_rq(req) && req_op(req) == REQ_OP_READ &&
-+	    nvme_req(req)->status == 0) {
-+		struct nvme_ns *ns = req->rq_disk->private_data;
+ 	/*
+ 	 * Unfortunately there is no control of global dirty data.  If the
+@@ -476,6 +476,9 @@ void bcache_dev_sectors_dirty_add(struct cache_set *c, unsigned inode,
+ 	if (!d)
+ 		return;
+ 
++	if (UUID_FLASH_ONLY(&c->uuids[inode]))
++		atomic_long_add(nr_sectors, &c->flash_dev_dirty_sectors);
 +
-+		t10_pi_complete(req, ns->pi_type,
-+				blk_rq_bytes(req) >> ns->lba_shift);
-+	}
-+	if (req->rq_flags & RQF_SPECIAL_PAYLOAD) {
-+		kfree(page_address(req->special_vec.bv_page) +
-+		      req->special_vec.bv_offset);
-+	}
-+}
-+EXPORT_SYMBOL_GPL(nvme_cleanup_cmd);
-+
- blk_status_t nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
- 		struct nvme_command *cmd)
- {
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 0c4a33d..dfc01ff 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -356,14 +356,6 @@ static inline u64 nvme_block_nr(struct nvme_ns *ns, sector_t sector)
- 	return (sector >> (ns->lba_shift - 9));
+ 	stripe = offset_to_stripe(d, offset);
+ 	stripe_offset = offset & (d->stripe_size - 1);
+ 
+diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
+index 610fb01de629..3745d7004c47 100644
+--- a/drivers/md/bcache/writeback.h
++++ b/drivers/md/bcache/writeback.h
+@@ -28,25 +28,6 @@ static inline uint64_t bcache_dev_sectors_dirty(struct bcache_device *d)
+ 	return ret;
  }
  
--static inline void nvme_cleanup_cmd(struct request *req)
+-static inline uint64_t  bcache_flash_devs_sectors_dirty(struct cache_set *c)
 -{
--	if (req->rq_flags & RQF_SPECIAL_PAYLOAD) {
--		kfree(page_address(req->special_vec.bv_page) +
--		      req->special_vec.bv_offset);
+-	uint64_t i, ret = 0;
+-
+-	mutex_lock(&bch_register_lock);
+-
+-	for (i = 0; i < c->devices_max_used; i++) {
+-		struct bcache_device *d = c->devices[i];
+-
+-		if (!d || !UUID_FLASH_ONLY(&c->uuids[i]))
+-			continue;
+-		ret += bcache_dev_sectors_dirty(d);
 -	}
+-
+-	mutex_unlock(&bch_register_lock);
+-
+-	return ret;
 -}
 -
- static inline void nvme_end_request(struct request *req, __le16 status,
- 		union nvme_result result)
+ static inline unsigned offset_to_stripe(struct bcache_device *d,
+ 					uint64_t offset)
  {
-@@ -420,6 +412,7 @@ void nvme_complete_async_event(struct nvme_ctrl *ctrl, __le16 status,
- #define NVME_QID_ANY -1
- struct request *nvme_alloc_request(struct request_queue *q,
- 		struct nvme_command *cmd, blk_mq_req_flags_t flags, int qid);
-+void nvme_cleanup_cmd(struct request *req);
- blk_status_t nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
- 		struct nvme_command *cmd);
- int nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index ddd441b..03beac5 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -535,73 +535,6 @@ static void nvme_free_iod(struct nvme_dev *dev, struct request *req)
- 		mempool_free(iod->sg, dev->iod_mempool);
- }
- 
--#ifdef CONFIG_BLK_DEV_INTEGRITY
--static void nvme_dif_prep(u32 p, u32 v, struct t10_pi_tuple *pi)
--{
--	if (be32_to_cpu(pi->ref_tag) == v)
--		pi->ref_tag = cpu_to_be32(p);
--}
--
--static void nvme_dif_complete(u32 p, u32 v, struct t10_pi_tuple *pi)
--{
--	if (be32_to_cpu(pi->ref_tag) == p)
--		pi->ref_tag = cpu_to_be32(v);
--}
--
--/**
-- * nvme_dif_remap - remaps ref tags to bip seed and physical lba
-- *
-- * The virtual start sector is the one that was originally submitted by the
-- * block layer.	Due to partitioning, MD/DM cloning, etc. the actual physical
-- * start sector may be different. Remap protection information to match the
-- * physical LBA on writes, and back to the original seed on reads.
-- *
-- * Type 0 and 3 do not have a ref tag, so no remapping required.
-- */
--static void nvme_dif_remap(struct request *req,
--			void (*dif_swap)(u32 p, u32 v, struct t10_pi_tuple *pi))
--{
--	struct nvme_ns *ns = req->rq_disk->private_data;
--	struct bio_integrity_payload *bip;
--	struct t10_pi_tuple *pi;
--	void *p, *pmap;
--	u32 i, nlb, ts, phys, virt;
--
--	if (!ns->pi_type || ns->pi_type == NVME_NS_DPS_PI_TYPE3)
--		return;
--
--	bip = bio_integrity(req->bio);
--	if (!bip)
--		return;
--
--	pmap = kmap_atomic(bip->bip_vec->bv_page) + bip->bip_vec->bv_offset;
--
--	p = pmap;
--	virt = bip_get_seed(bip);
--	phys = nvme_block_nr(ns, blk_rq_pos(req));
--	nlb = (blk_rq_bytes(req) >> ns->lba_shift);
--	ts = ns->disk->queue->integrity.tuple_size;
--
--	for (i = 0; i < nlb; i++, virt++, phys++) {
--		pi = (struct t10_pi_tuple *)p;
--		dif_swap(phys, virt, pi);
--		p += ts;
--	}
--	kunmap_atomic(pmap);
--}
--#else /* CONFIG_BLK_DEV_INTEGRITY */
--static void nvme_dif_remap(struct request *req,
--			void (*dif_swap)(u32 p, u32 v, struct t10_pi_tuple *pi))
--{
--}
--static void nvme_dif_prep(u32 p, u32 v, struct t10_pi_tuple *pi)
--{
--}
--static void nvme_dif_complete(u32 p, u32 v, struct t10_pi_tuple *pi)
--{
--}
--#endif
--
- static void nvme_print_sgl(struct scatterlist *sgl, int nents)
- {
- 	int i;
-@@ -827,9 +760,6 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
- 		if (blk_rq_map_integrity_sg(q, req->bio, &iod->meta_sg) != 1)
- 			goto out_unmap;
- 
--		if (req_op(req) == REQ_OP_WRITE)
--			nvme_dif_remap(req, nvme_dif_prep);
--
- 		if (!dma_map_sg(dev->dev, &iod->meta_sg, 1, dma_dir))
- 			goto out_unmap;
- 	}
-@@ -852,11 +782,8 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
- 
- 	if (iod->nents) {
- 		dma_unmap_sg(dev->dev, iod->sg, iod->nents, dma_dir);
--		if (blk_integrity_rq(req)) {
--			if (req_op(req) == REQ_OP_READ)
--				nvme_dif_remap(req, nvme_dif_complete);
-+		if (blk_integrity_rq(req))
- 			dma_unmap_sg(dev->dev, &iod->meta_sg, 1, dma_dir);
--		}
- 	}
- 
- 	nvme_cleanup_cmd(req);
 -- 
-1.8.3.1
+2.17.1
