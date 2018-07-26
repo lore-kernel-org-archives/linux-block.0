@@ -1,76 +1,60 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:43462 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726202AbeGMJCr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jul 2018 05:02:47 -0400
-Received: by mail-pg1-f194.google.com with SMTP id v13-v6so4788852pgr.10
-        for <linux-block@vger.kernel.org>; Fri, 13 Jul 2018 01:49:08 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        bart.vanassche@wdc.com, hans.holmberg@cnexlabs.com,
-        javier@cnexlabs.com, hlitz@ucsc.edu, igor.j.konopko@intel.com,
-        marcin.dziegielewski@intel.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 00/10] lightnvm updates for 4.19
-Date: Fri, 13 Jul 2018 10:48:35 +0200
-Message-Id: <20180713084845.19511-1-mb@lightnvm.io>
+Return-Path: <prvs=7387fcde5=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "jthumshirn@suse.de" <jthumshirn@suse.de>,
+	"stern@rowland.harvard.edu" <stern@rowland.harvard.edu>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>
+Subject: Re: [PATCH v2 3/5] block: Serialize queue freezing and
+ blk_pre_runtime_suspend()
+Date: Thu, 26 Jul 2018 22:18:32 +0000
+Message-ID: <420b3fca86e4f20a278473e3bb5f91d4f3ae7201.camel@wdc.com>
+References: <20180725222607.8854-1-bart.vanassche@wdc.com>
+	 <20180725222607.8854-4-bart.vanassche@wdc.com>
+	 <3593cfaf-06c5-db39-7f93-2cb4e8c7812f@oracle.com>
+In-Reply-To: <3593cfaf-06c5-db39-7f93-2cb4e8c7812f@oracle.com>
+Content-Type: text/plain; charset="utf-7"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+On Thu, 2018-07-26 at 10:45 +-0800, jianchao.wang wrote:
++AD4- On 07/26/2018 06:26 AM, Bart Van Assche wrote:
++AD4- +AD4- +-
++AD4- +AD4- +-void blk+AF8-pm+AF8-runtime+AF8-lock(struct request+AF8-queue=
+ +ACo-q)
++AD4- +AD4- +-+AHs-
++AD4- +AD4- +-	spin+AF8-lock(+ACY-q-+AD4-rpm+AF8-lock)+ADs-
++AD4- +AD4- +-	wait+AF8-event+AF8-interruptible+AF8-locked(q-+AD4-rpm+AF8-w=
+q,
++AD4- +AD4- +-			  q-+AD4-rpm+AF8-owner +AD0APQ- NULL +AHwAfA- q-+AD4-rpm+A=
+F8-owner +AD0APQ- current)+ADs-
++AD4- +AD4- +-	if (q-+AD4-rpm+AF8-owner +AD0APQ- NULL)
++AD4- +AD4- +-		q-+AD4-rpm+AF8-owner +AD0- current+ADs-
++AD4- +AD4- +-	q-+AD4-rpm+AF8-nesting+AF8-level+-+-+ADs-
++AD4- +AD4- +-	spin+AF8-unlock(+ACY-q-+AD4-rpm+AF8-lock)+ADs-
++AD4- +AD4- +-+AH0-
++AD4-=20
++AD4- The lock which wait+AF8-event+AF8-interruptible+AF8-locked want to ho=
+ld is the wq.lock.
 
-Please pick up the following patches for 4.19.
+The above code is indeed wrong. This is what I think it should be changed
+into:
 
- - A couple of small fixes from Bart, Gustavo, Hans and me.
- - Heiner has reworked the read path to issue reads in parallel on
-   partial reads.
- - Marcin fixed up the case where a device does need a host-side
-   cache to provide reliability.
- - I added device description to error messages in pblk,
-   moved the compile DEBUG option to be pblk only, and limited the
-   report chunk command size.
++-void blk+AF8-pm+AF8-runtime+AF8-lock(struct request+AF8-queue +ACo-q)
++-+AHs-
++-	might+AF8-sleep()+ADs-
++-
++-	spin+AF8-lock(+ACY-q-+AD4-rpm+AF8-lock)+ADs-
++-	wait+AF8-event+AF8-exclusive+AF8-cmd(q-+AD4-rpm+AF8-wq,
++-			q-+AD4-rpm+AF8-owner +AD0APQ- NULL +AHwAfA- q-+AD4-rpm+AF8-owner +AD0A=
+PQ- current,
++-			spin+AF8-unlock(+ACY-q-+AD4-rpm+AF8-lock), spin+AF8-lock(+ACY-q-+AD4-r=
+pm+AF8-lock))+ADs-
++-	if (q-+AD4-rpm+AF8-owner +AD0APQ- NULL)
++-		q-+AD4-rpm+AF8-owner +AD0- current+ADs-
++-	q-+AD4-rpm+AF8-nesting+AF8-level+-+-+ADs-
++-	spin+AF8-unlock(+ACY-q-+AD4-rpm+AF8-lock)+ADs-
++-+AH0-
 
-Thanks, Matias
-
-Bart Van Assche (1):
-  lightnvm: Remove redundant rq->__data_len initialization
-
-Gustavo A. R. Silva (1):
-  lightnvm: pblk: mark expected switch fall-through
-
-Hans Holmberg (1):
-  lightnvm: pblk: assume that chunks are closed on 1.2 devices
-
-Heiner Litz (1):
-  lightnvm: pblk: add asynchronous partial read
-
-Marcin Dziegielewski (1):
-  lightnvm: pblk: handle case when mw_cunits equals to 0
-
-Matias Bjørling (5):
-  lightnvm: move NVM_DEBUG to pblk
-  lightnvm: pblk: enable line minor version detection
-  lightnvm: pblk: fix read_bitmap for 32bit archs
-  lightnvm: limit get chunk meta request size
-  lightnvm: pblk: expose generic disk name on pr_* msgs
-
- drivers/lightnvm/Kconfig         |  32 +++---
- drivers/lightnvm/pblk-cache.c    |   4 +-
- drivers/lightnvm/pblk-core.c     |  78 +++++++------
- drivers/lightnvm/pblk-gc.c       |  34 +++---
- drivers/lightnvm/pblk-init.c     | 102 +++++++++--------
- drivers/lightnvm/pblk-rb.c       |  24 ++--
- drivers/lightnvm/pblk-read.c     | 242 ++++++++++++++++++++++++---------------
- drivers/lightnvm/pblk-recovery.c |  47 ++++----
- drivers/lightnvm/pblk-sysfs.c    |  13 +--
- drivers/lightnvm/pblk-write.c    |  35 +++---
- drivers/lightnvm/pblk.h          |  48 +++++---
- drivers/nvme/host/lightnvm.c     |  16 ++-
- 12 files changed, 382 insertions(+), 293 deletions(-)
-
--- 
-2.11.0
+Bart.
