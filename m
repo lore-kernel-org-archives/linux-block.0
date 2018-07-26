@@ -1,58 +1,64 @@
-Return-Path: <mwilck@suse.com>
-From: Martin Wilck <mwilck@suse.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Jan Kara <jack@suse.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Ming Lei <ming.lei@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Kent Overstreet <kent.overstreet@gmail.com>,
+Return-Path: <mfo@canonical.com>
+From: Mauricio Faria de Oliveira <mfo@canonical.com>
+To: axboe@kernel.dk
+Cc: phdm@macqel.be,
 	linux-block@vger.kernel.org,
-	Martin Wilck <mwilck@suse.com>
-Subject: [PATCH v5 2/3] blkdev: __blkdev_direct_IO_simple: fix leak in error case
-Date: Wed, 25 Jul 2018 23:15:08 +0200
-Message-Id: <20180725211509.13592-3-mwilck@suse.com>
-In-Reply-To: <20180725211509.13592-1-mwilck@suse.com>
-References: <20180725211509.13592-1-mwilck@suse.com>
+	linux-kernel@vger.kernel.org,
+	daniel.axtens@canonical.com
+Subject: [PATCH 1/2] partitions/aix: fix usage of uninitialized lv_info and lvname structures
+Date: Wed, 25 Jul 2018 22:46:28 -0300
+Message-Id: <20180726014629.30411-2-mfo@canonical.com>
+In-Reply-To: <20180726014629.30411-1-mfo@canonical.com>
+References: <20180726014629.30411-1-mfo@canonical.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Fixes: 72ecad22d9f1 ("block: support a full bio worth of IO for
- simplified bdev direct-io")
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Martin Wilck <mwilck@suse.com>
----
- fs/block_dev.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+The if-block that sets a successful return value in aix_partition()
+uses 'lvip[].pps_per_lv' and 'n[].name' potentially uninitialized.
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 0dd87aa..aba2541 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -221,7 +221,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 
- 	ret = bio_iov_iter_get_pages(&bio, iter);
- 	if (unlikely(ret))
--		return ret;
-+		goto out;
- 	ret = bio.bi_iter.bi_size;
- 
- 	if (iov_iter_rw(iter) == READ) {
-@@ -250,12 +250,13 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 		put_page(bvec->bv_page);
+For example, if 'numlvs' is zero or alloc_lvn() fails, neither is
+initialized, but are used anyway if alloc_pvd() succeeds after it.
+
+So, make the alloc_pvd() call conditional on their initialization.
+
+This has been hit when attaching an apparently corrupted/stressed
+AIX LUN, misleading the kernel to pr_warn() invalid data and hang.
+
+    [...] partition (null) (11 pp's found) is not contiguous
+    [...] partition (null) (2 pp's found) is not contiguous
+    [...] partition (null) (3 pp's found) is not contiguous
+    [...] partition (null) (64 pp's found) is not contiguous
+
+Fixes: 6ceea22bbbc8 ("partitions: add aix lvm partition support files")
+Signed-off-by: Mauricio Faria de Oliveira <mfo@canonical.com>
+---
+ block/partitions/aix.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/block/partitions/aix.c b/block/partitions/aix.c
+index 007f95eea0e1..850cbd1860d4 100644
+--- a/block/partitions/aix.c
++++ b/block/partitions/aix.c
+@@ -178,7 +178,7 @@ int aix_partition(struct parsed_partitions *state)
+ 	u32 vgda_sector = 0;
+ 	u32 vgda_len = 0;
+ 	int numlvs = 0;
+-	struct pvd *pvd;
++	struct pvd *pvd = NULL;
+ 	struct lv_info {
+ 		unsigned short pps_per_lv;
+ 		unsigned short pps_found;
+@@ -232,10 +232,11 @@ int aix_partition(struct parsed_partitions *state)
+ 				if (lvip[i].pps_per_lv)
+ 					foundlvs += 1;
+ 			}
++			/* pvd loops depend on n[].name and lvip[].pps_per_lv */
++			pvd = alloc_pvd(state, vgda_sector + 17);
+ 		}
+ 		put_dev_sector(sect);
  	}
- 
--	if (vecs != inline_vecs)
--		kfree(vecs);
--
- 	if (unlikely(bio.bi_status))
- 		ret = blk_status_to_errno(bio.bi_status);
- 
-+out:
-+	if (vecs != inline_vecs)
-+		kfree(vecs);
-+
- 	bio_uninit(&bio);
- 
- 	return ret;
+-	pvd = alloc_pvd(state, vgda_sector + 17);
+ 	if (pvd) {
+ 		int numpps = be16_to_cpu(pvd->pp_count);
+ 		int psn_part1 = be32_to_cpu(pvd->psn_part1);
 -- 
 2.17.1
