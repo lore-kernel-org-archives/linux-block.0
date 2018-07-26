@@ -1,35 +1,29 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:60844 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730452AbeGZPkU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jul 2018 11:40:20 -0400
-From: Coly Li <colyli@suse.de>
-To: colyli@suse.de, linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 6/9] bcache: fix mistaken comments in bch_keylist_realloc()
-Date: Thu, 26 Jul 2018 22:22:36 +0800
-Message-Id: <20180726142239.44669-7-colyli@suse.de>
-In-Reply-To: <20180726142239.44669-1-colyli@suse.de>
-References: <20180726142239.44669-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hch@lst.de>
+Date: Thu, 26 Jul 2018 11:20:12 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Martin Wilck <mwilck@suse.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.com>,
+	Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Kent Overstreet <kent.overstreet@gmail.com>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH v5 2/3] blkdev: __blkdev_direct_IO_simple: fix leak in
+	error case
+Message-ID: <20180726092012.GB24335@lst.de>
+References: <20180725211509.13592-1-mwilck@suse.com> <20180725211509.13592-3-mwilck@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180725211509.13592-3-mwilck@suse.com>
+List-ID: <linux-block@vger.kernel.org>
 
----
- drivers/md/bcache/request.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Jul 25, 2018 at 11:15:08PM +0200, Martin Wilck wrote:
+> Fixes: 72ecad22d9f1 ("block: support a full bio worth of IO for
+>  simplified bdev direct-io")
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Martin Wilck <mwilck@suse.com>
 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 8eece9ef9f46..91206f329971 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -107,7 +107,7 @@ static int bch_keylist_realloc(struct keylist *l, unsigned u64s,
- 	/*
- 	 * The journalling code doesn't handle the case where the keys to insert
- 	 * is bigger than an empty write: If we just return -ENOMEM here,
--	 * bio_insert() and bio_invalidate() will insert the keys created so far
-+	 * bch_data_insert_keys() will insert the keys created so far
- 	 * and finish the rest when the keylist is empty.
- 	 */
- 	if (newsize * sizeof(uint64_t) > block_bytes(c) - sizeof(struct jset))
--- 
-2.17.1
+I'm pretty sure I already ACKed this last time, but here we go
+again:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
