@@ -1,114 +1,104 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	linux-kernel@vger.kernel.org,
-	akpm@linux-foundation.org,
-	hannes@cmpxchg.org,
-	tj@kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 08/14] blk-stat: export helpers for modifying blk_rq_stat
-Date: Tue,  3 Jul 2018 11:14:57 -0400
-Message-Id: <20180703151503.2549-9-josef@toxicpanda.com>
-In-Reply-To: <20180703151503.2549-1-josef@toxicpanda.com>
-References: <20180703151503.2549-1-josef@toxicpanda.com>
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: colyli@suse.de,
+	axboe@kernel.dk,
+	linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Tang Junhui <tang.junhui@zte.com.cn>
+Subject: [PATCH 4/9] bcache: fix I/O significant decline while backend devices registering
+Date: Thu, 26 Jul 2018 12:17:36 +0800
+Message-Id: <20180726041741.1669-5-colyli@suse.de>
+In-Reply-To: <20180726041741.1669-1-colyli@suse.de>
+References: <20180726041741.1669-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Josef Bacik <jbacik@fb.com>
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-We need to use blk_rq_stat in the blkcg qos stuff, so export some of
-these helpers so they can be used by other things.
+I attached several backend devices in the same cache set, and produced lots
+of dirty data by running small rand I/O writes in a long time, then I
+continue run I/O in the others cached devices, and stopped a cached device,
+after a mean while, I register the stopped device again, I see the running
+I/O in the others cached devices dropped significantly, sometimes even
+jumps to zero.
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
-Acked-by: Tejun Heo <tj@kernel.org>
+In currently code, bcache would traverse each keys and btree node to count
+the dirty data under read locker, and the writes threads can not get the
+btree write locker, and when there is a lot of keys and btree node in the
+registering device, it would last several seconds, so the write I/Os in
+others cached device are blocked and declined significantly.
+
+In this patch, when a device registering to a ache set, which exist others
+cached devices with running I/Os, we get the amount of dirty data of the
+device in an incremental way, and do not block other cached devices all the
+time.
+
+Patch v2: Rename some variables and macros name as Coly suggested.
+
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
- block/blk-stat.c | 16 ++++++++--------
- block/blk-stat.h |  4 ++++
- 2 files changed, 12 insertions(+), 8 deletions(-)
+ drivers/md/bcache/writeback.c | 29 ++++++++++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-stat.c b/block/blk-stat.c
-index 175c143ac5b9..7587b1c3caaf 100644
---- a/block/blk-stat.c
-+++ b/block/blk-stat.c
-@@ -17,7 +17,7 @@ struct blk_queue_stats {
- 	bool enable_accounting;
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index 0d2a05074a81..912e969fedba 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -676,10 +676,14 @@ static int bch_writeback_thread(void *arg)
+ }
+ 
+ /* Init */
++#define INIT_KEYS_EACH_TIME	500000
++#define INIT_KEYS_SLEEP_MS	100
+ 
+ struct sectors_dirty_init {
+ 	struct btree_op	op;
+ 	unsigned	inode;
++	size_t		count;
++	struct bkey	start;
  };
  
--static void blk_stat_init(struct blk_rq_stat *stat)
-+void blk_rq_stat_init(struct blk_rq_stat *stat)
- {
- 	stat->min = -1ULL;
- 	stat->max = stat->nr_samples = stat->mean = 0;
-@@ -25,7 +25,7 @@ static void blk_stat_init(struct blk_rq_stat *stat)
- }
+ static int sectors_dirty_init_fn(struct btree_op *_op, struct btree *b,
+@@ -694,18 +698,37 @@ static int sectors_dirty_init_fn(struct btree_op *_op, struct btree *b,
+ 		bcache_dev_sectors_dirty_add(b->c, KEY_INODE(k),
+ 					     KEY_START(k), KEY_SIZE(k));
  
- /* src is a per-cpu stat, mean isn't initialized */
--static void blk_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
-+void blk_rq_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
- {
- 	if (!src->nr_samples)
- 		return;
-@@ -39,7 +39,7 @@ static void blk_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
- 	dst->nr_samples += src->nr_samples;
- }
- 
--static void __blk_stat_add(struct blk_rq_stat *stat, u64 value)
-+void blk_rq_stat_add(struct blk_rq_stat *stat, u64 value)
- {
- 	stat->min = min(stat->min, value);
- 	stat->max = max(stat->max, value);
-@@ -69,7 +69,7 @@ void blk_stat_add(struct request *rq, u64 now)
- 			continue;
- 
- 		stat = &get_cpu_ptr(cb->cpu_stat)[bucket];
--		__blk_stat_add(stat, value);
-+		blk_rq_stat_add(stat, value);
- 		put_cpu_ptr(cb->cpu_stat);
- 	}
- 	rcu_read_unlock();
-@@ -82,15 +82,15 @@ static void blk_stat_timer_fn(struct timer_list *t)
- 	int cpu;
- 
- 	for (bucket = 0; bucket < cb->buckets; bucket++)
--		blk_stat_init(&cb->stat[bucket]);
-+		blk_rq_stat_init(&cb->stat[bucket]);
- 
- 	for_each_online_cpu(cpu) {
- 		struct blk_rq_stat *cpu_stat;
- 
- 		cpu_stat = per_cpu_ptr(cb->cpu_stat, cpu);
- 		for (bucket = 0; bucket < cb->buckets; bucket++) {
--			blk_stat_sum(&cb->stat[bucket], &cpu_stat[bucket]);
--			blk_stat_init(&cpu_stat[bucket]);
-+			blk_rq_stat_sum(&cb->stat[bucket], &cpu_stat[bucket]);
-+			blk_rq_stat_init(&cpu_stat[bucket]);
- 		}
- 	}
- 
-@@ -143,7 +143,7 @@ void blk_stat_add_callback(struct request_queue *q,
- 
- 		cpu_stat = per_cpu_ptr(cb->cpu_stat, cpu);
- 		for (bucket = 0; bucket < cb->buckets; bucket++)
--			blk_stat_init(&cpu_stat[bucket]);
-+			blk_rq_stat_init(&cpu_stat[bucket]);
- 	}
- 
- 	spin_lock(&q->stats->lock);
-diff --git a/block/blk-stat.h b/block/blk-stat.h
-index 78399cdde9c9..f4a1568e81a4 100644
---- a/block/blk-stat.h
-+++ b/block/blk-stat.h
-@@ -159,4 +159,8 @@ static inline void blk_stat_activate_msecs(struct blk_stat_callback *cb,
- 	mod_timer(&cb->timer, jiffies + msecs_to_jiffies(msecs));
- }
- 
-+void blk_rq_stat_add(struct blk_rq_stat *, u64);
-+void blk_rq_stat_sum(struct blk_rq_stat *, struct blk_rq_stat *);
-+void blk_rq_stat_init(struct blk_rq_stat *);
++	op->count++;
++	if (atomic_read(&b->c->search_inflight) &&
++	    !(op->count % INIT_KEYS_EACH_TIME)) {
++		bkey_copy_key(&op->start, k);
++		return -EAGAIN;
++	}
 +
- #endif
+ 	return MAP_CONTINUE;
+ }
+ 
+ void bch_sectors_dirty_init(struct bcache_device *d)
+ {
+ 	struct sectors_dirty_init op;
++	int ret;
+ 
+ 	bch_btree_op_init(&op.op, -1);
+ 	op.inode = d->id;
+-
+-	bch_btree_map_keys(&op.op, d->c, &KEY(op.inode, 0, 0),
+-			   sectors_dirty_init_fn, 0);
++	op.count = 0;
++	op.start = KEY(op.inode, 0, 0);
++
++	do {
++		ret = bch_btree_map_keys(&op.op, d->c, &op.start,
++					 sectors_dirty_init_fn, 0);
++		if (ret == -EAGAIN)
++			schedule_timeout_interruptible(
++				msecs_to_jiffies(INIT_KEYS_SLEEP_MS));
++		else if (ret < 0) {
++			pr_warn("sectors dirty init failed, ret=%d!", ret);
++			break;
++		}
++	} while (ret == -EAGAIN);
+ }
+ 
+ void bch_cached_dev_writeback_init(struct cached_dev *dc)
 -- 
-2.14.3
+2.17.1
