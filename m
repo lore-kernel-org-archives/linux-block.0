@@ -1,49 +1,29 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk
-Cc: hch@lst.de,
-	dm-devel@redhat.com,
-	linux-block@vger.kernel.org
-Subject: [PATCH] block: allow max_discard_segments to be stacked
-Date: Fri, 20 Jul 2018 14:57:38 -0400
-Message-Id: <20180720185738.11646-1-snitzer@redhat.com>
+Return-Path: <martin.petersen@oracle.com>
+To: Max Gurtovoy <maxg@mellanox.com>
+Cc: keith.busch@intel.com, linux-nvme@lists.infradead.org, sagi@grimberg.me,
+        hch@lst.de, martin.petersen@oracle.com, linux-block@vger.kernel.org,
+        axboe@kernel.dk, vladimirk@mellanox.com
+Subject: Re: [PATCH v4 3/3] nvme: use blk API to remap ref tags for IOs with metadata
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1532533577-1600-1-git-send-email-maxg@mellanox.com>
+	<1532533577-1600-3-git-send-email-maxg@mellanox.com>
+Date: Wed, 25 Jul 2018 21:12:56 -0400
+In-Reply-To: <1532533577-1600-3-git-send-email-maxg@mellanox.com> (Max
+	Gurtovoy's message of "Wed, 25 Jul 2018 18:46:17 +0300")
+Message-ID: <yq1fu063ilj.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Set max_discard_segments to USHRT_MAX in blk_set_stacking_limits() so
-that blk_stack_limits() can stack up this limit for stacked devices.
 
-before:
+Max,
 
-$ cat /sys/block/nvme0n1/queue/max_discard_segments
-256
-$ cat /sys/block/dm-0/queue/max_discard_segments
-1
+> Also moved the logic of the remapping to the nvme core driver instead
+> of implementing it in the nvme pci driver. This way all the other nvme
+> transport drivers will benefit from it (in case they'll implement metadata
+> support).
 
-after:
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-$ cat /sys/block/nvme0n1/queue/max_discard_segments
-256
-$ cat /sys/block/dm-0/queue/max_discard_segments
-256
-
-Fixes: 1e739730c5b9e ("block: optionally merge discontiguous discard bios into a single request")
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
----
- block/blk-settings.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index d1de71124656..24fff4a3d08a 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -128,7 +128,7 @@ void blk_set_stacking_limits(struct queue_limits *lim)
- 
- 	/* Inherit limits from component devices */
- 	lim->max_segments = USHRT_MAX;
--	lim->max_discard_segments = 1;
-+	lim->max_discard_segments = USHRT_MAX;
- 	lim->max_hw_sectors = UINT_MAX;
- 	lim->max_segment_size = UINT_MAX;
- 	lim->max_sectors = UINT_MAX;
 -- 
-2.18.0
+Martin K. Petersen	Oracle Linux Engineering
