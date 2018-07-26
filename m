@@ -1,138 +1,140 @@
-Return-Path: <keescook@chromium.org>
-Return-Path: <keescook@chromium.org>
-From: Kees Cook <keescook@chromium.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Kees Cook <keescook@chromium.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Eric Biggers <ebiggers@google.com>,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-	Alasdair Kergon <agk@redhat.com>,
-	Rabin Vincent <rabinv@axis.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Pavel Machek <pavel@ucw.cz>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	x86@kernel.org,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Paul Mackerras <paulus@samba.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	David Howells <dhowells@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
-	Jia-Ju Bai <baijiaju1990@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Will Deacon <will.deacon@arm.com>,
-	dm-devel@redhat.com,
-	linux-pm@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
-	qat-linux@intel.com,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devel@driverdev.osuosl.org,
-	linux-afs@lists.infradead.org,
-	linux-wireless@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v6 07/18] crypto: shash: Remove VLA usage in unaligned hashing
-Date: Tue, 24 Jul 2018 09:49:25 -0700
-Message-Id: <20180724164936.37477-8-keescook@chromium.org>
-In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
-References: <20180724164936.37477-1-keescook@chromium.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:60740 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730293AbeGZPkE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Jul 2018 11:40:04 -0400
+From: Coly Li <colyli@suse.de>
+To: colyli@suse.de, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Kai Krakow <kai@kaishome.de>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Subject: [PATCH 1/9] bcache: do not check return value of debugfs_create_dir()
+Date: Thu, 26 Jul 2018 22:22:31 +0800
+Message-Id: <20180726142239.44669-2-colyli@suse.de>
+In-Reply-To: <20180726142239.44669-1-colyli@suse.de>
+References: <20180726142239.44669-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-In the quest to remove all stack VLA usage from the kernel[1], this uses
-the newly defined max alignment to perform unaligned hashing to avoid
-VLAs, and drops the helper function while adding sanity checks on the
-resulting buffer sizes. Additionally, the __aligned_largest macro is
-removed since this helper was the only user.
+Greg KH suggests that normal code should not care about debugfs. Therefore
+no matter successful or failed of debugfs_create_dir() execution, it is
+unncessary to check its return value.
 
-[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+There are two functions called debugfs_create_dir() and check the return
+value, which are bch_debug_init() and closure_debug_init(). This patch
+changes these two functions from int to void type, and ignore return values
+of debugfs_create_dir().
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
+This patch does not fix exact bug, just makes things work as they should.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Kai Krakow <kai@kaishome.de>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
 ---
- crypto/shash.c               | 27 ++++++++++++++++-----------
- include/linux/compiler-gcc.h |  1 -
- 2 files changed, 16 insertions(+), 12 deletions(-)
+ drivers/md/bcache/bcache.h  |  2 +-
+ drivers/md/bcache/closure.c | 13 +++++++++----
+ drivers/md/bcache/closure.h |  4 ++--
+ drivers/md/bcache/debug.c   | 11 ++++++-----
+ drivers/md/bcache/super.c   |  4 +++-
+ 5 files changed, 21 insertions(+), 13 deletions(-)
 
-diff --git a/crypto/shash.c b/crypto/shash.c
-index 86d76b5c626c..d21f04d70dce 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -73,13 +73,6 @@ int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key,
- }
- EXPORT_SYMBOL_GPL(crypto_shash_setkey);
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 872ef4d67711..a44bd427e5ba 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -1001,7 +1001,7 @@ void bch_open_buckets_free(struct cache_set *);
+ int bch_cache_allocator_start(struct cache *ca);
  
--static inline unsigned int shash_align_buffer_size(unsigned len,
--						   unsigned long mask)
--{
--	typedef u8 __aligned_largest u8_aligned;
--	return len + (mask & ~(__alignof__(u8_aligned) - 1));
--}
--
- static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
- 				  unsigned int len)
+ void bch_debug_exit(void);
+-int bch_debug_init(struct kobject *);
++void bch_debug_init(struct kobject *);
+ void bch_request_exit(void);
+ int bch_request_init(void);
+ 
+diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
+index 0e14969182c6..618253683d40 100644
+--- a/drivers/md/bcache/closure.c
++++ b/drivers/md/bcache/closure.c
+@@ -199,11 +199,16 @@ static const struct file_operations debug_ops = {
+ 	.release	= single_release
+ };
+ 
+-int __init closure_debug_init(void)
++void  __init closure_debug_init(void)
  {
-@@ -88,11 +81,17 @@ static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
- 	unsigned long alignmask = crypto_shash_alignmask(tfm);
- 	unsigned int unaligned_len = alignmask + 1 -
- 				     ((unsigned long)data & alignmask);
--	u8 ubuf[shash_align_buffer_size(unaligned_len, alignmask)]
--		__aligned_largest;
+-	closure_debug = debugfs_create_file("closures",
+-				0400, bcache_debug, NULL, &debug_ops);
+-	return IS_ERR_OR_NULL(closure_debug);
++	if (!IS_ERR_OR_NULL(bcache_debug))
++		/*
++		 * it is unnecessary to check return value of
++		 * debugfs_create_file(), we should not care
++		 * about this.
++		 */
++		closure_debug = debugfs_create_file(
++			"closures", 0400, bcache_debug, NULL, &debug_ops);
+ }
+ #endif
+ 
+diff --git a/drivers/md/bcache/closure.h b/drivers/md/bcache/closure.h
+index 71427eb5fdae..7c2c5bc7c88b 100644
+--- a/drivers/md/bcache/closure.h
++++ b/drivers/md/bcache/closure.h
+@@ -186,13 +186,13 @@ static inline void closure_sync(struct closure *cl)
+ 
+ #ifdef CONFIG_BCACHE_CLOSURES_DEBUG
+ 
+-int closure_debug_init(void);
++void closure_debug_init(void);
+ void closure_debug_create(struct closure *cl);
+ void closure_debug_destroy(struct closure *cl);
+ 
+ #else
+ 
+-static inline int closure_debug_init(void) { return 0; }
++static inline void closure_debug_init(void) {}
+ static inline void closure_debug_create(struct closure *cl) {}
+ static inline void closure_debug_destroy(struct closure *cl) {}
+ 
+diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
+index d030ce3025a6..57f8f5aeee55 100644
+--- a/drivers/md/bcache/debug.c
++++ b/drivers/md/bcache/debug.c
+@@ -248,11 +248,12 @@ void bch_debug_exit(void)
+ 		debugfs_remove_recursive(bcache_debug);
+ }
+ 
+-int __init bch_debug_init(struct kobject *kobj)
++void __init bch_debug_init(struct kobject *kobj)
+ {
+-	if (!IS_ENABLED(CONFIG_DEBUG_FS))
+-		return 0;
+-
 +	/*
-+	 * We cannot count on __aligned() working for large values:
-+	 * https://patchwork.kernel.org/patch/9507697/
++	 * it is unnecessary to check return value of
++	 * debugfs_create_file(), we should not care
++	 * about this.
 +	 */
-+	u8 ubuf[MAX_ALGAPI_ALIGNMASK * 2];
- 	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
- 	int err;
+ 	bcache_debug = debugfs_create_dir("bcache", NULL);
+-	return IS_ERR_OR_NULL(bcache_debug);
+ }
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index e0a92104ca23..c7ffa6ef3f82 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -2345,10 +2345,12 @@ static int __init bcache_init(void)
+ 		goto err;
  
-+	if (WARN_ON(buf + unaligned_len > ubuf + sizeof(ubuf)))
-+		return -EINVAL;
+ 	if (bch_request_init() ||
+-	    bch_debug_init(bcache_kobj) || closure_debug_init() ||
+ 	    sysfs_create_files(bcache_kobj, files))
+ 		goto err;
+ 
++	bch_debug_init(bcache_kobj);
++	closure_debug_init();
 +
- 	if (unaligned_len > len)
- 		unaligned_len = len;
- 
-@@ -124,11 +123,17 @@ static int shash_final_unaligned(struct shash_desc *desc, u8 *out)
- 	unsigned long alignmask = crypto_shash_alignmask(tfm);
- 	struct shash_alg *shash = crypto_shash_alg(tfm);
- 	unsigned int ds = crypto_shash_digestsize(tfm);
--	u8 ubuf[shash_align_buffer_size(ds, alignmask)]
--		__aligned_largest;
-+	/*
-+	 * We cannot count on __aligned() working for large values:
-+	 * https://patchwork.kernel.org/patch/9507697/
-+	 */
-+	u8 ubuf[MAX_ALGAPI_ALIGNMASK + HASH_MAX_DIGESTSIZE];
- 	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
- 	int err;
- 
-+	if (WARN_ON(buf + ds > ubuf + sizeof(ubuf)))
-+		return -EINVAL;
-+
- 	err = shash->final(desc, buf);
- 	if (err)
- 		goto out;
-diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
-index f1a7492a5cc8..1f1cdef36a82 100644
---- a/include/linux/compiler-gcc.h
-+++ b/include/linux/compiler-gcc.h
-@@ -125,7 +125,6 @@
-  */
- #define __pure			__attribute__((pure))
- #define __aligned(x)		__attribute__((aligned(x)))
--#define __aligned_largest	__attribute__((aligned))
- #define __printf(a, b)		__attribute__((format(printf, a, b)))
- #define __scanf(a, b)		__attribute__((format(scanf, a, b)))
- #define __attribute_const__	__attribute__((__const__))
+ 	return 0;
+ err:
+ 	bcache_exit();
 -- 
 2.17.1
