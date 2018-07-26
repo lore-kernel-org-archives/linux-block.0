@@ -1,37 +1,35 @@
-Return-Path: <ekorenevsky@gmail.com>
-Return-Path: <ekorenevsky@gmail.com>
-Date: Sun, 22 Jul 2018 01:28:49 +0300
-From: Eugene Korenevsky <ekorenevsky@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH] genhd: register_disk: inform about dev_set_name() failure
-Message-ID: <20180721222849.GA23331@vnote>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:60844 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730452AbeGZPkU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Jul 2018 11:40:20 -0400
+From: Coly Li <colyli@suse.de>
+To: colyli@suse.de, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 6/9] bcache: fix mistaken comments in bch_keylist_realloc()
+Date: Thu, 26 Jul 2018 22:22:36 +0800
+Message-Id: <20180726142239.44669-7-colyli@suse.de>
+In-Reply-To: <20180726142239.44669-1-colyli@suse.de>
+References: <20180726142239.44669-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Although dev_set_name() failure is not fatal, it is better to print
-a warning message into dmesg about it.
-
-Signed-off-by: Eugene Korenevsky <ekorenevsky@gmail.com>
 ---
- block/genhd.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/md/bcache/request.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index f1543a45e73b..071f8cbd529a 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -577,7 +577,9 @@ static void register_disk(struct device *parent, struct gendisk *disk)
- 
- 	ddev->parent = parent;
- 
--	dev_set_name(ddev, "%s", disk->disk_name);
-+	err = dev_set_name(ddev, "%s", disk->disk_name);
-+	if (err)
-+		pr_warn("%s: cannot set disk name: %d", __func__, err);
- 
- 	/* delay uevents, until we scanned partition table */
- 	dev_set_uevent_suppress(ddev, 1);
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 8eece9ef9f46..91206f329971 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -107,7 +107,7 @@ static int bch_keylist_realloc(struct keylist *l, unsigned u64s,
+ 	/*
+ 	 * The journalling code doesn't handle the case where the keys to insert
+ 	 * is bigger than an empty write: If we just return -ENOMEM here,
+-	 * bio_insert() and bio_invalidate() will insert the keys created so far
++	 * bch_data_insert_keys() will insert the keys created so far
+ 	 * and finish the rest when the keylist is empty.
+ 	 */
+ 	if (newsize * sizeof(uint64_t) > block_bytes(c) - sizeof(struct jset))
 -- 
-2.18.0
+2.17.1
