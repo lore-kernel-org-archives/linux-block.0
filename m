@@ -1,60 +1,42 @@
-Return-Path: <prvs=7387fcde5=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "jthumshirn@suse.de" <jthumshirn@suse.de>,
-	"stern@rowland.harvard.edu" <stern@rowland.harvard.edu>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>
+Return-Path: <jianchao.w.wang@oracle.com>
 Subject: Re: [PATCH v2 3/5] block: Serialize queue freezing and
  blk_pre_runtime_suspend()
-Date: Thu, 26 Jul 2018 22:18:32 +0000
-Message-ID: <420b3fca86e4f20a278473e3bb5f91d4f3ae7201.camel@wdc.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Alan Stern <stern@rowland.harvard.edu>
 References: <20180725222607.8854-1-bart.vanassche@wdc.com>
-	 <20180725222607.8854-4-bart.vanassche@wdc.com>
-	 <3593cfaf-06c5-db39-7f93-2cb4e8c7812f@oracle.com>
-In-Reply-To: <3593cfaf-06c5-db39-7f93-2cb4e8c7812f@oracle.com>
-Content-Type: text/plain; charset="utf-7"
+ <20180725222607.8854-4-bart.vanassche@wdc.com>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <3593cfaf-06c5-db39-7f93-2cb4e8c7812f@oracle.com>
+Date: Thu, 26 Jul 2018 10:45:30 +0800
 MIME-Version: 1.0
+In-Reply-To: <20180725222607.8854-4-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 2018-07-26 at 10:45 +-0800, jianchao.wang wrote:
-+AD4- On 07/26/2018 06:26 AM, Bart Van Assche wrote:
-+AD4- +AD4- +-
-+AD4- +AD4- +-void blk+AF8-pm+AF8-runtime+AF8-lock(struct request+AF8-queue=
- +ACo-q)
-+AD4- +AD4- +-+AHs-
-+AD4- +AD4- +-	spin+AF8-lock(+ACY-q-+AD4-rpm+AF8-lock)+ADs-
-+AD4- +AD4- +-	wait+AF8-event+AF8-interruptible+AF8-locked(q-+AD4-rpm+AF8-w=
-q,
-+AD4- +AD4- +-			  q-+AD4-rpm+AF8-owner +AD0APQ- NULL +AHwAfA- q-+AD4-rpm+A=
-F8-owner +AD0APQ- current)+ADs-
-+AD4- +AD4- +-	if (q-+AD4-rpm+AF8-owner +AD0APQ- NULL)
-+AD4- +AD4- +-		q-+AD4-rpm+AF8-owner +AD0- current+ADs-
-+AD4- +AD4- +-	q-+AD4-rpm+AF8-nesting+AF8-level+-+-+ADs-
-+AD4- +AD4- +-	spin+AF8-unlock(+ACY-q-+AD4-rpm+AF8-lock)+ADs-
-+AD4- +AD4- +-+AH0-
-+AD4-=20
-+AD4- The lock which wait+AF8-event+AF8-interruptible+AF8-locked want to ho=
-ld is the wq.lock.
+Hi Bart
 
-The above code is indeed wrong. This is what I think it should be changed
-into:
+On 07/26/2018 06:26 AM, Bart Van Assche wrote:
+> +
+> +void blk_pm_runtime_lock(struct request_queue *q)
+> +{
+> +	spin_lock(&q->rpm_lock);
+> +	wait_event_interruptible_locked(q->rpm_wq,
+> +			  q->rpm_owner == NULL || q->rpm_owner == current);
+> +	if (q->rpm_owner == NULL)
+> +		q->rpm_owner = current;
+> +	q->rpm_nesting_level++;
+> +	spin_unlock(&q->rpm_lock);
+> +}
 
-+-void blk+AF8-pm+AF8-runtime+AF8-lock(struct request+AF8-queue +ACo-q)
-+-+AHs-
-+-	might+AF8-sleep()+ADs-
-+-
-+-	spin+AF8-lock(+ACY-q-+AD4-rpm+AF8-lock)+ADs-
-+-	wait+AF8-event+AF8-exclusive+AF8-cmd(q-+AD4-rpm+AF8-wq,
-+-			q-+AD4-rpm+AF8-owner +AD0APQ- NULL +AHwAfA- q-+AD4-rpm+AF8-owner +AD0A=
-PQ- current,
-+-			spin+AF8-unlock(+ACY-q-+AD4-rpm+AF8-lock), spin+AF8-lock(+ACY-q-+AD4-r=
-pm+AF8-lock))+ADs-
-+-	if (q-+AD4-rpm+AF8-owner +AD0APQ- NULL)
-+-		q-+AD4-rpm+AF8-owner +AD0- current+ADs-
-+-	q-+AD4-rpm+AF8-nesting+AF8-level+-+-+ADs-
-+-	spin+AF8-unlock(+ACY-q-+AD4-rpm+AF8-lock)+ADs-
-+-+AH0-
+The lock which wait_event_interruptible_locked want to hold is the wq.lock.
+Please refer to comment of wait_event_interruptible_locked
 
-Bart.
+ * It must be called with wq.lock being held.  This spinlock is
+ * unlocked while sleeping but @condition testing is done while lock
+ * is held and when this macro exits the lock is held.
+
+Thanks
+Jianchao
