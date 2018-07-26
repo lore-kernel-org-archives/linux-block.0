@@ -1,38 +1,28 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: colyli@suse.de,
-	axboe@kernel.dk,
-	linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Shenghui Wang <shhuiw@foxmail.com>
-Subject: [PATCH 6/9] bcache: free heap cache_set->flush_btree in bch_journal_free
-Date: Thu, 26 Jul 2018 12:17:38 +0800
-Message-Id: <20180726041741.1669-7-colyli@suse.de>
-In-Reply-To: <20180726041741.1669-1-colyli@suse.de>
-References: <20180726041741.1669-1-colyli@suse.de>
+Return-Path: <jthumshirn@suse.de>
+Date: Thu, 26 Jul 2018 13:00:17 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+	Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH for v4.18] blk-mq: Rename BLK_EH_DONE into
+ BLK_EH_DONT_RESET_TIMER
+Message-ID: <20180726110017.27pgvbwheygfnxqi@linux-x5ow.site>
+References: <20180724213205.11119-1-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180724213205.11119-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Shenghui Wang <shhuiw@foxmail.com>
+I'm OK with the rename in general but not sure about doing it this
+late in the cycle.
 
-Free the cache_set->flush_bree heap memory on journal free.
-
-Signed-off-by: Wang Sheng-Hui <shhuiw@foxmail.com>
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/journal.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
-index 18f1b5239620..10748c626a1d 100644
---- a/drivers/md/bcache/journal.c
-+++ b/drivers/md/bcache/journal.c
-@@ -828,6 +828,7 @@ void bch_journal_free(struct cache_set *c)
- 	free_pages((unsigned long) c->journal.w[1].data, JSET_BITS);
- 	free_pages((unsigned long) c->journal.w[0].data, JSET_BITS);
- 	free_fifo(&c->journal.pin);
-+	free_heap(&c->flush_btree);
- }
- 
- int bch_journal_alloc(struct cache_set *c)
+Anyways,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.17.1
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
