@@ -1,18 +1,23 @@
-Return-Path: <prvs=7391cfe80=bart.vanassche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:25831 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730205AbeG0RnU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 27 Jul 2018 13:43:20 -0400
 From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Keith Busch <keith.busch@intel.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 4/5] block: Simplify blk_add_timer() and blk_mq_add_timer()
-Date: Fri, 27 Jul 2018 15:56:19 -0700
-Message-Id: <20180727225620.17855-5-bart.vanassche@wdc.com>
-In-Reply-To: <20180727225620.17855-1-bart.vanassche@wdc.com>
-References: <20180727225620.17855-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Jianchao Wang <jianchao.w.wang@oracle.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 4/5] block: Simplify blk_add_timer() and blk_mq_add_timer()
+Date: Fri, 27 Jul 2018 09:20:41 -0700
+Message-Id: <20180727162042.13425-5-bart.vanassche@wdc.com>
+In-Reply-To: <20180727162042.13425-1-bart.vanassche@wdc.com>
+References: <20180727162042.13425-1-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 Use the fact that q->mq_ops == NULL for the legacy block layer and
 also that q->mq_ops != NULL for blk-mq to simplify blk_add_timer and
@@ -28,10 +33,10 @@ Cc: Ming Lei <ming.lei@redhat.com>
  1 file changed, 11 insertions(+), 43 deletions(-)
 
 diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index ac0255a70401..8e6661031bc0 100644
+index 527670f2f985..02d7e3427369 100644
 --- a/block/blk-timeout.c
 +++ b/block/blk-timeout.c
-@@ -226,34 +226,21 @@ static void __blk_add_timer(struct request *req, unsigned long deadline)
+@@ -219,34 +219,21 @@ static void __blk_add_timer(struct request *req, unsigned long deadline)
  void blk_add_timer(struct request *req)
  {
  	struct request_queue *q = req->q;
@@ -73,7 +78,7 @@ index ac0255a70401..8e6661031bc0 100644
  }
  
  /**
-@@ -266,32 +253,13 @@ void blk_add_timer(struct request *req)
+@@ -259,32 +246,13 @@ void blk_add_timer(struct request *req)
  void blk_mq_add_timer(struct request *req)
  {
  	struct request_queue *q = req->q;
