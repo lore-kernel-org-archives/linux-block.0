@@ -1,86 +1,82 @@
-Return-Path: <keescook@chromium.org>
-Return-Path: <keescook@chromium.org>
-From: Kees Cook <keescook@chromium.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Kees Cook <keescook@chromium.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Christoph Hellwig <hch@infradead.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	Borislav Petkov <bp@alien8.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
-	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
-	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
-	"Nicholas A. Bellinger" <nab@linux-iscsi.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Philippe Ombredanne <pombredanne@nexb.com>,
-	Stephen Boyd <sboyd@codeaurora.org>,
-	Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
-	Juergen Gross <jgross@suse.com>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	Sagar Dharia <sdharia@codeaurora.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Vinod Koul <vinod.koul@intel.com>,
-	David Kershner <david.kershner@unisys.com>,
-	linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	target-devel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/9] scsi: build scsi_common.o for all scsi passthrough request users
-Date: Tue, 31 Jul 2018 12:51:48 -0700
-Message-Id: <20180731195155.46664-4-keescook@chromium.org>
-In-Reply-To: <20180731195155.46664-1-keescook@chromium.org>
-References: <20180731195155.46664-1-keescook@chromium.org>
+Return-Path: <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 4.18
+Message-ID: <f0440942-489d-a448-54da-942f0329e8aa@kernel.dk>
+Date: Fri, 27 Jul 2018 13:37:02 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Christoph Hellwig <hch@lst.de>
+Hi Linus,
 
-Split scsi_common.o out of SCSI so that non-SCSI users can pull it in
-easily for future sense buffer helper usage.
+Bigger than usual at this time, mostly due to the O_DIRECT corruption
+issue and the fact that I was on vacation last week. This pull request
+contains:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- drivers/Makefile      | 2 +-
- drivers/scsi/Makefile | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+- NVMe pull request with 2 fixes for the FC code, and 2 target
+  fixes (Christoph).
 
-diff --git a/drivers/Makefile b/drivers/Makefile
-index 24cd47014657..a6abd7a856c6 100644
---- a/drivers/Makefile
-+++ b/drivers/Makefile
-@@ -76,7 +76,7 @@ obj-$(CONFIG_DMA_SHARED_BUFFER) += dma-buf/
- obj-$(CONFIG_NUBUS)		+= nubus/
- obj-y				+= macintosh/
- obj-$(CONFIG_IDE)		+= ide/
--obj-$(CONFIG_SCSI)		+= scsi/
-+obj-y				+= scsi/
- obj-y				+= nvme/
- obj-$(CONFIG_ATA)		+= ata/
- obj-$(CONFIG_TARGET_CORE)	+= target/
-diff --git a/drivers/scsi/Makefile b/drivers/scsi/Makefile
-index e29f9b8fd66d..1f6218b98430 100644
---- a/drivers/scsi/Makefile
-+++ b/drivers/scsi/Makefile
-@@ -21,6 +21,7 @@ CFLAGS_gdth.o    = # -DDEBUG_GDTH=2 -D__SERIAL__ -D__COM2__ -DGDTH_STATISTICS
- obj-$(CONFIG_PCMCIA)		+= pcmcia/
- 
- obj-$(CONFIG_SCSI)		+= scsi_mod.o
-+obj-$(CONFIG_BLK_SCSI_REQUEST)	+= scsi_common.o
- 
- obj-$(CONFIG_RAID_ATTRS)	+= raid_class.o
- 
-@@ -155,7 +156,6 @@ obj-$(CONFIG_SCSI_HISI_SAS) += hisi_sas/
- obj-$(CONFIG_SCSI_DEBUG)	+= scsi_debug.o
- scsi_mod-y			+= scsi.o hosts.o scsi_ioctl.o \
- 				   scsicam.o scsi_error.o scsi_lib.o
--scsi_mod-y			+= scsi_common.o
- scsi_mod-$(CONFIG_SCSI_CONSTANTS) += constants.o
- scsi_mod-$(CONFIG_SCSI_DMA)	+= scsi_lib_dma.o
- scsi_mod-y			+= scsi_scan.o scsi_sysfs.o scsi_devinfo.o
+- A DIF bio reset iteration fix (Greg Edwards).
+
+- Two nbd reply and requeue fixes (Josef).
+
+- SCSI timeout fixup (Keith).
+
+- Small series that fixes an issue with bio_iov_iter_get_pages(), which
+  ended up causing corruption for larger sized O_DIRECT writes that
+  ended up racing with buffered writes (Martin Wilck).
+
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git tags/for-linus-20180727
+
+
+----------------------------------------------------------------
+Greg Edwards (1):
+      block: reset bi_iter.bi_done after splitting bio
+
+Hannes Reinecke (2):
+      nvmet: fixup crash on NULL device path
+      nvmet: only check for filebacking on -ENOTBLK
+
+James Smart (2):
+      nvmet-fc: fix target sgl list on large transfers
+      nvme: if_ready checks to fail io to deleting controller
+
+Jens Axboe (1):
+      Merge branch 'nvme-4.18' of git://git.infradead.org/nvme into for-linus
+
+Josef Bacik (2):
+      nbd: don't requeue the same request twice.
+      nbd: handle unexpected replies better
+
+Keith Busch (2):
+      blk-mq: export setting request completion state
+      scsi: set timed out out mq requests to complete
+
+Martin Wilck (3):
+      block: bio_iov_iter_get_pages: fix size of last iovec
+      blkdev: __blkdev_direct_IO_simple: fix leak in error case
+      block: bio_iov_iter_get_pages: pin more pages for multi-segment IOs
+
+ block/bio.c                    | 54 ++++++++++++++++++------
+ block/blk-mq.c                 |  4 +-
+ drivers/block/nbd.c            | 96 ++++++++++++++++++++++++++++++++++--------
+ drivers/nvme/host/fabrics.c    | 10 +++--
+ drivers/nvme/host/fabrics.h    |  3 +-
+ drivers/nvme/host/fc.c         |  2 +-
+ drivers/nvme/host/rdma.c       |  2 +-
+ drivers/nvme/target/configfs.c |  9 +++-
+ drivers/nvme/target/core.c     |  2 +-
+ drivers/nvme/target/fc.c       | 44 +++++++++++++++----
+ drivers/nvme/target/loop.c     |  2 +-
+ drivers/scsi/scsi_error.c      | 14 ++++++
+ fs/block_dev.c                 |  9 ++--
+ include/linux/blk-mq.h         | 14 ++++++
+ 14 files changed, 209 insertions(+), 56 deletions(-)
+
 -- 
-2.17.1
+Jens Axboe
