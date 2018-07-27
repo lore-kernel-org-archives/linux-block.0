@@ -1,52 +1,50 @@
-Return-Path: <prvs=7391cfe80=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "keith.busch@intel.com" <keith.busch@intel.com>
-CC: "hch@lst.de" <hch@lst.de>, "jianchao.w.wang@oracle.com"
-	<jianchao.w.wang@oracle.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <keith.busch@intel.com>
+Date: Fri, 27 Jul 2018 10:57:19 -0600
+From: Keith Busch <keith.busch@intel.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>
 Subject: Re: [PATCH 5/5] blk-mq: Rework blk-mq timeout handling again
-Date: Fri, 27 Jul 2018 16:59:34 +0000
-Message-ID: <fca08072e67fc8a8a9c9acfe130753ee7020f4fe.camel@wdc.com>
+Message-ID: <20180727165718.GC20829@localhost.localdomain>
 References: <20180727162042.13425-1-bart.vanassche@wdc.com>
-	 <20180727162042.13425-6-bart.vanassche@wdc.com>
-	 <20180727164627.GB20829@localhost.localdomain>
-	 <08bd5d1c691e2c8f9950f7ebcf04716507a02675.camel@wdc.com>
-	 <20180727165718.GC20829@localhost.localdomain>
-In-Reply-To: <20180727165718.GC20829@localhost.localdomain>
-Content-Type: text/plain; charset="utf-7"
+ <20180727162042.13425-6-bart.vanassche@wdc.com>
+ <20180727164627.GB20829@localhost.localdomain>
+ <08bd5d1c691e2c8f9950f7ebcf04716507a02675.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <08bd5d1c691e2c8f9950f7ebcf04716507a02675.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, 2018-07-27 at 10:57 -0600, Keith Busch wrote:
-+AD4- You skip that code if the driver returns BLK+AF8-EH+AF8-DONT+AF8-RESE=
-T+AF8-TIMER.
+On Fri, Jul 27, 2018 at 04:51:05PM +0000, Bart Van Assche wrote:
+> On Fri, 2018-07-27 at 10:46 -0600, Keith Busch wrote:
+> > On Fri, Jul 27, 2018 at 09:20:42AM -0700, Bart Van Assche wrote:
+> > > +	ret = req->q->mq_ops->timeout(req, reserved);
+> > > +	/*
+> > > +	 * BLK_EH_DONT_RESET_TIMER means that the block driver either
+> > > +	 * completed the request or still owns the request and will
+> > > +	 * continue processing the timeout asynchronously. In the
+> > > +	 * latter case, if blk_mq_complete_request() was called while
+> > > +	 * the timeout handler was in progress, ignore that call.
+> > > +	 */
+> > > +	if (ret == BLK_EH_DONT_RESET_TIMER)
+> > > +		return;
+> > 
+> > This is how completions get lost.
+> 
+> The new approach for handling completions that occur while the .timeout()
+> callback in progress is as follows:
+> * blk_mq_complete_request() executes the following code:
+>        if (blk_mq_change_rq_state(rq, MQ_RQ_TIMED_OUT, MQ_RQ_COMPLETE))
+>                return;
+> * blk_mq_rq_timed_out() executes the following code:
+>        if (blk_mq_rq_state(req) == MQ_RQ_COMPLETE) {
+>                __blk_mq_complete_request(req);
+>                return;
+>        }
+> 
+> As one can see __blk_mq_complete_request() gets called if this race occurs.
 
-How about applying the following patch on top of this series?
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a97ab5ba9d18..aa66535604fd 100644
---- a/block/blk-mq.c
-+-+-+- b/block/blk-mq.c
-+AEAAQA- -854,10 +-854,10 +AEAAQA- static void blk+AF8-mq+AF8-rq+AF8-timed+=
-AF8-out(struct request +ACo-req, bool reserved)
- 	 +ACo- latter case, if blk+AF8-mq+AF8-complete+AF8-request() was called w=
-hile
- 	 +ACo- the timeout handler was in progress, ignore that call.
- 	 +ACo-/
--	if (ret +AD0APQ- BLK+AF8-EH+AF8-DONT+AF8-RESET+AF8-TIMER)
--		return+ADs-
--	WARN+AF8-ON+AF8-ONCE(ret +ACEAPQ- BLK+AF8-EH+AF8-RESET+AF8-TIMER)+ADs-
--	blk+AF8-mq+AF8-add+AF8-timer(req)+ADs-
-+-	if (ret +AD0APQ- BLK+AF8-EH+AF8-RESET+AF8-TIMER)
-+-		blk+AF8-mq+AF8-add+AF8-timer(req)+ADs-
-+-	else
-+-		WARN+AF8-ON+AF8-ONCE(ret +ACEAPQ- BLK+AF8-EH+AF8-DONT+AF8-RESET+AF8-TIM=
-ER)+ADs-
- again:
- 	if (blk+AF8-mq+AF8-change+AF8-rq+AF8-state(req, MQ+AF8-RQ+AF8-TIMED+AF8-O=
-UT, MQ+AF8-RQ+AF8-IN+AF8-FLIGHT))
- 		return+ADs-
-
-Bart.
+You skip that code if the driver returns BLK_EH_DONT_RESET_TIMER.
