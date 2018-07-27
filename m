@@ -1,51 +1,31 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:56696 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730337AbeGYWgT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Jul 2018 18:36:19 -0400
-Date: Wed, 25 Jul 2018 14:22:46 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Coly Li <colyli@suse.de>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-bcache@vger.kernel.org,
-        linux-block@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Michael Lyle <mlyle@lyle.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Kate Stewart <kstewart@linuxfoundation.org>,
-        Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v4 1/3] lib: add crc64 calculation routines
-Message-Id: <20180725142246.23e354fcc21ef041bb3f87e6@linux-foundation.org>
-In-Reply-To: <01f8e352-a49f-2f41-6264-bb6395bb0bf2@suse.de>
-References: <20180718165545.1622-1-colyli@suse.de>
-        <20180718165545.1622-2-colyli@suse.de>
-        <20180724042637.GA1944@sol.localdomain>
-        <dd95ab25-562e-1318-19e9-c8163969252f@suse.de>
-        <399c1cc851f983370a0308c76c68a97ff41a5d4f.camel@linux.intel.com>
-        <01f8e352-a49f-2f41-6264-bb6395bb0bf2@suse.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 0/9] bcache patches for Linux v4.19
+To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+References: <20180726041741.1669-1-colyli@suse.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <1fada353-9f5b-887a-9815-64b8c65fecc9@kernel.dk>
+Date: Fri, 27 Jul 2018 09:16:17 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180726041741.1669-1-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-On Wed, 25 Jul 2018 10:37:23 +0800 Coly Li <colyli@suse.de> wrote:
-
-> > IIUC this series in Andrew's quilt. So, it's still possible to replace
-> > it with better one, I suppose. Ask Andrew (at least I remember recent
-> > case where he just replaced series by fixed one).
+On 7/25/18 10:17 PM, Coly Li wrote:
+> Hi Jenns,
 > 
-> Hi Andrew,
+> Here is the first wave bcache patches for Linnux v4.19.
 > 
-> It seems there should be some fix/update for this series. I see current
-> series is in linux-next for now. If I want to add the fix, should I post
-> a new version of the series, or the incremental patches to fix current
-> series ?
+> Florian Schmaus contributes useful chagnes for code cleanup, and
+> Arnd Bergmann replaces get_seconds() by ktime_get_real_seconds(). 
+> 
+> Shenghui Wang contributes a patch to fix a memory leak in bcache. And
+> patches from Tang Junhui are for recoganized performance improvement,
+> these patches are posted for monthes and good to me.
+> 
+> Please pick the first wave for 4.19. Thanks in advance.
 
-mm...  it sounds like the changes will be large, so probably a new
-series would be better at this early stage.  If the changes are small
-then little fixup patches would be nicer to the people who have already
-reviewed v1.
+Applied, thanks Coly.
+
+-- 
+Jens Axboe
