@@ -1,50 +1,114 @@
-Return-Path: <colin.king@canonical.com>
-From: Colin King <colin.king@canonical.com>
-To: Jiri Kosina <jikos@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] block/floppy: remove redundant variable dflags
-Date: Mon,  2 Jul 2018 08:42:34 +0100
-Message-Id: <20180702074234.10435-1-colin.king@canonical.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <prvs=7391cfe80=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Keith Busch <keith.busch@intel.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 4/5] block: Simplify blk_add_timer() and blk_mq_add_timer()
+Date: Fri, 27 Jul 2018 15:56:19 -0700
+Message-Id: <20180727225620.17855-5-bart.vanassche@wdc.com>
+In-Reply-To: <20180727225620.17855-1-bart.vanassche@wdc.com>
+References: <20180727225620.17855-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Colin Ian King <colin.king@canonical.com>
+Use the fact that q->mq_ops == NULL for the legacy block layer and
+also that q->mq_ops != NULL for blk-mq to simplify blk_add_timer and
+blk_mq_add_timer(). This patch does not change any functionality.
 
-Variable dflags is being assigned but is never used hence it is redundant
-and can be removed.
-
-Cleans up clang warning:
-warning: variable 'dflags' set but not used [-Wunused-but-set-variable]
-
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <keith.busch@intel.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/floppy.c | 3 ---
- 1 file changed, 3 deletions(-)
+ block/blk-timeout.c | 54 +++++++++------------------------------------
+ 1 file changed, 11 insertions(+), 43 deletions(-)
 
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index 8871b5044d9e..48f622728ce6 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -1461,7 +1461,6 @@ static void setup_rw_floppy(void)
- 	int i;
- 	int r;
- 	int flags;
--	int dflags;
- 	unsigned long ready_date;
- 	void (*function)(void);
+diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+index ac0255a70401..8e6661031bc0 100644
+--- a/block/blk-timeout.c
++++ b/block/blk-timeout.c
+@@ -226,34 +226,21 @@ static void __blk_add_timer(struct request *req, unsigned long deadline)
+ void blk_add_timer(struct request *req)
+ {
+ 	struct request_queue *q = req->q;
++	unsigned long deadline;
  
-@@ -1485,8 +1484,6 @@ static void setup_rw_floppy(void)
- 		if (fd_wait_for_completion(ready_date, function))
- 			return;
- 	}
--	dflags = DRS->flags;
+-	if (!q->mq_ops)
+-		lockdep_assert_held(q->queue_lock);
++	lockdep_assert_held(q->queue_lock);
+ 
+-	/* blk-mq has its own handler, so we don't need ->rq_timed_out_fn */
+-	if (!q->mq_ops && !q->rq_timed_out_fn)
++	if (!q->rq_timed_out_fn)
+ 		return;
 -
- 	if ((flags & FD_RAW_READ) || (flags & FD_RAW_WRITE))
- 		setup_DMA();
+-	BUG_ON(!list_empty(&req->timeout_list));
+-
+-	/*
+-	 * Some LLDs, like scsi, peek at the timeout to prevent a
+-	 * command from being retried forever.
+-	 */
+ 	if (!req->timeout)
+ 		req->timeout = q->rq_timeout;
  
+ 	req->rq_flags &= ~RQF_TIMED_OUT;
+-	blk_rq_set_deadline(req, jiffies + req->timeout);
++	deadline = jiffies + req->timeout;
++	blk_rq_set_deadline(req, deadline);
++	list_add_tail(&req->timeout_list, &req->q->timeout_list);
+ 
+-	/*
+-	 * Only the non-mq case needs to add the request to a protected list.
+-	 * For the mq case we simply scan the tag map.
+-	 */
+-	if (!q->mq_ops)
+-		list_add_tail(&req->timeout_list, &req->q->timeout_list);
+-
+-	__blk_add_timer(req, blk_rq_deadline(req));
++	__blk_add_timer(req, deadline);
+ }
+ 
+ /**
+@@ -266,32 +253,13 @@ void blk_add_timer(struct request *req)
+ void blk_mq_add_timer(struct request *req)
+ {
+ 	struct request_queue *q = req->q;
++	unsigned long deadline;
+ 
+-	if (!q->mq_ops)
+-		lockdep_assert_held(q->queue_lock);
+-
+-	/* blk-mq has its own handler, so we don't need ->rq_timed_out_fn */
+-	if (!q->mq_ops && !q->rq_timed_out_fn)
+-		return;
+-
+-	BUG_ON(!list_empty(&req->timeout_list));
+-
+-	/*
+-	 * Some LLDs, like scsi, peek at the timeout to prevent a
+-	 * command from being retried forever.
+-	 */
+ 	if (!req->timeout)
+ 		req->timeout = q->rq_timeout;
+ 
+ 	req->rq_flags &= ~RQF_TIMED_OUT;
+-	blk_rq_set_deadline(req, jiffies + req->timeout);
+-
+-	/*
+-	 * Only the non-mq case needs to add the request to a protected list.
+-	 * For the mq case we simply scan the tag map.
+-	 */
+-	if (!q->mq_ops)
+-		list_add_tail(&req->timeout_list, &req->q->timeout_list);
+-
+-	__blk_add_timer(req, blk_rq_deadline(req));
++	deadline = jiffies + req->timeout;
++	blk_rq_set_deadline(req, deadline);
++	__blk_add_timer(req, deadline);
+ }
 -- 
-2.17.1
+2.18.0
