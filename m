@@ -1,87 +1,80 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Martin Wilck <martin.wilck@suse.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 5/5] zram: use device_add_disk_with_groups()
-Date: Wed, 25 Jul 2018 08:28:40 +0200
-Message-Id: <20180725062840.94114-6-hare@suse.de>
-In-Reply-To: <20180725062840.94114-1-hare@suse.de>
-References: <20180725062840.94114-1-hare@suse.de>
+Return-Path: <gustavo@embeddedor.com>
+Subject: Re: [PATCH v2] pktcdvd: Fix possible Spectre-v1 for pkt_devs
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+To: Jinbum Park <jinb.park7@gmail.com>, axboe@kernel.dk,
+ bart.vanassche@wdc.com, jiufei.xue@linux.alibaba.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20180728023058.GA21103@pjb1027-Latitude-E5410>
+ <0f94623c-47e2-31e6-50ac-1d11ba061411@embeddedor.com>
+Message-ID: <d46d997c-e0c1-a77b-a234-3f9d39d9a5b8@embeddedor.com>
+Date: Fri, 27 Jul 2018 21:56:38 -0500
+MIME-Version: 1.0
+In-Reply-To: <0f94623c-47e2-31e6-50ac-1d11ba061411@embeddedor.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Use device_add_disk_with_groups() to avoid a race condition with
-udev during startup.
+Jinbum,
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
----
- drivers/block/zram/zram_drv.c | 28 +++++++---------------------
- 1 file changed, 7 insertions(+), 21 deletions(-)
+I just noticed this patch does not apply to linux-next.
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index da51293e7c03..6f55676e2164 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1619,6 +1619,11 @@ static const struct attribute_group zram_disk_attr_group = {
- 	.attrs = zram_disk_attrs,
- };
- 
-+static const struct attribute_group *zram_disk_attr_groups[] = {
-+	&zram_disk_attr_group,
-+	NULL,
-+};
-+
- /*
-  * Allocate and initialize new zram device. the function returns
-  * '>= 0' device_id upon success, and negative value otherwise.
-@@ -1699,24 +1704,14 @@ static int zram_add(void)
- 
- 	zram->disk->queue->backing_dev_info->capabilities |=
- 			(BDI_CAP_STABLE_WRITES | BDI_CAP_SYNCHRONOUS_IO);
--	add_disk(zram->disk);
--
--	ret = sysfs_create_group(&disk_to_dev(zram->disk)->kobj,
--				&zram_disk_attr_group);
--	if (ret < 0) {
--		pr_err("Error creating sysfs group for device %d\n",
--				device_id);
--		goto out_free_disk;
--	}
-+	device_add_disk_with_groups(NULL, zram->disk, zram_disk_attr_groups);
-+
- 	strlcpy(zram->compressor, default_compressor, sizeof(zram->compressor));
- 
- 	zram_debugfs_register(zram);
- 	pr_info("Added device: %s\n", zram->disk->disk_name);
- 	return device_id;
- 
--out_free_disk:
--	del_gendisk(zram->disk);
--	put_disk(zram->disk);
- out_free_queue:
- 	blk_cleanup_queue(queue);
- out_free_idr:
-@@ -1745,15 +1740,6 @@ static int zram_remove(struct zram *zram)
- 	mutex_unlock(&bdev->bd_mutex);
- 
- 	zram_debugfs_unregister(zram);
--	/*
--	 * Remove sysfs first, so no one will perform a disksize
--	 * store while we destroy the devices. This also helps during
--	 * hot_remove -- zram_reset_device() is the last holder of
--	 * ->init_lock, no later/concurrent disksize_store() or any
--	 * other sysfs handlers are possible.
--	 */
--	sysfs_remove_group(&disk_to_dev(zram->disk)->kobj,
--			&zram_disk_attr_group);
- 
- 	/* Make sure all the pending I/O are finished */
- 	fsync_bdev(bdev);
--- 
-2.12.3
+Please try again, but this time work from linux-next rather than from a stable tree.
+
+Thanks
+--
+Gustavo
+
+On 07/27/2018 09:47 PM, Gustavo A. R. Silva wrote:
+> 
+> 
+> On 07/27/2018 09:30 PM, Jinbum Park wrote:
+>> User controls @dev_minor which to be used as index of pkt_devs.
+>> So, It can be exploited via Spectre-like attack. (speculative execution)
+>>
+>> This kind of attack leaks address of pkt_devs, [1]
+>> It leads an attacker to bypass security mechanism such as KASLR.
+>>
+>> So sanitize @dev_minor before using it to prevent attack.
+>>
+>> [1] https://github.com/jinb-park/linux-exploit/
+>> tree/master/exploit-remaining-spectre-gadget/leak_pkt_devs.c
+>>
+>> Signed-off-by: Jinbum Park <jinb.park7@gmail.com>
+>> ---
+>> v2: Fix coding style by Gustavo.
+>>
+>>  drivers/block/pktcdvd.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+>> index c61d20c..8ec2eaa 100644
+>> --- a/drivers/block/pktcdvd.c
+>> +++ b/drivers/block/pktcdvd.c
+>> @@ -67,8 +67,8 @@
+>>  #include <scsi/scsi.h>
+>>  #include <linux/debugfs.h>
+>>  #include <linux/device.h>
+>> -
+>>  #include <linux/uaccess.h>
+>> +#include <linux/nospec.h>
+>>  
+>>  #define DRIVER_NAME	"pktcdvd"
+>>  
+>> @@ -2231,6 +2231,7 @@ static struct pktcdvd_device *pkt_find_dev_from_minor(unsigned int dev_minor)
+>>  {
+>>  	if (dev_minor >= MAX_WRITERS)
+>>  		return NULL;
+>> +	dev_minor = array_index_nospec(dev_minor, MAX_WRITERS);
+> 
+> Adding a blank line here would be even better.
+> 
+>>  	return pkt_devs[dev_minor];
+>>  }
+>>  
+>>
+> 
+> Acked-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+> 
+> Thanks
+> --
+> Gustavo
+> 
