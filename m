@@ -1,83 +1,141 @@
-Return-Path: <threeearcat@gmail.com>
-Return-Path: <threeearcat@gmail.com>
-Date: Fri, 27 Jul 2018 10:42:35 +0900
-From: "Dae R. Jeong" <threeearcat@gmail.com>
-To: jikos@kernel.org, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	lifeasageek@gmail.com, kt0755@gmail.com
-Subject: WARNING in schedule_bh
-Message-ID: <20180727014235.GA2483@dragonet>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mailrelay.collogia.de ([194.8.207.98]:2862 "HELO
+        mailrelay.collogia.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with SMTP id S1731155AbeG1X7L (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 28 Jul 2018 19:59:11 -0400
+From: Markus Stockhausen <stockhausen@collogia.de>
+To: Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: AW: [PATCH 0/2] direct IO: respect backing device max IO size
+Date: Sat, 28 Jul 2018 22:31:01 +0000
+Message-ID: <12EF8D94C6F8734FB2FF37B9FBEDD173010E0B4ED5@EXCHANGE.collogia.de>
+References: <5b5cc132.ZRg3eYC3DaoOBtul%stockhausen@collogia.de>,<b5c01601-9a80-118a-0f40-e730b87ce390@kernel.dk>
+In-Reply-To: <b5c01601-9a80-118a-0f40-e730b87ce390@kernel.dk>
+Content-Type: multipart/mixed;
+        boundary="----=_NextPartTM-000-440a8eed-1de3-4d90-9754-37e8447ff0db"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Reporting the crash: WARNING in schedule_bh
 
-This crash has been found in v4.18-rc4 using a modified version of
-Syzkaller, which focus on exploring hard-to-reach coverages.
+This is a multi-part message in MIME format.
 
-C repro code:
-https://kiwi.cs.purdue.edu/static/alexkkid-fuzzer/repro-98b14a.c
-Kernel config:
-https://kiwi.cs.purdue.edu/static/alexkkid-fuzzer/config-98b14a
+------=_NextPartTM-000-440a8eed-1de3-4d90-9754-37e8447ff0db
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Crash log:
-WARNING: CPU: 0 PID: 6107 at drivers/block/floppy.c:984 schedule_bh+0x4d/0x60 drivers/block/floppy.c:984
-Kernel panic - not syncing: panic_on_warn set ...
+> Von: Jens Axboe [axboe@kernel.dk]=0A=
+> Gesendet: Sonntag, 29. Juli 2018 00:22=0A=
+> An: Markus Stockhausen; linux-block@vger.kernel.org=0A=
+> Betreff: Re: [PATCH 0/2] direct IO: respect backing device max IO size=0A=
+> =0A=
+> On 7/28/18 1:17 PM, stockhausen@collogia.de wrote:=0A=
+> > Running older FusionIO cards with newer linux kernels turns out to be=
+=0A=
+> > a headache. First of all their driver is a mix of open sources and=0A=
+> > proprietary object parts. Second we get only support for kernels up=0A=
+> > to ~4.0. Trying to get this to work with 4.9 longterm was successful=0A=
+> > but 4.14 renders the driver totally useless.=0A=
+> >=0A=
+> > Searching the reason for lost data it turned out that the driver has=0A=
+> > a hard 1024K or 257 page IO limit and silently drops any request that=
+=0A=
+> > is too large. Of course this might be a driver only problem but at=0A=
+> > least it discloses the real source of a bad chain reaction.=0A=
+> >=0A=
+> > blkdev_direct_IO() sets the maximum allowed IO size to BIO_MAX_PAGES.=
+=0A=
+> > With 225311a4 ("mm: test code to write THP to swap device as a whole")=
+=0A=
+> > its value changed from 256 to 512. Indepedant of its value the choice=
+=0A=
+> > is arbitrary and can be driver agnostic as long as breakdown of bios=0A=
+> > happens later on.=0A=
+> >=0A=
+> > We already have sufficent info about backing device properties and=0A=
+> > can packetize the IO into sane values to avoid hassle later on. If=0A=
+> > bdi->io_pages is set and lower than BIO_MAX_PAGES reduce the package=0A=
+> > size appropriately.=0A=
+> >=0A=
+> > Ths patch consists of two parts. The first is only a cosmetic change=0A=
+> > to avoid double coding in the second one.=0A=
+> =0A=
+> Sounds to me like the fusion driver isn't calling split like it is=0A=
+> supposed to. That's what you get when it's unmaintained for years.=0A=
+> Add a:=0A=
+> =0A=
+>         blk_queue_split(queue, &bio);=0A=
+> =0A=
+> to kblock.c:kfio_make_request() and see if that helps.=0A=
+> --=0A=
+> Jens Axboe=0A=
+=0A=
+I guess You know the driver and got my only by a few minutes.=0A=
+Was just comparing iomemory 3.2.x with 4.3.x. And tadaaa: New=0A=
+driver has a split.=0A=
+=0A=
+Thanks a lot.=0A=
+=0A=
+Markus=0A=
+=0A=
+=0A=
+------=_NextPartTM-000-440a8eed-1de3-4d90-9754-37e8447ff0db
+Content-Type: text/plain;
+	name="InterScan_Disclaimer.txt"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename="InterScan_Disclaimer.txt"
 
-CPU: 0 PID: 6107 Comm: kworker/u4:6 Not tainted 4.18.0-rc4 #1
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Bochs 01/01/2011
-Workqueue: floppy floppy_work_workfn
-Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x122/0x198 lib/dump_stack.c:113
- panic+0x27d/0x489 kernel/panic.c:184
- __warn+0x291/0x2d0 kernel/panic.c:536
- report_bug+0x243/0x300 lib/bug.c:186
- fixup_bug.part.9+0x42/0x1a0 arch/x86/kernel/traps.c:178
- fixup_bug arch/x86/kernel/traps.c:248 [inline]
- do_error_trap+0x278/0x2c0 arch/x86/kernel/traps.c:296
- do_invalid_op+0x20/0x30 arch/x86/kernel/traps.c:316
- invalid_op+0x14/0x20 arch/x86/entry/entry_64.S:992
-RIP: 0010:schedule_bh+0x4d/0x60 drivers/block/floppy.c:984
-Code: c2 29 fe 48 8b 35 43 ee 88 07 48 c7 c2 40 f4 ac 88 bf 40 00 00 00 48 89 1d 50 e9 88 07 e8 cb 77 03 fe 5b 5d c3 e8 63 c2 29 fe <0f> 0b eb d0 66 66 66 66 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 
-RSP: 0018:ffff88011a607d38 EFLAGS: 00010006
-RAX: 0000000000010000 RBX: ffffffff83350970 RCX: ffffffff8333e1bd
-RDX: ffff880110404440 RSI: ffffffff8abcd070 RDI: ffffffff83350970
-RBP: ffff88011a607d40 R08: fffffbfff10e6995 R09: fffffbfff10e6995
-R10: ffffffff88734ca3 R11: fffffbfff10e6994 R12: ffffffff83350970
-R13: ffffffff8abcd070 R14: 0000000000000000 R15: ffffffff8abce960
- floppy_interrupt+0x1f6/0x390 drivers/block/floppy.c:1734
- floppy_hardint+0x25c/0x330 arch/x86/include/asm/floppy.h:66
- __handle_irq_event_percpu+0x10e/0xa30 kernel/irq/handle.c:149
- handle_irq_event_percpu+0x71/0x160 kernel/irq/handle.c:189
- handle_irq_event+0xca/0x170 kernel/irq/handle.c:206
- handle_edge_irq+0x2b0/0x960 kernel/irq/chip.c:791
- generic_handle_irq_desc include/linux/irqdesc.h:154 [inline]
- handle_irq+0x2dc/0x480 arch/x86/kernel/irq_64.c:77
- do_IRQ+0x15b/0x3c0 arch/x86/kernel/irq.c:245
- common_interrupt+0xf/0xf arch/x86/entry/entry_64.S:642
- </IRQ>
-RIP: 0010:outb arch/x86/include/asm/io.h:333 [inline]
-RIP: 0010:outb_p arch/x86/include/asm/io.h:333 [inline]
-RIP: 0010:output_byte+0x133/0x3d0 drivers/block/floppy.c:1128
-Code: 03 48 01 d0 80 38 00 0f 85 ab 02 00 00 4a 8d 14 b5 00 00 00 00 44 89 e8 49 01 d6 49 c1 e6 03 49 8b 96 70 d0 bc 8a 83 c2 05 ee <49> c7 c4 30 e1 6b 88 48 ba 00 00 00 00 00 fc ff df 4c 89 e0 48 c1 
-RSP: 0018:ffff8800b998fcb8 EFLAGS: 00000206 ORIG_RAX: ffffffffffffffdc
-RAX: 00000000ffffff8f RBX: 0000000000000090 RCX: ffffffff833438e3
-RDX: 00000000000003f5 RSI: ffffffff8abcd070 RDI: ffffffff8abcd070
-RBP: ffff8800b998fce0 R08: ffffffff8abcd070 R09: ffffffff8abcd060
-R10: 0000000000000000 R11: ffffffff8abcd070 R12: 0000000000000000
-R13: 00000000ffffff8f R14: 0000000000000000 R15: 0000000000000000
- seek_floppy drivers/block/floppy.c:1616 [inline]
- floppy_ready+0xac4/0x18f0 drivers/block/floppy.c:1920
- seek_interrupt+0x2c2/0x540 drivers/block/floppy.c:1540
- floppy_work_workfn+0x1a/0x20 drivers/block/floppy.c:977
- process_one_work+0x98d/0x1a30 kernel/workqueue.c:2153
- worker_thread+0x8f/0xcf0 kernel/workqueue.c:2296
- kthread+0x3d5/0x4b0 kernel/kthread.c:246
- ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:412
-Dumping ftrace buffer:
-   (ftrace buffer empty)
-Kernel Offset: disabled
-Rebooting in 86400 seconds..
+****************************************************************************
+Diese E-Mail enthält vertrauliche und/oder rechtlich geschützte
+Informationen. Wenn Sie nicht der richtige Adressat sind oder diese E-Mail
+irrtümlich erhalten haben, informieren Sie bitte sofort den Absender und
+vernichten Sie diese Mail. Das unerlaubte Kopieren sowie die unbefugte
+Weitergabe dieser Mail ist nicht gestattet.
+
+Über das Internet versandte E-Mails können unter fremden Namen erstellt oder
+manipuliert werden. Deshalb ist diese als E-Mail verschickte Nachricht keine
+rechtsverbindliche Willenserklärung.
+
+Collogia AG
+Ubierring 11
+D-50678 Köln
+
+Vorstand:
+Kadir Akin
+Dr. Michael Höhnerbach
+
+Vorsitzender des Aufsichtsrates:
+Hans Kristian Langva
+
+Registergericht: Amtsgericht Köln
+Registernummer: HRB 52 497
+
+This e-mail may contain confidential and/or privileged information. If you
+are not the intended recipient (or have received this e-mail in error)
+please notify the sender immediately and destroy this e-mail. Any
+unauthorized copying, disclosure or distribution of the material in this
+e-mail is strictly forbidden.
+
+e-mails sent over the internet may have been written under a wrong name or
+been manipulated. That is why this message sent as an e-mail is not a
+legally binding declaration of intention.
+
+Collogia AG
+Ubierring 11
+D-50678 Köln
+
+executive board:
+Kadir Akin
+Dr. Michael Höhnerbach
+
+President of the supervisory board:
+Hans Kristian Langva
+
+Registry office: district court Cologne
+Register number: HRB 52 497
+
+****************************************************************************
+
+------=_NextPartTM-000-440a8eed-1de3-4d90-9754-37e8447ff0db--
