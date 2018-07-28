@@ -1,57 +1,77 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: colyli@suse.de,
-	axboe@kernel.dk,
-	linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 0/9] bcache patches for Linux v4.19 
-Date: Thu, 26 Jul 2018 12:17:32 +0800
-Message-Id: <20180726041741.1669-1-colyli@suse.de>
+Return-Path: <gustavo@embeddedor.com>
+To: Jinbum Park <jinb.park7@gmail.com>, axboe@kernel.dk,
+ bart.vanassche@wdc.com, jiufei.xue@linux.alibaba.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20180728013151.GA15457@pjb1027-Latitude-E5410>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Subject: Re: [PATCH] pktcdvd: Fix possible Spectre-v1 for pkt_devs
+Message-ID: <ecede2b4-a980-3ad3-4474-d1d9db3e6a74@embeddedor.com>
+Date: Fri, 27 Jul 2018 20:47:41 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180728013151.GA15457@pjb1027-Latitude-E5410>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jenns,
+Hi Jinbum,
 
-Here is the first wave bcache patches for Linnux v4.19.
+Thanks for working on this.
 
-Florian Schmaus contributes useful chagnes for code cleanup, and
-Arnd Bergmann replaces get_seconds() by ktime_get_real_seconds(). 
+Please, see some comments below.
 
-Shenghui Wang contributes a patch to fix a memory leak in bcache. And
-patches from Tang Junhui are for recoganized performance improvement,
-these patches are posted for monthes and good to me.
+On 07/27/2018 08:31 PM, Jinbum Park wrote:
+> User controls @dev_minor which to be used as index of pkt_devs.
+> So, It can be exploited via Spectre-like attack. (speculative execution)
+> 
+> This kind of attack leaks address of pkt_devs, [1]
+> It leads an attacker to bypass security mechanism such as KASLR.
+> 
+> So sanitize @dev_minor before using it to prevent attack.
+> 
+> [1] https://github.com/jinb-park/linux-exploit/
+> tree/master/exploit-remaining-spectre-gadget/leak_pkt_devs.c
+> 
+> Signed-off-by: Jinbum Park <jinb.park7@gmail.com>
+> ---
+>  drivers/block/pktcdvd.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+> index c61d20c..665760d 100644
+> --- a/drivers/block/pktcdvd.c
+> +++ b/drivers/block/pktcdvd.c
+> @@ -67,8 +67,8 @@
+>  #include <scsi/scsi.h>
+>  #include <linux/debugfs.h>
+>  #include <linux/device.h>
+> -
+>  #include <linux/uaccess.h>
+> +#include <linux/nospec.h>
+>  
+>  #define DRIVER_NAME	"pktcdvd"
+>  
+> @@ -2229,9 +2229,13 @@ static void pkt_release_dev(struct pktcdvd_device *pd, int flush)
+>  
+>  static struct pktcdvd_device *pkt_find_dev_from_minor(unsigned int dev_minor)
+>  {
+> +	unsigned int idx = 0;
+> +
 
-Please pick the first wave for 4.19. Thanks in advance.
+There is no need for a new variable in this case.
 
-Coly Li
----
-Arnd Bergmann (1):
-  bcache: stop using the deprecated get_seconds()
+>  	if (dev_minor >= MAX_WRITERS)
+>  		return NULL;
+> -	return pkt_devs[dev_minor];
+> +
+> +	idx = array_index_nospec(dev_minor, MAX_WRITERS);
+> +	return pkt_devs[idx];
 
-Florian Schmaus (3):
-  bcache: do not assign in if condition register_bcache()
-  bcache: do not assign in if condition in bcache_init()
-  bcache: do not assign in if condition in bcache_device_init()
+Also, the following style is preferred:
 
-Shenghui Wang (1):
-  bcache: free heap cache_set->flush_btree in bch_journal_free
+if (dev_minor >= MAX_WRITERS)
+	return NULL;
+dev_minor = array_index_nospec(dev_minor, MAX_WRITERS);
 
-Tang Junhui (4):
-  bcache: simplify the calculation of the total amount of flash dirty
-    data
-  bcache: finish incremental GC
-  bcache: calculate the number of incremental GC nodes according to the
-    total of btree nodes
-  bcache: fix I/O significant decline while backend devices registering
 
- drivers/md/bcache/bcache.h    |  6 +++++
- drivers/md/bcache/btree.c     | 49 ++++++++++++++++++++++++++++++++--
- drivers/md/bcache/journal.c   |  1 +
- drivers/md/bcache/request.c   |  3 +++
- drivers/md/bcache/super.c     | 50 ++++++++++++++++++++++++-----------
- drivers/md/bcache/writeback.c | 34 +++++++++++++++++++++---
- drivers/md/bcache/writeback.h | 19 -------------
- include/uapi/linux/bcache.h   |  4 +--
- 8 files changed, 123 insertions(+), 43 deletions(-)
-
--- 
-2.17.1
+Thanks
+--
+Gustavo
