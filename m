@@ -1,49 +1,69 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:60960 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730068AbeGZPkk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jul 2018 11:40:40 -0400
-From: Coly Li <colyli@suse.de>
-To: colyli@suse.de, linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 8/9] bcache: initiate bcache_debug to NULL
-Date: Thu, 26 Jul 2018 22:22:38 +0800
-Message-Id: <20180726142239.44669-9-colyli@suse.de>
-In-Reply-To: <20180726142239.44669-1-colyli@suse.de>
-References: <20180726142239.44669-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v4 1/3] block: move ref_tag calculation func to the block
+ layer
+To: Max Gurtovoy <maxg@mellanox.com>, keith.busch@intel.com,
+ linux-nvme@lists.infradead.org, sagi@grimberg.me, hch@lst.de,
+ martin.petersen@oracle.com, linux-block@vger.kernel.org
+Cc: vladimirk@mellanox.com
+References: <1532533577-1600-1-git-send-email-maxg@mellanox.com>
+ <a50d17af-6e6f-c899-5dd6-e87d5436af98@kernel.dk>
+ <165f5bbe-168f-cd15-8fd0-d464aca64414@kernel.dk>
+ <f4fd6fd9-bc80-7c27-9a81-c09edbca8a4e@mellanox.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <d8fba6ff-c4c2-7a0f-5a8d-01aaf979f16e@kernel.dk>
+Date: Sat, 28 Jul 2018 16:22:42 -0600
+MIME-Version: 1.0
+In-Reply-To: <f4fd6fd9-bc80-7c27-9a81-c09edbca8a4e@mellanox.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Global variable bcache_debug is firstly initialized in bch_debug_init(),
-and destroyed in bch_debug_exit(). bch_debug_init() is called in
-bcache_init() with many other functions, if one of the previous calling
-onces failed, bcache_exit() will be called in the failure path.
+On 7/28/18 4:12 PM, Max Gurtovoy wrote:
+> 
+> 
+> On 7/27/2018 6:38 PM, Jens Axboe wrote:
+>> On 7/27/18 9:21 AM, Jens Axboe wrote:
+>>> On 7/25/18 9:46 AM, Max Gurtovoy wrote:
+>>>> Currently this function is implemented in the scsi layer, but it's
+>>>> actual place should be the block layer since T10-PI is a general
+>>>> data integrity feature that is used in the nvme protocol as well.
+>>>
+>>> Applied 1-3 for 4.19.
+>>
+>> This:
+>>
+>> static inline u32 t10_pi_ref_tag(struct request *rq)
+>> {
+>>          return blk_rq_pos(rq) >>
+>>                  (rq->q->integrity.interval_exp - 9) & 0xffffffff;
+>> }
+>>
+>> won't work for !CONFIG_BLK_DEV_INTEGRITY. I didn't want to make the
+>> change, but looks like it should either return -1U as we the value
+>> should mean nothing if BLK_DEV_INTEGRITY isn't set, or just ignore the
+>> shift and return blk_rq_pos(rq) & 0xffffffff.
+>>
+>> Please fixup and resend the series.
+>>
+> 
+> will this be good enough:
+> 
+> diff --git a/include/linux/t10-pi.h b/include/linux/t10-pi.h
+> index 81ae4c4..5a427c2 100644
+> --- a/include/linux/t10-pi.h
+> +++ b/include/linux/t10-pi.h
+> @@ -39,8 +39,12 @@ struct t10_pi_tuple {
+> 
+>   static inline u32 t10_pi_ref_tag(struct request *rq)
+>   {
+> +#ifdef CONFIG_BLK_DEV_INTEGRITY
+>          return blk_rq_pos(rq) >>
+>                  (rq->q->integrity.interval_exp - 9) & 0xffffffff;
+> +#else
+> +       return -1U;
+> +#endif
+>   }
 
-The problem is, if bcache_init() fails before bch_debug_init() is called,
-then in bcache_exit() when bch_debug_exit() is called to destroy global
-variable bcache_debug, at this moment bcache_debug is unndefined, then the
-test of "if (!IS_ERR_OR_NULL(bcache_debug))" might be buggy.
+I think so, that looks fine to me.
 
-This patch initializes global varabile bcache_debug to be NULL, to make
-the failure code path to be predictable.
-
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/debug.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
-index 57f8f5aeee55..24b0eb65ddec 100644
---- a/drivers/md/bcache/debug.c
-+++ b/drivers/md/bcache/debug.c
-@@ -17,7 +17,7 @@
- #include <linux/random.h>
- #include <linux/seq_file.h>
- 
--struct dentry *bcache_debug;
-+struct dentry *bcache_debug = NULL;
- 
- #ifdef CONFIG_BCACHE_DEBUG
- 
 -- 
-2.17.1
+Jens Axboe
