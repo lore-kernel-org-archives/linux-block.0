@@ -1,95 +1,35 @@
-Return-Path: <keescook@chromium.org>
-Return-Path: <keescook@chromium.org>
-From: Kees Cook <keescook@chromium.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Kees Cook <keescook@chromium.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	Borislav Petkov <bp@alien8.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
-	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
-	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
-	"Nicholas A. Bellinger" <nab@linux-iscsi.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Philippe Ombredanne <pombredanne@nexb.com>,
-	Stephen Boyd <sboyd@codeaurora.org>,
-	Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
-	Juergen Gross <jgross@suse.com>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	Sagar Dharia <sdharia@codeaurora.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Vinod Koul <vinod.koul@intel.com>,
-	David Kershner <david.kershner@unisys.com>,
-	linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	target-devel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 7/9] cdrom: Use struct scsi_sense_hdr internally
-Date: Tue, 31 Jul 2018 12:51:52 -0700
-Message-Id: <20180731195155.46664-8-keescook@chromium.org>
-In-Reply-To: <20180731195155.46664-1-keescook@chromium.org>
-References: <20180731195155.46664-1-keescook@chromium.org>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: blk_init_allocated_queue() set q->fq as NULL in
+ the fail case
+To: xiao jin <jin.xiao@intel.com>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: tom.leiming@gmail.com, bart.vanassche@wdc.com, stable@vger.kernel.org,
+ yanmin.zhang@intel.com, Ming Lei <ming.lei@redhat.com>
+References: <1532931072-5190-1-git-send-email-jin.xiao@intel.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <0bd7c6a3-4c55-d2f4-9b48-01f3898891b8@kernel.dk>
+Date: Mon, 30 Jul 2018 08:28:49 -0600
+MIME-Version: 1.0
+In-Reply-To: <1532931072-5190-1-git-send-email-jin.xiao@intel.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This removes more casts of struct request_sense and uses the standard
-struct scsi_sense_hdr instead. This also fixes any possible stale values
-since the prior code did not check the sense length.
+On 7/30/18 12:11 AM, xiao jin wrote:
+> We find the memory use-after-free issue in __blk_drain_queue()
+> on the kernel 4.14. After read the latest kernel 4.18-rc6 we
+> think it has the same problem.
+> 
+> Memory is allocated for q->fq in the blk_init_allocated_queue().
+> If the elevator init function called with error return, it will
+> run into the fail case to free the q->fq.
+> 
+> Then the __blk_drain_queue() uses the same memory after the free
+> of the q->fq, it will lead to the unpredictable event.
+> 
+> The patch is to set q->fq as NULL in the fail case of
+> blk_init_allocated_queue().
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- drivers/block/Kconfig | 2 +-
- drivers/cdrom/cdrom.c | 8 ++++++--
- 2 files changed, 7 insertions(+), 3 deletions(-)
+Applied, thanks.
 
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index ad9b687a236a..d4913516823f 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -74,12 +74,12 @@ config AMIGA_Z2RAM
- 
- config CDROM
- 	tristate
-+	select BLK_SCSI_REQUEST
- 
- config GDROM
- 	tristate "SEGA Dreamcast GD-ROM drive"
- 	depends on SH_DREAMCAST
- 	select CDROM
--	select BLK_SCSI_REQUEST # only for the generic cdrom code
- 	help
- 	  A standard SEGA Dreamcast comes with a modified CD ROM drive called a
- 	  "GD-ROM" by SEGA to signify it is capable of reading special disks
-diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
-index 3522d2cae1b6..e547213239dc 100644
---- a/drivers/cdrom/cdrom.c
-+++ b/drivers/cdrom/cdrom.c
-@@ -282,6 +282,7 @@
- #include <linux/blkdev.h>
- #include <linux/times.h>
- #include <linux/uaccess.h>
-+#include <scsi/scsi_common.h>
- #include <scsi/scsi_request.h>
- 
- /* used to tell the module to turn on full debugging messages */
-@@ -2222,9 +2223,12 @@ static int cdrom_read_cdda_bpc(struct cdrom_device_info *cdi, __u8 __user *ubuf,
- 
- 		blk_execute_rq(q, cdi->disk, rq, 0);
- 		if (scsi_req(rq)->result) {
--			struct request_sense *s = req->sense;
-+			struct scsi_sense_hdr sshdr;
-+
- 			ret = -EIO;
--			cdi->last_sense = s->sense_key;
-+			scsi_normalize_sense(req->sense, req->sense_len,
-+					     &sshdr);
-+			cdi->last_sense = sshdr.sense_key;
- 		}
- 
- 		if (blk_rq_unmap_user(bio))
 -- 
-2.17.1
+Jens Axboe
