@@ -1,70 +1,138 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:55538 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726378AbeG3WMV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Jul 2018 18:12:21 -0400
-Message-ID: <1532982936.14893.1.camel@HansenPartnership.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "tytso@mit.edu" <tytso@mit.edu>
 Subject: Re: What's the best way to call sd_shutdown() on all SCSI disks on
  shutdown?
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: "Theodore Y. Ts'o" <tytso@mit.edu>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org
-Date: Mon, 30 Jul 2018 13:35:36 -0700
-In-Reply-To: <20180730191707.GA28569@thunk.org>
+Date: Mon, 30 Jul 2018 20:35:15 +0000
+Message-ID: <6ce597717261cc2ad9deb739703b4175090fd552.camel@wdc.com>
 References: <20180730191707.GA28569@thunk.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180730191707.GA28569@thunk.org>
+Content-Type: text/plain; charset="utf-7"
+MIME-Version: 1.0
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
 On Mon, 2018-07-30 at 15:17 -0400, Theodore Y. Ts'o wrote:
-> I've been looking at what's the best way to make sure everything gets
-> cleanly flushed out to disk on a powerdown.  Right now in
-> __orderly_poweroff(), we call emergency_sync() which kicks a
-> workqueue to flush all file systems and block devices --- and then we
-> immediately power down the system, before the scheduler even has a
-> chance to schedule the workqueue thread.  Hopefully userspace has the
-> unmounted all file systems, which will has implicitly issued a cache
-> flush command, but if we have a userspace program writing to a block
-> device directly, currently there's nothing to make sure things will
-> get flushed out to the device.
-> 
-> Beyond that, though, I'm interested in figuring out how to make sure
-> that all SCSI devices will receive (and acknowledge) SHUTDOWN command
-> so that the disks can be spun down and heads retracted to a safe
-> landing zone before we power down the system.
++AD4- I've been looking at what's the best way to make sure everything gets
++AD4- cleanly flushed out to disk on a powerdown.  Right now in
++AD4- +AF8AXw-orderly+AF8-poweroff(), we call emergency+AF8-sync() which ki=
+cks a workqueue
++AD4- to flush all file systems and block devices --- and then we
++AD4- immediately power down the system, before the scheduler even has a
++AD4- chance to schedule the workqueue thread.  Hopefully userspace has the
++AD4- unmounted all file systems, which will has implicitly issued a cache
++AD4- flush command, but if we have a userspace program writing to a block
++AD4- device directly, currently there's nothing to make sure things will
++AD4- get flushed out to the device.
++AD4-=20
++AD4- Beyond that, though, I'm interested in figuring out how to make sure
++AD4- that all SCSI devices will receive (and acknowledge) SHUTDOWN command
++AD4- so that the disks can be spun down and heads retracted to a safe
++AD4- landing zone before we power down the system.
++AD4-=20
++AD4- It appears the best way to do this is to call sd+AF8-shutdown(), sinc=
+e we
++AD4- don't seem to have a high-level +ACI-shutdown+ACI- concept recognized=
+ in the
++AD4- block layer (the way we currently, have, say support for +ACI-discard=
++ACI-).
++AD4-=20
++AD4- So the question is, what's the best way to architect something like
++AD4- this.  I could implement a hacky interator loop in the SCSI subsystem=
+,
++AD4- and call it directly from +AF8AXw-orderly+AF8-poweroff in kernel/rebo=
+ot.c.  But
++AD4- I'm pretty sure that would never get accepted upstream, and so it
++AD4- would remain a Google data center hack.
++AD4-=20
++AD4- What do people think would be the best way of implementing something
++AD4- that would be upstream acceptable?
 
-The basic way to do this is to shut down the scsi bus, see below.
+Hi Ted,
 
-> It appears the best way to do this is to call sd_shutdown(), since we
-> don't seem to have a high-level "shutdown" concept recognized in the
-> block layer (the way we currently, have, say support for "discard").
-> 
-> So the question is, what's the best way to architect something like
-> this.  I could implement a hacky interator loop in the SCSI
-> subsystem, and call it directly from __orderly_poweroff in
-> kernel/reboot.c.  But I'm pretty sure that would never get accepted
-> upstream, and so it would remain a Google data center hack.
-> 
-> What do people think would be the best way of implementing something
-> that would be upstream acceptable?
+Isn't that behavior a bug in +AF8AXw-orderly+AF8-poweroff()? My understandi=
+ng is that
++AF8AXw-orderly+AF8-poweroff() calls run+AF8-cmd(poweroff+AF8-cmd). If the =
+poweroff command
+gets the chance to run then it will execute the reboot() system call to pow=
+er
+off the system. The reboot() system call then calls kernel+AF8-power+AF8-of=
+f(). That
+last function then calls device+AF8-shutdown(). device+AF8-shutdown() calls=
+ the
+.shutdown() method for all known devices. As you know the sd driver
+implements that method. More in detail:
 
-The sd_shutdown function is fully plumbed in to the current sysfs model
-with every scsi device being on a dummy scsi bus. So if you detach the
-device from the scsi bus, the remove function (which calls sd_shutdown)
-gets called as part of the detach.  At the moment, the way that happens
-is either by specific detach of the device or via the module_exit
-function of SCSI, so if you can get that called before the system shuts
-down everything should just work.  To be honest, I really thought this
-did actually happen anyway today.  The separate device_shutdown()
-method in the kernel_shutdown_prepare() should call our sd_shutdown
-method (eventually), can you investigate why that isn't working for you
-... is it being called too late?
+architecture code or ACPI code
+-+AD4- orderly+AF8-poweroff()
+  -+AD4- poweroff+AF8-work+AF8-func()
+    -+AD4- +AF8AXw-orderly+AF8-poweroff()
+      -+AD4- run+AF8-cmd(poweroff+AF8-cmd)
+        -+AD4- call+AF8-usermodehelper(+ACI-/sbin/poweroff+ACI-)
 
-Alternatively, if you can find a way to get sysfs to trigger a shutdown
-on all its busses at some point then we'll get swept up in that. 
-Finally, you could keep a list of busses needing to be shut down for
-storage safety and we could add scsi to that.
+>From the systemd source file src/core/shutdown.c:
 
-James
+    (void) reboot(RB+AF8-POWER+AF8-OFF)+ADs-
+
+>From kernel/reboot.c:
+
+SYSCALL+AF8-DEFINE4(reboot, int, magic1, int, magic2, unsigned int, cmd,
+		void +AF8AXw-user +ACo-, arg)
++AHs-
+	...
+	case LINUX+AF8-REBOOT+AF8-CMD+AF8-POWER+AF8-OFF:
+		kernel+AF8-power+AF8-off()+ADs-
+		do+AF8-exit(0)+ADs-
+		break+ADs-
+	...
++AH0-
+
+void kernel+AF8-power+AF8-off(void)
++AHs-
+	kernel+AF8-shutdown+AF8-prepare(SYSTEM+AF8-POWER+AF8-OFF)+ADs-
+	if (pm+AF8-power+AF8-off+AF8-prepare)
+		pm+AF8-power+AF8-off+AF8-prepare()+ADs-
+	migrate+AF8-to+AF8-reboot+AF8-cpu()+ADs-
+	syscore+AF8-shutdown()+ADs-
+	pr+AF8-emerg(+ACI-Power down+AFw-n+ACI-)+ADs-
+	kmsg+AF8-dump(KMSG+AF8-DUMP+AF8-POWEROFF)+ADs-
+	machine+AF8-power+AF8-off()+ADs-
++AH0-
+
+static void kernel+AF8-shutdown+AF8-prepare(enum system+AF8-states state)
++AHs-
+	blocking+AF8-notifier+AF8-call+AF8-chain(+ACY-reboot+AF8-notifier+AF8-list=
+,
+		(state +AD0APQ- SYSTEM+AF8-HALT) ? SYS+AF8-HALT : SYS+AF8-POWER+AF8-OFF, =
+NULL)+ADs-
+	system+AF8-state +AD0- state+ADs-
+	usermodehelper+AF8-disable()+ADs-
+	device+AF8-shutdown()+ADs-
++AH0-
+
+>From drivers/base/core.c:
+
+void device+AF8-shutdown(void)
++AHs-
+		...
+		if (dev-+AD4-class +ACYAJg- dev-+AD4-class-+AD4-shutdown+AF8-pre) +AHs-
+			if (initcall+AF8-debug)
+				dev+AF8-info(dev, +ACI-shutdown+AF8-pre+AFw-n+ACI-)+ADs-
+			dev-+AD4-class-+AD4-shutdown+AF8-pre(dev)+ADs-
+		+AH0-
+		if (dev-+AD4-bus +ACYAJg- dev-+AD4-bus-+AD4-shutdown) +AHs-
+			if (initcall+AF8-debug)
+				dev+AF8-info(dev, +ACI-shutdown+AFw-n+ACI-)+ADs-
+			dev-+AD4-bus-+AD4-shutdown(dev)+ADs-
+		+AH0- else if (dev-+AD4-driver +ACYAJg- dev-+AD4-driver-+AD4-shutdown) +A=
+Hs-
+			if (initcall+AF8-debug)
+				dev+AF8-info(dev, +ACI-shutdown+AFw-n+ACI-)+ADs-
+			dev-+AD4-driver-+AD4-shutdown(dev)+ADs-
+		+AH0-
+		...
++AH0-
+
+Bart.
