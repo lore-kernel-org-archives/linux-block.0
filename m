@@ -1,59 +1,24 @@
-Return-Path: <jinb.park7@gmail.com>
-Return-Path: <jinb.park7@gmail.com>
-Date: Sat, 28 Jul 2018 10:31:51 +0900
-From: Jinbum Park <jinb.park7@gmail.com>
-To: axboe@kernel.dk, bart.vanassche@wdc.com, jiufei.xue@linux.alibaba.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] pktcdvd: Fix possible Spectre-v1 for pkt_devs
-Message-ID: <20180728013151.GA15457@pjb1027-Latitude-E5410>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH][v3] block: don't account for split bio's size in cgroup
+ stats
+To: Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org,
+ kernel-team@fb.com
+References: <20180730141001.2617-1-josef@toxicpanda.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <45eddc00-14f7-271d-367d-8df93d757dee@kernel.dk>
+Date: Mon, 30 Jul 2018 08:26:06 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180730141001.2617-1-josef@toxicpanda.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-User controls @dev_minor which to be used as index of pkt_devs.
-So, It can be exploited via Spectre-like attack. (speculative execution)
+On 7/30/18 8:10 AM, Josef Bacik wrote:
+> We need to check in blkcg_bio_issue_check if the bio is flagged as
+> QUEUE_ENTERED, because if it is then we've already accounted for the
+> size of the IO in the cgroup stats.  We can still however account for
+> the extra IO since it'll be another request.
 
-This kind of attack leaks address of pkt_devs, [1]
-It leads an attacker to bypass security mechanism such as KASLR.
+Applied, thanks.
 
-So sanitize @dev_minor before using it to prevent attack.
-
-[1] https://github.com/jinb-park/linux-exploit/
-tree/master/exploit-remaining-spectre-gadget/leak_pkt_devs.c
-
-Signed-off-by: Jinbum Park <jinb.park7@gmail.com>
----
- drivers/block/pktcdvd.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index c61d20c..665760d 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -67,8 +67,8 @@
- #include <scsi/scsi.h>
- #include <linux/debugfs.h>
- #include <linux/device.h>
--
- #include <linux/uaccess.h>
-+#include <linux/nospec.h>
- 
- #define DRIVER_NAME	"pktcdvd"
- 
-@@ -2229,9 +2229,13 @@ static void pkt_release_dev(struct pktcdvd_device *pd, int flush)
- 
- static struct pktcdvd_device *pkt_find_dev_from_minor(unsigned int dev_minor)
- {
-+	unsigned int idx = 0;
-+
- 	if (dev_minor >= MAX_WRITERS)
- 		return NULL;
--	return pkt_devs[dev_minor];
-+
-+	idx = array_index_nospec(dev_minor, MAX_WRITERS);
-+	return pkt_devs[idx];
- }
- 
- static int pkt_open(struct block_device *bdev, fmode_t mode)
 -- 
-1.9.1
+Jens Axboe
