@@ -1,153 +1,66 @@
-Return-Path: <huijin.park@samsung.com>
-From: Huijin Park <huijin.park@samsung.com>
+Return-Path: <hare@suse.de>
+From: Hannes Reinecke <hare@suse.de>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, Huijin Park
-	<huijin.park@samsung.com>, js07.lee@samsung.com, bbanghj.park@gmail.com
-Subject: [PATCH] genhd: incrase size of disk stat counters
-Date: Mon, 30 Jul 2018 07:43:10 -0400
-Message-id: <1532950990-1657-1-git-send-email-huijin.park@samsung.com>
-References: <CGME20180730114602eucas1p14b7cd9e90df341d88fa5d97ec74f005a@eucas1p1.samsung.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	linux-block@vger.kernel.org,
+	Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 0/6] genhd: register default groups with device_add_disk()
+Date: Mon, 30 Jul 2018 09:12:21 +0200
+Message-Id: <20180730071227.22887-1-hare@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: "huijin.park" <huijin.park@samsung.com>
+device_add_disk() doesn't allow to register with default sysfs groups,
+which introduces a race with udev as these groups have to be created after
+the uevent has been sent.
+This patchset updates device_add_disk() to accept a 'groups' argument to
+avoid this race and updates the obvious drivers to use it.
+There are some more drivers which might benefit from this (eg loop or md),
+but the interface is not straightforward so I haven't attempted it.
 
-The kernel's representation of the disk statistics uses different size
-on 32b and 64b platforms. But the data size of io is not different
-between 32b and 64b platforms. So in the 32b platform, it might happen
-overflow earlier than 64b platform. Therefore, it seems like a better
-approach would be to extend the length of the disk_stats structure on
-32b architectures to 64b.
+As usual, comments and reviews are welcome.
 
-Signed-off-by: huijin.park <huijin.park@samsung.com>
----
- block/genhd.c             |   28 +++++++++++++++++++---------
- block/partition-generic.c |   31 +++++++++++++++++++------------
- include/linux/genhd.h     |   12 ++++++------
- 3 files changed, 44 insertions(+), 27 deletions(-)
+Hannes Reinecke (6):
+  genhd: drop 'bool' argument from __device_add_disk()
+  block: genhd: add 'groups' argument to device_add_disk
+  nvme: register ns_id attributes as default sysfs groups
+  aoe: use device_add_disk_with_groups()
+  zram: register default groups with device_add_disk()
+  virtio-blk: modernize sysfs attribute creation
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 8cc719a3..3e6d0c2 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1334,27 +1334,37 @@ static int diskstats_show(struct seq_file *seqf, void *v)
- 		part_stat_unlock();
- 		part_in_flight(gp->queue, hd, inflight);
- 		seq_printf(seqf, "%4d %7d %s "
--			   "%lu %lu %lu %u "
--			   "%lu %lu %lu %u "
--			   "%u %u %u "
--			   "%lu %lu %lu %u\n",
-+			   "%llu %llu %llu %llu "
-+			   "%llu %llu %llu %llu "
-+			   "%u %llu %llu "
-+			   "%llu %llu %llu %llu\n",
- 			   MAJOR(part_devt(hd)), MINOR(part_devt(hd)),
- 			   disk_name(gp, hd->partno, buf),
- 			   part_stat_read(hd, ios[STAT_READ]),
- 			   part_stat_read(hd, merges[STAT_READ]),
- 			   part_stat_read(hd, sectors[STAT_READ]),
--			   jiffies_to_msecs(part_stat_read(hd, ticks[STAT_READ])),
-+			   div_u64(jiffies64_to_nsecs(part_stat_read(hd,
-+							ticks[STAT_READ])),
-+				   NSEC_PER_MSEC),
- 			   part_stat_read(hd, ios[STAT_WRITE]),
- 			   part_stat_read(hd, merges[STAT_WRITE]),
- 			   part_stat_read(hd, sectors[STAT_WRITE]),
--			   jiffies_to_msecs(part_stat_read(hd, ticks[STAT_WRITE])),
-+			   div_u64(jiffies64_to_nsecs(part_stat_read(hd,
-+							ticks[STAT_WRITE])),
-+				   NSEC_PER_MSEC),
- 			   inflight[0],
--			   jiffies_to_msecs(part_stat_read(hd, io_ticks)),
--			   jiffies_to_msecs(part_stat_read(hd, time_in_queue)),
-+			   div_u64(jiffies64_to_nsecs(part_stat_read(hd,
-+							io_ticks)),
-+				   NSEC_PER_MSEC),
-+			   div_u64(jiffies64_to_nsecs(part_stat_read(hd,
-+							time_in_queue)),
-+				   NSEC_PER_MSEC),
- 			   part_stat_read(hd, ios[STAT_DISCARD]),
- 			   part_stat_read(hd, merges[STAT_DISCARD]),
- 			   part_stat_read(hd, sectors[STAT_DISCARD]),
--			   jiffies_to_msecs(part_stat_read(hd, ticks[STAT_DISCARD]))
-+			   div_u64(jiffies64_to_nsecs(part_stat_read(hd,
-+							ticks[STAT_DISCARD])),
-+				   NSEC_PER_MSEC)
- 			);
- 	}
- 	disk_part_iter_exit(&piter);
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 5a8975a..108b473 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -128,26 +128,33 @@ ssize_t part_stat_show(struct device *dev,
- 	part_stat_unlock();
- 	part_in_flight(q, p, inflight);
- 	return sprintf(buf,
--		"%8lu %8lu %8llu %8u "
--		"%8lu %8lu %8llu %8u "
--		"%8u %8u %8u "
--		"%8lu %8lu %8llu %8u"
-+		"%8llu %8llu %8llu %8llu "
-+		"%8llu %8llu %8llu %8llu "
-+		"%8u %8llu %8llu "
-+		"%8llu %8llu %8llu %8llu"
- 		"\n",
- 		part_stat_read(p, ios[STAT_READ]),
- 		part_stat_read(p, merges[STAT_READ]),
--		(unsigned long long)part_stat_read(p, sectors[STAT_READ]),
--		jiffies_to_msecs(part_stat_read(p, ticks[STAT_READ])),
-+		part_stat_read(p, sectors[STAT_READ]),
-+		div_u64(jiffies64_to_nsecs(part_stat_read(p, ticks[STAT_READ])),
-+			NSEC_PER_MSEC),
- 		part_stat_read(p, ios[STAT_WRITE]),
- 		part_stat_read(p, merges[STAT_WRITE]),
--		(unsigned long long)part_stat_read(p, sectors[STAT_WRITE]),
--		jiffies_to_msecs(part_stat_read(p, ticks[STAT_WRITE])),
-+		part_stat_read(p, sectors[STAT_WRITE]),
-+		div_u64(jiffies64_to_nsecs(part_stat_read(p,
-+							  ticks[STAT_WRITE])),
-+			NSEC_PER_MSEC),
- 		inflight[0],
--		jiffies_to_msecs(part_stat_read(p, io_ticks)),
--		jiffies_to_msecs(part_stat_read(p, time_in_queue)),
-+		div_u64(jiffies64_to_nsecs(part_stat_read(p, io_ticks)),
-+			NSEC_PER_MSEC),
-+		div_u64(jiffies64_to_nsecs(part_stat_read(p, time_in_queue)),
-+			NSEC_PER_MSEC),
- 		part_stat_read(p, ios[STAT_DISCARD]),
- 		part_stat_read(p, merges[STAT_DISCARD]),
--		(unsigned long long)part_stat_read(p, sectors[STAT_DISCARD]),
--		jiffies_to_msecs(part_stat_read(p, ticks[STAT_DISCARD])));
-+		part_stat_read(p, sectors[STAT_DISCARD]),
-+		div_u64(jiffies64_to_nsecs(part_stat_read(p,
-+							  ticks[STAT_DISCARD])),
-+			NSEC_PER_MSEC));
- }
- 
- ssize_t part_inflight_show(struct device *dev, struct device_attribute *attr,
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 5786442..d4cb798 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -83,12 +83,12 @@ struct partition {
- } __attribute__((packed));
- 
- struct disk_stats {
--	unsigned long sectors[NR_STAT_GROUPS];
--	unsigned long ios[NR_STAT_GROUPS];
--	unsigned long merges[NR_STAT_GROUPS];
--	unsigned long ticks[NR_STAT_GROUPS];
--	unsigned long io_ticks;
--	unsigned long time_in_queue;
-+	unsigned long long sectors[NR_STAT_GROUPS];
-+	unsigned long long ios[NR_STAT_GROUPS];
-+	unsigned long long merges[NR_STAT_GROUPS];
-+	unsigned long long ticks[NR_STAT_GROUPS];
-+	unsigned long long io_ticks;
-+	unsigned long long time_in_queue;
- };
- 
- #define PARTITION_META_INFO_VOLNAMELTH	64
+ arch/um/drivers/ubd_kern.c          |  2 +-
+ block/genhd.c                       | 39 ++++++++++++++-------
+ drivers/block/aoe/aoe.h             |  1 -
+ drivers/block/aoe/aoeblk.c          | 21 ++++--------
+ drivers/block/aoe/aoedev.c          |  1 -
+ drivers/block/floppy.c              |  2 +-
+ drivers/block/mtip32xx/mtip32xx.c   |  2 +-
+ drivers/block/ps3disk.c             |  2 +-
+ drivers/block/ps3vram.c             |  2 +-
+ drivers/block/rsxx/dev.c            |  2 +-
+ drivers/block/skd_main.c            |  2 +-
+ drivers/block/sunvdc.c              |  2 +-
+ drivers/block/virtio_blk.c          | 68 +++++++++++++++++++++----------------
+ drivers/block/xen-blkfront.c        |  2 +-
+ drivers/block/zram/zram_drv.c       | 28 ++++-----------
+ drivers/ide/ide-cd.c                |  2 +-
+ drivers/ide/ide-gd.c                |  2 +-
+ drivers/memstick/core/ms_block.c    |  2 +-
+ drivers/memstick/core/mspro_block.c |  2 +-
+ drivers/mmc/core/block.c            |  2 +-
+ drivers/mtd/mtd_blkdevs.c           |  2 +-
+ drivers/nvdimm/blk.c                |  2 +-
+ drivers/nvdimm/btt.c                |  2 +-
+ drivers/nvdimm/pmem.c               |  2 +-
+ drivers/nvme/host/core.c            | 13 ++++---
+ drivers/nvme/host/multipath.c       | 15 +++-----
+ drivers/nvme/host/nvme.h            |  2 +-
+ drivers/s390/block/dasd_genhd.c     |  2 +-
+ drivers/s390/block/dcssblk.c        |  2 +-
+ drivers/s390/block/scm_blk.c        |  2 +-
+ drivers/scsi/sd.c                   |  2 +-
+ drivers/scsi/sr.c                   |  2 +-
+ include/linux/genhd.h               |  5 +--
+ 33 files changed, 117 insertions(+), 122 deletions(-)
+
 -- 
-1.7.9.5
+2.12.3
