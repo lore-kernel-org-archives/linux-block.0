@@ -1,159 +1,120 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:60870 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730095AbeGZPkY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jul 2018 11:40:24 -0400
-From: Coly Li <colyli@suse.de>
-To: colyli@suse.de, linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 7/9] bcache: add code comments for bset.c
-Date: Thu, 26 Jul 2018 22:22:37 +0800
-Message-Id: <20180726142239.44669-8-colyli@suse.de>
-In-Reply-To: <20180726142239.44669-1-colyli@suse.de>
-References: <20180726142239.44669-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=7421cc28f=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Omar Sandoval <osandov@fb.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Alexandru Moise <00moses.alexander00@gmail.com>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v4 1/2] block: Introduce blk_exit_queue()
+Date: Mon, 30 Jul 2018 14:10:55 -0700
+Message-Id: <20180730211056.18570-2-bart.vanassche@wdc.com>
+In-Reply-To: <20180730211056.18570-1-bart.vanassche@wdc.com>
+References: <20180730211056.18570-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-This patch tries to add code comments in bset.c, to make some
-tricky code and designment to be more comprehensible. Most information
-of this patch comes from the discussion between Kent and I, he
-offers very informative details. If there is any mistake
-of the idea behind the code, no doubt that's from me misrepresentation.
+This patch does not change any functionality.
 
-Signed-off-by: Coly Li <colyli@suse.de>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Alexandru Moise <00moses.alexander00@gmail.com>
+Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
+Cc: <stable@vger.kernel.org>
 ---
- drivers/md/bcache/bset.c | 63 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 63 insertions(+)
+ block/blk-core.c | 54 +++++++++++++++++++++++++++---------------------
+ block/blk.h      |  1 +
+ 2 files changed, 31 insertions(+), 24 deletions(-)
 
-diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
-index f3403b45bc28..596c93b44e9b 100644
---- a/drivers/md/bcache/bset.c
-+++ b/drivers/md/bcache/bset.c
-@@ -366,6 +366,10 @@ EXPORT_SYMBOL(bch_btree_keys_init);
- 
- /* Binary tree stuff for auxiliary search trees */
- 
-+/*
-+ * return array index next to j when does in-order traverse
-+ * of a binary tree which is stored in a linear array
-+ */
- static unsigned inorder_next(unsigned j, unsigned size)
- {
- 	if (j * 2 + 1 < size) {
-@@ -379,6 +383,10 @@ static unsigned inorder_next(unsigned j, unsigned size)
- 	return j;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 7c65e297a4f1..5fbfa8484c95 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -719,6 +719,35 @@ void blk_set_queue_dying(struct request_queue *q)
  }
+ EXPORT_SYMBOL_GPL(blk_set_queue_dying);
  
-+/*
-+ * return array index previous to j when does in-order traverse
-+ * of a binary tree which is stored in a linear array
-+ */
- static unsigned inorder_prev(unsigned j, unsigned size)
- {
- 	if (j * 2 < size) {
-@@ -421,6 +429,10 @@ static unsigned __to_inorder(unsigned j, unsigned size, unsigned extra)
- 	return j;
- }
- 
-+/*
-+ * Return the cacheline index in bset_tree->data, where j is index
-+ * from a linear array which stores the auxiliar binary tree
-+ */
- static unsigned to_inorder(unsigned j, struct bset_tree *t)
- {
- 	return __to_inorder(j, t->size, t->extra);
-@@ -441,6 +453,10 @@ static unsigned __inorder_to_tree(unsigned j, unsigned size, unsigned extra)
- 	return j;
- }
- 
-+/*
-+ * Return an index from a linear array which stores the auxiliar binary
-+ * tree, j is the cacheline index of t->data.
-+ */
- static unsigned inorder_to_tree(unsigned j, struct bset_tree *t)
- {
- 	return __inorder_to_tree(j, t->size, t->extra);
-@@ -546,6 +562,20 @@ static inline uint64_t shrd128(uint64_t high, uint64_t low, uint8_t shift)
- 	return low;
- }
- 
-+/*
-+ * Calculate mantissa value for struct bkey_float.
-+ * If most significant bit of f->exponent is not set, then
-+ *  - f->exponent >> 6 is 0
-+ *  - p[0] points to bkey->low
-+ *  - p[-1] borrows bits from KEY_INODE() of bkey->high
-+ * if most isgnificant bits of f->exponent is set, then
-+ *  - f->exponent >> 6 is 1
-+ *  - p[0] points to bits from KEY_INODE() of bkey->high
-+ *  - p[-1] points to other bits from KEY_INODE() of
-+ *    bkey->high too.
-+ * See make_bfloat() to check when most significant bit of f->exponent
-+ * is set or not.
-+ */
- static inline unsigned bfloat_mantissa(const struct bkey *k,
- 				       struct bkey_float *f)
- {
-@@ -570,6 +600,16 @@ static void make_bfloat(struct bset_tree *t, unsigned j)
- 	BUG_ON(m < l || m > r);
- 	BUG_ON(bkey_next(p) != m);
- 
++/* Unconfigure the I/O scheduler and dissociate from the cgroup controller. */
++void blk_exit_queue(struct request_queue *q)
++{
 +	/*
-+	 * If l and r have different KEY_INODE values (different backing
-+	 * device), f->exponent records how many least significant bits
-+	 * are different in KEY_INODE values and sets most significant
-+	 * bits to 1 (by +64).
-+	 * If l and r have same KEY_INODE value, f->exponent records
-+	 * how many different bits in least significant bits of bkey->low.
-+	 * See bfloat_mantiss() how the most significant bit of
-+	 * f->exponent is used to calculate bfloat mantissa value.
++	 * Since the I/O scheduler exit code may access cgroup information,
++	 * perform I/O scheduler exit before disassociating from the block
++	 * cgroup controller.
 +	 */
- 	if (KEY_INODE(l) != KEY_INODE(r))
- 		f->exponent = fls64(KEY_INODE(r) ^ KEY_INODE(l)) + 64;
- 	else
-@@ -633,6 +673,15 @@ void bch_bset_init_next(struct btree_keys *b, struct bset *i, uint64_t magic)
- }
- EXPORT_SYMBOL(bch_bset_init_next);
++	if (q->elevator) {
++		ioc_clear_queue(q);
++		elevator_exit(q, q->elevator);
++		q->elevator = NULL;
++	}
++
++	/*
++	 * Remove all references to @q from the block cgroup controller before
++	 * restoring @q->queue_lock to avoid that restoring this pointer causes
++	 * e.g. blkcg_print_blkgs() to crash.
++	 */
++	blkcg_exit_queue(q);
++
++	/*
++	 * Since the cgroup code may dereference the @q->backing_dev_info
++	 * pointer, only decrease its reference count after having removed the
++	 * association with the block cgroup controller.
++	 */
++	bdi_put(q->backing_dev_info);
++}
++
+ /**
+  * blk_cleanup_queue - shutdown a request queue
+  * @q: request queue to shutdown
+@@ -788,30 +817,7 @@ void blk_cleanup_queue(struct request_queue *q)
+ 	 */
+ 	WARN_ON_ONCE(q->kobj.state_in_sysfs);
  
-+/*
-+ * Build auxiliary binary tree 'struct bset_tree *t', this tree is used to
-+ * accelerate bkey search in a btree node (pointed by bset_tree->data in
-+ * memory). After search in the auxiliar tree by calling bset_search_tree(),
-+ * a struct bset_search_iter is returned which indicates range [l, r] from
-+ * bset_tree->data where the searching bkey might be inside. Then a followed
-+ * linear comparison does the exact search, see __bch_bset_search() for how
-+ * the auxiliary tree is used.
-+ */
- void bch_bset_build_written_tree(struct btree_keys *b)
- {
- 	struct bset_tree *t = bset_tree_last(b);
-@@ -898,6 +947,17 @@ static struct bset_search_iter bset_search_tree(struct bset_tree *t,
- 	unsigned inorder, j, n = 1;
+-	/*
+-	 * Since the I/O scheduler exit code may access cgroup information,
+-	 * perform I/O scheduler exit before disassociating from the block
+-	 * cgroup controller.
+-	 */
+-	if (q->elevator) {
+-		ioc_clear_queue(q);
+-		elevator_exit(q, q->elevator);
+-		q->elevator = NULL;
+-	}
+-
+-	/*
+-	 * Remove all references to @q from the block cgroup controller before
+-	 * restoring @q->queue_lock to avoid that restoring this pointer causes
+-	 * e.g. blkcg_print_blkgs() to crash.
+-	 */
+-	blkcg_exit_queue(q);
+-
+-	/*
+-	 * Since the cgroup code may dereference the @q->backing_dev_info
+-	 * pointer, only decrease its reference count after having removed the
+-	 * association with the block cgroup controller.
+-	 */
+-	bdi_put(q->backing_dev_info);
++	blk_exit_queue(q);
  
- 	do {
-+		/*
-+		 * A bit trick here.
-+		 * If p < t->size, (int)(p - t->size) is a minus value and
-+		 * the most significant bit is set, right shifting 31 bits
-+		 * gets 1. If p >= t->size, the most significant bit is
-+		 * not set, right shifting 31 bits gets 0.
-+		 * So the following 2 lines equals to
-+		 *	if (p >= t->size)
-+		 *		p = 0;
-+		 * but a branch instruction is avoided.
-+		 */
- 		unsigned p = n << 4;
- 		p &= ((int) (p - t->size)) >> 31;
- 
-@@ -907,6 +967,9 @@ static struct bset_search_iter bset_search_tree(struct bset_tree *t,
- 		f = &t->tree[j];
- 
- 		/*
-+		 * Similar bit trick, use subtract operation to avoid a branch
-+		 * instruction.
-+		 *
- 		 * n = (f->mantissa > bfloat_mantissa())
- 		 *	? j * 2
- 		 *	: j * 2 + 1;
+ 	if (q->mq_ops)
+ 		blk_mq_free_queue(q);
+diff --git a/block/blk.h b/block/blk.h
+index 6adae8f94279..aeb8026f4d7b 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -130,6 +130,7 @@ void blk_free_flush_queue(struct blk_flush_queue *q);
+ int blk_init_rl(struct request_list *rl, struct request_queue *q,
+ 		gfp_t gfp_mask);
+ void blk_exit_rl(struct request_queue *q, struct request_list *rl);
++void blk_exit_queue(struct request_queue *q);
+ void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
+ 			struct bio *bio);
+ void blk_queue_bypass_start(struct request_queue *q);
 -- 
-2.17.1
+2.18.0
