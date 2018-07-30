@@ -1,24 +1,48 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH][v3] block: don't account for split bio's size in cgroup
- stats
-To: Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org,
- kernel-team@fb.com
-References: <20180730141001.2617-1-josef@toxicpanda.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <45eddc00-14f7-271d-367d-8df93d757dee@kernel.dk>
-Date: Mon, 30 Jul 2018 08:26:06 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180730141001.2617-1-josef@toxicpanda.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	kernel-team@fb.com
+Subject: [PATCH][v3] block: don't account for split bio's size in cgroup stats
+Date: Mon, 30 Jul 2018 10:10:01 -0400
+Message-Id: <20180730141001.2617-1-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 7/30/18 8:10 AM, Josef Bacik wrote:
-> We need to check in blkcg_bio_issue_check if the bio is flagged as
-> QUEUE_ENTERED, because if it is then we've already accounted for the
-> size of the IO in the cgroup stats.  We can still however account for
-> the extra IO since it'll be another request.
+We need to check in blkcg_bio_issue_check if the bio is flagged as
+QUEUE_ENTERED, because if it is then we've already accounted for the
+size of the IO in the cgroup stats.  We can still however account for
+the extra IO since it'll be another request.
 
-Applied, thanks.
+Reported-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+---
+v2->v3:
+- this one actually compiles
 
+ include/linux/blk-cgroup.h | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 3bed5e02a873..f7b910768306 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -769,8 +769,14 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
+ 
+ 	if (!throtl) {
+ 		blkg = blkg ?: q->root_blkg;
+-		blkg_rwstat_add(&blkg->stat_bytes, bio->bi_opf,
+-				bio->bi_iter.bi_size);
++		/*
++		 * If the bio is flagged with BIO_QUEUE_ENTERED it means this
++		 * is a split bio and we would have already accounted for the
++		 * size of the bio.
++		 */
++		if (!bio_flagged(bio, BIO_QUEUE_ENTERED))
++			blkg_rwstat_add(&blkg->stat_bytes, bio->bi_opf,
++					bio->bi_iter.bi_size);
+ 		blkg_rwstat_add(&blkg->stat_ios, bio->bi_opf, 1);
+ 	}
+ 
 -- 
-Jens Axboe
+2.14.3
