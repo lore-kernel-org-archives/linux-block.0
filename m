@@ -1,61 +1,39 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:60776 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730533AbeGZPkK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jul 2018 11:40:10 -0400
-From: Coly Li <colyli@suse.de>
-To: colyli@suse.de, linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 3/9] bcache: avoid unncessary cache prefetch bch_btree_node_get()
-Date: Thu, 26 Jul 2018 22:22:33 +0800
-Message-Id: <20180726142239.44669-4-colyli@suse.de>
-In-Reply-To: <20180726142239.44669-1-colyli@suse.de>
-References: <20180726142239.44669-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	kernel-team@fb.com
+Subject: [PATCH 2/3] blk-cgroup: hold the queue ref during throttling
+Date: Tue, 31 Jul 2018 12:39:03 -0400
+Message-Id: <20180731163904.21856-3-josef@toxicpanda.com>
+In-Reply-To: <20180731163904.21856-1-josef@toxicpanda.com>
+References: <20180731163904.21856-1-josef@toxicpanda.com>
+List-ID: <linux-block@vger.kernel.org>
 
-In bch_btree_node_get() the read-in btree node will be partially
-prefetched into L1 cache for following bset iteration (if there is).
-But if the btree node read is failed, the perfetch operations will
-waste L1 cache space. This patch checkes whether read operation and
-only does cache prefetch when read I/O successed.
+The blkg lifetime is protected by the queue lifetime, so we need to put
+the queue _after_ we're done using the blkg.
 
-Signed-off-by: Coly Li <colyli@suse.de>
+Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 ---
- drivers/md/bcache/btree.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ block/blk-cgroup.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 475008fbbaab..c19f7716df88 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -1011,6 +1011,13 @@ struct btree *bch_btree_node_get(struct cache_set *c, struct btree_op *op,
- 		BUG_ON(b->level != level);
- 	}
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 1942357d7165..694595b29b8f 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1759,10 +1759,10 @@ void blkcg_maybe_throttle_current(void)
+ 	if (!blkg)
+ 		goto out;
+ 	rcu_read_unlock();
+-	blk_put_queue(q);
  
-+	if (btree_node_io_error(b)) {
-+		rw_unlock(write, b);
-+		return ERR_PTR(-EIO);
-+	}
-+
-+	BUG_ON(!b->written);
-+
- 	b->parent = parent;
- 	b->accessed = 1;
- 
-@@ -1022,13 +1029,6 @@ struct btree *bch_btree_node_get(struct cache_set *c, struct btree_op *op,
- 	for (; i <= b->keys.nsets; i++)
- 		prefetch(b->keys.set[i].data);
- 
--	if (btree_node_io_error(b)) {
--		rw_unlock(write, b);
--		return ERR_PTR(-EIO);
--	}
--
--	BUG_ON(!b->written);
--
- 	return b;
- }
- 
+ 	blkcg_maybe_throttle_blkg(blkg, use_memdelay);
+ 	blkg_put(blkg);
++	blk_put_queue(q);
+ 	return;
+ out:
+ 	rcu_read_unlock();
 -- 
-2.17.1
+2.14.3
