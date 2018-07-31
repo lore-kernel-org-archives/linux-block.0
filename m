@@ -1,113 +1,136 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
+Return-Path: <keescook@chromium.org>
+Return-Path: <keescook@chromium.org>
+From: Kees Cook <keescook@chromium.org>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
+Cc: Kees Cook <keescook@chromium.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	Tejun Heo <tj@kernel.org>,
+	Borislav Petkov <bp@alien8.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
+	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
+	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
+	"Nicholas A. Bellinger" <nab@linux-iscsi.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Philippe Ombredanne <pombredanne@nexb.com>,
+	Stephen Boyd <sboyd@codeaurora.org>,
+	Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
+	Juergen Gross <jgross@suse.com>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Sagar Dharia <sdharia@codeaurora.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Vinod Koul <vinod.koul@intel.com>,
+	David Kershner <david.kershner@unisys.com>,
 	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Martin Wilck <martin.wilck@suse.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 3/5] nvme: register ns_id attributes as default sysfs groups
-Date: Wed, 25 Jul 2018 08:28:38 +0200
-Message-Id: <20180725062840.94114-4-hare@suse.de>
-In-Reply-To: <20180725062840.94114-1-hare@suse.de>
-References: <20180725062840.94114-1-hare@suse.de>
+	linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	target-devel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 2/9] scsi: cxlflash: Drop unused sense buffers
+Date: Tue, 31 Jul 2018 12:51:47 -0700
+Message-Id: <20180731195155.46664-3-keescook@chromium.org>
+In-Reply-To: <20180731195155.46664-1-keescook@chromium.org>
+References: <20180731195155.46664-1-keescook@chromium.org>
 List-ID: <linux-block@vger.kernel.org>
 
-We should be registering the ns_id attribute as default sysfs
-attribute groups, otherwise we have a race condition between
-the uevent and the attributes appearing in sysfs.
+This removes the unused sense buffer in read_cap16() and write_same16().
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Matthew R. Ochs <mrochs@linux.vnet.ibm.com>
 ---
- drivers/nvme/host/core.c      | 14 +++++++-------
- drivers/nvme/host/multipath.c | 12 +++---------
- drivers/nvme/host/nvme.h      |  2 +-
- 3 files changed, 11 insertions(+), 17 deletions(-)
+ drivers/scsi/cxlflash/superpipe.c | 8 ++------
+ drivers/scsi/cxlflash/vlun.c      | 7 ++-----
+ 2 files changed, 4 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index e77e6418a21c..45dab8d4aff2 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2689,6 +2689,11 @@ const struct attribute_group nvme_ns_id_attr_group = {
- 	.is_visible	= nvme_ns_id_attrs_are_visible,
- };
+diff --git a/drivers/scsi/cxlflash/superpipe.c b/drivers/scsi/cxlflash/superpipe.c
+index 2fe79df5c73c..59b9f2023748 100644
+--- a/drivers/scsi/cxlflash/superpipe.c
++++ b/drivers/scsi/cxlflash/superpipe.c
+@@ -324,7 +324,6 @@ static int read_cap16(struct scsi_device *sdev, struct llun_info *lli)
+ 	struct scsi_sense_hdr sshdr;
+ 	u8 *cmd_buf = NULL;
+ 	u8 *scsi_cmd = NULL;
+-	u8 *sense_buf = NULL;
+ 	int rc = 0;
+ 	int result = 0;
+ 	int retry_cnt = 0;
+@@ -333,8 +332,7 @@ static int read_cap16(struct scsi_device *sdev, struct llun_info *lli)
+ retry:
+ 	cmd_buf = kzalloc(CMD_BUFSIZE, GFP_KERNEL);
+ 	scsi_cmd = kzalloc(MAX_COMMAND_SIZE, GFP_KERNEL);
+-	sense_buf = kzalloc(SCSI_SENSE_BUFFERSIZE, GFP_KERNEL);
+-	if (unlikely(!cmd_buf || !scsi_cmd || !sense_buf)) {
++	if (unlikely(!cmd_buf || !scsi_cmd)) {
+ 		rc = -ENOMEM;
+ 		goto out;
+ 	}
+@@ -349,7 +347,7 @@ static int read_cap16(struct scsi_device *sdev, struct llun_info *lli)
+ 	/* Drop the ioctl read semahpore across lengthy call */
+ 	up_read(&cfg->ioctl_rwsem);
+ 	result = scsi_execute(sdev, scsi_cmd, DMA_FROM_DEVICE, cmd_buf,
+-			      CMD_BUFSIZE, sense_buf, &sshdr, to, CMD_RETRIES,
++			      CMD_BUFSIZE, NULL, &sshdr, to, CMD_RETRIES,
+ 			      0, 0, NULL);
+ 	down_read(&cfg->ioctl_rwsem);
+ 	rc = check_state(cfg);
+@@ -380,7 +378,6 @@ static int read_cap16(struct scsi_device *sdev, struct llun_info *lli)
+ 					if (retry_cnt++ < 1) {
+ 						kfree(cmd_buf);
+ 						kfree(scsi_cmd);
+-						kfree(sense_buf);
+ 						goto retry;
+ 					}
+ 				}
+@@ -411,7 +408,6 @@ static int read_cap16(struct scsi_device *sdev, struct llun_info *lli)
+ out:
+ 	kfree(cmd_buf);
+ 	kfree(scsi_cmd);
+-	kfree(sense_buf);
  
-+const struct attribute_group *nvme_ns_id_attr_groups[] = {
-+	&nvme_ns_id_attr_group,
-+	NULL,
-+};
-+
- #define nvme_show_str_function(field)						\
- static ssize_t  field##_show(struct device *dev,				\
- 			    struct device_attribute *attr, char *buf)		\
-@@ -3056,11 +3061,8 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 
- 	kfree(id);
- 
--	device_add_disk(ctrl->device, ns->disk);
--	if (sysfs_create_group(&disk_to_dev(ns->disk)->kobj,
--					&nvme_ns_id_attr_group))
--		pr_warn("%s: failed to create sysfs group for identification\n",
--			ns->disk->disk_name);
-+	device_add_disk_with_groups(ctrl->device, ns->disk,
-+				    nvme_ns_id_attr_groups);
- 	if (ns->ndev && nvme_nvm_register_sysfs(ns))
- 		pr_warn("%s: failed to register lightnvm sysfs group for identification\n",
- 			ns->disk->disk_name);
-@@ -3087,8 +3089,6 @@ static void nvme_ns_remove(struct nvme_ns *ns)
- 
- 	nvme_fault_inject_fini(ns);
- 	if (ns->disk && ns->disk->flags & GENHD_FL_UP) {
--		sysfs_remove_group(&disk_to_dev(ns->disk)->kobj,
--					&nvme_ns_id_attr_group);
- 		if (ns->ndev)
- 			nvme_nvm_unregister_sysfs(ns);
- 		del_gendisk(ns->disk);
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index 1ffd3e8b13a1..2f57ff69e26d 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -226,13 +226,9 @@ void nvme_mpath_add_disk(struct nvme_ns_head *head)
- 		return;
- 
- 	mutex_lock(&head->subsys->lock);
--	if (!(head->disk->flags & GENHD_FL_UP)) {
--		device_add_disk(&head->subsys->dev, head->disk);
--		if (sysfs_create_group(&disk_to_dev(head->disk)->kobj,
--				&nvme_ns_id_attr_group))
--			pr_warn("%s: failed to create sysfs group for identification\n",
--				head->disk->disk_name);
--	}
-+	if (!(head->disk->flags & GENHD_FL_UP))
-+		device_add_disk_with_groups(&head->subsys->dev, head->disk,
-+					    nvme_ns_id_attr_groups);
- 	mutex_unlock(&head->subsys->lock);
- }
- 
-@@ -240,8 +236,6 @@ void nvme_mpath_remove_disk(struct nvme_ns_head *head)
+ 	dev_dbg(dev, "%s: maxlba=%lld blklen=%d rc=%d\n",
+ 		__func__, gli->max_lba, gli->blk_len, rc);
+diff --git a/drivers/scsi/cxlflash/vlun.c b/drivers/scsi/cxlflash/vlun.c
+index 5deef57a7834..e7e9b2f2ad21 100644
+--- a/drivers/scsi/cxlflash/vlun.c
++++ b/drivers/scsi/cxlflash/vlun.c
+@@ -425,7 +425,6 @@ static int write_same16(struct scsi_device *sdev,
  {
- 	if (!head->disk)
- 		return;
--	sysfs_remove_group(&disk_to_dev(head->disk)->kobj,
--			   &nvme_ns_id_attr_group);
- 	del_gendisk(head->disk);
- 	blk_set_queue_dying(head->disk->queue);
- 	/* make sure all pending bios are cleaned up */
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 4ad0c8ad2a27..4b911274150d 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -446,7 +446,7 @@ int nvme_delete_ctrl_sync(struct nvme_ctrl *ctrl);
- int nvme_get_log_ext(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
- 		u8 log_page, void *log, size_t size, u64 offset);
+ 	u8 *cmd_buf = NULL;
+ 	u8 *scsi_cmd = NULL;
+-	u8 *sense_buf = NULL;
+ 	int rc = 0;
+ 	int result = 0;
+ 	u64 offset = lba;
+@@ -439,8 +438,7 @@ static int write_same16(struct scsi_device *sdev,
  
--extern const struct attribute_group nvme_ns_id_attr_group;
-+extern const struct attribute_group *nvme_ns_id_attr_groups[];
- extern const struct block_device_operations nvme_ns_head_ops;
- 
- #ifdef CONFIG_NVME_MULTIPATH
+ 	cmd_buf = kzalloc(CMD_BUFSIZE, GFP_KERNEL);
+ 	scsi_cmd = kzalloc(MAX_COMMAND_SIZE, GFP_KERNEL);
+-	sense_buf = kzalloc(SCSI_SENSE_BUFFERSIZE, GFP_KERNEL);
+-	if (unlikely(!cmd_buf || !scsi_cmd || !sense_buf)) {
++	if (unlikely(!cmd_buf || !scsi_cmd)) {
+ 		rc = -ENOMEM;
+ 		goto out;
+ 	}
+@@ -456,7 +454,7 @@ static int write_same16(struct scsi_device *sdev,
+ 		/* Drop the ioctl read semahpore across lengthy call */
+ 		up_read(&cfg->ioctl_rwsem);
+ 		result = scsi_execute(sdev, scsi_cmd, DMA_TO_DEVICE, cmd_buf,
+-				      CMD_BUFSIZE, sense_buf, NULL, to,
++				      CMD_BUFSIZE, NULL, NULL, to,
+ 				      CMD_RETRIES, 0, 0, NULL);
+ 		down_read(&cfg->ioctl_rwsem);
+ 		rc = check_state(cfg);
+@@ -481,7 +479,6 @@ static int write_same16(struct scsi_device *sdev,
+ out:
+ 	kfree(cmd_buf);
+ 	kfree(scsi_cmd);
+-	kfree(sense_buf);
+ 	dev_dbg(dev, "%s: returning rc=%d\n", __func__, rc);
+ 	return rc;
+ }
 -- 
-2.12.3
+2.17.1
