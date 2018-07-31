@@ -1,190 +1,44 @@
-Return-Path: <keescook@chromium.org>
-Return-Path: <keescook@chromium.org>
+Return-Path: <keescook@google.com>
+MIME-Version: 1.0
+Sender: keescook@google.com
+In-Reply-To: <20180731075305.GA16318@infradead.org>
+References: <CAGXu5jJsGWDsZNDJvUUqncSaAcvond_B_J7=BbvVW0X3r6Sxww@mail.gmail.com>
+ <aa150272-ffeb-fb8f-7303-0d9502cf9a71@kernel.dk> <20180523142545.GA16248@infradead.org>
+ <24d36869-e037-042d-cb16-20a81b34eb76@kernel.dk> <CAGXu5jJn=1Rz=D8VUwv_VoaGoLtaD=+tcPZxQxntweZoZwFa5Q@mail.gmail.com>
+ <f4eb4cd5-8976-3990-69b0-26cca054aa45@kernel.dk> <20180524080015.GA2866@infradead.org>
+ <CAGXu5j+pRUWgny+h5ToVQXBP8nANjreVhnXjk5TVgy84ufNsRg@mail.gmail.com>
+ <20180708202315.GA2239@infradead.org> <CAGXu5jKvUydp6nc3EUCyoGWbUUoiiASMFcBfVVOph1uc_oCNSg@mail.gmail.com>
+ <20180731075305.GA16318@infradead.org>
 From: Kees Cook <keescook@chromium.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Kees Cook <keescook@chromium.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Eric Biggers <ebiggers@google.com>,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-	Alasdair Kergon <agk@redhat.com>,
-	Rabin Vincent <rabinv@axis.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Pavel Machek <pavel@ucw.cz>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	x86@kernel.org,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Paul Mackerras <paulus@samba.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	David Howells <dhowells@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
-	Jia-Ju Bai <baijiaju1990@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Will Deacon <will.deacon@arm.com>,
-	dm-devel@redhat.com,
-	linux-pm@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
-	qat-linux@intel.com,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devel@driverdev.osuosl.org,
-	linux-afs@lists.infradead.org,
-	linux-wireless@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v6 14/18] staging: rtl8192u: ieee80211: Convert from ahash to shash
-Date: Tue, 24 Jul 2018 09:49:32 -0700
-Message-Id: <20180724164936.37477-15-keescook@chromium.org>
-In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
-References: <20180724164936.37477-1-keescook@chromium.org>
+Date: Tue, 31 Jul 2018 12:52:29 -0700
+Message-ID: <CAGXu5jKnGgAV9vC-mn=jQ+PZXaE_pqc5_6=O3XcSwDagm_3ZmA@mail.gmail.com>
+Subject: Re: [PATCH 3/6] block: Create scsi_sense.h for SCSI and ATAPI
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>, Tejun Heo <tj@kernel.org>,
+	Borislav Petkov <bp@alien8.de>, "David S. Miller" <davem@davemloft.net>,
+	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>, "Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
+	Uma Krishnan <ukrishn@linux.vnet.ibm.com>, linux-block <linux-block@vger.kernel.org>,
+	linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-This is an identical change to the wireless/lib80211 of the same name.
-In preparing to remove all stack VLA usage from the kernel[1], this
-removes the discouraged use of AHASH_REQUEST_ON_STACK in favor of
-the smaller SHASH_DESC_ON_STACK by converting from ahash-wrapped-shash
-to direct shash. By removing a layer of indirection this both improves
-performance and reduces stack usage. The stack allocation will be made
-a fixed size in a later patch to the crypto subsystem.
+On Tue, Jul 31, 2018 at 12:53 AM, Christoph Hellwig <hch@infradead.org> wrote:
+> On Mon, Jul 09, 2018 at 08:56:50AM -0700, Kees Cook wrote:
+>> > Btw, did you plan to resend the series with this and your changes
+>> > applied?
+>>
+>> Yeah, I've gotten distracted. I'll try to get to it in the next few days.
+>>
+>> Thanks for the reminder!
+>
+> Another little reminder.  I'd hate to miss it for 4.19.
 
-[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+Okay, finally sent. Thanks for the reminders. :)
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- .../rtl8192u/ieee80211/ieee80211_crypt_tkip.c | 57 +++++++++----------
- 1 file changed, 28 insertions(+), 29 deletions(-)
+-Kees
 
-diff --git a/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_tkip.c b/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_tkip.c
-index a7efaae4e25a..1088fa0aee0e 100644
---- a/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_tkip.c
-+++ b/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_tkip.c
-@@ -54,9 +54,9 @@ struct ieee80211_tkip_data {
- 	int key_idx;
- 
- 	struct crypto_skcipher *rx_tfm_arc4;
--	struct crypto_ahash *rx_tfm_michael;
-+	struct crypto_shash *rx_tfm_michael;
- 	struct crypto_skcipher *tx_tfm_arc4;
--	struct crypto_ahash *tx_tfm_michael;
-+	struct crypto_shash *tx_tfm_michael;
- 
- 	/* scratch buffers for virt_to_page() (crypto API) */
- 	u8 rx_hdr[16], tx_hdr[16];
-@@ -80,8 +80,7 @@ static void *ieee80211_tkip_init(int key_idx)
- 		goto fail;
- 	}
- 
--	priv->tx_tfm_michael = crypto_alloc_ahash("michael_mic", 0,
--			CRYPTO_ALG_ASYNC);
-+	priv->tx_tfm_michael = crypto_alloc_shash("michael_mic", 0, 0);
- 	if (IS_ERR(priv->tx_tfm_michael)) {
- 		printk(KERN_DEBUG "ieee80211_crypt_tkip: could not allocate "
- 				"crypto API michael_mic\n");
-@@ -98,8 +97,7 @@ static void *ieee80211_tkip_init(int key_idx)
- 		goto fail;
- 	}
- 
--	priv->rx_tfm_michael = crypto_alloc_ahash("michael_mic", 0,
--			CRYPTO_ALG_ASYNC);
-+	priv->rx_tfm_michael = crypto_alloc_shash("michael_mic", 0, 0);
- 	if (IS_ERR(priv->rx_tfm_michael)) {
- 		printk(KERN_DEBUG "ieee80211_crypt_tkip: could not allocate "
- 				"crypto API michael_mic\n");
-@@ -111,9 +109,9 @@ static void *ieee80211_tkip_init(int key_idx)
- 
- fail:
- 	if (priv) {
--		crypto_free_ahash(priv->tx_tfm_michael);
-+		crypto_free_shash(priv->tx_tfm_michael);
- 		crypto_free_skcipher(priv->tx_tfm_arc4);
--		crypto_free_ahash(priv->rx_tfm_michael);
-+		crypto_free_shash(priv->rx_tfm_michael);
- 		crypto_free_skcipher(priv->rx_tfm_arc4);
- 		kfree(priv);
- 	}
-@@ -127,9 +125,9 @@ static void ieee80211_tkip_deinit(void *priv)
- 	struct ieee80211_tkip_data *_priv = priv;
- 
- 	if (_priv) {
--		crypto_free_ahash(_priv->tx_tfm_michael);
-+		crypto_free_shash(_priv->tx_tfm_michael);
- 		crypto_free_skcipher(_priv->tx_tfm_arc4);
--		crypto_free_ahash(_priv->rx_tfm_michael);
-+		crypto_free_shash(_priv->rx_tfm_michael);
- 		crypto_free_skcipher(_priv->rx_tfm_arc4);
- 	}
- 	kfree(priv);
-@@ -500,30 +498,31 @@ static int ieee80211_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
- 	return keyidx;
- }
- 
--static int michael_mic(struct crypto_ahash *tfm_michael, u8 *key, u8 *hdr,
-+static int michael_mic(struct crypto_shash *tfm_michael, u8 *key, u8 *hdr,
- 		       u8 *data, size_t data_len, u8 *mic)
- {
--	AHASH_REQUEST_ON_STACK(req, tfm_michael);
--	struct scatterlist sg[2];
-+	SHASH_DESC_ON_STACK(desc, tfm_michael);
- 	int err;
- 
--	if (tfm_michael == NULL) {
--		printk(KERN_WARNING "michael_mic: tfm_michael == NULL\n");
--		return -1;
--	}
--
--	sg_init_table(sg, 2);
--	sg_set_buf(&sg[0], hdr, 16);
--	sg_set_buf(&sg[1], data, data_len);
-+	desc->tfm = tfm_michael;
-+	desc->flags = 0;
- 
--	if (crypto_ahash_setkey(tfm_michael, key, 8))
-+	if (crypto_shash_setkey(tfm_michael, key, 8))
- 		return -1;
- 
--	ahash_request_set_tfm(req, tfm_michael);
--	ahash_request_set_callback(req, 0, NULL, NULL);
--	ahash_request_set_crypt(req, sg, mic, data_len + 16);
--	err = crypto_ahash_digest(req);
--	ahash_request_zero(req);
-+	err = crypto_shash_init(desc);
-+	if (err)
-+		goto out;
-+	err = crypto_shash_update(desc, hdr, 16);
-+	if (err)
-+		goto out;
-+	err = crypto_shash_update(desc, data, data_len);
-+	if (err)
-+		goto out;
-+	err = crypto_shash_final(desc, mic);
-+
-+out:
-+	shash_desc_zero(desc);
- 	return err;
- }
- 
-@@ -663,9 +662,9 @@ static int ieee80211_tkip_set_key(void *key, int len, u8 *seq, void *priv)
- {
- 	struct ieee80211_tkip_data *tkey = priv;
- 	int keyidx;
--	struct crypto_ahash *tfm = tkey->tx_tfm_michael;
-+	struct crypto_shash *tfm = tkey->tx_tfm_michael;
- 	struct crypto_skcipher *tfm2 = tkey->tx_tfm_arc4;
--	struct crypto_ahash *tfm3 = tkey->rx_tfm_michael;
-+	struct crypto_shash *tfm3 = tkey->rx_tfm_michael;
- 	struct crypto_skcipher *tfm4 = tkey->rx_tfm_arc4;
- 
- 	keyidx = tkey->key_idx;
 -- 
-2.17.1
+Kees Cook
+Pixel Security
