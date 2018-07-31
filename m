@@ -1,116 +1,179 @@
-Return-Path: <keescook@chromium.org>
-Return-Path: <keescook@chromium.org>
-From: Kees Cook <keescook@chromium.org>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Kees Cook <keescook@chromium.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	Borislav Petkov <bp@alien8.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
-	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
-	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
-	"Nicholas A. Bellinger" <nab@linux-iscsi.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Philippe Ombredanne <pombredanne@nexb.com>,
-	Stephen Boyd <sboyd@codeaurora.org>,
-	Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
-	Juergen Gross <jgross@suse.com>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	Sagar Dharia <sdharia@codeaurora.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Vinod Koul <vinod.koul@intel.com>,
-	David Kershner <david.kershner@unisys.com>,
-	linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	target-devel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 8/9] libata-scsi: Move sense buffers onto stack
-Date: Tue, 31 Jul 2018 12:51:53 -0700
-Message-Id: <20180731195155.46664-9-keescook@chromium.org>
-In-Reply-To: <20180731195155.46664-1-keescook@chromium.org>
-References: <20180731195155.46664-1-keescook@chromium.org>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Kent Overstreet <kent.overstreet@gmail.com>
+Subject: [PATCH 2/3] block: kill QUEUE_FLAG_NO_SG_MERGE
+Date: Tue, 31 Jul 2018 18:49:13 +0800
+Message-Id: <20180731104914.17249-3-ming.lei@redhat.com>
+In-Reply-To: <20180731104914.17249-1-ming.lei@redhat.com>
+References: <20180731104914.17249-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-To support future compile-time sizeof() checks that will be able to
-validate the length of sense buffers, this removes the only dynamically
-allocated sense buffers in the tree by putting the 96 byte sense buffers
-on the stack.
+Since bdced438acd83ad83a6c ("block: setup bi_phys_segments after splitting"),
+physical segment number is mainly figured out in blk_queue_split() for
+fast path, and the flag of BIO_SEG_VALID is set there too.
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
+Now only blk_recount_segments() and blk_recalc_rq_segments() use this
+flag.
+
+Basically blk_recount_segments() is bypassed in fast path given BIO_SEG_VALID
+is set in blk_queue_split().
+
+For another user of blk_recalc_rq_segments():
+
+- run in partial completion branch of blk_update_request, which is an unusual case
+
+- run in blk_cloned_rq_check_limits(), still not a big problem if the flag is killed
+since dm-rq is the only user.
+
+Also multipage bvec will come soon, and each bvec may become a one segment
+at that time, so QUEUE_FLAG_NO_SG_MERGE doesn't make sense any more.
+
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/ata/libata-scsi.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+ block/blk-merge.c      | 31 ++++++-------------------------
+ block/blk-mq-debugfs.c |  1 -
+ block/blk-mq.c         |  3 ---
+ drivers/md/dm-table.c  | 13 -------------
+ include/linux/blkdev.h |  1 -
+ 5 files changed, 6 insertions(+), 43 deletions(-)
 
-diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
-index 89a9d4a2efc8..3a43d3a1ce2d 100644
---- a/drivers/ata/libata-scsi.c
-+++ b/drivers/ata/libata-scsi.c
-@@ -597,8 +597,9 @@ static int ata_get_identity(struct ata_port *ap, struct scsi_device *sdev,
- int ata_cmd_ioctl(struct scsi_device *scsidev, void __user *arg)
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 4a16d4f929da..9ee650aeda58 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -229,8 +229,7 @@ void blk_queue_split(struct request_queue *q, struct bio **bio)
+ EXPORT_SYMBOL(blk_queue_split);
+ 
+ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+-					     struct bio *bio,
+-					     bool no_sg_merge)
++					     struct bio *bio)
  {
- 	int rc = 0;
-+	u8 sensebuf[SCSI_SENSE_BUFFERSIZE];
- 	u8 scsi_cmd[MAX_COMMAND_SIZE];
--	u8 args[4], *argbuf = NULL, *sensebuf = NULL;
-+	u8 args[4], *argbuf = NULL;
- 	int argsize = 0;
- 	enum dma_data_direction data_dir;
- 	struct scsi_sense_hdr sshdr;
-@@ -610,10 +611,7 @@ int ata_cmd_ioctl(struct scsi_device *scsidev, void __user *arg)
- 	if (copy_from_user(args, arg, sizeof(args)))
- 		return -EFAULT;
- 
--	sensebuf = kzalloc(SCSI_SENSE_BUFFERSIZE, GFP_NOIO);
--	if (!sensebuf)
--		return -ENOMEM;
+ 	struct bio_vec bv, bvprv = { NULL };
+ 	int cluster, prev = 0;
+@@ -256,13 +255,6 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+ 	nr_phys_segs = 0;
+ 	for_each_bio(bio) {
+ 		bio_for_each_segment(bv, bio, iter) {
+-			/*
+-			 * If SG merging is disabled, each bio vector is
+-			 * a segment
+-			 */
+-			if (no_sg_merge)
+-				goto new_segment;
 -
-+	memset(sensebuf, 0, sizeof(sensebuf));
- 	memset(scsi_cmd, 0, sizeof(scsi_cmd));
+ 			if (prev && cluster) {
+ 				if (seg_size + bv.bv_len
+ 				    > queue_max_segment_size(q))
+@@ -299,27 +291,16 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
  
- 	if (args[3]) {
-@@ -685,7 +683,6 @@ int ata_cmd_ioctl(struct scsi_device *scsidev, void __user *arg)
- 	 && copy_to_user(arg + sizeof(args), argbuf, argsize))
- 		rc = -EFAULT;
- error:
--	kfree(sensebuf);
- 	kfree(argbuf);
- 	return rc;
- }
-@@ -704,8 +701,9 @@ int ata_cmd_ioctl(struct scsi_device *scsidev, void __user *arg)
- int ata_task_ioctl(struct scsi_device *scsidev, void __user *arg)
+ void blk_recalc_rq_segments(struct request *rq)
  {
- 	int rc = 0;
-+	u8 sensebuf[SCSI_SENSE_BUFFERSIZE];
- 	u8 scsi_cmd[MAX_COMMAND_SIZE];
--	u8 args[7], *sensebuf = NULL;
-+	u8 args[7];
- 	struct scsi_sense_hdr sshdr;
- 	int cmd_result;
- 
-@@ -715,10 +713,7 @@ int ata_task_ioctl(struct scsi_device *scsidev, void __user *arg)
- 	if (copy_from_user(args, arg, sizeof(args)))
- 		return -EFAULT;
- 
--	sensebuf = kzalloc(SCSI_SENSE_BUFFERSIZE, GFP_NOIO);
--	if (!sensebuf)
--		return -ENOMEM;
+-	bool no_sg_merge = !!test_bit(QUEUE_FLAG_NO_SG_MERGE,
+-			&rq->q->queue_flags);
 -
-+	memset(sensebuf, 0, sizeof(sensebuf));
- 	memset(scsi_cmd, 0, sizeof(scsi_cmd));
- 	scsi_cmd[0]  = ATA_16;
- 	scsi_cmd[1]  = (3 << 1); /* Non-data */
-@@ -769,7 +764,6 @@ int ata_task_ioctl(struct scsi_device *scsidev, void __user *arg)
- 	}
- 
-  error:
--	kfree(sensebuf);
- 	return rc;
+-	rq->nr_phys_segments = __blk_recalc_rq_segments(rq->q, rq->bio,
+-			no_sg_merge);
++	rq->nr_phys_segments = __blk_recalc_rq_segments(rq->q, rq->bio);
  }
  
+ void blk_recount_segments(struct request_queue *q, struct bio *bio)
+ {
+-	unsigned short seg_cnt = bio_segments(bio);
+-
+-	if (test_bit(QUEUE_FLAG_NO_SG_MERGE, &q->queue_flags) &&
+-			(seg_cnt < queue_max_segments(q)))
+-		bio->bi_phys_segments = seg_cnt;
+-	else {
+-		struct bio *nxt = bio->bi_next;
++	struct bio *nxt = bio->bi_next;
+ 
+-		bio->bi_next = NULL;
+-		bio->bi_phys_segments = __blk_recalc_rq_segments(q, bio, false);
+-		bio->bi_next = nxt;
+-	}
++	bio->bi_next = NULL;
++	bio->bi_phys_segments = __blk_recalc_rq_segments(q, bio);
++	bio->bi_next = nxt;
+ 
+ 	bio_set_flag(bio, BIO_SEG_VALID);
+ }
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index cb1e6cf7ac48..e590f9495d25 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -121,7 +121,6 @@ static const char *const blk_queue_flag_name[] = {
+ 	QUEUE_FLAG_NAME(SAME_FORCE),
+ 	QUEUE_FLAG_NAME(DEAD),
+ 	QUEUE_FLAG_NAME(INIT_DONE),
+-	QUEUE_FLAG_NAME(NO_SG_MERGE),
+ 	QUEUE_FLAG_NAME(POLL),
+ 	QUEUE_FLAG_NAME(WC),
+ 	QUEUE_FLAG_NAME(FUA),
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e13bdc2707ce..dc90be8206d2 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2606,9 +2606,6 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 
+ 	q->queue_flags |= QUEUE_FLAG_MQ_DEFAULT;
+ 
+-	if (!(set->flags & BLK_MQ_F_SG_MERGE))
+-		queue_flag_set_unlocked(QUEUE_FLAG_NO_SG_MERGE, q);
+-
+ 	q->sg_reserved_size = INT_MAX;
+ 
+ 	INIT_DELAYED_WORK(&q->requeue_work, blk_mq_requeue_work);
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 3d0e2c198f06..5ea54c5bd508 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -1718,14 +1718,6 @@ static int device_is_not_random(struct dm_target *ti, struct dm_dev *dev,
+ 	return q && !blk_queue_add_random(q);
+ }
+ 
+-static int queue_supports_sg_merge(struct dm_target *ti, struct dm_dev *dev,
+-				   sector_t start, sector_t len, void *data)
+-{
+-	struct request_queue *q = bdev_get_queue(dev->bdev);
+-
+-	return q && !test_bit(QUEUE_FLAG_NO_SG_MERGE, &q->queue_flags);
+-}
+-
+ static bool dm_table_all_devices_attribute(struct dm_table *t,
+ 					   iterate_devices_callout_fn func)
+ {
+@@ -1922,11 +1914,6 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+ 	if (!dm_table_supports_write_zeroes(t))
+ 		q->limits.max_write_zeroes_sectors = 0;
+ 
+-	if (dm_table_all_devices_attribute(t, queue_supports_sg_merge))
+-		blk_queue_flag_clear(QUEUE_FLAG_NO_SG_MERGE, q);
+-	else
+-		blk_queue_flag_set(QUEUE_FLAG_NO_SG_MERGE, q);
+-
+ 	dm_table_verify_integrity(t);
+ 
+ 	/*
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 050d599f5ea9..0697d30bb625 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -689,7 +689,6 @@ struct request_queue {
+ #define QUEUE_FLAG_SAME_FORCE  15	/* force complete on same CPU */
+ #define QUEUE_FLAG_DEAD        16	/* queue tear-down finished */
+ #define QUEUE_FLAG_INIT_DONE   17	/* queue is initialized */
+-#define QUEUE_FLAG_NO_SG_MERGE 18	/* don't attempt to merge SG segments*/
+ #define QUEUE_FLAG_POLL	       19	/* IO polling enabled if set */
+ #define QUEUE_FLAG_WC	       20	/* Write back caching */
+ #define QUEUE_FLAG_FUA	       21	/* device supports FUA writes */
 -- 
-2.17.1
+2.9.5
