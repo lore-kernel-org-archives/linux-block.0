@@ -1,37 +1,116 @@
-Return-Path: <zhongjiang@huawei.com>
-From: zhong jiang <zhongjiang@huawei.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH] block/bsg-lib: use PTR_ERR_OR_ZERO to simplify the flow path
-Date: Wed, 1 Aug 2018 00:13:14 +0800
-Message-ID: <1533053594-35244-1-git-send-email-zhongjiang@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <keescook@chromium.org>
+Return-Path: <keescook@chromium.org>
+From: Kees Cook <keescook@chromium.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Kees Cook <keescook@chromium.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	Tejun Heo <tj@kernel.org>,
+	Borislav Petkov <bp@alien8.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
+	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
+	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
+	"Nicholas A. Bellinger" <nab@linux-iscsi.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Philippe Ombredanne <pombredanne@nexb.com>,
+	Stephen Boyd <sboyd@codeaurora.org>,
+	Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
+	Juergen Gross <jgross@suse.com>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Sagar Dharia <sdharia@codeaurora.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Vinod Koul <vinod.koul@intel.com>,
+	David Kershner <david.kershner@unisys.com>,
+	linux-block@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	target-devel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 8/9] libata-scsi: Move sense buffers onto stack
+Date: Tue, 31 Jul 2018 12:51:53 -0700
+Message-Id: <20180731195155.46664-9-keescook@chromium.org>
+In-Reply-To: <20180731195155.46664-1-keescook@chromium.org>
+References: <20180731195155.46664-1-keescook@chromium.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Simplify the code by using the PTR_ERR_OR_ZERO, instead of the
-open code. It is better.
+To support future compile-time sizeof() checks that will be able to
+validate the length of sense buffers, this removes the only dynamically
+allocated sense buffers in the tree by putting the 96 byte sense buffers
+on the stack.
 
-Signed-off-by: zhong jiang <zhongjiang@huawei.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- block/bsg-lib.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/ata/libata-scsi.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index 9419def..f3501cd 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -48,9 +48,8 @@ static int bsg_transport_fill_hdr(struct request *rq, struct sg_io_v4 *hdr,
+diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
+index 89a9d4a2efc8..3a43d3a1ce2d 100644
+--- a/drivers/ata/libata-scsi.c
++++ b/drivers/ata/libata-scsi.c
+@@ -597,8 +597,9 @@ static int ata_get_identity(struct ata_port *ap, struct scsi_device *sdev,
+ int ata_cmd_ioctl(struct scsi_device *scsidev, void __user *arg)
+ {
+ 	int rc = 0;
++	u8 sensebuf[SCSI_SENSE_BUFFERSIZE];
+ 	u8 scsi_cmd[MAX_COMMAND_SIZE];
+-	u8 args[4], *argbuf = NULL, *sensebuf = NULL;
++	u8 args[4], *argbuf = NULL;
+ 	int argsize = 0;
+ 	enum dma_data_direction data_dir;
+ 	struct scsi_sense_hdr sshdr;
+@@ -610,10 +611,7 @@ int ata_cmd_ioctl(struct scsi_device *scsidev, void __user *arg)
+ 	if (copy_from_user(args, arg, sizeof(args)))
+ 		return -EFAULT;
  
- 	job->request_len = hdr->request_len;
- 	job->request = memdup_user(uptr64(hdr->request), hdr->request_len);
--	if (IS_ERR(job->request))
--		return PTR_ERR(job->request);
--	return 0;
-+
-+	return PTR_ERR_OR_ZERO(job->request);
+-	sensebuf = kzalloc(SCSI_SENSE_BUFFERSIZE, GFP_NOIO);
+-	if (!sensebuf)
+-		return -ENOMEM;
+-
++	memset(sensebuf, 0, sizeof(sensebuf));
+ 	memset(scsi_cmd, 0, sizeof(scsi_cmd));
+ 
+ 	if (args[3]) {
+@@ -685,7 +683,6 @@ int ata_cmd_ioctl(struct scsi_device *scsidev, void __user *arg)
+ 	 && copy_to_user(arg + sizeof(args), argbuf, argsize))
+ 		rc = -EFAULT;
+ error:
+-	kfree(sensebuf);
+ 	kfree(argbuf);
+ 	return rc;
+ }
+@@ -704,8 +701,9 @@ int ata_cmd_ioctl(struct scsi_device *scsidev, void __user *arg)
+ int ata_task_ioctl(struct scsi_device *scsidev, void __user *arg)
+ {
+ 	int rc = 0;
++	u8 sensebuf[SCSI_SENSE_BUFFERSIZE];
+ 	u8 scsi_cmd[MAX_COMMAND_SIZE];
+-	u8 args[7], *sensebuf = NULL;
++	u8 args[7];
+ 	struct scsi_sense_hdr sshdr;
+ 	int cmd_result;
+ 
+@@ -715,10 +713,7 @@ int ata_task_ioctl(struct scsi_device *scsidev, void __user *arg)
+ 	if (copy_from_user(args, arg, sizeof(args)))
+ 		return -EFAULT;
+ 
+-	sensebuf = kzalloc(SCSI_SENSE_BUFFERSIZE, GFP_NOIO);
+-	if (!sensebuf)
+-		return -ENOMEM;
+-
++	memset(sensebuf, 0, sizeof(sensebuf));
+ 	memset(scsi_cmd, 0, sizeof(scsi_cmd));
+ 	scsi_cmd[0]  = ATA_16;
+ 	scsi_cmd[1]  = (3 << 1); /* Non-data */
+@@ -769,7 +764,6 @@ int ata_task_ioctl(struct scsi_device *scsidev, void __user *arg)
+ 	}
+ 
+  error:
+-	kfree(sensebuf);
+ 	return rc;
  }
  
- static int bsg_transport_complete_rq(struct request *rq, struct sg_io_v4 *hdr)
 -- 
-1.7.12.4
+2.17.1
