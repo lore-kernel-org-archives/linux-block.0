@@ -1,41 +1,99 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([23.128.96.9]:59442 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729315AbeGaXMh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jul 2018 19:12:37 -0400
-Date: Tue, 31 Jul 2018 14:30:15 -0700 (PDT)
-Message-Id: <20180731.143015.1326547191404152411.davem@davemloft.net>
-To: keescook@chromium.org
-Cc: axboe@kernel.dk, hch@infradead.org, martin.petersen@oracle.com,
-        jejb@linux.vnet.ibm.com, tj@kernel.org, bp@alien8.de,
-        manoj@linux.vnet.ibm.com, mrochs@linux.vnet.ibm.com,
-        ukrishn@linux.vnet.ibm.com, nab@linux-iscsi.org,
-        tglx@linutronix.de, pombredanne@nexb.com, sboyd@codeaurora.org,
-        cyrille.pitchen@free-electrons.com, jgross@suse.com,
-        viresh.kumar@linaro.org, u.kleine-koenig@pengutronix.de,
-        sdharia@codeaurora.org, rdunlap@infradead.org,
-        vinod.koul@intel.com, david.kershner@unisys.com,
-        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 6/9] ide-cd: Remove redundant sense buffer
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20180731195155.46664-7-keescook@chromium.org>
-References: <20180731195155.46664-1-keescook@chromium.org>
-        <20180731195155.46664-7-keescook@chromium.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
-
+Return-Path: <keescook@chromium.org>
+Return-Path: <keescook@chromium.org>
 From: Kees Cook <keescook@chromium.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Kees Cook <keescook@chromium.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	Tejun Heo <tj@kernel.org>,
+	Borislav Petkov <bp@alien8.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
+	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
+	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
+	"Nicholas A. Bellinger" <nab@linux-iscsi.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Philippe Ombredanne <pombredanne@nexb.com>,
+	Stephen Boyd <sboyd@codeaurora.org>,
+	Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
+	Juergen Gross <jgross@suse.com>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Sagar Dharia <sdharia@codeaurora.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Vinod Koul <vinod.koul@intel.com>,
+	David Kershner <david.kershner@unisys.com>,
+	linux-block@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	target-devel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 6/9] ide-cd: Remove redundant sense buffer
 Date: Tue, 31 Jul 2018 12:51:51 -0700
+Message-Id: <20180731195155.46664-7-keescook@chromium.org>
+In-Reply-To: <20180731195155.46664-1-keescook@chromium.org>
+References: <20180731195155.46664-1-keescook@chromium.org>
+List-ID: <linux-block@vger.kernel.org>
 
-> This is already able to process the sense buffer, so remove the redundant
-> parsing during the failure path. This also fixes any possible stale values
-> since the prior code did not check the sense length.
-> 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+This is already able to process the sense buffer, so remove the redundant
+parsing during the failure path. This also fixes any possible stale values
+since the prior code did not check the sense length.
 
-Acked-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ drivers/ide/ide-cd.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/ide/ide-cd.c b/drivers/ide/ide-cd.c
+index cb90560acf6e..023a7d94eb08 100644
+--- a/drivers/ide/ide-cd.c
++++ b/drivers/ide/ide-cd.c
+@@ -423,6 +423,7 @@ int ide_cd_queue_pc(ide_drive_t *drive, const unsigned char *cmd,
+ 		    req_flags_t rq_flags)
+ {
+ 	struct cdrom_info *info = drive->driver_data;
++	struct scsi_sense_hdr local_sshdr;
+ 	int retries = 10;
+ 	bool failed;
+ 
+@@ -430,6 +431,9 @@ int ide_cd_queue_pc(ide_drive_t *drive, const unsigned char *cmd,
+ 				  "rq_flags: 0x%x",
+ 				  cmd[0], write, timeout, rq_flags);
+ 
++	if (!sshdr)
++		sshdr = &local_sshdr;
++
+ 	/* start of retry loop */
+ 	do {
+ 		struct request *rq;
+@@ -456,9 +460,8 @@ int ide_cd_queue_pc(ide_drive_t *drive, const unsigned char *cmd,
+ 
+ 		if (buffer)
+ 			*bufflen = scsi_req(rq)->resid_len;
+-		if (sshdr)
+-			scsi_normalize_sense(scsi_req(rq)->sense,
+-					     scsi_req(rq)->sense_len, sshdr);
++		scsi_normalize_sense(scsi_req(rq)->sense,
++				     scsi_req(rq)->sense_len, sshdr);
+ 
+ 		/*
+ 		 * FIXME: we should probably abort/retry or something in case of
+@@ -470,12 +473,10 @@ int ide_cd_queue_pc(ide_drive_t *drive, const unsigned char *cmd,
+ 			 * The request failed.  Retry if it was due to a unit
+ 			 * attention status (usually means media was changed).
+ 			 */
+-			struct request_sense *reqbuf = scsi_req(rq)->sense;
+-
+-			if (reqbuf->sense_key == UNIT_ATTENTION)
++			if (sshdr->sense_key == UNIT_ATTENTION)
+ 				cdrom_saw_media_change(drive);
+-			else if (reqbuf->sense_key == NOT_READY &&
+-				 reqbuf->asc == 4 && reqbuf->ascq != 4) {
++			else if (sshdr->sense_key == NOT_READY &&
++				 sshdr->asc == 4 && sshdr->ascq != 4) {
+ 				/*
+ 				 * The drive is in the process of loading
+ 				 * a disk.  Retry, but wait a little to give
+-- 
+2.17.1
