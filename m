@@ -1,69 +1,141 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	linux-kernel@vger.kernel.org,
-	akpm@linux-foundation.org,
-	hannes@cmpxchg.org,
-	tj@kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 14/14] skip readahead if the cgroup is congested
-Date: Tue,  3 Jul 2018 11:15:03 -0400
-Message-Id: <20180703151503.2549-15-josef@toxicpanda.com>
-In-Reply-To: <20180703151503.2549-1-josef@toxicpanda.com>
-References: <20180703151503.2549-1-josef@toxicpanda.com>
+Return-Path: <khazhy@google.com>
+MIME-Version: 1.0
+In-Reply-To: <20180406222350.174104-1-khazhy@google.com>
+References: <20180406222350.174104-1-khazhy@google.com>
+From: Khazhismel Kumykov <khazhy@google.com>
+Date: Tue, 31 Jul 2018 11:23:34 -0700
+Message-ID: <CACGdZY+cHaKSMKqpM3p5SJq9sVyZHViDUoCTmTusr=Dw1iiR0A@mail.gmail.com>
+Subject: Re: [PATCH] block/compat_ioctl: fix range check in BLKGETSIZE
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Khazhismel Kumykov <khazhy@google.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000001fefa205724fadda"
 List-ID: <linux-block@vger.kernel.org>
 
-From: Josef Bacik <jbacik@fb.com>
+--0000000000001fefa205724fadda
+Content-Type: text/plain; charset="UTF-8"
 
-We noticed in testing we'd get pretty bad latency stalls under heavy
-pressure because read ahead would try to do its thing while the cgroup
-was under severe pressure.  If we're under this much pressure we want to
-do as little IO as possible so we can still make progress on real work
-if we're a throttled cgroup, so just skip readahead if our group is
-under pressure.
+Ping?
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
-Acked-by: Tejun Heo <tj@kernel.org>
-Acked-by: Andrew Morton <akpm@linux-foundation.org>
----
- mm/readahead.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+On Fri, Apr 6, 2018 at 3:23 PM, Khazhismel Kumykov <khazhy@google.com> wrote:
+> kernel ulong and compat_ulong_t may not be same width. Use type directly
+> to eliminate mismatches.
+>
+> This would result in truncation rather than EFBIG for 32bit mode for
+> large disks.
+>
+> Signed-off-by: Khazhismel Kumykov <khazhy@google.com>
+> ---
+>  block/compat_ioctl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/block/compat_ioctl.c b/block/compat_ioctl.c
+> index 6ca015f92766..3a2c77f07da8 100644
+> --- a/block/compat_ioctl.c
+> +++ b/block/compat_ioctl.c
+> @@ -388,7 +388,7 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
+>                 return 0;
+>         case BLKGETSIZE:
+>                 size = i_size_read(bdev->bd_inode);
+> -               if ((size >> 9) > ~0UL)
+> +               if ((size >> 9) > ~((compat_ulong_t)0UL))
+>                         return -EFBIG;
+>                 return compat_put_ulong(arg, size >> 9);
+>
+> --
+> 2.17.0.484.g0c8726318c-goog
+>
 
-diff --git a/mm/readahead.c b/mm/readahead.c
-index e273f0de3376..9f62b7151100 100644
---- a/mm/readahead.c
-+++ b/mm/readahead.c
-@@ -19,6 +19,7 @@
- #include <linux/syscalls.h>
- #include <linux/file.h>
- #include <linux/mm_inline.h>
-+#include <linux/blk-cgroup.h>
- 
- #include "internal.h"
- 
-@@ -505,6 +506,9 @@ void page_cache_sync_readahead(struct address_space *mapping,
- 	if (!ra->ra_pages)
- 		return;
- 
-+	if (blk_cgroup_congested())
-+		return;
-+
- 	/* be dumb */
- 	if (filp && (filp->f_mode & FMODE_RANDOM)) {
- 		force_page_cache_readahead(mapping, filp, offset, req_size);
-@@ -555,6 +559,9 @@ page_cache_async_readahead(struct address_space *mapping,
- 	if (inode_read_congested(mapping->host))
- 		return;
- 
-+	if (blk_cgroup_congested())
-+		return;
-+
- 	/* do read-ahead */
- 	ondemand_readahead(mapping, ra, filp, true, offset, req_size);
- }
--- 
-2.14.3
+--0000000000001fefa205724fadda
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIIS5wYJKoZIhvcNAQcCoIIS2DCCEtQCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+ghBNMIIEXDCCA0SgAwIBAgIOSBtqDm4P/739RPqw/wcwDQYJKoZIhvcNAQELBQAwZDELMAkGA1UE
+BhMCQkUxGTAXBgNVBAoTEEdsb2JhbFNpZ24gbnYtc2ExOjA4BgNVBAMTMUdsb2JhbFNpZ24gUGVy
+c29uYWxTaWduIFBhcnRuZXJzIENBIC0gU0hBMjU2IC0gRzIwHhcNMTYwNjE1MDAwMDAwWhcNMjEw
+NjE1MDAwMDAwWjBMMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTEiMCAG
+A1UEAxMZR2xvYmFsU2lnbiBIViBTL01JTUUgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+AQoCggEBALR23lKtjlZW/17kthzYcMHHKFgywfc4vLIjfq42NmMWbXkNUabIgS8KX4PnIFsTlD6F
+GO2fqnsTygvYPFBSMX4OCFtJXoikP2CQlEvO7WooyE94tqmqD+w0YtyP2IB5j4KvOIeNv1Gbnnes
+BIUWLFxs1ERvYDhmk+OrvW7Vd8ZfpRJj71Rb+QQsUpkyTySaqALXnyztTDp1L5d1bABJN/bJbEU3
+Hf5FLrANmognIu+Npty6GrA6p3yKELzTsilOFmYNWg7L838NS2JbFOndl+ce89gM36CW7vyhszi6
+6LqqzJL8MsmkP53GGhf11YMP9EkmawYouMDP/PwQYhIiUO0CAwEAAaOCASIwggEeMA4GA1UdDwEB
+/wQEAwIBBjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwEgYDVR0TAQH/BAgwBgEB/wIB
+ADAdBgNVHQ4EFgQUyzgSsMeZwHiSjLMhleb0JmLA4D8wHwYDVR0jBBgwFoAUJiSSix/TRK+xsBtt
+r+500ox4AAMwSwYDVR0fBEQwQjBAoD6gPIY6aHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9ncy9n
+c3BlcnNvbmFsc2lnbnB0bnJzc2hhMmcyLmNybDBMBgNVHSAERTBDMEEGCSsGAQQBoDIBKDA0MDIG
+CCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzANBgkqhkiG
+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
+BQUHMAKGNGh0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5jb20vY2FjZXJ0L2dzaHZzbWltZWNhMS5j
+cnQwHQYDVR0OBBYEFDBayG/HuozB3nr7XpIwvMdtMOg+MB8GA1UdIwQYMBaAFMs4ErDHmcB4koyz
+IZXm9CZiwOA/MEwGA1UdIARFMEMwQQYJKwYBBAGgMgEoMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8v
+d3d3Lmdsb2JhbHNpZ24uY29tL3JlcG9zaXRvcnkvMDsGA1UdHwQ0MDIwMKAuoCyGKmh0dHA6Ly9j
+cmwuZ2xvYmFsc2lnbi5jb20vZ3NodnNtaW1lY2ExLmNybDAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0l
+BBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMA0GCSqGSIb3DQEBCwUAA4IBAQBRJEgrMaLvmWUZ+Njl
+2Nv1nyyUCOqZ9DVy/vSoHfwEGjfHvU7LKMBXG23U7+MFxsQ+zjvShwVFh+xd1f/WhVYskxUWtFNx
+cvVntI7VRiuPMEyzuJAIif7Gz/3nGHYELnuCT/LJiRt+8s5ifvk4ARlTyzXvmTgYI0SWmY3XzG7m
+w//hyllv3Oeju53dWy7m08J+wYroHL+95IETljOngoBeyaFJmACcHwdrM+oASBYR5cpauJrFZOuu
+6SmC9wsvjI52co5WcO6b7PqO/NjJtIIdXzWZH6P99IHiKI5NU3MAAOtJ7sz9py/SRei4YELyzwFp
+KW1mK6xDpJiRbOzZPIC5MYICXjCCAloCAQEwXDBMMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xv
+YmFsU2lnbiBudi1zYTEiMCAGA1UEAxMZR2xvYmFsU2lnbiBIViBTL01JTUUgQ0EgMQIMaTEz/DvA
+bIQaq/gnMA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEiBCCTvAmr+pRrcIsBIFFZT75y
+SUqoCEyL1acUFaE31/T8gzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
+Fw0xODA3MzExODIzMzZaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQB
+FjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEKMAsGCSqGSIb3DQEBBzALBglg
+hkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAm2t1bJAOwA7xQee2Q5GGeKtESeOD+gGi3LuJWB+z
+BDbVTKNWAuf5UtngnJnO7n3J7WtXY5owHdOil9Db4+61aHawsfKFyNjCzsXdMnzyletT1OeQ6su/
+n0Ttgcf3S3JCVbbnYpBW5a7ayCdsW3hWq/yBo6+zbECI7iM7PjNZlLgrH/EEdVCwPmh/e2Z9Z7xy
+BiiV8l7ieotmPluc/vySEyGxJcwqs6SjXpRuURJMfFGbIGIclgA8liGS+zjjkBG1Iu+Gt7vRzqBH
+vgVOOKGU8W8LEuFoxFj9yUmyZvVUqxxjZqpXh1nZSCAW6Mr4tIYvLaGnHAPKIlB7g0qPuLyfJQ==
+--0000000000001fefa205724fadda--
