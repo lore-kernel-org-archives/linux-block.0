@@ -1,111 +1,97 @@
-Return-Path: <gedwards@ddn.com>
-From: Greg Edwards <gedwards@ddn.com>
-To: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>
-CC: Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen"
-	<martin.petersen@oracle.com>, Greg Edwards <gedwards@ddn.com>
-Subject: [PATCH 1/2] block: move bio_integrity_{intervals,bytes} into blkdev.h
-Date: Wed, 25 Jul 2018 10:22:58 -0400
-Message-ID: <20180725142259.20562-2-gedwards@ddn.com>
-In-Reply-To: <20180725142259.20562-1-gedwards@ddn.com>
-References: <20180725142259.20562-1-gedwards@ddn.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: gedwards@ddn.com
+Return-Path: <keescook@chromium.org>
+Return-Path: <keescook@chromium.org>
+From: Kees Cook <keescook@chromium.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Kees Cook <keescook@chromium.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	Tejun Heo <tj@kernel.org>,
+	Borislav Petkov <bp@alien8.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
+	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
+	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
+	"Nicholas A. Bellinger" <nab@linux-iscsi.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Philippe Ombredanne <pombredanne@nexb.com>,
+	Stephen Boyd <sboyd@codeaurora.org>,
+	Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
+	Juergen Gross <jgross@suse.com>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Sagar Dharia <sdharia@codeaurora.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Vinod Koul <vinod.koul@intel.com>,
+	David Kershner <david.kershner@unisys.com>,
+	linux-block@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	target-devel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/9] block: Consolidate scsi sense buffer usage
+Date: Tue, 31 Jul 2018 12:51:45 -0700
+Message-Id: <20180731195155.46664-1-keescook@chromium.org>
 List-ID: <linux-block@vger.kernel.org>
 
-This allows bio_integrity_bytes() to be called from drivers instead of
-open coding it.
+This is a follow-up to commit f7068114d45e ("sr: pass down correctly
+sized SCSI sense buffer") which further cleans up and removes needless
+sense character array buffers and "struct request_sense" usage in favor
+of the common "struct scsi_sense_hdr".
 
-Signed-off-by: Greg Edwards <gedwards@ddn.com>
----
- block/bio-integrity.c  | 22 ----------------------
- include/linux/blkdev.h | 34 ++++++++++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+), 22 deletions(-)
+First, drop a bunch of unused sense buffers:
+ [PATCH 1/9] ide-cd: Drop unused sense buffers
+ [PATCH 2/9] scsi: cxlflash: Drop unused sense buffers
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index add7c7c85335..67b5fb861a51 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -159,28 +159,6 @@ int bio_integrity_add_page(struct bio *bio, struct page *page,
- }
- EXPORT_SYMBOL(bio_integrity_add_page);
- 
--/**
-- * bio_integrity_intervals - Return number of integrity intervals for a bio
-- * @bi:		blk_integrity profile for device
-- * @sectors:	Size of the bio in 512-byte sectors
-- *
-- * Description: The block layer calculates everything in 512 byte
-- * sectors but integrity metadata is done in terms of the data integrity
-- * interval size of the storage device.  Convert the block layer sectors
-- * to the appropriate number of integrity intervals.
-- */
--static inline unsigned int bio_integrity_intervals(struct blk_integrity *bi,
--						   unsigned int sectors)
--{
--	return sectors >> (bi->interval_exp - 9);
--}
--
--static inline unsigned int bio_integrity_bytes(struct blk_integrity *bi,
--					       unsigned int sectors)
--{
--	return bio_integrity_intervals(bi, sectors) * bi->tuple_size;
--}
--
- /**
-  * bio_integrity_process - Process integrity metadata for a bio
-  * @bio:	bio to generate/verify integrity metadata for
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 79226ca8f80f..553cc97900f6 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1877,6 +1877,28 @@ static inline bool integrity_req_gap_front_merge(struct request *req,
- 				bip_next->bip_vec[0].bv_offset);
- }
- 
-+/**
-+ * bio_integrity_intervals - Return number of integrity intervals for a bio
-+ * @bi:		blk_integrity profile for device
-+ * @sectors:	Size of the bio in 512-byte sectors
-+ *
-+ * Description: The block layer calculates everything in 512 byte
-+ * sectors but integrity metadata is done in terms of the data integrity
-+ * interval size of the storage device.  Convert the block layer sectors
-+ * to the appropriate number of integrity intervals.
-+ */
-+static inline unsigned int bio_integrity_intervals(struct blk_integrity *bi,
-+						   unsigned int sectors)
-+{
-+	return sectors >> (bi->interval_exp - 9);
-+}
-+
-+static inline unsigned int bio_integrity_bytes(struct blk_integrity *bi,
-+					       unsigned int sectors)
-+{
-+	return bio_integrity_intervals(bi, sectors) * bi->tuple_size;
-+}
-+
- #else /* CONFIG_BLK_DEV_INTEGRITY */
- 
- struct bio;
-@@ -1950,6 +1972,18 @@ static inline bool integrity_req_gap_front_merge(struct request *req,
- 	return false;
- }
- 
-+static inline unsigned int bio_integrity_intervals(struct blk_integrity *bi,
-+						   unsigned int sectors)
-+{
-+	return 0;
-+}
-+
-+static inline unsigned int bio_integrity_bytes(struct blk_integrity *bi,
-+					       unsigned int sectors)
-+{
-+	return 0;
-+}
-+
- #endif /* CONFIG_BLK_DEV_INTEGRITY */
- 
- struct block_device_operations {
+Next, allow the sense buffer to be usable outside SCSI tree:
+ [PATCH 3/9] scsi: build scsi_common.o for all scsi passthrough request users
+ [PATCH 4/9] target: don't depend on SCSI
+
+Then move all request_sense usage to scsi_sense_hdr:
+ [PATCH 5/9] block: Switch struct packet_command to use struct scsi_sense_hdr
+
+And do some further cleanups for scsi_sense_hdr now that we can:
+ [PATCH 6/9] ide-cd: Remove redundant sense buffer
+ [PATCH 7/9] cdrom: Use struct scsi_sense_hdr internally
+
+Finally add a build-time check to make sure we don't pass bad buffer sizes:
+ [PATCH 8/9] libata-scsi: Move sense buffers onto stack
+ [PATCH 9/9] scsi: Check sense buffer size at build time
+
+
+-Kees
+
+Christoph Hellwig (2):
+  scsi: build scsi_common.o for all scsi passthrough request users
+  target: don't depend on SCSI
+
+Kees Cook (7):
+  ide-cd: Drop unused sense buffers
+  scsi: cxlflash: Drop unused sense buffers
+  block: Switch struct packet_command to use struct scsi_sense_hdr
+  ide-cd: Remove redundant sense buffer
+  cdrom: Use struct scsi_sense_hdr internally
+  libata-scsi: Move sense buffers onto stack
+  scsi: Check sense buffer size at build time
+
+ drivers/Makefile                  |  2 +-
+ drivers/ata/libata-scsi.c         | 18 +++------
+ drivers/block/Kconfig             |  2 +-
+ drivers/block/pktcdvd.c           | 36 +++++++++---------
+ drivers/cdrom/cdrom.c             | 30 ++++++++-------
+ drivers/ide/ide-cd.c              | 58 ++++++++++++++---------------
+ drivers/ide/ide-cd.h              |  6 +--
+ drivers/ide/ide-cd_ioctl.c        | 62 +++++++++++++------------------
+ drivers/scsi/Makefile             |  2 +-
+ drivers/scsi/cxlflash/superpipe.c |  8 +---
+ drivers/scsi/cxlflash/vlun.c      |  7 +---
+ drivers/scsi/scsi_lib.c           |  6 +--
+ drivers/scsi/sr_ioctl.c           | 22 +++++------
+ drivers/target/Kconfig            |  5 ++-
+ include/linux/cdrom.h             |  3 +-
+ include/scsi/scsi_cmnd.h          |  6 +--
+ include/scsi/scsi_device.h        | 14 ++++++-
+ 17 files changed, 136 insertions(+), 151 deletions(-)
+
 -- 
 2.17.1
