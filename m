@@ -1,43 +1,24 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from gateway36.websitewelcome.com ([192.185.192.36]:30412 "EHLO
-        gateway36.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752839AbeGCVlb (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:35804 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728187AbeGaJ3m (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 3 Jul 2018 17:41:31 -0400
-Received: from cm12.websitewelcome.com (cm12.websitewelcome.com [100.42.49.8])
-        by gateway36.websitewelcome.com (Postfix) with ESMTP id E91D2400C6F09
-        for <linux-block@vger.kernel.org>; Tue,  3 Jul 2018 15:22:12 -0500 (CDT)
-Date: Tue, 3 Jul 2018 16:21:25 -0500
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] lightnvm: pblk: mark expected switch fall-through
-Message-ID: <20180703212125.GA29262@embeddedor.com>
+        Tue, 31 Jul 2018 05:29:42 -0400
+Date: Tue, 31 Jul 2018 00:50:39 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Li Dongyang <dongyangli@ddn.com>
+Cc: linux-block@vger.kernel.org, adilger@dilger.ca, lixi@ddn.com,
+        martin.petersen@oracle.com, sihara@ddn.com
+Subject: Re: [PATCH 1/2] block-integrity: allow optional integrity functions
+ for bio
+Message-ID: <20180731075039.GA10387@infradead.org>
+References: <20180731071938.22129-1-dongyangli@ddn.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180731071938.22129-1-dongyangli@ddn.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-In preparation to enabling -Wimplicit-fallthrough, mark switch cases
-where we are expecting to fall through.
-
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
----
- drivers/lightnvm/pblk-core.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index ed9cc97..9c93334 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -264,6 +264,7 @@ void pblk_free_rqd(struct pblk *pblk, struct nvm_rq *rqd, int type)
- 	switch (type) {
- 	case PBLK_WRITE:
- 		kfree(((struct pblk_c_ctx *)nvm_rq_to_pdu(rqd))->lun_bitmap);
-+		/* fall through */
- 	case PBLK_WRITE_INT:
- 		pool = &pblk->w_rq_pool;
- 		break;
--- 
-2.7.4
+Please submit these together with an actual user.  We are not
+going to add dead code to the kernel.  Even with an actual user
+you'll need a reall good argument for bloating struct bio.
