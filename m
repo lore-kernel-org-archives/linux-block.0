@@ -1,66 +1,54 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 0/6] genhd: register default groups with device_add_disk()
-Date: Mon, 30 Jul 2018 09:12:21 +0200
-Message-Id: <20180730071227.22887-1-hare@suse.de>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Kent Overstreet <kent.overstreet@gmail.com>
+Subject: [PATCH 1/3] block: don't use bio->bi_vcnt to figure out segment number
+Date: Tue, 31 Jul 2018 18:49:12 +0800
+Message-Id: <20180731104914.17249-2-ming.lei@redhat.com>
+In-Reply-To: <20180731104914.17249-1-ming.lei@redhat.com>
+References: <20180731104914.17249-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-device_add_disk() doesn't allow to register with default sysfs groups,
-which introduces a race with udev as these groups have to be created after
-the uevent has been sent.
-This patchset updates device_add_disk() to accept a 'groups' argument to
-avoid this race and updates the obvious drivers to use it.
-There are some more drivers which might benefit from this (eg loop or md),
-but the interface is not straightforward so I haven't attempted it.
+It is wrong to use bio->bi_vcnt to figure out how many segments
+there are in the bio even though CLONED flag isn't set on this bio,
+because this bio may be splitted or advanced.
 
-As usual, comments and reviews are welcome.
+So always use bio_segments() in blk_recount_segments(), and it shouldn't
+cause any performance loss now because the physical segment number is figured
+out in blk_queue_split() and BIO_SEG_VALID is set meantime since
+bdced438acd83ad83a6c ("block: setup bi_phys_segments after splitting").
 
-Hannes Reinecke (6):
-  genhd: drop 'bool' argument from __device_add_disk()
-  block: genhd: add 'groups' argument to device_add_disk
-  nvme: register ns_id attributes as default sysfs groups
-  aoe: use device_add_disk_with_groups()
-  zram: register default groups with device_add_disk()
-  virtio-blk: modernize sysfs attribute creation
+Fixes: 7f60dcaaf91 ("block: blk-merge: fix blk_recount_segments()")
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-merge.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
- arch/um/drivers/ubd_kern.c          |  2 +-
- block/genhd.c                       | 39 ++++++++++++++-------
- drivers/block/aoe/aoe.h             |  1 -
- drivers/block/aoe/aoeblk.c          | 21 ++++--------
- drivers/block/aoe/aoedev.c          |  1 -
- drivers/block/floppy.c              |  2 +-
- drivers/block/mtip32xx/mtip32xx.c   |  2 +-
- drivers/block/ps3disk.c             |  2 +-
- drivers/block/ps3vram.c             |  2 +-
- drivers/block/rsxx/dev.c            |  2 +-
- drivers/block/skd_main.c            |  2 +-
- drivers/block/sunvdc.c              |  2 +-
- drivers/block/virtio_blk.c          | 68 +++++++++++++++++++++----------------
- drivers/block/xen-blkfront.c        |  2 +-
- drivers/block/zram/zram_drv.c       | 28 ++++-----------
- drivers/ide/ide-cd.c                |  2 +-
- drivers/ide/ide-gd.c                |  2 +-
- drivers/memstick/core/ms_block.c    |  2 +-
- drivers/memstick/core/mspro_block.c |  2 +-
- drivers/mmc/core/block.c            |  2 +-
- drivers/mtd/mtd_blkdevs.c           |  2 +-
- drivers/nvdimm/blk.c                |  2 +-
- drivers/nvdimm/btt.c                |  2 +-
- drivers/nvdimm/pmem.c               |  2 +-
- drivers/nvme/host/core.c            | 13 ++++---
- drivers/nvme/host/multipath.c       | 15 +++-----
- drivers/nvme/host/nvme.h            |  2 +-
- drivers/s390/block/dasd_genhd.c     |  2 +-
- drivers/s390/block/dcssblk.c        |  2 +-
- drivers/s390/block/scm_blk.c        |  2 +-
- drivers/scsi/sd.c                   |  2 +-
- drivers/scsi/sr.c                   |  2 +-
- include/linux/genhd.h               |  5 +--
- 33 files changed, 117 insertions(+), 122 deletions(-)
-
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index aaec38cc37b8..4a16d4f929da 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -308,13 +308,7 @@ void blk_recalc_rq_segments(struct request *rq)
+ 
+ void blk_recount_segments(struct request_queue *q, struct bio *bio)
+ {
+-	unsigned short seg_cnt;
+-
+-	/* estimate segment number by bi_vcnt for non-cloned bio */
+-	if (bio_flagged(bio, BIO_CLONED))
+-		seg_cnt = bio_segments(bio);
+-	else
+-		seg_cnt = bio->bi_vcnt;
++	unsigned short seg_cnt = bio_segments(bio);
+ 
+ 	if (test_bit(QUEUE_FLAG_NO_SG_MERGE, &q->queue_flags) &&
+ 			(seg_cnt < queue_max_segments(q)))
 -- 
-2.12.3
+2.9.5
