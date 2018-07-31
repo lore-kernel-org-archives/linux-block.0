@@ -1,86 +1,18 @@
-Return-Path: <mwilck@suse.com>
-From: Martin Wilck <mwilck@suse.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Jan Kara <jack@suse.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Ming Lei <ming.lei@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Kent Overstreet <kent.overstreet@gmail.com>,
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
-	Martin Wilck <mwilck@suse.com>
-Subject: [PATCH v5 1/3] block: bio_iov_iter_get_pages: fix size of last iovec
-Date: Wed, 25 Jul 2018 23:15:07 +0200
-Message-Id: <20180725211509.13592-2-mwilck@suse.com>
-In-Reply-To: <20180725211509.13592-1-mwilck@suse.com>
-References: <20180725211509.13592-1-mwilck@suse.com>
+	kernel-team@fb.com
+Subject: [PATCH 0/3] blk-iolatency related ref counting fixes
+Date: Tue, 31 Jul 2018 12:39:01 -0400
+Message-Id: <20180731163904.21856-1-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-If the last page of the bio is not "full", the length of the last
-vector slot needs to be corrected. This slot has the index
-(bio->bi_vcnt - 1), but only in bio->bi_io_vec. In the "bv" helper
-array, which is shifted by the value of bio->bi_vcnt at function
-invocation, the correct index is (nr_pages - 1).
+These are three ref counting issues we found in testing.  They are pretty
+straightforward, the first two don't really happen in practice but need to be
+fixed, but the last one fixes a real panic we saw pretty regularly in our stress
+testing.  They've been running on our test boxes internally under stress tests
+and seem to have fixed the remaining issues we were seeing.  Thanks,
 
-v2: improved readability following suggestions from Ming Lei.
-v3: followed a formatting suggestion from Christoph Hellwig.
-
-Fixes: 2cefe4dbaadf ("block: add bio_iov_iter_get_pages()")
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Martin Wilck <mwilck@suse.com>
----
- block/bio.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 67eff5e..489a430 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -912,16 +912,16 @@ EXPORT_SYMBOL(bio_add_page);
-  */
- int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- {
--	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
-+	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt, idx;
- 	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
- 	struct page **pages = (struct page **)bv;
--	size_t offset, diff;
-+	size_t offset;
- 	ssize_t size;
- 
- 	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
- 	if (unlikely(size <= 0))
- 		return size ? size : -EFAULT;
--	nr_pages = (size + offset + PAGE_SIZE - 1) / PAGE_SIZE;
-+	idx = nr_pages = (size + offset + PAGE_SIZE - 1) / PAGE_SIZE;
- 
- 	/*
- 	 * Deep magic below:  We need to walk the pinned pages backwards
-@@ -934,17 +934,15 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	bio->bi_iter.bi_size += size;
- 	bio->bi_vcnt += nr_pages;
- 
--	diff = (nr_pages * PAGE_SIZE - offset) - size;
--	while (nr_pages--) {
--		bv[nr_pages].bv_page = pages[nr_pages];
--		bv[nr_pages].bv_len = PAGE_SIZE;
--		bv[nr_pages].bv_offset = 0;
-+	while (idx--) {
-+		bv[idx].bv_page = pages[idx];
-+		bv[idx].bv_len = PAGE_SIZE;
-+		bv[idx].bv_offset = 0;
- 	}
- 
- 	bv[0].bv_offset += offset;
- 	bv[0].bv_len -= offset;
--	if (diff)
--		bv[bio->bi_vcnt - 1].bv_len -= diff;
-+	bv[nr_pages - 1].bv_len -= nr_pages * PAGE_SIZE - offset - size;
- 
- 	iov_iter_advance(iter, size);
- 	return 0;
--- 
-2.17.1
+Josef
