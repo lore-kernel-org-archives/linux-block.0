@@ -1,13 +1,11 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 1 Aug 2018 08:45:02 -0700
-From: Tejun Heo <tj@kernel.org>
+Return-Path: <BATV+568b9e22b4768da93666+5456+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Wed, 1 Aug 2018 01:24:29 -0700
+From: Christoph Hellwig <hch@infradead.org>
 To: Kees Cook <keescook@chromium.org>
 Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
 	"Martin K. Petersen" <martin.petersen@oracle.com>,
 	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	Borislav Petkov <bp@alien8.de>,
+	Tejun Heo <tj@kernel.org>, Borislav Petkov <bp@alien8.de>,
 	"David S. Miller" <davem@davemloft.net>,
 	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
 	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
@@ -28,7 +26,7 @@ Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
 	linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH v2 8/9] libata-scsi: Move sense buffers onto stack
-Message-ID: <20180801154502.GO1206094@devbig004.ftw2.facebook.com>
+Message-ID: <20180801082429.GD26378@infradead.org>
 References: <20180731195155.46664-1-keescook@chromium.org>
  <20180731195155.46664-9-keescook@chromium.org>
 MIME-Version: 1.0
@@ -41,10 +39,9 @@ On Tue, Jul 31, 2018 at 12:51:53PM -0700, Kees Cook wrote:
 > validate the length of sense buffers, this removes the only dynamically
 > allocated sense buffers in the tree by putting the 96 byte sense buffers
 > on the stack.
+> 
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-Acked-by: Tejun Heo <tj@kernel.org>
+Looks good,
 
-Thanks.
-
--- 
-tejun
+Reviewed-by: Christoph Hellwig <hch@lst.de>
