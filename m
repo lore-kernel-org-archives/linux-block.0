@@ -1,284 +1,60 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-From: Dennis Zhou <dennisszhou@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Josef Bacik <josef@toxicpanda.com>
-Cc: kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-Subject: [PATCH 10/15] blkcg: remove bio->bi_css and instead use bio->bi_blkg
-Date: Thu, 30 Aug 2018 21:53:51 -0400
-Message-Id: <20180831015356.69796-11-dennisszhou@gmail.com>
-In-Reply-To: <20180831015356.69796-1-dennisszhou@gmail.com>
-References: <20180831015356.69796-1-dennisszhou@gmail.com>
+Return-Path: <keescook@google.com>
+MIME-Version: 1.0
+Sender: keescook@google.com
+In-Reply-To: <6c04fc087bae896bf00b94184def3d7697a22d6c.camel@wdc.com>
+References: <20180731195155.46664-1-keescook@chromium.org> <20180731195155.46664-4-keescook@chromium.org>
+ <a5b545eade66f95c9a9ecf37676306a8d395187c.camel@wdc.com> <20180731201225.GA1989@infradead.org>
+ <6c04fc087bae896bf00b94184def3d7697a22d6c.camel@wdc.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Wed, 1 Aug 2018 12:50:26 -0700
+Message-ID: <CAGXu5jK2kLiOGTbq2TCBp97c2KZsZKPDNLSWDWY4r+RQpAP4fQ@mail.gmail.com>
+Subject: Re: [PATCH v2 3/9] scsi: build scsi_common.o for all scsi passthrough
+ request users
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@infradead.org" <hch@infradead.org>,
+	"david.kershner@unisys.com" <david.kershner@unisys.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"rdunlap@infradead.org" <rdunlap@infradead.org>,
+	"u.kleine-koenig@pengutronix.de" <u.kleine-koenig@pengutronix.de>,
+	"nab@linux-iscsi.org" <nab@linux-iscsi.org>, "tglx@linutronix.de" <tglx@linutronix.de>, "hch@lst.de" <hch@lst.de>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"manoj@linux.vnet.ibm.com" <manoj@linux.vnet.ibm.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"jgross@suse.com" <jgross@suse.com>,
+	"cyrille.pitchen@free-electrons.com" <cyrille.pitchen@free-electrons.com>,
+	"sdharia@codeaurora.org" <sdharia@codeaurora.org>,
+	"viresh.kumar@linaro.org" <viresh.kumar@linaro.org>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
+	"pombredanne@nexb.com" <pombredanne@nexb.com>,
+	"linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>, "bp@alien8.de" <bp@alien8.de>,
+	"mrochs@linux.vnet.ibm.com" <mrochs@linux.vnet.ibm.com>, "tj@kernel.org" <tj@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>, "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"sboyd@codeaurora.org" <sboyd@codeaurora.org>,
+	"ukrishn@linux.vnet.ibm.com" <ukrishn@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+On Tue, Jul 31, 2018 at 1:18 PM, Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
+> On Tue, 2018-07-31 at 13:12 -0700, hch@infradead.org wrote:
+>> It shouldn't.  All these are built into scsi_mod.o, which is only built
+>> when CONFIG_SCSI is set.  Under what circumstances do you see them built?
+>
+> Although I think you are right, I still prefer that the scsi_common.c file
+> would be moved to a new directory. That will prevent confusion later on for
+> people who want to add additional code. This patch makes it nontrivial to
+> figure out which code is built when SCSI target functionality is enabled but
+> SCSI initiator functionality is not selected. I think moving scsi_common.c
+> into a new directory would make it much easier to figure out which code is
+> built depending on the kernel configuration.
 
-Prior patches ensured that all bios are now associated with some blkg.
-This now makes bio->bi_css unnecessary as blkg maintains a reference to
-the blkcg already.
+While I don't disagree with you, this series is the result of several
+back-and-forth discussions where that option was seemingly rejected.
+Christoph's approach seemed to satisfy Jens. If you can convince them,
+sure! I'll do whatever the consensus is. :)
 
-This patch removes the field bi_css and transfers corresponding uses to
-access via bi_blkg.
+-Kees
 
-Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
----
- block/bio.c                | 56 ++++++++------------------------------
- block/bounce.c             |  2 +-
- drivers/block/loop.c       |  5 ++--
- drivers/md/raid0.c         |  2 +-
- include/linux/bio.h        |  7 ++---
- include/linux/blk-cgroup.h |  4 +--
- include/linux/blk_types.h  |  1 -
- kernel/trace/blktrace.c    |  4 +--
- 8 files changed, 22 insertions(+), 59 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 97ef994a08b6..ec55ee810503 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -609,7 +609,7 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
- 	bio->bi_iter = bio_src->bi_iter;
- 	bio->bi_io_vec = bio_src->bi_io_vec;
- 
--	bio_clone_blkcg_association(bio, bio_src);
-+	bio_clone_blkg_association(bio, bio_src);
- 
- 	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
- }
-@@ -1930,34 +1930,6 @@ EXPORT_SYMBOL(bioset_init_from_src);
- 
- #ifdef CONFIG_BLK_CGROUP
- 
--/**
-- * bio_associate_blkcg - associate a bio with the specified blkcg
-- * @bio: target bio
-- * @blkcg_css: css of the blkcg to associate
-- *
-- * Associate @bio with the blkcg specified by @blkcg_css.  Block layer will
-- * treat @bio as if it were issued by a task which belongs to the blkcg.
-- *
-- * This function takes an extra reference of @blkcg_css which will be put
-- * when @bio is released.  The caller must own @bio and is responsible for
-- * synchronizing calls to this function.  If @blkcg_css is NULL, a call to
-- * blkcg_get_css finds the current css from the kthread or task.
-- */
--int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css)
--{
--	if (unlikely(bio->bi_css))
--		return -EBUSY;
--
--	if (blkcg_css)
--		css_get(blkcg_css);
--	else
--		blkcg_css = blkcg_get_css();
--
--	bio->bi_css = blkcg_css;
--	return 0;
--}
--EXPORT_SYMBOL_GPL(bio_associate_blkcg);
--
- /**
-  * bio_associate_blkg - associate a bio with the specified blkg
-  * @bio: target bio
-@@ -2004,7 +1976,6 @@ int bio_associate_blkg_from_css(struct bio *bio,
- 				struct cgroup_subsys_state *css)
- {
- 	css_get(css);
--	bio->bi_css = css;
- 	return __bio_associate_blkg_from_css(bio, css);
- }
- EXPORT_SYMBOL_GPL(bio_associate_blkg_from_css);
-@@ -2025,12 +1996,11 @@ int bio_associate_blkg_from_page(struct bio *bio, struct page *page)
- {
- 	struct cgroup_subsys_state *css;
- 
--	if (unlikely(bio->bi_css))
-+	if (unlikely(bio->bi_blkg))
- 		return -EBUSY;
- 	if (!page->mem_cgroup)
- 		return 0;
- 	css = cgroup_get_e_css(page->mem_cgroup->css.cgroup, &io_cgrp_subsys);
--	bio->bi_css = css;
- 
- 	return __bio_associate_blkg_from_css(bio, css);
- }
-@@ -2056,8 +2026,7 @@ int bio_associate_create_blkg(struct request_queue *q, struct bio *bio)
- 
- 	rcu_read_lock();
- 
--	bio_associate_blkcg(bio, NULL);
--	blkcg = bio_blkcg(bio);
-+	blkcg = css_to_blkcg(blkcg_get_css());
- 
- 	if (!blkcg->css.parent) {
- 		ret = bio_associate_blkg(bio, q->root_blkg);
-@@ -2084,30 +2053,27 @@ void bio_disassociate_task(struct bio *bio)
- 		put_io_context(bio->bi_ioc);
- 		bio->bi_ioc = NULL;
- 	}
--	if (bio->bi_css) {
--		css_put(bio->bi_css);
--		bio->bi_css = NULL;
--	}
- 	if (bio->bi_blkg) {
-+		/* a ref is always taken on css */
-+		css_put(&bio_blkcg(bio)->css);
- 		blkg_put(bio->bi_blkg);
- 		bio->bi_blkg = NULL;
- 	}
- }
- 
- /**
-- * bio_clone_blkcg_association - clone blkcg association from src to dst bio
-+ * bio_clone_blkg_association - clone blkg association from src to dst bio
-  * @dst: destination bio
-  * @src: source bio
-  */
--void bio_clone_blkcg_association(struct bio *dst, struct bio *src)
-+void bio_clone_blkg_association(struct bio *dst, struct bio *src)
- {
--	if (src->bi_css)
--		WARN_ON(bio_associate_blkcg(dst, src->bi_css));
--
--	if (src->bi_blkg)
-+	if (src->bi_blkg) {
-+		css_get(&bio_blkcg(src)->css);
- 		bio_associate_blkg(dst, src->bi_blkg);
-+	}
- }
--EXPORT_SYMBOL_GPL(bio_clone_blkcg_association);
-+EXPORT_SYMBOL_GPL(bio_clone_blkg_association);
- #endif /* CONFIG_BLK_CGROUP */
- 
- static void __init biovec_init_slabs(void)
-diff --git a/block/bounce.c b/block/bounce.c
-index bea3b0cbe4a7..9f7071e176a4 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -257,7 +257,7 @@ static struct bio *bounce_clone_bio(struct bio *bio_src, gfp_t gfp_mask,
- 		}
- 	}
- 
--	bio_clone_blkcg_association(bio, bio_src);
-+	bio_clone_blkg_association(bio, bio_src);
- 
- 	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
- 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index ea9debf59b22..abad6d15f956 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -77,6 +77,7 @@
- #include <linux/falloc.h>
- #include <linux/uio.h>
- #include <linux/ioprio.h>
-+#include <linux/blk-cgroup.h>
- 
- #include "loop.h"
- 
-@@ -1760,8 +1761,8 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 
- 	/* always use the first bio's css */
- #ifdef CONFIG_BLK_CGROUP
--	if (cmd->use_aio && rq->bio && rq->bio->bi_css) {
--		cmd->css = rq->bio->bi_css;
-+	if (cmd->use_aio && rq->bio && rq->bio->bi_blkg) {
-+		cmd->css = &bio_blkcg(rq->bio)->css;
- 		css_get(cmd->css);
- 	} else
- #endif
-diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
-index ac1cffd2a09b..f3fb5bb8c82a 100644
---- a/drivers/md/raid0.c
-+++ b/drivers/md/raid0.c
-@@ -542,7 +542,7 @@ static void raid0_handle_discard(struct mddev *mddev, struct bio *bio)
- 		    !discard_bio)
- 			continue;
- 		bio_chain(discard_bio, bio);
--		bio_clone_blkcg_association(discard_bio, bio);
-+		bio_clone_blkg_association(discard_bio, bio);
- 		if (mddev->gendisk)
- 			trace_block_bio_remap(bdev_get_queue(rdev->bdev),
- 				discard_bio, disk_devt(mddev->gendisk),
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 81530d11d34d..175e5e349d30 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -554,16 +554,13 @@ static inline int bio_associate_blkg_from_page(struct bio *bio,
- #endif
- 
- #ifdef CONFIG_BLK_CGROUP
--int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css);
- int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg);
- int bio_associate_blkg_from_css(struct bio *bio,
- 				struct cgroup_subsys_state *css);
- int bio_associate_create_blkg(struct request_queue *q, struct bio *bio);
- void bio_disassociate_task(struct bio *bio);
--void bio_clone_blkcg_association(struct bio *dst, struct bio *src);
-+void bio_clone_blkg_association(struct bio *dst, struct bio *src);
- #else	/* CONFIG_BLK_CGROUP */
--static inline int bio_associate_blkcg(struct bio *bio,
--			struct cgroup_subsys_state *blkcg_css) { return 0; }
- static inline int bio_associate_blkg(struct bio *bio,
- 				     struct blkcg_gq *blkg) { return 0; }
- static inline int bio_associate_blkg_from_css(struct bio *bio,
-@@ -572,7 +569,7 @@ static inline int bio_associate_blkg_from_css(struct bio *bio,
- static inline int bio_associate_create_blkg(struct request_queue *q,
- 					    struct bio *bio) { return 0; }
- static inline void bio_disassociate_task(struct bio *bio) { }
--static inline void bio_clone_blkcg_association(struct bio *dst,
-+static inline void bio_clone_blkg_association(struct bio *dst,
- 			struct bio *src) { }
- #endif	/* CONFIG_BLK_CGROUP */
- 
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 55c348d66372..3c66154709ed 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -275,8 +275,8 @@ static inline struct blkcg *css_to_blkcg(struct cgroup_subsys_state *css)
-  */
- static inline struct blkcg *bio_blkcg(struct bio *bio)
- {
--	if (bio && bio->bi_css)
--		return css_to_blkcg(bio->bi_css);
-+	if (bio && bio->bi_blkg)
-+		return bio->bi_blkg->blkcg;
- 	return NULL;
- }
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index f6dfb30737d8..9578c7ab1eb6 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -178,7 +178,6 @@ struct bio {
- 	 * release.  Read comment on top of bio_associate_current().
- 	 */
- 	struct io_context	*bi_ioc;
--	struct cgroup_subsys_state *bi_css;
- 	struct blkcg_gq		*bi_blkg;
- 	struct bio_issue	bi_issue;
- #endif
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index b951aa1fac61..cd90f653c804 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -776,9 +776,9 @@ blk_trace_bio_get_cgid(struct request_queue *q, struct bio *bio)
- 	if (!bt || !(blk_tracer_flags.val & TRACE_BLK_OPT_CGROUP))
- 		return NULL;
- 
--	if (!bio->bi_css)
-+	if (!bio->bi_blkg)
- 		return NULL;
--	return cgroup_get_kernfs_id(bio->bi_css->cgroup);
-+	return cgroup_get_kernfs_id(bio_blkcg(bio)->css.cgroup);
- }
- #else
- static union kernfs_node_id *
 -- 
-2.17.1
+Kees Cook
+Pixel Security
