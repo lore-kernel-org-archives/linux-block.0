@@ -1,90 +1,56 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: tom.leiming@gmail.com, bart.vanassche@wdc.com, keith.busch@linux.intel.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] blk-mq: sync the update nr_hw_queues with part_in_flight
-Date: Wed, 15 Aug 2018 15:25:15 +0800
-Message-Id: <1534317915-5041-3-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1534317915-5041-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1534317915-5041-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <BATV+568b9e22b4768da93666+5456+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Wed, 1 Aug 2018 01:25:16 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	Tejun Heo <tj@kernel.org>, Borislav Petkov <bp@alien8.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
+	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
+	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
+	"Nicholas A. Bellinger" <nab@linux-iscsi.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Philippe Ombredanne <pombredanne@nexb.com>,
+	Stephen Boyd <sboyd@codeaurora.org>,
+	Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
+	Juergen Gross <jgross@suse.com>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
+	Sagar Dharia <sdharia@codeaurora.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Vinod Koul <vinod.koul@intel.com>,
+	David Kershner <david.kershner@unisys.com>,
+	linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 9/9] scsi: Check sense buffer size at build time
+Message-ID: <20180801082516.GE26378@infradead.org>
+References: <20180731195155.46664-1-keescook@chromium.org>
+ <20180731195155.46664-10-keescook@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180731195155.46664-10-keescook@chromium.org>
 List-ID: <linux-block@vger.kernel.org>
 
-For blk-mq, part_in_flight/rw will invoke blk_mq_in_flight/rw to
-account the inflight requests. It will access the queue_hw_ctx and
-nr_hw_queues w/o any protection. When updating nr_hw_queues and
-blk_mq_in_flight/rw occur concurrently, panic comes up.
-To fix it, introduce mq_realloc_hw_ctxs into mark the updating
-nr_hw_queues process and use rcu to ensure the mq_realloc_hw_ctxs
-globally visible.
+On Tue, Jul 31, 2018 at 12:51:54PM -0700, Kees Cook wrote:
+> To avoid introducing problems like those fixed in commit f7068114d45e
+> ("sr: pass down correctly sized SCSI sense buffer"), this creates a macro
+> wrapper for scsi_execute() that verifies the size of the sense buffer
+> similar to what was done for command string sizes in commit 3756f6401c30
+> ("exec: avoid gcc-8 warning for get_task_comm").
+> 
+> Another solution could be to add a length argument to scsi_execute(),
+> but this function already takes a lot of arguments and Jens was not fond
+> of that approach.
+> 
+> Additionally, this moves the SCSI_SENSE_BUFFERSIZE definition into
+> scsi_device.h, and removes a redundant include for scsi_device.h from
+> scsi_cmnd.h.
+> 
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
----
- block/blk-mq.c         |  3 +++
- block/genhd.c          | 10 ++++++++--
- include/linux/blkdev.h |  1 +
- 3 files changed, 12 insertions(+), 2 deletions(-)
+Looks good,
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 89904cc..ff50afc 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2517,6 +2517,8 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 
- 	blk_mq_sysfs_unregister(q);
- 
-+	WRITE_ONCE(q->mq_realloc_hw_ctxs, true);
-+	synchronize_rcu();
- 	/* protect against switching io scheduler  */
- 	mutex_lock(&q->sysfs_lock);
- 	for (i = 0; i < set->nr_hw_queues; i++) {
-@@ -2564,6 +2566,7 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 	}
- 	q->nr_hw_queues = i;
- 	mutex_unlock(&q->sysfs_lock);
-+	WRITE_ONCE(q->mq_realloc_hw_ctxs, false);
- 	blk_mq_sysfs_register(q);
- }
- 
-diff --git a/block/genhd.c b/block/genhd.c
-index 8cc719a3..f9e46aa 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -69,7 +69,10 @@ void part_in_flight(struct request_queue *q, struct hd_struct *part,
- 		    unsigned int inflight[2])
- {
- 	if (q->mq_ops) {
--		blk_mq_in_flight(q, part, inflight);
-+		rcu_read_lock();
-+		if (!q->mq_realloc_hw_ctxs)
-+			blk_mq_in_flight(q, part, inflight);
-+		rcu_read_unlock();
- 		return;
- 	}
- 
-@@ -86,7 +89,10 @@ void part_in_flight_rw(struct request_queue *q, struct hd_struct *part,
- 		       unsigned int inflight[2])
- {
- 	if (q->mq_ops) {
--		blk_mq_in_flight_rw(q, part, inflight);
-+		rcu_read_lock();
-+		if (!q->mq_realloc_hw_ctxs)
-+			blk_mq_in_flight_rw(q, part, inflight);
-+		rcu_read_unlock();
- 		return;
- 	}
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index ee930c4..5cb6662 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -662,6 +662,7 @@ struct request_queue {
- #endif
- 
- 	bool			mq_sysfs_init_done;
-+	bool			mq_realloc_hw_ctxs;
- 
- 	size_t			cmd_size;
- 	void			*rq_alloc_data;
--- 
-2.7.4
+Reviewed-by: Christoph Hellwig <hch@lst.de>
