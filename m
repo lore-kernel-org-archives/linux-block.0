@@ -1,75 +1,29 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Marco Patalano <mpatalan@redhat.com>,
-	"Ewan D. Milne" <emilne@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Omar Sandoval <osandov@fb.com>
-Subject: [PATCH] blk-mq: fix updating tags depth
-Date: Thu,  2 Aug 2018 18:23:26 +0800
-Message-Id: <20180802102326.6859-1-ming.lei@redhat.com>
+Return-Path: <hch@lst.de>
+Date: Wed, 1 Aug 2018 16:52:25 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Mike Snitzer <snitzer@redhat.com>,
+	Kent Overstreet <kent.overstreet@gmail.com>
+Subject: Re: [PATCH 1/3] block: don't use bio->bi_vcnt to figure out
+	segment number
+Message-ID: <20180801145224.GA28668@lst.de>
+References: <20180731104914.17249-1-ming.lei@redhat.com> <20180731104914.17249-2-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180731104914.17249-2-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The passed 'nr' from userspace represents the total depth, meantime
-inside 'struct blk_mq_tags', 'nr_tags' stores the total tag depth,
-and 'nr_reserved_tags' stores the reserved part.
+On Tue, Jul 31, 2018 at 06:49:12PM +0800, Ming Lei wrote:
+> It is wrong to use bio->bi_vcnt to figure out how many segments
+> there are in the bio even though CLONED flag isn't set on this bio,
+> because this bio may be splitted or advanced.
+> 
+> So always use bio_segments() in blk_recount_segments(), and it shouldn't
+> cause any performance loss now because the physical segment number is figured
+> out in blk_queue_split() and BIO_SEG_VALID is set meantime since
+> bdced438acd83ad83a6c ("block: setup bi_phys_segments after splitting").
 
-There are two issues in blk_mq_tag_update_depth() now:
+Looks good,
 
-1) for growing tags, we should have used the passed 'nr', and keep the
-number of reserved tags not changed.
-
-2) the passed 'nr' should have been used for checking against
-'tags->nr_tags', instead of number of the normal part.
-
-This patch fixes the above two cases, and avoids kernel crash caused
-by wrong resizing sbitmap queue.
-
-Cc: Marco Patalano <mpatalan@redhat.com>
-Cc: "Ewan D. Milne" <emilne@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-tag.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 09b2ee6694fb..c43b3398d7b4 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -399,8 +399,6 @@ int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
- 	if (tdepth <= tags->nr_reserved_tags)
- 		return -EINVAL;
- 
--	tdepth -= tags->nr_reserved_tags;
--
- 	/*
- 	 * If we are allowed to grow beyond the original size, allocate
- 	 * a new set of tags before freeing the old one.
-@@ -420,7 +418,8 @@ int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
- 		if (tdepth > 16 * BLKDEV_MAX_RQ)
- 			return -EINVAL;
- 
--		new = blk_mq_alloc_rq_map(set, hctx->queue_num, tdepth, 0);
-+		new = blk_mq_alloc_rq_map(set, hctx->queue_num, tdepth,
-+				tags->nr_reserved_tags);
- 		if (!new)
- 			return -ENOMEM;
- 		ret = blk_mq_alloc_rqs(set, new, hctx->queue_num, tdepth);
-@@ -437,7 +436,8 @@ int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
- 		 * Don't need (or can't) update reserved tags here, they
- 		 * remain static and should never need resizing.
- 		 */
--		sbitmap_queue_resize(&tags->bitmap_tags, tdepth);
-+		sbitmap_queue_resize(&tags->bitmap_tags,
-+				tdepth - tags->nr_reserved_tags);
- 	}
- 
- 	return 0;
--- 
-2.9.5
+Reviewed-by: Christoph Hellwig <hch@lst.de>
