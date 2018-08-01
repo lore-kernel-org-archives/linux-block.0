@@ -1,137 +1,67 @@
-Return-Path: <prvs=752cffea0=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v6 02/12] scsi: Alter handling of RQF_DV requests
-Date: Thu,  9 Aug 2018 12:41:39 -0700
-Message-Id: <20180809194149.15285-3-bart.vanassche@wdc.com>
-In-Reply-To: <20180809194149.15285-1-bart.vanassche@wdc.com>
-References: <20180809194149.15285-1-bart.vanassche@wdc.com>
+Return-Path: <jianchao.w.wang@oracle.com>
+Subject: Re: [next-20180727][qla2xxx][BUG] WARNING: CPU: 12 PID: 511 at
+ drivers/scsi/scsi_lib.c:691 scsi_end_request+0x250/0x280
+To: Abdul Haleem <abdhalee@linux.vnet.ibm.com>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        "Madhani, Himanshu" <himanshu.madhani@cavium.com>
+Cc: linux-block <linux-block@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-ext4 <linux-ext4@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-next <linux-next@vger.kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        linux-kernel <linux-kernel@vger.kernel.org>, jejb@linux.vnet.ibm.com,
+        Jens Axboe <axboe@kernel.dk>, dgilbert@interlog.com,
+        "bart.vanassche" <bart.vanassche@wdc.com>, rosattig@br.ibm.com,
+        kyle.mahlkuch@ibm.com
+References: <1533105183.23332.15.camel@abdul>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <ea4ba28e-0b03-e0d0-a1f2-4e8cf06326b8@oracle.com>
+Date: Wed, 1 Aug 2018 15:19:58 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
+In-Reply-To: <1533105183.23332.15.camel@abdul>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Process all requests in state SDEV_CREATED instead of only RQF_DV
-requests. This does not change the behavior of the SCSI core because
-the SCSI device state is modified into another state before SCSI
-devices become visible in sysfs and before any device nodes are
-created in /dev. Do not process RQF_DV requests in state SDEV_CANCEL
-because only power management requests should be processed in this
-state. Handle all SCSI device states explicitly in
-scsi_prep_state_check() instead of using a default case in the
-switch/case statement in scsi_prep_state_check(). This allows the
-compiler to verify whether all states have been handled.
+Hi Abdul
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>
----
- drivers/scsi/scsi_lib.c | 78 +++++++++++++++++++----------------------
- 1 file changed, 36 insertions(+), 42 deletions(-)
+On 08/01/2018 02:33 PM, Abdul Haleem wrote:
+> # mkfs -t ext4 /dev/mapper/mpatha
+> mke2fs 1.43.1 (08-Jun-2016)
+> Found a dos partition table in /dev/mapper/mpatha
+> Proceed anyway? (y,n) y
+> Discarding device blocks: 
+> qla2xxx [0106:a0:00.1]-801c:2: Abort command issued nexus=2:1:0 --  1 2002.
+> qla2xxx [0106:a0:00.0]-801c:0: Abort command issued nexus=0:1:0 --  1 2002.
+> qla2xxx [0106:a0:00.1]-801c:2: Abort command issued nexus=2:1:0 --  1 2002.
+> qla2xxx [0106:a0:00.0]-801c:0: Abort command issued nexus=0:1:0 --  1 2002.
+> WARNING: CPU: 12 PID: 511 at drivers/scsi/scsi_lib.c:691 scsi_end_request+0x250/0x280
+...
+> NIP [c000000000690080] scsi_end_request+0x250/0x280
+> LR [c00000000068fe80] scsi_end_request+0x50/0x280
+> Call Trace:
+> [c00000027d39b600] [c00000000068fe80] scsi_end_request+0x50/0x280 (unreliable)
+> [c00000027d39b660] [c0000000006904ac] scsi_io_completion+0x29c/0x7d0
+> [c00000027d39b710] [c0000000006848e4] scsi_finish_command+0x104/0x1c0
+> [c00000027d39b790] [c00000000068f148] scsi_softirq_done+0x198/0x1f0
+> [c00000027d39b820] [c0000000004f2b80] blk_mq_complete_request+0x130/0x1d0
+> [c00000027d39b860] [c00000000068d27c] scsi_mq_done+0x2c/0xe0
+> [c00000027d39b890] [d000000004291080] qla2xxx_qpair_sp_compl+0xa8/0x140 [qla2xxx]
+> [c00000027d39b900] [d0000000042cc9d0] qla2x00_process_completed_request+0x68/0x140 [qla2xxx]
+> ------------[ cut here ]------------
+> kernel BUG at block/blk-core.c:3196!
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index a65a03e2bcc4..8685704f6c8b 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1331,49 +1331,43 @@ scsi_prep_state_check(struct scsi_device *sdev, struct request *req)
- 	 * If the device is not in running state we will reject some
- 	 * or all commands.
- 	 */
--	if (unlikely(sdev->sdev_state != SDEV_RUNNING)) {
--		switch (sdev->sdev_state) {
--		case SDEV_OFFLINE:
--		case SDEV_TRANSPORT_OFFLINE:
--			/*
--			 * If the device is offline we refuse to process any
--			 * commands.  The device must be brought online
--			 * before trying any recovery commands.
--			 */
--			sdev_printk(KERN_ERR, sdev,
--				    "rejecting I/O to offline device\n");
--			ret = BLKPREP_KILL;
--			break;
--		case SDEV_DEL:
--			/*
--			 * If the device is fully deleted, we refuse to
--			 * process any commands as well.
--			 */
--			sdev_printk(KERN_ERR, sdev,
--				    "rejecting I/O to dead device\n");
--			ret = BLKPREP_KILL;
--			break;
--		case SDEV_BLOCK:
--		case SDEV_CREATED_BLOCK:
-+	switch (sdev->sdev_state) {
-+	case SDEV_RUNNING:
-+	case SDEV_CREATED:
-+		break;
-+	case SDEV_OFFLINE:
-+	case SDEV_TRANSPORT_OFFLINE:
-+		/*
-+		 * If the device is offline we refuse to process any commands.
-+		 * The device must be brought online before trying any
-+		 * recovery commands.
-+		 */
-+		sdev_printk(KERN_ERR, sdev,
-+			    "rejecting I/O to offline device\n");
-+		ret = BLKPREP_KILL;
-+		break;
-+	case SDEV_DEL:
-+		/*
-+		 * If the device is fully deleted, we refuse to process any
-+		 * commands as well.
-+		 */
-+		sdev_printk(KERN_ERR, sdev, "rejecting I/O to dead device\n");
-+		ret = BLKPREP_KILL;
-+		break;
-+	case SDEV_BLOCK:
-+	case SDEV_CREATED_BLOCK:
-+		ret = BLKPREP_DEFER;
-+		break;
-+	case SDEV_QUIESCE:
-+		/* Only allow RQF_PM and RQF_DV requests. */
-+		if (!(req->rq_flags & (RQF_PM | RQF_DV)))
- 			ret = BLKPREP_DEFER;
--			break;
--		case SDEV_QUIESCE:
--			/*
--			 * If the devices is blocked we defer normal commands.
--			 */
--			if (req && !(req->rq_flags & (RQF_PM | RQF_DV)))
--				ret = BLKPREP_DEFER;
--			break;
--		default:
--			/*
--			 * For any other not fully online state we only allow
--			 * special commands.  In particular any user initiated
--			 * command is not allowed.
--			 */
--			if (req && !(req->rq_flags & (RQF_PM | RQF_DV)))
--				ret = BLKPREP_KILL;
--			break;
--		}
-+		break;
-+	case SDEV_CANCEL:
-+		/* Only allow RQF_PM requests. */
-+		if (!(req->rq_flags & RQF_PM))
-+			ret = BLKPREP_KILL;
-+		break;
- 	}
- 	return ret;
- }
--- 
-2.18.0
+blk_finish_request
+
+BUG_ON(blk_queued_rq(req))
+
+We are also suffering a similar issue on qla2xxx,
+the BUG_ON in blk_finish_request is triggered while there are lots of command aborted.
+The root cause should be qla2xxx driver still invoke scsi_done for an aborted command
+and cause race between requeue path and normal complete path.
+
+Add Himanshu Madhani from qlogic team.
+It seems that they are working on this.
+
+Thanks
+Jianchao
