@@ -1,48 +1,46 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:41658 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727655AbeHaRmS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Aug 2018 13:42:18 -0400
-Received: by mail-ed1-f66.google.com with SMTP id f38-v6so9062565edd.8
-        for <linux-block@vger.kernel.org>; Fri, 31 Aug 2018 06:34:47 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 1/4] lightnvm: use right address format on 1.2 path
-Date: Fri, 31 Aug 2018 15:34:34 +0200
-Message-Id: <1535722477-31288-2-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1535722477-31288-1-git-send-email-javier@cnexlabs.com>
-References: <1535722477-31288-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <BATV+568b9e22b4768da93666+5456+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Wed, 1 Aug 2018 01:23:30 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	Tejun Heo <tj@kernel.org>, Borislav Petkov <bp@alien8.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
+	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
+	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
+	"Nicholas A. Bellinger" <nab@linux-iscsi.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Philippe Ombredanne <pombredanne@nexb.com>,
+	Stephen Boyd <sboyd@codeaurora.org>,
+	Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
+	Juergen Gross <jgross@suse.com>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
+	Sagar Dharia <sdharia@codeaurora.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Vinod Koul <vinod.koul@intel.com>,
+	David Kershner <david.kershner@unisys.com>,
+	linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 6/9] ide-cd: Remove redundant sense buffer
+Message-ID: <20180801082330.GB26378@infradead.org>
+References: <20180731195155.46664-1-keescook@chromium.org>
+ <20180731195155.46664-7-keescook@chromium.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180731195155.46664-7-keescook@chromium.org>
+List-ID: <linux-block@vger.kernel.org>
 
-struct ppa_addr defines different address formats. When we are in the
-1.2 path, use 1.2 addressing, even when the generic format works too.
-This improves readability.
+On Tue, Jul 31, 2018 at 12:51:51PM -0700, Kees Cook wrote:
+> This is already able to process the sense buffer, so remove the redundant
+> parsing during the failure path. This also fixes any possible stale values
+> since the prior code did not check the sense length.
+> 
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Looks good,
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index f7154398ba38..e9f14c67f4f3 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -998,8 +998,8 @@ static int nvm_get_bb_meta(struct nvm_dev *dev, sector_t slba,
- 				goto done;
- 
- 			ppa_gen.ppa = 0;
--			ppa_gen.a.ch = ch;
--			ppa_gen.a.lun = lun;
-+			ppa_gen.g.ch = ch;
-+			ppa_gen.g.lun = lun;
- 			ppa_dev = generic_to_dev_addr(dev, ppa_gen);
- 
- 			ret = dev->ops->get_bb_tbl(dev, ppa_dev, blks);
--- 
-2.7.4
+Reviewed-by: Christoph Hellwig <hch@lst.de>
