@@ -1,39 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39220 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727237AbeHIJIq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Aug 2018 05:08:46 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 13/17] bcache: add static const prefix to char * array declarations
-Date: Thu,  9 Aug 2018 14:43:16 +0800
-Message-Id: <20180809064320.10229-14-colyli@suse.de>
-In-Reply-To: <20180809064320.10229-1-colyli@suse.de>
-References: <20180809064320.10229-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 1 Aug 2018 08:45:02 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	Borislav Petkov <bp@alien8.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
+	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
+	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
+	"Nicholas A. Bellinger" <nab@linux-iscsi.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Philippe Ombredanne <pombredanne@nexb.com>,
+	Stephen Boyd <sboyd@codeaurora.org>,
+	Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
+	Juergen Gross <jgross@suse.com>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
+	Sagar Dharia <sdharia@codeaurora.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Vinod Koul <vinod.koul@intel.com>,
+	David Kershner <david.kershner@unisys.com>,
+	linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 8/9] libata-scsi: Move sense buffers onto stack
+Message-ID: <20180801154502.GO1206094@devbig004.ftw2.facebook.com>
+References: <20180731195155.46664-1-keescook@chromium.org>
+ <20180731195155.46664-9-keescook@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180731195155.46664-9-keescook@chromium.org>
+List-ID: <linux-block@vger.kernel.org>
 
-This patch declares char * array with const prefix in sysfs.c,
-which is suggested by checkpatch.pl.
+On Tue, Jul 31, 2018 at 12:51:53PM -0700, Kees Cook wrote:
+> To support future compile-time sizeof() checks that will be able to
+> validate the length of sense buffers, this removes the only dynamically
+> allocated sense buffers in the tree by putting the 96 byte sense buffers
+> on the stack.
 
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/sysfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Acked-by: Tejun Heo <tj@kernel.org>
 
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index 2ed503ab9e5c..543b06408321 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -150,7 +150,7 @@ SHOW(__bch_cached_dev)
- {
- 	struct cached_dev *dc = container_of(kobj, struct cached_dev,
- 					     disk.kobj);
--	const char *states[] = { "no cache", "clean", "dirty", "inconsistent" };
-+	char const *states[] = { "no cache", "clean", "dirty", "inconsistent" };
- 	int wb = dc->writeback_running;
- 
- #define var(stat)		(dc->stat)
+Thanks.
+
 -- 
-2.18.0
+tejun
