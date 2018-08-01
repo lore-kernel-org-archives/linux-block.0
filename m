@@ -1,21 +1,23 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] block: copy ioprio in __bio_clone_fast()
+Return-Path: <jthumshirn@suse.de>
+Date: Wed, 1 Aug 2018 16:40:08 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
 To: Hannes Reinecke <hare@suse.de>
-Cc: linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH] block: copy ioprio in __bio_clone_fast()
+Message-ID: <20180801144008.wd4rnrvzk4x4bfqf@linux-x5ow.site>
 References: <20180801143809.5472-1-hare@suse.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <ba485213-abb5-1f7b-c2c2-3b6379b82cbe@kernel.dk>
-Date: Wed, 1 Aug 2018 09:17:46 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 In-Reply-To: <20180801143809.5472-1-hare@suse.de>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 8/1/18 8:38 AM, Hannes Reinecke wrote:
-> We need to copy the io priority, too; otherwise the clone will run
-> with a different priority than the original one.
-
-Looks good, but please make the patch against the block 4.19 branch.
-
+Good catch,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-Jens Axboe
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
