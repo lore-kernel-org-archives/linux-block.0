@@ -1,23 +1,19 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 2 Aug 2018 08:59:17 -0700
-From: Tejun Heo <tj@kernel.org>
-To: Dennis Zhou <dennisszhou@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
-	Johannes Weiner <hannes@cmpxchg.org>, kernel-team@fb.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH v3] block: make iolatency avg_lat exponentially decay
-Message-ID: <20180802155917.GT1206094@devbig004.ftw2.facebook.com>
+To: Dennis Zhou <dennisszhou@gmail.com>, Tejun Heo <tj@kernel.org>,
+ Josef Bacik <jbacik@fb.com>, Johannes Weiner <hannes@cmpxchg.org>
+Cc: kernel-team@fb.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 References: <20180802061541.49173-1-dennisszhou@gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <24d21a5c-f061-63ca-4571-ed32f1c8e2d3@kernel.dk>
+Date: Thu, 2 Aug 2018 09:58:32 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180802061541.49173-1-dennisszhou@gmail.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hello, Dennis.
-
-On Wed, Aug 01, 2018 at 11:15:41PM -0700, Dennis Zhou wrote:
+On 8/2/18 12:15 AM, Dennis Zhou wrote:
 > From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
 > 
 > Currently, avg_lat is calculated by accumulating the mean of every
@@ -33,18 +29,8 @@ On Wed, Aug 01, 2018 at 11:15:41PM -0700, Dennis Zhou wrote:
 > 
 > The current sample window size is exposed in the debug info to enable
 > calculation of the window range.
-> 
-> Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
-> Acked-by: Tejun Heo <tj@kernel.org>
-> Acked-by: Johannes Weiner <hannes@cmpxchg.org>
-> Acked-by: Josef Bacik <josef@toxicpanda.com>
 
-Heh, sorry about not thinking this up from the beginning but I think
-it'd be great to move this to blkcg core so that the stat is always
-available regardless of blk-iolatency.  It's a really important metric
-and can be used for both monitoring and policy implementation.
-
-Thanks!
+Applied for 4.19, thanks Dennis.
 
 -- 
-tejun
+Jens Axboe
