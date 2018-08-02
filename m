@@ -1,91 +1,98 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Subject: Re: [RFC] [PATCH 0/1] Introduce emergency raid0 stop for mounted
- arrays
-To: NeilBrown <neilb@suse.com>, linux-raid@vger.kernel.org,
-        shli@kernel.org
-Cc: kernel@gpiccoli.net, jay.vosburgh@canonical.com,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:37408 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730038AbeHBDke (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 Aug 2018 23:40:34 -0400
+From: NeilBrown <neilb@suse.com>
+To: "Guilherme G. Piccoli" <gpiccoli@canonical.com>,
+        linux-raid@vger.kernel.org, shli@kernel.org
+Date: Thu, 02 Aug 2018 11:51:35 +1000
+Cc: gpiccoli@canonical.com, kernel@gpiccoli.net,
+        jay.vosburgh@canonical.com, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [RFC] [PATCH 0/1] Introduce emergency raid0 stop for mounted arrays
+In-Reply-To: <20180801145608.19880-1-gpiccoli@canonical.com>
 References: <20180801145608.19880-1-gpiccoli@canonical.com>
- <87tvodpmc8.fsf@notabene.neil.brown.name>
-From: "Guilherme G. Piccoli" <gpiccoli@canonical.com>
-Message-ID: <7cfa220e-c04d-b69e-fe39-5b9277f0538d@canonical.com>
-Date: Thu, 2 Aug 2018 10:30:57 -0300
+Message-ID: <87tvodpmc8.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
-In-Reply-To: <87tvodpmc8.fsf@notabene.neil.brown.name>
-Content-Type: text/plain; charset=utf-8
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 01/08/2018 22:51, NeilBrown wrote:
->> [...] 
-> If you have hard drive and some sectors or track stop working, I think
-> you would still expect IO to the other sectors or tracks to keep
-> working.
-> 
-> For this reason, the behaviour of md/raid0 is to continue to serve IO to
-> working devices, and only fail IO to failed/missing devices.
-> 
+--=-=-=
+Content-Type: text/plain
 
-Hi Neil, thanks for your quick response. I agree with you about the
-potential sector failure, it shouldn't automatically fail the entire
-array for a single failed write.
+On Wed, Aug 01 2018, Guilherme G. Piccoli wrote:
 
-The check I'm using in the patch is against device request queue - if a
-raid0 member queue is dying/dead, then we consider the device as dead,
-and as a consequence, the array is marked dead.
-
-In my understanding of raid0/stripping, data is split among N devices,
-called raid members. If one member is failed, for sure the data written
-to the array will be corrupted, since that "portion" of data going to
-the failed device won't be stored.
-
-Regarding the current behavior, one test I made was to remove 1 device
-of a 2-disk raid0 array and after that, write a file. Write completed
-normally (no errors from the userspace perspective), and I hashed the
-file using md5. I then rebooted the machine, raid0 was back with the 2
-devices, and guess what?
-The written file was there, but corrupted (with a different hash). I
-don't think this is something fine, user could have written important
-data and don't realize it was getting corrupted while writing.
-
-
-> It seems reasonable that you might want a different behaviour, but I
-> think that should be optional.  i.e. you would need to explicitly set a
-> "one-out-all-out" flag on the array.  I'm not sure if this should cause
-> reads to fail, but it seems quite reasonable that it would cause all
-> writes to fail.
-> 
-> I would only change the kernel to recognise the flag and refuse any
-> writes after any error has been seen.
-> I would use udev/mdadm to detect a device removal and to mark the
-> relevant component device as missing.
+> Currently the md driver completely relies in the userspace to stop an
+> array in case of some failure. There's an interesting case for raid0: if
+> we remove a raid0 member, like PCI hot(un)plugging an NVMe device, and
+> the raid0 array is _mounted_, mdadm cannot stop the array, since the tool
+> tries to open the block device (to perform the ioctl) with O_EXCL flag.
 >
+> So, in this case the array is still alive - users may write to this
+> "broken-yet-alive" array and unless they check the kernel log or some
+> other monitor tool, everything will seem fine and the writes are completed
+> with no errors. Being more precise, direct writes will not work, but since
+> usually writes are done in a regular form, i.e., backed by the page
+> cache, the most common scenario is an user being able to regularly write
+> to a broken raid0, and get all their data corrupted.
+>
+> PROPOSAL:
+> The idea proposed here to fix this behavior is mimic other block devices:
+> if one have a filesystem mounted in a block device on top of an NVMe or
+> SCSI disk and the disk gets removed, writes are prevented, errors are
+> observed and it's obvious something is wrong. Same goes for USB sticks,
+> which are sometimes even removed physically from the machine without
+> getting their filesystem unmounted before.
+>
+> We believe right now the md driver is not behaving properly for raid0
+> arrays (it is handling these errors for other levels though). The approach
+> took for raid-0 is basically an emergency removal procedure, in which I/O
+> is blocked from the device, the regular clean-up happens and the associate
+> disk is deleted. It went to extensive testing, as detailed below.
+>
+> Not all are roses, we have some caveats that need to be resolved.
+> Feedback is _much appreciated_.
 
-Using the udev/mdadm to notice a member has failed and the array must be
-stopped might work, it was my first approach. The main issue here is
-timing: it takes "some time" until userspace is aware of the failure, so
-we have a window in which writes were sent between
+If you have hard drive and some sectors or track stop working, I think
+you would still expect IO to the other sectors or tracks to keep
+working.
 
-(A) the array member failed/got removed and
-(B) mdadm notices and instruct driver to refuse new writes;
+For this reason, the behaviour of md/raid0 is to continue to serve IO to
+working devices, and only fail IO to failed/missing devices.
 
-between (A) and (B), those writes are seen as completed, since they are
-indeed complete (at least, they are fine from the page cache point of
-view). Then, writeback will try to write those, which will cause
-problems or they will complete in a corrupted form (the file will
-be present in the array's filesystem after array is restored, but
-corrupted).
+It seems reasonable that you might want a different behaviour, but I
+think that should be optional.  i.e. you would need to explicitly set a
+"one-out-all-out" flag on the array.  I'm not sure if this should cause
+reads to fail, but it seems quite reasonable that it would cause all
+writes to fail.
 
-So, the in-kernel mechanism avoided most part of window (A)-(B),
-although it seems we still have some problems when nesting arrays,
-due to this same window, even with the in-kernel mechanism (given the
-fact it takes some time to remove the top array when a pretty "far"
-bottom-member is failed).
+I would only change the kernel to recognise the flag and refuse any
+writes after any error has been seen.
+I would use udev/mdadm to detect a device removal and to mark the
+relevant component device as missing.
 
-More suggestions on how to deal with this in a definitive manner are
-highly appreciated.
-Thanks,
+NeilBrown
 
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Guilherme
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAltiY6cACgkQOeye3VZi
+gbllpg//Uo2juv8crEDjznKeaBZwRfDIOzQB/A9+l6ZQZ7m8yYeiec5w2P5XgFmT
+rtg6wJ1ugwyA3G+jUrNvdavvXFVQpoqM8GVH1r6YcXkjIxhvZeHE15JNWJUdBlb+
+j43MaIuAY38ZLUhAw+cnFfCH5wo8nP634sx4/KgPcm5fyaWJoMRt5B5mSrYy9kj3
+COdGnlZc+ulwomzVVeeMQdBh12TD2LBbtxbk7xV68PaZXPHW2VUr8taIB2AyhpDW
+3LW2GA2HkMcaXFDaW7baYVQjJf6mDfkC6qPFljMGv49jBTQqOvH6PmHrAZVg7ysh
+PqGaqPyH2TJzE/THAHV0t1zC9r5ycWTVpkJLyAw4kmy8QZA9yiqOAZyxXvveVoQX
+NtvclnM4EFHoe5vKDpewEBKO7a/XjLKvMA22kJX9Csv8c4Ue9PCXpSxFGevLMdWq
+/sx/Y8Omdbn5FCAEE1y0Fcj1GfPZR59x/VKYe8QxlcBPeX8T24kVI6oz4drrdTaU
+qseZKB5TewTw8IzVICUzOu/lwPBMgH6ItwTd9vxe0LwYttIZYNXTFAF3P307REbi
+79hKc/D2IWnS1AP6DLMAQPutYTI3ebzIAFPBAP7LkjN4oC5hFxN8Ku3DRKFaJopO
+V1rk2J+kZkA7wHIj2ZHfcXXaIRWdcHyJUEvv2LGOXNXKtCuJjx4=
+=QkMt
+-----END PGP SIGNATURE-----
+--=-=-=--
