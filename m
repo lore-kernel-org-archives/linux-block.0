@@ -1,54 +1,73 @@
-Return-Path: <wgh@torlan.ru>
-Subject: Re: LVM snapshot broke between 4.14 and 4.16
-To: Linus Torvalds <torvalds@linux-foundation.org>,
- Ilya Dryomov <idryomov@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>, Mike Snitzer <snitzer@redhat.com>,
- dm-devel@redhat.com
+Return-Path: <linus971@gmail.com>
+MIME-Version: 1.0
 References: <226835ba-2197-b850-6e5b-8ba14f7fd016@torlan.ru>
  <CAOi1vP_tYG77e71CdDiOcszSSEWrp9Vfi+KB7yFAXVQChkjP5A@mail.gmail.com>
- <93bff248-6897-4867-841b-2dace11597de@torlan.ru>
- <CA+55aFyAox9BTDpRsqLXiROhHOX60aa45LEZ7Azteaumdu11Fw@mail.gmail.com>
+ <93bff248-6897-4867-841b-2dace11597de@torlan.ru> <CA+55aFyAox9BTDpRsqLXiROhHOX60aa45LEZ7Azteaumdu11Fw@mail.gmail.com>
  <CAOi1vP-SJO4AMK=XD3Lmja++2dQqoiw6Zn8Vgxf8OfvYgnuC6Q@mail.gmail.com>
- <CA+55aFy2DR9fxHhmGq+azSjX9D71YtLsuFKmoEuYW3uTAUYtJg@mail.gmail.com>
-From: WGH <wgh@torlan.ru>
-Message-ID: <d76415de-2056-c7d6-cc88-b896deaa8ead@torlan.ru>
-Date: Fri, 3 Aug 2018 00:32:21 +0300
-MIME-Version: 1.0
-In-Reply-To: <CA+55aFy2DR9fxHhmGq+azSjX9D71YtLsuFKmoEuYW3uTAUYtJg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAOi1vP-SJO4AMK=XD3Lmja++2dQqoiw6Zn8Vgxf8OfvYgnuC6Q@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Thu, 2 Aug 2018 11:32:54 -0700
+Message-ID: <CA+55aFy2DR9fxHhmGq+azSjX9D71YtLsuFKmoEuYW3uTAUYtJg@mail.gmail.com>
+Subject: Re: LVM snapshot broke between 4.14 and 4.16
+To: Ilya Dryomov <idryomov@gmail.com>
+Cc: wgh@torlan.ru, Jens Axboe <axboe@kernel.dk>,
+	linux-block <linux-block@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On 08/02/2018 09:32 PM, Linus Torvalds wrote:
-> WGH (sorry, no idea what your real name is) - what's the source of the
-> script that broke? Was it some system script you got from outside and
-> likely to affect others too?
+On Thu, Aug 2, 2018 at 11:18 AM Ilya Dryomov <idryomov@gmail.com> wrote:
 >
-> Or was it just some local thing you wrote yourself and was
-> unintentionally buggy and nobody else is likely to hit this?
+> I think it was my commit 721c7fc701c7 ("block: fail op_is_write()
+> requests to read-only partitions").  The block layer was previously
+> allowing non-blkdev_write_iter() writes to read-only disks and
+> partitions.  dm's chunk_io() boils down to submit_bio(), so in 4.16
+> it started to fail if the underlying device was marked read-only.
+
+Ugh. That commit does look like the obviously right thing to do, and
+our old behavior was obviously wrong.
+
+At the same time, we really really shouldn't break user flow, even if
+that flow was due to an obvious bug.
+
+Dang.
+
+> Apparently at least some versions of lvm(8) instruct dm to mark the COW
+> device read-only even though it is always written to.  It comes up only
+> if the user asks for a read-only snapshot (the default is writable).
 >
-> Because if the latter, if you can work around it and you're the only
-> user this hits, we might just be able to ignore it.
+> One option might be to ignore the supplied DM_READONLY_FLAG for COW
+> devices.  Marking the COW device (i.e. the exception store) read-only
+> is probably never sane...
 
-The script in question is written by me and contains literally two lines:
+That sounds like possibly the sanest fixlet for this - perhaps
+together with a warning message saying "ignoring DM_READONLY_FLAG for
+COW device" so that people see that they are doing insane things.
 
-    lvcreate --size 5G --snapshot --name snap0 --permission r
-/dev/mapper/vg0-lvol_rootfs
-    mount /dev/mapper/vg0-snap0 /mnt/rootfs_snapshot
+But some of our internal DM_READONLY_FLAG use obviously comes from
+other sources that we have to honor (ie some grepping shows me code
+like
 
-The script is not buggy (I think), it was written under simple
-assumption that --permission r works. And it does - unless you happen to
-have combination of kernel >=4.16 and lvm2 <2.02.178.
+                if (get_disk_ro(disk))
+                        param->flags |= DM_READONLY_FLAG;
 
-The commit in question appeared only in 4.16, and this kernel version is
-not widespread yet. You have to be running both recent kernel and
-not-so-recent lvm2 to be bitten by this. This probably explains why no
-one else reported this problem.
+where we obviously can *not* override the get_disk_ro() state. So it
+depends a lot on how this all happened. But it looks like in this
+particular case, it all came from one inconsistent lvmcreate command.
 
-Workaround certainly exists: I can just create read-write snapshot, but
-mount it read-only. The reason why I didn't discover the workaround
-earlier is that after unsuccessful read-only snapshot creation system
-ends up in some weird state where read-write snapshots are also failing
-with the same error (until reboot). So I got a wrong impression that
-read-write snapshots were broken as well.
+Or - if there really is only _one_ user that noticed this, and a new
+lvm2 release fixes his problem, maybe we can say "we broke it, but the
+only person who reported it can work around it".
+
+WGH (sorry, no idea what your real name is) - what's the source of the
+script that broke? Was it some system script you got from outside and
+likely to affect others too?
+
+Or was it just some local thing you wrote yourself and was
+unintentionally buggy and nobody else is likely to hit this?
+
+Because if the latter, if you can work around it and you're the only
+user this hits, we might just be able to ignore it.
+
+                   Linus
