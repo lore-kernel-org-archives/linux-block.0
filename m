@@ -1,61 +1,55 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH v2 0/9] block: Consolidate scsi sense buffer usage
+Return-Path: <martin.petersen@oracle.com>
 To: Kees Cook <keescook@chromium.org>
-Cc: Christoph Hellwig <hch@infradead.org>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>, Tejun Heo <tj@kernel.org>,
- Borislav Petkov <bp@alien8.de>, "David S. Miller" <davem@davemloft.net>,
- "Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
- "Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
- Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
- "Nicholas A. Bellinger" <nab@linux-iscsi.org>,
- Thomas Gleixner <tglx@linutronix.de>,
- Philippe Ombredanne <pombredanne@nexb.com>,
- Stephen Boyd <sboyd@codeaurora.org>,
- Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
- Juergen Gross <jgross@suse.com>, Viresh Kumar <viresh.kumar@linaro.org>,
- =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
- Sagar Dharia <sdharia@codeaurora.org>, Randy Dunlap <rdunlap@infradead.org>,
- Vinod Koul <vinod.koul@intel.com>, David Kershner
- <david.kershner@unisys.com>, linux-block@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
- target-devel@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        "James E.J.
+ Bottomley" <jejb@linux.vnet.ibm.com>,
+        Tejun Heo <tj@kernel.org>, Borislav Petkov <bp@alien8.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
+        "Matthew R. Ochs"
+ <mrochs@linux.vnet.ibm.com>,
+        Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
+        "Nicholas A. Bellinger" <nab@linux-iscsi.org>,
+        Thomas Gleixner
+ <tglx@linutronix.de>,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Stephen Boyd <sboyd@codeaurora.org>,
+        Cyrille Pitchen
+ <cyrille.pitchen@free-electrons.com>,
+        Juergen Gross <jgross@suse.com>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Uwe =?utf-8?Q?Kleine-K=C3=B6nig?=
+ <u.kleine-koenig@pengutronix.de>,
+        Sagar Dharia <sdharia@codeaurora.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Vinod Koul <vinod.koul@intel.com>,
+        David Kershner <david.kershner@unisys.com>,
+        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/9] block: Consolidate scsi sense buffer usage
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
 References: <20180731195155.46664-1-keescook@chromium.org>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <50e0f257-60d9-73c8-b4ac-a93c7bdccb57@kernel.dk>
-Date: Thu, 2 Aug 2018 15:24:47 -0600
+Date: Thu, 02 Aug 2018 16:21:28 -0400
+In-Reply-To: <20180731195155.46664-1-keescook@chromium.org> (Kees Cook's
+	message of "Tue, 31 Jul 2018 12:51:45 -0700")
+Message-ID: <yq18t5ozfhz.fsf@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20180731195155.46664-1-keescook@chromium.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-On 7/31/18 1:51 PM, Kees Cook wrote:
+
+Kees,
+
 > This is a follow-up to commit f7068114d45e ("sr: pass down correctly
 > sized SCSI sense buffer") which further cleans up and removes needless
 > sense character array buffers and "struct request_sense" usage in favor
 > of the common "struct scsi_sense_hdr".
-> 
-> First, drop a bunch of unused sense buffers:
->  [PATCH 1/9] ide-cd: Drop unused sense buffers
->  [PATCH 2/9] scsi: cxlflash: Drop unused sense buffers
-> 
-> Next, allow the sense buffer to be usable outside SCSI tree:
->  [PATCH 3/9] scsi: build scsi_common.o for all scsi passthrough request users
->  [PATCH 4/9] target: don't depend on SCSI
-> 
-> Then move all request_sense usage to scsi_sense_hdr:
->  [PATCH 5/9] block: Switch struct packet_command to use struct scsi_sense_hdr
-> 
-> And do some further cleanups for scsi_sense_hdr now that we can:
->  [PATCH 6/9] ide-cd: Remove redundant sense buffer
->  [PATCH 7/9] cdrom: Use struct scsi_sense_hdr internally
-> 
-> Finally add a build-time check to make sure we don't pass bad buffer sizes:
->  [PATCH 8/9] libata-scsi: Move sense buffers onto stack
->  [PATCH 9/9] scsi: Check sense buffer size at build time
 
-Thanks Kees, applied for 4.19. Note that I hand applied patch #5 and #9,
-since they did not apply directly to the block tree.
+This looks good to me.
+
+Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
 
 -- 
-Jens Axboe
+Martin K. Petersen	Oracle Linux Engineering
