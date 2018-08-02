@@ -1,29 +1,38 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:40798 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2387517AbeHAJZm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 Aug 2018 05:25:42 -0400
-Date: Wed, 1 Aug 2018 09:41:20 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: zhong jiang <zhongjiang@huawei.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block/bsg-lib: use PTR_ERR_OR_ZERO to simplify the flow
- path
-Message-ID: <20180801074120.ydxvlw5wrjn7suvf@linux-x5ow.site>
-References: <1533053594-35244-1-git-send-email-zhongjiang@huawei.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH V2 0/2] blk-mq: fix fix blk_mq_tagset_busy_iter
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
+ Christoph Hellwig <hch@lst.de>, Guenter Roeck <linux@roeck-us.net>,
+ Mark Brown <broonie@kernel.org>, Matt Hart <matthew.hart@linaro.org>,
+ Johannes Thumshirn <jthumshirn@suse.de>, John Garry <john.garry@huawei.com>,
+ Hannes Reinecke <hare@suse.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ James Bottomley <James.Bottomley@hansenpartnership.com>,
+ linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20180802174937.15444-1-ming.lei@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <5d0d3e30-ac78-5a84-48b5-5e558c3e7eaa@kernel.dk>
+Date: Thu, 2 Aug 2018 14:47:41 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1533053594-35244-1-git-send-email-zhongjiang@huawei.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180802174937.15444-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+On 8/2/18 11:49 AM, Ming Lei wrote:
+> Hi Jens,
+> 
+> The two patches fixes boot hang issue in lots of test vm system.
+> And the cause is in blk_mq_tagset_busy_iter().
+> 
+> V2:
+> 	- move blk_mq_request_started() into header file as suggested by
+> 	  James
+
+I'd be fine with moving that into a header, if the target of this
+was 4.19. But it's not, so there's absolutely no point to include
+that in this series.
+
+I'm going to apply 2/2 for 4.18.
+
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Jens Axboe
