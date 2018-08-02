@@ -1,38 +1,56 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH V2 0/2] blk-mq: fix fix blk_mq_tagset_busy_iter
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
- Christoph Hellwig <hch@lst.de>, Guenter Roeck <linux@roeck-us.net>,
- Mark Brown <broonie@kernel.org>, Matt Hart <matthew.hart@linaro.org>,
- Johannes Thumshirn <jthumshirn@suse.de>, John Garry <john.garry@huawei.com>,
- Hannes Reinecke <hare@suse.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- James Bottomley <James.Bottomley@hansenpartnership.com>,
- linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20180802174937.15444-1-ming.lei@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <5d0d3e30-ac78-5a84-48b5-5e558c3e7eaa@kernel.dk>
-Date: Thu, 2 Aug 2018 14:47:41 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180802174937.15444-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Mark Brown <broonie@kernel.org>,
+	Matt Hart <matthew.hart@linaro.org>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	John Garry <john.garry@huawei.com>,
+	Hannes Reinecke <hare@suse.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	linux-scsi@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH V2 0/2] blk-mq: fix fix blk_mq_tagset_busy_iter
+Date: Fri,  3 Aug 2018 01:49:35 +0800
+Message-Id: <20180802174937.15444-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 8/2/18 11:49 AM, Ming Lei wrote:
-> Hi Jens,
-> 
-> The two patches fixes boot hang issue in lots of test vm system.
-> And the cause is in blk_mq_tagset_busy_iter().
-> 
-> V2:
-> 	- move blk_mq_request_started() into header file as suggested by
-> 	  James
+Hi Jens,
 
-I'd be fine with moving that into a header, if the target of this
-was 4.19. But it's not, so there's absolutely no point to include
-that in this series.
+The two patches fixes boot hang issue in lots of test vm system.
+And the cause is in blk_mq_tagset_busy_iter().
 
-I'm going to apply 2/2 for 4.18.
+V2:
+	- move blk_mq_request_started() into header file as suggested by
+	  James
+
+Ming Lei (2):
+  blk-mq: move blk_mq_request_started() into header file
+  blk-mq: fix blk_mq_tagset_busy_iter
+
+ block/blk-mq-tag.c     |  2 +-
+ block/blk-mq.c         |  6 ------
+ block/blk-mq.h         |  9 ---------
+ include/linux/blk-mq.h | 15 ++++++++++++++-
+ 4 files changed, 15 insertions(+), 17 deletions(-)
+
+Cc: Josef Bacik <josef@toxicpanda.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Guenter Roeck <linux@roeck-us.net>
+Cc: Mark Brown <broonie@kernel.org>
+Cc: Matt Hart <matthew.hart@linaro.org>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: John Garry <john.garry@huawei.com>
+Cc: Hannes Reinecke <hare@suse.com>,
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+Cc: James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc: linux-scsi@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
 -- 
-Jens Axboe
+2.9.5
