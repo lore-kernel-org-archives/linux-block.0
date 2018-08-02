@@ -1,117 +1,138 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:32925 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727149AbeHJBo4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Aug 2018 21:44:56 -0400
-Received: from mail-qk0-f197.google.com ([209.85.220.197])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <gpiccoli@canonical.com>)
-        id 1fnuBh-0001rx-Mt
-        for linux-block@vger.kernel.org; Thu, 09 Aug 2018 23:17:49 +0000
-Received: by mail-qk0-f197.google.com with SMTP id 99-v6so7474706qkr.14
-        for <linux-block@vger.kernel.org>; Thu, 09 Aug 2018 16:17:49 -0700 (PDT)
-Subject: Re: [RFC] [PATCH 0/1] Introduce emergency raid0 stop for mounted
- arrays
-To: NeilBrown <neilb@suse.com>, linux-raid@vger.kernel.org,
-        shli@kernel.org
+Received: from mx2.suse.de ([195.135.220.15]:44552 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1731429AbeHBXbL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Aug 2018 19:31:11 -0400
+From: NeilBrown <neilb@suse.com>
+To: "Guilherme G. Piccoli" <gpiccoli@canonical.com>,
+        linux-raid@vger.kernel.org, shli@kernel.org
+Date: Fri, 03 Aug 2018 07:37:57 +1000
 Cc: kernel@gpiccoli.net, jay.vosburgh@canonical.com,
         dm-devel@redhat.com, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org
-References: <20180801145608.19880-1-gpiccoli@canonical.com>
- <87tvodpmc8.fsf@notabene.neil.brown.name>
- <7cfa220e-c04d-b69e-fe39-5b9277f0538d@canonical.com>
- <87h8kcphze.fsf@notabene.neil.brown.name>
-From: "Guilherme G. Piccoli" <gpiccoli@canonical.com>
-Message-ID: <5b7a349d-073d-4a42-eae1-aa1e6998c449@canonical.com>
-Date: Thu, 9 Aug 2018 20:17:40 -0300
+Subject: Re: [RFC] [PATCH 0/1] Introduce emergency raid0 stop for mounted arrays
+In-Reply-To: <7cfa220e-c04d-b69e-fe39-5b9277f0538d@canonical.com>
+References: <20180801145608.19880-1-gpiccoli@canonical.com> <87tvodpmc8.fsf@notabene.neil.brown.name> <7cfa220e-c04d-b69e-fe39-5b9277f0538d@canonical.com>
+Message-ID: <87h8kcphze.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
-In-Reply-To: <87h8kcphze.fsf@notabene.neil.brown.name>
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Neil, sorry for my delay.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Aug 02 2018, Guilherme G. Piccoli wrote:
+
+> On 01/08/2018 22:51, NeilBrown wrote:
+>>> [...]=20
+>> If you have hard drive and some sectors or track stop working, I think
+>> you would still expect IO to the other sectors or tracks to keep
+>> working.
+>>=20
+>> For this reason, the behaviour of md/raid0 is to continue to serve IO to
+>> working devices, and only fail IO to failed/missing devices.
+>>=20
+>
+> Hi Neil, thanks for your quick response. I agree with you about the
+> potential sector failure, it shouldn't automatically fail the entire
+> array for a single failed write.
+>
+> The check I'm using in the patch is against device request queue - if a
+> raid0 member queue is dying/dead, then we consider the device as dead,
+> and as a consequence, the array is marked dead.
+>
+> In my understanding of raid0/stripping, data is split among N devices,
+> called raid members. If one member is failed, for sure the data written
+> to the array will be corrupted, since that "portion" of data going to
+> the failed device won't be stored.
+>
+> Regarding the current behavior, one test I made was to remove 1 device
+> of a 2-disk raid0 array and after that, write a file. Write completed
+> normally (no errors from the userspace perspective), and I hashed the
+> file using md5. I then rebooted the machine, raid0 was back with the 2
+> devices, and guess what?
+> The written file was there, but corrupted (with a different hash). I
+> don't think this is something fine, user could have written important
+> data and don't realize it was getting corrupted while writing.
 
 
-On 02/08/2018 18:37, NeilBrown wrote:
-> On Thu, Aug 02 2018, Guilherme G. Piccoli wrote:
->> [...]
->> Regarding the current behavior, one test I made was to remove 1 device
->> of a 2-disk raid0 array and after that, write a file. Write completed
->> normally (no errors from the userspace perspective), and I hashed the
->> file using md5. I then rebooted the machine, raid0 was back with the 2
->> devices, and guess what?
->> The written file was there, but corrupted (with a different hash). I
->> don't think this is something fine, user could have written important
->> data and don't realize it was getting corrupted while writing.
-> 
-> 
-> In your test, did you "fsync" the file after writing to it?  That is
-> essential for data security.
-> If fsync succeeded even though the data wasn't written, that is
-> certainly a bug.  If it doesn't succeed, then you know there is a
-> problem with your data.
-> 
+In your test, did you "fsync" the file after writing to it?  That is
+essential for data security.
+If fsync succeeded even though the data wasn't written, that is
+certainly a bug.  If it doesn't succeed, then you know there is a
+problem with your data.
 
-Yes, I did. After writing, I ran both "sync" and "sync -f" after "dd"
-command complete (with no errors). The sync procedures also finished
-without errors, and the file was there. After a reboot, though, the
-file has a different md5, since it was corrupted.
-
-
->> [...]
->> Using the udev/mdadm to notice a member has failed and the array must be
->> stopped might work, it was my first approach. The main issue here is
->> timing: it takes "some time" until userspace is aware of the failure, so
->> we have a window in which writes were sent between
+>
+>
+>> It seems reasonable that you might want a different behaviour, but I
+>> think that should be optional.  i.e. you would need to explicitly set a
+>> "one-out-all-out" flag on the array.  I'm not sure if this should cause
+>> reads to fail, but it seems quite reasonable that it would cause all
+>> writes to fail.
+>>=20
+>> I would only change the kernel to recognise the flag and refuse any
+>> writes after any error has been seen.
+>> I would use udev/mdadm to detect a device removal and to mark the
+>> relevant component device as missing.
 >>
->> (A) the array member failed/got removed and
->> (B) mdadm notices and instruct driver to refuse new writes;
-> 
-> I don't think the delay is relevant.
-> If writes are happening, then the kernel will get write error from the
-> failed devices and can flag the array as faulty.
-> If writes aren't happening, then it no important cost in the "device is
-> removed" message going up to user-space and back.
+>
+> Using the udev/mdadm to notice a member has failed and the array must be
+> stopped might work, it was my first approach. The main issue here is
+> timing: it takes "some time" until userspace is aware of the failure, so
+> we have a window in which writes were sent between
+>
+> (A) the array member failed/got removed and
+> (B) mdadm notices and instruct driver to refuse new writes;
 
-The problem with the time between userspace notice something is wrong
-and "warn" the kernel to stop writes is that many writes will be sent
-to the device in this mean time, and they can completed later - handling
-async completions of dead devices proved to be tricky, at least in my
-approach.
-Also, writeback threads will be filled with I/Os to be written to the
-dead devices too, this is other part of the problem.
+I don't think the delay is relevant.
+If writes are happening, then the kernel will get write error from the
+failed devices and can flag the array as faulty.
+If writes aren't happening, then it no important cost in the "device is
+removed" message going up to user-space and back.
 
-If you have suggestions to improve my approach, or perhaps a totally
-different idea than mine, I highly appreciate the feedback.
+NeilBrown
 
-Thank you very much for the attention.
-Cheers,
+>
+> between (A) and (B), those writes are seen as completed, since they are
+> indeed complete (at least, they are fine from the page cache point of
+> view). Then, writeback will try to write those, which will cause
+> problems or they will complete in a corrupted form (the file will
+> be present in the array's filesystem after array is restored, but
+> corrupted).
+>
+> So, the in-kernel mechanism avoided most part of window (A)-(B),
+> although it seems we still have some problems when nesting arrays,
+> due to this same window, even with the in-kernel mechanism (given the
+> fact it takes some time to remove the top array when a pretty "far"
+> bottom-member is failed).
+>
+> More suggestions on how to deal with this in a definitive manner are
+> highly appreciated.
+> Thanks,
+>
+>
+> Guilherme
 
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Guilherme
+-----BEGIN PGP SIGNATURE-----
 
-> 
-> NeilBrown
-> 
->>
->> between (A) and (B), those writes are seen as completed, since they are
->> indeed complete (at least, they are fine from the page cache point of
->> view). Then, writeback will try to write those, which will cause
->> problems or they will complete in a corrupted form (the file will
->> be present in the array's filesystem after array is restored, but
->> corrupted).
->>
->> So, the in-kernel mechanism avoided most part of window (A)-(B),
->> although it seems we still have some problems when nesting arrays,
->> due to this same window, even with the in-kernel mechanism (given the
->> fact it takes some time to remove the top array when a pretty "far"
->> bottom-member is failed).
->>
->> More suggestions on how to deal with this in a definitive manner are
->> highly appreciated.
->> Thanks,
->>
->>
->> Guilherme
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAltjebYACgkQOeye3VZi
+gbkz5w/9HVou2dww+Ny0lqYWJn8Ses4OqX1+Wn+U2pu3ln1K/kMhrkTJqVn243fi
+0virsEggL7xeGSY5K2vJlOv5GN+9qNCh2fYzZXngxBPSQko8/CBgnWmQ6QbSfwCy
+N1YLFM68qvjfE2+ttcOKjurf68hB7XawgFTK9TV3cQTBRaC2U3cHYMG/msGdsTDE
+So1kQsQc3F3e5B0wNtGlZ9Xab9QIW/blhJ/qipLmresC9D3yPIWitbLNa582lmqx
+0Om/dk+Oe+xetEhTRxdR9pU409CfzhXq9Wu7YxIcdoh58Mz5lb0wQGLCgNeV7kC+
+IpXvv90sfGmF1oB6TfmPNxpCqbhVusRtrCLvUEDdULV0Q1UGhY+NARjRnAvEz3Ov
+gcP6UZ2b3YcxFCkKqDXjiwjUhMgPfygOKTyQeMtIsaW5KDCB6Emt6wBBHRImfOw7
+TNNlc5Mo9m9VYzj3SxdWqqCtlDlxidBizhc06PnJwn7aW2M9IJYZmu3y/MnUKsgh
+ZaE/HlACquRa4J5daMB2c/tEuDMys9qGq7uJnm0gejolIq3jrR6bxp2Fn6nYL05o
+TYJ3zxbBnSfChruFP2kSNC0h46xVWMsgK/s4ob7MEyKruFIvHbFpKfZt4ILnxqwg
+p2nuetYVBt99Zn6Pzd6LFIarcKeWMS130mqrScbBnL19TOJ5Wow=
+=+zB/
+-----END PGP SIGNATURE-----
+--=-=-=--
