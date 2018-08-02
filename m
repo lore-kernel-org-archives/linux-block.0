@@ -1,130 +1,48 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: axboe@kernel.dk,
-	linux-bcache@vger.kernel.org
+Return-Path: <prvs=7457c2e9b=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH v3 12/17] bcache: fix code comments style
-Date: Sat, 11 Aug 2018 13:19:55 +0800
-Message-Id: <20180811052000.103680-13-colyli@suse.de>
-In-Reply-To: <20180811052000.103680-1-colyli@suse.de>
-References: <20180811052000.103680-1-colyli@suse.de>
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v3 9/9] blk-mq: Enable support for runtime power management
+Date: Thu,  2 Aug 2018 11:29:44 -0700
+Message-Id: <20180802182944.14442-10-bart.vanassche@wdc.com>
+In-Reply-To: <20180802182944.14442-1-bart.vanassche@wdc.com>
+References: <20180802182944.14442-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch fixes 3 style issues warned by checkpatch.pl,
-- Comment lines are not aligned
-- Comments use "/*" on subsequent lines
-- Comment lines use a trailing "*/"
+Now that the blk-mq core processes power management requests
+(marked with RQF_PREEMPT) in other states than RPM_ACTIVE, enable
+runtime power management for blk-mq.
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Alan Stern <stern@rowland.harvard.edu>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/md/bcache/bset.c      |  9 ++++++---
- drivers/md/bcache/super.c     | 22 +++++++++++++---------
- drivers/md/bcache/writeback.c |  3 ++-
- 3 files changed, 21 insertions(+), 13 deletions(-)
+ block/blk-pm.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
-index b6a3f9d291a9..8f07fa6e1739 100644
---- a/drivers/md/bcache/bset.c
-+++ b/drivers/md/bcache/bset.c
-@@ -402,7 +402,8 @@ static unsigned int inorder_prev(unsigned int j, unsigned int size)
- 	return j;
- }
- 
--/* I have no idea why this code works... and I'm the one who wrote it
-+/*
-+ * I have no idea why this code works... and I'm the one who wrote it
-  *
-  * However, I do know what it does:
-  * Given a binary tree constructed in an array (i.e. how you normally implement
-@@ -795,7 +796,8 @@ static void bch_bset_fix_lookup_table(struct btree_keys *b,
- 	if (!t->size)
- 		return;
- 
--	/* k is the key we just inserted; we need to find the entry in the
-+	/*
-+	 * k is the key we just inserted; we need to find the entry in the
- 	 * lookup table for the first key that is strictly greater than k:
- 	 * it's either k's cacheline or the next one
- 	 */
-@@ -803,7 +805,8 @@ static void bch_bset_fix_lookup_table(struct btree_keys *b,
- 	       table_to_bkey(t, j) <= k)
- 		j++;
- 
--	/* Adjust all the lookup table entries, and find a new key for any that
-+	/*
-+	 * Adjust all the lookup table entries, and find a new key for any that
- 	 * have gotten too big
- 	 */
- 	for (; j < t->size; j++) {
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 2a7be104557e..01fc3c015a58 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -465,8 +465,8 @@ static struct uuid_entry *uuid_find_empty(struct cache_set *c)
-  * Bucket priorities/gens:
-  *
-  * For each bucket, we store on disk its
--   * 8 bit gen
--   * 16 bit priority
-+ *   8 bit gen
-+ *  16 bit priority
-  *
-  * See alloc.c for an explanation of the gen. The priority is used to implement
-  * lru (and in the future other) cache replacement policies; for most purposes
-@@ -934,8 +934,10 @@ void bch_cached_dev_run(struct cached_dev *dc)
- 
- 	add_disk(d->disk);
- 	bd_link_disk_holder(dc->bdev, dc->disk.disk);
--	/* won't show up in the uevent file, use udevadm monitor -e instead
--	 * only class / kset properties are persistent */
-+	/*
-+	 * won't show up in the uevent file, use udevadm monitor -e instead
-+	 * only class / kset properties are persistent
-+	 */
- 	kobject_uevent_env(&disk_to_dev(d->disk)->kobj, KOBJ_CHANGE, env);
- 	kfree(env[1]);
- 	kfree(env[2]);
-@@ -1104,8 +1106,9 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
- 		}
- 	}
- 
--	/* Deadlocks since we're called via sysfs...
--	sysfs_remove_file(&dc->kobj, &sysfs_attach);
-+	/*
-+	 * Deadlocks since we're called via sysfs...
-+	 * sysfs_remove_file(&dc->kobj, &sysfs_attach);
- 	 */
- 
- 	if (bch_is_zero(u->uuid, 16)) {
-@@ -1468,9 +1471,10 @@ bool bch_cache_set_error(struct cache_set *c, const char *fmt, ...)
- 	if (test_and_set_bit(CACHE_SET_IO_DISABLE, &c->flags))
- 		pr_info("CACHE_SET_IO_DISABLE already set");
- 
--	/* XXX: we can be called from atomic context
--	acquire_console_sem();
--	*/
-+	/*
-+	 * XXX: we can be called from atomic context
-+	 * acquire_console_sem();
-+	 */
- 
- 	pr_err("bcache: error on %pU: ", c->sb.set_uuid);
- 
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index e40bf0e403e7..6be05bd7ca67 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -468,7 +468,8 @@ static void read_dirty(struct cached_dev *dc)
- 
- 			down(&dc->in_flight);
- 
--			/* We've acquired a semaphore for the maximum
-+			/*
-+			 * We've acquired a semaphore for the maximum
- 			 * simultaneous number of writebacks; from here
- 			 * everything happens asynchronously.
- 			 */
+diff --git a/block/blk-pm.c b/block/blk-pm.c
+index c33c881f64df..d719cae766cf 100644
+--- a/block/blk-pm.c
++++ b/block/blk-pm.c
+@@ -66,10 +66,6 @@ void blk_pm_runtime_unlock(struct request_queue *q)
+  */
+ void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
+ {
+-	/* not support for RQF_PM and ->rpm_status in blk-mq yet */
+-	if (q->mq_ops)
+-		return;
+-
+ 	q->dev = dev;
+ 	q->rpm_status = RPM_ACTIVE;
+ 	pm_runtime_set_autosuspend_delay(q->dev, -1);
 -- 
 2.18.0
