@@ -1,36 +1,84 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 2 Aug 2018 12:06:49 -0700
-From: Tejun Heo <tj@kernel.org>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+Return-Path: <prvs=7457c2e9b=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Tejun Heo <tj@kernel.org>,
 	Jianchao Wang <jianchao.w.wang@oracle.com>,
 	Ming Lei <ming.lei@redhat.com>,
 	Alan Stern <stern@rowland.harvard.edu>,
 	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: Re: [PATCH v3 4/9] percpu-refcount: Introduce percpu_ref_read()
-Message-ID: <20180802190649.GV1206094@devbig004.ftw2.facebook.com>
+Subject: [PATCH v3 4/9] percpu-refcount: Introduce percpu_ref_read()
+Date: Thu,  2 Aug 2018 11:29:39 -0700
+Message-Id: <20180802182944.14442-5-bart.vanassche@wdc.com>
+In-Reply-To: <20180802182944.14442-1-bart.vanassche@wdc.com>
 References: <20180802182944.14442-1-bart.vanassche@wdc.com>
- <20180802182944.14442-5-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180802182944.14442-5-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
+Introduce a function that allows to read the value of a per-cpu counter.
+This function will be used in the next patch to check whether a per-cpu
+counter in atomic mode has the value one.
 
-On Thu, Aug 02, 2018 at 11:29:39AM -0700, Bart Van Assche wrote:
-> Introduce a function that allows to read the value of a per-cpu counter.
-> This function will be used in the next patch to check whether a per-cpu
-> counter in atomic mode has the value one.
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Alan Stern <stern@rowland.harvard.edu>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ include/linux/percpu-refcount.h |  2 ++
+ lib/percpu-refcount.c           | 29 +++++++++++++++++++++++++++++
+ 2 files changed, 31 insertions(+)
 
-I'm not a big fan of exposing this.  If you need to test for atomic &&
-1, I'd much prefer a helper specifically testing for that.  But can
-you please explain a bit why you need this?
-
-Thanks.
-
+diff --git a/include/linux/percpu-refcount.h b/include/linux/percpu-refcount.h
+index 009cdf3d65b6..5707289ba828 100644
+--- a/include/linux/percpu-refcount.h
++++ b/include/linux/percpu-refcount.h
+@@ -331,4 +331,6 @@ static inline bool percpu_ref_is_zero(struct percpu_ref *ref)
+ 	return !atomic_long_read(&ref->count);
+ }
+ 
++unsigned long percpu_ref_read(struct percpu_ref *ref);
++
+ #endif
+diff --git a/lib/percpu-refcount.c b/lib/percpu-refcount.c
+index 9f96fa7bc000..c0b9fc8efa6b 100644
+--- a/lib/percpu-refcount.c
++++ b/lib/percpu-refcount.c
+@@ -369,3 +369,32 @@ void percpu_ref_reinit(struct percpu_ref *ref)
+ 	spin_unlock_irqrestore(&percpu_ref_switch_lock, flags);
+ }
+ EXPORT_SYMBOL_GPL(percpu_ref_reinit);
++
++/**
++ * percpu_ref_read - read a percpu refcount
++ * @ref: percpu_ref to test
++ *
++ * This function is safe to call as long as @ref is between init and exit. It
++ * is the responsibility of the caller to handle changes of @ref concurrently
++ * with this function. If this function is called while @ref is in per-cpu
++ * mode the returned value may be incorrect if e.g. percpu_ref_get() is called
++ * from one CPU and percpu_ref_put() is called from another CPU.
++ */
++unsigned long percpu_ref_read(struct percpu_ref *ref)
++{
++	unsigned long __percpu *percpu_count;
++	unsigned long sum = 0;
++	int cpu;
++
++	rcu_read_lock_sched();
++	if (__ref_is_percpu(ref, &percpu_count)) {
++		for_each_possible_cpu(cpu)
++			sum += *per_cpu_ptr(percpu_count, cpu);
++	}
++	rcu_read_unlock_sched();
++	sum += atomic_long_read(&ref->count);
++	sum &= ~PERCPU_COUNT_BIAS;
++
++	return sum;
++}
++EXPORT_SYMBOL_GPL(percpu_ref_read);
 -- 
-tejun
+2.18.0
