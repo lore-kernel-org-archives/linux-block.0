@@ -1,67 +1,35 @@
 Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-mq: fix updating tags depth
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, Marco Patalano <mpatalan@redhat.com>,
+ "Ewan D. Milne" <emilne@redhat.com>, Christoph Hellwig <hch@lst.de>,
+ Bart Van Assche <bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>
+References: <20180802102326.6859-1-ming.lei@redhat.com>
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 1/3] blk-wbt: move disable check into get_limit()
-Date: Tue, 21 Aug 2018 09:05:15 -0600
-Message-Id: <20180821150517.19744-2-axboe@kernel.dk>
-In-Reply-To: <20180821150517.19744-1-axboe@kernel.dk>
-References: <20180821150517.19744-1-axboe@kernel.dk>
+Message-ID: <8119ed5d-af04-23b7-6dee-bfdb84497800@kernel.dk>
+Date: Thu, 2 Aug 2018 14:48:20 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180802102326.6859-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Check it in one place, instead of in multiple places.
+On 8/2/18 4:23 AM, Ming Lei wrote:
+> The passed 'nr' from userspace represents the total depth, meantime
+> inside 'struct blk_mq_tags', 'nr_tags' stores the total tag depth,
+> and 'nr_reserved_tags' stores the reserved part.
+> 
+> There are two issues in blk_mq_tag_update_depth() now:
+> 
+> 1) for growing tags, we should have used the passed 'nr', and keep the
+> number of reserved tags not changed.
+> 
+> 2) the passed 'nr' should have been used for checking against
+> 'tags->nr_tags', instead of number of the normal part.
+> 
+> This patch fixes the above two cases, and avoids kernel crash caused
+> by wrong resizing sbitmap queue.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-wbt.c | 22 +++++++---------------
- 1 file changed, 7 insertions(+), 15 deletions(-)
+Applied, thanks.
 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index bb93c7c2b182..1dd7edce7a99 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -449,6 +449,13 @@ static inline unsigned int get_limit(struct rq_wb *rwb, unsigned long rw)
- {
- 	unsigned int limit;
- 
-+	/*
-+	 * If we got disabled, just return UINT_MAX. This ensures that
-+	 * we'll properly inc a new IO, and dec+wakeup at the end.
-+	 */
-+	if (!rwb_enabled(rwb))
-+		return UINT_MAX;
-+
- 	if ((rw & REQ_OP_MASK) == REQ_OP_DISCARD)
- 		return rwb->wb_background;
- 
-@@ -486,16 +493,6 @@ static void __wbt_wait(struct rq_wb *rwb, enum wbt_flags wb_acct,
- 	struct rq_wait *rqw = get_rq_wait(rwb, wb_acct);
- 	DECLARE_WAITQUEUE(wait, current);
- 
--	/*
--	* inc it here even if disabled, since we'll dec it at completion.
--	* this only happens if the task was sleeping in __wbt_wait(),
--	* and someone turned it off at the same time.
--	*/
--	if (!rwb_enabled(rwb)) {
--		atomic_inc(&rqw->inflight);
--		return;
--	}
--
- 	if (!waitqueue_active(&rqw->wait)
- 		&& rq_wait_inc_below(rqw, get_limit(rwb, rw)))
- 		return;
-@@ -504,11 +501,6 @@ static void __wbt_wait(struct rq_wb *rwb, enum wbt_flags wb_acct,
- 	do {
- 		set_current_state(TASK_UNINTERRUPTIBLE);
- 
--		if (!rwb_enabled(rwb)) {
--			atomic_inc(&rqw->inflight);
--			break;
--		}
--
- 		if (rq_wait_inc_below(rqw, get_limit(rwb, rw)))
- 			break;
- 
 -- 
-2.17.1
+Jens Axboe
