@@ -1,75 +1,66 @@
-Return-Path: <groeck7@gmail.com>
-Return-Path: <groeck7@gmail.com>
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date: Thu, 2 Aug 2018 11:37:20 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Josef Bacik <josef@toxicpanda.com>, Christoph Hellwig <hch@lst.de>,
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Guenter Roeck <linux@roeck-us.net>,
 	Mark Brown <broonie@kernel.org>,
 	Matt Hart <matthew.hart@linaro.org>,
 	Johannes Thumshirn <jthumshirn@suse.de>,
-	John Garry <john.garry@huawei.com>, Hannes Reinecke <hare@suse.com>,
+	John Garry <john.garry@huawei.com>,
+	Hannes Reinecke <hare@suse.com>,
 	"Martin K. Petersen" <martin.petersen@oracle.com>,
 	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2 2/2] blk-mq: fix blk_mq_tagset_busy_iter
-Message-ID: <20180802183720.GA19280@roeck-us.net>
+	linux-scsi@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH V2 2/2] blk-mq: fix blk_mq_tagset_busy_iter
+Date: Fri,  3 Aug 2018 01:49:37 +0800
+Message-Id: <20180802174937.15444-3-ming.lei@redhat.com>
+In-Reply-To: <20180802174937.15444-1-ming.lei@redhat.com>
 References: <20180802174937.15444-1-ming.lei@redhat.com>
- <20180802174937.15444-3-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180802174937.15444-3-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Aug 03, 2018 at 01:49:37AM +0800, Ming Lei wrote:
-> Commit d250bf4e776ff09d5("blk-mq: only iterate over inflight requests
-> in blk_mq_tagset_busy_iter") uses 'blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT'
-> to replace 'blk_mq_request_started(req)', this way is wrong, and causes
-> lots of test system hang during booting.
-> 
-> Fix the issue by using blk_mq_request_started(req) inside bt_tags_iter().
-> 
-> Fixes: d250bf4e776ff09d5 ("blk-mq: only iterate over inflight requests in blk_mq_tagset_busy_iter")
-> Cc: Josef Bacik <josef@toxicpanda.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Guenter Roeck <linux@roeck-us.net>
-> Cc: Mark Brown <broonie@kernel.org>
-> Cc: Matt Hart <matthew.hart@linaro.org>
-> Cc: Johannes Thumshirn <jthumshirn@suse.de>
-> Cc: John Garry <john.garry@huawei.com>
-> Cc: Hannes Reinecke <hare@suse.com>,
-> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-> Cc: James Bottomley <James.Bottomley@hansenpartnership.com>
-> Cc: linux-scsi@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Reported-by: Mark Brown <broonie@kernel.org>
-> Reported-by: Guenter Roeck <linux@roeck-us.net>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Commit d250bf4e776ff09d5("blk-mq: only iterate over inflight requests
+in blk_mq_tagset_busy_iter") uses 'blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT'
+to replace 'blk_mq_request_started(req)', this way is wrong, and causes
+lots of test system hang during booting.
 
-Tested-by: Guenter Roeck <linux@roeck-us.net>
+Fix the issue by using blk_mq_request_started(req) inside bt_tags_iter().
 
-Test builds (with both patches applied):
+Fixes: d250bf4e776ff09d5 ("blk-mq: only iterate over inflight requests in blk_mq_tagset_busy_iter")
+Cc: Josef Bacik <josef@toxicpanda.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Guenter Roeck <linux@roeck-us.net>
+Cc: Mark Brown <broonie@kernel.org>
+Cc: Matt Hart <matthew.hart@linaro.org>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: John Garry <john.garry@huawei.com>
+Cc: Hannes Reinecke <hare@suse.com>,
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+Cc: James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc: linux-scsi@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Reported-by: Mark Brown <broonie@kernel.org>
+Reported-by: Guenter Roeck <linux@roeck-us.net>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-tag.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Building mips:malta_defconfig:nosmp ... running ..... passed
-Building mips:malta_defconfig:smp ... running ..... passed
-Building x86_64:q35:Broadwell-noTSX:defconfig:smp:sata:rootfs ... running .....  passed
-Building x86_64:q35:IvyBridge:defconfig:smp:nvme:rootfs ... running ..... passed
-Building x86_64:q35:SandyBridge:defconfig:smp:usb:rootfs ... running ......  passed
-Building x86_64:q35:Haswell:defconfig:smp:usb-uas:rootfs ... running ......  passed
-Building x86_64:q35:Skylake-Client:defconfig:smp:mmc:rootfs ... running ......  passed
-Building x86_64:q35:Conroe:defconfig:smp:scsi[DC395]:rootfs ... running .......  passed
-Building x86_64:q35:Nehalem:defconfig:smp:scsi[AM53C974]:rootfs ... running ....... passed
-Building x86_64:q35:Westmere-IBRS:defconfig:smp:scsi[53C810]:rootfs ... running ...... passed
-Building x86_64:q35:Skylake-Server:defconfig:smp:scsi[53C895A]:rootfs ...  running ...... passed
-Building x86_64:pc:EPYC:defconfig:smp:scsi[MEGASAS]:rootfs ... running ......  passed
-Building x86_64:q35:EPYC-IBPB:defconfig:smp:scsi[MEGASAS2]:rootfs ... running ..... passed
-Building x86_64:q35:Opteron_G5:defconfig:smp:scsi[FUSION]:rootfs ... running ..... passed
-Building x86_64:pc:phenom:defconfig:smp:initrd ... running ..... passed
-Building x86_64:q35:Opteron_G1:defconfig:smp:initrd ... running ..... passed
-Building x86_64:pc:Opteron_G2:defconfig:smp:sata:rootfs ... running ..... passed
-Building x86_64:q35:core2duo:defconfig:smp:usb:rootfs ... running ...... passed
-Building x86_64:pc:Opteron_G3:defconfig:nosmp:usb:rootfs ... running .......  passed
-Building x86_64:q35:Opteron_G4:defconfig:nosmp:sata:rootfs ... running ......  passed
-
-Guenter
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 09b2ee6694fb..3de0836163c2 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -271,7 +271,7 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+ 	 * test and set the bit before assining ->rqs[].
+ 	 */
+ 	rq = tags->rqs[bitnr];
+-	if (rq && blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT)
++	if (rq && blk_mq_request_started(rq))
+ 		iter_data->fn(rq, iter_data->data, reserved);
+ 
+ 	return true;
+-- 
+2.9.5
