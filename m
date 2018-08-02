@@ -1,56 +1,95 @@
-Return-Path: <BATV+568b9e22b4768da93666+5456+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Wed, 1 Aug 2018 01:25:16 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	Tejun Heo <tj@kernel.org>, Borislav Petkov <bp@alien8.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
-	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
-	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
-	"Nicholas A. Bellinger" <nab@linux-iscsi.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Philippe Ombredanne <pombredanne@nexb.com>,
-	Stephen Boyd <sboyd@codeaurora.org>,
-	Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
-	Juergen Gross <jgross@suse.com>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Sagar Dharia <sdharia@codeaurora.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Vinod Koul <vinod.koul@intel.com>,
-	David Kershner <david.kershner@unisys.com>,
-	linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 9/9] scsi: Check sense buffer size at build time
-Message-ID: <20180801082516.GE26378@infradead.org>
-References: <20180731195155.46664-1-keescook@chromium.org>
- <20180731195155.46664-10-keescook@chromium.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-eopbgr700086.outbound.protection.outlook.com ([40.107.70.86]:39552
+        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1732270AbeHBPKI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Aug 2018 11:10:08 -0400
+From: Javier Gonzalez <javier@cnexlabs.com>
+To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
+CC: "Konopko, Igor J" <igor.j.konopko@intel.com>,
+        "marcin.dziegielewski@intel.com" <marcin.dziegielewski@intel.com>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        Heiner Litz <hlitz@ucsc.edu>,
+        Young Tack Tack Jin <youngtack.jin@circuitblvd.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] lightnvm: remove dependencies on BLK_DEV_NVME and PCI
+Date: Thu, 2 Aug 2018 13:18:53 +0000
+Message-ID: <B899AED5-11D4-4ACB-B10B-5C080AC9B882@cnexlabs.com>
+References: <20180802110625.12463-1-mb@lightnvm.io>
+In-Reply-To: <20180802110625.12463-1-mb@lightnvm.io>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_D1E0DCC2-711A-4576-A471-453AA1F88B05";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha512
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180731195155.46664-10-keescook@chromium.org>
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Tue, Jul 31, 2018 at 12:51:54PM -0700, Kees Cook wrote:
-> To avoid introducing problems like those fixed in commit f7068114d45e
-> ("sr: pass down correctly sized SCSI sense buffer"), this creates a macro
-> wrapper for scsi_execute() that verifies the size of the sense buffer
-> similar to what was done for command string sizes in commit 3756f6401c30
-> ("exec: avoid gcc-8 warning for get_task_comm").
-> 
-> Another solution could be to add a length argument to scsi_execute(),
-> but this function already takes a lot of arguments and Jens was not fond
-> of that approach.
-> 
-> Additionally, this moves the SCSI_SENSE_BUFFERSIZE definition into
-> scsi_device.h, and removes a redundant include for scsi_device.h from
-> scsi_cmnd.h.
-> 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+--Apple-Mail=_D1E0DCC2-711A-4576-A471-453AA1F88B05
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-Looks good,
+> On 2 Aug 2018, at 13.06, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
+>=20
+> No need to force NVMe device driver to be compiled in if the
+> lightnvm subsystem is selected. Also no need for PCI to be selected
+> as well, as it would be selected by the device driver that hooks into
+> the subsystem.
+>=20
+> Signed-off-by: Matias Bj=C3=B8rling <mb@lightnvm.io>
+> ---
+> drivers/lightnvm/Kconfig | 3 +--
+> 1 file changed, 1 insertion(+), 2 deletions(-)
+>=20
+> diff --git a/drivers/lightnvm/Kconfig b/drivers/lightnvm/Kconfig
+> index 439bf90d084d..a872cd720967 100644
+> --- a/drivers/lightnvm/Kconfig
+> +++ b/drivers/lightnvm/Kconfig
+> @@ -4,8 +4,7 @@
+>=20
+> menuconfig NVM
+> 	bool "Open-Channel SSD target support"
+> -	depends on BLOCK && PCI
+> -	select BLK_DEV_NVME
+> +	depends on BLOCK
+> 	help
+> 	  Say Y here to get to enable Open-channel SSDs.
+>=20
+> --
+> 2.11.0
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Looks like a good dependency cleanup. Though the nvme driver is the
+only one that hooks into LigthNVM today, so it will have to be compiled
+anyway.
+
+Reviewed-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
+
+
+--Apple-Mail=_D1E0DCC2-711A-4576-A471-453AA1F88B05
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAltjBLoACgkQIX4xUKFR
+nnQgmA//UVT276oGQeV9xzaMVC9heQ90/1ifJqucvUz49ZRgC73j9Fm7kdlwJ08P
+hyi1gXUFjCgxa7+3g2nbQqTXrNsIjrtROjPyYa36/99hAqDLqOlQxnjgFO6UFAG1
+3+0Rz3hTJGNZRL+SzMlcMc+Qpsk+Ezq6s3sajDQdc5Lx7qq25iF2dH+/1/iGgERW
+zZlX1FOA3aQAWaFjXjw8tDCaM2rnH2p/39/Ekq4kk8/0ifOb0oYUtLJQ7F0k/kdH
+vgyuejcU4YNfxHvcuITyc82HoR2Z7yZotWHliGpQVpIHwi58VTXbMyTpNGrI3nib
+MM57u0HOGWfI6AS6zuJgApQGDa+wfPh7+TVsbMEEwAgV0ICDLJ8MfRVq2FlJ4p/s
+bw+blqFglVdelH7NK53P1tBDwnqckJQpUQWCjsBvWKYPqrzgZ4tx/eoRogkiaN1Z
+JBdbjfx5/r4hm1MFXuzQLvL7I952jKQNi5MX5Rbur35xyK/DcEgYr4vIHRMzx6TC
+KHPx/m28Ce19d//Ey5EmXdhyWzhDbN/UN9ebackYxs85MDmwtP9MCdVPhIiJMneA
+VRQL+gc5BIZtDQxhTJYjHN1AP3A0MTM4HTGI+nXseDX2yNeFxjRcg50jIaEJnizA
+/0OJ3YmE3S8mMDnBgM89dyODHHSzDSvdo2C6tJSJpiALYfUI8Kg=
+=ykDF
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_D1E0DCC2-711A-4576-A471-453AA1F88B05--
