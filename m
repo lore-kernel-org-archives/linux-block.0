@@ -1,137 +1,51 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from userp2120.oracle.com ([156.151.31.85]:53548 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728449AbeH3TDV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Aug 2018 15:03:21 -0400
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-To: herbert@gondor.apana.org.au
-Cc: Jeff.Lien@wdc.com, ard.biesheuvel@linaro.org,
-        david.darrington@wdc.com, hch@infradead.org, jeff.furlong@wdc.com,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        martin.petersen@oracle.com, tim.c.chen@linux.intel.com
-Subject: [PATCH v2 2/3] crc-t10dif: Pick better transform if one becomes available
-Date: Thu, 30 Aug 2018 11:00:15 -0400
-Message-Id: <20180830150016.15661-2-martin.petersen@oracle.com>
-In-Reply-To: <20180830150016.15661-1-martin.petersen@oracle.com>
-References: <20180827060918.tfz7ljufqhlej4kq@gondor.apana.org.au>
- <20180830150016.15661-1-martin.petersen@oracle.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+Date: Fri, 3 Aug 2018 09:11:33 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"jthumshirn@suse.de" <jthumshirn@suse.de>,
+	"stern@rowland.harvard.edu" <stern@rowland.harvard.edu>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH v3 8/9] blk-mq: Insert blk_pm_{add,put}_request() calls
+Message-ID: <20180803011132.GF16047@ming.t460p>
+References: <20180802182944.14442-1-bart.vanassche@wdc.com>
+ <20180802182944.14442-9-bart.vanassche@wdc.com>
+ <20180802235338.GB16047@ming.t460p>
+ <51cfe7ab9e54013e278072e91b59b04432488dc7.camel@wdc.com>
+ <20180803001142.GD16047@ming.t460p>
+ <9223e26eee24d595cde189daa9c121d07c2260e4.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <9223e26eee24d595cde189daa9c121d07c2260e4.camel@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-T10 CRC library is linked into the kernel thanks to block and SCSI. The
-crypto accelerators are typically loaded later as modules and are
-therefore not available when the T10 CRC library is initialized.
+On Fri, Aug 03, 2018 at 01:03:36AM +0000, Bart Van Assche wrote:
+> On Fri, 2018-08-03 at 08:11 +0800, Ming Lei wrote:
+> > On Fri, Aug 03, 2018 at 12:08:54AM +0000, Bart Van Assche wrote:
+> > > On Fri, 2018-08-03 at 07:53 +0800, Ming Lei wrote:
+> > > > blk_pm_add_request() calls pm_request_resume() for waking up device, but
+> > > > it is wrong because it is async request, which can't guarantee device
+> > > > will be ready before calling .queue_rq().
+> > > 
+> > > That's a longstanding issue and not something that has been introduced by this
+> > > patch series. Hence patch 6/9 that issues a warning if pm_request_resume() would
+> > > be called.
+> > 
+> > It is introduced by your patch, please see blk_pm_allow_request().
+> 
+> Did you perhaps misread my patch? Please have a look at commit c8158819d506
+> ("block: implement runtime pm strategy"). I think that commit from 2013
+> introduced the pm_request_resume() call in blk_pm_add_request().
+> 
+> By the way, if you would like to see that call removed, I'm fine with
+> removing that call.
 
-Use the crypto notifier facility to trigger a switch to a better algorithm
-if one becomes available after the initial hash has been registered. Use
-RCU to protect the original transform while the new one is being set up.
+pm_request_resume() isn't used wrong now, and the issue is introduced by
+removing blk_pm_allow_request(), which is called in elv_next_request() for
+avoiding this issue, so that requests can be kept in scheduler queue if
+device isn't active.
 
-Suggested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org
-Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
----
- include/linux/crc-t10dif.h |  1 +
- lib/crc-t10dif.c           | 46 ++++++++++++++++++++++++++++++++++++--
- 2 files changed, 45 insertions(+), 2 deletions(-)
-
-diff --git a/include/linux/crc-t10dif.h b/include/linux/crc-t10dif.h
-index 1fe0cfcdea30..6bb0c0bf357b 100644
---- a/include/linux/crc-t10dif.h
-+++ b/include/linux/crc-t10dif.h
-@@ -6,6 +6,7 @@
- 
- #define CRC_T10DIF_DIGEST_SIZE 2
- #define CRC_T10DIF_BLOCK_SIZE 1
-+#define CRC_T10DIF_STRING "crct10dif"
- 
- extern __u16 crc_t10dif_generic(__u16 crc, const unsigned char *buffer,
- 				size_t len);
-diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
-index 1ad33e555805..52f577a3868d 100644
---- a/lib/crc-t10dif.c
-+++ b/lib/crc-t10dif.c
-@@ -14,10 +14,47 @@
- #include <linux/err.h>
- #include <linux/init.h>
- #include <crypto/hash.h>
-+#include <crypto/algapi.h>
- #include <linux/static_key.h>
-+#include <linux/notifier.h>
- 
--static struct crypto_shash *crct10dif_tfm;
-+static struct crypto_shash __rcu *crct10dif_tfm;
- static struct static_key crct10dif_fallback __read_mostly;
-+DEFINE_MUTEX(crc_t10dif_mutex);
-+
-+static int crc_t10dif_rehash(struct notifier_block *self, unsigned long val, void *data)
-+{
-+	struct crypto_alg *alg = data;
-+	struct crypto_shash *new, *old;
-+
-+	if (val != CRYPTO_MSG_ALG_LOADED ||
-+	    static_key_false(&crct10dif_fallback) ||
-+	    strncmp(alg->cra_name, CRC_T10DIF_STRING, strlen(CRC_T10DIF_STRING)))
-+		return 0;
-+
-+	mutex_lock(&crc_t10dif_mutex);
-+	old = rcu_dereference_protected(crct10dif_tfm,
-+					lockdep_is_held(&crc_t10dif_mutex));
-+	if (!old) {
-+		mutex_unlock(&crc_t10dif_mutex);
-+		return 0;
-+	}
-+	new = crypto_alloc_shash("crct10dif", 0, 0);
-+	if (IS_ERR(new)) {
-+		mutex_unlock(&crc_t10dif_mutex);
-+		return 0;
-+	}
-+	rcu_assign_pointer(crct10dif_tfm, new);
-+	mutex_unlock(&crc_t10dif_mutex);
-+
-+	synchronize_rcu();
-+	crypto_free_shash(old);
-+	return 0;
-+}
-+
-+static struct notifier_block crc_t10dif_nb = {
-+	.notifier_call = crc_t10dif_rehash,
-+};
- 
- __u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
- {
-@@ -30,11 +67,14 @@ __u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
- 	if (static_key_false(&crct10dif_fallback))
- 		return crc_t10dif_generic(crc, buffer, len);
- 
--	desc.shash.tfm = crct10dif_tfm;
-+	rcu_read_lock();
-+	desc.shash.tfm = rcu_dereference(crct10dif_tfm);
- 	desc.shash.flags = 0;
- 	*(__u16 *)desc.ctx = crc;
- 
- 	err = crypto_shash_update(&desc.shash, buffer, len);
-+	rcu_read_unlock();
-+
- 	BUG_ON(err);
- 
- 	return *(__u16 *)desc.ctx;
-@@ -49,6 +89,7 @@ EXPORT_SYMBOL(crc_t10dif);
- 
- static int __init crc_t10dif_mod_init(void)
- {
-+	crypto_register_notifier(&crc_t10dif_nb);
- 	crct10dif_tfm = crypto_alloc_shash("crct10dif", 0, 0);
- 	if (IS_ERR(crct10dif_tfm)) {
- 		static_key_slow_inc(&crct10dif_fallback);
-@@ -59,6 +100,7 @@ static int __init crc_t10dif_mod_init(void)
- 
- static void __exit crc_t10dif_mod_fini(void)
- {
-+	crypto_unregister_notifier(&crc_t10dif_nb);
- 	crypto_free_shash(crct10dif_tfm);
- }
- 
--- 
-2.17.1
+Thanks,
+Ming
