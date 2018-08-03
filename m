@@ -1,96 +1,91 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-eopbgr710044.outbound.protection.outlook.com ([40.107.71.44]:28382
-        "EHLO NAM05-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728833AbeHCOMv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 3 Aug 2018 10:12:51 -0400
-From: Javier Gonzalez <javier@cnexlabs.com>
-To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
-CC: "Konopko, Igor J" <igor.j.konopko@intel.com>,
-        "marcin.dziegielewski@intel.com" <marcin.dziegielewski@intel.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        Heiner Litz <hlitz@ucsc.edu>,
-        Young Tack Tack Jin <youngtack.jin@circuitblvd.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] lightnvm: move device L2P detection to core
-Date: Fri, 3 Aug 2018 12:16:39 +0000
-Message-ID: <31319710-8A72-49DC-9CFA-521CA06843F3@cnexlabs.com>
-References: <20180803085449.3436-1-mb@lightnvm.io>
-In-Reply-To: <20180803085449.3436-1-mb@lightnvm.io>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_5A4D8955-3463-4B10-BBFB-9A29FF12EA6E";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha512
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:43468 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728525AbeHCKuW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Aug 2018 06:50:22 -0400
+Received: by mail-lf1-f68.google.com with SMTP id f135-v6so3507355lfg.10
+        for <linux-block@vger.kernel.org>; Fri, 03 Aug 2018 01:55:02 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: igor.j.konopko@intel.com, marcin.dziegielewski@intel.com,
+        javier@cnexlabs.com, hans.holmberg@cnexlabs.com, hlitz@ucsc.edu,
+        youngtack.jin@circuitblvd.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [PATCH] lightnvm: move device L2P detection to core
+Date: Fri,  3 Aug 2018 10:54:49 +0200
+Message-Id: <20180803085449.3436-1-mb@lightnvm.io>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
---Apple-Mail=_5A4D8955-3463-4B10-BBFB-9A29FF12EA6E
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+A 1.2 device is able to manage the logical to physical mapping
+table internally or leave it to the host.
 
-> On 3 Aug 2018, at 10.54, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
->=20
-> A 1.2 device is able to manage the logical to physical mapping
-> table internally or leave it to the host.
->=20
-> A target only supports one of those approaches, and therefore must
-> check on initialization. Move this check to core to avoid each target
-> implement the check.
->=20
-> Signed-off-by: Matias Bj=C3=B8rling <mb@lightnvm.io>
-> ---
+A target only supports one of those approaches, and therefore must
+check on initialization. Move this check to core to avoid each target
+implement the check.
 
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+---
+ drivers/lightnvm/core.c      | 5 +++++
+ drivers/lightnvm/pblk-init.c | 7 -------
+ include/linux/lightnvm.h     | 6 ++++++
+ 3 files changed, 11 insertions(+), 7 deletions(-)
 
-I see where you want to go with these changes, but the way targets are
-layered on top of the LightNVM subsystem does not align with it.
-LightNVM can support different OCSSD versions and capabilities, but that
-does not mean that a target (e.g., pblk) does. The way I see it, core
-should only check for (i) the drive to expose itself in a known revision
-and (ii) the reported structures to be consistent. However, specific
-functionality is not for core to check upo.
-
-In this particular case, the NVM_TGT_F_HOST_L2P check should be pblk
-specific, as it is indeed a 1.2 capability not supported by pblk.
-However, a different target supporting this 1.2 feature can be
-implemented on top.
-
-As mentioned before, I started looking at moving checks to core too and
-my initial thought was to add a .capabilities entry to nvm_tgt_type{} so
-that these can be checked prior target initialization. Alternatively, we
-can move all these checks to pblk-init.c. At this point, it is safe to
-push 1.2 / 2.0 specific functionality to core as registered targets
-would have validated the spec and the actual supported capabilities.
-
-Thoughts?
-
-Javier
-
---Apple-Mail=_5A4D8955-3463-4B10-BBFB-9A29FF12EA6E
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAltkR6QACgkQIX4xUKFR
-nnQKlg//eBcJdGKHmcQnEsjzkn6g+L/YnHFgEw9cfIfc8+rGnxwAd70Z4rFDlLYf
-60r4p6aYnFVbdLYc1s+ibdVvCRZZ8778V4jGE8aVs18UD45XkIeYLWpHCEC9Lan7
-7bBjj7fvqtfywmIgCLpdyH7ebXmPYYA3voGNBxUPEKEbSUPGQTTTY/1tOqOEs1vw
-JAtXrZeVHn4n9uBKh97W5Y5r7h4v6sfgF6t3GvfuXuEDmx1CaGaZkdjKbxxgRTV8
-8XujxINZU/2JJS+BYPx8X3a6jdL+9JNZfjfZtMZhc7XFyAHwanlSozAiH5++iS/e
-e93OjF5o0Hjn/kygkgI4McB0RGLC0uj1cUmFlso8QmmRCA1vuWjY5B0lUM2zsfnY
-9jv16w51mH1q1XeU/iEd3Jzqy1UBIr8W/HzZ5dPUTO4F/FSSsFAoIUM3q3CIPccs
-rPfYRsA88nnikHC2WroBY897hwKAOpf0CoqgjjsA76RjySYd2uhopExV5ZHxPeK+
-pY/sIukELilLyvqanIAlqdT4ys4HckHvCTgpW5Vu76l+FiC5tiQc8nl5wEbavwxF
-vZLXAdzkr74g/GTFwprLSAcI36Q9ZbOfO0bbwlYfYiOR5tez6dDl0a6WQ6OBZm4M
-NJn5NISO2IkuzwOFJNGkylk/FSqhMD5+V7pBadfhemnSl7jqqTw=
-=DQPD
------END PGP SIGNATURE-----
-
---Apple-Mail=_5A4D8955-3463-4B10-BBFB-9A29FF12EA6E--
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 68553c7ae937..964352720a03 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -355,6 +355,11 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ 		return -EINVAL;
+ 	}
+ 
++	if ((tt->flags & NVM_TGT_F_HOST_L2P) != (dev->geo.dom & NVM_RSP_L2P)) {
++		pr_err("nvm: device is incompatible with target L2P type.\n");
++		return -EINVAL;
++	}
++
+ 	if (nvm_target_exists(create->tgtname)) {
+ 		pr_err("nvm: target name already exists (%s)\n",
+ 							create->tgtname);
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index e9e2fedff387..cc8a59e3c240 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -1202,13 +1202,6 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+ 	pblk->state = PBLK_STATE_RUNNING;
+ 	pblk->gc.gc_enabled = 0;
+ 
+-	if (geo->version == NVM_OCSSD_SPEC_12 && geo->dom & NVM_RSP_L2P) {
+-		pblk_err(pblk, "host-side L2P table not supported. (%x)\n",
+-							geo->dom);
+-		kfree(pblk);
+-		return ERR_PTR(-EINVAL);
+-	}
+-
+ 	spin_lock_init(&pblk->resubmit_lock);
+ 	spin_lock_init(&pblk->trans_lock);
+ 	spin_lock_init(&pblk->lock);
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 8acc2fe277d6..f4a84694e5e2 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -495,9 +495,15 @@ typedef void (nvm_tgt_exit_fn)(void *, bool);
+ typedef int (nvm_tgt_sysfs_init_fn)(struct gendisk *);
+ typedef void (nvm_tgt_sysfs_exit_fn)(struct gendisk *);
+ 
++enum {
++	NVM_TGT_F_DEV_L2P = 0,
++	NVM_TGT_F_HOST_L2P = 1 << 0,
++};
++
+ struct nvm_tgt_type {
+ 	const char *name;
+ 	unsigned int version[3];
++	int flags;
+ 
+ 	/* target entry points */
+ 	nvm_tgt_make_rq_fn *make_rq;
+-- 
+2.11.0
