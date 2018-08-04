@@ -1,76 +1,84 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:34637 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731181AbeHBWn1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Aug 2018 18:43:27 -0400
-Received: by mail-lj1-f193.google.com with SMTP id f8-v6so3117280ljk.1
-        for <linux-block@vger.kernel.org>; Thu, 02 Aug 2018 13:50:38 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: igor.j.konopko@intel.com, marcin.dziegielewski@intel.com,
-        javier@cnexlabs.com, hans.holmberg@cnexlabs.com, hlitz@ucsc.edu,
-        youngtack.jin@circuitblvd.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [PATCH] lightnvm: pblk: fix rqd.error return value in pblk_blk_erase_sync
-Date: Thu,  2 Aug 2018 22:50:23 +0200
-Message-Id: <20180802205023.29094-1-mb@lightnvm.io>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=7477a5644=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Tejun Heo <tj@kernel.org>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v4 06/10] percpu-refcount: Introduce percpu_ref_read()
+Date: Fri,  3 Aug 2018 17:03:21 -0700
+Message-Id: <20180804000325.3610-7-bart.vanassche@wdc.com>
+In-Reply-To: <20180804000325.3610-1-bart.vanassche@wdc.com>
+References: <20180804000325.3610-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-rqd.error is masked by the return value of pblk_submit_io_sync.
-The rqd structure is then passed on to the end_io function, which
-assumes that any error should lead to a chunk being marked
-offline/bad. Since the pblk_submit_io_sync can fail before the
-command is issued to the device, the error value maybe not correspond
-to a media failure, leading to chunks being immaturely retired.
+Introduce a function that allows to read the value of a per-cpu counter.
+This function will be used in the next patch to check whether a per-cpu
+counter has the value one.
 
-Also, the pblk_blk_erase_sync function prints an error message in case
-the erase fails. Since the caller prints an error message by itself,
-remove the error message in this function.
-
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Alan Stern <stern@rowland.harvard.edu>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/lightnvm/pblk-core.c | 19 ++-----------------
- 1 file changed, 2 insertions(+), 17 deletions(-)
+ include/linux/percpu-refcount.h |  2 ++
+ lib/percpu-refcount.c           | 29 +++++++++++++++++++++++++++++
+ 2 files changed, 31 insertions(+)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 72acf2f6dbd6..814204d22a2e 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -886,10 +886,8 @@ static void pblk_setup_e_rq(struct pblk *pblk, struct nvm_rq *rqd,
+diff --git a/include/linux/percpu-refcount.h b/include/linux/percpu-refcount.h
+index 009cdf3d65b6..5707289ba828 100644
+--- a/include/linux/percpu-refcount.h
++++ b/include/linux/percpu-refcount.h
+@@ -331,4 +331,6 @@ static inline bool percpu_ref_is_zero(struct percpu_ref *ref)
+ 	return !atomic_long_read(&ref->count);
+ }
  
- static int pblk_blk_erase_sync(struct pblk *pblk, struct ppa_addr ppa)
- {
--	struct nvm_rq rqd;
--	int ret = 0;
--
--	memset(&rqd, 0, sizeof(struct nvm_rq));
-+	struct nvm_rq rqd = {0};
-+	int ret;
- 
- 	pblk_setup_e_rq(pblk, &rqd, ppa);
- 
-@@ -897,19 +895,6 @@ static int pblk_blk_erase_sync(struct pblk *pblk, struct ppa_addr ppa)
- 	 * with writes. Thus, there is no need to take the LUN semaphore.
- 	 */
- 	ret = pblk_submit_io_sync(pblk, &rqd);
--	if (ret) {
--		struct nvm_tgt_dev *dev = pblk->dev;
--		struct nvm_geo *geo = &dev->geo;
--
--		pblk_err(pblk, "could not sync erase line:%d,blk:%d\n",
--					pblk_ppa_to_line(ppa),
--					pblk_ppa_to_pos(geo, ppa));
--
--		rqd.error = ret;
--		goto out;
--	}
--
--out:
- 	rqd.private = pblk;
- 	__pblk_end_io_erase(pblk, &rqd);
- 
++unsigned long percpu_ref_read(struct percpu_ref *ref);
++
+ #endif
+diff --git a/lib/percpu-refcount.c b/lib/percpu-refcount.c
+index 9f96fa7bc000..c0b9fc8efa6b 100644
+--- a/lib/percpu-refcount.c
++++ b/lib/percpu-refcount.c
+@@ -369,3 +369,32 @@ void percpu_ref_reinit(struct percpu_ref *ref)
+ 	spin_unlock_irqrestore(&percpu_ref_switch_lock, flags);
+ }
+ EXPORT_SYMBOL_GPL(percpu_ref_reinit);
++
++/**
++ * percpu_ref_read - read a percpu refcount
++ * @ref: percpu_ref to test
++ *
++ * This function is safe to call as long as @ref is between init and exit. It
++ * is the responsibility of the caller to handle changes of @ref concurrently
++ * with this function. If this function is called while @ref is in per-cpu
++ * mode the returned value may be incorrect if e.g. percpu_ref_get() is called
++ * from one CPU and percpu_ref_put() is called from another CPU.
++ */
++unsigned long percpu_ref_read(struct percpu_ref *ref)
++{
++	unsigned long __percpu *percpu_count;
++	unsigned long sum = 0;
++	int cpu;
++
++	rcu_read_lock_sched();
++	if (__ref_is_percpu(ref, &percpu_count)) {
++		for_each_possible_cpu(cpu)
++			sum += *per_cpu_ptr(percpu_count, cpu);
++	}
++	rcu_read_unlock_sched();
++	sum += atomic_long_read(&ref->count);
++	sum &= ~PERCPU_COUNT_BIAS;
++
++	return sum;
++}
++EXPORT_SYMBOL_GPL(percpu_ref_read);
 -- 
-2.11.0
+2.18.0
