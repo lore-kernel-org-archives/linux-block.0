@@ -1,54 +1,54 @@
-Return-Path: <prvs=752cffea0=Bart.VanAssche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:34555 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732150AbeHDCCA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Aug 2018 22:02:00 -0400
 From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v5 0/3] Ensure that a request queue is dissociated from the cgroup controller
-Date: Thu,  9 Aug 2018 07:53:35 -0700
-Message-Id: <20180809145338.6160-1-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Jianchao Wang <jianchao.w.wang@oracle.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v4 10/10] blk-mq: Enable support for runtime power management
+Date: Fri,  3 Aug 2018 17:03:25 -0700
+Message-Id: <20180804000325.3610-11-bart.vanassche@wdc.com>
+In-Reply-To: <20180804000325.3610-1-bart.vanassche@wdc.com>
+References: <20180804000325.3610-1-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hello Jens,
+Now that the blk-mq core processes power management requests
+(marked with RQF_PREEMPT) in other states than RPM_ACTIVE, enable
+runtime power management for blk-mq.
 
-Several block drivers call alloc_disk() followed by put_disk() if something
-fails before device_add_disk() is called without calling blk_cleanup_queue().
-Make sure that also for this scenario a request queue is dissociated from the
-cgroup controller. This patch avoids that loading the parport_pc, paride and
-pf drivers trigger a kernel crash. Since this patch series fixes a regression,
-please consider these patches for kernel v4.19.
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Alan Stern <stern@rowland.harvard.edu>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ block/blk-pm.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-Thanks,
-
-Bart.
-
-Changes between v4 and v5:
-- Instead of using #ifdef CONFIG_CGROUP / #endif, introduced a new function in
-  the cgroups code.
-
-Changes between v3 and v4:
-- Added "Cc: stable" tags.
-
-Changes between v2 and v3:
-- Avoid code duplication by introducing a new helper function.
-
-Changes between v1 and v2:
-- Fixed the build for CONFIG_BLK_CGROUP=n.
-
-Bart Van Assche (3):
-  blkcg: Introduce blkg_root_lookup()
-  block: Introduce blk_exit_queue()
-  block: Ensure that a request queue is dissociated from the cgroup
-    controller
-
- block/blk-core.c           | 54 +++++++++++++++++++++-----------------
- block/blk-sysfs.c          | 15 +++++++++++
- block/blk.h                |  1 +
- include/linux/blk-cgroup.h | 18 +++++++++++++
- 4 files changed, 64 insertions(+), 24 deletions(-)
-
+diff --git a/block/blk-pm.c b/block/blk-pm.c
+index 0708185ead61..583cfc04e869 100644
+--- a/block/blk-pm.c
++++ b/block/blk-pm.c
+@@ -66,12 +66,6 @@ void blk_pm_runtime_unlock(struct request_queue *q)
+  */
+ void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
+ {
+-	/* Don't enable runtime PM for blk-mq until it is ready */
+-	if (q->mq_ops) {
+-		pm_runtime_disable(dev);
+-		return;
+-	}
+-
+ 	q->dev = dev;
+ 	q->rpm_status = RPM_ACTIVE;
+ 	pm_runtime_set_autosuspend_delay(q->dev, -1);
 -- 
 2.18.0
