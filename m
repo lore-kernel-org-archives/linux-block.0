@@ -1,45 +1,80 @@
-Return-Path: <wgh@torlan.ru>
-Subject: Re: LVM snapshot broke between 4.14 and 4.16
-To: Linus Torvalds <torvalds@linux-foundation.org>,
- Mike Snitzer <snitzer@redhat.com>
-Cc: Theodore Ts'o <tytso@mit.edu>, Jens Axboe <axboe@kernel.dk>,
- Sagi Grimberg <sagi@grimberg.me>,
+Return-Path: <zkabelac@redhat.com>
+Subject: Re: [dm-devel] LVM snapshot broke between 4.14 and 4.16
+To: "Theodore Y. Ts'o" <tytso@mit.edu>, Mike Snitzer <snitzer@redhat.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, Jens Axboe
+ <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
  Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
  linux-block <linux-block@vger.kernel.org>, dm-devel@redhat.com,
- Ilya Dryomov <idryomov@gmail.com>, Zdenek Kabelac <zkabelac@redhat.com>
-References: <CA+55aFyAox9BTDpRsqLXiROhHOX60aa45LEZ7Azteaumdu11Fw@mail.gmail.com>
- <CAOi1vP-SJO4AMK=XD3Lmja++2dQqoiw6Zn8Vgxf8OfvYgnuC6Q@mail.gmail.com>
+ Ilya Dryomov <idryomov@gmail.com>, wgh@torlan.ru
+References: <CAOi1vP-SJO4AMK=XD3Lmja++2dQqoiw6Zn8Vgxf8OfvYgnuC6Q@mail.gmail.com>
  <CA+55aFy2DR9fxHhmGq+azSjX9D71YtLsuFKmoEuYW3uTAUYtJg@mail.gmail.com>
  <d76415de-2056-c7d6-cc88-b896deaa8ead@torlan.ru>
  <1ec0a220-d5b0-1c27-e63b-c4d3f4ce9d77@torlan.ru>
  <CA+55aFyPVQ5-gA93irsaxPC9BNQxnGWrDDHPMUYai2kxKiaKWQ@mail.gmail.com>
- <20180803133102.GA3092@redhat.com> <20180803152034.GD32066@thunk.org>
- <20180803183932.GA3258@redhat.com>
- <CA+55aFwGGjs_imFFkEPJ4g99Kseam=4Qppv4G6Q=ZfZXdzF7Vw@mail.gmail.com>
- <20180803190617.GA4498@redhat.com>
- <CA+55aFzSM6qhZpM4CCpRNR_LWNCbLyRtQQ3hnPwnRrBdDkwWUw@mail.gmail.com>
-From: WGH <wgh@torlan.ru>
-Message-ID: <a5feeaa7-e043-3987-cf23-4090e3eeec4a@torlan.ru>
-Date: Sat, 4 Aug 2018 13:01:32 +0300
+ <b2bbd8ec-ac5b-fa8a-d3f7-8615d87f73c3@redhat.com>
+ <CA+55aFwWZX=CXmWDTkDGb36kf12XmTehmQjbiMPCqCRG2hi9kw@mail.gmail.com>
+ <20180803185431.GB3258@redhat.com>
+ <CA+55aFwDEY7B6OMh5xL2wc8BRj1KkzBHggNowAjbsWfma6H5Zg@mail.gmail.com>
+ <20180803193037.GA4581@redhat.com> <20180804052033.GA4461@thunk.org>
+From: Zdenek Kabelac <zkabelac@redhat.com>
+Message-ID: <102c2d75-f768-a649-52c3-bac6f0ca738d@redhat.com>
+Date: Sat, 4 Aug 2018 10:36:50 +0200
 MIME-Version: 1.0
-In-Reply-To: <CA+55aFzSM6qhZpM4CCpRNR_LWNCbLyRtQQ3hnPwnRrBdDkwWUw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180804052033.GA4461@thunk.org>
+Content-Type: text/plain; charset=iso-8859-2; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On 08/03/2018 10:22 PM, Linus Torvalds wrote:
-> And in fact, maybe the right thing to do is to not revert the original
-> commit entirely, but instead just weaken it a lot. Turn the "you did a
-> write request on a RO disk" into a WARN_ON_ONCE() instead of a hard
-> error.
->
-> Something like the attached patch.
->
-> WGH, do you build your own kernels? Does this attached (untested)
-> patch make things work for you? It should give a big warning, but let
-> the old behavior through..
+Dne 4.8.2018 v 07:20 Theodore Y. Ts'o napsal(a):
+> On Fri, Aug 03, 2018 at 03:30:37PM -0400, Mike Snitzer wrote:
+>>
+>> I was trying to give context for the "best to update lvm2 anyway"
+>> disclaimer that was used.  Yeah, it was specious.
+> 
+> Well, it seemed to indicate a certain attitude that both Linus and I
+> are concerned about.  I tried to use more of a "pursuading" style to
+> impress why that attitude was not ideal/correct.  Linus used a much
+> more assertive style (e.g., "Hell, no!").
 
-The patch works for me.
+My whole point was - when someone has 'enough time' to compile fresh new 
+kernel, spending couple seconds to build also recent lvm2 should have be no 
+issue. Bugs are continually fixed, new feature from newer kernel are being
+used, known problems are being addressed - that's  all what it means.
+Bug are fixed not just in kernel, but also in user-space.
 
-However, there's no text messsage in the kernel log, just a traceback. I
-think that's because WARN_ONCE is supposed to take condition as a first
-argument.
+> 
+>> And yeah, that isn't a good excuse to ignore it but: dm-snapshot is a
+>> steaming pile as compared to dm thin-provisioning...
+> 
+> On a side note, this is the first that I've heard the assertion that
+> dm-thin was better than dm-snapshot.  My impression was that
+> dm-snapshot was a proven code base, that only did one thing and (as
+> far as I could tell) did it well.  In contrast, dm-thin is much newer
+> code, **far** more complex, with functionality and corner cases
+> approaching that of a file system --- and just to be even more
+> exciting, it doesn't have an fsck/repair tool to deal with corrupted
+> metadata.
+> 
+> In your opinion, is it because you disagree with the assumption that
+> dm-thin is scary?  Or is the argument that dm-snapshot is even
+> scarier?
+
+
+dm-snapshost has really outdated design - it's been useful in the old age 
+where megabyte was hell lot of space.
+
+Nowadays, when users do need to handle snapshots in multi gigabyte sizes and 
+moreover have number of snapshots from the same volume taken over the time, 
+want to take snapshot of snapshot of snapshot, the old snapshot simple kills 
+all the performance, uses tons of resources and becomes serious bottleneck of 
+your system and has lots of usability limitation.
+
+That's where  thin provisioning will shine....
+
+However if you still need to take short-living smallish snapshot and you want 
+to use non-provisioned origin device, there the snapshot will still work as 
+proven technology -  just no one can expect it will scale for the recent 
+device size explosion...
+
+Regards
+
+Zdenek
