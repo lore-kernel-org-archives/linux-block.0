@@ -1,65 +1,67 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44760 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727633AbeHJJxW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Aug 2018 05:53:22 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, shhuiw@foxmail.com,
-        Coly Li <colyli@suse.de>
-Subject: [PATCH v2 05/17] bcache: replace Symbolic permissions by octal permission numbers
-Date: Fri, 10 Aug 2018 15:23:45 +0800
-Message-Id: <20180810072357.19823-6-colyli@suse.de>
-In-Reply-To: <20180810072357.19823-1-colyli@suse.de>
-References: <20180810072357.19823-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] lightnvm: remove minor version check for 2.0
+To: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Cc: Javier Gonzalez <javier@cnexlabs.com>,
+ "Konopko, Igor J" <igor.j.konopko@intel.com>,
+ "marcin.dziegielewski@intel.com" <marcin.dziegielewski@intel.com>,
+ Hans Holmberg <hans.holmberg@cnexlabs.com>, Heiner Litz <hlitz@ucsc.edu>,
+ Young Tack Tack Jin <youngtack.jin@circuitblvd.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20180803090237.2022-1-mb@lightnvm.io>
+ <7B08AEC1-90F8-4AE0-AE46-BADF8CC8D270@cnexlabs.com>
+ <2f1d5972-3257-22e0-efd7-0038f979f438@lightnvm.io>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <e2436194-0de5-df6a-5912-3346d6fca75b@kernel.dk>
+Date: Sun, 5 Aug 2018 08:26:14 -0600
+MIME-Version: 1.0
+In-Reply-To: <2f1d5972-3257-22e0-efd7-0038f979f438@lightnvm.io>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Symbolic permission names are used in bcache, for now octal permission
-numbers are encouraged to use for readability. This patch replaces
-all symbolic permissions by octal permission numbers.
+On 8/5/18 2:29 AM, Matias Bjørling wrote:
+> On 8/3/18 2:07 PM, Javier Gonzalez wrote:
+>>> On 3 Aug 2018, at 11.02, Matias Bjørling <mb@lightnvm.io> wrote:
+>>>
+>>> A minor version number increase should not break backwards
+>>> compatibility.
+>>>
+>>> Fixes: 3cb98f84d368b ("lightnvm: add minor version to generic geometry")
+>>> Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+>>> ---
+>>> drivers/nvme/host/lightnvm.c | 6 ------
+>>> 1 file changed, 6 deletions(-)
+>>>
+>>> diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+>>> index d9e4cccd5b66..a156fe3ca7d3 100644
+>>> --- a/drivers/nvme/host/lightnvm.c
+>>> +++ b/drivers/nvme/host/lightnvm.c
+>>> @@ -414,12 +414,6 @@ static int nvme_nvm_setup_20(struct nvme_nvm_id20 *id,
+>>> 	/* Set compacted version for upper layers */
+>>> 	geo->version = NVM_OCSSD_SPEC_20;
+>>>
+>>> -	if (!(geo->major_ver_id == 2 && geo->minor_ver_id == 0)) {
+>>> -		pr_err("nvm: OCSSD version not supported (v%d.%d)\n",
+>>> -				geo->major_ver_id, geo->minor_ver_id);
+>>> -		return -EINVAL;
+>>> -	}
+>>> -
+>>> 	geo->num_ch = le16_to_cpu(id->num_grp);
+>>> 	geo->num_lun = le16_to_cpu(id->num_pu);
+>>> 	geo->all_luns = geo->num_ch * geo->num_lun;
+>>> --
+>>> 2.11.0
+>>
+>> Looks good to me.
+>>
+>> Reviewed-by: Javier González <javier@cnexlabs.com>
+>>
+> 
+> Hi Jens,
+> 
+> Would it be possible to pick this one up for 4.19?
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Shenghui Wang <shhuiw@foxmail.com>
----
- drivers/md/bcache/bcache.h | 4 ++--
- drivers/md/bcache/sysfs.h  | 6 +++---
- 2 files changed, 5 insertions(+), 5 deletions(-)
+Done.
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 031a75a25d3e..66e6d5639b38 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -881,11 +881,11 @@ static inline uint8_t bucket_gc_gen(struct bucket *b)
- #define BUCKET_GC_GEN_MAX	96U
- 
- #define kobj_attribute_write(n, fn)					\
--	static struct kobj_attribute ksysfs_##n = __ATTR(n, S_IWUSR, NULL, fn)
-+	static struct kobj_attribute ksysfs_##n = __ATTR(n, 0200, NULL, fn)
- 
- #define kobj_attribute_rw(n, show, store)				\
- 	static struct kobj_attribute ksysfs_##n =			\
--		__ATTR(n, S_IWUSR|S_IRUSR, show, store)
-+		__ATTR(n, 0600, show, store)
- 
- static inline void wake_up_allocators(struct cache_set *c)
- {
-diff --git a/drivers/md/bcache/sysfs.h b/drivers/md/bcache/sysfs.h
-index b54fe9602529..3fe82425859c 100644
---- a/drivers/md/bcache/sysfs.h
-+++ b/drivers/md/bcache/sysfs.h
-@@ -44,9 +44,9 @@ STORE(fn)								\
- 	static struct attribute sysfs_##_name =				\
- 		{ .name = #_name, .mode = _mode }
- 
--#define write_attribute(n)	__sysfs_attribute(n, S_IWUSR)
--#define read_attribute(n)	__sysfs_attribute(n, S_IRUGO)
--#define rw_attribute(n)		__sysfs_attribute(n, S_IRUGO|S_IWUSR)
-+#define write_attribute(n)	__sysfs_attribute(n, 0200)
-+#define read_attribute(n)	__sysfs_attribute(n, 0444)
-+#define rw_attribute(n)		__sysfs_attribute(n, 0644)
- 
- #define sysfs_printf(file, fmt, ...)					\
- do {									\
 -- 
-2.18.0
+Jens Axboe
