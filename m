@@ -1,48 +1,27 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39126 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727237AbeHIJIL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Aug 2018 05:08:11 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 08/17] bcache: replace '%pF' by '%pS' in seq_printf()
-Date: Thu,  9 Aug 2018 14:43:11 +0800
-Message-Id: <20180809064320.10229-9-colyli@suse.de>
-In-Reply-To: <20180809064320.10229-1-colyli@suse.de>
-References: <20180809064320.10229-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=7490ff4ab=roger.pau@citrix.com>
+Date: Mon, 6 Aug 2018 18:18:59 +0200
+From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+To: Juergen Gross <jgross@suse.com>
+CC: <linux-kernel@vger.kernel.org>, <xen-devel@lists.xenproject.org>,
+	<linux-block@vger.kernel.org>, <konrad.wilk@oracle.com>, <axboe@kernel.dk>,
+	<boris.ostrovsky@oracle.com>
+Subject: Re: [PATCH 3/4] xen/blkfront: reorder tests in xlblk_init()
+Message-ID: <20180806161859.gqcc4xze5jbbuu4v@mac>
+References: <20180806113403.24728-1-jgross@suse.com>
+ <20180806113403.24728-5-jgross@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+In-Reply-To: <20180806113403.24728-5-jgross@suse.com>
+Return-Path: roger.pau@citrix.com
+List-ID: <linux-block@vger.kernel.org>
 
-'%pF' and '%pf' are deprecated vsprintf pointer extensions, this patch
-replace them by '%pS', which is suggested by checkpatch.pl.
+On Mon, Aug 06, 2018 at 01:34:02PM +0200, Juergen Gross wrote:
+> In case we don't want pv block devices we should not test parameters
+> for sanity and eventually print out error messages. So test precluding
+> conditions before checking parameters.
+> 
+> Signed-off-by: Juergen Gross <jgross@suse.com>
 
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/closure.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Reviewed-by: Roger Pau Monn� <roger.pau@citrix.com>
 
-diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
-index 8570fc426e31..034067e0e9ce 100644
---- a/drivers/md/bcache/closure.c
-+++ b/drivers/md/bcache/closure.c
-@@ -168,7 +168,7 @@ static int debug_seq_show(struct seq_file *f, void *data)
- 	list_for_each_entry(cl, &closure_list, all) {
- 		int r = atomic_read(&cl->remaining);
- 
--		seq_printf(f, "%p: %pF -> %pf p %p r %i ",
-+		seq_printf(f, "%p: %pS -> %pS p %p r %i ",
- 			   cl, (void *) cl->ip, cl->fn, cl->parent,
- 			   r & CLOSURE_REMAINING_MASK);
- 
-@@ -178,7 +178,7 @@ static int debug_seq_show(struct seq_file *f, void *data)
- 			   r & CLOSURE_RUNNING	? "R" : "");
- 
- 		if (r & CLOSURE_WAITING)
--			seq_printf(f, " W %pF\n",
-+			seq_printf(f, " W %pS\n",
- 				   (void *) cl->waiting_on);
- 
- 		seq_printf(f, "\n");
--- 
-2.18.0
+Thanks, Roger.
