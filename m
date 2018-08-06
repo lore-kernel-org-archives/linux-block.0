@@ -1,53 +1,32 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39142 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727237AbeHIJIT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Aug 2018 05:08:19 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 09/17] bcache: fix typo 'succesfully' to 'successfully'
-Date: Thu,  9 Aug 2018 14:43:12 +0800
-Message-Id: <20180809064320.10229-10-colyli@suse.de>
-In-Reply-To: <20180809064320.10229-1-colyli@suse.de>
-References: <20180809064320.10229-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=749b68ccf=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tom.leiming@gmail.com" <tom.leiming@gmail.com>
+CC: "jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "stern@rowland.harvard.edu" <stern@rowland.harvard.edu>,
+	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH v4 02/10] block, scsi: Give RQF_PREEMPT back its original
+ meaning
+Date: Mon, 6 Aug 2018 14:15:44 +0000
+Message-ID: <a3c2efd9423c547c9389b23e70fa857c25e5fa07.camel@wdc.com>
+References: <20180804000325.3610-1-bart.vanassche@wdc.com>
+	 <20180804000325.3610-3-bart.vanassche@wdc.com>
+	 <CACVXFVO3Ge7LRQdSvRMzAgSrQVFcHZGMAMnt_duNqX6X7Z=Dvw@mail.gmail.com>
+In-Reply-To: 
+ <CACVXFVO3Ge7LRQdSvRMzAgSrQVFcHZGMAMnt_duNqX6X7Z=Dvw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-7"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-This patch fixes typo 'succesfully' to correct 'successfully', which is
-suggested by checkpatch.pl.
+On Sat, 2018-08-04 at 09:16 +-0800, Ming Lei wrote:
++AD4- The above change will cause regression on SPI transport, please see
++AD4- spi+AF8-dv+AF8-device(), where non-PM command is sent to device via
++AD4- scsi+AF8-execute() after the device is put to QUIESCE.
 
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/io.c      | 2 +-
- drivers/md/bcache/request.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Hello Ming,
 
-diff --git a/drivers/md/bcache/io.c b/drivers/md/bcache/io.c
-index cfc56add799a..c25097968319 100644
---- a/drivers/md/bcache/io.c
-+++ b/drivers/md/bcache/io.c
-@@ -86,7 +86,7 @@ void bch_count_io_errors(struct cache *ca,
- 
- 			/*
- 			 * First we subtract refresh from count; each time we
--			 * succesfully do so, we rescale the errors once:
-+			 * successfully do so, we rescale the errors once:
- 			 */
- 
- 			count = atomic_cmpxchg(&ca->io_count, old, new);
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 50c0de5f95b4..449baec3fa19 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -154,7 +154,7 @@ static void bch_data_insert_error(struct closure *cl)
- 
- 	/*
- 	 * Our data write just errored, which means we've got a bunch of keys to
--	 * insert that point to data that wasn't succesfully written.
-+	 * insert that point to data that wasn't successfully written.
- 	 *
- 	 * We don't have to insert those keys but we still have to invalidate
- 	 * that region of the cache - so, if we just strip off all the pointers
--- 
-2.18.0
+I will drop this patch for now and revisit this change later.
+
+Bart.
