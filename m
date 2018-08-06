@@ -1,38 +1,47 @@
-Return-Path: <wgh@torlan.ru>
-To: axboe@kernel.dk, idryomov@gmail.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- sagi@grimberg.me
-From: WGH <wgh@torlan.ru>
-Subject: LVM snapshot broke between 4.14 and 4.16
-Message-ID: <226835ba-2197-b850-6e5b-8ba14f7fd016@torlan.ru>
-Date: Thu, 2 Aug 2018 15:26:13 +0300
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:53864 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729692AbeHFPKi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 6 Aug 2018 11:10:38 -0400
+Subject: Re: bcache-tools repo?
+To: Rolf Fokkens <rolf@rolffokkens.nl>
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <20180315104240.24647-1-colyli@suse.de>
+ <a0f8c2c5-6717-36d7-7ee8-ee1720eef268@rolffokkens.nl>
+From: Coly Li <colyli@suse.de>
+Message-ID: <2b4bd5e7-41b5-1865-c785-e33ca42cca81@suse.de>
+Date: Mon, 6 Aug 2018 21:01:25 +0800
 MIME-Version: 1.0
+In-Reply-To: <a0f8c2c5-6717-36d7-7ee8-ee1720eef268@rolffokkens.nl>
 Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-(I originally reported this problem here:
-https://bugzilla.kernel.org/show_bug.cgi?id=200439)
+On 2018/8/6 2:39 AM, Rolf Fokkens wrote:
+> Hi,
+> 
+> I'm the maintainer of the bcache-tools package for Fedora, and bcache
+> tools has been quiet for a while so I wasn't paying attention. But I
+> accidentally noticed there's stuff going on again with bcache tools. I
+> did a quick search in the mail archives to see where the new
+> bcache-tools git repository is (I think
+> https://bcache.evilpiepirate.org/ doesn't point in the right direction),
+> and I'm not able to find it.
+> 
+> Could anybody point me to the git repo that contains the latest
+> bcache-tools?
 
-When I updated from 4.14 to 4.16, my LVM snapshotting script broke for
-no apparent reason.
+Hi Rolf,
 
-My script has the following line, and it fails like this:
-+ lvcreate --size 5G --snapshot --name snap0 --permission r
-/dev/mapper/vg0-lvol_rootfs
-  device-mapper: create ioctl on
-vg0-snap0-cowLVM-sDdIeh9cecWdaNyRfZC31mxgfwTa4sOeHMJXVOykGVRtfP6Aii7IHvwS066AOLOM-cow
-failed: Device or resource busy
-  Failed to lock logical volume vg0/lvol_rootfs.
-  Aborting. Manual intervention required.
+So far we don't have any change to bcache-tools, there are some changes
+in progress, notable once are big endian support and bcache-ctl.
 
-At the same time, some errors appear in dmesg as well:
-[   26.145279] generic_make_request: Trying to write to read-only
-block-device dm-3 (partno 0)
-[   26.145288] device-mapper: persistent snapshot: write_header failed
-[   26.145847] device-mapper: table: 253:4: snapshot: Failed to read
-snapshot metadata
-[   26.145851] device-mapper: ioctl: error adding target to table
+Big endian support is still under developing. bcache-ctl seems to work
+well so far, but the author does not post patch yet.
 
-I bisected the vanilla kernel, and the first bad commit is
-[721c7fc701c71f693307d274d2b346a1ecd4a534] block: fail op_is_write()
-requests to read-only partitions
+I tend to keep all the changes in https://bcache.evilpiepirate.org until
+it is necessary to change the git repo.
+
+Thanks.
+
+Coly Li
