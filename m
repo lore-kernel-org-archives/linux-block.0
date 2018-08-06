@@ -1,155 +1,36 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44788 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727574AbeHJJx3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Aug 2018 05:53:29 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, shhuiw@foxmail.com,
-        Coly Li <colyli@suse.de>
-Subject: [PATCH v2 06/17] bcache: replace printk() by pr_*() routines
-Date: Fri, 10 Aug 2018 15:23:46 +0800
-Message-Id: <20180810072357.19823-7-colyli@suse.de>
-In-Reply-To: <20180810072357.19823-1-colyli@suse.de>
-References: <20180810072357.19823-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <rjw@rjwysocki.net>
+Return-Path: <rjw@rjwysocki.net>
+From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+To: Kees Cook <keescook@chromium.org>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, Arnd Bergmann <arnd@arndb.de>, Eric Biggers <ebiggers@google.com>, "Gustavo A. R. Silva" <gustavo@embeddedor.com>, Alasdair Kergon <agk@redhat.com>, Rabin Vincent <rabinv@axis.com>, Tim Chen <tim.c.chen@linux.intel.com>, Pavel Machek <pavel@ucw.cz>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, Philipp Reisner <philipp.reisner@linbit.com>, Lars Ellenberg <lars.ellenberg@linbit.com>, Jens Axboe <axboe@kernel.dk>, Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Mike Snitzer <snitzer@redhat.com>, Paul Mackerras <paulus@samba.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, David Howells <dhowells@redhat.com>, Johannes Berg <johannes@sipsolutions.net>, Tudor-Dan Ambarus <tudor.ambarus@microchip.com>, Jia-Ju Bai <baijiaju1990@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Josh Poimboeuf <jpoimboe@redhat.com>, David Woodhouse <dwmw@amazon.co.uk>, Will Deacon <will.deacon@arm.com>, device-mapper development <dm-devel@redhat.com>, Linux PM <linux-pm@vger.kernel.org>, linux-crypto <linux-crypto@vger.kernel.org>, drbd-dev@lists.linbit.com, linux-block <linux-block@vger.kernel.org>, qat-linux@intel.com, linux-ppp@vger.kernel.org, netdev <netdev@vger.kernel.org>, "open list:ANDROID DRIVERS" <devel@driverdev.osuosl.org>, linux-afs@lists.infradead.org, "open list:NETWORKING DRIVERS (WIRELESS)" <linux-wireless@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v6 10/18] x86/power/64: Remove VLA usage
+Date: Mon, 06 Aug 2018 12:28:28 +0200
+Message-ID: <1782361.6NaZWiq7ky@aspire.rjw.lan>
+In-Reply-To: <CAGXu5j+NPCc2hq5x7JUwgKYvY6zKN28YdtHbHVapnpgC3GwCsg@mail.gmail.com>
+References: <20180724164936.37477-1-keescook@chromium.org> <CAJZ5v0gVDotjufLKUW0YuQu2vA4fmU_gqia=ZA4DocW4XHxx0w@mail.gmail.com> <CAGXu5j+NPCc2hq5x7JUwgKYvY6zKN28YdtHbHVapnpgC3GwCsg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+List-ID: <linux-block@vger.kernel.org>
 
-There are still many places in bcache use printk to display kernel
-message, which are suggested to be preplaced by pr_*() routines like
-pr_err(), pr_info(), or pr_notice().
+On Wednesday, July 25, 2018 8:01:47 PM CEST Kees Cook wrote:
+> On Wed, Jul 25, 2018 at 4:32 AM, Rafael J. Wysocki <rafael@kernel.org> wrote:
+> > On Tue, Jul 24, 2018 at 6:49 PM, Kees Cook <keescook@chromium.org> wrote:
+> >> In the quest to remove all stack VLA usage from the kernel[1], this
+> >> removes the discouraged use of AHASH_REQUEST_ON_STACK by switching to
+> >> shash directly and allocating the descriptor in heap memory (which should
+> >> be fine: the tfm has already been allocated there too).
+> >>
+> >> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+> >>
+> >> Signed-off-by: Kees Cook <keescook@chromium.org>
+> >> Acked-by: Pavel Machek <pavel@ucw.cz>
+> >
+> > I think I can queue this up if there are no objections from others.
+> >
+> > Do you want me to do that?
+> 
+> Sure thing. It looks like the other stand-alone patches like this one
+> are getting taken into the non-crypto trees, so that's fine.
+> 
 
-This patch replaces all printk() with a proper pr_*() routine for
-bcache code.
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Shenghui Wang <shhuiw@foxmail.com>
----
- drivers/md/bcache/bset.c    |  8 ++++----
- drivers/md/bcache/debug.c   | 10 +++++-----
- drivers/md/bcache/extents.c |  8 ++++----
- drivers/md/bcache/super.c   |  4 ++--
- 4 files changed, 15 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
-index 19b4febe5b45..b6a3f9d291a9 100644
---- a/drivers/md/bcache/bset.c
-+++ b/drivers/md/bcache/bset.c
-@@ -25,18 +25,18 @@ void bch_dump_bset(struct btree_keys *b, struct bset *i, unsigned int set)
- 	for (k = i->start; k < bset_bkey_last(i); k = next) {
- 		next = bkey_next(k);
- 
--		printk(KERN_ERR "block %u key %u/%u: ", set,
-+		pr_err("block %u key %u/%u: ", set,
- 		       (unsigned int) ((u64 *) k - i->d), i->keys);
- 
- 		if (b->ops->key_dump)
- 			b->ops->key_dump(b, k);
- 		else
--			printk("%llu:%llu\n", KEY_INODE(k), KEY_OFFSET(k));
-+			pr_err("%llu:%llu\n", KEY_INODE(k), KEY_OFFSET(k));
- 
- 		if (next < bset_bkey_last(i) &&
- 		    bkey_cmp(k, b->ops->is_extents ?
- 			     &START_KEY(next) : next) > 0)
--			printk(KERN_ERR "Key skipped backwards\n");
-+			pr_err("Key skipped backwards\n");
- 	}
- }
- 
-@@ -482,7 +482,7 @@ void inorder_test(void)
- 		unsigned int i = 1, j = rounddown_pow_of_two(size - 1);
- 
- 		if (!(size % 4096))
--			printk(KERN_NOTICE "loop %u, %llu per us\n", size,
-+			pr_notice("loop %u, %llu per us\n", size,
- 			       done / ktime_us_delta(ktime_get(), start));
- 
- 		while (1) {
-diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
-index a8f70c916fdb..06da66b2488a 100644
---- a/drivers/md/bcache/debug.c
-+++ b/drivers/md/bcache/debug.c
-@@ -74,28 +74,28 @@ void bch_btree_verify(struct btree *b)
- 
- 		console_lock();
- 
--		printk(KERN_ERR "*** in memory:\n");
-+		pr_err("*** in memory:\n");
- 		bch_dump_bset(&b->keys, inmemory, 0);
- 
--		printk(KERN_ERR "*** read back in:\n");
-+		pr_err("*** read back in:\n");
- 		bch_dump_bset(&v->keys, sorted, 0);
- 
- 		for_each_written_bset(b, ondisk, i) {
- 			unsigned int block = ((void *) i - (void *) ondisk) /
- 				block_bytes(b->c);
- 
--			printk(KERN_ERR "*** on disk block %u:\n", block);
-+			pr_err("*** on disk block %u:\n", block);
- 			bch_dump_bset(&b->keys, i, block);
- 		}
- 
--		printk(KERN_ERR "*** block %zu not written\n",
-+		pr_err("*** block %zu not written\n",
- 		       ((void *) i - (void *) ondisk) / block_bytes(b->c));
- 
- 		for (j = 0; j < inmemory->keys; j++)
- 			if (inmemory->d[j] != sorted->d[j])
- 				break;
- 
--		printk(KERN_ERR "b->written %u\n", b->written);
-+		pr_err("b->written %u\n", b->written);
- 
- 		console_unlock();
- 		panic("verify failed at %u\n", j);
-diff --git a/drivers/md/bcache/extents.c b/drivers/md/bcache/extents.c
-index cb3b2c613ed6..c809724e6571 100644
---- a/drivers/md/bcache/extents.c
-+++ b/drivers/md/bcache/extents.c
-@@ -130,18 +130,18 @@ static void bch_bkey_dump(struct btree_keys *keys, const struct bkey *k)
- 	char buf[80];
- 
- 	bch_extent_to_text(buf, sizeof(buf), k);
--	printk(" %s", buf);
-+	pr_err(" %s", buf);
- 
- 	for (j = 0; j < KEY_PTRS(k); j++) {
- 		size_t n = PTR_BUCKET_NR(b->c, k, j);
- 
--		printk(" bucket %zu", n);
-+		pr_err(" bucket %zu", n);
- 		if (n >= b->c->sb.first_bucket && n < b->c->sb.nbuckets)
--			printk(" prio %i",
-+			pr_err(" prio %i",
- 			       PTR_BUCKET(b->c, k, j)->prio);
- 	}
- 
--	printk(" %s\n", bch_ptr_status(b->c, k));
-+	pr_err(" %s\n", bch_ptr_status(b->c, k));
- }
- 
- /* Btree ptrs */
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index fb4d885e4093..951776e8cd8b 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1472,13 +1472,13 @@ bool bch_cache_set_error(struct cache_set *c, const char *fmt, ...)
- 	acquire_console_sem();
- 	*/
- 
--	printk(KERN_ERR "bcache: error on %pU: ", c->sb.set_uuid);
-+	pr_err("bcache: error on %pU: ", c->sb.set_uuid);
- 
- 	va_start(args, fmt);
- 	vprintk(fmt, args);
- 	va_end(args);
- 
--	printk(", disabling caching\n");
-+	pr_err(", disabling caching\n");
- 
- 	if (c->on_error == ON_ERROR_PANIC)
- 		panic("panic forced after error\n");
--- 
-2.18.0
+Applied now, thanks!
