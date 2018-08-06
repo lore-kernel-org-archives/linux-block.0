@@ -1,313 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:41989 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727456AbeH2QUf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Aug 2018 12:20:35 -0400
-Received: by mail-ed1-f65.google.com with SMTP id l5so1131752edw.9
-        for <linux-block@vger.kernel.org>; Wed, 29 Aug 2018 05:23:53 -0700 (PDT)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Javier Gonzales <javier@cnexlabs.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH 1/7] lightnvm: introduce nvm_rq_to_ppa_list
-Date: Wed, 29 Aug 2018 14:23:28 +0200
-Message-Id: <1535545414-550-2-git-send-email-hans.ml.holmberg@owltronix.com>
-In-Reply-To: <1535545414-550-1-git-send-email-hans.ml.holmberg@owltronix.com>
-References: <1535545414-550-1-git-send-email-hans.ml.holmberg@owltronix.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v4 01/10] block: Change the preempt-only flag into a
+ counter
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Jianchao Wang <jianchao.w.wang@oracle.com>, Ming Lei <ming.lei@redhat.com>,
+ Johannes Thumshirn <jthumshirn@suse.de>,
+ Alan Stern <stern@rowland.harvard.edu>
+References: <20180804000325.3610-1-bart.vanassche@wdc.com>
+ <20180804000325.3610-2-bart.vanassche@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <0903c42a-0943-ccd2-12f4-19bfc35a12f8@suse.de>
+Date: Mon, 6 Aug 2018 08:25:21 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180804000325.3610-2-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+On 08/04/2018 02:03 AM, Bart Van Assche wrote:
+> Rename "preempt-only" into "pm-only" because the primary purpose of
+> this mode is power management. Since the power management core may
+> but does not have to resume a runtime suspended device before
+> performing system-wide suspend and since a later patch will set
+> "pm-only" mode as long as a block device is runtime suspended, make
+> it possible to set "pm-only" mode from more than one context.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> Cc: Alan Stern <stern@rowland.harvard.edu>
+> ---
+>  block/blk-core.c        | 35 ++++++++++++++++++-----------------
+>  block/blk-mq-debugfs.c  | 10 +++++++++-
+>  drivers/scsi/scsi_lib.c |  8 ++++----
+>  include/linux/blkdev.h  | 14 +++++++++-----
+>  4 files changed, 40 insertions(+), 27 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-There is a number of places in the lightnvm subsystem where the user
-iterates over the ppa list. Before iterating, the user must know if it
-is a single or multiple LBAs due to vector commands using either the
-nvm_rq ->ppa_addr or ->ppa_list fields on command submission, which
-leads to open-coding the if/else statement.
+Cheers,
 
-Instead of having multiple if/else's, move it into a function that can
-be called by its users.
-
-A nice side effect of this cleanup is that this patch fixes up a
-bunch of cases where we don't consider the single-ppa case in pblk.
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
----
- drivers/lightnvm/core.c          | 14 ++++----------
- drivers/lightnvm/pblk-map.c      | 10 ++++++----
- drivers/lightnvm/pblk-read.c     | 11 ++++-------
- drivers/lightnvm/pblk-recovery.c |  9 ++++++---
- drivers/lightnvm/pblk-write.c    | 18 ++++++++----------
- drivers/lightnvm/pblk.h          |  4 +---
- include/linux/lightnvm.h         |  5 +++++
- 7 files changed, 34 insertions(+), 37 deletions(-)
-
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 5d0ed33d7c59..f7154398ba38 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -603,22 +603,16 @@ static void nvm_ppa_dev_to_tgt(struct nvm_tgt_dev *tgt_dev,
- 
- static void nvm_rq_tgt_to_dev(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
- {
--	if (rqd->nr_ppas == 1) {
--		nvm_ppa_tgt_to_dev(tgt_dev, &rqd->ppa_addr, 1);
--		return;
--	}
-+	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
- 
--	nvm_ppa_tgt_to_dev(tgt_dev, rqd->ppa_list, rqd->nr_ppas);
-+	nvm_ppa_tgt_to_dev(tgt_dev, ppa_list, rqd->nr_ppas);
- }
- 
- static void nvm_rq_dev_to_tgt(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
- {
--	if (rqd->nr_ppas == 1) {
--		nvm_ppa_dev_to_tgt(tgt_dev, &rqd->ppa_addr, 1);
--		return;
--	}
-+	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
- 
--	nvm_ppa_dev_to_tgt(tgt_dev, rqd->ppa_list, rqd->nr_ppas);
-+	nvm_ppa_dev_to_tgt(tgt_dev, ppa_list, rqd->nr_ppas);
- }
- 
- int nvm_register_tgt_type(struct nvm_tgt_type *tt)
-diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
-index 953ca31dda68..dc0efb852475 100644
---- a/drivers/lightnvm/pblk-map.c
-+++ b/drivers/lightnvm/pblk-map.c
-@@ -88,13 +88,14 @@ void pblk_map_rq(struct pblk *pblk, struct nvm_rq *rqd, unsigned int sentry,
- 		 unsigned int off)
- {
- 	struct pblk_sec_meta *meta_list = rqd->meta_list;
-+	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
- 	unsigned int map_secs;
- 	int min = pblk->min_write_pgs;
- 	int i;
- 
- 	for (i = off; i < rqd->nr_ppas; i += min) {
- 		map_secs = (i + min > valid_secs) ? (valid_secs % min) : min;
--		if (pblk_map_page_data(pblk, sentry + i, &rqd->ppa_list[i],
-+		if (pblk_map_page_data(pblk, sentry + i, &ppa_list[i],
- 					lun_bitmap, &meta_list[i], map_secs)) {
- 			bio_put(rqd->bio);
- 			pblk_free_rqd(pblk, rqd, PBLK_WRITE);
-@@ -112,6 +113,7 @@ void pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 	struct nvm_geo *geo = &dev->geo;
- 	struct pblk_line_meta *lm = &pblk->lm;
- 	struct pblk_sec_meta *meta_list = rqd->meta_list;
-+	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
- 	struct pblk_line *e_line, *d_line;
- 	unsigned int map_secs;
- 	int min = pblk->min_write_pgs;
-@@ -119,14 +121,14 @@ void pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 
- 	for (i = 0; i < rqd->nr_ppas; i += min) {
- 		map_secs = (i + min > valid_secs) ? (valid_secs % min) : min;
--		if (pblk_map_page_data(pblk, sentry + i, &rqd->ppa_list[i],
-+		if (pblk_map_page_data(pblk, sentry + i, &ppa_list[i],
- 					lun_bitmap, &meta_list[i], map_secs)) {
- 			bio_put(rqd->bio);
- 			pblk_free_rqd(pblk, rqd, PBLK_WRITE);
- 			pblk_pipeline_stop(pblk);
- 		}
- 
--		erase_lun = pblk_ppa_to_pos(geo, rqd->ppa_list[i]);
-+		erase_lun = pblk_ppa_to_pos(geo, ppa_list[i]);
- 
- 		/* line can change after page map. We might also be writing the
- 		 * last line.
-@@ -141,7 +143,7 @@ void pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 			set_bit(erase_lun, e_line->erase_bitmap);
- 			atomic_dec(&e_line->left_eblks);
- 
--			*erase_ppa = rqd->ppa_list[i];
-+			*erase_ppa = ppa_list[i];
- 			erase_ppa->a.blk = e_line->id;
- 
- 			spin_unlock(&e_line->lock);
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index 928c638af5b6..df3c4eb13be9 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -116,10 +116,9 @@ static void pblk_read_check_seq(struct pblk *pblk, struct nvm_rq *rqd,
- 
- 		if (lba != blba + i) {
- #ifdef CONFIG_NVM_PBLK_DEBUG
--			struct ppa_addr *p;
-+			struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
- 
--			p = (nr_lbas == 1) ? &rqd->ppa_list[i] : &rqd->ppa_addr;
--			print_ppa(pblk, p, "seq", i);
-+			print_ppa(pblk, &ppa_list[i], "seq", i);
- #endif
- 			pblk_err(pblk, "corrupted read LBA (%llu/%llu)\n",
- 							lba, (u64)blba + i);
-@@ -148,11 +147,9 @@ static void pblk_read_check_rand(struct pblk *pblk, struct nvm_rq *rqd,
- 
- 		if (lba != meta_lba) {
- #ifdef CONFIG_NVM_PBLK_DEBUG
--			struct ppa_addr *p;
--			int nr_ppas = rqd->nr_ppas;
-+			struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
- 
--			p = (nr_ppas == 1) ? &rqd->ppa_list[j] : &rqd->ppa_addr;
--			print_ppa(pblk, p, "seq", j);
-+			print_ppa(pblk, &ppa_list[j], "seq", j);
- #endif
- 			pblk_err(pblk, "corrupted read LBA (%llu/%llu)\n",
- 								lba, meta_lba);
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index cf629ab016ba..3bd2b6b0a359 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -161,6 +161,8 @@ static int pblk_recov_read_oob(struct pblk *pblk, struct pblk_line *line,
- 	if (pblk_io_aligned(pblk, rq_ppas))
- 		rqd->is_seq = 1;
- 
-+	ppa_list = nvm_rq_to_ppa_list(rqd);
-+
- 	for (i = 0; i < rqd->nr_ppas; ) {
- 		struct ppa_addr ppa;
- 		int pos;
-@@ -175,7 +177,7 @@ static int pblk_recov_read_oob(struct pblk *pblk, struct pblk_line *line,
- 		}
- 
- 		for (j = 0; j < pblk->min_write_pgs; j++, i++, r_ptr_int++)
--			rqd->ppa_list[i] =
-+			ppa_list[i] =
- 				addr_to_gen_ppa(pblk, r_ptr_int, line->id);
- 	}
- 
-@@ -202,7 +204,7 @@ static int pblk_recov_read_oob(struct pblk *pblk, struct pblk_line *line,
- 		if (lba == ADDR_EMPTY || lba > pblk->rl.nr_secs)
- 			continue;
- 
--		pblk_update_map(pblk, lba, rqd->ppa_list[i]);
-+		pblk_update_map(pblk, lba, ppa_list[i]);
- 	}
- 
- 	left_ppas -= rq_ppas;
-@@ -221,10 +223,11 @@ static void pblk_recov_complete(struct kref *ref)
- 
- static void pblk_end_io_recov(struct nvm_rq *rqd)
- {
-+	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
- 	struct pblk_pad_rq *pad_rq = rqd->private;
- 	struct pblk *pblk = pad_rq->pblk;
- 
--	pblk_up_page(pblk, rqd->ppa_list, rqd->nr_ppas);
-+	pblk_up_page(pblk, ppa_list, rqd->nr_ppas);
- 
- 	pblk_free_rqd(pblk, rqd, PBLK_WRITE_INT);
- 
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index c23b65aaa27b..1bc879ab679d 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -208,15 +208,10 @@ static void pblk_submit_rec(struct work_struct *work)
- 	struct pblk *pblk = recovery->pblk;
- 	struct nvm_rq *rqd = recovery->rqd;
- 	struct pblk_c_ctx *c_ctx = nvm_rq_to_pdu(rqd);
--	struct ppa_addr *ppa_list;
-+	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
- 
- 	pblk_log_write_err(pblk, rqd);
- 
--	if (rqd->nr_ppas == 1)
--		ppa_list = &rqd->ppa_addr;
--	else
--		ppa_list = rqd->ppa_list;
--
- 	pblk_map_remaining(pblk, ppa_list);
- 	pblk_queue_resubmit(pblk, c_ctx);
- 
-@@ -273,9 +268,10 @@ static void pblk_end_io_write_meta(struct nvm_rq *rqd)
- 	struct pblk_g_ctx *m_ctx = nvm_rq_to_pdu(rqd);
- 	struct pblk_line *line = m_ctx->private;
- 	struct pblk_emeta *emeta = line->emeta;
-+	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
- 	int sync;
- 
--	pblk_up_page(pblk, rqd->ppa_list, rqd->nr_ppas);
-+	pblk_up_page(pblk, ppa_list, rqd->nr_ppas);
- 
- 	if (rqd->error) {
- 		pblk_log_write_err(pblk, rqd);
-@@ -375,6 +371,7 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
- 	struct pblk_line_meta *lm = &pblk->lm;
- 	struct pblk_emeta *emeta = meta_line->emeta;
-+	struct ppa_addr *ppa_list;
- 	struct pblk_g_ctx *m_ctx;
- 	struct bio *bio;
- 	struct nvm_rq *rqd;
-@@ -409,12 +406,13 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
- 	if (ret)
- 		goto fail_free_bio;
- 
-+	ppa_list = nvm_rq_to_ppa_list(rqd);
- 	for (i = 0; i < rqd->nr_ppas; ) {
- 		spin_lock(&meta_line->lock);
- 		paddr = __pblk_alloc_page(pblk, meta_line, rq_ppas);
- 		spin_unlock(&meta_line->lock);
- 		for (j = 0; j < rq_ppas; j++, i++, paddr++)
--			rqd->ppa_list[i] = addr_to_gen_ppa(pblk, paddr, id);
-+			ppa_list[i] = addr_to_gen_ppa(pblk, paddr, id);
- 	}
- 
- 	spin_lock(&l_mg->close_lock);
-@@ -423,7 +421,7 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
- 		list_del(&meta_line->list);
- 	spin_unlock(&l_mg->close_lock);
- 
--	pblk_down_page(pblk, rqd->ppa_list, rqd->nr_ppas);
-+	pblk_down_page(pblk, ppa_list, rqd->nr_ppas);
- 
- 	ret = pblk_submit_io(pblk, rqd);
- 	if (ret) {
-@@ -434,7 +432,7 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
- 	return NVM_IO_OK;
- 
- fail_rollback:
--	pblk_up_page(pblk, rqd->ppa_list, rqd->nr_ppas);
-+	pblk_up_page(pblk, ppa_list, rqd->nr_ppas);
- 	spin_lock(&l_mg->close_lock);
- 	pblk_dealloc_page(pblk, meta_line, rq_ppas);
- 	list_add(&meta_line->list, &meta_line->list);
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index eda66fed8e3a..fd274985aa82 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -1374,9 +1374,7 @@ static inline int pblk_boundary_ppa_checks(struct nvm_tgt_dev *tgt_dev,
- static inline int pblk_check_io(struct pblk *pblk, struct nvm_rq *rqd)
- {
- 	struct nvm_tgt_dev *dev = pblk->dev;
--	struct ppa_addr *ppa_list;
--
--	ppa_list = (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
-+	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
- 
- 	if (pblk_boundary_ppa_checks(dev, ppa_list, rqd->nr_ppas)) {
- 		WARN_ON(1);
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 0106984400bc..c3ee729feda5 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -320,6 +320,11 @@ static inline void *nvm_rq_to_pdu(struct nvm_rq *rqdata)
- 	return rqdata + 1;
- }
- 
-+static inline struct ppa_addr *nvm_rq_to_ppa_list(struct nvm_rq *rqd)
-+{
-+	return (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
-+}
-+
- enum {
- 	NVM_BLK_ST_FREE =	0x1,	/* Free block */
- 	NVM_BLK_ST_TGT =	0x2,	/* Block in use by target */
+Hannes
 -- 
-2.7.4
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
