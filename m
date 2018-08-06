@@ -1,54 +1,29 @@
-Return-Path: <prvs=750bc9d11=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v5 8/9] blk-mq: Insert a blk_pm_put_request() call
-Date: Tue,  7 Aug 2018 15:51:32 -0700
-Message-Id: <20180807225133.27221-9-bart.vanassche@wdc.com>
-In-Reply-To: <20180807225133.27221-1-bart.vanassche@wdc.com>
-References: <20180807225133.27221-1-bart.vanassche@wdc.com>
+Return-Path: <prvs=7490ff4ab=roger.pau@citrix.com>
+Date: Mon, 6 Aug 2018 18:20:37 +0200
+From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+To: Juergen Gross <jgross@suse.com>
+CC: <linux-kernel@vger.kernel.org>, <xen-devel@lists.xenproject.org>,
+	<linux-block@vger.kernel.org>, <konrad.wilk@oracle.com>, <axboe@kernel.dk>,
+	<boris.ostrovsky@oracle.com>
+Subject: Re: [PATCH 4/4] xen/blkback: remove unused pers_gnts_lock from
+ struct xen_blkif_ring
+Message-ID: <20180806162037.g32ilxvvzdfnwu7i@mac>
+References: <20180806113403.24728-1-jgross@suse.com>
+ <20180806113403.24728-6-jgross@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+In-Reply-To: <20180806113403.24728-6-jgross@suse.com>
+Return-Path: roger.pau@citrix.com
 List-ID: <linux-block@vger.kernel.org>
 
-Call blk_pm_put_request() after a request has finished.
+On Mon, Aug 06, 2018 at 01:34:03PM +0200, Juergen Gross wrote:
+> pers_gnts_lock isn't being used anywhere. Remove it.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>
----
- block/blk-mq.c | 3 +++
- 1 file changed, 3 insertions(+)
+That was likely a leftover from when the list of persistent grants was
+shared between rings.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 434515018c43..6fb91b2b001c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -37,6 +37,7 @@
- #include "blk-pm.h"
- #include "blk-stat.h"
- #include "blk-mq-sched.h"
-+#include "blk-pm.h"
- #include "blk-rq-qos.h"
- 
- static bool blk_mq_poll(struct request_queue *q, blk_qc_t cookie);
-@@ -478,6 +479,8 @@ static void __blk_mq_free_request(struct request *rq)
- 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, ctx->cpu);
- 	const int sched_tag = rq->internal_tag;
- 
-+	blk_pm_put_request(rq);
-+
- 	if (rq->tag != -1)
- 		blk_mq_put_tag(hctx, hctx->tags, ctx, rq->tag);
- 	if (sched_tag != -1)
--- 
-2.18.0
+> Signed-off-by: Juergen Gross <jgross@suse.com>
+
+Reviewed-by: Roger Pau Monn� <roger.pau@citrix.com>
+
+Thanks, Roger.
