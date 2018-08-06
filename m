@@ -1,4 +1,4 @@
-Return-Path: <prvs=750bc9d11=Bart.VanAssche@wdc.com>
+Return-Path: <prvs=749b68ccf=Bart.VanAssche@wdc.com>
 From: Bart Van Assche <Bart.VanAssche@wdc.com>
 To: "tj@kernel.org" <tj@kernel.org>
 CC: "hch@lst.de" <hch@lst.de>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
@@ -7,8 +7,8 @@ CC: "hch@lst.de" <hch@lst.de>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
 	<stern@rowland.harvard.edu>, "axboe@kernel.dk" <axboe@kernel.dk>,
 	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>
 Subject: Re: [PATCH v3 4/9] percpu-refcount: Introduce percpu_ref_read()
-Date: Tue, 7 Aug 2018 22:53:45 +0000
-Message-ID: <f059047f6f0a5194b85915c33ae5bdbd2b53b401.camel@wdc.com>
+Date: Mon, 6 Aug 2018 17:28:52 +0000
+Message-ID: <32574ddb03c47a273deac07e2b4f200626ed1f27.camel@wdc.com>
 References: <20180802182944.14442-1-bart.vanassche@wdc.com>
 	 <20180802182944.14442-5-bart.vanassche@wdc.com>
 	 <20180802190649.GV1206094@devbig004.ftw2.facebook.com>
@@ -37,14 +37,10 @@ AF8-one(), so
 +AD4- that all the magics can be contained in percpu-ref implementation
 +AD4- proper.
 
-Hi Tejun,
+Hello Tejun,
 
-Can you have a look at the new percpu+AF8-ref+AF8-is+AF8-in+AF8-use() funct=
-ion? Please also
-note that the synchronize+AF8-rcu() call between the two percpu+AF8-ref+AF8=
--is+AF8-in+AF8-use()
-calls is not related to the use of RCU in the per-cpu refcount implementati=
-on.
+I will try to come up with an approach that does not require to modify the
+per-cpu counter code.
 
 Thanks,
 
