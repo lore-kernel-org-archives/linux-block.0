@@ -1,141 +1,90 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:40112 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727345AbeH3W5n (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Aug 2018 18:57:43 -0400
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-Date: Thu, 30 Aug 2018 12:53:42 -0600
-Message-Id: <20180830185352.3369-4-logang@deltatee.com>
-In-Reply-To: <20180830185352.3369-1-logang@deltatee.com>
-References: <20180830185352.3369-1-logang@deltatee.com>
-Subject: [PATCH v5 03/13] PCI/P2PDMA: Add PCI p2pmem DMA mappings to adjust the bus offset
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <tom.leiming@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <b5548ab1d8523be0a13407e2bfca0071bd340c77.camel@wdc.com>
+References: <20180804000325.3610-1-bart.vanassche@wdc.com> <20180804000325.3610-8-bart.vanassche@wdc.com>
+ <CACVXFVOSB-r9OYJ+R7a-PfFuie3LCjUxhs2E7igh9vWp2VONkg@mail.gmail.com> <b5548ab1d8523be0a13407e2bfca0071bd340c77.camel@wdc.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Tue, 7 Aug 2018 06:30:00 +0800
+Message-ID: <CACVXFVPWERaoKRtU=3XpT=jgTu7rFA=oz0FLSYzKcTPCZt1X9g@mail.gmail.com>
+Subject: Re: [PATCH v4 07/10] block, scsi: Rework runtime power management
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "jthumshirn@suse.de" <jthumshirn@suse.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "paulmck@linux.vnet.ibm.com" <paulmck@linux.vnet.ibm.com>,
+	"stern@rowland.harvard.edu" <stern@rowland.harvard.edu>,
+	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+List-ID: <linux-block@vger.kernel.org>
 
-The DMA address used when mapping PCI P2P memory must be the PCI bus
-address. Thus, introduce pci_p2pmem_map_sg() to map the correct
-addresses when using P2P memory. Memory mapped in this way does not
-need to be unmapped.
+On Mon, Aug 6, 2018 at 11:20 PM, Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
+> On Sat, 2018-08-04 at 18:01 +0800, Ming Lei wrote:
+>> On Sat, Aug 4, 2018 at 8:03 AM, Bart Van Assche <bart.vanassche@wdc.com> wrote:
+>> >
+>> > diff --git a/block/blk-pm.c b/block/blk-pm.c
+>> > index 2a4632d0be4b..0708185ead61 100644
+>> > --- a/block/blk-pm.c
+>> > +++ b/block/blk-pm.c
+>> > @@ -107,17 +107,31 @@ int blk_pre_runtime_suspend(struct request_queue *q)
+>> >         if (!q->dev)
+>> >                 return ret;
+>> >
+>> > +       WARN_ON_ONCE(q->rpm_status != RPM_ACTIVE);
+>> > +
+>> >         blk_pm_runtime_lock(q);
+>> > +       /*
+>> > +        * Switch to preempt-only mode before calling synchronize_rcu() such
+>> > +        * that later blk_queue_enter() calls see the preempt-only state. See
+>> > +        * also http://lwn.net/Articles/573497/.
+>> > +        */
+>> > +       blk_set_pm_only(q);
+>> > +       ret = -EBUSY;
+>> > +       if (percpu_ref_read(&q->q_usage_counter) == 1) {
+>> > +               synchronize_rcu();
+>> > +               if (percpu_ref_read(&q->q_usage_counter) == 1)
+>> > +                       ret = 0;
+>> > +       }
+>>
+>> The above code looks too tricky, and the following issue might exist in case
+>> of potential WRITEs re-order from blk_queue_enter().
+>>
+>> 1) suppose there are one in-flight request not completed yet
+>>
+>> 2) observer is the percpu_ref_read() following synchronize_rcu().
+>>
+>> 3) inside blk_queue_enter(), WRITE in percpu_ref_tryget_live()/percpu_ref_put()
+>> can be re-ordered from view of the observer in 2)
+>>
+>> 4) then percpu_ref_read() may return 1 even though the only in-flight
+>> request isn't completed
+>>
+>> 5) suspend still moves on, and data loss may be triggered
+>>
+>> Cc Paul, and Alan have been CCed already, so we have several memory
+>> model experts here, :-), hope they may help to clarify if this reorder case
+>> may exist.
+>
+> Hello Ming,
+>
+> There are two cases:
+> (a) The percpu_ref_tryget_live() call in (3) is triggered by a runtime power
+>     state transition (RPM_*).
+> (b) The percpu_ref_tryget_live() call in (3) is not triggered by a runtime
+>     power state transition.
+>
+> In case (b) the driver that submits the request should protect the request
+> with scsi_autopm_get_device() / scsi_autopm_put_device() or by any other
+> mechanism that prevents runtime power state transitions. Since
+> scsi_autopm_get_device() is called before blk_queue_enter(), since
+> scsi_autopm_get_device() only returns after it has resumed a device and since
+> scsi_autopm_get_device() prevents runtime suspend, the function
+> blk_pre_runtime_suspend() won't be called concurrently with blk_queue_enter()
+> in case (b).
 
-For this, we assume that an SGL passed to these functions contain all
-P2P memory or no P2P memory.
+For normal IO path, blk_queue_enter() is called inside generic_make_request()
+which is usually run from fs, do you mean fs code will call
+scsi_autopm_get_device()? :-)
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
----
- drivers/pci/p2pdma.c       | 43 +++++++++++++++++++++++++++++++++++++++++++
- include/linux/memremap.h   |  1 +
- include/linux/pci-p2pdma.h |  7 +++++++
- 3 files changed, 51 insertions(+)
 
-diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
-index 67c1daf1189e..29bd40a87768 100644
---- a/drivers/pci/p2pdma.c
-+++ b/drivers/pci/p2pdma.c
-@@ -191,6 +191,8 @@ int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar, size_t size,
- 	pgmap->res.flags = pci_resource_flags(pdev, bar);
- 	pgmap->ref = &pdev->p2pdma->devmap_ref;
- 	pgmap->type = MEMORY_DEVICE_PCI_P2PDMA;
-+	pgmap->pci_p2pdma_bus_offset = pci_bus_address(pdev, bar) -
-+		pci_resource_start(pdev, bar);
- 
- 	addr = devm_memremap_pages(&pdev->dev, pgmap);
- 	if (IS_ERR(addr)) {
-@@ -813,3 +815,44 @@ void pci_p2pmem_publish(struct pci_dev *pdev, bool publish)
- 	pdev->p2pdma->p2pmem_published = publish;
- }
- EXPORT_SYMBOL_GPL(pci_p2pmem_publish);
-+
-+/**
-+ * pci_p2pdma_map_sg - map a PCI peer-to-peer scatterlist for DMA
-+ * @dev: device doing the DMA request
-+ * @sg: scatter list to map
-+ * @nents: elements in the scatterlist
-+ * @dir: DMA direction
-+ *
-+ * Scatterlists mapped with this function should not be unmapped in any way.
-+ *
-+ * Returns the number of SG entries mapped or 0 on error.
-+ */
-+int pci_p2pdma_map_sg(struct device *dev, struct scatterlist *sg, int nents,
-+		      enum dma_data_direction dir)
-+{
-+	struct dev_pagemap *pgmap;
-+	struct scatterlist *s;
-+	phys_addr_t paddr;
-+	int i;
-+
-+	/*
-+	 * p2pdma mappings are not compatible with devices that use
-+	 * dma_virt_ops. If the upper layers do the right thing
-+	 * this should never happen because it will be prevented
-+	 * by the check in pci_p2pdma_add_client()
-+	 */
-+	if (WARN_ON_ONCE(IS_ENABLED(CONFIG_DMA_VIRT_OPS) &&
-+			 dev->dma_ops == &dma_virt_ops))
-+		return 0;
-+
-+	for_each_sg(sg, s, nents, i) {
-+		pgmap = sg_page(s)->pgmap;
-+		paddr = sg_phys(s);
-+
-+		s->dma_address = paddr - pgmap->pci_p2pdma_bus_offset;
-+		sg_dma_len(s) = s->length;
-+	}
-+
-+	return nents;
-+}
-+EXPORT_SYMBOL_GPL(pci_p2pdma_map_sg);
-diff --git a/include/linux/memremap.h b/include/linux/memremap.h
-index 9553370ebdad..0ac69ddf5fc4 100644
---- a/include/linux/memremap.h
-+++ b/include/linux/memremap.h
-@@ -125,6 +125,7 @@ struct dev_pagemap {
- 	struct device *dev;
- 	void *data;
- 	enum memory_type type;
-+	u64 pci_p2pdma_bus_offset;
- };
- 
- #ifdef CONFIG_ZONE_DEVICE
-diff --git a/include/linux/pci-p2pdma.h b/include/linux/pci-p2pdma.h
-index 7b2b0f547528..2f03dbbf5af6 100644
---- a/include/linux/pci-p2pdma.h
-+++ b/include/linux/pci-p2pdma.h
-@@ -36,6 +36,8 @@ struct scatterlist *pci_p2pmem_alloc_sgl(struct pci_dev *pdev,
- 					 unsigned int *nents, u32 length);
- void pci_p2pmem_free_sgl(struct pci_dev *pdev, struct scatterlist *sgl);
- void pci_p2pmem_publish(struct pci_dev *pdev, bool publish);
-+int pci_p2pdma_map_sg(struct device *dev, struct scatterlist *sg, int nents,
-+		      enum dma_data_direction dir);
- #else /* CONFIG_PCI_P2PDMA */
- static inline int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar,
- 		size_t size, u64 offset)
-@@ -98,5 +100,10 @@ static inline void pci_p2pmem_free_sgl(struct pci_dev *pdev,
- static inline void pci_p2pmem_publish(struct pci_dev *pdev, bool publish)
- {
- }
-+static inline int pci_p2pdma_map_sg(struct device *dev,
-+		struct scatterlist *sg, int nents, enum dma_data_direction dir)
-+{
-+	return 0;
-+}
- #endif /* CONFIG_PCI_P2PDMA */
- #endif /* _LINUX_PCI_P2P_H */
--- 
-2.11.0
+Thanks,
+Ming Lei
