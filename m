@@ -1,55 +1,33 @@
-Return-Path: <prvs=752cffea0=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v6 12/12] blk-mq: Enable support for runtime power management
-Date: Thu,  9 Aug 2018 12:41:49 -0700
-Message-Id: <20180809194149.15285-13-bart.vanassche@wdc.com>
-In-Reply-To: <20180809194149.15285-1-bart.vanassche@wdc.com>
-References: <20180809194149.15285-1-bart.vanassche@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: nvme updates for 4.19
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+ Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
+References: <20180804084354.GA26103@infradead.org>
+ <df1c976e-8ea7-ba14-d1d2-caf8511de527@kernel.dk>
+ <20180805073305.GA31663@infradead.org>
+ <da7f8241-cd79-ff46-21a2-71b282bc1a57@kernel.dk>
+ <20180806073100.GA11515@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <a679bea1-6732-71bc-c943-778a75ac9e02@kernel.dk>
+Date: Mon, 6 Aug 2018 08:34:02 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
+In-Reply-To: <20180806073100.GA11515@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Now that the blk-mq core processes power management requests
-(marked with RQF_PREEMPT) in other states than RPM_ACTIVE, enable
-runtime power management for blk-mq.
+On 8/6/18 1:31 AM, Christoph Hellwig wrote:
+> On Sun, Aug 05, 2018 at 08:27:22AM -0600, Jens Axboe wrote:
+>> Right, the change is fine, it's just fighting a similar change
+>> in a different branch. I did fix it up (picked in the original change
+>> first), please double check at your convenience.
+> 
+> The merge looks good.  Given that you've changed the head anyway I'd
+> also be happy to give you a version of the ANA commit without that
+> change..
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>
----
- block/blk-pm.c | 6 ------
- 1 file changed, 6 deletions(-)
+Let's just leave it as-is for now, I pulled in -rc6 to ensure that I
+would resolve the conflict instead of introducing it to Linus.
 
-diff --git a/block/blk-pm.c b/block/blk-pm.c
-index 977beffdccd2..e76d85dcdd67 100644
---- a/block/blk-pm.c
-+++ b/block/blk-pm.c
-@@ -30,12 +30,6 @@
-  */
- void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
- {
--	/* Don't enable runtime PM for blk-mq until it is ready */
--	if (q->mq_ops) {
--		pm_runtime_disable(dev);
--		return;
--	}
--
- 	q->dev = dev;
- 	q->rpm_status = RPM_ACTIVE;
- 	pm_runtime_set_autosuspend_delay(q->dev, -1);
 -- 
-2.18.0
+Jens Axboe
