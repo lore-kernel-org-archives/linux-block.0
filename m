@@ -1,29 +1,38 @@
-Return-Path: <prvs=7490ff4ab=roger.pau@citrix.com>
-Date: Mon, 6 Aug 2018 18:20:37 +0200
-From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
-To: Juergen Gross <jgross@suse.com>
-CC: <linux-kernel@vger.kernel.org>, <xen-devel@lists.xenproject.org>,
-	<linux-block@vger.kernel.org>, <konrad.wilk@oracle.com>, <axboe@kernel.dk>,
-	<boris.ostrovsky@oracle.com>
-Subject: Re: [PATCH 4/4] xen/blkback: remove unused pers_gnts_lock from
- struct xen_blkif_ring
-Message-ID: <20180806162037.g32ilxvvzdfnwu7i@mac>
+Return-Path: <jgross@suse.com>
+From: Juergen Gross <jgross@suse.com>
+To: linux-kernel@vger.kernel.org,
+	xen-devel@lists.xenproject.org,
+	linux-block@vger.kernel.org
+Cc: konrad.wilk@oracle.com,
+	roger.pau@citrix.com,
+	axboe@kernel.dk,
+	boris.ostrovsky@oracle.com,
+	Juergen Gross <jgross@suse.com>
+Subject: [PATCH 4/4] xen/blkback: remove unused pers_gnts_lock from struct xen_blkif_ring
+Date: Mon,  6 Aug 2018 13:34:03 +0200
+Message-Id: <20180806113403.24728-6-jgross@suse.com>
+In-Reply-To: <20180806113403.24728-1-jgross@suse.com>
 References: <20180806113403.24728-1-jgross@suse.com>
- <20180806113403.24728-6-jgross@suse.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-In-Reply-To: <20180806113403.24728-6-jgross@suse.com>
-Return-Path: roger.pau@citrix.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Aug 06, 2018 at 01:34:03PM +0200, Juergen Gross wrote:
-> pers_gnts_lock isn't being used anywhere. Remove it.
+pers_gnts_lock isn't being used anywhere. Remove it.
 
-That was likely a leftover from when the list of persistent grants was
-shared between rings.
+Signed-off-by: Juergen Gross <jgross@suse.com>
+---
+ drivers/block/xen-blkback/common.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-> Signed-off-by: Juergen Gross <jgross@suse.com>
-
-Reviewed-by: Roger Pau Monn� <roger.pau@citrix.com>
-
-Thanks, Roger.
+diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
+index 26710602d463..4b7747159c38 100644
+--- a/drivers/block/xen-blkback/common.h
++++ b/drivers/block/xen-blkback/common.h
+@@ -279,7 +279,6 @@ struct xen_blkif_ring {
+ 	wait_queue_head_t	pending_free_wq;
+ 
+ 	/* Tree to store persistent grants. */
+-	spinlock_t		pers_gnts_lock;
+ 	struct rb_root		persistent_gnts;
+ 	unsigned int		persistent_gnt_c;
+ 	atomic_t		persistent_gnt_in_use;
+-- 
+2.13.7
