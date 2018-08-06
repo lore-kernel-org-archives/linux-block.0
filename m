@@ -1,57 +1,37 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [RFC PATCH V2 14/17] SCSI: transport_spi: resume a quiesced device
-Date: Sat, 11 Aug 2018 15:12:17 +0800
-Message-Id: <20180811071220.357-15-ming.lei@redhat.com>
-In-Reply-To: <20180811071220.357-1-ming.lei@redhat.com>
-References: <20180811071220.357-1-ming.lei@redhat.com>
+Return-Path: <prvs=749b68ccf=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tom.leiming@gmail.com" <tom.leiming@gmail.com>
+CC: "hch@lst.de" <hch@lst.de>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"jthumshirn@suse.de" <jthumshirn@suse.de>, "stern@rowland.harvard.edu"
+	<stern@rowland.harvard.edu>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH v4 05/10] block: Serialize queue freezing and
+ blk_pre_runtime_suspend()
+Date: Mon, 6 Aug 2018 14:19:56 +0000
+Message-ID: <3644dbbe5e684ba2fb6988416cb4d71e6d719624.camel@wdc.com>
+References: <20180804000325.3610-1-bart.vanassche@wdc.com>
+	 <20180804000325.3610-6-bart.vanassche@wdc.com>
+	 <CACVXFVPdK3VDW2sj3ozqO0H2-Kr3bDjLpbZ+BY8ZrzudUDgeiQ@mail.gmail.com>
+In-Reply-To: 
+ <CACVXFVPdK3VDW2sj3ozqO0H2-Kr3bDjLpbZ+BY8ZrzudUDgeiQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-7"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-We have to preempt freeze queue in scsi_device_quiesce(),
-and unfreeze in scsi_device_resume(), so call scsi_device_resume()
-for the device which is quiesced by scsi_device_quiesce().
+On Sat, 2018-08-04 at 18:23 +-0800, Ming Lei wrote:
++AD4- From user view, it isn't reasonable to prevent runtime suspend from h=
+appening
++AD4- during queue freeze. The period can be a bit long, and it should be o=
+ne perfect
++AD4- opportunity to suspend device during the period since no any IO is po=
+ssible.
 
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Adrian Hunter <adrian.hunter@intel.com>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/scsi_transport_spi.c | 3 +++
- 1 file changed, 3 insertions(+)
+Hello Ming,
 
-diff --git a/drivers/scsi/scsi_transport_spi.c b/drivers/scsi/scsi_transport_spi.c
-index 2ca150b16764..10854c1848e2 100644
---- a/drivers/scsi/scsi_transport_spi.c
-+++ b/drivers/scsi/scsi_transport_spi.c
-@@ -1052,6 +1052,9 @@ spi_dv_device(struct scsi_device *sdev)
- 
- 	scsi_target_resume(starget);
- 
-+	/* undo what scsi_device_quiesce() did */
-+	scsi_device_resume(sdev);
-+
- 	spi_initial_dv(starget) = 1;
- 
-  out_free:
--- 
-2.9.5
+I will look into reducing the scope of the code that is protected by
+blk+AF8-pm+AF8-runtime+AF8-lock() / blk+AF8-pm+AF8-runtime+AF8-unlock() to =
+the code in blk+AF8-freeze+AF8-queue+AF8-start()
+under +ACI-if (freeze+AF8-depth +AD0APQ- 1)+ACI-.
+
+Bart.
