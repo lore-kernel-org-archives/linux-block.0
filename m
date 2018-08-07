@@ -1,64 +1,67 @@
-Return-Path: <prvs=750bc9d11=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
-CC: "jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "hare@suse.de"
-	<hare@suse.de>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"stern@rowland.harvard.edu" <stern@rowland.harvard.edu>,
-	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
-	"jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-	"adrian.hunter@intel.com" <adrian.hunter@intel.com>
-Subject: Re: [RFC PATCH 06/14] SCSI: pass scsi_device to scsi_mq_prep_fn
-Date: Tue, 7 Aug 2018 23:24:06 +0000
-Message-ID: <9d8d49fcdd44152c9fda20c9a57dbb516a5bbbbd.camel@wdc.com>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org
+Subject: [RFC PATCH 06/14] SCSI: pass scsi_device to scsi_mq_prep_fn
+Date: Wed,  8 Aug 2018 01:44:25 +0800
+Message-Id: <20180807174433.8374-7-ming.lei@redhat.com>
+In-Reply-To: <20180807174433.8374-1-ming.lei@redhat.com>
 References: <20180807174433.8374-1-ming.lei@redhat.com>
-	 <20180807174433.8374-7-ming.lei@redhat.com>
-In-Reply-To: <20180807174433.8374-7-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-7"
-MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, 2018-08-08 at 01:44 +-0800, Ming Lei wrote:
-+AD4- diff --git a/drivers/scsi/scsi+AF8-lib.c b/drivers/scsi/scsi+AF8-lib.=
-c
-+AD4- index 435347f58328..52e498fb6280 100644
-+AD4- --- a/drivers/scsi/scsi+AF8-lib.c
-+AD4- +-+-+- b/drivers/scsi/scsi+AF8-lib.c
-+AD4- +AEAAQA- -1971,10 +-1971,9 +AEAAQA- static unsigned int scsi+AF8-mq+A=
-F8-sgl+AF8-size(struct Scsi+AF8-Host +ACo-shost)
-+AD4-  		sizeof(struct scatterlist)+ADs-
-+AD4-  +AH0-
-+AD4- =20
-+AD4- -static int scsi+AF8-mq+AF8-prep+AF8-fn(struct request +ACo-req)
-+AD4- +-static int scsi+AF8-mq+AF8-prep+AF8-fn(struct scsi+AF8-device +ACo-=
-sdev, struct request +ACo-req)
-+AD4-  +AHs-
-+AD4-  	struct scsi+AF8-cmnd +ACo-cmd +AD0- blk+AF8-mq+AF8-rq+AF8-to+AF8-pd=
-u(req)+ADs-
-+AD4- -	struct scsi+AF8-device +ACo-sdev +AD0- req-+AD4-q-+AD4-queuedata+AD=
-s-
-+AD4-  	struct Scsi+AF8-Host +ACo-shost +AD0- sdev-+AD4-host+ADs-
-+AD4-  	struct scatterlist +ACo-sg+ADs-
-+AD4- =20
-+AD4- +AEAAQA- -2070,7 +-2069,7 +AEAAQA- static blk+AF8-status+AF8-t scsi+A=
-F8-queue+AF8-rq(struct blk+AF8-mq+AF8-hw+AF8-ctx +ACo-hctx,
-+AD4-  		goto out+AF8-dec+AF8-target+AF8-busy+ADs-
-+AD4- =20
-+AD4-  	if (+ACE-(req-+AD4-rq+AF8-flags +ACY- RQF+AF8-DONTPREP)) +AHs-
-+AD4- -		ret +AD0- prep+AF8-to+AF8-mq(scsi+AF8-mq+AF8-prep+AF8-fn(req))+ADs=
--
-+AD4- +-		ret +AD0- prep+AF8-to+AF8-mq(scsi+AF8-mq+AF8-prep+AF8-fn(sdev, re=
-q))+ADs-
-+AD4-  		if (ret +ACEAPQ- BLK+AF8-STS+AF8-OK)
-+AD4-  			goto out+AF8-dec+AF8-host+AF8-busy+ADs-
-+AD4-  		req-+AD4-rq+AF8-flags +AHwAPQ- RQF+AF8-DONTPREP+ADs-
+This patchset will introduce per-host admin queue, so it may not to get
+'scsi_device' via q->queuedata.
 
-This patch looks useful to me since it probably realizes a (small) performa=
-nce
-improvement. I think this patch does not depend on any of the previous patc=
-hes
-in this series. Is that correct?
+Cc: Alan Stern <stern@rowland.harvard.edu>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Adrian Hunter <adrian.hunter@intel.com>
+Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/scsi/scsi_lib.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-Bart.
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 435347f58328..52e498fb6280 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1971,10 +1971,9 @@ static unsigned int scsi_mq_sgl_size(struct Scsi_Host *shost)
+ 		sizeof(struct scatterlist);
+ }
+ 
+-static int scsi_mq_prep_fn(struct request *req)
++static int scsi_mq_prep_fn(struct scsi_device *sdev, struct request *req)
+ {
+ 	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
+-	struct scsi_device *sdev = req->q->queuedata;
+ 	struct Scsi_Host *shost = sdev->host;
+ 	struct scatterlist *sg;
+ 
+@@ -2070,7 +2069,7 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		goto out_dec_target_busy;
+ 
+ 	if (!(req->rq_flags & RQF_DONTPREP)) {
+-		ret = prep_to_mq(scsi_mq_prep_fn(req));
++		ret = prep_to_mq(scsi_mq_prep_fn(sdev, req));
+ 		if (ret != BLK_STS_OK)
+ 			goto out_dec_host_busy;
+ 		req->rq_flags |= RQF_DONTPREP;
+-- 
+2.9.5
