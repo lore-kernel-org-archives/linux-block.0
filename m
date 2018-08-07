@@ -1,57 +1,24 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [RFC PATCH 11/14] SCSI: transport_spi: resume a quiesced device
-Date: Wed,  8 Aug 2018 01:44:30 +0800
-Message-Id: <20180807174433.8374-12-ming.lei@redhat.com>
-In-Reply-To: <20180807174433.8374-1-ming.lei@redhat.com>
-References: <20180807174433.8374-1-ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 0/2] CFQ: Suppress W=1 compiler warnings
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+References: <20180807231729.30308-1-bart.vanassche@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <1f12bf6c-a502-67d8-d984-0ec85414fc72@kernel.dk>
+Date: Tue, 7 Aug 2018 17:58:13 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180807231729.30308-1-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-We have to preempt freeze queue in scsi_device_quiesce(),
-and unfreeze in scsi_device_resume(), so call scsi_device_resume()
-for the device which is quiesced by scsi_device_quiesce().
+On 8/7/18 5:17 PM, Bart Van Assche wrote:
+> Hello Jens,
+> 
+> This patch series suppresses the compiler warnings that are reported when
+> building the CFQ I/O scheduler with W=1. Please consider these patches for
+> kernel v4.19.
 
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Adrian Hunter <adrian.hunter@intel.com>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/scsi_transport_spi.c | 3 +++
- 1 file changed, 3 insertions(+)
+Thanks, applied.
 
-diff --git a/drivers/scsi/scsi_transport_spi.c b/drivers/scsi/scsi_transport_spi.c
-index 2ca150b16764..10854c1848e2 100644
---- a/drivers/scsi/scsi_transport_spi.c
-+++ b/drivers/scsi/scsi_transport_spi.c
-@@ -1052,6 +1052,9 @@ spi_dv_device(struct scsi_device *sdev)
- 
- 	scsi_target_resume(starget);
- 
-+	/* undo what scsi_device_quiesce() did */
-+	scsi_device_resume(sdev);
-+
- 	spi_initial_dv(starget) = 1;
- 
-  out_free:
 -- 
-2.9.5
+Jens Axboe
