@@ -1,180 +1,112 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:43269 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728099AbeH2QUi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Aug 2018 12:20:38 -0400
-Received: by mail-ed1-f65.google.com with SMTP id z27-v6so3758562edb.10
-        for <linux-block@vger.kernel.org>; Wed, 29 Aug 2018 05:23:56 -0700 (PDT)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Javier Gonzales <javier@cnexlabs.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH 4/7] lightnvm: pblk: move global caches to module init/exit
-Date: Wed, 29 Aug 2018 14:23:31 +0200
-Message-Id: <1535545414-550-5-git-send-email-hans.ml.holmberg@owltronix.com>
-In-Reply-To: <1535545414-550-1-git-send-email-hans.ml.holmberg@owltronix.com>
-References: <1535545414-550-1-git-send-email-hans.ml.holmberg@owltronix.com>
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:60242 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726865AbeHHBeM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Aug 2018 21:34:12 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH 2/2] cfq: Suppress compiler warnings about comparisons
+Date: Tue,  7 Aug 2018 16:17:29 -0700
+Message-Id: <20180807231729.30308-3-bart.vanassche@wdc.com>
+In-Reply-To: <20180807231729.30308-1-bart.vanassche@wdc.com>
+References: <20180807231729.30308-1-bart.vanassche@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+This patch does not change any functionality but avoids that gcc
+reports the following warnings when building with W=1:
 
-Pblk's global caches should not be initialized every time
-a pblk instance is created, so move the creation and destruction
-of the caches to module init/exit.
+block/cfq-iosched.c: In function ?cfq_back_seek_max_store?:
+block/cfq-iosched.c:4741:13: warning: comparison of unsigned expression < 0 is always false [-Wtype-limits]
+  if (__data < (MIN))      \
+             ^
+block/cfq-iosched.c:4756:1: note: in expansion of macro ?STORE_FUNCTION?
+ STORE_FUNCTION(cfq_back_seek_max_store, &cfqd->cfq_back_max, 0, UINT_MAX, 0);
+ ^~~~~~~~~~~~~~
+block/cfq-iosched.c: In function ?cfq_slice_idle_store?:
+block/cfq-iosched.c:4741:13: warning: comparison of unsigned expression < 0 is always false [-Wtype-limits]
+  if (__data < (MIN))      \
+             ^
+block/cfq-iosched.c:4759:1: note: in expansion of macro ?STORE_FUNCTION?
+ STORE_FUNCTION(cfq_slice_idle_store, &cfqd->cfq_slice_idle, 0, UINT_MAX, 1);
+ ^~~~~~~~~~~~~~
+block/cfq-iosched.c: In function ?cfq_group_idle_store?:
+block/cfq-iosched.c:4741:13: warning: comparison of unsigned expression < 0 is always false [-Wtype-limits]
+  if (__data < (MIN))      \
+             ^
+block/cfq-iosched.c:4760:1: note: in expansion of macro ?STORE_FUNCTION?
+ STORE_FUNCTION(cfq_group_idle_store, &cfqd->cfq_group_idle, 0, UINT_MAX, 1);
+ ^~~~~~~~~~~~~~
+block/cfq-iosched.c: In function ?cfq_low_latency_store?:
+block/cfq-iosched.c:4741:13: warning: comparison of unsigned expression < 0 is always false [-Wtype-limits]
+  if (__data < (MIN))      \
+             ^
+block/cfq-iosched.c:4765:1: note: in expansion of macro ?STORE_FUNCTION?
+ STORE_FUNCTION(cfq_low_latency_store, &cfqd->cfq_latency, 0, 1, 0);
+ ^~~~~~~~~~~~~~
+block/cfq-iosched.c: In function ?cfq_slice_idle_us_store?:
+block/cfq-iosched.c:4775:13: warning: comparison of unsigned expression < 0 is always false [-Wtype-limits]
+  if (__data < (MIN))      \
+             ^
+block/cfq-iosched.c:4782:1: note: in expansion of macro ?USEC_STORE_FUNCTION?
+ USEC_STORE_FUNCTION(cfq_slice_idle_us_store, &cfqd->cfq_slice_idle, 0, UINT_MAX);
+ ^~~~~~~~~~~~~~~~~~~
+block/cfq-iosched.c: In function ?cfq_group_idle_us_store?:
+block/cfq-iosched.c:4775:13: warning: comparison of unsigned expression < 0 is always false [-Wtype-limits]
+  if (__data < (MIN))      \
+             ^
+block/cfq-iosched.c:4783:1: note: in expansion of macro ?USEC_STORE_FUNCTION?
+ USEC_STORE_FUNCTION(cfq_group_idle_us_store, &cfqd->cfq_group_idle, 0, UINT_MAX);
+ ^~~~~~~~~~~~~~~~~~~
 
-Also remove the global pblk lock as it is no longer needed after
-the move.
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 ---
- drivers/lightnvm/pblk-init.c | 42 ++++++++++++++++++++----------------------
- 1 file changed, 20 insertions(+), 22 deletions(-)
+ block/cfq-iosched.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 76a4a271b9cf..0be64220b5d8 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -27,7 +27,6 @@ MODULE_PARM_DESC(write_buffer_size, "number of entries in a write buffer");
- 
- static struct kmem_cache *pblk_ws_cache, *pblk_rec_cache, *pblk_g_rq_cache,
- 				*pblk_w_rq_cache;
--static DECLARE_RWSEM(pblk_lock);
- struct bio_set pblk_bio_set;
- 
- static int pblk_rw_io(struct request_queue *q, struct pblk *pblk,
-@@ -306,21 +305,17 @@ static int pblk_set_addrf(struct pblk *pblk)
- 	return 0;
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index ec6acdd58b7a..2eb87444b157 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -4736,12 +4736,13 @@ USEC_SHOW_FUNCTION(cfq_target_latency_us_show, cfqd->cfq_target_latency);
+ static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)	\
+ {									\
+ 	struct cfq_data *cfqd = e->elevator_data;			\
+-	unsigned int __data;						\
++	unsigned int __data, __min = (MIN), __max = (MAX);		\
++									\
+ 	cfq_var_store(&__data, (page));					\
+-	if (__data < (MIN))						\
+-		__data = (MIN);						\
+-	else if (__data > (MAX))					\
+-		__data = (MAX);						\
++	if (__data < __min)						\
++		__data = __min;						\
++	else if (__data > __max)					\
++		__data = __max;						\
+ 	if (__CONV)							\
+ 		*(__PTR) = (u64)__data * NSEC_PER_MSEC;			\
+ 	else								\
+@@ -4770,12 +4771,13 @@ STORE_FUNCTION(cfq_target_latency_store, &cfqd->cfq_target_latency, 1, UINT_MAX,
+ static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)	\
+ {									\
+ 	struct cfq_data *cfqd = e->elevator_data;			\
+-	unsigned int __data;						\
++	unsigned int __data, __min = (MIN), __max = (MAX);		\
++									\
+ 	cfq_var_store(&__data, (page));					\
+-	if (__data < (MIN))						\
+-		__data = (MIN);						\
+-	else if (__data > (MAX))					\
+-		__data = (MAX);						\
++	if (__data < __min)						\
++		__data = __min;						\
++	else if (__data > __max)					\
++		__data = __max;						\
+ 	*(__PTR) = (u64)__data * NSEC_PER_USEC;				\
+ 	return count;							\
  }
- 
--static int pblk_init_global_caches(struct pblk *pblk)
-+static int pblk_init_global_caches(void)
- {
--	down_write(&pblk_lock);
- 	pblk_ws_cache = kmem_cache_create("pblk_blk_ws",
- 				sizeof(struct pblk_line_ws), 0, 0, NULL);
--	if (!pblk_ws_cache) {
--		up_write(&pblk_lock);
-+	if (!pblk_ws_cache)
- 		return -ENOMEM;
--	}
- 
- 	pblk_rec_cache = kmem_cache_create("pblk_rec",
- 				sizeof(struct pblk_rec_ctx), 0, 0, NULL);
- 	if (!pblk_rec_cache) {
- 		kmem_cache_destroy(pblk_ws_cache);
--		up_write(&pblk_lock);
- 		return -ENOMEM;
- 	}
- 
-@@ -329,7 +324,6 @@ static int pblk_init_global_caches(struct pblk *pblk)
- 	if (!pblk_g_rq_cache) {
- 		kmem_cache_destroy(pblk_ws_cache);
- 		kmem_cache_destroy(pblk_rec_cache);
--		up_write(&pblk_lock);
- 		return -ENOMEM;
- 	}
- 
-@@ -339,15 +333,13 @@ static int pblk_init_global_caches(struct pblk *pblk)
- 		kmem_cache_destroy(pblk_ws_cache);
- 		kmem_cache_destroy(pblk_rec_cache);
- 		kmem_cache_destroy(pblk_g_rq_cache);
--		up_write(&pblk_lock);
- 		return -ENOMEM;
- 	}
--	up_write(&pblk_lock);
- 
- 	return 0;
- }
- 
--static void pblk_free_global_caches(struct pblk *pblk)
-+static void pblk_free_global_caches(void)
- {
- 	kmem_cache_destroy(pblk_ws_cache);
- 	kmem_cache_destroy(pblk_rec_cache);
-@@ -381,13 +373,10 @@ static int pblk_core_init(struct pblk *pblk)
- 	if (!pblk->pad_dist)
- 		return -ENOMEM;
- 
--	if (pblk_init_global_caches(pblk))
--		goto fail_free_pad_dist;
--
- 	/* Internal bios can be at most the sectors signaled by the device. */
- 	ret = mempool_init_page_pool(&pblk->page_bio_pool, NVM_MAX_VLBA, 0);
- 	if (ret)
--		goto free_global_caches;
-+		goto free_pad_dist;
- 
- 	ret = mempool_init_slab_pool(&pblk->gen_ws_pool, PBLK_GEN_WS_POOL_SIZE,
- 				     pblk_ws_cache);
-@@ -455,9 +444,7 @@ static int pblk_core_init(struct pblk *pblk)
- 	mempool_exit(&pblk->gen_ws_pool);
- free_page_bio_pool:
- 	mempool_exit(&pblk->page_bio_pool);
--free_global_caches:
--	pblk_free_global_caches(pblk);
--fail_free_pad_dist:
-+free_pad_dist:
- 	kfree(pblk->pad_dist);
- 	return -ENOMEM;
- }
-@@ -480,7 +467,6 @@ static void pblk_core_free(struct pblk *pblk)
- 	mempool_exit(&pblk->e_rq_pool);
- 	mempool_exit(&pblk->w_rq_pool);
- 
--	pblk_free_global_caches(pblk);
- 	kfree(pblk->pad_dist);
- }
- 
-@@ -1067,7 +1053,6 @@ static void pblk_exit(void *private, bool graceful)
- {
- 	struct pblk *pblk = private;
- 
--	down_write(&pblk_lock);
- 	pblk_gc_exit(pblk, graceful);
- 	pblk_tear_down(pblk, graceful);
- 
-@@ -1076,7 +1061,6 @@ static void pblk_exit(void *private, bool graceful)
- #endif
- 
- 	pblk_free(pblk);
--	up_write(&pblk_lock);
- }
- 
- static sector_t pblk_capacity(void *private)
-@@ -1237,9 +1221,22 @@ static int __init pblk_module_init(void)
- 	ret = bioset_init(&pblk_bio_set, BIO_POOL_SIZE, 0, 0);
- 	if (ret)
- 		return ret;
-+
- 	ret = nvm_register_tgt_type(&tt_pblk);
- 	if (ret)
--		bioset_exit(&pblk_bio_set);
-+		goto fail_exit_bioset;
-+
-+	ret = pblk_init_global_caches();
-+	if (ret)
-+		goto fail_unregister_tgt_type;
-+
-+	return 0;
-+
-+fail_unregister_tgt_type:
-+	nvm_unregister_tgt_type(&tt_pblk);
-+fail_exit_bioset:
-+	bioset_exit(&pblk_bio_set);
-+
- 	return ret;
- }
- 
-@@ -1247,6 +1244,7 @@ static void pblk_module_exit(void)
- {
- 	bioset_exit(&pblk_bio_set);
- 	nvm_unregister_tgt_type(&tt_pblk);
-+	pblk_free_global_caches();
- }
- 
- module_init(pblk_module_init);
 -- 
-2.7.4
+2.18.0
