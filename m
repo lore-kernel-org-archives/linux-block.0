@@ -1,88 +1,126 @@
-Return-Path: <ecashin@gmail.com>
-MIME-Version: 1.0
-References: <20180730071227.22887-1-hare@suse.de> <20180730071227.22887-5-hare@suse.de>
- <CADvA-d=ESWUgJNpsSxdOhLp1amt3B9Aqy+GZ-i=t5zkLVn6RWg@mail.gmail.com> <03060ac8-57ce-9b11-cc7a-287264ac87b5@suse.de>
-In-Reply-To: <03060ac8-57ce-9b11-cc7a-287264ac87b5@suse.de>
-From: Ed Cashin <ecashin@noserose.net>
-Date: Thu, 2 Aug 2018 07:55:46 -0400
-Message-ID: <CADvA-d=uYqT55bhM5s8oVmuG3zY7+6sRbabhk7Q-PO2-wbbmDw@mail.gmail.com>
-Subject: Re: [PATCH 4/6] aoe: use device_add_disk_with_groups()
-To: hare@suse.de
-Cc: "Ed L. Cashin" <ed.cashin@acm.org>, axboe@kernel.dk, hch@lst.de,
-	linux-block@vger.kernel.org, hare@suse.com
-Content-Type: multipart/alternative; boundary="00000000000066052a0572727e5d"
+Return-Path: <prvs=750bc9d11=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Alan Stern <stern@rowland.harvard.edu>
+Subject: [PATCH v5 3/9] block, scsi: Introduce blk_pm_runtime_exit()
+Date: Tue,  7 Aug 2018 15:51:27 -0700
+Message-Id: <20180807225133.27221-4-bart.vanassche@wdc.com>
+In-Reply-To: <20180807225133.27221-1-bart.vanassche@wdc.com>
+References: <20180807225133.27221-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
---00000000000066052a0572727e5d
-Content-Type: text/plain; charset="UTF-8"
+Since it is possible to unbind a SCSI ULD and since unbinding
+removes the association between a request queue and struct device,
+the q->dev pointer has to be reset during unbind. Hence introduce
+a function in the block layer that clears request_queue.dev.
 
-On Wed, Aug 1, 2018 at 2:57 AM Hannes Reinecke <hare@suse.de> wrote:
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Alan Stern <stern@rowland.harvard.edu>
+---
+ block/blk-pm.c         | 18 ++++++++++++++++++
+ drivers/scsi/sd.c      |  9 ++++-----
+ drivers/scsi/sr.c      |  3 ++-
+ include/linux/blk-pm.h |  2 ++
+ 4 files changed, 26 insertions(+), 6 deletions(-)
 
-> On 08/01/2018 03:00 AM, Ed Cashin wrote:
-> > On Mon, Jul 30, 2018 at 3:12 AM Hannes Reinecke <hare@suse.de
-> > <mailto:hare@suse.de>> wrote:
-> >
-> >     Use device_add_disk_with_groups() to avoid a race condition with
-> >     udev during startup.
-> >
-> >
-> > I love the idea of getting rid of the race, but I am having trouble
-> > seeing what happened to the cleanup we had via sysfs_remove_group.
-> > You're storing a pointer to groups off the device, but I don't see it
-> > getting
-> > used for cleanup later in this patch set.  Are you patching linux-next?
-> >
-> And that's the beauty of this patch: you don't need to free/unlink the
-> groups yourself.
-> Unlinking is done in the driver core via
-> device_del()->device_remove_attrs()->device_remove_groups().
->
-> So no separate patch needed.
->
-
-OK, thanks for the clarification.
-
+diff --git a/block/blk-pm.c b/block/blk-pm.c
+index 9b636960d285..bf8532da952d 100644
+--- a/block/blk-pm.c
++++ b/block/blk-pm.c
+@@ -40,6 +40,24 @@ void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
+ }
+ EXPORT_SYMBOL(blk_pm_runtime_init);
+ 
++/**
++ * blk_pm_runtime_exit - runtime PM exit routine
++ * @q: the queue of the device
++ *
++ * This function should be called from the device_driver.remove() callback
++ * function to avoid that further calls to runtime power management functions
++ * occur.
++ */
++void blk_pm_runtime_exit(struct request_queue *q)
++{
++	if (!q->dev)
++		return;
++
++	pm_runtime_get_sync(q->dev);
++	q->dev = NULL;
++}
++EXPORT_SYMBOL(blk_pm_runtime_exit);
++
+ /**
+  * blk_pre_runtime_suspend - Pre runtime suspend check
+  * @q: the queue of the device
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index 69ab459abb98..5537762dfcfd 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -3420,12 +3420,11 @@ static int sd_probe(struct device *dev)
+  **/
+ static int sd_remove(struct device *dev)
+ {
+-	struct scsi_disk *sdkp;
+-	dev_t devt;
++	struct scsi_disk *sdkp = dev_get_drvdata(dev);
++	struct scsi_device *sdp = sdkp->device;
++	dev_t devt = disk_devt(sdkp->disk);
+ 
+-	sdkp = dev_get_drvdata(dev);
+-	devt = disk_devt(sdkp->disk);
+-	scsi_autopm_get_device(sdkp->device);
++	blk_pm_runtime_exit(sdp->request_queue);
+ 
+ 	async_synchronize_full_domain(&scsi_sd_pm_domain);
+ 	async_synchronize_full_domain(&scsi_sd_probe_domain);
+diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
+index de4413e66eca..476987f7ed48 100644
+--- a/drivers/scsi/sr.c
++++ b/drivers/scsi/sr.c
+@@ -1002,8 +1002,9 @@ static void sr_kref_release(struct kref *kref)
+ static int sr_remove(struct device *dev)
+ {
+ 	struct scsi_cd *cd = dev_get_drvdata(dev);
++	struct scsi_device *sdev = cd->device;
+ 
+-	scsi_autopm_get_device(cd->device);
++	blk_pm_runtime_exit(sdev->request_queue);
+ 
+ 	del_gendisk(cd->disk);
+ 	dev_set_drvdata(dev, NULL);
+diff --git a/include/linux/blk-pm.h b/include/linux/blk-pm.h
+index b80c65aba249..6d654f41acbf 100644
+--- a/include/linux/blk-pm.h
++++ b/include/linux/blk-pm.h
+@@ -11,6 +11,7 @@ struct request_queue;
+  */
+ #ifdef CONFIG_PM
+ extern void blk_pm_runtime_init(struct request_queue *q, struct device *dev);
++extern void blk_pm_runtime_exit(struct request_queue *q);
+ extern int blk_pre_runtime_suspend(struct request_queue *q);
+ extern void blk_post_runtime_suspend(struct request_queue *q, int err);
+ extern void blk_pre_runtime_resume(struct request_queue *q);
+@@ -19,6 +20,7 @@ extern void blk_set_runtime_active(struct request_queue *q);
+ #else
+ static inline void blk_pm_runtime_init(struct request_queue *q,
+ 				       struct device *dev) {}
++static inline void blk_pm_runtime_exit(struct request_queue *q) {}
+ #endif
+ 
+ #endif /* _BLK_PM_H_ */
 -- 
-  Ed Cashin <ecashin@noserose.net>
-
---00000000000066052a0572727e5d
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div class=3D"gmail_quote"><div dir=3D"ltr">On Wed, Aug 1,=
- 2018 at 2:57 AM Hannes Reinecke &lt;<a href=3D"mailto:hare@suse.de">hare@s=
-use.de</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"m=
-argin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">On 08/01/2018=
- 03:00 AM, Ed Cashin wrote:<br>
-&gt; On Mon, Jul 30, 2018 at 3:12 AM Hannes Reinecke &lt;<a href=3D"mailto:=
-hare@suse.de" target=3D"_blank">hare@suse.de</a><br>
-&gt; &lt;mailto:<a href=3D"mailto:hare@suse.de" target=3D"_blank">hare@suse=
-.de</a>&gt;&gt; wrote:<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Use device_add_disk_with_groups() to avoid a race c=
-ondition with<br>
-&gt;=C2=A0 =C2=A0 =C2=A0udev during startup.<br>
-&gt; <br>
-&gt; <br>
-&gt; I love the idea of getting rid of the race, but I am having trouble<br=
->
-&gt; seeing what happened to the cleanup we had via sysfs_remove_group.<br>
-&gt; You&#39;re storing a pointer to groups off the device, but I don&#39;t=
- see it<br>
-&gt; getting<br>
-&gt; used for cleanup later in this patch set.=C2=A0 Are you patching linux=
--next?<br>
-&gt; <br>
-And that&#39;s the beauty of this patch: you don&#39;t need to free/unlink =
-the<br>
-groups yourself.<br>
-Unlinking is done in the driver core via<br>
-device_del()-&gt;device_remove_attrs()-&gt;device_remove_groups().<br>
-<br>
-So no separate patch needed.<br></blockquote></div><div><br></div><div>OK, =
-thanks for the clarification.</div><div><br></div>-- <br><div dir=3D"ltr" c=
-lass=3D"gmail_signature" data-smartmail=3D"gmail_signature"><div dir=3D"ltr=
-">=C2=A0 Ed Cashin &lt;<a href=3D"mailto:ecashin@noserose.net" target=3D"_b=
-lank">ecashin@noserose.net</a>&gt;</div></div></div>
-
---00000000000066052a0572727e5d--
+2.18.0
