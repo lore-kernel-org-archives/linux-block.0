@@ -1,50 +1,57 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44856 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727574AbeHJJxl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Aug 2018 05:53:41 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, shhuiw@foxmail.com,
-        Coly Li <colyli@suse.de>
-Subject: [PATCH v2 08/17] bcache: replace '%pF' by '%pS' in seq_printf()
-Date: Fri, 10 Aug 2018 15:23:48 +0800
-Message-Id: <20180810072357.19823-9-colyli@suse.de>
-In-Reply-To: <20180810072357.19823-1-colyli@suse.de>
-References: <20180810072357.19823-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org
+Subject: [RFC PATCH 11/14] SCSI: transport_spi: resume a quiesced device
+Date: Wed,  8 Aug 2018 01:44:30 +0800
+Message-Id: <20180807174433.8374-12-ming.lei@redhat.com>
+In-Reply-To: <20180807174433.8374-1-ming.lei@redhat.com>
+References: <20180807174433.8374-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-'%pF' and '%pf' are deprecated vsprintf pointer extensions, this patch
-replace them by '%pS', which is suggested by checkpatch.pl.
+We have to preempt freeze queue in scsi_device_quiesce(),
+and unfreeze in scsi_device_resume(), so call scsi_device_resume()
+for the device which is quiesced by scsi_device_quiesce().
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Shenghui Wang <shhuiw@foxmail.com>
+Cc: Alan Stern <stern@rowland.harvard.edu>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Adrian Hunter <adrian.hunter@intel.com>
+Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/closure.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/scsi/scsi_transport_spi.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
-index 8570fc426e31..034067e0e9ce 100644
---- a/drivers/md/bcache/closure.c
-+++ b/drivers/md/bcache/closure.c
-@@ -168,7 +168,7 @@ static int debug_seq_show(struct seq_file *f, void *data)
- 	list_for_each_entry(cl, &closure_list, all) {
- 		int r = atomic_read(&cl->remaining);
+diff --git a/drivers/scsi/scsi_transport_spi.c b/drivers/scsi/scsi_transport_spi.c
+index 2ca150b16764..10854c1848e2 100644
+--- a/drivers/scsi/scsi_transport_spi.c
++++ b/drivers/scsi/scsi_transport_spi.c
+@@ -1052,6 +1052,9 @@ spi_dv_device(struct scsi_device *sdev)
  
--		seq_printf(f, "%p: %pF -> %pf p %p r %i ",
-+		seq_printf(f, "%p: %pS -> %pS p %p r %i ",
- 			   cl, (void *) cl->ip, cl->fn, cl->parent,
- 			   r & CLOSURE_REMAINING_MASK);
+ 	scsi_target_resume(starget);
  
-@@ -178,7 +178,7 @@ static int debug_seq_show(struct seq_file *f, void *data)
- 			   r & CLOSURE_RUNNING	? "R" : "");
++	/* undo what scsi_device_quiesce() did */
++	scsi_device_resume(sdev);
++
+ 	spi_initial_dv(starget) = 1;
  
- 		if (r & CLOSURE_WAITING)
--			seq_printf(f, " W %pF\n",
-+			seq_printf(f, " W %pS\n",
- 				   (void *) cl->waiting_on);
- 
- 		seq_printf(f, "\n");
+  out_free:
 -- 
-2.18.0
+2.9.5
