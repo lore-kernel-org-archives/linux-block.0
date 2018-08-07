@@ -1,153 +1,73 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39078 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727237AbeHIJH7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Aug 2018 05:07:59 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 06/17] bcache: replace printk() by pr_*() routines
-Date: Thu,  9 Aug 2018 14:43:09 +0800
-Message-Id: <20180809064320.10229-7-colyli@suse.de>
-In-Reply-To: <20180809064320.10229-1-colyli@suse.de>
-References: <20180809064320.10229-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org
+Subject: [RFC PATCH 04/14] SCSI: pass 'scsi_device' instance from 'scsi_request'
+Date: Wed,  8 Aug 2018 01:44:23 +0800
+Message-Id: <20180807174433.8374-5-ming.lei@redhat.com>
+In-Reply-To: <20180807174433.8374-1-ming.lei@redhat.com>
+References: <20180807174433.8374-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-There are still many places in bcache use printk to display kernel
-message, which are suggested to be preplaced by pr_*() routines like
-pr_err(), pr_info(), or pr_notice().
+This patch prepares for introducing SCSI per-host admin queue, which
+is only used for queuing admin requests, which are now submitted via
+__scsi_execute().
 
-This patch replaces all printk() with a proper pr_*() routine for
-bcache code.
-
-Signed-off-by: Coly Li <colyli@suse.de>
+Cc: Alan Stern <stern@rowland.harvard.edu>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Adrian Hunter <adrian.hunter@intel.com>
+Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/bset.c    |  8 ++++----
- drivers/md/bcache/debug.c   | 10 +++++-----
- drivers/md/bcache/extents.c |  8 ++++----
- drivers/md/bcache/super.c   |  4 ++--
- 4 files changed, 15 insertions(+), 15 deletions(-)
+ drivers/scsi/scsi_lib.c     | 2 ++
+ include/scsi/scsi_request.h | 5 ++++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
-index 19b4febe5b45..b6a3f9d291a9 100644
---- a/drivers/md/bcache/bset.c
-+++ b/drivers/md/bcache/bset.c
-@@ -25,18 +25,18 @@ void bch_dump_bset(struct btree_keys *b, struct bset *i, unsigned int set)
- 	for (k = i->start; k < bset_bkey_last(i); k = next) {
- 		next = bkey_next(k);
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 4341cf8a7322..62699adaef61 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -279,6 +279,8 @@ int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 	rq->cmd_len = COMMAND_SIZE(cmd[0]);
+ 	memcpy(rq->cmd, cmd, rq->cmd_len);
+ 	rq->retries = retries;
++	rq->sdev = sdev;	/* only valid in submit path */
++
+ 	req->timeout = timeout;
+ 	req->cmd_flags |= flags;
+ 	req->rq_flags |= rq_flags | RQF_QUIET;
+diff --git a/include/scsi/scsi_request.h b/include/scsi/scsi_request.h
+index b06f28c74908..0de6901b48ab 100644
+--- a/include/scsi/scsi_request.h
++++ b/include/scsi/scsi_request.h
+@@ -14,7 +14,10 @@ struct scsi_request {
+ 	unsigned int	sense_len;
+ 	unsigned int	resid_len;	/* residual count */
+ 	int		retries;
+-	void		*sense;
++	union {
++		void		*sense;
++		struct scsi_device *sdev;
++	};
+ };
  
--		printk(KERN_ERR "block %u key %u/%u: ", set,
-+		pr_err("block %u key %u/%u: ", set,
- 		       (unsigned int) ((u64 *) k - i->d), i->keys);
- 
- 		if (b->ops->key_dump)
- 			b->ops->key_dump(b, k);
- 		else
--			printk("%llu:%llu\n", KEY_INODE(k), KEY_OFFSET(k));
-+			pr_err("%llu:%llu\n", KEY_INODE(k), KEY_OFFSET(k));
- 
- 		if (next < bset_bkey_last(i) &&
- 		    bkey_cmp(k, b->ops->is_extents ?
- 			     &START_KEY(next) : next) > 0)
--			printk(KERN_ERR "Key skipped backwards\n");
-+			pr_err("Key skipped backwards\n");
- 	}
- }
- 
-@@ -482,7 +482,7 @@ void inorder_test(void)
- 		unsigned int i = 1, j = rounddown_pow_of_two(size - 1);
- 
- 		if (!(size % 4096))
--			printk(KERN_NOTICE "loop %u, %llu per us\n", size,
-+			pr_notice("loop %u, %llu per us\n", size,
- 			       done / ktime_us_delta(ktime_get(), start));
- 
- 		while (1) {
-diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
-index a8f70c916fdb..06da66b2488a 100644
---- a/drivers/md/bcache/debug.c
-+++ b/drivers/md/bcache/debug.c
-@@ -74,28 +74,28 @@ void bch_btree_verify(struct btree *b)
- 
- 		console_lock();
- 
--		printk(KERN_ERR "*** in memory:\n");
-+		pr_err("*** in memory:\n");
- 		bch_dump_bset(&b->keys, inmemory, 0);
- 
--		printk(KERN_ERR "*** read back in:\n");
-+		pr_err("*** read back in:\n");
- 		bch_dump_bset(&v->keys, sorted, 0);
- 
- 		for_each_written_bset(b, ondisk, i) {
- 			unsigned int block = ((void *) i - (void *) ondisk) /
- 				block_bytes(b->c);
- 
--			printk(KERN_ERR "*** on disk block %u:\n", block);
-+			pr_err("*** on disk block %u:\n", block);
- 			bch_dump_bset(&b->keys, i, block);
- 		}
- 
--		printk(KERN_ERR "*** block %zu not written\n",
-+		pr_err("*** block %zu not written\n",
- 		       ((void *) i - (void *) ondisk) / block_bytes(b->c));
- 
- 		for (j = 0; j < inmemory->keys; j++)
- 			if (inmemory->d[j] != sorted->d[j])
- 				break;
- 
--		printk(KERN_ERR "b->written %u\n", b->written);
-+		pr_err("b->written %u\n", b->written);
- 
- 		console_unlock();
- 		panic("verify failed at %u\n", j);
-diff --git a/drivers/md/bcache/extents.c b/drivers/md/bcache/extents.c
-index cb3b2c613ed6..c809724e6571 100644
---- a/drivers/md/bcache/extents.c
-+++ b/drivers/md/bcache/extents.c
-@@ -130,18 +130,18 @@ static void bch_bkey_dump(struct btree_keys *keys, const struct bkey *k)
- 	char buf[80];
- 
- 	bch_extent_to_text(buf, sizeof(buf), k);
--	printk(" %s", buf);
-+	pr_err(" %s", buf);
- 
- 	for (j = 0; j < KEY_PTRS(k); j++) {
- 		size_t n = PTR_BUCKET_NR(b->c, k, j);
- 
--		printk(" bucket %zu", n);
-+		pr_err(" bucket %zu", n);
- 		if (n >= b->c->sb.first_bucket && n < b->c->sb.nbuckets)
--			printk(" prio %i",
-+			pr_err(" prio %i",
- 			       PTR_BUCKET(b->c, k, j)->prio);
- 	}
- 
--	printk(" %s\n", bch_ptr_status(b->c, k));
-+	pr_err(" %s\n", bch_ptr_status(b->c, k));
- }
- 
- /* Btree ptrs */
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 8cba2378734a..eac0d5d1ada3 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1472,13 +1472,13 @@ bool bch_cache_set_error(struct cache_set *c, const char *fmt, ...)
- 	acquire_console_sem();
- 	*/
- 
--	printk(KERN_ERR "bcache: error on %pU: ", c->sb.set_uuid);
-+	pr_err("bcache: error on %pU: ", c->sb.set_uuid);
- 
- 	va_start(args, fmt);
- 	vprintk(fmt, args);
- 	va_end(args);
- 
--	printk(", disabling caching\n");
-+	pr_err(", disabling caching\n");
- 
- 	if (c->on_error == ON_ERROR_PANIC)
- 		panic("panic forced after error\n");
+ static inline struct scsi_request *scsi_req(struct request *rq)
 -- 
-2.18.0
+2.9.5
