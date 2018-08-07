@@ -1,52 +1,45 @@
-Return-Path: <prvs=750bc9d11=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
+Return-Path: <hch@lst.de>
+Date: Tue, 7 Aug 2018 07:44:49 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Kees Cook <keescook@chromium.org>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Jens Axboe <axboe@kernel.dk>,
 	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v5 9/9] blk-mq: Enable support for runtime power management
-Date: Tue,  7 Aug 2018 15:51:33 -0700
-Message-Id: <20180807225133.27221-10-bart.vanassche@wdc.com>
-In-Reply-To: <20180807225133.27221-1-bart.vanassche@wdc.com>
-References: <20180807225133.27221-1-bart.vanassche@wdc.com>
+	Christoph Hellwig <hch@infradead.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	Tejun Heo <tj@kernel.org>, Borislav Petkov <bp@alien8.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
+	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
+	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
+	"Nicholas A. Bellinger" <nab@linux-iscsi.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Philippe Ombredanne <pombredanne@nexb.com>,
+	Stephen Boyd <sboyd@codeaurora.org>,
+	Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
+	Juergen Gross <jgross@suse.com>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
+	Sagar Dharia <sdharia@codeaurora.org>,
+	David Kershner <david.kershner@unisys.com>,
+	linux-block <linux-block@vger.kernel.org>,
+	linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+	target-devel <target-devel@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: Re: [PATCH v2 4/9] target: don't depend on SCSI
+Message-ID: <20180807054449.GA31556@lst.de>
+References: <20180731195155.46664-1-keescook@chromium.org> <20180731195155.46664-5-keescook@chromium.org> <111cb1b0-24ba-bcb2-53d5-9665d2b4c421@infradead.org> <CAGXu5jKNeep01VOwC-dWsT4iDXrkBOhHJX0+4BEBotYOx1D0Tg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAGXu5jKNeep01VOwC-dWsT4iDXrkBOhHJX0+4BEBotYOx1D0Tg@mail.gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Now that the blk-mq core processes power management requests
-(marked with RQF_PREEMPT) in other states than RPM_ACTIVE, enable
-runtime power management for blk-mq.
+On Mon, Aug 06, 2018 at 04:59:04PM -0700, Kees Cook wrote:
+> I wonder if LOOPBACK_TARGET is just missing a "depends on SCSI" as was
+> added for TCM_PSCSI?
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>
----
- block/blk-pm.c | 6 ------
- 1 file changed, 6 deletions(-)
+That is eactly the case.  LOOPBACK_TARGET is a scsi driver that
+feeds commands into the target layer, so it needs a depends on SCSI.
 
-diff --git a/block/blk-pm.c b/block/blk-pm.c
-index d6b65cef9764..eaaca1e26c88 100644
---- a/block/blk-pm.c
-+++ b/block/blk-pm.c
-@@ -27,12 +27,6 @@
-  */
- void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
- {
--	/* Don't enable runtime PM for blk-mq until it is ready */
--	if (q->mq_ops) {
--		pm_runtime_disable(dev);
--		return;
--	}
--
- 	q->dev = dev;
- 	q->rpm_status = RPM_ACTIVE;
- 	pm_runtime_set_autosuspend_delay(q->dev, -1);
--- 
-2.18.0
+Sorry for missing that earlier.
