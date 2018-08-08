@@ -1,57 +1,41 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: tom.leiming@gmail.com, bart.vanassche@wdc.com, keith.busch@linux.intel.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH V4 0/2] fixes for the updating nr_hw_queues
-Date: Tue, 21 Aug 2018 15:15:02 +0800
-Message-Id: <1534835704-3607-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <jgross@suse.com>
+From: Juergen Gross <jgross@suse.com>
+To: linux-kernel@vger.kernel.org,
+	xen-devel@lists.xenproject.org,
+	linux-block@vger.kernel.org
+Cc: konrad.wilk@oracle.com,
+	roger.pau@citrix.com,
+	axboe@kernel.dk,
+	boris.ostrovsky@oracle.com,
+	Juergen Gross <jgross@suse.com>
+Subject: [PATCH v2 5/5] xen/blkback: remove unused pers_gnts_lock from struct xen_blkif_ring
+Date: Wed,  8 Aug 2018 16:25:28 +0200
+Message-Id: <20180808142528.31029-6-jgross@suse.com>
+In-Reply-To: <20180808142528.31029-1-jgross@suse.com>
+References: <20180808142528.31029-1-jgross@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens
+pers_gnts_lock isn't being used anywhere. Remove it.
 
-Two fixes for updating nr_hw_queues.
+Signed-off-by: Juergen Gross <jgross@suse.com>
+Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
+---
+ drivers/block/xen-blkback/common.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-The first patch fixes the following scenario:
-io scheduler (kyber) depends on the mapping between ctx and hctx.
-When update nr_hw_queues, io scheduler's init_hctx will be
-invoked before the mapping is adapted correctly, this would cause
-panic in kyber.
-
-The second patch fixes the following scenario:
-part_in_flight/rw will invoke blk_mq_in_flight/rw to account the
-inflight requests. It will access the queue_hw_ctx and nr_hw_queues
-w/o any protection. When updating nr_hw_queues and blk_mq_in_flight
-/rw occur concurrently, panic comes up.
-
-V4:
- - remove the elv_type in request_queue and introduce blk_mq_qe_pair
-   to cache the elevator_type associated with one request_queue. And
-   add two new helper interfaces blk_mq_elv_switch_none/back to carry
-   out the elevator_type caching and switching work.
- - Add Ming's Reviewd-by on 2nd patch and remove it from 1st patch due
-   to the reworking.
- - comment modification.
-
-V3:
- - move the rcu and q_usage_counter checking into blk_mq_queue_tag_busy_iter
-   as suggestion of Ming.
- - Add more comment about the __module_get in 1st patch.
- - Add Ming's Reviewd-by on 1st patch.
-
-V2:
- - remove blk_mq_sched_init/exit_hctx in patch 1.
- - use q_usage_counter instead of adding new member suggested by
-   Ming in patch 2.
- - comment modification.
-
- block/blk-mq-sched.c | 44 --------------------------------------------
- block/blk-mq-sched.h |  5 -----
- block/blk-mq-tag.c   | 14 +++++++++++++-
- block/blk-mq.c       | 96 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--------
- block/blk.h          |  2 ++
- block/elevator.c     | 20 ++++++++++++--------
- 6 files changed, 115 insertions(+), 66 deletions(-)
-
-Thanks
-Jianchao
+diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
+index 2339b8d39c5e..1d3002d773f7 100644
+--- a/drivers/block/xen-blkback/common.h
++++ b/drivers/block/xen-blkback/common.h
+@@ -269,7 +269,6 @@ struct xen_blkif_ring {
+ 	wait_queue_head_t	pending_free_wq;
+ 
+ 	/* Tree to store persistent grants. */
+-	spinlock_t		pers_gnts_lock;
+ 	struct rb_root		persistent_gnts;
+ 	unsigned int		persistent_gnt_c;
+ 	atomic_t		persistent_gnt_in_use;
+-- 
+2.13.7
