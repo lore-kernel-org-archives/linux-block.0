@@ -1,32 +1,46 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:48766 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726721AbeHHJaK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 8 Aug 2018 05:30:10 -0400
-Date: Wed, 8 Aug 2018 09:11:47 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        Omar Sandoval <osandov@fb.com>,
-        Alexandru Moise <00moses.alexander00@gmail.com>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>, stable@vger.kernel.org
-Subject: Re: [PATCH v4 1/2] block: Introduce blk_exit_queue()
-Message-ID: <20180808071147.ytyznx6vqou5q2f5@linux-x5ow.site>
-References: <20180730211056.18570-1-bart.vanassche@wdc.com>
- <20180730211056.18570-2-bart.vanassche@wdc.com>
+Return-Path: <prvs=75172a298=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "jthumshirn@suse.de" <jthumshirn@suse.de>,
+	"stern@rowland.harvard.edu" <stern@rowland.harvard.edu>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH v5 1/9] block: Change the preempt-only flag into a counter
+Date: Wed, 8 Aug 2018 15:27:31 +0000
+Message-ID: <d5a518ad7777a27d26f718262ca7427d8ea4597b.camel@wdc.com>
+References: <20180807225133.27221-1-bart.vanassche@wdc.com>
+	 <20180807225133.27221-2-bart.vanassche@wdc.com>
+	 <20180808082136.GA13518@ming.t460p>
+In-Reply-To: <20180808082136.GA13518@ming.t460p>
+Content-Type: text/plain; charset="utf-7"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20180730211056.18570-2-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
--- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+On Wed, 2018-08-08 at 16:21 +-0800, Ming Lei wrote:
++AD4- On Tue, Aug 07, 2018 at 03:51:25PM -0700, Bart Van Assche wrote:
++AD4- +AD4- The RQF+AF8-PREEMPT flag is used for three purposes:
++AD4- +AD4- - In the SCSI core, for making sure that power management reque=
+sts
++AD4- +AD4-   are executed if a device is in the +ACI-quiesced+ACI- state.
++AD4- +AD4- - For domain validation by SCSI drivers that use the parallel p=
+ort.
++AD4- +AD4- - In the IDE driver, for IDE preempt requests.
++AD4-=20
++AD4- I think the above description may not be accurate, BLK+AF8-MQ+AF8-REQ=
++AF8-PREEMPT is
++AD4- always set inside scsi+AF8-execute(), that means any scsi+AF8-execute=
+() callers
++AD4- can use the flag of RQF+AF8-PREEMPT, of course, not limited to the ab=
+ove
++AD4- three cases.
+
+Hello Ming,
+
+What I described is for which cases we really need the RQF+AF8-PREEMPT flag=
+ rather
+than in which cases the RQF+AF8-PREEMPT flag is set today. I think we shoul=
+d split
+the RQF+AF8-PREEMPT flag into three flags, one flag per case mentioned abov=
+e.
+
+Bart.
