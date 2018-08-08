@@ -1,42 +1,67 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44998 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727462AbeHJJy3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Aug 2018 05:54:29 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, shhuiw@foxmail.com,
-        Coly Li <colyli@suse.de>
-Subject: [PATCH v2 16/17] bcache: remove unnecessary space before ioctl function pointer arguments
-Date: Fri, 10 Aug 2018 15:23:56 +0800
-Message-Id: <20180810072357.19823-17-colyli@suse.de>
-In-Reply-To: <20180810072357.19823-1-colyli@suse.de>
-References: <20180810072357.19823-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jgross@suse.com>
+From: Juergen Gross <jgross@suse.com>
+To: linux-kernel@vger.kernel.org,
+	xen-devel@lists.xenproject.org,
+	linux-block@vger.kernel.org
+Cc: konrad.wilk@oracle.com,
+	roger.pau@citrix.com,
+	axboe@kernel.dk,
+	boris.ostrovsky@oracle.com,
+	Juergen Gross <jgross@suse.com>
+Subject: [PATCH v2 3/5] xen/blkfront: reorder tests in xlblk_init()
+Date: Wed,  8 Aug 2018 16:25:26 +0200
+Message-Id: <20180808142528.31029-4-jgross@suse.com>
+In-Reply-To: <20180808142528.31029-1-jgross@suse.com>
+References: <20180808142528.31029-1-jgross@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+List-ID: <linux-block@vger.kernel.org>
 
-This is warned by checkpatch.pl, this patch removes the extra space.
+In case we don't want pv block devices we should not test parameters
+for sanity and eventually print out error messages. So test precluding
+conditions before checking parameters.
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Shenghui Wang <shhuiw@foxmail.com>
+Signed-off-by: Juergen Gross <jgross@suse.com>
+Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
 ---
- drivers/md/bcache/bcache.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/block/xen-blkfront.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 66e6d5639b38..83504dd8100a 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -275,8 +275,8 @@ struct bcache_device {
+diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+index 7c4b1b9d3971..36e4ca41e765 100644
+--- a/drivers/block/xen-blkfront.c
++++ b/drivers/block/xen-blkfront.c
+@@ -2713,6 +2713,15 @@ static int __init xlblk_init(void)
+ 	if (!xen_domain())
+ 		return -ENODEV;
  
- 	int (*cache_miss)(struct btree *b, struct search *s,
- 			  struct bio *bio, unsigned int sectors);
--	int (*ioctl) (struct bcache_device *d, fmode_t mode,
--		      unsigned int cmd, unsigned long arg);
-+	int (*ioctl)(struct bcache_device *d, fmode_t mode,
-+		     unsigned int cmd, unsigned long arg);
- };
++	if (!xen_has_pv_disk_devices())
++		return -ENODEV;
++
++	if (register_blkdev(XENVBD_MAJOR, DEV_NAME)) {
++		pr_warn("xen_blk: can't get major %d with name %s\n",
++			XENVBD_MAJOR, DEV_NAME);
++		return -ENODEV;
++	}
++
+ 	if (xen_blkif_max_segments < BLKIF_MAX_SEGMENTS_PER_REQUEST)
+ 		xen_blkif_max_segments = BLKIF_MAX_SEGMENTS_PER_REQUEST;
  
- struct io {
+@@ -2728,15 +2737,6 @@ static int __init xlblk_init(void)
+ 		xen_blkif_max_queues = nr_cpus;
+ 	}
+ 
+-	if (!xen_has_pv_disk_devices())
+-		return -ENODEV;
+-
+-	if (register_blkdev(XENVBD_MAJOR, DEV_NAME)) {
+-		printk(KERN_WARNING "xen_blk: can't get major %d with name %s\n",
+-		       XENVBD_MAJOR, DEV_NAME);
+-		return -ENODEV;
+-	}
+-
+ 	INIT_DELAYED_WORK(&blkfront_work, blkfront_delay_work);
+ 
+ 	ret = xenbus_register_frontend(&blkfront_driver);
 -- 
-2.18.0
+2.13.7
