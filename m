@@ -1,226 +1,84 @@
-Return-Path: <prvs=7477a5644=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v4 01/10] block: Change the preempt-only flag into a counter
-Date: Fri,  3 Aug 2018 17:03:16 -0700
-Message-Id: <20180804000325.3610-2-bart.vanassche@wdc.com>
-In-Reply-To: <20180804000325.3610-1-bart.vanassche@wdc.com>
-References: <20180804000325.3610-1-bart.vanassche@wdc.com>
+Return-Path: <tom.leiming@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <b6bbd42f-503f-d409-1b0b-4977f0a8240c@oracle.com>
+References: <20180807174433.8374-1-ming.lei@redhat.com> <20180807174433.8374-10-ming.lei@redhat.com>
+ <dd553e06-738e-37cb-ec4a-c8b695cb1b79@oracle.com> <CACVXFVN-4aWUevkyYM3ViNym4nnsNwy_hhpNG-HTk758E8hJ2w@mail.gmail.com>
+ <b6bbd42f-503f-d409-1b0b-4977f0a8240c@oracle.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Wed, 8 Aug 2018 15:46:15 +0800
+Message-ID: <CACVXFVM8kkTAwHv3n1FXmVoJC+o+6mSsKeeaOPqzDKyFdcXgkw@mail.gmail.com>
+Subject: Re: [RFC PATCH 09/14] SCSI: create admin queue for each host
+To: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block <linux-block@vger.kernel.org>, Alan Stern <stern@rowland.harvard.edu>,
+	Christoph Hellwig <hch@lst.de>, Bart Van Assche <bart.vanassche@wdc.com>, Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>, Adrian Hunter <adrian.hunter@intel.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>, "Martin K. Petersen" <martin.petersen@oracle.com>,
+	Linux SCSI List <linux-scsi@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Rename "preempt-only" into "pm-only" because the primary purpose of
-this mode is power management. Since the power management core may
-but does not have to resume a runtime suspended device before
-performing system-wide suspend and since a later patch will set
-"pm-only" mode as long as a block device is runtime suspended, make
-it possible to set "pm-only" mode from more than one context.
+On Wed, Aug 8, 2018 at 3:34 PM, jianchao.wang
+<jianchao.w.wang@oracle.com> wrote:
+>
+>
+> On 08/08/2018 03:11 PM, Ming Lei wrote:
+>> On Wed, Aug 8, 2018 at 1:57 PM, jianchao.wang
+>> <jianchao.w.wang@oracle.com> wrote:
+>>> Hi Ming
+>>>
+>>> On 08/08/2018 01:44 AM, Ming Lei wrote:
+>>>>
+>>>> +static struct request_queue *scsi_mq_alloc_admin_queue(struct Scsi_Host *shost)
+>>>> +{
+>>>> +     struct request_queue *q = __blk_mq_init_queue(&shost->tag_set,
+>>>> +                     QUEUE_FLAG_MQ_NO_SCHED_DEFAULT);
+>>>> +     if (IS_ERR(q))
+>>>> +             return NULL;
+>>>> +
+>>>> +     q->mq_ops = &scsi_mq_admin_ops;
+>>>> +
+>>>> +     __scsi_init_queue(shost, q);
+>>>> +
+>>>> +     return q;
+>>>> +}
+>>>
+>>> In your patch set, the logical adminq per host is standalone request_queue which share
+>>> the tagset with other request_queue.
+>>>
+>>> Due to the hctx_may_queue,
+>>> If only one LUN, the adminq will take away half of the driver tags when
+>>> the adminq is active.
+>>
+>> Most of times, the admin queue is inactive, so it shouldn't be a big deal.
+>>
+>>> And when multiple LUNs, all of the LUNs have to share the limited budget of tags
+>>> of the adminq.
+>>> This is unacceptable.
+>>
+>> That can be solved easily, such as, let __blk_mq_tag_busy() not take
+>> account of admin queue, will do it in V2.
+>>
+>>>
+>>> And also, not all the admin request is send out through scsi_execute, maybe SG_IO.
+>>> So the admin queue here looks more like the pm queue ?
+>>
+>> SG_IO should be covered by IO queue in which SCSI_PASSTHROUGH
+>> is enabled. It is reasonable too since SG_IO can be normal IO from
+>> userspace.
+>>
+>
+> I just concern too much complexity would be introduced by this logical admin queue. ;)
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>
----
- block/blk-core.c        | 35 ++++++++++++++++++-----------------
- block/blk-mq-debugfs.c  | 10 +++++++++-
- drivers/scsi/scsi_lib.c |  8 ++++----
- include/linux/blkdev.h  | 14 +++++++++-----
- 4 files changed, 40 insertions(+), 27 deletions(-)
+About this concern, I am pretty sure the logic is simple, :-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index f9ad73d8573c..b83798c03ca8 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -421,24 +421,25 @@ void blk_sync_queue(struct request_queue *q)
- EXPORT_SYMBOL(blk_sync_queue);
- 
- /**
-- * blk_set_preempt_only - set QUEUE_FLAG_PREEMPT_ONLY
-+ * blk_set_pm_only - increment pm_only counter
-  * @q: request queue pointer
-- *
-- * Returns the previous value of the PREEMPT_ONLY flag - 0 if the flag was not
-- * set and 1 if the flag was already set.
-  */
--int blk_set_preempt_only(struct request_queue *q)
-+void blk_set_pm_only(struct request_queue *q)
- {
--	return blk_queue_flag_test_and_set(QUEUE_FLAG_PREEMPT_ONLY, q);
-+	atomic_inc(&q->pm_only);
- }
--EXPORT_SYMBOL_GPL(blk_set_preempt_only);
-+EXPORT_SYMBOL_GPL(blk_set_pm_only);
- 
--void blk_clear_preempt_only(struct request_queue *q)
-+void blk_clear_pm_only(struct request_queue *q)
- {
--	blk_queue_flag_clear(QUEUE_FLAG_PREEMPT_ONLY, q);
--	wake_up_all(&q->mq_freeze_wq);
-+	int pm_only;
-+
-+	pm_only = atomic_dec_return(&q->pm_only);
-+	WARN_ON_ONCE(pm_only < 0);
-+	if (pm_only == 0)
-+		wake_up_all(&q->mq_freeze_wq);
- }
--EXPORT_SYMBOL_GPL(blk_clear_preempt_only);
-+EXPORT_SYMBOL_GPL(blk_clear_pm_only);
- 
- /**
-  * __blk_run_queue_uncond - run a queue whether or not it has been stopped
-@@ -911,7 +912,7 @@ EXPORT_SYMBOL(blk_alloc_queue);
-  */
- int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- {
--	const bool preempt = flags & BLK_MQ_REQ_PREEMPT;
-+	const bool pm = flags & BLK_MQ_REQ_PREEMPT;
- 
- 	while (true) {
- 		bool success = false;
-@@ -919,11 +920,11 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 		rcu_read_lock();
- 		if (percpu_ref_tryget_live(&q->q_usage_counter)) {
- 			/*
--			 * The code that sets the PREEMPT_ONLY flag is
--			 * responsible for ensuring that that flag is globally
--			 * visible before the queue is unfrozen.
-+			 * The code that increments the pm_only counter is
-+			 * responsible for ensuring that that counter is
-+			 * globally visible before the queue is unfrozen.
- 			 */
--			if (preempt || !blk_queue_preempt_only(q)) {
-+			if (pm || !blk_queue_pm_only(q)) {
- 				success = true;
- 			} else {
- 				percpu_ref_put(&q->q_usage_counter);
-@@ -948,7 +949,7 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 
- 		wait_event(q->mq_freeze_wq,
- 			   (atomic_read(&q->mq_freeze_depth) == 0 &&
--			    (preempt || !blk_queue_preempt_only(q))) ||
-+			    (pm || !blk_queue_pm_only(q))) ||
- 			   blk_queue_dying(q));
- 		if (blk_queue_dying(q))
- 			return -ENODEV;
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index cb1e6cf7ac48..a5ea86835fcb 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -102,6 +102,14 @@ static int blk_flags_show(struct seq_file *m, const unsigned long flags,
- 	return 0;
- }
- 
-+static int queue_pm_only_show(void *data, struct seq_file *m)
-+{
-+	struct request_queue *q = data;
-+
-+	seq_printf(m, "%d\n", atomic_read(&q->pm_only));
-+	return 0;
-+}
-+
- #define QUEUE_FLAG_NAME(name) [QUEUE_FLAG_##name] = #name
- static const char *const blk_queue_flag_name[] = {
- 	QUEUE_FLAG_NAME(QUEUED),
-@@ -132,7 +140,6 @@ static const char *const blk_queue_flag_name[] = {
- 	QUEUE_FLAG_NAME(REGISTERED),
- 	QUEUE_FLAG_NAME(SCSI_PASSTHROUGH),
- 	QUEUE_FLAG_NAME(QUIESCED),
--	QUEUE_FLAG_NAME(PREEMPT_ONLY),
- };
- #undef QUEUE_FLAG_NAME
- 
-@@ -209,6 +216,7 @@ static ssize_t queue_write_hint_store(void *data, const char __user *buf,
- static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
- 	{ "poll_stat", 0400, queue_poll_stat_show },
- 	{ "requeue_list", 0400, .seq_ops = &queue_requeue_list_seq_ops },
-+	{ "pm_only", 0600, queue_pm_only_show, NULL },
- 	{ "state", 0600, queue_state_show, queue_state_write },
- 	{ "write_hints", 0600, queue_write_hint_show, queue_write_hint_store },
- 	{ "zone_wlock", 0400, queue_zone_wlock_show, NULL },
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 9cb9a166fa0c..007bb2bc817d 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2996,11 +2996,11 @@ scsi_device_quiesce(struct scsi_device *sdev)
- 	 */
- 	WARN_ON_ONCE(sdev->quiesced_by && sdev->quiesced_by != current);
- 
--	blk_set_preempt_only(q);
-+	blk_set_pm_only(q);
- 
- 	blk_mq_freeze_queue(q);
- 	/*
--	 * Ensure that the effect of blk_set_preempt_only() will be visible
-+	 * Ensure that the effect of blk_set_pm_only() will be visible
- 	 * for percpu_ref_tryget() callers that occur after the queue
- 	 * unfreeze even if the queue was already frozen before this function
- 	 * was called. See also https://lwn.net/Articles/573497/.
-@@ -3013,7 +3013,7 @@ scsi_device_quiesce(struct scsi_device *sdev)
- 	if (err == 0)
- 		sdev->quiesced_by = current;
- 	else
--		blk_clear_preempt_only(q);
-+		blk_clear_pm_only(q);
- 	mutex_unlock(&sdev->state_mutex);
- 
- 	return err;
-@@ -3038,7 +3038,7 @@ void scsi_device_resume(struct scsi_device *sdev)
- 	mutex_lock(&sdev->state_mutex);
- 	WARN_ON_ONCE(!sdev->quiesced_by);
- 	sdev->quiesced_by = NULL;
--	blk_clear_preempt_only(sdev->request_queue);
-+	blk_clear_pm_only(sdev->request_queue);
- 	if (sdev->sdev_state == SDEV_QUIESCE)
- 		scsi_device_set_state(sdev, SDEV_RUNNING);
- 	mutex_unlock(&sdev->state_mutex);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 050d599f5ea9..1a08edbddf9f 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -506,6 +506,12 @@ struct request_queue {
- 	 * various queue flags, see QUEUE_* below
- 	 */
- 	unsigned long		queue_flags;
-+	/*
-+	 * Number of contexts that have called blk_set_pm_only(). If this
-+	 * counter is above zero then only RQF_PM and RQF_PREEMPT requests are
-+	 * processed.
-+	 */
-+	atomic_t		pm_only;
- 
- 	/*
- 	 * ida allocated id for this queue.  Used to index queues from
-@@ -700,7 +706,6 @@ struct request_queue {
- #define QUEUE_FLAG_REGISTERED  26	/* queue has been registered to a disk */
- #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
- #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
--#define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
- 
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
-@@ -738,12 +743,11 @@ bool blk_queue_flag_test_and_clear(unsigned int flag, struct request_queue *q);
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
- 			     REQ_FAILFAST_DRIVER))
- #define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
--#define blk_queue_preempt_only(q)				\
--	test_bit(QUEUE_FLAG_PREEMPT_ONLY, &(q)->queue_flags)
-+#define blk_queue_pm_only(q)	atomic_read(&(q)->pm_only)
- #define blk_queue_fua(q)	test_bit(QUEUE_FLAG_FUA, &(q)->queue_flags)
- 
--extern int blk_set_preempt_only(struct request_queue *q);
--extern void blk_clear_preempt_only(struct request_queue *q);
-+extern void blk_set_pm_only(struct request_queue *q);
-+extern void blk_clear_pm_only(struct request_queue *q);
- 
- static inline int queue_in_flight(struct request_queue *q)
- {
--- 
-2.18.0
+If no one objects the admin queue approach.  I plan to rename
+the queue flag of NO_SCHED into ADMIN in V2, then we can simply
+not increase/decrease the counter of 'active_queues' in case of one
+ADMIN queue.
+
+As you saw, the complexity is reduced a lot about implementing
+runtime PM and SCSI quiesce with this patch.
+
+Thanks,
+Ming Lei
