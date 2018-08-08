@@ -1,80 +1,120 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: axboe@kernel.dk,
-	linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Shenghui Wang <shhuiw@foxmail.com>,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH 09/10] bcache: make the pr_err statement used for ENOENT only in sysfs_attatch section
-Date: Thu,  9 Aug 2018 15:48:50 +0800
-Message-Id: <20180809074851.11027-10-colyli@suse.de>
-In-Reply-To: <20180809074851.11027-1-colyli@suse.de>
-References: <20180809074851.11027-1-colyli@suse.de>
+Return-Path: <jianchao.w.wang@oracle.com>
+Subject: Re: [RFC PATCH 13/14] block: simplify runtime PM support
+To: Ming Lei <ming.lei@redhat.com>, Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
+        "jthumshirn@suse.de" <jthumshirn@suse.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "hch@lst.de" <hch@lst.de>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "hare@suse.de" <hare@suse.de>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "stern@rowland.harvard.edu" <stern@rowland.harvard.edu>,
+        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+        "adrian.hunter@intel.com" <adrian.hunter@intel.com>
+References: <20180807174433.8374-1-ming.lei@redhat.com>
+ <20180807174433.8374-14-ming.lei@redhat.com>
+ <a1b7afb7e912c84b908342922b2fba12a364fd76.camel@wdc.com>
+ <20180808035040.GC9523@ming.t460p>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <0c3eab06-8e10-f24a-06df-8ff2d3560f38@oracle.com>
+Date: Wed, 8 Aug 2018 15:57:42 +0800
+MIME-Version: 1.0
+In-Reply-To: <20180808035040.GC9523@ming.t460p>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Shenghui Wang <shhuiw@foxmail.com>
+Hi Ming and Bart
 
-The pr_err statement in the code for sysfs_attatch section would run
-for various error codes, which maybe confusing.
+Would you mind to combine your solution together ? ;)
 
-E.g,
+It could be like this:
 
-Run the command twice:
-   echo 796b5c05-b03c-4bc7-9cbd-a8df5e8be891 > \
-				/sys/block/bcache0/bcache/attach
-   [the backing dev got attached on the first run]
-   echo 796b5c05-b03c-4bc7-9cbd-a8df5e8be891 > \
-				/sys/block/bcache0/bcache/attach
+blk_pre_runtime_suspend
 
-In dmesg, after the command run twice, we can get:
-	bcache: bch_cached_dev_attach() Can't attach sda6: already attached
-	bcache: __cached_dev_store() Can't attach 796b5c05-b03c-4bc7-9cbd-\
-a8df5e8be891
-               : cache set not found
-The first statement in the message was right, but the second was
-confusing.
 
-bch_cached_dev_attach has various pr_ statements for various error
-codes, except ENOENT.
+	if (q->mq_ops) {
+		if (!blk_mq_pm_queue_idle(q)) {
+ 		    ret = -EBUSY;
+  		    pm_runtime_mark_last_busy(q->dev);
+                } else {
+                    blk_set_preempt_only(q);
+                    synchronize_rcu()
+                    if (!blk_mq_pm_queue_idle(q)) {
+                        blk_clear_preempt_only(q);
+                        ret = -EBUSY;
+                    } else {
+                    q->rpm_status = RPM_SUSPENDING;
+                    }
+                }
+        } else {
+            spin_lock_irq(q->queue_lock);
+            if (q->nr_pending) {
+                ret = -EBUSY;
+                pm_runtime_mark_last_busy(q->dev);
+            } else {
+                q->rpm_status = RPM_SUSPENDING;
+            }
+            spin_unlock_irq(q->queue_lock);
+        }
 
-After the change, rerun above command twice:
-	echo 796b5c05-b03c-4bc7-9cbd-a8df5e8be891 > \
-			/sys/block/bcache0/bcache/attach
-	echo 796b5c05-b03c-4bc7-9cbd-a8df5e8be891 > \
-			/sys/block/bcache0/bcache/attach
-
-In dmesg we only got:
-	bcache: bch_cached_dev_attach() Can't attach sda6: already attached
-No confusing "cache set not found" message anymore.
-
-And for some not exist SET-UUID:
-	echo 796b5c05-b03c-4bc7-9cbd-a8df5e8be898 > \
-			/sys/block/bcache0/bcache/attach
-In dmesg we can get:
-	bcache: __cached_dev_store() Can't attach 796b5c05-b03c-4bc7-9cbd-\
-a8df5e8be898
-	               : cache set not found
-
-Signed-off-by: Shenghui Wang <shhuiw@foxmail.com>
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/sysfs.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index 6e88142514fb..22f8565d2bf1 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -351,8 +351,8 @@ STORE(__cached_dev)
- 			if (!v)
- 				return size;
- 		}
--
--		pr_err("Can't attach %s: cache set not found", buf);
-+		if (v == -ENOENT)
-+			pr_err("Can't attach %s: cache set not found", buf);
- 		return v;
- 	}
+blk_queue_enter
  
--- 
-2.18.0
+    blk_resume_queue(q);
+    wait_event(q->mq_freeze_wq,
+ 	  atomic_read(&q->mq_freeze_depth) == 0 ||
+ 	  blk_queue_dying(q));
+
+
+Thanks
+Jianchao
+
+On 08/08/2018 11:50 AM, Ming Lei wrote:
+> iff --git a/block/blk-core.c b/block/blk-core.c
+> index 26f9ceb85318..d1a5cd1da861 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -3730,6 +3730,24 @@ void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
+>  }
+>  EXPORT_SYMBOL(blk_pm_runtime_init);
+>  
+> +static void blk_mq_pm_check_idle(struct blk_mq_hw_ctx *hctx,
+> +		struct request *rq, void *priv, bool reserved)
+> +{
+> +	unsigned long *cnt = priv;
+> +
+> +	(*cnt)++;
+> +}
+> +
+> +static bool blk_mq_pm_queue_idle(struct request_queue *q)
+> +{
+> +	unsigned long idle_cnt;
+> +
+> +	idle_cnt = 0;
+> +	blk_mq_queue_tag_busy_iter(q, blk_mq_pm_check_idle, &idle_cnt);
+> +
+> +	return idle_cnt == 0;
+> +}
+> +
+>  /**
+>   * blk_pre_runtime_suspend - Pre runtime suspend check
+>   * @q: the queue of the device
+> @@ -3754,13 +3772,18 @@ EXPORT_SYMBOL(blk_pm_runtime_init);
+>  int blk_pre_runtime_suspend(struct request_queue *q)
+>  {
+>  	int ret = 0;
+> +	bool mq_idle = false;
+>  
+>  	if (!q->dev)
+>  		return ret;
+>  
+>  	mutex_lock(&q->pm_lock);
+> +
+> +	if (q->mq_ops)
+> +		mq_idle = blk_mq_pm_queue_idle(q);
+> +
+>  	spin_lock_irq(q->queue_lock);
+> -	if (q->nr_pending) {
+> +	if (q->nr_pending || !mq_idle) {
+>  		ret = -EBUSY;
+>  		pm_runtime_mark_last_busy(q->dev);
+>  	} else {
