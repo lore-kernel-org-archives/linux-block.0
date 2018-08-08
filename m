@@ -1,94 +1,161 @@
-Return-Path: <prvs=75172a298=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "hch@lst.de" <hch@lst.de>, "jthumshirn@suse.de" <jthumshirn@suse.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "hare@suse.com"
-	<hare@suse.com>, "stern@rowland.harvard.edu" <stern@rowland.harvard.edu>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "jianchao.w.wang@oracle.com"
-	<jianchao.w.wang@oracle.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Wed, 8 Aug 2018 16:50:18 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Alan Stern <stern@rowland.harvard.edu>
 Subject: Re: [PATCH v5 6/9] block: Change the runtime power management
  approach (2/2)
-Date: Wed, 8 Aug 2018 17:32:14 +0000
-Message-ID: <ac7bee2f2c3dcee9829aa0d010ffe9718130381b.camel@wdc.com>
+Message-ID: <20180808085012.GB13518@ming.t460p>
 References: <20180807225133.27221-1-bart.vanassche@wdc.com>
-	 <20180807225133.27221-7-bart.vanassche@wdc.com>
-	 <20180808085012.GB13518@ming.t460p>
-In-Reply-To: <20180808085012.GB13518@ming.t460p>
-Content-Type: text/plain; charset="utf-7"
+ <20180807225133.27221-7-bart.vanassche@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180807225133.27221-7-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, 2018-08-08 at 16:50 +-0800, Ming Lei wrote:
-+AD4- On Tue, Aug 07, 2018 at 03:51:30PM -0700, Bart Van Assche wrote:
-+AD4- +AD4- Instead of allowing requests that are not power management requ=
-ests
-+AD4- +AD4- to enter the queue in runtime suspended status (RPM+AF8-SUSPEND=
-ED), make
-+AD4- +AD4- the blk+AF8-get+AF8-request() caller block. This change fixes a=
- starvation
-+AD4-=20
-+AD4- Looks not see the related change which blocks blk+AF8-get+AF8-request=
-() in
-+AD4- this patchset.
+On Tue, Aug 07, 2018 at 03:51:30PM -0700, Bart Van Assche wrote:
+> Instead of allowing requests that are not power management requests
+> to enter the queue in runtime suspended status (RPM_SUSPENDED), make
+> the blk_get_request() caller block. This change fixes a starvation
 
-I was referring to setting pm-only mode for suspended devices. Since
-blk+AF8-queue+AF8-enter() is called before a request is allocated that is s=
-ufficient
-to make request allocation block.
+Looks not see the related change which blocks blk_get_request() in
+this patchset.
 
-+AD4- +AD4- diff --git a/block/blk-pm.c b/block/blk-pm.c
-+AD4- +AD4- index bf8532da952d..d6b65cef9764 100644
-+AD4- +AD4- --- a/block/blk-pm.c
-+AD4- +AD4- +-+-+- b/block/blk-pm.c
-+AD4- +AD4- +AEAAQA- -86,14 +-86,39 +AEAAQA- int blk+AF8-pre+AF8-runtime+AF=
-8-suspend(struct request+AF8-queue +ACo-q)
-+AD4- +AD4-  	if (+ACE-q-+AD4-dev)
-+AD4- +AD4-  		return ret+ADs-
-+AD4- +AD4- =20
-+AD4- +AD4- +-	WARN+AF8-ON+AF8-ONCE(q-+AD4-rpm+AF8-status +ACEAPQ- RPM+AF8-=
-ACTIVE)+ADs-
-+AD4- +AD4- +-
-+AD4- +AD4- +-	blk+AF8-set+AF8-pm+AF8-only(q)+ADs-
-+AD4- +AD4- +-	/+ACo-
-+AD4- +AD4- +-	 +ACo- This function only gets called if the most recent
-+AD4- +AD4- +-	 +ACo- pm+AF8-request+AF8-resume() call occurred at least au=
-tosuspend+AF8-delay+AF8-ms
-+AD4- +AD4- +-	 +ACo- ago. Since blk+AF8-queue+AF8-enter() is called by the=
- request allocation
-+AD4- +AD4- +-	 +ACo- code before pm+AF8-request+AF8-resume(), if q+AF8-usa=
-ge+AF8-counter indicates that
-+AD4- +AD4- +-	 +ACo- no requests are in flight it is safe to suspend the d=
-evice.
-+AD4- +AD4- +-	 +ACo-/
-+AD4- +AD4- +-	ret +AD0- -EBUSY+ADs-
-+AD4- +AD4- +-	if (+ACE-percpu+AF8-ref+AF8-is+AF8-in+AF8-use(+ACY-q-+AD4-q+=
-AF8-usage+AF8-counter)) +AHs-
-+AD4- +AD4- +-		/+ACo-
-+AD4- +AD4- +-		 +ACo- Switch to preempt-only mode before calling
-+AD4- +AD4- +-		 +ACo- synchronize+AF8-rcu() such that later blk+AF8-queue+=
-AF8-enter() calls
-+AD4- +AD4- +-		 +ACo- see the preempt-only state. See also
-+AD4- +AD4- +-		 +ACo- http://lwn.net/Articles/573497/.
-+AD4- +AD4- +-		 +ACo-/
-+AD4- +AD4- +-		synchronize+AF8-rcu()+ADs-
-+AD4- +AD4- +-		if (+ACE-percpu+AF8-ref+AF8-is+AF8-in+AF8-use(+ACY-q-+AD4-q=
-+AF8-usage+AF8-counter))
-+AD4- +AD4- +-			ret +AD0- 0+ADs-
-+AD4- +AD4- +-	+AH0-
-+AD4- +AD4- +-
-+AD4-=20
-+AD4- In blk+AF8-queue+AF8-enter(), V5 starts to allow all RQF+AF8-PREEMPT =
-requests
-+AD4- to enter queue even though pm+AF8-only is set. That means any scsi+AF=
-8-execute()
-+AD4- may issue a new command to host just after the above percpu+AF8-ref+A=
-F8-is+AF8-in+AF8-use()
-+AD4- returns 0, meantime the suspend is in-progress.
-+AD4-=20
-+AD4- This case is illegal given RQF+AF8-PM is the only kind of request whi=
-ch can be
-+AD4- issued to hardware during suspend.
+BTW, blk_pm_add_request() won't block since it uses the async version
+of runtime resume.
 
-Right, that's something that needs to be addressed.
+> issue: it is now guaranteed that power management requests will be
+> executed no matter how many blk_get_request() callers are waiting.
+> Instead of maintaining the q->nr_pending counter, rely on
+> q->q_usage_counter. Call pm_runtime_mark_last_busy() every time a
+> request finishes instead of only if the queue depth drops to zero.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> Cc: Alan Stern <stern@rowland.harvard.edu>
+> ---
+>  block/blk-core.c       | 37 ++++++++-----------------------------
+>  block/blk-mq-debugfs.c |  1 -
+>  block/blk-pm.c         | 40 +++++++++++++++++++++++++++++++++++-----
+>  block/blk-pm.h         |  6 ++----
+>  include/linux/blkdev.h |  1 -
+>  5 files changed, 45 insertions(+), 40 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 179a13be0fca..a2ef253edfbd 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -2737,30 +2737,6 @@ void blk_account_io_done(struct request *req, u64 now)
+>  	}
+>  }
+>  
+> -#ifdef CONFIG_PM
+> -/*
+> - * Don't process normal requests when queue is suspended
+> - * or in the process of suspending/resuming
+> - */
+> -static bool blk_pm_allow_request(struct request *rq)
+> -{
+> -	switch (rq->q->rpm_status) {
+> -	case RPM_RESUMING:
+> -	case RPM_SUSPENDING:
+> -		return rq->rq_flags & RQF_PM;
+> -	case RPM_SUSPENDED:
+> -		return false;
+> -	default:
+> -		return true;
+> -	}
+> -}
+> -#else
+> -static bool blk_pm_allow_request(struct request *rq)
+> -{
+> -	return true;
+> -}
+> -#endif
+> -
+>  void blk_account_io_start(struct request *rq, bool new_io)
+>  {
+>  	struct hd_struct *part;
+> @@ -2806,11 +2782,14 @@ static struct request *elv_next_request(struct request_queue *q)
+>  
+>  	while (1) {
+>  		list_for_each_entry(rq, &q->queue_head, queuelist) {
+> -			if (blk_pm_allow_request(rq))
+> -				return rq;
+> -
+> -			if (rq->rq_flags & RQF_SOFTBARRIER)
+> -				break;
+> +#ifdef CONFIG_PM
+> +			/*
+> +			 * If a request gets queued in state RPM_SUSPENDED
+> +			 * then that's a kernel bug.
+> +			 */
+> +			WARN_ON_ONCE(q->rpm_status == RPM_SUSPENDED);
+> +#endif
+> +			return rq;
+>  		}
+>  
+>  		/*
+> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> index a5ea86835fcb..7d74d53dc098 100644
+> --- a/block/blk-mq-debugfs.c
+> +++ b/block/blk-mq-debugfs.c
+> @@ -332,7 +332,6 @@ static const char *const rqf_name[] = {
+>  	RQF_NAME(ELVPRIV),
+>  	RQF_NAME(IO_STAT),
+>  	RQF_NAME(ALLOCED),
+> -	RQF_NAME(PM),
+>  	RQF_NAME(HASHED),
+>  	RQF_NAME(STATS),
+>  	RQF_NAME(SPECIAL_PAYLOAD),
+> diff --git a/block/blk-pm.c b/block/blk-pm.c
+> index bf8532da952d..d6b65cef9764 100644
+> --- a/block/blk-pm.c
+> +++ b/block/blk-pm.c
+> @@ -86,14 +86,39 @@ int blk_pre_runtime_suspend(struct request_queue *q)
+>  	if (!q->dev)
+>  		return ret;
+>  
+> +	WARN_ON_ONCE(q->rpm_status != RPM_ACTIVE);
+> +
+> +	blk_set_pm_only(q);
+> +	/*
+> +	 * This function only gets called if the most recent
+> +	 * pm_request_resume() call occurred at least autosuspend_delay_ms
+> +	 * ago. Since blk_queue_enter() is called by the request allocation
+> +	 * code before pm_request_resume(), if q_usage_counter indicates that
+> +	 * no requests are in flight it is safe to suspend the device.
+> +	 */
+> +	ret = -EBUSY;
+> +	if (!percpu_ref_is_in_use(&q->q_usage_counter)) {
+> +		/*
+> +		 * Switch to preempt-only mode before calling
+> +		 * synchronize_rcu() such that later blk_queue_enter() calls
+> +		 * see the preempt-only state. See also
+> +		 * http://lwn.net/Articles/573497/.
+> +		 */
+> +		synchronize_rcu();
+> +		if (!percpu_ref_is_in_use(&q->q_usage_counter))
+> +			ret = 0;
+> +	}
+> +
 
-Bart.
+In blk_queue_enter(), V5 starts to allow all RQF_PREEMPT requests
+to enter queue even though pm_only is set. That means any scsi_execute()
+may issue a new command to host just after the above percpu_ref_is_in_use()
+returns 0, meantime the suspend is in-progress.
+
+This case is illegal given RQF_PM is the only kind of request which can be
+issued to hardware during suspend.
+
+Thanks,
+Ming
