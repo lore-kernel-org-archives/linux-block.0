@@ -1,30 +1,59 @@
-Return-Path: <prvs=750bc9d11=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH 0/2] CFQ: Suppress W=1 compiler warnings
-Date: Tue,  7 Aug 2018 16:17:27 -0700
-Message-Id: <20180807231729.30308-1-bart.vanassche@wdc.com>
+Return-Path: <jgross@suse.com>
+From: Juergen Gross <jgross@suse.com>
+To: linux-kernel@vger.kernel.org,
+	xen-devel@lists.xenproject.org,
+	linux-block@vger.kernel.org
+Cc: konrad.wilk@oracle.com,
+	roger.pau@citrix.com,
+	axboe@kernel.dk,
+	boris.ostrovsky@oracle.com,
+	Juergen Gross <jgross@suse.com>
+Subject: [PATCH v2 0/5] xen/blk: persistent grant rework
+Date: Wed,  8 Aug 2018 16:25:23 +0200
+Message-Id: <20180808142528.31029-1-jgross@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
+Persistent grants are used in the Xen's blkfront/blkback drivers to
+avoid mapping/unmapping of I/O buffers in the backend for each I/O.
 
-This patch series suppresses the compiler warnings that are reported when
-building the CFQ I/O scheduler with W=1. Please consider these patches for
-kernel v4.19.
+While this speeds up processing quite a bit there are problems related
+to persistent grants in some configurations: domains with multiple
+block devices making use of persistent grants might suffer from a lack
+of grants if each of the block devices experienced a high I/O load at
+some time. This is due to the number of persistent grants per device
+only to be limited by a rather high maximum value, but never being
+released even in case of longer times without any I/O.
 
-Thanks,
+This series modifies xen-blkback to unmap any domU page mapped via a
+persistent grant after a timeout (default: 60 seconds). The timeout
+is set to its default value again when a persistent grant has been
+used for an I/O.
 
-Bart.
+xen-blkfront is modified to scan every 10 seconds for persistent grants
+not in use by blkback any more and to remove such grants.
 
-Bart Van Assche (2):
-  cfq: Annotate fall-through in a switch statement
-  cfq: Suppress compiler warnings about comparisons
+The last 3 patches are small cleanups of blkfront and blkback drivers.
 
- block/cfq-iosched.c | 23 +++++++++++++----------
- 1 file changed, 13 insertions(+), 10 deletions(-)
+V2:
+- patch 1: added new module parameter doc
+- patch 1: removed PERSISTENT_GNT_WAS_ACTIVE flag
+- patch 2: removed global worker active flag
+- added new patch 4
+
+Juergen Gross (5):
+  xen/blkback: don't keep persistent grants too long
+  xen/blkfront: cleanup stale persistent grants
+  xen/blkfront: reorder tests in xlblk_init()
+  xen/blkback: move persistent grants flags to bool
+  xen/blkback: remove unused pers_gnts_lock from struct xen_blkif_ring
+
+ Documentation/ABI/testing/sysfs-driver-xen-blkback |  10 ++
+ drivers/block/xen-blkback/blkback.c                |  99 ++++++++++---------
+ drivers/block/xen-blkback/common.h                 |  14 +--
+ drivers/block/xen-blkfront.c                       | 110 ++++++++++++++++++---
+ 4 files changed, 163 insertions(+), 70 deletions(-)
 
 -- 
-2.18.0
+2.13.7
