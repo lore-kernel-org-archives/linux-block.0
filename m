@@ -1,57 +1,60 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:35986 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728245AbeH2QUk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Aug 2018 12:20:40 -0400
-Received: by mail-ed1-f65.google.com with SMTP id f4-v6so3783945edq.3
-        for <linux-block@vger.kernel.org>; Wed, 29 Aug 2018 05:23:59 -0700 (PDT)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Javier Gonzales <javier@cnexlabs.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH 7/7] lightnvm: pblk: fix write amplificiation calculation
-Date: Wed, 29 Aug 2018 14:23:34 +0200
-Message-Id: <1535545414-550-8-git-send-email-hans.ml.holmberg@owltronix.com>
-In-Reply-To: <1535545414-550-1-git-send-email-hans.ml.holmberg@owltronix.com>
-References: <1535545414-550-1-git-send-email-hans.ml.holmberg@owltronix.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v5 1/3] blkcg: Introduce blkg_root_lookup()
+To: Bart Van Assche <Bart.VanAssche@wdc.com>, "tj@kernel.org" <tj@kernel.org>
+Cc: "jthumshirn@suse.de" <jthumshirn@suse.de>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "hch@lst.de" <hch@lst.de>, "stable@vger.kernel.org"
+ <stable@vger.kernel.org>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
+ "osandov@fb.com" <osandov@fb.com>,
+ "00moses.alexander00@gmail.com" <00moses.alexander00@gmail.com>,
+ "joseph.qi@linux.alibaba.com" <joseph.qi@linux.alibaba.com>
+References: <20180809145338.6160-1-bart.vanassche@wdc.com>
+ <20180809145338.6160-2-bart.vanassche@wdc.com>
+ <20180809195612.GE3978217@devbig004.ftw2.facebook.com>
+ <794ba3894d7099fa7a855d3eb4d51c30faecd248.camel@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <f51e9e5e-0f8c-c9bb-5318-c442ed242449@kernel.dk>
+Date: Thu, 9 Aug 2018 14:23:57 -0600
+MIME-Version: 1.0
+In-Reply-To: <794ba3894d7099fa7a855d3eb4d51c30faecd248.camel@wdc.com>
+Content-Type: text/plain; charset=UTF-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+On 8/9/18 2:17 PM, Bart Van Assche wrote:
+> On Thu, 2018-08-09 at 12:56 -0700, Tejun Heo wrote:
+>> Hello,
+>>
+>> On Thu, Aug 09, 2018 at 07:53:36AM -0700, Bart Van Assche wrote:
+>>> +/**
+>>> + * blkg_lookup - look up blkg for the specified request queue
+>>> + * @q: request_queue of interest
+>>> + *
+>>> + * Lookup blkg for @q at the root level. See also blkg_lookup().
+>>> + */
+>>> +static inline struct blkcg_gq *blkg_root_lookup(struct request_queue *q)
+>>> +{
+>>> +	struct blkcg_gq *blkg;
+>>> +
+>>> +	rcu_read_lock();
+>>> +	blkg = blkg_lookup(&blkcg_root, q);
+>>> +	rcu_read_unlock();
+>>> +
+>>> +	return blkg;
+>>> +}
+>>
+>> So, root blkg is always available as long as the request_queue is
+>> alive.  Sth like the following would be simpler?
+>>
+>> static inline struct blkcg_gq *blk_queue_root_blkg(struct request_queue *q)
+>> {
+>> 	return q->root_blkg;
+>> }
+> 
+> That would not only be simpler, it would also avoid that blk_queue_root_blkg()
+> returns NULL if bypass mode is enabled and the request queue is still associated
+> with the block cgroup controller. How do you want to proceed with this change?
 
-When the user data counter exceeds 32 bits, the write amplification
-calculation does not provide the right value. Fix this by using
-div64_u64 in stead of div64.
+Do a followup patch?
 
-Fixes: 76758390f83e ("lightnvm: pblk: export write amplification counters to sysfs")
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
----
- drivers/lightnvm/pblk-sysfs.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
-index 9fc3dfa168b4..e56eeeeb914e 100644
---- a/drivers/lightnvm/pblk-sysfs.c
-+++ b/drivers/lightnvm/pblk-sysfs.c
-@@ -337,7 +337,6 @@ static ssize_t pblk_get_write_amp(u64 user, u64 gc, u64 pad,
- {
- 	int sz;
- 
--
- 	sz = snprintf(page, PAGE_SIZE,
- 			"user:%lld gc:%lld pad:%lld WA:",
- 			user, gc, pad);
-@@ -349,7 +348,7 @@ static ssize_t pblk_get_write_amp(u64 user, u64 gc, u64 pad,
- 		u32 wa_frac;
- 
- 		wa_int = (user + gc + pad) * 100000;
--		wa_int = div_u64(wa_int, user);
-+		wa_int = div64_u64(wa_int, user);
- 		wa_int = div_u64_rem(wa_int, 100000, &wa_frac);
- 
- 		sz += snprintf(page + sz, PAGE_SIZE - sz, "%llu.%05u\n",
 -- 
-2.7.4
+Jens Axboe
