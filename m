@@ -1,185 +1,107 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-From: Dennis Zhou <dennisszhou@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Josef Bacik <josef@toxicpanda.com>
-Cc: kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-Subject: [PATCH 08/15] blkcg: associate a blkg for pages being evicted by swap
-Date: Thu, 30 Aug 2018 21:53:49 -0400
-Message-Id: <20180831015356.69796-9-dennisszhou@gmail.com>
-In-Reply-To: <20180831015356.69796-1-dennisszhou@gmail.com>
-References: <20180831015356.69796-1-dennisszhou@gmail.com>
+Return-Path: <prvs=752cffea0=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH v6 00/12] blk-mq: Implement runtime power management
+Date: Thu,  9 Aug 2018 12:41:37 -0700
+Message-Id: <20180809194149.15285-1-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: bart.vanassche@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+Hello Jens,
 
-A prior patch in this series added blkg association to bios issued by
-cgroups. There are two other paths that we want to attribute work back
-to the appropriate cgroup: swap and writeback. Here we modify the way
-swap tags bios to include the blkg. Writeback will be tackle in the next
-patch.
+This patch series not only implements runtime power management for blk-mq but
+also fixes a starvation issue in the power management code for the legacy
+block layer. Please consider this patch series for the upstream kernel.
 
-Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
----
- block/bio.c         | 83 ++++++++++++++++++++++++++++++++-------------
- include/linux/bio.h | 11 ++++--
- mm/page_io.c        |  2 +-
- 3 files changed, 68 insertions(+), 28 deletions(-)
+Thanks,
 
-diff --git a/block/bio.c b/block/bio.c
-index ab41f5b7eb1f..97ef994a08b6 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1930,30 +1930,6 @@ EXPORT_SYMBOL(bioset_init_from_src);
- 
- #ifdef CONFIG_BLK_CGROUP
- 
--#ifdef CONFIG_MEMCG
--/**
-- * bio_associate_blkcg_from_page - associate a bio with the page's blkcg
-- * @bio: target bio
-- * @page: the page to lookup the blkcg from
-- *
-- * Associate @bio with the blkcg from @page's owning memcg.  This works like
-- * every other associate function wrt references.
-- */
--int bio_associate_blkcg_from_page(struct bio *bio, struct page *page)
--{
--	struct cgroup_subsys_state *blkcg_css;
--
--	if (unlikely(bio->bi_css))
--		return -EBUSY;
--	if (!page->mem_cgroup)
--		return 0;
--	blkcg_css = cgroup_get_e_css(page->mem_cgroup->css.cgroup,
--				     &io_cgrp_subsys);
--	bio->bi_css = blkcg_css;
--	return 0;
--}
--#endif /* CONFIG_MEMCG */
--
- /**
-  * bio_associate_blkcg - associate a bio with the specified blkcg
-  * @bio: target bio
-@@ -2001,6 +1977,65 @@ int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg)
- 	return 0;
- }
- 
-+static int __bio_associate_blkg_from_css(struct bio *bio,
-+					 struct cgroup_subsys_state *css)
-+{
-+	struct blkcg_gq *blkg;
-+
-+	rcu_read_lock();
-+
-+	blkg = blkg_lookup_create(css_to_blkcg(css), bio->bi_disk->queue);
-+
-+	rcu_read_unlock();
-+
-+	return bio_associate_blkg(bio, blkg);
-+}
-+
-+/**
-+ * bio_associate_blkg_from_css - associate a bio with a specified css
-+ * @bio: target bio
-+ * @css: target css
-+ *
-+ * Associate @bio with the blkg found by combining the css's blkg and the
-+ * request_queue of the @bio.  This takes a reference on the css that will
-+ * be put upon freeing of @bio.
-+ */
-+int bio_associate_blkg_from_css(struct bio *bio,
-+				struct cgroup_subsys_state *css)
-+{
-+	css_get(css);
-+	bio->bi_css = css;
-+	return __bio_associate_blkg_from_css(bio, css);
-+}
-+EXPORT_SYMBOL_GPL(bio_associate_blkg_from_css);
-+
-+#ifdef CONFIG_MEMCG
-+/**
-+ * bio_associate_blkg_from_page - associate a bio with the page's blkg
-+ * @bio: target bio
-+ * @page: the page to lookup the blkcg from
-+ *
-+ * Associate @bio with the blkg from @page's owning memcg and the respective
-+ * request_queue.  This works like every other associate function wrt
-+ * references.
-+ *
-+ * Note: this must be called after bio has an associated device.
-+ */
-+int bio_associate_blkg_from_page(struct bio *bio, struct page *page)
-+{
-+	struct cgroup_subsys_state *css;
-+
-+	if (unlikely(bio->bi_css))
-+		return -EBUSY;
-+	if (!page->mem_cgroup)
-+		return 0;
-+	css = cgroup_get_e_css(page->mem_cgroup->css.cgroup, &io_cgrp_subsys);
-+	bio->bi_css = css;
-+
-+	return __bio_associate_blkg_from_css(bio, css);
-+}
-+#endif /* CONFIG_MEMCG */
-+
- /**
-  * bio_associate_create_blkg - associate a bio with a blkg from q
-  * @q: request_queue where bio is going
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index d4626108b9d7..81530d11d34d 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -547,15 +547,17 @@ do {						\
- 	disk_devt((bio)->bi_disk)
- 
- #if defined(CONFIG_MEMCG) && defined(CONFIG_BLK_CGROUP)
--int bio_associate_blkcg_from_page(struct bio *bio, struct page *page);
-+int bio_associate_blkg_from_page(struct bio *bio, struct page *page);
- #else
--static inline int bio_associate_blkcg_from_page(struct bio *bio,
--						struct page *page) {  return 0; }
-+static inline int bio_associate_blkg_from_page(struct bio *bio,
-+					       struct page *page) { return 0; }
- #endif
- 
- #ifdef CONFIG_BLK_CGROUP
- int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css);
- int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg);
-+int bio_associate_blkg_from_css(struct bio *bio,
-+				struct cgroup_subsys_state *css);
- int bio_associate_create_blkg(struct request_queue *q, struct bio *bio);
- void bio_disassociate_task(struct bio *bio);
- void bio_clone_blkcg_association(struct bio *dst, struct bio *src);
-@@ -564,6 +566,9 @@ static inline int bio_associate_blkcg(struct bio *bio,
- 			struct cgroup_subsys_state *blkcg_css) { return 0; }
- static inline int bio_associate_blkg(struct bio *bio,
- 				     struct blkcg_gq *blkg) { return 0; }
-+static inline int bio_associate_blkg_from_css(struct bio *bio,
-+					      struct cgroup_subsys_state *css)
-+{ return 0; }
- static inline int bio_associate_create_blkg(struct request_queue *q,
- 					    struct bio *bio) { return 0; }
- static inline void bio_disassociate_task(struct bio *bio) { }
-diff --git a/mm/page_io.c b/mm/page_io.c
-index aafd19ec1db4..573d3663d846 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -339,7 +339,7 @@ int __swap_writepage(struct page *page, struct writeback_control *wbc,
- 		goto out;
- 	}
- 	bio->bi_opf = REQ_OP_WRITE | REQ_SWAP | wbc_to_write_flags(wbc);
--	bio_associate_blkcg_from_page(bio, page);
-+	bio_associate_blkg_from_page(bio, page);
- 	count_swpout_vm_event(page);
- 	set_page_writeback(page);
- 	unlock_page(page);
+Bart.
+
+Changes compared to v5:
+- Introduced a new flag RQF_DV that replaces RQF_PREEMPT for SCSI domain
+  validation.
+- Introduced a new request queue state QUEUE_FLAG_DV_ONLY for SCSI domain
+  validation.
+- Instead of using SDEV_QUIESCE for both runtime suspend and SCSI domain
+  validation, use that state for domain validation only and introduce a new
+  state for runtime suspend, namely SDEV_QUIESCE.
+- Reallow system suspend during SCSI domain validation.
+- Moved the runtime resume call from the request allocation code into
+  blk_queue_enter().
+- Instead of relying on q_usage_counter, iterate over the tag set to determine
+  whether or not any requests are in flight.
+
+Changes compared to v4:
+- Dropped the patches "Give RQF_PREEMPT back its original meaning" and
+  "Serialize queue freezing and blk_pre_runtime_suspend()".
+- Replaced "percpu_ref_read()" with "percpu_is_in_use()".
+- Inserted pm_request_resume() calls in the block layer request allocation
+  code such that the context that submits a request no longer has to call
+  pm_runtime_get().
+
+Changes compared to v3:
+- Avoid adverse interactions between system-wide suspend/resume and runtime
+  power management by changing the PREEMPT_ONLY flag into a counter.
+- Give RQF_PREEMPT back its original meaning, namely that it is only set for
+  ide_preempt requests.
+- Remove the flag BLK_MQ_REQ_PREEMPT.
+- Removed the pm_request_resume() call.
+
+Changes compared to v2:
+- Fixed the build for CONFIG_BLOCK=n.
+- Added a patch that introduces percpu_ref_read() in the percpu-counter code.
+- Added a patch that makes it easier to detect missing pm_runtime_get*() calls.
+- Addressed Jianchao's feedback including the comment about runtime overhead
+  of switching a per-cpu counter to atomic mode.
+
+Changes compared to v1:
+- Moved the runtime power management code into a separate file.
+- Addressed Ming's feedback.
+
+Bart Van Assche (12):
+  block, scsi: Introduce request flag RQF_DV
+  scsi: Alter handling of RQF_DV requests
+  scsi: Only set RQF_DV for requests used for domain validation
+  scsi: Introduce the SDEV_SUSPENDED device status
+  block, scsi: Rename QUEUE_FLAG_PREEMPT_ONLY into DV_ONLY and introduce
+    PM_ONLY
+  scsi: Reallow SPI domain validation during system suspend
+  block: Move power management code into a new source file
+  block, scsi: Introduce blk_pm_runtime_exit()
+  block: Split blk_pm_add_request() and blk_pm_put_request()
+  block: Change the runtime power management approach (1/2)
+  block: Change the runtime power management approach (2/2)
+  blk-mq: Enable support for runtime power management
+
+ block/Kconfig                     |   5 +
+ block/Makefile                    |   1 +
+ block/blk-core.c                  | 310 ++++++------------------------
+ block/blk-mq-debugfs.c            |   4 +-
+ block/blk-mq.c                    |   4 +-
+ block/blk-pm.c                    | 262 +++++++++++++++++++++++++
+ block/blk-pm.h                    |  69 +++++++
+ block/elevator.c                  |  22 +--
+ drivers/ide/ide-pm.c              |   3 +-
+ drivers/scsi/scsi_lib.c           | 266 ++++++++++++++++++-------
+ drivers/scsi/scsi_pm.c            |   7 +-
+ drivers/scsi/scsi_sysfs.c         |   2 +
+ drivers/scsi/scsi_transport_spi.c |  26 +--
+ drivers/scsi/sd.c                 |  10 +-
+ drivers/scsi/sr.c                 |   4 +-
+ include/linux/blk-mq.h            |   6 +-
+ include/linux/blk-pm.h            |  26 +++
+ include/linux/blkdev.h            |  41 ++--
+ include/scsi/scsi_device.h        |  15 +-
+ include/scsi/scsi_transport_spi.h |   1 -
+ 20 files changed, 673 insertions(+), 411 deletions(-)
+ create mode 100644 block/blk-pm.c
+ create mode 100644 block/blk-pm.h
+ create mode 100644 include/linux/blk-pm.h
+
 -- 
-2.17.1
+2.18.0
