@@ -1,28 +1,117 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] Blk-throttle: reduce tail io latency when iops limit is
- enforced
-To: Liu Bo <bo.liu@linux.alibaba.com>, linux-block@vger.kernel.org
-References: <1532132960-44970-1-git-send-email-bo.liu@linux.alibaba.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <4105f8f2-ab76-6ab1-c1c3-1e2705283ff6@kernel.dk>
-Date: Thu, 9 Aug 2018 11:22:49 -0600
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-it0-f68.google.com ([209.85.214.68]:50857 "EHLO
+        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732652AbeHITrC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Aug 2018 15:47:02 -0400
+Received: by mail-it0-f68.google.com with SMTP id j81-v6so1301386ite.0
+        for <linux-block@vger.kernel.org>; Thu, 09 Aug 2018 10:21:12 -0700 (PDT)
 MIME-Version: 1.0
 In-Reply-To: <1532132960-44970-1-git-send-email-bo.liu@linux.alibaba.com>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+References: <1532132960-44970-1-git-send-email-bo.liu@linux.alibaba.com>
+From: Liu Bo <obuil.liubo@gmail.com>
+Date: Thu, 9 Aug 2018 10:21:11 -0700
+Message-ID: <CANQeFDDffKt-qiRadyg-ocCfvHUhNq6R5KL_fGou0BjeRgr-4Q@mail.gmail.com>
+Subject: Re: [PATCH] Blk-throttle: reduce tail io latency when iops limit is enforced
+To: Liu Bo <bo.liu@linux.alibaba.com>
+Cc: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 7/20/18 6:29 PM, Liu Bo wrote:
+ping?
+
+
+On Fri, Jul 20, 2018 at 5:29 PM, Liu Bo <bo.liu@linux.alibaba.com> wrote:
 > When an application's iops has exceeded its cgroup's iops limit, surely it
 > is throttled and kernel will set a timer for dispatching, thus IO latency
 > includes the delay.
-> 
+>
 > However, the dispatch delay which is calculated by the limit and the
 > elapsed jiffies is suboptimal.  As the dispatch delay is only calculated
 > once the application's iops is (iops limit + 1), it doesn't need to wait
 > any longer than the remaining time of the current slice.
-
-Looks good to me - can you resend against my for-4.19/block branch, as
-it doesn't apply.
-
--- 
-Jens Axboe
+>
+> The difference can be proved by the following fio job and cgroup iops
+> setting,
+> -----
+> $ echo 4 > /mnt/config/nullb/disk1/mbps    # limit nullb's bandwidth to 4MB/s for testing.
+> $ echo "253:1 riops=100 rbps=max" > /sys/fs/cgroup/unified/cg1/io.max
+> $ cat r2.job
+> [global]
+> name=fio-rand-read
+> filename=/dev/nullb1
+> rw=randread
+> bs=4k
+> direct=1
+> numjobs=1
+> time_based=1
+> runtime=60
+> group_reporting=1
+>
+> [file1]
+> size=4G
+> ioengine=libaio
+> iodepth=1
+> rate_iops=50000
+> norandommap=1
+> thinktime=4ms
+> -----
+>
+> wo patch:
+> file1: (g=0): rw=randread, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 4096B-4096B, ioengine=libaio, iodepth=1
+> fio-3.7-66-gedfc
+> Starting 1 process
+>
+>    read: IOPS=99, BW=400KiB/s (410kB/s)(23.4MiB/60001msec)
+>     slat (usec): min=10, max=336, avg=27.71, stdev=17.82
+>     clat (usec): min=2, max=28887, avg=5929.81, stdev=7374.29
+>      lat (usec): min=24, max=28901, avg=5958.73, stdev=7366.22
+>     clat percentiles (usec):
+>      |  1.00th=[    4],  5.00th=[    4], 10.00th=[    4], 20.00th=[    4],
+>      | 30.00th=[    4], 40.00th=[    4], 50.00th=[    6], 60.00th=[11731],
+>      | 70.00th=[11863], 80.00th=[11994], 90.00th=[12911], 95.00th=[22676],
+>      | 99.00th=[23725], 99.50th=[23987], 99.90th=[23987], 99.95th=[25035],
+>      | 99.99th=[28967]
+>
+> w/ patch:
+> file1: (g=0): rw=randread, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 4096B-4096B, ioengine=libaio, iodepth=1
+> fio-3.7-66-gedfc
+> Starting 1 process
+>
+>    read: IOPS=100, BW=400KiB/s (410kB/s)(23.4MiB/60005msec)
+>     slat (usec): min=10, max=155, avg=23.24, stdev=16.79
+>     clat (usec): min=2, max=12393, avg=5961.58, stdev=5959.25
+>      lat (usec): min=23, max=12412, avg=5985.91, stdev=5951.92
+>     clat percentiles (usec):
+>      |  1.00th=[    3],  5.00th=[    3], 10.00th=[    4], 20.00th=[    4],
+>      | 30.00th=[    4], 40.00th=[    5], 50.00th=[   47], 60.00th=[11863],
+>      | 70.00th=[11994], 80.00th=[11994], 90.00th=[11994], 95.00th=[11994],
+>      | 99.00th=[11994], 99.50th=[11994], 99.90th=[12125], 99.95th=[12125],
+>      | 99.99th=[12387]
+>
+> Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
+> ---
+>  block/blk-throttle.c | 7 +------
+>  1 file changed, 1 insertion(+), 6 deletions(-)
+>
+> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> index 26ddbe5286f8..3ca9a98748be 100644
+> --- a/block/blk-throttle.c
+> +++ b/block/blk-throttle.c
+> @@ -956,12 +956,7 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
+>                 return false;
+>
+>         /* Calc approx time to dispatch */
+> -       jiffy_wait = ((tg->io_disp[rw] + 1) * HZ) / tg_iops_limit(tg, rw) + 1;
+> -
+> -       if (jiffy_wait > jiffy_elapsed)
+> -               jiffy_wait = jiffy_wait - jiffy_elapsed;
+> -       else
+> -               jiffy_wait = 1;
+> +       jiffy_wait = jiffy_elapsed_rnd - jiffy_elapsed;
+>
+>         *wait = jiffy_wait;
+>         return false;
+> --
+> 1.8.3.1
+>
