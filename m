@@ -1,46 +1,26 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44828 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727574AbeHJJxf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Aug 2018 05:53:35 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, shhuiw@foxmail.com,
-        Coly Li <colyli@suse.de>
-Subject: [PATCH v2 07/17] bcache: fix indent by replacing blank by tabs
-Date: Fri, 10 Aug 2018 15:23:47 +0800
-Message-Id: <20180810072357.19823-8-colyli@suse.de>
-In-Reply-To: <20180810072357.19823-1-colyli@suse.de>
-References: <20180810072357.19823-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULL] last round of nvme updates for 4.19
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+ Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
+References: <20180809080734.GA1527@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <20521d28-0d18-91e6-fac5-018980856547@kernel.dk>
+Date: Thu, 9 Aug 2018 08:28:12 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180809080734.GA1527@infradead.org>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-bch_btree_insert_check_key() has unaligned indent, or indent by blank
-characters. This patch makes the indent aligned and replace blank by
-tabs.
+On 8/9/18 2:07 AM, Christoph Hellwig wrote:
+> Hi Jens,
+> 
+> this should be the last round of NVMe updates before the 4.19 merge
+> window opens.  It conains support for write protected (aka read-only)
+> namespaces from Chaitanya, two ANA fixes from Hannes and a fabrics
+> fix from Tal Shorer.
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Shenghui Wang <shhuiw@foxmail.com>
----
- drivers/md/bcache/btree.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Thanks, pulled.
 
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index c2e4174a2e03..e7d4817681f2 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -2231,10 +2231,10 @@ int bch_btree_insert_check_key(struct btree *b, struct btree_op *op,
- 		rw_lock(true, b, b->level);
- 
- 		if (b->key.ptr[0] != btree_ptr ||
--                   b->seq != seq + 1) {
-+		    b->seq != seq + 1) {
- 			op->lock = b->level;
- 			goto out;
--               }
-+		}
- 	}
- 
- 	SET_KEY_PTRS(check_key, 1);
 -- 
-2.18.0
+Jens Axboe
