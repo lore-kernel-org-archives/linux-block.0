@@ -1,48 +1,40 @@
-Return-Path: <BATV+568b9e22b4768da93666+5456+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Wed, 1 Aug 2018 01:22:20 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	Tejun Heo <tj@kernel.org>, Borislav Petkov <bp@alien8.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
-	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
-	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
-	"Nicholas A. Bellinger" <nab@linux-iscsi.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Philippe Ombredanne <pombredanne@nexb.com>,
-	Stephen Boyd <sboyd@codeaurora.org>,
-	Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
-	Juergen Gross <jgross@suse.com>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Sagar Dharia <sdharia@codeaurora.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Vinod Koul <vinod.koul@intel.com>,
-	David Kershner <david.kershner@unisys.com>,
-	linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 5/9] block: Switch struct packet_command to use struct
- scsi_sense_hdr
-Message-ID: <20180801082220.GA26378@infradead.org>
-References: <20180731195155.46664-1-keescook@chromium.org>
- <20180731195155.46664-6-keescook@chromium.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180731195155.46664-6-keescook@chromium.org>
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: axboe@kernel.dk,
+	linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Coly Li <colyli@suse.de>
+Subject: [PATCH 05/10] bcache: fix mistaken code comments in bcache.h
+Date: Thu,  9 Aug 2018 15:48:46 +0800
+Message-Id: <20180809074851.11027-6-colyli@suse.de>
+In-Reply-To: <20180809074851.11027-1-colyli@suse.de>
+References: <20180809074851.11027-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Jul 31, 2018 at 12:51:50PM -0700, Kees Cook wrote:
-> There is a lot of needless struct request_sense usage in the CDROM
-> code. These can all be struct scsi_sense_hdr instead, to avoid any
-> confusion over their respective structure sizes. This patch is a lot
-> of noise changing "sense" to "sshdr", but the final code is more
-> readable to distinguish between "sense" meaning "struct request_sense"
-> and "sshdr" meaning "struct scsi_sense_hdr".
+This patch updates the code comment in struct cache with correct array
+names, to make the code to be more comprehensible.
 
-Looks good,
+Signed-off-by: Coly Li <colyli@suse.de>
+---
+ drivers/md/bcache/bcache.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 0a3e82b0876d..b393b3fd06b6 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -423,9 +423,9 @@ struct cache {
+ 	/*
+ 	 * When allocating new buckets, prio_write() gets first dibs - since we
+ 	 * may not be allocate at all without writing priorities and gens.
+-	 * prio_buckets[] contains the last buckets we wrote priorities to (so
+-	 * gc can mark them as metadata), prio_next[] contains the buckets
+-	 * allocated for the next prio write.
++	 * prio_last_buckets[] contains the last buckets we wrote priorities to
++	 * (so gc can mark them as metadata), prio_buckets[] contains the
++	 * buckets allocated for the next prio write.
+ 	 */
+ 	uint64_t		*prio_buckets;
+ 	uint64_t		*prio_last_buckets;
+-- 
+2.18.0
