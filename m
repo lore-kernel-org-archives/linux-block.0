@@ -1,36 +1,130 @@
-Return-Path: <rjw@rjwysocki.net>
-Return-Path: <rjw@rjwysocki.net>
-From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-To: Kees Cook <keescook@chromium.org>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, Arnd Bergmann <arnd@arndb.de>, Eric Biggers <ebiggers@google.com>, "Gustavo A. R. Silva" <gustavo@embeddedor.com>, Alasdair Kergon <agk@redhat.com>, Rabin Vincent <rabinv@axis.com>, Tim Chen <tim.c.chen@linux.intel.com>, Pavel Machek <pavel@ucw.cz>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, Philipp Reisner <philipp.reisner@linbit.com>, Lars Ellenberg <lars.ellenberg@linbit.com>, Jens Axboe <axboe@kernel.dk>, Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Mike Snitzer <snitzer@redhat.com>, Paul Mackerras <paulus@samba.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, David Howells <dhowells@redhat.com>, Johannes Berg <johannes@sipsolutions.net>, Tudor-Dan Ambarus <tudor.ambarus@microchip.com>, Jia-Ju Bai <baijiaju1990@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Josh Poimboeuf <jpoimboe@redhat.com>, David Woodhouse <dwmw@amazon.co.uk>, Will Deacon <will.deacon@arm.com>, device-mapper development <dm-devel@redhat.com>, Linux PM <linux-pm@vger.kernel.org>, linux-crypto <linux-crypto@vger.kernel.org>, drbd-dev@lists.linbit.com, linux-block <linux-block@vger.kernel.org>, qat-linux@intel.com, linux-ppp@vger.kernel.org, netdev <netdev@vger.kernel.org>, "open list:ANDROID DRIVERS" <devel@driverdev.osuosl.org>, linux-afs@lists.infradead.org, "open list:NETWORKING DRIVERS (WIRELESS)" <linux-wireless@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v6 10/18] x86/power/64: Remove VLA usage
-Date: Mon, 06 Aug 2018 12:28:28 +0200
-Message-ID: <1782361.6NaZWiq7ky@aspire.rjw.lan>
-In-Reply-To: <CAGXu5j+NPCc2hq5x7JUwgKYvY6zKN28YdtHbHVapnpgC3GwCsg@mail.gmail.com>
-References: <20180724164936.37477-1-keescook@chromium.org> <CAJZ5v0gVDotjufLKUW0YuQu2vA4fmU_gqia=ZA4DocW4XHxx0w@mail.gmail.com> <CAGXu5j+NPCc2hq5x7JUwgKYvY6zKN28YdtHbHVapnpgC3GwCsg@mail.gmail.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:41000 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727123AbeHIWIe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Aug 2018 18:08:34 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Jianchao Wang <jianchao.w.wang@oracle.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Alan Stern <stern@rowland.harvard.edu>
+Subject: [PATCH v6 09/12] block: Split blk_pm_add_request() and blk_pm_put_request()
+Date: Thu,  9 Aug 2018 12:41:46 -0700
+Message-Id: <20180809194149.15285-10-bart.vanassche@wdc.com>
+In-Reply-To: <20180809194149.15285-1-bart.vanassche@wdc.com>
+References: <20180809194149.15285-1-bart.vanassche@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Wednesday, July 25, 2018 8:01:47 PM CEST Kees Cook wrote:
-> On Wed, Jul 25, 2018 at 4:32 AM, Rafael J. Wysocki <rafael@kernel.org> wrote:
-> > On Tue, Jul 24, 2018 at 6:49 PM, Kees Cook <keescook@chromium.org> wrote:
-> >> In the quest to remove all stack VLA usage from the kernel[1], this
-> >> removes the discouraged use of AHASH_REQUEST_ON_STACK by switching to
-> >> shash directly and allocating the descriptor in heap memory (which should
-> >> be fine: the tfm has already been allocated there too).
-> >>
-> >> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
-> >>
-> >> Signed-off-by: Kees Cook <keescook@chromium.org>
-> >> Acked-by: Pavel Machek <pavel@ucw.cz>
-> >
-> > I think I can queue this up if there are no objections from others.
-> >
-> > Do you want me to do that?
-> 
-> Sure thing. It looks like the other stand-alone patches like this one
-> are getting taken into the non-crypto trees, so that's fine.
-> 
+Move the pm_request_resume() and pm_runtime_mark_last_busy() calls into
+two new functions.
 
-Applied now, thanks!
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Alan Stern <stern@rowland.harvard.edu>
+---
+ block/blk-core.c |  1 +
+ block/blk-pm.h   | 36 +++++++++++++++++++++++++++++++-----
+ block/elevator.c |  1 +
+ 3 files changed, 33 insertions(+), 5 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 3770a36e85be..59dd98585eb0 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1774,6 +1774,7 @@ void __blk_put_request(struct request_queue *q, struct request *req)
+ 
+ 	blk_req_zone_write_unlock(req);
+ 	blk_pm_put_request(req);
++	blk_pm_mark_last_busy(req);
+ 
+ 	elv_completed_request(q, req);
+ 
+diff --git a/block/blk-pm.h b/block/blk-pm.h
+index 1ffc8ef203ec..a8564ea72a41 100644
+--- a/block/blk-pm.h
++++ b/block/blk-pm.h
+@@ -6,8 +6,23 @@
+ #include <linux/pm_runtime.h>
+ 
+ #ifdef CONFIG_PM
++static inline void blk_pm_request_resume(struct request_queue *q)
++{
++	if (q->dev && (q->rpm_status == RPM_SUSPENDED ||
++		       q->rpm_status == RPM_SUSPENDING))
++		pm_request_resume(q->dev);
++}
++
++static inline void blk_pm_mark_last_busy(struct request *rq)
++{
++	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
++		pm_runtime_mark_last_busy(rq->q->dev);
++}
++
+ static inline void blk_pm_requeue_request(struct request *rq)
+ {
++	lockdep_assert_held(rq->q->queue_lock);
++
+ 	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
+ 		rq->q->nr_pending--;
+ }
+@@ -15,17 +30,28 @@ static inline void blk_pm_requeue_request(struct request *rq)
+ static inline void blk_pm_add_request(struct request_queue *q,
+ 				      struct request *rq)
+ {
+-	if (q->dev && !(rq->rq_flags & RQF_PM) && q->nr_pending++ == 0 &&
+-	    (q->rpm_status == RPM_SUSPENDED || q->rpm_status == RPM_SUSPENDING))
+-		pm_request_resume(q->dev);
++	lockdep_assert_held(q->queue_lock);
++
++	if (q->dev && !(rq->rq_flags & RQF_PM))
++		q->nr_pending++;
+ }
+ 
+ static inline void blk_pm_put_request(struct request *rq)
+ {
+-	if (rq->q->dev && !(rq->rq_flags & RQF_PM) && !--rq->q->nr_pending)
+-		pm_runtime_mark_last_busy(rq->q->dev);
++	lockdep_assert_held(rq->q->queue_lock);
++
++	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
++		--rq->q->nr_pending;
+ }
+ #else
++static inline void blk_pm_request_resume(struct request_queue *q)
++{
++}
++
++static inline void blk_pm_mark_last_busy(struct request *rq)
++{
++}
++
+ static inline void blk_pm_requeue_request(struct request *rq)
+ {
+ }
+diff --git a/block/elevator.c b/block/elevator.c
+index 4c15f0240c99..00c5d8dbce16 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -601,6 +601,7 @@ void __elv_add_request(struct request_queue *q, struct request *rq, int where)
+ 	trace_block_rq_insert(q, rq);
+ 
+ 	blk_pm_add_request(q, rq);
++	blk_pm_request_resume(q);
+ 
+ 	rq->q = q;
+ 
+-- 
+2.18.0
