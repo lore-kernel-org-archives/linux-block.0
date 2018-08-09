@@ -1,37 +1,58 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: tom.leiming@gmail.com, bart.vanassche@wdc.com, keith.busch@linux.intel.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 0/2] fixes for the updating nr_hw_queues
-Date: Wed, 15 Aug 2018 15:25:13 +0800
-Message-Id: <1534317915-5041-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: axboe@kernel.dk,
+	linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Coly Li <colyli@suse.de>
+Subject: [PATCH 03/10] bcache: avoid unncessary cache prefetch bch_btree_node_get()
+Date: Thu,  9 Aug 2018 15:48:44 +0800
+Message-Id: <20180809074851.11027-4-colyli@suse.de>
+In-Reply-To: <20180809074851.11027-1-colyli@suse.de>
+References: <20180809074851.11027-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Two fixes for updating nr_hw_queues.
+In bch_btree_node_get() the read-in btree node will be partially
+prefetched into L1 cache for following bset iteration (if there is).
+But if the btree node read is failed, the perfetch operations will
+waste L1 cache space. This patch checkes whether read operation and
+only does cache prefetch when read I/O succeeded.
 
-The first patch fixes the following scenario:
-Kyber depends on the mapping between cpu and nr_hw_queues. When
-update nr_hw_queues, elevator_type->ops.mq.init_hctx will be
-invoked before the mapping is adapted correctly, this would cause
-panic in kyber.
+Signed-off-by: Coly Li <colyli@suse.de>
+---
+ drivers/md/bcache/btree.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-The second patch fixes the following scenario:
-part_in_flight/rw will invoke blk_mq_in_flight/rw to account the
-inflight requests. It will access the queue_hw_ctx and nr_hw_queues
-w/o any protection. When updating nr_hw_queues and blk_mq_in_flight
-/rw occur concurrently, panic comes up.
-
-Jianchao Wang (2)
-blk-mq: init hctx sched after update cpu & nr_hw_queues
-blk-mq: sync the update nr_hw_queues with part_in_flight
-
- block/blk-mq.c         | 40 ++++++++++++++++++++++++++++++++--------
- block/blk.h            |  2 ++
- block/elevator.c       | 20 ++++++++++++--------
- block/genhd.c          | 10 ++++++++--
- include/linux/blkdev.h |  4 ++++
- 5 files changed, 58 insertions(+), 18 deletions(-)
-
-Thanks
-Jianchao
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index 475008fbbaab..c19f7716df88 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -1011,6 +1011,13 @@ struct btree *bch_btree_node_get(struct cache_set *c, struct btree_op *op,
+ 		BUG_ON(b->level != level);
+ 	}
+ 
++	if (btree_node_io_error(b)) {
++		rw_unlock(write, b);
++		return ERR_PTR(-EIO);
++	}
++
++	BUG_ON(!b->written);
++
+ 	b->parent = parent;
+ 	b->accessed = 1;
+ 
+@@ -1022,13 +1029,6 @@ struct btree *bch_btree_node_get(struct cache_set *c, struct btree_op *op,
+ 	for (; i <= b->keys.nsets; i++)
+ 		prefetch(b->keys.set[i].data);
+ 
+-	if (btree_node_io_error(b)) {
+-		rw_unlock(write, b);
+-		return ERR_PTR(-EIO);
+-	}
+-
+-	BUG_ON(!b->written);
+-
+ 	return b;
+ }
+ 
+-- 
+2.18.0
