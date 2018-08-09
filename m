@@ -1,88 +1,51 @@
 Return-Path: <prvs=752cffea0=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v6 10/12] block: Change the runtime power management approach (1/2)
-Date: Thu,  9 Aug 2018 12:41:47 -0700
-Message-Id: <20180809194149.15285-11-bart.vanassche@wdc.com>
-In-Reply-To: <20180809194149.15285-1-bart.vanassche@wdc.com>
-References: <20180809194149.15285-1-bart.vanassche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "hch@lst.de" <hch@lst.de>, "hare@suse.com" <hare@suse.com>,
+	"jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "stern@rowland.harvard.edu"
+	<stern@rowland.harvard.edu>, "jianchao.w.wang@oracle.com"
+	<jianchao.w.wang@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH v5 5/9] block: Change the runtime power management
+ approach (1/2)
+Date: Thu, 9 Aug 2018 17:12:43 +0000
+Message-ID: <d13b751866a375f8898ce351c2194f4648fe62f6.camel@wdc.com>
+References: <20180807225133.27221-1-bart.vanassche@wdc.com>
+	 <20180807225133.27221-6-bart.vanassche@wdc.com>
+	 <414b8689-f04a-abaa-d659-f29dffed7d3e@oracle.com>
+	 <6a1acd11-6e71-ea48-d7fc-1e367d4e4dda@oracle.com>
+	 <2c3fa0fddb9118fb7a5584935fa79b19b062abcb.camel@wdc.com>
+	 <20180809025204.GC18139@ming.t460p>
+In-Reply-To: <20180809025204.GC18139@ming.t460p>
+Content-Type: text/plain; charset="utf-7"
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-Instead of scheduling runtime resume of a request queue after a
-request has been queued, schedule asynchronous resume during request
-allocation. The new pm_request_resume() calls occur after
-blk_queue_enter() has increased the q_usage_counter request queue
-member. This change is needed for a later patch that will make request
-allocation block while the queue status is not RPM_ACTIVE.
+On Thu, 2018-08-09 at 10:52 +-0800, Ming Lei wrote:
++AD4- On Wed, Aug 08, 2018 at 05:28:43PM +-0000, Bart Van Assche wrote:
++AD4- +AD4- Some but not all blk+AF8-queue+AF8-enter() calls are related to=
+ request allocation so
++AD4-=20
++AD4- The only one I remember is scsi+AF8-ioctl+AF8-reset(), in which scsi+=
+AF8-autopm+AF8-get+AF8-host()
++AD4- is called before allocating this request, that means it is enough to =
+put
++AD4- host up for handling RESET. Also this request shouldn't have entered =
+the block
++AD4- request queue.
++AD4-=20
++AD4- Or are there other cases in which request allocation isn't related wi=
+th
++AD4- blk+AF8-queue+AF8-enter()?
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>
----
- block/blk-core.c | 2 ++
- block/blk-mq.c   | 2 ++
- block/elevator.c | 1 -
- 3 files changed, 4 insertions(+), 1 deletion(-)
+What I was referring to in my e-mail is the q+AF8-usage+AF8-counter manipul=
+ations
+in blk+AF8-mq+AF8-timeout+AF8-work(). However, blk+AF8-mq+AF8-timeout+AF8-w=
+ork() manipulates that
+counter directly. So it's only the blk+AF8-queue+AF8-exit() call in that fu=
+nction
+that is not related to request allocation. All blk+AF8-queue+AF8-enter() ca=
+lls I
+know of are related to request allocation.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 59dd98585eb0..f30545fb2de2 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -972,6 +972,8 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 		if (success)
- 			return 0;
- 
-+		blk_pm_request_resume(q);
-+
- 		if (flags & BLK_MQ_REQ_NOWAIT)
- 			return -EBUSY;
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2a0eb058ba5a..24439735f20b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -33,6 +33,7 @@
- #include "blk-mq.h"
- #include "blk-mq-debugfs.h"
- #include "blk-mq-tag.h"
-+#include "blk-pm.h"
- #include "blk-stat.h"
- #include "blk-mq-sched.h"
- #include "blk-rq-qos.h"
-@@ -473,6 +474,7 @@ static void __blk_mq_free_request(struct request *rq)
- 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, ctx->cpu);
- 	const int sched_tag = rq->internal_tag;
- 
-+	blk_pm_mark_last_busy(rq);
- 	if (rq->tag != -1)
- 		blk_mq_put_tag(hctx, hctx->tags, ctx, rq->tag);
- 	if (sched_tag != -1)
-diff --git a/block/elevator.c b/block/elevator.c
-index 00c5d8dbce16..4c15f0240c99 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -601,7 +601,6 @@ void __elv_add_request(struct request_queue *q, struct request *rq, int where)
- 	trace_block_rq_insert(q, rq);
- 
- 	blk_pm_add_request(q, rq);
--	blk_pm_request_resume(q);
- 
- 	rq->q = q;
- 
--- 
-2.18.0
+Bart.
