@@ -1,67 +1,63 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [RFC PATCH V2 08/17] SCSI: pass scsi_device to scsi_mq_prep_fn
-Date: Sat, 11 Aug 2018 15:12:11 +0800
-Message-Id: <20180811071220.357-9-ming.lei@redhat.com>
-In-Reply-To: <20180811071220.357-1-ming.lei@redhat.com>
-References: <20180811071220.357-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:39272 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727689AbeHIJJJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Aug 2018 05:09:09 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH 17/17] bcache: add the missing code comments for smp_mb()
+Date: Thu,  9 Aug 2018 14:43:20 +0800
+Message-Id: <20180809064320.10229-18-colyli@suse.de>
+In-Reply-To: <20180809064320.10229-1-colyli@suse.de>
+References: <20180809064320.10229-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patchset will introduce per-host admin queue, so it may not to get
-'scsi_device' via q->queuedata.
+Checkpatch.pl warns there are 2 locations of smp_mb() without code
+comment. This patch adds the missing code comments for these smp_mb()
+calls.
 
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Adrian Hunter <adrian.hunter@intel.com>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/scsi/scsi_lib.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/md/bcache/closure.h | 4 +++-
+ drivers/md/bcache/super.c   | 2 +-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index d0da89322425..251ace90f254 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1970,10 +1970,9 @@ static unsigned int scsi_mq_sgl_size(struct Scsi_Host *shost)
- 		sizeof(struct scatterlist);
+diff --git a/drivers/md/bcache/closure.h b/drivers/md/bcache/closure.h
+index 7f3594c0be14..eca0d496b686 100644
+--- a/drivers/md/bcache/closure.h
++++ b/drivers/md/bcache/closure.h
+@@ -289,10 +289,12 @@ static inline void closure_init_stack(struct closure *cl)
  }
  
--static int scsi_mq_prep_fn(struct request *req)
-+static int scsi_mq_prep_fn(struct scsi_device *sdev, struct request *req)
+ /**
+- * closure_wake_up - wake up all closures on a wait list.
++ * closure_wake_up - wake up all closures on a wait list,
++ *		     with memory barrier
+  */
+ static inline void closure_wake_up(struct closure_waitlist *list)
  {
- 	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
--	struct scsi_device *sdev = req->q->queuedata;
- 	struct Scsi_Host *shost = sdev->host;
- 	struct scatterlist *sg;
++	/* Memory barrier for the wait list */
+ 	smp_mb();
+ 	__closure_wake_up(list);
+ }
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index f8fe39c72f99..985e2f456081 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1136,11 +1136,11 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
+ 	list_move(&dc->list, &c->cached_devs);
+ 	calc_cached_dev_sectors(c);
  
-@@ -2069,7 +2068,7 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		goto out_dec_target_busy;
+-	smp_wmb();
+ 	/*
+ 	 * dc->c must be set before dc->count != 0 - paired with the mb in
+ 	 * cached_dev_get()
+ 	 */
++	smp_wmb();
+ 	refcount_set(&dc->count, 1);
  
- 	if (!(req->rq_flags & RQF_DONTPREP)) {
--		ret = prep_to_mq(scsi_mq_prep_fn(req));
-+		ret = prep_to_mq(scsi_mq_prep_fn(sdev, req));
- 		if (ret != BLK_STS_OK)
- 			goto out_dec_host_busy;
- 		req->rq_flags |= RQF_DONTPREP;
+ 	/* Block writeback thread, but spawn it */
 -- 
-2.9.5
+2.18.0
