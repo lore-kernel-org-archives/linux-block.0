@@ -4,35 +4,74 @@ To: axboe@kernel.dk,
 	linux-bcache@vger.kernel.org
 Cc: linux-block@vger.kernel.org,
 	Coly Li <colyli@suse.de>
-Subject: [PATCH v3 16/17] bcache: remove unnecessary space before ioctl function pointer arguments
-Date: Sat, 11 Aug 2018 13:19:59 +0800
-Message-Id: <20180811052000.103680-17-colyli@suse.de>
-In-Reply-To: <20180811052000.103680-1-colyli@suse.de>
-References: <20180811052000.103680-1-colyli@suse.de>
+Subject: [PATCH 02/10] bcache: display rate debug parameters to 0 when writeback is not running
+Date: Thu,  9 Aug 2018 15:48:43 +0800
+Message-Id: <20180809074851.11027-3-colyli@suse.de>
+In-Reply-To: <20180809074851.11027-1-colyli@suse.de>
+References: <20180809074851.11027-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-This is warned by checkpatch.pl, this patch removes the extra space.
+When writeback is not running, writeback rate should be 0, other value is
+misleading. And the following dyanmic writeback rate debug parameters
+should be 0 too,
+	rate, proportional, integral, change
+otherwise they are misleading when writeback is not running.
 
 Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
 ---
- drivers/md/bcache/bcache.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/md/bcache/sysfs.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 66e6d5639b38..83504dd8100a 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -275,8 +275,8 @@ struct bcache_device {
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index 225b15aa0340..3e9d3459a224 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -149,6 +149,7 @@ SHOW(__bch_cached_dev)
+ 	struct cached_dev *dc = container_of(kobj, struct cached_dev,
+ 					     disk.kobj);
+ 	const char *states[] = { "no cache", "clean", "dirty", "inconsistent" };
++	int wb = dc->writeback_running;
  
- 	int (*cache_miss)(struct btree *b, struct search *s,
- 			  struct bio *bio, unsigned int sectors);
--	int (*ioctl) (struct bcache_device *d, fmode_t mode,
--		      unsigned int cmd, unsigned long arg);
-+	int (*ioctl)(struct bcache_device *d, fmode_t mode,
-+		     unsigned int cmd, unsigned long arg);
- };
+ #define var(stat)		(dc->stat)
  
- struct io {
+@@ -170,7 +171,7 @@ SHOW(__bch_cached_dev)
+ 	var_printf(writeback_running,	"%i");
+ 	var_print(writeback_delay);
+ 	var_print(writeback_percent);
+-	sysfs_hprint(writeback_rate,	dc->writeback_rate.rate << 9);
++	sysfs_hprint(writeback_rate,	wb ? dc->writeback_rate.rate << 9 : 0);
+ 	sysfs_hprint(io_errors,		atomic_read(&dc->io_errors));
+ 	sysfs_printf(io_error_limit,	"%i", dc->error_limit);
+ 	sysfs_printf(io_disable,	"%i", dc->io_disable);
+@@ -188,15 +189,20 @@ SHOW(__bch_cached_dev)
+ 		char change[20];
+ 		s64 next_io;
+ 
+-		bch_hprint(rate,	dc->writeback_rate.rate << 9);
+-		bch_hprint(dirty,	bcache_dev_sectors_dirty(&dc->disk) << 9);
+-		bch_hprint(target,	dc->writeback_rate_target << 9);
+-		bch_hprint(proportional,dc->writeback_rate_proportional << 9);
+-		bch_hprint(integral,	dc->writeback_rate_integral_scaled << 9);
+-		bch_hprint(change,	dc->writeback_rate_change << 9);
+-
+-		next_io = div64_s64(dc->writeback_rate.next - local_clock(),
+-				    NSEC_PER_MSEC);
++		/*
++		 * Except for dirty and target, other values should
++		 * be 0 if writeback is not running.
++		 */
++		bch_hprint(rate, wb ? dc->writeback_rate.rate << 9 : 0);
++		bch_hprint(dirty, bcache_dev_sectors_dirty(&dc->disk) << 9);
++		bch_hprint(target, dc->writeback_rate_target << 9);
++		bch_hprint(proportional,
++			   wb ? dc->writeback_rate_proportional << 9 : 0);
++		bch_hprint(integral,
++			   wb ? dc->writeback_rate_integral_scaled << 9 : 0);
++		bch_hprint(change, wb ? dc->writeback_rate_change << 9 : 0);
++		next_io = wb ? div64_s64(dc->writeback_rate.next-local_clock(),
++					 NSEC_PER_MSEC) : 0;
+ 
+ 		return sprintf(buf,
+ 			       "rate:\t\t%s/sec\n"
 -- 
 2.18.0
