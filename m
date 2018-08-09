@@ -1,244 +1,77 @@
-Return-Path: <jgross@suse.com>
-From: Juergen Gross <jgross@suse.com>
-To: linux-kernel@vger.kernel.org,
-	xen-devel@lists.xenproject.org,
-	linux-block@vger.kernel.org
-Cc: konrad.wilk@oracle.com,
-	roger.pau@citrix.com,
-	axboe@kernel.dk,
-	boris.ostrovsky@oracle.com,
-	Juergen Gross <jgross@suse.com>
-Subject: [PATCH v3 1/5] xen/blkback: don't keep persistent grants too long
-Date: Mon, 13 Aug 2018 16:01:10 +0200
-Message-Id: <20180813140114.20126-2-jgross@suse.com>
-In-Reply-To: <20180813140114.20126-1-jgross@suse.com>
-References: <20180813140114.20126-1-jgross@suse.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:38990 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727676AbeHIJHT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Aug 2018 05:07:19 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH 00/17] fixes reported by checkpatch.pl 
+Date: Thu,  9 Aug 2018 14:43:03 +0800
+Message-Id: <20180809064320.10229-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Persistent grants are allocated until a threshold per ring is being
-reached. Those grants won't be freed until the ring is being destroyed
-meaning there will be resources kept busy which might no longer be
-used.
+This series contains several minor fixes and code cleanup reported by
+scripts/checkpatch.pl. After this series, there are still a few warning
+from checkpatch.pl, but I think they are necessary to be the way they
+are and don't change them. For example, error message exceeds 80 chars
+line limit.
 
-Instead of freeing only persistent grants until the threshold is
-reached add a timestamp and remove all persistent grants not having
-been in use for a minute.
+Thanks in advance for any comment or review.
 
-Signed-off-by: Juergen Gross <jgross@suse.com>
-Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
+Coly Li
 ---
-V3: make timeout parameter static
----
- Documentation/ABI/testing/sysfs-driver-xen-blkback | 10 +++
- drivers/block/xen-blkback/blkback.c                | 88 ++++++++++++----------
- drivers/block/xen-blkback/common.h                 |  8 +-
- 3 files changed, 60 insertions(+), 46 deletions(-)
+Coly Li (17):
+  bcache: style fix to replace 'unsigned' by 'unsigned int'
+  bcache: style fix to add a blank line after declarations
+  bcache: add identifier names to arguments of function definitions
+  bcache: style fixes for lines over 80 characters
+  bcache: replace Symbolic permissions by octal permission numbers
+  bcache: replace printk() by pr_*() routines
+  bcache: fix indent by replacing blank by tabs
+  bcache: replace '%pF' by '%pS' in seq_printf()
+  bcache: fix typo 'succesfully' to 'successfully'
+  bcache: prefer 'help' in Kconfig
+  bcache: do not check NULL pointer before calling kmem_cache_destroy
+  bcache: fix code comments style
+  bcache: add static const prefix to char * array declarations
+  bcache: move open brace at end of function definitions to next line
+  bcache: add missing SPDX header
+  bcache: remove unnecessary space before ioctl function pointer
+    arguments
+  bcache: add the missing code comments for smp_mb()
 
-diff --git a/Documentation/ABI/testing/sysfs-driver-xen-blkback b/Documentation/ABI/testing/sysfs-driver-xen-blkback
-index 8bb43b66eb55..4e7babb3ba1f 100644
---- a/Documentation/ABI/testing/sysfs-driver-xen-blkback
-+++ b/Documentation/ABI/testing/sysfs-driver-xen-blkback
-@@ -15,3 +15,13 @@ Description:
-                 blkback. If the frontend tries to use more than
-                 max_persistent_grants, the LRU kicks in and starts
-                 removing 5% of max_persistent_grants every 100ms.
-+
-+What:           /sys/module/xen_blkback/parameters/persistent_grant_unused_seconds
-+Date:           August 2018
-+KernelVersion:  4.19
-+Contact:        Roger Pau Monné <roger.pau@citrix.com>
-+Description:
-+                How long a persistent grant is allowed to remain
-+                allocated without being in use. The time is in
-+                seconds, 0 means indefinitely long.
-+                The default is 60 seconds.
-diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
-index b55b245e8052..9eae7b243f68 100644
---- a/drivers/block/xen-blkback/blkback.c
-+++ b/drivers/block/xen-blkback/blkback.c
-@@ -84,6 +84,18 @@ MODULE_PARM_DESC(max_persistent_grants,
-                  "Maximum number of grants to map persistently");
- 
- /*
-+ * How long a persistent grant is allowed to remain allocated without being in
-+ * use. The time is in seconds, 0 means indefinitely long.
-+ */
-+
-+static unsigned int xen_blkif_pgrant_timeout = 60;
-+module_param_named(persistent_grant_unused_seconds, xen_blkif_pgrant_timeout,
-+		   uint, 0644);
-+MODULE_PARM_DESC(persistent_grant_unused_seconds,
-+		 "Time in seconds an unused persistent grant is allowed to "
-+		 "remain allocated. Default is 60, 0 means unlimited.");
-+
-+/*
-  * Maximum number of rings/queues blkback supports, allow as many queues as there
-  * are CPUs if user has not specified a value.
-  */
-@@ -123,6 +135,13 @@ module_param(log_stats, int, 0644);
- /* Number of free pages to remove on each call to gnttab_free_pages */
- #define NUM_BATCH_FREE_PAGES 10
- 
-+static inline bool persistent_gnt_timeout(struct persistent_gnt *persistent_gnt)
-+{
-+	return xen_blkif_pgrant_timeout &&
-+	       (jiffies - persistent_gnt->last_used >=
-+		HZ * xen_blkif_pgrant_timeout);
-+}
-+
- static inline int get_free_page(struct xen_blkif_ring *ring, struct page **page)
- {
- 	unsigned long flags;
-@@ -278,7 +297,7 @@ static void put_persistent_gnt(struct xen_blkif_ring *ring,
- {
- 	if(!test_bit(PERSISTENT_GNT_ACTIVE, persistent_gnt->flags))
- 		pr_alert_ratelimited("freeing a grant already unused\n");
--	set_bit(PERSISTENT_GNT_WAS_ACTIVE, persistent_gnt->flags);
-+	persistent_gnt->last_used = jiffies;
- 	clear_bit(PERSISTENT_GNT_ACTIVE, persistent_gnt->flags);
- 	atomic_dec(&ring->persistent_gnt_in_use);
- }
-@@ -371,26 +390,26 @@ static void purge_persistent_gnt(struct xen_blkif_ring *ring)
- 	struct persistent_gnt *persistent_gnt;
- 	struct rb_node *n;
- 	unsigned int num_clean, total;
--	bool scan_used = false, clean_used = false;
-+	bool scan_used = false;
- 	struct rb_root *root;
- 
--	if (ring->persistent_gnt_c < xen_blkif_max_pgrants ||
--	    (ring->persistent_gnt_c == xen_blkif_max_pgrants &&
--	    !ring->blkif->vbd.overflow_max_grants)) {
--		goto out;
--	}
--
- 	if (work_busy(&ring->persistent_purge_work)) {
- 		pr_alert_ratelimited("Scheduled work from previous purge is still busy, cannot purge list\n");
- 		goto out;
- 	}
- 
--	num_clean = (xen_blkif_max_pgrants / 100) * LRU_PERCENT_CLEAN;
--	num_clean = ring->persistent_gnt_c - xen_blkif_max_pgrants + num_clean;
--	num_clean = min(ring->persistent_gnt_c, num_clean);
--	if ((num_clean == 0) ||
--	    (num_clean > (ring->persistent_gnt_c - atomic_read(&ring->persistent_gnt_in_use))))
--		goto out;
-+	if (ring->persistent_gnt_c < xen_blkif_max_pgrants ||
-+	    (ring->persistent_gnt_c == xen_blkif_max_pgrants &&
-+	    !ring->blkif->vbd.overflow_max_grants)) {
-+		num_clean = 0;
-+	} else {
-+		num_clean = (xen_blkif_max_pgrants / 100) * LRU_PERCENT_CLEAN;
-+		num_clean = ring->persistent_gnt_c - xen_blkif_max_pgrants +
-+			    num_clean;
-+		num_clean = min(ring->persistent_gnt_c, num_clean);
-+		pr_debug("Going to purge at least %u persistent grants\n",
-+			 num_clean);
-+	}
- 
- 	/*
- 	 * At this point, we can assure that there will be no calls
-@@ -401,9 +420,7 @@ static void purge_persistent_gnt(struct xen_blkif_ring *ring)
-          * number of grants.
- 	 */
- 
--	total = num_clean;
--
--	pr_debug("Going to purge %u persistent grants\n", num_clean);
-+	total = 0;
- 
- 	BUG_ON(!list_empty(&ring->persistent_purge_list));
- 	root = &ring->persistent_gnts;
-@@ -412,46 +429,37 @@ static void purge_persistent_gnt(struct xen_blkif_ring *ring)
- 		BUG_ON(persistent_gnt->handle ==
- 			BLKBACK_INVALID_HANDLE);
- 
--		if (clean_used) {
--			clear_bit(PERSISTENT_GNT_WAS_ACTIVE, persistent_gnt->flags);
--			continue;
--		}
--
- 		if (test_bit(PERSISTENT_GNT_ACTIVE, persistent_gnt->flags))
- 			continue;
--		if (!scan_used &&
--		    (test_bit(PERSISTENT_GNT_WAS_ACTIVE, persistent_gnt->flags)))
-+		if (!scan_used && !persistent_gnt_timeout(persistent_gnt))
-+			continue;
-+		if (scan_used && total >= num_clean)
- 			continue;
- 
- 		rb_erase(&persistent_gnt->node, root);
- 		list_add(&persistent_gnt->remove_node,
- 			 &ring->persistent_purge_list);
--		if (--num_clean == 0)
--			goto finished;
-+		total++;
- 	}
- 	/*
--	 * If we get here it means we also need to start cleaning
-+	 * Check whether we also need to start cleaning
- 	 * grants that were used since last purge in order to cope
- 	 * with the requested num
- 	 */
--	if (!scan_used && !clean_used) {
--		pr_debug("Still missing %u purged frames\n", num_clean);
-+	if (!scan_used && total < num_clean) {
-+		pr_debug("Still missing %u purged frames\n", num_clean - total);
- 		scan_used = true;
- 		goto purge_list;
- 	}
--finished:
--	if (!clean_used) {
--		pr_debug("Finished scanning for grants to clean, removing used flag\n");
--		clean_used = true;
--		goto purge_list;
--	}
- 
--	ring->persistent_gnt_c -= (total - num_clean);
--	ring->blkif->vbd.overflow_max_grants = 0;
-+	if (total) {
-+		ring->persistent_gnt_c -= total;
-+		ring->blkif->vbd.overflow_max_grants = 0;
- 
--	/* We can defer this work */
--	schedule_work(&ring->persistent_purge_work);
--	pr_debug("Purged %u/%u\n", (total - num_clean), total);
-+		/* We can defer this work */
-+		schedule_work(&ring->persistent_purge_work);
-+		pr_debug("Purged %u/%u\n", num_clean, total);
-+	}
- 
- out:
- 	return;
-diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
-index ecb35fe8ca8d..7bff72db3b7e 100644
---- a/drivers/block/xen-blkback/common.h
-+++ b/drivers/block/xen-blkback/common.h
-@@ -234,14 +234,9 @@ struct xen_vbd {
- struct backend_info;
- 
- /* Number of available flags */
--#define PERSISTENT_GNT_FLAGS_SIZE	2
-+#define PERSISTENT_GNT_FLAGS_SIZE	1
- /* This persistent grant is currently in use */
- #define PERSISTENT_GNT_ACTIVE		0
--/*
-- * This persistent grant has been used, this flag is set when we remove the
-- * PERSISTENT_GNT_ACTIVE, to know that this grant has been used recently.
-- */
--#define PERSISTENT_GNT_WAS_ACTIVE	1
- 
- /* Number of requests that we can fit in a ring */
- #define XEN_BLKIF_REQS_PER_PAGE		32
-@@ -250,6 +245,7 @@ struct persistent_gnt {
- 	struct page *page;
- 	grant_ref_t gnt;
- 	grant_handle_t handle;
-+	unsigned long last_used;
- 	DECLARE_BITMAP(flags, PERSISTENT_GNT_FLAGS_SIZE);
- 	struct rb_node node;
- 	struct list_head remove_node;
+ drivers/md/bcache/Kconfig     |   6 +-
+ drivers/md/bcache/alloc.c     |  39 ++++---
+ drivers/md/bcache/bcache.h    | 210 +++++++++++++++++-----------------
+ drivers/md/bcache/bset.c      | 129 +++++++++++----------
+ drivers/md/bcache/bset.h      | 146 ++++++++++++-----------
+ drivers/md/bcache/btree.c     |  66 ++++++-----
+ drivers/md/bcache/btree.h     |  86 +++++++-------
+ drivers/md/bcache/closure.c   |   6 +-
+ drivers/md/bcache/closure.h   |   6 +-
+ drivers/md/bcache/debug.c     |  23 ++--
+ drivers/md/bcache/debug.h     |   6 +-
+ drivers/md/bcache/extents.c   |  37 +++---
+ drivers/md/bcache/extents.h   |   6 +-
+ drivers/md/bcache/io.c        |  24 ++--
+ drivers/md/bcache/journal.c   |  25 ++--
+ drivers/md/bcache/journal.h   |  28 ++---
+ drivers/md/bcache/movinggc.c  |  14 ++-
+ drivers/md/bcache/request.c   |  59 +++++-----
+ drivers/md/bcache/request.h   |  18 +--
+ drivers/md/bcache/stats.c     |  15 ++-
+ drivers/md/bcache/stats.h     |  15 ++-
+ drivers/md/bcache/super.c     | 103 ++++++++++-------
+ drivers/md/bcache/sysfs.c     |  36 +++---
+ drivers/md/bcache/sysfs.h     |   6 +-
+ drivers/md/bcache/util.c      |   2 +
+ drivers/md/bcache/util.h      |  24 ++--
+ drivers/md/bcache/writeback.c |  27 +++--
+ drivers/md/bcache/writeback.h |  19 +--
+ include/uapi/linux/bcache.h   |   8 +-
+ 29 files changed, 660 insertions(+), 529 deletions(-)
+
 -- 
-2.13.7
+2.18.0
