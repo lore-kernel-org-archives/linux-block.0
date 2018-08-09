@@ -1,73 +1,61 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [RFC PATCH V2 04/17] blk-mq: don't reserve tags for admin queue
-Date: Sat, 11 Aug 2018 15:12:07 +0800
-Message-Id: <20180811071220.357-5-ming.lei@redhat.com>
-In-Reply-To: <20180811071220.357-1-ming.lei@redhat.com>
-References: <20180811071220.357-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:39228 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727808AbeHIJIu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Aug 2018 05:08:50 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH 14/17] bcache: move open brace at end of function definitions to next line
+Date: Thu,  9 Aug 2018 14:43:17 +0800
+Message-Id: <20180809064320.10229-15-colyli@suse.de>
+In-Reply-To: <20180809064320.10229-1-colyli@suse.de>
+References: <20180809064320.10229-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Not necessary to reserve tags for admin queue since there isn't
-many inflight commands in admin queue usually.
+This is not a preferred style to place open brace '{' at the end of
+function definition, checkpatch.pl reports error for such coding
+style. This patch moves them into the start of the next new line.
 
-This change won't starve admin queue too because each blocked queue
-has equal priority to get one new tag when one driver tag is released,
-no matter it is freed from any queue.
-
-So that IO performance won't be affected after admin queue(shared tags
-with IO queues) is introduced in the following patches.
-
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Adrian Hunter <adrian.hunter@intel.com>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
- block/blk-mq-tag.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/md/bcache/super.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 816923bf874d..7cd09fd16f5a 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -30,7 +30,8 @@ bool blk_mq_has_free_tags(struct blk_mq_tags *tags)
- bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
- {
- 	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
--	    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
-+	    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
-+	    !blk_queue_admin(hctx->queue))
- 		atomic_inc(&hctx->tags->active_queues);
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index a8b751ba3ebc..1382c6afd271 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -2152,7 +2152,8 @@ static ssize_t register_bcache(struct kobject *, struct kobj_attribute *,
+ kobj_attribute_write(register,		register_bcache);
+ kobj_attribute_write(register_quiet,	register_bcache);
  
- 	return true;
-@@ -57,7 +58,8 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
- 	if (!test_and_clear_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
- 		return;
+-static bool bch_is_open_backing(struct block_device *bdev) {
++static bool bch_is_open_backing(struct block_device *bdev)
++{
+ 	struct cache_set *c, *tc;
+ 	struct cached_dev *dc, *t;
  
--	atomic_dec(&tags->active_queues);
-+	if (!blk_queue_admin(hctx->queue))
-+		atomic_dec(&tags->active_queues);
- 
- 	blk_mq_tag_wakeup_all(tags, false);
+@@ -2166,7 +2167,8 @@ static bool bch_is_open_backing(struct block_device *bdev) {
+ 	return false;
  }
+ 
+-static bool bch_is_open_cache(struct block_device *bdev) {
++static bool bch_is_open_cache(struct block_device *bdev)
++{
+ 	struct cache_set *c, *tc;
+ 	struct cache *ca;
+ 	unsigned int i;
+@@ -2178,7 +2180,8 @@ static bool bch_is_open_cache(struct block_device *bdev) {
+ 	return false;
+ }
+ 
+-static bool bch_is_open(struct block_device *bdev) {
++static bool bch_is_open(struct block_device *bdev)
++{
+ 	return bch_is_open_cache(bdev) || bch_is_open_backing(bdev);
+ }
+ 
 -- 
-2.9.5
+2.18.0
