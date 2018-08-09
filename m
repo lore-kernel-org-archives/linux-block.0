@@ -1,76 +1,153 @@
-Return-Path: <axboe@kernel.dk>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Josef Bacik <josef@toxicpanda.com>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] blk-wbt: don't maintain inflight counts if disabled
-Message-ID: <504f587c-681b-5502-30e3-9a3c4ed6c8fe@kernel.dk>
-Date: Thu, 23 Aug 2018 09:15:27 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:39078 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727237AbeHIJH7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Aug 2018 05:07:59 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH 06/17] bcache: replace printk() by pr_*() routines
+Date: Thu,  9 Aug 2018 14:43:09 +0800
+Message-Id: <20180809064320.10229-7-colyli@suse.de>
+In-Reply-To: <20180809064320.10229-1-colyli@suse.de>
+References: <20180809064320.10229-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-A previous commit removed the ability to have per-rq flags. We used
-those flags to maintain inflight counts. Since we don't have those
-anymore, we have to always maintain inflight counts, even if wbt is
-disabled. This is clearly suboptimal.
+There are still many places in bcache use printk to display kernel
+message, which are suggested to be preplaced by pr_*() routines like
+pr_err(), pr_info(), or pr_notice().
 
-Add a queue quiesce around changing the wbt latency settings from sysfs
-to work around this. With that, we can reliably put the enabled check in
-our bio_to_wbt_flags(), since we know the WBT_TRACKED flag will be
-consistent for the lifetime of the request.
+This patch replaces all printk() with a proper pr_*() routine for
+bcache code.
 
-Fixes: Fixes: c1c80384c8f ("block: remove external dependency on wbt_flags")
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
+ drivers/md/bcache/bset.c    |  8 ++++----
+ drivers/md/bcache/debug.c   | 10 +++++-----
+ drivers/md/bcache/extents.c |  8 ++++----
+ drivers/md/bcache/super.c   |  4 ++--
+ 4 files changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index bb109bb0a055..3772671cf2bc 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -453,9 +453,26 @@ static ssize_t queue_wb_lat_store(struct request_queue *q, const char *page,
- 	else if (val >= 0)
- 		val *= 1000ULL;
+diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
+index 19b4febe5b45..b6a3f9d291a9 100644
+--- a/drivers/md/bcache/bset.c
++++ b/drivers/md/bcache/bset.c
+@@ -25,18 +25,18 @@ void bch_dump_bset(struct btree_keys *b, struct bset *i, unsigned int set)
+ 	for (k = i->start; k < bset_bkey_last(i); k = next) {
+ 		next = bkey_next(k);
  
--	wbt_set_min_lat(q, val);
-+	/*
-+	 * Ensure that the queue is idled, in case the latency update
-+	 * ends up either enabling or disabling wbt completely. We can't
-+	 * have IO inflight if that happens.
-+	 */
-+	if (q->mq_ops) {
-+		blk_mq_freeze_queue(q);
-+		blk_mq_quiesce_queue(q);
-+	} else
-+		blk_queue_bypass_start(q);
+-		printk(KERN_ERR "block %u key %u/%u: ", set,
++		pr_err("block %u key %u/%u: ", set,
+ 		       (unsigned int) ((u64 *) k - i->d), i->keys);
  
-+	wbt_set_min_lat(q, val);
- 	wbt_update_limits(q);
-+
-+	if (q->mq_ops) {
-+		blk_mq_unquiesce_queue(q);
-+		blk_mq_unfreeze_queue(q);
-+	} else
-+		blk_queue_bypass_end(q);
-+
- 	return count;
+ 		if (b->ops->key_dump)
+ 			b->ops->key_dump(b, k);
+ 		else
+-			printk("%llu:%llu\n", KEY_INODE(k), KEY_OFFSET(k));
++			pr_err("%llu:%llu\n", KEY_INODE(k), KEY_OFFSET(k));
+ 
+ 		if (next < bset_bkey_last(i) &&
+ 		    bkey_cmp(k, b->ops->is_extents ?
+ 			     &START_KEY(next) : next) > 0)
+-			printk(KERN_ERR "Key skipped backwards\n");
++			pr_err("Key skipped backwards\n");
+ 	}
  }
  
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index c9358f1981fb..85e4a40a2a0a 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -540,6 +546,9 @@ static enum wbt_flags bio_to_wbt_flags(struct rq_wb *rwb, struct bio *bio)
- {
- 	enum wbt_flags flags = 0;
+@@ -482,7 +482,7 @@ void inorder_test(void)
+ 		unsigned int i = 1, j = rounddown_pow_of_two(size - 1);
  
-+	if (!rwb_enabled(rwb))
-+		return 0;
-+
- 	if (bio_op(bio) == REQ_OP_READ) {
- 		flags = WBT_READ;
- 	} else if (wbt_should_throttle(rwb, bio)) {
-
-
+ 		if (!(size % 4096))
+-			printk(KERN_NOTICE "loop %u, %llu per us\n", size,
++			pr_notice("loop %u, %llu per us\n", size,
+ 			       done / ktime_us_delta(ktime_get(), start));
+ 
+ 		while (1) {
+diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
+index a8f70c916fdb..06da66b2488a 100644
+--- a/drivers/md/bcache/debug.c
++++ b/drivers/md/bcache/debug.c
+@@ -74,28 +74,28 @@ void bch_btree_verify(struct btree *b)
+ 
+ 		console_lock();
+ 
+-		printk(KERN_ERR "*** in memory:\n");
++		pr_err("*** in memory:\n");
+ 		bch_dump_bset(&b->keys, inmemory, 0);
+ 
+-		printk(KERN_ERR "*** read back in:\n");
++		pr_err("*** read back in:\n");
+ 		bch_dump_bset(&v->keys, sorted, 0);
+ 
+ 		for_each_written_bset(b, ondisk, i) {
+ 			unsigned int block = ((void *) i - (void *) ondisk) /
+ 				block_bytes(b->c);
+ 
+-			printk(KERN_ERR "*** on disk block %u:\n", block);
++			pr_err("*** on disk block %u:\n", block);
+ 			bch_dump_bset(&b->keys, i, block);
+ 		}
+ 
+-		printk(KERN_ERR "*** block %zu not written\n",
++		pr_err("*** block %zu not written\n",
+ 		       ((void *) i - (void *) ondisk) / block_bytes(b->c));
+ 
+ 		for (j = 0; j < inmemory->keys; j++)
+ 			if (inmemory->d[j] != sorted->d[j])
+ 				break;
+ 
+-		printk(KERN_ERR "b->written %u\n", b->written);
++		pr_err("b->written %u\n", b->written);
+ 
+ 		console_unlock();
+ 		panic("verify failed at %u\n", j);
+diff --git a/drivers/md/bcache/extents.c b/drivers/md/bcache/extents.c
+index cb3b2c613ed6..c809724e6571 100644
+--- a/drivers/md/bcache/extents.c
++++ b/drivers/md/bcache/extents.c
+@@ -130,18 +130,18 @@ static void bch_bkey_dump(struct btree_keys *keys, const struct bkey *k)
+ 	char buf[80];
+ 
+ 	bch_extent_to_text(buf, sizeof(buf), k);
+-	printk(" %s", buf);
++	pr_err(" %s", buf);
+ 
+ 	for (j = 0; j < KEY_PTRS(k); j++) {
+ 		size_t n = PTR_BUCKET_NR(b->c, k, j);
+ 
+-		printk(" bucket %zu", n);
++		pr_err(" bucket %zu", n);
+ 		if (n >= b->c->sb.first_bucket && n < b->c->sb.nbuckets)
+-			printk(" prio %i",
++			pr_err(" prio %i",
+ 			       PTR_BUCKET(b->c, k, j)->prio);
+ 	}
+ 
+-	printk(" %s\n", bch_ptr_status(b->c, k));
++	pr_err(" %s\n", bch_ptr_status(b->c, k));
+ }
+ 
+ /* Btree ptrs */
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 8cba2378734a..eac0d5d1ada3 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1472,13 +1472,13 @@ bool bch_cache_set_error(struct cache_set *c, const char *fmt, ...)
+ 	acquire_console_sem();
+ 	*/
+ 
+-	printk(KERN_ERR "bcache: error on %pU: ", c->sb.set_uuid);
++	pr_err("bcache: error on %pU: ", c->sb.set_uuid);
+ 
+ 	va_start(args, fmt);
+ 	vprintk(fmt, args);
+ 	va_end(args);
+ 
+-	printk(", disabling caching\n");
++	pr_err(", disabling caching\n");
+ 
+ 	if (c->on_error == ON_ERROR_PANIC)
+ 		panic("panic forced after error\n");
 -- 
-Jens Axboe
+2.18.0
