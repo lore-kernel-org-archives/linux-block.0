@@ -1,81 +1,122 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:40060 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727359AbeH3W5l (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Aug 2018 18:57:41 -0400
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-Date: Thu, 30 Aug 2018 12:53:47 -0600
-Message-Id: <20180830185352.3369-9-logang@deltatee.com>
-In-Reply-To: <20180830185352.3369-1-logang@deltatee.com>
-References: <20180830185352.3369-1-logang@deltatee.com>
-Subject: [PATCH v5 08/13] IB/core: Ensure we map P2P memory correctly in rdma_rw_ctx_[init|destroy]()
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=752cffea0=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Omar Sandoval <osandov@fb.com>,
+	Alexandru Moise <00moses.alexander00@gmail.com>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v5 2/3] block: Introduce blk_exit_queue()
+Date: Thu,  9 Aug 2018 07:53:37 -0700
+Message-Id: <20180809145338.6160-3-bart.vanassche@wdc.com>
+In-Reply-To: <20180809145338.6160-1-bart.vanassche@wdc.com>
+References: <20180809145338.6160-1-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: bart.vanassche@wdc.com
+List-ID: <linux-block@vger.kernel.org>
 
-In order to use PCI P2P memory the pci_p2pmem_map_sg() function must be
-called to map the correct PCI bus address.
+This patch does not change any functionality.
 
-To do this, check the first page in the scatter list to see if it is P2P
-memory or not. At the moment, scatter lists that contain P2P memory must
-be homogeneous so if the first page is P2P the entire SGL should be P2P.
-
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Alexandru Moise <00moses.alexander00@gmail.com>
+Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
+Cc: <stable@vger.kernel.org>
 ---
- drivers/infiniband/core/rw.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ block/blk-core.c | 54 +++++++++++++++++++++++++++---------------------
+ block/blk.h      |  1 +
+ 2 files changed, 31 insertions(+), 24 deletions(-)
 
-diff --git a/drivers/infiniband/core/rw.c b/drivers/infiniband/core/rw.c
-index 683e6d11a564..d22c4a2ebac6 100644
---- a/drivers/infiniband/core/rw.c
-+++ b/drivers/infiniband/core/rw.c
-@@ -12,6 +12,7 @@
-  */
- #include <linux/moduleparam.h>
- #include <linux/slab.h>
-+#include <linux/pci-p2pdma.h>
- #include <rdma/mr_pool.h>
- #include <rdma/rw.h>
- 
-@@ -280,7 +281,11 @@ int rdma_rw_ctx_init(struct rdma_rw_ctx *ctx, struct ib_qp *qp, u8 port_num,
- 	struct ib_device *dev = qp->pd->device;
- 	int ret;
- 
--	ret = ib_dma_map_sg(dev, sg, sg_cnt, dir);
-+	if (is_pci_p2pdma_page(sg_page(sg)))
-+		ret = pci_p2pdma_map_sg(dev->dma_device, sg, sg_cnt, dir);
-+	else
-+		ret = ib_dma_map_sg(dev, sg, sg_cnt, dir);
-+
- 	if (!ret)
- 		return -ENOMEM;
- 	sg_cnt = ret;
-@@ -602,7 +607,9 @@ void rdma_rw_ctx_destroy(struct rdma_rw_ctx *ctx, struct ib_qp *qp, u8 port_num,
- 		break;
- 	}
- 
--	ib_dma_unmap_sg(qp->pd->device, sg, sg_cnt, dir);
-+	/* P2PDMA contexts do not need to be unmapped */
-+	if (!is_pci_p2pdma_page(sg_page(sg)))
-+		ib_dma_unmap_sg(qp->pd->device, sg, sg_cnt, dir);
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 2e054b65de42..55bc22ef2934 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -719,6 +719,35 @@ void blk_set_queue_dying(struct request_queue *q)
  }
- EXPORT_SYMBOL(rdma_rw_ctx_destroy);
+ EXPORT_SYMBOL_GPL(blk_set_queue_dying);
  
++/* Unconfigure the I/O scheduler and dissociate from the cgroup controller. */
++void blk_exit_queue(struct request_queue *q)
++{
++	/*
++	 * Since the I/O scheduler exit code may access cgroup information,
++	 * perform I/O scheduler exit before disassociating from the block
++	 * cgroup controller.
++	 */
++	if (q->elevator) {
++		ioc_clear_queue(q);
++		elevator_exit(q, q->elevator);
++		q->elevator = NULL;
++	}
++
++	/*
++	 * Remove all references to @q from the block cgroup controller before
++	 * restoring @q->queue_lock to avoid that restoring this pointer causes
++	 * e.g. blkcg_print_blkgs() to crash.
++	 */
++	blkcg_exit_queue(q);
++
++	/*
++	 * Since the cgroup code may dereference the @q->backing_dev_info
++	 * pointer, only decrease its reference count after having removed the
++	 * association with the block cgroup controller.
++	 */
++	bdi_put(q->backing_dev_info);
++}
++
+ /**
+  * blk_cleanup_queue - shutdown a request queue
+  * @q: request queue to shutdown
+@@ -788,30 +817,7 @@ void blk_cleanup_queue(struct request_queue *q)
+ 	 */
+ 	WARN_ON_ONCE(q->kobj.state_in_sysfs);
+ 
+-	/*
+-	 * Since the I/O scheduler exit code may access cgroup information,
+-	 * perform I/O scheduler exit before disassociating from the block
+-	 * cgroup controller.
+-	 */
+-	if (q->elevator) {
+-		ioc_clear_queue(q);
+-		elevator_exit(q, q->elevator);
+-		q->elevator = NULL;
+-	}
+-
+-	/*
+-	 * Remove all references to @q from the block cgroup controller before
+-	 * restoring @q->queue_lock to avoid that restoring this pointer causes
+-	 * e.g. blkcg_print_blkgs() to crash.
+-	 */
+-	blkcg_exit_queue(q);
+-
+-	/*
+-	 * Since the cgroup code may dereference the @q->backing_dev_info
+-	 * pointer, only decrease its reference count after having removed the
+-	 * association with the block cgroup controller.
+-	 */
+-	bdi_put(q->backing_dev_info);
++	blk_exit_queue(q);
+ 
+ 	if (q->mq_ops)
+ 		blk_mq_free_queue(q);
+diff --git a/block/blk.h b/block/blk.h
+index 6adae8f94279..aeb8026f4d7b 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -130,6 +130,7 @@ void blk_free_flush_queue(struct blk_flush_queue *q);
+ int blk_init_rl(struct request_list *rl, struct request_queue *q,
+ 		gfp_t gfp_mask);
+ void blk_exit_rl(struct request_queue *q, struct request_list *rl);
++void blk_exit_queue(struct request_queue *q);
+ void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
+ 			struct bio *bio);
+ void blk_queue_bypass_start(struct request_queue *q);
 -- 
-2.11.0
+2.18.0
