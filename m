@@ -1,73 +1,39 @@
-Return-Path: <prvs=750bc9d11=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: axboe@kernel.dk,
+	linux-bcache@vger.kernel.org
 Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v5 7/9] block: Remove blk_pm_requeue_request()
-Date: Tue,  7 Aug 2018 15:51:31 -0700
-Message-Id: <20180807225133.27221-8-bart.vanassche@wdc.com>
-In-Reply-To: <20180807225133.27221-1-bart.vanassche@wdc.com>
-References: <20180807225133.27221-1-bart.vanassche@wdc.com>
+	Shenghui Wang <shhuiw@foxmail.com>,
+	Coly Li <colyli@suse.de>
+Subject: [PATCH 10/10] bcache: trivial - remove tailing backslash in macro BTREE_FLAG
+Date: Thu,  9 Aug 2018 15:48:51 +0800
+Message-Id: <20180809074851.11027-11-colyli@suse.de>
+In-Reply-To: <20180809074851.11027-1-colyli@suse.de>
+References: <20180809074851.11027-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Since this function is now empty, remove it.
+From: Shenghui Wang <shhuiw@foxmail.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>
+Remove the tailing backslash in macro BTREE_FLAG in btree.h
+
+Signed-off-by: Shenghui Wang <shhuiw@foxmail.com>
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
- block/blk-pm.h   | 8 --------
- block/elevator.c | 2 --
- 2 files changed, 10 deletions(-)
+ drivers/md/bcache/btree.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-pm.h b/block/blk-pm.h
-index fcb507a29e99..3a903efcacaf 100644
---- a/block/blk-pm.h
-+++ b/block/blk-pm.h
-@@ -6,10 +6,6 @@
- #include <linux/pm_runtime.h>
+diff --git a/drivers/md/bcache/btree.h b/drivers/md/bcache/btree.h
+index d211e2c25b6b..68e9d926134d 100644
+--- a/drivers/md/bcache/btree.h
++++ b/drivers/md/bcache/btree.h
+@@ -152,7 +152,7 @@ static inline bool btree_node_ ## flag(struct btree *b)			\
+ {	return test_bit(BTREE_NODE_ ## flag, &b->flags); }		\
+ 									\
+ static inline void set_btree_node_ ## flag(struct btree *b)		\
+-{	set_bit(BTREE_NODE_ ## flag, &b->flags); }			\
++{	set_bit(BTREE_NODE_ ## flag, &b->flags); }
  
- #ifdef CONFIG_PM
--static inline void blk_pm_requeue_request(struct request *rq)
--{
--}
--
- static inline void blk_pm_add_request(struct request_queue *q,
- 				      struct request *rq)
- {
-@@ -24,10 +20,6 @@ static inline void blk_pm_put_request(struct request *rq)
- 		pm_runtime_mark_last_busy(rq->q->dev);
- }
- #else
--static inline void blk_pm_requeue_request(struct request *rq)
--{
--}
--
- static inline void blk_pm_add_request(struct request_queue *q,
- 				      struct request *rq)
- {
-diff --git a/block/elevator.c b/block/elevator.c
-index 3965292b0724..9e46df35cacc 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -572,8 +572,6 @@ void elv_requeue_request(struct request_queue *q, struct request *rq)
- 
- 	rq->rq_flags &= ~RQF_STARTED;
- 
--	blk_pm_requeue_request(rq);
--
- 	__elv_add_request(q, rq, ELEVATOR_INSERT_REQUEUE);
- }
- 
+ enum btree_flags {
+ 	BTREE_NODE_io_error,
 -- 
 2.18.0
