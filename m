@@ -1,72 +1,80 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:55498 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727422AbeHJSQ6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Aug 2018 14:16:58 -0400
+Return-Path: <colyli@suse.de>
 From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        stable@vger.kernel.org, Kai Krakow <kai@kaishome.de>,
-        Stefan Priebe <s.priebe@profihost.ag>
-Subject: [PATCH] bcache: fix 0day error of setting writeback_rate by sysfs interface
-Date: Fri, 10 Aug 2018 23:45:50 +0800
-Message-Id: <20180810154550.5020-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+To: axboe@kernel.dk,
+	linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Shenghui Wang <shhuiw@foxmail.com>,
+	Coly Li <colyli@suse.de>
+Subject: [PATCH 09/10] bcache: make the pr_err statement used for ENOENT only in sysfs_attatch section
+Date: Thu,  9 Aug 2018 15:48:50 +0800
+Message-Id: <20180809074851.11027-10-colyli@suse.de>
+In-Reply-To: <20180809074851.11027-1-colyli@suse.de>
+References: <20180809074851.11027-1-colyli@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Commit ea8c5356d390 ("bcache: set max writeback rate when I/O request
-is idle") changes struct bch_ratelimit member rate from uint32_t to
-atomic_long_t and uses atomic_long_set() in drivers/md/bcache/sysfs.c
-to set new writeback rate, after the input is converted from memory
-buf to long int by sysfs_strtoul_clamp().
+From: Shenghui Wang <shhuiw@foxmail.com>
 
-The above change has a problem because there is an implicit return
-inside sysfs_strtoul_clamp() so the following atomic_long_set()
-won't be called. This error is detected by 0day system with following
-snipped smatch warnings:
+The pr_err statement in the code for sysfs_attatch section would run
+for various error codes, which maybe confusing.
 
-drivers/md/bcache/sysfs.c:271 __cached_dev_store() error: uninitialized
-symbol 'v'.
-270  sysfs_strtoul_clamp(writeback_rate, v, 1, INT_MAX);
-     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-@271 atomic_long_set(&dc->writeback_rate.rate, v);
+E.g,
 
-This patch fixes the above error by using strtoul_safe_clamp() to
-convert the input buffer into a long int type result.
+Run the command twice:
+   echo 796b5c05-b03c-4bc7-9cbd-a8df5e8be891 > \
+				/sys/block/bcache0/bcache/attach
+   [the backing dev got attached on the first run]
+   echo 796b5c05-b03c-4bc7-9cbd-a8df5e8be891 > \
+				/sys/block/bcache0/bcache/attach
 
-Fixes: Commit ea8c5356d390 ("bcache: set max writeback rate when I/O request is idle")
+In dmesg, after the command run twice, we can get:
+	bcache: bch_cached_dev_attach() Can't attach sda6: already attached
+	bcache: __cached_dev_store() Can't attach 796b5c05-b03c-4bc7-9cbd-\
+a8df5e8be891
+               : cache set not found
+The first statement in the message was right, but the second was
+confusing.
+
+bch_cached_dev_attach has various pr_ statements for various error
+codes, except ENOENT.
+
+After the change, rerun above command twice:
+	echo 796b5c05-b03c-4bc7-9cbd-a8df5e8be891 > \
+			/sys/block/bcache0/bcache/attach
+	echo 796b5c05-b03c-4bc7-9cbd-a8df5e8be891 > \
+			/sys/block/bcache0/bcache/attach
+
+In dmesg we only got:
+	bcache: bch_cached_dev_attach() Can't attach sda6: already attached
+No confusing "cache set not found" message anymore.
+
+And for some not exist SET-UUID:
+	echo 796b5c05-b03c-4bc7-9cbd-a8df5e8be898 > \
+			/sys/block/bcache0/bcache/attach
+In dmesg we can get:
+	bcache: __cached_dev_store() Can't attach 796b5c05-b03c-4bc7-9cbd-\
+a8df5e8be898
+	               : cache set not found
+
+Signed-off-by: Shenghui Wang <shhuiw@foxmail.com>
 Signed-off-by: Coly Li <colyli@suse.de>
-Cc: stable@vger.kernel.org #4.16+
-Cc: Kai Krakow <kai@kaishome.de>
-Cc: Stefan Priebe <s.priebe@profihost.ag>
 ---
- drivers/md/bcache/sysfs.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ drivers/md/bcache/sysfs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index 543b06408321..150cf4f4cf74 100644
+index 6e88142514fb..22f8565d2bf1 100644
 --- a/drivers/md/bcache/sysfs.c
 +++ b/drivers/md/bcache/sysfs.c
-@@ -267,10 +267,17 @@ STORE(__cached_dev)
- 	sysfs_strtoul_clamp(writeback_percent, dc->writeback_percent, 0, 40);
- 
- 	if (attr == &sysfs_writeback_rate) {
--		int v;
-+		ssize_t ret;
-+		long int v = atomic_long_read(&dc->writeback_rate.rate);
-+
-+		ret = strtoul_safe_clamp(buf, v, 1, INT_MAX);
- 
--		sysfs_strtoul_clamp(writeback_rate, v, 1, INT_MAX);
--		atomic_long_set(&dc->writeback_rate.rate, v);
-+		if (!ret) {
-+			atomic_long_set(&dc->writeback_rate.rate, v);
-+			ret = size;
-+		}
-+
-+		return ret;
+@@ -351,8 +351,8 @@ STORE(__cached_dev)
+ 			if (!v)
+ 				return size;
+ 		}
+-
+-		pr_err("Can't attach %s: cache set not found", buf);
++		if (v == -ENOENT)
++			pr_err("Can't attach %s: cache set not found", buf);
+ 		return v;
  	}
  
- 	sysfs_strtoul_clamp(writeback_rate_update_seconds,
 -- 
 2.18.0
