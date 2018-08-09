@@ -1,51 +1,28 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: axboe@kernel.dk,
-	linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH v3 09/17] bcache: fix typo 'succesfully' to 'successfully'
-Date: Sat, 11 Aug 2018 13:19:52 +0800
-Message-Id: <20180811052000.103680-10-colyli@suse.de>
-In-Reply-To: <20180811052000.103680-1-colyli@suse.de>
-References: <20180811052000.103680-1-colyli@suse.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v5 0/3] Ensure that a request queue is dissociated from
+ the cgroup controller
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+References: <20180809145338.6160-1-bart.vanassche@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <9aaf1e67-c01f-8b0a-f312-6a216681f460@kernel.dk>
+Date: Thu, 9 Aug 2018 09:13:28 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180809145338.6160-1-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This patch fixes typo 'succesfully' to correct 'successfully', which is
-suggested by checkpatch.pl.
+On 8/9/18 8:53 AM, Bart Van Assche wrote:
+> Hello Jens,
+> 
+> Several block drivers call alloc_disk() followed by put_disk() if something
+> fails before device_add_disk() is called without calling blk_cleanup_queue().
+> Make sure that also for this scenario a request queue is dissociated from the
+> cgroup controller. This patch avoids that loading the parport_pc, paride and
+> pf drivers trigger a kernel crash. Since this patch series fixes a regression,
+> please consider these patches for kernel v4.19.
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
----
- drivers/md/bcache/io.c      | 2 +-
- drivers/md/bcache/request.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Thanks, applied for 4.19.
 
-diff --git a/drivers/md/bcache/io.c b/drivers/md/bcache/io.c
-index cfc56add799a..c25097968319 100644
---- a/drivers/md/bcache/io.c
-+++ b/drivers/md/bcache/io.c
-@@ -86,7 +86,7 @@ void bch_count_io_errors(struct cache *ca,
- 
- 			/*
- 			 * First we subtract refresh from count; each time we
--			 * succesfully do so, we rescale the errors once:
-+			 * successfully do so, we rescale the errors once:
- 			 */
- 
- 			count = atomic_cmpxchg(&ca->io_count, old, new);
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 858dd3da9dc5..55264e71369d 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -154,7 +154,7 @@ static void bch_data_insert_error(struct closure *cl)
- 
- 	/*
- 	 * Our data write just errored, which means we've got a bunch of keys to
--	 * insert that point to data that wasn't succesfully written.
-+	 * insert that point to data that wasn't successfully written.
- 	 *
- 	 * We don't have to insert those keys but we still have to invalidate
- 	 * that region of the cache - so, if we just strip off all the pointers
 -- 
-2.18.0
+Jens Axboe
