@@ -1,107 +1,86 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:55108 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732399AbeHIRTL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Aug 2018 13:19:11 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <keith.busch@intel.com>,
-	Bart van Assche <bart.vanassche@wdc.com>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>,
-	"Ed L . Cachin" <ed.cashin@acm.org>
-Subject: [PATCH 3/5] aoe: use device_add_disk_with_groups()
-Date: Tue, 14 Aug 2018 09:33:03 +0200
-Message-Id: <20180814073305.87255-4-hare@suse.de>
-In-Reply-To: <20180814073305.87255-1-hare@suse.de>
-References: <20180814073305.87255-1-hare@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@redhat.com>,
+        Alexandru Moise <00moses.alexander00@gmail.com>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>, stable@vger.kernel.org
+Subject: [PATCH v5 3/3] block: Ensure that a request queue is dissociated from the cgroup controller
+Date: Thu,  9 Aug 2018 07:53:38 -0700
+Message-Id: <20180809145338.6160-4-bart.vanassche@wdc.com>
+In-Reply-To: <20180809145338.6160-1-bart.vanassche@wdc.com>
+References: <20180809145338.6160-1-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Use device_add_disk_with_groups() to avoid a race condition with
-udev during startup.
+Several block drivers call alloc_disk() followed by put_disk() if
+something fails before device_add_disk() is called without calling
+blk_cleanup_queue(). Make sure that also for this scenario a request
+queue is dissociated from the cgroup controller. This patch avoids
+that loading the parport_pc, paride and pf drivers triggers the
+following kernel crash:
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Ed L. Cachin <ed.cashin@acm.org>
+BUG: KASAN: null-ptr-deref in pi_init+0x42e/0x580 [paride]
+Read of size 4 at addr 0000000000000008 by task modprobe/744
+Call Trace:
+dump_stack+0x9a/0xeb
+kasan_report+0x139/0x350
+pi_init+0x42e/0x580 [paride]
+pf_init+0x2bb/0x1000 [pf]
+do_one_initcall+0x8e/0x405
+do_init_module+0xd9/0x2f2
+load_module+0x3ab4/0x4700
+SYSC_finit_module+0x176/0x1a0
+do_syscall_64+0xee/0x2b0
+entry_SYSCALL_64_after_hwframe+0x42/0xb7
+
+Reported-by: Alexandru Moise <00moses.alexander00@gmail.com>
+Fixes: a063057d7c73 ("block: Fix a race between request queue removal and the block cgroup controller") # v4.17
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Tested-by: Alexandru Moise <00moses.alexander00@gmail.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Alexandru Moise <00moses.alexander00@gmail.com>
+Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
+Cc: <stable@vger.kernel.org>
 ---
- drivers/block/aoe/aoe.h    |  1 -
- drivers/block/aoe/aoeblk.c | 21 +++++++--------------
- drivers/block/aoe/aoedev.c |  1 -
- 3 files changed, 7 insertions(+), 16 deletions(-)
+ block/blk-sysfs.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/drivers/block/aoe/aoe.h b/drivers/block/aoe/aoe.h
-index c0ebda1283cc..015c68017a1c 100644
---- a/drivers/block/aoe/aoe.h
-+++ b/drivers/block/aoe/aoe.h
-@@ -201,7 +201,6 @@ int aoeblk_init(void);
- void aoeblk_exit(void);
- void aoeblk_gdalloc(void *);
- void aoedisk_rm_debugfs(struct aoedev *d);
--void aoedisk_rm_sysfs(struct aoedev *d);
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index ca1984ecbdeb..fcadea471779 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -802,6 +802,21 @@ static void __blk_release_queue(struct work_struct *work)
+ 		blk_stat_remove_callback(q, q->poll_cb);
+ 	blk_stat_free_callback(q->poll_cb);
  
- int aoechr_init(void);
- void aoechr_exit(void);
-diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
-index 429ebb84b592..ff770e7d9e52 100644
---- a/drivers/block/aoe/aoeblk.c
-+++ b/drivers/block/aoe/aoeblk.c
-@@ -177,10 +177,15 @@ static struct attribute *aoe_attrs[] = {
- 	NULL,
- };
- 
--static const struct attribute_group attr_group = {
-+static const struct attribute_group aoe_attr_group = {
- 	.attrs = aoe_attrs,
- };
- 
-+static const struct attribute_group *aoe_attr_groups[] = {
-+	&aoe_attr_group,
-+	NULL,
-+};
++	if (!blk_queue_dead(q)) {
++		/*
++		 * Last reference was dropped without having called
++		 * blk_cleanup_queue().
++		 */
++		WARN_ONCE(blk_queue_init_done(q),
++			  "request queue %p has been registered but blk_cleanup_queue() has not been called for that queue\n",
++			  q);
++		blk_exit_queue(q);
++	}
 +
- static const struct file_operations aoe_debugfs_fops = {
- 	.open = aoe_debugfs_open,
- 	.read = seq_read,
-@@ -220,17 +225,6 @@ aoedisk_rm_debugfs(struct aoedev *d)
- }
++	WARN(blkg_root_lookup(q),
++	     "request queue %p is being released but it has not yet been removed from the blkcg controller\n",
++	     q);
++
+ 	blk_free_queue_stats(q->stats);
  
- static int
--aoedisk_add_sysfs(struct aoedev *d)
--{
--	return sysfs_create_group(&disk_to_dev(d->gd)->kobj, &attr_group);
--}
--void
--aoedisk_rm_sysfs(struct aoedev *d)
--{
--	sysfs_remove_group(&disk_to_dev(d->gd)->kobj, &attr_group);
--}
--
--static int
- aoeblk_open(struct block_device *bdev, fmode_t mode)
- {
- 	struct aoedev *d = bdev->bd_disk->private_data;
-@@ -417,8 +411,7 @@ aoeblk_gdalloc(void *vp)
- 
- 	spin_unlock_irqrestore(&d->lock, flags);
- 
--	add_disk(gd);
--	aoedisk_add_sysfs(d);
-+	device_add_disk(NULL, gd, aoe_attr_groups);
- 	aoedisk_add_debugfs(d);
- 
- 	spin_lock_irqsave(&d->lock, flags);
-diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
-index 697f735b07a4..d92fa1fe3580 100644
---- a/drivers/block/aoe/aoedev.c
-+++ b/drivers/block/aoe/aoedev.c
-@@ -275,7 +275,6 @@ freedev(struct aoedev *d)
- 	del_timer_sync(&d->timer);
- 	if (d->gd) {
- 		aoedisk_rm_debugfs(d);
--		aoedisk_rm_sysfs(d);
- 		del_gendisk(d->gd);
- 		put_disk(d->gd);
- 		blk_cleanup_queue(d->blkq);
+ 	blk_exit_rl(q, &q->root_rl);
 -- 
-2.12.3
+2.18.0
