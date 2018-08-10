@@ -1,16 +1,17 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:57834 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:44910 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727771AbeHJScf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Aug 2018 14:32:35 -0400
+        id S1727501AbeHJJyB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 05:54:01 -0400
 From: Coly Li <colyli@suse.de>
 To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v3 11/17] bcache: do not check NULL pointer before calling kmem_cache_destroy
-Date: Sat, 11 Aug 2018 00:00:41 +0800
-Message-Id: <20180810160047.5363-12-colyli@suse.de>
-In-Reply-To: <20180810160047.5363-1-colyli@suse.de>
-References: <20180810160047.5363-1-colyli@suse.de>
+Cc: linux-block@vger.kernel.org, shhuiw@foxmail.com,
+        Coly Li <colyli@suse.de>
+Subject: [PATCH v2 11/17] bcache: do not check NULL pointer before calling kmem_cache_destroy
+Date: Fri, 10 Aug 2018 15:23:51 +0800
+Message-Id: <20180810072357.19823-12-colyli@suse.de>
+In-Reply-To: <20180810072357.19823-1-colyli@suse.de>
+References: <20180810072357.19823-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
@@ -19,7 +20,7 @@ checking is unncessary. This patch just removes the NULL pointer checking
 to make code simpler.
 
 Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
+Cc: Shenghui Wang <shhuiw@foxmail.com>
 ---
  drivers/md/bcache/request.c | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
