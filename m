@@ -1,51 +1,48 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:44434 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727207AbeHaRmU (ORCPT
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:40616 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726774AbeHKCD2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Aug 2018 13:42:20 -0400
-Received: by mail-ed1-f65.google.com with SMTP id s10-v6so9042330edb.11
-        for <linux-block@vger.kernel.org>; Fri, 31 Aug 2018 06:34:48 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 3/4] lightnvm: pblk: add helper for printing chunk state
-Date: Fri, 31 Aug 2018 15:34:36 +0200
-Message-Id: <1535722477-31288-4-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1535722477-31288-1-git-send-email-javier@cnexlabs.com>
-References: <1535722477-31288-1-git-send-email-javier@cnexlabs.com>
+        Fri, 10 Aug 2018 22:03:28 -0400
+Received: by mail-pg1-f193.google.com with SMTP id x5-v6so5044322pgp.7
+        for <linux-block@vger.kernel.org>; Fri, 10 Aug 2018 16:31:28 -0700 (PDT)
+Date: Fri, 10 Aug 2018 16:31:26 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@fb.com>,
+        kernel-team@fb.com
+Subject: Re: [RFC PATCH 1/5] block: move call of scheduler's
+ ->completed_request() hook
+Message-ID: <20180810233126.GB9835@vader>
+References: <cover.1533846185.git.osandov@fb.com>
+ <dc018874d79575db91e3ec44c09511720e2b0ab0.1533846185.git.osandov@fb.com>
+ <97b406d3-ae02-9f27-6855-59e5b13d665b@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <97b406d3-ae02-9f27-6855-59e5b13d665b@oracle.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Implement pblk helper for printing chunk state.
+On Fri, Aug 10, 2018 at 10:59:37AM +0800, jianchao.wang wrote:
+> Hi Omar
+> 
+> On 08/10/2018 04:26 AM, Omar Sandoval wrote:
+> > @@ -524,6 +524,9 @@ inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
+> >  		blk_stat_add(rq, now);
+> >  	}
+> >  
+> > +	if (rq->internal_tag != -1)
+> > +		blk_mq_sched_completed_request(rq, now);
+> > +
+> 
+> Is it OK to move the io scheduler completed callback into __blk_mq_end_request ?
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+It's ok in the sense that only Kyber uses it.
 
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index bc852bb9e3f0..5c35dcd57395 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -1239,6 +1239,15 @@ static inline int pblk_io_aligned(struct pblk *pblk, int nr_secs)
- 	return !(nr_secs % pblk->min_write_pgs);
- }
- 
-+static inline void print_chunk(struct pblk *pblk, struct nvm_chk_meta *chk,
-+			       char *msg, int error)
-+{
-+	pblk_err(pblk, "chunk: (%s: %x) s:%d,t:%d,wi:%d,slba:%llu,cnlb:%llu,wp:%llu\n",
-+			msg, error,
-+			chk->state, chk->type, chk->wi,
-+			chk->slba, chk->cnlb, chk->wp);
-+}
-+
- #ifdef CONFIG_NVM_PBLK_DEBUG
- static inline void print_ppa(struct pblk *pblk, struct ppa_addr *p,
- 			     char *msg, int error)
--- 
-2.7.4
+> There is a relatively long distance between the __blk_mq_complete_request and __blk_mq_end_request,
+> especially the driver's mq_ops.complete and the bio_endio.
+
+That's a fair point. We could maybe consolidate all of the I/O time
+measurements to __blk_mq_complete_request() and have a separate callback
+for the total time measurement in __blk_mq_end_request(), but I'm not
+sure it's worth adding another hook for that.
