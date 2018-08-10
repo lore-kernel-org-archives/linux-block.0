@@ -1,16 +1,17 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:57718 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:44788 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727977AbeHJScI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Aug 2018 14:32:08 -0400
+        id S1727574AbeHJJx3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 05:53:29 -0400
 From: Coly Li <colyli@suse.de>
 To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v3 06/17] bcache: replace printk() by pr_*() routines
-Date: Sat, 11 Aug 2018 00:00:36 +0800
-Message-Id: <20180810160047.5363-7-colyli@suse.de>
-In-Reply-To: <20180810160047.5363-1-colyli@suse.de>
-References: <20180810160047.5363-1-colyli@suse.de>
+Cc: linux-block@vger.kernel.org, shhuiw@foxmail.com,
+        Coly Li <colyli@suse.de>
+Subject: [PATCH v2 06/17] bcache: replace printk() by pr_*() routines
+Date: Fri, 10 Aug 2018 15:23:46 +0800
+Message-Id: <20180810072357.19823-7-colyli@suse.de>
+In-Reply-To: <20180810072357.19823-1-colyli@suse.de>
+References: <20180810072357.19823-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
@@ -22,7 +23,7 @@ This patch replaces all printk() with a proper pr_*() routine for
 bcache code.
 
 Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
+Cc: Shenghui Wang <shhuiw@foxmail.com>
 ---
  drivers/md/bcache/bset.c    |  8 ++++----
  drivers/md/bcache/debug.c   | 10 +++++-----
@@ -131,7 +132,7 @@ index cb3b2c613ed6..c809724e6571 100644
  
  /* Btree ptrs */
 diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 296fc8c31c6c..2a7be104557e 100644
+index fb4d885e4093..951776e8cd8b 100644
 --- a/drivers/md/bcache/super.c
 +++ b/drivers/md/bcache/super.c
 @@ -1472,13 +1472,13 @@ bool bch_cache_set_error(struct cache_set *c, const char *fmt, ...)
