@@ -1,16 +1,17 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:57692 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:44718 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728267AbeHJSb6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Aug 2018 14:31:58 -0400
+        id S1727607AbeHJJxR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 05:53:17 -0400
 From: Coly Li <colyli@suse.de>
 To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v3 04/17] bcache: style fixes for lines over 80 characters
-Date: Sat, 11 Aug 2018 00:00:34 +0800
-Message-Id: <20180810160047.5363-5-colyli@suse.de>
-In-Reply-To: <20180810160047.5363-1-colyli@suse.de>
-References: <20180810160047.5363-1-colyli@suse.de>
+Cc: linux-block@vger.kernel.org, shhuiw@foxmail.com,
+        Coly Li <colyli@suse.de>
+Subject: [PATCH v2 04/17] bcache: style fixes for lines over 80 characters
+Date: Fri, 10 Aug 2018 15:23:44 +0800
+Message-Id: <20180810072357.19823-5-colyli@suse.de>
+In-Reply-To: <20180810072357.19823-1-colyli@suse.de>
+References: <20180810072357.19823-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
@@ -19,7 +20,7 @@ warnings by checkpatch.pl. There are still some lines exceed 80 characters,
 but it is better to be a single line and I don't change them.
 
 Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
+Cc: Shenghui Wang <shhuiw@foxmail.com>
 ---
  drivers/md/bcache/bcache.h    |  4 ++--
  drivers/md/bcache/bset.c      | 10 +++++++---
@@ -169,7 +170,7 @@ index 8f5de61e1a90..cb3b2c613ed6 100644
  	struct btree *b = container_of(bk, struct btree, keys);
  	unsigned int i;
 diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
-index a70126466fa8..6116bbf870d8 100644
+index 301cbb43a78f..c0cb8ff187c2 100644
 --- a/drivers/md/bcache/journal.c
 +++ b/drivers/md/bcache/journal.c
 @@ -193,7 +193,8 @@ int bch_journal_read(struct cache_set *c, struct list_head *list)
@@ -208,7 +209,7 @@ index d7e6ee3d7dd2..858dd3da9dc5 100644
  		s->iop.bio->bi_iter.bi_size = s->insert_bio_sectors << 9;
  		bch_bio_map(s->iop.bio, NULL);
 diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 6a80069650c7..296fc8c31c6c 100644
+index c11cf852715c..fb4d885e4093 100644
 --- a/drivers/md/bcache/super.c
 +++ b/drivers/md/bcache/super.c
 @@ -149,7 +149,8 @@ static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
