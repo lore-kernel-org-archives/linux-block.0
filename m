@@ -1,67 +1,133 @@
-Return-Path: <jgross@suse.com>
-From: Juergen Gross <jgross@suse.com>
-To: linux-kernel@vger.kernel.org,
-	xen-devel@lists.xenproject.org,
-	linux-block@vger.kernel.org
-Cc: konrad.wilk@oracle.com,
-	roger.pau@citrix.com,
-	axboe@kernel.dk,
-	boris.ostrovsky@oracle.com,
-	Juergen Gross <jgross@suse.com>
-Subject: [PATCH v3 3/5] xen/blkfront: reorder tests in xlblk_init()
-Date: Mon, 13 Aug 2018 16:01:12 +0200
-Message-Id: <20180813140114.20126-4-jgross@suse.com>
-In-Reply-To: <20180813140114.20126-1-jgross@suse.com>
-References: <20180813140114.20126-1-jgross@suse.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:57844 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728635AbeHJScl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 14:32:41 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH v3 12/17] bcache: fix code comments style
+Date: Sat, 11 Aug 2018 00:00:42 +0800
+Message-Id: <20180810160047.5363-13-colyli@suse.de>
+In-Reply-To: <20180810160047.5363-1-colyli@suse.de>
+References: <20180810160047.5363-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-In case we don't want pv block devices we should not test parameters
-for sanity and eventually print out error messages. So test precluding
-conditions before checking parameters.
+This patch fixes 3 style issues warned by checkpatch.pl,
+- Comment lines are not aligned
+- Comments use "/*" on subsequent lines
+- Comment lines use a trailing "*/"
 
-Signed-off-by: Juergen Gross <jgross@suse.com>
-Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
 ---
- drivers/block/xen-blkfront.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ drivers/md/bcache/bset.c      |  9 ++++++---
+ drivers/md/bcache/super.c     | 22 +++++++++++++---------
+ drivers/md/bcache/writeback.c |  3 ++-
+ 3 files changed, 21 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 7c4b1b9d3971..36e4ca41e765 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -2713,6 +2713,15 @@ static int __init xlblk_init(void)
- 	if (!xen_domain())
- 		return -ENODEV;
+diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
+index b6a3f9d291a9..8f07fa6e1739 100644
+--- a/drivers/md/bcache/bset.c
++++ b/drivers/md/bcache/bset.c
+@@ -402,7 +402,8 @@ static unsigned int inorder_prev(unsigned int j, unsigned int size)
+ 	return j;
+ }
  
-+	if (!xen_has_pv_disk_devices())
-+		return -ENODEV;
-+
-+	if (register_blkdev(XENVBD_MAJOR, DEV_NAME)) {
-+		pr_warn("xen_blk: can't get major %d with name %s\n",
-+			XENVBD_MAJOR, DEV_NAME);
-+		return -ENODEV;
-+	}
-+
- 	if (xen_blkif_max_segments < BLKIF_MAX_SEGMENTS_PER_REQUEST)
- 		xen_blkif_max_segments = BLKIF_MAX_SEGMENTS_PER_REQUEST;
+-/* I have no idea why this code works... and I'm the one who wrote it
++/*
++ * I have no idea why this code works... and I'm the one who wrote it
+  *
+  * However, I do know what it does:
+  * Given a binary tree constructed in an array (i.e. how you normally implement
+@@ -795,7 +796,8 @@ static void bch_bset_fix_lookup_table(struct btree_keys *b,
+ 	if (!t->size)
+ 		return;
  
-@@ -2728,15 +2737,6 @@ static int __init xlblk_init(void)
- 		xen_blkif_max_queues = nr_cpus;
+-	/* k is the key we just inserted; we need to find the entry in the
++	/*
++	 * k is the key we just inserted; we need to find the entry in the
+ 	 * lookup table for the first key that is strictly greater than k:
+ 	 * it's either k's cacheline or the next one
+ 	 */
+@@ -803,7 +805,8 @@ static void bch_bset_fix_lookup_table(struct btree_keys *b,
+ 	       table_to_bkey(t, j) <= k)
+ 		j++;
+ 
+-	/* Adjust all the lookup table entries, and find a new key for any that
++	/*
++	 * Adjust all the lookup table entries, and find a new key for any that
+ 	 * have gotten too big
+ 	 */
+ 	for (; j < t->size; j++) {
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 2a7be104557e..01fc3c015a58 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -465,8 +465,8 @@ static struct uuid_entry *uuid_find_empty(struct cache_set *c)
+  * Bucket priorities/gens:
+  *
+  * For each bucket, we store on disk its
+-   * 8 bit gen
+-   * 16 bit priority
++ *   8 bit gen
++ *  16 bit priority
+  *
+  * See alloc.c for an explanation of the gen. The priority is used to implement
+  * lru (and in the future other) cache replacement policies; for most purposes
+@@ -934,8 +934,10 @@ void bch_cached_dev_run(struct cached_dev *dc)
+ 
+ 	add_disk(d->disk);
+ 	bd_link_disk_holder(dc->bdev, dc->disk.disk);
+-	/* won't show up in the uevent file, use udevadm monitor -e instead
+-	 * only class / kset properties are persistent */
++	/*
++	 * won't show up in the uevent file, use udevadm monitor -e instead
++	 * only class / kset properties are persistent
++	 */
+ 	kobject_uevent_env(&disk_to_dev(d->disk)->kobj, KOBJ_CHANGE, env);
+ 	kfree(env[1]);
+ 	kfree(env[2]);
+@@ -1104,8 +1106,9 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
+ 		}
  	}
  
--	if (!xen_has_pv_disk_devices())
--		return -ENODEV;
--
--	if (register_blkdev(XENVBD_MAJOR, DEV_NAME)) {
--		printk(KERN_WARNING "xen_blk: can't get major %d with name %s\n",
--		       XENVBD_MAJOR, DEV_NAME);
--		return -ENODEV;
--	}
--
- 	INIT_DELAYED_WORK(&blkfront_work, blkfront_delay_work);
+-	/* Deadlocks since we're called via sysfs...
+-	sysfs_remove_file(&dc->kobj, &sysfs_attach);
++	/*
++	 * Deadlocks since we're called via sysfs...
++	 * sysfs_remove_file(&dc->kobj, &sysfs_attach);
+ 	 */
  
- 	ret = xenbus_register_frontend(&blkfront_driver);
+ 	if (bch_is_zero(u->uuid, 16)) {
+@@ -1468,9 +1471,10 @@ bool bch_cache_set_error(struct cache_set *c, const char *fmt, ...)
+ 	if (test_and_set_bit(CACHE_SET_IO_DISABLE, &c->flags))
+ 		pr_info("CACHE_SET_IO_DISABLE already set");
+ 
+-	/* XXX: we can be called from atomic context
+-	acquire_console_sem();
+-	*/
++	/*
++	 * XXX: we can be called from atomic context
++	 * acquire_console_sem();
++	 */
+ 
+ 	pr_err("bcache: error on %pU: ", c->sb.set_uuid);
+ 
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index e40bf0e403e7..6be05bd7ca67 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -468,7 +468,8 @@ static void read_dirty(struct cached_dev *dc)
+ 
+ 			down(&dc->in_flight);
+ 
+-			/* We've acquired a semaphore for the maximum
++			/*
++			 * We've acquired a semaphore for the maximum
+ 			 * simultaneous number of writebacks; from here
+ 			 * everything happens asynchronously.
+ 			 */
 -- 
-2.13.7
+2.18.0
