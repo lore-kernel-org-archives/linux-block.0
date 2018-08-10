@@ -1,147 +1,59 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <keith.busch@intel.com>,
-	Bart van Assche <bart.vanassche@wdc.com>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 5/5] virtio-blk: modernize sysfs attribute creation
-Date: Tue, 14 Aug 2018 09:33:05 +0200
-Message-Id: <20180814073305.87255-6-hare@suse.de>
-In-Reply-To: <20180814073305.87255-1-hare@suse.de>
-References: <20180814073305.87255-1-hare@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:57818 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727771AbeHJSc3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 14:32:29 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH v3 10/17] bcache: prefer 'help' in Kconfig
+Date: Sat, 11 Aug 2018 00:00:40 +0800
+Message-Id: <20180810160047.5363-11-colyli@suse.de>
+In-Reply-To: <20180810160047.5363-1-colyli@suse.de>
+References: <20180810160047.5363-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Use new-style DEVICE_ATTR_RO/DEVICE_ATTR_RW to create the sysfs attributes
-and register the disk with default sysfs attribute groups.
+Current bcache Kconfig uses '---help---' as header of help information,
+for now 'help' is prefered. This patch fixes this style by replacing
+'---help---' by 'help' in bcache Kconfig file.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
 ---
- drivers/block/virtio_blk.c | 68 ++++++++++++++++++++++++++--------------------
- 1 file changed, 39 insertions(+), 29 deletions(-)
+ drivers/md/bcache/Kconfig | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index fe80560000a1..086c6bb12baa 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -351,8 +351,8 @@ static int minor_to_index(int minor)
- 	return minor >> PART_BITS;
- }
+diff --git a/drivers/md/bcache/Kconfig b/drivers/md/bcache/Kconfig
+index 17bf109c58e9..817b9fba50db 100644
+--- a/drivers/md/bcache/Kconfig
++++ b/drivers/md/bcache/Kconfig
+@@ -1,7 +1,7 @@
  
--static ssize_t virtblk_serial_show(struct device *dev,
--				struct device_attribute *attr, char *buf)
-+static ssize_t serial_show(struct device *dev,
-+			   struct device_attribute *attr, char *buf)
- {
- 	struct gendisk *disk = dev_to_disk(dev);
- 	int err;
-@@ -371,7 +371,7 @@ static ssize_t virtblk_serial_show(struct device *dev,
- 	return err;
- }
+ config BCACHE
+ 	tristate "Block device as cache"
+-	---help---
++	help
+ 	Allows a block device to be used as cache for other devices; uses
+ 	a btree for indexing and the layout is optimized for SSDs.
  
--static DEVICE_ATTR(serial, 0444, virtblk_serial_show, NULL);
-+static DEVICE_ATTR_RO(serial);
+@@ -10,7 +10,7 @@ config BCACHE
+ config BCACHE_DEBUG
+ 	bool "Bcache debugging"
+ 	depends on BCACHE
+-	---help---
++	help
+ 	Don't select this option unless you're a developer
  
- /* The queue's logical block size must be set before calling this */
- static void virtblk_update_capacity(struct virtio_blk *vblk, bool resize)
-@@ -545,8 +545,8 @@ static const char *const virtblk_cache_types[] = {
- };
- 
- static ssize_t
--virtblk_cache_type_store(struct device *dev, struct device_attribute *attr,
--			 const char *buf, size_t count)
-+cache_type_store(struct device *dev, struct device_attribute *attr,
-+		 const char *buf, size_t count)
- {
- 	struct gendisk *disk = dev_to_disk(dev);
- 	struct virtio_blk *vblk = disk->private_data;
-@@ -564,8 +564,7 @@ virtblk_cache_type_store(struct device *dev, struct device_attribute *attr,
- }
- 
- static ssize_t
--virtblk_cache_type_show(struct device *dev, struct device_attribute *attr,
--			 char *buf)
-+cache_type_show(struct device *dev, struct device_attribute *attr, char *buf)
- {
- 	struct gendisk *disk = dev_to_disk(dev);
- 	struct virtio_blk *vblk = disk->private_data;
-@@ -575,12 +574,38 @@ virtblk_cache_type_show(struct device *dev, struct device_attribute *attr,
- 	return snprintf(buf, 40, "%s\n", virtblk_cache_types[writeback]);
- }
- 
--static const struct device_attribute dev_attr_cache_type_ro =
--	__ATTR(cache_type, 0444,
--	       virtblk_cache_type_show, NULL);
--static const struct device_attribute dev_attr_cache_type_rw =
--	__ATTR(cache_type, 0644,
--	       virtblk_cache_type_show, virtblk_cache_type_store);
-+static DEVICE_ATTR_RW(cache_type);
-+
-+static struct attribute *virtblk_attrs[] = {
-+	&dev_attr_serial.attr,
-+	&dev_attr_cache_type.attr,
-+	NULL,
-+};
-+
-+static umode_t virtblk_attrs_are_visible(struct kobject *kobj,
-+		struct attribute *a, int n)
-+{
-+	struct device *dev = container_of(kobj, struct device, kobj);
-+	struct gendisk *disk = dev_to_disk(dev);
-+	struct virtio_blk *vblk = disk->private_data;
-+	struct virtio_device *vdev = vblk->vdev;
-+
-+	if (a == &dev_attr_cache_type.attr &&
-+	    !virtio_has_feature(vdev, VIRTIO_BLK_F_CONFIG_WCE))
-+		return S_IRUGO;
-+
-+	return a->mode;
-+}
-+
-+static const struct attribute_group virtblk_attr_group = {
-+	.attrs = virtblk_attrs,
-+	.is_visible = virtblk_attrs_are_visible,
-+};
-+
-+static const struct attribute_group *virtblk_attr_groups[] = {
-+	&virtblk_attr_group,
-+	NULL,
-+};
- 
- static int virtblk_init_request(struct blk_mq_tag_set *set, struct request *rq,
- 		unsigned int hctx_idx, unsigned int numa_node)
-@@ -780,24 +805,9 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	virtblk_update_capacity(vblk, false);
- 	virtio_device_ready(vdev);
- 
--	device_add_disk(&vdev->dev, vblk->disk, NULL);
--	err = device_create_file(disk_to_dev(vblk->disk), &dev_attr_serial);
--	if (err)
--		goto out_del_disk;
--
--	if (virtio_has_feature(vdev, VIRTIO_BLK_F_CONFIG_WCE))
--		err = device_create_file(disk_to_dev(vblk->disk),
--					 &dev_attr_cache_type_rw);
--	else
--		err = device_create_file(disk_to_dev(vblk->disk),
--					 &dev_attr_cache_type_ro);
--	if (err)
--		goto out_del_disk;
-+	device_add_disk(&vdev->dev, vblk->disk, virtblk_attr_groups);
- 	return 0;
- 
--out_del_disk:
--	del_gendisk(vblk->disk);
--	blk_cleanup_queue(vblk->disk->queue);
- out_free_tags:
- 	blk_mq_free_tag_set(&vblk->tag_set);
- out_put_disk:
+ 	Enables extra debugging tools, allows expensive runtime checks to be
+@@ -20,7 +20,7 @@ config BCACHE_CLOSURES_DEBUG
+ 	bool "Debug closures"
+ 	depends on BCACHE
+ 	select DEBUG_FS
+-	---help---
++	help
+ 	Keeps all active closures in a linked list and provides a debugfs
+ 	interface to list them, which makes it possible to see asynchronous
+ 	operations that get stuck.
 -- 
-2.12.3
+2.18.0
