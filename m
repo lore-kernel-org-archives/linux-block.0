@@ -1,59 +1,82 @@
-Return-Path: <colyli@suse.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:57548 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728267AbeHJSbZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 14:31:25 -0400
 From: Coly Li <colyli@suse.de>
-To: axboe@kernel.dk,
-	linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH v3 14/17] bcache: move open brace at end of function definitions to next line
-Date: Sat, 11 Aug 2018 13:19:57 +0800
-Message-Id: <20180811052000.103680-15-colyli@suse.de>
-In-Reply-To: <20180811052000.103680-1-colyli@suse.de>
-References: <20180811052000.103680-1-colyli@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH v3 00/17] fixes reported by checkpatch.pl
+Date: Sat, 11 Aug 2018 00:00:30 +0800
+Message-Id: <20180810160047.5363-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This is not a preferred style to place open brace '{' at the end of
-function definition, checkpatch.pl reports error for such coding
-style. This patch moves them into the start of the next new line.
+This series contains several minor fixes and code cleanup reported by
+scripts/checkpatch.pl. After this series, there are still a few warning
+from checkpatch.pl, but I think they are necessary to be the way they
+are and don't change them. For example, error message exceeds 80 chars
+line limit.
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
+Thanks in advance for any comment or review.
+
+Changelog:
+v3: Fix coments from Shenghui Wang.
+v2: Fix comments from Shenghui Wang.
+v1: Initial version
+
+Coly Li 
 ---
- drivers/md/bcache/super.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+Coly Li (17):
+  bcache: style fix to replace 'unsigned' by 'unsigned int'
+  bcache: style fix to add a blank line after declarations
+  bcache: add identifier names to arguments of function definitions
+  bcache: style fixes for lines over 80 characters
+  bcache: replace Symbolic permissions by octal permission numbers
+  bcache: replace printk() by pr_*() routines
+  bcache: fix indent by replacing blank by tabs
+  bcache: replace '%pF' by '%pS' in seq_printf()
+  bcache: fix typo 'succesfully' to 'successfully'
+  bcache: prefer 'help' in Kconfig
+  bcache: do not check NULL pointer before calling kmem_cache_destroy
+  bcache: fix code comments style
+  bcache: add static const prefix to char * array declarations
+  bcache: move open brace at end of function definitions to next line
+  bcache: add missing SPDX header
+  bcache: remove unnecessary space before ioctl function pointer
+    arguments
+  bcache: add the missing comments for smp_mb()/smp_wmb()
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 01fc3c015a58..e3ecf08a10fc 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -2152,7 +2152,8 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
- kobj_attribute_write(register,		register_bcache);
- kobj_attribute_write(register_quiet,	register_bcache);
- 
--static bool bch_is_open_backing(struct block_device *bdev) {
-+static bool bch_is_open_backing(struct block_device *bdev)
-+{
- 	struct cache_set *c, *tc;
- 	struct cached_dev *dc, *t;
- 
-@@ -2166,7 +2167,8 @@ static bool bch_is_open_backing(struct block_device *bdev) {
- 	return false;
- }
- 
--static bool bch_is_open_cache(struct block_device *bdev) {
-+static bool bch_is_open_cache(struct block_device *bdev)
-+{
- 	struct cache_set *c, *tc;
- 	struct cache *ca;
- 	unsigned int i;
-@@ -2178,7 +2180,8 @@ static bool bch_is_open_cache(struct block_device *bdev) {
- 	return false;
- }
- 
--static bool bch_is_open(struct block_device *bdev) {
-+static bool bch_is_open(struct block_device *bdev)
-+{
- 	return bch_is_open_cache(bdev) || bch_is_open_backing(bdev);
- }
- 
+ drivers/md/bcache/Kconfig     |   6 +-
+ drivers/md/bcache/alloc.c     |  39 ++++---
+ drivers/md/bcache/bcache.h    | 210 +++++++++++++++++-----------------
+ drivers/md/bcache/bset.c      | 142 +++++++++++++----------
+ drivers/md/bcache/bset.h      | 146 ++++++++++++-----------
+ drivers/md/bcache/btree.c     |  72 +++++++-----
+ drivers/md/bcache/btree.h     |  86 +++++++-------
+ drivers/md/bcache/closure.c   |   6 +-
+ drivers/md/bcache/closure.h   |   6 +-
+ drivers/md/bcache/debug.c     |  23 ++--
+ drivers/md/bcache/debug.h     |   6 +-
+ drivers/md/bcache/extents.c   |  37 +++---
+ drivers/md/bcache/extents.h   |   6 +-
+ drivers/md/bcache/io.c        |  24 ++--
+ drivers/md/bcache/journal.c   |  27 +++--
+ drivers/md/bcache/journal.h   |  28 ++---
+ drivers/md/bcache/movinggc.c  |  14 ++-
+ drivers/md/bcache/request.c   |  61 +++++-----
+ drivers/md/bcache/request.h   |  18 +--
+ drivers/md/bcache/stats.c     |  15 ++-
+ drivers/md/bcache/stats.h     |  15 ++-
+ drivers/md/bcache/super.c     | 107 ++++++++++-------
+ drivers/md/bcache/sysfs.c     |  36 +++---
+ drivers/md/bcache/sysfs.h     |   6 +-
+ drivers/md/bcache/util.c      |   2 +
+ drivers/md/bcache/util.h      |  24 ++--
+ drivers/md/bcache/writeback.c |  30 +++--
+ drivers/md/bcache/writeback.h |  19 +--
+ include/uapi/linux/bcache.h   |   8 +-
+ 29 files changed, 679 insertions(+), 540 deletions(-)
+
 -- 
 2.18.0
