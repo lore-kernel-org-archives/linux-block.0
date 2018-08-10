@@ -1,86 +1,64 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:55108 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732399AbeHIRTL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Aug 2018 13:19:11 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@redhat.com>,
-        Alexandru Moise <00moses.alexander00@gmail.com>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>, stable@vger.kernel.org
-Subject: [PATCH v5 3/3] block: Ensure that a request queue is dissociated from the cgroup controller
-Date: Thu,  9 Aug 2018 07:53:38 -0700
-Message-Id: <20180809145338.6160-4-bart.vanassche@wdc.com>
-In-Reply-To: <20180809145338.6160-1-bart.vanassche@wdc.com>
-References: <20180809145338.6160-1-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from mx2.suse.de ([195.135.220.15]:57708 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728267AbeHJScC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 14:32:02 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH v3 05/17] bcache: replace Symbolic permissions by octal permission numbers
+Date: Sat, 11 Aug 2018 00:00:35 +0800
+Message-Id: <20180810160047.5363-6-colyli@suse.de>
+In-Reply-To: <20180810160047.5363-1-colyli@suse.de>
+References: <20180810160047.5363-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Several block drivers call alloc_disk() followed by put_disk() if
-something fails before device_add_disk() is called without calling
-blk_cleanup_queue(). Make sure that also for this scenario a request
-queue is dissociated from the cgroup controller. This patch avoids
-that loading the parport_pc, paride and pf drivers triggers the
-following kernel crash:
+Symbolic permission names are used in bcache, for now octal permission
+numbers are encouraged to use for readability. This patch replaces
+all symbolic permissions by octal permission numbers.
 
-BUG: KASAN: null-ptr-deref in pi_init+0x42e/0x580 [paride]
-Read of size 4 at addr 0000000000000008 by task modprobe/744
-Call Trace:
-dump_stack+0x9a/0xeb
-kasan_report+0x139/0x350
-pi_init+0x42e/0x580 [paride]
-pf_init+0x2bb/0x1000 [pf]
-do_one_initcall+0x8e/0x405
-do_init_module+0xd9/0x2f2
-load_module+0x3ab4/0x4700
-SYSC_finit_module+0x176/0x1a0
-do_syscall_64+0xee/0x2b0
-entry_SYSCALL_64_after_hwframe+0x42/0xb7
-
-Reported-by: Alexandru Moise <00moses.alexander00@gmail.com>
-Fixes: a063057d7c73 ("block: Fix a race between request queue removal and the block cgroup controller") # v4.17
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Tested-by: Alexandru Moise <00moses.alexander00@gmail.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Alexandru Moise <00moses.alexander00@gmail.com>
-Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
-Cc: <stable@vger.kernel.org>
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
 ---
- block/blk-sysfs.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ drivers/md/bcache/bcache.h | 4 ++--
+ drivers/md/bcache/sysfs.h  | 6 +++---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index ca1984ecbdeb..fcadea471779 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -802,6 +802,21 @@ static void __blk_release_queue(struct work_struct *work)
- 		blk_stat_remove_callback(q, q->poll_cb);
- 	blk_stat_free_callback(q->poll_cb);
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 031a75a25d3e..66e6d5639b38 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -881,11 +881,11 @@ static inline uint8_t bucket_gc_gen(struct bucket *b)
+ #define BUCKET_GC_GEN_MAX	96U
  
-+	if (!blk_queue_dead(q)) {
-+		/*
-+		 * Last reference was dropped without having called
-+		 * blk_cleanup_queue().
-+		 */
-+		WARN_ONCE(blk_queue_init_done(q),
-+			  "request queue %p has been registered but blk_cleanup_queue() has not been called for that queue\n",
-+			  q);
-+		blk_exit_queue(q);
-+	}
-+
-+	WARN(blkg_root_lookup(q),
-+	     "request queue %p is being released but it has not yet been removed from the blkcg controller\n",
-+	     q);
-+
- 	blk_free_queue_stats(q->stats);
+ #define kobj_attribute_write(n, fn)					\
+-	static struct kobj_attribute ksysfs_##n = __ATTR(n, S_IWUSR, NULL, fn)
++	static struct kobj_attribute ksysfs_##n = __ATTR(n, 0200, NULL, fn)
  
- 	blk_exit_rl(q, &q->root_rl);
+ #define kobj_attribute_rw(n, show, store)				\
+ 	static struct kobj_attribute ksysfs_##n =			\
+-		__ATTR(n, S_IWUSR|S_IRUSR, show, store)
++		__ATTR(n, 0600, show, store)
+ 
+ static inline void wake_up_allocators(struct cache_set *c)
+ {
+diff --git a/drivers/md/bcache/sysfs.h b/drivers/md/bcache/sysfs.h
+index b54fe9602529..3fe82425859c 100644
+--- a/drivers/md/bcache/sysfs.h
++++ b/drivers/md/bcache/sysfs.h
+@@ -44,9 +44,9 @@ STORE(fn)								\
+ 	static struct attribute sysfs_##_name =				\
+ 		{ .name = #_name, .mode = _mode }
+ 
+-#define write_attribute(n)	__sysfs_attribute(n, S_IWUSR)
+-#define read_attribute(n)	__sysfs_attribute(n, S_IRUGO)
+-#define rw_attribute(n)		__sysfs_attribute(n, S_IRUGO|S_IWUSR)
++#define write_attribute(n)	__sysfs_attribute(n, 0200)
++#define read_attribute(n)	__sysfs_attribute(n, 0444)
++#define rw_attribute(n)		__sysfs_attribute(n, 0644)
+ 
+ #define sysfs_printf(file, fmt, ...)					\
+ do {									\
 -- 
 2.18.0
