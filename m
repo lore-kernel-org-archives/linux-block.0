@@ -1,73 +1,41 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [RFC PATCH 04/14] SCSI: pass 'scsi_device' instance from 'scsi_request'
-Date: Wed,  8 Aug 2018 01:44:23 +0800
-Message-Id: <20180807174433.8374-5-ming.lei@redhat.com>
-In-Reply-To: <20180807174433.8374-1-ming.lei@redhat.com>
-References: <20180807174433.8374-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:57974 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727810AbeHJSdF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 14:33:05 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH v3 16/17] bcache: remove unnecessary space before ioctl function pointer arguments
+Date: Sat, 11 Aug 2018 00:00:46 +0800
+Message-Id: <20180810160047.5363-17-colyli@suse.de>
+In-Reply-To: <20180810160047.5363-1-colyli@suse.de>
+References: <20180810160047.5363-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch prepares for introducing SCSI per-host admin queue, which
-is only used for queuing admin requests, which are now submitted via
-__scsi_execute().
+This is warned by checkpatch.pl, this patch removes the extra space.
 
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Adrian Hunter <adrian.hunter@intel.com>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
 ---
- drivers/scsi/scsi_lib.c     | 2 ++
- include/scsi/scsi_request.h | 5 ++++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ drivers/md/bcache/bcache.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 4341cf8a7322..62699adaef61 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -279,6 +279,8 @@ int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 	rq->cmd_len = COMMAND_SIZE(cmd[0]);
- 	memcpy(rq->cmd, cmd, rq->cmd_len);
- 	rq->retries = retries;
-+	rq->sdev = sdev;	/* only valid in submit path */
-+
- 	req->timeout = timeout;
- 	req->cmd_flags |= flags;
- 	req->rq_flags |= rq_flags | RQF_QUIET;
-diff --git a/include/scsi/scsi_request.h b/include/scsi/scsi_request.h
-index b06f28c74908..0de6901b48ab 100644
---- a/include/scsi/scsi_request.h
-+++ b/include/scsi/scsi_request.h
-@@ -14,7 +14,10 @@ struct scsi_request {
- 	unsigned int	sense_len;
- 	unsigned int	resid_len;	/* residual count */
- 	int		retries;
--	void		*sense;
-+	union {
-+		void		*sense;
-+		struct scsi_device *sdev;
-+	};
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 66e6d5639b38..83504dd8100a 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -275,8 +275,8 @@ struct bcache_device {
+ 
+ 	int (*cache_miss)(struct btree *b, struct search *s,
+ 			  struct bio *bio, unsigned int sectors);
+-	int (*ioctl) (struct bcache_device *d, fmode_t mode,
+-		      unsigned int cmd, unsigned long arg);
++	int (*ioctl)(struct bcache_device *d, fmode_t mode,
++		     unsigned int cmd, unsigned long arg);
  };
  
- static inline struct scsi_request *scsi_req(struct request *rq)
+ struct io {
 -- 
-2.9.5
+2.18.0
