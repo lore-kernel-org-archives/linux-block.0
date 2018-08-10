@@ -1,52 +1,54 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Josef Bacik <jbacik@fb.com>
-Subject: [PATCH] blk-wbt: fix IO hang in wbt_wait()
-Date: Tue, 14 Aug 2018 23:57:49 +0800
-Message-Id: <20180814155749.28912-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:57786 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727977AbeHJScY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 14:32:24 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH v3 09/17] bcache: fix typo 'succesfully' to 'successfully'
+Date: Sat, 11 Aug 2018 00:00:39 +0800
+Message-Id: <20180810160047.5363-10-colyli@suse.de>
+In-Reply-To: <20180810160047.5363-1-colyli@suse.de>
+References: <20180810160047.5363-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On wbt invariant is that if one IO is tracked via WBT_TRACKED, rqw->inflight
-should be updated for tracking this IO.
+This patch fixes typo 'succesfully' to correct 'successfully', which is
+suggested by checkpatch.pl.
 
-But commit c1c80384c8f ("block: remove external dependency on wbt_flags")
-forgets to remove the early handling of !rwb_enabled(rwb) inside wbt_wait(),
-then the inflight counter may not be increased in wbt_wait(), but decreased
-in wbt_done() for this kind of IO, so this counter may become negative, then
-wbt_wait() may wait forever.
-
-This patch fixes the report in the following link:
-
-	https://marc.info/?l=linux-block&m=153221542021033&w=2
-
-Fixes: c1c80384c8f ("block: remove external dependency on wbt_flags")
-Cc: Josef Bacik <jbacik@fb.com>
-Reported-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
 ---
- block/blk-wbt.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ drivers/md/bcache/io.c      | 2 +-
+ drivers/md/bcache/request.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 1d94a20374fc..bb93c7c2b182 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -576,12 +576,8 @@ static void wbt_wait(struct rq_qos *rqos, struct bio *bio, spinlock_t *lock)
- 	struct rq_wb *rwb = RQWB(rqos);
- 	enum wbt_flags flags;
+diff --git a/drivers/md/bcache/io.c b/drivers/md/bcache/io.c
+index cfc56add799a..c25097968319 100644
+--- a/drivers/md/bcache/io.c
++++ b/drivers/md/bcache/io.c
+@@ -86,7 +86,7 @@ void bch_count_io_errors(struct cache *ca,
  
--	if (!rwb_enabled(rwb))
--		return;
--
- 	flags = bio_to_wbt_flags(rwb, bio);
--
--	if (!wbt_should_throttle(rwb, bio)) {
-+	if (!(flags & WBT_TRACKED)) {
- 		if (flags & WBT_READ)
- 			wb_timestamp(rwb, &rwb->last_issue);
- 		return;
+ 			/*
+ 			 * First we subtract refresh from count; each time we
+-			 * succesfully do so, we rescale the errors once:
++			 * successfully do so, we rescale the errors once:
+ 			 */
+ 
+ 			count = atomic_cmpxchg(&ca->io_count, old, new);
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 858dd3da9dc5..55264e71369d 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -154,7 +154,7 @@ static void bch_data_insert_error(struct closure *cl)
+ 
+ 	/*
+ 	 * Our data write just errored, which means we've got a bunch of keys to
+-	 * insert that point to data that wasn't succesfully written.
++	 * insert that point to data that wasn't successfully written.
+ 	 *
+ 	 * We don't have to insert those keys but we still have to invalidate
+ 	 * that region of the cache - so, if we just strip off all the pointers
 -- 
-2.9.5
+2.18.0
