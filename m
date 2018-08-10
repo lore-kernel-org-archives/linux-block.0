@@ -1,14 +1,15 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:57548 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:44584 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728267AbeHJSbZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Aug 2018 14:31:25 -0400
+        id S1727450AbeHJJwq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 05:52:46 -0400
 From: Coly Li <colyli@suse.de>
 To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v3 00/17] fixes reported by checkpatch.pl
-Date: Sat, 11 Aug 2018 00:00:30 +0800
-Message-Id: <20180810160047.5363-1-colyli@suse.de>
+Cc: linux-block@vger.kernel.org, shhuiw@foxmail.com,
+        Coly Li <colyli@suse.de>
+Subject: [PATCH v2 00/17] fixes reported by checkpatch.pl
+Date: Fri, 10 Aug 2018 15:23:40 +0800
+Message-Id: <20180810072357.19823-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
@@ -21,11 +22,10 @@ line limit.
 Thanks in advance for any comment or review.
 
 Changelog:
-v3: Fix coments from Shenghui Wang.
-v2: Fix comments from Shenghui Wang.
-v1: Initial version
+v2: fix comments from Shenghui Wang.
+v1: initial version
 
-Coly Li 
+Coly Li
 ---
 Coly Li (17):
   bcache: style fix to replace 'unsigned' by 'unsigned int'
@@ -61,14 +61,14 @@ Coly Li (17):
  drivers/md/bcache/extents.c   |  37 +++---
  drivers/md/bcache/extents.h   |   6 +-
  drivers/md/bcache/io.c        |  24 ++--
- drivers/md/bcache/journal.c   |  27 +++--
+ drivers/md/bcache/journal.c   |  25 ++--
  drivers/md/bcache/journal.h   |  28 ++---
  drivers/md/bcache/movinggc.c  |  14 ++-
  drivers/md/bcache/request.c   |  61 +++++-----
  drivers/md/bcache/request.h   |  18 +--
  drivers/md/bcache/stats.c     |  15 ++-
  drivers/md/bcache/stats.h     |  15 ++-
- drivers/md/bcache/super.c     | 107 ++++++++++-------
+ drivers/md/bcache/super.c     | 103 ++++++++++-------
  drivers/md/bcache/sysfs.c     |  36 +++---
  drivers/md/bcache/sysfs.h     |   6 +-
  drivers/md/bcache/util.c      |   2 +
@@ -76,7 +76,7 @@ Coly Li (17):
  drivers/md/bcache/writeback.c |  30 +++--
  drivers/md/bcache/writeback.h |  19 +--
  include/uapi/linux/bcache.h   |   8 +-
- 29 files changed, 679 insertions(+), 540 deletions(-)
+ 29 files changed, 676 insertions(+), 537 deletions(-)
 
 -- 
 2.18.0
