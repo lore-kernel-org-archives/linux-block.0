@@ -1,16 +1,17 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:57580 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:44606 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727996AbeHJSbm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Aug 2018 14:31:42 -0400
+        id S1727450AbeHJJxC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 05:53:02 -0400
 From: Coly Li <colyli@suse.de>
 To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v3 01/17] bcache: style fix to replace 'unsigned' by 'unsigned int'
-Date: Sat, 11 Aug 2018 00:00:31 +0800
-Message-Id: <20180810160047.5363-2-colyli@suse.de>
-In-Reply-To: <20180810160047.5363-1-colyli@suse.de>
-References: <20180810160047.5363-1-colyli@suse.de>
+Cc: linux-block@vger.kernel.org, shhuiw@foxmail.com,
+        Coly Li <colyli@suse.de>
+Subject: [PATCH v2 01/17] bcache: style fix to replace 'unsigned' by 'unsigned int'
+Date: Fri, 10 Aug 2018 15:23:41 +0800
+Message-Id: <20180810072357.19823-2-colyli@suse.de>
+In-Reply-To: <20180810072357.19823-1-colyli@suse.de>
+References: <20180810072357.19823-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
@@ -18,7 +19,7 @@ This patch fixes warning reported by checkpatch.pl by replacing 'unsigned'
 with 'unsigned int'.
 
 Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
+Cc: Shenghui Wang <shhuiw@foxmail.com>
 ---
  drivers/md/bcache/alloc.c     |  36 ++++++-----
  drivers/md/bcache/bcache.h    | 107 +++++++++++++++----------------
