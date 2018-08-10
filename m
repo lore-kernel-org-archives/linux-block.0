@@ -1,19 +1,30 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from cloud1-vm154.de-nserver.de ([178.250.10.56]:14928 "EHLO
+        cloud1-vm154.de-nserver.de" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728257AbeHJUoV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 16:44:21 -0400
 Subject: Re: [PATCH] bcache: fix 0day error of setting writeback_rate by sysfs
  interface
 To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Kai Krakow <kai@kaishome.de>,
- Stefan Priebe <s.priebe@profihost.ag>
+Cc: linux-block@vger.kernel.org, stable@vger.kernel.org,
+        Kai Krakow <kai@kaishome.de>
 References: <20180810154550.5020-1-colyli@suse.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <a418aaaf-f392-79d6-4892-60737d748887@kernel.dk>
-Date: Fri, 10 Aug 2018 12:19:19 -0600
+From: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
+Message-ID: <16e6c566-5f4d-0d52-3c6e-aa2815baff29@profihost.ag>
+Date: Fri, 10 Aug 2018 20:13:21 +0200
 MIME-Version: 1.0
 In-Reply-To: <20180810154550.5020-1-colyli@suse.de>
 Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 8/10/18 9:45 AM, Coly Li wrote:
+Thanks for cc. How is this exploitable? I mean only root can write to
+sysfs? Or do you mean by allowing a user via sudo to write to that entry?
+
+Stefan
+
+Am 10.08.2018 um 17:45 schrieb Coly Li:
 > Commit ea8c5356d390 ("bcache: set max writeback rate when I/O request
 > is idle") changes struct bch_ratelimit member rate from uint32_t to
 > atomic_long_t and uses atomic_long_set() in drivers/md/bcache/sysfs.c
@@ -39,17 +50,33 @@ On 8/10/18 9:45 AM, Coly Li wrote:
 > Cc: stable@vger.kernel.org #4.16+
 > Cc: Kai Krakow <kai@kaishome.de>
 > Cc: Stefan Priebe <s.priebe@profihost.ag>
-
-You don't need to CC stable for this, the commit isn't in a released kernel
-yet. In fact, it's not even in Linus's tree, it's just queued up for 4.19.
-
-Also, the fixes line should be:
-
-Fixes: ea8c5356d390 ("bcache: set max writeback rate when I/O request is idle")
-
-(no Commit). I missed that on some of your earlier commits.
-
-Applied with those edits, and some wording changes.
-
--- 
-Jens Axboe
+> ---
+>  drivers/md/bcache/sysfs.c | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+> index 543b06408321..150cf4f4cf74 100644
+> --- a/drivers/md/bcache/sysfs.c
+> +++ b/drivers/md/bcache/sysfs.c
+> @@ -267,10 +267,17 @@ STORE(__cached_dev)
+>  	sysfs_strtoul_clamp(writeback_percent, dc->writeback_percent, 0, 40);
+>  
+>  	if (attr == &sysfs_writeback_rate) {
+> -		int v;
+> +		ssize_t ret;
+> +		long int v = atomic_long_read(&dc->writeback_rate.rate);
+> +
+> +		ret = strtoul_safe_clamp(buf, v, 1, INT_MAX);
+>  
+> -		sysfs_strtoul_clamp(writeback_rate, v, 1, INT_MAX);
+> -		atomic_long_set(&dc->writeback_rate.rate, v);
+> +		if (!ret) {
+> +			atomic_long_set(&dc->writeback_rate.rate, v);
+> +			ret = size;
+> +		}
+> +
+> +		return ret;
+>  	}
+>  
+>  	sysfs_strtoul_clamp(writeback_rate_update_seconds,
+> 
