@@ -1,16 +1,17 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:57730 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:44828 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727977AbeHJScM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Aug 2018 14:32:12 -0400
+        id S1727574AbeHJJxf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 05:53:35 -0400
 From: Coly Li <colyli@suse.de>
 To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v3 07/17] bcache: fix indent by replacing blank by tabs
-Date: Sat, 11 Aug 2018 00:00:37 +0800
-Message-Id: <20180810160047.5363-8-colyli@suse.de>
-In-Reply-To: <20180810160047.5363-1-colyli@suse.de>
-References: <20180810160047.5363-1-colyli@suse.de>
+Cc: linux-block@vger.kernel.org, shhuiw@foxmail.com,
+        Coly Li <colyli@suse.de>
+Subject: [PATCH v2 07/17] bcache: fix indent by replacing blank by tabs
+Date: Fri, 10 Aug 2018 15:23:47 +0800
+Message-Id: <20180810072357.19823-8-colyli@suse.de>
+In-Reply-To: <20180810072357.19823-1-colyli@suse.de>
+References: <20180810072357.19823-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
@@ -19,7 +20,7 @@ characters. This patch makes the indent aligned and replace blank by
 tabs.
 
 Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
+Cc: Shenghui Wang <shhuiw@foxmail.com>
 ---
  drivers/md/bcache/btree.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
