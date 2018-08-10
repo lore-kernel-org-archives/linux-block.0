@@ -1,54 +1,45 @@
-Return-Path: <keescook@chromium.org>
-Return-Path: <keescook@chromium.org>
-Date: Fri, 24 Aug 2018 14:15:35 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: syzbot+21cfe1f803e0e158acf1@syzkaller.appspotmail.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] block: Replace bio_check_ro()'s WARN_ON()
-Message-ID: <20180824211535.GA22251@beast>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:57730 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727977AbeHJScM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 14:32:12 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH v3 07/17] bcache: fix indent by replacing blank by tabs
+Date: Sat, 11 Aug 2018 00:00:37 +0800
+Message-Id: <20180810160047.5363-8-colyli@suse.de>
+In-Reply-To: <20180810160047.5363-1-colyli@suse.de>
+References: <20180810160047.5363-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-As described in commit 96c6a32ccb55a ("include/asm-generic/bug.h: clarify
-valid uses of WARN()"), this replaces a userspace-reachable WARN_ON()
-with pr_warn_once(). The reachability is even noted in the existing
-comment. This appears to be an "expected by unlikely" condition, so
-getting rid of the WARN_ON() means kernel fuzzers will stop reporting
-the problem. Additionally un-breaks the error string so it can more
-easily be found with grep.
+bch_btree_insert_check_key() has unaligned indent, or indent by blank
+characters. This patch makes the indent aligned and replace blank by
+tabs.
 
-Reported-by: syzbot+21cfe1f803e0e158acf1@syzkaller.appspotmail.com
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
 ---
- block/blk-core.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ drivers/md/bcache/btree.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index dee56c282efb..470c3cea8cb0 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2166,11 +2166,9 @@ static inline bool bio_check_ro(struct bio *bio, struct hd_struct *part)
- 	if (part->policy && (op_is_write(op) && !op_is_flush(op))) {
- 		char b[BDEVNAME_SIZE];
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index c2e4174a2e03..e7d4817681f2 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -2231,10 +2231,10 @@ int bch_btree_insert_check_key(struct btree *b, struct btree_op *op,
+ 		rw_lock(true, b, b->level);
  
--		WARN_ONCE(1,
--		       "generic_make_request: Trying to write "
--			"to read-only block-device %s (partno %d)\n",
-+		/* Older lvm-tools actually triggers this. */
-+		pr_warn_once("Trying to write to read-only block-device %s (partno %d)\n",
- 			bio_devname(bio, b), part->partno);
--		/* Older lvm-tools actually trigger this */
- 		return false;
+ 		if (b->key.ptr[0] != btree_ptr ||
+-                   b->seq != seq + 1) {
++		    b->seq != seq + 1) {
+ 			op->lock = b->level;
+ 			goto out;
+-               }
++		}
  	}
  
+ 	SET_KEY_PTRS(check_key, 1);
 -- 
-2.17.1
-
-
--- 
-Kees Cook
-Pixel Security
+2.18.0
