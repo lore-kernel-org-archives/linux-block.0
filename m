@@ -1,16 +1,17 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:57844 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:44942 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728635AbeHJScl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Aug 2018 14:32:41 -0400
+        id S1727501AbeHJJyH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 05:54:07 -0400
 From: Coly Li <colyli@suse.de>
 To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v3 12/17] bcache: fix code comments style
-Date: Sat, 11 Aug 2018 00:00:42 +0800
-Message-Id: <20180810160047.5363-13-colyli@suse.de>
-In-Reply-To: <20180810160047.5363-1-colyli@suse.de>
-References: <20180810160047.5363-1-colyli@suse.de>
+Cc: linux-block@vger.kernel.org, shhuiw@foxmail.com,
+        Coly Li <colyli@suse.de>
+Subject: [PATCH v2 12/17] bcache: fix code comments style
+Date: Fri, 10 Aug 2018 15:23:52 +0800
+Message-Id: <20180810072357.19823-13-colyli@suse.de>
+In-Reply-To: <20180810072357.19823-1-colyli@suse.de>
+References: <20180810072357.19823-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
@@ -20,7 +21,7 @@ This patch fixes 3 style issues warned by checkpatch.pl,
 - Comment lines use a trailing "*/"
 
 Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
+Cc: Shenghui Wang <shhuiw@foxmail.com>
 ---
  drivers/md/bcache/bset.c      |  9 ++++++---
  drivers/md/bcache/super.c     | 22 +++++++++++++---------
@@ -62,7 +63,7 @@ index b6a3f9d291a9..8f07fa6e1739 100644
  	 */
  	for (; j < t->size; j++) {
 diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 2a7be104557e..01fc3c015a58 100644
+index 951776e8cd8b..1b5ace425261 100644
 --- a/drivers/md/bcache/super.c
 +++ b/drivers/md/bcache/super.c
 @@ -465,8 +465,8 @@ static struct uuid_entry *uuid_find_empty(struct cache_set *c)
