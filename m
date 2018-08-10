@@ -1,107 +1,64 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:33171 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726990AbeHaOGk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Aug 2018 10:06:40 -0400
-Received: by mail-lf1-f67.google.com with SMTP id m26-v6so9530427lfb.0
-        for <linux-block@vger.kernel.org>; Fri, 31 Aug 2018 02:59:56 -0700 (PDT)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Javier Gonzales <javier@cnexlabs.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH V2] lightnvm: pblk: fix mapping issue on failed writes
-Date: Fri, 31 Aug 2018 11:59:29 +0200
-Message-Id: <1535709570-8923-1-git-send-email-hans.ml.holmberg@owltronix.com>
+Received: from mx2.suse.de ([195.135.220.15]:57980 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727810AbeHJSdN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 14:33:13 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH v3 17/17] bcache: add the missing comments for smp_mb()/smp_wmb()
+Date: Sat, 11 Aug 2018 00:00:47 +0800
+Message-Id: <20180810160047.5363-18-colyli@suse.de>
+In-Reply-To: <20180810160047.5363-1-colyli@suse.de>
+References: <20180810160047.5363-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Checkpatch.pl warns there are 2 locations of smp_mb() and smp_wmb()
+without code comment. This patch adds the missing code comments for
+these memory barrier calls.
 
-On 1.2-devices, the mapping-out of remaning sectors in the
-failed-write's block can result in an infinite loop,
-stalling the write pipeline, fix this.
-
-Fixes: 6a3abf5beef6 ("lightnvm: pblk: rework write error recovery path")
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
 ---
+ drivers/md/bcache/closure.h | 4 +++-
+ drivers/md/bcache/super.c   | 2 +-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-Changes in V2:
-	Moved the helper function pblk_next_ppa_in_blk to lightnvm core
-	Renamed variable done->last in the helper function
-	
-
- drivers/lightnvm/pblk-write.c | 10 +---------
- include/linux/lightnvm.h      | 34 ++++++++++++++++++++++++++++++++++
- 2 files changed, 35 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 5e6df65d392c..922506d2d0a6 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -125,15 +125,7 @@ static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa)
- 		if (!test_and_set_bit(paddr, line->invalid_bitmap))
- 			le32_add_cpu(line->vsc, -1);
- 
--		if (geo->version == NVM_OCSSD_SPEC_12) {
--			map_ppa.ppa++;
--			if (map_ppa.g.pg == geo->num_pg)
--				done = 1;
--		} else {
--			map_ppa.m.sec++;
--			if (map_ppa.m.sec == geo->clba)
--				done = 1;
--		}
-+		done = nvm_next_ppa_in_blk(geo, &map_ppa);
- 	}
- 
- 	line->w_err_gc->has_write_err = 1;
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 09f65c6c6676..2a6cbfe1d1b4 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -593,6 +593,40 @@ static inline u32 nvm_ppa64_to_ppa32(struct nvm_dev *dev,
- 	return ppa32;
+diff --git a/drivers/md/bcache/closure.h b/drivers/md/bcache/closure.h
+index 7f3594c0be14..eca0d496b686 100644
+--- a/drivers/md/bcache/closure.h
++++ b/drivers/md/bcache/closure.h
+@@ -289,10 +289,12 @@ static inline void closure_init_stack(struct closure *cl)
  }
  
-+static inline int nvm_next_ppa_in_blk(struct nvm_geo *geo, struct ppa_addr *ppa)
-+{
-+	int last = 0;
-+
-+	if (geo->version == NVM_OCSSD_SPEC_12) {
-+		int sec = ppa->g.sec;
-+
-+		sec++;
-+		if (sec == geo->ws_min) {
-+			int pg = ppa->g.pg;
-+
-+			sec = 0;
-+			pg++;
-+			if (pg == geo->num_pg) {
-+				int pl = ppa->g.pl;
-+
-+				pg = 0;
-+				pl++;
-+				if (pl == geo->num_pln)
-+					last = 1;
-+
-+				ppa->g.pl = pl;
-+			}
-+			ppa->g.pg = pg;
-+		}
-+		ppa->g.sec = sec;
-+	} else {
-+		ppa->m.sec++;
-+		if (ppa->m.sec == geo->clba)
-+			last = 1;
-+	}
-+
-+	return last;
-+}
+ /**
+- * closure_wake_up - wake up all closures on a wait list.
++ * closure_wake_up - wake up all closures on a wait list,
++ *		     with memory barrier
+  */
+ static inline void closure_wake_up(struct closure_waitlist *list)
+ {
++	/* Memory barrier for the wait list */
+ 	smp_mb();
+ 	__closure_wake_up(list);
+ }
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index e637d74e2908..94c756c66bd7 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1136,11 +1136,11 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
+ 	list_move(&dc->list, &c->cached_devs);
+ 	calc_cached_dev_sectors(c);
  
- typedef blk_qc_t (nvm_tgt_make_rq_fn)(struct request_queue *, struct bio *);
- typedef sector_t (nvm_tgt_capacity_fn)(void *);
+-	smp_wmb();
+ 	/*
+ 	 * dc->c must be set before dc->count != 0 - paired with the mb in
+ 	 * cached_dev_get()
+ 	 */
++	smp_wmb();
+ 	refcount_set(&dc->count, 1);
+ 
+ 	/* Block writeback thread, but spawn it */
 -- 
-2.7.4
+2.18.0
