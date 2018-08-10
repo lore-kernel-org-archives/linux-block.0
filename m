@@ -1,16 +1,17 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:57818 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:44890 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727771AbeHJSc3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Aug 2018 14:32:29 -0400
+        id S1727501AbeHJJxy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 05:53:54 -0400
 From: Coly Li <colyli@suse.de>
 To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v3 10/17] bcache: prefer 'help' in Kconfig
-Date: Sat, 11 Aug 2018 00:00:40 +0800
-Message-Id: <20180810160047.5363-11-colyli@suse.de>
-In-Reply-To: <20180810160047.5363-1-colyli@suse.de>
-References: <20180810160047.5363-1-colyli@suse.de>
+Cc: linux-block@vger.kernel.org, shhuiw@foxmail.com,
+        Coly Li <colyli@suse.de>
+Subject: [PATCH v2 10/17] bcache: prefer 'help' in Kconfig
+Date: Fri, 10 Aug 2018 15:23:50 +0800
+Message-Id: <20180810072357.19823-11-colyli@suse.de>
+In-Reply-To: <20180810072357.19823-1-colyli@suse.de>
+References: <20180810072357.19823-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
@@ -19,7 +20,7 @@ for now 'help' is prefered. This patch fixes this style by replacing
 '---help---' by 'help' in bcache Kconfig file.
 
 Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
+Cc: Shenghui Wang <shhuiw@foxmail.com>
 ---
  drivers/md/bcache/Kconfig | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
