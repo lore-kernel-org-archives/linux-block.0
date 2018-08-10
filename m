@@ -1,145 +1,40 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [RFC PATCH 05/14] SCSI: prepare for introducing admin queue for legacy path
-Date: Wed,  8 Aug 2018 01:44:24 +0800
-Message-Id: <20180807174433.8374-6-ming.lei@redhat.com>
-In-Reply-To: <20180807174433.8374-1-ming.lei@redhat.com>
-References: <20180807174433.8374-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:57906 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729175AbeHJScr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 14:32:47 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH v3 13/17] bcache: add static const prefix to char * array declarations
+Date: Sat, 11 Aug 2018 00:00:43 +0800
+Message-Id: <20180810160047.5363-14-colyli@suse.de>
+In-Reply-To: <20180810160047.5363-1-colyli@suse.de>
+References: <20180810160047.5363-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Uses scsi_is_admin_queue() and scsi_get_scsi_dev() to retrieve
-'scsi_device' for legacy path.
+This patch declares char * array with const prefix in sysfs.c,
+which is suggested by checkpatch.pl.
 
-The same approach can be used in SCSI_MQ path too, just not
-efficiently, and will deal with this issue when introducing admin
-queue for SCSI_MQ.
-
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Adrian Hunter <adrian.hunter@intel.com>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
 ---
- drivers/scsi/scsi_lib.c | 32 +++++++++++++++++++++++++++-----
- 1 file changed, 27 insertions(+), 5 deletions(-)
+ drivers/md/bcache/sysfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 62699adaef61..435347f58328 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -46,6 +46,20 @@ static DEFINE_MUTEX(scsi_sense_cache_mutex);
- 
- static void scsi_mq_uninit_cmd(struct scsi_cmnd *cmd);
- 
-+/* For admin queue, its queuedata is NULL */
-+static inline bool scsi_is_admin_queue(struct request_queue *q)
-+{
-+	return !q->queuedata;
-+}
-+
-+/* This helper can only be used in req prep stage */
-+static inline struct scsi_device *scsi_get_scsi_dev(struct request *rq)
-+{
-+	if (scsi_is_admin_queue(rq->q))
-+		return scsi_req(rq)->sdev;
-+	return rq->q->queuedata;
-+}
-+
- static inline struct kmem_cache *
- scsi_select_sense_cache(bool unchecked_isa_dma)
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index 2ed503ab9e5c..543b06408321 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -150,7 +150,7 @@ SHOW(__bch_cached_dev)
  {
-@@ -1378,7 +1392,7 @@ scsi_prep_state_check(struct scsi_device *sdev, struct request *req)
- static int
- scsi_prep_return(struct request_queue *q, struct request *req, int ret)
- {
--	struct scsi_device *sdev = q->queuedata;
-+	struct scsi_device *sdev = scsi_get_scsi_dev(req);
+ 	struct cached_dev *dc = container_of(kobj, struct cached_dev,
+ 					     disk.kobj);
+-	const char *states[] = { "no cache", "clean", "dirty", "inconsistent" };
++	char const *states[] = { "no cache", "clean", "dirty", "inconsistent" };
+ 	int wb = dc->writeback_running;
  
- 	switch (ret) {
- 	case BLKPREP_KILL:
-@@ -1411,7 +1425,7 @@ scsi_prep_return(struct request_queue *q, struct request *req, int ret)
- 
- static int scsi_prep_fn(struct request_queue *q, struct request *req)
- {
--	struct scsi_device *sdev = q->queuedata;
-+	struct scsi_device *sdev = scsi_get_scsi_dev(req);
- 	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
- 	int ret;
- 
-@@ -1613,6 +1627,9 @@ static int scsi_lld_busy(struct request_queue *q)
- 	if (blk_queue_dying(q))
- 		return 0;
- 
-+	if (WARN_ON_ONCE(scsi_is_admin_queue(q)))
-+		return 0;
-+
- 	shost = sdev->host;
- 
- 	/*
-@@ -1816,7 +1833,7 @@ static void scsi_request_fn(struct request_queue *q)
- 	__releases(q->queue_lock)
- 	__acquires(q->queue_lock)
- {
--	struct scsi_device *sdev = q->queuedata;
-+	struct scsi_device *sdev;
- 	struct Scsi_Host *shost;
- 	struct scsi_cmnd *cmd;
- 	struct request *req;
-@@ -1825,7 +1842,6 @@ static void scsi_request_fn(struct request_queue *q)
- 	 * To start with, we keep looping until the queue is empty, or until
- 	 * the host is no longer able to accept any more requests.
- 	 */
--	shost = sdev->host;
- 	for (;;) {
- 		int rtn;
- 		/*
-@@ -1837,6 +1853,10 @@ static void scsi_request_fn(struct request_queue *q)
- 		if (!req)
- 			break;
- 
-+		cmd = blk_mq_rq_to_pdu(req);
-+		sdev = cmd->device;
-+		shost = sdev->host;
-+
- 		if (unlikely(!scsi_device_online(sdev))) {
- 			sdev_printk(KERN_ERR, sdev,
- 				    "rejecting I/O to offline device\n");
-@@ -1854,7 +1874,6 @@ static void scsi_request_fn(struct request_queue *q)
- 			blk_start_request(req);
- 
- 		spin_unlock_irq(q->queue_lock);
--		cmd = blk_mq_rq_to_pdu(req);
- 		if (cmd != req->special) {
- 			printk(KERN_CRIT "impossible request in %s.\n"
- 					 "please mail a stack trace to "
-@@ -2332,6 +2351,9 @@ struct scsi_device *scsi_device_from_queue(struct request_queue *q)
- {
- 	struct scsi_device *sdev = NULL;
- 
-+	/* admin queue won't be exposed to external users */
-+	WARN_ON_ONCE(scsi_is_admin_queue(q));
-+
- 	if (q->mq_ops) {
- 		if (q->mq_ops == &scsi_mq_ops)
- 			sdev = q->queuedata;
+ #define var(stat)		(dc->stat)
 -- 
-2.9.5
+2.18.0
