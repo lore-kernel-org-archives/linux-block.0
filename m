@@ -1,84 +1,56 @@
-Return-Path: <prvs=7457c2e9b=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Tejun Heo <tj@kernel.org>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v3 4/9] percpu-refcount: Introduce percpu_ref_read()
-Date: Thu,  2 Aug 2018 11:29:39 -0700
-Message-Id: <20180802182944.14442-5-bart.vanassche@wdc.com>
-In-Reply-To: <20180802182944.14442-1-bart.vanassche@wdc.com>
-References: <20180802182944.14442-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:57968 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727810AbeHJSdA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 14:33:00 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH v3 15/17] bcache: add missing SPDX header
+Date: Sat, 11 Aug 2018 00:00:45 +0800
+Message-Id: <20180810160047.5363-16-colyli@suse.de>
+In-Reply-To: <20180810160047.5363-1-colyli@suse.de>
+References: <20180810160047.5363-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Introduce a function that allows to read the value of a per-cpu counter.
-This function will be used in the next patch to check whether a per-cpu
-counter in atomic mode has the value one.
+The SPDX header is missing fro closure.c, super.c and util.c, this
+patch adds SPDX header for GPL-2.0 into these files.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
 ---
- include/linux/percpu-refcount.h |  2 ++
- lib/percpu-refcount.c           | 29 +++++++++++++++++++++++++++++
- 2 files changed, 31 insertions(+)
+ drivers/md/bcache/closure.c | 1 +
+ drivers/md/bcache/super.c   | 1 +
+ drivers/md/bcache/util.c    | 1 +
+ 3 files changed, 3 insertions(+)
 
-diff --git a/include/linux/percpu-refcount.h b/include/linux/percpu-refcount.h
-index 009cdf3d65b6..5707289ba828 100644
---- a/include/linux/percpu-refcount.h
-+++ b/include/linux/percpu-refcount.h
-@@ -331,4 +331,6 @@ static inline bool percpu_ref_is_zero(struct percpu_ref *ref)
- 	return !atomic_long_read(&ref->count);
- }
- 
-+unsigned long percpu_ref_read(struct percpu_ref *ref);
-+
- #endif
-diff --git a/lib/percpu-refcount.c b/lib/percpu-refcount.c
-index 9f96fa7bc000..c0b9fc8efa6b 100644
---- a/lib/percpu-refcount.c
-+++ b/lib/percpu-refcount.c
-@@ -369,3 +369,32 @@ void percpu_ref_reinit(struct percpu_ref *ref)
- 	spin_unlock_irqrestore(&percpu_ref_switch_lock, flags);
- }
- EXPORT_SYMBOL_GPL(percpu_ref_reinit);
-+
-+/**
-+ * percpu_ref_read - read a percpu refcount
-+ * @ref: percpu_ref to test
-+ *
-+ * This function is safe to call as long as @ref is between init and exit. It
-+ * is the responsibility of the caller to handle changes of @ref concurrently
-+ * with this function. If this function is called while @ref is in per-cpu
-+ * mode the returned value may be incorrect if e.g. percpu_ref_get() is called
-+ * from one CPU and percpu_ref_put() is called from another CPU.
-+ */
-+unsigned long percpu_ref_read(struct percpu_ref *ref)
-+{
-+	unsigned long __percpu *percpu_count;
-+	unsigned long sum = 0;
-+	int cpu;
-+
-+	rcu_read_lock_sched();
-+	if (__ref_is_percpu(ref, &percpu_count)) {
-+		for_each_possible_cpu(cpu)
-+			sum += *per_cpu_ptr(percpu_count, cpu);
-+	}
-+	rcu_read_unlock_sched();
-+	sum += atomic_long_read(&ref->count);
-+	sum &= ~PERCPU_COUNT_BIAS;
-+
-+	return sum;
-+}
-+EXPORT_SYMBOL_GPL(percpu_ref_read);
+diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
+index 034067e0e9ce..73f5319295bc 100644
+--- a/drivers/md/bcache/closure.c
++++ b/drivers/md/bcache/closure.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0
+ /*
+  * Asynchronous refcounty things
+  *
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index e3ecf08a10fc..e637d74e2908 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0
+ /*
+  * bcache setup/teardown code, and some metadata io - read a superblock and
+  * figure out what to do with it.
+diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
+index 18016e7bb32c..e873b0f7a82a 100644
+--- a/drivers/md/bcache/util.c
++++ b/drivers/md/bcache/util.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0
+ /*
+  * random utiility code, for bcache but in theory not specific to bcache
+  *
 -- 
 2.18.0
