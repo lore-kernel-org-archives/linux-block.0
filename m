@@ -1,41 +1,42 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:45562 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726890AbeHIWxZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Aug 2018 18:53:25 -0400
-Received: by mail-pf1-f194.google.com with SMTP id i26-v6so3362051pfo.12
-        for <linux-block@vger.kernel.org>; Thu, 09 Aug 2018 13:26:57 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
-Subject: [RFC PATCH 2/5] block: export blk_stat_enable_accounting()
-Date: Thu,  9 Aug 2018 13:26:44 -0700
-Message-Id: <0201bd7f86112ddbe7c190a1344b6a030cc2e971.1533846185.git.osandov@fb.com>
-In-Reply-To: <cover.1533846185.git.osandov@fb.com>
-References: <cover.1533846185.git.osandov@fb.com>
+Received: from mx2.suse.de ([195.135.220.15]:57834 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727771AbeHJScf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Aug 2018 14:32:35 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH v3 11/17] bcache: do not check NULL pointer before calling kmem_cache_destroy
+Date: Sat, 11 Aug 2018 00:00:41 +0800
+Message-Id: <20180810160047.5363-12-colyli@suse.de>
+In-Reply-To: <20180810160047.5363-1-colyli@suse.de>
+References: <20180810160047.5363-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+kmem_cache_destroy() is safe for NULL pointer as input, the NULL pointer
+checking is unncessary. This patch just removes the NULL pointer checking
+to make code simpler.
 
-Kyber will need this in a future change if it is built as a module.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
 ---
- block/blk-stat.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/md/bcache/request.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/block/blk-stat.c b/block/blk-stat.c
-index 175c143ac5b9..d98f3ad6794e 100644
---- a/block/blk-stat.c
-+++ b/block/blk-stat.c
-@@ -190,6 +190,7 @@ void blk_stat_enable_accounting(struct request_queue *q)
- 	blk_queue_flag_set(QUEUE_FLAG_STATS, q);
- 	spin_unlock(&q->stats->lock);
- }
-+EXPORT_SYMBOL_GPL(blk_stat_enable_accounting);
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 55264e71369d..51be355a3309 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -1367,8 +1367,7 @@ void bch_flash_dev_request_init(struct bcache_device *d)
  
- struct blk_queue_stats *blk_alloc_queue_stats(void)
+ void bch_request_exit(void)
  {
+-	if (bch_search_cache)
+-		kmem_cache_destroy(bch_search_cache);
++	kmem_cache_destroy(bch_search_cache);
+ }
+ 
+ int __init bch_request_init(void)
 -- 
 2.18.0
