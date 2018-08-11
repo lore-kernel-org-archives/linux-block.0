@@ -1,50 +1,54 @@
-Return-Path: <gustavo@embeddedor.com>
-Date: Sat, 4 Aug 2018 19:08:59 -0500
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	Juergen Gross <jgross@suse.com>, Jens Axboe <axboe@kernel.dk>
-Cc: xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] xen-blkfront: use true and false for boolean values
-Message-ID: <20180805000859.GA20132@embeddedor.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org
+Subject: [RFC PATCH V2 09/17] SCSI: don't set .queuedata in scsi_mq_alloc_queue()
+Date: Sat, 11 Aug 2018 15:12:12 +0800
+Message-Id: <20180811071220.357-10-ming.lei@redhat.com>
+In-Reply-To: <20180811071220.357-1-ming.lei@redhat.com>
+References: <20180811071220.357-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Return statements in functions returning bool should use true or false
-instead of an integer value.
+.queuedata is set in scsi_alloc_sdev() for both non-mq and scsi_mq,
+so not necessary to do it in scsi_mq_alloc_queue().
 
-This code was detected with the help of Coccinelle.
-
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+Cc: Alan Stern <stern@rowland.harvard.edu>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Adrian Hunter <adrian.hunter@intel.com>
+Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/xen-blkfront.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/scsi/scsi_lib.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 94300db..8986ada 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -1436,7 +1436,7 @@ static bool blkif_completion(unsigned long *id,
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 251ace90f254..5a2e7fff1452 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -2304,7 +2304,6 @@ struct request_queue *scsi_mq_alloc_queue(struct scsi_device *sdev)
+ 	if (IS_ERR(sdev->request_queue))
+ 		return NULL;
  
- 		/* Wait the second response if not yet here. */
- 		if (s2->status == REQ_WAITING)
--			return 0;
-+			return false;
- 
- 		bret->status = blkif_get_final_status(s->status,
- 						      s2->status);
-@@ -1537,7 +1537,7 @@ static bool blkif_completion(unsigned long *id,
- 		}
- 	}
- 
--	return 1;
-+	return true;
- }
- 
- static irqreturn_t blkif_interrupt(int irq, void *dev_id)
+-	sdev->request_queue->queuedata = sdev;
+ 	__scsi_init_queue(sdev->host, sdev->request_queue);
+ 	blk_queue_flag_set(QUEUE_FLAG_SCSI_PASSTHROUGH, sdev->request_queue);
+ 	return sdev->request_queue;
 -- 
-2.7.4
+2.9.5
