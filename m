@@ -1,58 +1,61 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39164 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727237AbeHIJI0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Aug 2018 05:08:26 -0400
+Return-Path: <colyli@suse.de>
 From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 10/17] bcache: prefer 'help' in Kconfig
-Date: Thu,  9 Aug 2018 14:43:13 +0800
-Message-Id: <20180809064320.10229-11-colyli@suse.de>
-In-Reply-To: <20180809064320.10229-1-colyli@suse.de>
-References: <20180809064320.10229-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+To: axboe@kernel.dk,
+	linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Coly Li <colyli@suse.de>
+Subject: [PATCH v3 05/17] bcache: replace Symbolic permissions by octal permission numbers
+Date: Sat, 11 Aug 2018 13:19:48 +0800
+Message-Id: <20180811052000.103680-6-colyli@suse.de>
+In-Reply-To: <20180811052000.103680-1-colyli@suse.de>
+References: <20180811052000.103680-1-colyli@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Current bcache Kconfig uses '---help---' as header of help information,
-for now 'help' is prefered. This patch fixes this style by replacing
-'---help---' by 'help' in bcache Kconfig file.
+Symbolic permission names are used in bcache, for now octal permission
+numbers are encouraged to use for readability. This patch replaces
+all symbolic permissions by octal permission numbers.
 
 Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
 ---
- drivers/md/bcache/Kconfig | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/md/bcache/bcache.h | 4 ++--
+ drivers/md/bcache/sysfs.h  | 6 +++---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/md/bcache/Kconfig b/drivers/md/bcache/Kconfig
-index 17bf109c58e9..817b9fba50db 100644
---- a/drivers/md/bcache/Kconfig
-+++ b/drivers/md/bcache/Kconfig
-@@ -1,7 +1,7 @@
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 031a75a25d3e..66e6d5639b38 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -881,11 +881,11 @@ static inline uint8_t bucket_gc_gen(struct bucket *b)
+ #define BUCKET_GC_GEN_MAX	96U
  
- config BCACHE
- 	tristate "Block device as cache"
--	---help---
-+	help
- 	Allows a block device to be used as cache for other devices; uses
- 	a btree for indexing and the layout is optimized for SSDs.
+ #define kobj_attribute_write(n, fn)					\
+-	static struct kobj_attribute ksysfs_##n = __ATTR(n, S_IWUSR, NULL, fn)
++	static struct kobj_attribute ksysfs_##n = __ATTR(n, 0200, NULL, fn)
  
-@@ -10,7 +10,7 @@ config BCACHE
- config BCACHE_DEBUG
- 	bool "Bcache debugging"
- 	depends on BCACHE
--	---help---
-+	help
- 	Don't select this option unless you're a developer
+ #define kobj_attribute_rw(n, show, store)				\
+ 	static struct kobj_attribute ksysfs_##n =			\
+-		__ATTR(n, S_IWUSR|S_IRUSR, show, store)
++		__ATTR(n, 0600, show, store)
  
- 	Enables extra debugging tools, allows expensive runtime checks to be
-@@ -20,7 +20,7 @@ config BCACHE_CLOSURES_DEBUG
- 	bool "Debug closures"
- 	depends on BCACHE
- 	select DEBUG_FS
--	---help---
-+	help
- 	Keeps all active closures in a linked list and provides a debugfs
- 	interface to list them, which makes it possible to see asynchronous
- 	operations that get stuck.
+ static inline void wake_up_allocators(struct cache_set *c)
+ {
+diff --git a/drivers/md/bcache/sysfs.h b/drivers/md/bcache/sysfs.h
+index b54fe9602529..3fe82425859c 100644
+--- a/drivers/md/bcache/sysfs.h
++++ b/drivers/md/bcache/sysfs.h
+@@ -44,9 +44,9 @@ STORE(fn)								\
+ 	static struct attribute sysfs_##_name =				\
+ 		{ .name = #_name, .mode = _mode }
+ 
+-#define write_attribute(n)	__sysfs_attribute(n, S_IWUSR)
+-#define read_attribute(n)	__sysfs_attribute(n, S_IRUGO)
+-#define rw_attribute(n)		__sysfs_attribute(n, S_IRUGO|S_IWUSR)
++#define write_attribute(n)	__sysfs_attribute(n, 0200)
++#define read_attribute(n)	__sysfs_attribute(n, 0444)
++#define rw_attribute(n)		__sysfs_attribute(n, 0644)
+ 
+ #define sysfs_printf(file, fmt, ...)					\
+ do {									\
 -- 
 2.18.0
