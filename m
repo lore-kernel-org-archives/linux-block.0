@@ -1,21 +1,44 @@
-Return-Path: <colyli@suse.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:32806 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726858AbeHKHT5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 11 Aug 2018 03:19:57 -0400
 Subject: Re: [PATCH] bcache: fix 0day error of setting writeback_rate by sysfs
  interface
-To: Jens Axboe <axboe@kernel.dk>
+To: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
 Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
- Kai Krakow <kai@kaishome.de>, Stefan Priebe <s.priebe@profihost.ag>
+        stable@vger.kernel.org, Kai Krakow <kai@kaishome.de>
 References: <20180810154550.5020-1-colyli@suse.de>
- <a418aaaf-f392-79d6-4892-60737d748887@kernel.dk>
+ <16e6c566-5f4d-0d52-3c6e-aa2815baff29@profihost.ag>
 From: Coly Li <colyli@suse.de>
-Message-ID: <456e4bc7-ce84-8a1a-ba96-3eb7b24bd8ca@suse.de>
-Date: Sat, 11 Aug 2018 12:49:38 +0800
+Message-ID: <f39381fc-cb31-2979-84fa-7cc264942842@suse.de>
+Date: Sat, 11 Aug 2018 12:46:52 +0800
 MIME-Version: 1.0
-In-Reply-To: <a418aaaf-f392-79d6-4892-60737d748887@kernel.dk>
+In-Reply-To: <16e6c566-5f4d-0d52-3c6e-aa2815baff29@profihost.ag>
 Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 2018/8/11 2:19 AM, Jens Axboe wrote:
-> On 8/10/18 9:45 AM, Coly Li wrote:
+On 2018/8/11 2:13 AM, Stefan Priebe - Profihost AG wrote:
+> Thanks for cc. How is this exploitable? I mean only root can write to
+> sysfs? Or do you mean by allowing a user via sudo to write to that entry?
+
+Hi Stefan,
+
+This is not a security 0day bug, this is an error reported by Linux
+kernel 0day test service
+(https://01.org/zh/lkp/documentation/0-day-test-service). My development
+tree is registered and monitored by 0day testing service, so if there is
+any static code error or boot failure, I can be noticed in very early stage.
+
+The bug in previous patch is, writeback_rate cannot be set by sysfs
+interface, because sysfs_strtoul_clamp() directly returns. This patch
+fixes this and allows writeback_rate can be manually set again.
+
+Coly Li
+
+> 
+> Am 10.08.2018 um 17:45 schrieb Coly Li:
 >> Commit ea8c5356d390 ("bcache: set max writeback rate when I/O request
 >> is idle") changes struct bch_ratelimit member rate from uint32_t to
 >> atomic_long_t and uses atomic_long_set() in drivers/md/bcache/sysfs.c
@@ -41,31 +64,33 @@ On 2018/8/11 2:19 AM, Jens Axboe wrote:
 >> Cc: stable@vger.kernel.org #4.16+
 >> Cc: Kai Krakow <kai@kaishome.de>
 >> Cc: Stefan Priebe <s.priebe@profihost.ag>
-> 
-
-Hi Jens,
-
-> You don't need to CC stable for this, the commit isn't in a released kernel
-> yet. In fact, it's not even in Linus's tree, it's just queued up for 4.19.
-> 
-
-What I thought was, Commit ea8c5356d390 ("bcache: set max writeback rate
-when I/O request is idle") is a stable fix, so this patch should go into
-stable as well. Otherwise the stable kernel cannot manually set
-writeback_rate via sysfs interface.
-
-> Also, the fixes line should be:
-> 
-> Fixes: ea8c5356d390 ("bcache: set max writeback rate when I/O request is idle")
-> 
-> (no Commit). I missed that on some of your earlier commits.
-
-Copied, keep in mind for next time.
-
-> 
-> Applied with those edits, and some wording changes.
-> 
-
-Thanks for your help !
-
-Coly Li
+>> ---
+>>  drivers/md/bcache/sysfs.c | 13 ++++++++++---
+>>  1 file changed, 10 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+>> index 543b06408321..150cf4f4cf74 100644
+>> --- a/drivers/md/bcache/sysfs.c
+>> +++ b/drivers/md/bcache/sysfs.c
+>> @@ -267,10 +267,17 @@ STORE(__cached_dev)
+>>  	sysfs_strtoul_clamp(writeback_percent, dc->writeback_percent, 0, 40);
+>>  
+>>  	if (attr == &sysfs_writeback_rate) {
+>> -		int v;
+>> +		ssize_t ret;
+>> +		long int v = atomic_long_read(&dc->writeback_rate.rate);
+>> +
+>> +		ret = strtoul_safe_clamp(buf, v, 1, INT_MAX);
+>>  
+>> -		sysfs_strtoul_clamp(writeback_rate, v, 1, INT_MAX);
+>> -		atomic_long_set(&dc->writeback_rate.rate, v);
+>> +		if (!ret) {
+>> +			atomic_long_set(&dc->writeback_rate.rate, v);
+>> +			ret = size;
+>> +		}
+>> +
+>> +		return ret;
+>>  	}
+>>  
+>>  	sysfs_strtoul_clamp(writeback_rate_update_seconds,
+>>
