@@ -1,46 +1,130 @@
-Return-Path: <BATV+568b9e22b4768da93666+5456+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Wed, 1 Aug 2018 01:24:07 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	Tejun Heo <tj@kernel.org>, Borislav Petkov <bp@alien8.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Manoj N. Kumar" <manoj@linux.vnet.ibm.com>,
-	"Matthew R. Ochs" <mrochs@linux.vnet.ibm.com>,
-	Uma Krishnan <ukrishn@linux.vnet.ibm.com>,
-	"Nicholas A. Bellinger" <nab@linux-iscsi.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Philippe Ombredanne <pombredanne@nexb.com>,
-	Stephen Boyd <sboyd@codeaurora.org>,
-	Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
-	Juergen Gross <jgross@suse.com>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Sagar Dharia <sdharia@codeaurora.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Vinod Koul <vinod.koul@intel.com>,
-	David Kershner <david.kershner@unisys.com>,
-	linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 7/9] cdrom: Use struct scsi_sense_hdr internally
-Message-ID: <20180801082407.GC26378@infradead.org>
-References: <20180731195155.46664-1-keescook@chromium.org>
- <20180731195155.46664-8-keescook@chromium.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180731195155.46664-8-keescook@chromium.org>
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: axboe@kernel.dk,
+	linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Coly Li <colyli@suse.de>
+Subject: [PATCH v3 12/17] bcache: fix code comments style
+Date: Sat, 11 Aug 2018 13:19:55 +0800
+Message-Id: <20180811052000.103680-13-colyli@suse.de>
+In-Reply-To: <20180811052000.103680-1-colyli@suse.de>
+References: <20180811052000.103680-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Jul 31, 2018 at 12:51:52PM -0700, Kees Cook wrote:
-> This removes more casts of struct request_sense and uses the standard
-> struct scsi_sense_hdr instead. This also fixes any possible stale values
-> since the prior code did not check the sense length.
-> 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+This patch fixes 3 style issues warned by checkpatch.pl,
+- Comment lines are not aligned
+- Comments use "/*" on subsequent lines
+- Comment lines use a trailing "*/"
 
-Looks good,
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
+---
+ drivers/md/bcache/bset.c      |  9 ++++++---
+ drivers/md/bcache/super.c     | 22 +++++++++++++---------
+ drivers/md/bcache/writeback.c |  3 ++-
+ 3 files changed, 21 insertions(+), 13 deletions(-)
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
+index b6a3f9d291a9..8f07fa6e1739 100644
+--- a/drivers/md/bcache/bset.c
++++ b/drivers/md/bcache/bset.c
+@@ -402,7 +402,8 @@ static unsigned int inorder_prev(unsigned int j, unsigned int size)
+ 	return j;
+ }
+ 
+-/* I have no idea why this code works... and I'm the one who wrote it
++/*
++ * I have no idea why this code works... and I'm the one who wrote it
+  *
+  * However, I do know what it does:
+  * Given a binary tree constructed in an array (i.e. how you normally implement
+@@ -795,7 +796,8 @@ static void bch_bset_fix_lookup_table(struct btree_keys *b,
+ 	if (!t->size)
+ 		return;
+ 
+-	/* k is the key we just inserted; we need to find the entry in the
++	/*
++	 * k is the key we just inserted; we need to find the entry in the
+ 	 * lookup table for the first key that is strictly greater than k:
+ 	 * it's either k's cacheline or the next one
+ 	 */
+@@ -803,7 +805,8 @@ static void bch_bset_fix_lookup_table(struct btree_keys *b,
+ 	       table_to_bkey(t, j) <= k)
+ 		j++;
+ 
+-	/* Adjust all the lookup table entries, and find a new key for any that
++	/*
++	 * Adjust all the lookup table entries, and find a new key for any that
+ 	 * have gotten too big
+ 	 */
+ 	for (; j < t->size; j++) {
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 2a7be104557e..01fc3c015a58 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -465,8 +465,8 @@ static struct uuid_entry *uuid_find_empty(struct cache_set *c)
+  * Bucket priorities/gens:
+  *
+  * For each bucket, we store on disk its
+-   * 8 bit gen
+-   * 16 bit priority
++ *   8 bit gen
++ *  16 bit priority
+  *
+  * See alloc.c for an explanation of the gen. The priority is used to implement
+  * lru (and in the future other) cache replacement policies; for most purposes
+@@ -934,8 +934,10 @@ void bch_cached_dev_run(struct cached_dev *dc)
+ 
+ 	add_disk(d->disk);
+ 	bd_link_disk_holder(dc->bdev, dc->disk.disk);
+-	/* won't show up in the uevent file, use udevadm monitor -e instead
+-	 * only class / kset properties are persistent */
++	/*
++	 * won't show up in the uevent file, use udevadm monitor -e instead
++	 * only class / kset properties are persistent
++	 */
+ 	kobject_uevent_env(&disk_to_dev(d->disk)->kobj, KOBJ_CHANGE, env);
+ 	kfree(env[1]);
+ 	kfree(env[2]);
+@@ -1104,8 +1106,9 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
+ 		}
+ 	}
+ 
+-	/* Deadlocks since we're called via sysfs...
+-	sysfs_remove_file(&dc->kobj, &sysfs_attach);
++	/*
++	 * Deadlocks since we're called via sysfs...
++	 * sysfs_remove_file(&dc->kobj, &sysfs_attach);
+ 	 */
+ 
+ 	if (bch_is_zero(u->uuid, 16)) {
+@@ -1468,9 +1471,10 @@ bool bch_cache_set_error(struct cache_set *c, const char *fmt, ...)
+ 	if (test_and_set_bit(CACHE_SET_IO_DISABLE, &c->flags))
+ 		pr_info("CACHE_SET_IO_DISABLE already set");
+ 
+-	/* XXX: we can be called from atomic context
+-	acquire_console_sem();
+-	*/
++	/*
++	 * XXX: we can be called from atomic context
++	 * acquire_console_sem();
++	 */
+ 
+ 	pr_err("bcache: error on %pU: ", c->sb.set_uuid);
+ 
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index e40bf0e403e7..6be05bd7ca67 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -468,7 +468,8 @@ static void read_dirty(struct cached_dev *dc)
+ 
+ 			down(&dc->in_flight);
+ 
+-			/* We've acquired a semaphore for the maximum
++			/*
++			 * We've acquired a semaphore for the maximum
+ 			 * simultaneous number of writebacks; from here
+ 			 * everything happens asynchronously.
+ 			 */
+-- 
+2.18.0
