@@ -1,99 +1,139 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:35120 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727428AbeH2QUf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Aug 2018 12:20:35 -0400
-Received: by mail-ed1-f66.google.com with SMTP id y20-v6so3779912edq.2
-        for <linux-block@vger.kernel.org>; Wed, 29 Aug 2018 05:23:54 -0700 (PDT)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Javier Gonzales <javier@cnexlabs.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH 2/7] lightnvm: pblk: fix mapping issue on failed writes
-Date: Wed, 29 Aug 2018 14:23:29 +0200
-Message-Id: <1535545414-550-3-git-send-email-hans.ml.holmberg@owltronix.com>
-In-Reply-To: <1535545414-550-1-git-send-email-hans.ml.holmberg@owltronix.com>
-References: <1535545414-550-1-git-send-email-hans.ml.holmberg@owltronix.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org
+Subject: [RFC PATCH V2 05/17] SCSI: try to retrieve request_queue via 'scsi_cmnd' if possible
+Date: Sat, 11 Aug 2018 15:12:08 +0800
+Message-Id: <20180811071220.357-6-ming.lei@redhat.com>
+In-Reply-To: <20180811071220.357-1-ming.lei@redhat.com>
+References: <20180811071220.357-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Prepare for introduing per-host admin queue.
 
-On 1.2-devices, the mapping-out of remaning sectors in the
-failed-write's block can result in an infinite loop,
-stalling the write pipeline, fix this.
+The most important part is that the request originated from admin queue
+can't be called back to the IO queue associated with scsi_device, especially,
+one request may be requeued, timedout or completed via block layer helper, so
+what we should do is to use 'scsi_cmnd->request->q' to retrieve the request
+queue, and pass that to block layer helper, instead of
+sdev->request_queue.
 
-Fixes: 6a3abf5beef6 ("lightnvm: pblk: rework write error recovery path")
+Fortunately most of users of 'scsi_device->request_queue' aren't in related IO
+path(requeue, timeout, complete, run queue), so the audit isn't more difficult
+than I thought of.
 
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Cc: Alan Stern <stern@rowland.harvard.edu>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Adrian Hunter <adrian.hunter@intel.com>
+Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-write.c | 45 ++++++++++++++++++++++++++++++++++---------
- 1 file changed, 36 insertions(+), 9 deletions(-)
+ drivers/ata/libata-eh.c             | 2 +-
+ drivers/scsi/libsas/sas_ata.c       | 2 +-
+ drivers/scsi/libsas/sas_scsi_host.c | 2 +-
+ drivers/scsi/scsi_error.c           | 2 +-
+ drivers/scsi/scsi_lib.c             | 6 +++---
+ 5 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 1bc879ab679d..fd67325f6e54 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -103,6 +103,41 @@ static void pblk_complete_write(struct pblk *pblk, struct nvm_rq *rqd,
- 	pblk_rb_sync_end(&pblk->rwb, &flags);
- }
- 
-+static int pblk_next_ppa_in_blk(struct nvm_geo *geo, struct ppa_addr *ppa)
-+{
-+	int done = 0;
-+
-+	if (geo->version == NVM_OCSSD_SPEC_12) {
-+		int sec = ppa->g.sec;
-+
-+		sec++;
-+		if (sec == geo->ws_min) {
-+			int pg = ppa->g.pg;
-+
-+			sec = 0;
-+			pg++;
-+			if (pg == geo->num_pg) {
-+				int pl = ppa->g.pl;
-+
-+				pg = 0;
-+				pl++;
-+				if (pl == geo->num_pln)
-+					done = 1;
-+
-+				ppa->g.pl = pl;
-+			}
-+			ppa->g.pg = pg;
-+		}
-+		ppa->g.sec = sec;
-+	} else {
-+		ppa->m.sec++;
-+		if (ppa->m.sec == geo->clba)
-+			done = 1;
-+	}
-+
-+	return done;
-+}
-+
- /* Map remaining sectors in chunk, starting from ppa */
- static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa)
+diff --git a/drivers/ata/libata-eh.c b/drivers/ata/libata-eh.c
+index 01306c018398..fbceea6b62a9 100644
+--- a/drivers/ata/libata-eh.c
++++ b/drivers/ata/libata-eh.c
+@@ -919,7 +919,7 @@ static void ata_eh_set_pending(struct ata_port *ap, int fastdrain)
+ void ata_qc_schedule_eh(struct ata_queued_cmd *qc)
  {
-@@ -125,15 +160,7 @@ static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa)
- 		if (!test_and_set_bit(paddr, line->invalid_bitmap))
- 			le32_add_cpu(line->vsc, -1);
+ 	struct ata_port *ap = qc->ap;
+-	struct request_queue *q = qc->scsicmd->device->request_queue;
++	struct request_queue *q = qc->scsicmd->request->q;
+ 	unsigned long flags;
  
--		if (geo->version == NVM_OCSSD_SPEC_12) {
--			map_ppa.ppa++;
--			if (map_ppa.g.pg == geo->num_pg)
--				done = 1;
--		} else {
--			map_ppa.m.sec++;
--			if (map_ppa.m.sec == geo->clba)
--				done = 1;
--		}
-+		done = pblk_next_ppa_in_blk(geo, &map_ppa);
- 	}
+ 	WARN_ON(!ap->ops->error_handler);
+diff --git a/drivers/scsi/libsas/sas_ata.c b/drivers/scsi/libsas/sas_ata.c
+index ff1d612f6fb9..590dffe6e960 100644
+--- a/drivers/scsi/libsas/sas_ata.c
++++ b/drivers/scsi/libsas/sas_ata.c
+@@ -594,7 +594,7 @@ void sas_ata_task_abort(struct sas_task *task)
  
- 	line->w_err_gc->has_write_err = 1;
+ 	/* Bounce SCSI-initiated commands to the SCSI EH */
+ 	if (qc->scsicmd) {
+-		struct request_queue *q = qc->scsicmd->device->request_queue;
++		struct request_queue *q = qc->scsicmd->request->q;
+ 		unsigned long flags;
+ 
+ 		spin_lock_irqsave(q->queue_lock, flags);
+diff --git a/drivers/scsi/libsas/sas_scsi_host.c b/drivers/scsi/libsas/sas_scsi_host.c
+index ceab5e5c41c2..42994ad9549c 100644
+--- a/drivers/scsi/libsas/sas_scsi_host.c
++++ b/drivers/scsi/libsas/sas_scsi_host.c
+@@ -933,7 +933,7 @@ void sas_task_abort(struct sas_task *task)
+ 	if (dev_is_sata(task->dev)) {
+ 		sas_ata_task_abort(task);
+ 	} else {
+-		struct request_queue *q = sc->device->request_queue;
++		struct request_queue *q = sc->request->q;
+ 		unsigned long flags;
+ 
+ 		spin_lock_irqsave(q->queue_lock, flags);
+diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
+index 2715cdaa669c..9260b267fe43 100644
+--- a/drivers/scsi/scsi_error.c
++++ b/drivers/scsi/scsi_error.c
+@@ -1360,7 +1360,7 @@ static int scsi_eh_try_stu(struct scsi_cmnd *scmd)
+ 		int i, rtn = NEEDS_RETRY;
+ 
+ 		for (i = 0; rtn == NEEDS_RETRY && i < 2; i++)
+-			rtn = scsi_send_eh_cmnd(scmd, stu_command, 6, scmd->device->request_queue->rq_timeout, 0);
++			rtn = scsi_send_eh_cmnd(scmd, stu_command, 6, scmd->request->q->rq_timeout, 0);
+ 
+ 		if (rtn == SUCCESS)
+ 			return 0;
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 9cb9a166fa0c..4341cf8a7322 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -168,7 +168,7 @@ static void scsi_mq_requeue_cmd(struct scsi_cmnd *cmd)
+ static void __scsi_queue_insert(struct scsi_cmnd *cmd, int reason, bool unbusy)
+ {
+ 	struct scsi_device *device = cmd->device;
+-	struct request_queue *q = device->request_queue;
++	struct request_queue *q = cmd->request->q;
+ 	unsigned long flags;
+ 
+ 	SCSI_LOG_MLQUEUE(1, scmd_printk(KERN_INFO, cmd,
+@@ -667,7 +667,7 @@ static bool scsi_end_request(struct request *req, blk_status_t error,
+ {
+ 	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
+ 	struct scsi_device *sdev = cmd->device;
+-	struct request_queue *q = sdev->request_queue;
++	struct request_queue *q = cmd->request->q;
+ 
+ 	if (blk_update_request(req, error, bytes))
+ 		return true;
+@@ -792,7 +792,7 @@ static blk_status_t scsi_result_to_blk_status(struct scsi_cmnd *cmd, int result)
+ void scsi_io_completion(struct scsi_cmnd *cmd, unsigned int good_bytes)
+ {
+ 	int result = cmd->result;
+-	struct request_queue *q = cmd->device->request_queue;
++	struct request_queue *q = cmd->request->q;
+ 	struct request *req = cmd->request;
+ 	blk_status_t error = BLK_STS_OK;
+ 	struct scsi_sense_hdr sshdr;
 -- 
-2.7.4
+2.9.5
