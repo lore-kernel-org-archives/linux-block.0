@@ -1,117 +1,56 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:33854 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726890AbeHIWxZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Aug 2018 18:53:25 -0400
-Received: by mail-pg1-f196.google.com with SMTP id y5-v6so3278683pgv.1
-        for <linux-block@vger.kernel.org>; Thu, 09 Aug 2018 13:26:57 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
-Subject: [RFC PATCH 1/5] block: move call of scheduler's ->completed_request() hook
-Date: Thu,  9 Aug 2018 13:26:43 -0700
-Message-Id: <dc018874d79575db91e3ec44c09511720e2b0ab0.1533846185.git.osandov@fb.com>
-In-Reply-To: <cover.1533846185.git.osandov@fb.com>
-References: <cover.1533846185.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: axboe@kernel.dk,
+	linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Coly Li <colyli@suse.de>
+Subject: [PATCH v3 10/17] bcache: prefer 'help' in Kconfig
+Date: Sat, 11 Aug 2018 13:19:53 +0800
+Message-Id: <20180811052000.103680-11-colyli@suse.de>
+In-Reply-To: <20180811052000.103680-1-colyli@suse.de>
+References: <20180811052000.103680-1-colyli@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+Current bcache Kconfig uses '---help---' as header of help information,
+for now 'help' is prefered. This patch fixes this style by replacing
+'---help---' by 'help' in bcache Kconfig file.
 
-Commit 4bc6339a583c ("block: move blk_stat_add() to
-__blk_mq_end_request()") consolidated some calls using ktime_get() so
-we'd only need to call it once. Kyber's ->completed_request() hook also
-calls ktime_get(), so let's move it to the same place, too.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
 ---
- block/blk-mq-sched.h     | 4 ++--
- block/blk-mq.c           | 5 +++--
- block/kyber-iosched.c    | 5 ++---
- include/linux/elevator.h | 2 +-
- 4 files changed, 8 insertions(+), 8 deletions(-)
+ drivers/md/bcache/Kconfig | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 0cb8f938dff9..74fb6ff9a30d 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -54,12 +54,12 @@ blk_mq_sched_allow_merge(struct request_queue *q, struct request *rq,
- 	return true;
- }
+diff --git a/drivers/md/bcache/Kconfig b/drivers/md/bcache/Kconfig
+index 17bf109c58e9..817b9fba50db 100644
+--- a/drivers/md/bcache/Kconfig
++++ b/drivers/md/bcache/Kconfig
+@@ -1,7 +1,7 @@
  
--static inline void blk_mq_sched_completed_request(struct request *rq)
-+static inline void blk_mq_sched_completed_request(struct request *rq, u64 now)
- {
- 	struct elevator_queue *e = rq->q->elevator;
+ config BCACHE
+ 	tristate "Block device as cache"
+-	---help---
++	help
+ 	Allows a block device to be used as cache for other devices; uses
+ 	a btree for indexing and the layout is optimized for SSDs.
  
- 	if (e && e->type->ops.mq.completed_request)
--		e->type->ops.mq.completed_request(rq);
-+		e->type->ops.mq.completed_request(rq, now);
- }
+@@ -10,7 +10,7 @@ config BCACHE
+ config BCACHE_DEBUG
+ 	bool "Bcache debugging"
+ 	depends on BCACHE
+-	---help---
++	help
+ 	Don't select this option unless you're a developer
  
- static inline void blk_mq_sched_started_request(struct request *rq)
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 654b0dc7e001..0c5be0001d0f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -524,6 +524,9 @@ inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
- 		blk_stat_add(rq, now);
- 	}
- 
-+	if (rq->internal_tag != -1)
-+		blk_mq_sched_completed_request(rq, now);
-+
- 	blk_account_io_done(rq, now);
- 
- 	if (rq->end_io) {
-@@ -560,8 +563,6 @@ static void __blk_mq_complete_request(struct request *rq)
- 
- 	if (!blk_mq_mark_complete(rq))
- 		return;
--	if (rq->internal_tag != -1)
--		blk_mq_sched_completed_request(rq);
- 
- 	if (!test_bit(QUEUE_FLAG_SAME_COMP, &rq->q->queue_flags)) {
- 		rq->q->softirq_done_fn(rq);
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index a1660bafc912..95d062c07c61 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -558,12 +558,12 @@ static void kyber_finish_request(struct request *rq)
- 	rq_clear_domain_token(kqd, rq);
- }
- 
--static void kyber_completed_request(struct request *rq)
-+static void kyber_completed_request(struct request *rq, u64 now)
- {
- 	struct request_queue *q = rq->q;
- 	struct kyber_queue_data *kqd = q->elevator->elevator_data;
- 	unsigned int sched_domain;
--	u64 now, latency, target;
-+	u64 latency, target;
- 
- 	/*
- 	 * Check if this request met our latency goal. If not, quickly gather
-@@ -585,7 +585,6 @@ static void kyber_completed_request(struct request *rq)
- 	if (blk_stat_is_active(kqd->cb))
- 		return;
- 
--	now = ktime_get_ns();
- 	if (now < rq->io_start_time_ns)
- 		return;
- 
-diff --git a/include/linux/elevator.h b/include/linux/elevator.h
-index a02deea30185..015bb59c0331 100644
---- a/include/linux/elevator.h
-+++ b/include/linux/elevator.h
-@@ -111,7 +111,7 @@ struct elevator_mq_ops {
- 	void (*insert_requests)(struct blk_mq_hw_ctx *, struct list_head *, bool);
- 	struct request *(*dispatch_request)(struct blk_mq_hw_ctx *);
- 	bool (*has_work)(struct blk_mq_hw_ctx *);
--	void (*completed_request)(struct request *);
-+	void (*completed_request)(struct request *, u64);
- 	void (*started_request)(struct request *);
- 	void (*requeue_request)(struct request *);
- 	struct request *(*former_request)(struct request_queue *, struct request *);
+ 	Enables extra debugging tools, allows expensive runtime checks to be
+@@ -20,7 +20,7 @@ config BCACHE_CLOSURES_DEBUG
+ 	bool "Debug closures"
+ 	depends on BCACHE
+ 	select DEBUG_FS
+-	---help---
++	help
+ 	Keeps all active closures in a linked list and provides a debugfs
+ 	interface to list them, which makes it possible to see asynchronous
+ 	operations that get stuck.
 -- 
 2.18.0
