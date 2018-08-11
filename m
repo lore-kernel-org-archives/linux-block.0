@@ -4,36 +4,148 @@ To: axboe@kernel.dk,
 	linux-bcache@vger.kernel.org
 Cc: linux-block@vger.kernel.org,
 	Coly Li <colyli@suse.de>
-Subject: [PATCH v3 11/17] bcache: do not check NULL pointer before calling kmem_cache_destroy
-Date: Sat, 11 Aug 2018 13:19:54 +0800
-Message-Id: <20180811052000.103680-12-colyli@suse.de>
+Subject: [PATCH v3 06/17] bcache: replace printk() by pr_*() routines
+Date: Sat, 11 Aug 2018 13:19:49 +0800
+Message-Id: <20180811052000.103680-7-colyli@suse.de>
 In-Reply-To: <20180811052000.103680-1-colyli@suse.de>
 References: <20180811052000.103680-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-kmem_cache_destroy() is safe for NULL pointer as input, the NULL pointer
-checking is unncessary. This patch just removes the NULL pointer checking
-to make code simpler.
+There are still many places in bcache use printk to display kernel
+message, which are suggested to be preplaced by pr_*() routines like
+pr_err(), pr_info(), or pr_notice().
+
+This patch replaces all printk() with a proper pr_*() routine for
+bcache code.
 
 Signed-off-by: Coly Li <colyli@suse.de>
 Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
 ---
- drivers/md/bcache/request.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/md/bcache/bset.c    |  8 ++++----
+ drivers/md/bcache/debug.c   | 10 +++++-----
+ drivers/md/bcache/extents.c |  8 ++++----
+ drivers/md/bcache/super.c   |  4 ++--
+ 4 files changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 55264e71369d..51be355a3309 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -1367,8 +1367,7 @@ void bch_flash_dev_request_init(struct bcache_device *d)
+diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
+index 19b4febe5b45..b6a3f9d291a9 100644
+--- a/drivers/md/bcache/bset.c
++++ b/drivers/md/bcache/bset.c
+@@ -25,18 +25,18 @@ void bch_dump_bset(struct btree_keys *b, struct bset *i, unsigned int set)
+ 	for (k = i->start; k < bset_bkey_last(i); k = next) {
+ 		next = bkey_next(k);
  
- void bch_request_exit(void)
- {
--	if (bch_search_cache)
--		kmem_cache_destroy(bch_search_cache);
-+	kmem_cache_destroy(bch_search_cache);
+-		printk(KERN_ERR "block %u key %u/%u: ", set,
++		pr_err("block %u key %u/%u: ", set,
+ 		       (unsigned int) ((u64 *) k - i->d), i->keys);
+ 
+ 		if (b->ops->key_dump)
+ 			b->ops->key_dump(b, k);
+ 		else
+-			printk("%llu:%llu\n", KEY_INODE(k), KEY_OFFSET(k));
++			pr_err("%llu:%llu\n", KEY_INODE(k), KEY_OFFSET(k));
+ 
+ 		if (next < bset_bkey_last(i) &&
+ 		    bkey_cmp(k, b->ops->is_extents ?
+ 			     &START_KEY(next) : next) > 0)
+-			printk(KERN_ERR "Key skipped backwards\n");
++			pr_err("Key skipped backwards\n");
+ 	}
  }
  
- int __init bch_request_init(void)
+@@ -482,7 +482,7 @@ void inorder_test(void)
+ 		unsigned int i = 1, j = rounddown_pow_of_two(size - 1);
+ 
+ 		if (!(size % 4096))
+-			printk(KERN_NOTICE "loop %u, %llu per us\n", size,
++			pr_notice("loop %u, %llu per us\n", size,
+ 			       done / ktime_us_delta(ktime_get(), start));
+ 
+ 		while (1) {
+diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
+index a8f70c916fdb..06da66b2488a 100644
+--- a/drivers/md/bcache/debug.c
++++ b/drivers/md/bcache/debug.c
+@@ -74,28 +74,28 @@ void bch_btree_verify(struct btree *b)
+ 
+ 		console_lock();
+ 
+-		printk(KERN_ERR "*** in memory:\n");
++		pr_err("*** in memory:\n");
+ 		bch_dump_bset(&b->keys, inmemory, 0);
+ 
+-		printk(KERN_ERR "*** read back in:\n");
++		pr_err("*** read back in:\n");
+ 		bch_dump_bset(&v->keys, sorted, 0);
+ 
+ 		for_each_written_bset(b, ondisk, i) {
+ 			unsigned int block = ((void *) i - (void *) ondisk) /
+ 				block_bytes(b->c);
+ 
+-			printk(KERN_ERR "*** on disk block %u:\n", block);
++			pr_err("*** on disk block %u:\n", block);
+ 			bch_dump_bset(&b->keys, i, block);
+ 		}
+ 
+-		printk(KERN_ERR "*** block %zu not written\n",
++		pr_err("*** block %zu not written\n",
+ 		       ((void *) i - (void *) ondisk) / block_bytes(b->c));
+ 
+ 		for (j = 0; j < inmemory->keys; j++)
+ 			if (inmemory->d[j] != sorted->d[j])
+ 				break;
+ 
+-		printk(KERN_ERR "b->written %u\n", b->written);
++		pr_err("b->written %u\n", b->written);
+ 
+ 		console_unlock();
+ 		panic("verify failed at %u\n", j);
+diff --git a/drivers/md/bcache/extents.c b/drivers/md/bcache/extents.c
+index cb3b2c613ed6..c809724e6571 100644
+--- a/drivers/md/bcache/extents.c
++++ b/drivers/md/bcache/extents.c
+@@ -130,18 +130,18 @@ static void bch_bkey_dump(struct btree_keys *keys, const struct bkey *k)
+ 	char buf[80];
+ 
+ 	bch_extent_to_text(buf, sizeof(buf), k);
+-	printk(" %s", buf);
++	pr_err(" %s", buf);
+ 
+ 	for (j = 0; j < KEY_PTRS(k); j++) {
+ 		size_t n = PTR_BUCKET_NR(b->c, k, j);
+ 
+-		printk(" bucket %zu", n);
++		pr_err(" bucket %zu", n);
+ 		if (n >= b->c->sb.first_bucket && n < b->c->sb.nbuckets)
+-			printk(" prio %i",
++			pr_err(" prio %i",
+ 			       PTR_BUCKET(b->c, k, j)->prio);
+ 	}
+ 
+-	printk(" %s\n", bch_ptr_status(b->c, k));
++	pr_err(" %s\n", bch_ptr_status(b->c, k));
+ }
+ 
+ /* Btree ptrs */
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 296fc8c31c6c..2a7be104557e 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1472,13 +1472,13 @@ bool bch_cache_set_error(struct cache_set *c, const char *fmt, ...)
+ 	acquire_console_sem();
+ 	*/
+ 
+-	printk(KERN_ERR "bcache: error on %pU: ", c->sb.set_uuid);
++	pr_err("bcache: error on %pU: ", c->sb.set_uuid);
+ 
+ 	va_start(args, fmt);
+ 	vprintk(fmt, args);
+ 	va_end(args);
+ 
+-	printk(", disabling caching\n");
++	pr_err(", disabling caching\n");
+ 
+ 	if (c->on_error == ON_ERROR_PANIC)
+ 		panic("panic forced after error\n");
 -- 
 2.18.0
