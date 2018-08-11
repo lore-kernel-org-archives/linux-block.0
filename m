@@ -1,55 +1,57 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39240 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727808AbeHIJI4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Aug 2018 05:08:56 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 15/17] bcache: add missing SPDX header
-Date: Thu,  9 Aug 2018 14:43:18 +0800
-Message-Id: <20180809064320.10229-16-colyli@suse.de>
-In-Reply-To: <20180809064320.10229-1-colyli@suse.de>
-References: <20180809064320.10229-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org
+Subject: [RFC PATCH V2 14/17] SCSI: transport_spi: resume a quiesced device
+Date: Sat, 11 Aug 2018 15:12:17 +0800
+Message-Id: <20180811071220.357-15-ming.lei@redhat.com>
+In-Reply-To: <20180811071220.357-1-ming.lei@redhat.com>
+References: <20180811071220.357-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-The SPDX header is missing fro closure.c, super.c and util.c, this
-patch adds SPDX header for GPL-2.0 into these files.
+We have to preempt freeze queue in scsi_device_quiesce(),
+and unfreeze in scsi_device_resume(), so call scsi_device_resume()
+for the device which is quiesced by scsi_device_quiesce().
 
-Signed-off-by: Coly Li <colyli@suse.de>
+Cc: Alan Stern <stern@rowland.harvard.edu>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Adrian Hunter <adrian.hunter@intel.com>
+Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/closure.c | 1 +
- drivers/md/bcache/super.c   | 1 +
- drivers/md/bcache/util.c    | 1 +
- 3 files changed, 3 insertions(+)
+ drivers/scsi/scsi_transport_spi.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
-index 034067e0e9ce..73f5319295bc 100644
---- a/drivers/md/bcache/closure.c
-+++ b/drivers/md/bcache/closure.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * Asynchronous refcounty things
-  *
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 1382c6afd271..f8fe39c72f99 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * bcache setup/teardown code, and some metadata io - read a superblock and
-  * figure out what to do with it.
-diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
-index 18016e7bb32c..e873b0f7a82a 100644
---- a/drivers/md/bcache/util.c
-+++ b/drivers/md/bcache/util.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * random utiility code, for bcache but in theory not specific to bcache
-  *
+diff --git a/drivers/scsi/scsi_transport_spi.c b/drivers/scsi/scsi_transport_spi.c
+index 2ca150b16764..10854c1848e2 100644
+--- a/drivers/scsi/scsi_transport_spi.c
++++ b/drivers/scsi/scsi_transport_spi.c
+@@ -1052,6 +1052,9 @@ spi_dv_device(struct scsi_device *sdev)
+ 
+ 	scsi_target_resume(starget);
+ 
++	/* undo what scsi_device_quiesce() did */
++	scsi_device_resume(sdev);
++
+ 	spi_initial_dv(starget) = 1;
+ 
+  out_free:
 -- 
-2.18.0
+2.9.5
