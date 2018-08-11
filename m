@@ -4,43 +4,36 @@ To: axboe@kernel.dk,
 	linux-bcache@vger.kernel.org
 Cc: linux-block@vger.kernel.org,
 	Coly Li <colyli@suse.de>
-Subject: [PATCH v3 08/17] bcache: replace '%pF' by '%pS' in seq_printf()
-Date: Sat, 11 Aug 2018 13:19:51 +0800
-Message-Id: <20180811052000.103680-9-colyli@suse.de>
+Subject: [PATCH v3 11/17] bcache: do not check NULL pointer before calling kmem_cache_destroy
+Date: Sat, 11 Aug 2018 13:19:54 +0800
+Message-Id: <20180811052000.103680-12-colyli@suse.de>
 In-Reply-To: <20180811052000.103680-1-colyli@suse.de>
 References: <20180811052000.103680-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-'%pF' and '%pf' are deprecated vsprintf pointer extensions, this patch
-replace them by '%pS', which is suggested by checkpatch.pl.
+kmem_cache_destroy() is safe for NULL pointer as input, the NULL pointer
+checking is unncessary. This patch just removes the NULL pointer checking
+to make code simpler.
 
 Signed-off-by: Coly Li <colyli@suse.de>
 Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
 ---
- drivers/md/bcache/closure.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/md/bcache/request.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
-index 8570fc426e31..034067e0e9ce 100644
---- a/drivers/md/bcache/closure.c
-+++ b/drivers/md/bcache/closure.c
-@@ -168,7 +168,7 @@ static int debug_seq_show(struct seq_file *f, void *data)
- 	list_for_each_entry(cl, &closure_list, all) {
- 		int r = atomic_read(&cl->remaining);
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 55264e71369d..51be355a3309 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -1367,8 +1367,7 @@ void bch_flash_dev_request_init(struct bcache_device *d)
  
--		seq_printf(f, "%p: %pF -> %pf p %p r %i ",
-+		seq_printf(f, "%p: %pS -> %pS p %p r %i ",
- 			   cl, (void *) cl->ip, cl->fn, cl->parent,
- 			   r & CLOSURE_REMAINING_MASK);
+ void bch_request_exit(void)
+ {
+-	if (bch_search_cache)
+-		kmem_cache_destroy(bch_search_cache);
++	kmem_cache_destroy(bch_search_cache);
+ }
  
-@@ -178,7 +178,7 @@ static int debug_seq_show(struct seq_file *f, void *data)
- 			   r & CLOSURE_RUNNING	? "R" : "");
- 
- 		if (r & CLOSURE_WAITING)
--			seq_printf(f, " W %pF\n",
-+			seq_printf(f, " W %pS\n",
- 				   (void *) cl->waiting_on);
- 
- 		seq_printf(f, "\n");
+ int __init bch_request_init(void)
 -- 
 2.18.0
