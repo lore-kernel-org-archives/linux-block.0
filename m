@@ -1,50 +1,28 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-To: herbert@gondor.apana.org.au
-Cc: Jeff.Lien@wdc.com, ard.biesheuvel@linaro.org,
-        david.darrington@wdc.com, hch@infradead.org, jeff.furlong@wdc.com,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        martin.petersen@oracle.com, tim.c.chen@linux.intel.com
-Subject: [PATCH v2 3/3] crc-t10dif: Allow current transform to be inspected in sysfs
-Date: Thu, 30 Aug 2018 11:00:16 -0400
-Message-Id: <20180830150016.15661-3-martin.petersen@oracle.com>
-In-Reply-To: <20180830150016.15661-1-martin.petersen@oracle.com>
-References: <20180827060918.tfz7ljufqhlej4kq@gondor.apana.org.au>
- <20180830150016.15661-1-martin.petersen@oracle.com>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <prvs=7568bcc2f=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "gregkh@linuxfoundation.org"
+	<gregkh@linuxfoundation.org>
+Subject: Re: [PATCH v2 0/2] Fix a race condition related to creation of
+ /dev/nvme0n<x>
+Date: Mon, 13 Aug 2018 18:44:03 +0000
+Message-ID: <d258a812b96f3a03512a7c209cf49207411ac593.camel@wdc.com>
+References: <20180813172531.7451-1-bart.vanassche@wdc.com>
+	 <6f10ca9c-ba9b-50ac-3c8c-fb62d7dd750c@suse.de>
+In-Reply-To: <6f10ca9c-ba9b-50ac-3c8c-fb62d7dd750c@suse.de>
+Content-Type: text/plain; charset="utf-7"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Add a way to print the currently active CRC algorithm in:
+On Mon, 2018-08-13 at 20:42 +-0200, Hannes Reinecke wrote:
++AD4- I have fixed the very same thing with my patchset titled +ACI-genhd:=
+=20
++AD4- register default groups with device+AF8-add+AF8-disk+ACI- which is wa=
+iting for=20
++AD4- inclusion.
 
-	/sys/module/crc_t10dif/parameters/transform
+Thanks Hannes for the feedback. I will drop this patch series and review
+your patches instead.
 
-Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
----
- lib/crc-t10dif.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
-index 52f577a3868d..6507fa101eff 100644
---- a/lib/crc-t10dif.c
-+++ b/lib/crc-t10dif.c
-@@ -107,6 +107,17 @@ static void __exit crc_t10dif_mod_fini(void)
- module_init(crc_t10dif_mod_init);
- module_exit(crc_t10dif_mod_fini);
- 
-+static int crc_t10dif_transform_show(char *buffer, const struct kernel_param *kp)
-+{
-+	if (static_key_false(&crct10dif_fallback))
-+		return sprintf(buffer, "fallback\n");
-+
-+	return sprintf(buffer, "%s\n",
-+		crypto_tfm_alg_driver_name(crypto_shash_tfm(crct10dif_tfm)));
-+}
-+
-+module_param_call(transform, NULL, crc_t10dif_transform_show, NULL, 0644);
-+
- MODULE_DESCRIPTION("T10 DIF CRC calculation");
- MODULE_LICENSE("GPL");
- MODULE_SOFTDEP("pre: crct10dif");
--- 
-2.17.1
+Bart.
