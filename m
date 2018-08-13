@@ -1,86 +1,28 @@
-Return-Path: <mail@maciej.szmigiero.name>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>,
- Joseph Qi <joseph.qi@linux.alibaba.com>, Tejun Heo <tj@kernel.org>,
- jiufei.xue@linux.alibaba.com, Caspar Zhang <caspar@linux.alibaba.com>
-From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: [PATCH] cfq: clear queue pointers from cfqg after unpinning them in
- cfq_pd_offline
-Message-ID: <ba086112-65b1-c20f-0694-35d1ca0415d9@maciej.szmigiero.name>
-Date: Fri, 17 Aug 2018 19:28:39 +0200
+Return-Path: <gregkh@linuxfoundation.org>
+Date: Mon, 13 Aug 2018 20:52:34 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>, Matias Bjorling <mb@lightnvm.io>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] block: Introduce alloc_disk_node_attr()
+Message-ID: <20180813185234.GB5606@kroah.com>
+References: <20180813172531.7451-1-bart.vanassche@wdc.com>
+ <20180813172531.7451-2-bart.vanassche@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180813172531.7451-2-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The current linux-block, 4.18 and 4.17 can reliably be crashed within few
-minutes by running the following bash snippet:
+On Mon, Aug 13, 2018 at 10:25:30AM -0700, Bart Van Assche wrote:
+> This patch does not change the behavior of any existing code but
+> introduces a function that will be used by the next patch.
 
-mkfs.ext4 -v /dev/sda3 && mount /dev/sda3 /mnt/test/ -t ext4;
-while true; do
-	mkdir /sys/fs/cgroup/unified/test/;
-	echo $$ >/sys/fs/cgroup/unified/test/cgroup.procs;
-	dd if=/dev/zero of=/mnt/test/test-$(( RANDOM * 10 / 32768 )) bs=1M count=1024 &
-	echo $$ >/sys/fs/cgroup/unified/cgroup.procs;
-	sleep 1;
-	kill -KILL $!; wait $!;
-	rmdir /sys/fs/cgroup/unified/test;
-done
+"next" is hard to determine in a git log :)
 
-# cat /sys/block/sda/queue/scheduler
-noop [cfq]
-# cat /sys/block/sda/queue/rotational
-1
-# cat /sys/fs/cgroup/unified/cgroup.subtree_control
-cpu io memory pids
+Try being a bit more specific as to why you are doing this.
 
-The backtraces vary but often they are NULL pointer dereferences due to
-various cfqq fields being NULL.
-Or BUG_ON(cfqq->ref <= 0) in cfq_put_queue() triggers due to cfqq reference
-count being zero.
+thanks,
 
-Bisection points at
-commit 4c6994806f70 ("blk-throttle: fix race between blkcg_bio_issue_check() and cgroup_rmdir()").
-The prime suspect looked like .pd_offline_fn() method being called multiple
-times, but from analyzing the mentioned commit this didn't seem possible
-and runtime trials have confirmed that.
-
-However, CFQ's cfq_pd_offline() implementation of the above method were
-leaving queue pointers intact in cfqg after unpinning them.
-After making sure that they are cleared to NULL in this function I can no
-longer reproduce the crash.
-
-Signed-off-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
-Fixes: 4c6994806f70 ("blk-throttle: fix race between blkcg_bio_issue_check() and cgroup_rmdir()").
-Cc: stable@vger.kernel.org
----
- block/cfq-iosched.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 2eb87444b157..ed41aa978c4a 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -1644,14 +1644,20 @@ static void cfq_pd_offline(struct blkg_policy_data *pd)
- 	int i;
- 
- 	for (i = 0; i < IOPRIO_BE_NR; i++) {
--		if (cfqg->async_cfqq[0][i])
-+		if (cfqg->async_cfqq[0][i]) {
- 			cfq_put_queue(cfqg->async_cfqq[0][i]);
--		if (cfqg->async_cfqq[1][i])
-+			cfqg->async_cfqq[0][i] = NULL;
-+		}
-+		if (cfqg->async_cfqq[1][i]) {
- 			cfq_put_queue(cfqg->async_cfqq[1][i]);
-+			cfqg->async_cfqq[1][i] = NULL;
-+		}
- 	}
- 
--	if (cfqg->async_idle_cfqq)
-+	if (cfqg->async_idle_cfqq) {
- 		cfq_put_queue(cfqg->async_idle_cfqq);
-+		cfqg->async_idle_cfqq = NULL;
-+	}
- 
- 	/*
- 	 * @blkg is going offline and will be ignored by
+greg k-h
