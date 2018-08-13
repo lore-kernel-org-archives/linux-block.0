@@ -1,157 +1,107 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [RFC PATCH V2 07/17] SCSI: prepare for introducing admin queue for legacy path
-Date: Sat, 11 Aug 2018 15:12:10 +0800
-Message-Id: <20180811071220.357-8-ming.lei@redhat.com>
-In-Reply-To: <20180811071220.357-1-ming.lei@redhat.com>
-References: <20180811071220.357-1-ming.lei@redhat.com>
+Return-Path: <jgross@suse.com>
+From: Juergen Gross <jgross@suse.com>
+To: linux-kernel@vger.kernel.org,
+	xen-devel@lists.xenproject.org,
+	linux-block@vger.kernel.org
+Cc: konrad.wilk@oracle.com,
+	roger.pau@citrix.com,
+	axboe@kernel.dk,
+	boris.ostrovsky@oracle.com,
+	Juergen Gross <jgross@suse.com>
+Subject: [PATCH v3 4/5] xen/blkback: move persistent grants flags to bool
+Date: Mon, 13 Aug 2018 16:01:13 +0200
+Message-Id: <20180813140114.20126-5-jgross@suse.com>
+In-Reply-To: <20180813140114.20126-1-jgross@suse.com>
+References: <20180813140114.20126-1-jgross@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Uses scsi_is_admin_queue() and scsi_get_scsi_dev() to retrieve
-'scsi_device' for legacy path.
+The struct persistent_gnt flags member is meant to be a bitfield of
+different flags. There is only PERSISTENT_GNT_ACTIVE flag left, so
+convert it to a bool named "active".
 
-The same approach can be used in SCSI_MQ path too, just not very efficiently,
-and will deal with that in the patch when introducing admin queue for SCSI_MQ.
-
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Adrian Hunter <adrian.hunter@intel.com>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Juergen Gross <jgross@suse.com>
+Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
 ---
- drivers/scsi/scsi_lib.c | 37 +++++++++++++++++++++++++++++--------
- 1 file changed, 29 insertions(+), 8 deletions(-)
+ drivers/block/xen-blkback/blkback.c | 13 ++++++-------
+ drivers/block/xen-blkback/common.h  |  7 +------
+ 2 files changed, 7 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 62699adaef61..d0da89322425 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -46,6 +46,20 @@ static DEFINE_MUTEX(scsi_sense_cache_mutex);
+diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
+index 9eae7b243f68..fd1e19f1a49f 100644
+--- a/drivers/block/xen-blkback/blkback.c
++++ b/drivers/block/xen-blkback/blkback.c
+@@ -255,8 +255,7 @@ static int add_persistent_gnt(struct xen_blkif_ring *ring,
+ 		}
+ 	}
  
- static void scsi_mq_uninit_cmd(struct scsi_cmnd *cmd);
- 
-+/* For admin queue, its queuedata is NULL */
-+static inline bool scsi_is_admin_queue(struct request_queue *q)
-+{
-+	return !q->queuedata;
-+}
-+
-+/* This helper can only be used in req prep stage */
-+static inline struct scsi_device *scsi_get_scsi_dev(struct request *rq)
-+{
-+	if (scsi_is_admin_queue(rq->q))
-+		return scsi_req(rq)->sdev;
-+	return rq->q->queuedata;
-+}
-+
- static inline struct kmem_cache *
- scsi_select_sense_cache(bool unchecked_isa_dma)
+-	bitmap_zero(persistent_gnt->flags, PERSISTENT_GNT_FLAGS_SIZE);
+-	set_bit(PERSISTENT_GNT_ACTIVE, persistent_gnt->flags);
++	persistent_gnt->active = true;
+ 	/* Add new node and rebalance tree. */
+ 	rb_link_node(&(persistent_gnt->node), parent, new);
+ 	rb_insert_color(&(persistent_gnt->node), &ring->persistent_gnts);
+@@ -280,11 +279,11 @@ static struct persistent_gnt *get_persistent_gnt(struct xen_blkif_ring *ring,
+ 		else if (gref > data->gnt)
+ 			node = node->rb_right;
+ 		else {
+-			if(test_bit(PERSISTENT_GNT_ACTIVE, data->flags)) {
++			if (data->active) {
+ 				pr_alert_ratelimited("requesting a grant already in use\n");
+ 				return NULL;
+ 			}
+-			set_bit(PERSISTENT_GNT_ACTIVE, data->flags);
++			data->active = true;
+ 			atomic_inc(&ring->persistent_gnt_in_use);
+ 			return data;
+ 		}
+@@ -295,10 +294,10 @@ static struct persistent_gnt *get_persistent_gnt(struct xen_blkif_ring *ring,
+ static void put_persistent_gnt(struct xen_blkif_ring *ring,
+                                struct persistent_gnt *persistent_gnt)
  {
-@@ -1376,10 +1390,9 @@ scsi_prep_state_check(struct scsi_device *sdev, struct request *req)
+-	if(!test_bit(PERSISTENT_GNT_ACTIVE, persistent_gnt->flags))
++	if (!persistent_gnt->active)
+ 		pr_alert_ratelimited("freeing a grant already unused\n");
+ 	persistent_gnt->last_used = jiffies;
+-	clear_bit(PERSISTENT_GNT_ACTIVE, persistent_gnt->flags);
++	persistent_gnt->active = false;
+ 	atomic_dec(&ring->persistent_gnt_in_use);
  }
  
- static int
--scsi_prep_return(struct request_queue *q, struct request *req, int ret)
-+scsi_prep_return(struct scsi_device *sdev, struct request_queue *q,
-+		struct request *req, int ret)
- {
--	struct scsi_device *sdev = q->queuedata;
+@@ -429,7 +428,7 @@ static void purge_persistent_gnt(struct xen_blkif_ring *ring)
+ 		BUG_ON(persistent_gnt->handle ==
+ 			BLKBACK_INVALID_HANDLE);
+ 
+-		if (test_bit(PERSISTENT_GNT_ACTIVE, persistent_gnt->flags))
++		if (persistent_gnt->active)
+ 			continue;
+ 		if (!scan_used && !persistent_gnt_timeout(persistent_gnt))
+ 			continue;
+diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
+index 7bff72db3b7e..2339b8d39c5e 100644
+--- a/drivers/block/xen-blkback/common.h
++++ b/drivers/block/xen-blkback/common.h
+@@ -233,11 +233,6 @@ struct xen_vbd {
+ 
+ struct backend_info;
+ 
+-/* Number of available flags */
+-#define PERSISTENT_GNT_FLAGS_SIZE	1
+-/* This persistent grant is currently in use */
+-#define PERSISTENT_GNT_ACTIVE		0
 -
- 	switch (ret) {
- 	case BLKPREP_KILL:
- 	case BLKPREP_INVALID:
-@@ -1411,7 +1424,7 @@ scsi_prep_return(struct request_queue *q, struct request *req, int ret)
+ /* Number of requests that we can fit in a ring */
+ #define XEN_BLKIF_REQS_PER_PAGE		32
  
- static int scsi_prep_fn(struct request_queue *q, struct request *req)
- {
--	struct scsi_device *sdev = q->queuedata;
-+	struct scsi_device *sdev = scsi_get_scsi_dev(req);
- 	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
- 	int ret;
- 
-@@ -1436,7 +1449,7 @@ static int scsi_prep_fn(struct request_queue *q, struct request *req)
- 
- 	ret = scsi_setup_cmnd(sdev, req);
- out:
--	return scsi_prep_return(q, req, ret);
-+	return scsi_prep_return(sdev, q, req, ret);
- }
- 
- static void scsi_unprep_fn(struct request_queue *q, struct request *req)
-@@ -1613,6 +1626,9 @@ static int scsi_lld_busy(struct request_queue *q)
- 	if (blk_queue_dying(q))
- 		return 0;
- 
-+	if (WARN_ON_ONCE(scsi_is_admin_queue(q)))
-+		return 0;
-+
- 	shost = sdev->host;
- 
- 	/*
-@@ -1816,7 +1832,7 @@ static void scsi_request_fn(struct request_queue *q)
- 	__releases(q->queue_lock)
- 	__acquires(q->queue_lock)
- {
--	struct scsi_device *sdev = q->queuedata;
-+	struct scsi_device *sdev;
- 	struct Scsi_Host *shost;
- 	struct scsi_cmnd *cmd;
- 	struct request *req;
-@@ -1825,7 +1841,6 @@ static void scsi_request_fn(struct request_queue *q)
- 	 * To start with, we keep looping until the queue is empty, or until
- 	 * the host is no longer able to accept any more requests.
- 	 */
--	shost = sdev->host;
- 	for (;;) {
- 		int rtn;
- 		/*
-@@ -1837,6 +1852,10 @@ static void scsi_request_fn(struct request_queue *q)
- 		if (!req)
- 			break;
- 
-+		cmd = blk_mq_rq_to_pdu(req);
-+		sdev = cmd->device;
-+		shost = sdev->host;
-+
- 		if (unlikely(!scsi_device_online(sdev))) {
- 			sdev_printk(KERN_ERR, sdev,
- 				    "rejecting I/O to offline device\n");
-@@ -1854,7 +1873,6 @@ static void scsi_request_fn(struct request_queue *q)
- 			blk_start_request(req);
- 
- 		spin_unlock_irq(q->queue_lock);
--		cmd = blk_mq_rq_to_pdu(req);
- 		if (cmd != req->special) {
- 			printk(KERN_CRIT "impossible request in %s.\n"
- 					 "please mail a stack trace to "
-@@ -2332,6 +2350,9 @@ struct scsi_device *scsi_device_from_queue(struct request_queue *q)
- {
- 	struct scsi_device *sdev = NULL;
- 
-+	/* admin queue won't be exposed to external users */
-+	WARN_ON_ONCE(scsi_is_admin_queue(q));
-+
- 	if (q->mq_ops) {
- 		if (q->mq_ops == &scsi_mq_ops)
- 			sdev = q->queuedata;
+@@ -246,7 +241,7 @@ struct persistent_gnt {
+ 	grant_ref_t gnt;
+ 	grant_handle_t handle;
+ 	unsigned long last_used;
+-	DECLARE_BITMAP(flags, PERSISTENT_GNT_FLAGS_SIZE);
++	bool active;
+ 	struct rb_node node;
+ 	struct list_head remove_node;
+ };
 -- 
-2.9.5
+2.13.7
