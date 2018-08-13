@@ -1,47 +1,41 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Small set of block fixes for 4.19-rc1
-Message-ID: <1e119372-0c51-d9f8-20ab-71530b2397c0@kernel.dk>
-Date: Sat, 25 Aug 2018 08:53:52 -0600
+Return-Path: <jgross@suse.com>
+From: Juergen Gross <jgross@suse.com>
+To: linux-kernel@vger.kernel.org,
+	xen-devel@lists.xenproject.org,
+	linux-block@vger.kernel.org
+Cc: konrad.wilk@oracle.com,
+	roger.pau@citrix.com,
+	axboe@kernel.dk,
+	boris.ostrovsky@oracle.com,
+	Juergen Gross <jgross@suse.com>
+Subject: [PATCH v3 5/5] xen/blkback: remove unused pers_gnts_lock from struct xen_blkif_ring
+Date: Mon, 13 Aug 2018 16:01:14 +0200
+Message-Id: <20180813140114.20126-6-jgross@suse.com>
+In-Reply-To: <20180813140114.20126-1-jgross@suse.com>
+References: <20180813140114.20126-1-jgross@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+pers_gnts_lock isn't being used anywhere. Remove it.
 
-A few small fixes for this merge window. This pull request contains:
+Signed-off-by: Juergen Gross <jgross@suse.com>
+Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
+---
+ drivers/block/xen-blkback/common.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-- Locking imbalance fix for bcache (Shan Hai)
-
-- A few small fixes for wbt. One is a cleanup/prep, one is a fix for an
-  existing issue, and the last two are fixes for changes that went into
-  this merge window (me)
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20180825
-
-
-----------------------------------------------------------------
-for-linus-20180825
-
-----------------------------------------------------------------
-Jens Axboe (4):
-      blk-wbt: move disable check into get_limit()
-      blk-wbt: use wq_has_sleeper() for wq active check
-      blk-wbt: fix has-sleeper queueing check
-      blk-wbt: don't maintain inflight counts if disabled
-
-Shan Hai (1):
-      bcache: release dc->writeback_lock properly in bch_writeback_thread()
-
- block/blk-sysfs.c             | 19 ++++++++++++++++++-
- block/blk-wbt.c               | 37 +++++++++++++++++--------------------
- drivers/md/bcache/writeback.c |  4 +++-
- 3 files changed, 38 insertions(+), 22 deletions(-)
-
+diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
+index 2339b8d39c5e..1d3002d773f7 100644
+--- a/drivers/block/xen-blkback/common.h
++++ b/drivers/block/xen-blkback/common.h
+@@ -269,7 +269,6 @@ struct xen_blkif_ring {
+ 	wait_queue_head_t	pending_free_wq;
+ 
+ 	/* Tree to store persistent grants. */
+-	spinlock_t		pers_gnts_lock;
+ 	struct rb_root		persistent_gnts;
+ 	unsigned int		persistent_gnt_c;
+ 	atomic_t		persistent_gnt_in_use;
 -- 
-Jens Axboe
+2.13.7
