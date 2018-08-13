@@ -1,73 +1,36 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:42210 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730195AbeHMVY6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Aug 2018 17:24:58 -0400
-From: Jeffrey Lien <Jeff.Lien@wdc.com>
-To: Joe Perches <joe@perches.com>,
-        "dgilbert@interlog.com" <dgilbert@interlog.com>,
-        Nicolas Pitre <nicolas.pitre@linaro.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        David Darrington <david.darrington@wdc.com>,
-        Jeff Furlong <jeff.furlong@wdc.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: David Laight <David.Laight@ACULAB.COM>
+To: David Laight <David.Laight@ACULAB.COM>,
+        'Jeff Lien' <jeff.lien@wdc.com>,
+        "'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>,
+        "'linux-crypto@vger.kernel.org'" <linux-crypto@vger.kernel.org>,
+        "'linux-block@vger.kernel.org'" <linux-block@vger.kernel.org>,
+        "'linux-scsi@vger.kernel.org'" <linux-scsi@vger.kernel.org>
+CC: "'herbert@gondor.apana.org.au'" <herbert@gondor.apana.org.au>,
+        "'tim.c.chen@linux.intel.com'" <tim.c.chen@linux.intel.com>,
+        "'martin.petersen@oracle.com'" <martin.petersen@oracle.com>,
+        "'david.darrington@wdc.com'" <david.darrington@wdc.com>,
+        "'jeff.furlong@wdc.com'" <jeff.furlong@wdc.com>
 Subject: RE: [PATCH] Performance Improvement in CRC16 Calculations.
-Date: Mon, 13 Aug 2018 18:41:27 +0000
-Message-ID: <SN1PR04MB18246863506680B4ACB30866EA390@SN1PR04MB1824.namprd04.prod.outlook.com>
+Date: Mon, 13 Aug 2018 13:50:50 +0000
+Message-ID: <73795193e598470188953bab268e7af6@AcuMS.aculab.com>
 References: <1533928331-21303-1-git-send-email-jeff.lien@wdc.com>
-         <9b5b906f42dfab78f382c90f66851717d258a15d.camel@perches.com>
-         <nycvar.YSQ.7.76.1808101601110.13885@knanqh.ubzr>
-         <b3c86ddd67a73c09e09f3e51d7fc70036f00fb7b.camel@perches.com>
-         <75d66dfa-688b-f941-04fd-5a39cf882b21@interlog.com>
-         <8e63583eb6898c3f481f1cb45b067234737a11b4.camel@perches.com>
- <2089960838bccf80f6fb9cc586b1a663f1f9e9da.camel@perches.com>
-In-Reply-To: <2089960838bccf80f6fb9cc586b1a663f1f9e9da.camel@perches.com>
-Content-Type: text/plain; charset="us-ascii"
+ <8508c92d70dc41ffb66557e13c988dca@AcuMS.aculab.com>
+In-Reply-To: <8508c92d70dc41ffb66557e13c988dca@AcuMS.aculab.com>
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Joe, Doug, Nicolas,
-The CONFIG patch change suggested by Joe and Doug makes sense to do.   I'll=
- do some additional testing to verify the performance on my systems.  =20
+> A more interesting version would be to generate the lookup table
+> for a byte followed by 3 zero bytes.
+> You could then run four separate register dependency chains using the
+> same 256 entry lookup table.
 
+Not sure that works with a table lookup :-(
 
-Jeff Lien
+	David
 
------Original Message-----
-From: Joe Perches [mailto:joe@perches.com]=20
-Sent: Saturday, August 11, 2018 10:06 AM
-To: dgilbert@interlog.com; Nicolas Pitre <nicolas.pitre@linaro.org>
-Cc: Jeffrey Lien <Jeff.Lien@wdc.com>; linux-kernel@vger.kernel.org; linux-c=
-rypto@vger.kernel.org; linux-block@vger.kernel.org; linux-scsi@vger.kernel.=
-org; herbert@gondor.apana.org.au; tim.c.chen@linux.intel.com; martin.peters=
-en@oracle.com; David Darrington <david.darrington@wdc.com>; Jeff Furlong <j=
-eff.furlong@wdc.com>
-Subject: Re: [PATCH] Performance Improvement in CRC16 Calculations.
-
-On Sat, 2018-08-11 at 02:04 -0700, Joe Perches wrote:
-> On Fri, 2018-08-10 at 22:39 -0400, Douglas Gilbert wrote:
-> > but below is a copy and paste of a table 27 from draft SBC-4=20
-> > revision 15 in chapter 4.22.4.4 on page 87.
->=20
-> The posted code returns the proper crc for each=20
-> CONFIG_CRYPTO_CRCT10DIF_TABLE_SIZE value from
-> 1 to 5 for these arrays.
-
-Jeff, could you please test the suggested patch with your comparison framew=
-ork again with each CONFIG_CRYPTO_CRCT10DIF_TABLE_SIZE from 1 to 5?
-
-I get on a very limited test framework here:
-(runtime average of 10 runs)
-
-1: 4.32
-2: 1.86
-3: 1.31
-4: 1.05
-5: 0.99
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
