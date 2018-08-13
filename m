@@ -1,77 +1,221 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <keith.busch@intel.com>,
-	Bart van Assche <bart.vanassche@wdc.com>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
-	Hannes Reinecke <hare@suse.de>
-Subject: [PATCHv2 0/5] genhd: register default groups with device_add_disk()
-Date: Tue, 14 Aug 2018 09:33:00 +0200
-Message-Id: <20180814073305.87255-1-hare@suse.de>
+Return-Path: <jgross@suse.com>
+From: Juergen Gross <jgross@suse.com>
+To: linux-kernel@vger.kernel.org,
+	xen-devel@lists.xenproject.org,
+	linux-block@vger.kernel.org
+Cc: konrad.wilk@oracle.com,
+	roger.pau@citrix.com,
+	axboe@kernel.dk,
+	boris.ostrovsky@oracle.com,
+	Juergen Gross <jgross@suse.com>
+Subject: [PATCH v3 2/5] xen/blkfront: cleanup stale persistent grants
+Date: Mon, 13 Aug 2018 16:01:11 +0200
+Message-Id: <20180813140114.20126-3-jgross@suse.com>
+In-Reply-To: <20180813140114.20126-1-jgross@suse.com>
+References: <20180813140114.20126-1-jgross@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-device_add_disk() doesn't allow to register with default sysfs groups,
-which introduces a race with udev as these groups have to be created after
-the uevent has been sent.
-This patchset updates device_add_disk() to accept a 'groups' argument to
-avoid this race and updates the obvious drivers to use it.
-There are some more drivers which might benefit from this (eg loop or md),
-but the interface is not straightforward so I haven't attempted it.
+Add a periodic cleanup function to remove old persistent grants which
+are no longer in use on the backend side. This avoids starvation in
+case there are lots of persistent grants for a device which no longer
+is involved in I/O business.
 
-Patches are relative to Christophs nvme-4.19 branch.
+Signed-off-by: Juergen Gross <jgross@suse.com>
+Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
+---
+ drivers/block/xen-blkfront.c | 94 ++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 90 insertions(+), 4 deletions(-)
 
-As usual, comments and reviews are welcome.
-
-Changes to v1:
-- Drop first patch
-- Convert lightnvm sysfs attributes as suggested by Bart
-
-Hannes Reinecke (5):
-  block: genhd: add 'groups' argument to device_add_disk
-  nvme: register ns_id attributes as default sysfs groups
-  aoe: use device_add_disk_with_groups()
-  zram: register default groups with device_add_disk()
-  virtio-blk: modernize sysfs attribute creation
-
- arch/um/drivers/ubd_kern.c          |  2 +-
- block/genhd.c                       | 19 ++++++++---
- drivers/block/aoe/aoe.h             |  1 -
- drivers/block/aoe/aoeblk.c          | 21 ++++--------
- drivers/block/aoe/aoedev.c          |  1 -
- drivers/block/floppy.c              |  2 +-
- drivers/block/mtip32xx/mtip32xx.c   |  2 +-
- drivers/block/ps3disk.c             |  2 +-
- drivers/block/ps3vram.c             |  2 +-
- drivers/block/rsxx/dev.c            |  2 +-
- drivers/block/skd_main.c            |  2 +-
- drivers/block/sunvdc.c              |  2 +-
- drivers/block/virtio_blk.c          | 68 +++++++++++++++++++++----------------
- drivers/block/xen-blkfront.c        |  2 +-
- drivers/block/zram/zram_drv.c       | 28 ++++-----------
- drivers/ide/ide-cd.c                |  2 +-
- drivers/ide/ide-gd.c                |  2 +-
- drivers/memstick/core/ms_block.c    |  2 +-
- drivers/memstick/core/mspro_block.c |  2 +-
- drivers/mmc/core/block.c            |  2 +-
- drivers/mtd/mtd_blkdevs.c           |  2 +-
- drivers/nvdimm/blk.c                |  2 +-
- drivers/nvdimm/btt.c                |  2 +-
- drivers/nvdimm/pmem.c               |  2 +-
- drivers/nvme/host/core.c            | 21 +++++-------
- drivers/nvme/host/lightnvm.c        | 27 +++------------
- drivers/nvme/host/multipath.c       | 15 +++-----
- drivers/nvme/host/nvme.h            | 11 ++----
- drivers/s390/block/dasd_genhd.c     |  2 +-
- drivers/s390/block/dcssblk.c        |  2 +-
- drivers/s390/block/scm_blk.c        |  2 +-
- drivers/scsi/sd.c                   |  2 +-
- drivers/scsi/sr.c                   |  2 +-
- include/linux/genhd.h               |  5 +--
- 34 files changed, 113 insertions(+), 150 deletions(-)
-
+diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+index b5cedccb5d7d..7c4b1b9d3971 100644
+--- a/drivers/block/xen-blkfront.c
++++ b/drivers/block/xen-blkfront.c
+@@ -46,6 +46,7 @@
+ #include <linux/scatterlist.h>
+ #include <linux/bitmap.h>
+ #include <linux/list.h>
++#include <linux/workqueue.h>
+ 
+ #include <xen/xen.h>
+ #include <xen/xenbus.h>
+@@ -121,6 +122,8 @@ static inline struct blkif_req *blkif_req(struct request *rq)
+ 
+ static DEFINE_MUTEX(blkfront_mutex);
+ static const struct block_device_operations xlvbd_block_fops;
++static struct delayed_work blkfront_work;
++static LIST_HEAD(info_list);
+ 
+ /*
+  * Maximum number of segments in indirect requests, the actual value used by
+@@ -216,6 +219,7 @@ struct blkfront_info
+ 	/* Save uncomplete reqs and bios for migration. */
+ 	struct list_head requests;
+ 	struct bio_list bio_list;
++	struct list_head info_list;
+ };
+ 
+ static unsigned int nr_minors;
+@@ -1764,6 +1768,12 @@ static int write_per_ring_nodes(struct xenbus_transaction xbt,
+ 	return err;
+ }
+ 
++static void free_info(struct blkfront_info *info)
++{
++	list_del(&info->info_list);
++	kfree(info);
++}
++
+ /* Common code used when first setting up, and when resuming. */
+ static int talk_to_blkback(struct xenbus_device *dev,
+ 			   struct blkfront_info *info)
+@@ -1885,7 +1895,10 @@ static int talk_to_blkback(struct xenbus_device *dev,
+  destroy_blkring:
+ 	blkif_free(info, 0);
+ 
+-	kfree(info);
++	mutex_lock(&blkfront_mutex);
++	free_info(info);
++	mutex_unlock(&blkfront_mutex);
++
+ 	dev_set_drvdata(&dev->dev, NULL);
+ 
+ 	return err;
+@@ -1996,6 +2009,10 @@ static int blkfront_probe(struct xenbus_device *dev,
+ 	info->handle = simple_strtoul(strrchr(dev->nodename, '/')+1, NULL, 0);
+ 	dev_set_drvdata(&dev->dev, info);
+ 
++	mutex_lock(&blkfront_mutex);
++	list_add(&info->info_list, &info_list);
++	mutex_unlock(&blkfront_mutex);
++
+ 	return 0;
+ }
+ 
+@@ -2306,6 +2323,12 @@ static void blkfront_gather_backend_features(struct blkfront_info *info)
+ 	if (indirect_segments <= BLKIF_MAX_SEGMENTS_PER_REQUEST)
+ 		indirect_segments = 0;
+ 	info->max_indirect_segments = indirect_segments;
++
++	if (info->feature_persistent) {
++		mutex_lock(&blkfront_mutex);
++		schedule_delayed_work(&blkfront_work, HZ * 10);
++		mutex_unlock(&blkfront_mutex);
++	}
+ }
+ 
+ /*
+@@ -2487,7 +2510,9 @@ static int blkfront_remove(struct xenbus_device *xbdev)
+ 	mutex_unlock(&info->mutex);
+ 
+ 	if (!bdev) {
+-		kfree(info);
++		mutex_lock(&blkfront_mutex);
++		free_info(info);
++		mutex_unlock(&blkfront_mutex);
+ 		return 0;
+ 	}
+ 
+@@ -2507,7 +2532,9 @@ static int blkfront_remove(struct xenbus_device *xbdev)
+ 	if (info && !bdev->bd_openers) {
+ 		xlvbd_release_gendisk(info);
+ 		disk->private_data = NULL;
+-		kfree(info);
++		mutex_lock(&blkfront_mutex);
++		free_info(info);
++		mutex_unlock(&blkfront_mutex);
+ 	}
+ 
+ 	mutex_unlock(&bdev->bd_mutex);
+@@ -2590,7 +2617,7 @@ static void blkif_release(struct gendisk *disk, fmode_t mode)
+ 		dev_info(disk_to_dev(bdev->bd_disk), "releasing disk\n");
+ 		xlvbd_release_gendisk(info);
+ 		disk->private_data = NULL;
+-		kfree(info);
++		free_info(info);
+ 	}
+ 
+ out:
+@@ -2623,6 +2650,61 @@ static struct xenbus_driver blkfront_driver = {
+ 	.is_ready = blkfront_is_ready,
+ };
+ 
++static void purge_persistent_grants(struct blkfront_info *info)
++{
++	unsigned int i;
++	unsigned long flags;
++
++	for (i = 0; i < info->nr_rings; i++) {
++		struct blkfront_ring_info *rinfo = &info->rinfo[i];
++		struct grant *gnt_list_entry, *tmp;
++
++		spin_lock_irqsave(&rinfo->ring_lock, flags);
++
++		if (rinfo->persistent_gnts_c == 0) {
++			spin_unlock_irqrestore(&rinfo->ring_lock, flags);
++			continue;
++		}
++
++		list_for_each_entry_safe(gnt_list_entry, tmp, &rinfo->grants,
++					 node) {
++			if (gnt_list_entry->gref == GRANT_INVALID_REF ||
++			    gnttab_query_foreign_access(gnt_list_entry->gref))
++				continue;
++
++			list_del(&gnt_list_entry->node);
++			gnttab_end_foreign_access(gnt_list_entry->gref, 0, 0UL);
++			rinfo->persistent_gnts_c--;
++			__free_page(gnt_list_entry->page);
++			kfree(gnt_list_entry);
++		}
++
++		spin_unlock_irqrestore(&rinfo->ring_lock, flags);
++	}
++}
++
++static void blkfront_delay_work(struct work_struct *work)
++{
++	struct blkfront_info *info;
++	bool need_schedule_work = false;
++
++	mutex_lock(&blkfront_mutex);
++
++	list_for_each_entry(info, &info_list, info_list) {
++		if (info->feature_persistent) {
++			need_schedule_work = true;
++			mutex_lock(&info->mutex);
++			purge_persistent_grants(info);
++			mutex_unlock(&info->mutex);
++		}
++	}
++
++	if (need_schedule_work)
++		schedule_delayed_work(&blkfront_work, HZ * 10);
++
++	mutex_unlock(&blkfront_mutex);
++}
++
+ static int __init xlblk_init(void)
+ {
+ 	int ret;
+@@ -2655,6 +2737,8 @@ static int __init xlblk_init(void)
+ 		return -ENODEV;
+ 	}
+ 
++	INIT_DELAYED_WORK(&blkfront_work, blkfront_delay_work);
++
+ 	ret = xenbus_register_frontend(&blkfront_driver);
+ 	if (ret) {
+ 		unregister_blkdev(XENVBD_MAJOR, DEV_NAME);
+@@ -2668,6 +2752,8 @@ module_init(xlblk_init);
+ 
+ static void __exit xlblk_exit(void)
+ {
++	cancel_delayed_work_sync(&blkfront_work);
++
+ 	xenbus_unregister_driver(&blkfront_driver);
+ 	unregister_blkdev(XENVBD_MAJOR, DEV_NAME);
+ 	kfree(minors);
 -- 
-2.12.3
+2.13.7
