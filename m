@@ -1,139 +1,67 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-To: herbert@gondor.apana.org.au
-Cc: Jeff.Lien@wdc.com, ard.biesheuvel@linaro.org,
-        david.darrington@wdc.com, hch@infradead.org, jeff.furlong@wdc.com,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        martin.petersen@oracle.com, tim.c.chen@linux.intel.com
-Subject: [PATCH 4/4] block: Integrity profile init function to trigger module loads
-Date: Sat, 25 Aug 2018 22:40:06 -0400
-Message-Id: <20180826024006.13800-4-martin.petersen@oracle.com>
-In-Reply-To: <20180826024006.13800-1-martin.petersen@oracle.com>
-References: <20180825061205.ygrjjazkooqghrqy@gondor.apana.org.au>
- <20180826024006.13800-1-martin.petersen@oracle.com>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <jgross@suse.com>
+From: Juergen Gross <jgross@suse.com>
+To: linux-kernel@vger.kernel.org,
+	xen-devel@lists.xenproject.org,
+	linux-block@vger.kernel.org
+Cc: konrad.wilk@oracle.com,
+	roger.pau@citrix.com,
+	axboe@kernel.dk,
+	boris.ostrovsky@oracle.com,
+	Juergen Gross <jgross@suse.com>
+Subject: [PATCH v3 3/5] xen/blkfront: reorder tests in xlblk_init()
+Date: Mon, 13 Aug 2018 16:01:12 +0200
+Message-Id: <20180813140114.20126-4-jgross@suse.com>
+In-Reply-To: <20180813140114.20126-1-jgross@suse.com>
+References: <20180813140114.20126-1-jgross@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-The T10 CRC library function is built into the kernel and therefore
-registered early. The hardware-accelerated CRC helpers are typically
-loaded as modules and only become available later in the boot
-sequence. A separate patch modifies the T10 CRC library to subscribe
-to notifications from crypto and permits switching from the
-table-based algorithm to a hardware accelerated ditto once the
-relevant module is loaded.
+In case we don't want pv block devices we should not test parameters
+for sanity and eventually print out error messages. So test precluding
+conditions before checking parameters.
 
-However, since the dependency for "crc10dif" is already satisfied,
-nothing is going to cause the hardware-accelerated kernel modules to
-get loaded. Introduce an init_fn in the integrity profile that can be
-called to trigger a load of modules providing the T10 CRC calculation
-capability. This function will ony get called when a new integrity
-profile is registered during device discovery.
-
-Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Juergen Gross <jgross@suse.com>
+Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
 ---
- block/blk-integrity.c  |  5 +++++
- block/t10-pi.c         | 10 ++++++++++
- include/linux/blkdev.h |  2 ++
- 3 files changed, 17 insertions(+)
+ drivers/block/xen-blkfront.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index 6121611e1316..5cacae9a2dc2 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -27,6 +27,7 @@
- #include <linux/scatterlist.h>
- #include <linux/export.h>
- #include <linux/slab.h>
-+#include <linux/module.h>
+diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+index 7c4b1b9d3971..36e4ca41e765 100644
+--- a/drivers/block/xen-blkfront.c
++++ b/drivers/block/xen-blkfront.c
+@@ -2713,6 +2713,15 @@ static int __init xlblk_init(void)
+ 	if (!xen_domain())
+ 		return -ENODEV;
  
- #include "blk.h"
- 
-@@ -391,6 +392,7 @@ static blk_status_t blk_integrity_nop_fn(struct blk_integrity_iter *iter)
- 
- static const struct blk_integrity_profile nop_profile = {
- 	.name = "nop",
-+	.init_fn = NULL,
- 	.generate_fn = blk_integrity_nop_fn,
- 	.verify_fn = blk_integrity_nop_fn,
- };
-@@ -418,6 +420,9 @@ void blk_integrity_register(struct gendisk *disk, struct blk_integrity *template
- 	bi->tuple_size = template->tuple_size;
- 	bi->tag_size = template->tag_size;
- 
-+	if (bi->profile->init_fn)
-+		bi->profile->init_fn();
++	if (!xen_has_pv_disk_devices())
++		return -ENODEV;
 +
- 	disk->queue->backing_dev_info->capabilities |= BDI_CAP_STABLE_WRITES;
- }
- EXPORT_SYMBOL(blk_integrity_register);
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index a98db384048f..b83278f9163a 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -24,6 +24,7 @@
- #include <linux/t10-pi.h>
- #include <linux/blkdev.h>
- #include <linux/crc-t10dif.h>
-+#include <linux/module.h>
- #include <net/checksum.h>
- 
- typedef __be16 (csum_fn) (void *, unsigned int);
-@@ -157,8 +158,14 @@ static blk_status_t t10_pi_type3_verify_ip(struct blk_integrity_iter *iter)
- 	return t10_pi_verify(iter, t10_pi_ip_fn, 3);
- }
- 
-+static void t10_pi_crc_init(void)
-+{
-+	request_module_nowait(CRC_T10DIF_STRING);
-+}
++	if (register_blkdev(XENVBD_MAJOR, DEV_NAME)) {
++		pr_warn("xen_blk: can't get major %d with name %s\n",
++			XENVBD_MAJOR, DEV_NAME);
++		return -ENODEV;
++	}
 +
- const struct blk_integrity_profile t10_pi_type1_crc = {
- 	.name			= "T10-DIF-TYPE1-CRC",
-+	.init_fn		= t10_pi_crc_init,
- 	.generate_fn		= t10_pi_type1_generate_crc,
- 	.verify_fn		= t10_pi_type1_verify_crc,
- };
-@@ -166,6 +173,7 @@ EXPORT_SYMBOL(t10_pi_type1_crc);
+ 	if (xen_blkif_max_segments < BLKIF_MAX_SEGMENTS_PER_REQUEST)
+ 		xen_blkif_max_segments = BLKIF_MAX_SEGMENTS_PER_REQUEST;
  
- const struct blk_integrity_profile t10_pi_type1_ip = {
- 	.name			= "T10-DIF-TYPE1-IP",
-+	.init_fn		= NULL,
- 	.generate_fn		= t10_pi_type1_generate_ip,
- 	.verify_fn		= t10_pi_type1_verify_ip,
- };
-@@ -173,6 +181,7 @@ EXPORT_SYMBOL(t10_pi_type1_ip);
+@@ -2728,15 +2737,6 @@ static int __init xlblk_init(void)
+ 		xen_blkif_max_queues = nr_cpus;
+ 	}
  
- const struct blk_integrity_profile t10_pi_type3_crc = {
- 	.name			= "T10-DIF-TYPE3-CRC",
-+	.init_fn		= t10_pi_crc_init,
- 	.generate_fn		= t10_pi_type3_generate_crc,
- 	.verify_fn		= t10_pi_type3_verify_crc,
- };
-@@ -180,6 +189,7 @@ EXPORT_SYMBOL(t10_pi_type3_crc);
+-	if (!xen_has_pv_disk_devices())
+-		return -ENODEV;
+-
+-	if (register_blkdev(XENVBD_MAJOR, DEV_NAME)) {
+-		printk(KERN_WARNING "xen_blk: can't get major %d with name %s\n",
+-		       XENVBD_MAJOR, DEV_NAME);
+-		return -ENODEV;
+-	}
+-
+ 	INIT_DELAYED_WORK(&blkfront_work, blkfront_delay_work);
  
- const struct blk_integrity_profile t10_pi_type3_ip = {
- 	.name			= "T10-DIF-TYPE3-IP",
-+	.init_fn		= NULL,
- 	.generate_fn		= t10_pi_type3_generate_ip,
- 	.verify_fn		= t10_pi_type3_verify_ip,
- };
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 79226ca8f80f..a43c02e4f43d 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1806,10 +1806,12 @@ struct blk_integrity_iter {
- };
- 
- typedef blk_status_t (integrity_processing_fn) (struct blk_integrity_iter *);
-+typedef void (integrity_init_fn) (void);
- 
- struct blk_integrity_profile {
- 	integrity_processing_fn		*generate_fn;
- 	integrity_processing_fn		*verify_fn;
-+	integrity_init_fn		*init_fn;
- 	const char			*name;
- };
- 
+ 	ret = xenbus_register_frontend(&blkfront_driver);
 -- 
-2.17.1
+2.13.7
