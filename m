@@ -1,45 +1,107 @@
-Return-Path: <ecashin@gmail.com>
-MIME-Version: 1.0
-References: <20180814073305.87255-1-hare@suse.de> <20180814073305.87255-4-hare@suse.de>
-In-Reply-To: <20180814073305.87255-4-hare@suse.de>
-From: Ed Cashin <ed.cashin@acm.org>
-Date: Tue, 14 Aug 2018 07:49:07 -0400
-Message-ID: <CADvA-dne2YvhrOS-6YPsgeQgr43ps8KWDWEZ6c9a-GxQBs1AHw@mail.gmail.com>
-Subject: Re: [PATCH 3/5] aoe: use device_add_disk_with_groups()
-To: hare@suse.de
-Cc: axboe@kernel.dk, hch@lst.de, sagi@grimberg.me, keith.busch@intel.com,
-	bart.vanassche@wdc.com, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, hare@suse.com,
-	"Ed L. Cashin" <ed.cashin@acm.org>
-Content-Type: multipart/alternative; boundary="000000000000cb1166057363ccc4"
+Return-Path: <hare@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <keith.busch@intel.com>,
+	Bart van Assche <bart.vanassche@wdc.com>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
+	Hannes Reinecke <hare@suse.de>,
+	Hannes Reinecke <hare@suse.com>,
+	"Ed L . Cachin" <ed.cashin@acm.org>
+Subject: [PATCH 3/5] aoe: use device_add_disk_with_groups()
+Date: Tue, 14 Aug 2018 09:33:03 +0200
+Message-Id: <20180814073305.87255-4-hare@suse.de>
+In-Reply-To: <20180814073305.87255-1-hare@suse.de>
+References: <20180814073305.87255-1-hare@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
---000000000000cb1166057363ccc4
-Content-Type: text/plain; charset="UTF-8"
+Use device_add_disk_with_groups() to avoid a race condition with
+udev during startup.
 
-On Tue, Aug 14, 2018 at 3:33 AM Hannes Reinecke <hare@suse.de> wrote:
+Signed-off-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Ed L. Cachin <ed.cashin@acm.org>
+---
+ drivers/block/aoe/aoe.h    |  1 -
+ drivers/block/aoe/aoeblk.c | 21 +++++++--------------
+ drivers/block/aoe/aoedev.c |  1 -
+ 3 files changed, 7 insertions(+), 16 deletions(-)
 
-> Use device_add_disk_with_groups() to avoid a race condition with
-> udev during startup.
->
-
-I think the aoe part of the series hasn't changed much, so OK, thanks.
-
+diff --git a/drivers/block/aoe/aoe.h b/drivers/block/aoe/aoe.h
+index c0ebda1283cc..015c68017a1c 100644
+--- a/drivers/block/aoe/aoe.h
++++ b/drivers/block/aoe/aoe.h
+@@ -201,7 +201,6 @@ int aoeblk_init(void);
+ void aoeblk_exit(void);
+ void aoeblk_gdalloc(void *);
+ void aoedisk_rm_debugfs(struct aoedev *d);
+-void aoedisk_rm_sysfs(struct aoedev *d);
+ 
+ int aoechr_init(void);
+ void aoechr_exit(void);
+diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
+index 429ebb84b592..ff770e7d9e52 100644
+--- a/drivers/block/aoe/aoeblk.c
++++ b/drivers/block/aoe/aoeblk.c
+@@ -177,10 +177,15 @@ static struct attribute *aoe_attrs[] = {
+ 	NULL,
+ };
+ 
+-static const struct attribute_group attr_group = {
++static const struct attribute_group aoe_attr_group = {
+ 	.attrs = aoe_attrs,
+ };
+ 
++static const struct attribute_group *aoe_attr_groups[] = {
++	&aoe_attr_group,
++	NULL,
++};
++
+ static const struct file_operations aoe_debugfs_fops = {
+ 	.open = aoe_debugfs_open,
+ 	.read = seq_read,
+@@ -220,17 +225,6 @@ aoedisk_rm_debugfs(struct aoedev *d)
+ }
+ 
+ static int
+-aoedisk_add_sysfs(struct aoedev *d)
+-{
+-	return sysfs_create_group(&disk_to_dev(d->gd)->kobj, &attr_group);
+-}
+-void
+-aoedisk_rm_sysfs(struct aoedev *d)
+-{
+-	sysfs_remove_group(&disk_to_dev(d->gd)->kobj, &attr_group);
+-}
+-
+-static int
+ aoeblk_open(struct block_device *bdev, fmode_t mode)
+ {
+ 	struct aoedev *d = bdev->bd_disk->private_data;
+@@ -417,8 +411,7 @@ aoeblk_gdalloc(void *vp)
+ 
+ 	spin_unlock_irqrestore(&d->lock, flags);
+ 
+-	add_disk(gd);
+-	aoedisk_add_sysfs(d);
++	device_add_disk(NULL, gd, aoe_attr_groups);
+ 	aoedisk_add_debugfs(d);
+ 
+ 	spin_lock_irqsave(&d->lock, flags);
+diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
+index 697f735b07a4..d92fa1fe3580 100644
+--- a/drivers/block/aoe/aoedev.c
++++ b/drivers/block/aoe/aoedev.c
+@@ -275,7 +275,6 @@ freedev(struct aoedev *d)
+ 	del_timer_sync(&d->timer);
+ 	if (d->gd) {
+ 		aoedisk_rm_debugfs(d);
+-		aoedisk_rm_sysfs(d);
+ 		del_gendisk(d->gd);
+ 		put_disk(d->gd);
+ 		blk_cleanup_queue(d->blkq);
 -- 
-  Ed
-
---000000000000cb1166057363ccc4
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div class=3D"gmail_quote"><div dir=3D"ltr">On Tue, Aug 14=
-, 2018 at 3:33 AM Hannes Reinecke &lt;<a href=3D"mailto:hare@suse.de">hare@=
-suse.de</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"=
-margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">Use device_a=
-dd_disk_with_groups() to avoid a race condition with<br>
-udev during startup.<br>
-</blockquote><div><br></div><div>I think the aoe part of the series hasn&#3=
-9;t changed much, so OK, thanks.</div><div><br></div><div>--=C2=A0</div><di=
-v>=C2=A0 Ed=C2=A0</div></div></div>
-
---000000000000cb1166057363ccc4--
+2.12.3
