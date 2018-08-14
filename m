@@ -1,35 +1,93 @@
-Return-Path: <prvs=7571f9cb6=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"sagi@grimberg.me" <sagi@grimberg.me>, "ngupta@vflare.org"
-	<ngupta@vflare.org>, "hch@lst.de" <hch@lst.de>, "minchan@kernel.org"
-	<minchan@kernel.org>, "hare@suse.com" <hare@suse.com>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"keith.busch@intel.com" <keith.busch@intel.com>
-Subject: Re: [PATCH 4/5] zram: register default groups with device_add_disk()
-Date: Tue, 14 Aug 2018 15:23:06 +0000
-Message-ID: <3f8e9adbb899d40dde900e4b5d57cafe663f808b.camel@wdc.com>
+Return-Path: <hare@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <keith.busch@intel.com>,
+	Bart van Assche <bart.vanassche@wdc.com>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
+	Hannes Reinecke <hare@suse.de>,
+	Hannes Reinecke <hare@suse.com>,
+	Minchan Kim <minchan@kernel.org>,
+	Nitin Gupta <ngupta@vflare.org>
+Subject: [PATCH 4/5] zram: register default groups with device_add_disk()
+Date: Tue, 14 Aug 2018 09:33:04 +0200
+Message-Id: <20180814073305.87255-5-hare@suse.de>
+In-Reply-To: <20180814073305.87255-1-hare@suse.de>
 References: <20180814073305.87255-1-hare@suse.de>
-	 <20180814073305.87255-5-hare@suse.de>
-In-Reply-To: <20180814073305.87255-5-hare@suse.de>
-Content-Type: text/plain; charset="utf-7"
-MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, 2018-08-14 at 09:33 +-0200, Hannes Reinecke wrote:
-+AD4- Register default sysfs groups during device+AF8-add-disk() to avoid a
-                                       +AF4AXgBeAF4AXgBeAF4AXgBeAF4AXgBeAF4=
-AXgBeAF4AXg-
-                                       device+AF8-add+AF8-disk()?
-+AD4- race condition with udev during startup.
-+AD4-=20
-+AD4- Signed-off-by: Hannes Reinecke +ADw-hare+AEA-suse.com+AD4-
-+AD4- Cc: Minchan Kim +ADw-minchan+AEA-kernel.org+AD4-
-+AD4- Cc: Nitin Gupta +ADw-ngupta+AEA-vflare.org+AD4-
-+AD4- Reviewed-by: Christoph Hellwig +ADw-hch+AEA-lst.de+AD4-
+Register default sysfs groups during device_add-disk() to avoid a
+race condition with udev during startup.
 
-Anyway:
+Signed-off-by: Hannes Reinecke <hare@suse.com>
+Cc: Minchan Kim <minchan@kernel.org>
+Cc: Nitin Gupta <ngupta@vflare.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/zram/zram_drv.c | 28 +++++++---------------------
+ 1 file changed, 7 insertions(+), 21 deletions(-)
 
-Reviewed-by: Bart Van Assche +ADw-bart.vanassche+AEA-wdc.com+AD4-
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 2907a8156aaf..fc3626cb7fe5 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1618,6 +1618,11 @@ static const struct attribute_group zram_disk_attr_group = {
+ 	.attrs = zram_disk_attrs,
+ };
+ 
++static const struct attribute_group *zram_disk_attr_groups[] = {
++	&zram_disk_attr_group,
++	NULL,
++};
++
+ /*
+  * Allocate and initialize new zram device. the function returns
+  * '>= 0' device_id upon success, and negative value otherwise.
+@@ -1698,24 +1703,14 @@ static int zram_add(void)
+ 
+ 	zram->disk->queue->backing_dev_info->capabilities |=
+ 			(BDI_CAP_STABLE_WRITES | BDI_CAP_SYNCHRONOUS_IO);
+-	add_disk(zram->disk);
+-
+-	ret = sysfs_create_group(&disk_to_dev(zram->disk)->kobj,
+-				&zram_disk_attr_group);
+-	if (ret < 0) {
+-		pr_err("Error creating sysfs group for device %d\n",
+-				device_id);
+-		goto out_free_disk;
+-	}
++	device_add_disk(NULL, zram->disk, zram_disk_attr_groups);
++
+ 	strlcpy(zram->compressor, default_compressor, sizeof(zram->compressor));
+ 
+ 	zram_debugfs_register(zram);
+ 	pr_info("Added device: %s\n", zram->disk->disk_name);
+ 	return device_id;
+ 
+-out_free_disk:
+-	del_gendisk(zram->disk);
+-	put_disk(zram->disk);
+ out_free_queue:
+ 	blk_cleanup_queue(queue);
+ out_free_idr:
+@@ -1744,15 +1739,6 @@ static int zram_remove(struct zram *zram)
+ 	mutex_unlock(&bdev->bd_mutex);
+ 
+ 	zram_debugfs_unregister(zram);
+-	/*
+-	 * Remove sysfs first, so no one will perform a disksize
+-	 * store while we destroy the devices. This also helps during
+-	 * hot_remove -- zram_reset_device() is the last holder of
+-	 * ->init_lock, no later/concurrent disksize_store() or any
+-	 * other sysfs handlers are possible.
+-	 */
+-	sysfs_remove_group(&disk_to_dev(zram->disk)->kobj,
+-			&zram_disk_attr_group);
+ 
+ 	/* Make sure all the pending I/O are finished */
+ 	fsync_bdev(bdev);
+-- 
+2.12.3
