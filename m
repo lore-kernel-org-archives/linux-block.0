@@ -1,41 +1,32 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39202 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727237AbeHIJIc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Aug 2018 05:08:32 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 11/17] bcache: do not check NULL pointer before calling kmem_cache_destroy
-Date: Thu,  9 Aug 2018 14:43:14 +0800
-Message-Id: <20180809064320.10229-12-colyli@suse.de>
-In-Reply-To: <20180809064320.10229-1-colyli@suse.de>
-References: <20180809064320.10229-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=7571f9cb6=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"martin.wilck@suse.com" <martin.wilck@suse.com>, "sagi@grimberg.me"
+	<sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>, "hare@suse.com"
+	<hare@suse.com>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "keith.busch@intel.com"
+	<keith.busch@intel.com>
+Subject: Re: [PATCH 1/5] block: genhd: add 'groups' argument to
+ device_add_disk
+Date: Tue, 14 Aug 2018 15:17:11 +0000
+Message-ID: <712eaa404a1a76193b1a304443dcbae339e53ab5.camel@wdc.com>
+References: <20180814073305.87255-1-hare@suse.de>
+	 <20180814073305.87255-2-hare@suse.de>
+In-Reply-To: <20180814073305.87255-2-hare@suse.de>
+Content-Type: text/plain; charset="utf-7"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-kmem_cache_destroy() is safe for NULL pointer as input, the NULL pointer
-checking is unncessary. This patch just removes the NULL pointer checking
-to make code simpler.
+On Tue, 2018-08-14 at 09:33 +-0200, Hannes Reinecke wrote:
++AD4- Update device+AF8-add+AF8-disk() to take an 'groups' argument so that
++AD4- individual drivers can register a device with additional sysfs
++AD4- attributes.
++AD4- This avoids race condition the driver would otherwise have if these
+             +AF4- +ACI-a+ACI- is missing?
++AD4- groups were to be created with sysfs+AF8-add+AF8-groups().
 
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/request.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Anyway:
 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 449baec3fa19..4bdcec9167a0 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -1367,8 +1367,7 @@ void bch_flash_dev_request_init(struct bcache_device *d)
- 
- void bch_request_exit(void)
- {
--	if (bch_search_cache)
--		kmem_cache_destroy(bch_search_cache);
-+	kmem_cache_destroy(bch_search_cache);
- }
- 
- int __init bch_request_init(void)
--- 
-2.18.0
+Reviewed-by: Bart Van Assche +ADw-bart.vanassche+AEA-wdc.com+AD4-
