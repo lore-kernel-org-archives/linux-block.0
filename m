@@ -1,51 +1,25 @@
-Return-Path: <dan.carpenter@oracle.com>
-Date: Wed, 29 Aug 2018 15:48:42 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: Scott Bauer <scott.bauer@intel.com>
-Cc: axboe@kernel.dk, hch@infradead.org, linux-block@vger.kernel.org,
-        Scott Bauer <sbauer@plzdonthack.me>, stable@vger.kernel.org
-Subject: Re: [PATCH] cdrom: Fix info leak/OOB read in cdrom_ioctl_drive_status
-Message-ID: <20180829124842.plpsjdvausmtikhj@mwanda>
-References: <20180426175108.29280-1-scott.bauer@intel.com>
+Return-Path: <prvs=7571f9cb6=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "keith.busch@intel.com"
+	<keith.busch@intel.com>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "hare@suse.com" <hare@suse.com>,
+	"sagi@grimberg.me" <sagi@grimberg.me>
+Subject: Re: [PATCH 5/5] virtio-blk: modernize sysfs attribute creation
+Date: Tue, 14 Aug 2018 15:24:34 +0000
+Message-ID: <0e99ae23c2bea89e597dd3e8b20489054f461ff5.camel@wdc.com>
+References: <20180814073305.87255-1-hare@suse.de>
+	 <20180814073305.87255-6-hare@suse.de>
+In-Reply-To: <20180814073305.87255-6-hare@suse.de>
+Content-Type: text/plain; charset="utf-7"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180426175108.29280-1-scott.bauer@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Sorry, I responded to this patch that this wasn't a real bug, but then
-Scott corrected me that it was.
+On Tue, 2018-08-14 at 09:33 +-0200, Hannes Reinecke wrote:
++AD4- Use new-style DEVICE+AF8-ATTR+AF8-RO/DEVICE+AF8-ATTR+AF8-RW to create=
+ the sysfs attributes
++AD4- and register the disk with default sysfs attribute groups.
 
-Anyway, it is a bug and we haven't applied this patch yet.
-
-regards,
-dan carpenter
-
-On Thu, Apr 26, 2018 at 11:51:08AM -0600, Scott Bauer wrote:
-> Like d88b6d04: "cdrom: information leak in cdrom_ioctl_media_changed()"
-> 
-> There is another cast from unsigned long to int which causes
-> a bounds check to fail with specially crafted input. The value is
-> then used as an index in the slot array in cdrom_slot_status().
-> 
-> Signed-off-by: Scott Bauer <scott.bauer@intel.com>
-> Signed-off-by: Scott Bauer <sbauer@plzdonthack.me>
-> Cc: stable@vger.kernel.org
-> ---
->  drivers/cdrom/cdrom.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
-> index bfc566d3f31a..8cfa10ab7abc 100644
-> --- a/drivers/cdrom/cdrom.c
-> +++ b/drivers/cdrom/cdrom.c
-> @@ -2542,7 +2542,7 @@ static int cdrom_ioctl_drive_status(struct cdrom_device_info *cdi,
->  	if (!CDROM_CAN(CDC_SELECT_DISC) ||
->  	    (arg == CDSL_CURRENT || arg == CDSL_NONE))
->  		return cdi->ops->drive_status(cdi, CDSL_CURRENT);
-> -	if (((int)arg >= cdi->capacity))
-> +	if (arg >= cdi->capacity)
->  		return -EINVAL;
->  	return cdrom_slot_status(cdi, arg);
->  }
-> -- 
-> 2.14.1
+Reviewed-by: Bart Van Assche +ADw-bart.vanassche+AEA-wdc.com+AD4-
