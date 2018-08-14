@@ -1,77 +1,38 @@
-Return-Path: <lkp@intel.com>
-Date: Wed, 15 Aug 2018 05:53:12 +0800
-From: kbuild test robot <lkp@intel.com>
-To: Hannes Reinecke <hare@suse.de>
-Cc: kbuild-all@01.org, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <keith.busch@intel.com>,
-	Bart van Assche <bart.vanassche@wdc.com>,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
-	Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>
+Return-Path: <prvs=7571f9cb6=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "keith.busch@intel.com"
+	<keith.busch@intel.com>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "hare@suse.com" <hare@suse.com>,
+	"sagi@grimberg.me" <sagi@grimberg.me>
 Subject: Re: [PATCH 2/5] nvme: register ns_id attributes as default sysfs
  groups
-Message-ID: <201808150550.wKf5lVlA%fengguang.wu@intel.com>
-References: <20180814073305.87255-3-hare@suse.de>
+Date: Tue, 14 Aug 2018 15:44:57 +0000
+Message-ID: <f9ad4ed4685e51a7b0378f11d3ce9d0a76235095.camel@wdc.com>
+References: <20180814073305.87255-1-hare@suse.de>
+	 <20180814073305.87255-3-hare@suse.de>
+	 <5a4aab8b5f509d8090ad10107b01d11285fe1528.camel@wdc.com>
+	 <e4c9ba55-ad92-dcb2-1126-38e5ea4c0a13@suse.de>
+In-Reply-To: <e4c9ba55-ad92-dcb2-1126-38e5ea4c0a13@suse.de>
+Content-Type: text/plain; charset="utf-7"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180814073305.87255-3-hare@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Hannes,
+On Tue, 2018-08-14 at 17:39 +-0200, Hannes Reinecke wrote:
++AD4- While I have considered having nvme+AF8-nvm+AF8-register+AF8-sysfs() =
+returning a
++AD4- pointer I would then have to remove the 'static' declaration from the
++AD4- nvm+AF8-dev+AF8-attr+AF8-group+AF8-12/20.
++AD4- Which I didn't really like, either.
 
-I love your patch! Perhaps something to improve:
+Hmm ... I don't see why the static declaration would have to be removed fro=
+m
+nvm+AF8-dev+AF8-attr+AF8-group+AF8-12/20 if nvme+AF8-nvm+AF8-register+AF8-s=
+ysfs() would return a pointer?
+Am I perhaps missing something?
 
-[auto build test WARNING on block/for-next]
-[also build test WARNING on next-20180814]
-[cannot apply to v4.18]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+Thanks,
 
-url:    https://github.com/0day-ci/linux/commits/Hannes-Reinecke/genhd-register-default-groups-with-device_add_disk/20180815-034942
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-reproduce:
-        # apt-get install sparse
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF=-D__CHECK_ENDIAN__
-
-
-sparse warnings: (new ones prefixed by >>)
-
-   include/uapi/linux/perf_event.h:147:56: sparse: cast truncates bits from constant value (8000000000000000 becomes 0)
-   drivers/nvme/host/core.c:506:28: sparse: expression using sizeof(void)
-   include/linux/blkdev.h:1269:16: sparse: expression using sizeof(void)
-   include/linux/slab.h:631:13: sparse: undefined identifier '__builtin_mul_overflow'
-   drivers/nvme/host/core.c:1062:32: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:1062:32: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:1063:26: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:1063:26: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:1844:32: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:1844:32: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:1846:43: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:2406:17: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:2406:17: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:2417:42: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:2417:42: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:2417:42: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:2417:42: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:2417:42: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:2417:42: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:2417:42: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:2417:42: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:2417:42: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:2417:42: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:2417:42: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:2417:42: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:2417:42: sparse: expression using sizeof(void)
->> drivers/nvme/host/core.c:2732:30: sparse: symbol 'nvme_ns_id_attr_group' was not declared. Should it be static?
-   drivers/nvme/host/core.c:3203:33: sparse: expression using sizeof(void)
-   drivers/nvme/host/core.c:3566:17: sparse: expression using sizeof(void)
-   include/linux/slab.h:631:13: sparse: call with no type!
-   drivers/nvme/host/core.c:1264:23: sparse: context imbalance in 'nvme_get_ns_from_disk' - wrong count at exit
-   drivers/nvme/host/core.c:1282:33: sparse: context imbalance in 'nvme_put_ns_from_disk' - unexpected unlock
-
-Please review and possibly fold the followup patch.
-
----
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+Bart.
