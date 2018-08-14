@@ -1,25 +1,147 @@
-Return-Path: <prvs=7571f9cb6=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "keith.busch@intel.com"
-	<keith.busch@intel.com>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "hare@suse.com" <hare@suse.com>,
-	"sagi@grimberg.me" <sagi@grimberg.me>
-Subject: Re: [PATCH 5/5] virtio-blk: modernize sysfs attribute creation
-Date: Tue, 14 Aug 2018 15:24:34 +0000
-Message-ID: <0e99ae23c2bea89e597dd3e8b20489054f461ff5.camel@wdc.com>
+Return-Path: <hare@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <keith.busch@intel.com>,
+	Bart van Assche <bart.vanassche@wdc.com>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
+	Hannes Reinecke <hare@suse.de>,
+	Hannes Reinecke <hare@suse.com>
+Subject: [PATCH 5/5] virtio-blk: modernize sysfs attribute creation
+Date: Tue, 14 Aug 2018 09:33:05 +0200
+Message-Id: <20180814073305.87255-6-hare@suse.de>
+In-Reply-To: <20180814073305.87255-1-hare@suse.de>
 References: <20180814073305.87255-1-hare@suse.de>
-	 <20180814073305.87255-6-hare@suse.de>
-In-Reply-To: <20180814073305.87255-6-hare@suse.de>
-Content-Type: text/plain; charset="utf-7"
-MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, 2018-08-14 at 09:33 +-0200, Hannes Reinecke wrote:
-+AD4- Use new-style DEVICE+AF8-ATTR+AF8-RO/DEVICE+AF8-ATTR+AF8-RW to create=
- the sysfs attributes
-+AD4- and register the disk with default sysfs attribute groups.
+Use new-style DEVICE_ATTR_RO/DEVICE_ATTR_RW to create the sysfs attributes
+and register the disk with default sysfs attribute groups.
 
-Reviewed-by: Bart Van Assche +ADw-bart.vanassche+AEA-wdc.com+AD4-
+Signed-off-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ drivers/block/virtio_blk.c | 68 ++++++++++++++++++++++++++--------------------
+ 1 file changed, 39 insertions(+), 29 deletions(-)
+
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index fe80560000a1..086c6bb12baa 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -351,8 +351,8 @@ static int minor_to_index(int minor)
+ 	return minor >> PART_BITS;
+ }
+ 
+-static ssize_t virtblk_serial_show(struct device *dev,
+-				struct device_attribute *attr, char *buf)
++static ssize_t serial_show(struct device *dev,
++			   struct device_attribute *attr, char *buf)
+ {
+ 	struct gendisk *disk = dev_to_disk(dev);
+ 	int err;
+@@ -371,7 +371,7 @@ static ssize_t virtblk_serial_show(struct device *dev,
+ 	return err;
+ }
+ 
+-static DEVICE_ATTR(serial, 0444, virtblk_serial_show, NULL);
++static DEVICE_ATTR_RO(serial);
+ 
+ /* The queue's logical block size must be set before calling this */
+ static void virtblk_update_capacity(struct virtio_blk *vblk, bool resize)
+@@ -545,8 +545,8 @@ static const char *const virtblk_cache_types[] = {
+ };
+ 
+ static ssize_t
+-virtblk_cache_type_store(struct device *dev, struct device_attribute *attr,
+-			 const char *buf, size_t count)
++cache_type_store(struct device *dev, struct device_attribute *attr,
++		 const char *buf, size_t count)
+ {
+ 	struct gendisk *disk = dev_to_disk(dev);
+ 	struct virtio_blk *vblk = disk->private_data;
+@@ -564,8 +564,7 @@ virtblk_cache_type_store(struct device *dev, struct device_attribute *attr,
+ }
+ 
+ static ssize_t
+-virtblk_cache_type_show(struct device *dev, struct device_attribute *attr,
+-			 char *buf)
++cache_type_show(struct device *dev, struct device_attribute *attr, char *buf)
+ {
+ 	struct gendisk *disk = dev_to_disk(dev);
+ 	struct virtio_blk *vblk = disk->private_data;
+@@ -575,12 +574,38 @@ virtblk_cache_type_show(struct device *dev, struct device_attribute *attr,
+ 	return snprintf(buf, 40, "%s\n", virtblk_cache_types[writeback]);
+ }
+ 
+-static const struct device_attribute dev_attr_cache_type_ro =
+-	__ATTR(cache_type, 0444,
+-	       virtblk_cache_type_show, NULL);
+-static const struct device_attribute dev_attr_cache_type_rw =
+-	__ATTR(cache_type, 0644,
+-	       virtblk_cache_type_show, virtblk_cache_type_store);
++static DEVICE_ATTR_RW(cache_type);
++
++static struct attribute *virtblk_attrs[] = {
++	&dev_attr_serial.attr,
++	&dev_attr_cache_type.attr,
++	NULL,
++};
++
++static umode_t virtblk_attrs_are_visible(struct kobject *kobj,
++		struct attribute *a, int n)
++{
++	struct device *dev = container_of(kobj, struct device, kobj);
++	struct gendisk *disk = dev_to_disk(dev);
++	struct virtio_blk *vblk = disk->private_data;
++	struct virtio_device *vdev = vblk->vdev;
++
++	if (a == &dev_attr_cache_type.attr &&
++	    !virtio_has_feature(vdev, VIRTIO_BLK_F_CONFIG_WCE))
++		return S_IRUGO;
++
++	return a->mode;
++}
++
++static const struct attribute_group virtblk_attr_group = {
++	.attrs = virtblk_attrs,
++	.is_visible = virtblk_attrs_are_visible,
++};
++
++static const struct attribute_group *virtblk_attr_groups[] = {
++	&virtblk_attr_group,
++	NULL,
++};
+ 
+ static int virtblk_init_request(struct blk_mq_tag_set *set, struct request *rq,
+ 		unsigned int hctx_idx, unsigned int numa_node)
+@@ -780,24 +805,9 @@ static int virtblk_probe(struct virtio_device *vdev)
+ 	virtblk_update_capacity(vblk, false);
+ 	virtio_device_ready(vdev);
+ 
+-	device_add_disk(&vdev->dev, vblk->disk, NULL);
+-	err = device_create_file(disk_to_dev(vblk->disk), &dev_attr_serial);
+-	if (err)
+-		goto out_del_disk;
+-
+-	if (virtio_has_feature(vdev, VIRTIO_BLK_F_CONFIG_WCE))
+-		err = device_create_file(disk_to_dev(vblk->disk),
+-					 &dev_attr_cache_type_rw);
+-	else
+-		err = device_create_file(disk_to_dev(vblk->disk),
+-					 &dev_attr_cache_type_ro);
+-	if (err)
+-		goto out_del_disk;
++	device_add_disk(&vdev->dev, vblk->disk, virtblk_attr_groups);
+ 	return 0;
+ 
+-out_del_disk:
+-	del_gendisk(vblk->disk);
+-	blk_cleanup_queue(vblk->disk->queue);
+ out_free_tags:
+ 	blk_mq_free_tag_set(&vblk->tag_set);
+ out_put_disk:
+-- 
+2.12.3
