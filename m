@@ -1,222 +1,62 @@
-Return-Path: <prvs=752cffea0=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v6 11/12] block: Change the runtime power management approach (2/2)
-Date: Thu,  9 Aug 2018 12:41:48 -0700
-Message-Id: <20180809194149.15285-12-bart.vanassche@wdc.com>
-In-Reply-To: <20180809194149.15285-1-bart.vanassche@wdc.com>
-References: <20180809194149.15285-1-bart.vanassche@wdc.com>
+Return-Path: <dbavatar@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
+From: Debabrata Banerjee <dbavatar@gmail.com>
+Date: Wed, 15 Aug 2018 15:59:59 -0400
+Message-ID: <CAATkVEwKyUHWktL5PZ7Dqry_DQk9XSXzFg0s24XcUT2ftm=ZSA@mail.gmail.com>
+Subject: deadlock in wbt_wait()
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Instead of allowing requests that are not power management requests
-to enter the queue in runtime suspended status (RPM_SUSPENDED), make
-the blk_get_request() caller block. This change fixes a starvation
-issue: it is now guaranteed that power management requests will be
-executed no matter how many blk_get_request() callers are waiting.
-Instead of maintaining the q->nr_pending counter, rely on
-q->q_usage_counter. Call pm_runtime_mark_last_busy() every time a
-request finishes instead of only if the queue depth drops to zero.
+I believe I've found a problem with wbt code, appears like when
+switching elevators any blk requests that got throttled never wake up
+after the change. You can easily reproduce this by running some dd
+writers, and then switching between noop and cfq repeatedly. You
+should get a hung dd task with a stack similar to what's below.
+Attempting a patch to wake up waiters during a change, but nothing
+working yet. Confused by why we're calling wbt_disable_default(q) in
+cfq/bfq elevators only, as opposed to something generically from
+elevator_switch() (looking at 4.14.59).
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>
----
- block/blk-core.c | 37 ++++++-------------------
- block/blk-pm.c   | 72 ++++++++++++++++++++++++++++++++++++++++++++----
- 2 files changed, 75 insertions(+), 34 deletions(-)
+[<ffffffff82095632>] io_schedule+0x12/0x40
+[<ffffffff823a7b47>] wbt_wait+0x1a7/0x360
+[<ffffffff82374c49>] blk_queue_bio+0xf9/0x3e0
+[<ffffffff82373050>] generic_make_request+0x100/0x280
+[<ffffffff8237323c>] submit_bio+0x6c/0x140
+[<ffffffffa01d8b88>] ext4_io_submit+0x48/0x60 [ext4]
+[<ffffffffa01c098f>] ext4_writepages+0x68f/0xe40 [ext4]
+[<ffffffff821782aa>] do_writepages+0x1a/0x60
+[<ffffffff8216a1c7>] __filemap_fdatawrite_range+0xa7/0xe0
+[<ffffffffa01af8e2>] ext4_release_file+0x72/0xc0 [ext4]
+[<ffffffff821ee5e5>] __fput+0xa5/0x220
+[<ffffffff820880a0>] task_work_run+0x80/0xa0
+[<ffffffff820016e0>] exit_to_usermode_loop+0xb0/0xc0
+[<ffffffff82001d24>] do_syscall_64+0x104/0x120
+[<ffffffff82800081>] entry_SYSCALL_64_after_hwframe+0x3d/0xa2
+[<ffffffffffffffff>] 0xffffffffffffffff
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index f30545fb2de2..b0bb6b5320fe 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2772,30 +2772,6 @@ void blk_account_io_done(struct request *req, u64 now)
- 	}
- }
- 
--#ifdef CONFIG_PM
--/*
-- * Don't process normal requests when queue is suspended
-- * or in the process of suspending/resuming
-- */
--static bool blk_pm_allow_request(struct request *rq)
--{
--	switch (rq->q->rpm_status) {
--	case RPM_RESUMING:
--	case RPM_SUSPENDING:
--		return rq->rq_flags & RQF_PM;
--	case RPM_SUSPENDED:
--		return false;
--	default:
--		return true;
--	}
--}
--#else
--static bool blk_pm_allow_request(struct request *rq)
--{
--	return true;
--}
--#endif
--
- void blk_account_io_start(struct request *rq, bool new_io)
- {
- 	struct hd_struct *part;
-@@ -2841,11 +2817,14 @@ static struct request *elv_next_request(struct request_queue *q)
- 
- 	while (1) {
- 		list_for_each_entry(rq, &q->queue_head, queuelist) {
--			if (blk_pm_allow_request(rq))
--				return rq;
--
--			if (rq->rq_flags & RQF_SOFTBARRIER)
--				break;
-+#ifdef CONFIG_PM
-+			/*
-+			 * If a request gets queued in state RPM_SUSPENDED
-+			 * then that's a kernel bug.
-+			 */
-+			WARN_ON_ONCE(q->rpm_status == RPM_SUSPENDED);
-+#endif
-+			return rq;
- 		}
- 
- 		/*
-diff --git a/block/blk-pm.c b/block/blk-pm.c
-index bf8532da952d..977beffdccd2 100644
---- a/block/blk-pm.c
-+++ b/block/blk-pm.c
-@@ -1,8 +1,11 @@
- // SPDX-License-Identifier: GPL-2.0
- 
-+#include <linux/blk-mq.h>
- #include <linux/blk-pm.h>
- #include <linux/blkdev.h>
- #include <linux/pm_runtime.h>
-+#include "blk-mq.h"
-+#include "blk-mq-tag.h"
- 
- /**
-  * blk_pm_runtime_init - Block layer runtime PM initialization routine
-@@ -58,6 +61,36 @@ void blk_pm_runtime_exit(struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_pm_runtime_exit);
- 
-+struct in_flight_data {
-+	struct request_queue	*q;
-+	int			in_flight;
-+};
-+
-+static void blk_count_in_flight(struct blk_mq_hw_ctx *hctx, struct request *rq,
-+				void *priv, bool reserved)
-+{
-+	struct in_flight_data *in_flight = priv;
-+
-+	if (rq->q == in_flight->q)
-+		in_flight->in_flight++;
-+}
-+
-+/*
-+ * Count the number of requests that are in flight for request queue @q. Use
-+ * @q->nr_pending for legacy queues. Iterate over the tag set for blk-mq
-+ * queues.  Use blk_mq_queue_tag_busy_iter() instead of
-+ * blk_mq_tagset_busy_iter() because the latter only considers requests that
-+ * have already been started.
-+ */
-+static int blk_requests_in_flight(struct request_queue *q)
-+{
-+	struct in_flight_data in_flight = { .q = q };
-+
-+	if (q->mq_ops)
-+		blk_mq_queue_tag_busy_iter(q, blk_count_in_flight, &in_flight);
-+	return q->nr_pending + in_flight.in_flight;
-+}
-+
- /**
-  * blk_pre_runtime_suspend - Pre runtime suspend check
-  * @q: the queue of the device
-@@ -86,14 +119,38 @@ int blk_pre_runtime_suspend(struct request_queue *q)
- 	if (!q->dev)
- 		return ret;
- 
-+	WARN_ON_ONCE(q->rpm_status != RPM_ACTIVE);
-+
-+	blk_set_pm_only(q);
-+	/*
-+	 * This function only gets called if the most recent
-+	 * pm_request_resume() call occurred at least autosuspend_delay_ms
-+	 * ago. Since blk_queue_enter() is called by the request allocation
-+	 * code before pm_request_resume(), if no requests have a tag assigned
-+	 * it is safe to suspend the device.
-+	 */
-+	ret = -EBUSY;
-+	if (blk_requests_in_flight(q) == 0) {
-+		/*
-+		 * Call synchronize_rcu() such that later blk_queue_enter()
-+		 * calls see the preempt-only state. See also
-+		 * http://lwn.net/Articles/573497/.
-+		 */
-+		synchronize_rcu();
-+		if (blk_requests_in_flight(q) == 0)
-+			ret = 0;
-+	}
-+
- 	spin_lock_irq(q->queue_lock);
--	if (q->nr_pending) {
--		ret = -EBUSY;
-+	if (ret < 0)
- 		pm_runtime_mark_last_busy(q->dev);
--	} else {
-+	else
- 		q->rpm_status = RPM_SUSPENDING;
--	}
- 	spin_unlock_irq(q->queue_lock);
-+
-+	if (ret)
-+		blk_clear_pm_only(q);
-+
- 	return ret;
- }
- EXPORT_SYMBOL(blk_pre_runtime_suspend);
-@@ -124,6 +181,9 @@ void blk_post_runtime_suspend(struct request_queue *q, int err)
- 		pm_runtime_mark_last_busy(q->dev);
- 	}
- 	spin_unlock_irq(q->queue_lock);
-+
-+	if (err)
-+		blk_clear_pm_only(q);
- }
- EXPORT_SYMBOL(blk_post_runtime_suspend);
- 
-@@ -171,13 +231,15 @@ void blk_post_runtime_resume(struct request_queue *q, int err)
- 	spin_lock_irq(q->queue_lock);
- 	if (!err) {
- 		q->rpm_status = RPM_ACTIVE;
--		__blk_run_queue(q);
- 		pm_runtime_mark_last_busy(q->dev);
- 		pm_request_autosuspend(q->dev);
- 	} else {
- 		q->rpm_status = RPM_SUSPENDED;
- 	}
- 	spin_unlock_irq(q->queue_lock);
-+
-+	if (!err)
-+		blk_clear_pm_only(q);
- }
- EXPORT_SYMBOL(blk_post_runtime_resume);
- 
--- 
-2.18.0
+Actually if I run this test enough times sometimes I get a panic, I
+assume that's due to some disk completion arriving in the wrong place,
+maybe not related to wbt.
+
+[  804.546000] RIP: 0010:run_timer_softirq+0xf2/0x1d0
+[  804.551163] RSP: 0018:ffff88105f443f00 EFLAGS: 00010002
+[  804.556753] RAX: 00000001003e0002 RBX: ffff88085782de90 RCX: ffff88085782de90
+[  804.564269] RDX: ffff88105f443f00 RSI: ffff88105f4596a8 RDI: ffff88105f443f08
+[  804.571781] RBP: 0000000000000000 R08: ffff88105f459958 R09: ffff88105f443f08
+[  804.579297] R10: 0000000000000000 R11: 0000000000000000 R12: ffff88105f459680
+[  804.586819] R13: ffff88105f443f00 R14: 0000000000000000 R15: ffff88105f4596f0
+[  804.594314] FS:  0000000000000000(0000) GS:ffff88105f440000(0000)
+knlGS:0000000000000000
+[  804.603102] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  804.609196] CR2: 00000001003e000a CR3: 000000000300a001 CR4: 00000000001606e0
+[  804.616684] Call Trace:
+[  804.619520]  <IRQ>
+[  804.621913]  ? timerqueue_add+0x54/0x80
+[  804.626105]  ? enqueue_hrtimer+0x38/0x90
+[  804.630379]  __do_softirq+0xf1/0x296
+[  804.634323]  irq_exit+0x76/0x80
+[  804.637830]  smp_apic_timer_interrupt+0x70/0x130
+[  804.642827]  apic_timer_interrupt+0x7d/0x90
+[  804.647379]  </IRQ>
