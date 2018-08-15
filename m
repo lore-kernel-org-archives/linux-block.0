@@ -1,54 +1,63 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:33013 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727395AbeHaRmT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Aug 2018 13:42:19 -0400
-Received: by mail-ed1-f66.google.com with SMTP id d8-v6so1009683edv.0
-        for <linux-block@vger.kernel.org>; Fri, 31 Aug 2018 06:34:48 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 2/4] lightnvm: assign block address before slba
-Date: Fri, 31 Aug 2018 15:34:35 +0200
-Message-Id: <1535722477-31288-3-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1535722477-31288-1-git-send-email-javier@cnexlabs.com>
-References: <1535722477-31288-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+From: Kashyap Desai <kashyap.desai@broadcom.com>
+Date: Wed, 15 Aug 2018 21:44:33 +0530
+Message-ID: <CAHsXFKFVUJUi3VMrB=iRxFjspt4q-zQgWP60k6GAaUCB-BGb2A@mail.gmail.com>
+Subject: irq poll and threaded isr interrupt polling
+To: linux-block@vger.kernel.org,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        Peter Rivera <peter.rivera@broadcom.com>,
+        Steve Hagan <steve.hagan@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-In 1.2, the chunk slba is set to the physical representation of the
-block. Thus, assigning the block to the ppa must occur before the slba
-is assign.
+Hi,
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index e9f14c67f4f3..efb976a863d2 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -945,6 +945,8 @@ static int nvm_bb_to_chunk(struct nvm_dev *dev, struct ppa_addr ppa,
- 			}
- 		}
- 
-+		ppa.g.blk = blk;
-+
- 		meta->wp = 0;
- 		meta->type = NVM_CHK_TP_W_SEQ;
- 		meta->wi = 0;
-@@ -952,7 +954,6 @@ static int nvm_bb_to_chunk(struct nvm_dev *dev, struct ppa_addr ppa,
- 		meta->cnlb = dev->geo.clba;
- 
- 		if (blktype == NVM_BLK_T_FREE) {
--			ppa.a.blk = blk;
- 			ret = nvm_bb_chunk_scan(dev, ppa, meta);
- 			if (ret)
- 				return ret;
--- 
-2.7.4
+I refer below thread for interrupt polling related discussion for
+storage devices (NVME/HBA).
+
+
+http://lists.infradead.org/pipermail/linux-nvme/2017-January/007749.html
+
+
+I am trying to evaluate the similar concept to reduce interrupts using
+irq-poll and threaded ISR. Below is high level changes I did in my
+experiment.
+
+
+
+In megaraid_sas driver, I schedule irq poll using =E2=80=9Cirq_poll_sched=
+=E2=80=9D and
+disable that particular IRQ line. I was expecting more completion
+after I disable irq line, but in most of the cases  just one
+completion happened from irq poll context. It must be due to host side
+processing is much faster than IO processing at back end device.
+Similar observation was posted in above mentioned thread as well. I
+added manual wait using =E2=80=9Cudelay()=E2=80=9D and wait for some more t=
+ime in irq
+poll context. Using additional wait, I am able to reduce interrupt per
+seconds and performance impact on latency is not visible since I
+choose udelay(1). One drawback I see is overall CPU utilization goes
+up since driver is using extra delay to reduce interrupts.
+
+
+
+To overcome CPU utilization issue, I switch to threaded ISR and
+replace udelay() with usleep().  Using threaded interrupt based
+polling CPU utilization goes to normal.
+
+
+
+I am trying to understand what is a drawback using threaded ISR and
+doing interrupt polling from threaded ISR.  One problem I understood
+is threaded ISR can be preempted by other high priority context (most
+likely soft/hard interrupt).  If threaded interrupt is running on some
+CPU-x and some other device is also requesting interrupt on same
+CPU-x, there can be latency introduced because CPU-x will complete ISR
+before it can run threaded ISR.
+
+
+
+Thanks, Kashyap
