@@ -1,59 +1,37 @@
-Return-Path: <jgross@suse.com>
-From: Juergen Gross <jgross@suse.com>
-To: linux-kernel@vger.kernel.org,
-	xen-devel@lists.xenproject.org,
-	linux-block@vger.kernel.org
-Cc: konrad.wilk@oracle.com,
-	roger.pau@citrix.com,
-	axboe@kernel.dk,
-	boris.ostrovsky@oracle.com,
-	Juergen Gross <jgross@suse.com>
-Subject: [PATCH v2 0/5] xen/blk: persistent grant rework
-Date: Wed,  8 Aug 2018 16:25:23 +0200
-Message-Id: <20180808142528.31029-1-jgross@suse.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
+To: axboe@kernel.dk
+Cc: tom.leiming@gmail.com, bart.vanassche@wdc.com, keith.busch@linux.intel.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] fixes for the updating nr_hw_queues
+Date: Wed, 15 Aug 2018 15:25:13 +0800
+Message-Id: <1534317915-5041-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Persistent grants are used in the Xen's blkfront/blkback drivers to
-avoid mapping/unmapping of I/O buffers in the backend for each I/O.
+Two fixes for updating nr_hw_queues.
 
-While this speeds up processing quite a bit there are problems related
-to persistent grants in some configurations: domains with multiple
-block devices making use of persistent grants might suffer from a lack
-of grants if each of the block devices experienced a high I/O load at
-some time. This is due to the number of persistent grants per device
-only to be limited by a rather high maximum value, but never being
-released even in case of longer times without any I/O.
+The first patch fixes the following scenario:
+Kyber depends on the mapping between cpu and nr_hw_queues. When
+update nr_hw_queues, elevator_type->ops.mq.init_hctx will be
+invoked before the mapping is adapted correctly, this would cause
+panic in kyber.
 
-This series modifies xen-blkback to unmap any domU page mapped via a
-persistent grant after a timeout (default: 60 seconds). The timeout
-is set to its default value again when a persistent grant has been
-used for an I/O.
+The second patch fixes the following scenario:
+part_in_flight/rw will invoke blk_mq_in_flight/rw to account the
+inflight requests. It will access the queue_hw_ctx and nr_hw_queues
+w/o any protection. When updating nr_hw_queues and blk_mq_in_flight
+/rw occur concurrently, panic comes up.
 
-xen-blkfront is modified to scan every 10 seconds for persistent grants
-not in use by blkback any more and to remove such grants.
+Jianchao Wang (2)
+blk-mq: init hctx sched after update cpu & nr_hw_queues
+blk-mq: sync the update nr_hw_queues with part_in_flight
 
-The last 3 patches are small cleanups of blkfront and blkback drivers.
+ block/blk-mq.c         | 40 ++++++++++++++++++++++++++++++++--------
+ block/blk.h            |  2 ++
+ block/elevator.c       | 20 ++++++++++++--------
+ block/genhd.c          | 10 ++++++++--
+ include/linux/blkdev.h |  4 ++++
+ 5 files changed, 58 insertions(+), 18 deletions(-)
 
-V2:
-- patch 1: added new module parameter doc
-- patch 1: removed PERSISTENT_GNT_WAS_ACTIVE flag
-- patch 2: removed global worker active flag
-- added new patch 4
-
-Juergen Gross (5):
-  xen/blkback: don't keep persistent grants too long
-  xen/blkfront: cleanup stale persistent grants
-  xen/blkfront: reorder tests in xlblk_init()
-  xen/blkback: move persistent grants flags to bool
-  xen/blkback: remove unused pers_gnts_lock from struct xen_blkif_ring
-
- Documentation/ABI/testing/sysfs-driver-xen-blkback |  10 ++
- drivers/block/xen-blkback/blkback.c                |  99 ++++++++++---------
- drivers/block/xen-blkback/common.h                 |  14 +--
- drivers/block/xen-blkfront.c                       | 110 ++++++++++++++++++---
- 4 files changed, 163 insertions(+), 70 deletions(-)
-
--- 
-2.13.7
+Thanks
+Jianchao
