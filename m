@@ -1,102 +1,41 @@
-Return-Path: <3VrdrWwkbBVUFLM7x881ExCC50.3BB381HF1EzBAG1AG.zB9xKyB171EA18.07@M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] pktcdvd.c: Fix wrong return code when alloc_disk() fails.
+To: Jiecheng Wu <jasonwood2031@gmail.com>, linux-block@vger.kernel.org
+References: <20180815032251.32136-1-jasonwood2031@gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <1ba791a1-674a-89a5-74f3-9b9cd7eb6fb6@kernel.dk>
+Date: Wed, 15 Aug 2018 08:22:26 -0600
 MIME-Version: 1.0
-Date: Wed, 08 Aug 2018 20:39:02 -0700
-Message-ID: <0000000000003c4e6d0572f85eb2@google.com>
-Subject: WARNING in generic_make_request_checks
-From: syzbot <syzbot+21cfe1f803e0e158acf1@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+In-Reply-To: <20180815032251.32136-1-jasonwood2031@gmail.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
+On 8/14/18 9:22 PM, Jiecheng Wu wrote:
+> Function pkt_setup_dev() defined in drivers/block/pktcdvd.c calls
+> alloc_disk(). However, it forgets to set the error return code when
+> alloc_disk() fails. Instead, when alloc_disk() fails, it simply jumps
+> to label 'out_mem' leaving the variable ret unchanged.
 
-syzbot found the following crash on:
+We do init it to -ENOMEM, the problem is that
+mempool_init_kmalloc_pool() overwrites it, and any unset jump to error
+out after that won't work so well.
 
-HEAD commit:    60f5a2173632 Merge tag 'usercopy-fix-v4.18-rc8' of git://g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15e200e2400000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=2dc0cd7c2eefb46f
-dashboard link: https://syzkaller.appspot.com/bug?extid=21cfe1f803e0e158acf1
-compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
-syzkaller repro:https://syzkaller.appspot.com/x/repro.syz?x=17b87bfc400000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=117ccc8c400000
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+21cfe1f803e0e158acf1@syzkaller.appspotmail.com
-
-random: sshd: uninitialized urandom read (32 bytes read)
-random: sshd: uninitialized urandom read (32 bytes read)
-random: sshd: uninitialized urandom read (32 bytes read)
-------------[ cut here ]------------
-generic_make_request: Trying to write to read-only block-device loop0  
-(partno 0)
-WARNING: CPU: 1 PID: 4396 at block/blk-core.c:2161 bio_check_ro  
-block/blk-core.c:2158 [inline]
-WARNING: CPU: 1 PID: 4396 at block/blk-core.c:2161  
-generic_make_request_checks+0x1618/0x24a0 block/blk-core.c:2263
-Kernel panic - not syncing: panic_on_warn set ...
-
-CPU: 1 PID: 4396 Comm: syz-executor533 Not tainted 4.18.0-rc7+ #177
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x1c9/0x2b4 lib/dump_stack.c:113
-  panic+0x238/0x4e7 kernel/panic.c:184
-  __warn.cold.8+0x163/0x1ba kernel/panic.c:536
-  report_bug+0x252/0x2d0 lib/bug.c:186
-  fixup_bug arch/x86/kernel/traps.c:178 [inline]
-  do_error_trap+0x1fc/0x4d0 arch/x86/kernel/traps.c:296
-  do_invalid_op+0x1b/0x20 arch/x86/kernel/traps.c:316
-  invalid_op+0x14/0x20 arch/x86/entry/entry_64.S:992
-RIP: 0010:bio_check_ro block/blk-core.c:2158 [inline]
-RIP: 0010:generic_make_request_checks+0x1618/0x24a0 block/blk-core.c:2263
-Code: 8d bd 78 ff ff ff 45 8b b6 d4 04 00 00 48 89 df 4c 89 fe e8 ea 54 07  
-00 44 89 f2 48 c7 c7 60 16 39 87 48 89 c6 e8 68 30 ff fd <0f> 0b e9 56 ed  
-ff ff 48 8b bd 50 fd ff ff e8 75 f3 71 fe e9 ca ea
-RSP: 0018:ffff8801acc8f640 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: ffff8801ae5e0400 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffffffff81632481 RDI: 0000000000000001
-RBP: ffff8801acc8f940 R08: ffff8801ace94500 R09: ffffed003b624fc0
-R10: ffffed003b624fc0 R11: ffff8801db127e07 R12: ffff8801d3083140
-R13: ffff8801ae5e0408 R14: 0000000000000000 R15: ffff8801acc8f8b8
-  generic_make_request+0x2aa/0x1800 block/blk-core.c:2387
-  submit_bio+0xba/0x460 block/blk-core.c:2552
-  submit_bio_wait+0x134/0x1e0 block/bio.c:1004
-  blkdev_issue_flush+0x204/0x300 block/blk-flush.c:553
-  blkdev_fsync+0x93/0xd0 fs/block_dev.c:633
-  vfs_fsync_range+0x140/0x220 fs/sync.c:197
-  vfs_fsync fs/sync.c:211 [inline]
-  do_fsync+0x52/0xa0 fs/sync.c:221
-  __do_sys_fsync fs/sync.c:229 [inline]
-  __se_sys_fsync fs/sync.c:227 [inline]
-  __x64_sys_fsync+0x33/0x40 fs/sync.c:227
-  do_syscall_64+0x1b9/0x820 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x444999
-Code: e8 ec b2 02 00 48 83 c4 18 c3 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7  
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
-ff 0f 83 bb d4 fb ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007ffdc1fbd458 EFLAGS: 00000213 ORIG_RAX: 000000000000004a
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 0000000000444999
-RDX: 0000000000401430 RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 0000000000000000 R08: 00000000021eb880 R09: 00000000000000c2
-R10: 000000000000000f R11: 0000000000000213 R12: 00000000000074ed
-R13: 0000000000402370 R14: 0000000000000000 R15: 0000000000000000
-Dumping ftrace buffer:
-    (ftrace buffer empty)
-Kernel Offset: disabled
-Rebooting in 86400 seconds..
+So your fix isn't complete, since it won't catch blk_alloc_queue()
+failure. The below should do it.
 
 
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index e285413d4a75..6f1d25c1eb64 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -2740,6 +2740,7 @@ static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev)
+ 	pd->write_congestion_on  = write_congestion_on;
+ 	pd->write_congestion_off = write_congestion_off;
+ 
++	ret = -ENOMEM;
+ 	disk = alloc_disk(1);
+ 	if (!disk)
+ 		goto out_mem;
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
-syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+-- 
+Jens Axboe
