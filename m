@@ -1,68 +1,56 @@
-Return-Path: <ulf.hansson@linaro.org>
-Return-Path: <ulf.hansson@linaro.org>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-To: Linus <torvalds@linux-foundation.org>,
-	linux-mmc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Adrian Hunter <adrian.hunter@intel.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Ian W MORRISON <ianwmorrison@gmail.com>,
-	Peter Geis <pgwipeout@gmail.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	linux-block@vger.kernel.org
-Subject: [GIT PULL] MMC fixes for v4.19-rc2
-Date: Thu, 30 Aug 2018 14:20:53 +0200
-Message-Id: <20180830122053.15803-1-ulf.hansson@linaro.org>
+Return-Path: <mhiramat@kernel.org>
+Date: Fri, 17 Aug 2018 02:07:17 +0900
+From: Masami Hiramatsu <mhiramat@kernel.org>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: Ingo Molnar <mingo@redhat.com>, linux-kernel@vger.kernel.org, Jens Axboe
+ <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/2] tracing/blktrace: Fix to allow setting same value
+Message-Id: <20180817020717.7c0402429f0d4397f1b8d586@kernel.org>
+In-Reply-To: <20180816124917.77c82f04@gandalf.local.home>
+References: <153441301698.6024.1680500212551396320.stgit@devbox>
+	<153441307534.6024.2684721209411781531.stgit@devbox>
+	<20180816103802.08678002@gandalf.local.home>
+	<20180817013847.85ff26224bfd48d0fca1fd3f@kernel.org>
+	<20180816124917.77c82f04@gandalf.local.home>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+On Thu, 16 Aug 2018 12:49:17 -0400
+Steven Rostedt <rostedt@goodmis.org> wrote:
 
-Here's a PR with a couple of MMC fixes intended for v4.19-rc2. Details about the
-highlights are as usual found in the signed tag.
+> > > 
+> > > Hmm, why not just do this? Does this fix it too?  
+> > 
+> > Ah, yes, but we need to clear "ret" in that case.
+> 
+> Sure.
+> 
+> > 
+> > Thanks!
+> > 
+> > > 
+> > > diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+> > > index 987d9a9ae283..10b2b9c5fd25 100644
+> > > --- a/kernel/trace/blktrace.c
+> > > +++ b/kernel/trace/blktrace.c
+> > > @@ -1841,6 +1841,8 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
+> > >  	mutex_lock(&q->blk_trace_mutex);
+> > >  
+> 
+> > >  	if (attr == &dev_attr_enable) {
+> > > +		if (!!value == !!q->blk_trace) {
+>     +                   ret = 0;
+> > > +			goto out_unlock_bdev;
+>     +		}
+> 
 
-Please pull this in!
+OK, I tested and ensured that this works.
 
-Kind regards
-Ulf Hansson
+Tested-by: Masami Hiramatsu <mhiramat@kernel.org>
+
+Thanks!
 
 
-The following changes since commit 778a33959a8ad4cb1ea2f4c5119f9e1e8b9f9d9b:
-
-  Merge tag 'please-pull-noboot' of git://git.kernel.org/pub/scm/linux/kernel/git/aegl/linux (2018-08-20 19:37:09 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/ulfh/mmc.git tags/mmc-v4.19-2
-
-for you to fetch changes up to d2332f887ddfba50fee93b8e1736376517c2df0c:
-
-  mmc: renesas_sdhi_internal_dmac: mask DMAC interrupts (2018-08-23 10:00:49 +0200)
-
-----------------------------------------------------------------
-MMC core:
- - Fix unsupported parallel dispatch of requests
-
-MMC host:
- - atmel-mci/android-goldfish: Fixup logic of sg_copy_{from,to}_buffer
- - renesas_sdhi_internal_dmac: Prevent IRQ-storm due of DMAC IRQs
- - renesas_sdhi_internal_dmac: Fixup bad register offset
-
-----------------------------------------------------------------
-Adrian Hunter (1):
-      mmc: block: Fix unsupported parallel dispatch of requests
-
-Ludovic Desroches (2):
-      mmc: atmel-mci: fix bad logic of sg_copy_{from,to}_buffer conversion
-      mmc: android-goldfish: fix bad logic of sg_copy_{from,to}_buffer conversion
-
-Sergei Shtylyov (2):
-      mmc: renesas_sdhi_internal_dmac: fix #define RST_RESERVED_BITS
-      mmc: renesas_sdhi_internal_dmac: mask DMAC interrupts
-
- drivers/mmc/core/queue.c                      | 12 +++++++-----
- drivers/mmc/core/queue.h                      |  1 +
- drivers/mmc/host/android-goldfish.c           |  4 ++--
- drivers/mmc/host/atmel-mci.c                  | 12 ++++++------
- drivers/mmc/host/renesas_sdhi_internal_dmac.c | 10 +++++++++-
- 5 files changed, 25 insertions(+), 14 deletions(-)
+-- 
+Masami Hiramatsu <mhiramat@kernel.org>
