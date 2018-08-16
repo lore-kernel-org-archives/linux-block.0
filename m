@@ -1,36 +1,54 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: axboe@kernel.dk,
-	linux-bcache@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH 06/10] bcache: fix mistaken comments in request.c
-Date: Thu,  9 Aug 2018 15:48:47 +0800
-Message-Id: <20180809074851.11027-7-colyli@suse.de>
-In-Reply-To: <20180809074851.11027-1-colyli@suse.de>
-References: <20180809074851.11027-1-colyli@suse.de>
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT 4/4] block, bfq: improve code of bfq_bfqq_charge_time
+Date: Thu, 16 Aug 2018 18:51:18 +0200
+Message-Id: <20180816165118.17402-5-paolo.valente@linaro.org>
+In-Reply-To: <20180816165118.17402-1-paolo.valente@linaro.org>
+References: <20180816165118.17402-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch updates code comment in bch_keylist_realloc() by fixing
-incorrected function names, to make the code to be more comprehennsible.
+bfq_bfqq_charge_time contains some lengthy and redundant code. This
+commit trims and condenses that code.
 
-Signed-off-by: Coly Li <colyli@suse.de>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- drivers/md/bcache/request.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/bfq-wf2q.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 43af905920f5..914d501ad1e0 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -107,7 +107,7 @@ static int bch_keylist_realloc(struct keylist *l, unsigned u64s,
- 	/*
- 	 * The journalling code doesn't handle the case where the keys to insert
- 	 * is bigger than an empty write: If we just return -ENOMEM here,
--	 * bio_insert() and bio_invalidate() will insert the keys created so far
-+	 * bch_data_insert_keys() will insert the keys created so far
- 	 * and finish the rest when the keylist is empty.
- 	 */
- 	if (newsize * sizeof(uint64_t) > block_bytes(c) - sizeof(struct jset))
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index d558fd26740c..ae52bff43ce4 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -881,15 +881,11 @@ void bfq_bfqq_charge_time(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 			  unsigned long time_ms)
+ {
+ 	struct bfq_entity *entity = &bfqq->entity;
+-	int tot_serv_to_charge = entity->service;
+-	unsigned int timeout_ms = jiffies_to_msecs(bfq_timeout);
+-
+-	if (time_ms > 0 && time_ms < timeout_ms)
+-		tot_serv_to_charge =
+-			(bfqd->bfq_max_budget * time_ms) / timeout_ms;
+-
+-	if (tot_serv_to_charge < entity->service)
+-		tot_serv_to_charge = entity->service;
++	unsigned long timeout_ms = jiffies_to_msecs(bfq_timeout);
++	unsigned long bounded_time_ms = min(time_ms, timeout_ms);
++	int serv_to_charge_for_time =
++		(bfqd->bfq_max_budget * bounded_time_ms) / timeout_ms;
++	int tot_serv_to_charge = max(serv_to_charge_for_time, entity->service);
+ 
+ 	/* Increase budget to avoid inconsistencies */
+ 	if (tot_serv_to_charge > entity->budget)
 -- 
-2.18.0
+2.16.1
