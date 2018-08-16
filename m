@@ -1,53 +1,67 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: tom.leiming@gmail.com, bart.vanassche@wdc.com, keith.busch@linux.intel.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH V3 0/2] fixes for the updating nr_hw_queues
-Date: Mon, 20 Aug 2018 15:20:04 +0800
-Message-Id: <1534749606-7311-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT 1/4] block, bfq: readd missing reset of parent-entity service
+Date: Thu, 16 Aug 2018 18:51:15 +0200
+Message-Id: <20180816165118.17402-2-paolo.valente@linaro.org>
+In-Reply-To: <20180816165118.17402-1-paolo.valente@linaro.org>
+References: <20180816165118.17402-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens
+The received-service counter needs to be equal to 0 when an entity is
+set in service. Unfortunately, commit "block, bfq: fix service being
+wrongly set to zero in case of preemption" mistakenly removed the
+resetting of this counter for the parent entities of the bfq_queue
+being set in service. This commit fixes this issue by resetting
+service for parent entities, directly on the expiration of the
+in-service bfq_queue.
 
-Two fixes for updating nr_hw_queues.
+Fixes: 9fae8dd59ff3 ("block, bfq: fix service being wrongly set to zero in case of preemption")
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+---
+ block/bfq-iosched.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-The first patch fixes the following scenario:
-io scheduler (kyber) depends on the mapping between ctx and hctx.
-When update nr_hw_queues, io scheduler's init_hctx will be
-invoked before the mapping is adapted correctly, this would cause
-panic in kyber.
-
-The second patch fixes the following scenario:
-part_in_flight/rw will invoke blk_mq_in_flight/rw to account the
-inflight requests. It will access the queue_hw_ctx and nr_hw_queues
-w/o any protection. When updating nr_hw_queues and blk_mq_in_flight
-/rw occur concurrently, panic comes up.
-
-V3:
- - move the rcu and q_usage_counter checking into blk_mq_queue_tag_busy_iter
-   as suggestion of Ming.
- - Add more comment about the __module_get in 1st patch.
- - Add Ming's Reviewd-by on 1st patch.
-
-V2:
- - remove blk_mq_sched_init/exit_hctx in patch 1.
- - use q_usage_counter instead of adding new member suggested by
-   Ming in patch 2.
- - comment modification.
-
-Jianchao Wang(2)
-blk-mq: init hctx sched after update ctx and hctx
-blk-mq: sync the update nr_hw_queues with
-
- block/blk-mq-sched.c   | 44 --------------------------------------------
- block/blk-mq-sched.h   |  5 -----
- block/blk-mq-tag.c     | 14 +++++++++++++-
- block/blk-mq.c         | 43 +++++++++++++++++++++++++++++++++++--------
- block/blk.h            |  2 ++
- block/elevator.c       | 20 ++++++++++++--------
- include/linux/blkdev.h |  3 +++
- 7 files changed, 65 insertions(+), 66 deletions(-)
-
-Thanks
-Jianchao
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 41d9036b1822..62efc1b97afb 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -3298,6 +3298,27 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
+ 		 */
+ 	} else
+ 		entity->service = 0;
++
++	/*
++	 * Reset the received-service counter for every parent entity.
++	 * Differently from what happens with bfqq->entity.service,
++	 * the resetting of this counter never needs to be postponed
++	 * for parent entities. In fact, in case bfqq may have a
++	 * chance to go on being served using the last, partially
++	 * consumed budget, bfqq->entity.service needs to be kept,
++	 * because if bfqq then actually goes on being served using
++	 * the same budget, the last value of bfqq->entity.service is
++	 * needed to properly decrement bfqq->entity.budget by the
++	 * portion already consumed. In contrast, it is not necessary
++	 * to keep entity->service for parent entities too, because
++	 * the bubble up of the new value of bfqq->entity.budget will
++	 * make sure that the budgets of parent entities are correct,
++	 * even in case bfqq and thus parent entities go on receiving
++	 * service with the same budget.
++	 */
++	entity = entity->parent;
++	for_each_entity(entity)
++		entity->service = 0;
+ }
+ 
+ /*
+-- 
+2.16.1
