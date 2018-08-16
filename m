@@ -1,232 +1,99 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [RFC PATCH 12/14] SCSI: use admin queue to implement queue QUIESCE
-Date: Wed,  8 Aug 2018 01:44:31 +0800
-Message-Id: <20180807174433.8374-13-ming.lei@redhat.com>
-In-Reply-To: <20180807174433.8374-1-ming.lei@redhat.com>
-References: <20180807174433.8374-1-ming.lei@redhat.com>
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT 3/4] block, bfq: reduce write overcharge
+Date: Thu, 16 Aug 2018 18:51:17 +0200
+Message-Id: <20180816165118.17402-4-paolo.valente@linaro.org>
+In-Reply-To: <20180816165118.17402-1-paolo.valente@linaro.org>
+References: <20180816165118.17402-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-All admin commands are sent via per-host admin queue, so we can simply
-freeze the IO queue for quiescing scsi device.
+When a sync request is dispatched, the queue that contains that
+request, and all the ancestor entities of that queue, are charged with
+the number of sectors of the request. In constrast, if the request is
+async, then the queue and its ancestor entities are charged with the
+number of sectors of the request, multiplied by an overcharge
+factor. This throttles the bandwidth for async I/O, w.r.t. to sync
+I/O, and it is done to counter the tendency of async writes to steal
+I/O throughput to reads.
 
-Also the current SCSI stack guarantees that any request originated from
-admin queue won't be called back to block layer via the associated IO queue,
-and it is always dealt with by the admin queue.
+On the opposite end, the lower this parameter, the stabler I/O
+control, in the following respect.  The lower this parameter is, the
+less the bandwidth enjoyed by a group decreases
+- when the group does writes, w.r.t. to when it does reads;
+- when other groups do reads, w.r.t. to when they do writes.
 
-So it is safe to submit admin request via admin queue when the associated IO
-queue is frozen, and this way matches the PREEMPT flag perfectly.
+The fixes "block, bfq: always update the budget of an entity when
+needed" and "block, bfq: readd missing reset of parent-entity service"
+improved I/O control in bfq to such an extent that it has been
+possible to revise this overcharge factor downwards.  This commit
+introduces the resulting, new value.
 
-Finally, we can remove the preempt_only approach for supporting SCSI
-quiesce, then the code in block fast path is simplified a lot.
-
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Adrian Hunter <adrian.hunter@intel.com>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/blk-core.c           | 44 ++------------------------------------------
- block/blk-mq-debugfs.c     |  1 -
- drivers/scsi/scsi_lib.c    | 29 +++--------------------------
- include/linux/blkdev.h     |  6 ------
- include/scsi/scsi_device.h |  1 -
- 5 files changed, 5 insertions(+), 76 deletions(-)
+ block/bfq-iosched.c | 33 +++++++++++++++++++--------------
+ 1 file changed, 19 insertions(+), 14 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 5e0f4bee3588..ea12e3fcfa11 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -421,26 +421,6 @@ void blk_sync_queue(struct request_queue *q)
- EXPORT_SYMBOL(blk_sync_queue);
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 62efc1b97afb..653100fb719e 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -187,11 +187,25 @@ static const int bfq_stats_min_budgets = 194;
+ static const int bfq_default_max_budget = 16 * 1024;
+ 
+ /*
+- * Async to sync throughput distribution is controlled as follows:
+- * when an async request is served, the entity is charged the number
+- * of sectors of the request, multiplied by the factor below
++ * When a sync request is dispatched, the queue that contains that
++ * request, and all the ancestor entities of that queue, are charged
++ * with the number of sectors of the request. In constrast, if the
++ * request is async, then the queue and its ancestor entities are
++ * charged with the number of sectors of the request, multiplied by
++ * the factor below. This throttles the bandwidth for async I/O,
++ * w.r.t. to sync I/O, and it is done to counter the tendency of async
++ * writes to steal I/O throughput to reads.
++ *
++ * The current value of this parameter is the result of a tuning with
++ * several hardware and software configurations. We tried to find the
++ * lowest value for which writes do not cause noticeable problems to
++ * reads. In fact, the lower this parameter, the stabler I/O control,
++ * in the following respect.  The lower this parameter is, the less
++ * the bandwidth enjoyed by a group decreases
++ * - when the group does writes, w.r.t. to when it does reads;
++ * - when other groups do reads, w.r.t. to when they do writes.
+  */
+-static const int bfq_async_charge_factor = 10;
++static const int bfq_async_charge_factor = 3;
+ 
+ /* Default timeout values, in jiffies, approximating CFQ defaults. */
+ const int bfq_timeout = HZ / 8;
+@@ -853,16 +867,7 @@ static unsigned long bfq_serv_to_charge(struct request *rq,
+ 	if (bfq_bfqq_sync(bfqq) || bfqq->wr_coeff > 1)
+ 		return blk_rq_sectors(rq);
+ 
+-	/*
+-	 * If there are no weight-raised queues, then amplify service
+-	 * by just the async charge factor; otherwise amplify service
+-	 * by twice the async charge factor, to further reduce latency
+-	 * for weight-raised queues.
+-	 */
+-	if (bfqq->bfqd->wr_busy_queues == 0)
+-		return blk_rq_sectors(rq) * bfq_async_charge_factor;
+-
+-	return blk_rq_sectors(rq) * 2 * bfq_async_charge_factor;
++	return blk_rq_sectors(rq) * bfq_async_charge_factor;
+ }
  
  /**
-- * blk_set_preempt_only - set QUEUE_FLAG_PREEMPT_ONLY
-- * @q: request queue pointer
-- *
-- * Returns the previous value of the PREEMPT_ONLY flag - 0 if the flag was not
-- * set and 1 if the flag was already set.
-- */
--int blk_set_preempt_only(struct request_queue *q)
--{
--	return blk_queue_flag_test_and_set(QUEUE_FLAG_PREEMPT_ONLY, q);
--}
--EXPORT_SYMBOL_GPL(blk_set_preempt_only);
--
--void blk_clear_preempt_only(struct request_queue *q)
--{
--	blk_queue_flag_clear(QUEUE_FLAG_PREEMPT_ONLY, q);
--	wake_up_all(&q->mq_freeze_wq);
--}
--EXPORT_SYMBOL_GPL(blk_clear_preempt_only);
--
--/**
-  * __blk_run_queue_uncond - run a queue whether or not it has been stopped
-  * @q:	The queue to run
-  *
-@@ -911,27 +891,8 @@ EXPORT_SYMBOL(blk_alloc_queue);
-  */
- int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- {
--	const bool preempt = flags & BLK_MQ_REQ_PREEMPT;
--
- 	while (true) {
--		bool success = false;
--
--		rcu_read_lock();
--		if (percpu_ref_tryget_live(&q->q_usage_counter)) {
--			/*
--			 * The code that sets the PREEMPT_ONLY flag is
--			 * responsible for ensuring that that flag is globally
--			 * visible before the queue is unfrozen.
--			 */
--			if (preempt || !blk_queue_preempt_only(q)) {
--				success = true;
--			} else {
--				percpu_ref_put(&q->q_usage_counter);
--			}
--		}
--		rcu_read_unlock();
--
--		if (success)
-+		if (percpu_ref_tryget_live(&q->q_usage_counter))
- 			return 0;
- 
- 		if (flags & BLK_MQ_REQ_NOWAIT)
-@@ -947,8 +908,7 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 		smp_rmb();
- 
- 		wait_event(q->mq_freeze_wq,
--			   (atomic_read(&q->mq_freeze_depth) == 0 &&
--			    (preempt || !blk_queue_preempt_only(q))) ||
-+			   atomic_read(&q->mq_freeze_depth) == 0 ||
- 			   blk_queue_dying(q));
- 		if (blk_queue_dying(q))
- 			return -ENODEV;
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 246c9afb6f5d..899654eb10b6 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -132,7 +132,6 @@ static const char *const blk_queue_flag_name[] = {
- 	QUEUE_FLAG_NAME(REGISTERED),
- 	QUEUE_FLAG_NAME(SCSI_PASSTHROUGH),
- 	QUEUE_FLAG_NAME(QUIESCED),
--	QUEUE_FLAG_NAME(PREEMPT_ONLY),
- 	QUEUE_FLAG_NAME(NO_SCHED),
- };
- #undef QUEUE_FLAG_NAME
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 79475a679750..c78602f1a425 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -3118,34 +3118,12 @@ static void scsi_wait_for_queuecommand(struct scsi_device *sdev)
- int
- scsi_device_quiesce(struct scsi_device *sdev)
- {
--	struct request_queue *q = sdev->request_queue;
- 	int err;
- 
--	/*
--	 * It is allowed to call scsi_device_quiesce() multiple times from
--	 * the same context but concurrent scsi_device_quiesce() calls are
--	 * not allowed.
--	 */
--	WARN_ON_ONCE(sdev->quiesced_by && sdev->quiesced_by != current);
--
--	blk_set_preempt_only(q);
--
--	blk_mq_freeze_queue(q);
--	/*
--	 * Ensure that the effect of blk_set_preempt_only() will be visible
--	 * for percpu_ref_tryget() callers that occur after the queue
--	 * unfreeze even if the queue was already frozen before this function
--	 * was called. See also https://lwn.net/Articles/573497/.
--	 */
--	synchronize_rcu();
--	blk_mq_unfreeze_queue(q);
-+	blk_mq_freeze_queue(sdev->request_queue);
- 
- 	mutex_lock(&sdev->state_mutex);
- 	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
--	if (err == 0)
--		sdev->quiesced_by = current;
--	else
--		blk_clear_preempt_only(q);
- 	mutex_unlock(&sdev->state_mutex);
- 
- 	return err;
-@@ -3168,12 +3146,11 @@ void scsi_device_resume(struct scsi_device *sdev)
- 	 * device deleted during suspend)
- 	 */
- 	mutex_lock(&sdev->state_mutex);
--	WARN_ON_ONCE(!sdev->quiesced_by);
--	sdev->quiesced_by = NULL;
--	blk_clear_preempt_only(sdev->request_queue);
- 	if (sdev->sdev_state == SDEV_QUIESCE)
- 		scsi_device_set_state(sdev, SDEV_RUNNING);
- 	mutex_unlock(&sdev->state_mutex);
-+
-+	blk_mq_unfreeze_queue(sdev->request_queue);
- }
- EXPORT_SYMBOL(scsi_device_resume);
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 962945579f2a..a9d371f55ca5 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -700,7 +700,6 @@ struct request_queue {
- #define QUEUE_FLAG_REGISTERED  26	/* queue has been registered to a disk */
- #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
- #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
--#define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
- #define QUEUE_FLAG_NO_SCHED	30	/* no scheduler allowed */
- 
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
-@@ -742,14 +741,9 @@ bool blk_queue_flag_test_and_clear(unsigned int flag, struct request_queue *q);
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
- 			     REQ_FAILFAST_DRIVER))
- #define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
--#define blk_queue_preempt_only(q)				\
--	test_bit(QUEUE_FLAG_PREEMPT_ONLY, &(q)->queue_flags)
- #define blk_queue_fua(q)	test_bit(QUEUE_FLAG_FUA, &(q)->queue_flags)
- #define blk_queue_no_sched(q)	test_bit(QUEUE_FLAG_NO_SCHED, &(q)->queue_flags)
- 
--extern int blk_set_preempt_only(struct request_queue *q);
--extern void blk_clear_preempt_only(struct request_queue *q);
--
- static inline int queue_in_flight(struct request_queue *q)
- {
- 	return q->in_flight[0] + q->in_flight[1];
-diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
-index f6820da1dc37..666b58799cec 100644
---- a/include/scsi/scsi_device.h
-+++ b/include/scsi/scsi_device.h
-@@ -226,7 +226,6 @@ struct scsi_device {
- 	unsigned char		access_state;
- 	struct mutex		state_mutex;
- 	enum scsi_device_state sdev_state;
--	struct task_struct	*quiesced_by;
- 
- 	atomic_t		nr_admin_pending;
- 	wait_queue_head_t       admin_wq;
 -- 
-2.9.5
+2.16.1
