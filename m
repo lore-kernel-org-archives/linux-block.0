@@ -1,61 +1,43 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: axboe@kernel.dk,
-	linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH v3 17/17] bcache: add the missing comments for smp_mb()/smp_wmb()
-Date: Sat, 11 Aug 2018 13:20:00 +0800
-Message-Id: <20180811052000.103680-18-colyli@suse.de>
-In-Reply-To: <20180811052000.103680-1-colyli@suse.de>
-References: <20180811052000.103680-1-colyli@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52832 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727160AbeHQTId (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Aug 2018 15:08:33 -0400
+Date: Fri, 17 Aug 2018 12:04:36 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "osandov@fb.com" <osandov@fb.com>,
+        "jthumshirn@suse.de" <jthumshirn@suse.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH blktests 3/3] Add NVMeOF dm-mpath tests
+Message-ID: <20180817160436.GA3899@redhat.com>
+References: <20180815203728.19521-1-bart.vanassche@wdc.com>
+ <20180815203728.19521-4-bart.vanassche@wdc.com>
+ <20180817142428.GA3413@redhat.com>
+ <dde9f6a3cc4972cd041681847851d6d6bfcfe982.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <dde9f6a3cc4972cd041681847851d6d6bfcfe982.camel@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Checkpatch.pl warns there are 2 locations of smp_mb() and smp_wmb()
-without code comment. This patch adds the missing code comments for
-these memory barrier calls.
+On Fri, Aug 17 2018 at 11:46am -0400,
+Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
----
- drivers/md/bcache/closure.h | 4 +++-
- drivers/md/bcache/super.c   | 2 +-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+> On Fri, 2018-08-17 at 10:24 -0400, Mike Snitzer wrote:
+> > Put differently: until Jens stops taking hch's pull requests despite
+> > concerns being raised against hch's approach (that hch completely
+> > ignores because he rules with an iron fist from the top of a mountain in
+> > the Alps) we're pretty much screwed.
+> 
+> If everything works out as expected I will attend that mountain summit a
+> few weeks from now. Unless I missed something it's still possible to join
+> the summit as an attendee. I think you would be welcome.
 
-diff --git a/drivers/md/bcache/closure.h b/drivers/md/bcache/closure.h
-index 7f3594c0be14..eca0d496b686 100644
---- a/drivers/md/bcache/closure.h
-+++ b/drivers/md/bcache/closure.h
-@@ -289,10 +289,12 @@ static inline void closure_init_stack(struct closure *cl)
- }
- 
- /**
-- * closure_wake_up - wake up all closures on a wait list.
-+ * closure_wake_up - wake up all closures on a wait list,
-+ *		     with memory barrier
-  */
- static inline void closure_wake_up(struct closure_waitlist *list)
- {
-+	/* Memory barrier for the wait list */
- 	smp_mb();
- 	__closure_wake_up(list);
- }
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index e637d74e2908..94c756c66bd7 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1136,11 +1136,11 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
- 	list_move(&dc->list, &c->cached_devs);
- 	calc_cached_dev_sectors(c);
- 
--	smp_wmb();
- 	/*
- 	 * dc->c must be set before dc->count != 0 - paired with the mb in
- 	 * cached_dev_get()
- 	 */
-+	smp_wmb();
- 	refcount_set(&dc->count, 1);
- 
- 	/* Block writeback thread, but spawn it */
--- 
-2.18.0
+Cannot make it.
+
+But even if I did attend I've had quite a few instances where hch has
+said one thing in person, he later changes his mind, and then silently
+executes on implementing something that only serves his needs.
+
+Not the most productive.
