@@ -1,53 +1,75 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
+Return-Path: <mail@maciej.szmigiero.name>
+Subject: Re: [PATCH] cfq: clear queue pointers from cfqg after unpinning them
+ in cfq_pd_offline
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-kernel <linux-kernel@vger.kernel.org>,
+ Joseph Qi <joseph.qi@linux.alibaba.com>, Tejun Heo <tj@kernel.org>,
+ jiufei.xue@linux.alibaba.com, Caspar Zhang <caspar@linux.alibaba.com>
+References: <ba086112-65b1-c20f-0694-35d1ca0415d9@maciej.szmigiero.name>
+ <4FF39F18-108B-43BD-85A2-A09DB7755865@linaro.org>
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Message-ID: <11f9f800-f7d8-288d-4b17-f026170d5eba@maciej.szmigiero.name>
+Date: Fri, 17 Aug 2018 19:38:05 +0200
 MIME-Version: 1.0
-From: Kashyap Desai <kashyap.desai@broadcom.com>
-Date: Tue, 21 Aug 2018 13:06:58 -0600
-Message-ID: <CAHsXFKEdd+7fzAgbgjEiHNPwVs6Hi6j_J3mB1R-8jubaCgy6-A@mail.gmail.com>
-Subject: [RFC0/1] megaraid_sas : IRQ polling using threaded interrupt
-To: linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Peter Rivera <peter.rivera@broadcom.com>,
-        Steve Hagan <steve.hagan@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-scsi-owner@vger.kernel.org
+In-Reply-To: <4FF39F18-108B-43BD-85A2-A09DB7755865@linaro.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+On 17.08.2018 19:30, Paolo Valente wrote:
+> 
+> 
+>> Il giorno 17 ago 2018, alle ore 19:28, Maciej S. Szmigiero <mail@maciej.szmigiero.name> ha scritto:
+>>
+>> The current linux-block, 4.18 and 4.17 can reliably be crashed within few
+>> minutes by running the following bash snippet:
+>>
+>> mkfs.ext4 -v /dev/sda3 && mount /dev/sda3 /mnt/test/ -t ext4;
+>> while true; do
+>> 	mkdir /sys/fs/cgroup/unified/test/;
+>> 	echo $$ >/sys/fs/cgroup/unified/test/cgroup.procs;
+>> 	dd if=/dev/zero of=/mnt/test/test-$(( RANDOM * 10 / 32768 )) bs=1M count=1024 &
+>> 	echo $$ >/sys/fs/cgroup/unified/cgroup.procs;
+>> 	sleep 1;
+>> 	kill -KILL $!; wait $!;
+>> 	rmdir /sys/fs/cgroup/unified/test;
+>> done
+>>
+>> # cat /sys/block/sda/queue/scheduler
+>> noop [cfq]
+>> # cat /sys/block/sda/queue/rotational
+>> 1
+>> # cat /sys/fs/cgroup/unified/cgroup.subtree_control
+>> cpu io memory pids
+>>
+>> The backtraces vary but often they are NULL pointer dereferences due to
+>> various cfqq fields being NULL.
+>> Or BUG_ON(cfqq->ref <= 0) in cfq_put_queue() triggers due to cfqq reference
+>> count being zero.
+>>
+>> Bisection points at
+>> commit 4c6994806f70 ("blk-throttle: fix race between blkcg_bio_issue_check() and cgroup_rmdir()").
+>> The prime suspect looked like .pd_offline_fn() method being called multiple
+>> times, but from analyzing the mentioned commit this didn't seem possible
+>> and runtime trials have confirmed that.
+>>
+>> However, CFQ's cfq_pd_offline() implementation of the above method were
+>> leaving queue pointers intact in cfqg after unpinning them.
+>> After making sure that they are cleared to NULL in this function I can no
+>> longer reproduce the crash.
+>>
+> 
+> By chance, did you check whether is BFQ is ok in this respect?
 
-I refer below thread for interrupt polling related discussion for
-storage devices (NVME/HBA).
+I wasn't able to crash BFQ with the above test and in fact had run my
+machines on BFQ until I was able to find a fix for this in CFQ.
 
- http://lists.infradead.org/pipermail/linux-nvme/2017-January/007749.html
+Also, BFQ has a bit similar code in bfq_put_async_queues() that is
+called from bfq_pd_offline() that is already NULL-ing the passed
+pointer.
 
- I am trying to evaluate the similar concept to reduce interrupts
-using irq-poll and threaded ISR. Below is high level changes I did in
-my experiment.
+> Thanks,
+> Paolo
 
-
-In megaraid_sas driver, I schedule irq poll using =E2=80=9Cirq_poll_sched=
-=E2=80=9D and
-disable that particular IRQ line. I was expecting more completion
-after I disable irq line, but in most of the cases  just one
-completion happened from irq poll context. It must be due to host side
-processing is much faster than IO processing at back end device.
-Similar observation was posted in above mentioned thread as well. I
-added manual wait using =E2=80=9Cudelay()=E2=80=9D and wait for some more t=
-ime in irq
-poll context. Using additional wait, I am able to reduce interrupt per
-seconds and performance impact on latency is not visible since I
-choose udelay(1). One drawback I see is overall CPU utilization goes
-up since driver is using extra delay to reduce interrupts.
-
- To overcome CPU utilization issue, I switch to threaded ISR and
-replace udelay() with usleep().  Using threaded interrupt based
-polling CPU utilization goes to normal.
-
- I am trying to understand what is a drawback using threaded ISR and
-doing interrupt polling from threaded ISR.  One problem I understood
-is threaded ISR can be preempted by other high priority context (most
-likely soft/hard interrupt).  If threaded interrupt is running on some
-CPU-x and some other device is also requesting interrupt on same
-CPU-x, there can be latency introduced because CPU-x will complete ISR
-before it can run threaded ISR.
-
-Thanks ,Kashyap
+Regards,
+Maciej
