@@ -1,83 +1,53 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48714 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726032AbeHTLpa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Aug 2018 07:45:30 -0400
-Date: Mon, 20 Aug 2018 16:30:33 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
-Cc: tom.leiming@gmail.com, linux-block@vger.kernel.org,
-        Ben Hutchings <ben@decadent.org.uk>
-Subject: Re: blk-mq 5-8 times slower for bmap-tools
-Message-ID: <20180820083032.GA24522@ming.t460p>
-References: <CAPybu_2k-0d=8NxL7kr757QcWOnXyU_TAyV7DMwiMrSDkiXfgA@mail.gmail.com>
- <CACVXFVNguNEJ_R7XXvC8dG_yu5tghQk+Hdg6Hp6KKr4Ys4EV_A@mail.gmail.com>
- <CAPybu_2ke4usj9Qwr9iSKTymAk1510pzZnZAgLemRB+cK4Se1A@mail.gmail.com>
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:36736 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725911AbeHRCtY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Aug 2018 22:49:24 -0400
+Received: by mail-wm0-f68.google.com with SMTP id w24-v6so8680463wmc.1
+        for <linux-block@vger.kernel.org>; Fri, 17 Aug 2018 16:43:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAPybu_2ke4usj9Qwr9iSKTymAk1510pzZnZAgLemRB+cK4Se1A@mail.gmail.com>
+References: <CAPybu_2k-0d=8NxL7kr757QcWOnXyU_TAyV7DMwiMrSDkiXfgA@mail.gmail.com>
+In-Reply-To: <CAPybu_2k-0d=8NxL7kr757QcWOnXyU_TAyV7DMwiMrSDkiXfgA@mail.gmail.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Sat, 18 Aug 2018 07:43:46 +0800
+Message-ID: <CACVXFVNguNEJ_R7XXvC8dG_yu5tghQk+Hdg6Hp6KKr4Ys4EV_A@mail.gmail.com>
+Subject: Re: blk-mq 5-8 times slower for bmap-tools
+To: ricardo.ribalda@gmail.com
+Cc: linux-block <linux-block@vger.kernel.org>, ben@decadent.org.uk,
+        Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Aug 20, 2018 at 09:39:45AM +0200, Ricardo Ribalda Delgado wrote:
-> Some measurements:
-> 
-> Please note that even when iostat shows 0.0 the LED on the device was
-> blinking as if there was some activity going on.
-> 
-> Thanks!
-> 
-> KERNEL:
-> Linux neopili 4.17.0-1-amd64 #1 SMP Debian 4.17.8-1 (2018-07-20)
-> x86_64 GNU/Linux
-> 
-> DISK:
-> [247530.712686] usb 2-2: new SuperSpeed USB device number 3 using xhci_hcd
-> [247530.738906] usb 2-2: New USB device found, idVendor=174c,
-> idProduct=5136, bcdDevice= 1.00
-> [247530.738913] usb 2-2: New USB device strings: Mfr=2, Product=3,
-> SerialNumber=1
-> [247530.738918] usb 2-2: Product: 91686
-> [247530.738921] usb 2-2: Manufacturer: Delock
-> [247530.738925] usb 2-2: SerialNumber: 300000003B45
-> [247530.750709] scsi host6: uas
-> [247530.751377] scsi 6:0:0:0: Direct-Access     ASMT     2105
->    0    PQ: 0 ANSI: 6
-> [247530.752174] sd 6:0:0:0: Attached scsi generic sg2 type 0
-> [247530.752616] sd 6:0:0:0: [sdb] 31277232 512-byte logical blocks:
-> (16.0 GB/14.9 GiB)
-> [247530.752740] sd 6:0:0:0: [sdb] Write Protect is off
-> [247530.752742] sd 6:0:0:0: [sdb] Mode Sense: 43 00 00 00
-> [247530.752905] sd 6:0:0:0: [sdb] Write cache: enabled, read cache:
-> enabled, doesn't support DPO or FUA
-> [247530.755912]  sdb: sdb1 sdb2
-> [247530.756832] sd 6:0:0:0: [sdb] Attached SCSI disk
-> 
-> 
-> TL/DR:
-> CFQ: 21.7
-> NOOP: 21.7
-> DEADLINE: 21.7
-> MQ-DEADLINE: 175.2
-> NONE: 236.4
-> KYBER: 174.9
+On Sat, Aug 18, 2018 at 1:32 AM Ricardo Ribalda Delgado
+<ricardo.ribalda@gmail.com> wrote:
+>
+> Hello
+>
+> Coming from: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=906328
+>
+> bmaptools is kind of a "smart dd" tool, that lets you write images
+> very fast and securely. Since the last Debian Kernel update it has
+> become 5-8 times slower.
+>
+> After some debugging, we have figured out that the reason for that
+> slowness is the Multi-Queue Block IO Queueing Mechanism.
+>
+> Debian maintainer has pointed out that in the near future the single
+> queue will be deprecated.
+>
+> My question is if we can get a similar perfomance for bmaptools with
+> blk-mq and how?
 
-Thanks for your test!
+It suppose to be not worse than non-blk-mq, and maybe there is bug
+somewhere.
 
-One problem found from your iostat log is that looks there is ~30sec
-idle period between IO activities when blk-mq is enabled.
+Could you use 'iostat -dx $DISK_PATH 1' to collect io stat when running
+bmaptools in both blk-mq and non-blk-mq?
 
-Maybe it is related with timeout, given we had big change in v4.17 timeout code,
-and we also fixed one scsi_mq timeout related issue recently, and the patch[1] has
-been merged to v4.18 release already.
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2d5ba0e2de24ec87636244a01d4e78d095cc1b20
-
-So could you test v4.18 and see if there is such issue?
-
-BTW, I have run the same test on usb-storage, and can't reproduce it.
-However you are using UAS, and I don't have it at hand, so can't
-reproduce it completely.
+BTW, don't change the default io scheduler as none, which shouldn't
+work well for slow disk, such as non-SSD.
 
 Thanks,
-Ming
+Ming Lei
