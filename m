@@ -1,67 +1,32 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: James Bottomley <James.Bottomley@HansenPartnership.com>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Omar Sandoval <osandov@fb.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Don Brace <don.brace@microsemi.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Laurence Oberman <loberman@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 1/2] Revert "scsi: core: fix scsi_host_queue_ready"
-Date: Mon, 27 Aug 2018 15:24:42 +0800
-Message-Id: <20180827072443.26920-2-ming.lei@redhat.com>
-In-Reply-To: <20180827072443.26920-1-ming.lei@redhat.com>
-References: <20180827072443.26920-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:58980 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726478AbeHQKh0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Aug 2018 06:37:26 -0400
+Date: Fri, 17 Aug 2018 00:35:06 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Changwei Ge <gechangwei@live.cn>
+Cc: "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "ge.changwei@h3c.com" <ge.changwei@h3c.com>,
+        "liu.cong@h3c.com" <liu.cong@h3c.com>,
+        "changlimin@h3c.com" <changlimin@h3c.com>
+Subject: Re: [RFC] Can DM pass SCSI command to path now?
+Message-ID: <20180817073506.GA8653@infradead.org>
+References: <HK0PR06MB25611BB82C50809642EFC4C5D53E0@HK0PR06MB2561.apcprd06.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <HK0PR06MB25611BB82C50809642EFC4C5D53E0@HK0PR06MB2561.apcprd06.prod.outlook.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This reverts commit 265d59aacbce7e50bdc1f5d25033c38dd70b3767.
+On Thu, Aug 16, 2018 at 11:56:48AM +0000, Changwei Ge wrote:
+> Hi list,
+> 
+> Recently, I found that block request can't take SCSI CDB any more.
+> 
+> So, can we still pass SCSI command to DM device which will clone the 
+> request and transfer it real path?
 
-There is fundamental issue in commit 328728630d9f2bf1 (scsi: core: avoid
-host-wide host_busy counter for scsi_mq) because SCSI's host busy counter
-may not be same with counter of blk-mq's inflight tags, especially in case
-of none io scheduler.
-
-So revert this commit first.
-
-Cc: Omar Sandoval <osandov@fb.com>,
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Don Brace <don.brace@microsemi.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Laurence Oberman <loberman@redhat.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Guenter Roeck <linux@roeck-us.net>
-Cc: Jens Axboe <axboe@kernel.dk>
-Reported-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/scsi_lib.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 0adfb3bce0fd..1046679f5473 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1611,7 +1611,7 @@ static inline int scsi_host_queue_ready(struct request_queue *q,
- 	else
- 		busy = 0;
- 	if (atomic_read(&shost->host_blocked) > 0) {
--		if (busy)
-+		if (busy || scsi_host_busy(shost))
- 			goto starved;
- 
- 		/*
--- 
-2.9.5
+You never could before, as the infrastructure was always missing.
