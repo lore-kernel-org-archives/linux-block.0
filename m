@@ -1,151 +1,71 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-From: Dennis Zhou <dennisszhou@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Josef Bacik <josef@toxicpanda.com>
-Cc: kernel-team@fb.com,
+Return-Path: <javier@javigon.com>
+Return-Path: <javier@javigon.com>
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
+To: mb@lightnvm.io
+Cc: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-Subject: [PATCH 07/15] blkcg: consolidate bio_issue_init and blkg association
-Date: Thu, 30 Aug 2018 21:53:48 -0400
-Message-Id: <20180831015356.69796-8-dennisszhou@gmail.com>
-In-Reply-To: <20180831015356.69796-1-dennisszhou@gmail.com>
-References: <20180831015356.69796-1-dennisszhou@gmail.com>
+	=?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 2/2] lightnvm: pblk: take write semaphore on metadata
+Date: Fri, 17 Aug 2018 12:19:10 +0200
+Message-Id: <1534501150-11906-3-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1534501150-11906-1-git-send-email-javier@cnexlabs.com>
+References: <1534501150-11906-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+pblk guarantees write ordering at a chunk level through a per open chunk
+semaphore. At this point, since we only have an open I/O stream for both
+user and GC data, the semaphore is per parallel unit.
 
-This removes the now duplicate association logic in blk-throttle and
-blk-iolatency. bio_issue_init is moved into blkcg_bio_issue_check and
-into the bio clone variants to allow for the future addition of a
-latency moving average for IOs.
+For the metadata I/O that is synchronous, the semaphore is not needed as
+ordering is guaranteed. However, if the metadata scheme changes or
+multiple streams are open, this guarantee might not be preserved.
 
-Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
+This patch makes sure that all writes go through the semaphore, even for
+synchronous I/O. This is consistent with pblk's write I/O model. It also
+simplifies maintenance since changes in the metadata scheme could cause
+ordering issues.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- block/bio.c                |  2 ++
- block/blk-iolatency.c      | 24 +-----------------------
- block/blk-throttle.c       | 13 +------------
- block/bounce.c             |  2 ++
- include/linux/blk-cgroup.h |  2 ++
- 5 files changed, 8 insertions(+), 35 deletions(-)
+ drivers/lightnvm/pblk-core.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index e937f9681188..ab41f5b7eb1f 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -610,6 +610,8 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
- 	bio->bi_io_vec = bio_src->bi_io_vec;
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 52306573cc0e..eac5bd551860 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -493,6 +493,20 @@ int pblk_submit_io_sync(struct pblk *pblk, struct nvm_rq *rqd)
+ 	return nvm_submit_io_sync(dev, rqd);
+ }
  
- 	bio_clone_blkcg_association(bio, bio_src);
++int pblk_submit_io_sync_sem(struct pblk *pblk, struct nvm_rq *rqd)
++{
++	struct ppa_addr *ppa_list;
++	int ret;
 +
-+	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
- }
- EXPORT_SYMBOL(__bio_clone_fast);
- 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 22b2ff0440cc..9d7052bad6f7 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -395,34 +395,12 @@ static void blkcg_iolatency_throttle(struct rq_qos *rqos, struct bio *bio,
- 				     spinlock_t *lock)
- {
- 	struct blk_iolatency *blkiolat = BLKIOLATENCY(rqos);
--	struct blkcg *blkcg;
--	struct blkcg_gq *blkg;
--	struct request_queue *q = rqos->q;
-+	struct blkcg_gq *blkg = bio->bi_blkg;
- 	bool issue_as_root = bio_issue_as_root_blkg(bio);
- 
- 	if (!blk_iolatency_enabled(blkiolat))
- 		return;
- 
--	rcu_read_lock();
--	bio_associate_blkcg(bio, NULL);
--	blkcg = bio_blkcg(bio);
--	blkg = blkg_lookup(blkcg, q);
--	if (unlikely(!blkg)) {
--		if (!lock)
--			spin_lock_irq(q->queue_lock);
--		blkg = __blkg_lookup_create(blkcg, q);
--		if (IS_ERR(blkg))
--			blkg = NULL;
--		if (!lock)
--			spin_unlock_irq(q->queue_lock);
--	}
--	if (!blkg)
--		goto out;
--
--	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
--	bio_associate_blkg(bio, blkg);
--out:
--	rcu_read_unlock();
- 	while (blkg && blkg->parent) {
- 		struct iolatency_grp *iolat = blkg_to_lat(blkg);
- 		if (!iolat) {
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index c626e1f7cdcd..f2b355338894 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2126,21 +2126,11 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
- }
- #endif
- 
--static void blk_throtl_assoc_bio(struct throtl_grp *tg, struct bio *bio)
--{
--#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
--	/* fallback to root_blkg if we fail to get a blkg ref */
--	if (bio->bi_css && bio_associate_blkg(bio, tg_to_blkg(tg)))
--		bio_associate_blkg(bio, bio->bi_disk->queue->root_blkg);
--	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
--#endif
--}
--
- bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 		    struct bio *bio)
- {
- 	struct throtl_qnode *qn = NULL;
--	struct throtl_grp *tg = blkg_to_tg(blkg ?: q->root_blkg);
-+	struct throtl_grp *tg = blkg_to_tg(blkg);
- 	struct throtl_service_queue *sq;
- 	bool rw = bio_data_dir(bio);
- 	bool throttled = false;
-@@ -2159,7 +2149,6 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 	if (unlikely(blk_queue_bypass(q)))
- 		goto out_unlock;
- 
--	blk_throtl_assoc_bio(tg, bio);
- 	blk_throtl_update_idletime(tg);
- 
- 	sq = &tg->service_queue;
-diff --git a/block/bounce.c b/block/bounce.c
-index bc63b3a2d18c..bea3b0cbe4a7 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -259,6 +259,8 @@ static struct bio *bounce_clone_bio(struct bio *bio_src, gfp_t gfp_mask,
- 
- 	bio_clone_blkcg_association(bio, bio_src);
- 
-+	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
++	ppa_list = (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
 +
- 	return bio;
- }
- 
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 9931ec2f4e9e..55c348d66372 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -844,6 +844,8 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 		blkg_rwstat_add(&blkg->stat_ios, bio->bi_opf, 1);
++	pblk_down_page(pblk, ppa_list, rqd->nr_ppas);
++	ret = pblk_submit_io_sync(pblk, rqd);
++	pblk_up_page(pblk, ppa_list, rqd->nr_ppas);
++
++	return ret;
++}
++
+ static void pblk_bio_map_addr_endio(struct bio *bio)
+ {
+ 	bio_put(bio);
+@@ -731,7 +745,7 @@ static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line,
+ 		meta_list[i].lba = lba_list[paddr] = addr_empty;
  	}
  
-+	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
-+
- 	return !throtl;
- }
- 
+-	ret = pblk_submit_io_sync(pblk, &rqd);
++	ret = pblk_submit_io_sync_sem(pblk, &rqd);
+ 	if (ret) {
+ 		pblk_err(pblk, "smeta I/O submission failed: %d\n", ret);
+ 		bio_put(bio);
 -- 
-2.17.1
+2.7.4
