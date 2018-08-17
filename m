@@ -1,52 +1,47 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:44158 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728167AbeH2QUj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Aug 2018 12:20:39 -0400
-Received: by mail-ed1-f67.google.com with SMTP id s10-v6so3757421edb.11
-        for <linux-block@vger.kernel.org>; Wed, 29 Aug 2018 05:23:58 -0700 (PDT)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Javier Gonzales <javier@cnexlabs.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH 6/7] lightnvm: pblk: fix up prints in pblk_read_check_rand
-Date: Wed, 29 Aug 2018 14:23:33 +0200
-Message-Id: <1535545414-550-7-git-send-email-hans.ml.holmberg@owltronix.com>
-In-Reply-To: <1535545414-550-1-git-send-email-hans.ml.holmberg@owltronix.com>
-References: <1535545414-550-1-git-send-email-hans.ml.holmberg@owltronix.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
+To: axboe@kernel.dk
+Cc: tom.leiming@gmail.com, bart.vanassche@wdc.com, keith.busch@linux.intel.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH V2 0/2] fixes for the updating nr_hw_queues
+Date: Fri, 17 Aug 2018 11:54:01 +0800
+Message-Id: <1534478043-7170-1-git-send-email-jianchao.w.wang@oracle.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Hi Jens
 
-The prefix when printing ppas in pblk_read_check_rand should be "rnd"
-not "seq", so fix this so we can differentiate between lba missmatches
-in random and sequential reads. Also change the print order so
-we align with pblk_read_check_seq, printing read lba first.
+Two fixes for updating nr_hw_queues.
 
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
----
- drivers/lightnvm/pblk-read.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+The first patch fixes the following scenario:
+io scheduler (kyber) depends on the mapping between ctx and hctx.
+When update nr_hw_queues, io scheduler's init_hctx will be
+invoked before the mapping is adapted correctly, this would cause
+panic in kyber.
 
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index df3c4eb13be9..6d13763f2f6a 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -149,10 +149,10 @@ static void pblk_read_check_rand(struct pblk *pblk, struct nvm_rq *rqd,
- #ifdef CONFIG_NVM_PBLK_DEBUG
- 			struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
- 
--			print_ppa(pblk, &ppa_list[j], "seq", j);
-+			print_ppa(pblk, &ppa_list[j], "rnd", j);
- #endif
- 			pblk_err(pblk, "corrupted read LBA (%llu/%llu)\n",
--								lba, meta_lba);
-+							meta_lba, lba);
- 			WARN_ON(1);
- 		}
- 
--- 
-2.7.4
+The second patch fixes the following scenario:
+part_in_flight/rw will invoke blk_mq_in_flight/rw to account the
+inflight requests. It will access the queue_hw_ctx and nr_hw_queues
+w/o any protection. When updating nr_hw_queues and blk_mq_in_flight
+/rw occur concurrently, panic comes up.
+
+
+V2:
+ - remove blk_mq_sched_init/exit_hctx in patch 1.
+ - use q_usage_counter instead of adding new member suggested by
+   Ming in patch 2.
+ - comment modification.
+
+Jianchao Wang(2)
+blk-mq: init hctx sched after update ctx and hctx mapping
+blk-mq: sync the update nr_hw_queues with part_in_flight
+
+ block/blk-mq-sched.c   | 44 ----------------------------------
+ block/blk-mq-sched.h   |  5 ----
+ block/blk-mq.c         | 65 +++++++++++++++++++++++++++++++++++++++++++-------
+ block/blk.h            |  2 ++
+ block/elevator.c       | 20 +++++++++-------
+ include/linux/blkdev.h |  3 +++
+ 6 files changed, 74 insertions(+), 65 deletions(-)
+
+Thanks
+Jianchao
