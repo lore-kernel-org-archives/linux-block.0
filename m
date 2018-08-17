@@ -1,76 +1,41 @@
-Return-Path: <mhiramat@kernel.org>
-From: Masami Hiramatsu <mhiramat@kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Ingo Molnar <mingo@redhat.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 2/2] tracing/blktrace: Fix to allow setting same value
-Date: Thu, 16 Aug 2018 18:51:15 +0900
-Message-Id: <153441307534.6024.2684721209411781531.stgit@devbox>
-In-Reply-To: <153441301698.6024.1680500212551396320.stgit@devbox>
-References: <153441301698.6024.1680500212551396320.stgit@devbox>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block, bfq: return nbytes and not zero from struct cftype
+ .write() method
+To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc: Paolo Valente <paolo.valente@linaro.org>, linux-block@vger.kernel.org,
+ linux-kernel <linux-kernel@vger.kernel.org>,
+ Arianna Avanzini <avanzini.arianna@gmail.com>
+References: <f574e019-00f2-96c3-fc32-541c6584ca96@maciej.szmigiero.name>
+ <19c68f93-017d-cda1-632f-039ca3ca0158@kernel.dk>
+ <1f2ca124-bb7c-d02c-07cd-4afe6a634ee6@maciej.szmigiero.name>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <cb3a6209-9474-2b4d-1ff8-2e2f7c3367fb@kernel.dk>
+Date: Fri, 17 Aug 2018 11:38:57 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1f2ca124-bb7c-d02c-07cd-4afe6a634ee6@maciej.szmigiero.name>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Current trace-enable attribute in sysfs returns an error
-if user writes the same setting value as current one,
-e.g.
+On 8/17/18 11:27 AM, Maciej S. Szmigiero wrote:
+> On 16.08.2018 21:11, Jens Axboe wrote:
+>> On 8/15/18 3:56 PM, Maciej S. Szmigiero wrote:
+>>> The value that struct cftype .write() method returns is then directly
+>>> returned to userspace as the value returned by write() syscall, so it
+>>> should be the number of bytes actually written (or consumed) and not zero.
+>>>
+>>> Returning zero from write() syscall makes programs like /bin/echo or bash
+>>> spin.
+>>
+>> Applied, thanks.
+> 
+> Thanks.
+> 
+>> Just a heads-up that gmail thinks your email is spam.
+> 
+> Thanks for the information - it looks like gmail just doesn't like my
+> email server for some reason.
 
-  # cat /sys/block/sda/trace/enable
-  0
-  # echo 0 > /sys/block/sda/trace/enable
-  bash: echo: write error: Invalid argument
-  # echo 1 > /sys/block/sda/trace/enable
-  # echo 1 > /sys/block/sda/trace/enable
-  bash: echo: write error: Device or resource busy
+This one came through fine, jfyi.
 
-But this is not a preferred behavior, it should ignore
-if new setting is same as current one. This fixes the
-problem as below.
-
-  # cat /sys/block/sda/trace/enable
-  0
-  # echo 0 > /sys/block/sda/trace/enable
-  # echo 1 > /sys/block/sda/trace/enable
-  # echo 1 > /sys/block/sda/trace/enable
-
-Signed-off-by: Masami Hiramatsu <mhiramat@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
----
- kernel/trace/blktrace.c |   11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
-
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 987d9a9ae283..e67db1e8a000 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -1602,11 +1602,11 @@ static int blk_trace_remove_queue(struct request_queue *q)
- 	struct blk_trace *bt;
- 
- 	bt = xchg(&q->blk_trace, NULL);
--	if (bt == NULL)
--		return -EINVAL;
-+	if (bt != NULL) {
-+		put_probe_ref();
-+		blk_trace_free(bt);
-+	}
- 
--	put_probe_ref();
--	blk_trace_free(bt);
- 	return 0;
- }
- 
-@@ -1619,6 +1619,9 @@ static int blk_trace_setup_queue(struct request_queue *q,
- 	struct blk_trace *bt = NULL;
- 	int ret = -ENOMEM;
- 
-+	if (q->blk_trace)
-+		return 0;
-+
- 	bt = kzalloc(sizeof(*bt), GFP_KERNEL);
- 	if (!bt)
- 		return -ENOMEM;
+-- 
+Jens Axboe
