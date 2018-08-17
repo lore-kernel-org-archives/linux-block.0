@@ -1,49 +1,26 @@
-Return-Path: <jgross@suse.com>
-From: Juergen Gross <jgross@suse.com>
-To: linux-kernel@vger.kernel.org,
-	xen-devel@lists.xenproject.org,
-	linux-block@vger.kernel.org
-Cc: konrad.wilk@oracle.com,
-	roger.pau@citrix.com,
-	axboe@kernel.dk,
-	boris.ostrovsky@oracle.com,
-	Juergen Gross <jgross@suse.com>
-Subject: [PATCH 0/4] xen/blk: persistent grant rework
-Date: Mon,  6 Aug 2018 13:33:58 +0200
-Message-Id: <20180806113403.24728-1-jgross@suse.com>
+Return-Path: <hch@lst.de>
+Date: Fri, 17 Aug 2018 08:53:26 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <keith.busch@intel.com>,
+	Bart van Assche <bart.vanassche@wdc.com>,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
+	Hannes Reinecke <hare@suse.com>,
+	"Ed L . Cachin" <ed.cashin@acm.org>
+Subject: Re: [PATCH 3/5] aoe: use device_add_disk_with_groups()
+Message-ID: <20180817065326.GB11170@lst.de>
+References: <20180814073305.87255-1-hare@suse.de> <20180814073305.87255-4-hare@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180814073305.87255-4-hare@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Persistent grants are used in the Xen's blkfront/blkback drivers to
-avoid mapping/unmapping of I/O buffers in the backend for each I/O.
+On Tue, Aug 14, 2018 at 09:33:03AM +0200, Hannes Reinecke wrote:
+> Use device_add_disk_with_groups() to avoid a race condition with
+> udev during startup.
 
-While this speeds up processing quite a bit there are problems related
-to persistent grants in some configurations: domains with multiple
-block devices making use of persistent grants might suffer from a lack
-of grants if each of the block devices experienced a high I/O load at
-some time. This is due to the number of persistent grants per device
-only to be limited by a rather high maximum value, but never being
-released even in case of longer times without any I/O.
-
-This series modifies xen-blkback to unmap any domU page mapped via a
-persistent grant after a timeout (default: 60 seconds). The timeout
-is set to its default value again when a persistent grant has been
-used for an I/O.
-
-xen-blkfront is modified to scan every 10 seconds for persistent grants
-not in use by blkback any more and to remove such grants.
-
-The last 2 patches are small cleanups of blkfront and blkback drivers.
-
-Juergen Gross (4):
-  xen/blkback: don't keep persistent grants too long
-  xen/blkfront: cleanup stale persistent grants
-  xen/blkfront: reorder tests in xlblk_init()
-  xen/blkback: remove unused pers_gnts_lock from struct xen_blkif_ring
-
- drivers/block/xen-blkback/blkback.c |  77 +++++++++++++++---------
- drivers/block/xen-blkback/common.h  |   2 +-
- drivers/block/xen-blkfront.c        | 115 ++++++++++++++++++++++++++++++++----
- 3 files changed, 153 insertions(+), 41 deletions(-)
-
--- 
-2.13.7
+The desxription and the subject line need an update now that
+device_add_disk_with_groups is no more.
