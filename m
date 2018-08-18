@@ -1,41 +1,43 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga06.intel.com ([134.134.136.31]:49998 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726453AbeHRMaD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 18 Aug 2018 08:30:03 -0400
+Date: Sat, 18 Aug 2018 17:22:53 +0800
+From: kbuild test robot <lkp@intel.com>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: kbuild-all@01.org, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Christoph Hellwig <hch@lst.de>,
+        Steve Wise <swise@opengridcomputing.com>,
+        Max Gurtovoy <maxg@mellanox.com>
 Subject: Re: [PATCH] block: fix rdma queue mapping
-To: Sagi Grimberg <sagi@grimberg.me>, <linux-block@vger.kernel.org>,
- <linux-rdma@vger.kernel.org>, <linux-nvme@lists.infradead.org>
+Message-ID: <201808181744.BIqmnwvW%fengguang.wu@intel.com>
 References: <20180817223823.19566-1-sagi@grimberg.me>
-From: Max Gurtovoy <maxg@mellanox.com>
-Message-ID: <5973cbfe-1466-cf44-c33e-d9b0dbcc9ca6@mellanox.com>
-Date: Sun, 19 Aug 2018 15:45:07 +0300
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180817223823.19566-1-sagi@grimberg.me>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: Israel Rukshin <israelr@mellanox.com>,
- Steve Wise <swise@opengridcomputing.com>, Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 Hi Sagi,
-did you have a chance to look on Israel's and mine fixes that we 
-attached to the first thread ?
 
-there are few issues with this approach. For example in case you don't 
-have a "free" cpu in the mask for Qi and you take cpu from Qi+j mask.
+I love your patch! Perhaps something to improve:
 
-Also in case we have a non-symetrical affinity for 2 queues e.g. and the 
-system has 32 cpus, the mapping is 16 for each (and not according to the 
-user affinity...).
+[auto build test WARNING on block/for-next]
+[also build test WARNING on v4.18 next-20180817]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
 
--Max.
+url:    https://github.com/0day-ci/linux/commits/Sagi-Grimberg/block-fix-rdma-queue-mapping/20180818-103103
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
 
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+
+coccinelle warnings: (new ones prefixed by >>)
+
+>> block/blk-mq-rdma.c:105:34-35: Unneeded semicolon
+
+Please review and possibly fold the followup patch.
+
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
