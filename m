@@ -1,140 +1,95 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] blk-wbt: get back the missed wakeup from __wbt_done
-Date: Thu, 23 Aug 2018 21:08:38 +0800
-Message-Id: <1535029718-17259-1-git-send-email-jianchao.w.wang@oracle.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-sn1nam01on0056.outbound.protection.outlook.com ([104.47.32.56]:60384
+        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726032AbeHTK75 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 Aug 2018 06:59:57 -0400
+From: Javier Gonzalez <javier@cnexlabs.com>
+To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
+CC: "Konopko, Igor J" <igor.j.konopko@intel.com>,
+        "Dziegielewski, Marcin" <marcin.dziegielewski@intel.com>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        Heiner Litz <hlitz@ucsc.edu>,
+        Young Tack Tack Jin <youngtack.jin@circuitblvd.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] lightnvm: pblk: fix incorrect min_write_pgs
+Date: Mon, 20 Aug 2018 07:45:19 +0000
+Message-ID: <6F75B3CB-23BA-4CCD-9EA7-8B8B00BFFB9E@cnexlabs.com>
+References: <20180817143637.15943-1-mb@lightnvm.io>
+In-Reply-To: <20180817143637.15943-1-mb@lightnvm.io>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_1AF0A1C8-ADBF-41BC-A0C1-0F6D4E82CE9F";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha512
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-2887e41 (blk-wbt: Avoid lock contention and thundering herd
-issue in wbt_wait) introduces two cases that could miss wakeup:
- - __wbt_done only wakes up one waiter one time. There could be
-   multiple waiters and (limit - inflight) > 1 at the moment.
+--Apple-Mail=_1AF0A1C8-ADBF-41BC-A0C1-0F6D4E82CE9F
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
- - When the waiter is waked up, it is still on wait queue and set
-   to TASK_UNINTERRUPTIBLE immediately, so this waiter could be
-   waked up one more time. If a __wbt_done comes and wakes up
-   again, the prevous waiter may waste a wakeup.
+> On 17 Aug 2018, at 16.36, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
+>=20
+> The calculation of pblk->min_write_pgs should only use the optimal
+> write size attribute provided by the drive, it does not correlate to
+> the memory page size of the system, which can be smaller or larger
+> than the LBA size reported.
+>=20
+> Signed-off-by: Matias Bj=C3=B8rling <mb@lightnvm.io>
+> ---
+> drivers/lightnvm/pblk-init.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/lightnvm/pblk-init.c =
+b/drivers/lightnvm/pblk-init.c
+> index 9119c64d6f62..8adc8ac8b03c 100644
+> --- a/drivers/lightnvm/pblk-init.c
+> +++ b/drivers/lightnvm/pblk-init.c
+> @@ -371,7 +371,7 @@ static int pblk_core_init(struct pblk *pblk)
+> 	atomic64_set(&pblk->nr_flush, 0);
+> 	pblk->nr_flush_rst =3D 0;
+>=20
+> -	pblk->min_write_pgs =3D geo->ws_opt * (geo->csecs / PAGE_SIZE);
+> +	pblk->min_write_pgs =3D geo->ws_opt;
+> 	max_write_ppas =3D pblk->min_write_pgs * geo->all_luns;
+> 	pblk->max_write_pgs =3D min_t(int, max_write_ppas, =
+NVM_MAX_VLBA);
+> 	pblk_set_sec_per_write(pblk, pblk->min_write_pgs);
+> --
+> 2.11.0
 
-To fix them and avoid to introduce too much lock contention, we
-introduce our own wake up func wbt_wake_function in __wbt_wait and
-use wake_up_all in __wbt_done. wbt_wake_function will try to get
-wbt budget firstly, if sucesses, wake up the process, otherwise,
-return -1 to interrupt the wake up loop.
+Looks good to me.
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
-Fixes: 2887e41 (blk-wbt: Avoid lock contention and thundering herd issue in wbt_wait)
-Cc: Anchal Agarwal <anchalag@amazon.com>
-Cc: Frank van der Linden <fllinden@amazon.com>
----
- block/blk-wbt.c | 78 +++++++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 54 insertions(+), 24 deletions(-)
 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index c9358f1..2667590 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -166,7 +166,7 @@ static void __wbt_done(struct rq_qos *rqos, enum wbt_flags wb_acct)
- 		int diff = limit - inflight;
- 
- 		if (!inflight || diff >= rwb->wb_background / 2)
--			wake_up(&rqw->wait);
-+			wake_up_all(&rqw->wait);
- 	}
- }
- 
-@@ -481,6 +481,40 @@ static inline unsigned int get_limit(struct rq_wb *rwb, unsigned long rw)
- 	return limit;
- }
- 
-+struct wbt_wait_data {
-+	struct task_struct *curr;
-+	struct rq_wb *rwb;
-+	struct rq_wait *rqw;
-+	unsigned long rw;
-+};
-+
-+static int wbt_wake_function(wait_queue_entry_t *curr, unsigned int mode,
-+		int wake_flags, void *key)
-+{
-+	struct wbt_wait_data *data = curr->private;
-+
-+	/*
-+	 * If fail to get budget, return -1 to interrupt the wake up
-+	 * loop in __wake_up_common.
-+	 */
-+	if (!rq_wait_inc_below(data->rqw, get_limit(data->rwb, data->rw)))
-+		return -1;
-+
-+	wake_up_process(data->curr);
-+
-+	list_del_init(&curr->entry);
-+	return 1;
-+}
-+
-+static inline void wbt_init_wait(struct wait_queue_entry *wait,
-+		struct wbt_wait_data *data)
-+{
-+	INIT_LIST_HEAD(&wait->entry);
-+	wait->flags = 0;
-+	wait->func = wbt_wake_function;
-+	wait->private = data;
-+}
-+
- /*
-  * Block if we will exceed our limit, or if we are currently waiting for
-  * the timer to kick off queuing again.
-@@ -491,31 +525,27 @@ static void __wbt_wait(struct rq_wb *rwb, enum wbt_flags wb_acct,
- 	__acquires(lock)
- {
- 	struct rq_wait *rqw = get_rq_wait(rwb, wb_acct);
--	DECLARE_WAITQUEUE(wait, current);
--	bool has_sleeper;
--
--	has_sleeper = wq_has_sleeper(&rqw->wait);
--	if (!has_sleeper && rq_wait_inc_below(rqw, get_limit(rwb, rw)))
-+	struct wait_queue_entry wait;
-+	struct wbt_wait_data data = {
-+		.curr = current,
-+		.rwb = rwb,
-+		.rqw = rqw,
-+		.rw = rw,
-+	};
-+
-+	if (!wq_has_sleeper(&rqw->wait) &&
-+			rq_wait_inc_below(rqw, get_limit(rwb, rw)))
- 		return;
- 
--	add_wait_queue_exclusive(&rqw->wait, &wait);
--	do {
--		set_current_state(TASK_UNINTERRUPTIBLE);
--
--		if (!has_sleeper && rq_wait_inc_below(rqw, get_limit(rwb, rw)))
--			break;
--
--		if (lock) {
--			spin_unlock_irq(lock);
--			io_schedule();
--			spin_lock_irq(lock);
--		} else
--			io_schedule();
--		has_sleeper = false;
--	} while (1);
--
--	__set_current_state(TASK_RUNNING);
--	remove_wait_queue(&rqw->wait, &wait);
-+	wbt_init_wait(&wait, &data);
-+	prepare_to_wait_exclusive(&rqw->wait, &wait,
-+			TASK_UNINTERRUPTIBLE);
-+	if (lock) {
-+		spin_unlock_irq(lock);
-+		io_schedule();
-+		spin_lock_irq(lock);
-+	} else
-+		io_schedule();
- }
- 
- static inline bool wbt_should_throttle(struct rq_wb *rwb, struct bio *bio)
--- 
-2.7.4
+Reviewed-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
+
+
+--Apple-Mail=_1AF0A1C8-ADBF-41BC-A0C1-0F6D4E82CE9F
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAlt6cY0ACgkQIX4xUKFR
+nnQNmRAAgJxwq9yBZonp9i4GgHcr9g+7wT0y06HoX1lI64UbdzdSWE5EAXxaGR37
+1+0Cw53iF0gwDG79SI4grudAtdMYUxppmHeJDFdOJOedHykiybqXNlRAoCeFx5fa
+iBGS9HrAiqHJpQE7Mo5Ov3gCWDPrCgWUq13u3z33vq02t+pk3FLh9Rka71v4ID6k
+l9imXjKmDHBfwsqbd8MPmfYvkfLCxg49uTkQ1FAs+q7nJPrfX3fPsvUnDAdul+Q5
+KYx7MZNSzyyvuaQJb/wi9sDJBDmEtMAhEJYxw6Fd3tVAMtmFcub4VPLMlm3G23xp
+ZI+ili6Wn+pWJ3cbv5MFf44s/1zmtGBsOH9XUtxE40aWqEKL6EJQ/PYXO2G6iRsg
+stghihRLfkqAlhEUvtUGHyyVWT4uRPQsse8bDIco4Dr+yA7XiXkPOnn87V8tseUG
+PYJ9oD4o2tAtxmLwph3mynNAtErGewleU2A0JqhnY+3/T5W+jWK9OGOwtMOqLlc1
+2XRtRzcQotpPzc7hhBWzBFQh5JhN6ulZzAndwftemZPLww/BxZd7dFdFVOBcDjKT
+n+QDToOgN3JCmi65B2R7WNUzx15hE3DbksUZyjDEwZU/BrC0ceoD5kCYjjDNgttO
++4CNWJq2SUlktMmrZ25v3c8DzetY+GINZVfiSM0vvcebs73IN4k=
+=gWWt
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_1AF0A1C8-ADBF-41BC-A0C1-0F6D4E82CE9F--
