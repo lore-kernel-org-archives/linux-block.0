@@ -1,266 +1,76 @@
 Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: tom.leiming@gmail.com, bart.vanassche@wdc.com, keith.busch@linux.intel.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH V3 1/2] blk-mq: init hctx sched after update ctx and hctx mapping
-Date: Mon, 20 Aug 2018 15:20:05 +0800
-Message-Id: <1534749606-7311-2-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1534749606-7311-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1534749606-7311-1-git-send-email-jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH V2 1/2] blk-mq: init hctx sched after update ctx and hctx
+ mapping
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Keith Busch <keith.busch@linux.intel.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <1534478043-7170-1-git-send-email-jianchao.w.wang@oracle.com>
+ <1534478043-7170-2-git-send-email-jianchao.w.wang@oracle.com>
+ <CACVXFVPZF7ohzUib4Nr1qdHLwjpEWP4+be6h6GmZh1y9-qsVqg@mail.gmail.com>
+ <96657784-dd95-6ea9-3ffd-25737c534075@oracle.com>
+ <CACVXFVMqjiSmzL2JeLUV2Q4bXqy2WRNHahg-fusFYjHeCX3gng@mail.gmail.com>
+ <3ce9f249-4c2f-89a6-727f-9bc449a4fdf4@oracle.com>
+ <20180820041833.GB21600@ming.t460p>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <edbed43c-8470-c803-02b4-8d55fed781a9@oracle.com>
+Date: Mon, 20 Aug 2018 13:21:38 +0800
+MIME-Version: 1.0
+In-Reply-To: <20180820041833.GB21600@ming.t460p>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Currently, when update nr_hw_queues, io scheduler's init_hctx will
-be invoked before the mapping between ctx and hctx is adapted
-correctly by blk_mq_map_swqueue. The io scheduler init_hctx (kyber)
-may depend on this mapping and get wrong result and panic finally.
-A simply way to fix this is switch the io scheduler to none before
-update the nr_hw_queues, and then get it back after update nr_hw_queues.
-To achieve this, we add a new member elv_type in request_queue to
-save the original elevator and adapt and export elevator_switch_mq.
-And also blk_mq_sched_init_/exit_hctx are removed due to nobody use
-them any more.
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c   | 44 --------------------------------------------
- block/blk-mq-sched.h   |  5 -----
- block/blk-mq.c         | 40 ++++++++++++++++++++++++++++++++--------
- block/blk.h            |  2 ++
- block/elevator.c       | 20 ++++++++++++--------
- include/linux/blkdev.h |  3 +++
- 6 files changed, 49 insertions(+), 65 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index cf9c66c..29bfe80 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -462,50 +462,6 @@ static void blk_mq_sched_tags_teardown(struct request_queue *q)
- 		blk_mq_sched_free_tags(set, hctx, i);
- }
+On 08/20/2018 12:18 PM, Ming Lei wrote:
+> On Mon, Aug 20, 2018 at 11:57:52AM +0800, jianchao.wang wrote:
+>> Hi Ming
+>>
+>> On 08/20/2018 10:24 AM, Ming Lei wrote:
+>>>> The code path is:
+>>>>
+>>>> elevator_release
+>>>>   -> elevator_put(e->type)
+>>>>     -> module_put(e->elevator_owner)
+>>>>
+>>>> In normal elevator switch path, elevator_get will hold a reference counter of the
+>>>> elevator_owner.
+>>>> In this patch set, the elevator_type is saved directly. To prevent the io scheduler module
+>>>> is removed, we need to hold a reference of the module.
+>>> Yeah, I agree that the module reference need to be held, but it need to be
+>>> released too.
+>>>
+>>> My concern is that this introduced getting module reference in your patch
+>>> isn't released. The module reference is a counter too, so the get and
+>>> put operation should be matched.
+>>
+>> elevator_switch_mq
+>>   -> elevator_exit
+>> it will put a reference count of the elevator_queue associated with the request_queue.
+>> and the elevator_release will be invoked when the reference count of elevator_queue->kobj reaches zero.
+>> elevator_release will put the reference count of the io scheduler module.
+>>
+>> the elevator_queue structure will be allocated and freed every time when we switch io scheduler.
+>> so the elevator_release will always be invoked.
+>>
+>> This is the put ref corresponding to the get one in this patch.
+> 
+> OK, got it, the added __module_get() is just like what elevator_get()
+> does from __elevator_change(). Sorry for the noise.
+> 
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> 
+
+Thanks very much for your reviewing.
+
+I will add more comment to describe the added __module_get() in the V3.
+
+Thanks
+Jianchao
  
--int blk_mq_sched_init_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
--			   unsigned int hctx_idx)
--{
--	struct elevator_queue *e = q->elevator;
--	int ret;
--
--	if (!e)
--		return 0;
--
--	ret = blk_mq_sched_alloc_tags(q, hctx, hctx_idx);
--	if (ret)
--		return ret;
--
--	if (e->type->ops.mq.init_hctx) {
--		ret = e->type->ops.mq.init_hctx(hctx, hctx_idx);
--		if (ret) {
--			blk_mq_sched_free_tags(q->tag_set, hctx, hctx_idx);
--			return ret;
--		}
--	}
--
--	blk_mq_debugfs_register_sched_hctx(q, hctx);
--
--	return 0;
--}
--
--void blk_mq_sched_exit_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
--			    unsigned int hctx_idx)
--{
--	struct elevator_queue *e = q->elevator;
--
--	if (!e)
--		return;
--
--	blk_mq_debugfs_unregister_sched_hctx(hctx);
--
--	if (e->type->ops.mq.exit_hctx && hctx->sched_data) {
--		e->type->ops.mq.exit_hctx(hctx, hctx_idx);
--		hctx->sched_data = NULL;
--	}
--
--	blk_mq_sched_free_tags(q->tag_set, hctx, hctx_idx);
--}
--
- int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
- {
- 	struct blk_mq_hw_ctx *hctx;
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 0cb8f93..4e028ee 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -28,11 +28,6 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx);
- int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e);
- void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e);
- 
--int blk_mq_sched_init_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
--			   unsigned int hctx_idx);
--void blk_mq_sched_exit_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
--			    unsigned int hctx_idx);
--
- static inline bool
- blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
- {
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 5efd789..7b99477 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2147,8 +2147,6 @@ static void blk_mq_exit_hctx(struct request_queue *q,
- 	if (set->ops->exit_request)
- 		set->ops->exit_request(set, hctx->fq->flush_rq, hctx_idx);
- 
--	blk_mq_sched_exit_hctx(q, hctx, hctx_idx);
--
- 	if (set->ops->exit_hctx)
- 		set->ops->exit_hctx(hctx, hctx_idx);
- 
-@@ -2216,12 +2214,9 @@ static int blk_mq_init_hctx(struct request_queue *q,
- 	    set->ops->init_hctx(hctx, set->driver_data, hctx_idx))
- 		goto free_bitmap;
- 
--	if (blk_mq_sched_init_hctx(q, hctx, hctx_idx))
--		goto exit_hctx;
--
- 	hctx->fq = blk_alloc_flush_queue(q, hctx->numa_node, set->cmd_size);
- 	if (!hctx->fq)
--		goto sched_exit_hctx;
-+		goto exit_hctx;
- 
- 	if (blk_mq_init_request(set, hctx->fq->flush_rq, hctx_idx, node))
- 		goto free_fq;
-@@ -2235,8 +2230,6 @@ static int blk_mq_init_hctx(struct request_queue *q,
- 
-  free_fq:
- 	kfree(hctx->fq);
-- sched_exit_hctx:
--	blk_mq_sched_exit_hctx(q, hctx, hctx_idx);
-  exit_hctx:
- 	if (set->ops->exit_hctx)
- 		set->ops->exit_hctx(hctx, hctx_idx);
-@@ -2913,6 +2906,29 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 	list_for_each_entry(q, &set->tag_list, tag_set_list)
- 		blk_mq_freeze_queue(q);
- 
-+	/*
-+	 * switch io scheduler to NULL to clean up the data in it.
-+	 * will get it back after update mapping between cpu and hw queues.
-+	 */
-+	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-+		if (!q->elevator) {
-+			q->elv_type = NULL;
-+			continue;
-+		}
-+		q->elv_type = q->elevator->type;
-+		mutex_lock(&q->sysfs_lock);
-+		/*
-+		 * After elevator_switch_mq, the previous elevator_queue will be
-+		 * released by elevator_release. The reference of the io scheduler
-+		 * module get by elevator_get will also be put. So we need to get
-+		 * a reference of the io scheduler module here to prevent it to be
-+		 * removed.
-+		 */
-+		__module_get(q->elv_type->elevator_owner);
-+		elevator_switch_mq(q, NULL);
-+		mutex_unlock(&q->sysfs_lock);
-+	}
-+
- 	set->nr_hw_queues = nr_hw_queues;
- 	blk_mq_update_queue_map(set);
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-@@ -2920,6 +2936,14 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 		blk_mq_queue_reinit(q);
- 	}
- 
-+	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-+		if (!q->elv_type)
-+			continue;
-+
-+		mutex_lock(&q->sysfs_lock);
-+		elevator_switch_mq(q, q->elv_type);
-+		mutex_unlock(&q->sysfs_lock);
-+	}
- 	list_for_each_entry(q, &set->tag_list, tag_set_list)
- 		blk_mq_unfreeze_queue(q);
- }
-diff --git a/block/blk.h b/block/blk.h
-index d4d67e9..0c9bc8d 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -234,6 +234,8 @@ static inline void elv_deactivate_rq(struct request_queue *q, struct request *rq
- 
- int elevator_init(struct request_queue *);
- int elevator_init_mq(struct request_queue *q);
-+int elevator_switch_mq(struct request_queue *q,
-+			      struct elevator_type *new_e);
- void elevator_exit(struct request_queue *, struct elevator_queue *);
- int elv_register_queue(struct request_queue *q);
- void elv_unregister_queue(struct request_queue *q);
-diff --git a/block/elevator.c b/block/elevator.c
-index fa828b5..5ea6e7d 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -933,16 +933,13 @@ void elv_unregister(struct elevator_type *e)
- }
- EXPORT_SYMBOL_GPL(elv_unregister);
- 
--static int elevator_switch_mq(struct request_queue *q,
-+int elevator_switch_mq(struct request_queue *q,
- 			      struct elevator_type *new_e)
- {
- 	int ret;
- 
- 	lockdep_assert_held(&q->sysfs_lock);
- 
--	blk_mq_freeze_queue(q);
--	blk_mq_quiesce_queue(q);
--
- 	if (q->elevator) {
- 		if (q->elevator->registered)
- 			elv_unregister_queue(q);
-@@ -968,8 +965,6 @@ static int elevator_switch_mq(struct request_queue *q,
- 		blk_add_trace_msg(q, "elv switch: none");
- 
- out:
--	blk_mq_unquiesce_queue(q);
--	blk_mq_unfreeze_queue(q);
- 	return ret;
- }
- 
-@@ -1021,8 +1016,17 @@ static int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
- 
- 	lockdep_assert_held(&q->sysfs_lock);
- 
--	if (q->mq_ops)
--		return elevator_switch_mq(q, new_e);
-+	if (q->mq_ops) {
-+		blk_mq_freeze_queue(q);
-+		blk_mq_quiesce_queue(q);
-+
-+		err = elevator_switch_mq(q, new_e);
-+
-+		blk_mq_unquiesce_queue(q);
-+		blk_mq_unfreeze_queue(q);
-+
-+		return err;
-+	}
- 
- 	/*
- 	 * Turn on BYPASS and drain all requests w/ elevator private data.
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d6869e0..ee930c4 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -437,6 +437,9 @@ struct request_queue {
- 	struct list_head	queue_head;
- 	struct request		*last_merge;
- 	struct elevator_queue	*elevator;
-+
-+	/* used when update nr_hw_queues */
-+	struct elevator_type	*elv_type;
- 	int			nr_rqs[2];	/* # allocated [a]sync rqs */
- 	int			nr_rqs_elvpriv;	/* # allocated rqs w/ elvpriv */
- 
--- 
-2.7.4
+
+> Thanks,
+> Ming
+> 
