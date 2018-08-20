@@ -1,49 +1,53 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:39163 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727316AbeH2Q2N (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Aug 2018 12:28:13 -0400
-Received: by mail-ed1-f67.google.com with SMTP id h4-v6so3795437edi.6
-        for <linux-block@vger.kernel.org>; Wed, 29 Aug 2018 05:31:30 -0700 (PDT)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Javier Gonzales <javier@cnexlabs.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH 0/4] Introduce trace events for pblk
-Date: Wed, 29 Aug 2018 14:31:13 +0200
-Message-Id: <1535545877-770-1-git-send-email-hans.ml.holmberg@owltronix.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
+To: axboe@kernel.dk
+Cc: tom.leiming@gmail.com, bart.vanassche@wdc.com, keith.busch@linux.intel.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH V3 0/2] fixes for the updating nr_hw_queues
+Date: Mon, 20 Aug 2018 15:20:04 +0800
+Message-Id: <1534749606-7311-1-git-send-email-jianchao.w.wang@oracle.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Hi Jens
 
-This patchset adds trace events for tracking the internal state of
-pblk. I've used the events extensively the last few months, and
-they have proven very useful.
+Two fixes for updating nr_hw_queues.
 
-The patches depend on some of Javier's for-4.20 patches.
-For ordering, see:
+The first patch fixes the following scenario:
+io scheduler (kyber) depends on the mapping between ctx and hctx.
+When update nr_hw_queues, io scheduler's init_hctx will be
+invoked before the mapping is adapted correctly, this would cause
+panic in kyber.
 
-Branch: for-4.20/pblk
-Remote: ssh://github.com/OpenChannelSSD/linux
+The second patch fixes the following scenario:
+part_in_flight/rw will invoke blk_mq_in_flight/rw to account the
+inflight requests. It will access the queue_hw_ctx and nr_hw_queues
+w/o any protection. When updating nr_hw_queues and blk_mq_in_flight
+/rw occur concurrently, panic comes up.
 
-Hans Holmberg (4):
-  lightnvm: pblk: add trace events for chunk states
-  lightnvm: pblk: add trace events for line state changes
-  lightnvm: pblk: add trace events for pblk state changes
-  lightnvm: pblk: add tracing for chunk resets
+V3:
+ - move the rcu and q_usage_counter checking into blk_mq_queue_tag_busy_iter
+   as suggestion of Ming.
+ - Add more comment about the __module_get in 1st patch.
+ - Add Ming's Reviewd-by on 1st patch.
 
- drivers/lightnvm/pblk-core.c     |  69 ++++++++++++++++++-
- drivers/lightnvm/pblk-gc.c       |   8 +++
- drivers/lightnvm/pblk-init.c     |   8 +++
- drivers/lightnvm/pblk-recovery.c |   6 ++
- drivers/lightnvm/pblk-trace.h    | 145 +++++++++++++++++++++++++++++++++++++++
- drivers/lightnvm/pblk-write.c    |  10 ++-
- drivers/lightnvm/pblk.h          |  14 ++++
- 7 files changed, 256 insertions(+), 4 deletions(-)
- create mode 100644 drivers/lightnvm/pblk-trace.h
+V2:
+ - remove blk_mq_sched_init/exit_hctx in patch 1.
+ - use q_usage_counter instead of adding new member suggested by
+   Ming in patch 2.
+ - comment modification.
 
--- 
-2.7.4
+Jianchao Wang(2)
+blk-mq: init hctx sched after update ctx and hctx
+blk-mq: sync the update nr_hw_queues with
+
+ block/blk-mq-sched.c   | 44 --------------------------------------------
+ block/blk-mq-sched.h   |  5 -----
+ block/blk-mq-tag.c     | 14 +++++++++++++-
+ block/blk-mq.c         | 43 +++++++++++++++++++++++++++++++++++--------
+ block/blk.h            |  2 ++
+ block/elevator.c       | 20 ++++++++++++--------
+ include/linux/blkdev.h |  3 +++
+ 7 files changed, 65 insertions(+), 66 deletions(-)
+
+Thanks
+Jianchao
