@@ -1,11 +1,14 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <prvs=763d7176c=fllinden@amazon.com>
+From: "van der Linden, Frank" <fllinden@amazon.com>
+To: Jens Axboe <axboe@kernel.dk>, "Agarwal, Anchal" <anchalag@amazon.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Singh,
+ Balbir" <sblbir@amazon.com>, "Wilson, Matt" <msw@amazon.com>
 Subject: Re: [PATCH] blk-wbt: Avoid lock contention and thundering herd issue
  in wbt_wait
-To: "van der Linden, Frank" <fllinden@amazon.com>,
- "Agarwal, Anchal" <anchalag@amazon.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "Singh, Balbir" <sblbir@amazon.com>, "Wilson, Matt" <msw@amazon.com>
+Date: Mon, 20 Aug 2018 20:19:30 +0000
+Message-ID: <168d80ac73a44a6f9242c47c164778fc@EX13D13UWB002.ant.amazon.com>
 References: <20180731213410.GA35291@kaos-source-ops-60001.pdx1.amazon.com>
  <df2a0476-d9d1-c6c9-6553-f459e890ce8b@kernel.dk>
  <20180801170603.GA32864@kaos-source-ops-60001.pdx1.amazon.com>
@@ -19,316 +22,412 @@ References: <20180731213410.GA35291@kaos-source-ops-60001.pdx1.amazon.com>
  <761bb0ab416649b8bf3bac1706124456@EX13D13UWB002.ant.amazon.com>
  <7f6c399d-bda1-0bbf-4ea1-07fc510ed1eb@kernel.dk>
  <3498fbfb-e9f3-7606-1fc3-904a0e61ff57@kernel.dk>
- <168d80ac73a44a6f9242c47c164778fc@EX13D13UWB002.ant.amazon.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <c5152431-6e36-6f6e-616e-1cfbd974817d@kernel.dk>
-Date: Mon, 20 Aug 2018 14:20:59 -0600
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <168d80ac73a44a6f9242c47c164778fc@EX13D13UWB002.ant.amazon.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 8/20/18 2:19 PM, van der Linden, Frank wrote:
-> On 8/20/18 12:29 PM, Jens Axboe wrote:
->> On 8/20/18 1:08 PM, Jens Axboe wrote:
->>> On 8/20/18 11:34 AM, van der Linden, Frank wrote:
->>>> On 8/20/18 9:37 AM, Jens Axboe wrote:
->>>>> On 8/7/18 3:19 PM, Jens Axboe wrote:
->>>>>> On 8/7/18 3:12 PM, Anchal Agarwal wrote:
->>>>>>> On Tue, Aug 07, 2018 at 02:39:48PM -0600, Jens Axboe wrote:
->>>>>>>> On 8/7/18 2:12 PM, Anchal Agarwal wrote:
->>>>>>>>> On Tue, Aug 07, 2018 at 08:29:44AM -0600, Jens Axboe wrote:
->>>>>>>>>> On 8/1/18 4:09 PM, Jens Axboe wrote:
->>>>>>>>>>> On 8/1/18 11:06 AM, Anchal Agarwal wrote:
->>>>>>>>>>>> On Wed, Aug 01, 2018 at 09:14:50AM -0600, Jens Axboe wrote:
->>>>>>>>>>>>> On 7/31/18 3:34 PM, Anchal Agarwal wrote:
->>>>>>>>>>>>>> Hi folks,
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> This patch modifies commit e34cbd307477a
->>>>>>>>>>>>>> (blk-wbt: add general throttling mechanism)
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> I am currently running a large bare metal instance (i3.metal)
->>>>>>>>>>>>>> on EC2 with 72 cores, 512GB of RAM and NVME drives, with a
->>>>>>>>>>>>>> 4.18 kernel. I have a workload that simulates a database
->>>>>>>>>>>>>> workload and I am running into lockup issues when writeback
->>>>>>>>>>>>>> throttling is enabled,with the hung task detector also
->>>>>>>>>>>>>> kicking in.
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> Crash dumps show that most CPUs (up to 50 of them) are
->>>>>>>>>>>>>> all trying to get the wbt wait queue lock while trying to add
->>>>>>>>>>>>>> themselves to it in __wbt_wait (see stack traces below).
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> [    0.948118] CPU: 45 PID: 0 Comm: swapper/45 Not tainted 4.14.51-62.38.amzn1.x86_64 #1
->>>>>>>>>>>>>> [    0.948119] Hardware name: Amazon EC2 i3.metal/Not Specified, BIOS 1.0 10/16/2017
->>>>>>>>>>>>>> [    0.948120] task: ffff883f7878c000 task.stack: ffffc9000c69c000
->>>>>>>>>>>>>> [    0.948124] RIP: 0010:native_queued_spin_lock_slowpath+0xf8/0x1a0
->>>>>>>>>>>>>> [    0.948125] RSP: 0018:ffff883f7fcc3dc8 EFLAGS: 00000046
->>>>>>>>>>>>>> [    0.948126] RAX: 0000000000000000 RBX: ffff887f7709ca68 RCX: ffff883f7fce2a00
->>>>>>>>>>>>>> [    0.948128] RDX: 000000000000001c RSI: 0000000000740001 RDI: ffff887f7709ca68
->>>>>>>>>>>>>> [    0.948129] RBP: 0000000000000002 R08: 0000000000b80000 R09: 0000000000000000
->>>>>>>>>>>>>> [    0.948130] R10: ffff883f7fcc3d78 R11: 000000000de27121 R12: 0000000000000002
->>>>>>>>>>>>>> [    0.948131] R13: 0000000000000003 R14: 0000000000000000 R15: 0000000000000000
->>>>>>>>>>>>>> [    0.948132] FS:  0000000000000000(0000) GS:ffff883f7fcc0000(0000) knlGS:0000000000000000
->>>>>>>>>>>>>> [    0.948134] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>>>>>>>>>>>>> [    0.948135] CR2: 000000c424c77000 CR3: 0000000002010005 CR4: 00000000003606e0
->>>>>>>>>>>>>> [    0.948136] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->>>>>>>>>>>>>> [    0.948137] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->>>>>>>>>>>>>> [    0.948138] Call Trace:
->>>>>>>>>>>>>> [    0.948139]  <IRQ>
->>>>>>>>>>>>>> [    0.948142]  do_raw_spin_lock+0xad/0xc0
->>>>>>>>>>>>>> [    0.948145]  _raw_spin_lock_irqsave+0x44/0x4b
->>>>>>>>>>>>>> [    0.948149]  ? __wake_up_common_lock+0x53/0x90
->>>>>>>>>>>>>> [    0.948150]  __wake_up_common_lock+0x53/0x90
->>>>>>>>>>>>>> [    0.948155]  wbt_done+0x7b/0xa0
->>>>>>>>>>>>>> [    0.948158]  blk_mq_free_request+0xb7/0x110
->>>>>>>>>>>>>> [    0.948161]  __blk_mq_complete_request+0xcb/0x140
->>>>>>>>>>>>>> [    0.948166]  nvme_process_cq+0xce/0x1a0 [nvme]
->>>>>>>>>>>>>> [    0.948169]  nvme_irq+0x23/0x50 [nvme]
->>>>>>>>>>>>>> [    0.948173]  __handle_irq_event_percpu+0x46/0x300
->>>>>>>>>>>>>> [    0.948176]  handle_irq_event_percpu+0x20/0x50
->>>>>>>>>>>>>> [    0.948179]  handle_irq_event+0x34/0x60
->>>>>>>>>>>>>> [    0.948181]  handle_edge_irq+0x77/0x190
->>>>>>>>>>>>>> [    0.948185]  handle_irq+0xaf/0x120
->>>>>>>>>>>>>> [    0.948188]  do_IRQ+0x53/0x110
->>>>>>>>>>>>>> [    0.948191]  common_interrupt+0x87/0x87
->>>>>>>>>>>>>> [    0.948192]  </IRQ>
->>>>>>>>>>>>>> ....
->>>>>>>>>>>>>> [    0.311136] CPU: 4 PID: 9737 Comm: run_linux_amd64 Not tainted 4.14.51-62.38.amzn1.x86_64 #1
->>>>>>>>>>>>>> [    0.311137] Hardware name: Amazon EC2 i3.metal/Not Specified, BIOS 1.0 10/16/2017
->>>>>>>>>>>>>> [    0.311138] task: ffff883f6e6a8000 task.stack: ffffc9000f1ec000
->>>>>>>>>>>>>> [    0.311141] RIP: 0010:native_queued_spin_lock_slowpath+0xf5/0x1a0
->>>>>>>>>>>>>> [    0.311142] RSP: 0018:ffffc9000f1efa28 EFLAGS: 00000046
->>>>>>>>>>>>>> [    0.311144] RAX: 0000000000000000 RBX: ffff887f7709ca68 RCX: ffff883f7f722a00
->>>>>>>>>>>>>> [    0.311145] RDX: 0000000000000035 RSI: 0000000000d80001 RDI: ffff887f7709ca68
->>>>>>>>>>>>>> [    0.311146] RBP: 0000000000000202 R08: 0000000000140000 R09: 0000000000000000
->>>>>>>>>>>>>> [    0.311147] R10: ffffc9000f1ef9d8 R11: 000000001a249fa0 R12: ffff887f7709ca68
->>>>>>>>>>>>>> [    0.311148] R13: ffffc9000f1efad0 R14: 0000000000000000 R15: ffff887f7709ca00
->>>>>>>>>>>>>> [    0.311149] FS:  000000c423f30090(0000) GS:ffff883f7f700000(0000) knlGS:0000000000000000
->>>>>>>>>>>>>> [    0.311150] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>>>>>>>>>>>>> [    0.311151] CR2: 00007feefcea4000 CR3: 0000007f7016e001 CR4: 00000000003606e0
->>>>>>>>>>>>>> [    0.311152] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->>>>>>>>>>>>>> [    0.311153] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->>>>>>>>>>>>>> [    0.311154] Call Trace:
->>>>>>>>>>>>>> [    0.311157]  do_raw_spin_lock+0xad/0xc0
->>>>>>>>>>>>>> [    0.311160]  _raw_spin_lock_irqsave+0x44/0x4b
->>>>>>>>>>>>>> [    0.311162]  ? prepare_to_wait_exclusive+0x28/0xb0
->>>>>>>>>>>>>> [    0.311164]  prepare_to_wait_exclusive+0x28/0xb0
->>>>>>>>>>>>>> [    0.311167]  wbt_wait+0x127/0x330
->>>>>>>>>>>>>> [    0.311169]  ? finish_wait+0x80/0x80
->>>>>>>>>>>>>> [    0.311172]  ? generic_make_request+0xda/0x3b0
->>>>>>>>>>>>>> [    0.311174]  blk_mq_make_request+0xd6/0x7b0
->>>>>>>>>>>>>> [    0.311176]  ? blk_queue_enter+0x24/0x260
->>>>>>>>>>>>>> [    0.311178]  ? generic_make_request+0xda/0x3b0
->>>>>>>>>>>>>> [    0.311181]  generic_make_request+0x10c/0x3b0
->>>>>>>>>>>>>> [    0.311183]  ? submit_bio+0x5c/0x110
->>>>>>>>>>>>>> [    0.311185]  submit_bio+0x5c/0x110
->>>>>>>>>>>>>> [    0.311197]  ? __ext4_journal_stop+0x36/0xa0 [ext4]
->>>>>>>>>>>>>> [    0.311210]  ext4_io_submit+0x48/0x60 [ext4]
->>>>>>>>>>>>>> [    0.311222]  ext4_writepages+0x810/0x11f0 [ext4]
->>>>>>>>>>>>>> [    0.311229]  ? do_writepages+0x3c/0xd0
->>>>>>>>>>>>>> [    0.311239]  ? ext4_mark_inode_dirty+0x260/0x260 [ext4]
->>>>>>>>>>>>>> [    0.311240]  do_writepages+0x3c/0xd0
->>>>>>>>>>>>>> [    0.311243]  ? _raw_spin_unlock+0x24/0x30
->>>>>>>>>>>>>> [    0.311245]  ? wbc_attach_and_unlock_inode+0x165/0x280
->>>>>>>>>>>>>> [    0.311248]  ? __filemap_fdatawrite_range+0xa3/0xe0
->>>>>>>>>>>>>> [    0.311250]  __filemap_fdatawrite_range+0xa3/0xe0
->>>>>>>>>>>>>> [    0.311253]  file_write_and_wait_range+0x34/0x90
->>>>>>>>>>>>>> [    0.311264]  ext4_sync_file+0x151/0x500 [ext4]
->>>>>>>>>>>>>> [    0.311267]  do_fsync+0x38/0x60
->>>>>>>>>>>>>> [    0.311270]  SyS_fsync+0xc/0x10
->>>>>>>>>>>>>> [    0.311272]  do_syscall_64+0x6f/0x170
->>>>>>>>>>>>>> [    0.311274]  entry_SYSCALL_64_after_hwframe+0x42/0xb7
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> In the original patch, wbt_done is waking up all the exclusive
->>>>>>>>>>>>>> processes in the wait queue, which can cause a thundering herd
->>>>>>>>>>>>>> if there is a large number of writer threads in the queue. The
->>>>>>>>>>>>>> original intention of the code seems to be to wake up one thread
->>>>>>>>>>>>>> only however, it uses wake_up_all() in __wbt_done(), and then
->>>>>>>>>>>>>> uses the following check in __wbt_wait to have only one thread
->>>>>>>>>>>>>> actually get out of the wait loop:
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> if (waitqueue_active(&rqw->wait) &&
->>>>>>>>>>>>>>             rqw->wait.head.next != &wait->entry)
->>>>>>>>>>>>>>                 return false;
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> The problem with this is that the wait entry in wbt_wait is
->>>>>>>>>>>>>> define with DEFINE_WAIT, which uses the autoremove wakeup function.
->>>>>>>>>>>>>> That means that the above check is invalid - the wait entry will
->>>>>>>>>>>>>> have been removed from the queue already by the time we hit the
->>>>>>>>>>>>>> check in the loop.
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> Secondly, auto-removing the wait entries also means that the wait
->>>>>>>>>>>>>> queue essentially gets reordered "randomly" (e.g. threads re-add
->>>>>>>>>>>>>> themselves in the order they got to run after being woken up).
->>>>>>>>>>>>>> Additionally, new requests entering wbt_wait might overtake requests
->>>>>>>>>>>>>> that were queued earlier, because the wait queue will be
->>>>>>>>>>>>>> (temporarily) empty after the wake_up_all, so the waitqueue_active
->>>>>>>>>>>>>> check will not stop them. This can cause certain threads to starve
->>>>>>>>>>>>>> under high load.
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> The fix is to leave the woken up requests in the queue and remove
->>>>>>>>>>>>>> them in finish_wait() once the current thread breaks out of the
->>>>>>>>>>>>>> wait loop in __wbt_wait. This will ensure new requests always
->>>>>>>>>>>>>> end up at the back of the queue, and they won't overtake requests
->>>>>>>>>>>>>> that are already in the wait queue. With that change, the loop
->>>>>>>>>>>>>> in wbt_wait is also in line with many other wait loops in the kernel.
->>>>>>>>>>>>>> Waking up just one thread drastically reduces lock contention, as
->>>>>>>>>>>>>> does moving the wait queue add/remove out of the loop.
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> A significant drop in lockdep's lock contention numbers is seen when
->>>>>>>>>>>>>> running the test application on the patched kernel.
->>>>>>>>>>>>> I like the patch, and a few weeks ago we independently discovered that
->>>>>>>>>>>>> the waitqueue list checking was bogus as well. My only worry is that
->>>>>>>>>>>>> changes like this can be delicate, meaning that it's easy to introduce
->>>>>>>>>>>>> stall conditions. What kind of testing did you push this through?
->>>>>>>>>>>>>
->>>>>>>>>>>>> -- 
->>>>>>>>>>>>> Jens Axboe
->>>>>>>>>>>>>
->>>>>>>>>>>> I ran the following tests on both real HW with NVME devices attached
->>>>>>>>>>>> and emulated NVME too:
->>>>>>>>>>>>
->>>>>>>>>>>> 1. The test case I used to reproduce the issue, spawns a bunch of threads 
->>>>>>>>>>>>    to concurrently read and write files with random size and content. 
->>>>>>>>>>>>    Files are randomly fsync'd. The implementation is a FIFO queue of files. 
->>>>>>>>>>>>    When the queue fills the test starts to verify and remove the files. This 
->>>>>>>>>>>>    test will fail if there's a read, write, or hash check failure. It tests
->>>>>>>>>>>>    for file corruption when lots of small files are being read and written 
->>>>>>>>>>>>    with high concurrency.
->>>>>>>>>>>>
->>>>>>>>>>>> 2. Fio for random writes with a root NVME device of 200GB
->>>>>>>>>>>>   
->>>>>>>>>>>>   fio --name=randwrite --ioengine=libaio --iodepth=1 --rw=randwrite --bs=4k 
->>>>>>>>>>>>   --direct=0 --size=10G --numjobs=2 --runtime=60 --group_reporting
->>>>>>>>>>>>   
->>>>>>>>>>>>   fio --name=randwrite --ioengine=libaio --iodepth=1 --rw=randwrite --bs=4k
->>>>>>>>>>>>   --direct=0 --size=5G --numjobs=2 --runtime=30 --fsync=64 --group_reporting
->>>>>>>>>>>>   
->>>>>>>>>>>>   I did see an improvement in the bandwidth numbers reported on the patched
->>>>>>>>>>>>   kernel. 
->>>>>>>>>>>>
->>>>>>>>>>>> Do you have any test case/suite in mind that you would suggest me to 
->>>>>>>>>>>> run to be sure that patch does not introduce any stall conditions?
->>>>>>>>>>> One thing that is always useful is to run xfstest, do a full run on
->>>>>>>>>>> the device. If that works, then do another full run, this time limiting
->>>>>>>>>>> the queue depth of the SCSI device to 1. If both of those pass, then
->>>>>>>>>>> I'd feel pretty good getting this applied for 4.19.
->>>>>>>>>> Did you get a chance to run this full test?
->>>>>>>>>>
->>>>>>>>>> -- 
->>>>>>>>>> Jens Axboe
->>>>>>>>>>
->>>>>>>>>>
->>>>>>>>> Hi Jens,
->>>>>>>>> Yes I did run the tests and was in the process of compiling concrete results
->>>>>>>>> I tested following environments against xfs/auto group
->>>>>>>>> 1. Vanilla 4.18.rc kernel
->>>>>>>>> 2. 4.18 kernel with the blk-wbt patch
->>>>>>>>> 3. 4.18 kernel with the blk-wbt patch + io_queue_depth=2. I 
->>>>>>>>> understand you asked for queue depth for SCSI device=1 however, I have NVME 
->>>>>>>>> devices in my environment and 2 is the minimum value for io_queue_depth allowed 
->>>>>>>>> according to the NVME driver code. The results pretty much look same with no 
->>>>>>>>> stalls or exceptional failures. 
->>>>>>>>> xfs/auto ran 296 odd tests with 3 failures and 130 something "no runs". 
->>>>>>>>> Remaining tests passed. "Skipped tests"  were mostly due to missing features
->>>>>>>>> (eg: reflink support on scratch filesystem)
->>>>>>>>> The failures were consistent across runs on 3 different environments. 
->>>>>>>>> I am also running full test suite but it is taking long time as I am 
->>>>>>>>> hitting kernel BUG in xfs code in some generic tests. This BUG is not 
->>>>>>>>> related to the patch and  I see them in vanilla kernel too. I am in 
->>>>>>>>> the process of excluding these kind of tests as they come and 
->>>>>>>>> re-run the suite however, this proces is time taking. 
->>>>>>>>> Do you have any specific tests in mind that you would like me 
->>>>>>>>> to run apart from what I have already tested above?
->>>>>>>> Thanks, I think that looks good. I'll get your patch applied for
->>>>>>>> 4.19.
->>>>>>>>
->>>>>>>> -- 
->>>>>>>> Jens Axboe
->>>>>>>>
->>>>>>>>
->>>>>>> Hi Jens,
->>>>>>> Thanks for accepting this. There is one small issue, I don't find any emails
->>>>>>> send by me on the lkml mailing list. I am not sure why it didn't land there,
->>>>>>> all I can see is your responses. Do you want one of us to resend the patch
->>>>>>> or will you be able to do it?
->>>>>> That's odd, are you getting rejections on your emails? For reference, the
->>>>>> patch is here:
->>>>>>
->>>>>> http://git.kernel.dk/cgit/linux-block/commit/?h=for-4.19/block&id=2887e41b910bb14fd847cf01ab7a5993db989d88
->>>>> One issue with this, as far as I can tell. Right now we've switched to
->>>>> waking one task at the time, which is obviously more efficient. But if
->>>>> we do that with exclusive waits, then we have to ensure that this task
->>>>> makes progress. If we wake up a task, and then fail to get a queueing
->>>>> token, then we'll go back to sleep. We need to ensure that someone makes
->>>>> forward progress at this point. There are two ways I can see that
->>>>> happening:
->>>>>
->>>>> 1) The task woken _always_ gets to queue an IO
->>>>> 2) If the task woken is NOT allowed to queue an IO, then it must select
->>>>>    a new task to wake up. That new task is then subjected to rule 1 or 2
->>>>>    as well.
->>>>>
->>>>> For #1, it could be as simple as:
->>>>>
->>>>> if (slept || !rwb_enabled(rwb)) {
->>>>> 	atomic_inc(&rqw->inflight);
->>>>> 	break;
->>>>> }
->>>>>
->>>>> but this obviously won't always be fair. Might be good enough however,
->>>>> instead of having to eg replace the generic wait queues with a priority
->>>>> list/queue.
->>>>>
->>>>> Note that this isn't an entirely new issue, it's just so much easier to
->>>>> hit with the single wakeups.
->>>>>
->>>> Hi Jens,
->>>>
->>>> What is the scenario that you see under which the woken up task does not
->>>> get to run?
->>> That scenario is pretty easy to hit - let's say the next in line task
->>> has a queue limit of 1, and we currently have 4 pending. Task gets
->>> woken, goes back to sleep. Which should be totally fine. At some point
->>> we'll get below the limit, and allow the task to proceed. This will
->>> ensure forward progress.
->>>
->>>> The theory behind leaving the task on the wait queue is that the
->>>> waitqueue_active check in wbt_wait prevents new tasks from taking up a
->>>> slot in the queue (e.g. incrementing inflight). So, there should not be
->>>> a way for inflight to be incremented between the time the wake_up is
->>>> done and the task at the head of the wait queue runs. That's the idea
->>>> anyway :-) If we missed something, let us know.
->>> And that's a fine theory, I think it's a good improvement (and how it
->>> should have worked). I'm struggling to see where the issue is. Perhaps
->>> it's related to the wq active check. With fewer wakeups, we're more
->>> likely to hit a race there.
->>>
->>> I'll poke at it...
->> Trying something like this:
->>
->> http://git.kernel.dk/cgit/linux-block/log/?h=for-4.19/wbt
->>
-> Ah, now I see what you mean.
-> 
-> This is the case where a task goes to sleep, not because the inflight
-> limit has been reached, but simply because it needs to go to the back of
-> the wait queue.
-> 
-> In that case, it should, for its first time inside the loop, not try to
-> decrement inflight - since that means it could still race to overtake a
-> task that got there earlier and is in the wait queue.
-> 
-> So what you are doing is keeping track of whether it got in to the loop
-> only because of queueing, and then you don't try to decrement inflight
-> the first time around the loop.
-> 
-> I think that should work to fix that corner case.
-
-I hope so, got tests running now and we'll see...
-
-Outside of that, getting the matching memory barrier for the wq check
-could also fix a race on the completion side.
-
--- 
-Jens Axboe
+On 8/20/18 12:29 PM, Jens Axboe wrote:=0A=
+> On 8/20/18 1:08 PM, Jens Axboe wrote:=0A=
+>> On 8/20/18 11:34 AM, van der Linden, Frank wrote:=0A=
+>>> On 8/20/18 9:37 AM, Jens Axboe wrote:=0A=
+>>>> On 8/7/18 3:19 PM, Jens Axboe wrote:=0A=
+>>>>> On 8/7/18 3:12 PM, Anchal Agarwal wrote:=0A=
+>>>>>> On Tue, Aug 07, 2018 at 02:39:48PM -0600, Jens Axboe wrote:=0A=
+>>>>>>> On 8/7/18 2:12 PM, Anchal Agarwal wrote:=0A=
+>>>>>>>> On Tue, Aug 07, 2018 at 08:29:44AM -0600, Jens Axboe wrote:=0A=
+>>>>>>>>> On 8/1/18 4:09 PM, Jens Axboe wrote:=0A=
+>>>>>>>>>> On 8/1/18 11:06 AM, Anchal Agarwal wrote:=0A=
+>>>>>>>>>>> On Wed, Aug 01, 2018 at 09:14:50AM -0600, Jens Axboe wrote:=0A=
+>>>>>>>>>>>> On 7/31/18 3:34 PM, Anchal Agarwal wrote:=0A=
+>>>>>>>>>>>>> Hi folks,=0A=
+>>>>>>>>>>>>>=0A=
+>>>>>>>>>>>>> This patch modifies commit e34cbd307477a=0A=
+>>>>>>>>>>>>> (blk-wbt: add general throttling mechanism)=0A=
+>>>>>>>>>>>>>=0A=
+>>>>>>>>>>>>> I am currently running a large bare metal instance (i3.metal)=
+=0A=
+>>>>>>>>>>>>> on EC2 with 72 cores, 512GB of RAM and NVME drives, with a=0A=
+>>>>>>>>>>>>> 4.18 kernel. I have a workload that simulates a database=0A=
+>>>>>>>>>>>>> workload and I am running into lockup issues when writeback=
+=0A=
+>>>>>>>>>>>>> throttling is enabled,with the hung task detector also=0A=
+>>>>>>>>>>>>> kicking in.=0A=
+>>>>>>>>>>>>>=0A=
+>>>>>>>>>>>>> Crash dumps show that most CPUs (up to 50 of them) are=0A=
+>>>>>>>>>>>>> all trying to get the wbt wait queue lock while trying to add=
+=0A=
+>>>>>>>>>>>>> themselves to it in __wbt_wait (see stack traces below).=0A=
+>>>>>>>>>>>>>=0A=
+>>>>>>>>>>>>> [    0.948118] CPU: 45 PID: 0 Comm: swapper/45 Not tainted 4.=
+14.51-62.38.amzn1.x86_64 #1=0A=
+>>>>>>>>>>>>> [    0.948119] Hardware name: Amazon EC2 i3.metal/Not Specifi=
+ed, BIOS 1.0 10/16/2017=0A=
+>>>>>>>>>>>>> [    0.948120] task: ffff883f7878c000 task.stack: ffffc9000c6=
+9c000=0A=
+>>>>>>>>>>>>> [    0.948124] RIP: 0010:native_queued_spin_lock_slowpath+0xf=
+8/0x1a0=0A=
+>>>>>>>>>>>>> [    0.948125] RSP: 0018:ffff883f7fcc3dc8 EFLAGS: 00000046=0A=
+>>>>>>>>>>>>> [    0.948126] RAX: 0000000000000000 RBX: ffff887f7709ca68 RC=
+X: ffff883f7fce2a00=0A=
+>>>>>>>>>>>>> [    0.948128] RDX: 000000000000001c RSI: 0000000000740001 RD=
+I: ffff887f7709ca68=0A=
+>>>>>>>>>>>>> [    0.948129] RBP: 0000000000000002 R08: 0000000000b80000 R0=
+9: 0000000000000000=0A=
+>>>>>>>>>>>>> [    0.948130] R10: ffff883f7fcc3d78 R11: 000000000de27121 R1=
+2: 0000000000000002=0A=
+>>>>>>>>>>>>> [    0.948131] R13: 0000000000000003 R14: 0000000000000000 R1=
+5: 0000000000000000=0A=
+>>>>>>>>>>>>> [    0.948132] FS:  0000000000000000(0000) GS:ffff883f7fcc000=
+0(0000) knlGS:0000000000000000=0A=
+>>>>>>>>>>>>> [    0.948134] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050=
+033=0A=
+>>>>>>>>>>>>> [    0.948135] CR2: 000000c424c77000 CR3: 0000000002010005 CR=
+4: 00000000003606e0=0A=
+>>>>>>>>>>>>> [    0.948136] DR0: 0000000000000000 DR1: 0000000000000000 DR=
+2: 0000000000000000=0A=
+>>>>>>>>>>>>> [    0.948137] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR=
+7: 0000000000000400=0A=
+>>>>>>>>>>>>> [    0.948138] Call Trace:=0A=
+>>>>>>>>>>>>> [    0.948139]  <IRQ>=0A=
+>>>>>>>>>>>>> [    0.948142]  do_raw_spin_lock+0xad/0xc0=0A=
+>>>>>>>>>>>>> [    0.948145]  _raw_spin_lock_irqsave+0x44/0x4b=0A=
+>>>>>>>>>>>>> [    0.948149]  ? __wake_up_common_lock+0x53/0x90=0A=
+>>>>>>>>>>>>> [    0.948150]  __wake_up_common_lock+0x53/0x90=0A=
+>>>>>>>>>>>>> [    0.948155]  wbt_done+0x7b/0xa0=0A=
+>>>>>>>>>>>>> [    0.948158]  blk_mq_free_request+0xb7/0x110=0A=
+>>>>>>>>>>>>> [    0.948161]  __blk_mq_complete_request+0xcb/0x140=0A=
+>>>>>>>>>>>>> [    0.948166]  nvme_process_cq+0xce/0x1a0 [nvme]=0A=
+>>>>>>>>>>>>> [    0.948169]  nvme_irq+0x23/0x50 [nvme]=0A=
+>>>>>>>>>>>>> [    0.948173]  __handle_irq_event_percpu+0x46/0x300=0A=
+>>>>>>>>>>>>> [    0.948176]  handle_irq_event_percpu+0x20/0x50=0A=
+>>>>>>>>>>>>> [    0.948179]  handle_irq_event+0x34/0x60=0A=
+>>>>>>>>>>>>> [    0.948181]  handle_edge_irq+0x77/0x190=0A=
+>>>>>>>>>>>>> [    0.948185]  handle_irq+0xaf/0x120=0A=
+>>>>>>>>>>>>> [    0.948188]  do_IRQ+0x53/0x110=0A=
+>>>>>>>>>>>>> [    0.948191]  common_interrupt+0x87/0x87=0A=
+>>>>>>>>>>>>> [    0.948192]  </IRQ>=0A=
+>>>>>>>>>>>>> ....=0A=
+>>>>>>>>>>>>> [    0.311136] CPU: 4 PID: 9737 Comm: run_linux_amd64 Not tai=
+nted 4.14.51-62.38.amzn1.x86_64 #1=0A=
+>>>>>>>>>>>>> [    0.311137] Hardware name: Amazon EC2 i3.metal/Not Specifi=
+ed, BIOS 1.0 10/16/2017=0A=
+>>>>>>>>>>>>> [    0.311138] task: ffff883f6e6a8000 task.stack: ffffc9000f1=
+ec000=0A=
+>>>>>>>>>>>>> [    0.311141] RIP: 0010:native_queued_spin_lock_slowpath+0xf=
+5/0x1a0=0A=
+>>>>>>>>>>>>> [    0.311142] RSP: 0018:ffffc9000f1efa28 EFLAGS: 00000046=0A=
+>>>>>>>>>>>>> [    0.311144] RAX: 0000000000000000 RBX: ffff887f7709ca68 RC=
+X: ffff883f7f722a00=0A=
+>>>>>>>>>>>>> [    0.311145] RDX: 0000000000000035 RSI: 0000000000d80001 RD=
+I: ffff887f7709ca68=0A=
+>>>>>>>>>>>>> [    0.311146] RBP: 0000000000000202 R08: 0000000000140000 R0=
+9: 0000000000000000=0A=
+>>>>>>>>>>>>> [    0.311147] R10: ffffc9000f1ef9d8 R11: 000000001a249fa0 R1=
+2: ffff887f7709ca68=0A=
+>>>>>>>>>>>>> [    0.311148] R13: ffffc9000f1efad0 R14: 0000000000000000 R1=
+5: ffff887f7709ca00=0A=
+>>>>>>>>>>>>> [    0.311149] FS:  000000c423f30090(0000) GS:ffff883f7f70000=
+0(0000) knlGS:0000000000000000=0A=
+>>>>>>>>>>>>> [    0.311150] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050=
+033=0A=
+>>>>>>>>>>>>> [    0.311151] CR2: 00007feefcea4000 CR3: 0000007f7016e001 CR=
+4: 00000000003606e0=0A=
+>>>>>>>>>>>>> [    0.311152] DR0: 0000000000000000 DR1: 0000000000000000 DR=
+2: 0000000000000000=0A=
+>>>>>>>>>>>>> [    0.311153] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR=
+7: 0000000000000400=0A=
+>>>>>>>>>>>>> [    0.311154] Call Trace:=0A=
+>>>>>>>>>>>>> [    0.311157]  do_raw_spin_lock+0xad/0xc0=0A=
+>>>>>>>>>>>>> [    0.311160]  _raw_spin_lock_irqsave+0x44/0x4b=0A=
+>>>>>>>>>>>>> [    0.311162]  ? prepare_to_wait_exclusive+0x28/0xb0=0A=
+>>>>>>>>>>>>> [    0.311164]  prepare_to_wait_exclusive+0x28/0xb0=0A=
+>>>>>>>>>>>>> [    0.311167]  wbt_wait+0x127/0x330=0A=
+>>>>>>>>>>>>> [    0.311169]  ? finish_wait+0x80/0x80=0A=
+>>>>>>>>>>>>> [    0.311172]  ? generic_make_request+0xda/0x3b0=0A=
+>>>>>>>>>>>>> [    0.311174]  blk_mq_make_request+0xd6/0x7b0=0A=
+>>>>>>>>>>>>> [    0.311176]  ? blk_queue_enter+0x24/0x260=0A=
+>>>>>>>>>>>>> [    0.311178]  ? generic_make_request+0xda/0x3b0=0A=
+>>>>>>>>>>>>> [    0.311181]  generic_make_request+0x10c/0x3b0=0A=
+>>>>>>>>>>>>> [    0.311183]  ? submit_bio+0x5c/0x110=0A=
+>>>>>>>>>>>>> [    0.311185]  submit_bio+0x5c/0x110=0A=
+>>>>>>>>>>>>> [    0.311197]  ? __ext4_journal_stop+0x36/0xa0 [ext4]=0A=
+>>>>>>>>>>>>> [    0.311210]  ext4_io_submit+0x48/0x60 [ext4]=0A=
+>>>>>>>>>>>>> [    0.311222]  ext4_writepages+0x810/0x11f0 [ext4]=0A=
+>>>>>>>>>>>>> [    0.311229]  ? do_writepages+0x3c/0xd0=0A=
+>>>>>>>>>>>>> [    0.311239]  ? ext4_mark_inode_dirty+0x260/0x260 [ext4]=0A=
+>>>>>>>>>>>>> [    0.311240]  do_writepages+0x3c/0xd0=0A=
+>>>>>>>>>>>>> [    0.311243]  ? _raw_spin_unlock+0x24/0x30=0A=
+>>>>>>>>>>>>> [    0.311245]  ? wbc_attach_and_unlock_inode+0x165/0x280=0A=
+>>>>>>>>>>>>> [    0.311248]  ? __filemap_fdatawrite_range+0xa3/0xe0=0A=
+>>>>>>>>>>>>> [    0.311250]  __filemap_fdatawrite_range+0xa3/0xe0=0A=
+>>>>>>>>>>>>> [    0.311253]  file_write_and_wait_range+0x34/0x90=0A=
+>>>>>>>>>>>>> [    0.311264]  ext4_sync_file+0x151/0x500 [ext4]=0A=
+>>>>>>>>>>>>> [    0.311267]  do_fsync+0x38/0x60=0A=
+>>>>>>>>>>>>> [    0.311270]  SyS_fsync+0xc/0x10=0A=
+>>>>>>>>>>>>> [    0.311272]  do_syscall_64+0x6f/0x170=0A=
+>>>>>>>>>>>>> [    0.311274]  entry_SYSCALL_64_after_hwframe+0x42/0xb7=0A=
+>>>>>>>>>>>>>=0A=
+>>>>>>>>>>>>> In the original patch, wbt_done is waking up all the exclusiv=
+e=0A=
+>>>>>>>>>>>>> processes in the wait queue, which can cause a thundering her=
+d=0A=
+>>>>>>>>>>>>> if there is a large number of writer threads in the queue. Th=
+e=0A=
+>>>>>>>>>>>>> original intention of the code seems to be to wake up one thr=
+ead=0A=
+>>>>>>>>>>>>> only however, it uses wake_up_all() in __wbt_done(), and then=
+=0A=
+>>>>>>>>>>>>> uses the following check in __wbt_wait to have only one threa=
+d=0A=
+>>>>>>>>>>>>> actually get out of the wait loop:=0A=
+>>>>>>>>>>>>>=0A=
+>>>>>>>>>>>>> if (waitqueue_active(&rqw->wait) &&=0A=
+>>>>>>>>>>>>>             rqw->wait.head.next !=3D &wait->entry)=0A=
+>>>>>>>>>>>>>                 return false;=0A=
+>>>>>>>>>>>>>=0A=
+>>>>>>>>>>>>> The problem with this is that the wait entry in wbt_wait is=
+=0A=
+>>>>>>>>>>>>> define with DEFINE_WAIT, which uses the autoremove wakeup fun=
+ction.=0A=
+>>>>>>>>>>>>> That means that the above check is invalid - the wait entry w=
+ill=0A=
+>>>>>>>>>>>>> have been removed from the queue already by the time we hit t=
+he=0A=
+>>>>>>>>>>>>> check in the loop.=0A=
+>>>>>>>>>>>>>=0A=
+>>>>>>>>>>>>> Secondly, auto-removing the wait entries also means that the =
+wait=0A=
+>>>>>>>>>>>>> queue essentially gets reordered "randomly" (e.g. threads re-=
+add=0A=
+>>>>>>>>>>>>> themselves in the order they got to run after being woken up)=
+.=0A=
+>>>>>>>>>>>>> Additionally, new requests entering wbt_wait might overtake r=
+equests=0A=
+>>>>>>>>>>>>> that were queued earlier, because the wait queue will be=0A=
+>>>>>>>>>>>>> (temporarily) empty after the wake_up_all, so the waitqueue_a=
+ctive=0A=
+>>>>>>>>>>>>> check will not stop them. This can cause certain threads to s=
+tarve=0A=
+>>>>>>>>>>>>> under high load.=0A=
+>>>>>>>>>>>>>=0A=
+>>>>>>>>>>>>> The fix is to leave the woken up requests in the queue and re=
+move=0A=
+>>>>>>>>>>>>> them in finish_wait() once the current thread breaks out of t=
+he=0A=
+>>>>>>>>>>>>> wait loop in __wbt_wait. This will ensure new requests always=
+=0A=
+>>>>>>>>>>>>> end up at the back of the queue, and they won't overtake requ=
+ests=0A=
+>>>>>>>>>>>>> that are already in the wait queue. With that change, the loo=
+p=0A=
+>>>>>>>>>>>>> in wbt_wait is also in line with many other wait loops in the=
+ kernel.=0A=
+>>>>>>>>>>>>> Waking up just one thread drastically reduces lock contention=
+, as=0A=
+>>>>>>>>>>>>> does moving the wait queue add/remove out of the loop.=0A=
+>>>>>>>>>>>>>=0A=
+>>>>>>>>>>>>> A significant drop in lockdep's lock contention numbers is se=
+en when=0A=
+>>>>>>>>>>>>> running the test application on the patched kernel.=0A=
+>>>>>>>>>>>> I like the patch, and a few weeks ago we independently discove=
+red that=0A=
+>>>>>>>>>>>> the waitqueue list checking was bogus as well. My only worry i=
+s that=0A=
+>>>>>>>>>>>> changes like this can be delicate, meaning that it's easy to i=
+ntroduce=0A=
+>>>>>>>>>>>> stall conditions. What kind of testing did you push this throu=
+gh?=0A=
+>>>>>>>>>>>>=0A=
+>>>>>>>>>>>> -- =0A=
+>>>>>>>>>>>> Jens Axboe=0A=
+>>>>>>>>>>>>=0A=
+>>>>>>>>>>> I ran the following tests on both real HW with NVME devices att=
+ached=0A=
+>>>>>>>>>>> and emulated NVME too:=0A=
+>>>>>>>>>>>=0A=
+>>>>>>>>>>> 1. The test case I used to reproduce the issue, spawns a bunch =
+of threads =0A=
+>>>>>>>>>>>    to concurrently read and write files with random size and co=
+ntent. =0A=
+>>>>>>>>>>>    Files are randomly fsync'd. The implementation is a FIFO que=
+ue of files. =0A=
+>>>>>>>>>>>    When the queue fills the test starts to verify and remove th=
+e files. This =0A=
+>>>>>>>>>>>    test will fail if there's a read, write, or hash check failu=
+re. It tests=0A=
+>>>>>>>>>>>    for file corruption when lots of small files are being read =
+and written =0A=
+>>>>>>>>>>>    with high concurrency.=0A=
+>>>>>>>>>>>=0A=
+>>>>>>>>>>> 2. Fio for random writes with a root NVME device of 200GB=0A=
+>>>>>>>>>>>   =0A=
+>>>>>>>>>>>   fio --name=3Drandwrite --ioengine=3Dlibaio --iodepth=3D1 --rw=
+=3Drandwrite --bs=3D4k =0A=
+>>>>>>>>>>>   --direct=3D0 --size=3D10G --numjobs=3D2 --runtime=3D60 --grou=
+p_reporting=0A=
+>>>>>>>>>>>   =0A=
+>>>>>>>>>>>   fio --name=3Drandwrite --ioengine=3Dlibaio --iodepth=3D1 --rw=
+=3Drandwrite --bs=3D4k=0A=
+>>>>>>>>>>>   --direct=3D0 --size=3D5G --numjobs=3D2 --runtime=3D30 --fsync=
+=3D64 --group_reporting=0A=
+>>>>>>>>>>>   =0A=
+>>>>>>>>>>>   I did see an improvement in the bandwidth numbers reported on=
+ the patched=0A=
+>>>>>>>>>>>   kernel. =0A=
+>>>>>>>>>>>=0A=
+>>>>>>>>>>> Do you have any test case/suite in mind that you would suggest =
+me to =0A=
+>>>>>>>>>>> run to be sure that patch does not introduce any stall conditio=
+ns?=0A=
+>>>>>>>>>> One thing that is always useful is to run xfstest, do a full run=
+ on=0A=
+>>>>>>>>>> the device. If that works, then do another full run, this time l=
+imiting=0A=
+>>>>>>>>>> the queue depth of the SCSI device to 1. If both of those pass, =
+then=0A=
+>>>>>>>>>> I'd feel pretty good getting this applied for 4.19.=0A=
+>>>>>>>>> Did you get a chance to run this full test?=0A=
+>>>>>>>>>=0A=
+>>>>>>>>> -- =0A=
+>>>>>>>>> Jens Axboe=0A=
+>>>>>>>>>=0A=
+>>>>>>>>>=0A=
+>>>>>>>> Hi Jens,=0A=
+>>>>>>>> Yes I did run the tests and was in the process of compiling concre=
+te results=0A=
+>>>>>>>> I tested following environments against xfs/auto group=0A=
+>>>>>>>> 1. Vanilla 4.18.rc kernel=0A=
+>>>>>>>> 2. 4.18 kernel with the blk-wbt patch=0A=
+>>>>>>>> 3. 4.18 kernel with the blk-wbt patch + io_queue_depth=3D2. I =0A=
+>>>>>>>> understand you asked for queue depth for SCSI device=3D1 however, =
+I have NVME =0A=
+>>>>>>>> devices in my environment and 2 is the minimum value for io_queue_=
+depth allowed =0A=
+>>>>>>>> according to the NVME driver code. The results pretty much look sa=
+me with no =0A=
+>>>>>>>> stalls or exceptional failures. =0A=
+>>>>>>>> xfs/auto ran 296 odd tests with 3 failures and 130 something "no r=
+uns". =0A=
+>>>>>>>> Remaining tests passed. "Skipped tests"  were mostly due to missin=
+g features=0A=
+>>>>>>>> (eg: reflink support on scratch filesystem)=0A=
+>>>>>>>> The failures were consistent across runs on 3 different environmen=
+ts. =0A=
+>>>>>>>> I am also running full test suite but it is taking long time as I =
+am =0A=
+>>>>>>>> hitting kernel BUG in xfs code in some generic tests. This BUG is =
+not =0A=
+>>>>>>>> related to the patch and  I see them in vanilla kernel too. I am i=
+n =0A=
+>>>>>>>> the process of excluding these kind of tests as they come and =0A=
+>>>>>>>> re-run the suite however, this proces is time taking. =0A=
+>>>>>>>> Do you have any specific tests in mind that you would like me =0A=
+>>>>>>>> to run apart from what I have already tested above?=0A=
+>>>>>>> Thanks, I think that looks good. I'll get your patch applied for=0A=
+>>>>>>> 4.19.=0A=
+>>>>>>>=0A=
+>>>>>>> -- =0A=
+>>>>>>> Jens Axboe=0A=
+>>>>>>>=0A=
+>>>>>>>=0A=
+>>>>>> Hi Jens,=0A=
+>>>>>> Thanks for accepting this. There is one small issue, I don't find an=
+y emails=0A=
+>>>>>> send by me on the lkml mailing list. I am not sure why it didn't lan=
+d there,=0A=
+>>>>>> all I can see is your responses. Do you want one of us to resend the=
+ patch=0A=
+>>>>>> or will you be able to do it?=0A=
+>>>>> That's odd, are you getting rejections on your emails? For reference,=
+ the=0A=
+>>>>> patch is here:=0A=
+>>>>>=0A=
+>>>>> http://git.kernel.dk/cgit/linux-block/commit/?h=3Dfor-4.19/block&id=
+=3D2887e41b910bb14fd847cf01ab7a5993db989d88=0A=
+>>>> One issue with this, as far as I can tell. Right now we've switched to=
+=0A=
+>>>> waking one task at the time, which is obviously more efficient. But if=
+=0A=
+>>>> we do that with exclusive waits, then we have to ensure that this task=
+=0A=
+>>>> makes progress. If we wake up a task, and then fail to get a queueing=
+=0A=
+>>>> token, then we'll go back to sleep. We need to ensure that someone mak=
+es=0A=
+>>>> forward progress at this point. There are two ways I can see that=0A=
+>>>> happening:=0A=
+>>>>=0A=
+>>>> 1) The task woken _always_ gets to queue an IO=0A=
+>>>> 2) If the task woken is NOT allowed to queue an IO, then it must selec=
+t=0A=
+>>>>    a new task to wake up. That new task is then subjected to rule 1 or=
+ 2=0A=
+>>>>    as well.=0A=
+>>>>=0A=
+>>>> For #1, it could be as simple as:=0A=
+>>>>=0A=
+>>>> if (slept || !rwb_enabled(rwb)) {=0A=
+>>>> 	atomic_inc(&rqw->inflight);=0A=
+>>>> 	break;=0A=
+>>>> }=0A=
+>>>>=0A=
+>>>> but this obviously won't always be fair. Might be good enough however,=
+=0A=
+>>>> instead of having to eg replace the generic wait queues with a priorit=
+y=0A=
+>>>> list/queue.=0A=
+>>>>=0A=
+>>>> Note that this isn't an entirely new issue, it's just so much easier t=
+o=0A=
+>>>> hit with the single wakeups.=0A=
+>>>>=0A=
+>>> Hi Jens,=0A=
+>>>=0A=
+>>> What is the scenario that you see under which the woken up task does no=
+t=0A=
+>>> get to run?=0A=
+>> That scenario is pretty easy to hit - let's say the next in line task=0A=
+>> has a queue limit of 1, and we currently have 4 pending. Task gets=0A=
+>> woken, goes back to sleep. Which should be totally fine. At some point=
+=0A=
+>> we'll get below the limit, and allow the task to proceed. This will=0A=
+>> ensure forward progress.=0A=
+>>=0A=
+>>> The theory behind leaving the task on the wait queue is that the=0A=
+>>> waitqueue_active check in wbt_wait prevents new tasks from taking up a=
+=0A=
+>>> slot in the queue (e.g. incrementing inflight). So, there should not be=
+=0A=
+>>> a way for inflight to be incremented between the time the wake_up is=0A=
+>>> done and the task at the head of the wait queue runs. That's the idea=
+=0A=
+>>> anyway :-) If we missed something, let us know.=0A=
+>> And that's a fine theory, I think it's a good improvement (and how it=0A=
+>> should have worked). I'm struggling to see where the issue is. Perhaps=
+=0A=
+>> it's related to the wq active check. With fewer wakeups, we're more=0A=
+>> likely to hit a race there.=0A=
+>>=0A=
+>> I'll poke at it...=0A=
+> Trying something like this:=0A=
+>=0A=
+> http://git.kernel.dk/cgit/linux-block/log/?h=3Dfor-4.19/wbt=0A=
+>=0A=
+Ah, now I see what you mean.=0A=
+=0A=
+This is the case where a task goes to sleep, not because the inflight=0A=
+limit has been reached, but simply because it needs to go to the back of=0A=
+the wait queue.=0A=
+=0A=
+In that case, it should, for its first time inside the loop, not try to=0A=
+decrement inflight - since that means it could still race to overtake a=0A=
+task that got there earlier and is in the wait queue.=0A=
+=0A=
+So what you are doing is keeping track of whether it got in to the loop=0A=
+only because of queueing, and then you don't try to decrement inflight=0A=
+the first time around the loop.=0A=
+=0A=
+I think that should work to fix that corner case.=0A=
+=0A=
+Frank=0A=
+=0A=
