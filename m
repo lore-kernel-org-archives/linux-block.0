@@ -1,85 +1,93 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:43273 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727818AbeH2QUi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Aug 2018 12:20:38 -0400
-Received: by mail-ed1-f68.google.com with SMTP id z27-v6so3758618edb.10
-        for <linux-block@vger.kernel.org>; Wed, 29 Aug 2018 05:23:57 -0700 (PDT)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Javier Gonzales <javier@cnexlabs.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH 5/7] lightnvm: pblk: remove unused parameters in pblk_up_rq
-Date: Wed, 29 Aug 2018 14:23:32 +0200
-Message-Id: <1535545414-550-6-git-send-email-hans.ml.holmberg@owltronix.com>
-In-Reply-To: <1535545414-550-1-git-send-email-hans.ml.holmberg@owltronix.com>
-References: <1535545414-550-1-git-send-email-hans.ml.holmberg@owltronix.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <tom.leiming@gmail.com>
+MIME-Version: 1.0
+References: <1534749606-7311-1-git-send-email-jianchao.w.wang@oracle.com> <1534749606-7311-3-git-send-email-jianchao.w.wang@oracle.com>
+In-Reply-To: <1534749606-7311-3-git-send-email-jianchao.w.wang@oracle.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Mon, 20 Aug 2018 16:16:55 +0800
+Message-ID: <CACVXFVMxMf4Ag8CODJ_FPNrNTY-DhUZXV5JGLX-J4zexKF+qzg@mail.gmail.com>
+Subject: Re: [PATCH V3 2/2] blk-mq: sync the update nr_hw_queues with blk_mq_queue_tag_busy_iter
+To: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bart.vanassche@wdc.com>,
+	Keith Busch <keith.busch@linux.intel.com>, linux-block <linux-block@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+On Mon, Aug 20, 2018 at 3:18 PM Jianchao Wang
+<jianchao.w.wang@oracle.com> wrote:
+>
+> For blk-mq, part_in_flight/rw will invoke blk_mq_in_flight/rw to
+> account the inflight requests. It will access the queue_hw_ctx and
+> nr_hw_queues w/o any protection. When updating nr_hw_queues and
+> blk_mq_in_flight/rw occur concurrently, panic comes up.
+>
+> Before update nr_hw_queues, the q will be frozen. So we could use
+> q_usage_counter to avoid the race. percpu_ref_is_zero is used here
+> so that we will not miss any in-flight request. The access to
+> nr_hw_queues and queue_hw_ctx in blk_mq_queue_tag_busy_iter are
+> under rcu critical section, __blk_mq_update_nr_hw_queues could use
+> synchronize_rcu to ensure the zeroed q_usage_counter to be globally
+> visible.
+>
+> Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+> ---
+>  block/blk-mq-tag.c | 14 +++++++++++++-
+>  block/blk-mq.c     |  5 ++++-
+>  2 files changed, 17 insertions(+), 2 deletions(-)
+>
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index c0c4e63..8c5cc11 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -320,6 +320,18 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+>         struct blk_mq_hw_ctx *hctx;
+>         int i;
+>
+> +       /*
+> +        * __blk_mq_update_nr_hw_queues will update the nr_hw_queues and
+> +        * queue_hw_ctx after freeze the queue. So we could use q_usage_counter
+> +        * to avoid race with it. __blk_mq_update_nr_hw_queues will users
+> +        * synchronize_rcu to ensure all of the users go out of the critical
+> +        * section below and see zeroed q_usage_counter.
+> +        */
+> +       rcu_read_lock();
+> +       if (percpu_ref_is_zero(&q->q_usage_counter)) {
+> +               rcu_read_unlock();
+> +               return;
+> +       }
+>
+>         queue_for_each_hw_ctx(q, hctx, i) {
+>                 struct blk_mq_tags *tags = hctx->tags;
+> @@ -335,7 +347,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+>                         bt_for_each(hctx, &tags->breserved_tags, fn, priv, true);
+>                 bt_for_each(hctx, &tags->bitmap_tags, fn, priv, false);
+>         }
+> -
+> +       rcu_read_unlock();
+>  }
+>
+>  static int bt_alloc(struct sbitmap_queue *bt, unsigned int depth,
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 7b99477..fb56bae 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2905,7 +2905,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+>
+>         list_for_each_entry(q, &set->tag_list, tag_set_list)
+>                 blk_mq_freeze_queue(q);
+> -
+> +       /*
+> +        * Sync with blk_mq_in_flight and blk_mq_queue_tag_busy_iter.
+> +        */
+> +       synchronize_rcu();
+>         /*
+>          * switch io scheduler to NULL to clean up the data in it.
+>          * will get it back after update mapping between cpu and hw queues.
+> --
+> 2.7.4
+>
 
-The parameters nr_ppas and ppa_list are not used, so remove them.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
----
- drivers/lightnvm/pblk-core.c  | 3 +--
- drivers/lightnvm/pblk-write.c | 5 ++---
- drivers/lightnvm/pblk.h       | 3 +--
- 3 files changed, 4 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index a1033d82b9cc..f7bff3ae52ac 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1920,8 +1920,7 @@ void pblk_up_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas)
- 	up(&rlun->wr_sem);
- }
- 
--void pblk_up_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
--		unsigned long *lun_bitmap)
-+void pblk_up_rq(struct pblk *pblk, unsigned long *lun_bitmap)
- {
- 	struct nvm_tgt_dev *dev = pblk->dev;
- 	struct nvm_geo *geo = &dev->geo;
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index fd67325f6e54..8aa4b9ee5092 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -81,8 +81,7 @@ static void pblk_complete_write(struct pblk *pblk, struct nvm_rq *rqd,
- #ifdef CONFIG_NVM_PBLK_DEBUG
- 	atomic_long_sub(c_ctx->nr_valid, &pblk->inflight_writes);
- #endif
--
--	pblk_up_rq(pblk, rqd->ppa_list, rqd->nr_ppas, c_ctx->lun_bitmap);
-+	pblk_up_rq(pblk, c_ctx->lun_bitmap);
- 
- 	pos = pblk_rb_sync_init(&pblk->rwb, &flags);
- 	if (pos == c_ctx->sentry) {
-@@ -242,7 +241,7 @@ static void pblk_submit_rec(struct work_struct *work)
- 	pblk_map_remaining(pblk, ppa_list);
- 	pblk_queue_resubmit(pblk, c_ctx);
- 
--	pblk_up_rq(pblk, rqd->ppa_list, rqd->nr_ppas, c_ctx->lun_bitmap);
-+	pblk_up_rq(pblk, c_ctx->lun_bitmap);
- 	if (c_ctx->nr_padded)
- 		pblk_bio_free_pages(pblk, rqd->bio, c_ctx->nr_valid,
- 							c_ctx->nr_padded);
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 1a31fda3a9f2..1bdac22e7897 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -827,8 +827,7 @@ void pblk_up_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas);
- void pblk_down_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
- 		  unsigned long *lun_bitmap);
- void pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas);
--void pblk_up_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
--		unsigned long *lun_bitmap);
-+void pblk_up_rq(struct pblk *pblk, unsigned long *lun_bitmap);
- int pblk_bio_add_pages(struct pblk *pblk, struct bio *bio, gfp_t flags,
- 		       int nr_pages);
- void pblk_bio_free_pages(struct pblk *pblk, struct bio *bio, int off,
--- 
-2.7.4
+Thanks,
+Ming Lei
