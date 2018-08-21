@@ -1,24 +1,55 @@
 Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] block/compat_ioctl: fix range check in BLKGETSIZE
-To: Khazhismel Kumykov <khazhy@google.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20180406222350.174104-1-khazhy@google.com>
 From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <e40fc93d-ddb1-23a5-725c-e8ab613168cb@kernel.dk>
-Date: Thu, 2 Aug 2018 15:31:52 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180406222350.174104-1-khazhy@google.com>
-Content-Type: text/plain; charset=utf-8
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 2/3] blk-wbt: use wq_has_sleeper() for wq active check
+Date: Tue, 21 Aug 2018 09:05:16 -0600
+Message-Id: <20180821150517.19744-3-axboe@kernel.dk>
+In-Reply-To: <20180821150517.19744-1-axboe@kernel.dk>
+References: <20180821150517.19744-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On 4/6/18 4:23 PM, Khazhismel Kumykov wrote:
-> kernel ulong and compat_ulong_t may not be same width. Use type directly
-> to eliminate mismatches.
-> 
-> This would result in truncation rather than EFBIG for 32bit mode for
-> large disks.
+We need the memory barrier before checking the list head,
+use the appropriate helper for this. The matching queue
+side memory barrier is provided by set_current_state().
 
-Sorry for not getting to this. Applied, thanks.
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ block/blk-wbt.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 1dd7edce7a99..853e22492f4e 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -118,7 +118,7 @@ static void rwb_wake_all(struct rq_wb *rwb)
+ 	for (i = 0; i < WBT_NUM_RWQ; i++) {
+ 		struct rq_wait *rqw = &rwb->rq_wait[i];
+ 
+-		if (waitqueue_active(&rqw->wait))
++		if (wq_has_sleeper(&rqw->wait))
+ 			wake_up_all(&rqw->wait);
+ 	}
+ }
+@@ -162,7 +162,7 @@ static void __wbt_done(struct rq_qos *rqos, enum wbt_flags wb_acct)
+ 	if (inflight && inflight >= limit)
+ 		return;
+ 
+-	if (waitqueue_active(&rqw->wait)) {
++	if (wq_has_sleeper(&rqw->wait)) {
+ 		int diff = limit - inflight;
+ 
+ 		if (!inflight || diff >= rwb->wb_background / 2)
+@@ -493,8 +493,8 @@ static void __wbt_wait(struct rq_wb *rwb, enum wbt_flags wb_acct,
+ 	struct rq_wait *rqw = get_rq_wait(rwb, wb_acct);
+ 	DECLARE_WAITQUEUE(wait, current);
+ 
+-	if (!waitqueue_active(&rqw->wait)
+-		&& rq_wait_inc_below(rqw, get_limit(rwb, rw)))
++	if (!wq_has_sleeper(&rqw->wait) &&
++	    rq_wait_inc_below(rqw, get_limit(rwb, rw)))
+ 		return;
+ 
+ 	add_wait_queue_exclusive(&rqw->wait, &wait);
 -- 
-Jens Axboe
+2.17.1
