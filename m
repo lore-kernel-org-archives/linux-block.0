@@ -1,348 +1,513 @@
-Return-Path: <javier@cnexlabs.com>
-From: Javier Gonzalez <javier@cnexlabs.com>
-To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
-CC: "javier@javigon.com" <javier@javigon.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
+Return-Path: <mb@lightnvm.io>
+Return-Path: <mb@lightnvm.io>
 Subject: Re: [PATCH 1/2] lightnvm: pblk: refactor metadata paths
-Date: Tue, 21 Aug 2018 11:56:41 +0000
-Message-ID: <238046C8-A030-49AA-AC73-F1E03C748CB4@cnexlabs.com>
+To: javier@javigon.com
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, javier@cnexlabs.com
 References: <1534501150-11906-1-git-send-email-javier@cnexlabs.com>
- <1534501150-11906-2-git-send-email-javier@cnexlabs.com>,<1713254e-a1d7-a261-216a-b03c0fb57531@lightnvm.io>
-In-Reply-To: <1713254e-a1d7-a261-216a-b03c0fb57531@lightnvm.io>
-Content-Type: text/plain; charset="utf-8"
+ <1534501150-11906-2-git-send-email-javier@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <1713254e-a1d7-a261-216a-b03c0fb57531@lightnvm.io>
+Date: Tue, 21 Aug 2018 13:53:57 +0200
 MIME-Version: 1.0
+In-Reply-To: <1534501150-11906-2-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-DQoNCj4gT24gMjEgQXVnIDIwMTgsIGF0IDEzLjU0LCBNYXRpYXMgQmrDuHJsaW5nIDxtYkBsaWdo
-dG52bS5pbz4gd3JvdGU6DQo+IA0KPj4gT24gMDgvMTcvMjAxOCAxMjoxOSBQTSwgSmF2aWVyIEdv
-bnrDoWxleiB3cm90ZToNCj4+IHBibGsgbWFpbnRhaW5zIHR3byBkaWZmZXJlbnQgbWV0YWRhdGEg
-cGF0aHMgZm9yIHNtZXRhIGFuZCBlbWV0YSwgd2hpY2gNCj4+IHN0b3JlIG1ldGFkYXRhIGF0IHRo
-ZSBzdGFydCBvZiB0aGUgbGluZSBhbmQgYXQgdGhlIGVuZCBvZiB0aGUgbGluZSwNCj4+IHJlc3Bl
-Y3RpdmVseS4gVW50aWwgbm93LCB0aGVzZSBwYXRoIGhhcyBiZWVuIGNvbW1vbiBmb3Igd3JpdGlu
-ZyBhbmQNCj4+IHJldHJpZXZpbmcgbWV0YWRhdGEsIGhvd2V2ZXIsIGFzIHRoZXNlIHBhdGhzIGRp
-dmVyZ2UsIHRoZSBjb21tb24gY29kZQ0KPj4gYmVjb21lcyBsZXNzIGNsZWFyIGFuZCB1bm5lY2Vz
-c2FyeSBjb21wbGljYXRlZC4NCj4+IEluIHByZXBhcmF0aW9uIGZvciBmdXJ0aGVyIGNoYW5nZXMg
-dG8gdGhlIG1ldGFkYXRhIHdyaXRlIHBhdGgsIHRoaXMNCj4+IHBhdGNoIHNlcGFyYXRlcyB0aGUg
-d3JpdGUgYW5kIHJlYWQgcGF0aHMgZm9yIHNtZXRhIGFuZCBlbWV0YSBhbmQNCj4+IHJlbW92ZXMg
-dGhlIHN5bmNocm9ub3VzIGVtZXRhIHBhdGggYXMgaXQgbm90IHVzZWQgYW55bW9yZSAoZW1ldGEg
-aXMNCj4+IHNjaGVkdWxlZCBhc3luY2hyb25vdXNseSB0byBwcmV2ZW50IGppdHRlcmluZyBkdWUg
-dG8gaW50ZXJuYWwgSS9PcykuDQo+PiBTaWduZWQtb2ZmLWJ5OiBKYXZpZXIgR29uesOhbGV6IDxq
-YXZpZXJAY25leGxhYnMuY29tPg0KPj4gLS0tDQo+PiAgZHJpdmVycy9saWdodG52bS9wYmxrLWNv
-cmUuYyAgICAgfCAzMzggKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+
-PiAgZHJpdmVycy9saWdodG52bS9wYmxrLWdjLmMgICAgICAgfCAgIDIgKy0NCj4+ICBkcml2ZXJz
-L2xpZ2h0bnZtL3BibGstcmVjb3ZlcnkuYyB8ICAgNCArLQ0KPj4gIGRyaXZlcnMvbGlnaHRudm0v
-cGJsay5oICAgICAgICAgIHwgICA1ICstDQo+PiAgNCBmaWxlcyBjaGFuZ2VkLCAxNjQgaW5zZXJ0
-aW9ucygrKSwgMTg1IGRlbGV0aW9ucygtKQ0KPj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvbGlnaHRu
-dm0vcGJsay1jb3JlLmMgYi9kcml2ZXJzL2xpZ2h0bnZtL3BibGstY29yZS5jDQo+PiBpbmRleCA3
-MmRlNzQ1Njg0NWIuLjUyMzA2NTczY2MwZSAxMDA2NDQNCj4+IC0tLSBhL2RyaXZlcnMvbGlnaHRu
-dm0vcGJsay1jb3JlLmMNCj4+ICsrKyBiL2RyaXZlcnMvbGlnaHRudm0vcGJsay1jb3JlLmMNCj4+
-IEBAIC02MjEsMTIgKzYyMSwxMzcgQEAgdTY0IHBibGtfbG9va3VwX3BhZ2Uoc3RydWN0IHBibGsg
-KnBibGssIHN0cnVjdCBwYmxrX2xpbmUgKmxpbmUpDQo+PiAgICAgIHJldHVybiBwYWRkcjsNCj4+
-ICB9DQo+PiAgLS8qDQo+PiAtICogU3VibWl0IGVtZXRhIHRvIG9uZSBMVU4gaW4gdGhlIHJhaWQg
-bGluZSBhdCB0aGUgdGltZSB0byBhdm9pZCBhIGRlYWRsb2NrIHdoZW4NCj4+IC0gKiB0YWtpbmcg
-dGhlIHBlciBMVU4gc2VtYXBob3JlLg0KPj4gLSAqLw0KPj4gLXN0YXRpYyBpbnQgcGJsa19saW5l
-X3N1Ym1pdF9lbWV0YV9pbyhzdHJ1Y3QgcGJsayAqcGJsaywgc3RydWN0IHBibGtfbGluZSAqbGlu
-ZSwNCj4+IC0gICAgICAgICAgICAgICAgICAgICB2b2lkICplbWV0YV9idWYsIHU2NCBwYWRkciwg
-aW50IGRpcikNCj4+ICt1NjQgcGJsa19saW5lX3NtZXRhX3N0YXJ0KHN0cnVjdCBwYmxrICpwYmxr
-LCBzdHJ1Y3QgcGJsa19saW5lICpsaW5lKQ0KPj4gK3sNCj4+ICsgICAgc3RydWN0IG52bV90Z3Rf
-ZGV2ICpkZXYgPSBwYmxrLT5kZXY7DQo+PiArICAgIHN0cnVjdCBudm1fZ2VvICpnZW8gPSAmZGV2
-LT5nZW87DQo+PiArICAgIHN0cnVjdCBwYmxrX2xpbmVfbWV0YSAqbG0gPSAmcGJsay0+bG07DQo+
-PiArICAgIGludCBiaXQ7DQo+PiArDQo+PiArICAgIC8qIFRoaXMgdXN1YWxseSBvbmx5IGhhcHBl
-bnMgb24gYmFkIGxpbmVzICovDQo+PiArICAgIGJpdCA9IGZpbmRfZmlyc3RfemVyb19iaXQobGlu
-ZS0+YmxrX2JpdG1hcCwgbG0tPmJsa19wZXJfbGluZSk7DQo+PiArICAgIGlmIChiaXQgPj0gbG0t
-PmJsa19wZXJfbGluZSkNCj4+ICsgICAgICAgIHJldHVybiAtMTsNCj4+ICsNCj4+ICsgICAgcmV0
-dXJuIGJpdCAqIGdlby0+d3Nfb3B0Ow0KPj4gK30NCj4+ICsNCj4+ICtpbnQgcGJsa19saW5lX3Nt
-ZXRhX3JlYWQoc3RydWN0IHBibGsgKnBibGssIHN0cnVjdCBwYmxrX2xpbmUgKmxpbmUpDQo+PiAr
-ew0KPj4gKyAgICBzdHJ1Y3QgbnZtX3RndF9kZXYgKmRldiA9IHBibGstPmRldjsNCj4+ICsgICAg
-c3RydWN0IHBibGtfbGluZV9tZXRhICpsbSA9ICZwYmxrLT5sbTsNCj4+ICsgICAgc3RydWN0IGJp
-byAqYmlvOw0KPj4gKyAgICBzdHJ1Y3QgbnZtX3JxIHJxZDsNCj4+ICsgICAgdTY0IHBhZGRyID0g
-cGJsa19saW5lX3NtZXRhX3N0YXJ0KHBibGssIGxpbmUpOw0KPj4gKyAgICBpbnQgaSwgcmV0Ow0K
-Pj4gKw0KPj4gKyAgICBtZW1zZXQoJnJxZCwgMCwgc2l6ZW9mKHN0cnVjdCBudm1fcnEpKTsNCj4+
-ICsNCj4+ICsgICAgcnFkLm1ldGFfbGlzdCA9IG52bV9kZXZfZG1hX2FsbG9jKGRldi0+cGFyZW50
-LCBHRlBfS0VSTkVMLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAmcnFkLmRtYV9t
-ZXRhX2xpc3QpOw0KPj4gKyAgICBpZiAoIXJxZC5tZXRhX2xpc3QpDQo+PiArICAgICAgICByZXR1
-cm4gLUVOT01FTTsNCj4+ICsNCj4+ICsgICAgcnFkLnBwYV9saXN0ID0gcnFkLm1ldGFfbGlzdCAr
-IHBibGtfZG1hX21ldGFfc2l6ZTsNCj4+ICsgICAgcnFkLmRtYV9wcGFfbGlzdCA9IHJxZC5kbWFf
-bWV0YV9saXN0ICsgcGJsa19kbWFfbWV0YV9zaXplOw0KPj4gKw0KPj4gKyAgICBiaW8gPSBiaW9f
-bWFwX2tlcm4oZGV2LT5xLCBsaW5lLT5zbWV0YSwgbG0tPnNtZXRhX2xlbiwgR0ZQX0tFUk5FTCk7
-DQo+PiArICAgIGlmIChJU19FUlIoYmlvKSkgew0KPj4gKyAgICAgICAgcmV0ID0gUFRSX0VSUihi
-aW8pOw0KPj4gKyAgICAgICAgZ290byBmcmVlX3BwYV9saXN0Ow0KPj4gKyAgICB9DQo+PiArDQo+
-PiArICAgIGJpby0+YmlfaXRlci5iaV9zZWN0b3IgPSAwOyAvKiBpbnRlcm5hbCBiaW8gKi8NCj4+
-ICsgICAgYmlvX3NldF9vcF9hdHRycyhiaW8sIFJFUV9PUF9SRUFELCAwKTsNCj4+ICsNCj4+ICsg
-ICAgcnFkLmJpbyA9IGJpbzsNCj4+ICsgICAgcnFkLm9wY29kZSA9IE5WTV9PUF9QUkVBRDsNCj4+
-ICsgICAgcnFkLm5yX3BwYXMgPSBsbS0+c21ldGFfc2VjOw0KPj4gKyAgICBycWQuaXNfc2VxID0g
-MTsNCj4+ICsNCj4+ICsgICAgZm9yIChpID0gMDsgaSA8IGxtLT5zbWV0YV9zZWM7IGkrKywgcGFk
-ZHIrKykNCj4+ICsgICAgICAgIHJxZC5wcGFfbGlzdFtpXSA9IGFkZHJfdG9fZ2VuX3BwYShwYmxr
-LCBwYWRkciwgbGluZS0+aWQpOw0KPj4gKw0KPj4gKyAgICByZXQgPSBwYmxrX3N1Ym1pdF9pb19z
-eW5jKHBibGssICZycWQpOw0KPj4gKyAgICBpZiAocmV0KSB7DQo+PiArICAgICAgICBwYmxrX2Vy
-cihwYmxrLCAic21ldGEgSS9PIHN1Ym1pc3Npb24gZmFpbGVkOiAlZFxuIiwgcmV0KTsNCj4+ICsg
-ICAgICAgIGJpb19wdXQoYmlvKTsNCj4+ICsgICAgICAgIGdvdG8gZnJlZV9wcGFfbGlzdDsNCj4+
-ICsgICAgfQ0KPj4gKw0KPj4gKyAgICBhdG9taWNfZGVjKCZwYmxrLT5pbmZsaWdodF9pbyk7DQo+
-PiArDQo+PiArICAgIGlmIChycWQuZXJyb3IpDQo+PiArICAgICAgICBwYmxrX2xvZ19yZWFkX2Vy
-cihwYmxrLCAmcnFkKTsNCj4+ICsNCj4+ICtmcmVlX3BwYV9saXN0Og0KPj4gKyAgICBudm1fZGV2
-X2RtYV9mcmVlKGRldi0+cGFyZW50LCBycWQubWV0YV9saXN0LCBycWQuZG1hX21ldGFfbGlzdCk7
-DQo+PiArICAgIHJldHVybiByZXQ7DQo+PiArfQ0KPj4gKw0KPj4gK3N0YXRpYyBpbnQgcGJsa19s
-aW5lX3NtZXRhX3dyaXRlKHN0cnVjdCBwYmxrICpwYmxrLCBzdHJ1Y3QgcGJsa19saW5lICpsaW5l
-LA0KPj4gKyAgICAgICAgICAgICAgICAgdTY0IHBhZGRyKQ0KPj4gK3sNCj4+ICsgICAgc3RydWN0
-IG52bV90Z3RfZGV2ICpkZXYgPSBwYmxrLT5kZXY7DQo+PiArICAgIHN0cnVjdCBwYmxrX2xpbmVf
-bWV0YSAqbG0gPSAmcGJsay0+bG07DQo+PiArICAgIHN0cnVjdCBiaW8gKmJpbzsNCj4+ICsgICAg
-c3RydWN0IG52bV9ycSBycWQ7DQo+PiArICAgIF9fbGU2NCAqbGJhX2xpc3QgPSBlbWV0YV90b19s
-YmFzKHBibGssIGxpbmUtPmVtZXRhLT5idWYpOw0KPj4gKyAgICBfX2xlNjQgYWRkcl9lbXB0eSA9
-IGNwdV90b19sZTY0KEFERFJfRU1QVFkpOw0KPj4gKyAgICBpbnQgaSwgcmV0Ow0KPj4gKw0KPj4g
-KyAgICBtZW1zZXQoJnJxZCwgMCwgc2l6ZW9mKHN0cnVjdCBudm1fcnEpKTsNCj4+ICsNCj4+ICsg
-ICAgcnFkLm1ldGFfbGlzdCA9IG52bV9kZXZfZG1hX2FsbG9jKGRldi0+cGFyZW50LCBHRlBfS0VS
-TkVMLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAmcnFkLmRtYV9tZXRhX2xpc3Qp
-Ow0KPj4gKyAgICBpZiAoIXJxZC5tZXRhX2xpc3QpDQo+PiArICAgICAgICByZXR1cm4gLUVOT01F
-TTsNCj4+ICsNCj4+ICsgICAgcnFkLnBwYV9saXN0ID0gcnFkLm1ldGFfbGlzdCArIHBibGtfZG1h
-X21ldGFfc2l6ZTsNCj4+ICsgICAgcnFkLmRtYV9wcGFfbGlzdCA9IHJxZC5kbWFfbWV0YV9saXN0
-ICsgcGJsa19kbWFfbWV0YV9zaXplOw0KPj4gKw0KPj4gKyAgICBiaW8gPSBiaW9fbWFwX2tlcm4o
-ZGV2LT5xLCBsaW5lLT5zbWV0YSwgbG0tPnNtZXRhX2xlbiwgR0ZQX0tFUk5FTCk7DQo+PiArICAg
-IGlmIChJU19FUlIoYmlvKSkgew0KPj4gKyAgICAgICAgcmV0ID0gUFRSX0VSUihiaW8pOw0KPj4g
-KyAgICAgICAgZ290byBmcmVlX3BwYV9saXN0Ow0KPj4gKyAgICB9DQo+PiArDQo+PiArICAgIGJp
-by0+YmlfaXRlci5iaV9zZWN0b3IgPSAwOyAvKiBpbnRlcm5hbCBiaW8gKi8NCj4+ICsgICAgYmlv
-X3NldF9vcF9hdHRycyhiaW8sIFJFUV9PUF9XUklURSwgMCk7DQo+PiArDQo+PiArICAgIHJxZC5i
-aW8gPSBiaW87DQo+PiArICAgIHJxZC5vcGNvZGUgPSBOVk1fT1BfUFdSSVRFOw0KPj4gKyAgICBy
-cWQubnJfcHBhcyA9IGxtLT5zbWV0YV9zZWM7DQo+PiArICAgIHJxZC5pc19zZXEgPSAxOw0KPj4g
-Kw0KPj4gKyAgICBmb3IgKGkgPSAwOyBpIDwgbG0tPnNtZXRhX3NlYzsgaSsrLCBwYWRkcisrKSB7
-DQo+PiArICAgICAgICBzdHJ1Y3QgcGJsa19zZWNfbWV0YSAqbWV0YV9saXN0ID0gcnFkLm1ldGFf
-bGlzdDsNCj4+ICsNCj4+ICsgICAgICAgIHJxZC5wcGFfbGlzdFtpXSA9IGFkZHJfdG9fZ2VuX3Bw
-YShwYmxrLCBwYWRkciwgbGluZS0+aWQpOw0KPj4gKyAgICAgICAgbWV0YV9saXN0W2ldLmxiYSA9
-IGxiYV9saXN0W3BhZGRyXSA9IGFkZHJfZW1wdHk7DQo+PiArICAgIH0NCj4+ICsNCj4+ICsgICAg
-cmV0ID0gcGJsa19zdWJtaXRfaW9fc3luYyhwYmxrLCAmcnFkKTsNCj4+ICsgICAgaWYgKHJldCkg
-ew0KPj4gKyAgICAgICAgcGJsa19lcnIocGJsaywgInNtZXRhIEkvTyBzdWJtaXNzaW9uIGZhaWxl
-ZDogJWRcbiIsIHJldCk7DQo+PiArICAgICAgICBiaW9fcHV0KGJpbyk7DQo+PiArICAgICAgICBn
-b3RvIGZyZWVfcHBhX2xpc3Q7DQo+PiArICAgIH0NCj4+ICsNCj4+ICsgICAgYXRvbWljX2RlYygm
-cGJsay0+aW5mbGlnaHRfaW8pOw0KPj4gKw0KPj4gKyAgICBpZiAocnFkLmVycm9yKSB7DQo+PiAr
-ICAgICAgICBwYmxrX2xvZ193cml0ZV9lcnIocGJsaywgJnJxZCk7DQo+PiArICAgICAgICByZXQg
-PSAtRUlPOw0KPj4gKyAgICB9DQo+PiArDQo+PiArZnJlZV9wcGFfbGlzdDoNCj4+ICsgICAgbnZt
-X2Rldl9kbWFfZnJlZShkZXYtPnBhcmVudCwgcnFkLm1ldGFfbGlzdCwgcnFkLmRtYV9tZXRhX2xp
-c3QpOw0KPj4gKyAgICByZXR1cm4gcmV0Ow0KPj4gK30NCj4+ICsNCj4+ICtpbnQgcGJsa19saW5l
-X2VtZXRhX3JlYWQoc3RydWN0IHBibGsgKnBibGssIHN0cnVjdCBwYmxrX2xpbmUgKmxpbmUsDQo+
-PiArICAgICAgICAgICAgIHZvaWQgKmVtZXRhX2J1ZikNCj4+ICB7DQo+PiAgICAgIHN0cnVjdCBu
-dm1fdGd0X2RldiAqZGV2ID0gcGJsay0+ZGV2Ow0KPj4gICAgICBzdHJ1Y3QgbnZtX2dlbyAqZ2Vv
-ID0gJmRldi0+Z2VvOw0KPj4gQEAgLTYzNSwyNCArNzYwLDE1IEBAIHN0YXRpYyBpbnQgcGJsa19s
-aW5lX3N1Ym1pdF9lbWV0YV9pbyhzdHJ1Y3QgcGJsayAqcGJsaywgc3RydWN0IHBibGtfbGluZSAq
-bGluZSwNCj4+ICAgICAgdm9pZCAqcHBhX2xpc3QsICptZXRhX2xpc3Q7DQo+PiAgICAgIHN0cnVj
-dCBiaW8gKmJpbzsNCj4+ICAgICAgc3RydWN0IG52bV9ycSBycWQ7DQo+PiArICAgIHU2NCBwYWRk
-ciA9IGxpbmUtPmVtZXRhX3NzZWM7DQo+PiAgICAgIGRtYV9hZGRyX3QgZG1hX3BwYV9saXN0LCBk
-bWFfbWV0YV9saXN0Ow0KPj4gICAgICBpbnQgbWluID0gcGJsay0+bWluX3dyaXRlX3BnczsNCj4+
-ICAgICAgaW50IGxlZnRfcHBhcyA9IGxtLT5lbWV0YV9zZWNbMF07DQo+PiAtICAgIGludCBpZCA9
-IGxpbmUtPmlkOw0KPj4gKyAgICBpbnQgbGluZV9pZCA9IGxpbmUtPmlkOw0KPj4gICAgICBpbnQg
-cnFfcHBhcywgcnFfbGVuOw0KPj4gLSAgICBpbnQgY21kX29wLCBiaW9fb3A7DQo+PiAgICAgIGlu
-dCBpLCBqOw0KPj4gICAgICBpbnQgcmV0Ow0KPj4gIC0gICAgaWYgKGRpciA9PSBQQkxLX1dSSVRF
-KSB7DQo+PiAtICAgICAgICBiaW9fb3AgPSBSRVFfT1BfV1JJVEU7DQo+PiAtICAgICAgICBjbWRf
-b3AgPSBOVk1fT1BfUFdSSVRFOw0KPj4gLSAgICB9IGVsc2UgaWYgKGRpciA9PSBQQkxLX1JFQUQp
-IHsNCj4+IC0gICAgICAgIGJpb19vcCA9IFJFUV9PUF9SRUFEOw0KPj4gLSAgICAgICAgY21kX29w
-ID0gTlZNX09QX1BSRUFEOw0KPj4gLSAgICB9IGVsc2UNCj4+IC0gICAgICAgIHJldHVybiAtRUlO
-VkFMOw0KPj4gLQ0KPj4gICAgICBtZXRhX2xpc3QgPSBudm1fZGV2X2RtYV9hbGxvYyhkZXYtPnBh
-cmVudCwgR0ZQX0tFUk5FTCwNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJmRtYV9t
-ZXRhX2xpc3QpOw0KPj4gICAgICBpZiAoIW1ldGFfbGlzdCkNCj4+IEBAIC02NzUsNjQgKzc5MSw0
-MyBAQCBzdGF0aWMgaW50IHBibGtfbGluZV9zdWJtaXRfZW1ldGFfaW8oc3RydWN0IHBibGsgKnBi
-bGssIHN0cnVjdCBwYmxrX2xpbmUgKmxpbmUsDQo+PiAgICAgIH0NCj4+ICAgICAgICBiaW8tPmJp
-X2l0ZXIuYmlfc2VjdG9yID0gMDsgLyogaW50ZXJuYWwgYmlvICovDQo+PiAtICAgIGJpb19zZXRf
-b3BfYXR0cnMoYmlvLCBiaW9fb3AsIDApOw0KPj4gKyAgICBiaW9fc2V0X29wX2F0dHJzKGJpbywg
-UkVRX09QX1JFQUQsIDApOw0KPj4gICAgICAgIHJxZC5iaW8gPSBiaW87DQo+PiAgICAgIHJxZC5t
-ZXRhX2xpc3QgPSBtZXRhX2xpc3Q7DQo+PiAgICAgIHJxZC5wcGFfbGlzdCA9IHBwYV9saXN0Ow0K
-Pj4gICAgICBycWQuZG1hX21ldGFfbGlzdCA9IGRtYV9tZXRhX2xpc3Q7DQo+PiAgICAgIHJxZC5k
-bWFfcHBhX2xpc3QgPSBkbWFfcHBhX2xpc3Q7DQo+PiAtICAgIHJxZC5vcGNvZGUgPSBjbWRfb3A7
-DQo+PiArICAgIHJxZC5vcGNvZGUgPSBOVk1fT1BfUFJFQUQ7DQo+PiAgICAgIHJxZC5ucl9wcGFz
-ID0gcnFfcHBhczsNCj4+ICAtICAgIGlmIChkaXIgPT0gUEJMS19XUklURSkgew0KPj4gLSAgICAg
-ICAgc3RydWN0IHBibGtfc2VjX21ldGEgKm1ldGFfbGlzdCA9IHJxZC5tZXRhX2xpc3Q7DQo+PiAr
-ICAgIGZvciAoaSA9IDA7IGkgPCBycWQubnJfcHBhczsgKSB7DQo+PiArICAgICAgICBzdHJ1Y3Qg
-cHBhX2FkZHIgcHBhID0gYWRkcl90b19nZW5fcHBhKHBibGssIHBhZGRyLCBsaW5lX2lkKTsNCj4+
-ICsgICAgICAgIGludCBwb3MgPSBwYmxrX3BwYV90b19wb3MoZ2VvLCBwcGEpOw0KPj4gIC0gICAg
-ICAgIHJxZC5pc19zZXEgPSAxOw0KPj4gLSAgICAgICAgZm9yIChpID0gMDsgaSA8IHJxZC5ucl9w
-cGFzOyApIHsNCj4+IC0gICAgICAgICAgICBzcGluX2xvY2soJmxpbmUtPmxvY2spOw0KPj4gLSAg
-ICAgICAgICAgIHBhZGRyID0gX19wYmxrX2FsbG9jX3BhZ2UocGJsaywgbGluZSwgbWluKTsNCj4+
-IC0gICAgICAgICAgICBzcGluX3VubG9jaygmbGluZS0+bG9jayk7DQo+PiAtICAgICAgICAgICAg
-Zm9yIChqID0gMDsgaiA8IG1pbjsgaisrLCBpKyssIHBhZGRyKyspIHsNCj4+IC0gICAgICAgICAg
-ICAgICAgbWV0YV9saXN0W2ldLmxiYSA9IGNwdV90b19sZTY0KEFERFJfRU1QVFkpOw0KPj4gLSAg
-ICAgICAgICAgICAgICBycWQucHBhX2xpc3RbaV0gPQ0KPj4gLSAgICAgICAgICAgICAgICAgICAg
-YWRkcl90b19nZW5fcHBhKHBibGssIHBhZGRyLCBpZCk7DQo+PiAtICAgICAgICAgICAgfQ0KPj4g
-LSAgICAgICAgfQ0KPj4gLSAgICB9IGVsc2Ugew0KPj4gLSAgICAgICAgZm9yIChpID0gMDsgaSA8
-IHJxZC5ucl9wcGFzOyApIHsNCj4+IC0gICAgICAgICAgICBzdHJ1Y3QgcHBhX2FkZHIgcHBhID0g
-YWRkcl90b19nZW5fcHBhKHBibGssIHBhZGRyLCBpZCk7DQo+PiAtICAgICAgICAgICAgaW50IHBv
-cyA9IHBibGtfcHBhX3RvX3BvcyhnZW8sIHBwYSk7DQo+PiArICAgICAgICBpZiAocGJsa19pb19h
-bGlnbmVkKHBibGssIHJxX3BwYXMpKQ0KPj4gKyAgICAgICAgICAgIHJxZC5pc19zZXEgPSAxOw0K
-Pj4gIC0gICAgICAgICAgICBpZiAocGJsa19pb19hbGlnbmVkKHBibGssIHJxX3BwYXMpKQ0KPj4g
-LSAgICAgICAgICAgICAgICBycWQuaXNfc2VxID0gMTsNCj4+IC0NCj4+IC0gICAgICAgICAgICB3
-aGlsZSAodGVzdF9iaXQocG9zLCBsaW5lLT5ibGtfYml0bWFwKSkgew0KPj4gLSAgICAgICAgICAg
-ICAgICBwYWRkciArPSBtaW47DQo+PiAtICAgICAgICAgICAgICAgIGlmIChwYmxrX2JvdW5kYXJ5
-X3BhZGRyX2NoZWNrcyhwYmxrLCBwYWRkcikpIHsNCj4+IC0gICAgICAgICAgICAgICAgICAgIHBi
-bGtfZXJyKHBibGssICJjb3JydXB0IGVtZXRhIGxpbmU6JWRcbiIsDQo+PiAtICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBsaW5lLT5pZCk7DQo+PiAtICAgICAgICAgICAgICAgICAgICBi
-aW9fcHV0KGJpbyk7DQo+PiAtICAgICAgICAgICAgICAgICAgICByZXQgPSAtRUlOVFI7DQo+PiAt
-ICAgICAgICAgICAgICAgICAgICBnb3RvIGZyZWVfcnFkX2RtYTsNCj4+IC0gICAgICAgICAgICAg
-ICAgfQ0KPj4gLQ0KPj4gLSAgICAgICAgICAgICAgICBwcGEgPSBhZGRyX3RvX2dlbl9wcGEocGJs
-aywgcGFkZHIsIGlkKTsNCj4+IC0gICAgICAgICAgICAgICAgcG9zID0gcGJsa19wcGFfdG9fcG9z
-KGdlbywgcHBhKTsNCj4+IC0gICAgICAgICAgICB9DQo+PiAtDQo+PiAtICAgICAgICAgICAgaWYg
-KHBibGtfYm91bmRhcnlfcGFkZHJfY2hlY2tzKHBibGssIHBhZGRyICsgbWluKSkgew0KPj4gLSAg
-ICAgICAgICAgICAgICBwYmxrX2VycihwYmxrLCAiY29ycnVwdCBlbWV0YSBsaW5lOiVkXG4iLA0K
-Pj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbGluZS0+aWQpOw0KPj4gKyAgICAg
-ICAgd2hpbGUgKHRlc3RfYml0KHBvcywgbGluZS0+YmxrX2JpdG1hcCkpIHsNCj4+ICsgICAgICAg
-ICAgICBwYWRkciArPSBtaW47DQo+PiArICAgICAgICAgICAgaWYgKHBibGtfYm91bmRhcnlfcGFk
-ZHJfY2hlY2tzKHBibGssIHBhZGRyKSkgew0KPj4gICAgICAgICAgICAgICAgICBiaW9fcHV0KGJp
-byk7DQo+PiAgICAgICAgICAgICAgICAgIHJldCA9IC1FSU5UUjsNCj4+ICAgICAgICAgICAgICAg
-ICAgZ290byBmcmVlX3JxZF9kbWE7DQo+PiAgICAgICAgICAgICAgfQ0KPj4gIC0gICAgICAgICAg
-ICBmb3IgKGogPSAwOyBqIDwgbWluOyBqKyssIGkrKywgcGFkZHIrKykNCj4+IC0gICAgICAgICAg
-ICAgICAgcnFkLnBwYV9saXN0W2ldID0NCj4+IC0gICAgICAgICAgICAgICAgICAgIGFkZHJfdG9f
-Z2VuX3BwYShwYmxrLCBwYWRkciwgbGluZS0+aWQpOw0KPj4gKyAgICAgICAgICAgIHBwYSA9IGFk
-ZHJfdG9fZ2VuX3BwYShwYmxrLCBwYWRkciwgbGluZV9pZCk7DQo+PiArICAgICAgICAgICAgcG9z
-ID0gcGJsa19wcGFfdG9fcG9zKGdlbywgcHBhKTsNCj4+ICAgICAgICAgIH0NCj4+ICsNCj4+ICsg
-ICAgICAgIGlmIChwYmxrX2JvdW5kYXJ5X3BhZGRyX2NoZWNrcyhwYmxrLCBwYWRkciArIG1pbikp
-IHsNCj4+ICsgICAgICAgICAgICBiaW9fcHV0KGJpbyk7DQo+PiArICAgICAgICAgICAgcmV0ID0g
-LUVJTlRSOw0KPj4gKyAgICAgICAgICAgIGdvdG8gZnJlZV9ycWRfZG1hOw0KPj4gKyAgICAgICAg
-fQ0KPj4gKw0KPj4gKyAgICAgICAgZm9yIChqID0gMDsgaiA8IG1pbjsgaisrLCBpKyssIHBhZGRy
-KyspDQo+PiArICAgICAgICAgICAgcnFkLnBwYV9saXN0W2ldID0gYWRkcl90b19nZW5fcHBhKHBi
-bGssIHBhZGRyLCBsaW5lX2lkKTsNCj4+ICAgICAgfQ0KPj4gICAgICAgIHJldCA9IHBibGtfc3Vi
-bWl0X2lvX3N5bmMocGJsaywgJnJxZCk7DQo+PiBAQCAtNzQ0LDEzNiArODM5LDE5IEBAIHN0YXRp
-YyBpbnQgcGJsa19saW5lX3N1Ym1pdF9lbWV0YV9pbyhzdHJ1Y3QgcGJsayAqcGJsaywgc3RydWN0
-IHBibGtfbGluZSAqbGluZSwNCj4+ICAgICAgICBhdG9taWNfZGVjKCZwYmxrLT5pbmZsaWdodF9p
-byk7DQo+PiAgLSAgICBpZiAocnFkLmVycm9yKSB7DQo+PiAtICAgICAgICBpZiAoZGlyID09IFBC
-TEtfV1JJVEUpDQo+PiAtICAgICAgICAgICAgcGJsa19sb2dfd3JpdGVfZXJyKHBibGssICZycWQp
-Ow0KPj4gLSAgICAgICAgZWxzZQ0KPj4gLSAgICAgICAgICAgIHBibGtfbG9nX3JlYWRfZXJyKHBi
-bGssICZycWQpOw0KPj4gLSAgICB9DQo+PiArICAgIGlmIChycWQuZXJyb3IpDQo+PiArICAgICAg
-ICBwYmxrX2xvZ19yZWFkX2VycihwYmxrLCAmcnFkKTsNCj4+ICAgICAgICBlbWV0YV9idWYgKz0g
-cnFfbGVuOw0KPj4gICAgICBsZWZ0X3BwYXMgLT0gcnFfcHBhczsNCj4+ICAgICAgaWYgKGxlZnRf
-cHBhcykNCj4+ICAgICAgICAgIGdvdG8gbmV4dF9ycTsNCj4+ICsNCj4+ICBmcmVlX3JxZF9kbWE6
-DQo+PiAgICAgIG52bV9kZXZfZG1hX2ZyZWUoZGV2LT5wYXJlbnQsIHJxZC5tZXRhX2xpc3QsIHJx
-ZC5kbWFfbWV0YV9saXN0KTsNCj4+ICAgICAgcmV0dXJuIHJldDsNCj4+ICB9DQo+PiAgLXU2NCBw
-YmxrX2xpbmVfc21ldGFfc3RhcnQoc3RydWN0IHBibGsgKnBibGssIHN0cnVjdCBwYmxrX2xpbmUg
-KmxpbmUpDQo+PiAtew0KPj4gLSAgICBzdHJ1Y3QgbnZtX3RndF9kZXYgKmRldiA9IHBibGstPmRl
-djsNCj4+IC0gICAgc3RydWN0IG52bV9nZW8gKmdlbyA9ICZkZXYtPmdlbzsNCj4+IC0gICAgc3Ry
-dWN0IHBibGtfbGluZV9tZXRhICpsbSA9ICZwYmxrLT5sbTsNCj4+IC0gICAgaW50IGJpdDsNCj4+
-IC0NCj4+IC0gICAgLyogVGhpcyB1c3VhbGx5IG9ubHkgaGFwcGVucyBvbiBiYWQgbGluZXMgKi8N
-Cj4+IC0gICAgYml0ID0gZmluZF9maXJzdF96ZXJvX2JpdChsaW5lLT5ibGtfYml0bWFwLCBsbS0+
-YmxrX3Blcl9saW5lKTsNCj4+IC0gICAgaWYgKGJpdCA+PSBsbS0+YmxrX3Blcl9saW5lKQ0KPj4g
-LSAgICAgICAgcmV0dXJuIC0xOw0KPj4gLQ0KPj4gLSAgICByZXR1cm4gYml0ICogZ2VvLT53c19v
-cHQ7DQo+PiAtfQ0KPj4gLQ0KPj4gLXN0YXRpYyBpbnQgcGJsa19saW5lX3N1Ym1pdF9zbWV0YV9p
-byhzdHJ1Y3QgcGJsayAqcGJsaywgc3RydWN0IHBibGtfbGluZSAqbGluZSwNCj4+IC0gICAgICAg
-ICAgICAgICAgICAgICB1NjQgcGFkZHIsIGludCBkaXIpDQo+PiAtew0KPj4gLSAgICBzdHJ1Y3Qg
-bnZtX3RndF9kZXYgKmRldiA9IHBibGstPmRldjsNCj4+IC0gICAgc3RydWN0IHBibGtfbGluZV9t
-ZXRhICpsbSA9ICZwYmxrLT5sbTsNCj4+IC0gICAgc3RydWN0IGJpbyAqYmlvOw0KPj4gLSAgICBz
-dHJ1Y3QgbnZtX3JxIHJxZDsNCj4+IC0gICAgX19sZTY0ICpsYmFfbGlzdCA9IE5VTEw7DQo+PiAt
-ICAgIGludCBpLCByZXQ7DQo+PiAtICAgIGludCBjbWRfb3AsIGJpb19vcDsNCj4+IC0NCj4+IC0g
-ICAgaWYgKGRpciA9PSBQQkxLX1dSSVRFKSB7DQo+PiAtICAgICAgICBiaW9fb3AgPSBSRVFfT1Bf
-V1JJVEU7DQo+PiAtICAgICAgICBjbWRfb3AgPSBOVk1fT1BfUFdSSVRFOw0KPj4gLSAgICAgICAg
-bGJhX2xpc3QgPSBlbWV0YV90b19sYmFzKHBibGssIGxpbmUtPmVtZXRhLT5idWYpOw0KPj4gLSAg
-ICB9IGVsc2UgaWYgKGRpciA9PSBQQkxLX1JFQURfUkVDT1YgfHwgZGlyID09IFBCTEtfUkVBRCkg
-ew0KPj4gLSAgICAgICAgYmlvX29wID0gUkVRX09QX1JFQUQ7DQo+PiAtICAgICAgICBjbWRfb3Ag
-PSBOVk1fT1BfUFJFQUQ7DQo+PiAtICAgIH0gZWxzZQ0KPj4gLSAgICAgICAgcmV0dXJuIC1FSU5W
-QUw7DQo+PiAtDQo+PiAtICAgIG1lbXNldCgmcnFkLCAwLCBzaXplb2Yoc3RydWN0IG52bV9ycSkp
-Ow0KPj4gLQ0KPj4gLSAgICBycWQubWV0YV9saXN0ID0gbnZtX2Rldl9kbWFfYWxsb2MoZGV2LT5w
-YXJlbnQsIEdGUF9LRVJORUwsDQo+PiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICZycWQu
-ZG1hX21ldGFfbGlzdCk7DQo+PiAtICAgIGlmICghcnFkLm1ldGFfbGlzdCkNCj4+IC0gICAgICAg
-IHJldHVybiAtRU5PTUVNOw0KPj4gLQ0KPj4gLSAgICBycWQucHBhX2xpc3QgPSBycWQubWV0YV9s
-aXN0ICsgcGJsa19kbWFfbWV0YV9zaXplOw0KPj4gLSAgICBycWQuZG1hX3BwYV9saXN0ID0gcnFk
-LmRtYV9tZXRhX2xpc3QgKyBwYmxrX2RtYV9tZXRhX3NpemU7DQo+PiAtDQo+PiAtICAgIGJpbyA9
-IGJpb19tYXBfa2VybihkZXYtPnEsIGxpbmUtPnNtZXRhLCBsbS0+c21ldGFfbGVuLCBHRlBfS0VS
-TkVMKTsNCj4+IC0gICAgaWYgKElTX0VSUihiaW8pKSB7DQo+PiAtICAgICAgICByZXQgPSBQVFJf
-RVJSKGJpbyk7DQo+PiAtICAgICAgICBnb3RvIGZyZWVfcHBhX2xpc3Q7DQo+PiAtICAgIH0NCj4+
-IC0NCj4+IC0gICAgYmlvLT5iaV9pdGVyLmJpX3NlY3RvciA9IDA7IC8qIGludGVybmFsIGJpbyAq
-Lw0KPj4gLSAgICBiaW9fc2V0X29wX2F0dHJzKGJpbywgYmlvX29wLCAwKTsNCj4+IC0NCj4+IC0g
-ICAgcnFkLmJpbyA9IGJpbzsNCj4+IC0gICAgcnFkLm9wY29kZSA9IGNtZF9vcDsNCj4+IC0gICAg
-cnFkLmlzX3NlcSA9IDE7DQo+PiAtICAgIHJxZC5ucl9wcGFzID0gbG0tPnNtZXRhX3NlYzsNCj4+
-IC0NCj4+IC0gICAgZm9yIChpID0gMDsgaSA8IGxtLT5zbWV0YV9zZWM7IGkrKywgcGFkZHIrKykg
-ew0KPj4gLSAgICAgICAgc3RydWN0IHBibGtfc2VjX21ldGEgKm1ldGFfbGlzdCA9IHJxZC5tZXRh
-X2xpc3Q7DQo+PiAtDQo+PiAtICAgICAgICBycWQucHBhX2xpc3RbaV0gPSBhZGRyX3RvX2dlbl9w
-cGEocGJsaywgcGFkZHIsIGxpbmUtPmlkKTsNCj4+IC0NCj4+IC0gICAgICAgIGlmIChkaXIgPT0g
-UEJMS19XUklURSkgew0KPj4gLSAgICAgICAgICAgIF9fbGU2NCBhZGRyX2VtcHR5ID0gY3B1X3Rv
-X2xlNjQoQUREUl9FTVBUWSk7DQo+PiAtDQo+PiAtICAgICAgICAgICAgbWV0YV9saXN0W2ldLmxi
-YSA9IGxiYV9saXN0W3BhZGRyXSA9IGFkZHJfZW1wdHk7DQo+PiAtICAgICAgICB9DQo+PiAtICAg
-IH0NCj4+IC0NCj4+IC0gICAgLyoNCj4+IC0gICAgICogVGhpcyBJL08gaXMgc2VudCBieSB0aGUg
-d3JpdGUgdGhyZWFkIHdoZW4gYSBsaW5lIGlzIHJlcGxhY2UuIFNpbmNlDQo+PiAtICAgICAqIHRo
-ZSB3cml0ZSB0aHJlYWQgaXMgdGhlIG9ubHkgb25lIHNlbmRpbmcgd3JpdGUgYW5kIGVyYXNlIGNv
-bW1hbmRzLA0KPj4gLSAgICAgKiB0aGVyZSBpcyBubyBuZWVkIHRvIHRha2UgdGhlIExVTiBzZW1h
-cGhvcmUuDQo+PiAtICAgICAqLw0KPj4gLSAgICByZXQgPSBwYmxrX3N1Ym1pdF9pb19zeW5jKHBi
-bGssICZycWQpOw0KPj4gLSAgICBpZiAocmV0KSB7DQo+PiAtICAgICAgICBwYmxrX2VycihwYmxr
-LCAic21ldGEgSS9PIHN1Ym1pc3Npb24gZmFpbGVkOiAlZFxuIiwgcmV0KTsNCj4+IC0gICAgICAg
-IGJpb19wdXQoYmlvKTsNCj4+IC0gICAgICAgIGdvdG8gZnJlZV9wcGFfbGlzdDsNCj4+IC0gICAg
-fQ0KPj4gLQ0KPj4gLSAgICBhdG9taWNfZGVjKCZwYmxrLT5pbmZsaWdodF9pbyk7DQo+PiAtDQo+
-PiAtICAgIGlmIChycWQuZXJyb3IpIHsNCj4+IC0gICAgICAgIGlmIChkaXIgPT0gUEJMS19XUklU
-RSkgew0KPj4gLSAgICAgICAgICAgIHBibGtfbG9nX3dyaXRlX2VycihwYmxrLCAmcnFkKTsNCj4+
-IC0gICAgICAgICAgICByZXQgPSAxOw0KPj4gLSAgICAgICAgfSBlbHNlIGlmIChkaXIgPT0gUEJM
-S19SRUFEKQ0KPj4gLSAgICAgICAgICAgIHBibGtfbG9nX3JlYWRfZXJyKHBibGssICZycWQpOw0K
-Pj4gLSAgICB9DQo+PiAtDQo+PiAtZnJlZV9wcGFfbGlzdDoNCj4+IC0gICAgbnZtX2Rldl9kbWFf
-ZnJlZShkZXYtPnBhcmVudCwgcnFkLm1ldGFfbGlzdCwgcnFkLmRtYV9tZXRhX2xpc3QpOw0KPj4g
-LQ0KPj4gLSAgICByZXR1cm4gcmV0Ow0KPj4gLX0NCj4+IC0NCj4+IC1pbnQgcGJsa19saW5lX3Jl
-YWRfc21ldGEoc3RydWN0IHBibGsgKnBibGssIHN0cnVjdCBwYmxrX2xpbmUgKmxpbmUpDQo+PiAt
-ew0KPj4gLSAgICB1NjQgYnBhZGRyID0gcGJsa19saW5lX3NtZXRhX3N0YXJ0KHBibGssIGxpbmUp
-Ow0KPj4gLQ0KPj4gLSAgICByZXR1cm4gcGJsa19saW5lX3N1Ym1pdF9zbWV0YV9pbyhwYmxrLCBs
-aW5lLCBicGFkZHIsIFBCTEtfUkVBRF9SRUNPVik7DQo+PiAtfQ0KPj4gLQ0KPj4gLWludCBwYmxr
-X2xpbmVfcmVhZF9lbWV0YShzdHJ1Y3QgcGJsayAqcGJsaywgc3RydWN0IHBibGtfbGluZSAqbGlu
-ZSwNCj4+IC0gICAgICAgICAgICAgdm9pZCAqZW1ldGFfYnVmKQ0KPj4gLXsNCj4+IC0gICAgcmV0
-dXJuIHBibGtfbGluZV9zdWJtaXRfZW1ldGFfaW8ocGJsaywgbGluZSwgZW1ldGFfYnVmLA0KPj4g
-LSAgICAgICAgICAgICAgICAgICAgICAgIGxpbmUtPmVtZXRhX3NzZWMsIFBCTEtfUkVBRCk7DQo+
-PiAtfQ0KPj4gLQ0KPj4gIHN0YXRpYyB2b2lkIHBibGtfc2V0dXBfZV9ycShzdHJ1Y3QgcGJsayAq
-cGJsaywgc3RydWN0IG52bV9ycSAqcnFkLA0KPj4gICAgICAgICAgICAgICAgICBzdHJ1Y3QgcHBh
-X2FkZHIgcHBhKQ0KPj4gIHsNCj4+IEBAIC0xMTAyLDcgKzEwODAsNyBAQCBzdGF0aWMgaW50IHBi
-bGtfbGluZV9pbml0X2JiKHN0cnVjdCBwYmxrICpwYmxrLCBzdHJ1Y3QgcGJsa19saW5lICpsaW5l
-LA0KPj4gICAgICBsaW5lLT5zbWV0YV9zc2VjID0gb2ZmOw0KPj4gICAgICBsaW5lLT5jdXJfc2Vj
-ID0gb2ZmICsgbG0tPnNtZXRhX3NlYzsNCj4+ICAtICAgIGlmIChpbml0ICYmIHBibGtfbGluZV9z
-dWJtaXRfc21ldGFfaW8ocGJsaywgbGluZSwgb2ZmLCBQQkxLX1dSSVRFKSkgew0KPj4gKyAgICBp
-ZiAoaW5pdCAmJiBwYmxrX2xpbmVfc21ldGFfd3JpdGUocGJsaywgbGluZSwgb2ZmKSkgew0KPj4g
-ICAgICAgICAgcGJsa19kZWJ1ZyhwYmxrLCAibGluZSBzbWV0YSBJL08gZmFpbGVkLiBSZXRyeVxu
-Iik7DQo+PiAgICAgICAgICByZXR1cm4gMDsNCj4+ICAgICAgfQ0KPj4gZGlmZiAtLWdpdCBhL2Ry
-aXZlcnMvbGlnaHRudm0vcGJsay1nYy5jIGIvZHJpdmVycy9saWdodG52bS9wYmxrLWdjLmMNCj4+
-IGluZGV4IDE1N2MyNTY3YzllOC4uMTg5ZDkyYjU4NDQ3IDEwMDY0NA0KPj4gLS0tIGEvZHJpdmVy
-cy9saWdodG52bS9wYmxrLWdjLmMNCj4+ICsrKyBiL2RyaXZlcnMvbGlnaHRudm0vcGJsay1nYy5j
-DQo+PiBAQCAtMTQ0LDcgKzE0NCw3IEBAIHN0YXRpYyBfX2xlNjQgKmdldF9sYmFfbGlzdF9mcm9t
-X2VtZXRhKHN0cnVjdCBwYmxrICpwYmxrLA0KPj4gICAgICBpZiAoIWVtZXRhX2J1ZikNCj4+ICAg
-ICAgICAgIHJldHVybiBOVUxMOw0KPj4gIC0gICAgcmV0ID0gcGJsa19saW5lX3JlYWRfZW1ldGEo
-cGJsaywgbGluZSwgZW1ldGFfYnVmKTsNCj4+ICsgICAgcmV0ID0gcGJsa19saW5lX2VtZXRhX3Jl
-YWQocGJsaywgbGluZSwgZW1ldGFfYnVmKTsNCj4+ICAgICAgaWYgKHJldCkgew0KPj4gICAgICAg
-ICAgcGJsa19lcnIocGJsaywgImxpbmUgJWQgcmVhZCBlbWV0YSBmYWlsZWQgKCVkKVxuIiwNCj4+
-ICAgICAgICAgICAgICAgICAgbGluZS0+aWQsIHJldCk7DQo+PiBkaWZmIC0tZ2l0IGEvZHJpdmVy
-cy9saWdodG52bS9wYmxrLXJlY292ZXJ5LmMgYi9kcml2ZXJzL2xpZ2h0bnZtL3BibGstcmVjb3Zl
-cnkuYw0KPj4gaW5kZXggY2Y2MjlhYjAxNmJhLi43YjI3ZTk1OGRjOGUgMTAwNjQ0DQo+PiAtLS0g
-YS9kcml2ZXJzL2xpZ2h0bnZtL3BibGstcmVjb3ZlcnkuYw0KPj4gKysrIGIvZHJpdmVycy9saWdo
-dG52bS9wYmxrLXJlY292ZXJ5LmMNCj4+IEBAIC04MzUsNyArODM1LDcgQEAgc3RydWN0IHBibGtf
-bGluZSAqcGJsa19yZWNvdl9sMnAoc3RydWN0IHBibGsgKnBibGspDQo+PiAgICAgICAgICAgICAg
-Y29udGludWU7DQo+PiAgICAgICAgICAgIC8qIExpbmVzIHRoYXQgY2Fubm90IGJlIHJlYWQgYXJl
-IGFzc3VtZWQgYXMgbm90IHdyaXR0ZW4gaGVyZSAqLw0KPj4gLSAgICAgICAgaWYgKHBibGtfbGlu
-ZV9yZWFkX3NtZXRhKHBibGssIGxpbmUpKQ0KPj4gKyAgICAgICAgaWYgKHBibGtfbGluZV9zbWV0
-YV9yZWFkKHBibGssIGxpbmUpKQ0KPj4gICAgICAgICAgICAgIGNvbnRpbnVlOw0KPj4gICAgICAg
-ICAgICBjcmMgPSBwYmxrX2NhbGNfc21ldGFfY3JjKHBibGssIHNtZXRhX2J1Zik7DQo+PiBAQCAt
-OTA1LDcgKzkwNSw3IEBAIHN0cnVjdCBwYmxrX2xpbmUgKnBibGtfcmVjb3ZfbDJwKHN0cnVjdCBw
-YmxrICpwYmxrKQ0KPj4gICAgICAgICAgbGluZS0+ZW1ldGEgPSBlbWV0YTsNCj4+ICAgICAgICAg
-IG1lbXNldChsaW5lLT5lbWV0YS0+YnVmLCAwLCBsbS0+ZW1ldGFfbGVuWzBdKTsNCj4+ICAtICAg
-ICAgICBpZiAocGJsa19saW5lX3JlYWRfZW1ldGEocGJsaywgbGluZSwgbGluZS0+ZW1ldGEtPmJ1
-ZikpIHsNCj4+ICsgICAgICAgIGlmIChwYmxrX2xpbmVfZW1ldGFfcmVhZChwYmxrLCBsaW5lLCBs
-aW5lLT5lbWV0YS0+YnVmKSkgew0KPj4gICAgICAgICAgICAgIHBibGtfcmVjb3ZfbDJwX2Zyb21f
-b29iKHBibGssIGxpbmUpOw0KPj4gICAgICAgICAgICAgIGdvdG8gbmV4dDsNCj4+ICAgICAgICAg
-IH0NCj4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2xpZ2h0bnZtL3BibGsuaCBiL2RyaXZlcnMvbGln
-aHRudm0vcGJsay5oDQo+PiBpbmRleCA0OGIzMDM1ZGYzYzQuLmE3MWY5ODQ3OTU3YiAxMDA2NDQN
-Cj4+IC0tLSBhL2RyaXZlcnMvbGlnaHRudm0vcGJsay5oDQo+PiArKysgYi9kcml2ZXJzL2xpZ2h0
-bnZtL3BibGsuaA0KPj4gQEAgLTc4Miw2ICs3ODIsNyBAQCB2b2lkIHBibGtfbG9nX3dyaXRlX2Vy
-cihzdHJ1Y3QgcGJsayAqcGJsaywgc3RydWN0IG52bV9ycSAqcnFkKTsNCj4+ICB2b2lkIHBibGtf
-bG9nX3JlYWRfZXJyKHN0cnVjdCBwYmxrICpwYmxrLCBzdHJ1Y3QgbnZtX3JxICpycWQpOw0KPj4g
-IGludCBwYmxrX3N1Ym1pdF9pbyhzdHJ1Y3QgcGJsayAqcGJsaywgc3RydWN0IG52bV9ycSAqcnFk
-KTsNCj4+ICBpbnQgcGJsa19zdWJtaXRfaW9fc3luYyhzdHJ1Y3QgcGJsayAqcGJsaywgc3RydWN0
-IG52bV9ycSAqcnFkKTsNCj4+ICtpbnQgcGJsa19zdWJtaXRfaW9fc3luY19zZW0oc3RydWN0IHBi
-bGsgKnBibGssIHN0cnVjdCBudm1fcnEgKnJxZCk7DQo+IA0KPiBJJ2xsIHJlbW92ZSB0aGlzIGZy
-b20gdGhlIHBhdGNoIGFuZCBhZGQgdG8gdGhlIG5leHQuDQo+IA0KPj4gIGludCBwYmxrX3N1Ym1p
-dF9tZXRhX2lvKHN0cnVjdCBwYmxrICpwYmxrLCBzdHJ1Y3QgcGJsa19saW5lICptZXRhX2xpbmUp
-Ow0KPj4gIHN0cnVjdCBiaW8gKnBibGtfYmlvX21hcF9hZGRyKHN0cnVjdCBwYmxrICpwYmxrLCB2
-b2lkICpkYXRhLA0KPj4gICAgICAgICAgICAgICAgICAgIHVuc2lnbmVkIGludCBucl9zZWNzLCB1
-bnNpZ25lZCBpbnQgbGVuLA0KPj4gQEAgLTgwNiw4ICs4MDcsOCBAQCB2b2lkIHBibGtfZ2VuX3J1
-bl93cyhzdHJ1Y3QgcGJsayAqcGJsaywgc3RydWN0IHBibGtfbGluZSAqbGluZSwgdm9pZCAqcHJp
-diwNCj4+ICAgICAgICAgICAgICAgdm9pZCAoKndvcmspKHN0cnVjdCB3b3JrX3N0cnVjdCAqKSwg
-Z2ZwX3QgZ2ZwX21hc2ssDQo+PiAgICAgICAgICAgICAgIHN0cnVjdCB3b3JrcXVldWVfc3RydWN0
-ICp3cSk7DQo+PiAgdTY0IHBibGtfbGluZV9zbWV0YV9zdGFydChzdHJ1Y3QgcGJsayAqcGJsaywg
-c3RydWN0IHBibGtfbGluZSAqbGluZSk7DQo+PiAtaW50IHBibGtfbGluZV9yZWFkX3NtZXRhKHN0
-cnVjdCBwYmxrICpwYmxrLCBzdHJ1Y3QgcGJsa19saW5lICpsaW5lKTsNCj4+IC1pbnQgcGJsa19s
-aW5lX3JlYWRfZW1ldGEoc3RydWN0IHBibGsgKnBibGssIHN0cnVjdCBwYmxrX2xpbmUgKmxpbmUs
-DQo+PiAraW50IHBibGtfbGluZV9zbWV0YV9yZWFkKHN0cnVjdCBwYmxrICpwYmxrLCBzdHJ1Y3Qg
-cGJsa19saW5lICpsaW5lKTsNCj4+ICtpbnQgcGJsa19saW5lX2VtZXRhX3JlYWQoc3RydWN0IHBi
-bGsgKnBibGssIHN0cnVjdCBwYmxrX2xpbmUgKmxpbmUsDQo+PiAgICAgICAgICAgICAgIHZvaWQg
-KmVtZXRhX2J1Zik7DQo+PiAgaW50IHBibGtfYmxrX2VyYXNlX2FzeW5jKHN0cnVjdCBwYmxrICpw
-YmxrLCBzdHJ1Y3QgcHBhX2FkZHIgZXJhc2VfcHBhKTsNCj4+ICB2b2lkIHBibGtfbGluZV9wdXQo
-c3RydWN0IGtyZWYgKnJlZik7DQo+IA0KPiBUaGFua3MuIEFwcGxpZWQgZm9yIDQuMjAuIEkgdGhp
-bmsgdGhlIHNwbGl0IGNvdWxkIGJlIG9wdGltaXplZCBxdWl0ZSBhIGJpdCB3aXRoIHJlc3BlY3Qg
-dG8gY29tcGxleGl0eS4gTm93IGEgbG90IG9mIHZlcnkgc2ltaWxhciBjb2RlIGlzIHNwcmVhZCBh
-Y3Jvc3MgdHdvIGZ1bmN0aW9ucy4gSSBtYXkgbG9vayBpbnRvIG9wdGltaXppbmcgdGhlIHJlcXVl
-c3QgYWxsb2MgcGF0aCwgc3VjaCB0aGF0IGl0IG5vdCBvcGVuIGNvZGVkIGluIG1vc3QgcGxhY2Vz
-Lg0KDQpMZXQgbWUgdGFrZSBhbm90aGVyIHJvdW5kIGF0IGl0LiBJ4oCZbGwgc3VibWl0IGEgVjIg
-bGF0ZXIgdGhpcyB3ZWVrLiANCg0KSmF2aWVyLiA=
+On 08/17/2018 12:19 PM, Javier González wrote:
+> pblk maintains two different metadata paths for smeta and emeta, which
+> store metadata at the start of the line and at the end of the line,
+> respectively. Until now, these path has been common for writing and
+> retrieving metadata, however, as these paths diverge, the common code
+> becomes less clear and unnecessary complicated.
+> 
+> In preparation for further changes to the metadata write path, this
+> patch separates the write and read paths for smeta and emeta and
+> removes the synchronous emeta path as it not used anymore (emeta is
+> scheduled asynchronously to prevent jittering due to internal I/Os).
+> 
+> Signed-off-by: Javier González <javier@cnexlabs.com>
+> ---
+>   drivers/lightnvm/pblk-core.c     | 338 ++++++++++++++++++---------------------
+>   drivers/lightnvm/pblk-gc.c       |   2 +-
+>   drivers/lightnvm/pblk-recovery.c |   4 +-
+>   drivers/lightnvm/pblk.h          |   5 +-
+>   4 files changed, 164 insertions(+), 185 deletions(-)
+> 
+> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+> index 72de7456845b..52306573cc0e 100644
+> --- a/drivers/lightnvm/pblk-core.c
+> +++ b/drivers/lightnvm/pblk-core.c
+> @@ -621,12 +621,137 @@ u64 pblk_lookup_page(struct pblk *pblk, struct pblk_line *line)
+>   	return paddr;
+>   }
+>   
+> -/*
+> - * Submit emeta to one LUN in the raid line at the time to avoid a deadlock when
+> - * taking the per LUN semaphore.
+> - */
+> -static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
+> -				     void *emeta_buf, u64 paddr, int dir)
+> +u64 pblk_line_smeta_start(struct pblk *pblk, struct pblk_line *line)
+> +{
+> +	struct nvm_tgt_dev *dev = pblk->dev;
+> +	struct nvm_geo *geo = &dev->geo;
+> +	struct pblk_line_meta *lm = &pblk->lm;
+> +	int bit;
+> +
+> +	/* This usually only happens on bad lines */
+> +	bit = find_first_zero_bit(line->blk_bitmap, lm->blk_per_line);
+> +	if (bit >= lm->blk_per_line)
+> +		return -1;
+> +
+> +	return bit * geo->ws_opt;
+> +}
+> +
+> +int pblk_line_smeta_read(struct pblk *pblk, struct pblk_line *line)
+> +{
+> +	struct nvm_tgt_dev *dev = pblk->dev;
+> +	struct pblk_line_meta *lm = &pblk->lm;
+> +	struct bio *bio;
+> +	struct nvm_rq rqd;
+> +	u64 paddr = pblk_line_smeta_start(pblk, line);
+> +	int i, ret;
+> +
+> +	memset(&rqd, 0, sizeof(struct nvm_rq));
+> +
+> +	rqd.meta_list = nvm_dev_dma_alloc(dev->parent, GFP_KERNEL,
+> +							&rqd.dma_meta_list);
+> +	if (!rqd.meta_list)
+> +		return -ENOMEM;
+> +
+> +	rqd.ppa_list = rqd.meta_list + pblk_dma_meta_size;
+> +	rqd.dma_ppa_list = rqd.dma_meta_list + pblk_dma_meta_size;
+> +
+> +	bio = bio_map_kern(dev->q, line->smeta, lm->smeta_len, GFP_KERNEL);
+> +	if (IS_ERR(bio)) {
+> +		ret = PTR_ERR(bio);
+> +		goto free_ppa_list;
+> +	}
+> +
+> +	bio->bi_iter.bi_sector = 0; /* internal bio */
+> +	bio_set_op_attrs(bio, REQ_OP_READ, 0);
+> +
+> +	rqd.bio = bio;
+> +	rqd.opcode = NVM_OP_PREAD;
+> +	rqd.nr_ppas = lm->smeta_sec;
+> +	rqd.is_seq = 1;
+> +
+> +	for (i = 0; i < lm->smeta_sec; i++, paddr++)
+> +		rqd.ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line->id);
+> +
+> +	ret = pblk_submit_io_sync(pblk, &rqd);
+> +	if (ret) {
+> +		pblk_err(pblk, "smeta I/O submission failed: %d\n", ret);
+> +		bio_put(bio);
+> +		goto free_ppa_list;
+> +	}
+> +
+> +	atomic_dec(&pblk->inflight_io);
+> +
+> +	if (rqd.error)
+> +		pblk_log_read_err(pblk, &rqd);
+> +
+> +free_ppa_list:
+> +	nvm_dev_dma_free(dev->parent, rqd.meta_list, rqd.dma_meta_list);
+> +	return ret;
+> +}
+> +
+> +static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line,
+> +				 u64 paddr)
+> +{
+> +	struct nvm_tgt_dev *dev = pblk->dev;
+> +	struct pblk_line_meta *lm = &pblk->lm;
+> +	struct bio *bio;
+> +	struct nvm_rq rqd;
+> +	__le64 *lba_list = emeta_to_lbas(pblk, line->emeta->buf);
+> +	__le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
+> +	int i, ret;
+> +
+> +	memset(&rqd, 0, sizeof(struct nvm_rq));
+> +
+> +	rqd.meta_list = nvm_dev_dma_alloc(dev->parent, GFP_KERNEL,
+> +							&rqd.dma_meta_list);
+> +	if (!rqd.meta_list)
+> +		return -ENOMEM;
+> +
+> +	rqd.ppa_list = rqd.meta_list + pblk_dma_meta_size;
+> +	rqd.dma_ppa_list = rqd.dma_meta_list + pblk_dma_meta_size;
+> +
+> +	bio = bio_map_kern(dev->q, line->smeta, lm->smeta_len, GFP_KERNEL);
+> +	if (IS_ERR(bio)) {
+> +		ret = PTR_ERR(bio);
+> +		goto free_ppa_list;
+> +	}
+> +
+> +	bio->bi_iter.bi_sector = 0; /* internal bio */
+> +	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
+> +
+> +	rqd.bio = bio;
+> +	rqd.opcode = NVM_OP_PWRITE;
+> +	rqd.nr_ppas = lm->smeta_sec;
+> +	rqd.is_seq = 1;
+> +
+> +	for (i = 0; i < lm->smeta_sec; i++, paddr++) {
+> +		struct pblk_sec_meta *meta_list = rqd.meta_list;
+> +
+> +		rqd.ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line->id);
+> +		meta_list[i].lba = lba_list[paddr] = addr_empty;
+> +	}
+> +
+> +	ret = pblk_submit_io_sync(pblk, &rqd);
+> +	if (ret) {
+> +		pblk_err(pblk, "smeta I/O submission failed: %d\n", ret);
+> +		bio_put(bio);
+> +		goto free_ppa_list;
+> +	}
+> +
+> +	atomic_dec(&pblk->inflight_io);
+> +
+> +	if (rqd.error) {
+> +		pblk_log_write_err(pblk, &rqd);
+> +		ret = -EIO;
+> +	}
+> +
+> +free_ppa_list:
+> +	nvm_dev_dma_free(dev->parent, rqd.meta_list, rqd.dma_meta_list);
+> +	return ret;
+> +}
+> +
+> +int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
+> +			 void *emeta_buf)
+>   {
+>   	struct nvm_tgt_dev *dev = pblk->dev;
+>   	struct nvm_geo *geo = &dev->geo;
+> @@ -635,24 +760,15 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
+>   	void *ppa_list, *meta_list;
+>   	struct bio *bio;
+>   	struct nvm_rq rqd;
+> +	u64 paddr = line->emeta_ssec;
+>   	dma_addr_t dma_ppa_list, dma_meta_list;
+>   	int min = pblk->min_write_pgs;
+>   	int left_ppas = lm->emeta_sec[0];
+> -	int id = line->id;
+> +	int line_id = line->id;
+>   	int rq_ppas, rq_len;
+> -	int cmd_op, bio_op;
+>   	int i, j;
+>   	int ret;
+>   
+> -	if (dir == PBLK_WRITE) {
+> -		bio_op = REQ_OP_WRITE;
+> -		cmd_op = NVM_OP_PWRITE;
+> -	} else if (dir == PBLK_READ) {
+> -		bio_op = REQ_OP_READ;
+> -		cmd_op = NVM_OP_PREAD;
+> -	} else
+> -		return -EINVAL;
+> -
+>   	meta_list = nvm_dev_dma_alloc(dev->parent, GFP_KERNEL,
+>   							&dma_meta_list);
+>   	if (!meta_list)
+> @@ -675,64 +791,43 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
+>   	}
+>   
+>   	bio->bi_iter.bi_sector = 0; /* internal bio */
+> -	bio_set_op_attrs(bio, bio_op, 0);
+> +	bio_set_op_attrs(bio, REQ_OP_READ, 0);
+>   
+>   	rqd.bio = bio;
+>   	rqd.meta_list = meta_list;
+>   	rqd.ppa_list = ppa_list;
+>   	rqd.dma_meta_list = dma_meta_list;
+>   	rqd.dma_ppa_list = dma_ppa_list;
+> -	rqd.opcode = cmd_op;
+> +	rqd.opcode = NVM_OP_PREAD;
+>   	rqd.nr_ppas = rq_ppas;
+>   
+> -	if (dir == PBLK_WRITE) {
+> -		struct pblk_sec_meta *meta_list = rqd.meta_list;
+> +	for (i = 0; i < rqd.nr_ppas; ) {
+> +		struct ppa_addr ppa = addr_to_gen_ppa(pblk, paddr, line_id);
+> +		int pos = pblk_ppa_to_pos(geo, ppa);
+>   
+> -		rqd.is_seq = 1;
+> -		for (i = 0; i < rqd.nr_ppas; ) {
+> -			spin_lock(&line->lock);
+> -			paddr = __pblk_alloc_page(pblk, line, min);
+> -			spin_unlock(&line->lock);
+> -			for (j = 0; j < min; j++, i++, paddr++) {
+> -				meta_list[i].lba = cpu_to_le64(ADDR_EMPTY);
+> -				rqd.ppa_list[i] =
+> -					addr_to_gen_ppa(pblk, paddr, id);
+> -			}
+> -		}
+> -	} else {
+> -		for (i = 0; i < rqd.nr_ppas; ) {
+> -			struct ppa_addr ppa = addr_to_gen_ppa(pblk, paddr, id);
+> -			int pos = pblk_ppa_to_pos(geo, ppa);
+> +		if (pblk_io_aligned(pblk, rq_ppas))
+> +			rqd.is_seq = 1;
+>   
+> -			if (pblk_io_aligned(pblk, rq_ppas))
+> -				rqd.is_seq = 1;
+> -
+> -			while (test_bit(pos, line->blk_bitmap)) {
+> -				paddr += min;
+> -				if (pblk_boundary_paddr_checks(pblk, paddr)) {
+> -					pblk_err(pblk, "corrupt emeta line:%d\n",
+> -								line->id);
+> -					bio_put(bio);
+> -					ret = -EINTR;
+> -					goto free_rqd_dma;
+> -				}
+> -
+> -				ppa = addr_to_gen_ppa(pblk, paddr, id);
+> -				pos = pblk_ppa_to_pos(geo, ppa);
+> -			}
+> -
+> -			if (pblk_boundary_paddr_checks(pblk, paddr + min)) {
+> -				pblk_err(pblk, "corrupt emeta line:%d\n",
+> -								line->id);
+> +		while (test_bit(pos, line->blk_bitmap)) {
+> +			paddr += min;
+> +			if (pblk_boundary_paddr_checks(pblk, paddr)) {
+>   				bio_put(bio);
+>   				ret = -EINTR;
+>   				goto free_rqd_dma;
+>   			}
+>   
+> -			for (j = 0; j < min; j++, i++, paddr++)
+> -				rqd.ppa_list[i] =
+> -					addr_to_gen_ppa(pblk, paddr, line->id);
+> +			ppa = addr_to_gen_ppa(pblk, paddr, line_id);
+> +			pos = pblk_ppa_to_pos(geo, ppa);
+>   		}
+> +
+> +		if (pblk_boundary_paddr_checks(pblk, paddr + min)) {
+> +			bio_put(bio);
+> +			ret = -EINTR;
+> +			goto free_rqd_dma;
+> +		}
+> +
+> +		for (j = 0; j < min; j++, i++, paddr++)
+> +			rqd.ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line_id);
+>   	}
+>   
+>   	ret = pblk_submit_io_sync(pblk, &rqd);
+> @@ -744,136 +839,19 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
+>   
+>   	atomic_dec(&pblk->inflight_io);
+>   
+> -	if (rqd.error) {
+> -		if (dir == PBLK_WRITE)
+> -			pblk_log_write_err(pblk, &rqd);
+> -		else
+> -			pblk_log_read_err(pblk, &rqd);
+> -	}
+> +	if (rqd.error)
+> +		pblk_log_read_err(pblk, &rqd);
+>   
+>   	emeta_buf += rq_len;
+>   	left_ppas -= rq_ppas;
+>   	if (left_ppas)
+>   		goto next_rq;
+> +
+>   free_rqd_dma:
+>   	nvm_dev_dma_free(dev->parent, rqd.meta_list, rqd.dma_meta_list);
+>   	return ret;
+>   }
+>   
+> -u64 pblk_line_smeta_start(struct pblk *pblk, struct pblk_line *line)
+> -{
+> -	struct nvm_tgt_dev *dev = pblk->dev;
+> -	struct nvm_geo *geo = &dev->geo;
+> -	struct pblk_line_meta *lm = &pblk->lm;
+> -	int bit;
+> -
+> -	/* This usually only happens on bad lines */
+> -	bit = find_first_zero_bit(line->blk_bitmap, lm->blk_per_line);
+> -	if (bit >= lm->blk_per_line)
+> -		return -1;
+> -
+> -	return bit * geo->ws_opt;
+> -}
+> -
+> -static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
+> -				     u64 paddr, int dir)
+> -{
+> -	struct nvm_tgt_dev *dev = pblk->dev;
+> -	struct pblk_line_meta *lm = &pblk->lm;
+> -	struct bio *bio;
+> -	struct nvm_rq rqd;
+> -	__le64 *lba_list = NULL;
+> -	int i, ret;
+> -	int cmd_op, bio_op;
+> -
+> -	if (dir == PBLK_WRITE) {
+> -		bio_op = REQ_OP_WRITE;
+> -		cmd_op = NVM_OP_PWRITE;
+> -		lba_list = emeta_to_lbas(pblk, line->emeta->buf);
+> -	} else if (dir == PBLK_READ_RECOV || dir == PBLK_READ) {
+> -		bio_op = REQ_OP_READ;
+> -		cmd_op = NVM_OP_PREAD;
+> -	} else
+> -		return -EINVAL;
+> -
+> -	memset(&rqd, 0, sizeof(struct nvm_rq));
+> -
+> -	rqd.meta_list = nvm_dev_dma_alloc(dev->parent, GFP_KERNEL,
+> -							&rqd.dma_meta_list);
+> -	if (!rqd.meta_list)
+> -		return -ENOMEM;
+> -
+> -	rqd.ppa_list = rqd.meta_list + pblk_dma_meta_size;
+> -	rqd.dma_ppa_list = rqd.dma_meta_list + pblk_dma_meta_size;
+> -
+> -	bio = bio_map_kern(dev->q, line->smeta, lm->smeta_len, GFP_KERNEL);
+> -	if (IS_ERR(bio)) {
+> -		ret = PTR_ERR(bio);
+> -		goto free_ppa_list;
+> -	}
+> -
+> -	bio->bi_iter.bi_sector = 0; /* internal bio */
+> -	bio_set_op_attrs(bio, bio_op, 0);
+> -
+> -	rqd.bio = bio;
+> -	rqd.opcode = cmd_op;
+> -	rqd.is_seq = 1;
+> -	rqd.nr_ppas = lm->smeta_sec;
+> -
+> -	for (i = 0; i < lm->smeta_sec; i++, paddr++) {
+> -		struct pblk_sec_meta *meta_list = rqd.meta_list;
+> -
+> -		rqd.ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line->id);
+> -
+> -		if (dir == PBLK_WRITE) {
+> -			__le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
+> -
+> -			meta_list[i].lba = lba_list[paddr] = addr_empty;
+> -		}
+> -	}
+> -
+> -	/*
+> -	 * This I/O is sent by the write thread when a line is replace. Since
+> -	 * the write thread is the only one sending write and erase commands,
+> -	 * there is no need to take the LUN semaphore.
+> -	 */
+> -	ret = pblk_submit_io_sync(pblk, &rqd);
+> -	if (ret) {
+> -		pblk_err(pblk, "smeta I/O submission failed: %d\n", ret);
+> -		bio_put(bio);
+> -		goto free_ppa_list;
+> -	}
+> -
+> -	atomic_dec(&pblk->inflight_io);
+> -
+> -	if (rqd.error) {
+> -		if (dir == PBLK_WRITE) {
+> -			pblk_log_write_err(pblk, &rqd);
+> -			ret = 1;
+> -		} else if (dir == PBLK_READ)
+> -			pblk_log_read_err(pblk, &rqd);
+> -	}
+> -
+> -free_ppa_list:
+> -	nvm_dev_dma_free(dev->parent, rqd.meta_list, rqd.dma_meta_list);
+> -
+> -	return ret;
+> -}
+> -
+> -int pblk_line_read_smeta(struct pblk *pblk, struct pblk_line *line)
+> -{
+> -	u64 bpaddr = pblk_line_smeta_start(pblk, line);
+> -
+> -	return pblk_line_submit_smeta_io(pblk, line, bpaddr, PBLK_READ_RECOV);
+> -}
+> -
+> -int pblk_line_read_emeta(struct pblk *pblk, struct pblk_line *line,
+> -			 void *emeta_buf)
+> -{
+> -	return pblk_line_submit_emeta_io(pblk, line, emeta_buf,
+> -						line->emeta_ssec, PBLK_READ);
+> -}
+> -
+>   static void pblk_setup_e_rq(struct pblk *pblk, struct nvm_rq *rqd,
+>   			    struct ppa_addr ppa)
+>   {
+> @@ -1102,7 +1080,7 @@ static int pblk_line_init_bb(struct pblk *pblk, struct pblk_line *line,
+>   	line->smeta_ssec = off;
+>   	line->cur_sec = off + lm->smeta_sec;
+>   
+> -	if (init && pblk_line_submit_smeta_io(pblk, line, off, PBLK_WRITE)) {
+> +	if (init && pblk_line_smeta_write(pblk, line, off)) {
+>   		pblk_debug(pblk, "line smeta I/O failed. Retry\n");
+>   		return 0;
+>   	}
+> diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
+> index 157c2567c9e8..189d92b58447 100644
+> --- a/drivers/lightnvm/pblk-gc.c
+> +++ b/drivers/lightnvm/pblk-gc.c
+> @@ -144,7 +144,7 @@ static __le64 *get_lba_list_from_emeta(struct pblk *pblk,
+>   	if (!emeta_buf)
+>   		return NULL;
+>   
+> -	ret = pblk_line_read_emeta(pblk, line, emeta_buf);
+> +	ret = pblk_line_emeta_read(pblk, line, emeta_buf);
+>   	if (ret) {
+>   		pblk_err(pblk, "line %d read emeta failed (%d)\n",
+>   				line->id, ret);
+> diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+> index cf629ab016ba..7b27e958dc8e 100644
+> --- a/drivers/lightnvm/pblk-recovery.c
+> +++ b/drivers/lightnvm/pblk-recovery.c
+> @@ -835,7 +835,7 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+>   			continue;
+>   
+>   		/* Lines that cannot be read are assumed as not written here */
+> -		if (pblk_line_read_smeta(pblk, line))
+> +		if (pblk_line_smeta_read(pblk, line))
+>   			continue;
+>   
+>   		crc = pblk_calc_smeta_crc(pblk, smeta_buf);
+> @@ -905,7 +905,7 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+>   		line->emeta = emeta;
+>   		memset(line->emeta->buf, 0, lm->emeta_len[0]);
+>   
+> -		if (pblk_line_read_emeta(pblk, line, line->emeta->buf)) {
+> +		if (pblk_line_emeta_read(pblk, line, line->emeta->buf)) {
+>   			pblk_recov_l2p_from_oob(pblk, line);
+>   			goto next;
+>   		}
+> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+> index 48b3035df3c4..a71f9847957b 100644
+> --- a/drivers/lightnvm/pblk.h
+> +++ b/drivers/lightnvm/pblk.h
+> @@ -782,6 +782,7 @@ void pblk_log_write_err(struct pblk *pblk, struct nvm_rq *rqd);
+>   void pblk_log_read_err(struct pblk *pblk, struct nvm_rq *rqd);
+>   int pblk_submit_io(struct pblk *pblk, struct nvm_rq *rqd);
+>   int pblk_submit_io_sync(struct pblk *pblk, struct nvm_rq *rqd);
+> +int pblk_submit_io_sync_sem(struct pblk *pblk, struct nvm_rq *rqd);
+
+I'll remove this from the patch and add to the next.
+
+>   int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line);
+>   struct bio *pblk_bio_map_addr(struct pblk *pblk, void *data,
+>   			      unsigned int nr_secs, unsigned int len,
+> @@ -806,8 +807,8 @@ void pblk_gen_run_ws(struct pblk *pblk, struct pblk_line *line, void *priv,
+>   		     void (*work)(struct work_struct *), gfp_t gfp_mask,
+>   		     struct workqueue_struct *wq);
+>   u64 pblk_line_smeta_start(struct pblk *pblk, struct pblk_line *line);
+> -int pblk_line_read_smeta(struct pblk *pblk, struct pblk_line *line);
+> -int pblk_line_read_emeta(struct pblk *pblk, struct pblk_line *line,
+> +int pblk_line_smeta_read(struct pblk *pblk, struct pblk_line *line);
+> +int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
+>   			 void *emeta_buf);
+>   int pblk_blk_erase_async(struct pblk *pblk, struct ppa_addr erase_ppa);
+>   void pblk_line_put(struct kref *ref);
+> 
+
+Thanks. Applied for 4.20. I think the split could be optimized quite a 
+bit with respect to complexity. Now a lot of very similar code is spread 
+across two functions. I may look into optimizing the request alloc path, 
+such that it not open coded in most places.
