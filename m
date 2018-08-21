@@ -1,53 +1,65 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it0-f68.google.com ([209.85.214.68]:51698 "EHLO
-        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728242AbeH2OGD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Aug 2018 10:06:03 -0400
-Received: by mail-it0-f68.google.com with SMTP id e14-v6so6879185itf.1
-        for <linux-block@vger.kernel.org>; Wed, 29 Aug 2018 03:09:53 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: igor.j.konopko@intel.com, marcin.dziegielewski@intel.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 2/3] lightnvm: do no update csecs and sos on 1.2
-Date: Wed, 29 Aug 2018 12:09:29 +0200
-Message-Id: <1535537370-10729-3-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1535537370-10729-1-git-send-email-javier@cnexlabs.com>
-References: <1535537370-10729-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH V3 1/2] blk-mq: init hctx sched after update ctx and hctx
+ mapping
+To: Jens Axboe <axboe@kernel.dk>
+Cc: tom.leiming@gmail.com, bart.vanassche@wdc.com, keith.busch@linux.intel.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1534749606-7311-1-git-send-email-jianchao.w.wang@oracle.com>
+ <1534749606-7311-2-git-send-email-jianchao.w.wang@oracle.com>
+ <048cdf08-6c9e-f54a-1e5c-f1d40fb2ecdb@kernel.dk>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <a9379a69-cfaf-56b5-9c2b-b4c4e35f6a67@oracle.com>
+Date: Tue, 21 Aug 2018 15:18:24 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <048cdf08-6c9e-f54a-1e5c-f1d40fb2ecdb@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-In the OCSSD 2.0 spec., the sector and metadata sizes are reported though
-the standard nvme identify command. Thus, the lightnvm subsystem needs
-to update this information on the geometry structure on bootup.
+Hi Jens
 
-Since 1.2 devices report these values on the OCSSD geometry identify,
-avoid this update is it is unnecessary and can also corrupt the geometry
-if the devices does not report the nvme sizes correctly (which is not
-required by the OCSSD 1.2 spec either)
+On 08/20/2018 10:45 PM, Jens Axboe wrote:
+> On 8/20/18 1:20 AM, Jianchao Wang wrote:
+>> @@ -2913,6 +2906,29 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+>>  	list_for_each_entry(q, &set->tag_list, tag_set_list)
+>>  		blk_mq_freeze_queue(q);
+>>  
+>> +	/*
+>> +	 * switch io scheduler to NULL to clean up the data in it.
+>> +	 * will get it back after update mapping between cpu and hw queues.
+>> +	 */
+> 
+> "Switch IO scheduler to 'none', cleaning up the data associated with
+> the previous scheduler. We'll switch back once we're done updating
+> the new sw to hw queue mappings.
+> 
+>> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+>> +		if (!q->elevator) {
+>> +			q->elv_type = NULL;
+>> +			continue;
+>> +		}
+>> +		q->elv_type = q->elevator->type;
+>> +		mutex_lock(&q->sysfs_lock);
+>> +		/*
+>> +		 * After elevator_switch_mq, the previous elevator_queue will be
+>> +		 * released by elevator_release. The reference of the io scheduler
+>> +		 * module get by elevator_get will also be put. So we need to get
+>> +		 * a reference of the io scheduler module here to prevent it to be
+>> +		 * removed.
+>> +		 */
+>> +		__module_get(q->elv_type->elevator_owner);
+>> +		elevator_switch_mq(q, NULL);
+>> +		mutex_unlock(&q->sysfs_lock);
+>> +	}
+> 
+> I don't hate this, but I also find it pretty annoying to put local state
+> into the queue itself. It would be much nicer _not_ to have ->elv_type
+> in the queue itself. That would need an allocation, however...
+> 
+> Apart from those two things, looks fine to me.
+> 
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/nvme/host/lightnvm.c | 3 +++
- 1 file changed, 3 insertions(+)
+Thanks very much for your comment.
+I have reworked this patch based on your kindly suggestion and posted the V4.
 
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index 5bfa354c5dd5..33ed09f8410e 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -980,6 +980,9 @@ void nvme_nvm_update_nvm_info(struct nvme_ns *ns)
- 	struct nvm_dev *ndev = ns->ndev;
- 	struct nvm_geo *geo = &ndev->geo;
- 
-+	if (geo->version == NVM_OCSSD_SPEC_12)
-+		return;
-+
- 	geo->csecs = 1 << ns->lba_shift;
- 	geo->sos = ns->ms;
- }
--- 
-2.7.4
+Thanks
+Jianchao
