@@ -1,48 +1,100 @@
-Return-Path: <javier@javigon.com>
-Return-Path: <javier@javigon.com>
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	=?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [V4 PATCH 0/2] lightnvm: pblk: take write semaphore on metadata
-Date: Wed, 29 Aug 2018 10:56:17 +0200
-Message-Id: <1535532980-27672-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <ulf.hansson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20180821120555.11941-1-adrian.hunter@intel.com>
+References: <20180821120555.11941-1-adrian.hunter@intel.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Tue, 21 Aug 2018 16:19:17 +0200
+Message-ID: <CAPDyKFqs3vKN4Xm7ZxaUuXjmhPBeQ9_pbb_3+gBkrOm7=fXUhA@mail.gmail.com>
+Subject: Re: [PATCH] mmc: block: Fix unsupported parallel dispatch of requests
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>, Peter Geis <pgwipeout@gmail.com>,
+	Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-# Changes since V3:
-  - Encapsulate rqd dma allocations to reduce code replication (by Matias)
+On 21 August 2018 at 14:05, Adrian Hunter <adrian.hunter@intel.com> wrote:
+> The mmc block driver does not support parallel dispatch of requests. In
+> normal circumstances, all requests are anyway funneled through a single
+> work item, so parallel dispatch never happens. However it can happen if
+> there is no elevator.
+>
+> Fix that by detecting if a dispatch is in progress and returning busy
+> (BLK_STS_RESOURCE) in that case
+>
+> Fixes: 81196976ed94 ("mmc: block: Add blk-mq support")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 
-# Changes since V2:
-  - Split the original patch between the metadata refactoring and the
-    semaphore logic. This simplifies the write path, where the semaphore
-    is taken.
+Thanks, applied for fixes!
 
-# Changes singe V1:
-  - Fix double I/O on the read path (by Matias)
-    - Improve commit message (by Jens)
+Kind regards
+Uffe
 
-    This patchset refactors the metadata separate write and read paths,
-    which simplifies how the semaphore is taken for writes.
-
-    Thanks,
-    Javier
-
-Javier González (3):
-  lightnvm: pblk: refactor metadata paths
-  lightnvm: encapsule rqd dma allocations
-  lightnvm: pblk: take write semaphore on metadata
-
- drivers/lightnvm/pblk-core.c     | 377 ++++++++++++++++++++-------------------
- drivers/lightnvm/pblk-gc.c       |   2 +-
- drivers/lightnvm/pblk-read.c     |  35 ++--
- drivers/lightnvm/pblk-recovery.c |  33 ++--
- drivers/lightnvm/pblk-write.c    |  15 +-
- drivers/lightnvm/pblk.h          |   8 +-
- 6 files changed, 230 insertions(+), 240 deletions(-)
-
--- 
-2.7.4
+> ---
+>  drivers/mmc/core/queue.c | 12 +++++++-----
+>  drivers/mmc/core/queue.h |  1 +
+>  2 files changed, 8 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+> index 648eb6743ed5..6edffeed9953 100644
+> --- a/drivers/mmc/core/queue.c
+> +++ b/drivers/mmc/core/queue.c
+> @@ -238,10 +238,6 @@ static void mmc_mq_exit_request(struct blk_mq_tag_set *set, struct request *req,
+>         mmc_exit_request(mq->queue, req);
+>  }
+>
+> -/*
+> - * We use BLK_MQ_F_BLOCKING and have only 1 hardware queue, which means requests
+> - * will not be dispatched in parallel.
+> - */
+>  static blk_status_t mmc_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
+>                                     const struct blk_mq_queue_data *bd)
+>  {
+> @@ -264,7 +260,7 @@ static blk_status_t mmc_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
+>
+>         spin_lock_irq(q->queue_lock);
+>
+> -       if (mq->recovery_needed) {
+> +       if (mq->recovery_needed || mq->busy) {
+>                 spin_unlock_irq(q->queue_lock);
+>                 return BLK_STS_RESOURCE;
+>         }
+> @@ -291,6 +287,9 @@ static blk_status_t mmc_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
+>                 break;
+>         }
+>
+> +       /* Parallel dispatch of requests is not supported at the moment */
+> +       mq->busy = true;
+> +
+>         mq->in_flight[issue_type] += 1;
+>         get_card = (mmc_tot_in_flight(mq) == 1);
+>         cqe_retune_ok = (mmc_cqe_qcnt(mq) == 1);
+> @@ -333,9 +332,12 @@ static blk_status_t mmc_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
+>                 mq->in_flight[issue_type] -= 1;
+>                 if (mmc_tot_in_flight(mq) == 0)
+>                         put_card = true;
+> +               mq->busy = false;
+>                 spin_unlock_irq(q->queue_lock);
+>                 if (put_card)
+>                         mmc_put_card(card, &mq->ctx);
+> +       } else {
+> +               WRITE_ONCE(mq->busy, false);
+>         }
+>
+>         return ret;
+> diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
+> index 17e59d50b496..9bf3c9245075 100644
+> --- a/drivers/mmc/core/queue.h
+> +++ b/drivers/mmc/core/queue.h
+> @@ -81,6 +81,7 @@ struct mmc_queue {
+>         unsigned int            cqe_busy;
+>  #define MMC_CQE_DCMD_BUSY      BIT(0)
+>  #define MMC_CQE_QUEUE_FULL     BIT(1)
+> +       bool                    busy;
+>         bool                    use_cqe;
+>         bool                    recovery_needed;
+>         bool                    in_recovery;
+> --
+> 2.17.1
+>
