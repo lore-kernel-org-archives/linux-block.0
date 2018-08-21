@@ -1,81 +1,35 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: tom.leiming@gmail.com, bart.vanassche@wdc.com, keith.busch@linux.intel.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH V3 2/2] blk-mq: sync the update nr_hw_queues with blk_mq_queue_tag_busy_iter
-Date: Mon, 20 Aug 2018 15:20:06 +0800
-Message-Id: <1534749606-7311-3-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1534749606-7311-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1534749606-7311-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block/DAC960.c: make some arrays static const, shrinks
+ object size
+To: Colin King <colin.king@canonical.com>, linux-block@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20180821091248.8669-1-colin.king@canonical.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <cbe876ce-8f1f-1dc3-86fb-b26278277312@kernel.dk>
+Date: Tue, 21 Aug 2018 11:00:49 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180821091248.8669-1-colin.king@canonical.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-For blk-mq, part_in_flight/rw will invoke blk_mq_in_flight/rw to
-account the inflight requests. It will access the queue_hw_ctx and
-nr_hw_queues w/o any protection. When updating nr_hw_queues and
-blk_mq_in_flight/rw occur concurrently, panic comes up.
+On 8/21/18 3:12 AM, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
+> 
+> Don't populate the arrays ReadCacheStatus, WriteCacheStatus and
+> SenseErrors on the stack but instead make them static const. Makes
+> the object code smaller by 47 bytes:
+> 
+> Before:
+>    text	   data	    bss	    dec	    hex	filename
+>  160974	  34628	    832	 196434	  2ff52	drivers/block/DAC960.o
+> 
+> After:
+>    text	   data	    bss	    dec	    hex	filename
+>  160671	  34884	    832	 196387	  2ff23	drivers/block/DAC960.o
+> 
+> (gcc version 8.2.0 x86_64)
 
-Before update nr_hw_queues, the q will be frozen. So we could use
-q_usage_counter to avoid the race. percpu_ref_is_zero is used here
-so that we will not miss any in-flight request. The access to
-nr_hw_queues and queue_hw_ctx in blk_mq_queue_tag_busy_iter are
-under rcu critical section, __blk_mq_update_nr_hw_queues could use
-synchronize_rcu to ensure the zeroed q_usage_counter to be globally
-visible.
+Applied, thanks.
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
----
- block/blk-mq-tag.c | 14 +++++++++++++-
- block/blk-mq.c     |  5 ++++-
- 2 files changed, 17 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index c0c4e63..8c5cc11 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -320,6 +320,18 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
- 	struct blk_mq_hw_ctx *hctx;
- 	int i;
- 
-+	/*
-+	 * __blk_mq_update_nr_hw_queues will update the nr_hw_queues and
-+	 * queue_hw_ctx after freeze the queue. So we could use q_usage_counter
-+	 * to avoid race with it. __blk_mq_update_nr_hw_queues will users
-+	 * synchronize_rcu to ensure all of the users go out of the critical
-+	 * section below and see zeroed q_usage_counter.
-+	 */
-+	rcu_read_lock();
-+	if (percpu_ref_is_zero(&q->q_usage_counter)) {
-+		rcu_read_unlock();
-+		return;
-+	}
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		struct blk_mq_tags *tags = hctx->tags;
-@@ -335,7 +347,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
- 			bt_for_each(hctx, &tags->breserved_tags, fn, priv, true);
- 		bt_for_each(hctx, &tags->bitmap_tags, fn, priv, false);
- 	}
--
-+	rcu_read_unlock();
- }
- 
- static int bt_alloc(struct sbitmap_queue *bt, unsigned int depth,
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 7b99477..fb56bae 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2905,7 +2905,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 
- 	list_for_each_entry(q, &set->tag_list, tag_set_list)
- 		blk_mq_freeze_queue(q);
--
-+	/*
-+	 * Sync with blk_mq_in_flight and blk_mq_queue_tag_busy_iter.
-+	 */
-+	synchronize_rcu();
- 	/*
- 	 * switch io scheduler to NULL to clean up the data in it.
- 	 * will get it back after update mapping between cpu and hw queues.
 -- 
-2.7.4
+Jens Axboe
