@@ -1,48 +1,81 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:48332 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727466AbeHVVMY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Aug 2018 17:12:24 -0400
-From: Coly Li <colyli@suse.de>
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
 To: axboe@kernel.dk
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Shan Hai <shan.hai@oracle.com>, Coly Li <colyli@suse.de>,
-        stable@vger.kernel.org
-Subject: [PATCH] bcache: release dc->writeback_lock properly in bch_writeback_thread()
-Date: Thu, 23 Aug 2018 01:46:14 +0800
-Message-Id: <20180822174614.15483-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Cc: tom.leiming@gmail.com, bart.vanassche@wdc.com, keith.busch@linux.intel.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH V4 2/2] blk-mq: sync the update nr_hw_queues with blk_mq_queue_tag_busy_iter
+Date: Tue, 21 Aug 2018 15:15:04 +0800
+Message-Id: <1534835704-3607-3-git-send-email-jianchao.w.wang@oracle.com>
+In-Reply-To: <1534835704-3607-1-git-send-email-jianchao.w.wang@oracle.com>
+References: <1534835704-3607-1-git-send-email-jianchao.w.wang@oracle.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shan Hai <shan.hai@oracle.com>
+For blk-mq, part_in_flight/rw will invoke blk_mq_in_flight/rw to
+account the inflight requests. It will access the queue_hw_ctx and
+nr_hw_queues w/o any protection. When updating nr_hw_queues and
+blk_mq_in_flight/rw occur concurrently, panic comes up.
 
-The writeback thread would exit with a lock held when the cache device is
-detached via sysfs interface, fix it by releasing the held lock before exiting
-the while-loop.
+Before update nr_hw_queues, the q will be frozen. So we could use
+q_usage_counter to avoid the race. percpu_ref_is_zero is used here
+so that we will not miss any in-flight request. The access to
+nr_hw_queues and queue_hw_ctx in blk_mq_queue_tag_busy_iter are
+under rcu critical section, __blk_mq_update_nr_hw_queues could use
+synchronize_rcu to ensure the zeroed q_usage_counter to be globally
+visible.
 
-Signed-off-by: Shan Hai <shan.hai@oracle.com>
-Signed-off-by: Coly Li <colyli@suse.de>
-Tested-by: Shenghui Wang <shhuiw@foxmail.com>
-Cc: stable@vger.kernel.org #4.17+
+Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/writeback.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ block/blk-mq-tag.c | 14 +++++++++++++-
+ block/blk-mq.c     |  4 ++++
+ 2 files changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 6be05bd7ca67..08c3a9f9676c 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -685,8 +685,10 @@ static int bch_writeback_thread(void *arg)
- 			 * data on cache. BCACHE_DEV_DETACHING flag is set in
- 			 * bch_cached_dev_detach().
- 			 */
--			if (test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags))
-+			if (test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags)) {
-+				up_write(&dc->writeback_lock);
- 				break;
-+			}
- 		}
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index c0c4e63..8c5cc11 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -320,6 +320,18 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i;
  
- 		up_write(&dc->writeback_lock);
++	/*
++	 * __blk_mq_update_nr_hw_queues will update the nr_hw_queues and
++	 * queue_hw_ctx after freeze the queue. So we could use q_usage_counter
++	 * to avoid race with it. __blk_mq_update_nr_hw_queues will users
++	 * synchronize_rcu to ensure all of the users go out of the critical
++	 * section below and see zeroed q_usage_counter.
++	 */
++	rcu_read_lock();
++	if (percpu_ref_is_zero(&q->q_usage_counter)) {
++		rcu_read_unlock();
++		return;
++	}
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		struct blk_mq_tags *tags = hctx->tags;
+@@ -335,7 +347,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+ 			bt_for_each(hctx, &tags->breserved_tags, fn, priv, true);
+ 		bt_for_each(hctx, &tags->bitmap_tags, fn, priv, false);
+ 	}
+-
++	rcu_read_unlock();
+ }
+ 
+ static int bt_alloc(struct sbitmap_queue *bt, unsigned int depth,
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 9c8c8c7..81cb84b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2977,6 +2977,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list)
+ 		blk_mq_freeze_queue(q);
+ 	/*
++	 * Sync with blk_mq_queue_tag_busy_iter.
++	 */
++	synchronize_rcu();
++	/*
+ 	 * Switch IO scheduler to 'none', cleaning up the data associated
+ 	 * with the previous scheduler. We will switch back once we are done
+ 	 * updating the new sw to hw queue mappings.
 -- 
-2.18.0
+2.7.4
