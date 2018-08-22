@@ -1,71 +1,88 @@
-Return-Path: <massimo@burcheri.de>
-Message-ID: <1535092156.11909.8.camel@burcheri.de>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: MQ-BFQ crashing on battery mode
-From: Massimo Burcheri <massimo@burcheri.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, Omar
- Sandoval <osandov@osandov.com>
-In-Reply-To: <a43c5bdd-06ec-ae23-ebd3-bda8c0ea4f5c@kernel.dk>
+To: Massimo Burcheri <massimo@burcheri.de>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Omar Sandoval <osandov@osandov.com>
 References: <1534926011.18658.29.camel@burcheri.de>
-	 <a43c5bdd-06ec-ae23-ebd3-bda8c0ea4f5c@kernel.dk>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-	protocol="application/pgp-signature"; boundary="=-g/wU6nwrQoj7I+d5cqX4"
-Date: Fri, 24 Aug 2018 08:29:16 +0200
-Mime-Version: 1.0
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <a43c5bdd-06ec-ae23-ebd3-bda8c0ea4f5c@kernel.dk>
+Date: Wed, 22 Aug 2018 11:42:00 -0600
+MIME-Version: 1.0
+In-Reply-To: <1534926011.18658.29.camel@burcheri.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
+On 8/22/18 2:20 AM, Massimo Burcheri wrote:
+> Hello,
+> 
+> 
+> I got a kernel trace when unplugging the power supply, switching to battery
+> mode. I get the same kernel trace when booting on battery.
+> Both making the system unusable or breaking the boot.
+> 
+> The kernel call trace with symbols:
+> 
+> ? blk_mq_requeue_request+0x...
+> ? __scsi_queue_insert+0x...
+> ? ata_scsi_var_len_cdb_xlat+0x
+> ? __blk_mq_complete_request+0x...
+> ? ata_scsi_translate+0x...
+> ? ata_scsi_queuecmd+0x...
+> ? scsi_dispatch_cmd+0x...
+> ? scsi_queue_rq+0x...
+> ? blk_mq_dispatch_rq_list+0x...
+> ? kyber_dispatch_cur_domain+0x...
+> ? kyber_completed_request+0x...
+> ? blk_mq_sched_dispatch_requests+0x...
+> ? __ blk_mq_run_hw_queue+0x...
+> ? __blk_mq_delay_run_hw_queue+0x...
+> ? blk_mq_run_hw_queue+0x...
+> ? blk_mq_run_hw_queues+0x...
+> ? blk_mq_requeue_work+0x...
+> ? process_one_work+0x...
+> ? worker_thread+0x...
+> ? process_one_work+0x...
+> ? kthread+0x...
+> ? kthread_flush_work_fn+0x...
+> ? ret_from_fork+0x...
+> Code: ...
+> RIP: sbitmap_queue_clear+0x...
+> 
+> Screenshot: 	https://ibin.co/4D34Ej3DWsqI.jpg
+> Kernel config: 	https://bpaste.net/show/870004e55123
+> 
+> Kernel: 4.17.11-ck
+> 
+> Setup:
+> 
+> btrfs-on-bcache-on-luks
+> btrfs options (rw,noatime,nodiratime,compress-
+> force=lzo,nossd,noacl,space_cache,autodefrag)
+> 
+> Using mq bfq scheduler for the hdd backing and kyber for the ssd caching device
+> 
+> 
+> Failed tests:
+> Tested many kernel down to 4.13.2 with Gentoo or Ck patchset. Sorry for not
+> including the vanilla sources in the test, I can provide if required.
+> Skipping services in the boot process didn't help, any next service leads to the
+> same trace.
+> Switching off the laptop-mode-tools daemon didn't help.
+> Switching all devices to "none" scheduler did not help.
 
---=-g/wU6nwrQoj7I+d5cqX4
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Any chance you can try 4.18 at least?
 
-On Wed, 2018-08-22 at 11:42 -0600, Jens Axboe wrote:
-> Any chance you can try 4.18 at least?
+> Workaround:
+> After some tests and due to the *mq* call stack I was able to workaround by
+> disabling CONFIG_SCSI_MQ_DEFAULT and CONFIG_DM_MQ_DEFAULT and switching all
+> devices to cfq scheduler.
+> However with the MQ enabled kernel, only bfq, kyber and none are possible, while
+> the non-mq kernel can only set cfq. I guess this is intentional as the current
+> bfq implementation is a MQ only version and CFQ is a non-mq only version?
 
-Of course, I tried the kernel.org sources now, sys-kernel/vanilla-sources-4=
-.18.3=20
-on Gentoo. The issue is the same.
+Schedulers are specific to the queuing infrastructure, so certain types
+will only be available with MQ and certain types will only be available
+on !MQ.
 
-I wonder that nobody has noticed that issue that I can reproduce on many ke=
-rnels
-since 4.13 or even older. Is it a rare combination with my bcache, luks or
-btrfs? Or hardware specific? Or scheduler specific, as even BFQ is not that=
- well
-tested on btrfs like the default one.
-
-> Schedulers are specific to the queuing infrastructure, so certain types
-> will only be available with MQ and certain types will only be available
-> on !MQ.
-
-I noticed that. It's just a bit intransparent from the menuconfig, options =
-don't
-mention if a scheduler is working on MQ or not, like CONFIG_IOSCHED_BFQ.
-There it's written in the description, while CONFIG_MQ_IOSCHED_KYBER has th=
-e
-note in the name.
-Actually MQ schedulers could depend on BLK_MQ to make it obvious.
-
-Best regards,
-Massimo
---=-g/wU6nwrQoj7I+d5cqX4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEjdL61EKP3VOAA+I8lQj3p5VSZjIFAlt/pbwACgkQlQj3p5VS
-ZjLVbhAAiSmWLiGV5zu+M11FU6Z4W5Emdl6fZHJG9w424mH/7A0hRwgpVup79uJ3
-nHW7W/oZMc5g3dshJ6raZICSiEnWc4ichvgXcTIY5jNQdmntG1KstFszucT8z7iP
-MC5NfteTJGjgvH//INcIkId71d8BFbynqUNZA8uYGsNrq8i1IjTYb3VIhtnafGWf
-dei2cKwGhFVKA7vOZkSRaD/u1eR7lKfoLewUuVC09ufVrKlkiAZ1fEEUc0RL6UZ9
-/LGkBwoywBGSaLfIk306P3mWfJN4Bc+X2qO/N3Nqq1f4jbtG+7NYnGhi+t9+1zXu
-/0/GxnGJ8OAwd4i83bMwahaYNu3/5Zqe6/UlU3Vq5/UHWdjTyFoWYs29IA6cL+Kg
-65+h6YQ8hY78pvhnicH756+OGkf40rr+NIwzAZZ4nqfFiLn/lzJlVQcP4E9bY5ni
-XTDUfprpeAUDeuFtD9gDtdm523dKXXsKcDOMJGpeeIJgDwagG/g8QuOrr0xFkQ+c
-5m3BxGAdTBQeSbjxh34Av53sK8CRr7mm8bYNYepBXpYnfTMzrtfKzRRoqcr3Dv7E
-HnHk12l3SeyljRpmfQ9UtkrAIyjW0PbVwu7B3WekFV5Sh6NO1tTYJXj0MBzCJGov
-aTbBA0uD7jgQta6SrHlWk9Z65YtI4Ax5eI6H4sU25rmGSAf11mQ=
-=vvfj
------END PGP SIGNATURE-----
-
---=-g/wU6nwrQoj7I+d5cqX4--
+-- 
+Jens Axboe
