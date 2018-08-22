@@ -1,8 +1,7 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <holger@applied-asynchrony.com>
 Subject: Re: [PATCH] blk-wbt: Avoid lock contention and thundering herd issue
  in wbt_wait
-To: =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>,
- Anchal Agarwal <anchalag@amazon.com>
+To: Jens Axboe <axboe@kernel.dk>, Anchal Agarwal <anchalag@amazon.com>
 Cc: fllinden@amazon.com, sblbir@amazon.com, msw@amazon.com,
  linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <6bab69c9-b787-b12f-7738-72e05bf74444@kernel.dk>
@@ -17,32 +16,27 @@ References: <6bab69c9-b787-b12f-7738-72e05bf74444@kernel.dk>
  <b2adf708-d396-94ac-b123-8027d3839fd1@kernel.dk>
  <20180822040126.GA18736@kaos-source-ops-60001.pdx1.amazon.com>
  <76ecb022-f167-67eb-8801-111fc209bbaa@kernel.dk>
- <834649ab-62d6-bc7f-ec60-6c1654ea3f26@applied-asynchrony.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <d8c171ce-6dfe-e9e5-5673-8443cfec5f01@kernel.dk>
-Date: Wed, 22 Aug 2018 08:27:04 -0600
+From: =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
+Message-ID: <834649ab-62d6-bc7f-ec60-6c1654ea3f26@applied-asynchrony.com>
+Date: Wed, 22 Aug 2018 14:54:15 +0200
 MIME-Version: 1.0
-In-Reply-To: <834649ab-62d6-bc7f-ec60-6c1654ea3f26@applied-asynchrony.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <76ecb022-f167-67eb-8801-111fc209bbaa@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On 8/22/18 6:54 AM, Holger Hoffstätte wrote:
-> On 08/22/18 06:10, Jens Axboe wrote:
->> [...]
->> If you have time, please look at the 3 patches I posted earlier today.
->> Those are for mainline, so should be OK :-)
-> 
-> I'm just playing along at home but with those 3 I get repeatable
-> hangs & writeback not starting at all, but curiously *only* on my btrfs
-> device; for inexplicable reasons some other devices with ext4/xfs flush
-> properly. Yes, that surprised me too, but it's repeatable.
-> Now this may or may not have something to do with some of my in-testing
-> patches for btrfs itself, but if I remove those 3 wbt fixes, everything
-> is golden again. Not eager to repeat since it hangs sync & requires a
-> hard reboot.. :(
-> Just thought you'd like to know.
+On 08/22/18 06:10, Jens Axboe wrote:
+> [...]
+> If you have time, please look at the 3 patches I posted earlier today.
+> Those are for mainline, so should be OK :-)
 
-Thanks, that's very useful info! I'll see if I can reproduce that.
+I'm just playing along at home but with those 3 I get repeatable
+hangs & writeback not starting at all, but curiously *only* on my btrfs
+device; for inexplicable reasons some other devices with ext4/xfs flush
+properly. Yes, that surprised me too, but it's repeatable.
+Now this may or may not have something to do with some of my in-testing
+patches for btrfs itself, but if I remove those 3 wbt fixes, everything
+is golden again. Not eager to repeat since it hangs sync & requires a
+hard reboot.. :(
+Just thought you'd like to know.
 
--- 
-Jens Axboe
+-h
