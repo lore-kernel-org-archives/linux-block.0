@@ -1,172 +1,92 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:33720 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727877AbeH2QUg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Aug 2018 12:20:36 -0400
-Received: by mail-ed1-f67.google.com with SMTP id h9-v6so3783916edr.0
-        for <linux-block@vger.kernel.org>; Wed, 29 Aug 2018 05:23:55 -0700 (PDT)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Javier Gonzales <javier@cnexlabs.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH 3/7] lightnvm: pblk: allocate line map bitmaps using a mempool
-Date: Wed, 29 Aug 2018 14:23:30 +0200
-Message-Id: <1535545414-550-4-git-send-email-hans.ml.holmberg@owltronix.com>
-In-Reply-To: <1535545414-550-1-git-send-email-hans.ml.holmberg@owltronix.com>
-References: <1535545414-550-1-git-send-email-hans.ml.holmberg@owltronix.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+Date: Wed, 22 Aug 2018 14:47:09 +0200
+From: Jan Kara <jack@suse.cz>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jan Kara <jack@suse.cz>, Martin Wilck <mwilck@suse.com>,
+	Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.com>,
+	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Kent Overstreet <kent.overstreet@gmail.com>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH v5 3/3] block: bio_iov_iter_get_pages: pin more pages for
+ multi-segment IOs
+Message-ID: <20180822124709.GC23037@quack2.suse.cz>
+References: <20180725211509.13592-1-mwilck@suse.com>
+ <20180725211509.13592-4-mwilck@suse.com>
+ <20180730123715.GC6972@ming.t460p>
+ <2e2a6a0854156a33b1866c02f2ac5c455216efac.camel@suse.com>
+ <20180822103305.GA23037@quack2.suse.cz>
+ <20180822105046.GA3272@ming.t460p>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180822105046.GA3272@ming.t460p>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+On Wed 22-08-18 18:50:53, Ming Lei wrote:
+> On Wed, Aug 22, 2018 at 12:33:05PM +0200, Jan Kara wrote:
+> > On Wed 22-08-18 10:02:49, Martin Wilck wrote:
+> > > On Mon, 2018-07-30 at 20:37 +0800, Ming Lei wrote:
+> > > > On Wed, Jul 25, 2018 at 11:15:09PM +0200, Martin Wilck wrote:
+> > > > > 
+> > > > > +/**
+> > > > > + * bio_iov_iter_get_pages - pin user or kernel pages and add them
+> > > > > to a bio
+> > > > > + * @bio: bio to add pages to
+> > > > > + * @iter: iov iterator describing the region to be mapped
+> > > > > + *
+> > > > > + * Pins pages from *iter and appends them to @bio's bvec array.
+> > > > > The
+> > > > > + * pages will have to be released using put_page() when done.
+> > > > > + * The function tries, but does not guarantee, to pin as many
+> > > > > pages as
+> > > > > + * fit into the bio, or are requested in *iter, whatever is
+> > > > > smaller.
+> > > > > + * If MM encounters an error pinning the requested pages, it
+> > > > > stops.
+> > > > > + * Error is returned only if 0 pages could be pinned.
+> > > > > + */
+> > > > > +int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+> > > > > +{
+> > > > > +	unsigned short orig_vcnt = bio->bi_vcnt;
+> > > > > +
+> > > > > +	do {
+> > > > > +		int ret = __bio_iov_iter_get_pages(bio, iter);
+> > > > > +
+> > > > > +		if (unlikely(ret))
+> > > > > +			return bio->bi_vcnt > orig_vcnt ? 0 : ret;
+> > > > > +
+> > > > > +	} while (iov_iter_count(iter) && !bio_full(bio));
+> > > > 
+> > > > When 'ret' isn't zero, and some partial progress has been made, seems
+> > > > less pages
+> > > > might be obtained than requested too. Is that something we need to
+> > > > worry about?
+> > > 
+> > > This would be the case when VM isn't willing or able to fulfill the
+> > > page-pinning request. Previously, we came to the conclusion that VM has
+> > > the right to do so. This is the reason why callers have to check the
+> > > number of pages allocated, and either loop over
+> > > bio_iov_iter_get_pages(), or fall back to buffered I/O, until all pages
+> > > have been obtained. All callers except the blockdev fast path do the
+> > > former. 
+> > > 
+> > > We could add looping in __blkdev_direct_IO_simple() on top of the
+> > > current patch set, to avoid fallback to buffered IO in this corner
+> > > case. Should we? If yes, only for WRITEs, or for READs as well?
+> > > 
+> > > I haven't encountered this situation in my tests, and I'm unsure how to
+> > > provoke it - run a direct IO test under high memory pressure?
+> > 
+> > Currently, iov_iter_get_pages() is always guaranteed to get at least one
+> > page as that is current guarantee of get_user_pages() (unless we hit
+> > EFAULT obviously). So bio_iov_iter_get_pages() as is now is guaranteed to
+> 
+> Is it possible for this EFAULT to happen on the user-space VM?
 
-Line map bitmap allocations are fairly large and can fail. Allocation
-failures are fatal to pblk, stoping the write pipeline. To avoid this,
-allocate the bitmaps using a mempool instead.
+Certainly if the user passes bogus address...
 
-Mempool allocations never fail if called from a process context,
-and pblk *should* only allocate map bitmaps in process context,
-but keep the failure handling for robustness sake.
+									Honza
 
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
----
- drivers/lightnvm/pblk-core.c     | 22 +++++++++++++++-------
- drivers/lightnvm/pblk-init.c     | 18 ++++++++++++++++++
- drivers/lightnvm/pblk-recovery.c |  2 +-
- drivers/lightnvm/pblk.h          |  4 ++++
- 4 files changed, 38 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 36ac9eff8ebd..a1033d82b9cc 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1049,15 +1049,18 @@ static int pblk_line_init_metadata(struct pblk *pblk, struct pblk_line *line,
- static int pblk_line_alloc_bitmaps(struct pblk *pblk, struct pblk_line *line)
- {
- 	struct pblk_line_meta *lm = &pblk->lm;
-+	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
- 
--	line->map_bitmap = kzalloc(lm->sec_bitmap_len, GFP_KERNEL);
-+	line->map_bitmap = mempool_alloc(l_mg->bitmap_pool, GFP_KERNEL);
- 	if (!line->map_bitmap)
- 		return -ENOMEM;
- 
-+	memset(line->map_bitmap, 0, lm->sec_bitmap_len);
-+
- 	/* will be initialized using bb info from map_bitmap */
--	line->invalid_bitmap = kmalloc(lm->sec_bitmap_len, GFP_KERNEL);
-+	line->invalid_bitmap = mempool_alloc(l_mg->bitmap_pool, GFP_KERNEL);
- 	if (!line->invalid_bitmap) {
--		kfree(line->map_bitmap);
-+		mempool_free(line->map_bitmap, l_mg->bitmap_pool);
- 		line->map_bitmap = NULL;
- 		return -ENOMEM;
- 	}
-@@ -1243,7 +1246,9 @@ int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line)
- 
- void pblk_line_recov_close(struct pblk *pblk, struct pblk_line *line)
- {
--	kfree(line->map_bitmap);
-+	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
-+
-+	mempool_free(line->map_bitmap, l_mg->bitmap_pool);
- 	line->map_bitmap = NULL;
- 	line->smeta = NULL;
- 	line->emeta = NULL;
-@@ -1261,8 +1266,11 @@ static void pblk_line_reinit(struct pblk_line *line)
- 
- void pblk_line_free(struct pblk_line *line)
- {
--	kfree(line->map_bitmap);
--	kfree(line->invalid_bitmap);
-+	struct pblk *pblk = line->pblk;
-+	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
-+
-+	mempool_free(line->map_bitmap, l_mg->bitmap_pool);
-+	mempool_free(line->invalid_bitmap, l_mg->bitmap_pool);
- 
- 	pblk_line_reinit(line);
- }
-@@ -1741,7 +1749,7 @@ void pblk_line_close(struct pblk *pblk, struct pblk_line *line)
- 
- 	list_add_tail(&line->list, move_list);
- 
--	kfree(line->map_bitmap);
-+	mempool_free(line->map_bitmap, l_mg->bitmap_pool);
- 	line->map_bitmap = NULL;
- 	line->smeta = NULL;
- 	line->emeta = NULL;
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 8adc8ac8b03c..76a4a271b9cf 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -498,6 +498,9 @@ static void pblk_line_mg_free(struct pblk *pblk)
- 		pblk_mfree(l_mg->eline_meta[i]->buf, l_mg->emeta_alloc_type);
- 		kfree(l_mg->eline_meta[i]);
- 	}
-+
-+	mempool_destroy(l_mg->bitmap_pool);
-+	kmem_cache_destroy(l_mg->bitmap_cache);
- }
- 
- static void pblk_line_meta_free(struct pblk_line_mgmt *l_mg,
-@@ -797,6 +800,17 @@ static int pblk_line_mg_init(struct pblk *pblk)
- 			goto fail_free_smeta;
- 	}
- 
-+	l_mg->bitmap_cache = kmem_cache_create("pblk_lm_bitmap",
-+			lm->sec_bitmap_len, 0, 0, NULL);
-+	if (!l_mg->bitmap_cache)
-+		goto fail_free_smeta;
-+
-+	/* the bitmap pool is used for both valid and map bitmaps */
-+	l_mg->bitmap_pool = mempool_create_slab_pool(PBLK_DATA_LINES * 2,
-+				l_mg->bitmap_cache);
-+	if (!l_mg->bitmap_pool)
-+		goto fail_destroy_bitmap_cache;
-+
- 	/* emeta allocates three different buffers for managing metadata with
- 	 * in-memory and in-media layouts
- 	 */
-@@ -849,6 +863,10 @@ static int pblk_line_mg_init(struct pblk *pblk)
- 			kfree(l_mg->eline_meta[i]->buf);
- 		kfree(l_mg->eline_meta[i]);
- 	}
-+
-+	mempool_destroy(l_mg->bitmap_pool);
-+fail_destroy_bitmap_cache:
-+	kmem_cache_destroy(l_mg->bitmap_cache);
- fail_free_smeta:
- 	for (i = 0; i < PBLK_DATA_LINES; i++)
- 		kfree(l_mg->sline_meta[i]);
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 3bd2b6b0a359..eea901d7cebc 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -939,7 +939,7 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
- 			list_move_tail(&line->list, move_list);
- 			spin_unlock(&l_mg->gc_lock);
- 
--			kfree(line->map_bitmap);
-+			mempool_free(line->map_bitmap, l_mg->bitmap_pool);
- 			line->map_bitmap = NULL;
- 			line->smeta = NULL;
- 			line->emeta = NULL;
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index fd274985aa82..1a31fda3a9f2 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -530,6 +530,10 @@ struct pblk_line_mgmt {
- 	struct pblk_emeta *eline_meta[PBLK_DATA_LINES];
- 	unsigned long meta_bitmap;
- 
-+	/* Cache and mempool for map/invalid bitmaps */
-+	struct kmem_cache *bitmap_cache;
-+	mempool_t *bitmap_pool;
-+
- 	/* Helpers for fast bitmap calculations */
- 	unsigned long *bb_template;
- 	unsigned long *bb_aux;
 -- 
-2.7.4
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
