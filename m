@@ -1,63 +1,56 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39066 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727237AbeHIJHv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Aug 2018 05:07:51 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 05/17] bcache: replace Symbolic permissions by octal permission numbers
-Date: Thu,  9 Aug 2018 14:43:08 +0800
-Message-Id: <20180809064320.10229-6-colyli@suse.de>
-In-Reply-To: <20180809064320.10229-1-colyli@suse.de>
-References: <20180809064320.10229-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <groug@kaod.org>
+Date: Wed, 22 Aug 2018 12:15:23 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Oleksandr Natalenko <oleksandr@natalenko.name>
+Cc: Ming Lei <tom.leiming@gmail.com>, Ming Lei <ming.lei@redhat.com>, Omar
+ Sandoval <osandov@fb.com>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, Christoph Hellwig <hch@lst.de>, Paolo Bonzini
+ <pbonzini@redhat.com>, Hannes Reinecke <hare@suse.de>, Jens Axboe
+ <axboe@kernel.dk>, Linux SCSI List <linux-scsi@vger.kernel.org>,
+ linux-block <linux-block@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, qemu-discuss@nongnu.org, qemu-devel
+ <qemu-devel@nongnu.org>
+Subject: Re: Slow boot in QEMU with virtio-scsi disks
+Message-ID: <20180822121523.4494871d@bahia.lan>
+In-Reply-To: <98344e68266e447826f133ad14d0c83d@natalenko.name>
+References: <f40092b20856d07bd7f870abf5ea939e@natalenko.name>
+	<CACVXFVO1pN=CZvNY8Q4wBrAoA=3w8Ew38aGqpOSHJ1uYAM-sxw@mail.gmail.com>
+	<98344e68266e447826f133ad14d0c83d@natalenko.name>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+List-ID: <linux-block@vger.kernel.org>
 
-Symbolic permission names are used in bcache, for now octal permission
-numbers are encouraged to use for readability. This patch replaces
-all symbolic permissions by octal permission numbers.
+On Sat, 11 Aug 2018 19:39:56 +0200
+Oleksandr Natalenko <oleksandr@natalenko.name> wrote:
 
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/bcache.h | 4 ++--
- drivers/md/bcache/sysfs.h  | 6 +++---
- 2 files changed, 5 insertions(+), 5 deletions(-)
+> Hi.
+> 
+> On 11.08.2018 14:23, Ming Lei wrote:
+> > Please test for-4.19/block:
+> > 
+> > https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/log/?h=for-4.19/block
+> > 
+> > This slow boot issue should have been fixed by the following commits:
+> > 
+> > 1311326cf475 blk-mq: avoid to synchronize rcu inside 
+> > blk_cleanup_queue()
+> > 97889f9ac24f blk-mq: remove synchronize_rcu() from 
+> > blk_mq_del_queue_tag_set()
+> > 5815839b3ca1 blk-mq: introduce new lock for protecting 
+> > hctx->dispatch_wait
+> > 2278d69f030f blk-mq: don't pass **hctx to blk_mq_mark_tag_wait()
+> > 8ab6bb9ee8d0 blk-mq: cleanup blk_mq_get_driver_tag()  
+> 
+> Indeed, I can confirm that these commits fix the issue.
+> 
+> Thanks a lot.
+> 
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 031a75a25d3e..66e6d5639b38 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -881,11 +881,11 @@ static inline uint8_t bucket_gc_gen(struct bucket *b)
- #define BUCKET_GC_GEN_MAX	96U
- 
- #define kobj_attribute_write(n, fn)					\
--	static struct kobj_attribute ksysfs_##n = __ATTR(n, S_IWUSR, NULL, fn)
-+	static struct kobj_attribute ksysfs_##n = __ATTR(n, 0200, NULL, fn)
- 
- #define kobj_attribute_rw(n, show, store)				\
- 	static struct kobj_attribute ksysfs_##n =			\
--		__ATTR(n, S_IWUSR|S_IRUSR, show, store)
-+		__ATTR(n, 0600, show, store)
- 
- static inline void wake_up_allocators(struct cache_set *c)
- {
-diff --git a/drivers/md/bcache/sysfs.h b/drivers/md/bcache/sysfs.h
-index b54fe9602529..3fe82425859c 100644
---- a/drivers/md/bcache/sysfs.h
-+++ b/drivers/md/bcache/sysfs.h
-@@ -44,9 +44,9 @@ STORE(fn)								\
- 	static struct attribute sysfs_##_name =				\
- 		{ .name = #_name, .mode = _mode }
- 
--#define write_attribute(n)	__sysfs_attribute(n, S_IWUSR)
--#define read_attribute(n)	__sysfs_attribute(n, S_IRUGO)
--#define rw_attribute(n)		__sysfs_attribute(n, S_IRUGO|S_IWUSR)
-+#define write_attribute(n)	__sysfs_attribute(n, 0200)
-+#define read_attribute(n)	__sysfs_attribute(n, 0444)
-+#define rw_attribute(n)		__sysfs_attribute(n, 0644)
- 
- #define sysfs_printf(file, fmt, ...)					\
- do {									\
--- 
-2.18.0
+So do I.
+
+Thanks Ming Lei for the fix !
+
+Cheers,
+
+--
+Greg
