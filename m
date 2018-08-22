@@ -1,84 +1,46 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:36436 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726279AbeHXTIF (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:35580 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727772AbeHVJnn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Aug 2018 15:08:05 -0400
-From: Jeffrey Lien <Jeff.Lien@wdc.com>
-To: Christoph Hellwig <hch@infradead.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>,
-        David Darrington <david.darrington@wdc.com>,
-        Jeff Furlong <jeff.furlong@wdc.com>
-Subject: RE: [PATCH] Performance Improvement in CRC16 Calculations.
-Date: Fri, 24 Aug 2018 15:32:52 +0000
-Message-ID: <SN1PR04MB18241CBDC8E4CA5275EE4424EA360@SN1PR04MB1824.namprd04.prod.outlook.com>
+        Wed, 22 Aug 2018 05:43:43 -0400
+Date: Tue, 21 Aug 2018 23:20:16 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Jeff Lien <jeff.lien@wdc.com>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, herbert@gondor.apana.org.au,
+        tim.c.chen@linux.intel.com, david.darrington@wdc.com,
+        jeff.furlong@wdc.com
+Subject: Re: [PATCH] Performance Improvement in CRC16 Calculations.
+Message-ID: <20180822062016.GA10356@infradead.org>
 References: <1533928331-21303-1-git-send-email-jeff.lien@wdc.com>
- <yq1in4gq5jf.fsf@oracle.com> <yq1lg8zb2lp.fsf@oracle.com>
- <20180822062016.GA10356@infradead.org>
-In-Reply-To: <20180822062016.GA10356@infradead.org>
-Content-Type: text/plain; charset="us-ascii"
+ <yq1in4gq5jf.fsf@oracle.com>
+ <yq1lg8zb2lp.fsf@oracle.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <yq1lg8zb2lp.fsf@oracle.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-I rebuilt my 4.18 kernel with CONFIG_CRYPTO_CRCT10DIF_PCLMUL=3Dy as Martin =
-recommended and got even better performance results vs the CRC Slice by 16 =
-changes.  Here's a summary of the results
-
-FIO Sequential Write, 64K Block Size, Queue Depth 64
-PCLMUL =3D y Kernel:        bw =3D 2237 MiB/s
-Slice by 16 CRC Calc:      bw =3D 1964 MiB/s
-Base Kernel:                     bw =3D   357 MiB/s
-
-FIO Sequential Read, 64K Block Size, Queue Depth 64
-PCLMUL =3D y Kernel:        bw =3D 3839 MiB/s
-Slice by 16 CRC Calc:      bw =3D 2730  MiB/s
-Base Kernel:                     bw =3D   797 MiB/s
-
-So it seems the CONFIG_CRYPTO_CRCT10DIF_PCLMUL=3Dy provides the best perfor=
-mance.  Are there any negative side effect to this config option?   If not,=
- does it make sense to recommend all the major distro's change their config=
- options to have CONFIG_CRYPTO_CRCT10DIF_PCLMUL=3Dy as the default option? =
-=20
-
-
-Jeff Lien
-
-
------Original Message-----
-From: Christoph Hellwig [mailto:hch@infradead.org]=20
-Sent: Wednesday, August 22, 2018 1:20 AM
-To: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Jeffrey Lien <Jeff.Lien@wdc.com>; linux-kernel@vger.kernel.org; linux-c=
-rypto@vger.kernel.org; linux-block@vger.kernel.org; linux-scsi@vger.kernel.=
-org; herbert@gondor.apana.org.au; tim.c.chen@linux.intel.com; David Darring=
-ton <david.darrington@wdc.com>; Jeff Furlong <jeff.furlong@wdc.com>
-Subject: Re: [PATCH] Performance Improvement in CRC16 Calculations.
-
 On Tue, Aug 21, 2018 at 09:40:34PM -0400, Martin K. Petersen wrote:
-> When crc-t10dif is initialized, the crypto infrastructure will pick=20
-> the algorithm with the highest priority currently registered. Both=20
-> block and SCSI will cause crc-t10dif to be compiled as a built-in so=20
-> this selection happens very early.
+> When crc-t10dif is initialized, the crypto infrastructure will pick the
+> algorithm with the highest priority currently registered. Both block and
+> SCSI will cause crc-t10dif to be compiled as a built-in so this
+> selection happens very early.
 
-Ouch.  This might actually happen in a lot of other users of the crypto fun=
-ctionality as well.
+Ouch.  This might actually happen in a lot of other users of the crypto
+functionality as well.
 
-> However, it seems like a bit of a deficiency in crypto that there is=20
-> no way to upgrade existing transformations if higher priority=20
-> algorithms become available. btrfs and a few others work around this=20
-> issue by not using the generic lib/ CRC functions (which defeats the=20
-> purpose of having these in the first place). Instead they are=20
-> registering their own transformation at a later time where any=20
-> accelerator modules are more likely to be loaded.
+> However, it seems like a bit of a deficiency in crypto that there is no
+> way to upgrade existing transformations if higher priority algorithms
+> become available. btrfs and a few others work around this issue by not
+> using the generic lib/ CRC functions (which defeats the purpose of
+> having these in the first place). Instead they are registering their own
+> transformation at a later time where any accelerator modules are more
+> likely to be loaded.
 
-If we can't fix this in crypto (which doesn't seem that easy), we should at=
- least clearly document the issue somewhere, and fix this in the t10pi code=
- by initializing crct10dif_tfm in a lazy fashion only once the fist block d=
-evice starts using it.
+If we can't fix this in crypto (which doesn't seem that easy), we
+should at least clearly document the issue somewhere, and fix this in
+the t10pi code by initializing crct10dif_tfm in a lazy fashion only
+once the fist block device starts using it.
