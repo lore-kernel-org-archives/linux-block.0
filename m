@@ -1,50 +1,132 @@
-Return-Path: <prvs=752cffea0=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Keith Busch <keith.busch@intel.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH] block: Remove two superfluous #include directives
-Date: Thu,  9 Aug 2018 07:47:28 -0700
-Message-Id: <20180809144728.5218-1-bart.vanassche@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-wbt: Avoid lock contention and thundering herd issue
+ in wbt_wait
+To: Anchal Agarwal <anchalag@amazon.com>
+Cc: fllinden@amazon.com, sblbir@amazon.com, holger@applied-asynchrony.com,
+ msw@amazon.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <c5152431-6e36-6f6e-616e-1cfbd974817d@kernel.dk>
+ <20180820224241.GA72523@8c8590bceeee.ant.amazon.com>
+ <70e2063a-53fa-2475-eed9-07db277c8c0d@kernel.dk>
+ <b2adf708-d396-94ac-b123-8027d3839fd1@kernel.dk>
+ <20180822040126.GA18736@kaos-source-ops-60001.pdx1.amazon.com>
+ <76ecb022-f167-67eb-8801-111fc209bbaa@kernel.dk>
+ <834649ab-62d6-bc7f-ec60-6c1654ea3f26@applied-asynchrony.com>
+ <d8c171ce-6dfe-e9e5-5673-8443cfec5f01@kernel.dk>
+ <f71cf3f9c54346e1b69ab42601404597@EX13D13UWB002.ant.amazon.com>
+ <f457d299-574b-52e1-782f-51cbc988f4fb@kernel.dk>
+ <20180822202645.GA8025@kaos-source-ops-60001.pdx1.amazon.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <af9d0c9f-e65b-b2d1-5e4a-cb4785de8881@kernel.dk>
+Date: Wed, 22 Aug 2018 15:05:56 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
+In-Reply-To: <20180822202645.GA8025@kaos-source-ops-60001.pdx1.amazon.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Commit 12f5b9314545 ("blk-mq: Remove generation seqeunce") removed the
-only seqcount_t and u64_stats_sync instances from <linux/blkdev.h> but
-did not remove the corresponding #include directives. Since these
-include directives are no longer needed, remove them.
+On 8/22/18 2:26 PM, Anchal Agarwal wrote:
+> On Wed, Aug 22, 2018 at 11:30:40AM -0600, Jens Axboe wrote:
+>> On 8/22/18 10:42 AM, van der Linden, Frank wrote:
+>>> On 8/22/18 7:27 AM, Jens Axboe wrote:
+>>>> On 8/22/18 6:54 AM, Holger Hoffst??tte wrote:
+>>>>> On 08/22/18 06:10, Jens Axboe wrote:
+>>>>>> [...]
+>>>>>> If you have time, please look at the 3 patches I posted earlier today.
+>>>>>> Those are for mainline, so should be OK :-)
+>>>>> I'm just playing along at home but with those 3 I get repeatable
+>>>>> hangs & writeback not starting at all, but curiously *only* on my btrfs
+>>>>> device; for inexplicable reasons some other devices with ext4/xfs flush
+>>>>> properly. Yes, that surprised me too, but it's repeatable.
+>>>>> Now this may or may not have something to do with some of my in-testing
+>>>>> patches for btrfs itself, but if I remove those 3 wbt fixes, everything
+>>>>> is golden again. Not eager to repeat since it hangs sync & requires a
+>>>>> hard reboot.. :(
+>>>>> Just thought you'd like to know.
+>>>> Thanks, that's very useful info! I'll see if I can reproduce that.
+>>>>
+>>> I think it might be useful to kind of give a dump of what we discussed
+>>> before this patch was sent, there was a little more than was in the
+>>> description.
+>>>
+>>> We saw hangs and heavy lock contention in the wbt code under a specific
+>>> workload, on XFS. Crash dump analysis showed the following issues:
+>>>
+>>> 1) wbt_done uses wake_up_all, which causes a thundering herd
+>>> 2) __wbt_wait sets up a wait queue with the auto remove wake function
+>>> (via DEFINE_WAIT), which caused two problems:
+>>>    * combined with the use of wake_up_all, the wait queue would
+>>> essentially be randomly reordered for tasks that did not get to run
+>>>    * the waitqueue_active check in may_queue was not valid with the auto
+>>> remove function, which could lead incoming tasks with requests to
+>>> overtake existing requests
+>>>
+>>> 1) was fixed by using a plain wake_up
+>>> 2) was fixed by keeping tasks on the queue until they could break out of
+>>> the wait loop in __wbt_wait
+>>>
+>>>
+>>> The random reordering, causing task starvation in __wbt_wait, was the
+>>> main problem. Simply not using the auto remove wait function, e.g.
+>>> *only* changing DEFINE_WAIT(wait) to DEFINE_WAIT_FUNC(wait,
+>>> default_wake_function), fixed the hang / task starvation issue in our
+>>> tests. But there was still more lock contention than there should be, so
+>>> we also changed wake_up_all to wake_up.
+>>>
+>>> It might be useful to run your tests with only the DEFINE_WAIT change I
+>>> describe above added to the original code to see if that still has any
+>>> problems. That would give a good datapoint whether any remaining issues
+>>> are due to missed wakeups or not.
+>>>
+>>> There is the issue of making forward progress, or at least making it
+>>> fast enough. With the changes as they stand now, you could come up with
+>>> a scenario where the throttling limit is hit, but then is raised. Since
+>>> there might still be a wait queue, you could end up putting each
+>>> incoming task to sleep, even though it's not needed.
+>>>
+>>> One way to guarantee that the wait queue clears up as fast as possible,
+>>> without resorting to wakeup_all, is to use wakeup_nr, where the number
+>>> of tasks to wake up is (limit - inflight).
+>>>
+>>> Also, to avoid having tasks going back to sleep in the loop, you could
+>>> do what you already proposed - always just sleep at most once, and
+>>> unconditionally proceed after waking up. To avoid incoming tasks
+>>> overtaking the ones that are being woken up, you could have wbt_done
+>>> increment inflight, effectively reserving a spot for the tasks that are
+>>> about to be woken up.
+>>>
+>>> Another thing I thought about was recording the number of waiters in the
+>>> wait queue, and modify the check from (inflight < limit) to (inflight <
+>>> (limit - nwaiters)), and no longer use any waitqueue_active checks.
+>>>
+>>> The condition checks are of course complicated by the fact that
+>>> condition manipulation is not always done under the same lock (e.g.
+>>> wbt_wait can be called with a NULL lock).
+>>>
+>>>
+>>> So, these are just some of the things to consider here - maybe there's
+>>> nothing in there that you hadn't already considered, but I thought it'd
+>>> be useful to summarize them.
+>>>
+>>> Thanks for looking in to this!
+>>
+>> It turned out to be an unrelated problem with rq reordering in blk-mq,
+>> mainline doesn't have it.
+>>
+>> So I think the above change is safe and fine, but we definitely still
+>> want the extra change of NOT allowing a queue token for the initial loop
+>> inside __wbt_wait() for when we have current sleepers on the queue.
+>> Without that, the initial check in __wbt_wait() is not useful at all.
+>>
+>>
+>> -- 
+>> Jens Axboe
+>>
+>>
+> 
+> Hi Jens,
+> I tested your patches in my environment and they look good. There is no sudden increase in 
+> lock contention either. Thanks for catching the corner case though.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <keith.busch@intel.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.com>,
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- include/linux/blkdev.h | 2 --
- 1 file changed, 2 deletions(-)
+Thanks for testing. Can I add your tested-by to the 3 patches?
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 050d599f5ea9..d6869e0e2b64 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -27,8 +27,6 @@
- #include <linux/percpu-refcount.h>
- #include <linux/scatterlist.h>
- #include <linux/blkzoned.h>
--#include <linux/seqlock.h>
--#include <linux/u64_stats_sync.h>
- 
- struct module;
- struct scsi_ioctl_command;
 -- 
-2.18.0
+Jens Axboe
