@@ -1,15 +1,14 @@
-Return-Path: <prvs=76545b8e1=anchalag@kaos-source-ops-60001.pdx1.amazon.com>
-Date: Wed, 22 Aug 2018 20:26:45 +0000
-From: Anchal Agarwal <anchalag@amazon.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <fllinden@amazon.com>, <sblbir@amazon.com>,
-        <holger@applied-asynchrony.com>, <msw@amazon.com>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <anchalag@amazon.com>
+Return-Path: <holger@applied-asynchrony.com>
 Subject: Re: [PATCH] blk-wbt: Avoid lock contention and thundering herd issue
  in wbt_wait
-Message-ID: <20180822202645.GA8025@kaos-source-ops-60001.pdx1.amazon.com>
-References: <c5152431-6e36-6f6e-616e-1cfbd974817d@kernel.dk>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+References: <6bab69c9-b787-b12f-7738-72e05bf74444@kernel.dk>
+ <761bb0ab416649b8bf3bac1706124456@EX13D13UWB002.ant.amazon.com>
+ <7f6c399d-bda1-0bbf-4ea1-07fc510ed1eb@kernel.dk>
+ <3498fbfb-e9f3-7606-1fc3-904a0e61ff57@kernel.dk>
+ <168d80ac73a44a6f9242c47c164778fc@EX13D13UWB002.ant.amazon.com>
+ <c5152431-6e36-6f6e-616e-1cfbd974817d@kernel.dk>
  <20180820224241.GA72523@8c8590bceeee.ant.amazon.com>
  <70e2063a-53fa-2475-eed9-07db277c8c0d@kernel.dk>
  <b2adf708-d396-94ac-b123-8027d3839fd1@kernel.dk>
@@ -17,114 +16,52 @@ References: <c5152431-6e36-6f6e-616e-1cfbd974817d@kernel.dk>
  <76ecb022-f167-67eb-8801-111fc209bbaa@kernel.dk>
  <834649ab-62d6-bc7f-ec60-6c1654ea3f26@applied-asynchrony.com>
  <d8c171ce-6dfe-e9e5-5673-8443cfec5f01@kernel.dk>
- <f71cf3f9c54346e1b69ab42601404597@EX13D13UWB002.ant.amazon.com>
- <f457d299-574b-52e1-782f-51cbc988f4fb@kernel.dk>
+ <ed71fb8f-1f36-c216-5886-269c77250e29@kernel.dk>
+ <1c40bce3-24fc-f473-5263-a04a677a3f69@applied-asynchrony.com>
+ <727c76cc-3578-2272-eaaf-834213d929e1@kernel.dk>
+ <ae772eed-6488-acd2-4122-73a10a669b99@applied-asynchrony.com>
+ <6f0e6f3d-060b-1dd7-b91e-5e9df3f485cb@kernel.dk>
+From: =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
+Message-ID: <ee45647b-d848-5be0-6ae1-4349e68a15ca@applied-asynchrony.com>
+Date: Wed, 22 Aug 2018 21:58:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <f457d299-574b-52e1-782f-51cbc988f4fb@kernel.dk>
+In-Reply-To: <6f0e6f3d-060b-1dd7-b91e-5e9df3f485cb@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Aug 22, 2018 at 11:30:40AM -0600, Jens Axboe wrote:
-> On 8/22/18 10:42 AM, van der Linden, Frank wrote:
-> > On 8/22/18 7:27 AM, Jens Axboe wrote:
-> >> On 8/22/18 6:54 AM, Holger Hoffst??tte wrote:
-> >>> On 08/22/18 06:10, Jens Axboe wrote:
-> >>>> [...]
-> >>>> If you have time, please look at the 3 patches I posted earlier today.
-> >>>> Those are for mainline, so should be OK :-)
-> >>> I'm just playing along at home but with those 3 I get repeatable
-> >>> hangs & writeback not starting at all, but curiously *only* on my btrfs
-> >>> device; for inexplicable reasons some other devices with ext4/xfs flush
-> >>> properly. Yes, that surprised me too, but it's repeatable.
-> >>> Now this may or may not have something to do with some of my in-testing
-> >>> patches for btrfs itself, but if I remove those 3 wbt fixes, everything
-> >>> is golden again. Not eager to repeat since it hangs sync & requires a
-> >>> hard reboot.. :(
-> >>> Just thought you'd like to know.
-> >> Thanks, that's very useful info! I'll see if I can reproduce that.
-> >>
-> > I think it might be useful to kind of give a dump of what we discussed
-> > before this patch was sent, there was a little more than was in the
-> > description.
-> > 
-> > We saw hangs and heavy lock contention in the wbt code under a specific
-> > workload, on XFS. Crash dump analysis showed the following issues:
-> > 
-> > 1) wbt_done uses wake_up_all, which causes a thundering herd
-> > 2) __wbt_wait sets up a wait queue with the auto remove wake function
-> > (via DEFINE_WAIT), which caused two problems:
-> >    * combined with the use of wake_up_all, the wait queue would
-> > essentially be randomly reordered for tasks that did not get to run
-> >    * the waitqueue_active check in may_queue was not valid with the auto
-> > remove function, which could lead incoming tasks with requests to
-> > overtake existing requests
-> > 
-> > 1) was fixed by using a plain wake_up
-> > 2) was fixed by keeping tasks on the queue until they could break out of
-> > the wait loop in __wbt_wait
-> > 
-> > 
-> > The random reordering, causing task starvation in __wbt_wait, was the
-> > main problem. Simply not using the auto remove wait function, e.g.
-> > *only* changing DEFINE_WAIT(wait) to DEFINE_WAIT_FUNC(wait,
-> > default_wake_function), fixed the hang / task starvation issue in our
-> > tests. But there was still more lock contention than there should be, so
-> > we also changed wake_up_all to wake_up.
-> > 
-> > It might be useful to run your tests with only the DEFINE_WAIT change I
-> > describe above added to the original code to see if that still has any
-> > problems. That would give a good datapoint whether any remaining issues
-> > are due to missed wakeups or not.
-> > 
-> > There is the issue of making forward progress, or at least making it
-> > fast enough. With the changes as they stand now, you could come up with
-> > a scenario where the throttling limit is hit, but then is raised. Since
-> > there might still be a wait queue, you could end up putting each
-> > incoming task to sleep, even though it's not needed.
-> > 
-> > One way to guarantee that the wait queue clears up as fast as possible,
-> > without resorting to wakeup_all, is to use wakeup_nr, where the number
-> > of tasks to wake up is (limit - inflight).
-> > 
-> > Also, to avoid having tasks going back to sleep in the loop, you could
-> > do what you already proposed - always just sleep at most once, and
-> > unconditionally proceed after waking up. To avoid incoming tasks
-> > overtaking the ones that are being woken up, you could have wbt_done
-> > increment inflight, effectively reserving a spot for the tasks that are
-> > about to be woken up.
-> > 
-> > Another thing I thought about was recording the number of waiters in the
-> > wait queue, and modify the check from (inflight < limit) to (inflight <
-> > (limit - nwaiters)), and no longer use any waitqueue_active checks.
-> > 
-> > The condition checks are of course complicated by the fact that
-> > condition manipulation is not always done under the same lock (e.g.
-> > wbt_wait can be called with a NULL lock).
-> > 
-> > 
-> > So, these are just some of the things to consider here - maybe there's
-> > nothing in there that you hadn't already considered, but I thought it'd
-> > be useful to summarize them.
-> > 
-> > Thanks for looking in to this!
+On 08/22/18 21:46, Jens Axboe wrote:
+> On 8/22/18 1:37 PM, Holger Hoffstätte wrote:
+>> On 08/22/18 21:17, Jens Axboe wrote:
+>>>> So the obvious suspect is the new return of UINT_MAX from get_limit() to
+>>>> __wbt_wait(). I first suspected that I mispatched something, but it's all
+>>>> like in mainline or your tree. Even the recently moved-around atomic loop
+>>>> inside rq_wait_inc_below() is 1:1 the same and looks like it should.
+>>>> Now building mainline and see where that leads me.
+>>
+>> So mainline + your tree's last 4 patches works fine, as suspected.
+>> It's all me, as usual.
 > 
-> It turned out to be an unrelated problem with rq reordering in blk-mq,
-> mainline doesn't have it.
+> That's a relief!
 > 
-> So I think the above change is safe and fine, but we definitely still
-> want the extra change of NOT allowing a queue token for the initial loop
-> inside __wbt_wait() for when we have current sleepers on the queue.
-> Without that, the initial check in __wbt_wait() is not useful at all.
+>>> I wonder if it's a signedness thing? Can you try and see if using INT_MAX
+>>> instead changes anything?
+>>
+>> Beat me to it while I was rebooting ;-)
+>> Exactly what I also found a minute ago:
+>>
+>> $diff -rup linux-4.18.4/block/blk-rq-qos.c linux/block/blk-rq-qos.c
+>> ..
+>> -bool rq_wait_inc_below(struct rq_wait *rq_wait, int limit)
+>> +bool rq_wait_inc_below(struct rq_wait *rq_wait, unsigned int limit)
+>> ..
+>>
+>> Moo! Patching now.
 > 
-> 
-> -- 
-> Jens Axboe
-> 
->
+> At least we have an explanation for why it didn't work.
 
-Hi Jens,
-I tested your patches in my environment and they look good. There is no sudden increase in 
-lock contention either. Thanks for catching the corner case though.
+Luckily I can still read and 22f17952c7 is conveniently called "blk-rq-qos:
+make depth comparisons unsigned"! Needless to say with that thrown into the
+mix all is good again. Sorry for the confusion & thanks for your patience.
 
---
-Anchal Agarwal
+cheers!
+Holger
