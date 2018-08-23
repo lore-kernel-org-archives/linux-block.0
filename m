@@ -1,107 +1,104 @@
-Return-Path: <prvs=752cffea0=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v6 00/12] blk-mq: Implement runtime power management
-Date: Thu,  9 Aug 2018 12:41:37 -0700
-Message-Id: <20180809194149.15285-1-bart.vanassche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:37913 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726068AbeHWJ6W (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 23 Aug 2018 05:58:22 -0400
+Received: by mail-lj1-f196.google.com with SMTP id p6-v6so3270238ljc.5
+        for <linux-block@vger.kernel.org>; Wed, 22 Aug 2018 23:30:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+References: <CAPybu_2k-0d=8NxL7kr757QcWOnXyU_TAyV7DMwiMrSDkiXfgA@mail.gmail.com>
+ <CACVXFVNguNEJ_R7XXvC8dG_yu5tghQk+Hdg6Hp6KKr4Ys4EV_A@mail.gmail.com>
+ <CAPybu_2ke4usj9Qwr9iSKTymAk1510pzZnZAgLemRB+cK4Se1A@mail.gmail.com>
+ <20180820083032.GA24522@ming.t460p> <CAPybu_3QT_qTojTUXFhJFQKVsbhnWUmvyQ0zb5MwDJ5hsECf=A@mail.gmail.com>
+ <526e40ca8f426252377be21f935ddcdec93cb197.camel@decadent.org.uk>
+In-Reply-To: <526e40ca8f426252377be21f935ddcdec93cb197.camel@decadent.org.uk>
+From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+Date: Thu, 23 Aug 2018 08:29:59 +0200
+Message-ID: <CAPybu_0AChdJ-TofPVuHeSAfTjH6EiOmaiQtU62wux7UYB7Z0Q@mail.gmail.com>
+Subject: Re: blk-mq 5-8 times slower for bmap-tools
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: ming.lei@redhat.com, Ming Lei <tom.leiming@gmail.com>,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hello Jens,
+Hi Ben
+On Wed, Aug 22, 2018 at 9:22 PM Ben Hutchings <ben@decadent.org.uk> wrote:
+>
+> On Mon, 2018-08-20 at 11:04 +0200, Ricardo Ribalda Delgado wrote:
+> > Hello Ming
+> > On Mon, Aug 20, 2018 at 10:30 AM Ming Lei <ming.lei@redhat.com> wrote:
+> [...]
+> > > One problem found from your iostat log is that looks there is ~30sec
+> > > idle period between IO activities when blk-mq is enabled.
+> >
+> > During all the test the LED on the device was blinking.
+> >
+> > But a closer look to dmesg reveals a lot of this messages:
+> >
+> > [  196.929811] sd 6:0:0:0: [sdb] tag#3 data cmplt err -71 uas-tag 1
+> > inflight: CMD
+> > [  196.929822] sd 6:0:0:0: [sdb] tag#3 CDB: Write(10) 2a 00 00 04 00
+> > 68 00 04 00 00
+> > [  227.764379] sd 6:0:0:0: [sdb] tag#4 uas_eh_abort_handler 0 uas-tag
+> > 2 inflight: CMD OUT
+> > [  227.764389] sd 6:0:0:0: [sdb] tag#4 CDB: Write(10) 2a 00 00 04 04
+> > 68 00 04 00 00
+> > [  227.766555] sd 6:0:0:0: [sdb] tag#3 uas_eh_abort_handler 0 uas-tag
+> > 1 inflight: CMD
+> > [  227.766562] sd 6:0:0:0: [sdb] tag#3 CDB: Write(10) 2a 00 00 04 00
+> > 68 00 04 00 00
+> > [  227.784312] scsi host6: uas_eh_device_reset_handler start
+> > [  227.913672] usb 2-2: reset SuperSpeed USB device number 3 using xhci_hcd
+> > [  227.944842] scsi host6: uas_eh_device_reset_handler success
+> > [  231.416133] sd 6:0:0:0: [sdb] tag#1 data cmplt err -71 uas-tag 10
+> > inflight: CMD
+> > [  231.416147] sd 6:0:0:0: [sdb] tag#1 CDB: Write(10) 2a 00 00 06 d5
+> > e8 00 04 00 00
+> >
+> > And they take around 30 secons (227-196)
+> >
+> >
+> > Maybe this is a hw issue? I will bring the reader home tonight and see
+> > if I can replicate the bug with my notebook
+> >
+> > >
+> > > Maybe it is related with timeout, given we had big change in v4.17 timeout code,
+> > > and we also fixed one scsi_mq timeout related issue recently, and the patch[1] has
+> > > been merged to v4.18 release already.
+> >
+> > I tried with v4.18-rc4 (latest one packaged in debian experimental)
+> > and after 3 runs, 2 were fine (27 sec), but the last one was over a
+> > minute.
+>
+> Is it possible that this is fixed by "block: really disable runtime-pm
+> for blk-mq"?
+>
+> That fix went into Debian's version 4.17.14-1, but is not yet in any
+> 4.18-based package.
 
-This patch series not only implements runtime power management for blk-mq but
-also fixes a starvation issue in the power management code for the legacy
-block layer. Please consider this patch series for the upstream kernel.
+Just tried out
+ricardo@neopili:~$ uname -a
+Linux neopili 4.17.0-3-amd64 #1 SMP Debian 4.17.17-1 (2018-08-18)
+x86_64 GNU/Linux
 
-Thanks,
+and after around 10 executions all the runtimes are similar to the
+ones with non-blk-mq and I havent seen the "uas error" on dmesg
 
-Bart.
+Thanks for your help.
 
-Changes compared to v5:
-- Introduced a new flag RQF_DV that replaces RQF_PREEMPT for SCSI domain
-  validation.
-- Introduced a new request queue state QUEUE_FLAG_DV_ONLY for SCSI domain
-  validation.
-- Instead of using SDEV_QUIESCE for both runtime suspend and SCSI domain
-  validation, use that state for domain validation only and introduce a new
-  state for runtime suspend, namely SDEV_QUIESCE.
-- Reallow system suspend during SCSI domain validation.
-- Moved the runtime resume call from the request allocation code into
-  blk_queue_enter().
-- Instead of relying on q_usage_counter, iterate over the tag set to determine
-  whether or not any requests are in flight.
+I will keep an eye on the issue in case it triggers again
 
-Changes compared to v4:
-- Dropped the patches "Give RQF_PREEMPT back its original meaning" and
-  "Serialize queue freezing and blk_pre_runtime_suspend()".
-- Replaced "percpu_ref_read()" with "percpu_is_in_use()".
-- Inserted pm_request_resume() calls in the block layer request allocation
-  code such that the context that submits a request no longer has to call
-  pm_runtime_get().
+>
+> Ben.
+>
+> --
+> Ben Hutchings
+> You can't have everything.  Where would you put it?
+>
 
-Changes compared to v3:
-- Avoid adverse interactions between system-wide suspend/resume and runtime
-  power management by changing the PREEMPT_ONLY flag into a counter.
-- Give RQF_PREEMPT back its original meaning, namely that it is only set for
-  ide_preempt requests.
-- Remove the flag BLK_MQ_REQ_PREEMPT.
-- Removed the pm_request_resume() call.
-
-Changes compared to v2:
-- Fixed the build for CONFIG_BLOCK=n.
-- Added a patch that introduces percpu_ref_read() in the percpu-counter code.
-- Added a patch that makes it easier to detect missing pm_runtime_get*() calls.
-- Addressed Jianchao's feedback including the comment about runtime overhead
-  of switching a per-cpu counter to atomic mode.
-
-Changes compared to v1:
-- Moved the runtime power management code into a separate file.
-- Addressed Ming's feedback.
-
-Bart Van Assche (12):
-  block, scsi: Introduce request flag RQF_DV
-  scsi: Alter handling of RQF_DV requests
-  scsi: Only set RQF_DV for requests used for domain validation
-  scsi: Introduce the SDEV_SUSPENDED device status
-  block, scsi: Rename QUEUE_FLAG_PREEMPT_ONLY into DV_ONLY and introduce
-    PM_ONLY
-  scsi: Reallow SPI domain validation during system suspend
-  block: Move power management code into a new source file
-  block, scsi: Introduce blk_pm_runtime_exit()
-  block: Split blk_pm_add_request() and blk_pm_put_request()
-  block: Change the runtime power management approach (1/2)
-  block: Change the runtime power management approach (2/2)
-  blk-mq: Enable support for runtime power management
-
- block/Kconfig                     |   5 +
- block/Makefile                    |   1 +
- block/blk-core.c                  | 310 ++++++------------------------
- block/blk-mq-debugfs.c            |   4 +-
- block/blk-mq.c                    |   4 +-
- block/blk-pm.c                    | 262 +++++++++++++++++++++++++
- block/blk-pm.h                    |  69 +++++++
- block/elevator.c                  |  22 +--
- drivers/ide/ide-pm.c              |   3 +-
- drivers/scsi/scsi_lib.c           | 266 ++++++++++++++++++-------
- drivers/scsi/scsi_pm.c            |   7 +-
- drivers/scsi/scsi_sysfs.c         |   2 +
- drivers/scsi/scsi_transport_spi.c |  26 +--
- drivers/scsi/sd.c                 |  10 +-
- drivers/scsi/sr.c                 |   4 +-
- include/linux/blk-mq.h            |   6 +-
- include/linux/blk-pm.h            |  26 +++
- include/linux/blkdev.h            |  41 ++--
- include/scsi/scsi_device.h        |  15 +-
- include/scsi/scsi_transport_spi.h |   1 -
- 20 files changed, 673 insertions(+), 411 deletions(-)
- create mode 100644 block/blk-pm.c
- create mode 100644 block/blk-pm.h
- create mode 100644 include/linux/blk-pm.h
 
 -- 
-2.18.0
+Ricardo Ribalda
