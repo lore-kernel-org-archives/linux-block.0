@@ -1,37 +1,35 @@
-Return-Path: <christophe.leroy@c-s.fr>
-Message-Id: <48bcbeb8e5f57c958e6e0bc7a29feae44821901d.1535385970.git.christophe.leroy@c-s.fr>
-In-Reply-To: <ab6b6c60d921335b44c100c5018fcc6585f05c24.1535385970.git.christophe.leroy@c-s.fr>
-References: <ab6b6c60d921335b44c100c5018fcc6585f05c24.1535385970.git.christophe.leroy@c-s.fr>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v2 3/3] drivers/block/z2ram: use ioremap_wt() instead of
- __ioremap(_PAGE_WRITETHRU)
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org, linux-block@vger.kernel.org, linux-m68k@lists.linux-m68k.org
-Date: Mon, 27 Aug 2018 16:10:25 +0000 (UTC)
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+Date: Thu, 23 Aug 2018 11:32:52 -0400
+From: Josef Bacik <josef@toxicpanda.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>
+Subject: Re: [PATCH] blk-wbt: don't maintain inflight counts if disabled
+Message-ID: <20180823153251.qwjnpvfxlnn6ft3m@destiny>
+References: <504f587c-681b-5502-30e3-9a3c4ed6c8fe@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <504f587c-681b-5502-30e3-9a3c4ed6c8fe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-_PAGE_WRITETHRU is a target specific flag. Prefer generic functions.
+On Thu, Aug 23, 2018 at 09:15:27AM -0600, Jens Axboe wrote:
+> A previous commit removed the ability to have per-rq flags. We used
+> those flags to maintain inflight counts. Since we don't have those
+> anymore, we have to always maintain inflight counts, even if wbt is
+> disabled. This is clearly suboptimal.
+> 
+> Add a queue quiesce around changing the wbt latency settings from sysfs
+> to work around this. With that, we can reliably put the enabled check in
+> our bio_to_wbt_flags(), since we know the WBT_TRACKED flag will be
+> consistent for the lifetime of the request.
+> 
+> Fixes: Fixes: c1c80384c8f ("block: remove external dependency on wbt_flags")
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
 
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
----
- v2: no change
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 
- drivers/block/z2ram.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Sorry about that,
 
-diff --git a/drivers/block/z2ram.c b/drivers/block/z2ram.c
-index d0c5bc4e0703..cfbd70520eeb 100644
---- a/drivers/block/z2ram.c
-+++ b/drivers/block/z2ram.c
-@@ -190,8 +190,7 @@ static int z2_open(struct block_device *bdev, fmode_t mode)
- 			vfree(vmalloc (size));
- 		}
- 
--		vaddr = (unsigned long) __ioremap (paddr, size, 
--						   _PAGE_WRITETHRU);
-+		vaddr = (unsigned long)ioremap_wt(paddr, size);
- 
- #else
- 		vaddr = (unsigned long)z_remap_nocache_nonser(paddr, size);
--- 
-2.13.3
+Josef
