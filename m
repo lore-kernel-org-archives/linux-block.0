@@ -1,75 +1,35 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:6503 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730196AbeHBUWE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Aug 2018 16:22:04 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Jianchao Wang <jianchao.w.wang@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v3 7/9] block: Remove blk_pm_requeue_request()
-Date: Thu,  2 Aug 2018 11:29:42 -0700
-Message-Id: <20180802182944.14442-8-bart.vanassche@wdc.com>
-In-Reply-To: <20180802182944.14442-1-bart.vanassche@wdc.com>
-References: <20180802182944.14442-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <adb9282f01ca9ae55874639b8c26d6d1bba1fda0.1535104490.git.christophe.leroy@c-s.fr>
+In-Reply-To: <4f905a9d9752768c628623276f5e2fb465c947c8.1535104490.git.christophe.leroy@c-s.fr>
+References: <4f905a9d9752768c628623276f5e2fb465c947c8.1535104490.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH 3/3] drivers/block/z2ram: use ioremap_wt() instead of
+ __ioremap(_PAGE_WRITETHRU)
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org, linux-block@vger.kernel.org, linux-m68k@lists.linux-m68k.org
+Date: Fri, 24 Aug 2018 10:04:59 +0000 (UTC)
+List-ID: <linux-block@vger.kernel.org>
 
-Since this function is now empty, remove it.
+_PAGE_WRITETHRU is a target specific flag. Prefer generic functions.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- block/blk-pm.h   | 8 --------
- block/elevator.c | 2 --
- 2 files changed, 10 deletions(-)
+ drivers/block/z2ram.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/block/blk-pm.h b/block/blk-pm.h
-index 3978a3021958..d9077bd7ba6d 100644
---- a/block/blk-pm.h
-+++ b/block/blk-pm.h
-@@ -6,10 +6,6 @@
- #include <linux/pm_runtime.h>
+diff --git a/drivers/block/z2ram.c b/drivers/block/z2ram.c
+index d0c5bc4e0703..cfbd70520eeb 100644
+--- a/drivers/block/z2ram.c
++++ b/drivers/block/z2ram.c
+@@ -190,8 +190,7 @@ static int z2_open(struct block_device *bdev, fmode_t mode)
+ 			vfree(vmalloc (size));
+ 		}
  
- #ifdef CONFIG_PM
--static inline void blk_pm_requeue_request(struct request *rq)
--{
--}
--
- static inline void blk_pm_add_request(struct request_queue *q,
- 				      struct request *rq)
- {
-@@ -26,10 +22,6 @@ static inline void blk_pm_put_request(struct request *rq)
- 		pm_runtime_mark_last_busy(rq->q->dev);
- }
+-		vaddr = (unsigned long) __ioremap (paddr, size, 
+-						   _PAGE_WRITETHRU);
++		vaddr = (unsigned long)ioremap_wt(paddr, size);
+ 
  #else
--static inline void blk_pm_requeue_request(struct request *rq)
--{
--}
--
- static inline void blk_pm_add_request(struct request_queue *q,
- 				      struct request *rq)
- {
-diff --git a/block/elevator.c b/block/elevator.c
-index 4c15f0240c99..fd7b12bb32a3 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -572,8 +572,6 @@ void elv_requeue_request(struct request_queue *q, struct request *rq)
- 
- 	rq->rq_flags &= ~RQF_STARTED;
- 
--	blk_pm_requeue_request(rq);
--
- 	__elv_add_request(q, rq, ELEVATOR_INSERT_REQUEUE);
- }
- 
+ 		vaddr = (unsigned long)z_remap_nocache_nonser(paddr, size);
 -- 
-2.18.0
+2.13.3
