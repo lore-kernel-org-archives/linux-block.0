@@ -1,84 +1,56 @@
-Return-Path: <prvs=7477a5644=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Tejun Heo <tj@kernel.org>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v4 06/10] percpu-refcount: Introduce percpu_ref_read()
-Date: Fri,  3 Aug 2018 17:03:21 -0700
-Message-Id: <20180804000325.3610-7-bart.vanassche@wdc.com>
-In-Reply-To: <20180804000325.3610-1-bart.vanassche@wdc.com>
-References: <20180804000325.3610-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-oi0-f66.google.com ([209.85.218.66]:45999 "EHLO
+        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726009AbeHYNZ3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 25 Aug 2018 09:25:29 -0400
+MIME-Version: 1.0
+From: Junhui Tang <tang.junhui.linux@gmail.com>
+Date: Sat, 25 Aug 2018 17:48:04 +0800
+Message-ID: <CA+NNRhF8-M4S-hby3MJn=i-+7f=giRb9FaK9gwsYLy08wnS_xQ@mail.gmail.com>
+Subject: [PATCH] bcache: fix miss key refill->end in writeback
+To: colyli@suse.de
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Introduce a function that allows to read the value of a per-cpu counter.
-This function will be used in the next patch to check whether a per-cpu
-counter has the value one.
+>From 5562f3868115ba5f6d4242750e02bb4c179c5274 Mon Sep 17 00:00:00 2001
+From: Tang Junhui <tang.junhui.linux@gmail.com>
+Date: Sun, 26 Aug 2018 01:28:35 +0800
+Subject: [PATCH] bcache: fix miss key refill->end in writeback
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Tang Junhui <tang.junhui.linux@gmail.com>
+refill->end record the last key of writeback,
+for example, at the first time, keys (1,128K) to (1,1024K)
+are flush to the backend device, but the end key (1,1024K)
+is not included, since the bellow code:
+if (bkey_cmp(k, refill->end) >= 0) {
+ret = MAP_DONE;
+goto out;
+}
+And in the next time when we refill writeback keybuf again,
+we searched key start from (1,1024K), and got a key bigger
+than it, so the key (1,1024K) missed.
+This patch modify the above code, and let the end key to
+be included to the writeback key buffer.
 ---
- include/linux/percpu-refcount.h |  2 ++
- lib/percpu-refcount.c           | 29 +++++++++++++++++++++++++++++
- 2 files changed, 31 insertions(+)
+ drivers/md/bcache/btree.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/percpu-refcount.h b/include/linux/percpu-refcount.h
-index 009cdf3d65b6..5707289ba828 100644
---- a/include/linux/percpu-refcount.h
-+++ b/include/linux/percpu-refcount.h
-@@ -331,4 +331,6 @@ static inline bool percpu_ref_is_zero(struct percpu_ref *ref)
- 	return !atomic_long_read(&ref->count);
- }
- 
-+unsigned long percpu_ref_read(struct percpu_ref *ref);
-+
- #endif
-diff --git a/lib/percpu-refcount.c b/lib/percpu-refcount.c
-index 9f96fa7bc000..c0b9fc8efa6b 100644
---- a/lib/percpu-refcount.c
-+++ b/lib/percpu-refcount.c
-@@ -369,3 +369,32 @@ void percpu_ref_reinit(struct percpu_ref *ref)
- 	spin_unlock_irqrestore(&percpu_ref_switch_lock, flags);
- }
- EXPORT_SYMBOL_GPL(percpu_ref_reinit);
-+
-+/**
-+ * percpu_ref_read - read a percpu refcount
-+ * @ref: percpu_ref to test
-+ *
-+ * This function is safe to call as long as @ref is between init and exit. It
-+ * is the responsibility of the caller to handle changes of @ref concurrently
-+ * with this function. If this function is called while @ref is in per-cpu
-+ * mode the returned value may be incorrect if e.g. percpu_ref_get() is called
-+ * from one CPU and percpu_ref_put() is called from another CPU.
-+ */
-+unsigned long percpu_ref_read(struct percpu_ref *ref)
-+{
-+	unsigned long __percpu *percpu_count;
-+	unsigned long sum = 0;
-+	int cpu;
-+
-+	rcu_read_lock_sched();
-+	if (__ref_is_percpu(ref, &percpu_count)) {
-+		for_each_possible_cpu(cpu)
-+			sum += *per_cpu_ptr(percpu_count, cpu);
-+	}
-+	rcu_read_unlock_sched();
-+	sum += atomic_long_read(&ref->count);
-+	sum &= ~PERCPU_COUNT_BIAS;
-+
-+	return sum;
-+}
-+EXPORT_SYMBOL_GPL(percpu_ref_read);
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index 079ae18..2b5df26 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -2363,7 +2363,7 @@ static int refill_keybuf_fn(struct btree_op *op,
+struct btree *b,
+  struct keybuf *buf = refill->buf;
+  int ret = MAP_CONTINUE;
+
+- if (bkey_cmp(k, refill->end) >= 0) {
++ if (bkey_cmp(k, refill->end) > 0) {
+  ret = MAP_DONE;
+  goto out;
+  }
 -- 
-2.18.0
+1.8.3.1
