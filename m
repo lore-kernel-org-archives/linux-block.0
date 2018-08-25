@@ -1,218 +1,38 @@
-Return-Path: <jgross@suse.com>
-From: Juergen Gross <jgross@suse.com>
-To: linux-kernel@vger.kernel.org,
-	xen-devel@lists.xenproject.org,
-	linux-block@vger.kernel.org
-Cc: konrad.wilk@oracle.com,
-	roger.pau@citrix.com,
-	axboe@kernel.dk,
-	boris.ostrovsky@oracle.com,
-	Juergen Gross <jgross@suse.com>
-Subject: [PATCH v2 2/5] xen/blkfront: cleanup stale persistent grants
-Date: Wed,  8 Aug 2018 16:25:25 +0200
-Message-Id: <20180808142528.31029-3-jgross@suse.com>
-In-Reply-To: <20180808142528.31029-1-jgross@suse.com>
-References: <20180808142528.31029-1-jgross@suse.com>
+Return-Path: <christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH RESEND 3/3] drivers/block/z2ram: use ioremap_wt() instead of
+ __ioremap(_PAGE_WRITETHRU)
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>,
+ Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-block@vger.kernel.org,
+ linux-m68k@lists.linux-m68k.org, linuxppc-dev@lists.ozlabs.org
+Message-Id: <20180825143425.5014E104912@pc16082vm.idsi0.si.c-s.fr>
+Date: Sat, 25 Aug 2018 16:34:25 +0200 (CEST)
 List-ID: <linux-block@vger.kernel.org>
 
-Add a periodic cleanup function to remove old persistent grants which
-are no longer in use on the backend side. This avoids starvation in
-case there are lots of persistent grants for a device which no longer
-is involved in I/O business.
+_PAGE_WRITETHRU is a target specific flag. Prefer generic functions.
 
-Signed-off-by: Juergen Gross <jgross@suse.com>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- drivers/block/xen-blkfront.c | 94 ++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 90 insertions(+), 4 deletions(-)
+ drivers/block/z2ram.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index b5cedccb5d7d..7c4b1b9d3971 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -46,6 +46,7 @@
- #include <linux/scatterlist.h>
- #include <linux/bitmap.h>
- #include <linux/list.h>
-+#include <linux/workqueue.h>
+diff --git a/drivers/block/z2ram.c b/drivers/block/z2ram.c
+index d0c5bc4e0703..cfbd70520eeb 100644
+--- a/drivers/block/z2ram.c
++++ b/drivers/block/z2ram.c
+@@ -190,8 +190,7 @@ static int z2_open(struct block_device *bdev, fmode_t mode)
+ 			vfree(vmalloc (size));
+ 		}
  
- #include <xen/xen.h>
- #include <xen/xenbus.h>
-@@ -121,6 +122,8 @@ static inline struct blkif_req *blkif_req(struct request *rq)
+-		vaddr = (unsigned long) __ioremap (paddr, size, 
+-						   _PAGE_WRITETHRU);
++		vaddr = (unsigned long)ioremap_wt(paddr, size);
  
- static DEFINE_MUTEX(blkfront_mutex);
- static const struct block_device_operations xlvbd_block_fops;
-+static struct delayed_work blkfront_work;
-+static LIST_HEAD(info_list);
- 
- /*
-  * Maximum number of segments in indirect requests, the actual value used by
-@@ -216,6 +219,7 @@ struct blkfront_info
- 	/* Save uncomplete reqs and bios for migration. */
- 	struct list_head requests;
- 	struct bio_list bio_list;
-+	struct list_head info_list;
- };
- 
- static unsigned int nr_minors;
-@@ -1764,6 +1768,12 @@ static int write_per_ring_nodes(struct xenbus_transaction xbt,
- 	return err;
- }
- 
-+static void free_info(struct blkfront_info *info)
-+{
-+	list_del(&info->info_list);
-+	kfree(info);
-+}
-+
- /* Common code used when first setting up, and when resuming. */
- static int talk_to_blkback(struct xenbus_device *dev,
- 			   struct blkfront_info *info)
-@@ -1885,7 +1895,10 @@ static int talk_to_blkback(struct xenbus_device *dev,
-  destroy_blkring:
- 	blkif_free(info, 0);
- 
--	kfree(info);
-+	mutex_lock(&blkfront_mutex);
-+	free_info(info);
-+	mutex_unlock(&blkfront_mutex);
-+
- 	dev_set_drvdata(&dev->dev, NULL);
- 
- 	return err;
-@@ -1996,6 +2009,10 @@ static int blkfront_probe(struct xenbus_device *dev,
- 	info->handle = simple_strtoul(strrchr(dev->nodename, '/')+1, NULL, 0);
- 	dev_set_drvdata(&dev->dev, info);
- 
-+	mutex_lock(&blkfront_mutex);
-+	list_add(&info->info_list, &info_list);
-+	mutex_unlock(&blkfront_mutex);
-+
- 	return 0;
- }
- 
-@@ -2306,6 +2323,12 @@ static void blkfront_gather_backend_features(struct blkfront_info *info)
- 	if (indirect_segments <= BLKIF_MAX_SEGMENTS_PER_REQUEST)
- 		indirect_segments = 0;
- 	info->max_indirect_segments = indirect_segments;
-+
-+	if (info->feature_persistent) {
-+		mutex_lock(&blkfront_mutex);
-+		schedule_delayed_work(&blkfront_work, HZ * 10);
-+		mutex_unlock(&blkfront_mutex);
-+	}
- }
- 
- /*
-@@ -2487,7 +2510,9 @@ static int blkfront_remove(struct xenbus_device *xbdev)
- 	mutex_unlock(&info->mutex);
- 
- 	if (!bdev) {
--		kfree(info);
-+		mutex_lock(&blkfront_mutex);
-+		free_info(info);
-+		mutex_unlock(&blkfront_mutex);
- 		return 0;
- 	}
- 
-@@ -2507,7 +2532,9 @@ static int blkfront_remove(struct xenbus_device *xbdev)
- 	if (info && !bdev->bd_openers) {
- 		xlvbd_release_gendisk(info);
- 		disk->private_data = NULL;
--		kfree(info);
-+		mutex_lock(&blkfront_mutex);
-+		free_info(info);
-+		mutex_unlock(&blkfront_mutex);
- 	}
- 
- 	mutex_unlock(&bdev->bd_mutex);
-@@ -2590,7 +2617,7 @@ static void blkif_release(struct gendisk *disk, fmode_t mode)
- 		dev_info(disk_to_dev(bdev->bd_disk), "releasing disk\n");
- 		xlvbd_release_gendisk(info);
- 		disk->private_data = NULL;
--		kfree(info);
-+		free_info(info);
- 	}
- 
- out:
-@@ -2623,6 +2650,61 @@ static struct xenbus_driver blkfront_driver = {
- 	.is_ready = blkfront_is_ready,
- };
- 
-+static void purge_persistent_grants(struct blkfront_info *info)
-+{
-+	unsigned int i;
-+	unsigned long flags;
-+
-+	for (i = 0; i < info->nr_rings; i++) {
-+		struct blkfront_ring_info *rinfo = &info->rinfo[i];
-+		struct grant *gnt_list_entry, *tmp;
-+
-+		spin_lock_irqsave(&rinfo->ring_lock, flags);
-+
-+		if (rinfo->persistent_gnts_c == 0) {
-+			spin_unlock_irqrestore(&rinfo->ring_lock, flags);
-+			continue;
-+		}
-+
-+		list_for_each_entry_safe(gnt_list_entry, tmp, &rinfo->grants,
-+					 node) {
-+			if (gnt_list_entry->gref == GRANT_INVALID_REF ||
-+			    gnttab_query_foreign_access(gnt_list_entry->gref))
-+				continue;
-+
-+			list_del(&gnt_list_entry->node);
-+			gnttab_end_foreign_access(gnt_list_entry->gref, 0, 0UL);
-+			rinfo->persistent_gnts_c--;
-+			__free_page(gnt_list_entry->page);
-+			kfree(gnt_list_entry);
-+		}
-+
-+		spin_unlock_irqrestore(&rinfo->ring_lock, flags);
-+	}
-+}
-+
-+static void blkfront_delay_work(struct work_struct *work)
-+{
-+	struct blkfront_info *info;
-+	bool need_schedule_work = false;
-+
-+	mutex_lock(&blkfront_mutex);
-+
-+	list_for_each_entry(info, &info_list, info_list) {
-+		if (info->feature_persistent) {
-+			need_schedule_work = true;
-+			mutex_lock(&info->mutex);
-+			purge_persistent_grants(info);
-+			mutex_unlock(&info->mutex);
-+		}
-+	}
-+
-+	if (need_schedule_work)
-+		schedule_delayed_work(&blkfront_work, HZ * 10);
-+
-+	mutex_unlock(&blkfront_mutex);
-+}
-+
- static int __init xlblk_init(void)
- {
- 	int ret;
-@@ -2655,6 +2737,8 @@ static int __init xlblk_init(void)
- 		return -ENODEV;
- 	}
- 
-+	INIT_DELAYED_WORK(&blkfront_work, blkfront_delay_work);
-+
- 	ret = xenbus_register_frontend(&blkfront_driver);
- 	if (ret) {
- 		unregister_blkdev(XENVBD_MAJOR, DEV_NAME);
-@@ -2668,6 +2752,8 @@ module_init(xlblk_init);
- 
- static void __exit xlblk_exit(void)
- {
-+	cancel_delayed_work_sync(&blkfront_work);
-+
- 	xenbus_unregister_driver(&blkfront_driver);
- 	unregister_blkdev(XENVBD_MAJOR, DEV_NAME);
- 	kfree(minors);
+ #else
+ 		vaddr = (unsigned long)z_remap_nocache_nonser(paddr, size);
 -- 
-2.13.7
+2.17.1
