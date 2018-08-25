@@ -1,77 +1,37 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:38560 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727525AbeHIJDq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Aug 2018 05:03:46 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 00/17] fixes reported by checkpatch.pl 
-Date: Thu,  9 Aug 2018 14:38:44 +0800
-Message-Id: <20180809063901.10169-1-colyli@suse.de>
+Received: from mail-yw1-f65.google.com ([209.85.161.65]:40733 "EHLO
+        mail-yw1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726078AbeHYGPc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 25 Aug 2018 02:15:32 -0400
+Subject: Re: [PATCH] block: fix rdma queue mapping
+To: Max Gurtovoy <maxg@mellanox.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org
+Cc: Christoph Hellwig <hch@lst.de>,
+        Steve Wise <swise@opengridcomputing.com>,
+        Israel Rukshin <israelr@mellanox.com>
+References: <20180817223823.19566-1-sagi@grimberg.me>
+ <5973cbfe-1466-cf44-c33e-d9b0dbcc9ca6@mellanox.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <1057d15e-ffea-ead8-71b0-58a38174966a@grimberg.me>
+Date: Fri, 24 Aug 2018 19:38:13 -0700
+MIME-Version: 1.0
+In-Reply-To: <5973cbfe-1466-cf44-c33e-d9b0dbcc9ca6@mellanox.com>
+Content-Type: text/plain; charset=windows-1255; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This series contains several minor fixes and code cleanup reported by
-scripts/checkpatch.pl. After this series, there are still a few warning
-from checkpatch.pl, but I think they are necessary to be the way they
-are and don't change them. For example, error message exceeds 80 chars
-line limit.
 
-Thanks in advance for any comment or review.
+> Hi Sagi,
+> did you have a chance to look on Israel's and mine fixes that we 
+> attached to the first thread ?
+> 
+> there are few issues with this approach. For example in case you don't 
+> have a "free" cpu in the mask for Qi and you take cpu from Qi+j mask.
+> 
+> Also in case we have a non-symetrical affinity for 2 queues e.g. and the 
+> system has 32 cpus, the mapping is 16 for each (and not according to the 
+> user affinity...).
 
-Coly Li
----
-Coly Li (17):
-  bcache: style fix to replace 'unsigned' by 'unsigned int'
-  bcache: style fix to add a blank line after declarations
-  bcache: add identifier names to arguments of function definitions
-  bcache: style fixes for lines over 80 characters
-  bcache: replace Symbolic permissions by octal permission numbers
-  bcache: replace printk() by pr_*() routines
-  bcache: fix indent by replacing blank by tabs
-  bcache: replace '%pF' by '%pS' in seq_printf()
-  bcache: fix typo 'succesfully' to 'successfully'
-  bcache: prefer 'help' in Kconfig
-  bcache: do not check NULL pointer before calling kmem_cache_destroy
-  bcache: fix code comments style
-  bcache: add static const prefix to char * array declarations
-  bcache: move open brace at end of function definitions to next line
-  bcache: add missing SPDX header
-  bcache: remove unnecessary space before ioctl function pointer
-    arguments
-  bcache: add the missing code comments for smp_mb()
-
- drivers/md/bcache/Kconfig     |   6 +-
- drivers/md/bcache/alloc.c     |  39 ++++---
- drivers/md/bcache/bcache.h    | 210 +++++++++++++++++-----------------
- drivers/md/bcache/bset.c      | 129 +++++++++++----------
- drivers/md/bcache/bset.h      | 146 ++++++++++++-----------
- drivers/md/bcache/btree.c     |  66 ++++++-----
- drivers/md/bcache/btree.h     |  86 +++++++-------
- drivers/md/bcache/closure.c   |   6 +-
- drivers/md/bcache/closure.h   |   6 +-
- drivers/md/bcache/debug.c     |  23 ++--
- drivers/md/bcache/debug.h     |   6 +-
- drivers/md/bcache/extents.c   |  37 +++---
- drivers/md/bcache/extents.h   |   6 +-
- drivers/md/bcache/io.c        |  24 ++--
- drivers/md/bcache/journal.c   |  25 ++--
- drivers/md/bcache/journal.h   |  28 ++---
- drivers/md/bcache/movinggc.c  |  14 ++-
- drivers/md/bcache/request.c   |  59 +++++-----
- drivers/md/bcache/request.h   |  18 +--
- drivers/md/bcache/stats.c     |  15 ++-
- drivers/md/bcache/stats.h     |  15 ++-
- drivers/md/bcache/super.c     | 103 ++++++++++-------
- drivers/md/bcache/sysfs.c     |  36 +++---
- drivers/md/bcache/sysfs.h     |   6 +-
- drivers/md/bcache/util.c      |   2 +
- drivers/md/bcache/util.h      |  24 ++--
- drivers/md/bcache/writeback.c |  27 +++--
- drivers/md/bcache/writeback.h |  19 +--
- include/uapi/linux/bcache.h   |   8 +-
- 29 files changed, 660 insertions(+), 529 deletions(-)
-
--- 
-2.18.0
+Can you explain a little better? From Steve's mappings it behaved like I
+expected it to.
