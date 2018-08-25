@@ -1,42 +1,78 @@
-Return-Path: <javier@javigon.com>
-Return-Path: <javier@javigon.com>
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	=?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [V3 PATCH 0/2] lightnvm: pblk: take write semaphore on metadata
-Date: Fri, 17 Aug 2018 12:19:08 +0200
-Message-Id: <1534501150-11906-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH RESEND 1/3] powerpc/32: Add ioremap_wt()
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>,
+ Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-block@vger.kernel.org,
+ linux-m68k@lists.linux-m68k.org, linuxppc-dev@lists.ozlabs.org
+Message-Id: <20180825143421.42F4F104912@pc16082vm.idsi0.si.c-s.fr>
+Date: Sat, 25 Aug 2018 16:34:21 +0200 (CEST)
 List-ID: <linux-block@vger.kernel.org>
 
-# Changes since V2:
-  - Split the original patch between the metadata refactoring and the
-    semaphore logic. This simplifies the write path, where the semaphore
-    is taken.
+Other arches have ioremap_wt() to map IO areas write-through.
+Implement it on PPC as well in order to avoid drivers using
+__ioremap(_PAGE_WRITETHRU)
 
-# Changes singe V1:
-  - Fix double I/O on the read path (by Matias)
-  - Improve commit message (by Jens)
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+---
+ No change. First serie didn't apply because I generated it on a working branch.
 
-This patchset refactors the metadata separate write and read paths,
-which simplifies how the semaphore is taken for writes.
+ arch/powerpc/include/asm/io.h | 6 ++++++
+ arch/powerpc/mm/pgtable_32.c  | 8 ++++++++
+ 2 files changed, 14 insertions(+)
 
-Thanks,
-Javier
-
-Javier González (2):
-  lightnvm: pblk: refactor metadata paths
-  lightnvm: pblk: take write semaphore on metadata
-
- drivers/lightnvm/pblk-core.c     | 352 +++++++++++++++++++--------------------
- drivers/lightnvm/pblk-gc.c       |   2 +-
- drivers/lightnvm/pblk-recovery.c |   4 +-
- drivers/lightnvm/pblk.h          |   5 +-
- 4 files changed, 178 insertions(+), 185 deletions(-)
-
+diff --git a/arch/powerpc/include/asm/io.h b/arch/powerpc/include/asm/io.h
+index e0331e754568..3380b5b22450 100644
+--- a/arch/powerpc/include/asm/io.h
++++ b/arch/powerpc/include/asm/io.h
+@@ -3,6 +3,9 @@
+ #ifdef __KERNEL__
+ 
+ #define ARCH_HAS_IOREMAP_WC
++#ifdef CONFIG_PPC32
++#define ARCH_HAS_IOREMAP_WT
++#endif
+ 
+ /*
+  * This program is free software; you can redistribute it and/or
+@@ -746,6 +749,8 @@ static inline void iosync(void)
+  *
+  * * ioremap_wc enables write combining
+  *
++ * * ioremap_wt enables write through
++ *
+  * * iounmap undoes such a mapping and can be hooked
+  *
+  * * __ioremap_at (and the pending __iounmap_at) are low level functions to
+@@ -767,6 +772,7 @@ extern void __iomem *ioremap(phys_addr_t address, unsigned long size);
+ extern void __iomem *ioremap_prot(phys_addr_t address, unsigned long size,
+ 				  unsigned long flags);
+ extern void __iomem *ioremap_wc(phys_addr_t address, unsigned long size);
++void __iomem *ioremap_wt(phys_addr_t address, unsigned long size);
+ #define ioremap_nocache(addr, size)	ioremap((addr), (size))
+ #define ioremap_uc(addr, size)		ioremap((addr), (size))
+ #define ioremap_cache(addr, size) \
+diff --git a/arch/powerpc/mm/pgtable_32.c b/arch/powerpc/mm/pgtable_32.c
+index 120a49bfb9c6..528999738645 100644
+--- a/arch/powerpc/mm/pgtable_32.c
++++ b/arch/powerpc/mm/pgtable_32.c
+@@ -89,6 +89,14 @@ ioremap_wc(phys_addr_t addr, unsigned long size)
+ }
+ EXPORT_SYMBOL(ioremap_wc);
+ 
++void __iomem *
++ioremap_wt(phys_addr_t addr, unsigned long size)
++{
++	return __ioremap_caller(addr, size, _PAGE_WRITETHRU,
++				__builtin_return_address(0));
++}
++EXPORT_SYMBOL(ioremap_wt);
++
+ void __iomem *
+ ioremap_prot(phys_addr_t addr, unsigned long size, unsigned long flags)
+ {
 -- 
-2.7.4
+2.17.1
