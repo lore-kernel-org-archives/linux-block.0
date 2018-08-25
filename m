@@ -9,8 +9,8 @@ To: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
 Cc: linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  dri-devel@lists.freedesktop.org, linux-block@vger.kernel.org,
  linux-m68k@lists.linux-m68k.org, linuxppc-dev@lists.ozlabs.org
-Message-Id: <20180825143425.5014E104912@pc16082vm.idsi0.si.c-s.fr>
-Date: Sat, 25 Aug 2018 16:34:25 +0200 (CEST)
+Message-Id: <20180825142702.77FD7104918@pc16082vm.idsi0.si.c-s.fr>
+Date: Sat, 25 Aug 2018 16:27:02 +0200 (CEST)
 List-ID: <linux-block@vger.kernel.org>
 
 _PAGE_WRITETHRU is a target specific flag. Prefer generic functions.
