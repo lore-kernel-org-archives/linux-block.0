@@ -1,55 +1,48 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52460 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725724AbeHJE7b (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Aug 2018 00:59:31 -0400
-Date: Fri, 10 Aug 2018 10:31:29 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Felipe Franciosi <felipe@nutanix.com>, stable@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Omar Sandoval <osandov@fb.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Don Brace <don.brace@microsemi.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        "Greg A. Smith" <gasmith@nutanix.com>,
-        Peter Turschmid <peter.turschm@nutanix.com>
-Subject: Re: Fix for 84676c1f (b5b6e8c8) missing in 4.14.y
-Message-ID: <20180810023128.GB2816@ming.t460p>
-References: <53EA26B1-86F8-40BF-A128-33137217A3F9@nutanix.com>
+Received: from userp2130.oracle.com ([156.151.31.86]:39670 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726500AbeHZRc5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 26 Aug 2018 13:32:57 -0400
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jeffrey Lien <Jeff.Lien@wdc.com>,
+        David Darrington <david.darrington@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jeff Furlong <jeff.furlong@wdc.com>,
+        linux-block@vger.kernel.org,
+        "open list\:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-scsi@vger.kernel.org, Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH 4/4] block: Integrity profile init function to trigger module loads
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20180825061205.ygrjjazkooqghrqy@gondor.apana.org.au>
+        <20180826024006.13800-1-martin.petersen@oracle.com>
+        <20180826024006.13800-4-martin.petersen@oracle.com>
+        <CAKv+Gu92yj5Cuz36bRS7wz3Lg2srp8OFJC6QVO0UWYSjm8eEeg@mail.gmail.com>
+        <yq1h8jh6yrk.fsf@oracle.com>
+        <CAKv+Gu88A8OmVGV3-9YGkgNKOtCRmN70Ys2WL+F7au=NB4vydQ@mail.gmail.com>
+Date: Sun, 26 Aug 2018 09:48:55 -0400
+In-Reply-To: <CAKv+Gu88A8OmVGV3-9YGkgNKOtCRmN70Ys2WL+F7au=NB4vydQ@mail.gmail.com>
+        (Ard Biesheuvel's message of "Sun, 26 Aug 2018 15:44:31 +0200")
+Message-ID: <yq1d0u56xx4.fsf@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <53EA26B1-86F8-40BF-A128-33137217A3F9@nutanix.com>
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Aug 10, 2018 at 02:09:01AM +0000, Felipe Franciosi wrote:
-> Hi Ming (and all),
-> 
-> Your series "scsi: virtio_scsi: fix IO hang caused by irq vector automatic affinity" which forces virtio-scsi to use blk-mq fixes an issue introduced by 84676c1f. We noticed that this bug also exists in 4.14.y (as ef86f3a72adb), but your series was not backported to that stable branch.
-> 
-> Are there any plans to do that? At least CoreOS is using 4.14 and showing issues on AHV (which provides an mq virtio-scsi controller).
-> 
 
-Hi Felipe,
+Ard,
 
-Looks the following 4 patches should have been marked as stable, sorry
-for missing that.
+> That is odd. On my Ubuntu system, both crct10dif_pclmul and
+> crc32_pclmul get loaded automatically.
 
-b5b6e8c8d3b4 scsi: virtio_scsi: fix IO hang caused by automatic irq vector affinity
-2f31115e940c scsi: core: introduce force_blk_mq
-adbe552349f2 scsi: megaraid_sas: fix selection of reply queue
-8b834bff1b73 scsi: hpsa: fix selection of reply queue
+Just checked my Fedora box and they are loaded there too. Peculiar. I'll
+keep digging...
 
-Usually this backporting is done by our stable guys, so I will CC stable
-and leave them handle it, but I am happy to provide any help for
-addressing conflicts or sort of thing.
+(crc32c-intel is brought in by dracut on RHEL/OL/Fedora, fwiw)
 
-
-Thanks,
-Ming
+-- 
+Martin K. Petersen	Oracle Linux Engineering
