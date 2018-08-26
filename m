@@ -1,42 +1,47 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: axboe@kernel.dk,
-	linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH v3 07/17] bcache: fix indent by replacing blank by tabs
-Date: Sat, 11 Aug 2018 13:19:50 +0800
-Message-Id: <20180811052000.103680-8-colyli@suse.de>
-In-Reply-To: <20180811052000.103680-1-colyli@suse.de>
-References: <20180811052000.103680-1-colyli@suse.de>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Jeffrey Lien <Jeff.Lien@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto\@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi\@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "tim.c.chen\@linux.intel.com" <tim.c.chen@linux.intel.com>,
+        David Darrington <david.darrington@wdc.com>,
+        Jeff Furlong <jeff.furlong@wdc.com>
+Subject: Re: [PATCH] Performance Improvement in CRC16 Calculations.
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1533928331-21303-1-git-send-email-jeff.lien@wdc.com>
+        <yq1in4gq5jf.fsf@oracle.com> <yq1lg8zb2lp.fsf@oracle.com>
+        <20180822062016.GA10356@infradead.org>
+        <SN1PR04MB18241CBDC8E4CA5275EE4424EA360@SN1PR04MB1824.namprd04.prod.outlook.com>
+        <CAKv+Gu-RwCrdgW69NVpyRLwGPGPCZx+ksTBM7NZk7v0-dzczGg@mail.gmail.com>
+        <yq1a7pb9196.fsf@oracle.com>
+        <CAKv+Gu8Y7YmyB5rmxaj-SGB7q03in7ijv2cOifwYnhP5CNastw@mail.gmail.com>
+        <yq1tvnj780o.fsf@oracle.com>
+        <20180825061205.ygrjjazkooqghrqy@gondor.apana.org.au>
+Date: Sat, 25 Aug 2018 22:35:23 -0400
+In-Reply-To: <20180825061205.ygrjjazkooqghrqy@gondor.apana.org.au> (Herbert
+        Xu's message of "Sat, 25 Aug 2018 14:12:05 +0800")
+Message-ID: <yq1lg8t7t3o.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-bch_btree_insert_check_key() has unaligned indent, or indent by blank
-characters. This patch makes the indent aligned and replace blank by
-tabs.
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Shenghui Wang <shhuiw@foxmail.com>
----
- drivers/md/bcache/btree.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Herbert,
 
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index c2e4174a2e03..e7d4817681f2 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -2231,10 +2231,10 @@ int bch_btree_insert_check_key(struct btree *b, struct btree_op *op,
- 		rw_lock(true, b, b->level);
- 
- 		if (b->key.ptr[0] != btree_ptr ||
--                   b->seq != seq + 1) {
-+		    b->seq != seq + 1) {
- 			op->lock = b->level;
- 			goto out;
--               }
-+		}
- 	}
- 
- 	SET_KEY_PTRS(check_key, 1);
+> I don't think this is safe unless you do some kind of locking
+> which would slow down the data path.  The easiest fix would be
+> to keep the old tfm around forever, or use RCU if RCU read locking
+> is acceptable to your use-case.
+
+You're right. There's a small race there.
+
+Patch series coming...
+
 -- 
-2.18.0
+Martin K. Petersen	Oracle Linux Engineering
