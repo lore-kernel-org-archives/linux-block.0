@@ -1,212 +1,159 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-From: Dennis Zhou <dennisszhou@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Josef Bacik <josef@toxicpanda.com>
-Cc: kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>,
-	Jiufei Xue <jiufei.xue@linux.alibaba.com>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>
-Subject: [PATCH 1/3] Revert "blk-throttle: fix race between blkcg_bio_issue_check() and cgroup_rmdir()"
-Date: Fri, 31 Aug 2018 16:22:42 -0400
-Message-Id: <20180831202244.21678-2-dennisszhou@gmail.com>
-In-Reply-To: <20180831202244.21678-1-dennisszhou@gmail.com>
-References: <20180831202244.21678-1-dennisszhou@gmail.com>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: James Bottomley <James.Bottomley@HansenPartnership.com>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Omar Sandoval <osandov@fb.com>,
+	James Bottomley <james.bottomley@hansenpartnership.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Don Brace <don.brace@microsemi.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Laurence Oberman <loberman@redhat.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 2/2] Revert "scsi: core: avoid host-wide host_busy counter for scsi_mq"
+Date: Mon, 27 Aug 2018 15:24:43 +0800
+Message-Id: <20180827072443.26920-3-ming.lei@redhat.com>
+In-Reply-To: <20180827072443.26920-1-ming.lei@redhat.com>
+References: <20180827072443.26920-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+This reverts commit 328728630d9f2bf14b82ca30b5e47489beefe361.
 
-This reverts commit 4c6994806f708559c2812b73501406e21ae5dcd0.
+There is fundamental issue in commit 328728630d9f2bf1 (scsi: core: avoid
+host-wide host_busy counter for scsi_mq) because SCSI's host busy counter
+may not be same with counter of blk-mq's inflight tags, especially in case
+of none io scheduler.
 
-Destroying blkgs is tricky because of the nature of the relationship. A
-blkg should go away when either a blkcg or a request_queue goes away.
-However, blkg's pin the blkcg to ensure they remain valid. To break this
-cycle, when a blkcg is offlined, blkgs put back their css ref. This
-eventually lets css_free() get called which frees the blkcg.
+We may switch to other approach for addressing this scsi_mq's performance issue,
+such as percpu counter or kind of ways, so revert this commit first for fixing this
+kind of issue in EH path, as reported by Jens.
 
-The above commit (4c6994806f70) breaks this order of events by trying to
-destroy blkgs in css_free(). As the blkgs still hold references to the
-blkcg, css_free() is never called.
-
-The race between blkcg_bio_issue_check() and cgroup_rmdir() will be
-addressed in the following patch by delaying destruction of a blkg until
-all writeback associated with the blkcg has been finished.
-
-Fixes: 4c6994806f70 ("blk-throttle: fix race between blkcg_bio_issue_check() and cgroup_rmdir()")
-Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
-Cc: Jiufei Xue <jiufei.xue@linux.alibaba.com>
-Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
-Cc: Tejun Heo <tj@kernel.org>
+Cc: Omar Sandoval <osandov@fb.com>,
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
+Cc: Christoph Hellwig <hch@lst.de>,
+Cc: Don Brace <don.brace@microsemi.com>
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Laurence Oberman <loberman@redhat.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
 Cc: Jens Axboe <axboe@kernel.dk>
+Reported-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-cgroup.c         | 78 ++++++++------------------------------
- include/linux/blk-cgroup.h |  1 -
- 2 files changed, 16 insertions(+), 63 deletions(-)
+ drivers/scsi/hosts.c    | 24 +-----------------------
+ drivers/scsi/scsi_lib.c | 23 ++++++-----------------
+ 2 files changed, 7 insertions(+), 40 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 694595b29b8f..2998e4f095d1 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -310,28 +310,11 @@ struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
- 	}
+diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
+index f02dcc875a09..ea4b0bb0c1cd 100644
+--- a/drivers/scsi/hosts.c
++++ b/drivers/scsi/hosts.c
+@@ -563,35 +563,13 @@ struct Scsi_Host *scsi_host_get(struct Scsi_Host *shost)
  }
+ EXPORT_SYMBOL(scsi_host_get);
  
--static void blkg_pd_offline(struct blkcg_gq *blkg)
+-struct scsi_host_mq_in_flight {
+-	int cnt;
+-};
+-
+-static void scsi_host_check_in_flight(struct request *rq, void *data,
+-		bool reserved)
 -{
--	int i;
+-	struct scsi_host_mq_in_flight *in_flight = data;
 -
--	lockdep_assert_held(blkg->q->queue_lock);
--	lockdep_assert_held(&blkg->blkcg->lock);
--
--	for (i = 0; i < BLKCG_MAX_POLS; i++) {
--		struct blkcg_policy *pol = blkcg_policy[i];
--
--		if (blkg->pd[i] && !blkg->pd[i]->offline &&
--		    pol->pd_offline_fn) {
--			pol->pd_offline_fn(blkg->pd[i]);
--			blkg->pd[i]->offline = true;
--		}
--	}
+-	if (blk_mq_request_started(rq))
+-		in_flight->cnt++;
 -}
 -
- static void blkg_destroy(struct blkcg_gq *blkg)
+ /**
+  * scsi_host_busy - Return the host busy counter
+  * @shost:	Pointer to Scsi_Host to inc.
+  **/
+ int scsi_host_busy(struct Scsi_Host *shost)
  {
- 	struct blkcg *blkcg = blkg->blkcg;
- 	struct blkcg_gq *parent = blkg->parent;
-+	int i;
- 
- 	lockdep_assert_held(blkg->q->queue_lock);
- 	lockdep_assert_held(&blkcg->lock);
-@@ -340,6 +323,13 @@ static void blkg_destroy(struct blkcg_gq *blkg)
- 	WARN_ON_ONCE(list_empty(&blkg->q_node));
- 	WARN_ON_ONCE(hlist_unhashed(&blkg->blkcg_node));
- 
-+	for (i = 0; i < BLKCG_MAX_POLS; i++) {
-+		struct blkcg_policy *pol = blkcg_policy[i];
-+
-+		if (blkg->pd[i] && pol->pd_offline_fn)
-+			pol->pd_offline_fn(blkg->pd[i]);
-+	}
-+
- 	if (parent) {
- 		blkg_rwstat_add_aux(&parent->stat_bytes, &blkg->stat_bytes);
- 		blkg_rwstat_add_aux(&parent->stat_ios, &blkg->stat_ios);
-@@ -382,7 +372,6 @@ static void blkg_destroy_all(struct request_queue *q)
- 		struct blkcg *blkcg = blkg->blkcg;
- 
- 		spin_lock(&blkcg->lock);
--		blkg_pd_offline(blkg);
- 		blkg_destroy(blkg);
- 		spin_unlock(&blkcg->lock);
- 	}
-@@ -1058,54 +1047,21 @@ static struct cftype blkcg_legacy_files[] = {
-  * @css: css of interest
-  *
-  * This function is called when @css is about to go away and responsible
-- * for offlining all blkgs pd and killing all wbs associated with @css.
-- * blkgs pd offline should be done while holding both q and blkcg locks.
-- * As blkcg lock is nested inside q lock, this function performs reverse
-- * double lock dancing.
-+ * for shooting down all blkgs associated with @css.  blkgs should be
-+ * removed while holding both q and blkcg locks.  As blkcg lock is nested
-+ * inside q lock, this function performs reverse double lock dancing.
-  *
-  * This is the blkcg counterpart of ioc_release_fn().
-  */
- static void blkcg_css_offline(struct cgroup_subsys_state *css)
- {
- 	struct blkcg *blkcg = css_to_blkcg(css);
--	struct blkcg_gq *blkg;
- 
- 	spin_lock_irq(&blkcg->lock);
- 
--	hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
--		struct request_queue *q = blkg->q;
+-	struct scsi_host_mq_in_flight in_flight = {
+-		.cnt = 0,
+-	};
 -
--		if (spin_trylock(q->queue_lock)) {
--			blkg_pd_offline(blkg);
--			spin_unlock(q->queue_lock);
--		} else {
--			spin_unlock_irq(&blkcg->lock);
--			cpu_relax();
--			spin_lock_irq(&blkcg->lock);
--		}
--	}
+-	if (!shost->use_blk_mq)
+-		return atomic_read(&shost->host_busy);
 -
--	spin_unlock_irq(&blkcg->lock);
--
--	wb_blkcg_offline(blkcg);
--}
--
--/**
-- * blkcg_destroy_all_blkgs - destroy all blkgs associated with a blkcg
-- * @blkcg: blkcg of interest
-- *
-- * This function is called when blkcg css is about to free and responsible for
-- * destroying all blkgs associated with @blkcg.
-- * blkgs should be removed while holding both q and blkcg locks. As blkcg lock
-- * is nested inside q lock, this function performs reverse double lock dancing.
-- */
--static void blkcg_destroy_all_blkgs(struct blkcg *blkcg)
--{
--	spin_lock_irq(&blkcg->lock);
- 	while (!hlist_empty(&blkcg->blkg_list)) {
- 		struct blkcg_gq *blkg = hlist_entry(blkcg->blkg_list.first,
--						    struct blkcg_gq,
--						    blkcg_node);
-+						struct blkcg_gq, blkcg_node);
- 		struct request_queue *q = blkg->q;
- 
- 		if (spin_trylock(q->queue_lock)) {
-@@ -1117,7 +1073,10 @@ static void blkcg_destroy_all_blkgs(struct blkcg *blkcg)
- 			spin_lock_irq(&blkcg->lock);
- 		}
- 	}
-+
- 	spin_unlock_irq(&blkcg->lock);
-+
-+	wb_blkcg_offline(blkcg);
+-	blk_mq_tagset_busy_iter(&shost->tag_set, scsi_host_check_in_flight,
+-			&in_flight);
+-	return in_flight.cnt;
++	return atomic_read(&shost->host_busy);
  }
+ EXPORT_SYMBOL(scsi_host_busy);
  
- static void blkcg_css_free(struct cgroup_subsys_state *css)
-@@ -1125,8 +1084,6 @@ static void blkcg_css_free(struct cgroup_subsys_state *css)
- 	struct blkcg *blkcg = css_to_blkcg(css);
- 	int i;
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 1046679f5473..eb97d2dd3651 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -345,8 +345,7 @@ static void scsi_dec_host_busy(struct Scsi_Host *shost)
+ 	unsigned long flags;
  
--	blkcg_destroy_all_blkgs(blkcg);
+ 	rcu_read_lock();
+-	if (!shost->use_blk_mq)
+-		atomic_dec(&shost->host_busy);
++	atomic_dec(&shost->host_busy);
+ 	if (unlikely(scsi_host_in_recovery(shost))) {
+ 		spin_lock_irqsave(shost->host_lock, flags);
+ 		if (shost->host_failed || shost->host_eh_scheduled)
+@@ -445,12 +444,7 @@ static inline bool scsi_target_is_busy(struct scsi_target *starget)
+ 
+ static inline bool scsi_host_is_busy(struct Scsi_Host *shost)
+ {
+-	/*
+-	 * blk-mq can handle host queue busy efficiently via host-wide driver
+-	 * tag allocation
+-	 */
 -
- 	mutex_lock(&blkcg_pol_mutex);
+-	if (!shost->use_blk_mq && shost->can_queue > 0 &&
++	if (shost->can_queue > 0 &&
+ 	    atomic_read(&shost->host_busy) >= shost->can_queue)
+ 		return true;
+ 	if (atomic_read(&shost->host_blocked) > 0)
+@@ -1606,12 +1600,9 @@ static inline int scsi_host_queue_ready(struct request_queue *q,
+ 	if (scsi_host_in_recovery(shost))
+ 		return 0;
  
- 	list_del(&blkcg->all_blkcgs_node);
-@@ -1480,11 +1437,8 @@ void blkcg_deactivate_policy(struct request_queue *q,
+-	if (!shost->use_blk_mq)
+-		busy = atomic_inc_return(&shost->host_busy) - 1;
+-	else
+-		busy = 0;
++	busy = atomic_inc_return(&shost->host_busy) - 1;
+ 	if (atomic_read(&shost->host_blocked) > 0) {
+-		if (busy || scsi_host_busy(shost))
++		if (busy)
+ 			goto starved;
  
- 	list_for_each_entry(blkg, &q->blkg_list, q_node) {
- 		if (blkg->pd[pol->plid]) {
--			if (!blkg->pd[pol->plid]->offline &&
--			    pol->pd_offline_fn) {
-+			if (pol->pd_offline_fn)
- 				pol->pd_offline_fn(blkg->pd[pol->plid]);
--				blkg->pd[pol->plid]->offline = true;
--			}
- 			pol->pd_free_fn(blkg->pd[pol->plid]);
- 			blkg->pd[pol->plid] = NULL;
- 		}
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 34aec30e06c7..1615cdd4c797 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -89,7 +89,6 @@ struct blkg_policy_data {
- 	/* the blkg and policy id this per-policy data belongs to */
- 	struct blkcg_gq			*blkg;
- 	int				plid;
--	bool				offline;
- };
+ 		/*
+@@ -1625,7 +1616,7 @@ static inline int scsi_host_queue_ready(struct request_queue *q,
+ 				     "unblocking host at zero depth\n"));
+ 	}
  
- /*
+-	if (!shost->use_blk_mq && shost->can_queue > 0 && busy >= shost->can_queue)
++	if (shost->can_queue > 0 && busy >= shost->can_queue)
+ 		goto starved;
+ 	if (shost->host_self_blocked)
+ 		goto starved;
+@@ -1711,9 +1702,7 @@ static void scsi_kill_request(struct request *req, struct request_queue *q)
+ 	 * with the locks as normal issue path does.
+ 	 */
+ 	atomic_inc(&sdev->device_busy);
+-
+-	if (!shost->use_blk_mq)
+-		atomic_inc(&shost->host_busy);
++	atomic_inc(&shost->host_busy);
+ 	if (starget->can_queue > 0)
+ 		atomic_inc(&starget->target_busy);
+ 
 -- 
-2.17.1
+2.9.5
