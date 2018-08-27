@@ -1,96 +1,129 @@
-Return-Path: <colin.king@canonical.com>
-From: Colin King <colin.king@canonical.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] block/DAC960.c: make some arrays static const, shrinks object size
-Date: Tue, 21 Aug 2018 10:12:48 +0100
-Message-Id: <20180821091248.8669-1-colin.king@canonical.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <ead0a7af4be483bded58977f42471607a76e880c.1535385970.git.christophe.leroy@c-s.fr>
+In-Reply-To: <ab6b6c60d921335b44c100c5018fcc6585f05c24.1535385970.git.christophe.leroy@c-s.fr>
+References: <ab6b6c60d921335b44c100c5018fcc6585f05c24.1535385970.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v2 2/3] drivers/video/fbdev: use ioremap_wt() instead of
+ __ioremap(_PAGE_WRITETHRU)
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org, linux-block@vger.kernel.org, linux-m68k@lists.linux-m68k.org
+Date: Mon, 27 Aug 2018 16:10:23 +0000 (UTC)
 List-ID: <linux-block@vger.kernel.org>
 
-From: Colin Ian King <colin.king@canonical.com>
+_PAGE_WRITETHRU is a target specific flag. Prefer generic functions.
 
-Don't populate the arrays ReadCacheStatus, WriteCacheStatus and
-SenseErrors on the stack but instead make them static const. Makes
-the object code smaller by 47 bytes:
-
-Before:
-   text	   data	    bss	    dec	    hex	filename
- 160974	  34628	    832	 196434	  2ff52	drivers/block/DAC960.o
-
-After:
-   text	   data	    bss	    dec	    hex	filename
- 160671	  34884	    832	 196387	  2ff23	drivers/block/DAC960.o
-
-(gcc version 8.2.0 x86_64)
-
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- drivers/block/DAC960.c | 42 ++++++++++++++++++++++++------------------
- 1 file changed, 24 insertions(+), 18 deletions(-)
+ v2: removed unnecessary includes headers
 
-diff --git a/drivers/block/DAC960.c b/drivers/block/DAC960.c
-index f99e5c883368..581312ac375f 100644
---- a/drivers/block/DAC960.c
-+++ b/drivers/block/DAC960.c
-@@ -2428,16 +2428,20 @@ static bool DAC960_V2_ReportDeviceConfiguration(DAC960_Controller_T
-     {
-       DAC960_V2_LogicalDeviceInfo_T *LogicalDeviceInfo =
- 	Controller->V2.LogicalDeviceInformation[LogicalDriveNumber];
--      unsigned char *ReadCacheStatus[] = { "Read Cache Disabled",
--					   "Read Cache Enabled",
--					   "Read Ahead Enabled",
--					   "Intelligent Read Ahead Enabled",
--					   "-", "-", "-", "-" };
--      unsigned char *WriteCacheStatus[] = { "Write Cache Disabled",
--					    "Logical Device Read Only",
--					    "Write Cache Enabled",
--					    "Intelligent Write Cache Enabled",
--					    "-", "-", "-", "-" };
-+      static const unsigned char *ReadCacheStatus[] = {
-+        "Read Cache Disabled",
-+        "Read Cache Enabled",
-+        "Read Ahead Enabled",
-+        "Intelligent Read Ahead Enabled",
-+        "-", "-", "-", "-"
-+      };
-+      static const unsigned char *WriteCacheStatus[] = {
-+        "Write Cache Disabled",
-+        "Logical Device Read Only",
-+        "Write Cache Enabled",
-+        "Intelligent Write Cache Enabled",
-+        "-", "-", "-", "-"
-+      };
-       unsigned char *GeometryTranslation;
-       if (LogicalDeviceInfo == NULL) continue;
-       switch (LogicalDeviceInfo->DriveGeometry)
-@@ -4339,14 +4343,16 @@ static void DAC960_V1_ProcessCompletedCommand(DAC960_Command_T *Command)
- static void DAC960_V2_ReadWriteError(DAC960_Command_T *Command)
+ drivers/video/fbdev/controlfb.c  |  5 +----
+ drivers/video/fbdev/platinumfb.c |  5 +----
+ drivers/video/fbdev/valkyriefb.c | 12 ++++++------
+ 3 files changed, 8 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/video/fbdev/controlfb.c b/drivers/video/fbdev/controlfb.c
+index 8d14b29aafea..9cb0ef7ac29e 100644
+--- a/drivers/video/fbdev/controlfb.c
++++ b/drivers/video/fbdev/controlfb.c
+@@ -48,9 +48,7 @@
+ #include <linux/nvram.h>
+ #include <linux/adb.h>
+ #include <linux/cuda.h>
+-#include <asm/io.h>
+ #include <asm/prom.h>
+-#include <asm/pgtable.h>
+ #include <asm/btext.h>
+ 
+ #include "macmodes.h"
+@@ -715,8 +713,7 @@ static int __init control_of_init(struct device_node *dp)
+ 		goto error_out;
+ 	}
+ 	/* map at most 8MB for the frame buffer */
+-	p->frame_buffer = __ioremap(p->frame_buffer_phys, 0x800000,
+-				    _PAGE_WRITETHRU);
++	p->frame_buffer = ioremap_wt(p->frame_buffer_phys, 0x800000);
+ 
+ 	if (!p->control_regs_phys ||
+ 	    !request_mem_region(p->control_regs_phys, p->control_regs_size,
+diff --git a/drivers/video/fbdev/platinumfb.c b/drivers/video/fbdev/platinumfb.c
+index 377d3399a3ad..bf6b7fb83cf4 100644
+--- a/drivers/video/fbdev/platinumfb.c
++++ b/drivers/video/fbdev/platinumfb.c
+@@ -32,9 +32,7 @@
+ #include <linux/nvram.h>
+ #include <linux/of_device.h>
+ #include <linux/of_platform.h>
+-#include <asm/io.h>
+ #include <asm/prom.h>
+-#include <asm/pgtable.h>
+ 
+ #include "macmodes.h"
+ #include "platinumfb.h"
+@@ -577,8 +575,7 @@ static int platinumfb_probe(struct platform_device* odev)
+ 
+ 	/* frame buffer - map only 4MB */
+ 	pinfo->frame_buffer_phys = pinfo->rsrc_fb.start;
+-	pinfo->frame_buffer = __ioremap(pinfo->rsrc_fb.start, 0x400000,
+-					_PAGE_WRITETHRU);
++	pinfo->frame_buffer = ioremap_wt(pinfo->rsrc_fb.start, 0x400000);
+ 	pinfo->base_frame_buffer = pinfo->frame_buffer;
+ 
+ 	/* registers */
+diff --git a/drivers/video/fbdev/valkyriefb.c b/drivers/video/fbdev/valkyriefb.c
+index 275fb98236d3..d51c3a8009cb 100644
+--- a/drivers/video/fbdev/valkyriefb.c
++++ b/drivers/video/fbdev/valkyriefb.c
+@@ -54,13 +54,11 @@
+ #include <linux/nvram.h>
+ #include <linux/adb.h>
+ #include <linux/cuda.h>
+-#include <asm/io.h>
+ #ifdef CONFIG_MAC
+ #include <asm/macintosh.h>
+ #else
+ #include <asm/prom.h>
+ #endif
+-#include <asm/pgtable.h>
+ 
+ #include "macmodes.h"
+ #include "valkyriefb.h"
+@@ -318,7 +316,7 @@ static void __init valkyrie_choose_mode(struct fb_info_valkyrie *p)
+ int __init valkyriefb_init(void)
  {
-   DAC960_Controller_T *Controller = Command->Controller;
--  unsigned char *SenseErrors[] = { "NO SENSE", "RECOVERED ERROR",
--				   "NOT READY", "MEDIUM ERROR",
--				   "HARDWARE ERROR", "ILLEGAL REQUEST",
--				   "UNIT ATTENTION", "DATA PROTECT",
--				   "BLANK CHECK", "VENDOR-SPECIFIC",
--				   "COPY ABORTED", "ABORTED COMMAND",
--				   "EQUAL", "VOLUME OVERFLOW",
--				   "MISCOMPARE", "RESERVED" };
-+  static const unsigned char *SenseErrors[] = {
-+    "NO SENSE", "RECOVERED ERROR",
-+    "NOT READY", "MEDIUM ERROR",
-+    "HARDWARE ERROR", "ILLEGAL REQUEST",
-+    "UNIT ATTENTION", "DATA PROTECT",
-+    "BLANK CHECK", "VENDOR-SPECIFIC",
-+    "COPY ABORTED", "ABORTED COMMAND",
-+    "EQUAL", "VOLUME OVERFLOW",
-+    "MISCOMPARE", "RESERVED"
-+  };
-   unsigned char *CommandName = "UNKNOWN";
-   switch (Command->CommandType)
-     {
+ 	struct fb_info_valkyrie	*p;
+-	unsigned long frame_buffer_phys, cmap_regs_phys, flags;
++	unsigned long frame_buffer_phys, cmap_regs_phys;
+ 	int err;
+ 	char *option = NULL;
+ 
+@@ -337,7 +335,6 @@ int __init valkyriefb_init(void)
+ 	/* Hardcoded addresses... welcome to 68k Macintosh country :-) */
+ 	frame_buffer_phys = 0xf9000000;
+ 	cmap_regs_phys = 0x50f24000;
+-	flags = IOMAP_NOCACHE_SER; /* IOMAP_WRITETHROUGH?? */
+ #else /* ppc (!CONFIG_MAC) */
+ 	{
+ 		struct device_node *dp;
+@@ -354,7 +351,6 @@ int __init valkyriefb_init(void)
+ 
+ 		frame_buffer_phys = r.start;
+ 		cmap_regs_phys = r.start + 0x304000;
+-		flags = _PAGE_WRITETHRU;
+ 	}
+ #endif /* ppc (!CONFIG_MAC) */
+ 
+@@ -369,7 +365,11 @@ int __init valkyriefb_init(void)
+ 	}
+ 	p->total_vram = 0x100000;
+ 	p->frame_buffer_phys = frame_buffer_phys;
+-	p->frame_buffer = __ioremap(frame_buffer_phys, p->total_vram, flags);
++#ifdef CONFIG_MAC
++	p->frame_buffer = ioremap_nocache(frame_buffer_phys, p->total_vram);
++#else
++	p->frame_buffer = ioremap_wt(frame_buffer_phys, p->total_vram);
++#endif
+ 	p->cmap_regs_phys = cmap_regs_phys;
+ 	p->cmap_regs = ioremap(p->cmap_regs_phys, 0x1000);
+ 	p->valkyrie_regs_phys = cmap_regs_phys+0x6000;
 -- 
-2.17.1
+2.13.3
