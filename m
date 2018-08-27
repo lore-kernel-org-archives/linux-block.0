@@ -1,127 +1,55 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [RFC PATCH 10/14] SCSI: use the dedicated admin queue to send admin commands
-Date: Wed,  8 Aug 2018 01:44:29 +0800
-Message-Id: <20180807174433.8374-11-ming.lei@redhat.com>
-In-Reply-To: <20180807174433.8374-1-ming.lei@redhat.com>
-References: <20180807174433.8374-1-ming.lei@redhat.com>
+Return-Path: <geert.uytterhoeven@gmail.com>
+MIME-Version: 1.0
+References: <ab6b6c60d921335b44c100c5018fcc6585f05c24.1535385970.git.christophe.leroy@c-s.fr>
+ <48bcbeb8e5f57c958e6e0bc7a29feae44821901d.1535385970.git.christophe.leroy@c-s.fr>
+In-Reply-To: <48bcbeb8e5f57c958e6e0bc7a29feae44821901d.1535385970.git.christophe.leroy@c-s.fr>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 27 Aug 2018 18:42:16 +0200
+Message-ID: <CAMuHMdVFUH_6dW0zFP4tuLHjaXWQFr7TXKGuaLz0q57gX9Tpmw@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] drivers/block/z2ram: use ioremap_wt() instead of __ioremap(_PAGE_WRITETHRU)
+To: Christophe Leroy <christophe.leroy@c-s.fr>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>,
+	Michael Ellerman <mpe@ellerman.id.au>, Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+	DRI Development <dri-devel@lists.freedesktop.org>,
+	Linux Fbdev development list <linux-fbdev@vger.kernel.org>, linux-block@vger.kernel.org,
+	linux-m68k <linux-m68k@lists.linux-m68k.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Now the per-host dedicated admin queue is ready, so use this queue to
-send admin commands only.
+On Mon, Aug 27, 2018 at 6:10 PM Christophe Leroy
+<christophe.leroy@c-s.fr> wrote:
+> _PAGE_WRITETHRU is a target specific flag. Prefer generic functions.
+>
+> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Adrian Hunter <adrian.hunter@intel.com>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/scsi_lib.c    | 11 ++++++++---
- drivers/scsi/scsi_scan.c   |  1 +
- drivers/scsi/scsi_sysfs.c  |  1 +
- include/scsi/scsi_device.h |  4 ++++
- 4 files changed, 14 insertions(+), 3 deletions(-)
+>From a Zorro bus point of view:
+Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index dbb355e23262..79475a679750 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -278,16 +278,16 @@ int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 	struct request *req;
- 	struct scsi_request *rq;
- 	int ret = DRIVER_ERROR << 24;
-+	struct request_queue *q = sdev->host->admin_q;
- 
--	req = blk_get_request(sdev->request_queue,
-+	req = blk_get_request(q,
- 			data_direction == DMA_TO_DEVICE ?
- 			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, BLK_MQ_REQ_PREEMPT);
- 	if (IS_ERR(req))
- 		return ret;
- 	rq = scsi_req(req);
- 
--	if (bufflen &&	blk_rq_map_kern(sdev->request_queue, req,
--					buffer, bufflen, GFP_NOIO))
-+	if (bufflen && blk_rq_map_kern(q, req, buffer, bufflen, GFP_NOIO))
- 		goto out;
- 
- 	rq->cmd_len = COMMAND_SIZE(cmd[0]);
-@@ -299,6 +299,8 @@ int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 	req->cmd_flags |= flags;
- 	req->rq_flags |= rq_flags | RQF_QUIET;
- 
-+	atomic_inc(&sdev->nr_admin_pending);
-+
- 	/*
- 	 * head injection *required* here otherwise quiesce won't work
- 	 */
-@@ -323,6 +325,9 @@ int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
-  out:
- 	blk_put_request(req);
- 
-+	atomic_dec(&sdev->nr_admin_pending);
-+	wake_up_all(&sdev->admin_wq);
-+
- 	return ret;
- }
- EXPORT_SYMBOL(__scsi_execute);
-diff --git a/drivers/scsi/scsi_scan.c b/drivers/scsi/scsi_scan.c
-index 0880d975eed3..b10af1692ddd 100644
---- a/drivers/scsi/scsi_scan.c
-+++ b/drivers/scsi/scsi_scan.c
-@@ -243,6 +243,7 @@ static struct scsi_device *scsi_alloc_sdev(struct scsi_target *starget,
- 	mutex_init(&sdev->inquiry_mutex);
- 	INIT_WORK(&sdev->event_work, scsi_evt_thread);
- 	INIT_WORK(&sdev->requeue_work, scsi_requeue_run_queue);
-+	init_waitqueue_head(&sdev->admin_wq);
- 
- 	sdev->sdev_gendev.parent = get_device(&starget->dev);
- 	sdev->sdev_target = starget;
-diff --git a/drivers/scsi/scsi_sysfs.c b/drivers/scsi/scsi_sysfs.c
-index 7943b762c12d..7e03a420dfe7 100644
---- a/drivers/scsi/scsi_sysfs.c
-+++ b/drivers/scsi/scsi_sysfs.c
-@@ -1377,6 +1377,7 @@ void __scsi_remove_device(struct scsi_device *sdev)
- 
- 	blk_cleanup_queue(sdev->request_queue);
- 	cancel_work_sync(&sdev->requeue_work);
-+	wait_event(sdev->admin_wq, !atomic_read(&sdev->nr_admin_pending));
- 
- 	if (sdev->host->hostt->slave_destroy)
- 		sdev->host->hostt->slave_destroy(sdev);
-diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
-index 202f4d6a4342..f6820da1dc37 100644
---- a/include/scsi/scsi_device.h
-+++ b/include/scsi/scsi_device.h
-@@ -227,6 +227,10 @@ struct scsi_device {
- 	struct mutex		state_mutex;
- 	enum scsi_device_state sdev_state;
- 	struct task_struct	*quiesced_by;
-+
-+	atomic_t		nr_admin_pending;
-+	wait_queue_head_t       admin_wq;
-+
- 	unsigned long		sdev_data[0];
- } __attribute__((aligned(sizeof(unsigned long))));
- 
+> --- a/drivers/block/z2ram.c
+> +++ b/drivers/block/z2ram.c
+> @@ -190,8 +190,7 @@ static int z2_open(struct block_device *bdev, fmode_t mode)
+>                         vfree(vmalloc (size));
+>                 }
+>
+> -               vaddr = (unsigned long) __ioremap (paddr, size,
+> -                                                  _PAGE_WRITETHRU);
+> +               vaddr = (unsigned long)ioremap_wt(paddr, size);
+>
+>  #else
+>                 vaddr = (unsigned long)z_remap_nocache_nonser(paddr, size);
+
+However, since the removal of APUS support, this file can no longer be
+compiled on powerpc.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
 -- 
-2.9.5
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
