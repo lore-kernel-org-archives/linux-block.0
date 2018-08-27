@@ -1,111 +1,67 @@
-Return-Path: <massimo@burcheri.de>
-Message-ID: <1534926011.18658.29.camel@burcheri.de>
-Subject: MQ-BFQ crashing on battery mode
-From: Massimo Burcheri <massimo@burcheri.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: multipart/signed; micalg="pgp-sha256";
-	protocol="application/pgp-signature"; boundary="=-FkIqwNjyHCVyvhY4Q5sg"
-Date: Wed, 22 Aug 2018 10:20:11 +0200
-Mime-Version: 1.0
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: James Bottomley <James.Bottomley@HansenPartnership.com>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Omar Sandoval <osandov@fb.com>,
+	James Bottomley <james.bottomley@hansenpartnership.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Don Brace <don.brace@microsemi.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Laurence Oberman <loberman@redhat.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 1/2] Revert "scsi: core: fix scsi_host_queue_ready"
+Date: Mon, 27 Aug 2018 15:24:42 +0800
+Message-Id: <20180827072443.26920-2-ming.lei@redhat.com>
+In-Reply-To: <20180827072443.26920-1-ming.lei@redhat.com>
+References: <20180827072443.26920-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
+This reverts commit 265d59aacbce7e50bdc1f5d25033c38dd70b3767.
 
---=-FkIqwNjyHCVyvhY4Q5sg
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+There is fundamental issue in commit 328728630d9f2bf1 (scsi: core: avoid
+host-wide host_busy counter for scsi_mq) because SCSI's host busy counter
+may not be same with counter of blk-mq's inflight tags, especially in case
+of none io scheduler.
 
-Hello,
+So revert this commit first.
 
+Cc: Omar Sandoval <osandov@fb.com>,
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
+Cc: Christoph Hellwig <hch@lst.de>,
+Cc: Don Brace <don.brace@microsemi.com>
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Laurence Oberman <loberman@redhat.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Guenter Roeck <linux@roeck-us.net>
+Cc: Jens Axboe <axboe@kernel.dk>
+Reported-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/scsi/scsi_lib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I got a kernel trace when unplugging the power supply, switching to battery
-mode. I get the same kernel trace when booting on battery.
-Both making the system unusable or breaking the boot.
-
-The kernel call trace with symbols:
-
-? blk_mq_requeue_request+0x...
-? __scsi_queue_insert+0x...
-? ata_scsi_var_len_cdb_xlat+0x
-? __blk_mq_complete_request+0x...
-? ata_scsi_translate+0x...
-? ata_scsi_queuecmd+0x...
-? scsi_dispatch_cmd+0x...
-? scsi_queue_rq+0x...
-? blk_mq_dispatch_rq_list+0x...
-? kyber_dispatch_cur_domain+0x...
-? kyber_completed_request+0x...
-? blk_mq_sched_dispatch_requests+0x...
-? __ blk_mq_run_hw_queue+0x...
-? __blk_mq_delay_run_hw_queue+0x...
-? blk_mq_run_hw_queue+0x...
-? blk_mq_run_hw_queues+0x...
-? blk_mq_requeue_work+0x...
-? process_one_work+0x...
-? worker_thread+0x...
-? process_one_work+0x...
-? kthread+0x...
-? kthread_flush_work_fn+0x...
-? ret_from_fork+0x...
-Code: ...
-RIP: sbitmap_queue_clear+0x...
-
-Screenshot: 	https://ibin.co/4D34Ej3DWsqI.jpg
-Kernel config: 	https://bpaste.net/show/870004e55123
-
-Kernel: 4.17.11-ck
-
-Setup:
-
-btrfs-on-bcache-on-luks
-btrfs options (rw,noatime,nodiratime,compress-
-force=3Dlzo,nossd,noacl,space_cache,autodefrag)
-
-Using mq bfq scheduler for the hdd backing and kyber for the ssd caching de=
-vice
-
-
-Failed tests:
-Tested many kernel down to 4.13.2 with Gentoo or Ck patchset. Sorry for not
-including the vanilla sources in the test, I can provide if required.
-Skipping services in the boot process didn't help, any next service leads t=
-o the
-same trace.
-Switching off the laptop-mode-tools daemon didn't help.
-Switching all devices to "none" scheduler did not help.
-
-
-Workaround:
-After some tests and due to the *mq* call stack I was able to workaround by
-disabling CONFIG_SCSI_MQ_DEFAULT and CONFIG_DM_MQ_DEFAULT and switching all
-devices to cfq scheduler.
-However with the MQ enabled kernel, only bfq, kyber and none are possible, =
-while
-the non-mq kernel can only set cfq. I guess this is intentional as the curr=
-ent
-bfq implementation is a MQ only version and CFQ is a non-mq only version?
-
-Best regards,
-Massimo
---=-FkIqwNjyHCVyvhY4Q5sg
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEjdL61EKP3VOAA+I8lQj3p5VSZjIFAlt9HLsACgkQlQj3p5VS
-ZjL95hAAn3RpwMKbRwv3NjEfWwxpTaJXgtNIAW3rKxyEOO3jX0fhfA1rlEKtQ3r9
-w6OCxaORedTpxB0QEIkd2Pe82fj5dteVSETQQsZ1w/PEYhY9nZkhebbhjB5X817x
-tmwuYE3CDxn6Yti0phV7tIp9/TxmUaCybP1X8vR02t247x+lqnAPA+3eumig2y5o
-YNOghADyJj7dmxnK8C0kcnPicDlxNacP/T7NtHA/3EHIc1/itGGPN6W+G6D2Jpn5
-FOShUBCUX6rfc/z9HOWnhZXWGQfqgLp8fCPCainA7EH2DjcZn9xIRxRG/fdkja2w
-Aoj4A4JNNLJ/9YSksTt26eaeGT8ybf9eujaDtBdrk1P6R3q6qZ2lgbUOE6V+7F5r
-5KE8u1kvGBn8Q/wov6ZzvlR9vnV2GoUlJmSNiAgRt70WXmw3HXgTY5RTj1lnmbTj
-1qWJCjdx3OumnfSgrs2s/amAHa3xMhcu7dLL5u7dEg9vzgHARrAve8aQLG/tpXGc
-EAXDJIk0WhMeCXWXO3GtZCqTFelKS/BAUeCh7zQwx+U3laKqRr2oFKs6snAliY33
-UlCV91Hd8iA6tZqkhWey0sAoXvSiOjRoEE5UywV9WWovTnjMsIsCwvgsfb7f0Vij
-qvwAwhtL6G2AcbmioQvybC93r4ZbI0e2WmOvhwjzmMh4qZ8NmeI=
-=h385
------END PGP SIGNATURE-----
-
---=-FkIqwNjyHCVyvhY4Q5sg--
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 0adfb3bce0fd..1046679f5473 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1611,7 +1611,7 @@ static inline int scsi_host_queue_ready(struct request_queue *q,
+ 	else
+ 		busy = 0;
+ 	if (atomic_read(&shost->host_blocked) > 0) {
+-		if (busy)
++		if (busy || scsi_host_busy(shost))
+ 			goto starved;
+ 
+ 		/*
+-- 
+2.9.5
