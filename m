@@ -1,55 +1,43 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44878 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727501AbeHJJxs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Aug 2018 05:53:48 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, shhuiw@foxmail.com,
-        Coly Li <colyli@suse.de>
-Subject: [PATCH v2 09/17] bcache: fix typo 'succesfully' to 'successfully'
-Date: Fri, 10 Aug 2018 15:23:49 +0800
-Message-Id: <20180810072357.19823-10-colyli@suse.de>
-In-Reply-To: <20180810072357.19823-1-colyli@suse.de>
-References: <20180810072357.19823-1-colyli@suse.de>
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:39656 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727130AbeH1V7T (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Aug 2018 17:59:19 -0400
+Received: by mail-pf1-f193.google.com with SMTP id j8-v6so1063215pff.6
+        for <linux-block@vger.kernel.org>; Tue, 28 Aug 2018 11:06:30 -0700 (PDT)
+Date: Tue, 28 Aug 2018 11:06:28 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Yi Zhang <yi.zhang@redhat.com>
+Cc: gi-oh.kim@profitbricks.com, osandov@fb.com,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] blktests: remove unused null_blk parameter for
+ _init_null_blk in block/016
+Message-ID: <20180828180628.GB18173@vader>
+References: <20180825100619.17868-1-yi.zhang@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180825100619.17868-1-yi.zhang@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This patch fixes typo 'succesfully' to correct 'successfully', which is
-suggested by checkpatch.pl.
+On Sat, Aug 25, 2018 at 06:06:19PM +0800, Yi Zhang wrote:
+> Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
+> ---
+>  tests/block/016 | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tests/block/016 b/tests/block/016
+> index 0e6f2e1..e0a63ad 100755
+> --- a/tests/block/016
+> +++ b/tests/block/016
+> @@ -32,7 +32,7 @@ requires() {
+>  test() {
+>  	echo "Running ${TEST_NAME}"
+>  
+> -	if ! _init_null_blk null_blk queue_mode=2 irqmode=2 completion_nsec=2000000000; then
+> +	if ! _init_null_blk queue_mode=2 irqmode=2 completion_nsec=2000000000; then
+>  		return 1
+>  	fi
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Shenghui Wang <shhuiw@foxmail.com>
----
- drivers/md/bcache/io.c      | 2 +-
- drivers/md/bcache/request.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/md/bcache/io.c b/drivers/md/bcache/io.c
-index cfc56add799a..c25097968319 100644
---- a/drivers/md/bcache/io.c
-+++ b/drivers/md/bcache/io.c
-@@ -86,7 +86,7 @@ void bch_count_io_errors(struct cache *ca,
- 
- 			/*
- 			 * First we subtract refresh from count; each time we
--			 * succesfully do so, we rescale the errors once:
-+			 * successfully do so, we rescale the errors once:
- 			 */
- 
- 			count = atomic_cmpxchg(&ca->io_count, old, new);
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 858dd3da9dc5..55264e71369d 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -154,7 +154,7 @@ static void bch_data_insert_error(struct closure *cl)
- 
- 	/*
- 	 * Our data write just errored, which means we've got a bunch of keys to
--	 * insert that point to data that wasn't succesfully written.
-+	 * insert that point to data that wasn't successfully written.
- 	 *
- 	 * We don't have to insert those keys but we still have to invalidate
- 	 * that region of the cache - so, if we just strip off all the pointers
--- 
-2.18.0
+Applied, thanks!
