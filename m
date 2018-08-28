@@ -1,37 +1,26 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from aserp2120.oracle.com ([141.146.126.78]:32960 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728220AbeH3TAw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Aug 2018 15:00:52 -0400
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jeff.Lien@wdc.com, ard.biesheuvel@linaro.org,
-        david.darrington@wdc.com, hch@infradead.org, jeff.furlong@wdc.com,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        tim.c.chen@linux.intel.com
-Subject: Re: [PATCH 1/4] crypto: Introduce notifier for new crypto algorithms
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <20180825061205.ygrjjazkooqghrqy@gondor.apana.org.au>
-        <20180826024006.13800-1-martin.petersen@oracle.com>
-        <20180827060918.tfz7ljufqhlej4kq@gondor.apana.org.au>
-Date: Thu, 30 Aug 2018 10:57:46 -0400
-In-Reply-To: <20180827060918.tfz7ljufqhlej4kq@gondor.apana.org.au> (Herbert
-        Xu's message of "Mon, 27 Aug 2018 14:09:19 +0800")
-Message-ID: <yq15zzr52c5.fsf@oracle.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: bsg: move atomic_t ref_count variable to refcount
+ API
+To: John Pittman <jpittman@redhat.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+References: <20180827183305.27722-1-jpittman@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <98fb97d4-d098-e3a2-ff5e-4b8244d07610@kernel.dk>
+Date: Mon, 27 Aug 2018 19:17:13 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180827183305.27722-1-jpittman@redhat.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
+On 8/27/18 12:33 PM, John Pittman wrote:
+> Currently, variable ref_count within the bsg_device struct is of
+> type atomic_t.  For variables being used as reference counters,
+> the refcount API should be used instead of atomic.  The newer
+> refcount API works to prevent counter overflows and use-after-free
+> bugs.  So, move this varable from the atomic API to refcount,
+> potentially avoiding the issues mentioned.
 
-Herbert,
-
-Sorry about the delay. Been on the road with surprisingly spotty
-internet.
-
-I addressed your two comments in the patch series that will follow.
+Applied, thanks.
 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+Jens Axboe
