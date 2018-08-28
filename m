@@ -1,49 +1,46 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:37034 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727207AbeHaRmS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Aug 2018 13:42:18 -0400
-Received: by mail-ed1-f65.google.com with SMTP id a20-v6so6388374edd.4
-        for <linux-block@vger.kernel.org>; Fri, 31 Aug 2018 06:34:46 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
+Return-Path: <penguin-kernel@i-love.sakura.ne.jp>
+Subject: Re: [PATCH v3] block/loop: Serialize ioctl operations.
+From: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 0/4] lightnvm: pblk: add support for chunk metadata on erase
-Date: Fri, 31 Aug 2018 15:34:33 +0200
-Message-Id: <1535722477-31288-1-git-send-email-javier@cnexlabs.com>
+        syzbot
+ <syzbot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>,
+        syzbot <syzbot+bf89c128e05dd6c62523@syzkaller.appspotmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+References: <1527297408-4428-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp>
+ <ce5ce21a-5865-36c5-a110-eed11f785ab2@I-love.SAKURA.ne.jp>
+ <748bce03-afda-4ed2-13b3-1fcd01d57770@kernel.dk>
+ <9a9209af-c841-6034-4b4f-46d93aa0c037@i-love.sakura.ne.jp>
+ <92bffcc8-c25d-2297-80b3-24ba99075cd6@i-love.sakura.ne.jp>
+Message-ID: <7986e524-1dc8-8d8e-51bc-a5671d7555cc@i-love.sakura.ne.jp>
+Date: Tue, 28 Aug 2018 19:31:16 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <92bffcc8-c25d-2297-80b3-24ba99075cd6@i-love.sakura.ne.jp>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Matias,
+Jens, did you come up with a better alternative?
+We have another bug which is causing many hung task reports.
+I do want to make progress rather than stall for another three month.
 
-This patchset implements support for retrieving chunk metadata when
-submitting a reset/erase command. Patches 0 and 1 are small fixes that
-can be directly merged into your patch:
-  
-  lightnvm: move bad block and chunk state logic to core
-
-Also, note that these do not apply on top of your for-4.20/core due them
-depending on patches that I sent before that you have not picked up yet.
-You can see them though in for-4.20/pblk. I'll rebase as patches in the
-list appear in your tree.
-
-Thanks,
-Javier
-
-Javier González (4):
-  lightnvm: use right address format on 1.2 path
-  lightnvm: assign block address before slba
-  lightnvm: pblk: add helper for printing chunk state
-  lightnvm: pblk: retrieve chunk metadata on erase
-
- drivers/lightnvm/core.c      | 51 +++++++++++++++++++++++++++++++++++++++-----
- drivers/lightnvm/pblk-core.c | 47 ++++++++++++++++++++++++++++++----------
- drivers/lightnvm/pblk.h      |  9 ++++++++
- 3 files changed, 91 insertions(+), 16 deletions(-)
-
--- 
-2.7.4
+On 2018/07/11 23:29, Tetsuo Handa wrote:
+> Since syzbot restarted testing linux-next.git , it is a good chance
+> to test this patch for unexpected regressions (until you come up with
+> a good alternative).
+> 
+> On 2018/06/26 23:34, Tetsuo Handa wrote:
+>> Did you get any idea?
+>>
+>> On 2018/06/05 3:13, Jens Axboe wrote:
+>>> On 6/4/18 5:19 AM, Tetsuo Handa wrote:
+>>>> This problem was already ignored for 8 months. Unless we boost priority,
+>>>> this problem will be ignored for years. Jens, can we test this patch?
+>>>
+>>> Sorry, it's just that I _really_ hate this patch. We're making up
+>>> a weird locking primitive that tracks the process, with a weird
+>>> unlock helper that only unlocks if it's the process that is
+>>> holding the mutex.
+>>>
+>>> I'll try and think about this a bit, it would be nice if we had
+>>> a better alternative than the above.
+>>>
