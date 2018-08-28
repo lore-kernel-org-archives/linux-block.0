@@ -1,114 +1,79 @@
-Return-Path: <ulf.hansson@linaro.org>
-MIME-Version: 1.0
-In-Reply-To: <363DA0ED52042842948283D2FC38E4649C266411@IRSMSX106.ger.corp.intel.com>
-References: <20180828154727.3589-1-ianwmorrison@gmail.com> <211633e2-a812-d489-e11c-c3f271c465fc@kernel.dk>
- <CAFXWsS_661mkZa1iYEs+8-O-fdFF6bEcqtZrNBzVaNthT2U46w@mail.gmail.com>
- <1cbdba28-3ff5-2bbe-a2cf-b533249c6970@kernel.dk> <CAFXWsS82zi7w81-=4ALwMiFm9iQd=NgF3sSBLfvNdU2czEzxwg@mail.gmail.com>
- <853d7213-c6ce-5de9-6c83-806c3b8f18ca@kernel.dk> <CAFXWsS_xOKTJk87vQSESQNfdwY1TU0jjS4twEg_+yF3pqbKQ3g@mail.gmail.com>
- <702eb090-2bf4-69d1-bfb6-afdca4ba5c5f@kernel.dk> <363DA0ED52042842948283D2FC38E4649C266411@IRSMSX106.ger.corp.intel.com>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Wed, 29 Aug 2018 08:15:44 +0200
-Message-ID: <CAPDyKFqLdWL-VG2uZsiQNrJA=VvytGJp0xYYd52jMtmeP1nLcw@mail.gmail.com>
-Subject: Re: [PATCH] Revert "blk-mq: issue directly if hw queue isn't busy in
- case of 'none'"
-To: "Hunter, Adrian" <adrian.hunter@intel.com>, Jens Axboe <axboe@kernel.dk>
-Cc: Ian W MORRISON <ianwmorrison@gmail.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+Return-Path: <adrian.hunter@intel.com>
+From: "Hunter, Adrian" <adrian.hunter@intel.com>
+To: Jens Axboe <axboe@kernel.dk>, Ian W MORRISON <ianwmorrison@gmail.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kashyap.desai@broadcom.com" <kashyap.desai@broadcom.com>, "loberman@redhat.com" <loberman@redhat.com>,
-	"osandov@fb.com" <osandov@fb.com>, "hch@lst.de" <hch@lst.de>,
-	"bart.vanassche@wdc.com" <bart.vanassche@wdc.com>, "hare@suse.de" <hare@suse.de>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+	"kashyap.desai@broadcom.com" <kashyap.desai@broadcom.com>,
+	"loberman@redhat.com" <loberman@redhat.com>, "osandov@fb.com"
+	<osandov@fb.com>, "hch@lst.de" <hch@lst.de>, "bart.vanassche@wdc.com"
+	<bart.vanassche@wdc.com>, "hare@suse.de" <hare@suse.de>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>, Ulf Hansson
+	<ulf.hansson@linaro.org>
+Subject: RE: [PATCH] Revert "blk-mq: issue directly if hw queue isn't busy
+ in case of 'none'"
+Date: Tue, 28 Aug 2018 19:11:02 +0000
+Message-ID: <363DA0ED52042842948283D2FC38E4649C266411@IRSMSX106.ger.corp.intel.com>
+References: <20180828154727.3589-1-ianwmorrison@gmail.com>
+ <211633e2-a812-d489-e11c-c3f271c465fc@kernel.dk>
+ <CAFXWsS_661mkZa1iYEs+8-O-fdFF6bEcqtZrNBzVaNthT2U46w@mail.gmail.com>
+ <1cbdba28-3ff5-2bbe-a2cf-b533249c6970@kernel.dk>
+ <CAFXWsS82zi7w81-=4ALwMiFm9iQd=NgF3sSBLfvNdU2czEzxwg@mail.gmail.com>
+ <853d7213-c6ce-5de9-6c83-806c3b8f18ca@kernel.dk>
+ <CAFXWsS_xOKTJk87vQSESQNfdwY1TU0jjS4twEg_+yF3pqbKQ3g@mail.gmail.com>
+ <702eb090-2bf4-69d1-bfb6-afdca4ba5c5f@kernel.dk>
+In-Reply-To: <702eb090-2bf4-69d1-bfb6-afdca4ba5c5f@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Return-Path: adrian.hunter@intel.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 28 August 2018 at 21:11, Hunter, Adrian <adrian.hunter@intel.com> wrote:
->> -----Original Message-----
->> From: Jens Axboe [mailto:axboe@kernel.dk]
->> Sent: Tuesday, August 28, 2018 8:12 PM
->> To: Ian W MORRISON <ianwmorrison@gmail.com>
->> Cc: linux-block@vger.kernel.org; linux-kernel@vger.kernel.org;
->> kashyap.desai@broadcom.com; loberman@redhat.com; osandov@fb.com;
->> hch@lst.de; bart.vanassche@wdc.com; hare@suse.de;
->> ming.lei@redhat.com; Hunter, Adrian <adrian.hunter@intel.com>
->> Subject: Re: [PATCH] Revert "blk-mq: issue directly if hw queue isn't busy in
->> case of 'none'"
->>
->> On 8/28/18 11:01 AM, Ian W MORRISON wrote:
->> > On Wed, 29 Aug 2018 at 02:13, Jens Axboe <axboe@kernel.dk> wrote:
->> >>
->> >> On 8/28/18 10:10 AM, Ian W MORRISON wrote:
->> >>> On Wed, 29 Aug 2018 at 02:09, Jens Axboe <axboe@kernel.dk> wrote:
->> >>>>
->> >>>> On 8/28/18 10:07 AM, Ian W MORRISON wrote:
->> >>>>> On Wed, 29 Aug 2018 at 01:48, Jens Axboe <axboe@kernel.dk>
->> wrote:
->> >>>>>>
->> >>>>>> On 8/28/18 9:47 AM, Ian W MORRISON wrote:
->> >>>>>>> Kernel oops when booting on Bay and Cherry Trail devices such as
->> >>>>>>> Intel Compute Stick. Bisected as:
->> >>>>>>>
->> >>>>>>> commit 6ce3dd6eec11 ("blk-mq: issue directly if hw queue isn't
->> >>>>>>> busy in case of 'none'")
->> >>>>>>>
->> >>>>>>> This patch reverts the above commit.
->> >>>>>>
->> >>>>>> Did I miss the posting of that oops? Just curious where this is
->> >>>>>> going wrong. Not adverse to reverting, but I'd like to try to
->> >>>>>> understand the issue first.
->> >>>>>>
->> >>>>>> --
->> >>>>>> Jens Axboe
->> >>>>>>
->> >>>>>
->> >>>>> I've not been able to capture it however manually transcribing
->> >>>>> what is on the screen:
->> >>>>>
->> >>>>> mmc0: Got data interrupt 0x00000002 even though no data operation
->> >>>>>
->> >>>>> followed by:
->> >>>>>
->> >>>>> mmc0: sdhci: ============= SDHCI REGISTER DUMP
->> ==============
->> >>>>>
->> >>>>> Do you want any specific register value or should I transcribe
->> >>>>> each (as I am working from an image taken at boot)?
->> >>>>
->> >>>> Just take a picture of the screen, that should be good enough.
->> >>>>
->> >>>> --
->> >>>> Jens Axboe
->> >>>>
->> >>>
->> >>> Attached as requested.
->> >>
->> >> Can you see if this patch helps?
->> >>
->> >> https://marc.info/?l=linux-mmc&m=153485326025301&w=2
->> >>
->> >> --
->> >> Jens Axboe
->> >>
->> >
->> > I confirm that the above patch works with commit 6ce3dd6eec11 and
->> > removes the need for reverting it on eMMC based devices.
->> >
->> > Tested on Bay Trail, Cherry Trail (both now working) and Kaby Lake
->> > (not affected) devices.
->>
->> Great, thanks for testing. Adrian, when is this going upstream?
->
-> It is in Ulf's fixes branch, so most likely v4.19-rc2 .  Then to stable in due course.
->
->         https://git.kernel.org/pub/scm/linux/kernel/git/ulfh/mmc.git/commit/?h=fixes&id=26caddf274cf1e89fd4ce44ab2b8dbc7a7f97681
-
-Yep, correct!
-
-As I told someone before, I am deliberately holding on to fixes a
-little longer that before, to extend the test coverage a bit.
-
-If someone wants to test the latest rc with fixes, one could instead
-try the pending-fixes branch in Stephen Rothwell's linux-next tree.
-
-Kind regards
-Uffe
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKZW5zIEF4Ym9lIFttYWlsdG86
+YXhib2VAa2VybmVsLmRrXQ0KPiBTZW50OiBUdWVzZGF5LCBBdWd1c3QgMjgsIDIwMTggODoxMiBQ
+TQ0KPiBUbzogSWFuIFcgTU9SUklTT04gPGlhbndtb3JyaXNvbkBnbWFpbC5jb20+DQo+IENjOiBs
+aW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7
+DQo+IGthc2h5YXAuZGVzYWlAYnJvYWRjb20uY29tOyBsb2Jlcm1hbkByZWRoYXQuY29tOyBvc2Fu
+ZG92QGZiLmNvbTsNCj4gaGNoQGxzdC5kZTsgYmFydC52YW5hc3NjaGVAd2RjLmNvbTsgaGFyZUBz
+dXNlLmRlOw0KPiBtaW5nLmxlaUByZWRoYXQuY29tOyBIdW50ZXIsIEFkcmlhbiA8YWRyaWFuLmh1
+bnRlckBpbnRlbC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0hdIFJldmVydCAiYmxrLW1xOiBp
+c3N1ZSBkaXJlY3RseSBpZiBodyBxdWV1ZSBpc24ndCBidXN5IGluDQo+IGNhc2Ugb2YgJ25vbmUn
+Ig0KPiANCj4gT24gOC8yOC8xOCAxMTowMSBBTSwgSWFuIFcgTU9SUklTT04gd3JvdGU6DQo+ID4g
+T24gV2VkLCAyOSBBdWcgMjAxOCBhdCAwMjoxMywgSmVucyBBeGJvZSA8YXhib2VAa2VybmVsLmRr
+PiB3cm90ZToNCj4gPj4NCj4gPj4gT24gOC8yOC8xOCAxMDoxMCBBTSwgSWFuIFcgTU9SUklTT04g
+d3JvdGU6DQo+ID4+PiBPbiBXZWQsIDI5IEF1ZyAyMDE4IGF0IDAyOjA5LCBKZW5zIEF4Ym9lIDxh
+eGJvZUBrZXJuZWwuZGs+IHdyb3RlOg0KPiA+Pj4+DQo+ID4+Pj4gT24gOC8yOC8xOCAxMDowNyBB
+TSwgSWFuIFcgTU9SUklTT04gd3JvdGU6DQo+ID4+Pj4+IE9uIFdlZCwgMjkgQXVnIDIwMTggYXQg
+MDE6NDgsIEplbnMgQXhib2UgPGF4Ym9lQGtlcm5lbC5kaz4NCj4gd3JvdGU6DQo+ID4+Pj4+Pg0K
+PiA+Pj4+Pj4gT24gOC8yOC8xOCA5OjQ3IEFNLCBJYW4gVyBNT1JSSVNPTiB3cm90ZToNCj4gPj4+
+Pj4+PiBLZXJuZWwgb29wcyB3aGVuIGJvb3Rpbmcgb24gQmF5IGFuZCBDaGVycnkgVHJhaWwgZGV2
+aWNlcyBzdWNoIGFzDQo+ID4+Pj4+Pj4gSW50ZWwgQ29tcHV0ZSBTdGljay4gQmlzZWN0ZWQgYXM6
+DQo+ID4+Pj4+Pj4NCj4gPj4+Pj4+PiBjb21taXQgNmNlM2RkNmVlYzExICgiYmxrLW1xOiBpc3N1
+ZSBkaXJlY3RseSBpZiBodyBxdWV1ZSBpc24ndA0KPiA+Pj4+Pj4+IGJ1c3kgaW4gY2FzZSBvZiAn
+bm9uZSciKQ0KPiA+Pj4+Pj4+DQo+ID4+Pj4+Pj4gVGhpcyBwYXRjaCByZXZlcnRzIHRoZSBhYm92
+ZSBjb21taXQuDQo+ID4+Pj4+Pg0KPiA+Pj4+Pj4gRGlkIEkgbWlzcyB0aGUgcG9zdGluZyBvZiB0
+aGF0IG9vcHM/IEp1c3QgY3VyaW91cyB3aGVyZSB0aGlzIGlzDQo+ID4+Pj4+PiBnb2luZyB3cm9u
+Zy4gTm90IGFkdmVyc2UgdG8gcmV2ZXJ0aW5nLCBidXQgSSdkIGxpa2UgdG8gdHJ5IHRvDQo+ID4+
+Pj4+PiB1bmRlcnN0YW5kIHRoZSBpc3N1ZSBmaXJzdC4NCj4gPj4+Pj4+DQo+ID4+Pj4+PiAtLQ0K
+PiA+Pj4+Pj4gSmVucyBBeGJvZQ0KPiA+Pj4+Pj4NCj4gPj4+Pj4NCj4gPj4+Pj4gSSd2ZSBub3Qg
+YmVlbiBhYmxlIHRvIGNhcHR1cmUgaXQgaG93ZXZlciBtYW51YWxseSB0cmFuc2NyaWJpbmcNCj4g
+Pj4+Pj4gd2hhdCBpcyBvbiB0aGUgc2NyZWVuOg0KPiA+Pj4+Pg0KPiA+Pj4+PiBtbWMwOiBHb3Qg
+ZGF0YSBpbnRlcnJ1cHQgMHgwMDAwMDAwMiBldmVuIHRob3VnaCBubyBkYXRhIG9wZXJhdGlvbg0K
+PiA+Pj4+Pg0KPiA+Pj4+PiBmb2xsb3dlZCBieToNCj4gPj4+Pj4NCj4gPj4+Pj4gbW1jMDogc2Ro
+Y2k6ID09PT09PT09PT09PT0gU0RIQ0kgUkVHSVNURVIgRFVNUA0KPiA9PT09PT09PT09PT09PQ0K
+PiA+Pj4+Pg0KPiA+Pj4+PiBEbyB5b3Ugd2FudCBhbnkgc3BlY2lmaWMgcmVnaXN0ZXIgdmFsdWUg
+b3Igc2hvdWxkIEkgdHJhbnNjcmliZQ0KPiA+Pj4+PiBlYWNoIChhcyBJIGFtIHdvcmtpbmcgZnJv
+bSBhbiBpbWFnZSB0YWtlbiBhdCBib290KT8NCj4gPj4+Pg0KPiA+Pj4+IEp1c3QgdGFrZSBhIHBp
+Y3R1cmUgb2YgdGhlIHNjcmVlbiwgdGhhdCBzaG91bGQgYmUgZ29vZCBlbm91Z2guDQo+ID4+Pj4N
+Cj4gPj4+PiAtLQ0KPiA+Pj4+IEplbnMgQXhib2UNCj4gPj4+Pg0KPiA+Pj4NCj4gPj4+IEF0dGFj
+aGVkIGFzIHJlcXVlc3RlZC4NCj4gPj4NCj4gPj4gQ2FuIHlvdSBzZWUgaWYgdGhpcyBwYXRjaCBo
+ZWxwcz8NCj4gPj4NCj4gPj4gaHR0cHM6Ly9tYXJjLmluZm8vP2w9bGludXgtbW1jJm09MTUzNDg1
+MzI2MDI1MzAxJnc9Mg0KPiA+Pg0KPiA+PiAtLQ0KPiA+PiBKZW5zIEF4Ym9lDQo+ID4+DQo+ID4N
+Cj4gPiBJIGNvbmZpcm0gdGhhdCB0aGUgYWJvdmUgcGF0Y2ggd29ya3Mgd2l0aCBjb21taXQgNmNl
+M2RkNmVlYzExIGFuZA0KPiA+IHJlbW92ZXMgdGhlIG5lZWQgZm9yIHJldmVydGluZyBpdCBvbiBl
+TU1DIGJhc2VkIGRldmljZXMuDQo+ID4NCj4gPiBUZXN0ZWQgb24gQmF5IFRyYWlsLCBDaGVycnkg
+VHJhaWwgKGJvdGggbm93IHdvcmtpbmcpIGFuZCBLYWJ5IExha2UNCj4gPiAobm90IGFmZmVjdGVk
+KSBkZXZpY2VzLg0KPiANCj4gR3JlYXQsIHRoYW5rcyBmb3IgdGVzdGluZy4gQWRyaWFuLCB3aGVu
+IGlzIHRoaXMgZ29pbmcgdXBzdHJlYW0/DQoNCkl0IGlzIGluIFVsZidzIGZpeGVzIGJyYW5jaCwg
+c28gbW9zdCBsaWtlbHkgdjQuMTktcmMyIC4gIFRoZW4gdG8gc3RhYmxlIGluIGR1ZSBjb3Vyc2Uu
+DQoNCglodHRwczovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC91bGZo
+L21tYy5naXQvY29tbWl0Lz9oPWZpeGVzJmlkPTI2Y2FkZGYyNzRjZjFlODlmZDRjZTQ0YWIyYjhk
+YmM3YTdmOTc2ODENCg0K
