@@ -1,78 +1,43 @@
-Return-Path: <prvs=7477a5644=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v4 00/10] blk-mq: Enable runtime power management
-Date: Fri,  3 Aug 2018 17:03:15 -0700
-Message-Id: <20180804000325.3610-1-bart.vanassche@wdc.com>
+Return-Path: <jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH] blk-wbt: get back the missed wakeup from __wbt_done
+To: Jens Axboe <axboe@kernel.dk>, Anchal Agarwal <anchalag@amzn.com>
+Cc: fllinden@amazon.com,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <1535029718-17259-1-git-send-email-jianchao.w.wang@oracle.com>
+ <bd84ff08-b75a-0a2f-6b37-07a104452bff@kernel.dk>
+ <da9458c632cb4c4695660664bf7c3fb3@EX13D13UWB002.ant.amazon.com>
+ <20180823210144.GB5624@kaos-source-ops-60001.pdx1.amazon.com>
+ <3eaa20ce-0599-c405-d979-87d91ea331d2@kernel.dk>
+ <20180824181223.GA9049@kaos-source-ops-60001.pdx1.amazon.com>
+ <677c8648-63fd-601c-b906-40a8502f9782@kernel.dk>
+ <20180824203305.GA4690@kaos-source-ops-60001.pdx1.amazon.com>
+ <dc734449-7cd8-3a8e-9fdc-d7d854393900@kernel.dk>
+ <2fecf2f2-f00b-f6ba-710a-54ceaacfedbb@kernel.dk>
+ <00445460-d826-4d85-c5f4-fa565892da01@oracle.com>
+ <3876c36c-fec6-6586-435f-dc177dc38c76@oracle.com>
+ <f88cd48d-e140-fa61-76f7-8985ca2c2e08@kernel.dk>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <5cd959f0-b40c-b6ac-c037-89f6cc670f47@oracle.com>
+Date: Tue, 28 Aug 2018 10:52:57 +0800
+MIME-Version: 1.0
+In-Reply-To: <f88cd48d-e140-fa61-76f7-8985ca2c2e08@kernel.dk>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
+Hi Jens
 
-This patch series not only enables runtime power management for blk-mq but
-also fixes a starvation issue in the power management code for the legacy
-block layer. Please consider this patch series for kernel v4.19.
+On 08/27/2018 10:51 PM, Jens Axboe wrote:
+>>> I cannot get the point of "since we can't rely on just being woken from the ->func handler
+>>> we set".
+>>> Do you mean there could be someone else could wake up this task ?
+> Yeah, you don't know for a fact that the wbt wait queue is the only
+> guy waking us up. Any sleep like this needs a loop. It was quite
+> easy to reproduce for me, and as expected, you'll get list corruption
+> on the wait queue since we leave it on the list and the stack goes
+> away.
+> 
+Yes, got it. Thanks for your kindly response. :)
 
-Thanks,
-
-Bart.
-
-Changes compared to v3:
-- Avoid adverse interactions between system-wide suspend/resume and runtime
-  power management by changing the PREEMPT_ONLY flag into a counter.
-- Give RQF_PREEMPT back its original meaning, namely that it is only set for
-  ide_preempt requests.
-- Remove the flag BLK_MQ_REQ_PREEMPT.
-- Removed the pm_request_resume() call.
-
-Changes compared to v2:
-- Fixed the build for CONFIG_BLOCK=n.
-- Added a patch that introduces percpu_ref_read() in the percpu-counter code.
-- Added a patch that makes it easier to detect missing pm_runtime_get*() calls.
-- Addressed Jianchao's feedback including the comment about runtime overhead
-  of switching a per-cpu counter to atomic mode.
-
-Changes compared to v1:
-- Moved the runtime power management code into a separate file.
-- Addressed Ming's feedback.
-
-Bart Van Assche (10):
-  block: Change the preempt-only flag into a counter
-  block, scsi: Give RQF_PREEMPT back its original meaning
-  block, ide: Remove flag BLK_MQ_REQ_PREEMPT
-  block: Move power management code into a new source file
-  block: Serialize queue freezing and blk_pre_runtime_suspend()
-  percpu-refcount: Introduce percpu_ref_read()
-  block, scsi: Rework runtime power management
-  block: Remove blk_pm_requeue_request()
-  blk-mq: Insert blk_pm_{add,put}_request() calls
-  blk-mq: Enable support for runtime power management
-
- block/Kconfig                   |   5 +
- block/Makefile                  |   1 +
- block/blk-core.c                | 281 ++++----------------------------
- block/blk-mq-debugfs.c          |  11 +-
- block/blk-mq-sched.c            |  13 +-
- block/blk-mq.c                  |  13 +-
- block/blk-pm.c                  | 245 ++++++++++++++++++++++++++++
- block/blk-pm.h                  |  37 +++++
- block/elevator.c                |  24 +--
- drivers/ide/ide-pm.c            |   3 +-
- drivers/scsi/scsi_lib.c         |  36 ++--
- drivers/scsi/scsi_pm.c          |   1 +
- drivers/scsi/sd.c               |   1 +
- drivers/scsi/sr.c               |   1 +
- include/linux/blk-mq.h          |   4 +-
- include/linux/blk-pm.h          |  30 ++++
- include/linux/blkdev.h          |  45 ++---
- include/linux/percpu-refcount.h |   2 +
- lib/percpu-refcount.c           |  29 ++++
- 19 files changed, 453 insertions(+), 329 deletions(-)
- create mode 100644 block/blk-pm.c
- create mode 100644 block/blk-pm.h
- create mode 100644 include/linux/blk-pm.h
-
--- 
-2.18.0
+Thanks
+Jianchao
