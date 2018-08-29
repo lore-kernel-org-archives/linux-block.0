@@ -1,93 +1,80 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <keith.busch@intel.com>,
-	Bart van Assche <bart.vanassche@wdc.com>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>,
-	Minchan Kim <minchan@kernel.org>,
-	Nitin Gupta <ngupta@vflare.org>
-Subject: [PATCH 4/5] zram: register default groups with device_add_disk()
-Date: Tue, 14 Aug 2018 09:33:04 +0200
-Message-Id: <20180814073305.87255-5-hare@suse.de>
-In-Reply-To: <20180814073305.87255-1-hare@suse.de>
-References: <20180814073305.87255-1-hare@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-cys01nam02on0083.outbound.protection.outlook.com ([104.47.37.83]:20150
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727245AbeH2Xz4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Aug 2018 19:55:56 -0400
+From: Javier Gonzalez <javier@cnexlabs.com>
+To: "Konopko, Igor J" <igor.j.konopko@intel.com>
+CC: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>,
+        "marcin.dziegielewski@intel.com" <marcin.dziegielewski@intel.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 0/3] lightnvm: pblk: support variable OOB size
+Date: Wed, 29 Aug 2018 19:57:25 +0000
+Message-ID: <26B5331A-D040-4AB7-BB7C-5752A76F5515@cnexlabs.com>
+References: <1535537370-10729-1-git-send-email-javier@cnexlabs.com>
+ <106d492e-4f09-7af5-d89a-75c204f3da38@intel.com>
+In-Reply-To: <106d492e-4f09-7af5-d89a-75c204f3da38@intel.com>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_4CECD028-685F-4020-98D7-91CACBD021B3";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha512
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Register default sysfs groups during device_add-disk() to avoid a
-race condition with udev during startup.
+--Apple-Mail=_4CECD028-685F-4020-98D7-91CACBD021B3
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-Cc: Minchan Kim <minchan@kernel.org>
-Cc: Nitin Gupta <ngupta@vflare.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/zram/zram_drv.c | 28 +++++++---------------------
- 1 file changed, 7 insertions(+), 21 deletions(-)
+> On 29 Aug 2018, at 16.51, Igor Konopko <igor.j.konopko@intel.com> =
+wrote:
+>=20
+>=20
+>=20
+> On 29.08.2018 12:09, Javier Gonz=C3=A1lez wrote:
+>> This patchset adds pblk support for variable metadata sizes on the =
+out
+>> of bound area.
+>> Igor, Marcin, you sent a patch some time ago implementing a similar
+>> functionality, but it never got re-posted after review. Can you test
+>> this and see if it works for your case? I did not implement support =
+for
+>> outlined metadata for the case where the reported OOB area is 0. It
+>> should be pretty simple to do that on top of these patches though.
+>=20
+> Sure, we will test that and let you know. I was busy last time and due
+> to that I never repost it. I will do this on top of your patches,
+> hopefully soon.
+>=20
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 2907a8156aaf..fc3626cb7fe5 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1618,6 +1618,11 @@ static const struct attribute_group zram_disk_attr_group = {
- 	.attrs = zram_disk_attrs,
- };
- 
-+static const struct attribute_group *zram_disk_attr_groups[] = {
-+	&zram_disk_attr_group,
-+	NULL,
-+};
-+
- /*
-  * Allocate and initialize new zram device. the function returns
-  * '>= 0' device_id upon success, and negative value otherwise.
-@@ -1698,24 +1703,14 @@ static int zram_add(void)
- 
- 	zram->disk->queue->backing_dev_info->capabilities |=
- 			(BDI_CAP_STABLE_WRITES | BDI_CAP_SYNCHRONOUS_IO);
--	add_disk(zram->disk);
--
--	ret = sysfs_create_group(&disk_to_dev(zram->disk)->kobj,
--				&zram_disk_attr_group);
--	if (ret < 0) {
--		pr_err("Error creating sysfs group for device %d\n",
--				device_id);
--		goto out_free_disk;
--	}
-+	device_add_disk(NULL, zram->disk, zram_disk_attr_groups);
-+
- 	strlcpy(zram->compressor, default_compressor, sizeof(zram->compressor));
- 
- 	zram_debugfs_register(zram);
- 	pr_info("Added device: %s\n", zram->disk->disk_name);
- 	return device_id;
- 
--out_free_disk:
--	del_gendisk(zram->disk);
--	put_disk(zram->disk);
- out_free_queue:
- 	blk_cleanup_queue(queue);
- out_free_idr:
-@@ -1744,15 +1739,6 @@ static int zram_remove(struct zram *zram)
- 	mutex_unlock(&bdev->bd_mutex);
- 
- 	zram_debugfs_unregister(zram);
--	/*
--	 * Remove sysfs first, so no one will perform a disksize
--	 * store while we destroy the devices. This also helps during
--	 * hot_remove -- zram_reset_device() is the last holder of
--	 * ->init_lock, no later/concurrent disksize_store() or any
--	 * other sysfs handlers are possible.
--	 */
--	sysfs_remove_group(&disk_to_dev(zram->disk)->kobj,
--			&zram_disk_attr_group);
- 
- 	/* Make sure all the pending I/O are finished */
- 	fsync_bdev(bdev);
--- 
-2.12.3
+Thanks Igor, this would be great.
+
+--Apple-Mail=_4CECD028-685F-4020-98D7-91CACBD021B3
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAluG+qMACgkQIX4xUKFR
+nnR0NxAAiVQXJKYU17Nm6QtFwZyBfRovomCllDAImTjYLcJ7hMwyj0WOuiJkR4wl
+vovKkkrf75h66FP3eDWdkLMFBR2WcFig+W0VXXZKY7UhNrH4acoKyVgeph7Q9wB+
+vgw7v6w56dqXsQC2Uca1k+9q/zgEaK0Z9dLAVmGbtqnBPTSnbstaUDnaFaYfq5S+
+mEeNowMY5z1lcFPwhGUkl93eQuy7MdyaMDYBPKdXDHAmkEh5VY8FPmBjUk5zPMD6
+0q7xuR/qZByky05pndKTJArHgvsSTKu3Gb7HaHQvUl9EzmuGel8BScHH0xd/Pup5
+2MsQiD4FdnjZJmF37E7arLXbWwlQq1f3oCl99Er60KgEzQ8T6Q4zRJpAvoeLopfy
+DPOwUmqgDKe0RqOzb2jhPdB5ZaibswfEfi8RSequFDGNXRjikWWnkThZt/wmc/jC
+bmCawhhQ3lrM7bI+htOmNVWBitNaL0Vr4Y4U4OiQ7NebUPGEeO8s0+2sQm1mWGbv
+K+5QIAgDIzdqPtLTblvhgZFRA7WKVj7z8lMR1cUeZ3IOmI6NqEKEbe0SssriXcNK
+PxjUX8QiZ94awBXRTOr5s0wgtmQtU0uSwWMYOqhiqcMBVlhLFEYThDzQTAoImpTI
+OBof8SGdnmB2vgy4/xC5y8i+RgxanyUD6twwfXBN0Qzp/VoZA4A=
+=zYZi
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_4CECD028-685F-4020-98D7-91CACBD021B3--
