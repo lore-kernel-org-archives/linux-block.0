@@ -1,39 +1,53 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: axboe@kernel.dk,
-	linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Shenghui Wang <shhuiw@foxmail.com>,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH 10/10] bcache: trivial - remove tailing backslash in macro BTREE_FLAG
-Date: Thu,  9 Aug 2018 15:48:51 +0800
-Message-Id: <20180809074851.11027-11-colyli@suse.de>
-In-Reply-To: <20180809074851.11027-1-colyli@suse.de>
-References: <20180809074851.11027-1-colyli@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-it0-f68.google.com ([209.85.214.68]:51698 "EHLO
+        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728242AbeH2OGD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Aug 2018 10:06:03 -0400
+Received: by mail-it0-f68.google.com with SMTP id e14-v6so6879185itf.1
+        for <linux-block@vger.kernel.org>; Wed, 29 Aug 2018 03:09:53 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
+To: mb@lightnvm.io
+Cc: igor.j.konopko@intel.com, marcin.dziegielewski@intel.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 2/3] lightnvm: do no update csecs and sos on 1.2
+Date: Wed, 29 Aug 2018 12:09:29 +0200
+Message-Id: <1535537370-10729-3-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1535537370-10729-1-git-send-email-javier@cnexlabs.com>
+References: <1535537370-10729-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Shenghui Wang <shhuiw@foxmail.com>
+In the OCSSD 2.0 spec., the sector and metadata sizes are reported though
+the standard nvme identify command. Thus, the lightnvm subsystem needs
+to update this information on the geometry structure on bootup.
 
-Remove the tailing backslash in macro BTREE_FLAG in btree.h
+Since 1.2 devices report these values on the OCSSD geometry identify,
+avoid this update is it is unnecessary and can also corrupt the geometry
+if the devices does not report the nvme sizes correctly (which is not
+required by the OCSSD 1.2 spec either)
 
-Signed-off-by: Shenghui Wang <shhuiw@foxmail.com>
-Signed-off-by: Coly Li <colyli@suse.de>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- drivers/md/bcache/btree.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/nvme/host/lightnvm.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/md/bcache/btree.h b/drivers/md/bcache/btree.h
-index d211e2c25b6b..68e9d926134d 100644
---- a/drivers/md/bcache/btree.h
-+++ b/drivers/md/bcache/btree.h
-@@ -152,7 +152,7 @@ static inline bool btree_node_ ## flag(struct btree *b)			\
- {	return test_bit(BTREE_NODE_ ## flag, &b->flags); }		\
- 									\
- static inline void set_btree_node_ ## flag(struct btree *b)		\
--{	set_bit(BTREE_NODE_ ## flag, &b->flags); }			\
-+{	set_bit(BTREE_NODE_ ## flag, &b->flags); }
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index 5bfa354c5dd5..33ed09f8410e 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -980,6 +980,9 @@ void nvme_nvm_update_nvm_info(struct nvme_ns *ns)
+ 	struct nvm_dev *ndev = ns->ndev;
+ 	struct nvm_geo *geo = &ndev->geo;
  
- enum btree_flags {
- 	BTREE_NODE_io_error,
++	if (geo->version == NVM_OCSSD_SPEC_12)
++		return;
++
+ 	geo->csecs = 1 << ns->lba_shift;
+ 	geo->sos = ns->ms;
+ }
 -- 
-2.18.0
+2.7.4
