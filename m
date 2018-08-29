@@ -6,79 +6,43 @@ Cc: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	=?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 3/3] lightnvm: pblk: take write semaphore on metadata
-Date: Wed, 29 Aug 2018 10:56:20 +0200
-Message-Id: <1535532980-27672-4-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1535532980-27672-1-git-send-email-javier@cnexlabs.com>
-References: <1535532980-27672-1-git-send-email-javier@cnexlabs.com>
+Subject: [V4 PATCH 0/2] lightnvm: pblk: take write semaphore on metadata
+Date: Wed, 29 Aug 2018 10:56:17 +0200
+Message-Id: <1535532980-27672-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-pblk guarantees write ordering at a chunk level through a per open chunk
-semaphore. At this point, since we only have an open I/O stream for both
-user and GC data, the semaphore is per parallel unit.
+# Changes since V3:
+  - Encapsulate rqd dma allocations to reduce code replication (by Matias)
 
-For the metadata I/O that is synchronous, the semaphore is not needed as
-ordering is guaranteed. However, if the metadata scheme changes or
-multiple streams are open, this guarantee might not be preserved.
+# Changes since V2:
+  - Split the original patch between the metadata refactoring and the
+    semaphore logic. This simplifies the write path, where the semaphore
+    is taken.
 
-This patch makes sure that all writes go through the semaphore, even for
-synchronous I/O. This is consistent with pblk's write I/O model. It also
-simplifies maintenance since changes in the metadata scheme could cause
-ordering issues.
+# Changes singe V1:
+  - Fix double I/O on the read path (by Matias)
+    - Improve commit message (by Jens)
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-core.c | 16 +++++++++++++++-
- drivers/lightnvm/pblk.h      |  1 +
- 2 files changed, 16 insertions(+), 1 deletion(-)
+    This patchset refactors the metadata separate write and read paths,
+    which simplifies how the semaphore is taken for writes.
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 767178185f19..1e4dc0c1ed88 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -558,6 +558,20 @@ int pblk_submit_io_sync(struct pblk *pblk, struct nvm_rq *rqd)
- 	return ret;
- }
- 
-+int pblk_submit_io_sync_sem(struct pblk *pblk, struct nvm_rq *rqd)
-+{
-+	struct ppa_addr *ppa_list;
-+	int ret;
-+
-+	ppa_list = (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
-+
-+	pblk_down_page(pblk, ppa_list, rqd->nr_ppas);
-+	ret = pblk_submit_io_sync(pblk, rqd);
-+	pblk_up_page(pblk, ppa_list, rqd->nr_ppas);
-+
-+	return ret;
-+}
-+
- static void pblk_bio_map_addr_endio(struct bio *bio)
- {
- 	bio_put(bio);
-@@ -788,7 +802,7 @@ static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line,
- 		meta_list[i].lba = lba_list[paddr] = addr_empty;
- 	}
- 
--	ret = pblk_submit_io_sync(pblk, &rqd);
-+	ret = pblk_submit_io_sync_sem(pblk, &rqd);
- 	if (ret) {
- 		pblk_err(pblk, "smeta I/O submission failed: %d\n", ret);
- 		bio_put(bio);
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index c0d9eddd344b..54f937c1fb62 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -793,6 +793,7 @@ void pblk_log_write_err(struct pblk *pblk, struct nvm_rq *rqd);
- void pblk_log_read_err(struct pblk *pblk, struct nvm_rq *rqd);
- int pblk_submit_io(struct pblk *pblk, struct nvm_rq *rqd);
- int pblk_submit_io_sync(struct pblk *pblk, struct nvm_rq *rqd);
-+int pblk_submit_io_sync_sem(struct pblk *pblk, struct nvm_rq *rqd);
- int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line);
- void pblk_check_chunk_state_update(struct pblk *pblk, struct nvm_rq *rqd);
- struct bio *pblk_bio_map_addr(struct pblk *pblk, void *data,
+    Thanks,
+    Javier
+
+Javier González (3):
+  lightnvm: pblk: refactor metadata paths
+  lightnvm: encapsule rqd dma allocations
+  lightnvm: pblk: take write semaphore on metadata
+
+ drivers/lightnvm/pblk-core.c     | 377 ++++++++++++++++++++-------------------
+ drivers/lightnvm/pblk-gc.c       |   2 +-
+ drivers/lightnvm/pblk-read.c     |  35 ++--
+ drivers/lightnvm/pblk-recovery.c |  33 ++--
+ drivers/lightnvm/pblk-write.c    |  15 +-
+ drivers/lightnvm/pblk.h          |   8 +-
+ 6 files changed, 230 insertions(+), 240 deletions(-)
+
 -- 
 2.7.4
