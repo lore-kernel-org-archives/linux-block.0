@@ -1,50 +1,66 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:28433 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726069AbeHWFUx (ORCPT
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:44445 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727254AbeH2M5z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Aug 2018 01:20:53 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "jthumshirn@suse.de" <jthumshirn@suse.de>
-CC: "osandov@fb.com" <osandov@fb.com>,
-        "msnitzer@redhat.com" <msnitzer@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests 0/3] Add NVMeOF multipath tests
-Date: Thu, 23 Aug 2018 01:53:33 +0000
-Message-ID: <775a05ab91aed62b980ecfff1525ac3d71017752.camel@wdc.com>
-References: <20180815203728.19521-1-bart.vanassche@wdc.com>
-         <20180820073059.quvg3bh4ngv5ka4x@linux-x5ow.site>
-         <ee851ae7b88a93b9b5c9f1b0c6e206944c0b3c64.camel@wdc.com>
-         <20180821064619.7tyhlst74qkrw4fi@linux-x5ow.site>
-In-Reply-To: <20180821064619.7tyhlst74qkrw4fi@linux-x5ow.site>
-Content-Type: text/plain; charset="utf-7"
+        Wed, 29 Aug 2018 08:57:55 -0400
+Received: by mail-ed1-f66.google.com with SMTP id s10-v6so3344482edb.11
+        for <linux-block@vger.kernel.org>; Wed, 29 Aug 2018 02:02:00 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 1/4] lightnvm: pblk: calculate line pad distance in helper
+Date: Wed, 29 Aug 2018 11:01:50 +0200
+Message-Id: <1535533313-29944-2-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1535533313-29944-1-git-send-email-javier@cnexlabs.com>
+References: <1535533313-29944-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, 2018-08-21 at 08:46 +-0200, Johannes Thumshirn wrote:
-+AD4- On Mon, Aug 20, 2018 at 03:46:45PM +-0000, Bart Van Assche wrote:
-+AD4- +AD4- Moving these tests into the nvme directory is possible but will=
- make it
-+AD4- +AD4- harder to run the NVMeOF multipath tests separately. Are you fi=
-ne with this?
-+AD4-=20
-+AD4- Both way's have it's up and downsides, I agree.
-+AD4-=20
-+AD4- Having two distinct groups requires to run './check nvme nvmeof-mp' t=
-o
-+AD4- run full coverage with nvme.
-+AD4-=20
-+AD4- Having it all in one group would require to run './check nvme 18 19 2=
-0
-+AD4- 21 22 23 24 ...' to get only the dm-mpath ones.
-+AD4-=20
-+AD4- Honestly I hate both but your's (the two distinct groups) is probably
-+AD4- easier to handle in the end, I have to admit.
+If a line is padded, calculate the pad distance directly on the helper
+being used for this purpose.
 
-Omar, do you have a preference for one of the two aforementioned approaches=
-?
+Signed-off-by: Javier González <javier@cnexlabs.com>
+---
+ drivers/lightnvm/pblk-recovery.c | 2 --
+ drivers/lightnvm/pblk.h          | 5 +++--
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-Thanks,
-
-Bart.
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index fdc770f2545f..188c89819a40 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -487,8 +487,6 @@ static int pblk_recov_scan_all_oob(struct pblk *pblk, struct pblk_line *line,
+ 		bitmap_clear(line->map_bitmap, line->cur_sec, nr_error_bits);
+ 
+ 		pad_secs = pblk_pad_distance(pblk);
+-		if (pad_secs > line->left_msecs)
+-			pad_secs = line->left_msecs;
+ 
+ 		ret = pblk_recov_pad_oob(pblk, line, pad_secs);
+ 		if (ret)
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 54f937c1fb62..994a081994fb 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -990,12 +990,13 @@ static inline int pblk_line_vsc(struct pblk_line *line)
+ 	return le32_to_cpu(*line->vsc);
+ }
+ 
+-static inline int pblk_pad_distance(struct pblk *pblk)
++static inline int pblk_pad_distance(struct pblk *pblk, struct pblk_line *line)
+ {
+ 	struct nvm_tgt_dev *dev = pblk->dev;
+ 	struct nvm_geo *geo = &dev->geo;
++	int distance = geo->mw_cunits * geo->all_luns * geo->ws_opt;
+ 
+-	return geo->mw_cunits * geo->all_luns * geo->ws_opt;
++	return (distance > line->left_msecs) ? line->left_msecs : distance;
+ }
+ 
+ static inline int pblk_ppa_to_line_id(struct ppa_addr p)
+-- 
+2.7.4
