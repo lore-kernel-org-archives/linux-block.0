@@ -1,42 +1,44 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH] block: copy ioprio in __bio_clone_fast()
-Date: Wed,  1 Aug 2018 16:38:09 +0200
-Message-Id: <20180801143809.5472-1-hare@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:45383 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727761AbeH2M54 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Aug 2018 08:57:56 -0400
+Received: by mail-ed1-f65.google.com with SMTP id p52-v6so3345442eda.12
+        for <linux-block@vger.kernel.org>; Wed, 29 Aug 2018 02:02:01 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 2/4] lightnvm: pblk: fix comment typo
+Date: Wed, 29 Aug 2018 11:01:51 +0200
+Message-Id: <1535533313-29944-3-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1535533313-29944-1-git-send-email-javier@cnexlabs.com>
+References: <1535533313-29944-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We need to copy the io priority, too; otherwise the clone will run
-with a different priority than the original one.
+Fix comment typo Decrese -> Decrease
 
-Fixes: 43b62ce3ff0a ("block: move bio io prio to a new field")
-Signed-off-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- block/bio.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/lightnvm/pblk-write.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 8ecc95615941..88129f20623d 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -608,6 +608,7 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
- 	bio->bi_write_hint = bio_src->bi_write_hint;
- 	bio->bi_iter = bio_src->bi_iter;
- 	bio->bi_io_vec = bio_src->bi_io_vec;
-+	bio->bi_ioprio = bio_src->bi_ioprio;
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index 767618eba4c2..617572717065 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -195,7 +195,7 @@ static void pblk_prepare_resubmit(struct pblk *pblk, unsigned int sentry,
+ 		/* Release flags on write context. Protect from writes */
+ 		smp_store_release(&w_ctx->flags, flags);
  
- 	bio_clone_blkcg_association(bio, bio_src);
- }
-@@ -692,6 +693,7 @@ struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
- 	bio->bi_write_hint	= bio_src->bi_write_hint;
- 	bio->bi_iter.bi_sector	= bio_src->bi_iter.bi_sector;
- 	bio->bi_iter.bi_size	= bio_src->bi_iter.bi_size;
-+	bio->bi_ioprio		= bio_src->bi_ioprio;
- 
- 	switch (bio_op(bio)) {
- 	case REQ_OP_DISCARD:
+-		/* Decrese the reference count to the line as we will
++		/* Decrease the reference count to the line as we will
+ 		 * re-map these entries
+ 		 */
+ 		line = pblk_ppa_to_line(pblk, w_ctx->ppa);
 -- 
-2.12.3
+2.7.4
