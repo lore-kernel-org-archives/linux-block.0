@@ -1,61 +1,135 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39228 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727808AbeHIJIu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Aug 2018 05:08:50 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 14/17] bcache: move open brace at end of function definitions to next line
-Date: Thu,  9 Aug 2018 14:43:17 +0800
-Message-Id: <20180809064320.10229-15-colyli@suse.de>
-In-Reply-To: <20180809064320.10229-1-colyli@suse.de>
-References: <20180809064320.10229-1-colyli@suse.de>
+Received: from mail-it0-f66.google.com ([209.85.214.66]:37047 "EHLO
+        mail-it0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728262AbeH2OGB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Aug 2018 10:06:01 -0400
+Received: by mail-it0-f66.google.com with SMTP id h20-v6so6502133itf.2
+        for <linux-block@vger.kernel.org>; Wed, 29 Aug 2018 03:09:52 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
+To: mb@lightnvm.io
+Cc: igor.j.konopko@intel.com, marcin.dziegielewski@intel.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 1/3] lightnvm: use internal allocation for chunk log page
+Date: Wed, 29 Aug 2018 12:09:28 +0200
+Message-Id: <1535537370-10729-2-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1535537370-10729-1-git-send-email-javier@cnexlabs.com>
+References: <1535537370-10729-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This is not a preferred style to place open brace '{' at the end of
-function definition, checkpatch.pl reports error for such coding
-style. This patch moves them into the start of the next new line.
+The lightnvm subsystem provides helpers to retrieve chunk metadata,
+where the target needs to provide a buffer to store the metadata. An
+implicit assumption is that this buffer is contiguous and can be used to
+retrieve the data from the device. If the device exposes too many
+chunks, then kmalloc might fail, thus failing instance creation.
 
-Signed-off-by: Coly Li <colyli@suse.de>
+This patch removes this assumption by implementing an internal buffer in
+the lightnvm subsystem to retrieve chunk metadata. Targets can then
+use virtual memory allocations. Since this is a target API change, adapt
+pblk accordingly.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- drivers/md/bcache/super.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ drivers/lightnvm/pblk-core.c |  4 ++--
+ drivers/lightnvm/pblk-init.c |  2 +-
+ drivers/nvme/host/lightnvm.c | 23 +++++++++++++++--------
+ 3 files changed, 18 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index a8b751ba3ebc..1382c6afd271 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -2152,7 +2152,8 @@ static ssize_t register_bcache(struct kobject *, struct kobj_attribute *,
- kobj_attribute_write(register,		register_bcache);
- kobj_attribute_write(register_quiet,	register_bcache);
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index fdcbeb920c9e..a311cc29afd8 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -120,7 +120,7 @@ static void pblk_end_io_erase(struct nvm_rq *rqd)
+ /*
+  * Get information for all chunks from the device.
+  *
+- * The caller is responsible for freeing the returned structure
++ * The caller is responsible for freeing (vmalloc) the returned structure
+  */
+ struct nvm_chk_meta *pblk_get_chunk_meta(struct pblk *pblk)
+ {
+@@ -134,7 +134,7 @@ struct nvm_chk_meta *pblk_get_chunk_meta(struct pblk *pblk)
+ 	ppa.ppa = 0;
  
--static bool bch_is_open_backing(struct block_device *bdev) {
-+static bool bch_is_open_backing(struct block_device *bdev)
-+{
- 	struct cache_set *c, *tc;
- 	struct cached_dev *dc, *t;
+ 	len = geo->all_chunks * sizeof(*meta);
+-	meta = kzalloc(len, GFP_KERNEL);
++	meta = vzalloc(len);
+ 	if (!meta)
+ 		return ERR_PTR(-ENOMEM);
  
-@@ -2166,7 +2167,8 @@ static bool bch_is_open_backing(struct block_device *bdev) {
- 	return false;
- }
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index e0db6de137d6..a99854439224 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -983,7 +983,7 @@ static int pblk_lines_init(struct pblk *pblk)
  
--static bool bch_is_open_cache(struct block_device *bdev) {
-+static bool bch_is_open_cache(struct block_device *bdev)
-+{
- 	struct cache_set *c, *tc;
- 	struct cache *ca;
- 	unsigned int i;
-@@ -2178,7 +2180,8 @@ static bool bch_is_open_cache(struct block_device *bdev) {
- 	return false;
- }
+ 	pblk_set_provision(pblk, nr_free_chks);
  
--static bool bch_is_open(struct block_device *bdev) {
-+static bool bch_is_open(struct block_device *bdev)
-+{
- 	return bch_is_open_cache(bdev) || bch_is_open_backing(bdev);
- }
+-	kfree(chunk_meta);
++	vfree(chunk_meta);
+ 	return 0;
  
+ fail_free_lines:
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index 2c96e7fcdcac..5bfa354c5dd5 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -579,7 +579,7 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
+ 	struct nvm_geo *geo = &ndev->geo;
+ 	struct nvme_ns *ns = ndev->q->queuedata;
+ 	struct nvme_ctrl *ctrl = ns->ctrl;
+-	struct nvme_nvm_chk_meta *dev_meta = (struct nvme_nvm_chk_meta *)meta;
++	struct nvme_nvm_chk_meta *dev_meta, *dev_meta_off;
+ 	struct ppa_addr ppa;
+ 	size_t left = nchks * sizeof(struct nvme_nvm_chk_meta);
+ 	size_t log_pos, offset, len;
+@@ -591,6 +591,10 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
+ 	 */
+ 	max_len = min_t(unsigned int, ctrl->max_hw_sectors << 9, 256 * 1024);
+ 
++	dev_meta = kmalloc(max_len, GFP_KERNEL);
++	if (!dev_meta)
++		return -ENOMEM;
++
+ 	/* Normalize lba address space to obtain log offset */
+ 	ppa.ppa = slba;
+ 	ppa = dev_to_generic_addr(ndev, ppa);
+@@ -604,6 +608,9 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
+ 	while (left) {
+ 		len = min_t(unsigned int, left, max_len);
+ 
++		memset(dev_meta, 0, max_len);
++		dev_meta_off = dev_meta;
++
+ 		ret = nvme_get_log_ext(ctrl, ns, NVME_NVM_LOG_REPORT_CHUNK,
+ 				dev_meta, len, offset);
+ 		if (ret) {
+@@ -612,15 +619,15 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
+ 		}
+ 
+ 		for (i = 0; i < len; i += sizeof(struct nvme_nvm_chk_meta)) {
+-			meta->state = dev_meta->state;
+-			meta->type = dev_meta->type;
+-			meta->wi = dev_meta->wi;
+-			meta->slba = le64_to_cpu(dev_meta->slba);
+-			meta->cnlb = le64_to_cpu(dev_meta->cnlb);
+-			meta->wp = le64_to_cpu(dev_meta->wp);
++			meta->state = dev_meta_off->state;
++			meta->type = dev_meta_off->type;
++			meta->wi = dev_meta_off->wi;
++			meta->slba = le64_to_cpu(dev_meta_off->slba);
++			meta->cnlb = le64_to_cpu(dev_meta_off->cnlb);
++			meta->wp = le64_to_cpu(dev_meta_off->wp);
+ 
+ 			meta++;
+-			dev_meta++;
++			dev_meta_off++;
+ 		}
+ 
+ 		offset += len;
 -- 
-2.18.0
+2.7.4
