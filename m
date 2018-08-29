@@ -1,185 +1,203 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-From: Dennis Zhou <dennisszhou@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Josef Bacik <josef@toxicpanda.com>
-Cc: kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-Subject: [PATCH 04/15] blkcg: fix ref count issue with bio_blkcg using task_css
-Date: Thu, 30 Aug 2018 21:53:45 -0400
-Message-Id: <20180831015356.69796-5-dennisszhou@gmail.com>
-In-Reply-To: <20180831015356.69796-1-dennisszhou@gmail.com>
-References: <20180831015356.69796-1-dennisszhou@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:33365 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727444AbeH2SOS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Aug 2018 14:14:18 -0400
+Received: by mail-pl1-f196.google.com with SMTP id 60-v6so2371517ple.0
+        for <linux-block@vger.kernel.org>; Wed, 29 Aug 2018 07:17:09 -0700 (PDT)
+Subject: Re: [PATCH] lightnvm: pblk: improve line helpers
+To: javier@javigon.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        javier@cnexlabs.com
+References: <1535532258-24039-1-git-send-email-javier@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <67952975-32cd-8dd0-6605-b634f3125f39@lightnvm.io>
+Date: Wed, 29 Aug 2018 16:17:04 +0200
+MIME-Version: 1.0
+In-Reply-To: <1535532258-24039-1-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+On 08/29/2018 10:44 AM, Javier González wrote:
+> The current helper to obtain a line from a ppa returns the line id,
+> which requires its users to explicitly retrieve the pointer to the line
+> with the id.
+> 
+> Make 2 different helpers: one returning the line id and one returning
+> the line directly.
+> 
+> Signed-off-by: Javier González <javier@cnexlabs.com>
+> ---
+>   drivers/lightnvm/pblk-core.c  | 15 ++++++---------
+>   drivers/lightnvm/pblk-rb.c    |  2 +-
+>   drivers/lightnvm/pblk-read.c  |  4 ++--
+>   drivers/lightnvm/pblk-write.c |  4 ++--
+>   drivers/lightnvm/pblk.h       | 13 +++++++++----
+>   5 files changed, 20 insertions(+), 18 deletions(-)
+> 
+> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+> index 8e3f3c5fe233..dbf037b2b32f 100644
+> --- a/drivers/lightnvm/pblk-core.c
+> +++ b/drivers/lightnvm/pblk-core.c
+> @@ -35,7 +35,7 @@ static void pblk_line_mark_bb(struct work_struct *work)
+>   		struct pblk_line *line;
+>   		int pos;
+>   
+> -		line = &pblk->lines[pblk_ppa_to_line(*ppa)];
+> +		line = pblk_ppa_to_line(pblk, *ppa);
+>   		pos = pblk_ppa_to_pos(&dev->geo, *ppa);
+>   
+>   		pblk_err(pblk, "failed to mark bb, line:%d, pos:%d\n",
+> @@ -83,7 +83,7 @@ static void __pblk_end_io_erase(struct pblk *pblk, struct nvm_rq *rqd)
+>   	struct pblk_line *line;
+>   	int pos;
+>   
+> -	line = &pblk->lines[pblk_ppa_to_line(rqd->ppa_addr)];
+> +	line = pblk_ppa_to_line(pblk, rqd->ppa_addr);
+>   	pos = pblk_ppa_to_pos(geo, rqd->ppa_addr);
+>   	chunk = &line->chks[pos];
+>   
+> @@ -204,7 +204,6 @@ void pblk_map_invalidate(struct pblk *pblk, struct ppa_addr ppa)
+>   {
+>   	struct pblk_line *line;
+>   	u64 paddr;
+> -	int line_id;
+>   
+>   #ifdef CONFIG_NVM_PBLK_DEBUG
+>   	/* Callers must ensure that the ppa points to a device address */
+> @@ -212,8 +211,7 @@ void pblk_map_invalidate(struct pblk *pblk, struct ppa_addr ppa)
+>   	BUG_ON(pblk_ppa_empty(ppa));
+>   #endif
+>   
+> -	line_id = pblk_ppa_to_line(ppa);
+> -	line = &pblk->lines[line_id];
+> +	line = pblk_ppa_to_line(pblk, ppa);
+>   	paddr = pblk_dev_ppa_to_line_addr(pblk, ppa);
+>   
+>   	__pblk_map_invalidate(pblk, line, paddr);
+> @@ -1493,7 +1491,7 @@ void pblk_ppa_to_line_put(struct pblk *pblk, struct ppa_addr ppa)
+>   {
+>   	struct pblk_line *line;
+>   
+> -	line = &pblk->lines[pblk_ppa_to_line(ppa)];
+> +	line = pblk_ppa_to_line(pblk, ppa);
+>   	kref_put(&line->ref, pblk_line_put_wq);
+>   }
+>   
+> @@ -1759,7 +1757,7 @@ int pblk_blk_erase_async(struct pblk *pblk, struct ppa_addr ppa)
+>   		struct nvm_geo *geo = &dev->geo;
+>   
+>   		pblk_err(pblk, "could not async erase line:%d,blk:%d\n",
+> -					pblk_ppa_to_line(ppa),
+> +					pblk_ppa_to_line_id(ppa),
+>   					pblk_ppa_to_pos(geo, ppa));
+>   	}
+>   
+> @@ -2131,8 +2129,7 @@ void pblk_lookup_l2p_seq(struct pblk *pblk, struct ppa_addr *ppas,
+>   
+>   		/* If the L2P entry maps to a line, the reference is valid */
+>   		if (!pblk_ppa_empty(ppa) && !pblk_addr_in_cache(ppa)) {
+> -			int line_id = pblk_ppa_to_line(ppa);
+> -			struct pblk_line *line = &pblk->lines[line_id];
+> +			struct pblk_line *line = pblk_ppa_to_line(pblk, ppa);
+>   
+>   			kref_get(&line->ref);
+>   		}
+> diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+> index f6eec0212dfc..a7648e12f54f 100644
+> --- a/drivers/lightnvm/pblk-rb.c
+> +++ b/drivers/lightnvm/pblk-rb.c
+> @@ -225,7 +225,7 @@ static int __pblk_rb_update_l2p(struct pblk_rb *rb, unsigned int to_update)
+>   		pblk_update_map_dev(pblk, w_ctx->lba, w_ctx->ppa,
+>   							entry->cacheline);
+>   
+> -		line = &pblk->lines[pblk_ppa_to_line(w_ctx->ppa)];
+> +		line = pblk_ppa_to_line(pblk, w_ctx->ppa);
+>   		kref_put(&line->ref, pblk_line_put);
+>   		clean_wctx(w_ctx);
+>   		rb->l2p_update = (rb->l2p_update + 1) & (rb->nr_entries - 1);
+> diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+> index 97d602f153e2..6d13763f2f6a 100644
+> --- a/drivers/lightnvm/pblk-read.c
+> +++ b/drivers/lightnvm/pblk-read.c
+> @@ -249,9 +249,9 @@ static void pblk_end_partial_read(struct nvm_rq *rqd)
+>   	i = 0;
+>   	hole = find_first_zero_bit(read_bitmap, nr_secs);
+>   	do {
+> -		int line_id = pblk_ppa_to_line(rqd->ppa_list[i]);
+> -		struct pblk_line *line = &pblk->lines[line_id];
+> +		struct pblk_line *line;
+>   
+> +		line = pblk_ppa_to_line(pblk, rqd->ppa_list[i]);
+>   		kref_put(&line->ref, pblk_line_put);
+>   
+>   		meta_list[hole].lba = lba_list_media[i];
+> diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+> index a3c77092ad3f..8ea66bb83c29 100644
+> --- a/drivers/lightnvm/pblk-write.c
+> +++ b/drivers/lightnvm/pblk-write.c
+> @@ -148,7 +148,7 @@ static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa)
+>   	u64 paddr;
+>   	int done = 0;
+>   
+> -	line = &pblk->lines[pblk_ppa_to_line(*ppa)];
+> +	line = pblk_ppa_to_line(pblk, *ppa);
+>   	spin_lock(&line->lock);
+>   
+>   	while (!done)  {
+> @@ -198,7 +198,7 @@ static void pblk_prepare_resubmit(struct pblk *pblk, unsigned int sentry,
+>   		/* Decrese the reference count to the line as we will
+>   		 * re-map these entries
+>   		 */
+> -		line = &pblk->lines[pblk_ppa_to_line(w_ctx->ppa)];
+> +		line = pblk_ppa_to_line(pblk, w_ctx->ppa);
+>   		kref_put(&line->ref, pblk_line_put);
+>   
+>   		pos = (pos + 1) & (rb->nr_entries - 1);
+> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+> index 23e6b3528852..6195e3f5d2e6 100644
+> --- a/drivers/lightnvm/pblk.h
+> +++ b/drivers/lightnvm/pblk.h
+> @@ -994,11 +994,17 @@ static inline int pblk_pad_distance(struct pblk *pblk)
+>   	return geo->mw_cunits * geo->all_luns * geo->ws_opt;
+>   }
+>   
+> -static inline int pblk_ppa_to_line(struct ppa_addr p)
+> +static inline int pblk_ppa_to_line_id(struct ppa_addr p)
+>   {
+>   	return p.a.blk;
+>   }
+>   
+> +static inline struct pblk_line *pblk_ppa_to_line(struct pblk *pblk,
+> +						 struct ppa_addr p)
+> +{
+> +	return &pblk->lines[pblk_ppa_to_line_id(p)];
+> +}
+> +
+>   static inline int pblk_ppa_to_pos(struct nvm_geo *geo, struct ppa_addr p)
+>   {
+>   	return p.a.lun * geo->num_ch + p.a.ch;
+> @@ -1049,7 +1055,7 @@ static inline struct nvm_chk_meta *pblk_dev_ppa_to_chunk(struct pblk *pblk,
+>   {
+>   	struct nvm_tgt_dev *dev = pblk->dev;
+>   	struct nvm_geo *geo = &dev->geo;
+> -	struct pblk_line *line = &pblk->lines[pblk_ppa_to_line(p)];
+> +	struct pblk_line *line = pblk_ppa_to_line(pblk, p);
+>   	int pos = pblk_ppa_to_pos(geo, p);
+>   
+>   	return &line->chks[pos];
+> @@ -1391,8 +1397,7 @@ static inline int pblk_check_io(struct pblk *pblk, struct nvm_rq *rqd)
+>   		int i;
+>   
+>   		for (i = 0; i < rqd->nr_ppas; i++) {
+> -			ppa = ppa_list[i];
+> -			line = &pblk->lines[pblk_ppa_to_line(ppa)];
+> +			line = pblk_ppa_to_line(pblk, ppa_list[i]);
+>   
+>   			spin_lock(&line->lock);
+>   			if (line->state != PBLK_LINESTATE_OPEN) {
+> 
 
-The accessor function bio_blkcg either returns the blkcg associated with
-the bio or finds one in the current context. This can cause an issue
-when trying to associate a bio with a blkcg. Particularly, it's the
-third case that is problematic:
-
-	return css_to_blkcg(task_css(current, io_cgrp_id));
-
-As the above may race against task migration and the cgroup exiting, it
-is not always ok to take a reference on the blkcg returned from
-bio_blkcg.
-
-This patch adds association ahead of calling bio_blkcg rather than
-after. This prevents makes association a required and explicit step
-along the code paths for calling bio_blkcg. blk_get_rl is modified
-as well to get a reference to the blkcg it may use and blk_put_rl
-will always put the reference back. Association is also moved above the
-bio_blkcg call to ensure it will not return NULL in blk-iolatency.
-
-Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
----
- block/bio.c                | 10 +++++--
- block/blk-iolatency.c      |  2 +-
- include/linux/blk-cgroup.h | 53 ++++++++++++++++++++++++++++++++------
- 3 files changed, 54 insertions(+), 11 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 4473ccd22987..09a31e4d46bb 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1962,13 +1962,19 @@ int bio_associate_blkcg_from_page(struct bio *bio, struct page *page)
-  *
-  * This function takes an extra reference of @blkcg_css which will be put
-  * when @bio is released.  The caller must own @bio and is responsible for
-- * synchronizing calls to this function.
-+ * synchronizing calls to this function.  If @blkcg_css is NULL, a call to
-+ * blkcg_get_css finds the current css from the kthread or task.
-  */
- int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css)
- {
- 	if (unlikely(bio->bi_css))
- 		return -EBUSY;
--	css_get(blkcg_css);
-+
-+	if (blkcg_css)
-+		css_get(blkcg_css);
-+	else
-+		blkcg_css = blkcg_get_css();
-+
- 	bio->bi_css = blkcg_css;
- 	return 0;
- }
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 19923f8a029d..62fdd9002c29 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -404,8 +404,8 @@ static void blkcg_iolatency_throttle(struct rq_qos *rqos, struct bio *bio,
- 		return;
- 
- 	rcu_read_lock();
-+	bio_associate_blkcg(bio, NULL);
- 	blkcg = bio_blkcg(bio);
--	bio_associate_blkcg(bio, &blkcg->css);
- 	blkg = blkg_lookup(blkcg, q);
- 	if (unlikely(!blkg)) {
- 		if (!lock)
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index c7386464ec4c..d3cafb1eda48 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -230,22 +230,52 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
- 		   char *input, struct blkg_conf_ctx *ctx);
- void blkg_conf_finish(struct blkg_conf_ctx *ctx);
- 
-+/**
-+ * blkcg_get_css - find and get a reference to the css
-+ *
-+ * Find the css associated with either the kthread or the current task.
-+ */
-+static inline struct cgroup_subsys_state *blkcg_get_css(void)
-+{
-+	struct cgroup_subsys_state *css;
-+
-+	rcu_read_lock();
-+
-+	css = kthread_blkcg();
-+	if (css) {
-+		css_get(css);
-+	} else {
-+		while (true) {
-+			css = task_css(current, io_cgrp_id);
-+			if (likely(css_tryget(css)))
-+				break;
-+			cpu_relax();
-+		}
-+	}
-+
-+	rcu_read_unlock();
-+
-+	return css;
-+}
- 
- static inline struct blkcg *css_to_blkcg(struct cgroup_subsys_state *css)
- {
- 	return css ? container_of(css, struct blkcg, css) : NULL;
- }
- 
-+/**
-+ * bio_blkcg - grab the blkcg associated with a bio
-+ * @bio: target bio
-+ *
-+ * This returns the blkcg associated with a bio, NULL if not associated.
-+ * Callers are expected to either handle NULL or know association has been
-+ * done prior to calling this.
-+ */
- static inline struct blkcg *bio_blkcg(struct bio *bio)
- {
--	struct cgroup_subsys_state *css;
--
- 	if (bio && bio->bi_css)
- 		return css_to_blkcg(bio->bi_css);
--	css = kthread_blkcg();
--	if (css)
--		return css_to_blkcg(css);
--	return css_to_blkcg(task_css(current, io_cgrp_id));
-+	return NULL;
- }
- 
- static inline bool blk_cgroup_congested(void)
-@@ -519,6 +549,11 @@ static inline struct request_list *blk_get_rl(struct request_queue *q,
- 	rcu_read_lock();
- 
- 	blkcg = bio_blkcg(bio);
-+	if (blkcg) {
-+		css_get(&blkcg->css);
-+	} else {
-+		blkcg = css_to_blkcg(blkcg_get_css());
-+	}
- 
- 	/* bypass blkg lookup and use @q->root_rl directly for root */
- 	if (blkcg == &blkcg_root)
-@@ -550,6 +585,8 @@ static inline struct request_list *blk_get_rl(struct request_queue *q,
-  */
- static inline void blk_put_rl(struct request_list *rl)
- {
-+	/* an additional ref is always taken for rl */
-+	css_put(&rl->blkg->blkcg->css);
- 	if (rl->blkg->blkcg != &blkcg_root)
- 		blkg_put(rl->blkg);
- }
-@@ -790,10 +827,10 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 	bool throtl = false;
- 
- 	rcu_read_lock();
--	blkcg = bio_blkcg(bio);
- 
- 	/* associate blkcg if bio hasn't attached one */
--	bio_associate_blkcg(bio, &blkcg->css);
-+	bio_associate_blkcg(bio, NULL);
-+	blkcg = bio_blkcg(bio);
- 
- 	blkg = blkg_lookup(blkcg, q);
- 	if (unlikely(!blkg)) {
--- 
-2.17.1
+Thanks. Applied for 4.20.
