@@ -1,132 +1,89 @@
-Return-Path: <ianwmorrison@gmail.com>
-Return-Path: <ianwmorrison@gmail.com>
-From: Ian W MORRISON <ianwmorrison@gmail.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kashyap.desai@broadcom.com,
-	loberman@redhat.com,
-	osandov@fb.com,
-	hch@lst.de,
-	bart.vanassche@wdc.com,
-	hare@suse.de,
-	ming.lei@redhat.com,
-	ianwmorrison@gmail.com
-Subject: [PATCH] Revert "blk-mq: issue directly if hw queue isn't busy in case of 'none'"
-Date: Wed, 29 Aug 2018 01:47:27 +1000
-Message-Id: <20180828154727.3589-1-ianwmorrison@gmail.com>
+Return-Path: <mb@lightnvm.io>
+Return-Path: <mb@lightnvm.io>
+Subject: Re: [PATCH 2/3] lightnvm: encapsule rqd dma allocations
+To: javier@cnexlabs.com
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1535532980-27672-1-git-send-email-javier@cnexlabs.com>
+ <1535532980-27672-3-git-send-email-javier@cnexlabs.com>
+ <559e39f2-1601-95ea-9305-6a0566943798@lightnvm.io>
+ <8B4755CD-3C36-49B4-9F94-1169E19EF090@cnexlabs.com>
+ <e5d4678d-814d-e2a5-da3e-66245034743f@lightnvm.io>
+ <1CF9AE13-2C0C-426C-8B62-E0B111EDEB5E@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <c6414a97-607d-2bd8-c575-4c54e5ee84e1@lightnvm.io>
+Date: Wed, 29 Aug 2018 15:42:57 +0200
+MIME-Version: 1.0
+In-Reply-To: <1CF9AE13-2C0C-426C-8B62-E0B111EDEB5E@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Kernel oops when booting on Bay and Cherry Trail devices
-such as Intel Compute Stick. Bisected as:
+On 08/29/2018 03:41 PM, Javier Gonzalez wrote:
+> 
+>> On 29 Aug 2018, at 15.36, Matias Bjørling <mb@lightnvm.io> wrote:
+>>
+>> On 08/29/2018 03:18 PM, Javier Gonzalez wrote:
+>>>> On 29 Aug 2018, at 15.00, Matias Bjørling <mb@lightnvm.io> wrote:
+>>>>
+>>>> On 08/29/2018 10:56 AM, Javier González wrote:
+>>>>> dma allocations for ppa_list and meta_list in rqd are replicated in
+>>>>> several places across the pblk codebase. Make helpers to encapsulate
+>>>>> creation and deletion to simplify the code.
+>>>>> Signed-off-by: Javier González <javier@cnexlabs.com>
+>>>>> ---
+>>>>>   drivers/lightnvm/pblk-core.c     | 69 +++++++++++++++++++++++++---------------
+>>>>>   drivers/lightnvm/pblk-read.c     | 35 ++++++++++----------
+>>>>>   drivers/lightnvm/pblk-recovery.c | 29 ++++++-----------
+>>>>>   drivers/lightnvm/pblk-write.c    | 15 ++-------
+>>>>>   drivers/lightnvm/pblk.h          |  3 ++
+>>>>>   5 files changed, 74 insertions(+), 77 deletions(-)
+>>>>> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+>>>>> index 09160ec02c5f..767178185f19 100644
+>>>>> --- a/drivers/lightnvm/pblk-core.c
+>>>>> +++ b/drivers/lightnvm/pblk-core.c
+>>>>> @@ -237,6 +237,34 @@ static void pblk_invalidate_range(struct pblk *pblk, sector_t slba,
+>>>>>   	spin_unlock(&pblk->trans_lock);
+>>>>>   }
+>>>>>   +int pblk_setup_rqd(struct pblk *pblk, struct nvm_rq *rqd, gfp_t mem_flags,
+>>>>> +		   bool is_vector)
+>>>>
+>>>>
+>>>> The mem_flags argument can be removed. It is GFP_KERNEL from all the
+>>>> places it is called.
+>>> Thought it was better to have the flexibility in a helper function, but
+>>> we can always add it later on if needed...
+>>>> is_vector, will be better to do nr_ppas (or similar name). Then
+>>>> pblk_submit_read/pblk_submit_read_gc are a bit cleaner.
+>>> We can do that too, yes.
+>>>>> +{
+>>>>> +	struct nvm_tgt_dev *dev = pblk->dev;
+>>>>> +
+>>>>> +	rqd->meta_list = nvm_dev_dma_alloc(dev->parent, mem_flags,
+>>>>> +							&rqd->dma_meta_list);
+>>>>> +	if (!rqd->meta_list)
+>>>>> +		return -ENOMEM;
+>>>>> +
+>>>>> +	if (!is_vector)
+>>>>> +		return 0;
+>>>>> +
+>>>>> +	rqd->ppa_list = rqd->meta_list + pblk_dma_meta_size;
+>>>>> +	rqd->dma_ppa_list = rqd->dma_meta_list + pblk_dma_meta_size;
+>>>>
+>>>> Wrt to is_vector, does it matter if we just set ppa_list and
+>>>> dma_ppa_list? If we have them, we use them, else leave them alone?
+>>> If we only have 1 address then ppa_addr is set and the ppa_list attempt
+>>> to free in the completion path interpreting ppa_addr as the dma address.
+>>> So I don't think so - unless I'm missing something?
+>>
+>> In that case, we could drop is_vector/nr_ppas all together? That would be nice.
+>>
+> 
+> The problem is that the metadata region still needs to be used, even if
+> the ppa_list is not set. Thing that the oob area can be larger than
+> 64bits, so we cannot do the dma address is the actual value trick.
+> 
+> So if encapsulating, we need to know if we need to allocate the ppa_list
+> or not.
+> 
+> Does it make sense?
 
-commit 6ce3dd6eec11 ("blk-mq: issue directly if hw queue isn't busy in case of 'none'")
-
-This patch reverts the above commit.
-
-Signed-off-by: Ian W MORRISON <ianwmorrison@gmail.com>
----
- block/blk-mq-sched.c | 13 +------------
- block/blk-mq.c       | 27 +--------------------------
- block/blk-mq.h       |  2 --
- 3 files changed, 2 insertions(+), 40 deletions(-)
-
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 29bfe8017a2d..3204c39cb39f 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -405,19 +405,8 @@ void blk_mq_sched_insert_requests(struct request_queue *q,
- 
- 	if (e && e->type->ops.mq.insert_requests)
- 		e->type->ops.mq.insert_requests(hctx, list, false);
--	else {
--		/*
--		 * try to issue requests directly if the hw queue isn't
--		 * busy in case of 'none' scheduler, and this way may save
--		 * us one extra enqueue & dequeue to sw queue.
--		 */
--		if (!hctx->dispatch_busy && !e && !run_queue_async) {
--			blk_mq_try_issue_list_directly(hctx, list);
--			if (list_empty(list))
--				return;
--		}
-+	else
- 		blk_mq_insert_requests(hctx, ctx, list);
--	}
- 
- 	blk_mq_run_hw_queue(hctx, run_queue_async);
- }
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 85a1c1a59c72..09e4611d330d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1693,16 +1693,13 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	ret = q->mq_ops->queue_rq(hctx, &bd);
- 	switch (ret) {
- 	case BLK_STS_OK:
--		blk_mq_update_dispatch_busy(hctx, false);
- 		*cookie = new_cookie;
- 		break;
- 	case BLK_STS_RESOURCE:
- 	case BLK_STS_DEV_RESOURCE:
--		blk_mq_update_dispatch_busy(hctx, true);
- 		__blk_mq_requeue_request(rq);
- 		break;
- 	default:
--		blk_mq_update_dispatch_busy(hctx, false);
- 		*cookie = BLK_QC_T_NONE;
- 		break;
- 	}
-@@ -1785,27 +1782,6 @@ blk_status_t blk_mq_request_issue_directly(struct request *rq)
- 	return ret;
- }
- 
--void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
--		struct list_head *list)
--{
--	while (!list_empty(list)) {
--		blk_status_t ret;
--		struct request *rq = list_first_entry(list, struct request,
--				queuelist);
--
--		list_del_init(&rq->queuelist);
--		ret = blk_mq_request_issue_directly(rq);
--		if (ret != BLK_STS_OK) {
--			if (ret == BLK_STS_RESOURCE ||
--					ret == BLK_STS_DEV_RESOURCE) {
--				list_add(&rq->queuelist, list);
--				break;
--			}
--			blk_mq_end_request(rq, ret);
--		}
--	}
--}
--
- static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- {
- 	const int is_sync = op_is_sync(bio->bi_opf);
-@@ -1906,8 +1882,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 			blk_mq_try_issue_directly(data.hctx, same_queue_rq,
- 					&cookie);
- 		}
--	} else if ((q->nr_hw_queues > 1 && is_sync) || (!q->elevator &&
--			!data.hctx->dispatch_busy)) {
-+	} else if (q->nr_hw_queues > 1 && is_sync) {
- 		blk_mq_put_ctx(data.ctx);
- 		blk_mq_bio_to_request(rq, bio);
- 		blk_mq_try_issue_directly(data.hctx, rq, &cookie);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 9497b47e2526..bc2b24735ed4 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -64,8 +64,6 @@ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
- 
- /* Used by blk_insert_cloned_request() to issue request directly */
- blk_status_t blk_mq_request_issue_directly(struct request *rq);
--void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
--				    struct list_head *list);
- 
- /*
-  * CPU -> queue mappings
--- 
-2.17.1
+Cool. We'll just leave it as is.
