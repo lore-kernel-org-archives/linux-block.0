@@ -1,44 +1,37 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:46504 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727204AbeH2RLb (ORCPT
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:36199 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727204AbeH2M5y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Aug 2018 13:11:31 -0400
-Received: by mail-pg1-f193.google.com with SMTP id b129-v6so2297941pga.13
-        for <linux-block@vger.kernel.org>; Wed, 29 Aug 2018 06:14:38 -0700 (PDT)
-Subject: Re: [PATCH 0/4] lightnvm: pblk: collection of small fixes
-To: javier@javigon.com
+        Wed, 29 Aug 2018 08:57:54 -0400
+Received: by mail-ed1-f67.google.com with SMTP id f4-v6so3368273edq.3
+        for <linux-block@vger.kernel.org>; Wed, 29 Aug 2018 02:01:59 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
+To: mb@lightnvm.io
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        javier@cnexlabs.com
-References: <1535533313-29944-1-git-send-email-javier@cnexlabs.com>
-From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <5b8881cd-019a-a1d8-86ed-0131ef3b71af@lightnvm.io>
-Date: Wed, 29 Aug 2018 15:14:33 +0200
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 0/4] lightnvm: pblk: collection of small fixes
+Date: Wed, 29 Aug 2018 11:01:49 +0200
+Message-Id: <1535533313-29944-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-In-Reply-To: <1535533313-29944-1-git-send-email-javier@cnexlabs.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 08/29/2018 11:01 AM, Javier González wrote:
-> Collection of small helper function fixes, removal of unused variables
-> and comment typos.
-> 
-> Javier González (4):
->    lightnvm: pblk: calculate line pad distance in helper
->    lightnvm: pblk: fix comment typo
->    lightnvm: pblk: remove unused variable.
->    lightnvm: pblk: guarantee emeta on line close
-> 
->   drivers/lightnvm/pblk-core.c     | 13 +++++++++++--
->   drivers/lightnvm/pblk-recovery.c |  2 --
->   drivers/lightnvm/pblk-write.c    |  2 +-
->   drivers/lightnvm/pblk.h          |  6 +++---
->   4 files changed, 15 insertions(+), 8 deletions(-)
-> 
+Collection of small helper function fixes, removal of unused variables
+and comment typos.
 
-Thanks. Applied 2-4. The pad distance does not compile due to missing 
-update to pblk_pad_distance call from pblk-recovery.c.
+Javier González (4):
+  lightnvm: pblk: calculate line pad distance in helper
+  lightnvm: pblk: fix comment typo
+  lightnvm: pblk: remove unused variable.
+  lightnvm: pblk: guarantee emeta on line close
 
-Also, it looks like pblk-recovery.c is the only user. Please consider 
-moving it the function from pblk.h to pblk-recovery.c
+ drivers/lightnvm/pblk-core.c     | 13 +++++++++++--
+ drivers/lightnvm/pblk-recovery.c |  2 --
+ drivers/lightnvm/pblk-write.c    |  2 +-
+ drivers/lightnvm/pblk.h          |  6 +++---
+ 4 files changed, 15 insertions(+), 8 deletions(-)
+
+-- 
+2.7.4
