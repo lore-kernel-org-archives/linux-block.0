@@ -1,110 +1,133 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-eopbgr720043.outbound.protection.outlook.com ([40.107.72.43]:11881
-        "EHLO NAM05-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727392AbeH3ARS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Aug 2018 20:17:18 -0400
-From: Javier Gonzalez <javier@cnexlabs.com>
-To: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-CC: =?iso-8859-1?Q?Matias_Bj=F8rling?= <mb@lightnvm.io>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:40021 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728198AbeH2Q2Q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Aug 2018 12:28:16 -0400
+Received: by mail-ed1-f65.google.com with SMTP id e19-v6so3784413edq.7
+        for <linux-block@vger.kernel.org>; Wed, 29 Aug 2018 05:31:33 -0700 (PDT)
+From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
+To: Matias Bjorling <mb@lightnvm.io>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Javier Gonzales <javier@cnexlabs.com>,
         Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: Re: [PATCH 4/4] lightnvm: pblk: add tracing for chunk resets
-Date: Wed, 29 Aug 2018 20:09:38 +0000
-Message-ID: <AE72A23A-F779-466B-89A7-846A232DD9B2@cnexlabs.com>
+Subject: [PATCH 4/4] lightnvm: pblk: add tracing for chunk resets
+Date: Wed, 29 Aug 2018 14:31:17 +0200
+Message-Id: <1535545877-770-5-git-send-email-hans.ml.holmberg@owltronix.com>
+In-Reply-To: <1535545877-770-1-git-send-email-hans.ml.holmberg@owltronix.com>
 References: <1535545877-770-1-git-send-email-hans.ml.holmberg@owltronix.com>
- <1535545877-770-5-git-send-email-hans.ml.holmberg@owltronix.com>
-In-Reply-To: <1535545877-770-5-git-send-email-hans.ml.holmberg@owltronix.com>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_CB620C91-DF80-4D28-A9CE-FA7AA977389B";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha512
-MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
---Apple-Mail=_CB620C91-DF80-4D28-A9CE-FA7AA977389B
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-> On 29 Aug 2018, at 14.31, Hans Holmberg =
-<hans.ml.holmberg@owltronix.com> wrote:
->=20
-> From: Hans Holmberg <hans.holmberg@cnexlabs.com>
->=20
-> Trace state of chunk resets.
->=20
-> Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-> ---
-> drivers/lightnvm/pblk-core.c  | 12 ++++++++++++
-> drivers/lightnvm/pblk-trace.h | 31 +++++++++++++++++++++++++++++++
-> drivers/lightnvm/pblk.h       |  6 ++++++
-> 3 files changed, 49 insertions(+)
->=20
-> diff --git a/drivers/lightnvm/pblk-core.c =
-b/drivers/lightnvm/pblk-core.c
-> index 566a5d3165ee..b874001d1175 100644
-> --- a/drivers/lightnvm/pblk-core.c
-> +++ b/drivers/lightnvm/pblk-core.c
-> @@ -90,9 +90,15 @@ static void __pblk_end_io_erase(struct pblk *pblk, =
-struct nvm_rq *rqd)
-> 	atomic_dec(&line->left_seblks);
->=20
-> 	if (rqd->error) {
-> +		trace_pblk_chunk_reset(pblk_disk_name(pblk),
-> +				&rqd->ppa_addr, =
-PBLK_CHUNK_RESET_FAILED);
-> +
-> 		chunk->state =3D NVM_CHK_ST_OFFLINE;
-> 		pblk_mark_bb(pblk, line, rqd->ppa_addr);
-> 	} else {
-> +		trace_pblk_chunk_reset(pblk_disk_name(pblk),
-> +				&rqd->ppa_addr, PBLK_CHUNK_RESET_DONE);
-> +
-> 		chunk->state =3D NVM_CHK_ST_FREE;
-> 	}
->=20
-> @@ -958,6 +964,9 @@ int pblk_line_erase(struct pblk *pblk, struct =
-pblk_line *line)
-> 		WARN_ON(test_and_set_bit(bit, line->erase_bitmap));
-> 		spin_unlock(&line->lock);
->=20
-> +		trace_pblk_chunk_reset(pblk_disk_name(pblk),
-> +				&ppa, PBLK_CHUNK_RESET_START);
-> +
+Trace state of chunk resets.
 
-Can you move this inside of pblk_blk_erase_sync() instead? I was looking
-at the code now to implement a different thing and it is confusing to
-see tracing inside erase_async and not in erase_sync.
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+---
+ drivers/lightnvm/pblk-core.c  | 12 ++++++++++++
+ drivers/lightnvm/pblk-trace.h | 31 +++++++++++++++++++++++++++++++
+ drivers/lightnvm/pblk.h       |  6 ++++++
+ 3 files changed, 49 insertions(+)
 
-Thanks,
-Javier
-
---Apple-Mail=_CB620C91-DF80-4D28-A9CE-FA7AA977389B
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIyBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAluG/X8ACgkQIX4xUKFR
-nnQeTg/48XG9dPgdwv6BwnYYiRWe0dxxUWZ4D3emWcY1mHgaLZMGcQBaQMVJ6kit
-4e73epVxLC/12qSPVvFqT5YmJAkTafbB90IZaWzplW5BlUaMkAk633x0GV6jUx9J
-ujjDXmg6N3SEPgQznUSo0gQR8R5EGDKHAo5MmEuQcj8htJEppsKmXHmJjhU2tifc
-FZdi7tmNpyamLZmxZ/F+wbXRxCajEpK6TVNlYHVPSug4ygntGw+twjhEt1wvO0Fr
-sqMQfytLHmMV0yTlGZJKTI47C3i8AaOx38hh9pUJidShliF7HRgAf+eAe7nu7Haa
-cHya9anQjsj4aH4Qgz8wNb3ozxK+316Wsws4KUK6zRYG5ZTY+YExt069/TaFMXGt
-5dg/baP7nCU2zzj/72vbdhKttxRz6/6yjzhFGn5Rqy2l5wFLaV4ncmPN7AU7dhlF
-AkK52cFgvWUkLT2S4aln1Ry4dlUYYG0HzH7NdZs/fm0tthfXWXWGk9zz284HimUT
-EGY4V5Bu2ldrbcotYBr2QSYbfTo7G0lABQTWs2kAaBkJzFjj7V2IVlzzCnzrSlqN
-y1fIDlqRUQyX5Yg125FAn3sAwX7FPky1KF1iKPUVxt44mvXA0WUvnWHDCixA6j1s
-mL311dWIqvZPiO5806djma5kgQa95fGydbILbu8AscK/NApBjA==
-=QK3p
------END PGP SIGNATURE-----
-
---Apple-Mail=_CB620C91-DF80-4D28-A9CE-FA7AA977389B--
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 566a5d3165ee..b874001d1175 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -90,9 +90,15 @@ static void __pblk_end_io_erase(struct pblk *pblk, struct nvm_rq *rqd)
+ 	atomic_dec(&line->left_seblks);
+ 
+ 	if (rqd->error) {
++		trace_pblk_chunk_reset(pblk_disk_name(pblk),
++				&rqd->ppa_addr, PBLK_CHUNK_RESET_FAILED);
++
+ 		chunk->state = NVM_CHK_ST_OFFLINE;
+ 		pblk_mark_bb(pblk, line, rqd->ppa_addr);
+ 	} else {
++		trace_pblk_chunk_reset(pblk_disk_name(pblk),
++				&rqd->ppa_addr, PBLK_CHUNK_RESET_DONE);
++
+ 		chunk->state = NVM_CHK_ST_FREE;
+ 	}
+ 
+@@ -958,6 +964,9 @@ int pblk_line_erase(struct pblk *pblk, struct pblk_line *line)
+ 		WARN_ON(test_and_set_bit(bit, line->erase_bitmap));
+ 		spin_unlock(&line->lock);
+ 
++		trace_pblk_chunk_reset(pblk_disk_name(pblk),
++				&ppa, PBLK_CHUNK_RESET_START);
++
+ 		ret = pblk_blk_erase_sync(pblk, ppa);
+ 		if (ret) {
+ 			pblk_err(pblk, "failed to erase line %d\n", line->id);
+@@ -1736,6 +1745,9 @@ int pblk_blk_erase_async(struct pblk *pblk, struct ppa_addr ppa)
+ 	rqd->end_io = pblk_end_io_erase;
+ 	rqd->private = pblk;
+ 
++	trace_pblk_chunk_reset(pblk_disk_name(pblk),
++				&ppa, PBLK_CHUNK_RESET_START);
++
+ 	/* The write thread schedules erases so that it minimizes disturbances
+ 	 * with writes. Thus, there is no need to take the LUN semaphore.
+ 	 */
+diff --git a/drivers/lightnvm/pblk-trace.h b/drivers/lightnvm/pblk-trace.h
+index c171d0450c07..679e5c458ca6 100644
+--- a/drivers/lightnvm/pblk-trace.h
++++ b/drivers/lightnvm/pblk-trace.h
+@@ -31,6 +31,37 @@ struct ppa_addr;
+ 	{ PBLK_STATE_RECOVERING,	"RECOVERING",	},	\
+ 	{ PBLK_STATE_STOPPED,		"STOPPED"	})
+ 
++#define show_chunk_erase_state(state) __print_symbolic(state,	\
++	{ PBLK_CHUNK_RESET_START,	"START",	},	\
++	{ PBLK_CHUNK_RESET_DONE,	"OK",		},	\
++	{ PBLK_CHUNK_RESET_FAILED,	"FAILED"	})
++
++
++TRACE_EVENT(pblk_chunk_reset,
++
++	TP_PROTO(const char *name, struct ppa_addr *ppa, int state),
++
++	TP_ARGS(name, ppa, state),
++
++	TP_STRUCT__entry(
++		__string(name, name)
++		__field(u64, ppa)
++		__field(int, state);
++	),
++
++	TP_fast_assign(
++		__assign_str(name, name);
++		__entry->ppa = ppa->ppa;
++		__entry->state = state;
++	),
++
++	TP_printk("dev=%s grp=%llu pu=%llu chk=%llu state=%s", __get_str(name),
++			(u64)(((struct ppa_addr *)(&__entry->ppa))->m.grp),
++			(u64)(((struct ppa_addr *)(&__entry->ppa))->m.pu),
++			(u64)(((struct ppa_addr *)(&__entry->ppa))->m.chk),
++			show_chunk_erase_state((int)__entry->state))
++
++);
+ 
+ TRACE_EVENT(pblk_chunk_state,
+ 
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index ed17db2cae2c..6195e3f5d2e6 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -79,6 +79,12 @@ enum {
+ 	PBLK_BLK_ST_CLOSED =	0x2,
+ };
+ 
++enum {
++	PBLK_CHUNK_RESET_START,
++	PBLK_CHUNK_RESET_DONE,
++	PBLK_CHUNK_RESET_FAILED,
++};
++
+ struct pblk_sec_meta {
+ 	u64 reserved;
+ 	__le64 lba;
+-- 
+2.7.4
