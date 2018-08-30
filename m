@@ -1,76 +1,224 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-From: Dennis Zhou <dennisszhou@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Josef Bacik <josef@toxicpanda.com>
-Cc: kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>,
-	Jiufei Xue <jiufei.xue@linux.alibaba.com>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>
-Subject: [PATCH 03/15] blkcg: use tryget logic when associating a blkg with a bio
-Date: Thu, 30 Aug 2018 21:53:44 -0400
-Message-Id: <20180831015356.69796-4-dennisszhou@gmail.com>
-In-Reply-To: <20180831015356.69796-1-dennisszhou@gmail.com>
-References: <20180831015356.69796-1-dennisszhou@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from ale.deltatee.com ([207.54.116.67]:40062 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727173AbeH3W5l (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Aug 2018 18:57:41 -0400
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+Date: Thu, 30 Aug 2018 12:53:48 -0600
+Message-Id: <20180830185352.3369-10-logang@deltatee.com>
+In-Reply-To: <20180830185352.3369-1-logang@deltatee.com>
+References: <20180830185352.3369-1-logang@deltatee.com>
+Subject: [PATCH v5 09/13] nvme-pci: Use PCI p2pmem subsystem to manage the CMB
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+Register the CMB buffer as p2pmem and use the appropriate allocation
+functions to create and destroy the IO submission queues.
 
-There is a very small change a bio gets caught up in a really
-unfortunate race between a task migration, cgroup exiting, and itself
-trying to associate with a blkg. This is due to css offlining being
-performed after the css->refcnt is killed which triggers removal of
-blkgs that reach their blkg->refcnt of 0.
+If the CMB supports WDS and RDS, publish it for use as P2P memory
+by other devices.
 
-To avoid this, association with a blkg should use tryget and fallback to
-using the root_blkg.
+Kernels without CONFIG_PCI_P2PDMA will also no longer support NVMe CMB.
+However, seeing the main use-cases for the CMB is P2P operations,
+this seems like a reasonable dependency.
 
-Fixes: 08e18eab0c579 ("block: add bi_blkg to the bio for cgroups")
-Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
-Cc: Jiufei Xue <jiufei.xue@linux.alibaba.com>
-Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Josef Bacik <josef@toxicpanda.com>
-Cc: Jens Axboe <axboe@kernel.dk>
+We drop the __iomem safety on the buffer seeing that, by convention, it's
+safe to directly access memory mapped by memremap()/devm_memremap_pages().
+Architectures where this is not safe will not be supported by memremap()
+and therefore will not be support PCI P2P and have no support for CMB.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- block/bio.c          | 3 ++-
- block/blk-throttle.c | 5 +++--
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ drivers/nvme/host/pci.c | 80 +++++++++++++++++++++++++++----------------------
+ 1 file changed, 45 insertions(+), 35 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 04969b392c72..4473ccd22987 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1987,7 +1987,8 @@ int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg)
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 1b9951d2067e..2902585c6ddf 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -30,6 +30,7 @@
+ #include <linux/types.h>
+ #include <linux/io-64-nonatomic-lo-hi.h>
+ #include <linux/sed-opal.h>
++#include <linux/pci-p2pdma.h>
+ 
+ #include "nvme.h"
+ 
+@@ -99,9 +100,8 @@ struct nvme_dev {
+ 	struct work_struct remove_work;
+ 	struct mutex shutdown_lock;
+ 	bool subsystem;
+-	void __iomem *cmb;
+-	pci_bus_addr_t cmb_bus_addr;
+ 	u64 cmb_size;
++	bool cmb_use_sqes;
+ 	u32 cmbsz;
+ 	u32 cmbloc;
+ 	struct nvme_ctrl ctrl;
+@@ -158,7 +158,7 @@ struct nvme_queue {
+ 	struct nvme_dev *dev;
+ 	spinlock_t sq_lock;
+ 	struct nvme_command *sq_cmds;
+-	struct nvme_command __iomem *sq_cmds_io;
++	bool sq_cmds_is_io;
+ 	spinlock_t cq_lock ____cacheline_aligned_in_smp;
+ 	volatile struct nvme_completion *cqes;
+ 	struct blk_mq_tags **tags;
+@@ -439,11 +439,8 @@ static int nvme_pci_map_queues(struct blk_mq_tag_set *set)
+ static void nvme_submit_cmd(struct nvme_queue *nvmeq, struct nvme_command *cmd)
  {
- 	if (unlikely(bio->bi_blkg))
- 		return -EBUSY;
--	blkg_get(blkg);
-+	if (!blkg_try_get(blkg))
-+		return -ENODEV;
- 	bio->bi_blkg = blkg;
+ 	spin_lock(&nvmeq->sq_lock);
+-	if (nvmeq->sq_cmds_io)
+-		memcpy_toio(&nvmeq->sq_cmds_io[nvmeq->sq_tail], cmd,
+-				sizeof(*cmd));
+-	else
+-		memcpy(&nvmeq->sq_cmds[nvmeq->sq_tail], cmd, sizeof(*cmd));
++
++	memcpy(&nvmeq->sq_cmds[nvmeq->sq_tail], cmd, sizeof(*cmd));
+ 
+ 	if (++nvmeq->sq_tail == nvmeq->q_depth)
+ 		nvmeq->sq_tail = 0;
+@@ -1224,9 +1221,18 @@ static void nvme_free_queue(struct nvme_queue *nvmeq)
+ {
+ 	dma_free_coherent(nvmeq->q_dmadev, CQ_SIZE(nvmeq->q_depth),
+ 				(void *)nvmeq->cqes, nvmeq->cq_dma_addr);
+-	if (nvmeq->sq_cmds)
+-		dma_free_coherent(nvmeq->q_dmadev, SQ_SIZE(nvmeq->q_depth),
+-					nvmeq->sq_cmds, nvmeq->sq_dma_addr);
++
++	if (nvmeq->sq_cmds) {
++		if (nvmeq->sq_cmds_is_io)
++			pci_free_p2pmem(to_pci_dev(nvmeq->q_dmadev),
++					nvmeq->sq_cmds,
++					SQ_SIZE(nvmeq->q_depth));
++		else
++			dma_free_coherent(nvmeq->q_dmadev,
++					  SQ_SIZE(nvmeq->q_depth),
++					  nvmeq->sq_cmds,
++					  nvmeq->sq_dma_addr);
++	}
+ }
+ 
+ static void nvme_free_queues(struct nvme_dev *dev, int lowest)
+@@ -1315,12 +1321,21 @@ static int nvme_cmb_qdepth(struct nvme_dev *dev, int nr_io_queues,
+ static int nvme_alloc_sq_cmds(struct nvme_dev *dev, struct nvme_queue *nvmeq,
+ 				int qid, int depth)
+ {
+-	/* CMB SQEs will be mapped before creation */
+-	if (qid && dev->cmb && use_cmb_sqes && (dev->cmbsz & NVME_CMBSZ_SQS))
+-		return 0;
++	struct pci_dev *pdev = to_pci_dev(dev->dev);
++
++	if (qid && dev->cmb_use_sqes && (dev->cmbsz & NVME_CMBSZ_SQS)) {
++		nvmeq->sq_cmds = pci_alloc_p2pmem(pdev, SQ_SIZE(depth));
++		nvmeq->sq_dma_addr = pci_p2pmem_virt_to_bus(pdev,
++						nvmeq->sq_cmds);
++		nvmeq->sq_cmds_is_io = true;
++	}
++
++	if (!nvmeq->sq_cmds) {
++		nvmeq->sq_cmds = dma_alloc_coherent(dev->dev, SQ_SIZE(depth),
++					&nvmeq->sq_dma_addr, GFP_KERNEL);
++		nvmeq->sq_cmds_is_io = false;
++	}
+ 
+-	nvmeq->sq_cmds = dma_alloc_coherent(dev->dev, SQ_SIZE(depth),
+-					    &nvmeq->sq_dma_addr, GFP_KERNEL);
+ 	if (!nvmeq->sq_cmds)
+ 		return -ENOMEM;
  	return 0;
- }
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index a3eede00d302..c626e1f7cdcd 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2129,8 +2129,9 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
- static void blk_throtl_assoc_bio(struct throtl_grp *tg, struct bio *bio)
+@@ -1397,13 +1412,6 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
+ 	int result;
+ 	s16 vector;
+ 
+-	if (dev->cmb && use_cmb_sqes && (dev->cmbsz & NVME_CMBSZ_SQS)) {
+-		unsigned offset = (qid - 1) * roundup(SQ_SIZE(nvmeq->q_depth),
+-						      dev->ctrl.page_size);
+-		nvmeq->sq_dma_addr = dev->cmb_bus_addr + offset;
+-		nvmeq->sq_cmds_io = dev->cmb + offset;
+-	}
+-
+ 	/*
+ 	 * A queue's vector matches the queue identifier unless the controller
+ 	 * has only one vector available.
+@@ -1644,9 +1652,6 @@ static void nvme_map_cmb(struct nvme_dev *dev)
+ 		return;
+ 	dev->cmbloc = readl(dev->bar + NVME_REG_CMBLOC);
+ 
+-	if (!use_cmb_sqes)
+-		return;
+-
+ 	size = nvme_cmb_size_unit(dev) * nvme_cmb_size(dev);
+ 	offset = nvme_cmb_size_unit(dev) * NVME_CMB_OFST(dev->cmbloc);
+ 	bar = NVME_CMB_BIR(dev->cmbloc);
+@@ -1663,11 +1668,18 @@ static void nvme_map_cmb(struct nvme_dev *dev)
+ 	if (size > bar_size - offset)
+ 		size = bar_size - offset;
+ 
+-	dev->cmb = ioremap_wc(pci_resource_start(pdev, bar) + offset, size);
+-	if (!dev->cmb)
++	if (pci_p2pdma_add_resource(pdev, bar, size, offset)) {
++		dev_warn(dev->ctrl.device,
++			 "failed to register the CMB\n");
+ 		return;
+-	dev->cmb_bus_addr = pci_bus_address(pdev, bar) + offset;
++	}
++
+ 	dev->cmb_size = size;
++	dev->cmb_use_sqes = use_cmb_sqes && (dev->cmbsz & NVME_CMBSZ_SQS);
++
++	if ((dev->cmbsz & (NVME_CMBSZ_WDS | NVME_CMBSZ_RDS)) ==
++			(NVME_CMBSZ_WDS | NVME_CMBSZ_RDS))
++		pci_p2pmem_publish(pdev, true);
+ 
+ 	if (sysfs_add_file_to_group(&dev->ctrl.device->kobj,
+ 				    &dev_attr_cmb.attr, NULL))
+@@ -1677,12 +1689,10 @@ static void nvme_map_cmb(struct nvme_dev *dev)
+ 
+ static inline void nvme_release_cmb(struct nvme_dev *dev)
  {
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
--	if (bio->bi_css)
--		bio_associate_blkg(bio, tg_to_blkg(tg));
-+	/* fallback to root_blkg if we fail to get a blkg ref */
-+	if (bio->bi_css && bio_associate_blkg(bio, tg_to_blkg(tg)))
-+		bio_associate_blkg(bio, bio->bi_disk->queue->root_blkg);
- 	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
- #endif
+-	if (dev->cmb) {
+-		iounmap(dev->cmb);
+-		dev->cmb = NULL;
++	if (dev->cmb_size) {
+ 		sysfs_remove_file_from_group(&dev->ctrl.device->kobj,
+ 					     &dev_attr_cmb.attr, NULL);
+-		dev->cmbsz = 0;
++		dev->cmb_size = 0;
+ 	}
  }
+ 
+@@ -1881,13 +1891,13 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
+ 	if (nr_io_queues == 0)
+ 		return 0;
+ 
+-	if (dev->cmb && (dev->cmbsz & NVME_CMBSZ_SQS)) {
++	if (dev->cmb_use_sqes) {
+ 		result = nvme_cmb_qdepth(dev, nr_io_queues,
+ 				sizeof(struct nvme_command));
+ 		if (result > 0)
+ 			dev->q_depth = result;
+ 		else
+-			nvme_release_cmb(dev);
++			dev->cmb_use_sqes = false;
+ 	}
+ 
+ 	do {
 -- 
-2.17.1
+2.11.0
