@@ -1,45 +1,137 @@
-Return-Path: <jgross@suse.com>
-From: Juergen Gross <jgross@suse.com>
-To: linux-kernel@vger.kernel.org,
-	xen-devel@lists.xenproject.org,
-	linux-block@vger.kernel.org
-Cc: konrad.wilk@oracle.com,
-	roger.pau@citrix.com,
-	axboe@kernel.dk,
-	boris.ostrovsky@oracle.com,
-	Juergen Gross <jgross@suse.com>
-Subject: [PATCH] xen/blkfront: remove unused macros
-Date: Mon,  6 Aug 2018 13:34:00 +0200
-Message-Id: <20180806113403.24728-3-jgross@suse.com>
-In-Reply-To: <20180806113403.24728-1-jgross@suse.com>
-References: <20180806113403.24728-1-jgross@suse.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from userp2120.oracle.com ([156.151.31.85]:53548 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728449AbeH3TDV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Aug 2018 15:03:21 -0400
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+To: herbert@gondor.apana.org.au
+Cc: Jeff.Lien@wdc.com, ard.biesheuvel@linaro.org,
+        david.darrington@wdc.com, hch@infradead.org, jeff.furlong@wdc.com,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        martin.petersen@oracle.com, tim.c.chen@linux.intel.com
+Subject: [PATCH v2 2/3] crc-t10dif: Pick better transform if one becomes available
+Date: Thu, 30 Aug 2018 11:00:15 -0400
+Message-Id: <20180830150016.15661-2-martin.petersen@oracle.com>
+In-Reply-To: <20180830150016.15661-1-martin.petersen@oracle.com>
+References: <20180827060918.tfz7ljufqhlej4kq@gondor.apana.org.au>
+ <20180830150016.15661-1-martin.petersen@oracle.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Remove some macros not used anywhere.
+T10 CRC library is linked into the kernel thanks to block and SCSI. The
+crypto accelerators are typically loaded later as modules and are
+therefore not available when the T10 CRC library is initialized.
 
-Signed-off-by: Juergen Gross <jgross@suse.com>
+Use the crypto notifier facility to trigger a switch to a better algorithm
+if one becomes available after the initial hash has been registered. Use
+RCU to protect the original transform while the new one is being set up.
+
+Suggested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org
+Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
 ---
- drivers/block/xen-blkfront.c | 5 -----
- 1 file changed, 5 deletions(-)
+ include/linux/crc-t10dif.h |  1 +
+ lib/crc-t10dif.c           | 46 ++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 45 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index b5cedccb5d7d..94300dbe358b 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -251,14 +251,9 @@ static DEFINE_SPINLOCK(minor_lock);
- #define GRANTS_PER_INDIRECT_FRAME \
- 	(XEN_PAGE_SIZE / sizeof(struct blkif_request_segment))
+diff --git a/include/linux/crc-t10dif.h b/include/linux/crc-t10dif.h
+index 1fe0cfcdea30..6bb0c0bf357b 100644
+--- a/include/linux/crc-t10dif.h
++++ b/include/linux/crc-t10dif.h
+@@ -6,6 +6,7 @@
  
--#define PSEGS_PER_INDIRECT_FRAME	\
--	(GRANTS_INDIRECT_FRAME / GRANTS_PSEGS)
--
- #define INDIRECT_GREFS(_grants)		\
- 	DIV_ROUND_UP(_grants, GRANTS_PER_INDIRECT_FRAME)
+ #define CRC_T10DIF_DIGEST_SIZE 2
+ #define CRC_T10DIF_BLOCK_SIZE 1
++#define CRC_T10DIF_STRING "crct10dif"
  
--#define GREFS(_psegs)	((_psegs) * GRANTS_PER_PSEG)
--
- static int blkfront_setup_indirect(struct blkfront_ring_info *rinfo);
- static void blkfront_gather_backend_features(struct blkfront_info *info);
- static int negotiate_mq(struct blkfront_info *info);
+ extern __u16 crc_t10dif_generic(__u16 crc, const unsigned char *buffer,
+ 				size_t len);
+diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
+index 1ad33e555805..52f577a3868d 100644
+--- a/lib/crc-t10dif.c
++++ b/lib/crc-t10dif.c
+@@ -14,10 +14,47 @@
+ #include <linux/err.h>
+ #include <linux/init.h>
+ #include <crypto/hash.h>
++#include <crypto/algapi.h>
+ #include <linux/static_key.h>
++#include <linux/notifier.h>
+ 
+-static struct crypto_shash *crct10dif_tfm;
++static struct crypto_shash __rcu *crct10dif_tfm;
+ static struct static_key crct10dif_fallback __read_mostly;
++DEFINE_MUTEX(crc_t10dif_mutex);
++
++static int crc_t10dif_rehash(struct notifier_block *self, unsigned long val, void *data)
++{
++	struct crypto_alg *alg = data;
++	struct crypto_shash *new, *old;
++
++	if (val != CRYPTO_MSG_ALG_LOADED ||
++	    static_key_false(&crct10dif_fallback) ||
++	    strncmp(alg->cra_name, CRC_T10DIF_STRING, strlen(CRC_T10DIF_STRING)))
++		return 0;
++
++	mutex_lock(&crc_t10dif_mutex);
++	old = rcu_dereference_protected(crct10dif_tfm,
++					lockdep_is_held(&crc_t10dif_mutex));
++	if (!old) {
++		mutex_unlock(&crc_t10dif_mutex);
++		return 0;
++	}
++	new = crypto_alloc_shash("crct10dif", 0, 0);
++	if (IS_ERR(new)) {
++		mutex_unlock(&crc_t10dif_mutex);
++		return 0;
++	}
++	rcu_assign_pointer(crct10dif_tfm, new);
++	mutex_unlock(&crc_t10dif_mutex);
++
++	synchronize_rcu();
++	crypto_free_shash(old);
++	return 0;
++}
++
++static struct notifier_block crc_t10dif_nb = {
++	.notifier_call = crc_t10dif_rehash,
++};
+ 
+ __u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
+ {
+@@ -30,11 +67,14 @@ __u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
+ 	if (static_key_false(&crct10dif_fallback))
+ 		return crc_t10dif_generic(crc, buffer, len);
+ 
+-	desc.shash.tfm = crct10dif_tfm;
++	rcu_read_lock();
++	desc.shash.tfm = rcu_dereference(crct10dif_tfm);
+ 	desc.shash.flags = 0;
+ 	*(__u16 *)desc.ctx = crc;
+ 
+ 	err = crypto_shash_update(&desc.shash, buffer, len);
++	rcu_read_unlock();
++
+ 	BUG_ON(err);
+ 
+ 	return *(__u16 *)desc.ctx;
+@@ -49,6 +89,7 @@ EXPORT_SYMBOL(crc_t10dif);
+ 
+ static int __init crc_t10dif_mod_init(void)
+ {
++	crypto_register_notifier(&crc_t10dif_nb);
+ 	crct10dif_tfm = crypto_alloc_shash("crct10dif", 0, 0);
+ 	if (IS_ERR(crct10dif_tfm)) {
+ 		static_key_slow_inc(&crct10dif_fallback);
+@@ -59,6 +100,7 @@ static int __init crc_t10dif_mod_init(void)
+ 
+ static void __exit crc_t10dif_mod_fini(void)
+ {
++	crypto_unregister_notifier(&crc_t10dif_nb);
+ 	crypto_free_shash(crct10dif_tfm);
+ }
+ 
 -- 
-2.13.7
+2.17.1
