@@ -1,38 +1,90 @@
-Return-Path: <christophe.leroy@c-s.fr>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH RESEND 3/3] drivers/block/z2ram: use ioremap_wt() instead of
- __ioremap(_PAGE_WRITETHRU)
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
- Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
- Jens Axboe <axboe@kernel.dk>
-Cc: linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-block@vger.kernel.org,
- linux-m68k@lists.linux-m68k.org, linuxppc-dev@lists.ozlabs.org
-Message-Id: <20180825142702.77FD7104918@pc16082vm.idsi0.si.c-s.fr>
-Date: Sat, 25 Aug 2018 16:27:02 +0200 (CEST)
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 4.19-rc2
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-ID: <968a77bc-35b8-bcef-35c1-17a3ad894db2@kernel.dk>
+Date: Thu, 30 Aug 2018 14:16:07 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-_PAGE_WRITETHRU is a target specific flag. Prefer generic functions.
+Hi Linus,
 
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
----
- drivers/block/z2ram.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Small collection of fixes that should go into this series. This pull
+request contains:
 
-diff --git a/drivers/block/z2ram.c b/drivers/block/z2ram.c
-index d0c5bc4e0703..cfbd70520eeb 100644
---- a/drivers/block/z2ram.c
-+++ b/drivers/block/z2ram.c
-@@ -190,8 +190,7 @@ static int z2_open(struct block_device *bdev, fmode_t mode)
- 			vfree(vmalloc (size));
- 		}
- 
--		vaddr = (unsigned long) __ioremap (paddr, size, 
--						   _PAGE_WRITETHRU);
-+		vaddr = (unsigned long)ioremap_wt(paddr, size);
- 
- #else
- 		vaddr = (unsigned long)z_remap_nocache_nonser(paddr, size);
+- NVMe pull request with three small fixes (via Christoph)
+
+- Kill useless NULL check before kmem_cache_destroy (Chengguang Xu)
+
+- Xen block driver pull request with persistent grant flushing fixes
+  (Juergen Gross)
+
+- Final wbt fixes, wrapping up the changes for this series. These have
+  been heavily tested (me)
+
+- cdrom info leak fix (Scott Bauer)
+
+- ATA dma quirk for SQ201 (Linus Walleij)
+
+- Straight forward bsg refcount_t conversion (John Pittman)
+
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git tags/for-linus-20180830
+
+
+----------------------------------------------------------------
+Chaitanya Kulkarni (1):
+      nvmet: free workqueue object if module init fails
+
+Chengguang Xu (1):
+      block: remove unnecessary condition check
+
+James Smart (1):
+      nvme-fcloop: Fix dropped LS's to removed target port
+
+Jens Axboe (5):
+      blk-wbt: abstract out end IO completion handler
+      blk-wbt: improve waking of tasks
+      Merge branch 'stable/for-jens-4.19' of git://git.kernel.org/.../konrad/xen into for-linus
+      blk-wbt: remove dead code
+      Merge branch 'nvme-4.19' of git://git.infradead.org/nvme into for-linus
+
+John Pittman (1):
+      block: bsg: move atomic_t ref_count variable to refcount API
+
+Juergen Gross (5):
+      xen/blkback: don't keep persistent grants too long
+      xen/blkfront: cleanup stale persistent grants
+      xen/blkfront: reorder tests in xlblk_init()
+      xen/blkback: move persistent grants flags to bool
+      xen/blkback: remove unused pers_gnts_lock from struct xen_blkif_ring
+
+Linus Walleij (1):
+      ata: ftide010: Add a quirk for SQ201
+
+Michal Wnukowski (1):
+      nvme-pci: add a memory barrier to nvme_dbbuf_update_and_check_event
+
+Scott Bauer (1):
+      cdrom: Fix info leak/OOB read in cdrom_ioctl_drive_status
+
+ Documentation/ABI/testing/sysfs-driver-xen-blkback |  10 ++
+ block/blk-wbt.c                                    |  89 +++++++++++++----
+ block/bsg.c                                        |   8 +-
+ block/elevator.c                                   |   3 +-
+ drivers/ata/pata_ftide010.c                        |  27 +++--
+ drivers/block/xen-blkback/blkback.c                |  99 ++++++++++---------
+ drivers/block/xen-blkback/common.h                 |  14 +--
+ drivers/block/xen-blkfront.c                       | 110 ++++++++++++++++++---
+ drivers/cdrom/cdrom.c                              |   2 +-
+ drivers/nvme/host/pci.c                            |   8 ++
+ drivers/nvme/target/core.c                         |   4 +-
+ drivers/nvme/target/fcloop.c                       |   3 +-
+ 12 files changed, 269 insertions(+), 108 deletions(-)
+
 -- 
-2.17.1
+Jens Axboe
