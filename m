@@ -1,26 +1,36 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] block: elevator: remove unneeded null check in
- elv_register()
-To: John Pittman <jpittman@redhat.com>
-Cc: linux-block@vger.kernel.org
-References: <20180830195618.25658-1-jpittman@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <c7ada2a7-c02c-9d0d-2e81-c52b292e3585@kernel.dk>
-Date: Thu, 30 Aug 2018 14:00:15 -0600
-MIME-Version: 1.0
-In-Reply-To: <20180830195618.25658-1-jpittman@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <jpittman@redhat.com>
+From: John Pittman <jpittman@redhat.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	John Pittman <jpittman@redhat.com>
+Subject: [PATCH] block: elevator: remove unneeded null check in elv_register()
+Date: Thu, 30 Aug 2018 15:56:18 -0400
+Message-Id: <20180830195618.25658-1-jpittman@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 8/30/18 1:56 PM, John Pittman wrote:
-> Since commit 3942d2991852 ("mm/slab_common: allow NULL cache
-> pointer in kmem_cache_destroy()"), the kmem_cache_destroy()
-> function has been able to handle null pointers.  Remove NULL
-> check against e->icq_cache in elv_register(), simplifying the code.
+Since commit 3942d2991852 ("mm/slab_common: allow NULL cache
+pointer in kmem_cache_destroy()"), the kmem_cache_destroy()
+function has been able to handle null pointers.  Remove NULL
+check against e->icq_cache in elv_register(), simplifying the code.
 
-You're the 3rd person sending in this patch this week :-)
+Signed-off-by: John Pittman <jpittman@redhat.com>
+---
+ block/elevator.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-http://git.kernel.dk/cgit/linux-block/commit/?h=for-linus&id=62d2a1940709198a522a43ff8be8b8f6b3654dec
-
+diff --git a/block/elevator.c b/block/elevator.c
+index 5ea6e7d600e4..6a06b5d040e5 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -895,8 +895,7 @@ int elv_register(struct elevator_type *e)
+ 	spin_lock(&elv_list_lock);
+ 	if (elevator_find(e->elevator_name, e->uses_mq)) {
+ 		spin_unlock(&elv_list_lock);
+-		if (e->icq_cache)
+-			kmem_cache_destroy(e->icq_cache);
++		kmem_cache_destroy(e->icq_cache);
+ 		return -EBUSY;
+ 	}
+ 	list_add_tail(&e->list, &elv_list);
 -- 
-Jens Axboe
+2.17.1
