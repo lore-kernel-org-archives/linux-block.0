@@ -1,40 +1,36 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39252 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727689AbeHIJJB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Aug 2018 05:09:01 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 16/17] bcache: remove unnecessary space before ioctl function pointer arguments
-Date: Thu,  9 Aug 2018 14:43:19 +0800
-Message-Id: <20180809064320.10229-17-colyli@suse.de>
-In-Reply-To: <20180809064320.10229-1-colyli@suse.de>
-References: <20180809064320.10229-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <suhua.tanke@gmail.com>
+Return-Path: <suhua.tanke@gmail.com>
+From: Su Hua <suhua.tanke@gmail.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Su Hua <suhua.tanke@gmail.com>
+Subject: [PATCH] block: Add a check for fdisk
+Date: Thu, 30 Aug 2018 17:11:27 +0800
+Message-Id: <1535620287-27189-1-git-send-email-suhua.tanke@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-This is warned by checkpatch.pl, this patch removes the extra space.
+When a block device is acquired in the form of FMODE_EXCL, I think it
+should not be allowed to perform partition operations, similar to when
+mount is executed.
 
-Signed-off-by: Coly Li <colyli@suse.de>
+Signed-off-by: Su Hua <suhua.tanke@gmail.com>
 ---
- drivers/md/bcache/bcache.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ block/partition-generic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 66e6d5639b38..83504dd8100a 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -275,8 +275,8 @@ struct bcache_device {
+diff --git a/block/partition-generic.c b/block/partition-generic.c
+index 5a8975a..a8daa31 100644
+--- a/block/partition-generic.c
++++ b/block/partition-generic.c
+@@ -440,7 +440,7 @@ static int drop_partitions(struct gendisk *disk, struct block_device *bdev)
+ 	struct hd_struct *part;
+ 	int res;
  
- 	int (*cache_miss)(struct btree *b, struct search *s,
- 			  struct bio *bio, unsigned int sectors);
--	int (*ioctl) (struct bcache_device *d, fmode_t mode,
--		      unsigned int cmd, unsigned long arg);
-+	int (*ioctl)(struct bcache_device *d, fmode_t mode,
-+		     unsigned int cmd, unsigned long arg);
- };
- 
- struct io {
+-	if (bdev->bd_part_count || bdev->bd_super)
++	if (bdev->bd_part_count || bdev->bd_super || bdev->bd_holders)
+ 		return -EBUSY;
+ 	res = invalidate_partition(disk, 0);
+ 	if (res)
 -- 
-2.18.0
+2.7.4
