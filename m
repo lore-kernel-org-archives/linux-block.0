@@ -1,22 +1,36 @@
-Return-Path: <axboe@kernel.dk>
-Received: from x1.thefacebook.com ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id k5-v6sm2956501ioj.59.2018.08.21.08.05.18
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 21 Aug 2018 08:05:19 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Subject: [PATCHSET 0/3] blk-wbt fixes
-Date: Tue, 21 Aug 2018 09:05:14 -0600
-Message-Id: <20180821150517.19744-1-axboe@kernel.dk>
+Return-Path: <zlsh007@hotmail.com>
+From: ? ? <zlsh007@hotmail.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: [PATCH] block: Add a check for fdisk
+Date: Thu, 30 Aug 2018 07:07:41 +0000
+Message-ID: <KL1PR01MB127192D2FC817BCA02F8B365F5080@KL1PR01MB1271.apcprd01.prod.exchangelabs.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-One cleanup, and two fixes:
+When a block device is acquired in the form of FMODE_EXCL, I think it
+should not be allowed to perform partition operations, similar to when
+mount is executed.
 
-Patch 2 - Ensure that the wait queue active check includes the necessary
-memory barrier.
+Signed-off-by: Hua Su <zlsh007@hotmail.com>
+---
+ block/partition-generic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Patch 3 - Ensure that new tasks don't supersede already waiting tasks.
-
--- 
-Jens Axboe
+diff --git a/block/partition-generic.c b/block/partition-generic.c
+index 5a8975a..a8daa31 100644
+--- a/block/partition-generic.c
++++ b/block/partition-generic.c
+@@ -440,7 +440,7 @@ static int drop_partitions(struct gendisk *disk, struct=
+ block_device *bdev)
+ 	struct hd_struct *part;
+ 	int res;
+=20
+-	if (bdev->bd_part_count || bdev->bd_super)
++	if (bdev->bd_part_count || bdev->bd_super || bdev->bd_holders)
+ 		return -EBUSY;
+ 	res =3D invalidate_partition(disk, 0);
+ 	if (res)
+--=20
+2.7.4
