@@ -1,71 +1,128 @@
-Return-Path: <christophe.leroy@c-s.fr>
-Message-Id: <4f905a9d9752768c628623276f5e2fb465c947c8.1535104490.git.christophe.leroy@c-s.fr>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH 1/3] powerpc/32: Add ioremap_wt()
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org, linux-block@vger.kernel.org, linux-m68k@lists.linux-m68k.org
-Date: Fri, 24 Aug 2018 10:04:55 +0000 (UTC)
+Return-Path: <ulf.hansson@linaro.org>
+MIME-Version: 1.0
+In-Reply-To: <77d400a8-2b16-8cac-7e2c-f155a734d047@kernel.dk>
+References: <20180828154727.3589-1-ianwmorrison@gmail.com> <211633e2-a812-d489-e11c-c3f271c465fc@kernel.dk>
+ <CAFXWsS_661mkZa1iYEs+8-O-fdFF6bEcqtZrNBzVaNthT2U46w@mail.gmail.com>
+ <1cbdba28-3ff5-2bbe-a2cf-b533249c6970@kernel.dk> <CAFXWsS82zi7w81-=4ALwMiFm9iQd=NgF3sSBLfvNdU2czEzxwg@mail.gmail.com>
+ <853d7213-c6ce-5de9-6c83-806c3b8f18ca@kernel.dk> <CAFXWsS_xOKTJk87vQSESQNfdwY1TU0jjS4twEg_+yF3pqbKQ3g@mail.gmail.com>
+ <702eb090-2bf4-69d1-bfb6-afdca4ba5c5f@kernel.dk> <363DA0ED52042842948283D2FC38E4649C266411@IRSMSX106.ger.corp.intel.com>
+ <CAPDyKFqLdWL-VG2uZsiQNrJA=VvytGJp0xYYd52jMtmeP1nLcw@mail.gmail.com> <77d400a8-2b16-8cac-7e2c-f155a734d047@kernel.dk>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Thu, 30 Aug 2018 14:05:49 +0200
+Message-ID: <CAPDyKFp=JJR3rs2NSnVL=TDB80C5oYpMxnMhDGSwBhqqm=JBSw@mail.gmail.com>
+Subject: Re: [PATCH] Revert "blk-mq: issue directly if hw queue isn't busy in
+ case of 'none'"
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "Hunter, Adrian" <adrian.hunter@intel.com>, Ian W MORRISON <ianwmorrison@gmail.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kashyap.desai@broadcom.com" <kashyap.desai@broadcom.com>, "loberman@redhat.com" <loberman@redhat.com>,
+	"osandov@fb.com" <osandov@fb.com>, "hch@lst.de" <hch@lst.de>,
+	"bart.vanassche@wdc.com" <bart.vanassche@wdc.com>, "hare@suse.de" <hare@suse.de>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Other arches have ioremap_wt() to map IO areas write-through.
-Implement it on PPC as well in order to avoid drivers using
-__ioremap(_PAGE_WRITETHRU)
+On 29 August 2018 at 16:01, Jens Axboe <axboe@kernel.dk> wrote:
+> On 8/29/18 12:15 AM, Ulf Hansson wrote:
+>> On 28 August 2018 at 21:11, Hunter, Adrian <adrian.hunter@intel.com> wrote:
+>>>> -----Original Message-----
+>>>> From: Jens Axboe [mailto:axboe@kernel.dk]
+>>>> Sent: Tuesday, August 28, 2018 8:12 PM
+>>>> To: Ian W MORRISON <ianwmorrison@gmail.com>
+>>>> Cc: linux-block@vger.kernel.org; linux-kernel@vger.kernel.org;
+>>>> kashyap.desai@broadcom.com; loberman@redhat.com; osandov@fb.com;
+>>>> hch@lst.de; bart.vanassche@wdc.com; hare@suse.de;
+>>>> ming.lei@redhat.com; Hunter, Adrian <adrian.hunter@intel.com>
+>>>> Subject: Re: [PATCH] Revert "blk-mq: issue directly if hw queue isn't busy in
+>>>> case of 'none'"
+>>>>
+>>>> On 8/28/18 11:01 AM, Ian W MORRISON wrote:
+>>>>> On Wed, 29 Aug 2018 at 02:13, Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>>
+>>>>>> On 8/28/18 10:10 AM, Ian W MORRISON wrote:
+>>>>>>> On Wed, 29 Aug 2018 at 02:09, Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>>>>
+>>>>>>>> On 8/28/18 10:07 AM, Ian W MORRISON wrote:
+>>>>>>>>> On Wed, 29 Aug 2018 at 01:48, Jens Axboe <axboe@kernel.dk>
+>>>> wrote:
+>>>>>>>>>>
+>>>>>>>>>> On 8/28/18 9:47 AM, Ian W MORRISON wrote:
+>>>>>>>>>>> Kernel oops when booting on Bay and Cherry Trail devices such as
+>>>>>>>>>>> Intel Compute Stick. Bisected as:
+>>>>>>>>>>>
+>>>>>>>>>>> commit 6ce3dd6eec11 ("blk-mq: issue directly if hw queue isn't
+>>>>>>>>>>> busy in case of 'none'")
+>>>>>>>>>>>
+>>>>>>>>>>> This patch reverts the above commit.
+>>>>>>>>>>
+>>>>>>>>>> Did I miss the posting of that oops? Just curious where this is
+>>>>>>>>>> going wrong. Not adverse to reverting, but I'd like to try to
+>>>>>>>>>> understand the issue first.
+>>>>>>>>>>
+>>>>>>>>>> --
+>>>>>>>>>> Jens Axboe
+>>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> I've not been able to capture it however manually transcribing
+>>>>>>>>> what is on the screen:
+>>>>>>>>>
+>>>>>>>>> mmc0: Got data interrupt 0x00000002 even though no data operation
+>>>>>>>>>
+>>>>>>>>> followed by:
+>>>>>>>>>
+>>>>>>>>> mmc0: sdhci: ============= SDHCI REGISTER DUMP
+>>>> ==============
+>>>>>>>>>
+>>>>>>>>> Do you want any specific register value or should I transcribe
+>>>>>>>>> each (as I am working from an image taken at boot)?
+>>>>>>>>
+>>>>>>>> Just take a picture of the screen, that should be good enough.
+>>>>>>>>
+>>>>>>>> --
+>>>>>>>> Jens Axboe
+>>>>>>>>
+>>>>>>>
+>>>>>>> Attached as requested.
+>>>>>>
+>>>>>> Can you see if this patch helps?
+>>>>>>
+>>>>>> https://marc.info/?l=linux-mmc&m=153485326025301&w=2
+>>>>>>
+>>>>>> --
+>>>>>> Jens Axboe
+>>>>>>
+>>>>>
+>>>>> I confirm that the above patch works with commit 6ce3dd6eec11 and
+>>>>> removes the need for reverting it on eMMC based devices.
+>>>>>
+>>>>> Tested on Bay Trail, Cherry Trail (both now working) and Kaby Lake
+>>>>> (not affected) devices.
+>>>>
+>>>> Great, thanks for testing. Adrian, when is this going upstream?
+>>>
+>>> It is in Ulf's fixes branch, so most likely v4.19-rc2 .  Then to stable in due course.
+>>>
+>>>         https://git.kernel.org/pub/scm/linux/kernel/git/ulfh/mmc.git/commit/?h=fixes&id=26caddf274cf1e89fd4ce44ab2b8dbc7a7f97681
+>>
+>> Yep, correct!
+>>
+>> As I told someone before, I am deliberately holding on to fixes a
+>> little longer that before, to extend the test coverage a bit.
+>>
+>> If someone wants to test the latest rc with fixes, one could instead
+>> try the pending-fixes branch in Stephen Rothwell's linux-next tree.
+>
+> With all due respect, you should expedite this one so we're not
+> wasting peoples time bisecting it again and again. I didn't even
+> know about a pending-fixes branch in the linux-next tree, so I
+> doubt most users will.
 
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
----
- arch/powerpc/include/asm/io.h | 6 ++++++
- arch/powerpc/mm/pgtable_32.c  | 8 ++++++++
- 2 files changed, 14 insertions(+)
+I guess it takes some time before people gets aware of the
+pending-fixes branch. At least I managed to highlight its presence in
+this thread. :-)
 
-diff --git a/arch/powerpc/include/asm/io.h b/arch/powerpc/include/asm/io.h
-index e0331e754568..3380b5b22450 100644
---- a/arch/powerpc/include/asm/io.h
-+++ b/arch/powerpc/include/asm/io.h
-@@ -3,6 +3,9 @@
- #ifdef __KERNEL__
- 
- #define ARCH_HAS_IOREMAP_WC
-+#ifdef CONFIG_PPC32
-+#define ARCH_HAS_IOREMAP_WT
-+#endif
- 
- /*
-  * This program is free software; you can redistribute it and/or
-@@ -746,6 +749,8 @@ static inline void iosync(void)
-  *
-  * * ioremap_wc enables write combining
-  *
-+ * * ioremap_wt enables write through
-+ *
-  * * iounmap undoes such a mapping and can be hooked
-  *
-  * * __ioremap_at (and the pending __iounmap_at) are low level functions to
-@@ -767,6 +772,7 @@ extern void __iomem *ioremap(phys_addr_t address, unsigned long size);
- extern void __iomem *ioremap_prot(phys_addr_t address, unsigned long size,
- 				  unsigned long flags);
- extern void __iomem *ioremap_wc(phys_addr_t address, unsigned long size);
-+void __iomem *ioremap_wt(phys_addr_t address, unsigned long size);
- #define ioremap_nocache(addr, size)	ioremap((addr), (size))
- #define ioremap_uc(addr, size)		ioremap((addr), (size))
- #define ioremap_cache(addr, size) \
-diff --git a/arch/powerpc/mm/pgtable_32.c b/arch/powerpc/mm/pgtable_32.c
-index 2bbc22384f78..b2e73e82f8fc 100644
---- a/arch/powerpc/mm/pgtable_32.c
-+++ b/arch/powerpc/mm/pgtable_32.c
-@@ -90,6 +90,14 @@ ioremap_wc(phys_addr_t addr, unsigned long size)
- EXPORT_SYMBOL(ioremap_wc);
- 
- void __iomem *
-+ioremap_wt(phys_addr_t addr, unsigned long size)
-+{
-+	return __ioremap_caller(addr, size, _PAGE_WRITETHRU,
-+				__builtin_return_address(0));
-+}
-+EXPORT_SYMBOL(ioremap_wt);
-+
-+void __iomem *
- ioremap_prot(phys_addr_t addr, unsigned long size, unsigned long flags)
- {
- 	pte_t pte = __pte(flags);
--- 
-2.13.3
+PR about to be created, I keep the folkz in this thread on cc once I post it.
+
+Kind regards
+Uffe
