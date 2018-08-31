@@ -1,44 +1,66 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39104 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728435AbeHIJID (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Aug 2018 05:08:03 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 07/17] bcache: fix indent by replacing blank by tabs
-Date: Thu,  9 Aug 2018 14:43:10 +0800
-Message-Id: <20180809064320.10229-8-colyli@suse.de>
-In-Reply-To: <20180809064320.10229-1-colyli@suse.de>
-References: <20180809064320.10229-1-colyli@suse.de>
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:44265 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727433AbeHaSEn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 31 Aug 2018 14:04:43 -0400
+Received: by mail-lj1-f194.google.com with SMTP id q127-v6so10154837ljq.11
+        for <linux-block@vger.kernel.org>; Fri, 31 Aug 2018 06:57:06 -0700 (PDT)
+Subject: Re: [PATCH 0/4] lightnvm: pblk: add support for chunk metadata on
+ erase
+To: javier@javigon.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        javier@cnexlabs.com, hans.holmberg@cnexlabs.com
+References: <1535722477-31288-1-git-send-email-javier@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <71f5f8b3-66d5-a0e0-85ab-cb22e5ac621c@lightnvm.io>
+Date: Fri, 31 Aug 2018 15:57:03 +0200
+MIME-Version: 1.0
+In-Reply-To: <1535722477-31288-1-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-bch_btree_insert_check_key() has unaligned indent, or indent by blank
-characters. This patch makes the indent aligned and replace blank by
-tabs.
+On 08/31/2018 03:34 PM, Javier González wrote:
+> Matias,
+> 
+> This patchset implements support for retrieving chunk metadata when
+> submitting a reset/erase command. Patches 0 and 1 are small fixes that
+> can be directly merged into your patch:
+>    
+>    lightnvm: move bad block and chunk state logic to core
+> 
+> Also, note that these do not apply on top of your for-4.20/core due them
+> depending on patches that I sent before that you have not picked up yet.
+> You can see them though in for-4.20/pblk. I'll rebase as patches in the
+> list appear in your tree.
 
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/btree.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Thanks. It is really confusing when you guys maintains an implicit order 
+and posts the patches separately. I will appreciate that patches that 
+are related are posted together, such that I don't have to manually 
+track what comes before another. That makes it less of a pain for me to 
+keep track of and we can keep the reviews together.
 
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index afd691b4cb6e..a072e3a6c91d 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -2229,10 +2229,10 @@ int bch_btree_insert_check_key(struct btree *b, struct btree_op *op,
- 		rw_lock(true, b, b->level);
- 
- 		if (b->key.ptr[0] != btree_ptr ||
--                   b->seq != seq + 1) {
-+		    b->seq != seq + 1) {
- 			op->lock = b->level;
- 			goto out;
--               }
-+		}
- 	}
- 
- 	SET_KEY_PTRS(check_key, 1);
--- 
-2.18.0
+This is the patches that I have in the pipeline (from before the e-mails 
+from today):
+
+   - This serie - Pending review
+   - Serie: pblk: support variable OOB size - Waiting on review from Igor
+   - lightnvm: pblk: recover open lines on 2.0 devices. Which doesn't 
+apply due to the fixes to the pad distance patch.
+
+> 
+> Thanks,
+> Javier
+> 
+> Javier González (4):
+>    lightnvm: use right address format on 1.2 path
+>    lightnvm: assign block address before slba
+>    lightnvm: pblk: add helper for printing chunk state
+>    lightnvm: pblk: retrieve chunk metadata on erase
+> 
+>   drivers/lightnvm/core.c      | 51 +++++++++++++++++++++++++++++++++++++++-----
+>   drivers/lightnvm/pblk-core.c | 47 ++++++++++++++++++++++++++++++----------
+>   drivers/lightnvm/pblk.h      |  9 ++++++++
+>   3 files changed, 91 insertions(+), 16 deletions(-)
+> 
