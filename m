@@ -1,43 +1,52 @@
-Return-Path: <mpatocka@redhat.com>
-Date: Wed, 22 Aug 2018 12:23:03 -0400 (EDT)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-cc: Ilya Dryomov <idryomov@gmail.com>, Sagi Grimberg <sagi@grimberg.me>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Zdenek Kabelac <zkabelac@redhat.com>, WGH <wgh@torlan.ru>,
-        linux-block@vger.kernel.org
-Subject: [PATCH] block: don't warn when calling fsync on read-only block
- devices
-Message-ID: <alpine.LRH.2.02.1808221217030.30929@file01.intranet.prod.int.rdu2.redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 0/3] fix blkcg offlining and destruction
+To: Dennis Zhou <dennisszhou@gmail.com>, Tejun Heo <tj@kernel.org>,
+ Johannes Weiner <hannes@cmpxchg.org>, Josef Bacik <josef@toxicpanda.com>
+Cc: kernel-team@fb.com, linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20180831202244.21678-1-dennisszhou@gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <7b5ec635-c251-7ac3-bebd-2cfd687ffed6@kernel.dk>
+Date: Fri, 31 Aug 2018 14:49:54 -0600
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <20180831202244.21678-1-dennisszhou@gmail.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-It is possible to call fsync on a read-only handle (for example, fsck.ext2 
-does it when doing read-only check), and this call results in kernel 
-warning. This bug was introduced by the commit 721c7fc701c7 "block: fail 
-op_is_write() requests to read-only partitions".
+On 8/31/18 2:22 PM, Dennis Zhou wrote:
+> Hi everyone,
+> 
+> This is a split of an earlier series I sent out [1] containing the first
+> 3 patches with fixes from feedback. This series tackles the first
+> problem where blkcgs were not being destroyed.
+> 
+> There is a regression in blkcg destruction where references weren't
+> properly put causing blkcgs to never be destroyed. Previously, blkgs
+> were destroyed during offlining of the blkcg. This puts back the blkcg
+> reference a blkg holds allowing blkcg ref to reach zero. Then,
+> blkcg_css_free() is called as part of the final cleanup.
+> 
+> To address the problem, 0001 reverts the broken commit, 0002 delays
+> blkg destruction until writeback has finished, and 0003 closes the
+> window on a race condition between a css migration and dying, and
+> blkg association. This should fix the issue where blkg_get() was getting
+> called when a blkcg had already begun exiting. If a bio finds itself
+> here, it will just fall back to root. Oddly enough at one point,
+> blk-throttle was using policy data from and associating with potentially
+> different blkgs, thus how this was exposed.
+> 
+> [1] https://lore.kernel.org/lkml/20180831015356.69796-1-dennisszhou@gmail.com/T
+> 
+> This patchset contains the following 3 patches:
+>   0001-Revert-blk-throttle-fix-race-between-blkcg_bio_issue.patch
+>   0002-blkcg-delay-blkg-destruction-until-after-writeback-h.patch
+>   0003-blkcg-use-tryget-logic-when-associating-a-blkg-with-.patch
+> 
+> 0001 reverts the broken commit.
+> 0002 delays blkg destruction until after writeback.
+> 0003 fixes a race condition for ongoing IO and blkcg destruction.
 
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-Fixes: 721c7fc701c7 ("block: fail op_is_write() requests to read-only partitions")
-Cc: stable@vger.kernel.org	# 4.18
+Applied for 4.19, thanks Dennis.
 
----
- block/blk-core.c              |    3 +++
- drivers/md/dm-verity-target.c |   33 +++++++++++++++++----------------
- 2 files changed, 20 insertions(+), 16 deletions(-)
-
-Index: linux-2.6/block/blk-core.c
-===================================================================
---- linux-2.6.orig/block/blk-core.c	2018-08-15 16:47:18.930000000 +0200
-+++ linux-2.6/block/blk-core.c	2018-08-22 16:37:19.680000000 +0200
-@@ -2155,6 +2155,9 @@ static inline bool bio_check_ro(struct b
- 	if (part->policy && op_is_write(bio_op(bio))) {
- 		char b[BDEVNAME_SIZE];
- 
-+		if (op_is_flush(bio->bi_opf) && !bio_sectors(bio))
-+			return false;
-+
- 		WARN_ONCE(1,
- 		       "generic_make_request: Trying to write "
- 			"to read-only block-device %s (partno %d)\n",
+-- 
+Jens Axboe
