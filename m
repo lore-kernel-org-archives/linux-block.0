@@ -1,12 +1,14 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:46842 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727768AbeHaTu2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Aug 2018 15:50:28 -0400
-To: Sagi Grimberg <sagi@grimberg.me>, linux-kernel@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-rdma@vger.kernel.org, linux-nvdimm@lists.01.org,
-        linux-block@vger.kernel.org
+Received: from mail-oi0-f66.google.com ([209.85.218.66]:41565 "EHLO
+        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725772AbeHaE34 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 31 Aug 2018 00:29:56 -0400
+Subject: Re: [PATCH v5 13/13] nvmet: Optionally use PCI P2P memory
+To: Logan Gunthorpe <logang@deltatee.com>,
+        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org
 Cc: Stephen Bates <sbates@raithlin.com>,
         Christoph Hellwig <hch@lst.de>,
         Keith Busch <keith.busch@intel.com>,
@@ -21,36 +23,53 @@ Cc: Stephen Bates <sbates@raithlin.com>,
         Steve Wise <swise@opengridcomputing.com>
 References: <20180830185352.3369-1-logang@deltatee.com>
  <20180830185352.3369-14-logang@deltatee.com>
- <ecbb669a-2e84-1333-7e0d-1560cf014750@grimberg.me>
-From: Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <ee3d5c87-4dff-edfb-1f85-958571cb1fef@deltatee.com>
-Date: Fri, 31 Aug 2018 09:41:51 -0600
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <ecbb669a-2e84-1333-7e0d-1560cf014750@grimberg.me>
+Date: Thu, 30 Aug 2018 17:25:09 -0700
 MIME-Version: 1.0
-In-Reply-To: <ecbb669a-2e84-1333-7e0d-1560cf014750@grimberg.me>
-Content-Type: text/plain; charset=utf-8
-Subject: Re: [PATCH v5 13/13] nvmet: Optionally use PCI P2P memory
+In-Reply-To: <20180830185352.3369-14-logang@deltatee.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Thanks, for the review.
 
-On 30/08/18 06:25 PM, Sagi Grimberg wrote:
->> +	if (req->port->p2p_dev) {
->> +		if (!pci_p2pdma_assign_provider(req->port->p2p_dev,
->> +						&ctrl->p2p_clients)) {
->> +			pr_info("peer-to-peer memory on %s is not supported\n",
->> +				pci_name(req->port->p2p_dev));
->> +			goto free_devices;
->> +		}
->> +		ctrl->p2p_dev = pci_dev_get(req->port->p2p_dev);
->> +	} else {
-> 
-> When is port->p2p_dev == NULL? a little more documentation would help 
-> here...
+> +/*
+> + * If allow_p2pmem is set, we will try to use P2P memory for the SGL lists for
+> + * Ι/O commands. This requires the PCI p2p device to be compatible with the
+> + * backing device for every namespace on this controller.
+> + */
+> +static void nvmet_setup_p2pmem(struct nvmet_ctrl *ctrl, struct nvmet_req *req)
+> +{
+> +	struct nvmet_ns *ns;
+> +	int ret;
+> +
+> +	if (!req->port->use_p2pmem || !req->p2p_client)
+> +		return;
+> +
+> +	mutex_lock(&ctrl->subsys->lock);
+> +
+> +	ret = pci_p2pdma_add_client(&ctrl->p2p_clients, req->p2p_client);
+> +	if (ret) {
+> +		pr_err("failed adding peer-to-peer DMA client %s: %d\n",
+> +		       dev_name(req->p2p_client), ret);
+> +		goto free_devices;
+> +	}
+> +
+> +	list_for_each_entry_rcu(ns, &ctrl->subsys->namespaces, dev_link) {
+> +		ret = nvmet_p2pdma_add_client(ctrl, ns);
+> +		if (ret)
+> +			goto free_devices;
+> +	}
+> +
+> +	if (req->port->p2p_dev) {
+> +		if (!pci_p2pdma_assign_provider(req->port->p2p_dev,
+> +						&ctrl->p2p_clients)) {
+> +			pr_info("peer-to-peer memory on %s is not supported\n",
+> +				pci_name(req->port->p2p_dev));
+> +			goto free_devices;
+> +		}
+> +		ctrl->p2p_dev = pci_dev_get(req->port->p2p_dev);
+> +	} else {
 
-In the configfs functions, if the user enables p2p (port->use_p2pmem)
-using 'auto' or 'y' then port->p2p_dev will be NULL. If the user sets a
-specific p2p_dev to use, port->p2p_dev will be set to that device. I can
-add a couple comments in the next version.
-
-Logan
+When is port->p2p_dev == NULL? a little more documentation would help 
+here...
