@@ -1,72 +1,146 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-Date: Tue, 28 Aug 2018 19:33:25 -0400
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: Dmitry Monakhov <dmonakhov@openvz.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Hannes Reinecke <hare@suse.com>, linux-block@vger.kernel.org
-Subject: bvec_iter rewind API
-Message-ID: <20180828233325.GA32495@kmo-pixel>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:54333 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727326AbeHaV0O (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 31 Aug 2018 17:26:14 -0400
+From: Jeffrey Lien <Jeff.Lien@wdc.com>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+CC: "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>,
+        David Darrington <david.darrington@wdc.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        Jeff Furlong <jeff.furlong@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>
+Subject: RE: [PATCH v2 1/3] crypto: Introduce notifier for new crypto
+ algorithms
+Date: Fri, 31 Aug 2018 17:17:34 +0000
+Message-ID: <SN1PR04MB18242CFC7BBA2A40495FA9BCEA0F0@SN1PR04MB1824.namprd04.prod.outlook.com>
+References: <20180827060918.tfz7ljufqhlej4kq@gondor.apana.org.au>
+ <20180830150016.15661-1-martin.petersen@oracle.com>
+In-Reply-To: <20180830150016.15661-1-martin.petersen@oracle.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-I just came across bi_done and your patch that added it -
-f9df1cd99e bio: add bvec_iter rewind API
+Martin,
+I tried out this latest series of patches on my system and the performance =
+is matches what I saw with CONFIG_CRYPTO_CRCT10DIF_PCLMUL=3DY, as expected.=
+  =20
 
-I invite you to think through what happens to a bio that gets split by something
-further down the stack, and then rewound after completion:
+In this case, I applied your patches and built with CONFIG_CRYPTO_CRCT10DIF=
+_PCLMUL=3Dm.  =20
 
-To create the first half of the split, you just truncate the iterator by setting
-bio->bi_iter.bi_size to be the length you want. So if the original bio becomes
-the first half of the split, we've lost the original value for bi_size. After
-completion, bio_rewind_iter will rewind the bio to the start position the
-original code expects, but the bio will _not_ have the same size as it did when
-that code submitted it.
+Is there anything else I should be checking or verifying?  =20
 
-So if bio_rewind_iter() is being used because we want to restore the bio to what
-it was when we submitted it, this is bogus.
 
-To create the second half of the split, we just advance the bio's iterator up to
-where we want the split to start. So this shouldn't prevent us from restoring
-the bio to the state it was in when it was created by rewinding it.
+Jeff Lien
 
-Except if you look at bio_split(), it sets bi_done to 0, and git blame reveals
-an interesting commit message...
+-----Original Message-----
+From: Martin K. Petersen [mailto:martin.petersen@oracle.com]=20
+Sent: Thursday, August 30, 2018 10:00 AM
+To: herbert@gondor.apana.org.au
+Cc: Jeffrey Lien <Jeff.Lien@wdc.com>; ard.biesheuvel@linaro.org; David Darr=
+ington <david.darrington@wdc.com>; hch@infradead.org; Jeff Furlong <jeff.fu=
+rlong@wdc.com>; linux-block@vger.kernel.org; linux-crypto@vger.kernel.org; =
+linux-kernel@vger.kernel.org; linux-scsi@vger.kernel.org; martin.petersen@o=
+racle.com; tim.c.chen@linux.intel.com
+Subject: [PATCH v2 1/3] crypto: Introduce notifier for new crypto algorithm=
+s
 
-    block: reset bi_iter.bi_done after splitting bio
-    
-    After the bio has been updated to represent the remaining sectors, reset
-    bi_done so bio_rewind_iter() does not rewind further than it should.
-    
-    This resolves a bio_integrity_process() failure on reads where the
-    original request was split.
+Introduce a facility that can be used to receive a notification callback wh=
+en a new algorithm becomes available. This can be used by existing crypto r=
+egistrations to trigger a switch from a software-only algorithm to a hardwa=
+re-accelerated version.
 
-*sigh*
+A new CRYPTO_MSG_ALG_LOADED state is introduced to the existing crypto noti=
+fication chain, and the register/unregister functions are exported so they =
+can be called by subsystems outside of crypto.
 
-The original code was bogus, and so was the fix. If a bio is split _AFTER_ a
-chunk of code in the stack sees it - and wants to restore it to the state it was
-it when it saw it after it completes - then not touching bi_done gives us the
-result we want. But if the bio was split _BEFORE_ that chunk of code sees it,
-rewinding it without ever touching bi_done will rewind it to be _LARGER_ than
-the bio that chunk of code saw.
+Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ crypto/algapi.c         |  2 ++
+ crypto/algboss.c        |  2 ++
+ crypto/internal.h       |  8 --------
+ include/crypto/algapi.h | 10 ++++++++++
+ 4 files changed, 14 insertions(+), 8 deletions(-)
 
-So what should bi_done be? There is no correct answer - fundamentally, bi_done
-_cannot_ do what you're trying to do with it. Advancing or truncating an
-iterator destroys information, and stacked layers can manipulate bio iterators
-in arbitrary ways.
-
-The correct way, the ONLY way, to restore a bio's iterator to a previous state
-after it's been submitted and other code has messed with it, is to save the
-entire iterator state: before you submit the bio, you save a copy of
-bio->bi_iter in your driver's private state, and then you restore it after
-completion.
-
-I know you want to "save memory" and avoid the hassle of having to allocate
-state for your layer of the stack, but fundamentally what you're trying to do
-_does not work_. You have to save the iterator, you cannot play games and assume
-you can restore it.
-
-Jens, can you please make sure I get CC'd on patches that touch bio/bvec
-iterators in the future? This is not the first time I've seen people make this
-mistake...
+diff --git a/crypto/algapi.c b/crypto/algapi.c index c0755cf4f53f..33522a14=
+7412 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -367,6 +367,8 @@ static void crypto_wait_for_test(struct crypto_larval *=
+larval)
+=20
+ 	err =3D wait_for_completion_killable(&larval->completion);
+ 	WARN_ON(err);
++	if (!err)
++		crypto_probing_notify(CRYPTO_MSG_ALG_LOADED, larval);
+=20
+ out:
+ 	crypto_larval_kill(&larval->alg);
+diff --git a/crypto/algboss.c b/crypto/algboss.c index 5e6df2a087fa..527b44=
+d0af21 100644
+--- a/crypto/algboss.c
++++ b/crypto/algboss.c
+@@ -274,6 +274,8 @@ static int cryptomgr_notify(struct notifier_block *this=
+, unsigned long msg,
+ 		return cryptomgr_schedule_probe(data);
+ 	case CRYPTO_MSG_ALG_REGISTER:
+ 		return cryptomgr_schedule_test(data);
++	case CRYPTO_MSG_ALG_LOADED:
++		break;
+ 	}
+=20
+ 	return NOTIFY_DONE;
+diff --git a/crypto/internal.h b/crypto/internal.h index 9a3f39939fba..ef76=
+9b5e8ad3 100644
+--- a/crypto/internal.h
++++ b/crypto/internal.h
+@@ -26,12 +26,6 @@
+ #include <linux/rwsem.h>
+ #include <linux/slab.h>
+=20
+-/* Crypto notification events. */
+-enum {
+-	CRYPTO_MSG_ALG_REQUEST,
+-	CRYPTO_MSG_ALG_REGISTER,
+-};
+-
+ struct crypto_instance;
+ struct crypto_template;
+=20
+@@ -90,8 +84,6 @@ struct crypto_alg *crypto_find_alg(const char *alg_name, =
+ void *crypto_alloc_tfm(const char *alg_name,
+ 		       const struct crypto_type *frontend, u32 type, u32 mask);
+=20
+-int crypto_register_notifier(struct notifier_block *nb); -int crypto_unreg=
+ister_notifier(struct notifier_block *nb);  int crypto_probing_notify(unsig=
+ned long val, void *v);
+=20
+ unsigned int crypto_alg_extsize(struct crypto_alg *alg); diff --git a/incl=
+ude/crypto/algapi.h b/include/crypto/algapi.h index bd5e8ccf1687..807501a4a=
+754 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -425,4 +425,14 @@ static inline void crypto_yield(u32 flags)  #endif  }
+=20
++int crypto_register_notifier(struct notifier_block *nb); int=20
++crypto_unregister_notifier(struct notifier_block *nb);
++
++/* Crypto notification events. */
++enum {
++	CRYPTO_MSG_ALG_REQUEST,
++	CRYPTO_MSG_ALG_REGISTER,
++	CRYPTO_MSG_ALG_LOADED,
++};
++
+ #endif	/* _CRYPTO_ALGAPI_H */
+--
+2.17.1
