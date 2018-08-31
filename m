@@ -1,97 +1,212 @@
-Return-Path: <prvs=750bc9d11=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
+Return-Path: <dennisszhou@gmail.com>
+Return-Path: <dennisszhou@gmail.com>
+From: Dennis Zhou <dennisszhou@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
 	Tejun Heo <tj@kernel.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v5 4/9] percpu-refcount: Introduce percpu_ref_is_in_use()
-Date: Tue,  7 Aug 2018 15:51:28 -0700
-Message-Id: <20180807225133.27221-5-bart.vanassche@wdc.com>
-In-Reply-To: <20180807225133.27221-1-bart.vanassche@wdc.com>
-References: <20180807225133.27221-1-bart.vanassche@wdc.com>
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Josef Bacik <josef@toxicpanda.com>
+Cc: kernel-team@fb.com,
+	linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>,
+	Jiufei Xue <jiufei.xue@linux.alibaba.com>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>
+Subject: [PATCH 01/15] Revert "blk-throttle: fix race between blkcg_bio_issue_check() and cgroup_rmdir()"
+Date: Thu, 30 Aug 2018 21:53:42 -0400
+Message-Id: <20180831015356.69796-2-dennisszhou@gmail.com>
+In-Reply-To: <20180831015356.69796-1-dennisszhou@gmail.com>
+References: <20180831015356.69796-1-dennisszhou@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Introduce a function that allows to determine whether a per-cpu refcount
-is in use. This function will be used in a later patch to determine
-whether or not any block layer requests are being executed.
+From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+This reverts commit 4c6994806f708559c2812b73501406e21ae5dcd0.
+
+Destroying blkgs is tricky because of the nature of the relationship. A
+blkg should go away when either a blkcg or a request_queue goes away.
+However, blkg's pin the blkcg to ensure they remain valid. To break this
+cycle, when a blkcg is offlined, blkgs put back their css ref. This
+eventually lets css_free() get called which frees the blkcg.
+
+The above commit (4c6994806f70) breaks this order of events by trying to
+destroy blkgs in css_free(). As the blkgs still hold references to the
+blkcg, css_free() is never called.
+
+The race between blkcg_bio_issue_check() and cgroup_rmdir() will be
+addressed in the following patch by delaying destruction of a blkg until
+all writeback associated with the blkcg has been finished.
+
+Fixes: 4c6994806f70 ("blk-throttle: fix race between blkcg_bio_issue_check() and cgroup_rmdir()")
+Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
+Cc: Jiufei Xue <jiufei.xue@linux.alibaba.com>
+Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
 Cc: Tejun Heo <tj@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>
+Cc: Jens Axboe <axboe@kernel.dk>
 ---
- include/linux/percpu-refcount.h |  2 ++
- lib/percpu-refcount.c           | 40 +++++++++++++++++++++++++++++++++
- 2 files changed, 42 insertions(+)
+ block/blk-cgroup.c         | 78 ++++++++------------------------------
+ include/linux/blk-cgroup.h |  1 -
+ 2 files changed, 16 insertions(+), 63 deletions(-)
 
-diff --git a/include/linux/percpu-refcount.h b/include/linux/percpu-refcount.h
-index 009cdf3d65b6..dd247756d634 100644
---- a/include/linux/percpu-refcount.h
-+++ b/include/linux/percpu-refcount.h
-@@ -331,4 +331,6 @@ static inline bool percpu_ref_is_zero(struct percpu_ref *ref)
- 	return !atomic_long_read(&ref->count);
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 694595b29b8f..2998e4f095d1 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -310,28 +310,11 @@ struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
+ 	}
  }
  
-+bool percpu_ref_is_in_use(struct percpu_ref *ref);
+-static void blkg_pd_offline(struct blkcg_gq *blkg)
+-{
+-	int i;
+-
+-	lockdep_assert_held(blkg->q->queue_lock);
+-	lockdep_assert_held(&blkg->blkcg->lock);
+-
+-	for (i = 0; i < BLKCG_MAX_POLS; i++) {
+-		struct blkcg_policy *pol = blkcg_policy[i];
+-
+-		if (blkg->pd[i] && !blkg->pd[i]->offline &&
+-		    pol->pd_offline_fn) {
+-			pol->pd_offline_fn(blkg->pd[i]);
+-			blkg->pd[i]->offline = true;
+-		}
+-	}
+-}
+-
+ static void blkg_destroy(struct blkcg_gq *blkg)
+ {
+ 	struct blkcg *blkcg = blkg->blkcg;
+ 	struct blkcg_gq *parent = blkg->parent;
++	int i;
+ 
+ 	lockdep_assert_held(blkg->q->queue_lock);
+ 	lockdep_assert_held(&blkcg->lock);
+@@ -340,6 +323,13 @@ static void blkg_destroy(struct blkcg_gq *blkg)
+ 	WARN_ON_ONCE(list_empty(&blkg->q_node));
+ 	WARN_ON_ONCE(hlist_unhashed(&blkg->blkcg_node));
+ 
++	for (i = 0; i < BLKCG_MAX_POLS; i++) {
++		struct blkcg_policy *pol = blkcg_policy[i];
 +
- #endif
-diff --git a/lib/percpu-refcount.c b/lib/percpu-refcount.c
-index 9f96fa7bc000..1dcb47e2c561 100644
---- a/lib/percpu-refcount.c
-+++ b/lib/percpu-refcount.c
-@@ -369,3 +369,43 @@ void percpu_ref_reinit(struct percpu_ref *ref)
- 	spin_unlock_irqrestore(&percpu_ref_switch_lock, flags);
- }
- EXPORT_SYMBOL_GPL(percpu_ref_reinit);
-+
-+/**
-+ * percpu_ref_is_in_use - verify whether or not a percpu refcount is in use
-+ * @ref: percpu_ref to test
-+ *
-+ * For a percpu refcount that is in percpu-mode, verify whether the reference
-+ * count is above one. For a percpu refcount that is in atomic mode, verify
-+ * whether the reference count is above zero. This function allows to verify
-+ * whether any references are held on a percpu refcount that is switched
-+ * between atomic and percpu mode with percpu_ref_reinit() /
-+ * percpu_ref_kill().
-+ *
-+ * This function is safe to call as long as @ref is between init and exit. It
-+ * is the responsibility of the caller to handle percpu_ref_get() and
-+ * percpu_ref_put() calls that occur concurrently with this function.
-+ */
-+bool percpu_ref_is_in_use(struct percpu_ref *ref)
-+{
-+	unsigned long __percpu *percpu_count;
-+	unsigned long sum = 0;
-+	int cpu;
-+	unsigned long flags;
-+
-+	/* Obtain percpu_ref_switch_lock to serialize against mode switches. */
-+	spin_lock_irqsave(&percpu_ref_switch_lock, flags);
-+	rcu_read_lock_sched();
-+	if (__ref_is_percpu(ref, &percpu_count)) {
-+		for_each_possible_cpu(cpu)
-+			sum += *per_cpu_ptr(percpu_count, cpu);
++		if (blkg->pd[i] && pol->pd_offline_fn)
++			pol->pd_offline_fn(blkg->pd[i]);
 +	}
-+	rcu_read_unlock_sched();
-+	sum += atomic_long_read(&ref->count);
-+	sum &= ~PERCPU_COUNT_BIAS;
-+	sum += (ref->percpu_count_ptr & __PERCPU_REF_DEAD);
-+	spin_unlock_irqrestore(&percpu_ref_switch_lock, flags);
 +
-+	WARN_ON_ONCE(sum == 0);
-+	return sum > 1;
-+}
-+EXPORT_SYMBOL_GPL(percpu_ref_is_in_use);
+ 	if (parent) {
+ 		blkg_rwstat_add_aux(&parent->stat_bytes, &blkg->stat_bytes);
+ 		blkg_rwstat_add_aux(&parent->stat_ios, &blkg->stat_ios);
+@@ -382,7 +372,6 @@ static void blkg_destroy_all(struct request_queue *q)
+ 		struct blkcg *blkcg = blkg->blkcg;
+ 
+ 		spin_lock(&blkcg->lock);
+-		blkg_pd_offline(blkg);
+ 		blkg_destroy(blkg);
+ 		spin_unlock(&blkcg->lock);
+ 	}
+@@ -1058,54 +1047,21 @@ static struct cftype blkcg_legacy_files[] = {
+  * @css: css of interest
+  *
+  * This function is called when @css is about to go away and responsible
+- * for offlining all blkgs pd and killing all wbs associated with @css.
+- * blkgs pd offline should be done while holding both q and blkcg locks.
+- * As blkcg lock is nested inside q lock, this function performs reverse
+- * double lock dancing.
++ * for shooting down all blkgs associated with @css.  blkgs should be
++ * removed while holding both q and blkcg locks.  As blkcg lock is nested
++ * inside q lock, this function performs reverse double lock dancing.
+  *
+  * This is the blkcg counterpart of ioc_release_fn().
+  */
+ static void blkcg_css_offline(struct cgroup_subsys_state *css)
+ {
+ 	struct blkcg *blkcg = css_to_blkcg(css);
+-	struct blkcg_gq *blkg;
+ 
+ 	spin_lock_irq(&blkcg->lock);
+ 
+-	hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
+-		struct request_queue *q = blkg->q;
+-
+-		if (spin_trylock(q->queue_lock)) {
+-			blkg_pd_offline(blkg);
+-			spin_unlock(q->queue_lock);
+-		} else {
+-			spin_unlock_irq(&blkcg->lock);
+-			cpu_relax();
+-			spin_lock_irq(&blkcg->lock);
+-		}
+-	}
+-
+-	spin_unlock_irq(&blkcg->lock);
+-
+-	wb_blkcg_offline(blkcg);
+-}
+-
+-/**
+- * blkcg_destroy_all_blkgs - destroy all blkgs associated with a blkcg
+- * @blkcg: blkcg of interest
+- *
+- * This function is called when blkcg css is about to free and responsible for
+- * destroying all blkgs associated with @blkcg.
+- * blkgs should be removed while holding both q and blkcg locks. As blkcg lock
+- * is nested inside q lock, this function performs reverse double lock dancing.
+- */
+-static void blkcg_destroy_all_blkgs(struct blkcg *blkcg)
+-{
+-	spin_lock_irq(&blkcg->lock);
+ 	while (!hlist_empty(&blkcg->blkg_list)) {
+ 		struct blkcg_gq *blkg = hlist_entry(blkcg->blkg_list.first,
+-						    struct blkcg_gq,
+-						    blkcg_node);
++						struct blkcg_gq, blkcg_node);
+ 		struct request_queue *q = blkg->q;
+ 
+ 		if (spin_trylock(q->queue_lock)) {
+@@ -1117,7 +1073,10 @@ static void blkcg_destroy_all_blkgs(struct blkcg *blkcg)
+ 			spin_lock_irq(&blkcg->lock);
+ 		}
+ 	}
++
+ 	spin_unlock_irq(&blkcg->lock);
++
++	wb_blkcg_offline(blkcg);
+ }
+ 
+ static void blkcg_css_free(struct cgroup_subsys_state *css)
+@@ -1125,8 +1084,6 @@ static void blkcg_css_free(struct cgroup_subsys_state *css)
+ 	struct blkcg *blkcg = css_to_blkcg(css);
+ 	int i;
+ 
+-	blkcg_destroy_all_blkgs(blkcg);
+-
+ 	mutex_lock(&blkcg_pol_mutex);
+ 
+ 	list_del(&blkcg->all_blkcgs_node);
+@@ -1480,11 +1437,8 @@ void blkcg_deactivate_policy(struct request_queue *q,
+ 
+ 	list_for_each_entry(blkg, &q->blkg_list, q_node) {
+ 		if (blkg->pd[pol->plid]) {
+-			if (!blkg->pd[pol->plid]->offline &&
+-			    pol->pd_offline_fn) {
++			if (pol->pd_offline_fn)
+ 				pol->pd_offline_fn(blkg->pd[pol->plid]);
+-				blkg->pd[pol->plid]->offline = true;
+-			}
+ 			pol->pd_free_fn(blkg->pd[pol->plid]);
+ 			blkg->pd[pol->plid] = NULL;
+ 		}
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 34aec30e06c7..1615cdd4c797 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -89,7 +89,6 @@ struct blkg_policy_data {
+ 	/* the blkg and policy id this per-policy data belongs to */
+ 	struct blkcg_gq			*blkg;
+ 	int				plid;
+-	bool				offline;
+ };
+ 
+ /*
 -- 
-2.18.0
+2.17.1
