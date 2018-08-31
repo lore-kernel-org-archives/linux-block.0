@@ -1,184 +1,72 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-From: Dennis Zhou <dennisszhou@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Josef Bacik <josef@toxicpanda.com>
-Cc: kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-Subject: [PATCH 13/15] blkcg: change blkg reference counting to use percpu_ref
-Date: Thu, 30 Aug 2018 21:53:54 -0400
-Message-Id: <20180831015356.69796-14-dennisszhou@gmail.com>
-In-Reply-To: <20180831015356.69796-1-dennisszhou@gmail.com>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 31 Aug 2018 16:04:20 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Josef Bacik <josef@toxicpanda.com>
+Cc: Dennis Zhou <dennisszhou@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+	Johannes Weiner <hannes@cmpxchg.org>, kernel-team@fb.com,
+	linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 04/15] blkcg: fix ref count issue with bio_blkcg using
+ task_css
+Message-ID: <20180831230420.GB1488037@devbig004.ftw2.facebook.com>
 References: <20180831015356.69796-1-dennisszhou@gmail.com>
+ <20180831015356.69796-5-dennisszhou@gmail.com>
+ <20180831153538.brzgcm3rgmwfy3rg@destiny>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180831153538.brzgcm3rgmwfy3rg@destiny>
 List-ID: <linux-block@vger.kernel.org>
 
-From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+Hello,
 
-Now that every bio is associated with a blkg, this puts the use of
-blkg_get, blkg_try_get, and blkg_put on the hot path. This switches over
-the refcnt in blkg to use percpu_ref.
+On Fri, Aug 31, 2018 at 11:35:39AM -0400, Josef Bacik wrote:
+> > +static inline struct cgroup_subsys_state *blkcg_get_css(void)
+> > +{
+> > +	struct cgroup_subsys_state *css;
+> > +
+> > +	rcu_read_lock();
+> > +
+> > +	css = kthread_blkcg();
+> > +	if (css) {
+> > +		css_get(css);
+> > +	} else {
+> > +		while (true) {
+> > +			css = task_css(current, io_cgrp_id);
+> > +			if (likely(css_tryget(css)))
+> > +				break;
+> > +			cpu_relax();
+> 
+> Does this work?  I'm ignorant of what cpu_relax() does, but it seems if we're
+> rcu_read_lock()'ed here we aren't going to queisce so if we fail to get the css
+> here we just simply aren't going to get it unless we go to sleep right?  An
+> honest question, because this is all magic to me, I'd like to understand how
+> this isn't going to infinite loop on us if css_tryget(css) fails.
 
-Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
----
- block/blk-cgroup.c         | 56 +++++++++++++++++++++-----------------
- include/linux/blk-cgroup.h | 14 +++-------
- 2 files changed, 35 insertions(+), 35 deletions(-)
+The only time css_tryget() on task_css(current, xxx) can fail is if it
+races against the current thread migrating away from that cgroup and
+that cgroup is now getting destroyed.  IOW,
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index f678cd555814..bbea4b44bd8f 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -84,6 +84,30 @@ static void blkg_free(struct blkcg_gq *blkg)
- 	kfree(blkg);
- }
- 
-+/*
-+ * A group is RCU protected, but having an rcu lock does not mean that one
-+ * can access all the fields of blkg and assume these are valid.  For
-+ * example, don't try to follow throtl_data and request queue links.
-+ *
-+ * Having a reference to blkg under an rcu allows accesses to only values
-+ * local to groups like group stats and group rate limits.
-+ */
-+static void __blkg_release(struct percpu_ref *ref)
-+{
-+	struct blkcg_gq *blkg = container_of(ref, struct blkcg_gq, refcnt);
-+
-+	percpu_ref_exit(&blkg->refcnt);
-+
-+	/* release the blkcg and parent blkg refs this blkg has been holding */
-+	css_put(&blkg->blkcg->css);
-+	if (blkg->parent)
-+		blkg_put(blkg->parent);
-+
-+	wb_congested_put(blkg->wb_congested);
-+
-+	blkg_free(blkg);
-+}
-+
- /**
-  * blkg_alloc - allocate a blkg
-  * @blkcg: block cgroup the new blkg is associated with
-@@ -110,7 +134,6 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
- 	blkg->q = q;
- 	INIT_LIST_HEAD(&blkg->q_node);
- 	blkg->blkcg = blkcg;
--	atomic_set(&blkg->refcnt, 1);
- 
- 	/* root blkg uses @q->root_rl, init rl only for !root blkgs */
- 	if (blkcg != &blkcg_root) {
-@@ -217,6 +240,10 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
- 		blkg_get(blkg->parent);
- 	}
- 
-+	ret = percpu_ref_init(&blkg->refcnt, __blkg_release, 0, GFP_KERNEL);
-+	if (ret)
-+		goto err_cancel_ref;
-+
- 	/* invoke per-policy init */
- 	for (i = 0; i < BLKCG_MAX_POLS; i++) {
- 		struct blkcg_policy *pol = blkcg_policy[i];
-@@ -249,6 +276,8 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
- 	blkg_put(blkg);
- 	return ERR_PTR(ret);
- 
-+err_cancel_ref:
-+	percpu_ref_exit(&blkg->refcnt);
- err_put_congested:
- 	wb_congested_put(wb_congested);
- err_put_css:
-@@ -378,7 +407,7 @@ static void blkg_destroy(struct blkcg_gq *blkg)
- 	 * Put the reference taken at the time of creation so that when all
- 	 * queues are gone, group can be destroyed.
- 	 */
--	blkg_put(blkg);
-+	percpu_ref_kill(&blkg->refcnt);
- }
- 
- /**
-@@ -405,29 +434,6 @@ static void blkg_destroy_all(struct request_queue *q)
- 	q->root_rl.blkg = NULL;
- }
- 
--/*
-- * A group is RCU protected, but having an rcu lock does not mean that one
-- * can access all the fields of blkg and assume these are valid.  For
-- * example, don't try to follow throtl_data and request queue links.
-- *
-- * Having a reference to blkg under an rcu allows accesses to only values
-- * local to groups like group stats and group rate limits.
-- */
--void __blkg_release_rcu(struct rcu_head *rcu_head)
--{
--	struct blkcg_gq *blkg = container_of(rcu_head, struct blkcg_gq, rcu_head);
--
--	/* release the blkcg and parent blkg refs this blkg has been holding */
--	css_put(&blkg->blkcg->css);
--	if (blkg->parent)
--		blkg_put(blkg->parent);
--
--	wb_congested_put(blkg->wb_congested);
--
--	blkg_free(blkg);
--}
--EXPORT_SYMBOL_GPL(__blkg_release_rcu);
--
- /*
-  * The next function used by blk_queue_for_each_rl().  It's a bit tricky
-  * because the root blkg uses @q->root_rl instead of its own rl.
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 97cb82029b18..b60d063fb0d7 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -126,7 +126,7 @@ struct blkcg_gq {
- 	struct request_list		rl;
- 
- 	/* reference count */
--	atomic_t			refcnt;
-+	struct percpu_ref		refcnt;
- 
- 	/* is this blkg online? protected by both blkcg and q locks */
- 	bool				online;
-@@ -455,8 +455,7 @@ static inline int blkg_path(struct blkcg_gq *blkg, char *buf, int buflen)
-  */
- static inline void blkg_get(struct blkcg_gq *blkg)
- {
--	WARN_ON_ONCE(atomic_read(&blkg->refcnt) <= 0);
--	atomic_inc(&blkg->refcnt);
-+	percpu_ref_get(&blkg->refcnt);
- }
- 
- /**
-@@ -468,23 +467,18 @@ static inline void blkg_get(struct blkcg_gq *blkg)
-  */
- static inline struct blkcg_gq *blkg_try_get(struct blkcg_gq *blkg)
- {
--	if (atomic_inc_not_zero(&blkg->refcnt))
-+	if (percpu_ref_tryget(&blkg->refcnt))
- 		return blkg;
- 	return NULL;
- }
- 
--
--void __blkg_release_rcu(struct rcu_head *rcu);
--
- /**
-  * blkg_put - put a blkg reference
-  * @blkg: blkg to put
-  */
- static inline void blkg_put(struct blkcg_gq *blkg)
- {
--	WARN_ON_ONCE(atomic_read(&blkg->refcnt) <= 0);
--	if (atomic_dec_and_test(&blkg->refcnt))
--		call_rcu(&blkg->rcu_head, __blkg_release_rcu);
-+	percpu_ref_put(&blkg->refcnt);
- }
- 
- /**
+1. For css_tryget() to fail, the cgroup must be dying.
+2. The cgroup must be empty for it to be dying.
+3. current must have already been migrated away to a different cgroup.
+
+So, the above happens only when racing against css_set_move_task() -
+it's seeing the old css pointer.  As the membership pointer switching
+must already have happened, all it's waiting for is the new css
+membership pointer to be propagated on the polling cpu, making
+cpu_relax() busy loop the right thing to do.
+
+This pattern is also used in task_get_css() and cgroup_sk_alloc().
+Given that it's a bit tricky, it probably would be worthwhile to
+factor out and document it.
+
+Once Josef's other concerns are addressed, please feel free to add
+
+Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
 -- 
-2.17.1
+tejun
