@@ -1,91 +1,51 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:38514 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726981AbeHCOBo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Aug 2018 10:01:44 -0400
-Received: by mail-ed1-f68.google.com with SMTP id t2-v6so2068426edr.5
-        for <linux-block@vger.kernel.org>; Fri, 03 Aug 2018 05:05:41 -0700 (PDT)
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:44434 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727207AbeHaRmU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 31 Aug 2018 13:42:20 -0400
+Received: by mail-ed1-f65.google.com with SMTP id s10-v6so9042330edb.11
+        for <linux-block@vger.kernel.org>; Fri, 31 Aug 2018 06:34:48 -0700 (PDT)
 From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
 To: mb@lightnvm.io
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH] lightnvm: pblk: take write semaphore on metadata
-Date: Fri,  3 Aug 2018 14:05:19 +0200
-Message-Id: <1533297919-27253-1-git-send-email-javier@cnexlabs.com>
+Subject: [PATCH 3/4] lightnvm: pblk: add helper for printing chunk state
+Date: Fri, 31 Aug 2018 15:34:36 +0200
+Message-Id: <1535722477-31288-4-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1535722477-31288-1-git-send-email-javier@cnexlabs.com>
+References: <1535722477-31288-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-pblk guarantees write ordering at a chunk level through a per open chunk
-semaphore. At this point, since we only have an open I/O stream for both
-user and GC data, the semaphore is per parallel unit.
-
-Since metadata I/O is synchronous, the semaphore is not needed as
-ordering is guaranteed. However, if the metadata scheme changes or
-multiple streams are open, this guarantee might not be preserved.
-
-This patch makes sure that all writes go through the semaphore, even for
-synchronous I/O. This is consistent with pblk's write I/O model. It also
-simplifies maintenance since changes in the metdatada scheme could cause
-ordering issues.
+Implement pblk helper for printing chunk state.
 
 Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- drivers/lightnvm/pblk-core.c | 14 ++++++++++++--
- drivers/lightnvm/pblk.h      |  1 +
- 2 files changed, 13 insertions(+), 2 deletions(-)
+ drivers/lightnvm/pblk.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 00984b486fea..160b54d26bfa 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -493,6 +493,16 @@ int pblk_submit_io_sync(struct pblk *pblk, struct nvm_rq *rqd)
- 	return nvm_submit_io_sync(dev, rqd);
- }
- 
-+int pblk_submit_io_sync_sem(struct pblk *pblk, struct nvm_rq *rqd)
-+{
-+	if (rqd->opcode != NVM_OP_PWRITE)
-+		pblk_submit_io_sync(pblk, rqd);
-+
-+	pblk_down_page(pblk, rqd->ppa_list, rqd->nr_ppas);
-+	pblk_submit_io_sync(pblk, rqd);
-+	pblk_up_page(pblk, rqd->ppa_list, rqd->nr_ppas);
-+}
-+
- static void pblk_bio_map_addr_endio(struct bio *bio)
- {
- 	bio_put(bio);
-@@ -737,7 +747,7 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
- 		}
- 	}
- 
--	ret = pblk_submit_io_sync(pblk, &rqd);
-+	ret = pblk_submit_io_sync_sem(pblk, &rqd);
- 	if (ret) {
- 		pblk_err(pblk, "emeta I/O submission failed: %d\n", ret);
- 		bio_put(bio);
-@@ -842,7 +852,7 @@ static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
- 	 * the write thread is the only one sending write and erase commands,
- 	 * there is no need to take the LUN semaphore.
- 	 */
--	ret = pblk_submit_io_sync(pblk, &rqd);
-+	ret = pblk_submit_io_sync_sem(pblk, &rqd);
- 	if (ret) {
- 		pblk_err(pblk, "smeta I/O submission failed: %d\n", ret);
- 		bio_put(bio);
 diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 4760af7b6499..6ccc6ad8e1ce 100644
+index bc852bb9e3f0..5c35dcd57395 100644
 --- a/drivers/lightnvm/pblk.h
 +++ b/drivers/lightnvm/pblk.h
-@@ -782,6 +782,7 @@ void pblk_log_write_err(struct pblk *pblk, struct nvm_rq *rqd);
- void pblk_log_read_err(struct pblk *pblk, struct nvm_rq *rqd);
- int pblk_submit_io(struct pblk *pblk, struct nvm_rq *rqd);
- int pblk_submit_io_sync(struct pblk *pblk, struct nvm_rq *rqd);
-+int pblk_submit_io_sync_sem(struct pblk *pblk, struct nvm_rq *rqd);
- int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line);
- struct bio *pblk_bio_map_addr(struct pblk *pblk, void *data,
- 			      unsigned int nr_secs, unsigned int len,
+@@ -1239,6 +1239,15 @@ static inline int pblk_io_aligned(struct pblk *pblk, int nr_secs)
+ 	return !(nr_secs % pblk->min_write_pgs);
+ }
+ 
++static inline void print_chunk(struct pblk *pblk, struct nvm_chk_meta *chk,
++			       char *msg, int error)
++{
++	pblk_err(pblk, "chunk: (%s: %x) s:%d,t:%d,wi:%d,slba:%llu,cnlb:%llu,wp:%llu\n",
++			msg, error,
++			chk->state, chk->type, chk->wi,
++			chk->slba, chk->cnlb, chk->wp);
++}
++
+ #ifdef CONFIG_NVM_PBLK_DEBUG
+ static inline void print_ppa(struct pblk *pblk, struct ppa_addr *p,
+ 			     char *msg, int error)
 -- 
 2.7.4
