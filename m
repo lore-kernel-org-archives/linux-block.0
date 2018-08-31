@@ -1,77 +1,69 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: axboe@kernel.dk,
-	linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH 02/10] bcache: display rate debug parameters to 0 when writeback is not running
-Date: Thu,  9 Aug 2018 15:48:43 +0800
-Message-Id: <20180809074851.11027-3-colyli@suse.de>
-In-Reply-To: <20180809074851.11027-1-colyli@suse.de>
-References: <20180809074851.11027-1-colyli@suse.de>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 31 Aug 2018 16:16:09 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Dennis Zhou <dennisszhou@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
+	linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 06/15] blkcg: always associate a bio with a blkg
+Message-ID: <20180831231609.GD1488037@devbig004.ftw2.facebook.com>
+References: <20180831015356.69796-1-dennisszhou@gmail.com>
+ <20180831015356.69796-7-dennisszhou@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180831015356.69796-7-dennisszhou@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-When writeback is not running, writeback rate should be 0, other value is
-misleading. And the following dyanmic writeback rate debug parameters
-should be 0 too,
-	rate, proportional, integral, change
-otherwise they are misleading when writeback is not running.
+Hello,
 
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/sysfs.c | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
+On Thu, Aug 30, 2018 at 09:53:47PM -0400, Dennis Zhou wrote:
+> From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+> 
+> Previously, blkg's were only assigned as needed by blk-iolatency and
+> blk-throttle. bio->css was also always being associated while blkg was
+> being looked up and then thrown away in blkcg_bio_issue_check.
+> 
+> This patch beings the cleanup of bio->css and bio->bi_blkg by always
+             ^
+	     begins
 
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index 225b15aa0340..3e9d3459a224 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -149,6 +149,7 @@ SHOW(__bch_cached_dev)
- 	struct cached_dev *dc = container_of(kobj, struct cached_dev,
- 					     disk.kobj);
- 	const char *states[] = { "no cache", "clean", "dirty", "inconsistent" };
-+	int wb = dc->writeback_running;
- 
- #define var(stat)		(dc->stat)
- 
-@@ -170,7 +171,7 @@ SHOW(__bch_cached_dev)
- 	var_printf(writeback_running,	"%i");
- 	var_print(writeback_delay);
- 	var_print(writeback_percent);
--	sysfs_hprint(writeback_rate,	dc->writeback_rate.rate << 9);
-+	sysfs_hprint(writeback_rate,	wb ? dc->writeback_rate.rate << 9 : 0);
- 	sysfs_hprint(io_errors,		atomic_read(&dc->io_errors));
- 	sysfs_printf(io_error_limit,	"%i", dc->error_limit);
- 	sysfs_printf(io_disable,	"%i", dc->io_disable);
-@@ -188,15 +189,20 @@ SHOW(__bch_cached_dev)
- 		char change[20];
- 		s64 next_io;
- 
--		bch_hprint(rate,	dc->writeback_rate.rate << 9);
--		bch_hprint(dirty,	bcache_dev_sectors_dirty(&dc->disk) << 9);
--		bch_hprint(target,	dc->writeback_rate_target << 9);
--		bch_hprint(proportional,dc->writeback_rate_proportional << 9);
--		bch_hprint(integral,	dc->writeback_rate_integral_scaled << 9);
--		bch_hprint(change,	dc->writeback_rate_change << 9);
--
--		next_io = div64_s64(dc->writeback_rate.next - local_clock(),
--				    NSEC_PER_MSEC);
-+		/*
-+		 * Except for dirty and target, other values should
-+		 * be 0 if writeback is not running.
-+		 */
-+		bch_hprint(rate, wb ? dc->writeback_rate.rate << 9 : 0);
-+		bch_hprint(dirty, bcache_dev_sectors_dirty(&dc->disk) << 9);
-+		bch_hprint(target, dc->writeback_rate_target << 9);
-+		bch_hprint(proportional,
-+			   wb ? dc->writeback_rate_proportional << 9 : 0);
-+		bch_hprint(integral,
-+			   wb ? dc->writeback_rate_integral_scaled << 9 : 0);
-+		bch_hprint(change, wb ? dc->writeback_rate_change << 9 : 0);
-+		next_io = wb ? div64_s64(dc->writeback_rate.next-local_clock(),
-+					 NSEC_PER_MSEC) : 0;
- 
- 		return sprintf(buf,
- 			       "rate:\t\t%s/sec\n"
+> +int bio_associate_create_blkg(struct request_queue *q, struct bio *bio)
+> +{
+> +	struct blkcg *blkcg;
+> +	struct blkcg_gq *blkg;
+> +	int ret = 0;
+> +
+> +	/* someone has already associated this bio with a blkg */
+> +	if (bio->bi_blkg)
+> +		return ret;
+> +
+> +	rcu_read_lock();
+> +
+> +	bio_associate_blkcg(bio, NULL);
+> +	blkcg = bio_blkcg(bio);
+> +
+> +	if (!blkcg->css.parent) {
+> +		ret = bio_associate_blkg(bio, q->root_blkg);
+> +		goto assoc_out;
+> +	}
+> +
+> +	blkg = blkg_lookup_create(blkcg, q);
+> +	if (IS_ERR(blkg))
+> +		blkg = q->root_blkg;
+> +
+> +	ret = bio_associate_blkg(bio, blkg);
+> +assoc_out:
+
+Maybe if/else instead of goto?
+
+Other than that,
+
+Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
 -- 
-2.18.0
+tejun
