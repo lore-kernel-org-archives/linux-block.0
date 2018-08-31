@@ -1,35 +1,43 @@
-Return-Path: <christophe.leroy@c-s.fr>
-Message-Id: <adb9282f01ca9ae55874639b8c26d6d1bba1fda0.1535104490.git.christophe.leroy@c-s.fr>
-In-Reply-To: <4f905a9d9752768c628623276f5e2fb465c947c8.1535104490.git.christophe.leroy@c-s.fr>
-References: <4f905a9d9752768c628623276f5e2fb465c947c8.1535104490.git.christophe.leroy@c-s.fr>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH 3/3] drivers/block/z2ram: use ioremap_wt() instead of
- __ioremap(_PAGE_WRITETHRU)
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>, Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org, linux-block@vger.kernel.org, linux-m68k@lists.linux-m68k.org
-Date: Fri, 24 Aug 2018 10:04:59 +0000 (UTC)
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 31 Aug 2018 16:09:02 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Dennis Zhou <dennisszhou@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
+	linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 05/15] blkcg: update blkg_lookup_create to do locking
+Message-ID: <20180831230902.GC1488037@devbig004.ftw2.facebook.com>
+References: <20180831015356.69796-1-dennisszhou@gmail.com>
+ <20180831015356.69796-6-dennisszhou@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180831015356.69796-6-dennisszhou@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-_PAGE_WRITETHRU is a target specific flag. Prefer generic functions.
+On Thu, Aug 30, 2018 at 09:53:46PM -0400, Dennis Zhou wrote:
+> From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+> 
+> To know when to create a blkg, the general pattern is to do a
+> blkg_lookup and if that fails, lock and then do a lookup again and if
+> that fails finally create. It doesn't make much sense for everyone who
+> wants to do creation to write this themselves.
+> 
+> This changes blkg_lookup_create to do locking and implement this
+> pattern. The old blkg_lookup_create is renamed to __blkg_lookup_create.
+> If a call site wants to do its own error handling or already owns the
+> queue lock, they can use __blkg_lookup_create.
+> 
+> Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
 
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
----
- drivers/block/z2ram.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+It looks a bit weird w/o actual users, might be worthwhile to mention
+that future patches will add users.
 
-diff --git a/drivers/block/z2ram.c b/drivers/block/z2ram.c
-index d0c5bc4e0703..cfbd70520eeb 100644
---- a/drivers/block/z2ram.c
-+++ b/drivers/block/z2ram.c
-@@ -190,8 +190,7 @@ static int z2_open(struct block_device *bdev, fmode_t mode)
- 			vfree(vmalloc (size));
- 		}
- 
--		vaddr = (unsigned long) __ioremap (paddr, size, 
--						   _PAGE_WRITETHRU);
-+		vaddr = (unsigned long)ioremap_wt(paddr, size);
- 
- #else
- 		vaddr = (unsigned long)z_remap_nocache_nonser(paddr, size);
+Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
 -- 
-2.13.3
+tejun
