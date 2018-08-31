@@ -1,39 +1,80 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:44609 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727365AbeHQUg2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Aug 2018 16:36:28 -0400
-Received: by mail-lf1-f67.google.com with SMTP id g6-v6so6416637lfb.11
-        for <linux-block@vger.kernel.org>; Fri, 17 Aug 2018 10:32:13 -0700 (PDT)
-MIME-Version: 1.0
-From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
-Date: Fri, 17 Aug 2018 19:31:56 +0200
-Message-ID: <CAPybu_2k-0d=8NxL7kr757QcWOnXyU_TAyV7DMwiMrSDkiXfgA@mail.gmail.com>
-Subject: blk-mq 5-8 times slower for bmap-tools
-To: linux-block@vger.kernel.org, Ben Hutchings <ben@decadent.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <dennisszhou@gmail.com>
+Return-Path: <dennisszhou@gmail.com>
+From: Dennis Zhou <dennisszhou@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Josef Bacik <josef@toxicpanda.com>
+Cc: kernel-team@fb.com,
+	linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>,
+	Jiufei Xue <jiufei.xue@linux.alibaba.com>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>
+Subject: [PATCH 3/3] blkcg: use tryget logic when associating a blkg with a bio
+Date: Fri, 31 Aug 2018 16:22:44 -0400
+Message-Id: <20180831202244.21678-4-dennisszhou@gmail.com>
+In-Reply-To: <20180831202244.21678-1-dennisszhou@gmail.com>
+References: <20180831202244.21678-1-dennisszhou@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Hello
+From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
 
-Coming from: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=906328
+There is a very small change a bio gets caught up in a really
+unfortunate race between a task migration, cgroup exiting, and itself
+trying to associate with a blkg. This is due to css offlining being
+performed after the css->refcnt is killed which triggers removal of
+blkgs that reach their blkg->refcnt of 0.
 
-bmaptools is kind of a "smart dd" tool, that lets you write images
-very fast and securely. Since the last Debian Kernel update it has
-become 5-8 times slower.
+To avoid this, association with a blkg should use tryget and fallback to
+using the root_blkg.
 
-After some debugging, we have figured out that the reason for that
-slowness is the Multi-Queue Block IO Queueing Mechanism.
+v2:
+ - In blk-throttle, be explicit that we only associate with the
+   root_blkg if tryget failed.
 
-Debian maintainer has pointed out that in the near future the single
-queue will be deprecated.
+Fixes: 08e18eab0c579 ("block: add bi_blkg to the bio for cgroups")
+Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
+Cc: Jiufei Xue <jiufei.xue@linux.alibaba.com>
+Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Josef Bacik <josef@toxicpanda.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+---
+ block/bio.c          | 3 ++-
+ block/blk-throttle.c | 5 +++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-My question is if we can get a similar perfomance for bmaptools with
-blk-mq and how?
-
-Thanks!
-
+diff --git a/block/bio.c b/block/bio.c
+index 04969b392c72..4473ccd22987 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1987,7 +1987,8 @@ int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg)
+ {
+ 	if (unlikely(bio->bi_blkg))
+ 		return -EBUSY;
+-	blkg_get(blkg);
++	if (!blkg_try_get(blkg))
++		return -ENODEV;
+ 	bio->bi_blkg = blkg;
+ 	return 0;
+ }
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index a3eede00d302..01d0620a4e4a 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -2129,8 +2129,9 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
+ static void blk_throtl_assoc_bio(struct throtl_grp *tg, struct bio *bio)
+ {
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+-	if (bio->bi_css)
+-		bio_associate_blkg(bio, tg_to_blkg(tg));
++	/* fallback to root_blkg if we fail to get a blkg ref */
++	if (bio->bi_css && (bio_associate_blkg(bio, tg_to_blkg(tg)) == -ENODEV))
++		bio_associate_blkg(bio, bio->bi_disk->queue->root_blkg);
+ 	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
+ #endif
+ }
 -- 
-Ricardo Ribalda
+2.17.1
