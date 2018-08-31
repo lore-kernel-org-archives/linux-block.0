@@ -1,60 +1,39 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44890 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727501AbeHJJxy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Aug 2018 05:53:54 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, shhuiw@foxmail.com,
-        Coly Li <colyli@suse.de>
-Subject: [PATCH v2 10/17] bcache: prefer 'help' in Kconfig
-Date: Fri, 10 Aug 2018 15:23:50 +0800
-Message-Id: <20180810072357.19823-11-colyli@suse.de>
-In-Reply-To: <20180810072357.19823-1-colyli@suse.de>
-References: <20180810072357.19823-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 31 Aug 2018 16:45:14 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Dennis Zhou <dennisszhou@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
+	linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 07/15] blkcg: consolidate bio_issue_init and blkg
+ association
+Message-ID: <20180831234514.GE1488037@devbig004.ftw2.facebook.com>
+References: <20180831015356.69796-1-dennisszhou@gmail.com>
+ <20180831015356.69796-8-dennisszhou@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180831015356.69796-8-dennisszhou@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Current bcache Kconfig uses '---help---' as header of help information,
-for now 'help' is prefered. This patch fixes this style by replacing
-'---help---' by 'help' in bcache Kconfig file.
+On Thu, Aug 30, 2018 at 09:53:48PM -0400, Dennis Zhou wrote:
+> From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+> 
+> This removes the now duplicate association logic in blk-throttle and
+> blk-iolatency. bio_issue_init is moved into blkcg_bio_issue_check and
+> into the bio clone variants to allow for the future addition of a
+> latency moving average for IOs.
+> 
+> Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Shenghui Wang <shhuiw@foxmail.com>
----
- drivers/md/bcache/Kconfig | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+I don't have strong feelings about where the removal goes, so please
+feel free to reorganize patches per Josef's suggestion.
 
-diff --git a/drivers/md/bcache/Kconfig b/drivers/md/bcache/Kconfig
-index 17bf109c58e9..817b9fba50db 100644
---- a/drivers/md/bcache/Kconfig
-+++ b/drivers/md/bcache/Kconfig
-@@ -1,7 +1,7 @@
- 
- config BCACHE
- 	tristate "Block device as cache"
--	---help---
-+	help
- 	Allows a block device to be used as cache for other devices; uses
- 	a btree for indexing and the layout is optimized for SSDs.
- 
-@@ -10,7 +10,7 @@ config BCACHE
- config BCACHE_DEBUG
- 	bool "Bcache debugging"
- 	depends on BCACHE
--	---help---
-+	help
- 	Don't select this option unless you're a developer
- 
- 	Enables extra debugging tools, allows expensive runtime checks to be
-@@ -20,7 +20,7 @@ config BCACHE_CLOSURES_DEBUG
- 	bool "Debug closures"
- 	depends on BCACHE
- 	select DEBUG_FS
--	---help---
-+	help
- 	Keeps all active closures in a linked list and provides a debugfs
- 	interface to list them, which makes it possible to see asynchronous
- 	operations that get stuck.
+Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
 -- 
-2.18.0
+tejun
