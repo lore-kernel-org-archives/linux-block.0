@@ -1,33 +1,109 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-Date: Fri, 31 Aug 2018 11:50:17 -0400
-From: Josef Bacik <josef@toxicpanda.com>
-To: Dennis Zhou <dennisszhou@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+Return-Path: <dennisszhou@gmail.com>
+Return-Path: <dennisszhou@gmail.com>
+From: Dennis Zhou <dennisszhou@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>,
 	Johannes Weiner <hannes@cmpxchg.org>,
-	Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
-	linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 14/15] blkcg: rename blkg_try_get to blkg_tryget
-Message-ID: <20180831155016.2u5erpni5omhcncr@destiny>
+	Josef Bacik <josef@toxicpanda.com>
+Cc: kernel-team@fb.com,
+	linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+Subject: [PATCH 14/15] blkcg: rename blkg_try_get to blkg_tryget
+Date: Thu, 30 Aug 2018 21:53:55 -0400
+Message-Id: <20180831015356.69796-15-dennisszhou@gmail.com>
+In-Reply-To: <20180831015356.69796-1-dennisszhou@gmail.com>
 References: <20180831015356.69796-1-dennisszhou@gmail.com>
- <20180831015356.69796-15-dennisszhou@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180831015356.69796-15-dennisszhou@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Aug 30, 2018 at 09:53:55PM -0400, Dennis Zhou wrote:
-> From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-> 
-> blkg reference counting now uses percpu_ref rather than atomic_t. Let's
-> make this consistent with css_tryget. This renames blkg_try_get to
-> blkg_tryget and now returns a bool rather than the blkg or NULL.
-> 
-> Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
+From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
 
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+blkg reference counting now uses percpu_ref rather than atomic_t. Let's
+make this consistent with css_tryget. This renames blkg_try_get to
+blkg_tryget and now returns a bool rather than the blkg or NULL.
 
-Thanks,
+Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
+---
+ block/bio.c                |  2 +-
+ block/blk-cgroup.c         |  3 +--
+ block/blk-iolatency.c      |  2 +-
+ include/linux/blk-cgroup.h | 10 ++++------
+ 4 files changed, 7 insertions(+), 10 deletions(-)
 
-Josef
+diff --git a/block/bio.c b/block/bio.c
+index b792bffecce1..a0b816811e7d 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1943,7 +1943,7 @@ int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg)
+ {
+ 	if (unlikely(bio->bi_blkg))
+ 		return -EBUSY;
+-	if (!blkg_try_get(blkg))
++	if (!blkg_tryget(blkg))
+ 		return -ENODEV;
+ 	bio->bi_blkg = blkg;
+ 	return 0;
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index bbea4b44bd8f..1eaf097e38b0 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1777,8 +1777,7 @@ void blkcg_maybe_throttle_current(void)
+ 	blkg = blkg_lookup(blkcg, q);
+ 	if (!blkg)
+ 		goto out;
+-	blkg = blkg_try_get(blkg);
+-	if (!blkg)
++	if (!blkg_tryget(blkg))
+ 		goto out;
+ 	rcu_read_unlock();
+ 
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index 9d7052bad6f7..5a4cec54c998 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -628,7 +628,7 @@ static void blkiolatency_timer_fn(struct timer_list *t)
+ 		 * We could be exiting, don't access the pd unless we have a
+ 		 * ref on the blkg.
+ 		 */
+-		if (!blkg_try_get(blkg))
++		if (!blkg_tryget(blkg))
+ 			continue;
+ 
+ 		iolat = blkg_to_lat(blkg);
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index b60d063fb0d7..0134cdd270b8 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -459,17 +459,15 @@ static inline void blkg_get(struct blkcg_gq *blkg)
+ }
+ 
+ /**
+- * blkg_try_get - try and get a blkg reference
++ * blkg_tryget - try and get a blkg reference
+  * @blkg: blkg to get
+  *
+  * This is for use when doing an RCU lookup of the blkg.  We may be in the midst
+  * of freeing this blkg, so we can only use it if the refcnt is not zero.
+  */
+-static inline struct blkcg_gq *blkg_try_get(struct blkcg_gq *blkg)
++static inline bool blkg_tryget(struct blkcg_gq *blkg)
+ {
+-	if (percpu_ref_tryget(&blkg->refcnt))
+-		return blkg;
+-	return NULL;
++	return percpu_ref_tryget(&blkg->refcnt);
+ }
+ 
+ /**
+@@ -560,7 +558,7 @@ static inline struct request_list *blk_get_rl(struct request_queue *q,
+ 			}
+ 		}
+ 
+-		if (blkg_try_get(blkg))
++		if (blkg_tryget(blkg))
+ 			break;
+ 		cpu_relax();
+ 	}
+-- 
+2.17.1
