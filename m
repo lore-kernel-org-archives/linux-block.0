@@ -1,131 +1,61 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-From: Dennis Zhou <dennisszhou@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Josef Bacik <josef@toxicpanda.com>
-Cc: kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-Subject: [PATCH 05/15] blkcg: update blkg_lookup_create to do locking
-Date: Thu, 30 Aug 2018 21:53:46 -0400
-Message-Id: <20180831015356.69796-6-dennisszhou@gmail.com>
-In-Reply-To: <20180831015356.69796-1-dennisszhou@gmail.com>
-References: <20180831015356.69796-1-dennisszhou@gmail.com>
+Return-Path: <massimo@burcheri.de>
+Message-ID: <1535698162.6624.31.camel@burcheri.de>
+Subject: Re: blk-mq crashing on battery mode
+From: Massimo Burcheri <massimo@burcheri.de>
+To: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Omar Sandoval <osandov@osandov.com>
+In-Reply-To: <f2983f77-8cc7-2734-9acb-c2cea4a90bd8@oracle.com>
+References: <1534926011.18658.29.camel@burcheri.de>
+	 <a43c5bdd-06ec-ae23-ebd3-bda8c0ea4f5c@kernel.dk>
+	 <1535092156.11909.8.camel@burcheri.de>
+	 <f2983f77-8cc7-2734-9acb-c2cea4a90bd8@oracle.com>
+Content-Type: multipart/signed; micalg="pgp-sha256";
+	protocol="application/pgp-signature"; boundary="=-43iEQBTRbqeAJEy0+Dhb"
+Date: Fri, 31 Aug 2018 08:49:22 +0200
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
 
-To know when to create a blkg, the general pattern is to do a
-blkg_lookup and if that fails, lock and then do a lookup again and if
-that fails finally create. It doesn't make much sense for everyone who
-wants to do creation to write this themselves.
+--=-43iEQBTRbqeAJEy0+Dhb
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This changes blkg_lookup_create to do locking and implement this
-pattern. The old blkg_lookup_create is renamed to __blkg_lookup_create.
-If a call site wants to do its own error handling or already owns the
-queue lock, they can use __blkg_lookup_create.
+On Fri, 2018-08-24 at 15:12 +0800, jianchao.wang wrote:
+> So this issue should not related with io scheduler.
 
-Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
----
- block/blk-cgroup.c         | 31 ++++++++++++++++++++++++++++---
- block/blk-iolatency.c      |  2 +-
- include/linux/blk-cgroup.h |  4 +++-
- 3 files changed, 32 insertions(+), 5 deletions(-)
+Hi, I can't localize the specific issue and have changed the subject to blk=
+-mq.
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index d7114308a480..f678cd555814 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -259,7 +259,7 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
- }
- 
- /**
-- * blkg_lookup_create - lookup blkg, try to create one if not there
-+ * __blkg_lookup_create - lookup blkg, try to create one if not there
-  * @blkcg: blkcg of interest
-  * @q: request_queue of interest
-  *
-@@ -272,8 +272,8 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
-  * value on error.  If @q is dead, returns ERR_PTR(-EINVAL).  If @q is not
-  * dead and bypassing, returns ERR_PTR(-EBUSY).
-  */
--struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
--				    struct request_queue *q)
-+struct blkcg_gq *__blkg_lookup_create(struct blkcg *blkcg,
-+				      struct request_queue *q)
- {
- 	struct blkcg_gq *blkg;
- 
-@@ -310,6 +310,31 @@ struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
- 	}
- }
- 
-+/**
-+ * blkg_lookup_create - find or create a blkg
-+ * @blkcg: target block cgroup
-+ * @q: target request_queue
-+ *
-+ * This looks up or creates the blkg representing the unique pair
-+ * of the blkcg and the request_queue.
-+ */
-+struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
-+				    struct request_queue *q)
-+{
-+	struct blkcg_gq *blkg = blkg_lookup(blkcg, q);
-+	unsigned long flags;
-+
-+	if (unlikely(!blkg)) {
-+		spin_lock_irqsave(q->queue_lock, flags);
-+
-+		blkg = __blkg_lookup_create(blkcg, q);
-+
-+		spin_unlock_irqrestore(q->queue_lock, flags);
-+	}
-+
-+	return blkg;
-+}
-+
- static void blkg_destroy(struct blkcg_gq *blkg)
- {
- 	struct blkcg *blkcg = blkg->blkcg;
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 62fdd9002c29..22b2ff0440cc 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -410,7 +410,7 @@ static void blkcg_iolatency_throttle(struct rq_qos *rqos, struct bio *bio,
- 	if (unlikely(!blkg)) {
- 		if (!lock)
- 			spin_lock_irq(q->queue_lock);
--		blkg = blkg_lookup_create(blkcg, q);
-+		blkg = __blkg_lookup_create(blkcg, q);
- 		if (IS_ERR(blkg))
- 			blkg = NULL;
- 		if (!lock)
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index d3cafb1eda48..ea2dd6e6baf2 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -184,6 +184,8 @@ extern struct cgroup_subsys_state * const blkcg_root_css;
- 
- struct blkcg_gq *blkg_lookup_slowpath(struct blkcg *blkcg,
- 				      struct request_queue *q, bool update_hint);
-+struct blkcg_gq *__blkg_lookup_create(struct blkcg *blkcg,
-+				      struct request_queue *q);
- struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
- 				    struct request_queue *q);
- int blkcg_init_queue(struct request_queue *q);
-@@ -835,7 +837,7 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 	blkg = blkg_lookup(blkcg, q);
- 	if (unlikely(!blkg)) {
- 		spin_lock_irq(q->queue_lock);
--		blkg = blkg_lookup_create(blkcg, q);
-+		blkg = __blkg_lookup_create(blkcg, q);
- 		if (IS_ERR(blkg))
- 			blkg = NULL;
- 		spin_unlock_irq(q->queue_lock);
--- 
-2.17.1
+> Would you please share the entire dmesg log or backtrace you got on 4.18.=
+3 ?
+
+Have you been able to reproduce this? I reproduced the backtrace on a vanil=
+la
+4.18.3:
+https://ibin.co/4E3q5dETqA5T.jpg
+
+Best regards,
+Massimo
+--=-43iEQBTRbqeAJEy0+Dhb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEjdL61EKP3VOAA+I8lQj3p5VSZjIFAluI5PIACgkQlQj3p5VS
+ZjLWOg/+OoHTqFGVd1DSUkWeie6Z0a3PmgFyFESfIIQDOz1xNIR4j/XPvxDR1gut
+BXa+lydeJ062GQI+QZZYfhCIOAh1QvrZ2A6dOabar1zM8cDUzaVuRV49a8CK7QOu
+DFN5Nh40G2uYRF8mrd6szurzJlTUm8dRixpTxQk5+pwfB3TZU3H2w/d7MAKIxDPH
+FzfUup+qLpXSoxUpz1JXSpeOsTVPPTgOqcTMI+nTnnY/WJAMfRr4mFP3MUOTpsWs
+ovQoHveFZK9OiWs2xlr+ybEQ3JHMqPecnD8PvKu5xkPA3tODbUYj/bxt+0swzrio
+bEZx4ZMWKhLXWppgRAbsPxFb9lXK7kIDDF3AGf3uorFtdPuiKaTd/oxt91oLagKt
+SR3xHG1bvyI0AqCQ1PSF4xlg+U7nRWmrramU63VIuoxGpxxRe2CqQP3wgL72UFOt
+YCyGFrfPaCmbIltczhkVZoA+UpY+yB2eoZIbYugVirqiZ3znTmbFYNZn3t8/jyqL
+sQBWmtuNIkakhqciF9w4AU385iCUpwkpQxUtXGzgKhyNmfaDV/u6ZcIvqpQi2y6D
+6kmFD8pTfDkSWCZblOC/c+e2TV3Xvg2HjzyT6Av0xEhs11vwZV2mzug69lrb++Et
+yj1xOwB/LU/q3/OzTGpq4RUDWoy/8qApi7yBryw0JSHreie5NSQ=
+=hEIB
+-----END PGP SIGNATURE-----
+
+--=-43iEQBTRbqeAJEy0+Dhb--
