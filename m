@@ -1,16 +1,16 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Fri, 31 Aug 2018 17:31:59 -0700
-From: Tejun Heo <tj@kernel.org>
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+Date: Fri, 31 Aug 2018 11:49:41 -0400
+From: Josef Bacik <josef@toxicpanda.com>
 To: Dennis Zhou <dennisszhou@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
 	Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
 	linux-block@vger.kernel.org, cgroups@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH 13/15] blkcg: change blkg reference counting to use
  percpu_ref
-Message-ID: <20180901003159.GK1488037@devbig004.ftw2.facebook.com>
+Message-ID: <20180831154939.sb24oz7ekxcwkkfd@destiny>
 References: <20180831015356.69796-1-dennisszhou@gmail.com>
  <20180831015356.69796-14-dennisszhou@gmail.com>
 MIME-Version: 1.0
@@ -18,21 +18,17 @@ Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180831015356.69796-14-dennisszhou@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
-
 On Thu, Aug 30, 2018 at 09:53:54PM -0400, Dennis Zhou wrote:
-> @@ -217,6 +240,10 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
->  		blkg_get(blkg->parent);
->  	}
->  
-> +	ret = percpu_ref_init(&blkg->refcnt, __blkg_release, 0, GFP_KERNEL);
+> From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+> 
+> Now that every bio is associated with a blkg, this puts the use of
+> blkg_get, blkg_try_get, and blkg_put on the hot path. This switches over
+> the refcnt in blkg to use percpu_ref.
+> 
+> Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
 
-So, while this would work in some configs, you can't depend on RCU
-grace period inside percpu_ref.  blkg is now percpu-reference counted
-and rcu protected object - it has to explicitly go through a rcu grace
-period before release.
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 
-Thanks.
+Thanks,
 
--- 
-tejun
+Josef
