@@ -1,53 +1,35 @@
-Return-Path: <Valentin.Vidic@carnet.hr>
-From: Valentin Vidic <Valentin.Vidic@CARNet.hr>
-To: =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	xen-devel@lists.xenproject.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Valentin Vidic <Valentin.Vidic@CARNet.hr>,
-	stable@vger.kernel.org
-Date: Wed, 29 Aug 2018 08:52:14 +0200
-Message-Id: <20180829065214.23546-1-Valentin.Vidic@CARNet.hr>
-Subject: [PATCH] xen-blkback: Switch to closed state after releasing the backing device
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 31 Aug 2018 16:53:28 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Dennis Zhou <dennisszhou@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
+	linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 09/15] blkcg: associate writeback bios with a blkg
+Message-ID: <20180831235328.GG1488037@devbig004.ftw2.facebook.com>
+References: <20180831015356.69796-1-dennisszhou@gmail.com>
+ <20180831015356.69796-10-dennisszhou@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180831015356.69796-10-dennisszhou@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Switching to closed state earlier can cause the block-drbd
-script to fail with 'Device is held open by someone':
+On Thu, Aug 30, 2018 at 09:53:50PM -0400, Dennis Zhou wrote:
+> From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+> 
+> One of the goals of this series is to remove a separate reference to
+> the css of the bio. This can and should be accessed via bio_blkcg. In
+> this patch, the wbc_init_bio call is changed such that it must be called
+> after a queue has been associated with the bio.
+> 
+> Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
 
-root: /etc/xen/scripts/block-drbd: remove XENBUS_PATH=backend/vbd/6/51712
-kernel: [ 2222.278235] block drbd6: State change failed: Device is held open by someone
-kernel: [ 2222.278304] block drbd6:   state = { cs:Connected ro:Primary/Secondary ds:UpToDate/UpToDate r----- }
-kernel: [ 2222.278340] block drbd6:  wanted = { cs:Connected ro:Secondary/Secondary ds:UpToDate/UpToDate r----- }
-root: /etc/xen/scripts/block-drbd: Writing backend/vbd/6/51712/hotplug-error /etc/xen/scripts/block-drbd failed; error detected. backend/vbd/6/51712/hotplug-status error to xenstore.
-root: /etc/xen/scripts/block-drbd: /etc/xen/scripts/block-drbd failed; error detected.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Signed-off-by: Valentin Vidic <Valentin.Vidic@CARNet.hr>
-Cc: stable@vger.kernel.org
----
- drivers/block/xen-blkback/xenbus.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks.
 
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index a4bc74e72c39..43bddc996709 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -323,6 +323,7 @@ static void xen_blkif_free(struct xen_blkif *blkif)
- {
- 	WARN_ON(xen_blkif_disconnect(blkif));
- 	xen_vbd_free(&blkif->vbd);
-+	xenbus_switch_state(blkif->be->dev, XenbusStateClosed);
- 	kfree(blkif->be->mode);
- 	kfree(blkif->be);
- 
-@@ -814,7 +815,6 @@ static void frontend_changed(struct xenbus_device *dev,
- 
- 	case XenbusStateClosed:
- 		xen_blkif_disconnect(be->blkif);
--		xenbus_switch_state(dev, XenbusStateClosed);
- 		if (xenbus_dev_is_online(dev))
- 			break;
- 		/* fall through */
 -- 
-2.18.0
+tejun
