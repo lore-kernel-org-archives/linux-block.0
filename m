@@ -1,107 +1,277 @@
-Return-Path: <jgross@suse.com>
-From: Juergen Gross <jgross@suse.com>
-To: linux-kernel@vger.kernel.org,
-	xen-devel@lists.xenproject.org,
-	linux-block@vger.kernel.org
-Cc: konrad.wilk@oracle.com,
-	roger.pau@citrix.com,
-	axboe@kernel.dk,
-	boris.ostrovsky@oracle.com,
-	Juergen Gross <jgross@suse.com>
-Subject: [PATCH v3 4/5] xen/blkback: move persistent grants flags to bool
-Date: Mon, 13 Aug 2018 16:01:13 +0200
-Message-Id: <20180813140114.20126-5-jgross@suse.com>
-In-Reply-To: <20180813140114.20126-1-jgross@suse.com>
-References: <20180813140114.20126-1-jgross@suse.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:34892 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727582AbeHaSWM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 31 Aug 2018 14:22:12 -0400
+Received: by mail-lf1-f66.google.com with SMTP id q13-v6so10111646lfc.2
+        for <linux-block@vger.kernel.org>; Fri, 31 Aug 2018 07:14:30 -0700 (PDT)
+Subject: Re: [PATCH] lightnvm: pblk: stop recreating global caches
+To: hans.ml.holmberg@owltronix.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        javier@cnexlabs.com, hans.holmberg@cnexlabs.com
+References: <1535709570-8923-1-git-send-email-hans.ml.holmberg@owltronix.com>
+ <1535709570-8923-2-git-send-email-hans.ml.holmberg@owltronix.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <c2e682ab-b1e9-596d-b892-0e72685cec37@lightnvm.io>
+Date: Fri, 31 Aug 2018 16:14:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <1535709570-8923-2-git-send-email-hans.ml.holmberg@owltronix.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The struct persistent_gnt flags member is meant to be a bitfield of
-different flags. There is only PERSISTENT_GNT_ACTIVE flag left, so
-convert it to a bool named "active".
+On 08/31/2018 11:59 AM, Hans Holmberg wrote:
+> From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+> 
+> Pblk should not create a set of global caches every time
+> a pblk instance is created. The global caches should be
+> made available only when there is one or more pblk instances.
+> 
+> This patch bundles the global caches together with a kref
+> keeping track of whether the caches should be available or not.
+> 
+> Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+> ---
+>   drivers/lightnvm/pblk-init.c | 113 ++++++++++++++++++++++++++-----------------
+>   1 file changed, 68 insertions(+), 45 deletions(-)
+> 
+> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+> index 9aebdee8e4c9..e2cdd840e7d0 100644
+> --- a/drivers/lightnvm/pblk-init.c
+> +++ b/drivers/lightnvm/pblk-init.c
+> @@ -26,9 +26,19 @@ static unsigned int write_buffer_size;
+>   module_param(write_buffer_size, uint, 0644);
+>   MODULE_PARM_DESC(write_buffer_size, "number of entries in a write buffer");
+>   
+> -static struct kmem_cache *pblk_ws_cache, *pblk_rec_cache, *pblk_g_rq_cache,
+> -				*pblk_w_rq_cache;
+> -static DECLARE_RWSEM(pblk_lock);
+> +struct pblk_global_caches {
 
-Signed-off-by: Juergen Gross <jgross@suse.com>
-Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
----
- drivers/block/xen-blkback/blkback.c | 13 ++++++-------
- drivers/block/xen-blkback/common.h  |  7 +------
- 2 files changed, 7 insertions(+), 13 deletions(-)
+How about pblk_caches?
 
-diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
-index 9eae7b243f68..fd1e19f1a49f 100644
---- a/drivers/block/xen-blkback/blkback.c
-+++ b/drivers/block/xen-blkback/blkback.c
-@@ -255,8 +255,7 @@ static int add_persistent_gnt(struct xen_blkif_ring *ring,
- 		}
- 	}
- 
--	bitmap_zero(persistent_gnt->flags, PERSISTENT_GNT_FLAGS_SIZE);
--	set_bit(PERSISTENT_GNT_ACTIVE, persistent_gnt->flags);
-+	persistent_gnt->active = true;
- 	/* Add new node and rebalance tree. */
- 	rb_link_node(&(persistent_gnt->node), parent, new);
- 	rb_insert_color(&(persistent_gnt->node), &ring->persistent_gnts);
-@@ -280,11 +279,11 @@ static struct persistent_gnt *get_persistent_gnt(struct xen_blkif_ring *ring,
- 		else if (gref > data->gnt)
- 			node = node->rb_right;
- 		else {
--			if(test_bit(PERSISTENT_GNT_ACTIVE, data->flags)) {
-+			if (data->active) {
- 				pr_alert_ratelimited("requesting a grant already in use\n");
- 				return NULL;
- 			}
--			set_bit(PERSISTENT_GNT_ACTIVE, data->flags);
-+			data->active = true;
- 			atomic_inc(&ring->persistent_gnt_in_use);
- 			return data;
- 		}
-@@ -295,10 +294,10 @@ static struct persistent_gnt *get_persistent_gnt(struct xen_blkif_ring *ring,
- static void put_persistent_gnt(struct xen_blkif_ring *ring,
-                                struct persistent_gnt *persistent_gnt)
- {
--	if(!test_bit(PERSISTENT_GNT_ACTIVE, persistent_gnt->flags))
-+	if (!persistent_gnt->active)
- 		pr_alert_ratelimited("freeing a grant already unused\n");
- 	persistent_gnt->last_used = jiffies;
--	clear_bit(PERSISTENT_GNT_ACTIVE, persistent_gnt->flags);
-+	persistent_gnt->active = false;
- 	atomic_dec(&ring->persistent_gnt_in_use);
- }
- 
-@@ -429,7 +428,7 @@ static void purge_persistent_gnt(struct xen_blkif_ring *ring)
- 		BUG_ON(persistent_gnt->handle ==
- 			BLKBACK_INVALID_HANDLE);
- 
--		if (test_bit(PERSISTENT_GNT_ACTIVE, persistent_gnt->flags))
-+		if (persistent_gnt->active)
- 			continue;
- 		if (!scan_used && !persistent_gnt_timeout(persistent_gnt))
- 			continue;
-diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
-index 7bff72db3b7e..2339b8d39c5e 100644
---- a/drivers/block/xen-blkback/common.h
-+++ b/drivers/block/xen-blkback/common.h
-@@ -233,11 +233,6 @@ struct xen_vbd {
- 
- struct backend_info;
- 
--/* Number of available flags */
--#define PERSISTENT_GNT_FLAGS_SIZE	1
--/* This persistent grant is currently in use */
--#define PERSISTENT_GNT_ACTIVE		0
--
- /* Number of requests that we can fit in a ring */
- #define XEN_BLKIF_REQS_PER_PAGE		32
- 
-@@ -246,7 +241,7 @@ struct persistent_gnt {
- 	grant_ref_t gnt;
- 	grant_handle_t handle;
- 	unsigned long last_used;
--	DECLARE_BITMAP(flags, PERSISTENT_GNT_FLAGS_SIZE);
-+	bool active;
- 	struct rb_node node;
- 	struct list_head remove_node;
- };
--- 
-2.13.7
+> +	struct kmem_cache *ws_cache;
+> +	struct kmem_cache *rec_cache;
+> +	struct kmem_cache *g_rq_cache;
+> +	struct kmem_cache *w_rq_cache;
+
+You can drop _cache from the names now that its implicit from the structure.
+
+> +	struct kref kref;
+> +};
+> +
+> +static struct pblk_global_caches caches = {
+
+g_caches? pblk_caches?
+
+> +	.kref = KREF_INIT(0)
+> +};
+> +
+> +static DECLARE_RWSEM(pblk_lock);	/* Protects global caches */
+pblk_caches_lock? and consider just using a semaphore, we don't need 
+separate readers and writers for this.
+
+>   struct bio_set pblk_bio_set;
+>   
+>   static int pblk_rw_io(struct request_queue *q, struct pblk *pblk,
+> @@ -307,53 +317,68 @@ static int pblk_set_addrf(struct pblk *pblk)
+>   	return 0;
+>   }
+>   
+> -static int pblk_init_global_caches(struct pblk *pblk)
+> +static int pblk_get_global_caches(void)
+
+Looks like what this one does is initializing the caches. I get the 
+get/put concept, but you may want to split it into two other functions. 
+Such that you have
+
+pblk_init_caches() (only called by pblk_get_caches)
+
+and
+
+pblk_get_caches()
+{
+	down(&pblk_cache_sem);
+	if (kref_read(&caches.kref) > 0) {
+		down(&pblk_cache_sem);
+		return 0;
+}
+
+	ret = pblk_init_caches(..);
+	up(&pblk_cache_sem);
+	return ret;
+}
+
+>   {
+>   	down_write(&pblk_lock);
+> -	pblk_ws_cache = kmem_cache_create("pblk_blk_ws",
+> +
+> +	if (kref_read(&caches.kref) > 0)
+> +		goto caches_available;
+> +
+> +	caches.ws_cache = kmem_cache_create("pblk_blk_ws",
+>   				sizeof(struct pblk_line_ws), 0, 0, NULL);
+> -	if (!pblk_ws_cache) {
+> -		up_write(&pblk_lock);
+> -		return -ENOMEM;
+> -	}
+> +	if (!caches.ws_cache)
+> +		goto fail;
+>   
+> -	pblk_rec_cache = kmem_cache_create("pblk_rec",
+> +	caches.rec_cache = kmem_cache_create("pblk_rec",
+>   				sizeof(struct pblk_rec_ctx), 0, 0, NULL);
+> -	if (!pblk_rec_cache) {
+> -		kmem_cache_destroy(pblk_ws_cache);
+> -		up_write(&pblk_lock);
+> -		return -ENOMEM;
+> -	}
+> +	if (!caches.rec_cache)
+> +		goto fail_destroy_ws_cache;
+>   
+> -	pblk_g_rq_cache = kmem_cache_create("pblk_g_rq", pblk_g_rq_size,
+> +	caches.g_rq_cache = kmem_cache_create("pblk_g_rq", pblk_g_rq_size,
+>   				0, 0, NULL);
+> -	if (!pblk_g_rq_cache) {
+> -		kmem_cache_destroy(pblk_ws_cache);
+> -		kmem_cache_destroy(pblk_rec_cache);
+> -		up_write(&pblk_lock);
+> -		return -ENOMEM;
+> -	}
+> +	if (!caches.g_rq_cache)
+> +		goto fail_destroy_rec_cache;
+>   
+> -	pblk_w_rq_cache = kmem_cache_create("pblk_w_rq", pblk_w_rq_size,
+> +	caches.w_rq_cache = kmem_cache_create("pblk_w_rq", pblk_w_rq_size,
+>   				0, 0, NULL);
+> -	if (!pblk_w_rq_cache) {
+> -		kmem_cache_destroy(pblk_ws_cache);
+> -		kmem_cache_destroy(pblk_rec_cache);
+> -		kmem_cache_destroy(pblk_g_rq_cache);
+> -		up_write(&pblk_lock);
+> -		return -ENOMEM;
+> -	}
+> +	if (!caches.w_rq_cache)
+> +		goto fail_destroy_g_rq_cache;
+> +
+> +caches_available:
+> +	kref_get(&caches.kref);
+>   	up_write(&pblk_lock);
+>   
+>   	return 0;
+> +
+> +fail_destroy_g_rq_cache:
+> +	kmem_cache_destroy(caches.g_rq_cache);
+> +fail_destroy_rec_cache:
+> +	kmem_cache_destroy(caches.rec_cache);
+> +fail_destroy_ws_cache:
+> +	kmem_cache_destroy(caches.ws_cache);
+> +fail:
+> +	up_write(&pblk_lock);
+> +
+> +	return -ENOMEM;
+>   }
+>   
+> -static void pblk_free_global_caches(struct pblk *pblk)
+> +static void pblk_destroy_global_caches(struct kref *ref)
+>   {
+> -	kmem_cache_destroy(pblk_ws_cache);
+> -	kmem_cache_destroy(pblk_rec_cache);
+> -	kmem_cache_destroy(pblk_g_rq_cache);
+> -	kmem_cache_destroy(pblk_w_rq_cache);
+> +	struct pblk_global_caches *c;
+> +
+> +	c = container_of(ref, struct pblk_global_caches, kref);
+> +
+> +	kmem_cache_destroy(c->ws_cache);
+> +	kmem_cache_destroy(c->rec_cache);
+> +	kmem_cache_destroy(c->g_rq_cache);
+> +	kmem_cache_destroy(c->w_rq_cache);
+> +}
+> +
+> +static void pblk_put_global_caches(void)
+> +{
+> +	down_write(&pblk_lock);
+> +	kref_put(&caches.kref, pblk_destroy_global_caches);
+> +	up_write(&pblk_lock);
+>   }
+>   
+>   static int pblk_core_init(struct pblk *pblk)
+> @@ -382,7 +407,7 @@ static int pblk_core_init(struct pblk *pblk)
+>   	if (!pblk->pad_dist)
+>   		return -ENOMEM;
+>   
+> -	if (pblk_init_global_caches(pblk))
+> +	if (pblk_get_global_caches())
+>   		goto fail_free_pad_dist;
+>   
+>   	/* Internal bios can be at most the sectors signaled by the device. */
+> @@ -391,27 +416,27 @@ static int pblk_core_init(struct pblk *pblk)
+>   		goto free_global_caches;
+>   
+>   	ret = mempool_init_slab_pool(&pblk->gen_ws_pool, PBLK_GEN_WS_POOL_SIZE,
+> -				     pblk_ws_cache);
+> +				     caches.ws_cache);
+>   	if (ret)
+>   		goto free_page_bio_pool;
+>   
+>   	ret = mempool_init_slab_pool(&pblk->rec_pool, geo->all_luns,
+> -				     pblk_rec_cache);
+> +				     caches.rec_cache);
+>   	if (ret)
+>   		goto free_gen_ws_pool;
+>   
+>   	ret = mempool_init_slab_pool(&pblk->r_rq_pool, geo->all_luns,
+> -				     pblk_g_rq_cache);
+> +				     caches.g_rq_cache);
+>   	if (ret)
+>   		goto free_rec_pool;
+>   
+>   	ret = mempool_init_slab_pool(&pblk->e_rq_pool, geo->all_luns,
+> -				     pblk_g_rq_cache);
+> +				     caches.g_rq_cache);
+>   	if (ret)
+>   		goto free_r_rq_pool;
+>   
+>   	ret = mempool_init_slab_pool(&pblk->w_rq_pool, geo->all_luns,
+> -				     pblk_w_rq_cache);
+> +				     caches.w_rq_cache);
+>   	if (ret)
+>   		goto free_e_rq_pool;
+>   
+> @@ -457,7 +482,7 @@ static int pblk_core_init(struct pblk *pblk)
+>   free_page_bio_pool:
+>   	mempool_exit(&pblk->page_bio_pool);
+>   free_global_caches:
+> -	pblk_free_global_caches(pblk);
+> +	pblk_put_global_caches();
+>   fail_free_pad_dist:
+>   	kfree(pblk->pad_dist);
+>   	return -ENOMEM;
+> @@ -481,7 +506,7 @@ static void pblk_core_free(struct pblk *pblk)
+>   	mempool_exit(&pblk->e_rq_pool);
+>   	mempool_exit(&pblk->w_rq_pool);
+>   
+> -	pblk_free_global_caches(pblk);
+> +	pblk_put_global_caches();
+>   	kfree(pblk->pad_dist);
+>   }
+>   
+> @@ -1074,7 +1099,6 @@ static void pblk_exit(void *private, bool graceful)
+>   {
+>   	struct pblk *pblk = private;
+>   
+> -	down_write(&pblk_lock);
+>   	pblk_gc_exit(pblk, graceful);
+>   	pblk_tear_down(pblk, graceful);
+>   
+> @@ -1083,7 +1107,6 @@ static void pblk_exit(void *private, bool graceful)
+>   #endif
+>   
+>   	pblk_free(pblk);
+> -	up_write(&pblk_lock);
+>   }
+>   
+>   static sector_t pblk_capacity(void *private)
+> 
