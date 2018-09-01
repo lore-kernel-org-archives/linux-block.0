@@ -1,71 +1,47 @@
-Return-Path: <tom.leiming@gmail.com>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 31 Aug 2018 17:29:00 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Dennis Zhou <dennisszhou@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
+	linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 12/15] blkcg: cleanup and make blk_get_rl use
+ blkg_lookup_create
+Message-ID: <20180901002900.GJ1488037@devbig004.ftw2.facebook.com>
+References: <20180831015356.69796-1-dennisszhou@gmail.com>
+ <20180831015356.69796-13-dennisszhou@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180731104914.17249-1-ming.lei@redhat.com>
-References: <20180731104914.17249-1-ming.lei@redhat.com>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Mon, 6 Aug 2018 10:37:11 +0800
-Message-ID: <CACVXFVNhqmyL4cHJ--k+cOhqCA2vkaLGCXnxEzB3urhrC=AAzg@mail.gmail.com>
-Subject: Re: [PATCH 0/3] block: fix mismatch of figuring out physical segment number
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Mike Snitzer <snitzer@redhat.com>,
-	Kent Overstreet <kent.overstreet@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180831015356.69796-13-dennisszhou@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Jul 31, 2018 at 6:49 PM, Ming Lei <ming.lei@redhat.com> wrote:
-> Hi,
->
-> This patchset fixes one issue related with physical segment computation,
-> which is found by Mike. In case of dm-rq, the warning of 'blk_cloned_rq_check_limits:
-> over max segments limit' can be triggered easily.
->
-> Follows the cause:
->
-> 1) in IO fast path(blk_queue_split()), we always figure out physical segment number
-> no matter the flag of QUEUE_FLAG_NO_SG_MERGE is set or not.
->
-> 2) only blk_recount_segments() and blk_recalc_rq_segments() uses the flag of
-> QUEUE_FLAG_NO_SG_MERGE, but the two are only called in some unusual
-> cases, such as request clone in dm-rq.
->
-> 3) the above two computation don't match, and cause the warning of
-> "blk_cloned_rq_check_limits: over max segments limit".
->
-> This patchset fixes this issue by killing the queue flag since it is basically
-> bypassed since v4.4, and no one complains that at all. Also multipage bvec will
-> come soon, and it doesn't make sense to keep QUEUE_FLAG_NO_SG_MERGE any more.
->
->
-> Ming Lei (3):
->   block: don't use bio->bi_vcnt to figure out segment number
->   block: kill QUEUE_FLAG_NO_SG_MERGE
->   block: kill BLK_MQ_F_SG_MERGE
->
->  block/blk-merge.c            | 39 +++++++--------------------------------
->  block/blk-mq-debugfs.c       |  2 --
->  block/blk-mq.c               |  3 ---
->  drivers/block/loop.c         |  2 +-
->  drivers/block/nbd.c          |  2 +-
->  drivers/block/rbd.c          |  2 +-
->  drivers/block/skd_main.c     |  1 -
->  drivers/block/xen-blkfront.c |  2 +-
->  drivers/md/dm-rq.c           |  2 +-
->  drivers/md/dm-table.c        | 13 -------------
->  drivers/mmc/core/queue.c     |  3 +--
->  drivers/scsi/scsi_lib.c      |  2 +-
->  include/linux/blk-mq.h       |  1 -
->  include/linux/blkdev.h       |  1 -
->  14 files changed, 14 insertions(+), 61 deletions(-)
->
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Mike Snitzer <snitzer@redhat.com>
-> Cc: Kent Overstreet <kent.overstreet@gmail.com>
+On Thu, Aug 30, 2018 at 09:53:53PM -0400, Dennis Zhou wrote:
+> From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+> 
+> blk_get_rl is responsible for identifying which request_list a request
+> should be allocated to. Try get logic was added earlier, but
+> semantically the logic was not changed.
+> 
+> This patch makes better use of the bio already having a reference to the
+> blkg in the hot path. The cold path uses a better fallback of
+> blkg_lookup_create rather than just blkg_lookup and then falling back to
+> the q->root_rl. If lookup_create fails with anything but -ENODEV, it
+> falls back to q->root_rl.
+> 
+> A clarifying comment is added to explain why q->root_rl is used rather
+> than the root blkg's rl.
+> 
+> Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
 
-Hello Guys,
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Ping...
+We're replicating that retry busy loop a lot.  It'd be really great to
+factor that out and document what it's doing.
 
+Thanks.
 
-Thanks,
-Ming Lei
+-- 
+tejun
