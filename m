@@ -1,29 +1,38 @@
-Return-Path: <hch@lst.de>
-Date: Wed, 1 Aug 2018 16:52:25 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Mike Snitzer <snitzer@redhat.com>,
-	Kent Overstreet <kent.overstreet@gmail.com>
-Subject: Re: [PATCH 1/3] block: don't use bio->bi_vcnt to figure out
-	segment number
-Message-ID: <20180801145224.GA28668@lst.de>
-References: <20180731104914.17249-1-ming.lei@redhat.com> <20180731104914.17249-2-ming.lei@redhat.com>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 31 Aug 2018 17:13:05 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Dennis Zhou <dennisszhou@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
+	linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 10/15] blkcg: remove bio->bi_css and instead use
+ bio->bi_blkg
+Message-ID: <20180901001305.GH1488037@devbig004.ftw2.facebook.com>
+References: <20180831015356.69796-1-dennisszhou@gmail.com>
+ <20180831015356.69796-11-dennisszhou@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180731104914.17249-2-ming.lei@redhat.com>
+In-Reply-To: <20180831015356.69796-11-dennisszhou@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Jul 31, 2018 at 06:49:12PM +0800, Ming Lei wrote:
-> It is wrong to use bio->bi_vcnt to figure out how many segments
-> there are in the bio even though CLONED flag isn't set on this bio,
-> because this bio may be splitted or advanced.
+On Thu, Aug 30, 2018 at 09:53:51PM -0400, Dennis Zhou wrote:
+> From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
 > 
-> So always use bio_segments() in blk_recount_segments(), and it shouldn't
-> cause any performance loss now because the physical segment number is figured
-> out in blk_queue_split() and BIO_SEG_VALID is set meantime since
-> bdced438acd83ad83a6c ("block: setup bi_phys_segments after splitting").
+> Prior patches ensured that all bios are now associated with some blkg.
+> This now makes bio->bi_css unnecessary as blkg maintains a reference to
+> the blkcg already.
+> 
+> This patch removes the field bi_css and transfers corresponding uses to
+> access via bi_blkg.
+> 
+> Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
 
-Looks good,
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Thanks.
+
+-- 
+tejun
