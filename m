@@ -1,99 +1,34 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENT 3/4] block, bfq: reduce write overcharge
-Date: Thu, 16 Aug 2018 18:51:17 +0200
-Message-Id: <20180816165118.17402-4-paolo.valente@linaro.org>
-In-Reply-To: <20180816165118.17402-1-paolo.valente@linaro.org>
-References: <20180816165118.17402-1-paolo.valente@linaro.org>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 31 Aug 2018 17:32:50 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Dennis Zhou <dennisszhou@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
+	linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 14/15] blkcg: rename blkg_try_get to blkg_tryget
+Message-ID: <20180901003250.GL1488037@devbig004.ftw2.facebook.com>
+References: <20180831015356.69796-1-dennisszhou@gmail.com>
+ <20180831015356.69796-15-dennisszhou@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180831015356.69796-15-dennisszhou@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-When a sync request is dispatched, the queue that contains that
-request, and all the ancestor entities of that queue, are charged with
-the number of sectors of the request. In constrast, if the request is
-async, then the queue and its ancestor entities are charged with the
-number of sectors of the request, multiplied by an overcharge
-factor. This throttles the bandwidth for async I/O, w.r.t. to sync
-I/O, and it is done to counter the tendency of async writes to steal
-I/O throughput to reads.
+On Thu, Aug 30, 2018 at 09:53:55PM -0400, Dennis Zhou wrote:
+> From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+> 
+> blkg reference counting now uses percpu_ref rather than atomic_t. Let's
+> make this consistent with css_tryget. This renames blkg_try_get to
+> blkg_tryget and now returns a bool rather than the blkg or NULL.
+> 
+> Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
 
-On the opposite end, the lower this parameter, the stabler I/O
-control, in the following respect.  The lower this parameter is, the
-less the bandwidth enjoyed by a group decreases
-- when the group does writes, w.r.t. to when it does reads;
-- when other groups do reads, w.r.t. to when they do writes.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-The fixes "block, bfq: always update the budget of an entity when
-needed" and "block, bfq: readd missing reset of parent-entity service"
-improved I/O control in bfq to such an extent that it has been
-possible to revise this overcharge factor downwards.  This commit
-introduces the resulting, new value.
+Thanks.
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 33 +++++++++++++++++++--------------
- 1 file changed, 19 insertions(+), 14 deletions(-)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 62efc1b97afb..653100fb719e 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -187,11 +187,25 @@ static const int bfq_stats_min_budgets = 194;
- static const int bfq_default_max_budget = 16 * 1024;
- 
- /*
-- * Async to sync throughput distribution is controlled as follows:
-- * when an async request is served, the entity is charged the number
-- * of sectors of the request, multiplied by the factor below
-+ * When a sync request is dispatched, the queue that contains that
-+ * request, and all the ancestor entities of that queue, are charged
-+ * with the number of sectors of the request. In constrast, if the
-+ * request is async, then the queue and its ancestor entities are
-+ * charged with the number of sectors of the request, multiplied by
-+ * the factor below. This throttles the bandwidth for async I/O,
-+ * w.r.t. to sync I/O, and it is done to counter the tendency of async
-+ * writes to steal I/O throughput to reads.
-+ *
-+ * The current value of this parameter is the result of a tuning with
-+ * several hardware and software configurations. We tried to find the
-+ * lowest value for which writes do not cause noticeable problems to
-+ * reads. In fact, the lower this parameter, the stabler I/O control,
-+ * in the following respect.  The lower this parameter is, the less
-+ * the bandwidth enjoyed by a group decreases
-+ * - when the group does writes, w.r.t. to when it does reads;
-+ * - when other groups do reads, w.r.t. to when they do writes.
-  */
--static const int bfq_async_charge_factor = 10;
-+static const int bfq_async_charge_factor = 3;
- 
- /* Default timeout values, in jiffies, approximating CFQ defaults. */
- const int bfq_timeout = HZ / 8;
-@@ -853,16 +867,7 @@ static unsigned long bfq_serv_to_charge(struct request *rq,
- 	if (bfq_bfqq_sync(bfqq) || bfqq->wr_coeff > 1)
- 		return blk_rq_sectors(rq);
- 
--	/*
--	 * If there are no weight-raised queues, then amplify service
--	 * by just the async charge factor; otherwise amplify service
--	 * by twice the async charge factor, to further reduce latency
--	 * for weight-raised queues.
--	 */
--	if (bfqq->bfqd->wr_busy_queues == 0)
--		return blk_rq_sectors(rq) * bfq_async_charge_factor;
--
--	return blk_rq_sectors(rq) * 2 * bfq_async_charge_factor;
-+	return blk_rq_sectors(rq) * bfq_async_charge_factor;
- }
- 
- /**
 -- 
-2.16.1
+tejun
