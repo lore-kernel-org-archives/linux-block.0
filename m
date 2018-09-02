@@ -1,69 +1,66 @@
-Return-Path: <dgilbert@interlog.com>
-Reply-To: dgilbert@interlog.com
-Subject: Re: Recent removal of bsg read/write support
-To: Richard Weinberger <richard.weinberger@gmail.com>, drorl@infinidat.com
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
- linux-scsi@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>,
- Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>
+Return-Path: <linus971@gmail.com>
+MIME-Version: 1.0
 References: <CAOuWhkaGjX8Q_xghkFVTqzZkDrUv-sdH=VbS7hvnqFWrT+3eOQ@mail.gmail.com>
  <CAFLxGvxX8QW4wUJKommXVMpGBj7G_H3=SOwQGjGuyPZZrhCzKw@mail.gmail.com>
-From: Douglas Gilbert <dgilbert@interlog.com>
-Message-ID: <6b907fed-d83f-de75-bde4-11270a0b1b0b@interlog.com>
-Date: Sun, 2 Sep 2018 21:16:10 +0200
-MIME-Version: 1.0
 In-Reply-To: <CAFLxGvxX8QW4wUJKommXVMpGBj7G_H3=SOwQGjGuyPZZrhCzKw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sun, 2 Sep 2018 10:55:21 -0700
+Message-ID: <CA+55aFyLC8PhjZ+iV7MucSZ1aGKMT=S9=EkEAQ6T1=ZRqD-xLA@mail.gmail.com>
+Subject: Re: Recent removal of bsg read/write support
+To: richard -rw- weinberger <richard.weinberger@gmail.com>
+Cc: drorl@infinidat.com,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>,
+	Linux SCSI List <linux-scsi@vger.kernel.org>, Christoph Hellwig <hch@infradead.org>,
+	Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On 2018-09-02 01:44 PM, Richard Weinberger wrote:
+On Sun, Sep 2, 2018 at 4:44 AM Richard Weinberger
+<richard.weinberger@gmail.com> wrote:
+>
 > CC'ing relevant people. Otherwise your mail might get lost.
-> 
+
+Indeed.
+
 > On Sun, Sep 2, 2018 at 1:37 PM Dror Levin <drorl@infinidat.com> wrote:
->>
->> Note: I am not subscribed to LKML so please CC replies to this email.
->>
->> Hi,
->>
->> We have an internal tool that uses the bsg read/write interface to
->> issue SCSI commands as part of a test suite for a storage device.
->>
->> After recently reading on LWN that this interface is to be removed we
->> tried porting our code to use sg instead. However, that raises new
->> issues - mainly getting ENOMEM over iSCSI for unknown reasons.
->>
->> Because of this we would like to continue using the bsg interface,
->> even if some changes are required to meet security concerns.
->>
->> Is there any chance for this removal to be reverted? I saw it was
->> already included in 4.19-rc1.
+> >
+> > We have an internal tool that uses the bsg read/write interface to
+> > issue SCSI commands as part of a test suite for a storage device.
+> >
+> > After recently reading on LWN that this interface is to be removed we
+> > tried porting our code to use sg instead. However, that raises new
+> > issues - mainly getting ENOMEM over iSCSI for unknown reasons.
 
-Hi,
-Both bsg and sg are relatively thin shims over the same block layer
-pass-through calls. And neither driver will themselves generate ENOMEM
-unless the CPU is running low of memory.
+Is there any chance that you can make more data available?
 
-In my experience, the main reason for unexpected ENOMEMs *** is from
-blk_rq_map_user_iov() in block/blk_map.c called from both drivers.
-That is a particular resource shortage rather than memory in general.
-I do notice the blk_rq_map_user_iov() is/was called with GFP_KERNEL
-in bsg and GFP_ATOMIC by sg. That suggests when you call write() on
-a sg device and get ENOMEM, then wait a little (depends on your app)
-and try again.
+I'd rather fix the sg interface (which while also broken garbage, we
+can't get rid of) than re-surrect the bsg interface.
 
-Could you share a test program that illustrates the problem with us?
+That said, the removed bsg code looks a hell of a lot prettier than
+the nasty sg interface code does, although it also lacks ansolutely
+_any_ kind of security checking.
 
-One way of limiting user space programs that used bsg's write()/read()
-interface (via the sg v4 interface), from needing a significant rewrite
-would be to implement the sg_v4 interface in the sg driver. Currently the
-sg driver supports the sg v1 (sort of), sg v2 and sg v3 (typically used)
-interfaces.
+> > Because of this we would like to continue using the bsg interface,
+> > even if some changes are required to meet security concerns.
 
-Doug Gilbert
+I wonder if we could at least try to unify the bsg/sg code - possibly
+by making sg use the prettier bsg code (but definitely have to add all
+the security measures).
 
+And dammit, the SCSI people need to get their heads out of their
+arses. This whole "stream random commands over read/write" needs to go
+the f*ck away.
 
-*** Prior to around February this year, that block layer resource
-shortage resulted in a EINVAL being returned to the sg driver. That
-had perplexed me for some time, as it happened only under heavy
-testing, typically with the same SCSI command being repeated
-(e.g. REQUEST SENSE). It was really a ENOMEM error that was being
-inadvertently overwritten.
+Could we perhaps extend the SG_IO interace to have an async mode?
+Instead of "read/write", have "SG_IOSUBMIT" and "SG_IORECEIVE" and
+have the SG_IO ioctl just be a shorthand of "both".
+
+And have a model that actually checks that "yeah, this command is ok
+for a normal user", so that it's actually useful for things like CD
+burning etc, without making it a huge gaping security hole that is
+only useful for crazy special cases?
+
+Maybe that - otherwise reasonably pretty - block/bsg.c code could be
+joined with the SG_IO code that actually understands security issues?
+
+                 Linus
