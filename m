@@ -1,25 +1,26 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-io0-f176.google.com ([209.85.223.176]:42407 "EHLO
-        mail-io0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725895AbeICK3e (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Sep 2018 06:29:34 -0400
-Received: by mail-io0-f176.google.com with SMTP id n18-v6so15007850ioa.9
-        for <linux-block@vger.kernel.org>; Sun, 02 Sep 2018 23:10:55 -0700 (PDT)
+Received: from mail-io0-f195.google.com ([209.85.223.195]:44194 "EHLO
+        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725810AbeICJxT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Sep 2018 05:53:19 -0400
+Received: by mail-io0-f195.google.com with SMTP id 75-v6so14937891iou.11
+        for <linux-block@vger.kernel.org>; Sun, 02 Sep 2018 22:34:46 -0700 (PDT)
 From: Kashyap Desai <kashyap.desai@broadcom.com>
 References: <eccc46e12890a1d033d9003837012502@mail.gmail.com>
  <20180829084618.GA24765@ming.t460p> <300d6fef733ca76ced581f8c6304bac6@mail.gmail.com>
  <CACVXFVM7nGxpyq0_jfshgBOTx5B+PuCDmN43SfPTCkENJRLpMg@mail.gmail.com>
- <615d78004495aebc53807156d04d988c@mail.gmail.com> <20180903021332.GA5481@ming.t460p>
-In-Reply-To: <20180903021332.GA5481@ming.t460p>
+ <615d78004495aebc53807156d04d988c@mail.gmail.com> <alpine.DEB.2.21.1808312207390.1349@nanos.tec.linutronix.de>
+ <486f94a563d63c4779498fe8829a546c@mail.gmail.com> <alpine.DEB.2.21.1809010020520.1349@nanos.tec.linutronix.de>
+ <602cee6381b9f435a938bbaf852d07f9@mail.gmail.com> <alpine.DEB.2.21.1809021357000.1349@nanos.tec.linutronix.de>
+In-Reply-To: <alpine.DEB.2.21.1809021357000.1349@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Date: Mon, 3 Sep 2018 11:40:53 +0530
-Message-ID: <6e187fdf263c80e95cf627f6b363cf8d@mail.gmail.com>
+Date: Mon, 3 Sep 2018 11:04:44 +0530
+Message-ID: <66256272c020be186becdd7a3f049302@mail.gmail.com>
 Subject: RE: Affinity managed interrupts vs non-managed interrupts
-To: Ming Lei <ming.lei@redhat.com>
+To: Thomas Gleixner <tglx@linutronix.de>
 Cc: Ming Lei <tom.leiming@gmail.com>,
         Sumit Saxena <sumit.saxena@broadcom.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Shivasharan Srikanteshwara
         <shivasharan.srikanteshwara@broadcom.com>,
@@ -28,211 +29,171 @@ Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-> > It is not yet finalized, but it can be based on per sdev outstanding,
-> > shost_busy etc.
-> > We want to use special 16 reply queue for IO acceleration (these
-queues are
-> > working interrupt coalescing mode. This is a h/w feature)
->
-> This part is very key to your approach, so I'd suggest to finalize it
-> first. That said this way doesn't make sense if you can't figure out
-> one doable approach to decide when to use the coalescing mode, and when
-> to
-> use the regular 72 reply queues.
-This is almost finalized, but going through testing and may take some time
-to review all the output.
-At very high level -
-If scsi device is Virtual Disk, it will count each physical disk for data
-arm and required condition to use io acceleration (interrupt coalescing)
-path is - outstanding for sdev should be more than 8 * data_arms. Using
-this method we are not going to impact low latency intensive workload.
-
->
-> If it is just for IO acceleration, why not always use the coalescing
-mode?
-
-Ming, we attempted all the possible approaches. Let me summarize.
-
-If we use *all* interrupt coalescing, single worker and lower queue depth
-profile is impacted and latency drop is seen upto 20%.
-
->
-> >
-> > >
-> > > Frankly speaking, you may reuse the 72 reply queues to do interrupt
-> > > coalescing by configuring one extra register to enable the
-coalescing
-> > > mode,
-> > > and you may just use small part of the 72 reply queues under the
-> > > interrupt coalescing mode.
-> > Our h/w can set interrupt coalescing per 8 reply queues. So smallest
-is 8.
-> > If we choose to take 8 reply queue from existing 72 reply queue
-(without
-> > asking for extra reply queue), we still have  an issue on more numa
-node
-> > systems.  Example - in 8 numa node system each node will have only
-*one*
-> > reply queue for effective interrupt coalescing. (since irq subsystem
-will
-> > spread msix per numa).
-> >
-> > To keep things scalable we cherry picked few reply queues and wanted
-them
-> to
-> > be out of cpu-msix mapping.
->
-> I mean you can group the reply queues according to the queue's numa node
-> info, given the mapping has been figured out there by genirq affinity
-> code.
-
-Not able to follow you.  I replied to Thomas on the same topic. Is that
-reply clarifies or I am still missing ?
-
->
-> >
-> > >
-> > > Or you can learn from SPDK to use one or small number of dedicated
-cores
-> > > or kernel threads to poll the interrupts from all reply queues, then
-I
-> > > guess you may benefit much compared with the extra 16 queue
-approach.
-> > Problem with polling -  It requires some steady completion, otherwise
-> > prediction in driver gives different results on different profiles.
-> > We attempted irq-poll and thread ISR based polling, but it has pros
+> On Fri, 31 Aug 2018, Kashyap Desai wrote:
+> > > Ok. I misunderstood the whole thing a bit. So your real issue is
+that you
+> > > want to have reply queues which are instantaneous, the per cpu ones,
 and
-> > cons. One of the key usage of method what we are trying is not to
-impact
-> > latency for lower QD workloads.
->
-> Interrupt coalescing should effect latency too[1], or could you share
-your
-> idea how to use interrupt coalescing to address the latency issue?
->
-> 	"Interrupt coalescing, also known as interrupt moderation,[1] is a
-> 	technique in which events which would normally trigger a hardware
-> interrupt
-> 	are held back, either until a certain amount of work is pending,
-or a
-> 	timeout timer triggers."[1]
->
-> [1] https://en.wikipedia.org/wiki/Interrupt_coalescing
-
-That is correct. We are not going to use 100% interrupt coalescing to
-avoid latency impact.  We will have two set of queues. You can consider
-this as hybrid interrupt coalescing.
-On 72 logical cpu case, we will allocate 88 (72 + 16) reply queues (msix
-index). Only first 16 reply queue will be configured in interrupt
-coalescing mode (This is special h/w feature.) and remaining 72 reply are
-without any interrupt coalescing.  72 reply queue are 1:1 cpu-msix map and
-16 reply queue are mapped to local numa node.
-
-As explained above, per scsi device outstanding is a key factors to route
-io to queues with interrupt coalescing vs regular queue (without interrupt
-coalescing.)
-Example -
-If there are sync IO request per scsi device (one IO at a time), driver
-will keep posting those IO to the queues without any interrupt coalescing.
-If there are more than 8 outstanding io per scsi device, driver will post
-those io to reply queues with interrupt coalescing. This particular group
-of io will not have latency impact because coalescing depth are key
-factors to flush the ios. There can be some corner cases of workload which
-can theoretically possible to have latency impact, but having more scsi
-devices doing active io submission will close that loop and we are not
-suspecting those issue need any special treatment. In fact, this solution
-is to provide reasonable latency + higher iops for most of the cases and
-if there are some deployment which need tuning..it is still possible to
-disable this feature.  We really want to deal with those scenario on case
-by case bases (through firmware settings).
-
-
->
-> > I posted RFC at
-> > https://www.spinics.net/lists/linux-scsi/msg122874.html
+> > > then the extra 16 which do batching and are shared over a set of
+CPUs,
+> > > right?
 > >
-> > We have done extensive study and concluded to use interrupt coalescing
-is
-> > better if h/w can manage two different modes (coalescing on/off).
+> > Yes that is correct.  Extra 16 or whatever should be shared over set
+of
+> > CPUs of *local* numa node of the PCI device.
 >
-> Could you explain a bit why coalescing is better?
+> Why restricting it to the local NUMA node of the device? That doesn't
+> really make sense if you queue lots of requests from CPUs on a different
+> node.
 
-Actually we are doing hybrid coalescing. You are correct, we have no
-single answer here, but there are pros and cons.
-For such hybrid coalescing we need h/w support.
-
->
-> In theory, interrupt coalescing is just to move the implementation into
-> hardware. And the IO submitted from the same coalescing group is usually
-> irrelevant. The same problem you found in polling should have been in
-> coalescing too.
-
-Coalescing either in software or hardware is best attempt mechanism and
-there is no steady snapshot of submission and completion in both the case.
-
-One of the problem with coalescing/polling in OS driver is - Irq-poll
-works in interrupt context and waiting in polling consume more CPU because
-driver should do some predictive loop. At the same time driver should quit
-after some completion to give fairness to other devices.  Threaded
-interrupt can resolve the cpu hogging issue, but we are moving our key
-interrupt processing to threaded context so fairness will be compromised.
-In case of threaded interrupt polling we may be impacted if interrupt of
-other devices request the same cpu where threaded isr is running.  If
-polling logic in driver does not work well on different systems, we are
-going to see extra penalty of doing disable/enable interrupt call.  This
-particular problem is not a concern if h/w does interrupt coalescing.
+Penalty of cross numa node is minimal with higher interrupt coalescing
+used in h/w.  We see penalty of cross numa traffic for lower IOPs type
+work load.
+In this particular case we are taking care cross numa traffic via higher
+interrupt coalescing.
 
 >
-> >
-> > >
-> > > Introducing extra 16 queues just for interrupt coalescing and making
-it
-> > > coexisting with the regular 72 reply queues seems one very unusual
-use
-> > > case, not sure the current genirq affinity can support it well.
-> >
-> > Yes. This is unusual case. I think it is not used by any other
-drivers.
-> >
-> > >
-> > > > >
-> > > > > >
-> > > > > > All pre_vectors (16) will be mapped to all available online
-CPUs but
-> > > > > > e
-> > > > > > ffective affinity of each vector is to CPU 0. Our requirement
-is to
-> > > > > > have pre _vectors 16 reply queues to be mapped to local NUMA
-node
-> > > with
-> > > > > > effective CPU should be spread within local node cpu mask.
-Without
-> > > > > > changing kernel code, we can
-> > > > >
-> > > > > If all CPUs in one NUMA node is offline, can this use case work
-as
-> > > > expected?
-> > > > > Seems we have to understand what the use case is and how it
-works.
-> > > >
-> > > > Yes, if all CPUs of the NUMA node is offlined, IRQ-CPU affinity
-will be
-> > > > broken and irqbalancer takes care of migrating affected IRQs to
-online
-> > > > CPUs of different NUMA node.
-> > > > When offline CPUs are onlined again, irqbalancer restores
-affinity.
-> > >
-> > >  irqbalance daemon can't cover managed interrupts, or you mean
-> > > you don't use pci_alloc_irq_vectors_affinity(PCI_IRQ_AFFINITY)?
-> >
-> > Yes. We did not used " pci_alloc_irq_vectors_affinity".
-> > We used " pci_enable_msix_range" and manually set affinity in driver
-using
-> > irq_set_affinity_hint.
+> Why don't you spread these extra interrupts accross all nodes and keep
+the
+> locality for the request/reply?
+
+I assuming you are refereeing spreading msix to all numa node the way
+"pci_alloc_irq_vectors" does.
+
+Having extra 16 reply queue spread across nodes will have negative impact.
+Take example of 8 node system (total 128 logical cpus).
+If  16 reply queue are spread across numa node, there will be total 8
+logical cpu mapped to 1 reply queue (eventually one numa node will have
+only 2 reply queue mapped).
+
+Running IO from one numa node will only consume 2 reply queues.
+Performance dropped drastically in such case.  This is typical problem
+with cpu-msix mapping goes to N:1 where msix is less than online cpus.
+
+Mapping extra 16 reply queue to local numa node will always make sure that
+driver will round robin all 16 reply queue irrespective of originated cpu.
+We validated this method sending IOs from remote node and did not observed
+performance penalty.
+
 >
-> Then you have to cover all kind of CPU hotplug issues in your driver
-> because you switch to driver to maintain the queue mapping.
+> That also would allow to make them properly managed interrupts as you
+> could
+> shutdown the per node batching interrupts when all CPUs of that node are
+> offlined and you'd avoid the whole affinity hint irq balancer hackery.
+
+One more clarification -
+
+I am using " for-4.19/block " and this particular patch "a0c9259
+irq/matrix: Spread interrupts on allocation" is included.
+I can see that 16 extra reply queues via pre_vectors are still assigned to
+CPU 0 (effective affinity ).
+
+irq 33, cpu list 0-71
+irq 34, cpu list 0-71
+irq 35, cpu list 0-71
+irq 36, cpu list 0-71
+irq 37, cpu list 0-71
+irq 38, cpu list 0-71
+irq 39, cpu list 0-71
+irq 40, cpu list 0-71
+irq 41, cpu list 0-71
+irq 42, cpu list 0-71
+irq 43, cpu list 0-71
+irq 44, cpu list 0-71
+irq 45, cpu list 0-71
+irq 46, cpu list 0-71
+irq 47, cpu list 0-71
+irq 48, cpu list 0-71
+
+
+# cat /sys/kernel/debug/irq/irqs/34
+handler:  handle_edge_irq
+device:   0000:86:00.0
+status:   0x00004000
+istate:   0x00000000
+ddepth:   0
+wdepth:   0
+dstate:   0x01608200
+            IRQD_ACTIVATED
+            IRQD_IRQ_STARTED
+            IRQD_SINGLE_TARGET
+            IRQD_MOVE_PCNTXT
+            IRQD_AFFINITY_MANAGED
+node:     0
+affinity: 0-71
+effectiv: 0
+pending:
+domain:  INTEL-IR-MSI-1-2
+ hwirq:   0x4300001
+ chip:    IR-PCI-MSI
+  flags:   0x10
+             IRQCHIP_SKIP_SET_WAKE
+ parent:
+    domain:  INTEL-IR-1
+     hwirq:   0x40000
+     chip:    INTEL-IR
+      flags:   0x0
+     parent:
+        domain:  VECTOR
+         hwirq:   0x22
+         chip:    APIC
+          flags:   0x0
+         Vector:    46
+         Target:     0
+         move_in_progress: 0
+         is_managed:       1
+         can_reserve:      0
+         has_reserved:     0
+         cleanup_pending:  0
+
+#cat /sys/kernel/debug/irq/irqs/35
+handler:  handle_edge_irq
+device:   0000:86:00.0
+status:   0x00004000
+istate:   0x00000000
+ddepth:   0
+wdepth:   0
+dstate:   0x01608200
+            IRQD_ACTIVATED
+            IRQD_IRQ_STARTED
+            IRQD_SINGLE_TARGET
+            IRQD_MOVE_PCNTXT
+            IRQD_AFFINITY_MANAGED
+node:     0
+affinity: 0-71
+effectiv: 0
+pending:
+domain:  INTEL-IR-MSI-1-2
+ hwirq:   0x4300002
+ chip:    IR-PCI-MSI
+  flags:   0x10
+             IRQCHIP_SKIP_SET_WAKE
+ parent:
+    domain:  INTEL-IR-1
+     hwirq:   0x50000
+     chip:    INTEL-IR
+      flags:   0x0
+     parent:
+        domain:  VECTOR
+         hwirq:   0x23
+         chip:    APIC
+          flags:   0x0
+         Vector:    47
+         Target:     0
+         move_in_progress: 0
+         is_managed:       1
+         can_reserve:      0
+         has_reserved:     0
+         cleanup_pending:  0
+
+Ideally, what we are looking for 16 extra pre_vector reply queue is
+"effective affinity" to be within local numa node as long as that numa
+node has online CPUs. If not, we are ok to have effective cpu from any
+node.
+
 >
 > Thanks,
-> Ming
+>
+> 	tglx
+>
+>
