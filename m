@@ -1,78 +1,33 @@
-Return-Path: <axboe@kernel.dk>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.19-rc6
-Message-ID: <7a9020a9-171b-3ef0-cb49-0c157ca9902b@kernel.dk>
-Date: Sat, 29 Sep 2018 15:12:25 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <BATV+97b555f176c451e34851+5490+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	linux-block@vger.kernel.org,
+	xen-devel@lists.xen.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 02/13] xen: remove the xen_biovec_phys_mergeable export
+Date: Tue,  4 Sep 2018 12:14:20 -0700
+Message-Id: <20180904191431.20102-3-hch@lst.de>
+In-Reply-To: <20180904191431.20102-1-hch@lst.de>
+References: <20180904191431.20102-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Greg,
+BIOVEC_PHYS_MERGEABLE is only called from core block code.
 
-A set of fixes that should go into this release. This pull request
-contains:
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/xen/biomerge.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-- A fix (hopefully) for the persistent grants for xen-blkfront. A
-  previous fix from this series wasn't complete, hence reverted, and
-  this one should hopefully be it. (Boris Ostrovsky)
-
-- Fix for an elevator drain warning with SMR devices, which is triggered
-  when you switch schedulers (Damien)
-
-- bcache deadlock fix (Guoju Fang)
-
-- Fix for the block unplug tracepoint, which has had the timer/explicit
-  flag reverted since 4.11 (Ilya)
-
-- Fix a regression in this series where the blk-mq timeout hook is
-  invoked with the RCU read lock held, hence preventing it from blocking
-  (Keith)
-
-- NVMe pull from Christoph, with a single multipath fix (Susobhan Dey)
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20180929
-
-
-----------------------------------------------------------------
-Boris Ostrovsky (1):
-      xen/blkfront: When purging persistent grants, keep them in the buffer
-
-Damien Le Moal (1):
-      block: fix deadline elevator drain for zoned block devices
-
-Guoju Fang (1):
-      bcache: add separate workqueue for journal_write to avoid deadlock
-
-Ilya Dryomov (1):
-      blk-mq: I/O and timer unplugs are inverted in blktrace
-
-Jens Axboe (2):
-      Revert "xen/blkfront: When purging persistent grants, keep them in the buffer"
-      Merge branch 'nvme-4.19' of git://git.infradead.org/nvme into for-linus
-
-Juergen Gross (1):
-      xen/blkfront: correct purging of persistent grants
-
-Keith Busch (1):
-      blk-mq: Allow blocking queue tag iter callbacks
-
-Susobhan Dey (1):
-      nvme: properly propagate errors in nvme_mpath_init
-
- block/blk-mq-tag.c            | 13 ++++---------
- block/blk-mq.c                |  4 ++--
- block/elevator.c              |  2 +-
- drivers/block/xen-blkfront.c  |  4 ++--
- drivers/md/bcache/bcache.h    |  1 +
- drivers/md/bcache/journal.c   |  6 +++---
- drivers/md/bcache/super.c     |  8 ++++++++
- drivers/nvme/host/multipath.c |  6 ++++--
- 8 files changed, 25 insertions(+), 19 deletions(-)
-
+diff --git a/drivers/xen/biomerge.c b/drivers/xen/biomerge.c
+index 55ed80c3a17c..399c4e30f723 100644
+--- a/drivers/xen/biomerge.c
++++ b/drivers/xen/biomerge.c
+@@ -20,4 +20,3 @@ bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
+ 	return false;
+ #endif
+ }
+-EXPORT_SYMBOL(xen_biovec_phys_mergeable);
 -- 
-Jens Axboe
+2.18.0
