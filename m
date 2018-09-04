@@ -1,95 +1,146 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Subject: [PATCH 5/5] blk-iolatency: keep track of previous windows stats
-Date: Fri, 28 Sep 2018 13:45:43 -0400
-Message-Id: <20180928174543.28486-6-josef@toxicpanda.com>
-In-Reply-To: <20180928174543.28486-1-josef@toxicpanda.com>
-References: <20180928174543.28486-1-josef@toxicpanda.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:34690 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727364AbeIDPV5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Sep 2018 11:21:57 -0400
+Received: by mail-lf1-f65.google.com with SMTP id c29-v6so2596205lfj.1
+        for <linux-block@vger.kernel.org>; Tue, 04 Sep 2018 03:57:20 -0700 (PDT)
+Subject: Re: [PATCH V2] lightnvm: pblk: add tracing for chunk resets
+To: hans.ml.holmberg@owltronix.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        javier@cnexlabs.com, hans.holmberg@cnexlabs.com
+References: <1536057487-17267-1-git-send-email-hans.ml.holmberg@owltronix.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <76c839e6-7a30-7365-1813-d1f2aa81f4c8@lightnvm.io>
+Date: Tue, 4 Sep 2018 12:57:18 +0200
+MIME-Version: 1.0
+In-Reply-To: <1536057487-17267-1-git-send-email-hans.ml.holmberg@owltronix.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We apply a smoothing to the scale changes in order to keep sawtoothy
-behavior from occurring.  However our window for checking if we've
-missed our target can sometimes be lower than the smoothing interval
-(500ms), especially on faster drives like ssd's.  In order to deal with
-this keep track of the running tally of the previous intervals that we
-threw away because we had already done a scale event recently.
+On 09/04/2018 12:38 PM, Hans Holmberg wrote:
+> From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+> 
+> Trace state of chunk resets.
+> 
+> Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+> Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+> 
+> ---
+> 
+> You already picked up the first version of this patch Matias,
+> but here's a V2 adressing the review comment from Javier that came
+> after that.
+> 
+> Changes in V2:
+> 	Moved the synchronous PBLK_CHUNK_RESET_START trace to
+> 	pblk_blk_erase_sync (as Javier suggested)
+> 
+>   drivers/lightnvm/pblk-core.c  | 12 ++++++++++++
+>   drivers/lightnvm/pblk-trace.h | 31 +++++++++++++++++++++++++++++++
+>   drivers/lightnvm/pblk.h       |  6 ++++++
+>   3 files changed, 49 insertions(+)
+> 
+> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+> index 73f117bc99a9..951f81a1b273 100644
+> --- a/drivers/lightnvm/pblk-core.c
+> +++ b/drivers/lightnvm/pblk-core.c
+> @@ -90,9 +90,15 @@ static void __pblk_end_io_erase(struct pblk *pblk, struct nvm_rq *rqd)
+>   	atomic_dec(&line->left_seblks);
+>   
+>   	if (rqd->error) {
+> +		trace_pblk_chunk_reset(pblk_disk_name(pblk),
+> +				&rqd->ppa_addr, PBLK_CHUNK_RESET_FAILED);
+> +
+>   		chunk->state = NVM_CHK_ST_OFFLINE;
+>   		pblk_mark_bb(pblk, line, rqd->ppa_addr);
+>   	} else {
+> +		trace_pblk_chunk_reset(pblk_disk_name(pblk),
+> +				&rqd->ppa_addr, PBLK_CHUNK_RESET_DONE);
+> +
+>   		chunk->state = NVM_CHK_ST_FREE;
+>   	}
+>   
+> @@ -923,6 +929,9 @@ static int pblk_blk_erase_sync(struct pblk *pblk, struct ppa_addr ppa)
+>   	struct nvm_rq rqd = {NULL};
+>   	int ret;
+>   
+> +	trace_pblk_chunk_reset(pblk_disk_name(pblk), &ppa,
+> +				PBLK_CHUNK_RESET_START);
+> +
+>   	pblk_setup_e_rq(pblk, &rqd, ppa);
+>   
+>   	/* The write thread schedules erases so that it minimizes disturbances
+> @@ -1736,6 +1745,9 @@ int pblk_blk_erase_async(struct pblk *pblk, struct ppa_addr ppa)
+>   	rqd->end_io = pblk_end_io_erase;
+>   	rqd->private = pblk;
+>   
+> +	trace_pblk_chunk_reset(pblk_disk_name(pblk),
+> +				&ppa, PBLK_CHUNK_RESET_START);
+> +
+>   	/* The write thread schedules erases so that it minimizes disturbances
+>   	 * with writes. Thus, there is no need to take the LUN semaphore.
+>   	 */
+> diff --git a/drivers/lightnvm/pblk-trace.h b/drivers/lightnvm/pblk-trace.h
+> index c171d0450c07..679e5c458ca6 100644
+> --- a/drivers/lightnvm/pblk-trace.h
+> +++ b/drivers/lightnvm/pblk-trace.h
+> @@ -31,6 +31,37 @@ struct ppa_addr;
+>   	{ PBLK_STATE_RECOVERING,	"RECOVERING",	},	\
+>   	{ PBLK_STATE_STOPPED,		"STOPPED"	})
+>   
+> +#define show_chunk_erase_state(state) __print_symbolic(state,	\
+> +	{ PBLK_CHUNK_RESET_START,	"START",	},	\
+> +	{ PBLK_CHUNK_RESET_DONE,	"OK",		},	\
+> +	{ PBLK_CHUNK_RESET_FAILED,	"FAILED"	})
+> +
+> +
+> +TRACE_EVENT(pblk_chunk_reset,
+> +
+> +	TP_PROTO(const char *name, struct ppa_addr *ppa, int state),
+> +
+> +	TP_ARGS(name, ppa, state),
+> +
+> +	TP_STRUCT__entry(
+> +		__string(name, name)
+> +		__field(u64, ppa)
+> +		__field(int, state);
+> +	),
+> +
+> +	TP_fast_assign(
+> +		__assign_str(name, name);
+> +		__entry->ppa = ppa->ppa;
+> +		__entry->state = state;
+> +	),
+> +
+> +	TP_printk("dev=%s grp=%llu pu=%llu chk=%llu state=%s", __get_str(name),
+> +			(u64)(((struct ppa_addr *)(&__entry->ppa))->m.grp),
+> +			(u64)(((struct ppa_addr *)(&__entry->ppa))->m.pu),
+> +			(u64)(((struct ppa_addr *)(&__entry->ppa))->m.chk),
+> +			show_chunk_erase_state((int)__entry->state))
+> +
+> +);
+>   
+>   TRACE_EVENT(pblk_chunk_state,
+>   
+> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+> index ae705fb52cf7..f0fcd963ab3a 100644
+> --- a/drivers/lightnvm/pblk.h
+> +++ b/drivers/lightnvm/pblk.h
+> @@ -79,6 +79,12 @@ enum {
+>   	PBLK_BLK_ST_CLOSED =	0x2,
+>   };
+>   
+> +enum {
+> +	PBLK_CHUNK_RESET_START,
+> +	PBLK_CHUNK_RESET_DONE,
+> +	PBLK_CHUNK_RESET_FAILED,
+> +};
+> +
+>   struct pblk_sec_meta {
+>   	u64 reserved;
+>   	__le64 lba;
+> 
 
-This is needed for the ssd case as these low latency drives will have
-bursts of latency, and if it happens to be ok for the window that
-directly follows the opening of the scale window we could unthrottle
-when previous windows we were missing our target.
-
-Signed-off-by: Josef Bacik <josef@toxicpanda.com>
----
- block/blk-iolatency.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
-
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index fd246805b0be..35c48d7b8f78 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -130,6 +130,7 @@ struct latency_stat {
- struct iolatency_grp {
- 	struct blkg_policy_data pd;
- 	struct latency_stat __percpu *stats;
-+	struct latency_stat cur_stat;
- 	struct blk_iolatency *blkiolat;
- 	struct rq_depth rq_depth;
- 	struct rq_wait rq_wait;
-@@ -570,24 +571,27 @@ static void iolatency_check_latencies(struct iolatency_grp *iolat, u64 now)
- 
- 	/* Somebody beat us to the punch, just bail. */
- 	spin_lock_irqsave(&lat_info->lock, flags);
-+
-+	latency_stat_sum(iolat, &iolat->cur_stat, &stat);
- 	lat_info->nr_samples -= iolat->nr_samples;
--	lat_info->nr_samples += latency_stat_samples(iolat, &stat);
--	iolat->nr_samples = latency_stat_samples(iolat, &stat);
-+	lat_info->nr_samples += latency_stat_samples(iolat, &iolat->cur_stat);
-+	iolat->nr_samples = latency_stat_samples(iolat, &iolat->cur_stat);
- 
- 	if ((lat_info->last_scale_event >= now ||
--	    now - lat_info->last_scale_event < BLKIOLATENCY_MIN_ADJUST_TIME) &&
--	    lat_info->scale_lat <= iolat->min_lat_nsec)
-+	    now - lat_info->last_scale_event < BLKIOLATENCY_MIN_ADJUST_TIME))
- 		goto out;
- 
--	if (latency_sum_ok(iolat, &stat)) {
--		if (latency_stat_samples(iolat, &stat) <
-+	if (latency_sum_ok(iolat, &iolat->cur_stat) &&
-+	    latency_sum_ok(iolat, &stat)) {
-+		if (latency_stat_samples(iolat, &iolat->cur_stat) <
- 		    BLKIOLATENCY_MIN_GOOD_SAMPLES)
- 			goto out;
- 		if (lat_info->scale_grp == iolat) {
- 			lat_info->last_scale_event = now;
- 			scale_cookie_change(iolat->blkiolat, lat_info, true);
- 		}
--	} else {
-+	} else if (lat_info->scale_lat == 0 ||
-+		   lat_info->scale_lat >= iolat->min_lat_nsec) {
- 		lat_info->last_scale_event = now;
- 		if (!lat_info->scale_grp ||
- 		    lat_info->scale_lat > iolat->min_lat_nsec) {
-@@ -596,6 +600,7 @@ static void iolatency_check_latencies(struct iolatency_grp *iolat, u64 now)
- 		}
- 		scale_cookie_change(iolat->blkiolat, lat_info, false);
- 	}
-+	latency_stat_init(iolat, &iolat->cur_stat);
- out:
- 	spin_unlock_irqrestore(&lat_info->lock, flags);
- }
-@@ -966,6 +971,7 @@ static void iolatency_pd_init(struct blkg_policy_data *pd)
- 		latency_stat_init(iolat, stat);
- 	}
- 
-+	latency_stat_init(iolat, &iolat->cur_stat);
- 	rq_wait_init(&iolat->rq_wait);
- 	spin_lock_init(&iolat->child_lat.lock);
- 	iolat->rq_depth.queue_depth = blkg->q->nr_requests;
--- 
-2.14.3
+Thanks. Applied for 4.20 (replaced the previous one)
