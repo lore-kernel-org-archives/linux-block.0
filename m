@@ -1,93 +1,151 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:37760 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728054AbeIDXlU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Sep 2018 19:41:20 -0400
+From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <keith.busch@intel.com>,
-	Bart van Assche <bart.vanassche@wdc.com>,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>,
-	Minchan Kim <minchan@kernel.org>,
-	Nitin Gupta <ngupta@vflare.org>
-Subject: [PATCH 4/5] zram: register default groups with device_add_disk()
-Date: Wed,  5 Sep 2018 09:00:52 +0200
-Message-Id: <20180905070053.26239-5-hare@suse.de>
-In-Reply-To: <20180905070053.26239-1-hare@suse.de>
-References: <20180905070053.26239-1-hare@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Cc: Ming Lei <ming.lei@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        linux-block@vger.kernel.org, xen-devel@lists.xen.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 13/13] xen: don't include <xen/xen.h> from <asm/io.h> and <asm/dma-mapping.h>
+Date: Tue,  4 Sep 2018 12:14:31 -0700
+Message-Id: <20180904191431.20102-14-hch@lst.de>
+In-Reply-To: <20180904191431.20102-1-hch@lst.de>
+References: <20180904191431.20102-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Register default sysfs groups during device_add_disk() to avoid a
-race condition with udev during startup.
+Nothing Xen specific in these headers, which get included from a lot
+of code in the kernel.  So prune the includes and move them to the
+Xen-specific files that actually use them instead.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-Cc: Minchan Kim <minchan@kernel.org>
-Cc: Nitin Gupta <ngupta@vflare.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/zram/zram_drv.c | 28 +++++++---------------------
- 1 file changed, 7 insertions(+), 21 deletions(-)
+ arch/arm/include/asm/io.h          | 1 -
+ arch/arm64/include/asm/io.h        | 2 --
+ arch/x86/include/asm/io.h          | 4 ----
+ arch/x86/include/asm/xen/events.h  | 2 ++
+ arch/x86/xen/enlighten.c           | 1 +
+ arch/x86/xen/enlighten_pvh.c       | 1 +
+ arch/x86/xen/platform-pci-unplug.c | 1 +
+ arch/x86/xen/pmu.c                 | 1 +
+ drivers/xen/xen-acpi-pad.c         | 1 +
+ 9 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index a1d6b5597c17..4879595200e1 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1636,6 +1636,11 @@ static const struct attribute_group zram_disk_attr_group = {
- 	.attrs = zram_disk_attrs,
- };
+diff --git a/arch/arm/include/asm/io.h b/arch/arm/include/asm/io.h
+index 6ae7674da0d6..6b51826ab3d1 100644
+--- a/arch/arm/include/asm/io.h
++++ b/arch/arm/include/asm/io.h
+@@ -28,7 +28,6 @@
+ #include <asm/byteorder.h>
+ #include <asm/memory.h>
+ #include <asm-generic/pci_iomap.h>
+-#include <xen/xen.h>
  
-+static const struct attribute_group *zram_disk_attr_groups[] = {
-+	&zram_disk_attr_group,
-+	NULL,
-+};
-+
  /*
-  * Allocate and initialize new zram device. the function returns
-  * '>= 0' device_id upon success, and negative value otherwise.
-@@ -1716,24 +1721,14 @@ static int zram_add(void)
+  * ISA I/O bus memory addresses are 1:1 with the physical address.
+diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
+index 18f6ae6a43f1..9f8b915af3a7 100644
+--- a/arch/arm64/include/asm/io.h
++++ b/arch/arm64/include/asm/io.h
+@@ -31,8 +31,6 @@
+ #include <asm/alternative.h>
+ #include <asm/cpufeature.h>
  
- 	zram->disk->queue->backing_dev_info->capabilities |=
- 			(BDI_CAP_STABLE_WRITES | BDI_CAP_SYNCHRONOUS_IO);
--	add_disk(zram->disk);
+-#include <xen/xen.h>
 -
--	ret = sysfs_create_group(&disk_to_dev(zram->disk)->kobj,
--				&zram_disk_attr_group);
--	if (ret < 0) {
--		pr_err("Error creating sysfs group for device %d\n",
--				device_id);
--		goto out_free_disk;
--	}
-+	device_add_disk(NULL, zram->disk, zram_disk_attr_groups);
+ /*
+  * Generic IO read/write.  These perform native-endian accesses.
+  */
+diff --git a/arch/x86/include/asm/io.h b/arch/x86/include/asm/io.h
+index 232d8e9ee8a0..9a92a3ac2ac5 100644
+--- a/arch/x86/include/asm/io.h
++++ b/arch/x86/include/asm/io.h
+@@ -369,10 +369,6 @@ extern void __iomem *ioremap_wt(resource_size_t offset, unsigned long size);
+ 
+ extern bool is_early_ioremap_ptep(pte_t *ptep);
+ 
+-#ifdef CONFIG_XEN
+-#include <xen/xen.h>
+-#endif	/* CONFIG_XEN */
+-
+ #define IO_SPACE_LIMIT 0xffff
+ 
+ #include <asm-generic/io.h>
+diff --git a/arch/x86/include/asm/xen/events.h b/arch/x86/include/asm/xen/events.h
+index d383140e1dc8..068d9b067c83 100644
+--- a/arch/x86/include/asm/xen/events.h
++++ b/arch/x86/include/asm/xen/events.h
+@@ -2,6 +2,8 @@
+ #ifndef _ASM_X86_XEN_EVENTS_H
+ #define _ASM_X86_XEN_EVENTS_H
+ 
++#include <xen/xen.h>
 +
- 	strlcpy(zram->compressor, default_compressor, sizeof(zram->compressor));
+ enum ipi_vector {
+ 	XEN_RESCHEDULE_VECTOR,
+ 	XEN_CALL_FUNCTION_VECTOR,
+diff --git a/arch/x86/xen/enlighten.c b/arch/x86/xen/enlighten.c
+index 2eeddd814653..0ca46e03b830 100644
+--- a/arch/x86/xen/enlighten.c
++++ b/arch/x86/xen/enlighten.c
+@@ -5,6 +5,7 @@
+ #include <linux/kexec.h>
+ #include <linux/slab.h>
  
- 	zram_debugfs_register(zram);
- 	pr_info("Added device: %s\n", zram->disk->disk_name);
- 	return device_id;
++#include <xen/xen.h>
+ #include <xen/features.h>
+ #include <xen/page.h>
+ #include <xen/interface/memory.h>
+diff --git a/arch/x86/xen/enlighten_pvh.c b/arch/x86/xen/enlighten_pvh.c
+index c85d1a88f476..2a9025343534 100644
+--- a/arch/x86/xen/enlighten_pvh.c
++++ b/arch/x86/xen/enlighten_pvh.c
+@@ -11,6 +11,7 @@
+ #include <asm/xen/interface.h>
+ #include <asm/xen/hypercall.h>
  
--out_free_disk:
--	del_gendisk(zram->disk);
--	put_disk(zram->disk);
- out_free_queue:
- 	blk_cleanup_queue(queue);
- out_free_idr:
-@@ -1762,15 +1757,6 @@ static int zram_remove(struct zram *zram)
- 	mutex_unlock(&bdev->bd_mutex);
++#include <xen/xen.h>
+ #include <xen/interface/memory.h>
+ #include <xen/interface/hvm/start_info.h>
  
- 	zram_debugfs_unregister(zram);
--	/*
--	 * Remove sysfs first, so no one will perform a disksize
--	 * store while we destroy the devices. This also helps during
--	 * hot_remove -- zram_reset_device() is the last holder of
--	 * ->init_lock, no later/concurrent disksize_store() or any
--	 * other sysfs handlers are possible.
--	 */
--	sysfs_remove_group(&disk_to_dev(zram->disk)->kobj,
--			&zram_disk_attr_group);
+diff --git a/arch/x86/xen/platform-pci-unplug.c b/arch/x86/xen/platform-pci-unplug.c
+index 33a783c77d96..b99585034dd2 100644
+--- a/arch/x86/xen/platform-pci-unplug.c
++++ b/arch/x86/xen/platform-pci-unplug.c
+@@ -23,6 +23,7 @@
+ #include <linux/io.h>
+ #include <linux/export.h>
  
- 	/* Make sure all the pending I/O are finished */
- 	fsync_bdev(bdev);
++#include <xen/xen.h>
+ #include <xen/platform_pci.h>
+ #include "xen-ops.h"
+ 
+diff --git a/arch/x86/xen/pmu.c b/arch/x86/xen/pmu.c
+index 7d00d4ad44d4..5f7d530fc679 100644
+--- a/arch/x86/xen/pmu.c
++++ b/arch/x86/xen/pmu.c
+@@ -3,6 +3,7 @@
+ #include <linux/interrupt.h>
+ 
+ #include <asm/xen/hypercall.h>
++#include <xen/xen.h>
+ #include <xen/page.h>
+ #include <xen/interface/xen.h>
+ #include <xen/interface/vcpu.h>
+diff --git a/drivers/xen/xen-acpi-pad.c b/drivers/xen/xen-acpi-pad.c
+index 23d1808fe027..e25ab76b9c99 100644
+--- a/drivers/xen/xen-acpi-pad.c
++++ b/drivers/xen/xen-acpi-pad.c
+@@ -19,6 +19,7 @@
+ #include <linux/kernel.h>
+ #include <linux/types.h>
+ #include <linux/acpi.h>
++#include <xen/xen.h>
+ #include <xen/interface/version.h>
+ #include <xen/xen-ops.h>
+ #include <asm/xen/hypercall.h>
 -- 
-2.16.4
+2.18.0
