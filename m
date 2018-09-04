@@ -1,42 +1,56 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:56595 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725973AbeIAMfN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 1 Sep 2018 08:35:13 -0400
-Date: Sat, 1 Sep 2018 10:27:03 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Logan Gunthorpe <logang@deltatee.com>
-Cc: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v5 01/13] PCI/P2PDMA: Support peer-to-peer memory
-Message-ID: <20180901082703.GA670@lst.de>
-References: <20180830185352.3369-1-logang@deltatee.com> <20180830185352.3369-2-logang@deltatee.com> <2711b3a7-f582-0dda-8ac2-530be7bda1bb@amd.com> <439181bb-6cd6-0ab2-bca6-fc820845166e@deltatee.com>
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:34258 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726281AbeIDOe2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Sep 2018 10:34:28 -0400
+Received: by mail-lf1-f65.google.com with SMTP id c29-v6so2494722lfj.1
+        for <linux-block@vger.kernel.org>; Tue, 04 Sep 2018 03:10:02 -0700 (PDT)
+Subject: Re: [PATCH 2/4] lightnvm: assign block address before slba
+To: javier@javigon.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        javier@cnexlabs.com
+References: <1535722477-31288-1-git-send-email-javier@cnexlabs.com>
+ <1535722477-31288-3-git-send-email-javier@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <daf2443d-8d31-359e-02e7-f553eeca7b73@lightnvm.io>
+Date: Tue, 4 Sep 2018 12:09:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <439181bb-6cd6-0ab2-bca6-fc820845166e@deltatee.com>
+In-Reply-To: <1535722477-31288-3-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Aug 31, 2018 at 09:48:40AM -0600, Logan Gunthorpe wrote:
-> Pretty easy. P2P detection is pretty much just pci_p2pdma_distance() ,
-> which has nothing to do with the ZONE_DEVICE support.
+On 08/31/2018 03:34 PM, Javier González wrote:
+> In 1.2, the chunk slba is set to the physical representation of the
+> block. Thus, assigning the block to the ppa must occur before the slba
+> is assign.
 > 
-> (And the distance function makes use of a number of static functions
-> which could be combined into a simpler interface, should we need it.)
+> Signed-off-by: Javier González <javier@cnexlabs.com>
+> ---
+>   drivers/lightnvm/core.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+> index e9f14c67f4f3..efb976a863d2 100644
+> --- a/drivers/lightnvm/core.c
+> +++ b/drivers/lightnvm/core.c
+> @@ -945,6 +945,8 @@ static int nvm_bb_to_chunk(struct nvm_dev *dev, struct ppa_addr ppa,
+>   			}
+>   		}
+>   
+> +		ppa.g.blk = blk;
+> +
+>   		meta->wp = 0;
+>   		meta->type = NVM_CHK_TP_W_SEQ;
+>   		meta->wi = 0;
+> @@ -952,7 +954,6 @@ static int nvm_bb_to_chunk(struct nvm_dev *dev, struct ppa_addr ppa,
+>   		meta->cnlb = dev->geo.clba;
+>   
+>   		if (blktype == NVM_BLK_T_FREE) {
+> -			ppa.a.blk = blk;
+>   			ret = nvm_bb_chunk_scan(dev, ppa, meta);
+>   			if (ret)
+>   				return ret;
+> 
 
-I'd ѕay lets get things merged as-is, so that we can review the
-non-ZONE_DEVICE users.  I'm a little curious how that is going to work,
-so having it as a full series would be useful.
+Thanks. I've folded 1 & 2 into the bb patch.
