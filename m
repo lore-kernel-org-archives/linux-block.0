@@ -1,63 +1,85 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:34727 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725987AbeIGPI5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Sep 2018 11:08:57 -0400
-Received: by mail-pg1-f194.google.com with SMTP id d19-v6so6813081pgv.1
-        for <linux-block@vger.kernel.org>; Fri, 07 Sep 2018 03:28:39 -0700 (PDT)
-Subject: Re: [PATCH 2/3] lightnvm: do no update csecs and sos on 1.2
-To: javier@javigon.com
-Cc: igor.j.konopko@intel.com, marcin.dziegielewski@intel.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        javier@cnexlabs.com
-References: <1535537370-10729-1-git-send-email-javier@cnexlabs.com>
- <1535537370-10729-3-git-send-email-javier@cnexlabs.com>
-From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <4ac29eb8-65bf-f733-d196-80c5bb41876c@lightnvm.io>
-Date: Fri, 7 Sep 2018 12:28:33 +0200
-MIME-Version: 1.0
-In-Reply-To: <1535537370-10729-3-git-send-email-javier@cnexlabs.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+97b555f176c451e34851+5490+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	linux-block@vger.kernel.org,
+	xen-devel@lists.xen.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 03/13] xen: provide a prototype for xen_biovec_phys_mergeable in xen.h
+Date: Tue,  4 Sep 2018 12:14:21 -0700
+Message-Id: <20180904191431.20102-4-hch@lst.de>
+In-Reply-To: <20180904191431.20102-1-hch@lst.de>
+References: <20180904191431.20102-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-On 08/29/2018 12:09 PM, Javier González wrote:
-> In the OCSSD 2.0 spec., the sector and metadata sizes are reported though
-> the standard nvme identify command. Thus, the lightnvm subsystem needs
-> to update this information on the geometry structure on bootup.
-> 
-> Since 1.2 devices report these values on the OCSSD geometry identify,
-> avoid this update is it is unnecessary and can also corrupt the geometry
-> if the devices does not report the nvme sizes correctly (which is not
-> required by the OCSSD 1.2 spec either) >
-> Signed-off-by: Javier González <javier@cnexlabs.com>
-> ---
->   drivers/nvme/host/lightnvm.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-> index 5bfa354c5dd5..33ed09f8410e 100644
-> --- a/drivers/nvme/host/lightnvm.c
-> +++ b/drivers/nvme/host/lightnvm.c
-> @@ -980,6 +980,9 @@ void nvme_nvm_update_nvm_info(struct nvme_ns *ns)
->   	struct nvm_dev *ndev = ns->ndev;
->   	struct nvm_geo *geo = &ndev->geo;
->   
-> +	if (geo->version == NVM_OCSSD_SPEC_12)
-> +		return;
+Having multiple externs in arch headers is not a good way to provide
+a common interface.
 
-The lba format sizes are not explicit in 2.0 either. For a conforming 
-drive, it should implement the NVM Command Set and expose the LBA format 
-correctly. Although, I do get your incentive, and if it is okay with 
-you, I'll reword the commit message to this and apply it?:
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ arch/arm/include/asm/io.h   | 3 ---
+ arch/arm64/include/asm/io.h | 3 ---
+ arch/x86/include/asm/io.h   | 5 -----
+ include/xen/xen.h           | 4 ++++
+ 4 files changed, 4 insertions(+), 11 deletions(-)
 
-"1.2 devices exposes their data and metadata size through the separate
-identify command. Make sure that the NVMe LBA format does not override
-these values."
-
-
-> +
->   	geo->csecs = 1 << ns->lba_shift;
->   	geo->sos = ns->ms;
->   }
-> 
+diff --git a/arch/arm/include/asm/io.h b/arch/arm/include/asm/io.h
+index 6774553dc214..9855a4d48956 100644
+--- a/arch/arm/include/asm/io.h
++++ b/arch/arm/include/asm/io.h
+@@ -459,9 +459,6 @@ extern void pci_iounmap(struct pci_dev *dev, void __iomem *addr);
+ 
+ #include <asm-generic/io.h>
+ 
+-struct bio_vec;
+-extern bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
+-				      const struct bio_vec *vec2);
+ #define BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
+ 	(__BIOVEC_PHYS_MERGEABLE(vec1, vec2) &&				\
+ 	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2)))
+diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
+index 35b2e50f17fb..9bc620c44d32 100644
+--- a/arch/arm64/include/asm/io.h
++++ b/arch/arm64/include/asm/io.h
+@@ -205,9 +205,6 @@ extern int valid_mmap_phys_addr_range(unsigned long pfn, size_t size);
+ 
+ extern int devmem_is_allowed(unsigned long pfn);
+ 
+-struct bio_vec;
+-extern bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
+-				      const struct bio_vec *vec2);
+ #define BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
+ 	(__BIOVEC_PHYS_MERGEABLE(vec1, vec2) &&				\
+ 	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2)))
+diff --git a/arch/x86/include/asm/io.h b/arch/x86/include/asm/io.h
+index 6de64840dd22..193dae6d9c45 100644
+--- a/arch/x86/include/asm/io.h
++++ b/arch/x86/include/asm/io.h
+@@ -371,11 +371,6 @@ extern bool is_early_ioremap_ptep(pte_t *ptep);
+ 
+ #ifdef CONFIG_XEN
+ #include <xen/xen.h>
+-struct bio_vec;
+-
+-extern bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
+-				      const struct bio_vec *vec2);
+-
+ #define BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
+ 	(__BIOVEC_PHYS_MERGEABLE(vec1, vec2) &&				\
+ 	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2)))
+diff --git a/include/xen/xen.h b/include/xen/xen.h
+index 1e1d9bd0bd37..d7a2678da77f 100644
+--- a/include/xen/xen.h
++++ b/include/xen/xen.h
+@@ -39,4 +39,8 @@ extern uint32_t xen_start_flags;
+ #define xen_initial_domain()	(0)
+ #endif	/* CONFIG_XEN_DOM0 */
+ 
++struct bio_vec;
++bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
++		const struct bio_vec *vec2);
++
+ #endif	/* _XEN_XEN_H */
+-- 
+2.18.0
