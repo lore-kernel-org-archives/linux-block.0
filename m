@@ -1,42 +1,39 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from szxga06-in.huawei.com ([45.249.212.32]:44161 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726343AbeIZL6a (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Sep 2018 07:58:30 -0400
-From: Wei Yongjun <weiyongjun1@huawei.com>
-To: Matias Bjorling <mb@lightnvm.io>,
-        Javier Gonzlez <javier@javigon.com>
-CC: Wei Yongjun <weiyongjun1@huawei.com>,
-        <linux-block@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
-Subject: [PATCH -next] lightnvm: pblk: fix error handling of pblk_lines_init()
-Date: Wed, 26 Sep 2018 05:56:24 +0000
-Message-ID: <1537941384-25324-1-git-send-email-weiyongjun1@huawei.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+97b555f176c451e34851+5490+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	linux-block@vger.kernel.org,
+	xen-devel@lists.xen.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 11/13] block: don't include io.h from bio.h
+Date: Tue,  4 Sep 2018 12:14:29 -0700
+Message-Id: <20180904191431.20102-12-hch@lst.de>
+In-Reply-To: <20180904191431.20102-1-hch@lst.de>
+References: <20180904191431.20102-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-In the too many bad blocks error handling case, we should release all
-the alloced resources instead direct return, otherwise it will cause
-memory leak.
+Now that we don't need an override for BIOVEC_PHYS_MERGEABLE there is
+no need to drag this header in.
 
-Fixes: 2deeefc02dff ("lightnvm: pblk: fail gracefully on line alloc. failure")
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/lightnvm/pblk-init.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ include/linux/bio.h | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 537e98f..a26f4e6 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -1083,7 +1083,8 @@ static int pblk_lines_init(struct pblk *pblk)
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index fcb5f5618ed4..3af2fea686a9 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -24,9 +24,6 @@
+ #include <linux/bug.h>
  
- 	if (!nr_free_chks) {
- 		pblk_err(pblk, "too many bad blocks prevent for sane instance\n");
--		return -EINTR;
-+		ret = -EINTR;
-+		goto fail_free_lines;
- 	}
+ #ifdef CONFIG_BLOCK
+-
+-#include <asm/io.h>
+-
+ /* struct bio, bio_vec and BIO_* flags are defined in blk_types.h */
+ #include <linux/blk_types.h>
  
- 	pblk_set_provision(pblk, nr_free_chks);
+-- 
+2.18.0
