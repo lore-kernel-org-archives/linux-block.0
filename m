@@ -1,54 +1,72 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:46082 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726315AbeIZSss (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Sep 2018 14:48:48 -0400
-Received: by mail-wr1-f67.google.com with SMTP id z3-v6so15010377wrr.13
-        for <linux-block@vger.kernel.org>; Wed, 26 Sep 2018 05:35:59 -0700 (PDT)
-From: Ilya Dryomov <idryomov@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, Bart Van Assche <bvanassche@acm.org>,
-        Omar Sandoval <osandov@fb.com>
-Subject: [PATCH] blk-mq: I/O and timer unplugs are inverted in blktrace
-Date: Wed, 26 Sep 2018 14:35:50 +0200
-Message-Id: <20180926123550.16311-1-idryomov@gmail.com>
+Received: from mail-ua1-f65.google.com ([209.85.222.65]:44745 "EHLO
+        mail-ua1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726339AbeIDPEa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Sep 2018 11:04:30 -0400
+Received: by mail-ua1-f65.google.com with SMTP id m11-v6so2441297uao.11
+        for <linux-block@vger.kernel.org>; Tue, 04 Sep 2018 03:39:58 -0700 (PDT)
+MIME-Version: 1.0
+References: <1535545877-770-1-git-send-email-hans.ml.holmberg@owltronix.com>
+ <1535545877-770-5-git-send-email-hans.ml.holmberg@owltronix.com> <AE72A23A-F779-466B-89A7-846A232DD9B2@cnexlabs.com>
+In-Reply-To: <AE72A23A-F779-466B-89A7-846A232DD9B2@cnexlabs.com>
+From: Hans Holmberg <hans@owltronix.com>
+Date: Tue, 4 Sep 2018 12:39:46 +0200
+Message-ID: <CANr-nt3kvXVMSeaEZf3hZo2tR31G+h1B9X300Ew+Ys5QiK02QQ@mail.gmail.com>
+Subject: Re: [PATCH 4/4] lightnvm: pblk: add tracing for chunk resets
+To: Javier Gonzalez <javier@cnexlabs.com>
+Cc: Matias Bjorling <mb@lightnvm.io>, linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-trace_block_unplug() takes true for explicit unplugs and false for
-implicit unplugs.  schedule() unplugs are implicit and should be
-reported as timer unplugs.  While correct in the legacy code, this has
-been inverted in blk-mq since 4.11.
+On Wed, Aug 29, 2018 at 10:09 PM Javier Gonzalez <javier@cnexlabs.com> wrote:
+>
+> > On 29 Aug 2018, at 14.31, Hans Holmberg <hans.ml.holmberg@owltronix.com> wrote:
+> >
+> > From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+> >
+> > Trace state of chunk resets.
+> >
+> > Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+> > ---
+> > drivers/lightnvm/pblk-core.c  | 12 ++++++++++++
+> > drivers/lightnvm/pblk-trace.h | 31 +++++++++++++++++++++++++++++++
+> > drivers/lightnvm/pblk.h       |  6 ++++++
+> > 3 files changed, 49 insertions(+)
+> >
+> > diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+> > index 566a5d3165ee..b874001d1175 100644
+> > --- a/drivers/lightnvm/pblk-core.c
+> > +++ b/drivers/lightnvm/pblk-core.c
+> > @@ -90,9 +90,15 @@ static void __pblk_end_io_erase(struct pblk *pblk, struct nvm_rq *rqd)
+> >       atomic_dec(&line->left_seblks);
+> >
+> >       if (rqd->error) {
+> > +             trace_pblk_chunk_reset(pblk_disk_name(pblk),
+> > +                             &rqd->ppa_addr, PBLK_CHUNK_RESET_FAILED);
+> > +
+> >               chunk->state = NVM_CHK_ST_OFFLINE;
+> >               pblk_mark_bb(pblk, line, rqd->ppa_addr);
+> >       } else {
+> > +             trace_pblk_chunk_reset(pblk_disk_name(pblk),
+> > +                             &rqd->ppa_addr, PBLK_CHUNK_RESET_DONE);
+> > +
+> >               chunk->state = NVM_CHK_ST_FREE;
+> >       }
+> >
+> > @@ -958,6 +964,9 @@ int pblk_line_erase(struct pblk *pblk, struct pblk_line *line)
+> >               WARN_ON(test_and_set_bit(bit, line->erase_bitmap));
+> >               spin_unlock(&line->lock);
+> >
+> > +             trace_pblk_chunk_reset(pblk_disk_name(pblk),
+> > +                             &ppa, PBLK_CHUNK_RESET_START);
+> > +
+>
+> Can you move this inside of pblk_blk_erase_sync() instead? I was looking
+> at the code now to implement a different thing and it is confusing to
+> see tracing inside erase_async and not in erase_sync.
+>
 
-Cc: stable@vger.kernel.org
-Fixes: bd166ef183c2 ("blk-mq-sched: add framework for MQ capable IO schedulers")
-Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
----
- block/blk-mq.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 85a1c1a59c72..e3c39ea8e17b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1628,7 +1628,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- 		BUG_ON(!rq->q);
- 		if (rq->mq_ctx != this_ctx) {
- 			if (this_ctx) {
--				trace_block_unplug(this_q, depth, from_schedule);
-+				trace_block_unplug(this_q, depth, !from_schedule);
- 				blk_mq_sched_insert_requests(this_q, this_ctx,
- 								&ctx_list,
- 								from_schedule);
-@@ -1648,7 +1648,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- 	 * on 'ctx_list'. Do those.
- 	 */
- 	if (this_ctx) {
--		trace_block_unplug(this_q, depth, from_schedule);
-+		trace_block_unplug(this_q, depth, !from_schedule);
- 		blk_mq_sched_insert_requests(this_q, this_ctx, &ctx_list,
- 						from_schedule);
- 	}
--- 
-2.14.4
+Fixed in a V2. Thanks.
