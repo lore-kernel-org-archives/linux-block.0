@@ -1,175 +1,170 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from m12-14.163.com ([220.181.12.14]:55469 "EHLO m12-14.163.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726189AbeIEKPX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Sep 2018 06:15:23 -0400
-Subject: Re: Affinity managed interrupts vs non-managed interrupts
-To: Kashyap Desai <kashyap.desai@broadcom.com>,
-        Thomas Gleixner <tglx@linutronix.de>
+Received: from mail-it0-f53.google.com ([209.85.214.53]:37827 "EHLO
+        mail-it0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727216AbeIDOyG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Sep 2018 10:54:06 -0400
+Received: by mail-it0-f53.google.com with SMTP id h20-v6so4135064itf.2
+        for <linux-block@vger.kernel.org>; Tue, 04 Sep 2018 03:29:36 -0700 (PDT)
+From: Kashyap Desai <kashyap.desai@broadcom.com>
+References: <eccc46e12890a1d033d9003837012502@mail.gmail.com>
+ <20180829084618.GA24765@ming.t460p> <300d6fef733ca76ced581f8c6304bac6@mail.gmail.com>
+ <CACVXFVM7nGxpyq0_jfshgBOTx5B+PuCDmN43SfPTCkENJRLpMg@mail.gmail.com>
+ <615d78004495aebc53807156d04d988c@mail.gmail.com> <alpine.DEB.2.21.1808312207390.1349@nanos.tec.linutronix.de>
+ <486f94a563d63c4779498fe8829a546c@mail.gmail.com> <alpine.DEB.2.21.1809010020520.1349@nanos.tec.linutronix.de>
+ <602cee6381b9f435a938bbaf852d07f9@mail.gmail.com> <alpine.DEB.2.21.1809021357000.1349@nanos.tec.linutronix.de>
+ <66256272c020be186becdd7a3f049302@mail.gmail.com> <alpine.DEB.2.21.1809031719460.1383@nanos.tec.linutronix.de>
+In-Reply-To: <alpine.DEB.2.21.1809031719460.1383@nanos.tec.linutronix.de>
+MIME-Version: 1.0
+Date: Tue, 4 Sep 2018 15:59:34 +0530
+Message-ID: <dd1c5df55aa99cf4a37bcc58e77e840a@mail.gmail.com>
+Subject: RE: Affinity managed interrupts vs non-managed interrupts
+To: Thomas Gleixner <tglx@linutronix.de>
 Cc: Ming Lei <tom.leiming@gmail.com>,
         Sumit Saxena <sumit.saxena@broadcom.com>,
         Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Shivasharan Srikanteshwara
         <shivasharan.srikanteshwara@broadcom.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Dou Liyang <douly.fnst@cn.fujitsu.com>
-References: <eccc46e12890a1d033d9003837012502@mail.gmail.com>
- <20180829084618.GA24765@ming.t460p>
- <300d6fef733ca76ced581f8c6304bac6@mail.gmail.com>
- <CACVXFVM7nGxpyq0_jfshgBOTx5B+PuCDmN43SfPTCkENJRLpMg@mail.gmail.com>
- <615d78004495aebc53807156d04d988c@mail.gmail.com>
- <alpine.DEB.2.21.1808312207390.1349@nanos.tec.linutronix.de>
- <486f94a563d63c4779498fe8829a546c@mail.gmail.com>
- <alpine.DEB.2.21.1809010020520.1349@nanos.tec.linutronix.de>
- <602cee6381b9f435a938bbaf852d07f9@mail.gmail.com>
- <alpine.DEB.2.21.1809021357000.1349@nanos.tec.linutronix.de>
- <66256272c020be186becdd7a3f049302@mail.gmail.com>
- <alpine.DEB.2.21.1809031719460.1383@nanos.tec.linutronix.de>
- <dd1c5df55aa99cf4a37bcc58e77e840a@mail.gmail.com>
-From: Dou Liyang <dou_liyang@163.com>
-Message-ID: <f436fa6a-b865-fadb-4f77-44309ff84405@163.com>
-Date: Wed, 5 Sep 2018 13:46:16 +0800
-MIME-Version: 1.0
-In-Reply-To: <dd1c5df55aa99cf4a37bcc58e77e840a@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Thomas, Kashyap,
+>
+> On Mon, 3 Sep 2018, Kashyap Desai wrote:
+> > I am using " for-4.19/block " and this particular patch "a0c9259
+> > irq/matrix: Spread interrupts on allocation" is included.
+>
+> Can you please try against 4.19-rc2 or later?
+>
+> > I can see that 16 extra reply queues via pre_vectors are still
+assigned to
+> > CPU 0 (effective affinity ).
+> >
+> > irq 33, cpu list 0-71
+>
+> The cpu list is irrelevant because that's the allowed affinity mask. The
+> effective one is what counts.
+>
+> > # cat /sys/kernel/debug/irq/irqs/34
+> > node:     0
+> > affinity: 0-71
+> > effectiv: 0
+>
+> So if all 16 have their effective affinity set to CPU0 then that's
+strange
+> at least.
+>
+> Can you please provide the output of
+> /sys/kernel/debug/irq/domains/VECTOR ?
 
-At 09/04/2018 06:29 PM, Kashyap Desai wrote:
->>> I am using " for-4.19/block " and this particular patch "a0c9259
->>> irq/matrix: Spread interrupts on allocation" is included.
->>
+I tried 4.19-rc2. Same behavior as I posted earlier. All 16 pre_vector irq
+has effective CPU = 0.
 
-IMO, this patch is just used for non-managed interrupts.
+Here is output of "/sys/kernel/debug/irq/domains/VECTOR"
 
->> So if all 16 have their effective affinity set to CPU0 then that's
-> strange
+# cat /sys/kernel/debug/irq/domains/VECTOR
+name:   VECTOR
+ size:   0
+ mapped: 360
+ flags:  0x00000041
+Online bitmaps:       72
+Global available:  13062
+Global reserved:      86
+Total allocated:     274
+System: 43: 0-19,32,50,128,236-255
+ | CPU | avl | man | act | vectors
+     0   169    17    32  33-49,51-65
+     1   181    17     4  33,36,52-53
+     2   181    17     4  33-36
+     3   181    17     4  33-34,52-53
+     4   181    17     4  33,35,53-54
+     5   181    17     4  33,35-36,54
+     6   182    17     3  33,35-36
+     7   182    17     3  33-34,36
+     8   182    17     3  34-35,53
+     9   181    17     4  33-34,52-53
+    10   182    17     3  34,36,53
+    11   182    17     3  34-35,54
+    12   182    17     3  33-34,53
+    13   182    17     3  33,37,55
+    14   181    17     4  33-36
+    15   181    17     4  33,35-36,54
+    16   181    17     4  33,35,53-54
+    17   182    17     3  33,36-37
+    18   181    17     4  33,36,54-55
+    19   181    17     4  33,35-36,54
+    20   181    17     4  33,35-37
+    21   180    17     5  33,35,37,55-56
+    22   181    17     4  33-36
+    23   181    17     4  33,35,37,55
+    24   180    17     5  33-36,54
+    25   181    17     4  33-36
+    26   181    17     4  33-35,54
+    27   181    17     4  34-36,54
+    28   181    17     4  33-35,53
+    29   182    17     3  34-35,53
+    30   182    17     3  33-35
+    31   181    17     4  34-36,54
+    32   182    17     3  33-34,53
+    33   182    17     3  34-35,53
+    34   182    17     3  33-34,53
+    35   182    17     3  34-36
+    36   182    17     3  33-34,53
+    37   181    17     4  33,35,52-53
+    38   182    17     3  34-35,53
+    39   182    17     3  34,52-53
+    40   182    17     3  33-35
+    41   182    17     3  34-35,53
+    42   182    17     3  33-35
+    43   182    17     3  34,52-53
+    44   182    17     3  33-34,53
+    45   182    17     3  34-35,53
+    46   182    17     3  34,36,54
+    47   182    17     3  33-34,52
+    48   182    17     3  34,36,54
+    49   182    17     3  33,51-52
+    50   181    17     4  33-36
+    51   182    17     3  33-35
+    52   182    17     3  33-35
+    53   182    17     3  34-35,53
+    54   182    17     3  33-34,53
+    55   182    17     3  34-36
+    56   181    17     4  33-35,53
+    57   182    17     3  34-36
+    58   182    17     3  33-34,53
+    59   181    17     4  33-35,53
+    60   181    17     4  33-35,53
+    61   182    17     3  33-34,53
+    62   182    17     3  33-35
+    63   182    17     3  34-36
+    64   182    17     3  33-34,54
+    65   181    17     4  33-35,53
+    66   182    17     3  33-34,54
+    67   182    17     3  34-36
+    68   182    17     3  33-34,54
+    69   182    17     3  34,36,54
+    70   182    17     3  33-35
+    71   182    17     3  34,36,54
 
-But, all these 16 are managed interrupts, and will be assigned vectors
-by assign_managed_vector():
-{
-     cpumask_and(vector_searchmask, vector_searchmask, affmsk);
-     cpu = cpumask_first(vector_searchmask);
+>
+> > Ideally, what we are looking for 16 extra pre_vector reply queue is
+> > "effective affinity" to be within local numa node as long as that numa
+> > node has online CPUs. If not, we are ok to have effective cpu from any
+> > node.
+>
+> Well, we surely can do the initial allocation and spreading on the local
+> numa node, but once all CPUs are offline on that node, then the whole
+thing
+> goes down the drain and allocates from where it sees fit. I'll think
+about
+> it some more, especially how to avoid the proliferation of the affinity
+> hint.
 
-     ...
-     vector = irq_matrix_alloc_managed(vector_matrix, cpu);
-     ...
-}
+Thanks for looking this request. This will help us to implement WIP
+megaraid_sas driver changes.  I can test any patch you want me to try.
 
-Where we always used the *first* cpu in the vector_searchmask(0-71), not
-the suitable one. So I guess this situation happened.
-
-Shall we also spread the managed interrupts on allocation?
-
-Thanks,
-     dou
------------------8<----------------------------------------
-
-diff --git a/arch/x86/kernel/apic/vector.c b/arch/x86/kernel/apic/vector.c
-diff --git a/arch/x86/kernel/apic/vector.c b/arch/x86/kernel/apic/vector.c
-index 9f148e3d45b4..57dc05691f44 100644
---- a/arch/x86/kernel/apic/vector.c
-+++ b/arch/x86/kernel/apic/vector.c
-@@ -314,13 +314,12 @@ assign_managed_vector(struct irq_data *irqd, const 
-struct cpumask *dest)
-         int vector, cpu;
-
-         cpumask_and(vector_searchmask, vector_searchmask, affmsk);
--       cpu = cpumask_first(vector_searchmask);
--       if (cpu >= nr_cpu_ids)
--               return -EINVAL;
-+
-         /* set_affinity might call here for nothing */
-         if (apicd->vector && cpumask_test_cpu(apicd->cpu, 
-vector_searchmask))
-                 return 0;
--       vector = irq_matrix_alloc_managed(vector_matrix, cpu);
-+
-+       vector = irq_matrix_alloc_managed(vector_matrix, 
-vector_searchmask, &cpu);
-         trace_vector_alloc_managed(irqd->irq, vector, vector);
-         if (vector < 0)
-                 return vector;
-diff --git a/include/linux/irq.h b/include/linux/irq.h
-index 201de12a9957..36fdeff5043a 100644
---- a/include/linux/irq.h
-+++ b/include/linux/irq.h
-@@ -1151,7 +1151,8 @@ void irq_matrix_offline(struct irq_matrix *m);
-  void irq_matrix_assign_system(struct irq_matrix *m, unsigned int bit, 
-bool replace);
-  int irq_matrix_reserve_managed(struct irq_matrix *m, const struct 
-cpumask *msk);
-  void irq_matrix_remove_managed(struct irq_matrix *m, const struct 
-cpumask *msk);
--int irq_matrix_alloc_managed(struct irq_matrix *m, unsigned int cpu);
-+int irq_matrix_alloc_managed(struct irq_matrix *m, const struct cpumask 
-*msk,
-+                                       unsigned int *mapped_cpu);
-  void irq_matrix_reserve(struct irq_matrix *m);
-  void irq_matrix_remove_reserved(struct irq_matrix *m);
-  int irq_matrix_alloc(struct irq_matrix *m, const struct cpumask *msk,
-diff --git a/kernel/irq/matrix.c b/kernel/irq/matrix.c
-index 5092494bf261..d9e4e0a385fa 100644
---- a/kernel/irq/matrix.c
-+++ b/kernel/irq/matrix.c
-@@ -239,21 +239,40 @@ void irq_matrix_remove_managed(struct irq_matrix 
-*m, const struct cpumask *msk)
-   * @m:         Matrix pointer
-   * @cpu:       On which CPU the interrupt should be allocated
-   */
--int irq_matrix_alloc_managed(struct irq_matrix *m, unsigned int cpu)
-+int irq_matrix_alloc_managed(struct irq_matrix *m, const struct cpumask 
-*msk,
-+                                       unsigned int *mapped_cpu)
-  {
--       struct cpumap *cm = per_cpu_ptr(m->maps, cpu);
--       unsigned int bit, end = m->alloc_end;
--
--       /* Get managed bit which are not allocated */
--       bitmap_andnot(m->scratch_map, cm->managed_map, cm->alloc_map, end);
--       bit = find_first_bit(m->scratch_map, end);
--       if (bit >= end)
--               return -ENOSPC;
--       set_bit(bit, cm->alloc_map);
--       cm->allocated++;
--       m->total_allocated++;
--       trace_irq_matrix_alloc_managed(bit, cpu, m, cm);
--       return bit;
-+       unsigned int cpu, best_cpu, maxavl = 0;
-+       unsigned int bit, end;
-+       struct cpumap *cm;
-+
-+       best_cpu = UINT_MAX;
-+       for_each_cpu(cpu, msk) {
-+               cm = per_cpu_ptr(m->maps, cpu);
-+
-+               if (!cm->online || cm->available <= maxavl)
-+                       continue;
-+
-+               best_cpu = cpu;
-+               maxavl = cm->available;
-+       }
-+
-+       if (maxavl) {
-+               cm = per_cpu_ptr(m->maps, best_cpu);
-+               end = m->alloc_end;
-+               /* Get managed bit which are not allocated */
-+               bitmap_andnot(m->scratch_map, cm->managed_map, 
-cm->alloc_map, end);
-+               bit = find_first_bit(m->scratch_map, end);
-+               if (bit >= end)
-+                       return -ENOSPC;
-+               set_bit(bit, cm->alloc_map);
-+               cm->allocated++;
-+               m->total_allocated++;
-+               *mapped_cpu = best_cpu;
-+               trace_irq_matrix_alloc_managed(bit, cpu, m, cm);
-+               return bit;
-+       }
-+       return -ENOSPC;
-  }
-
-  /**
+>
+> Thanks,
+>
+> 	tglx
