@@ -1,65 +1,126 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Logan Gunthorpe <logang@deltatee.com>
-Date: Wed, 12 Sep 2018 18:11:50 -0600
-Message-Id: <20180913001156.4115-8-logang@deltatee.com>
-In-Reply-To: <20180913001156.4115-1-logang@deltatee.com>
-References: <20180913001156.4115-1-logang@deltatee.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:45251 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727364AbeIDPVh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Sep 2018 11:21:37 -0400
+Received: by mail-lf1-f67.google.com with SMTP id r4-v6so2532751lff.12
+        for <linux-block@vger.kernel.org>; Tue, 04 Sep 2018 03:57:01 -0700 (PDT)
+Subject: Re: [PATCH V3] lightnvm: pblk: fix mapping issue on failed writes
+To: hans.ml.holmberg@owltronix.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        javier@cnexlabs.com, hans.holmberg@cnexlabs.com
+References: <1536057487-17267-1-git-send-email-hans.ml.holmberg@owltronix.com>
+ <1536057487-17267-2-git-send-email-hans.ml.holmberg@owltronix.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <f3178168-f516-5ac5-efa8-915bdf25b36e@lightnvm.io>
+Date: Tue, 4 Sep 2018 12:56:59 +0200
 MIME-Version: 1.0
-Subject: [PATCH v6 07/13] block: Add PCI P2P flag for request queue and check support for requests
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <1536057487-17267-2-git-send-email-hans.ml.holmberg@owltronix.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-QUEUE_FLAG_PCI_P2P is introduced meaning a driver's request queue
-supports targeting P2P memory.
+On 09/04/2018 12:38 PM, Hans Holmberg wrote:
+> From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+> 
+> On 1.2-devices, the mapping-out of remaning sectors in the
+> failed-write's block can result in an infinite loop,
+> stalling the write pipeline, fix this.
+> 
+> Fixes: 6a3abf5beef6 ("lightnvm: pblk: rework write error recovery path")
+> 
+> Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+> ---
+> 
+> Changes in V2:
+> 	Moved the helper function pblk_next_ppa_in_blk to lightnvm core
+> 	Renamed variable done->last in the helper function.
+> 
+> Changes in V3:
+> 	Renamed the helper function to nvm_next_ppa_in_chk and changed
+> 	the first parameter to type nvm_tgt_dev
+> 
+>   drivers/lightnvm/pblk-write.c | 12 +-----------
+>   include/linux/lightnvm.h      | 36 ++++++++++++++++++++++++++++++++++++
+>   2 files changed, 37 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+> index 5e6df65d392c..9e8bf2076beb 100644
+> --- a/drivers/lightnvm/pblk-write.c
+> +++ b/drivers/lightnvm/pblk-write.c
+> @@ -106,8 +106,6 @@ static void pblk_complete_write(struct pblk *pblk, struct nvm_rq *rqd,
+>   /* Map remaining sectors in chunk, starting from ppa */
+>   static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa)
+>   {
+> -	struct nvm_tgt_dev *dev = pblk->dev;
+> -	struct nvm_geo *geo = &dev->geo;
+>   	struct pblk_line *line;
+>   	struct ppa_addr map_ppa = *ppa;
+>   	u64 paddr;
+> @@ -125,15 +123,7 @@ static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa)
+>   		if (!test_and_set_bit(paddr, line->invalid_bitmap))
+>   			le32_add_cpu(line->vsc, -1);
+>   
+> -		if (geo->version == NVM_OCSSD_SPEC_12) {
+> -			map_ppa.ppa++;
+> -			if (map_ppa.g.pg == geo->num_pg)
+> -				done = 1;
+> -		} else {
+> -			map_ppa.m.sec++;
+> -			if (map_ppa.m.sec == geo->clba)
+> -				done = 1;
+> -		}
+> +		done = nvm_next_ppa_in_chk(pblk->dev, &map_ppa);
+>   	}
+>   
+>   	line->w_err_gc->has_write_err = 1;
+> diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+> index 09f65c6c6676..36a84180c1e8 100644
+> --- a/include/linux/lightnvm.h
+> +++ b/include/linux/lightnvm.h
+> @@ -593,6 +593,42 @@ static inline u32 nvm_ppa64_to_ppa32(struct nvm_dev *dev,
+>   	return ppa32;
+>   }
+>   
+> +static inline int nvm_next_ppa_in_chk(struct nvm_tgt_dev *dev,
+> +				      struct ppa_addr *ppa)
+> +{
+> +	struct nvm_geo *geo = &dev->geo;
+> +	int last = 0;
+> +
+> +	if (geo->version == NVM_OCSSD_SPEC_12) {
+> +		int sec = ppa->g.sec;
+> +
+> +		sec++;
+> +		if (sec == geo->ws_min) {
+> +			int pg = ppa->g.pg;
+> +
+> +			sec = 0;
+> +			pg++;
+> +			if (pg == geo->num_pg) {
+> +				int pl = ppa->g.pl;
+> +
+> +				pg = 0;
+> +				pl++;
+> +				if (pl == geo->num_pln)
+> +					last = 1;
+> +
+> +				ppa->g.pl = pl;
+> +			}
+> +			ppa->g.pg = pg;
+> +		}
+> +		ppa->g.sec = sec;
+> +	} else {
+> +		ppa->m.sec++;
+> +		if (ppa->m.sec == geo->clba)
+> +			last = 1;
+> +	}
+> +
+> +	return last;
+> +}
+>   
+>   typedef blk_qc_t (nvm_tgt_make_rq_fn)(struct request_queue *, struct bio *);
+>   typedef sector_t (nvm_tgt_capacity_fn)(void *);
+> 
 
-When a request is submitted we check if PCI P2PDMA memory is assigned
-to the first page in the bio. If it is, we ensure the queue it's
-submitted to supports it, and enforce REQ_NOMERGE.
-
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
----
- include/linux/blkdev.h | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d6869e0e2b64..7bf80ca802e1 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -699,6 +699,7 @@ struct request_queue {
- #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
- #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
- #define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
-+#define QUEUE_FLAG_PCI_P2PDMA  30	/* device supports pci p2p requests */
- 
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
-@@ -731,6 +732,8 @@ bool blk_queue_flag_test_and_clear(unsigned int flag, struct request_queue *q);
- #define blk_queue_dax(q)	test_bit(QUEUE_FLAG_DAX, &(q)->queue_flags)
- #define blk_queue_scsi_passthrough(q)	\
- 	test_bit(QUEUE_FLAG_SCSI_PASSTHROUGH, &(q)->queue_flags)
-+#define blk_queue_pci_p2pdma(q)	\
-+	test_bit(QUEUE_FLAG_PCI_P2PDMA, &(q)->queue_flags)
- 
- #define blk_noretry_request(rq) \
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
--- 
-2.19.0
+Thanks. Applied for 4.20.
