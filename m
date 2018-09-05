@@ -1,72 +1,45 @@
-Return-Path: <prvs=779943e21=roger.pau@citrix.com>
-Date: Wed, 5 Sep 2018 12:36:49 +0200
-From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
-To: Valentin Vidic <Valentin.Vidic@CARNet.hr>
-CC: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Jens Axboe
-	<axboe@kernel.dk>, <xen-devel@lists.xenproject.org>,
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<stable@vger.kernel.org>
-Subject: Re: [PATCH] xen-blkback: Switch to closed state after releasing the
- backing device
-Message-ID: <20180905103649.edugijsjx4v2fbxd@mac.bytemobile.com>
-References: <20180829065214.23546-1-Valentin.Vidic@CARNet.hr>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-oi0-f68.google.com ([209.85.218.68]:36178 "EHLO
+        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725868AbeIERgn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Sep 2018 13:36:43 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <20180829065214.23546-1-Valentin.Vidic@CARNet.hr>
-Return-Path: roger.pau@citrix.com
-List-ID: <linux-block@vger.kernel.org>
+From: Junhui Tang <tang.junhui.linux@gmail.com>
+Date: Wed, 5 Sep 2018 21:06:11 +0800
+Message-ID: <CA+NNRhHxU6zRfOVPxkZSLA4_75-HxQnaLAvPk+OLiHcu0ah5gw@mail.gmail.com>
+Subject: [PATCH] bcache: trace missed reading by cache_missed
+To: colyli@suse.de
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Wed, Aug 29, 2018 at 08:52:14AM +0200, Valentin Vidic wrote:
-> Switching to closed state earlier can cause the block-drbd
-> script to fail with 'Device is held open by someone':
-> 
-> root: /etc/xen/scripts/block-drbd: remove XENBUS_PATH=backend/vbd/6/51712
-> kernel: [ 2222.278235] block drbd6: State change failed: Device is held open by someone
-> kernel: [ 2222.278304] block drbd6:   state = { cs:Connected ro:Primary/Secondary ds:UpToDate/UpToDate r----- }
-> kernel: [ 2222.278340] block drbd6:  wanted = { cs:Connected ro:Secondary/Secondary ds:UpToDate/UpToDate r----- }
-> root: /etc/xen/scripts/block-drbd: Writing backend/vbd/6/51712/hotplug-error /etc/xen/scripts/block-drbd failed; error detected. backend/vbd/6/51712/hotplug-status error to xenstore.
-> root: /etc/xen/scripts/block-drbd: /etc/xen/scripts/block-drbd failed; error detected.
-> 
-> Signed-off-by: Valentin Vidic <Valentin.Vidic@CARNet.hr>
-> Cc: stable@vger.kernel.org
-> ---
->  drivers/block/xen-blkback/xenbus.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-> index a4bc74e72c39..43bddc996709 100644
-> --- a/drivers/block/xen-blkback/xenbus.c
-> +++ b/drivers/block/xen-blkback/xenbus.c
-> @@ -323,6 +323,7 @@ static void xen_blkif_free(struct xen_blkif *blkif)
->  {
->  	WARN_ON(xen_blkif_disconnect(blkif));
->  	xen_vbd_free(&blkif->vbd);
-> +	xenbus_switch_state(blkif->be->dev, XenbusStateClosed);
->  	kfree(blkif->be->mode);
->  	kfree(blkif->be);
->  
-> @@ -814,7 +815,6 @@ static void frontend_changed(struct xenbus_device *dev,
->  
->  	case XenbusStateClosed:
->  		xen_blkif_disconnect(be->blkif);
-> -		xenbus_switch_state(dev, XenbusStateClosed);
->  		if (xenbus_dev_is_online(dev))
->  			break;
+>From acd3853bca04799659cdb1c90675d36b6397a373 Mon Sep 17 00:00:00 2001
+From: Tang Junhui <tang.junhui.linux@gmail.com>
+Date: Wed, 5 Sep 2018 21:00:44 +0800
+Subject: [PATCH] bcache: trace missed reading by cache_missed
 
-AFAICT, this will cause the backend to never switch to 'Closed' state
-until the toolstack sets online to 0, which is not good IMO.
+Missed reading IOs are identified by s->cache_missed, not the
+s->cache_miss, so in trace_bcache_read() using trace_bcache_read
+to identify wether the IO is missed or not.
 
-If for example a frontend decides to close a device, the backend will
-stay in state 'Closing' until the toolstack actually removes the disk
-by setting online to 0.
+Signed-off-by: Tang Junhui <tang.junhui.linux@gmail.com>
+---
+ drivers/md/bcache/request.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This will prevent resetting blk connections, as blkback will refuse to
-switch to state XenbusStateInitWait unless it's at XenbusStateClosed
-(see the XenbusStateInitialising case in frontend_changed), which will
-never be reached with your patch.
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 7dbe8b6..928fa99 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -845,7 +845,7 @@ static void cached_dev_read_done_bh(struct closure *cl)
 
-Maybe the easiest solution would be to wait in the block-drbd script
-until the device is released? Maybe using fstat in a loop or one of
-the drbd tools?
+  bch_mark_cache_accounting(s->iop.c, s->d,
+    !s->cache_missed, s->iop.bypass);
+- trace_bcache_read(s->orig_bio, !s->cache_miss, s->iop.bypass);
++ trace_bcache_read(s->orig_bio, !s->cache_missed, s->iop.bypass);
 
-Thanks, Roger.
+  if (s->iop.status)
+  continue_at_nobarrier(cl, cached_dev_read_error, bcache_wq);
+-- 
+1.8.3.1
