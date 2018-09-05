@@ -1,7 +1,5 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH v5 07/13] block: Add PCI P2P flag for request queue and
- check support for requests
-To: Logan Gunthorpe <logang@deltatee.com>, Christoph Hellwig <hch@lst.de>
+Return-Path: <logang@deltatee.com>
+To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
 Cc: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
  linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
  linux-nvdimm@lists.01.org, linux-block@vger.kernel.org,
@@ -25,29 +23,24 @@ References: <20180830185352.3369-1-logang@deltatee.com>
  <20180905201152.GA1893@lst.de>
  <eb42fb94-9da6-955b-8524-0a0f5ac4bd19@deltatee.com>
  <2a3394bd-5f13-4818-43f4-dfc61f501e05@kernel.dk>
- <e3ef26e6-6c8d-25b8-fa64-14594a51263c@deltatee.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <3af4d1d4-da07-c0a6-8464-9ddc1378f2f4@kernel.dk>
-Date: Wed, 5 Sep 2018 14:19:39 -0600
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <e3ef26e6-6c8d-25b8-fa64-14594a51263c@deltatee.com>
+Date: Wed, 5 Sep 2018 14:18:03 -0600
 MIME-Version: 1.0
-In-Reply-To: <e3ef26e6-6c8d-25b8-fa64-14594a51263c@deltatee.com>
+In-Reply-To: <2a3394bd-5f13-4818-43f4-dfc61f501e05@kernel.dk>
 Content-Type: text/plain; charset=utf-8
+Subject: Re: [PATCH v5 07/13] block: Add PCI P2P flag for request queue and
+ check support for requests
 List-ID: <linux-block@vger.kernel.org>
 
-On 9/5/18 2:18 PM, Logan Gunthorpe wrote:
-> 
-> 
-> On 05/09/18 02:14 PM, Jens Axboe wrote:
->> But if the caller must absolutely know where the bio will end up, then
->> it seems super redundant. So I'd vote for killing this check, it buys
->> us absolutely nothing and isn't even exhaustive in its current form.
-> 
-> 
-> Ok, I'll remove it for v6.
 
-Since the drivers needs to know it's doing it right, it might not
-hurt to add a sanity check helper for that. Just have the driver
-call it, and don't add it in the normal IO submission path.
 
--- 
-Jens Axboe
+On 05/09/18 02:14 PM, Jens Axboe wrote:
+> But if the caller must absolutely know where the bio will end up, then
+> it seems super redundant. So I'd vote for killing this check, it buys
+> us absolutely nothing and isn't even exhaustive in its current form.
+
+
+Ok, I'll remove it for v6.
+
+Logan
