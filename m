@@ -1,54 +1,93 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk, ming.lei@redhat.com, bart.vanassche@wdc.com,
-        sagi@grimberg.me, keith.busch@intel.com, jthumshirn@suse.de,
-        jsmart2021@gmail.com
-Cc: linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 0/3] Introduce a light-weight queue close feature
-Date: Wed,  5 Sep 2018 12:09:43 +0800
-Message-Id: <1536120586-3378-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <hare@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <keith.busch@intel.com>,
+	Bart van Assche <bart.vanassche@wdc.com>,
+	linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Hannes Reinecke <hare@suse.de>,
+	Hannes Reinecke <hare@suse.com>,
+	Minchan Kim <minchan@kernel.org>,
+	Nitin Gupta <ngupta@vflare.org>
+Subject: [PATCH 4/5] zram: register default groups with device_add_disk()
+Date: Wed,  5 Sep 2018 09:00:52 +0200
+Message-Id: <20180905070053.26239-5-hare@suse.de>
+In-Reply-To: <20180905070053.26239-1-hare@suse.de>
+References: <20180905070053.26239-1-hare@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Dear all
+Register default sysfs groups during device_add_disk() to avoid a
+race condition with udev during startup.
 
-As we know, queue freeze is used to stop new IO comming in and drain
-the request queue. And the draining queue here is necessary, because
-queue freeze kills the percpu-ref q_usage_counter and need to drain
-the q_usage_counter before switch it back to percpu mode. This could
-be a trouble when we just want to prevent new IO.
+Signed-off-by: Hannes Reinecke <hare@suse.com>
+Cc: Minchan Kim <minchan@kernel.org>
+Cc: Nitin Gupta <ngupta@vflare.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+---
+ drivers/block/zram/zram_drv.c | 28 +++++++---------------------
+ 1 file changed, 7 insertions(+), 21 deletions(-)
 
-In nvme-pci, nvme_dev_disable freezes queues to prevent new IO.
-nvme_reset_work will unfreeze and wait to drain the queues. However,
-if IO timeout at the moment, no body could do recovery as nvme_reset_work
-is waiting. We will encounter IO hang.
-
-So introduce a light-weight queue close feature in this patch set
-which could prevent new IO and needn't drain the queue.
-
-The 1st patch introduces a queue_gate into request queue and migrate
-preempt only from queue flags on it.
-
-The 2nd patch introduces queue close feature.
-
-The 3rd patch apply the queue close in nvme-pci to avoid the IO hang
-issue above.
-
-Jianchao Wang (3)
-blk-core: migrate preempt-only mode to queue_gate
-blk-core: introduce queue close feature
-nvme-pci: use queue close instead of queue freeze
-
- block/blk-core.c         | 82 +++++++++++++++++++++++++++++++++---------------
- block/blk-mq-debugfs.c   |  1 -
- block/blk.h              |  5 +++
- drivers/nvme/host/core.c | 22 +++++++++++++
- drivers/nvme/host/nvme.h |  3 ++
- drivers/nvme/host/pci.c  | 27 ++++++++--------
- drivers/scsi/scsi_lib.c  | 10 ------
- include/linux/blkdev.h   |  7 +++--
- 8 files changed, 104 insertions(+), 53 deletions(-)
-
-
-Thanks
-Jianchao
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index a1d6b5597c17..4879595200e1 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1636,6 +1636,11 @@ static const struct attribute_group zram_disk_attr_group = {
+ 	.attrs = zram_disk_attrs,
+ };
+ 
++static const struct attribute_group *zram_disk_attr_groups[] = {
++	&zram_disk_attr_group,
++	NULL,
++};
++
+ /*
+  * Allocate and initialize new zram device. the function returns
+  * '>= 0' device_id upon success, and negative value otherwise.
+@@ -1716,24 +1721,14 @@ static int zram_add(void)
+ 
+ 	zram->disk->queue->backing_dev_info->capabilities |=
+ 			(BDI_CAP_STABLE_WRITES | BDI_CAP_SYNCHRONOUS_IO);
+-	add_disk(zram->disk);
+-
+-	ret = sysfs_create_group(&disk_to_dev(zram->disk)->kobj,
+-				&zram_disk_attr_group);
+-	if (ret < 0) {
+-		pr_err("Error creating sysfs group for device %d\n",
+-				device_id);
+-		goto out_free_disk;
+-	}
++	device_add_disk(NULL, zram->disk, zram_disk_attr_groups);
++
+ 	strlcpy(zram->compressor, default_compressor, sizeof(zram->compressor));
+ 
+ 	zram_debugfs_register(zram);
+ 	pr_info("Added device: %s\n", zram->disk->disk_name);
+ 	return device_id;
+ 
+-out_free_disk:
+-	del_gendisk(zram->disk);
+-	put_disk(zram->disk);
+ out_free_queue:
+ 	blk_cleanup_queue(queue);
+ out_free_idr:
+@@ -1762,15 +1757,6 @@ static int zram_remove(struct zram *zram)
+ 	mutex_unlock(&bdev->bd_mutex);
+ 
+ 	zram_debugfs_unregister(zram);
+-	/*
+-	 * Remove sysfs first, so no one will perform a disksize
+-	 * store while we destroy the devices. This also helps during
+-	 * hot_remove -- zram_reset_device() is the last holder of
+-	 * ->init_lock, no later/concurrent disksize_store() or any
+-	 * other sysfs handlers are possible.
+-	 */
+-	sysfs_remove_group(&disk_to_dev(zram->disk)->kobj,
+-			&zram_disk_attr_group);
+ 
+ 	/* Make sure all the pending I/O are finished */
+ 	fsync_bdev(bdev);
+-- 
+2.16.4
