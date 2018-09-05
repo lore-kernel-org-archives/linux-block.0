@@ -1,33 +1,50 @@
-Return-Path: <jianchao.w.wang@oracle.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Thu, 6 Sep 2018 05:27:00 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: axboe@kernel.dk, bart.vanassche@wdc.com, sagi@grimberg.me,
+	keith.busch@intel.com, jthumshirn@suse.de, jsmart2021@gmail.com,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
 Subject: Re: [PATCH 0/3] Introduce a light-weight queue close feature
-To: Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk, ming.lei@redhat.com,
-        bart.vanassche@wdc.com, sagi@grimberg.me, keith.busch@intel.com,
-        jthumshirn@suse.de, jsmart2021@gmail.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org
+Message-ID: <20180905212659.GB21352@ming.t460p>
 References: <1536120586-3378-1-git-send-email-jianchao.w.wang@oracle.com>
- <1536162485.11534.3.camel@acm.org>
-From: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <ebeffce9-4136-1b4d-1253-b5c045eff3f7@oracle.com>
-Date: Thu, 6 Sep 2018 09:35:09 +0800
 MIME-Version: 1.0
-In-Reply-To: <1536162485.11534.3.camel@acm.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1536120586-3378-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Bart
-
-On 09/05/2018 11:48 PM, Bart Van Assche wrote:
->> The 3rd patch apply the queue close in nvme-pci to avoid the IO hang
->> issue above.
-> Hello Jianchao,
+On Wed, Sep 05, 2018 at 12:09:43PM +0800, Jianchao Wang wrote:
+> Dear all
 > 
-> Is this patch series based on a theoretical concern or rather on something
-> you ran into? In the latter case, can you explain which scenario makes it
-> likely on your setup to encounter an NVMe timeout?
+> As we know, queue freeze is used to stop new IO comming in and drain
+> the request queue. And the draining queue here is necessary, because
+> queue freeze kills the percpu-ref q_usage_counter and need to drain
+> the q_usage_counter before switch it back to percpu mode. This could
+> be a trouble when we just want to prevent new IO.
+> 
+> In nvme-pci, nvme_dev_disable freezes queues to prevent new IO.
+> nvme_reset_work will unfreeze and wait to drain the queues. However,
+> if IO timeout at the moment, no body could do recovery as nvme_reset_work
+> is waiting. We will encounter IO hang.
 
-It is a theoretical concern. But I think it is very obvious.
-It could be very easy to reproduce if simulate IO timeout in software.
+As we discussed this nvme time issue before, I have pointed out that
+this is because of blk_mq_unfreeze_queue()'s limit which requires that
+unfreeze can only be done when this queue ref counter drops to zero.
 
-Thanks
-Jianchao
+For this nvme timeout case, we may relax the limit, for example,
+introducing another API of blk_freeze_queue_stop() as counter-pair of
+blk_freeze_queue_start(), and simply switch the percpu-ref to percpu mode
+from atomic mode inside the new API.
+
+> 
+> So introduce a light-weight queue close feature in this patch set
+> which could prevent new IO and needn't drain the queue.
+
+Frankly speaking, IMO, it may not be an good idea to mess up the fast path
+just for handling the extremely unusual timeout event. The same is true
+for doing the preemp only stuff, as you saw I have posted patchset for
+killing it.
+
+Thanks,
+Ming
