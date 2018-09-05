@@ -1,44 +1,156 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-Date: Tue, 4 Sep 2018 23:52:33 -0400
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Kent Overstreet <kent.overstreet@gmail.com>,
 	Dmitry Monakhov <dmonakhov@openvz.org>,
-	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>
-Subject: Re: [PATCH] block: remove bio_rewind_iter()
-Message-ID: <20180905035232.GA2501@kmo-pixel>
-References: <20180905033335.12666-1-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180905033335.12666-1-ming.lei@redhat.com>
+	Christoph Hellwig <hch@lst.de>,
+	Hannes Reinecke <hare@suse.com>
+Subject: [PATCH] block: remove bio_rewind_iter()
+Date: Wed,  5 Sep 2018 11:33:35 +0800
+Message-Id: <20180905033335.12666-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Thanks for doing this, Ming
+It is pointed that bio_rewind_iter() is one very bad API[1]:
 
-On Wed, Sep 05, 2018 at 11:33:35AM +0800, Ming Lei wrote:
-> It is pointed that bio_rewind_iter() is one very bad API[1]:
-> 
-> 1) bio size may not be restored after rewinding
-> 
-> 2) it causes some bogus change, such as 5151842b9d8732 (block: reset
-> bi_iter.bi_done after splitting bio)
-> 
-> 3) rewinding really makes things complicated wrt. bio splitting
-> 
-> 4) unnecessary updating of .bi_done in fast path
-> 
-> [1] https://marc.info/?t=153549924200005&r=1&w=2
-> 
-> So this patch takes Kent's suggestion to restore one bio into its original
-> state via saving bio iterator(struct bvec_iter) in bio_integrity_prep(),
-> given now bio_rewind_iter() is only used by bio integrity code.
-> 
-> Suggested-by: Kent Overstreet <kent.overstreet@gmail.com>
-> Cc: Kent Overstreet <kent.overstreet@gmail.com>
-> Cc: Dmitry Monakhov <dmonakhov@openvz.org>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Hannes Reinecke <hare@suse.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+1) bio size may not be restored after rewinding
 
-Acked-by: Kent Overstreet <kent.overstreet@gmail.com>
+2) it causes some bogus change, such as 5151842b9d8732 (block: reset
+bi_iter.bi_done after splitting bio)
+
+3) rewinding really makes things complicated wrt. bio splitting
+
+4) unnecessary updating of .bi_done in fast path
+
+[1] https://marc.info/?t=153549924200005&r=1&w=2
+
+So this patch takes Kent's suggestion to restore one bio into its original
+state via saving bio iterator(struct bvec_iter) in bio_integrity_prep(),
+given now bio_rewind_iter() is only used by bio integrity code.
+
+Suggested-by: Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Dmitry Monakhov <dmonakhov@openvz.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/bio-integrity.c | 10 +++-------
+ block/bio.c           |  1 -
+ include/linux/bio.h   | 22 ++++------------------
+ include/linux/bvec.h  |  3 ---
+ 4 files changed, 7 insertions(+), 29 deletions(-)
+
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 67b5fb861a51..839c332069a9 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -306,6 +306,8 @@ bool bio_integrity_prep(struct bio *bio)
+ 	if (bio_data_dir(bio) == WRITE) {
+ 		bio_integrity_process(bio, &bio->bi_iter,
+ 				      bi->profile->generate_fn);
++	} else {
++		bip->bio_iter = bio->bi_iter;
+ 	}
+ 	return true;
+ 
+@@ -331,19 +333,13 @@ static void bio_integrity_verify_fn(struct work_struct *work)
+ 		container_of(work, struct bio_integrity_payload, bip_work);
+ 	struct bio *bio = bip->bip_bio;
+ 	struct blk_integrity *bi = blk_get_integrity(bio->bi_disk);
+-	struct bvec_iter iter = bio->bi_iter;
+ 
+ 	/*
+ 	 * At the moment verify is called bio's iterator was advanced
+ 	 * during split and completion, we need to rewind iterator to
+ 	 * it's original position.
+ 	 */
+-	if (bio_rewind_iter(bio, &iter, iter.bi_done)) {
+-		bio->bi_status = bio_integrity_process(bio, &iter,
+-						       bi->profile->verify_fn);
+-	} else {
+-		bio->bi_status = BLK_STS_IOERR;
+-	}
++	bio->bi_status = bio_integrity_process(bio, &bip->bio_iter, bi->profile->verify_fn);
+ 
+ 	bio_integrity_free(bio);
+ 	bio_endio(bio);
+diff --git a/block/bio.c b/block/bio.c
+index b12966e415d3..cc57cbbebbfd 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1807,7 +1807,6 @@ struct bio *bio_split(struct bio *bio, int sectors,
+ 		bio_integrity_trim(split);
+ 
+ 	bio_advance(bio, split->bi_iter.bi_size);
+-	bio->bi_iter.bi_done = 0;
+ 
+ 	if (bio_flagged(bio, BIO_TRACE_COMPLETION))
+ 		bio_set_flag(split, BIO_TRACE_COMPLETION);
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 51371740d2a8..14b4fa266357 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -170,27 +170,11 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+ {
+ 	iter->bi_sector += bytes >> 9;
+ 
+-	if (bio_no_advance_iter(bio)) {
++	if (bio_no_advance_iter(bio))
+ 		iter->bi_size -= bytes;
+-		iter->bi_done += bytes;
+-	} else {
++	else
+ 		bvec_iter_advance(bio->bi_io_vec, iter, bytes);
+ 		/* TODO: It is reasonable to complete bio with error here. */
+-	}
+-}
+-
+-static inline bool bio_rewind_iter(struct bio *bio, struct bvec_iter *iter,
+-		unsigned int bytes)
+-{
+-	iter->bi_sector -= bytes >> 9;
+-
+-	if (bio_no_advance_iter(bio)) {
+-		iter->bi_size += bytes;
+-		iter->bi_done -= bytes;
+-		return true;
+-	}
+-
+-	return bvec_iter_rewind(bio->bi_io_vec, iter, bytes);
+ }
+ 
+ #define __bio_for_each_segment(bvl, bio, iter, start)			\
+@@ -353,6 +337,8 @@ struct bio_integrity_payload {
+ 	unsigned short		bip_max_vcnt;	/* integrity bio_vec slots */
+ 	unsigned short		bip_flags;	/* control flags */
+ 
++	struct bvec_iter	bio_iter;	/* for rewinding parent bio */
++
+ 	struct work_struct	bip_work;	/* I/O completion */
+ 
+ 	struct bio_vec		*bip_vec;
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index fe7a22dd133b..02c73c6aa805 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -40,8 +40,6 @@ struct bvec_iter {
+ 
+ 	unsigned int		bi_idx;		/* current index into bvl_vec */
+ 
+-	unsigned int            bi_done;	/* number of bytes completed */
+-
+ 	unsigned int            bi_bvec_done;	/* number of bytes completed in
+ 						   current bvec */
+ };
+@@ -85,7 +83,6 @@ static inline bool bvec_iter_advance(const struct bio_vec *bv,
+ 		bytes -= len;
+ 		iter->bi_size -= len;
+ 		iter->bi_bvec_done += len;
+-		iter->bi_done += len;
+ 
+ 		if (iter->bi_bvec_done == __bvec_iter_bvec(bv, *iter)->bv_len) {
+ 			iter->bi_bvec_done = 0;
+-- 
+2.9.5
