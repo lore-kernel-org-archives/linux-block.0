@@ -1,120 +1,51 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: keith.busch@linux.intel.com, ming.lei@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] blk-mq: adjust debugfs and sysfs register when updating nr_hw_queues
-Date: Thu, 27 Sep 2018 18:43:03 +0800
-Message-Id: <1538044984-2147-2-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1538044984-2147-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1538044984-2147-1-git-send-email-jianchao.w.wang@oracle.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from verein.lst.de ([213.95.11.211]:46885 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726544AbeIEXus (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 5 Sep 2018 19:50:48 -0400
+Date: Wed, 5 Sep 2018 21:22:52 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Logan Gunthorpe <logang@deltatee.com>
+Cc: Jason Gunthorpe <jgg@mellanox.com>, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-rdma@vger.kernel.org, linux-nvdimm@lists.01.org,
+        linux-block@vger.kernel.org, Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
+Subject: Re: [PATCH v5 10/13] nvme-pci: Add support for P2P memory in
+ requests
+Message-ID: <20180905192252.GA888@lst.de>
+References: <20180830185352.3369-1-logang@deltatee.com> <20180830185352.3369-11-logang@deltatee.com> <20180904151638.GL335@mellanox.com> <d5548f5d-59df-f38e-255d-59b46a17a219@deltatee.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <d5548f5d-59df-f38e-255d-59b46a17a219@deltatee.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-blk-mq debugfs and sysfs entries need to be removed before updating
-queue map, otherwise, we get get wrong result there. This patch fixes
-it and remove the redundant debugfs and sysfs register/unregister
-operations during __blk_mq_update_nr_hw_queues.
+On Tue, Sep 04, 2018 at 09:47:07AM -0600, Logan Gunthorpe wrote:
+> 
+> 
+> On 04/09/18 09:16 AM, Jason Gunthorpe wrote:
+> >>  	if (iod->nents) {
+> >> -		dma_unmap_sg(dev->dev, iod->sg, iod->nents, dma_dir);
+> >> +		/* P2PDMA requests do not need to be unmapped */
+> >> +		if (!is_pci_p2pdma_page(sg_page(iod->sg)))
+> >> +			dma_unmap_sg(dev->dev, iod->sg, iod->nents, dma_dir);
+> > 
+> > This seems like a poor direction, if we add IOMMU hairpin support we
+> > will need unmapping.
+> 
+> It can always be added later. In any case, you'll have to convince
+> Christoph who requested the change; I'm not that invested in this decision.
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
----
- block/blk-mq.c | 39 ++++++++++++---------------------------
- 1 file changed, 12 insertions(+), 27 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 85a1c1a..6356455 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2137,8 +2137,6 @@ static void blk_mq_exit_hctx(struct request_queue *q,
- 		struct blk_mq_tag_set *set,
- 		struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
- {
--	blk_mq_debugfs_unregister_hctx(hctx);
--
- 	if (blk_mq_hw_queue_mapped(hctx))
- 		blk_mq_tag_idle(hctx);
- 
-@@ -2165,6 +2163,7 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		if (i == nr_queue)
- 			break;
-+		blk_mq_debugfs_unregister_hctx(hctx);
- 		blk_mq_exit_hctx(q, set, hctx, i);
- 	}
- }
-@@ -2222,8 +2221,6 @@ static int blk_mq_init_hctx(struct request_queue *q,
- 	if (hctx->flags & BLK_MQ_F_BLOCKING)
- 		init_srcu_struct(hctx->srcu);
- 
--	blk_mq_debugfs_register_hctx(q, hctx);
--
- 	return 0;
- 
-  free_fq:
-@@ -2512,8 +2509,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 	int i, j;
- 	struct blk_mq_hw_ctx **hctxs = q->queue_hw_ctx;
- 
--	blk_mq_sysfs_unregister(q);
--
- 	/* protect against switching io scheduler  */
- 	mutex_lock(&q->sysfs_lock);
- 	for (i = 0; i < set->nr_hw_queues; i++) {
-@@ -2561,7 +2556,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 	}
- 	q->nr_hw_queues = i;
- 	mutex_unlock(&q->sysfs_lock);
--	blk_mq_sysfs_register(q);
- }
- 
- struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
-@@ -2659,25 +2653,6 @@ void blk_mq_free_queue(struct request_queue *q)
- 	blk_mq_exit_hw_queues(q, set, set->nr_hw_queues);
- }
- 
--/* Basically redo blk_mq_init_queue with queue frozen */
--static void blk_mq_queue_reinit(struct request_queue *q)
--{
--	WARN_ON_ONCE(!atomic_read(&q->mq_freeze_depth));
--
--	blk_mq_debugfs_unregister_hctxs(q);
--	blk_mq_sysfs_unregister(q);
--
--	/*
--	 * redo blk_mq_init_cpu_queues and blk_mq_init_hw_queues. FIXME: maybe
--	 * we should change hctx numa_node according to the new topology (this
--	 * involves freeing and re-allocating memory, worth doing?)
--	 */
--	blk_mq_map_swqueue(q);
--
--	blk_mq_sysfs_register(q);
--	blk_mq_debugfs_register_hctxs(q);
--}
--
- static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
- {
- 	int i;
-@@ -2987,11 +2962,21 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 		if (!blk_mq_elv_switch_none(&head, q))
- 			goto switch_back;
- 
-+	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-+		blk_mq_debugfs_unregister_hctxs(q);
-+		blk_mq_sysfs_unregister(q);
-+	}
-+
- 	set->nr_hw_queues = nr_hw_queues;
- 	blk_mq_update_queue_map(set);
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
- 		blk_mq_realloc_hw_ctxs(set, q);
--		blk_mq_queue_reinit(q);
-+		blk_mq_map_swqueue(q);
-+	}
-+
-+	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-+		blk_mq_sysfs_register(q);
-+		blk_mq_debugfs_register_hctxs(q);
- 	}
- 
- switch_back:
--- 
-2.7.4
+Yes, no point to add dead code here.  In the long run we should
+aim for hiding the p2p address translation behind the normal DMA API
+anyway, but we're not quite ready for it yet.
