@@ -1,26 +1,19 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:54416 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726514AbeIOMVB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Sep 2018 08:21:01 -0400
-Date: Sat, 15 Sep 2018 00:03:01 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Dmitry Monakhov <dmonakhov@openvz.org>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH] block: remove bio_rewind_iter()
-Message-ID: <20180915070301.GB15555@infradead.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, Kent Overstreet <kent.overstreet@gmail.com>,
+ Dmitry Monakhov <dmonakhov@openvz.org>, Christoph Hellwig <hch@lst.de>,
+ Hannes Reinecke <hare@suse.com>
 References: <20180905033335.12666-1-ming.lei@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <8990f9dd-32bd-1bdb-42e6-6d4573d34a03@kernel.dk>
+Date: Wed, 5 Sep 2018 15:46:47 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180905033335.12666-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Sep 05, 2018 at 11:33:35AM +0800, Ming Lei wrote:
+On 9/4/18 9:33 PM, Ming Lei wrote:
 > It is pointed that bio_rewind_iter() is one very bad API[1]:
 > 
 > 1) bio size may not be restored after rewinding
@@ -33,6 +26,12 @@ On Wed, Sep 05, 2018 at 11:33:35AM +0800, Ming Lei wrote:
 > 4) unnecessary updating of .bi_done in fast path
 > 
 > [1] https://marc.info/?t=153549924200005&r=1&w=2
+> 
+> So this patch takes Kent's suggestion to restore one bio into its original
+> state via saving bio iterator(struct bvec_iter) in bio_integrity_prep(),
+> given now bio_rewind_iter() is only used by bio integrity code.
 
-Based on that this is a bug fix and should go to 4.19 instead of 4.20
-as it is queued up right now..
+Applied, thanks Ming.
+
+-- 
+Jens Axboe
