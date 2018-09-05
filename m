@@ -1,41 +1,52 @@
-Return-Path: <BATV+97b555f176c451e34851+5490+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	linux-block@vger.kernel.org,
-	xen-devel@lists.xen.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 08/13] block: add a missing BIOVEC_SEG_BOUNDARY check in bio_add_pc_page
-Date: Tue,  4 Sep 2018 12:14:26 -0700
-Message-Id: <20180904191431.20102-9-hch@lst.de>
-In-Reply-To: <20180904191431.20102-1-hch@lst.de>
-References: <20180904191431.20102-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: don't warn when calling fsync on read-only block
+ devices
+To: Mikulas Patocka <mpatocka@redhat.com>
+Cc: Ilya Dryomov <idryomov@gmail.com>, Sagi Grimberg <sagi@grimberg.me>,
+ Mike Snitzer <snitzer@redhat.com>, Zdenek Kabelac <zkabelac@redhat.com>,
+ WGH <wgh@torlan.ru>, linux-block@vger.kernel.org,
+ Stefan Agner <stefan@agner.ch>
+References: <alpine.LRH.2.02.1808221217030.30929@file01.intranet.prod.int.rdu2.redhat.com>
+ <222ce989-dbb9-b994-a97f-4dce04f5bc69@kernel.dk>
+ <alpine.LRH.2.02.1809031725530.27063@file01.intranet.prod.int.rdu2.redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <d0a42d2c-a6a0-701e-c142-001f570c4d19@kernel.dk>
+Date: Wed, 5 Sep 2018 16:14:13 -0600
+MIME-Version: 1.0
+In-Reply-To: <alpine.LRH.2.02.1809031725530.27063@file01.intranet.prod.int.rdu2.redhat.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-The actual recaculation of segments in __blk_recalc_rq_segments will
-do this check, so there is no point in forcing it if we know it won't
-succeed.
+On 9/3/18 4:05 PM, Mikulas Patocka wrote:
+> 
+> 
+> On Wed, 22 Aug 2018, Jens Axboe wrote:
+> 
+>> On 8/22/18 10:23 AM, Mikulas Patocka wrote:
+>>> It is possible to call fsync on a read-only handle (for example, fsck.ext2 
+>>> does it when doing read-only check), and this call results in kernel 
+>>> warning. This bug was introduced by the commit 721c7fc701c7 "block: fail 
+>>> op_is_write() requests to read-only partitions".
+>>
+>> Similar patch is already queued up, it'll go into Linus's tree before
+>> -rc1.
+>>
+>> -- 
+>> Jens Axboe
+> 
+> I think you mean the patch b089cfd95d32638335c551651a8e00fd2c4edb0b, but 
+> it doesn't work.
+> 
+> The first problem is that bio_op returns the opcode, but op_is_flush 
+> expects flags as its parameter. bio_op strips off the flags, and so the 
+> condition op_is_flush is never true and the warning is not shut off.
+> 
+> Anoher problem is that the flags REQ_FUA and REQ_PREFLUSH may be 
+> superimposed on regular write bio and in that case the warning should be 
+> triggered. We want to shut the warning off only if bio_sectors is zero 
+> (i.e. if the flush request is not superimposed on regular write).
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/bio.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Thanks for fixing that up, that was somewhat of a disaster. Applied.
 
-diff --git a/block/bio.c b/block/bio.c
-index 7f7230140b66..d15a228d1bfc 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -729,7 +729,9 @@ int bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
- 	}
- 
- 	/* If we may be able to merge these biovecs, force a recount */
--	if (bio->bi_vcnt > 1 && biovec_phys_mergeable(bvec-1, bvec))
-+	if (bio->bi_vcnt > 1 &&
-+	    biovec_phys_mergeable(bvec - 1, bvec) &&
-+	    BIOVEC_SEG_BOUNDARY(q, bvec - 1, bvec))
- 		bio_clear_flag(bio, BIO_SEG_VALID);
- 
-  done:
 -- 
-2.18.0
+Jens Axboe
