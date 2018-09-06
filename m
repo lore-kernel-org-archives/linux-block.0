@@ -1,34 +1,186 @@
-Return-Path: <BATV+da9bc55dc8984c6037d5+5514+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Fri, 28 Sep 2018 08:40:03 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme fixes for 4.19
-Message-ID: <20180928154003.GA3163@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <dennisszhou@gmail.com>
+Return-Path: <dennisszhou@gmail.com>
+From: Dennis Zhou <dennisszhou@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Josef Bacik <josef@toxicpanda.com>
+Cc: kernel-team@fb.com,
+	linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+Subject: [PATCH 06/12] blkcg: associate a blkg for pages being evicted by swap
+Date: Thu,  6 Sep 2018 17:10:39 -0400
+Message-Id: <20180906211045.29055-7-dennisszhou@gmail.com>
+In-Reply-To: <20180906211045.29055-1-dennisszhou@gmail.com>
+References: <20180906211045.29055-1-dennisszhou@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The following changes since commit b228ba1cb95afbaeeb86cf06cd9fd6f6369c3b14:
+From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
 
-  null_blk: fix zoned support for non-rq based operation (2018-09-12 18:21:11 -0600)
+A prior patch in this series added blkg association to bios issued by
+cgroups. There are two other paths that we want to attribute work back
+to the appropriate cgroup: swap and writeback. Here we modify the way
+swap tags bios to include the blkg. Writeback will be tackle in the next
+patch.
 
-are available in the Git repository at:
+Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+---
+ block/bio.c         | 83 ++++++++++++++++++++++++++++++++-------------
+ include/linux/bio.h | 11 ++++--
+ mm/page_io.c        |  2 +-
+ 3 files changed, 68 insertions(+), 28 deletions(-)
 
-  git://git.infradead.org/nvme.git nvme-4.19
-
-for you to fetch changes up to bb830add192e9d8338082c0fc2c209e23b43d865:
-
-  nvme: properly propagate errors in nvme_mpath_init (2018-09-25 16:21:40 -0700)
-
-----------------------------------------------------------------
-Hannes Reinecke (1):
-      nvme: count all ANA groups for ANA Log page
-
-Susobhan Dey (1):
-      nvme: properly propagate errors in nvme_mpath_init
-
- drivers/nvme/host/multipath.c   | 6 ++++--
- drivers/nvme/target/admin-cmd.c | 4 ++++
- 2 files changed, 8 insertions(+), 2 deletions(-)
+diff --git a/block/bio.c b/block/bio.c
+index a05997bdb967..6c69c35db8c7 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1958,30 +1958,6 @@ EXPORT_SYMBOL(bioset_init_from_src);
+ 
+ #ifdef CONFIG_BLK_CGROUP
+ 
+-#ifdef CONFIG_MEMCG
+-/**
+- * bio_associate_blkcg_from_page - associate a bio with the page's blkcg
+- * @bio: target bio
+- * @page: the page to lookup the blkcg from
+- *
+- * Associate @bio with the blkcg from @page's owning memcg.  This works like
+- * every other associate function wrt references.
+- */
+-int bio_associate_blkcg_from_page(struct bio *bio, struct page *page)
+-{
+-	struct cgroup_subsys_state *blkcg_css;
+-
+-	if (unlikely(bio->bi_css))
+-		return -EBUSY;
+-	if (!page->mem_cgroup)
+-		return 0;
+-	blkcg_css = cgroup_get_e_css(page->mem_cgroup->css.cgroup,
+-				     &io_cgrp_subsys);
+-	bio->bi_css = blkcg_css;
+-	return 0;
+-}
+-#endif /* CONFIG_MEMCG */
+-
+ /**
+  * bio_associate_blkcg - associate a bio with the specified blkcg
+  * @bio: target bio
+@@ -2027,6 +2003,65 @@ int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg)
+ 	return 0;
+ }
+ 
++static int __bio_associate_blkg_from_css(struct bio *bio,
++					 struct cgroup_subsys_state *css)
++{
++	struct blkcg_gq *blkg;
++
++	rcu_read_lock();
++
++	blkg = blkg_lookup_create(css_to_blkcg(css), bio->bi_disk->queue);
++
++	rcu_read_unlock();
++
++	return bio_associate_blkg(bio, blkg);
++}
++
++/**
++ * bio_associate_blkg_from_css - associate a bio with a specified css
++ * @bio: target bio
++ * @css: target css
++ *
++ * Associate @bio with the blkg found by combining the css's blkg and the
++ * request_queue of the @bio.  This takes a reference on the css that will
++ * be put upon freeing of @bio.
++ */
++int bio_associate_blkg_from_css(struct bio *bio,
++				struct cgroup_subsys_state *css)
++{
++	css_get(css);
++	bio->bi_css = css;
++	return __bio_associate_blkg_from_css(bio, css);
++}
++EXPORT_SYMBOL_GPL(bio_associate_blkg_from_css);
++
++#ifdef CONFIG_MEMCG
++/**
++ * bio_associate_blkg_from_page - associate a bio with the page's blkg
++ * @bio: target bio
++ * @page: the page to lookup the blkcg from
++ *
++ * Associate @bio with the blkg from @page's owning memcg and the respective
++ * request_queue.  This works like every other associate function wrt
++ * references.
++ *
++ * Note: this must be called after bio has an associated device.
++ */
++int bio_associate_blkg_from_page(struct bio *bio, struct page *page)
++{
++	struct cgroup_subsys_state *css;
++
++	if (unlikely(bio->bi_css))
++		return -EBUSY;
++	if (!page->mem_cgroup)
++		return 0;
++	css = cgroup_get_e_css(page->mem_cgroup->css.cgroup, &io_cgrp_subsys);
++	bio->bi_css = css;
++
++	return __bio_associate_blkg_from_css(bio, css);
++}
++#endif /* CONFIG_MEMCG */
++
+ /**
+  * bio_associate_create_blkg - associate a bio with a blkg from q
+  * @q: request_queue where bio is going
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index d1435643f5b7..bd8e67c01aa1 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -547,21 +547,26 @@ do {						\
+ 	disk_devt((bio)->bi_disk)
+ 
+ #if defined(CONFIG_MEMCG) && defined(CONFIG_BLK_CGROUP)
+-int bio_associate_blkcg_from_page(struct bio *bio, struct page *page);
++int bio_associate_blkg_from_page(struct bio *bio, struct page *page);
+ #else
+-static inline int bio_associate_blkcg_from_page(struct bio *bio,
+-						struct page *page) {  return 0; }
++static inline int bio_associate_blkg_from_page(struct bio *bio,
++					       struct page *page) { return 0; }
+ #endif
+ 
+ #ifdef CONFIG_BLK_CGROUP
+ int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css);
+ int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg);
++int bio_associate_blkg_from_css(struct bio *bio,
++				struct cgroup_subsys_state *css);
+ int bio_associate_create_blkg(struct request_queue *q, struct bio *bio);
+ void bio_disassociate_task(struct bio *bio);
+ void bio_clone_blkcg_association(struct bio *dst, struct bio *src);
+ #else	/* CONFIG_BLK_CGROUP */
+ static inline int bio_associate_blkcg(struct bio *bio,
+ 			struct cgroup_subsys_state *blkcg_css) { return 0; }
++static inline int bio_associate_blkg_from_css(struct bio *bio,
++					      struct cgroup_subsys_state *css)
++{ return 0; }
+ static inline int bio_associate_create_blkg(struct request_queue *q,
+ 					    struct bio *bio) { return 0; }
+ static inline void bio_disassociate_task(struct bio *bio) { }
+diff --git a/mm/page_io.c b/mm/page_io.c
+index aafd19ec1db4..573d3663d846 100644
+--- a/mm/page_io.c
++++ b/mm/page_io.c
+@@ -339,7 +339,7 @@ int __swap_writepage(struct page *page, struct writeback_control *wbc,
+ 		goto out;
+ 	}
+ 	bio->bi_opf = REQ_OP_WRITE | REQ_SWAP | wbc_to_write_flags(wbc);
+-	bio_associate_blkcg_from_page(bio, page);
++	bio_associate_blkg_from_page(bio, page);
+ 	count_swpout_vm_event(page);
+ 	set_page_writeback(page);
+ 	unlock_page(page);
+-- 
+2.17.1
