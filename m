@@ -1,41 +1,59 @@
-Return-Path: <jgross@suse.com>
-From: Juergen Gross <jgross@suse.com>
-To: linux-kernel@vger.kernel.org,
-	xen-devel@lists.xenproject.org,
-	linux-block@vger.kernel.org
-Cc: boris.ostrovsky@oracle.com,
-	roger.pau@citrix.com,
-	konrad.wilk@oracle.com,
-	axboe@kernel.dk,
-	Juergen Gross <jgross@suse.com>
-Subject: [PATCH] xen/blkfront: correct purging of persistent grants
-Date: Fri, 28 Sep 2018 09:28:27 +0200
-Message-Id: <20180928072827.14229-1-jgross@suse.com>
+Return-Path: <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 4..19-rc3
+Message-ID: <2c80ff97-47fc-23bb-0ba7-d81e863a8ba1@kernel.dk>
+Date: Thu, 6 Sep 2018 14:54:00 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Commit a46b53672b2c2e3770b38a4abf90d16364d2584b ("xen/blkfront: cleanup
-stale persistent grants") introduced a regression as purged persistent
-grants were not pu into the list of free grants again. Correct that.
+Hi Linus,
 
-Signed-off-by: Juergen Gross <jgross@suse.com>
----
- drivers/block/xen-blkfront.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Small collection of fixes that should go into this release. This pull
+request contains:
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index a71d817e900d..429d20131c7e 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -2670,8 +2670,8 @@ static void purge_persistent_grants(struct blkfront_info *info)
- 			list_del(&gnt_list_entry->node);
- 			gnttab_end_foreign_access(gnt_list_entry->gref, 0, 0UL);
- 			rinfo->persistent_gnts_c--;
--			__free_page(gnt_list_entry->page);
--			kfree(gnt_list_entry);
-+			gnt_list_entry->gref = GRANT_INVALID_REF;
-+			list_add_tail(&gnt_list_entry->node, &rinfo->grants);
- 		}
- 
- 		spin_unlock_irqrestore(&rinfo->ring_lock, flags);
+- Small series that fixes a race between blkcg teardown and writeback
+  (Dennis Zhou)
+
+- Fix disallowing invalid block size settings from the nbd ioctl (me)
+
+- BFQ fix for a use-after-free on last release of a bfqg (Konstantin
+  Khlebnikov)
+
+- Fix for the "don't warn for flush" fix (Mikulas)
+
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git tags/for-linus-20180906
+
+
+----------------------------------------------------------------
+Dennis Zhou (Facebook) (3):
+      Revert "blk-throttle: fix race between blkcg_bio_issue_check() and cgroup_rmdir()"
+      blkcg: delay blkg destruction until after writeback has finished
+      blkcg: use tryget logic when associating a blkg with a bio
+
+Jens Axboe (1):
+      nbd: don't allow invalid blocksize settings
+
+Konstantin Khlebnikov (1):
+      block: bfq: swap puts in bfqg_and_blkg_put
+
+Mikulas Patocka (1):
+      block: don't warn when doing fsync on read-only devices
+
+ block/bfq-cgroup.c         |   4 +-
+ block/bio.c                |   3 +-
+ block/blk-cgroup.c         | 105 +++++++++++++++++++++------------------------
+ block/blk-core.c           |   5 ++-
+ block/blk-throttle.c       |   5 ++-
+ drivers/block/nbd.c        |   3 ++
+ include/linux/blk-cgroup.h |  45 ++++++++++++++++++-
+ mm/backing-dev.c           |   5 +++
+ 8 files changed, 111 insertions(+), 64 deletions(-)
+
 -- 
-2.16.4
+Jens Axboe
