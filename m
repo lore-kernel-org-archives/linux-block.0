@@ -1,51 +1,97 @@
-Return-Path: <axboe@kernel.dk>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Storage fixes for 4.19-rc5
-Message-ID: <23e4fede-4dc5-ab36-fc83-bf0509cab12b@kernel.dk>
-Date: Thu, 20 Sep 2018 15:50:53 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <dennisszhou@gmail.com>
+Return-Path: <dennisszhou@gmail.com>
+From: Dennis Zhou <dennisszhou@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Josef Bacik <josef@toxicpanda.com>
+Cc: kernel-team@fb.com,
+	linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+Subject: [PATCH 10/12] blkcg: cleanup and make blk_get_rl use blkg_lookup_create
+Date: Thu,  6 Sep 2018 17:10:43 -0400
+Message-Id: <20180906211045.29055-11-dennisszhou@gmail.com>
+In-Reply-To: <20180906211045.29055-1-dennisszhou@gmail.com>
+References: <20180906211045.29055-1-dennisszhou@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Greg,
+From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
 
-Three fixes that should go into this series. This pull request
-contains:
+blk_get_rl is responsible for identifying which request_list a request
+should be allocated to. Try get logic was added earlier, but
+semantically the logic was not changed.
 
-- Fix for leaking kernel pointer in floppy ioctl (Andy Whitcroft)
+This patch makes better use of the bio already having a reference to the
+blkg in the hot path. The cold path uses a better fallback of
+blkg_lookup_create rather than just blkg_lookup and then falling back to
+the q->root_rl. If lookup_create fails with anything but -ENODEV, it
+falls back to q->root_rl.
 
-- NVMe pull request from Christoph, and a single ANA log page fix
-  (Hannes)
+A clarifying comment is added to explain why q->root_rl is used rather
+than the root blkg's rl.
 
-- Regression fix for libata qd32 support, where we trigger an illegal
-  active command transition. This fixes a CD-ROM detection issue that
-  was reported, but could also trigger premature completion of the
-  internal tag (me)
+Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+---
+ include/linux/blk-cgroup.h | 36 ++++++++++++++++++++++--------------
+ 1 file changed, 22 insertions(+), 14 deletions(-)
 
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20180920
-
-
-----------------------------------------------------------------
-Andy Whitcroft (1):
-      floppy: Do not copy a kernel pointer to user memory in FDGETPRM ioctl
-
-Hannes Reinecke (1):
-      nvme: count all ANA groups for ANA Log page
-
-Jens Axboe (2):
-      libata: mask swap internal and hardware tag
-      Merge branch 'nvme-4.19' of git://git.infradead.org/nvme into for-linus
-
- drivers/ata/libata-core.c       | 14 ++++++++++++--
- drivers/block/floppy.c          |  3 +++
- drivers/nvme/target/admin-cmd.c |  4 ++++
- 3 files changed, 19 insertions(+), 2 deletions(-)
-
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 2951ea3541b1..7964e7fc6521 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -586,28 +586,36 @@ static inline struct request_list *blk_get_rl(struct request_queue *q,
+ 
+ 	rcu_read_lock();
+ 
+-	blkcg = bio_blkcg(bio);
+-	if (!blkcg)
+-		blkcg = css_to_blkcg(blkcg_css());
++	if (bio && bio->bi_blkg) {
++		blkcg = bio->bi_blkg->blkcg;
++		if (blkcg == &blkcg_root)
++			goto rl_use_root;
++
++		blkg_get(bio->bi_blkg);
++		rcu_read_unlock();
++		return &bio->bi_blkg->rl;
++	}
+ 
+-	/* bypass blkg lookup and use @q->root_rl directly for root */
+-	if (blkcg == &blkcg_root)
+-		goto root_rl;
++	blkcg = css_to_blkcg(blkcg_css());
++	if (blkg->blkcg == &blkcg_root)
++		goto rl_use_root;
+ 
+-	/*
+-	 * Try to use blkg->rl.  blkg lookup may fail under memory pressure
+-	 * or if either the blkcg or queue is going away.  Fall back to
+-	 * root_rl in such cases.
+-	 */
+ 	blkg = blkg_lookup(blkcg, q);
+ 	if (unlikely(!blkg))
+-		goto root_rl;
++		blkg = __blkg_lookup_create(blkcg, q);
+ 
+ 	if (!blkg_try_get(blkg))
+-		goto root_rl;
++		goto rl_use_root;
++
+ 	rcu_read_unlock();
+ 	return &blkg->rl;
+-root_rl:
++
++	/*
++	 * Each blkg has its own request_list, however, the root blkcg
++	 * uses the request_queue's root_rl.  This is to avoid most
++	 * overhead for the root blkcg.
++	 */
++rl_use_root:
+ 	rcu_read_unlock();
+ 	return &q->root_rl;
+ }
 -- 
-Jens Axboe
+2.17.1
