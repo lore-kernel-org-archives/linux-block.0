@@ -1,112 +1,134 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Logan Gunthorpe <logang@deltatee.com>
-Date: Tue, 25 Sep 2018 10:22:29 -0600
-Message-Id: <20180925162231.4354-12-logang@deltatee.com>
-In-Reply-To: <20180925162231.4354-1-logang@deltatee.com>
-References: <20180925162231.4354-1-logang@deltatee.com>
-MIME-Version: 1.0
-Subject: [PATCH v7 11/13] nvme-pci: Add a quirk for a pseudo CMB
+Return-Path: <dennisszhou@gmail.com>
+Return-Path: <dennisszhou@gmail.com>
+From: Dennis Zhou <dennisszhou@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Josef Bacik <josef@toxicpanda.com>
+Cc: kernel-team@fb.com,
+	linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+Subject: [PATCH 07/12] blkcg: associate writeback bios with a blkg
+Date: Thu,  6 Sep 2018 17:10:40 -0400
+Message-Id: <20180906211045.29055-8-dennisszhou@gmail.com>
+In-Reply-To: <20180906211045.29055-1-dennisszhou@gmail.com>
+References: <20180906211045.29055-1-dennisszhou@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Introduce a quirk to use CMB-like memory on older devices that have
-an exposed BAR but do not advertise support for using CMBLOC and
-CMBSIZE.
+From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
 
-We'd like to use some of these older cards to test P2P memory.
+One of the goals of this series is to remove a separate reference to
+the css of the bio. This can and should be accessed via bio_blkcg. In
+this patch, the wbc_init_bio call is changed such that it must be called
+after a queue has been associated with the bio.
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+Acked-by: Tejun Heo <tj@kernel.org>
 ---
- drivers/nvme/host/nvme.h |  7 +++++++
- drivers/nvme/host/pci.c  | 24 ++++++++++++++++++++----
- 2 files changed, 27 insertions(+), 4 deletions(-)
+ Documentation/admin-guide/cgroup-v2.rst |  8 +++++---
+ fs/buffer.c                             | 10 +++++-----
+ fs/ext4/page-io.c                       |  2 +-
+ include/linux/writeback.h               |  5 +++--
+ 4 files changed, 14 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 4030743c90aa..8e6f3bcfe956 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -90,6 +90,13 @@ enum nvme_quirks {
- 	 * Set MEDIUM priority on SQ creation
+diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
+index 184193bcb262..caf36105a1c7 100644
+--- a/Documentation/admin-guide/cgroup-v2.rst
++++ b/Documentation/admin-guide/cgroup-v2.rst
+@@ -1857,8 +1857,10 @@ following two functions.
+ 
+   wbc_init_bio(@wbc, @bio)
+ 	Should be called for each bio carrying writeback data and
+-	associates the bio with the inode's owner cgroup.  Can be
+-	called anytime between bio allocation and submission.
++	associates the bio with the inode's owner cgroup and the
++	corresponding request queue.  This must be called after
++	a queue (device) has been associated with the bio and
++	before submission.
+ 
+   wbc_account_io(@wbc, @page, @bytes)
+ 	Should be called for each data segment being written out.
+@@ -1877,7 +1879,7 @@ the configuration, the bio may be executed at a lower priority and if
+ the writeback session is holding shared resources, e.g. a journal
+ entry, may lead to priority inversion.  There is no one easy solution
+ for the problem.  Filesystems can try to work around specific problem
+-cases by skipping wbc_init_bio() or using bio_associate_blkcg()
++cases by skipping wbc_init_bio() or using bio_associate_create_blkg()
+ directly.
+ 
+ 
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 6f1ae3ac9789..109f55196866 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -3060,11 +3060,6 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
  	 */
- 	NVME_QUIRK_MEDIUM_PRIO_SQ		= (1 << 7),
-+
-+	/*
-+	 * Pseudo CMB Support on BAR 4. For adapters like the Microsemi
-+	 * NVRAM that have CMB-like memory on a BAR but does not set
-+	 * CMBLOC or CMBSZ.
-+	 */
-+	NVME_QUIRK_PSEUDO_CMB_BAR4		= (1 << 8),
- };
+ 	bio = bio_alloc(GFP_NOIO, 1);
  
- /*
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 0d6c41bc2b35..db862ee6e53e 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1644,6 +1644,13 @@ static ssize_t nvme_cmb_show(struct device *dev,
- }
- static DEVICE_ATTR(cmb, S_IRUGO, nvme_cmb_show, NULL);
+-	if (wbc) {
+-		wbc_init_bio(wbc, bio);
+-		wbc_account_io(wbc, bh->b_page, bh->b_size);
+-	}
+-
+ 	bio->bi_iter.bi_sector = bh->b_blocknr * (bh->b_size >> 9);
+ 	bio_set_dev(bio, bh->b_bdev);
+ 	bio->bi_write_hint = write_hint;
+@@ -3084,6 +3079,11 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
+ 		op_flags |= REQ_PRIO;
+ 	bio_set_op_attrs(bio, op, op_flags);
  
-+static u32 nvme_pseudo_cmbsz(struct pci_dev *pdev, int bar)
-+{
-+	return NVME_CMBSZ_WDS | NVME_CMBSZ_RDS |
-+		(((ilog2(SZ_16M) - 12) / 4) << NVME_CMBSZ_SZU_SHIFT) |
-+		((pci_resource_len(pdev, bar) / SZ_16M) << NVME_CMBSZ_SZ_SHIFT);
-+}
-+
- static u64 nvme_cmb_size_unit(struct nvme_dev *dev)
- {
- 	u8 szu = (dev->cmbsz >> NVME_CMBSZ_SZU_SHIFT) & NVME_CMBSZ_SZU_MASK;
-@@ -1663,10 +1670,15 @@ static void nvme_map_cmb(struct nvme_dev *dev)
- 	struct pci_dev *pdev = to_pci_dev(dev->dev);
- 	int bar;
- 
--	dev->cmbsz = readl(dev->bar + NVME_REG_CMBSZ);
--	if (!dev->cmbsz)
--		return;
--	dev->cmbloc = readl(dev->bar + NVME_REG_CMBLOC);
-+	if (dev->ctrl.quirks & NVME_QUIRK_PSEUDO_CMB_BAR4) {
-+		dev->cmbsz = nvme_pseudo_cmbsz(pdev, 4);
-+		dev->cmbloc = 4;
-+	} else {
-+		dev->cmbsz = readl(dev->bar + NVME_REG_CMBSZ);
-+		if (!dev->cmbsz)
-+			return;
-+		dev->cmbloc = readl(dev->bar + NVME_REG_CMBLOC);
++	if (wbc) {
++		wbc_init_bio(wbc, bio);
++		wbc_account_io(wbc, bh->b_page, bh->b_size);
 +	}
++
+ 	submit_bio(bio);
+ 	return 0;
+ }
+diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
+index db7590178dfc..2aa62d58d8dd 100644
+--- a/fs/ext4/page-io.c
++++ b/fs/ext4/page-io.c
+@@ -374,13 +374,13 @@ static int io_submit_init_bio(struct ext4_io_submit *io,
+ 	bio = bio_alloc(GFP_NOIO, BIO_MAX_PAGES);
+ 	if (!bio)
+ 		return -ENOMEM;
+-	wbc_init_bio(io->io_wbc, bio);
+ 	bio->bi_iter.bi_sector = bh->b_blocknr * (bh->b_size >> 9);
+ 	bio_set_dev(bio, bh->b_bdev);
+ 	bio->bi_end_io = ext4_end_bio;
+ 	bio->bi_private = ext4_get_io_end(io->io_end);
+ 	io->io_bio = bio;
+ 	io->io_next_block = bh->b_blocknr;
++	wbc_init_bio(io->io_wbc, bio);
+ 	return 0;
+ }
  
- 	size = nvme_cmb_size_unit(dev) * nvme_cmb_size(dev);
- 	offset = nvme_cmb_size_unit(dev) * NVME_CMB_OFST(dev->cmbloc);
-@@ -2715,6 +2727,10 @@ static const struct pci_device_id nvme_id_table[] = {
- 		.driver_data = NVME_QUIRK_LIGHTNVM, },
- 	{ PCI_DEVICE(0x1d1d, 0x2601),	/* CNEX Granby */
- 		.driver_data = NVME_QUIRK_LIGHTNVM, },
-+	{ PCI_DEVICE(0x11f8, 0xf117),	/* Microsemi NVRAM adaptor */
-+		.driver_data = NVME_QUIRK_PSEUDO_CMB_BAR4, },
-+	{ PCI_DEVICE(0x1db1, 0x0002),	/* Everspin nvNitro adaptor */
-+		.driver_data = NVME_QUIRK_PSEUDO_CMB_BAR4,  },
- 	{ PCI_DEVICE_CLASS(PCI_CLASS_STORAGE_EXPRESS, 0xffffff) },
- 	{ PCI_DEVICE(PCI_VENDOR_ID_APPLE, 0x2001) },
- 	{ PCI_DEVICE(PCI_VENDOR_ID_APPLE, 0x2003) },
+diff --git a/include/linux/writeback.h b/include/linux/writeback.h
+index fdfd04e348f6..738a0c24874f 100644
+--- a/include/linux/writeback.h
++++ b/include/linux/writeback.h
+@@ -246,7 +246,8 @@ static inline void wbc_attach_fdatawrite_inode(struct writeback_control *wbc,
+  *
+  * @bio is a part of the writeback in progress controlled by @wbc.  Perform
+  * writeback specific initialization.  This is used to apply the cgroup
+- * writeback context.
++ * writeback context.  Must be called after the bio has been associated with
++ * a device.
+  */
+ static inline void wbc_init_bio(struct writeback_control *wbc, struct bio *bio)
+ {
+@@ -257,7 +258,7 @@ static inline void wbc_init_bio(struct writeback_control *wbc, struct bio *bio)
+ 	 * regular writeback instead of writing things out itself.
+ 	 */
+ 	if (wbc->wb)
+-		bio_associate_blkcg(bio, wbc->wb->blkcg_css);
++		bio_associate_blkg_from_css(bio, wbc->wb->blkcg_css);
+ }
+ 
+ #else	/* CONFIG_CGROUP_WRITEBACK */
 -- 
-2.19.0
+2.17.1
