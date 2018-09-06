@@ -1,137 +1,219 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:41069 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728183AbeIGPS4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Sep 2018 11:18:56 -0400
-Received: by mail-pg1-f193.google.com with SMTP id s15-v6so6808675pgv.8
-        for <linux-block@vger.kernel.org>; Fri, 07 Sep 2018 03:38:35 -0700 (PDT)
-Subject: Re: [PATCH 1/3] lightnvm: use internal allocation for chunk log page
-To: javier@javigon.com
-Cc: igor.j.konopko@intel.com, marcin.dziegielewski@intel.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        javier@cnexlabs.com
-References: <1535537370-10729-1-git-send-email-javier@cnexlabs.com>
- <1535537370-10729-2-git-send-email-javier@cnexlabs.com>
-From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <8ee257b6-d275-356a-184a-749ef455d945@lightnvm.io>
-Date: Fri, 7 Sep 2018 12:38:30 +0200
-MIME-Version: 1.0
-In-Reply-To: <1535537370-10729-2-git-send-email-javier@cnexlabs.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <dennisszhou@gmail.com>
+Return-Path: <dennisszhou@gmail.com>
+From: Dennis Zhou <dennisszhou@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Josef Bacik <josef@toxicpanda.com>
+Cc: kernel-team@fb.com,
+	linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+Subject: [PATCH 04/12] blkcg: always associate a bio with a blkg
+Date: Thu,  6 Sep 2018 17:10:37 -0400
+Message-Id: <20180906211045.29055-5-dennisszhou@gmail.com>
+In-Reply-To: <20180906211045.29055-1-dennisszhou@gmail.com>
+References: <20180906211045.29055-1-dennisszhou@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-On 08/29/2018 12:09 PM, Javier González wrote:
-> The lightnvm subsystem provides helpers to retrieve chunk metadata,
-> where the target needs to provide a buffer to store the metadata. An
-> implicit assumption is that this buffer is contiguous and can be used to
-> retrieve the data from the device. If the device exposes too many
-> chunks, then kmalloc might fail, thus failing instance creation.
-> 
-> This patch removes this assumption by implementing an internal buffer in
-> the lightnvm subsystem to retrieve chunk metadata. Targets can then
-> use virtual memory allocations. Since this is a target API change, adapt
-> pblk accordingly.
-> 
-> Signed-off-by: Javier González <javier@cnexlabs.com>
-> ---
->   drivers/lightnvm/pblk-core.c |  4 ++--
->   drivers/lightnvm/pblk-init.c |  2 +-
->   drivers/nvme/host/lightnvm.c | 23 +++++++++++++++--------
->   3 files changed, 18 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-> index fdcbeb920c9e..a311cc29afd8 100644
-> --- a/drivers/lightnvm/pblk-core.c
-> +++ b/drivers/lightnvm/pblk-core.c
-> @@ -120,7 +120,7 @@ static void pblk_end_io_erase(struct nvm_rq *rqd)
->   /*
->    * Get information for all chunks from the device.
->    *
-> - * The caller is responsible for freeing the returned structure
-> + * The caller is responsible for freeing (vmalloc) the returned structure
->    */
->   struct nvm_chk_meta *pblk_get_chunk_meta(struct pblk *pblk)
->   {
-> @@ -134,7 +134,7 @@ struct nvm_chk_meta *pblk_get_chunk_meta(struct pblk *pblk)
->   	ppa.ppa = 0;
->   
->   	len = geo->all_chunks * sizeof(*meta);
-> -	meta = kzalloc(len, GFP_KERNEL);
-> +	meta = vzalloc(len);
->   	if (!meta)
->   		return ERR_PTR(-ENOMEM);
->   
-> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-> index e0db6de137d6..a99854439224 100644
-> --- a/drivers/lightnvm/pblk-init.c
-> +++ b/drivers/lightnvm/pblk-init.c
-> @@ -983,7 +983,7 @@ static int pblk_lines_init(struct pblk *pblk)
->   
->   	pblk_set_provision(pblk, nr_free_chks);
->   
-> -	kfree(chunk_meta);
-> +	vfree(chunk_meta);
->   	return 0;
->   
->   fail_free_lines:
-> diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-> index 2c96e7fcdcac..5bfa354c5dd5 100644
-> --- a/drivers/nvme/host/lightnvm.c
-> +++ b/drivers/nvme/host/lightnvm.c
-> @@ -579,7 +579,7 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
->   	struct nvm_geo *geo = &ndev->geo;
->   	struct nvme_ns *ns = ndev->q->queuedata;
->   	struct nvme_ctrl *ctrl = ns->ctrl;
-> -	struct nvme_nvm_chk_meta *dev_meta = (struct nvme_nvm_chk_meta *)meta;
-> +	struct nvme_nvm_chk_meta *dev_meta, *dev_meta_off;
->   	struct ppa_addr ppa;
->   	size_t left = nchks * sizeof(struct nvme_nvm_chk_meta);
->   	size_t log_pos, offset, len;
-> @@ -591,6 +591,10 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
->   	 */
->   	max_len = min_t(unsigned int, ctrl->max_hw_sectors << 9, 256 * 1024);
->   
-> +	dev_meta = kmalloc(max_len, GFP_KERNEL);
-> +	if (!dev_meta)
-> +		return -ENOMEM;
-> +
->   	/* Normalize lba address space to obtain log offset */
->   	ppa.ppa = slba;
->   	ppa = dev_to_generic_addr(ndev, ppa);
-> @@ -604,6 +608,9 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
->   	while (left) {
->   		len = min_t(unsigned int, left, max_len);
->   
-> +		memset(dev_meta, 0, max_len);
-> +		dev_meta_off = dev_meta;
-> +
->   		ret = nvme_get_log_ext(ctrl, ns, NVME_NVM_LOG_REPORT_CHUNK,
->   				dev_meta, len, offset);
->   		if (ret) {
-> @@ -612,15 +619,15 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
->   		}
->   
->   		for (i = 0; i < len; i += sizeof(struct nvme_nvm_chk_meta)) {
-> -			meta->state = dev_meta->state;
-> -			meta->type = dev_meta->type;
-> -			meta->wi = dev_meta->wi;
-> -			meta->slba = le64_to_cpu(dev_meta->slba);
-> -			meta->cnlb = le64_to_cpu(dev_meta->cnlb);
-> -			meta->wp = le64_to_cpu(dev_meta->wp);
-> +			meta->state = dev_meta_off->state;
-> +			meta->type = dev_meta_off->type;
-> +			meta->wi = dev_meta_off->wi;
-> +			meta->slba = le64_to_cpu(dev_meta_off->slba);
-> +			meta->cnlb = le64_to_cpu(dev_meta_off->cnlb);
-> +			meta->wp = le64_to_cpu(dev_meta_off->wp);
->   
->   			meta++;
-> -			dev_meta++;
-> +			dev_meta_off++;
->   		}
->   
->   		offset += len;
-> 
+From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
 
-Thanks. Applied for 4.20.
+Previously, blkg's were only assigned as needed by blk-iolatency and
+blk-throttle. bio->css was also always being associated while blkg was
+being looked up and then thrown away in blkcg_bio_issue_check.
+
+This patch begins the cleanup of bio->css and bio->bi_blkg by always
+associating a blkg in blkcg_bio_issue_check. This tries to create the
+blkg, but if it is not possible, falls back to using the root_blkg of
+the request_queue. Therefore, a bio will always be associated with a
+blkg. The duplicate association logic is removed from blk-throttle and
+blk-iolatency.
+
+Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+---
+ block/bio.c                | 38 ++++++++++++++++++++++++++++++++++++++
+ block/blk-iolatency.c      | 24 ++----------------------
+ block/blk-throttle.c       |  5 +----
+ include/linux/bio.h        |  3 +++
+ include/linux/blk-cgroup.h | 16 ++--------------
+ 5 files changed, 46 insertions(+), 40 deletions(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index cd947ad4cf08..b2b3fddfcd6f 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -2025,6 +2025,41 @@ int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg)
+ 	return 0;
+ }
+ 
++/**
++ * bio_associate_create_blkg - associate a bio with a blkg from q
++ * @q: request_queue where bio is going
++ * @bio: target bio
++ *
++ * Associate @bio with the blkg found from the bio's css and the request_queue.
++ * If one is not found, bio_lookup_blkg creates the blkg.
++ */
++int bio_associate_create_blkg(struct request_queue *q, struct bio *bio)
++{
++	struct blkcg *blkcg;
++	struct blkcg_gq *blkg;
++	int ret = 0;
++
++	/* someone has already associated this bio with a blkg */
++	if (bio->bi_blkg)
++		return ret;
++
++	rcu_read_lock();
++
++	bio_associate_blkcg(bio, NULL);
++	blkcg = bio_blkcg(bio);
++
++	if (!blkcg->css.parent) {
++		ret = bio_associate_blkg(bio, q->root_blkg);
++	} else {
++		blkg = blkg_lookup_create(blkcg, q);
++
++		ret = bio_associate_blkg(bio, blkg);
++	}
++
++	rcu_read_unlock();
++	return ret;
++}
++
+ /**
+  * bio_disassociate_task - undo bio_associate_current()
+  * @bio: target bio
+@@ -2054,6 +2089,9 @@ void bio_clone_blkcg_association(struct bio *dst, struct bio *src)
+ {
+ 	if (src->bi_css)
+ 		WARN_ON(bio_associate_blkcg(dst, src->bi_css));
++
++	if (src->bi_blkg)
++		bio_associate_blkg(dst, src->bi_blkg);
+ }
+ EXPORT_SYMBOL_GPL(bio_clone_blkcg_association);
+ #endif /* CONFIG_BLK_CGROUP */
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index 22b2ff0440cc..79a7549e2062 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -395,34 +395,14 @@ static void blkcg_iolatency_throttle(struct rq_qos *rqos, struct bio *bio,
+ 				     spinlock_t *lock)
+ {
+ 	struct blk_iolatency *blkiolat = BLKIOLATENCY(rqos);
+-	struct blkcg *blkcg;
+-	struct blkcg_gq *blkg;
+-	struct request_queue *q = rqos->q;
++	struct blkcg_gq *blkg = bio->bi_blkg;
+ 	bool issue_as_root = bio_issue_as_root_blkg(bio);
+ 
+ 	if (!blk_iolatency_enabled(blkiolat))
+ 		return;
+ 
+-	rcu_read_lock();
+-	bio_associate_blkcg(bio, NULL);
+-	blkcg = bio_blkcg(bio);
+-	blkg = blkg_lookup(blkcg, q);
+-	if (unlikely(!blkg)) {
+-		if (!lock)
+-			spin_lock_irq(q->queue_lock);
+-		blkg = __blkg_lookup_create(blkcg, q);
+-		if (IS_ERR(blkg))
+-			blkg = NULL;
+-		if (!lock)
+-			spin_unlock_irq(q->queue_lock);
+-	}
+-	if (!blkg)
+-		goto out;
+-
+ 	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
+-	bio_associate_blkg(bio, blkg);
+-out:
+-	rcu_read_unlock();
++
+ 	while (blkg && blkg->parent) {
+ 		struct iolatency_grp *iolat = blkg_to_lat(blkg);
+ 		if (!iolat) {
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 01d0620a4e4a..b7b5cc4defc2 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -2129,9 +2129,6 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
+ static void blk_throtl_assoc_bio(struct throtl_grp *tg, struct bio *bio)
+ {
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+-	/* fallback to root_blkg if we fail to get a blkg ref */
+-	if (bio->bi_css && (bio_associate_blkg(bio, tg_to_blkg(tg)) == -ENODEV))
+-		bio_associate_blkg(bio, bio->bi_disk->queue->root_blkg);
+ 	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
+ #endif
+ }
+@@ -2140,7 +2137,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 		    struct bio *bio)
+ {
+ 	struct throtl_qnode *qn = NULL;
+-	struct throtl_grp *tg = blkg_to_tg(blkg ?: q->root_blkg);
++	struct throtl_grp *tg = blkg_to_tg(blkg);
+ 	struct throtl_service_queue *sq;
+ 	bool rw = bio_data_dir(bio);
+ 	bool throttled = false;
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 51371740d2a8..d1435643f5b7 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -556,11 +556,14 @@ static inline int bio_associate_blkcg_from_page(struct bio *bio,
+ #ifdef CONFIG_BLK_CGROUP
+ int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css);
+ int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg);
++int bio_associate_create_blkg(struct request_queue *q, struct bio *bio);
+ void bio_disassociate_task(struct bio *bio);
+ void bio_clone_blkcg_association(struct bio *dst, struct bio *src);
+ #else	/* CONFIG_BLK_CGROUP */
+ static inline int bio_associate_blkcg(struct bio *bio,
+ 			struct cgroup_subsys_state *blkcg_css) { return 0; }
++static inline int bio_associate_create_blkg(struct request_queue *q,
++					    struct bio *bio) { return 0; }
+ static inline void bio_disassociate_task(struct bio *bio) { }
+ static inline void bio_clone_blkcg_association(struct bio *dst,
+ 			struct bio *src) { }
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 1fbff1bbb651..6e33ad1d92b4 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -900,29 +900,17 @@ static inline bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg
+ static inline bool blkcg_bio_issue_check(struct request_queue *q,
+ 					 struct bio *bio)
+ {
+-	struct blkcg *blkcg;
+ 	struct blkcg_gq *blkg;
+ 	bool throtl = false;
+ 
+ 	rcu_read_lock();
+ 
+-	/* associate blkcg if bio hasn't attached one */
+-	bio_associate_blkcg(bio, NULL);
+-	blkcg = bio_blkcg(bio);
+-
+-	blkg = blkg_lookup(blkcg, q);
+-	if (unlikely(!blkg)) {
+-		spin_lock_irq(q->queue_lock);
+-		blkg = __blkg_lookup_create(blkcg, q);
+-		if (IS_ERR(blkg))
+-			blkg = NULL;
+-		spin_unlock_irq(q->queue_lock);
+-	}
++	bio_associate_create_blkg(q, bio);
++	blkg = bio->bi_blkg;
+ 
+ 	throtl = blk_throtl_bio(q, blkg, bio);
+ 
+ 	if (!throtl) {
+-		blkg = blkg ?: q->root_blkg;
+ 		/*
+ 		 * If the bio is flagged with BIO_QUEUE_ENTERED it means this
+ 		 * is a split bio and we would have already accounted for the
+-- 
+2.17.1
