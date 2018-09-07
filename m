@@ -8,16 +8,16 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-block@vger.kernel.org,
 	Masami Hiramatsu <mhiramat@kernel.org>,
 	"Steven Rostedt (VMware)" <rostedt@goodmis.org>
-Subject: [PATCH 4.9 30/63] tracing/blktrace: Fix to allow setting same value
-Date: Fri,  7 Sep 2018 23:10:01 +0200
-Message-Id: <20180907211014.655232544@linuxfoundation.org>
-In-Reply-To: <20180907211012.965501324@linuxfoundation.org>
-References: <20180907211012.965501324@linuxfoundation.org>
+Subject: [PATCH 4.14 46/89] tracing/blktrace: Fix to allow setting same value
+Date: Fri,  7 Sep 2018 23:09:40 +0200
+Message-Id: <20180907210858.105984780@linuxfoundation.org>
+In-Reply-To: <20180907210852.341064285@linuxfoundation.org>
+References: <20180907210852.341064285@linuxfoundation.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-4.9-stable review patch.  If anyone has any objections, please let me know.
+4.14-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -68,8 +68,8 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/kernel/trace/blktrace.c
 +++ b/kernel/trace/blktrace.c
-@@ -1720,6 +1720,10 @@ static ssize_t sysfs_blk_trace_attr_stor
- 	mutex_lock(&bdev->bd_mutex);
+@@ -1809,6 +1809,10 @@ static ssize_t sysfs_blk_trace_attr_stor
+ 	mutex_lock(&q->blk_trace_mutex);
  
  	if (attr == &dev_attr_enable) {
 +		if (!!value == !!q->blk_trace) {
