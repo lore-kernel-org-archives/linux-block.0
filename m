@@ -1,127 +1,95 @@
-Return-Path: <bvanassche@acm.org>
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v9 5/8] block: Split blk_pm_add_request() and blk_pm_put_request()
-Date: Wed, 19 Sep 2018 15:45:27 -0700
-Message-Id: <20180919224530.222469-6-bvanassche@acm.org>
-In-Reply-To: <20180919224530.222469-1-bvanassche@acm.org>
-References: <20180919224530.222469-1-bvanassche@acm.org>
-MIME-Version: 1.0
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	kernel-team@fb.com,
+	linux-block@vger.kernel.org
+Subject: [PATCH 6/6] blk-iolatency: keep track of previous windows stats
+Date: Mon, 10 Sep 2018 16:49:32 -0400
+Message-Id: <20180910204932.14323-7-josef@toxicpanda.com>
+In-Reply-To: <20180910204932.14323-1-josef@toxicpanda.com>
+References: <20180910204932.14323-1-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Move the pm_request_resume() and pm_runtime_mark_last_busy() calls into
-two new functions and thereby separate legacy block layer code from code
-that works for both the legacy block layer and blk-mq. A later patch will
-add calls to the new functions in the blk-mq code.
+We apply a smoothing to the scale changes in order to keep sawtoothy
+behavior from occurring.  However our window for checking if we've
+missed our target can sometimes be lower than the smoothing interval
+(500ms), especially on faster drives like ssd's.  In order to deal with
+this keep track of the running tally of the previous intervals that we
+threw away because we had already done a scale event recently.
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>
+This is needed for the ssd case as these low latency drives will have
+bursts of latency, and if it happens to be ok for the window that
+directly follows the opening of the scale window we could unthrottle
+when previous windows we were missing our target.
+
+Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 ---
- block/blk-core.c |  1 +
- block/blk-pm.h   | 36 +++++++++++++++++++++++++++++++-----
- block/elevator.c |  1 +
- 3 files changed, 33 insertions(+), 5 deletions(-)
+ block/blk-iolatency.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 1a691f5269bb..fd91e9bf2893 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1744,6 +1744,7 @@ void __blk_put_request(struct request_queue *q, struct request *req)
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index e36b949a5696..14c30e01ecc7 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -130,6 +130,7 @@ struct latency_stat {
+ struct iolatency_grp {
+ 	struct blkg_policy_data pd;
+ 	struct latency_stat __percpu *stats;
++	struct latency_stat cur_stat;
+ 	struct blk_iolatency *blkiolat;
+ 	struct rq_depth rq_depth;
+ 	struct rq_wait rq_wait;
+@@ -592,24 +593,27 @@ static void iolatency_check_latencies(struct iolatency_grp *iolat, u64 now)
  
- 	blk_req_zone_write_unlock(req);
- 	blk_pm_put_request(req);
-+	blk_pm_mark_last_busy(req);
- 
- 	elv_completed_request(q, req);
- 
-diff --git a/block/blk-pm.h b/block/blk-pm.h
-index 1ffc8ef203ec..a8564ea72a41 100644
---- a/block/blk-pm.h
-+++ b/block/blk-pm.h
-@@ -6,8 +6,23 @@
- #include <linux/pm_runtime.h>
- 
- #ifdef CONFIG_PM
-+static inline void blk_pm_request_resume(struct request_queue *q)
-+{
-+	if (q->dev && (q->rpm_status == RPM_SUSPENDED ||
-+		       q->rpm_status == RPM_SUSPENDING))
-+		pm_request_resume(q->dev);
-+}
+ 	/* Somebody beat us to the punch, just bail. */
+ 	spin_lock_irqsave(&lat_info->lock, flags);
 +
-+static inline void blk_pm_mark_last_busy(struct request *rq)
-+{
-+	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
-+		pm_runtime_mark_last_busy(rq->q->dev);
-+}
-+
- static inline void blk_pm_requeue_request(struct request *rq)
- {
-+	lockdep_assert_held(rq->q->queue_lock);
-+
- 	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
- 		rq->q->nr_pending--;
++	latency_stat_sum(iolat, &iolat->cur_stat, &stat);
+ 	lat_info->nr_samples -= iolat->nr_samples;
+-	lat_info->nr_samples += latency_stat_samples(iolat, &stat);
+-	iolat->nr_samples = latency_stat_samples(iolat, &stat);
++	lat_info->nr_samples += latency_stat_samples(iolat, &iolat->cur_stat);
++	iolat->nr_samples = latency_stat_samples(iolat, &iolat->cur_stat);
+ 
+ 	if ((lat_info->last_scale_event >= now ||
+-	    now - lat_info->last_scale_event < BLKIOLATENCY_MIN_ADJUST_TIME) &&
+-	    lat_info->scale_lat <= iolat->min_lat_nsec)
++	    now - lat_info->last_scale_event < BLKIOLATENCY_MIN_ADJUST_TIME))
+ 		goto out;
+ 
+-	if (latency_sum_ok(iolat, &stat)) {
+-		if (latency_stat_samples(iolat, &stat) <
++	if (latency_sum_ok(iolat, &iolat->cur_stat) &&
++	    latency_sum_ok(iolat, &stat)) {
++		if (latency_stat_samples(iolat, &iolat->cur_stat) <
+ 		    BLKIOLATENCY_MIN_GOOD_SAMPLES)
+ 			goto out;
+ 		if (lat_info->scale_grp == iolat) {
+ 			lat_info->last_scale_event = now;
+ 			scale_cookie_change(iolat->blkiolat, lat_info, true);
+ 		}
+-	} else {
++	} else if (lat_info->scale_lat == 0 ||
++		   lat_info->scale_lat >= iolat->min_lat_nsec) {
+ 		lat_info->last_scale_event = now;
+ 		if (!lat_info->scale_grp ||
+ 		    lat_info->scale_lat > iolat->min_lat_nsec) {
+@@ -618,6 +622,7 @@ static void iolatency_check_latencies(struct iolatency_grp *iolat, u64 now)
+ 		}
+ 		scale_cookie_change(iolat->blkiolat, lat_info, false);
+ 	}
++	latency_stat_init(iolat, &iolat->cur_stat);
+ out:
+ 	spin_unlock_irqrestore(&lat_info->lock, flags);
  }
-@@ -15,17 +30,28 @@ static inline void blk_pm_requeue_request(struct request *rq)
- static inline void blk_pm_add_request(struct request_queue *q,
- 				      struct request *rq)
- {
--	if (q->dev && !(rq->rq_flags & RQF_PM) && q->nr_pending++ == 0 &&
--	    (q->rpm_status == RPM_SUSPENDED || q->rpm_status == RPM_SUSPENDING))
--		pm_request_resume(q->dev);
-+	lockdep_assert_held(q->queue_lock);
-+
-+	if (q->dev && !(rq->rq_flags & RQF_PM))
-+		q->nr_pending++;
- }
+@@ -990,6 +995,7 @@ static void iolatency_pd_init(struct blkg_policy_data *pd)
+ 		latency_stat_init(iolat, stat);
+ 	}
  
- static inline void blk_pm_put_request(struct request *rq)
- {
--	if (rq->q->dev && !(rq->rq_flags & RQF_PM) && !--rq->q->nr_pending)
--		pm_runtime_mark_last_busy(rq->q->dev);
-+	lockdep_assert_held(rq->q->queue_lock);
-+
-+	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
-+		--rq->q->nr_pending;
- }
- #else
-+static inline void blk_pm_request_resume(struct request_queue *q)
-+{
-+}
-+
-+static inline void blk_pm_mark_last_busy(struct request *rq)
-+{
-+}
-+
- static inline void blk_pm_requeue_request(struct request *rq)
- {
- }
-diff --git a/block/elevator.c b/block/elevator.c
-index e18ac68626e3..1c992bf6cfb1 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -601,6 +601,7 @@ void __elv_add_request(struct request_queue *q, struct request *rq, int where)
- 	trace_block_rq_insert(q, rq);
- 
- 	blk_pm_add_request(q, rq);
-+	blk_pm_request_resume(q);
- 
- 	rq->q = q;
- 
++	latency_stat_init(iolat, &iolat->cur_stat);
+ 	rq_wait_init(&iolat->rq_wait);
+ 	spin_lock_init(&iolat->child_lat.lock);
+ 	iolat->rq_depth.queue_depth = blkg->q->nr_requests;
 -- 
-2.19.0.397.gdd90340f6a-goog
+2.14.3
