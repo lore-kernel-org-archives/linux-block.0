@@ -1,40 +1,135 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	kernel-team@fb.com,
-	linux-block@vger.kernel.org
-Subject: [PATCH 3/6] blk-iolatency: deal with nr_requests == 1
-Date: Mon, 10 Sep 2018 16:49:29 -0400
-Message-Id: <20180910204932.14323-4-josef@toxicpanda.com>
-In-Reply-To: <20180910204932.14323-1-josef@toxicpanda.com>
-References: <20180910204932.14323-1-josef@toxicpanda.com>
+Return-Path: <dennisszhou@gmail.com>
+Return-Path: <dennisszhou@gmail.com>
+From: Dennis Zhou <dennisszhou@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Josef Bacik <josef@toxicpanda.com>
+Cc: kernel-team@fb.com,
+	linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+Subject: [PATCH 02/12] blkcg: update blkg_lookup_create to do locking
+Date: Tue, 11 Sep 2018 14:41:27 -0400
+Message-Id: <20180911184137.35897-3-dennisszhou@gmail.com>
+In-Reply-To: <20180911184137.35897-1-dennisszhou@gmail.com>
+References: <20180911184137.35897-1-dennisszhou@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hitting the case where blk_queue_depth() returned 1 uncovered the fact
-that iolatency doesn't actually handle this case properly, it simply
-doesn't scale down anybody.  For this case we should go straight into
-applying the time delay, which we weren't doing.  Since we already limit
-the floor at 1 request this if statement is not needed, and this allows
-us to set our depth to 1 which allows us to apply the delay if needed.
+From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
 
-Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+To know when to create a blkg, the general pattern is to do a
+blkg_lookup and if that fails, lock and then do a lookup again and if
+that fails finally create. It doesn't make much sense for everyone who
+wants to do creation to write this themselves.
+
+This changes blkg_lookup_create to do locking and implement this
+pattern. The old blkg_lookup_create is renamed to __blkg_lookup_create.
+If a call site wants to do its own error handling or already owns the
+queue lock, they can use __blkg_lookup_create. This will be used in
+upcoming patches.
+
+Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Reviewed-by: Liu Bo <bo.liu@linux.alibaba.com>
 ---
- block/blk-iolatency.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-cgroup.c         | 31 ++++++++++++++++++++++++++++---
+ block/blk-iolatency.c      |  2 +-
+ include/linux/blk-cgroup.h |  4 +++-
+ 3 files changed, 32 insertions(+), 5 deletions(-)
 
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index c19f9078da1e..cd0d97bed83d 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -259,7 +259,7 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
+ }
+ 
+ /**
+- * blkg_lookup_create - lookup blkg, try to create one if not there
++ * __blkg_lookup_create - lookup blkg, try to create one if not there
+  * @blkcg: blkcg of interest
+  * @q: request_queue of interest
+  *
+@@ -272,8 +272,8 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
+  * value on error.  If @q is dead, returns ERR_PTR(-EINVAL).  If @q is not
+  * dead and bypassing, returns ERR_PTR(-EBUSY).
+  */
+-struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
+-				    struct request_queue *q)
++struct blkcg_gq *__blkg_lookup_create(struct blkcg *blkcg,
++				      struct request_queue *q)
+ {
+ 	struct blkcg_gq *blkg;
+ 
+@@ -310,6 +310,31 @@ struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
+ 	}
+ }
+ 
++/**
++ * blkg_lookup_create - find or create a blkg
++ * @blkcg: target block cgroup
++ * @q: target request_queue
++ *
++ * This looks up or creates the blkg representing the unique pair
++ * of the blkcg and the request_queue.
++ */
++struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
++				    struct request_queue *q)
++{
++	struct blkcg_gq *blkg = blkg_lookup(blkcg, q);
++	unsigned long flags;
++
++	if (unlikely(!blkg)) {
++		spin_lock_irqsave(q->queue_lock, flags);
++
++		blkg = __blkg_lookup_create(blkcg, q);
++
++		spin_unlock_irqrestore(q->queue_lock, flags);
++	}
++
++	return blkg;
++}
++
+ static void blkg_destroy(struct blkcg_gq *blkg)
+ {
+ 	struct blkcg *blkcg = blkg->blkcg;
 diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 8f32aa1817f8..4ed05d09a69e 100644
+index 62fdd9002c29..22b2ff0440cc 100644
 --- a/block/blk-iolatency.c
 +++ b/block/blk-iolatency.c
-@@ -312,7 +312,7 @@ static void scale_change(struct iolatency_grp *iolat, bool up)
- 			iolat->rq_depth.max_depth = old;
- 			wake_up_all(&iolat->rq_wait.wait);
- 		}
--	} else if (old > 1) {
-+	} else {
- 		old >>= 1;
- 		iolat->rq_depth.max_depth = max(old, 1UL);
- 	}
+@@ -410,7 +410,7 @@ static void blkcg_iolatency_throttle(struct rq_qos *rqos, struct bio *bio,
+ 	if (unlikely(!blkg)) {
+ 		if (!lock)
+ 			spin_lock_irq(q->queue_lock);
+-		blkg = blkg_lookup_create(blkcg, q);
++		blkg = __blkg_lookup_create(blkcg, q);
+ 		if (IS_ERR(blkg))
+ 			blkg = NULL;
+ 		if (!lock)
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 24067a1f8b36..cc0f238530f6 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -184,6 +184,8 @@ extern struct cgroup_subsys_state * const blkcg_root_css;
+ 
+ struct blkcg_gq *blkg_lookup_slowpath(struct blkcg *blkcg,
+ 				      struct request_queue *q, bool update_hint);
++struct blkcg_gq *__blkg_lookup_create(struct blkcg *blkcg,
++				      struct request_queue *q);
+ struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
+ 				    struct request_queue *q);
+ int blkcg_init_queue(struct request_queue *q);
+@@ -897,7 +899,7 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
+ 	blkg = blkg_lookup(blkcg, q);
+ 	if (unlikely(!blkg)) {
+ 		spin_lock_irq(q->queue_lock);
+-		blkg = blkg_lookup_create(blkcg, q);
++		blkg = __blkg_lookup_create(blkcg, q);
+ 		if (IS_ERR(blkg))
+ 			blkg = NULL;
+ 		spin_unlock_irq(q->queue_lock);
 -- 
-2.14.3
+2.17.1
