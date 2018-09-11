@@ -1,74 +1,202 @@
-Return-Path: <bvanassche@acm.org>
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v9 8/8] blk-mq: Enable support for runtime power management
-Date: Wed, 19 Sep 2018 15:45:30 -0700
-Message-Id: <20180919224530.222469-9-bvanassche@acm.org>
-In-Reply-To: <20180919224530.222469-1-bvanassche@acm.org>
-References: <20180919224530.222469-1-bvanassche@acm.org>
-MIME-Version: 1.0
+Return-Path: <dennisszhou@gmail.com>
+Return-Path: <dennisszhou@gmail.com>
+From: Dennis Zhou <dennisszhou@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Josef Bacik <josef@toxicpanda.com>
+Cc: kernel-team@fb.com,
+	linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+Subject: [PATCH 11/12] blkcg: change blkg reference counting to use percpu_ref
+Date: Tue, 11 Sep 2018 14:41:36 -0400
+Message-Id: <20180911184137.35897-12-dennisszhou@gmail.com>
+In-Reply-To: <20180911184137.35897-1-dennisszhou@gmail.com>
+References: <20180911184137.35897-1-dennisszhou@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Now that the blk-mq core processes power management requests
-(marked with RQF_PREEMPT) in other states than RPM_ACTIVE, enable
-runtime power management for blk-mq.
+From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>
+Now that every bio is associated with a blkg, this puts the use of
+blkg_get, blkg_try_get, and blkg_put on the hot path. This switches over
+the refcnt in blkg to use percpu_ref.
+
+Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
+Acked-by: Tejun Heo <tj@kernel.org>
 ---
- block/blk-mq.c | 2 ++
- block/blk-pm.c | 6 ------
- 2 files changed, 2 insertions(+), 6 deletions(-)
+ block/blk-cgroup.c         | 64 +++++++++++++++++++++++---------------
+ include/linux/blk-cgroup.h | 15 +++------
+ 2 files changed, 44 insertions(+), 35 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 85a1c1a59c72..20fdd78b75c7 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -33,6 +33,7 @@
- #include "blk-mq.h"
- #include "blk-mq-debugfs.h"
- #include "blk-mq-tag.h"
-+#include "blk-pm.h"
- #include "blk-stat.h"
- #include "blk-mq-sched.h"
- #include "blk-rq-qos.h"
-@@ -475,6 +476,7 @@ static void __blk_mq_free_request(struct request *rq)
- 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, ctx->cpu);
- 	const int sched_tag = rq->internal_tag;
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index e9e3a955f61a..ab3676e1e15e 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -84,6 +84,37 @@ static void blkg_free(struct blkcg_gq *blkg)
+ 	kfree(blkg);
+ }
  
-+	blk_pm_mark_last_busy(rq);
- 	if (rq->tag != -1)
- 		blk_mq_put_tag(hctx, hctx->tags, ctx, rq->tag);
- 	if (sched_tag != -1)
-diff --git a/block/blk-pm.c b/block/blk-pm.c
-index 3ad5a7334baa..7c0ac1424f46 100644
---- a/block/blk-pm.c
-+++ b/block/blk-pm.c
-@@ -30,12 +30,6 @@
-  */
- void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
- {
--	/* Don't enable runtime PM for blk-mq until it is ready */
--	if (q->mq_ops) {
--		pm_runtime_disable(dev);
--		return;
--	}
++static void __blkg_release(struct rcu_head *rcu)
++{
++	struct blkcg_gq *blkg = container_of(rcu, struct blkcg_gq, rcu_head);
++
++	percpu_ref_exit(&blkg->refcnt);
++
++	/* release the blkcg and parent blkg refs this blkg has been holding */
++	css_put(&blkg->blkcg->css);
++	if (blkg->parent)
++		blkg_put(blkg->parent);
++
++	wb_congested_put(blkg->wb_congested);
++
++	blkg_free(blkg);
++}
++
++/*
++ * A group is RCU protected, but having an rcu lock does not mean that one
++ * can access all the fields of blkg and assume these are valid.  For
++ * example, don't try to follow throtl_data and request queue links.
++ *
++ * Having a reference to blkg under an rcu allows accesses to only values
++ * local to groups like group stats and group rate limits.
++ */
++static void blkg_release(struct percpu_ref *ref)
++{
++	struct blkcg_gq *blkg = container_of(ref, struct blkcg_gq, refcnt);
++
++	call_rcu(&blkg->rcu_head, __blkg_release);
++}
++
+ /**
+  * blkg_alloc - allocate a blkg
+  * @blkcg: block cgroup the new blkg is associated with
+@@ -110,7 +141,6 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
+ 	blkg->q = q;
+ 	INIT_LIST_HEAD(&blkg->q_node);
+ 	blkg->blkcg = blkcg;
+-	atomic_set(&blkg->refcnt, 1);
+ 
+ 	/* root blkg uses @q->root_rl, init rl only for !root blkgs */
+ 	if (blkcg != &blkcg_root) {
+@@ -217,6 +247,11 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
+ 		blkg_get(blkg->parent);
+ 	}
+ 
++	ret = percpu_ref_init(&blkg->refcnt, blkg_release, 0,
++			      GFP_NOWAIT | __GFP_NOWARN);
++	if (ret)
++		goto err_cancel_ref;
++
+ 	/* invoke per-policy init */
+ 	for (i = 0; i < BLKCG_MAX_POLS; i++) {
+ 		struct blkcg_policy *pol = blkcg_policy[i];
+@@ -249,6 +284,8 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
+ 	blkg_put(blkg);
+ 	return ERR_PTR(ret);
+ 
++err_cancel_ref:
++	percpu_ref_exit(&blkg->refcnt);
+ err_put_congested:
+ 	wb_congested_put(wb_congested);
+ err_put_css:
+@@ -387,7 +424,7 @@ static void blkg_destroy(struct blkcg_gq *blkg)
+ 	 * Put the reference taken at the time of creation so that when all
+ 	 * queues are gone, group can be destroyed.
+ 	 */
+-	blkg_put(blkg);
++	percpu_ref_kill(&blkg->refcnt);
+ }
+ 
+ /**
+@@ -414,29 +451,6 @@ static void blkg_destroy_all(struct request_queue *q)
+ 	q->root_rl.blkg = NULL;
+ }
+ 
+-/*
+- * A group is RCU protected, but having an rcu lock does not mean that one
+- * can access all the fields of blkg and assume these are valid.  For
+- * example, don't try to follow throtl_data and request queue links.
+- *
+- * Having a reference to blkg under an rcu allows accesses to only values
+- * local to groups like group stats and group rate limits.
+- */
+-void __blkg_release_rcu(struct rcu_head *rcu_head)
+-{
+-	struct blkcg_gq *blkg = container_of(rcu_head, struct blkcg_gq, rcu_head);
 -
- 	q->dev = dev;
- 	q->rpm_status = RPM_ACTIVE;
- 	pm_runtime_set_autosuspend_delay(q->dev, -1);
+-	/* release the blkcg and parent blkg refs this blkg has been holding */
+-	css_put(&blkg->blkcg->css);
+-	if (blkg->parent)
+-		blkg_put(blkg->parent);
+-
+-	wb_congested_put(blkg->wb_congested);
+-
+-	blkg_free(blkg);
+-}
+-EXPORT_SYMBOL_GPL(__blkg_release_rcu);
+-
+ /*
+  * The next function used by blk_queue_for_each_rl().  It's a bit tricky
+  * because the root blkg uses @q->root_rl instead of its own rl.
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index d2f7f1b00fcf..7ff5d8ba8c7a 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -126,7 +126,7 @@ struct blkcg_gq {
+ 	struct request_list		rl;
+ 
+ 	/* reference count */
+-	atomic_t			refcnt;
++	struct percpu_ref		refcnt;
+ 
+ 	/* is this blkg online? protected by both blkcg and q locks */
+ 	bool				online;
+@@ -490,8 +490,7 @@ static inline int blkg_path(struct blkcg_gq *blkg, char *buf, int buflen)
+  */
+ static inline void blkg_get(struct blkcg_gq *blkg)
+ {
+-	WARN_ON_ONCE(atomic_read(&blkg->refcnt) <= 0);
+-	atomic_inc(&blkg->refcnt);
++	percpu_ref_get(&blkg->refcnt);
+ }
+ 
+ /**
+@@ -503,7 +502,7 @@ static inline void blkg_get(struct blkcg_gq *blkg)
+  */
+ static inline struct blkcg_gq *blkg_try_get(struct blkcg_gq *blkg)
+ {
+-	if (atomic_inc_not_zero(&blkg->refcnt))
++	if (percpu_ref_tryget(&blkg->refcnt))
+ 		return blkg;
+ 	return NULL;
+ }
+@@ -517,23 +516,19 @@ static inline struct blkcg_gq *blkg_try_get(struct blkcg_gq *blkg)
+  */
+ static inline struct blkcg_gq *blkg_try_get_closest(struct blkcg_gq *blkg)
+ {
+-	while (!atomic_inc_not_zero(&blkg->refcnt))
++	while (!percpu_ref_tryget(&blkg->refcnt))
+ 		blkg = blkg->parent;
+ 
+ 	return blkg;
+ }
+ 
+-void __blkg_release_rcu(struct rcu_head *rcu);
+-
+ /**
+  * blkg_put - put a blkg reference
+  * @blkg: blkg to put
+  */
+ static inline void blkg_put(struct blkcg_gq *blkg)
+ {
+-	WARN_ON_ONCE(atomic_read(&blkg->refcnt) <= 0);
+-	if (atomic_dec_and_test(&blkg->refcnt))
+-		call_rcu(&blkg->rcu_head, __blkg_release_rcu);
++	percpu_ref_put(&blkg->refcnt);
+ }
+ 
+ /**
 -- 
-2.19.0.397.gdd90340f6a-goog
+2.17.1
