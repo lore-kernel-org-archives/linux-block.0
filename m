@@ -1,39 +1,49 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:41823 "EHLO newverein.lst.de"
+Received: from verein.lst.de ([213.95.11.211]:41780 "EHLO newverein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726563AbeIKOQz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Sep 2018 10:16:55 -0400
-Date: Tue, 11 Sep 2018 11:22:54 +0200
+        id S1726554AbeIKOHx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Sep 2018 10:07:53 -0400
+Date: Tue, 11 Sep 2018 11:13:54 +0200
 From: Christoph Hellwig <hch@lst.de>
 To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>,
+Cc: Dou Liyang <dou_liyang@163.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
         Ming Lei <tom.leiming@gmail.com>,
         Sumit Saxena <sumit.saxena@broadcom.com>,
         Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Shivasharan Srikanteshwara
         <shivasharan.srikanteshwara@broadcom.com>,
-        linux-block <linux-block@vger.kernel.org>
+        linux-block <linux-block@vger.kernel.org>,
+        Dou Liyang <douly.fnst@cn.fujitsu.com>
 Subject: Re: Affinity managed interrupts vs non-managed interrupts
-Message-ID: <20180911092254.GB10330@lst.de>
-References: <eccc46e12890a1d033d9003837012502@mail.gmail.com> <20180829084618.GA24765@ming.t460p> <300d6fef733ca76ced581f8c6304bac6@mail.gmail.com> <CACVXFVM7nGxpyq0_jfshgBOTx5B+PuCDmN43SfPTCkENJRLpMg@mail.gmail.com> <615d78004495aebc53807156d04d988c@mail.gmail.com> <alpine.DEB.2.21.1808312207390.1349@nanos.tec.linutronix.de> <486f94a563d63c4779498fe8829a546c@mail.gmail.com> <alpine.DEB.2.21.1809010020520.1349@nanos.tec.linutronix.de>
+Message-ID: <20180911091354.GA9898@lst.de>
+References: <602cee6381b9f435a938bbaf852d07f9@mail.gmail.com> <alpine.DEB.2.21.1809021357000.1349@nanos.tec.linutronix.de> <66256272c020be186becdd7a3f049302@mail.gmail.com> <alpine.DEB.2.21.1809031719460.1383@nanos.tec.linutronix.de> <dd1c5df55aa99cf4a37bcc58e77e840a@mail.gmail.com> <f436fa6a-b865-fadb-4f77-44309ff84405@163.com> <c0f779f1d5ef131c39f9397f97d453e8@mail.gmail.com> <alpine.DEB.2.21.1809051235180.1416@nanos.tec.linutronix.de> <d2a6f7cf-31df-de17-82e3-eccb9cc73ed8@163.com> <alpine.DEB.2.21.1809061244151.1570@nanos.tec.linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.DEB.2.21.1809010020520.1349@nanos.tec.linutronix.de>
+In-Reply-To: <alpine.DEB.2.21.1809061244151.1570@nanos.tec.linutronix.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Sat, Sep 01, 2018 at 12:48:46AM +0200, Thomas Gleixner wrote:
-> > We want some changes in current API which can allow us to  pass flags
-> > (like *local numa affinity*) and cpu-msix mapping are from local numa node
-> > + effective cpu are spread across local numa node.
+On Thu, Sep 06, 2018 at 01:46:46PM +0200, Thomas Gleixner wrote:
+> There are a few things we need to clarify upfront:
 > 
-> What you really want is to split the vector space for your device into two
-> blocks. One for the regular per cpu queues and the other (16 or how many
-> ever) which are managed separately, i.e. spread out evenly. That needs some
-> extensions to the core allocation/management code, but that shouldn't be a
-> huge problem.
+> Right now the pre and post vectors are marked managed and their
+> affinity mask is set to the irq default affinity mask.
+> 
+> The default affinity mask is by default ALL cpus, but it can be tweaked
+> both on the kernel command line and via proc.
+> 
+> If that mask is only a subset of CPUs and all of them go offline
+> then these vectors are shutdown in managed mode.
+> 
+> That means we need to set the affinity mask of the pre and post vectors to
+> possible mask, but that doesn't make much sense either, unless there is a
+> reason to have them marked managed.
+> 
+> I think the right solution for these pre/post vectors is to _NOT_ mark
+> them managed and leave them as regular interrupts which can be affinity
+> controlled and also can move freely on hotplug.
 
-Note that there are some other uses cases for multiple sets of affinity
-managed irqs.  Various network devices insist on having separate TX vs
-RX interrupts for example.
+Yes, agreed.  Marking the pre/post vector as managed was a mistake
+(and I don't think it even was intentional, at least on my part).
