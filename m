@@ -1,63 +1,41 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50430 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726622AbeIKUpq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Sep 2018 16:45:46 -0400
-Date: Tue, 11 Sep 2018 23:45:41 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Tejun Heo <tj@kernel.org>
-Cc: linux-kernel@vger.kernel.org,
-        Jianchao Wang <jianchao.w.wang@oracle.com>,
+Received: from userp2130.oracle.com ([156.151.31.86]:48962 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726761AbeIKTWA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Sep 2018 15:22:00 -0400
+Subject: Re: [PATCH] percpu-refcount: relax limit on percpu_ref_reinit()
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Tejun Heo <tj@kernel.org>,
         Kent Overstreet <kent.overstreet@gmail.com>,
         linux-block@vger.kernel.org
-Subject: Re: [PATCH] percpu-refcount: relax limit on percpu_ref_reinit()
-Message-ID: <20180911154540.GA10082@ming.t460p>
 References: <20180909125824.9150-1-ming.lei@redhat.com>
- <20180910164920.GE1100574@devbig004.ftw2.facebook.com>
- <20180911000049.GB30977@ming.t460p>
- <20180911134836.GG1100574@devbig004.ftw2.facebook.com>
+ <d4fb5fcc-305e-b3a7-0124-9c7b75042f01@oracle.com>
+ <20180910161135.GA27430@ming.t460p>
+ <e91ee38e-3ea2-a003-2aac-8a8cc5c8f04a@oracle.com>
+ <20180911040323.GC30977@ming.t460p>
+ <771fa1eb-85d3-2ff2-6070-207874da85b6@oracle.com>
+ <20180911082023.GA5360@ming.t460p>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <096be5c0-a69f-4553-5507-5fcdecc1ea20@oracle.com>
+Date: Tue, 11 Sep 2018 22:22:22 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180911134836.GG1100574@devbig004.ftw2.facebook.com>
+In-Reply-To: <20180911082023.GA5360@ming.t460p>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, Sep 11, 2018 at 06:48:36AM -0700, Tejun Heo wrote:
-> Hello, Ming.
+Hi Ming
+
+On 09/11/2018 04:20 PM, Ming Lei wrote:
+> We only check the 'whole counting' at atomic mode, so it is the atomic
+> part('ref->count'), please see percpu_ref_put_many(), in which ref->release()
+> is only called at atomic mode.
 > 
-> On Tue, Sep 11, 2018 at 08:00:50AM +0800, Ming Lei wrote:
-> > > > @@ -357,10 +349,11 @@ EXPORT_SYMBOL_GPL(percpu_ref_kill_and_confirm);
-> > > >  void percpu_ref_reinit(struct percpu_ref *ref)
-> > > >  {
-> > > >  	unsigned long flags;
-> > > > +	unsigned long __percpu *percpu_count;
-> > > >  
-> > > >  	spin_lock_irqsave(&percpu_ref_switch_lock, flags);
-> > > >  
-> > > > -	WARN_ON_ONCE(!percpu_ref_is_zero(ref));
-> > > > +	WARN_ON_ONCE(__ref_is_percpu(ref, &percpu_count));
-> > > 
-> > > Can you elaborate this part?  This doesn't seem required for the
-> > > described change.  Why is it part of the patch?
-> > 
-> > The motivation of this patch is to avoid the above warning and allow
-> > the ref to switch back to percpu mode without dropping to zero.
-> > 
-> > That is why the check has to be changed to the above way.
-> 
-> So, this part seems wrong.  The function is called percpu_ref_reinit()
-> - the refcnt is expected to be in its initial state with just the base
-> ref once this function returns.  If you're removing the restriction on
+> At percpu mode, the ref-count is only decreased/increased on the local CPU.
 
-But the comment says that 'Re-initialize @ref so that it's in the same
-state as when it finished', and this invariant isn't changed with this
-patch.
+Yes, I got it.
+Thanks for your kindly response.
 
-> when this can be called, you should also make sure that the function
-> actually enforces the target state.  Also, this is a separate logical
-> change, please put it in a separate patch.
-
-OK, will do it in V2.
-
-Thanks,
-Ming
+Sincerely
+Jianchao
