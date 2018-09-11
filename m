@@ -1,12 +1,12 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from userp2130.oracle.com ([156.151.31.86]:48962 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726761AbeIKTWA (ORCPT
+Received: from aserp2120.oracle.com ([141.146.126.78]:60404 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727010AbeIKTNG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Sep 2018 15:22:00 -0400
+        Tue, 11 Sep 2018 15:13:06 -0400
 Subject: Re: [PATCH] percpu-refcount: relax limit on percpu_ref_reinit()
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Tejun Heo <tj@kernel.org>,
+To: Tejun Heo <tj@kernel.org>
+Cc: Ming Lei <ming.lei@redhat.com>, linux-kernel@vger.kernel.org,
         Kent Overstreet <kent.overstreet@gmail.com>,
         linux-block@vger.kernel.org
 References: <20180909125824.9150-1-ming.lei@redhat.com>
@@ -15,27 +15,34 @@ References: <20180909125824.9150-1-ming.lei@redhat.com>
  <e91ee38e-3ea2-a003-2aac-8a8cc5c8f04a@oracle.com>
  <20180911040323.GC30977@ming.t460p>
  <771fa1eb-85d3-2ff2-6070-207874da85b6@oracle.com>
- <20180911082023.GA5360@ming.t460p>
+ <20180911134404.GF1100574@devbig004.ftw2.facebook.com>
 From: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <096be5c0-a69f-4553-5507-5fcdecc1ea20@oracle.com>
-Date: Tue, 11 Sep 2018 22:22:22 +0800
+Message-ID: <e18c28d9-24dd-3048-a5e0-e3ed96643706@oracle.com>
+Date: Tue, 11 Sep 2018 22:13:23 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180911082023.GA5360@ming.t460p>
+In-Reply-To: <20180911134404.GF1100574@devbig004.ftw2.facebook.com>
 Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Ming
+Hi tejun
 
-On 09/11/2018 04:20 PM, Ming Lei wrote:
-> We only check the 'whole counting' at atomic mode, so it is the atomic
-> part('ref->count'), please see percpu_ref_put_many(), in which ref->release()
-> is only called at atomic mode.
+On 09/11/2018 09:44 PM, Tejun Heo wrote:
+> Hello,
 > 
-> At percpu mode, the ref-count is only decreased/increased on the local CPU.
+> On Tue, Sep 11, 2018 at 12:40:36PM +0800, jianchao.wang wrote:
+>> (long)(sum (every cpu's refcounter)) + atomic refcounter
+>>
+>> and when switch to atomic mode, there could be value left in atomic refcounter.
+>> then the unsigned long percpu refcounter cound be decreased from 0.
+> 
+> It can always do that.  Imagine a task getting a ref on one cpu,
+> migrating and putting it on another.  The only thing which matters is
+> that the sum of everything adds upto what it should be.
+> 
 
-Yes, I got it.
 Thanks for your kindly response.
+I have got the point here.
 
-Sincerely
+Thanks
 Jianchao
