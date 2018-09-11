@@ -1,149 +1,45 @@
-Return-Path: <BATV+7902ada3182718150db7+5511+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	linux-block@vger.kernel.org,
-	xen-devel@lists.xen.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 5/5] xen: don't include <xen/xen.h> from <asm/io.h> and <asm/dma-mapping.h>
-Date: Tue, 25 Sep 2018 13:30:09 -0700
-Message-Id: <20180925203009.1838-6-hch@lst.de>
-In-Reply-To: <20180925203009.1838-1-hch@lst.de>
-References: <20180925203009.1838-1-hch@lst.de>
-MIME-Version: 1.0
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
+To: axboe@kernel.dk, ming.lei@redhat.com, bart.vanassche@wdc.com,
+        sagi@grimberg.me, keith.busch@intel.com, hch@lst.de
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Subject: [PATCH 2/4] blk-mq: retrieve bios before update nr_hw_queues
+Date: Tue, 11 Sep 2018 17:48:12 +0800
+Message-Id: <1536659294-2321-3-git-send-email-jianchao.w.wang@oracle.com>
+In-Reply-To: <1536659294-2321-1-git-send-email-jianchao.w.wang@oracle.com>
+References: <1536659294-2321-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Nothing Xen specific in these headers, which get included from a lot
-of code in the kernel.  So prune the includes and move them to the
-Xen-specific files that actually use them instead.
+retrieve bios of requests on queue to drain requests, then:
+ - avoid fail requests on dying hw queue
+ - needn't depend on storage device to drain the queue any more
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
 ---
- arch/arm/include/asm/io.h          | 1 -
- arch/arm64/include/asm/io.h        | 2 --
- arch/x86/include/asm/io.h          | 4 ----
- arch/x86/include/asm/xen/events.h  | 2 ++
- arch/x86/xen/enlighten.c           | 1 +
- arch/x86/xen/enlighten_pvh.c       | 1 +
- arch/x86/xen/platform-pci-unplug.c | 1 +
- arch/x86/xen/pmu.c                 | 1 +
- drivers/xen/xen-acpi-pad.c         | 1 +
- 9 files changed, 7 insertions(+), 7 deletions(-)
+ block/blk-mq.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/include/asm/io.h b/arch/arm/include/asm/io.h
-index 6ae7674da0d6..6b51826ab3d1 100644
---- a/arch/arm/include/asm/io.h
-+++ b/arch/arm/include/asm/io.h
-@@ -28,7 +28,6 @@
- #include <asm/byteorder.h>
- #include <asm/memory.h>
- #include <asm-generic/pci_iomap.h>
--#include <xen/xen.h>
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 3d59741..adc14f0 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3013,7 +3013,15 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 		return;
  
- /*
-  * ISA I/O bus memory addresses are 1:1 with the physical address.
-diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
-index 18f6ae6a43f1..9f8b915af3a7 100644
---- a/arch/arm64/include/asm/io.h
-+++ b/arch/arm64/include/asm/io.h
-@@ -31,8 +31,6 @@
- #include <asm/alternative.h>
- #include <asm/cpufeature.h>
- 
--#include <xen/xen.h>
--
- /*
-  * Generic IO read/write.  These perform native-endian accesses.
-  */
-diff --git a/arch/x86/include/asm/io.h b/arch/x86/include/asm/io.h
-index 232d8e9ee8a0..9a92a3ac2ac5 100644
---- a/arch/x86/include/asm/io.h
-+++ b/arch/x86/include/asm/io.h
-@@ -369,10 +369,6 @@ extern void __iomem *ioremap_wt(resource_size_t offset, unsigned long size);
- 
- extern bool is_early_ioremap_ptep(pte_t *ptep);
- 
--#ifdef CONFIG_XEN
--#include <xen/xen.h>
--#endif	/* CONFIG_XEN */
--
- #define IO_SPACE_LIMIT 0xffff
- 
- #include <asm-generic/io.h>
-diff --git a/arch/x86/include/asm/xen/events.h b/arch/x86/include/asm/xen/events.h
-index d383140e1dc8..068d9b067c83 100644
---- a/arch/x86/include/asm/xen/events.h
-+++ b/arch/x86/include/asm/xen/events.h
-@@ -2,6 +2,8 @@
- #ifndef _ASM_X86_XEN_EVENTS_H
- #define _ASM_X86_XEN_EVENTS_H
- 
-+#include <xen/xen.h>
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list)
+-		blk_mq_freeze_queue(q);
++		blk_freeze_queue_start(q);
 +
- enum ipi_vector {
- 	XEN_RESCHEDULE_VECTOR,
- 	XEN_CALL_FUNCTION_VECTOR,
-diff --git a/arch/x86/xen/enlighten.c b/arch/x86/xen/enlighten.c
-index 2eeddd814653..0ca46e03b830 100644
---- a/arch/x86/xen/enlighten.c
-+++ b/arch/x86/xen/enlighten.c
-@@ -5,6 +5,7 @@
- #include <linux/kexec.h>
- #include <linux/slab.h>
- 
-+#include <xen/xen.h>
- #include <xen/features.h>
- #include <xen/page.h>
- #include <xen/interface/memory.h>
-diff --git a/arch/x86/xen/enlighten_pvh.c b/arch/x86/xen/enlighten_pvh.c
-index c85d1a88f476..2a9025343534 100644
---- a/arch/x86/xen/enlighten_pvh.c
-+++ b/arch/x86/xen/enlighten_pvh.c
-@@ -11,6 +11,7 @@
- #include <asm/xen/interface.h>
- #include <asm/xen/hypercall.h>
- 
-+#include <xen/xen.h>
- #include <xen/interface/memory.h>
- #include <xen/interface/hvm/start_info.h>
- 
-diff --git a/arch/x86/xen/platform-pci-unplug.c b/arch/x86/xen/platform-pci-unplug.c
-index 33a783c77d96..b99585034dd2 100644
---- a/arch/x86/xen/platform-pci-unplug.c
-+++ b/arch/x86/xen/platform-pci-unplug.c
-@@ -23,6 +23,7 @@
- #include <linux/io.h>
- #include <linux/export.h>
- 
-+#include <xen/xen.h>
- #include <xen/platform_pci.h>
- #include "xen-ops.h"
- 
-diff --git a/arch/x86/xen/pmu.c b/arch/x86/xen/pmu.c
-index 7d00d4ad44d4..5f7d530fc679 100644
---- a/arch/x86/xen/pmu.c
-+++ b/arch/x86/xen/pmu.c
-@@ -3,6 +3,7 @@
- #include <linux/interrupt.h>
- 
- #include <asm/xen/hypercall.h>
-+#include <xen/xen.h>
- #include <xen/page.h>
- #include <xen/interface/xen.h>
- #include <xen/interface/vcpu.h>
-diff --git a/drivers/xen/xen-acpi-pad.c b/drivers/xen/xen-acpi-pad.c
-index 23d1808fe027..e25ab76b9c99 100644
---- a/drivers/xen/xen-acpi-pad.c
-+++ b/drivers/xen/xen-acpi-pad.c
-@@ -19,6 +19,7 @@
- #include <linux/kernel.h>
- #include <linux/types.h>
- #include <linux/acpi.h>
-+#include <xen/xen.h>
- #include <xen/interface/version.h>
- #include <xen/xen-ops.h>
- #include <asm/xen/hypercall.h>
++	/*
++	 * Wait the percpu ref to be switched to atomic mode.
++	 */
++	synchronize_sched();
++
++	list_for_each_entry(q, &set->tag_list, tag_set_list)
++		blk_mq_sched_retrieve_bios(q);
+ 	/*
+ 	 * Sync with blk_mq_queue_tag_busy_iter.
+ 	 */
 -- 
-2.19.0
+2.7.4
