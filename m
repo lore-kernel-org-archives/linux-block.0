@@ -1,265 +1,134 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:39637 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726083AbeI1FRN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Sep 2018 01:17:13 -0400
-Received: by mail-pf1-f195.google.com with SMTP id j8-v6so2907979pff.6
-        for <linux-block@vger.kernel.org>; Thu, 27 Sep 2018 15:56:35 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
-Subject: [PATCH v2 5/5] kyber: add tracepoints
-Date: Thu, 27 Sep 2018 15:55:55 -0700
-Message-Id: <be9814962eaef8a038bb69aad0d211c58e983dde.1538088475.git.osandov@fb.com>
-In-Reply-To: <cover.1538088475.git.osandov@fb.com>
-References: <cover.1538088475.git.osandov@fb.com>
-MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <dennisszhou@gmail.com>
+Return-Path: <dennisszhou@gmail.com>
+From: Dennis Zhou <dennisszhou@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Josef Bacik <josef@toxicpanda.com>
+Cc: kernel-team@fb.com,
+	linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+Subject: [PATCH 07/12] blkcg: associate writeback bios with a blkg
+Date: Tue, 11 Sep 2018 14:41:32 -0400
+Message-Id: <20180911184137.35897-8-dennisszhou@gmail.com>
+In-Reply-To: <20180911184137.35897-1-dennisszhou@gmail.com>
+References: <20180911184137.35897-1-dennisszhou@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
 
-When debugging Kyber, it's really useful to know what latencies we've
-been having, how the domain depths have been adjusted, and if we've
-actually been throttling. Add three tracepoints, kyber_latency,
-kyber_adjust, and kyber_throttled, to record that.
+One of the goals of this series is to remove a separate reference to
+the css of the bio. This can and should be accessed via bio_blkcg. In
+this patch, the wbc_init_bio call is changed such that it must be called
+after a queue has been associated with the bio.
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+Acked-by: Tejun Heo <tj@kernel.org>
 ---
- block/kyber-iosched.c        | 52 ++++++++++++-------
- include/trace/events/kyber.h | 96 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 130 insertions(+), 18 deletions(-)
- create mode 100644 include/trace/events/kyber.h
+ Documentation/admin-guide/cgroup-v2.rst |  8 +++++---
+ fs/buffer.c                             | 10 +++++-----
+ fs/ext4/page-io.c                       |  2 +-
+ include/linux/writeback.h               |  5 +++--
+ 4 files changed, 14 insertions(+), 11 deletions(-)
 
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index adc8e6393829..2b62e362fb36 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -30,6 +30,9 @@
- #include "blk-mq-sched.h"
- #include "blk-mq-tag.h"
+diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
+index 184193bcb262..caf36105a1c7 100644
+--- a/Documentation/admin-guide/cgroup-v2.rst
++++ b/Documentation/admin-guide/cgroup-v2.rst
+@@ -1857,8 +1857,10 @@ following two functions.
  
-+#define CREATE_TRACE_POINTS
-+#include <trace/events/kyber.h>
-+
- /*
-  * Scheduling domains: the device is divided into multiple domains based on the
-  * request type.
-@@ -42,6 +45,13 @@ enum {
- 	KYBER_NUM_DOMAINS,
- };
+   wbc_init_bio(@wbc, @bio)
+ 	Should be called for each bio carrying writeback data and
+-	associates the bio with the inode's owner cgroup.  Can be
+-	called anytime between bio allocation and submission.
++	associates the bio with the inode's owner cgroup and the
++	corresponding request queue.  This must be called after
++	a queue (device) has been associated with the bio and
++	before submission.
  
-+static const char *kyber_domain_names[] = {
-+	[KYBER_READ] = "READ",
-+	[KYBER_WRITE] = "WRITE",
-+	[KYBER_DISCARD] = "DISCARD",
-+	[KYBER_OTHER] = "OTHER",
-+};
-+
- enum {
- 	/*
- 	 * In order to prevent starvation of synchronous requests by a flood of
-@@ -122,6 +132,11 @@ enum {
- 	KYBER_IO_LATENCY,
- };
+   wbc_account_io(@wbc, @page, @bytes)
+ 	Should be called for each data segment being written out.
+@@ -1877,7 +1879,7 @@ the configuration, the bio may be executed at a lower priority and if
+ the writeback session is holding shared resources, e.g. a journal
+ entry, may lead to priority inversion.  There is no one easy solution
+ for the problem.  Filesystems can try to work around specific problem
+-cases by skipping wbc_init_bio() or using bio_associate_blkcg()
++cases by skipping wbc_init_bio() or using bio_associate_create_blkg()
+ directly.
  
-+static const char *kyber_latency_type_names[] = {
-+	[KYBER_TOTAL_LATENCY] = "total",
-+	[KYBER_IO_LATENCY] = "I/O",
-+};
-+
- /*
-  * Per-cpu latency histograms: total latency and I/O latency for each scheduling
-  * domain except for KYBER_OTHER.
-@@ -144,6 +159,8 @@ struct kyber_ctx_queue {
- } ____cacheline_aligned_in_smp;
  
- struct kyber_queue_data {
-+	struct request_queue *q;
-+
- 	/*
- 	 * Each scheduling domain has a limited number of in-flight requests
- 	 * device-wide, limited by these tokens.
-@@ -249,6 +266,10 @@ static int calculate_percentile(struct kyber_queue_data *kqd,
- 	}
- 	memset(buckets, 0, sizeof(kqd->latency_buckets[sched_domain][type]));
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 6f1ae3ac9789..109f55196866 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -3060,11 +3060,6 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
+ 	 */
+ 	bio = bio_alloc(GFP_NOIO, 1);
  
-+	trace_kyber_latency(kqd->q, kyber_domain_names[sched_domain],
-+			    kyber_latency_type_names[type], percentile,
-+			    bucket + 1, 1 << KYBER_LATENCY_SHIFT, samples);
-+
- 	return bucket;
- }
- 
-@@ -256,8 +277,11 @@ static void kyber_resize_domain(struct kyber_queue_data *kqd,
- 				unsigned int sched_domain, unsigned int depth)
- {
- 	depth = clamp(depth, 1U, kyber_depth[sched_domain]);
--	if (depth != kqd->domain_tokens[sched_domain].sb.depth)
-+	if (depth != kqd->domain_tokens[sched_domain].sb.depth) {
- 		sbitmap_queue_resize(&kqd->domain_tokens[sched_domain], depth);
-+		trace_kyber_adjust(kqd->q, kyber_domain_names[sched_domain],
-+				   depth);
-+	}
- }
- 
- static void kyber_timer_fn(struct timer_list *t)
-@@ -360,6 +384,8 @@ static struct kyber_queue_data *kyber_queue_data_alloc(struct request_queue *q)
- 	if (!kqd)
- 		goto err;
- 
-+	kqd->q = q;
-+
- 	kqd->cpu_latency = alloc_percpu_gfp(struct kyber_cpu_latency,
- 					    GFP_KERNEL | __GFP_ZERO);
- 	if (!kqd->cpu_latency)
-@@ -756,6 +782,9 @@ kyber_dispatch_cur_domain(struct kyber_queue_data *kqd,
- 			rq_set_domain_token(rq, nr);
- 			list_del_init(&rq->queuelist);
- 			return rq;
-+		} else {
-+			trace_kyber_throttled(kqd->q,
-+					      kyber_domain_names[khd->cur_domain]);
- 		}
- 	} else if (sbitmap_any_bit_set(&khd->kcq_map[khd->cur_domain])) {
- 		nr = kyber_get_domain_token(kqd, khd, hctx);
-@@ -766,6 +795,9 @@ kyber_dispatch_cur_domain(struct kyber_queue_data *kqd,
- 			rq_set_domain_token(rq, nr);
- 			list_del_init(&rq->queuelist);
- 			return rq;
-+		} else {
-+			trace_kyber_throttled(kqd->q,
-+					      kyber_domain_names[khd->cur_domain]);
- 		}
- 	}
- 
-@@ -944,23 +976,7 @@ static int kyber_cur_domain_show(void *data, struct seq_file *m)
- 	struct blk_mq_hw_ctx *hctx = data;
- 	struct kyber_hctx_data *khd = hctx->sched_data;
- 
--	switch (khd->cur_domain) {
--	case KYBER_READ:
--		seq_puts(m, "READ\n");
--		break;
--	case KYBER_WRITE:
--		seq_puts(m, "WRITE\n");
--		break;
--	case KYBER_DISCARD:
--		seq_puts(m, "DISCARD\n");
--		break;
--	case KYBER_OTHER:
--		seq_puts(m, "OTHER\n");
--		break;
--	default:
--		seq_printf(m, "%u\n", khd->cur_domain);
--		break;
+-	if (wbc) {
+-		wbc_init_bio(wbc, bio);
+-		wbc_account_io(wbc, bh->b_page, bh->b_size);
 -	}
-+	seq_printf(m, "%s\n", kyber_domain_names[khd->cur_domain]);
+-
+ 	bio->bi_iter.bi_sector = bh->b_blocknr * (bh->b_size >> 9);
+ 	bio_set_dev(bio, bh->b_bdev);
+ 	bio->bi_write_hint = write_hint;
+@@ -3084,6 +3079,11 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
+ 		op_flags |= REQ_PRIO;
+ 	bio_set_op_attrs(bio, op, op_flags);
+ 
++	if (wbc) {
++		wbc_init_bio(wbc, bio);
++		wbc_account_io(wbc, bh->b_page, bh->b_size);
++	}
++
+ 	submit_bio(bio);
+ 	return 0;
+ }
+diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
+index db7590178dfc..2aa62d58d8dd 100644
+--- a/fs/ext4/page-io.c
++++ b/fs/ext4/page-io.c
+@@ -374,13 +374,13 @@ static int io_submit_init_bio(struct ext4_io_submit *io,
+ 	bio = bio_alloc(GFP_NOIO, BIO_MAX_PAGES);
+ 	if (!bio)
+ 		return -ENOMEM;
+-	wbc_init_bio(io->io_wbc, bio);
+ 	bio->bi_iter.bi_sector = bh->b_blocknr * (bh->b_size >> 9);
+ 	bio_set_dev(bio, bh->b_bdev);
+ 	bio->bi_end_io = ext4_end_bio;
+ 	bio->bi_private = ext4_get_io_end(io->io_end);
+ 	io->io_bio = bio;
+ 	io->io_next_block = bh->b_blocknr;
++	wbc_init_bio(io->io_wbc, bio);
  	return 0;
  }
  
-diff --git a/include/trace/events/kyber.h b/include/trace/events/kyber.h
-new file mode 100644
-index 000000000000..a9834c37ac40
---- /dev/null
-+++ b/include/trace/events/kyber.h
-@@ -0,0 +1,96 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM kyber
-+
-+#if !defined(_TRACE_KYBER_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_KYBER_H
-+
-+#include <linux/blkdev.h>
-+#include <linux/tracepoint.h>
-+
-+#define DOMAIN_LEN		16
-+#define LATENCY_TYPE_LEN	8
-+
-+TRACE_EVENT(kyber_latency,
-+
-+	TP_PROTO(struct request_queue *q, const char *domain, const char *type,
-+		 unsigned int percentile, unsigned int numerator,
-+		 unsigned int denominator, unsigned int samples),
-+
-+	TP_ARGS(q, domain, type, percentile, numerator, denominator, samples),
-+
-+	TP_STRUCT__entry(
-+		__field(	dev_t,	dev				)
-+		__array(	char,	domain,	DOMAIN_LEN		)
-+		__array(	char,	type,	LATENCY_TYPE_LEN	)
-+		__field(	u8,	percentile			)
-+		__field(	u8,	numerator			)
-+		__field(	u8,	denominator			)
-+		__field(	unsigned int,	samples			)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->dev		= disk_devt(dev_to_disk(kobj_to_dev(q->kobj.parent)));
-+		strlcpy(__entry->domain, domain, DOMAIN_LEN);
-+		strlcpy(__entry->type, type, DOMAIN_LEN);
-+		__entry->percentile	= percentile;
-+		__entry->numerator	= numerator;
-+		__entry->denominator	= denominator;
-+		__entry->samples	= samples;
-+	),
-+
-+	TP_printk("%d,%d %s %s p%u %u/%u samples=%u",
-+		  MAJOR(__entry->dev), MINOR(__entry->dev), __entry->domain,
-+		  __entry->type, __entry->percentile, __entry->numerator,
-+		  __entry->denominator, __entry->samples)
-+);
-+
-+TRACE_EVENT(kyber_adjust,
-+
-+	TP_PROTO(struct request_queue *q, const char *domain,
-+		 unsigned int depth),
-+
-+	TP_ARGS(q, domain, depth),
-+
-+	TP_STRUCT__entry(
-+		__field(	dev_t,	dev			)
-+		__array(	char,	domain,	DOMAIN_LEN	)
-+		__field(	unsigned int,	depth		)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->dev		= disk_devt(dev_to_disk(kobj_to_dev(q->kobj.parent)));
-+		strlcpy(__entry->domain, domain, DOMAIN_LEN);
-+		__entry->depth		= depth;
-+	),
-+
-+	TP_printk("%d,%d %s %u",
-+		  MAJOR(__entry->dev), MINOR(__entry->dev), __entry->domain,
-+		  __entry->depth)
-+);
-+
-+TRACE_EVENT(kyber_throttled,
-+
-+	TP_PROTO(struct request_queue *q, const char *domain),
-+
-+	TP_ARGS(q, domain),
-+
-+	TP_STRUCT__entry(
-+		__field(	dev_t,	dev			)
-+		__array(	char,	domain,	DOMAIN_LEN	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->dev		= disk_devt(dev_to_disk(kobj_to_dev(q->kobj.parent)));
-+		strlcpy(__entry->domain, domain, DOMAIN_LEN);
-+	),
-+
-+	TP_printk("%d,%d %s", MAJOR(__entry->dev), MINOR(__entry->dev),
-+		  __entry->domain)
-+);
-+
-+#define _TRACE_KYBER_H
-+#endif /* _TRACE_KYBER_H */
-+
-+/* This part must be outside protection */
-+#include <trace/define_trace.h>
+diff --git a/include/linux/writeback.h b/include/linux/writeback.h
+index fdfd04e348f6..738a0c24874f 100644
+--- a/include/linux/writeback.h
++++ b/include/linux/writeback.h
+@@ -246,7 +246,8 @@ static inline void wbc_attach_fdatawrite_inode(struct writeback_control *wbc,
+  *
+  * @bio is a part of the writeback in progress controlled by @wbc.  Perform
+  * writeback specific initialization.  This is used to apply the cgroup
+- * writeback context.
++ * writeback context.  Must be called after the bio has been associated with
++ * a device.
+  */
+ static inline void wbc_init_bio(struct writeback_control *wbc, struct bio *bio)
+ {
+@@ -257,7 +258,7 @@ static inline void wbc_init_bio(struct writeback_control *wbc, struct bio *bio)
+ 	 * regular writeback instead of writing things out itself.
+ 	 */
+ 	if (wbc->wb)
+-		bio_associate_blkcg(bio, wbc->wb->blkcg_css);
++		bio_associate_blkg_from_css(bio, wbc->wb->blkcg_css);
+ }
+ 
+ #else	/* CONFIG_CGROUP_WRITEBACK */
 -- 
-2.19.0
+2.17.1
