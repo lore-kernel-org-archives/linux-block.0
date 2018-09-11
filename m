@@ -1,134 +1,51 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-From: Dennis Zhou <dennisszhou@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Josef Bacik <josef@toxicpanda.com>
-Cc: kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-Subject: [PATCH 07/12] blkcg: associate writeback bios with a blkg
-Date: Thu,  6 Sep 2018 17:10:40 -0400
-Message-Id: <20180906211045.29055-8-dennisszhou@gmail.com>
-In-Reply-To: <20180906211045.29055-1-dennisszhou@gmail.com>
-References: <20180906211045.29055-1-dennisszhou@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:34923 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726670AbeIKQei (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Sep 2018 12:34:38 -0400
+Received: by mail-ed1-f67.google.com with SMTP id y20-v6so18988355edq.2
+        for <linux-block@vger.kernel.org>; Tue, 11 Sep 2018 04:35:41 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 1/2] lightnvm: pblk: add helper for printing chunk state
+Date: Tue, 11 Sep 2018 13:35:33 +0200
+Message-Id: <1536665734-14305-2-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1536665734-14305-1-git-send-email-javier@cnexlabs.com>
+References: <1536665734-14305-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+Implement pblk helper for printing chunk state.
 
-One of the goals of this series is to remove a separate reference to
-the css of the bio. This can and should be accessed via bio_blkcg. In
-this patch, the wbc_init_bio call is changed such that it must be called
-after a queue has been associated with the bio.
-
-Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
-Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- Documentation/admin-guide/cgroup-v2.rst |  8 +++++---
- fs/buffer.c                             | 10 +++++-----
- fs/ext4/page-io.c                       |  2 +-
- include/linux/writeback.h               |  5 +++--
- 4 files changed, 14 insertions(+), 11 deletions(-)
+ drivers/lightnvm/pblk.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
-index 184193bcb262..caf36105a1c7 100644
---- a/Documentation/admin-guide/cgroup-v2.rst
-+++ b/Documentation/admin-guide/cgroup-v2.rst
-@@ -1857,8 +1857,10 @@ following two functions.
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 3d7248829013..5e4cec453a43 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -1230,6 +1230,15 @@ static inline int pblk_io_aligned(struct pblk *pblk, int nr_secs)
+ 	return !(nr_secs % pblk->min_write_pgs);
+ }
  
-   wbc_init_bio(@wbc, @bio)
- 	Should be called for each bio carrying writeback data and
--	associates the bio with the inode's owner cgroup.  Can be
--	called anytime between bio allocation and submission.
-+	associates the bio with the inode's owner cgroup and the
-+	corresponding request queue.  This must be called after
-+	a queue (device) has been associated with the bio and
-+	before submission.
- 
-   wbc_account_io(@wbc, @page, @bytes)
- 	Should be called for each data segment being written out.
-@@ -1877,7 +1879,7 @@ the configuration, the bio may be executed at a lower priority and if
- the writeback session is holding shared resources, e.g. a journal
- entry, may lead to priority inversion.  There is no one easy solution
- for the problem.  Filesystems can try to work around specific problem
--cases by skipping wbc_init_bio() or using bio_associate_blkcg()
-+cases by skipping wbc_init_bio() or using bio_associate_create_blkg()
- directly.
- 
- 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 6f1ae3ac9789..109f55196866 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -3060,11 +3060,6 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
- 	 */
- 	bio = bio_alloc(GFP_NOIO, 1);
- 
--	if (wbc) {
--		wbc_init_bio(wbc, bio);
--		wbc_account_io(wbc, bh->b_page, bh->b_size);
--	}
--
- 	bio->bi_iter.bi_sector = bh->b_blocknr * (bh->b_size >> 9);
- 	bio_set_dev(bio, bh->b_bdev);
- 	bio->bi_write_hint = write_hint;
-@@ -3084,6 +3079,11 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
- 		op_flags |= REQ_PRIO;
- 	bio_set_op_attrs(bio, op, op_flags);
- 
-+	if (wbc) {
-+		wbc_init_bio(wbc, bio);
-+		wbc_account_io(wbc, bh->b_page, bh->b_size);
-+	}
++static inline void print_chunk(struct pblk *pblk, struct nvm_chk_meta *chk,
++			       char *msg, int error)
++{
++	pblk_err(pblk, "chunk: (%s: %x) s:%d,t:%d,wi:%d,slba:%llu,cnlb:%llu,wp:%llu\n",
++			msg, error,
++			chk->state, chk->type, chk->wi,
++			chk->slba, chk->cnlb, chk->wp);
++}
 +
- 	submit_bio(bio);
- 	return 0;
- }
-diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
-index db7590178dfc..2aa62d58d8dd 100644
---- a/fs/ext4/page-io.c
-+++ b/fs/ext4/page-io.c
-@@ -374,13 +374,13 @@ static int io_submit_init_bio(struct ext4_io_submit *io,
- 	bio = bio_alloc(GFP_NOIO, BIO_MAX_PAGES);
- 	if (!bio)
- 		return -ENOMEM;
--	wbc_init_bio(io->io_wbc, bio);
- 	bio->bi_iter.bi_sector = bh->b_blocknr * (bh->b_size >> 9);
- 	bio_set_dev(bio, bh->b_bdev);
- 	bio->bi_end_io = ext4_end_bio;
- 	bio->bi_private = ext4_get_io_end(io->io_end);
- 	io->io_bio = bio;
- 	io->io_next_block = bh->b_blocknr;
-+	wbc_init_bio(io->io_wbc, bio);
- 	return 0;
- }
- 
-diff --git a/include/linux/writeback.h b/include/linux/writeback.h
-index fdfd04e348f6..738a0c24874f 100644
---- a/include/linux/writeback.h
-+++ b/include/linux/writeback.h
-@@ -246,7 +246,8 @@ static inline void wbc_attach_fdatawrite_inode(struct writeback_control *wbc,
-  *
-  * @bio is a part of the writeback in progress controlled by @wbc.  Perform
-  * writeback specific initialization.  This is used to apply the cgroup
-- * writeback context.
-+ * writeback context.  Must be called after the bio has been associated with
-+ * a device.
-  */
- static inline void wbc_init_bio(struct writeback_control *wbc, struct bio *bio)
- {
-@@ -257,7 +258,7 @@ static inline void wbc_init_bio(struct writeback_control *wbc, struct bio *bio)
- 	 * regular writeback instead of writing things out itself.
- 	 */
- 	if (wbc->wb)
--		bio_associate_blkcg(bio, wbc->wb->blkcg_css);
-+		bio_associate_blkg_from_css(bio, wbc->wb->blkcg_css);
- }
- 
- #else	/* CONFIG_CGROUP_WRITEBACK */
+ #ifdef CONFIG_NVM_PBLK_DEBUG
+ static inline void print_ppa(struct pblk *pblk, struct ppa_addr *p,
+ 			     char *msg, int error)
 -- 
-2.17.1
+2.7.4
