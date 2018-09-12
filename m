@@ -1,65 +1,299 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:36602 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727835AbeIQKzp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Sep 2018 06:55:45 -0400
-Received: by mail-pg1-f193.google.com with SMTP id d1-v6so7096983pgo.3
-        for <linux-block@vger.kernel.org>; Sun, 16 Sep 2018 22:29:59 -0700 (PDT)
-From: Heiner Litz <hlitz@ucsc.edu>
-To: linux-block@vger.kernel.org, hlitz@ucsc.edu
-Cc: javier@cnexlabs.com, mb@lightnvm.io, igor.j.konopko@intel.com,
-        marcin.dziegielewski@intel.com
-Subject: [RFC PATCH 4/6] lightnvm: pblk: Add pblk_submit_io_sem
-Date: Sun, 16 Sep 2018 22:29:37 -0700
-Message-Id: <20180917052939.4776-5-hlitz@ucsc.edu>
-In-Reply-To: <20180917052939.4776-1-hlitz@ucsc.edu>
-References: <20180917052939.4776-1-hlitz@ucsc.edu>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <1fef2d2e99620e4e8a1b7ddf808f09fa8bfc3bc8.1536692743.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1536692743.git.christophe.leroy@c-s.fr>
+References: <cover.1536692743.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v2 20/24] powerpc/mm: Allow platforms to redefine some helpers
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Wed, 12 Sep 2018 15:58:54 +0000 (UTC)
+List-ID: <linux-block@vger.kernel.org>
 
-In preparation of supporting RAIL, add a new API pblk_submit_io_sem which
-takes the lun semaphore before submitting the asynchronous request.
+The 40xx defines _PAGE_HWWRITE while others don't.
+The 8xx defines _PAGE_RO instead of _PAGE_RW.
+The 8xx defines _PAGE_PRIVILEGED instead of _PAGE_USER.
+The 8xx defines _PAGE_HUGE and _PAGE_NA while others don't.
 
-Signed-off-by: Heiner Litz <hlitz@ucsc.edu>
+Lets those platforms redefine pte_write(), pte_wrprotect() and
+pte_mkwrite() and get _PAGE_RO and _PAGE_HWWRITE off the common
+helpers.
+
+Lets the 8xx redefine pte_user(), pte_mkprivileged() and pte_mkuser()
+and get rid of _PAGE_PRIVILEGED and _PAGE_USER default values.
+
+Lets the 8xx redefine pte_mkhuge() and get rid of
+_PAGE_HUGE default value.
+
+Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- drivers/lightnvm/pblk-core.c | 11 +++++++++++
- drivers/lightnvm/pblk.h      |  1 +
- 2 files changed, 12 insertions(+)
+ arch/powerpc/include/asm/nohash/32/pgtable.h | 16 ++++-----
+ arch/powerpc/include/asm/nohash/32/pte-40x.h | 16 +++++++++
+ arch/powerpc/include/asm/nohash/32/pte-8xx.h | 51 ++++++++++++++++++++++++++++
+ arch/powerpc/include/asm/nohash/64/pgtable.h |  4 ---
+ arch/powerpc/include/asm/nohash/pgtable.h    | 24 +++++++++----
+ arch/powerpc/include/asm/pte-common.h        | 24 -------------
+ 6 files changed, 91 insertions(+), 44 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 2e40666fdf80..a31bf359f905 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -492,6 +492,17 @@ int pblk_submit_io(struct pblk *pblk, struct nvm_rq *rqd)
- 	return nvm_submit_io(dev, rqd);
+diff --git a/arch/powerpc/include/asm/nohash/32/pgtable.h b/arch/powerpc/include/asm/nohash/32/pgtable.h
+index a4156da4a7a4..ce9270a0ea42 100644
+--- a/arch/powerpc/include/asm/nohash/32/pgtable.h
++++ b/arch/powerpc/include/asm/nohash/32/pgtable.h
+@@ -136,14 +136,12 @@ extern int icache_44x_need_flush;
+ #define pte_clear(mm, addr, ptep) \
+ 	do { pte_update(ptep, ~0, 0); } while (0)
+ 
++#ifndef pte_mkwrite
+ static inline pte_t pte_mkwrite(pte_t pte)
+ {
+-	pte_basic_t ptev;
+-
+-	ptev = pte_val(pte) & ~_PAGE_RO;
+-	ptev |= _PAGE_RW;
+-	return __pte(ptev);
++	return __pte(pte_val(pte) | _PAGE_RW);
+ }
++#endif
+ 
+ static inline pte_t pte_mkdirty(pte_t pte)
+ {
+@@ -155,14 +153,12 @@ static inline pte_t pte_mkyoung(pte_t pte)
+ 	return __pte(pte_val(pte) | _PAGE_ACCESSED);
  }
  
-+int pblk_submit_io_sem(struct pblk *pblk, struct nvm_rq *rqd)
++#ifndef pte_wrprotect
+ static inline pte_t pte_wrprotect(pte_t pte)
+ {
+-	pte_basic_t ptev;
+-
+-	ptev = pte_val(pte) & ~(_PAGE_RW | _PAGE_HWWRITE);
+-	ptev |= _PAGE_RO;
+-	return __pte(ptev);
++	return __pte(pte_val(pte) & ~_PAGE_RW);
+ }
++#endif
+ 
+ static inline pte_t pte_mkexec(pte_t pte)
+ {
+diff --git a/arch/powerpc/include/asm/nohash/32/pte-40x.h b/arch/powerpc/include/asm/nohash/32/pte-40x.h
+index 2b48bc289a4d..ab043b3e9b99 100644
+--- a/arch/powerpc/include/asm/nohash/32/pte-40x.h
++++ b/arch/powerpc/include/asm/nohash/32/pte-40x.h
+@@ -87,5 +87,21 @@
+ #define PAGE_READONLY	__pgprot(_PAGE_BASE | _PAGE_USER)
+ #define PAGE_READONLY_X	__pgprot(_PAGE_BASE | _PAGE_USER | _PAGE_EXEC)
+ 
++#ifndef __ASSEMBLY__
++static inline pte_t pte_wrprotect(pte_t pte)
 +{
-+	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
-+	int ret;
-+
-+	pblk_down_chunk(pblk, ppa_list[0]);
-+	ret = pblk_submit_io(pblk, rqd);
-+
-+	return ret;
++	return __pte(pte_val(pte) & ~(_PAGE_RW | _PAGE_HWWRITE));
 +}
 +
- void pblk_check_chunk_state_update(struct pblk *pblk, struct nvm_rq *rqd)
++#define pte_wrprotect pte_wrprotect
++
++static inline pte_t pte_mkclean(pte_t pte)
++{
++	return __pte(pte_val(pte) & ~(_PAGE_DIRTY | _PAGE_HWWRITE));
++}
++
++#define pte_mkclean pte_mkclean
++#endif
++
+ #endif /* __KERNEL__ */
+ #endif /*  _ASM_POWERPC_NOHASH_32_PTE_40x_H */
+diff --git a/arch/powerpc/include/asm/nohash/32/pte-8xx.h b/arch/powerpc/include/asm/nohash/32/pte-8xx.h
+index d06fc45bd9ac..b899c3c877ac 100644
+--- a/arch/powerpc/include/asm/nohash/32/pte-8xx.h
++++ b/arch/powerpc/include/asm/nohash/32/pte-8xx.h
+@@ -87,5 +87,56 @@
+ #define PAGE_READONLY	__pgprot(_PAGE_BASE | _PAGE_RO)
+ #define PAGE_READONLY_X	__pgprot(_PAGE_BASE | _PAGE_RO | _PAGE_EXEC)
+ 
++#ifndef __ASSEMBLY__
++static inline pte_t pte_wrprotect(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_RO);
++}
++
++#define pte_wrprotect pte_wrprotect
++
++static inline int pte_write(pte_t pte)
++{
++	return !(pte_val(pte) & _PAGE_RO);
++}
++
++#define pte_write pte_write
++
++static inline pte_t pte_mkwrite(pte_t pte)
++{
++	return __pte(pte_val(pte) & ~_PAGE_RO);
++}
++
++#define pte_mkwrite pte_mkwrite
++
++static inline bool pte_user(pte_t pte)
++{
++	return !(pte_val(pte) & _PAGE_PRIVILEGED);
++}
++
++#define pte_user pte_user
++
++static inline pte_t pte_mkprivileged(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_PRIVILEGED);
++}
++
++#define pte_mkprivileged pte_mkprivileged
++
++static inline pte_t pte_mkuser(pte_t pte)
++{
++	return __pte(pte_val(pte) & ~_PAGE_PRIVILEGED);
++}
++
++#define pte_mkuser pte_mkuser
++
++static inline pte_t pte_mkhuge(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_HUGE);
++}
++
++#define pte_mkhuge pte_mkhuge
++#endif
++
+ #endif /* __KERNEL__ */
+ #endif /*  _ASM_POWERPC_NOHASH_32_PTE_8xx_H */
+diff --git a/arch/powerpc/include/asm/nohash/64/pgtable.h b/arch/powerpc/include/asm/nohash/64/pgtable.h
+index 9ccea94b3d4e..f272e4599803 100644
+--- a/arch/powerpc/include/asm/nohash/64/pgtable.h
++++ b/arch/powerpc/include/asm/nohash/64/pgtable.h
+@@ -90,11 +90,7 @@
+  */
+ #include <asm/nohash/pte-book3e.h>
+ 
+-#define _PAGE_HWWRITE	0
+ #define _PAGE_SAO	0
+-#define _PAGE_RO 0
+-#define _PAGE_NA 0
+-#define _PAGE_HUGE 0
+ 
+ #define PTE_RPN_MASK	(~((1UL << PTE_RPN_SHIFT) - 1))
+ 
+diff --git a/arch/powerpc/include/asm/nohash/pgtable.h b/arch/powerpc/include/asm/nohash/pgtable.h
+index 897f110139c2..aa968d87337b 100644
+--- a/arch/powerpc/include/asm/nohash/pgtable.h
++++ b/arch/powerpc/include/asm/nohash/pgtable.h
+@@ -38,10 +38,12 @@
+ #ifndef __ASSEMBLY__
+ 
+ /* Generic accessors to PTE bits */
++#ifndef pte_write
+ static inline int pte_write(pte_t pte)
  {
- 	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 64d9c206ec52..bd88784e51d9 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -797,6 +797,7 @@ struct nvm_chk_meta *pblk_chunk_get_off(struct pblk *pblk,
- void pblk_log_write_err(struct pblk *pblk, struct nvm_rq *rqd);
- void pblk_log_read_err(struct pblk *pblk, struct nvm_rq *rqd);
- int pblk_submit_io(struct pblk *pblk, struct nvm_rq *rqd);
-+int pblk_submit_io_sem(struct pblk *pblk, struct nvm_rq *rqd);
- int pblk_submit_io_sync(struct pblk *pblk, struct nvm_rq *rqd);
- int pblk_submit_io_sync_sem(struct pblk *pblk, struct nvm_rq *rqd);
- int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line);
+-	return (pte_val(pte) & (_PAGE_RW | _PAGE_RO)) != _PAGE_RO;
++	return pte_val(pte) & _PAGE_RW;
+ }
++#endif
+ static inline int pte_read(pte_t pte)		{ return 1; }
+ static inline int pte_dirty(pte_t pte)		{ return pte_val(pte) & _PAGE_DIRTY; }
+ static inline int pte_special(pte_t pte)	{ return pte_val(pte) & _PAGE_SPECIAL; }
+@@ -78,10 +80,12 @@ static inline int pte_present(pte_t pte)
+  * and PTE_64BIT, PAGE_KERNEL_X contains _PAGE_BAP_SR which is also in
+  * _PAGE_USER.  Need to explicitly match _PAGE_BAP_UR bit in that case too.
+  */
++#ifndef pte_user
+ static inline bool pte_user(pte_t pte)
+ {
+-	return (pte_val(pte) & (_PAGE_USER | _PAGE_PRIVILEGED)) == _PAGE_USER;
++	return (pte_val(pte) & _PAGE_USER) == _PAGE_USER;
+ }
++#endif
+ 
+ /*
+  * We only find page table entry in the last level
+@@ -121,10 +125,12 @@ static inline pte_t pte_exprotect(pte_t pte)
+ 	return __pte(pte_val(pte) & ~_PAGE_EXEC);
+ }
+ 
++#ifndef pte_mkclean
+ static inline pte_t pte_mkclean(pte_t pte)
+ {
+-	return __pte(pte_val(pte) & ~(_PAGE_DIRTY | _PAGE_HWWRITE));
++	return __pte(pte_val(pte) & ~_PAGE_DIRTY);
+ }
++#endif
+ 
+ static inline pte_t pte_mkold(pte_t pte)
+ {
+@@ -141,20 +147,26 @@ static inline pte_t pte_mkspecial(pte_t pte)
+ 	return __pte(pte_val(pte) | _PAGE_SPECIAL);
+ }
+ 
++#ifndef pte_mkhuge
+ static inline pte_t pte_mkhuge(pte_t pte)
+ {
+-	return __pte(pte_val(pte) | _PAGE_HUGE);
++	return __pte(pte_val(pte));
+ }
++#endif
+ 
++#ifndef pte_mkprivileged
+ static inline pte_t pte_mkprivileged(pte_t pte)
+ {
+-	return __pte((pte_val(pte) & ~_PAGE_USER) | _PAGE_PRIVILEGED);
++	return __pte(pte_val(pte) & ~_PAGE_USER);
+ }
++#endif
+ 
++#ifndef pte_mkuser
+ static inline pte_t pte_mkuser(pte_t pte)
+ {
+-	return __pte((pte_val(pte) & ~_PAGE_PRIVILEGED) | _PAGE_USER);
++	return __pte(pte_val(pte) | _PAGE_USER);
+ }
++#endif
+ 
+ static inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
+ {
+diff --git a/arch/powerpc/include/asm/pte-common.h b/arch/powerpc/include/asm/pte-common.h
+index 4d594039bca5..1a2102f8b1e7 100644
+--- a/arch/powerpc/include/asm/pte-common.h
++++ b/arch/powerpc/include/asm/pte-common.h
+@@ -5,36 +5,12 @@
+  * Some bits are only used on some cpu families... Make sure that all
+  * the undefined gets a sensible default
+  */
+-#ifndef _PAGE_HWWRITE
+-#define _PAGE_HWWRITE	0
+-#endif
+ #ifndef _PAGE_COHERENT
+ #define _PAGE_COHERENT	0
+ #endif
+ #ifndef _PAGE_WRITETHRU
+ #define _PAGE_WRITETHRU	0
+ #endif
+-/* _PAGE_RO and _PAGE_RW shall not be defined at the same time */
+-#ifndef _PAGE_RO
+-#define _PAGE_RO 0
+-#else
+-#define _PAGE_RW 0
+-#endif
+-
+-/* At least one of _PAGE_PRIVILEGED or _PAGE_USER must be defined */
+-#ifndef _PAGE_PRIVILEGED
+-#define _PAGE_PRIVILEGED 0
+-#else
+-#ifndef _PAGE_USER
+-#define _PAGE_USER 0
+-#endif
+-#endif
+-#ifndef _PAGE_NA
+-#define _PAGE_NA 0
+-#endif
+-#ifndef _PAGE_HUGE
+-#define _PAGE_HUGE 0
+-#endif
+ 
+ /* Location of the PFN in the PTE. Most 32-bit platforms use the same
+  * as _PAGE_SHIFT here (ie, naturally aligned).
 -- 
-2.17.1
+2.13.3
