@@ -1,186 +1,203 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-From: Dennis Zhou <dennisszhou@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Josef Bacik <josef@toxicpanda.com>
-Cc: kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-Subject: [PATCH 06/12] blkcg: associate a blkg for pages being evicted by swap
-Date: Thu,  6 Sep 2018 17:10:39 -0400
-Message-Id: <20180906211045.29055-7-dennisszhou@gmail.com>
-In-Reply-To: <20180906211045.29055-1-dennisszhou@gmail.com>
-References: <20180906211045.29055-1-dennisszhou@gmail.com>
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <a89ba07fd74532a151c247e15300d2e741059305.1536692743.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1536692743.git.christophe.leroy@c-s.fr>
+References: <cover.1536692743.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v2 16/24] powerpc/book3s/32: do not include pte-common.h
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Wed, 12 Sep 2018 15:58:46 +0000 (UTC)
 List-ID: <linux-block@vger.kernel.org>
 
-From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+As done for book3s/64, add necessary flags/defines in
+book3s/32/pgtable.h and do not include pte-common.h
 
-A prior patch in this series added blkg association to bios issued by
-cgroups. There are two other paths that we want to attribute work back
-to the appropriate cgroup: swap and writeback. Here we modify the way
-swap tags bios to include the blkg. Writeback will be tackle in the next
-patch.
+It allows in the meantime to remove all related hash
+definitions from pte-common.h and to also remove
+_PAGE_EXEC default as _PAGE_EXEC is defined on all
+platforms except book3s/32.
 
-Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
-Acked-by: Tejun Heo <tj@kernel.org>
+Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- block/bio.c         | 83 ++++++++++++++++++++++++++++++++-------------
- include/linux/bio.h | 11 ++++--
- mm/page_io.c        |  2 +-
- 3 files changed, 68 insertions(+), 28 deletions(-)
+ arch/powerpc/include/asm/book3s/32/pgtable.h | 97 ++++++++++++++++++++++++++--
+ arch/powerpc/include/asm/pte-common.h        | 16 +----
+ 2 files changed, 96 insertions(+), 17 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index a05997bdb967..6c69c35db8c7 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1958,30 +1958,6 @@ EXPORT_SYMBOL(bioset_init_from_src);
+diff --git a/arch/powerpc/include/asm/book3s/32/pgtable.h b/arch/powerpc/include/asm/book3s/32/pgtable.h
+index d4f2f396af70..5ffb7e3b211f 100644
+--- a/arch/powerpc/include/asm/book3s/32/pgtable.h
++++ b/arch/powerpc/include/asm/book3s/32/pgtable.h
+@@ -8,7 +8,97 @@
+ #include <asm/book3s/32/hash.h>
  
- #ifdef CONFIG_BLK_CGROUP
+ /* And here we include common definitions */
+-#include <asm/pte-common.h>
++
++#define _PAGE_KERNEL_RO		0
++#define _PAGE_KERNEL_ROX	0
++#define _PAGE_KERNEL_RW		(_PAGE_DIRTY | _PAGE_RW)
++#define _PAGE_KERNEL_RWX	(_PAGE_DIRTY | _PAGE_RW)
++
++#define _PAGE_HPTEFLAGS _PAGE_HASHPTE
++
++#ifndef __ASSEMBLY__
++
++static inline bool pte_user(pte_t pte)
++{
++	return pte_val(pte) & _PAGE_USER;
++}
++#endif /* __ASSEMBLY__ */
++
++/* Location of the PFN in the PTE. Most 32-bit platforms use the same
++ * as _PAGE_SHIFT here (ie, naturally aligned).
++ * Platform who don't just pre-define the value so we don't override it here
++ */
++#define PTE_RPN_SHIFT	(PAGE_SHIFT)
++
++/* The mask covered by the RPN must be a ULL on 32-bit platforms with
++ * 64-bit PTEs
++ */
++#ifdef CONFIG_PTE_64BIT
++#define PTE_RPN_MASK	(~((1ULL << PTE_RPN_SHIFT) - 1))
++#else
++#define PTE_RPN_MASK	(~((1UL << PTE_RPN_SHIFT) - 1))
++#endif
++
++/* _PAGE_CHG_MASK masks of bits that are to be preserved across
++ * pgprot changes
++ */
++#define _PAGE_CHG_MASK	(PTE_RPN_MASK | _PAGE_HASHPTE | _PAGE_DIRTY | \
++			 _PAGE_ACCESSED | _PAGE_SPECIAL)
++
++/* Mask of bits returned by pte_pgprot() */
++#define PAGE_PROT_BITS	(_PAGE_GUARDED | _PAGE_COHERENT | _PAGE_NO_CACHE | \
++			 _PAGE_WRITETHRU | _PAGE_USER | _PAGE_ACCESSED | \
++			 _PAGE_RW | _PAGE_DIRTY)
++
++/*
++ * We define 2 sets of base prot bits, one for basic pages (ie,
++ * cacheable kernel and user pages) and one for non cacheable
++ * pages. We always set _PAGE_COHERENT when SMP is enabled or
++ * the processor might need it for DMA coherency.
++ */
++#define _PAGE_BASE_NC	(_PAGE_PRESENT | _PAGE_ACCESSED)
++#define _PAGE_BASE	(_PAGE_BASE_NC | _PAGE_COHERENT)
++
++/* Permission masks used to generate the __P and __S table,
++ *
++ * Note:__pgprot is defined in arch/powerpc/include/asm/page.h
++ *
++ * Write permissions imply read permissions for now.
++ */
++#define PAGE_NONE	__pgprot(_PAGE_BASE)
++#define PAGE_SHARED	__pgprot(_PAGE_BASE | _PAGE_USER | _PAGE_RW)
++#define PAGE_SHARED_X	__pgprot(_PAGE_BASE | _PAGE_USER | _PAGE_RW)
++#define PAGE_COPY	__pgprot(_PAGE_BASE | _PAGE_USER)
++#define PAGE_COPY_X	__pgprot(_PAGE_BASE | _PAGE_USER)
++#define PAGE_READONLY	__pgprot(_PAGE_BASE | _PAGE_USER)
++#define PAGE_READONLY_X	__pgprot(_PAGE_BASE | _PAGE_USER)
++
++/* Permission masks used for kernel mappings */
++#define PAGE_KERNEL	__pgprot(_PAGE_BASE | _PAGE_KERNEL_RW)
++#define PAGE_KERNEL_NC	__pgprot(_PAGE_BASE_NC | _PAGE_KERNEL_RW | _PAGE_NO_CACHE)
++#define PAGE_KERNEL_NCG	__pgprot(_PAGE_BASE_NC | _PAGE_KERNEL_RW | \
++				 _PAGE_NO_CACHE | _PAGE_GUARDED)
++#define PAGE_KERNEL_X	__pgprot(_PAGE_BASE | _PAGE_KERNEL_RWX)
++#define PAGE_KERNEL_RO	__pgprot(_PAGE_BASE | _PAGE_KERNEL_RO)
++#define PAGE_KERNEL_ROX	__pgprot(_PAGE_BASE | _PAGE_KERNEL_ROX)
++
++/* Protection used for kernel text. We want the debuggers to be able to
++ * set breakpoints anywhere, so don't write protect the kernel text
++ * on platforms where such control is possible.
++ */
++#if defined(CONFIG_KGDB) || defined(CONFIG_XMON) || defined(CONFIG_BDI_SWITCH) ||\
++	defined(CONFIG_KPROBES) || defined(CONFIG_DYNAMIC_FTRACE)
++#define PAGE_KERNEL_TEXT	PAGE_KERNEL_X
++#else
++#define PAGE_KERNEL_TEXT	PAGE_KERNEL_ROX
++#endif
++
++/* Make modules code happy. We don't set RO yet */
++#define PAGE_KERNEL_EXEC	PAGE_KERNEL_X
++
++/* Advertise special mapping type for AGP */
++#define PAGE_AGP		(PAGE_KERNEL_NC)
++#define HAVE_PAGE_AGP
  
--#ifdef CONFIG_MEMCG
--/**
-- * bio_associate_blkcg_from_page - associate a bio with the page's blkcg
-- * @bio: target bio
-- * @page: the page to lookup the blkcg from
-- *
-- * Associate @bio with the blkcg from @page's owning memcg.  This works like
-- * every other associate function wrt references.
-- */
--int bio_associate_blkcg_from_page(struct bio *bio, struct page *page)
--{
--	struct cgroup_subsys_state *blkcg_css;
--
--	if (unlikely(bio->bi_css))
--		return -EBUSY;
--	if (!page->mem_cgroup)
--		return 0;
--	blkcg_css = cgroup_get_e_css(page->mem_cgroup->css.cgroup,
--				     &io_cgrp_subsys);
--	bio->bi_css = blkcg_css;
--	return 0;
--}
--#endif /* CONFIG_MEMCG */
--
- /**
-  * bio_associate_blkcg - associate a bio with the specified blkcg
-  * @bio: target bio
-@@ -2027,6 +2003,65 @@ int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg)
- 	return 0;
+ #define PTE_INDEX_SIZE	PTE_SHIFT
+ #define PMD_INDEX_SIZE	0
+@@ -219,7 +309,7 @@ static inline pte_t ptep_get_and_clear(struct mm_struct *mm, unsigned long addr,
+ static inline void ptep_set_wrprotect(struct mm_struct *mm, unsigned long addr,
+ 				      pte_t *ptep)
+ {
+-	pte_update(ptep, (_PAGE_RW | _PAGE_HWWRITE), _PAGE_RO);
++	pte_update(ptep, _PAGE_RW, 0);
  }
+ static inline void huge_ptep_set_wrprotect(struct mm_struct *mm,
+ 					   unsigned long addr, pte_t *ptep)
+@@ -235,9 +325,8 @@ static inline void __ptep_set_access_flags(struct vm_area_struct *vma,
+ {
+ 	unsigned long set = pte_val(entry) &
+ 		(_PAGE_DIRTY | _PAGE_ACCESSED | _PAGE_RW);
+-	unsigned long clr = ~pte_val(entry) & _PAGE_RO;
  
-+static int __bio_associate_blkg_from_css(struct bio *bio,
-+					 struct cgroup_subsys_state *css)
-+{
-+	struct blkcg_gq *blkg;
-+
-+	rcu_read_lock();
-+
-+	blkg = blkg_lookup_create(css_to_blkcg(css), bio->bi_disk->queue);
-+
-+	rcu_read_unlock();
-+
-+	return bio_associate_blkg(bio, blkg);
-+}
-+
-+/**
-+ * bio_associate_blkg_from_css - associate a bio with a specified css
-+ * @bio: target bio
-+ * @css: target css
-+ *
-+ * Associate @bio with the blkg found by combining the css's blkg and the
-+ * request_queue of the @bio.  This takes a reference on the css that will
-+ * be put upon freeing of @bio.
-+ */
-+int bio_associate_blkg_from_css(struct bio *bio,
-+				struct cgroup_subsys_state *css)
-+{
-+	css_get(css);
-+	bio->bi_css = css;
-+	return __bio_associate_blkg_from_css(bio, css);
-+}
-+EXPORT_SYMBOL_GPL(bio_associate_blkg_from_css);
-+
-+#ifdef CONFIG_MEMCG
-+/**
-+ * bio_associate_blkg_from_page - associate a bio with the page's blkg
-+ * @bio: target bio
-+ * @page: the page to lookup the blkcg from
-+ *
-+ * Associate @bio with the blkg from @page's owning memcg and the respective
-+ * request_queue.  This works like every other associate function wrt
-+ * references.
-+ *
-+ * Note: this must be called after bio has an associated device.
-+ */
-+int bio_associate_blkg_from_page(struct bio *bio, struct page *page)
-+{
-+	struct cgroup_subsys_state *css;
-+
-+	if (unlikely(bio->bi_css))
-+		return -EBUSY;
-+	if (!page->mem_cgroup)
-+		return 0;
-+	css = cgroup_get_e_css(page->mem_cgroup->css.cgroup, &io_cgrp_subsys);
-+	bio->bi_css = css;
-+
-+	return __bio_associate_blkg_from_css(bio, css);
-+}
-+#endif /* CONFIG_MEMCG */
-+
- /**
-  * bio_associate_create_blkg - associate a bio with a blkg from q
-  * @q: request_queue where bio is going
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index d1435643f5b7..bd8e67c01aa1 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -547,21 +547,26 @@ do {						\
- 	disk_devt((bio)->bi_disk)
+-	pte_update(ptep, clr, set);
++	pte_update(ptep, 0, set);
  
- #if defined(CONFIG_MEMCG) && defined(CONFIG_BLK_CGROUP)
--int bio_associate_blkcg_from_page(struct bio *bio, struct page *page);
-+int bio_associate_blkg_from_page(struct bio *bio, struct page *page);
- #else
--static inline int bio_associate_blkcg_from_page(struct bio *bio,
--						struct page *page) {  return 0; }
-+static inline int bio_associate_blkg_from_page(struct bio *bio,
-+					       struct page *page) { return 0; }
+ 	flush_tlb_page(vma, address);
+ }
+diff --git a/arch/powerpc/include/asm/pte-common.h b/arch/powerpc/include/asm/pte-common.h
+index 4860dae76dae..3a8ec18ffd22 100644
+--- a/arch/powerpc/include/asm/pte-common.h
++++ b/arch/powerpc/include/asm/pte-common.h
+@@ -5,15 +5,9 @@
+  * Some bits are only used on some cpu families... Make sure that all
+  * the undefined gets a sensible default
+  */
+-#ifndef _PAGE_HASHPTE
+-#define _PAGE_HASHPTE	0
+-#endif
+ #ifndef _PAGE_HWWRITE
+ #define _PAGE_HWWRITE	0
+ #endif
+-#ifndef _PAGE_EXEC
+-#define _PAGE_EXEC	0
+-#endif
+ #ifndef _PAGE_COHERENT
+ #define _PAGE_COHERENT	0
+ #endif
+@@ -68,11 +62,8 @@
+ #define _PAGE_KERNEL_RWX	(_PAGE_PRIVILEGED | _PAGE_DIRTY | _PAGE_RW | \
+ 				 _PAGE_HWWRITE | _PAGE_EXEC)
+ #endif
+-#ifndef _PAGE_HPTEFLAGS
+-#define _PAGE_HPTEFLAGS _PAGE_HASHPTE
+-#endif
+ #ifndef _PTE_NONE_MASK
+-#define _PTE_NONE_MASK	_PAGE_HPTEFLAGS
++#define _PTE_NONE_MASK	0
  #endif
  
- #ifdef CONFIG_BLK_CGROUP
- int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css);
- int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg);
-+int bio_associate_blkg_from_css(struct bio *bio,
-+				struct cgroup_subsys_state *css);
- int bio_associate_create_blkg(struct request_queue *q, struct bio *bio);
- void bio_disassociate_task(struct bio *bio);
- void bio_clone_blkcg_association(struct bio *dst, struct bio *src);
- #else	/* CONFIG_BLK_CGROUP */
- static inline int bio_associate_blkcg(struct bio *bio,
- 			struct cgroup_subsys_state *blkcg_css) { return 0; }
-+static inline int bio_associate_blkg_from_css(struct bio *bio,
-+					      struct cgroup_subsys_state *css)
-+{ return 0; }
- static inline int bio_associate_create_blkg(struct request_queue *q,
- 					    struct bio *bio) { return 0; }
- static inline void bio_disassociate_task(struct bio *bio) { }
-diff --git a/mm/page_io.c b/mm/page_io.c
-index aafd19ec1db4..573d3663d846 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -339,7 +339,7 @@ int __swap_writepage(struct page *page, struct writeback_control *wbc,
- 		goto out;
- 	}
- 	bio->bi_opf = REQ_OP_WRITE | REQ_SWAP | wbc_to_write_flags(wbc);
--	bio_associate_blkcg_from_page(bio, page);
-+	bio_associate_blkg_from_page(bio, page);
- 	count_swpout_vm_event(page);
- 	set_page_writeback(page);
- 	unlock_page(page);
+ #ifndef __ASSEMBLY__
+@@ -108,7 +99,7 @@ static inline bool pte_user(pte_t pte)
+ /* _PAGE_CHG_MASK masks of bits that are to be preserved across
+  * pgprot changes
+  */
+-#define _PAGE_CHG_MASK	(PTE_RPN_MASK | _PAGE_HPTEFLAGS | _PAGE_DIRTY | \
++#define _PAGE_CHG_MASK	(PTE_RPN_MASK | _PAGE_DIRTY | \
+                          _PAGE_ACCESSED | _PAGE_SPECIAL)
+ 
+ /* Mask of bits returned by pte_pgprot() */
+@@ -125,8 +116,7 @@ static inline bool pte_user(pte_t pte)
+  * the processor might need it for DMA coherency.
+  */
+ #define _PAGE_BASE_NC	(_PAGE_PRESENT | _PAGE_ACCESSED | _PAGE_PSIZE)
+-#if defined(CONFIG_SMP) || defined(CONFIG_PPC_STD_MMU) || \
+-	defined(CONFIG_PPC_E500MC)
++#if defined(CONFIG_SMP) || defined(CONFIG_PPC_E500MC)
+ #define _PAGE_BASE	(_PAGE_BASE_NC | _PAGE_COHERENT)
+ #else
+ #define _PAGE_BASE	(_PAGE_BASE_NC)
 -- 
-2.17.1
+2.13.3
