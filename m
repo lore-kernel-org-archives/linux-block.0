@@ -1,67 +1,39 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:58048 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726768AbeIRPvz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Sep 2018 11:51:55 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>, Tejun Heo <tj@kernel.org>,
-        Jianchao Wang <jianchao.w.wang@oracle.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH 1/4] percpu-refcount: move zeroing of percpu part into percpu_ref_switch_to_atomic_rcu
-Date: Tue, 18 Sep 2018 18:19:43 +0800
-Message-Id: <20180918101946.13329-2-ming.lei@redhat.com>
-In-Reply-To: <20180918101946.13329-1-ming.lei@redhat.com>
-References: <20180918101946.13329-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <34f570a52b8309984bbe500410098c85dcd28eaa.1536692743.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1536692743.git.christophe.leroy@c-s.fr>
+References: <cover.1536692743.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v2 04/24] soc/fsl/qbman: use ioremap_cache() instead of
+ ioremap_prot(0)
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Wed, 12 Sep 2018 15:58:21 +0000 (UTC)
+List-ID: <linux-block@vger.kernel.org>
 
-The percpu parts are added to atomic part in percpu_ref_switch_to_atomic_rcu(),
-so it is readable & reasonable to clear them there.
+ioremap_prot() with flag set to 0 relies on a hack in
+__ioremap_caller() which adds PAGE_KERNEL flags when the
+handed flags don't look like a valid set of flags
+(ie don't include _PAGE_PRESENT)
 
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Cc: linux-block@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+The intention being to map cached memory, use ioremap_cache() instead.
+
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- lib/percpu-refcount.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ drivers/soc/fsl/qbman/qman_ccsr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/lib/percpu-refcount.c b/lib/percpu-refcount.c
-index 9f96fa7bc000..a220b717f6bb 100644
---- a/lib/percpu-refcount.c
-+++ b/lib/percpu-refcount.c
-@@ -130,8 +130,10 @@ static void percpu_ref_switch_to_atomic_rcu(struct rcu_head *rcu)
- 	unsigned long count = 0;
- 	int cpu;
- 
--	for_each_possible_cpu(cpu)
-+	for_each_possible_cpu(cpu) {
- 		count += *per_cpu_ptr(percpu_count, cpu);
-+		*per_cpu_ptr(percpu_count, cpu) = 0;
-+	}
- 
- 	pr_debug("global %ld percpu %ld",
- 		 atomic_long_read(&ref->count), (long)count);
-@@ -187,7 +189,6 @@ static void __percpu_ref_switch_to_atomic(struct percpu_ref *ref,
- static void __percpu_ref_switch_to_percpu(struct percpu_ref *ref)
+diff --git a/drivers/soc/fsl/qbman/qman_ccsr.c b/drivers/soc/fsl/qbman/qman_ccsr.c
+index 79cba58387a5..0fbb201346c7 100644
+--- a/drivers/soc/fsl/qbman/qman_ccsr.c
++++ b/drivers/soc/fsl/qbman/qman_ccsr.c
+@@ -418,7 +418,7 @@ static size_t fqd_sz, pfdr_sz;
+ static int zero_priv_mem(phys_addr_t addr, size_t sz)
  {
- 	unsigned long __percpu *percpu_count = percpu_count_ptr(ref);
--	int cpu;
+ 	/* map as cacheable, non-guarded */
+-	void __iomem *tmpp = ioremap_prot(addr, sz, 0);
++	void __iomem *tmpp = ioremap_cache(addr, sz);
  
- 	BUG_ON(!percpu_count);
- 
-@@ -202,9 +203,6 @@ static void __percpu_ref_switch_to_percpu(struct percpu_ref *ref)
- 	 * zeroing is visible to all percpu accesses which can see the
- 	 * following __PERCPU_REF_ATOMIC clearing.
- 	 */
--	for_each_possible_cpu(cpu)
--		*per_cpu_ptr(percpu_count, cpu) = 0;
--
- 	smp_store_release(&ref->percpu_count_ptr,
- 			  ref->percpu_count_ptr & ~__PERCPU_REF_ATOMIC);
- }
+ 	if (!tmpp)
+ 		return -ENOMEM;
 -- 
-2.9.5
+2.13.3
