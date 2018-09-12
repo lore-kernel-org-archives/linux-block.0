@@ -1,52 +1,78 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:41223 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726121AbeI1Wr3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Sep 2018 18:47:29 -0400
-Received: by mail-pf1-f196.google.com with SMTP id m77-v6so4653223pfi.8
-        for <linux-block@vger.kernel.org>; Fri, 28 Sep 2018 09:22:58 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com,
-        Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: [PATCH] kyber: fix integer overflow of latency targets on 32-bit
-Date: Fri, 28 Sep 2018 09:22:50 -0700
-Message-Id: <56a03261ec32ef67a8ce36106bf2f2f7638600ca.1538151757.git.osandov@fb.com>
-MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <88c230e7629f287437cd7ea7fccf4c8abf090a4c.1536692743.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1536692743.git.christophe.leroy@c-s.fr>
+References: <cover.1536692743.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v2 21/24] powerpc/mm: Define platform default caches related
+ flags
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Wed, 12 Sep 2018 15:58:56 +0000 (UTC)
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+Cache related flags like _PAGE_COHERENT and _PAGE_WRITETHRU
+are defined on most platforms. The platforms not defining
+them don't define any alternative. So we can give them a NUL
+value directly for those platforms directly.
 
-NSEC_PER_SEC has type long, so 5 * NSEC_PER_SEC is calculated as a long.
-However, 5 seconds is 5,000,000,000 nanoseconds, which overflows a
-32-bit long. Make sure all of the targets are calculated as 64-bit
-values.
-
-Fixes: 6e25cb01ea20 ("kyber: implement improved heuristics")
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- block/kyber-iosched.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/powerpc/include/asm/nohash/32/pte-40x.h |  3 +++
+ arch/powerpc/include/asm/nohash/32/pte-8xx.h |  4 ++++
+ arch/powerpc/include/asm/pte-common.h        | 11 -----------
+ 3 files changed, 7 insertions(+), 11 deletions(-)
 
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index 2b62e362fb36..eccac01a10b6 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -79,9 +79,9 @@ static const unsigned int kyber_depth[] = {
-  * Default latency targets for each scheduling domain.
-  */
- static const u64 kyber_latency_targets[] = {
--	[KYBER_READ] = 2 * NSEC_PER_MSEC,
--	[KYBER_WRITE] = 10 * NSEC_PER_MSEC,
--	[KYBER_DISCARD] = 5 * NSEC_PER_SEC,
-+	[KYBER_READ] = 2ULL * NSEC_PER_MSEC,
-+	[KYBER_WRITE] = 10ULL * NSEC_PER_MSEC,
-+	[KYBER_DISCARD] = 5ULL * NSEC_PER_SEC,
- };
+diff --git a/arch/powerpc/include/asm/nohash/32/pte-40x.h b/arch/powerpc/include/asm/nohash/32/pte-40x.h
+index ab043b3e9b99..7a8b3c94592f 100644
+--- a/arch/powerpc/include/asm/nohash/32/pte-40x.h
++++ b/arch/powerpc/include/asm/nohash/32/pte-40x.h
+@@ -53,6 +53,9 @@
+ /* No page size encoding in the linux PTE */
+ #define _PAGE_PSIZE		0
  
- /*
++/* cache related flags non existing on 40x */
++#define _PAGE_COHERENT	0
++
+ #define _PAGE_KERNEL_RO		0
+ #define _PAGE_KERNEL_ROX	_PAGE_EXEC
+ #define _PAGE_KERNEL_RW		(_PAGE_DIRTY | _PAGE_RW | _PAGE_HWWRITE)
+diff --git a/arch/powerpc/include/asm/nohash/32/pte-8xx.h b/arch/powerpc/include/asm/nohash/32/pte-8xx.h
+index b899c3c877ac..2b4669b3badb 100644
+--- a/arch/powerpc/include/asm/nohash/32/pte-8xx.h
++++ b/arch/powerpc/include/asm/nohash/32/pte-8xx.h
+@@ -46,6 +46,10 @@
+ #define _PAGE_NA	0x0200	/* Supervisor NA, User no access */
+ #define _PAGE_RO	0x0600	/* Supervisor RO, User no access */
+ 
++/* cache related flags non existing on 8xx */
++#define _PAGE_COHERENT	0
++#define _PAGE_WRITETHRU	0
++
+ #define _PAGE_KERNEL_RO		(_PAGE_PRIVILEGED | _PAGE_RO)
+ #define _PAGE_KERNEL_ROX	(_PAGE_PRIVILEGED | _PAGE_RO | _PAGE_EXEC)
+ #define _PAGE_KERNEL_RW		(_PAGE_PRIVILEGED | _PAGE_DIRTY)
+diff --git a/arch/powerpc/include/asm/pte-common.h b/arch/powerpc/include/asm/pte-common.h
+index 1a2102f8b1e7..ff01368a175a 100644
+--- a/arch/powerpc/include/asm/pte-common.h
++++ b/arch/powerpc/include/asm/pte-common.h
+@@ -1,17 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ /* Included from asm/pgtable-*.h only ! */
+ 
+-/*
+- * Some bits are only used on some cpu families... Make sure that all
+- * the undefined gets a sensible default
+- */
+-#ifndef _PAGE_COHERENT
+-#define _PAGE_COHERENT	0
+-#endif
+-#ifndef _PAGE_WRITETHRU
+-#define _PAGE_WRITETHRU	0
+-#endif
+-
+ /* Location of the PFN in the PTE. Most 32-bit platforms use the same
+  * as _PAGE_SHIFT here (ie, naturally aligned).
+  * Platform who don't just pre-define the value so we don't override it here
 -- 
-2.19.0
+2.13.3
