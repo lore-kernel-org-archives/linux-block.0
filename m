@@ -1,132 +1,109 @@
-Return-Path: <bvanassche@acm.org>
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH v11 0/8] blk-mq: Implement runtime power management
-Date: Wed, 26 Sep 2018 14:01:02 -0700
-Message-Id: <20180926210110.20362-1-bvanassche@acm.org>
-MIME-Version: 1.0
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <1ac1795d39315628744604df233b4cddf50535eb.1536692743.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1536692743.git.christophe.leroy@c-s.fr>
+References: <cover.1536692743.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v2 01/24] powerpc/32: Add ioremap_wt() and ioremap_coherent()
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Wed, 12 Sep 2018 15:58:15 +0000 (UTC)
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
+Other arches have ioremap_wt() to map IO areas write-through.
+Implement it on PPC as well in order to avoid drivers using
+__ioremap(_PAGE_WRITETHRU)
 
-One of the pieces that is missing before blk-mq can be made the default
-is implementing runtime power management support for blk-mq.  This patch
-series not only implements runtime power management for blk-mq but also
-fixes a starvation issue in the power management code for the legacy
-block layer. Please consider this patch series for the upstream kernel.
+Also implement ioremap_coherent() to avoid drivers using
+__ioremap(_PAGE_COHERENT)
 
-Thanks,
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+---
+ arch/powerpc/include/asm/io.h |  9 +++++++++
+ arch/powerpc/mm/pgtable_32.c  | 16 ++++++++++++++++
+ arch/powerpc/mm/pgtable_64.c  | 10 ++++++++++
+ 3 files changed, 35 insertions(+)
 
-Bart.
-
-Changes compared to v10:
-- Added a comment in the percpu-refcount patch in this series as Tejun
-  asked.
-- Updated Acked-by / Reviewed-by tags.
-
-Changes compared to v9:
-- Left out the patches that document the functions that iterate over
-  requests and also the patch that introduces blk_mq_queue_rq_iter().
-- Simplified blk_pre_runtime_suspend(): left out the check whether no
-  requests are in progress.
-- Fixed the race between blk_queue_enter(), queue freezing and runtime
-  power management that Ming had identified.
-- Added a new patch that introduces percpu_ref_resurrect().
-
-Changes compared to v8:
-- Fixed the race that was reported by Jianchao.
-- Fixed another spelling issue in a source code comment.
-
-Changes compared to v7:
-- Addressed Jianchao's feedback about patch "Make blk_get_request() block
-  for non-PM requests while suspended".
-- Added two new patches - one that documents the functions that iterate
-  over requests and one that introduces a new function that iterates over
-  all requests associated with a queue.
-
-Changes compared to v6:
-- Left out the patches that split RQF_PREEMPT in three flags.
-- Left out the patch that introduces the SCSI device state SDEV_SUSPENDED.
-- Left out the patch that introduces blk_pm_runtime_exit().
-- Restored the patch that changes the PREEMPT_ONLY flag into a counter.
-
-Changes compared to v5:
-- Introduced a new flag RQF_DV that replaces RQF_PREEMPT for SCSI domain
-  validation.
-- Introduced a new request queue state QUEUE_FLAG_DV_ONLY for SCSI domain
-  validation.
-- Instead of using SDEV_QUIESCE for both runtime suspend and SCSI domain
-  validation, use that state for domain validation only and introduce a new
-  state for runtime suspend, namely SDEV_QUIESCE.
-- Reallow system suspend during SCSI domain validation.
-- Moved the runtime resume call from the request allocation code into
-  blk_queue_enter().
-- Instead of relying on q_usage_counter, iterate over the tag set to
-  determine whether or not any requests are in flight.
-
-Changes compared to v4:
-- Dropped the patches "Give RQF_PREEMPT back its original meaning" and
-  "Serialize queue freezing and blk_pre_runtime_suspend()".
-- Replaced "percpu_ref_read()" with "percpu_is_in_use()".
-- Inserted pm_request_resume() calls in the block layer request allocation
-  code such that the context that submits a request no longer has to call
-  pm_runtime_get().
-
-Changes compared to v3:
-- Avoid adverse interactions between system-wide suspend/resume and runtime
-  power management by changing the PREEMPT_ONLY flag into a counter.
-- Give RQF_PREEMPT back its original meaning, namely that it is only set
-  for ide_preempt requests.
-- Remove the flag BLK_MQ_REQ_PREEMPT.
-- Removed the pm_request_resume() call.
-
-Changes compared to v2:
-- Fixed the build for CONFIG_BLOCK=n.
-- Added a patch that introduces percpu_ref_read() in the percpu-counter
-  code.
-- Added a patch that makes it easier to detect missing pm_runtime_get*()
-  calls.
-- Addressed Jianchao's feedback including the comment about runtime
-  overhead of switching a per-cpu counter to atomic mode.
-
-Changes compared to v1:
-- Moved the runtime power management code into a separate file.
-- Addressed Ming's feedback.
-
-Bart Van Assche (8):
-  block: Move power management code into a new source file
-  block, scsi: Change the preempt-only flag into a counter
-  block: Split blk_pm_add_request() and blk_pm_put_request()
-  block: Schedule runtime resume earlier
-  percpu-refcount: Introduce percpu_ref_resurrect()
-  block: Allow unfreezing of a queue while requests are in progress
-  block: Make blk_get_request() block for non-PM requests while
-    suspended
-  blk-mq: Enable support for runtime power management
-
- block/Kconfig                   |   3 +
- block/Makefile                  |   1 +
- block/blk-core.c                | 270 ++++----------------------------
- block/blk-mq-debugfs.c          |  10 +-
- block/blk-mq.c                  |   4 +-
- block/blk-pm.c                  | 216 +++++++++++++++++++++++++
- block/blk-pm.h                  |  69 ++++++++
- block/elevator.c                |  22 +--
- drivers/scsi/scsi_lib.c         |  11 +-
- drivers/scsi/scsi_pm.c          |   1 +
- drivers/scsi/sd.c               |   1 +
- drivers/scsi/sr.c               |   1 +
- include/linux/blk-pm.h          |  24 +++
- include/linux/blkdev.h          |  37 ++---
- include/linux/percpu-refcount.h |   1 +
- lib/percpu-refcount.c           |  28 +++-
- 16 files changed, 401 insertions(+), 298 deletions(-)
- create mode 100644 block/blk-pm.c
- create mode 100644 block/blk-pm.h
- create mode 100644 include/linux/blk-pm.h
-
+diff --git a/arch/powerpc/include/asm/io.h b/arch/powerpc/include/asm/io.h
+index e0331e754568..cdccab3938db 100644
+--- a/arch/powerpc/include/asm/io.h
++++ b/arch/powerpc/include/asm/io.h
+@@ -3,6 +3,9 @@
+ #ifdef __KERNEL__
+ 
+ #define ARCH_HAS_IOREMAP_WC
++#ifdef CONFIG_PPC32
++#define ARCH_HAS_IOREMAP_WT
++#endif
+ 
+ /*
+  * This program is free software; you can redistribute it and/or
+@@ -746,6 +749,10 @@ static inline void iosync(void)
+  *
+  * * ioremap_wc enables write combining
+  *
++ * * ioremap_wt enables write through
++ *
++ * * ioremap_coherent maps coherent cached memory
++ *
+  * * iounmap undoes such a mapping and can be hooked
+  *
+  * * __ioremap_at (and the pending __iounmap_at) are low level functions to
+@@ -767,6 +774,8 @@ extern void __iomem *ioremap(phys_addr_t address, unsigned long size);
+ extern void __iomem *ioremap_prot(phys_addr_t address, unsigned long size,
+ 				  unsigned long flags);
+ extern void __iomem *ioremap_wc(phys_addr_t address, unsigned long size);
++void __iomem *ioremap_wt(phys_addr_t address, unsigned long size);
++void __iomem *ioremap_coherent(phys_addr_t address, unsigned long size);
+ #define ioremap_nocache(addr, size)	ioremap((addr), (size))
+ #define ioremap_uc(addr, size)		ioremap((addr), (size))
+ #define ioremap_cache(addr, size) \
+diff --git a/arch/powerpc/mm/pgtable_32.c b/arch/powerpc/mm/pgtable_32.c
+index 120a49bfb9c6..4c3adde09d95 100644
+--- a/arch/powerpc/mm/pgtable_32.c
++++ b/arch/powerpc/mm/pgtable_32.c
+@@ -90,6 +90,22 @@ ioremap_wc(phys_addr_t addr, unsigned long size)
+ EXPORT_SYMBOL(ioremap_wc);
+ 
+ void __iomem *
++ioremap_wt(phys_addr_t addr, unsigned long size)
++{
++	return __ioremap_caller(addr, size, _PAGE_WRITETHRU,
++				__builtin_return_address(0));
++}
++EXPORT_SYMBOL(ioremap_wt);
++
++void __iomem *
++ioremap_coherent(phys_addr_t addr, unsigned long size)
++{
++	return __ioremap_caller(addr, size, _PAGE_COHERENT,
++				__builtin_return_address(0));
++}
++EXPORT_SYMBOL(ioremap_coherent);
++
++void __iomem *
+ ioremap_prot(phys_addr_t addr, unsigned long size, unsigned long flags)
+ {
+ 	/* writeable implies dirty for kernel addresses */
+diff --git a/arch/powerpc/mm/pgtable_64.c b/arch/powerpc/mm/pgtable_64.c
+index 53e9eeecd5d4..cdccfac477e0 100644
+--- a/arch/powerpc/mm/pgtable_64.c
++++ b/arch/powerpc/mm/pgtable_64.c
+@@ -222,6 +222,16 @@ void __iomem * ioremap_wc(phys_addr_t addr, unsigned long size)
+ 	return __ioremap_caller(addr, size, flags, caller);
+ }
+ 
++void __iomem *ioremap_coherent(phys_addr_t addr, unsigned long size)
++{
++	unsigned long flags = pgprot_val(pgprot_cached(__pgprot(0)));
++	void *caller = __builtin_return_address(0);
++
++	if (ppc_md.ioremap)
++		return ppc_md.ioremap(addr, size, flags, caller);
++	return __ioremap_caller(addr, size, flags, caller);
++}
++
+ void __iomem * ioremap_prot(phys_addr_t addr, unsigned long size,
+ 			     unsigned long flags)
+ {
 -- 
-2.19.0.605.g01d371f741-goog
+2.13.3
