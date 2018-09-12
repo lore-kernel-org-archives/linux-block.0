@@ -1,65 +1,116 @@
-Return-Path: <bvanassche@acm.org>
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v7 4/6] block: Schedule runtime resume earlier
-Date: Mon, 17 Sep 2018 13:11:18 -0700
-Message-Id: <20180917201124.26161-6-bvanassche@acm.org>
-In-Reply-To: <20180917201124.26161-1-bvanassche@acm.org>
-References: <20180917201124.26161-1-bvanassche@acm.org>
-MIME-Version: 1.0
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <18d5b7489e75dfa504010bc8939f97cd4463d229.1536692743.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1536692743.git.christophe.leroy@c-s.fr>
+References: <cover.1536692743.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v2 05/24] powerpc: don't use ioremap_prot() nor __ioremap()
+ unless really needed.
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Wed, 12 Sep 2018 15:58:23 +0000 (UTC)
 List-ID: <linux-block@vger.kernel.org>
 
-Instead of scheduling runtime resume of a request queue after a
-request has been queued, schedule asynchronous resume during request
-allocation. The new pm_request_resume() calls occur after
-blk_queue_enter() has increased the q_usage_counter request queue
-member. This change is needed for a later patch that will make request
-allocation block while the queue status is not RPM_ACTIVE.
+In many places, ioremap_prot() and __ioremap() can be replaced with
+higher level functions like ioremap(), ioremap_coherent(),
+ioremap_cache(), ioremap_wc() ...
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- block/blk-core.c | 2 ++
- block/elevator.c | 1 -
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ arch/powerpc/kernel/btext.c               | 2 +-
+ arch/powerpc/kernel/crash_dump.c          | 2 +-
+ arch/powerpc/platforms/85xx/smp.c         | 4 ++--
+ arch/powerpc/platforms/pasemi/dma_lib.c   | 2 +-
+ arch/powerpc/platforms/ps3/spu.c          | 3 +--
+ arch/powerpc/sysdev/fsl_85xx_cache_sram.c | 8 ++++----
+ 6 files changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index fd91e9bf2893..18b874d5c9c9 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -942,6 +942,8 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 		if (success)
- 			return 0;
+diff --git a/arch/powerpc/kernel/btext.c b/arch/powerpc/kernel/btext.c
+index b2072d5bbf2b..b4241ed1456e 100644
+--- a/arch/powerpc/kernel/btext.c
++++ b/arch/powerpc/kernel/btext.c
+@@ -163,7 +163,7 @@ void btext_map(void)
+ 	offset = ((unsigned long) dispDeviceBase) - base;
+ 	size = dispDeviceRowBytes * dispDeviceRect[3] + offset
+ 		+ dispDeviceRect[0];
+-	vbase = __ioremap(base, size, pgprot_val(pgprot_noncached_wc(__pgprot(0))));
++	vbase = ioremap_wc(base, size);
+ 	if (!vbase)
+ 		return;
+ 	logicalDisplayBase = vbase + offset;
+diff --git a/arch/powerpc/kernel/crash_dump.c b/arch/powerpc/kernel/crash_dump.c
+index d10ad258d41a..bbdc4706c159 100644
+--- a/arch/powerpc/kernel/crash_dump.c
++++ b/arch/powerpc/kernel/crash_dump.c
+@@ -110,7 +110,7 @@ ssize_t copy_oldmem_page(unsigned long pfn, char *buf,
+ 		vaddr = __va(paddr);
+ 		csize = copy_oldmem_vaddr(vaddr, buf, csize, offset, userbuf);
+ 	} else {
+-		vaddr = __ioremap(paddr, PAGE_SIZE, 0);
++		vaddr = ioremap_cache(paddr, PAGE_SIZE);
+ 		csize = copy_oldmem_vaddr(vaddr, buf, csize, offset, userbuf);
+ 		iounmap(vaddr);
+ 	}
+diff --git a/arch/powerpc/platforms/85xx/smp.c b/arch/powerpc/platforms/85xx/smp.c
+index 7e966f4cf19a..fff72425727a 100644
+--- a/arch/powerpc/platforms/85xx/smp.c
++++ b/arch/powerpc/platforms/85xx/smp.c
+@@ -216,8 +216,8 @@ static int smp_85xx_start_cpu(int cpu)
  
-+		blk_pm_request_resume(q);
-+
- 		if (flags & BLK_MQ_REQ_NOWAIT)
- 			return -EBUSY;
+ 	/* Map the spin table */
+ 	if (ioremappable)
+-		spin_table = ioremap_prot(*cpu_rel_addr,
+-			sizeof(struct epapr_spin_table), _PAGE_COHERENT);
++		spin_table = ioremap_coherent(*cpu_rel_addr,
++					      sizeof(struct epapr_spin_table));
+ 	else
+ 		spin_table = phys_to_virt(*cpu_rel_addr);
  
-diff --git a/block/elevator.c b/block/elevator.c
-index 1c992bf6cfb1..e18ac68626e3 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -601,7 +601,6 @@ void __elv_add_request(struct request_queue *q, struct request *rq, int where)
- 	trace_block_rq_insert(q, rq);
+diff --git a/arch/powerpc/platforms/pasemi/dma_lib.c b/arch/powerpc/platforms/pasemi/dma_lib.c
+index c80f72c370ae..53384eb42a76 100644
+--- a/arch/powerpc/platforms/pasemi/dma_lib.c
++++ b/arch/powerpc/platforms/pasemi/dma_lib.c
+@@ -576,7 +576,7 @@ int pasemi_dma_init(void)
+ 		res.start = 0xfd800000;
+ 		res.end = res.start + 0x1000;
+ 	}
+-	dma_status = __ioremap(res.start, resource_size(&res), 0);
++	dma_status = ioremap_cache(res.start, resource_size(&res));
+ 	pci_dev_put(iob_pdev);
  
- 	blk_pm_add_request(q, rq);
--	blk_pm_request_resume(q);
+ 	for (i = 0; i < MAX_TXCH; i++)
+diff --git a/arch/powerpc/platforms/ps3/spu.c b/arch/powerpc/platforms/ps3/spu.c
+index b54850845466..7746c2a3c509 100644
+--- a/arch/powerpc/platforms/ps3/spu.c
++++ b/arch/powerpc/platforms/ps3/spu.c
+@@ -215,8 +215,7 @@ static int __init setup_areas(struct spu *spu)
+ 		goto fail_ioremap;
+ 	}
  
- 	rq->q = q;
+-	spu->local_store = (__force void *)ioremap_prot(spu->local_store_phys,
+-		LS_SIZE, pgprot_val(pgprot_noncached_wc(__pgprot(0))));
++	spu->local_store = (__force void *)ioremap_wc(spu->local_store_phys, LS_SIZE);
  
+ 	if (!spu->local_store) {
+ 		pr_debug("%s:%d: ioremap local_store failed\n",
+diff --git a/arch/powerpc/sysdev/fsl_85xx_cache_sram.c b/arch/powerpc/sysdev/fsl_85xx_cache_sram.c
+index 00ccf3e4fcb4..15cbdd4fde06 100644
+--- a/arch/powerpc/sysdev/fsl_85xx_cache_sram.c
++++ b/arch/powerpc/sysdev/fsl_85xx_cache_sram.c
+@@ -107,11 +107,11 @@ int __init instantiate_cache_sram(struct platform_device *dev,
+ 		goto out_free;
+ 	}
+ 
+-	cache_sram->base_virt = ioremap_prot(cache_sram->base_phys,
+-				cache_sram->size, _PAGE_COHERENT | PAGE_KERNEL);
++	cache_sram->base_virt = ioremap_coherent(cache_sram->base_phys,
++						 cache_sram->size);
+ 	if (!cache_sram->base_virt) {
+-		dev_err(&dev->dev, "%pOF: ioremap_prot failed\n",
+-				dev->dev.of_node);
++		dev_err(&dev->dev, "%pOF: ioremap_coherent failed\n",
++			dev->dev.of_node);
+ 		ret = -ENOMEM;
+ 		goto out_release;
+ 	}
 -- 
-2.18.0
+2.13.3
