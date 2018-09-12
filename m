@@ -1,55 +1,145 @@
-Return-Path: <penguin-kernel@i-love.sakura.ne.jp>
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Subject: [PATCH 1/4] block/loop: Don't grab "struct file" for vfs_getattr() operation.
-Date: Wed, 26 Sep 2018 00:26:46 +0900
-Message-Id: <1537889209-7208-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp>
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <31dea7ecceb9737932beaa4dc3339c7808356872.1536692743.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1536692743.git.christophe.leroy@c-s.fr>
+References: <cover.1536692743.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v2 09/24] powerpc/mm: move some nohash pte helpers in
+ nohash/[32:64]/pgtable.h
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Wed, 12 Sep 2018 15:58:32 +0000 (UTC)
 List-ID: <linux-block@vger.kernel.org>
 
-vfs_getattr() needs "struct path" rather than "struct file".
-Let's use path_get()/path_put() rather than get_file()/fput().
+In order to allow their use in nohash/32/pgtable.h, we have to move the
+following helpers in nohash/[32:64]/pgtable.h:
+- pte_mkwrite()
+- pte_mkdirty()
+- pte_mkyoung()
+- pte_wrprotect()
 
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- drivers/block/loop.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ arch/powerpc/include/asm/nohash/32/pgtable.h | 28 ++++++++++++++++++++++++++++
+ arch/powerpc/include/asm/nohash/64/pgtable.h | 20 ++++++++++++++++++++
+ arch/powerpc/include/asm/nohash/pgtable.h    | 28 ----------------------------
+ 3 files changed, 48 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index abad6d1..c2745e6 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1206,7 +1206,7 @@ static int loop_clr_fd(struct loop_device *lo)
- static int
- loop_get_status(struct loop_device *lo, struct loop_info64 *info)
+diff --git a/arch/powerpc/include/asm/nohash/32/pgtable.h b/arch/powerpc/include/asm/nohash/32/pgtable.h
+index a7f44498ab6f..4373f8c44b6d 100644
+--- a/arch/powerpc/include/asm/nohash/32/pgtable.h
++++ b/arch/powerpc/include/asm/nohash/32/pgtable.h
+@@ -136,6 +136,34 @@ extern int icache_44x_need_flush;
+ #define pte_clear(mm, addr, ptep) \
+ 	do { pte_update(ptep, ~0, 0); } while (0)
+ 
++static inline pte_t pte_mkwrite(pte_t pte)
++{
++	pte_basic_t ptev;
++
++	ptev = pte_val(pte) & ~_PAGE_RO;
++	ptev |= _PAGE_RW;
++	return __pte(ptev);
++}
++
++static inline pte_t pte_mkdirty(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_DIRTY);
++}
++
++static inline pte_t pte_mkyoung(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_ACCESSED);
++}
++
++static inline pte_t pte_wrprotect(pte_t pte)
++{
++	pte_basic_t ptev;
++
++	ptev = pte_val(pte) & ~(_PAGE_RW | _PAGE_HWWRITE);
++	ptev |= _PAGE_RO;
++	return __pte(ptev);
++}
++
+ #define pmd_none(pmd)		(!pmd_val(pmd))
+ #define	pmd_bad(pmd)		(pmd_val(pmd) & _PMD_BAD)
+ #define	pmd_present(pmd)	(pmd_val(pmd) & _PMD_PRESENT_MASK)
+diff --git a/arch/powerpc/include/asm/nohash/64/pgtable.h b/arch/powerpc/include/asm/nohash/64/pgtable.h
+index 513b6e9e62c6..72dac522aa66 100644
+--- a/arch/powerpc/include/asm/nohash/64/pgtable.h
++++ b/arch/powerpc/include/asm/nohash/64/pgtable.h
+@@ -94,6 +94,26 @@
+ #ifndef __ASSEMBLY__
+ /* pte_clear moved to later in this file */
+ 
++static inline pte_t pte_mkwrite(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_RW);
++}
++
++static inline pte_t pte_mkdirty(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_DIRTY);
++}
++
++static inline pte_t pte_mkyoung(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_ACCESSED);
++}
++
++static inline pte_t pte_wrprotect(pte_t pte)
++{
++	return __pte(pte_val(pte) & ~_PAGE_RW);
++}
++
+ #define PMD_BAD_BITS		(PTE_TABLE_SIZE-1)
+ #define PUD_BAD_BITS		(PMD_TABLE_SIZE-1)
+ 
+diff --git a/arch/powerpc/include/asm/nohash/pgtable.h b/arch/powerpc/include/asm/nohash/pgtable.h
+index 5b82e44c4231..c746e9e784cd 100644
+--- a/arch/powerpc/include/asm/nohash/pgtable.h
++++ b/arch/powerpc/include/asm/nohash/pgtable.h
+@@ -77,15 +77,6 @@ static inline unsigned long pte_pfn(pte_t pte)	{
+ 	return pte_val(pte) >> PTE_RPN_SHIFT; }
+ 
+ /* Generic modifiers for PTE bits */
+-static inline pte_t pte_wrprotect(pte_t pte)
+-{
+-	pte_basic_t ptev;
+-
+-	ptev = pte_val(pte) & ~(_PAGE_RW | _PAGE_HWWRITE);
+-	ptev |= _PAGE_RO;
+-	return __pte(ptev);
+-}
+-
+ static inline pte_t pte_mkclean(pte_t pte)
  {
--	struct file *file;
-+	struct path path;
- 	struct kstat stat;
- 	int ret;
- 
-@@ -1231,16 +1231,16 @@ static int loop_clr_fd(struct loop_device *lo)
- 	}
- 
- 	/* Drop lo_ctl_mutex while we call into the filesystem. */
--	file = get_file(lo->lo_backing_file);
-+	path = lo->lo_backing_file->f_path;
-+	path_get(&path);
- 	mutex_unlock(&lo->lo_ctl_mutex);
--	ret = vfs_getattr(&file->f_path, &stat, STATX_INO,
--			  AT_STATX_SYNC_AS_STAT);
-+	ret = vfs_getattr(&path, &stat, STATX_INO, AT_STATX_SYNC_AS_STAT);
- 	if (!ret) {
- 		info->lo_device = huge_encode_dev(stat.dev);
- 		info->lo_inode = stat.ino;
- 		info->lo_rdevice = huge_encode_dev(stat.rdev);
- 	}
--	fput(file);
-+	path_put(&path);
- 	return ret;
+ 	return __pte(pte_val(pte) & ~(_PAGE_DIRTY | _PAGE_HWWRITE));
+@@ -96,25 +87,6 @@ static inline pte_t pte_mkold(pte_t pte)
+ 	return __pte(pte_val(pte) & ~_PAGE_ACCESSED);
  }
  
+-static inline pte_t pte_mkwrite(pte_t pte)
+-{
+-	pte_basic_t ptev;
+-
+-	ptev = pte_val(pte) & ~_PAGE_RO;
+-	ptev |= _PAGE_RW;
+-	return __pte(ptev);
+-}
+-
+-static inline pte_t pte_mkdirty(pte_t pte)
+-{
+-	return __pte(pte_val(pte) | _PAGE_DIRTY);
+-}
+-
+-static inline pte_t pte_mkyoung(pte_t pte)
+-{
+-	return __pte(pte_val(pte) | _PAGE_ACCESSED);
+-}
+-
+ static inline pte_t pte_mkspecial(pte_t pte)
+ {
+ 	return __pte(pte_val(pte) | _PAGE_SPECIAL);
 -- 
-1.8.3.1
+2.13.3
