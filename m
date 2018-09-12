@@ -1,37 +1,84 @@
 Return-Path: <axboe@kernel.dk>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [REGRESSION] bfq probe failed on 4.19-rc3
+To: Takashi Iwai <tiwai@suse.de>
+Cc: Jeff Moyer <jmoyer@redhat.com>, Paolo Valente <paolo.valente@linaro.org>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <s5ha7ooxbps.wl-tiwai@suse.de>
+ <8b5a7dc9-2dc1-16ee-4b05-a72eb6680c77@kernel.dk>
+ <x49a7ooj7zp.fsf@segfault.boston.devel.redhat.com>
+ <bd71494f-4595-7586-4c46-000f2b2029aa@kernel.dk>
+ <x495zzcj7u8.fsf@segfault.boston.devel.redhat.com>
+ <8d5f3ab2-50e8-226c-8ccb-c722872910db@kernel.dk>
+ <s5hbm936qii.wl-tiwai@suse.de>
 From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fix for 4.19-rc5
-Message-ID: <1132dc7f-d3d0-a318-22d5-01d2af8f63c7@kernel.dk>
-Date: Sat, 22 Sep 2018 15:21:19 -0600
+Message-ID: <6e932598-3e24-3918-a600-eb162a475ea3@kernel.dk>
+Date: Wed, 12 Sep 2018 08:31:18 -0600
 MIME-Version: 1.0
+In-Reply-To: <s5hbm936qii.wl-tiwai@suse.de>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Greg,
+On 9/12/18 2:58 AM, Takashi Iwai wrote:
+> On Tue, 11 Sep 2018 18:54:19 +0200,
+> Jens Axboe wrote:
+>>
+>> On 9/11/18 10:51 AM, Jeff Moyer wrote:
+>>> Jens Axboe <axboe@kernel.dk> writes:
+>>>
+>>>> On 9/11/18 10:48 AM, Jeff Moyer wrote:
+>>>>> Jens Axboe <axboe@kernel.dk> writes:
+>>>>>
+>>>>>> On 9/11/18 10:03 AM, Takashi Iwai wrote:
+>>>>>>> Hi,
+>>>>>>>
+>>>>>>> I noticed that bfq doesn't appear in the I/O scheduler list on
+>>>>>>> 4.19-rc3.  It seems that blkcg_policy_register() at the beginning of
+>>>>>>> bfq_init() returns -ENOSPC, hence the probe aborts silently.
+>>>>>>>
+>>>>>>> Is this already addressed?
+>>>>>>
+>>>>>> Haven't heard about this one before. What kernel did you last use that
+>>>>>> worked?
+>>>>>
+>>>>> I'm guessing you just need to update the maximum number of policies:
+>>>>>
+>>>>> /*
+>>>>>  * Maximum number of blkcg policies allowed to be registered concurrently.
+>>>>>  * Defined here to simplify include dependency.
+>>>>>  */
+>>>>> #define BLKCG_MAX_POLS          3
+>>>>
+>>>> That is my guess too, hence the suggestion to try and disable the
+>>>> iolatency policy. Just tried here without, and it works, rebooting
+>>>> with to verify that we're running out of policy slots.
+>>>
+>>> Functions calling this function: blkcg_policy_register
+>>>
+>>>   File                      Function       Line
+>>> 0 block/bfq-iosched.c       bfq_init       5675 ret =
+>>>                                                 blkcg_policy_register(&blkcg_pol
+>>>                                                 icy_bfq);
+>>> 1 block/blk-iolatency.c     iolatency_init  946 return
+>>>                                                 blkcg_policy_register(&blkcg_pol
+>>>                                                 icy_iolatency);
+>>> 2 block/blk-throttle.c      throtl_init    2511 return
+>>>                                                 blkcg_policy_register(&blkcg_pol
+>>>                                                 icy_throtl);
+>>> 3 block/cfq-iosched.c       cfq_init       4869 ret =
+>>>                                                 blkcg_policy_register(&blkcg_pol
+>>>                                                 icy_cfq);
+>>>
+>>> And then there were 4...
+>>
+>> Exactly. I'd bump it to 5 to leave room for one more, if we have to grow it
+>> again, probably worth it to make it dynamic. So for, not really needed. Takashi,
+>> can verify that the below fixes it up for you?
+> 
+> Yes, it works.
+> 
+> Tested-by: Takashi Iwai <tiwai@suse.de>
 
-I was going to wait with this one, but then I decided that I think we
-should put it in sooner rather than later. Just a single fix in this
-pull request, fixing a regression in /proc/diskstats caused by the
-unification of timestamps.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20180922
-
-
-----------------------------------------------------------------
-Omar Sandoval (1):
-      block: use nanosecond resolution for iostat
-
- block/bio.c               | 2 +-
- block/blk-core.c          | 4 +---
- block/genhd.c             | 6 +++---
- block/partition-generic.c | 6 +++---
- include/linux/genhd.h     | 5 ++++-
- 5 files changed, 12 insertions(+), 11 deletions(-)
+Thanks for verifying (and reporting), I'll get this in for 4.19-rc4.
 
 -- 
 Jens Axboe
