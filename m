@@ -1,69 +1,69 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 03/14] loop: Fold __loop_release into loop_release
-Date: Thu, 27 Sep 2018 13:36:41 +0200
-Message-Id: <20180927113652.5422-4-jack@suse.cz>
-In-Reply-To: <20180927113652.5422-1-jack@suse.cz>
-References: <20180927113652.5422-1-jack@suse.cz>
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <c7144b5c3f3da430e4e75c40e8d1a758b3f40e85.1536692743.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1536692743.git.christophe.leroy@c-s.fr>
+References: <cover.1536692743.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v2 17/24] powerpc/mm: Move pte_user() into nohash/pgtable.h
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Wed, 12 Sep 2018 15:58:48 +0000 (UTC)
 List-ID: <linux-block@vger.kernel.org>
 
-__loop_release() has a single call site. Fold it there. This is
-currently not a huge win but it will make following replacement of
-loop_index_mutex more obvious.
+Now the pte-common.h is only for nohash platforms, lets
+move pte_user() helper out of pte-common.h to put it
+together with other helpers.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- drivers/block/loop.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ arch/powerpc/include/asm/nohash/pgtable.h | 10 ++++++++++
+ arch/powerpc/include/asm/pte-common.h     | 13 -------------
+ 2 files changed, 10 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index d0f1b7106572..cc43d835fe6f 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1642,12 +1642,15 @@ static int lo_open(struct block_device *bdev, fmode_t mode)
- 	return err;
+diff --git a/arch/powerpc/include/asm/nohash/pgtable.h b/arch/powerpc/include/asm/nohash/pgtable.h
+index 92def7088054..a4c31b829071 100644
+--- a/arch/powerpc/include/asm/nohash/pgtable.h
++++ b/arch/powerpc/include/asm/nohash/pgtable.h
+@@ -47,6 +47,16 @@ static inline int pte_present(pte_t pte)
  }
  
--static void __lo_release(struct loop_device *lo)
-+static void lo_release(struct gendisk *disk, fmode_t mode)
- {
-+	struct loop_device *lo;
- 	int err;
+ /*
++ * Don't just check for any non zero bits in __PAGE_USER, since for book3e
++ * and PTE_64BIT, PAGE_KERNEL_X contains _PAGE_BAP_SR which is also in
++ * _PAGE_USER.  Need to explicitly match _PAGE_BAP_UR bit in that case too.
++ */
++static inline bool pte_user(pte_t pte)
++{
++	return (pte_val(pte) & (_PAGE_USER | _PAGE_PRIVILEGED)) == _PAGE_USER;
++}
++
++/*
+  * We only find page table entry in the last level
+  * Hence no need for other accessors
+  */
+diff --git a/arch/powerpc/include/asm/pte-common.h b/arch/powerpc/include/asm/pte-common.h
+index 3a8ec18ffd22..556a914ff845 100644
+--- a/arch/powerpc/include/asm/pte-common.h
++++ b/arch/powerpc/include/asm/pte-common.h
+@@ -66,19 +66,6 @@
+ #define _PTE_NONE_MASK	0
+ #endif
  
-+	mutex_lock(&loop_index_mutex);
-+	lo = disk->private_data;
- 	if (atomic_dec_return(&lo->lo_refcnt))
--		return;
-+		goto unlock_index;
- 
- 	mutex_lock(&loop_ctl_mutex);
- 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
-@@ -1657,7 +1660,7 @@ static void __lo_release(struct loop_device *lo)
- 		 */
- 		err = loop_clr_fd(lo);
- 		if (!err)
--			return;
-+			goto unlock_index;
- 	} else if (lo->lo_state == Lo_bound) {
- 		/*
- 		 * Otherwise keep thread (if running) and config,
-@@ -1668,12 +1671,7 @@ static void __lo_release(struct loop_device *lo)
- 	}
- 
- 	mutex_unlock(&loop_ctl_mutex);
--}
+-#ifndef __ASSEMBLY__
 -
--static void lo_release(struct gendisk *disk, fmode_t mode)
+-/*
+- * Don't just check for any non zero bits in __PAGE_USER, since for book3e
+- * and PTE_64BIT, PAGE_KERNEL_X contains _PAGE_BAP_SR which is also in
+- * _PAGE_USER.  Need to explicitly match _PAGE_BAP_UR bit in that case too.
+- */
+-static inline bool pte_user(pte_t pte)
 -{
--	mutex_lock(&loop_index_mutex);
--	__lo_release(disk->private_data);
-+unlock_index:
- 	mutex_unlock(&loop_index_mutex);
- }
- 
+-	return (pte_val(pte) & (_PAGE_USER | _PAGE_PRIVILEGED)) == _PAGE_USER;
+-}
+-#endif /* __ASSEMBLY__ */
+-
+ /* Location of the PFN in the PTE. Most 32-bit platforms use the same
+  * as _PAGE_SHIFT here (ie, naturally aligned).
+  * Platform who don't just pre-define the value so we don't override it here
 -- 
-2.16.4
+2.13.3
