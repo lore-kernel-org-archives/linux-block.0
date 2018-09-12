@@ -1,157 +1,131 @@
 Return-Path: <christophe.leroy@c-s.fr>
-Message-Id: <2f980cf32a05415662272cf052c2b9e2a94c756f.1536692743.git.christophe.leroy@c-s.fr>
+Message-Id: <e99eebcd2aafb379cdf8fd39f06399e6abaf3ced.1536692743.git.christophe.leroy@c-s.fr>
 In-Reply-To: <cover.1536692743.git.christophe.leroy@c-s.fr>
 References: <cover.1536692743.git.christophe.leroy@c-s.fr>
 From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v2 02/24] drivers/video/fbdev: use ioremap_wc/wt() instead of
- __ioremap()
+Subject: [PATCH v2 15/24] powerpc/mm: move __P and __S tables in the common
+ pgtable.h
 To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
 Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
-Date: Wed, 12 Sep 2018 15:58:17 +0000 (UTC)
+Date: Wed, 12 Sep 2018 15:58:44 +0000 (UTC)
 List-ID: <linux-block@vger.kernel.org>
 
-_PAGE_NO_CACHE is a platform specific flag. In addition, this flag
-is misleading because one would think it requests a noncached page
-whereas a noncached page is _PAGE_NO_CACHE | _PAGE_GUARDED
+__P and __S flags are the same for all platform and should remain
+as is in the future, so avoid duplication.
 
-_PAGE_NO_CACHE alone means write combined noncached page, so lets
-use ioremap_wc() instead.
-
-_PAGE_WRITETHRU is also platform specific flag. Use ioremap_wt()
-instead.
-
+Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
 Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- drivers/video/fbdev/chipsfb.c    |  3 +--
- drivers/video/fbdev/controlfb.c  |  5 +----
- drivers/video/fbdev/platinumfb.c |  5 +----
- drivers/video/fbdev/valkyriefb.c | 12 ++++++------
- 4 files changed, 9 insertions(+), 16 deletions(-)
+ arch/powerpc/include/asm/book3s/64/pgtable.h | 20 --------------------
+ arch/powerpc/include/asm/pgtable.h           | 19 +++++++++++++++++++
+ arch/powerpc/include/asm/pte-common.h        | 20 --------------------
+ 3 files changed, 19 insertions(+), 40 deletions(-)
 
-diff --git a/drivers/video/fbdev/chipsfb.c b/drivers/video/fbdev/chipsfb.c
-index f103665cad43..40182ed85648 100644
---- a/drivers/video/fbdev/chipsfb.c
-+++ b/drivers/video/fbdev/chipsfb.c
-@@ -27,7 +27,6 @@
- #include <linux/init.h>
- #include <linux/pci.h>
- #include <linux/console.h>
--#include <asm/io.h>
+diff --git a/arch/powerpc/include/asm/book3s/64/pgtable.h b/arch/powerpc/include/asm/book3s/64/pgtable.h
+index 8cf44faa6ff3..6799bc02cb22 100644
+--- a/arch/powerpc/include/asm/book3s/64/pgtable.h
++++ b/arch/powerpc/include/asm/book3s/64/pgtable.h
+@@ -151,8 +151,6 @@
+  * Write permissions imply read permissions for now (we could make write-only
+  * pages on BookE but we don't bother for now). Execute permission control is
+  * possible on platforms that define _PAGE_EXEC
+- *
+- * Note due to the way vm flags are laid out, the bits are XWR
+  */
+ #define PAGE_NONE	__pgprot(_PAGE_BASE | _PAGE_PRIVILEGED)
+ #define PAGE_SHARED	__pgprot(_PAGE_BASE | _PAGE_RW)
+@@ -162,24 +160,6 @@
+ #define PAGE_READONLY	__pgprot(_PAGE_BASE | _PAGE_READ)
+ #define PAGE_READONLY_X	__pgprot(_PAGE_BASE | _PAGE_READ | _PAGE_EXEC)
  
- #ifdef CONFIG_PMAC_BACKLIGHT
- #include <asm/backlight.h>
-@@ -401,7 +400,7 @@ static int chipsfb_pci_init(struct pci_dev *dp, const struct pci_device_id *ent)
- #endif /* CONFIG_PMAC_BACKLIGHT */
+-#define __P000	PAGE_NONE
+-#define __P001	PAGE_READONLY
+-#define __P010	PAGE_COPY
+-#define __P011	PAGE_COPY
+-#define __P100	PAGE_READONLY_X
+-#define __P101	PAGE_READONLY_X
+-#define __P110	PAGE_COPY_X
+-#define __P111	PAGE_COPY_X
+-
+-#define __S000	PAGE_NONE
+-#define __S001	PAGE_READONLY
+-#define __S010	PAGE_SHARED
+-#define __S011	PAGE_SHARED
+-#define __S100	PAGE_READONLY_X
+-#define __S101	PAGE_READONLY_X
+-#define __S110	PAGE_SHARED_X
+-#define __S111	PAGE_SHARED_X
+-
+ /* Permission masks used for kernel mappings */
+ #define PAGE_KERNEL	__pgprot(_PAGE_BASE | _PAGE_KERNEL_RW)
+ #define PAGE_KERNEL_NC	__pgprot(_PAGE_BASE_NC | _PAGE_KERNEL_RW | \
+diff --git a/arch/powerpc/include/asm/pgtable.h b/arch/powerpc/include/asm/pgtable.h
+index 14c79a7dc855..fb4b85bba110 100644
+--- a/arch/powerpc/include/asm/pgtable.h
++++ b/arch/powerpc/include/asm/pgtable.h
+@@ -20,6 +20,25 @@ struct mm_struct;
+ #include <asm/nohash/pgtable.h>
+ #endif /* !CONFIG_PPC_BOOK3S */
  
- #ifdef CONFIG_PPC
--	p->screen_base = __ioremap(addr, 0x200000, _PAGE_NO_CACHE);
-+	p->screen_base = ioremap_wc(addr, 0x200000);
- #else
- 	p->screen_base = ioremap(addr, 0x200000);
- #endif
-diff --git a/drivers/video/fbdev/controlfb.c b/drivers/video/fbdev/controlfb.c
-index 8d14b29aafea..9cb0ef7ac29e 100644
---- a/drivers/video/fbdev/controlfb.c
-+++ b/drivers/video/fbdev/controlfb.c
-@@ -48,9 +48,7 @@
- #include <linux/nvram.h>
- #include <linux/adb.h>
- #include <linux/cuda.h>
--#include <asm/io.h>
- #include <asm/prom.h>
--#include <asm/pgtable.h>
- #include <asm/btext.h>
++/* Note due to the way vm flags are laid out, the bits are XWR */
++#define __P000	PAGE_NONE
++#define __P001	PAGE_READONLY
++#define __P010	PAGE_COPY
++#define __P011	PAGE_COPY
++#define __P100	PAGE_READONLY_X
++#define __P101	PAGE_READONLY_X
++#define __P110	PAGE_COPY_X
++#define __P111	PAGE_COPY_X
++
++#define __S000	PAGE_NONE
++#define __S001	PAGE_READONLY
++#define __S010	PAGE_SHARED
++#define __S011	PAGE_SHARED
++#define __S100	PAGE_READONLY_X
++#define __S101	PAGE_READONLY_X
++#define __S110	PAGE_SHARED_X
++#define __S111	PAGE_SHARED_X
++
+ #ifndef __ASSEMBLY__
  
- #include "macmodes.h"
-@@ -715,8 +713,7 @@ static int __init control_of_init(struct device_node *dp)
- 		goto error_out;
- 	}
- 	/* map at most 8MB for the frame buffer */
--	p->frame_buffer = __ioremap(p->frame_buffer_phys, 0x800000,
--				    _PAGE_WRITETHRU);
-+	p->frame_buffer = ioremap_wt(p->frame_buffer_phys, 0x800000);
+ #include <asm/tlbflush.h>
+diff --git a/arch/powerpc/include/asm/pte-common.h b/arch/powerpc/include/asm/pte-common.h
+index 5a5ba43bdf98..4860dae76dae 100644
+--- a/arch/powerpc/include/asm/pte-common.h
++++ b/arch/powerpc/include/asm/pte-common.h
+@@ -139,8 +139,6 @@ static inline bool pte_user(pte_t pte)
+  * Write permissions imply read permissions for now (we could make write-only
+  * pages on BookE but we don't bother for now). Execute permission control is
+  * possible on platforms that define _PAGE_EXEC
+- *
+- * Note due to the way vm flags are laid out, the bits are XWR
+  */
+ #define PAGE_NONE	__pgprot(_PAGE_BASE | _PAGE_NA)
+ #define PAGE_SHARED	__pgprot(_PAGE_BASE | _PAGE_USER | _PAGE_RW)
+@@ -153,24 +151,6 @@ static inline bool pte_user(pte_t pte)
+ #define PAGE_READONLY_X	__pgprot(_PAGE_BASE | _PAGE_USER | _PAGE_RO | \
+ 				 _PAGE_EXEC)
  
- 	if (!p->control_regs_phys ||
- 	    !request_mem_region(p->control_regs_phys, p->control_regs_size,
-diff --git a/drivers/video/fbdev/platinumfb.c b/drivers/video/fbdev/platinumfb.c
-index 377d3399a3ad..bf6b7fb83cf4 100644
---- a/drivers/video/fbdev/platinumfb.c
-+++ b/drivers/video/fbdev/platinumfb.c
-@@ -32,9 +32,7 @@
- #include <linux/nvram.h>
- #include <linux/of_device.h>
- #include <linux/of_platform.h>
--#include <asm/io.h>
- #include <asm/prom.h>
--#include <asm/pgtable.h>
- 
- #include "macmodes.h"
- #include "platinumfb.h"
-@@ -577,8 +575,7 @@ static int platinumfb_probe(struct platform_device* odev)
- 
- 	/* frame buffer - map only 4MB */
- 	pinfo->frame_buffer_phys = pinfo->rsrc_fb.start;
--	pinfo->frame_buffer = __ioremap(pinfo->rsrc_fb.start, 0x400000,
--					_PAGE_WRITETHRU);
-+	pinfo->frame_buffer = ioremap_wt(pinfo->rsrc_fb.start, 0x400000);
- 	pinfo->base_frame_buffer = pinfo->frame_buffer;
- 
- 	/* registers */
-diff --git a/drivers/video/fbdev/valkyriefb.c b/drivers/video/fbdev/valkyriefb.c
-index 275fb98236d3..d51c3a8009cb 100644
---- a/drivers/video/fbdev/valkyriefb.c
-+++ b/drivers/video/fbdev/valkyriefb.c
-@@ -54,13 +54,11 @@
- #include <linux/nvram.h>
- #include <linux/adb.h>
- #include <linux/cuda.h>
--#include <asm/io.h>
- #ifdef CONFIG_MAC
- #include <asm/macintosh.h>
- #else
- #include <asm/prom.h>
- #endif
--#include <asm/pgtable.h>
- 
- #include "macmodes.h"
- #include "valkyriefb.h"
-@@ -318,7 +316,7 @@ static void __init valkyrie_choose_mode(struct fb_info_valkyrie *p)
- int __init valkyriefb_init(void)
- {
- 	struct fb_info_valkyrie	*p;
--	unsigned long frame_buffer_phys, cmap_regs_phys, flags;
-+	unsigned long frame_buffer_phys, cmap_regs_phys;
- 	int err;
- 	char *option = NULL;
- 
-@@ -337,7 +335,6 @@ int __init valkyriefb_init(void)
- 	/* Hardcoded addresses... welcome to 68k Macintosh country :-) */
- 	frame_buffer_phys = 0xf9000000;
- 	cmap_regs_phys = 0x50f24000;
--	flags = IOMAP_NOCACHE_SER; /* IOMAP_WRITETHROUGH?? */
- #else /* ppc (!CONFIG_MAC) */
- 	{
- 		struct device_node *dp;
-@@ -354,7 +351,6 @@ int __init valkyriefb_init(void)
- 
- 		frame_buffer_phys = r.start;
- 		cmap_regs_phys = r.start + 0x304000;
--		flags = _PAGE_WRITETHRU;
- 	}
- #endif /* ppc (!CONFIG_MAC) */
- 
-@@ -369,7 +365,11 @@ int __init valkyriefb_init(void)
- 	}
- 	p->total_vram = 0x100000;
- 	p->frame_buffer_phys = frame_buffer_phys;
--	p->frame_buffer = __ioremap(frame_buffer_phys, p->total_vram, flags);
-+#ifdef CONFIG_MAC
-+	p->frame_buffer = ioremap_nocache(frame_buffer_phys, p->total_vram);
-+#else
-+	p->frame_buffer = ioremap_wt(frame_buffer_phys, p->total_vram);
-+#endif
- 	p->cmap_regs_phys = cmap_regs_phys;
- 	p->cmap_regs = ioremap(p->cmap_regs_phys, 0x1000);
- 	p->valkyrie_regs_phys = cmap_regs_phys+0x6000;
+-#define __P000	PAGE_NONE
+-#define __P001	PAGE_READONLY
+-#define __P010	PAGE_COPY
+-#define __P011	PAGE_COPY
+-#define __P100	PAGE_READONLY_X
+-#define __P101	PAGE_READONLY_X
+-#define __P110	PAGE_COPY_X
+-#define __P111	PAGE_COPY_X
+-
+-#define __S000	PAGE_NONE
+-#define __S001	PAGE_READONLY
+-#define __S010	PAGE_SHARED
+-#define __S011	PAGE_SHARED
+-#define __S100	PAGE_READONLY_X
+-#define __S101	PAGE_READONLY_X
+-#define __S110	PAGE_SHARED_X
+-#define __S111	PAGE_SHARED_X
+-
+ /* Permission masks used for kernel mappings */
+ #define PAGE_KERNEL	__pgprot(_PAGE_BASE | _PAGE_KERNEL_RW)
+ #define PAGE_KERNEL_NC	__pgprot(_PAGE_BASE_NC | _PAGE_KERNEL_RW | \
 -- 
 2.13.3
