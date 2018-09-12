@@ -1,104 +1,173 @@
-Return-Path: <bvanassche@acm.org>
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v9 2/8] blk-mq: Introduce blk_mq_queue_rq_iter()
-Date: Wed, 19 Sep 2018 15:45:24 -0700
-Message-Id: <20180919224530.222469-3-bvanassche@acm.org>
-In-Reply-To: <20180919224530.222469-1-bvanassche@acm.org>
-References: <20180919224530.222469-1-bvanassche@acm.org>
-MIME-Version: 1.0
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <54802e1bb2df75a6e8352539e13ab7ec96eea43b.1536692743.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1536692743.git.christophe.leroy@c-s.fr>
+References: <cover.1536692743.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v2 23/24] powerpc/8xx: change name of a few page flags to
+ avoid confusion
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Wed, 12 Sep 2018 15:59:00 +0000 (UTC)
 List-ID: <linux-block@vger.kernel.org>
 
-This function will be used in the patch "Make blk_get_request() block for
-non-PM requests while suspended".
+_PAGE_PRIVILEGED corresponds to the SH bit which doesn't protect
+against user access but only disables ASID verification on kernel
+accesses. User access is controlled with _PMD_USER flag.
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>
+Name it _PAGE_SH instead of _PAGE_PRIVILEGED
+
+_PAGE_HUGE corresponds to the SPS bit which doesn't really tells
+that's it is a huge page but only that it is not a 4k page.
+
+Name it _PAGE_SPS instead of _PAGE_HUGE
+
+Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- block/blk-mq-tag.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
- block/blk-mq-tag.h |  2 ++
- 2 files changed, 46 insertions(+)
+ arch/powerpc/include/asm/nohash/32/pte-8xx.h | 28 ++++++++++++++--------------
+ arch/powerpc/kernel/head_8xx.S               |  6 +++---
+ arch/powerpc/mm/8xx_mmu.c                    |  2 +-
+ arch/powerpc/mm/dump_linuxpagetables-8xx.c   |  2 +-
+ 4 files changed, 19 insertions(+), 19 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index cb5db0c3cc32..f95b41b5f07a 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -374,6 +374,50 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
- 	rcu_read_unlock();
+diff --git a/arch/powerpc/include/asm/nohash/32/pte-8xx.h b/arch/powerpc/include/asm/nohash/32/pte-8xx.h
+index 2b4669b3badb..1c57efac089d 100644
+--- a/arch/powerpc/include/asm/nohash/32/pte-8xx.h
++++ b/arch/powerpc/include/asm/nohash/32/pte-8xx.h
+@@ -29,10 +29,10 @@
+  */
+ 
+ /* Definitions for 8xx embedded chips. */
+-#define _PAGE_PRESENT	0x0001	/* Page is valid */
+-#define _PAGE_NO_CACHE	0x0002	/* I: cache inhibit */
+-#define _PAGE_PRIVILEGED	0x0004	/* No ASID (context) compare */
+-#define _PAGE_HUGE	0x0008	/* SPS: Small Page Size (1 if 16k, 512k or 8M)*/
++#define _PAGE_PRESENT	0x0001	/* V: Page is valid */
++#define _PAGE_NO_CACHE	0x0002	/* CI: cache inhibit */
++#define _PAGE_SH	0x0004	/* SH: No ASID (context) compare */
++#define _PAGE_SPS	0x0008	/* SPS: Small Page Size (1 if 16k, 512k or 8M)*/
+ #define _PAGE_DIRTY	0x0100	/* C: page changed */
+ 
+ /* These 4 software bits must be masked out when the L2 entry is loaded
+@@ -50,15 +50,15 @@
+ #define _PAGE_COHERENT	0
+ #define _PAGE_WRITETHRU	0
+ 
+-#define _PAGE_KERNEL_RO		(_PAGE_PRIVILEGED | _PAGE_RO)
+-#define _PAGE_KERNEL_ROX	(_PAGE_PRIVILEGED | _PAGE_RO | _PAGE_EXEC)
+-#define _PAGE_KERNEL_RW		(_PAGE_PRIVILEGED | _PAGE_DIRTY)
+-#define _PAGE_KERNEL_RWX	(_PAGE_PRIVILEGED | _PAGE_DIRTY | _PAGE_EXEC)
++#define _PAGE_KERNEL_RO		(_PAGE_SH | _PAGE_RO)
++#define _PAGE_KERNEL_ROX	(_PAGE_SH | _PAGE_RO | _PAGE_EXEC)
++#define _PAGE_KERNEL_RW		(_PAGE_SH | _PAGE_DIRTY)
++#define _PAGE_KERNEL_RWX	(_PAGE_SH | _PAGE_DIRTY | _PAGE_EXEC)
+ 
+ /* Mask of bits returned by pte_pgprot() */
+ #define PAGE_PROT_BITS	(_PAGE_GUARDED | _PAGE_NO_CACHE | \
+ 			 _PAGE_ACCESSED | _PAGE_RO | _PAGE_NA | \
+-			 _PAGE_PRIVILEGED | _PAGE_DIRTY | _PAGE_EXEC)
++			 _PAGE_SH | _PAGE_DIRTY | _PAGE_EXEC)
+ 
+ #define _PMD_PRESENT	0x0001
+ #define _PMD_PRESENT_MASK	_PMD_PRESENT
+@@ -74,7 +74,7 @@
+ #define PTE_ATOMIC_UPDATES	1
+ 
+ #ifdef CONFIG_PPC_16K_PAGES
+-#define _PAGE_PSIZE	_PAGE_HUGE
++#define _PAGE_PSIZE	_PAGE_SPS
+ #else
+ #define _PAGE_PSIZE		0
+ #endif
+@@ -115,28 +115,28 @@ static inline pte_t pte_mkwrite(pte_t pte)
+ 
+ static inline bool pte_user(pte_t pte)
+ {
+-	return !(pte_val(pte) & _PAGE_PRIVILEGED);
++	return !(pte_val(pte) & _PAGE_SH);
  }
  
-+/*
-+ * Call @fn(rq, @priv, reserved) for each request associated with request
-+ * queue @q or any queue that it shares tags with and that has been assigned a
-+ * tag. 'reserved' indicates whether or not 'rq' is a reserved request. In
-+ * contrast to blk_mq_queue_tag_busy_iter(), if an I/O scheduler has been
-+ * associated with @q, this function also iterates over requests that have
-+ * been assigned a scheduler tag but that have not yet been assigned a driver
-+ * tag.
-+ */
-+void blk_mq_queue_rq_iter(struct request_queue *q, busy_iter_fn *fn, void *priv)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+	int i;
-+
-+	/*
-+	 * __blk_mq_update_nr_hw_queues() will update nr_hw_queues and
-+	 * queue_hw_ctx after having frozen the request queue. So we can use
-+	 * q_usage_counter to avoid a race with that
-+	 * function. __blk_mq_update_nr_hw_queues() uses synchronize_rcu() to
-+	 * ensure that this function leaves the critical section below.
-+	 */
-+	rcu_read_lock();
-+	if (percpu_ref_is_zero(&q->q_usage_counter)) {
-+		rcu_read_unlock();
-+		return;
-+	}
-+
-+	queue_for_each_hw_ctx(q, hctx, i) {
-+		struct blk_mq_tags *tags = hctx->sched_tags ? : hctx->tags;
-+
-+		/*
-+		 * If no software queues are currently mapped to this
-+		 * hardware queue, there's nothing to check
-+		 */
-+		if (!blk_mq_hw_queue_mapped(hctx))
-+			continue;
-+
-+		if (tags->nr_reserved_tags)
-+			bt_for_each(hctx, &tags->breserved_tags, fn, priv, true);
-+		bt_for_each(hctx, &tags->bitmap_tags, fn, priv, false);
-+	}
-+	rcu_read_unlock();
-+}
-+
- static int bt_alloc(struct sbitmap_queue *bt, unsigned int depth,
- 		    bool round_robin, int node)
- {
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index 61deab0b5a5a..25e62997ed6c 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -35,6 +35,8 @@ extern int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
- extern void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool);
- void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
- 		void *priv);
-+void blk_mq_queue_rq_iter(struct request_queue *q, busy_iter_fn *fn,
-+			  void *priv);
+ #define pte_user pte_user
  
- static inline struct sbq_wait_state *bt_wait_ptr(struct sbitmap_queue *bt,
- 						 struct blk_mq_hw_ctx *hctx)
+ static inline pte_t pte_mkprivileged(pte_t pte)
+ {
+-	return __pte(pte_val(pte) | _PAGE_PRIVILEGED);
++	return __pte(pte_val(pte) | _PAGE_SH);
+ }
+ 
+ #define pte_mkprivileged pte_mkprivileged
+ 
+ static inline pte_t pte_mkuser(pte_t pte)
+ {
+-	return __pte(pte_val(pte) & ~_PAGE_PRIVILEGED);
++	return __pte(pte_val(pte) & ~_PAGE_SH);
+ }
+ 
+ #define pte_mkuser pte_mkuser
+ 
+ static inline pte_t pte_mkhuge(pte_t pte)
+ {
+-	return __pte(pte_val(pte) | _PAGE_HUGE);
++	return __pte(pte_val(pte) | _PAGE_SPS);
+ }
+ 
+ #define pte_mkhuge pte_mkhuge
+diff --git a/arch/powerpc/kernel/head_8xx.S b/arch/powerpc/kernel/head_8xx.S
+index 6582f824d620..134a573a9f2d 100644
+--- a/arch/powerpc/kernel/head_8xx.S
++++ b/arch/powerpc/kernel/head_8xx.S
+@@ -642,7 +642,7 @@ DTLBMissIMMR:
+ 	mtspr	SPRN_MD_TWC, r10
+ 	mfspr	r10, SPRN_IMMR			/* Get current IMMR */
+ 	rlwinm	r10, r10, 0, 0xfff80000		/* Get 512 kbytes boundary */
+-	ori	r10, r10, 0xf0 | MD_SPS16K | _PAGE_PRIVILEGED | _PAGE_DIRTY | \
++	ori	r10, r10, 0xf0 | MD_SPS16K | _PAGE_SH | _PAGE_DIRTY | \
+ 			  _PAGE_PRESENT | _PAGE_NO_CACHE
+ 	mtspr	SPRN_MD_RPN, r10	/* Update TLB entry */
+ 
+@@ -660,7 +660,7 @@ DTLBMissLinear:
+ 	li	r11, MD_PS8MEG | MD_SVALID | M_APG2
+ 	mtspr	SPRN_MD_TWC, r11
+ 	rlwinm	r10, r10, 0, 0x0f800000	/* 8xx supports max 256Mb RAM */
+-	ori	r10, r10, 0xf0 | MD_SPS16K | _PAGE_PRIVILEGED | _PAGE_DIRTY | \
++	ori	r10, r10, 0xf0 | MD_SPS16K | _PAGE_SH | _PAGE_DIRTY | \
+ 			  _PAGE_PRESENT
+ 	mtspr	SPRN_MD_RPN, r10	/* Update TLB entry */
+ 
+@@ -679,7 +679,7 @@ ITLBMissLinear:
+ 	li	r11, MI_PS8MEG | MI_SVALID | M_APG2
+ 	mtspr	SPRN_MI_TWC, r11
+ 	rlwinm	r10, r10, 0, 0x0f800000	/* 8xx supports max 256Mb RAM */
+-	ori	r10, r10, 0xf0 | MI_SPS16K | _PAGE_PRIVILEGED | _PAGE_DIRTY | \
++	ori	r10, r10, 0xf0 | MI_SPS16K | _PAGE_SH | _PAGE_DIRTY | \
+ 			  _PAGE_PRESENT
+ 	mtspr	SPRN_MI_RPN, r10	/* Update TLB entry */
+ 
+diff --git a/arch/powerpc/mm/8xx_mmu.c b/arch/powerpc/mm/8xx_mmu.c
+index 9137361d687d..36484a2ef915 100644
+--- a/arch/powerpc/mm/8xx_mmu.c
++++ b/arch/powerpc/mm/8xx_mmu.c
+@@ -67,7 +67,7 @@ void __init MMU_init_hw(void)
+ 	/* PIN up to the 3 first 8Mb after IMMR in DTLB table */
+ #ifdef CONFIG_PIN_TLB_DATA
+ 	unsigned long ctr = mfspr(SPRN_MD_CTR) & 0xfe000000;
+-	unsigned long flags = 0xf0 | MD_SPS16K | _PAGE_PRIVILEGED | _PAGE_DIRTY;
++	unsigned long flags = 0xf0 | MD_SPS16K | _PAGE_SH | _PAGE_DIRTY;
+ #ifdef CONFIG_PIN_TLB_IMMR
+ 	int i = 29;
+ #else
+diff --git a/arch/powerpc/mm/dump_linuxpagetables-8xx.c b/arch/powerpc/mm/dump_linuxpagetables-8xx.c
+index 33f52a97975b..ab9e3f24db2f 100644
+--- a/arch/powerpc/mm/dump_linuxpagetables-8xx.c
++++ b/arch/powerpc/mm/dump_linuxpagetables-8xx.c
+@@ -11,7 +11,7 @@
+ 
+ static const struct flag_info flag_array[] = {
+ 	{
+-		.mask	= _PAGE_PRIVILEGED,
++		.mask	= _PAGE_SH,
+ 		.val	= 0,
+ 		.set	= "user",
+ 		.clear	= "    ",
 -- 
-2.19.0.397.gdd90340f6a-goog
+2.13.3
