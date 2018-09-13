@@ -1,240 +1,264 @@
-Return-Path: <bvanassche@acm.org>
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
+	linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
 	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v10 2/8] block, scsi: Change the preempt-only flag into a counter
-Date: Fri, 21 Sep 2018 13:31:16 -0700
-Message-Id: <20180921203122.49743-3-bvanassche@acm.org>
-In-Reply-To: <20180921203122.49743-1-bvanassche@acm.org>
-References: <20180921203122.49743-1-bvanassche@acm.org>
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 12 Sep 2018 18:11:43 -0600
+Message-Id: <20180913001156.4115-1-logang@deltatee.com>
 MIME-Version: 1.0
+Subject: [PATCH v6 00/13] Copy Offload in NVMe Fabrics with P2P PCI Memory
 List-ID: <linux-block@vger.kernel.org>
 
-The RQF_PREEMPT flag is used for three purposes:
-- In the SCSI core, for making sure that power management requests
-  are executed even if a device is in the "quiesced" state.
-- For domain validation by SCSI drivers that use the parallel port.
-- In the IDE driver, for IDE preempt requests.
-Rename "preempt-only" into "pm-only" because the primary purpose of
-this mode is power management. Since the power management core may
-but does not have to resume a runtime suspended device before
-performing system-wide suspend and since a later patch will set
-"pm-only" mode as long as a block device is runtime suspended, make
-it possible to set "pm-only" mode from more than one context. Since
-with this change scsi_device_quiesce() is no longer idempotent, make
-that function return early if it is called for a quiesced queue.
+Hi Everyone,
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>
----
- block/blk-core.c        | 35 ++++++++++++++++++-----------------
- block/blk-mq-debugfs.c  | 10 +++++++++-
- drivers/scsi/scsi_lib.c | 11 +++++++----
- include/linux/blkdev.h  | 14 +++++++++-----
- 4 files changed, 43 insertions(+), 27 deletions(-)
+Here is version 6 of the PCI P2PDMA patch set. This version makes
+a few minor changes from v5 and is based on v4.19-rc3. A git repo is here:
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 6d4dd176bd9d..1a691f5269bb 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -422,24 +422,25 @@ void blk_sync_queue(struct request_queue *q)
- EXPORT_SYMBOL(blk_sync_queue);
- 
- /**
-- * blk_set_preempt_only - set QUEUE_FLAG_PREEMPT_ONLY
-+ * blk_set_pm_only - increment pm_only counter
-  * @q: request queue pointer
-- *
-- * Returns the previous value of the PREEMPT_ONLY flag - 0 if the flag was not
-- * set and 1 if the flag was already set.
-  */
--int blk_set_preempt_only(struct request_queue *q)
-+void blk_set_pm_only(struct request_queue *q)
- {
--	return blk_queue_flag_test_and_set(QUEUE_FLAG_PREEMPT_ONLY, q);
-+	atomic_inc(&q->pm_only);
- }
--EXPORT_SYMBOL_GPL(blk_set_preempt_only);
-+EXPORT_SYMBOL_GPL(blk_set_pm_only);
- 
--void blk_clear_preempt_only(struct request_queue *q)
-+void blk_clear_pm_only(struct request_queue *q)
- {
--	blk_queue_flag_clear(QUEUE_FLAG_PREEMPT_ONLY, q);
--	wake_up_all(&q->mq_freeze_wq);
-+	int pm_only;
-+
-+	pm_only = atomic_dec_return(&q->pm_only);
-+	WARN_ON_ONCE(pm_only < 0);
-+	if (pm_only == 0)
-+		wake_up_all(&q->mq_freeze_wq);
- }
--EXPORT_SYMBOL_GPL(blk_clear_preempt_only);
-+EXPORT_SYMBOL_GPL(blk_clear_pm_only);
- 
- /**
-  * __blk_run_queue_uncond - run a queue whether or not it has been stopped
-@@ -918,7 +919,7 @@ EXPORT_SYMBOL(blk_alloc_queue);
-  */
- int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- {
--	const bool preempt = flags & BLK_MQ_REQ_PREEMPT;
-+	const bool pm = flags & BLK_MQ_REQ_PREEMPT;
- 
- 	while (true) {
- 		bool success = false;
-@@ -926,11 +927,11 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 		rcu_read_lock();
- 		if (percpu_ref_tryget_live(&q->q_usage_counter)) {
- 			/*
--			 * The code that sets the PREEMPT_ONLY flag is
--			 * responsible for ensuring that that flag is globally
--			 * visible before the queue is unfrozen.
-+			 * The code that increments the pm_only counter is
-+			 * responsible for ensuring that that counter is
-+			 * globally visible before the queue is unfrozen.
- 			 */
--			if (preempt || !blk_queue_preempt_only(q)) {
-+			if (pm || !blk_queue_pm_only(q)) {
- 				success = true;
- 			} else {
- 				percpu_ref_put(&q->q_usage_counter);
-@@ -955,7 +956,7 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 
- 		wait_event(q->mq_freeze_wq,
- 			   (atomic_read(&q->mq_freeze_depth) == 0 &&
--			    (preempt || !blk_queue_preempt_only(q))) ||
-+			    (pm || !blk_queue_pm_only(q))) ||
- 			   blk_queue_dying(q));
- 		if (blk_queue_dying(q))
- 			return -ENODEV;
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index cb1e6cf7ac48..a5ea86835fcb 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -102,6 +102,14 @@ static int blk_flags_show(struct seq_file *m, const unsigned long flags,
- 	return 0;
- }
- 
-+static int queue_pm_only_show(void *data, struct seq_file *m)
-+{
-+	struct request_queue *q = data;
-+
-+	seq_printf(m, "%d\n", atomic_read(&q->pm_only));
-+	return 0;
-+}
-+
- #define QUEUE_FLAG_NAME(name) [QUEUE_FLAG_##name] = #name
- static const char *const blk_queue_flag_name[] = {
- 	QUEUE_FLAG_NAME(QUEUED),
-@@ -132,7 +140,6 @@ static const char *const blk_queue_flag_name[] = {
- 	QUEUE_FLAG_NAME(REGISTERED),
- 	QUEUE_FLAG_NAME(SCSI_PASSTHROUGH),
- 	QUEUE_FLAG_NAME(QUIESCED),
--	QUEUE_FLAG_NAME(PREEMPT_ONLY),
- };
- #undef QUEUE_FLAG_NAME
- 
-@@ -209,6 +216,7 @@ static ssize_t queue_write_hint_store(void *data, const char __user *buf,
- static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
- 	{ "poll_stat", 0400, queue_poll_stat_show },
- 	{ "requeue_list", 0400, .seq_ops = &queue_requeue_list_seq_ops },
-+	{ "pm_only", 0600, queue_pm_only_show, NULL },
- 	{ "state", 0600, queue_state_show, queue_state_write },
- 	{ "write_hints", 0600, queue_write_hint_show, queue_write_hint_store },
- 	{ "zone_wlock", 0400, queue_zone_wlock_show, NULL },
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index eb97d2dd3651..62348412ed1b 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -3046,11 +3046,14 @@ scsi_device_quiesce(struct scsi_device *sdev)
- 	 */
- 	WARN_ON_ONCE(sdev->quiesced_by && sdev->quiesced_by != current);
- 
--	blk_set_preempt_only(q);
-+	if (sdev->quiesced_by == current)
-+		return 0;
-+
-+	blk_set_pm_only(q);
- 
- 	blk_mq_freeze_queue(q);
- 	/*
--	 * Ensure that the effect of blk_set_preempt_only() will be visible
-+	 * Ensure that the effect of blk_set_pm_only() will be visible
- 	 * for percpu_ref_tryget() callers that occur after the queue
- 	 * unfreeze even if the queue was already frozen before this function
- 	 * was called. See also https://lwn.net/Articles/573497/.
-@@ -3063,7 +3066,7 @@ scsi_device_quiesce(struct scsi_device *sdev)
- 	if (err == 0)
- 		sdev->quiesced_by = current;
- 	else
--		blk_clear_preempt_only(q);
-+		blk_clear_pm_only(q);
- 	mutex_unlock(&sdev->state_mutex);
- 
- 	return err;
-@@ -3088,7 +3091,7 @@ void scsi_device_resume(struct scsi_device *sdev)
- 	mutex_lock(&sdev->state_mutex);
- 	WARN_ON_ONCE(!sdev->quiesced_by);
- 	sdev->quiesced_by = NULL;
--	blk_clear_preempt_only(sdev->request_queue);
-+	blk_clear_pm_only(sdev->request_queue);
- 	if (sdev->sdev_state == SDEV_QUIESCE)
- 		scsi_device_set_state(sdev, SDEV_RUNNING);
- 	mutex_unlock(&sdev->state_mutex);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index e25ce42c982d..5f6c36b5058c 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -504,6 +504,12 @@ struct request_queue {
- 	 * various queue flags, see QUEUE_* below
- 	 */
- 	unsigned long		queue_flags;
-+	/*
-+	 * Number of contexts that have called blk_set_pm_only(). If this
-+	 * counter is above zero then only RQF_PM and RQF_PREEMPT requests are
-+	 * processed.
-+	 */
-+	atomic_t		pm_only;
- 
- 	/*
- 	 * ida allocated id for this queue.  Used to index queues from
-@@ -698,7 +704,6 @@ struct request_queue {
- #define QUEUE_FLAG_REGISTERED  26	/* queue has been registered to a disk */
- #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
- #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
--#define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
- 
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
-@@ -736,12 +741,11 @@ bool blk_queue_flag_test_and_clear(unsigned int flag, struct request_queue *q);
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
- 			     REQ_FAILFAST_DRIVER))
- #define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
--#define blk_queue_preempt_only(q)				\
--	test_bit(QUEUE_FLAG_PREEMPT_ONLY, &(q)->queue_flags)
-+#define blk_queue_pm_only(q)	atomic_read(&(q)->pm_only)
- #define blk_queue_fua(q)	test_bit(QUEUE_FLAG_FUA, &(q)->queue_flags)
- 
--extern int blk_set_preempt_only(struct request_queue *q);
--extern void blk_clear_preempt_only(struct request_queue *q);
-+extern void blk_set_pm_only(struct request_queue *q);
-+extern void blk_clear_pm_only(struct request_queue *q);
- 
- static inline int queue_in_flight(struct request_queue *q)
- {
--- 
-2.19.0.444.g18242da7ef-goog
+https://github.com/sbates130272/linux-p2pmem pci-p2p-v6
+
+Thanks,
+
+Logan
+
+--
+
+Changes in v6:
+
+* Rebased on v4.19-rc3
+
+* Remove the changes to the common submit_bio() path and instead
+  set REQ_NOMERGE in the NVME target driver, when appropriate.
+  Per discussions with Jens and Christoph.
+
+* Some minor grammar changes in the documentation as spotted by Randy.
+
+Changes in v5:
+
+* Rebased on v4.19-rc1
+
+* Drop changing ACS settings in this patchset. Now, the code
+  will only allow P2P transactions between devices whos
+  downstream ports do not restrict P2P TLPs.
+
+* Drop the REQ_PCI_P2PDMA block flag and instead use
+  is_pci_p2pdma_page() to tell if a request is P2P or not. In that
+  case we check for queue support and enforce using REQ_NOMERGE.
+  Per feedback from Christoph.
+
+* Drop the pci_p2pdma_unmap_sg() function as it was empty and only
+  there for symmetry and compatibility with dma_unmap_sg. Per feedback
+  from Christoph.
+
+* Split off the logic to handle enabling P2P in NVMe fabrics' configfs
+  into specific helpers in the p2pdma code. Per feedback from Christoph.
+
+* A number of other minor cleanups and fixes as pointed out by
+  Christoph and others.
+
+Changes in v4:
+
+* Change the original upstream_bridges_match() function to
+  upstream_bridge_distance() which calculates the distance between two
+  devices as long as they are behind the same root port. This should
+  address Bjorn's concerns that the code was to focused on
+  being behind a single switch.
+
+* The disable ACS function now disables ACS for all bridge ports instead
+  of switch ports (ie. those that had two upstream_bridge ports).
+
+* Change the pci_p2pmem_alloc_sgl() and pci_p2pmem_free_sgl()
+  API to be more like sgl_alloc() in that the alloc function returns
+  the allocated scatterlist and nents is not required bythe free
+  function.
+
+* Moved the new documentation into the driver-api tree as requested
+  by Jonathan
+
+* Add SGL alloc and free helpers in the nvmet code so that the
+  individual drivers can share the code that allocates P2P memory.
+  As requested by Christoph.
+
+* Cleanup the nvmet_p2pmem_store() function as Christoph
+  thought my first attempt was ugly.
+
+* Numerous commit message and comment fix-ups
+
+Changes in v3:
+
+* Many more fixes and minor cleanups that were spotted by Bjorn
+
+* Additional explanation of the ACS change in both the commit message
+  and Kconfig doc. Also, the code that disables the ACS bits is surrounded
+  explicitly by an #ifdef
+
+* Removed the flag we added to rdma_rw_ctx() in favour of using
+  is_pci_p2pdma_page(), as suggested by Sagi.
+
+* Adjust pci_p2pmem_find() so that it prefers P2P providers that
+  are closest to (or the same as) the clients using them. In cases
+  of ties, the provider is randomly chosen.
+
+* Modify the NVMe Target code so that the PCI device name of the provider
+  may be explicitly specified, bypassing the logic in pci_p2pmem_find().
+  (Note: it's still enforced that the provider must be behind the
+   same switch as the clients).
+
+* As requested by Bjorn, added documentation for driver writers.
+
+
+Changes in v2:
+
+* Renamed everything to 'p2pdma' per the suggestion from Bjorn as well
+  as a bunch of cleanup and spelling fixes he pointed out in the last
+  series.
+
+* To address Alex's ACS concerns, we change to a simpler method of
+  just disabling ACS behind switches for any kernel that has
+  CONFIG_PCI_P2PDMA.
+
+* We also reject using devices that employ 'dma_virt_ops' which should
+  fairly simply handle Jason's concerns that this work might break with
+  the HFI, QIB and rxe drivers that use the virtual ops to implement
+  their own special DMA operations.
+
+--
+
+This is a continuation of our work to enable using Peer-to-Peer PCI
+memory in the kernel with initial support for the NVMe fabrics target
+subsystem. Many thanks go to Christoph Hellwig who provided valuable
+feedback to get these patches to where they are today.
+
+The concept here is to use memory that's exposed on a PCI BAR as
+data buffers in the NVMe target code such that data can be transferred
+from an RDMA NIC to the special memory and then directly to an NVMe
+device avoiding system memory entirely. The upside of this is better
+QoS for applications running on the CPU utilizing memory and lower
+PCI bandwidth required to the CPU (such that systems could be designed
+with fewer lanes connected to the CPU).
+
+Due to these trade-offs we've designed the system to only enable using
+the PCI memory in cases where the NIC, NVMe devices and memory are all
+behind the same PCI switch hierarchy. This will mean many setups that
+could likely work well will not be supported so that we can be more
+confident it will work and not place any responsibility on the user to
+understand their topology. (We chose to go this route based on feedback
+we received at the last LSF). Future work may enable these transfers
+using a white list of known good root complexes. However, at this time,
+there is no reliable way to ensure that Peer-to-Peer transactions are
+permitted between PCI Root Ports.
+
+For PCI P2P DMA transfers to work in this situation the ACS bits
+must be disabled on the downstream ports (DSPs) for all devices
+involved in the transfer. This can be done using the "disable_acs_redir"
+PCI kernel command line option which was introduced in v4.19.
+
+In order to enable PCI P2P functionality, we introduce a few new PCI
+functions such that a driver can register P2P memory with the system.
+Struct pages are created for this memory using devm_memremap_pages()
+and the PCI bus offset is stored in the corresponding pagemap structure.
+
+Another set of functions allow a client driver to create a list of
+client devices that will be used in a given P2P transactions and then
+use that list to find any P2P memory that is supported by all the
+client devices.
+
+In the block layer, we also introduce a flag for a request queue
+to indicate a given queue supports targeting P2P memory. The driver
+submitting bios must ensure that the queue supports P2P before
+attempting to submit BIOs backed by P2P memory. Also, P2P requests
+are marked to not be merged seeing a non-homogenous request would
+complicate the DMA mapping requirements.
+
+In the PCI NVMe driver, we modify the existing CMB support to utilize
+the new PCI P2P memory infrastructure and also add support for P2P
+memory in its request queue. When a P2P request is received it uses the
+pci_p2pmem_map_sg() function which applies the necessary transformation
+to get the corrent pci_bus_addr_t for the DMA transactions.
+
+In the RDMA core, we also adjust rdma_rw_ctx_init() and
+rdma_rw_ctx_destroy() to take a flags argument which indicates whether
+to use the PCI P2P mapping functions or not. To avoid odd RDMA devices
+that don't use the proper DMA infrastructure this code rejects using
+any device that employs the virt_dma_ops implementation.
+
+Finally, in the NVMe fabrics target port we introduce a new
+configuration attribute: 'p2pmem'. When set to a true boolean, the port
+will attempt to find P2P memory supported by the RDMA NIC and all namespaces.
+It may also be set to a PCI device name to select a specific P2P
+memory to use. If supported memory is found, it will be used in all IO
+transfers. And if a port is using P2P memory, adding new namespaces that
+are not supported by that memory will fail.
+
+These patches have been tested on a number of Intel based systems and
+for a variety of RDMA NICs (Mellanox, Broadcomm, Chelsio) and NVMe
+SSDs (Intel, Seagate, Samsung) and p2pdma devices (Eideticom,
+Microsemi, Chelsio and Everspin) using switches from both Microsemi
+and Broadcomm.
+
+--
+
+Logan Gunthorpe (13):
+  PCI/P2PDMA: Support peer-to-peer memory
+  PCI/P2PDMA: Add sysfs group to display p2pmem stats
+  PCI/P2PDMA: Add PCI p2pmem DMA mappings to adjust the bus offset
+  PCI/P2PDMA: Introduce configfs/sysfs enable attribute helpers
+  docs-rst: Add a new directory for PCI documentation
+  PCI/P2PDMA: Add P2P DMA driver writer's documentation
+  block: Add PCI P2P flag for request queue and check support for
+    requests
+  IB/core: Ensure we map P2P memory correctly in
+    rdma_rw_ctx_[init|destroy]()
+  nvme-pci: Use PCI p2pmem subsystem to manage the CMB
+  nvme-pci: Add support for P2P memory in requests
+  nvme-pci: Add a quirk for a pseudo CMB
+  nvmet: Introduce helper functions to allocate and free request SGLs
+  nvmet: Optionally use PCI P2P memory
+
+ Documentation/ABI/testing/sysfs-bus-pci    |  25 +
+ Documentation/driver-api/index.rst         |   2 +-
+ Documentation/driver-api/pci/index.rst     |  21 +
+ Documentation/driver-api/pci/p2pdma.rst    | 170 ++++
+ Documentation/driver-api/{ => pci}/pci.rst |   0
+ drivers/infiniband/core/rw.c               |  11 +-
+ drivers/nvme/host/core.c                   |   4 +
+ drivers/nvme/host/nvme.h                   |   8 +
+ drivers/nvme/host/pci.c                    | 121 ++-
+ drivers/nvme/target/configfs.c             |  36 +
+ drivers/nvme/target/core.c                 | 154 ++++
+ drivers/nvme/target/io-cmd-bdev.c          |   3 +
+ drivers/nvme/target/nvmet.h                |  15 +
+ drivers/nvme/target/rdma.c                 |  22 +-
+ drivers/pci/Kconfig                        |  17 +
+ drivers/pci/Makefile                       |   1 +
+ drivers/pci/p2pdma.c                       | 941 +++++++++++++++++++++
+ include/linux/blkdev.h                     |   3 +
+ include/linux/memremap.h                   |   6 +
+ include/linux/mm.h                         |  18 +
+ include/linux/pci-p2pdma.h                 | 124 +++
+ include/linux/pci.h                        |   4 +
+ 22 files changed, 1652 insertions(+), 54 deletions(-)
+ create mode 100644 Documentation/driver-api/pci/index.rst
+ create mode 100644 Documentation/driver-api/pci/p2pdma.rst
+ rename Documentation/driver-api/{ => pci}/pci.rst (100%)
+ create mode 100644 drivers/pci/p2pdma.c
+ create mode 100644 include/linux/pci-p2pdma.h
+
+--
+2.19.0
