@@ -1,135 +1,54 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-io1-f65.google.com ([209.85.166.65]:38348 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725749AbeIUFb3 (ORCPT
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:38850 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726261AbeIMGdu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Sep 2018 01:31:29 -0400
-Received: by mail-io1-f65.google.com with SMTP id y3-v6so10350121ioc.5
-        for <linux-block@vger.kernel.org>; Thu, 20 Sep 2018 16:45:29 -0700 (PDT)
+        Thu, 13 Sep 2018 02:33:50 -0400
+Received: by mail-pl1-f195.google.com with SMTP id u11-v6so1818469plq.5
+        for <linux-block@vger.kernel.org>; Wed, 12 Sep 2018 18:26:42 -0700 (PDT)
+Date: Wed, 12 Sep 2018 18:26:40 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Klaus Kusche <klaus.kusche@computerix.info>
+Cc: linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: Re: Subsystem responsible for /proc/diskstats timings?
+Message-ID: <20180913012640.GB32250@vader>
+References: <fdbf1284-a111-f99b-30e4-4d35a35b119c@computerix.info>
 MIME-Version: 1.0
-In-Reply-To: <1534800075-74931-1-git-send-email-bo.liu@linux.alibaba.com>
-References: <1534800075-74931-1-git-send-email-bo.liu@linux.alibaba.com>
-From: Liu Bo <obuil.liubo@gmail.com>
-Date: Thu, 20 Sep 2018 16:45:28 -0700
-Message-ID: <CANQeFDDSA_uHLScDYrO4QyMZMAJJ80zLkjVJD1W3=aN_=khAOg@mail.gmail.com>
-Subject: Re: [PATCH] Blk-throttle: update to use rbtree with leftmost node cached
-To: Liu Bo <bo.liu@linux.alibaba.com>
-Cc: linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <fdbf1284-a111-f99b-30e4-4d35a35b119c@computerix.info>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-ping?
+On Sun, Sep 09, 2018 at 10:03:35AM +0200, Klaus Kusche wrote:
+> 
+> Hello,
+> 
+> Which subsystem could be responsible for
+> 
+> https://bugzilla.kernel.org/show_bug.cgi?id=200857
+> 
+> ("4.18 regression: /proc/diskstats: I/O busy time not updated correctly")?
+> 
+> This is for AHCI SATA disks (/dev/sda, /dev/sdb, ...),
+> and the busy time reported by /proc/diskstats for SSD's is still (4.18.6)
+> to low by at least a factor of 20 (!).
+> 
+> Many thanks in advance for your help!
 
-thanks,
-liubo
+This was probably 522a777566f5 ("block: consolidate struct request
+timestamp fields"). Not the proper fix, but can you try the following:
 
-
-On Mon, Aug 20, 2018 at 2:21 PM, Liu Bo <bo.liu@linux.alibaba.com> wrote:
-> As rbtree has native support of caching leftmost node,
-> i.e. rb_root_cached, no need to do the caching by ourselves.
->
-> Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
-> ---
->  block/blk-throttle.c | 41 +++++++++++++++--------------------------
->  1 file changed, 15 insertions(+), 26 deletions(-)
->
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index a3eede00d302..b1f7623b666b 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -84,8 +84,7 @@ struct throtl_service_queue {
->          * RB tree of active children throtl_grp's, which are sorted by
->          * their ->disptime.
->          */
-> -       struct rb_root          pending_tree;   /* RB tree of active tgs */
-> -       struct rb_node          *first_pending; /* first node in the tree */
-> +       struct rb_root_cached   pending_tree;   /* RB tree of active tgs */
->         unsigned int            nr_pending;     /* # queued in the tree */
->         unsigned long           first_pending_disptime; /* disptime of the first tg */
->         struct timer_list       pending_timer;  /* fires on first_pending_disptime */
-> @@ -475,7 +474,7 @@ static void throtl_service_queue_init(struct throtl_service_queue *sq)
->  {
->         INIT_LIST_HEAD(&sq->queued[0]);
->         INIT_LIST_HEAD(&sq->queued[1]);
-> -       sq->pending_tree = RB_ROOT;
-> +       sq->pending_tree = RB_ROOT_CACHED;
->         timer_setup(&sq->pending_timer, throtl_pending_timer_fn, 0);
->  }
->
-> @@ -616,31 +615,23 @@ static void throtl_pd_free(struct blkg_policy_data *pd)
->  static struct throtl_grp *
->  throtl_rb_first(struct throtl_service_queue *parent_sq)
->  {
-> +       struct rb_node *n;
->         /* Service tree is empty */
->         if (!parent_sq->nr_pending)
->                 return NULL;
->
-> -       if (!parent_sq->first_pending)
-> -               parent_sq->first_pending = rb_first(&parent_sq->pending_tree);
-> -
-> -       if (parent_sq->first_pending)
-> -               return rb_entry_tg(parent_sq->first_pending);
-> -
-> -       return NULL;
-> -}
-> -
-> -static void rb_erase_init(struct rb_node *n, struct rb_root *root)
-> -{
-> -       rb_erase(n, root);
-> -       RB_CLEAR_NODE(n);
-> +       n = rb_first_cached(&parent_sq->pending_tree);
-> +       WARN_ON_ONCE(!n);
-> +       if (!n)
-> +               return NULL;
-> +       return rb_entry_tg(n);
->  }
->
->  static void throtl_rb_erase(struct rb_node *n,
->                             struct throtl_service_queue *parent_sq)
->  {
-> -       if (parent_sq->first_pending == n)
-> -               parent_sq->first_pending = NULL;
-> -       rb_erase_init(n, &parent_sq->pending_tree);
-> +       rb_erase_cached(n, &parent_sq->pending_tree);
-> +       RB_CLEAR_NODE(n);
->         --parent_sq->nr_pending;
->  }
->
-> @@ -658,11 +649,11 @@ static void update_min_dispatch_time(struct throtl_service_queue *parent_sq)
->  static void tg_service_queue_add(struct throtl_grp *tg)
->  {
->         struct throtl_service_queue *parent_sq = tg->service_queue.parent_sq;
-> -       struct rb_node **node = &parent_sq->pending_tree.rb_node;
-> +       struct rb_node **node = &parent_sq->pending_tree.rb_root.rb_node;
->         struct rb_node *parent = NULL;
->         struct throtl_grp *__tg;
->         unsigned long key = tg->disptime;
-> -       int left = 1;
-> +       bool leftmost = true;
->
->         while (*node != NULL) {
->                 parent = *node;
-> @@ -672,15 +663,13 @@ static void tg_service_queue_add(struct throtl_grp *tg)
->                         node = &parent->rb_left;
->                 else {
->                         node = &parent->rb_right;
-> -                       left = 0;
-> +                       leftmost = false;
->                 }
->         }
->
-> -       if (left)
-> -               parent_sq->first_pending = &tg->rb_node;
-> -
->         rb_link_node(&tg->rb_node, parent, node);
-> -       rb_insert_color(&tg->rb_node, &parent_sq->pending_tree);
-> +       rb_insert_color_cached(&tg->rb_node, &parent_sq->pending_tree,
-> +                              leftmost);
->  }
->
->  static void __throtl_enqueue_tg(struct throtl_grp *tg)
-> --
-> 1.8.3.1
->
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 4dbc93f43b38..663430090281 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2738,7 +2738,7 @@ void blk_account_io_done(struct request *req, u64 now)
+ 		struct hd_struct *part;
+ 		int cpu;
+ 
+-		duration = nsecs_to_jiffies(now - req->start_time_ns);
++		duration = max(nsecs_to_jiffies(now - req->start_time_ns), 1);
+ 		cpu = part_stat_lock();
+ 		part = req->part;
+ 
