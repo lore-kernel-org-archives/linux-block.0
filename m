@@ -1,169 +1,45 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:37138 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727216AbeI0RzG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Sep 2018 13:55:06 -0400
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH 05/14] loop: Push lo_ctl_mutex down into individual ioctls
-Date: Thu, 27 Sep 2018 13:36:43 +0200
-Message-Id: <20180927113652.5422-6-jack@suse.cz>
-In-Reply-To: <20180927113652.5422-1-jack@suse.cz>
-References: <20180927113652.5422-1-jack@suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <logang@deltatee.com>
+To: Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-rdma@vger.kernel.org, linux-nvdimm@lists.01.org,
+ linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>, Christoph Hellwig <hch@lst.de>,
+ Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+ Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>,
+ Max Gurtovoy <maxg@mellanox.com>, Dan Williams <dan.j.williams@intel.com>,
+ =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>
+References: <20180913001156.4115-1-logang@deltatee.com>
+ <20180913001156.4115-8-logang@deltatee.com>
+ <0118d3d8-a2f5-047f-6627-04ac3d0371ad@kernel.dk>
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <5998a8c3-697e-82ac-91d4-a648455a21e9@deltatee.com>
+Date: Thu, 13 Sep 2018 10:14:02 -0600
+MIME-Version: 1.0
+In-Reply-To: <0118d3d8-a2f5-047f-6627-04ac3d0371ad@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Subject: Re: [PATCH v6 07/13] block: Add PCI P2P flag for request queue and
+ check support for requests
+List-ID: <linux-block@vger.kernel.org>
 
-Push acquisition of lo_ctl_mutex down into individual ioctl handling
-branches. This is a preparatory step for pushing the lock down into
-individual ioctl handling functions so that they can release the lock as
-they need it. We also factor out some simple ioctl handlers that will
-not need any special handling to reduce unnecessary code duplication.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- drivers/block/loop.c | 88 +++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 63 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index e35707fb8318..a86ef20c15e2 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1394,70 +1394,108 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
- 	return 0;
- }
- 
--static int lo_ioctl(struct block_device *bdev, fmode_t mode,
--	unsigned int cmd, unsigned long arg)
-+static int lo_simple_ioctl(struct loop_device *lo, unsigned int cmd,
-+			   unsigned long arg)
- {
--	struct loop_device *lo = bdev->bd_disk->private_data;
- 	int err;
- 
- 	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
- 	if (err)
--		goto out_unlocked;
-+		return err;
-+	switch (cmd) {
-+	case LOOP_SET_CAPACITY:
-+		err = loop_set_capacity(lo);
-+		break;
-+	case LOOP_SET_DIRECT_IO:
-+		err = loop_set_dio(lo, arg);
-+		break;
-+	case LOOP_SET_BLOCK_SIZE:
-+		err = loop_set_block_size(lo, arg);
-+		break;
-+	default:
-+		err = lo->ioctl ? lo->ioctl(lo, cmd, arg) : -EINVAL;
-+	}
-+	mutex_unlock(&loop_ctl_mutex);
-+	return err;
-+}
-+
-+static int lo_ioctl(struct block_device *bdev, fmode_t mode,
-+	unsigned int cmd, unsigned long arg)
-+{
-+	struct loop_device *lo = bdev->bd_disk->private_data;
-+	int err;
- 
- 	switch (cmd) {
- 	case LOOP_SET_FD:
-+		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+		if (err)
-+			return err;
- 		err = loop_set_fd(lo, mode, bdev, arg);
-+		mutex_unlock(&loop_ctl_mutex);
- 		break;
- 	case LOOP_CHANGE_FD:
-+		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+		if (err)
-+			return err;
- 		err = loop_change_fd(lo, bdev, arg);
-+		mutex_unlock(&loop_ctl_mutex);
- 		break;
- 	case LOOP_CLR_FD:
-+		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+		if (err)
-+			return err;
- 		/* loop_clr_fd would have unlocked loop_ctl_mutex on success */
- 		err = loop_clr_fd(lo);
--		if (!err)
--			goto out_unlocked;
-+		if (err)
-+			mutex_unlock(&loop_ctl_mutex);
- 		break;
- 	case LOOP_SET_STATUS:
- 		err = -EPERM;
--		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
-+		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
-+			err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+			if (err)
-+				return err;
- 			err = loop_set_status_old(lo,
- 					(struct loop_info __user *)arg);
-+			mutex_unlock(&loop_ctl_mutex);
-+		}
- 		break;
- 	case LOOP_GET_STATUS:
-+		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+		if (err)
-+			return err;
- 		err = loop_get_status_old(lo, (struct loop_info __user *) arg);
- 		/* loop_get_status() unlocks loop_ctl_mutex */
--		goto out_unlocked;
-+		break;
- 	case LOOP_SET_STATUS64:
- 		err = -EPERM;
--		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
-+		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
-+			err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+			if (err)
-+				return err;
- 			err = loop_set_status64(lo,
- 					(struct loop_info64 __user *) arg);
-+			mutex_unlock(&loop_ctl_mutex);
-+		}
- 		break;
- 	case LOOP_GET_STATUS64:
-+		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+		if (err)
-+			return err;
- 		err = loop_get_status64(lo, (struct loop_info64 __user *) arg);
- 		/* loop_get_status() unlocks loop_ctl_mutex */
--		goto out_unlocked;
--	case LOOP_SET_CAPACITY:
--		err = -EPERM;
--		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
--			err = loop_set_capacity(lo);
- 		break;
-+	case LOOP_SET_CAPACITY:
- 	case LOOP_SET_DIRECT_IO:
--		err = -EPERM;
--		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
--			err = loop_set_dio(lo, arg);
--		break;
- 	case LOOP_SET_BLOCK_SIZE:
--		err = -EPERM;
--		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
--			err = loop_set_block_size(lo, arg);
--		break;
-+		if (!(mode & FMODE_WRITE) && !capable(CAP_SYS_ADMIN))
-+			return -EPERM;
-+		/* Fall through */
- 	default:
--		err = lo->ioctl ? lo->ioctl(lo, cmd, arg) : -EINVAL;
-+		err = lo_simple_ioctl(lo, cmd, arg);
-+		break;
- 	}
--	mutex_unlock(&loop_ctl_mutex);
- 
--out_unlocked:
- 	return err;
- }
- 
--- 
-2.16.4
+On 12/09/18 06:28 PM, Jens Axboe wrote:
+> On 9/12/18 6:11 PM, Logan Gunthorpe wrote:
+>> QUEUE_FLAG_PCI_P2P is introduced meaning a driver's request queue
+>> supports targeting P2P memory.
+>>
+>> When a request is submitted we check if PCI P2PDMA memory is assigned
+>> to the first page in the bio. If it is, we ensure the queue it's
+>> submitted to supports it, and enforce REQ_NOMERGE.
+> 
+> This changelog is no longer accurate.
+
+
+Oops, I'll fix this for v7.
+
+Thanks,
+
+Logan
