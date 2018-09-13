@@ -1,186 +1,63 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-From: Dennis Zhou <dennisszhou@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Josef Bacik <josef@toxicpanda.com>
-Cc: kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-Subject: [PATCH 06/12] blkcg: associate a blkg for pages being evicted by swap
-Date: Tue, 11 Sep 2018 14:41:31 -0400
-Message-Id: <20180911184137.35897-7-dennisszhou@gmail.com>
-In-Reply-To: <20180911184137.35897-1-dennisszhou@gmail.com>
-References: <20180911184137.35897-1-dennisszhou@gmail.com>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org
+Subject: [PATCH V3 13/17] SCSI: use the dedicated admin queue to send admin commands
+Date: Thu, 13 Sep 2018 20:15:42 +0800
+Message-Id: <20180913121546.5710-14-ming.lei@redhat.com>
+In-Reply-To: <20180913121546.5710-1-ming.lei@redhat.com>
+References: <20180913121546.5710-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+Now the per-host dedicated admin queue is ready, so use this queue to
+send admin commands only.
 
-A prior patch in this series added blkg association to bios issued by
-cgroups. There are two other paths that we want to attribute work back
-to the appropriate cgroup: swap and writeback. Here we modify the way
-swap tags bios to include the blkg. Writeback will be tackle in the next
-patch.
-
-Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
-Acked-by: Tejun Heo <tj@kernel.org>
+Cc: Alan Stern <stern@rowland.harvard.edu>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Adrian Hunter <adrian.hunter@intel.com>
+Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bio.c         | 83 ++++++++++++++++++++++++++++++++-------------
- include/linux/bio.h | 11 ++++--
- mm/page_io.c        |  2 +-
- 3 files changed, 68 insertions(+), 28 deletions(-)
+ drivers/scsi/scsi_lib.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 1d28d7ad2342..897c8ed9e572 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1957,30 +1957,6 @@ EXPORT_SYMBOL(bioset_init_from_src);
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 87a88094b1eb..1e75515cc7ba 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -279,14 +279,14 @@ int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 	struct scsi_request *rq;
+ 	int ret = DRIVER_ERROR << 24;
  
- #ifdef CONFIG_BLK_CGROUP
+-	req = blk_get_request(sdev->request_queue,
++	req = blk_get_request(sdev->host->admin_q,
+ 			data_direction == DMA_TO_DEVICE ?
+ 			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, BLK_MQ_REQ_PREEMPT);
+ 	if (IS_ERR(req))
+ 		return ret;
+ 	rq = scsi_req(req);
  
--#ifdef CONFIG_MEMCG
--/**
-- * bio_associate_blkcg_from_page - associate a bio with the page's blkcg
-- * @bio: target bio
-- * @page: the page to lookup the blkcg from
-- *
-- * Associate @bio with the blkcg from @page's owning memcg.  This works like
-- * every other associate function wrt references.
-- */
--int bio_associate_blkcg_from_page(struct bio *bio, struct page *page)
--{
--	struct cgroup_subsys_state *blkcg_css;
--
--	if (unlikely(bio->bi_css))
--		return -EBUSY;
--	if (!page->mem_cgroup)
--		return 0;
--	blkcg_css = cgroup_get_e_css(page->mem_cgroup->css.cgroup,
--				     &io_cgrp_subsys);
--	bio->bi_css = blkcg_css;
--	return 0;
--}
--#endif /* CONFIG_MEMCG */
--
- /**
-  * bio_associate_blkcg - associate a bio with the specified blkcg
-  * @bio: target bio
-@@ -2031,6 +2007,65 @@ int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg)
- 	return 0;
- }
- 
-+static int __bio_associate_blkg_from_css(struct bio *bio,
-+					 struct cgroup_subsys_state *css)
-+{
-+	struct blkcg_gq *blkg;
-+
-+	rcu_read_lock();
-+
-+	blkg = blkg_lookup_create(css_to_blkcg(css), bio->bi_disk->queue);
-+
-+	rcu_read_unlock();
-+
-+	return bio_associate_blkg(bio, blkg);
-+}
-+
-+/**
-+ * bio_associate_blkg_from_css - associate a bio with a specified css
-+ * @bio: target bio
-+ * @css: target css
-+ *
-+ * Associate @bio with the blkg found by combining the css's blkg and the
-+ * request_queue of the @bio.  This takes a reference on the css that will
-+ * be put upon freeing of @bio.
-+ */
-+int bio_associate_blkg_from_css(struct bio *bio,
-+				struct cgroup_subsys_state *css)
-+{
-+	css_get(css);
-+	bio->bi_css = css;
-+	return __bio_associate_blkg_from_css(bio, css);
-+}
-+EXPORT_SYMBOL_GPL(bio_associate_blkg_from_css);
-+
-+#ifdef CONFIG_MEMCG
-+/**
-+ * bio_associate_blkg_from_page - associate a bio with the page's blkg
-+ * @bio: target bio
-+ * @page: the page to lookup the blkcg from
-+ *
-+ * Associate @bio with the blkg from @page's owning memcg and the respective
-+ * request_queue.  This works like every other associate function wrt
-+ * references.
-+ *
-+ * Note: this must be called after bio has an associated device.
-+ */
-+int bio_associate_blkg_from_page(struct bio *bio, struct page *page)
-+{
-+	struct cgroup_subsys_state *css;
-+
-+	if (unlikely(bio->bi_css))
-+		return -EBUSY;
-+	if (!page->mem_cgroup)
-+		return 0;
-+	css = cgroup_get_e_css(page->mem_cgroup->css.cgroup, &io_cgrp_subsys);
-+	bio->bi_css = css;
-+
-+	return __bio_associate_blkg_from_css(bio, css);
-+}
-+#endif /* CONFIG_MEMCG */
-+
- /**
-  * bio_associate_create_blkg - associate a bio with a blkg from q
-  * @q: request_queue where bio is going
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 829cd0bb407d..c73a870ebc0e 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -533,21 +533,26 @@ do {						\
- 	disk_devt((bio)->bi_disk)
- 
- #if defined(CONFIG_MEMCG) && defined(CONFIG_BLK_CGROUP)
--int bio_associate_blkcg_from_page(struct bio *bio, struct page *page);
-+int bio_associate_blkg_from_page(struct bio *bio, struct page *page);
- #else
--static inline int bio_associate_blkcg_from_page(struct bio *bio,
--						struct page *page) {  return 0; }
-+static inline int bio_associate_blkg_from_page(struct bio *bio,
-+					       struct page *page) { return 0; }
- #endif
- 
- #ifdef CONFIG_BLK_CGROUP
- int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css);
- int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg);
-+int bio_associate_blkg_from_css(struct bio *bio,
-+				struct cgroup_subsys_state *css);
- int bio_associate_create_blkg(struct request_queue *q, struct bio *bio);
- void bio_disassociate_task(struct bio *bio);
- void bio_clone_blkcg_association(struct bio *dst, struct bio *src);
- #else	/* CONFIG_BLK_CGROUP */
- static inline int bio_associate_blkcg(struct bio *bio,
- 			struct cgroup_subsys_state *blkcg_css) { return 0; }
-+static inline int bio_associate_blkg_from_css(struct bio *bio,
-+					      struct cgroup_subsys_state *css)
-+{ return 0; }
- static inline int bio_associate_create_blkg(struct request_queue *q,
- 					    struct bio *bio) { return 0; }
- static inline void bio_disassociate_task(struct bio *bio) { }
-diff --git a/mm/page_io.c b/mm/page_io.c
-index aafd19ec1db4..573d3663d846 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -339,7 +339,7 @@ int __swap_writepage(struct page *page, struct writeback_control *wbc,
+-	if (bufflen &&	blk_rq_map_kern(sdev->request_queue, req,
++	if (bufflen &&	blk_rq_map_kern(req->q, req,
+ 					buffer, bufflen, GFP_NOIO))
  		goto out;
- 	}
- 	bio->bi_opf = REQ_OP_WRITE | REQ_SWAP | wbc_to_write_flags(wbc);
--	bio_associate_blkcg_from_page(bio, page);
-+	bio_associate_blkg_from_page(bio, page);
- 	count_swpout_vm_event(page);
- 	set_page_writeback(page);
- 	unlock_page(page);
+ 
 -- 
-2.17.1
+2.9.5
