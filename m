@@ -1,145 +1,240 @@
-Return-Path: <christophe.leroy@c-s.fr>
-Message-Id: <31dea7ecceb9737932beaa4dc3339c7808356872.1536692743.git.christophe.leroy@c-s.fr>
-In-Reply-To: <cover.1536692743.git.christophe.leroy@c-s.fr>
-References: <cover.1536692743.git.christophe.leroy@c-s.fr>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v2 09/24] powerpc/mm: move some nohash pte helpers in
- nohash/[32:64]/pgtable.h
-To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
-Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
-Date: Wed, 12 Sep 2018 15:58:32 +0000 (UTC)
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Wed, 12 Sep 2018 17:04:55 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: Re: [PATCH] null_blk: fix zoned support for non-rq based operation
+Message-ID: <20180913000455.GC6052@vader>
+References: <5be22cec-2a80-9e07-6fe6-d5886295e848@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <5be22cec-2a80-9e07-6fe6-d5886295e848@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-In order to allow their use in nohash/32/pgtable.h, we have to move the
-following helpers in nohash/[32:64]/pgtable.h:
-- pte_mkwrite()
-- pte_mkdirty()
-- pte_mkyoung()
-- pte_wrprotect()
+On Wed, Sep 12, 2018 at 04:15:28PM -0600, Jens Axboe wrote:
+> The supported added for zones in null_blk seem to assume that
+> only rq based operation is possible. But this depends on the
+> queue_mode setting, if this is set to 0, then cmd->bio is what
+> we need to be operating on. Right now any attempt to load null_blk
+> with queue_mode=0 will insta-crash, since cmd->rq is NULL and
+> null_handle_cmd() assumes it to always be set.
+> 
+> Make the zoned code deal with bio's instead, or pass in the
+> appropriate sector/nr_sectors instead.
+> 
+> Fixes: ca4b2a011948 ("null_blk: add zone support")
 
-Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
----
- arch/powerpc/include/asm/nohash/32/pgtable.h | 28 ++++++++++++++++++++++++++++
- arch/powerpc/include/asm/nohash/64/pgtable.h | 20 ++++++++++++++++++++
- arch/powerpc/include/asm/nohash/pgtable.h    | 28 ----------------------------
- 3 files changed, 48 insertions(+), 28 deletions(-)
+I just added block/023 to blktests for this, so
 
-diff --git a/arch/powerpc/include/asm/nohash/32/pgtable.h b/arch/powerpc/include/asm/nohash/32/pgtable.h
-index a7f44498ab6f..4373f8c44b6d 100644
---- a/arch/powerpc/include/asm/nohash/32/pgtable.h
-+++ b/arch/powerpc/include/asm/nohash/32/pgtable.h
-@@ -136,6 +136,34 @@ extern int icache_44x_need_flush;
- #define pte_clear(mm, addr, ptep) \
- 	do { pte_update(ptep, ~0, 0); } while (0)
- 
-+static inline pte_t pte_mkwrite(pte_t pte)
-+{
-+	pte_basic_t ptev;
-+
-+	ptev = pte_val(pte) & ~_PAGE_RO;
-+	ptev |= _PAGE_RW;
-+	return __pte(ptev);
-+}
-+
-+static inline pte_t pte_mkdirty(pte_t pte)
-+{
-+	return __pte(pte_val(pte) | _PAGE_DIRTY);
-+}
-+
-+static inline pte_t pte_mkyoung(pte_t pte)
-+{
-+	return __pte(pte_val(pte) | _PAGE_ACCESSED);
-+}
-+
-+static inline pte_t pte_wrprotect(pte_t pte)
-+{
-+	pte_basic_t ptev;
-+
-+	ptev = pte_val(pte) & ~(_PAGE_RW | _PAGE_HWWRITE);
-+	ptev |= _PAGE_RO;
-+	return __pte(ptev);
-+}
-+
- #define pmd_none(pmd)		(!pmd_val(pmd))
- #define	pmd_bad(pmd)		(pmd_val(pmd) & _PMD_BAD)
- #define	pmd_present(pmd)	(pmd_val(pmd) & _PMD_PRESENT_MASK)
-diff --git a/arch/powerpc/include/asm/nohash/64/pgtable.h b/arch/powerpc/include/asm/nohash/64/pgtable.h
-index 513b6e9e62c6..72dac522aa66 100644
---- a/arch/powerpc/include/asm/nohash/64/pgtable.h
-+++ b/arch/powerpc/include/asm/nohash/64/pgtable.h
-@@ -94,6 +94,26 @@
- #ifndef __ASSEMBLY__
- /* pte_clear moved to later in this file */
- 
-+static inline pte_t pte_mkwrite(pte_t pte)
-+{
-+	return __pte(pte_val(pte) | _PAGE_RW);
-+}
-+
-+static inline pte_t pte_mkdirty(pte_t pte)
-+{
-+	return __pte(pte_val(pte) | _PAGE_DIRTY);
-+}
-+
-+static inline pte_t pte_mkyoung(pte_t pte)
-+{
-+	return __pte(pte_val(pte) | _PAGE_ACCESSED);
-+}
-+
-+static inline pte_t pte_wrprotect(pte_t pte)
-+{
-+	return __pte(pte_val(pte) & ~_PAGE_RW);
-+}
-+
- #define PMD_BAD_BITS		(PTE_TABLE_SIZE-1)
- #define PUD_BAD_BITS		(PMD_TABLE_SIZE-1)
- 
-diff --git a/arch/powerpc/include/asm/nohash/pgtable.h b/arch/powerpc/include/asm/nohash/pgtable.h
-index 5b82e44c4231..c746e9e784cd 100644
---- a/arch/powerpc/include/asm/nohash/pgtable.h
-+++ b/arch/powerpc/include/asm/nohash/pgtable.h
-@@ -77,15 +77,6 @@ static inline unsigned long pte_pfn(pte_t pte)	{
- 	return pte_val(pte) >> PTE_RPN_SHIFT; }
- 
- /* Generic modifiers for PTE bits */
--static inline pte_t pte_wrprotect(pte_t pte)
--{
--	pte_basic_t ptev;
--
--	ptev = pte_val(pte) & ~(_PAGE_RW | _PAGE_HWWRITE);
--	ptev |= _PAGE_RO;
--	return __pte(ptev);
--}
--
- static inline pte_t pte_mkclean(pte_t pte)
- {
- 	return __pte(pte_val(pte) & ~(_PAGE_DIRTY | _PAGE_HWWRITE));
-@@ -96,25 +87,6 @@ static inline pte_t pte_mkold(pte_t pte)
- 	return __pte(pte_val(pte) & ~_PAGE_ACCESSED);
- }
- 
--static inline pte_t pte_mkwrite(pte_t pte)
--{
--	pte_basic_t ptev;
--
--	ptev = pte_val(pte) & ~_PAGE_RO;
--	ptev |= _PAGE_RW;
--	return __pte(ptev);
--}
--
--static inline pte_t pte_mkdirty(pte_t pte)
--{
--	return __pte(pte_val(pte) | _PAGE_DIRTY);
--}
--
--static inline pte_t pte_mkyoung(pte_t pte)
--{
--	return __pte(pte_val(pte) | _PAGE_ACCESSED);
--}
--
- static inline pte_t pte_mkspecial(pte_t pte)
- {
- 	return __pte(pte_val(pte) | _PAGE_SPECIAL);
--- 
-2.13.3
+Tested-by: Omar Sandoval <osandov@fb.com>
+
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
+> ---
+> 
+> diff --git a/drivers/block/null_blk.h b/drivers/block/null_blk.h
+> index d81781f22dba..34e0030f0592 100644
+> --- a/drivers/block/null_blk.h
+> +++ b/drivers/block/null_blk.h
+> @@ -87,10 +87,10 @@ struct nullb {
+>  #ifdef CONFIG_BLK_DEV_ZONED
+>  int null_zone_init(struct nullb_device *dev);
+>  void null_zone_exit(struct nullb_device *dev);
+> -blk_status_t null_zone_report(struct nullb *nullb,
+> -					    struct nullb_cmd *cmd);
+> -void null_zone_write(struct nullb_cmd *cmd);
+> -void null_zone_reset(struct nullb_cmd *cmd);
+> +blk_status_t null_zone_report(struct nullb *nullb, struct bio *bio);
+> +void null_zone_write(struct nullb_cmd *cmd, sector_t sector,
+> +			unsigned int nr_sectors);
+> +void null_zone_reset(struct nullb_cmd *cmd, sector_t sector);
+>  #else
+>  static inline int null_zone_init(struct nullb_device *dev)
+>  {
+> @@ -98,11 +98,14 @@ static inline int null_zone_init(struct nullb_device *dev)
+>  }
+>  static inline void null_zone_exit(struct nullb_device *dev) {}
+>  static inline blk_status_t null_zone_report(struct nullb *nullb,
+> -					    struct nullb_cmd *cmd)
+> +					    struct bio *bio)
+>  {
+>  	return BLK_STS_NOTSUPP;
+>  }
+> -static inline void null_zone_write(struct nullb_cmd *cmd) {}
+> -static inline void null_zone_reset(struct nullb_cmd *cmd) {}
+> +static inline void null_zone_write(struct nullb_cmd *cmd, sector_t sector,
+> +				   unsigned int nr_sectors)
+> +{
+> +}
+> +static inline void null_zone_reset(struct nullb_cmd *cmd, sector_t sector) {}
+>  #endif /* CONFIG_BLK_DEV_ZONED */
+>  #endif /* __NULL_BLK_H */
+> diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+> index 6127e3ff7b4b..093b614d6524 100644
+> --- a/drivers/block/null_blk_main.c
+> +++ b/drivers/block/null_blk_main.c
+> @@ -1157,16 +1157,33 @@ static void null_restart_queue_async(struct nullb *nullb)
+>  	}
+>  }
+>  
+> +static bool cmd_report_zone(struct nullb *nullb, struct nullb_cmd *cmd)
+> +{
+> +	struct nullb_device *dev = cmd->nq->dev;
+> +
+> +	if (dev->queue_mode == NULL_Q_BIO) {
+> +		if (bio_op(cmd->bio) == REQ_OP_ZONE_REPORT) {
+> +			cmd->error = null_zone_report(nullb, cmd->bio);
+> +			return true;
+> +		}
+> +	} else {
+> +		if (req_op(cmd->rq) == REQ_OP_ZONE_REPORT) {
+> +			cmd->error = null_zone_report(nullb, cmd->rq->bio);
+> +			return true;
+> +		}
+> +	}
+> +
+> +	return false;
+> +}
+> +
+>  static blk_status_t null_handle_cmd(struct nullb_cmd *cmd)
+>  {
+>  	struct nullb_device *dev = cmd->nq->dev;
+>  	struct nullb *nullb = dev->nullb;
+>  	int err = 0;
+>  
+> -	if (req_op(cmd->rq) == REQ_OP_ZONE_REPORT) {
+> -		cmd->error = null_zone_report(nullb, cmd);
+> +	if (cmd_report_zone(nullb, cmd))
+>  		goto out;
+> -	}
+>  
+>  	if (test_bit(NULLB_DEV_FL_THROTTLED, &dev->flags)) {
+>  		struct request *rq = cmd->rq;
+> @@ -1234,10 +1251,24 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd)
+>  	cmd->error = errno_to_blk_status(err);
+>  
+>  	if (!cmd->error && dev->zoned) {
+> -		if (req_op(cmd->rq) == REQ_OP_WRITE)
+> -			null_zone_write(cmd);
+> -		else if (req_op(cmd->rq) == REQ_OP_ZONE_RESET)
+> -			null_zone_reset(cmd);
+> +		sector_t sector;
+> +		unsigned int nr_sectors;
+> +		int op;
+> +
+> +		if (dev->queue_mode == NULL_Q_BIO) {
+> +			op = bio_op(cmd->bio);
+> +			sector = cmd->bio->bi_iter.bi_sector;
+> +			nr_sectors = cmd->bio->bi_iter.bi_size >> 9;
+> +		} else {
+> +			op = req_op(cmd->rq);
+> +			sector = blk_rq_pos(cmd->rq);
+> +			nr_sectors = blk_rq_sectors(cmd->rq);
+> +		}
+> +
+> +		if (op == REQ_OP_WRITE)
+> +			null_zone_write(cmd, sector, nr_sectors);
+> +		else if (op == REQ_OP_ZONE_RESET)
+> +			null_zone_reset(cmd, sector);
+>  	}
+>  out:
+>  	/* Complete IO by inline, softirq or timer */
+> diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
+> index a979ca00d7be..7c6b86d98700 100644
+> --- a/drivers/block/null_blk_zoned.c
+> +++ b/drivers/block/null_blk_zoned.c
+> @@ -48,8 +48,8 @@ void null_zone_exit(struct nullb_device *dev)
+>  	kvfree(dev->zones);
+>  }
+>  
+> -static void null_zone_fill_rq(struct nullb_device *dev, struct request *rq,
+> -			      unsigned int zno, unsigned int nr_zones)
+> +static void null_zone_fill_bio(struct nullb_device *dev, struct bio *bio,
+> +			       unsigned int zno, unsigned int nr_zones)
+>  {
+>  	struct blk_zone_report_hdr *hdr = NULL;
+>  	struct bio_vec bvec;
+> @@ -57,7 +57,7 @@ static void null_zone_fill_rq(struct nullb_device *dev, struct request *rq,
+>  	void *addr;
+>  	unsigned int zones_to_cpy;
+>  
+> -	bio_for_each_segment(bvec, rq->bio, iter) {
+> +	bio_for_each_segment(bvec, bio, iter) {
+>  		addr = kmap_atomic(bvec.bv_page);
+>  
+>  		zones_to_cpy = bvec.bv_len / sizeof(struct blk_zone);
+> @@ -84,29 +84,24 @@ static void null_zone_fill_rq(struct nullb_device *dev, struct request *rq,
+>  	}
+>  }
+>  
+> -blk_status_t null_zone_report(struct nullb *nullb,
+> -				     struct nullb_cmd *cmd)
+> +blk_status_t null_zone_report(struct nullb *nullb, struct bio *bio)
+>  {
+>  	struct nullb_device *dev = nullb->dev;
+> -	struct request *rq = cmd->rq;
+> -	unsigned int zno = null_zone_no(dev, blk_rq_pos(rq));
+> +	unsigned int zno = null_zone_no(dev, bio->bi_iter.bi_sector);
+>  	unsigned int nr_zones = dev->nr_zones - zno;
+> -	unsigned int max_zones = (blk_rq_bytes(rq) /
+> -					sizeof(struct blk_zone)) - 1;
+> +	unsigned int max_zones;
+>  
+> +	max_zones = (bio->bi_iter.bi_size / sizeof(struct blk_zone)) - 1;
+>  	nr_zones = min_t(unsigned int, nr_zones, max_zones);
+> -
+> -	null_zone_fill_rq(nullb->dev, rq, zno, nr_zones);
+> +	null_zone_fill_bio(nullb->dev, bio, zno, nr_zones);
+>  
+>  	return BLK_STS_OK;
+>  }
+>  
+> -void null_zone_write(struct nullb_cmd *cmd)
+> +void null_zone_write(struct nullb_cmd *cmd, sector_t sector,
+> +		     unsigned int nr_sectors)
+>  {
+>  	struct nullb_device *dev = cmd->nq->dev;
+> -	struct request *rq = cmd->rq;
+> -	sector_t sector = blk_rq_pos(rq);
+> -	unsigned int rq_sectors = blk_rq_sectors(rq);
+>  	unsigned int zno = null_zone_no(dev, sector);
+>  	struct blk_zone *zone = &dev->zones[zno];
+>  
+> @@ -118,7 +113,7 @@ void null_zone_write(struct nullb_cmd *cmd)
+>  	case BLK_ZONE_COND_EMPTY:
+>  	case BLK_ZONE_COND_IMP_OPEN:
+>  		/* Writes must be at the write pointer position */
+> -		if (blk_rq_pos(rq) != zone->wp) {
+> +		if (sector != zone->wp) {
+>  			cmd->error = BLK_STS_IOERR;
+>  			break;
+>  		}
+> @@ -126,7 +121,7 @@ void null_zone_write(struct nullb_cmd *cmd)
+>  		if (zone->cond == BLK_ZONE_COND_EMPTY)
+>  			zone->cond = BLK_ZONE_COND_IMP_OPEN;
+>  
+> -		zone->wp += rq_sectors;
+> +		zone->wp += nr_sectors;
+>  		if (zone->wp == zone->start + zone->len)
+>  			zone->cond = BLK_ZONE_COND_FULL;
+>  		break;
+> @@ -137,11 +132,10 @@ void null_zone_write(struct nullb_cmd *cmd)
+>  	}
+>  }
+>  
+> -void null_zone_reset(struct nullb_cmd *cmd)
+> +void null_zone_reset(struct nullb_cmd *cmd, sector_t sector)
+>  {
+>  	struct nullb_device *dev = cmd->nq->dev;
+> -	struct request *rq = cmd->rq;
+> -	unsigned int zno = null_zone_no(dev, blk_rq_pos(rq));
+> +	unsigned int zno = null_zone_no(dev, sector);
+>  	struct blk_zone *zone = &dev->zones[zno];
+>  
+>  	zone->cond = BLK_ZONE_COND_EMPTY;
+> 
+> -- 
+> Jens Axboe
+> 
