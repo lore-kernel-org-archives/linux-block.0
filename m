@@ -1,127 +1,86 @@
-Return-Path: <bvanassche@acm.org>
-From: Bart Van Assche <bvanassche@acm.org>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
 	Ming Lei <ming.lei@redhat.com>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
 	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.com>,
+	Hannes Reinecke <hare@suse.de>,
 	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v8 5/8] block: Split blk_pm_add_request() and blk_pm_put_request()
-Date: Tue, 18 Sep 2018 13:59:00 -0700
-Message-Id: <20180918205903.15516-6-bvanassche@acm.org>
-In-Reply-To: <20180918205903.15516-1-bvanassche@acm.org>
-References: <20180918205903.15516-1-bvanassche@acm.org>
-MIME-Version: 1.0
+	Adrian Hunter <adrian.hunter@intel.com>,
+	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org
+Subject: [PATCH V3 04/17] blk-mq: don't reserve tags for admin queue
+Date: Thu, 13 Sep 2018 20:15:33 +0800
+Message-Id: <20180913121546.5710-5-ming.lei@redhat.com>
+In-Reply-To: <20180913121546.5710-1-ming.lei@redhat.com>
+References: <20180913121546.5710-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Move the pm_request_resume() and pm_runtime_mark_last_busy() calls into
-two new functions and thereby separate legacy block layer code from code
-that works for both the legacy block layer and blk-mq. A later patch will
-add calls to the new functions in the blk-mq code.
+Not necessary to reserve tags for admin queue since there isn't
+many inflight commands in admin queue usually.
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+This change won't starve admin queue too because each blocked queue
+has equal priority to get one new tag when one driver tag is released,
+no matter it is freed from any queue.
+
+So that IO performance won't be affected after admin queue(shared tags
+with IO queues) is introduced in the following patches.
+
 Cc: Alan Stern <stern@rowland.harvard.edu>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Adrian Hunter <adrian.hunter@intel.com>
+Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-core.c |  1 +
- block/blk-pm.h   | 36 +++++++++++++++++++++++++++++++-----
- block/elevator.c |  1 +
- 3 files changed, 33 insertions(+), 5 deletions(-)
+ block/blk-mq-tag.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 1a691f5269bb..fd91e9bf2893 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1744,6 +1744,7 @@ void __blk_put_request(struct request_queue *q, struct request *req)
- 
- 	blk_req_zone_write_unlock(req);
- 	blk_pm_put_request(req);
-+	blk_pm_mark_last_busy(req);
- 
- 	elv_completed_request(q, req);
- 
-diff --git a/block/blk-pm.h b/block/blk-pm.h
-index 1ffc8ef203ec..a8564ea72a41 100644
---- a/block/blk-pm.h
-+++ b/block/blk-pm.h
-@@ -6,8 +6,23 @@
- #include <linux/pm_runtime.h>
- 
- #ifdef CONFIG_PM
-+static inline void blk_pm_request_resume(struct request_queue *q)
-+{
-+	if (q->dev && (q->rpm_status == RPM_SUSPENDED ||
-+		       q->rpm_status == RPM_SUSPENDING))
-+		pm_request_resume(q->dev);
-+}
-+
-+static inline void blk_pm_mark_last_busy(struct request *rq)
-+{
-+	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
-+		pm_runtime_mark_last_busy(rq->q->dev);
-+}
-+
- static inline void blk_pm_requeue_request(struct request *rq)
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 94e1ed667b6e..7b0390f1c764 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -30,7 +30,8 @@ bool blk_mq_has_free_tags(struct blk_mq_tags *tags)
+ bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
  {
-+	lockdep_assert_held(rq->q->queue_lock);
-+
- 	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
- 		rq->q->nr_pending--;
- }
-@@ -15,17 +30,28 @@ static inline void blk_pm_requeue_request(struct request *rq)
- static inline void blk_pm_add_request(struct request_queue *q,
- 				      struct request *rq)
- {
--	if (q->dev && !(rq->rq_flags & RQF_PM) && q->nr_pending++ == 0 &&
--	    (q->rpm_status == RPM_SUSPENDED || q->rpm_status == RPM_SUSPENDING))
--		pm_request_resume(q->dev);
-+	lockdep_assert_held(q->queue_lock);
-+
-+	if (q->dev && !(rq->rq_flags & RQF_PM))
-+		q->nr_pending++;
- }
+ 	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
+-	    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
++	    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
++	    !blk_queue_admin(hctx->queue))
+ 		atomic_inc(&hctx->tags->active_queues);
  
- static inline void blk_pm_put_request(struct request *rq)
- {
--	if (rq->q->dev && !(rq->rq_flags & RQF_PM) && !--rq->q->nr_pending)
--		pm_runtime_mark_last_busy(rq->q->dev);
-+	lockdep_assert_held(rq->q->queue_lock);
-+
-+	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
-+		--rq->q->nr_pending;
+ 	return true;
+@@ -57,7 +58,8 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+ 	if (!test_and_clear_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+ 		return;
+ 
+-	atomic_dec(&tags->active_queues);
++	if (!blk_queue_admin(hctx->queue))
++		atomic_dec(&tags->active_queues);
+ 
+ 	blk_mq_tag_wakeup_all(tags, false);
  }
- #else
-+static inline void blk_pm_request_resume(struct request_queue *q)
-+{
-+}
-+
-+static inline void blk_pm_mark_last_busy(struct request *rq)
-+{
-+}
-+
- static inline void blk_pm_requeue_request(struct request *rq)
- {
- }
-diff --git a/block/elevator.c b/block/elevator.c
-index e18ac68626e3..1c992bf6cfb1 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -601,6 +601,7 @@ void __elv_add_request(struct request_queue *q, struct request *rq, int where)
- 	trace_block_rq_insert(q, rq);
+@@ -82,6 +84,12 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+ 	if (bt->sb.depth == 1)
+ 		return true;
  
- 	blk_pm_add_request(q, rq);
-+	blk_pm_request_resume(q);
- 
- 	rq->q = q;
- 
++	/*
++	 * Needn't to deal with admin queue specially here even though we
++	 * don't take it account to tags->active_queues, so blk_queue_admin()
++	 * can be avoided to check in the fast path, also with implicit benefit
++	 * of avoiding too many in-flight admin requests
++	 */
+ 	users = atomic_read(&hctx->tags->active_queues);
+ 	if (!users)
+ 		return true;
 -- 
-2.18.0
+2.9.5
