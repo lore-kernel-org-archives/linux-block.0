@@ -1,190 +1,118 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-Subject: Re: [PATCH V3 00/17] SCSI: introduce per-host admin queue & enable
- runtime PM
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-References: <20180913121546.5710-1-ming.lei@redhat.com>
-From: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <f9ba3c11-21ac-d963-3f24-cb83744014e1@oracle.com>
-Date: Fri, 14 Sep 2018 15:27:44 +0800
-MIME-Version: 1.0
-In-Reply-To: <20180913121546.5710-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 00/17] SCSI: introduce per-host admin queue & enable runtime PM 
+Date: Thu, 13 Sep 2018 20:15:29 +0800
+Message-Id: <20180913121546.5710-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Ming
+Hi,
 
-On 09/13/2018 08:15 PM, Ming Lei wrote:
-> This patchset introduces per-host admin request queue for submitting
-> admin request only, and uses this approach to implement both SCSI
-> quiesce and runtime PM in one very simply way. Also runtime PM deadlock
-> can be avoided in case that request pool is used up, such as when too
-> many IO requests are allocated before resuming device
+This patchset introduces per-host admin request queue for submitting
+admin request only, and uses this approach to implement both SCSI
+quiesce and runtime PM in one very simply way. Also runtime PM deadlock
+can be avoided in case that request pool is used up, such as when too
+many IO requests are allocated before resuming device.
 
-To be honest, after look in to the SCSI part of this patchset, I really
-suspect whether it is worth to introduce this per scsi-host adminq.
-Too much complexity is introduced into SCSI. Compared with this, the current
-preempt-only feature look much simpler.
+The idea is borrowed from NVMe.
 
-If you just don't like the preempt-only checking in the hot path, we may introduce
-a new interface similar with blk_queue_enter for the non hot path.
+In this patchset, admin request(all requests submitted via __scsi_execute) will
+be submitted via one per-host admin queue, and the request is still
+associated with the same scsi_device as before, and respects this
+scsi_device's all kinds of limits too. Admin queue shares host tags with
+other IO queues.
 
-With your patch percpu-refcount: relax limit on percpu_ref_reinit()
+One core idea is that for any admin request submitted from this admin queue,
+this request won't be called back to block layer via the associated IO
+queue(scsi_device). And this is done in the 3rd patch. So once IO queue
+is frozen, it can be observed as really frozen from block layer view.
 
-(totally no test)
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 4dbc93f..dd7f007 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -427,14 +427,24 @@ EXPORT_SYMBOL(blk_sync_queue);
-  * Returns the previous value of the PREEMPT_ONLY flag - 0 if the flag was not
-  * set and 1 if the flag was already set.
-  */
--int blk_set_preempt_only(struct request_queue *q)
-+int blk_set_preempt_only(struct request_queue *q, bool drain)
- {
--    return blk_queue_flag_test_and_set(QUEUE_FLAG_PREEMPT_ONLY, q);
-+    if (blk_queue_flag_test_and_set(QUEUE_FLAG_PREEMPT_ONLY, q))
-+        return 1;
-+    percpu_ref_kill(&q->q_usage_counter);
-+    synchronize_sched();
-+
-+    if (drain)
-+        wait_event(q->mq_freeze_wq,
-+                percpu_ref_is_zero(&q->q_usage_counter));
-+
-+    return 0;
- }
- EXPORT_SYMBOL_GPL(blk_set_preempt_only);
- 
- void blk_clear_preempt_only(struct request_queue *q)
- {
-+    percpu_ref_reinit(&q->q_usage_counter);
-     blk_queue_flag_clear(QUEUE_FLAG_PREEMPT_ONLY, q);
-     wake_up_all(&q->mq_freeze_wq);
- }
-@@ -913,31 +923,13 @@ EXPORT_SYMBOL(blk_alloc_queue);
- /**
-  * blk_queue_enter() - try to increase q->q_usage_counter
-  * @q: request queue pointer
-- * @flags: BLK_MQ_REQ_NOWAIT and/or BLK_MQ_REQ_PREEMPT
-+ * @flags: BLK_MQ_REQ_NOWAIT
-  */
- int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- {
--    const bool preempt = flags & BLK_MQ_REQ_PREEMPT;
--
-     while (true) {
--        bool success = false;
--
--        rcu_read_lock();
--        if (percpu_ref_tryget_live(&q->q_usage_counter)) {
--            /*
--             * The code that sets the PREEMPT_ONLY flag is
--             * responsible for ensuring that that flag is globally
--             * visible before the queue is unfrozen.
--             */
--            if (preempt || !blk_queue_preempt_only(q)) {
--                success = true;
--            } else {
--                percpu_ref_put(&q->q_usage_counter);
--            }
--        }
--        rcu_read_unlock();
- 
--        if (success)
-+        if (percpu_ref_tryget_live(&q->q_usage_counter))
-             return 0;
- 
-         if (flags & BLK_MQ_REQ_NOWAIT)
-@@ -954,7 +946,44 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 
-         wait_event(q->mq_freeze_wq,
-                (atomic_read(&q->mq_freeze_depth) == 0 &&
--                (preempt || !blk_queue_preempt_only(q))) ||
-+               !blk_queue_preempt_only(q)) ||
-+               blk_queue_dying(q));
-+        if (blk_queue_dying(q))
-+            return -ENODEV;
-+    }
-+}
-+
-+/*
-+ * When set PREEMPT_ONLY mode, q->q_usage_counter is killed.
-+ * If only PREEMPT_ONLY mode, go on.
-+ * If queue frozen, wait.
-+ */
-+int blk_queue_preempt_enter(struct request_queue *q,
-+    blk_mq_req_flags_t flags)
-+{
-+    while (true) {
-+
-+        if (percpu_ref_tryget_live(&q->q_usage_counter))
-+            return 0;
-+
-+        smp_rmb();
-+
-+        /*
-+         * If queue is only in PREEMPT_ONLY mode, get the ref
-+         * directly. The one who set PREEMPT_ONLY mode is responsible
-+         * to wake up the waiters on mq_freeze_wq.
-+         */
-+        if (!atomic_read(&q->mq_freeze_depth) &&
-+                blk_queue_preempt_only(q)) {
-+            percpu_ref_get_many(&q->q_usage_counter, 1);
-+            return 0;
-+        }
-+
-+        if (flags & BLK_MQ_REQ_NOWAIT)
-+            return -EBUSY;
-+
-+        wait_event(q->mq_freeze_wq,
-+               (atomic_read(&q->mq_freeze_depth) == 0 ||
-                blk_queue_dying(q));
-         if (blk_queue_dying(q))
-             return -ENODEV;
-@@ -1587,7 +1616,7 @@ static struct request *blk_old_get_request(struct request_queue *q,
-     /* create ioc upfront */
-     create_io_context(gfp_mask, q->node);
- 
--    ret = blk_queue_enter(q, flags);
-+    ret = blk_queue_preempt_enter(q, flags);
-     if (ret)
-         return ERR_PTR(ret);
-     spin_lock_irq(q->queue_lock);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 85a1c1a..3aea78f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -403,7 +403,7 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
-     struct request *rq;
-     int ret;
- 
--    ret = blk_queue_enter(q, flags);
-+    ret = blk_queue_preempt_enter(q, flags);
-     if (ret)
-         return ERR_PTR(ret);
- 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index eb97d2d..c338c3a 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -3046,17 +3046,7 @@ scsi_device_quiesce(struct scsi_device *sdev)
-      */
-     WARN_ON_ONCE(sdev->quiesced_by && sdev->quiesced_by != current);
- 
--    blk_set_preempt_only(q);
--
--    blk_mq_freeze_queue(q);
--    /*
--     * Ensure that the effect of blk_set_preempt_only() will be visible
--     * for percpu_ref_tryget() callers that occur after the queue
--     * unfreeze even if the queue was already frozen before this function
--     * was called. See also https://lwn.net/Articles/573497/.
--     */
--    synchronize_rcu();
--    blk_mq_unfreeze_queue(q);
-+    blk_set_preempt_only(q, true);
- 
-     mutex_lock(&sdev->state_mutex);
-     err = scsi_device_set_state(sdev, SDEV_QUIESCE);
+SCSI quiesce is implemented by admin queue in very simple way, see patch
+15.
+
+Also runtime PM for legacy path is simplified too, see patch 16, and device
+resume is moved to blk_queue_enter().
+
+blk-mq simply follows legacy's approach for supporting runtime PM.
+
+Also the fast IO path is simplified much, see blk_queue_enter().
+
+
+gitweb:
+	https://github.com/ming1/linux/commits/v4.19-rc-next-scsi_admin_queue_v3
+
+Both runtime PM and system suspend on both legacy & blk-mq have been verified,
+and not see regression when running blktests.
+
+Any comments are welcome!
+
+Thanks,
+Ming
+
+V3->V2:
+	- add comment on hanlding admin queue inside hctx_may_queue() (4/17)
+	- improve runtime suspend helper as suggested by Jianchao (16/17)
+	- remove RFC
+
+V1->V2:
+	- convert NO_SCHED to ADMIN flag, don't allocate driver tag budget
+	for admin queue, as pointed by Jianchao(4/17)
+	- fix one issue in run scsi queue: admin queue shares IO queue depth
+	when sending one command to this scsi_device(10/17)
+	- fix one race between runtime PM and system suspend(16/17)
+	- iterate over scheduler tags instead of driver tags for counting
+	allocated requests(17/17)
+
+
+Ming Lei (17):
+  blk-mq: allow to pass default queue flags for creating & initializing
+    queue
+  blk-mq: convert BLK_MQ_F_NO_SCHED into per-queue flag
+  block: rename QUEUE_FLAG_NO_SCHED as QUEUE_FLAG_ADMIN
+  blk-mq: don't reserve tags for admin queue
+  SCSI: try to retrieve request_queue via 'scsi_cmnd' if possible
+  SCSI: pass 'scsi_device' instance from 'scsi_request'
+  SCSI: prepare for introducing admin queue for legacy path
+  SCSI: pass scsi_device to scsi_mq_prep_fn
+  SCSI: don't set .queuedata in scsi_mq_alloc_queue()
+  SCSI: deal with admin queue busy
+  SCSI: track pending admin commands
+  SCSI: create admin queue for each host
+  SCSI: use the dedicated admin queue to send admin commands
+  SCSI: transport_spi: resume a quiesced device
+  SCSI: use admin queue to implement queue QUIESCE
+  block: simplify runtime PM support
+  block: enable runtime PM for blk-mq
+
+ block/blk-core.c                    | 189 ++++++++++++------------
+ block/blk-mq-debugfs.c              |   3 +-
+ block/blk-mq-tag.c                  |  33 ++++-
+ block/blk-mq-tag.h                  |   2 +
+ block/blk-mq.c                      |  44 ++++--
+ block/elevator.c                    |  28 +---
+ drivers/ata/libata-eh.c             |   2 +-
+ drivers/block/null_blk_main.c       |   7 +-
+ drivers/nvme/host/fc.c              |   4 +-
+ drivers/nvme/host/pci.c             |   4 +-
+ drivers/nvme/host/rdma.c            |   4 +-
+ drivers/nvme/target/loop.c          |   4 +-
+ drivers/scsi/hosts.c                |   9 ++
+ drivers/scsi/libsas/sas_ata.c       |   2 +-
+ drivers/scsi/libsas/sas_scsi_host.c |   2 +-
+ drivers/scsi/scsi_error.c           |   2 +-
+ drivers/scsi/scsi_lib.c             | 278 ++++++++++++++++++++++++++----------
+ drivers/scsi/scsi_priv.h            |   1 +
+ drivers/scsi/scsi_scan.c            |   1 +
+ drivers/scsi/scsi_sysfs.c           |   1 +
+ drivers/scsi/scsi_transport_spi.c   |   3 +
+ include/linux/blk-mq.h              |  22 ++-
+ include/linux/blkdev.h              |  14 +-
+ include/scsi/scsi_device.h          |   5 +-
+ include/scsi/scsi_host.h            |   2 +
+ include/scsi/scsi_request.h         |   5 +-
+ 26 files changed, 439 insertions(+), 232 deletions(-)
+
+-- 
+2.9.5
