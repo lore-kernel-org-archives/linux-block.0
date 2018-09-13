@@ -1,58 +1,54 @@
-Return-Path: <prvs=8011d1e1c=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Bart Van Assche <bvanassche@acm.org>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	stable@vger.kernel.org
-Subject: [PATCH v3] block: fix deadline elevator drain for zoned block devices
-Date: Thu, 27 Sep 2018 10:55:13 +0900
-Message-Id: <20180927015513.24020-1-damien.lemoal@wdc.com>
+Return-Path: <b.zolnierkie@samsung.com>
+Subject: Re: [PATCH v2 02/24] drivers/video/fbdev: use ioremap_wc/wt()
+ instead of __ioremap()
+To: Christophe Leroy <christophe.leroy@c-s.fr>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski
+	<linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe
+	<axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang
+	<leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin
+	<npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood
+	<oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com,
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+From: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+Date: Thu, 13 Sep 2018 19:02:31 +0200
+MIME-Version: 1.0
+In-Reply-To: <2f980cf32a05415662272cf052c2b9e2a94c756f.1536692743.git.christophe.leroy@c-s.fr>
+Message-Id: <20180913170233eucas1p19e6cd20020f27bb4db0cd927bb9a3302~UBFkQTUaX2145421454eucas1p1M@eucas1p1.samsung.com>
+Content-Type: text/plain; charset="utf-8"
+References: <cover.1536692743.git.christophe.leroy@c-s.fr>
+	<CGME20180912155824epcas5p17cd1e14fa1cb246362ec47b15248cf71@epcas5p1.samsung.com>
+	<2f980cf32a05415662272cf052c2b9e2a94c756f.1536692743.git.christophe.leroy@c-s.fr>
 List-ID: <linux-block@vger.kernel.org>
 
-When the deadline scheduler is used with a zoned block device, writes
-to a zone will be dispatched one at a time. This causes the warning
-message:
 
-deadline: forced dispatching is broken (nr_sorted=X), please report this
+On 09/12/2018 05:58 PM, Christophe Leroy wrote:
+> _PAGE_NO_CACHE is a platform specific flag. In addition, this flag
+> is misleading because one would think it requests a noncached page
+> whereas a noncached page is _PAGE_NO_CACHE | _PAGE_GUARDED
+> 
+> _PAGE_NO_CACHE alone means write combined noncached page, so lets
+> use ioremap_wc() instead.
+> 
+> _PAGE_WRITETHRU is also platform specific flag. Use ioremap_wt()
+> instead.
+> 
+> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 
-to be displayed when switching to another elevator with the legacy I/O
-path while write requests to a zone are being retained in the scheduler
-queue.
+After reading patch #1 this one LGTM.
 
-Prevent this message from being displayed when executing
-elv_drain_elevator() for a zoned block device. __blk_drain_queue() will
-loop until all writes are dispatched and completed, resulting in the
-desired elevator queue drain without extensive modifications to the
-deadline code itself to handle forced-dispatch calls.
+Acked-by: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Fixes: 8dc8146f9c92 ("deadline-iosched: Introduce zone locking support")
-Cc: stable@vger.kernel.org
----
+> ---
+>  drivers/video/fbdev/chipsfb.c    |  3 +--
+>  drivers/video/fbdev/controlfb.c  |  5 +----
+>  drivers/video/fbdev/platinumfb.c |  5 +----
+>  drivers/video/fbdev/valkyriefb.c | 12 ++++++------
+>  4 files changed, 9 insertions(+), 16 deletions(-)
 
-Changes from v2:
-* Move zoned block device test before 'printed' increment as suggested by Bart
-* Added "Fixes" tag and cc stable
-
-Changes from v1:
-* Fixed typo in commit message
-
- block/elevator.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/elevator.c b/block/elevator.c
-index 6a06b5d040e5..fae58b2f906f 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -609,7 +609,7 @@ void elv_drain_elevator(struct request_queue *q)
- 
- 	while (e->type->ops.sq.elevator_dispatch_fn(q, 1))
- 		;
--	if (q->nr_sorted && printed++ < 10) {
-+	if (q->nr_sorted && !blk_queue_is_zoned(q) && printed++ < 10 ) {
- 		printk(KERN_ERR "%s: forced dispatching is broken "
- 		       "(nr_sorted=%u), please report this\n",
- 		       q->elevator->type->elevator_name, q->nr_sorted);
--- 
-2.17.1
+Best regards,
+--
+Bartlomiej Zolnierkiewicz
+Samsung R&D Institute Poland
+Samsung Electronics
