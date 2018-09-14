@@ -1,118 +1,82 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Logan Gunthorpe <logang@deltatee.com>
-Date: Tue, 25 Sep 2018 10:22:28 -0600
-Message-Id: <20180925162231.4354-11-logang@deltatee.com>
-In-Reply-To: <20180925162231.4354-1-logang@deltatee.com>
-References: <20180925162231.4354-1-logang@deltatee.com>
-MIME-Version: 1.0
-Subject: [PATCH v7 10/13] nvme-pci: Add support for P2P memory in requests
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT 1/3] block, bfq: correctly charge and reset entity service in all cases
+Date: Fri, 14 Sep 2018 16:23:07 +0200
+Message-Id: <20180914142309.6789-2-paolo.valente@linaro.org>
+In-Reply-To: <20180914142309.6789-1-paolo.valente@linaro.org>
+References: <20180914142309.6789-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-For P2P requests, we must use the pci_p2pmem_map_sg() function
-instead of the dma_map_sg functions.
+BFQ schedules entities (which represent either per-process queues or
+groups of queues) as a function of their timestamps. In particular, as
+a function of their (virtual) finish times. The finish time of an
+entity is computed as a function of the budget assigned to the entity,
+assuming, tentatively, that the entity, once in service, will receive
+an amount of service equal to its budget. Then, when the entity is
+expired because it finishes to be served, this finish time is updated
+as a function of the actual service received by the entity. This
+allows the entity to be correctly charged with only the service
+received, and then to be correctly re-scheduled.
 
-With that, we can then indicate PCI_P2P support in the request queue.
-For this, we create an NVME_F_PCI_P2P flag which tells the core to
-set QUEUE_FLAG_PCI_P2P in the request queue.
+Yet an entity may receive service also while not being the entity in
+service (in the scheduling environment of its parent entity), for
+several reasons. If the entity remains with no backlog while receiving
+this 'unofficial' service, then it is expired. Also on such an
+expiration, the finish time of the entity should be updated to account
+for only the service actually received by the entity. Unfortunately,
+such an update is not performed for an entity expiring without being
+the entity in service.
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+In a similar vein, the service counter of the entity in service is
+reset when the entity is expired, to be ready to be used for next
+service cycle. This reset too should be performed also in case an
+entity is expired because it remains empty after receiving service
+while not being the entity in service. But in this case the reset is
+not performed.
+
+This commit performs the above update of the finish time and reset of
+the service received, also for an entity expiring while not being the
+entity in service.
+
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- drivers/nvme/host/core.c |  4 ++++
- drivers/nvme/host/nvme.h |  1 +
- drivers/nvme/host/pci.c  | 17 +++++++++++++----
- 3 files changed, 18 insertions(+), 4 deletions(-)
+ block/bfq-wf2q.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index dd8ec1dd9219..6033ce2fd3e9 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -3051,7 +3051,11 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 	ns->queue = blk_mq_init_queue(ctrl->tagset);
- 	if (IS_ERR(ns->queue))
- 		goto out_free_ns;
-+
- 	blk_queue_flag_set(QUEUE_FLAG_NONROT, ns->queue);
-+	if (ctrl->ops->flags & NVME_F_PCI_P2PDMA)
-+		blk_queue_flag_set(QUEUE_FLAG_PCI_P2PDMA, ns->queue);
-+
- 	ns->queue->queuedata = ns;
- 	ns->ctrl = ctrl;
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index ae52bff43ce4..ff7c2d470bb8 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -1181,10 +1181,17 @@ bool __bfq_deactivate_entity(struct bfq_entity *entity, bool ins_into_idle_tree)
+ 	st = bfq_entity_service_tree(entity);
+ 	is_in_service = entity == sd->in_service_entity;
  
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index bb4a2003c097..4030743c90aa 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -343,6 +343,7 @@ struct nvme_ctrl_ops {
- 	unsigned int flags;
- #define NVME_F_FABRICS			(1 << 0)
- #define NVME_F_METADATA_SUPPORTED	(1 << 1)
-+#define NVME_F_PCI_P2PDMA		(1 << 2)
- 	int (*reg_read32)(struct nvme_ctrl *ctrl, u32 off, u32 *val);
- 	int (*reg_write32)(struct nvme_ctrl *ctrl, u32 off, u32 val);
- 	int (*reg_read64)(struct nvme_ctrl *ctrl, u32 off, u64 *val);
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index f434706a04e8..0d6c41bc2b35 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -745,8 +745,13 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
- 		goto out;
- 
- 	ret = BLK_STS_RESOURCE;
--	nr_mapped = dma_map_sg_attrs(dev->dev, iod->sg, iod->nents, dma_dir,
--			DMA_ATTR_NO_WARN);
+-	if (is_in_service) {
+-		bfq_calc_finish(entity, entity->service);
++	bfq_calc_finish(entity, entity->service);
 +
-+	if (is_pci_p2pdma_page(sg_page(iod->sg)))
-+		nr_mapped = pci_p2pdma_map_sg(dev->dev, iod->sg, iod->nents,
-+					  dma_dir);
++	if (is_in_service)
+ 		sd->in_service_entity = NULL;
+-	}
 +	else
-+		nr_mapped = dma_map_sg_attrs(dev->dev, iod->sg, iod->nents,
-+					     dma_dir,  DMA_ATTR_NO_WARN);
- 	if (!nr_mapped)
- 		goto out;
++		/*
++		 * Non in-service entity: nobody will take care of
++		 * resetting its service counter on expiration. Do it
++		 * now.
++		 */
++		entity->service = 0;
  
-@@ -788,7 +793,10 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
- 			DMA_TO_DEVICE : DMA_FROM_DEVICE;
- 
- 	if (iod->nents) {
--		dma_unmap_sg(dev->dev, iod->sg, iod->nents, dma_dir);
-+		/* P2PDMA requests do not need to be unmapped */
-+		if (!is_pci_p2pdma_page(sg_page(iod->sg)))
-+			dma_unmap_sg(dev->dev, iod->sg, iod->nents, dma_dir);
-+
- 		if (blk_integrity_rq(req))
- 			dma_unmap_sg(dev->dev, &iod->meta_sg, 1, dma_dir);
- 	}
-@@ -2400,7 +2408,8 @@ static int nvme_pci_get_address(struct nvme_ctrl *ctrl, char *buf, int size)
- static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
- 	.name			= "pcie",
- 	.module			= THIS_MODULE,
--	.flags			= NVME_F_METADATA_SUPPORTED,
-+	.flags			= NVME_F_METADATA_SUPPORTED |
-+				  NVME_F_PCI_P2PDMA,
- 	.reg_read32		= nvme_pci_reg_read32,
- 	.reg_write32		= nvme_pci_reg_write32,
- 	.reg_read64		= nvme_pci_reg_read64,
+ 	if (entity->tree == &st->active)
+ 		bfq_active_extract(st, entity);
 -- 
-2.19.0
+2.16.1
