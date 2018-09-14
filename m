@@ -1,147 +1,41 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <keith.busch@intel.com>,
-	Bart van Assche <bart.vanassche@wdc.com>,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 5/5] virtio-blk: modernize sysfs attribute creation
-Date: Wed,  5 Sep 2018 09:00:53 +0200
-Message-Id: <20180905070053.26239-6-hare@suse.de>
-In-Reply-To: <20180905070053.26239-1-hare@suse.de>
-References: <20180905070053.26239-1-hare@suse.de>
+Return-Path: <hch@lst.de>
+Date: Fri, 14 Sep 2018 14:58:13 +0200
+From: "hch@lst.de" <hch@lst.de>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"hch@lst.de" <hch@lst.de>,
+	"jthumshirn@suse.de" <jthumshirn@suse.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"stern@rowland.harvard.edu" <stern@rowland.harvard.edu>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>
+Subject: Re: [PATCH v4 02/10] block, scsi: Give RQF_PREEMPT back its
+ original meaning
+Message-ID: <20180914125813.GB26651@lst.de>
+References: <20180804000325.3610-1-bart.vanassche@wdc.com> <20180804000325.3610-3-bart.vanassche@wdc.com> <4a329d4c-8b11-be8f-28f7-88839a6f9b66@suse.de> <4d70e0857780753bd8938b06f3a1a5ead2e0f4c1.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4d70e0857780753bd8938b06f3a1a5ead2e0f4c1.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Use new-style DEVICE_ATTR_RO/DEVICE_ATTR_RW to create the sysfs attributes
-and register the disk with default sysfs attribute groups.
+On Mon, Aug 06, 2018 at 01:54:40PM +0000, Bart Van Assche wrote:
+> On Mon, 2018-08-06 at 08:27 +0200, Hannes Reinecke wrote:
+> > I am not sure this is going to work for SCSI parallel; we're using the
+> > QUIESCE state there to do domain validation, and all commands there are
+> > most definitely not PM requests.
+> > Can you please validate your patches with eg aic7xxx and SCSI parallel
+> > disks?
+> 
+> Hello Hannes,
+> 
+> How about using the RQF_PM flag for SCSI parallel requests instead of
+> RQF_PREEMPT? That change will also avoid that RQF_PREEMPT has a double meaning.
+> Anyway, I will see whether I can drop that change from this series and submit
+> that change seperately.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
----
- drivers/block/virtio_blk.c | 68 ++++++++++++++++++++++++++--------------------
- 1 file changed, 39 insertions(+), 29 deletions(-)
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index fe80560000a1..086c6bb12baa 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -351,8 +351,8 @@ static int minor_to_index(int minor)
- 	return minor >> PART_BITS;
- }
- 
--static ssize_t virtblk_serial_show(struct device *dev,
--				struct device_attribute *attr, char *buf)
-+static ssize_t serial_show(struct device *dev,
-+			   struct device_attribute *attr, char *buf)
- {
- 	struct gendisk *disk = dev_to_disk(dev);
- 	int err;
-@@ -371,7 +371,7 @@ static ssize_t virtblk_serial_show(struct device *dev,
- 	return err;
- }
- 
--static DEVICE_ATTR(serial, 0444, virtblk_serial_show, NULL);
-+static DEVICE_ATTR_RO(serial);
- 
- /* The queue's logical block size must be set before calling this */
- static void virtblk_update_capacity(struct virtio_blk *vblk, bool resize)
-@@ -545,8 +545,8 @@ static const char *const virtblk_cache_types[] = {
- };
- 
- static ssize_t
--virtblk_cache_type_store(struct device *dev, struct device_attribute *attr,
--			 const char *buf, size_t count)
-+cache_type_store(struct device *dev, struct device_attribute *attr,
-+		 const char *buf, size_t count)
- {
- 	struct gendisk *disk = dev_to_disk(dev);
- 	struct virtio_blk *vblk = disk->private_data;
-@@ -564,8 +564,7 @@ virtblk_cache_type_store(struct device *dev, struct device_attribute *attr,
- }
- 
- static ssize_t
--virtblk_cache_type_show(struct device *dev, struct device_attribute *attr,
--			 char *buf)
-+cache_type_show(struct device *dev, struct device_attribute *attr, char *buf)
- {
- 	struct gendisk *disk = dev_to_disk(dev);
- 	struct virtio_blk *vblk = disk->private_data;
-@@ -575,12 +574,38 @@ virtblk_cache_type_show(struct device *dev, struct device_attribute *attr,
- 	return snprintf(buf, 40, "%s\n", virtblk_cache_types[writeback]);
- }
- 
--static const struct device_attribute dev_attr_cache_type_ro =
--	__ATTR(cache_type, 0444,
--	       virtblk_cache_type_show, NULL);
--static const struct device_attribute dev_attr_cache_type_rw =
--	__ATTR(cache_type, 0644,
--	       virtblk_cache_type_show, virtblk_cache_type_store);
-+static DEVICE_ATTR_RW(cache_type);
-+
-+static struct attribute *virtblk_attrs[] = {
-+	&dev_attr_serial.attr,
-+	&dev_attr_cache_type.attr,
-+	NULL,
-+};
-+
-+static umode_t virtblk_attrs_are_visible(struct kobject *kobj,
-+		struct attribute *a, int n)
-+{
-+	struct device *dev = container_of(kobj, struct device, kobj);
-+	struct gendisk *disk = dev_to_disk(dev);
-+	struct virtio_blk *vblk = disk->private_data;
-+	struct virtio_device *vdev = vblk->vdev;
-+
-+	if (a == &dev_attr_cache_type.attr &&
-+	    !virtio_has_feature(vdev, VIRTIO_BLK_F_CONFIG_WCE))
-+		return S_IRUGO;
-+
-+	return a->mode;
-+}
-+
-+static const struct attribute_group virtblk_attr_group = {
-+	.attrs = virtblk_attrs,
-+	.is_visible = virtblk_attrs_are_visible,
-+};
-+
-+static const struct attribute_group *virtblk_attr_groups[] = {
-+	&virtblk_attr_group,
-+	NULL,
-+};
- 
- static int virtblk_init_request(struct blk_mq_tag_set *set, struct request *rq,
- 		unsigned int hctx_idx, unsigned int numa_node)
-@@ -780,24 +805,9 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	virtblk_update_capacity(vblk, false);
- 	virtio_device_ready(vdev);
- 
--	device_add_disk(&vdev->dev, vblk->disk, NULL);
--	err = device_create_file(disk_to_dev(vblk->disk), &dev_attr_serial);
--	if (err)
--		goto out_del_disk;
--
--	if (virtio_has_feature(vdev, VIRTIO_BLK_F_CONFIG_WCE))
--		err = device_create_file(disk_to_dev(vblk->disk),
--					 &dev_attr_cache_type_rw);
--	else
--		err = device_create_file(disk_to_dev(vblk->disk),
--					 &dev_attr_cache_type_ro);
--	if (err)
--		goto out_del_disk;
-+	device_add_disk(&vdev->dev, vblk->disk, virtblk_attr_groups);
- 	return 0;
- 
--out_del_disk:
--	del_gendisk(vblk->disk);
--	blk_cleanup_queue(vblk->disk->queue);
- out_free_tags:
- 	blk_mq_free_tag_set(&vblk->tag_set);
- out_put_disk:
--- 
-2.16.4
+One thing I'd like to do is split BLK_MQ_REQ_PREEMPT and RQF_PREEMPT,
+that is don't set RQF_PREEMPT automatically when BLK_MQ_REQ_PREEMPT is
+passed to blk_get_request, but let the caller set it manually.  After
+that RQF_PREEMPT isn't used by the block layer itself at all and can
+be moved into ide/scsi specific flags that we can use as we want.
