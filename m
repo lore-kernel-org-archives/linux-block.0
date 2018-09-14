@@ -1,81 +1,77 @@
-Return-Path: <gregkh@linuxfoundation.org>
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: linux-kernel@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	stable@vger.kernel.org,
-	Ingo Molnar <mingo@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	"Steven Rostedt (VMware)" <rostedt@goodmis.org>
-Subject: [PATCH 4.18 076/145] tracing/blktrace: Fix to allow setting same value
-Date: Fri,  7 Sep 2018 23:09:02 +0200
-Message-Id: <20180907210910.676712109@linuxfoundation.org>
-In-Reply-To: <20180907210903.617721278@linuxfoundation.org>
-References: <20180907210903.617721278@linuxfoundation.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT 3/3] blok, bfq: do not plug I/O if all queues are weight-raised
+Date: Fri, 14 Sep 2018 16:23:09 +0200
+Message-Id: <20180914142309.6789-4-paolo.valente@linaro.org>
+In-Reply-To: <20180914142309.6789-1-paolo.valente@linaro.org>
+References: <20180914142309.6789-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-4.18-stable review patch.  If anyone has any objections, please let me know.
+To reduce latency for interactive and soft real-time applications, bfq
+privileges the bfq_queues containing the I/O of these
+applications. These privileged queues, referred-to as weight-raised
+queues, get a much higher share of the device throughput
+w.r.t. non-privileged queues. To preserve this higher share, the I/O
+of any non-weight-raised queue must be plugged whenever a sync
+weight-raised queue, while being served, remains temporarily empty. To
+attain this goal, bfq simply plugs any I/O (from any queue), if a sync
+weight-raised queue remains empty while in service.
 
-------------------
+Unfortunately, this plugging typically lowers throughput with random
+I/O, on devices with internal queueing (because it reduces the filling
+level of the internal queues of the device).
 
-From: Steven Rostedt (VMware) <rostedt@goodmis.org>
+This commit addresses this issue by restricting the cases where
+plugging is performed: if a sync weight-raised queue remains empty
+while in service, then I/O plugging is performed only if some of the
+active bfq_queues are *not* weight-raised (which is actually the only
+circumstance where plugging is needed to preserve the higher share of
+the throughput of weight-raised queues). This restriction proved able
+to boost throughput in really many use cases needing only maximum
+throughput.
 
-commit 757d9140072054528b13bbe291583d9823cde195 upstream.
-
-Masami Hiramatsu reported:
-
-  Current trace-enable attribute in sysfs returns an error
-  if user writes the same setting value as current one,
-  e.g.
-
-    # cat /sys/block/sda/trace/enable
-    0
-    # echo 0 > /sys/block/sda/trace/enable
-    bash: echo: write error: Invalid argument
-    # echo 1 > /sys/block/sda/trace/enable
-    # echo 1 > /sys/block/sda/trace/enable
-    bash: echo: write error: Device or resource busy
-
-  But this is not a preferred behavior, it should ignore
-  if new setting is same as current one. This fixes the
-  problem as below.
-
-    # cat /sys/block/sda/trace/enable
-    0
-    # echo 0 > /sys/block/sda/trace/enable
-    # echo 1 > /sys/block/sda/trace/enable
-    # echo 1 > /sys/block/sda/trace/enable
-
-Link: http://lkml.kernel.org/r/20180816103802.08678002@gandalf.local.home
-
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Cc: stable@vger.kernel.org
-Fixes: cd649b8bb830d ("blktrace: remove sysfs_blk_trace_enable_show/store()")
-Reported-by: Masami Hiramatsu <mhiramat@kernel.org>
-Tested-by: Masami Hiramatsu <mhiramat@kernel.org>
-Signed-off-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- kernel/trace/blktrace.c |    4 ++++
- 1 file changed, 4 insertions(+)
+ block/bfq-iosched.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -1841,6 +1841,10 @@ static ssize_t sysfs_blk_trace_attr_stor
- 	mutex_lock(&q->blk_trace_mutex);
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index d94838bcc135..c0b1db3afb81 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -3580,7 +3580,12 @@ static bool bfq_better_to_idle(struct bfq_queue *bfqq)
+ 	 * whether bfqq is being weight-raised, because
+ 	 * bfq_symmetric_scenario() does not take into account also
+ 	 * weight-raised queues (see comments on
+-	 * bfq_weights_tree_add()).
++	 * bfq_weights_tree_add()). In particular, if bfqq is being
++	 * weight-raised, it is important to idle only if there are
++	 * other, non-weight-raised queues that may steal throughput
++	 * to bfqq. Actually, we should be even more precise, and
++	 * differentiate between interactive weight raising and
++	 * soft real-time weight raising.
+ 	 *
+ 	 * As a side note, it is worth considering that the above
+ 	 * device-idling countermeasures may however fail in the
+@@ -3592,7 +3597,8 @@ static bool bfq_better_to_idle(struct bfq_queue *bfqq)
+ 	 * to let requests be served in the desired order until all
+ 	 * the requests already queued in the device have been served.
+ 	 */
+-	asymmetric_scenario = bfqq->wr_coeff > 1 ||
++	asymmetric_scenario = (bfqq->wr_coeff > 1 &&
++			       bfqd->wr_busy_queues < bfqd->busy_queues) ||
+ 		!bfq_symmetric_scenario(bfqd);
  
- 	if (attr == &dev_attr_enable) {
-+		if (!!value == !!q->blk_trace) {
-+			ret = 0;
-+			goto out_unlock_bdev;
-+		}
- 		if (value)
- 			ret = blk_trace_setup_queue(q, bdev);
- 		else
+ 	/*
+-- 
+2.16.1
