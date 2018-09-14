@@ -1,57 +1,64 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH V3 14/17] SCSI: transport_spi: resume a quiesced device
-Date: Thu, 13 Sep 2018 20:15:43 +0800
-Message-Id: <20180913121546.5710-15-ming.lei@redhat.com>
-In-Reply-To: <20180913121546.5710-1-ming.lei@redhat.com>
-References: <20180913121546.5710-1-ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc: Josef Bacik <josef@toxicpanda.com>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: blk-wbt: handle O_DIRECT writes like high priority writes
+Message-ID: <b58ca65a-0064-f138-80c4-4f1021a0213a@kernel.dk>
+Date: Fri, 14 Sep 2018 11:34:21 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-We have to preempt freeze queue in scsi_device_quiesce(),
-and unfreeze in scsi_device_resume(), so call scsi_device_resume()
-for the device which is quiesced by scsi_device_quiesce().
+Currently we don't limit O_DIRECT writes at all, we just let them queue
+up as many as possible. As max priority writes should be able to get
+full bandwidth, handle O_DIRECT writes just like we would high priority
+buffered writes.
 
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Adrian Hunter <adrian.hunter@intel.com>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
 ---
- drivers/scsi/scsi_transport_spi.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/scsi/scsi_transport_spi.c b/drivers/scsi/scsi_transport_spi.c
-index 40b85b752b79..e4174e8137a8 100644
---- a/drivers/scsi/scsi_transport_spi.c
-+++ b/drivers/scsi/scsi_transport_spi.c
-@@ -1052,6 +1052,9 @@ spi_dv_device(struct scsi_device *sdev)
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 8e20a0677dcf..9b17161b5668 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -450,6 +450,12 @@ static bool close_io(struct rq_wb *rwb)
+ 		time_before(now, rwb->last_comp + HZ / 10);
+ }
  
- 	scsi_target_resume(starget);
- 
-+	/* undo what scsi_device_quiesce() did */
-+	scsi_device_resume(sdev);
++static bool is_odirect_write(unsigned long rw)
++{
++	return op_is_write(rw) &&
++		((rw & (REQ_SYNC | REQ_IDLE)) == (REQ_SYNC | REQ_IDLE));
++}
 +
- 	spi_initial_dv(starget) = 1;
+ #define REQ_HIPRIO	(REQ_SYNC | REQ_META | REQ_PRIO)
  
-  out_free:
+ static inline unsigned int get_limit(struct rq_wb *rwb, unsigned long rw)
+@@ -474,7 +480,8 @@ static inline unsigned int get_limit(struct rq_wb *rwb, unsigned long rw)
+ 	 * the idle limit, or go to normal if we haven't had competing
+ 	 * IO for a bit.
+ 	 */
+-	if ((rw & REQ_HIPRIO) || wb_recent_wait(rwb) || current_is_kswapd())
++	if ((rw & REQ_HIPRIO) || wb_recent_wait(rwb) || current_is_kswapd() ||
++	    is_odirect_write(rw))
+ 		limit = rwb->rq_depth.max_depth;
+ 	else if ((rw & REQ_BACKGROUND) || close_io(rwb)) {
+ 		/*
+@@ -578,12 +585,6 @@ static inline bool wbt_should_throttle(struct rq_wb *rwb, struct bio *bio)
+ {
+ 	switch (bio_op(bio)) {
+ 	case REQ_OP_WRITE:
+-		/*
+-		 * Don't throttle WRITE_ODIRECT
+-		 */
+-		if ((bio->bi_opf & (REQ_SYNC | REQ_IDLE)) ==
+-		    (REQ_SYNC | REQ_IDLE))
+-			return false;
+ 		/* fallthrough */
+ 	case REQ_OP_DISCARD:
+ 		return true;
+
+
 -- 
-2.9.5
+Jens Axboe
