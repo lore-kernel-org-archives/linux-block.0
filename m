@@ -1,31 +1,35 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:37977 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726881AbeIKQ2R (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Sep 2018 12:28:17 -0400
-Received: by mail-ed1-f68.google.com with SMTP id h33-v6so18938949edb.5
-        for <linux-block@vger.kernel.org>; Tue, 11 Sep 2018 04:29:21 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH BUGFIX/IMPROVEMENT 0/3] bfq: one fix and two important
+ improvements for throughput
+To: Paolo Valente <paolo.valente@linaro.org>
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [V2 PATCH]  lightnvm: pblk: recover open lines on 2.0 devices
-Date: Tue, 11 Sep 2018 13:29:13 +0200
-Message-Id: <1536665354-13493-1-git-send-email-javier@cnexlabs.com>
+ ulf.hansson@linaro.org, linus.walleij@linaro.org, broonie@kernel.org,
+ bfq-iosched@googlegroups.com, oleksandr@natalenko.name
+References: <20180914142309.6789-1-paolo.valente@linaro.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <bb31b362-53a9-483f-381f-1fcf0dad32bd@kernel.dk>
+Date: Fri, 14 Sep 2018 13:06:29 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180914142309.6789-1-paolo.valente@linaro.org>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-# Changes sinve V1:
-  - Rebase on top of Matias' core
+On 9/14/18 8:23 AM, Paolo Valente wrote:
+> Hi Jens,
+> the second and third patch in this series provide two important
+> improvements in bfq's ability to boost throughput with random I/O. The
+> benefits of the second patch concern I/O control, and are described in
+> detail in this LWN article [1] (and briefly in the commit message
+> itself). The benefits of the other patch should be
+> straightforward. Finally, the first patch fixes an I/O-control bug,
+> found while making the second patch.
+> 
+> These patches modify somehow core operations of bfq, so, before
+> submitting them, I have tested them a lot, and have had them tested by
+> other people too. In particular, during these months, they have been
+> tested in systems ranging from PCs to development platforms.
 
-Javier González (1):
-  lightnvm: pblk: recover open lines on 2.0 devices
-
- drivers/lightnvm/pblk-recovery.c | 406 ++++++++++++---------------------------
- 1 file changed, 124 insertions(+), 282 deletions(-)
+Applied for 4.20, thanks Paolo.
 
 -- 
-2.7.4
+Jens Axboe
