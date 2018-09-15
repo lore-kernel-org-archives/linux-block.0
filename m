@@ -1,36 +1,40 @@
-Return-Path: <BATV+97b555f176c451e34851+5490+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	linux-block@vger.kernel.org,
-	xen-devel@lists.xen.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 12/13] block: don't include bug.h from bio.h
-Date: Tue,  4 Sep 2018 12:14:30 -0700
-Message-Id: <20180904191431.20102-13-hch@lst.de>
-In-Reply-To: <20180904191431.20102-1-hch@lst.de>
-References: <20180904191431.20102-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: remove bio_rewind_iter()
+To: Christoph Hellwig <hch@infradead.org>, Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, Kent Overstreet <kent.overstreet@gmail.com>,
+ Dmitry Monakhov <dmonakhov@openvz.org>, Christoph Hellwig <hch@lst.de>,
+ Hannes Reinecke <hare@suse.com>
+References: <20180905033335.12666-1-ming.lei@redhat.com>
+ <20180915070301.GB15555@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <e04d57cd-2ed1-2141-41c3-099a348ed80d@kernel.dk>
+Date: Sat, 15 Sep 2018 08:41:32 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180915070301.GB15555@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-No need to pull in the BUG() defintion.
+On 9/15/18 1:03 AM, Christoph Hellwig wrote:
+> On Wed, Sep 05, 2018 at 11:33:35AM +0800, Ming Lei wrote:
+>> It is pointed that bio_rewind_iter() is one very bad API[1]:
+>>
+>> 1) bio size may not be restored after rewinding
+>>
+>> 2) it causes some bogus change, such as 5151842b9d8732 (block: reset
+>> bi_iter.bi_done after splitting bio)
+>>
+>> 3) rewinding really makes things complicated wrt. bio splitting
+>>
+>> 4) unnecessary updating of .bi_done in fast path
+>>
+>> [1] https://marc.info/?t=153549924200005&r=1&w=2
+> 
+> Based on that this is a bug fix and should go to 4.19 instead of 4.20
+> as it is queued up right now..
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/bio.h | 1 -
- 1 file changed, 1 deletion(-)
+It's not a new issue (in fact not even close, we're about a year back),
+hence not a strong reason to shove it into 4.19 vs 4.20. I'm fine
+with subsequently marking it for stable.
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 3af2fea686a9..85f2e56ecdb8 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -21,7 +21,6 @@
- #include <linux/highmem.h>
- #include <linux/mempool.h>
- #include <linux/ioprio.h>
--#include <linux/bug.h>
- 
- #ifdef CONFIG_BLOCK
- /* struct bio, bio_vec and BIO_* flags are defined in blk_types.h */
 -- 
-2.18.0
+Jens Axboe
