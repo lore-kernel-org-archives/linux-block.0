@@ -9,11 +9,11 @@ Cc: linux-block@vger.kernel.org,
 	Hannes Reinecke <hare@suse.com>,
 	Johannes Thumshirn <jthumshirn@suse.de>,
 	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v7 5/6] block: Make blk_get_request() block for non-PM requests while suspended
-Date: Mon, 17 Sep 2018 13:15:24 -0700
-Message-Id: <20180917201525.26570-6-bvanassche@acm.org>
-In-Reply-To: <20180917201525.26570-1-bvanassche@acm.org>
-References: <20180917201525.26570-1-bvanassche@acm.org>
+Subject: [PATCH v7 6/7] block: Make blk_get_request() block for non-PM requests while suspended
+Date: Mon, 17 Sep 2018 13:11:23 -0700
+Message-Id: <20180917201124.26161-11-bvanassche@acm.org>
+In-Reply-To: <20180917201124.26161-1-bvanassche@acm.org>
+References: <20180917201124.26161-1-bvanassche@acm.org>
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
@@ -94,7 +94,7 @@ index 18b874d5c9c9..ae092ca121d5 100644
  
  		/*
 diff --git a/block/blk-pm.c b/block/blk-pm.c
-index 9b636960d285..5f21bedcb307 100644
+index bf8532da952d..1f3504775af3 100644
 --- a/block/blk-pm.c
 +++ b/block/blk-pm.c
 @@ -1,8 +1,11 @@
@@ -109,9 +109,9 @@ index 9b636960d285..5f21bedcb307 100644
  
  /**
   * blk_pm_runtime_init - Block layer runtime PM initialization routine
-@@ -40,6 +43,36 @@ void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
+@@ -58,6 +61,36 @@ void blk_pm_runtime_exit(struct request_queue *q)
  }
- EXPORT_SYMBOL(blk_pm_runtime_init);
+ EXPORT_SYMBOL(blk_pm_runtime_exit);
  
 +struct in_flight_data {
 +	struct request_queue	*q;
@@ -146,7 +146,7 @@ index 9b636960d285..5f21bedcb307 100644
  /**
   * blk_pre_runtime_suspend - Pre runtime suspend check
   * @q: the queue of the device
-@@ -68,14 +101,38 @@ int blk_pre_runtime_suspend(struct request_queue *q)
+@@ -86,14 +119,38 @@ int blk_pre_runtime_suspend(struct request_queue *q)
  	if (!q->dev)
  		return ret;
  
@@ -189,7 +189,7 @@ index 9b636960d285..5f21bedcb307 100644
  	return ret;
  }
  EXPORT_SYMBOL(blk_pre_runtime_suspend);
-@@ -106,6 +163,9 @@ void blk_post_runtime_suspend(struct request_queue *q, int err)
+@@ -124,6 +181,9 @@ void blk_post_runtime_suspend(struct request_queue *q, int err)
  		pm_runtime_mark_last_busy(q->dev);
  	}
  	spin_unlock_irq(q->queue_lock);
@@ -199,7 +199,7 @@ index 9b636960d285..5f21bedcb307 100644
  }
  EXPORT_SYMBOL(blk_post_runtime_suspend);
  
-@@ -153,13 +213,15 @@ void blk_post_runtime_resume(struct request_queue *q, int err)
+@@ -171,13 +231,15 @@ void blk_post_runtime_resume(struct request_queue *q, int err)
  	spin_lock_irq(q->queue_lock);
  	if (!err) {
  		q->rpm_status = RPM_ACTIVE;
