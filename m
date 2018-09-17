@@ -1,96 +1,142 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-From: Dennis Zhou <dennisszhou@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Josef Bacik <josef@toxicpanda.com>
-Cc: kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-Subject: [PATCH 10/12] blkcg: cleanup and make blk_get_rl use blkg_lookup_create
-Date: Tue, 11 Sep 2018 14:41:35 -0400
-Message-Id: <20180911184137.35897-11-dennisszhou@gmail.com>
-In-Reply-To: <20180911184137.35897-1-dennisszhou@gmail.com>
-References: <20180911184137.35897-1-dennisszhou@gmail.com>
+Return-Path: <aneesh.kumar@linux.ibm.com>
+From: "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
+To: Christophe Leroy <christophe.leroy@c-s.fr>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+        Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>,
+        Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Subject: Re: [PATCH v2 11/24] powerpc/mm: don't use _PAGE_EXEC for calling hash_preload()
+In-Reply-To: <4792a83ab79c6709d010ed4fec3b40242f46df33.1536692743.git.christophe.leroy@c-s.fr>
+References: <cover.1536692743.git.christophe.leroy@c-s.fr> <4792a83ab79c6709d010ed4fec3b40242f46df33.1536692743.git.christophe.leroy@c-s.fr>
+Date: Mon, 17 Sep 2018 13:29:00 +0530
+MIME-Version: 1.0
+Content-Type: text/plain
+Message-Id: <87workh7wb.fsf@linux.ibm.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+Christophe Leroy <christophe.leroy@c-s.fr> writes:
 
-blk_get_rl is responsible for identifying which request_list a request
-should be allocated to. Try get logic was added earlier, but
-semantically the logic was not changed.
+> The 'access' parameter of hash_preload() is either 0 or _PAGE_EXEC.
+> Among the two versions of hash_preload(), only the PPC64 one is
+> doing something with this 'access' parameter.
+>
+> In order to remove the use of _PAGE_EXEC outside platform code,
+> 'access' parameter is replaced by 'is_exec' which will be either
+> true of false, and the PPC64 version of hash_preload() creates
+> the access flag based on 'is_exec'.
+>
 
-This patch makes better use of the bio already having a reference to the
-blkg in the hot path. The cold path uses a better fallback of
-blkg_lookup_create rather than just blkg_lookup and then falling back to
-the q->root_rl. If lookup_create fails with anything but -ENODEV, it
-falls back to q->root_rl.
+Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
 
-A clarifying comment is added to explain why q->root_rl is used rather
-than the root blkg's rl.
-
-Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
-Acked-by: Tejun Heo <tj@kernel.org>
----
- include/linux/blk-cgroup.h | 34 +++++++++++++++++++++-------------
- 1 file changed, 21 insertions(+), 13 deletions(-)
-
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 2951ea3541b1..d2f7f1b00fcf 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -586,28 +586,36 @@ static inline struct request_list *blk_get_rl(struct request_queue *q,
- 
- 	rcu_read_lock();
- 
--	blkcg = bio_blkcg(bio);
--	if (!blkcg)
--		blkcg = css_to_blkcg(blkcg_css());
-+	if (bio && bio->bi_blkg) {
-+		blkcg = bio->bi_blkg->blkcg;
-+		if (blkcg == &blkcg_root)
-+			goto rl_use_root;
-+
-+		blkg_get(bio->bi_blkg);
-+		rcu_read_unlock();
-+		return &bio->bi_blkg->rl;
-+	}
- 
--	/* bypass blkg lookup and use @q->root_rl directly for root */
-+	blkcg = css_to_blkcg(blkcg_css());
- 	if (blkcg == &blkcg_root)
--		goto root_rl;
-+		goto rl_use_root;
- 
--	/*
--	 * Try to use blkg->rl.  blkg lookup may fail under memory pressure
--	 * or if either the blkcg or queue is going away.  Fall back to
--	 * root_rl in such cases.
--	 */
- 	blkg = blkg_lookup(blkcg, q);
- 	if (unlikely(!blkg))
--		goto root_rl;
-+		blkg = __blkg_lookup_create(blkcg, q);
- 
- 	if (!blkg_try_get(blkg))
--		goto root_rl;
-+		goto rl_use_root;
-+
- 	rcu_read_unlock();
- 	return &blkg->rl;
--root_rl:
-+
-+	/*
-+	 * Each blkg has its own request_list, however, the root blkcg
-+	 * uses the request_queue's root_rl.  This is to avoid most
-+	 * overhead for the root blkcg.
-+	 */
-+rl_use_root:
- 	rcu_read_unlock();
- 	return &q->root_rl;
- }
--- 
-2.17.1
+> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+> ---
+>  arch/powerpc/mm/hash_utils_64.c | 3 ++-
+>  arch/powerpc/mm/mem.c           | 9 +++++----
+>  arch/powerpc/mm/mmu_decl.h      | 2 +-
+>  arch/powerpc/mm/pgtable_32.c    | 2 +-
+>  arch/powerpc/mm/ppc_mmu_32.c    | 2 +-
+>  5 files changed, 10 insertions(+), 8 deletions(-)
+>
+> diff --git a/arch/powerpc/mm/hash_utils_64.c b/arch/powerpc/mm/hash_utils_64.c
+> index f23a89d8e4ce..b8ce0e8cc608 100644
+> --- a/arch/powerpc/mm/hash_utils_64.c
+> +++ b/arch/powerpc/mm/hash_utils_64.c
+> @@ -1482,7 +1482,7 @@ static bool should_hash_preload(struct mm_struct *mm, unsigned long ea)
+>  #endif
+>  
+>  void hash_preload(struct mm_struct *mm, unsigned long ea,
+> -		  unsigned long access, unsigned long trap)
+> +		  bool is_exec, unsigned long trap)
+>  {
+>  	int hugepage_shift;
+>  	unsigned long vsid;
+> @@ -1490,6 +1490,7 @@ void hash_preload(struct mm_struct *mm, unsigned long ea,
+>  	pte_t *ptep;
+>  	unsigned long flags;
+>  	int rc, ssize, update_flags = 0;
+> +	unsigned long access = _PAGE_PRESENT | _PAGE_READ | (is_exec ? _PAGE_EXEC : 0);
+>  
+>  	BUG_ON(REGION_ID(ea) != USER_REGION_ID);
+>  
+> diff --git a/arch/powerpc/mm/mem.c b/arch/powerpc/mm/mem.c
+> index 31bd9b53c358..0ba0cdb3f759 100644
+> --- a/arch/powerpc/mm/mem.c
+> +++ b/arch/powerpc/mm/mem.c
+> @@ -507,7 +507,8 @@ void update_mmu_cache(struct vm_area_struct *vma, unsigned long address,
+>  	 * We don't need to worry about _PAGE_PRESENT here because we are
+>  	 * called with either mm->page_table_lock held or ptl lock held
+>  	 */
+> -	unsigned long access, trap;
+> +	unsigned long trap;
+> +	bool is_exec;
+>  
+>  	if (radix_enabled()) {
+>  		prefetch((void *)address);
+> @@ -529,16 +530,16 @@ void update_mmu_cache(struct vm_area_struct *vma, unsigned long address,
+>  	trap = current->thread.regs ? TRAP(current->thread.regs) : 0UL;
+>  	switch (trap) {
+>  	case 0x300:
+> -		access = 0UL;
+> +		is_exec = false;
+>  		break;
+>  	case 0x400:
+> -		access = _PAGE_EXEC;
+> +		is_exec = true;
+>  		break;
+>  	default:
+>  		return;
+>  	}
+>  
+> -	hash_preload(vma->vm_mm, address, access, trap);
+> +	hash_preload(vma->vm_mm, address, is_exec, trap);
+>  #endif /* CONFIG_PPC_STD_MMU */
+>  #if (defined(CONFIG_PPC_BOOK3E_64) || defined(CONFIG_PPC_FSL_BOOK3E)) \
+>  	&& defined(CONFIG_HUGETLB_PAGE)
+> diff --git a/arch/powerpc/mm/mmu_decl.h b/arch/powerpc/mm/mmu_decl.h
+> index e5d779eed181..dd7f9b951d25 100644
+> --- a/arch/powerpc/mm/mmu_decl.h
+> +++ b/arch/powerpc/mm/mmu_decl.h
+> @@ -82,7 +82,7 @@ static inline void _tlbivax_bcast(unsigned long address, unsigned int pid,
+>  #else /* CONFIG_PPC_MMU_NOHASH */
+>  
+>  extern void hash_preload(struct mm_struct *mm, unsigned long ea,
+> -			 unsigned long access, unsigned long trap);
+> +			 bool is_exec, unsigned long trap);
+>  
+>  
+>  extern void _tlbie(unsigned long address);
+> diff --git a/arch/powerpc/mm/pgtable_32.c b/arch/powerpc/mm/pgtable_32.c
+> index 0bbc7b7d8a05..01f348938328 100644
+> --- a/arch/powerpc/mm/pgtable_32.c
+> +++ b/arch/powerpc/mm/pgtable_32.c
+> @@ -261,7 +261,7 @@ static void __init __mapin_ram_chunk(unsigned long offset, unsigned long top)
+>  		map_kernel_page(v, p, ktext ? PAGE_KERNEL_TEXT : PAGE_KERNEL);
+>  #ifdef CONFIG_PPC_STD_MMU_32
+>  		if (ktext)
+> -			hash_preload(&init_mm, v, 0, 0x300);
+> +			hash_preload(&init_mm, v, false, 0x300);
+>  #endif
+>  		v += PAGE_SIZE;
+>  		p += PAGE_SIZE;
+> diff --git a/arch/powerpc/mm/ppc_mmu_32.c b/arch/powerpc/mm/ppc_mmu_32.c
+> index bea6c544e38f..38a793bfca37 100644
+> --- a/arch/powerpc/mm/ppc_mmu_32.c
+> +++ b/arch/powerpc/mm/ppc_mmu_32.c
+> @@ -163,7 +163,7 @@ void __init setbat(int index, unsigned long virt, phys_addr_t phys,
+>   * Preload a translation in the hash table
+>   */
+>  void hash_preload(struct mm_struct *mm, unsigned long ea,
+> -		  unsigned long access, unsigned long trap)
+> +		  bool is_exec, unsigned long trap)
+>  {
+>  	pmd_t *pmd;
+>  
+> -- 
+> 2.13.3
