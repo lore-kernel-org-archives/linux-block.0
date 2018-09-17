@@ -1,123 +1,96 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-From: Dennis Zhou <dennisszhou@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Josef Bacik <josef@toxicpanda.com>
-Cc: kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-Subject: [PATCH 12/12] blkcg: rename blkg_try_get to blkg_tryget
-Date: Thu,  6 Sep 2018 17:10:45 -0400
-Message-Id: <20180906211045.29055-13-dennisszhou@gmail.com>
-In-Reply-To: <20180906211045.29055-1-dennisszhou@gmail.com>
-References: <20180906211045.29055-1-dennisszhou@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:45986 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727835AbeIQKzn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Sep 2018 06:55:43 -0400
+Received: by mail-pf1-f196.google.com with SMTP id i26-v6so6976895pfo.12
+        for <linux-block@vger.kernel.org>; Sun, 16 Sep 2018 22:29:57 -0700 (PDT)
+From: Heiner Litz <hlitz@ucsc.edu>
+To: linux-block@vger.kernel.org, hlitz@ucsc.edu
+Cc: javier@cnexlabs.com, mb@lightnvm.io, igor.j.konopko@intel.com,
+        marcin.dziegielewski@intel.com
+Subject: [RFC PATCH 3/6] lightnvm: pblk: Refactor end_io function in pblk_submit_io_set
+Date: Sun, 16 Sep 2018 22:29:36 -0700
+Message-Id: <20180917052939.4776-4-hlitz@ucsc.edu>
+In-Reply-To: <20180917052939.4776-1-hlitz@ucsc.edu>
+References: <20180917052939.4776-1-hlitz@ucsc.edu>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+In preparation of supporting RAIL, refactor pblk_submit_io_set in the write
+path so that the end_io function can be specified when setting up the
+request.
 
-blkg reference counting now uses percpu_ref rather than atomic_t. Let's
-make this consistent with css_tryget. This renames blkg_try_get to
-blkg_tryget and now returns a bool rather than the blkg or NULL.
-
-Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
-Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Heiner Litz <hlitz@ucsc.edu>
 ---
- block/bio.c                |  2 +-
- block/blk-cgroup.c         |  3 +--
- block/blk-iolatency.c      |  2 +-
- include/linux/blk-cgroup.h | 14 ++++++--------
- 4 files changed, 9 insertions(+), 12 deletions(-)
+ drivers/lightnvm/pblk-write.c | 11 ++++++-----
+ drivers/lightnvm/pblk.h       |  3 ++-
+ 2 files changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 3cc8fcd8b827..bed3328c92ff 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1971,7 +1971,7 @@ int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg)
- {
- 	if (unlikely(bio->bi_blkg))
- 		return -EBUSY;
--	bio->bi_blkg = blkg_try_get_closest(blkg);
-+	bio->bi_blkg = blkg_tryget_closest(blkg);
- 	return 0;
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index 1ce03d7c873b..6eba38b83acd 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -309,7 +309,7 @@ static int pblk_alloc_w_rq(struct pblk *pblk, struct nvm_rq *rqd,
  }
  
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 1efd697c9019..0c9aeb30ba8e 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1793,8 +1793,7 @@ void blkcg_maybe_throttle_current(void)
- 	blkg = blkg_lookup(blkcg, q);
- 	if (!blkg)
- 		goto out;
--	blkg = blkg_try_get(blkg);
--	if (!blkg)
-+	if (!blkg_tryget(blkg))
- 		goto out;
- 	rcu_read_unlock();
+ static int pblk_setup_w_rq(struct pblk *pblk, struct nvm_rq *rqd,
+-			   struct ppa_addr *erase_ppa)
++			   struct ppa_addr *erase_ppa, nvm_end_io_fn(*end_io))
+ {
+ 	struct pblk_line_meta *lm = &pblk->lm;
+ 	struct pblk_line *e_line = pblk_line_get_erase(pblk);
+@@ -325,7 +325,7 @@ static int pblk_setup_w_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 		return -ENOMEM;
+ 	c_ctx->lun_bitmap = lun_bitmap;
  
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 9d7052bad6f7..5a4cec54c998 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -628,7 +628,7 @@ static void blkiolatency_timer_fn(struct timer_list *t)
- 		 * We could be exiting, don't access the pd unless we have a
- 		 * ref on the blkg.
- 		 */
--		if (!blkg_try_get(blkg))
-+		if (!blkg_tryget(blkg))
- 			continue;
- 
- 		iolat = blkg_to_lat(blkg);
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index f8edff271a17..b5bbd9bdf37e 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -494,27 +494,25 @@ static inline void blkg_get(struct blkcg_gq *blkg)
+-	ret = pblk_alloc_w_rq(pblk, rqd, nr_secs, pblk_end_io_write);
++	ret = pblk_alloc_w_rq(pblk, rqd, nr_secs, end_io);
+ 	if (ret) {
+ 		kfree(lun_bitmap);
+ 		return ret;
+@@ -500,7 +500,8 @@ static struct pblk_line *pblk_should_submit_meta_io(struct pblk *pblk,
+ 	return meta_line;
  }
  
- /**
-- * blkg_try_get - try and get a blkg reference
-+ * blkg_tryget - try and get a blkg reference
-  * @blkg: blkg to get
-  *
-  * This is for use when doing an RCU lookup of the blkg.  We may be in the midst
-  * of freeing this blkg, so we can only use it if the refcnt is not zero.
-  */
--static inline struct blkcg_gq *blkg_try_get(struct blkcg_gq *blkg)
-+static inline bool blkg_tryget(struct blkcg_gq *blkg)
+-int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd)
++int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd,
++		       nvm_end_io_fn(*end_io))
  {
--	if (percpu_ref_tryget(&blkg->refcnt))
--		return blkg;
--	return NULL;
-+	return percpu_ref_tryget(&blkg->refcnt);
- }
+ 	struct ppa_addr erase_ppa;
+ 	struct pblk_line *meta_line;
+@@ -509,7 +510,7 @@ int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd)
+ 	pblk_ppa_set_empty(&erase_ppa);
  
- /**
-- * blkg_try_get_closest - try and get a blkg ref on the closet blkg
-+ * blkg_tryget_closest - try and get a blkg ref on the closet blkg
-  * @blkg: blkg to get
-  *
-  * This walks up the blkg tree to find the closest non-dying blkg and returns
-  * the blkg that it did association with as it may not be the passed in blkg.
-  */
--static inline struct blkcg_gq *blkg_try_get_closest(struct blkcg_gq *blkg)
-+static inline struct blkcg_gq *blkg_tryget_closest(struct blkcg_gq *blkg)
- {
- 	while (!percpu_ref_tryget(&blkg->refcnt))
- 		blkg = blkg->parent;
-@@ -599,7 +597,7 @@ static inline struct request_list *blk_get_rl(struct request_queue *q,
- 	if (unlikely(!blkg))
- 		blkg = __blkg_lookup_create(blkcg, q);
+ 	/* Assign lbas to ppas and populate request structure */
+-	err = pblk_setup_w_rq(pblk, rqd, &erase_ppa);
++	err = pblk_setup_w_rq(pblk, rqd, &erase_ppa, end_io);
+ 	if (err) {
+ 		pblk_err(pblk, "could not setup write request: %d\n", err);
+ 		return NVM_IO_ERR;
+@@ -631,7 +632,7 @@ static int pblk_submit_write(struct pblk *pblk)
+ 		goto fail_put_bio;
+ 	}
  
--	if (!blkg_try_get(blkg))
-+	if (!blkg_tryget(blkg))
- 		goto rl_use_root;
+-	if (pblk_submit_io_set(pblk, rqd))
++	if (pblk_submit_io_set(pblk, rqd, pblk_end_io_write))
+ 		goto fail_free_bio;
  
- 	rcu_read_unlock();
+ #ifdef CONFIG_NVM_PBLK_DEBUG
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 87dc24772dad..64d9c206ec52 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -870,7 +870,8 @@ int pblk_write_to_cache(struct pblk *pblk, struct bio *bio,
+ 			unsigned long flags);
+ int pblk_write_gc_to_cache(struct pblk *pblk, struct pblk_gc_rq *gc_rq);
+ void pblk_end_w_fail(struct pblk *pblk, struct nvm_rq *rqd);
+-int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd);
++int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd,
++		       nvm_end_io_fn(*end_io));
+ 
+ /*
+  * pblk map
 -- 
 2.17.1
