@@ -1,86 +1,65 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH V3 04/17] blk-mq: don't reserve tags for admin queue
-Date: Thu, 13 Sep 2018 20:15:33 +0800
-Message-Id: <20180913121546.5710-5-ming.lei@redhat.com>
-In-Reply-To: <20180913121546.5710-1-ming.lei@redhat.com>
-References: <20180913121546.5710-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:36602 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727835AbeIQKzp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Sep 2018 06:55:45 -0400
+Received: by mail-pg1-f193.google.com with SMTP id d1-v6so7096983pgo.3
+        for <linux-block@vger.kernel.org>; Sun, 16 Sep 2018 22:29:59 -0700 (PDT)
+From: Heiner Litz <hlitz@ucsc.edu>
+To: linux-block@vger.kernel.org, hlitz@ucsc.edu
+Cc: javier@cnexlabs.com, mb@lightnvm.io, igor.j.konopko@intel.com,
+        marcin.dziegielewski@intel.com
+Subject: [RFC PATCH 4/6] lightnvm: pblk: Add pblk_submit_io_sem
+Date: Sun, 16 Sep 2018 22:29:37 -0700
+Message-Id: <20180917052939.4776-5-hlitz@ucsc.edu>
+In-Reply-To: <20180917052939.4776-1-hlitz@ucsc.edu>
+References: <20180917052939.4776-1-hlitz@ucsc.edu>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Not necessary to reserve tags for admin queue since there isn't
-many inflight commands in admin queue usually.
+In preparation of supporting RAIL, add a new API pblk_submit_io_sem which
+takes the lun semaphore before submitting the asynchronous request.
 
-This change won't starve admin queue too because each blocked queue
-has equal priority to get one new tag when one driver tag is released,
-no matter it is freed from any queue.
-
-So that IO performance won't be affected after admin queue(shared tags
-with IO queues) is introduced in the following patches.
-
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Adrian Hunter <adrian.hunter@intel.com>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Heiner Litz <hlitz@ucsc.edu>
 ---
- block/blk-mq-tag.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ drivers/lightnvm/pblk-core.c | 11 +++++++++++
+ drivers/lightnvm/pblk.h      |  1 +
+ 2 files changed, 12 insertions(+)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 94e1ed667b6e..7b0390f1c764 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -30,7 +30,8 @@ bool blk_mq_has_free_tags(struct blk_mq_tags *tags)
- bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
- {
- 	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
--	    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
-+	    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
-+	    !blk_queue_admin(hctx->queue))
- 		atomic_inc(&hctx->tags->active_queues);
- 
- 	return true;
-@@ -57,7 +58,8 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
- 	if (!test_and_clear_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
- 		return;
- 
--	atomic_dec(&tags->active_queues);
-+	if (!blk_queue_admin(hctx->queue))
-+		atomic_dec(&tags->active_queues);
- 
- 	blk_mq_tag_wakeup_all(tags, false);
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 2e40666fdf80..a31bf359f905 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -492,6 +492,17 @@ int pblk_submit_io(struct pblk *pblk, struct nvm_rq *rqd)
+ 	return nvm_submit_io(dev, rqd);
  }
-@@ -82,6 +84,12 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
- 	if (bt->sb.depth == 1)
- 		return true;
  
-+	/*
-+	 * Needn't to deal with admin queue specially here even though we
-+	 * don't take it account to tags->active_queues, so blk_queue_admin()
-+	 * can be avoided to check in the fast path, also with implicit benefit
-+	 * of avoiding too many in-flight admin requests
-+	 */
- 	users = atomic_read(&hctx->tags->active_queues);
- 	if (!users)
- 		return true;
++int pblk_submit_io_sem(struct pblk *pblk, struct nvm_rq *rqd)
++{
++	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
++	int ret;
++
++	pblk_down_chunk(pblk, ppa_list[0]);
++	ret = pblk_submit_io(pblk, rqd);
++
++	return ret;
++}
++
+ void pblk_check_chunk_state_update(struct pblk *pblk, struct nvm_rq *rqd)
+ {
+ 	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 64d9c206ec52..bd88784e51d9 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -797,6 +797,7 @@ struct nvm_chk_meta *pblk_chunk_get_off(struct pblk *pblk,
+ void pblk_log_write_err(struct pblk *pblk, struct nvm_rq *rqd);
+ void pblk_log_read_err(struct pblk *pblk, struct nvm_rq *rqd);
+ int pblk_submit_io(struct pblk *pblk, struct nvm_rq *rqd);
++int pblk_submit_io_sem(struct pblk *pblk, struct nvm_rq *rqd);
+ int pblk_submit_io_sync(struct pblk *pblk, struct nvm_rq *rqd);
+ int pblk_submit_io_sync_sem(struct pblk *pblk, struct nvm_rq *rqd);
+ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line);
 -- 
-2.9.5
+2.17.1
