@@ -1,93 +1,127 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Bart van Assche <bvanassche@acm.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <keith.busch@intel.com>,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Hannes Reinecke <hare@suse.de>,
+Return-Path: <bvanassche@acm.org>
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
 	Hannes Reinecke <hare@suse.com>,
-	Minchan Kim <minchan@kernel.org>,
-	Nitin Gupta <ngupta@vflare.org>
-Subject: [PATCH 4/5] zram: register default groups with device_add_disk()
-Date: Fri, 28 Sep 2018 08:17:22 +0200
-Message-Id: <20180928061723.13180-5-hare@suse.de>
-In-Reply-To: <20180928061723.13180-1-hare@suse.de>
-References: <20180928061723.13180-1-hare@suse.de>
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Alan Stern <stern@rowland.harvard.edu>
+Subject: [PATCH v7 3/6] block: Split blk_pm_add_request() and blk_pm_put_request()
+Date: Mon, 17 Sep 2018 13:15:22 -0700
+Message-Id: <20180917201525.26570-4-bvanassche@acm.org>
+In-Reply-To: <20180917201525.26570-1-bvanassche@acm.org>
+References: <20180917201525.26570-1-bvanassche@acm.org>
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Register default sysfs groups during device_add_disk() to avoid a
-race condition with udev during startup.
+Move the pm_request_resume() and pm_runtime_mark_last_busy() calls into
+two new functions and thereby separate legacy block layer code from code
+that works for both the legacy block layer and blk-mq. A later patch will
+add calls to the new functions in the blk-mq code.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-Cc: Minchan Kim <minchan@kernel.org>
-Cc: Nitin Gupta <ngupta@vflare.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Alan Stern <stern@rowland.harvard.edu>
 ---
- drivers/block/zram/zram_drv.c | 28 +++++++---------------------
- 1 file changed, 7 insertions(+), 21 deletions(-)
+ block/blk-core.c |  1 +
+ block/blk-pm.h   | 36 +++++++++++++++++++++++++++++++-----
+ block/elevator.c |  1 +
+ 3 files changed, 33 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index a1d6b5597c17..4879595200e1 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1636,6 +1636,11 @@ static const struct attribute_group zram_disk_attr_group = {
- 	.attrs = zram_disk_attrs,
- };
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 1a691f5269bb..fd91e9bf2893 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1744,6 +1744,7 @@ void __blk_put_request(struct request_queue *q, struct request *req)
  
-+static const struct attribute_group *zram_disk_attr_groups[] = {
-+	&zram_disk_attr_group,
-+	NULL,
-+};
+ 	blk_req_zone_write_unlock(req);
+ 	blk_pm_put_request(req);
++	blk_pm_mark_last_busy(req);
+ 
+ 	elv_completed_request(q, req);
+ 
+diff --git a/block/blk-pm.h b/block/blk-pm.h
+index 1ffc8ef203ec..a8564ea72a41 100644
+--- a/block/blk-pm.h
++++ b/block/blk-pm.h
+@@ -6,8 +6,23 @@
+ #include <linux/pm_runtime.h>
+ 
+ #ifdef CONFIG_PM
++static inline void blk_pm_request_resume(struct request_queue *q)
++{
++	if (q->dev && (q->rpm_status == RPM_SUSPENDED ||
++		       q->rpm_status == RPM_SUSPENDING))
++		pm_request_resume(q->dev);
++}
 +
- /*
-  * Allocate and initialize new zram device. the function returns
-  * '>= 0' device_id upon success, and negative value otherwise.
-@@ -1716,24 +1721,14 @@ static int zram_add(void)
- 
- 	zram->disk->queue->backing_dev_info->capabilities |=
- 			(BDI_CAP_STABLE_WRITES | BDI_CAP_SYNCHRONOUS_IO);
--	add_disk(zram->disk);
--
--	ret = sysfs_create_group(&disk_to_dev(zram->disk)->kobj,
--				&zram_disk_attr_group);
--	if (ret < 0) {
--		pr_err("Error creating sysfs group for device %d\n",
--				device_id);
--		goto out_free_disk;
--	}
-+	device_add_disk(NULL, zram->disk, zram_disk_attr_groups);
++static inline void blk_pm_mark_last_busy(struct request *rq)
++{
++	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
++		pm_runtime_mark_last_busy(rq->q->dev);
++}
 +
- 	strlcpy(zram->compressor, default_compressor, sizeof(zram->compressor));
+ static inline void blk_pm_requeue_request(struct request *rq)
+ {
++	lockdep_assert_held(rq->q->queue_lock);
++
+ 	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
+ 		rq->q->nr_pending--;
+ }
+@@ -15,17 +30,28 @@ static inline void blk_pm_requeue_request(struct request *rq)
+ static inline void blk_pm_add_request(struct request_queue *q,
+ 				      struct request *rq)
+ {
+-	if (q->dev && !(rq->rq_flags & RQF_PM) && q->nr_pending++ == 0 &&
+-	    (q->rpm_status == RPM_SUSPENDED || q->rpm_status == RPM_SUSPENDING))
+-		pm_request_resume(q->dev);
++	lockdep_assert_held(q->queue_lock);
++
++	if (q->dev && !(rq->rq_flags & RQF_PM))
++		q->nr_pending++;
+ }
  
- 	zram_debugfs_register(zram);
- 	pr_info("Added device: %s\n", zram->disk->disk_name);
- 	return device_id;
+ static inline void blk_pm_put_request(struct request *rq)
+ {
+-	if (rq->q->dev && !(rq->rq_flags & RQF_PM) && !--rq->q->nr_pending)
+-		pm_runtime_mark_last_busy(rq->q->dev);
++	lockdep_assert_held(rq->q->queue_lock);
++
++	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
++		--rq->q->nr_pending;
+ }
+ #else
++static inline void blk_pm_request_resume(struct request_queue *q)
++{
++}
++
++static inline void blk_pm_mark_last_busy(struct request *rq)
++{
++}
++
+ static inline void blk_pm_requeue_request(struct request *rq)
+ {
+ }
+diff --git a/block/elevator.c b/block/elevator.c
+index e18ac68626e3..1c992bf6cfb1 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -601,6 +601,7 @@ void __elv_add_request(struct request_queue *q, struct request *rq, int where)
+ 	trace_block_rq_insert(q, rq);
  
--out_free_disk:
--	del_gendisk(zram->disk);
--	put_disk(zram->disk);
- out_free_queue:
- 	blk_cleanup_queue(queue);
- out_free_idr:
-@@ -1762,15 +1757,6 @@ static int zram_remove(struct zram *zram)
- 	mutex_unlock(&bdev->bd_mutex);
+ 	blk_pm_add_request(q, rq);
++	blk_pm_request_resume(q);
  
- 	zram_debugfs_unregister(zram);
--	/*
--	 * Remove sysfs first, so no one will perform a disksize
--	 * store while we destroy the devices. This also helps during
--	 * hot_remove -- zram_reset_device() is the last holder of
--	 * ->init_lock, no later/concurrent disksize_store() or any
--	 * other sysfs handlers are possible.
--	 */
--	sysfs_remove_group(&disk_to_dev(zram->disk)->kobj,
--			&zram_disk_attr_group);
+ 	rq->q = q;
  
- 	/* Make sure all the pending I/O are finished */
- 	fsync_bdev(bdev);
 -- 
-2.16.4
+2.18.0
