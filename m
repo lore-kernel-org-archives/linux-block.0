@@ -10,10 +10,10 @@ Cc: linux-block@vger.kernel.org,
 	Johannes Thumshirn <jthumshirn@suse.de>,
 	Alan Stern <stern@rowland.harvard.edu>
 Subject: [PATCH v7 1/6] block: Move power management code into a new source file
-Date: Mon, 17 Sep 2018 13:15:20 -0700
-Message-Id: <20180917201525.26570-2-bvanassche@acm.org>
-In-Reply-To: <20180917201525.26570-1-bvanassche@acm.org>
-References: <20180917201525.26570-1-bvanassche@acm.org>
+Date: Mon, 17 Sep 2018 13:11:14 -0700
+Message-Id: <20180917201124.26161-2-bvanassche@acm.org>
+In-Reply-To: <20180917201124.26161-1-bvanassche@acm.org>
+References: <20180917201124.26161-1-bvanassche@acm.org>
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
