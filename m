@@ -1,182 +1,126 @@
-Return-Path: <BATV+97b555f176c451e34851+5490+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	linux-block@vger.kernel.org,
-	xen-devel@lists.xen.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 05/13] block: move req_gap_{back,front}_merge to blk-merge.c
-Date: Tue,  4 Sep 2018 12:14:23 -0700
-Message-Id: <20180904191431.20102-6-hch@lst.de>
-In-Reply-To: <20180904191431.20102-1-hch@lst.de>
-References: <20180904191431.20102-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:36161 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727835AbeIQKzl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Sep 2018 06:55:41 -0400
+Received: by mail-pf1-f195.google.com with SMTP id b11-v6so7001762pfo.3
+        for <linux-block@vger.kernel.org>; Sun, 16 Sep 2018 22:29:55 -0700 (PDT)
+From: Heiner Litz <hlitz@ucsc.edu>
+To: linux-block@vger.kernel.org, hlitz@ucsc.edu
+Cc: javier@cnexlabs.com, mb@lightnvm.io, igor.j.konopko@intel.com,
+        marcin.dziegielewski@intel.com
+Subject: [RFC PATCH 2/6] lightnvm: pblk: Add configurable mapping function
+Date: Sun, 16 Sep 2018 22:29:35 -0700
+Message-Id: <20180917052939.4776-3-hlitz@ucsc.edu>
+In-Reply-To: <20180917052939.4776-1-hlitz@ucsc.edu>
+References: <20180917052939.4776-1-hlitz@ucsc.edu>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Keep it close to the actual users instead of exposing the function to all
-drivers.
+In prepartion of supporting RAIL, introduce a new function pointer so that
+different mapping functions can be used to determine sector placement.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Heiner Litz <hlitz@ucsc.edu>
 ---
- block/blk-merge.c      | 65 +++++++++++++++++++++++++++++++++++++++
- include/linux/blkdev.h | 69 ------------------------------------------
- 2 files changed, 65 insertions(+), 69 deletions(-)
+ drivers/lightnvm/pblk-init.c |  2 ++
+ drivers/lightnvm/pblk-map.c  | 18 +++++++++---------
+ drivers/lightnvm/pblk.h      | 13 +++++++++++++
+ 3 files changed, 24 insertions(+), 9 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index aaec38cc37b8..ad8a226347a6 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -12,6 +12,71 @@
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index fb66bc84d5ca..2b9c6ebd9fac 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -411,6 +411,8 @@ static int pblk_core_init(struct pblk *pblk)
+ 	pblk->pad_rst_wa = 0;
+ 	pblk->gc_rst_wa = 0;
  
- #include "blk.h"
++	pblk->map_page = pblk_map_page_data;
++
+ 	atomic64_set(&pblk->nr_flush, 0);
+ 	pblk->nr_flush_rst = 0;
  
-+/*
-+ * Check if the two bvecs from two bios can be merged to one segment.  If yes,
-+ * no need to check gap between the two bios since the 1st bio and the 1st bvec
-+ * in the 2nd bio can be handled in one segment.
-+ */
-+static inline bool bios_segs_mergeable(struct request_queue *q,
-+		struct bio *prev, struct bio_vec *prev_last_bv,
-+		struct bio_vec *next_first_bv)
-+{
-+	if (!BIOVEC_PHYS_MERGEABLE(prev_last_bv, next_first_bv))
-+		return false;
-+	if (!BIOVEC_SEG_BOUNDARY(q, prev_last_bv, next_first_bv))
-+		return false;
-+	if (prev->bi_seg_back_size + next_first_bv->bv_len >
-+			queue_max_segment_size(q))
-+		return false;
-+	return true;
-+}
-+
-+static inline bool bio_will_gap(struct request_queue *q,
-+		struct request *prev_rq, struct bio *prev, struct bio *next)
-+{
-+	struct bio_vec pb, nb;
-+
-+	if (!bio_has_data(prev) || !queue_virt_boundary(q))
-+		return false;
-+
-+	/*
-+	 * Don't merge if the 1st bio starts with non-zero offset, otherwise it
-+	 * is quite difficult to respect the sg gap limit.  We work hard to
-+	 * merge a huge number of small single bios in case of mkfs.
-+	 */
-+	if (prev_rq)
-+		bio_get_first_bvec(prev_rq->bio, &pb);
-+	else
-+		bio_get_first_bvec(prev, &pb);
-+	if (pb.bv_offset)
-+		return true;
-+
-+	/*
-+	 * We don't need to worry about the situation that the merged segment
-+	 * ends in unaligned virt boundary:
-+	 *
-+	 * - if 'pb' ends aligned, the merged segment ends aligned
-+	 * - if 'pb' ends unaligned, the next bio must include
-+	 *   one single bvec of 'nb', otherwise the 'nb' can't
-+	 *   merge with 'pb'
-+	 */
-+	bio_get_last_bvec(prev, &pb);
-+	bio_get_first_bvec(next, &nb);
-+	if (bios_segs_mergeable(q, prev, &pb, &nb))
-+		return false;
-+	return __bvec_gap_to_prev(q, &pb, nb.bv_offset);
-+}
-+
-+static inline bool req_gap_back_merge(struct request *req, struct bio *bio)
-+{
-+	return bio_will_gap(req->q, req, req->biotail, bio);
-+}
-+
-+static inline bool req_gap_front_merge(struct request *req, struct bio *bio)
-+{
-+	return bio_will_gap(req->q, NULL, bio, req->bio);
-+}
-+
- static struct bio *blk_bio_discard_split(struct request_queue *q,
- 					 struct bio *bio,
- 					 struct bio_set *bs,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index bc534c857344..b7e676bb01bc 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1695,75 +1695,6 @@ static inline bool bvec_gap_to_prev(struct request_queue *q,
- 	return __bvec_gap_to_prev(q, bprv, offset);
- }
+diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
+index ff677ca6e4e1..9490601de3a5 100644
+--- a/drivers/lightnvm/pblk-map.c
++++ b/drivers/lightnvm/pblk-map.c
+@@ -18,11 +18,11 @@
  
--/*
-- * Check if the two bvecs from two bios can be merged to one segment.
-- * If yes, no need to check gap between the two bios since the 1st bio
-- * and the 1st bvec in the 2nd bio can be handled in one segment.
-- */
--static inline bool bios_segs_mergeable(struct request_queue *q,
--		struct bio *prev, struct bio_vec *prev_last_bv,
--		struct bio_vec *next_first_bv)
--{
--	if (!BIOVEC_PHYS_MERGEABLE(prev_last_bv, next_first_bv))
--		return false;
--	if (!BIOVEC_SEG_BOUNDARY(q, prev_last_bv, next_first_bv))
--		return false;
--	if (prev->bi_seg_back_size + next_first_bv->bv_len >
--			queue_max_segment_size(q))
--		return false;
--	return true;
--}
--
--static inline bool bio_will_gap(struct request_queue *q,
--				struct request *prev_rq,
--				struct bio *prev,
--				struct bio *next)
--{
--	if (bio_has_data(prev) && queue_virt_boundary(q)) {
--		struct bio_vec pb, nb;
--
--		/*
--		 * don't merge if the 1st bio starts with non-zero
--		 * offset, otherwise it is quite difficult to respect
--		 * sg gap limit. We work hard to merge a huge number of small
--		 * single bios in case of mkfs.
--		 */
--		if (prev_rq)
--			bio_get_first_bvec(prev_rq->bio, &pb);
--		else
--			bio_get_first_bvec(prev, &pb);
--		if (pb.bv_offset)
--			return true;
--
--		/*
--		 * We don't need to worry about the situation that the
--		 * merged segment ends in unaligned virt boundary:
--		 *
--		 * - if 'pb' ends aligned, the merged segment ends aligned
--		 * - if 'pb' ends unaligned, the next bio must include
--		 *   one single bvec of 'nb', otherwise the 'nb' can't
--		 *   merge with 'pb'
--		 */
--		bio_get_last_bvec(prev, &pb);
--		bio_get_first_bvec(next, &nb);
--
--		if (!bios_segs_mergeable(q, prev, &pb, &nb))
--			return __bvec_gap_to_prev(q, &pb, nb.bv_offset);
--	}
--
--	return false;
--}
--
--static inline bool req_gap_back_merge(struct request *req, struct bio *bio)
--{
--	return bio_will_gap(req->q, req, req->biotail, bio);
--}
--
--static inline bool req_gap_front_merge(struct request *req, struct bio *bio)
--{
--	return bio_will_gap(req->q, NULL, bio, req->bio);
--}
--
- int kblockd_schedule_work(struct work_struct *work);
- int kblockd_schedule_work_on(int cpu, struct work_struct *work);
- int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork, unsigned long delay);
+ #include "pblk.h"
+ 
+-static int pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
+-			      struct ppa_addr *ppa_list,
+-			      unsigned long *lun_bitmap,
+-			      struct pblk_sec_meta *meta_list,
+-			      unsigned int valid_secs)
++int pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
++		       struct ppa_addr *ppa_list,
++		       unsigned long *lun_bitmap,
++		       struct pblk_sec_meta *meta_list,
++		       unsigned int valid_secs)
+ {
+ 	struct pblk_line *line = pblk_line_get_data(pblk);
+ 	struct pblk_emeta *emeta;
+@@ -95,8 +95,8 @@ void pblk_map_rq(struct pblk *pblk, struct nvm_rq *rqd, unsigned int sentry,
+ 
+ 	for (i = off; i < rqd->nr_ppas; i += min) {
+ 		map_secs = (i + min > valid_secs) ? (valid_secs % min) : min;
+-		if (pblk_map_page_data(pblk, sentry + i, &ppa_list[i],
+-					lun_bitmap, &meta_list[i], map_secs)) {
++		if (pblk->map_page(pblk, sentry + i, &ppa_list[i], lun_bitmap,
++				   &meta_list[i], map_secs)) {
+ 			bio_put(rqd->bio);
+ 			pblk_free_rqd(pblk, rqd, PBLK_WRITE);
+ 			pblk_pipeline_stop(pblk);
+@@ -121,8 +121,8 @@ void pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 
+ 	for (i = 0; i < rqd->nr_ppas; i += min) {
+ 		map_secs = (i + min > valid_secs) ? (valid_secs % min) : min;
+-		if (pblk_map_page_data(pblk, sentry + i, &ppa_list[i],
+-					lun_bitmap, &meta_list[i], map_secs)) {
++		if (pblk->map_page(pblk, sentry + i, &ppa_list[i], lun_bitmap,
++				   &meta_list[i], map_secs)) {
+ 			bio_put(rqd->bio);
+ 			pblk_free_rqd(pblk, rqd, PBLK_WRITE);
+ 			pblk_pipeline_stop(pblk);
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index eab50df70ae6..87dc24772dad 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -604,6 +604,12 @@ struct pblk_addrf {
+ 	int sec_ws_stripe;
+ };
+ 
++typedef int (pblk_map_page_fn)(struct pblk *pblk, unsigned int sentry,
++			       struct ppa_addr *ppa_list,
++			       unsigned long *lun_bitmap,
++			       struct pblk_sec_meta *meta_list,
++			       unsigned int valid_secs);
++
+ struct pblk {
+ 	struct nvm_tgt_dev *dev;
+ 	struct gendisk *disk;
+@@ -709,6 +715,8 @@ struct pblk {
+ 	struct timer_list wtimer;
+ 
+ 	struct pblk_gc gc;
++
++	pblk_map_page_fn *map_page;
+ };
+ 
+ struct pblk_line_ws {
+@@ -873,6 +881,11 @@ void pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ void pblk_map_rq(struct pblk *pblk, struct nvm_rq *rqd, unsigned int sentry,
+ 		 unsigned long *lun_bitmap, unsigned int valid_secs,
+ 		 unsigned int off);
++int pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
++		       struct ppa_addr *ppa_list,
++		       unsigned long *lun_bitmap,
++		       struct pblk_sec_meta *meta_list,
++		       unsigned int valid_secs);
+ 
+ /*
+  * pblk write thread
 -- 
-2.18.0
+2.17.1
