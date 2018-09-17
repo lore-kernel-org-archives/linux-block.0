@@ -9,9 +9,9 @@ Cc: linux-block@vger.kernel.org,
 	Hannes Reinecke <hare@suse.com>,
 	Johannes Thumshirn <jthumshirn@suse.de>,
 	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v7 7/7] blk-mq: Enable support for runtime power management
-Date: Mon, 17 Sep 2018 13:11:24 -0700
-Message-Id: <20180917201124.26161-12-bvanassche@acm.org>
+Subject: [PATCH v7 6/6] blk-mq: Enable support for runtime power management
+Date: Mon, 17 Sep 2018 13:11:22 -0700
+Message-Id: <20180917201124.26161-10-bvanassche@acm.org>
 In-Reply-To: <20180917201124.26161-1-bvanassche@acm.org>
 References: <20180917201124.26161-1-bvanassche@acm.org>
 MIME-Version: 1.0
@@ -54,7 +54,7 @@ index 85a1c1a59c72..20fdd78b75c7 100644
  		blk_mq_put_tag(hctx, hctx->tags, ctx, rq->tag);
  	if (sched_tag != -1)
 diff --git a/block/blk-pm.c b/block/blk-pm.c
-index 1f3504775af3..3a15e0fd1f2e 100644
+index 5f21bedcb307..04184ff8b182 100644
 --- a/block/blk-pm.c
 +++ b/block/blk-pm.c
 @@ -30,12 +30,6 @@
