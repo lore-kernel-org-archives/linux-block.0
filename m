@@ -1,137 +1,106 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-From: Dennis Zhou <dennisszhou@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Josef Bacik <josef@toxicpanda.com>
-Cc: kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-Subject: [PATCH 05/12] blkcg: consolidate bio_issue_init to be a part of core
-Date: Tue, 11 Sep 2018 14:41:30 -0400
-Message-Id: <20180911184137.35897-6-dennisszhou@gmail.com>
-In-Reply-To: <20180911184137.35897-1-dennisszhou@gmail.com>
-References: <20180911184137.35897-1-dennisszhou@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:35178 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726073AbeIQKzi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Sep 2018 06:55:38 -0400
+Received: by mail-pl1-f196.google.com with SMTP id g2-v6so6853681plo.2
+        for <linux-block@vger.kernel.org>; Sun, 16 Sep 2018 22:29:53 -0700 (PDT)
+From: Heiner Litz <hlitz@ucsc.edu>
+To: linux-block@vger.kernel.org, hlitz@ucsc.edu
+Cc: javier@cnexlabs.com, mb@lightnvm.io, igor.j.konopko@intel.com,
+        marcin.dziegielewski@intel.com
+Subject: [RFC PATCH 1/6] lightnvm: pblk: refactor read and write APIs
+Date: Sun, 16 Sep 2018 22:29:34 -0700
+Message-Id: <20180917052939.4776-2-hlitz@ucsc.edu>
+In-Reply-To: <20180917052939.4776-1-hlitz@ucsc.edu>
+References: <20180917052939.4776-1-hlitz@ucsc.edu>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+In prepartion of supporting RAIL, expose read and write APIs so their
+functionality can be leveraged by RAIL.
 
-bio_issue_init among other things initializes the timestamp for an IO.
-Rather than have this logic handled by policies, this consolidates it to
-be on the init paths (normal, clone, bounce clone).
-
-Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
-Acked-by: Tejun Heo <tj@kernel.org>
-Reviewed-by: Liu Bo <bo.liu@linux.alibaba.com>
+Signed-off-by: Heiner Litz <hlitz@ucsc.edu>
 ---
- block/bio.c                | 2 ++
- block/blk-iolatency.c      | 2 --
- block/blk-throttle.c       | 8 --------
- block/bounce.c             | 2 ++
- include/linux/blk-cgroup.h | 9 +++++++++
- 5 files changed, 13 insertions(+), 10 deletions(-)
+ drivers/lightnvm/pblk-read.c  | 8 +++-----
+ drivers/lightnvm/pblk-write.c | 4 ++--
+ drivers/lightnvm/pblk.h       | 7 +++++++
+ 3 files changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 97c1c4bf8df6..1d28d7ad2342 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -610,6 +610,8 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
- 	bio->bi_io_vec = bio_src->bi_io_vec;
- 
- 	bio_clone_blkcg_association(bio, bio_src);
-+
-+	blkcg_bio_issue_init(bio);
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index 6d13763f2f6a..67d44caefff4 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -170,8 +170,7 @@ static void pblk_end_user_read(struct bio *bio)
+ 	bio_endio(bio);
  }
- EXPORT_SYMBOL(__bio_clone_fast);
  
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 79a7549e2062..9d7052bad6f7 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -401,8 +401,6 @@ static void blkcg_iolatency_throttle(struct rq_qos *rqos, struct bio *bio,
- 	if (!blk_iolatency_enabled(blkiolat))
- 		return;
- 
--	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
--
- 	while (blkg && blkg->parent) {
- 		struct iolatency_grp *iolat = blkg_to_lat(blkg);
- 		if (!iolat) {
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index b7b5cc4defc2..f2b355338894 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2126,13 +2126,6 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
- }
- #endif
- 
--static void blk_throtl_assoc_bio(struct throtl_grp *tg, struct bio *bio)
--{
--#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
--	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
--#endif
--}
--
- bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 		    struct bio *bio)
+-static void __pblk_end_io_read(struct pblk *pblk, struct nvm_rq *rqd,
+-			       bool put_line)
++void __pblk_end_io_read(struct pblk *pblk, struct nvm_rq *rqd, bool put_line)
  {
-@@ -2156,7 +2149,6 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 	if (unlikely(blk_queue_bypass(q)))
- 		goto out_unlock;
- 
--	blk_throtl_assoc_bio(tg, bio);
- 	blk_throtl_update_idletime(tg);
- 
- 	sq = &tg->service_queue;
-diff --git a/block/bounce.c b/block/bounce.c
-index bc63b3a2d18c..7a08703b1204 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -259,6 +259,8 @@ static struct bio *bounce_clone_bio(struct bio *bio_src, gfp_t gfp_mask,
- 
- 	bio_clone_blkcg_association(bio, bio_src);
- 
-+	blkcg_bio_issue_init(bio);
-+
- 	return bio;
+ 	struct nvm_tgt_dev *dev = pblk->dev;
+ 	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
+@@ -285,10 +284,9 @@ static void pblk_end_partial_read(struct nvm_rq *rqd)
+ 	__pblk_end_io_read(pblk, rqd, false);
  }
  
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 6e33ad1d92b4..a6b6e741a75e 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -897,6 +897,12 @@ static inline bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg
- 				  struct bio *bio) { return false; }
- #endif
- 
-+
-+static inline void blkcg_bio_issue_init(struct bio *bio)
-+{
-+	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
-+}
-+
- static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 					 struct bio *bio)
+-static int pblk_setup_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
++int pblk_setup_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
+ 			    unsigned int bio_init_idx,
+-			    unsigned long *read_bitmap,
+-			    int nr_holes)
++			    unsigned long *read_bitmap, int nr_holes)
  {
-@@ -922,6 +928,8 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 		blkg_rwstat_add(&blkg->stat_ios, bio->bi_opf, 1);
- 	}
- 
-+	blkcg_bio_issue_init(bio);
-+
- 	rcu_read_unlock();
- 	return !throtl;
+ 	struct pblk_sec_meta *meta_list = rqd->meta_list;
+ 	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index 9554febee480..1ce03d7c873b 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -217,7 +217,7 @@ static void pblk_submit_rec(struct work_struct *work)
  }
-@@ -1034,6 +1042,7 @@ static inline void blk_put_rl(struct request_list *rl) { }
- static inline void blk_rq_set_rl(struct request *rq, struct request_list *rl) { }
- static inline struct request_list *blk_rq_rl(struct request *rq) { return &rq->q->root_rl; }
  
-+static inline void blkcg_bio_issue_init(struct bio *bio) { }
- static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 					 struct bio *bio) { return true; }
  
+-static void pblk_end_w_fail(struct pblk *pblk, struct nvm_rq *rqd)
++void pblk_end_w_fail(struct pblk *pblk, struct nvm_rq *rqd)
+ {
+ 	struct pblk_rec_ctx *recovery;
+ 
+@@ -500,7 +500,7 @@ static struct pblk_line *pblk_should_submit_meta_io(struct pblk *pblk,
+ 	return meta_line;
+ }
+ 
+-static int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd)
++int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd)
+ {
+ 	struct ppa_addr erase_ppa;
+ 	struct pblk_line *meta_line;
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 3596043332f2..eab50df70ae6 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -861,6 +861,8 @@ void pblk_lookup_l2p_seq(struct pblk *pblk, struct ppa_addr *ppas,
+ int pblk_write_to_cache(struct pblk *pblk, struct bio *bio,
+ 			unsigned long flags);
+ int pblk_write_gc_to_cache(struct pblk *pblk, struct pblk_gc_rq *gc_rq);
++void pblk_end_w_fail(struct pblk *pblk, struct nvm_rq *rqd);
++int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd);
+ 
+ /*
+  * pblk map
+@@ -886,6 +888,11 @@ void pblk_write_kick(struct pblk *pblk);
+ extern struct bio_set pblk_bio_set;
+ int pblk_submit_read(struct pblk *pblk, struct bio *bio);
+ int pblk_submit_read_gc(struct pblk *pblk, struct pblk_gc_rq *gc_rq);
++void __pblk_end_io_read(struct pblk *pblk, struct nvm_rq *rqd, bool put_line);
++int pblk_setup_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
++			    unsigned int bio_init_idx,
++			    unsigned long *read_bitmap, int nr_holes);
++
+ /*
+  * pblk recovery
+  */
 -- 
 2.17.1
