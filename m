@@ -1,158 +1,74 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:37122 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727187AbeI0RzF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Sep 2018 13:55:05 -0400
-From: Jan Kara <jack@suse.cz>
+Return-Path: <bvanassche@acm.org>
+From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH 09/14] loop: Push loop_ctl_mutex down to loop_set_status()
-Date: Thu, 27 Sep 2018 13:36:47 +0200
-Message-Id: <20180927113652.5422-10-jack@suse.cz>
-In-Reply-To: <20180927113652.5422-1-jack@suse.cz>
-References: <20180927113652.5422-1-jack@suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Ming Lei <ming.lei@redhat.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Alan Stern <stern@rowland.harvard.edu>
+Subject: [PATCH v7 6/6] blk-mq: Enable support for runtime power management
+Date: Mon, 17 Sep 2018 13:15:25 -0700
+Message-Id: <20180917201525.26570-7-bvanassche@acm.org>
+In-Reply-To: <20180917201525.26570-1-bvanassche@acm.org>
+References: <20180917201525.26570-1-bvanassche@acm.org>
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-Push loop_ctl_mutex down to loop_set_status(). We will need this to be
-able to call loop_reread_partitions() without loop_ctl_mutex.
+Now that the blk-mq core processes power management requests
+(marked with RQF_PREEMPT) in other states than RPM_ACTIVE, enable
+runtime power management for blk-mq.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Alan Stern <stern@rowland.harvard.edu>
 ---
- drivers/block/loop.c | 51 +++++++++++++++++++++++++--------------------------
- 1 file changed, 25 insertions(+), 26 deletions(-)
+ block/blk-mq.c | 2 ++
+ block/blk-pm.c | 6 ------
+ 2 files changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 577d5e5a9312..1cc29bd77d67 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1142,46 +1142,55 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	struct loop_func_table *xfer;
- 	kuid_t uid = current_uid();
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 85a1c1a59c72..20fdd78b75c7 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -33,6 +33,7 @@
+ #include "blk-mq.h"
+ #include "blk-mq-debugfs.h"
+ #include "blk-mq-tag.h"
++#include "blk-pm.h"
+ #include "blk-stat.h"
+ #include "blk-mq-sched.h"
+ #include "blk-rq-qos.h"
+@@ -475,6 +476,7 @@ static void __blk_mq_free_request(struct request *rq)
+ 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, ctx->cpu);
+ 	const int sched_tag = rq->internal_tag;
  
-+	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+	if (err)
-+		return err;
- 	if (lo->lo_encrypt_key_size &&
- 	    !uid_eq(lo->lo_key_owner, uid) &&
--	    !capable(CAP_SYS_ADMIN))
--		return -EPERM;
--	if (lo->lo_state != Lo_bound)
--		return -ENXIO;
--	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE)
--		return -EINVAL;
-+	    !capable(CAP_SYS_ADMIN)) {
-+		err = -EPERM;
-+		goto out_unlock;
-+	}
-+	if (lo->lo_state != Lo_bound) {
-+		err = -ENXIO;
-+		goto out_unlock;
-+	}
-+	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE) {
-+		err = -EINVAL;
-+		goto out_unlock;
-+	}
- 
- 	/* I/O need to be drained during transfer transition */
- 	blk_mq_freeze_queue(lo->lo_queue);
- 
- 	err = loop_release_xfer(lo);
- 	if (err)
--		goto exit;
-+		goto out_unfreeze;
- 
- 	if (info->lo_encrypt_type) {
- 		unsigned int type = info->lo_encrypt_type;
- 
- 		if (type >= MAX_LO_CRYPT) {
- 			err = -EINVAL;
--			goto exit;
-+			goto out_unfreeze;
- 		}
- 		xfer = xfer_funcs[type];
- 		if (xfer == NULL) {
- 			err = -EINVAL;
--			goto exit;
-+			goto out_unfreeze;
- 		}
- 	} else
- 		xfer = NULL;
- 
- 	err = loop_init_xfer(lo, xfer, info);
- 	if (err)
--		goto exit;
-+		goto out_unfreeze;
- 
- 	if (lo->lo_offset != info->lo_offset ||
- 	    lo->lo_sizelimit != info->lo_sizelimit) {
- 		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit)) {
- 			err = -EFBIG;
--			goto exit;
-+			goto out_unfreeze;
- 		}
- 	}
- 
-@@ -1213,7 +1222,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	/* update dio if lo_offset or transfer is changed */
- 	__loop_update_dio(lo, lo->use_dio);
- 
-- exit:
-+out_unfreeze:
- 	blk_mq_unfreeze_queue(lo->lo_queue);
- 
- 	if (!err && (info->lo_flags & LO_FLAGS_PARTSCAN) &&
-@@ -1222,6 +1231,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 		lo->lo_disk->flags &= ~GENHD_FL_NO_PART_SCAN;
- 		loop_reread_partitions(lo, lo->lo_device);
- 	}
-+out_unlock:
-+	mutex_unlock(&loop_ctl_mutex);
- 
- 	return err;
- }
-@@ -1468,12 +1479,8 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 	case LOOP_SET_STATUS:
- 		err = -EPERM;
- 		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
--			err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
--			if (err)
--				return err;
- 			err = loop_set_status_old(lo,
- 					(struct loop_info __user *)arg);
--			mutex_unlock(&loop_ctl_mutex);
- 		}
- 		break;
- 	case LOOP_GET_STATUS:
-@@ -1481,12 +1488,8 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 	case LOOP_SET_STATUS64:
- 		err = -EPERM;
- 		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
--			err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
--			if (err)
--				return err;
- 			err = loop_set_status64(lo,
- 					(struct loop_info64 __user *) arg);
--			mutex_unlock(&loop_ctl_mutex);
- 		}
- 		break;
- 	case LOOP_GET_STATUS64:
-@@ -1631,12 +1634,8 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
- 
- 	switch(cmd) {
- 	case LOOP_SET_STATUS:
--		err = mutex_lock_killable(&loop_ctl_mutex);
--		if (!err) {
--			err = loop_set_status_compat(lo,
--						     (const struct compat_loop_info __user *)arg);
--			mutex_unlock(&loop_ctl_mutex);
--		}
-+		err = loop_set_status_compat(lo,
-+			     (const struct compat_loop_info __user *)arg);
- 		break;
- 	case LOOP_GET_STATUS:
- 		err = loop_get_status_compat(lo,
++	blk_pm_mark_last_busy(rq);
+ 	if (rq->tag != -1)
+ 		blk_mq_put_tag(hctx, hctx->tags, ctx, rq->tag);
+ 	if (sched_tag != -1)
+diff --git a/block/blk-pm.c b/block/blk-pm.c
+index 5f21bedcb307..04184ff8b182 100644
+--- a/block/blk-pm.c
++++ b/block/blk-pm.c
+@@ -30,12 +30,6 @@
+  */
+ void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
+ {
+-	/* Don't enable runtime PM for blk-mq until it is ready */
+-	if (q->mq_ops) {
+-		pm_runtime_disable(dev);
+-		return;
+-	}
+-
+ 	q->dev = dev;
+ 	q->rpm_status = RPM_ACTIVE;
+ 	pm_runtime_set_autosuspend_delay(q->dev, -1);
 -- 
-2.16.4
+2.18.0
