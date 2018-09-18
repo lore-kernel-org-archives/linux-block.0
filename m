@@ -1,69 +1,51 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-Date: Thu, 6 Sep 2018 16:43:06 -0400
-From: Dennis Zhou <dennisszhou@gmail.com>
-To: Josef Bacik <josef@toxicpanda.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>, kernel-team@fb.com,
-	linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 07/15] blkcg: consolidate bio_issue_init and blkg
- association
-Message-ID: <20180906204305.GB26048@dennisz-mbp.dhcp.thefacebook.com>
-References: <20180831015356.69796-1-dennisszhou@gmail.com>
- <20180831015356.69796-8-dennisszhou@gmail.com>
- <20180831154225.zoiztxvdvcfaat5r@destiny>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:34782 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729250AbeIROIz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Sep 2018 10:08:55 -0400
+Received: by mail-ed1-f68.google.com with SMTP id u1-v6so1207339eds.1
+        for <linux-block@vger.kernel.org>; Tue, 18 Sep 2018 01:37:20 -0700 (PDT)
+Subject: Re: [PATCH 0/4] lightnvm: pblk: fixes for read buffer
+To: javier@javigon.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        javier@cnexlabs.com
+References: <1537257785-31630-1-git-send-email-javier@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <4b97830b-61c9-302d-5882-1ac51a94ea16@lightnvm.io>
+Date: Tue, 18 Sep 2018 10:37:17 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180831154225.zoiztxvdvcfaat5r@destiny>
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <1537257785-31630-1-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Fri, Aug 31, 2018 at 11:42:26AM -0400, Josef Bacik wrote:
-> On Thu, Aug 30, 2018 at 09:53:48PM -0400, Dennis Zhou wrote:
-> > diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-> > index 22b2ff0440cc..9d7052bad6f7 100644
-> > --- a/block/blk-iolatency.c
-> > +++ b/block/blk-iolatency.c
-> > @@ -395,34 +395,12 @@ static void blkcg_iolatency_throttle(struct rq_qos *rqos, struct bio *bio,
-> >  				     spinlock_t *lock)
-> >  {
-> >  	struct blk_iolatency *blkiolat = BLKIOLATENCY(rqos);
-> > -	struct blkcg *blkcg;
-> > -	struct blkcg_gq *blkg;
-> > -	struct request_queue *q = rqos->q;
-> > +	struct blkcg_gq *blkg = bio->bi_blkg;
-> >  	bool issue_as_root = bio_issue_as_root_blkg(bio);
-> >  
-> >  	if (!blk_iolatency_enabled(blkiolat))
-> >  		return;
-> >  
-> > -	rcu_read_lock();
-> > -	bio_associate_blkcg(bio, NULL);
-> > -	blkcg = bio_blkcg(bio);
-> > -	blkg = blkg_lookup(blkcg, q);
-> > -	if (unlikely(!blkg)) {
-> > -		if (!lock)
-> > -			spin_lock_irq(q->queue_lock);
-> > -		blkg = __blkg_lookup_create(blkcg, q);
-> > -		if (IS_ERR(blkg))
-> > -			blkg = NULL;
-> > -		if (!lock)
-> > -			spin_unlock_irq(q->queue_lock);
-> > -	}
-> > -	if (!blkg)
-> > -		goto out;
-> > -
-> > -	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
-> > -	bio_associate_blkg(bio, blkg);
-> > -out:
-> > -	rcu_read_unlock();
+On 09/18/2018 10:03 AM, Javier González wrote:
+> This patchet's main motivation is to account for a corner case in which
+> the read constrains imposed by the device are not respected by pblk. In
+> the process, it also refactors parts of the read ring buffer to simplify
+> creation/deletion operations and improve readability.
 > 
-> Move this removal to the previous patch, so you keep this patch soley about the
-> bio_issue_init.  Thanks,
+> Note that the checkpatch warnings on missing comments for memory
+> barriers are false positives.
+> 
+> The code is also available in the for-4.20/pblk branch in the OCSSD github
+> project.
+> 
+> Thanks,
+> Javier
+> 
+> Javier González (4):
+>    lightnvm: pblk: remove unused function
+>    lightnvm: pblk: encapsulate rb pointer operations
+>    lightnvm: pblk: move ring buffer alloc/free rb init
+>    lightnvm: pblk: guarantee mw_cunits on read buffer
+> 
+>   drivers/lightnvm/pblk-init.c  |  21 +++------
+>   drivers/lightnvm/pblk-rb.c    | 100 +++++++++++++++++++-----------------------
+>   drivers/lightnvm/pblk-write.c |   7 +--
+>   drivers/lightnvm/pblk.h       |  11 ++---
+>   4 files changed, 57 insertions(+), 82 deletions(-)
 > 
 
-I've moved this removal to the previous patch and addressed the kbuild
-errors.
-
-Thanks,
-Dennis
+Applied for 4.20.
