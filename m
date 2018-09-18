@@ -1,8 +1,8 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59850 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:45452 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726768AbeIRPwN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Sep 2018 11:52:13 -0400
+        id S1726768AbeIRPpe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Sep 2018 11:45:34 -0400
 From: Ming Lei <ming.lei@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: Ming Lei <ming.lei@redhat.com>, Tejun Heo <tj@kernel.org>,
@@ -10,11 +10,11 @@ Cc: Ming Lei <ming.lei@redhat.com>, Tejun Heo <tj@kernel.org>,
         Kent Overstreet <kent.overstreet@gmail.com>,
         linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         linux-nvme@lists.infradead.org, Keith Busch <keith.busch@intel.com>
-Subject: [PATCH 4/4] nvme: don't drain IO in nvme_reset_work()
-Date: Tue, 18 Sep 2018 18:19:46 +0800
-Message-Id: <20180918101946.13329-5-ming.lei@redhat.com>
-In-Reply-To: <20180918101946.13329-1-ming.lei@redhat.com>
-References: <20180918101946.13329-1-ming.lei@redhat.com>
+Subject: [PATCH 3/3] nvme: don't drain IO in nvme_reset_work()
+Date: Tue, 18 Sep 2018 18:13:10 +0800
+Message-Id: <20180918101310.13154-4-ming.lei@redhat.com>
+In-Reply-To: <20180918101310.13154-1-ming.lei@redhat.com>
+References: <20180918101310.13154-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
