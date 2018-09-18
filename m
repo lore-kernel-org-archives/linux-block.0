@@ -1,101 +1,159 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0067.outbound.protection.outlook.com ([104.47.41.67]:52939
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725866AbeICNhv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 3 Sep 2018 09:37:51 -0400
-From: Javier Gonzalez <javier@cnexlabs.com>
-To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: Re: [PATCH 0/4] lightnvm: pblk: add support for chunk metadata on
- erase
-Date: Mon, 3 Sep 2018 09:16:53 +0000
-Message-ID: <7FBEB635-C943-484D-A970-D3BF870BAFFB@cnexlabs.com>
-References: <1535722477-31288-1-git-send-email-javier@cnexlabs.com>
- <71f5f8b3-66d5-a0e0-85ab-cb22e5ac621c@lightnvm.io>
-In-Reply-To: <71f5f8b3-66d5-a0e0-85ab-cb22e5ac621c@lightnvm.io>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_9BF0F591-CAF6-46DC-B708-61CA4FCDACEB";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha512
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:37034 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727317AbeIRNen (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Sep 2018 09:34:43 -0400
+Received: by mail-ed1-f66.google.com with SMTP id a20-v6so1119274edd.4
+        for <linux-block@vger.kernel.org>; Tue, 18 Sep 2018 01:03:15 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 2/4] lightnvm: pblk: encapsulate rb pointer operations
+Date: Tue, 18 Sep 2018 10:03:03 +0200
+Message-Id: <1537257785-31630-3-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1537257785-31630-1-git-send-email-javier@cnexlabs.com>
+References: <1537257785-31630-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
---Apple-Mail=_9BF0F591-CAF6-46DC-B708-61CA4FCDACEB
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+pblk's read/write buffer is always a power-of-2, thus wrapping up the
+buffer can be done with a bit mask. Since this is an implementation
+detail internal to the write buffer, make a helper that hides pointer
+increment + wrap, and allows to  transparently relax this assumption in
+the future.
 
-> On 31 Aug 2018, at 15.57, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
->=20
-> On 08/31/2018 03:34 PM, Javier Gonz=C3=A1lez wrote:
->> Matias,
->> This patchset implements support for retrieving chunk metadata when
->> submitting a reset/erase command. Patches 0 and 1 are small fixes =
-that
->> can be directly merged into your patch:
->>      lightnvm: move bad block and chunk state logic to core
->> Also, note that these do not apply on top of your for-4.20/core due =
-them
->> depending on patches that I sent before that you have not picked up =
-yet.
->> You can see them though in for-4.20/pblk. I'll rebase as patches in =
-the
->> list appear in your tree.
->=20
-> Thanks. It is really confusing when you guys maintains an implicit =
-order and posts the patches separately. I will appreciate that patches =
-that are related are posted together, such that I don't have to manually =
-track what comes before another. That makes it less of a pain for me to =
-keep track of and we can keep the reviews together.
->=20
-> This is the patches that I have in the pipeline (from before the =
-e-mails from today):
->=20
->  - This serie - Pending review
->  - Serie: pblk: support variable OOB size - Waiting on review from =
-Igor
->  - lightnvm: pblk: recover open lines on 2.0 devices. Which doesn't =
-apply due to the fixes to the pad distance patch.
->=20
+Signed-off-by: Javier González <javier@cnexlabs.com>
+---
+ drivers/lightnvm/pblk-rb.c    | 21 +++++++++++++--------
+ drivers/lightnvm/pblk-write.c |  7 ++-----
+ drivers/lightnvm/pblk.h       |  2 ++
+ 3 files changed, 17 insertions(+), 13 deletions(-)
 
-Yes, I know and I apologize - we should have a better flow. What do you
-say that for windows like this, where we have a number of patches that
-have dependencies that we post them in meaningful patchsets and point to
-a branch where they are ordered, like in a PR? Then we can rebase and
-propagate changes properly?
-
-For this window, I'll rebase the rest of the patches in for-4.20/pblk on
-top of your for-4.20/core, then we can propagate changes as they come.
-
-Javier
-
---Apple-Mail=_9BF0F591-CAF6-46DC-B708-61CA4FCDACEB
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAluM/AIACgkQIX4xUKFR
-nnSPlw/+LWvj9fJ0ivtsAUDOw6HK29PlpTwm16Pk6L0RComF25n2l/kTitrm9D2M
-h1JpGMk8I9x2aq4cmrqJ+dL5AUPNYzhUyWQVMiTuBJpoa3SxSO62+pxW67K59g3C
-xj0HRHl6UNfYXbp0is1OkqlDsTgDqfe7kp6tQhUjR48BhC4r/BDNZSJMe8lor4nQ
-YWDT57j++hoiguVNpb/TRIuTFw2eUkTX1hVH2nuCoUluLcGU0koxxZTby+501ewJ
-44AUyUSWqVaCV5w9+L/yonAn41pzOrxGkMZXVVd75zHzVjS22bX6i/q5oh7U6YuT
-saaQKB3JI3J6Czal61t/Aol2eNxmV/S4LH0R09X+bawTToHkZKnth1PUl9mzKroW
-6U9eYPd9PVhCB64aNKwGaNBtfYs42XJYcPY0/G+bu77tNMFPop1EcEp05Magnl0I
-ZTISZMijT6wnk+KGYW6ci9+mRw3/Krt9N1NFtkkzHB6e9JjbSA4h5j1mV0RVfBLN
-jcQyk0QKUyhoL9liwCxLzz4BPE2bNqKhvpupy1o8maMirTWU/O1ECZmrt2jbx6MQ
-0RbYoWpgfKV2fafB93iQ+t7A/FjNKQP91bAqJkQWegUsEzxBF3uz6tPgprizUGcj
-rb80G/FeeYh+6X61cUGTkxoluyPGXuxK2LVHDjBK4Fj4w97E5vw=
-=VjXM
------END PGP SIGNATURE-----
-
---Apple-Mail=_9BF0F591-CAF6-46DC-B708-61CA4FCDACEB--
+diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+index 82829e8151db..e46d8cb9d28b 100644
+--- a/drivers/lightnvm/pblk-rb.c
++++ b/drivers/lightnvm/pblk-rb.c
+@@ -169,6 +169,12 @@ static unsigned int pblk_rb_space(struct pblk_rb *rb)
+ 	return pblk_rb_ring_space(rb, mem, sync, rb->nr_entries);
+ }
+ 
++unsigned int pblk_rb_ptr_wrap(struct pblk_rb *rb, unsigned int p,
++			      unsigned int nr_entries)
++{
++	return (p + nr_entries) & (rb->nr_entries - 1);
++}
++
+ /*
+  * Buffer count is calculated with respect to the submission entry signaling the
+  * entries that are available to send to the media
+@@ -195,8 +201,7 @@ unsigned int pblk_rb_read_commit(struct pblk_rb *rb, unsigned int nr_entries)
+ 
+ 	subm = READ_ONCE(rb->subm);
+ 	/* Commit read means updating submission pointer */
+-	smp_store_release(&rb->subm,
+-				(subm + nr_entries) & (rb->nr_entries - 1));
++	smp_store_release(&rb->subm, pblk_rb_ptr_wrap(rb, subm, nr_entries));
+ 
+ 	return subm;
+ }
+@@ -229,7 +234,7 @@ static int __pblk_rb_update_l2p(struct pblk_rb *rb, unsigned int to_update)
+ 		line = pblk_ppa_to_line(pblk, w_ctx->ppa);
+ 		kref_put(&line->ref, pblk_line_put);
+ 		clean_wctx(w_ctx);
+-		rb->l2p_update = (rb->l2p_update + 1) & (rb->nr_entries - 1);
++		rb->l2p_update = pblk_rb_ptr_wrap(rb, rb->l2p_update, 1);
+ 	}
+ 
+ 	pblk_rl_out(&pblk->rl, user_io, gc_io);
+@@ -408,7 +413,7 @@ static int pblk_rb_may_write(struct pblk_rb *rb, unsigned int nr_entries,
+ 		return 0;
+ 
+ 	/* Protect from read count */
+-	smp_store_release(&rb->mem, (*pos + nr_entries) & (rb->nr_entries - 1));
++	smp_store_release(&rb->mem, pblk_rb_ptr_wrap(rb, *pos, nr_entries));
+ 	return 1;
+ }
+ 
+@@ -432,7 +437,7 @@ static int pblk_rb_may_write_flush(struct pblk_rb *rb, unsigned int nr_entries,
+ 	if (!__pblk_rb_may_write(rb, nr_entries, pos))
+ 		return 0;
+ 
+-	mem = (*pos + nr_entries) & (rb->nr_entries - 1);
++	mem = pblk_rb_ptr_wrap(rb, *pos, nr_entries);
+ 	*io_ret = NVM_IO_DONE;
+ 
+ 	if (bio->bi_opf & REQ_PREFLUSH) {
+@@ -572,7 +577,7 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
+ 		/* Release flags on context. Protect from writes */
+ 		smp_store_release(&entry->w_ctx.flags, flags);
+ 
+-		pos = (pos + 1) & (rb->nr_entries - 1);
++		pos = pblk_rb_ptr_wrap(rb, pos, 1);
+ 	}
+ 
+ 	if (pad) {
+@@ -652,7 +657,7 @@ int pblk_rb_copy_to_bio(struct pblk_rb *rb, struct bio *bio, sector_t lba,
+ 
+ struct pblk_w_ctx *pblk_rb_w_ctx(struct pblk_rb *rb, unsigned int pos)
+ {
+-	unsigned int entry = pos & (rb->nr_entries - 1);
++	unsigned int entry = pblk_rb_ptr_wrap(rb, pos, 0);
+ 
+ 	return &rb->entries[entry].w_ctx;
+ }
+@@ -698,7 +703,7 @@ unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries)
+ 		}
+ 	}
+ 
+-	sync = (sync + nr_entries) & (rb->nr_entries - 1);
++	sync = pblk_rb_ptr_wrap(rb, sync, nr_entries);
+ 
+ 	/* Protect from counts */
+ 	smp_store_release(&rb->sync, sync);
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index 277abc8633f7..fa8726493b39 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -140,12 +140,11 @@ static void pblk_prepare_resubmit(struct pblk *pblk, unsigned int sentry,
+ 	struct pblk_w_ctx *w_ctx;
+ 	struct ppa_addr ppa_l2p;
+ 	int flags;
+-	unsigned int pos, i;
++	unsigned int i;
+ 
+ 	spin_lock(&pblk->trans_lock);
+-	pos = sentry;
+ 	for (i = 0; i < nr_entries; i++) {
+-		entry = &rb->entries[pos];
++		entry = &rb->entries[pblk_rb_ptr_wrap(rb, sentry, i)];
+ 		w_ctx = &entry->w_ctx;
+ 
+ 		/* Check if the lba has been overwritten */
+@@ -164,8 +163,6 @@ static void pblk_prepare_resubmit(struct pblk *pblk, unsigned int sentry,
+ 		 */
+ 		line = pblk_ppa_to_line(pblk, w_ctx->ppa);
+ 		kref_put(&line->ref, pblk_line_put);
+-
+-		pos = (pos + 1) & (rb->nr_entries - 1);
+ 	}
+ 	spin_unlock(&pblk->trans_lock);
+ }
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index e70ece87a9f4..0ffc19cff697 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -760,6 +760,8 @@ unsigned int pblk_rb_read_commit(struct pblk_rb *rb, unsigned int entries);
+ 
+ unsigned int pblk_rb_sync_init(struct pblk_rb *rb, unsigned long *flags);
+ unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries);
++unsigned int pblk_rb_ptr_wrap(struct pblk_rb *rb, unsigned int p,
++			      unsigned int nr_entries);
+ void pblk_rb_sync_end(struct pblk_rb *rb, unsigned long *flags);
+ unsigned int pblk_rb_flush_point_count(struct pblk_rb *rb);
+ 
+-- 
+2.7.4
