@@ -1,117 +1,70 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 08/14] loop: Push loop_ctl_mutex down to loop_get_status()
-Date: Thu, 27 Sep 2018 13:36:46 +0200
-Message-Id: <20180927113652.5422-9-jack@suse.cz>
-In-Reply-To: <20180927113652.5422-1-jack@suse.cz>
-References: <20180927113652.5422-1-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:39196 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729223AbeIROIn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Sep 2018 10:08:43 -0400
+Received: by mail-ed1-f66.google.com with SMTP id h4-v6so1189742edi.6
+        for <linux-block@vger.kernel.org>; Tue, 18 Sep 2018 01:37:08 -0700 (PDT)
+Subject: Re: [PATCH 2/3] lightnvm: do no update csecs and sos on 1.2
+To: javier@cnexlabs.com
+Cc: igor.j.konopko@intel.com, marcin.dziegielewski@intel.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1535537370-10729-1-git-send-email-javier@cnexlabs.com>
+ <1535537370-10729-3-git-send-email-javier@cnexlabs.com>
+ <4ac29eb8-65bf-f733-d196-80c5bb41876c@lightnvm.io>
+ <7493E737-A7F5-4F86-A91D-8BA01755714D@cnexlabs.com>
+ <9C271B60-C421-4C9B-99B6-C30B65494095@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <52cca772-f7dc-9e7b-c9aa-92a390533382@lightnvm.io>
+Date: Tue, 18 Sep 2018 10:37:04 +0200
+MIME-Version: 1.0
+In-Reply-To: <9C271B60-C421-4C9B-99B6-C30B65494095@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Push loop_ctl_mutex down to loop_get_status() to avoid the unusual
-convention that the function gets called with loop_ctl_mutex held and
-releases it.
+On 09/11/2018 01:30 PM, Javier Gonzalez wrote:
+>> On 11 Sep 2018, at 10.50, Javier Gonzalez <javier@cnexlabs.com> wrote:
+>>
+>>> On 7 Sep 2018, at 12.28, Matias Bjørling <mb@lightnvm.io> wrote:
+>>>
+>>> On 08/29/2018 12:09 PM, Javier González wrote:
+>>>> In the OCSSD 2.0 spec., the sector and metadata sizes are reported though
+>>>> the standard nvme identify command. Thus, the lightnvm subsystem needs
+>>>> to update this information on the geometry structure on bootup.
+>>>> Since 1.2 devices report these values on the OCSSD geometry identify,
+>>>> avoid this update is it is unnecessary and can also corrupt the geometry
+>>>> if the devices does not report the nvme sizes correctly (which is not
+>>>> required by the OCSSD 1.2 spec either) >
+>>>> Signed-off-by: Javier González <javier@cnexlabs.com>
+>>>> ---
+>>>> drivers/nvme/host/lightnvm.c | 3 +++
+>>>> 1 file changed, 3 insertions(+)
+>>>> diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+>>>> index 5bfa354c5dd5..33ed09f8410e 100644
+>>>> --- a/drivers/nvme/host/lightnvm.c
+>>>> +++ b/drivers/nvme/host/lightnvm.c
+>>>> @@ -980,6 +980,9 @@ void nvme_nvm_update_nvm_info(struct nvme_ns *ns)
+>>>> 	struct nvm_dev *ndev = ns->ndev;
+>>>> 	struct nvm_geo *geo = &ndev->geo;
+>>>> +	if (geo->version == NVM_OCSSD_SPEC_12)
+>>>> +		return;
+>>>
+>>> The lba format sizes are not explicit in 2.0 either. For a conforming drive, it should implement the NVM Command Set and expose the LBA format correctly. Although, I do get your incentive, and if it is okay with you, I'll reword the commit message to this and apply it?:
+>>>
+>>> "1.2 devices exposes their data and metadata size through the separate
+>>> identify command. Make sure that the NVMe LBA format does not override
+>>> these values."
+>>
+>> Sounds good. I'll resend either way as I rebased on top of for-4.20/core
+>> - you can change the commit as you think it suits.
+> 
+> Since Igor will send a patch for the OOB, can you pick this up
+> separately? No changes needed after rebase.
+> 
+> Thanks,
+> Javier
+> 
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- drivers/block/loop.c | 37 ++++++++++---------------------------
- 1 file changed, 10 insertions(+), 27 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index e4b82ca49286..577d5e5a9312 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1233,6 +1233,9 @@ loop_get_status(struct loop_device *lo, struct loop_info64 *info)
- 	struct kstat stat;
- 	int ret;
- 
-+	ret = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+	if (ret)
-+		return ret;
- 	if (lo->lo_state != Lo_bound) {
- 		mutex_unlock(&loop_ctl_mutex);
- 		return -ENXIO;
-@@ -1347,10 +1350,8 @@ loop_get_status_old(struct loop_device *lo, struct loop_info __user *arg) {
- 	struct loop_info64 info64;
- 	int err;
- 
--	if (!arg) {
--		mutex_unlock(&loop_ctl_mutex);
-+	if (!arg)
- 		return -EINVAL;
--	}
- 	err = loop_get_status(lo, &info64);
- 	if (!err)
- 		err = loop_info64_to_old(&info64, &info);
-@@ -1365,10 +1366,8 @@ loop_get_status64(struct loop_device *lo, struct loop_info64 __user *arg) {
- 	struct loop_info64 info64;
- 	int err;
- 
--	if (!arg) {
--		mutex_unlock(&loop_ctl_mutex);
-+	if (!arg)
- 		return -EINVAL;
--	}
- 	err = loop_get_status(lo, &info64);
- 	if (!err && copy_to_user(arg, &info64, sizeof(info64)))
- 		err = -EFAULT;
-@@ -1478,12 +1477,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 		}
- 		break;
- 	case LOOP_GET_STATUS:
--		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
--		if (err)
--			return err;
--		err = loop_get_status_old(lo, (struct loop_info __user *) arg);
--		/* loop_get_status() unlocks loop_ctl_mutex */
--		break;
-+		return loop_get_status_old(lo, (struct loop_info __user *) arg);
- 	case LOOP_SET_STATUS64:
- 		err = -EPERM;
- 		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
-@@ -1496,12 +1490,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 		}
- 		break;
- 	case LOOP_GET_STATUS64:
--		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
--		if (err)
--			return err;
--		err = loop_get_status64(lo, (struct loop_info64 __user *) arg);
--		/* loop_get_status() unlocks loop_ctl_mutex */
--		break;
-+		return loop_get_status64(lo, (struct loop_info64 __user *) arg);
- 	case LOOP_SET_CAPACITY:
- 	case LOOP_SET_DIRECT_IO:
- 	case LOOP_SET_BLOCK_SIZE:
-@@ -1626,10 +1615,8 @@ loop_get_status_compat(struct loop_device *lo,
- 	struct loop_info64 info64;
- 	int err;
- 
--	if (!arg) {
--		mutex_unlock(&loop_ctl_mutex);
-+	if (!arg)
- 		return -EINVAL;
--	}
- 	err = loop_get_status(lo, &info64);
- 	if (!err)
- 		err = loop_info64_to_compat(&info64, arg);
-@@ -1652,12 +1639,8 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
- 		}
- 		break;
- 	case LOOP_GET_STATUS:
--		err = mutex_lock_killable(&loop_ctl_mutex);
--		if (!err) {
--			err = loop_get_status_compat(lo,
--						     (struct compat_loop_info __user *)arg);
--			/* loop_get_status() unlocks loop_ctl_mutex */
--		}
-+		err = loop_get_status_compat(lo,
-+				     (struct compat_loop_info __user *)arg);
- 		break;
- 	case LOOP_SET_CAPACITY:
- 	case LOOP_CLR_FD:
--- 
-2.16.4
+Applied for 4.20.
