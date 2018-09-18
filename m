@@ -1,37 +1,32 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Tue, 18 Sep 2018 15:42:47 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Return-Path: <jianchao.w.wang@oracle.com>
 Subject: Re: [PATCH V3 00/17] SCSI: introduce per-host admin queue & enable
  runtime PM
-Message-ID: <20180918074245.GC4805@ming.t460p>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
 References: <20180913121546.5710-1-ming.lei@redhat.com>
  <f9ba3c11-21ac-d963-3f24-cb83744014e1@oracle.com>
  <20180916130918.GA9947@ming.t460p>
  <7e9cfa7a-292a-0c26-0da8-187d961d974a@oracle.com>
  <20180917120727.GC28349@ming.t460p>
- <0475ffa4-be81-e35f-efe8-6821bada104c@oracle.com>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <0475ffa4-be81-e35f-efe8-6821bada104c@oracle.com>
+Date: Tue, 18 Sep 2018 09:17:12 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <0475ffa4-be81-e35f-efe8-6821bada104c@oracle.com>
+In-Reply-To: <20180917120727.GC28349@ming.t460p>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Sep 18, 2018 at 09:17:12AM +0800, jianchao.wang wrote:
-> Hi Ming
-> 
-> On 09/17/2018 08:07 PM, Ming Lei wrote:
-> >>> This way will delay runtime pm or system suspend until the queue is unfrozen,
-> >>> but it isn't reasonable.
-> >> This interface is for the __scsi_execute only, before we call into function, we should have
-> >> get the device resumed synchronously.
-> > I mean when the queue is frozen, it is reasonable to runtime suspend the queue. However,
-> > blk_queue_preempt_enter() is still waiting for queue becoming unfreezing first.
-> 
-> We don't freeze the queue, but set preempt-only mode when suspend the queue. :)
+Hi Ming
 
-But the queue can be frozen by other paths. Even though it is frozen, the queue
-should be allowed to suspend too.
+On 09/17/2018 08:07 PM, Ming Lei wrote:
+>>> This way will delay runtime pm or system suspend until the queue is unfrozen,
+>>> but it isn't reasonable.
+>> This interface is for the __scsi_execute only, before we call into function, we should have
+>> get the device resumed synchronously.
+> I mean when the queue is frozen, it is reasonable to runtime suspend the queue. However,
+> blk_queue_preempt_enter() is still waiting for queue becoming unfreezing first.
 
-Thanks,
-Ming
+We don't freeze the queue, but set preempt-only mode when suspend the queue. :)
+
+Thanks
+Jianchao
