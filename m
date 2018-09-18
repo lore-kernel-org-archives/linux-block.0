@@ -1,61 +1,104 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Subject: [PATCH 1/5] blk-iolatency: use q->nr_requests directly
-Date: Fri, 28 Sep 2018 13:45:39 -0400
-Message-Id: <20180928174543.28486-2-josef@toxicpanda.com>
-In-Reply-To: <20180928174543.28486-1-josef@toxicpanda.com>
-References: <20180928174543.28486-1-josef@toxicpanda.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:59850 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726768AbeIRPwN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Sep 2018 11:52:13 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>, Tejun Heo <tj@kernel.org>,
+        Jianchao Wang <jianchao.w.wang@oracle.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        linux-nvme@lists.infradead.org, Keith Busch <keith.busch@intel.com>
+Subject: [PATCH 4/4] nvme: don't drain IO in nvme_reset_work()
+Date: Tue, 18 Sep 2018 18:19:46 +0800
+Message-Id: <20180918101946.13329-5-ming.lei@redhat.com>
+In-Reply-To: <20180918101946.13329-1-ming.lei@redhat.com>
+References: <20180918101946.13329-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We were using blk_queue_depth() assuming that it would return
-nr_requests, but we hit a case in production on drives that had to have
-NCQ turned off in order for them to not shit the bed which resulted in a
-qd of 1, even though the nr_requests was much larger.  iolatency really
-only cares about requests we are allowed to queue up, as any io that
-get's onto the request list is going to be serviced soonish, so we want
-to be throttling before the bio gets onto the request list.  To make
-iolatency work as expected, simply use q->nr_requests instead of
-blk_queue_depth() as that is what we actually care about.
+After the controller is recovered, it isn't necessary to wait for
+completion of all in-flight IO. More importantly, it is easy to trigger
+deadlock if there is new IO timeout triggered.
 
-Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Cc: linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: linux-nvme@lists.infradead.org
+Cc: Keith Busch <keith.busch@intel.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-iolatency.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/nvme/host/core.c | 12 ++++++++----
+ drivers/nvme/host/nvme.h |  2 +-
+ drivers/nvme/host/pci.c  |  3 +--
+ 3 files changed, 10 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 27c14f8d2576..c2e38bc12f27 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -255,7 +255,7 @@ static void scale_cookie_change(struct blk_iolatency *blkiolat,
- 				struct child_latency_info *lat_info,
- 				bool up)
- {
--	unsigned long qd = blk_queue_depth(blkiolat->rqos.q);
-+	unsigned long qd = blkiolat->rqos.q->nr_requests;
- 	unsigned long scale = scale_amount(qd, up);
- 	unsigned long old = atomic_read(&lat_info->scale_cookie);
- 	unsigned long max_scale = qd << 1;
-@@ -295,7 +295,7 @@ static void scale_cookie_change(struct blk_iolatency *blkiolat,
-  */
- static void scale_change(struct iolatency_grp *iolat, bool up)
- {
--	unsigned long qd = blk_queue_depth(iolat->blkiolat->rqos.q);
-+	unsigned long qd = iolat->blkiolat->rqos.q->nr_requests;
- 	unsigned long scale = scale_amount(qd, up);
- 	unsigned long old = iolat->rq_depth.max_depth;
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index dd8ec1dd9219..cf6a2267d44e 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -1203,7 +1203,7 @@ static void nvme_passthru_end(struct nvme_ctrl *ctrl, u32 effects)
+ 	if (effects & NVME_CMD_EFFECTS_LBCC)
+ 		nvme_update_formats(ctrl);
+ 	if (effects & (NVME_CMD_EFFECTS_LBCC | NVME_CMD_EFFECTS_CSE_MASK))
+-		nvme_unfreeze(ctrl);
++		nvme_unfreeze(ctrl, true);
+ 	if (effects & NVME_CMD_EFFECTS_CCC)
+ 		nvme_init_identify(ctrl);
+ 	if (effects & (NVME_CMD_EFFECTS_NIC | NVME_CMD_EFFECTS_NCC))
+@@ -3602,13 +3602,17 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
+ }
+ EXPORT_SYMBOL_GPL(nvme_kill_queues);
  
-@@ -857,7 +857,7 @@ static void iolatency_pd_init(struct blkg_policy_data *pd)
+-void nvme_unfreeze(struct nvme_ctrl *ctrl)
++void nvme_unfreeze(struct nvme_ctrl *ctrl, bool check_io_drained)
+ {
+ 	struct nvme_ns *ns;
  
- 	rq_wait_init(&iolat->rq_wait);
- 	spin_lock_init(&iolat->child_lat.lock);
--	iolat->rq_depth.queue_depth = blk_queue_depth(blkg->q);
-+	iolat->rq_depth.queue_depth = blkg->q->nr_requests;
- 	iolat->rq_depth.max_depth = UINT_MAX;
- 	iolat->rq_depth.default_depth = iolat->rq_depth.queue_depth;
- 	iolat->blkiolat = blkiolat;
+ 	down_read(&ctrl->namespaces_rwsem);
+-	list_for_each_entry(ns, &ctrl->namespaces, list)
+-		blk_mq_unfreeze_queue(ns->queue);
++	list_for_each_entry(ns, &ctrl->namespaces, list) {
++		if  (check_io_drained)
++			blk_mq_unfreeze_queue(ns->queue);
++		else
++			blk_mq_unfreeze_queue_no_drain_io(ns->queue);
++	}
+ 	up_read(&ctrl->namespaces_rwsem);
+ }
+ EXPORT_SYMBOL_GPL(nvme_unfreeze);
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index bb4a2003c097..fd56270637d1 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -432,7 +432,7 @@ void nvme_complete_async_event(struct nvme_ctrl *ctrl, __le16 status,
+ void nvme_stop_queues(struct nvme_ctrl *ctrl);
+ void nvme_start_queues(struct nvme_ctrl *ctrl);
+ void nvme_kill_queues(struct nvme_ctrl *ctrl);
+-void nvme_unfreeze(struct nvme_ctrl *ctrl);
++void nvme_unfreeze(struct nvme_ctrl *ctrl, bool check_io_drained);
+ void nvme_wait_freeze(struct nvme_ctrl *ctrl);
+ void nvme_wait_freeze_timeout(struct nvme_ctrl *ctrl, long timeout);
+ void nvme_start_freeze(struct nvme_ctrl *ctrl);
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index d668682f91df..1c26a2e92063 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -2328,11 +2328,10 @@ static void nvme_reset_work(struct work_struct *work)
+ 		new_state = NVME_CTRL_ADMIN_ONLY;
+ 	} else {
+ 		nvme_start_queues(&dev->ctrl);
+-		nvme_wait_freeze(&dev->ctrl);
+ 		/* hit this only when allocate tagset fails */
+ 		if (nvme_dev_add(dev))
+ 			new_state = NVME_CTRL_ADMIN_ONLY;
+-		nvme_unfreeze(&dev->ctrl);
++		nvme_unfreeze(&dev->ctrl, false);
+ 	}
+ 
+ 	/*
 -- 
-2.14.3
+2.9.5
