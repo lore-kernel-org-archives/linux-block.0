@@ -1,61 +1,44 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 01/14] block/loop: Don't grab "struct file" for vfs_getattr() operation.
-Date: Thu, 27 Sep 2018 13:36:39 +0200
-Message-Id: <20180927113652.5422-2-jack@suse.cz>
-In-Reply-To: <20180927113652.5422-1-jack@suse.cz>
-References: <20180927113652.5422-1-jack@suse.cz>
+Return-Path: <jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH V3 00/17] SCSI: introduce per-host admin queue & enable
+ runtime PM
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <20180913121546.5710-1-ming.lei@redhat.com>
+ <f9ba3c11-21ac-d963-3f24-cb83744014e1@oracle.com>
+ <20180916130918.GA9947@ming.t460p>
+ <7e9cfa7a-292a-0c26-0da8-187d961d974a@oracle.com>
+ <20180917120727.GC28349@ming.t460p>
+ <0475ffa4-be81-e35f-efe8-6821bada104c@oracle.com>
+ <20180918074245.GC4805@ming.t460p>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <5549f4a1-8b87-44d4-50fc-80583824a4b1@oracle.com>
+Date: Tue, 18 Sep 2018 15:53:51 +0800
+MIME-Version: 1.0
+In-Reply-To: <20180918074245.GC4805@ming.t460p>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Hi Ming
 
-vfs_getattr() needs "struct path" rather than "struct file".
-Let's use path_get()/path_put() rather than get_file()/fput().
+On 09/18/2018 03:42 PM, Ming Lei wrote:
+> On Tue, Sep 18, 2018 at 09:17:12AM +0800, jianchao.wang wrote:
+>> Hi Ming
+>>
+>> On 09/17/2018 08:07 PM, Ming Lei wrote:
+>>>>> This way will delay runtime pm or system suspend until the queue is unfrozen,
+>>>>> but it isn't reasonable.
+>>>> This interface is for the __scsi_execute only, before we call into function, we should have
+>>>> get the device resumed synchronously.
+>>> I mean when the queue is frozen, it is reasonable to runtime suspend the queue. However,
+>>> blk_queue_preempt_enter() is still waiting for queue becoming unfreezing first.
+>>
+>> We don't freeze the queue, but set preempt-only mode when suspend the queue. :)
+> 
+> But the queue can be frozen by other paths. Even though it is frozen, the queue
+> should be allowed to suspend too.
+> 
 
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- drivers/block/loop.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Yes, the race between freeze and preempt-only is a tricky issue.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index ea9debf59b22..50c81ff44ae2 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1205,7 +1205,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- static int
- loop_get_status(struct loop_device *lo, struct loop_info64 *info)
- {
--	struct file *file;
-+	struct path path;
- 	struct kstat stat;
- 	int ret;
- 
-@@ -1230,16 +1230,16 @@ loop_get_status(struct loop_device *lo, struct loop_info64 *info)
- 	}
- 
- 	/* Drop lo_ctl_mutex while we call into the filesystem. */
--	file = get_file(lo->lo_backing_file);
-+	path = lo->lo_backing_file->f_path;
-+	path_get(&path);
- 	mutex_unlock(&lo->lo_ctl_mutex);
--	ret = vfs_getattr(&file->f_path, &stat, STATX_INO,
--			  AT_STATX_SYNC_AS_STAT);
-+	ret = vfs_getattr(&path, &stat, STATX_INO, AT_STATX_SYNC_AS_STAT);
- 	if (!ret) {
- 		info->lo_device = huge_encode_dev(stat.dev);
- 		info->lo_inode = stat.ino;
- 		info->lo_rdevice = huge_encode_dev(stat.rdev);
- 	}
--	fput(file);
-+	path_put(&path);
- 	return ret;
- }
- 
--- 
-2.16.4
+Thanks
+Jianchao
