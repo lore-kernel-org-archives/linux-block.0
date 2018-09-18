@@ -1,241 +1,679 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:42810 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729889AbeIYWbN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Sep 2018 18:31:13 -0400
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Jonathan Corbet <corbet@lwn.net>
-Date: Tue, 25 Sep 2018 10:22:24 -0600
-Message-Id: <20180925162231.4354-7-logang@deltatee.com>
-In-Reply-To: <20180925162231.4354-1-logang@deltatee.com>
-References: <20180925162231.4354-1-logang@deltatee.com>
+Return-Path: <bvanassche@acm.org>
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Ming Lei <ming.lei@redhat.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Alan Stern <stern@rowland.harvard.edu>
+Subject: [PATCH v8 3/8] block: Move power management code into a new source file
+Date: Tue, 18 Sep 2018 13:58:58 -0700
+Message-Id: <20180918205903.15516-4-bvanassche@acm.org>
+In-Reply-To: <20180918205903.15516-1-bvanassche@acm.org>
+References: <20180918205903.15516-1-bvanassche@acm.org>
 MIME-Version: 1.0
-Subject: [PATCH v7 06/13] PCI/P2PDMA: Add P2P DMA driver writer's documentation
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Add a restructured text file describing how to write drivers
-with support for P2P DMA transactions. The document describes
-how to use the APIs that were added in the previous few
-commits.
+Move the code for runtime power management from blk-core.c into the
+new source file blk-pm.c. Move the corresponding declarations from
+<linux/blkdev.h> into <linux/blk-pm.h>. For CONFIG_PM=n, leave out
+the declarations of the functions that are not used in that mode.
+This patch not only reduces the number of #ifdefs in the block layer
+core code but also reduces the size of header file <linux/blkdev.h>
+and hence should help to reduce the build time of the Linux kernel
+if CONFIG_PM is not defined.
 
-Also adds an index for the PCI documentation tree even though this
-is the only PCI document that has been converted to restructured text
-at this time.
-
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
-Cc: Jonathan Corbet <corbet@lwn.net>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Alan Stern <stern@rowland.harvard.edu>
 ---
- Documentation/driver-api/pci/index.rst  |   1 +
- Documentation/driver-api/pci/p2pdma.rst | 170 ++++++++++++++++++++++++
- 2 files changed, 171 insertions(+)
- create mode 100644 Documentation/driver-api/pci/p2pdma.rst
+ block/Kconfig          |   3 +
+ block/Makefile         |   1 +
+ block/blk-core.c       | 196 +----------------------------------------
+ block/blk-pm.c         | 188 +++++++++++++++++++++++++++++++++++++++
+ block/blk-pm.h         |  43 +++++++++
+ block/elevator.c       |  22 +----
+ drivers/scsi/scsi_pm.c |   1 +
+ drivers/scsi/sd.c      |   1 +
+ drivers/scsi/sr.c      |   1 +
+ include/linux/blk-pm.h |  24 +++++
+ include/linux/blkdev.h |  23 -----
+ 11 files changed, 264 insertions(+), 239 deletions(-)
+ create mode 100644 block/blk-pm.c
+ create mode 100644 block/blk-pm.h
+ create mode 100644 include/linux/blk-pm.h
 
-diff --git a/Documentation/driver-api/pci/index.rst b/Documentation/driver-api/pci/index.rst
-index eaf20b24bf7d..ecc7416c523b 100644
---- a/Documentation/driver-api/pci/index.rst
-+++ b/Documentation/driver-api/pci/index.rst
-@@ -11,6 +11,7 @@ The Linux PCI driver implementer's API guide
-    :maxdepth: 2
+diff --git a/block/Kconfig b/block/Kconfig
+index 1f2469a0123c..85263e7bded6 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -228,4 +228,7 @@ config BLK_MQ_RDMA
+ 	depends on BLOCK && INFINIBAND
+ 	default y
  
-    pci
-+   p2pdma
++config BLK_PM
++	def_bool BLOCK && PM
++
+ source block/Kconfig.iosched
+diff --git a/block/Makefile b/block/Makefile
+index 572b33f32c07..27eac600474f 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -37,3 +37,4 @@ obj-$(CONFIG_BLK_WBT)		+= blk-wbt.o
+ obj-$(CONFIG_BLK_DEBUG_FS)	+= blk-mq-debugfs.o
+ obj-$(CONFIG_BLK_DEBUG_FS_ZONED)+= blk-mq-debugfs-zoned.o
+ obj-$(CONFIG_BLK_SED_OPAL)	+= sed-opal.o
++obj-$(CONFIG_BLK_PM)		+= blk-pm.o
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 4dbc93f43b38..6d4dd176bd9d 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -42,6 +42,7 @@
+ #include "blk.h"
+ #include "blk-mq.h"
+ #include "blk-mq-sched.h"
++#include "blk-pm.h"
+ #include "blk-rq-qos.h"
  
- .. only::  subproject and html
+ #ifdef CONFIG_DEBUG_FS
+@@ -1726,16 +1727,6 @@ void part_round_stats(struct request_queue *q, int cpu, struct hd_struct *part)
+ }
+ EXPORT_SYMBOL_GPL(part_round_stats);
  
-diff --git a/Documentation/driver-api/pci/p2pdma.rst b/Documentation/driver-api/pci/p2pdma.rst
+-#ifdef CONFIG_PM
+-static void blk_pm_put_request(struct request *rq)
+-{
+-	if (rq->q->dev && !(rq->rq_flags & RQF_PM) && !--rq->q->nr_pending)
+-		pm_runtime_mark_last_busy(rq->q->dev);
+-}
+-#else
+-static inline void blk_pm_put_request(struct request *rq) {}
+-#endif
+-
+ void __blk_put_request(struct request_queue *q, struct request *req)
+ {
+ 	req_flags_t rq_flags = req->rq_flags;
+@@ -3757,191 +3748,6 @@ void blk_finish_plug(struct blk_plug *plug)
+ }
+ EXPORT_SYMBOL(blk_finish_plug);
+ 
+-#ifdef CONFIG_PM
+-/**
+- * blk_pm_runtime_init - Block layer runtime PM initialization routine
+- * @q: the queue of the device
+- * @dev: the device the queue belongs to
+- *
+- * Description:
+- *    Initialize runtime-PM-related fields for @q and start auto suspend for
+- *    @dev. Drivers that want to take advantage of request-based runtime PM
+- *    should call this function after @dev has been initialized, and its
+- *    request queue @q has been allocated, and runtime PM for it can not happen
+- *    yet(either due to disabled/forbidden or its usage_count > 0). In most
+- *    cases, driver should call this function before any I/O has taken place.
+- *
+- *    This function takes care of setting up using auto suspend for the device,
+- *    the autosuspend delay is set to -1 to make runtime suspend impossible
+- *    until an updated value is either set by user or by driver. Drivers do
+- *    not need to touch other autosuspend settings.
+- *
+- *    The block layer runtime PM is request based, so only works for drivers
+- *    that use request as their IO unit instead of those directly use bio's.
+- */
+-void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
+-{
+-	/* Don't enable runtime PM for blk-mq until it is ready */
+-	if (q->mq_ops) {
+-		pm_runtime_disable(dev);
+-		return;
+-	}
+-
+-	q->dev = dev;
+-	q->rpm_status = RPM_ACTIVE;
+-	pm_runtime_set_autosuspend_delay(q->dev, -1);
+-	pm_runtime_use_autosuspend(q->dev);
+-}
+-EXPORT_SYMBOL(blk_pm_runtime_init);
+-
+-/**
+- * blk_pre_runtime_suspend - Pre runtime suspend check
+- * @q: the queue of the device
+- *
+- * Description:
+- *    This function will check if runtime suspend is allowed for the device
+- *    by examining if there are any requests pending in the queue. If there
+- *    are requests pending, the device can not be runtime suspended; otherwise,
+- *    the queue's status will be updated to SUSPENDING and the driver can
+- *    proceed to suspend the device.
+- *
+- *    For the not allowed case, we mark last busy for the device so that
+- *    runtime PM core will try to autosuspend it some time later.
+- *
+- *    This function should be called near the start of the device's
+- *    runtime_suspend callback.
+- *
+- * Return:
+- *    0		- OK to runtime suspend the device
+- *    -EBUSY	- Device should not be runtime suspended
+- */
+-int blk_pre_runtime_suspend(struct request_queue *q)
+-{
+-	int ret = 0;
+-
+-	if (!q->dev)
+-		return ret;
+-
+-	spin_lock_irq(q->queue_lock);
+-	if (q->nr_pending) {
+-		ret = -EBUSY;
+-		pm_runtime_mark_last_busy(q->dev);
+-	} else {
+-		q->rpm_status = RPM_SUSPENDING;
+-	}
+-	spin_unlock_irq(q->queue_lock);
+-	return ret;
+-}
+-EXPORT_SYMBOL(blk_pre_runtime_suspend);
+-
+-/**
+- * blk_post_runtime_suspend - Post runtime suspend processing
+- * @q: the queue of the device
+- * @err: return value of the device's runtime_suspend function
+- *
+- * Description:
+- *    Update the queue's runtime status according to the return value of the
+- *    device's runtime suspend function and mark last busy for the device so
+- *    that PM core will try to auto suspend the device at a later time.
+- *
+- *    This function should be called near the end of the device's
+- *    runtime_suspend callback.
+- */
+-void blk_post_runtime_suspend(struct request_queue *q, int err)
+-{
+-	if (!q->dev)
+-		return;
+-
+-	spin_lock_irq(q->queue_lock);
+-	if (!err) {
+-		q->rpm_status = RPM_SUSPENDED;
+-	} else {
+-		q->rpm_status = RPM_ACTIVE;
+-		pm_runtime_mark_last_busy(q->dev);
+-	}
+-	spin_unlock_irq(q->queue_lock);
+-}
+-EXPORT_SYMBOL(blk_post_runtime_suspend);
+-
+-/**
+- * blk_pre_runtime_resume - Pre runtime resume processing
+- * @q: the queue of the device
+- *
+- * Description:
+- *    Update the queue's runtime status to RESUMING in preparation for the
+- *    runtime resume of the device.
+- *
+- *    This function should be called near the start of the device's
+- *    runtime_resume callback.
+- */
+-void blk_pre_runtime_resume(struct request_queue *q)
+-{
+-	if (!q->dev)
+-		return;
+-
+-	spin_lock_irq(q->queue_lock);
+-	q->rpm_status = RPM_RESUMING;
+-	spin_unlock_irq(q->queue_lock);
+-}
+-EXPORT_SYMBOL(blk_pre_runtime_resume);
+-
+-/**
+- * blk_post_runtime_resume - Post runtime resume processing
+- * @q: the queue of the device
+- * @err: return value of the device's runtime_resume function
+- *
+- * Description:
+- *    Update the queue's runtime status according to the return value of the
+- *    device's runtime_resume function. If it is successfully resumed, process
+- *    the requests that are queued into the device's queue when it is resuming
+- *    and then mark last busy and initiate autosuspend for it.
+- *
+- *    This function should be called near the end of the device's
+- *    runtime_resume callback.
+- */
+-void blk_post_runtime_resume(struct request_queue *q, int err)
+-{
+-	if (!q->dev)
+-		return;
+-
+-	spin_lock_irq(q->queue_lock);
+-	if (!err) {
+-		q->rpm_status = RPM_ACTIVE;
+-		__blk_run_queue(q);
+-		pm_runtime_mark_last_busy(q->dev);
+-		pm_request_autosuspend(q->dev);
+-	} else {
+-		q->rpm_status = RPM_SUSPENDED;
+-	}
+-	spin_unlock_irq(q->queue_lock);
+-}
+-EXPORT_SYMBOL(blk_post_runtime_resume);
+-
+-/**
+- * blk_set_runtime_active - Force runtime status of the queue to be active
+- * @q: the queue of the device
+- *
+- * If the device is left runtime suspended during system suspend the resume
+- * hook typically resumes the device and corrects runtime status
+- * accordingly. However, that does not affect the queue runtime PM status
+- * which is still "suspended". This prevents processing requests from the
+- * queue.
+- *
+- * This function can be used in driver's resume hook to correct queue
+- * runtime PM status and re-enable peeking requests from the queue. It
+- * should be called before first request is added to the queue.
+- */
+-void blk_set_runtime_active(struct request_queue *q)
+-{
+-	spin_lock_irq(q->queue_lock);
+-	q->rpm_status = RPM_ACTIVE;
+-	pm_runtime_mark_last_busy(q->dev);
+-	pm_request_autosuspend(q->dev);
+-	spin_unlock_irq(q->queue_lock);
+-}
+-EXPORT_SYMBOL(blk_set_runtime_active);
+-#endif
+-
+ int __init blk_dev_init(void)
+ {
+ 	BUILD_BUG_ON(REQ_OP_LAST >= (1 << REQ_OP_BITS));
+diff --git a/block/blk-pm.c b/block/blk-pm.c
 new file mode 100644
-index 000000000000..7febe66ee4f3
+index 000000000000..9b636960d285
 --- /dev/null
-+++ b/Documentation/driver-api/pci/p2pdma.rst
-@@ -0,0 +1,170 @@
-+.. SPDX-License-Identifier: GPL-2.0
++++ b/block/blk-pm.c
+@@ -0,0 +1,188 @@
++// SPDX-License-Identifier: GPL-2.0
 +
-+============================
-+PCI Peer-to-Peer DMA Support
-+============================
++#include <linux/blk-pm.h>
++#include <linux/blkdev.h>
++#include <linux/pm_runtime.h>
 +
-+The PCI bus has pretty decent support for performing DMA transfers
-+between two devices on the bus. This type of transaction is henceforth
-+called Peer-to-Peer (or P2P). However, there are a number of issues that
-+make P2P transactions tricky to do in a perfectly safe way.
++/**
++ * blk_pm_runtime_init - Block layer runtime PM initialization routine
++ * @q: the queue of the device
++ * @dev: the device the queue belongs to
++ *
++ * Description:
++ *    Initialize runtime-PM-related fields for @q and start auto suspend for
++ *    @dev. Drivers that want to take advantage of request-based runtime PM
++ *    should call this function after @dev has been initialized, and its
++ *    request queue @q has been allocated, and runtime PM for it can not happen
++ *    yet(either due to disabled/forbidden or its usage_count > 0). In most
++ *    cases, driver should call this function before any I/O has taken place.
++ *
++ *    This function takes care of setting up using auto suspend for the device,
++ *    the autosuspend delay is set to -1 to make runtime suspend impossible
++ *    until an updated value is either set by user or by driver. Drivers do
++ *    not need to touch other autosuspend settings.
++ *
++ *    The block layer runtime PM is request based, so only works for drivers
++ *    that use request as their IO unit instead of those directly use bio's.
++ */
++void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
++{
++	/* Don't enable runtime PM for blk-mq until it is ready */
++	if (q->mq_ops) {
++		pm_runtime_disable(dev);
++		return;
++	}
 +
-+One of the biggest issues is that PCI doesn't require forwarding
-+transactions between hierarchy domains, and in PCIe, each Root Port
-+defines a separate hierarchy domain. To make things worse, there is no
-+simple way to determine if a given Root Complex supports this or not.
-+(See PCIe r4.0, sec 1.3.1). Therefore, as of this writing, the kernel
-+only supports doing P2P when the endpoints involved are all behind the
-+same PCI bridge, as such devices are all in the same PCI hierarchy
-+domain, and the spec guarantees that all transactions within the
-+hierarchy will be routable, but it does not require routing
-+between hierarchies.
++	q->dev = dev;
++	q->rpm_status = RPM_ACTIVE;
++	pm_runtime_set_autosuspend_delay(q->dev, -1);
++	pm_runtime_use_autosuspend(q->dev);
++}
++EXPORT_SYMBOL(blk_pm_runtime_init);
 +
-+The second issue is that to make use of existing interfaces in Linux,
-+memory that is used for P2P transactions needs to be backed by struct
-+pages. However, PCI BARs are not typically cache coherent so there are
-+a few corner case gotchas with these pages so developers need to
-+be careful about what they do with them.
++/**
++ * blk_pre_runtime_suspend - Pre runtime suspend check
++ * @q: the queue of the device
++ *
++ * Description:
++ *    This function will check if runtime suspend is allowed for the device
++ *    by examining if there are any requests pending in the queue. If there
++ *    are requests pending, the device can not be runtime suspended; otherwise,
++ *    the queue's status will be updated to SUSPENDING and the driver can
++ *    proceed to suspend the device.
++ *
++ *    For the not allowed case, we mark last busy for the device so that
++ *    runtime PM core will try to autosuspend it some time later.
++ *
++ *    This function should be called near the start of the device's
++ *    runtime_suspend callback.
++ *
++ * Return:
++ *    0		- OK to runtime suspend the device
++ *    -EBUSY	- Device should not be runtime suspended
++ */
++int blk_pre_runtime_suspend(struct request_queue *q)
++{
++	int ret = 0;
 +
++	if (!q->dev)
++		return ret;
 +
-+Driver Writer's Guide
-+=====================
++	spin_lock_irq(q->queue_lock);
++	if (q->nr_pending) {
++		ret = -EBUSY;
++		pm_runtime_mark_last_busy(q->dev);
++	} else {
++		q->rpm_status = RPM_SUSPENDING;
++	}
++	spin_unlock_irq(q->queue_lock);
++	return ret;
++}
++EXPORT_SYMBOL(blk_pre_runtime_suspend);
 +
-+In a given P2P implementation there may be three or more different
-+types of kernel drivers in play:
++/**
++ * blk_post_runtime_suspend - Post runtime suspend processing
++ * @q: the queue of the device
++ * @err: return value of the device's runtime_suspend function
++ *
++ * Description:
++ *    Update the queue's runtime status according to the return value of the
++ *    device's runtime suspend function and mark last busy for the device so
++ *    that PM core will try to auto suspend the device at a later time.
++ *
++ *    This function should be called near the end of the device's
++ *    runtime_suspend callback.
++ */
++void blk_post_runtime_suspend(struct request_queue *q, int err)
++{
++	if (!q->dev)
++		return;
 +
-+* Provider - A driver which provides or publishes P2P resources like
-+  memory or doorbell registers to other drivers.
-+* Client - A driver which makes use of a resource by setting up a
-+  DMA transaction to or from it.
-+* Orchestrator - A driver which orchestrates the flow of data between
-+  clients and providers.
++	spin_lock_irq(q->queue_lock);
++	if (!err) {
++		q->rpm_status = RPM_SUSPENDED;
++	} else {
++		q->rpm_status = RPM_ACTIVE;
++		pm_runtime_mark_last_busy(q->dev);
++	}
++	spin_unlock_irq(q->queue_lock);
++}
++EXPORT_SYMBOL(blk_post_runtime_suspend);
 +
-+In many cases there could be overlap between these three types (i.e.,
-+it may be typical for a driver to be both a provider and a client).
++/**
++ * blk_pre_runtime_resume - Pre runtime resume processing
++ * @q: the queue of the device
++ *
++ * Description:
++ *    Update the queue's runtime status to RESUMING in preparation for the
++ *    runtime resume of the device.
++ *
++ *    This function should be called near the start of the device's
++ *    runtime_resume callback.
++ */
++void blk_pre_runtime_resume(struct request_queue *q)
++{
++	if (!q->dev)
++		return;
 +
-+For example, in the NVMe Target Copy Offload implementation:
++	spin_lock_irq(q->queue_lock);
++	q->rpm_status = RPM_RESUMING;
++	spin_unlock_irq(q->queue_lock);
++}
++EXPORT_SYMBOL(blk_pre_runtime_resume);
 +
-+* The NVMe PCI driver is both a client, provider and orchestrator
-+  in that it exposes any CMB (Controller Memory Buffer) as a P2P memory
-+  resource (provider), it accepts P2P memory pages as buffers in requests
-+  to be used directly (client) and it can also make use the CMB as
-+  submission queue entries.
-+* The RDMA driver is a client in this arrangement so that an RNIC
-+  can DMA directly to the memory exposed by the NVMe device.
-+* The NVMe Target driver (nvmet) can orchestrate the data from the RNIC
-+  to the P2P memory (CMB) and then to the NVMe device (and vice versa).
++/**
++ * blk_post_runtime_resume - Post runtime resume processing
++ * @q: the queue of the device
++ * @err: return value of the device's runtime_resume function
++ *
++ * Description:
++ *    Update the queue's runtime status according to the return value of the
++ *    device's runtime_resume function. If it is successfully resumed, process
++ *    the requests that are queued into the device's queue when it is resuming
++ *    and then mark last busy and initiate autosuspend for it.
++ *
++ *    This function should be called near the end of the device's
++ *    runtime_resume callback.
++ */
++void blk_post_runtime_resume(struct request_queue *q, int err)
++{
++	if (!q->dev)
++		return;
 +
-+This is currently the only arrangement supported by the kernel but
-+one could imagine slight tweaks to this that would allow for the same
-+functionality. For example, if a specific RNIC added a BAR with some
-+memory behind it, its driver could add support as a P2P provider and
-+then the NVMe Target could use the RNIC's memory instead of the CMB
-+in cases where the NVMe cards in use do not have CMB support.
++	spin_lock_irq(q->queue_lock);
++	if (!err) {
++		q->rpm_status = RPM_ACTIVE;
++		__blk_run_queue(q);
++		pm_runtime_mark_last_busy(q->dev);
++		pm_request_autosuspend(q->dev);
++	} else {
++		q->rpm_status = RPM_SUSPENDED;
++	}
++	spin_unlock_irq(q->queue_lock);
++}
++EXPORT_SYMBOL(blk_post_runtime_resume);
 +
++/**
++ * blk_set_runtime_active - Force runtime status of the queue to be active
++ * @q: the queue of the device
++ *
++ * If the device is left runtime suspended during system suspend the resume
++ * hook typically resumes the device and corrects runtime status
++ * accordingly. However, that does not affect the queue runtime PM status
++ * which is still "suspended". This prevents processing requests from the
++ * queue.
++ *
++ * This function can be used in driver's resume hook to correct queue
++ * runtime PM status and re-enable peeking requests from the queue. It
++ * should be called before first request is added to the queue.
++ */
++void blk_set_runtime_active(struct request_queue *q)
++{
++	spin_lock_irq(q->queue_lock);
++	q->rpm_status = RPM_ACTIVE;
++	pm_runtime_mark_last_busy(q->dev);
++	pm_request_autosuspend(q->dev);
++	spin_unlock_irq(q->queue_lock);
++}
++EXPORT_SYMBOL(blk_set_runtime_active);
+diff --git a/block/blk-pm.h b/block/blk-pm.h
+new file mode 100644
+index 000000000000..1ffc8ef203ec
+--- /dev/null
++++ b/block/blk-pm.h
+@@ -0,0 +1,43 @@
++/* SPDX-License-Identifier: GPL-2.0 */
 +
-+Provider Drivers
-+----------------
++#ifndef _BLOCK_BLK_PM_H_
++#define _BLOCK_BLK_PM_H_
 +
-+A provider simply needs to register a BAR (or a portion of a BAR)
-+as a P2P DMA resource using :c:func:`pci_p2pdma_add_resource()`.
-+This will register struct pages for all the specified memory.
++#include <linux/pm_runtime.h>
 +
-+After that it may optionally publish all of its resources as
-+P2P memory using :c:func:`pci_p2pmem_publish()`. This will allow
-+any orchestrator drivers to find and use the memory. When marked in
-+this way, the resource must be regular memory with no side effects.
++#ifdef CONFIG_PM
++static inline void blk_pm_requeue_request(struct request *rq)
++{
++	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
++		rq->q->nr_pending--;
++}
 +
-+For the time being this is fairly rudimentary in that all resources
-+are typically going to be P2P memory. Future work will likely expand
-+this to include other types of resources like doorbells.
++static inline void blk_pm_add_request(struct request_queue *q,
++				      struct request *rq)
++{
++	if (q->dev && !(rq->rq_flags & RQF_PM) && q->nr_pending++ == 0 &&
++	    (q->rpm_status == RPM_SUSPENDED || q->rpm_status == RPM_SUSPENDING))
++		pm_request_resume(q->dev);
++}
 +
++static inline void blk_pm_put_request(struct request *rq)
++{
++	if (rq->q->dev && !(rq->rq_flags & RQF_PM) && !--rq->q->nr_pending)
++		pm_runtime_mark_last_busy(rq->q->dev);
++}
++#else
++static inline void blk_pm_requeue_request(struct request *rq)
++{
++}
 +
-+Client Drivers
-+--------------
++static inline void blk_pm_add_request(struct request_queue *q,
++				      struct request *rq)
++{
++}
 +
-+A client driver typically only has to conditionally change its DMA map
-+routine to use the mapping function :c:func:`pci_p2pdma_map_sg()` instead
-+of the usual :c:func:`dma_map_sg()` function. Memory mapped in this
-+way does not need to be unmapped.
++static inline void blk_pm_put_request(struct request *rq)
++{
++}
++#endif
 +
-+The client may also, optionally, make use of
-+:c:func:`is_pci_p2pdma_page()` to determine when to use the P2P mapping
-+functions and when to use the regular mapping functions. In some
-+situations, it may be more appropriate to use a flag to indicate a
-+given request is P2P memory and map appropriately (for example the
-+block layer uses a flag to keep P2P memory out of queues that do not
-+have P2P client support). It is important to ensure that struct pages that
-+back P2P memory stay out of code that does not have support for them.
++#endif /* _BLOCK_BLK_PM_H_ */
+diff --git a/block/elevator.c b/block/elevator.c
+index 6a06b5d040e5..e18ac68626e3 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -41,6 +41,7 @@
+ 
+ #include "blk.h"
+ #include "blk-mq-sched.h"
++#include "blk-pm.h"
+ #include "blk-wbt.h"
+ 
+ static DEFINE_SPINLOCK(elv_list_lock);
+@@ -557,27 +558,6 @@ void elv_bio_merged(struct request_queue *q, struct request *rq,
+ 		e->type->ops.sq.elevator_bio_merged_fn(q, rq, bio);
+ }
+ 
+-#ifdef CONFIG_PM
+-static void blk_pm_requeue_request(struct request *rq)
+-{
+-	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
+-		rq->q->nr_pending--;
+-}
+-
+-static void blk_pm_add_request(struct request_queue *q, struct request *rq)
+-{
+-	if (q->dev && !(rq->rq_flags & RQF_PM) && q->nr_pending++ == 0 &&
+-	    (q->rpm_status == RPM_SUSPENDED || q->rpm_status == RPM_SUSPENDING))
+-		pm_request_resume(q->dev);
+-}
+-#else
+-static inline void blk_pm_requeue_request(struct request *rq) {}
+-static inline void blk_pm_add_request(struct request_queue *q,
+-				      struct request *rq)
+-{
+-}
+-#endif
+-
+ void elv_requeue_request(struct request_queue *q, struct request *rq)
+ {
+ 	/*
+diff --git a/drivers/scsi/scsi_pm.c b/drivers/scsi/scsi_pm.c
+index b44c1bb687a2..a2b4179bfdf7 100644
+--- a/drivers/scsi/scsi_pm.c
++++ b/drivers/scsi/scsi_pm.c
+@@ -8,6 +8,7 @@
+ #include <linux/pm_runtime.h>
+ #include <linux/export.h>
+ #include <linux/async.h>
++#include <linux/blk-pm.h>
+ 
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_device.h>
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index b79b366a94f7..64514e8359e4 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -45,6 +45,7 @@
+ #include <linux/init.h>
+ #include <linux/blkdev.h>
+ #include <linux/blkpg.h>
++#include <linux/blk-pm.h>
+ #include <linux/delay.h>
+ #include <linux/mutex.h>
+ #include <linux/string_helpers.h>
+diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
+index d0389b20574d..4f07b3410595 100644
+--- a/drivers/scsi/sr.c
++++ b/drivers/scsi/sr.c
+@@ -43,6 +43,7 @@
+ #include <linux/interrupt.h>
+ #include <linux/init.h>
+ #include <linux/blkdev.h>
++#include <linux/blk-pm.h>
+ #include <linux/mutex.h>
+ #include <linux/slab.h>
+ #include <linux/pm_runtime.h>
+diff --git a/include/linux/blk-pm.h b/include/linux/blk-pm.h
+new file mode 100644
+index 000000000000..b80c65aba249
+--- /dev/null
++++ b/include/linux/blk-pm.h
+@@ -0,0 +1,24 @@
++/* SPDX-License-Identifier: GPL-2.0 */
 +
++#ifndef _BLK_PM_H_
++#define _BLK_PM_H_
 +
-+Orchestrator Drivers
-+--------------------
++struct device;
++struct request_queue;
 +
-+The first task an orchestrator driver must do is compile a list of
-+all client devices that will be involved in a given transaction. For
-+example, the NVMe Target driver creates a list including all NVMe
-+devices and the RNIC in use. The list is stored as an anonymous struct
-+list_head which must be initialized with the usual INIT_LIST_HEAD.
-+The following functions may then be used to add to, remove from and free
-+the list of clients with the functions :c:func:`pci_p2pdma_add_client()`,
-+:c:func:`pci_p2pdma_remove_client()` and
-+:c:func:`pci_p2pdma_client_list_free()`.
++/*
++ * block layer runtime pm functions
++ */
++#ifdef CONFIG_PM
++extern void blk_pm_runtime_init(struct request_queue *q, struct device *dev);
++extern int blk_pre_runtime_suspend(struct request_queue *q);
++extern void blk_post_runtime_suspend(struct request_queue *q, int err);
++extern void blk_pre_runtime_resume(struct request_queue *q);
++extern void blk_post_runtime_resume(struct request_queue *q, int err);
++extern void blk_set_runtime_active(struct request_queue *q);
++#else
++static inline void blk_pm_runtime_init(struct request_queue *q,
++				       struct device *dev) {}
++#endif
 +
-+With the client list in hand, the orchestrator may then call
-+:c:func:`pci_p2pmem_find()` to obtain a published P2P memory provider
-+that is supported (behind the same root port) as all the clients. If more
-+than one provider is supported, the one nearest to all the clients will
-+be chosen first. If more than one provider is an equal distance away, the
-+one returned will be chosen at random. This function returns the PCI
-+device to use for the provider with a reference taken and therefore
-+when it's no longer needed it should be returned with pci_dev_put().
-+
-+Alternatively, if the orchestrator knows (via some other means)
-+which provider it wants to use it may use :c:func:`pci_has_p2pmem()`
-+to determine if it has P2P memory and :c:func:`pci_p2pdma_distance()`
-+to determine the cumulative distance between it and a potential
-+list of clients.
-+
-+With a supported provider in hand, the driver can then call
-+:c:func:`pci_p2pdma_assign_provider()` to assign the provider
-+to the client list. This function returns false if any of the
-+clients are unsupported by the provider.
-+
-+Once a provider is assigned to a client list via either
-+:c:func:`pci_p2pmem_find()` or :c:func:`pci_p2pdma_assign_provider()`,
-+the list is permanently bound to the provider such that any new clients
-+added to the list must be supported by the already selected provider.
-+If they are not supported, :c:func:`pci_p2pdma_add_client()` will return
-+an error. In this way, orchestrators are free to add and remove devices
-+without having to recheck support or tear down existing transfers to
-+change P2P providers.
-+
-+Once a provider is selected, the orchestrator can then use
-+:c:func:`pci_alloc_p2pmem()` and :c:func:`pci_free_p2pmem()` to
-+allocate P2P memory from the provider. :c:func:`pci_p2pmem_alloc_sgl()`
-+and :c:func:`pci_p2pmem_free_sgl()` are convenience functions for
-+allocating scatter-gather lists with P2P memory.
-+
-+Struct Page Caveats
-+-------------------
-+
-+Driver writers should be very careful about not passing these special
-+struct pages to code that isn't prepared for it. At this time, the kernel
-+interfaces do not have any checks for ensuring this. This obviously
-+precludes passing these pages to userspace.
-+
-+P2P memory is also technically IO memory but should never have any side
-+effects behind it. Thus, the order of loads and stores should not be important
-+and ioreadX(), iowriteX() and friends should not be necessary.
-+However, as the memory is not cache coherent, if access ever needs to
-+be protected by a spinlock then :c:func:`mmiowb()` must be used before
-+unlocking the lock. (See ACQUIRES VS I/O ACCESSES in
-+Documentation/memory-barriers.txt)
-+
-+
-+P2P DMA Support Library
-+=====================
-+
-+.. kernel-doc:: drivers/pci/p2pdma.c
-+   :export:
++#endif /* _BLK_PM_H_ */
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 6980014357d4..e25ce42c982d 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1280,29 +1280,6 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
+ extern void blk_put_queue(struct request_queue *);
+ extern void blk_set_queue_dying(struct request_queue *);
+ 
+-/*
+- * block layer runtime pm functions
+- */
+-#ifdef CONFIG_PM
+-extern void blk_pm_runtime_init(struct request_queue *q, struct device *dev);
+-extern int blk_pre_runtime_suspend(struct request_queue *q);
+-extern void blk_post_runtime_suspend(struct request_queue *q, int err);
+-extern void blk_pre_runtime_resume(struct request_queue *q);
+-extern void blk_post_runtime_resume(struct request_queue *q, int err);
+-extern void blk_set_runtime_active(struct request_queue *q);
+-#else
+-static inline void blk_pm_runtime_init(struct request_queue *q,
+-	struct device *dev) {}
+-static inline int blk_pre_runtime_suspend(struct request_queue *q)
+-{
+-	return -ENOSYS;
+-}
+-static inline void blk_post_runtime_suspend(struct request_queue *q, int err) {}
+-static inline void blk_pre_runtime_resume(struct request_queue *q) {}
+-static inline void blk_post_runtime_resume(struct request_queue *q, int err) {}
+-static inline void blk_set_runtime_active(struct request_queue *q) {}
+-#endif
+-
+ /*
+  * blk_plug permits building a queue of related requests by holding the I/O
+  * fragments for a short period. This allows merging of sequential requests
 -- 
-2.19.0
+2.18.0
