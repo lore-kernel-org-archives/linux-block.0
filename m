@@ -1,19 +1,19 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-yb1-f193.google.com ([209.85.219.193]:37342 "EHLO
-        mail-yb1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727676AbeITCQW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Sep 2018 22:16:22 -0400
-Date: Wed, 19 Sep 2018 13:36:41 -0700
-From: Tejun Heo <tj@kernel.org>
-To: Ming Lei <ming.lei@redhat.com>
+Received: from mx1.redhat.com ([209.132.183.28]:51988 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726825AbeISI1m (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Sep 2018 04:27:42 -0400
+Date: Wed, 19 Sep 2018 10:51:49 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Tejun Heo <tj@kernel.org>
 Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-kernel@vger.kernel.org,
         Jianchao Wang <jianchao.w.wang@oracle.com>,
         Kent Overstreet <kent.overstreet@gmail.com>
 Subject: Re: [PATCH] percpu-refcount: relax limit on percpu_ref_reinit()
-Message-ID: <20180919203641.GD902964@devbig004.ftw2.facebook.com>
-References: <20180911154959.GI1100574@devbig004.ftw2.facebook.com>
+Message-ID: <20180919025148.GB20560@ming.t460p>
+References: <20180911154540.GA10082@ming.t460p>
+ <20180911154959.GI1100574@devbig004.ftw2.facebook.com>
  <20180911160532.GB10082@ming.t460p>
  <20180911163032.GA2966370@devbig004.ftw2.facebook.com>
  <20180911163443.GD10082@ming.t460p>
@@ -22,70 +22,100 @@ References: <20180911154959.GI1100574@devbig004.ftw2.facebook.com>
  <20180912155321.GE2966370@devbig004.ftw2.facebook.com>
  <20180912221139.GB15810@ming.t460p>
  <20180918124909.GA902964@devbig004.ftw2.facebook.com>
- <20180919025148.GB20560@ming.t460p>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180919025148.GB20560@ming.t460p>
+In-Reply-To: <20180918124909.GA902964@devbig004.ftw2.facebook.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hello, Ming.
+Hi Tejun,
 
-On Wed, Sep 19, 2018 at 10:51:49AM +0800, Ming Lei wrote:
-> > That doesn't make sense to me.  How is synchronize_rcu() gonna change
-> > anything there?
+On Tue, Sep 18, 2018 at 05:49:09AM -0700, Tejun Heo wrote:
+> Hello, Ming.
 > 
-> As you saw in the new post, synchronize_rcu() isn't used for avoiding
-> the race. Instead, it is done by grabbing one extra ref on atomic part.
-
-This is layering violation.  It just isn't a good idea to depend on
-percpu_ref internal implementation details like this.
-
-> > 1. Callers of percpu_ref must not depend on what internal
-> >    synchronization construct percpu_ref uses.  Again, percpu_ref
-> >    doesn't even use regular RCU.
+> Sorry about the delay.
+> 
+> On Thu, Sep 13, 2018 at 06:11:40AM +0800, Ming Lei wrote:
+> > > Yeah but what guards ->release() starting to run and then the ref
+> > > being switched to percpu mode?  Or maybe that doesn't matter?
 > > 
-> > 2. If there is already an outer RCU protection around ref operation,
-> >    that RCU critical section can and should be used for
-> >    synchronization, not percpu_ref.
+> > OK, we may add synchronize_rcu() just after clearing the DEAD flag in
+> > the new introduced helper to avoid the race.
 > 
-> I guess the above doesn't apply any more because there isn't new 
-> synchronize_rcu() introduced in my new post.
+> That doesn't make sense to me.  How is synchronize_rcu() gonna change
+> anything there?
 
-It still does.  The problem is that what you're doing creates
-dependencies on percpu_ref's implementation details - how it
-guarantees the mode transition visibility using what sort of
-synchronization construct.
+As you saw in the new post, synchronize_rcu() isn't used for avoiding
+the race. Instead, it is done by grabbing one extra ref on atomic part.
 
-> > Right?  There isn't much wheel to reinvent here and using percpu_ref
-> > for the above is likely already incorrect due to the different RCU
-> > type being used.
 > 
-> No RCU story any more, :-)
+> > > > 4) after the queue is recovered(or the controller is reset successfully), it
+> > > > isn't necessary to wait until the refcount drops zero, since it is fine to
+> > > > reinit it by clearing DEAD and switching back to percpu mode from atomic mode.
+> > > > And waiting for the refcount dropping to zero in the reset handler may trigger
+> > > > IO hang if IO timeout happens again during reset.
+> > > 
+> > > Does the recovery need the in-flight commands actually drained or does
+> > > it just need to block new issues for a while.  If latter, why is
+> > 
+> > The recovery needn't to drain the in-flight commands actually.
 > 
-> It might work, but still a reinvented wheel since perpcu-refcount does
-> provide same function. Not mention the inter-action between the two
-> mechanism may have to be considered.
+> Is it just waiting till confirm_kill is called?  So that new ref is
+> not given away?  If synchronization like that is gonna work, the
+> percpu ref operations on the reader side must be wrapped in a larger
+> critical region, which brings up two issues.
+> 
+> 1. Callers of percpu_ref must not depend on what internal
+>    synchronization construct percpu_ref uses.  Again, percpu_ref
+>    doesn't even use regular RCU.
+> 
+> 2. If there is already an outer RCU protection around ref operation,
+>    that RCU critical section can and should be used for
+>    synchronization, not percpu_ref.
 
-Why would the two independent mechanisms interact with each other?
-What's problematic is entangling two mechanisms in an implementation
-dependent way.
+I guess the above doesn't apply any more because there isn't new 
+synchronize_rcu() introduced in my new post.
 
-> Also there is still cost introduced in WRITER side, and the
-> synchronize_rcu() often takes a bit long, especially there might be lots
-> of namespaces, each need to run one synchronize_rcu(). We have learned
-> lessons in converting to blk-mq for scsi, in which synchronize_rcu()
-> introduces long delay in booting.
+> 
+> > > percpu_ref even being used?
+> > 
+> > Just for avoiding to invent a new wheel, especially .q_usage_counter
+> > has served for this purpose for long time.
+> 
+> It sounds like this was more of an abuse.  So, basically what you want
+> is sth like the following.
+> 
+> READER
+> 
+>  rcu_read_lock();
+>  if (can_issue_new_commands)
+> 	issue;
+>  else
+> 	abort;
+>  rcu_read_unlock();
+> 
+> WRITER
+> 
+>  can_issue_new_commands = false;
+>  synchronize_rcu();
+>  // no new command will be issued anymore
+> 
+> Right?  There isn't much wheel to reinvent here and using percpu_ref
+> for the above is likely already incorrect due to the different RCU
+> type being used.
 
-You're already paying that latency.  It's not like percpu_ref can make
-it happen magically without paying the same cost.  You also can easily
-overlay the two grace periods as the percpu_ref part can be
-asynchronous (if you still care about it).  But, from what I've read
-till now, it doesn't even look like you'd need to do anything with
-percpu_ref if you all you need to do is shutting down issue of new
-commands.
+No RCU story any more, :-)
 
-Thanks.
+It might work, but still a reinvented wheel since perpcu-refcount does
+provide same function. Not mention the inter-action between the two
+mechanism may have to be considered.
 
--- 
-tejun
+Also there is still cost introduced in WRITER side, and the
+synchronize_rcu() often takes a bit long, especially there might be lots
+of namespaces, each need to run one synchronize_rcu(). We have learned
+lessons in converting to blk-mq for scsi, in which synchronize_rcu()
+introduces long delay in booting.
+
+
+Thanks,
+Ming
