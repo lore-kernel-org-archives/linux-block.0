@@ -1,190 +1,116 @@
-Return-Path: <BATV+97b555f176c451e34851+5490+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
+Return-Path: <bvanassche@acm.org>
+From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	linux-block@vger.kernel.org,
-	xen-devel@lists.xen.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 09/13] block: merge BIOVEC_SEG_BOUNDARY into biovec_phys_mergeable
-Date: Tue,  4 Sep 2018 12:14:27 -0700
-Message-Id: <20180904191431.20102-10-hch@lst.de>
-In-Reply-To: <20180904191431.20102-1-hch@lst.de>
-References: <20180904191431.20102-1-hch@lst.de>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v9 0/8] blk-mq: Implement runtime power management
+Date: Wed, 19 Sep 2018 15:45:22 -0700
+Message-Id: <20180919224530.222469-1-bvanassche@acm.org>
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-These two checks should always be performed together, so merge them into
-a single helper.
+Hello Jens,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/bio.c           |  4 +---
- block/blk-integrity.c | 12 ++----------
- block/blk-merge.c     | 29 +++++------------------------
- block/blk.h           | 12 +++++++++---
- include/linux/bio.h   |  8 --------
- 5 files changed, 17 insertions(+), 48 deletions(-)
+One of the pieces that is missing before blk-mq can be made the default is
+implementing runtime power management support for blk-mq.  This patch series
+not only implements runtime power management for blk-mq but also fixes a
+starvation issue in the power management code for the legacy block
+layer. Please consider this patch series for the upstream kernel.
 
-diff --git a/block/bio.c b/block/bio.c
-index d15a228d1bfc..26f6e8deee2d 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -729,9 +729,7 @@ int bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
- 	}
- 
- 	/* If we may be able to merge these biovecs, force a recount */
--	if (bio->bi_vcnt > 1 &&
--	    biovec_phys_mergeable(bvec - 1, bvec) &&
--	    BIOVEC_SEG_BOUNDARY(q, bvec - 1, bvec))
-+	if (bio->bi_vcnt > 1 && biovec_phys_mergeable(q, bvec - 1, bvec))
- 		bio_clear_flag(bio, BIO_SEG_VALID);
- 
-  done:
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index 0f7267916509..d1ab089e0919 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -49,12 +49,8 @@ int blk_rq_count_integrity_sg(struct request_queue *q, struct bio *bio)
- 	bio_for_each_integrity_vec(iv, bio, iter) {
- 
- 		if (prev) {
--			if (!biovec_phys_mergeable(&ivprv, &iv))
-+			if (!biovec_phys_mergeable(q, &ivprv, &iv))
- 				goto new_segment;
--
--			if (!BIOVEC_SEG_BOUNDARY(q, &ivprv, &iv))
--				goto new_segment;
--
- 			if (seg_size + iv.bv_len > queue_max_segment_size(q))
- 				goto new_segment;
- 
-@@ -95,12 +91,8 @@ int blk_rq_map_integrity_sg(struct request_queue *q, struct bio *bio,
- 	bio_for_each_integrity_vec(iv, bio, iter) {
- 
- 		if (prev) {
--			if (!biovec_phys_mergeable(&ivprv, &iv))
-+			if (!biovec_phys_mergeable(q, &ivprv, &iv))
- 				goto new_segment;
--
--			if (!BIOVEC_SEG_BOUNDARY(q, &ivprv, &iv))
--				goto new_segment;
--
- 			if (sg->length + iv.bv_len > queue_max_segment_size(q))
- 				goto new_segment;
- 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 5e63e8259f92..42a46744c11b 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -21,9 +21,7 @@ static inline bool bios_segs_mergeable(struct request_queue *q,
- 		struct bio *prev, struct bio_vec *prev_last_bv,
- 		struct bio_vec *next_first_bv)
- {
--	if (!biovec_phys_mergeable(prev_last_bv, next_first_bv))
--		return false;
--	if (!BIOVEC_SEG_BOUNDARY(q, prev_last_bv, next_first_bv))
-+	if (!biovec_phys_mergeable(q, prev_last_bv, next_first_bv))
- 		return false;
- 	if (prev->bi_seg_back_size + next_first_bv->bv_len >
- 			queue_max_segment_size(q))
-@@ -199,9 +197,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 		if (bvprvp && blk_queue_cluster(q)) {
- 			if (seg_size + bv.bv_len > queue_max_segment_size(q))
- 				goto new_segment;
--			if (!biovec_phys_mergeable(bvprvp, &bv))
--				goto new_segment;
--			if (!BIOVEC_SEG_BOUNDARY(q, bvprvp, &bv))
-+			if (!biovec_phys_mergeable(q, bvprvp, &bv))
- 				goto new_segment;
- 
- 			seg_size += bv.bv_len;
-@@ -332,9 +328,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 				if (seg_size + bv.bv_len
- 				    > queue_max_segment_size(q))
- 					goto new_segment;
--				if (!biovec_phys_mergeable(&bvprv, &bv))
--					goto new_segment;
--				if (!BIOVEC_SEG_BOUNDARY(q, &bvprv, &bv))
-+				if (!biovec_phys_mergeable(q, &bvprv, &bv))
- 					goto new_segment;
- 
- 				seg_size += bv.bv_len;
-@@ -414,17 +408,7 @@ static int blk_phys_contig_segment(struct request_queue *q, struct bio *bio,
- 	bio_get_last_bvec(bio, &end_bv);
- 	bio_get_first_bvec(nxt, &nxt_bv);
- 
--	if (!biovec_phys_mergeable(&end_bv, &nxt_bv))
--		return 0;
--
--	/*
--	 * bio and nxt are contiguous in memory; check if the queue allows
--	 * these two to be merged into one
--	 */
--	if (BIOVEC_SEG_BOUNDARY(q, &end_bv, &nxt_bv))
--		return 1;
--
--	return 0;
-+	return biovec_phys_mergeable(q, &end_bv, &nxt_bv);
- }
- 
- static inline void
-@@ -438,10 +422,7 @@ __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
- 	if (*sg && *cluster) {
- 		if ((*sg)->length + nbytes > queue_max_segment_size(q))
- 			goto new_segment;
--
--		if (!biovec_phys_mergeable(bvprv, bvec))
--			goto new_segment;
--		if (!BIOVEC_SEG_BOUNDARY(q, bvprv, bvec))
-+		if (!biovec_phys_mergeable(q, bvprv, bvec))
- 			goto new_segment;
- 
- 		(*sg)->length += nbytes;
-diff --git a/block/blk.h b/block/blk.h
-index e36395e4c686..e903ce783624 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -150,13 +150,19 @@ static inline void blk_queue_enter_live(struct request_queue *q)
- 	percpu_ref_get(&q->q_usage_counter);
- }
- 
--static inline bool biovec_phys_mergeable(const struct bio_vec *vec1,
--		const struct bio_vec *vec2)
-+static inline bool biovec_phys_mergeable(struct request_queue *q,
-+		struct bio_vec *vec1, struct bio_vec *vec2)
- {
--	if (bvec_to_phys(vec1) + vec1->bv_len != bvec_to_phys(vec2))
-+	unsigned long mask = queue_segment_boundary(q);
-+	phys_addr_t addr1 = bvec_to_phys(vec1);
-+	phys_addr_t addr2 = bvec_to_phys(vec2);
-+
-+	if (addr1 + vec1->bv_len != addr2)
- 		return false;
- 	if (xen_domain() && !xen_biovec_phys_mergeable(vec1, vec2))
- 		return false;
-+	if ((addr1 | mask) != ((addr2 + vec2->bv_len - 1) | mask))
-+		return false;
- 	return true;
- }
- 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index e3d0abb694d4..8bec9f248ab8 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -137,14 +137,6 @@ static inline bool bio_full(struct bio *bio)
-  */
- #define bvec_to_phys(bv)	(page_to_phys((bv)->bv_page) + (unsigned long) (bv)->bv_offset)
- 
--/*
-- * merge helpers etc
-- */
--#define __BIO_SEG_BOUNDARY(addr1, addr2, mask) \
--	(((addr1) | (mask)) == (((addr2) - 1) | (mask)))
--#define BIOVEC_SEG_BOUNDARY(q, b1, b2) \
--	__BIO_SEG_BOUNDARY(bvec_to_phys((b1)), bvec_to_phys((b2)) + (b2)->bv_len, queue_segment_boundary((q)))
--
- /*
-  * drivers should _never_ use the all version - the bio may have been split
-  * before it got to the driver and the driver won't own all of it
+Thanks,
+
+Bart.
+
+Changes compared to v8:
+- Fixed the race that was reported by Jianchao and Ming.
+- Fixed another spelling issue in a source code comment.
+
+Changes compared to v7:
+- Addressed Jianchao's feedback about patch "Make blk_get_request() block for
+  non-PM requests while suspended".
+- Added two new patches - one that documents the functions that iterate over
+  requests and one that introduces a new function that iterates over all
+  requests associated with a queue.
+
+Changes compared to v6:
+- Left out the patches that split RQF_PREEMPT in three flags.
+- Left out the patch that introduces the SCSI device state SDEV_SUSPENDED.
+- Left out the patch that introduces blk_pm_runtime_exit().
+- Restored the patch that changes the PREEMPT_ONLY flag into a counter.
+
+Changes compared to v5:
+- Introduced a new flag RQF_DV that replaces RQF_PREEMPT for SCSI domain
+  validation.
+- Introduced a new request queue state QUEUE_FLAG_DV_ONLY for SCSI domain
+  validation.
+- Instead of using SDEV_QUIESCE for both runtime suspend and SCSI domain
+  validation, use that state for domain validation only and introduce a new
+  state for runtime suspend, namely SDEV_QUIESCE.
+- Reallow system suspend during SCSI domain validation.
+- Moved the runtime resume call from the request allocation code into
+  blk_queue_enter().
+- Instead of relying on q_usage_counter, iterate over the tag set to determine
+  whether or not any requests are in flight.
+
+Changes compared to v4:
+- Dropped the patches "Give RQF_PREEMPT back its original meaning" and
+  "Serialize queue freezing and blk_pre_runtime_suspend()".
+- Replaced "percpu_ref_read()" with "percpu_is_in_use()".
+- Inserted pm_request_resume() calls in the block layer request allocation
+  code such that the context that submits a request no longer has to call
+  pm_runtime_get().
+
+Changes compared to v3:
+- Avoid adverse interactions between system-wide suspend/resume and runtime
+  power management by changing the PREEMPT_ONLY flag into a counter.
+- Give RQF_PREEMPT back its original meaning, namely that it is only set for
+  ide_preempt requests.
+- Remove the flag BLK_MQ_REQ_PREEMPT.
+- Removed the pm_request_resume() call.
+
+Changes compared to v2:
+- Fixed the build for CONFIG_BLOCK=n.
+- Added a patch that introduces percpu_ref_read() in the percpu-counter code.
+- Added a patch that makes it easier to detect missing pm_runtime_get*() calls.
+- Addressed Jianchao's feedback including the comment about runtime overhead
+  of switching a per-cpu counter to atomic mode.
+
+Changes compared to v1:
+- Moved the runtime power management code into a separate file.
+- Addressed Ming's feedback.
+
+Bart Van Assche (8):
+  blk-mq: Document the functions that iterate over requests
+  blk-mq: Introduce blk_mq_queue_rq_iter()
+  block: Move power management code into a new source file
+  block, scsi: Change the preempt-only flag into a counter
+  block: Split blk_pm_add_request() and blk_pm_put_request()
+  block: Schedule runtime resume earlier
+  block: Make blk_get_request() block for non-PM requests while
+    suspended
+  blk-mq: Enable support for runtime power management
+
+ block/Kconfig           |   3 +
+ block/Makefile          |   1 +
+ block/blk-core.c        | 271 +++++-----------------------------------
+ block/blk-mq-debugfs.c  |  10 +-
+ block/blk-mq-tag.c      |  74 ++++++++++-
+ block/blk-mq-tag.h      |   2 +
+ block/blk-mq.c          |   2 +
+ block/blk-pm.c          | 253 +++++++++++++++++++++++++++++++++++++
+ block/blk-pm.h          |  69 ++++++++++
+ block/elevator.c        |  22 +---
+ drivers/scsi/scsi_lib.c |  11 +-
+ drivers/scsi/scsi_pm.c  |   1 +
+ drivers/scsi/sd.c       |   1 +
+ drivers/scsi/sr.c       |   1 +
+ include/linux/blk-pm.h  |  24 ++++
+ include/linux/blkdev.h  |  37 ++----
+ 16 files changed, 484 insertions(+), 298 deletions(-)
+ create mode 100644 block/blk-pm.c
+ create mode 100644 block/blk-pm.h
+ create mode 100644 include/linux/blk-pm.h
+
 -- 
-2.18.0
+2.19.0.397.gdd90340f6a-goog
