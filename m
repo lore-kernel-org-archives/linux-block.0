@@ -1,21 +1,19 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Wed, 19 Sep 2018 16:07:31 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Cc: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-	linux-block <linux-block@vger.kernel.org>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	James Bottomley <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Linux SCSI List <linux-scsi@vger.kernel.org>
+Return-Path: <jianchao.w.wang@oracle.com>
 Subject: Re: [PATCH V3 11/17] SCSI: track pending admin commands
-Message-ID: <20180919080730.GC23172@ming.t460p>
-References: <CACVXFVMWxXZqQfhAT7KaWP60NE2ACPPOz-9Tuoku_QYxuJuwRg@mail.gmail.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Alan Stern <stern@rowland.harvard.edu>, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>
+References: <20180913121546.5710-12-ming.lei@redhat.com>
+ <ae5c53be-b61a-5cba-9e92-538dee0a6536@oracle.com>
+ <CACVXFVMWxXZqQfhAT7KaWP60NE2ACPPOz-9Tuoku_QYxuJuwRg@mail.gmail.com>
  <5c13533d-b1ea-616e-07d0-99d59cf65f8a@oracle.com>
  <20180917113506.GA28349@ming.t460p>
  <1f91bfaf-7b9e-881d-7455-6f04bbb37823@oracle.com>
@@ -24,34 +22,28 @@ References: <CACVXFVMWxXZqQfhAT7KaWP60NE2ACPPOz-9Tuoku_QYxuJuwRg@mail.gmail.com>
  <20180918075544.GD4805@ming.t460p>
  <8d9049f4-a133-d725-d144-769b2d285660@oracle.com>
  <20180918121515.GA14172@ming.t460p>
- <47528f73-334a-16ef-5ec2-b3872b4eeeb7@oracle.com>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <47528f73-334a-16ef-5ec2-b3872b4eeeb7@oracle.com>
+Date: Wed, 19 Sep 2018 11:52:21 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <47528f73-334a-16ef-5ec2-b3872b4eeeb7@oracle.com>
+In-Reply-To: <20180918121515.GA14172@ming.t460p>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Sep 19, 2018 at 11:52:21AM +0800, jianchao.wang wrote:
-> Hi Ming
-> 
-> On 09/18/2018 08:15 PM, Ming Lei wrote:
-> > The adminq request can be quisced in the scsi_device level, just as normal IO
-> > request, because the scsi_device instance is same with normal IO.
-> 
-> Yes, the scsi_queue_rq->scsi_prep_state_check could gate things out of.
-> 
-> > 
-> > But in blk-mq level, this admin queue won't be quiesced or frozen at all.
-> 
-> But the scsi_queue_rq/scsi_request_fn will be invoked, right ?
-> 
-> This is different from the original implementation.
+Hi Ming
 
-For legacy path, as you mentioned, scsi_prep_fn() will work, then
-scsi_request_fn() won't be called.
+On 09/18/2018 08:15 PM, Ming Lei wrote:
+> The adminq request can be quisced in the scsi_device level, just as normal IO
+> request, because the scsi_device instance is same with normal IO.
 
-For blk-mq, scsi_queue_rq() is always called, and that is a bit
-different, but the result is fine given admin request is submitted
-much less frequently.
+Yes, the scsi_queue_rq->scsi_prep_state_check could gate things out of.
 
-Thanks,
-Ming
+> 
+> But in blk-mq level, this admin queue won't be quiesced or frozen at all.
+
+But the scsi_queue_rq/scsi_request_fn will be invoked, right ?
+
+This is different from the original implementation.
+
+Thanks
+Jianchao
