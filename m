@@ -1,94 +1,65 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:60854 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726000AbeITHTA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Sep 2018 03:19:00 -0400
-Date: Thu, 20 Sep 2018 09:38:07 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Jianchao Wang <jianchao.w.wang@oracle.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Alan Stern <stern@rowland.harvard.edu>
-Subject: Re: [PATCH v8 6/8] block: Schedule runtime resume earlier
-Message-ID: <20180920013806.GB27645@ming.t460p>
-References: <20180918205903.15516-1-bvanassche@acm.org>
- <20180918205903.15516-7-bvanassche@acm.org>
- <20180919040514.GE20560@ming.t460p>
- <1537393175.186311.3.camel@acm.org>
+Return-Path: <bvanassche@acm.org>
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Ming Lei <ming.lei@redhat.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Alan Stern <stern@rowland.harvard.edu>
+Subject: [PATCH v9 6/8] block: Schedule runtime resume earlier
+Date: Wed, 19 Sep 2018 15:45:28 -0700
+Message-Id: <20180919224530.222469-7-bvanassche@acm.org>
+In-Reply-To: <20180919224530.222469-1-bvanassche@acm.org>
+References: <20180919224530.222469-1-bvanassche@acm.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1537393175.186311.3.camel@acm.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Sep 19, 2018 at 02:39:35PM -0700, Bart Van Assche wrote:
-> On Wed, 2018-09-19 at 12:05 +0800, Ming Lei wrote:
-> > Looks this patch may introduce the following race between queue
-> > freeze and
-> > runtime suspend:
-> > 
-> > -------------------------------------------------------------------
-> > -------
-> > CPU0				CPU1				
-> > 		CPU2
-> > -------------------------------------------------------------------
-> > -------
-> > 
-> > blk_freeze_queue()
-> > 
-> > 					blk_mq_alloc_request()
-> > 						blk_queue_enter()
-> > 							blk_pm_request_
-> > resume()
-> > 							wait_event()
-> > 
-> > 									
-> > 			blk_pre_runtime_suspend()
-> > 									
-> > 				->blk_set_pm_only
-> > 									
-> > 			...
-> > 									
-> > 			blk_post_runtime_suspend()
-> > 
-> > ...
-> > blk_mq_unfreeze_queue()
-> > -------------------------------------------------------------------
-> > -------
-> > - CPU0: queue is frozen
-> > 
-> > - CPU1: one new request comes, and see queue is frozen, but queue
-> > isn't
-> > runtime-suspended yet, then blk_pm_request_resume() does nothing. So
-> > this
-> > allocation is blocked in wait_event().
-> > 
-> > - CPU2: runtime suspend comes, and queue becomes runtime-suspended
-> > now
-> > 
-> > - CPU0: queue is unfreeze, but the new request allocation in CPU1 may
-> > never
-> > be done because the queue is runtime suspended, and wait_event()
-> > won't return.
-> > And the expected result is that the queue becomes active and the
-> > allocation on
-> > CPU1 is done immediately.
-> 
-> Hello Ming,
-> 
-> Just like for the scenario Jianchao reported, I will address this by
-> only allowing the suspend to proceed if q_usage_counter == 0.
+Instead of scheduling runtime resume of a request queue after a
+request has been queued, schedule asynchronous resume during request
+allocation. The new pm_request_resume() calls occur after
+blk_queue_enter() has increased the q_usage_counter request queue
+member. This change is needed for a later patch that will make request
+allocation block while the queue status is not RPM_ACTIVE.
 
-Hi Bart,
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Alan Stern <stern@rowland.harvard.edu>
+---
+ block/blk-core.c | 2 ++
+ block/elevator.c | 1 -
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-But .q_usage_counter has been zero already in the case I described,
-no one grabs a queue ref before starting runtime suspend.
-
-Also, if there is in-progress PM request, the .q_usage_counter can be
-non-zero, but it should be fine to start the suspend.
-
-Thanks,
-Ming
+diff --git a/block/blk-core.c b/block/blk-core.c
+index fd91e9bf2893..18b874d5c9c9 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -942,6 +942,8 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
+ 		if (success)
+ 			return 0;
+ 
++		blk_pm_request_resume(q);
++
+ 		if (flags & BLK_MQ_REQ_NOWAIT)
+ 			return -EBUSY;
+ 
+diff --git a/block/elevator.c b/block/elevator.c
+index 1c992bf6cfb1..e18ac68626e3 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -601,7 +601,6 @@ void __elv_add_request(struct request_queue *q, struct request *rq, int where)
+ 	trace_block_rq_insert(q, rq);
+ 
+ 	blk_pm_add_request(q, rq);
+-	blk_pm_request_resume(q);
+ 
+ 	rq->q = q;
+ 
+-- 
+2.19.0.397.gdd90340f6a-goog
