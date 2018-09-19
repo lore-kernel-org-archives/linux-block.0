@@ -1,125 +1,679 @@
-Return-Path: <christophe.leroy@c-s.fr>
-Message-Id: <d5036d6c9b61e9552eba111ceace1afa2c532df5.1536692743.git.christophe.leroy@c-s.fr>
-In-Reply-To: <cover.1536692743.git.christophe.leroy@c-s.fr>
-References: <cover.1536692743.git.christophe.leroy@c-s.fr>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v2 14/24] powerpc/mm: drop unused page flags
-To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
-Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
-Date: Wed, 12 Sep 2018 15:58:42 +0000 (UTC)
+Return-Path: <bvanassche@acm.org>
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Ming Lei <ming.lei@redhat.com>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Alan Stern <stern@rowland.harvard.edu>
+Subject: [PATCH v9 3/8] block: Move power management code into a new source file
+Date: Wed, 19 Sep 2018 15:45:25 -0700
+Message-Id: <20180919224530.222469-4-bvanassche@acm.org>
+In-Reply-To: <20180919224530.222469-1-bvanassche@acm.org>
+References: <20180919224530.222469-1-bvanassche@acm.org>
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-The following page flags in pte-common.h can be dropped:
+Move the code for runtime power management from blk-core.c into the
+new source file blk-pm.c. Move the corresponding declarations from
+<linux/blkdev.h> into <linux/blk-pm.h>. For CONFIG_PM=n, leave out
+the declarations of the functions that are not used in that mode.
+This patch not only reduces the number of #ifdefs in the block layer
+core code but also reduces the size of header file <linux/blkdev.h>
+and hence should help to reduce the build time of the Linux kernel
+if CONFIG_PM is not defined.
 
-_PAGE_ENDIAN is only used in mm/fsl_booke_mmu.c and is defined in
-asm/nohash/32/pte-fsl-booke.h
-
-_PAGE_4K_PFN is nowhere defined nor used
-
-_PAGE_READ, _PAGE_WRITE and _PAGE_PTE are only defined and used
-in book3s/64
-
-The following page flags in book3s/64/pgtable.h can be dropped as
-they are not used on this platform nor by common code.
-
-_PAGE_NA, _PAGE_RO, _PAGE_USER and _PAGE_PSIZE
-
-Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Alan Stern <stern@rowland.harvard.edu>
 ---
- arch/powerpc/include/asm/book3s/64/pgtable.h | 10 +---------
- arch/powerpc/include/asm/pte-common.h        | 17 +----------------
- 2 files changed, 2 insertions(+), 25 deletions(-)
+ block/Kconfig          |   3 +
+ block/Makefile         |   1 +
+ block/blk-core.c       | 196 +----------------------------------------
+ block/blk-pm.c         | 188 +++++++++++++++++++++++++++++++++++++++
+ block/blk-pm.h         |  43 +++++++++
+ block/elevator.c       |  22 +----
+ drivers/scsi/scsi_pm.c |   1 +
+ drivers/scsi/sd.c      |   1 +
+ drivers/scsi/sr.c      |   1 +
+ include/linux/blk-pm.h |  24 +++++
+ include/linux/blkdev.h |  23 -----
+ 11 files changed, 264 insertions(+), 239 deletions(-)
+ create mode 100644 block/blk-pm.c
+ create mode 100644 block/blk-pm.h
+ create mode 100644 include/linux/blk-pm.h
 
-diff --git a/arch/powerpc/include/asm/book3s/64/pgtable.h b/arch/powerpc/include/asm/book3s/64/pgtable.h
-index 56eddd79ab7d..8cf44faa6ff3 100644
---- a/arch/powerpc/include/asm/book3s/64/pgtable.h
-+++ b/arch/powerpc/include/asm/book3s/64/pgtable.h
-@@ -14,10 +14,6 @@
-  */
- #define _PAGE_BIT_SWAP_TYPE	0
+diff --git a/block/Kconfig b/block/Kconfig
+index 1f2469a0123c..85263e7bded6 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -228,4 +228,7 @@ config BLK_MQ_RDMA
+ 	depends on BLOCK && INFINIBAND
+ 	default y
  
--#define _PAGE_NA		0
--#define _PAGE_RO		0
--#define _PAGE_USER		0
++config BLK_PM
++	def_bool BLOCK && PM
++
+ source block/Kconfig.iosched
+diff --git a/block/Makefile b/block/Makefile
+index 572b33f32c07..27eac600474f 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -37,3 +37,4 @@ obj-$(CONFIG_BLK_WBT)		+= blk-wbt.o
+ obj-$(CONFIG_BLK_DEBUG_FS)	+= blk-mq-debugfs.o
+ obj-$(CONFIG_BLK_DEBUG_FS_ZONED)+= blk-mq-debugfs-zoned.o
+ obj-$(CONFIG_BLK_SED_OPAL)	+= sed-opal.o
++obj-$(CONFIG_BLK_PM)		+= blk-pm.o
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 4dbc93f43b38..6d4dd176bd9d 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -42,6 +42,7 @@
+ #include "blk.h"
+ #include "blk-mq.h"
+ #include "blk-mq-sched.h"
++#include "blk-pm.h"
+ #include "blk-rq-qos.h"
+ 
+ #ifdef CONFIG_DEBUG_FS
+@@ -1726,16 +1727,6 @@ void part_round_stats(struct request_queue *q, int cpu, struct hd_struct *part)
+ }
+ EXPORT_SYMBOL_GPL(part_round_stats);
+ 
+-#ifdef CONFIG_PM
+-static void blk_pm_put_request(struct request *rq)
+-{
+-	if (rq->q->dev && !(rq->rq_flags & RQF_PM) && !--rq->q->nr_pending)
+-		pm_runtime_mark_last_busy(rq->q->dev);
+-}
+-#else
+-static inline void blk_pm_put_request(struct request *rq) {}
+-#endif
 -
- #define _PAGE_EXEC		0x00001 /* execute permission */
- #define _PAGE_WRITE		0x00002 /* write access allowed */
- #define _PAGE_READ		0x00004	/* read access allowed */
-@@ -123,10 +119,6 @@
- #define _PAGE_KERNEL_RWX	(_PAGE_PRIVILEGED | _PAGE_DIRTY |	\
- 				 _PAGE_RW | _PAGE_EXEC)
- /*
-- * No page size encoding in the linux PTE
+ void __blk_put_request(struct request_queue *q, struct request *req)
+ {
+ 	req_flags_t rq_flags = req->rq_flags;
+@@ -3757,191 +3748,6 @@ void blk_finish_plug(struct blk_plug *plug)
+ }
+ EXPORT_SYMBOL(blk_finish_plug);
+ 
+-#ifdef CONFIG_PM
+-/**
+- * blk_pm_runtime_init - Block layer runtime PM initialization routine
+- * @q: the queue of the device
+- * @dev: the device the queue belongs to
+- *
+- * Description:
+- *    Initialize runtime-PM-related fields for @q and start auto suspend for
+- *    @dev. Drivers that want to take advantage of request-based runtime PM
+- *    should call this function after @dev has been initialized, and its
+- *    request queue @q has been allocated, and runtime PM for it can not happen
+- *    yet(either due to disabled/forbidden or its usage_count > 0). In most
+- *    cases, driver should call this function before any I/O has taken place.
+- *
+- *    This function takes care of setting up using auto suspend for the device,
+- *    the autosuspend delay is set to -1 to make runtime suspend impossible
+- *    until an updated value is either set by user or by driver. Drivers do
+- *    not need to touch other autosuspend settings.
+- *
+- *    The block layer runtime PM is request based, so only works for drivers
+- *    that use request as their IO unit instead of those directly use bio's.
 - */
--#define _PAGE_PSIZE		0
--/*
-  * _PAGE_CHG_MASK masks of bits that are to be preserved across
-  * pgprot changes
-  */
-@@ -149,7 +141,7 @@
-  * pages. We always set _PAGE_COHERENT when SMP is enabled or
-  * the processor might need it for DMA coherency.
-  */
--#define _PAGE_BASE_NC	(_PAGE_PRESENT | _PAGE_ACCESSED | _PAGE_PSIZE)
-+#define _PAGE_BASE_NC	(_PAGE_PRESENT | _PAGE_ACCESSED)
- #define _PAGE_BASE	(_PAGE_BASE_NC)
- 
- /* Permission masks used to generate the __P and __S table,
-diff --git a/arch/powerpc/include/asm/pte-common.h b/arch/powerpc/include/asm/pte-common.h
-index bef56141a549..5a5ba43bdf98 100644
---- a/arch/powerpc/include/asm/pte-common.h
-+++ b/arch/powerpc/include/asm/pte-common.h
-@@ -14,18 +14,12 @@
- #ifndef _PAGE_EXEC
- #define _PAGE_EXEC	0
- #endif
--#ifndef _PAGE_ENDIAN
--#define _PAGE_ENDIAN	0
--#endif
- #ifndef _PAGE_COHERENT
- #define _PAGE_COHERENT	0
- #endif
- #ifndef _PAGE_WRITETHRU
- #define _PAGE_WRITETHRU	0
- #endif
--#ifndef _PAGE_4K_PFN
--#define _PAGE_4K_PFN		0
--#endif
- #ifndef _PAGE_SAO
- #define _PAGE_SAO	0
- #endif
-@@ -39,9 +33,6 @@
- #define _PAGE_RW 0
- #endif
- 
--#ifndef _PAGE_PTE
--#define _PAGE_PTE 0
--#endif
- /* At least one of _PAGE_PRIVILEGED or _PAGE_USER must be defined */
- #ifndef _PAGE_PRIVILEGED
- #define _PAGE_PRIVILEGED 0
-@@ -122,7 +113,7 @@ static inline bool pte_user(pte_t pte)
- 
- /* Mask of bits returned by pte_pgprot() */
- #define PAGE_PROT_BITS	(_PAGE_GUARDED | _PAGE_COHERENT | _PAGE_NO_CACHE | \
--			 _PAGE_WRITETHRU | _PAGE_ENDIAN | _PAGE_4K_PFN | \
-+			 _PAGE_WRITETHRU | \
- 			 _PAGE_USER | _PAGE_ACCESSED | _PAGE_RO | _PAGE_NA | \
- 			 _PAGE_PRIVILEGED | \
- 			 _PAGE_RW | _PAGE_HWWRITE | _PAGE_DIRTY | _PAGE_EXEC)
-@@ -208,12 +199,6 @@ static inline bool pte_user(pte_t pte)
- #define PAGE_AGP		(PAGE_KERNEL_NC)
- #define HAVE_PAGE_AGP
- 
--#ifndef _PAGE_READ
--/* if not defined, we should not find _PAGE_WRITE too */
--#define _PAGE_READ 0
--#define _PAGE_WRITE _PAGE_RW
+-void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
+-{
+-	/* Don't enable runtime PM for blk-mq until it is ready */
+-	if (q->mq_ops) {
+-		pm_runtime_disable(dev);
+-		return;
+-	}
+-
+-	q->dev = dev;
+-	q->rpm_status = RPM_ACTIVE;
+-	pm_runtime_set_autosuspend_delay(q->dev, -1);
+-	pm_runtime_use_autosuspend(q->dev);
+-}
+-EXPORT_SYMBOL(blk_pm_runtime_init);
+-
+-/**
+- * blk_pre_runtime_suspend - Pre runtime suspend check
+- * @q: the queue of the device
+- *
+- * Description:
+- *    This function will check if runtime suspend is allowed for the device
+- *    by examining if there are any requests pending in the queue. If there
+- *    are requests pending, the device can not be runtime suspended; otherwise,
+- *    the queue's status will be updated to SUSPENDING and the driver can
+- *    proceed to suspend the device.
+- *
+- *    For the not allowed case, we mark last busy for the device so that
+- *    runtime PM core will try to autosuspend it some time later.
+- *
+- *    This function should be called near the start of the device's
+- *    runtime_suspend callback.
+- *
+- * Return:
+- *    0		- OK to runtime suspend the device
+- *    -EBUSY	- Device should not be runtime suspended
+- */
+-int blk_pre_runtime_suspend(struct request_queue *q)
+-{
+-	int ret = 0;
+-
+-	if (!q->dev)
+-		return ret;
+-
+-	spin_lock_irq(q->queue_lock);
+-	if (q->nr_pending) {
+-		ret = -EBUSY;
+-		pm_runtime_mark_last_busy(q->dev);
+-	} else {
+-		q->rpm_status = RPM_SUSPENDING;
+-	}
+-	spin_unlock_irq(q->queue_lock);
+-	return ret;
+-}
+-EXPORT_SYMBOL(blk_pre_runtime_suspend);
+-
+-/**
+- * blk_post_runtime_suspend - Post runtime suspend processing
+- * @q: the queue of the device
+- * @err: return value of the device's runtime_suspend function
+- *
+- * Description:
+- *    Update the queue's runtime status according to the return value of the
+- *    device's runtime suspend function and mark last busy for the device so
+- *    that PM core will try to auto suspend the device at a later time.
+- *
+- *    This function should be called near the end of the device's
+- *    runtime_suspend callback.
+- */
+-void blk_post_runtime_suspend(struct request_queue *q, int err)
+-{
+-	if (!q->dev)
+-		return;
+-
+-	spin_lock_irq(q->queue_lock);
+-	if (!err) {
+-		q->rpm_status = RPM_SUSPENDED;
+-	} else {
+-		q->rpm_status = RPM_ACTIVE;
+-		pm_runtime_mark_last_busy(q->dev);
+-	}
+-	spin_unlock_irq(q->queue_lock);
+-}
+-EXPORT_SYMBOL(blk_post_runtime_suspend);
+-
+-/**
+- * blk_pre_runtime_resume - Pre runtime resume processing
+- * @q: the queue of the device
+- *
+- * Description:
+- *    Update the queue's runtime status to RESUMING in preparation for the
+- *    runtime resume of the device.
+- *
+- *    This function should be called near the start of the device's
+- *    runtime_resume callback.
+- */
+-void blk_pre_runtime_resume(struct request_queue *q)
+-{
+-	if (!q->dev)
+-		return;
+-
+-	spin_lock_irq(q->queue_lock);
+-	q->rpm_status = RPM_RESUMING;
+-	spin_unlock_irq(q->queue_lock);
+-}
+-EXPORT_SYMBOL(blk_pre_runtime_resume);
+-
+-/**
+- * blk_post_runtime_resume - Post runtime resume processing
+- * @q: the queue of the device
+- * @err: return value of the device's runtime_resume function
+- *
+- * Description:
+- *    Update the queue's runtime status according to the return value of the
+- *    device's runtime_resume function. If it is successfully resumed, process
+- *    the requests that are queued into the device's queue when it is resuming
+- *    and then mark last busy and initiate autosuspend for it.
+- *
+- *    This function should be called near the end of the device's
+- *    runtime_resume callback.
+- */
+-void blk_post_runtime_resume(struct request_queue *q, int err)
+-{
+-	if (!q->dev)
+-		return;
+-
+-	spin_lock_irq(q->queue_lock);
+-	if (!err) {
+-		q->rpm_status = RPM_ACTIVE;
+-		__blk_run_queue(q);
+-		pm_runtime_mark_last_busy(q->dev);
+-		pm_request_autosuspend(q->dev);
+-	} else {
+-		q->rpm_status = RPM_SUSPENDED;
+-	}
+-	spin_unlock_irq(q->queue_lock);
+-}
+-EXPORT_SYMBOL(blk_post_runtime_resume);
+-
+-/**
+- * blk_set_runtime_active - Force runtime status of the queue to be active
+- * @q: the queue of the device
+- *
+- * If the device is left runtime suspended during system suspend the resume
+- * hook typically resumes the device and corrects runtime status
+- * accordingly. However, that does not affect the queue runtime PM status
+- * which is still "suspended". This prevents processing requests from the
+- * queue.
+- *
+- * This function can be used in driver's resume hook to correct queue
+- * runtime PM status and re-enable peeking requests from the queue. It
+- * should be called before first request is added to the queue.
+- */
+-void blk_set_runtime_active(struct request_queue *q)
+-{
+-	spin_lock_irq(q->queue_lock);
+-	q->rpm_status = RPM_ACTIVE;
+-	pm_runtime_mark_last_busy(q->dev);
+-	pm_request_autosuspend(q->dev);
+-	spin_unlock_irq(q->queue_lock);
+-}
+-EXPORT_SYMBOL(blk_set_runtime_active);
 -#endif
 -
- #ifndef H_PAGE_4K_PFN
- #define H_PAGE_4K_PFN 0
- #endif
+ int __init blk_dev_init(void)
+ {
+ 	BUILD_BUG_ON(REQ_OP_LAST >= (1 << REQ_OP_BITS));
+diff --git a/block/blk-pm.c b/block/blk-pm.c
+new file mode 100644
+index 000000000000..9b636960d285
+--- /dev/null
++++ b/block/blk-pm.c
+@@ -0,0 +1,188 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include <linux/blk-pm.h>
++#include <linux/blkdev.h>
++#include <linux/pm_runtime.h>
++
++/**
++ * blk_pm_runtime_init - Block layer runtime PM initialization routine
++ * @q: the queue of the device
++ * @dev: the device the queue belongs to
++ *
++ * Description:
++ *    Initialize runtime-PM-related fields for @q and start auto suspend for
++ *    @dev. Drivers that want to take advantage of request-based runtime PM
++ *    should call this function after @dev has been initialized, and its
++ *    request queue @q has been allocated, and runtime PM for it can not happen
++ *    yet(either due to disabled/forbidden or its usage_count > 0). In most
++ *    cases, driver should call this function before any I/O has taken place.
++ *
++ *    This function takes care of setting up using auto suspend for the device,
++ *    the autosuspend delay is set to -1 to make runtime suspend impossible
++ *    until an updated value is either set by user or by driver. Drivers do
++ *    not need to touch other autosuspend settings.
++ *
++ *    The block layer runtime PM is request based, so only works for drivers
++ *    that use request as their IO unit instead of those directly use bio's.
++ */
++void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
++{
++	/* Don't enable runtime PM for blk-mq until it is ready */
++	if (q->mq_ops) {
++		pm_runtime_disable(dev);
++		return;
++	}
++
++	q->dev = dev;
++	q->rpm_status = RPM_ACTIVE;
++	pm_runtime_set_autosuspend_delay(q->dev, -1);
++	pm_runtime_use_autosuspend(q->dev);
++}
++EXPORT_SYMBOL(blk_pm_runtime_init);
++
++/**
++ * blk_pre_runtime_suspend - Pre runtime suspend check
++ * @q: the queue of the device
++ *
++ * Description:
++ *    This function will check if runtime suspend is allowed for the device
++ *    by examining if there are any requests pending in the queue. If there
++ *    are requests pending, the device can not be runtime suspended; otherwise,
++ *    the queue's status will be updated to SUSPENDING and the driver can
++ *    proceed to suspend the device.
++ *
++ *    For the not allowed case, we mark last busy for the device so that
++ *    runtime PM core will try to autosuspend it some time later.
++ *
++ *    This function should be called near the start of the device's
++ *    runtime_suspend callback.
++ *
++ * Return:
++ *    0		- OK to runtime suspend the device
++ *    -EBUSY	- Device should not be runtime suspended
++ */
++int blk_pre_runtime_suspend(struct request_queue *q)
++{
++	int ret = 0;
++
++	if (!q->dev)
++		return ret;
++
++	spin_lock_irq(q->queue_lock);
++	if (q->nr_pending) {
++		ret = -EBUSY;
++		pm_runtime_mark_last_busy(q->dev);
++	} else {
++		q->rpm_status = RPM_SUSPENDING;
++	}
++	spin_unlock_irq(q->queue_lock);
++	return ret;
++}
++EXPORT_SYMBOL(blk_pre_runtime_suspend);
++
++/**
++ * blk_post_runtime_suspend - Post runtime suspend processing
++ * @q: the queue of the device
++ * @err: return value of the device's runtime_suspend function
++ *
++ * Description:
++ *    Update the queue's runtime status according to the return value of the
++ *    device's runtime suspend function and mark last busy for the device so
++ *    that PM core will try to auto suspend the device at a later time.
++ *
++ *    This function should be called near the end of the device's
++ *    runtime_suspend callback.
++ */
++void blk_post_runtime_suspend(struct request_queue *q, int err)
++{
++	if (!q->dev)
++		return;
++
++	spin_lock_irq(q->queue_lock);
++	if (!err) {
++		q->rpm_status = RPM_SUSPENDED;
++	} else {
++		q->rpm_status = RPM_ACTIVE;
++		pm_runtime_mark_last_busy(q->dev);
++	}
++	spin_unlock_irq(q->queue_lock);
++}
++EXPORT_SYMBOL(blk_post_runtime_suspend);
++
++/**
++ * blk_pre_runtime_resume - Pre runtime resume processing
++ * @q: the queue of the device
++ *
++ * Description:
++ *    Update the queue's runtime status to RESUMING in preparation for the
++ *    runtime resume of the device.
++ *
++ *    This function should be called near the start of the device's
++ *    runtime_resume callback.
++ */
++void blk_pre_runtime_resume(struct request_queue *q)
++{
++	if (!q->dev)
++		return;
++
++	spin_lock_irq(q->queue_lock);
++	q->rpm_status = RPM_RESUMING;
++	spin_unlock_irq(q->queue_lock);
++}
++EXPORT_SYMBOL(blk_pre_runtime_resume);
++
++/**
++ * blk_post_runtime_resume - Post runtime resume processing
++ * @q: the queue of the device
++ * @err: return value of the device's runtime_resume function
++ *
++ * Description:
++ *    Update the queue's runtime status according to the return value of the
++ *    device's runtime_resume function. If it is successfully resumed, process
++ *    the requests that are queued into the device's queue when it is resuming
++ *    and then mark last busy and initiate autosuspend for it.
++ *
++ *    This function should be called near the end of the device's
++ *    runtime_resume callback.
++ */
++void blk_post_runtime_resume(struct request_queue *q, int err)
++{
++	if (!q->dev)
++		return;
++
++	spin_lock_irq(q->queue_lock);
++	if (!err) {
++		q->rpm_status = RPM_ACTIVE;
++		__blk_run_queue(q);
++		pm_runtime_mark_last_busy(q->dev);
++		pm_request_autosuspend(q->dev);
++	} else {
++		q->rpm_status = RPM_SUSPENDED;
++	}
++	spin_unlock_irq(q->queue_lock);
++}
++EXPORT_SYMBOL(blk_post_runtime_resume);
++
++/**
++ * blk_set_runtime_active - Force runtime status of the queue to be active
++ * @q: the queue of the device
++ *
++ * If the device is left runtime suspended during system suspend the resume
++ * hook typically resumes the device and corrects runtime status
++ * accordingly. However, that does not affect the queue runtime PM status
++ * which is still "suspended". This prevents processing requests from the
++ * queue.
++ *
++ * This function can be used in driver's resume hook to correct queue
++ * runtime PM status and re-enable peeking requests from the queue. It
++ * should be called before first request is added to the queue.
++ */
++void blk_set_runtime_active(struct request_queue *q)
++{
++	spin_lock_irq(q->queue_lock);
++	q->rpm_status = RPM_ACTIVE;
++	pm_runtime_mark_last_busy(q->dev);
++	pm_request_autosuspend(q->dev);
++	spin_unlock_irq(q->queue_lock);
++}
++EXPORT_SYMBOL(blk_set_runtime_active);
+diff --git a/block/blk-pm.h b/block/blk-pm.h
+new file mode 100644
+index 000000000000..1ffc8ef203ec
+--- /dev/null
++++ b/block/blk-pm.h
+@@ -0,0 +1,43 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++#ifndef _BLOCK_BLK_PM_H_
++#define _BLOCK_BLK_PM_H_
++
++#include <linux/pm_runtime.h>
++
++#ifdef CONFIG_PM
++static inline void blk_pm_requeue_request(struct request *rq)
++{
++	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
++		rq->q->nr_pending--;
++}
++
++static inline void blk_pm_add_request(struct request_queue *q,
++				      struct request *rq)
++{
++	if (q->dev && !(rq->rq_flags & RQF_PM) && q->nr_pending++ == 0 &&
++	    (q->rpm_status == RPM_SUSPENDED || q->rpm_status == RPM_SUSPENDING))
++		pm_request_resume(q->dev);
++}
++
++static inline void blk_pm_put_request(struct request *rq)
++{
++	if (rq->q->dev && !(rq->rq_flags & RQF_PM) && !--rq->q->nr_pending)
++		pm_runtime_mark_last_busy(rq->q->dev);
++}
++#else
++static inline void blk_pm_requeue_request(struct request *rq)
++{
++}
++
++static inline void blk_pm_add_request(struct request_queue *q,
++				      struct request *rq)
++{
++}
++
++static inline void blk_pm_put_request(struct request *rq)
++{
++}
++#endif
++
++#endif /* _BLOCK_BLK_PM_H_ */
+diff --git a/block/elevator.c b/block/elevator.c
+index 6a06b5d040e5..e18ac68626e3 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -41,6 +41,7 @@
+ 
+ #include "blk.h"
+ #include "blk-mq-sched.h"
++#include "blk-pm.h"
+ #include "blk-wbt.h"
+ 
+ static DEFINE_SPINLOCK(elv_list_lock);
+@@ -557,27 +558,6 @@ void elv_bio_merged(struct request_queue *q, struct request *rq,
+ 		e->type->ops.sq.elevator_bio_merged_fn(q, rq, bio);
+ }
+ 
+-#ifdef CONFIG_PM
+-static void blk_pm_requeue_request(struct request *rq)
+-{
+-	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
+-		rq->q->nr_pending--;
+-}
+-
+-static void blk_pm_add_request(struct request_queue *q, struct request *rq)
+-{
+-	if (q->dev && !(rq->rq_flags & RQF_PM) && q->nr_pending++ == 0 &&
+-	    (q->rpm_status == RPM_SUSPENDED || q->rpm_status == RPM_SUSPENDING))
+-		pm_request_resume(q->dev);
+-}
+-#else
+-static inline void blk_pm_requeue_request(struct request *rq) {}
+-static inline void blk_pm_add_request(struct request_queue *q,
+-				      struct request *rq)
+-{
+-}
+-#endif
+-
+ void elv_requeue_request(struct request_queue *q, struct request *rq)
+ {
+ 	/*
+diff --git a/drivers/scsi/scsi_pm.c b/drivers/scsi/scsi_pm.c
+index b44c1bb687a2..a2b4179bfdf7 100644
+--- a/drivers/scsi/scsi_pm.c
++++ b/drivers/scsi/scsi_pm.c
+@@ -8,6 +8,7 @@
+ #include <linux/pm_runtime.h>
+ #include <linux/export.h>
+ #include <linux/async.h>
++#include <linux/blk-pm.h>
+ 
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_device.h>
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index b79b366a94f7..64514e8359e4 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -45,6 +45,7 @@
+ #include <linux/init.h>
+ #include <linux/blkdev.h>
+ #include <linux/blkpg.h>
++#include <linux/blk-pm.h>
+ #include <linux/delay.h>
+ #include <linux/mutex.h>
+ #include <linux/string_helpers.h>
+diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
+index d0389b20574d..4f07b3410595 100644
+--- a/drivers/scsi/sr.c
++++ b/drivers/scsi/sr.c
+@@ -43,6 +43,7 @@
+ #include <linux/interrupt.h>
+ #include <linux/init.h>
+ #include <linux/blkdev.h>
++#include <linux/blk-pm.h>
+ #include <linux/mutex.h>
+ #include <linux/slab.h>
+ #include <linux/pm_runtime.h>
+diff --git a/include/linux/blk-pm.h b/include/linux/blk-pm.h
+new file mode 100644
+index 000000000000..b80c65aba249
+--- /dev/null
++++ b/include/linux/blk-pm.h
+@@ -0,0 +1,24 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++#ifndef _BLK_PM_H_
++#define _BLK_PM_H_
++
++struct device;
++struct request_queue;
++
++/*
++ * block layer runtime pm functions
++ */
++#ifdef CONFIG_PM
++extern void blk_pm_runtime_init(struct request_queue *q, struct device *dev);
++extern int blk_pre_runtime_suspend(struct request_queue *q);
++extern void blk_post_runtime_suspend(struct request_queue *q, int err);
++extern void blk_pre_runtime_resume(struct request_queue *q);
++extern void blk_post_runtime_resume(struct request_queue *q, int err);
++extern void blk_set_runtime_active(struct request_queue *q);
++#else
++static inline void blk_pm_runtime_init(struct request_queue *q,
++				       struct device *dev) {}
++#endif
++
++#endif /* _BLK_PM_H_ */
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 6980014357d4..e25ce42c982d 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1280,29 +1280,6 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
+ extern void blk_put_queue(struct request_queue *);
+ extern void blk_set_queue_dying(struct request_queue *);
+ 
+-/*
+- * block layer runtime pm functions
+- */
+-#ifdef CONFIG_PM
+-extern void blk_pm_runtime_init(struct request_queue *q, struct device *dev);
+-extern int blk_pre_runtime_suspend(struct request_queue *q);
+-extern void blk_post_runtime_suspend(struct request_queue *q, int err);
+-extern void blk_pre_runtime_resume(struct request_queue *q);
+-extern void blk_post_runtime_resume(struct request_queue *q, int err);
+-extern void blk_set_runtime_active(struct request_queue *q);
+-#else
+-static inline void blk_pm_runtime_init(struct request_queue *q,
+-	struct device *dev) {}
+-static inline int blk_pre_runtime_suspend(struct request_queue *q)
+-{
+-	return -ENOSYS;
+-}
+-static inline void blk_post_runtime_suspend(struct request_queue *q, int err) {}
+-static inline void blk_pre_runtime_resume(struct request_queue *q) {}
+-static inline void blk_post_runtime_resume(struct request_queue *q, int err) {}
+-static inline void blk_set_runtime_active(struct request_queue *q) {}
+-#endif
+-
+ /*
+  * blk_plug permits building a queue of related requests by holding the I/O
+  * fragments for a short period. This allows merging of sequential requests
 -- 
-2.13.3
+2.19.0.397.gdd90340f6a-goog
