@@ -4,94 +4,101 @@ To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	Bart Van Assche <bvanassche@acm.org>,
-	Tejun Heo <tj@kernel.org>,
 	Ming Lei <ming.lei@redhat.com>,
 	Jianchao Wang <jianchao.w.wang@oracle.com>,
 	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v10 5/8] percpu-refcount: Introduce percpu_ref_resurrect()
-Date: Fri, 21 Sep 2018 13:31:19 -0700
-Message-Id: <20180921203122.49743-6-bvanassche@acm.org>
-In-Reply-To: <20180921203122.49743-1-bvanassche@acm.org>
-References: <20180921203122.49743-1-bvanassche@acm.org>
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Alan Stern <stern@rowland.harvard.edu>
+Subject: [PATCH v9 2/8] blk-mq: Introduce blk_mq_queue_rq_iter()
+Date: Wed, 19 Sep 2018 15:45:24 -0700
+Message-Id: <20180919224530.222469-3-bvanassche@acm.org>
+In-Reply-To: <20180919224530.222469-1-bvanassche@acm.org>
+References: <20180919224530.222469-1-bvanassche@acm.org>
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-This function will be used in a later patch to switch the struct
-request_queue q_usage_counter from killed back to live. In contrast
-to percpu_ref_reinit(), this new function does not require that the
-refcount is zero.
+This function will be used in the patch "Make blk_get_request() block for
+non-PM requests while suspended".
 
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-Cc: Tejun Heo <tj@kernel.org>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Ming Lei <ming.lei@redhat.com>
 Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
 Cc: Hannes Reinecke <hare@suse.com>
 Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Alan Stern <stern@rowland.harvard.edu>
 ---
- include/linux/percpu-refcount.h |  1 +
- lib/percpu-refcount.c           | 28 ++++++++++++++++++++++++++--
- 2 files changed, 27 insertions(+), 2 deletions(-)
+ block/blk-mq-tag.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ block/blk-mq-tag.h |  2 ++
+ 2 files changed, 46 insertions(+)
 
-diff --git a/include/linux/percpu-refcount.h b/include/linux/percpu-refcount.h
-index 009cdf3d65b6..b297cd1cd4f1 100644
---- a/include/linux/percpu-refcount.h
-+++ b/include/linux/percpu-refcount.h
-@@ -108,6 +108,7 @@ void percpu_ref_switch_to_atomic_sync(struct percpu_ref *ref);
- void percpu_ref_switch_to_percpu(struct percpu_ref *ref);
- void percpu_ref_kill_and_confirm(struct percpu_ref *ref,
- 				 percpu_ref_func_t *confirm_kill);
-+void percpu_ref_resurrect(struct percpu_ref *ref);
- void percpu_ref_reinit(struct percpu_ref *ref);
- 
- /**
-diff --git a/lib/percpu-refcount.c b/lib/percpu-refcount.c
-index 9f96fa7bc000..17fe3e996ddc 100644
---- a/lib/percpu-refcount.c
-+++ b/lib/percpu-refcount.c
-@@ -356,11 +356,35 @@ EXPORT_SYMBOL_GPL(percpu_ref_kill_and_confirm);
-  */
- void percpu_ref_reinit(struct percpu_ref *ref)
- {
-+	WARN_ON_ONCE(!percpu_ref_is_zero(ref));
-+
-+	percpu_ref_resurrect(ref);
-+}
-+EXPORT_SYMBOL_GPL(percpu_ref_reinit);
-+
-+/**
-+ * percpu_ref_resurrect - modify a percpu refcount from dead to live
-+ * @ref: perpcu_ref to resurrect
-+ *
-+ * Modify @ref so that it's in the same state as before percpu_ref_kill() was
-+ * called. @ref must have be dead but not exited.
-+ *
-+ * If @ref->release() frees @ref then the caller is responsible for
-+ * guaranteeing that @ref->release() does not get called while this
-+ * function is in progress.
-+ *
-+ * Note that percpu_ref_tryget[_live]() are safe to perform on @ref while
-+ * this function is in progress.
-+ */
-+void percpu_ref_resurrect(struct percpu_ref *ref)
-+{
-+	unsigned long __percpu *percpu_count;
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(&percpu_ref_switch_lock, flags);
- 
--	WARN_ON_ONCE(!percpu_ref_is_zero(ref));
-+	WARN_ON_ONCE(!(ref->percpu_count_ptr & __PERCPU_REF_DEAD));
-+	WARN_ON_ONCE(__ref_is_percpu(ref, &percpu_count));
- 
- 	ref->percpu_count_ptr &= ~__PERCPU_REF_DEAD;
- 	percpu_ref_get(ref);
-@@ -368,4 +392,4 @@ void percpu_ref_reinit(struct percpu_ref *ref)
- 
- 	spin_unlock_irqrestore(&percpu_ref_switch_lock, flags);
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index cb5db0c3cc32..f95b41b5f07a 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -374,6 +374,50 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+ 	rcu_read_unlock();
  }
--EXPORT_SYMBOL_GPL(percpu_ref_reinit);
-+EXPORT_SYMBOL_GPL(percpu_ref_resurrect);
+ 
++/*
++ * Call @fn(rq, @priv, reserved) for each request associated with request
++ * queue @q or any queue that it shares tags with and that has been assigned a
++ * tag. 'reserved' indicates whether or not 'rq' is a reserved request. In
++ * contrast to blk_mq_queue_tag_busy_iter(), if an I/O scheduler has been
++ * associated with @q, this function also iterates over requests that have
++ * been assigned a scheduler tag but that have not yet been assigned a driver
++ * tag.
++ */
++void blk_mq_queue_rq_iter(struct request_queue *q, busy_iter_fn *fn, void *priv)
++{
++	struct blk_mq_hw_ctx *hctx;
++	int i;
++
++	/*
++	 * __blk_mq_update_nr_hw_queues() will update nr_hw_queues and
++	 * queue_hw_ctx after having frozen the request queue. So we can use
++	 * q_usage_counter to avoid a race with that
++	 * function. __blk_mq_update_nr_hw_queues() uses synchronize_rcu() to
++	 * ensure that this function leaves the critical section below.
++	 */
++	rcu_read_lock();
++	if (percpu_ref_is_zero(&q->q_usage_counter)) {
++		rcu_read_unlock();
++		return;
++	}
++
++	queue_for_each_hw_ctx(q, hctx, i) {
++		struct blk_mq_tags *tags = hctx->sched_tags ? : hctx->tags;
++
++		/*
++		 * If no software queues are currently mapped to this
++		 * hardware queue, there's nothing to check
++		 */
++		if (!blk_mq_hw_queue_mapped(hctx))
++			continue;
++
++		if (tags->nr_reserved_tags)
++			bt_for_each(hctx, &tags->breserved_tags, fn, priv, true);
++		bt_for_each(hctx, &tags->bitmap_tags, fn, priv, false);
++	}
++	rcu_read_unlock();
++}
++
+ static int bt_alloc(struct sbitmap_queue *bt, unsigned int depth,
+ 		    bool round_robin, int node)
+ {
+diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+index 61deab0b5a5a..25e62997ed6c 100644
+--- a/block/blk-mq-tag.h
++++ b/block/blk-mq-tag.h
+@@ -35,6 +35,8 @@ extern int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
+ extern void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool);
+ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+ 		void *priv);
++void blk_mq_queue_rq_iter(struct request_queue *q, busy_iter_fn *fn,
++			  void *priv);
+ 
+ static inline struct sbq_wait_state *bt_wait_ptr(struct sbitmap_queue *bt,
+ 						 struct blk_mq_hw_ctx *hctx)
 -- 
-2.19.0.444.g18242da7ef-goog
+2.19.0.397.gdd90340f6a-goog
