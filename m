@@ -1,94 +1,83 @@
-Return-Path: <shy828301@gmail.com>
-MIME-Version: 1.0
-References: <CACVXFVOBq3L_EjSTCoiqUL1PH=HMR5EuNNQV0hNndFpGxmUK6g@mail.gmail.com>
- <877ejh3jv0.fsf@vitty.brq.redhat.com> <20180919100256.GD23172@ming.t460p>
- <8736u53fij.fsf@vitty.brq.redhat.com> <20180920012836.GA27645@ming.t460p>
-In-Reply-To: <20180920012836.GA27645@ming.t460p>
-From: Yang Shi <shy828301@gmail.com>
-Date: Wed, 19 Sep 2018 20:59:07 -0700
-Message-ID: <CAHbLzkrq-CSBK8p-GbUgkhP0tMbA53=Es3v8Zw26qmf2t_vSQQ@mail.gmail.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Thu, 20 Sep 2018 09:28:37 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>,
+	David Rientjes <rientjes@google.com>,
+	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: Ming Lei <tom.leiming@gmail.com>,
+	linux-block <linux-block@vger.kernel.org>,
+	linux-mm <linux-mm@kvack.org>,
+	Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+	"open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
+	Dave Chinner <dchinner@redhat.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Subject: Re: block: DMA alignment of IO buffer allocated from slab
-To: ming.lei@redhat.com
-Cc: vkuznets@redhat.com, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>,
-	David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-	Andrew Morton <akpm@linux-foundation.org>, Ming Lei <tom.leiming@gmail.com>,
-	linux-block@vger.kernel.org, Linux MM <linux-mm@kvack.org>,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org, dchinner@redhat.com,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, hch@lst.de, axboe@kernel.dk
-Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20180920012836.GA27645@ming.t460p>
+References: <CACVXFVOBq3L_EjSTCoiqUL1PH=HMR5EuNNQV0hNndFpGxmUK6g@mail.gmail.com>
+ <877ejh3jv0.fsf@vitty.brq.redhat.com>
+ <20180919100256.GD23172@ming.t460p>
+ <8736u53fij.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <8736u53fij.fsf@vitty.brq.redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Sep 19, 2018 at 6:28 PM Ming Lei <ming.lei@redhat.com> wrote:
->
-> On Wed, Sep 19, 2018 at 01:15:00PM +0200, Vitaly Kuznetsov wrote:
-> > Ming Lei <ming.lei@redhat.com> writes:
+On Wed, Sep 19, 2018 at 01:15:00PM +0200, Vitaly Kuznetsov wrote:
+> Ming Lei <ming.lei@redhat.com> writes:
+> 
+> > Hi Vitaly,
 > >
-> > > Hi Vitaly,
-> > >
-> > > On Wed, Sep 19, 2018 at 11:41:07AM +0200, Vitaly Kuznetsov wrote:
-> > >> Ming Lei <tom.leiming@gmail.com> writes:
-> > >>
-> > >> > Hi Guys,
-> > >> >
-> > >> > Some storage controllers have DMA alignment limit, which is often set via
-> > >> > blk_queue_dma_alignment(), such as 512-byte alignment for IO buffer.
-> > >>
-> > >> While mostly drivers use 512-byte alignment it is not a rule of thumb,
-> > >> 'git grep' tell me we have:
-> > >> ide-cd.c with 32-byte alignment
-> > >> ps3disk.c and rsxx/dev.c with variable alignment.
-> > >>
-> > >> What if our block configuration consists of several devices (in raid
-> > >> array, for example) with different requirements, e.g. one requiring
-> > >> 512-byte alignment and the other requiring 256?
-> > >
-> > > 512-byte alignment is also 256-byte aligned, and the sector size is 512 byte.
-> > >
+> > On Wed, Sep 19, 2018 at 11:41:07AM +0200, Vitaly Kuznetsov wrote:
+> >> Ming Lei <tom.leiming@gmail.com> writes:
+> >> 
+> >> > Hi Guys,
+> >> >
+> >> > Some storage controllers have DMA alignment limit, which is often set via
+> >> > blk_queue_dma_alignment(), such as 512-byte alignment for IO buffer.
+> >> 
+> >> While mostly drivers use 512-byte alignment it is not a rule of thumb,
+> >> 'git grep' tell me we have:
+> >> ide-cd.c with 32-byte alignment
+> >> ps3disk.c and rsxx/dev.c with variable alignment.
+> >> 
+> >> What if our block configuration consists of several devices (in raid
+> >> array, for example) with different requirements, e.g. one requiring
+> >> 512-byte alignment and the other requiring 256?
 > >
-> > Yes, but it doesn't work the other way around, e.g. what if some device
-> > has e.g. PAGE_SIZE alignment requirement (this would likely imply that
-> > it's sector size is also not 512 I guess)?
->
-> Yeah, that can be true if one controller has 4k-byte sector size, also
-> its DMA alignment is 4K. But there shouldn't be cases in which the two
-> doesn't match.
->
+> > 512-byte alignment is also 256-byte aligned, and the sector size is 512 byte.
 > >
-> > >
-> > > From the Red Hat BZ, looks I understand this issue is only triggered when
-> > > KASAN is enabled, or you have figured out how to reproduce it without
-> > > KASAN involved?
+> 
+> Yes, but it doesn't work the other way around, e.g. what if some device
+> has e.g. PAGE_SIZE alignment requirement (this would likely imply that
+> it's sector size is also not 512 I guess)?
+
+Yeah, that can be true if one controller has 4k-byte sector size, also
+its DMA alignment is 4K. But there shouldn't be cases in which the two
+doesn't match.
+
+> 
 > >
-> > Yes, any SLUB debug triggers it (e.g. build your kernel with
-> > SLUB_DEBUG_ON or slub_debug= options (Red zoning, User tracking, ... -
-> > everything will trigger it)
->
-> That means the slab always return 512-byte aligned buffer if the buffer
-> size is 512byte in case of no any slab debug options enabled.
->
-> The question is that if it is one reliable rule in slab. If yes, any
-> slab debug option does violate the rule.
+> > From the Red Hat BZ, looks I understand this issue is only triggered when
+> > KASAN is enabled, or you have figured out how to reproduce it without
+> > KASAN involved?
+> 
+> Yes, any SLUB debug triggers it (e.g. build your kernel with
+> SLUB_DEBUG_ON or slub_debug= options (Red zoning, User tracking, ... -
+> everything will trigger it)
 
-Once slub debug (i.e. red zone) is on, it will append extra bytes to
-the object, so the object may look like:
+That means the slab always return 512-byte aligned buffer if the buffer
+size is 512byte in case of no any slab debug options enabled.
 
------------------------------------------------------------------
-| object   | red zone | FP | owner track | red zone |
-------------------------------------------------------------------
+The question is that if it is one reliable rule in slab. If yes, any
+slab debug option does violate the rule.
 
-This is how slub debug is designed and how it works.
+The same is true for 4k alignment and 4k sector size.
 
-CC to Chris Lameter who is the maintainer of SLUB.
+I think we need our MM guys to clarify this point.
 
-Regards,
-Yang
 
->
-> The same is true for 4k alignment and 4k sector size.
->
-> I think we need our MM guys to clarify this point.
->
->
-> Thanks,
-> Ming
->
+Thanks,
+Ming
