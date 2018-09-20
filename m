@@ -1,96 +1,170 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:45986 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727835AbeIQKzn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Sep 2018 06:55:43 -0400
-Received: by mail-pf1-f196.google.com with SMTP id i26-v6so6976895pfo.12
-        for <linux-block@vger.kernel.org>; Sun, 16 Sep 2018 22:29:57 -0700 (PDT)
-From: Heiner Litz <hlitz@ucsc.edu>
-To: linux-block@vger.kernel.org, hlitz@ucsc.edu
-Cc: javier@cnexlabs.com, mb@lightnvm.io, igor.j.konopko@intel.com,
-        marcin.dziegielewski@intel.com
-Subject: [RFC PATCH 3/6] lightnvm: pblk: Refactor end_io function in pblk_submit_io_set
-Date: Sun, 16 Sep 2018 22:29:36 -0700
-Message-Id: <20180917052939.4776-4-hlitz@ucsc.edu>
-In-Reply-To: <20180917052939.4776-1-hlitz@ucsc.edu>
-References: <20180917052939.4776-1-hlitz@ucsc.edu>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
+To: axboe@kernel.dk, tj@kernel.org, kent.overstreet@gmail.com,
+        ming.lei@redhat.com, bart.vanassche@wdc.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 2/3] blk-core: rework the queue freeze
+Date: Thu, 20 Sep 2018 18:18:22 +0800
+Message-Id: <1537438703-25217-3-git-send-email-jianchao.w.wang@oracle.com>
+In-Reply-To: <1537438703-25217-1-git-send-email-jianchao.w.wang@oracle.com>
+References: <1537438703-25217-1-git-send-email-jianchao.w.wang@oracle.com>
+List-ID: <linux-block@vger.kernel.org>
 
-In preparation of supporting RAIL, refactor pblk_submit_io_set in the write
-path so that the end_io function can be specified when setting up the
-request.
+The previous queue freeze depends on the percpu_ref_kill/reinit.
+But the limit is that we have to drain the q_usage_counter when
+unfreeze the queue.
 
-Signed-off-by: Heiner Litz <hlitz@ucsc.edu>
+To improve this, we implement our own condition checking, namely
+queue_gate, instead of depending on the __PERCPU_REF_DEAD. Then
+put both the checking on queue_gate and __percpu_ref_get_many
+under sched rcu lock. At the same time, switch the percpu ref mode
+between atomic and percpu with percpu_ref_switch_to_atomic/percpu.
+
+After this, introduce the BLK_QUEUE_GATE_FROZEN on queue_gate to
+implement queue freeze feature. Then we could unfreeze the queue
+anytime without drain the queue.
+
+In addition, this fashion will be convinient to implement other
+condition checking, such as preempt-only mode.
+
+Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
 ---
- drivers/lightnvm/pblk-write.c | 11 ++++++-----
- drivers/lightnvm/pblk.h       |  3 ++-
- 2 files changed, 8 insertions(+), 6 deletions(-)
+ block/blk-core.c        | 28 +++++++++++++++++-----------
+ block/blk-mq.c          |  8 ++++++--
+ block/blk.h             |  4 ++++
+ drivers/scsi/scsi_lib.c |  2 +-
+ include/linux/blkdev.h  |  2 ++
+ 5 files changed, 30 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 1ce03d7c873b..6eba38b83acd 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -309,7 +309,7 @@ static int pblk_alloc_w_rq(struct pblk *pblk, struct nvm_rq *rqd,
+diff --git a/block/blk-core.c b/block/blk-core.c
+index dee56c2..f8b8fe2 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -910,6 +910,18 @@ struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
  }
+ EXPORT_SYMBOL(blk_alloc_queue);
  
- static int pblk_setup_w_rq(struct pblk *pblk, struct nvm_rq *rqd,
--			   struct ppa_addr *erase_ppa)
-+			   struct ppa_addr *erase_ppa, nvm_end_io_fn(*end_io))
- {
- 	struct pblk_line_meta *lm = &pblk->lm;
- 	struct pblk_line *e_line = pblk_line_get_erase(pblk);
-@@ -325,7 +325,7 @@ static int pblk_setup_w_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 		return -ENOMEM;
- 	c_ctx->lun_bitmap = lun_bitmap;
++static inline bool blk_queue_gate_allow(struct request_queue *q,
++		blk_mq_req_flags_t flags)
++{
++	if (likely(!q->queue_gate))
++		return true;
++
++	if (test_bit(BLK_QUEUE_GATE_FROZEN, &q->queue_gate))
++		return false;
++
++	return true;
++}
++
+ /**
+  * blk_queue_enter() - try to increase q->q_usage_counter
+  * @q: request queue pointer
+@@ -922,8 +934,9 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
+ 	while (true) {
+ 		bool success = false;
  
--	ret = pblk_alloc_w_rq(pblk, rqd, nr_secs, pblk_end_io_write);
-+	ret = pblk_alloc_w_rq(pblk, rqd, nr_secs, end_io);
- 	if (ret) {
- 		kfree(lun_bitmap);
- 		return ret;
-@@ -500,7 +500,8 @@ static struct pblk_line *pblk_should_submit_meta_io(struct pblk *pblk,
- 	return meta_line;
- }
+-		rcu_read_lock();
+-		if (percpu_ref_tryget_live(&q->q_usage_counter)) {
++		rcu_read_lock_sched();
++		if (blk_queue_gate_allow(q, flags)) {
++			__percpu_ref_get_many(&q->q_usage_counter, 1);
+ 			/*
+ 			 * The code that sets the PREEMPT_ONLY flag is
+ 			 * responsible for ensuring that that flag is globally
+@@ -935,7 +948,7 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
+ 				percpu_ref_put(&q->q_usage_counter);
+ 			}
+ 		}
+-		rcu_read_unlock();
++		rcu_read_unlock_sched();
  
--int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd)
-+int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd,
-+		       nvm_end_io_fn(*end_io))
- {
- 	struct ppa_addr erase_ppa;
- 	struct pblk_line *meta_line;
-@@ -509,7 +510,7 @@ int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd)
- 	pblk_ppa_set_empty(&erase_ppa);
+ 		if (success)
+ 			return 0;
+@@ -943,17 +956,10 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
+ 		if (flags & BLK_MQ_REQ_NOWAIT)
+ 			return -EBUSY;
  
- 	/* Assign lbas to ppas and populate request structure */
--	err = pblk_setup_w_rq(pblk, rqd, &erase_ppa);
-+	err = pblk_setup_w_rq(pblk, rqd, &erase_ppa, end_io);
- 	if (err) {
- 		pblk_err(pblk, "could not setup write request: %d\n", err);
- 		return NVM_IO_ERR;
-@@ -631,7 +632,7 @@ static int pblk_submit_write(struct pblk *pblk)
- 		goto fail_put_bio;
+-		/*
+-		 * read pair of barrier in blk_freeze_queue_start(),
+-		 * we need to order reading __PERCPU_REF_DEAD flag of
+-		 * .q_usage_counter and reading .mq_freeze_depth or
+-		 * queue dying flag, otherwise the following wait may
+-		 * never return if the two reads are reordered.
+-		 */
+ 		smp_rmb();
+ 
+ 		wait_event(q->mq_freeze_wq,
+-			   (atomic_read(&q->mq_freeze_depth) == 0 &&
++			   (blk_queue_gate_allow(q, flags) &&
+ 			    (preempt || !blk_queue_preempt_only(q))) ||
+ 			   blk_queue_dying(q));
+ 		if (blk_queue_dying(q))
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 85a1c1a..fc90ad3 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -140,7 +140,9 @@ void blk_freeze_queue_start(struct request_queue *q)
+ 
+ 	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
+ 	if (freeze_depth == 1) {
+-		percpu_ref_kill(&q->q_usage_counter);
++		set_bit(BLK_QUEUE_GATE_FROZEN, &q->queue_gate);
++		percpu_ref_put(&q->q_usage_counter);
++		percpu_ref_switch_to_atomic(&q->q_usage_counter, NULL);
+ 		if (q->mq_ops)
+ 			blk_mq_run_hw_queues(q, false);
  	}
+@@ -198,7 +200,9 @@ void blk_mq_unfreeze_queue(struct request_queue *q)
+ 	freeze_depth = atomic_dec_return(&q->mq_freeze_depth);
+ 	WARN_ON_ONCE(freeze_depth < 0);
+ 	if (!freeze_depth) {
+-		percpu_ref_reinit(&q->q_usage_counter);
++		clear_bit(BLK_QUEUE_GATE_FROZEN, &q->queue_gate);
++		percpu_ref_get(&q->q_usage_counter);
++		percpu_ref_switch_to_percpu(&q->q_usage_counter);
+ 		wake_up_all(&q->mq_freeze_wq);
+ 	}
+ }
+diff --git a/block/blk.h b/block/blk.h
+index 9db4e38..19d2c00 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -19,6 +19,10 @@
+ extern struct dentry *blk_debugfs_root;
+ #endif
  
--	if (pblk_submit_io_set(pblk, rqd))
-+	if (pblk_submit_io_set(pblk, rqd, pblk_end_io_write))
- 		goto fail_free_bio;
++enum blk_queue_gate_flag_t {
++	BLK_QUEUE_GATE_FROZEN,
++};
++
+ struct blk_flush_queue {
+ 	unsigned int		flush_queue_delayed:1;
+ 	unsigned int		flush_pending_idx:1;
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 0adfb3b..1980648 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -3066,7 +3066,7 @@ scsi_device_quiesce(struct scsi_device *sdev)
+ 	 * unfreeze even if the queue was already frozen before this function
+ 	 * was called. See also https://lwn.net/Articles/573497/.
+ 	 */
+-	synchronize_rcu();
++	synchronize_sched();
+ 	blk_mq_unfreeze_queue(q);
  
- #ifdef CONFIG_NVM_PBLK_DEBUG
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 87dc24772dad..64d9c206ec52 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -870,7 +870,8 @@ int pblk_write_to_cache(struct pblk *pblk, struct bio *bio,
- 			unsigned long flags);
- int pblk_write_gc_to_cache(struct pblk *pblk, struct pblk_gc_rq *gc_rq);
- void pblk_end_w_fail(struct pblk *pblk, struct nvm_rq *rqd);
--int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd);
-+int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd,
-+		       nvm_end_io_fn(*end_io));
+ 	mutex_lock(&sdev->state_mutex);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index d6869e0..9f3f0d7 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -647,6 +647,8 @@ struct request_queue {
+ 	struct rcu_head		rcu_head;
+ 	wait_queue_head_t	mq_freeze_wq;
+ 	struct percpu_ref	q_usage_counter;
++	unsigned long		queue_gate;
++
+ 	struct list_head	all_q_node;
  
- /*
-  * pblk map
+ 	struct blk_mq_tag_set	*tag_set;
 -- 
-2.17.1
+2.7.4
