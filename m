@@ -1,25 +1,135 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] Blk-throttle: update to use rbtree with leftmost node
- cached
-To: Liu Bo <bo.liu@linux.alibaba.com>, linux-block@vger.kernel.org
-References: <1534800075-74931-1-git-send-email-bo.liu@linux.alibaba.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <227df034-69b9-a71f-7c1f-b9de9fc4cfb2@kernel.dk>
-Date: Thu, 20 Sep 2018 19:31:33 -0600
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-io1-f65.google.com ([209.85.166.65]:38348 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725749AbeIUFb3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Sep 2018 01:31:29 -0400
+Received: by mail-io1-f65.google.com with SMTP id y3-v6so10350121ioc.5
+        for <linux-block@vger.kernel.org>; Thu, 20 Sep 2018 16:45:29 -0700 (PDT)
 MIME-Version: 1.0
 In-Reply-To: <1534800075-74931-1-git-send-email-bo.liu@linux.alibaba.com>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+References: <1534800075-74931-1-git-send-email-bo.liu@linux.alibaba.com>
+From: Liu Bo <obuil.liubo@gmail.com>
+Date: Thu, 20 Sep 2018 16:45:28 -0700
+Message-ID: <CANQeFDDSA_uHLScDYrO4QyMZMAJJ80zLkjVJD1W3=aN_=khAOg@mail.gmail.com>
+Subject: Re: [PATCH] Blk-throttle: update to use rbtree with leftmost node cached
+To: Liu Bo <bo.liu@linux.alibaba.com>
+Cc: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 8/20/18 3:21 PM, Liu Bo wrote:
+ping?
+
+thanks,
+liubo
+
+
+On Mon, Aug 20, 2018 at 2:21 PM, Liu Bo <bo.liu@linux.alibaba.com> wrote:
 > As rbtree has native support of caching leftmost node,
 > i.e. rb_root_cached, no need to do the caching by ourselves.
-
-This looks fine to me. I think this code was probably inherited
-from a similar caching trick in cfq, an predates leftmost
-caching being generally available in the rbtree code.
-
-I'll apply it for 4.20.
-
--- 
-Jens Axboe
+>
+> Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
+> ---
+>  block/blk-throttle.c | 41 +++++++++++++++--------------------------
+>  1 file changed, 15 insertions(+), 26 deletions(-)
+>
+> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> index a3eede00d302..b1f7623b666b 100644
+> --- a/block/blk-throttle.c
+> +++ b/block/blk-throttle.c
+> @@ -84,8 +84,7 @@ struct throtl_service_queue {
+>          * RB tree of active children throtl_grp's, which are sorted by
+>          * their ->disptime.
+>          */
+> -       struct rb_root          pending_tree;   /* RB tree of active tgs */
+> -       struct rb_node          *first_pending; /* first node in the tree */
+> +       struct rb_root_cached   pending_tree;   /* RB tree of active tgs */
+>         unsigned int            nr_pending;     /* # queued in the tree */
+>         unsigned long           first_pending_disptime; /* disptime of the first tg */
+>         struct timer_list       pending_timer;  /* fires on first_pending_disptime */
+> @@ -475,7 +474,7 @@ static void throtl_service_queue_init(struct throtl_service_queue *sq)
+>  {
+>         INIT_LIST_HEAD(&sq->queued[0]);
+>         INIT_LIST_HEAD(&sq->queued[1]);
+> -       sq->pending_tree = RB_ROOT;
+> +       sq->pending_tree = RB_ROOT_CACHED;
+>         timer_setup(&sq->pending_timer, throtl_pending_timer_fn, 0);
+>  }
+>
+> @@ -616,31 +615,23 @@ static void throtl_pd_free(struct blkg_policy_data *pd)
+>  static struct throtl_grp *
+>  throtl_rb_first(struct throtl_service_queue *parent_sq)
+>  {
+> +       struct rb_node *n;
+>         /* Service tree is empty */
+>         if (!parent_sq->nr_pending)
+>                 return NULL;
+>
+> -       if (!parent_sq->first_pending)
+> -               parent_sq->first_pending = rb_first(&parent_sq->pending_tree);
+> -
+> -       if (parent_sq->first_pending)
+> -               return rb_entry_tg(parent_sq->first_pending);
+> -
+> -       return NULL;
+> -}
+> -
+> -static void rb_erase_init(struct rb_node *n, struct rb_root *root)
+> -{
+> -       rb_erase(n, root);
+> -       RB_CLEAR_NODE(n);
+> +       n = rb_first_cached(&parent_sq->pending_tree);
+> +       WARN_ON_ONCE(!n);
+> +       if (!n)
+> +               return NULL;
+> +       return rb_entry_tg(n);
+>  }
+>
+>  static void throtl_rb_erase(struct rb_node *n,
+>                             struct throtl_service_queue *parent_sq)
+>  {
+> -       if (parent_sq->first_pending == n)
+> -               parent_sq->first_pending = NULL;
+> -       rb_erase_init(n, &parent_sq->pending_tree);
+> +       rb_erase_cached(n, &parent_sq->pending_tree);
+> +       RB_CLEAR_NODE(n);
+>         --parent_sq->nr_pending;
+>  }
+>
+> @@ -658,11 +649,11 @@ static void update_min_dispatch_time(struct throtl_service_queue *parent_sq)
+>  static void tg_service_queue_add(struct throtl_grp *tg)
+>  {
+>         struct throtl_service_queue *parent_sq = tg->service_queue.parent_sq;
+> -       struct rb_node **node = &parent_sq->pending_tree.rb_node;
+> +       struct rb_node **node = &parent_sq->pending_tree.rb_root.rb_node;
+>         struct rb_node *parent = NULL;
+>         struct throtl_grp *__tg;
+>         unsigned long key = tg->disptime;
+> -       int left = 1;
+> +       bool leftmost = true;
+>
+>         while (*node != NULL) {
+>                 parent = *node;
+> @@ -672,15 +663,13 @@ static void tg_service_queue_add(struct throtl_grp *tg)
+>                         node = &parent->rb_left;
+>                 else {
+>                         node = &parent->rb_right;
+> -                       left = 0;
+> +                       leftmost = false;
+>                 }
+>         }
+>
+> -       if (left)
+> -               parent_sq->first_pending = &tg->rb_node;
+> -
+>         rb_link_node(&tg->rb_node, parent, node);
+> -       rb_insert_color(&tg->rb_node, &parent_sq->pending_tree);
+> +       rb_insert_color_cached(&tg->rb_node, &parent_sq->pending_tree,
+> +                              leftmost);
+>  }
+>
+>  static void __throtl_enqueue_tg(struct throtl_grp *tg)
+> --
+> 1.8.3.1
+>
