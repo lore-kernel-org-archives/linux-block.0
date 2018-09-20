@@ -1,84 +1,48 @@
-Return-Path: <schmitzmic@gmail.com>
-Return-Path: <schmitzmic@gmail.com>
-From: Michael Schmitz <schmitzmic@gmail.com>
-To: linux-block@vger.kernel.org,
-	axboe@kernel.dk
-Cc: linux-m68k@vger.kernel.org,
-	geert@linux-m68k.org,
-	Michael Schmitz <schmitzmic@gmail.com>
-Subject: [PATCH v4 1/2] block: fix signed int overflow in Amiga partition support
-Date: Sun, 30 Sep 2018 12:56:17 +1300
-Message-Id: <1538265378-20544-2-git-send-email-schmitzmic@gmail.com>
-In-Reply-To: <1538265378-20544-1-git-send-email-schmitzmic@gmail.com>
-References: <1538265378-20544-1-git-send-email-schmitzmic@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from vostok.pvgoran.name ([71.19.149.48]:35559 "EHLO
+        vostok.pvgoran.name" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730758AbeITUrJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Sep 2018 16:47:09 -0400
+Date: Thu, 20 Sep 2018 21:58:08 +0700
+From: Pavel Goran <via-bcache@pvgoran.name>
+Reply-To: Pavel Goran <via-bcache@pvgoran.name>
+Message-ID: <1481894441.20180920215808@pvgoran.name>
+To: Junhui Tang <tang.junhui.linux@gmail.com>
+CC: colyli@suse.de, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] bcache: add a command to show bcache topology
+In-Reply-To: <CA+NNRhHpArYXt7YofXcH0h8yhcPvFhWC9ZKnRTcPhXziSPDHPg@mail.gmail.com>
+References: <CA+NNRhHpArYXt7YofXcH0h8yhcPvFhWC9ZKnRTcPhXziSPDHPg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The Amiga partition parser module uses signed int for partition sector
-address and count, which will overflow for disks larger than 1 TB.
+Hello Junhui,
 
-Use sector_t as type for sector address and size to allow using disks
-up to 2 TB without LBD support, and disks larger than 2 TB with LBD.
+Thursday, September 20, 2018, 8:26:58 PM, you wrote:
 
-This bug was reported originally in 2012, and the fix was created by
-the RDB author, Joanne Dow <jdow@earthlink.net>. A patch had been
-discussed and reviewed on linux-m68k at that time but never officially
-submitted. This patch differs from Joanne's patch only in its use of
-sector_t instead of unsigned int. No checking for overflows is done
-(see patch 2 of this series for that).
+> From 647ac21a0068df1fafb038a628791d2fcc135462 Mon Sep 17 00:00:00 2001
+> From: Tang Junhui <tang.junhui.linux@gmail.com>
+> Date: Fri, 21 Sep 2018 04:52:20 +0800
+> Subject: [PATCH] bcache: add a command to show bcache topology
 
-Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=43511
-Reported-by: Martin Steigerwald <Martin@lichtvoll.de>
-Message-ID: <201206192146.09327.Martin@lichtvoll.de>
-Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
-Tested-by: Martin Steigerwald <Martin@lichtvoll.de>
+> This patch add a command to show bcache topology as bellow:
+> [root@ceph x86_64]# cat /sys/fs/bcache/show
 
----
+"show" doesn't look like a good file name here, it's vague and doesn't
+convey the meaning. Maybe just use "topology" instead?
 
-Changes from v3:
+> ( sdb ) : ( sdg:bcache4 sdf:bcache3 sde:bcache2 sdd:bcache1 sdc:bcache0 )
+> ( sdh ) : ( sdm:bcache9 sdl:bcache8 sdk:bcache7 sdj:bcache6 sdi:bcache5 )
+> In the output result, each line shows cache devices in the first () and
+> its cached devices in the second (). By this command, we can be easily
+> to know cached device bcache4 base on backing device sdg and cache device
+> sdb, we also can see bcache0 bcache1 bcache2 bcache3 and bcache4 are in
+> the same cache set.
 
-- split off change of sector address type as quick fix.
-- cast to sector_t in sector address calculations.
-- move overflow checking to separate patch for more thorough review.
----
- block/partitions/amiga.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+> (patch skipped)
 
-diff --git a/block/partitions/amiga.c b/block/partitions/amiga.c
-index 5609366..902ddeb 100644
---- a/block/partitions/amiga.c
-+++ b/block/partitions/amiga.c
-@@ -32,7 +32,8 @@ int amiga_partition(struct parsed_partitions *state)
- 	unsigned char *data;
- 	struct RigidDiskBlock *rdb;
- 	struct PartitionBlock *pb;
--	int start_sect, nr_sects, blk, part, res = 0;
-+	sector_t start_sect, nr_sects;
-+	int blk, part, res = 0;
- 	int blksize = 1;	/* Multiplier for disk block size */
- 	int slot = 1;
- 	char b[BDEVNAME_SIZE];
-@@ -100,17 +101,17 @@ int amiga_partition(struct parsed_partitions *state)
- 
- 		/* Tell Kernel about it */
- 
--		nr_sects = (be32_to_cpu(pb->pb_Environment[10]) + 1 -
--			    be32_to_cpu(pb->pb_Environment[9])) *
-+		nr_sects = (sector_t) ((be32_to_cpu(pb->pb_Environment[10])
-+			   + 1 - be32_to_cpu(pb->pb_Environment[9])) *
- 			   be32_to_cpu(pb->pb_Environment[3]) *
- 			   be32_to_cpu(pb->pb_Environment[5]) *
--			   blksize;
-+			   blksize);
- 		if (!nr_sects)
- 			continue;
--		start_sect = be32_to_cpu(pb->pb_Environment[9]) *
-+		start_sect = (sector_t) (be32_to_cpu(pb->pb_Environment[9]) *
- 			     be32_to_cpu(pb->pb_Environment[3]) *
- 			     be32_to_cpu(pb->pb_Environment[5]) *
--			     blksize;
-+			     blksize);
- 		put_partition(state,slot++,start_sect,nr_sects);
- 		{
- 			/* Be even more informative to aid mounting */
--- 
-1.9.1
+Pavel Goran
+  
