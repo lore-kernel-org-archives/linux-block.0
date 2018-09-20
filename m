@@ -1,60 +1,36 @@
-Return-Path: <bvanassche@acm.org>
+Return-Path: <hch@lst.de>
+Date: Thu, 20 Sep 2018 08:32:26 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>,
+	David Rientjes <rientjes@google.com>,
+	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Ming Lei <tom.leiming@gmail.com>,
+	linux-block <linux-block@vger.kernel.org>,
+	linux-mm <linux-mm@kvack.org>,
+	Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+	"open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
+	Dave Chinner <dchinner@redhat.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Subject: Re: block: DMA alignment of IO buffer allocated from slab
-To: Ming Lei <tom.leiming@gmail.com>,
- linux-block <linux-block@vger.kernel.org>, linux-mm <linux-mm@kvack.org>,
- Linux FS Devel <linux-fsdevel@vger.kernel.org>,
- "open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
- Dave Chinner <dchinner@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
- Ming Lei <ming.lei@redhat.com>
-References: <CACVXFVOBq3L_EjSTCoiqUL1PH=HMR5EuNNQV0hNndFpGxmUK6g@mail.gmail.com>
-From: Bart Van Assche <bvanassche@acm.org>
-Message-ID: <c5acf280-b3e3-51b3-da98-0809d9d76cc4@acm.org>
-Date: Thu, 20 Sep 2018 07:07:19 -0700
+Message-ID: <20180920063226.GC12913@lst.de>
+References: <CACVXFVOBq3L_EjSTCoiqUL1PH=HMR5EuNNQV0hNndFpGxmUK6g@mail.gmail.com> <877ejh3jv0.fsf@vitty.brq.redhat.com> <20180919100256.GD23172@ming.t460p> <8736u53fij.fsf@vitty.brq.redhat.com> <20180920012836.GA27645@ming.t460p>
 MIME-Version: 1.0
-In-Reply-To: <CACVXFVOBq3L_EjSTCoiqUL1PH=HMR5EuNNQV0hNndFpGxmUK6g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180920012836.GA27645@ming.t460p>
 List-ID: <linux-block@vger.kernel.org>
 
-On 9/19/18 2:15 AM, Ming Lei wrote:
-> Hi Guys,
+On Thu, Sep 20, 2018 at 09:28:37AM +0800, Ming Lei wrote:
+> > has e.g. PAGE_SIZE alignment requirement (this would likely imply that
+> > it's sector size is also not 512 I guess)?
 > 
-> Some storage controllers have DMA alignment limit, which is often set via
-> blk_queue_dma_alignment(), such as 512-byte alignment for IO buffer.
-> 
-> Block layer now only checks if this limit is respected for buffer of
-> pass-through request,
-> see blk_rq_map_user_iov(), bio_map_user_iov().
-> 
-> The userspace buffer for direct IO is checked in dio path, see
-> do_blockdev_direct_IO().
-> IO buffer from page cache should be fine wrt. this limit too.
-> 
-> However, some file systems, such as XFS, may allocate single sector IO buffer
-> via slab. Usually I guess kmalloc-512 should be fine to return
-> 512-aligned buffer.
-> But once KASAN or other slab debug options are enabled, looks this
-> isn't true any
-> more, kmalloc-512 may not return 512-aligned buffer. Then data corruption
-> can be observed because the IO buffer from fs layer doesn't respect the DMA
-> alignment limit any more.
-> 
-> Follows several related questions:
-> 
-> 1) does kmalloc-N slab guarantee to return N-byte aligned buffer?  If
-> yes, is it a stable rule?
-> 
-> 2) If it is a rule for kmalloc-N slab to return N-byte aligned buffer,
-> seems KASAN violates this
-> rule?
-> 
-> 3) If slab can't guarantee to return 512-aligned buffer, how to fix
-> this data corruption issue?
+> Yeah, that can be true if one controller has 4k-byte sector size, also
+> its DMA alignment is 4K. But there shouldn't be cases in which the two
+> doesn't match.
 
-I don't think that (1) is correct, especially if N is not a power of 
-two. In the skd driver I addressed this problem by using 
-kmem_cache_create() and kmem_cache_alloc() instead of kmalloc(). 
-kmem_cache_create() allows to specify the alignment explicitly.
-
-Bart.
+The general block storage worlds is that devices always need to have
+an alignment requirement <= minimum LBAs size.  If they don't they'll
+need to bounce buffer (in the driver!).
