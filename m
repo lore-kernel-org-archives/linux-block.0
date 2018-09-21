@@ -1,33 +1,47 @@
-Return-Path: <BATV+97b555f176c451e34851+5490+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	linux-block@vger.kernel.org,
-	xen-devel@lists.xen.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 02/13] xen: remove the xen_biovec_phys_mergeable export
-Date: Tue,  4 Sep 2018 12:14:20 -0700
-Message-Id: <20180904191431.20102-3-hch@lst.de>
-In-Reply-To: <20180904191431.20102-1-hch@lst.de>
-References: <20180904191431.20102-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from ale.deltatee.com ([207.54.116.67]:46062 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2391089AbeIVBvs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Sep 2018 21:51:48 -0400
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Sagi Grimberg <sagi@grimberg.me>, linux-nvdimm@lists.01.org,
+        linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Stephen Bates <sbates@raithlin.com>,
+        linux-block@vger.kernel.org,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20180913001156.4115-1-logang@deltatee.com>
+ <20180913001156.4115-4-logang@deltatee.com>
+ <20180921131550.GG224714@bhelgaas-glaptop.roam.corp.google.com>
+ <20180921164813.GJ224714@bhelgaas-glaptop.roam.corp.google.com>
+ <506dd00c-35e9-e285-bc97-c689c766b4cf@deltatee.com>
+ <20180921200021.GN224714@bhelgaas-glaptop.roam.corp.google.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <cf4ead8f-9dde-ba3b-3c87-71f73cebee74@deltatee.com>
+Date: Fri, 21 Sep 2018 14:01:13 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180921200021.GN224714@bhelgaas-glaptop.roam.corp.google.com>
+Content-Type: text/plain; charset=utf-8
+Subject: Re: [PATCH v6 03/13] PCI/P2PDMA: Add PCI p2pmem DMA mappings to
+ adjust the bus offset
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-BIOVEC_PHYS_MERGEABLE is only called from core block code.
+On 2018-09-21 2:00 PM, Bjorn Helgaas wrote:
+> Ok.  I was assuming s->dma_address would have been already set before
+> the call and would be overwritten by pci_p2pmem_map_sg().  But I guess
+> that's not the case -- sounds like s->dma_address is undefined before
+> the call.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/xen/biomerge.c | 1 -
- 1 file changed, 1 deletion(-)
+Correct. It's set by whatever dma_map function operates on it.
 
-diff --git a/drivers/xen/biomerge.c b/drivers/xen/biomerge.c
-index 55ed80c3a17c..399c4e30f723 100644
---- a/drivers/xen/biomerge.c
-+++ b/drivers/xen/biomerge.c
-@@ -20,4 +20,3 @@ bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
- 	return false;
- #endif
- }
--EXPORT_SYMBOL(xen_biovec_phys_mergeable);
--- 
-2.18.0
+Logan
