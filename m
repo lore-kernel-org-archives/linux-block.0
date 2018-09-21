@@ -1,164 +1,82 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 04/14] loop: Get rid of loop_index_mutex
-Date: Thu, 27 Sep 2018 13:36:42 +0200
-Message-Id: <20180927113652.5422-5-jack@suse.cz>
-In-Reply-To: <20180927113652.5422-1-jack@suse.cz>
-References: <20180927113652.5422-1-jack@suse.cz>
+Return-Path: <jianchao.w.wang@oracle.com>
+Subject: Re: [RFC PATCH 0/3] blk-mq: rework queue freeze and preempt-only
+To: Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk, tj@kernel.org,
+        kent.overstreet@gmail.com, ming.lei@redhat.com, bart.vanassche@wdc.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1537438703-25217-1-git-send-email-jianchao.w.wang@oracle.com>
+ <1537463217.224533.4.camel@acm.org>
+ <0e6caed5-33eb-e645-f452-3dfc6c20206d@oracle.com>
+ <4a6c3930-1f90-6a9b-ba25-882b1c9102e2@acm.org>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <a8faeb4a-549a-05b3-6bb9-5611a1cff850@oracle.com>
+Date: Fri, 21 Sep 2018 10:24:49 +0800
+MIME-Version: 1.0
+In-Reply-To: <4a6c3930-1f90-6a9b-ba25-882b1c9102e2@acm.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Now that loop_ctl_mutex is global, just get rid of loop_index_mutex as
-there is no good reason to keep these two separate and it just
-complicates the locking.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- drivers/block/loop.c | 38 ++++++++++++++++++--------------------
- 1 file changed, 18 insertions(+), 20 deletions(-)
+Hi Bart
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index cc43d835fe6f..e35707fb8318 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -83,7 +83,6 @@
- #include <linux/uaccess.h>
+On 09/21/2018 10:13 AM, Bart Van Assche wrote:
+> On 9/20/18 6:51 PM, jianchao.wang wrote:
+>> Hi Bart
+>>
+>> On 09/21/2018 01:06 AM, Bart Van Assche wrote:
+>>> On Thu, 2018-09-20 at 18:18 +0800, Jianchao Wang wrote:
+>>>> The current queue freeze depending on percpu_ref_kil/reinit has a limit that
+>>>> we have drain the requests before unfreeze the queue.
+>>>>
+>>>> Let's rework the queue freeze feature as following:
+>>>> 1. introduce __percpu_ref_get_many.
+>>>>     It is same with original percpu_ref_get_many, but just need callers to provide
+>>>>     sched rcu critical section. We will put the __percpu_ref_get_many and our own
+>>>>     condition checking under rcu_read_lock_sched. With this new helper interface,
+>>>>     we could save an extra rcu_read_lock_sched.
+>>>> 2. rework the blk_queue_enter as:
+>>>>         rcu_read_lock_sched()
+>>>>     if condition check true
+>>>>       __percpu_ref_get_many(&q->q_usage_counter, 1)
+>>>>     else
+>>>>       goto wait
+>>>>     rcu_read_unlock_sched()
+>>>> 3. use percpu_ref_switch_to_atomic/percpu to switch mode directly.
+>>>>
+>>>> Then we could unfreeze the queue w/o draining requests.
+>>>> In addition, preempt-only mode code could be simplified.
+>>> Hello Jianchao,
+>>>                                                                             =
+>>> Thanks for having taken a look. However, the approach of this patch series
+>>> may be more complicated than necessary. Had you considered something like
+>>> the patch below?
+>>
+>> This patch is just a trying that let our life easier w/o changing anything in percpu-ref code. :)
+>> In fact, the 1st patch which introduces a new non-functional-changing helper interface in
+>> percpu-ref code is not necessary.
+>>
+>> This patchset just implement our own condition checking in blk_queue_enter instead of depending on
+>> __PERCPU_REF_DEAD checking in percpu_ref_tryget_live.
+>>
+>> Then we could do more thing here, like:
+>>   - unfreeze the queue without draining requests.
+>>   - check whether q->q_usage_counter is zero
+>>   - add other gate conditions into blk_queue_enter, such as preempt-only, even any others.
+>>
+>> So why not try it ?
+> 
+> Hello Jianchao,
+> 
+> Some time ago Tejun wrote that he wants to keep the dependency of the percpu_ref implementation on rcu-sched inside the percpu_ref implementation because he would like to have the freedom to switch to regular RCU. Your patch series makes the dependency of percpu_ref counters on rcu-sched visible outside the percpu_ref implementation. I think that's a disadvantage of your approach. Tejun, please correct me if I misunderstood you.
+
+It will be easy to fix this through adding some other interfaces like:
+
+percpu_ref_lock/unlock
+{
+    rcu_read_lock/unlock_sched
+}
+
+But things is up to Tejun that whether he agrees to do like this.
  
- static DEFINE_IDR(loop_index_idr);
--static DEFINE_MUTEX(loop_index_mutex);
- static DEFINE_MUTEX(loop_ctl_mutex);
+Thanks
+Jianchao
  
- static int max_part;
-@@ -1627,9 +1626,11 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
- static int lo_open(struct block_device *bdev, fmode_t mode)
- {
- 	struct loop_device *lo;
--	int err = 0;
-+	int err;
- 
--	mutex_lock(&loop_index_mutex);
-+	err = mutex_lock_killable(&loop_ctl_mutex);
-+	if (err)
-+		return err;
- 	lo = bdev->bd_disk->private_data;
- 	if (!lo) {
- 		err = -ENXIO;
-@@ -1638,7 +1639,7 @@ static int lo_open(struct block_device *bdev, fmode_t mode)
- 
- 	atomic_inc(&lo->lo_refcnt);
- out:
--	mutex_unlock(&loop_index_mutex);
-+	mutex_unlock(&loop_ctl_mutex);
- 	return err;
- }
- 
-@@ -1647,12 +1648,11 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 	struct loop_device *lo;
- 	int err;
- 
--	mutex_lock(&loop_index_mutex);
-+	mutex_lock(&loop_ctl_mutex);
- 	lo = disk->private_data;
- 	if (atomic_dec_return(&lo->lo_refcnt))
--		goto unlock_index;
-+		goto out_unlock;
- 
--	mutex_lock(&loop_ctl_mutex);
- 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
- 		/*
- 		 * In autoclear mode, stop the loop thread
-@@ -1660,7 +1660,7 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 		 */
- 		err = loop_clr_fd(lo);
- 		if (!err)
--			goto unlock_index;
-+			return;
- 	} else if (lo->lo_state == Lo_bound) {
- 		/*
- 		 * Otherwise keep thread (if running) and config,
-@@ -1670,9 +1670,8 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 		blk_mq_unfreeze_queue(lo->lo_queue);
- 	}
- 
-+out_unlock:
- 	mutex_unlock(&loop_ctl_mutex);
--unlock_index:
--	mutex_unlock(&loop_index_mutex);
- }
- 
- static const struct block_device_operations lo_fops = {
-@@ -1973,7 +1972,7 @@ static struct kobject *loop_probe(dev_t dev, int *part, void *data)
- 	struct kobject *kobj;
- 	int err;
- 
--	mutex_lock(&loop_index_mutex);
-+	mutex_lock(&loop_ctl_mutex);
- 	err = loop_lookup(&lo, MINOR(dev) >> part_shift);
- 	if (err < 0)
- 		err = loop_add(&lo, MINOR(dev) >> part_shift);
-@@ -1981,7 +1980,7 @@ static struct kobject *loop_probe(dev_t dev, int *part, void *data)
- 		kobj = NULL;
- 	else
- 		kobj = get_disk_and_module(lo->lo_disk);
--	mutex_unlock(&loop_index_mutex);
-+	mutex_unlock(&loop_ctl_mutex);
- 
- 	*part = 0;
- 	return kobj;
-@@ -1993,7 +1992,10 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
- 	struct loop_device *lo;
- 	int ret = -ENOSYS;
- 
--	mutex_lock(&loop_index_mutex);
-+	ret = mutex_lock_killable(&loop_ctl_mutex);
-+	if (ret)
-+		return ret;
-+
- 	switch (cmd) {
- 	case LOOP_CTL_ADD:
- 		ret = loop_lookup(&lo, parm);
-@@ -2007,9 +2009,6 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
- 		ret = loop_lookup(&lo, parm);
- 		if (ret < 0)
- 			break;
--		ret = mutex_lock_killable(&loop_ctl_mutex);
--		if (ret)
--			break;
- 		if (lo->lo_state != Lo_unbound) {
- 			ret = -EBUSY;
- 			mutex_unlock(&loop_ctl_mutex);
-@@ -2021,7 +2020,6 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
- 			break;
- 		}
- 		lo->lo_disk->private_data = NULL;
--		mutex_unlock(&loop_ctl_mutex);
- 		idr_remove(&loop_index_idr, lo->lo_number);
- 		loop_remove(lo);
- 		break;
-@@ -2031,7 +2029,7 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
- 			break;
- 		ret = loop_add(&lo, -1);
- 	}
--	mutex_unlock(&loop_index_mutex);
-+	mutex_unlock(&loop_ctl_mutex);
- 
- 	return ret;
- }
-@@ -2115,10 +2113,10 @@ static int __init loop_init(void)
- 				  THIS_MODULE, loop_probe, NULL, NULL);
- 
- 	/* pre-create number of devices given by config or max_loop */
--	mutex_lock(&loop_index_mutex);
-+	mutex_lock(&loop_ctl_mutex);
- 	for (i = 0; i < nr; i++)
- 		loop_add(&lo, i);
--	mutex_unlock(&loop_index_mutex);
-+	mutex_unlock(&loop_ctl_mutex);
- 
- 	printk(KERN_INFO "loop: module loaded\n");
- 	return 0;
--- 
-2.16.4
