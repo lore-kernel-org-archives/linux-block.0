@@ -1,73 +1,44 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH V3 06/17] SCSI: pass 'scsi_device' instance from 'scsi_request'
-Date: Thu, 13 Sep 2018 20:15:35 +0800
-Message-Id: <20180913121546.5710-7-ming.lei@redhat.com>
-In-Reply-To: <20180913121546.5710-1-ming.lei@redhat.com>
-References: <20180913121546.5710-1-ming.lei@redhat.com>
+Return-Path: <hch@lst.de>
+Date: Fri, 21 Sep 2018 18:05:33 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Logan Gunthorpe <logang@deltatee.com>
+Cc: Bjorn Helgaas <helgaas@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org, linux-nvdimm@lists.01.org,
+	linux-block@vger.kernel.org, Stephen Bates <sbates@raithlin.com>,
+	Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH v6 01/13] PCI/P2PDMA: Support peer-to-peer memory
+Message-ID: <20180921160533.GA26601@lst.de>
+References: <20180913001156.4115-1-logang@deltatee.com> <20180913001156.4115-2-logang@deltatee.com> <20180920223829.GD224714@bhelgaas-glaptop.roam.corp.google.com> <ab733346-9518-ed68-492d-e52929586293@deltatee.com> <20180921130010.GE224714@bhelgaas-glaptop.roam.corp.google.com> <a7e2b2cb-ea35-0a97-498b-1f5753e406aa@deltatee.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <a7e2b2cb-ea35-0a97-498b-1f5753e406aa@deltatee.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch prepares for introducing SCSI per-host admin queue, which
-is only used for queuing admin requests, which are now submitted via
-__scsi_execute().
+On Fri, Sep 21, 2018 at 09:37:33AM -0600, Logan Gunthorpe wrote:
+> On 2018-09-21 7:00 AM, Bjorn Helgaas wrote:
+> > On Thu, Sep 20, 2018 at 04:47:49PM -0600, Logan Gunthorpe wrote:
+> >> On 2018-09-20 4:38 PM, Bjorn Helgaas wrote:
+> >>>> +#define pr_fmt(fmt) "pci-p2pdma: " fmt
+> >>>
+> >>> Is pr_fmt() actually used anywhere?
+> >>
+> >> It's used in a Patch 4 to print errors in the configfs helpers.
+> > 
+> > Ideally pr_fmt() would be added in the same patch that uses it, but
+> > obviously pretty trivial.
+> 
+> Hmm, well Christoph asked me to do it this way. ;)
 
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Adrian Hunter <adrian.hunter@intel.com>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/scsi_lib.c     | 2 ++
- include/scsi/scsi_request.h | 5 ++++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 6fb8fd3ccc2c..2800dfae19cd 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -279,6 +279,8 @@ int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 	rq->cmd_len = COMMAND_SIZE(cmd[0]);
- 	memcpy(rq->cmd, cmd, rq->cmd_len);
- 	rq->retries = retries;
-+	rq->sdev = sdev;	/* only valid in submit path */
-+
- 	req->timeout = timeout;
- 	req->cmd_flags |= flags;
- 	req->rq_flags |= rq_flags | RQF_QUIET;
-diff --git a/include/scsi/scsi_request.h b/include/scsi/scsi_request.h
-index b06f28c74908..0de6901b48ab 100644
---- a/include/scsi/scsi_request.h
-+++ b/include/scsi/scsi_request.h
-@@ -14,7 +14,10 @@ struct scsi_request {
- 	unsigned int	sense_len;
- 	unsigned int	resid_len;	/* residual count */
- 	int		retries;
--	void		*sense;
-+	union {
-+		void		*sense;
-+		struct scsi_device *sdev;
-+	};
- };
- 
- static inline struct scsi_request *scsi_req(struct request *rq)
--- 
-2.9.5
+Sorry.  I somehow was under the impression we already had a printk
+in the earlier patch, but it looks like I was confused.
