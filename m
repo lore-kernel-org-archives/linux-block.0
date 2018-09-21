@@ -1,31 +1,74 @@
-Return-Path: <hch@lst.de>
-Date: Wed, 26 Sep 2018 16:28:47 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+Return-Path: <bvanassche@acm.org>
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Ming Lei <ming.lei@redhat.com>,
 	Jianchao Wang <jianchao.w.wang@oracle.com>,
 	Hannes Reinecke <hare@suse.com>,
 	Johannes Thumshirn <jthumshirn@suse.de>,
 	Alan Stern <stern@rowland.harvard.edu>
-Subject: Re: [PATCH v10 8/8] blk-mq: Enable support for runtime power
- management
-Message-ID: <20180926142847.GF8604@lst.de>
-References: <20180921203122.49743-1-bvanassche@acm.org> <20180921203122.49743-9-bvanassche@acm.org>
+Subject: [PATCH v10 8/8] blk-mq: Enable support for runtime power management
+Date: Fri, 21 Sep 2018 13:31:22 -0700
+Message-Id: <20180921203122.49743-9-bvanassche@acm.org>
+In-Reply-To: <20180921203122.49743-1-bvanassche@acm.org>
+References: <20180921203122.49743-1-bvanassche@acm.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180921203122.49743-9-bvanassche@acm.org>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Sep 21, 2018 at 01:31:22PM -0700, Bart Van Assche wrote:
-> Now that the blk-mq core processes power management requests
-> (marked with RQF_PREEMPT) in other states than RPM_ACTIVE, enable
-> runtime power management for blk-mq.
+Now that the blk-mq core processes power management requests
+(marked with RQF_PREEMPT) in other states than RPM_ACTIVE, enable
+runtime power management for blk-mq.
 
-Looks fine,
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Alan Stern <stern@rowland.harvard.edu>
+---
+ block/blk-mq.c | 2 ++
+ block/blk-pm.c | 6 ------
+ 2 files changed, 2 insertions(+), 6 deletions(-)
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-
-We also need to remember to rever the !blk_mq flag in the ufs driver
-after this, but I guess the commit enabling this isn't even in Jens'
-tree, so it will have to be done after the merge.
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 96d501e8663c..d384ab700afd 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -33,6 +33,7 @@
+ #include "blk-mq.h"
+ #include "blk-mq-debugfs.h"
+ #include "blk-mq-tag.h"
++#include "blk-pm.h"
+ #include "blk-stat.h"
+ #include "blk-mq-sched.h"
+ #include "blk-rq-qos.h"
+@@ -475,6 +476,7 @@ static void __blk_mq_free_request(struct request *rq)
+ 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, ctx->cpu);
+ 	const int sched_tag = rq->internal_tag;
+ 
++	blk_pm_mark_last_busy(rq);
+ 	if (rq->tag != -1)
+ 		blk_mq_put_tag(hctx, hctx->tags, ctx, rq->tag);
+ 	if (sched_tag != -1)
+diff --git a/block/blk-pm.c b/block/blk-pm.c
+index 972fbc656846..f8fdae01bea2 100644
+--- a/block/blk-pm.c
++++ b/block/blk-pm.c
+@@ -30,12 +30,6 @@
+  */
+ void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
+ {
+-	/* Don't enable runtime PM for blk-mq until it is ready */
+-	if (q->mq_ops) {
+-		pm_runtime_disable(dev);
+-		return;
+-	}
+-
+ 	q->dev = dev;
+ 	q->rpm_status = RPM_ACTIVE;
+ 	pm_runtime_set_autosuspend_delay(q->dev, -1);
+-- 
+2.19.0.444.g18242da7ef-goog
