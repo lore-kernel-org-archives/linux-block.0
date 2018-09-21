@@ -1,99 +1,38 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:49660 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731651AbeITMKP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Sep 2018 08:10:15 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH, resend] block: use bio_add_page in bio_iov_iter_get_pages
-Date: Thu, 20 Sep 2018 08:28:21 +0200
-Message-Id: <20180920062821.18592-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <gregkh@linuxfoundation.org>
+Date: Fri, 21 Sep 2018 10:28:26 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [GIT PULL] Storage fixes for 4.19-rc5
+Message-ID: <20180921082826.GA6453@kroah.com>
+References: <23e4fede-4dc5-ab36-fc83-bf0509cab12b@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <23e4fede-4dc5-ab36-fc83-bf0509cab12b@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-Replace a nasty hack with a different nasty hack to prepare for multipage
-bio_vecs.  By moving the temporary page array as far up as possible in
-the space allocated for the bio_vec array we can iterate forward over it
-and thus use bio_add_page.  Using bio_add_page means we'll be able to
-merge physically contiguous pages once support for multipath bio_vecs is
-merged.
+On Thu, Sep 20, 2018 at 03:50:53PM -0600, Jens Axboe wrote:
+> Hi Greg,
+> 
+> Three fixes that should go into this series. This pull request
+> contains:
+> 
+> - Fix for leaking kernel pointer in floppy ioctl (Andy Whitcroft)
+> 
+> - NVMe pull request from Christoph, and a single ANA log page fix
+>   (Hannes)
+> 
+> - Regression fix for libata qd32 support, where we trigger an illegal
+>   active command transition. This fixes a CD-ROM detection issue that
+>   was reported, but could also trigger premature completion of the
+>   internal tag (me)
+> 
+> 
+> Please pull!
+> 
+> 
+>   git://git.kernel.dk/linux-block.git tags/for-linus-20180920
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/bio.c | 41 ++++++++++++++++++++---------------------
- 1 file changed, 20 insertions(+), 21 deletions(-)
+Now pulled, thanks.
 
-diff --git a/block/bio.c b/block/bio.c
-index b12966e415d3..53a36723338a 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -827,6 +827,8 @@ int bio_add_page(struct bio *bio, struct page *page,
- }
- EXPORT_SYMBOL(bio_add_page);
- 
-+#define PAGE_PTRS_PER_BVEC     (sizeof(struct bio_vec) / sizeof(struct page *))
-+
- /**
-  * __bio_iov_iter_get_pages - pin user or kernel pages and add them to a bio
-  * @bio: bio to add pages to
-@@ -839,38 +841,35 @@ EXPORT_SYMBOL(bio_add_page);
-  */
- static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- {
--	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt, idx;
-+	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
-+	unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
- 	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
- 	struct page **pages = (struct page **)bv;
-+	ssize_t size, left;
-+	unsigned len, i;
- 	size_t offset;
--	ssize_t size;
-+
-+	/*
-+	 * Move page array up in the allocated memory for the bio vecs as far as
-+	 * possible so that we can start filling biovecs from the beginning
-+	 * without overwriting the temporary page array.
-+	*/
-+	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
-+	pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
- 
- 	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
- 	if (unlikely(size <= 0))
- 		return size ? size : -EFAULT;
--	idx = nr_pages = (size + offset + PAGE_SIZE - 1) / PAGE_SIZE;
- 
--	/*
--	 * Deep magic below:  We need to walk the pinned pages backwards
--	 * because we are abusing the space allocated for the bio_vecs
--	 * for the page array.  Because the bio_vecs are larger than the
--	 * page pointers by definition this will always work.  But it also
--	 * means we can't use bio_add_page, so any changes to it's semantics
--	 * need to be reflected here as well.
--	 */
--	bio->bi_iter.bi_size += size;
--	bio->bi_vcnt += nr_pages;
-+	for (left = size, i = 0; left > 0; left -= len, i++) {
-+		struct page *page = pages[i];
- 
--	while (idx--) {
--		bv[idx].bv_page = pages[idx];
--		bv[idx].bv_len = PAGE_SIZE;
--		bv[idx].bv_offset = 0;
-+		len = min_t(size_t, PAGE_SIZE - offset, left);
-+		if (WARN_ON_ONCE(bio_add_page(bio, page, len, offset) != len))
-+			return -EINVAL;
-+		offset = 0;
- 	}
- 
--	bv[0].bv_offset += offset;
--	bv[0].bv_len -= offset;
--	bv[nr_pages - 1].bv_len -= nr_pages * PAGE_SIZE - offset - size;
--
- 	iov_iter_advance(iter, size);
- 	return 0;
- }
--- 
-2.18.0
+greg k-h
