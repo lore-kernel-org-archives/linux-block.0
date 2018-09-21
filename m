@@ -1,61 +1,112 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:45257 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729353AbeIRNeo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Sep 2018 09:34:44 -0400
-Received: by mail-ed1-f67.google.com with SMTP id p52-v6so1081844eda.12
-        for <linux-block@vger.kernel.org>; Tue, 18 Sep 2018 01:03:17 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 4/4] lightnvm: pblk: guarantee mw_cunits on read buffer
-Date: Tue, 18 Sep 2018 10:03:05 +0200
-Message-Id: <1537257785-31630-5-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1537257785-31630-1-git-send-email-javier@cnexlabs.com>
-References: <1537257785-31630-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH 1/3] percpu_ref: add a new helper interface
+ __percpu_ref_get_many
+To: Tejun Heo <tj@kernel.org>
+Cc: axboe@kernel.dk, kent.overstreet@gmail.com, ming.lei@redhat.com,
+        bart.vanassche@wdc.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1537438703-25217-1-git-send-email-jianchao.w.wang@oracle.com>
+ <1537438703-25217-2-git-send-email-jianchao.w.wang@oracle.com>
+ <20180920205333.GF902964@devbig004.ftw2.facebook.com>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <2659fd02-fc20-cada-c43e-fac12827d1ad@oracle.com>
+Date: Fri, 21 Sep 2018 09:45:46 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180920205333.GF902964@devbig004.ftw2.facebook.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-OCSSD 2.0 defines the amount of data that the host must buffer per chunk
-to guarantee reads through the geometry field mw_cunits. This value is
-the base that pblk uses to determine the size of its read buffer.
-Currently, this size is set to be the closes power-of-2 to mw_cunits
-times the number of parallel units available to the pblk instance for
-each open line (currently one). When an entry (4KB) is put in the
-buffer, the L2P table points to it. As the buffer wraps up, the L2P is
-updated to point to addresses on the device, thus guaranteeing mw_cunits
-at a chunk level.
+Hi Tejun
 
-However, given that pblk cannot write to the device under ws_min
-(normally ws_opt), there might be a window in which the buffer starts
-wrapping up and updating L2P entries before the mw_cunits value in a
-chunk has been surpassed.
+Thanks for your kindly response.
 
-In order not to violate the mw_cunits constrain in this case, account
-for ws_opt on the read buffer creation.
+On 09/21/2018 04:53 AM, Tejun Heo wrote:
+> Hello,
+> 
+> On Thu, Sep 20, 2018 at 06:18:21PM +0800, Jianchao Wang wrote:
+>> -static inline void percpu_ref_get_many(struct percpu_ref *ref, unsigned long nr)
+>> +static inline void __percpu_ref_get_many(struct percpu_ref *ref, unsigned long nr)
+>>  {
+>>  	unsigned long __percpu *percpu_count;
+>>  
+>> -	rcu_read_lock_sched();
+> 
+> So, if we're gonna do this (please read below tho), please add the
+> matching assertion
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-init.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Yes, I will.
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 549f13a58b33..604bb743b92b 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -195,7 +195,8 @@ static int pblk_rwb_init(struct pblk *pblk)
- 	unsigned long buffer_size;
- 	int pgs_in_buffer;
- 
--	pgs_in_buffer = max(geo->mw_cunits, geo->ws_opt) * geo->all_luns;
-+	pgs_in_buffer = (max(geo->mw_cunits, geo->ws_opt) + geo->ws_opt)
-+								* geo->all_luns;
- 
- 	if (write_buffer_size && (write_buffer_size > pgs_in_buffer))
- 		buffer_size = write_buffer_size;
--- 
-2.7.4
+> 
+>>  	if (__ref_is_percpu(ref, &percpu_count))
+>>  		this_cpu_add(*percpu_count, nr);
+>>  	else
+>>  		atomic_long_add(nr, &ref->count);
+>> +}
+>>  
+>> +/**
+>> + * percpu_ref_get_many - increment a percpu refcount
+>> + * @ref: percpu_ref to get
+>> + * @nr: number of references to get
+>> + *
+>> + * Analogous to atomic_long_add().
+>> + *
+>> + * This function is safe to call as long as @ref is between init and exit.
+>> + */
+>> +static inline void percpu_ref_get_many(struct percpu_ref *ref, unsigned long nr)
+>> +{
+>> +	rcu_read_lock_sched();
+>> +	__percpu_ref_get_many(ref, nr);
+>>  	rcu_read_unlock_sched();
+>>  }
+> 
+> And add the matching variant for get/put with and without _many.
+
+Yes.
+
+> 
+> Ming, so, if we make locking explicit like above, I think it should be
+> fine to share the locking.  However, please note that percpu_ref and
+> blk_mq are using different types of RCU, at least for now, and I'm not
+> really sure that unifying that and taking out one rcu read lock/unlock
+> is a meaningful optimization.
+> 
+
+Essentially, I want to rework the current queue freeze which depends on
+percpu_ref_kil/reinit. We implement our own condition checking instead of
+using the __PERCPU_REF_DEAD checking in percpu_ref_tryget_live. And use
+percpu with percpu_ref_switch_to_atomic/percpu to switch the percpu ref
+mode between percpu and atimic directly. Then it will be more convenient
+to implement:
+ - unfreeze the queue without draining requests.
+ - check whether q->q_usage_counter is zero
+ - add other gate conditions into blk_queue_enter, such as preempt-only
+
+So I want to put the condition checking and percpu_ref_get_many into a
+same sched rcu critical section.
+ rcu_read_lock_sched()
+   if condition check true
+     percpu_ref_get_many(&q->q_usage_counter, 1)
+   else
+     goto wait
+   rcu_read_unlock_sched()
+
+Then we could freeze the queue like:
+  set FROZEN flag on q
+  percpu_ref_put(1)
+  percpu_ref_switch_to_atomic
+Otherwise, we may need a synchronize_rcu.
+It is not for performance.
+
+Is there any reason that why blk_queue_enter only could use rcu lock instead of
+the sched rcu lock ?
+
+
+> Let's please first do something straight-forward.  If somebody can
+> show that this actually impacts performance, we can optimize it but
+> right now all these seem premature to me.
+
+Adding this interface is just for saving an extra rcu_read_lock/unlock_sched pair.
+If it doesn't make any sense, It is OK for me to discard it. :)
+
+Thanks
+Jianchao
