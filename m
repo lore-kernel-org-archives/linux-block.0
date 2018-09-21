@@ -1,34 +1,25 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH 0/1] bcache fix for 4.19-rc6 
-Date: Thu, 27 Sep 2018 23:41:45 +0800
-Message-Id: <20180927154146.28262-1-colyli@suse.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] Blk-throttle: update to use rbtree with leftmost node
+ cached
+To: Liu Bo <bo.liu@linux.alibaba.com>, linux-block@vger.kernel.org
+References: <1534800075-74931-1-git-send-email-bo.liu@linux.alibaba.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <227df034-69b9-a71f-7c1f-b9de9fc4cfb2@kernel.dk>
+Date: Thu, 20 Sep 2018 19:31:33 -0600
 MIME-Version: 1.0
+In-Reply-To: <1534800075-74931-1-git-send-email-bo.liu@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+On 8/20/18 3:21 PM, Liu Bo wrote:
+> As rbtree has native support of caching leftmost node,
+> i.e. rb_root_cached, no need to do the caching by ourselves.
 
-Guoju Fang just posts a bug fix to solve a bcache journal deadlock.
-This bug probably happens when system memory is in heavy usage,
-the deadlock is observed occasionally for a long while.
-If it is too late to go into Linux 4.19, I will submit to you in
-4.20 merge window, but it will be cool to have it in this run.
+This looks fine to me. I think this code was probably inherited
+from a similar caching trick in cfq, an predates leftmost
+caching being generally available in the rbtree code.
 
-Thanks.
-
-Coly Li
-
-guoju (1):
-  bcache: add separate workqueue for journal_write to avoid deadlock
-
- drivers/md/bcache/bcache.h  | 1 +
- drivers/md/bcache/journal.c | 6 +++---
- drivers/md/bcache/super.c   | 8 ++++++++
- 3 files changed, 12 insertions(+), 3 deletions(-)
+I'll apply it for 4.20.
 
 -- 
-2.19.0
+Jens Axboe
