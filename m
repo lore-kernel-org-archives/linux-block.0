@@ -1,140 +1,128 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 07/14] loop: Push loop_ctl_mutex down into loop_clr_fd()
-Date: Thu, 27 Sep 2018 13:36:45 +0200
-Message-Id: <20180927113652.5422-8-jack@suse.cz>
-In-Reply-To: <20180927113652.5422-1-jack@suse.cz>
-References: <20180927113652.5422-1-jack@suse.cz>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v3 00/12] block: always associate blkg and refcount
+ cleanup
+To: Dennis Zhou <dennisszhou@gmail.com>
+Cc: Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
+ Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
+ linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20180911184137.35897-1-dennisszhou@gmail.com>
+ <20180921205640.GA50648@dennisz-mbp.dhcp.thefacebook.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <b1bcc8b3-f15f-08e3-e5e0-c1877fba144e@kernel.dk>
+Date: Fri, 21 Sep 2018 20:29:51 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180921205640.GA50648@dennisz-mbp.dhcp.thefacebook.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-loop_clr_fd() has a weird locking convention that is expects
-loop_ctl_mutex held, releases it on success and keeps it on failure.
-Untangle the mess by moving locking of loop_ctl_mutex into
-loop_clr_fd().
+On 9/21/18 2:56 PM, Dennis Zhou wrote:
+> Hi Jens,
+> 
+> On Tue, Sep 11, 2018 at 02:41:25PM -0400, Dennis Zhou wrote:
+>> Hi everyone,
+>>
+>> v3: a few minor fixes.
+>>   0003: Updated the comment to bio_associate_blkg to reflect closest
+>>         association.
+>>         Removed a return branch in __bio_lookup_create.
+>>   0009: Removed an unnecessary rcu_read_(un)lock pair.
+>>   0010: Fixed blkg null pointer... blkg->blkcg => blkcg.
+>>
+>> This is rebased onto axboe#for-4.20/block 902d53914f64.
+>>
+>> From v2 below (updated):
+>> ------
+>> This is a followup to the patch series I sent out earlier [1] containing
+>> the middle two points:
+>>   1. always associate a bio with a blkg
+>>   2. remove the extra css ref held by bios and utilize the blkg ref
+>>
+>> The major difference with v2 is that error handling on blkg creation
+>> and association failure is handled more gracefully. Rather than having
+>> the complex logic to fallback to root, failures walk up the blkg tree.
+>> This seems more natural and less prone to error with the many possible
+>> failure scenarios.
+>>
+>> Additionally, there are fixes for kbuild errors and some key details
+>> overlooked by me in the first series that were pointed out in review.
+>>
+>> Modified from the first patchset:
+>> First, both blk-throttle and blk-iolatency rely on blkg association
+>> to enable their policies. Rather than each policy (and future policies)
+>> implement this logic independently, this consolidates it such that
+>> all bios are tagged with a blkg.
+>>
+>> Second, with the addition of always having a blkg reference, the blkcg
+>> can now be referenced through it rather than maintaining an additional
+>> pointer and reference. So let's clean this up.
+>>
+>> [1] https://lore.kernel.org/lkml/20180831015356.69796-1-dennisszhou@gmail.com/T
+>>
+>> This patchset contains the following 12 patches:
+>>   0001-blkcg-fix-ref-count-issue-with-bio_blkcg-using-task_.patch
+>>   0002-blkcg-update-blkg_lookup_create-to-do-locking.patch
+>>   0003-blkcg-convert-blkg_lookup_create-to-find-closest-blk.patch
+>>   0004-blkcg-always-associate-a-bio-with-a-blkg.patch
+>>   0005-blkcg-consolidate-bio_issue_init-to-be-a-part-of-cor.patch
+>>   0006-blkcg-associate-a-blkg-for-pages-being-evicted-by-sw.patch
+>>   0007-blkcg-associate-writeback-bios-with-a-blkg.patch
+>>   0008-blkcg-remove-bio-bi_css-and-instead-use-bio-bi_blkg.patch
+>>   0009-blkcg-remove-additional-reference-to-the-css.patch
+>>   0010-blkcg-cleanup-and-make-blk_get_rl-use-blkg_lookup_cr.patch
+>>   0011-blkcg-change-blkg-reference-counting-to-use-percpu_r.patch
+>>   0012-blkcg-rename-blkg_try_get-to-blkg_tryget.patch
+>>
+>> This patchset is on top of axboe#for-4.20/block 902d53914f64.
+>>
+>> diffstats below:
+>>
+>> Dennis Zhou (Facebook) (12):
+>>   blkcg: fix ref count issue with bio_blkcg using task_css
+>>   blkcg: update blkg_lookup_create to do locking
+>>   blkcg: convert blkg_lookup_create to find closest blkg
+>>   blkcg: always associate a bio with a blkg
+>>   blkcg: consolidate bio_issue_init to be a part of core
+>>   blkcg: associate a blkg for pages being evicted by swap
+>>   blkcg: associate writeback bios with a blkg
+>>   blkcg: remove bio->bi_css and instead use bio->bi_blkg
+>>   blkcg: remove additional reference to the css
+>>   blkcg: cleanup and make blk_get_rl use blkg_lookup_create
+>>   blkcg: change blkg reference counting to use percpu_ref
+>>   blkcg: rename blkg_try_get to blkg_tryget
+>>
+>>  Documentation/admin-guide/cgroup-v2.rst |   8 +-
+>>  block/bfq-cgroup.c                      |   4 +-
+>>  block/bfq-iosched.c                     |   2 +-
+>>  block/bio.c                             | 158 ++++++++++++++++--------
+>>  block/blk-cgroup.c                      | 123 ++++++++++++------
+>>  block/blk-iolatency.c                   |  26 +---
+>>  block/blk-throttle.c                    |  13 +-
+>>  block/bounce.c                          |   4 +-
+>>  block/cfq-iosched.c                     |   4 +-
+>>  drivers/block/loop.c                    |   5 +-
+>>  drivers/md/raid0.c                      |   2 +-
+>>  fs/buffer.c                             |  10 +-
+>>  fs/ext4/page-io.c                       |   2 +-
+>>  include/linux/bio.h                     |  23 ++--
+>>  include/linux/blk-cgroup.h              | 145 +++++++++++++++-------
+>>  include/linux/blk_types.h               |   1 -
+>>  include/linux/cgroup.h                  |   2 +
+>>  include/linux/writeback.h               |   5 +-
+>>  kernel/cgroup/cgroup.c                  |  48 +++++--
+>>  kernel/trace/blktrace.c                 |   4 +-
+>>  mm/page_io.c                            |   2 +-
+>>  21 files changed, 381 insertions(+), 210 deletions(-)
+>>
+>> Thanks,
+>> Dennis
+> 
+> I reran some basic test again for sanity and it seems to be fine on my
+> end. There are at least acks, and some reviewed-by's on the series. Is
+> there anything else you think needs to be done before we let this bake
+> in for-4.20/for-next?
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- drivers/block/loop.c | 49 +++++++++++++++++++++++++++++--------------------
- 1 file changed, 29 insertions(+), 20 deletions(-)
+Looks like it's good to go, I have applied it for 4.20. Thanks Dennis.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 51d11898e170..e4b82ca49286 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1028,15 +1028,22 @@ loop_init_xfer(struct loop_device *lo, struct loop_func_table *xfer,
- 
- static int __loop_clr_fd(struct loop_device *lo)
- {
--	struct file *filp = lo->lo_backing_file;
-+	struct file *filp = NULL;
- 	gfp_t gfp = lo->old_gfp_mask;
- 	struct block_device *bdev = lo->lo_device;
-+	int err = 0;
- 
--	if (WARN_ON_ONCE(lo->lo_state != Lo_rundown))
--		return -ENXIO;
-+	mutex_lock(&loop_ctl_mutex);
-+	if (WARN_ON_ONCE(lo->lo_state != Lo_rundown)) {
-+		err = -ENXIO;
-+		goto out_unlock;
-+	}
- 
--	if (filp == NULL)
--		return -EINVAL;
-+	filp = lo->lo_backing_file;
-+	if (filp == NULL) {
-+		err = -EINVAL;
-+		goto out_unlock;
-+	}
- 
- 	/* freeze request queue during the transition */
- 	blk_mq_freeze_queue(lo->lo_queue);
-@@ -1083,6 +1090,7 @@ static int __loop_clr_fd(struct loop_device *lo)
- 	if (!part_shift)
- 		lo->lo_disk->flags |= GENHD_FL_NO_PART_SCAN;
- 	loop_unprepare_queue(lo);
-+out_unlock:
- 	mutex_unlock(&loop_ctl_mutex);
- 	/*
- 	 * Need not hold loop_ctl_mutex to fput backing file.
-@@ -1090,14 +1098,22 @@ static int __loop_clr_fd(struct loop_device *lo)
- 	 * lock dependency possibility warning as fput can take
- 	 * bd_mutex which is usually taken before loop_ctl_mutex.
- 	 */
--	fput(filp);
--	return 0;
-+	if (filp)
-+		fput(filp);
-+	return err;
- }
- 
- static int loop_clr_fd(struct loop_device *lo)
- {
--	if (lo->lo_state != Lo_bound)
-+	int err;
-+
-+	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+	if (err)
-+		return err;
-+	if (lo->lo_state != Lo_bound) {
-+		mutex_unlock(&loop_ctl_mutex);
- 		return -ENXIO;
-+	}
- 	/*
- 	 * If we've explicitly asked to tear down the loop device,
- 	 * and it has an elevated reference count, set it for auto-teardown when
-@@ -1114,6 +1130,7 @@ static int loop_clr_fd(struct loop_device *lo)
- 		return 0;
- 	}
- 	lo->lo_state = Lo_rundown;
-+	mutex_unlock(&loop_ctl_mutex);
- 
- 	return __loop_clr_fd(lo);
- }
-@@ -1448,14 +1465,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 		mutex_unlock(&loop_ctl_mutex);
- 		break;
- 	case LOOP_CLR_FD:
--		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
--		if (err)
--			return err;
--		/* loop_clr_fd would have unlocked loop_ctl_mutex on success */
--		err = loop_clr_fd(lo);
--		if (err)
--			mutex_unlock(&loop_ctl_mutex);
--		break;
-+		return loop_clr_fd(lo);
- 	case LOOP_SET_STATUS:
- 		err = -EPERM;
- 		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
-@@ -1691,7 +1701,6 @@ static int lo_open(struct block_device *bdev, fmode_t mode)
- static void lo_release(struct gendisk *disk, fmode_t mode)
- {
- 	struct loop_device *lo;
--	int err;
- 
- 	mutex_lock(&loop_ctl_mutex);
- 	lo = disk->private_data;
-@@ -1702,13 +1711,13 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 		if (lo->lo_state != Lo_bound)
- 			goto out_unlock;
- 		lo->lo_state = Lo_rundown;
-+		mutex_unlock(&loop_ctl_mutex);
- 		/*
- 		 * In autoclear mode, stop the loop thread
- 		 * and remove configuration after last close.
- 		 */
--		err = __loop_clr_fd(lo);
--		if (!err)
--			return;
-+		__loop_clr_fd(lo);
-+		return;
- 	} else if (lo->lo_state == Lo_bound) {
- 		/*
- 		 * Otherwise keep thread (if running) and config,
 -- 
-2.16.4
+Jens Axboe
