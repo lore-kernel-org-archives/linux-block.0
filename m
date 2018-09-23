@@ -1,77 +1,26 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
+Return-Path: <gregkh@linuxfoundation.org>
+Date: Sun, 23 Sep 2018 09:23:05 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENT 3/3] blok, bfq: do not plug I/O if all queues are weight-raised
-Date: Fri, 14 Sep 2018 16:23:09 +0200
-Message-Id: <20180914142309.6789-4-paolo.valente@linaro.org>
-In-Reply-To: <20180914142309.6789-1-paolo.valente@linaro.org>
-References: <20180914142309.6789-1-paolo.valente@linaro.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [GIT PULL] Block fix for 4.19-rc5
+Message-ID: <20180923072305.GA8444@kroah.com>
+References: <1132dc7f-d3d0-a318-22d5-01d2af8f63c7@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1132dc7f-d3d0-a318-22d5-01d2af8f63c7@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-To reduce latency for interactive and soft real-time applications, bfq
-privileges the bfq_queues containing the I/O of these
-applications. These privileged queues, referred-to as weight-raised
-queues, get a much higher share of the device throughput
-w.r.t. non-privileged queues. To preserve this higher share, the I/O
-of any non-weight-raised queue must be plugged whenever a sync
-weight-raised queue, while being served, remains temporarily empty. To
-attain this goal, bfq simply plugs any I/O (from any queue), if a sync
-weight-raised queue remains empty while in service.
+On Sat, Sep 22, 2018 at 03:21:19PM -0600, Jens Axboe wrote:
+> Hi Greg,
+> 
+> I was going to wait with this one, but then I decided that I think we
+> should put it in sooner rather than later. Just a single fix in this
+> pull request, fixing a regression in /proc/diskstats caused by the
+> unification of timestamps.
+> 
+> Please pull!
 
-Unfortunately, this plugging typically lowers throughput with random
-I/O, on devices with internal queueing (because it reduces the filling
-level of the internal queues of the device).
+Now pulled, thanks.
 
-This commit addresses this issue by restricting the cases where
-plugging is performed: if a sync weight-raised queue remains empty
-while in service, then I/O plugging is performed only if some of the
-active bfq_queues are *not* weight-raised (which is actually the only
-circumstance where plugging is needed to preserve the higher share of
-the throughput of weight-raised queues). This restriction proved able
-to boost throughput in really many use cases needing only maximum
-throughput.
-
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index d94838bcc135..c0b1db3afb81 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -3580,7 +3580,12 @@ static bool bfq_better_to_idle(struct bfq_queue *bfqq)
- 	 * whether bfqq is being weight-raised, because
- 	 * bfq_symmetric_scenario() does not take into account also
- 	 * weight-raised queues (see comments on
--	 * bfq_weights_tree_add()).
-+	 * bfq_weights_tree_add()). In particular, if bfqq is being
-+	 * weight-raised, it is important to idle only if there are
-+	 * other, non-weight-raised queues that may steal throughput
-+	 * to bfqq. Actually, we should be even more precise, and
-+	 * differentiate between interactive weight raising and
-+	 * soft real-time weight raising.
- 	 *
- 	 * As a side note, it is worth considering that the above
- 	 * device-idling countermeasures may however fail in the
-@@ -3592,7 +3597,8 @@ static bool bfq_better_to_idle(struct bfq_queue *bfqq)
- 	 * to let requests be served in the desired order until all
- 	 * the requests already queued in the device have been served.
- 	 */
--	asymmetric_scenario = bfqq->wr_coeff > 1 ||
-+	asymmetric_scenario = (bfqq->wr_coeff > 1 &&
-+			       bfqd->wr_busy_queues < bfqd->busy_queues) ||
- 		!bfq_symmetric_scenario(bfqd);
- 
- 	/*
--- 
-2.16.1
+greg k-h
