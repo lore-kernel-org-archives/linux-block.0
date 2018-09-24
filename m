@@ -1,75 +1,43 @@
-Return-Path: <ard.biesheuvel@linaro.org>
+Return-Path: <keescook@chromium.org>
+Return-Path: <keescook@chromium.org>
 MIME-Version: 1.0
+In-Reply-To: <CAKv+Gu8ynaVi1KCMNsjCU0ucAjFFku=ourh9Yc9Rizoc4ztvOQ@mail.gmail.com>
 References: <20180919021100.3380-1-keescook@chromium.org> <20180919021100.3380-8-keescook@chromium.org>
- <CAKv+Gu8ynaVi1KCMNsjCU0ucAjFFku=ourh9Yc9Rizoc4ztvOQ@mail.gmail.com> <CAGXu5jLw3+nvb9opPeoCyH0MhyVK5UY7H5qeQ2b8GFTUGDGrUQ@mail.gmail.com>
-In-Reply-To: <CAGXu5jLw3+nvb9opPeoCyH0MhyVK5UY7H5qeQ2b8GFTUGDGrUQ@mail.gmail.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Tue, 25 Sep 2018 11:25:57 +0200
-Message-ID: <CAKv+Gu-xKWsiegZXnsMvmMVgKTo7S2cm4wEqdaL7w9z64X7SAA@mail.gmail.com>
+ <CAKv+Gu8ynaVi1KCMNsjCU0ucAjFFku=ourh9Yc9Rizoc4ztvOQ@mail.gmail.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Mon, 24 Sep 2018 10:53:30 -0700
+Message-ID: <CAGXu5jLw3+nvb9opPeoCyH0MhyVK5UY7H5qeQ2b8GFTUGDGrUQ@mail.gmail.com>
 Subject: Re: [PATCH crypto-next 07/23] block: cryptoloop: Remove VLA usage of skcipher
-To: Kees Cook <keescook@chromium.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
+	linux-block <linux-block@vger.kernel.org>, Eric Biggers <ebiggers@google.com>,
 	"open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, 24 Sep 2018 at 19:53, Kees Cook <keescook@chromium.org> wrote:
+On Mon, Sep 24, 2018 at 4:52 AM, Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+> On Wed, 19 Sep 2018 at 04:11, Kees Cook <keescook@chromium.org> wrote:
+>> @@ -119,7 +119,7 @@ cryptoloop_transfer(struct loop_device *lo, int cmd,
+>>         unsigned in_offs, out_offs;
+>>         int err;
+>>
+>> -       skcipher_request_set_tfm(req, tfm);
+>> +       skcipher_request_set_sync_tfm(req, tfm);
+>>         skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP,
+>>                                       NULL, NULL);
+>>
 >
-> On Mon, Sep 24, 2018 at 4:52 AM, Ard Biesheuvel
-> <ard.biesheuvel@linaro.org> wrote:
-> > On Wed, 19 Sep 2018 at 04:11, Kees Cook <keescook@chromium.org> wrote:
-> >> @@ -119,7 +119,7 @@ cryptoloop_transfer(struct loop_device *lo, int cmd,
-> >>         unsigned in_offs, out_offs;
-> >>         int err;
-> >>
-> >> -       skcipher_request_set_tfm(req, tfm);
-> >> +       skcipher_request_set_sync_tfm(req, tfm);
-> >>         skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP,
-> >>                                       NULL, NULL);
-> >>
-> >
-> > Does this work?
->
-> Everything is a direct wrapper for existing types and functions, so I
-> wouldn't expect any functional change. I haven't been able to test
-> this particular interface, though. cryptoloop is very deprecated,
-> isn't it?
->
+> Does this work?
 
-Ah yes, I managed to confuse myself there. This looks all fine to me.
+Everything is a direct wrapper for existing types and functions, so I
+wouldn't expect any functional change. I haven't been able to test
+this particular interface, though. cryptoloop is very deprecated,
+isn't it?
 
-In any case, this is another example where we may decide to fix the
-code rather than retain the request allocation on the stack (but that
-is Jens's call ultimately, I suppose)
+-Kees
 
-diff --git a/drivers/block/cryptoloop.c b/drivers/block/cryptoloop.c
-index 7033a4beda66..5ed2167219ba 100644
---- a/drivers/block/cryptoloop.c
-+++ b/drivers/block/cryptoloop.c
-@@ -110,7 +110,7 @@ cryptoloop_transfer(struct loop_device *lo, int cmd,
-                    int size, sector_t IV)
- {
-        struct crypto_skcipher *tfm = lo->key_data;
--       SKCIPHER_REQUEST_ON_STACK(req, tfm);
-+       struct skcipher_request *req;
-        struct scatterlist sg_out;
-        struct scatterlist sg_in;
-
-@@ -119,7 +119,10 @@ cryptoloop_transfer(struct loop_device *lo, int cmd,
-        unsigned in_offs, out_offs;
-        int err;
-
--       skcipher_request_set_tfm(req, tfm);
-+       req = skcipher_request_alloc(tfm, GFP_NOIO);
-+       if (!req)
-+               return -ENOMEM;
-+
-        skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP,
-                                      NULL, NULL);
-
-
-or if we stick with the current change to sync:
-
-Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+-- 
+Kees Cook
+Pixel Security
