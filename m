@@ -1,109 +1,64 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:42730 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729674AbeIYWbJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Sep 2018 18:31:09 -0400
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Vinod Koul <vinod.koul@intel.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Thierry Reding <treding@nvidia.com>,
-        Sanyog Kale <sanyog.r.kale@intel.com>,
-        Sagar Dharia <sdharia@codeaurora.org>
-Date: Tue, 25 Sep 2018 10:22:23 -0600
-Message-Id: <20180925162231.4354-6-logang@deltatee.com>
-In-Reply-To: <20180925162231.4354-1-logang@deltatee.com>
-References: <20180925162231.4354-1-logang@deltatee.com>
+Return-Path: <keith.busch@intel.com>
+Date: Mon, 24 Sep 2018 14:00:41 -0600
+From: Keith Busch <keith.busch@intel.com>
+To: Bart Van Assche <bart.vanassche@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	"jianchao.wang" <jianchao.w.wang@oracle.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: Re: Regression caused by f5bbbbe4d635
+Message-ID: <20180924200040.GA9777@localhost.localdomain>
+References: <bae37c56-3f12-448d-cdb5-6ed2c2d069a4@kernel.dk>
+ <20180924191348.GB9223@localhost.localdomain>
+ <1537818667.195115.22.camel@gmail.com>
 MIME-Version: 1.0
-Subject: [PATCH v7 05/13] docs-rst: Add a new directory for PCI documentation
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1537818667.195115.22.camel@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Add a new directory in the driver API guide for PCI specific
-documentation.
+On Mon, Sep 24, 2018 at 12:51:07PM -0700, Bart Van Assche wrote:
+> On Mon, 2018-09-24 at 13:13 -0600, Keith Busch wrote:
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index 85a1c1a59c72..28d128450621 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -848,22 +848,6 @@ static void blk_mq_timeout_work(struct work_struct *work)
+> > 	struct blk_mq_hw_ctx *hctx;
+> > 	int i;
+> >  
+> > -	/* A deadlock might occur if a request is stuck requiring a
+> > -	 * timeout at the same time a queue freeze is waiting
+> > -	 * completion, since the timeout code would not be able to
+> > -	 * acquire the queue reference here.
+> > -	 *
+> > -	 * That's why we don't use blk_queue_enter here; instead, we use
+> > -	 * percpu_ref_tryget directly, because we need to be able to
+> > -	 * obtain a reference even in the short window between the queue
+> > -	 * starting to freeze, by dropping the first reference in
+> > -	 * blk_freeze_queue_start, and the moment the last request is
+> > -	 * consumed, marked by the instant q_usage_counter reaches
+> > -	 * zero.
+> > -	 */
+> > -	if (!percpu_ref_tryget(&q->q_usage_counter))
+> > -		return;
+> > -
+> > 	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &next);
+> >  
+> > 	if (next != 0) {
+> > @@ -881,7 +865,6 @@ static void blk_mq_timeout_work(struct work_struct *work)
+> > 				blk_mq_tag_idle(hctx);
+> > 		}
+> > 	}
+> > -	blk_queue_exit(q);
+> >  }
+> 
+> Hi Keith,
+> 
+> The above introduces a behavior change: if the percpu_ref_tryget() call inside
+> blk_mq_queue_tag_busy_iter() fails then blk_mq_timeout_work() will now call
+> blk_mq_tag_idle(). I think that's wrong if the percpu_ref_tryget() call fails
+> due to the queue having been frozen. Please make blk_mq_queue_tag_busy_iter()
+> return a bool that indicates whether or not it has iterated over the request
+> queue.
 
-This is in preparation for adding a new PCI P2P DMA driver writers
-guide which will go in this directory.
-
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Vinod Koul <vinod.koul@intel.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>
-Cc: Logan Gunthorpe <logang@deltatee.com>
-Cc: Thierry Reding <treding@nvidia.com>
-Cc: Sanyog Kale <sanyog.r.kale@intel.com>
-Cc: Sagar Dharia <sdharia@codeaurora.org>
----
- Documentation/driver-api/index.rst         |  2 +-
- Documentation/driver-api/pci/index.rst     | 20 ++++++++++++++++++++
- Documentation/driver-api/{ => pci}/pci.rst |  0
- 3 files changed, 21 insertions(+), 1 deletion(-)
- create mode 100644 Documentation/driver-api/pci/index.rst
- rename Documentation/driver-api/{ => pci}/pci.rst (100%)
-
-diff --git a/Documentation/driver-api/index.rst b/Documentation/driver-api/index.rst
-index 6d9f2f9fe20e..e9e7d24169cf 100644
---- a/Documentation/driver-api/index.rst
-+++ b/Documentation/driver-api/index.rst
-@@ -29,7 +29,7 @@ available subsections can be seen below.
-    iio/index
-    input
-    usb/index
--   pci
-+   pci/index
-    spi
-    i2c
-    hsi
-diff --git a/Documentation/driver-api/pci/index.rst b/Documentation/driver-api/pci/index.rst
-new file mode 100644
-index 000000000000..eaf20b24bf7d
---- /dev/null
-+++ b/Documentation/driver-api/pci/index.rst
-@@ -0,0 +1,20 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+============================================
-+The Linux PCI driver implementer's API guide
-+============================================
-+
-+.. class:: toc-title
-+
-+	   Table of contents
-+
-+.. toctree::
-+   :maxdepth: 2
-+
-+   pci
-+
-+.. only::  subproject and html
-+
-+   Indices
-+   =======
-+
-+   * :ref:`genindex`
-diff --git a/Documentation/driver-api/pci.rst b/Documentation/driver-api/pci/pci.rst
-similarity index 100%
-rename from Documentation/driver-api/pci.rst
-rename to Documentation/driver-api/pci/pci.rst
--- 
-2.19.0
+Good point, thanks for the feedback.
