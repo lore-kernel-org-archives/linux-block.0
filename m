@@ -1,679 +1,215 @@
-Return-Path: <bvanassche@acm.org>
-From: Bart Van Assche <bvanassche@acm.org>
+Return-Path: <BATV+afefc9c3360d6e01bea6+5510+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v7 1/6] block: Move power management code into a new source file
-Date: Mon, 17 Sep 2018 13:11:14 -0700
-Message-Id: <20180917201124.26161-2-bvanassche@acm.org>
-In-Reply-To: <20180917201124.26161-1-bvanassche@acm.org>
-References: <20180917201124.26161-1-bvanassche@acm.org>
+Cc: Ming Lei <ming.lei@redhat.com>,
+	linux-block@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 05/10] block: simplify BIOVEC_PHYS_MERGEABLE
+Date: Mon, 24 Sep 2018 09:43:50 +0200
+Message-Id: <20180924074355.2802-6-hch@lst.de>
+In-Reply-To: <20180924074355.2802-1-hch@lst.de>
+References: <20180924074355.2802-1-hch@lst.de>
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Move the code for runtime power management from blk-core.c into the
-new source file blk-pm.c. Move the corresponding declarations from
-<linux/blkdev.h> into <linux/blk-pm.h>. For CONFIG_PM=n, leave out
-the declarations of the functions that are not used in that mode.
-This patch not only reduces the number of #ifdefs in the block layer
-core code but also reduces the size of header file <linux/blkdev.h>
-and hence should help to reduce the build time of the Linux kernel
-if CONFIG_PM is not defined.
+Turn the macro into an inline, move it to blk.h and simplify the
+arch hooks a bit.
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>
+Also rename the function to biovec_phys_mergeable as there is no need
+to shout.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/Kconfig          |   3 +
- block/Makefile         |   1 +
- block/blk-core.c       | 196 +----------------------------------------
- block/blk-pm.c         | 188 +++++++++++++++++++++++++++++++++++++++
- block/blk-pm.h         |  43 +++++++++
- block/elevator.c       |  22 +----
- drivers/scsi/scsi_pm.c |   1 +
- drivers/scsi/sd.c      |   1 +
- drivers/scsi/sr.c      |   1 +
- include/linux/blk-pm.h |  24 +++++
- include/linux/blkdev.h |  23 -----
- 11 files changed, 264 insertions(+), 239 deletions(-)
- create mode 100644 block/blk-pm.c
- create mode 100644 block/blk-pm.h
- create mode 100644 include/linux/blk-pm.h
+ arch/arm/include/asm/io.h   |  5 ++---
+ arch/arm64/include/asm/io.h |  5 ++---
+ arch/x86/include/asm/io.h   |  5 ++---
+ block/bio.c                 |  2 +-
+ block/blk-integrity.c       |  4 ++--
+ block/blk-merge.c           | 10 +++++-----
+ block/blk.h                 | 14 ++++++++++++++
+ include/linux/bio.h         | 13 -------------
+ 8 files changed, 28 insertions(+), 30 deletions(-)
 
-diff --git a/block/Kconfig b/block/Kconfig
-index 1f2469a0123c..85263e7bded6 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -228,4 +228,7 @@ config BLK_MQ_RDMA
- 	depends on BLOCK && INFINIBAND
- 	default y
+diff --git a/arch/arm/include/asm/io.h b/arch/arm/include/asm/io.h
+index 6774553dc214..e58ca25eddb7 100644
+--- a/arch/arm/include/asm/io.h
++++ b/arch/arm/include/asm/io.h
+@@ -462,9 +462,8 @@ extern void pci_iounmap(struct pci_dev *dev, void __iomem *addr);
+ struct bio_vec;
+ extern bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
+ 				      const struct bio_vec *vec2);
+-#define BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
+-	(__BIOVEC_PHYS_MERGEABLE(vec1, vec2) &&				\
+-	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2)))
++#define ARCH_BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
++	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2))
  
-+config BLK_PM
-+	def_bool BLOCK && PM
-+
- source block/Kconfig.iosched
-diff --git a/block/Makefile b/block/Makefile
-index 572b33f32c07..27eac600474f 100644
---- a/block/Makefile
-+++ b/block/Makefile
-@@ -37,3 +37,4 @@ obj-$(CONFIG_BLK_WBT)		+= blk-wbt.o
- obj-$(CONFIG_BLK_DEBUG_FS)	+= blk-mq-debugfs.o
- obj-$(CONFIG_BLK_DEBUG_FS_ZONED)+= blk-mq-debugfs-zoned.o
- obj-$(CONFIG_BLK_SED_OPAL)	+= sed-opal.o
-+obj-$(CONFIG_BLK_PM)		+= blk-pm.o
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 4dbc93f43b38..6d4dd176bd9d 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -42,6 +42,7 @@
- #include "blk.h"
- #include "blk-mq.h"
- #include "blk-mq-sched.h"
-+#include "blk-pm.h"
- #include "blk-rq-qos.h"
+ #ifdef CONFIG_MMU
+ #define ARCH_HAS_VALID_PHYS_ADDR_RANGE
+diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
+index 35b2e50f17fb..774e03ea1bb0 100644
+--- a/arch/arm64/include/asm/io.h
++++ b/arch/arm64/include/asm/io.h
+@@ -208,9 +208,8 @@ extern int devmem_is_allowed(unsigned long pfn);
+ struct bio_vec;
+ extern bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
+ 				      const struct bio_vec *vec2);
+-#define BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
+-	(__BIOVEC_PHYS_MERGEABLE(vec1, vec2) &&				\
+-	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2)))
++#define ARCH_BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
++	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2))
  
- #ifdef CONFIG_DEBUG_FS
-@@ -1726,16 +1727,6 @@ void part_round_stats(struct request_queue *q, int cpu, struct hd_struct *part)
- }
- EXPORT_SYMBOL_GPL(part_round_stats);
+ #endif	/* __KERNEL__ */
+ #endif	/* __ASM_IO_H */
+diff --git a/arch/x86/include/asm/io.h b/arch/x86/include/asm/io.h
+index 6de64840dd22..7c6106216d9c 100644
+--- a/arch/x86/include/asm/io.h
++++ b/arch/x86/include/asm/io.h
+@@ -376,9 +376,8 @@ struct bio_vec;
+ extern bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
+ 				      const struct bio_vec *vec2);
  
--#ifdef CONFIG_PM
--static void blk_pm_put_request(struct request *rq)
--{
--	if (rq->q->dev && !(rq->rq_flags & RQF_PM) && !--rq->q->nr_pending)
--		pm_runtime_mark_last_busy(rq->q->dev);
--}
--#else
--static inline void blk_pm_put_request(struct request *rq) {}
--#endif
--
- void __blk_put_request(struct request_queue *q, struct request *req)
+-#define BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
+-	(__BIOVEC_PHYS_MERGEABLE(vec1, vec2) &&				\
+-	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2)))
++#define ARCH_BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
++	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2))
+ #endif	/* CONFIG_XEN */
+ 
+ #define IO_SPACE_LIMIT 0xffff
+diff --git a/block/bio.c b/block/bio.c
+index 1cd47f218200..81d90b839e05 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -731,7 +731,7 @@ int bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
+ 	}
+ 
+ 	/* If we may be able to merge these biovecs, force a recount */
+-	if (bio->bi_vcnt > 1 && (BIOVEC_PHYS_MERGEABLE(bvec-1, bvec)))
++	if (bio->bi_vcnt > 1 && biovec_phys_mergeable(bvec-1, bvec))
+ 		bio_clear_flag(bio, BIO_SEG_VALID);
+ 
+  done:
+diff --git a/block/blk-integrity.c b/block/blk-integrity.c
+index 6121611e1316..0f7267916509 100644
+--- a/block/blk-integrity.c
++++ b/block/blk-integrity.c
+@@ -49,7 +49,7 @@ int blk_rq_count_integrity_sg(struct request_queue *q, struct bio *bio)
+ 	bio_for_each_integrity_vec(iv, bio, iter) {
+ 
+ 		if (prev) {
+-			if (!BIOVEC_PHYS_MERGEABLE(&ivprv, &iv))
++			if (!biovec_phys_mergeable(&ivprv, &iv))
+ 				goto new_segment;
+ 
+ 			if (!BIOVEC_SEG_BOUNDARY(q, &ivprv, &iv))
+@@ -95,7 +95,7 @@ int blk_rq_map_integrity_sg(struct request_queue *q, struct bio *bio,
+ 	bio_for_each_integrity_vec(iv, bio, iter) {
+ 
+ 		if (prev) {
+-			if (!BIOVEC_PHYS_MERGEABLE(&ivprv, &iv))
++			if (!biovec_phys_mergeable(&ivprv, &iv))
+ 				goto new_segment;
+ 
+ 			if (!BIOVEC_SEG_BOUNDARY(q, &ivprv, &iv))
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index ad8a226347a6..5e63e8259f92 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -21,7 +21,7 @@ static inline bool bios_segs_mergeable(struct request_queue *q,
+ 		struct bio *prev, struct bio_vec *prev_last_bv,
+ 		struct bio_vec *next_first_bv)
  {
- 	req_flags_t rq_flags = req->rq_flags;
-@@ -3757,191 +3748,6 @@ void blk_finish_plug(struct blk_plug *plug)
- }
- EXPORT_SYMBOL(blk_finish_plug);
+-	if (!BIOVEC_PHYS_MERGEABLE(prev_last_bv, next_first_bv))
++	if (!biovec_phys_mergeable(prev_last_bv, next_first_bv))
+ 		return false;
+ 	if (!BIOVEC_SEG_BOUNDARY(q, prev_last_bv, next_first_bv))
+ 		return false;
+@@ -199,7 +199,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 		if (bvprvp && blk_queue_cluster(q)) {
+ 			if (seg_size + bv.bv_len > queue_max_segment_size(q))
+ 				goto new_segment;
+-			if (!BIOVEC_PHYS_MERGEABLE(bvprvp, &bv))
++			if (!biovec_phys_mergeable(bvprvp, &bv))
+ 				goto new_segment;
+ 			if (!BIOVEC_SEG_BOUNDARY(q, bvprvp, &bv))
+ 				goto new_segment;
+@@ -332,7 +332,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+ 				if (seg_size + bv.bv_len
+ 				    > queue_max_segment_size(q))
+ 					goto new_segment;
+-				if (!BIOVEC_PHYS_MERGEABLE(&bvprv, &bv))
++				if (!biovec_phys_mergeable(&bvprv, &bv))
+ 					goto new_segment;
+ 				if (!BIOVEC_SEG_BOUNDARY(q, &bvprv, &bv))
+ 					goto new_segment;
+@@ -414,7 +414,7 @@ static int blk_phys_contig_segment(struct request_queue *q, struct bio *bio,
+ 	bio_get_last_bvec(bio, &end_bv);
+ 	bio_get_first_bvec(nxt, &nxt_bv);
  
--#ifdef CONFIG_PM
--/**
-- * blk_pm_runtime_init - Block layer runtime PM initialization routine
-- * @q: the queue of the device
-- * @dev: the device the queue belongs to
-- *
-- * Description:
-- *    Initialize runtime-PM-related fields for @q and start auto suspend for
-- *    @dev. Drivers that want to take advantage of request-based runtime PM
-- *    should call this function after @dev has been initialized, and its
-- *    request queue @q has been allocated, and runtime PM for it can not happen
-- *    yet(either due to disabled/forbidden or its usage_count > 0). In most
-- *    cases, driver should call this function before any I/O has taken place.
-- *
-- *    This function takes care of setting up using auto suspend for the device,
-- *    the autosuspend delay is set to -1 to make runtime suspend impossible
-- *    until an updated value is either set by user or by driver. Drivers do
-- *    not need to touch other autosuspend settings.
-- *
-- *    The block layer runtime PM is request based, so only works for drivers
-- *    that use request as their IO unit instead of those directly use bio's.
-- */
--void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
--{
--	/* Don't enable runtime PM for blk-mq until it is ready */
--	if (q->mq_ops) {
--		pm_runtime_disable(dev);
--		return;
--	}
--
--	q->dev = dev;
--	q->rpm_status = RPM_ACTIVE;
--	pm_runtime_set_autosuspend_delay(q->dev, -1);
--	pm_runtime_use_autosuspend(q->dev);
--}
--EXPORT_SYMBOL(blk_pm_runtime_init);
--
--/**
-- * blk_pre_runtime_suspend - Pre runtime suspend check
-- * @q: the queue of the device
-- *
-- * Description:
-- *    This function will check if runtime suspend is allowed for the device
-- *    by examining if there are any requests pending in the queue. If there
-- *    are requests pending, the device can not be runtime suspended; otherwise,
-- *    the queue's status will be updated to SUSPENDING and the driver can
-- *    proceed to suspend the device.
-- *
-- *    For the not allowed case, we mark last busy for the device so that
-- *    runtime PM core will try to autosuspend it some time later.
-- *
-- *    This function should be called near the start of the device's
-- *    runtime_suspend callback.
-- *
-- * Return:
-- *    0		- OK to runtime suspend the device
-- *    -EBUSY	- Device should not be runtime suspended
-- */
--int blk_pre_runtime_suspend(struct request_queue *q)
--{
--	int ret = 0;
--
--	if (!q->dev)
--		return ret;
--
--	spin_lock_irq(q->queue_lock);
--	if (q->nr_pending) {
--		ret = -EBUSY;
--		pm_runtime_mark_last_busy(q->dev);
--	} else {
--		q->rpm_status = RPM_SUSPENDING;
--	}
--	spin_unlock_irq(q->queue_lock);
--	return ret;
--}
--EXPORT_SYMBOL(blk_pre_runtime_suspend);
--
--/**
-- * blk_post_runtime_suspend - Post runtime suspend processing
-- * @q: the queue of the device
-- * @err: return value of the device's runtime_suspend function
-- *
-- * Description:
-- *    Update the queue's runtime status according to the return value of the
-- *    device's runtime suspend function and mark last busy for the device so
-- *    that PM core will try to auto suspend the device at a later time.
-- *
-- *    This function should be called near the end of the device's
-- *    runtime_suspend callback.
-- */
--void blk_post_runtime_suspend(struct request_queue *q, int err)
--{
--	if (!q->dev)
--		return;
--
--	spin_lock_irq(q->queue_lock);
--	if (!err) {
--		q->rpm_status = RPM_SUSPENDED;
--	} else {
--		q->rpm_status = RPM_ACTIVE;
--		pm_runtime_mark_last_busy(q->dev);
--	}
--	spin_unlock_irq(q->queue_lock);
--}
--EXPORT_SYMBOL(blk_post_runtime_suspend);
--
--/**
-- * blk_pre_runtime_resume - Pre runtime resume processing
-- * @q: the queue of the device
-- *
-- * Description:
-- *    Update the queue's runtime status to RESUMING in preparation for the
-- *    runtime resume of the device.
-- *
-- *    This function should be called near the start of the device's
-- *    runtime_resume callback.
-- */
--void blk_pre_runtime_resume(struct request_queue *q)
--{
--	if (!q->dev)
--		return;
--
--	spin_lock_irq(q->queue_lock);
--	q->rpm_status = RPM_RESUMING;
--	spin_unlock_irq(q->queue_lock);
--}
--EXPORT_SYMBOL(blk_pre_runtime_resume);
--
--/**
-- * blk_post_runtime_resume - Post runtime resume processing
-- * @q: the queue of the device
-- * @err: return value of the device's runtime_resume function
-- *
-- * Description:
-- *    Update the queue's runtime status according to the return value of the
-- *    device's runtime_resume function. If it is successfully resumed, process
-- *    the requests that are queued into the device's queue when it is resuming
-- *    and then mark last busy and initiate autosuspend for it.
-- *
-- *    This function should be called near the end of the device's
-- *    runtime_resume callback.
-- */
--void blk_post_runtime_resume(struct request_queue *q, int err)
--{
--	if (!q->dev)
--		return;
--
--	spin_lock_irq(q->queue_lock);
--	if (!err) {
--		q->rpm_status = RPM_ACTIVE;
--		__blk_run_queue(q);
--		pm_runtime_mark_last_busy(q->dev);
--		pm_request_autosuspend(q->dev);
--	} else {
--		q->rpm_status = RPM_SUSPENDED;
--	}
--	spin_unlock_irq(q->queue_lock);
--}
--EXPORT_SYMBOL(blk_post_runtime_resume);
--
--/**
-- * blk_set_runtime_active - Force runtime status of the queue to be active
-- * @q: the queue of the device
-- *
-- * If the device is left runtime suspended during system suspend the resume
-- * hook typically resumes the device and corrects runtime status
-- * accordingly. However, that does not affect the queue runtime PM status
-- * which is still "suspended". This prevents processing requests from the
-- * queue.
-- *
-- * This function can be used in driver's resume hook to correct queue
-- * runtime PM status and re-enable peeking requests from the queue. It
-- * should be called before first request is added to the queue.
-- */
--void blk_set_runtime_active(struct request_queue *q)
--{
--	spin_lock_irq(q->queue_lock);
--	q->rpm_status = RPM_ACTIVE;
--	pm_runtime_mark_last_busy(q->dev);
--	pm_request_autosuspend(q->dev);
--	spin_unlock_irq(q->queue_lock);
--}
--EXPORT_SYMBOL(blk_set_runtime_active);
--#endif
--
- int __init blk_dev_init(void)
- {
- 	BUILD_BUG_ON(REQ_OP_LAST >= (1 << REQ_OP_BITS));
-diff --git a/block/blk-pm.c b/block/blk-pm.c
-new file mode 100644
-index 000000000000..9b636960d285
---- /dev/null
-+++ b/block/blk-pm.c
-@@ -0,0 +1,188 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <linux/blk-pm.h>
-+#include <linux/blkdev.h>
-+#include <linux/pm_runtime.h>
-+
-+/**
-+ * blk_pm_runtime_init - Block layer runtime PM initialization routine
-+ * @q: the queue of the device
-+ * @dev: the device the queue belongs to
-+ *
-+ * Description:
-+ *    Initialize runtime-PM-related fields for @q and start auto suspend for
-+ *    @dev. Drivers that want to take advantage of request-based runtime PM
-+ *    should call this function after @dev has been initialized, and its
-+ *    request queue @q has been allocated, and runtime PM for it can not happen
-+ *    yet(either due to disabled/forbidden or its usage_count > 0). In most
-+ *    cases, driver should call this function before any I/O has taken place.
-+ *
-+ *    This function takes care of setting up using auto suspend for the device,
-+ *    the autosuspend delay is set to -1 to make runtime suspend impossible
-+ *    until an updated value is either set by user or by driver. Drivers do
-+ *    not need to touch other autosuspend settings.
-+ *
-+ *    The block layer runtime PM is request based, so only works for drivers
-+ *    that use request as their IO unit instead of those directly use bio's.
-+ */
-+void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
-+{
-+	/* Don't enable runtime PM for blk-mq until it is ready */
-+	if (q->mq_ops) {
-+		pm_runtime_disable(dev);
-+		return;
-+	}
-+
-+	q->dev = dev;
-+	q->rpm_status = RPM_ACTIVE;
-+	pm_runtime_set_autosuspend_delay(q->dev, -1);
-+	pm_runtime_use_autosuspend(q->dev);
-+}
-+EXPORT_SYMBOL(blk_pm_runtime_init);
-+
-+/**
-+ * blk_pre_runtime_suspend - Pre runtime suspend check
-+ * @q: the queue of the device
-+ *
-+ * Description:
-+ *    This function will check if runtime suspend is allowed for the device
-+ *    by examining if there are any requests pending in the queue. If there
-+ *    are requests pending, the device can not be runtime suspended; otherwise,
-+ *    the queue's status will be updated to SUSPENDING and the driver can
-+ *    proceed to suspend the device.
-+ *
-+ *    For the not allowed case, we mark last busy for the device so that
-+ *    runtime PM core will try to autosuspend it some time later.
-+ *
-+ *    This function should be called near the start of the device's
-+ *    runtime_suspend callback.
-+ *
-+ * Return:
-+ *    0		- OK to runtime suspend the device
-+ *    -EBUSY	- Device should not be runtime suspended
-+ */
-+int blk_pre_runtime_suspend(struct request_queue *q)
-+{
-+	int ret = 0;
-+
-+	if (!q->dev)
-+		return ret;
-+
-+	spin_lock_irq(q->queue_lock);
-+	if (q->nr_pending) {
-+		ret = -EBUSY;
-+		pm_runtime_mark_last_busy(q->dev);
-+	} else {
-+		q->rpm_status = RPM_SUSPENDING;
-+	}
-+	spin_unlock_irq(q->queue_lock);
-+	return ret;
-+}
-+EXPORT_SYMBOL(blk_pre_runtime_suspend);
-+
-+/**
-+ * blk_post_runtime_suspend - Post runtime suspend processing
-+ * @q: the queue of the device
-+ * @err: return value of the device's runtime_suspend function
-+ *
-+ * Description:
-+ *    Update the queue's runtime status according to the return value of the
-+ *    device's runtime suspend function and mark last busy for the device so
-+ *    that PM core will try to auto suspend the device at a later time.
-+ *
-+ *    This function should be called near the end of the device's
-+ *    runtime_suspend callback.
-+ */
-+void blk_post_runtime_suspend(struct request_queue *q, int err)
-+{
-+	if (!q->dev)
-+		return;
-+
-+	spin_lock_irq(q->queue_lock);
-+	if (!err) {
-+		q->rpm_status = RPM_SUSPENDED;
-+	} else {
-+		q->rpm_status = RPM_ACTIVE;
-+		pm_runtime_mark_last_busy(q->dev);
-+	}
-+	spin_unlock_irq(q->queue_lock);
-+}
-+EXPORT_SYMBOL(blk_post_runtime_suspend);
-+
-+/**
-+ * blk_pre_runtime_resume - Pre runtime resume processing
-+ * @q: the queue of the device
-+ *
-+ * Description:
-+ *    Update the queue's runtime status to RESUMING in preparation for the
-+ *    runtime resume of the device.
-+ *
-+ *    This function should be called near the start of the device's
-+ *    runtime_resume callback.
-+ */
-+void blk_pre_runtime_resume(struct request_queue *q)
-+{
-+	if (!q->dev)
-+		return;
-+
-+	spin_lock_irq(q->queue_lock);
-+	q->rpm_status = RPM_RESUMING;
-+	spin_unlock_irq(q->queue_lock);
-+}
-+EXPORT_SYMBOL(blk_pre_runtime_resume);
-+
-+/**
-+ * blk_post_runtime_resume - Post runtime resume processing
-+ * @q: the queue of the device
-+ * @err: return value of the device's runtime_resume function
-+ *
-+ * Description:
-+ *    Update the queue's runtime status according to the return value of the
-+ *    device's runtime_resume function. If it is successfully resumed, process
-+ *    the requests that are queued into the device's queue when it is resuming
-+ *    and then mark last busy and initiate autosuspend for it.
-+ *
-+ *    This function should be called near the end of the device's
-+ *    runtime_resume callback.
-+ */
-+void blk_post_runtime_resume(struct request_queue *q, int err)
-+{
-+	if (!q->dev)
-+		return;
-+
-+	spin_lock_irq(q->queue_lock);
-+	if (!err) {
-+		q->rpm_status = RPM_ACTIVE;
-+		__blk_run_queue(q);
-+		pm_runtime_mark_last_busy(q->dev);
-+		pm_request_autosuspend(q->dev);
-+	} else {
-+		q->rpm_status = RPM_SUSPENDED;
-+	}
-+	spin_unlock_irq(q->queue_lock);
-+}
-+EXPORT_SYMBOL(blk_post_runtime_resume);
-+
-+/**
-+ * blk_set_runtime_active - Force runtime status of the queue to be active
-+ * @q: the queue of the device
-+ *
-+ * If the device is left runtime suspended during system suspend the resume
-+ * hook typically resumes the device and corrects runtime status
-+ * accordingly. However, that does not affect the queue runtime PM status
-+ * which is still "suspended". This prevents processing requests from the
-+ * queue.
-+ *
-+ * This function can be used in driver's resume hook to correct queue
-+ * runtime PM status and re-enable peeking requests from the queue. It
-+ * should be called before first request is added to the queue.
-+ */
-+void blk_set_runtime_active(struct request_queue *q)
-+{
-+	spin_lock_irq(q->queue_lock);
-+	q->rpm_status = RPM_ACTIVE;
-+	pm_runtime_mark_last_busy(q->dev);
-+	pm_request_autosuspend(q->dev);
-+	spin_unlock_irq(q->queue_lock);
-+}
-+EXPORT_SYMBOL(blk_set_runtime_active);
-diff --git a/block/blk-pm.h b/block/blk-pm.h
-new file mode 100644
-index 000000000000..1ffc8ef203ec
---- /dev/null
-+++ b/block/blk-pm.h
-@@ -0,0 +1,43 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+#ifndef _BLOCK_BLK_PM_H_
-+#define _BLOCK_BLK_PM_H_
-+
-+#include <linux/pm_runtime.h>
-+
-+#ifdef CONFIG_PM
-+static inline void blk_pm_requeue_request(struct request *rq)
-+{
-+	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
-+		rq->q->nr_pending--;
-+}
-+
-+static inline void blk_pm_add_request(struct request_queue *q,
-+				      struct request *rq)
-+{
-+	if (q->dev && !(rq->rq_flags & RQF_PM) && q->nr_pending++ == 0 &&
-+	    (q->rpm_status == RPM_SUSPENDED || q->rpm_status == RPM_SUSPENDING))
-+		pm_request_resume(q->dev);
-+}
-+
-+static inline void blk_pm_put_request(struct request *rq)
-+{
-+	if (rq->q->dev && !(rq->rq_flags & RQF_PM) && !--rq->q->nr_pending)
-+		pm_runtime_mark_last_busy(rq->q->dev);
-+}
-+#else
-+static inline void blk_pm_requeue_request(struct request *rq)
-+{
-+}
-+
-+static inline void blk_pm_add_request(struct request_queue *q,
-+				      struct request *rq)
-+{
-+}
-+
-+static inline void blk_pm_put_request(struct request *rq)
-+{
-+}
-+#endif
-+
-+#endif /* _BLOCK_BLK_PM_H_ */
-diff --git a/block/elevator.c b/block/elevator.c
-index 6a06b5d040e5..e18ac68626e3 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -41,6 +41,7 @@
+-	if (!BIOVEC_PHYS_MERGEABLE(&end_bv, &nxt_bv))
++	if (!biovec_phys_mergeable(&end_bv, &nxt_bv))
+ 		return 0;
  
- #include "blk.h"
- #include "blk-mq-sched.h"
-+#include "blk-pm.h"
- #include "blk-wbt.h"
- 
- static DEFINE_SPINLOCK(elv_list_lock);
-@@ -557,27 +558,6 @@ void elv_bio_merged(struct request_queue *q, struct request *rq,
- 		e->type->ops.sq.elevator_bio_merged_fn(q, rq, bio);
- }
- 
--#ifdef CONFIG_PM
--static void blk_pm_requeue_request(struct request *rq)
--{
--	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
--		rq->q->nr_pending--;
--}
--
--static void blk_pm_add_request(struct request_queue *q, struct request *rq)
--{
--	if (q->dev && !(rq->rq_flags & RQF_PM) && q->nr_pending++ == 0 &&
--	    (q->rpm_status == RPM_SUSPENDED || q->rpm_status == RPM_SUSPENDING))
--		pm_request_resume(q->dev);
--}
--#else
--static inline void blk_pm_requeue_request(struct request *rq) {}
--static inline void blk_pm_add_request(struct request_queue *q,
--				      struct request *rq)
--{
--}
--#endif
--
- void elv_requeue_request(struct request_queue *q, struct request *rq)
- {
  	/*
-diff --git a/drivers/scsi/scsi_pm.c b/drivers/scsi/scsi_pm.c
-index b44c1bb687a2..a2b4179bfdf7 100644
---- a/drivers/scsi/scsi_pm.c
-+++ b/drivers/scsi/scsi_pm.c
-@@ -8,6 +8,7 @@
- #include <linux/pm_runtime.h>
- #include <linux/export.h>
- #include <linux/async.h>
-+#include <linux/blk-pm.h>
+@@ -439,7 +439,7 @@ __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
+ 		if ((*sg)->length + nbytes > queue_max_segment_size(q))
+ 			goto new_segment;
  
- #include <scsi/scsi.h>
- #include <scsi/scsi_device.h>
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index b79b366a94f7..64514e8359e4 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -45,6 +45,7 @@
- #include <linux/init.h>
- #include <linux/blkdev.h>
- #include <linux/blkpg.h>
-+#include <linux/blk-pm.h>
- #include <linux/delay.h>
- #include <linux/mutex.h>
- #include <linux/string_helpers.h>
-diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
-index d0389b20574d..4f07b3410595 100644
---- a/drivers/scsi/sr.c
-+++ b/drivers/scsi/sr.c
-@@ -43,6 +43,7 @@
- #include <linux/interrupt.h>
- #include <linux/init.h>
- #include <linux/blkdev.h>
-+#include <linux/blk-pm.h>
- #include <linux/mutex.h>
- #include <linux/slab.h>
- #include <linux/pm_runtime.h>
-diff --git a/include/linux/blk-pm.h b/include/linux/blk-pm.h
-new file mode 100644
-index 000000000000..b80c65aba249
---- /dev/null
-+++ b/include/linux/blk-pm.h
-@@ -0,0 +1,24 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+#ifndef _BLK_PM_H_
-+#define _BLK_PM_H_
-+
-+struct device;
-+struct request_queue;
-+
-+/*
-+ * block layer runtime pm functions
-+ */
-+#ifdef CONFIG_PM
-+extern void blk_pm_runtime_init(struct request_queue *q, struct device *dev);
-+extern int blk_pre_runtime_suspend(struct request_queue *q);
-+extern void blk_post_runtime_suspend(struct request_queue *q, int err);
-+extern void blk_pre_runtime_resume(struct request_queue *q);
-+extern void blk_post_runtime_resume(struct request_queue *q, int err);
-+extern void blk_set_runtime_active(struct request_queue *q);
-+#else
-+static inline void blk_pm_runtime_init(struct request_queue *q,
-+				       struct device *dev) {}
+-		if (!BIOVEC_PHYS_MERGEABLE(bvprv, bvec))
++		if (!biovec_phys_mergeable(bvprv, bvec))
+ 			goto new_segment;
+ 		if (!BIOVEC_SEG_BOUNDARY(q, bvprv, bvec))
+ 			goto new_segment;
+diff --git a/block/blk.h b/block/blk.h
+index 63035c95689c..aed99cbc1bca 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -149,6 +149,20 @@ static inline void blk_queue_enter_live(struct request_queue *q)
+ 	percpu_ref_get(&q->q_usage_counter);
+ }
+ 
++#ifndef ARCH_BIOVEC_PHYS_MERGEABLE
++#define ARCH_BIOVEC_PHYS_MERGEABLE(vec1, vec2) true
 +#endif
 +
-+#endif /* _BLK_PM_H_ */
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d6869e0e2b64..9f1673b561a2 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1280,29 +1280,6 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
- extern void blk_put_queue(struct request_queue *);
- extern void blk_set_queue_dying(struct request_queue *);
- 
++static inline bool biovec_phys_mergeable(const struct bio_vec *vec1,
++		const struct bio_vec *vec2)
++{
++	if (bvec_to_phys(vec1) + vec1->bv_len != bvec_to_phys(vec2))
++		return false;
++	if (!ARCH_BIOVEC_PHYS_MERGEABLE(vec1, vec2))
++		return false;
++	return true;
++}
++
+ static inline bool __bvec_gap_to_prev(struct request_queue *q,
+ 		struct bio_vec *bprv, unsigned int offset)
+ {
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index e973876625a8..e2adb96346f0 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -140,19 +140,6 @@ static inline bool bio_full(struct bio *bio)
+ /*
+  * merge helpers etc
+  */
+-
+-/* Default implementation of BIOVEC_PHYS_MERGEABLE */
+-#define __BIOVEC_PHYS_MERGEABLE(vec1, vec2)	\
+-	((bvec_to_phys((vec1)) + (vec1)->bv_len) == bvec_to_phys((vec2)))
+-
 -/*
-- * block layer runtime pm functions
+- * allow arch override, for eg virtualized architectures (put in asm/io.h)
 - */
--#ifdef CONFIG_PM
--extern void blk_pm_runtime_init(struct request_queue *q, struct device *dev);
--extern int blk_pre_runtime_suspend(struct request_queue *q);
--extern void blk_post_runtime_suspend(struct request_queue *q, int err);
--extern void blk_pre_runtime_resume(struct request_queue *q);
--extern void blk_post_runtime_resume(struct request_queue *q, int err);
--extern void blk_set_runtime_active(struct request_queue *q);
--#else
--static inline void blk_pm_runtime_init(struct request_queue *q,
--	struct device *dev) {}
--static inline int blk_pre_runtime_suspend(struct request_queue *q)
--{
--	return -ENOSYS;
--}
--static inline void blk_post_runtime_suspend(struct request_queue *q, int err) {}
--static inline void blk_pre_runtime_resume(struct request_queue *q) {}
--static inline void blk_post_runtime_resume(struct request_queue *q, int err) {}
--static inline void blk_set_runtime_active(struct request_queue *q) {}
+-#ifndef BIOVEC_PHYS_MERGEABLE
+-#define BIOVEC_PHYS_MERGEABLE(vec1, vec2)	\
+-	__BIOVEC_PHYS_MERGEABLE(vec1, vec2)
 -#endif
 -
- /*
-  * blk_plug permits building a queue of related requests by holding the I/O
-  * fragments for a short period. This allows merging of sequential requests
+ #define __BIO_SEG_BOUNDARY(addr1, addr2, mask) \
+ 	(((addr1) | (mask)) == (((addr2) - 1) | (mask)))
+ #define BIOVEC_SEG_BOUNDARY(q, b1, b2) \
 -- 
-2.18.0
+2.19.0
