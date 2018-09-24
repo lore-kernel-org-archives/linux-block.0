@@ -1,30 +1,26 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: clean up physical merging helpers V2
-To: Christoph Hellwig <hch@lst.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.133]:44672 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726241AbeIXNor (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 24 Sep 2018 09:44:47 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
 Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-References: <20180924074355.2802-1-hch@lst.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <dae7788b-9b0f-bb51-820e-ab626d157e23@kernel.dk>
-Date: Mon, 24 Sep 2018 12:35:08 -0600
+        linux-arm-kernel@lists.infradead.org
+Subject: clean up physical merging helpers V2
+Date: Mon, 24 Sep 2018 09:43:45 +0200
+Message-Id: <20180924074355.2802-1-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20180924074355.2802-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 9/24/18 1:43 AM, Christoph Hellwig wrote:
-> Hi Jens,
-> 
-> this series moves various helpers related to merging based on physical
-> addresses from the public headers into block/, cleans up the code a bit
-> and removes not nessecary includes from the block headers.
-> 
-> Change since V1:
->  - dropped the Xen related changed which are moved into a new series
->    to be sent after this one
+Hi Jens,
 
-Looks good to me - #1 should just go to the arm guys separately, there's
-no point in me carrying this arch patch.
+this series moves various helpers related to merging based on physical
+addresses from the public headers into block/, cleans up the code a bit
+and removes not nessecary includes from the block headers.
 
--- 
-Jens Axboe
+Change since V1:
+ - dropped the Xen related changed which are moved into a new series
+   to be sent after this one
