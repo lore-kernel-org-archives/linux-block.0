@@ -1,269 +1,181 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:37727 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726066AbeIDPCv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Sep 2018 11:02:51 -0400
-Received: by mail-ed1-f67.google.com with SMTP id a20-v6so2847182edd.4
-        for <linux-block@vger.kernel.org>; Tue, 04 Sep 2018 03:38:19 -0700 (PDT)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Javier Gonzales <javier@cnexlabs.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH V2] lightnvm: pblk: stop recreating global caches
-Date: Tue,  4 Sep 2018 12:38:07 +0200
-Message-Id: <1536057487-17267-3-git-send-email-hans.ml.holmberg@owltronix.com>
-In-Reply-To: <1536057487-17267-1-git-send-email-hans.ml.holmberg@owltronix.com>
-References: <1536057487-17267-1-git-send-email-hans.ml.holmberg@owltronix.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+afefc9c3360d6e01bea6+5510+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>,
+	linux-block@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 03/10] block: move req_gap_{back,front}_merge to blk-merge.c
+Date: Mon, 24 Sep 2018 09:43:48 +0200
+Message-Id: <20180924074355.2802-4-hch@lst.de>
+In-Reply-To: <20180924074355.2802-1-hch@lst.de>
+References: <20180924074355.2802-1-hch@lst.de>
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Keep it close to the actual users instead of exposing the function to all
+drivers.
 
-Pblk should not create a set of global caches every time
-a pblk instance is created. The global caches should be
-made available only when there is one or more pblk instances.
-
-This patch bundles the global caches together with a kref
-keeping track of whether the caches should be available or not.
-
-Also, turn the global pblk lock into a mutex that explicitly
-protects the caches (as this was the only purpose of the lock).
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
+ block/blk-merge.c      | 65 +++++++++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h | 69 ------------------------------------------
+ 2 files changed, 65 insertions(+), 69 deletions(-)
 
-Changes in V2:
-	* Turned the pblk global lock into a mutex protecting the
-	  caches struct.
-	* Renamed the global caches to pblk_caches
-	* Refactored pblk_get_global_caches to handle only refcounting
- 	  and locking.
-
- drivers/lightnvm/pblk-init.c | 132 ++++++++++++++++++++++++++++---------------
- 1 file changed, 86 insertions(+), 46 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 9aebdee8e4c9..fb66bc84d5ca 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -26,9 +26,24 @@ static unsigned int write_buffer_size;
- module_param(write_buffer_size, uint, 0644);
- MODULE_PARM_DESC(write_buffer_size, "number of entries in a write buffer");
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index aaec38cc37b8..ad8a226347a6 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -12,6 +12,71 @@
  
--static struct kmem_cache *pblk_ws_cache, *pblk_rec_cache, *pblk_g_rq_cache,
--				*pblk_w_rq_cache;
--static DECLARE_RWSEM(pblk_lock);
-+struct pblk_global_caches {
-+	struct kmem_cache	*ws;
-+	struct kmem_cache	*rec;
-+	struct kmem_cache	*g_rq;
-+	struct kmem_cache	*w_rq;
-+
-+	struct kref		kref;
-+
-+	struct mutex		mutex; /* Ensures consistency between
-+					* caches and kref
-+					*/
-+};
-+
-+static struct pblk_global_caches pblk_caches = {
-+	.mutex = __MUTEX_INITIALIZER(pblk_caches.mutex),
-+	.kref = KREF_INIT(0),
-+};
-+
- struct bio_set pblk_bio_set;
+ #include "blk.h"
  
- static int pblk_rw_io(struct request_queue *q, struct pblk *pblk,
-@@ -307,53 +322,80 @@ static int pblk_set_addrf(struct pblk *pblk)
- 	return 0;
- }
- 
--static int pblk_init_global_caches(struct pblk *pblk)
-+static int pblk_create_global_caches(void)
- {
--	down_write(&pblk_lock);
--	pblk_ws_cache = kmem_cache_create("pblk_blk_ws",
-+
-+	pblk_caches.ws = kmem_cache_create("pblk_blk_ws",
- 				sizeof(struct pblk_line_ws), 0, 0, NULL);
--	if (!pblk_ws_cache) {
--		up_write(&pblk_lock);
-+	if (!pblk_caches.ws)
- 		return -ENOMEM;
--	}
- 
--	pblk_rec_cache = kmem_cache_create("pblk_rec",
-+	pblk_caches.rec = kmem_cache_create("pblk_rec",
- 				sizeof(struct pblk_rec_ctx), 0, 0, NULL);
--	if (!pblk_rec_cache) {
--		kmem_cache_destroy(pblk_ws_cache);
--		up_write(&pblk_lock);
--		return -ENOMEM;
--	}
-+	if (!pblk_caches.rec)
-+		goto fail_destroy_ws;
- 
--	pblk_g_rq_cache = kmem_cache_create("pblk_g_rq", pblk_g_rq_size,
-+	pblk_caches.g_rq = kmem_cache_create("pblk_g_rq", pblk_g_rq_size,
- 				0, 0, NULL);
--	if (!pblk_g_rq_cache) {
--		kmem_cache_destroy(pblk_ws_cache);
--		kmem_cache_destroy(pblk_rec_cache);
--		up_write(&pblk_lock);
--		return -ENOMEM;
--	}
-+	if (!pblk_caches.g_rq)
-+		goto fail_destroy_rec;
- 
--	pblk_w_rq_cache = kmem_cache_create("pblk_w_rq", pblk_w_rq_size,
-+	pblk_caches.w_rq = kmem_cache_create("pblk_w_rq", pblk_w_rq_size,
- 				0, 0, NULL);
--	if (!pblk_w_rq_cache) {
--		kmem_cache_destroy(pblk_ws_cache);
--		kmem_cache_destroy(pblk_rec_cache);
--		kmem_cache_destroy(pblk_g_rq_cache);
--		up_write(&pblk_lock);
--		return -ENOMEM;
--	}
--	up_write(&pblk_lock);
-+	if (!pblk_caches.w_rq)
-+		goto fail_destroy_g_rq;
- 
- 	return 0;
-+
-+fail_destroy_g_rq:
-+	kmem_cache_destroy(pblk_caches.g_rq);
-+fail_destroy_rec:
-+	kmem_cache_destroy(pblk_caches.rec);
-+fail_destroy_ws:
-+	kmem_cache_destroy(pblk_caches.ws);
-+
-+	return -ENOMEM;
++/*
++ * Check if the two bvecs from two bios can be merged to one segment.  If yes,
++ * no need to check gap between the two bios since the 1st bio and the 1st bvec
++ * in the 2nd bio can be handled in one segment.
++ */
++static inline bool bios_segs_mergeable(struct request_queue *q,
++		struct bio *prev, struct bio_vec *prev_last_bv,
++		struct bio_vec *next_first_bv)
++{
++	if (!BIOVEC_PHYS_MERGEABLE(prev_last_bv, next_first_bv))
++		return false;
++	if (!BIOVEC_SEG_BOUNDARY(q, prev_last_bv, next_first_bv))
++		return false;
++	if (prev->bi_seg_back_size + next_first_bv->bv_len >
++			queue_max_segment_size(q))
++		return false;
++	return true;
 +}
 +
-+static int pblk_get_global_caches(void)
++static inline bool bio_will_gap(struct request_queue *q,
++		struct request *prev_rq, struct bio *prev, struct bio *next)
 +{
-+	int ret;
++	struct bio_vec pb, nb;
 +
-+	mutex_lock(&pblk_caches.mutex);
++	if (!bio_has_data(prev) || !queue_virt_boundary(q))
++		return false;
 +
-+	if (kref_read(&pblk_caches.kref) > 0) {
-+		kref_get(&pblk_caches.kref);
-+		mutex_unlock(&pblk_caches.mutex);
-+		return 0;
-+	}
++	/*
++	 * Don't merge if the 1st bio starts with non-zero offset, otherwise it
++	 * is quite difficult to respect the sg gap limit.  We work hard to
++	 * merge a huge number of small single bios in case of mkfs.
++	 */
++	if (prev_rq)
++		bio_get_first_bvec(prev_rq->bio, &pb);
++	else
++		bio_get_first_bvec(prev, &pb);
++	if (pb.bv_offset)
++		return true;
 +
-+	ret = pblk_create_global_caches();
-+
-+	if (!ret)
-+		kref_get(&pblk_caches.kref);
-+
-+	mutex_unlock(&pblk_caches.mutex);
-+
-+	return ret;
++	/*
++	 * We don't need to worry about the situation that the merged segment
++	 * ends in unaligned virt boundary:
++	 *
++	 * - if 'pb' ends aligned, the merged segment ends aligned
++	 * - if 'pb' ends unaligned, the next bio must include
++	 *   one single bvec of 'nb', otherwise the 'nb' can't
++	 *   merge with 'pb'
++	 */
++	bio_get_last_bvec(prev, &pb);
++	bio_get_first_bvec(next, &nb);
++	if (bios_segs_mergeable(q, prev, &pb, &nb))
++		return false;
++	return __bvec_gap_to_prev(q, &pb, nb.bv_offset);
 +}
 +
-+static void pblk_destroy_global_caches(struct kref *ref)
++static inline bool req_gap_back_merge(struct request *req, struct bio *bio)
 +{
-+	struct pblk_global_caches *c;
++	return bio_will_gap(req->q, req, req->biotail, bio);
++}
 +
-+	c = container_of(ref, struct pblk_global_caches, kref);
++static inline bool req_gap_front_merge(struct request *req, struct bio *bio)
++{
++	return bio_will_gap(req->q, NULL, bio, req->bio);
++}
 +
-+	kmem_cache_destroy(c->ws);
-+	kmem_cache_destroy(c->rec);
-+	kmem_cache_destroy(c->g_rq);
-+	kmem_cache_destroy(c->w_rq);
+ static struct bio *blk_bio_discard_split(struct request_queue *q,
+ 					 struct bio *bio,
+ 					 struct bio_set *bs,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index bc534c857344..b7e676bb01bc 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1695,75 +1695,6 @@ static inline bool bvec_gap_to_prev(struct request_queue *q,
+ 	return __bvec_gap_to_prev(q, bprv, offset);
  }
  
--static void pblk_free_global_caches(struct pblk *pblk)
-+static void pblk_put_global_caches(void)
- {
--	kmem_cache_destroy(pblk_ws_cache);
--	kmem_cache_destroy(pblk_rec_cache);
--	kmem_cache_destroy(pblk_g_rq_cache);
--	kmem_cache_destroy(pblk_w_rq_cache);
-+	mutex_lock(&pblk_caches.mutex);
-+	kref_put(&pblk_caches.kref, pblk_destroy_global_caches);
-+	mutex_unlock(&pblk_caches.mutex);
- }
- 
- static int pblk_core_init(struct pblk *pblk)
-@@ -382,7 +424,7 @@ static int pblk_core_init(struct pblk *pblk)
- 	if (!pblk->pad_dist)
- 		return -ENOMEM;
- 
--	if (pblk_init_global_caches(pblk))
-+	if (pblk_get_global_caches())
- 		goto fail_free_pad_dist;
- 
- 	/* Internal bios can be at most the sectors signaled by the device. */
-@@ -391,27 +433,27 @@ static int pblk_core_init(struct pblk *pblk)
- 		goto free_global_caches;
- 
- 	ret = mempool_init_slab_pool(&pblk->gen_ws_pool, PBLK_GEN_WS_POOL_SIZE,
--				     pblk_ws_cache);
-+				     pblk_caches.ws);
- 	if (ret)
- 		goto free_page_bio_pool;
- 
- 	ret = mempool_init_slab_pool(&pblk->rec_pool, geo->all_luns,
--				     pblk_rec_cache);
-+				     pblk_caches.rec);
- 	if (ret)
- 		goto free_gen_ws_pool;
- 
- 	ret = mempool_init_slab_pool(&pblk->r_rq_pool, geo->all_luns,
--				     pblk_g_rq_cache);
-+				     pblk_caches.g_rq);
- 	if (ret)
- 		goto free_rec_pool;
- 
- 	ret = mempool_init_slab_pool(&pblk->e_rq_pool, geo->all_luns,
--				     pblk_g_rq_cache);
-+				     pblk_caches.g_rq);
- 	if (ret)
- 		goto free_r_rq_pool;
- 
- 	ret = mempool_init_slab_pool(&pblk->w_rq_pool, geo->all_luns,
--				     pblk_w_rq_cache);
-+				     pblk_caches.w_rq);
- 	if (ret)
- 		goto free_e_rq_pool;
- 
-@@ -457,7 +499,7 @@ static int pblk_core_init(struct pblk *pblk)
- free_page_bio_pool:
- 	mempool_exit(&pblk->page_bio_pool);
- free_global_caches:
--	pblk_free_global_caches(pblk);
-+	pblk_put_global_caches();
- fail_free_pad_dist:
- 	kfree(pblk->pad_dist);
- 	return -ENOMEM;
-@@ -481,7 +523,7 @@ static void pblk_core_free(struct pblk *pblk)
- 	mempool_exit(&pblk->e_rq_pool);
- 	mempool_exit(&pblk->w_rq_pool);
- 
--	pblk_free_global_caches(pblk);
-+	pblk_put_global_caches();
- 	kfree(pblk->pad_dist);
- }
- 
-@@ -1074,7 +1116,6 @@ static void pblk_exit(void *private, bool graceful)
- {
- 	struct pblk *pblk = private;
- 
--	down_write(&pblk_lock);
- 	pblk_gc_exit(pblk, graceful);
- 	pblk_tear_down(pblk, graceful);
- 
-@@ -1083,7 +1124,6 @@ static void pblk_exit(void *private, bool graceful)
- #endif
- 
- 	pblk_free(pblk);
--	up_write(&pblk_lock);
- }
- 
- static sector_t pblk_capacity(void *private)
+-/*
+- * Check if the two bvecs from two bios can be merged to one segment.
+- * If yes, no need to check gap between the two bios since the 1st bio
+- * and the 1st bvec in the 2nd bio can be handled in one segment.
+- */
+-static inline bool bios_segs_mergeable(struct request_queue *q,
+-		struct bio *prev, struct bio_vec *prev_last_bv,
+-		struct bio_vec *next_first_bv)
+-{
+-	if (!BIOVEC_PHYS_MERGEABLE(prev_last_bv, next_first_bv))
+-		return false;
+-	if (!BIOVEC_SEG_BOUNDARY(q, prev_last_bv, next_first_bv))
+-		return false;
+-	if (prev->bi_seg_back_size + next_first_bv->bv_len >
+-			queue_max_segment_size(q))
+-		return false;
+-	return true;
+-}
+-
+-static inline bool bio_will_gap(struct request_queue *q,
+-				struct request *prev_rq,
+-				struct bio *prev,
+-				struct bio *next)
+-{
+-	if (bio_has_data(prev) && queue_virt_boundary(q)) {
+-		struct bio_vec pb, nb;
+-
+-		/*
+-		 * don't merge if the 1st bio starts with non-zero
+-		 * offset, otherwise it is quite difficult to respect
+-		 * sg gap limit. We work hard to merge a huge number of small
+-		 * single bios in case of mkfs.
+-		 */
+-		if (prev_rq)
+-			bio_get_first_bvec(prev_rq->bio, &pb);
+-		else
+-			bio_get_first_bvec(prev, &pb);
+-		if (pb.bv_offset)
+-			return true;
+-
+-		/*
+-		 * We don't need to worry about the situation that the
+-		 * merged segment ends in unaligned virt boundary:
+-		 *
+-		 * - if 'pb' ends aligned, the merged segment ends aligned
+-		 * - if 'pb' ends unaligned, the next bio must include
+-		 *   one single bvec of 'nb', otherwise the 'nb' can't
+-		 *   merge with 'pb'
+-		 */
+-		bio_get_last_bvec(prev, &pb);
+-		bio_get_first_bvec(next, &nb);
+-
+-		if (!bios_segs_mergeable(q, prev, &pb, &nb))
+-			return __bvec_gap_to_prev(q, &pb, nb.bv_offset);
+-	}
+-
+-	return false;
+-}
+-
+-static inline bool req_gap_back_merge(struct request *req, struct bio *bio)
+-{
+-	return bio_will_gap(req->q, req, req->biotail, bio);
+-}
+-
+-static inline bool req_gap_front_merge(struct request *req, struct bio *bio)
+-{
+-	return bio_will_gap(req->q, NULL, bio, req->bio);
+-}
+-
+ int kblockd_schedule_work(struct work_struct *work);
+ int kblockd_schedule_work_on(int cpu, struct work_struct *work);
+ int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork, unsigned long delay);
 -- 
-2.7.4
+2.19.0
