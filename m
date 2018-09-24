@@ -1,54 +1,40 @@
-Return-Path: <willy@infradead.org>
-Date: Mon, 24 Sep 2018 11:57:53 -0700
-From: Matthew Wilcox <willy@infradead.org>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Christoph Hellwig <hch@lst.de>, Ming Lei <tom.leiming@gmail.com>,
-	linux-block <linux-block@vger.kernel.org>,
-	linux-mm <linux-mm@kvack.org>,
-	Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-	"open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
-	Dave Chinner <dchinner@redhat.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Lameter <cl@linux.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: block: DMA alignment of IO buffer allocated from slab
-Message-ID: <20180924185753.GA32269@bombadil.infradead.org>
-References: <87h8ij0zot.fsf@vitty.brq.redhat.com>
- <20180923224206.GA13618@ming.t460p>
- <38c03920-0fd0-0a39-2a6e-70cd8cb4ef34@virtuozzo.com>
- <20a20568-5089-541d-3cee-546e549a0bc8@acm.org>
- <12eee877-affa-c822-c9d5-fda3aa0a50da@virtuozzo.com>
- <1537801706.195115.7.camel@acm.org>
- <c844c598-be1d-bef4-fb99-09cf99571fd7@virtuozzo.com>
- <1537804720.195115.9.camel@acm.org>
- <10c706fd-2252-f11b-312e-ae0d97d9a538@virtuozzo.com>
- <1537805984.195115.14.camel@acm.org>
+To: Christopher Lameter <cl@linux.com>
+Cc: Christoph Hellwig <hch@lst.de>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Ming Lei <tom.leiming@gmail.com>, linux-block <linux-block@vger.kernel.org>,
+ linux-mm <linux-mm@kvack.org>, Linux FS Devel
+ <linux-fsdevel@vger.kernel.org>,
+ "open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
+ Dave Chinner <dchinner@redhat.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Ming Lei <ming.lei@redhat.com>
+References: <CACVXFVOBq3L_EjSTCoiqUL1PH=HMR5EuNNQV0hNndFpGxmUK6g@mail.gmail.com>
+ <20180920063129.GB12913@lst.de> <87h8ij0zot.fsf@vitty.brq.redhat.com>
+ <20180921130504.GA22551@lst.de>
+ <010001660c54fb65-b9d3a770-6678-40d0-8088-4db20af32280-000000@email.amazonses.com>
+ <1f88f59a-2cac-e899-4c2e-402e919b1034@kernel.dk>
+ <010001660cbd51ea-56e96208-564d-4f5d-a5fb-119a938762a9-000000@email.amazonses.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <1a5b255f-682e-783a-7f99-9d02e39c4af2@kernel.dk>
+Date: Mon, 24 Sep 2018 12:09:37 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1537805984.195115.14.camel@acm.org>
+In-Reply-To: <010001660cbd51ea-56e96208-564d-4f5d-a5fb-119a938762a9-000000@email.amazonses.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Sep 24, 2018 at 09:19:44AM -0700, Bart Van Assche wrote:
-> That means that two buffers allocated with kmalloc() may share a cache line on
-> x86-64. Since it is allowed to use a buffer allocated by kmalloc() for DMA, can
-> this lead to data corruption, e.g. if the CPU writes into one buffer allocated
-> with kmalloc() and a device performs a DMA write to another kmalloc() buffer and
-> both write operations affect the same cache line?
+On 9/24/18 12:00 PM, Christopher Lameter wrote:
+> On Mon, 24 Sep 2018, Jens Axboe wrote:
+> 
+>> The situation is making me a little uncomfortable, though. If we export
+>> such a setting, we really should be honoring it...
+> 
+> Various subsystems create custom slab arrays with their particular
+> alignment requirement for these allocations.
 
-You're not supposed to use kmalloc memory for DMA.  This is why we have
-dma_alloc_coherent() and friends.  Also, from DMA-API.txt:
+Oh yeah, I think the solution is basic enough for XFS, for instance.
+They just have to error on the side of being cautious, by going full
+sector alignment for memory...
 
-        Memory coherency operates at a granularity called the cache
-        line width.  In order for memory mapped by this API to operate
-        correctly, the mapped region must begin exactly on a cache line
-        boundary and end exactly on one (to prevent two separately mapped
-        regions from sharing a single cache line).  Since the cache line size
-        may not be known at compile time, the API will not enforce this
-        requirement.  Therefore, it is recommended that driver writers who
-        don't take special care to determine the cache line size at run time
-        only map virtual regions that begin and end on page boundaries (which
-        are guaranteed also to be cache line boundaries).
+-- 
+Jens Axboe
