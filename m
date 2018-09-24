@@ -1,87 +1,40 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:38830 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725957AbeI1FRL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Sep 2018 01:17:11 -0400
-Received: by mail-pf1-f196.google.com with SMTP id x17-v6so2908822pfh.5
-        for <linux-block@vger.kernel.org>; Thu, 27 Sep 2018 15:56:33 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
-Subject: [PATCH v2 3/5] kyber: don't make domain token sbitmap larger than necessary
-Date: Thu, 27 Sep 2018 15:55:53 -0700
-Message-Id: <22c03a0be5e385516b9c2b2cb37c3baa54e82129.1538088475.git.osandov@fb.com>
-In-Reply-To: <cover.1538088475.git.osandov@fb.com>
-References: <cover.1538088475.git.osandov@fb.com>
+Return-Path: <BATV+afefc9c3360d6e01bea6+5510+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>,
+	linux-block@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 06/10] block: add a missing BIOVEC_SEG_BOUNDARY check in bio_add_pc_page
+Date: Mon, 24 Sep 2018 09:43:51 +0200
+Message-Id: <20180924074355.2802-7-hch@lst.de>
+In-Reply-To: <20180924074355.2802-1-hch@lst.de>
+References: <20180924074355.2802-1-hch@lst.de>
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+The actual recaculation of segments in __blk_recalc_rq_segments will
+do this check, so there is no point in forcing it if we know it won't
+succeed.
 
-The domain token sbitmaps are currently initialized to the device queue
-depth or 256, whichever is larger, and immediately resized to the
-maximum depth for that domain (256, 128, or 64 for read, write, and
-other, respectively). The sbitmap is never resized larger than that, so
-it's unnecessary to allocate a bitmap larger than the maximum depth.
-Let's just allocate it to the maximum depth to begin with. This will use
-marginally less memory, and more importantly, give us a more appropriate
-number of bits per sbitmap word.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/kyber-iosched.c | 15 ++-------------
- 1 file changed, 2 insertions(+), 13 deletions(-)
+ block/bio.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index 95d062c07c61..08eb5295c18d 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -40,8 +40,6 @@ enum {
- };
- 
- enum {
--	KYBER_MIN_DEPTH = 256,
--
- 	/*
- 	 * In order to prevent starvation of synchronous requests by a flood of
- 	 * asynchronous requests, we reserve 25% of requests for synchronous
-@@ -305,7 +303,6 @@ static int kyber_bucket_fn(const struct request *rq)
- static struct kyber_queue_data *kyber_queue_data_alloc(struct request_queue *q)
- {
- 	struct kyber_queue_data *kqd;
--	unsigned int max_tokens;
- 	unsigned int shift;
- 	int ret = -ENOMEM;
- 	int i;
-@@ -320,25 +317,17 @@ static struct kyber_queue_data *kyber_queue_data_alloc(struct request_queue *q)
- 	if (!kqd->cb)
- 		goto err_kqd;
- 
--	/*
--	 * The maximum number of tokens for any scheduling domain is at least
--	 * the queue depth of a single hardware queue. If the hardware doesn't
--	 * have many tags, still provide a reasonable number.
--	 */
--	max_tokens = max_t(unsigned int, q->tag_set->queue_depth,
--			   KYBER_MIN_DEPTH);
- 	for (i = 0; i < KYBER_NUM_DOMAINS; i++) {
- 		WARN_ON(!kyber_depth[i]);
- 		WARN_ON(!kyber_batch_size[i]);
- 		ret = sbitmap_queue_init_node(&kqd->domain_tokens[i],
--					      max_tokens, -1, false, GFP_KERNEL,
--					      q->node);
-+					      kyber_depth[i], -1, false,
-+					      GFP_KERNEL, q->node);
- 		if (ret) {
- 			while (--i >= 0)
- 				sbitmap_queue_free(&kqd->domain_tokens[i]);
- 			goto err_cb;
- 		}
--		sbitmap_queue_resize(&kqd->domain_tokens[i], kyber_depth[i]);
+diff --git a/block/bio.c b/block/bio.c
+index 81d90b839e05..c254e5aa331f 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -731,7 +731,9 @@ int bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
  	}
  
- 	shift = kyber_sched_tags_shift(kqd);
+ 	/* If we may be able to merge these biovecs, force a recount */
+-	if (bio->bi_vcnt > 1 && biovec_phys_mergeable(bvec-1, bvec))
++	if (bio->bi_vcnt > 1 &&
++	    biovec_phys_mergeable(bvec - 1, bvec) &&
++	    BIOVEC_SEG_BOUNDARY(q, bvec - 1, bvec))
+ 		bio_clear_flag(bio, BIO_SEG_VALID);
+ 
+  done:
 -- 
 2.19.0
