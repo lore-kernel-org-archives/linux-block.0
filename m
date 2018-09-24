@@ -1,43 +1,40 @@
-Return-Path: <010001660c54fb65-b9d3a770-6678-40d0-8088-4db20af32280-000000@amazonses.com>
-Date: Mon, 24 Sep 2018 16:06:28 +0000
-From: Christopher Lameter <cl@linux.com>
-To: Christoph Hellwig <hch@lst.de>
-cc: Vitaly Kuznetsov <vkuznets@redhat.com>, Ming Lei <tom.leiming@gmail.com>,
-    linux-block <linux-block@vger.kernel.org>, linux-mm <linux-mm@kvack.org>,
-    Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-    "open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
-    Dave Chinner <dchinner@redhat.com>,
-    Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-    Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
+Return-Path: <bart.vanassche@gmail.com>
+Return-Path: <bart.vanassche@gmail.com>
+Message-ID: <1537804720.195115.9.camel@acm.org>
 Subject: Re: block: DMA alignment of IO buffer allocated from slab
-In-Reply-To: <20180921130504.GA22551@lst.de>
-Message-ID: <010001660c54fb65-b9d3a770-6678-40d0-8088-4db20af32280-000000@email.amazonses.com>
-References: <CACVXFVOBq3L_EjSTCoiqUL1PH=HMR5EuNNQV0hNndFpGxmUK6g@mail.gmail.com> <20180920063129.GB12913@lst.de> <87h8ij0zot.fsf@vitty.brq.redhat.com> <20180921130504.GA22551@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+From: Bart Van Assche <bvanassche@acm.org>
+To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Ming Lei
+ <ming.lei@redhat.com>,  Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, Ming Lei <tom.leiming@gmail.com>,
+ linux-block <linux-block@vger.kernel.org>, linux-mm <linux-mm@kvack.org>,
+ Linux FS Devel <linux-fsdevel@vger.kernel.org>, "open list:XFS FILESYSTEM"
+ <linux-xfs@vger.kernel.org>, Dave Chinner <dchinner@redhat.com>, Linux
+ Kernel Mailing List <linux-kernel@vger.kernel.org>, Jens Axboe
+ <axboe@kernel.dk>, Christoph Lameter <cl@linux.com>,  Linus Torvalds
+ <torvalds@linux-foundation.org>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>
+Date: Mon, 24 Sep 2018 08:58:40 -0700
+In-Reply-To: <c844c598-be1d-bef4-fb99-09cf99571fd7@virtuozzo.com>
+References: 
+	<CACVXFVOBq3L_EjSTCoiqUL1PH=HMR5EuNNQV0hNndFpGxmUK6g@mail.gmail.com>
+	 <20180920063129.GB12913@lst.de> <87h8ij0zot.fsf@vitty.brq.redhat.com>
+	 <20180923224206.GA13618@ming.t460p>
+	 <38c03920-0fd0-0a39-2a6e-70cd8cb4ef34@virtuozzo.com>
+	 <20a20568-5089-541d-3cee-546e549a0bc8@acm.org>
+	 <12eee877-affa-c822-c9d5-fda3aa0a50da@virtuozzo.com>
+	 <1537801706.195115.7.camel@acm.org>
+	 <c844c598-be1d-bef4-fb99-09cf99571fd7@virtuozzo.com>
+Content-Type: text/plain; charset="UTF-7"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, 21 Sep 2018, Christoph Hellwig wrote:
+On Mon, 2018-09-24 at 18:52 +-0300, Andrey Ryabinin wrote:
++AD4 Yes, with CONFIG+AF8-DEBUG+AF8-SLAB+AD0-y, CONFIG+AF8-SLUB+AF8-DEBUG+AF8-ON+AD0-y kmalloc() guarantees
++AD4 that result is aligned on ARCH+AF8-KMALLOC+AF8-MINALIGN boundary.
 
-> On Fri, Sep 21, 2018 at 03:04:18PM +0200, Vitaly Kuznetsov wrote:
-> > Christoph Hellwig <hch@lst.de> writes:
-> >
-> > > On Wed, Sep 19, 2018 at 05:15:43PM +0800, Ming Lei wrote:
-> > >> 1) does kmalloc-N slab guarantee to return N-byte aligned buffer?  If
-> > >> yes, is it a stable rule?
-> > >
-> > > This is the assumption in a lot of the kernel, so I think if somethings
-> > > breaks this we are in a lot of pain.
-> >
-> > It seems that SLUB debug breaks this assumption. Kernel built with
-> >
-> > CONFIG_SLUB_DEBUG=y
-> > CONFIG_SLUB=y
-> > CONFIG_SLUB_DEBUG_ON=y
->
-> Looks like we should fix SLUB debug then..
+Had you noticed that Vitaly Kuznetsov showed that this is not the case? See
+also https://lore.kernel.org/lkml/87h8ij0zot.fsf+AEA-vitty.brq.redhat.com/.
 
-Nope. We need to not make unwarranted assumptions. Alignment is guaranteed
-to ARCH_KMALLOC_MINALIGN for kmalloc requests. Fantasizing about
-alighments and guessing from alignments that result on a particular
-hardware and slab configuration that these are general does not work.
+Thanks,
+
+Bart.
