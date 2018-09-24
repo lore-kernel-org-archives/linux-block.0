@@ -1,44 +1,38 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Date: Tue, 4 Sep 2018 13:21:51 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Jeff.Lien@wdc.com, ard.biesheuvel@linaro.org,
-        david.darrington@wdc.com, hch@infradead.org, jeff.furlong@wdc.com,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        tim.c.chen@linux.intel.com
-Subject: Re: [PATCH v2 1/3] crypto: Introduce notifier for new crypto
- algorithms
-Message-ID: <20180904052151.ys2mtoixeax6jj5w@gondor.apana.org.au>
-References: <20180827060918.tfz7ljufqhlej4kq@gondor.apana.org.au>
- <20180830150016.15661-1-martin.petersen@oracle.com>
+Return-Path: <BATV+afefc9c3360d6e01bea6+5510+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>,
+	linux-block@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 09/10] block: don't include io.h from bio.h
+Date: Mon, 24 Sep 2018 09:43:54 +0200
+Message-Id: <20180924074355.2802-10-hch@lst.de>
+In-Reply-To: <20180924074355.2802-1-hch@lst.de>
+References: <20180924074355.2802-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180830150016.15661-1-martin.petersen@oracle.com>
-Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Aug 30, 2018 at 11:00:14AM -0400, Martin K. Petersen wrote:
-> Introduce a facility that can be used to receive a notification
-> callback when a new algorithm becomes available. This can be used by
-> existing crypto registrations to trigger a switch from a software-only
-> algorithm to a hardware-accelerated version.
-> 
-> A new CRYPTO_MSG_ALG_LOADED state is introduced to the existing crypto
-> notification chain, and the register/unregister functions are exported
-> so they can be called by subsystems outside of crypto.
-> 
-> Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
-> Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-> ---
->  crypto/algapi.c         |  2 ++
->  crypto/algboss.c        |  2 ++
->  crypto/internal.h       |  8 --------
->  include/crypto/algapi.h | 10 ++++++++++
->  4 files changed, 14 insertions(+), 8 deletions(-)
+Now that we don't need an override for BIOVEC_PHYS_MERGEABLE there is
+no need to drag this header in.
 
-All applied.  Thanks.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ include/linux/bio.h | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 9ad4b0a487a4..b3d47862b1b4 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -24,9 +24,6 @@
+ #include <linux/bug.h>
+ 
+ #ifdef CONFIG_BLOCK
+-
+-#include <asm/io.h>
+-
+ /* struct bio, bio_vec and BIO_* flags are defined in blk_types.h */
+ #include <linux/blk_types.h>
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.19.0
