@@ -1,60 +1,39 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <010001660c7ae798-2c446e83-392a-40bd-a89d-8da2f20dd1b8-000000@amazonses.com>
+Date: Mon, 24 Sep 2018 16:47:53 +0000
+From: Christopher Lameter <cl@linux.com>
+To: Bart Van Assche <bvanassche@acm.org>
+cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Ming Lei <ming.lei@redhat.com>,
+    Vitaly Kuznetsov <vkuznets@redhat.com>, Christoph Hellwig <hch@lst.de>,
+    Ming Lei <tom.leiming@gmail.com>,
+    linux-block <linux-block@vger.kernel.org>, linux-mm <linux-mm@kvack.org>,
+    Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+    "open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
+    Dave Chinner <dchinner@redhat.com>,
+    Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+    Jens Axboe <axboe@kernel.dk>,
+    Linus Torvalds <torvalds@linux-foundation.org>,
+    Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Subject: Re: block: DMA alignment of IO buffer allocated from slab
-To: Christopher Lameter <cl@linux.com>, Christoph Hellwig <hch@lst.de>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>, Ming Lei <tom.leiming@gmail.com>,
- linux-block <linux-block@vger.kernel.org>, linux-mm <linux-mm@kvack.org>,
- Linux FS Devel <linux-fsdevel@vger.kernel.org>,
- "open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
- Dave Chinner <dchinner@redhat.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Ming Lei <ming.lei@redhat.com>
-References: <CACVXFVOBq3L_EjSTCoiqUL1PH=HMR5EuNNQV0hNndFpGxmUK6g@mail.gmail.com>
- <20180920063129.GB12913@lst.de> <87h8ij0zot.fsf@vitty.brq.redhat.com>
- <20180921130504.GA22551@lst.de>
- <010001660c54fb65-b9d3a770-6678-40d0-8088-4db20af32280-000000@email.amazonses.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <1f88f59a-2cac-e899-4c2e-402e919b1034@kernel.dk>
-Date: Mon, 24 Sep 2018 11:49:36 -0600
+In-Reply-To: <1537805984.195115.14.camel@acm.org>
+Message-ID: <010001660c7ae798-2c446e83-392a-40bd-a89d-8da2f20dd1b8-000000@email.amazonses.com>
+References: <CACVXFVOBq3L_EjSTCoiqUL1PH=HMR5EuNNQV0hNndFpGxmUK6g@mail.gmail.com> <20180920063129.GB12913@lst.de> <87h8ij0zot.fsf@vitty.brq.redhat.com> <20180923224206.GA13618@ming.t460p> <38c03920-0fd0-0a39-2a6e-70cd8cb4ef34@virtuozzo.com>
+ <20a20568-5089-541d-3cee-546e549a0bc8@acm.org> <12eee877-affa-c822-c9d5-fda3aa0a50da@virtuozzo.com> <1537801706.195115.7.camel@acm.org> <c844c598-be1d-bef4-fb99-09cf99571fd7@virtuozzo.com> <1537804720.195115.9.camel@acm.org> <10c706fd-2252-f11b-312e-ae0d97d9a538@virtuozzo.com>
+ <1537805984.195115.14.camel@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <010001660c54fb65-b9d3a770-6678-40d0-8088-4db20af32280-000000@email.amazonses.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 9/24/18 10:06 AM, Christopher Lameter wrote:
-> On Fri, 21 Sep 2018, Christoph Hellwig wrote:
-> 
->> On Fri, Sep 21, 2018 at 03:04:18PM +0200, Vitaly Kuznetsov wrote:
->>> Christoph Hellwig <hch@lst.de> writes:
->>>
->>>> On Wed, Sep 19, 2018 at 05:15:43PM +0800, Ming Lei wrote:
->>>>> 1) does kmalloc-N slab guarantee to return N-byte aligned buffer?  If
->>>>> yes, is it a stable rule?
->>>>
->>>> This is the assumption in a lot of the kernel, so I think if somethings
->>>> breaks this we are in a lot of pain.
->>>
->>> It seems that SLUB debug breaks this assumption. Kernel built with
->>>
->>> CONFIG_SLUB_DEBUG=y
->>> CONFIG_SLUB=y
->>> CONFIG_SLUB_DEBUG_ON=y
->>
->> Looks like we should fix SLUB debug then..
-> 
-> Nope. We need to not make unwarranted assumptions. Alignment is guaranteed
-> to ARCH_KMALLOC_MINALIGN for kmalloc requests. Fantasizing about
-> alighments and guessing from alignments that result on a particular
-> hardware and slab configuration that these are general does not work.
+On Mon, 24 Sep 2018, Bart Van Assche wrote:
 
-The summary is that, no, kmalloc(N) is not N-1 aligned and nobody should
-rely on that. On the block side, a few drivers set DMA alignment to
-the sector size. Given that things seem to Just Work, even with XFS doing
-kmalloc(512) and submitting IO with that, I think we can fairly safely
-assume that most of those drivers are just being overly cautious and are
-probably quite fine with 4/8 byte alignment.
+> That means that two buffers allocated with kmalloc() may share a cache line on
+> x86-64. Since it is allowed to use a buffer allocated by kmalloc() for DMA, can
+> this lead to data corruption, e.g. if the CPU writes into one buffer allocated
+> with kmalloc() and a device performs a DMA write to another kmalloc() buffer and
+> both write operations affect the same cache line?
 
-The situation is making me a little uncomfortable, though. If we export
-such a setting, we really should be honoring it...
+The devices writes to the cacheline through the processor which serializes
+access appropriately.
 
--- 
-Jens Axboe
+The DMA device cannot write directly to memory after all on current Intel
+processors. Other architectures have bus protocols that prevent situations
+like that.
