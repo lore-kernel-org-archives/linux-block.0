@@ -1,41 +1,60 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Subject: Re: [RFC] [PATCH 0/1] Introduce emergency raid0 stop for mounted
- arrays
-From: "Guilherme G. Piccoli" <gpiccoli@canonical.com>
-To: NeilBrown <neilb@suse.com>, linux-raid@vger.kernel.org,
-        shli@kernel.org
-Cc: kernel@gpiccoli.net, jay.vosburgh@canonical.com,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-References: <20180801145608.19880-1-gpiccoli@canonical.com>
- <87tvodpmc8.fsf@notabene.neil.brown.name>
- <7cfa220e-c04d-b69e-fe39-5b9277f0538d@canonical.com>
- <87h8kcphze.fsf@notabene.neil.brown.name>
- <5b7a349d-073d-4a42-eae1-aa1e6998c449@canonical.com>
-Message-ID: <c7653666-b8f8-f98c-33ee-64cd3038c6bc@canonical.com>
-Date: Mon, 3 Sep 2018 09:16:39 -0300
+Return-Path: <logang@deltatee.com>
+To: Bart Van Assche <bvanassche@acm.org>, linux-kernel@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-rdma@vger.kernel.org, linux-nvdimm@lists.01.org,
+ linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>, Christoph Hellwig <hch@lst.de>,
+ Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+ Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>,
+ Max Gurtovoy <maxg@mellanox.com>, Dan Williams <dan.j.williams@intel.com>,
+ =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+ Jens Axboe <axboe@kernel.dk>
+References: <20180925162231.4354-1-logang@deltatee.com>
+ <20180925162231.4354-4-logang@deltatee.com>
+ <1537896805.11137.25.camel@acm.org>
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <18e5d3f2-c56b-645b-ac96-f0d861d12cc2@deltatee.com>
+Date: Tue, 25 Sep 2018 12:46:30 -0600
 MIME-Version: 1.0
-In-Reply-To: <5b7a349d-073d-4a42-eae1-aa1e6998c449@canonical.com>
-Content-Type: text/plain; charset=utf-8
-Sender: linux-fsdevel-owner@vger.kernel.org
+In-Reply-To: <1537896805.11137.25.camel@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH v7 03/13] PCI/P2PDMA: Add PCI p2pmem DMA mappings to
+ adjust the bus offset
 List-ID: <linux-block@vger.kernel.org>
 
-On 09/08/2018 20:17, Guilherme G. Piccoli wrote:
-> [..] 
-> If you have suggestions to improve my approach, or perhaps a totally
-> different idea than mine, I highly appreciate the feedback.
+
+
+On 2018-09-25 11:33 a.m., Bart Van Assche wrote:
+>> +	/*
+>> +	 * p2pdma mappings are not compatible with devices that use
+>> +	 * dma_virt_ops. If the upper layers do the right thing
+>> +	 * this should never happen because it will be prevented
+>> +	 * by the check in pci_p2pdma_add_client()
+>> +	 */
+>> +	if (WARN_ON_ONCE(IS_ENABLED(CONFIG_DMA_VIRT_OPS) &&
+>> +			 dev->dma_ops == &dma_virt_ops))
+>> +		return 0;
 > 
-> Thank you very much for the attention.
-> Cheers,
-> 
-> 
-> Guilherme
->
+> Are you assuming that the compiler will optimize out the dev->dma_ops
+> == &dma_virt_ops test if CONFIG_DMA_VIRT_OPS=n such that no reference to the
+> dma_virt_ops symbol appears in the object file? Are you sure all compilers
+> and compiler versions that are used to build the Linux kernel will do that?
 
-Hi Neil and Shaohua Li, sorry for the ping - do you have any
-news on this? Any feedback is much appreciated.
+Hmm, I can't say for certain but I would definitely expect any sane
+compiler to do so. It's a fairly obvious optimization and the kbuild
+robot is happy with it.
 
-Cheers,
+I just did a test compile on 4.9 (which is the earliest compiler version
+I have readily available) and it worked fine. The minimum gcc the kernel
+supports is 4.6 right now.
+
+I've also done a similar test on godbolt.org[1] and can't find any
+compiler version that doesn't work.
+
+Logan
 
 
-Guilherme
+[1] https://godbolt.org/z/d5Mhee
