@@ -1,126 +1,65 @@
-Return-Path: <BATV+afefc9c3360d6e01bea6+5510+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>,
-	linux-block@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 02/10] block: move integrity_req_gap_{back,front}_merge to blk.h
-Date: Mon, 24 Sep 2018 09:43:47 +0200
-Message-Id: <20180924074355.2802-3-hch@lst.de>
-In-Reply-To: <20180924074355.2802-1-hch@lst.de>
-References: <20180924074355.2802-1-hch@lst.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from ale.deltatee.com ([207.54.116.67]:42790 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729253AbeIYWbM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Sep 2018 18:31:12 -0400
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Logan Gunthorpe <logang@deltatee.com>
+Date: Tue, 25 Sep 2018 10:22:25 -0600
+Message-Id: <20180925162231.4354-8-logang@deltatee.com>
+In-Reply-To: <20180925162231.4354-1-logang@deltatee.com>
+References: <20180925162231.4354-1-logang@deltatee.com>
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Subject: [PATCH v7 07/13] block: Add PCI P2P flag for request queue and check support for requests
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-No need to expose these to drivers.
+QUEUE_FLAG_PCI_P2P is introduced meaning a driver's request queue
+supports targeting P2P memory. This will be used by P2P providers and
+orchestrators (in subsequent patches) to ensure block devices can
+support P2P memory before submitting P2P backed pages to submit_bio().
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- block/blk.h            | 35 +++++++++++++++++++++++++++++++++--
- include/linux/blkdev.h | 31 -------------------------------
- 2 files changed, 33 insertions(+), 33 deletions(-)
+ include/linux/blkdev.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/block/blk.h b/block/blk.h
-index 9db4e389582c..441c2de1d4b9 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -158,7 +158,38 @@ static inline bool bio_integrity_endio(struct bio *bio)
- 		return __bio_integrity_endio(bio);
- 	return true;
- }
--#else
-+
-+static inline bool integrity_req_gap_back_merge(struct request *req,
-+		struct bio *next)
-+{
-+	struct bio_integrity_payload *bip = bio_integrity(req->bio);
-+	struct bio_integrity_payload *bip_next = bio_integrity(next);
-+
-+	return bvec_gap_to_prev(req->q, &bip->bip_vec[bip->bip_vcnt - 1],
-+				bip_next->bip_vec[0].bv_offset);
-+}
-+
-+static inline bool integrity_req_gap_front_merge(struct request *req,
-+		struct bio *bio)
-+{
-+	struct bio_integrity_payload *bip = bio_integrity(bio);
-+	struct bio_integrity_payload *bip_next = bio_integrity(req->bio);
-+
-+	return bvec_gap_to_prev(req->q, &bip->bip_vec[bip->bip_vcnt - 1],
-+				bip_next->bip_vec[0].bv_offset);
-+}
-+#else /* CONFIG_BLK_DEV_INTEGRITY */
-+static inline bool integrity_req_gap_back_merge(struct request *req,
-+		struct bio *next)
-+{
-+	return false;
-+}
-+static inline bool integrity_req_gap_front_merge(struct request *req,
-+		struct bio *bio)
-+{
-+	return false;
-+}
-+
- static inline void blk_flush_integrity(void)
- {
- }
-@@ -166,7 +197,7 @@ static inline bool bio_integrity_endio(struct bio *bio)
- {
- 	return true;
- }
--#endif
-+#endif /* CONFIG_BLK_DEV_INTEGRITY */
- 
- void blk_timeout_work(struct work_struct *work);
- unsigned long blk_rq_timeout(unsigned long timeout);
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d6869e0e2b64..bc534c857344 100644
+index 6980014357d4..87fb1963b721 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -1843,26 +1843,6 @@ queue_max_integrity_segments(struct request_queue *q)
- 	return q->limits.max_integrity_segments;
- }
+@@ -699,6 +699,7 @@ struct request_queue {
+ #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
+ #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
+ #define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
++#define QUEUE_FLAG_PCI_P2PDMA  30	/* device supports pci p2p requests */
  
--static inline bool integrity_req_gap_back_merge(struct request *req,
--						struct bio *next)
--{
--	struct bio_integrity_payload *bip = bio_integrity(req->bio);
--	struct bio_integrity_payload *bip_next = bio_integrity(next);
--
--	return bvec_gap_to_prev(req->q, &bip->bip_vec[bip->bip_vcnt - 1],
--				bip_next->bip_vec[0].bv_offset);
--}
--
--static inline bool integrity_req_gap_front_merge(struct request *req,
--						 struct bio *bio)
--{
--	struct bio_integrity_payload *bip = bio_integrity(bio);
--	struct bio_integrity_payload *bip_next = bio_integrity(req->bio);
--
--	return bvec_gap_to_prev(req->q, &bip->bip_vec[bip->bip_vcnt - 1],
--				bip_next->bip_vec[0].bv_offset);
--}
--
- /**
-  * bio_integrity_intervals - Return number of integrity intervals for a bio
-  * @bi:		blk_integrity profile for device
-@@ -1947,17 +1927,6 @@ static inline bool blk_integrity_merge_bio(struct request_queue *rq,
- 	return true;
- }
+ #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+ 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
+@@ -731,6 +732,8 @@ bool blk_queue_flag_test_and_clear(unsigned int flag, struct request_queue *q);
+ #define blk_queue_dax(q)	test_bit(QUEUE_FLAG_DAX, &(q)->queue_flags)
+ #define blk_queue_scsi_passthrough(q)	\
+ 	test_bit(QUEUE_FLAG_SCSI_PASSTHROUGH, &(q)->queue_flags)
++#define blk_queue_pci_p2pdma(q)	\
++	test_bit(QUEUE_FLAG_PCI_P2PDMA, &(q)->queue_flags)
  
--static inline bool integrity_req_gap_back_merge(struct request *req,
--						struct bio *next)
--{
--	return false;
--}
--static inline bool integrity_req_gap_front_merge(struct request *req,
--						 struct bio *bio)
--{
--	return false;
--}
--
- static inline unsigned int bio_integrity_intervals(struct blk_integrity *bi,
- 						   unsigned int sectors)
- {
+ #define blk_noretry_request(rq) \
+ 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
 -- 
 2.19.0
