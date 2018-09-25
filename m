@@ -1,83 +1,50 @@
-Return-Path: <david@fromorbit.com>
-Date: Tue, 25 Sep 2018 17:49:10 +1000
-From: Dave Chinner <david@fromorbit.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christopher Lameter <cl@linux.com>, Christoph Hellwig <hch@lst.de>,
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 25 Sep 2018 14:55:18 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Bart Van Assche <bvanassche@acm.org>,
+	Andrey Ryabinin <aryabinin@virtuozzo.com>,
 	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Ming Lei <tom.leiming@gmail.com>,
+	Christoph Hellwig <hch@lst.de>, Ming Lei <tom.leiming@gmail.com>,
 	linux-block <linux-block@vger.kernel.org>,
 	linux-mm <linux-mm@kvack.org>,
 	Linux FS Devel <linux-fsdevel@vger.kernel.org>,
 	"open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
 	Dave Chinner <dchinner@redhat.com>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Ming Lei <ming.lei@redhat.com>
+	Jens Axboe <axboe@kernel.dk>, Christoph Lameter <cl@linux.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Subject: Re: block: DMA alignment of IO buffer allocated from slab
-Message-ID: <20180925074910.GB31060@dastard>
-References: <CACVXFVOBq3L_EjSTCoiqUL1PH=HMR5EuNNQV0hNndFpGxmUK6g@mail.gmail.com>
- <20180920063129.GB12913@lst.de>
- <87h8ij0zot.fsf@vitty.brq.redhat.com>
- <20180921130504.GA22551@lst.de>
- <010001660c54fb65-b9d3a770-6678-40d0-8088-4db20af32280-000000@email.amazonses.com>
- <1f88f59a-2cac-e899-4c2e-402e919b1034@kernel.dk>
- <010001660cbd51ea-56e96208-564d-4f5d-a5fb-119a938762a9-000000@email.amazonses.com>
- <1a5b255f-682e-783a-7f99-9d02e39c4af2@kernel.dk>
+Message-ID: <20180925065517.GA4868@ming.t460p>
+References: <1537801706.195115.7.camel@acm.org>
+ <c844c598-be1d-bef4-fb99-09cf99571fd7@virtuozzo.com>
+ <1537804720.195115.9.camel@acm.org>
+ <10c706fd-2252-f11b-312e-ae0d97d9a538@virtuozzo.com>
+ <1537805984.195115.14.camel@acm.org>
+ <20180924185753.GA32269@bombadil.infradead.org>
+ <20180925001615.GA14386@ming.t460p>
+ <20180925032826.GA4110@bombadil.infradead.org>
+ <4a19ac2f-82c1-db55-9b93-4005ace5e2fe@acm.org>
+ <20180925044421.GA11163@bombadil.infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1a5b255f-682e-783a-7f99-9d02e39c4af2@kernel.dk>
+In-Reply-To: <20180925044421.GA11163@bombadil.infradead.org>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Sep 24, 2018 at 12:09:37PM -0600, Jens Axboe wrote:
-> On 9/24/18 12:00 PM, Christopher Lameter wrote:
-> > On Mon, 24 Sep 2018, Jens Axboe wrote:
-> > 
-> >> The situation is making me a little uncomfortable, though. If we export
-> >> such a setting, we really should be honoring it...
-
-That's what I said up front, but you replied to this with:
-
-| I think this is all crazy talk. We've never done this, [...]
-
-Now I'm not sure what you are saying we should do....
-
-> > Various subsystems create custom slab arrays with their particular
-> > alignment requirement for these allocations.
+On Mon, Sep 24, 2018 at 09:44:21PM -0700, Matthew Wilcox wrote:
+> On Mon, Sep 24, 2018 at 09:10:43PM -0700, Bart Van Assche wrote:
+> > On 9/24/18 8:28 PM, Matthew Wilcox wrote:
+> > > [ ... ] Because if we have to
+> > > round all allocations below 64 bytes up to 64 bytes, [ ... ]
+> > Have you noticed that in another e-mail in this thread it has been explained
+> > why it is not necessary on x86 to align buffers allocated by kmalloc() on a
+> > 64-byte boundary even if these buffers are used for DMA?
 > 
-> Oh yeah, I think the solution is basic enough for XFS, for instance.
-> They just have to error on the side of being cautious, by going full
-> sector alignment for memory...
+> Oh, so drivers which do this only break on !x86.  Yes, that'll work
+> out great.
 
-How does the filesystem find out about hardware alignment
-requirements? Isn't probing through the block device to find out
-about the request queue configurations considered a layering
-violation?
+It shouldn't break !x86 because ARCH_KMALLOC_MINALIGN handles that.
 
-What if sector alignment is not sufficient?  And how would this work
-if we start supporting sector sizes larger than page size? (which the
-XFS buffer cache supports just fine, even if nothing else in
-Linux does).
-
-But even ignoring sector size > page size, implementing this
-requires a bunch of new slab caches, especially for 64k page
-machines because XFS supports sector sizes up to 32k.  And every
-other filesystem that uses sector sized buffers (e.g. HFS) would
-have to do the same thing. Seems somewhat wasteful to require
-everyone to implement their own aligned sector slab cache...
-
-Perhaps we should take the filesystem out of this completely - maybe
-the block layer could provide a generic "sector heap" and have all
-filesystems that use sector sized buffers allocate from it. e.g.
-something like
-
-	mem = bdev_alloc_sector_buffer(bdev, sector_size)
-
-That way we don't have to rely on filesystems knowing anything about
-the alignment limitations of the devices or assumptions about DMA
-to work correctly...
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Thanks,
+Ming
