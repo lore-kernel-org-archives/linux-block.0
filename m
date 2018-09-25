@@ -4,11 +4,9 @@ To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>,
         Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
         syzbot <syzbot+bf89c128e05dd6c62523@syzkaller.appspotmail.com>
-Subject: [PATCH v2] block/loop: Use global lock for ioctl() operation.
-Date: Tue, 25 Sep 2018 13:21:01 +0900
-Message-Id: <1537849261-10100-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <1537848915-9335-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp>
-References: <1537848915-9335-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: [PATCH] block/loop: Use global lock for ioctl() operation.
+Date: Tue, 25 Sep 2018 13:15:15 +0900
+Message-Id: <1537848915-9335-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp>
 List-ID: <linux-block@vger.kernel.org>
 
 syzbot is reporting NULL pointer dereference [1] which is caused by
@@ -28,17 +26,15 @@ blkdev_reread_part() with lock held. This patch does not address it.
 [1] https://syzkaller.appspot.com/bug?id=f3cfe26e785d85f9ee259f385515291d21bd80a3
 [2] https://syzkaller.appspot.com/bug?id=bf154052f0eea4bc7712499e4569505907d15889
 
-v2: Don't call mutex_init() upon loop_add() request.
-
 Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 Reported-by: syzbot <syzbot+bf89c128e05dd6c62523@syzkaller.appspotmail.com>
 ---
- drivers/block/loop.c | 58 ++++++++++++++++++++++++++--------------------------
+ drivers/block/loop.c | 59 ++++++++++++++++++++++++++--------------------------
  drivers/block/loop.h |  1 -
- 2 files changed, 29 insertions(+), 30 deletions(-)
+ 2 files changed, 30 insertions(+), 30 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index c2745e6..920cbb1 100644
+index c2745e6..1477f52e 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
 @@ -85,6 +85,7 @@
@@ -224,15 +220,16 @@ index c2745e6..920cbb1 100644
  	return 0;
  }
  
-@@ -1897,7 +1898,6 @@ static int loop_add(struct loop_device **l, int i)
+@@ -1897,7 +1898,7 @@ static int loop_add(struct loop_device **l, int i)
  	if (!part_shift)
  		disk->flags |= GENHD_FL_NO_PART_SCAN;
  	disk->flags |= GENHD_FL_EXT_DEVT;
 -	mutex_init(&lo->lo_ctl_mutex);
++	mutex_init(&loop_ctl_mutex);
  	atomic_set(&lo->lo_refcnt, 0);
  	lo->lo_number		= i;
  	spin_lock_init(&lo->lo_lock);
-@@ -2010,21 +2010,21 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
+@@ -2010,21 +2011,21 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
  		ret = loop_lookup(&lo, parm);
  		if (ret < 0)
  			break;
