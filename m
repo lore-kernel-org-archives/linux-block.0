@@ -1,271 +1,241 @@
-Return-Path: <penguin-kernel@i-love.sakura.ne.jp>
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        syzbot <syzbot+bf89c128e05dd6c62523@syzkaller.appspotmail.com>
-Subject: [PATCH] block/loop: Use global lock for ioctl() operation.
-Date: Tue, 25 Sep 2018 13:15:15 +0900
-Message-Id: <1537848915-9335-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from ale.deltatee.com ([207.54.116.67]:42810 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729889AbeIYWbN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Sep 2018 18:31:13 -0400
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Jonathan Corbet <corbet@lwn.net>
+Date: Tue, 25 Sep 2018 10:22:24 -0600
+Message-Id: <20180925162231.4354-7-logang@deltatee.com>
+In-Reply-To: <20180925162231.4354-1-logang@deltatee.com>
+References: <20180925162231.4354-1-logang@deltatee.com>
+MIME-Version: 1.0
+Subject: [PATCH v7 06/13] PCI/P2PDMA: Add P2P DMA driver writer's documentation
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-syzbot is reporting NULL pointer dereference [1] which is caused by
-race condition between ioctl(loop_fd, LOOP_CLR_FD, 0) versus
-ioctl(other_loop_fd, LOOP_SET_FD, loop_fd) due to traversing other
-loop devices at loop_validate_file() without holding corresponding
-lo->lo_ctl_mutex locks.
+Add a restructured text file describing how to write drivers
+with support for P2P DMA transactions. The document describes
+how to use the APIs that were added in the previous few
+commits.
 
-Since ioctl() request on loop devices is not frequent operation, we don't
-need fine grained locking. Let's use global lock in order to allow safe
-traversal at loop_validate_file().
+Also adds an index for the PCI documentation tree even though this
+is the only PCI document that has been converted to restructured text
+at this time.
 
-Note that syzbot is also reporting circular locking dependency between
-bdev->bd_mutex and lo->lo_ctl_mutex [2] which is caused by calling
-blkdev_reread_part() with lock held. This patch does not address it.
-
-[1] https://syzkaller.appspot.com/bug?id=f3cfe26e785d85f9ee259f385515291d21bd80a3
-[2] https://syzkaller.appspot.com/bug?id=bf154052f0eea4bc7712499e4569505907d15889
-
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Reported-by: syzbot <syzbot+bf89c128e05dd6c62523@syzkaller.appspotmail.com>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+Cc: Jonathan Corbet <corbet@lwn.net>
 ---
- drivers/block/loop.c | 59 ++++++++++++++++++++++++++--------------------------
- drivers/block/loop.h |  1 -
- 2 files changed, 30 insertions(+), 30 deletions(-)
+ Documentation/driver-api/pci/index.rst  |   1 +
+ Documentation/driver-api/pci/p2pdma.rst | 170 ++++++++++++++++++++++++
+ 2 files changed, 171 insertions(+)
+ create mode 100644 Documentation/driver-api/pci/p2pdma.rst
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index c2745e6..1477f52e 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -85,6 +85,7 @@
+diff --git a/Documentation/driver-api/pci/index.rst b/Documentation/driver-api/pci/index.rst
+index eaf20b24bf7d..ecc7416c523b 100644
+--- a/Documentation/driver-api/pci/index.rst
++++ b/Documentation/driver-api/pci/index.rst
+@@ -11,6 +11,7 @@ The Linux PCI driver implementer's API guide
+    :maxdepth: 2
  
- static DEFINE_IDR(loop_index_idr);
- static DEFINE_MUTEX(loop_index_mutex);
-+static DEFINE_MUTEX(loop_ctl_mutex);
+    pci
++   p2pdma
  
- static int max_part;
- static int part_shift;
-@@ -1048,7 +1049,7 @@ static int loop_clr_fd(struct loop_device *lo)
- 	 */
- 	if (atomic_read(&lo->lo_refcnt) > 1) {
- 		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
--		mutex_unlock(&lo->lo_ctl_mutex);
-+		mutex_unlock(&loop_ctl_mutex);
- 		return 0;
- 	}
+ .. only::  subproject and html
  
-@@ -1101,12 +1102,12 @@ static int loop_clr_fd(struct loop_device *lo)
- 	if (!part_shift)
- 		lo->lo_disk->flags |= GENHD_FL_NO_PART_SCAN;
- 	loop_unprepare_queue(lo);
--	mutex_unlock(&lo->lo_ctl_mutex);
-+	mutex_unlock(&loop_ctl_mutex);
- 	/*
--	 * Need not hold lo_ctl_mutex to fput backing file.
--	 * Calling fput holding lo_ctl_mutex triggers a circular
-+	 * Need not hold loop_ctl_mutex to fput backing file.
-+	 * Calling fput holding loop_ctl_mutex triggers a circular
- 	 * lock dependency possibility warning as fput can take
--	 * bd_mutex which is usually taken before lo_ctl_mutex.
-+	 * bd_mutex which is usually taken before loop_ctl_mutex.
- 	 */
- 	fput(filp);
- 	return 0;
-@@ -1211,7 +1212,7 @@ static int loop_clr_fd(struct loop_device *lo)
- 	int ret;
- 
- 	if (lo->lo_state != Lo_bound) {
--		mutex_unlock(&lo->lo_ctl_mutex);
-+		mutex_unlock(&loop_ctl_mutex);
- 		return -ENXIO;
- 	}
- 
-@@ -1230,10 +1231,10 @@ static int loop_clr_fd(struct loop_device *lo)
- 		       lo->lo_encrypt_key_size);
- 	}
- 
--	/* Drop lo_ctl_mutex while we call into the filesystem. */
-+	/* Drop loop_ctl_mutex while we call into the filesystem. */
- 	path = lo->lo_backing_file->f_path;
- 	path_get(&path);
--	mutex_unlock(&lo->lo_ctl_mutex);
-+	mutex_unlock(&loop_ctl_mutex);
- 	ret = vfs_getattr(&path, &stat, STATX_INO, AT_STATX_SYNC_AS_STAT);
- 	if (!ret) {
- 		info->lo_device = huge_encode_dev(stat.dev);
-@@ -1325,7 +1326,7 @@ static int loop_clr_fd(struct loop_device *lo)
- 	int err;
- 
- 	if (!arg) {
--		mutex_unlock(&lo->lo_ctl_mutex);
-+		mutex_unlock(&loop_ctl_mutex);
- 		return -EINVAL;
- 	}
- 	err = loop_get_status(lo, &info64);
-@@ -1343,7 +1344,7 @@ static int loop_clr_fd(struct loop_device *lo)
- 	int err;
- 
- 	if (!arg) {
--		mutex_unlock(&lo->lo_ctl_mutex);
-+		mutex_unlock(&loop_ctl_mutex);
- 		return -EINVAL;
- 	}
- 	err = loop_get_status(lo, &info64);
-@@ -1401,7 +1402,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 	struct loop_device *lo = bdev->bd_disk->private_data;
- 	int err;
- 
--	err = mutex_lock_killable_nested(&lo->lo_ctl_mutex, 1);
-+	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
- 	if (err)
- 		goto out_unlocked;
- 
-@@ -1413,7 +1414,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 		err = loop_change_fd(lo, bdev, arg);
- 		break;
- 	case LOOP_CLR_FD:
--		/* loop_clr_fd would have unlocked lo_ctl_mutex on success */
-+		/* loop_clr_fd would have unlocked loop_ctl_mutex on success */
- 		err = loop_clr_fd(lo);
- 		if (!err)
- 			goto out_unlocked;
-@@ -1426,7 +1427,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 		break;
- 	case LOOP_GET_STATUS:
- 		err = loop_get_status_old(lo, (struct loop_info __user *) arg);
--		/* loop_get_status() unlocks lo_ctl_mutex */
-+		/* loop_get_status() unlocks loop_ctl_mutex */
- 		goto out_unlocked;
- 	case LOOP_SET_STATUS64:
- 		err = -EPERM;
-@@ -1436,7 +1437,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 		break;
- 	case LOOP_GET_STATUS64:
- 		err = loop_get_status64(lo, (struct loop_info64 __user *) arg);
--		/* loop_get_status() unlocks lo_ctl_mutex */
-+		/* loop_get_status() unlocks loop_ctl_mutex */
- 		goto out_unlocked;
- 	case LOOP_SET_CAPACITY:
- 		err = -EPERM;
-@@ -1456,7 +1457,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 	default:
- 		err = lo->ioctl ? lo->ioctl(lo, cmd, arg) : -EINVAL;
- 	}
--	mutex_unlock(&lo->lo_ctl_mutex);
-+	mutex_unlock(&loop_ctl_mutex);
- 
- out_unlocked:
- 	return err;
-@@ -1573,7 +1574,7 @@ struct compat_loop_info {
- 	int err;
- 
- 	if (!arg) {
--		mutex_unlock(&lo->lo_ctl_mutex);
-+		mutex_unlock(&loop_ctl_mutex);
- 		return -EINVAL;
- 	}
- 	err = loop_get_status(lo, &info64);
-@@ -1590,19 +1591,19 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
- 
- 	switch(cmd) {
- 	case LOOP_SET_STATUS:
--		err = mutex_lock_killable(&lo->lo_ctl_mutex);
-+		err = mutex_lock_killable(&loop_ctl_mutex);
- 		if (!err) {
- 			err = loop_set_status_compat(lo,
- 						     (const struct compat_loop_info __user *)arg);
--			mutex_unlock(&lo->lo_ctl_mutex);
-+			mutex_unlock(&loop_ctl_mutex);
- 		}
- 		break;
- 	case LOOP_GET_STATUS:
--		err = mutex_lock_killable(&lo->lo_ctl_mutex);
-+		err = mutex_lock_killable(&loop_ctl_mutex);
- 		if (!err) {
- 			err = loop_get_status_compat(lo,
- 						     (struct compat_loop_info __user *)arg);
--			/* loop_get_status() unlocks lo_ctl_mutex */
-+			/* loop_get_status() unlocks loop_ctl_mutex */
- 		}
- 		break;
- 	case LOOP_SET_CAPACITY:
-@@ -1649,7 +1650,7 @@ static void __lo_release(struct loop_device *lo)
- 	if (atomic_dec_return(&lo->lo_refcnt))
- 		return;
- 
--	mutex_lock(&lo->lo_ctl_mutex);
-+	mutex_lock(&loop_ctl_mutex);
- 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
- 		/*
- 		 * In autoclear mode, stop the loop thread
-@@ -1667,7 +1668,7 @@ static void __lo_release(struct loop_device *lo)
- 		blk_mq_unfreeze_queue(lo->lo_queue);
- 	}
- 
--	mutex_unlock(&lo->lo_ctl_mutex);
-+	mutex_unlock(&loop_ctl_mutex);
- }
- 
- static void lo_release(struct gendisk *disk, fmode_t mode)
-@@ -1713,10 +1714,10 @@ static int unregister_transfer_cb(int id, void *ptr, void *data)
- 	struct loop_device *lo = ptr;
- 	struct loop_func_table *xfer = data;
- 
--	mutex_lock(&lo->lo_ctl_mutex);
-+	mutex_lock(&loop_ctl_mutex);
- 	if (lo->lo_encryption == xfer)
- 		loop_release_xfer(lo);
--	mutex_unlock(&lo->lo_ctl_mutex);
-+	mutex_unlock(&loop_ctl_mutex);
- 	return 0;
- }
- 
-@@ -1897,7 +1898,7 @@ static int loop_add(struct loop_device **l, int i)
- 	if (!part_shift)
- 		disk->flags |= GENHD_FL_NO_PART_SCAN;
- 	disk->flags |= GENHD_FL_EXT_DEVT;
--	mutex_init(&lo->lo_ctl_mutex);
-+	mutex_init(&loop_ctl_mutex);
- 	atomic_set(&lo->lo_refcnt, 0);
- 	lo->lo_number		= i;
- 	spin_lock_init(&lo->lo_lock);
-@@ -2010,21 +2011,21 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
- 		ret = loop_lookup(&lo, parm);
- 		if (ret < 0)
- 			break;
--		ret = mutex_lock_killable(&lo->lo_ctl_mutex);
-+		ret = mutex_lock_killable(&loop_ctl_mutex);
- 		if (ret)
- 			break;
- 		if (lo->lo_state != Lo_unbound) {
- 			ret = -EBUSY;
--			mutex_unlock(&lo->lo_ctl_mutex);
-+			mutex_unlock(&loop_ctl_mutex);
- 			break;
- 		}
- 		if (atomic_read(&lo->lo_refcnt) > 0) {
- 			ret = -EBUSY;
--			mutex_unlock(&lo->lo_ctl_mutex);
-+			mutex_unlock(&loop_ctl_mutex);
- 			break;
- 		}
- 		lo->lo_disk->private_data = NULL;
--		mutex_unlock(&lo->lo_ctl_mutex);
-+		mutex_unlock(&loop_ctl_mutex);
- 		idr_remove(&loop_index_idr, lo->lo_number);
- 		loop_remove(lo);
- 		break;
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index 4d42c7a..af75a5e 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -54,7 +54,6 @@ struct loop_device {
- 
- 	spinlock_t		lo_lock;
- 	int			lo_state;
--	struct mutex		lo_ctl_mutex;
- 	struct kthread_worker	worker;
- 	struct task_struct	*worker_task;
- 	bool			use_dio;
+diff --git a/Documentation/driver-api/pci/p2pdma.rst b/Documentation/driver-api/pci/p2pdma.rst
+new file mode 100644
+index 000000000000..7febe66ee4f3
+--- /dev/null
++++ b/Documentation/driver-api/pci/p2pdma.rst
+@@ -0,0 +1,170 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++============================
++PCI Peer-to-Peer DMA Support
++============================
++
++The PCI bus has pretty decent support for performing DMA transfers
++between two devices on the bus. This type of transaction is henceforth
++called Peer-to-Peer (or P2P). However, there are a number of issues that
++make P2P transactions tricky to do in a perfectly safe way.
++
++One of the biggest issues is that PCI doesn't require forwarding
++transactions between hierarchy domains, and in PCIe, each Root Port
++defines a separate hierarchy domain. To make things worse, there is no
++simple way to determine if a given Root Complex supports this or not.
++(See PCIe r4.0, sec 1.3.1). Therefore, as of this writing, the kernel
++only supports doing P2P when the endpoints involved are all behind the
++same PCI bridge, as such devices are all in the same PCI hierarchy
++domain, and the spec guarantees that all transactions within the
++hierarchy will be routable, but it does not require routing
++between hierarchies.
++
++The second issue is that to make use of existing interfaces in Linux,
++memory that is used for P2P transactions needs to be backed by struct
++pages. However, PCI BARs are not typically cache coherent so there are
++a few corner case gotchas with these pages so developers need to
++be careful about what they do with them.
++
++
++Driver Writer's Guide
++=====================
++
++In a given P2P implementation there may be three or more different
++types of kernel drivers in play:
++
++* Provider - A driver which provides or publishes P2P resources like
++  memory or doorbell registers to other drivers.
++* Client - A driver which makes use of a resource by setting up a
++  DMA transaction to or from it.
++* Orchestrator - A driver which orchestrates the flow of data between
++  clients and providers.
++
++In many cases there could be overlap between these three types (i.e.,
++it may be typical for a driver to be both a provider and a client).
++
++For example, in the NVMe Target Copy Offload implementation:
++
++* The NVMe PCI driver is both a client, provider and orchestrator
++  in that it exposes any CMB (Controller Memory Buffer) as a P2P memory
++  resource (provider), it accepts P2P memory pages as buffers in requests
++  to be used directly (client) and it can also make use the CMB as
++  submission queue entries.
++* The RDMA driver is a client in this arrangement so that an RNIC
++  can DMA directly to the memory exposed by the NVMe device.
++* The NVMe Target driver (nvmet) can orchestrate the data from the RNIC
++  to the P2P memory (CMB) and then to the NVMe device (and vice versa).
++
++This is currently the only arrangement supported by the kernel but
++one could imagine slight tweaks to this that would allow for the same
++functionality. For example, if a specific RNIC added a BAR with some
++memory behind it, its driver could add support as a P2P provider and
++then the NVMe Target could use the RNIC's memory instead of the CMB
++in cases where the NVMe cards in use do not have CMB support.
++
++
++Provider Drivers
++----------------
++
++A provider simply needs to register a BAR (or a portion of a BAR)
++as a P2P DMA resource using :c:func:`pci_p2pdma_add_resource()`.
++This will register struct pages for all the specified memory.
++
++After that it may optionally publish all of its resources as
++P2P memory using :c:func:`pci_p2pmem_publish()`. This will allow
++any orchestrator drivers to find and use the memory. When marked in
++this way, the resource must be regular memory with no side effects.
++
++For the time being this is fairly rudimentary in that all resources
++are typically going to be P2P memory. Future work will likely expand
++this to include other types of resources like doorbells.
++
++
++Client Drivers
++--------------
++
++A client driver typically only has to conditionally change its DMA map
++routine to use the mapping function :c:func:`pci_p2pdma_map_sg()` instead
++of the usual :c:func:`dma_map_sg()` function. Memory mapped in this
++way does not need to be unmapped.
++
++The client may also, optionally, make use of
++:c:func:`is_pci_p2pdma_page()` to determine when to use the P2P mapping
++functions and when to use the regular mapping functions. In some
++situations, it may be more appropriate to use a flag to indicate a
++given request is P2P memory and map appropriately (for example the
++block layer uses a flag to keep P2P memory out of queues that do not
++have P2P client support). It is important to ensure that struct pages that
++back P2P memory stay out of code that does not have support for them.
++
++
++Orchestrator Drivers
++--------------------
++
++The first task an orchestrator driver must do is compile a list of
++all client devices that will be involved in a given transaction. For
++example, the NVMe Target driver creates a list including all NVMe
++devices and the RNIC in use. The list is stored as an anonymous struct
++list_head which must be initialized with the usual INIT_LIST_HEAD.
++The following functions may then be used to add to, remove from and free
++the list of clients with the functions :c:func:`pci_p2pdma_add_client()`,
++:c:func:`pci_p2pdma_remove_client()` and
++:c:func:`pci_p2pdma_client_list_free()`.
++
++With the client list in hand, the orchestrator may then call
++:c:func:`pci_p2pmem_find()` to obtain a published P2P memory provider
++that is supported (behind the same root port) as all the clients. If more
++than one provider is supported, the one nearest to all the clients will
++be chosen first. If more than one provider is an equal distance away, the
++one returned will be chosen at random. This function returns the PCI
++device to use for the provider with a reference taken and therefore
++when it's no longer needed it should be returned with pci_dev_put().
++
++Alternatively, if the orchestrator knows (via some other means)
++which provider it wants to use it may use :c:func:`pci_has_p2pmem()`
++to determine if it has P2P memory and :c:func:`pci_p2pdma_distance()`
++to determine the cumulative distance between it and a potential
++list of clients.
++
++With a supported provider in hand, the driver can then call
++:c:func:`pci_p2pdma_assign_provider()` to assign the provider
++to the client list. This function returns false if any of the
++clients are unsupported by the provider.
++
++Once a provider is assigned to a client list via either
++:c:func:`pci_p2pmem_find()` or :c:func:`pci_p2pdma_assign_provider()`,
++the list is permanently bound to the provider such that any new clients
++added to the list must be supported by the already selected provider.
++If they are not supported, :c:func:`pci_p2pdma_add_client()` will return
++an error. In this way, orchestrators are free to add and remove devices
++without having to recheck support or tear down existing transfers to
++change P2P providers.
++
++Once a provider is selected, the orchestrator can then use
++:c:func:`pci_alloc_p2pmem()` and :c:func:`pci_free_p2pmem()` to
++allocate P2P memory from the provider. :c:func:`pci_p2pmem_alloc_sgl()`
++and :c:func:`pci_p2pmem_free_sgl()` are convenience functions for
++allocating scatter-gather lists with P2P memory.
++
++Struct Page Caveats
++-------------------
++
++Driver writers should be very careful about not passing these special
++struct pages to code that isn't prepared for it. At this time, the kernel
++interfaces do not have any checks for ensuring this. This obviously
++precludes passing these pages to userspace.
++
++P2P memory is also technically IO memory but should never have any side
++effects behind it. Thus, the order of loads and stores should not be important
++and ioreadX(), iowriteX() and friends should not be necessary.
++However, as the memory is not cache coherent, if access ever needs to
++be protected by a spinlock then :c:func:`mmiowb()` must be used before
++unlocking the lock. (See ACQUIRES VS I/O ACCESSES in
++Documentation/memory-barriers.txt)
++
++
++P2P DMA Support Library
++=====================
++
++.. kernel-doc:: drivers/pci/p2pdma.c
++   :export:
 -- 
-1.8.3.1
+2.19.0
