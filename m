@@ -1,54 +1,56 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:9646 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726322AbeIYWk6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Sep 2018 18:40:58 -0400
-From: Adam Manzanares <Adam.Manzanares@wdc.com>
-To: Coly Li <colyli@suse.de>,
-        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] bcache: use REQ_PRIO to indicate bio for metadata
-Date: Tue, 25 Sep 2018 16:32:39 +0000
-Message-ID: <8f55a4a3-ee8f-6d2f-0565-7fe5fc224119@wdc.com>
-References: <20180925161213.15923-1-colyli@suse.de>
-In-Reply-To: <20180925161213.15923-1-colyli@suse.de>
-Content-Type: text/plain; charset="utf-8"
+Received: from mx2.suse.de ([195.135.220.15]:48944 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729051AbeIYWUf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Sep 2018 18:20:35 -0400
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Adam Manzanares <adam.manzanares@wdc.com>
+Subject: [PATCH] bcache: use REQ_PRIO to indicate bio for metadata
+Date: Wed, 26 Sep 2018 00:12:13 +0800
+Message-Id: <20180925161213.15923-1-colyli@suse.de>
 MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-DQoNCk9uIDkvMjUvMTggOToxMiBBTSwgQ29seSBMaSB3cm90ZToNCj4gSW4gY2FjaGVkX2Rldl9j
-YWNoZV9taXNzKCkgYW5kIGNoZWNrX3Nob3VsZF9ieXBhc3MoKSwgUkVRX01FVEEgaXMgdXNlZA0K
-PiB0byBjaGVjayB3aGV0aGVyIGEgYmlvIGlzIGZvciBtZXRhZGF0YSByZXF1ZXN0LiBSRVFfTUVU
-QSBpcyB1c2VkIGZvcg0KPiBibGt0cmFjZSwgdGhlIGNvcnJlY3QgUkVRXyBmbGFnIHNob3VsZCBi
-ZSBSRVFfUFJJTy4gVGhpcyBmbGFnIG1lYW5zIHRoZQ0KPiBiaW8gc2hvdWxkIGJlIHByaW9yIHRv
-IG90aGVyIGJpbywgYW5kIGZyZXF1ZW50bHkgYmUgdXNlZCB0byBpbmRpY2F0ZQ0KPiBtZXRhZGF0
-YSBpbyBpbiBmaWxlIHN5c3RlbSBjb2RlLg0KPiANCj4gVGhpcyBwYXRjaCByZXBsYWNlcyBSRVFf
-TUVUQSB3aXRoIGNvcnJlY3QgZmxhZyBSRVFfUFJJTy4NCj4gDQo+IENDIEFkYW0gTWFuemFuYXJl
-cyBiZWNhdXNlIGhlIGV4cGxhaW5zIHRvIG1lIHdoYXQgUkVRX1BSSU8gaXMgZm9yLg0KDQpTb3Jy
-eSBmb3IgdGhlIGNvbmZ1c2lvbiwgSSB3YXMgdGFsa2luZyBhYm91dCB1c2luZyB0aGUgYmlfaW9w
-cmlvIGZpZWxkIA0KdG8gcGFzcyBpb3ByaW8gaW5mb3JtYXRpb24gZG93biB0byBkZXZpY2VzIHRo
-YXQgc3VwcG9ydCBwcmlvcml0aXplZCANCmNvbW1hbmRzLiBJIGhhdmVuJ3QgdXNlZCB0aGUgUkVR
-X1BSSU8gZmxhZyBpbiB0aGUgd29yayB0aGF0IEkgaGF2ZSBkb25lLg0KDQo+IA0KPiBTaWduZWQt
-b2ZmLWJ5OiBDb2x5IExpIDxjb2x5bGlAc3VzZS5kZT4NCj4gQ2M6IEFkYW0gTWFuemFuYXJlcyA8
-YWRhbS5tYW56YW5hcmVzQHdkYy5jb20+DQo+IC0tLQ0KPiAgIGRyaXZlcnMvbWQvYmNhY2hlL3Jl
-cXVlc3QuYyB8IDQgKystLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDIg
-ZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9tZC9iY2FjaGUvcmVxdWVz
-dC5jIGIvZHJpdmVycy9tZC9iY2FjaGUvcmVxdWVzdC5jDQo+IGluZGV4IDUxYmUzNTVhMzMwOS4u
-MTNkMzM1NWE5MGMwIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJzL21kL2JjYWNoZS9yZXF1ZXN0LmMN
-Cj4gKysrIGIvZHJpdmVycy9tZC9iY2FjaGUvcmVxdWVzdC5jDQo+IEBAIC0zOTUsNyArMzk1LDcg
-QEAgc3RhdGljIGJvb2wgY2hlY2tfc2hvdWxkX2J5cGFzcyhzdHJ1Y3QgY2FjaGVkX2RldiAqZGMs
-IHN0cnVjdCBiaW8gKmJpbykNCj4gICAJICogdW5sZXNzIHRoZSByZWFkLWFoZWFkIHJlcXVlc3Qg
-aXMgZm9yIG1ldGFkYXRhIChlZywgZm9yIGdmczIpLg0KPiAgIAkgKi8NCj4gICAJaWYgKGJpby0+
-Ymlfb3BmICYgKFJFUV9SQUhFQUR8UkVRX0JBQ0tHUk9VTkQpICYmDQo+IC0JICAgICEoYmlvLT5i
-aV9vcGYgJiBSRVFfTUVUQSkpDQo+ICsJICAgICEoYmlvLT5iaV9vcGYgJiBSRVFfUFJJTykpDQo+
-ICAgCQlnb3RvIHNraXA7DQo+ICAgDQo+ICAgCWlmIChiaW8tPmJpX2l0ZXIuYmlfc2VjdG9yICYg
-KGMtPnNiLmJsb2NrX3NpemUgLSAxKSB8fA0KPiBAQCAtODc3LDcgKzg3Nyw3IEBAIHN0YXRpYyBp
-bnQgY2FjaGVkX2Rldl9jYWNoZV9taXNzKHN0cnVjdCBidHJlZSAqYiwgc3RydWN0IHNlYXJjaCAq
-cywNCj4gICAJfQ0KPiAgIA0KPiAgIAlpZiAoIShiaW8tPmJpX29wZiAmIFJFUV9SQUhFQUQpICYm
-DQo+IC0JICAgICEoYmlvLT5iaV9vcGYgJiBSRVFfTUVUQSkgJiYNCj4gKwkgICAgIShiaW8tPmJp
-X29wZiAmIFJFUV9QUklPKSAmJg0KPiAgIAkgICAgcy0+aW9wLmMtPmdjX3N0YXRzLmluX3VzZSA8
-IENVVE9GRl9DQUNIRV9SRUFEQSkNCj4gICAJCXJlYWRhID0gbWluX3Qoc2VjdG9yX3QsIGRjLT5y
-ZWFkYWhlYWQgPj4gOSwNCj4gICAJCQkgICAgICBnZXRfY2FwYWNpdHkoYmlvLT5iaV9kaXNrKSAt
-IGJpb19lbmRfc2VjdG9yKGJpbykpOw0KPiA=
+In cached_dev_cache_miss() and check_should_bypass(), REQ_META is used
+to check whether a bio is for metadata request. REQ_META is used for
+blktrace, the correct REQ_ flag should be REQ_PRIO. This flag means the
+bio should be prior to other bio, and frequently be used to indicate
+metadata io in file system code.
+
+This patch replaces REQ_META with correct flag REQ_PRIO.
+
+CC Adam Manzanares because he explains to me what REQ_PRIO is for.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Cc: Adam Manzanares <adam.manzanares@wdc.com>
+---
+ drivers/md/bcache/request.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 51be355a3309..13d3355a90c0 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -395,7 +395,7 @@ static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
+ 	 * unless the read-ahead request is for metadata (eg, for gfs2).
+ 	 */
+ 	if (bio->bi_opf & (REQ_RAHEAD|REQ_BACKGROUND) &&
+-	    !(bio->bi_opf & REQ_META))
++	    !(bio->bi_opf & REQ_PRIO))
+ 		goto skip;
+ 
+ 	if (bio->bi_iter.bi_sector & (c->sb.block_size - 1) ||
+@@ -877,7 +877,7 @@ static int cached_dev_cache_miss(struct btree *b, struct search *s,
+ 	}
+ 
+ 	if (!(bio->bi_opf & REQ_RAHEAD) &&
+-	    !(bio->bi_opf & REQ_META) &&
++	    !(bio->bi_opf & REQ_PRIO) &&
+ 	    s->iop.c->gc_stats.in_use < CUTOFF_CACHE_READA)
+ 		reada = min_t(sector_t, dc->readahead >> 9,
+ 			      get_capacity(bio->bi_disk) - bio_end_sector(bio));
+-- 
+2.19.0
