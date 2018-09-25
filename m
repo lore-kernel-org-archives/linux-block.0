@@ -1,114 +1,109 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:37112 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727145AbeI0RzF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Sep 2018 13:55:05 -0400
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH 13/14] loop: Move loop_reread_partitions() out of loop_ctl_mutex
-Date: Thu, 27 Sep 2018 13:36:51 +0200
-Message-Id: <20180927113652.5422-14-jack@suse.cz>
-In-Reply-To: <20180927113652.5422-1-jack@suse.cz>
-References: <20180927113652.5422-1-jack@suse.cz>
+Received: from ale.deltatee.com ([207.54.116.67]:42730 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729674AbeIYWbJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Sep 2018 18:31:09 -0400
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Vinod Koul <vinod.koul@intel.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Thierry Reding <treding@nvidia.com>,
+        Sanyog Kale <sanyog.r.kale@intel.com>,
+        Sagar Dharia <sdharia@codeaurora.org>
+Date: Tue, 25 Sep 2018 10:22:23 -0600
+Message-Id: <20180925162231.4354-6-logang@deltatee.com>
+In-Reply-To: <20180925162231.4354-1-logang@deltatee.com>
+References: <20180925162231.4354-1-logang@deltatee.com>
+MIME-Version: 1.0
+Subject: [PATCH v7 05/13] docs-rst: Add a new directory for PCI documentation
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Calling loop_reread_partitions() under loop_ctl_mutex causes lockdep to
-complain about circular lock dependency between bdev->bd_mutex and
-lo->lo_ctl_mutex. The problem is that on loop device open or close
-lo_open() and lo_release() get called with bdev->bd_mutex held and they
-need to acquire loop_ctl_mutex. OTOH when loop_reread_partitions() is
-called with loop_ctl_mutex held, it will call blkdev_reread_part() which
-acquires bdev->bd_mutex. See syzbot report for details [1].
+Add a new directory in the driver API guide for PCI specific
+documentation.
 
-Move all calls of loop_rescan_partitions() out of loop_ctl_mutex to
-avoid lockdep warning and fix deadlock possibility.
+This is in preparation for adding a new PCI P2P DMA driver writers
+guide which will go in this directory.
 
-[1] https://syzkaller.appspot.com/bug?id=bf154052f0eea4bc7712499e4569505907d1588
-
-Reported-by: syzbot <syzbot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Vinod Koul <vinod.koul@intel.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>
+Cc: Logan Gunthorpe <logang@deltatee.com>
+Cc: Thierry Reding <treding@nvidia.com>
+Cc: Sanyog Kale <sanyog.r.kale@intel.com>
+Cc: Sagar Dharia <sdharia@codeaurora.org>
 ---
- drivers/block/loop.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+ Documentation/driver-api/index.rst         |  2 +-
+ Documentation/driver-api/pci/index.rst     | 20 ++++++++++++++++++++
+ Documentation/driver-api/{ => pci}/pci.rst |  0
+ 3 files changed, 21 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/driver-api/pci/index.rst
+ rename Documentation/driver-api/{ => pci}/pci.rst (100%)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index cce1a32ae6d0..d2be85c48f03 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -680,6 +680,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- {
- 	struct file	*file, *old_file;
- 	int		error;
-+	bool		partscan;
- 
- 	error = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
- 	if (error)
-@@ -721,9 +722,10 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	blk_mq_unfreeze_queue(lo->lo_queue);
- 
- 	fput(old_file);
--	if (lo->lo_flags & LO_FLAGS_PARTSCAN)
--		loop_reread_partitions(lo, bdev);
-+	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
- 	mutex_unlock(&loop_ctl_mutex);
-+	if (partscan)
-+		loop_reread_partitions(lo, bdev);
- 	return 0;
- 
- out_putf:
-@@ -904,6 +906,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	int		lo_flags = 0;
- 	int		error;
- 	loff_t		size;
-+	bool		partscan;
- 
- 	/* This is safe, since we have a reference from open(). */
- 	__module_get(THIS_MODULE);
-@@ -970,14 +973,15 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	lo->lo_state = Lo_bound;
- 	if (part_shift)
- 		lo->lo_flags |= LO_FLAGS_PARTSCAN;
--	if (lo->lo_flags & LO_FLAGS_PARTSCAN)
--		loop_reread_partitions(lo, bdev);
-+	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
- 
- 	/* Grab the block_device to prevent its destruction after we
- 	 * put /dev/loopXX inode. Later in __loop_clr_fd() we bdput(bdev).
- 	 */
- 	bdgrab(bdev);
- 	mutex_unlock(&loop_ctl_mutex);
-+	if (partscan)
-+		loop_reread_partitions(lo, bdev);
- 	return 0;
- 
- out_unlock:
-@@ -1158,6 +1162,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	int err;
- 	struct loop_func_table *xfer;
- 	kuid_t uid = current_uid();
-+	struct block_device *bdev;
-+	bool partscan = false;
- 
- 	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
- 	if (err)
-@@ -1246,10 +1252,13 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	     !(lo->lo_flags & LO_FLAGS_PARTSCAN)) {
- 		lo->lo_flags |= LO_FLAGS_PARTSCAN;
- 		lo->lo_disk->flags &= ~GENHD_FL_NO_PART_SCAN;
--		loop_reread_partitions(lo, lo->lo_device);
-+		bdev = lo->lo_device;
-+		partscan = true;
- 	}
- out_unlock:
- 	mutex_unlock(&loop_ctl_mutex);
-+	if (partscan)
-+		loop_reread_partitions(lo, bdev);
- 
- 	return err;
- }
+diff --git a/Documentation/driver-api/index.rst b/Documentation/driver-api/index.rst
+index 6d9f2f9fe20e..e9e7d24169cf 100644
+--- a/Documentation/driver-api/index.rst
++++ b/Documentation/driver-api/index.rst
+@@ -29,7 +29,7 @@ available subsections can be seen below.
+    iio/index
+    input
+    usb/index
+-   pci
++   pci/index
+    spi
+    i2c
+    hsi
+diff --git a/Documentation/driver-api/pci/index.rst b/Documentation/driver-api/pci/index.rst
+new file mode 100644
+index 000000000000..eaf20b24bf7d
+--- /dev/null
++++ b/Documentation/driver-api/pci/index.rst
+@@ -0,0 +1,20 @@
++.. SPDX-License-Identifier: GPL-2.0
++============================================
++The Linux PCI driver implementer's API guide
++============================================
++
++.. class:: toc-title
++
++	   Table of contents
++
++.. toctree::
++   :maxdepth: 2
++
++   pci
++
++.. only::  subproject and html
++
++   Indices
++   =======
++
++   * :ref:`genindex`
+diff --git a/Documentation/driver-api/pci.rst b/Documentation/driver-api/pci/pci.rst
+similarity index 100%
+rename from Documentation/driver-api/pci.rst
+rename to Documentation/driver-api/pci/pci.rst
 -- 
-2.16.4
+2.19.0
