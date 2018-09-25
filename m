@@ -1,77 +1,157 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:46899 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728952AbeIRNMT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Sep 2018 09:12:19 -0400
-Received: by mail-ed1-f66.google.com with SMTP id k14-v6so1027907edr.13
-        for <linux-block@vger.kernel.org>; Tue, 18 Sep 2018 00:40:56 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH] lightnvm: pblk: fix race on sysfs line state
-Date: Tue, 18 Sep 2018 09:40:32 +0200
-Message-Id: <1537256432-19807-1-git-send-email-javier@cnexlabs.com>
+Received: from ale.deltatee.com ([207.54.116.67]:42766 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729839AbeIYWbL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Sep 2018 18:31:11 -0400
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Logan Gunthorpe <logang@deltatee.com>
+Date: Tue, 25 Sep 2018 10:22:30 -0600
+Message-Id: <20180925162231.4354-13-logang@deltatee.com>
+In-Reply-To: <20180925162231.4354-1-logang@deltatee.com>
+References: <20180925162231.4354-1-logang@deltatee.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH v7 12/13] nvmet: Introduce helper functions to allocate and free request SGLs
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-pblk exposes a sysfs interface that represents its internal state. Part
-of this state is the map bitmap for the current open line, which should
-be protected by the line lock to avoid a race when freeing the line
-metadata. Currently, it is not.
+Add helpers to allocate and free the SGL in a struct nvmet_req:
 
-This patch makes sure that the line state is consistent and NULL
-bitmap pointers are not dereferenced.
+int nvmet_req_alloc_sgl(struct nvmet_req *req, struct nvmet_sq *sq)
+void nvmet_req_free_sgl(struct nvmet_req *req)
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+This will be expanded in a future patch to implement peer-to-peer
+memory DMAs and should be common with all target drivers. The presently
+unused 'sq' argument in the alloc function will be necessary to
+decide whether to use peer-to-peer memory and obtain the correct
+provider to allocate the memory.
+
+The new helpers are used in nvmet-rdma. Seeing we use req.transfer_len
+as the length of the SGL it is set earlier and cleared on any error.
+It also seems to be unnecessary to accumulate the length as the map_sgl
+functions should only ever be called once per request.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Acked-by: Sagi Grimberg <sagi@grimberg.me>
+Cc: Christoph Hellwig <hch@lst.de>
 ---
- drivers/lightnvm/pblk-core.c  | 5 +++--
- drivers/lightnvm/pblk-sysfs.c | 8 +++++++-
- 2 files changed, 10 insertions(+), 3 deletions(-)
+ drivers/nvme/target/core.c  | 18 ++++++++++++++++++
+ drivers/nvme/target/nvmet.h |  2 ++
+ drivers/nvme/target/rdma.c  | 20 ++++++++++++--------
+ 3 files changed, 32 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index a23e965d32fc..fec0ad68dcd6 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1662,13 +1662,14 @@ struct pblk_line *pblk_line_replace_data(struct pblk *pblk)
- 	struct pblk_line *cur, *new = NULL;
- 	unsigned int left_seblks;
+diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
+index b5ec96abd048..bddd1599b826 100644
+--- a/drivers/nvme/target/core.c
++++ b/drivers/nvme/target/core.c
+@@ -725,6 +725,24 @@ void nvmet_req_execute(struct nvmet_req *req)
+ }
+ EXPORT_SYMBOL_GPL(nvmet_req_execute);
  
--	cur = l_mg->data_line;
- 	new = l_mg->data_next;
- 	if (!new)
- 		goto out;
++int nvmet_req_alloc_sgl(struct nvmet_req *req, struct nvmet_sq *sq)
++{
++	req->sg = sgl_alloc(req->transfer_len, GFP_KERNEL, &req->sg_cnt);
++	if (!req->sg)
++		return -ENOMEM;
 +
-+	spin_lock(&l_mg->free_lock);
-+	cur = l_mg->data_line;
- 	l_mg->data_line = new;
- 
--	spin_lock(&l_mg->free_lock);
- 	pblk_line_setup_metadata(new, l_mg, &pblk->lm);
- 	spin_unlock(&l_mg->free_lock);
- 
-diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
-index cba83ac43e62..2d2818155aa8 100644
---- a/drivers/lightnvm/pblk-sysfs.c
-+++ b/drivers/lightnvm/pblk-sysfs.c
-@@ -263,8 +263,14 @@ static ssize_t pblk_sysfs_lines(struct pblk *pblk, char *page)
- 		sec_in_line = l_mg->data_line->sec_in_line;
- 		meta_weight = bitmap_weight(&l_mg->meta_bitmap,
- 							PBLK_DATA_LINES);
--		map_weight = bitmap_weight(l_mg->data_line->map_bitmap,
++	return 0;
++}
++EXPORT_SYMBOL_GPL(nvmet_req_alloc_sgl);
 +
-+		spin_lock(&l_mg->data_line->lock);
-+		if (l_mg->data_line->map_bitmap)
-+			map_weight = bitmap_weight(l_mg->data_line->map_bitmap,
- 							lm->sec_per_line);
-+		else
-+			map_weight = 0;
-+		spin_unlock(&l_mg->data_line->lock);
++void nvmet_req_free_sgl(struct nvmet_req *req)
++{
++	sgl_free(req->sg);
++	req->sg = NULL;
++	req->sg_cnt = 0;
++}
++EXPORT_SYMBOL_GPL(nvmet_req_free_sgl);
++
+ static inline bool nvmet_cc_en(u32 cc)
+ {
+ 	return (cc >> NVME_CC_EN_SHIFT) & 0x1;
+diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+index ec9af4ee03b6..7d6cb61021e4 100644
+--- a/drivers/nvme/target/nvmet.h
++++ b/drivers/nvme/target/nvmet.h
+@@ -336,6 +336,8 @@ bool nvmet_req_init(struct nvmet_req *req, struct nvmet_cq *cq,
+ void nvmet_req_uninit(struct nvmet_req *req);
+ void nvmet_req_execute(struct nvmet_req *req);
+ void nvmet_req_complete(struct nvmet_req *req, u16 status);
++int nvmet_req_alloc_sgl(struct nvmet_req *req, struct nvmet_sq *sq);
++void nvmet_req_free_sgl(struct nvmet_req *req);
+ 
+ void nvmet_cq_setup(struct nvmet_ctrl *ctrl, struct nvmet_cq *cq, u16 qid,
+ 		u16 size);
+diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
+index bfc4da660bb4..b0d0cedc74bb 100644
+--- a/drivers/nvme/target/rdma.c
++++ b/drivers/nvme/target/rdma.c
+@@ -503,7 +503,7 @@ static void nvmet_rdma_release_rsp(struct nvmet_rdma_rsp *rsp)
  	}
- 	spin_unlock(&l_mg->free_lock);
  
+ 	if (rsp->req.sg != rsp->cmd->inline_sg)
+-		sgl_free(rsp->req.sg);
++		nvmet_req_free_sgl(&rsp->req);
+ 
+ 	if (unlikely(!list_empty_careful(&queue->rsp_wr_wait_list)))
+ 		nvmet_rdma_process_wr_wait_list(queue);
+@@ -652,24 +652,24 @@ static u16 nvmet_rdma_map_sgl_keyed(struct nvmet_rdma_rsp *rsp,
+ {
+ 	struct rdma_cm_id *cm_id = rsp->queue->cm_id;
+ 	u64 addr = le64_to_cpu(sgl->addr);
+-	u32 len = get_unaligned_le24(sgl->length);
+ 	u32 key = get_unaligned_le32(sgl->key);
+ 	int ret;
+ 
++	rsp->req.transfer_len = get_unaligned_le24(sgl->length);
++
+ 	/* no data command? */
+-	if (!len)
++	if (!rsp->req.transfer_len)
+ 		return 0;
+ 
+-	rsp->req.sg = sgl_alloc(len, GFP_KERNEL, &rsp->req.sg_cnt);
+-	if (!rsp->req.sg)
+-		return NVME_SC_INTERNAL;
++	ret = nvmet_req_alloc_sgl(&rsp->req, &rsp->queue->nvme_sq);
++	if (ret < 0)
++		goto error_out;
+ 
+ 	ret = rdma_rw_ctx_init(&rsp->rw, cm_id->qp, cm_id->port_num,
+ 			rsp->req.sg, rsp->req.sg_cnt, 0, addr, key,
+ 			nvmet_data_dir(&rsp->req));
+ 	if (ret < 0)
+-		return NVME_SC_INTERNAL;
+-	rsp->req.transfer_len += len;
++		goto error_out;
+ 	rsp->n_rdma += ret;
+ 
+ 	if (invalidate) {
+@@ -678,6 +678,10 @@ static u16 nvmet_rdma_map_sgl_keyed(struct nvmet_rdma_rsp *rsp,
+ 	}
+ 
+ 	return 0;
++
++error_out:
++	rsp->req.transfer_len = 0;
++	return NVME_SC_INTERNAL;
+ }
+ 
+ static u16 nvmet_rdma_map_sgl(struct nvmet_rdma_rsp *rsp)
 -- 
-2.7.4
+2.19.0
