@@ -1,180 +1,117 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:38644 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727844AbeIMFTC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Sep 2018 01:19:02 -0400
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Logan Gunthorpe <logang@deltatee.com>
-Date: Wed, 12 Sep 2018 18:11:47 -0600
-Message-Id: <20180913001156.4115-5-logang@deltatee.com>
-In-Reply-To: <20180913001156.4115-1-logang@deltatee.com>
-References: <20180913001156.4115-1-logang@deltatee.com>
+Return-Path: <BATV+7902ada3182718150db7+5511+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	linux-block@vger.kernel.org,
+	xen-devel@lists.xen.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 4/5] block: remove ARCH_BIOVEC_PHYS_MERGEABLE
+Date: Tue, 25 Sep 2018 13:30:08 -0700
+Message-Id: <20180925203009.1838-5-hch@lst.de>
+In-Reply-To: <20180925203009.1838-1-hch@lst.de>
+References: <20180925203009.1838-1-hch@lst.de>
 MIME-Version: 1.0
-Subject: [PATCH v6 04/13] PCI/P2PDMA: Introduce configfs/sysfs enable attribute helpers
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Users of the P2PDMA infrastructure will typically need a way for
-the user to tell the kernel to use P2P resources. Typically
-this will be a simple on/off boolean operation but sometimes
-it may be desirable for the user to specify the exact device to
-use for the P2P operation.
+Take the Xen check into the core code instead of delegating it to
+the architectures.
 
-Add new helpers for attributes which take a boolean or a PCI device.
-Any boolean, or the word 'auto' turn P2P on or off. Specifying a full
-PCI device name/BDF will select the specific device.
-
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/pci/p2pdma.c       | 83 ++++++++++++++++++++++++++++++++++++++
- include/linux/pci-p2pdma.h | 15 +++++++
- 2 files changed, 98 insertions(+)
+ arch/arm/include/asm/io.h   | 3 ---
+ arch/arm64/include/asm/io.h | 3 ---
+ arch/x86/include/asm/io.h   | 3 ---
+ block/blk.h                 | 7 ++-----
+ drivers/xen/biomerge.c      | 2 +-
+ 5 files changed, 3 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
-index 29bd40a87768..3da848f3fe72 100644
---- a/drivers/pci/p2pdma.c
-+++ b/drivers/pci/p2pdma.c
-@@ -9,6 +9,7 @@
-  */
+diff --git a/arch/arm/include/asm/io.h b/arch/arm/include/asm/io.h
+index cf5cd88e7289..6ae7674da0d6 100644
+--- a/arch/arm/include/asm/io.h
++++ b/arch/arm/include/asm/io.h
+@@ -459,9 +459,6 @@ extern void pci_iounmap(struct pci_dev *dev, void __iomem *addr);
  
- #define pr_fmt(fmt) "pci-p2pdma: " fmt
-+#include <linux/ctype.h>
- #include <linux/pci-p2pdma.h>
- #include <linux/module.h>
- #include <linux/slab.h>
-@@ -856,3 +857,85 @@ int pci_p2pdma_map_sg(struct device *dev, struct scatterlist *sg, int nents,
- 	return nents;
+ #include <asm-generic/io.h>
+ 
+-#define ARCH_BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
+-	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2))
+-
+ #ifdef CONFIG_MMU
+ #define ARCH_HAS_VALID_PHYS_ADDR_RANGE
+ extern int valid_phys_addr_range(phys_addr_t addr, size_t size);
+diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
+index 06119ee511cd..18f6ae6a43f1 100644
+--- a/arch/arm64/include/asm/io.h
++++ b/arch/arm64/include/asm/io.h
+@@ -205,8 +205,5 @@ extern int valid_mmap_phys_addr_range(unsigned long pfn, size_t size);
+ 
+ extern int devmem_is_allowed(unsigned long pfn);
+ 
+-#define ARCH_BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
+-	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2))
+-
+ #endif	/* __KERNEL__ */
+ #endif	/* __ASM_IO_H */
+diff --git a/arch/x86/include/asm/io.h b/arch/x86/include/asm/io.h
+index abdb501a551d..232d8e9ee8a0 100644
+--- a/arch/x86/include/asm/io.h
++++ b/arch/x86/include/asm/io.h
+@@ -371,9 +371,6 @@ extern bool is_early_ioremap_ptep(pte_t *ptep);
+ 
+ #ifdef CONFIG_XEN
+ #include <xen/xen.h>
+-
+-#define ARCH_BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
+-	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2))
+ #endif	/* CONFIG_XEN */
+ 
+ #define IO_SPACE_LIMIT 0xffff
+diff --git a/block/blk.h b/block/blk.h
+index 50f74ce60453..58c030f727e9 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -4,6 +4,7 @@
+ 
+ #include <linux/idr.h>
+ #include <linux/blk-mq.h>
++#include <xen/xen.h>
+ #include "blk-mq.h"
+ 
+ /* Amount of time in which a process may batch requests */
+@@ -149,10 +150,6 @@ static inline void blk_queue_enter_live(struct request_queue *q)
+ 	percpu_ref_get(&q->q_usage_counter);
  }
- EXPORT_SYMBOL_GPL(pci_p2pdma_map_sg);
-+
-+/**
-+ * pci_p2pdma_enable_store - parse a configfs/sysfs attribute store
-+ *		to enable p2pdma
-+ * @page: contents of the value to be stored
-+ * @p2p_dev: returns the PCI device that was selected to be used
-+ *		(if 'auto', 'none or a boolean isn't the store value)
-+ * @use_p2pdma: returns whether to enable p2pdma or not
-+ *
-+ * Parses an attribute value to decide whether to enable p2pdma.
-+ * The value can select a PCI device (using it's full BDF device
-+ * name), a boolean, or 'auto'. 'auto' and a true boolean value
-+ * have the same meaning. A false value disables p2pdma and
-+ * a PCI device enables it to use a specific device as the
-+ * backing provider.
-+ *
-+ * pci_p2pdma_enable_show() should be used as the show operation for
-+ * the attribute.
-+ *
-+ * Returns 0 on success
-+ */
-+int pci_p2pdma_enable_store(const char *page, struct pci_dev **p2p_dev,
-+			    bool *use_p2pdma)
-+{
-+	struct device *dev;
-+
-+	dev = bus_find_device_by_name(&pci_bus_type, NULL, page);
-+	if (dev) {
-+		*use_p2pdma = true;
-+		*p2p_dev = to_pci_dev(dev);
-+
-+		if (!pci_has_p2pmem(*p2p_dev)) {
-+			pr_err("PCI device has no peer-to-peer memory: %s\n",
-+			       page);
-+			pci_dev_put(*p2p_dev);
-+			return -ENODEV;
-+		}
-+
-+		return 0;
-+	} else if (sysfs_streq(page, "auto")) {
-+		*use_p2pdma = true;
-+		return 0;
-+	} else if ((page[0] == '0' || page[0] == '1') && !iscntrl(page[1])) {
-+		/*
-+		 * If the user enters a PCI device that  doesn't exist
-+		 * like "0000:01:00.1", we don't want strtobool to think
-+		 * it's a '0' when it's clearly not what the user wanted.
-+		 * So we require 0's and 1's to be exactly one character.
-+		 */
-+	} else if (!strtobool(page, use_p2pdma)) {
-+		return 0;
-+	}
-+
-+	pr_err("No such PCI device: %.*s\n", (int)strcspn(page, "\n"), page);
-+	return -ENODEV;
-+}
-+EXPORT_SYMBOL_GPL(pci_p2pdma_enable_store);
-+
-+/**
-+ * pci_p2pdma_enable_show - show a configfs/sysfs attribute indicating
-+ *		whether p2pdma is enabled
-+ * @page: contents of the stored value
-+ * @p2p_dev: the selected p2p device (NULL if no device is selected)
-+ * @use_p2pdma: whether p2pdme has been enabled
-+ *
-+ * Attributes that use pci_p2pdma_enable_store() should use this function
-+ * to show the value of the attribute.
-+ *
-+ * Returns 0 on success
-+ */
-+ssize_t pci_p2pdma_enable_show(char *page, struct pci_dev *p2p_dev,
-+			       bool use_p2pdma)
-+{
-+	if (!use_p2pdma)
-+		return sprintf(page, "none\n");
-+
-+	if (!p2p_dev)
-+		return sprintf(page, "auto\n");
-+
-+	return sprintf(page, "%s\n", pci_name(p2p_dev));
-+}
-+EXPORT_SYMBOL_GPL(pci_p2pdma_enable_show);
-diff --git a/include/linux/pci-p2pdma.h b/include/linux/pci-p2pdma.h
-index 2f03dbbf5af6..377de4d73767 100644
---- a/include/linux/pci-p2pdma.h
-+++ b/include/linux/pci-p2pdma.h
-@@ -38,6 +38,10 @@ void pci_p2pmem_free_sgl(struct pci_dev *pdev, struct scatterlist *sgl);
- void pci_p2pmem_publish(struct pci_dev *pdev, bool publish);
- int pci_p2pdma_map_sg(struct device *dev, struct scatterlist *sg, int nents,
- 		      enum dma_data_direction dir);
-+int pci_p2pdma_enable_store(const char *page, struct pci_dev **p2p_dev,
-+			    bool *use_p2pdma);
-+ssize_t pci_p2pdma_enable_show(char *page, struct pci_dev *p2p_dev,
-+			       bool use_p2pdma);
- #else /* CONFIG_PCI_P2PDMA */
- static inline int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar,
- 		size_t size, u64 offset)
-@@ -105,5 +109,16 @@ static inline int pci_p2pdma_map_sg(struct device *dev,
+ 
+-#ifndef ARCH_BIOVEC_PHYS_MERGEABLE
+-#define ARCH_BIOVEC_PHYS_MERGEABLE(vec1, vec2) true
+-#endif
+-
+ static inline bool biovec_phys_mergeable(struct request_queue *q,
+ 		struct bio_vec *vec1, struct bio_vec *vec2)
  {
- 	return 0;
- }
-+static inline int pci_p2pdma_enable_store(const char *page,
-+		struct pci_dev **p2p_dev, bool *use_p2pdma)
-+{
-+	*use_p2pdma = false;
-+	return 0;
-+}
-+static inline ssize_t pci_p2pdma_enable_show(char *page,
-+		struct pci_dev *p2p_dev, bool use_p2pdma)
-+{
-+	return sprintf(page, "none\n");
-+}
- #endif /* CONFIG_PCI_P2PDMA */
- #endif /* _LINUX_PCI_P2P_H */
+@@ -162,7 +159,7 @@ static inline bool biovec_phys_mergeable(struct request_queue *q,
+ 
+ 	if (addr1 + vec1->bv_len != addr2)
+ 		return false;
+-	if (!ARCH_BIOVEC_PHYS_MERGEABLE(vec1, vec2))
++	if (xen_domain() && !xen_biovec_phys_mergeable(vec1, vec2))
+ 		return false;
+ 	if ((addr1 | mask) != ((addr2 + vec2->bv_len - 1) | mask))
+ 		return false;
+diff --git a/drivers/xen/biomerge.c b/drivers/xen/biomerge.c
+index 399c4e30f723..f3fbb700f569 100644
+--- a/drivers/xen/biomerge.c
++++ b/drivers/xen/biomerge.c
+@@ -1,7 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0
+ #include <linux/bio.h>
+-#include <linux/io.h>
+ #include <linux/export.h>
++#include <xen/xen.h>
+ #include <xen/page.h>
+ 
+ bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
 -- 
 2.19.0
