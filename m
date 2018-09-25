@@ -1,159 +1,83 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:37034 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727317AbeIRNen (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Sep 2018 09:34:43 -0400
-Received: by mail-ed1-f66.google.com with SMTP id a20-v6so1119274edd.4
-        for <linux-block@vger.kernel.org>; Tue, 18 Sep 2018 01:03:15 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 2/4] lightnvm: pblk: encapsulate rb pointer operations
-Date: Tue, 18 Sep 2018 10:03:03 +0200
-Message-Id: <1537257785-31630-3-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1537257785-31630-1-git-send-email-javier@cnexlabs.com>
-References: <1537257785-31630-1-git-send-email-javier@cnexlabs.com>
+Received: from mx2.suse.de ([195.135.220.15]:52414 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727309AbeIYOxj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Sep 2018 10:53:39 -0400
+Date: Tue, 25 Sep 2018 10:47:09 +0200
+From: Jan Kara <jack@suse.cz>
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Jan Kara <jack@suse.cz>,
+        syzbot
+        <syzbot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>
+Subject: Re: [PATCH] block/loop: Don't hold lock while rereading partition.
+Message-ID: <20180925084709.GD6567@quack2.suse.cz>
+References: <1537852203-3193-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1537852203-3193-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-pblk's read/write buffer is always a power-of-2, thus wrapping up the
-buffer can be done with a bit mask. Since this is an implementation
-detail internal to the write buffer, make a helper that hides pointer
-increment + wrap, and allows to  transparently relax this assumption in
-the future.
+On Tue 25-09-18 14:10:03, Tetsuo Handa wrote:
+> syzbot is reporting circular locking dependency between bdev->bd_mutex and
+> lo->lo_ctl_mutex [1] which is caused by calling blkdev_reread_part() with
+> lock held. Don't hold loop_ctl_mutex while calling blkdev_reread_part().
+> Also, bring bdgrab() at loop_set_fd() to before loop_reread_partitions()
+> in case loop_clr_fd() is called while blkdev_reread_part() from
+> loop_set_fd() is in progress.
+> 
+> [1] https://syzkaller.appspot.com/bug?id=bf154052f0eea4bc7712499e4569505907d15889
+> 
+> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+> Reported-by: syzbot <syzbot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-rb.c    | 21 +++++++++++++--------
- drivers/lightnvm/pblk-write.c |  7 ++-----
- drivers/lightnvm/pblk.h       |  2 ++
- 3 files changed, 17 insertions(+), 13 deletions(-)
+Thank you for splitting out this patch. Some comments below.
 
-diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
-index 82829e8151db..e46d8cb9d28b 100644
---- a/drivers/lightnvm/pblk-rb.c
-+++ b/drivers/lightnvm/pblk-rb.c
-@@ -169,6 +169,12 @@ static unsigned int pblk_rb_space(struct pblk_rb *rb)
- 	return pblk_rb_ring_space(rb, mem, sync, rb->nr_entries);
- }
- 
-+unsigned int pblk_rb_ptr_wrap(struct pblk_rb *rb, unsigned int p,
-+			      unsigned int nr_entries)
-+{
-+	return (p + nr_entries) & (rb->nr_entries - 1);
-+}
-+
- /*
-  * Buffer count is calculated with respect to the submission entry signaling the
-  * entries that are available to send to the media
-@@ -195,8 +201,7 @@ unsigned int pblk_rb_read_commit(struct pblk_rb *rb, unsigned int nr_entries)
- 
- 	subm = READ_ONCE(rb->subm);
- 	/* Commit read means updating submission pointer */
--	smp_store_release(&rb->subm,
--				(subm + nr_entries) & (rb->nr_entries - 1));
-+	smp_store_release(&rb->subm, pblk_rb_ptr_wrap(rb, subm, nr_entries));
- 
- 	return subm;
- }
-@@ -229,7 +234,7 @@ static int __pblk_rb_update_l2p(struct pblk_rb *rb, unsigned int to_update)
- 		line = pblk_ppa_to_line(pblk, w_ctx->ppa);
- 		kref_put(&line->ref, pblk_line_put);
- 		clean_wctx(w_ctx);
--		rb->l2p_update = (rb->l2p_update + 1) & (rb->nr_entries - 1);
-+		rb->l2p_update = pblk_rb_ptr_wrap(rb, rb->l2p_update, 1);
- 	}
- 
- 	pblk_rl_out(&pblk->rl, user_io, gc_io);
-@@ -408,7 +413,7 @@ static int pblk_rb_may_write(struct pblk_rb *rb, unsigned int nr_entries,
- 		return 0;
- 
- 	/* Protect from read count */
--	smp_store_release(&rb->mem, (*pos + nr_entries) & (rb->nr_entries - 1));
-+	smp_store_release(&rb->mem, pblk_rb_ptr_wrap(rb, *pos, nr_entries));
- 	return 1;
- }
- 
-@@ -432,7 +437,7 @@ static int pblk_rb_may_write_flush(struct pblk_rb *rb, unsigned int nr_entries,
- 	if (!__pblk_rb_may_write(rb, nr_entries, pos))
- 		return 0;
- 
--	mem = (*pos + nr_entries) & (rb->nr_entries - 1);
-+	mem = pblk_rb_ptr_wrap(rb, *pos, nr_entries);
- 	*io_ret = NVM_IO_DONE;
- 
- 	if (bio->bi_opf & REQ_PREFLUSH) {
-@@ -572,7 +577,7 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
- 		/* Release flags on context. Protect from writes */
- 		smp_store_release(&entry->w_ctx.flags, flags);
- 
--		pos = (pos + 1) & (rb->nr_entries - 1);
-+		pos = pblk_rb_ptr_wrap(rb, pos, 1);
- 	}
- 
- 	if (pad) {
-@@ -652,7 +657,7 @@ int pblk_rb_copy_to_bio(struct pblk_rb *rb, struct bio *bio, sector_t lba,
- 
- struct pblk_w_ctx *pblk_rb_w_ctx(struct pblk_rb *rb, unsigned int pos)
- {
--	unsigned int entry = pos & (rb->nr_entries - 1);
-+	unsigned int entry = pblk_rb_ptr_wrap(rb, pos, 0);
- 
- 	return &rb->entries[entry].w_ctx;
- }
-@@ -698,7 +703,7 @@ unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries)
- 		}
- 	}
- 
--	sync = (sync + nr_entries) & (rb->nr_entries - 1);
-+	sync = pblk_rb_ptr_wrap(rb, sync, nr_entries);
- 
- 	/* Protect from counts */
- 	smp_store_release(&rb->sync, sync);
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 277abc8633f7..fa8726493b39 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -140,12 +140,11 @@ static void pblk_prepare_resubmit(struct pblk *pblk, unsigned int sentry,
- 	struct pblk_w_ctx *w_ctx;
- 	struct ppa_addr ppa_l2p;
- 	int flags;
--	unsigned int pos, i;
-+	unsigned int i;
- 
- 	spin_lock(&pblk->trans_lock);
--	pos = sentry;
- 	for (i = 0; i < nr_entries; i++) {
--		entry = &rb->entries[pos];
-+		entry = &rb->entries[pblk_rb_ptr_wrap(rb, sentry, i)];
- 		w_ctx = &entry->w_ctx;
- 
- 		/* Check if the lba has been overwritten */
-@@ -164,8 +163,6 @@ static void pblk_prepare_resubmit(struct pblk *pblk, unsigned int sentry,
- 		 */
- 		line = pblk_ppa_to_line(pblk, w_ctx->ppa);
- 		kref_put(&line->ref, pblk_line_put);
--
--		pos = (pos + 1) & (rb->nr_entries - 1);
- 	}
- 	spin_unlock(&pblk->trans_lock);
- }
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index e70ece87a9f4..0ffc19cff697 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -760,6 +760,8 @@ unsigned int pblk_rb_read_commit(struct pblk_rb *rb, unsigned int entries);
- 
- unsigned int pblk_rb_sync_init(struct pblk_rb *rb, unsigned long *flags);
- unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries);
-+unsigned int pblk_rb_ptr_wrap(struct pblk_rb *rb, unsigned int p,
-+			      unsigned int nr_entries);
- void pblk_rb_sync_end(struct pblk_rb *rb, unsigned long *flags);
- unsigned int pblk_rb_flush_point_count(struct pblk_rb *rb);
- 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 920cbb1..877cca8 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -632,7 +632,12 @@ static void loop_reread_partitions(struct loop_device *lo,
+>  				   struct block_device *bdev)
+>  {
+>  	int rc;
+> +	char filename[LO_NAME_SIZE];
+> +	const int num = lo->lo_number;
+> +	const int count = atomic_read(&lo->lo_refcnt);
+>  
+> +	memcpy(filename, lo->lo_file_name, sizeof(filename));
+> +	mutex_unlock(&loop_ctl_mutex);
+>  	/*
+>  	 * bd_mutex has been held already in release path, so don't
+>  	 * acquire it if this function is called in such case.
+> @@ -641,13 +646,14 @@ static void loop_reread_partitions(struct loop_device *lo,
+>  	 * must be at least one and it can only become zero when the
+>  	 * current holder is released.
+>  	 */
+> -	if (!atomic_read(&lo->lo_refcnt))
+> +	if (!count)
+>  		rc = __blkdev_reread_part(bdev);
+>  	else
+>  		rc = blkdev_reread_part(bdev);
+> +	mutex_lock(&loop_ctl_mutex);
+>  	if (rc)
+>  		pr_warn("%s: partition scan of loop%d (%s) failed (rc=%d)\n",
+> -			__func__, lo->lo_number, lo->lo_file_name, rc);
+> +			__func__, num, filename, rc);
+>  }
+
+I still don't quite like this. It is non-trivial to argue that the
+temporary dropping of loop_ctl_mutex in loop_reread_partitions() is OK for
+all it's callers. I'm really strongly in favor of unlocking the mutex in
+the callers of loop_reread_partitions() and reorganizing the code there so
+that loop_reread_partitions() is called as late as possible so that it is
+clear that dropping the mutex is fine (and usually we don't even have to
+reacquire it). Plus your patch does not seem to take care of the possible
+races of loop_clr_fd() with LOOP_CTL_REMOVE? See my other mail for
+details...
+
+								Honza
 -- 
-2.7.4
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
