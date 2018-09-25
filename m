@@ -1,59 +1,79 @@
-Return-Path: <bart.vanassche@gmail.com>
-Return-Path: <bart.vanassche@gmail.com>
-Message-ID: <1537888485.11137.1.camel@acm.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga06.intel.com ([134.134.136.31]:27590 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729260AbeIYUqX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Sep 2018 16:46:23 -0400
+Date: Tue, 25 Sep 2018 08:39:16 -0600
+From: Keith Busch <keith.busch@intel.com>
+To: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Cc: Bart Van Assche <bvanassche@acm.org>,
+        Linux Block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
 Subject: Re: [PATCH] blk-mq: Allow blocking queue tag iter callbacks
-From: Bart Van Assche <bvanassche@acm.org>
-To: Keith Busch <keith.busch@intel.com>, "jianchao.wang"
-	 <jianchao.w.wang@oracle.com>
-Cc: Linux Block <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>
-Date: Tue, 25 Sep 2018 08:14:45 -0700
-In-Reply-To: <20180925143916.GB11657@localhost.localdomain>
+Message-ID: <20180925143916.GB11657@localhost.localdomain>
 References: <20180924210919.9995-1-keith.busch@intel.com>
-	 <45fc0cf9-92b2-2380-d11b-428613a470c2@oracle.com>
-	 <fc9d3a15-b136-478c-c35f-74a9a3479fb7@acm.org>
-	 <4de9e32b-18a0-bc37-1454-def9486fe3e0@oracle.com>
-	 <20180925143916.GB11657@localhost.localdomain>
-Content-Type: text/plain; charset="UTF-7"
-Mime-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+ <45fc0cf9-92b2-2380-d11b-428613a470c2@oracle.com>
+ <fc9d3a15-b136-478c-c35f-74a9a3479fb7@acm.org>
+ <4de9e32b-18a0-bc37-1454-def9486fe3e0@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <4de9e32b-18a0-bc37-1454-def9486fe3e0@oracle.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Tue, 2018-09-25 at 08:39 -0600, Keith Busch wrote:
-+AD4 On Tue, Sep 25, 2018 at 10:39:46AM +-0800, jianchao.wang wrote:
-+AD4 +AD4 But the issue is the left part of blk+AF8-mq+AF8-timeout+AF8-work is moved out of protection of q refcount.
-+AD4 
-+AD4 I'm not sure what you mean by +ACI-left part+ACI. The only part that isn't
-+AD4 outside the reference with this patch is the part Bart pointed out.
-+AD4 
-+AD4 This looks like it may be fixed by either moving the refcount back up a
-+AD4 level to all the callers of blk+AF8-mq+AF8-queue+AF8-tag+AF8-busy+AF8-iter, or add
-+AD4 cancel+AF8-work+AF8-sync(+ACY-q-+AD4-timeout+AF8-work) to +AF8AXw-blk+AF8-mq+AF8-update+AF8-nr+AF8-hw+AF8-queues after
-+AD4 the freeze.
+On Tue, Sep 25, 2018 at 10:39:46AM +0800, jianchao.wang wrote:
+> Hi Bart
+> 
+> On 09/25/2018 10:20 AM, Bart Van Assche wrote:
+> > On 9/24/18 7:11 PM, jianchao.wang wrote:
+> >> Hi Keith
+> >>
+> >> On 09/25/2018 05:09 AM, Keith Busch wrote:
+> >>> -��� /* A deadlock might occur if a request is stuck requiring a
+> >>> -���� * timeout at the same time a queue freeze is waiting
+> >>> -���� * completion, since the timeout code would not be able to
+> >>> -���� * acquire the queue reference here.
+> >>> -���� *
+> >>> -���� * That's why we don't use blk_queue_enter here; instead, we use
+> >>> -���� * percpu_ref_tryget directly, because we need to be able to
+> >>> -���� * obtain a reference even in the short window between the queue
+> >>> -���� * starting to freeze, by dropping the first reference in
+> >>> -���� * blk_freeze_queue_start, and the moment the last request is
+> >>> -���� * consumed, marked by the instant q_usage_counter reaches
+> >>> -���� * zero.
+> >>> -���� */
+> >>> -��� if (!percpu_ref_tryget(&q->q_usage_counter))
+> >>> +��� if (!blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &next))
+> >>> ��������� return;
+> >>
+> >> We cannot discard the percpu_ref_tryget here.
+> >>
+> >> There following code in blk_mq_timeout_work still need it:
+> >>
+> >> ����if (next != 0) {
+> >> ������� mod_timer(&q->timeout, next);
+> >> ����} else {
+> >> ������� queue_for_each_hw_ctx(q, hctx, i) {
+> >> ����������� /* the hctx may be unmapped, so check it here */
+> >> ����������� if (blk_mq_hw_queue_mapped(hctx))
+> >> ��������������� blk_mq_tag_idle(hctx);
+> >> ������� }
+> >> ����}
+> > 
+> > Hi Jianchao,
+> > 
+> > Had you noticed that the percpu_ref_tryget() call has been moved into
+> > blk_mq_queue_tag_busy_iter()?
+> > 
+> 
+> Yes.
+> 
+> But the issue is the left part of blk_mq_timeout_work is moved out of protection of q refcount.
 
-Hi Keith,
+I'm not sure what you mean by "left part". The only part that isn't
+outside the reference with this patch is the part Bart pointed out.
 
-How about applying the following (untested) patch on top of your patch?
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 019f9b169887..099e203b5213 100644
---- a/block/blk-mq.c
-+-+-+- b/block/blk-mq.c
-+AEAAQA -851,6 +-851,9 +AEAAQA static void blk+AF8-mq+AF8-timeout+AF8-work(struct work+AF8-struct +ACo-work)
- 	if (+ACE-blk+AF8-mq+AF8-queue+AF8-tag+AF8-busy+AF8-iter(q, blk+AF8-mq+AF8-check+AF8-expired, +ACY-next))
- 		return+ADs
- 
-+-	if (+ACE-percpu+AF8-ref+AF8-tryget(+ACY-q-+AD4-q+AF8-usage+AF8-counter))
-+-		return+ADs
-+-
- 	if (next +ACEAPQ 0) +AHs
- 		mod+AF8-timer(+ACY-q-+AD4-timeout, next)+ADs
- 	+AH0 else +AHs
-+AEAAQA -866,6 +-869,7 +AEAAQA static void blk+AF8-mq+AF8-timeout+AF8-work(struct work+AF8-struct +ACo-work)
- 				blk+AF8-mq+AF8-tag+AF8-idle(hctx)+ADs
- 		+AH0
- 	+AH0
-+-	blk+AF8-queue+AF8-exit(q)+ADs
- +AH0
-
-Thanks,
-
-Bart.
+This looks like it may be fixed by either moving the refcount back up a
+level to all the callers of blk_mq_queue_tag_busy_iter, or add
+cancel_work_sync(&q->timeout_work) to __blk_mq_update_nr_hw_queues after
+the freeze.
