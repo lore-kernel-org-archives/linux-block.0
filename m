@@ -1,85 +1,77 @@
-Return-Path: <penguin-kernel@i-love.sakura.ne.jp>
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        syzbot <syzbot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>
-Subject: [PATCH] block/loop: Don't hold lock while rereading partition.
-Date: Tue, 25 Sep 2018 14:10:03 +0900
-Message-Id: <1537852203-3193-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp>
+Return-Path: <willy@infradead.org>
+Date: Tue, 25 Sep 2018 14:04:18 -0700
+From: Matthew Wilcox <willy@infradead.org>
+To: Dave Chinner <david@fromorbit.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Christopher Lameter <cl@linux.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Ming Lei <tom.leiming@gmail.com>,
+	linux-block <linux-block@vger.kernel.org>,
+	linux-mm <linux-mm@kvack.org>,
+	Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+	"open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
+	Dave Chinner <dchinner@redhat.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: Re: block: DMA alignment of IO buffer allocated from slab
+Message-ID: <20180925210418.GA9854@bombadil.infradead.org>
+References: <CACVXFVOBq3L_EjSTCoiqUL1PH=HMR5EuNNQV0hNndFpGxmUK6g@mail.gmail.com>
+ <20180920063129.GB12913@lst.de>
+ <87h8ij0zot.fsf@vitty.brq.redhat.com>
+ <20180921130504.GA22551@lst.de>
+ <010001660c54fb65-b9d3a770-6678-40d0-8088-4db20af32280-000000@email.amazonses.com>
+ <1f88f59a-2cac-e899-4c2e-402e919b1034@kernel.dk>
+ <010001660cbd51ea-56e96208-564d-4f5d-a5fb-119a938762a9-000000@email.amazonses.com>
+ <1a5b255f-682e-783a-7f99-9d02e39c4af2@kernel.dk>
+ <20180925074910.GB31060@dastard>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180925074910.GB31060@dastard>
 List-ID: <linux-block@vger.kernel.org>
 
-syzbot is reporting circular locking dependency between bdev->bd_mutex and
-lo->lo_ctl_mutex [1] which is caused by calling blkdev_reread_part() with
-lock held. Don't hold loop_ctl_mutex while calling blkdev_reread_part().
-Also, bring bdgrab() at loop_set_fd() to before loop_reread_partitions()
-in case loop_clr_fd() is called while blkdev_reread_part() from
-loop_set_fd() is in progress.
+On Tue, Sep 25, 2018 at 05:49:10PM +1000, Dave Chinner wrote:
+> On Mon, Sep 24, 2018 at 12:09:37PM -0600, Jens Axboe wrote:
+> > On 9/24/18 12:00 PM, Christopher Lameter wrote:
+> > > On Mon, 24 Sep 2018, Jens Axboe wrote:
+> > > 
+> > >> The situation is making me a little uncomfortable, though. If we export
+> > >> such a setting, we really should be honoring it...
+> 
+> That's what I said up front, but you replied to this with:
+> 
+> | I think this is all crazy talk. We've never done this, [...]
+> 
+> Now I'm not sure what you are saying we should do....
+> 
+> > > Various subsystems create custom slab arrays with their particular
+> > > alignment requirement for these allocations.
+> > 
+> > Oh yeah, I think the solution is basic enough for XFS, for instance.
+> > They just have to error on the side of being cautious, by going full
+> > sector alignment for memory...
+> 
+> How does the filesystem find out about hardware alignment
+> requirements? Isn't probing through the block device to find out
+> about the request queue configurations considered a layering
+> violation?
+> 
+> What if sector alignment is not sufficient?  And how would this work
+> if we start supporting sector sizes larger than page size? (which the
+> XFS buffer cache supports just fine, even if nothing else in
+> Linux does).
 
-[1] https://syzkaller.appspot.com/bug?id=bf154052f0eea4bc7712499e4569505907d15889
+I've never quite understood the O_DIRECT sector size alignment
+restriction.  The sector size has literally nothing to do with the
+limitations of the controller that's doing the DMA.  OK, NVMe smooshes the
+two components into one, but back in the SCSI era, the DMA abilities were
+the HBA's responsibility and the sector size was a property of the LUN!
 
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Reported-by: syzbot <syzbot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>
----
- drivers/block/loop.c | 20 ++++++++++++++------
- 1 file changed, 14 insertions(+), 6 deletions(-)
+Heck, with a sufficiently advanced HBA (eg supporting scatterlists with
+bitbuckets), you could even ask for sub-sector-*sized* IOs.  Not terribly
+useful since the bytes still had to be transferred over the SCSI cable,
+but you'd save transferring them across the PCI bus.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 920cbb1..877cca8 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -632,7 +632,12 @@ static void loop_reread_partitions(struct loop_device *lo,
- 				   struct block_device *bdev)
- {
- 	int rc;
-+	char filename[LO_NAME_SIZE];
-+	const int num = lo->lo_number;
-+	const int count = atomic_read(&lo->lo_refcnt);
- 
-+	memcpy(filename, lo->lo_file_name, sizeof(filename));
-+	mutex_unlock(&loop_ctl_mutex);
- 	/*
- 	 * bd_mutex has been held already in release path, so don't
- 	 * acquire it if this function is called in such case.
-@@ -641,13 +646,14 @@ static void loop_reread_partitions(struct loop_device *lo,
- 	 * must be at least one and it can only become zero when the
- 	 * current holder is released.
- 	 */
--	if (!atomic_read(&lo->lo_refcnt))
-+	if (!count)
- 		rc = __blkdev_reread_part(bdev);
- 	else
- 		rc = blkdev_reread_part(bdev);
-+	mutex_lock(&loop_ctl_mutex);
- 	if (rc)
- 		pr_warn("%s: partition scan of loop%d (%s) failed (rc=%d)\n",
--			__func__, lo->lo_number, lo->lo_file_name, rc);
-+			__func__, num, filename, rc);
- }
- 
- static inline int is_loop_device(struct file *file)
-@@ -971,16 +977,18 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	set_blocksize(bdev, S_ISBLK(inode->i_mode) ?
- 		      block_size(inode->i_bdev) : PAGE_SIZE);
- 
-+	/*
-+	 * Grab the block_device to prevent its destruction after we
-+	 * put /dev/loopXX inode. Later in loop_clr_fd() we bdput(bdev).
-+	 */
-+	bdgrab(bdev);
-+
- 	lo->lo_state = Lo_bound;
- 	if (part_shift)
- 		lo->lo_flags |= LO_FLAGS_PARTSCAN;
- 	if (lo->lo_flags & LO_FLAGS_PARTSCAN)
- 		loop_reread_partitions(lo, bdev);
- 
--	/* Grab the block_device to prevent its destruction after we
--	 * put /dev/loopXX inode. Later in loop_clr_fd() we bdput(bdev).
--	 */
--	bdgrab(bdev);
- 	return 0;
- 
-  out_putf:
--- 
-1.8.3.1
+Anyway, why would we require *larger* than 512 byte alignment for
+in-kernel users?  I doubt there are any remaining HBAs that can't do
+8-byte aligned I/Os (for the record, NVMe requires controllers to be
+able to do 4-byte aligned I/Os).
