@@ -1,95 +1,36 @@
-Return-Path: <bvanassche@acm.org>
+Return-Path: <bart.vanassche@gmail.com>
+Return-Path: <bart.vanassche@gmail.com>
+Message-ID: <1537987695.209118.2.camel@acm.org>
+Subject: Re: [PATCH v10 5/8] percpu-refcount: Introduce
+ percpu_ref_resurrect()
 From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v11 5/8] percpu-refcount: Introduce percpu_ref_resurrect()
-Date: Wed, 26 Sep 2018 14:01:07 -0700
-Message-Id: <20180926210110.20362-6-bvanassche@acm.org>
-In-Reply-To: <20180926210110.20362-1-bvanassche@acm.org>
-References: <20180926210110.20362-1-bvanassche@acm.org>
-MIME-Version: 1.0
+To: Tejun Heo <tj@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, Christoph
+ Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>, Jianchao Wang
+ <jianchao.w.wang@oracle.com>,  Hannes Reinecke <hare@suse.com>, Johannes
+ Thumshirn <jthumshirn@suse.de>
+Date: Wed, 26 Sep 2018 11:48:15 -0700
+In-Reply-To: <20180926165954.GH1297799@devbig004.ftw2.facebook.com>
+References: <20180921203122.49743-1-bvanassche@acm.org>
+	 <20180921203122.49743-6-bvanassche@acm.org>
+	 <20180924180117.GG1297799@devbig004.ftw2.facebook.com>
+	 <1537821815.195115.26.camel@acm.org>
+	 <20180926165954.GH1297799@devbig004.ftw2.facebook.com>
+Content-Type: text/plain; charset="UTF-7"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-This function will be used in a later patch to switch the struct
-request_queue q_usage_counter from killed back to live. In contrast
-to percpu_ref_reinit(), this new function does not require that the
-refcount is zero.
+On Wed, 2018-09-26 at 09:59 -0700, Tejun Heo wrote:
++AD4 Hello, Bart.
++AD4 
++AD4 On Mon, Sep 24, 2018 at 01:43:35PM -0700, Bart Van Assche wrote:
++AD4 +AD4 Thanks for the review. But could you please clarify what +ACI-after -+AD4-percpu+AF8-ref
++AD4 +AD4 is called+ACI refers to?
++AD4 
++AD4 Oops, sorry, I meant the confirm+AF8-kill callback of
++AD4 percpu+AF8-ref+AF8-kill+AF8-and+AF8-confirm().
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-Acked-by: Tejun Heo <tj@kernel.org>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- include/linux/percpu-refcount.h |  1 +
- lib/percpu-refcount.c           | 28 ++++++++++++++++++++++++++--
- 2 files changed, 27 insertions(+), 2 deletions(-)
+Thanks for the clarification. I will update the comment above
+percpu+AF8-ref+AF8-resurrect().
 
-diff --git a/include/linux/percpu-refcount.h b/include/linux/percpu-refcount.h
-index 009cdf3d65b6..b297cd1cd4f1 100644
---- a/include/linux/percpu-refcount.h
-+++ b/include/linux/percpu-refcount.h
-@@ -108,6 +108,7 @@ void percpu_ref_switch_to_atomic_sync(struct percpu_ref *ref);
- void percpu_ref_switch_to_percpu(struct percpu_ref *ref);
- void percpu_ref_kill_and_confirm(struct percpu_ref *ref,
- 				 percpu_ref_func_t *confirm_kill);
-+void percpu_ref_resurrect(struct percpu_ref *ref);
- void percpu_ref_reinit(struct percpu_ref *ref);
- 
- /**
-diff --git a/lib/percpu-refcount.c b/lib/percpu-refcount.c
-index 9f96fa7bc000..de10b8c0bff6 100644
---- a/lib/percpu-refcount.c
-+++ b/lib/percpu-refcount.c
-@@ -356,11 +356,35 @@ EXPORT_SYMBOL_GPL(percpu_ref_kill_and_confirm);
-  */
- void percpu_ref_reinit(struct percpu_ref *ref)
- {
-+	WARN_ON_ONCE(!percpu_ref_is_zero(ref));
-+
-+	percpu_ref_resurrect(ref);
-+}
-+EXPORT_SYMBOL_GPL(percpu_ref_reinit);
-+
-+/**
-+ * percpu_ref_resurrect - modify a percpu refcount from dead to live
-+ * @ref: perpcu_ref to resurrect
-+ *
-+ * Modify @ref so that it's in the same state as before percpu_ref_kill() was
-+ * called. @ref must be dead but must not yet have exited.
-+ *
-+ * If @ref->release() frees @ref then the caller is responsible for
-+ * guaranteeing that @ref->release() does not get called while this
-+ * function is in progress.
-+ *
-+ * Note that percpu_ref_tryget[_live]() are safe to perform on @ref while
-+ * this function is in progress.
-+ */
-+void percpu_ref_resurrect(struct percpu_ref *ref)
-+{
-+	unsigned long __percpu *percpu_count;
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(&percpu_ref_switch_lock, flags);
- 
--	WARN_ON_ONCE(!percpu_ref_is_zero(ref));
-+	WARN_ON_ONCE(!(ref->percpu_count_ptr & __PERCPU_REF_DEAD));
-+	WARN_ON_ONCE(__ref_is_percpu(ref, &percpu_count));
- 
- 	ref->percpu_count_ptr &= ~__PERCPU_REF_DEAD;
- 	percpu_ref_get(ref);
-@@ -368,4 +392,4 @@ void percpu_ref_reinit(struct percpu_ref *ref)
- 
- 	spin_unlock_irqrestore(&percpu_ref_switch_lock, flags);
- }
--EXPORT_SYMBOL_GPL(percpu_ref_reinit);
-+EXPORT_SYMBOL_GPL(percpu_ref_resurrect);
--- 
-2.19.0.605.g01d371f741-goog
+Bart.
