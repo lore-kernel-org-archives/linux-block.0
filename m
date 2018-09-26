@@ -1,68 +1,95 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk, tj@kernel.org, kent.overstreet@gmail.com,
-        ming.lei@redhat.com, bart.vanassche@wdc.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] percpu_ref: add a new helper interface __percpu_ref_get_many
-Date: Thu, 20 Sep 2018 18:18:21 +0800
-Message-Id: <1537438703-25217-2-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1537438703-25217-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1537438703-25217-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <bvanassche@acm.org>
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v11 5/8] percpu-refcount: Introduce percpu_ref_resurrect()
+Date: Wed, 26 Sep 2018 14:01:07 -0700
+Message-Id: <20180926210110.20362-6-bvanassche@acm.org>
+In-Reply-To: <20180926210110.20362-1-bvanassche@acm.org>
+References: <20180926210110.20362-1-bvanassche@acm.org>
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-This __percpu_ref_get_many is almost same with the percpu_ref_get_many,
-except for the caller need to provide a sched rcu critical section
-for it. We want to do some other condition checking under the sched
-rcu lock. With this interface, one extra rcu_read_lock/unlock_sched
-could be saved.
+This function will be used in a later patch to switch the struct
+request_queue q_usage_counter from killed back to live. In contrast
+to percpu_ref_reinit(), this new function does not require that the
+refcount is zero.
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Acked-by: Tejun Heo <tj@kernel.org>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- include/linux/percpu-refcount.h | 23 +++++++++++++++++------
- 1 file changed, 17 insertions(+), 6 deletions(-)
+ include/linux/percpu-refcount.h |  1 +
+ lib/percpu-refcount.c           | 28 ++++++++++++++++++++++++++--
+ 2 files changed, 27 insertions(+), 2 deletions(-)
 
 diff --git a/include/linux/percpu-refcount.h b/include/linux/percpu-refcount.h
-index 009cdf3..b86e03b 100644
+index 009cdf3d65b6..b297cd1cd4f1 100644
 --- a/include/linux/percpu-refcount.h
 +++ b/include/linux/percpu-refcount.h
-@@ -169,21 +169,32 @@ static inline bool __ref_is_percpu(struct percpu_ref *ref,
-  * @ref: percpu_ref to get
-  * @nr: number of references to get
-  *
-- * Analogous to atomic_long_add().
-- *
-- * This function is safe to call as long as @ref is between init and exit.
-+ * This function is same with percpu_ref_get_many except for the caller need to
-+ * provide a sched rcu critical section for it.
+@@ -108,6 +108,7 @@ void percpu_ref_switch_to_atomic_sync(struct percpu_ref *ref);
+ void percpu_ref_switch_to_percpu(struct percpu_ref *ref);
+ void percpu_ref_kill_and_confirm(struct percpu_ref *ref,
+ 				 percpu_ref_func_t *confirm_kill);
++void percpu_ref_resurrect(struct percpu_ref *ref);
+ void percpu_ref_reinit(struct percpu_ref *ref);
+ 
+ /**
+diff --git a/lib/percpu-refcount.c b/lib/percpu-refcount.c
+index 9f96fa7bc000..de10b8c0bff6 100644
+--- a/lib/percpu-refcount.c
++++ b/lib/percpu-refcount.c
+@@ -356,11 +356,35 @@ EXPORT_SYMBOL_GPL(percpu_ref_kill_and_confirm);
   */
--static inline void percpu_ref_get_many(struct percpu_ref *ref, unsigned long nr)
-+static inline void __percpu_ref_get_many(struct percpu_ref *ref, unsigned long nr)
+ void percpu_ref_reinit(struct percpu_ref *ref)
  {
- 	unsigned long __percpu *percpu_count;
- 
--	rcu_read_lock_sched();
--
- 	if (__ref_is_percpu(ref, &percpu_count))
- 		this_cpu_add(*percpu_count, nr);
- 	else
- 		atomic_long_add(nr, &ref->count);
++	WARN_ON_ONCE(!percpu_ref_is_zero(ref));
++
++	percpu_ref_resurrect(ref);
 +}
- 
++EXPORT_SYMBOL_GPL(percpu_ref_reinit);
++
 +/**
-+ * percpu_ref_get_many - increment a percpu refcount
-+ * @ref: percpu_ref to get
-+ * @nr: number of references to get
++ * percpu_ref_resurrect - modify a percpu refcount from dead to live
++ * @ref: perpcu_ref to resurrect
 + *
-+ * Analogous to atomic_long_add().
++ * Modify @ref so that it's in the same state as before percpu_ref_kill() was
++ * called. @ref must be dead but must not yet have exited.
 + *
-+ * This function is safe to call as long as @ref is between init and exit.
++ * If @ref->release() frees @ref then the caller is responsible for
++ * guaranteeing that @ref->release() does not get called while this
++ * function is in progress.
++ *
++ * Note that percpu_ref_tryget[_live]() are safe to perform on @ref while
++ * this function is in progress.
 + */
-+static inline void percpu_ref_get_many(struct percpu_ref *ref, unsigned long nr)
++void percpu_ref_resurrect(struct percpu_ref *ref)
 +{
-+	rcu_read_lock_sched();
-+	__percpu_ref_get_many(ref, nr);
- 	rcu_read_unlock_sched();
- }
++	unsigned long __percpu *percpu_count;
+ 	unsigned long flags;
  
+ 	spin_lock_irqsave(&percpu_ref_switch_lock, flags);
+ 
+-	WARN_ON_ONCE(!percpu_ref_is_zero(ref));
++	WARN_ON_ONCE(!(ref->percpu_count_ptr & __PERCPU_REF_DEAD));
++	WARN_ON_ONCE(__ref_is_percpu(ref, &percpu_count));
+ 
+ 	ref->percpu_count_ptr &= ~__PERCPU_REF_DEAD;
+ 	percpu_ref_get(ref);
+@@ -368,4 +392,4 @@ void percpu_ref_reinit(struct percpu_ref *ref)
+ 
+ 	spin_unlock_irqrestore(&percpu_ref_switch_lock, flags);
+ }
+-EXPORT_SYMBOL_GPL(percpu_ref_reinit);
++EXPORT_SYMBOL_GPL(percpu_ref_resurrect);
 -- 
-2.7.4
+2.19.0.605.g01d371f741-goog
