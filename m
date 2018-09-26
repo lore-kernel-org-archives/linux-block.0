@@ -1,63 +1,184 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Thu, 27 Sep 2018 08:54:35 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH v10 7/8] block: Make blk_get_request() block for non-PM
- requests while suspended
-Message-ID: <20180927065435.GA6959@linux-x5ow.site>
-References: <20180921203122.49743-1-bvanassche@acm.org>
- <20180921203122.49743-8-bvanassche@acm.org>
- <20180926142740.GE8604@lst.de>
- <20180926144357.GC13588@linux-x5ow.site>
- <20180926145732.GA9446@lst.de>
- <20180926150634.GD13588@linux-x5ow.site>
- <1537986295.209118.0.camel@acm.org>
+Return-Path: <bvanassche@acm.org>
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Alan Stern <stern@rowland.harvard.edu>
+Subject: [PATCH v11 7/8] block: Make blk_get_request() block for non-PM requests while suspended
+Date: Wed, 26 Sep 2018 14:01:09 -0700
+Message-Id: <20180926210110.20362-8-bvanassche@acm.org>
+In-Reply-To: <20180926210110.20362-1-bvanassche@acm.org>
+References: <20180926210110.20362-1-bvanassche@acm.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1537986295.209118.0.camel@acm.org>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Sep 26, 2018 at 11:24:55AM -0700, Bart Van Assche wrote:
-> On Wed, 2018-09-26 at 17:06 +0200, Johannes Thumshirn wrote:
-> > On Wed, Sep 26, 2018 at 04:57:32PM +0200, Christoph Hellwig wrote:
-> > > I don't think this actually works given that rpm_status only exists
-> > > if CONFIG_PM is set.
-> > 
-> > I think it'll work as GCC does constant propagation. There are
-> > actually some places in the kernel that follow this pattern.
-> 
-> This is what gcc on my development system thinks about that proposal:
-> 
-> In file included from ./arch/x86/include/asm/bug.h:83:0,
->                  from ./include/linux/bug.h:5,
->                  from ./include/linux/thread_info.h:12,
->                  from ./arch/x86/include/asm/preempt.h:7,
->                  from ./include/linux/preempt.h:81,
->                  from ./include/linux/spinlock.h:51,
->                  from ./include/linux/seqlock.h:36,
->                  from ./include/linux/time.h:6,
->                  from ./include/linux/stat.h:19,
->                  from ./include/linux/module.h:10,
->                  from block/blk-core.c:15:
-> block/blk-core.c: In function ‘elv_next_request’:
-> block/blk-core.c:2795:44: error: ‘struct request_queue’ has no member named ‘rpm_status’; did you mean ‘stats’?
->                             WARN_ON_ONCE(q->rpm_status == RPM_SUSPENDED);
->                                             ^
-> ./include/asm-generic/bug.h:69:25: note: in definition of macro ‘WARN_ON_ONCE’
->   int __ret_warn_on = !!(condition);   \
->                          ^~~~~~~~~
-> scripts/Makefile.build:305: recipe for target 'block/blk-core.o' failed
+Instead of allowing requests that are not power management requests
+to enter the queue in runtime suspended status (RPM_SUSPENDED), make
+the blk_get_request() caller block. This change fixes a starvation
+issue: it is now guaranteed that power management requests will be
+executed no matter how many blk_get_request() callers are waiting.
+For blk-mq, instead of maintaining the q->nr_pending counter, rely
+on q->q_usage_counter. Call pm_runtime_mark_last_busy() every time a
+request finishes instead of only if the queue depth drops to zero.
 
-Aparently this only works for functions and not struct members, my
-bad.
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Alan Stern <stern@rowland.harvard.edu>
+---
+ block/blk-core.c | 37 ++++++++-----------------------------
+ block/blk-pm.c   | 44 +++++++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 47 insertions(+), 34 deletions(-)
 
-	Johannes
+diff --git a/block/blk-core.c b/block/blk-core.c
+index fec135ae52cf..16dd3a989753 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2746,30 +2746,6 @@ void blk_account_io_done(struct request *req, u64 now)
+ 	}
+ }
+ 
+-#ifdef CONFIG_PM
+-/*
+- * Don't process normal requests when queue is suspended
+- * or in the process of suspending/resuming
+- */
+-static bool blk_pm_allow_request(struct request *rq)
+-{
+-	switch (rq->q->rpm_status) {
+-	case RPM_RESUMING:
+-	case RPM_SUSPENDING:
+-		return rq->rq_flags & RQF_PM;
+-	case RPM_SUSPENDED:
+-		return false;
+-	default:
+-		return true;
+-	}
+-}
+-#else
+-static bool blk_pm_allow_request(struct request *rq)
+-{
+-	return true;
+-}
+-#endif
+-
+ void blk_account_io_start(struct request *rq, bool new_io)
+ {
+ 	struct hd_struct *part;
+@@ -2815,11 +2791,14 @@ static struct request *elv_next_request(struct request_queue *q)
+ 
+ 	while (1) {
+ 		list_for_each_entry(rq, &q->queue_head, queuelist) {
+-			if (blk_pm_allow_request(rq))
+-				return rq;
+-
+-			if (rq->rq_flags & RQF_SOFTBARRIER)
+-				break;
++#ifdef CONFIG_PM
++			/*
++			 * If a request gets queued in state RPM_SUSPENDED
++			 * then that's a kernel bug.
++			 */
++			WARN_ON_ONCE(q->rpm_status == RPM_SUSPENDED);
++#endif
++			return rq;
+ 		}
+ 
+ 		/*
+diff --git a/block/blk-pm.c b/block/blk-pm.c
+index 9b636960d285..972fbc656846 100644
+--- a/block/blk-pm.c
++++ b/block/blk-pm.c
+@@ -1,8 +1,11 @@
+ // SPDX-License-Identifier: GPL-2.0
+ 
++#include <linux/blk-mq.h>
+ #include <linux/blk-pm.h>
+ #include <linux/blkdev.h>
+ #include <linux/pm_runtime.h>
++#include "blk-mq.h"
++#include "blk-mq-tag.h"
+ 
+ /**
+  * blk_pm_runtime_init - Block layer runtime PM initialization routine
+@@ -68,14 +71,40 @@ int blk_pre_runtime_suspend(struct request_queue *q)
+ 	if (!q->dev)
+ 		return ret;
+ 
++	WARN_ON_ONCE(q->rpm_status != RPM_ACTIVE);
++
++	/*
++	 * Increase the pm_only counter before checking whether any
++	 * non-PM blk_queue_enter() calls are in progress to avoid that any
++	 * new non-PM blk_queue_enter() calls succeed before the pm_only
++	 * counter is decreased again.
++	 */
++	blk_set_pm_only(q);
++	ret = -EBUSY;
++	/* Switch q_usage_counter from per-cpu to atomic mode. */
++	blk_freeze_queue_start(q);
++	/*
++	 * Wait until atomic mode has been reached. Since that
++	 * involves calling call_rcu(), it is guaranteed that later
++	 * blk_queue_enter() calls see the pm-only state. See also
++	 * http://lwn.net/Articles/573497/.
++	 */
++	percpu_ref_switch_to_atomic_sync(&q->q_usage_counter);
++	if (percpu_ref_is_zero(&q->q_usage_counter))
++		ret = 0;
++	/* Switch q_usage_counter back to per-cpu mode. */
++	blk_mq_unfreeze_queue(q);
++
+ 	spin_lock_irq(q->queue_lock);
+-	if (q->nr_pending) {
+-		ret = -EBUSY;
++	if (ret < 0)
+ 		pm_runtime_mark_last_busy(q->dev);
+-	} else {
++	else
+ 		q->rpm_status = RPM_SUSPENDING;
+-	}
+ 	spin_unlock_irq(q->queue_lock);
++
++	if (ret)
++		blk_clear_pm_only(q);
++
+ 	return ret;
+ }
+ EXPORT_SYMBOL(blk_pre_runtime_suspend);
+@@ -106,6 +135,9 @@ void blk_post_runtime_suspend(struct request_queue *q, int err)
+ 		pm_runtime_mark_last_busy(q->dev);
+ 	}
+ 	spin_unlock_irq(q->queue_lock);
++
++	if (err)
++		blk_clear_pm_only(q);
+ }
+ EXPORT_SYMBOL(blk_post_runtime_suspend);
+ 
+@@ -153,13 +185,15 @@ void blk_post_runtime_resume(struct request_queue *q, int err)
+ 	spin_lock_irq(q->queue_lock);
+ 	if (!err) {
+ 		q->rpm_status = RPM_ACTIVE;
+-		__blk_run_queue(q);
+ 		pm_runtime_mark_last_busy(q->dev);
+ 		pm_request_autosuspend(q->dev);
+ 	} else {
+ 		q->rpm_status = RPM_SUSPENDED;
+ 	}
+ 	spin_unlock_irq(q->queue_lock);
++
++	if (!err)
++		blk_clear_pm_only(q);
+ }
+ EXPORT_SYMBOL(blk_post_runtime_resume);
+ 
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.19.0.605.g01d371f741-goog
