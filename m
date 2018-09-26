@@ -1,85 +1,48 @@
-Return-Path: <BATV+97b555f176c451e34851+5490+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
+Return-Path: <bvanassche@acm.org>
+From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	linux-block@vger.kernel.org,
-	xen-devel@lists.xen.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 03/13] xen: provide a prototype for xen_biovec_phys_mergeable in xen.h
-Date: Tue,  4 Sep 2018 12:14:21 -0700
-Message-Id: <20180904191431.20102-4-hch@lst.de>
-In-Reply-To: <20180904191431.20102-1-hch@lst.de>
-References: <20180904191431.20102-1-hch@lst.de>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v11 6/8] block: Allow unfreezing of a queue while requests are in progress
+Date: Wed, 26 Sep 2018 14:01:08 -0700
+Message-Id: <20180926210110.20362-7-bvanassche@acm.org>
+In-Reply-To: <20180926210110.20362-1-bvanassche@acm.org>
+References: <20180926210110.20362-1-bvanassche@acm.org>
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Having multiple externs in arch headers is not a good way to provide
-a common interface.
+A later patch will call blk_freeze_queue_start() followed by
+blk_mq_unfreeze_queue() without waiting for q_usage_counter to drop
+to zero. Make sure that this doesn't cause a kernel warning to appear
+by switching from percpu_ref_reinit() to percpu_ref_resurrect(). The
+former namely requires that the refcount it operates on is zero.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- arch/arm/include/asm/io.h   | 3 ---
- arch/arm64/include/asm/io.h | 3 ---
- arch/x86/include/asm/io.h   | 5 -----
- include/xen/xen.h           | 4 ++++
- 4 files changed, 4 insertions(+), 11 deletions(-)
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm/include/asm/io.h b/arch/arm/include/asm/io.h
-index 6774553dc214..9855a4d48956 100644
---- a/arch/arm/include/asm/io.h
-+++ b/arch/arm/include/asm/io.h
-@@ -459,9 +459,6 @@ extern void pci_iounmap(struct pci_dev *dev, void __iomem *addr);
- 
- #include <asm-generic/io.h>
- 
--struct bio_vec;
--extern bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
--				      const struct bio_vec *vec2);
- #define BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
- 	(__BIOVEC_PHYS_MERGEABLE(vec1, vec2) &&				\
- 	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2)))
-diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
-index 35b2e50f17fb..9bc620c44d32 100644
---- a/arch/arm64/include/asm/io.h
-+++ b/arch/arm64/include/asm/io.h
-@@ -205,9 +205,6 @@ extern int valid_mmap_phys_addr_range(unsigned long pfn, size_t size);
- 
- extern int devmem_is_allowed(unsigned long pfn);
- 
--struct bio_vec;
--extern bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
--				      const struct bio_vec *vec2);
- #define BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
- 	(__BIOVEC_PHYS_MERGEABLE(vec1, vec2) &&				\
- 	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2)))
-diff --git a/arch/x86/include/asm/io.h b/arch/x86/include/asm/io.h
-index 6de64840dd22..193dae6d9c45 100644
---- a/arch/x86/include/asm/io.h
-+++ b/arch/x86/include/asm/io.h
-@@ -371,11 +371,6 @@ extern bool is_early_ioremap_ptep(pte_t *ptep);
- 
- #ifdef CONFIG_XEN
- #include <xen/xen.h>
--struct bio_vec;
--
--extern bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
--				      const struct bio_vec *vec2);
--
- #define BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
- 	(__BIOVEC_PHYS_MERGEABLE(vec1, vec2) &&				\
- 	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2)))
-diff --git a/include/xen/xen.h b/include/xen/xen.h
-index 1e1d9bd0bd37..d7a2678da77f 100644
---- a/include/xen/xen.h
-+++ b/include/xen/xen.h
-@@ -39,4 +39,8 @@ extern uint32_t xen_start_flags;
- #define xen_initial_domain()	(0)
- #endif	/* CONFIG_XEN_DOM0 */
- 
-+struct bio_vec;
-+bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
-+		const struct bio_vec *vec2);
-+
- #endif	/* _XEN_XEN_H */
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 85a1c1a59c72..96d501e8663c 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -198,7 +198,7 @@ void blk_mq_unfreeze_queue(struct request_queue *q)
+ 	freeze_depth = atomic_dec_return(&q->mq_freeze_depth);
+ 	WARN_ON_ONCE(freeze_depth < 0);
+ 	if (!freeze_depth) {
+-		percpu_ref_reinit(&q->q_usage_counter);
++		percpu_ref_resurrect(&q->q_usage_counter);
+ 		wake_up_all(&q->mq_freeze_wq);
+ 	}
+ }
 -- 
-2.18.0
+2.19.0.605.g01d371f741-goog
