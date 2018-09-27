@@ -1,109 +1,61 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:58492 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728512AbeI0XNr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Sep 2018 19:13:47 -0400
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Vinod Koul <vinod.koul@intel.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Thierry Reding <treding@nvidia.com>,
-        Sanyog Kale <sanyog.r.kale@intel.com>,
-        Sagar Dharia <sdharia@codeaurora.org>
-Date: Thu, 27 Sep 2018 10:54:12 -0600
-Message-Id: <20180927165420.5290-6-logang@deltatee.com>
-In-Reply-To: <20180927165420.5290-1-logang@deltatee.com>
-References: <20180927165420.5290-1-logang@deltatee.com>
-MIME-Version: 1.0
-Subject: [PATCH v8 05/13] docs-rst: Add a new directory for PCI documentation
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 01/14] block/loop: Don't grab "struct file" for vfs_getattr() operation.
+Date: Thu, 27 Sep 2018 13:36:39 +0200
+Message-Id: <20180927113652.5422-2-jack@suse.cz>
+In-Reply-To: <20180927113652.5422-1-jack@suse.cz>
+References: <20180927113652.5422-1-jack@suse.cz>
+List-ID: <linux-block@vger.kernel.org>
 
-Add a new directory in the driver API guide for PCI specific
-documentation.
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 
-This is in preparation for adding a new PCI P2P DMA driver writers
-guide which will go in this directory.
+vfs_getattr() needs "struct path" rather than "struct file".
+Let's use path_get()/path_put() rather than get_file()/fput().
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Vinod Koul <vinod.koul@intel.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>
-Cc: Logan Gunthorpe <logang@deltatee.com>
-Cc: Thierry Reding <treding@nvidia.com>
-Cc: Sanyog Kale <sanyog.r.kale@intel.com>
-Cc: Sagar Dharia <sdharia@codeaurora.org>
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- Documentation/driver-api/index.rst         |  2 +-
- Documentation/driver-api/pci/index.rst     | 20 ++++++++++++++++++++
- Documentation/driver-api/{ => pci}/pci.rst |  0
- 3 files changed, 21 insertions(+), 1 deletion(-)
- create mode 100644 Documentation/driver-api/pci/index.rst
- rename Documentation/driver-api/{ => pci}/pci.rst (100%)
+ drivers/block/loop.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/driver-api/index.rst b/Documentation/driver-api/index.rst
-index 6d9f2f9fe20e..e9e7d24169cf 100644
---- a/Documentation/driver-api/index.rst
-+++ b/Documentation/driver-api/index.rst
-@@ -29,7 +29,7 @@ available subsections can be seen below.
-    iio/index
-    input
-    usb/index
--   pci
-+   pci/index
-    spi
-    i2c
-    hsi
-diff --git a/Documentation/driver-api/pci/index.rst b/Documentation/driver-api/pci/index.rst
-new file mode 100644
-index 000000000000..eaf20b24bf7d
---- /dev/null
-+++ b/Documentation/driver-api/pci/index.rst
-@@ -0,0 +1,20 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+============================================
-+The Linux PCI driver implementer's API guide
-+============================================
-+
-+.. class:: toc-title
-+
-+	   Table of contents
-+
-+.. toctree::
-+   :maxdepth: 2
-+
-+   pci
-+
-+.. only::  subproject and html
-+
-+   Indices
-+   =======
-+
-+   * :ref:`genindex`
-diff --git a/Documentation/driver-api/pci.rst b/Documentation/driver-api/pci/pci.rst
-similarity index 100%
-rename from Documentation/driver-api/pci.rst
-rename to Documentation/driver-api/pci/pci.rst
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index ea9debf59b22..50c81ff44ae2 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1205,7 +1205,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ static int
+ loop_get_status(struct loop_device *lo, struct loop_info64 *info)
+ {
+-	struct file *file;
++	struct path path;
+ 	struct kstat stat;
+ 	int ret;
+ 
+@@ -1230,16 +1230,16 @@ loop_get_status(struct loop_device *lo, struct loop_info64 *info)
+ 	}
+ 
+ 	/* Drop lo_ctl_mutex while we call into the filesystem. */
+-	file = get_file(lo->lo_backing_file);
++	path = lo->lo_backing_file->f_path;
++	path_get(&path);
+ 	mutex_unlock(&lo->lo_ctl_mutex);
+-	ret = vfs_getattr(&file->f_path, &stat, STATX_INO,
+-			  AT_STATX_SYNC_AS_STAT);
++	ret = vfs_getattr(&path, &stat, STATX_INO, AT_STATX_SYNC_AS_STAT);
+ 	if (!ret) {
+ 		info->lo_device = huge_encode_dev(stat.dev);
+ 		info->lo_inode = stat.ino;
+ 		info->lo_rdevice = huge_encode_dev(stat.rdev);
+ 	}
+-	fput(file);
++	path_put(&path);
+ 	return ret;
+ }
+ 
 -- 
-2.19.0
+2.16.4
