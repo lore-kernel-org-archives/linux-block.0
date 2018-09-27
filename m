@@ -1,64 +1,39 @@
-Return-Path: <axboe@kernel.dk>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: Josef Bacik <josef@toxicpanda.com>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: blk-wbt: handle O_DIRECT writes like high priority writes
-Message-ID: <b58ca65a-0064-f138-80c4-4f1021a0213a@kernel.dk>
-Date: Fri, 14 Sep 2018 11:34:21 -0600
+Return-Path: <keith.busch@linux.intel.com>
+Date: Thu, 27 Sep 2018 11:10:38 -0600
+From: Keith Busch <keith.busch@linux.intel.com>
+To: Logan Gunthorpe <logang@deltatee.com>
+Cc: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org, linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Max Gurtovoy <maxg@mellanox.com>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v8 10/13] nvme-pci: Add support for P2P memory in requests
+Message-ID: <20180927171038.GD19589@localhost.localdomain>
+References: <20180927165420.5290-1-logang@deltatee.com>
+ <20180927165420.5290-11-logang@deltatee.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180927165420.5290-11-logang@deltatee.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Currently we don't limit O_DIRECT writes at all, we just let them queue
-up as many as possible. As max priority writes should be able to get
-full bandwidth, handle O_DIRECT writes just like we would high priority
-buffered writes.
+On Thu, Sep 27, 2018 at 10:54:17AM -0600, Logan Gunthorpe wrote:
+> For P2P requests, we must use the pci_p2pmem_map_sg() function
+> instead of the dma_map_sg functions.
+> 
+> With that, we can then indicate PCI_P2P support in the request queue.
+> For this, we create an NVME_F_PCI_P2P flag which tells the core to
+> set QUEUE_FLAG_PCI_P2P in the request queue.
+> 
+> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Looks good to me as well.
 
----
-
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 8e20a0677dcf..9b17161b5668 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -450,6 +450,12 @@ static bool close_io(struct rq_wb *rwb)
- 		time_before(now, rwb->last_comp + HZ / 10);
- }
- 
-+static bool is_odirect_write(unsigned long rw)
-+{
-+	return op_is_write(rw) &&
-+		((rw & (REQ_SYNC | REQ_IDLE)) == (REQ_SYNC | REQ_IDLE));
-+}
-+
- #define REQ_HIPRIO	(REQ_SYNC | REQ_META | REQ_PRIO)
- 
- static inline unsigned int get_limit(struct rq_wb *rwb, unsigned long rw)
-@@ -474,7 +480,8 @@ static inline unsigned int get_limit(struct rq_wb *rwb, unsigned long rw)
- 	 * the idle limit, or go to normal if we haven't had competing
- 	 * IO for a bit.
- 	 */
--	if ((rw & REQ_HIPRIO) || wb_recent_wait(rwb) || current_is_kswapd())
-+	if ((rw & REQ_HIPRIO) || wb_recent_wait(rwb) || current_is_kswapd() ||
-+	    is_odirect_write(rw))
- 		limit = rwb->rq_depth.max_depth;
- 	else if ((rw & REQ_BACKGROUND) || close_io(rwb)) {
- 		/*
-@@ -578,12 +585,6 @@ static inline bool wbt_should_throttle(struct rq_wb *rwb, struct bio *bio)
- {
- 	switch (bio_op(bio)) {
- 	case REQ_OP_WRITE:
--		/*
--		 * Don't throttle WRITE_ODIRECT
--		 */
--		if ((bio->bi_opf & (REQ_SYNC | REQ_IDLE)) ==
--		    (REQ_SYNC | REQ_IDLE))
--			return false;
- 		/* fallthrough */
- 	case REQ_OP_DISCARD:
- 		return true;
-
-
--- 
-Jens Axboe
+Reviewed-by: Keith Busch <keith.busch@intel.com>
