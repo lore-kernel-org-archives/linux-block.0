@@ -1,155 +1,114 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Logan Gunthorpe <logang@deltatee.com>
-Date: Wed, 12 Sep 2018 18:11:55 -0600
-Message-Id: <20180913001156.4115-13-logang@deltatee.com>
-In-Reply-To: <20180913001156.4115-1-logang@deltatee.com>
-References: <20180913001156.4115-1-logang@deltatee.com>
-MIME-Version: 1.0
-Subject: [PATCH v6 12/13] nvmet: Introduce helper functions to allocate and free request SGLs
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:37112 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727145AbeI0RzF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 27 Sep 2018 13:55:05 -0400
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH 13/14] loop: Move loop_reread_partitions() out of loop_ctl_mutex
+Date: Thu, 27 Sep 2018 13:36:51 +0200
+Message-Id: <20180927113652.5422-14-jack@suse.cz>
+In-Reply-To: <20180927113652.5422-1-jack@suse.cz>
+References: <20180927113652.5422-1-jack@suse.cz>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Add helpers to allocate and free the SGL in a struct nvmet_req:
+Calling loop_reread_partitions() under loop_ctl_mutex causes lockdep to
+complain about circular lock dependency between bdev->bd_mutex and
+lo->lo_ctl_mutex. The problem is that on loop device open or close
+lo_open() and lo_release() get called with bdev->bd_mutex held and they
+need to acquire loop_ctl_mutex. OTOH when loop_reread_partitions() is
+called with loop_ctl_mutex held, it will call blkdev_reread_part() which
+acquires bdev->bd_mutex. See syzbot report for details [1].
 
-int nvmet_req_alloc_sgl(struct nvmet_req *req, struct nvmet_sq *sq)
-void nvmet_req_free_sgl(struct nvmet_req *req)
+Move all calls of loop_rescan_partitions() out of loop_ctl_mutex to
+avoid lockdep warning and fix deadlock possibility.
 
-This will be expanded in a future patch to implement peer-to-peer
-memory DMAs and should be common with all target drivers. The presently
-unused 'sq' argument in the alloc function will be necessary to
-decide whether to use peer-to-peer memory and obtain the correct
-provider to allocate the memory.
+[1] https://syzkaller.appspot.com/bug?id=bf154052f0eea4bc7712499e4569505907d1588
 
-The new helpers are used in nvmet-rdma. Seeing we use req.transfer_len
-as the length of the SGL it is set earlier and cleared on any error.
-It also seems to be unnecessary to accumulate the length as the map_sgl
-functions should only ever be called once per request.
-
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Acked-by: Sagi Grimberg <sagi@grimberg.me>
-Cc: Christoph Hellwig <hch@lst.de>
+Reported-by: syzbot <syzbot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/nvme/target/core.c  | 18 ++++++++++++++++++
- drivers/nvme/target/nvmet.h |  2 ++
- drivers/nvme/target/rdma.c  | 20 ++++++++++++--------
- 3 files changed, 32 insertions(+), 8 deletions(-)
+ drivers/block/loop.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
-index b5ec96abd048..bddd1599b826 100644
---- a/drivers/nvme/target/core.c
-+++ b/drivers/nvme/target/core.c
-@@ -725,6 +725,24 @@ void nvmet_req_execute(struct nvmet_req *req)
- }
- EXPORT_SYMBOL_GPL(nvmet_req_execute);
- 
-+int nvmet_req_alloc_sgl(struct nvmet_req *req, struct nvmet_sq *sq)
-+{
-+	req->sg = sgl_alloc(req->transfer_len, GFP_KERNEL, &req->sg_cnt);
-+	if (!req->sg)
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(nvmet_req_alloc_sgl);
-+
-+void nvmet_req_free_sgl(struct nvmet_req *req)
-+{
-+	sgl_free(req->sg);
-+	req->sg = NULL;
-+	req->sg_cnt = 0;
-+}
-+EXPORT_SYMBOL_GPL(nvmet_req_free_sgl);
-+
- static inline bool nvmet_cc_en(u32 cc)
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index cce1a32ae6d0..d2be85c48f03 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -680,6 +680,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
  {
- 	return (cc >> NVME_CC_EN_SHIFT) & 0x1;
-diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
-index ec9af4ee03b6..7d6cb61021e4 100644
---- a/drivers/nvme/target/nvmet.h
-+++ b/drivers/nvme/target/nvmet.h
-@@ -336,6 +336,8 @@ bool nvmet_req_init(struct nvmet_req *req, struct nvmet_cq *cq,
- void nvmet_req_uninit(struct nvmet_req *req);
- void nvmet_req_execute(struct nvmet_req *req);
- void nvmet_req_complete(struct nvmet_req *req, u16 status);
-+int nvmet_req_alloc_sgl(struct nvmet_req *req, struct nvmet_sq *sq);
-+void nvmet_req_free_sgl(struct nvmet_req *req);
+ 	struct file	*file, *old_file;
+ 	int		error;
++	bool		partscan;
  
- void nvmet_cq_setup(struct nvmet_ctrl *ctrl, struct nvmet_cq *cq, u16 qid,
- 		u16 size);
-diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
-index 3533e918ea37..e148dee72ba5 100644
---- a/drivers/nvme/target/rdma.c
-+++ b/drivers/nvme/target/rdma.c
-@@ -489,7 +489,7 @@ static void nvmet_rdma_release_rsp(struct nvmet_rdma_rsp *rsp)
- 	}
+ 	error = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+ 	if (error)
+@@ -721,9 +722,10 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	blk_mq_unfreeze_queue(lo->lo_queue);
  
- 	if (rsp->req.sg != rsp->cmd->inline_sg)
--		sgl_free(rsp->req.sg);
-+		nvmet_req_free_sgl(&rsp->req);
- 
- 	if (unlikely(!list_empty_careful(&queue->rsp_wr_wait_list)))
- 		nvmet_rdma_process_wr_wait_list(queue);
-@@ -638,24 +638,24 @@ static u16 nvmet_rdma_map_sgl_keyed(struct nvmet_rdma_rsp *rsp,
- {
- 	struct rdma_cm_id *cm_id = rsp->queue->cm_id;
- 	u64 addr = le64_to_cpu(sgl->addr);
--	u32 len = get_unaligned_le24(sgl->length);
- 	u32 key = get_unaligned_le32(sgl->key);
- 	int ret;
- 
-+	rsp->req.transfer_len = get_unaligned_le24(sgl->length);
-+
- 	/* no data command? */
--	if (!len)
-+	if (!rsp->req.transfer_len)
- 		return 0;
- 
--	rsp->req.sg = sgl_alloc(len, GFP_KERNEL, &rsp->req.sg_cnt);
--	if (!rsp->req.sg)
--		return NVME_SC_INTERNAL;
-+	ret = nvmet_req_alloc_sgl(&rsp->req, &rsp->queue->nvme_sq);
-+	if (ret < 0)
-+		goto error_out;
- 
- 	ret = rdma_rw_ctx_init(&rsp->rw, cm_id->qp, cm_id->port_num,
- 			rsp->req.sg, rsp->req.sg_cnt, 0, addr, key,
- 			nvmet_data_dir(&rsp->req));
- 	if (ret < 0)
--		return NVME_SC_INTERNAL;
--	rsp->req.transfer_len += len;
-+		goto error_out;
- 	rsp->n_rdma += ret;
- 
- 	if (invalidate) {
-@@ -664,6 +664,10 @@ static u16 nvmet_rdma_map_sgl_keyed(struct nvmet_rdma_rsp *rsp,
- 	}
- 
+ 	fput(old_file);
+-	if (lo->lo_flags & LO_FLAGS_PARTSCAN)
+-		loop_reread_partitions(lo, bdev);
++	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
+ 	mutex_unlock(&loop_ctl_mutex);
++	if (partscan)
++		loop_reread_partitions(lo, bdev);
  	return 0;
-+
-+error_out:
-+	rsp->req.transfer_len = 0;
-+	return NVME_SC_INTERNAL;
- }
  
- static u16 nvmet_rdma_map_sgl(struct nvmet_rdma_rsp *rsp)
+ out_putf:
+@@ -904,6 +906,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	int		lo_flags = 0;
+ 	int		error;
+ 	loff_t		size;
++	bool		partscan;
+ 
+ 	/* This is safe, since we have a reference from open(). */
+ 	__module_get(THIS_MODULE);
+@@ -970,14 +973,15 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	lo->lo_state = Lo_bound;
+ 	if (part_shift)
+ 		lo->lo_flags |= LO_FLAGS_PARTSCAN;
+-	if (lo->lo_flags & LO_FLAGS_PARTSCAN)
+-		loop_reread_partitions(lo, bdev);
++	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
+ 
+ 	/* Grab the block_device to prevent its destruction after we
+ 	 * put /dev/loopXX inode. Later in __loop_clr_fd() we bdput(bdev).
+ 	 */
+ 	bdgrab(bdev);
+ 	mutex_unlock(&loop_ctl_mutex);
++	if (partscan)
++		loop_reread_partitions(lo, bdev);
+ 	return 0;
+ 
+ out_unlock:
+@@ -1158,6 +1162,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	int err;
+ 	struct loop_func_table *xfer;
+ 	kuid_t uid = current_uid();
++	struct block_device *bdev;
++	bool partscan = false;
+ 
+ 	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+ 	if (err)
+@@ -1246,10 +1252,13 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	     !(lo->lo_flags & LO_FLAGS_PARTSCAN)) {
+ 		lo->lo_flags |= LO_FLAGS_PARTSCAN;
+ 		lo->lo_disk->flags &= ~GENHD_FL_NO_PART_SCAN;
+-		loop_reread_partitions(lo, lo->lo_device);
++		bdev = lo->lo_device;
++		partscan = true;
+ 	}
+ out_unlock:
+ 	mutex_unlock(&loop_ctl_mutex);
++	if (partscan)
++		loop_reread_partitions(lo, bdev);
+ 
+ 	return err;
+ }
 -- 
-2.19.0
+2.16.4
