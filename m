@@ -1,139 +1,87 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH V3 05/17] SCSI: try to retrieve request_queue via 'scsi_cmnd' if possible
-Date: Thu, 13 Sep 2018 20:15:34 +0800
-Message-Id: <20180913121546.5710-6-ming.lei@redhat.com>
-In-Reply-To: <20180913121546.5710-1-ming.lei@redhat.com>
-References: <20180913121546.5710-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:38830 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725957AbeI1FRL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Sep 2018 01:17:11 -0400
+Received: by mail-pf1-f196.google.com with SMTP id x17-v6so2908822pfh.5
+        for <linux-block@vger.kernel.org>; Thu, 27 Sep 2018 15:56:33 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
+Subject: [PATCH v2 3/5] kyber: don't make domain token sbitmap larger than necessary
+Date: Thu, 27 Sep 2018 15:55:53 -0700
+Message-Id: <22c03a0be5e385516b9c2b2cb37c3baa54e82129.1538088475.git.osandov@fb.com>
+In-Reply-To: <cover.1538088475.git.osandov@fb.com>
+References: <cover.1538088475.git.osandov@fb.com>
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Prepare for introduing per-host admin queue.
+From: Omar Sandoval <osandov@fb.com>
 
-The most important part is that the request originated from admin queue
-can't be called back to the IO queue associated with scsi_device, especially,
-one request may be requeued, timedout or completed via block layer helper, so
-what we should do is to use 'scsi_cmnd->request->q' to retrieve the request
-queue, and pass that to block layer helper, instead of
-sdev->request_queue.
+The domain token sbitmaps are currently initialized to the device queue
+depth or 256, whichever is larger, and immediately resized to the
+maximum depth for that domain (256, 128, or 64 for read, write, and
+other, respectively). The sbitmap is never resized larger than that, so
+it's unnecessary to allocate a bitmap larger than the maximum depth.
+Let's just allocate it to the maximum depth to begin with. This will use
+marginally less memory, and more importantly, give us a more appropriate
+number of bits per sbitmap word.
 
-Fortunately most of users of 'scsi_device->request_queue' aren't in related IO
-path(requeue, timeout, complete, run queue), so the audit isn't more difficult
-than I thought of.
-
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Adrian Hunter <adrian.hunter@intel.com>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- drivers/ata/libata-eh.c             | 2 +-
- drivers/scsi/libsas/sas_ata.c       | 2 +-
- drivers/scsi/libsas/sas_scsi_host.c | 2 +-
- drivers/scsi/scsi_error.c           | 2 +-
- drivers/scsi/scsi_lib.c             | 6 +++---
- 5 files changed, 7 insertions(+), 7 deletions(-)
+ block/kyber-iosched.c | 15 ++-------------
+ 1 file changed, 2 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/ata/libata-eh.c b/drivers/ata/libata-eh.c
-index 01306c018398..fbceea6b62a9 100644
---- a/drivers/ata/libata-eh.c
-+++ b/drivers/ata/libata-eh.c
-@@ -919,7 +919,7 @@ static void ata_eh_set_pending(struct ata_port *ap, int fastdrain)
- void ata_qc_schedule_eh(struct ata_queued_cmd *qc)
+diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
+index 95d062c07c61..08eb5295c18d 100644
+--- a/block/kyber-iosched.c
++++ b/block/kyber-iosched.c
+@@ -40,8 +40,6 @@ enum {
+ };
+ 
+ enum {
+-	KYBER_MIN_DEPTH = 256,
+-
+ 	/*
+ 	 * In order to prevent starvation of synchronous requests by a flood of
+ 	 * asynchronous requests, we reserve 25% of requests for synchronous
+@@ -305,7 +303,6 @@ static int kyber_bucket_fn(const struct request *rq)
+ static struct kyber_queue_data *kyber_queue_data_alloc(struct request_queue *q)
  {
- 	struct ata_port *ap = qc->ap;
--	struct request_queue *q = qc->scsicmd->device->request_queue;
-+	struct request_queue *q = qc->scsicmd->request->q;
- 	unsigned long flags;
+ 	struct kyber_queue_data *kqd;
+-	unsigned int max_tokens;
+ 	unsigned int shift;
+ 	int ret = -ENOMEM;
+ 	int i;
+@@ -320,25 +317,17 @@ static struct kyber_queue_data *kyber_queue_data_alloc(struct request_queue *q)
+ 	if (!kqd->cb)
+ 		goto err_kqd;
  
- 	WARN_ON(!ap->ops->error_handler);
-diff --git a/drivers/scsi/libsas/sas_ata.c b/drivers/scsi/libsas/sas_ata.c
-index 64a958a99f6a..fcf46437b756 100644
---- a/drivers/scsi/libsas/sas_ata.c
-+++ b/drivers/scsi/libsas/sas_ata.c
-@@ -601,7 +601,7 @@ void sas_ata_task_abort(struct sas_task *task)
+-	/*
+-	 * The maximum number of tokens for any scheduling domain is at least
+-	 * the queue depth of a single hardware queue. If the hardware doesn't
+-	 * have many tags, still provide a reasonable number.
+-	 */
+-	max_tokens = max_t(unsigned int, q->tag_set->queue_depth,
+-			   KYBER_MIN_DEPTH);
+ 	for (i = 0; i < KYBER_NUM_DOMAINS; i++) {
+ 		WARN_ON(!kyber_depth[i]);
+ 		WARN_ON(!kyber_batch_size[i]);
+ 		ret = sbitmap_queue_init_node(&kqd->domain_tokens[i],
+-					      max_tokens, -1, false, GFP_KERNEL,
+-					      q->node);
++					      kyber_depth[i], -1, false,
++					      GFP_KERNEL, q->node);
+ 		if (ret) {
+ 			while (--i >= 0)
+ 				sbitmap_queue_free(&kqd->domain_tokens[i]);
+ 			goto err_cb;
+ 		}
+-		sbitmap_queue_resize(&kqd->domain_tokens[i], kyber_depth[i]);
+ 	}
  
- 	/* Bounce SCSI-initiated commands to the SCSI EH */
- 	if (qc->scsicmd) {
--		struct request_queue *q = qc->scsicmd->device->request_queue;
-+		struct request_queue *q = qc->scsicmd->request->q;
- 		unsigned long flags;
- 
- 		spin_lock_irqsave(q->queue_lock, flags);
-diff --git a/drivers/scsi/libsas/sas_scsi_host.c b/drivers/scsi/libsas/sas_scsi_host.c
-index 33229348dcb6..91e192f93ae1 100644
---- a/drivers/scsi/libsas/sas_scsi_host.c
-+++ b/drivers/scsi/libsas/sas_scsi_host.c
-@@ -933,7 +933,7 @@ void sas_task_abort(struct sas_task *task)
- 	if (dev_is_sata(task->dev)) {
- 		sas_ata_task_abort(task);
- 	} else {
--		struct request_queue *q = sc->device->request_queue;
-+		struct request_queue *q = sc->request->q;
- 		unsigned long flags;
- 
- 		spin_lock_irqsave(q->queue_lock, flags);
-diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-index b7a8fdfeb2f4..9f19c80b983c 100644
---- a/drivers/scsi/scsi_error.c
-+++ b/drivers/scsi/scsi_error.c
-@@ -1360,7 +1360,7 @@ static int scsi_eh_try_stu(struct scsi_cmnd *scmd)
- 		int i, rtn = NEEDS_RETRY;
- 
- 		for (i = 0; rtn == NEEDS_RETRY && i < 2; i++)
--			rtn = scsi_send_eh_cmnd(scmd, stu_command, 6, scmd->device->request_queue->rq_timeout, 0);
-+			rtn = scsi_send_eh_cmnd(scmd, stu_command, 6, scmd->request->q->rq_timeout, 0);
- 
- 		if (rtn == SUCCESS)
- 			return 0;
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index eb97d2dd3651..6fb8fd3ccc2c 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -168,7 +168,7 @@ static void scsi_mq_requeue_cmd(struct scsi_cmnd *cmd)
- static void __scsi_queue_insert(struct scsi_cmnd *cmd, int reason, bool unbusy)
- {
- 	struct scsi_device *device = cmd->device;
--	struct request_queue *q = device->request_queue;
-+	struct request_queue *q = cmd->request->q;
- 	unsigned long flags;
- 
- 	SCSI_LOG_MLQUEUE(1, scmd_printk(KERN_INFO, cmd,
-@@ -668,7 +668,7 @@ static bool scsi_end_request(struct request *req, blk_status_t error,
- {
- 	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
- 	struct scsi_device *sdev = cmd->device;
--	struct request_queue *q = sdev->request_queue;
-+	struct request_queue *q = cmd->request->q;
- 
- 	if (blk_update_request(req, error, bytes))
- 		return true;
-@@ -1038,7 +1038,7 @@ static int scsi_io_completion_nz_result(struct scsi_cmnd *cmd, int result,
- void scsi_io_completion(struct scsi_cmnd *cmd, unsigned int good_bytes)
- {
- 	int result = cmd->result;
--	struct request_queue *q = cmd->device->request_queue;
-+	struct request_queue *q = cmd->request->q;
- 	struct request *req = cmd->request;
- 	blk_status_t blk_stat = BLK_STS_OK;
- 
+ 	shift = kyber_sched_tags_shift(kqd);
 -- 
-2.9.5
+2.19.0
