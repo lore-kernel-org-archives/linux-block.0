@@ -1,91 +1,29 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:43468 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728525AbeHCKuW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Aug 2018 06:50:22 -0400
-Received: by mail-lf1-f68.google.com with SMTP id f135-v6so3507355lfg.10
-        for <linux-block@vger.kernel.org>; Fri, 03 Aug 2018 01:55:02 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: igor.j.konopko@intel.com, marcin.dziegielewski@intel.com,
-        javier@cnexlabs.com, hans.holmberg@cnexlabs.com, hlitz@ucsc.edu,
-        youngtack.jin@circuitblvd.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [PATCH] lightnvm: move device L2P detection to core
-Date: Fri,  3 Aug 2018 10:54:49 +0200
-Message-Id: <20180803085449.3436-1-mb@lightnvm.io>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
+To: axboe@kernel.dk
+Cc: keith.busch@linux.intel.com, ming.lei@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] blk-mq: two fixes about updating hw queues
+Date: Thu, 27 Sep 2018 18:43:02 +0800
+Message-Id: <1538044984-2147-1-git-send-email-jianchao.w.wang@oracle.com>
+List-ID: <linux-block@vger.kernel.org>
 
-A 1.2 device is able to manage the logical to physical mapping
-table internally or leave it to the host.
+Hi Jens
 
-A target only supports one of those approaches, and therefore must
-check on initialization. Move this check to core to avoid each target
-implement the check.
+This patch set fixes two defects during update hw queues.
 
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
----
- drivers/lightnvm/core.c      | 5 +++++
- drivers/lightnvm/pblk-init.c | 7 -------
- include/linux/lightnvm.h     | 6 ++++++
- 3 files changed, 11 insertions(+), 7 deletions(-)
+1st patch refactor the blk-mq debugfs and sysfs register during
+blk_mq_update_nr_hw_queues.
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 68553c7ae937..964352720a03 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -355,6 +355,11 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 		return -EINVAL;
- 	}
- 
-+	if ((tt->flags & NVM_TGT_F_HOST_L2P) != (dev->geo.dom & NVM_RSP_L2P)) {
-+		pr_err("nvm: device is incompatible with target L2P type.\n");
-+		return -EINVAL;
-+	}
-+
- 	if (nvm_target_exists(create->tgtname)) {
- 		pr_err("nvm: target name already exists (%s)\n",
- 							create->tgtname);
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index e9e2fedff387..cc8a59e3c240 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -1202,13 +1202,6 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 	pblk->state = PBLK_STATE_RUNNING;
- 	pblk->gc.gc_enabled = 0;
- 
--	if (geo->version == NVM_OCSSD_SPEC_12 && geo->dom & NVM_RSP_L2P) {
--		pblk_err(pblk, "host-side L2P table not supported. (%x)\n",
--							geo->dom);
--		kfree(pblk);
--		return ERR_PTR(-EINVAL);
--	}
--
- 	spin_lock_init(&pblk->resubmit_lock);
- 	spin_lock_init(&pblk->trans_lock);
- 	spin_lock_init(&pblk->lock);
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 8acc2fe277d6..f4a84694e5e2 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -495,9 +495,15 @@ typedef void (nvm_tgt_exit_fn)(void *, bool);
- typedef int (nvm_tgt_sysfs_init_fn)(struct gendisk *);
- typedef void (nvm_tgt_sysfs_exit_fn)(struct gendisk *);
- 
-+enum {
-+	NVM_TGT_F_DEV_L2P = 0,
-+	NVM_TGT_F_HOST_L2P = 1 << 0,
-+};
-+
- struct nvm_tgt_type {
- 	const char *name;
- 	unsigned int version[3];
-+	int flags;
- 
- 	/* target entry points */
- 	nvm_tgt_make_rq_fn *make_rq;
--- 
-2.11.0
+2nd patch should be able to fix the panic reported in follwing link
+https://marc.info/?l=linux-block&m=153799465603723&w=2
+
+Jianchao Wang (2)
+blk-mq: adjust debugfs and sysfs register when updating nr_hw_queues
+blk-mq: fallback to previous nr_hw_queues when updating fails
+
+block/blk-mq.c | 79 ++++++++++++++++++++++++++++++++++------------------------
+1 file changed, 47 insertions(+), 32 deletions(-)
+
+Thanks
+Jianchao
