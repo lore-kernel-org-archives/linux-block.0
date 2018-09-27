@@ -1,70 +1,69 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-Date: Thu, 6 Sep 2018 16:41:54 -0400
-From: Dennis Zhou <dennisszhou@gmail.com>
-To: Tejun Heo <tj@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
-	linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 06/15] blkcg: always associate a bio with a blkg
-Message-ID: <20180906204153.GA26048@dennisz-mbp.dhcp.thefacebook.com>
-References: <20180831015356.69796-1-dennisszhou@gmail.com>
- <20180831015356.69796-7-dennisszhou@gmail.com>
- <20180831231609.GD1488037@devbig004.ftw2.facebook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180831231609.GD1488037@devbig004.ftw2.facebook.com>
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 03/14] loop: Fold __loop_release into loop_release
+Date: Thu, 27 Sep 2018 13:36:41 +0200
+Message-Id: <20180927113652.5422-4-jack@suse.cz>
+In-Reply-To: <20180927113652.5422-1-jack@suse.cz>
+References: <20180927113652.5422-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Aug 31, 2018 at 04:16:09PM -0700, Tejun Heo wrote:
-> Hello,
-> 
-> On Thu, Aug 30, 2018 at 09:53:47PM -0400, Dennis Zhou wrote:
-> > From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-> > 
-> > Previously, blkg's were only assigned as needed by blk-iolatency and
-> > blk-throttle. bio->css was also always being associated while blkg was
-> > being looked up and then thrown away in blkcg_bio_issue_check.
-> > 
-> > This patch beings the cleanup of bio->css and bio->bi_blkg by always
->              ^
-> 	     begins
-> 
+__loop_release() has a single call site. Fold it there. This is
+currently not a huge win but it will make following replacement of
+loop_index_mutex more obvious.
 
-Thanks!
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ drivers/block/loop.c | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
-> > +int bio_associate_create_blkg(struct request_queue *q, struct bio *bio)
-> > +{
-> > +	struct blkcg *blkcg;
-> > +	struct blkcg_gq *blkg;
-> > +	int ret = 0;
-> > +
-> > +	/* someone has already associated this bio with a blkg */
-> > +	if (bio->bi_blkg)
-> > +		return ret;
-> > +
-> > +	rcu_read_lock();
-> > +
-> > +	bio_associate_blkcg(bio, NULL);
-> > +	blkcg = bio_blkcg(bio);
-> > +
-> > +	if (!blkcg->css.parent) {
-> > +		ret = bio_associate_blkg(bio, q->root_blkg);
-> > +		goto assoc_out;
-> > +	}
-> > +
-> > +	blkg = blkg_lookup_create(blkcg, q);
-> > +	if (IS_ERR(blkg))
-> > +		blkg = q->root_blkg;
-> > +
-> > +	ret = bio_associate_blkg(bio, blkg);
-> > +assoc_out:
-> 
-> Maybe if/else instead of goto?
-> 
-
-Yeah, no need for goto.
-
-Thanks,
-Dennis
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index d0f1b7106572..cc43d835fe6f 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1642,12 +1642,15 @@ static int lo_open(struct block_device *bdev, fmode_t mode)
+ 	return err;
+ }
+ 
+-static void __lo_release(struct loop_device *lo)
++static void lo_release(struct gendisk *disk, fmode_t mode)
+ {
++	struct loop_device *lo;
+ 	int err;
+ 
++	mutex_lock(&loop_index_mutex);
++	lo = disk->private_data;
+ 	if (atomic_dec_return(&lo->lo_refcnt))
+-		return;
++		goto unlock_index;
+ 
+ 	mutex_lock(&loop_ctl_mutex);
+ 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
+@@ -1657,7 +1660,7 @@ static void __lo_release(struct loop_device *lo)
+ 		 */
+ 		err = loop_clr_fd(lo);
+ 		if (!err)
+-			return;
++			goto unlock_index;
+ 	} else if (lo->lo_state == Lo_bound) {
+ 		/*
+ 		 * Otherwise keep thread (if running) and config,
+@@ -1668,12 +1671,7 @@ static void __lo_release(struct loop_device *lo)
+ 	}
+ 
+ 	mutex_unlock(&loop_ctl_mutex);
+-}
+-
+-static void lo_release(struct gendisk *disk, fmode_t mode)
+-{
+-	mutex_lock(&loop_index_mutex);
+-	__lo_release(disk->private_data);
++unlock_index:
+ 	mutex_unlock(&loop_index_mutex);
+ }
+ 
+-- 
+2.16.4
