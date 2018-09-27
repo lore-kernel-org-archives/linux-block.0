@@ -1,215 +1,159 @@
-Return-Path: <BATV+afefc9c3360d6e01bea6+5510+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>,
-	linux-block@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 05/10] block: simplify BIOVEC_PHYS_MERGEABLE
-Date: Mon, 24 Sep 2018 09:43:50 +0200
-Message-Id: <20180924074355.2802-6-hch@lst.de>
-In-Reply-To: <20180924074355.2802-1-hch@lst.de>
-References: <20180924074355.2802-1-hch@lst.de>
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
+	linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Logan Gunthorpe <logang@deltatee.com>
+Date: Thu, 27 Sep 2018 10:54:09 -0600
+Message-Id: <20180927165420.5290-3-logang@deltatee.com>
+In-Reply-To: <20180927165420.5290-1-logang@deltatee.com>
+References: <20180927165420.5290-1-logang@deltatee.com>
 MIME-Version: 1.0
+Subject: [PATCH v8 02/13] PCI/P2PDMA: Add sysfs group to display p2pmem stats
 List-ID: <linux-block@vger.kernel.org>
 
-Turn the macro into an inline, move it to blk.h and simplify the
-arch hooks a bit.
+Add a sysfs group to display statistics about P2P memory that is
+registered in each PCI device.
 
-Also rename the function to biovec_phys_mergeable as there is no need
-to shout.
+Attributes in the group display the total amount of P2P memory, the
+amount available and whether it is published or not.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
 ---
- arch/arm/include/asm/io.h   |  5 ++---
- arch/arm64/include/asm/io.h |  5 ++---
- arch/x86/include/asm/io.h   |  5 ++---
- block/bio.c                 |  2 +-
- block/blk-integrity.c       |  4 ++--
- block/blk-merge.c           | 10 +++++-----
- block/blk.h                 | 14 ++++++++++++++
- include/linux/bio.h         | 13 -------------
- 8 files changed, 28 insertions(+), 30 deletions(-)
+ Documentation/ABI/testing/sysfs-bus-pci | 24 +++++++++++
+ drivers/pci/p2pdma.c                    | 54 +++++++++++++++++++++++++
+ 2 files changed, 78 insertions(+)
 
-diff --git a/arch/arm/include/asm/io.h b/arch/arm/include/asm/io.h
-index 6774553dc214..e58ca25eddb7 100644
---- a/arch/arm/include/asm/io.h
-+++ b/arch/arm/include/asm/io.h
-@@ -462,9 +462,8 @@ extern void pci_iounmap(struct pci_dev *dev, void __iomem *addr);
- struct bio_vec;
- extern bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
- 				      const struct bio_vec *vec2);
--#define BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
--	(__BIOVEC_PHYS_MERGEABLE(vec1, vec2) &&				\
--	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2)))
-+#define ARCH_BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
-+	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2))
+diff --git a/Documentation/ABI/testing/sysfs-bus-pci b/Documentation/ABI/testing/sysfs-bus-pci
+index 44d4b2be92fd..8bfee557e50e 100644
+--- a/Documentation/ABI/testing/sysfs-bus-pci
++++ b/Documentation/ABI/testing/sysfs-bus-pci
+@@ -323,3 +323,27 @@ Description:
  
- #ifdef CONFIG_MMU
- #define ARCH_HAS_VALID_PHYS_ADDR_RANGE
-diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
-index 35b2e50f17fb..774e03ea1bb0 100644
---- a/arch/arm64/include/asm/io.h
-+++ b/arch/arm64/include/asm/io.h
-@@ -208,9 +208,8 @@ extern int devmem_is_allowed(unsigned long pfn);
- struct bio_vec;
- extern bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
- 				      const struct bio_vec *vec2);
--#define BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
--	(__BIOVEC_PHYS_MERGEABLE(vec1, vec2) &&				\
--	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2)))
-+#define ARCH_BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
-+	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2))
+ 		This is similar to /sys/bus/pci/drivers_autoprobe, but
+ 		affects only the VFs associated with a specific PF.
++
++What:		/sys/bus/pci/devices/.../p2pmem/size
++Date:		November 2017
++Contact:	Logan Gunthorpe <logang@deltatee.com>
++Description:
++		If the device has any Peer-to-Peer memory registered, this
++	        file contains the total amount of memory that the device
++		provides (in decimal).
++
++What:		/sys/bus/pci/devices/.../p2pmem/available
++Date:		November 2017
++Contact:	Logan Gunthorpe <logang@deltatee.com>
++Description:
++		If the device has any Peer-to-Peer memory registered, this
++	        file contains the amount of memory that has not been
++		allocated (in decimal).
++
++What:		/sys/bus/pci/devices/.../p2pmem/published
++Date:		November 2017
++Contact:	Logan Gunthorpe <logang@deltatee.com>
++Description:
++		If the device has any Peer-to-Peer memory registered, this
++	        file contains a '1' if the memory has been published for
++		use outside the driver that owns the device.
+diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+index 14913640baa6..7d239c203fde 100644
+--- a/drivers/pci/p2pdma.c
++++ b/drivers/pci/p2pdma.c
+@@ -24,6 +24,54 @@ struct pci_p2pdma {
+ 	bool p2pmem_published;
+ };
  
- #endif	/* __KERNEL__ */
- #endif	/* __ASM_IO_H */
-diff --git a/arch/x86/include/asm/io.h b/arch/x86/include/asm/io.h
-index 6de64840dd22..7c6106216d9c 100644
---- a/arch/x86/include/asm/io.h
-+++ b/arch/x86/include/asm/io.h
-@@ -376,9 +376,8 @@ struct bio_vec;
- extern bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
- 				      const struct bio_vec *vec2);
- 
--#define BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
--	(__BIOVEC_PHYS_MERGEABLE(vec1, vec2) &&				\
--	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2)))
-+#define ARCH_BIOVEC_PHYS_MERGEABLE(vec1, vec2)				\
-+	 (!xen_domain() || xen_biovec_phys_mergeable(vec1, vec2))
- #endif	/* CONFIG_XEN */
- 
- #define IO_SPACE_LIMIT 0xffff
-diff --git a/block/bio.c b/block/bio.c
-index 1cd47f218200..81d90b839e05 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -731,7 +731,7 @@ int bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
- 	}
- 
- 	/* If we may be able to merge these biovecs, force a recount */
--	if (bio->bi_vcnt > 1 && (BIOVEC_PHYS_MERGEABLE(bvec-1, bvec)))
-+	if (bio->bi_vcnt > 1 && biovec_phys_mergeable(bvec-1, bvec))
- 		bio_clear_flag(bio, BIO_SEG_VALID);
- 
-  done:
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index 6121611e1316..0f7267916509 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -49,7 +49,7 @@ int blk_rq_count_integrity_sg(struct request_queue *q, struct bio *bio)
- 	bio_for_each_integrity_vec(iv, bio, iter) {
- 
- 		if (prev) {
--			if (!BIOVEC_PHYS_MERGEABLE(&ivprv, &iv))
-+			if (!biovec_phys_mergeable(&ivprv, &iv))
- 				goto new_segment;
- 
- 			if (!BIOVEC_SEG_BOUNDARY(q, &ivprv, &iv))
-@@ -95,7 +95,7 @@ int blk_rq_map_integrity_sg(struct request_queue *q, struct bio *bio,
- 	bio_for_each_integrity_vec(iv, bio, iter) {
- 
- 		if (prev) {
--			if (!BIOVEC_PHYS_MERGEABLE(&ivprv, &iv))
-+			if (!biovec_phys_mergeable(&ivprv, &iv))
- 				goto new_segment;
- 
- 			if (!BIOVEC_SEG_BOUNDARY(q, &ivprv, &iv))
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index ad8a226347a6..5e63e8259f92 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -21,7 +21,7 @@ static inline bool bios_segs_mergeable(struct request_queue *q,
- 		struct bio *prev, struct bio_vec *prev_last_bv,
- 		struct bio_vec *next_first_bv)
++static ssize_t size_show(struct device *dev, struct device_attribute *attr,
++			 char *buf)
++{
++	struct pci_dev *pdev = to_pci_dev(dev);
++	size_t size = 0;
++
++	if (pdev->p2pdma->pool)
++		size = gen_pool_size(pdev->p2pdma->pool);
++
++	return snprintf(buf, PAGE_SIZE, "%zd\n", size);
++}
++static DEVICE_ATTR_RO(size);
++
++static ssize_t available_show(struct device *dev, struct device_attribute *attr,
++			      char *buf)
++{
++	struct pci_dev *pdev = to_pci_dev(dev);
++	size_t avail = 0;
++
++	if (pdev->p2pdma->pool)
++		avail = gen_pool_avail(pdev->p2pdma->pool);
++
++	return snprintf(buf, PAGE_SIZE, "%zd\n", avail);
++}
++static DEVICE_ATTR_RO(available);
++
++static ssize_t published_show(struct device *dev, struct device_attribute *attr,
++			      char *buf)
++{
++	struct pci_dev *pdev = to_pci_dev(dev);
++
++	return snprintf(buf, PAGE_SIZE, "%d\n",
++			pdev->p2pdma->p2pmem_published);
++}
++static DEVICE_ATTR_RO(published);
++
++static struct attribute *p2pmem_attrs[] = {
++	&dev_attr_size.attr,
++	&dev_attr_available.attr,
++	&dev_attr_published.attr,
++	NULL,
++};
++
++static const struct attribute_group p2pmem_group = {
++	.attrs = p2pmem_attrs,
++	.name = "p2pmem",
++};
++
+ static void pci_p2pdma_percpu_release(struct percpu_ref *ref)
  {
--	if (!BIOVEC_PHYS_MERGEABLE(prev_last_bv, next_first_bv))
-+	if (!biovec_phys_mergeable(prev_last_bv, next_first_bv))
- 		return false;
- 	if (!BIOVEC_SEG_BOUNDARY(q, prev_last_bv, next_first_bv))
- 		return false;
-@@ -199,7 +199,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 		if (bvprvp && blk_queue_cluster(q)) {
- 			if (seg_size + bv.bv_len > queue_max_segment_size(q))
- 				goto new_segment;
--			if (!BIOVEC_PHYS_MERGEABLE(bvprvp, &bv))
-+			if (!biovec_phys_mergeable(bvprvp, &bv))
- 				goto new_segment;
- 			if (!BIOVEC_SEG_BOUNDARY(q, bvprvp, &bv))
- 				goto new_segment;
-@@ -332,7 +332,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 				if (seg_size + bv.bv_len
- 				    > queue_max_segment_size(q))
- 					goto new_segment;
--				if (!BIOVEC_PHYS_MERGEABLE(&bvprv, &bv))
-+				if (!biovec_phys_mergeable(&bvprv, &bv))
- 					goto new_segment;
- 				if (!BIOVEC_SEG_BOUNDARY(q, &bvprv, &bv))
- 					goto new_segment;
-@@ -414,7 +414,7 @@ static int blk_phys_contig_segment(struct request_queue *q, struct bio *bio,
- 	bio_get_last_bvec(bio, &end_bv);
- 	bio_get_first_bvec(nxt, &nxt_bv);
+ 	struct pci_p2pdma *p2p =
+@@ -59,6 +107,7 @@ static void pci_p2pdma_release(void *data)
+ 	percpu_ref_exit(&pdev->p2pdma->devmap_ref);
  
--	if (!BIOVEC_PHYS_MERGEABLE(&end_bv, &nxt_bv))
-+	if (!biovec_phys_mergeable(&end_bv, &nxt_bv))
- 		return 0;
- 
- 	/*
-@@ -439,7 +439,7 @@ __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
- 		if ((*sg)->length + nbytes > queue_max_segment_size(q))
- 			goto new_segment;
- 
--		if (!BIOVEC_PHYS_MERGEABLE(bvprv, bvec))
-+		if (!biovec_phys_mergeable(bvprv, bvec))
- 			goto new_segment;
- 		if (!BIOVEC_SEG_BOUNDARY(q, bvprv, bvec))
- 			goto new_segment;
-diff --git a/block/blk.h b/block/blk.h
-index 63035c95689c..aed99cbc1bca 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -149,6 +149,20 @@ static inline void blk_queue_enter_live(struct request_queue *q)
- 	percpu_ref_get(&q->q_usage_counter);
+ 	gen_pool_destroy(pdev->p2pdma->pool);
++	sysfs_remove_group(&pdev->dev.kobj, &p2pmem_group);
+ 	pdev->p2pdma = NULL;
  }
  
-+#ifndef ARCH_BIOVEC_PHYS_MERGEABLE
-+#define ARCH_BIOVEC_PHYS_MERGEABLE(vec1, vec2) true
-+#endif
+@@ -87,9 +136,14 @@ static int pci_p2pdma_setup(struct pci_dev *pdev)
+ 
+ 	pdev->p2pdma = p2p;
+ 
++	error = sysfs_create_group(&pdev->dev.kobj, &p2pmem_group);
++	if (error)
++		goto out_pool_destroy;
 +
-+static inline bool biovec_phys_mergeable(const struct bio_vec *vec1,
-+		const struct bio_vec *vec2)
-+{
-+	if (bvec_to_phys(vec1) + vec1->bv_len != bvec_to_phys(vec2))
-+		return false;
-+	if (!ARCH_BIOVEC_PHYS_MERGEABLE(vec1, vec2))
-+		return false;
-+	return true;
-+}
-+
- static inline bool __bvec_gap_to_prev(struct request_queue *q,
- 		struct bio_vec *bprv, unsigned int offset)
- {
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index e973876625a8..e2adb96346f0 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -140,19 +140,6 @@ static inline bool bio_full(struct bio *bio)
- /*
-  * merge helpers etc
-  */
--
--/* Default implementation of BIOVEC_PHYS_MERGEABLE */
--#define __BIOVEC_PHYS_MERGEABLE(vec1, vec2)	\
--	((bvec_to_phys((vec1)) + (vec1)->bv_len) == bvec_to_phys((vec2)))
--
--/*
-- * allow arch override, for eg virtualized architectures (put in asm/io.h)
-- */
--#ifndef BIOVEC_PHYS_MERGEABLE
--#define BIOVEC_PHYS_MERGEABLE(vec1, vec2)	\
--	__BIOVEC_PHYS_MERGEABLE(vec1, vec2)
--#endif
--
- #define __BIO_SEG_BOUNDARY(addr1, addr2, mask) \
- 	(((addr1) | (mask)) == (((addr2) - 1) | (mask)))
- #define BIOVEC_SEG_BOUNDARY(q, b1, b2) \
+ 	return 0;
+ 
+ out_pool_destroy:
++	pdev->p2pdma = NULL;
+ 	gen_pool_destroy(p2p->pool);
+ out:
+ 	devm_kfree(&pdev->dev, p2p);
 -- 
 2.19.0
