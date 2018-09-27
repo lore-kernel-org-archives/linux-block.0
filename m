@@ -1,141 +1,140 @@
-Return-Path: <christophe.leroy@c-s.fr>
-Message-Id: <1ce159e4e67106089d8ccbdae85dee20a39f201a.1536692743.git.christophe.leroy@c-s.fr>
-In-Reply-To: <cover.1536692743.git.christophe.leroy@c-s.fr>
-References: <cover.1536692743.git.christophe.leroy@c-s.fr>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v2 19/24] powerpc/nohash/64: do not include pte-common.h
-To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
-Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
-Date: Wed, 12 Sep 2018 15:58:52 +0000 (UTC)
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 07/14] loop: Push loop_ctl_mutex down into loop_clr_fd()
+Date: Thu, 27 Sep 2018 13:36:45 +0200
+Message-Id: <20180927113652.5422-8-jack@suse.cz>
+In-Reply-To: <20180927113652.5422-1-jack@suse.cz>
+References: <20180927113652.5422-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-nohash/64 only uses book3e PTE flags, so it doesn't need pte-common.h
+loop_clr_fd() has a weird locking convention that is expects
+loop_ctl_mutex held, releases it on success and keeps it on failure.
+Untangle the mess by moving locking of loop_ctl_mutex into
+loop_clr_fd().
 
-This also allows to drop PAGE_SAO and H_PAGE_4K_PFN from pte_common.h
-as they are only used by PPC64
-
-Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- arch/powerpc/include/asm/nohash/64/pgtable.h | 16 ++++++++++++-
- arch/powerpc/include/asm/nohash/pgtable.h    | 27 +++++++++++++++++++++
- arch/powerpc/include/asm/pte-common.h        | 35 ----------------------------
- 3 files changed, 42 insertions(+), 36 deletions(-)
+ drivers/block/loop.c | 49 +++++++++++++++++++++++++++++--------------------
+ 1 file changed, 29 insertions(+), 20 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/nohash/64/pgtable.h b/arch/powerpc/include/asm/nohash/64/pgtable.h
-index b7d65d4b61be..9ccea94b3d4e 100644
---- a/arch/powerpc/include/asm/nohash/64/pgtable.h
-+++ b/arch/powerpc/include/asm/nohash/64/pgtable.h
-@@ -89,7 +89,21 @@
-  * Include the PTE bits definitions
-  */
- #include <asm/nohash/pte-book3e.h>
--#include <asm/pte-common.h>
-+
-+#define _PAGE_HWWRITE	0
-+#define _PAGE_SAO	0
-+#define _PAGE_RO 0
-+#define _PAGE_NA 0
-+#define _PAGE_HUGE 0
-+
-+#define PTE_RPN_MASK	(~((1UL << PTE_RPN_SHIFT) - 1))
-+
-+/* _PAGE_CHG_MASK masks of bits that are to be preserved across
-+ * pgprot changes
-+ */
-+#define _PAGE_CHG_MASK	(PTE_RPN_MASK | _PAGE_DIRTY | _PAGE_ACCESSED | _PAGE_SPECIAL)
-+
-+#define H_PAGE_4K_PFN 0
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 51d11898e170..e4b82ca49286 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1028,15 +1028,22 @@ loop_init_xfer(struct loop_device *lo, struct loop_func_table *xfer,
  
- #ifndef __ASSEMBLY__
- /* pte_clear moved to later in this file */
-diff --git a/arch/powerpc/include/asm/nohash/pgtable.h b/arch/powerpc/include/asm/nohash/pgtable.h
-index a4c31b829071..897f110139c2 100644
---- a/arch/powerpc/include/asm/nohash/pgtable.h
-+++ b/arch/powerpc/include/asm/nohash/pgtable.h
-@@ -8,6 +8,33 @@
- #include <asm/nohash/32/pgtable.h>
- #endif
+ static int __loop_clr_fd(struct loop_device *lo)
+ {
+-	struct file *filp = lo->lo_backing_file;
++	struct file *filp = NULL;
+ 	gfp_t gfp = lo->old_gfp_mask;
+ 	struct block_device *bdev = lo->lo_device;
++	int err = 0;
  
-+/* Permission masks used for kernel mappings */
-+#define PAGE_KERNEL	__pgprot(_PAGE_BASE | _PAGE_KERNEL_RW)
-+#define PAGE_KERNEL_NC	__pgprot(_PAGE_BASE_NC | _PAGE_KERNEL_RW | _PAGE_NO_CACHE)
-+#define PAGE_KERNEL_NCG	__pgprot(_PAGE_BASE_NC | _PAGE_KERNEL_RW | \
-+				 _PAGE_NO_CACHE | _PAGE_GUARDED)
-+#define PAGE_KERNEL_X	__pgprot(_PAGE_BASE | _PAGE_KERNEL_RWX)
-+#define PAGE_KERNEL_RO	__pgprot(_PAGE_BASE | _PAGE_KERNEL_RO)
-+#define PAGE_KERNEL_ROX	__pgprot(_PAGE_BASE | _PAGE_KERNEL_ROX)
-+
-+/* Protection used for kernel text. We want the debuggers to be able to
-+ * set breakpoints anywhere, so don't write protect the kernel text
-+ * on platforms where such control is possible.
-+ */
-+#if defined(CONFIG_KGDB) || defined(CONFIG_XMON) || defined(CONFIG_BDI_SWITCH) ||\
-+	defined(CONFIG_KPROBES) || defined(CONFIG_DYNAMIC_FTRACE)
-+#define PAGE_KERNEL_TEXT	PAGE_KERNEL_X
-+#else
-+#define PAGE_KERNEL_TEXT	PAGE_KERNEL_ROX
-+#endif
-+
-+/* Make modules code happy. We don't set RO yet */
-+#define PAGE_KERNEL_EXEC	PAGE_KERNEL_X
-+
-+/* Advertise special mapping type for AGP */
-+#define PAGE_AGP		(PAGE_KERNEL_NC)
-+#define HAVE_PAGE_AGP
-+
- #ifndef __ASSEMBLY__
+-	if (WARN_ON_ONCE(lo->lo_state != Lo_rundown))
+-		return -ENXIO;
++	mutex_lock(&loop_ctl_mutex);
++	if (WARN_ON_ONCE(lo->lo_state != Lo_rundown)) {
++		err = -ENXIO;
++		goto out_unlock;
++	}
  
- /* Generic accessors to PTE bits */
-diff --git a/arch/powerpc/include/asm/pte-common.h b/arch/powerpc/include/asm/pte-common.h
-index cce60b3ba7d4..4d594039bca5 100644
---- a/arch/powerpc/include/asm/pte-common.h
-+++ b/arch/powerpc/include/asm/pte-common.h
-@@ -14,9 +14,6 @@
- #ifndef _PAGE_WRITETHRU
- #define _PAGE_WRITETHRU	0
- #endif
--#ifndef _PAGE_SAO
--#define _PAGE_SAO	0
--#endif
- /* _PAGE_RO and _PAGE_RW shall not be defined at the same time */
- #ifndef _PAGE_RO
- #define _PAGE_RO 0
-@@ -61,35 +58,3 @@
-  */
- #define _PAGE_CHG_MASK	(PTE_RPN_MASK | _PAGE_DIRTY | \
-                          _PAGE_ACCESSED | _PAGE_SPECIAL)
--
--/* Permission masks used for kernel mappings */
--#define PAGE_KERNEL	__pgprot(_PAGE_BASE | _PAGE_KERNEL_RW)
--#define PAGE_KERNEL_NC	__pgprot(_PAGE_BASE_NC | _PAGE_KERNEL_RW | \
--				 _PAGE_NO_CACHE)
--#define PAGE_KERNEL_NCG	__pgprot(_PAGE_BASE_NC | _PAGE_KERNEL_RW | \
--				 _PAGE_NO_CACHE | _PAGE_GUARDED)
--#define PAGE_KERNEL_X	__pgprot(_PAGE_BASE | _PAGE_KERNEL_RWX)
--#define PAGE_KERNEL_RO	__pgprot(_PAGE_BASE | _PAGE_KERNEL_RO)
--#define PAGE_KERNEL_ROX	__pgprot(_PAGE_BASE | _PAGE_KERNEL_ROX)
--
--/* Protection used for kernel text. We want the debuggers to be able to
-- * set breakpoints anywhere, so don't write protect the kernel text
-- * on platforms where such control is possible.
-- */
--#if defined(CONFIG_KGDB) || defined(CONFIG_XMON) || defined(CONFIG_BDI_SWITCH) ||\
--	defined(CONFIG_KPROBES) || defined(CONFIG_DYNAMIC_FTRACE)
--#define PAGE_KERNEL_TEXT	PAGE_KERNEL_X
--#else
--#define PAGE_KERNEL_TEXT	PAGE_KERNEL_ROX
--#endif
--
--/* Make modules code happy. We don't set RO yet */
--#define PAGE_KERNEL_EXEC	PAGE_KERNEL_X
--
--/* Advertise special mapping type for AGP */
--#define PAGE_AGP		(PAGE_KERNEL_NC)
--#define HAVE_PAGE_AGP
--
--#ifndef H_PAGE_4K_PFN
--#define H_PAGE_4K_PFN 0
--#endif
+-	if (filp == NULL)
+-		return -EINVAL;
++	filp = lo->lo_backing_file;
++	if (filp == NULL) {
++		err = -EINVAL;
++		goto out_unlock;
++	}
+ 
+ 	/* freeze request queue during the transition */
+ 	blk_mq_freeze_queue(lo->lo_queue);
+@@ -1083,6 +1090,7 @@ static int __loop_clr_fd(struct loop_device *lo)
+ 	if (!part_shift)
+ 		lo->lo_disk->flags |= GENHD_FL_NO_PART_SCAN;
+ 	loop_unprepare_queue(lo);
++out_unlock:
+ 	mutex_unlock(&loop_ctl_mutex);
+ 	/*
+ 	 * Need not hold loop_ctl_mutex to fput backing file.
+@@ -1090,14 +1098,22 @@ static int __loop_clr_fd(struct loop_device *lo)
+ 	 * lock dependency possibility warning as fput can take
+ 	 * bd_mutex which is usually taken before loop_ctl_mutex.
+ 	 */
+-	fput(filp);
+-	return 0;
++	if (filp)
++		fput(filp);
++	return err;
+ }
+ 
+ static int loop_clr_fd(struct loop_device *lo)
+ {
+-	if (lo->lo_state != Lo_bound)
++	int err;
++
++	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++	if (err)
++		return err;
++	if (lo->lo_state != Lo_bound) {
++		mutex_unlock(&loop_ctl_mutex);
+ 		return -ENXIO;
++	}
+ 	/*
+ 	 * If we've explicitly asked to tear down the loop device,
+ 	 * and it has an elevated reference count, set it for auto-teardown when
+@@ -1114,6 +1130,7 @@ static int loop_clr_fd(struct loop_device *lo)
+ 		return 0;
+ 	}
+ 	lo->lo_state = Lo_rundown;
++	mutex_unlock(&loop_ctl_mutex);
+ 
+ 	return __loop_clr_fd(lo);
+ }
+@@ -1448,14 +1465,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 		mutex_unlock(&loop_ctl_mutex);
+ 		break;
+ 	case LOOP_CLR_FD:
+-		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+-		if (err)
+-			return err;
+-		/* loop_clr_fd would have unlocked loop_ctl_mutex on success */
+-		err = loop_clr_fd(lo);
+-		if (err)
+-			mutex_unlock(&loop_ctl_mutex);
+-		break;
++		return loop_clr_fd(lo);
+ 	case LOOP_SET_STATUS:
+ 		err = -EPERM;
+ 		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
+@@ -1691,7 +1701,6 @@ static int lo_open(struct block_device *bdev, fmode_t mode)
+ static void lo_release(struct gendisk *disk, fmode_t mode)
+ {
+ 	struct loop_device *lo;
+-	int err;
+ 
+ 	mutex_lock(&loop_ctl_mutex);
+ 	lo = disk->private_data;
+@@ -1702,13 +1711,13 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 		if (lo->lo_state != Lo_bound)
+ 			goto out_unlock;
+ 		lo->lo_state = Lo_rundown;
++		mutex_unlock(&loop_ctl_mutex);
+ 		/*
+ 		 * In autoclear mode, stop the loop thread
+ 		 * and remove configuration after last close.
+ 		 */
+-		err = __loop_clr_fd(lo);
+-		if (!err)
+-			return;
++		__loop_clr_fd(lo);
++		return;
+ 	} else if (lo->lo_state == Lo_bound) {
+ 		/*
+ 		 * Otherwise keep thread (if running) and config,
 -- 
-2.13.3
+2.16.4
