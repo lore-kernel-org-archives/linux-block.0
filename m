@@ -1,72 +1,46 @@
-Return-Path: <BATV+97b555f176c451e34851+5490+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	linux-block@vger.kernel.org,
-	xen-devel@lists.xen.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 10/13] block: remove bvec_to_phys
-Date: Tue,  4 Sep 2018 12:14:28 -0700
-Message-Id: <20180904191431.20102-11-hch@lst.de>
-In-Reply-To: <20180904191431.20102-1-hch@lst.de>
-References: <20180904191431.20102-1-hch@lst.de>
+Return-Path: <keith.busch@linux.intel.com>
+Date: Thu, 27 Sep 2018 11:10:13 -0600
+From: Keith Busch <keith.busch@linux.intel.com>
+To: Logan Gunthorpe <logang@deltatee.com>
+Cc: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org, linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Max Gurtovoy <maxg@mellanox.com>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v8 09/13] nvme-pci: Use PCI p2pmem subsystem to manage
+ the CMB
+Message-ID: <20180927171013.GC19589@localhost.localdomain>
+References: <20180927165420.5290-1-logang@deltatee.com>
+ <20180927165420.5290-10-logang@deltatee.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180927165420.5290-10-logang@deltatee.com>
 List-ID: <linux-block@vger.kernel.org>
 
-We only use it in biovec_phys_mergeable and a m68k paravirt driver,
-so just opencode it there.  Also remove the pointless unsigned long cast
-for the offset in the opencoded instances.
+On Thu, Sep 27, 2018 at 10:54:16AM -0600, Logan Gunthorpe wrote:
+> Register the CMB buffer as p2pmem and use the appropriate allocation
+> functions to create and destroy the IO submission queues.
+> 
+> If the CMB supports WDS and RDS, publish it for use as P2P memory
+> by other devices.
+> 
+> Kernels without CONFIG_PCI_P2PDMA will also no longer support NVMe CMB.
+> However, seeing the main use-cases for the CMB is P2P operations,
+> this seems like a reasonable dependency.
+> 
+> We drop the __iomem safety on the buffer seeing that, by convention, it's
+> safe to directly access memory mapped by memremap()/devm_memremap_pages().
+> Architectures where this is not safe will not be supported by memremap()
+> and therefore will not be support PCI P2P and have no support for CMB.
+> 
+> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- arch/m68k/emu/nfblock.c | 2 +-
- block/blk.h             | 4 ++--
- include/linux/bio.h     | 5 -----
- 3 files changed, 3 insertions(+), 8 deletions(-)
+Looks good to me.
 
-diff --git a/arch/m68k/emu/nfblock.c b/arch/m68k/emu/nfblock.c
-index e9110b9b8bcd..38049357d6d3 100644
---- a/arch/m68k/emu/nfblock.c
-+++ b/arch/m68k/emu/nfblock.c
-@@ -73,7 +73,7 @@ static blk_qc_t nfhd_make_request(struct request_queue *queue, struct bio *bio)
- 		len = bvec.bv_len;
- 		len >>= 9;
- 		nfhd_read_write(dev->id, 0, dir, sec >> shift, len >> shift,
--				bvec_to_phys(&bvec));
-+				page_to_phys(bvec.bv_page) + bvec.bv_offset);
- 		sec += len;
- 	}
- 	bio_endio(bio);
-diff --git a/block/blk.h b/block/blk.h
-index e903ce783624..58c030f727e9 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -154,8 +154,8 @@ static inline bool biovec_phys_mergeable(struct request_queue *q,
- 		struct bio_vec *vec1, struct bio_vec *vec2)
- {
- 	unsigned long mask = queue_segment_boundary(q);
--	phys_addr_t addr1 = bvec_to_phys(vec1);
--	phys_addr_t addr2 = bvec_to_phys(vec2);
-+	phys_addr_t addr1 = page_to_phys(vec1->bv_page) + vec1->bv_offset;
-+	phys_addr_t addr2 = page_to_phys(vec2->bv_page) + vec2->bv_offset;
- 
- 	if (addr1 + vec1->bv_len != addr2)
- 		return false;
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 8bec9f248ab8..fcb5f5618ed4 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -132,11 +132,6 @@ static inline bool bio_full(struct bio *bio)
- 	return bio->bi_vcnt >= bio->bi_max_vecs;
- }
- 
--/*
-- * will die
-- */
--#define bvec_to_phys(bv)	(page_to_phys((bv)->bv_page) + (unsigned long) (bv)->bv_offset)
--
- /*
-  * drivers should _never_ use the all version - the bio may have been split
-  * before it got to the driver and the driver won't own all of it
--- 
-2.18.0
+Reviewed-by: Keith Busch <keith.busch@intel.com>
