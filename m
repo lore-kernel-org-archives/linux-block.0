@@ -1,91 +1,63 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 10/14] loop: Push loop_ctl_mutex down to loop_set_fd()
-Date: Thu, 27 Sep 2018 13:36:48 +0200
-Message-Id: <20180927113652.5422-11-jack@suse.cz>
-In-Reply-To: <20180927113652.5422-1-jack@suse.cz>
-References: <20180927113652.5422-1-jack@suse.cz>
+Return-Path: <jthumshirn@suse.de>
+Date: Thu, 27 Sep 2018 08:54:35 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH v10 7/8] block: Make blk_get_request() block for non-PM
+ requests while suspended
+Message-ID: <20180927065435.GA6959@linux-x5ow.site>
+References: <20180921203122.49743-1-bvanassche@acm.org>
+ <20180921203122.49743-8-bvanassche@acm.org>
+ <20180926142740.GE8604@lst.de>
+ <20180926144357.GC13588@linux-x5ow.site>
+ <20180926145732.GA9446@lst.de>
+ <20180926150634.GD13588@linux-x5ow.site>
+ <1537986295.209118.0.camel@acm.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1537986295.209118.0.camel@acm.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Push lo_ctl_mutex down to loop_set_fd(). We will need this to be able to
-call loop_reread_partitions() without lo_ctl_mutex.
+On Wed, Sep 26, 2018 at 11:24:55AM -0700, Bart Van Assche wrote:
+> On Wed, 2018-09-26 at 17:06 +0200, Johannes Thumshirn wrote:
+> > On Wed, Sep 26, 2018 at 04:57:32PM +0200, Christoph Hellwig wrote:
+> > > I don't think this actually works given that rpm_status only exists
+> > > if CONFIG_PM is set.
+> > 
+> > I think it'll work as GCC does constant propagation. There are
+> > actually some places in the kernel that follow this pattern.
+> 
+> This is what gcc on my development system thinks about that proposal:
+> 
+> In file included from ./arch/x86/include/asm/bug.h:83:0,
+>                  from ./include/linux/bug.h:5,
+>                  from ./include/linux/thread_info.h:12,
+>                  from ./arch/x86/include/asm/preempt.h:7,
+>                  from ./include/linux/preempt.h:81,
+>                  from ./include/linux/spinlock.h:51,
+>                  from ./include/linux/seqlock.h:36,
+>                  from ./include/linux/time.h:6,
+>                  from ./include/linux/stat.h:19,
+>                  from ./include/linux/module.h:10,
+>                  from block/blk-core.c:15:
+> block/blk-core.c: In function ‘elv_next_request’:
+> block/blk-core.c:2795:44: error: ‘struct request_queue’ has no member named ‘rpm_status’; did you mean ‘stats’?
+>                             WARN_ON_ONCE(q->rpm_status == RPM_SUSPENDED);
+>                                             ^
+> ./include/asm-generic/bug.h:69:25: note: in definition of macro ‘WARN_ON_ONCE’
+>   int __ret_warn_on = !!(condition);   \
+>                          ^~~~~~~~~
+> scripts/Makefile.build:305: recipe for target 'block/blk-core.o' failed
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- drivers/block/loop.c | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+Aparently this only works for functions and not struct members, my
+bad.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 1cc29bd77d67..504e5ef07509 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -919,13 +919,17 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	if (!file)
- 		goto out;
- 
-+	error = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+	if (error)
-+		goto out_putf;
-+
- 	error = -EBUSY;
- 	if (lo->lo_state != Lo_unbound)
--		goto out_putf;
-+		goto out_unlock;
- 
- 	error = loop_validate_file(file, bdev);
- 	if (error)
--		goto out_putf;
-+		goto out_unlock;
- 
- 	mapping = file->f_mapping;
- 	inode = mapping->host;
-@@ -937,10 +941,10 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	error = -EFBIG;
- 	size = get_loop_size(lo, file);
- 	if ((loff_t)(sector_t)size != size)
--		goto out_putf;
-+		goto out_unlock;
- 	error = loop_prepare_queue(lo);
- 	if (error)
--		goto out_putf;
-+		goto out_unlock;
- 
- 	error = 0;
- 
-@@ -979,11 +983,14 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	 * put /dev/loopXX inode. Later in __loop_clr_fd() we bdput(bdev).
- 	 */
- 	bdgrab(bdev);
-+	mutex_unlock(&loop_ctl_mutex);
- 	return 0;
- 
-- out_putf:
-+out_unlock:
-+	mutex_unlock(&loop_ctl_mutex);
-+out_putf:
- 	fput(file);
-- out:
-+out:
- 	/* This is safe: open() is still holding a reference. */
- 	module_put(THIS_MODULE);
- 	return error;
-@@ -1461,12 +1468,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 
- 	switch (cmd) {
- 	case LOOP_SET_FD:
--		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
--		if (err)
--			return err;
--		err = loop_set_fd(lo, mode, bdev, arg);
--		mutex_unlock(&loop_ctl_mutex);
--		break;
-+		return loop_set_fd(lo, mode, bdev, arg);
- 	case LOOP_CHANGE_FD:
- 		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
- 		if (err)
+	Johannes
 -- 
-2.16.4
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
