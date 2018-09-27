@@ -1,132 +1,158 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-From: Dennis Zhou <dennisszhou@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Josef Bacik <josef@toxicpanda.com>
-Cc: kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
-Subject: [PATCH 03/12] blkcg: convert blkg_lookup_create to find closest blkg
-Date: Thu,  6 Sep 2018 17:10:36 -0400
-Message-Id: <20180906211045.29055-4-dennisszhou@gmail.com>
-In-Reply-To: <20180906211045.29055-1-dennisszhou@gmail.com>
-References: <20180906211045.29055-1-dennisszhou@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:37122 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727187AbeI0RzF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 27 Sep 2018 13:55:05 -0400
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH 09/14] loop: Push loop_ctl_mutex down to loop_set_status()
+Date: Thu, 27 Sep 2018 13:36:47 +0200
+Message-Id: <20180927113652.5422-10-jack@suse.cz>
+In-Reply-To: <20180927113652.5422-1-jack@suse.cz>
+References: <20180927113652.5422-1-jack@suse.cz>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: "Dennis Zhou (Facebook)" <dennisszhou@gmail.com>
+Push loop_ctl_mutex down to loop_set_status(). We will need this to be
+able to call loop_reread_partitions() without loop_ctl_mutex.
 
-There are several scenarios where blkg_lookup_create can fail. Examples
-include the blkcg dying, request_queue is dying, or simply being OOM. At
-the end of the day, most handle this by simply falling back to the
-q->root_blkg and calling it a day.
-
-This patch implements the notion of closest blkg. During
-blkg_lookup_create, if it fails to create, return the closest blkg
-found or the q->root_blkg. blkg_try_get_closest is introduced and used
-during association so a bio is always attached to a blkg.
-
-Signed-off-by: Dennis Zhou <dennisszhou@gmail.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/bio.c                |  4 +---
- block/blk-cgroup.c         | 22 +++++++++++++++-------
- include/linux/blk-cgroup.h | 14 ++++++++++++++
- 3 files changed, 30 insertions(+), 10 deletions(-)
+ drivers/block/loop.c | 51 +++++++++++++++++++++++++--------------------------
+ 1 file changed, 25 insertions(+), 26 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 91c6b1458454..cd947ad4cf08 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -2021,9 +2021,7 @@ int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg)
- {
- 	if (unlikely(bio->bi_blkg))
- 		return -EBUSY;
--	if (!blkg_try_get(blkg))
--		return -ENODEV;
--	bio->bi_blkg = blkg;
-+	bio->bi_blkg = blkg_try_get_closest(blkg);
- 	return 0;
- }
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 577d5e5a9312..1cc29bd77d67 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1142,46 +1142,55 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	struct loop_func_table *xfer;
+ 	kuid_t uid = current_uid();
  
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index cd0d97bed83d..9f8aba29b7c1 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -268,9 +268,8 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
-  * that all non-root blkg's have access to the parent blkg.  This function
-  * should be called under RCU read lock and @q->queue_lock.
-  *
-- * Returns pointer to the looked up or created blkg on success, ERR_PTR()
-- * value on error.  If @q is dead, returns ERR_PTR(-EINVAL).  If @q is not
-- * dead and bypassing, returns ERR_PTR(-EBUSY).
-+ * Returns the blkg or the closest blkg if blkg_create fails as it walks
-+ * down from root.
-  */
- struct blkcg_gq *__blkg_lookup_create(struct blkcg *blkcg,
- 				      struct request_queue *q)
-@@ -285,7 +284,7 @@ struct blkcg_gq *__blkg_lookup_create(struct blkcg *blkcg,
- 	 * we shouldn't allow anything to go through for a bypassing queue.
- 	 */
- 	if (unlikely(blk_queue_bypass(q)))
--		return ERR_PTR(blk_queue_dying(q) ? -ENODEV : -EBUSY);
-+		return q->root_blkg;
++	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++	if (err)
++		return err;
+ 	if (lo->lo_encrypt_key_size &&
+ 	    !uid_eq(lo->lo_key_owner, uid) &&
+-	    !capable(CAP_SYS_ADMIN))
+-		return -EPERM;
+-	if (lo->lo_state != Lo_bound)
+-		return -ENXIO;
+-	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE)
+-		return -EINVAL;
++	    !capable(CAP_SYS_ADMIN)) {
++		err = -EPERM;
++		goto out_unlock;
++	}
++	if (lo->lo_state != Lo_bound) {
++		err = -ENXIO;
++		goto out_unlock;
++	}
++	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE) {
++		err = -EINVAL;
++		goto out_unlock;
++	}
  
- 	blkg = __blkg_lookup(blkcg, q, true);
- 	if (blkg)
-@@ -298,14 +297,23 @@ struct blkcg_gq *__blkg_lookup_create(struct blkcg *blkcg,
- 	while (true) {
- 		struct blkcg *pos = blkcg;
- 		struct blkcg *parent = blkcg_parent(blkcg);
--
--		while (parent && !__blkg_lookup(parent, q, false)) {
-+		struct blkcg_gq *ret_blkg = NULL;
-+
-+		while (parent) {
-+			blkg = __blkg_lookup(parent, q, false);
-+			if (blkg) {
-+				/* remember closest blkg */
-+				ret_blkg = blkg;
-+				break;
-+			}
- 			pos = parent;
- 			parent = blkcg_parent(parent);
+ 	/* I/O need to be drained during transfer transition */
+ 	blk_mq_freeze_queue(lo->lo_queue);
+ 
+ 	err = loop_release_xfer(lo);
+ 	if (err)
+-		goto exit;
++		goto out_unfreeze;
+ 
+ 	if (info->lo_encrypt_type) {
+ 		unsigned int type = info->lo_encrypt_type;
+ 
+ 		if (type >= MAX_LO_CRYPT) {
+ 			err = -EINVAL;
+-			goto exit;
++			goto out_unfreeze;
  		}
+ 		xfer = xfer_funcs[type];
+ 		if (xfer == NULL) {
+ 			err = -EINVAL;
+-			goto exit;
++			goto out_unfreeze;
+ 		}
+ 	} else
+ 		xfer = NULL;
  
- 		blkg = blkg_create(pos, q, NULL);
--		if (pos == blkcg || IS_ERR(blkg))
-+		if (IS_ERR(blkg))
-+			return ret_blkg ?: q->root_blkg;
-+		if (pos == blkcg)
- 			return blkg;
+ 	err = loop_init_xfer(lo, xfer, info);
+ 	if (err)
+-		goto exit;
++		goto out_unfreeze;
+ 
+ 	if (lo->lo_offset != info->lo_offset ||
+ 	    lo->lo_sizelimit != info->lo_sizelimit) {
+ 		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit)) {
+ 			err = -EFBIG;
+-			goto exit;
++			goto out_unfreeze;
+ 		}
  	}
+ 
+@@ -1213,7 +1222,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	/* update dio if lo_offset or transfer is changed */
+ 	__loop_update_dio(lo, lo->use_dio);
+ 
+- exit:
++out_unfreeze:
+ 	blk_mq_unfreeze_queue(lo->lo_queue);
+ 
+ 	if (!err && (info->lo_flags & LO_FLAGS_PARTSCAN) &&
+@@ -1222,6 +1231,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 		lo->lo_disk->flags &= ~GENHD_FL_NO_PART_SCAN;
+ 		loop_reread_partitions(lo, lo->lo_device);
+ 	}
++out_unlock:
++	mutex_unlock(&loop_ctl_mutex);
+ 
+ 	return err;
  }
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index cc0f238530f6..1fbff1bbb651 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -549,6 +549,20 @@ static inline struct blkcg_gq *blkg_try_get(struct blkcg_gq *blkg)
- 	return NULL;
- }
+@@ -1468,12 +1479,8 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 	case LOOP_SET_STATUS:
+ 		err = -EPERM;
+ 		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
+-			err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+-			if (err)
+-				return err;
+ 			err = loop_set_status_old(lo,
+ 					(struct loop_info __user *)arg);
+-			mutex_unlock(&loop_ctl_mutex);
+ 		}
+ 		break;
+ 	case LOOP_GET_STATUS:
+@@ -1481,12 +1488,8 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 	case LOOP_SET_STATUS64:
+ 		err = -EPERM;
+ 		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
+-			err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+-			if (err)
+-				return err;
+ 			err = loop_set_status64(lo,
+ 					(struct loop_info64 __user *) arg);
+-			mutex_unlock(&loop_ctl_mutex);
+ 		}
+ 		break;
+ 	case LOOP_GET_STATUS64:
+@@ -1631,12 +1634,8 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
  
-+/**
-+ * blkg_try_get_closest - try and get a blkg ref on the closet blkg
-+ * @blkg: blkg to get
-+ *
-+ * This walks up the blkg tree to find the closest non-dying blkg and returns
-+ * the blkg that it did association with as it may not be the passed in blkg.
-+ */
-+static inline struct blkcg_gq *blkg_try_get_closest(struct blkcg_gq *blkg)
-+{
-+	while (!atomic_inc_not_zero(&blkg->refcnt))
-+		blkg = blkg->parent;
-+
-+	return blkg;
-+}
- 
- void __blkg_release_rcu(struct rcu_head *rcu);
- 
+ 	switch(cmd) {
+ 	case LOOP_SET_STATUS:
+-		err = mutex_lock_killable(&loop_ctl_mutex);
+-		if (!err) {
+-			err = loop_set_status_compat(lo,
+-						     (const struct compat_loop_info __user *)arg);
+-			mutex_unlock(&loop_ctl_mutex);
+-		}
++		err = loop_set_status_compat(lo,
++			     (const struct compat_loop_info __user *)arg);
+ 		break;
+ 	case LOOP_GET_STATUS:
+ 		err = loop_get_status_compat(lo,
 -- 
-2.17.1
+2.16.4
