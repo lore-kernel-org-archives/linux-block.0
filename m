@@ -1,24 +1,115 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH 1/1] bcache: add separate workqueue for journal_write to
- avoid deadlock
-To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, guoju <fangguoju@gmail.com>,
- stable@vger.kernel.org
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	guoju <fangguoju@gmail.com>,
+	stable@vger.kernel.org,
+	Coly Li <colyli@suse.de>
+Subject: [PATCH 1/1] bcache: add separate workqueue for journal_write to avoid deadlock
+Date: Thu, 27 Sep 2018 23:41:46 +0800
+Message-Id: <20180927154146.28262-2-colyli@suse.de>
+In-Reply-To: <20180927154146.28262-1-colyli@suse.de>
 References: <20180927154146.28262-1-colyli@suse.de>
- <20180927154146.28262-2-colyli@suse.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <970bb505-ef6e-7057-5e0f-21d9439b4031@kernel.dk>
-Date: Thu, 27 Sep 2018 09:46:13 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180927154146.28262-2-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 9/27/18 9:41 AM, Coly Li wrote:
-> From: guoju <fangguoju@gmail.com>
+From: guoju <fangguoju@gmail.com>
 
-This, and the signed-off, should use the full name. I can fix that up,
-assuming Guoju Fang is the full name?
+After write SSD completed, bcache schedules journal_write work to
+system_wq, which is a public workqueue in system, without WQ_MEM_RECLAIM
+flag. system_wq is also a bound wq, and there may be no idle kworker on
+current processor. Creating a new kworker may unfortunately need to
+reclaim memory first, by shrinking cache and slab used by vfs, which
+depends on bcache device. That's a deadlock.
 
+This patch create a new workqueue for journal_write with WQ_MEM_RECLAIM
+flag. It's rescuer thread will work to avoid the deadlock.
+
+Signed-off-by: guoju <fangguoju@gmail.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Coly Li <colyli@suse.de>
+---
+ drivers/md/bcache/bcache.h  | 1 +
+ drivers/md/bcache/journal.c | 6 +++---
+ drivers/md/bcache/super.c   | 8 ++++++++
+ 3 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 83504dd8100a..954dad29e6e8 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -965,6 +965,7 @@ void bch_prio_write(struct cache *ca);
+ void bch_write_bdev_super(struct cached_dev *dc, struct closure *parent);
+ 
+ extern struct workqueue_struct *bcache_wq;
++extern struct workqueue_struct *bch_journal_wq;
+ extern struct mutex bch_register_lock;
+ extern struct list_head bch_cache_sets;
+ 
+diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+index 6116bbf870d8..522c7426f3a0 100644
+--- a/drivers/md/bcache/journal.c
++++ b/drivers/md/bcache/journal.c
+@@ -485,7 +485,7 @@ static void do_journal_discard(struct cache *ca)
+ 
+ 		closure_get(&ca->set->cl);
+ 		INIT_WORK(&ja->discard_work, journal_discard_work);
+-		schedule_work(&ja->discard_work);
++		queue_work(bch_journal_wq, &ja->discard_work);
+ 	}
+ }
+ 
+@@ -592,7 +592,7 @@ static void journal_write_done(struct closure *cl)
+ 		: &j->w[0];
+ 
+ 	__closure_wake_up(&w->wait);
+-	continue_at_nobarrier(cl, journal_write, system_wq);
++	continue_at_nobarrier(cl, journal_write, bch_journal_wq);
+ }
+ 
+ static void journal_write_unlock(struct closure *cl)
+@@ -627,7 +627,7 @@ static void journal_write_unlocked(struct closure *cl)
+ 		spin_unlock(&c->journal.lock);
+ 
+ 		btree_flush_write(c);
+-		continue_at(cl, journal_write, system_wq);
++		continue_at(cl, journal_write, bch_journal_wq);
+ 		return;
+ 	}
+ 
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 94c756c66bd7..30ba9aeb5ee8 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -47,6 +47,7 @@ static int bcache_major;
+ static DEFINE_IDA(bcache_device_idx);
+ static wait_queue_head_t unregister_wait;
+ struct workqueue_struct *bcache_wq;
++struct workqueue_struct *bch_journal_wq;
+ 
+ #define BTREE_MAX_PAGES		(256 * 1024 / PAGE_SIZE)
+ /* limitation of partitions number on single bcache device */
+@@ -2341,6 +2342,9 @@ static void bcache_exit(void)
+ 		kobject_put(bcache_kobj);
+ 	if (bcache_wq)
+ 		destroy_workqueue(bcache_wq);
++	if (bch_journal_wq)
++		destroy_workqueue(bch_journal_wq);
++
+ 	if (bcache_major)
+ 		unregister_blkdev(bcache_major, "bcache");
+ 	unregister_reboot_notifier(&reboot);
+@@ -2370,6 +2374,10 @@ static int __init bcache_init(void)
+ 	if (!bcache_wq)
+ 		goto err;
+ 
++	bch_journal_wq = alloc_workqueue("bch_journal", WQ_MEM_RECLAIM, 0);
++	if (!bch_journal_wq)
++		goto err;
++
+ 	bcache_kobj = kobject_create_and_add("bcache", fs_kobj);
+ 	if (!bcache_kobj)
+ 		goto err;
 -- 
-Jens Axboe
+2.19.0
