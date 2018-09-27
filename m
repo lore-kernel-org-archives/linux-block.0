@@ -1,72 +1,91 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ua1-f65.google.com ([209.85.222.65]:44745 "EHLO
-        mail-ua1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726339AbeIDPEa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Sep 2018 11:04:30 -0400
-Received: by mail-ua1-f65.google.com with SMTP id m11-v6so2441297uao.11
-        for <linux-block@vger.kernel.org>; Tue, 04 Sep 2018 03:39:58 -0700 (PDT)
-MIME-Version: 1.0
-References: <1535545877-770-1-git-send-email-hans.ml.holmberg@owltronix.com>
- <1535545877-770-5-git-send-email-hans.ml.holmberg@owltronix.com> <AE72A23A-F779-466B-89A7-846A232DD9B2@cnexlabs.com>
-In-Reply-To: <AE72A23A-F779-466B-89A7-846A232DD9B2@cnexlabs.com>
-From: Hans Holmberg <hans@owltronix.com>
-Date: Tue, 4 Sep 2018 12:39:46 +0200
-Message-ID: <CANr-nt3kvXVMSeaEZf3hZo2tR31G+h1B9X300Ew+Ys5QiK02QQ@mail.gmail.com>
-Subject: Re: [PATCH 4/4] lightnvm: pblk: add tracing for chunk resets
-To: Javier Gonzalez <javier@cnexlabs.com>
-Cc: Matias Bjorling <mb@lightnvm.io>, linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 10/14] loop: Push loop_ctl_mutex down to loop_set_fd()
+Date: Thu, 27 Sep 2018 13:36:48 +0200
+Message-Id: <20180927113652.5422-11-jack@suse.cz>
+In-Reply-To: <20180927113652.5422-1-jack@suse.cz>
+References: <20180927113652.5422-1-jack@suse.cz>
+List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Aug 29, 2018 at 10:09 PM Javier Gonzalez <javier@cnexlabs.com> wrote:
->
-> > On 29 Aug 2018, at 14.31, Hans Holmberg <hans.ml.holmberg@owltronix.com> wrote:
-> >
-> > From: Hans Holmberg <hans.holmberg@cnexlabs.com>
-> >
-> > Trace state of chunk resets.
-> >
-> > Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-> > ---
-> > drivers/lightnvm/pblk-core.c  | 12 ++++++++++++
-> > drivers/lightnvm/pblk-trace.h | 31 +++++++++++++++++++++++++++++++
-> > drivers/lightnvm/pblk.h       |  6 ++++++
-> > 3 files changed, 49 insertions(+)
-> >
-> > diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-> > index 566a5d3165ee..b874001d1175 100644
-> > --- a/drivers/lightnvm/pblk-core.c
-> > +++ b/drivers/lightnvm/pblk-core.c
-> > @@ -90,9 +90,15 @@ static void __pblk_end_io_erase(struct pblk *pblk, struct nvm_rq *rqd)
-> >       atomic_dec(&line->left_seblks);
-> >
-> >       if (rqd->error) {
-> > +             trace_pblk_chunk_reset(pblk_disk_name(pblk),
-> > +                             &rqd->ppa_addr, PBLK_CHUNK_RESET_FAILED);
-> > +
-> >               chunk->state = NVM_CHK_ST_OFFLINE;
-> >               pblk_mark_bb(pblk, line, rqd->ppa_addr);
-> >       } else {
-> > +             trace_pblk_chunk_reset(pblk_disk_name(pblk),
-> > +                             &rqd->ppa_addr, PBLK_CHUNK_RESET_DONE);
-> > +
-> >               chunk->state = NVM_CHK_ST_FREE;
-> >       }
-> >
-> > @@ -958,6 +964,9 @@ int pblk_line_erase(struct pblk *pblk, struct pblk_line *line)
-> >               WARN_ON(test_and_set_bit(bit, line->erase_bitmap));
-> >               spin_unlock(&line->lock);
-> >
-> > +             trace_pblk_chunk_reset(pblk_disk_name(pblk),
-> > +                             &ppa, PBLK_CHUNK_RESET_START);
-> > +
->
-> Can you move this inside of pblk_blk_erase_sync() instead? I was looking
-> at the code now to implement a different thing and it is confusing to
-> see tracing inside erase_async and not in erase_sync.
->
+Push lo_ctl_mutex down to loop_set_fd(). We will need this to be able to
+call loop_reread_partitions() without lo_ctl_mutex.
 
-Fixed in a V2. Thanks.
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ drivers/block/loop.c | 26 ++++++++++++++------------
+ 1 file changed, 14 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 1cc29bd77d67..504e5ef07509 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -919,13 +919,17 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	if (!file)
+ 		goto out;
+ 
++	error = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++	if (error)
++		goto out_putf;
++
+ 	error = -EBUSY;
+ 	if (lo->lo_state != Lo_unbound)
+-		goto out_putf;
++		goto out_unlock;
+ 
+ 	error = loop_validate_file(file, bdev);
+ 	if (error)
+-		goto out_putf;
++		goto out_unlock;
+ 
+ 	mapping = file->f_mapping;
+ 	inode = mapping->host;
+@@ -937,10 +941,10 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	error = -EFBIG;
+ 	size = get_loop_size(lo, file);
+ 	if ((loff_t)(sector_t)size != size)
+-		goto out_putf;
++		goto out_unlock;
+ 	error = loop_prepare_queue(lo);
+ 	if (error)
+-		goto out_putf;
++		goto out_unlock;
+ 
+ 	error = 0;
+ 
+@@ -979,11 +983,14 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	 * put /dev/loopXX inode. Later in __loop_clr_fd() we bdput(bdev).
+ 	 */
+ 	bdgrab(bdev);
++	mutex_unlock(&loop_ctl_mutex);
+ 	return 0;
+ 
+- out_putf:
++out_unlock:
++	mutex_unlock(&loop_ctl_mutex);
++out_putf:
+ 	fput(file);
+- out:
++out:
+ 	/* This is safe: open() is still holding a reference. */
+ 	module_put(THIS_MODULE);
+ 	return error;
+@@ -1461,12 +1468,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 
+ 	switch (cmd) {
+ 	case LOOP_SET_FD:
+-		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+-		if (err)
+-			return err;
+-		err = loop_set_fd(lo, mode, bdev, arg);
+-		mutex_unlock(&loop_ctl_mutex);
+-		break;
++		return loop_set_fd(lo, mode, bdev, arg);
+ 	case LOOP_CHANGE_FD:
+ 		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+ 		if (err)
+-- 
+2.16.4
