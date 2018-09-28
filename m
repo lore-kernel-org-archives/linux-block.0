@@ -1,37 +1,61 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:48474 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731651AbeITMJB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Sep 2018 08:09:01 -0400
-Date: Thu, 20 Sep 2018 08:26:59 +0200
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme fix for 4.19
-Message-ID: <20180920062659.GA18562@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	kernel-team@fb.com
+Subject: [PATCH 1/5] blk-iolatency: use q->nr_requests directly
+Date: Fri, 28 Sep 2018 13:45:39 -0400
+Message-Id: <20180928174543.28486-2-josef@toxicpanda.com>
+In-Reply-To: <20180928174543.28486-1-josef@toxicpanda.com>
+References: <20180928174543.28486-1-josef@toxicpanda.com>
+List-ID: <linux-block@vger.kernel.org>
 
-The following changes since commit b228ba1cb95afbaeeb86cf06cd9fd6f6369c3b14:
+We were using blk_queue_depth() assuming that it would return
+nr_requests, but we hit a case in production on drives that had to have
+NCQ turned off in order for them to not shit the bed which resulted in a
+qd of 1, even though the nr_requests was much larger.  iolatency really
+only cares about requests we are allowed to queue up, as any io that
+get's onto the request list is going to be serviced soonish, so we want
+to be throttling before the bio gets onto the request list.  To make
+iolatency work as expected, simply use q->nr_requests instead of
+blk_queue_depth() as that is what we actually care about.
 
-  null_blk: fix zoned support for non-rq based operation (2018-09-12 18:21:11 -0600)
+Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+---
+ block/blk-iolatency.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-are available in the Git repository at:
-
-  git://git.infradead.org/nvme.git nvme-4.19
-
-for you to fetch changes up to be1277f5eb17a2e5788139eabb0b53dd04c695f3:
-
-  nvme: count all ANA groups for ANA Log page (2018-09-17 15:49:40 +0200)
-
-----------------------------------------------------------------
-Hannes Reinecke (1):
-      nvme: count all ANA groups for ANA Log page
-
- drivers/nvme/target/admin-cmd.c | 4 ++++
- 1 file changed, 4 insertions(+)
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index 27c14f8d2576..c2e38bc12f27 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -255,7 +255,7 @@ static void scale_cookie_change(struct blk_iolatency *blkiolat,
+ 				struct child_latency_info *lat_info,
+ 				bool up)
+ {
+-	unsigned long qd = blk_queue_depth(blkiolat->rqos.q);
++	unsigned long qd = blkiolat->rqos.q->nr_requests;
+ 	unsigned long scale = scale_amount(qd, up);
+ 	unsigned long old = atomic_read(&lat_info->scale_cookie);
+ 	unsigned long max_scale = qd << 1;
+@@ -295,7 +295,7 @@ static void scale_cookie_change(struct blk_iolatency *blkiolat,
+  */
+ static void scale_change(struct iolatency_grp *iolat, bool up)
+ {
+-	unsigned long qd = blk_queue_depth(iolat->blkiolat->rqos.q);
++	unsigned long qd = iolat->blkiolat->rqos.q->nr_requests;
+ 	unsigned long scale = scale_amount(qd, up);
+ 	unsigned long old = iolat->rq_depth.max_depth;
+ 
+@@ -857,7 +857,7 @@ static void iolatency_pd_init(struct blkg_policy_data *pd)
+ 
+ 	rq_wait_init(&iolat->rq_wait);
+ 	spin_lock_init(&iolat->child_lat.lock);
+-	iolat->rq_depth.queue_depth = blk_queue_depth(blkg->q);
++	iolat->rq_depth.queue_depth = blkg->q->nr_requests;
+ 	iolat->rq_depth.max_depth = UINT_MAX;
+ 	iolat->rq_depth.default_depth = iolat->rq_depth.queue_depth;
+ 	iolat->blkiolat = blkiolat;
+-- 
+2.14.3
