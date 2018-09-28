@@ -1,185 +1,93 @@
-Return-Path: <bvanassche@acm.org>
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
+Return-Path: <hare@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Bart van Assche <bvanassche@acm.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <keith.busch@intel.com>,
+	linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Hannes Reinecke <hare@suse.de>,
 	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v10 7/8] block: Make blk_get_request() block for non-PM requests while suspended
-Date: Fri, 21 Sep 2018 13:31:21 -0700
-Message-Id: <20180921203122.49743-8-bvanassche@acm.org>
-In-Reply-To: <20180921203122.49743-1-bvanassche@acm.org>
-References: <20180921203122.49743-1-bvanassche@acm.org>
-MIME-Version: 1.0
+	Minchan Kim <minchan@kernel.org>,
+	Nitin Gupta <ngupta@vflare.org>
+Subject: [PATCH 4/5] zram: register default groups with device_add_disk()
+Date: Fri, 28 Sep 2018 08:17:22 +0200
+Message-Id: <20180928061723.13180-5-hare@suse.de>
+In-Reply-To: <20180928061723.13180-1-hare@suse.de>
+References: <20180928061723.13180-1-hare@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Instead of allowing requests that are not power management requests
-to enter the queue in runtime suspended status (RPM_SUSPENDED), make
-the blk_get_request() caller block. This change fixes a starvation
-issue: it is now guaranteed that power management requests will be
-executed no matter how many blk_get_request() callers are waiting.
-For blk-mq, instead of maintaining the q->nr_pending counter, rely
-on q->q_usage_counter. Call pm_runtime_mark_last_busy() every time a
-request finishes instead of only if the queue depth drops to zero.
+Register default sysfs groups during device_add_disk() to avoid a
+race condition with udev during startup.
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>
+Signed-off-by: Hannes Reinecke <hare@suse.com>
+Cc: Minchan Kim <minchan@kernel.org>
+Cc: Nitin Gupta <ngupta@vflare.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
 ---
- block/blk-core.c | 37 ++++++++-----------------------------
- block/blk-pm.c   | 44 +++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 47 insertions(+), 34 deletions(-)
+ drivers/block/zram/zram_drv.c | 28 +++++++---------------------
+ 1 file changed, 7 insertions(+), 21 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index fec135ae52cf..16dd3a989753 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2746,30 +2746,6 @@ void blk_account_io_done(struct request *req, u64 now)
- 	}
- }
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index a1d6b5597c17..4879595200e1 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1636,6 +1636,11 @@ static const struct attribute_group zram_disk_attr_group = {
+ 	.attrs = zram_disk_attrs,
+ };
  
--#ifdef CONFIG_PM
--/*
-- * Don't process normal requests when queue is suspended
-- * or in the process of suspending/resuming
-- */
--static bool blk_pm_allow_request(struct request *rq)
--{
--	switch (rq->q->rpm_status) {
--	case RPM_RESUMING:
--	case RPM_SUSPENDING:
--		return rq->rq_flags & RQF_PM;
--	case RPM_SUSPENDED:
--		return false;
--	default:
--		return true;
--	}
--}
--#else
--static bool blk_pm_allow_request(struct request *rq)
--{
--	return true;
--}
--#endif
++static const struct attribute_group *zram_disk_attr_groups[] = {
++	&zram_disk_attr_group,
++	NULL,
++};
++
+ /*
+  * Allocate and initialize new zram device. the function returns
+  * '>= 0' device_id upon success, and negative value otherwise.
+@@ -1716,24 +1721,14 @@ static int zram_add(void)
+ 
+ 	zram->disk->queue->backing_dev_info->capabilities |=
+ 			(BDI_CAP_STABLE_WRITES | BDI_CAP_SYNCHRONOUS_IO);
+-	add_disk(zram->disk);
 -
- void blk_account_io_start(struct request *rq, bool new_io)
- {
- 	struct hd_struct *part;
-@@ -2815,11 +2791,14 @@ static struct request *elv_next_request(struct request_queue *q)
- 
- 	while (1) {
- 		list_for_each_entry(rq, &q->queue_head, queuelist) {
--			if (blk_pm_allow_request(rq))
--				return rq;
--
--			if (rq->rq_flags & RQF_SOFTBARRIER)
--				break;
-+#ifdef CONFIG_PM
-+			/*
-+			 * If a request gets queued in state RPM_SUSPENDED
-+			 * then that's a kernel bug.
-+			 */
-+			WARN_ON_ONCE(q->rpm_status == RPM_SUSPENDED);
-+#endif
-+			return rq;
- 		}
- 
- 		/*
-diff --git a/block/blk-pm.c b/block/blk-pm.c
-index 9b636960d285..972fbc656846 100644
---- a/block/blk-pm.c
-+++ b/block/blk-pm.c
-@@ -1,8 +1,11 @@
- // SPDX-License-Identifier: GPL-2.0
- 
-+#include <linux/blk-mq.h>
- #include <linux/blk-pm.h>
- #include <linux/blkdev.h>
- #include <linux/pm_runtime.h>
-+#include "blk-mq.h"
-+#include "blk-mq-tag.h"
- 
- /**
-  * blk_pm_runtime_init - Block layer runtime PM initialization routine
-@@ -68,14 +71,40 @@ int blk_pre_runtime_suspend(struct request_queue *q)
- 	if (!q->dev)
- 		return ret;
- 
-+	WARN_ON_ONCE(q->rpm_status != RPM_ACTIVE);
-+
-+	/*
-+	 * Increase the pm_only counter before checking whether any
-+	 * non-PM blk_queue_enter() calls are in progress to avoid that any
-+	 * new non-PM blk_queue_enter() calls succeed before the pm_only
-+	 * counter is decreased again.
-+	 */
-+	blk_set_pm_only(q);
-+	ret = -EBUSY;
-+	/* Switch q_usage_counter from per-cpu to atomic mode. */
-+	blk_freeze_queue_start(q);
-+	/*
-+	 * Wait until atomic mode has been reached. Since that
-+	 * involves calling call_rcu(), it is guaranteed that later
-+	 * blk_queue_enter() calls see the pm-only state. See also
-+	 * http://lwn.net/Articles/573497/.
-+	 */
-+	percpu_ref_switch_to_atomic_sync(&q->q_usage_counter);
-+	if (percpu_ref_is_zero(&q->q_usage_counter))
-+		ret = 0;
-+	/* Switch q_usage_counter back to per-cpu mode. */
-+	blk_mq_unfreeze_queue(q);
-+
- 	spin_lock_irq(q->queue_lock);
--	if (q->nr_pending) {
--		ret = -EBUSY;
-+	if (ret < 0)
- 		pm_runtime_mark_last_busy(q->dev);
--	} else {
-+	else
- 		q->rpm_status = RPM_SUSPENDING;
+-	ret = sysfs_create_group(&disk_to_dev(zram->disk)->kobj,
+-				&zram_disk_attr_group);
+-	if (ret < 0) {
+-		pr_err("Error creating sysfs group for device %d\n",
+-				device_id);
+-		goto out_free_disk;
 -	}
- 	spin_unlock_irq(q->queue_lock);
++	device_add_disk(NULL, zram->disk, zram_disk_attr_groups);
 +
-+	if (ret)
-+		blk_clear_pm_only(q);
-+
- 	return ret;
- }
- EXPORT_SYMBOL(blk_pre_runtime_suspend);
-@@ -106,6 +135,9 @@ void blk_post_runtime_suspend(struct request_queue *q, int err)
- 		pm_runtime_mark_last_busy(q->dev);
- 	}
- 	spin_unlock_irq(q->queue_lock);
-+
-+	if (err)
-+		blk_clear_pm_only(q);
- }
- EXPORT_SYMBOL(blk_post_runtime_suspend);
+ 	strlcpy(zram->compressor, default_compressor, sizeof(zram->compressor));
  
-@@ -153,13 +185,15 @@ void blk_post_runtime_resume(struct request_queue *q, int err)
- 	spin_lock_irq(q->queue_lock);
- 	if (!err) {
- 		q->rpm_status = RPM_ACTIVE;
--		__blk_run_queue(q);
- 		pm_runtime_mark_last_busy(q->dev);
- 		pm_request_autosuspend(q->dev);
- 	} else {
- 		q->rpm_status = RPM_SUSPENDED;
- 	}
- 	spin_unlock_irq(q->queue_lock);
-+
-+	if (!err)
-+		blk_clear_pm_only(q);
- }
- EXPORT_SYMBOL(blk_post_runtime_resume);
+ 	zram_debugfs_register(zram);
+ 	pr_info("Added device: %s\n", zram->disk->disk_name);
+ 	return device_id;
  
+-out_free_disk:
+-	del_gendisk(zram->disk);
+-	put_disk(zram->disk);
+ out_free_queue:
+ 	blk_cleanup_queue(queue);
+ out_free_idr:
+@@ -1762,15 +1757,6 @@ static int zram_remove(struct zram *zram)
+ 	mutex_unlock(&bdev->bd_mutex);
+ 
+ 	zram_debugfs_unregister(zram);
+-	/*
+-	 * Remove sysfs first, so no one will perform a disksize
+-	 * store while we destroy the devices. This also helps during
+-	 * hot_remove -- zram_reset_device() is the last holder of
+-	 * ->init_lock, no later/concurrent disksize_store() or any
+-	 * other sysfs handlers are possible.
+-	 */
+-	sysfs_remove_group(&disk_to_dev(zram->disk)->kobj,
+-			&zram_disk_attr_group);
+ 
+ 	/* Make sure all the pending I/O are finished */
+ 	fsync_bdev(bdev);
 -- 
-2.19.0.444.g18242da7ef-goog
+2.16.4
