@@ -1,47 +1,92 @@
-Return-Path: <boris.ostrovsky@oracle.com>
-Subject: Re: [PATCH] xen/blkfront: correct purging of persistent grants
-To: Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org
-Cc: roger.pau@citrix.com, konrad.wilk@oracle.com, axboe@kernel.dk
+Return-Path: <Alan.Robinson@ts.fujitsu.com>
+Return-Path: <Alan.Robinson@ts.fujitsu.com>
+Date: Fri, 28 Sep 2018 09:58:52 +0200
+To: Juergen Gross <jgross@suse.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
+        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+        "roger.pau@citrix.com" <roger.pau@citrix.com>
+Subject: Re: [Xen-devel] [PATCH] xen/blkfront: correct purging of persistent
+ grants
+Message-ID: <20180928075852.GC6271@ts.fujitsu.com>
+Reply-To: Alan.Robinson@ts.fujitsu.com
 References: <20180928072827.14229-1-jgross@suse.com>
-From: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Message-ID: <95e32835-426f-36c9-a86a-09563f090f22@oracle.com>
-Date: Fri, 28 Sep 2018 08:45:26 -0400
 MIME-Version: 1.0
+Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";
+	micalg=sha-256; boundary="Y5rl02BVI9TCfPar"
 In-Reply-To: <20180928072827.14229-1-jgross@suse.com>
-Content-Type: text/plain; charset=utf-8
+From: Alan.Robinson@ts.fujitsu.com (Alan Robinson)
 List-ID: <linux-block@vger.kernel.org>
 
-On 9/28/18 3:28 AM, Juergen Gross wrote:
+
+--Y5rl02BVI9TCfPar
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Fri, Sep 28, 2018 at 09:28:27AM +0200, Juergen Gross wrote:
 > Commit a46b53672b2c2e3770b38a4abf90d16364d2584b ("xen/blkfront: cleanup
 > stale persistent grants") introduced a regression as purged persistent
 > grants were not pu into the list of free grants again. Correct that.
->
-> Signed-off-by: Juergen Gross <jgross@suse.com>
-> ---
->  drivers/block/xen-blkfront.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-> index a71d817e900d..429d20131c7e 100644
-> --- a/drivers/block/xen-blkfront.c
-> +++ b/drivers/block/xen-blkfront.c
-> @@ -2670,8 +2670,8 @@ static void purge_persistent_grants(struct blkfront_info *info)
->  			list_del(&gnt_list_entry->node);
->  			gnttab_end_foreign_access(gnt_list_entry->gref, 0, 0UL);
->  			rinfo->persistent_gnts_c--;
-> -			__free_page(gnt_list_entry->page);
-> -			kfree(gnt_list_entry);
-> +			gnt_list_entry->gref = GRANT_INVALID_REF;
-> +			list_add_tail(&gnt_list_entry->node, &rinfo->grants);
+s/pu /put /
 
-Sorry, I don't follow this. What is the purpose of removing the grant
-from rinfo->grants list with list_del() and then adding it back with
-list_add_tail()?
+Alan
 
--boris
+--Y5rl02BVI9TCfPar
+Content-Type: application/x-pkcs7-signature
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
+MIIKTgYJKoZIhvcNAQcCoIIKPzCCCjsCAQExCzAJBgUrDgMCGgUAMAsGCSqGSIb3DQEHAaCC
+CH8wggSjMIIDi6ADAgECAgo2C52zAAAAAlTDMA0GCSqGSIb3DQEBBQUAMC8xLTArBgNVBAMT
+JEZ1aml0c3UgVGVjaG5vbG9neSBTb2x1dGlvbnMgVXNlciBDQTAeFw0xNzA1MTIxNTM0Mjda
+Fw0xOTAzMTExMjI0NTlaMEAxFzAVBgNVBAMMDlJvYmluc29uLCBBbGFuMSUwIwYDVQQKDBxG
+dWppdHN1IFRlY2hub2xvZ3kgU29sdXRpb25zMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKB
+gQClZEMpN68qHzred2QKqifLuUSlYnt/kB4V9Kjy8U7cQK/pN+ytbEBFXsllMyP2CjgGNYFu
+oqeztgkla2vBrjV9ilrJe3s+RJqkXgioKG1RSuiDW0sBFvI90dS4mHCH7cOTPPFHO5QHuCBU
+bClqAN0HlKweu/rIbqg0/g9j+SMb8QIDAQABo4ICMjCCAi4wCwYDVR0PBAQDAgWgMIGSBgNV
+HREEgYowgYeBHGFsYW4ucm9iaW5zb25AdHMuZnVqaXRzdS5jb22BJmFsYW4ucm9iaW5zb25A
+ZW1laWFjZW1lYS5mdWppdHN1LmxvY2FsgRxhbGFuLnJvYmluc29uQGNlbWFpbC5mc2MubmV0
+gSFBbGFuLlJvYmluc29uQGZ1aml0c3Utc2llbWVucy5jb20wHQYDVR0OBBYEFIlosAD8kas+
+gZn51OiifJoSRQTUMB8GA1UdIwQYMBaAFAj1yGq/gON7UMQ59AeYRuhtfpeoMDwGA1UdHwQ1
+MDMwMaAvoC2GK2h0dHA6Ly9jZHAudHMuZnVqaXRzdS5jb20vY2RwL2Z0czAxdXNlci5jcmww
+RwYIKwYBBQUHAQEEOzA5MDcGCCsGAQUFBzAChitodHRwOi8vYWlhLnRzLmZ1aml0c3UuY29t
+L2FpYS9mdHMwMXVzZXIuY2VyMAwGA1UdEwEB/wQCMAAwPQYJKwYBBAGCNxUHBDAwLgYmKwYB
+BAGCNxUIhYXEMoGH/2GBhYEEhuyCIIHHgRp5g4igcYfS8S8CAWQCAQgwEwYDVR0lBAwwCgYI
+KwYBBQUHAwQwGwYJKwYBBAGCNxUKBA4wDDAKBggrBgEFBQcDBDBEBgkqhkiG9w0BCQ8ENzA1
+MA4GCCqGSIb3DQMCAgIAgDAOBggqhkiG9w0DBAICAIAwBwYFKw4DAgcwCgYIKoZIhvcNAwcw
+DQYJKoZIhvcNAQEFBQADggEBADwUZHvoZuxiGLFQCoURq/FgeKSyxKrjuoutb8Bs3blR2QDA
+D3NWp0W+T4Js9fDcIb3Rq3uvFx0T/EcUiz1fFeQyN4B2xT8ofAnZeWuxWxWLUqS/K73fRIUC
+m7DUNj8lgRGsnSnAIl6ZKHDrdvwnxrF7qFPRVz77B4k3BK5mkMxxNVtKjbCoPj8fnh17Vnob
+Wnb0yztrPYeOHi2CqIey5qPjVMSTxKJYOejwjvE78SBMKKQS7cHBg+iOnYK90S0m+LK2/Yz5
+vgJtjGJL+68d5i0O/rmzgefOEeuMtD0IOI9lFXoUS16hbxj8gMy0dXKxfPhoYWB7bqIlY4Ri
+mpguPFwwggPUMIICvKADAgECAhA0zRJXyDaDRuC/9z0wA24FMA0GCSqGSIb3DQEBBQUAMC8x
+LTArBgNVBAMTJEZ1aml0c3UgVGVjaG5vbG9neSBTb2x1dGlvbnMgUm9vdCBDQTAeFw0wOTAz
+MTIxMjI0NTlaFw0xOTAzMTExMjI0NTlaMC8xLTArBgNVBAMTJEZ1aml0c3UgVGVjaG5vbG9n
+eSBTb2x1dGlvbnMgVXNlciBDQTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALAb
+TX9HzfBJFvcukKqEBkui1MHs3p1dgZw8zkXRmp7pEbaRs2DAD3cosLZadP8zjWvowiRs5F+I
+mAo07Iib8dNUj0TWduHx2hRl6SQV+ffaumRdIrLvodWiGrNbX8ggWpQGyii7zYCLkI514XX3
+1ZOL0rgcrTtzhnFC7SdvpWFUhL8cxrfYk0sE+UZxLyqUdIjgvvf1DVTojyvVws+bu24N4noT
++YA/r+brt2CEcFf+YMnewGT3HJE32D/xmXMm3AF3xJeZ2/22Ykix3mRI8TDDPGGahSoR/ccp
+iHY5HESuzSdo/Dg+9PEBb+G+G5ntZhxn040m8W9ZzqFE7DbbIWcCAwEAAaOB6zCB6DAdBgNV
+HQ4EFgQUCPXIar+A43tQxDn0B5hG6G1+l6gwCwYDVR0PBAQDAgGGMB8GA1UdIwQYMBaAFBR1
+4le2FTcVgCqX5VFIZazPhpDLMBIGA1UdEwEB/wQIMAYBAf8CAQAwRwYIKwYBBQUHAQEEOzA5
+MDcGCCsGAQUFBzAChitodHRwOi8vYWlhLnRzLmZ1aml0c3UuY29tL2FpYS9mdHMwMXJvb3Qu
+Y2VyMDwGA1UdHwQ1MDMwMaAvoC2GK2h0dHA6Ly9jZHAudHMuZnVqaXRzdS5jb20vY2RwL2Z0
+czAxcm9vdC5jcmwwDQYJKoZIhvcNAQEFBQADggEBAEO6UD/S8PW3J7dQ4b1eVFm9c5pwAkqO
+p+sfm7qXJEM5a392iex0GYoGbmgmpPnXsS9fCPOojQwziQQbK89A3A+Fz7M3C01Hs6qhpQMi
+G74gauZsAxwFgQPRddRkcei3axzCjXRz8AFsgt6+qr+BjugPs9eilGRUj+JL7mjeWByOPNU+
+xRcRJp7ZMpaYZ3V/upkNTQAQKTDIV9GjeXVYTwDAD/JxDSdYRpPNSBvIM5KBwz0qCwrX3wJz
+YWAKob6wztsm12//cfkn9w0LswYN4aQdciTNyvH6EGkt7k6RSE33TKa3EMqyHZeCcNurP+r6
+SLNLIi1U6d8gMIDWqkEoMUkxggGXMIIBkwIBATA9MC8xLTArBgNVBAMTJEZ1aml0c3UgVGVj
+aG5vbG9neSBTb2x1dGlvbnMgVXNlciBDQQIKNgudswAAAAJUwzAJBgUrDgMCGgUAoIGxMBgG
+CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE4MDkyODA3NTg1Mlow
+IwYJKoZIhvcNAQkEMRYEFGaKtAFzZu9vnVRDeB9gNBRUgmHnMFIGCSqGSIb3DQEJDzFFMEMw
+CgYIKoZIhvcNAwcwDgYIKoZIhvcNAwICAgCAMA0GCCqGSIb3DQMCAgFAMAcGBSsOAwIHMA0G
+CCqGSIb3DQMCAgEoMA0GCSqGSIb3DQEBAQUABIGAGIF5Z7uJhBa1KzaIw4hNUuzQpHTdy2pe
+Ahk/mJsX4mPGi/CDu3gHQRElCRQ8X7jD2GkiHphP/km8Wojk85pZ0Opfr1ldVl46jrYkbYIb
+CMC/AgOwTHeV3sT6o4IqabVvqqK0nPVIZRZ/GdEOnGp/kTAwg/bEdvYe9gzz1UzGlEU=
 
->  		}
->  
->  		spin_unlock_irqrestore(&rinfo->ring_lock, flags);
+--Y5rl02BVI9TCfPar--
