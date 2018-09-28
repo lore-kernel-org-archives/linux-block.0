@@ -1,51 +1,95 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:34923 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726670AbeIKQei (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Sep 2018 12:34:38 -0400
-Received: by mail-ed1-f67.google.com with SMTP id y20-v6so18988355edq.2
-        for <linux-block@vger.kernel.org>; Tue, 11 Sep 2018 04:35:41 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 1/2] lightnvm: pblk: add helper for printing chunk state
-Date: Tue, 11 Sep 2018 13:35:33 +0200
-Message-Id: <1536665734-14305-2-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1536665734-14305-1-git-send-email-javier@cnexlabs.com>
-References: <1536665734-14305-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	kernel-team@fb.com
+Subject: [PATCH 5/5] blk-iolatency: keep track of previous windows stats
+Date: Fri, 28 Sep 2018 13:45:43 -0400
+Message-Id: <20180928174543.28486-6-josef@toxicpanda.com>
+In-Reply-To: <20180928174543.28486-1-josef@toxicpanda.com>
+References: <20180928174543.28486-1-josef@toxicpanda.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Implement pblk helper for printing chunk state.
+We apply a smoothing to the scale changes in order to keep sawtoothy
+behavior from occurring.  However our window for checking if we've
+missed our target can sometimes be lower than the smoothing interval
+(500ms), especially on faster drives like ssd's.  In order to deal with
+this keep track of the running tally of the previous intervals that we
+threw away because we had already done a scale event recently.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+This is needed for the ssd case as these low latency drives will have
+bursts of latency, and if it happens to be ok for the window that
+directly follows the opening of the scale window we could unthrottle
+when previous windows we were missing our target.
+
+Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 ---
- drivers/lightnvm/pblk.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ block/blk-iolatency.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 3d7248829013..5e4cec453a43 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -1230,6 +1230,15 @@ static inline int pblk_io_aligned(struct pblk *pblk, int nr_secs)
- 	return !(nr_secs % pblk->min_write_pgs);
- }
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index fd246805b0be..35c48d7b8f78 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -130,6 +130,7 @@ struct latency_stat {
+ struct iolatency_grp {
+ 	struct blkg_policy_data pd;
+ 	struct latency_stat __percpu *stats;
++	struct latency_stat cur_stat;
+ 	struct blk_iolatency *blkiolat;
+ 	struct rq_depth rq_depth;
+ 	struct rq_wait rq_wait;
+@@ -570,24 +571,27 @@ static void iolatency_check_latencies(struct iolatency_grp *iolat, u64 now)
  
-+static inline void print_chunk(struct pblk *pblk, struct nvm_chk_meta *chk,
-+			       char *msg, int error)
-+{
-+	pblk_err(pblk, "chunk: (%s: %x) s:%d,t:%d,wi:%d,slba:%llu,cnlb:%llu,wp:%llu\n",
-+			msg, error,
-+			chk->state, chk->type, chk->wi,
-+			chk->slba, chk->cnlb, chk->wp);
-+}
+ 	/* Somebody beat us to the punch, just bail. */
+ 	spin_lock_irqsave(&lat_info->lock, flags);
 +
- #ifdef CONFIG_NVM_PBLK_DEBUG
- static inline void print_ppa(struct pblk *pblk, struct ppa_addr *p,
- 			     char *msg, int error)
++	latency_stat_sum(iolat, &iolat->cur_stat, &stat);
+ 	lat_info->nr_samples -= iolat->nr_samples;
+-	lat_info->nr_samples += latency_stat_samples(iolat, &stat);
+-	iolat->nr_samples = latency_stat_samples(iolat, &stat);
++	lat_info->nr_samples += latency_stat_samples(iolat, &iolat->cur_stat);
++	iolat->nr_samples = latency_stat_samples(iolat, &iolat->cur_stat);
+ 
+ 	if ((lat_info->last_scale_event >= now ||
+-	    now - lat_info->last_scale_event < BLKIOLATENCY_MIN_ADJUST_TIME) &&
+-	    lat_info->scale_lat <= iolat->min_lat_nsec)
++	    now - lat_info->last_scale_event < BLKIOLATENCY_MIN_ADJUST_TIME))
+ 		goto out;
+ 
+-	if (latency_sum_ok(iolat, &stat)) {
+-		if (latency_stat_samples(iolat, &stat) <
++	if (latency_sum_ok(iolat, &iolat->cur_stat) &&
++	    latency_sum_ok(iolat, &stat)) {
++		if (latency_stat_samples(iolat, &iolat->cur_stat) <
+ 		    BLKIOLATENCY_MIN_GOOD_SAMPLES)
+ 			goto out;
+ 		if (lat_info->scale_grp == iolat) {
+ 			lat_info->last_scale_event = now;
+ 			scale_cookie_change(iolat->blkiolat, lat_info, true);
+ 		}
+-	} else {
++	} else if (lat_info->scale_lat == 0 ||
++		   lat_info->scale_lat >= iolat->min_lat_nsec) {
+ 		lat_info->last_scale_event = now;
+ 		if (!lat_info->scale_grp ||
+ 		    lat_info->scale_lat > iolat->min_lat_nsec) {
+@@ -596,6 +600,7 @@ static void iolatency_check_latencies(struct iolatency_grp *iolat, u64 now)
+ 		}
+ 		scale_cookie_change(iolat->blkiolat, lat_info, false);
+ 	}
++	latency_stat_init(iolat, &iolat->cur_stat);
+ out:
+ 	spin_unlock_irqrestore(&lat_info->lock, flags);
+ }
+@@ -966,6 +971,7 @@ static void iolatency_pd_init(struct blkg_policy_data *pd)
+ 		latency_stat_init(iolat, stat);
+ 	}
+ 
++	latency_stat_init(iolat, &iolat->cur_stat);
+ 	rq_wait_init(&iolat->rq_wait);
+ 	spin_lock_init(&iolat->child_lat.lock);
+ 	iolat->rq_depth.queue_depth = blkg->q->nr_requests;
 -- 
-2.7.4
+2.14.3
