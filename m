@@ -1,49 +1,39 @@
-Return-Path: <bvanassche@acm.org>
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v10 6/8] block: Allow unfreezing of a queue while requests are in progress
-Date: Fri, 21 Sep 2018 13:31:20 -0700
-Message-Id: <20180921203122.49743-7-bvanassche@acm.org>
-In-Reply-To: <20180921203122.49743-1-bvanassche@acm.org>
-References: <20180921203122.49743-1-bvanassche@acm.org>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULL] nvme fixes for 4.19
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+ Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
+References: <20180928154003.GA3163@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <ad779853-fa07-698f-97aa-2db33aa77d8a@kernel.dk>
+Date: Fri, 28 Sep 2018 09:42:32 -0600
 MIME-Version: 1.0
+In-Reply-To: <20180928154003.GA3163@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-A later patch will call blk_freeze_queue_start() followed by
-blk_mq_unfreeze_queue() without waiting for q_usage_counter to drop
-to zero. Make sure that this doesn't cause a kernel warning to appear
-by switching from percpu_ref_reinit() to percpu_ref_resurrect(). The
-former namely requires that the refcount it operates on is zero.
+On 9/28/18 9:40 AM, Christoph Hellwig wrote:
+> The following changes since commit b228ba1cb95afbaeeb86cf06cd9fd6f6369c3b14:
+> 
+>   null_blk: fix zoned support for non-rq based operation (2018-09-12 18:21:11 -0600)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.infradead.org/nvme.git nvme-4.19
+> 
+> for you to fetch changes up to bb830add192e9d8338082c0fc2c209e23b43d865:
+> 
+>   nvme: properly propagate errors in nvme_mpath_init (2018-09-25 16:21:40 -0700)
+> 
+> ----------------------------------------------------------------
+> Hannes Reinecke (1):
+>       nvme: count all ANA groups for ANA Log page
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This one I already pulled a while back, only this one:
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 85a1c1a59c72..96d501e8663c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -198,7 +198,7 @@ void blk_mq_unfreeze_queue(struct request_queue *q)
- 	freeze_depth = atomic_dec_return(&q->mq_freeze_depth);
- 	WARN_ON_ONCE(freeze_depth < 0);
- 	if (!freeze_depth) {
--		percpu_ref_reinit(&q->q_usage_counter);
-+		percpu_ref_resurrect(&q->q_usage_counter);
- 		wake_up_all(&q->mq_freeze_wq);
- 	}
- }
+> Susobhan Dey (1):
+>       nvme: properly propagate errors in nvme_mpath_init
+is new.
+
 -- 
-2.19.0.444.g18242da7ef-goog
+Jens Axboe
