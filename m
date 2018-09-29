@@ -1,95 +1,45 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	kernel-team@fb.com,
-	linux-block@vger.kernel.org
-Subject: [PATCH 6/6] blk-iolatency: keep track of previous windows stats
-Date: Mon, 10 Sep 2018 16:49:32 -0400
-Message-Id: <20180910204932.14323-7-josef@toxicpanda.com>
-In-Reply-To: <20180910204932.14323-1-josef@toxicpanda.com>
-References: <20180910204932.14323-1-josef@toxicpanda.com>
+Return-Path: <gregkh@linuxfoundation.org>
+Date: Sat, 29 Sep 2018 15:24:35 -0700
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [GIT PULL] Block fixes for 4.19-rc6
+Message-ID: <20180929222435.GD23365@kroah.com>
+References: <7a9020a9-171b-3ef0-cb49-0c157ca9902b@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <7a9020a9-171b-3ef0-cb49-0c157ca9902b@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-We apply a smoothing to the scale changes in order to keep sawtoothy
-behavior from occurring.  However our window for checking if we've
-missed our target can sometimes be lower than the smoothing interval
-(500ms), especially on faster drives like ssd's.  In order to deal with
-this keep track of the running tally of the previous intervals that we
-threw away because we had already done a scale event recently.
+On Sat, Sep 29, 2018 at 03:12:25PM -0600, Jens Axboe wrote:
+> Hi Greg,
+> 
+> A set of fixes that should go into this release. This pull request
+> contains:
+> 
+> - A fix (hopefully) for the persistent grants for xen-blkfront. A
+>   previous fix from this series wasn't complete, hence reverted, and
+>   this one should hopefully be it. (Boris Ostrovsky)
+> 
+> - Fix for an elevator drain warning with SMR devices, which is triggered
+>   when you switch schedulers (Damien)
+> 
+> - bcache deadlock fix (Guoju Fang)
+> 
+> - Fix for the block unplug tracepoint, which has had the timer/explicit
+>   flag reverted since 4.11 (Ilya)
+> 
+> - Fix a regression in this series where the blk-mq timeout hook is
+>   invoked with the RCU read lock held, hence preventing it from blocking
+>   (Keith)
+> 
+> - NVMe pull from Christoph, with a single multipath fix (Susobhan Dey)
+> 
+> Please pull!
+> 
+> 
+>   git://git.kernel.dk/linux-block.git tags/for-linus-20180929
 
-This is needed for the ssd case as these low latency drives will have
-bursts of latency, and if it happens to be ok for the window that
-directly follows the opening of the scale window we could unthrottle
-when previous windows we were missing our target.
+Now pulled, thanks.
 
-Signed-off-by: Josef Bacik <josef@toxicpanda.com>
----
- block/blk-iolatency.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
-
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index e36b949a5696..14c30e01ecc7 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -130,6 +130,7 @@ struct latency_stat {
- struct iolatency_grp {
- 	struct blkg_policy_data pd;
- 	struct latency_stat __percpu *stats;
-+	struct latency_stat cur_stat;
- 	struct blk_iolatency *blkiolat;
- 	struct rq_depth rq_depth;
- 	struct rq_wait rq_wait;
-@@ -592,24 +593,27 @@ static void iolatency_check_latencies(struct iolatency_grp *iolat, u64 now)
- 
- 	/* Somebody beat us to the punch, just bail. */
- 	spin_lock_irqsave(&lat_info->lock, flags);
-+
-+	latency_stat_sum(iolat, &iolat->cur_stat, &stat);
- 	lat_info->nr_samples -= iolat->nr_samples;
--	lat_info->nr_samples += latency_stat_samples(iolat, &stat);
--	iolat->nr_samples = latency_stat_samples(iolat, &stat);
-+	lat_info->nr_samples += latency_stat_samples(iolat, &iolat->cur_stat);
-+	iolat->nr_samples = latency_stat_samples(iolat, &iolat->cur_stat);
- 
- 	if ((lat_info->last_scale_event >= now ||
--	    now - lat_info->last_scale_event < BLKIOLATENCY_MIN_ADJUST_TIME) &&
--	    lat_info->scale_lat <= iolat->min_lat_nsec)
-+	    now - lat_info->last_scale_event < BLKIOLATENCY_MIN_ADJUST_TIME))
- 		goto out;
- 
--	if (latency_sum_ok(iolat, &stat)) {
--		if (latency_stat_samples(iolat, &stat) <
-+	if (latency_sum_ok(iolat, &iolat->cur_stat) &&
-+	    latency_sum_ok(iolat, &stat)) {
-+		if (latency_stat_samples(iolat, &iolat->cur_stat) <
- 		    BLKIOLATENCY_MIN_GOOD_SAMPLES)
- 			goto out;
- 		if (lat_info->scale_grp == iolat) {
- 			lat_info->last_scale_event = now;
- 			scale_cookie_change(iolat->blkiolat, lat_info, true);
- 		}
--	} else {
-+	} else if (lat_info->scale_lat == 0 ||
-+		   lat_info->scale_lat >= iolat->min_lat_nsec) {
- 		lat_info->last_scale_event = now;
- 		if (!lat_info->scale_grp ||
- 		    lat_info->scale_lat > iolat->min_lat_nsec) {
-@@ -618,6 +622,7 @@ static void iolatency_check_latencies(struct iolatency_grp *iolat, u64 now)
- 		}
- 		scale_cookie_change(iolat->blkiolat, lat_info, false);
- 	}
-+	latency_stat_init(iolat, &iolat->cur_stat);
- out:
- 	spin_unlock_irqrestore(&lat_info->lock, flags);
- }
-@@ -990,6 +995,7 @@ static void iolatency_pd_init(struct blkg_policy_data *pd)
- 		latency_stat_init(iolat, stat);
- 	}
- 
-+	latency_stat_init(iolat, &iolat->cur_stat);
- 	rq_wait_init(&iolat->rq_wait);
- 	spin_lock_init(&iolat->child_lat.lock);
- 	iolat->rq_depth.queue_depth = blkg->q->nr_requests;
--- 
-2.14.3
+greg k-h
