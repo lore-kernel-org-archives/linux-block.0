@@ -1,82 +1,60 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Logan Gunthorpe <logang@deltatee.com>
-Date: Tue, 25 Sep 2018 10:22:26 -0600
-Message-Id: <20180925162231.4354-9-logang@deltatee.com>
-In-Reply-To: <20180925162231.4354-1-logang@deltatee.com>
-References: <20180925162231.4354-1-logang@deltatee.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:36765 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728583AbeI3CY5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 29 Sep 2018 22:24:57 -0400
+Received: by mail-pf1-f193.google.com with SMTP id b7-v6so6511554pfo.3
+        for <linux-block@vger.kernel.org>; Sat, 29 Sep 2018 12:55:15 -0700 (PDT)
+Subject: Re: [PATCH -next] lightnvm: pblk: fix error handling of
+ pblk_lines_init()
+To: Hans Holmberg <hans.ml.holmberg@owltronix.com>,
+        weiyongjun1@huawei.com
+Cc: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
+        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
+References: <1537941384-25324-1-git-send-email-weiyongjun1@huawei.com>
+ <CANr-nt2AugGYaifCj7dbeZ+3b4A8JyxKjZZeQQ7yhXbnJVGhDQ@mail.gmail.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <570f0994-eb27-24f6-740a-62e3cc00dc90@lightnvm.io>
+Date: Sat, 29 Sep 2018 21:55:12 +0200
 MIME-Version: 1.0
-Subject: [PATCH v7 08/13] IB/core: Ensure we map P2P memory correctly in rdma_rw_ctx_[init|destroy]()
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <CANr-nt2AugGYaifCj7dbeZ+3b4A8JyxKjZZeQQ7yhXbnJVGhDQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-In order to use PCI P2P memory the pci_p2pmem_map_sg() function must be
-called to map the correct PCI bus address.
+On 9/26/18 8:29 AM, Hans Holmberg wrote:
+> On Wed, Sep 26, 2018 at 7:47 AM Wei Yongjun <weiyongjun1@huawei.com> wrote:
+>>
+>> In the too many bad blocks error handling case, we should release all
+>> the alloced resources instead direct return, otherwise it will cause
+>> memory leak.
+>>
+>> Fixes: 2deeefc02dff ("lightnvm: pblk: fail gracefully on line alloc. failure")
+>> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+>> ---
+>>   drivers/lightnvm/pblk-init.c | 3 ++-
+>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+>> index 537e98f..a26f4e6 100644
+>> --- a/drivers/lightnvm/pblk-init.c
+>> +++ b/drivers/lightnvm/pblk-init.c
+>> @@ -1083,7 +1083,8 @@ static int pblk_lines_init(struct pblk *pblk)
+>>
+>>          if (!nr_free_chks) {
+>>                  pblk_err(pblk, "too many bad blocks prevent for sane instance\n");
+>> -               return -EINTR;
+>> +               ret = -EINTR;
+>> +               goto fail_free_lines;
+>>          }
+>>
+>>          pblk_set_provision(pblk, nr_free_chks);
+>>
+> 
+> Looks good to me.
+> 
+> Reviewed-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+> 
 
-To do this, check the first page in the scatter list to see if it is P2P
-memory or not. At the moment, scatter lists that contain P2P memory must
-be homogeneous so if the first page is P2P the entire SGL should be P2P.
-
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/infiniband/core/rw.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/infiniband/core/rw.c b/drivers/infiniband/core/rw.c
-index 683e6d11a564..d22c4a2ebac6 100644
---- a/drivers/infiniband/core/rw.c
-+++ b/drivers/infiniband/core/rw.c
-@@ -12,6 +12,7 @@
-  */
- #include <linux/moduleparam.h>
- #include <linux/slab.h>
-+#include <linux/pci-p2pdma.h>
- #include <rdma/mr_pool.h>
- #include <rdma/rw.h>
- 
-@@ -280,7 +281,11 @@ int rdma_rw_ctx_init(struct rdma_rw_ctx *ctx, struct ib_qp *qp, u8 port_num,
- 	struct ib_device *dev = qp->pd->device;
- 	int ret;
- 
--	ret = ib_dma_map_sg(dev, sg, sg_cnt, dir);
-+	if (is_pci_p2pdma_page(sg_page(sg)))
-+		ret = pci_p2pdma_map_sg(dev->dma_device, sg, sg_cnt, dir);
-+	else
-+		ret = ib_dma_map_sg(dev, sg, sg_cnt, dir);
-+
- 	if (!ret)
- 		return -ENOMEM;
- 	sg_cnt = ret;
-@@ -602,7 +607,9 @@ void rdma_rw_ctx_destroy(struct rdma_rw_ctx *ctx, struct ib_qp *qp, u8 port_num,
- 		break;
- 	}
- 
--	ib_dma_unmap_sg(qp->pd->device, sg, sg_cnt, dir);
-+	/* P2PDMA contexts do not need to be unmapped */
-+	if (!is_pci_p2pdma_page(sg_page(sg)))
-+		ib_dma_unmap_sg(qp->pd->device, sg, sg_cnt, dir);
- }
- EXPORT_SYMBOL(rdma_rw_ctx_destroy);
- 
--- 
-2.19.0
+Thanks. Applied for 4.20.
