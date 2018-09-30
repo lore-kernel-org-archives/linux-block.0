@@ -1,86 +1,74 @@
-Return-Path: <mpatocka@redhat.com>
-Date: Mon, 3 Sep 2018 18:05:42 -0400 (EDT)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-cc: Ilya Dryomov <idryomov@gmail.com>, Sagi Grimberg <sagi@grimberg.me>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Zdenek Kabelac <zkabelac@redhat.com>, WGH <wgh@torlan.ru>,
-        linux-block@vger.kernel.org, Stefan Agner <stefan@agner.ch>
-Subject: Re: [PATCH] block: don't warn when calling fsync on read-only block
- devices
-In-Reply-To: <222ce989-dbb9-b994-a97f-4dce04f5bc69@kernel.dk>
-Message-ID: <alpine.LRH.2.02.1809031725530.27063@file01.intranet.prod.int.rdu2.redhat.com>
-References: <alpine.LRH.2.02.1808221217030.30929@file01.intranet.prod.int.rdu2.redhat.com> <222ce989-dbb9-b994-a97f-4dce04f5bc69@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:44986 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726538AbeJAGA6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 1 Oct 2018 02:00:58 -0400
+Subject: Re: [PATCH] bcache: fix ioctl in flash device
+To: Junhui Tang <tang.junhui.linux@gmail.com>
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <CA+NNRhHMQDo8MZ7x=jiZnu8PdRD+pw_PE9CzH5-9oNQga92Wkw@mail.gmail.com>
+From: Coly Li <colyli@suse.de>
+Message-ID: <a07bf86d-341a-814b-a9d0-1f92b3375962@suse.de>
+Date: Mon, 1 Oct 2018 07:25:56 +0800
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <CA+NNRhHMQDo8MZ7x=jiZnu8PdRD+pw_PE9CzH5-9oNQga92Wkw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 
+On 9/7/18 8:01 PM, Junhui Tang wrote:
+>  From 799ad1d9443a28eb640c8dbc3abe8a224f3a1292 Mon Sep 17 00:00:00 2001
+> From: Tang Junhui <tang.junhui.linux@gmail.com>
+> Date: Sat, 8 Sep 2018 03:51:30 +0800
+> Subject: [PATCH] bcache: fix ioctl in flash device
+>
+> When doing ioctl in flash device, it will call ioctl_dev() in super.c,
+> then we should not to get cached device since flash only device has
+> no backend device. This patch just move the jugement dc->io_disable
+> to cached_dev_ioctl() to make ioctl in flash device correctly.
+>
+> Signed-off-by: Tang Junhui <tang.junhui.linux@gmail.com>
 
-On Wed, 22 Aug 2018, Jens Axboe wrote:
+Nice catch, I will add a Fixes: 0f0709e6bfc3c line in the commit log.
 
-> On 8/22/18 10:23 AM, Mikulas Patocka wrote:
-> > It is possible to call fsync on a read-only handle (for example, fsck.ext2 
-> > does it when doing read-only check), and this call results in kernel 
-> > warning. This bug was introduced by the commit 721c7fc701c7 "block: fail 
-> > op_is_write() requests to read-only partitions".
-> 
-> Similar patch is already queued up, it'll go into Linus's tree before
-> -rc1.
-> 
-> -- 
-> Jens Axboe
-
-I think you mean the patch b089cfd95d32638335c551651a8e00fd2c4edb0b, but 
-it doesn't work.
-
-The first problem is that bio_op returns the opcode, but op_is_flush 
-expects flags as its parameter. bio_op strips off the flags, and so the 
-condition op_is_flush is never true and the warning is not shut off.
-
-Anoher problem is that the flags REQ_FUA and REQ_PREFLUSH may be 
-superimposed on regular write bio and in that case the warning should be 
-triggered. We want to shut the warning off only if bio_sectors is zero 
-(i.e. if the flush request is not superimposed on regular write).
-
-Mikulas
+Have it in my for-next. Thanks.
 
 
+Coly Li
 
-From: Mikulas Patocka <mpatocka@redhat.com>
-Subject: [PATCH] block: don't warn when doing fsync on read-only devices
-
-It is possible to call fsync on a read-only handle (for example, fsck.ext2
-does it when doing read-only check), and this call results in kernel
-warning.
-
-The patch b089cfd95d32 ("block: don't warn for flush on read-only device")
-attempted to disable the warning, but it is buggy and it doesn't
-(op_is_flush tests flags, but bio_op strips off the flags).
-
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-Fixes: 721c7fc701c7 ("block: fail op_is_write() requests to read-only partitions")
-Cc: stable@vger.kernel.org	# 4.18
-
----
- block/blk-core.c |    5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-Index: linux-2.6/block/blk-core.c
-===================================================================
---- linux-2.6.orig/block/blk-core.c	2018-09-03 23:32:38.550000000 +0200
-+++ linux-2.6/block/blk-core.c	2018-09-03 23:33:11.960000000 +0200
-@@ -2163,9 +2163,12 @@ static inline bool bio_check_ro(struct b
- {
- 	const int op = bio_op(bio);
- 
--	if (part->policy && (op_is_write(op) && !op_is_flush(op))) {
-+	if (part->policy && op_is_write(op)) {
- 		char b[BDEVNAME_SIZE];
- 
-+		if (op_is_flush(bio->bi_opf) && !bio_sectors(bio))
-+			return false;
-+
- 		WARN_ONCE(1,
- 		       "generic_make_request: Trying to write "
- 			"to read-only block-device %s (partno %d)\n",
+> ---
+>   drivers/md/bcache/request.c | 3 +++
+>   drivers/md/bcache/super.c   | 4 ----
+>   2 files changed, 3 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+> index 7dbe8b6..bafc85e 100644
+> --- a/drivers/md/bcache/request.c
+> +++ b/drivers/md/bcache/request.c
+> @@ -1212,6 +1212,9 @@ static int cached_dev_ioctl(struct bcache_device
+> *d, fmode_t mode,
+>        unsigned int cmd, unsigned long arg)
+>   {
+>    struct cached_dev *dc = container_of(d, struct cached_dev, disk);
+> +
+> + if (dc->io_disable)
+> + return -EIO;
+>    return __blkdev_driver_ioctl(dc->bdev, mode, cmd, arg);
+>   }
+>
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index 55a3764..ced830e 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -636,10 +636,6 @@ static int ioctl_dev(struct block_device *b, fmode_t mode,
+>         unsigned int cmd, unsigned long arg)
+>   {
+>    struct bcache_device *d = b->bd_disk->private_data;
+> - struct cached_dev *dc = container_of(d, struct cached_dev, disk);
+> -
+> - if (dc->io_disable)
+> - return -EIO;
+>
+>    return d->ioctl(d, mode, cmd, arg);
+>   }
