@@ -5,10 +5,9 @@ Content-Type: text/plain;
 Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
 Subject: Re: [PATCH] block: BFQ default for single queue devices
 From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <1538582446.205649.22.camel@acm.org>
-Date: Wed, 3 Oct 2018 18:04:02 +0200
-Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
- Jens Axboe <axboe@kernel.dk>,
+In-Reply-To: <1538582091.205649.20.camel@acm.org>
+Date: Wed, 3 Oct 2018 18:02:36 +0200
+Cc: Jens Axboe <axboe@kernel.dk>,
  Linus Walleij <linus.walleij@linaro.org>,
  linux-block <linux-block@vger.kernel.org>,
  linux-mmc <linux-mmc@vger.kernel.org>,
@@ -24,37 +23,60 @@ Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
  Chunyan Zhang <zhang.chunyan@linaro.org>,
  linux-kernel <linux-kernel@vger.kernel.org>,
  'Paolo Valente' via bfq-iosched <bfq-iosched@googlegroups.com>,
+ Oleksandr Natalenko <oleksandr@natalenko.name>,
  Mark Brown <broonie@kernel.org>
-Message-Id: <843B42A9-DDE9-46C4-A3AE-616E8DF3946E@linaro.org>
+Message-Id: <C7FEB750-D993-44EC-B3CB-0639DF68CD26@linaro.org>
 References: <20181002124329.21248-1-linus.walleij@linaro.org>
  <05fdbe23-ec01-895f-e67e-abff85c1ece2@kernel.dk>
  <B5321A64-8A1A-42FF-A337-F4524BDA179B@linaro.org>
- <1eca41df95ff660eb247a3de666adeb4@natalenko.name>
- <6AF8CEDE-2720-4206-900A-1A9B914A8FF0@linaro.org>
- <1538582446.205649.22.camel@acm.org>
+ <1538582091.205649.20.camel@acm.org>
 To: Bart Van Assche <bvanassche@acm.org>
 List-ID: <linux-block@vger.kernel.org>
 
 
 
-> Il giorno 03 ott 2018, alle ore 18:00, Bart Van Assche =
+> Il giorno 03 ott 2018, alle ore 17:54, Bart Van Assche =
 <bvanassche@acm.org> ha scritto:
 >=20
-> On Wed, 2018-10-03 at 17:55 +0200, Paolo Valente wrote:
->> The problem, in particular, is that bfq is a complex beast, fighting
->> against a jungle of I/O issues.  You have to be really into bfq, even
->> to just know all of its features!
+> On Wed, 2018-10-03 at 08:29 +0200, Paolo Valente wrote:
+>> [1] https://lkml.org/lkml/2017/2/21/791
+>> [2] http://algo.ing.unimo.it/people/paolo/disk_sched/results.php
+>> [3] https://lwn.net/Articles/763603/
 >=20
-> This is a problem by itself. I don't know anyone who wants to have to =
-deal
-> with I/O scheduler tunables.
+> =46rom [2]: "BFQ loses about 18% with only random readers, because the =
+number
+> of IOPS becomes so high that the execution time and parallel =
+efficiency of
+> the schedulers becomes relevant." Since the number of I/O patterns for =
+which
+> results are available on [2] is limited and since the number of =
+devices for
+> which test results are available on [2] is limited (e.g. RAID is =
+missing),
+> there might be other cases in which configuring BFQ as the default =
+would
+> introduce a regression.
 >=20
 
-In fact, I designed and am constantly improving bfq, exactly so that
-you don't have to touch any tunable.
+=46rom [3]: none with throttling loses 80% of the throughput when used
+to control I/O. On any drive. And this is really only one example among =
+a ton.
+
+In addition, the test you mention, designed by me, was meant exactly
+to find and show the worst breaking point of BFQ.  If your main
+workload of interest is really made only of tens of parallel thread
+doing only sync random I/O, and you care only about throughput,
+without any concern for your system becoming so unresponsive to be
+unusable during the test, then, yes, mq-deadline is a better option
+for you.
+
+So, are you really sure the balance is in favor of mq-deadline?
 
 Thanks,
 Paolo
 
-> Bart.
+> I agree with Jens that it's best to leave it to the Linux distributors =
+to
+> select a default I/O scheduler.
 >=20
+> Bart.
