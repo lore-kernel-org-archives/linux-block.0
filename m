@@ -1,46 +1,63 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-yw1-f66.google.com ([209.85.161.66]:37334 "EHLO
-        mail-yw1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725199AbeJDEFE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Oct 2018 00:05:04 -0400
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
 Subject: Re: [PATCH v2] block: fix rdma queue mapping
-To: Steve Wise <swise@opengridcomputing.com>,
-        Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Max Gurtovoy <maxg@mellanox.com>
+To: Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>
 References: <20180820205420.25908-1-sagi@grimberg.me>
  <20180822131130.GC28149@lst.de>
  <83dd169f-034b-3460-7496-ef2e6766ea55@grimberg.me>
- <33192971-7edd-a3b6-f2fa-abdcbef375de@opengridcomputing.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <66c41a1a-e57d-8526-366c-e15dcded7cec@grimberg.me>
-Date: Wed, 3 Oct 2018 14:14:57 -0700
+From: Steve Wise <swise@opengridcomputing.com>
+Message-ID: <33192971-7edd-a3b6-f2fa-abdcbef375de@opengridcomputing.com>
+Date: Wed, 3 Oct 2018 14:05:16 -0500
 MIME-Version: 1.0
-In-Reply-To: <33192971-7edd-a3b6-f2fa-abdcbef375de@opengridcomputing.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <83dd169f-034b-3460-7496-ef2e6766ea55@grimberg.me>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-nvme@lists.infradead.org, Max Gurtovoy <maxg@mellanox.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-
-> Can we please make forward progress on this?
-> 
-> Christoph, Sagi:  it seems you think /proc/irq/$IRP/smp_affinity
-> shouldn't be allowed if drivers support managed affinity. Is that correct?
-> 
-> Perhaps that can be codified and be a way forward?  IE: Somehow allow
-> the admin to choose either "managed by the driver/ulps" or "managed by
-> the system admin directly"?
-> 
-> Or just use Sagi's patch.  Perhaps a WARN_ONCE() if the affinity looks
-> wonked when set via procfs?  Just thinking out loud...
-
-I think we should take my patch. While ideally we'd like to have
-perfect linear irq based queue mapping, people apparently really like
-to modify devices irq affinity. With this, at least some of the queues
-are assigned according to the device affinity. Its not ideal, but at
-least better than blindly falling to default mapping.
-
-Christoph?
-
-If there is strong resistance to the patch we should at least start
-by falling to the default mapping unconditionally.
+CgpPbiA4LzI0LzIwMTggOToxNyBQTSwgU2FnaSBHcmltYmVyZyB3cm90ZToKPiAKPj4+IG52bWUt
+cmRtYSBhdHRlbXB0cyB0byBtYXAgcXVldWVzIGJhc2VkIG9uIGlycSB2ZWN0b3IgYWZmaW5pdHku
+Cj4+PiBIb3dldmVyLCBmb3Igc29tZSBkZXZpY2VzLCBjb21wbGV0aW9uIHZlY3RvciBpcnEgYWZm
+aW5pdHkgaXMKPj4+IGNvbmZpZ3VyYWJsZSBieSB0aGUgdXNlciB3aGljaCBjYW4gYnJlYWsgdGhl
+IGV4aXN0aW5nIGFzc3VtcHRpb24KPj4+IHRoYXQgaXJxIHZlY3RvcnMgYXJlIG9wdGltYWxseSBh
+cnJhbmdlZCBvdmVyIHRoZSBob3N0IGNwdSBjb3Jlcy4KPj4KPj4gSUZGIGFmZmluaXR5IGlzIGNv
+bmZpZ3VyYWJsZSB3ZSBzaG91bGQgbmV2ZXIgdXNlIHRoaXMgY29kZSwKPj4gYXMgaXQgYnJlYWtz
+IHRoZSBtb2RlbCBlbnRpcmVseS7CoCBpYl9nZXRfdmVjdG9yX2FmZmluaXR5IHNob3VsZAo+PiBu
+ZXZlciByZXR1cm4gYSB2YWxpZCBtYXNrIGlmIGFmZmluaXR5IGlzIGNvbmZpZ3VyYWJsZS4KPiAK
+PiBJIGFncmVlIHRoYXQgdGhlIG1vZGVsIGludGVuZGVkIGluaXRpYWxseSBkb2Vzbid0IGZpdC4g
+QnV0IGl0IHNlZW1zCj4gdGhhdCBzb21lIHVzZXJzIGxpa2UgdG8gd3JpdGUgaW50byB0aGVpciBu
+aWMncwo+IC9wcm9jL2lycS8kSVJQL3NtcF9hZmZpbml0eSBhbmQgZ2V0IG1hZCBhdCB1cyBmb3Ig
+bm90IGxldHRpbmcgdGhlbSB3aXRoCj4gdXNpbmcgbWFuYWdlZCBhZmZpbml0eS4KPiAKPiBTbyBp
+bnN0ZWFkIG9mIGZhbGxpbmcgYmFjayB0byB0aGUgYmxvY2sgbWFwcGluZyBmdW5jdGlvbiB3ZSB0
+cnkKPiB0byBkbyBhIGxpdHRsZSBiZXR0ZXIgZmlyc3Q6Cj4gMS4gbWFwIGFjY29yZGluZyB0byB0
+aGUgZGV2aWNlIHZlY3RvciBhZmZpbml0eQo+IDIuIG1hcCB2ZWN0b3JzIHRoYXQgZW5kIHVwIHdp
+dGhvdXQgYSBtYXBwaW5nIHRvIGNwdXMgdGhhdCBiZWxvbmcKPiDCoMKgIHRvIHRoZSBzYW1lIG51
+bWEtbm9kZQo+IDMuIG1hcCBhbGwgdGhlIHJlc3Qgb2YgdGhlIHVubWFwcGVkIGNwdXMgbGlrZSB0
+aGUgYmxvY2sgbGF5ZXIKPiDCoMKgIHdvdWxkIGRvLgo+IAo+IFdlIGNvdWxkIGhhdmUgZGV2aWNl
+IGRyaXZlcnMgdGhhdCBkb24ndCB1c2UgbWFuYWdlZCBhZmZpbml0eSB0byBuZXZlcgo+IHJldHVy
+biBhIHZhbGlkIG1hc2sgYnV0IHRoYXQgd291bGQgbmV2ZXIgYWxsb3cgYWZmaW5pdHkgYmFzZWQg
+bWFwcGluZwo+IHdoaWNoIGlzIG9wdGltYWwgYXQgbGVhc3QgZm9yIHVzZXJzIHRoYXQgZG8gbm90
+IG1hbmdsZSB3aXRoIGRldmljZQo+IGlycSBhZmZpbml0eSAod2hpY2ggaXMgcHJvYmFibHkgdGhl
+IG1ham9yaXR5IG9mIHVzZXJzKS4KPiAKPiBUaG91Z2h0cz8KCkNhbiB3ZSBwbGVhc2UgbWFrZSBm
+b3J3YXJkIHByb2dyZXNzIG9uIHRoaXM/CgpDaHJpc3RvcGgsIFNhZ2k6ICBpdCBzZWVtcyB5b3Ug
+dGhpbmsgL3Byb2MvaXJxLyRJUlAvc21wX2FmZmluaXR5CnNob3VsZG4ndCBiZSBhbGxvd2VkIGlm
+IGRyaXZlcnMgc3VwcG9ydCBtYW5hZ2VkIGFmZmluaXR5LiBJcyB0aGF0IGNvcnJlY3Q/CgpQZXJo
+YXBzIHRoYXQgY2FuIGJlIGNvZGlmaWVkIGFuZCBiZSBhIHdheSBmb3J3YXJkPyAgSUU6IFNvbWVo
+b3cgYWxsb3cKdGhlIGFkbWluIHRvIGNob29zZSBlaXRoZXIgIm1hbmFnZWQgYnkgdGhlIGRyaXZl
+ci91bHBzIiBvciAibWFuYWdlZCBieQp0aGUgc3lzdGVtIGFkbWluIGRpcmVjdGx5Ij8KCk9yIGp1
+c3QgdXNlIFNhZ2kncyBwYXRjaC4gIFBlcmhhcHMgYSBXQVJOX09OQ0UoKSBpZiB0aGUgYWZmaW5p
+dHkgbG9va3MKd29ua2VkIHdoZW4gc2V0IHZpYSBwcm9jZnM/ICBKdXN0IHRoaW5raW5nIG91dCBs
+b3VkLi4uCgpCdXQgYXMgaXQgc3RhbmRzLCB0aGluZ3MgYXJlIGp1c3QgcGxhaW4gYm9ya2VkIGlm
+IGFuIHJkbWEgZHJpdmVyCnN1cHBvcnRzIGliX2dldF92ZWN0b3JfYWZmaW5pdHkoKSB5ZXQgdGhl
+IGFkbWluIGNoYW5nZXMgdGhlIGFmZmluaXR5IHZpYQovcHJvYy4uLgoKVGhhbmtzLAoKU3RldmUu
+CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eC1u
+dm1lIG1haWxpbmcgbGlzdApMaW51eC1udm1lQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xp
+c3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1udm1lCg==
