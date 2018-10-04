@@ -1,62 +1,50 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-ide@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 16/28] blk-cgroup: remove legacy queue bypassing
-Date: Thu, 25 Oct 2018 15:10:27 -0600
-Message-Id: <20181025211039.11559-17-axboe@kernel.dk>
-In-Reply-To: <20181025211039.11559-1-axboe@kernel.dk>
-References: <20181025211039.11559-1-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:42882 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727131AbeJDOFy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Oct 2018 10:05:54 -0400
+Received: by mail-ed1-f68.google.com with SMTP id b7-v6so1002104edd.9
+        for <linux-block@vger.kernel.org>; Thu, 04 Oct 2018 00:14:04 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 1/2] lightnvm: pblk: add helper for printing chunk state
+Date: Thu,  4 Oct 2018 09:13:54 +0200
+Message-Id: <1538637235-25469-2-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1538637235-25469-1-git-send-email-javier@cnexlabs.com>
+References: <1538637235-25469-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We only support mq devices now.
+Implement pblk helper for printing chunk state.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- block/blk-cgroup.c | 8 --------
- 1 file changed, 8 deletions(-)
+ drivers/lightnvm/pblk.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 992da5592c6e..5f10d755ec52 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1446,8 +1446,6 @@ int blkcg_activate_policy(struct request_queue *q,
- 
- 	if (q->mq_ops)
- 		blk_mq_freeze_queue(q);
--	else
--		blk_queue_bypass_start(q);
- pd_prealloc:
- 	if (!pd_prealloc) {
- 		pd_prealloc = pol->pd_alloc_fn(GFP_KERNEL, q->node);
-@@ -1487,8 +1485,6 @@ int blkcg_activate_policy(struct request_queue *q,
- out_bypass_end:
- 	if (q->mq_ops)
- 		blk_mq_unfreeze_queue(q);
--	else
--		blk_queue_bypass_end(q);
- 	if (pd_prealloc)
- 		pol->pd_free_fn(pd_prealloc);
- 	return ret;
-@@ -1513,8 +1509,6 @@ void blkcg_deactivate_policy(struct request_queue *q,
- 
- 	if (q->mq_ops)
- 		blk_mq_freeze_queue(q);
--	else
--		blk_queue_bypass_start(q);
- 
- 	spin_lock_irq(q->queue_lock);
- 
-@@ -1533,8 +1527,6 @@ void blkcg_deactivate_policy(struct request_queue *q,
- 
- 	if (q->mq_ops)
- 		blk_mq_unfreeze_queue(q);
--	else
--		blk_queue_bypass_end(q);
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 0f98ea24ee59..34c9c1dbeed9 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -1218,6 +1218,15 @@ static inline int pblk_io_aligned(struct pblk *pblk, int nr_secs)
+ 	return !(nr_secs % pblk->min_write_pgs);
  }
- EXPORT_SYMBOL_GPL(blkcg_deactivate_policy);
  
++static inline void print_chunk(struct pblk *pblk, struct nvm_chk_meta *chk,
++			       char *msg, int error)
++{
++	pblk_err(pblk, "chunk: (%s: %x) s:%d,t:%d,wi:%d,slba:%llu,cnlb:%llu,wp:%llu\n",
++			msg, error,
++			chk->state, chk->type, chk->wi,
++			chk->slba, chk->cnlb, chk->wp);
++}
++
+ #ifdef CONFIG_NVM_PBLK_DEBUG
+ static inline void print_ppa(struct pblk *pblk, struct ppa_addr *p,
+ 			     char *msg, int error)
 -- 
-2.17.1
+2.7.4
