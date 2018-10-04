@@ -1,53 +1,62 @@
-Return-Path: <BATV+13169ad6bbd430f4295b+5521+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Thu, 4 Oct 2018 23:24:44 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Artem Bityutskiy <dedekind1@gmail.com>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block <linux-block@vger.kernel.org>,
-	linux-mmc <linux-mmc@vger.kernel.org>,
-	"linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
-	Pavel Machek <pavel@ucw.cz>, Ulf Hansson <ulf.hansson@linaro.org>,
-	Richard Weinberger <richard@nod.at>,
-	Adrian Hunter <adrian.hunter@intel.com>, Jan Kara <jack@suse.cz>,
-	"aherrmann@suse.com" <aherrmann@suse.com>,
-	"mgorman@suse.com" <mgorman@suse.com>,
-	Chunyan Zhang <zhang.chunyan@linaro.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"bfq-iosched@googlegroups.com" <bfq-iosched@googlegroups.com>,
-	"oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-	Mark Brown <broonie@kernel.org>
+Return-Path: <bart.vanassche@gmail.com>
+Return-Path: <bart.vanassche@gmail.com>
+Message-ID: <1538692972.8223.7.camel@acm.org>
 Subject: Re: [PATCH] block: BFQ default for single queue devices
-Message-ID: <20181005062444.GA30240@infradead.org>
+From: Bart Van Assche <bvanassche@acm.org>
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: Alan Cox <gnomes@lxorguk.ukuu.org.uk>, Jens Axboe <axboe@kernel.dk>,
+ Linus Walleij <linus.walleij@linaro.org>, linux-block
+ <linux-block@vger.kernel.org>, linux-mmc <linux-mmc@vger.kernel.org>,
+ linux-mtd@lists.infradead.org, Pavel Machek <pavel@ucw.cz>, Ulf Hansson
+ <ulf.hansson@linaro.org>, Richard Weinberger <richard@nod.at>, Artem
+ Bityutskiy <dedekind1@gmail.com>, Adrian Hunter <adrian.hunter@intel.com>,
+ Jan Kara <jack@suse.cz>, Andreas Herrmann <aherrmann@suse.com>, Mel Gorman
+ <mgorman@suse.com>, Chunyan Zhang <zhang.chunyan@linaro.org>, linux-kernel
+ <linux-kernel@vger.kernel.org>
+Date: Thu, 04 Oct 2018 15:42:52 -0700
+In-Reply-To: <A017CAC7-41E6-4BB3-AC31-5EB524276138@linaro.org>
 References: <20181002124329.21248-1-linus.walleij@linaro.org>
- <05fdbe23-ec01-895f-e67e-abff85c1ece2@kernel.dk>
- <B5321A64-8A1A-42FF-A337-F4524BDA179B@linaro.org>
- <1538550325.14984.108.camel@gmail.com>
- <CACRpkdaLZXGKMQGJPH02p2QPkxUDA03Y=cu_wBR_+rFaLWTw7g@mail.gmail.com>
- <BN3PR0401MB164003C967C45F2681F503A7E7E90@BN3PR0401MB1640.namprd04.prod.outlook.com>
- <20181003125146.GA9313@infradead.org>
- <1538578732.205649.0.camel@acm.org>
- <20181003150131.GA7306@infradead.org>
- <1538579724.205649.2.camel@acm.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1538579724.205649.2.camel@acm.org>
+	 <05fdbe23-ec01-895f-e67e-abff85c1ece2@kernel.dk>
+	 <B5321A64-8A1A-42FF-A337-F4524BDA179B@linaro.org>
+	 <1538582091.205649.20.camel@acm.org>
+	 <20181004202553.71c2599c@alans-desktop> <1538683746.230807.9.camel@acm.org>
+	 <A017CAC7-41E6-4BB3-AC31-5EB524276138@linaro.org>
+Content-Type: text/plain; charset="UTF-7"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Oct 03, 2018 at 08:15:24AM -0700, Bart Van Assche wrote:
-> On Wed, 2018-10-03 at 08:01 -0700, Christoph Hellwig wrote:
-> > On Wed, Oct 03, 2018 at 07:58:52AM -0700, Bart Van Assche wrote:
-> > > Has the work with the T10 committee to standardize the SCSI equivalent of anonymous
-> > > writes already started?
-> > 
-> > No, and I don't know of anyone who wants to do that in the short term.
-> 
-> That's unfortunate. I think having such a command available in the SCSI
-> command set would be a step forward.
+On Thu, 2018-10-04 at 22:39 +-0200, Paolo Valente wrote:
++AD4 No, kernel build is, for evident reasons, one of the workloads I cared
++AD4 most about.  Actually, I tried to focus on all my main
++AD4 kernel-development tasks, such as also git checkout, git merge, git
++AD4 grep, ...
++AD4 
++AD4 According to my test results, with BFQ these tasks are at least as
++AD4 fast as, or, in most system configurations, much faster than with the
++AD4 other schedulers.  Of course, at the same time the system also remains
++AD4 responsive with BFQ.
++AD4 
++AD4 You can repeat these tests using one of my first scripts in the S
++AD4 suite: kern+AF8-dev+AF8-tasks+AF8-vs+AF8-rw.sh (usually, the older the tests, the more
++AD4 hypertrophied the names I gave :) ).
++AD4 
++AD4 I stopped sharing also my kernel-build results years ago, because I
++AD4 went on obtaining the same, identical good results for years, and I'm
++AD4 aware that I tend to show and say too much stuff.
 
-I'm not saying it doesn't make sense, only that I don't know of any short
-term plans.
+On my test setup building the kernel is slightly slower when using the BFQ
+scheduler compared to using scheduler +ACI-none+ACI (kernel 4.18.12, NVMe SSD,
+single CPU with 6 cores, hyperthreading disabled). I am aware that the
+proposal at the start of this thread was to make BFQ the default for devices
+with a single hardware queue and not for devices like NVMe SSDs that support
+multiple hardware queues.
+
+What I think is missing is measurement results for BFQ on a system with
+multiple CPU sockets and against a fast storage medium. Eliminating
+the host lock from the SCSI core yielded a significant performance
+improvement for such storage devices. Since the BFQ scheduler locks and
+unlocks bfqd-+AD4-lock for every dispatch operation it is very likely that BFQ
+will slow down I/O for fast storage devices, even if their driver only
+creates a single hardware queue.
+
+Bart.
