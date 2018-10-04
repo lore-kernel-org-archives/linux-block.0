@@ -1,31 +1,159 @@
-Return-Path: <hch@lst.de>
-Date: Fri, 5 Oct 2018 09:08:06 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Logan Gunthorpe <logang@deltatee.com>
-Cc: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org, linux-block@vger.kernel.org,
-	Stephen Bates <sbates@raithlin.com>, Christoph Hellwig <hch@lst.de>,
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
+	linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+	Christoph Hellwig <hch@lst.de>,
 	Keith Busch <keith.busch@intel.com>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	Bjorn Helgaas <bhelgaas@google.com>,
 	Jason Gunthorpe <jgg@mellanox.com>,
 	Max Gurtovoy <maxg@mellanox.com>,
 	Dan Williams <dan.j.williams@intel.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
 	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
 	Alex Williamson <alex.williamson@redhat.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v9 02/13] PCI/P2PDMA: Add sysfs group to display p2pmem
- stats
-Message-ID: <20181005070806.GA23761@lst.de>
-References: <20181004212747.6301-1-logang@deltatee.com> <20181004212747.6301-3-logang@deltatee.com>
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Logan Gunthorpe <logang@deltatee.com>
+Date: Thu,  4 Oct 2018 15:27:36 -0600
+Message-Id: <20181004212747.6301-3-logang@deltatee.com>
+In-Reply-To: <20181004212747.6301-1-logang@deltatee.com>
+References: <20181004212747.6301-1-logang@deltatee.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20181004212747.6301-3-logang@deltatee.com>
+Subject: [PATCH v9 02/13] PCI/P2PDMA: Add sysfs group to display p2pmem stats
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
+Add a sysfs group to display statistics about P2P memory that is
+registered in each PCI device.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Attributes in the group display the total amount of P2P memory, the
+amount available and whether it is published or not.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+---
+ Documentation/ABI/testing/sysfs-bus-pci | 24 +++++++++++
+ drivers/pci/p2pdma.c                    | 54 +++++++++++++++++++++++++
+ 2 files changed, 78 insertions(+)
+
+diff --git a/Documentation/ABI/testing/sysfs-bus-pci b/Documentation/ABI/testing/sysfs-bus-pci
+index 44d4b2be92fd..8bfee557e50e 100644
+--- a/Documentation/ABI/testing/sysfs-bus-pci
++++ b/Documentation/ABI/testing/sysfs-bus-pci
+@@ -323,3 +323,27 @@ Description:
+ 
+ 		This is similar to /sys/bus/pci/drivers_autoprobe, but
+ 		affects only the VFs associated with a specific PF.
++
++What:		/sys/bus/pci/devices/.../p2pmem/size
++Date:		November 2017
++Contact:	Logan Gunthorpe <logang@deltatee.com>
++Description:
++		If the device has any Peer-to-Peer memory registered, this
++	        file contains the total amount of memory that the device
++		provides (in decimal).
++
++What:		/sys/bus/pci/devices/.../p2pmem/available
++Date:		November 2017
++Contact:	Logan Gunthorpe <logang@deltatee.com>
++Description:
++		If the device has any Peer-to-Peer memory registered, this
++	        file contains the amount of memory that has not been
++		allocated (in decimal).
++
++What:		/sys/bus/pci/devices/.../p2pmem/published
++Date:		November 2017
++Contact:	Logan Gunthorpe <logang@deltatee.com>
++Description:
++		If the device has any Peer-to-Peer memory registered, this
++	        file contains a '1' if the memory has been published for
++		use outside the driver that owns the device.
+diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+index c32cab20dd73..526c638579d1 100644
+--- a/drivers/pci/p2pdma.c
++++ b/drivers/pci/p2pdma.c
+@@ -24,6 +24,54 @@ struct pci_p2pdma {
+ 	bool p2pmem_published;
+ };
+ 
++static ssize_t size_show(struct device *dev, struct device_attribute *attr,
++			 char *buf)
++{
++	struct pci_dev *pdev = to_pci_dev(dev);
++	size_t size = 0;
++
++	if (pdev->p2pdma->pool)
++		size = gen_pool_size(pdev->p2pdma->pool);
++
++	return snprintf(buf, PAGE_SIZE, "%zd\n", size);
++}
++static DEVICE_ATTR_RO(size);
++
++static ssize_t available_show(struct device *dev, struct device_attribute *attr,
++			      char *buf)
++{
++	struct pci_dev *pdev = to_pci_dev(dev);
++	size_t avail = 0;
++
++	if (pdev->p2pdma->pool)
++		avail = gen_pool_avail(pdev->p2pdma->pool);
++
++	return snprintf(buf, PAGE_SIZE, "%zd\n", avail);
++}
++static DEVICE_ATTR_RO(available);
++
++static ssize_t published_show(struct device *dev, struct device_attribute *attr,
++			      char *buf)
++{
++	struct pci_dev *pdev = to_pci_dev(dev);
++
++	return snprintf(buf, PAGE_SIZE, "%d\n",
++			pdev->p2pdma->p2pmem_published);
++}
++static DEVICE_ATTR_RO(published);
++
++static struct attribute *p2pmem_attrs[] = {
++	&dev_attr_size.attr,
++	&dev_attr_available.attr,
++	&dev_attr_published.attr,
++	NULL,
++};
++
++static const struct attribute_group p2pmem_group = {
++	.attrs = p2pmem_attrs,
++	.name = "p2pmem",
++};
++
+ static void pci_p2pdma_percpu_release(struct percpu_ref *ref)
+ {
+ 	struct pci_p2pdma *p2p =
+@@ -59,6 +107,7 @@ static void pci_p2pdma_release(void *data)
+ 	percpu_ref_exit(&pdev->p2pdma->devmap_ref);
+ 
+ 	gen_pool_destroy(pdev->p2pdma->pool);
++	sysfs_remove_group(&pdev->dev.kobj, &p2pmem_group);
+ 	pdev->p2pdma = NULL;
+ }
+ 
+@@ -87,9 +136,14 @@ static int pci_p2pdma_setup(struct pci_dev *pdev)
+ 
+ 	pdev->p2pdma = p2p;
+ 
++	error = sysfs_create_group(&pdev->dev.kobj, &p2pmem_group);
++	if (error)
++		goto out_pool_destroy;
++
+ 	return 0;
+ 
+ out_pool_destroy:
++	pdev->p2pdma = NULL;
+ 	gen_pool_destroy(p2p->pool);
+ out:
+ 	devm_kfree(&pdev->dev, p2p);
+-- 
+2.19.0
