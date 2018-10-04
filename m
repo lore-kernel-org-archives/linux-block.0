@@ -1,112 +1,55 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Followup block changes for 4.20-rc1
-Message-ID: <8ce17575-5db8-955f-4e79-9874c1641614@kernel.dk>
-Date: Fri, 26 Oct 2018 10:00:30 -0600
+Return-Path: <natechancellor@gmail.com>
+Return-Path: <natechancellor@gmail.com>
+Date: Thu, 4 Oct 2018 12:22:31 -0700
+From: Nathan Chancellor <natechancellor@gmail.com>
+To: Lars Ellenberg <lars.ellenberg@linbit.com>
+Cc: Philipp Reisner <philipp.reisner@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH RESEND] drbd: avoid clang warning about pointless switch
+ statement
+Message-ID: <20181004192231.GA29744@localhost>
+References: <20181002171447.10765-1-natechancellor@gmail.com>
+ <20181004191854.GD10984@soda.linbit>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20181004191854.GD10984@soda.linbit>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+On Thu, Oct 04, 2018 at 09:18:54PM +0200, Lars Ellenberg wrote:
+> On Tue, Oct 02, 2018 at 10:14:48AM -0700, Nathan Chancellor wrote:
+> > From: Arnd Bergmann <arnd@arndb.de>
+> > 
+> > The drbd code causes warnings that we cannot easily disable when building with clang:
+> > 
+> > In file included from drivers/block/drbd/drbd_debugfs.c:10:
+> > In file included from drivers/block/drbd/drbd_int.h:48:
+> > In file included from include/linux/drbd_genl_api.h:53:
+> > In file included from include/linux/genl_magic_struct.h:237:
+> > include/linux/drbd_genl.h:300:1: warning: no case matching constant switch condition '0'
+> > 
+> > There is nothing wrong with the code, and adding 'default:' labels
+> > in the right place is enough to let clang shut up about the warning.
+> 
+> Actually, I think I'd prefer a "case 0:" instead of the "default:",
+> because that would assert that we don't use a 0 for op or field numbers.
+> 
+> As at least some people seem to care, I suggest we bundle up
+> this and the other clang warning you just resent the patch for
+> with whatever else we may come up with for the next merge window
+> and send a pull request to Jens then.
+> In case we forget, please send a friendly reminder.
+> 
+> Thanks,
+> 
+>     Lars
+> 
 
-A followup pull request for this merge window. This pull request
-contains:
+Hi Lars,
 
-- Set of patches improving support for zoned devices. This was ready
-  before the merge window, but I was late in picking it up and hence it
-  missed the original pull request (Damien, Christoph)
+I will go ahead and test that change shortly and send it over for
+review.
 
-- libata no link power management quirk addition for a Samsung drive
-  (Diego Viola)
-
-- Fix for a performance regression in BFQ that went into this merge
-  window (Federico Motta)
-
-- Fix for a missing dma mask setting return value check (Gustavo)
-
-- Typo in the gdrom queue failure case (me)
-
-- NULL pointer deref fix for xen-blkfront (Vasilis Liaskovitis)
-
-- Fixing the get_rq trace point placement in blk-mq (Xiaoguang Wang)
-
-- Removal of a set-but-not-read variable in cdrom (zhong jiang)
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20181026
-
-
-----------------------------------------------------------------
-Christoph Hellwig (1):
-      block: add a report_zones method
-
-Damien Le Moal (10):
-      scsi: sd_zbc: Rearrange code
-      scsi: sd_zbc: Reduce boot device scan and revalidate time
-      scsi: sd_zbc: Fix sd_zbc_check_zones() error checks
-      block: Introduce blkdev_nr_zones() helper
-      block: Limit allocation of zone descriptors for report zones
-      block: Introduce BLKGETZONESZ ioctl
-      block: Introduce BLKGETNRZONES ioctl
-      block: Improve zone reset execution
-      block: Expose queue nr_zones in sysfs
-      block: Introduce blk_revalidate_disk_zones()
-
-Diego Viola (1):
-      libata: Apply NOLPM quirk for SAMSUNG MZ7TD256HAFV-000L9
-
-Federico Motta (1):
-      block, bfq: fix asymmetric scenarios detection
-
-Gustavo A. R. Silva (1):
-      skd: fix unchecked return values
-
-Jens Axboe (1):
-      gdrom: fix mistake in assignment of error
-
-Vasilis Liaskovitis (1):
-      xen/blkfront: avoid NULL blkfront_info dereference on device removal
-
-Xiaoguang Wang (1):
-      blk-mq: place trace_block_getrq() in correct place
-
-zhong jiang (1):
-      cdrom: remove set but not used variable 'tocuse'
-
- block/bfq-wf2q.c               |  18 +-
- block/blk-core.c               |   1 -
- block/blk-lib.c                |  13 +-
- block/blk-mq-debugfs.c         |   1 -
- block/blk-mq.c                 |   4 +-
- block/blk-sysfs.c              |  13 ++
- block/blk-zoned.c              | 359 ++++++++++++++++++-----------
- block/blk.h                    |   8 +
- block/ioctl.c                  |   4 +
- drivers/ata/libata-core.c      |   1 +
- drivers/block/null_blk.h       |  11 +-
- drivers/block/null_blk_main.c  |  30 +--
- drivers/block/null_blk_zoned.c |  57 ++---
- drivers/block/skd_main.c       |   4 +-
- drivers/block/xen-blkfront.c   |   3 +
- drivers/cdrom/gdrom.c          |   8 +-
- drivers/md/dm-flakey.c         |  30 ++-
- drivers/md/dm-linear.c         |  35 +--
- drivers/md/dm-table.c          |  10 +
- drivers/md/dm-zoned-target.c   |   3 +-
- drivers/md/dm.c                | 169 +++++++-------
- drivers/scsi/sd.c              |  15 +-
- drivers/scsi/sd.h              |  15 +-
- drivers/scsi/sd_zbc.c          | 501 +++++++++++------------------------------
- include/linux/blk_types.h      |   2 -
- include/linux/blkdev.h         |  30 ++-
- include/linux/device-mapper.h  |  12 +-
- include/trace/events/f2fs.h    |   1 -
- include/uapi/linux/blkzoned.h  |   3 +
- 29 files changed, 620 insertions(+), 741 deletions(-)
-
--- 
-Jens Axboe
+Thanks for the quick reply!
+Nathan
