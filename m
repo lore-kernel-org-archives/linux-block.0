@@ -1,309 +1,121 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 09/17] mspro_block: convert to blk-mq
-Date: Thu, 11 Oct 2018 10:59:01 -0600
-Message-Id: <20181011165909.32615-10-axboe@kernel.dk>
-In-Reply-To: <20181011165909.32615-1-axboe@kernel.dk>
-References: <20181011165909.32615-1-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from ale.deltatee.com ([207.54.116.67]:52934 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725893AbeJEEXP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 5 Oct 2018 00:23:15 -0400
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Logan Gunthorpe <logang@deltatee.com>
+Date: Thu,  4 Oct 2018 15:27:44 -0600
+Message-Id: <20181004212747.6301-11-logang@deltatee.com>
+In-Reply-To: <20181004212747.6301-1-logang@deltatee.com>
+References: <20181004212747.6301-1-logang@deltatee.com>
+MIME-Version: 1.0
+Subject: [PATCH v9 10/13] nvme-pci: Add support for P2P memory in requests
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Straight forward conversion, there's room for improvement.
+For P2P requests, we must use the pci_p2pmem_map_sg() function
+instead of the dma_map_sg functions.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+With that, we can then indicate PCI_P2P support in the request queue.
+For this, we create an NVME_F_PCI_P2P flag which tells the core to
+set QUEUE_FLAG_PCI_P2P in the request queue.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Keith Busch <keith.busch@intel.com>
 ---
- drivers/memstick/core/mspro_block.c | 133 ++++++++++++++++------------
- 1 file changed, 78 insertions(+), 55 deletions(-)
+ drivers/nvme/host/core.c |  4 ++++
+ drivers/nvme/host/nvme.h |  1 +
+ drivers/nvme/host/pci.c  | 17 +++++++++++++----
+ 3 files changed, 18 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/memstick/core/mspro_block.c b/drivers/memstick/core/mspro_block.c
-index 5ee932631fae..d55b398d16c4 100644
---- a/drivers/memstick/core/mspro_block.c
-+++ b/drivers/memstick/core/mspro_block.c
-@@ -12,7 +12,7 @@
-  *
-  */
- 
--#include <linux/blkdev.h>
-+#include <linux/blk-mq.h>
- #include <linux/idr.h>
- #include <linux/hdreg.h>
- #include <linux/kthread.h>
-@@ -142,6 +142,7 @@ struct mspro_block_data {
- 	struct gendisk        *disk;
- 	struct request_queue  *queue;
- 	struct request        *block_req;
-+	struct blk_mq_tag_set tag_set;
- 	spinlock_t            q_lock;
- 
- 	unsigned short        page_size;
-@@ -152,7 +153,6 @@ struct mspro_block_data {
- 	unsigned char         system;
- 	unsigned char         read_only:1,
- 			      eject:1,
--			      has_request:1,
- 			      data_dir:1,
- 			      active:1;
- 	unsigned char         transfer_cmd;
-@@ -694,13 +694,12 @@ static void h_mspro_block_setup_cmd(struct memstick_dev *card, u64 offset,
- 
- /*** Data transfer ***/
- 
--static int mspro_block_issue_req(struct memstick_dev *card, int chunk)
-+static int mspro_block_issue_req(struct memstick_dev *card, bool chunk)
- {
- 	struct mspro_block_data *msb = memstick_get_drvdata(card);
- 	u64 t_off;
- 	unsigned int count;
- 
--try_again:
- 	while (chunk) {
- 		msb->current_page = 0;
- 		msb->current_seg = 0;
-@@ -709,9 +708,17 @@ static int mspro_block_issue_req(struct memstick_dev *card, int chunk)
- 					       msb->req_sg);
- 
- 		if (!msb->seg_count) {
--			chunk = __blk_end_request_cur(msb->block_req,
--					BLK_STS_RESOURCE);
--			continue;
-+			unsigned int bytes = blk_rq_cur_bytes(msb->block_req);
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index dd8ec1dd9219..6033ce2fd3e9 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -3051,7 +3051,11 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
+ 	ns->queue = blk_mq_init_queue(ctrl->tagset);
+ 	if (IS_ERR(ns->queue))
+ 		goto out_free_ns;
 +
-+			chunk = blk_update_request(msb->block_req,
-+							BLK_STS_RESOURCE,
-+							bytes);
-+			if (chunk)
-+				continue;
-+			__blk_mq_end_request(msb->block_req,
-+						BLK_STS_RESOURCE);
-+			msb->block_req = NULL;
-+			break;
- 		}
+ 	blk_queue_flag_set(QUEUE_FLAG_NONROT, ns->queue);
++	if (ctrl->ops->flags & NVME_F_PCI_P2PDMA)
++		blk_queue_flag_set(QUEUE_FLAG_PCI_P2PDMA, ns->queue);
++
+ 	ns->queue->queuedata = ns;
+ 	ns->ctrl = ctrl;
  
- 		t_off = blk_rq_pos(msb->block_req);
-@@ -729,30 +736,22 @@ static int mspro_block_issue_req(struct memstick_dev *card, int chunk)
- 		return 0;
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index bb4a2003c097..4030743c90aa 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -343,6 +343,7 @@ struct nvme_ctrl_ops {
+ 	unsigned int flags;
+ #define NVME_F_FABRICS			(1 << 0)
+ #define NVME_F_METADATA_SUPPORTED	(1 << 1)
++#define NVME_F_PCI_P2PDMA		(1 << 2)
+ 	int (*reg_read32)(struct nvme_ctrl *ctrl, u32 off, u32 *val);
+ 	int (*reg_write32)(struct nvme_ctrl *ctrl, u32 off, u32 val);
+ 	int (*reg_read64)(struct nvme_ctrl *ctrl, u32 off, u64 *val);
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index f434706a04e8..0d6c41bc2b35 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -745,8 +745,13 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
+ 		goto out;
+ 
+ 	ret = BLK_STS_RESOURCE;
+-	nr_mapped = dma_map_sg_attrs(dev->dev, iod->sg, iod->nents, dma_dir,
+-			DMA_ATTR_NO_WARN);
++
++	if (is_pci_p2pdma_page(sg_page(iod->sg)))
++		nr_mapped = pci_p2pdma_map_sg(dev->dev, iod->sg, iod->nents,
++					  dma_dir);
++	else
++		nr_mapped = dma_map_sg_attrs(dev->dev, iod->sg, iod->nents,
++					     dma_dir,  DMA_ATTR_NO_WARN);
+ 	if (!nr_mapped)
+ 		goto out;
+ 
+@@ -788,7 +793,10 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
+ 			DMA_TO_DEVICE : DMA_FROM_DEVICE;
+ 
+ 	if (iod->nents) {
+-		dma_unmap_sg(dev->dev, iod->sg, iod->nents, dma_dir);
++		/* P2PDMA requests do not need to be unmapped */
++		if (!is_pci_p2pdma_page(sg_page(iod->sg)))
++			dma_unmap_sg(dev->dev, iod->sg, iod->nents, dma_dir);
++
+ 		if (blk_integrity_rq(req))
+ 			dma_unmap_sg(dev->dev, &iod->meta_sg, 1, dma_dir);
  	}
- 
--	dev_dbg(&card->dev, "blk_fetch\n");
--	msb->block_req = blk_fetch_request(msb->queue);
--	if (!msb->block_req) {
--		dev_dbg(&card->dev, "issue end\n");
--		return -EAGAIN;
--	}
--
--	dev_dbg(&card->dev, "trying again\n");
--	chunk = 1;
--	goto try_again;
-+	return 1;
- }
- 
- static int mspro_block_complete_req(struct memstick_dev *card, int error)
- {
- 	struct mspro_block_data *msb = memstick_get_drvdata(card);
--	int chunk, cnt;
-+	int cnt;
-+	bool chunk;
- 	unsigned int t_len = 0;
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(&msb->q_lock, flags);
--	dev_dbg(&card->dev, "complete %d, %d\n", msb->has_request ? 1 : 0,
-+	dev_dbg(&card->dev, "complete %d, %d\n", msb->block_req ? 1 : 0,
- 		error);
- 
--	if (msb->has_request) {
-+	if (msb->block_req) {
- 		/* Nothing to do - not really an error */
- 		if (error == -EAGAIN)
- 			error = 0;
-@@ -777,15 +776,17 @@ static int mspro_block_complete_req(struct memstick_dev *card, int error)
- 		if (error && !t_len)
- 			t_len = blk_rq_cur_bytes(msb->block_req);
- 
--		chunk = __blk_end_request(msb->block_req,
-+		chunk = blk_update_request(msb->block_req,
- 				errno_to_blk_status(error), t_len);
--
--		error = mspro_block_issue_req(card, chunk);
--
--		if (!error)
--			goto out;
--		else
--			msb->has_request = 0;
-+		if (chunk) {
-+			error = mspro_block_issue_req(card, chunk);
-+			if (!error)
-+				goto out;
-+		} else {
-+			__blk_mq_end_request(msb->block_req,
-+						errno_to_blk_status(error));
-+			msb->block_req = NULL;
-+		}
- 	} else {
- 		if (!error)
- 			error = -EAGAIN;
-@@ -806,8 +807,8 @@ static void mspro_block_stop(struct memstick_dev *card)
- 
- 	while (1) {
- 		spin_lock_irqsave(&msb->q_lock, flags);
--		if (!msb->has_request) {
--			blk_stop_queue(msb->queue);
-+		if (!msb->block_req) {
-+			blk_mq_stop_hw_queues(msb->queue);
- 			rc = 1;
- 		}
- 		spin_unlock_irqrestore(&msb->q_lock, flags);
-@@ -822,32 +823,37 @@ static void mspro_block_stop(struct memstick_dev *card)
- static void mspro_block_start(struct memstick_dev *card)
- {
- 	struct mspro_block_data *msb = memstick_get_drvdata(card);
--	unsigned long flags;
- 
--	spin_lock_irqsave(&msb->q_lock, flags);
--	blk_start_queue(msb->queue);
--	spin_unlock_irqrestore(&msb->q_lock, flags);
-+	blk_mq_start_hw_queues(msb->queue);
- }
- 
--static void mspro_block_submit_req(struct request_queue *q)
-+static blk_status_t mspro_queue_rq(struct blk_mq_hw_ctx *hctx,
-+				   const struct blk_mq_queue_data *bd)
- {
--	struct memstick_dev *card = q->queuedata;
-+	struct memstick_dev *card = hctx->queue->queuedata;
- 	struct mspro_block_data *msb = memstick_get_drvdata(card);
--	struct request *req = NULL;
- 
--	if (msb->has_request)
--		return;
-+	spin_lock_irq(&msb->q_lock);
- 
--	if (msb->eject) {
--		while ((req = blk_fetch_request(q)) != NULL)
--			__blk_end_request_all(req, BLK_STS_IOERR);
-+	if (msb->block_req) {
-+		spin_unlock_irq(&msb->q_lock);
-+		return BLK_STS_DEV_RESOURCE;
-+	}
- 
--		return;
-+	if (msb->eject) {
-+		spin_unlock_irq(&msb->q_lock);
-+		blk_mq_start_request(bd->rq);
-+		return BLK_STS_IOERR;
- 	}
- 
--	msb->has_request = 1;
--	if (mspro_block_issue_req(card, 0))
--		msb->has_request = 0;
-+	msb->block_req = bd->rq;
-+	blk_mq_start_request(bd->rq);
-+
-+	if (mspro_block_issue_req(card, true))
-+		msb->block_req = NULL;
-+
-+	spin_unlock_irq(&msb->q_lock);
-+	return BLK_STS_OK;
- }
- 
- /*** Initialization ***/
-@@ -1167,12 +1173,17 @@ static int mspro_block_init_card(struct memstick_dev *card)
- 
- }
- 
-+static const struct blk_mq_ops mspro_mq_ops = {
-+	.queue_rq	= mspro_queue_rq,
-+};
-+
- static int mspro_block_init_disk(struct memstick_dev *card)
- {
- 	struct mspro_block_data *msb = memstick_get_drvdata(card);
- 	struct mspro_devinfo *dev_info = NULL;
- 	struct mspro_sys_info *sys_info = NULL;
- 	struct mspro_sys_attr *s_attr = NULL;
-+	struct blk_mq_tag_set *set;
- 	int rc, disk_id;
- 	unsigned long capacity;
- 
-@@ -1206,10 +1217,21 @@ static int mspro_block_init_disk(struct memstick_dev *card)
- 		goto out_release_id;
- 	}
- 
--	msb->queue = blk_init_queue(mspro_block_submit_req, &msb->q_lock);
--	if (!msb->queue) {
--		rc = -ENOMEM;
-+	set = &msb->tag_set;
-+	set->ops = &mspro_mq_ops;
-+	set->nr_hw_queues = 1;
-+	set->queue_depth = 2;
-+	set->numa_node = NUMA_NO_NODE;
-+	set->flags = BLK_MQ_F_SHOULD_MERGE;
-+	rc = blk_mq_alloc_tag_set(set);
-+	if (rc)
- 		goto out_put_disk;
-+
-+	msb->queue = blk_mq_init_queue(set);
-+	if (IS_ERR(msb->queue)) {
-+		rc = PTR_ERR(msb->queue);
-+		msb->queue = NULL;
-+		goto out_put_tag;
- 	}
- 
- 	msb->queue->queuedata = card;
-@@ -1240,6 +1262,8 @@ static int mspro_block_init_disk(struct memstick_dev *card)
- 	msb->active = 1;
- 	return 0;
- 
-+out_put_tag:
-+	blk_mq_free_tag_set(&msb->tag_set);
- out_put_disk:
- 	put_disk(msb->disk);
- out_release_id:
-@@ -1318,12 +1342,13 @@ static void mspro_block_remove(struct memstick_dev *card)
- 
- 	spin_lock_irqsave(&msb->q_lock, flags);
- 	msb->eject = 1;
--	blk_start_queue(msb->queue);
- 	spin_unlock_irqrestore(&msb->q_lock, flags);
-+	blk_mq_start_hw_queues(msb->queue);
- 
- 	del_gendisk(msb->disk);
- 	dev_dbg(&card->dev, "mspro block remove\n");
- 
-+	blk_mq_free_tag_set(msb->queue->tag_set);
- 	blk_cleanup_queue(msb->queue);
- 	msb->queue = NULL;
- 
-@@ -1344,8 +1369,9 @@ static int mspro_block_suspend(struct memstick_dev *card, pm_message_t state)
- 	struct mspro_block_data *msb = memstick_get_drvdata(card);
- 	unsigned long flags;
- 
-+	blk_mq_stop_hw_queues(msb->queue);
-+
- 	spin_lock_irqsave(&msb->q_lock, flags);
--	blk_stop_queue(msb->queue);
- 	msb->active = 0;
- 	spin_unlock_irqrestore(&msb->q_lock, flags);
- 
-@@ -1355,7 +1381,6 @@ static int mspro_block_suspend(struct memstick_dev *card, pm_message_t state)
- static int mspro_block_resume(struct memstick_dev *card)
- {
- 	struct mspro_block_data *msb = memstick_get_drvdata(card);
--	unsigned long flags;
- 	int rc = 0;
- 
- #ifdef CONFIG_MEMSTICK_UNSAFE_RESUME
-@@ -1401,9 +1426,7 @@ static int mspro_block_resume(struct memstick_dev *card)
- 
- #endif /* CONFIG_MEMSTICK_UNSAFE_RESUME */
- 
--	spin_lock_irqsave(&msb->q_lock, flags);
--	blk_start_queue(msb->queue);
--	spin_unlock_irqrestore(&msb->q_lock, flags);
-+	blk_mq_start_hw_queues(msb->queue);
- 	return rc;
- }
- 
+@@ -2400,7 +2408,8 @@ static int nvme_pci_get_address(struct nvme_ctrl *ctrl, char *buf, int size)
+ static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
+ 	.name			= "pcie",
+ 	.module			= THIS_MODULE,
+-	.flags			= NVME_F_METADATA_SUPPORTED,
++	.flags			= NVME_F_METADATA_SUPPORTED |
++				  NVME_F_PCI_P2PDMA,
+ 	.reg_read32		= nvme_pci_reg_read32,
+ 	.reg_write32		= nvme_pci_reg_write32,
+ 	.reg_read64		= nvme_pci_reg_read64,
 -- 
-2.17.1
+2.19.0
