@@ -1,107 +1,69 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Thu, 4 Oct 2018 09:45:35 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Jan Kara <jack@suse.cz>
-Cc: Linus Walleij <linus.walleij@linaro.org>,
-	Paolo Valente <paolo.valente@linaro.org>, aherrmann@suse.com,
+Return-Path: <jack@suse.cz>
+Date: Thu, 4 Oct 2018 09:38:09 +0200
+From: Jan Kara <jack@suse.cz>
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
 	Jens Axboe <axboe@kernel.dk>,
+	Linus Walleij <linus.walleij@linaro.org>,
 	linux-block <linux-block@vger.kernel.org>,
 	linux-mmc <linux-mmc@vger.kernel.org>,
 	linux-mtd@lists.infradead.org, Pavel Machek <pavel@ucw.cz>,
 	Ulf Hansson <ulf.hansson@linaro.org>,
 	Richard Weinberger <richard@nod.at>,
 	Artem Bityutskiy <dedekind1@gmail.com>,
-	Adrian Hunter <adrian.hunter@intel.com>, mgorman@suse.com,
+	Adrian Hunter <adrian.hunter@intel.com>, Jan Kara <jack@suse.cz>,
+	Andreas Herrmann <aherrmann@suse.com>,
+	Mel Gorman <mgorman@suse.com>,
 	Chunyan Zhang <zhang.chunyan@linaro.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	'Paolo Valente' via bfq-iosched <bfq-iosched@googlegroups.com>,
 	Mark Brown <broonie@kernel.org>
 Subject: Re: [PATCH] block: BFQ default for single queue devices
-Message-ID: <20181004074535.GB6682@linux-x5ow.site>
+Message-ID: <20181004073809.GD29482@quack2.suse.cz>
 References: <20181002124329.21248-1-linus.walleij@linaro.org>
  <05fdbe23-ec01-895f-e67e-abff85c1ece2@kernel.dk>
  <B5321A64-8A1A-42FF-A337-F4524BDA179B@linaro.org>
- <CACRpkdaeYU+Crr75T49WftyOHqCrsyBLBPDBBsJF-RCjmAQEdw@mail.gmail.com>
- <20181003132554.GC21043@quack2.suse.cz>
+ <1eca41df95ff660eb247a3de666adeb4@natalenko.name>
+ <6AF8CEDE-2720-4206-900A-1A9B914A8FF0@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20181003132554.GC21043@quack2.suse.cz>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <6AF8CEDE-2720-4206-900A-1A9B914A8FF0@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Oct 03, 2018 at 03:25:54PM +0200, Jan Kara wrote:
-> On Wed 03-10-18 08:53:37, Linus Walleij wrote:
-> > On Wed, Oct 3, 2018 at 8:29 AM Paolo Valente <paolo.valente@linaro.org> wrote:
+On Wed 03-10-18 17:55:41, Paolo Valente wrote:
+> > On 03.10.2018 08:29, Paolo Valente wrote:
+> >> As also Linus Torvalds complained [1], people feel lost among
+> >> I/O-scheduler options.  Actual differences across I/O schedulers are
+> >> basically obscure to non experts.  In this respect, Linux-kernel
+> >> 'users' are way more than a few top-level distros that can afford a
+> >> strong performance team, and that, basing on the input of such a team,
+> >> might venture light-heartedly to change a critical component like an
+> >> I/O scheduler.  Plus, as Linus Walleij pointed out, some users simply
+> >> are not distros that use udev.
 > > 
-> > > So, I do understand your need for conservativeness, but, after so much
-> > > evidence on single-queue devices, and so many years! :), what's the
-> > > point in keeping Linux worse for virtually everybody, by default?
+> > I feel a contradiction in this counter-argument. On one hand, there are lots of, let's call them, home users, that use major distributions with udev, so the distribution maintainers can reasonably decide which scheduler to use for which type of device based on the udev rule and common sense provided via Documentation/ by linux-block devs. Moreover, most likely, those rules should be similar or the same across all the major distros and available via some (systemd?) upstream.
 > > 
-> > I understand if we need to ease things in as well, I don't intend this
-> > change for the current merge window or anything, since v4.19
-> > will notably have this patch:
-> > 
-> > commit d5038a13eca72fb216c07eb717169092e92284f1
-> > Author: Johannes Thumshirn <jthumshirn@suse.de>
-> > Date:   Wed Jul 4 10:53:56 2018 +0200
-> > 
-> >     scsi: core: switch to scsi-mq by default
-> > 
-> >     It has been more than one year since we tried to change the default from
-> >     legacy to multi queue in SCSI with commit c279bd9e406 ("scsi: default to
-> >     scsi-mq"). But due to issues with suspend/resume and performance problems
-> >     it had been reverted again with commit cbe7dfa26eee ("Revert "scsi: default
-> >     to scsi-mq"").
-> > 
-> >     In the meantime there have been a substantial amount of performance
-> >     improvements and suspend/resume got fixed as well, thus we can re-enable
-> >     scsi-mq without a significant performance penalty.
-> > 
-> >     Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
-> >     Reviewed-by: Hannes Reinecke <hare@suse.com>
-> >     Reviewed-by: Ming Lei <ming.lei@redhat.com>
-> >     Acked-by: John Garry <john.garry@huawei.com>
-> >     Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
-> > 
-> > I guess that patch can be a bit scary by itself. But IIUC it all went
-> > fine this time!
-> > 
-> > But hey, if that works, that means $SUBJECT patch will enable BFQ on all
-> > libata devices and any SCSI that is single queue as well, not just
-> > "obscure" stuff like MMC/SD and UBI, and that is
-> > indeed a massive crowd of legacy devices. But we're talking
-> > v4.21 here.
-> > 
-> > Johannes, you might be interested in $SUBJECT patch.
-> > It'd be nice to hear what SUSE people have to add, since they
-> > are pretty proactive in this area.
 > 
-> So we do have a udev rules in our distro which sets the IO scheduler based
-> on device parameters (rotational at least, with blk-mq we might start
-> considering number of queues as well, plus we have some exceptions like
-> virtio, loop, etc.). So the kernel default doesn't concern us too much as a
-> distro.
+> Let me basically repeat Mark's answer here, with my words.
 > 
-> I personally would consider bfq a safer default for single-queue devices
-> (loop probably needs exception) but I don't feel too strongly about it.
+> Unfortunately, facts mismatch with your optimistic view: after so many
+> years and concordant test results, only very few distributions
+> switched to bfq, no major distribution did (AFAIK).  As I already
+> wrote, the reason is the one pointed out by Torvalds [1].  Do you want
+> a simple example?  Take the last sentence in Jan's email in this
+> thread: "I *personally would* consider bfq a safer default ...  but *I
+> don't feel too strongly* about it." And he is definitely a storage
+> expert.
 
-[Full quote for context]
+Yeah, but let me add that currently all our released kernels still use legacy
+block stack for SCSI by default and thus CFQ/deadline. And once we feel
+scsi-mq + BFQ is comparable enough for rotating disks (which may be after
+your latest changes, Andreas will be running some larger evaluation), we
+are going to switch to that instead of scsi + CFQ. So it's not like for us
+it is a question between deadline-mq and BFQ, it is rather between scsi +
+CFQ vs scsi-mq + BFQ.
 
-What about resurrecting CONFIG_DEFAULT_IOSCHED for MQ as well and
-leave it default to mq-deadline but give bfq, kyber and none as a
-choice as well?
-
-The question is shall we only do it for single queue devices or for
-native MQ devices as well if we go down that road?
-
-I understand the embedded floks will want a different interface than
-udev, but from the non-embedded point of view I'm with Jens and Jan
-here, let udev do the job.
-
-      Johannes
+								Honza
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
