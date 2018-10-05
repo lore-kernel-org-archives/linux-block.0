@@ -1,86 +1,135 @@
-Return-Path: <pavel@ucw.cz>
-Date: Fri, 5 Oct 2018 11:49:09 +0200
-From: Pavel Machek <pavel@ucw.cz>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: oleksandr@natalenko.name, Paolo Valente <paolo.valente@linaro.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block <linux-block@vger.kernel.org>,
-	linux-mmc <linux-mmc@vger.kernel.org>,
-	linux-mtd@lists.infradead.org, Ulf Hansson <ulf.hansson@linaro.org>,
-	Richard Weinberger <richard@nod.at>,
-	Artem Bityutskiy <dedekind1@gmail.com>,
-	Adrian Hunter <adrian.hunter@intel.com>, Jan Kara <jack@suse.cz>,
-	aherrmann@suse.com, mgorman@suse.com,
-	Chunyan Zhang <zhang.chunyan@linaro.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	bfq-iosched@googlegroups.com, Mark Brown <broonie@kernel.org>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
 Subject: Re: [PATCH] block: BFQ default for single queue devices
-Message-ID: <20181005094909.GB17069@amd>
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <1538692972.8223.7.camel@acm.org>
+Date: Fri, 5 Oct 2018 11:28:07 +0200
+Cc: Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
+ Jens Axboe <axboe@kernel.dk>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ linux-block <linux-block@vger.kernel.org>,
+ linux-mmc <linux-mmc@vger.kernel.org>,
+ linux-mtd@lists.infradead.org,
+ Pavel Machek <pavel@ucw.cz>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ Richard Weinberger <richard@nod.at>,
+ Artem Bityutskiy <dedekind1@gmail.com>,
+ Adrian Hunter <adrian.hunter@intel.com>,
+ Jan Kara <jack@suse.cz>,
+ Andreas Herrmann <aherrmann@suse.com>,
+ Mel Gorman <mgorman@suse.com>,
+ Chunyan Zhang <zhang.chunyan@linaro.org>,
+ linux-kernel <linux-kernel@vger.kernel.org>
+Message-Id: <A76F98D4-4D3E-4DFA-BF24-C64AD8BF8169@linaro.org>
 References: <20181002124329.21248-1-linus.walleij@linaro.org>
  <05fdbe23-ec01-895f-e67e-abff85c1ece2@kernel.dk>
  <B5321A64-8A1A-42FF-A337-F4524BDA179B@linaro.org>
- <1eca41df95ff660eb247a3de666adeb4@natalenko.name>
- <CACRpkdYG2Y=rspbZ_o=H3REXTEfOcaiqEyQD4kzO=G=d63V3yA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="5I6of5zJg18YgZEa"
-In-Reply-To: <CACRpkdYG2Y=rspbZ_o=H3REXTEfOcaiqEyQD4kzO=G=d63V3yA@mail.gmail.com>
+ <1538582091.205649.20.camel@acm.org> <20181004202553.71c2599c@alans-desktop>
+ <1538683746.230807.9.camel@acm.org>
+ <A017CAC7-41E6-4BB3-AC31-5EB524276138@linaro.org>
+ <1538692972.8223.7.camel@acm.org>
+To: Bart Van Assche <bvanassche@acm.org>
 List-ID: <linux-block@vger.kernel.org>
 
 
---5I6of5zJg18YgZEa
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-Hi!
-
-> On another hand, the users of embedded devices, mentioned by Linus,
-> > should already know what scheduler to choose because dealing with
-> > embedded world assumes the person can decide this on their own, or with
-> > the help of abovementioned udev scripts and/or Documentation/ as a
-> > reference point.
-> >
-> > So I see no obstacles here, and the choice to rely on udev by default
-> > sounds reasonable.
-> >
+> Il giorno 05 ott 2018, alle ore 00:42, Bart Van Assche =
+<bvanassche@acm.org> ha scritto:
 >=20
-> I am sorry but I do not agree with this.
+> On Thu, 2018-10-04 at 22:39 +0200, Paolo Valente wrote:
+>> No, kernel build is, for evident reasons, one of the workloads I =
+cared
+>> most about.  Actually, I tried to focus on all my main
+>> kernel-development tasks, such as also git checkout, git merge, git
+>> grep, ...
+>>=20
+>> According to my test results, with BFQ these tasks are at least as
+>> fast as, or, in most system configurations, much faster than with the
+>> other schedulers.  Of course, at the same time the system also =
+remains
+>> responsive with BFQ.
+>>=20
+>> You can repeat these tests using one of my first scripts in the S
+>> suite: kern_dev_tasks_vs_rw.sh (usually, the older the tests, the =
+more
+>> hypertrophied the names I gave :) ).
+>>=20
+>> I stopped sharing also my kernel-build results years ago, because I
+>> went on obtaining the same, identical good results for years, and I'm
+>> aware that I tend to show and say too much stuff.
 >=20
-> There are several historical precedents where we have
-> concluded that just "have the kernel do the right thing
-> by default" is the way to go.
+> On my test setup building the kernel is slightly slower when using the =
+BFQ
+> scheduler compared to using scheduler "none" (kernel 4.18.12, NVMe =
+SSD,
+> single CPU with 6 cores, hyperthreading disabled). I am aware that the
+> proposal at the start of this thread was to make BFQ the default for =
+devices
+> with a single hardware queue and not for devices like NVMe SSDs that =
+support
+> multiple hardware queues.
+>=20
 
-Kernel should do the right thing by default, I agree with Linus W.
+I miss your point: as you yourself note, the proposal is limited to
+single-queue devices, exactly because BFQ is not ready for
+multiple-queue devices yet.
 
-Having reasonable defaults is useful; yes, my desktop has udev etc,
-but I still want reasonable scheduler when doing fsck in
-init=3D/bin/bash.
+> What I think is missing is measurement results for BFQ on a system =
+with
+> multiple CPU sockets and against a fast storage medium.
 
-Plus, I update kernels more often than distros, and I run various
-embedded stuff.
+It is not missing.  As I happened to report in previous threads, we
+made a script to measure that too [1], using fio and null block.
 
-Kernel should just provide reasonable defaults.
+I have reported the results we obtained, for three classes of
+processors, in the in-kernel BFQ documentation [2].
 
-And yes, we have "ionice" command and yes, it would be nice if it
-worked by default...
+In particular, BFQ reached 400KIOPS with the fastest CPU mentioned in
+that document (Intel i7-4850HQ).
 
-									Pavel
---=20
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
-g.html
+So, since the speed of that single-socket commodity CPU is most likely
+lower than the total speed of a multi-socket system, we have that, on
+such a system and with BFQ, you should be conservatively ok with
+single-queue devices in the range 300-500 KIOPS.
 
---5I6of5zJg18YgZEa
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
+[1] https://github.com/Algodev-github/IOSpeed
+[2] https://www.kernel.org/doc/Documentation/block/bfq-iosched.txt
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
+> =20
 
-iEYEARECAAYFAlu3M5UACgkQMOfwapXb+vJ6eACfcuqmLHOP0/KPd0GVpLGns0P0
-WcIAoJmlmzUGDFB4GFpMdVF0osheZdbP
-=pxio
------END PGP SIGNATURE-----
+> Eliminating
+> the host lock from the SCSI core yielded a significant performance
+> improvement for such storage devices. Since the BFQ scheduler locks =
+and
+> unlocks bfqd->lock for every dispatch operation it is very likely that =
+BFQ
+> will slow down I/O for fast storage devices, even if their driver only
+> creates a single hardware queue.
+>=20
 
---5I6of5zJg18YgZEa--
+One of the main motivations behind NVMe, and blk-mq itself, is that it
+is hard to reach the above IOPS, and more, with a single I/O queue as
+bottleneck.
+
+So, I wouldn't expect that systems
+- equipped with single-queue drives reaching more than 500 KIOPS
+- using SATA or some other non-NVMe as protocol
+- so fast to push these drives to their maximum speeds
+constitute more than a negligible percentage of devices.
+
+So, by sticking to mq-deadline, we would sacrifice 99% of systems, to
+make sure, basically, that those very few systems on steroids reach
+maximum throughput with random I/O (while however still suffering from
+responsiveness problems).  I think it makes much more sense to have as
+default what is best for 99% of the single-queue systems, with those
+super systems properly reconfigured by their users.  For sure, other
+defaults are to be changed too, to get the most out of those systems.
+
+Thanks,
+Paolo
+
+
+> Bart.
