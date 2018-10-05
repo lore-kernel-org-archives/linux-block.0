@@ -1,60 +1,53 @@
-Return-Path: <dedekind1@gmail.com>
-Message-ID: <1538720688.14984.143.camel@gmail.com>
+Return-Path: <BATV+13169ad6bbd430f4295b+5521+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Thu, 4 Oct 2018 23:24:44 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Artem Bityutskiy <dedekind1@gmail.com>,
+	Paolo Valente <paolo.valente@linaro.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block <linux-block@vger.kernel.org>,
+	linux-mmc <linux-mmc@vger.kernel.org>,
+	"linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
+	Pavel Machek <pavel@ucw.cz>, Ulf Hansson <ulf.hansson@linaro.org>,
+	Richard Weinberger <richard@nod.at>,
+	Adrian Hunter <adrian.hunter@intel.com>, Jan Kara <jack@suse.cz>,
+	"aherrmann@suse.com" <aherrmann@suse.com>,
+	"mgorman@suse.com" <mgorman@suse.com>,
+	Chunyan Zhang <zhang.chunyan@linaro.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"bfq-iosched@googlegroups.com" <bfq-iosched@googlegroups.com>,
+	"oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+	Mark Brown <broonie@kernel.org>
 Subject: Re: [PATCH] block: BFQ default for single queue devices
-From: Artem Bityutskiy <dedekind1@gmail.com>
-Reply-To: dedekind1@gmail.com
-To: Bart Van Assche <bvanassche@acm.org>, Alan Cox
- <gnomes@lxorguk.ukuu.org.uk>
-Cc: Paolo Valente <paolo.valente@linaro.org>, Jens Axboe <axboe@kernel.dk>,
- Linus Walleij <linus.walleij@linaro.org>, linux-block
- <linux-block@vger.kernel.org>, linux-mmc <linux-mmc@vger.kernel.org>,
- linux-mtd@lists.infradead.org, Pavel Machek <pavel@ucw.cz>, Ulf Hansson
- <ulf.hansson@linaro.org>, Richard Weinberger <richard@nod.at>, Adrian
- Hunter <adrian.hunter@intel.com>, Jan Kara <jack@suse.cz>,  Andreas
- Herrmann <aherrmann@suse.com>, Mel Gorman <mgorman@suse.com>, Chunyan Zhang
- <zhang.chunyan@linaro.org>,  linux-kernel <linux-kernel@vger.kernel.org>
-Date: Fri, 05 Oct 2018 09:24:48 +0300
-In-Reply-To: <1538683746.230807.9.camel@acm.org>
+Message-ID: <20181005062444.GA30240@infradead.org>
 References: <20181002124329.21248-1-linus.walleij@linaro.org>
-	 <05fdbe23-ec01-895f-e67e-abff85c1ece2@kernel.dk>
-	 <B5321A64-8A1A-42FF-A337-F4524BDA179B@linaro.org>
-	 <1538582091.205649.20.camel@acm.org>
-	 <20181004202553.71c2599c@alans-desktop> <1538683746.230807.9.camel@acm.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+ <05fdbe23-ec01-895f-e67e-abff85c1ece2@kernel.dk>
+ <B5321A64-8A1A-42FF-A337-F4524BDA179B@linaro.org>
+ <1538550325.14984.108.camel@gmail.com>
+ <CACRpkdaLZXGKMQGJPH02p2QPkxUDA03Y=cu_wBR_+rFaLWTw7g@mail.gmail.com>
+ <BN3PR0401MB164003C967C45F2681F503A7E7E90@BN3PR0401MB1640.namprd04.prod.outlook.com>
+ <20181003125146.GA9313@infradead.org>
+ <1538578732.205649.0.camel@acm.org>
+ <20181003150131.GA7306@infradead.org>
+ <1538579724.205649.2.camel@acm.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1538579724.205649.2.camel@acm.org>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 2018-10-04 at 13:09 -0700, Bart Van Assche wrote:
-> On Thu, 2018-10-04 at 20:25 +0100, Alan Cox wrote:
-> > > I agree with Jens that it's best to leave it to the Linux distributors to
-> > > select a default I/O scheduler.
+On Wed, Oct 03, 2018 at 08:15:24AM -0700, Bart Van Assche wrote:
+> On Wed, 2018-10-03 at 08:01 -0700, Christoph Hellwig wrote:
+> > On Wed, Oct 03, 2018 at 07:58:52AM -0700, Bart Van Assche wrote:
+> > > Has the work with the T10 committee to standardize the SCSI equivalent of anonymous
+> > > writes already started?
 > > 
-> > That assumes such a thing exists. The kernel knows what devices it is
-> > dealing with. The kernel 'default' ought to be 'whatever is usually best
-> > for this device'. A distro cannot just pick a correct single default
-> > because NVME and USB sticks are both normal and rather different in needs.
+> > No, and I don't know of anyone who wants to do that in the short term.
 > 
-> Which I/O scheduler works best also depends which workload the user will run.
-> BFQ has significant advantages for interactive workloads like video replay
-> with concurrent background I/O but probably slows down kernel builds. That's
-> why I'm not sure whether the kernel should select the default I/O scheduler.
+> That's unfortunate. I think having such a command available in the SCSI
+> command set would be a step forward.
 
-Whats wrong with this simple hierarchy?
-
-1. Block core selects the default scheduler.
-2. Driver can overrule it early.
-3. Userspace can overrule the default later.
-
-Everyone is happy.
-
-Good defaults in block core are great. Those defaults + #3 may cover
-99% of the population.
-
-1% of the population can use #2. See, Linus wants "bfq" for ubiblock.
-Why wouldn't we to let him work with UBI community, show that bfq is 
-best for ubiblock, and just let the UBI community overrule the block
-core's default.
-
-If some day in the future there is a very good reason, we can even make
-this to be a module parameter, and people could just boot with
-'ubiblock.iosched=bfq'.
+I'm not saying it doesn't make sense, only that I don't know of any short
+term plans.
