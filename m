@@ -1,592 +1,342 @@
-Return-Path: <prvs=81407a9e8=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH 11/11] block: Introduce revalidate_disk_zones()
-Date: Wed, 10 Oct 2018 10:52:39 +0900
-Message-Id: <20181010015239.24930-12-damien.lemoal@wdc.com>
-In-Reply-To: <20181010015239.24930-1-damien.lemoal@wdc.com>
-References: <20181010015239.24930-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga04.intel.com ([192.55.52.120]:4647 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728746AbeJEUhB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 5 Oct 2018 16:37:01 -0400
+From: Igor Konopko <igor.j.konopko@intel.com>
+To: mb@lightnvm.io, javier@cnexlabs.com
+Cc: linux-block@vger.kernel.org, marcin.dziegielewski@intel.com,
+        igor.j.konopko@intel.com
+Subject: [PATCH 5/5] lightnvm: pblk: Support for packed metadata
+Date: Fri,  5 Oct 2018 15:34:37 +0200
+Message-Id: <20181005133437.25255-6-igor.j.konopko@intel.com>
+In-Reply-To: <20181005133437.25255-1-igor.j.konopko@intel.com>
+References: <20181005133437.25255-1-igor.j.konopko@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Drivers exposing zoned block devices have to initialize and maintain
-correctness (i.e. revalidate) of the device zone bitmaps attached to
-the device request queue (seq_zones_bitmap and seq_zones_wlock).
+In current pblk implementation, l2p mapping for not closed lines
+is always stored only in OOB metadata and recovered from it.
 
-To simplify coding this, introduce a generic helper function
-revalidate_disk_zones() suitable for most (and likely all) cases. This
-new function always update the seq_zones_bitmap and seq_zones_wlock
-bitmaps as well as the queue nr_zones field when called for a disk
-using a request based queue. For a disk using a BIO based queue, only
-the number of zones is updated since these queues do not have
-schedulers and do not need the zone bitmaps.
+Such a solution does not provide data integrity when drives does
+not have such a OOB metadata space.
 
-With this change, the zone bitmap initialization code in sd_zbc.c can be
-replaced with a call to this function in sd_zbc_read_zones(), which is
-called from the disk revalidate block operation method.
+The goal of this patch is to add support for so called packed
+metadata, which store l2p mapping for open lines in last sector
+of every write unit.
 
-A call to this function is also added to the null_blk friver for devices
-created with the zoned mode enabled.
-
-Finally, to ensure that dm zoned devices created with dm-linear or
-dm-flakey expose the correct number of zones through sysfs, a call to
-revalidate_disk_zones() is added to dm_table_set_restrictions().
-
-The zone bitmaps allocated and initialized by revalidate_disk_zones()
-are freed automatically from __blk_release_queue() using the block
-internal function blk_queue_free_zone_bitmaps().
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
 ---
- block/blk-sysfs.c             |   2 +
- block/blk-zoned.c             | 137 +++++++++++++++++++++
- block/blk.h                   |   6 +
- drivers/block/null_blk_main.c |   7 ++
- drivers/md/dm-table.c         |  10 ++
- drivers/scsi/sd.c             |   2 -
- drivers/scsi/sd.h             |   4 -
- drivers/scsi/sd_zbc.c         | 218 ++++------------------------------
- include/linux/blkdev.h        |   7 ++
- 9 files changed, 195 insertions(+), 198 deletions(-)
+ drivers/lightnvm/pblk-core.c     | 52 +++++++++++++++++++++++++++++---
+ drivers/lightnvm/pblk-init.c     | 37 +++++++++++++++++++++--
+ drivers/lightnvm/pblk-rb.c       |  3 ++
+ drivers/lightnvm/pblk-recovery.c |  5 +--
+ drivers/lightnvm/pblk-sysfs.c    |  7 +++++
+ drivers/lightnvm/pblk-write.c    | 14 ++++++---
+ drivers/lightnvm/pblk.h          |  5 ++-
+ 7 files changed, 110 insertions(+), 13 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index f7060a938bf9..8bc1a9a9d6f7 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -852,6 +852,8 @@ static void __blk_release_queue(struct work_struct *work)
- 	if (q->queue_tags)
- 		__blk_queue_free_tags(q);
- 
-+	blk_queue_free_zone_bitmaps(q);
-+
- 	if (!q->mq_ops) {
- 		if (q->exit_rq_fn)
- 			q->exit_rq_fn(q, q->fq->flush_rq);
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 2ed03e301908..6554c386d3a5 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -12,6 +12,7 @@
- #include <linux/module.h>
- #include <linux/rbtree.h>
- #include <linux/blkdev.h>
-+#include <linux/blk-mq.h>
- 
- #include "blk.h"
- 
-@@ -362,3 +363,139 @@ int blkdev_reset_zones_ioctl(struct block_device *bdev, fmode_t mode,
- 	return blkdev_reset_zones(bdev, zrange.sector, zrange.nr_sectors,
- 				  GFP_KERNEL);
- }
-+
-+static inline unsigned long *__alloc_zone_bitmap(int node,
-+						 unsigned int nr_zones)
-+{
-+	return kcalloc_node(BITS_TO_LONGS(nr_zones), sizeof(unsigned long),
-+			    GFP_NOIO | __GFP_ZERO, node);
-+}
-+
-+/*
-+ * Allocate an array of struct blk_zone to get nr_zones zone information.
-+ * The allocated array may be smaller than nr_zones.
-+ */
-+static struct blk_zone *__alloc_zones(int node, unsigned int *nr_zones)
-+{
-+	size_t size = *nr_zones * sizeof(struct blk_zone);
-+	struct page *page;
-+	int order;
-+
-+	for (order = get_order(size); order > 0; order--) {
-+		page = alloc_pages_node(node, GFP_NOIO | __GFP_ZERO, order);
-+		if (page) {
-+			*nr_zones = min_t(unsigned int, *nr_zones,
-+				(PAGE_SIZE << order) / sizeof(struct blk_zone));
-+			return page_address(page);
-+		}
-+	}
-+
-+	return NULL;
-+}
-+
-+void blk_queue_free_zone_bitmaps(struct request_queue *q)
-+{
-+	kfree(q->seq_zones_bitmap);
-+	q->seq_zones_bitmap = NULL;
-+	kfree(q->seq_zones_wlock);
-+	q->seq_zones_wlock = NULL;
-+}
-+
-+/**
-+ * revalidate_disk_zones - (re)allocate and initialize zone bitmaps
-+ * @disk:	Target disk
-+ *
-+ * Description:
-+ *    Helper function for low-level device drivers to (re) allocate and
-+ *    initialize a disk request queue zone bitmaps. This functions should
-+ *    normally be called within the disk ->revalidate method.
-+ *    For BIO based queues, no zone bitmap is allocated.
-+ */
-+int revalidate_disk_zones(struct gendisk *disk)
-+{
-+	struct request_queue *q = disk->queue;
-+	unsigned int nr_zones = __blkdev_nr_zones(q, get_capacity(disk));
-+	unsigned long *seq_zones_wlock = NULL, *seq_zones_bitmap = NULL;
-+	unsigned int i, rep_nr_zones = 0, z = 0, nrz;
-+	struct blk_zone *zones = NULL;
-+	sector_t sector = 0;
-+	int ret = 0;
-+
-+	/*
-+	 * BIO based queues do not use a scheduler so only q->nr_zones
-+	 * needs to be updated so that the sysfs exposed value is correct.
-+	 */
-+	if (!queue_is_rq_based(q)) {
-+		q->nr_zones = nr_zones;
-+		return 0;
-+	}
-+
-+	if (!blk_queue_is_zoned(q) || !nr_zones) {
-+		nr_zones = 0;
-+		goto update;
-+	}
-+
-+	/* Allocate bitmaps */
-+	ret = -ENOMEM;
-+	seq_zones_wlock = __alloc_zone_bitmap(q->node, nr_zones);
-+	if (!seq_zones_wlock)
-+		goto out;
-+	seq_zones_bitmap = __alloc_zone_bitmap(q->node, nr_zones);
-+	if (!seq_zones_bitmap)
-+		goto out;
-+
-+	/* Get zone information and initialize seq_zones_bitmap */
-+	rep_nr_zones = nr_zones;
-+	zones = __alloc_zones(q->node, &rep_nr_zones);
-+	if (!zones)
-+		goto out;
-+
-+	while (z < nr_zones) {
-+		nrz = min(nr_zones - z, rep_nr_zones);
-+		ret = blk_report_zones(disk, sector, zones, &nrz, GFP_NOIO);
-+		if (ret)
-+			goto out;
-+		if (!nrz)
-+			break;
-+		for (i = 0; i < nrz; i++) {
-+			if (zones[i].type != BLK_ZONE_TYPE_CONVENTIONAL)
-+				set_bit(z, seq_zones_bitmap);
-+			z++;
-+		}
-+		sector += nrz * blk_queue_zone_sectors(q);
-+	}
-+
-+	if (WARN_ON(z != nr_zones)) {
-+		ret = -EIO;
-+		goto out;
-+	}
-+
-+update:
-+	/*
-+	 * Install the new bitmaps, making sure the queue is stopped and
-+	 * all I/Os are completed (i.e. a scheduler is not referencing the
-+	 * bitmaps).
-+	 */
-+	blk_mq_freeze_queue(q);
-+	q->nr_zones = nr_zones;
-+	swap(q->seq_zones_wlock, seq_zones_wlock);
-+	swap(q->seq_zones_bitmap, seq_zones_bitmap);
-+	blk_mq_unfreeze_queue(q);
-+
-+out:
-+	free_pages((unsigned long)zones,
-+		   get_order(rep_nr_zones * sizeof(struct blk_zone)));
-+	kfree(seq_zones_wlock);
-+	kfree(seq_zones_bitmap);
-+
-+	if (ret) {
-+		pr_warn("%s: failed to revalidate zones\n", disk->disk_name);
-+		blk_mq_freeze_queue(q);
-+		blk_queue_free_zone_bitmaps(q);
-+		blk_mq_unfreeze_queue(q);
-+	}
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(revalidate_disk_zones);
-+
-diff --git a/block/blk.h b/block/blk.h
-index 3d67844676fb..7e30ecea0680 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -423,4 +423,10 @@ static inline int blk_iolatency_init(struct request_queue *q) { return 0; }
- 
- struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp);
- 
-+#ifdef CONFIG_BLK_DEV_ZONED
-+void blk_queue_free_zone_bitmaps(struct request_queue *q);
-+#else
-+static inline void blk_queue_free_zone_bitmaps(struct request_queue *q) {}
-+#endif
-+
- #endif /* BLK_INTERNAL_H */
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index f5759ca768d1..4086c2941ff8 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -1613,6 +1613,13 @@ static int null_gendisk_register(struct nullb *nullb)
- 	disk->queue		= nullb->q;
- 	strncpy(disk->disk_name, nullb->disk_name, DISK_NAME_LEN);
- 
-+	if (nullb->dev->zoned) {
-+		int ret = revalidate_disk_zones(disk);
-+
-+		if (ret != 0)
-+			return ret;
-+	}
-+
- 	add_disk(disk);
- 	return 0;
- }
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index 3d0e2c198f06..2a61f07e75d9 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -1937,6 +1937,16 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
- 	 */
- 	if (blk_queue_add_random(q) && dm_table_all_devices_attribute(t, device_is_not_random))
- 		blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, q);
-+
-+	/*
-+	 * For a zoned target, the number of zones should be updated for the
-+	 * correct value to be exposed in sysfs queue/nr_zones. For a BIO based
-+	 * target, this is all that is needed. For a request based target, the
-+	 * queue zone bitmaps must also be updated. Use revalidate_disk_zones()
-+	 * to handle this.
-+	 */
-+	if (blk_queue_is_zoned(q))
-+		revalidate_disk_zones(t->md->disk);
- }
- 
- unsigned int dm_table_get_num_targets(struct dm_table *t)
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 718aaf15d812..370b43683470 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -3413,8 +3413,6 @@ static int sd_remove(struct device *dev)
- 	del_gendisk(sdkp->disk);
- 	sd_shutdown(dev);
- 
--	sd_zbc_remove(sdkp);
--
- 	free_opal_dev(sdkp->opal_dev);
- 
- 	blk_register_region(devt, SD_MINORS, NULL,
-diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-index f72f20fd0d8b..1d63f3a23ffb 100644
---- a/drivers/scsi/sd.h
-+++ b/drivers/scsi/sd.h
-@@ -76,7 +76,6 @@ struct scsi_disk {
- #ifdef CONFIG_BLK_DEV_ZONED
- 	u32		nr_zones;
- 	u32		zone_blocks;
--	u32		zone_shift;
- 	u32		zones_optimal_open;
- 	u32		zones_optimal_nonseq;
- 	u32		zones_max_open;
-@@ -271,7 +270,6 @@ static inline int sd_is_zoned(struct scsi_disk *sdkp)
- #ifdef CONFIG_BLK_DEV_ZONED
- 
- extern int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buffer);
--extern void sd_zbc_remove(struct scsi_disk *sdkp);
- extern void sd_zbc_print_zones(struct scsi_disk *sdkp);
- extern int sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd);
- extern void sd_zbc_complete(struct scsi_cmnd *cmd, unsigned int good_bytes,
-@@ -288,8 +286,6 @@ static inline int sd_zbc_read_zones(struct scsi_disk *sdkp,
- 	return 0;
- }
- 
--static inline void sd_zbc_remove(struct scsi_disk *sdkp) {}
--
- static inline void sd_zbc_print_zones(struct scsi_disk *sdkp) {}
- 
- static inline int sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd)
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 1e8274f473b0..529c698a0189 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -424,191 +424,10 @@ static s32 sd_zbc_check_zones(struct scsi_disk *sdkp)
- 	return ret;
- }
- 
--/**
-- * sd_zbc_alloc_zone_bitmap - Allocate a zone bitmap (one bit per zone).
-- * @nr_zones: Number of zones to allocate space for.
-- * @numa_node: NUMA node to allocate the memory from.
-- */
--static inline unsigned long *
--sd_zbc_alloc_zone_bitmap(u32 nr_zones, int numa_node)
--{
--	return kcalloc_node(BITS_TO_LONGS(nr_zones), sizeof(unsigned long),
--			    GFP_KERNEL, numa_node);
--}
--
--/**
-- * sd_zbc_get_seq_zones - Parse report zones reply to identify sequential zones
-- * @sdkp: disk used
-- * @buf: report reply buffer
-- * @buflen: length of @buf
-- * @zone_shift: logarithm base 2 of the number of blocks in a zone
-- * @seq_zones_bitmap: bitmap of sequential zones to set
-- *
-- * Parse reported zone descriptors in @buf to identify sequential zones and
-- * set the reported zone bit in @seq_zones_bitmap accordingly.
-- * Since read-only and offline zones cannot be written, do not
-- * mark them as sequential in the bitmap.
-- * Return the LBA after the last zone reported.
-- */
--static sector_t sd_zbc_get_seq_zones(struct scsi_disk *sdkp, unsigned char *buf,
--				     unsigned int buflen, u32 zone_shift,
--				     unsigned long *seq_zones_bitmap)
--{
--	sector_t lba, next_lba = sdkp->capacity;
--	unsigned int buf_len, list_length;
--	unsigned char *rec;
--	u8 type, cond;
--
--	list_length = get_unaligned_be32(&buf[0]) + 64;
--	buf_len = min(list_length, buflen);
--	rec = buf + 64;
--
--	while (rec < buf + buf_len) {
--		type = rec[0] & 0x0f;
--		cond = (rec[1] >> 4) & 0xf;
--		lba = get_unaligned_be64(&rec[16]);
--		if (type != ZBC_ZONE_TYPE_CONV &&
--		    cond != ZBC_ZONE_COND_READONLY &&
--		    cond != ZBC_ZONE_COND_OFFLINE)
--			set_bit(lba >> zone_shift, seq_zones_bitmap);
--		next_lba = lba + get_unaligned_be64(&rec[8]);
--		rec += 64;
--	}
--
--	return next_lba;
--}
--
--/**
-- * sd_zbc_setup_seq_zones_bitmap - Initialize a seq zone bitmap.
-- * @sdkp: target disk
-- * @zone_shift: logarithm base 2 of the number of blocks in a zone
-- * @nr_zones: number of zones to set up a seq zone bitmap for
-- *
-- * Allocate a zone bitmap and initialize it by identifying sequential zones.
-- */
--static unsigned long *
--sd_zbc_setup_seq_zones_bitmap(struct scsi_disk *sdkp, u32 zone_shift,
--			      u32 nr_zones)
--{
--	struct request_queue *q = sdkp->disk->queue;
--	unsigned long *seq_zones_bitmap;
--	sector_t lba = 0;
--	unsigned char *buf;
--	int ret = -ENOMEM;
--
--	seq_zones_bitmap = sd_zbc_alloc_zone_bitmap(nr_zones, q->node);
--	if (!seq_zones_bitmap)
--		return ERR_PTR(-ENOMEM);
--
--	buf = kmalloc(SD_ZBC_BUF_SIZE, GFP_KERNEL);
--	if (!buf)
--		goto out;
--
--	while (lba < sdkp->capacity) {
--		ret = sd_zbc_do_report_zones(sdkp, buf, SD_ZBC_BUF_SIZE, lba,
--					     true);
--		if (ret)
--			goto out;
--		lba = sd_zbc_get_seq_zones(sdkp, buf, SD_ZBC_BUF_SIZE,
--					   zone_shift, seq_zones_bitmap);
--	}
--
--	if (lba != sdkp->capacity) {
--		/* Something went wrong */
--		ret = -EIO;
--	}
--
--out:
--	kfree(buf);
--	if (ret) {
--		kfree(seq_zones_bitmap);
--		return ERR_PTR(ret);
--	}
--	return seq_zones_bitmap;
--}
--
--static void sd_zbc_cleanup(struct scsi_disk *sdkp)
--{
--	struct request_queue *q = sdkp->disk->queue;
--
--	kfree(q->seq_zones_bitmap);
--	q->seq_zones_bitmap = NULL;
--
--	kfree(q->seq_zones_wlock);
--	q->seq_zones_wlock = NULL;
--
--	q->nr_zones = 0;
--}
--
--static int sd_zbc_setup(struct scsi_disk *sdkp, u32 zone_blocks)
--{
--	struct request_queue *q = sdkp->disk->queue;
--	u32 zone_shift = ilog2(zone_blocks);
--	u32 nr_zones;
--	int ret;
--
--	/* chunk_sectors indicates the zone size */
--	blk_queue_chunk_sectors(q,
--			logical_to_sectors(sdkp->device, zone_blocks));
--	nr_zones = round_up(sdkp->capacity, zone_blocks) >> zone_shift;
--
--	/*
--	 * Initialize the device request queue information if the number
--	 * of zones changed.
--	 */
--	if (nr_zones != sdkp->nr_zones || nr_zones != q->nr_zones) {
--		unsigned long *seq_zones_wlock = NULL, *seq_zones_bitmap = NULL;
--		size_t zone_bitmap_size;
--
--		if (nr_zones) {
--			seq_zones_wlock = sd_zbc_alloc_zone_bitmap(nr_zones,
--								   q->node);
--			if (!seq_zones_wlock) {
--				ret = -ENOMEM;
--				goto err;
--			}
--
--			seq_zones_bitmap = sd_zbc_setup_seq_zones_bitmap(sdkp,
--							zone_shift, nr_zones);
--			if (IS_ERR(seq_zones_bitmap)) {
--				ret = PTR_ERR(seq_zones_bitmap);
--				kfree(seq_zones_wlock);
--				goto err;
--			}
--		}
--		zone_bitmap_size = BITS_TO_LONGS(nr_zones) *
--			sizeof(unsigned long);
--		blk_mq_freeze_queue(q);
--		if (q->nr_zones != nr_zones) {
--			/* READ16/WRITE16 is mandatory for ZBC disks */
--			sdkp->device->use_16_for_rw = 1;
--			sdkp->device->use_10_for_rw = 0;
--
--			sdkp->zone_blocks = zone_blocks;
--			sdkp->zone_shift = zone_shift;
--			sdkp->nr_zones = nr_zones;
--			q->nr_zones = nr_zones;
--			swap(q->seq_zones_wlock, seq_zones_wlock);
--			swap(q->seq_zones_bitmap, seq_zones_bitmap);
--		} else if (memcmp(q->seq_zones_bitmap, seq_zones_bitmap,
--				  zone_bitmap_size) != 0) {
--			memcpy(q->seq_zones_bitmap, seq_zones_bitmap,
--			       zone_bitmap_size);
--		}
--		blk_mq_unfreeze_queue(q);
--		kfree(seq_zones_wlock);
--		kfree(seq_zones_bitmap);
--	}
--
--	return 0;
--
--err:
--	sd_zbc_cleanup(sdkp);
--	return ret;
--}
--
- int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 131972b13e27..e11a46c05067 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -376,7 +376,7 @@ void pblk_write_should_kick(struct pblk *pblk)
  {
-+	struct gendisk *disk = sdkp->disk;
-+	unsigned int nr_zones;
- 	int ret, zone_blocks;
+ 	unsigned int secs_avail = pblk_rb_read_count(&pblk->rwb);
  
- 	if (!sd_is_zoned(sdkp))
-@@ -634,24 +453,39 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
+-	if (secs_avail >= pblk->min_write_pgs)
++	if (secs_avail >= pblk->min_write_pgs_data)
+ 		pblk_write_kick(pblk);
+ }
+ 
+@@ -407,7 +407,9 @@ struct list_head *pblk_line_gc_list(struct pblk *pblk, struct pblk_line *line)
+ 	struct pblk_line_meta *lm = &pblk->lm;
+ 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+ 	struct list_head *move_list = NULL;
+-	int vsc = le32_to_cpu(*line->vsc);
++	int packed_meta = (le32_to_cpu(*line->vsc) / pblk->min_write_pgs_data)
++			* (pblk->min_write_pgs - pblk->min_write_pgs_data);
++	int vsc = le32_to_cpu(*line->vsc) + packed_meta;
+ 
+ 	lockdep_assert_held(&line->lock);
+ 
+@@ -620,12 +622,15 @@ struct bio *pblk_bio_map_addr(struct pblk *pblk, void *data,
+ }
+ 
+ int pblk_calc_secs(struct pblk *pblk, unsigned long secs_avail,
+-		   unsigned long secs_to_flush)
++		   unsigned long secs_to_flush, bool skip_meta)
+ {
+ 	int max = pblk->sec_per_write;
+ 	int min = pblk->min_write_pgs;
+ 	int secs_to_sync = 0;
+ 
++	if (skip_meta && pblk->min_write_pgs_data != pblk->min_write_pgs)
++		min = max = pblk->min_write_pgs_data;
++
+ 	if (secs_avail >= max)
+ 		secs_to_sync = max;
+ 	else if (secs_avail >= min)
+@@ -851,7 +856,7 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
+ next_rq:
+ 	memset(&rqd, 0, sizeof(struct nvm_rq));
+ 
+-	rq_ppas = pblk_calc_secs(pblk, left_ppas, 0);
++	rq_ppas = pblk_calc_secs(pblk, left_ppas, 0, false);
+ 	rq_len = rq_ppas * geo->csecs;
+ 
+ 	bio = pblk_bio_map_addr(pblk, emeta_buf, rq_ppas, rq_len,
+@@ -2161,3 +2166,42 @@ void pblk_lookup_l2p_rand(struct pblk *pblk, struct ppa_addr *ppas,
+ 	}
+ 	spin_unlock(&pblk->trans_lock);
+ }
++
++void pblk_set_packed_meta(struct pblk *pblk, struct nvm_rq *rqd)
++{
++	void *meta_list = rqd->meta_list;
++	void *page;
++	int i = 0;
++
++	if (pblk_is_oob_meta_supported(pblk))
++		return;
++
++	/* We need to zero out metadata corresponding to packed meta page */
++	pblk_set_meta_lba(pblk, meta_list, rqd->nr_ppas - 1, ADDR_EMPTY);
++
++	page = page_to_virt(rqd->bio->bi_io_vec[rqd->bio->bi_vcnt - 1].bv_page);
++	/* We need to fill last page of request (packed metadata)
++	 * with data from oob meta buffer.
++	 */
++	for (; i < rqd->nr_ppas; i++)
++		memcpy(page + (i * sizeof(struct pblk_sec_meta)),
++			pblk_get_meta_buffer(pblk, meta_list, i),
++			sizeof(struct pblk_sec_meta));
++}
++
++void pblk_get_packed_meta(struct pblk *pblk, struct nvm_rq *rqd)
++{
++	void *meta_list = rqd->meta_list;
++	void *page;
++	int i = 0;
++
++	if (pblk_is_oob_meta_supported(pblk))
++		return;
++
++	page = page_to_virt(rqd->bio->bi_io_vec[rqd->bio->bi_vcnt - 1].bv_page);
++	/* We need to fill oob meta buffer with data from packe metadata */
++	for (; i < rqd->nr_ppas; i++)
++		memcpy(pblk_get_meta_buffer(pblk, meta_list, i),
++			page + (i * sizeof(struct pblk_sec_meta)),
++			sizeof(struct pblk_sec_meta));
++}
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 1529aa37b30f..d2a63494def6 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -407,8 +407,40 @@ static int pblk_core_init(struct pblk *pblk)
+ 	pblk->min_write_pgs = geo->ws_opt;
+ 	max_write_ppas = pblk->min_write_pgs * geo->all_luns;
+ 	pblk->max_write_pgs = min_t(int, max_write_ppas, NVM_MAX_VLBA);
++	pblk->min_write_pgs_data = pblk->min_write_pgs;
+ 	pblk_set_sec_per_write(pblk, pblk->min_write_pgs);
+ 
++	if (!pblk_is_oob_meta_supported(pblk)) {
++		/* For drives which does not have OOB metadata feature
++		 * in order to support recovery feature we need to use
++		 * so called packed metadata. Packed metada will store
++		 * the same information as OOB metadata (l2p table mapping,
++		 * but in the form of the single page at the end of
++		 * every write request.
++		 */
++		if (pblk->min_write_pgs
++			* sizeof(struct pblk_sec_meta) > PAGE_SIZE) {
++			/* We want to keep all the packed metadata on single
++			 * page per write requests. So we need to ensure that
++			 * it will fit.
++			 *
++			 * This is more like sanity check, since there is
++			 * no device with such a big minimal write size
++			 * (above 1 metabytes).
++			 */
++			pblk_err(pblk, "Not supported min write size\n");
++			return -EINVAL;
++		}
++		/* For packed meta approach we do some simplification.
++		 * On read path we always issue requests which size
++		 * equal to max_write_pgs, with all pages filled with
++		 * user payload except of last one page which will be
++		 * filled with packed metadata.
++		 */
++		pblk->max_write_pgs = pblk->min_write_pgs;
++		pblk->min_write_pgs_data = pblk->min_write_pgs - 1;
++	}
++
+ 	pblk->pad_dist = kcalloc(pblk->min_write_pgs - 1, sizeof(atomic64_t),
+ 								GFP_KERNEL);
+ 	if (!pblk->pad_dist)
+@@ -639,7 +671,7 @@ static void pblk_set_provision(struct pblk *pblk, long nr_free_blks)
+ 	struct pblk_line_meta *lm = &pblk->lm;
+ 	struct nvm_geo *geo = &dev->geo;
+ 	sector_t provisioned;
+-	int sec_meta, blk_meta;
++	int sec_meta, blk_meta, clba;
+ 
+ 	if (geo->op == NVM_TARGET_DEFAULT_OP)
+ 		pblk->op = PBLK_DEFAULT_OP;
+@@ -662,7 +694,8 @@ static void pblk_set_provision(struct pblk *pblk, long nr_free_blks)
+ 	sec_meta = (lm->smeta_sec + lm->emeta_sec[0]) * l_mg->nr_free_lines;
+ 	blk_meta = DIV_ROUND_UP(sec_meta, geo->clba);
+ 
+-	pblk->capacity = (provisioned - blk_meta) * geo->clba;
++	clba = (geo->clba / pblk->min_write_pgs) * pblk->min_write_pgs_data;
++	pblk->capacity = (provisioned - blk_meta) * clba;
+ 
+ 	atomic_set(&pblk->rl.free_blocks, nr_free_blks);
+ 	atomic_set(&pblk->rl.free_user_blocks, nr_free_blks);
+diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+index f653faa6a9ed..b6376a23a271 100644
+--- a/drivers/lightnvm/pblk-rb.c
++++ b/drivers/lightnvm/pblk-rb.c
+@@ -547,6 +547,9 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
+ 		to_read = count;
  	}
  
- 	/* The drive satisfies the kernel restrictions: set it up */
--	ret = sd_zbc_setup(sdkp, zone_blocks);
--	if (ret)
--		goto err;
-+	blk_queue_chunk_sectors(sdkp->disk->queue,
-+			logical_to_sectors(sdkp->device, zone_blocks));
-+	nr_zones = round_up(sdkp->capacity, zone_blocks) >> ilog2(zone_blocks);
++	/* Add space for packed metadata if in use*/
++	pad += (pblk->min_write_pgs - pblk->min_write_pgs_data);
 +
-+	/* READ16/WRITE16 is mandatory for ZBC disks */
-+	sdkp->device->use_16_for_rw = 1;
-+	sdkp->device->use_10_for_rw = 0;
-+
-+	/*
-+	 * If something changed, revalidate the disk zone bitmaps once we have
-+	 * the capacity, that is on the second revalidate execution during disk
-+	 * scan and always during normal revalidate.
-+	 */
-+	if (sdkp->first_scan)
-+		return 0;
-+	if (sdkp->zone_blocks != zone_blocks ||
-+	    sdkp->nr_zones != nr_zones ||
-+	    disk->queue->nr_zones != nr_zones) {
-+		ret = revalidate_disk_zones(disk);
-+		if (ret != 0)
-+			goto err;
-+		sdkp->zone_blocks = zone_blocks;
-+		sdkp->nr_zones = nr_zones;
+ 	c_ctx->sentry = pos;
+ 	c_ctx->nr_valid = to_read;
+ 	c_ctx->nr_padded = pad;
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index 4b703877907b..41ba2bf2f817 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -188,7 +188,7 @@ static int pblk_recov_pad_line(struct pblk *pblk, struct pblk_line *line,
+ 	kref_init(&pad_rq->ref);
+ 
+ next_pad_rq:
+-	rq_ppas = pblk_calc_secs(pblk, left_ppas, 0);
++	rq_ppas = pblk_calc_secs(pblk, left_ppas, 0, false);
+ 	if (rq_ppas < pblk->min_write_pgs) {
+ 		pblk_err(pblk, "corrupted pad line %d\n", line->id);
+ 		goto fail_free_pad;
+@@ -366,7 +366,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
+ next_rq:
+ 	memset(rqd, 0, pblk_g_rq_size);
+ 
+-	rq_ppas = pblk_calc_secs(pblk, left_ppas, 0);
++	rq_ppas = pblk_calc_secs(pblk, left_ppas, 0, false);
+ 	if (!rq_ppas)
+ 		rq_ppas = pblk->min_write_pgs;
+ 	rq_len = rq_ppas * geo->csecs;
+@@ -435,6 +435,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
+ 		goto retry_rq;
+ 	}
+ 
++	pblk_get_packed_meta(pblk, rqd);
+ 	for (i = 0; i < rqd->nr_ppas; i++) {
+ 		u64 lba = pblk_get_meta_lba(pblk, meta_list, i);
+ 
+diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
+index 2d2818155aa8..7d8958df9472 100644
+--- a/drivers/lightnvm/pblk-sysfs.c
++++ b/drivers/lightnvm/pblk-sysfs.c
+@@ -479,6 +479,13 @@ static ssize_t pblk_sysfs_set_sec_per_write(struct pblk *pblk,
+ 	if (kstrtouint(page, 0, &sec_per_write))
+ 		return -EINVAL;
+ 
++	if (!pblk_is_oob_meta_supported(pblk)) {
++		/* For packed metadata case it is
++		 * not allowed to change sec_per_write.
++		 */
++		return -EINVAL;
 +	}
- 
- 	return 0;
- 
- err:
- 	sdkp->capacity = 0;
--	sd_zbc_cleanup(sdkp);
- 
- 	return ret;
- }
- 
--void sd_zbc_remove(struct scsi_disk *sdkp)
--{
--	sd_zbc_cleanup(sdkp);
--}
--
- void sd_zbc_print_zones(struct scsi_disk *sdkp)
- {
- 	if (!sd_is_zoned(sdkp) || !sdkp->capacity)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d183c10872b7..90d9e49d2815 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -402,6 +402,7 @@ extern int blkdev_report_zones(struct block_device *bdev,
- 			       unsigned int *nr_zones, gfp_t gfp_mask);
- extern int blkdev_reset_zones(struct block_device *bdev, sector_t sectors,
- 			      sector_t nr_sectors, gfp_t gfp_mask);
-+extern int revalidate_disk_zones(struct gendisk *disk);
- 
- extern int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
- 				     unsigned int cmd, unsigned long arg);
-@@ -414,6 +415,12 @@ static inline unsigned int blkdev_nr_zones(struct block_device *bdev)
- {
- 	return 0;
- }
 +
-+static inline int revalidate_disk_zones(struct gendisk *disk)
-+{
-+	return 0;
-+}
+ 	if (sec_per_write < pblk->min_write_pgs
+ 				|| sec_per_write > pblk->max_write_pgs
+ 				|| sec_per_write % pblk->min_write_pgs != 0)
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index fa8726493b39..c78dfb996bcb 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -332,7 +332,7 @@ static int pblk_calc_secs_to_sync(struct pblk *pblk, unsigned int secs_avail,
+ {
+ 	int secs_to_sync;
+ 
+-	secs_to_sync = pblk_calc_secs(pblk, secs_avail, secs_to_flush);
++	secs_to_sync = pblk_calc_secs(pblk, secs_avail, secs_to_flush, true);
+ 
+ #ifdef CONFIG_NVM_PBLK_DEBUG
+ 	if ((!secs_to_sync && secs_to_flush)
+@@ -502,6 +502,11 @@ static int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd)
+ 		return NVM_IO_ERR;
+ 	}
+ 
++	/* This is the first place when we have write requests mapped
++	 * and we can fill packed metadata with l2p mappings.
++	 */
++	pblk_set_packed_meta(pblk, rqd);
 +
- static inline int blkdev_report_zones_ioctl(struct block_device *bdev,
- 					    fmode_t mode, unsigned int cmd,
- 					    unsigned long arg)
+ 	meta_line = pblk_should_submit_meta_io(pblk, rqd);
+ 
+ 	/* Submit data write for current data line */
+@@ -553,7 +558,7 @@ static int pblk_submit_write(struct pblk *pblk)
+ 	struct bio *bio;
+ 	struct nvm_rq *rqd;
+ 	unsigned int secs_avail, secs_to_sync, secs_to_com;
+-	unsigned int secs_to_flush;
++	unsigned int secs_to_flush, packed_meta_pgs;
+ 	unsigned long pos;
+ 	unsigned int resubmit;
+ 
+@@ -589,7 +594,7 @@ static int pblk_submit_write(struct pblk *pblk)
+ 			return 1;
+ 
+ 		secs_to_flush = pblk_rb_flush_point_count(&pblk->rwb);
+-		if (!secs_to_flush && secs_avail < pblk->min_write_pgs)
++		if (!secs_to_flush && secs_avail < pblk->min_write_pgs_data)
+ 			return 1;
+ 
+ 		secs_to_sync = pblk_calc_secs_to_sync(pblk, secs_avail,
+@@ -604,7 +609,8 @@ static int pblk_submit_write(struct pblk *pblk)
+ 		pos = pblk_rb_read_commit(&pblk->rwb, secs_to_com);
+ 	}
+ 
+-	bio = bio_alloc(GFP_KERNEL, secs_to_sync);
++	packed_meta_pgs = (pblk->min_write_pgs - pblk->min_write_pgs_data);
++	bio = bio_alloc(GFP_KERNEL, secs_to_sync + packed_meta_pgs);
+ 
+ 	bio->bi_iter.bi_sector = 0; /* internal bio */
+ 	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 6e4a63fd4c49..0da6aabd5988 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -626,6 +626,7 @@ struct pblk {
+ 	int state;			/* pblk line state */
+ 
+ 	int min_write_pgs; /* Minimum amount of pages required by controller */
++	int min_write_pgs_data; /* Minimum amount of payload pages */
+ 	int max_write_pgs; /* Maximum amount of pages supported by controller */
+ 
+ 	sector_t capacity; /* Device capacity when bad blocks are subtracted */
+@@ -831,7 +832,7 @@ void pblk_dealloc_page(struct pblk *pblk, struct pblk_line *line, int nr_secs);
+ u64 pblk_alloc_page(struct pblk *pblk, struct pblk_line *line, int nr_secs);
+ u64 __pblk_alloc_page(struct pblk *pblk, struct pblk_line *line, int nr_secs);
+ int pblk_calc_secs(struct pblk *pblk, unsigned long secs_avail,
+-		   unsigned long secs_to_flush);
++		   unsigned long secs_to_flush, bool skip_meta);
+ void pblk_down_rq(struct pblk *pblk, struct ppa_addr ppa,
+ 		  unsigned long *lun_bitmap);
+ void pblk_down_chunk(struct pblk *pblk, struct ppa_addr ppa);
+@@ -855,6 +856,8 @@ void pblk_lookup_l2p_rand(struct pblk *pblk, struct ppa_addr *ppas,
+ 			  u64 *lba_list, int nr_secs);
+ void pblk_lookup_l2p_seq(struct pblk *pblk, struct ppa_addr *ppas,
+ 			 sector_t blba, int nr_secs);
++void pblk_set_packed_meta(struct pblk *pblk, struct nvm_rq *rqd);
++void pblk_get_packed_meta(struct pblk *pblk, struct nvm_rq *rqd);
+ 
+ /*
+  * pblk user I/O write path
 -- 
 2.17.1
