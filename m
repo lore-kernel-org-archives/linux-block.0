@@ -1,34 +1,42 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH V2 0/3] blk-mq: refactor and fix on issue request directly
-Date: Sat, 27 Oct 2018 00:01:08 +0800
-Message-Id: <1540569671-6589-1-git-send-email-jianchao.w.wang@oracle.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga04.intel.com ([192.55.52.120]:4640 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727701AbeJEUhA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 5 Oct 2018 16:37:00 -0400
+From: Igor Konopko <igor.j.konopko@intel.com>
+To: mb@lightnvm.io, javier@cnexlabs.com
+Cc: linux-block@vger.kernel.org, marcin.dziegielewski@intel.com,
+        igor.j.konopko@intel.com
+Subject: [PATCH 0/5] lightnvm: pblk: Flexible metadata
+Date: Fri,  5 Oct 2018 15:34:32 +0200
+Message-Id: <20181005133437.25255-1-igor.j.konopko@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Jens
+This series of patches extends the way how pblk can
+store L2P sector metadata. After this set of changes
+any size of NVMe metadata (including 0) is supported.
 
-The 1st patch refactors the code of issue request directly.
-It merges the blk_mq_try_issue_directly and __blk_mq_try_issue_directly
-and make blk_mq_try_issue_directly handle return value of .queue_rq itself.
+Igor Konopko (5):
+  lightnvm: pblk: Do not reuse DMA memory on partial read
+  lightnvm: pblk: Helpers for OOB metadata
+  lightnvm: Flexible DMA pool entry size
+  lightnvm: Disable interleaved metadata
+  lightnvm: pblk: Support for packed metadata
 
-The 2nd patch make blk_mq_sched_insert_requests issue request directly with
-bypass "false" instead of the "true", then needn't to handle the non-issued
-requests any more.
+ drivers/lightnvm/core.c          | 33 ++++++++++----
+ drivers/lightnvm/pblk-core.c     | 77 +++++++++++++++++++++++++-------
+ drivers/lightnvm/pblk-init.c     | 54 +++++++++++++++++++++-
+ drivers/lightnvm/pblk-map.c      | 21 ++++++---
+ drivers/lightnvm/pblk-rb.c       |  3 ++
+ drivers/lightnvm/pblk-read.c     | 56 +++++++++++------------
+ drivers/lightnvm/pblk-recovery.c | 28 +++++++-----
+ drivers/lightnvm/pblk-sysfs.c    |  7 +++
+ drivers/lightnvm/pblk-write.c    | 14 ++++--
+ drivers/lightnvm/pblk.h          | 55 +++++++++++++++++++++--
+ drivers/nvme/host/lightnvm.c     |  7 ++-
+ include/linux/lightnvm.h         |  9 ++--
+ 12 files changed, 278 insertions(+), 86 deletions(-)
 
-The 3rd patch ensures the hctx to be ran on its mapped cpu in issue directly
-path.
-
-V2:
- - Add 1st and 2nd patch.
-
-Jianchao Wang(3)
-    blk-mq: refactor the code of issue request directly
-    blk-mq: issue directly with bypass 'false' in blk_mq_sched_insert_requests
-    blk-mq: ensure hctx to be ran on mapped cpu when issue
-
- block/blk-mq-sched.c |   8 ++--
- block/blk-mq.c       | 128 ++++++++++++++++++++++++---------------------------
- 2 files changed, 63 insertions(+), 73 deletions(-)
+-- 
+2.17.1
