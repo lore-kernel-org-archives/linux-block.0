@@ -1,66 +1,83 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-eopbgr720060.outbound.protection.outlook.com ([40.107.72.60]:57901
-        "EHLO NAM05-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725857AbeJHOOl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 8 Oct 2018 10:14:41 -0400
-From: Javier Gonzalez <javier@cnexlabs.com>
-To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
-CC: "zjwu@marvell.com" <zjwu@marvell.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "hongd@marvell.com" <hongd@marvell.com>
-Subject: Re: [PATCH v2] lightnvm: pblk: consider max hw sectors supported for
- max_write_pgs
-Date: Mon, 8 Oct 2018 07:04:24 +0000
-Message-ID: <7BFFB7A6-C510-42D2-B60B-0216C9F408C0@cnexlabs.com>
-References: <1538761161-6652-1-git-send-email-zjwu@marvell.com>,<add40e9e-d35d-259a-5425-42268d1c0dfb@lightnvm.io>
-In-Reply-To: <add40e9e-d35d-259a-5425-42268d1c0dfb@lightnvm.io>
-Content-Type: text/plain; charset="utf-8"
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:51428 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726505AbeJFILM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 6 Oct 2018 04:11:12 -0400
+Message-ID: <5BB80B5E.7090804@marvell.com>
+Date: Fri, 5 Oct 2018 18:09:50 -0700
+From: Zhoujie Wu <zjwu@marvell.com>
 MIME-Version: 1.0
+To: =?UTF-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>,
+        <linux-block@vger.kernel.org>
+CC: <hongd@marvell.com>, <javier@cnexlabs.com>
+Subject: Re: [EXT] Re: [PATCH v2] lightnvm: pblk: consider max hw sectors
+ supported for max_write_pgs
+References: <1538761161-6652-1-git-send-email-zjwu@marvell.com>
+ <add40e9e-d35d-259a-5425-42268d1c0dfb@lightnvm.io>
+In-Reply-To: <add40e9e-d35d-259a-5425-42268d1c0dfb@lightnvm.io>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-DQo+IE9uIDYgT2N0IDIwMTgsIGF0IDAzLjAxLCBNYXRpYXMgQmrDuHJsaW5nIDxtYkBsaWdodG52
-bS5pbz4gd3JvdGU6DQo+IA0KPj4gT24gMTAvMDUvMjAxOCAwNzozOSBQTSwgWmhvdWppZSBXdSB3
-cm90ZToNCj4+IFdoZW4gZG8gR0MsIHRoZSBudW1iZXIgb2YgcmVhZC93cml0ZSBzZWN0b3JzIGFy
-ZSBkZXRlcm1pbmVkDQo+PiBieSBtYXhfd3JpdGVfcGdzKHNlZSBnY19ycSBwcmVwYXJhdGlvbiBp
-biBwYmxrX2djX2xpbmVfcHJlcGFyZV93cykuDQo+PiBEdWUgdG8gbWF4X3dyaXRlX3BncyBkb2Vz
-bid0IGNvbnNpZGVyIG1heCBodyBzZWN0b3JzDQo+PiBzdXBwb3J0ZWQgYnkgbnZtZSBjb250cm9s
-bGVyKDEyOEspLCB3aGljaCBsZWFkcyB0byBHQw0KPj4gdHJpZXMgdG8gcmVhZCA2NCAqIDRLIGlu
-IG9uZSBjb21tYW5kLCBhbmQgc2VlIGJlbG93IGVycm9yDQo+PiBjYXVzZWQgYnkgcGJsa19iaW9f
-bWFwX2FkZHIgaW4gZnVuY3Rpb24gcGJsa19zdWJtaXRfcmVhZF9nYy4NCj4+IFsgMjkyMy4wMDUz
-NzZdIHBibGs6IGNvdWxkIG5vdCBhZGQgcGFnZSB0byBiaW8NCj4+IFsgMjkyMy4wMDUzNzddIHBi
-bGs6IGNvdWxkIG5vdCBhbGxvY2F0ZSBHQyBiaW8gKDE4NDQ2NzQ0MDczNzA5NTUxNjA0KQ0KPj4g
-U2lnbmVkLW9mZi1ieTogWmhvdWppZSBXdSA8emp3dUBtYXJ2ZWxsLmNvbT4NCj4+IC0tLQ0KPj4g
-djI6IENoYW5nZWQgYWNjb3JkaW5nIHRvIEphdmllcidzIGNvbW1lbnRzLg0KPj4gUmVtb3ZlIHVu
-bmVjY2Vzc2FyeSBjb21tZW50IGFuZCBtb3ZlIHRoZSBkZWZpbml0aW9uIG9mIGJxdWV1ZSB0bw0K
-Pj4gbWFpbnRhaW4gb3JkZXJpbmcuDQo+PiAgZHJpdmVycy9saWdodG52bS9wYmxrLWluaXQuYyB8
-IDMgKysrDQo+PiAgMSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKQ0KPj4gZGlmZiAtLWdp
-dCBhL2RyaXZlcnMvbGlnaHRudm0vcGJsay1pbml0LmMgYi9kcml2ZXJzL2xpZ2h0bnZtL3BibGst
-aW5pdC5jDQo+PiBpbmRleCBlMzU3Mzg4Li4wZWY5YWM1IDEwMDY0NA0KPj4gLS0tIGEvZHJpdmVy
-cy9saWdodG52bS9wYmxrLWluaXQuYw0KPj4gKysrIGIvZHJpdmVycy9saWdodG52bS9wYmxrLWlu
-aXQuYw0KPj4gQEAgLTM5MSw2ICszOTEsNyBAQCBzdGF0aWMgdm9pZCBwYmxrX3B1dF9nbG9iYWxf
-Y2FjaGVzKHZvaWQpDQo+PiAgc3RhdGljIGludCBwYmxrX2NvcmVfaW5pdChzdHJ1Y3QgcGJsayAq
-cGJsaykNCj4+ICB7DQo+PiAgICAgIHN0cnVjdCBudm1fdGd0X2RldiAqZGV2ID0gcGJsay0+ZGV2
-Ow0KPj4gKyAgICBzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqYnF1ZXVlID0gZGV2LT5xOw0KPj4gICAg
-ICBzdHJ1Y3QgbnZtX2dlbyAqZ2VvID0gJmRldi0+Z2VvOw0KPj4gICAgICBpbnQgcmV0LCBtYXhf
-d3JpdGVfcHBhczsNCj4+ICBAQCAtNDA3LDYgKzQwOCw4IEBAIHN0YXRpYyBpbnQgcGJsa19jb3Jl
-X2luaXQoc3RydWN0IHBibGsgKnBibGspDQo+PiAgICAgIHBibGstPm1pbl93cml0ZV9wZ3MgPSBn
-ZW8tPndzX29wdDsNCj4+ICAgICAgbWF4X3dyaXRlX3BwYXMgPSBwYmxrLT5taW5fd3JpdGVfcGdz
-ICogZ2VvLT5hbGxfbHVuczsNCj4+ICAgICAgcGJsay0+bWF4X3dyaXRlX3BncyA9IG1pbl90KGlu
-dCwgbWF4X3dyaXRlX3BwYXMsIE5WTV9NQVhfVkxCQSk7DQo+PiArICAgIHBibGstPm1heF93cml0
-ZV9wZ3MgPSAgbWluX3QoaW50LCBwYmxrLT5tYXhfd3JpdGVfcGdzLA0KPj4gKyAgICAgICAgcXVl
-dWVfbWF4X2h3X3NlY3RvcnMoYnF1ZXVlKSAvIChnZW8tPmNzZWNzID4+IDkpKTsNCj4+ICAgICAg
-cGJsa19zZXRfc2VjX3Blcl93cml0ZShwYmxrLCBwYmxrLT5taW5fd3JpdGVfcGdzKTsNCj4+ICAg
-ICAgICBwYmxrLT5wYWRfZGlzdCA9IGtjYWxsb2MocGJsay0+bWluX3dyaXRlX3BncyAtIDEsIHNp
-emVvZihhdG9taWM2NF90KSwNCj4gDQo+IFRoYW5rcyBaaG91amllLiBJJ3ZlIGRvbmUgdGhlIGZv
-bGxvd2luZyB1cGRhdGUgYW5kIGFwcGxpZWQgaXQgdG8gNC4yMC4gTm90ZSB0aGF0IEkgYWxzbyBy
-ZW1vdmVkIHRoZSBicXVldWUuDQo+IA0KPiAtICAgICAgIHBibGstPm1heF93cml0ZV9wZ3MgPSAg
-bWluX3QoaW50LCBwYmxrLT5tYXhfd3JpdGVfcGdzLA0KPiAtICAgICAgICAgICAgICAgcXVldWVf
-bWF4X2h3X3NlY3RvcnMoYnF1ZXVlKSAvIChnZW8tPmNzZWNzID4+IDkpKTsNCj4gKyAgICAgICBw
-YmxrLT5tYXhfd3JpdGVfcGdzID0gbWluX3QoaW50LCBwYmxrLT5tYXhfd3JpdGVfcGdzLA0KPiAr
-ICAgICAgICAgICAgICAgcXVldWVfbWF4X2h3X3NlY3RvcnMoZGV2LT5xKSAvIChnZW8tPmNzZWNz
-ID4+IFNFQ1RPUl9TSElGVCkpOw0KPiANCj4gSmF2aWVyLCBJJ3ZlIGNhcnJpZWQgb3ZlciB5b3Vy
-IFJldmlld2VkLWJ5LCBsZXQgbWUga25vdyBpZiB5b3Ugd2FudCBpdCB0byBiZSByZW1vdmVkLg0K
-DQpUaGUgY2hhbmdlcyB5b3UgbWFkZSBsb29rIGdvb2QgdG9vLiBQbGVhc2UsIGtlZXAgdGhlIHRh
-Zy4gDQoNClRoYW5rcywNCkphdmllcg==
+
+
+On 10/05/2018 06:01 PM, Matias Bjørling wrote:
+> External Email
+>
+> ----------------------------------------------------------------------
+> On 10/05/2018 07:39 PM, Zhoujie Wu wrote:
+>> When do GC, the number of read/write sectors are determined
+>> by max_write_pgs(see gc_rq preparation in pblk_gc_line_prepare_ws).
+>>
+>> Due to max_write_pgs doesn't consider max hw sectors
+>> supported by nvme controller(128K), which leads to GC
+>> tries to read 64 * 4K in one command, and see below error
+>> caused by pblk_bio_map_addr in function pblk_submit_read_gc.
+>>
+>> [ 2923.005376] pblk: could not add page to bio
+>> [ 2923.005377] pblk: could not allocate GC bio (18446744073709551604)
+>>
+>> Signed-off-by: Zhoujie Wu <zjwu@marvell.com>
+>> ---
+>> v2: Changed according to Javier's comments.
+>> Remove unneccessary comment and move the definition of bqueue to
+>> maintain ordering.
+>>
+>>   drivers/lightnvm/pblk-init.c | 3 +++
+>>   1 file changed, 3 insertions(+)
+>>
+>> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+>> index e357388..0ef9ac5 100644
+>> --- a/drivers/lightnvm/pblk-init.c
+>> +++ b/drivers/lightnvm/pblk-init.c
+>> @@ -391,6 +391,7 @@ static void pblk_put_global_caches(void)
+>>   static int pblk_core_init(struct pblk *pblk)
+>>   {
+>>       struct nvm_tgt_dev *dev = pblk->dev;
+>> +    struct request_queue *bqueue = dev->q;
+>>       struct nvm_geo *geo = &dev->geo;
+>>       int ret, max_write_ppas;
+>>   @@ -407,6 +408,8 @@ static int pblk_core_init(struct pblk *pblk)
+>>       pblk->min_write_pgs = geo->ws_opt;
+>>       max_write_ppas = pblk->min_write_pgs * geo->all_luns;
+>>       pblk->max_write_pgs = min_t(int, max_write_ppas, NVM_MAX_VLBA);
+>> +    pblk->max_write_pgs =  min_t(int, pblk->max_write_pgs,
+>> +        queue_max_hw_sectors(bqueue) / (geo->csecs >> 9));
+>>       pblk_set_sec_per_write(pblk, pblk->min_write_pgs);
+>>         pblk->pad_dist = kcalloc(pblk->min_write_pgs - 1, 
+>> sizeof(atomic64_t),
+>>
+>
+> Thanks Zhoujie. I've done the following update and applied it to 4.20. 
+> Note that I also removed the bqueue.
+Good for me, thanks a lot.
+>
+> -       pblk->max_write_pgs =  min_t(int, pblk->max_write_pgs,
+> -               queue_max_hw_sectors(bqueue) / (geo->csecs >> 9));
+> +       pblk->max_write_pgs = min_t(int, pblk->max_write_pgs,
+> +               queue_max_hw_sectors(dev->q) / (geo->csecs >> 
+> SECTOR_SHIFT));
+>
+> Javier, I've carried over your Reviewed-by, let me know if you want it 
+> to be removed.
