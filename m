@@ -1,57 +1,51 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0083.outbound.protection.outlook.com ([104.47.36.83]:31568
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725857AbeJHONs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 8 Oct 2018 10:13:48 -0400
-From: Javier Gonzalez <javier@cnexlabs.com>
-To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
-CC: "javier@javigon.com" <javier@javigon.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:44876 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726608AbeJFIOi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 6 Oct 2018 04:14:38 -0400
+Received: by mail-ed1-f67.google.com with SMTP id z21-v6so8677035edb.11
+        for <linux-block@vger.kernel.org>; Fri, 05 Oct 2018 18:13:20 -0700 (PDT)
 Subject: Re: [V2 PATCH 0/2] lightnvm: pblk: retrieve chunk metadata on erase
-Date: Mon, 8 Oct 2018 07:03:29 +0000
-Message-ID: <B49B713F-1E73-44B1-BFB1-34D91EC6A88C@cnexlabs.com>
-References: <1538637235-25469-1-git-send-email-javier@cnexlabs.com>,<afc7d53c-b514-293d-f876-f2bdaa3c5dbb@lightnvm.io>
-In-Reply-To: <afc7d53c-b514-293d-f876-f2bdaa3c5dbb@lightnvm.io>
-Content-Type: text/plain; charset="utf-8"
+To: javier@javigon.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        javier@cnexlabs.com
+References: <1538637235-25469-1-git-send-email-javier@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <afc7d53c-b514-293d-f876-f2bdaa3c5dbb@lightnvm.io>
+Date: Sat, 6 Oct 2018 03:13:17 +0200
 MIME-Version: 1.0
+In-Reply-To: <1538637235-25469-1-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-DQo+IE9uIDYgT2N0IDIwMTgsIGF0IDAzLjEzLCBNYXRpYXMgQmrDuHJsaW5nIDxtYkBsaWdodG52
-bS5pbz4gd3JvdGU6DQo+IA0KPj4gT24gMTAvMDQvMjAxOCAwOToxMyBBTSwgSmF2aWVyIEdvbnrD
-oWxleiB3cm90ZToNCj4+IENoYW5nZXMgc2luZ2UgVjE6DQo+PiAgIC0gcmVtb3ZlIHNhbml0eSBj
-aGVja3Mgb24gdGhlIGZhc3QgcGF0aA0KPj4gVGhpcyBwYXRjaHNldCBpbXBsZW1lbnRzIHN1cHBv
-cnQgZm9yIHJldHJpZXZpbmcgY2h1bmsgbWV0YWRhdGEgb24gcmVzZXQuDQo+PiBUaGlzIGlzIHRo
-ZSBiYXNlIGZvciBpbXBsZW1lbnRpbmcgd2Vhci1sZXZlbGluZyBhbmQgYWxsb3dpbmcgY2h1bmtz
-IHRvDQo+PiBzaHJpbmsgYXQgcnVudGltZS4NCj4+IEphdmllcg0KPj4gSmF2aWVyIEdvbnrDoWxl
-eiAoMik6DQo+PiAgIGxpZ2h0bnZtOiBwYmxrOiBhZGQgaGVscGVyIGZvciBwcmludGluZyBjaHVu
-ayBzdGF0ZQ0KPj4gICBsaWdodG52bTogcGJsazogcmV0cmlldmUgY2h1bmsgbWV0YWRhdGEgb24g
-ZXJhc2UNCj4+ICBkcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYyAgICAgIHwgNDQgKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKy0tDQo+PiAgZHJpdmVycy9saWdodG52bS9wYmxrLWNvcmUu
-YyB8IDU0ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tDQo+PiAg
-ZHJpdmVycy9saWdodG52bS9wYmxrLmggICAgICB8ICA5ICsrKysrKysrDQo+PiAgMyBmaWxlcyBj
-aGFuZ2VkLCA5MiBpbnNlcnRpb25zKCspLCAxNSBkZWxldGlvbnMoLSkNCj4gDQo+IFJpZ2h0IG5v
-dyB0aGVyZSBpc24ndCBhIHdheSBpbiB0aGUgc3BlYyB0byB0ZWxsIGlmIHRoZSBkcml2ZSBzdXBw
-b3J0cyB0aGlzIGZlYXR1cmUgb3Igbm90LCBhbmQgRFNNIFJlc2V0IGRvZXNuJ3Qgc3VwcG9ydCBp
-dCBlaXRoZXIuIE1ha2luZyBpdCBhIGJ1ZyBpbiB0aGUgc3BlYy4gVW50aWwgdGhlIHVwZGF0ZWQg
-c3BlYyBpcyBvdXQsIEkgbGlrZSB0byBhdm9pZCBhZGRpbmcgdGhpcyBmZWF0dXJlIGludG8gdGhl
-IGtlcm5lbC4NCg0KU3VyZS4gSXQgaXMgdGhlIHNhbWUgYnVnIHdlIGhhdmUgd2hlbiB0aGUgcmVh
-ZC93cml0ZSBjb21tYW5kcyBkbyBub3Qgc2lnbmFsIGlmIHRoZSBtZXRhZGF0YSBwb2ludGVyIGlz
-IHNldCBvciBub3QuIFRoaXMgaGFzIG5vdCBwcmV2ZW50ZWQgY3VycmVudCBpbXBsZW1lbnRhdGlv
-bnMgb2YgdGhpcyBmZWF0dXJlIHRob3VnaC4gDQoNCkFueXdheSwgSSBzZWUgdGhlIHBvaW50OyB0
-aGlzIG5vdCBhIGNyaXRpY2FsIHRoaW5nLCBzbyBsZXQgd2FpdCBhbmQgZ2V0IHRoaXMgZml4ZWQg
-aW4gdGhlIG5ldyBzcGVjIHJlbGVhc2UuIFRoZXJlIGlzIGEgY291cGxlIG1vcmUgYnVncyB0aGF0
-IEkgd291bGQgbGlrZSB0byBmaXguIEnigJlsbCBzZW5kIHlvdSBhbiBlbWFpbCBsYXRlciB0aGlz
-IHdlZWsuICANCg0KRm9yIHRoZSBEU00gY29tbWFuZCBzZWVtcyBtb3JlIGRpZmZpY3VsdCBhcyBp
-dCB3b3VsZCByZXF1aXJlIGNoYW5nZXMgdG8gdGhlIG52bWUgc3BlYy4gDQoNCj4gDQo+IFRoZSBH
-ZXQgTG9nIFBhZ2UgYXBwcm9hY2ggY2FuIGJlIHVzZWQgZm9yIHdlYXItbGV2ZWxsaW5nIGluZm9y
-bWF0aW9uLg0KDQpXZWxsLCBpdCBpcyBhbiB1bm5lY2Vzc2FyeSBvdmVyaGVhZCB0byBzZW5kIGEg
-bG9nIHBhZ2UgdG8gcHVsbCB0aGUgZGF0YS4gU28gbGV04oCZcyBnZXQgaXQgZml4ZWQuIA0KDQo+
-IFNpbWlsYXJseSBmb3Iga25vd2luZyB3aGVuIGEgY2h1bmsgc2hyaW5rLCBwYmxrIGNhbid0IHJl
-bHkgb24gYSBjaHVuayBub3Qgc2hyaW5raW5nIGF0IHJ1bnRpbWUgKGFuZCByZXBvcnRpbmcgZWFy
-bHkgY2xvc2UgZXJyb3IpLCBzbyBpbiB0aGUgY2FzZSB0aGlzIGhhcHBlbnMsIHBibGsgY2FuIGVp
-dGhlciBjb250aW51ZSBidXNpbmVzcyBhcyB1c3VhbCwgb3IgcmVzeW5jIHdpdGggdGhlIGRyaXZl
-Lg0KDQpTdXJlLCBpdOKAmXMgZGlmZmVyZW50IGxldmVscyBvZiBoYW5kbGluZyBhbmQgYWxsIHBh
-dGhzIHNob3VsZCBiZSBpbXBsZW1lbnRlZC4NCg0KVGhhbmtzLA0KSmF2aWVyDQoNCg==
+On 10/04/2018 09:13 AM, Javier González wrote:
+> Changes singe V1:
+>    - remove sanity checks on the fast path
+> 
+> This patchset implements support for retrieving chunk metadata on reset.
+> This is the base for implementing wear-leveling and allowing chunks to
+> shrink at runtime.
+> 
+> Javier
+> 
+> Javier González (2):
+>    lightnvm: pblk: add helper for printing chunk state
+>    lightnvm: pblk: retrieve chunk metadata on erase
+> 
+>   drivers/lightnvm/core.c      | 44 ++++++++++++++++++++++++++++++++++--
+>   drivers/lightnvm/pblk-core.c | 54 +++++++++++++++++++++++++++++++++-----------
+>   drivers/lightnvm/pblk.h      |  9 ++++++++
+>   3 files changed, 92 insertions(+), 15 deletions(-)
+> 
+
+Right now there isn't a way in the spec to tell if the drive supports 
+this feature or not, and DSM Reset doesn't support it either. Making it 
+a bug in the spec. Until the updated spec is out, I like to avoid adding 
+this feature into the kernel.
+
+The Get Log Page approach can be used for wear-levelling information. 
+Similarly for knowing when a chunk shrink, pblk can't rely on a chunk 
+not shrinking at runtime (and reporting early close error), so in the 
+case this happens, pblk can either continue business as usual, or resync 
+with the drive.
