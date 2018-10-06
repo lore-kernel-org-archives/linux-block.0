@@ -1,188 +1,135 @@
-Return-Path: <kt0755@gmail.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:39605 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728182AbeJFIG0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 6 Oct 2018 04:06:26 -0400
+Received: by mail-ed1-f67.google.com with SMTP id d15-v6so905725edq.6
+        for <linux-block@vger.kernel.org>; Fri, 05 Oct 2018 18:05:10 -0700 (PDT)
+Subject: Re: [PATCH] lightnvm: pblk: guarantee that backpointer is respected
+ on writer stall
+To: javier@javigon.com
+Cc: hlitz@ucsc.edu, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, javier@cnexlabs.com
+References: <1538637968-28032-1-git-send-email-javier@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <a63d3e8f-df14-f707-8960-7ad3f9ae069a@lightnvm.io>
+Date: Sat, 6 Oct 2018 03:05:08 +0200
 MIME-Version: 1.0
-From: Kyungtae Kim <kt0755@gmail.com>
-Date: Tue, 23 Oct 2018 08:20:22 +0900
-Message-ID: <CAEAjamtML1yMLL0DsV5JkD1H6P0Yg19F2DVq+_c-u09RaCKuDw@mail.gmail.com>
-Subject: UBSAN: Undefined behaviour in drivers/block/floppy.c:1495:32
-To: axboe@kernel.dk, jikos@kernel.org
-Cc: Byoungyoung Lee <lifeasageek@gmail.com>, DaeRyong Jeong <threeearcat@gmail.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	syzkaller@googlegroups.com
-Content-Type: multipart/alternative; boundary="000000000000ed96770578d97f66"
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <1538637968-28032-1-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
---000000000000ed96770578d97f66
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 10/04/2018 09:26 AM, Javier González wrote:
+> pblk's write buffer must guarantee that it respects the device's
+> constrains for reads (i.e., mw_cunits). This is done by maintaining a
+> backpointer that updates the L2P table as entries wrap up, making them
+> point to the media instead of pointing to the write buffer.
+> 
+> This mechanism can race in case that the write thread stalls, as the
+> write pointer will protect the last written entry, thus disregarding the
+> read constrains.
+> 
+> This patch adds an extra check on wrap up, making sure that the
+> threshold is respected at all times, preventing new entries to overwrite
+> committed data, also in case of write thread stall.
+> 
+> Reported-by: Heiner Litz <hlitz@ucsc.edu>
+> Signed-off-by: Javier González <javier@cnexlabs.com>
+> ---
+>   drivers/lightnvm/pblk-init.c | 5 +++--
+>   drivers/lightnvm/pblk-rb.c   | 9 +++++++--
+>   drivers/lightnvm/pblk.h      | 8 +++++++-
+>   3 files changed, 17 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+> index e3573880dbda..deaeb4649294 100644
+> --- a/drivers/lightnvm/pblk-init.c
+> +++ b/drivers/lightnvm/pblk-init.c
+> @@ -193,8 +193,9 @@ static int pblk_rwb_init(struct pblk *pblk)
+>   	struct nvm_tgt_dev *dev = pblk->dev;
+>   	struct nvm_geo *geo = &dev->geo;
+>   	unsigned long buffer_size;
+> -	int pgs_in_buffer;
+> +	int pgs_in_buffer, threshold;
+>   
+> +	threshold = geo->mw_cunits * geo->all_luns;
+>   	pgs_in_buffer = (max(geo->mw_cunits, geo->ws_opt) + geo->ws_opt)
+>   								* geo->all_luns;
+>   
+> @@ -203,7 +204,7 @@ static int pblk_rwb_init(struct pblk *pblk)
+>   	else
+>   		buffer_size = pgs_in_buffer;
+>   
+> -	return pblk_rb_init(&pblk->rwb, buffer_size, geo->csecs);
+> +	return pblk_rb_init(&pblk->rwb, buffer_size, threshold, geo->csecs);
+>   }
+>   
+>   /* Minimum pages needed within a lun */
+> diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+> index f653faa6a9ed..b1f4b51783f4 100644
+> --- a/drivers/lightnvm/pblk-rb.c
+> +++ b/drivers/lightnvm/pblk-rb.c
+> @@ -56,7 +56,8 @@ static unsigned int pblk_rb_calculate_size(unsigned int nr_entries)
+>    * allocated and their size must be a power of two
+>    * (Documentation/core-api/circular-buffers.rst)
+>    */
+> -int pblk_rb_init(struct pblk_rb *rb, unsigned int size, unsigned int seg_size)
+> +int pblk_rb_init(struct pblk_rb *rb, unsigned int size, unsigned int threshold,
+> +		 unsigned int seg_size)
+>   {
+>   	struct pblk *pblk = container_of(rb, struct pblk, rwb);
+>   	struct pblk_rb_entry *entries;
+> @@ -79,6 +80,7 @@ int pblk_rb_init(struct pblk_rb *rb, unsigned int size, unsigned int seg_size)
+>   	rb->seg_size = (1 << power_seg_sz);
+>   	rb->nr_entries = (1 << power_size);
+>   	rb->mem = rb->subm = rb->sync = rb->l2p_update = 0;
+> +	rb->back_thres = threshold;
+>   	rb->flush_point = EMPTY_ENTRY;
+>   
+>   	spin_lock_init(&rb->w_lock);
+> @@ -404,11 +406,14 @@ static int __pblk_rb_may_write(struct pblk_rb *rb, unsigned int nr_entries,
+>   {
+>   	unsigned int mem;
+>   	unsigned int sync;
+> +	unsigned int threshold;
+>   
+>   	sync = READ_ONCE(rb->sync);
+>   	mem = READ_ONCE(rb->mem);
+>   
+> -	if (pblk_rb_ring_space(rb, mem, sync, rb->nr_entries) < nr_entries)
+> +	threshold = nr_entries + rb->back_thres;
+> +
+> +	if (pblk_rb_ring_space(rb, mem, sync, rb->nr_entries) < threshold)
+>   		return 0;
+>   
+>   	if (pblk_rb_update_l2p(rb, nr_entries, mem, sync))
+> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+> index 34c9c1dbeed9..c1665e39829d 100644
+> --- a/drivers/lightnvm/pblk.h
+> +++ b/drivers/lightnvm/pblk.h
+> @@ -203,6 +203,11 @@ struct pblk_rb {
+>   					 * will be 4KB
+>   					 */
+>   
+> +	unsigned int back_thres;	/* Threshold that shall be maintained by
+> +					 * the backpointer in order to respect
+> +					 * geo->mw_cunits on a per chunk basis
+> +					 */
+> +
+>   	struct list_head pages;		/* List of data pages */
+>   
+>   	spinlock_t w_lock;		/* Write lock */
+> @@ -734,7 +739,8 @@ struct pblk_line_ws {
+>   /*
+>    * pblk ring buffer operations
+>    */
+> -int pblk_rb_init(struct pblk_rb *rb, unsigned int size, unsigned int seg_sz);
+> +int pblk_rb_init(struct pblk_rb *rb, unsigned int size, unsigned int threshold,
+> +		 unsigned int seg_sz);
+>   int pblk_rb_may_write_user(struct pblk_rb *rb, struct bio *bio,
+>   			   unsigned int nr_entries, unsigned int *pos);
+>   int pblk_rb_may_write_gc(struct pblk_rb *rb, unsigned int nr_entries,
+> 
 
-We report a bug found in v4.19-rc2 (v4.19-rc8 as well):
-UBSAN: Undefined behaviour in drivers/block/floppy.c:1495:32
-
-kernel config: https://kt0755.github.io/etc/config_v2-4.19
-repro: https://kt0755.github.io/etc/repro.b4076.c
-
-Analysis:
-
-struct floppy_raw_cmd {
-   unsigned char cmd_count;
-   unsigned char cmd[16];
-  ...
-};
-
-for (i=3D0; i<raw_cmd->cmd_count; i++)
-    output_byte(raw_cmd->cmd[i])
-
-In driver/block/floppy.c:1495, the code snippet above is trying to
-write some bytes to the floppy disk controller, depending on "cmd_count".
-As you see "struct floppy_raw_cmd" above, the size of array =E2=80=9Ccmd=E2=
-=80=9D is
-fixed as 16.
-The thing is, there is no boundary check for the index of array "cmd"
-when this is used. Besides, "cmd_count" can be manipulated by raw_cmd_ioctl
-which is derived from ioctl system call.
-We observed that cmd_count is set at line 2540 (or 2111), but that is
-after such a bug arose in our experiment. So by manipulating system call
-ioctl,
-user program can have illegitimate memory access.
-
-The following is a simple patch to stop this. (This might not be the
-best.)
-
-diff --git a/linux-4.19-rc2/drivers/block/floppy.c
-b/linux-4.19-rc2/drivers/block/floppy.c
-index f2b6f4d..a3610c9 100644
---- a/linux-4.19-rc2/drivers/block/floppy.c
-+++ b/linux-4.19-rc2/drivers/block/floppy.c
-@@ -3149,6 +3149,8 @@ static int raw_cmd_copyin(int cmd, void __user *param=
-,
-                         */
-                return -EINVAL;
-
-+       if (ptr->cmd_count > ARRAY_SIZE(ptr->cmd)) {
-+               return -EINVAL;
-+
-        for (i =3D 0; i < 16; i++)
-                ptr->reply[i] =3D 0;
-        ptr->resultcode =3D 0;
-
-
-Crash log
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-UBSAN: Undefined behaviour in drivers/block/floppy.c:1495:32
-index 16 is out of range for type 'unsigned char [16]'
-CPU: 0 PID: 2420 Comm: kworker/u4:3 Not tainted 4.19.0-rc2 #1
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Bochs 01/01/201=
-1
-Workqueue: floppy fd_timer_workfn
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0xd2/0x148 lib/dump_stack.c:113
- ubsan_epilogue+0x12/0x94 lib/ubsan.c:159
- __ubsan_handle_out_of_bounds+0x174/0x1b8 lib/ubsan.c:386
- setup_rw_floppy+0xbd9/0xe60 drivers/block/floppy.c:1495
- seek_floppy drivers/block/floppy.c:1605 [inline]
- floppy_ready+0x61a/0x2230 drivers/block/floppy.c:1917
- fd_timer_workfn+0x1a/0x20 drivers/block/floppy.c:994
- process_one_work+0xa0c/0x1820 kernel/workqueue.c:2153
- worker_thread+0x8f/0xd20 kernel/workqueue.c:2296
- kthread+0x3a3/0x470 kernel/kthread.c:246
- ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:413
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
---000000000000ed96770578d97f66
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div>We report a bug found in v4.19-rc2 (v4.19-rc8 as well):<br>
-UBSAN: Undefined behaviour in drivers/block/floppy.c:1495:32<br>
-<br>
-kernel config: <a href=3D"https://kt0755.github.io/etc/config_v2-4.19" rel=
-=3D"noreferrer" target=3D"_blank">https://kt0755.github.io/etc/config_v2-4.=
-19</a><br>
-repro: <a href=3D"https://kt0755.github.io/etc/repro.b4076.c" rel=3D"norefe=
-rrer" target=3D"_blank">https://kt0755.github.io/etc/repro.b4076.c</a><br>
-<br>
-Analysis:<br>
-<br>
-struct floppy_raw_cmd {<br>
-=C2=A0 =C2=A0unsigned char cmd_count;<br>
-=C2=A0 =C2=A0unsigned char cmd[16];<br>
-=C2=A0 ...<br>
-};<br>
-<br>
-for (i=3D0; i&lt;raw_cmd-&gt;cmd_count; i++)<br>
-=C2=A0 =C2=A0 output_byte(raw_cmd-&gt;cmd[i])<br>
-<br>
-In driver/block/floppy.c:1495, the code snippet above is trying to<br>
-write some bytes to the floppy disk controller, depending on &quot;cmd_coun=
-t&quot;.<br>
-As you see &quot;struct floppy_raw_cmd&quot; above, the size of array =E2=
-=80=9Ccmd=E2=80=9D is<br>
-fixed as 16.<br>
-The thing is, there is no boundary check for the index of array &quot;cmd&q=
-uot;<br>
-when this is used. Besides, &quot;cmd_count&quot; can be manipulated by raw=
-_cmd_ioctl<br>
-which is derived from ioctl system call.<br>
-We observed that cmd_count is set at line 2540 (or 2111), but that is<br>
-after such a bug arose in our experiment. So by manipulating system call io=
-ctl,<br>
-user program can have illegitimate memory access.<br>
-<br>
-The following is a simple patch to stop this. (This might not be the<br>
-best.)<br>
-<br>
-diff --git a/linux-4.19-rc2/drivers/block/floppy.c<br>
-b/linux-4.19-rc2/drivers/block/floppy.c<br>
-index f2b6f4d..a3610c9 100644<br>
---- a/linux-4.19-rc2/drivers/block/floppy.c<br>
-+++ b/linux-4.19-rc2/drivers/block/floppy.c<br>
-@@ -3149,6 +3149,8 @@ static int raw_cmd_copyin(int cmd, void __user *param=
-,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0*/<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return -EINVAL;<br>
-<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0if (ptr-&gt;cmd_count &gt; ARRAY_SIZE(ptr-&gt;c=
-md)) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return -EINVAL;<br>
-+<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 for (i =3D 0; i &lt; 16; i++)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ptr-&gt;reply[i] =
-=3D 0;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 ptr-&gt;resultcode =3D 0;<br>
-<br>
-<br>
-Crash log<br>
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D<br>
-UBSAN: Undefined behaviour in drivers/block/floppy.c:1495:32<br>
-index 16 is out of range for type &#39;unsigned char [16]&#39;<br>
-CPU: 0 PID: 2420 Comm: kworker/u4:3 Not tainted 4.19.0-rc2 #1<br>
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Bochs 01/01/201=
-1<br>
-Workqueue: floppy fd_timer_workfn<br>
-Call Trace:<br>
-=C2=A0__dump_stack lib/dump_stack.c:77 [inline]<br>
-=C2=A0dump_stack+0xd2/0x148 lib/dump_stack.c:113<br>
-=C2=A0ubsan_epilogue+0x12/0x94 lib/ubsan.c:159<br>
-=C2=A0__ubsan_handle_out_of_bounds+0x174/0x1b8 lib/ubsan.c:386<br>
-=C2=A0setup_rw_floppy+0xbd9/0xe60 drivers/block/floppy.c:1495<br>
-=C2=A0seek_floppy drivers/block/floppy.c:1605 [inline]<br>
-=C2=A0floppy_ready+0x61a/0x2230 drivers/block/floppy.c:1917<br>
-=C2=A0fd_timer_workfn+0x1a/0x20 drivers/block/floppy.c:994<br>
-=C2=A0process_one_work+0xa0c/0x1820 kernel/workqueue.c:2153<br>
-=C2=A0worker_thread+0x8f/0xd20 kernel/workqueue.c:2296<br>
-=C2=A0kthread+0x3a3/0x470 kernel/kthread.c:246<br>
-=C2=A0ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:413<br>
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D<br>
-</div>
-
---000000000000ed96770578d97f66--
+Thanks. Applied for 4.20.
