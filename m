@@ -1,115 +1,57 @@
-Return-Path: <BATV+8bbc4aa54a9b92872f27+5534+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Joshua Morris <josh.h.morris@us.ibm.com>,
-	Philip Kelleher <pjk1939@linux.vnet.ibm.com>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 6/6] mtip32xx: fully switch to the generic DMA API
-Date: Thu, 18 Oct 2018 15:15:16 +0200
-Message-Id: <20181018131516.10629-7-hch@lst.de>
-In-Reply-To: <20181018131516.10629-1-hch@lst.de>
-References: <20181018131516.10629-1-hch@lst.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-sn1nam02on0083.outbound.protection.outlook.com ([104.47.36.83]:31568
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725857AbeJHONs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 8 Oct 2018 10:13:48 -0400
+From: Javier Gonzalez <javier@cnexlabs.com>
+To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
+CC: "javier@javigon.com" <javier@javigon.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [V2 PATCH 0/2] lightnvm: pblk: retrieve chunk metadata on erase
+Date: Mon, 8 Oct 2018 07:03:29 +0000
+Message-ID: <B49B713F-1E73-44B1-BFB1-34D91EC6A88C@cnexlabs.com>
+References: <1538637235-25469-1-git-send-email-javier@cnexlabs.com>,<afc7d53c-b514-293d-f876-f2bdaa3c5dbb@lightnvm.io>
+In-Reply-To: <afc7d53c-b514-293d-f876-f2bdaa3c5dbb@lightnvm.io>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The mtip32xx used an odd mix of the old PCI and the generic DMA API,
-so switch it over to the generic API entirely.
-
-Note that this also removes a weird fallback to just a 32-bit coherent
-dma mask if the 64-bit dma mask doesn't work, as that can't even happen.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/mtip32xx/mtip32xx.c | 47 ++++++++++++-------------------
- 1 file changed, 18 insertions(+), 29 deletions(-)
-
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index 1d7d48d8a205..dfc8de6ce525 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -1862,11 +1862,9 @@ static int exec_drive_taskfile(struct driver_data *dd,
- 		if (IS_ERR(outbuf))
- 			return PTR_ERR(outbuf);
- 
--		outbuf_dma = pci_map_single(dd->pdev,
--					 outbuf,
--					 taskout,
--					 DMA_TO_DEVICE);
--		if (pci_dma_mapping_error(dd->pdev, outbuf_dma)) {
-+		outbuf_dma = dma_map_single(&dd->pdev->dev, outbuf,
-+					    taskout, DMA_TO_DEVICE);
-+		if (dma_mapping_error(&dd->pdev->dev, outbuf_dma)) {
- 			err = -ENOMEM;
- 			goto abort;
- 		}
-@@ -1880,10 +1878,9 @@ static int exec_drive_taskfile(struct driver_data *dd,
- 			inbuf = NULL;
- 			goto abort;
- 		}
--		inbuf_dma = pci_map_single(dd->pdev,
--					 inbuf,
--					 taskin, DMA_FROM_DEVICE);
--		if (pci_dma_mapping_error(dd->pdev, inbuf_dma)) {
-+		inbuf_dma = dma_map_single(&dd->pdev->dev, inbuf,
-+					   taskin, DMA_FROM_DEVICE);
-+		if (dma_mapping_error(&dd->pdev->dev, inbuf_dma)) {
- 			err = -ENOMEM;
- 			goto abort;
- 		}
-@@ -2002,11 +1999,11 @@ static int exec_drive_taskfile(struct driver_data *dd,
- 
- 	/* reclaim the DMA buffers.*/
- 	if (inbuf_dma)
--		pci_unmap_single(dd->pdev, inbuf_dma,
--			taskin, DMA_FROM_DEVICE);
-+		dma_unmap_single(&dd->pdev->dev, inbuf_dma, taskin,
-+				 DMA_FROM_DEVICE);
- 	if (outbuf_dma)
--		pci_unmap_single(dd->pdev, outbuf_dma,
--			taskout, DMA_TO_DEVICE);
-+		dma_unmap_single(&dd->pdev->dev, outbuf_dma, taskout,
-+				 DMA_TO_DEVICE);
- 	inbuf_dma  = 0;
- 	outbuf_dma = 0;
- 
-@@ -2053,11 +2050,11 @@ static int exec_drive_taskfile(struct driver_data *dd,
- 	}
- abort:
- 	if (inbuf_dma)
--		pci_unmap_single(dd->pdev, inbuf_dma,
--					taskin, DMA_FROM_DEVICE);
-+		dma_unmap_single(&dd->pdev->dev, inbuf_dma, taskin,
-+				 DMA_FROM_DEVICE);
- 	if (outbuf_dma)
--		pci_unmap_single(dd->pdev, outbuf_dma,
--					taskout, DMA_TO_DEVICE);
-+		dma_unmap_single(&dd->pdev->dev, outbuf_dma, taskout,
-+				 DMA_TO_DEVICE);
- 	kfree(outbuf);
- 	kfree(inbuf);
- 
-@@ -4216,18 +4213,10 @@ static int mtip_pci_probe(struct pci_dev *pdev,
- 		goto iomap_err;
- 	}
- 
--	if (!pci_set_dma_mask(pdev, DMA_BIT_MASK(64))) {
--		rv = pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(64));
--
--		if (rv) {
--			rv = pci_set_consistent_dma_mask(pdev,
--						DMA_BIT_MASK(32));
--			if (rv) {
--				dev_warn(&pdev->dev,
--					"64-bit DMA enable failed\n");
--				goto setmask_err;
--			}
--		}
-+	rv = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
-+	if (rv) {
-+		dev_warn(&pdev->dev, "64-bit DMA enable failed\n");
-+		goto setmask_err;
- 	}
- 
- 	/* Copy the info we may need later into the private data structure. */
--- 
-2.19.1
+DQo+IE9uIDYgT2N0IDIwMTgsIGF0IDAzLjEzLCBNYXRpYXMgQmrDuHJsaW5nIDxtYkBsaWdodG52
+bS5pbz4gd3JvdGU6DQo+IA0KPj4gT24gMTAvMDQvMjAxOCAwOToxMyBBTSwgSmF2aWVyIEdvbnrD
+oWxleiB3cm90ZToNCj4+IENoYW5nZXMgc2luZ2UgVjE6DQo+PiAgIC0gcmVtb3ZlIHNhbml0eSBj
+aGVja3Mgb24gdGhlIGZhc3QgcGF0aA0KPj4gVGhpcyBwYXRjaHNldCBpbXBsZW1lbnRzIHN1cHBv
+cnQgZm9yIHJldHJpZXZpbmcgY2h1bmsgbWV0YWRhdGEgb24gcmVzZXQuDQo+PiBUaGlzIGlzIHRo
+ZSBiYXNlIGZvciBpbXBsZW1lbnRpbmcgd2Vhci1sZXZlbGluZyBhbmQgYWxsb3dpbmcgY2h1bmtz
+IHRvDQo+PiBzaHJpbmsgYXQgcnVudGltZS4NCj4+IEphdmllcg0KPj4gSmF2aWVyIEdvbnrDoWxl
+eiAoMik6DQo+PiAgIGxpZ2h0bnZtOiBwYmxrOiBhZGQgaGVscGVyIGZvciBwcmludGluZyBjaHVu
+ayBzdGF0ZQ0KPj4gICBsaWdodG52bTogcGJsazogcmV0cmlldmUgY2h1bmsgbWV0YWRhdGEgb24g
+ZXJhc2UNCj4+ICBkcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYyAgICAgIHwgNDQgKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKy0tDQo+PiAgZHJpdmVycy9saWdodG52bS9wYmxrLWNvcmUu
+YyB8IDU0ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tDQo+PiAg
+ZHJpdmVycy9saWdodG52bS9wYmxrLmggICAgICB8ICA5ICsrKysrKysrDQo+PiAgMyBmaWxlcyBj
+aGFuZ2VkLCA5MiBpbnNlcnRpb25zKCspLCAxNSBkZWxldGlvbnMoLSkNCj4gDQo+IFJpZ2h0IG5v
+dyB0aGVyZSBpc24ndCBhIHdheSBpbiB0aGUgc3BlYyB0byB0ZWxsIGlmIHRoZSBkcml2ZSBzdXBw
+b3J0cyB0aGlzIGZlYXR1cmUgb3Igbm90LCBhbmQgRFNNIFJlc2V0IGRvZXNuJ3Qgc3VwcG9ydCBp
+dCBlaXRoZXIuIE1ha2luZyBpdCBhIGJ1ZyBpbiB0aGUgc3BlYy4gVW50aWwgdGhlIHVwZGF0ZWQg
+c3BlYyBpcyBvdXQsIEkgbGlrZSB0byBhdm9pZCBhZGRpbmcgdGhpcyBmZWF0dXJlIGludG8gdGhl
+IGtlcm5lbC4NCg0KU3VyZS4gSXQgaXMgdGhlIHNhbWUgYnVnIHdlIGhhdmUgd2hlbiB0aGUgcmVh
+ZC93cml0ZSBjb21tYW5kcyBkbyBub3Qgc2lnbmFsIGlmIHRoZSBtZXRhZGF0YSBwb2ludGVyIGlz
+IHNldCBvciBub3QuIFRoaXMgaGFzIG5vdCBwcmV2ZW50ZWQgY3VycmVudCBpbXBsZW1lbnRhdGlv
+bnMgb2YgdGhpcyBmZWF0dXJlIHRob3VnaC4gDQoNCkFueXdheSwgSSBzZWUgdGhlIHBvaW50OyB0
+aGlzIG5vdCBhIGNyaXRpY2FsIHRoaW5nLCBzbyBsZXQgd2FpdCBhbmQgZ2V0IHRoaXMgZml4ZWQg
+aW4gdGhlIG5ldyBzcGVjIHJlbGVhc2UuIFRoZXJlIGlzIGEgY291cGxlIG1vcmUgYnVncyB0aGF0
+IEkgd291bGQgbGlrZSB0byBmaXguIEnigJlsbCBzZW5kIHlvdSBhbiBlbWFpbCBsYXRlciB0aGlz
+IHdlZWsuICANCg0KRm9yIHRoZSBEU00gY29tbWFuZCBzZWVtcyBtb3JlIGRpZmZpY3VsdCBhcyBp
+dCB3b3VsZCByZXF1aXJlIGNoYW5nZXMgdG8gdGhlIG52bWUgc3BlYy4gDQoNCj4gDQo+IFRoZSBH
+ZXQgTG9nIFBhZ2UgYXBwcm9hY2ggY2FuIGJlIHVzZWQgZm9yIHdlYXItbGV2ZWxsaW5nIGluZm9y
+bWF0aW9uLg0KDQpXZWxsLCBpdCBpcyBhbiB1bm5lY2Vzc2FyeSBvdmVyaGVhZCB0byBzZW5kIGEg
+bG9nIHBhZ2UgdG8gcHVsbCB0aGUgZGF0YS4gU28gbGV04oCZcyBnZXQgaXQgZml4ZWQuIA0KDQo+
+IFNpbWlsYXJseSBmb3Iga25vd2luZyB3aGVuIGEgY2h1bmsgc2hyaW5rLCBwYmxrIGNhbid0IHJl
+bHkgb24gYSBjaHVuayBub3Qgc2hyaW5raW5nIGF0IHJ1bnRpbWUgKGFuZCByZXBvcnRpbmcgZWFy
+bHkgY2xvc2UgZXJyb3IpLCBzbyBpbiB0aGUgY2FzZSB0aGlzIGhhcHBlbnMsIHBibGsgY2FuIGVp
+dGhlciBjb250aW51ZSBidXNpbmVzcyBhcyB1c3VhbCwgb3IgcmVzeW5jIHdpdGggdGhlIGRyaXZl
+Lg0KDQpTdXJlLCBpdOKAmXMgZGlmZmVyZW50IGxldmVscyBvZiBoYW5kbGluZyBhbmQgYWxsIHBh
+dGhzIHNob3VsZCBiZSBpbXBsZW1lbnRlZC4NCg0KVGhhbmtzLA0KSmF2aWVyDQoNCg==
