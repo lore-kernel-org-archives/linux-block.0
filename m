@@ -1,87 +1,43 @@
-Return-Path: <natechancellor@gmail.com>
-Return-Path: <natechancellor@gmail.com>
-From: Nathan Chancellor <natechancellor@gmail.com>
-To: Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: drbd-dev@lists.linbit.com,
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: axboe@kernel.dk
+Cc: linux-bcache@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>,
-	Nathan Chancellor <natechancellor@gmail.com>
-Subject: [PATCH RESEND] drbd: avoid clang warning about pointless switch statement
-Date: Tue,  2 Oct 2018 10:14:48 -0700
-Message-Id: <20181002171447.10765-1-natechancellor@gmail.com>
+	Shenghui Wang <shhuiw@foxmail.com>,
+	Coly Li <colyli@suse.de>
+Subject: [PATCH 09/15] bcache: recal cached_dev_sectors on detach
+Date: Mon,  8 Oct 2018 20:41:15 +0800
+Message-Id: <20181008124121.20192-10-colyli@suse.de>
+In-Reply-To: <20181008124121.20192-1-colyli@suse.de>
+References: <20181008124121.20192-1-colyli@suse.de>
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-From: Arnd Bergmann <arnd@arndb.de>
+From: Shenghui Wang <shhuiw@foxmail.com>
 
-The drbd code causes warnings that we cannot easily disable when building with clang:
+Recal cached_dev_sectors on cached_dev detached, as recal done on
+cached_dev attached.
 
-In file included from drivers/block/drbd/drbd_debugfs.c:10:
-In file included from drivers/block/drbd/drbd_int.h:48:
-In file included from include/linux/drbd_genl_api.h:53:
-In file included from include/linux/genl_magic_struct.h:237:
-include/linux/drbd_genl.h:300:1: warning: no case matching constant switch condition '0'
+Update the cached_dev_sectors before bcache_device_detach called
+as bcache_device_detach will set bcache_device->c to NULL.
 
-There is nothing wrong with the code, and adding 'default:' labels
-in the right place is enough to let clang shut up about the warning.
-
-Fixes: ec2c35ac1ea2 ("drbd: prepare the transition from connector to genetlink")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+Signed-off-by: Shenghui Wang <shhuiw@foxmail.com>
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
+ drivers/md/bcache/super.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-This was recently resent by Philipp Klocke but the attribution on it
-was incorrect (had Arnd's signoff but no From: line) and linux-block
-wasn't cc'd, who presumably should take this patch since this file was
-introduced by commit ec2c35ac1ea2 ("drbd: prepare the transition from
-connector to genetlink"). If that is the case, perhaps these files
-should be added to the drbd MAINTAINERS entry since they were introduced
-by drbd and have been the only consumers since; I'd be happy to send a
-patch if others agree.
-
-It was acked by Lars on https://lore.kernel.org/patchwork/patch/756723/
-so I don't know if this patch should carry
-
-Acked-by: Lars Ellenberg <lars.ellenberg@linbit.com>
-
-or not. I'll leave that up to the maintainer to decide.
-
-Thanks!
-Nathan
-
- include/linux/genl_magic_struct.h | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/include/linux/genl_magic_struct.h b/include/linux/genl_magic_struct.h
-index 5972e4969197..c11f42179c63 100644
---- a/include/linux/genl_magic_struct.h
-+++ b/include/linux/genl_magic_struct.h
-@@ -191,6 +191,7 @@ static inline void ct_assert_unique_operations(void)
- {
- 	switch (0) {
- #include GENL_MAGIC_INCLUDE_FILE
-+	default:
- 		;
- 	}
- }
-@@ -209,6 +210,7 @@ static inline void ct_assert_unique_top_level_attributes(void)
- {
- 	switch (0) {
- #include GENL_MAGIC_INCLUDE_FILE
-+	default:
- 		;
- 	}
- }
-@@ -219,6 +221,7 @@ static inline void ct_assert_unique_ ## s_name ## _attributes(void)	\
- {									\
- 	switch (0) {							\
- 		s_fields						\
-+		default:						\
- 			;						\
- 	}								\
- }
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 4989c7d4d4d0..dc392a485269 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1008,6 +1008,7 @@ static void cached_dev_detach_finish(struct work_struct *w)
+ 	bch_write_bdev_super(dc, &cl);
+ 	closure_sync(&cl);
+ 
++	calc_cached_dev_sectors(dc->disk.c);
+ 	bcache_device_detach(&dc->disk);
+ 	list_move(&dc->list, &uncached_devices);
+ 
 -- 
 2.19.0
