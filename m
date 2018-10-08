@@ -1,80 +1,43 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 27/30] block: remove req_no_special_merge() from merging code
-Date: Wed, 31 Oct 2018 11:59:19 -0600
-Message-Id: <20181031175922.8849-28-axboe@kernel.dk>
-In-Reply-To: <20181031175922.8849-1-axboe@kernel.dk>
-References: <20181031175922.8849-1-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from shards.monkeyblade.net ([23.128.96.9]:48710 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725950AbeJHN4z (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Oct 2018 09:56:55 -0400
+Date: Sun, 07 Oct 2018 23:46:41 -0700 (PDT)
+Message-Id: <20181007.234641.2199470135547877917.davem@davemloft.net>
+To: keescook@chromium.org
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] sunvdc: Remove VLA usage
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <CAGXu5jKV3eLJJsemxNEjZuANRd8-TnRkMSmiztVyY5mgC2ySHw@mail.gmail.com>
+References: <20180906000926.GA18830@beast>
+        <CAGXu5jJ-Hbj143Sv7ikxmLnBPyvcd1cGoT5fSbwG21LomnsORw@mail.gmail.com>
+        <CAGXu5jKV3eLJJsemxNEjZuANRd8-TnRkMSmiztVyY5mgC2ySHw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-It'll always be false at this point, just remove it.
+From: Kees Cook <keescook@chromium.org>
+Date: Sun, 7 Oct 2018 23:16:01 -0700
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-merge.c | 25 +++----------------------
- 1 file changed, 3 insertions(+), 22 deletions(-)
+> On Mon, Sep 24, 2018 at 8:19 PM, Kees Cook <keescook@chromium.org> wrote:
+>> On Wed, Sep 5, 2018 at 5:09 PM, Kees Cook <keescook@chromium.org> wrote:
+>>> In the quest to remove all stack VLA usage from the kernel[1], this
+>>> moves the math for cookie calculation into macros and allocates a fixed
+>>> size array for the maximum number of cookies and adds a runtime sanity check.
+>>> (Note that the size was always fixed, but just hidden from the compiler.)
+>>>
+>>> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+>>>
+>>> Signed-off-by: Kees Cook <keescook@chromium.org>
+>>
+>> Friendly ping. Jens, can you take this?
+> 
+> Dave, should this go via you instead? I'll take it via my tree if no
+> one else wants it...
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 7fedc0391610..3561dcce2260 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -595,17 +595,6 @@ int ll_front_merge_fn(struct request_queue *q, struct request *req,
- 	return ll_new_hw_segment(q, req, bio);
- }
- 
--/*
-- * blk-mq uses req->special to carry normal driver per-request payload, it
-- * does not indicate a prepared command that we cannot merge with.
-- */
--static bool req_no_special_merge(struct request *req)
--{
--	struct request_queue *q = req->q;
--
--	return !q->mq_ops && req->special;
--}
--
- static bool req_attempt_discard_merge(struct request_queue *q, struct request *req,
- 		struct request *next)
- {
-@@ -631,13 +620,6 @@ static int ll_merge_requests_fn(struct request_queue *q, struct request *req,
- 	unsigned int seg_size =
- 		req->biotail->bi_seg_back_size + next->bio->bi_seg_front_size;
- 
--	/*
--	 * First check if the either of the requests are re-queued
--	 * requests.  Can't merge them if they are.
--	 */
--	if (req_no_special_merge(req) || req_no_special_merge(next))
--		return 0;
--
- 	if (req_gap_back_merge(req, next->bio))
- 		return 0;
- 
-@@ -738,8 +720,7 @@ static struct request *attempt_merge(struct request_queue *q,
- 		return NULL;
- 
- 	if (rq_data_dir(req) != rq_data_dir(next)
--	    || req->rq_disk != next->rq_disk
--	    || req_no_special_merge(next))
-+	    || req->rq_disk != next->rq_disk)
- 		return NULL;
- 
- 	if (req_op(req) == REQ_OP_WRITE_SAME &&
-@@ -858,8 +839,8 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
- 	if (bio_data_dir(bio) != rq_data_dir(rq))
- 		return false;
- 
--	/* must be same device and not a special request */
--	if (rq->rq_disk != bio->bi_disk || req_no_special_merge(rq))
-+	/* must be same device */
-+	if (rq->rq_disk != bio->bi_disk)
- 		return false;
- 
- 	/* only merge integrity protected bio into ditto rq */
--- 
-2.17.1
+Please resend to me and CC: sparclinux@vger.kernel.org and I'll take it.
+
+Thanks.
