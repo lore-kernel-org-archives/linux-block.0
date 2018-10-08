@@ -1,84 +1,62 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 10/30] block: remove q->lld_busy_fn()
-Date: Wed, 31 Oct 2018 11:59:02 -0600
-Message-Id: <20181031175922.8849-11-axboe@kernel.dk>
-In-Reply-To: <20181031175922.8849-1-axboe@kernel.dk>
-References: <20181031175922.8849-1-axboe@kernel.dk>
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: axboe@kernel.dk
+Cc: linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Dongbo Cao <cdbdyx@163.com>,
+	Coly Li <colyli@suse.de>
+Subject: [PATCH 15/15] bcache: panic fix for making cache device
+Date: Mon,  8 Oct 2018 20:41:21 +0800
+Message-Id: <20181008124121.20192-16-colyli@suse.de>
+In-Reply-To: <20181008124121.20192-1-colyli@suse.de>
+References: <20181008124121.20192-1-colyli@suse.de>
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Nobody is using the legacy path for blk_lld_busy() anymore, remove
-it.
+From: Dongbo Cao <cdbdyx@163.com>
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+when the nbuckets of cache device is smaller than 1024, making cache
+device will trigger BUG_ON in kernel, add a condition to avoid this.
+
+Reported-by: nitroxis <n@nxs.re>
+Signed-off-by: Dongbo Cao <cdbdyx@163.com>
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
- block/blk-core.c       | 2 --
- block/blk-settings.c   | 6 ------
- include/linux/blkdev.h | 3 ---
- 3 files changed, 11 deletions(-)
+ drivers/md/bcache/super.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index c99088d0e80b..5044a1c41493 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -3427,8 +3427,6 @@ EXPORT_SYMBOL_GPL(rq_flush_dcache_pages);
-  */
- int blk_lld_busy(struct request_queue *q)
- {
--	if (q->lld_busy_fn)
--		return q->lld_busy_fn(q);
- 	if (q->mq_ops && q->mq_ops->busy)
- 		return q->mq_ops->busy(q);
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 2a362a7ba995..563f75686100 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -2070,6 +2070,11 @@ static int cache_alloc(struct cache *ca)
+ 	 */
+ 	btree_buckets = ca->sb.njournal_buckets ?: 8;
+ 	free = roundup_pow_of_two(ca->sb.nbuckets) >> 10;
++	if (!free) {
++		ret = -EPERM;
++		err = "ca->sb.nbuckets is too small";
++		goto err_free;
++	}
  
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index ffd459969689..82b31fb2888c 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -73,12 +73,6 @@ void blk_queue_rq_timed_out(struct request_queue *q, rq_timed_out_fn *fn)
- }
- EXPORT_SYMBOL_GPL(blk_queue_rq_timed_out);
- 
--void blk_queue_lld_busy(struct request_queue *q, lld_busy_fn *fn)
--{
--	q->lld_busy_fn = fn;
--}
--EXPORT_SYMBOL_GPL(blk_queue_lld_busy);
--
- /**
-  * blk_set_default_limits - reset limits to default values
-  * @lim:  the queue_limits structure to reset
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 4293dc1cd160..e867733b761d 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -320,7 +320,6 @@ typedef void (unprep_rq_fn) (struct request_queue *, struct request *);
- struct bio_vec;
- typedef void (softirq_done_fn)(struct request *);
- typedef int (dma_drain_needed_fn)(struct request *);
--typedef int (lld_busy_fn) (struct request_queue *q);
- typedef int (bsg_job_fn) (struct bsg_job *);
- typedef int (init_rq_fn)(struct request_queue *, struct request *, gfp_t);
- typedef void (exit_rq_fn)(struct request_queue *, struct request *);
-@@ -466,7 +465,6 @@ struct request_queue {
- 	softirq_done_fn		*softirq_done_fn;
- 	rq_timed_out_fn		*rq_timed_out_fn;
- 	dma_drain_needed_fn	*dma_drain_needed;
--	lld_busy_fn		*lld_busy_fn;
- 	/* Called just after a request is allocated */
- 	init_rq_fn		*init_rq_fn;
- 	/* Called just before a request is freed */
-@@ -1255,7 +1253,6 @@ extern void blk_queue_update_dma_pad(struct request_queue *, unsigned int);
- extern int blk_queue_dma_drain(struct request_queue *q,
- 			       dma_drain_needed_fn *dma_drain_needed,
- 			       void *buf, unsigned int size);
--extern void blk_queue_lld_busy(struct request_queue *q, lld_busy_fn *fn);
- extern void blk_queue_segment_boundary(struct request_queue *, unsigned long);
- extern void blk_queue_virt_boundary(struct request_queue *, unsigned long);
- extern void blk_queue_prep_rq(struct request_queue *, prep_rq_fn *pfn);
+ 	if (!init_fifo(&ca->free[RESERVE_BTREE], btree_buckets,
+ 						GFP_KERNEL)) {
+@@ -2147,6 +2152,7 @@ static int cache_alloc(struct cache *ca)
+ err_prio_alloc:
+ 	free_fifo(&ca->free[RESERVE_BTREE]);
+ err_btree_alloc:
++err_free:
+ 	module_put(THIS_MODULE);
+ 	if (err)
+ 		pr_notice("error %s: %s", ca->cache_dev_name, err);
+@@ -2176,6 +2182,8 @@ static int register_cache(struct cache_sb *sb, struct page *sb_page,
+ 		blkdev_put(bdev, FMODE_READ|FMODE_WRITE|FMODE_EXCL);
+ 		if (ret == -ENOMEM)
+ 			err = "cache_alloc(): -ENOMEM";
++		else if (ret == -EPERM)
++			err = "cache_alloc(): cache device is too small";
+ 		else
+ 			err = "cache_alloc(): unknown error";
+ 		goto err;
 -- 
-2.17.1
+2.19.0
