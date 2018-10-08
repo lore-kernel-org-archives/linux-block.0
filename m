@@ -1,238 +1,48 @@
-Return-Path: <christophe.leroy@c-s.fr>
-Message-Id: <45a7925eab3cc8d1203136f99230ae9f4e5c8c20.1539092112.git.christophe.leroy@c-s.fr>
-In-Reply-To: <cover.1539092111.git.christophe.leroy@c-s.fr>
-References: <cover.1539092111.git.christophe.leroy@c-s.fr>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v3 24/24] powerpc/book3s64: Avoid multiple endian conversion
- in pte helpers
-To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
-Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
-Date: Tue,  9 Oct 2018 13:52:20 +0000 (UTC)
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: axboe@kernel.dk
+Cc: linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Shenghui Wang <shhuiw@foxmail.com>,
+	Coly Li <colyli@suse.de>
+Subject: [PATCH 13/15] bcache: use MAX_CACHES_PER_SET instead of magic number 8 in __bch_bucket_alloc_set
+Date: Mon,  8 Oct 2018 20:41:19 +0800
+Message-Id: <20181008124121.20192-14-colyli@suse.de>
+In-Reply-To: <20181008124121.20192-1-colyli@suse.de>
+References: <20181008124121.20192-1-colyli@suse.de>
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-In the same spirit as already done in pte query helpers,
-this patch changes pte setting helpers to perform endian
-conversions on the constants rather than on the pte value.
+From: Shenghui Wang <shhuiw@foxmail.com>
 
-In the meantime, it changes pte_access_permitted() to use
-pte helpers for the same reason.
+Current cache_set has MAX_CACHES_PER_SET caches most, and the macro
+is used for
+"
+	struct cache *cache_by_alloc[MAX_CACHES_PER_SET];
+"
+in the define of struct cache_set.
 
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+Use MAX_CACHES_PER_SET instead of magic number 8 in
+__bch_bucket_alloc_set.
+
+Signed-off-by: Shenghui Wang <shhuiw@foxmail.com>
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
- arch/powerpc/include/asm/book3s/64/pgtable.h | 71 +++++++++++++---------------
- 1 file changed, 32 insertions(+), 39 deletions(-)
+ drivers/md/bcache/alloc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/powerpc/include/asm/book3s/64/pgtable.h b/arch/powerpc/include/asm/book3s/64/pgtable.h
-index cf8dbd5f8f03..f0c79f370cf0 100644
---- a/arch/powerpc/include/asm/book3s/64/pgtable.h
-+++ b/arch/powerpc/include/asm/book3s/64/pgtable.h
-@@ -506,12 +506,12 @@ static inline bool pte_soft_dirty(pte_t pte)
+diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
+index 7a28232d868b..5002838ea476 100644
+--- a/drivers/md/bcache/alloc.c
++++ b/drivers/md/bcache/alloc.c
+@@ -484,7 +484,7 @@ int __bch_bucket_alloc_set(struct cache_set *c, unsigned int reserve,
+ 	int i;
  
- static inline pte_t pte_mksoft_dirty(pte_t pte)
- {
--	return __pte(pte_val(pte) | _PAGE_SOFT_DIRTY);
-+	return __pte_raw(pte_raw(pte) | cpu_to_be64(_PAGE_SOFT_DIRTY));
- }
+ 	lockdep_assert_held(&c->bucket_lock);
+-	BUG_ON(!n || n > c->caches_loaded || n > 8);
++	BUG_ON(!n || n > c->caches_loaded || n > MAX_CACHES_PER_SET);
  
- static inline pte_t pte_clear_soft_dirty(pte_t pte)
- {
--	return __pte(pte_val(pte) & ~_PAGE_SOFT_DIRTY);
-+	return __pte_raw(pte_raw(pte) & cpu_to_be64(~_PAGE_SOFT_DIRTY));
- }
- #endif /* CONFIG_HAVE_ARCH_SOFT_DIRTY */
+ 	bkey_init(k);
  
-@@ -532,7 +532,7 @@ static inline pte_t pte_mk_savedwrite(pte_t pte)
- 	 */
- 	VM_BUG_ON((pte_raw(pte) & cpu_to_be64(_PAGE_PRESENT | _PAGE_RWX | _PAGE_PRIVILEGED)) !=
- 		  cpu_to_be64(_PAGE_PRESENT | _PAGE_PRIVILEGED));
--	return __pte(pte_val(pte) & ~_PAGE_PRIVILEGED);
-+	return __pte_raw(pte_raw(pte) & cpu_to_be64(~_PAGE_PRIVILEGED));
- }
- 
- #define pte_clear_savedwrite pte_clear_savedwrite
-@@ -542,14 +542,14 @@ static inline pte_t pte_clear_savedwrite(pte_t pte)
- 	 * Used by KSM subsystem to make a protnone pte readonly.
- 	 */
- 	VM_BUG_ON(!pte_protnone(pte));
--	return __pte(pte_val(pte) | _PAGE_PRIVILEGED);
-+	return __pte_raw(pte_raw(pte) | cpu_to_be64(_PAGE_PRIVILEGED));
- }
- #else
- #define pte_clear_savedwrite pte_clear_savedwrite
- static inline pte_t pte_clear_savedwrite(pte_t pte)
- {
- 	VM_WARN_ON(1);
--	return __pte(pte_val(pte) & ~_PAGE_WRITE);
-+	return __pte_raw(pte_raw(pte) & cpu_to_be64(~_PAGE_WRITE));
- }
- #endif /* CONFIG_NUMA_BALANCING */
- 
-@@ -578,25 +578,22 @@ static inline bool arch_pte_access_permitted(u64 pte, bool write, bool execute)
- }
- #endif /* CONFIG_PPC_MEM_KEYS */
- 
-+static inline bool pte_user(pte_t pte)
-+{
-+	return !(pte_raw(pte) & cpu_to_be64(_PAGE_PRIVILEGED));
-+}
-+
- #define pte_access_permitted pte_access_permitted
- static inline bool pte_access_permitted(pte_t pte, bool write)
- {
--	unsigned long pteval = pte_val(pte);
--	/* Also check for pte_user */
--	unsigned long clear_pte_bits = _PAGE_PRIVILEGED;
- 	/*
- 	 * _PAGE_READ is needed for any access and will be
- 	 * cleared for PROT_NONE
- 	 */
--	unsigned long need_pte_bits = _PAGE_PRESENT | _PAGE_READ;
--
--	if (write)
--		need_pte_bits |= _PAGE_WRITE;
--
--	if ((pteval & need_pte_bits) != need_pte_bits)
-+	if (!pte_present(pte) || !pte_user(pte) || !pte_read(pte))
- 		return false;
- 
--	if ((pteval & clear_pte_bits) == clear_pte_bits)
-+	if (write && !pte_write(pte))
- 		return false;
- 
- 	return arch_pte_access_permitted(pte_val(pte), write, 0);
-@@ -625,32 +622,32 @@ static inline pte_t pte_wrprotect(pte_t pte)
- {
- 	if (unlikely(pte_savedwrite(pte)))
- 		return pte_clear_savedwrite(pte);
--	return __pte(pte_val(pte) & ~_PAGE_WRITE);
-+	return __pte_raw(pte_raw(pte) & cpu_to_be64(~_PAGE_WRITE));
- }
- 
- static inline pte_t pte_exprotect(pte_t pte)
- {
--	return __pte(pte_val(pte) & ~_PAGE_EXEC);
-+	return __pte_raw(pte_raw(pte) & cpu_to_be64(~_PAGE_EXEC));
- }
- 
- static inline pte_t pte_mkclean(pte_t pte)
- {
--	return __pte(pte_val(pte) & ~_PAGE_DIRTY);
-+	return __pte_raw(pte_raw(pte) & cpu_to_be64(~_PAGE_DIRTY));
- }
- 
- static inline pte_t pte_mkold(pte_t pte)
- {
--	return __pte(pte_val(pte) & ~_PAGE_ACCESSED);
-+	return __pte_raw(pte_raw(pte) & cpu_to_be64(~_PAGE_ACCESSED));
- }
- 
- static inline pte_t pte_mkexec(pte_t pte)
- {
--	return __pte(pte_val(pte) | _PAGE_EXEC);
-+	return __pte_raw(pte_raw(pte) | cpu_to_be64(_PAGE_EXEC));
- }
- 
- static inline pte_t pte_mkpte(pte_t pte)
- {
--	return __pte(pte_val(pte) | _PAGE_PTE);
-+	return __pte_raw(pte_raw(pte) | cpu_to_be64(_PAGE_PTE));
- }
- 
- static inline pte_t pte_mkwrite(pte_t pte)
-@@ -658,22 +655,22 @@ static inline pte_t pte_mkwrite(pte_t pte)
- 	/*
- 	 * write implies read, hence set both
- 	 */
--	return __pte(pte_val(pte) | _PAGE_RW);
-+	return __pte_raw(pte_raw(pte) | cpu_to_be64(_PAGE_RW));
- }
- 
- static inline pte_t pte_mkdirty(pte_t pte)
- {
--	return __pte(pte_val(pte) | _PAGE_DIRTY | _PAGE_SOFT_DIRTY);
-+	return __pte_raw(pte_raw(pte) | cpu_to_be64(_PAGE_DIRTY | _PAGE_SOFT_DIRTY));
- }
- 
- static inline pte_t pte_mkyoung(pte_t pte)
- {
--	return __pte(pte_val(pte) | _PAGE_ACCESSED);
-+	return __pte_raw(pte_raw(pte) | cpu_to_be64(_PAGE_ACCESSED));
- }
- 
- static inline pte_t pte_mkspecial(pte_t pte)
- {
--	return __pte(pte_val(pte) | _PAGE_SPECIAL);
-+	return __pte_raw(pte_raw(pte) | cpu_to_be64(_PAGE_SPECIAL));
- }
- 
- static inline pte_t pte_mkhuge(pte_t pte)
-@@ -683,17 +680,17 @@ static inline pte_t pte_mkhuge(pte_t pte)
- 
- static inline pte_t pte_mkdevmap(pte_t pte)
- {
--	return __pte(pte_val(pte) | _PAGE_SPECIAL|_PAGE_DEVMAP);
-+	return __pte_raw(pte_raw(pte) | cpu_to_be64(_PAGE_SPECIAL | _PAGE_DEVMAP));
- }
- 
- static inline pte_t pte_mkprivileged(pte_t pte)
- {
--	return __pte(pte_val(pte) | _PAGE_PRIVILEGED);
-+	return __pte_raw(pte_raw(pte) | cpu_to_be64(_PAGE_PRIVILEGED));
- }
- 
- static inline pte_t pte_mkuser(pte_t pte)
- {
--	return __pte(pte_val(pte) & ~_PAGE_PRIVILEGED);
-+	return __pte_raw(pte_raw(pte) & cpu_to_be64(~_PAGE_PRIVILEGED));
- }
- 
- /*
-@@ -712,12 +709,8 @@ static inline int pte_devmap(pte_t pte)
- static inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
- {
- 	/* FIXME!! check whether this need to be a conditional */
--	return __pte((pte_val(pte) & _PAGE_CHG_MASK) | pgprot_val(newprot));
--}
--
--static inline bool pte_user(pte_t pte)
--{
--	return !(pte_raw(pte) & cpu_to_be64(_PAGE_PRIVILEGED));
-+	return __pte_raw((pte_raw(pte) & cpu_to_be64(_PAGE_CHG_MASK)) |
-+			 cpu_to_be64(pgprot_val(newprot)));
- }
- 
- /* Encode and de-code a swap entry */
-@@ -760,7 +753,7 @@ static inline bool pte_user(pte_t pte)
- #ifdef CONFIG_HAVE_ARCH_SOFT_DIRTY
- static inline pte_t pte_swp_mksoft_dirty(pte_t pte)
- {
--	return __pte(pte_val(pte) | _PAGE_SWP_SOFT_DIRTY);
-+	return __pte_raw(pte_raw(pte) | cpu_to_be64(_PAGE_SWP_SOFT_DIRTY));
- }
- 
- static inline bool pte_swp_soft_dirty(pte_t pte)
-@@ -770,7 +763,7 @@ static inline bool pte_swp_soft_dirty(pte_t pte)
- 
- static inline pte_t pte_swp_clear_soft_dirty(pte_t pte)
- {
--	return __pte(pte_val(pte) & ~_PAGE_SWP_SOFT_DIRTY);
-+	return __pte_raw(pte_raw(pte) & cpu_to_be64(~_PAGE_SWP_SOFT_DIRTY));
- }
- #endif /* CONFIG_HAVE_ARCH_SOFT_DIRTY */
- 
-@@ -859,10 +852,10 @@ static inline pgprot_t pgprot_writecombine(pgprot_t prot)
-  */
- static inline bool pte_ci(pte_t pte)
- {
--	unsigned long pte_v = pte_val(pte);
-+	__be64 pte_v = pte_raw(pte);
- 
--	if (((pte_v & _PAGE_CACHE_CTL) == _PAGE_TOLERANT) ||
--	    ((pte_v & _PAGE_CACHE_CTL) == _PAGE_NON_IDEMPOTENT))
-+	if (((pte_v & cpu_to_be64(_PAGE_CACHE_CTL)) == cpu_to_be64(_PAGE_TOLERANT)) ||
-+	    ((pte_v & cpu_to_be64(_PAGE_CACHE_CTL)) == cpu_to_be64(_PAGE_NON_IDEMPOTENT)))
- 		return true;
- 	return false;
- }
 -- 
-2.13.3
+2.19.0
