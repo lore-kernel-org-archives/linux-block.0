@@ -1,86 +1,39 @@
-Return-Path: <natechancellor@gmail.com>
-Return-Path: <natechancellor@gmail.com>
-From: Nathan Chancellor <natechancellor@gmail.com>
-To: Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: drbd-dev@lists.linbit.com,
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: axboe@kernel.dk
+Cc: linux-bcache@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>,
-	Nathan Chancellor <natechancellor@gmail.com>
-Subject: [PATCH v2] drbd: Avoid Clang warning about pointless switch statment
-Date: Thu,  4 Oct 2018 13:09:13 -0700
-Message-Id: <20181004200912.32348-1-natechancellor@gmail.com>
-In-Reply-To: <20181002171447.10765-1-natechancellor@gmail.com>
-References: <20181002171447.10765-1-natechancellor@gmail.com>
+	Coly Li <colyli@suse.de>
+Subject: [PATCH 12/15] bcache: replace hard coded number with BUCKET_GC_GEN_MAX
+Date: Mon,  8 Oct 2018 20:41:18 +0800
+Message-Id: <20181008124121.20192-13-colyli@suse.de>
+In-Reply-To: <20181008124121.20192-1-colyli@suse.de>
+References: <20181008124121.20192-1-colyli@suse.de>
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-There are several warnings from Clang about no case statement matching
-the constant 0:
+In extents.c:bch_extent_bad(), number 96 is used as parameter to call
+btree_bug_on(). The purpose is to check whether stale gen value exceeds
+BUCKET_GC_GEN_MAX, so it is better to use macro BUCKET_GC_GEN_MAX to
+make the code more understandable.
 
-In file included from drivers/block/drbd/drbd_receiver.c:48:
-In file included from drivers/block/drbd/drbd_int.h:48:
-In file included from ./include/linux/drbd_genl_api.h:54:
-In file included from ./include/linux/genl_magic_struct.h:236:
-./include/linux/drbd_genl.h:321:1: warning: no case matching constant
-switch condition '0'
-GENL_struct(DRBD_NLA_HELPER, 24, drbd_helper_info,
-^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-./include/linux/genl_magic_struct.h:220:10: note: expanded from macro
-'GENL_struct'
-        switch (0) {
-                ^
-
-Silence this warning by adding a 'case 0:' statement. Additionally,
-adjust the alignment of the statements in the ct_assert_unique macro to
-avoid a checkpatch warning.
-
-This solution was originally sent by Arnd Bergmann with a default case
-statement: https://lore.kernel.org/patchwork/patch/756723/
-
-Link: https://github.com/ClangBuiltLinux/linux/issues/43
-Suggested-by: Lars Ellenberg <lars.ellenberg@linbit.com>
-Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
+ drivers/md/bcache/extents.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Since this is not the same as Arnd's patch, I took authorship for it
-while leaving a link to the original patch in the commit message. If
-this is not how it should have been done, please let me know.
-
- include/linux/genl_magic_struct.h | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/genl_magic_struct.h b/include/linux/genl_magic_struct.h
-index 5972e4969197..eeae59d3ceb7 100644
---- a/include/linux/genl_magic_struct.h
-+++ b/include/linux/genl_magic_struct.h
-@@ -191,6 +191,7 @@ static inline void ct_assert_unique_operations(void)
- {
- 	switch (0) {
- #include GENL_MAGIC_INCLUDE_FILE
-+	case 0:
- 		;
- 	}
- }
-@@ -209,6 +210,7 @@ static inline void ct_assert_unique_top_level_attributes(void)
- {
- 	switch (0) {
- #include GENL_MAGIC_INCLUDE_FILE
-+	case 0:
- 		;
- 	}
- }
-@@ -218,7 +220,8 @@ static inline void ct_assert_unique_top_level_attributes(void)
- static inline void ct_assert_unique_ ## s_name ## _attributes(void)	\
- {									\
- 	switch (0) {							\
--		s_fields						\
-+	s_fields							\
-+	case 0:								\
- 			;						\
- 	}								\
- }
+diff --git a/drivers/md/bcache/extents.c b/drivers/md/bcache/extents.c
+index c809724e6571..956004366699 100644
+--- a/drivers/md/bcache/extents.c
++++ b/drivers/md/bcache/extents.c
+@@ -553,7 +553,7 @@ static bool bch_extent_bad(struct btree_keys *bk, const struct bkey *k)
+ 	for (i = 0; i < KEY_PTRS(k); i++) {
+ 		stale = ptr_stale(b->c, k, i);
+ 
+-		btree_bug_on(stale > 96, b,
++		btree_bug_on(stale > BUCKET_GC_GEN_MAX, b,
+ 			     "key too stale: %i, need_gc %u",
+ 			     stale, b->c->need_gc);
+ 
 -- 
 2.19.0
