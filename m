@@ -1,21 +1,21 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <ming.lei@redhat.com>
+Date: Mon, 8 Oct 2018 18:14:05 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Dongli Zhang <dongli.zhang@oracle.com>,
+	Zach Marano <zmarano@google.com>, Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>
 Subject: Re: [PATCH V2] blk-mq: complete req in softirq context in case of
  single queue
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, Dongli Zhang <dongli.zhang@oracle.com>,
- Zach Marano <zmarano@google.com>, Christoph Hellwig <hch@lst.de>,
- Bart Van Assche <bvanassche@acm.org>,
- Jianchao Wang <jianchao.w.wang@oracle.com>
+Message-ID: <20181008101404.GA10966@ming.t460p>
 References: <20180928084220.32026-1-ming.lei@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <d72826db-1ce5-dde6-8940-24878f3ef9c1@kernel.dk>
-Date: Mon, 8 Oct 2018 10:49:01 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180928084220.32026-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 9/28/18 2:42 AM, Ming Lei wrote:
+On Fri, Sep 28, 2018 at 04:42:20PM +0800, Ming Lei wrote:
 > Lot of controllers may have only one irq vector for completing IO
 > request. And usually affinity of the only irq vector is all possible
 > CPUs, however, on most of ARCH, there may be only one specific CPU
@@ -33,10 +33,72 @@ On 9/28/18 2:42 AM, Ming Lei wrote:
 > mdadm --create --verbose /dev/md0 --level=0 --chunk=1024 --raid-devices=8 /dev/sdb /dev/sdc /dev/sdd /dev/sde /dev/sdf /dev/sdg /dev/sdh /dev/sdi
 > 
 > fio --time_based --name=benchmark --runtime=30 --filename=/dev/md0 --nrfiles=1 --ioengine=libaio --iodepth=32 --direct=1 --invalidate=1 --verify=0 --verify_fatal=0 --numjobs=32 --rw=randread --blocksize=4k
+> 
+> Cc: Dongli Zhang <dongli.zhang@oracle.com>
+> Cc: Zach Marano <zmarano@google.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-mq.c      | 14 ++++++++++++++
+>  block/blk-softirq.c |  5 ++---
+>  2 files changed, 16 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 85a1c1a59c72..d4792c3ac983 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -565,6 +565,20 @@ static void __blk_mq_complete_request(struct request *rq)
+>  	if (rq->internal_tag != -1)
+>  		blk_mq_sched_completed_request(rq);
+>  
+> +	/*
+> +	 * Most of single queue controllers, there is only one irq vector
+> +	 * for handling IO completion, and the only irq's affinity is set
+> +	 * as all possible CPUs. On most of ARCHs, this affinity means the
+> +	 * irq is handled on one specific CPU.
+> +	 *
+> +	 * So complete IO reqeust in softirq context in case of single queue
+> +	 * for not degrading IO performance by irqsoff latency.
+> +	 */
+> +	if (rq->q->nr_hw_queues == 1) {
+> +		__blk_complete_request(rq);
+> +		return;
+> +	}
+> +
+>  	if (!test_bit(QUEUE_FLAG_SAME_COMP, &rq->q->queue_flags)) {
+>  		rq->q->softirq_done_fn(rq);
+>  		return;
+> diff --git a/block/blk-softirq.c b/block/blk-softirq.c
+> index 15c1f5e12eb8..e47a2f751884 100644
+> --- a/block/blk-softirq.c
+> +++ b/block/blk-softirq.c
+> @@ -97,8 +97,8 @@ static int blk_softirq_cpu_dead(unsigned int cpu)
+>  
+>  void __blk_complete_request(struct request *req)
+>  {
+> -	int ccpu, cpu;
+>  	struct request_queue *q = req->q;
+> +	int cpu, ccpu = q->mq_ops ? req->mq_ctx->cpu : req->cpu;
+>  	unsigned long flags;
+>  	bool shared = false;
+>  
+> @@ -110,8 +110,7 @@ void __blk_complete_request(struct request *req)
+>  	/*
+>  	 * Select completion CPU
+>  	 */
+> -	if (req->cpu != -1) {
+> -		ccpu = req->cpu;
+> +	if (test_bit(QUEUE_FLAG_SAME_COMP, &q->queue_flags) && ccpu != -1) {
+>  		if (!test_bit(QUEUE_FLAG_SAME_FORCE, &q->queue_flags))
+>  			shared = cpus_share_cache(cpu, ccpu);
+>  	} else
+> -- 
+> 2.9.5
+> 
 
-Looks fine to me, and imho it makes a lot of sense to apply the same
-logic for remote completions to single queue as we did for the legacy
-parts. I have applied it for 4.20.
+Ping...
 
--- 
-Jens Axboe
+Thanks,
+Ming
