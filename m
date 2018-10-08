@@ -1,66 +1,44 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-ide@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 14/28] block: remove blk_complete_request()
-Date: Thu, 25 Oct 2018 15:10:25 -0600
-Message-Id: <20181025211039.11559-15-axboe@kernel.dk>
-In-Reply-To: <20181025211039.11559-1-axboe@kernel.dk>
-References: <20181025211039.11559-1-axboe@kernel.dk>
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: axboe@kernel.dk
+Cc: linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Tang Junhui <tang.junhui.linux@gmail.com>,
+	stable@vger.kernel.org,
+	Coly Li <colyli@suse.de>
+Subject: [PATCH 02/15] bcache: trace missed reading by cache_missed
+Date: Mon,  8 Oct 2018 20:41:08 +0800
+Message-Id: <20181008124121.20192-3-colyli@suse.de>
+In-Reply-To: <20181008124121.20192-1-colyli@suse.de>
+References: <20181008124121.20192-1-colyli@suse.de>
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-It's now unused.
+From: Tang Junhui <tang.junhui.linux@gmail.com>
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Missed reading IOs are identified by s->cache_missed, not the
+s->cache_miss, so in trace_bcache_read() using trace_bcache_read
+to identify whether the IO is missed or not.
+
+Signed-off-by: Tang Junhui <tang.junhui.linux@gmail.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
- block/blk-softirq.c    | 20 --------------------
- include/linux/blkdev.h |  1 -
- 2 files changed, 21 deletions(-)
+ drivers/md/bcache/request.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-softirq.c b/block/blk-softirq.c
-index e47a2f751884..8ca0f6caf174 100644
---- a/block/blk-softirq.c
-+++ b/block/blk-softirq.c
-@@ -145,26 +145,6 @@ void __blk_complete_request(struct request *req)
- }
- EXPORT_SYMBOL(__blk_complete_request);
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 51be355a3309..4946d486f734 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -850,7 +850,7 @@ static void cached_dev_read_done_bh(struct closure *cl)
  
--/**
-- * blk_complete_request - end I/O on a request
-- * @req:      the request being processed
-- *
-- * Description:
-- *     Ends all I/O on a request. It does not handle partial completions,
-- *     unless the driver actually implements this in its completion callback
-- *     through requeueing. The actual completion happens out-of-order,
-- *     through a softirq handler. The user must have registered a completion
-- *     callback through blk_queue_softirq_done().
-- **/
--void blk_complete_request(struct request *req)
--{
--	if (unlikely(blk_should_fake_timeout(req->q)))
--		return;
--	if (!blk_mark_rq_complete(req))
--		__blk_complete_request(req);
--}
--EXPORT_SYMBOL(blk_complete_request);
--
- static __init int blk_softirq_init(void)
- {
- 	int i;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 4293dc1cd160..9ff9ab6fc1fe 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1205,7 +1205,6 @@ extern bool __blk_end_request(struct request *rq, blk_status_t error,
- extern void __blk_end_request_all(struct request *rq, blk_status_t error);
- extern bool __blk_end_request_cur(struct request *rq, blk_status_t error);
+ 	bch_mark_cache_accounting(s->iop.c, s->d,
+ 				  !s->cache_missed, s->iop.bypass);
+-	trace_bcache_read(s->orig_bio, !s->cache_miss, s->iop.bypass);
++	trace_bcache_read(s->orig_bio, !s->cache_missed, s->iop.bypass);
  
--extern void blk_complete_request(struct request *);
- extern void __blk_complete_request(struct request *);
- extern void blk_abort_request(struct request *);
- extern void blk_unprep_request(struct request *);
+ 	if (s->iop.status)
+ 		continue_at_nobarrier(cl, cached_dev_read_error, bcache_wq);
 -- 
-2.17.1
+2.19.0
