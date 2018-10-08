@@ -1,62 +1,55 @@
-Return-Path: <jack@suse.cz>
-Date: Thu, 4 Oct 2018 12:15:56 +0200
-From: Jan Kara <jack@suse.cz>
-To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc: Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH 0/14] loop: Fix oops and possible deadlocks
-Message-ID: <20181004101556.GE11529@quack2.suse.cz>
-References: <20180927113652.5422-1-jack@suse.cz>
- <9aa37417-990d-84bf-5a6e-88bcca1c106a@i-love.sakura.ne.jp>
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: axboe@kernel.dk
+Cc: linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Coly Li <colyli@suse.de>,
+	Adam Manzanares <adam.manzanares@wdc.com>
+Subject: [PATCH 03/15] bcache: use REQ_PRIO to indicate bio for metadata
+Date: Mon,  8 Oct 2018 20:41:09 +0800
+Message-Id: <20181008124121.20192-4-colyli@suse.de>
+In-Reply-To: <20181008124121.20192-1-colyli@suse.de>
+References: <20181008124121.20192-1-colyli@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <9aa37417-990d-84bf-5a6e-88bcca1c106a@i-love.sakura.ne.jp>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu 27-09-18 23:47:01, Tetsuo Handa wrote:
-> Possible changes folded into this series.
+In cached_dev_cache_miss() and check_should_bypass(), REQ_META is used
+to check whether a bio is for metadata request. REQ_META is used for
+blktrace, the correct REQ_ flag should be REQ_PRIO. This flag means the
+bio should be prior to other bio, and frequently be used to indicate
+metadata io in file system code.
 
-Thanks for having a look. But please comment on individual patches at
-appropriate places instead of sending this patch where everything is just
-mixed together. It is much easier to find out what we are talking about
-that way.
+This patch replaces REQ_META with correct flag REQ_PRIO.
 
->   (1) (I guess) no need to use _nested version.
+CC Adam Manzanares because he explains to me what REQ_PRIO is for.
 
-I just preserved the current status as I didn't want to dig into that hole.
-Even if you're right, that would be a separate change. Not something these
-patches should deal with.
+Signed-off-by: Coly Li <colyli@suse.de>
+Cc: Adam Manzanares <adam.manzanares@wdc.com>
+---
+ drivers/md/bcache/request.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
->   (2) Use mutex_lock_killable() where possible.
-
-Where exactly? I've only noticed you've changed loop_probe() where I think
-the change is just bogus. That gets called on device insertion and you have
-nowhere to deliver the signal in that case.
-
->   (3) Move fput() to after mutex_unlock().
-
-Again, independent change. I've just preserved the current situation. But
-probably worth including in this series as a separate patch. Care to send a
-follow up patch with proper changelog etc.?
-
->   (4) Don't return 0 upon invalid loop_control_ioctl().
-
-Good catch, I'll fix that up.
-
->   (5) No need to mutex_lock()/mutex_unlock() on each loop device at
->       unregister_transfer_cb() callback.
-
-Another independent optimization. Will you send a follow up patch? I can
-write the patch (and the one above) but I don't want to steal the credit
-from you...
-
->   (6) No need to mutex_unlock()+mutex_lock() when calling __loop_clr_fd().
-
-This is deliberate so that we get rid of the weird "__loop_clr_fd()
-releases mutex it did not acquire". This is not performance critical path
-by any means so better keep the locking simple.
-
-								Honza
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 4946d486f734..ee15fb039fd0 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -395,7 +395,7 @@ static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
+ 	 * unless the read-ahead request is for metadata (eg, for gfs2).
+ 	 */
+ 	if (bio->bi_opf & (REQ_RAHEAD|REQ_BACKGROUND) &&
+-	    !(bio->bi_opf & REQ_META))
++	    !(bio->bi_opf & REQ_PRIO))
+ 		goto skip;
+ 
+ 	if (bio->bi_iter.bi_sector & (c->sb.block_size - 1) ||
+@@ -877,7 +877,7 @@ static int cached_dev_cache_miss(struct btree *b, struct search *s,
+ 	}
+ 
+ 	if (!(bio->bi_opf & REQ_RAHEAD) &&
+-	    !(bio->bi_opf & REQ_META) &&
++	    !(bio->bi_opf & REQ_PRIO) &&
+ 	    s->iop.c->gc_stats.in_use < CUTOFF_CACHE_READA)
+ 		reada = min_t(sector_t, dc->readahead >> 9,
+ 			      get_capacity(bio->bi_disk) - bio_end_sector(bio));
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.19.0
