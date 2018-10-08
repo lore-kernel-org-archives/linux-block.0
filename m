@@ -1,82 +1,59 @@
-Return-Path: <prvs=81407a9e8=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH 00/11] Zoned block device support improvements
-Date: Wed, 10 Oct 2018 10:52:28 +0900
-Message-Id: <20181010015239.24930-1-damien.lemoal@wdc.com>
+Return-Path: <jthumshirn@suse.de>
+Date: Mon, 8 Oct 2018 11:15:03 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Omar Sandoval <osandov@osandov.com>,
+	Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+	Hannes Reinecke <hare@suse.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH] blk-mq-debugfs: Also show requests that have not yet
+ been started
+Message-ID: <20181008091503.GA8074@linux-x5ow.site>
+References: <20181004173524.52712-1-bvanassche@acm.org>
+ <a3f6a55e-eaa5-6a65-8360-9d85c7566961@kernel.dk>
+ <20181005223718.GL25437@vader>
+ <499d4461-5452-26c5-5b47-b1f9ec5877d8@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <499d4461-5452-26c5-5b47-b1f9ec5877d8@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-This series improves zoned block device support (reduce overhead) and
-introduces many simplifications to the code (overall, there are more deletions
-than insertions).
+On Fri, Oct 05, 2018 at 07:13:32PM -0600, Jens Axboe wrote:
+> On 10/5/18 4:37 PM, Omar Sandoval wrote:
+> > On Fri, Oct 05, 2018 at 08:18:00AM -0600, Jens Axboe wrote:
+> >> On 10/4/18 11:35 AM, Bart Van Assche wrote:
+> >>> When debugging e.g. the SCSI timeout handler it is important that
+> >>> requests that have not yet been started or that already have
+> >>> completed are also reported through debugfs.
+> >>
+> >> Thanks, I like this better - applied. BTW, what's up with the
+> >> reverse ordering on this:
+> >>
+> >>> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> >>> Cc: Christoph Hellwig <hch@lst.de>
+> >>> Cc: Ming Lei <ming.lei@redhat.com>
+> >>> Cc: Hannes Reinecke <hare@suse.com>
+> >>> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> >>> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> >>
+> >> For some reason that really annoys me, and I see it in various
+> >> patches these days. IMHO the SOB should be last, with whatever
+> >> acks, reviews, CC, before that.
+> > 
+> > I could've sworn that this guideline was even documented somewhere, but
+> > I can't find it now ¯\_(ツ)_/¯
+> 
+> My guess is that it's some newer git thing - but if it is, it's really
+> annoying and should be reverted. I end up fixing these up by hand.
 
-In more details:
-* Patches 1 to 3 are SCSI side (sd driver) cleanups and improvements reducing
-  the overhead of report zones command execution during disk scan and
-  revalidation.
-* Patches 4 to 9 improve the useability and user API of zoned block devices.
-* Patch 10 is the main part of this series. This patch replaces the
-  REQ_OP_ZONE_REPORT BIO/request operation for executing report zones commands
-  with a block device file operation, removing the need for the command reply
-  payload in-place rewriting in the BIO buffer. This leads to major
-  simplification of the code in many places.
-* Patch 11 further simplifies the code of low level drivers by providing a
-  generic implementation of zoned block device request queue zone bitmaps
-  initialization and revalidation.
-
-Please consider the addition of these patches in 4.20.
-Comments are as always welcome.
-
-Note: Patch 10 generates an easy to fix conflict with the patch
-"dm: Fix report zone remapping" submitted for review yesterday to the
-dm-devel list.
-
-Christoph Hellwig (1):
-  block: add a report_zones method
-
-Damien Le Moal (10):
-  scsi: sd_zbc: Rearrange code
-  scsi: sd_zbc: Reduce boot device scan and revalidate time
-  scsi: sd_zbc: Fix sd_zbc_check_zones() error checks
-  block: Introduce blkdev_nr_zones() helper
-  block: Limit allocation of zone descriptors for report zones
-  block: Introduce BLKGETZONESZ ioctl
-  block: Introduce BLKGETNRZONES ioctl
-  block: Improve zone reset execution
-  block: Expose queue nr_zones in sysfs
-  block: Introduce revalidate_disk_zones()
-
- block/blk-core.c               |   1 -
- block/blk-lib.c                |  13 +-
- block/blk-mq-debugfs.c         |   1 -
- block/blk-sysfs.c              |  13 +
- block/blk-zoned.c              | 363 +++++++++++++++---------
- block/blk.h                    |   8 +
- block/ioctl.c                  |   4 +
- drivers/block/null_blk.h       |  11 +-
- drivers/block/null_blk_main.c  |  30 +-
- drivers/block/null_blk_zoned.c |  57 +---
- drivers/md/dm-flakey.c         |  28 +-
- drivers/md/dm-linear.c         |  31 +-
- drivers/md/dm-table.c          |  10 +
- drivers/md/dm-zoned-target.c   |   3 +-
- drivers/md/dm.c                | 150 +++++-----
- drivers/scsi/sd.c              |  15 +-
- drivers/scsi/sd.h              |  15 +-
- drivers/scsi/sd_zbc.c          | 497 +++++++++------------------------
- include/linux/blk_types.h      |   2 -
- include/linux/blkdev.h         |  20 +-
- include/linux/device-mapper.h  |  10 +-
- include/trace/events/f2fs.h    |   1 -
- include/uapi/linux/blkzoned.h  |   3 +
- 23 files changed, 583 insertions(+), 703 deletions(-)
+Isn't it the way patchwork adds the tags? And yes I also thought this is the
+correct way of adding the Ccs, etc..
 
 -- 
-2.17.1
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
