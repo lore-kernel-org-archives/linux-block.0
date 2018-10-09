@@ -1,50 +1,51 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: axboe@kernel.dk
-Cc: linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Tang Junhui <tang.junhui.linux@gmail.com>,
-	stable@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH 06/15] bcache: correct dirty data statistics
-Date: Mon,  8 Oct 2018 20:41:12 +0800
-Message-Id: <20181008124121.20192-7-colyli@suse.de>
-In-Reply-To: <20181008124121.20192-1-colyli@suse.de>
-References: <20181008124121.20192-1-colyli@suse.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:38536 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727237AbeJIScD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:32:03 -0400
+Received: by mail-pf1-f196.google.com with SMTP id f29-v6so680369pff.5
+        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:15:37 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 42/45] lightnvm: do no update csecs and sos on 1.2
+Date: Tue,  9 Oct 2018 13:12:12 +0200
+Message-Id: <20181009111215.7653-43-mb@lightnvm.io>
+In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
+References: <20181009111215.7653-1-mb@lightnvm.io>
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui.linux@gmail.com>
+From: Javier González <javier@javigon.com>
 
-When bcache device is clean, dirty keys may still exist after
-journal replay, so we need to count these dirty keys even
-device in clean status, otherwise after writeback, the amount
-of dirty data would be incorrect.
+1.2 devices exposes their data and metadata size through the separate
+identify command. Make sure that the NVMe LBA format does not override
+these values.
 
-Signed-off-by: Tang Junhui <tang.junhui.linux@gmail.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Coly Li <colyli@suse.de>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- drivers/md/bcache/super.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/nvme/host/lightnvm.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index a99af19d2f91..4989c7d4d4d0 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1152,11 +1152,12 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
- 	}
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index 7d0a4d3b0a48..a4f3b263cd6c 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -977,6 +977,9 @@ void nvme_nvm_update_nvm_info(struct nvme_ns *ns)
+ 	struct nvm_dev *ndev = ns->ndev;
+ 	struct nvm_geo *geo = &ndev->geo;
  
- 	if (BDEV_STATE(&dc->sb) == BDEV_STATE_DIRTY) {
--		bch_sectors_dirty_init(&dc->disk);
- 		atomic_set(&dc->has_dirty, 1);
- 		bch_writeback_queue(dc);
- 	}
- 
-+	bch_sectors_dirty_init(&dc->disk);
++	if (geo->version == NVM_OCSSD_SPEC_12)
++		return;
 +
- 	bch_cached_dev_run(dc);
- 	bcache_device_link(&dc->disk, c, "bdev");
- 	atomic_inc(&c->attached_dev_nr);
+ 	geo->csecs = 1 << ns->lba_shift;
+ 	geo->sos = ns->ms;
+ }
 -- 
-2.19.0
+2.17.1
