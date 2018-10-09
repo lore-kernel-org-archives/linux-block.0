@@ -1,63 +1,58 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 07/30] blk-mq: provide mq_ops->busy() hook
-Date: Wed, 31 Oct 2018 11:58:59 -0600
-Message-Id: <20181031175922.8849-8-axboe@kernel.dk>
-In-Reply-To: <20181031175922.8849-1-axboe@kernel.dk>
-References: <20181031175922.8849-1-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:34115 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726523AbeJISas (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:30:48 -0400
+Received: by mail-pf1-f196.google.com with SMTP id k19-v6so684880pfi.1
+        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:14:22 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 20/45] lightnvm: pblk: fix write amplificiation calculation
+Date: Tue,  9 Oct 2018 13:11:50 +0200
+Message-Id: <20181009111215.7653-21-mb@lightnvm.io>
+In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
+References: <20181009111215.7653-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We'll hook into this from blk_lld_busy(), allowing blk-mq to also
-return whether or not a given queue currently has requests in
-progress.
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+When the user data counter exceeds 32 bits, the write amplification
+calculation does not provide the right value. Fix this by using
+div64_u64 in stead of div64.
+
+Fixes: 76758390f83e ("lightnvm: pblk: export write amplification counters to sysfs")
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- block/blk-core.c       | 2 ++
- include/linux/blk-mq.h | 6 ++++++
- 2 files changed, 8 insertions(+)
+ drivers/lightnvm/pblk-sysfs.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index bc6ea87d10e0..c99088d0e80b 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -3429,6 +3429,8 @@ int blk_lld_busy(struct request_queue *q)
+diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
+index 9fc3dfa168b4..e56eeeeb914e 100644
+--- a/drivers/lightnvm/pblk-sysfs.c
++++ b/drivers/lightnvm/pblk-sysfs.c
+@@ -337,7 +337,6 @@ static ssize_t pblk_get_write_amp(u64 user, u64 gc, u64 pad,
  {
- 	if (q->lld_busy_fn)
- 		return q->lld_busy_fn(q);
-+	if (q->mq_ops && q->mq_ops->busy)
-+		return q->mq_ops->busy(q);
+ 	int sz;
  
- 	return 0;
- }
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 2286dc12c6bc..5c8418ebbfd6 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -114,6 +114,7 @@ typedef void (busy_iter_fn)(struct blk_mq_hw_ctx *, struct request *, void *,
- typedef void (busy_tag_iter_fn)(struct request *, void *, bool);
- typedef int (poll_fn)(struct blk_mq_hw_ctx *, unsigned int);
- typedef int (map_queues_fn)(struct blk_mq_tag_set *set);
-+typedef bool (busy_fn)(struct request_queue *);
+-
+ 	sz = snprintf(page, PAGE_SIZE,
+ 			"user:%lld gc:%lld pad:%lld WA:",
+ 			user, gc, pad);
+@@ -349,7 +348,7 @@ static ssize_t pblk_get_write_amp(u64 user, u64 gc, u64 pad,
+ 		u32 wa_frac;
  
+ 		wa_int = (user + gc + pad) * 100000;
+-		wa_int = div_u64(wa_int, user);
++		wa_int = div64_u64(wa_int, user);
+ 		wa_int = div_u64_rem(wa_int, 100000, &wa_frac);
  
- struct blk_mq_ops {
-@@ -165,6 +166,11 @@ struct blk_mq_ops {
- 	/* Called from inside blk_get_request() */
- 	void (*initialize_rq_fn)(struct request *rq);
- 
-+	/*
-+	 * If set, returns whether or not this queue currently is busy
-+	 */
-+	busy_fn			*busy;
-+
- 	map_queues_fn		*map_queues;
- 
- #ifdef CONFIG_BLK_DEBUG_FS
+ 		sz += snprintf(page + sz, PAGE_SIZE - sz, "%llu.%05u\n",
 -- 
 2.17.1
