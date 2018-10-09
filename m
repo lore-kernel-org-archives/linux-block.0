@@ -1,424 +1,273 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-ide@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 24/28] block: remove request_list code
-Date: Thu, 25 Oct 2018 15:10:35 -0600
-Message-Id: <20181025211039.11559-25-axboe@kernel.dk>
-In-Reply-To: <20181025211039.11559-1-axboe@kernel.dk>
-References: <20181025211039.11559-1-axboe@kernel.dk>
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <343c844bbc5081d13ee4c9aa27ff3118f607e1cc.1539092112.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1539092111.git.christophe.leroy@c-s.fr>
+References: <cover.1539092111.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v3 12/24] powerpc/mm: use pte helpers in generic code
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Tue,  9 Oct 2018 13:51:56 +0000 (UTC)
 List-ID: <linux-block@vger.kernel.org>
 
-It's now dead code, nobody uses it.
+Get rid of platform specific _PAGE_XXXX in powerpc common code and
+use helpers instead.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+mm/dump_linuxpagetables.c will be handled separately
+
+Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- block/blk-cgroup.c         |  47 ----------------
- block/blk-core.c           |  75 --------------------------
- block/blk-mq.c             |   4 --
- block/blk.h                |   3 --
- include/linux/blk-cgroup.h | 108 -------------------------------------
- include/linux/blkdev.h     |  34 ------------
- 6 files changed, 271 deletions(-)
+ arch/powerpc/include/asm/book3s/32/pgtable.h |  9 +++------
+ arch/powerpc/include/asm/nohash/32/pgtable.h | 12 ++++++++----
+ arch/powerpc/include/asm/nohash/pgtable.h    |  3 +--
+ arch/powerpc/mm/pgtable.c                    | 21 +++++++--------------
+ arch/powerpc/mm/pgtable_32.c                 | 15 ++++++++-------
+ arch/powerpc/mm/pgtable_64.c                 | 14 +++++++-------
+ arch/powerpc/xmon/xmon.c                     | 12 +++++++-----
+ 7 files changed, 41 insertions(+), 45 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 5f10d755ec52..020869a37d11 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -76,9 +76,6 @@ static void blkg_free(struct blkcg_gq *blkg)
- 		if (blkg->pd[i])
- 			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
- 
--	if (blkg->blkcg != &blkcg_root)
--		blk_exit_rl(blkg->q, &blkg->rl);
+diff --git a/arch/powerpc/include/asm/book3s/32/pgtable.h b/arch/powerpc/include/asm/book3s/32/pgtable.h
+index a6ca799e0eb5..a0dc3a3eef33 100644
+--- a/arch/powerpc/include/asm/book3s/32/pgtable.h
++++ b/arch/powerpc/include/asm/book3s/32/pgtable.h
+@@ -331,17 +331,14 @@ static inline bool pte_ci(pte_t pte)
+ #define pte_access_permitted pte_access_permitted
+ static inline bool pte_access_permitted(pte_t pte, bool write)
+ {
+-	unsigned long pteval = pte_val(pte);
+ 	/*
+ 	 * A read-only access is controlled by _PAGE_USER bit.
+ 	 * We have _PAGE_READ set for WRITE and EXECUTE
+ 	 */
+-	unsigned long need_pte_bits = _PAGE_PRESENT | _PAGE_USER;
 -
- 	blkg_rwstat_exit(&blkg->stat_ios);
- 	blkg_rwstat_exit(&blkg->stat_bytes);
- 	kfree(blkg);
-@@ -142,13 +139,6 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
- 	INIT_LIST_HEAD(&blkg->q_node);
- 	blkg->blkcg = blkcg;
+-	if (write)
+-		need_pte_bits |= _PAGE_WRITE;
++	if (!pte_present(pte) || !pte_user(pte) || !pte_read(pte))
++		return false;
  
--	/* root blkg uses @q->root_rl, init rl only for !root blkgs */
--	if (blkcg != &blkcg_root) {
--		if (blk_init_rl(&blkg->rl, q, gfp_mask))
--			goto err_free;
--		blkg->rl.blkg = blkg;
--	}
--
- 	for (i = 0; i < BLKCG_MAX_POLS; i++) {
- 		struct blkcg_policy *pol = blkcg_policy[i];
- 		struct blkg_policy_data *pd;
-@@ -448,42 +438,6 @@ static void blkg_destroy_all(struct request_queue *q)
+-	if ((pteval & need_pte_bits) != need_pte_bits)
++	if (write && !pte_write(pte))
+ 		return false;
+ 
+ 	return true;
+diff --git a/arch/powerpc/include/asm/nohash/32/pgtable.h b/arch/powerpc/include/asm/nohash/32/pgtable.h
+index 6fecfd7854f5..a4156da4a7a4 100644
+--- a/arch/powerpc/include/asm/nohash/32/pgtable.h
++++ b/arch/powerpc/include/asm/nohash/32/pgtable.h
+@@ -277,7 +277,10 @@ static inline pte_t ptep_get_and_clear(struct mm_struct *mm, unsigned long addr,
+ static inline void ptep_set_wrprotect(struct mm_struct *mm, unsigned long addr,
+ 				      pte_t *ptep)
+ {
+-	pte_update(ptep, (_PAGE_RW | _PAGE_HWWRITE), _PAGE_RO);
++	unsigned long clr = ~pte_val(pte_wrprotect(__pte(~0)));
++	unsigned long set = pte_val(pte_wrprotect(__pte(0)));
++
++	pte_update(ptep, clr, set);
+ }
+ static inline void huge_ptep_set_wrprotect(struct mm_struct *mm,
+ 					   unsigned long addr, pte_t *ptep)
+@@ -291,9 +294,10 @@ static inline void __ptep_set_access_flags(struct vm_area_struct *vma,
+ 					   unsigned long address,
+ 					   int psize)
+ {
+-	unsigned long set = pte_val(entry) &
+-		(_PAGE_DIRTY | _PAGE_ACCESSED | _PAGE_RW | _PAGE_EXEC);
+-	unsigned long clr = ~pte_val(entry) & (_PAGE_RO | _PAGE_NA);
++	pte_t pte_set = pte_mkyoung(pte_mkdirty(pte_mkwrite(pte_mkexec(__pte(0)))));
++	pte_t pte_clr = pte_mkyoung(pte_mkdirty(pte_mkwrite(pte_mkexec(__pte(~0)))));
++	unsigned long set = pte_val(entry) & pte_val(pte_set);
++	unsigned long clr = ~pte_val(entry) & ~pte_val(pte_clr);
+ 
+ 	pte_update(ptep, clr, set);
+ 
+diff --git a/arch/powerpc/include/asm/nohash/pgtable.h b/arch/powerpc/include/asm/nohash/pgtable.h
+index b256e38a047c..062d96233673 100644
+--- a/arch/powerpc/include/asm/nohash/pgtable.h
++++ b/arch/powerpc/include/asm/nohash/pgtable.h
+@@ -32,8 +32,7 @@ static inline pgprot_t pte_pgprot(pte_t pte)	{ return __pgprot(pte_val(pte) & PA
+  */
+ static inline int pte_protnone(pte_t pte)
+ {
+-	return (pte_val(pte) &
+-		(_PAGE_PRESENT | _PAGE_USER)) == _PAGE_PRESENT;
++	return pte_present(pte) && !pte_user(pte);
+ }
+ 
+ static inline int pmd_protnone(pmd_t pmd)
+diff --git a/arch/powerpc/mm/pgtable.c b/arch/powerpc/mm/pgtable.c
+index f97d9c3760e3..ca4b1f7ac39d 100644
+--- a/arch/powerpc/mm/pgtable.c
++++ b/arch/powerpc/mm/pgtable.c
+@@ -44,20 +44,13 @@ static inline int is_exec_fault(void)
+ static inline int pte_looks_normal(pte_t pte)
+ {
+ 
+-#if defined(CONFIG_PPC_BOOK3S_64)
+-	if ((pte_val(pte) & (_PAGE_PRESENT | _PAGE_SPECIAL)) == _PAGE_PRESENT) {
++	if (pte_present(pte) && !pte_special(pte)) {
+ 		if (pte_ci(pte))
+ 			return 0;
+ 		if (pte_user(pte))
+ 			return 1;
+ 	}
+ 	return 0;
+-#else
+-	return (pte_val(pte) &
+-		(_PAGE_PRESENT | _PAGE_SPECIAL | _PAGE_NO_CACHE | _PAGE_USER |
+-		 _PAGE_PRIVILEGED)) ==
+-		(_PAGE_PRESENT | _PAGE_USER);
+-#endif
+ }
+ 
+ static struct page *maybe_pte_to_page(pte_t pte)
+@@ -117,7 +110,7 @@ static pte_t set_pte_filter(pte_t pte)
+ 	struct page *pg;
+ 
+ 	/* No exec permission in the first place, move on */
+-	if (!(pte_val(pte) & _PAGE_EXEC) || !pte_looks_normal(pte))
++	if (!pte_exec(pte) || !pte_looks_normal(pte))
+ 		return pte;
+ 
+ 	/* If you set _PAGE_EXEC on weird pages you're on your own */
+@@ -137,7 +130,7 @@ static pte_t set_pte_filter(pte_t pte)
  	}
  
- 	q->root_blkg = NULL;
--	q->root_rl.blkg = NULL;
--}
--
--/*
-- * The next function used by blk_queue_for_each_rl().  It's a bit tricky
-- * because the root blkg uses @q->root_rl instead of its own rl.
-- */
--struct request_list *__blk_queue_next_rl(struct request_list *rl,
--					 struct request_queue *q)
--{
--	struct list_head *ent;
--	struct blkcg_gq *blkg;
--
--	/*
--	 * Determine the current blkg list_head.  The first entry is
--	 * root_rl which is off @q->blkg_list and mapped to the head.
--	 */
--	if (rl == &q->root_rl) {
--		ent = &q->blkg_list;
--		/* There are no more block groups, hence no request lists */
--		if (list_empty(ent))
--			return NULL;
--	} else {
--		blkg = container_of(rl, struct blkcg_gq, rl);
--		ent = &blkg->q_node;
--	}
--
--	/* walk to the next list_head, skip root blkcg */
--	ent = ent->next;
--	if (ent == &q->root_blkg->q_node)
--		ent = ent->next;
--	if (ent == &q->blkg_list)
--		return NULL;
--
--	blkg = container_of(ent, struct blkcg_gq, q_node);
--	return &blkg->rl;
+ 	/* Else, we filter out _PAGE_EXEC */
+-	return __pte(pte_val(pte) & ~_PAGE_EXEC);
++	return pte_exprotect(pte);
  }
  
- static int blkcg_reset_stats(struct cgroup_subsys_state *css,
-@@ -1278,7 +1232,6 @@ int blkcg_init_queue(struct request_queue *q)
- 	if (IS_ERR(blkg))
- 		goto err_unlock;
- 	q->root_blkg = blkg;
--	q->root_rl.blkg = blkg;
- 	spin_unlock_irq(q->queue_lock);
- 	rcu_read_unlock();
+ static pte_t set_access_flags_filter(pte_t pte, struct vm_area_struct *vma,
+@@ -150,7 +143,7 @@ static pte_t set_access_flags_filter(pte_t pte, struct vm_area_struct *vma,
+ 	 * if necessary. Also if _PAGE_EXEC is already set, same deal,
+ 	 * we just bail out
+ 	 */
+-	if (dirty || (pte_val(pte) & _PAGE_EXEC) || !is_exec_fault())
++	if (dirty || pte_exec(pte) || !is_exec_fault())
+ 		return pte;
  
-diff --git a/block/blk-core.c b/block/blk-core.c
-index dd1328f4dc31..e8f60ed456a2 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -447,81 +447,6 @@ void blk_cleanup_queue(struct request_queue *q)
+ #ifdef CONFIG_DEBUG_VM
+@@ -176,7 +169,7 @@ static pte_t set_access_flags_filter(pte_t pte, struct vm_area_struct *vma,
+ 	set_bit(PG_arch_1, &pg->flags);
+ 
+  bail:
+-	return __pte(pte_val(pte) | _PAGE_EXEC);
++	return pte_mkexec(pte);
  }
- EXPORT_SYMBOL(blk_cleanup_queue);
  
--/* Allocate memory local to the request queue */
--static void *alloc_request_simple(gfp_t gfp_mask, void *data)
--{
--	struct request_queue *q = data;
--
--	return kmem_cache_alloc_node(request_cachep, gfp_mask, q->node);
--}
--
--static void free_request_simple(void *element, void *data)
--{
--	kmem_cache_free(request_cachep, element);
--}
--
--static void *alloc_request_size(gfp_t gfp_mask, void *data)
--{
--	struct request_queue *q = data;
--	struct request *rq;
--
--	rq = kmalloc_node(sizeof(struct request) + q->cmd_size, gfp_mask,
--			q->node);
--	if (rq && q->init_rq_fn && q->init_rq_fn(q, rq, gfp_mask) < 0) {
--		kfree(rq);
--		rq = NULL;
--	}
--	return rq;
--}
--
--static void free_request_size(void *element, void *data)
--{
--	struct request_queue *q = data;
--
--	if (q->exit_rq_fn)
--		q->exit_rq_fn(q, element);
--	kfree(element);
--}
--
--int blk_init_rl(struct request_list *rl, struct request_queue *q,
--		gfp_t gfp_mask)
--{
--	if (unlikely(rl->rq_pool) || q->mq_ops)
--		return 0;
--
--	rl->q = q;
--	rl->count[BLK_RW_SYNC] = rl->count[BLK_RW_ASYNC] = 0;
--	rl->starved[BLK_RW_SYNC] = rl->starved[BLK_RW_ASYNC] = 0;
--	init_waitqueue_head(&rl->wait[BLK_RW_SYNC]);
--	init_waitqueue_head(&rl->wait[BLK_RW_ASYNC]);
--
--	if (q->cmd_size) {
--		rl->rq_pool = mempool_create_node(BLKDEV_MIN_RQ,
--				alloc_request_size, free_request_size,
--				q, gfp_mask, q->node);
--	} else {
--		rl->rq_pool = mempool_create_node(BLKDEV_MIN_RQ,
--				alloc_request_simple, free_request_simple,
--				q, gfp_mask, q->node);
--	}
--	if (!rl->rq_pool)
--		return -ENOMEM;
--
--	if (rl != &q->root_rl)
--		WARN_ON_ONCE(!blk_get_queue(q));
--
--	return 0;
--}
--
--void blk_exit_rl(struct request_queue *q, struct request_list *rl)
--{
--	if (rl->rq_pool) {
--		mempool_destroy(rl->rq_pool);
--		if (rl != &q->root_rl)
--			blk_put_queue(q);
--	}
--}
--
- struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
+ #endif /* CONFIG_PPC_BOOK3S */
+@@ -191,10 +184,10 @@ void set_pte_at(struct mm_struct *mm, unsigned long addr, pte_t *ptep,
+ 	 * Make sure hardware valid bit is not set. We don't do
+ 	 * tlb flush for this update.
+ 	 */
+-	VM_WARN_ON(pte_val(*ptep) & _PAGE_PRESENT);
++	VM_WARN_ON(pte_hw_valid(*ptep));
+ 
+ 	/* Add the pte bit when trying to set a pte */
+-	pte = __pte(pte_val(pte) | _PAGE_PTE);
++	pte = pte_mkpte(pte);
+ 
+ 	/* Note: mm->context.id might not yet have been assigned as
+ 	 * this context might not have been activated yet when this
+diff --git a/arch/powerpc/mm/pgtable_32.c b/arch/powerpc/mm/pgtable_32.c
+index 01f348938328..5877f5aa8f5d 100644
+--- a/arch/powerpc/mm/pgtable_32.c
++++ b/arch/powerpc/mm/pgtable_32.c
+@@ -112,15 +112,17 @@ EXPORT_SYMBOL(ioremap_coherent);
+ void __iomem *
+ ioremap_prot(phys_addr_t addr, unsigned long size, unsigned long flags)
  {
- 	return blk_alloc_queue_node(gfp_mask, NUMA_NO_NODE, NULL);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a58d2d953876..d43c9232c77c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -326,10 +326,6 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	rq->end_io_data = NULL;
- 	rq->next_rq = NULL;
++	pte_t pte = __pte(flags);
++
+ 	/* writeable implies dirty for kernel addresses */
+-	if ((flags & (_PAGE_RW | _PAGE_RO)) != _PAGE_RO)
+-		flags |= _PAGE_DIRTY | _PAGE_HWWRITE;
++	if (pte_write(pte))
++		pte = pte_mkdirty(pte);
  
--#ifdef CONFIG_BLK_CGROUP
--	rq->rl = NULL;
--#endif
--
- 	data->ctx->rq_dispatched[op_is_sync(op)]++;
- 	refcount_set(&rq->ref, 1);
- 	return rq;
-diff --git a/block/blk.h b/block/blk.h
-index 4ae6cacb4548..e925cf4fe4de 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -120,9 +120,6 @@ struct blk_flush_queue *blk_alloc_flush_queue(struct request_queue *q,
- 		int node, int cmd_size, gfp_t flags);
- void blk_free_flush_queue(struct blk_flush_queue *q);
+ 	/* we don't want to let _PAGE_USER and _PAGE_EXEC leak out */
+-	flags &= ~(_PAGE_USER | _PAGE_EXEC);
+-	flags |= _PAGE_PRIVILEGED;
++	pte = pte_exprotect(pte);
++	pte = pte_mkprivileged(pte);
  
--int blk_init_rl(struct request_list *rl, struct request_queue *q,
--		gfp_t gfp_mask);
--void blk_exit_rl(struct request_queue *q, struct request_list *rl);
- void blk_exit_queue(struct request_queue *q);
- void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
- 			struct bio *bio);
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 1e76ceebeb5d..f2c067071336 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -122,9 +122,6 @@ struct blkcg_gq {
- 	/* all non-root blkcg_gq's are guaranteed to have access to parent */
- 	struct blkcg_gq			*parent;
+-	return __ioremap_caller(addr, size, __pgprot(flags), __builtin_return_address(0));
++	return __ioremap_caller(addr, size, pte_pgprot(pte), __builtin_return_address(0));
+ }
+ EXPORT_SYMBOL(ioremap_prot);
  
--	/* request allocation list for this blkcg-q pair */
--	struct request_list		rl;
--
- 	/* reference count */
- 	struct percpu_ref		refcnt;
- 
-@@ -561,105 +558,6 @@ static inline void blkg_put(struct blkcg_gq *blkg)
- 		if (((d_blkg) = __blkg_lookup(css_to_blkcg(pos_css),	\
- 					      (p_blkg)->q, false)))
- 
--/**
-- * blk_get_rl - get request_list to use
-- * @q: request_queue of interest
-- * @bio: bio which will be attached to the allocated request (may be %NULL)
-- *
-- * The caller wants to allocate a request from @q to use for @bio.  Find
-- * the request_list to use and obtain a reference on it.  Should be called
-- * under queue_lock.  This function is guaranteed to return non-%NULL
-- * request_list.
-- */
--static inline struct request_list *blk_get_rl(struct request_queue *q,
--					      struct bio *bio)
--{
--	struct blkcg *blkcg;
--	struct blkcg_gq *blkg;
--
--	rcu_read_lock();
--
--	if (bio && bio->bi_blkg) {
--		blkcg = bio->bi_blkg->blkcg;
--		if (blkcg == &blkcg_root)
--			goto rl_use_root;
--
--		blkg_get(bio->bi_blkg);
--		rcu_read_unlock();
--		return &bio->bi_blkg->rl;
--	}
--
--	blkcg = css_to_blkcg(blkcg_css());
--	if (blkcg == &blkcg_root)
--		goto rl_use_root;
--
--	blkg = blkg_lookup(blkcg, q);
--	if (unlikely(!blkg))
--		blkg = __blkg_lookup_create(blkcg, q);
--
--	if (blkg->blkcg == &blkcg_root || !blkg_tryget(blkg))
--		goto rl_use_root;
--
--	rcu_read_unlock();
--	return &blkg->rl;
--
--	/*
--	 * Each blkg has its own request_list, however, the root blkcg
--	 * uses the request_queue's root_rl.  This is to avoid most
--	 * overhead for the root blkcg.
--	 */
--rl_use_root:
--	rcu_read_unlock();
--	return &q->root_rl;
--}
--
--/**
-- * blk_put_rl - put request_list
-- * @rl: request_list to put
-- *
-- * Put the reference acquired by blk_get_rl().  Should be called under
-- * queue_lock.
-- */
--static inline void blk_put_rl(struct request_list *rl)
--{
--	if (rl->blkg->blkcg != &blkcg_root)
--		blkg_put(rl->blkg);
--}
--
--/**
-- * blk_rq_set_rl - associate a request with a request_list
-- * @rq: request of interest
-- * @rl: target request_list
-- *
-- * Associate @rq with @rl so that accounting and freeing can know the
-- * request_list @rq came from.
-- */
--static inline void blk_rq_set_rl(struct request *rq, struct request_list *rl)
--{
--	rq->rl = rl;
--}
--
--/**
-- * blk_rq_rl - return the request_list a request came from
-- * @rq: request of interest
-- *
-- * Return the request_list @rq is allocated from.
-- */
--static inline struct request_list *blk_rq_rl(struct request *rq)
--{
--	return rq->rl;
--}
--
--struct request_list *__blk_queue_next_rl(struct request_list *rl,
--					 struct request_queue *q);
--/**
-- * blk_queue_for_each_rl - iterate through all request_lists of a request_queue
-- *
-- * Should be used under queue_lock.
-- */
--#define blk_queue_for_each_rl(rl, q)	\
--	for ((rl) = &(q)->root_rl; (rl); (rl) = __blk_queue_next_rl((rl), (q)))
--
- static inline int blkg_stat_init(struct blkg_stat *stat, gfp_t gfp)
+@@ -235,8 +237,7 @@ int map_kernel_page(unsigned long va, phys_addr_t pa, pgprot_t prot)
+ 		/* The PTE should never be already set nor present in the
+ 		 * hash table
+ 		 */
+-		BUG_ON((pte_val(*pg) & (_PAGE_PRESENT | _PAGE_HASHPTE)) &&
+-		       pgprot_val(prot));
++		BUG_ON((pte_present(*pg) | pte_hashpte(*pg)) && pgprot_val(prot));
+ 		set_pte_at(&init_mm, va, pg, pfn_pte(pa >> PAGE_SHIFT, prot));
+ 	}
+ 	smp_wmb();
+diff --git a/arch/powerpc/mm/pgtable_64.c b/arch/powerpc/mm/pgtable_64.c
+index b0f4a4b4f62b..fb1375c07e8c 100644
+--- a/arch/powerpc/mm/pgtable_64.c
++++ b/arch/powerpc/mm/pgtable_64.c
+@@ -230,23 +230,23 @@ void __iomem *ioremap_coherent(phys_addr_t addr, unsigned long size)
+ void __iomem * ioremap_prot(phys_addr_t addr, unsigned long size,
+ 			     unsigned long flags)
  {
- 	int ret;
-@@ -993,12 +891,6 @@ static inline char *blkg_path(struct blkcg_gq *blkg) { return NULL; }
- static inline void blkg_get(struct blkcg_gq *blkg) { }
- static inline void blkg_put(struct blkcg_gq *blkg) { }
++	pte_t pte = __pte(flags);
+ 	void *caller = __builtin_return_address(0);
  
--static inline struct request_list *blk_get_rl(struct request_queue *q,
--					      struct bio *bio) { return &q->root_rl; }
--static inline void blk_put_rl(struct request_list *rl) { }
--static inline void blk_rq_set_rl(struct request *rq, struct request_list *rl) { }
--static inline struct request_list *blk_rq_rl(struct request *rq) { return &rq->q->root_rl; }
--
- static inline void blkcg_bio_issue_init(struct bio *bio) { }
- static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 					 struct bio *bio) { return true; }
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 115199e7c581..95e119409490 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -58,22 +58,6 @@ struct blk_stat_callback;
+ 	/* writeable implies dirty for kernel addresses */
+-	if (flags & _PAGE_WRITE)
+-		flags |= _PAGE_DIRTY;
++	if (pte_write(pte))
++		pte = pte_mkdirty(pte);
  
- typedef void (rq_end_io_fn)(struct request *, blk_status_t);
+ 	/* we don't want to let _PAGE_EXEC leak out */
+-	flags &= ~_PAGE_EXEC;
++	pte = pte_exprotect(pte);
+ 	/*
+ 	 * Force kernel mapping.
+ 	 */
+-	flags &= ~_PAGE_USER;
+-	flags |= _PAGE_PRIVILEGED;
++	pte = pte_mkprivileged(pte);
  
--struct request_list {
--	struct request_queue	*q;	/* the queue this rl belongs to */
--#ifdef CONFIG_BLK_CGROUP
--	struct blkcg_gq		*blkg;	/* blkg this request pool belongs to */
--#endif
--	/*
--	 * count[], starved[], and wait[] are indexed by
--	 * BLK_RW_SYNC/BLK_RW_ASYNC
--	 */
--	int			count[2];
--	int			starved[2];
--	mempool_t		*rq_pool;
--	wait_queue_head_t	wait[2];
--	unsigned int		flags;
--};
--
- /*
-  * request flags */
- typedef __u32 __bitwise req_flags_t;
-@@ -259,10 +243,6 @@ struct request {
+ 	if (ppc_md.ioremap)
+-		return ppc_md.ioremap(addr, size, __pgprot(flags), caller);
+-	return __ioremap_caller(addr, size, __pgprot(flags), caller);
++		return ppc_md.ioremap(addr, size, pte_pgprot(pte), caller);
++	return __ioremap_caller(addr, size, pte_pgprot(pte), caller);
+ }
  
- 	/* for bidi */
- 	struct request *next_rq;
--
--#ifdef CONFIG_BLK_CGROUP
--	struct request_list *rl;		/* rl this rq is alloced from */
--#endif
- };
  
- static inline bool blk_op_is_scsi(unsigned int op)
-@@ -313,8 +293,6 @@ struct bio_vec;
- typedef void (softirq_done_fn)(struct request *);
- typedef int (dma_drain_needed_fn)(struct request *);
- typedef int (bsg_job_fn) (struct bsg_job *);
--typedef int (init_rq_fn)(struct request_queue *, struct request *, gfp_t);
--typedef void (exit_rq_fn)(struct request_queue *, struct request *);
+diff --git a/arch/powerpc/xmon/xmon.c b/arch/powerpc/xmon/xmon.c
+index c70d17c9a6ba..167271c7a97c 100644
+--- a/arch/powerpc/xmon/xmon.c
++++ b/arch/powerpc/xmon/xmon.c
+@@ -2993,15 +2993,17 @@ static void show_task(struct task_struct *tsk)
+ #ifdef CONFIG_PPC_BOOK3S_64
+ void format_pte(void *ptep, unsigned long pte)
+ {
++	pte_t entry = __pte(pte);
++
+ 	printf("ptep @ 0x%016lx = 0x%016lx\n", (unsigned long)ptep, pte);
+ 	printf("Maps physical address = 0x%016lx\n", pte & PTE_RPN_MASK);
  
- enum blk_eh_timer_return {
- 	BLK_EH_DONE,		/* drivers has completed the command */
-@@ -430,22 +408,10 @@ struct request_queue {
- 	struct blk_queue_stats	*stats;
- 	struct rq_qos		*rq_qos;
+ 	printf("Flags = %s%s%s%s%s\n",
+-	       (pte & _PAGE_ACCESSED) ? "Accessed " : "",
+-	       (pte & _PAGE_DIRTY)    ? "Dirty " : "",
+-	       (pte & _PAGE_READ)     ? "Read " : "",
+-	       (pte & _PAGE_WRITE)    ? "Write " : "",
+-	       (pte & _PAGE_EXEC)     ? "Exec " : "");
++	       pte_young(entry) ? "Accessed " : "",
++	       pte_dirty(entry) ? "Dirty " : "",
++	       pte_read(entry)  ? "Read " : "",
++	       pte_write(entry) ? "Write " : "",
++	       pte_exec(entry)  ? "Exec " : "");
+ }
  
--	/*
--	 * If blkcg is not used, @q->root_rl serves all requests.  If blkcg
--	 * is used, root blkg allocates from @q->root_rl and all other
--	 * blkgs from their own blkg->rl.  Which one to use should be
--	 * determined using bio_request_list().
--	 */
--	struct request_list	root_rl;
--
- 	make_request_fn		*make_request_fn;
- 	poll_q_fn		*poll_fn;
- 	softirq_done_fn		*softirq_done_fn;
- 	dma_drain_needed_fn	*dma_drain_needed;
--	/* Called just after a request is allocated */
--	init_rq_fn		*init_rq_fn;
--	/* Called just before a request is freed */
--	exit_rq_fn		*exit_rq_fn;
- 
- 	const struct blk_mq_ops	*mq_ops;
- 
+ static void show_pte(unsigned long addr)
 -- 
-2.17.1
+2.13.3
