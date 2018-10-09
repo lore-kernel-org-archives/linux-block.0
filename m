@@ -1,122 +1,131 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:35828 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727670AbeJISbB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:31:01 -0400
-Received: by mail-pl1-f194.google.com with SMTP id f8-v6so680932plb.2
-        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:14:34 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 24/45] lightnvm: pblk: add trace events for pblk state changes
-Date: Tue,  9 Oct 2018 13:11:54 +0200
-Message-Id: <20181009111215.7653-25-mb@lightnvm.io>
-In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
-References: <20181009111215.7653-1-mb@lightnvm.io>
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 9 Oct 2018 10:49:38 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: axboe@kernel.dk, keith.busch@linux.intel.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] blk-mq: adjust debugfs and sysfs register when
+ updating nr_hw_queues
+Message-ID: <20181009024937.GA18673@ming.t460p>
+References: <1538044984-2147-1-git-send-email-jianchao.w.wang@oracle.com>
+ <1538044984-2147-2-git-send-email-jianchao.w.wang@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1538044984-2147-2-git-send-email-jianchao.w.wang@oracle.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+On Thu, Sep 27, 2018 at 06:43:03PM +0800, Jianchao Wang wrote:
+> blk-mq debugfs and sysfs entries need to be removed before updating
+> queue map, otherwise, we get get wrong result there. This patch fixes
+> it and remove the redundant debugfs and sysfs register/unregister
+> operations during __blk_mq_update_nr_hw_queues.
+> 
+> Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+> ---
+>  block/blk-mq.c | 39 ++++++++++++---------------------------
+>  1 file changed, 12 insertions(+), 27 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 85a1c1a..6356455 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2137,8 +2137,6 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+>  		struct blk_mq_tag_set *set,
+>  		struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
+>  {
+> -	blk_mq_debugfs_unregister_hctx(hctx);
+> -
+>  	if (blk_mq_hw_queue_mapped(hctx))
+>  		blk_mq_tag_idle(hctx);
+>  
+> @@ -2165,6 +2163,7 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
+>  	queue_for_each_hw_ctx(q, hctx, i) {
+>  		if (i == nr_queue)
+>  			break;
+> +		blk_mq_debugfs_unregister_hctx(hctx);
+>  		blk_mq_exit_hctx(q, set, hctx, i);
+>  	}
+>  }
+> @@ -2222,8 +2221,6 @@ static int blk_mq_init_hctx(struct request_queue *q,
+>  	if (hctx->flags & BLK_MQ_F_BLOCKING)
+>  		init_srcu_struct(hctx->srcu);
+>  
+> -	blk_mq_debugfs_register_hctx(q, hctx);
+> -
+>  	return 0;
+>  
+>   free_fq:
+> @@ -2512,8 +2509,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+>  	int i, j;
+>  	struct blk_mq_hw_ctx **hctxs = q->queue_hw_ctx;
+>  
+> -	blk_mq_sysfs_unregister(q);
+> -
+>  	/* protect against switching io scheduler  */
+>  	mutex_lock(&q->sysfs_lock);
+>  	for (i = 0; i < set->nr_hw_queues; i++) {
+> @@ -2561,7 +2556,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+>  	}
+>  	q->nr_hw_queues = i;
+>  	mutex_unlock(&q->sysfs_lock);
+> -	blk_mq_sysfs_register(q);
+>  }
+>  
+>  struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+> @@ -2659,25 +2653,6 @@ void blk_mq_free_queue(struct request_queue *q)
+>  	blk_mq_exit_hw_queues(q, set, set->nr_hw_queues);
+>  }
+>  
+> -/* Basically redo blk_mq_init_queue with queue frozen */
+> -static void blk_mq_queue_reinit(struct request_queue *q)
+> -{
+> -	WARN_ON_ONCE(!atomic_read(&q->mq_freeze_depth));
+> -
+> -	blk_mq_debugfs_unregister_hctxs(q);
+> -	blk_mq_sysfs_unregister(q);
+> -
+> -	/*
+> -	 * redo blk_mq_init_cpu_queues and blk_mq_init_hw_queues. FIXME: maybe
+> -	 * we should change hctx numa_node according to the new topology (this
+> -	 * involves freeing and re-allocating memory, worth doing?)
+> -	 */
+> -	blk_mq_map_swqueue(q);
+> -
+> -	blk_mq_sysfs_register(q);
+> -	blk_mq_debugfs_register_hctxs(q);
+> -}
+> -
+>  static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+>  {
+>  	int i;
+> @@ -2987,11 +2962,21 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+>  		if (!blk_mq_elv_switch_none(&head, q))
+>  			goto switch_back;
+>  
+> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+> +		blk_mq_debugfs_unregister_hctxs(q);
+> +		blk_mq_sysfs_unregister(q);
+> +	}
+> +
+>  	set->nr_hw_queues = nr_hw_queues;
+>  	blk_mq_update_queue_map(set);
+>  	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+>  		blk_mq_realloc_hw_ctxs(set, q);
+> -		blk_mq_queue_reinit(q);
+> +		blk_mq_map_swqueue(q);
+> +	}
+> +
+> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+> +		blk_mq_sysfs_register(q);
+> +		blk_mq_debugfs_register_hctxs(q);
+>  	}
+>  
+>  switch_back:
+> -- 
+> 2.7.4
+> 
 
-Add trace events for tracking pblk state changes.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
----
- drivers/lightnvm/pblk-core.c  |  3 +++
- drivers/lightnvm/pblk-init.c  |  1 +
- drivers/lightnvm/pblk-trace.h | 28 ++++++++++++++++++++++++++++
- 3 files changed, 32 insertions(+)
-
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index ef52c1647f88..c482ef7dd4b5 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1503,6 +1503,7 @@ static void pblk_stop_writes(struct pblk *pblk, struct pblk_line *line)
- 
- 	pblk_set_space_limit(pblk);
- 	pblk->state = PBLK_STATE_STOPPING;
-+	trace_pblk_state(pblk_disk_name(pblk), pblk->state);
- }
- 
- static void pblk_line_close_meta_sync(struct pblk *pblk)
-@@ -1552,6 +1553,7 @@ void __pblk_pipeline_flush(struct pblk *pblk)
- 		return;
- 	}
- 	pblk->state = PBLK_STATE_RECOVERING;
-+	trace_pblk_state(pblk_disk_name(pblk), pblk->state);
- 	spin_unlock(&l_mg->free_lock);
- 
- 	pblk_flush_writer(pblk);
-@@ -1573,6 +1575,7 @@ void __pblk_pipeline_stop(struct pblk *pblk)
- 
- 	spin_lock(&l_mg->free_lock);
- 	pblk->state = PBLK_STATE_STOPPED;
-+	trace_pblk_state(pblk_disk_name(pblk), pblk->state);
- 	l_mg->data_line = NULL;
- 	l_mg->data_next = NULL;
- 	spin_unlock(&l_mg->free_lock);
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index fca37da16266..9aebdee8e4c9 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -1109,6 +1109,7 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 	pblk->dev = dev;
- 	pblk->disk = tdisk;
- 	pblk->state = PBLK_STATE_RUNNING;
-+	trace_pblk_state(pblk_disk_name(pblk), pblk->state);
- 	pblk->gc.gc_enabled = 0;
- 
- 	if (!(geo->version == NVM_OCSSD_SPEC_12 ||
-diff --git a/drivers/lightnvm/pblk-trace.h b/drivers/lightnvm/pblk-trace.h
-index f9aa9e25e428..c171d0450c07 100644
---- a/drivers/lightnvm/pblk-trace.h
-+++ b/drivers/lightnvm/pblk-trace.h
-@@ -25,6 +25,13 @@ struct ppa_addr;
- 	{ PBLK_LINESTATE_CORRUPT,	"CORRUPT"	})
- 
- 
-+#define show_pblk_state(state) __print_symbolic(state,		\
-+	{ PBLK_STATE_RUNNING,		"RUNNING",	},	\
-+	{ PBLK_STATE_STOPPING,		"STOPPING",	},	\
-+	{ PBLK_STATE_RECOVERING,	"RECOVERING",	},	\
-+	{ PBLK_STATE_STOPPED,		"STOPPED"	})
-+
-+
- TRACE_EVENT(pblk_chunk_state,
- 
- 	TP_PROTO(const char *name, struct ppa_addr *ppa, int state),
-@@ -75,6 +82,27 @@ TRACE_EVENT(pblk_line_state,
- 
- );
- 
-+TRACE_EVENT(pblk_state,
-+
-+	TP_PROTO(const char *name, int state),
-+
-+	TP_ARGS(name, state),
-+
-+	TP_STRUCT__entry(
-+		__string(name, name)
-+		__field(int, state);
-+	),
-+
-+	TP_fast_assign(
-+		__assign_str(name, name);
-+		__entry->state = state;
-+	),
-+
-+	TP_printk("dev=%s state=%s", __get_str(name),
-+			show_pblk_state((int)__entry->state))
-+
-+);
-+
- #endif /* !defined(_TRACE_PBLK_H) || defined(TRACE_HEADER_MULTI_READ) */
- 
- /* This part must be outside protection */
--- 
-2.17.1
+Thanks,
+Ming
