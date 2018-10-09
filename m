@@ -1,326 +1,78 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	David Miller <davem@davemloft.net>
-Subject: [PATCH 01/17] sunvdc: convert to blk-mq
-Date: Thu, 11 Oct 2018 10:58:53 -0600
-Message-Id: <20181011165909.32615-2-axboe@kernel.dk>
-In-Reply-To: <20181011165909.32615-1-axboe@kernel.dk>
-References: <20181011165909.32615-1-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:41987 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726418AbeJIS3v (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:29:51 -0400
+Received: by mail-pg1-f195.google.com with SMTP id i4-v6so645405pgq.9
+        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:13:24 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 03/45] lightnvm: pblk: fix rqd.error return value in pblk_blk_erase_sync
+Date: Tue,  9 Oct 2018 13:11:33 +0200
+Message-Id: <20181009111215.7653-4-mb@lightnvm.io>
+In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
+References: <20181009111215.7653-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Convert from the old request_fn style driver to blk-mq.
+rqd.error is masked by the return value of pblk_submit_io_sync.
+The rqd structure is then passed on to the end_io function, which
+assumes that any error should lead to a chunk being marked
+offline/bad. Since the pblk_submit_io_sync can fail before the
+command is issued to the device, the error value maybe not correspond
+to a media failure, leading to chunks being immaturely retired.
 
-Cc: David Miller <davem@davemloft.net>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Also, the pblk_blk_erase_sync function prints an error message in case
+the erase fails. Since the caller prints an error message by itself,
+remove the error message in this function.
+
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+Reviewed-by: Javier González <javier@cnexlabs.com>
+Reviewed-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
 ---
- drivers/block/sunvdc.c | 161 ++++++++++++++++++++++++++++-------------
- 1 file changed, 110 insertions(+), 51 deletions(-)
+ drivers/lightnvm/pblk-core.c | 19 ++-----------------
+ 1 file changed, 2 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/block/sunvdc.c b/drivers/block/sunvdc.c
-index f68e9baffad7..bf51a2307ce1 100644
---- a/drivers/block/sunvdc.c
-+++ b/drivers/block/sunvdc.c
-@@ -6,7 +6,7 @@
- #include <linux/module.h>
- #include <linux/kernel.h>
- #include <linux/types.h>
--#include <linux/blkdev.h>
-+#include <linux/blk-mq.h>
- #include <linux/hdreg.h>
- #include <linux/genhd.h>
- #include <linux/cdrom.h>
-@@ -66,9 +66,10 @@ struct vdc_port {
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 72acf2f6dbd6..72de7456845b 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -886,10 +886,8 @@ static void pblk_setup_e_rq(struct pblk *pblk, struct nvm_rq *rqd,
  
- 	u64			max_xfer_size;
- 	u32			vdisk_block_size;
-+	u32			drain;
- 
- 	u64			ldc_timeout;
--	struct timer_list	ldc_reset_timer;
-+	struct delayed_work	ldc_reset_timer_work;
- 	struct work_struct	ldc_reset_work;
- 
- 	/* The server fills these in for us in the disk attribute
-@@ -80,12 +81,14 @@ struct vdc_port {
- 	u8			vdisk_mtype;
- 	u32			vdisk_phys_blksz;
- 
-+	struct blk_mq_tag_set	tag_set;
-+
- 	char			disk_name[32];
- };
- 
- static void vdc_ldc_reset(struct vdc_port *port);
- static void vdc_ldc_reset_work(struct work_struct *work);
--static void vdc_ldc_reset_timer(struct timer_list *t);
-+static void vdc_ldc_reset_timer_work(struct work_struct *work);
- 
- static inline struct vdc_port *to_vdc_port(struct vio_driver_state *vio)
+ static int pblk_blk_erase_sync(struct pblk *pblk, struct ppa_addr ppa)
  {
-@@ -175,11 +178,8 @@ static void vdc_blk_queue_start(struct vdc_port *port)
- 	 * handshake completes, so check for initial handshake before we've
- 	 * allocated a disk.
+-	struct nvm_rq rqd;
+-	int ret = 0;
+-
+-	memset(&rqd, 0, sizeof(struct nvm_rq));
++	struct nvm_rq rqd = {NULL};
++	int ret;
+ 
+ 	pblk_setup_e_rq(pblk, &rqd, ppa);
+ 
+@@ -897,19 +895,6 @@ static int pblk_blk_erase_sync(struct pblk *pblk, struct ppa_addr ppa)
+ 	 * with writes. Thus, there is no need to take the LUN semaphore.
  	 */
--	if (port->disk && blk_queue_stopped(port->disk->queue) &&
--	    vdc_tx_dring_avail(dr) * 100 / VDC_TX_RING_SIZE >= 50) {
--		blk_start_queue(port->disk->queue);
+ 	ret = pblk_submit_io_sync(pblk, &rqd);
+-	if (ret) {
+-		struct nvm_tgt_dev *dev = pblk->dev;
+-		struct nvm_geo *geo = &dev->geo;
+-
+-		pblk_err(pblk, "could not sync erase line:%d,blk:%d\n",
+-					pblk_ppa_to_line(ppa),
+-					pblk_ppa_to_pos(geo, ppa));
+-
+-		rqd.error = ret;
+-		goto out;
 -	}
 -
-+	if (port->disk && vdc_tx_dring_avail(dr) * 100 / VDC_TX_RING_SIZE >= 50)
-+		blk_mq_start_hw_queues(port->disk->queue);
- }
+-out:
+ 	rqd.private = pblk;
+ 	__pblk_end_io_erase(pblk, &rqd);
  
- static void vdc_finish(struct vio_driver_state *vio, int err, int waiting_for)
-@@ -197,7 +197,7 @@ static void vdc_handshake_complete(struct vio_driver_state *vio)
- {
- 	struct vdc_port *port = to_vdc_port(vio);
- 
--	del_timer(&port->ldc_reset_timer);
-+	cancel_delayed_work(&port->ldc_reset_timer_work);
- 	vdc_finish(vio, 0, WAITING_FOR_LINK_UP);
- 	vdc_blk_queue_start(port);
- }
-@@ -320,7 +320,7 @@ static void vdc_end_one(struct vdc_port *port, struct vio_dring_state *dr,
- 
- 	rqe->req = NULL;
- 
--	__blk_end_request(req, (desc->status ? BLK_STS_IOERR : 0), desc->size);
-+	blk_mq_end_request(req, desc->status ? BLK_STS_IOERR : 0);
- 
- 	vdc_blk_queue_start(port);
- }
-@@ -525,29 +525,40 @@ static int __send_request(struct request *req)
- 	return err;
- }
- 
--static void do_vdc_request(struct request_queue *rq)
-+static blk_status_t vdc_queue_rq(struct blk_mq_hw_ctx *hctx,
-+				 const struct blk_mq_queue_data *bd)
- {
--	struct request *req;
-+	struct vdc_port *port = hctx->queue->queuedata;
-+	struct vio_dring_state *dr;
-+	unsigned long flags;
- 
--	while ((req = blk_peek_request(rq)) != NULL) {
--		struct vdc_port *port;
--		struct vio_dring_state *dr;
-+	dr = &port->vio.drings[VIO_DRIVER_TX_RING];
- 
--		port = req->rq_disk->private_data;
--		dr = &port->vio.drings[VIO_DRIVER_TX_RING];
--		if (unlikely(vdc_tx_dring_avail(dr) < 1))
--			goto wait;
-+	blk_mq_start_request(bd->rq);
- 
--		blk_start_request(req);
-+	spin_lock_irqsave(&port->vio.lock, flags);
- 
--		if (__send_request(req) < 0) {
--			blk_requeue_request(rq, req);
--wait:
--			/* Avoid pointless unplugs. */
--			blk_stop_queue(rq);
--			break;
--		}
-+	/*
-+	 * Doing drain, just end the request in error
-+	 */
-+	if (unlikely(port->drain)) {
-+		spin_unlock_irqrestore(&port->vio.lock, flags);
-+		return BLK_STS_IOERR;
- 	}
-+
-+	if (unlikely(vdc_tx_dring_avail(dr) < 1)) {
-+		spin_unlock_irqrestore(&port->vio.lock, flags);
-+		blk_mq_stop_hw_queue(hctx);
-+		return BLK_STS_DEV_RESOURCE;
-+	}
-+
-+	if (__send_request(bd->rq) < 0) {
-+		spin_unlock_irqrestore(&port->vio.lock, flags);
-+		return BLK_STS_IOERR;
-+	}
-+
-+	spin_unlock_irqrestore(&port->vio.lock, flags);
-+	return BLK_STS_OK;
- }
- 
- static int generic_request(struct vdc_port *port, u8 op, void *buf, int len)
-@@ -759,6 +770,44 @@ static void vdc_port_down(struct vdc_port *port)
- 	vio_ldc_free(&port->vio);
- }
- 
-+static const struct blk_mq_ops vdc_mq_ops = {
-+	.queue_rq	= vdc_queue_rq,
-+};
-+
-+static void cleanup_queue(struct request_queue *q)
-+{
-+	struct vdc_port *port = q->queuedata;
-+
-+	blk_mq_free_tag_set(&port->tag_set);
-+	blk_cleanup_queue(q);
-+}
-+
-+static struct request_queue *init_queue(struct vdc_port *port)
-+{
-+	struct blk_mq_tag_set *set = &port->tag_set;
-+	struct request_queue *q;
-+	int ret;
-+
-+	set->ops = &vdc_mq_ops;
-+	set->nr_hw_queues = 1;
-+	set->queue_depth = VDC_TX_RING_SIZE;
-+	set->numa_node = NUMA_NO_NODE;
-+	set->flags = BLK_MQ_F_SHOULD_MERGE;
-+
-+	ret = blk_mq_alloc_tag_set(set);
-+	if (ret)
-+		return ERR_PTR(ret);
-+
-+	q = blk_mq_init_queue(set);
-+	if (IS_ERR(q)) {
-+		blk_mq_free_tag_set(set);
-+		return q;
-+	}
-+
-+	q->queuedata = port;
-+	return q;
-+}
-+
- static int probe_disk(struct vdc_port *port)
- {
- 	struct request_queue *q;
-@@ -796,17 +845,17 @@ static int probe_disk(struct vdc_port *port)
- 				    (u64)geom.num_sec);
- 	}
- 
--	q = blk_init_queue(do_vdc_request, &port->vio.lock);
--	if (!q) {
-+	q = init_queue(port);
-+	if (IS_ERR(q)) {
- 		printk(KERN_ERR PFX "%s: Could not allocate queue.\n",
- 		       port->vio.name);
--		return -ENOMEM;
-+		return PTR_ERR(q);
- 	}
- 	g = alloc_disk(1 << PARTITION_SHIFT);
- 	if (!g) {
- 		printk(KERN_ERR PFX "%s: Could not allocate gendisk.\n",
- 		       port->vio.name);
--		blk_cleanup_queue(q);
-+		cleanup_queue(q);
- 		return -ENOMEM;
- 	}
- 
-@@ -981,7 +1030,7 @@ static int vdc_port_probe(struct vio_dev *vdev, const struct vio_device_id *id)
- 	 */
- 	ldc_timeout = mdesc_get_property(hp, vdev->mp, "vdc-timeout", NULL);
- 	port->ldc_timeout = ldc_timeout ? *ldc_timeout : 0;
--	timer_setup(&port->ldc_reset_timer, vdc_ldc_reset_timer, 0);
-+	INIT_DELAYED_WORK(&port->ldc_reset_timer_work, vdc_ldc_reset_timer_work);
- 	INIT_WORK(&port->ldc_reset_work, vdc_ldc_reset_work);
- 
- 	err = vio_driver_init(&port->vio, vdev, VDEV_DISK,
-@@ -1034,18 +1083,14 @@ static int vdc_port_remove(struct vio_dev *vdev)
- 	struct vdc_port *port = dev_get_drvdata(&vdev->dev);
- 
- 	if (port) {
--		unsigned long flags;
--
--		spin_lock_irqsave(&port->vio.lock, flags);
--		blk_stop_queue(port->disk->queue);
--		spin_unlock_irqrestore(&port->vio.lock, flags);
-+		blk_mq_stop_hw_queues(port->disk->queue);
- 
- 		flush_work(&port->ldc_reset_work);
--		del_timer_sync(&port->ldc_reset_timer);
-+		cancel_delayed_work_sync(&port->ldc_reset_timer_work);
- 		del_timer_sync(&port->vio.timer);
- 
- 		del_gendisk(port->disk);
--		blk_cleanup_queue(port->disk->queue);
-+		cleanup_queue(port->disk->queue);
- 		put_disk(port->disk);
- 		port->disk = NULL;
- 
-@@ -1080,32 +1125,46 @@ static void vdc_requeue_inflight(struct vdc_port *port)
- 		}
- 
- 		rqe->req = NULL;
--		blk_requeue_request(port->disk->queue, req);
-+		blk_mq_requeue_request(req, false);
- 	}
- }
- 
- static void vdc_queue_drain(struct vdc_port *port)
- {
--	struct request *req;
-+	struct request_queue *q = port->disk->queue;
- 
--	while ((req = blk_fetch_request(port->disk->queue)) != NULL)
--		__blk_end_request_all(req, BLK_STS_IOERR);
-+	/*
-+	 * Mark the queue as draining, then freeze/quiesce to ensure
-+	 * that all existing requests are seen in ->queue_rq() and killed
-+	 */
-+	port->drain = 1;
-+	spin_unlock_irq(&port->vio.lock);
-+
-+	blk_mq_freeze_queue(q);
-+	blk_mq_quiesce_queue(q);
-+
-+	spin_lock_irq(&port->vio.lock);
-+	port->drain = 0;
-+	blk_mq_unquiesce_queue(q);
-+	blk_mq_unfreeze_queue(q);
- }
- 
--static void vdc_ldc_reset_timer(struct timer_list *t)
-+static void vdc_ldc_reset_timer_work(struct work_struct *work)
- {
--	struct vdc_port *port = from_timer(port, t, ldc_reset_timer);
--	struct vio_driver_state *vio = &port->vio;
--	unsigned long flags;
-+	struct vdc_port *port;
-+	struct vio_driver_state *vio;
- 
--	spin_lock_irqsave(&vio->lock, flags);
-+	port = container_of(work, struct vdc_port, ldc_reset_timer_work.work);
-+	vio = &port->vio;
-+
-+	spin_lock_irq(&vio->lock);
- 	if (!(port->vio.hs_state & VIO_HS_COMPLETE)) {
- 		pr_warn(PFX "%s ldc down %llu seconds, draining queue\n",
- 			port->disk_name, port->ldc_timeout);
- 		vdc_queue_drain(port);
- 		vdc_blk_queue_start(port);
- 	}
--	spin_unlock_irqrestore(&vio->lock, flags);
-+	spin_unlock_irq(&vio->lock);
- }
- 
- static void vdc_ldc_reset_work(struct work_struct *work)
-@@ -1129,7 +1188,7 @@ static void vdc_ldc_reset(struct vdc_port *port)
- 	assert_spin_locked(&port->vio.lock);
- 
- 	pr_warn(PFX "%s ldc link reset\n", port->disk_name);
--	blk_stop_queue(port->disk->queue);
-+	blk_mq_stop_hw_queues(port->disk->queue);
- 	vdc_requeue_inflight(port);
- 	vdc_port_down(port);
- 
-@@ -1146,7 +1205,7 @@ static void vdc_ldc_reset(struct vdc_port *port)
- 	}
- 
- 	if (port->ldc_timeout)
--		mod_timer(&port->ldc_reset_timer,
-+		mod_delayed_work(system_wq, &port->ldc_reset_timer_work,
- 			  round_jiffies(jiffies + HZ * port->ldc_timeout));
- 	mod_timer(&port->vio.timer, round_jiffies(jiffies + HZ));
- 	return;
 -- 
 2.17.1
