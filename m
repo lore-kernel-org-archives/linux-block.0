@@ -1,1242 +1,608 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-ide@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 08/28] scsi: kill off the legacy IO path
-Date: Thu, 25 Oct 2018 15:10:19 -0600
-Message-Id: <20181025211039.11559-9-axboe@kernel.dk>
-In-Reply-To: <20181025211039.11559-1-axboe@kernel.dk>
-References: <20181025211039.11559-1-axboe@kernel.dk>
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <fc383e01d80636f957aa7fc66dacbb09ccbf0366.1539092111.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1539092111.git.christophe.leroy@c-s.fr>
+References: <cover.1539092111.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v3 07/24] powerpc: handover page flags with a pgprot_t
+ parameter
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Tue,  9 Oct 2018 13:51:45 +0000 (UTC)
 List-ID: <linux-block@vger.kernel.org>
 
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- Documentation/scsi/scsi-parameters.txt |   5 -
- drivers/scsi/Kconfig                   |  12 -
- drivers/scsi/cxlflash/main.c           |   6 -
- drivers/scsi/hosts.c                   |  29 +-
- drivers/scsi/lpfc/lpfc_scsi.c          |   2 +-
- drivers/scsi/qedi/qedi_main.c          |   3 +-
- drivers/scsi/qla2xxx/qla_os.c          |  30 +-
- drivers/scsi/scsi.c                    |   5 +-
- drivers/scsi/scsi_debug.c              |   3 +-
- drivers/scsi/scsi_error.c              |   2 +-
- drivers/scsi/scsi_lib.c                | 624 ++-----------------------
- drivers/scsi/scsi_priv.h               |   1 -
- drivers/scsi/scsi_scan.c               |  10 +-
- drivers/scsi/scsi_sysfs.c              |   8 +-
- drivers/scsi/ufs/ufshcd.c              |   6 -
- include/scsi/scsi_host.h               |  18 +-
- include/scsi/scsi_tcq.h                |  14 +-
- 17 files changed, 73 insertions(+), 705 deletions(-)
+In order to avoid multiple conversions, handover directly a
+pgprot_t to map_kernel_page() as already done for radix.
 
-diff --git a/Documentation/scsi/scsi-parameters.txt b/Documentation/scsi/scsi-parameters.txt
-index 92999d4e0cb8..25a4b4cf04a6 100644
---- a/Documentation/scsi/scsi-parameters.txt
-+++ b/Documentation/scsi/scsi-parameters.txt
-@@ -97,11 +97,6 @@ parameters may be changed at runtime by the command
- 			allowing boot to proceed.  none ignores them, expecting
- 			user space to do the scan.
+Do the same for __ioremap_caller() and __ioremap_at().
+
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+---
+ arch/powerpc/include/asm/book3s/32/pgtable.h |  2 +-
+ arch/powerpc/include/asm/book3s/64/hash.h    |  3 +--
+ arch/powerpc/include/asm/book3s/64/pgtable.h |  7 +++---
+ arch/powerpc/include/asm/fixmap.h            |  2 +-
+ arch/powerpc/include/asm/io.h                |  4 +--
+ arch/powerpc/include/asm/machdep.h           |  2 +-
+ arch/powerpc/include/asm/nohash/32/pgtable.h |  2 +-
+ arch/powerpc/include/asm/nohash/64/pgtable.h |  3 +--
+ arch/powerpc/kernel/io-workarounds.c         |  4 +--
+ arch/powerpc/kernel/isa-bridge.c             |  6 ++---
+ arch/powerpc/kernel/pci_64.c                 |  2 +-
+ arch/powerpc/lib/code-patching.c             |  3 +--
+ arch/powerpc/mm/8xx_mmu.c                    |  3 +--
+ arch/powerpc/mm/dma-noncoherent.c            |  2 +-
+ arch/powerpc/mm/mem.c                        |  4 +--
+ arch/powerpc/mm/pgtable-book3e.c             |  9 +++----
+ arch/powerpc/mm/pgtable-hash64.c             |  7 +++---
+ arch/powerpc/mm/pgtable_32.c                 | 37 +++++++++++++---------------
+ arch/powerpc/mm/pgtable_64.c                 | 37 ++++++++++++++--------------
+ drivers/pcmcia/electra_cf.c                  |  2 +-
+ 20 files changed, 64 insertions(+), 77 deletions(-)
+
+diff --git a/arch/powerpc/include/asm/book3s/32/pgtable.h b/arch/powerpc/include/asm/book3s/32/pgtable.h
+index 751cf931bb3f..7a9f0ed599ff 100644
+--- a/arch/powerpc/include/asm/book3s/32/pgtable.h
++++ b/arch/powerpc/include/asm/book3s/32/pgtable.h
+@@ -292,7 +292,7 @@ static inline void __ptep_set_access_flags(struct vm_area_struct *vma,
+ #define __pte_to_swp_entry(pte)		((swp_entry_t) { pte_val(pte) >> 3 })
+ #define __swp_entry_to_pte(x)		((pte_t) { (x).val << 3 })
  
--	scsi_mod.use_blk_mq=
--			[SCSI] use blk-mq I/O path by default
--			See SCSI_MQ_DEFAULT in drivers/scsi/Kconfig.
--			Format: <y/n>
--
- 	sim710=		[SCSI,HW]
- 			See header of drivers/scsi/sim710.c.
+-int map_kernel_page(unsigned long va, phys_addr_t pa, int flags);
++int map_kernel_page(unsigned long va, phys_addr_t pa, pgprot_t prot);
  
-diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
-index 70988c381268..ff5a569fdbcb 100644
---- a/drivers/scsi/Kconfig
-+++ b/drivers/scsi/Kconfig
-@@ -50,18 +50,6 @@ config SCSI_NETLINK
- 	default	n
- 	depends on NET
+ /* Generic accessors to PTE bits */
+ static inline int pte_write(pte_t pte)		{ return !!(pte_val(pte) & _PAGE_RW);}
+diff --git a/arch/powerpc/include/asm/book3s/64/hash.h b/arch/powerpc/include/asm/book3s/64/hash.h
+index fcf8b10a209f..247aff9cc6ba 100644
+--- a/arch/powerpc/include/asm/book3s/64/hash.h
++++ b/arch/powerpc/include/asm/book3s/64/hash.h
+@@ -201,8 +201,7 @@ static inline void hpte_do_hugepage_flush(struct mm_struct *mm,
+ #endif /* CONFIG_TRANSPARENT_HUGEPAGE */
  
--config SCSI_MQ_DEFAULT
--	bool "SCSI: use blk-mq I/O path by default"
--	default y
--	depends on SCSI
--	---help---
--	  This option enables the blk-mq based I/O path for SCSI devices by
--	  default.  With this option the scsi_mod.use_blk_mq module/boot
--	  option defaults to Y, without it to N, but it can still be
--	  overridden either way.
--
--	  If unsure say Y.
--
- config SCSI_PROC_FS
- 	bool "legacy /proc/scsi/ support"
- 	depends on SCSI && PROC_FS
-diff --git a/drivers/scsi/cxlflash/main.c b/drivers/scsi/cxlflash/main.c
-index 6637116529aa..abdc9eac4173 100644
---- a/drivers/scsi/cxlflash/main.c
-+++ b/drivers/scsi/cxlflash/main.c
-@@ -3088,12 +3088,6 @@ static ssize_t hwq_mode_store(struct device *dev,
- 		return -EINVAL;
+ 
+-extern int hash__map_kernel_page(unsigned long ea, unsigned long pa,
+-			     unsigned long flags);
++int hash__map_kernel_page(unsigned long ea, unsigned long pa, pgprot_t prot);
+ extern int __meminit hash__vmemmap_create_mapping(unsigned long start,
+ 					      unsigned long page_size,
+ 					      unsigned long phys);
+diff --git a/arch/powerpc/include/asm/book3s/64/pgtable.h b/arch/powerpc/include/asm/book3s/64/pgtable.h
+index f108e2ce7f64..d4327f494371 100644
+--- a/arch/powerpc/include/asm/book3s/64/pgtable.h
++++ b/arch/powerpc/include/asm/book3s/64/pgtable.h
+@@ -1030,17 +1030,16 @@ extern struct page *pgd_page(pgd_t pgd);
+ #define pgd_ERROR(e) \
+ 	pr_err("%s:%d: bad pgd %08lx.\n", __FILE__, __LINE__, pgd_val(e))
+ 
+-static inline int map_kernel_page(unsigned long ea, unsigned long pa,
+-				  unsigned long flags)
++static inline int map_kernel_page(unsigned long ea, unsigned long pa, pgprot_t prot)
+ {
+ 	if (radix_enabled()) {
+ #if defined(CONFIG_PPC_RADIX_MMU) && defined(DEBUG_VM)
+ 		unsigned long page_size = 1 << mmu_psize_defs[mmu_io_psize].shift;
+ 		WARN((page_size != PAGE_SIZE), "I/O page size != PAGE_SIZE");
+ #endif
+-		return radix__map_kernel_page(ea, pa, __pgprot(flags), PAGE_SIZE);
++		return radix__map_kernel_page(ea, pa, prot, PAGE_SIZE);
  	}
- 
--	if ((mode == HWQ_MODE_TAG) && !shost_use_blk_mq(shost)) {
--		dev_info(cfgdev, "SCSI-MQ is not enabled, use a different "
--			 "HWQ steering mode.\n");
--		return -EINVAL;
--	}
--
- 	afu->hwq_mode = mode;
- 
- 	return count;
-diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
-index ea4b0bb0c1cd..cc71136ba300 100644
---- a/drivers/scsi/hosts.c
-+++ b/drivers/scsi/hosts.c
-@@ -222,18 +222,9 @@ int scsi_add_host_with_dma(struct Scsi_Host *shost, struct device *dev,
- 	if (error)
- 		goto fail;
- 
--	if (shost_use_blk_mq(shost)) {
--		error = scsi_mq_setup_tags(shost);
--		if (error)
--			goto fail;
--	} else {
--		shost->bqt = blk_init_tags(shost->can_queue,
--				shost->hostt->tag_alloc_policy);
--		if (!shost->bqt) {
--			error = -ENOMEM;
--			goto fail;
--		}
--	}
-+	error = scsi_mq_setup_tags(shost);
-+	if (error)
-+		goto fail;
- 
- 	if (!shost->shost_gendev.parent)
- 		shost->shost_gendev.parent = dev ? dev : &platform_bus;
-@@ -309,8 +300,7 @@ int scsi_add_host_with_dma(struct Scsi_Host *shost, struct device *dev,
- 	pm_runtime_disable(&shost->shost_gendev);
- 	pm_runtime_set_suspended(&shost->shost_gendev);
- 	pm_runtime_put_noidle(&shost->shost_gendev);
--	if (shost_use_blk_mq(shost))
--		scsi_mq_destroy_tags(shost);
-+	scsi_mq_destroy_tags(shost);
-  fail:
- 	return error;
+-	return hash__map_kernel_page(ea, pa, flags);
++	return hash__map_kernel_page(ea, pa, prot);
  }
-@@ -344,13 +334,8 @@ static void scsi_host_dev_release(struct device *dev)
- 		kfree(dev_name(&shost->shost_dev));
- 	}
  
--	if (shost_use_blk_mq(shost)) {
--		if (shost->tag_set.tags)
--			scsi_mq_destroy_tags(shost);
--	} else {
--		if (shost->bqt)
--			blk_free_tags(shost->bqt);
--	}
-+	if (shost->tag_set.tags)
-+		scsi_mq_destroy_tags(shost);
+ static inline int __meminit vmemmap_create_mapping(unsigned long start,
+diff --git a/arch/powerpc/include/asm/fixmap.h b/arch/powerpc/include/asm/fixmap.h
+index 41cc15c14eee..b9fbed84ddca 100644
+--- a/arch/powerpc/include/asm/fixmap.h
++++ b/arch/powerpc/include/asm/fixmap.h
+@@ -72,7 +72,7 @@ enum fixed_addresses {
+ static inline void __set_fixmap(enum fixed_addresses idx,
+ 				phys_addr_t phys, pgprot_t flags)
+ {
+-	map_kernel_page(fix_to_virt(idx), phys, pgprot_val(flags));
++	map_kernel_page(fix_to_virt(idx), phys, flags);
+ }
  
- 	kfree(shost->shost_data);
+ #endif /* !__ASSEMBLY__ */
+diff --git a/arch/powerpc/include/asm/io.h b/arch/powerpc/include/asm/io.h
+index cdccab3938db..0a034519957d 100644
+--- a/arch/powerpc/include/asm/io.h
++++ b/arch/powerpc/include/asm/io.h
+@@ -786,12 +786,12 @@ extern void iounmap(volatile void __iomem *addr);
+ extern void __iomem *__ioremap(phys_addr_t, unsigned long size,
+ 			       unsigned long flags);
+ extern void __iomem *__ioremap_caller(phys_addr_t, unsigned long size,
+-				      unsigned long flags, void *caller);
++				      pgprot_t prot, void *caller);
  
-@@ -472,8 +457,6 @@ struct Scsi_Host *scsi_host_alloc(struct scsi_host_template *sht, int privsize)
+ extern void __iounmap(volatile void __iomem *addr);
+ 
+ extern void __iomem * __ioremap_at(phys_addr_t pa, void *ea,
+-				   unsigned long size, unsigned long flags);
++				   unsigned long size, pgprot_t prot);
+ extern void __iounmap_at(void *ea, unsigned long size);
+ 
+ /*
+diff --git a/arch/powerpc/include/asm/machdep.h b/arch/powerpc/include/asm/machdep.h
+index b4831f1338db..8311869005fa 100644
+--- a/arch/powerpc/include/asm/machdep.h
++++ b/arch/powerpc/include/asm/machdep.h
+@@ -35,7 +35,7 @@ struct machdep_calls {
+ 	char		*name;
+ #ifdef CONFIG_PPC64
+ 	void __iomem *	(*ioremap)(phys_addr_t addr, unsigned long size,
+-				   unsigned long flags, void *caller);
++				   pgprot_t prot, void *caller);
+ 	void		(*iounmap)(volatile void __iomem *token);
+ 
+ #ifdef CONFIG_PM
+diff --git a/arch/powerpc/include/asm/nohash/32/pgtable.h b/arch/powerpc/include/asm/nohash/32/pgtable.h
+index a507a65b0866..a7f44498ab6f 100644
+--- a/arch/powerpc/include/asm/nohash/32/pgtable.h
++++ b/arch/powerpc/include/asm/nohash/32/pgtable.h
+@@ -323,7 +323,7 @@ static inline int pte_young(pte_t pte)
+ #define __pte_to_swp_entry(pte)		((swp_entry_t) { pte_val(pte) >> 3 })
+ #define __swp_entry_to_pte(x)		((pte_t) { (x).val << 3 })
+ 
+-int map_kernel_page(unsigned long va, phys_addr_t pa, int flags);
++int map_kernel_page(unsigned long va, phys_addr_t pa, pgprot_t prot);
+ 
+ #endif /* !__ASSEMBLY__ */
+ 
+diff --git a/arch/powerpc/include/asm/nohash/64/pgtable.h b/arch/powerpc/include/asm/nohash/64/pgtable.h
+index 7cd6809f4d33..513b6e9e62c6 100644
+--- a/arch/powerpc/include/asm/nohash/64/pgtable.h
++++ b/arch/powerpc/include/asm/nohash/64/pgtable.h
+@@ -327,8 +327,7 @@ static inline void __ptep_set_access_flags(struct vm_area_struct *vma,
+ #define __pte_to_swp_entry(pte)		((swp_entry_t) { pte_val((pte)) })
+ #define __swp_entry_to_pte(x)		__pte((x).val)
+ 
+-extern int map_kernel_page(unsigned long ea, unsigned long pa,
+-			   unsigned long flags);
++int map_kernel_page(unsigned long ea, unsigned long pa, pgprot_t prot);
+ extern int __meminit vmemmap_create_mapping(unsigned long start,
+ 					    unsigned long page_size,
+ 					    unsigned long phys);
+diff --git a/arch/powerpc/kernel/io-workarounds.c b/arch/powerpc/kernel/io-workarounds.c
+index aa9f1b8261db..7e89d02a84e1 100644
+--- a/arch/powerpc/kernel/io-workarounds.c
++++ b/arch/powerpc/kernel/io-workarounds.c
+@@ -153,10 +153,10 @@ static const struct ppc_pci_io iowa_pci_io = {
+ 
+ #ifdef CONFIG_PPC_INDIRECT_MMIO
+ static void __iomem *iowa_ioremap(phys_addr_t addr, unsigned long size,
+-				  unsigned long flags, void *caller)
++				  pgprot_t prot, void *caller)
+ {
+ 	struct iowa_bus *bus;
+-	void __iomem *res = __ioremap_caller(addr, size, flags, caller);
++	void __iomem *res = __ioremap_caller(addr, size, prot, caller);
+ 	int busno;
+ 
+ 	bus = iowa_pci_find(0, (unsigned long)addr);
+diff --git a/arch/powerpc/kernel/isa-bridge.c b/arch/powerpc/kernel/isa-bridge.c
+index 072e384f8c86..fda3ae48480c 100644
+--- a/arch/powerpc/kernel/isa-bridge.c
++++ b/arch/powerpc/kernel/isa-bridge.c
+@@ -110,14 +110,14 @@ static void pci_process_ISA_OF_ranges(struct device_node *isa_node,
+ 		size = 0x10000;
+ 
+ 	__ioremap_at(phb_io_base_phys, (void *)ISA_IO_BASE,
+-		     size, pgprot_val(pgprot_noncached(PAGE_KERNEL)));
++		     size, pgprot_noncached(PAGE_KERNEL));
+ 	return;
+ 
+ inval_range:
+ 	printk(KERN_ERR "no ISA IO ranges or unexpected isa range, "
+ 	       "mapping 64k\n");
+ 	__ioremap_at(phb_io_base_phys, (void *)ISA_IO_BASE,
+-		     0x10000, pgprot_val(pgprot_noncached(PAGE_KERNEL)));
++		     0x10000, pgprot_noncached(PAGE_KERNEL));
+ }
+ 
+ 
+@@ -253,7 +253,7 @@ void __init isa_bridge_init_non_pci(struct device_node *np)
+ 	 */
+ 	isa_io_base = ISA_IO_BASE;
+ 	__ioremap_at(pbase, (void *)ISA_IO_BASE,
+-		     size, pgprot_val(pgprot_noncached(PAGE_KERNEL)));
++		     size, pgprot_noncached(PAGE_KERNEL));
+ 
+ 	pr_debug("ISA: Non-PCI bridge is %pOF\n", np);
+ }
+diff --git a/arch/powerpc/kernel/pci_64.c b/arch/powerpc/kernel/pci_64.c
+index 64bb4dd2b8f1..9d8c10d55407 100644
+--- a/arch/powerpc/kernel/pci_64.c
++++ b/arch/powerpc/kernel/pci_64.c
+@@ -159,7 +159,7 @@ static int pcibios_map_phb_io_space(struct pci_controller *hose)
+ 
+ 	/* Establish the mapping */
+ 	if (__ioremap_at(phys_page, area->addr, size_page,
+-			 pgprot_val(pgprot_noncached(PAGE_KERNEL))) == NULL)
++			 pgprot_noncached(PAGE_KERNEL)) == NULL)
+ 		return -ENOMEM;
+ 
+ 	/* Fixup hose IO resource */
+diff --git a/arch/powerpc/lib/code-patching.c b/arch/powerpc/lib/code-patching.c
+index 5ffee298745f..89502cbccb1b 100644
+--- a/arch/powerpc/lib/code-patching.c
++++ b/arch/powerpc/lib/code-patching.c
+@@ -98,8 +98,7 @@ static int map_patch_area(void *addr, unsigned long text_poke_addr)
  	else
- 		shost->dma_boundary = 0xffffffff;
+ 		pfn = __pa_symbol(addr) >> PAGE_SHIFT;
  
--	shost->use_blk_mq = scsi_use_blk_mq || shost->hostt->force_blk_mq;
--
- 	device_initialize(&shost->shost_gendev);
- 	dev_set_name(&shost->shost_gendev, "host%d", shost->host_no);
- 	shost->shost_gendev.bus = &scsi_bus_type;
-diff --git a/drivers/scsi/lpfc/lpfc_scsi.c b/drivers/scsi/lpfc/lpfc_scsi.c
-index 4fa6703a9ec9..baed2b891efb 100644
---- a/drivers/scsi/lpfc/lpfc_scsi.c
-+++ b/drivers/scsi/lpfc/lpfc_scsi.c
-@@ -3914,7 +3914,7 @@ int lpfc_sli4_scmd_to_wqidx_distr(struct lpfc_hba *phba,
- 	uint32_t tag;
- 	uint16_t hwq;
+-	err = map_kernel_page(text_poke_addr, (pfn << PAGE_SHIFT),
+-				pgprot_val(PAGE_KERNEL));
++	err = map_kernel_page(text_poke_addr, (pfn << PAGE_SHIFT), PAGE_KERNEL);
  
--	if (cmnd && shost_use_blk_mq(cmnd->device->host)) {
-+	if (cmnd) {
- 		tag = blk_mq_unique_tag(cmnd->request);
- 		hwq = blk_mq_unique_tag_to_hwq(tag);
- 
-diff --git a/drivers/scsi/qedi/qedi_main.c b/drivers/scsi/qedi/qedi_main.c
-index 105b0e4d7818..311eb22068e1 100644
---- a/drivers/scsi/qedi/qedi_main.c
-+++ b/drivers/scsi/qedi/qedi_main.c
-@@ -644,8 +644,7 @@ static struct qedi_ctx *qedi_host_alloc(struct pci_dev *pdev)
- 	qedi->max_active_conns = ISCSI_MAX_SESS_PER_HBA;
- 	qedi->max_sqes = QEDI_SQ_SIZE;
- 
--	if (shost_use_blk_mq(shost))
--		shost->nr_hw_queues = MIN_NUM_CPUS_MSIX(qedi);
-+	shost->nr_hw_queues = MIN_NUM_CPUS_MSIX(qedi);
- 
- 	pci_set_drvdata(pdev, qedi);
- 
-diff --git a/drivers/scsi/qla2xxx/qla_os.c b/drivers/scsi/qla2xxx/qla_os.c
-index 8794e54f43a9..3e2665c66bc4 100644
---- a/drivers/scsi/qla2xxx/qla_os.c
-+++ b/drivers/scsi/qla2xxx/qla_os.c
-@@ -857,13 +857,9 @@ qla2xxx_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *cmd)
- 	}
- 
- 	if (ha->mqenable) {
--		if (shost_use_blk_mq(vha->host)) {
--			tag = blk_mq_unique_tag(cmd->request);
--			hwq = blk_mq_unique_tag_to_hwq(tag);
--			qpair = ha->queue_pair_map[hwq];
--		} else if (vha->vp_idx && vha->qpair) {
--			qpair = vha->qpair;
--		}
-+		tag = blk_mq_unique_tag(cmd->request);
-+		hwq = blk_mq_unique_tag_to_hwq(tag);
-+		qpair = ha->queue_pair_map[hwq];
- 
- 		if (qpair)
- 			return qla2xxx_mqueuecommand(host, cmd, qpair);
-@@ -3153,7 +3149,7 @@ qla2x00_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
- 		goto probe_failed;
- 	}
- 
--	if (ha->mqenable && shost_use_blk_mq(host)) {
-+	if (ha->mqenable) {
- 		/* number of hardware queues supported by blk/scsi-mq*/
- 		host->nr_hw_queues = ha->max_qpairs;
- 
-@@ -3265,25 +3261,17 @@ qla2x00_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
- 	    base_vha->mgmt_svr_loop_id, host->sg_tablesize);
- 
- 	if (ha->mqenable) {
--		bool mq = false;
- 		bool startit = false;
- 
--		if (QLA_TGT_MODE_ENABLED()) {
--			mq = true;
-+		if (QLA_TGT_MODE_ENABLED())
- 			startit = false;
--		}
- 
--		if ((ql2x_ini_mode == QLA2XXX_INI_MODE_ENABLED) &&
--		    shost_use_blk_mq(host)) {
--			mq = true;
-+		if (ql2x_ini_mode == QLA2XXX_INI_MODE_ENABLED)
- 			startit = true;
--		}
- 
--		if (mq) {
--			/* Create start of day qpairs for Block MQ */
--			for (i = 0; i < ha->max_qpairs; i++)
--				qla2xxx_create_qpair(base_vha, 5, 0, startit);
--		}
-+		/* Create start of day qpairs for Block MQ */
-+		for (i = 0; i < ha->max_qpairs; i++)
-+			qla2xxx_create_qpair(base_vha, 5, 0, startit);
- 	}
- 
- 	if (ha->flags.running_gold_fw)
-diff --git a/drivers/scsi/scsi.c b/drivers/scsi/scsi.c
-index fc1356d101b0..99db3f4316b5 100644
---- a/drivers/scsi/scsi.c
-+++ b/drivers/scsi/scsi.c
-@@ -780,11 +780,8 @@ MODULE_LICENSE("GPL");
- module_param(scsi_logging_level, int, S_IRUGO|S_IWUSR);
- MODULE_PARM_DESC(scsi_logging_level, "a bit mask of logging levels");
- 
--#ifdef CONFIG_SCSI_MQ_DEFAULT
-+/* Kill module parameter */
- bool scsi_use_blk_mq = true;
--#else
--bool scsi_use_blk_mq = false;
--#endif
- module_param_named(use_blk_mq, scsi_use_blk_mq, bool, S_IWUSR | S_IRUGO);
- 
- static int __init init_scsi(void)
-diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-index 60bcc6df97a9..4740f1e9dd17 100644
---- a/drivers/scsi/scsi_debug.c
-+++ b/drivers/scsi/scsi_debug.c
-@@ -5881,8 +5881,7 @@ static int sdebug_driver_probe(struct device *dev)
- 	}
- 	/* Decide whether to tell scsi subsystem that we want mq */
- 	/* Following should give the same answer for each host */
--	if (shost_use_blk_mq(hpnt))
--		hpnt->nr_hw_queues = submit_queues;
-+	hpnt->nr_hw_queues = submit_queues;
- 
- 	sdbg_host->shost = hpnt;
- 	*((struct sdebug_host_info **)hpnt->hostdata) = sdbg_host;
-diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-index c736d61b1648..fff128aa9ec2 100644
---- a/drivers/scsi/scsi_error.c
-+++ b/drivers/scsi/scsi_error.c
-@@ -308,7 +308,7 @@ enum blk_eh_timer_return scsi_times_out(struct request *req)
- 		 * error handler. In that case we can return immediately as no
- 		 * further action is required.
- 		 */
--		if (req->q->mq_ops && !blk_mq_mark_complete(req))
-+		if (!blk_mq_mark_complete(req))
- 			return rtn;
- 		if (scsi_abort_command(scmd) != SUCCESS) {
- 			set_host_byte(scmd, DID_TIME_OUT);
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index c7fccbb8f554..77b0f10e1be1 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -168,8 +168,6 @@ static void scsi_mq_requeue_cmd(struct scsi_cmnd *cmd)
- static void __scsi_queue_insert(struct scsi_cmnd *cmd, int reason, bool unbusy)
+ 	pr_devel("Mapped addr %lx with pfn %lx:%d\n", text_poke_addr, pfn, err);
+ 	if (err)
+diff --git a/arch/powerpc/mm/8xx_mmu.c b/arch/powerpc/mm/8xx_mmu.c
+index cf77d755246d..9137361d687d 100644
+--- a/arch/powerpc/mm/8xx_mmu.c
++++ b/arch/powerpc/mm/8xx_mmu.c
+@@ -91,11 +91,10 @@ static void __init mmu_mapin_immr(void)
  {
- 	struct scsi_device *device = cmd->device;
--	struct request_queue *q = device->request_queue;
--	unsigned long flags;
+ 	unsigned long p = PHYS_IMMR_BASE;
+ 	unsigned long v = VIRT_IMMR_BASE;
+-	unsigned long f = pgprot_val(PAGE_KERNEL_NCG);
+ 	int offset;
  
- 	SCSI_LOG_MLQUEUE(1, scmd_printk(KERN_INFO, cmd,
- 		"Inserting command %p into mlqueue\n", cmd));
-@@ -190,26 +188,20 @@ static void __scsi_queue_insert(struct scsi_cmnd *cmd, int reason, bool unbusy)
- 	 * before blk_cleanup_queue() finishes.
+ 	for (offset = 0; offset < IMMR_SIZE; offset += PAGE_SIZE)
+-		map_kernel_page(v + offset, p + offset, f);
++		map_kernel_page(v + offset, p + offset, PAGE_KERNEL_NCG);
+ }
+ 
+ /* Address of instructions to patch */
+diff --git a/arch/powerpc/mm/dma-noncoherent.c b/arch/powerpc/mm/dma-noncoherent.c
+index 382528475433..b6e7b5952ab5 100644
+--- a/arch/powerpc/mm/dma-noncoherent.c
++++ b/arch/powerpc/mm/dma-noncoherent.c
+@@ -228,7 +228,7 @@ __dma_alloc_coherent(struct device *dev, size_t size, dma_addr_t *handle, gfp_t
+ 		do {
+ 			SetPageReserved(page);
+ 			map_kernel_page(vaddr, page_to_phys(page),
+-				 pgprot_val(pgprot_noncached(PAGE_KERNEL)));
++					pgprot_noncached(PAGE_KERNEL));
+ 			page++;
+ 			vaddr += PAGE_SIZE;
+ 		} while (size -= PAGE_SIZE);
+diff --git a/arch/powerpc/mm/mem.c b/arch/powerpc/mm/mem.c
+index 04ccb274a620..cb421aeb7674 100644
+--- a/arch/powerpc/mm/mem.c
++++ b/arch/powerpc/mm/mem.c
+@@ -309,11 +309,11 @@ void __init paging_init(void)
+ 	unsigned long end = __fix_to_virt(FIX_HOLE);
+ 
+ 	for (; v < end; v += PAGE_SIZE)
+-		map_kernel_page(v, 0, 0); /* XXX gross */
++		map_kernel_page(v, 0, __pgprot(0)); /* XXX gross */
+ #endif
+ 
+ #ifdef CONFIG_HIGHMEM
+-	map_kernel_page(PKMAP_BASE, 0, 0);	/* XXX gross */
++	map_kernel_page(PKMAP_BASE, 0, __pgprot(0));	/* XXX gross */
+ 	pkmap_page_table = virt_to_kpte(PKMAP_BASE);
+ 
+ 	kmap_pte = virt_to_kpte(__fix_to_virt(FIX_KMAP_BEGIN));
+diff --git a/arch/powerpc/mm/pgtable-book3e.c b/arch/powerpc/mm/pgtable-book3e.c
+index a2298930f990..e0ccf36714b2 100644
+--- a/arch/powerpc/mm/pgtable-book3e.c
++++ b/arch/powerpc/mm/pgtable-book3e.c
+@@ -42,7 +42,7 @@ int __meminit vmemmap_create_mapping(unsigned long start,
+ 	 * thus must have the low bits clear
  	 */
- 	cmd->result = 0;
--	if (q->mq_ops) {
--		/*
--		 * Before a SCSI command is dispatched,
--		 * get_device(&sdev->sdev_gendev) is called and the host,
--		 * target and device busy counters are increased. Since
--		 * requeuing a request causes these actions to be repeated and
--		 * since scsi_device_unbusy() has already been called,
--		 * put_device(&device->sdev_gendev) must still be called. Call
--		 * put_device() after blk_mq_requeue_request() to avoid that
--		 * removal of the SCSI device can start before requeueing has
--		 * happened.
--		 */
--		blk_mq_requeue_request(cmd->request, true);
--		put_device(&device->sdev_gendev);
--		return;
--	}
--	spin_lock_irqsave(q->queue_lock, flags);
--	blk_requeue_request(q, cmd->request);
--	kblockd_schedule_work(&device->requeue_work);
--	spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+	/*
-+	 * Before a SCSI command is dispatched,
-+	 * get_device(&sdev->sdev_gendev) is called and the host,
-+	 * target and device busy counters are increased. Since
-+	 * requeuing a request causes these actions to be repeated and
-+	 * since scsi_device_unbusy() has already been called,
-+	 * put_device(&device->sdev_gendev) must still be called. Call
-+	 * put_device() after blk_mq_requeue_request() to avoid that
-+	 * removal of the SCSI device can start before requeueing has
-+	 * happened.
-+	 */
-+	blk_mq_requeue_request(cmd->request, true);
-+	put_device(&device->sdev_gendev);
+ 	for (i = 0; i < page_size; i += PAGE_SIZE)
+-		BUG_ON(map_kernel_page(start + i, phys, flags));
++		BUG_ON(map_kernel_page(start + i, phys, __pgprot(flags)));
+ 
+ 	return 0;
  }
- 
- /*
-@@ -370,10 +362,7 @@ void scsi_device_unbusy(struct scsi_device *sdev)
- 
- static void scsi_kick_queue(struct request_queue *q)
- {
--	if (q->mq_ops)
--		blk_mq_run_hw_queues(q, false);
--	else
--		blk_run_queue(q);
-+	blk_mq_run_hw_queues(q, false);
- }
- 
- /*
-@@ -534,10 +523,7 @@ static void scsi_run_queue(struct request_queue *q)
- 	if (!list_empty(&sdev->host->starved_list))
- 		scsi_starved_list_run(sdev->host);
- 
--	if (q->mq_ops)
--		blk_mq_run_hw_queues(q, false);
--	else
--		blk_run_queue(q);
-+	blk_mq_run_hw_queues(q, false);
- }
- 
- void scsi_requeue_run_queue(struct work_struct *work)
-@@ -550,42 +536,6 @@ void scsi_requeue_run_queue(struct work_struct *work)
- 	scsi_run_queue(q);
- }
- 
--/*
-- * Function:	scsi_requeue_command()
-- *
-- * Purpose:	Handle post-processing of completed commands.
-- *
-- * Arguments:	q	- queue to operate on
-- *		cmd	- command that may need to be requeued.
-- *
-- * Returns:	Nothing
-- *
-- * Notes:	After command completion, there may be blocks left
-- *		over which weren't finished by the previous command
-- *		this can be for a number of reasons - the main one is
-- *		I/O errors in the middle of the request, in which case
-- *		we need to request the blocks that come after the bad
-- *		sector.
-- * Notes:	Upon return, cmd is a stale pointer.
-- */
--static void scsi_requeue_command(struct request_queue *q, struct scsi_cmnd *cmd)
--{
--	struct scsi_device *sdev = cmd->device;
--	struct request *req = cmd->request;
--	unsigned long flags;
--
--	spin_lock_irqsave(q->queue_lock, flags);
--	blk_unprep_request(req);
--	req->special = NULL;
--	scsi_put_command(cmd);
--	blk_requeue_request(q, req);
--	spin_unlock_irqrestore(q->queue_lock, flags);
--
--	scsi_run_queue(q);
--
--	put_device(&sdev->sdev_gendev);
--}
--
- void scsi_run_host_queues(struct Scsi_Host *shost)
- {
- 	struct scsi_device *sdev;
-@@ -626,42 +576,6 @@ static void scsi_mq_uninit_cmd(struct scsi_cmnd *cmd)
- 	scsi_del_cmd_from_list(cmd);
- }
- 
--/*
-- * Function:    scsi_release_buffers()
-- *
-- * Purpose:     Free resources allocate for a scsi_command.
-- *
-- * Arguments:   cmd	- command that we are bailing.
-- *
-- * Lock status: Assumed that no lock is held upon entry.
-- *
-- * Returns:     Nothing
-- *
-- * Notes:       In the event that an upper level driver rejects a
-- *		command, we must release resources allocated during
-- *		the __init_io() function.  Primarily this would involve
-- *		the scatter-gather table.
-- */
--static void scsi_release_buffers(struct scsi_cmnd *cmd)
--{
--	if (cmd->sdb.table.nents)
--		sg_free_table_chained(&cmd->sdb.table, false);
--
--	memset(&cmd->sdb, 0, sizeof(cmd->sdb));
--
--	if (scsi_prot_sg_count(cmd))
--		sg_free_table_chained(&cmd->prot_sdb->table, false);
--}
--
--static void scsi_release_bidi_buffers(struct scsi_cmnd *cmd)
--{
--	struct scsi_data_buffer *bidi_sdb = cmd->request->next_rq->special;
--
--	sg_free_table_chained(&bidi_sdb->table, false);
--	kmem_cache_free(scsi_sdb_cache, bidi_sdb);
--	cmd->request->next_rq->special = NULL;
--}
--
- /* Returns false when no more bytes to process, true if there are more */
- static bool scsi_end_request(struct request *req, blk_status_t error,
- 		unsigned int bytes, unsigned int bidi_bytes)
-@@ -687,37 +601,22 @@ static bool scsi_end_request(struct request *req, blk_status_t error,
- 		destroy_rcu_head(&cmd->rcu);
- 	}
- 
--	if (req->mq_ctx) {
--		/*
--		 * In the MQ case the command gets freed by __blk_mq_end_request,
--		 * so we have to do all cleanup that depends on it earlier.
--		 *
--		 * We also can't kick the queues from irq context, so we
--		 * will have to defer it to a workqueue.
--		 */
--		scsi_mq_uninit_cmd(cmd);
--
--		__blk_mq_end_request(req, error);
--
--		if (scsi_target(sdev)->single_lun ||
--		    !list_empty(&sdev->host->starved_list))
--			kblockd_schedule_work(&sdev->requeue_work);
--		else
--			blk_mq_run_hw_queues(q, true);
--	} else {
--		unsigned long flags;
--
--		if (bidi_bytes)
--			scsi_release_bidi_buffers(cmd);
--		scsi_release_buffers(cmd);
--		scsi_put_command(cmd);
-+	/*
-+	 * In the MQ case the command gets freed by __blk_mq_end_request,
-+	 * so we have to do all cleanup that depends on it earlier.
-+	 *
-+	 * We also can't kick the queues from irq context, so we
-+	 * will have to defer it to a workqueue.
-+	 */
-+	scsi_mq_uninit_cmd(cmd);
- 
--		spin_lock_irqsave(q->queue_lock, flags);
--		blk_finish_request(req, error);
--		spin_unlock_irqrestore(q->queue_lock, flags);
-+	__blk_mq_end_request(req, error);
- 
--		scsi_run_queue(q);
--	}
-+	if (scsi_target(sdev)->single_lun ||
-+	    !list_empty(&sdev->host->starved_list))
-+		kblockd_schedule_work(&sdev->requeue_work);
-+	else
-+		blk_mq_run_hw_queues(q, true);
- 
- 	put_device(&sdev->sdev_gendev);
- 	return false;
-@@ -766,13 +665,7 @@ static void scsi_io_completion_reprep(struct scsi_cmnd *cmd,
- 				      struct request_queue *q)
- {
- 	/* A new command will be prepared and issued. */
--	if (q->mq_ops) {
--		scsi_mq_requeue_cmd(cmd);
--	} else {
--		/* Unprep request and put it back at head of the queue. */
--		scsi_release_buffers(cmd);
--		scsi_requeue_command(q, cmd);
--	}
-+	scsi_mq_requeue_cmd(cmd);
- }
- 
- /* Helper for scsi_io_completion() when special action required. */
-@@ -1147,9 +1040,7 @@ static int scsi_init_sgtable(struct request *req, struct scsi_data_buffer *sdb)
+@@ -70,7 +70,7 @@ static __ref void *early_alloc_pgtable(unsigned long size)
+  * map_kernel_page adds an entry to the ioremap page table
+  * and adds an entry to the HPT, possibly bolting it
   */
- int scsi_init_io(struct scsi_cmnd *cmd)
+-int map_kernel_page(unsigned long ea, unsigned long pa, unsigned long flags)
++int map_kernel_page(unsigned long ea, unsigned long pa, pgprot_t prot)
  {
--	struct scsi_device *sdev = cmd->device;
- 	struct request *rq = cmd->request;
--	bool is_mq = (rq->mq_ctx != NULL);
- 	int error = BLKPREP_KILL;
+ 	pgd_t *pgdp;
+ 	pud_t *pudp;
+@@ -89,8 +89,6 @@ int map_kernel_page(unsigned long ea, unsigned long pa, unsigned long flags)
+ 		ptep = pte_alloc_kernel(pmdp, ea);
+ 		if (!ptep)
+ 			return -ENOMEM;
+-		set_pte_at(&init_mm, ea, ptep, pfn_pte(pa >> PAGE_SHIFT,
+-							  __pgprot(flags)));
+ 	} else {
+ 		pgdp = pgd_offset_k(ea);
+ #ifndef __PAGETABLE_PUD_FOLDED
+@@ -113,9 +111,8 @@ int map_kernel_page(unsigned long ea, unsigned long pa, unsigned long flags)
+ 			pmd_populate_kernel(&init_mm, pmdp, ptep);
+ 		}
+ 		ptep = pte_offset_kernel(pmdp, ea);
+-		set_pte_at(&init_mm, ea, ptep, pfn_pte(pa >> PAGE_SHIFT,
+-							  __pgprot(flags)));
+ 	}
++	set_pte_at(&init_mm, ea, ptep, pfn_pte(pa >> PAGE_SHIFT, prot));
  
- 	if (WARN_ON_ONCE(!blk_rq_nr_phys_segments(rq)))
-@@ -1160,17 +1051,6 @@ int scsi_init_io(struct scsi_cmnd *cmd)
- 		goto err_exit;
- 
- 	if (blk_bidi_rq(rq)) {
--		if (!rq->q->mq_ops) {
--			struct scsi_data_buffer *bidi_sdb =
--				kmem_cache_zalloc(scsi_sdb_cache, GFP_ATOMIC);
--			if (!bidi_sdb) {
--				error = BLKPREP_DEFER;
--				goto err_exit;
--			}
--
--			rq->next_rq->special = bidi_sdb;
--		}
--
- 		error = scsi_init_sgtable(rq->next_rq, rq->next_rq->special);
- 		if (error)
- 			goto err_exit;
-@@ -1210,14 +1090,7 @@ int scsi_init_io(struct scsi_cmnd *cmd)
- 
- 	return BLKPREP_OK;
- err_exit:
--	if (is_mq) {
--		scsi_mq_free_sgtables(cmd);
--	} else {
--		scsi_release_buffers(cmd);
--		cmd->request->special = NULL;
--		scsi_put_command(cmd);
--		put_device(&sdev->sdev_gendev);
--	}
-+	scsi_mq_free_sgtables(cmd);
- 	return error;
- }
- EXPORT_SYMBOL(scsi_init_io);
-@@ -1423,75 +1296,6 @@ scsi_prep_state_check(struct scsi_device *sdev, struct request *req)
- 	return ret;
- }
- 
--static int
--scsi_prep_return(struct request_queue *q, struct request *req, int ret)
--{
--	struct scsi_device *sdev = q->queuedata;
--
--	switch (ret) {
--	case BLKPREP_KILL:
--	case BLKPREP_INVALID:
--		scsi_req(req)->result = DID_NO_CONNECT << 16;
--		/* release the command and kill it */
--		if (req->special) {
--			struct scsi_cmnd *cmd = req->special;
--			scsi_release_buffers(cmd);
--			scsi_put_command(cmd);
--			put_device(&sdev->sdev_gendev);
--			req->special = NULL;
--		}
--		break;
--	case BLKPREP_DEFER:
--		/*
--		 * If we defer, the blk_peek_request() returns NULL, but the
--		 * queue must be restarted, so we schedule a callback to happen
--		 * shortly.
--		 */
--		if (atomic_read(&sdev->device_busy) == 0)
--			blk_delay_queue(q, SCSI_QUEUE_DELAY);
--		break;
--	default:
--		req->rq_flags |= RQF_DONTPREP;
--	}
--
--	return ret;
--}
--
--static int scsi_prep_fn(struct request_queue *q, struct request *req)
--{
--	struct scsi_device *sdev = q->queuedata;
--	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
--	int ret;
--
--	ret = scsi_prep_state_check(sdev, req);
--	if (ret != BLKPREP_OK)
--		goto out;
--
--	if (!req->special) {
--		/* Bail if we can't get a reference to the device */
--		if (unlikely(!get_device(&sdev->sdev_gendev))) {
--			ret = BLKPREP_DEFER;
--			goto out;
--		}
--
--		scsi_init_command(sdev, cmd);
--		req->special = cmd;
--	}
--
--	cmd->tag = req->tag;
--	cmd->request = req;
--	cmd->prot_op = SCSI_PROT_NORMAL;
--
--	ret = scsi_setup_cmnd(sdev, req);
--out:
--	return scsi_prep_return(q, req, ret);
--}
--
--static void scsi_unprep_fn(struct request_queue *q, struct request *req)
--{
--	scsi_uninit_cmd(blk_mq_rq_to_pdu(req));
--}
--
- /*
-  * scsi_dev_queue_ready: if we can send requests to sdev, return 1 else
-  * return 0.
-@@ -1511,14 +1315,8 @@ static inline int scsi_dev_queue_ready(struct request_queue *q,
+ 	smp_wmb();
+ 	return 0;
+diff --git a/arch/powerpc/mm/pgtable-hash64.c b/arch/powerpc/mm/pgtable-hash64.c
+index 692bfc9e372c..c08d49046a96 100644
+--- a/arch/powerpc/mm/pgtable-hash64.c
++++ b/arch/powerpc/mm/pgtable-hash64.c
+@@ -142,7 +142,7 @@ void hash__vmemmap_remove_mapping(unsigned long start,
+  * map_kernel_page adds an entry to the ioremap page table
+  * and adds an entry to the HPT, possibly bolting it
+  */
+-int hash__map_kernel_page(unsigned long ea, unsigned long pa, unsigned long flags)
++int hash__map_kernel_page(unsigned long ea, unsigned long pa, pgprot_t prot)
+ {
+ 	pgd_t *pgdp;
+ 	pud_t *pudp;
+@@ -161,8 +161,7 @@ int hash__map_kernel_page(unsigned long ea, unsigned long pa, unsigned long flag
+ 		ptep = pte_alloc_kernel(pmdp, ea);
+ 		if (!ptep)
+ 			return -ENOMEM;
+-		set_pte_at(&init_mm, ea, ptep, pfn_pte(pa >> PAGE_SHIFT,
+-							  __pgprot(flags)));
++		set_pte_at(&init_mm, ea, ptep, pfn_pte(pa >> PAGE_SHIFT, prot));
+ 	} else {
  		/*
- 		 * unblock after device_blocked iterates to zero
+ 		 * If the mm subsystem is not fully up, we cannot create a
+@@ -170,7 +169,7 @@ int hash__map_kernel_page(unsigned long ea, unsigned long pa, unsigned long flag
+ 		 * entry in the hardware page table.
+ 		 *
  		 */
--		if (atomic_dec_return(&sdev->device_blocked) > 0) {
--			/*
--			 * For the MQ case we take care of this in the caller.
--			 */
--			if (!q->mq_ops)
--				blk_delay_queue(q, SCSI_QUEUE_DELAY);
-+		if (atomic_dec_return(&sdev->device_blocked) > 0)
- 			goto out_dec;
--		}
- 		SCSI_LOG_MLQUEUE(3, sdev_printk(KERN_INFO, sdev,
- 				   "unblocking device at zero depth\n"));
+-		if (htab_bolt_mapping(ea, ea + PAGE_SIZE, pa, flags,
++		if (htab_bolt_mapping(ea, ea + PAGE_SIZE, pa, pgprot_val(prot),
+ 				      mmu_io_psize, mmu_kernel_ssize)) {
+ 			printk(KERN_ERR "Failed to do bolted mapping IO "
+ 			       "memory at %016lx !\n", pa);
+diff --git a/arch/powerpc/mm/pgtable_32.c b/arch/powerpc/mm/pgtable_32.c
+index 6a81a2446c47..0bbc7b7d8a05 100644
+--- a/arch/powerpc/mm/pgtable_32.c
++++ b/arch/powerpc/mm/pgtable_32.c
+@@ -76,36 +76,36 @@ pgtable_t pte_alloc_one(struct mm_struct *mm, unsigned long address)
+ void __iomem *
+ ioremap(phys_addr_t addr, unsigned long size)
+ {
+-	unsigned long flags = pgprot_val(pgprot_noncached(PAGE_KERNEL));
++	pgprot_t prot = pgprot_noncached(PAGE_KERNEL);
+ 
+-	return __ioremap_caller(addr, size, flags, __builtin_return_address(0));
++	return __ioremap_caller(addr, size, prot, __builtin_return_address(0));
+ }
+ EXPORT_SYMBOL(ioremap);
+ 
+ void __iomem *
+ ioremap_wc(phys_addr_t addr, unsigned long size)
+ {
+-	unsigned long flags = pgprot_val(pgprot_noncached_wc(PAGE_KERNEL));
++	pgprot_t prot = pgprot_noncached_wc(PAGE_KERNEL);
+ 
+-	return __ioremap_caller(addr, size, flags, __builtin_return_address(0));
++	return __ioremap_caller(addr, size, prot, __builtin_return_address(0));
+ }
+ EXPORT_SYMBOL(ioremap_wc);
+ 
+ void __iomem *
+ ioremap_wt(phys_addr_t addr, unsigned long size)
+ {
+-	unsigned long flags = pgprot_val(pgprot_cached_wthru(PAGE_KERNEL));
++	pgprot_t prot = pgprot_cached_wthru(PAGE_KERNEL);
+ 
+-	return __ioremap_caller(addr, size, flags, __builtin_return_address(0));
++	return __ioremap_caller(addr, size, prot, __builtin_return_address(0));
+ }
+ EXPORT_SYMBOL(ioremap_wt);
+ 
+ void __iomem *
+ ioremap_coherent(phys_addr_t addr, unsigned long size)
+ {
+-	unsigned long flags = pgprot_val(pgprot_cached(PAGE_KERNEL));
++	pgprot_t prot = pgprot_cached(PAGE_KERNEL);
+ 
+-	return __ioremap_caller(addr, size, flags, __builtin_return_address(0));
++	return __ioremap_caller(addr, size, prot, __builtin_return_address(0));
+ }
+ EXPORT_SYMBOL(ioremap_coherent);
+ 
+@@ -120,19 +120,18 @@ ioremap_prot(phys_addr_t addr, unsigned long size, unsigned long flags)
+ 	flags &= ~(_PAGE_USER | _PAGE_EXEC);
+ 	flags |= _PAGE_PRIVILEGED;
+ 
+-	return __ioremap_caller(addr, size, flags, __builtin_return_address(0));
++	return __ioremap_caller(addr, size, __pgprot(flags), __builtin_return_address(0));
+ }
+ EXPORT_SYMBOL(ioremap_prot);
+ 
+ void __iomem *
+ __ioremap(phys_addr_t addr, unsigned long size, unsigned long flags)
+ {
+-	return __ioremap_caller(addr, size, flags, __builtin_return_address(0));
++	return __ioremap_caller(addr, size, __pgprot(flags), __builtin_return_address(0));
+ }
+ 
+ void __iomem *
+-__ioremap_caller(phys_addr_t addr, unsigned long size, unsigned long flags,
+-		 void *caller)
++__ioremap_caller(phys_addr_t addr, unsigned long size, pgprot_t prot, void *caller)
+ {
+ 	unsigned long v, i;
+ 	phys_addr_t p;
+@@ -195,7 +194,7 @@ __ioremap_caller(phys_addr_t addr, unsigned long size, unsigned long flags,
+ 
+ 	err = 0;
+ 	for (i = 0; i < size && err == 0; i += PAGE_SIZE)
+-		err = map_kernel_page(v+i, p+i, flags);
++		err = map_kernel_page(v + i, p + i, prot);
+ 	if (err) {
+ 		if (slab_is_available())
+ 			vunmap((void *)v);
+@@ -221,7 +220,7 @@ void iounmap(volatile void __iomem *addr)
+ }
+ EXPORT_SYMBOL(iounmap);
+ 
+-int map_kernel_page(unsigned long va, phys_addr_t pa, int flags)
++int map_kernel_page(unsigned long va, phys_addr_t pa, pgprot_t prot)
+ {
+ 	pmd_t *pd;
+ 	pte_t *pg;
+@@ -237,9 +236,8 @@ int map_kernel_page(unsigned long va, phys_addr_t pa, int flags)
+ 		 * hash table
+ 		 */
+ 		BUG_ON((pte_val(*pg) & (_PAGE_PRESENT | _PAGE_HASHPTE)) &&
+-		       flags);
+-		set_pte_at(&init_mm, va, pg, pfn_pte(pa >> PAGE_SHIFT,
+-						     __pgprot(flags)));
++		       pgprot_val(prot));
++		set_pte_at(&init_mm, va, pg, pfn_pte(pa >> PAGE_SHIFT, prot));
  	}
-@@ -1641,74 +1439,6 @@ static inline int scsi_host_queue_ready(struct request_queue *q,
- 	return 0;
- }
- 
--/*
-- * Busy state exporting function for request stacking drivers.
-- *
-- * For efficiency, no lock is taken to check the busy state of
-- * shost/starget/sdev, since the returned value is not guaranteed and
-- * may be changed after request stacking drivers call the function,
-- * regardless of taking lock or not.
-- *
-- * When scsi can't dispatch I/Os anymore and needs to kill I/Os scsi
-- * needs to return 'not busy'. Otherwise, request stacking drivers
-- * may hold requests forever.
-- */
--static int scsi_lld_busy(struct request_queue *q)
--{
--	struct scsi_device *sdev = q->queuedata;
--	struct Scsi_Host *shost;
--
--	if (blk_queue_dying(q))
--		return 0;
--
--	shost = sdev->host;
--
--	/*
--	 * Ignore host/starget busy state.
--	 * Since block layer does not have a concept of fairness across
--	 * multiple queues, congestion of host/starget needs to be handled
--	 * in SCSI layer.
--	 */
--	if (scsi_host_in_recovery(shost) || scsi_device_is_busy(sdev))
--		return 1;
--
--	return 0;
--}
--
--/*
-- * Kill a request for a dead device
-- */
--static void scsi_kill_request(struct request *req, struct request_queue *q)
--{
--	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
--	struct scsi_device *sdev;
--	struct scsi_target *starget;
--	struct Scsi_Host *shost;
--
--	blk_start_request(req);
--
--	scmd_printk(KERN_INFO, cmd, "killing request\n");
--
--	sdev = cmd->device;
--	starget = scsi_target(sdev);
--	shost = sdev->host;
--	scsi_init_cmd_errh(cmd);
--	cmd->result = DID_NO_CONNECT << 16;
--	atomic_inc(&cmd->device->iorequest_cnt);
--
--	/*
--	 * SCSI request completion path will do scsi_device_unbusy(),
--	 * bump busy counts.  To bump the counters, we need to dance
--	 * with the locks as normal issue path does.
--	 */
--	atomic_inc(&sdev->device_busy);
--	atomic_inc(&shost->host_busy);
--	if (starget->can_queue > 0)
--		atomic_inc(&starget->target_busy);
--
--	blk_complete_request(req);
--}
--
- static void scsi_softirq_done(struct request *rq)
- {
- 	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(rq);
-@@ -1829,158 +1559,6 @@ static int scsi_dispatch_cmd(struct scsi_cmnd *cmd)
- 	return 0;
- }
- 
--/**
-- * scsi_done - Invoke completion on finished SCSI command.
-- * @cmd: The SCSI Command for which a low-level device driver (LLDD) gives
-- * ownership back to SCSI Core -- i.e. the LLDD has finished with it.
-- *
-- * Description: This function is the mid-level's (SCSI Core) interrupt routine,
-- * which regains ownership of the SCSI command (de facto) from a LLDD, and
-- * calls blk_complete_request() for further processing.
-- *
-- * This function is interrupt context safe.
-- */
--static void scsi_done(struct scsi_cmnd *cmd)
--{
--	trace_scsi_dispatch_cmd_done(cmd);
--	blk_complete_request(cmd->request);
--}
--
--/*
-- * Function:    scsi_request_fn()
-- *
-- * Purpose:     Main strategy routine for SCSI.
-- *
-- * Arguments:   q       - Pointer to actual queue.
-- *
-- * Returns:     Nothing
-- *
-- * Lock status: request queue lock assumed to be held when called.
-- *
-- * Note: See sd_zbc.c sd_zbc_write_lock_zone() for write order
-- * protection for ZBC disks.
-- */
--static void scsi_request_fn(struct request_queue *q)
--	__releases(q->queue_lock)
--	__acquires(q->queue_lock)
--{
--	struct scsi_device *sdev = q->queuedata;
--	struct Scsi_Host *shost;
--	struct scsi_cmnd *cmd;
--	struct request *req;
--
--	/*
--	 * To start with, we keep looping until the queue is empty, or until
--	 * the host is no longer able to accept any more requests.
--	 */
--	shost = sdev->host;
--	for (;;) {
--		int rtn;
--		/*
--		 * get next queueable request.  We do this early to make sure
--		 * that the request is fully prepared even if we cannot
--		 * accept it.
--		 */
--		req = blk_peek_request(q);
--		if (!req)
--			break;
--
--		if (unlikely(!scsi_device_online(sdev))) {
--			sdev_printk(KERN_ERR, sdev,
--				    "rejecting I/O to offline device\n");
--			scsi_kill_request(req, q);
--			continue;
--		}
--
--		if (!scsi_dev_queue_ready(q, sdev))
--			break;
--
--		/*
--		 * Remove the request from the request list.
--		 */
--		if (!(blk_queue_tagged(q) && !blk_queue_start_tag(q, req)))
--			blk_start_request(req);
--
--		spin_unlock_irq(q->queue_lock);
--		cmd = blk_mq_rq_to_pdu(req);
--		if (cmd != req->special) {
--			printk(KERN_CRIT "impossible request in %s.\n"
--					 "please mail a stack trace to "
--					 "linux-scsi@vger.kernel.org\n",
--					 __func__);
--			blk_dump_rq_flags(req, "foo");
--			BUG();
--		}
--
--		/*
--		 * We hit this when the driver is using a host wide
--		 * tag map. For device level tag maps the queue_depth check
--		 * in the device ready fn would prevent us from trying
--		 * to allocate a tag. Since the map is a shared host resource
--		 * we add the dev to the starved list so it eventually gets
--		 * a run when a tag is freed.
--		 */
--		if (blk_queue_tagged(q) && !(req->rq_flags & RQF_QUEUED)) {
--			spin_lock_irq(shost->host_lock);
--			if (list_empty(&sdev->starved_entry))
--				list_add_tail(&sdev->starved_entry,
--					      &shost->starved_list);
--			spin_unlock_irq(shost->host_lock);
--			goto not_ready;
--		}
--
--		if (!scsi_target_queue_ready(shost, sdev))
--			goto not_ready;
--
--		if (!scsi_host_queue_ready(q, shost, sdev))
--			goto host_not_ready;
--	
--		if (sdev->simple_tags)
--			cmd->flags |= SCMD_TAGGED;
--		else
--			cmd->flags &= ~SCMD_TAGGED;
--
--		/*
--		 * Finally, initialize any error handling parameters, and set up
--		 * the timers for timeouts.
--		 */
--		scsi_init_cmd_errh(cmd);
--
--		/*
--		 * Dispatch the command to the low-level driver.
--		 */
--		cmd->scsi_done = scsi_done;
--		rtn = scsi_dispatch_cmd(cmd);
--		if (rtn) {
--			scsi_queue_insert(cmd, rtn);
--			spin_lock_irq(q->queue_lock);
--			goto out_delay;
--		}
--		spin_lock_irq(q->queue_lock);
--	}
--
--	return;
--
-- host_not_ready:
--	if (scsi_target(sdev)->can_queue > 0)
--		atomic_dec(&scsi_target(sdev)->target_busy);
-- not_ready:
--	/*
--	 * lock q, handle tag, requeue req, and decrement device_busy. We
--	 * must return with queue_lock held.
--	 *
--	 * Decrementing device_busy without checking it is OK, as all such
--	 * cases (host limits or settings) should run the queue at some
--	 * later time.
--	 */
--	spin_lock_irq(q->queue_lock);
--	blk_requeue_request(q, req);
--	atomic_dec(&sdev->device_busy);
--out_delay:
--	if (!atomic_read(&sdev->device_busy) && !scsi_device_blocked(sdev))
--		blk_delay_queue(q, SCSI_QUEUE_DELAY);
--}
--
- static inline blk_status_t prep_to_mq(int ret)
- {
- 	switch (ret) {
-@@ -2243,77 +1821,6 @@ void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(__scsi_init_queue);
- 
--static int scsi_old_init_rq(struct request_queue *q, struct request *rq,
--			    gfp_t gfp)
--{
--	struct Scsi_Host *shost = q->rq_alloc_data;
--	const bool unchecked_isa_dma = shost->unchecked_isa_dma;
--	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(rq);
--
--	memset(cmd, 0, sizeof(*cmd));
--
--	if (unchecked_isa_dma)
--		cmd->flags |= SCMD_UNCHECKED_ISA_DMA;
--	cmd->sense_buffer = scsi_alloc_sense_buffer(unchecked_isa_dma, gfp,
--						    NUMA_NO_NODE);
--	if (!cmd->sense_buffer)
--		goto fail;
--	cmd->req.sense = cmd->sense_buffer;
--
--	if (scsi_host_get_prot(shost) >= SHOST_DIX_TYPE0_PROTECTION) {
--		cmd->prot_sdb = kmem_cache_zalloc(scsi_sdb_cache, gfp);
--		if (!cmd->prot_sdb)
--			goto fail_free_sense;
--	}
--
--	return 0;
--
--fail_free_sense:
--	scsi_free_sense_buffer(unchecked_isa_dma, cmd->sense_buffer);
--fail:
--	return -ENOMEM;
--}
--
--static void scsi_old_exit_rq(struct request_queue *q, struct request *rq)
--{
--	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(rq);
--
--	if (cmd->prot_sdb)
--		kmem_cache_free(scsi_sdb_cache, cmd->prot_sdb);
--	scsi_free_sense_buffer(cmd->flags & SCMD_UNCHECKED_ISA_DMA,
--			       cmd->sense_buffer);
--}
--
--struct request_queue *scsi_old_alloc_queue(struct scsi_device *sdev)
--{
--	struct Scsi_Host *shost = sdev->host;
--	struct request_queue *q;
--
--	q = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE, NULL);
--	if (!q)
--		return NULL;
--	q->cmd_size = sizeof(struct scsi_cmnd) + shost->hostt->cmd_size;
--	q->rq_alloc_data = shost;
--	q->request_fn = scsi_request_fn;
--	q->init_rq_fn = scsi_old_init_rq;
--	q->exit_rq_fn = scsi_old_exit_rq;
--	q->initialize_rq_fn = scsi_initialize_rq;
--
--	if (blk_init_allocated_queue(q) < 0) {
--		blk_cleanup_queue(q);
--		return NULL;
--	}
--
--	__scsi_init_queue(shost, q);
--	blk_queue_flag_set(QUEUE_FLAG_SCSI_PASSTHROUGH, q);
--	blk_queue_prep_rq(q, scsi_prep_fn);
--	blk_queue_unprep_rq(q, scsi_unprep_fn);
--	blk_queue_softirq_done(q, scsi_softirq_done);
--	blk_queue_rq_timed_out(q, scsi_times_out);
--	blk_queue_lld_busy(q, scsi_lld_busy);
--	return q;
--}
--
- static const struct blk_mq_ops scsi_mq_ops = {
- 	.get_budget	= scsi_mq_get_budget,
- 	.put_budget	= scsi_mq_put_budget,
-@@ -2380,10 +1887,7 @@ struct scsi_device *scsi_device_from_queue(struct request_queue *q)
- {
- 	struct scsi_device *sdev = NULL;
- 
--	if (q->mq_ops) {
--		if (q->mq_ops == &scsi_mq_ops)
--			sdev = q->queuedata;
--	} else if (q->request_fn == scsi_request_fn)
-+	if (q->mq_ops == &scsi_mq_ops)
- 		sdev = q->queuedata;
- 	if (!sdev || !get_device(&sdev->sdev_gendev))
- 		sdev = NULL;
-@@ -2986,39 +2490,6 @@ void sdev_evt_send_simple(struct scsi_device *sdev,
- }
- EXPORT_SYMBOL_GPL(sdev_evt_send_simple);
- 
--/**
-- * scsi_request_fn_active() - number of kernel threads inside scsi_request_fn()
-- * @sdev: SCSI device to count the number of scsi_request_fn() callers for.
-- */
--static int scsi_request_fn_active(struct scsi_device *sdev)
--{
--	struct request_queue *q = sdev->request_queue;
--	int request_fn_active;
--
--	WARN_ON_ONCE(sdev->host->use_blk_mq);
--
--	spin_lock_irq(q->queue_lock);
--	request_fn_active = q->request_fn_active;
--	spin_unlock_irq(q->queue_lock);
--
--	return request_fn_active;
--}
--
--/**
-- * scsi_wait_for_queuecommand() - wait for ongoing queuecommand() calls
-- * @sdev: SCSI device pointer.
-- *
-- * Wait until the ongoing shost->hostt->queuecommand() calls that are
-- * invoked from scsi_request_fn() have finished.
-- */
--static void scsi_wait_for_queuecommand(struct scsi_device *sdev)
--{
--	WARN_ON_ONCE(sdev->host->use_blk_mq);
--
--	while (scsi_request_fn_active(sdev))
--		msleep(20);
--}
--
- /**
-  *	scsi_device_quiesce - Block user issued commands.
-  *	@sdev:	scsi device to quiesce.
-@@ -3142,7 +2613,6 @@ EXPORT_SYMBOL(scsi_target_resume);
- int scsi_internal_device_block_nowait(struct scsi_device *sdev)
- {
- 	struct request_queue *q = sdev->request_queue;
--	unsigned long flags;
- 	int err = 0;
- 
- 	err = scsi_device_set_state(sdev, SDEV_BLOCK);
-@@ -3158,14 +2628,7 @@ int scsi_internal_device_block_nowait(struct scsi_device *sdev)
- 	 * block layer from calling the midlayer with this device's
- 	 * request queue. 
- 	 */
--	if (q->mq_ops) {
--		blk_mq_quiesce_queue_nowait(q);
--	} else {
--		spin_lock_irqsave(q->queue_lock, flags);
--		blk_stop_queue(q);
--		spin_unlock_irqrestore(q->queue_lock, flags);
--	}
--
-+	blk_mq_quiesce_queue_nowait(q);
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(scsi_internal_device_block_nowait);
-@@ -3196,12 +2659,8 @@ static int scsi_internal_device_block(struct scsi_device *sdev)
- 
- 	mutex_lock(&sdev->state_mutex);
- 	err = scsi_internal_device_block_nowait(sdev);
--	if (err == 0) {
--		if (q->mq_ops)
--			blk_mq_quiesce_queue(q);
--		else
--			scsi_wait_for_queuecommand(sdev);
--	}
-+	if (err == 0)
-+		blk_mq_quiesce_queue(q);
- 	mutex_unlock(&sdev->state_mutex);
- 
+ 	smp_wmb();
  	return err;
-@@ -3210,15 +2669,8 @@ static int scsi_internal_device_block(struct scsi_device *sdev)
- void scsi_start_queue(struct scsi_device *sdev)
+@@ -250,7 +248,7 @@ int map_kernel_page(unsigned long va, phys_addr_t pa, int flags)
+  */
+ static void __init __mapin_ram_chunk(unsigned long offset, unsigned long top)
  {
- 	struct request_queue *q = sdev->request_queue;
--	unsigned long flags;
+-	unsigned long v, s, f;
++	unsigned long v, s;
+ 	phys_addr_t p;
+ 	int ktext;
  
--	if (q->mq_ops) {
--		blk_mq_unquiesce_queue(q);
--	} else {
--		spin_lock_irqsave(q->queue_lock, flags);
--		blk_start_queue(q);
--		spin_unlock_irqrestore(q->queue_lock, flags);
--	}
-+	blk_mq_unquiesce_queue(q);
- }
- 
- /**
-diff --git a/drivers/scsi/scsi_priv.h b/drivers/scsi/scsi_priv.h
-index 99f1db5e467e..5f21547b2ad2 100644
---- a/drivers/scsi/scsi_priv.h
-+++ b/drivers/scsi/scsi_priv.h
-@@ -92,7 +92,6 @@ extern void scsi_queue_insert(struct scsi_cmnd *cmd, int reason);
- extern void scsi_io_completion(struct scsi_cmnd *, unsigned int);
- extern void scsi_run_host_queues(struct Scsi_Host *shost);
- extern void scsi_requeue_run_queue(struct work_struct *work);
--extern struct request_queue *scsi_old_alloc_queue(struct scsi_device *sdev);
- extern struct request_queue *scsi_mq_alloc_queue(struct scsi_device *sdev);
- extern void scsi_start_queue(struct scsi_device *sdev);
- extern int scsi_mq_setup_tags(struct Scsi_Host *shost);
-diff --git a/drivers/scsi/scsi_scan.c b/drivers/scsi/scsi_scan.c
-index 78ca63dfba4a..dd0d516f65e2 100644
---- a/drivers/scsi/scsi_scan.c
-+++ b/drivers/scsi/scsi_scan.c
-@@ -266,10 +266,7 @@ static struct scsi_device *scsi_alloc_sdev(struct scsi_target *starget,
- 	 */
- 	sdev->borken = 1;
- 
--	if (shost_use_blk_mq(shost))
--		sdev->request_queue = scsi_mq_alloc_queue(sdev);
--	else
--		sdev->request_queue = scsi_old_alloc_queue(sdev);
-+	sdev->request_queue = scsi_mq_alloc_queue(sdev);
- 	if (!sdev->request_queue) {
- 		/* release fn is set up in scsi_sysfs_device_initialise, so
- 		 * have to free and put manually here */
-@@ -280,11 +277,6 @@ static struct scsi_device *scsi_alloc_sdev(struct scsi_target *starget,
- 	WARN_ON_ONCE(!blk_get_queue(sdev->request_queue));
- 	sdev->request_queue->queuedata = sdev;
- 
--	if (!shost_use_blk_mq(sdev->host)) {
--		blk_queue_init_tags(sdev->request_queue,
--				    sdev->host->cmd_per_lun, shost->bqt,
--				    shost->hostt->tag_alloc_policy);
--	}
- 	scsi_change_queue_depth(sdev, sdev->host->cmd_per_lun ?
- 					sdev->host->cmd_per_lun : 1);
- 
-diff --git a/drivers/scsi/scsi_sysfs.c b/drivers/scsi/scsi_sysfs.c
-index 3aee9464a7bf..12e2c2829df2 100644
---- a/drivers/scsi/scsi_sysfs.c
-+++ b/drivers/scsi/scsi_sysfs.c
-@@ -367,7 +367,6 @@ store_shost_eh_deadline(struct device *dev, struct device_attribute *attr,
- 
- static DEVICE_ATTR(eh_deadline, S_IRUGO | S_IWUSR, show_shost_eh_deadline, store_shost_eh_deadline);
- 
--shost_rd_attr(use_blk_mq, "%d\n");
- shost_rd_attr(unique_id, "%u\n");
- shost_rd_attr(cmd_per_lun, "%hd\n");
- shost_rd_attr(can_queue, "%hd\n");
-@@ -386,6 +385,13 @@ show_host_busy(struct device *dev, struct device_attribute *attr, char *buf)
- }
- static DEVICE_ATTR(host_busy, S_IRUGO, show_host_busy, NULL);
- 
-+static ssize_t
-+show_use_blk_mq(struct device *dev, struct device_attribute *attr, char *buf)
-+{
-+	return snprintf(buf, 20, "1\n");
-+}
-+static DEVICE_ATTR(use_blk_mq, S_IRUGO, show_use_blk_mq, NULL);
-+
- static struct attribute *scsi_sysfs_shost_attrs[] = {
- 	&dev_attr_use_blk_mq.attr,
- 	&dev_attr_unique_id.attr,
-diff --git a/drivers/scsi/ufs/ufshcd.c b/drivers/scsi/ufs/ufshcd.c
-index 23d7cca36ff0..fb308ea8e9a5 100644
---- a/drivers/scsi/ufs/ufshcd.c
-+++ b/drivers/scsi/ufs/ufshcd.c
-@@ -8100,12 +8100,6 @@ int ufshcd_alloc_host(struct device *dev, struct ufs_hba **hba_handle)
- 		goto out_error;
- 	}
- 
--	/*
--	 * Do not use blk-mq at this time because blk-mq does not support
--	 * runtime pm.
--	 */
--	host->use_blk_mq = false;
--
- 	hba = shost_priv(host);
- 	hba->host = host;
- 	hba->dev = dev;
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index 5ea06d310a25..aa760df8c6b3 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -11,7 +11,6 @@
- #include <linux/blk-mq.h>
- #include <scsi/scsi.h>
- 
--struct request_queue;
- struct block_device;
- struct completion;
- struct module;
-@@ -22,7 +21,6 @@ struct scsi_target;
- struct Scsi_Host;
- struct scsi_host_cmd_pool;
- struct scsi_transport_template;
--struct blk_queue_tags;
- 
- 
- /*
-@@ -547,14 +545,8 @@ struct Scsi_Host {
- 	struct scsi_host_template *hostt;
- 	struct scsi_transport_template *transportt;
- 
--	/*
--	 * Area to keep a shared tag map (if needed, will be
--	 * NULL if not).
--	 */
--	union {
--		struct blk_queue_tag	*bqt;
--		struct blk_mq_tag_set	tag_set;
--	};
-+	/* Area to keep a shared tag map */
-+	struct blk_mq_tag_set	tag_set;
- 
- 	atomic_t host_busy;		   /* commands actually active on low-level */
- 	atomic_t host_blocked;
-@@ -648,7 +640,6 @@ struct Scsi_Host {
- 	/* The controller does not support WRITE SAME */
- 	unsigned no_write_same:1;
- 
--	unsigned use_blk_mq:1;
- 	unsigned use_cmd_list:1;
- 
- 	/* Host responded with short (<36 bytes) INQUIRY result */
-@@ -742,11 +733,6 @@ static inline int scsi_host_in_recovery(struct Scsi_Host *shost)
- 		shost->tmf_in_progress;
- }
- 
--static inline bool shost_use_blk_mq(struct Scsi_Host *shost)
--{
--	return shost->use_blk_mq;
--}
--
- extern int scsi_queue_work(struct Scsi_Host *, struct work_struct *);
- extern void scsi_flush_work(struct Scsi_Host *);
- 
-diff --git a/include/scsi/scsi_tcq.h b/include/scsi/scsi_tcq.h
-index e192a0caa850..6053d46e794e 100644
---- a/include/scsi/scsi_tcq.h
-+++ b/include/scsi/scsi_tcq.h
-@@ -23,19 +23,15 @@ static inline struct scsi_cmnd *scsi_host_find_tag(struct Scsi_Host *shost,
- 		int tag)
+@@ -260,8 +258,7 @@ static void __init __mapin_ram_chunk(unsigned long offset, unsigned long top)
+ 	for (; s < top; s += PAGE_SIZE) {
+ 		ktext = ((char *)v >= _stext && (char *)v < etext) ||
+ 			((char *)v >= _sinittext && (char *)v < _einittext);
+-		f = ktext ? pgprot_val(PAGE_KERNEL_TEXT) : pgprot_val(PAGE_KERNEL);
+-		map_kernel_page(v, p, f);
++		map_kernel_page(v, p, ktext ? PAGE_KERNEL_TEXT : PAGE_KERNEL);
+ #ifdef CONFIG_PPC_STD_MMU_32
+ 		if (ktext)
+ 			hash_preload(&init_mm, v, 0, 0x300);
+diff --git a/arch/powerpc/mm/pgtable_64.c b/arch/powerpc/mm/pgtable_64.c
+index 1f1bb40555a8..b0f4a4b4f62b 100644
+--- a/arch/powerpc/mm/pgtable_64.c
++++ b/arch/powerpc/mm/pgtable_64.c
+@@ -113,13 +113,12 @@ unsigned long ioremap_bot = IOREMAP_BASE;
+  * __ioremap_at - Low level function to establish the page tables
+  *                for an IO mapping
+  */
+-void __iomem * __ioremap_at(phys_addr_t pa, void *ea, unsigned long size,
+-			    unsigned long flags)
++void __iomem *__ioremap_at(phys_addr_t pa, void *ea, unsigned long size, pgprot_t prot)
  {
- 	struct request *req = NULL;
-+	u16 hwq;
+ 	unsigned long i;
  
- 	if (tag == SCSI_NO_TAG)
+ 	/* We don't support the 4K PFN hack with ioremap */
+-	if (flags & H_PAGE_4K_PFN)
++	if (pgprot_val(prot) & H_PAGE_4K_PFN)
  		return NULL;
  
--	if (shost_use_blk_mq(shost)) {
--		u16 hwq = blk_mq_unique_tag_to_hwq(tag);
--
--		if (hwq < shost->tag_set.nr_hw_queues) {
--			req = blk_mq_tag_to_rq(shost->tag_set.tags[hwq],
--				blk_mq_unique_tag_to_tag(tag));
--		}
--	} else {
--		req = blk_map_queue_find_tag(shost->bqt, tag);
-+	hwq = blk_mq_unique_tag_to_hwq(tag);
-+	if (hwq < shost->tag_set.nr_hw_queues) {
-+		req = blk_mq_tag_to_rq(shost->tag_set.tags[hwq],
-+					blk_mq_unique_tag_to_tag(tag));
- 	}
+ 	WARN_ON(pa & ~PAGE_MASK);
+@@ -127,7 +126,7 @@ void __iomem * __ioremap_at(phys_addr_t pa, void *ea, unsigned long size,
+ 	WARN_ON(size & ~PAGE_MASK);
  
- 	if (!req)
+ 	for (i = 0; i < size; i += PAGE_SIZE)
+-		if (map_kernel_page((unsigned long)ea+i, pa+i, flags))
++		if (map_kernel_page((unsigned long)ea + i, pa + i, prot))
+ 			return NULL;
+ 
+ 	return (void __iomem *)ea;
+@@ -148,7 +147,7 @@ void __iounmap_at(void *ea, unsigned long size)
+ }
+ 
+ void __iomem * __ioremap_caller(phys_addr_t addr, unsigned long size,
+-				unsigned long flags, void *caller)
++				pgprot_t prot, void *caller)
+ {
+ 	phys_addr_t paligned;
+ 	void __iomem *ret;
+@@ -178,11 +177,11 @@ void __iomem * __ioremap_caller(phys_addr_t addr, unsigned long size,
+ 			return NULL;
+ 
+ 		area->phys_addr = paligned;
+-		ret = __ioremap_at(paligned, area->addr, size, flags);
++		ret = __ioremap_at(paligned, area->addr, size, prot);
+ 		if (!ret)
+ 			vunmap(area->addr);
+ 	} else {
+-		ret = __ioremap_at(paligned, (void *)ioremap_bot, size, flags);
++		ret = __ioremap_at(paligned, (void *)ioremap_bot, size, prot);
+ 		if (ret)
+ 			ioremap_bot += size;
+ 	}
+@@ -195,37 +194,37 @@ void __iomem * __ioremap_caller(phys_addr_t addr, unsigned long size,
+ void __iomem * __ioremap(phys_addr_t addr, unsigned long size,
+ 			 unsigned long flags)
+ {
+-	return __ioremap_caller(addr, size, flags, __builtin_return_address(0));
++	return __ioremap_caller(addr, size, __pgprot(flags), __builtin_return_address(0));
+ }
+ 
+ void __iomem * ioremap(phys_addr_t addr, unsigned long size)
+ {
+-	unsigned long flags = pgprot_val(pgprot_noncached(PAGE_KERNEL));
++	pgprot_t prot = pgprot_noncached(PAGE_KERNEL);
+ 	void *caller = __builtin_return_address(0);
+ 
+ 	if (ppc_md.ioremap)
+-		return ppc_md.ioremap(addr, size, flags, caller);
+-	return __ioremap_caller(addr, size, flags, caller);
++		return ppc_md.ioremap(addr, size, prot, caller);
++	return __ioremap_caller(addr, size, prot, caller);
+ }
+ 
+ void __iomem * ioremap_wc(phys_addr_t addr, unsigned long size)
+ {
+-	unsigned long flags = pgprot_val(pgprot_noncached_wc(PAGE_KERNEL));
++	pgprot_t prot = pgprot_noncached_wc(PAGE_KERNEL);
+ 	void *caller = __builtin_return_address(0);
+ 
+ 	if (ppc_md.ioremap)
+-		return ppc_md.ioremap(addr, size, flags, caller);
+-	return __ioremap_caller(addr, size, flags, caller);
++		return ppc_md.ioremap(addr, size, prot, caller);
++	return __ioremap_caller(addr, size, prot, caller);
+ }
+ 
+ void __iomem *ioremap_coherent(phys_addr_t addr, unsigned long size)
+ {
+-	unsigned long flags = pgprot_val(pgprot_cached(PAGE_KERNEL));
++	pgprot_t prot = pgprot_cached(PAGE_KERNEL);
+ 	void *caller = __builtin_return_address(0);
+ 
+ 	if (ppc_md.ioremap)
+-		return ppc_md.ioremap(addr, size, flags, caller);
+-	return __ioremap_caller(addr, size, flags, caller);
++		return ppc_md.ioremap(addr, size, prot, caller);
++	return __ioremap_caller(addr, size, prot, caller);
+ }
+ 
+ void __iomem * ioremap_prot(phys_addr_t addr, unsigned long size,
+@@ -246,8 +245,8 @@ void __iomem * ioremap_prot(phys_addr_t addr, unsigned long size,
+ 	flags |= _PAGE_PRIVILEGED;
+ 
+ 	if (ppc_md.ioremap)
+-		return ppc_md.ioremap(addr, size, flags, caller);
+-	return __ioremap_caller(addr, size, flags, caller);
++		return ppc_md.ioremap(addr, size, __pgprot(flags), caller);
++	return __ioremap_caller(addr, size, __pgprot(flags), caller);
+ }
+ 
+ 
+diff --git a/drivers/pcmcia/electra_cf.c b/drivers/pcmcia/electra_cf.c
+index 34d6c1a0971e..b31abe35ed2c 100644
+--- a/drivers/pcmcia/electra_cf.c
++++ b/drivers/pcmcia/electra_cf.c
+@@ -230,7 +230,7 @@ static int electra_cf_probe(struct platform_device *ofdev)
+ 
+ 	if (!cf->mem_base || !cf->io_virt || !cf->gpio_base ||
+ 	    (__ioremap_at(io.start, cf->io_virt, cf->io_size,
+-			  pgprot_val(pgprot_noncached(PAGE_KERNEL))) == NULL)) {
++			  pgprot_noncached(PAGE_KERNEL)) == NULL)) {
+ 		dev_err(device, "can't ioremap ranges\n");
+ 		status = -ENOMEM;
+ 		goto fail1;
 -- 
-2.17.1
+2.13.3
