@@ -1,117 +1,65 @@
-Return-Path: <BATV+8bbc4aa54a9b92872f27+5534+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Joshua Morris <josh.h.morris@us.ibm.com>,
-	Philip Kelleher <pjk1939@linux.vnet.ibm.com>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 4/6] umem: switch to the generic DMA API
-Date: Thu, 18 Oct 2018 15:15:14 +0200
-Message-Id: <20181018131516.10629-5-hch@lst.de>
-In-Reply-To: <20181018131516.10629-1-hch@lst.de>
-References: <20181018131516.10629-1-hch@lst.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:46323 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728065AbeJIScA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:32:00 -0400
+Received: by mail-pf1-f196.google.com with SMTP id r64-v6so662121pfb.13
+        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:15:33 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 41/45] lightnvm: pblk: guarantee mw_cunits on read buffer
+Date: Tue,  9 Oct 2018 13:12:11 +0200
+Message-Id: <20181009111215.7653-42-mb@lightnvm.io>
+In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
+References: <20181009111215.7653-1-mb@lightnvm.io>
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The PCI DMA API is deprecated, switch to the generic DMA API instead.
+From: Javier González <javier@javigon.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+OCSSD 2.0 defines the amount of data that the host must buffer per chunk
+to guarantee reads through the geometry field mw_cunits. This value is
+the base that pblk uses to determine the size of its read buffer.
+Currently, this size is set to be the closes power-of-2 to mw_cunits
+times the number of parallel units available to the pblk instance for
+each open line (currently one). When an entry (4KB) is put in the
+buffer, the L2P table points to it. As the buffer wraps up, the L2P is
+updated to point to addresses on the device, thus guaranteeing mw_cunits
+at a chunk level.
+
+However, given that pblk cannot write to the device under ws_min
+(normally ws_opt), there might be a window in which the buffer starts
+wrapping up and updating L2P entries before the mw_cunits value in a
+chunk has been surpassed.
+
+In order not to violate the mw_cunits constrain in this case, account
+for ws_opt on the read buffer creation.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- drivers/block/umem.c | 38 ++++++++++++++++++--------------------
- 1 file changed, 18 insertions(+), 20 deletions(-)
+ drivers/lightnvm/pblk-init.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/umem.c b/drivers/block/umem.c
-index 9094ca60949c..be3e3ab79950 100644
---- a/drivers/block/umem.c
-+++ b/drivers/block/umem.c
-@@ -363,12 +363,12 @@ static int add_bio(struct cardinfo *card)
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index b2c49fc006c9..e0db0cb3122d 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -195,7 +195,8 @@ static int pblk_rwb_init(struct pblk *pblk)
+ 	unsigned long buffer_size;
+ 	int pgs_in_buffer;
  
- 	vec = bio_iter_iovec(bio, card->current_iter);
+-	pgs_in_buffer = max(geo->mw_cunits, geo->ws_opt) * geo->all_luns;
++	pgs_in_buffer = (max(geo->mw_cunits, geo->ws_opt) + geo->ws_opt)
++								* geo->all_luns;
  
--	dma_handle = pci_map_page(card->dev,
-+	dma_handle = dma_map_page(&card->dev->dev,
- 				  vec.bv_page,
- 				  vec.bv_offset,
- 				  vec.bv_len,
- 				  bio_op(bio) == REQ_OP_READ ?
--				  PCI_DMA_FROMDEVICE : PCI_DMA_TODEVICE);
-+				  DMA_FROM_DEVICE : DMA_TO_DEVICE);
- 
- 	p = &card->mm_pages[card->Ready];
- 	desc = &p->desc[p->cnt];
-@@ -448,10 +448,10 @@ static void process_page(unsigned long data)
- 				page->iter = page->bio->bi_iter;
- 		}
- 
--		pci_unmap_page(card->dev, desc->data_dma_handle,
-+		dma_unmap_page(&card->dev->dev, desc->data_dma_handle,
- 			       vec.bv_len,
- 				 (control & DMASCR_TRANSFER_READ) ?
--				PCI_DMA_TODEVICE : PCI_DMA_FROMDEVICE);
-+				DMA_TO_DEVICE : DMA_FROM_DEVICE);
- 		if (control & DMASCR_HARD_ERROR) {
- 			/* error */
- 			bio->bi_status = BLK_STS_IOERR;
-@@ -817,8 +817,8 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
- 	dev_printk(KERN_INFO, &dev->dev,
- 	  "Micro Memory(tm) controller found (PCI Mem Module (Battery Backup))\n");
- 
--	if (pci_set_dma_mask(dev, DMA_BIT_MASK(64)) &&
--	    pci_set_dma_mask(dev, DMA_BIT_MASK(32))) {
-+	if (dma_set_mask(&dev->dev, DMA_BIT_MASK(64)) &&
-+	    dma_set_mask(&dev->dev, DMA_BIT_MASK(32))) {
- 		dev_printk(KERN_WARNING, &dev->dev, "NO suitable DMA found\n");
- 		return  -ENOMEM;
- 	}
-@@ -871,12 +871,10 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
- 		goto failed_magic;
- 	}
- 
--	card->mm_pages[0].desc = pci_alloc_consistent(card->dev,
--						PAGE_SIZE * 2,
--						&card->mm_pages[0].page_dma);
--	card->mm_pages[1].desc = pci_alloc_consistent(card->dev,
--						PAGE_SIZE * 2,
--						&card->mm_pages[1].page_dma);
-+	card->mm_pages[0].desc = dma_alloc_coherent(&card->dev->dev,
-+			PAGE_SIZE * 2, &card->mm_pages[0].page_dma, GFP_KERNEL);
-+	card->mm_pages[1].desc = dma_alloc_coherent(&card->dev->dev,
-+			PAGE_SIZE * 2, &card->mm_pages[1].page_dma, GFP_KERNEL);
- 	if (card->mm_pages[0].desc == NULL ||
- 	    card->mm_pages[1].desc == NULL) {
- 		dev_printk(KERN_ERR, &card->dev->dev, "alloc failed\n");
-@@ -1002,13 +1000,13 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
-  failed_req_irq:
-  failed_alloc:
- 	if (card->mm_pages[0].desc)
--		pci_free_consistent(card->dev, PAGE_SIZE*2,
--				    card->mm_pages[0].desc,
--				    card->mm_pages[0].page_dma);
-+		dma_free_coherent(&card->dev->dev, PAGE_SIZE * 2,
-+				  card->mm_pages[0].desc,
-+				  card->mm_pages[0].page_dma);
- 	if (card->mm_pages[1].desc)
--		pci_free_consistent(card->dev, PAGE_SIZE*2,
--				    card->mm_pages[1].desc,
--				    card->mm_pages[1].page_dma);
-+		dma_free_coherent(&card->dev->dev, PAGE_SIZE * 2,
-+				  card->mm_pages[1].desc,
-+				  card->mm_pages[1].page_dma);
-  failed_magic:
- 	iounmap(card->csr_remap);
-  failed_remap_csr:
-@@ -1027,11 +1025,11 @@ static void mm_pci_remove(struct pci_dev *dev)
- 	iounmap(card->csr_remap);
- 
- 	if (card->mm_pages[0].desc)
--		pci_free_consistent(card->dev, PAGE_SIZE*2,
-+		dma_free_coherent(&card->dev->dev, PAGE_SIZE * 2,
- 				    card->mm_pages[0].desc,
- 				    card->mm_pages[0].page_dma);
- 	if (card->mm_pages[1].desc)
--		pci_free_consistent(card->dev, PAGE_SIZE*2,
-+		dma_free_coherent(&card->dev->dev, PAGE_SIZE * 2,
- 				    card->mm_pages[1].desc,
- 				    card->mm_pages[1].page_dma);
- 	blk_cleanup_queue(card->queue);
+ 	if (write_buffer_size && (write_buffer_size > pgs_in_buffer))
+ 		buffer_size = write_buffer_size;
 -- 
-2.19.1
+2.17.1
