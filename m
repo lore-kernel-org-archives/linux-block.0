@@ -1,48 +1,131 @@
-Return-Path: <esyr@redhat.com>
-Date: Sat, 6 Oct 2018 20:07:03 +0200
-From: Eugene Syromiatnikov <esyr@redhat.com>
-To: nbd@other.debian.org, linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] nbd: avoid losing the pointer to reallocated config->socks
- in nbd_add_socket()
-Message-ID: <20181006180703.GA1870@asgard.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <bbf9c5cc3b44c70bec26b6cfa898cd59c1c08c2c.1539092112.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1539092111.git.christophe.leroy@c-s.fr>
+References: <cover.1539092111.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v3 15/24] powerpc/mm: move __P and __S tables in the common
+ pgtable.h
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Tue,  9 Oct 2018 13:52:02 +0000 (UTC)
 List-ID: <linux-block@vger.kernel.org>
 
-In the (very unlikely) case of config->socks reallocation success and
-nsock allocation failure config->nsock will not get updated with the new pointer
-to socks array. Fix it by updating config->socks right after reallocation
-successfulness check.
+__P and __S flags are the same for all platform and should remain
+as is in the future, so avoid duplication.
 
-Fixes: 9561a7ade0c2 ("nbd: add multi-connection support")
-Signed-off-by: Eugene Syromiatnikov <esyr@redhat.com>
-Cc: stable@vger.kernel.org # 4.10+
+Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- drivers/block/nbd.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/powerpc/include/asm/book3s/64/pgtable.h | 20 --------------------
+ arch/powerpc/include/asm/pgtable.h           | 19 +++++++++++++++++++
+ arch/powerpc/include/asm/pte-common.h        | 20 --------------------
+ 3 files changed, 19 insertions(+), 40 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 14a5125..bfeaf68 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -951,14 +951,14 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
- 		sockfd_put(sock);
- 		return -ENOMEM;
- 	}
-+	config->socks = socks;
-+
- 	nsock = kzalloc(sizeof(struct nbd_sock), GFP_KERNEL);
- 	if (!nsock) {
- 		sockfd_put(sock);
- 		return -ENOMEM;
- 	}
+diff --git a/arch/powerpc/include/asm/book3s/64/pgtable.h b/arch/powerpc/include/asm/book3s/64/pgtable.h
+index f80f436834a1..cf8dbd5f8f03 100644
+--- a/arch/powerpc/include/asm/book3s/64/pgtable.h
++++ b/arch/powerpc/include/asm/book3s/64/pgtable.h
+@@ -151,8 +151,6 @@
+  * Write permissions imply read permissions for now (we could make write-only
+  * pages on BookE but we don't bother for now). Execute permission control is
+  * possible on platforms that define _PAGE_EXEC
+- *
+- * Note due to the way vm flags are laid out, the bits are XWR
+  */
+ #define PAGE_NONE	__pgprot(_PAGE_BASE | _PAGE_PRIVILEGED)
+ #define PAGE_SHARED	__pgprot(_PAGE_BASE | _PAGE_RW)
+@@ -162,24 +160,6 @@
+ #define PAGE_READONLY	__pgprot(_PAGE_BASE | _PAGE_READ)
+ #define PAGE_READONLY_X	__pgprot(_PAGE_BASE | _PAGE_READ | _PAGE_EXEC)
  
--	config->socks = socks;
+-#define __P000	PAGE_NONE
+-#define __P001	PAGE_READONLY
+-#define __P010	PAGE_COPY
+-#define __P011	PAGE_COPY
+-#define __P100	PAGE_READONLY_X
+-#define __P101	PAGE_READONLY_X
+-#define __P110	PAGE_COPY_X
+-#define __P111	PAGE_COPY_X
 -
- 	nsock->fallback_index = -1;
- 	nsock->dead = false;
- 	mutex_init(&nsock->tx_lock);
+-#define __S000	PAGE_NONE
+-#define __S001	PAGE_READONLY
+-#define __S010	PAGE_SHARED
+-#define __S011	PAGE_SHARED
+-#define __S100	PAGE_READONLY_X
+-#define __S101	PAGE_READONLY_X
+-#define __S110	PAGE_SHARED_X
+-#define __S111	PAGE_SHARED_X
+-
+ /* Permission masks used for kernel mappings */
+ #define PAGE_KERNEL	__pgprot(_PAGE_BASE | _PAGE_KERNEL_RW)
+ #define PAGE_KERNEL_NC	__pgprot(_PAGE_BASE_NC | _PAGE_KERNEL_RW | \
+diff --git a/arch/powerpc/include/asm/pgtable.h b/arch/powerpc/include/asm/pgtable.h
+index 14c79a7dc855..fb4b85bba110 100644
+--- a/arch/powerpc/include/asm/pgtable.h
++++ b/arch/powerpc/include/asm/pgtable.h
+@@ -20,6 +20,25 @@ struct mm_struct;
+ #include <asm/nohash/pgtable.h>
+ #endif /* !CONFIG_PPC_BOOK3S */
+ 
++/* Note due to the way vm flags are laid out, the bits are XWR */
++#define __P000	PAGE_NONE
++#define __P001	PAGE_READONLY
++#define __P010	PAGE_COPY
++#define __P011	PAGE_COPY
++#define __P100	PAGE_READONLY_X
++#define __P101	PAGE_READONLY_X
++#define __P110	PAGE_COPY_X
++#define __P111	PAGE_COPY_X
++
++#define __S000	PAGE_NONE
++#define __S001	PAGE_READONLY
++#define __S010	PAGE_SHARED
++#define __S011	PAGE_SHARED
++#define __S100	PAGE_READONLY_X
++#define __S101	PAGE_READONLY_X
++#define __S110	PAGE_SHARED_X
++#define __S111	PAGE_SHARED_X
++
+ #ifndef __ASSEMBLY__
+ 
+ #include <asm/tlbflush.h>
+diff --git a/arch/powerpc/include/asm/pte-common.h b/arch/powerpc/include/asm/pte-common.h
+index 5a5ba43bdf98..4860dae76dae 100644
+--- a/arch/powerpc/include/asm/pte-common.h
++++ b/arch/powerpc/include/asm/pte-common.h
+@@ -139,8 +139,6 @@ static inline bool pte_user(pte_t pte)
+  * Write permissions imply read permissions for now (we could make write-only
+  * pages on BookE but we don't bother for now). Execute permission control is
+  * possible on platforms that define _PAGE_EXEC
+- *
+- * Note due to the way vm flags are laid out, the bits are XWR
+  */
+ #define PAGE_NONE	__pgprot(_PAGE_BASE | _PAGE_NA)
+ #define PAGE_SHARED	__pgprot(_PAGE_BASE | _PAGE_USER | _PAGE_RW)
+@@ -153,24 +151,6 @@ static inline bool pte_user(pte_t pte)
+ #define PAGE_READONLY_X	__pgprot(_PAGE_BASE | _PAGE_USER | _PAGE_RO | \
+ 				 _PAGE_EXEC)
+ 
+-#define __P000	PAGE_NONE
+-#define __P001	PAGE_READONLY
+-#define __P010	PAGE_COPY
+-#define __P011	PAGE_COPY
+-#define __P100	PAGE_READONLY_X
+-#define __P101	PAGE_READONLY_X
+-#define __P110	PAGE_COPY_X
+-#define __P111	PAGE_COPY_X
+-
+-#define __S000	PAGE_NONE
+-#define __S001	PAGE_READONLY
+-#define __S010	PAGE_SHARED
+-#define __S011	PAGE_SHARED
+-#define __S100	PAGE_READONLY_X
+-#define __S101	PAGE_READONLY_X
+-#define __S110	PAGE_SHARED_X
+-#define __S111	PAGE_SHARED_X
+-
+ /* Permission masks used for kernel mappings */
+ #define PAGE_KERNEL	__pgprot(_PAGE_BASE | _PAGE_KERNEL_RW)
+ #define PAGE_KERNEL_NC	__pgprot(_PAGE_BASE_NC | _PAGE_KERNEL_RW | \
 -- 
-2.1.4
+2.13.3
