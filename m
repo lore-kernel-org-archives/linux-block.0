@@ -1,58 +1,122 @@
-Return-Path: <konrad.r.wilk@gmail.com>
-Return-Path: <konrad.r.wilk@gmail.com>
-Sender: Konrad Rzeszutek Wilk <konrad.r.wilk@gmail.com>
-Date: Mon, 22 Oct 2018 15:31:33 -0400
-From: Konrad Rzeszutek Wilk <konrad@darnok.org>
-To: axboe@kernel.dk, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, xen-devel@lists.xen.org
-Subject: [GIT PULL] (xen) stable/for-jens-4.20
-Message-ID: <20181022193132.GB20677@dhcp-10-175-29-12.vpn.oracle.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:35828 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727670AbeJISbB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:31:01 -0400
+Received: by mail-pl1-f194.google.com with SMTP id f8-v6so680932plb.2
+        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:14:34 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 24/45] lightnvm: pblk: add trace events for pblk state changes
+Date: Tue,  9 Oct 2018 13:11:54 +0200
+Message-Id: <20181009111215.7653-25-mb@lightnvm.io>
+In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
+References: <20181009111215.7653-1-mb@lightnvm.io>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="k1lZvvs/B4yU6o8G"
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
---k1lZvvs/B4yU6o8G
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Add trace events for tracking pblk state changes.
 
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+---
+ drivers/lightnvm/pblk-core.c  |  3 +++
+ drivers/lightnvm/pblk-init.c  |  1 +
+ drivers/lightnvm/pblk-trace.h | 28 ++++++++++++++++++++++++++++
+ 3 files changed, 32 insertions(+)
 
-Hi Jens,
-
-Please git pull the following branch:
-
-git pull git://git.kernel.org/pub/scm/linux/kernel/git/konrad/xen.git stable/for-jens-4.20
-
-which has exactly one tiny patch fixing an NULL pointer issue (also has stable tree CCed).
-
-Thank you!
-
-drivers/block/xen-blkfront.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-Vasilis Liaskovitis (2):
-      xen/blkfront: avoid NULL blkfront_info dereference on device removal
-
-
---k1lZvvs/B4yU6o8G
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJbziWUAAoJEFKlDoTx2wm/LeEP/jzfxixLC5x9JxlYAg9G3VwF
-h0pzABE7VDNPfeRTIV152g63xdtiBjWMTK74bO/hkqxvmtsCEeKzIm8MQPj+QF7P
-jWadDoVLFds7yKxSJq6vm5wPqd+C6hZsmQUFVjNAnLX1nfxy8GjjsavMyJxHVMCe
-oB2WF9Frk9K6yn4gUxmjOyWWD0N2eNNFuPNb+OLjx0/l/lG7p0ADCZ0fwEZgywJ4
-6yFgHy8DBsWYqfe1RMT3t5wULFxNeaV3hiI+2YLcYtcmCoHJHwSQd4DjPhO1WsNx
-LyhK37BIhX3P4aqLwVxMlSEuBR+VPxRH6mslrJoxOAhZJCloYEEjivNUadKlO1kR
-BjM/1fVlDsHF5IbtreBghCO3mlZ+QJI7Zzr3ijh0jy5Il61VKp2BdbjxCgmbZPLq
-IeAO4h+Q/kBLrBrU2HPda0NACjah9Eq/5ajY7TcG/CoHY+V9TkNsBLL5qG4ioq5Q
-OokX1ZFbOvFvOVwLZmaJTvC9IsPnUeQrWbgr7JAPqiq7+A/CSz9uT6cXJ1mDrfZB
-I9B5M3lhugaqPcL+LkGpXFPcl+yie2LAHWUGxDTBzYMmpER+Wy8DQiw1qzcDFhzh
-L/XnPK05Kr1Dt4IROoWunwzMb53B/QJ1u3yttoQ1sTpFLi+La46O9ej7HL2l7/Hn
-oaxGGpPP4yhb8t9WJ6CQ
-=HN4e
------END PGP SIGNATURE-----
-
---k1lZvvs/B4yU6o8G--
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index ef52c1647f88..c482ef7dd4b5 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -1503,6 +1503,7 @@ static void pblk_stop_writes(struct pblk *pblk, struct pblk_line *line)
+ 
+ 	pblk_set_space_limit(pblk);
+ 	pblk->state = PBLK_STATE_STOPPING;
++	trace_pblk_state(pblk_disk_name(pblk), pblk->state);
+ }
+ 
+ static void pblk_line_close_meta_sync(struct pblk *pblk)
+@@ -1552,6 +1553,7 @@ void __pblk_pipeline_flush(struct pblk *pblk)
+ 		return;
+ 	}
+ 	pblk->state = PBLK_STATE_RECOVERING;
++	trace_pblk_state(pblk_disk_name(pblk), pblk->state);
+ 	spin_unlock(&l_mg->free_lock);
+ 
+ 	pblk_flush_writer(pblk);
+@@ -1573,6 +1575,7 @@ void __pblk_pipeline_stop(struct pblk *pblk)
+ 
+ 	spin_lock(&l_mg->free_lock);
+ 	pblk->state = PBLK_STATE_STOPPED;
++	trace_pblk_state(pblk_disk_name(pblk), pblk->state);
+ 	l_mg->data_line = NULL;
+ 	l_mg->data_next = NULL;
+ 	spin_unlock(&l_mg->free_lock);
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index fca37da16266..9aebdee8e4c9 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -1109,6 +1109,7 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+ 	pblk->dev = dev;
+ 	pblk->disk = tdisk;
+ 	pblk->state = PBLK_STATE_RUNNING;
++	trace_pblk_state(pblk_disk_name(pblk), pblk->state);
+ 	pblk->gc.gc_enabled = 0;
+ 
+ 	if (!(geo->version == NVM_OCSSD_SPEC_12 ||
+diff --git a/drivers/lightnvm/pblk-trace.h b/drivers/lightnvm/pblk-trace.h
+index f9aa9e25e428..c171d0450c07 100644
+--- a/drivers/lightnvm/pblk-trace.h
++++ b/drivers/lightnvm/pblk-trace.h
+@@ -25,6 +25,13 @@ struct ppa_addr;
+ 	{ PBLK_LINESTATE_CORRUPT,	"CORRUPT"	})
+ 
+ 
++#define show_pblk_state(state) __print_symbolic(state,		\
++	{ PBLK_STATE_RUNNING,		"RUNNING",	},	\
++	{ PBLK_STATE_STOPPING,		"STOPPING",	},	\
++	{ PBLK_STATE_RECOVERING,	"RECOVERING",	},	\
++	{ PBLK_STATE_STOPPED,		"STOPPED"	})
++
++
+ TRACE_EVENT(pblk_chunk_state,
+ 
+ 	TP_PROTO(const char *name, struct ppa_addr *ppa, int state),
+@@ -75,6 +82,27 @@ TRACE_EVENT(pblk_line_state,
+ 
+ );
+ 
++TRACE_EVENT(pblk_state,
++
++	TP_PROTO(const char *name, int state),
++
++	TP_ARGS(name, state),
++
++	TP_STRUCT__entry(
++		__string(name, name)
++		__field(int, state);
++	),
++
++	TP_fast_assign(
++		__assign_str(name, name);
++		__entry->state = state;
++	),
++
++	TP_printk("dev=%s state=%s", __get_str(name),
++			show_pblk_state((int)__entry->state))
++
++);
++
+ #endif /* !defined(_TRACE_PBLK_H) || defined(TRACE_HEADER_MULTI_READ) */
+ 
+ /* This part must be outside protection */
+-- 
+2.17.1
