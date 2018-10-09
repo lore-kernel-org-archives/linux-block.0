@@ -1,104 +1,91 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Mon, 8 Oct 2018 18:14:05 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Dongli Zhang <dongli.zhang@oracle.com>,
-	Zach Marano <zmarano@google.com>, Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>
-Subject: Re: [PATCH V2] blk-mq: complete req in softirq context in case of
- single queue
-Message-ID: <20181008101404.GA10966@ming.t460p>
-References: <20180928084220.32026-1-ming.lei@redhat.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:39999 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726882AbeJIS3y (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:29:54 -0400
+Received: by mail-pf1-f193.google.com with SMTP id s5-v6so672137pfj.7
+        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:13:28 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 04/45] lightnvm: move device L2P detection to core
+Date: Tue,  9 Oct 2018 13:11:34 +0200
+Message-Id: <20181009111215.7653-5-mb@lightnvm.io>
+In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
+References: <20181009111215.7653-1-mb@lightnvm.io>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180928084220.32026-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Fri, Sep 28, 2018 at 04:42:20PM +0800, Ming Lei wrote:
-> Lot of controllers may have only one irq vector for completing IO
-> request. And usually affinity of the only irq vector is all possible
-> CPUs, however, on most of ARCH, there may be only one specific CPU
-> for handling this interrupt.
-> 
-> So if all IOs are completed in hardirq context, it is inevitable to
-> degrade IO performance because of increased irq latency.
-> 
-> This patch tries to address this issue by allowing to complete request
-> in softirq context, like the legacy IO path.
-> 
-> IOPS is observed as ~13%+ in the following randread test on raid0 over
-> virtio-scsi.
-> 
-> mdadm --create --verbose /dev/md0 --level=0 --chunk=1024 --raid-devices=8 /dev/sdb /dev/sdc /dev/sdd /dev/sde /dev/sdf /dev/sdg /dev/sdh /dev/sdi
-> 
-> fio --time_based --name=benchmark --runtime=30 --filename=/dev/md0 --nrfiles=1 --ioengine=libaio --iodepth=32 --direct=1 --invalidate=1 --verify=0 --verify_fatal=0 --numjobs=32 --rw=randread --blocksize=4k
-> 
-> Cc: Dongli Zhang <dongli.zhang@oracle.com>
-> Cc: Zach Marano <zmarano@google.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-mq.c      | 14 ++++++++++++++
->  block/blk-softirq.c |  5 ++---
->  2 files changed, 16 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 85a1c1a59c72..d4792c3ac983 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -565,6 +565,20 @@ static void __blk_mq_complete_request(struct request *rq)
->  	if (rq->internal_tag != -1)
->  		blk_mq_sched_completed_request(rq);
->  
-> +	/*
-> +	 * Most of single queue controllers, there is only one irq vector
-> +	 * for handling IO completion, and the only irq's affinity is set
-> +	 * as all possible CPUs. On most of ARCHs, this affinity means the
-> +	 * irq is handled on one specific CPU.
-> +	 *
-> +	 * So complete IO reqeust in softirq context in case of single queue
-> +	 * for not degrading IO performance by irqsoff latency.
-> +	 */
-> +	if (rq->q->nr_hw_queues == 1) {
-> +		__blk_complete_request(rq);
-> +		return;
-> +	}
-> +
->  	if (!test_bit(QUEUE_FLAG_SAME_COMP, &rq->q->queue_flags)) {
->  		rq->q->softirq_done_fn(rq);
->  		return;
-> diff --git a/block/blk-softirq.c b/block/blk-softirq.c
-> index 15c1f5e12eb8..e47a2f751884 100644
-> --- a/block/blk-softirq.c
-> +++ b/block/blk-softirq.c
-> @@ -97,8 +97,8 @@ static int blk_softirq_cpu_dead(unsigned int cpu)
->  
->  void __blk_complete_request(struct request *req)
->  {
-> -	int ccpu, cpu;
->  	struct request_queue *q = req->q;
-> +	int cpu, ccpu = q->mq_ops ? req->mq_ctx->cpu : req->cpu;
->  	unsigned long flags;
->  	bool shared = false;
->  
-> @@ -110,8 +110,7 @@ void __blk_complete_request(struct request *req)
->  	/*
->  	 * Select completion CPU
->  	 */
-> -	if (req->cpu != -1) {
-> -		ccpu = req->cpu;
-> +	if (test_bit(QUEUE_FLAG_SAME_COMP, &q->queue_flags) && ccpu != -1) {
->  		if (!test_bit(QUEUE_FLAG_SAME_FORCE, &q->queue_flags))
->  			shared = cpus_share_cache(cpu, ccpu);
->  	} else
-> -- 
-> 2.9.5
-> 
+A 1.2 device is able to manage the logical to physical mapping
+table internally or leave it to the host.
 
-Ping...
+A target only supports one of those approaches, and therefore must
+check on initialization. Move this check to core to avoid each target
+implement the check.
 
-Thanks,
-Ming
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+---
+ drivers/lightnvm/core.c      | 5 +++++
+ drivers/lightnvm/pblk-init.c | 7 -------
+ include/linux/lightnvm.h     | 6 ++++++
+ 3 files changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 68553c7ae937..964352720a03 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -355,6 +355,11 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ 		return -EINVAL;
+ 	}
+ 
++	if ((tt->flags & NVM_TGT_F_HOST_L2P) != (dev->geo.dom & NVM_RSP_L2P)) {
++		pr_err("nvm: device is incompatible with target L2P type.\n");
++		return -EINVAL;
++	}
++
+ 	if (nvm_target_exists(create->tgtname)) {
+ 		pr_err("nvm: target name already exists (%s)\n",
+ 							create->tgtname);
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 537e98f2b24a..039f62d05e84 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -1210,13 +1210,6 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+ 		return ERR_PTR(-EINVAL);
+ 	}
+ 
+-	if (geo->version == NVM_OCSSD_SPEC_12 && geo->dom & NVM_RSP_L2P) {
+-		pblk_err(pblk, "host-side L2P table not supported. (%x)\n",
+-							geo->dom);
+-		kfree(pblk);
+-		return ERR_PTR(-EINVAL);
+-	}
+-
+ 	spin_lock_init(&pblk->resubmit_lock);
+ 	spin_lock_init(&pblk->trans_lock);
+ 	spin_lock_init(&pblk->lock);
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 8acc2fe277d6..f4a84694e5e2 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -495,9 +495,15 @@ typedef void (nvm_tgt_exit_fn)(void *, bool);
+ typedef int (nvm_tgt_sysfs_init_fn)(struct gendisk *);
+ typedef void (nvm_tgt_sysfs_exit_fn)(struct gendisk *);
+ 
++enum {
++	NVM_TGT_F_DEV_L2P = 0,
++	NVM_TGT_F_HOST_L2P = 1 << 0,
++};
++
+ struct nvm_tgt_type {
+ 	const char *name;
+ 	unsigned int version[3];
++	int flags;
+ 
+ 	/* target entry points */
+ 	nvm_tgt_make_rq_fn *make_rq;
+-- 
+2.17.1
