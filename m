@@ -1,447 +1,87 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:39986 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729154AbeJLB7M (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Oct 2018 21:59:12 -0400
-Received: by mail-pg1-f196.google.com with SMTP id n31-v6so4570688pgm.7
-        for <linux-block@vger.kernel.org>; Thu, 11 Oct 2018 11:30:47 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com,
-        Laurent Vivier <lvivier@redhat.com>
-Subject: [PATCH 11/13] ataflop: convert to blk-mq
-Date: Thu, 11 Oct 2018 11:30:21 -0700
-Message-Id: <3461961db53c6f209afb7bf09ea35880acbe39cd.1539282366.git.osandov@fb.com>
-In-Reply-To: <cover.1539282366.git.osandov@fb.com>
-References: <cover.1539282366.git.osandov@fb.com>
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:39023 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727714AbeJISbL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:31:11 -0400
+Received: by mail-pg1-f194.google.com with SMTP id r9-v6so652537pgv.6
+        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:14:45 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 27/45] lightnvm: pblk: calculate line pad distance in helper
+Date: Tue,  9 Oct 2018 13:11:57 +0200
+Message-Id: <20181009111215.7653-28-mb@lightnvm.io>
+In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
+References: <20181009111215.7653-1-mb@lightnvm.io>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+From: Javier González <javier@javigon.com>
 
-This driver is already pretty broken, in that it has two wait_events()
-(one in stdma_lock()) in request_fn. Get rid of the first one by
-freezing/quiescing the queue on format, and the second one by replacing
-it with stdma_try_lock(). The rest is straightforward. Compile-tested
-only and probably incorrect.
+If a line is padded, calculate the pad distance directly on the helper
+being used for this purpose.
 
-Cc: Laurent Vivier <lvivier@redhat.com>
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- drivers/block/ataflop.c | 188 ++++++++++++++++++----------------------
- 1 file changed, 86 insertions(+), 102 deletions(-)
+ drivers/lightnvm/pblk-recovery.c | 13 ++++++++++---
+ drivers/lightnvm/pblk.h          |  8 --------
+ 2 files changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
-index 0144d598ac47..5934e30d4805 100644
---- a/drivers/block/ataflop.c
-+++ b/drivers/block/ataflop.c
-@@ -66,7 +66,7 @@
- #include <linux/fd.h>
- #include <linux/delay.h>
- #include <linux/init.h>
--#include <linux/blkdev.h>
-+#include <linux/blk-mq.h>
- #include <linux/mutex.h>
- #include <linux/completion.h>
- #include <linux/wait.h>
-@@ -81,7 +81,6 @@
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index 0322ab915ddc..8036c3eb6372 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -380,6 +380,15 @@ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
+ 	return ret;
+ }
  
- static DEFINE_MUTEX(ataflop_mutex);
- static struct request *fd_request;
--static int fdc_queue;
- 
- /*
-  * WD1772 stuff
-@@ -300,6 +299,7 @@ static struct atari_floppy_struct {
- 	struct gendisk *disk;
- 	int ref;
- 	int type;
-+	struct blk_mq_tag_set tag_set;
- } unit[FD_MAX_UNITS];
- 
- #define	UD	unit[drive]
-@@ -379,9 +379,6 @@ static int IsFormatting = 0, FormatError;
- static int UserSteprate[FD_MAX_UNITS] = { -1, -1 };
- module_param_array(UserSteprate, int, NULL, 0);
- 
--/* Synchronization of FDC access. */
--static volatile int fdc_busy = 0;
--static DECLARE_WAIT_QUEUE_HEAD(fdc_wait);
- static DECLARE_COMPLETION(format_wait);
- 
- static unsigned long changed_floppies = 0xff, fake_change = 0;
-@@ -441,7 +438,6 @@ static void fd_times_out(struct timer_list *unused);
- static void finish_fdc( void );
- static void finish_fdc_done( int dummy );
- static void setup_req_params( int drive );
--static void redo_fd_request( void);
- static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode, unsigned int
-                      cmd, unsigned long param);
- static void fd_probe( int drive );
-@@ -459,8 +455,16 @@ static DEFINE_TIMER(fd_timer, check_change);
- 	
- static void fd_end_request_cur(blk_status_t err)
- {
--	if (!__blk_end_request_cur(fd_request, err))
-+	if (err) {
-+		blk_mq_end_request(fd_request, err);
-+		return;
-+	}
++static int pblk_pad_distance(struct pblk *pblk, struct pblk_line *line)
++{
++	struct nvm_tgt_dev *dev = pblk->dev;
++	struct nvm_geo *geo = &dev->geo;
++	int distance = geo->mw_cunits * geo->all_luns * geo->ws_opt;
 +
-+	if (!blk_update_request(fd_request, err,
-+				blk_rq_cur_bytes(fd_request))) {
-+		__blk_mq_end_request(fd_request, err);
- 		fd_request = NULL;
-+	}
++	return (distance > line->left_msecs) ? line->left_msecs : distance;
++}
++
+ /* When this function is called, it means that not all upper pages have been
+  * written in a page that contains valid data. In order to recover this data, we
+  * first find the write pointer on the device, then we pad all necessary
+@@ -495,9 +504,7 @@ static int pblk_recov_scan_all_oob(struct pblk *pblk, struct pblk_line *line,
+ 		line->left_msecs += nr_error_bits;
+ 		bitmap_clear(line->map_bitmap, line->cur_sec, nr_error_bits);
+ 
+-		pad_secs = pblk_pad_distance(pblk);
+-		if (pad_secs > line->left_msecs)
+-			pad_secs = line->left_msecs;
++		pad_secs = pblk_pad_distance(pblk, line);
+ 
+ 		ret = pblk_recov_pad_oob(pblk, line, pad_secs);
+ 		if (ret)
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index a2cc581951ef..d123cff82589 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -986,14 +986,6 @@ static inline int pblk_line_vsc(struct pblk_line *line)
+ 	return le32_to_cpu(*line->vsc);
  }
  
- static inline void start_motor_off_timer(void)
-@@ -706,7 +710,6 @@ static void fd_error( void )
- 		if (SelectedDrive != -1)
- 			SUD.track = -1;
- 	}
--	redo_fd_request();
- }
- 
- 
-@@ -724,14 +727,15 @@ static void fd_error( void )
- 
- static int do_format(int drive, int type, struct atari_format_descr *desc)
- {
-+	struct request_queue *q = unit[drive].disk->queue;
- 	unsigned char	*p;
- 	int sect, nsect;
- 	unsigned long	flags;
-+	int ret;
- 
--	DPRINT(("do_format( dr=%d tr=%d he=%d offs=%d )\n",
--		drive, desc->track, desc->head, desc->sect_offset ));
-+	blk_mq_freeze_queue(q);
-+	blk_mq_quiesce_queue(q);
- 
--	wait_event(fdc_wait, cmpxchg(&fdc_busy, 0, 1) == 0);
- 	local_irq_save(flags);
- 	stdma_lock(floppy_irq, NULL);
- 	atari_turnon_irq( IRQ_MFP_FDC ); /* should be already, just to be sure */
-@@ -740,16 +744,16 @@ static int do_format(int drive, int type, struct atari_format_descr *desc)
- 	if (type) {
- 		if (--type >= NUM_DISK_MINORS ||
- 		    minor2disktype[type].drive_types > DriveType) {
--			redo_fd_request();
--			return -EINVAL;
-+			ret = -EINVAL;
-+			goto out;
- 		}
- 		type = minor2disktype[type].index;
- 		UDT = &atari_disk_type[type];
- 	}
- 
- 	if (!UDT || desc->track >= UDT->blocks/UDT->spt/2 || desc->head >= 2) {
--		redo_fd_request();
--		return -EINVAL;
-+		ret = -EINVAL;
-+		goto out;
- 	}
- 
- 	nsect = UDT->spt;
-@@ -788,8 +792,11 @@ static int do_format(int drive, int type, struct atari_format_descr *desc)
- 
- 	wait_for_completion(&format_wait);
- 
--	redo_fd_request();
--	return( FormatError ? -EIO : 0 );	
-+	ret = FormatError ? -EIO : 0;
-+out:
-+	blk_mq_unquiesce_queue(q);
-+	blk_mq_unfreeze_queue(q);
-+	return ret;
- }
- 
- 
-@@ -819,7 +826,6 @@ static void do_fd_action( int drive )
- 		    else {
- 			/* all sectors finished */
- 			fd_end_request_cur(BLK_STS_OK);
--			redo_fd_request();
- 			return;
- 		    }
- 		}
-@@ -1224,7 +1230,6 @@ static void fd_rwsec_done1(int status)
- 	else {
- 		/* all sectors finished */
- 		fd_end_request_cur(BLK_STS_OK);
--		redo_fd_request();
- 	}
- 	return;
-   
-@@ -1382,8 +1387,6 @@ static void finish_fdc_done( int dummy )
- 
- 	local_irq_save(flags);
- 	stdma_release();
--	fdc_busy = 0;
--	wake_up( &fdc_wait );
- 	local_irq_restore(flags);
- 
- 	DPRINT(("finish_fdc() finished\n"));
-@@ -1473,59 +1476,34 @@ static void setup_req_params( int drive )
- 			ReqTrack, ReqSector, (unsigned long)ReqData ));
- }
- 
--/*
-- * Round-robin between our available drives, doing one request from each
-- */
--static struct request *set_next_request(void)
-+static blk_status_t ataflop_queue_rq(struct blk_mq_hw_ctx *hctx,
-+				     const struct blk_mq_queue_data *bd)
- {
--	struct request_queue *q;
--	int old_pos = fdc_queue;
--	struct request *rq = NULL;
+-static inline int pblk_pad_distance(struct pblk *pblk)
+-{
+-	struct nvm_tgt_dev *dev = pblk->dev;
+-	struct nvm_geo *geo = &dev->geo;
 -
--	do {
--		q = unit[fdc_queue].disk->queue;
--		if (++fdc_queue == FD_MAX_UNITS)
--			fdc_queue = 0;
--		if (q) {
--			rq = blk_fetch_request(q);
--			if (rq) {
--				rq->error_count = 0;
--				break;
--			}
--		}
--	} while (fdc_queue != old_pos);
--
--	return rq;
+-	return geo->mw_cunits * geo->all_luns * geo->ws_opt;
 -}
 -
-+	struct atari_floppy_struct *floppy = bd->rq->rq_disk->private_data;
-+	int drive = floppy - unit;
-+	int type = floppy->type;
- 
--static void redo_fd_request(void)
--{
--	int drive, type;
--	struct atari_floppy_struct *floppy;
-+	spin_lock_irq(&ataflop_lock);
-+	if (fd_request) {
-+		spin_unlock_irq(&ataflop_lock);
-+		return BLK_STS_DEV_RESOURCE;
-+	}
-+	if (!stdma_try_lock(floppy_irq, NULL))  {
-+		spin_unlock_irq(&ataflop_lock);
-+		return BLK_STS_RESOURCE;
-+	}
-+	fd_request = bd->rq;
-+	blk_mq_start_request(fd_request);
- 
--	DPRINT(("redo_fd_request: fd_request=%p dev=%s fd_request->sector=%ld\n",
--		fd_request, fd_request ? fd_request->rq_disk->disk_name : "",
--		fd_request ? blk_rq_pos(fd_request) : 0 ));
-+	atari_disable_irq( IRQ_MFP_FDC );
- 
- 	IsFormatting = 0;
- 
--repeat:
--	if (!fd_request) {
--		fd_request = set_next_request();
--		if (!fd_request)
--			goto the_end;
--	}
--
--	floppy = fd_request->rq_disk->private_data;
--	drive = floppy - unit;
--	type = floppy->type;
--	
- 	if (!UD.connected) {
- 		/* drive not connected */
- 		printk(KERN_ERR "Unknown Device: fd%d\n", drive );
- 		fd_end_request_cur(BLK_STS_IOERR);
--		goto repeat;
-+		goto out;
- 	}
- 		
- 	if (type == 0) {
-@@ -1541,23 +1519,18 @@ static void redo_fd_request(void)
- 		if (--type >= NUM_DISK_MINORS) {
- 			printk(KERN_WARNING "fd%d: invalid disk format", drive );
- 			fd_end_request_cur(BLK_STS_IOERR);
--			goto repeat;
-+			goto out;
- 		}
- 		if (minor2disktype[type].drive_types > DriveType)  {
- 			printk(KERN_WARNING "fd%d: unsupported disk format", drive );
- 			fd_end_request_cur(BLK_STS_IOERR);
--			goto repeat;
-+			goto out;
- 		}
- 		type = minor2disktype[type].index;
- 		UDT = &atari_disk_type[type];
- 		set_capacity(floppy->disk, UDT->blocks);
- 		UD.autoprobe = 0;
- 	}
--	
--	if (blk_rq_pos(fd_request) + 1 > UDT->blocks) {
--		fd_end_request_cur(BLK_STS_IOERR);
--		goto repeat;
--	}
- 
- 	/* stop deselect timer */
- 	del_timer( &motor_off_timer );
-@@ -1569,22 +1542,13 @@ static void redo_fd_request(void)
- 	setup_req_params( drive );
- 	do_fd_action( drive );
- 
--	return;
--
--  the_end:
--	finish_fdc();
--}
--
--
--void do_fd_request(struct request_queue * q)
--{
--	DPRINT(("do_fd_request for pid %d\n",current->pid));
--	wait_event(fdc_wait, cmpxchg(&fdc_busy, 0, 1) == 0);
--	stdma_lock(floppy_irq, NULL);
--
--	atari_disable_irq( IRQ_MFP_FDC );
--	redo_fd_request();
-+	if (bd->last)
-+		finish_fdc();
- 	atari_enable_irq( IRQ_MFP_FDC );
-+
-+out:
-+	spin_unlock_irq(&ataflop_lock);
-+	return BLK_STS_OK;
- }
- 
- static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode,
-@@ -1662,7 +1626,6 @@ static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode,
- 		/* what if type > 0 here? Overwrite specified entry ? */
- 		if (type) {
- 		        /* refuse to re-set a predefined type for now */
--			redo_fd_request();
- 			return -EINVAL;
- 		}
- 
-@@ -1730,10 +1693,8 @@ static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode,
- 
- 		/* sanity check */
- 		if (setprm.track != dtp->blocks/dtp->spt/2 ||
--		    setprm.head != 2) {
--			redo_fd_request();
-+		    setprm.head != 2)
- 			return -EINVAL;
--		}
- 
- 		UDT = dtp;
- 		set_capacity(floppy->disk, UDT->blocks);
-@@ -1989,6 +1950,10 @@ static const struct block_device_operations floppy_fops = {
- 	.revalidate_disk= floppy_revalidate,
- };
- 
-+static const struct blk_mq_ops ataflop_mq_ops = {
-+	.queue_rq = ataflop_queue_rq,
-+};
-+
- static struct kobject *floppy_find(dev_t dev, int *part, void *data)
+ static inline int pblk_ppa_to_line_id(struct ppa_addr p)
  {
- 	int drive = *part & 3;
-@@ -2002,6 +1967,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
- static int __init atari_floppy_init (void)
- {
- 	int i;
-+	int ret;
- 
- 	if (!MACH_IS_ATARI)
- 		/* Amiga, Mac, ... don't have Atari-compatible floppy :-) */
-@@ -2011,14 +1977,30 @@ static int __init atari_floppy_init (void)
- 		return -EBUSY;
- 
- 	for (i = 0; i < FD_MAX_UNITS; i++) {
-+		struct blk_mq_tag_set *set;
-+
- 		unit[i].disk = alloc_disk(1);
--		if (!unit[i].disk)
--			goto Enomem;
-+		if (!unit[i].disk) {
-+			ret = -ENOMEM;
-+			goto err;
-+		}
- 
--		unit[i].disk->queue = blk_init_queue(do_fd_request,
--						     &ataflop_lock);
--		if (!unit[i].disk->queue)
--			goto Enomem;
-+		set = &unit[i].tag_set;
-+		set->ops = &ataflop_mq_ops;
-+		set->nr_hw_queues = 1;
-+		set->queue_depth = 2;
-+		set->numa_node = NUMA_NO_NODE;
-+		set->flags = BLK_MQ_F_SHOULD_MERGE;
-+		ret = blk_mq_alloc_tag_set(set);
-+		if (ret)
-+			goto err;
-+
-+		unit[i].disk->queue = blk_mq_init_queue(set);
-+		if (IS_ERR(unit[i].disk->queue)) {
-+			ret = PTR_ERR(unit[i].disk->queue);
-+			unit[i].disk->queue = NULL;
-+			goto err;
-+		}
- 	}
- 
- 	if (UseTrackbuffer < 0)
-@@ -2035,7 +2017,8 @@ static int __init atari_floppy_init (void)
- 	DMABuffer = atari_stram_alloc(BUFFER_SIZE+512, "ataflop");
- 	if (!DMABuffer) {
- 		printk(KERN_ERR "atari_floppy_init: cannot get dma buffer\n");
--		goto Enomem;
-+		ret = -ENOMEM;
-+		goto err;
- 	}
- 	TrackBuffer = DMABuffer + 512;
- 	PhysDMABuffer = atari_stram_to_phys(DMABuffer);
-@@ -2063,7 +2046,8 @@ static int __init atari_floppy_init (void)
- 	config_types();
- 
- 	return 0;
--Enomem:
-+
-+err:
- 	do {
- 		struct gendisk *disk = unit[i].disk;
- 
-@@ -2072,12 +2056,13 @@ static int __init atari_floppy_init (void)
- 				blk_cleanup_queue(disk->queue);
- 				disk->queue = NULL;
- 			}
-+			blk_mq_free_tag_set(&unit[i].tag_set);
- 			put_disk(unit[i].disk);
- 		}
- 	} while (i--);
- 
- 	unregister_blkdev(FLOPPY_MAJOR, "fd");
--	return -ENOMEM;
-+	return ret;
- }
- 
- #ifndef MODULE
-@@ -2124,11 +2109,10 @@ static void __exit atari_floppy_exit(void)
- 	int i;
- 	blk_unregister_region(MKDEV(FLOPPY_MAJOR, 0), 256);
- 	for (i = 0; i < FD_MAX_UNITS; i++) {
--		struct request_queue *q = unit[i].disk->queue;
--
- 		del_gendisk(unit[i].disk);
-+		blk_cleanup_queue(unit[i].disk->queue);
-+		blk_mq_free_tag_set(&unit[i].tag_set);
- 		put_disk(unit[i].disk);
--		blk_cleanup_queue(q);
- 	}
- 	unregister_blkdev(FLOPPY_MAJOR, "fd");
- 
+ 	return p.a.blk;
 -- 
-2.19.1
+2.17.1
