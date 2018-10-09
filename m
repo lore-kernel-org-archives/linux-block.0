@@ -1,74 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:46836 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727701AbeJEUkE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Oct 2018 16:40:04 -0400
-Date: Fri, 5 Oct 2018 15:41:04 +0200
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme updates for 4.20
-Message-ID: <20181005134104.GA11359@infradead.org>
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:33508 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727095AbeJISaH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:30:07 -0400
+Received: by mail-pg1-f194.google.com with SMTP id y18-v6so665465pge.0
+        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:13:40 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 08/45] lightnvm: pblk: fix incorrect min_write_pgs
+Date: Tue,  9 Oct 2018 13:11:38 +0200
+Message-Id: <20181009111215.7653-9-mb@lightnvm.io>
+In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
+References: <20181009111215.7653-1-mb@lightnvm.io>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-A relatively boring merge window:
+The calculation of pblk->min_write_pgs should only use the optimal
+write size attribute provided by the drive, it does not correlate to
+the memory page size of the system, which can be smaller or larger
+than the LBA size reported.
 
- - better AEN tracing (Chaitanya)
- - NUMA aware PCIe multipathing (me)
- - RDMA workqueue fixes (Sagi)
- - better bio usage in the target (Sagi)
- - FC rework for target removal (James)
- - better multipath handling of ->queue_rq failures (James)
- - various cleanups (Milan)
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+Reviewed-by: Javier González <javier@cnexlabs.com>
+---
+ drivers/lightnvm/pblk-init.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The following changes since commit c0aac682fa6590cb660cb083dbc09f55e799d2d2:
-
-  Merge tag 'v4.19-rc6' into for-4.20/block (2018-10-01 08:58:57 -0600)
-
-are available in the Git repository at:
-
-  git://git.infradead.org/nvme.git nvme-4.20
-
-for you to fetch changes up to 2acf70ade79d26b97611a8df52eb22aa33814cd4:
-
-  nvmet-rdma: use a private workqueue for delete (2018-10-05 09:25:18 +0200)
-
-----------------------------------------------------------------
-Chaitanya Kulkarni (2):
-      nvmet: remove redundant module prefix
-      nvme-core: add async event trace helper
-
-Christoph Hellwig (1):
-      nvme: take node locality into account when selecting a path
-
-James Smart (3):
-      nvmet_fc: support target port removal with nvmet layer
-      nvme_fc: add 'nvme_discovery' sysfs attribute to fc transport device
-      nvme: call nvme_complete_rq when nvmf_check_ready fails for mpath I/O
-
-Milan P. Gandhi (2):
-      nvme: fix typo in nvme_identify_ns_descs
-      nvme-fc: fix for a minor typos
-
-Sagi Grimberg (2):
-      nvmet: don't split large I/Os unconditionally
-      nvmet-rdma: use a private workqueue for delete
-
- drivers/nvme/host/core.c          |  20 ++++--
- drivers/nvme/host/fabrics.c       |   7 +-
- drivers/nvme/host/fc.c            | 108 +++++++++++++++++++++++++++----
- drivers/nvme/host/multipath.c     |  57 +++++++++++++----
- drivers/nvme/host/nvme.h          |  25 +++-----
- drivers/nvme/host/trace.h         |  28 ++++++++
- drivers/nvme/target/admin-cmd.c   |   2 +-
- drivers/nvme/target/fc.c          | 130 +++++++++++++++++++++++++++++++++++---
- drivers/nvme/target/io-cmd-bdev.c |   9 ++-
- drivers/nvme/target/nvmet.h       |   1 +
- drivers/nvme/target/rdma.c        |  19 ++++--
- include/linux/nvme.h              |   1 +
- 12 files changed, 347 insertions(+), 60 deletions(-)
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 9119c64d6f62..8adc8ac8b03c 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -371,7 +371,7 @@ static int pblk_core_init(struct pblk *pblk)
+ 	atomic64_set(&pblk->nr_flush, 0);
+ 	pblk->nr_flush_rst = 0;
+ 
+-	pblk->min_write_pgs = geo->ws_opt * (geo->csecs / PAGE_SIZE);
++	pblk->min_write_pgs = geo->ws_opt;
+ 	max_write_ppas = pblk->min_write_pgs * geo->all_luns;
+ 	pblk->max_write_pgs = min_t(int, max_write_ppas, NVM_MAX_VLBA);
+ 	pblk_set_sec_per_write(pblk, pblk->min_write_pgs);
+-- 
+2.17.1
