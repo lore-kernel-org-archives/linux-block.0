@@ -1,94 +1,174 @@
-Return-Path: <valdis.kletnieks@vt.edu>
-From: valdis.kletnieks@vt.edu
-To: "Theodore Ts'o" <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [BUG] ext4 null pointer crash in linux-next
-Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="==_Exmh_1539028475_2640P";
-	 micalg=pgp-sha1; protocol="application/pgp-signature"
-Date: Mon, 08 Oct 2018 15:54:35 -0400
-Message-ID: <36243.1539028475@turing-police.cc.vt.edu>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:44869 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727333AbeJISai (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:30:38 -0400
+Received: by mail-pl1-f196.google.com with SMTP id p25-v6so658677pli.11
+        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:14:12 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 17/45] lightnvm: pblk: allocate line map bitmaps using a mempool
+Date: Tue,  9 Oct 2018 13:11:47 +0200
+Message-Id: <20181009111215.7653-18-mb@lightnvm.io>
+In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
+References: <20181009111215.7653-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
---==_Exmh_1539028475_2640P
-Content-Type: text/plain; charset=us-ascii
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-I'm seeing a fairly replicable crash/hang with a traceback implicating ext4 (or
-possibly the block layer). next-20180918 seemed stable, but next-20180926 and
--next-20181005 have a habit of crashing while dnf is updating software (so far,
-I've hit it 6 times with identical tracebacks while attempting to update software
+Line map bitmap allocations are fairly large and can fail. Allocation
+failures are fatal to pblk, stopping the write pipeline. To avoid this,
+allocate the bitmaps using a mempool instead.
 
-This ringing any bells, or did I just buy myself another git bisect? Google says
-that ext4_mpage_readpages from the traceback hasn't been referenced in the
-last 2 months...
+Mempool allocations never fail if called from a process context,
+and pblk *should* only allocate map bitmaps in process context,
+but keep the failure handling for robustness sake.
 
-[  680.692888] BUG: unable to handle kernel NULL pointer dereference at 0000000000000000
-[  680.692895] PGD 0 P4D 0
-[  680.692901] Oops: 0000 [#1] PREEMPT SMP PTI
-[  680.692905] CPU: 3 PID: 15464 Comm: sh Tainted: G           O    T 4.19.0-rc6-next-20181005-dirty #621
-[  680.692908] Hardware name: Dell Inc. Latitude E6530/07Y85M, BIOS A21 02/21/2018
-[  680.692915] RIP: 0010:__get_request+0x31/0x7e0
-[  680.692918] Code: 89 e5 41 57 41 56 41 55 49 89 fd 41 54 41 89 f4 53 48 83 ec 50 48 8b 1f 48 85 d2 48 89 55 b8 89 4d c0 44 89 45 c4 48 8b 43 18 <48> 8b 00 48 89 45 b0 0f 84 ba 03 00 00 48 8b 42 58 48 85 c0 48 89
-[  680.692921] RSP: 0018:ffff9fa98d93f578 EFLAGS: 00010086
-[  680.692925] RAX: 0000000000000000 RBX: ffff975ad40e7040 RCX: 0000000000000000
-[  680.692927] RDX: ffff975aac306e00 RSI: 0000000000080000 RDI: ffff975acce39840
-[  680.692930] RBP: ffff9fa98d93f5f0 R08: 0000000000600000 R09: 0000000000000001
-[  680.692933] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000080000
-[  680.692935] R13: ffff975acce39840 R14: ffff975aac306e00 R15: ffff975acce398c0
-[  680.692938] FS:  00007f8fb7876740(0000) GS:ffff975adda00000(0000) knlGS:0000000000000000
-[  680.692941] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  680.692944] CR2: 0000000000000000 CR3: 00000003ebc64006 CR4: 00000000001606e0
-[  680.692946] Call Trace:
-[  680.692957]  get_request+0x214/0x8b0
-[  680.692964]  ? remove_wait_queue+0x70/0x70
-[  680.692971]  blk_queue_bio+0x23b/0x760
-[  680.692977]  generic_make_request+0x2fe/0x570
-[  680.692983]  submit_bio+0x4d/0x190
-[  680.692987]  ? submit_bio+0x4d/0x190
-[  680.692992]  ? bio_add_page+0x4b/0x60
-[  680.692997]  ext4_mpage_readpages+0x814/0xed4
-[  680.693002]  ? get_page_from_freelist+0x42c/0x1bd0
-[  680.693015]  ext4_readpages+0x55/0x60
-[  680.693020]  read_pages+0x72/0x190
-[  680.693031]  __do_page_cache_readahead+0x1f6/0x220
-[  680.693045]  ondemand_readahead+0x2ae/0x4f0
-[  680.693055]  page_cache_sync_readahead+0x112/0x250
-[  680.693065]  generic_file_buffered_read+0x542/0xf70
-[  680.693079]  ? _raw_spin_unlock_irqrestore+0x78/0xa0
-[  680.693087]  ? avc_update_node+0x1b6/0x2c0
-[  680.693095]  generic_file_read_iter+0xd0/0x140
-[  680.693102]  ext4_file_read_iter+0x6c/0x80
-[  680.693107]  new_sync_read+0x121/0x1a0
-[  680.693116]  __vfs_read+0x49/0x60
-[  680.693120]  vfs_read+0x152/0x250
-[  680.693126]  kernel_read+0x43/0x60
-[  680.693131]  prepare_binprm+0x19b/0x1f0
-[  680.693136]  __do_execve_file+0x5ca/0xbc0
-[  680.693142]  __x64_sys_execve+0x38/0x50
-[  680.693148]  do_syscall_64+0x8f/0xa52
-[  680.693152]  ? trace_hardirqs_off_caller+0x22/0x150
-[  680.693156]  ? trace_hardirqs_off_thunk+0x1a/0x1c
-[  680.693162]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-[  680.693165] RIP: 0033:0x7f8fb7942b5b
-[  680.693169] Code: 41 89 01 eb da 66 2e 0f 1f 84 00 00 00 00 00 f7 d8 64 41 89 01 eb d6 0f 1f 84 00 00 00 00 00 f3 0f 1e fa b8 3b 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d fd 62 0f 00 f7 d8 64 89 01 48
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+---
+ drivers/lightnvm/pblk-core.c     | 22 +++++++++++++++-------
+ drivers/lightnvm/pblk-init.c     | 18 ++++++++++++++++++
+ drivers/lightnvm/pblk-recovery.c |  2 +-
+ drivers/lightnvm/pblk.h          |  4 ++++
+ 4 files changed, 38 insertions(+), 8 deletions(-)
 
-
-
---==_Exmh_1539028475_2640P
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Comment: Exmh version 2.8.0 04/21/2017
-
-iQEVAwUBW7u1+40DS38y7CIcAQK3lwgAo6YdaS1o78aU57SBUJpn/3Pp/4xdnJDB
-jXozpDUwaCwAU6Py3Utb8e+dMkIxJGBRe3dpWx5zN8eABQfkeZu9o9S9zYzeG5lG
-2xiwHC18sBZ7OHK/y0BdN7y3Vc6DA3bZ/U6lXsnt6wk4eeKM0U1niX2f51bMIYNL
-ojYFTMFX++NVIQEY8QHZKJRwTU1GyP799rURWswOcjvhVsAJRUJahHJBm/5VYfBB
-CncJQXGkcD60Juc12DzEk7kD6W3M0oAckQxeviQxsSImjBcyTV5I7klJY36/aqfR
-LbXIQNFiVAT32tyJdWiT7i2sUT0VH7S6LpxdHjKCVUwKqnUdY9l9IQ==
-=BZRg
------END PGP SIGNATURE-----
-
---==_Exmh_1539028475_2640P--
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index a31417682c90..e1207a4f9d54 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -1049,15 +1049,18 @@ static int pblk_line_init_metadata(struct pblk *pblk, struct pblk_line *line,
+ static int pblk_line_alloc_bitmaps(struct pblk *pblk, struct pblk_line *line)
+ {
+ 	struct pblk_line_meta *lm = &pblk->lm;
++	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+ 
+-	line->map_bitmap = kzalloc(lm->sec_bitmap_len, GFP_KERNEL);
++	line->map_bitmap = mempool_alloc(l_mg->bitmap_pool, GFP_KERNEL);
+ 	if (!line->map_bitmap)
+ 		return -ENOMEM;
+ 
++	memset(line->map_bitmap, 0, lm->sec_bitmap_len);
++
+ 	/* will be initialized using bb info from map_bitmap */
+-	line->invalid_bitmap = kmalloc(lm->sec_bitmap_len, GFP_KERNEL);
++	line->invalid_bitmap = mempool_alloc(l_mg->bitmap_pool, GFP_KERNEL);
+ 	if (!line->invalid_bitmap) {
+-		kfree(line->map_bitmap);
++		mempool_free(line->map_bitmap, l_mg->bitmap_pool);
+ 		line->map_bitmap = NULL;
+ 		return -ENOMEM;
+ 	}
+@@ -1243,7 +1246,9 @@ int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line)
+ 
+ void pblk_line_recov_close(struct pblk *pblk, struct pblk_line *line)
+ {
+-	kfree(line->map_bitmap);
++	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
++
++	mempool_free(line->map_bitmap, l_mg->bitmap_pool);
+ 	line->map_bitmap = NULL;
+ 	line->smeta = NULL;
+ 	line->emeta = NULL;
+@@ -1261,8 +1266,11 @@ static void pblk_line_reinit(struct pblk_line *line)
+ 
+ void pblk_line_free(struct pblk_line *line)
+ {
+-	kfree(line->map_bitmap);
+-	kfree(line->invalid_bitmap);
++	struct pblk *pblk = line->pblk;
++	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
++
++	mempool_free(line->map_bitmap, l_mg->bitmap_pool);
++	mempool_free(line->invalid_bitmap, l_mg->bitmap_pool);
+ 
+ 	pblk_line_reinit(line);
+ }
+@@ -1741,7 +1749,7 @@ void pblk_line_close(struct pblk *pblk, struct pblk_line *line)
+ 
+ 	list_add_tail(&line->list, move_list);
+ 
+-	kfree(line->map_bitmap);
++	mempool_free(line->map_bitmap, l_mg->bitmap_pool);
+ 	line->map_bitmap = NULL;
+ 	line->smeta = NULL;
+ 	line->emeta = NULL;
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 8adc8ac8b03c..76a4a271b9cf 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -498,6 +498,9 @@ static void pblk_line_mg_free(struct pblk *pblk)
+ 		pblk_mfree(l_mg->eline_meta[i]->buf, l_mg->emeta_alloc_type);
+ 		kfree(l_mg->eline_meta[i]);
+ 	}
++
++	mempool_destroy(l_mg->bitmap_pool);
++	kmem_cache_destroy(l_mg->bitmap_cache);
+ }
+ 
+ static void pblk_line_meta_free(struct pblk_line_mgmt *l_mg,
+@@ -797,6 +800,17 @@ static int pblk_line_mg_init(struct pblk *pblk)
+ 			goto fail_free_smeta;
+ 	}
+ 
++	l_mg->bitmap_cache = kmem_cache_create("pblk_lm_bitmap",
++			lm->sec_bitmap_len, 0, 0, NULL);
++	if (!l_mg->bitmap_cache)
++		goto fail_free_smeta;
++
++	/* the bitmap pool is used for both valid and map bitmaps */
++	l_mg->bitmap_pool = mempool_create_slab_pool(PBLK_DATA_LINES * 2,
++				l_mg->bitmap_cache);
++	if (!l_mg->bitmap_pool)
++		goto fail_destroy_bitmap_cache;
++
+ 	/* emeta allocates three different buffers for managing metadata with
+ 	 * in-memory and in-media layouts
+ 	 */
+@@ -849,6 +863,10 @@ static int pblk_line_mg_init(struct pblk *pblk)
+ 			kfree(l_mg->eline_meta[i]->buf);
+ 		kfree(l_mg->eline_meta[i]);
+ 	}
++
++	mempool_destroy(l_mg->bitmap_pool);
++fail_destroy_bitmap_cache:
++	kmem_cache_destroy(l_mg->bitmap_cache);
+ fail_free_smeta:
+ 	for (i = 0; i < PBLK_DATA_LINES; i++)
+ 		kfree(l_mg->sline_meta[i]);
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index 3bd2b6b0a359..eea901d7cebc 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -939,7 +939,7 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+ 			list_move_tail(&line->list, move_list);
+ 			spin_unlock(&l_mg->gc_lock);
+ 
+-			kfree(line->map_bitmap);
++			mempool_free(line->map_bitmap, l_mg->bitmap_pool);
+ 			line->map_bitmap = NULL;
+ 			line->smeta = NULL;
+ 			line->emeta = NULL;
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 60c509a00574..9068b158de22 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -530,6 +530,10 @@ struct pblk_line_mgmt {
+ 	struct pblk_emeta *eline_meta[PBLK_DATA_LINES];
+ 	unsigned long meta_bitmap;
+ 
++	/* Cache and mempool for map/invalid bitmaps */
++	struct kmem_cache *bitmap_cache;
++	mempool_t *bitmap_pool;
++
+ 	/* Helpers for fast bitmap calculations */
+ 	unsigned long *bb_template;
+ 	unsigned long *bb_aux;
+-- 
+2.17.1
