@@ -1,56 +1,90 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 16/30] blk-wbt: kill check for legacy queue type
-Date: Wed, 31 Oct 2018 11:59:08 -0600
-Message-Id: <20181031175922.8849-17-axboe@kernel.dk>
-In-Reply-To: <20181031175922.8849-1-axboe@kernel.dk>
-References: <20181031175922.8849-1-axboe@kernel.dk>
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <2b1bca2aba3213b13dadaca5e311a15e9fcb1aab.1539092112.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1539092111.git.christophe.leroy@c-s.fr>
+References: <cover.1539092111.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v3 22/24] powerpc/mm: Get rid of pte-common.h
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Tue,  9 Oct 2018 13:52:16 +0000 (UTC)
 List-ID: <linux-block@vger.kernel.org>
 
-Everything is blk-mq at this point, so it doesn't make any sense
-to have this option available as it does nothing.
+Do not include pte-common.h in nohash/32/pgtable.h
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+As that was the last includer, get rid of pte-common.h
+
+Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- block/Kconfig   | 6 ------
- block/blk-wbt.c | 3 +--
- 2 files changed, 1 insertion(+), 8 deletions(-)
+ arch/powerpc/include/asm/nohash/32/pgtable.h | 23 +++++++++++++++++++++--
+ arch/powerpc/include/asm/pte-common.h        | 25 -------------------------
+ 2 files changed, 21 insertions(+), 27 deletions(-)
+ delete mode 100644 arch/powerpc/include/asm/pte-common.h
 
-diff --git a/block/Kconfig b/block/Kconfig
-index f7045aa47edb..8044452a4fd3 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -155,12 +155,6 @@ config BLK_CGROUP_IOLATENCY
+diff --git a/arch/powerpc/include/asm/nohash/32/pgtable.h b/arch/powerpc/include/asm/nohash/32/pgtable.h
+index ce9270a0ea42..d2908a8038e8 100644
+--- a/arch/powerpc/include/asm/nohash/32/pgtable.h
++++ b/arch/powerpc/include/asm/nohash/32/pgtable.h
+@@ -128,8 +128,27 @@ extern int icache_44x_need_flush;
+ #include <asm/nohash/32/pte-8xx.h>
+ #endif
  
- 	Note, this is an experimental interface and could be changed someday.
+-/* And here we include common definitions */
+-#include <asm/pte-common.h>
++/* Location of the PFN in the PTE. Most 32-bit platforms use the same
++ * as _PAGE_SHIFT here (ie, naturally aligned).
++ * Platform who don't just pre-define the value so we don't override it here
++ */
++#ifndef PTE_RPN_SHIFT
++#define PTE_RPN_SHIFT	(PAGE_SHIFT)
++#endif
++
++/* The mask covered by the RPN must be a ULL on 32-bit platforms with
++ * 64-bit PTEs
++ */
++#if defined(CONFIG_PPC32) && defined(CONFIG_PTE_64BIT)
++#define PTE_RPN_MASK	(~((1ULL << PTE_RPN_SHIFT) - 1))
++#else
++#define PTE_RPN_MASK	(~((1UL << PTE_RPN_SHIFT) - 1))
++#endif
++
++/* _PAGE_CHG_MASK masks of bits that are to be preserved across
++ * pgprot changes
++ */
++#define _PAGE_CHG_MASK	(PTE_RPN_MASK | _PAGE_DIRTY | _PAGE_ACCESSED | _PAGE_SPECIAL)
  
--config BLK_WBT_SQ
--	bool "Single queue writeback throttling"
--	depends on BLK_WBT
--	---help---
--	Enable writeback throttling by default on legacy single queue devices
+ #ifndef __ASSEMBLY__
+ 
+diff --git a/arch/powerpc/include/asm/pte-common.h b/arch/powerpc/include/asm/pte-common.h
+deleted file mode 100644
+index ff01368a175a..000000000000
+--- a/arch/powerpc/include/asm/pte-common.h
++++ /dev/null
+@@ -1,25 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-/* Included from asm/pgtable-*.h only ! */
 -
- config BLK_WBT_MQ
- 	bool "Multiqueue writeback throttling"
- 	default y
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 8ac93fcbaa2e..0fc222d4194b 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -709,8 +709,7 @@ void wbt_enable_default(struct request_queue *q)
- 	if (!test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
- 		return;
- 
--	if ((q->mq_ops && IS_ENABLED(CONFIG_BLK_WBT_MQ)) ||
--	    (q->request_fn && IS_ENABLED(CONFIG_BLK_WBT_SQ)))
-+	if (q->mq_ops && IS_ENABLED(CONFIG_BLK_WBT_MQ))
- 		wbt_init(q);
- }
- EXPORT_SYMBOL_GPL(wbt_enable_default);
+-/* Location of the PFN in the PTE. Most 32-bit platforms use the same
+- * as _PAGE_SHIFT here (ie, naturally aligned).
+- * Platform who don't just pre-define the value so we don't override it here
+- */
+-#ifndef PTE_RPN_SHIFT
+-#define PTE_RPN_SHIFT	(PAGE_SHIFT)
+-#endif
+-
+-/* The mask covered by the RPN must be a ULL on 32-bit platforms with
+- * 64-bit PTEs
+- */
+-#if defined(CONFIG_PPC32) && defined(CONFIG_PTE_64BIT)
+-#define PTE_RPN_MASK	(~((1ULL<<PTE_RPN_SHIFT)-1))
+-#else
+-#define PTE_RPN_MASK	(~((1UL<<PTE_RPN_SHIFT)-1))
+-#endif
+-
+-/* _PAGE_CHG_MASK masks of bits that are to be preserved across
+- * pgprot changes
+- */
+-#define _PAGE_CHG_MASK	(PTE_RPN_MASK | _PAGE_DIRTY | \
+-                         _PAGE_ACCESSED | _PAGE_SPECIAL)
 -- 
-2.17.1
+2.13.3
