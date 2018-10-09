@@ -1,265 +1,292 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 23/30] block: kill legacy parts of timeout handling
-Date: Wed, 31 Oct 2018 11:59:15 -0600
-Message-Id: <20181031175922.8849-24-axboe@kernel.dk>
-In-Reply-To: <20181031175922.8849-1-axboe@kernel.dk>
-References: <20181031175922.8849-1-axboe@kernel.dk>
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <72a3b716211b937bcf3f0bd44f5e93a9d191486e.1539092112.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1539092111.git.christophe.leroy@c-s.fr>
+References: <cover.1539092111.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v3 10/24] powerpc/mm: add pte helpers to query and change pte
+ flags
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Tue,  9 Oct 2018 13:51:52 +0000 (UTC)
 List-ID: <linux-block@vger.kernel.org>
 
-The only user of legacy timing now is BSG, which is invoked
-from the mq timeout handler. Kill the legacy code, and rename
-the q->rq_timed_out_fn to q->bsg_job_timeout_fn.
+In order to avoid using generic _PAGE_XXX flags in powerpc
+core functions, define helpers for all needed flags:
+- pte_mkuser() and pte_mkprivileged() to set/unset and/or
+unset/set _PAGE_USER and/or _PAGE_PRIVILEGED
+- pte_hashpte() to check if _PAGE_HASHPTE is set.
+- pte_ci() check if cache is inhibited (already existing on book3s/64)
+- pte_exprotect() to protect against execution
+- pte_exec() and pte_mkexec() to query and set page execution
+- pte_mkpte() to set _PAGE_PTE flag.
+- pte_hw_valid() to check _PAGE_PRESENT since pte_present does
+something different on book3s/64.
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+On book3s/32 there is no exec protection, so pte_mkexec() and
+pte_exprotect() are nops and pte_exec() returns always true.
+
+Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- block/blk-core.c       |  1 -
- block/blk-settings.c   |  7 ---
- block/blk-timeout.c    | 99 +++---------------------------------------
- block/blk.h            |  1 -
- block/bsg-lib.c        |  6 +--
- include/linux/blkdev.h |  4 +-
- 6 files changed, 11 insertions(+), 107 deletions(-)
+ arch/powerpc/include/asm/book3s/32/pgtable.h | 41 ++++++++++++++++++++++++++++
+ arch/powerpc/include/asm/book3s/64/pgtable.h | 35 ++++++++++++++++++++++++
+ arch/powerpc/include/asm/nohash/32/pgtable.h |  5 ++++
+ arch/powerpc/include/asm/nohash/64/pgtable.h |  5 ++++
+ arch/powerpc/include/asm/nohash/pgtable.h    | 28 +++++++++++++++++++
+ 5 files changed, 114 insertions(+)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index bffc80052948..fcdb631f0a7a 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -653,7 +653,6 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
- 		    laptop_mode_timer_fn, 0);
- 	timer_setup(&q->timeout, blk_rq_timed_out_timer, 0);
- 	INIT_WORK(&q->timeout_work, NULL);
--	INIT_LIST_HEAD(&q->timeout_list);
- 	INIT_LIST_HEAD(&q->icq_list);
- #ifdef CONFIG_BLK_CGROUP
- 	INIT_LIST_HEAD(&q->blkg_list);
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index f284e1600e29..1895f499bbe5 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -32,13 +32,6 @@ void blk_queue_rq_timeout(struct request_queue *q, unsigned int timeout)
- }
- EXPORT_SYMBOL_GPL(blk_queue_rq_timeout);
+diff --git a/arch/powerpc/include/asm/book3s/32/pgtable.h b/arch/powerpc/include/asm/book3s/32/pgtable.h
+index 3127cc529aa1..a6ca799e0eb5 100644
+--- a/arch/powerpc/include/asm/book3s/32/pgtable.h
++++ b/arch/powerpc/include/asm/book3s/32/pgtable.h
+@@ -301,6 +301,7 @@ static inline int pte_dirty(pte_t pte)		{ return !!(pte_val(pte) & _PAGE_DIRTY);
+ static inline int pte_young(pte_t pte)		{ return !!(pte_val(pte) & _PAGE_ACCESSED); }
+ static inline int pte_special(pte_t pte)	{ return !!(pte_val(pte) & _PAGE_SPECIAL); }
+ static inline int pte_none(pte_t pte)		{ return (pte_val(pte) & ~_PTE_NONE_MASK) == 0; }
++static inline bool pte_exec(pte_t pte)		{ return true; }
+ static inline pgprot_t pte_pgprot(pte_t pte)	{ return __pgprot(pte_val(pte) & PAGE_PROT_BITS); }
  
--void blk_queue_rq_timed_out(struct request_queue *q, rq_timed_out_fn *fn)
--{
--	WARN_ON_ONCE(q->mq_ops);
--	q->rq_timed_out_fn = fn;
--}
--EXPORT_SYMBOL_GPL(blk_queue_rq_timed_out);
--
- /**
-  * blk_set_default_limits - reset limits to default values
-  * @lim:  the queue_limits structure to reset
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index f2cfd56e1606..6428d458072a 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -78,70 +78,6 @@ void blk_delete_timer(struct request *req)
- 	list_del_init(&req->timeout_list);
+ static inline int pte_present(pte_t pte)
+@@ -308,6 +309,21 @@ static inline int pte_present(pte_t pte)
+ 	return pte_val(pte) & _PAGE_PRESENT;
  }
  
--static void blk_rq_timed_out(struct request *req)
--{
--	struct request_queue *q = req->q;
--	enum blk_eh_timer_return ret = BLK_EH_RESET_TIMER;
--
--	if (q->rq_timed_out_fn)
--		ret = q->rq_timed_out_fn(req);
--	switch (ret) {
--	case BLK_EH_RESET_TIMER:
--		blk_add_timer(req);
--		blk_clear_rq_complete(req);
--		break;
--	case BLK_EH_DONE:
--		/*
--		 * LLD handles this for now but in the future
--		 * we can send a request msg to abort the command
--		 * and we can move more of the generic scsi eh code to
--		 * the blk layer.
--		 */
--		break;
--	default:
--		printk(KERN_ERR "block: bad eh return: %d\n", ret);
--		break;
--	}
--}
--
--static void blk_rq_check_expired(struct request *rq, unsigned long *next_timeout,
--			  unsigned int *next_set)
--{
--	const unsigned long deadline = blk_rq_deadline(rq);
--
--	if (time_after_eq(jiffies, deadline)) {
--		list_del_init(&rq->timeout_list);
--
--		/*
--		 * Check if we raced with end io completion
--		 */
--		if (!blk_mark_rq_complete(rq))
--			blk_rq_timed_out(rq);
--	} else if (!*next_set || time_after(*next_timeout, deadline)) {
--		*next_timeout = deadline;
--		*next_set = 1;
--	}
--}
--
--void blk_timeout_work(struct work_struct *work)
--{
--	struct request_queue *q =
--		container_of(work, struct request_queue, timeout_work);
--	unsigned long flags, next = 0;
--	struct request *rq, *tmp;
--	int next_set = 0;
--
--	spin_lock_irqsave(q->queue_lock, flags);
--
--	list_for_each_entry_safe(rq, tmp, &q->timeout_list, timeout_list)
--		blk_rq_check_expired(rq, &next, &next_set);
--
--	if (next_set)
--		mod_timer(&q->timeout, round_jiffies_up(next));
--
--	spin_unlock_irqrestore(q->queue_lock, flags);
--}
--
- /**
-  * blk_abort_request -- Request request recovery for the specified command
-  * @req:	pointer to the request of interest
-@@ -153,20 +89,13 @@ void blk_timeout_work(struct work_struct *work)
-  */
- void blk_abort_request(struct request *req)
++static inline bool pte_hw_valid(pte_t pte)
++{
++	return pte_val(pte) & _PAGE_PRESENT;
++}
++
++static inline bool pte_hashpte(pte_t pte)
++{
++	return !!(pte_val(pte) & _PAGE_HASHPTE);
++}
++
++static inline bool pte_ci(pte_t pte)
++{
++	return !!(pte_val(pte) & _PAGE_NO_CACHE);
++}
++
+ /*
+  * We only find page table entry in the last level
+  * Hence no need for other accessors
+@@ -354,6 +370,11 @@ static inline pte_t pte_wrprotect(pte_t pte)
+ 	return __pte(pte_val(pte) & ~_PAGE_RW);
+ }
+ 
++static inline pte_t pte_exprotect(pte_t pte)
++{
++	return pte;
++}
++
+ static inline pte_t pte_mkclean(pte_t pte)
  {
--	if (req->q->mq_ops) {
--		/*
--		 * All we need to ensure is that timeout scan takes place
--		 * immediately and that scan sees the new timeout value.
--		 * No need for fancy synchronizations.
--		 */
--		blk_rq_set_deadline(req, jiffies);
--		kblockd_schedule_work(&req->q->timeout_work);
--	} else {
--		if (blk_mark_rq_complete(req))
--			return;
--		blk_delete_timer(req);
--		blk_rq_timed_out(req);
--	}
-+	/*
-+	 * All we need to ensure is that timeout scan takes place
-+	 * immediately and that scan sees the new timeout value.
-+	 * No need for fancy synchronizations.
-+	 */
-+	blk_rq_set_deadline(req, jiffies);
-+	kblockd_schedule_work(&req->q->timeout_work);
+ 	return __pte(pte_val(pte) & ~_PAGE_DIRTY);
+@@ -364,6 +385,16 @@ static inline pte_t pte_mkold(pte_t pte)
+ 	return __pte(pte_val(pte) & ~_PAGE_ACCESSED);
  }
- EXPORT_SYMBOL_GPL(blk_abort_request);
  
-@@ -194,13 +123,6 @@ void blk_add_timer(struct request *req)
- 	struct request_queue *q = req->q;
- 	unsigned long expiry;
++static inline pte_t pte_mkexec(pte_t pte)
++{
++	return pte;
++}
++
++static inline pte_t pte_mkpte(pte_t pte)
++{
++	return pte;
++}
++
+ static inline pte_t pte_mkwrite(pte_t pte)
+ {
+ 	return __pte(pte_val(pte) | _PAGE_RW);
+@@ -389,6 +420,16 @@ static inline pte_t pte_mkhuge(pte_t pte)
+ 	return pte;
+ }
  
--	if (!q->mq_ops)
--		lockdep_assert_held(q->queue_lock);
--
--	/* blk-mq has its own handler, so we don't need ->rq_timed_out_fn */
--	if (!q->mq_ops && !q->rq_timed_out_fn)
--		return;
--
- 	BUG_ON(!list_empty(&req->timeout_list));
++static inline pte_t pte_mkprivileged(pte_t pte)
++{
++	return __pte(pte_val(pte) & ~_PAGE_USER);
++}
++
++static inline pte_t pte_mkuser(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_USER);
++}
++
+ static inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
+ {
+ 	return __pte((pte_val(pte) & _PAGE_CHG_MASK) | pgprot_val(newprot));
+diff --git a/arch/powerpc/include/asm/book3s/64/pgtable.h b/arch/powerpc/include/asm/book3s/64/pgtable.h
+index d4327f494371..c8564762b6f0 100644
+--- a/arch/powerpc/include/asm/book3s/64/pgtable.h
++++ b/arch/powerpc/include/asm/book3s/64/pgtable.h
+@@ -519,6 +519,11 @@ static inline int pte_special(pte_t pte)
+ 	return !!(pte_raw(pte) & cpu_to_be64(_PAGE_SPECIAL));
+ }
  
++static inline bool pte_exec(pte_t pte)
++{
++	return !!(pte_raw(pte) & cpu_to_be64(_PAGE_EXEC));
++}
++
+ static inline pgprot_t pte_pgprot(pte_t pte)	{ return __pgprot(pte_val(pte) & PAGE_PROT_BITS); }
+ 
+ #ifdef CONFIG_HAVE_ARCH_SOFT_DIRTY
+@@ -587,6 +592,11 @@ static inline int pte_present(pte_t pte)
+ 	return !!(pte_raw(pte) & cpu_to_be64(_PAGE_PRESENT | _PAGE_INVALID));
+ }
+ 
++static inline bool pte_hw_valid(pte_t pte)
++{
++	return !!(pte_raw(pte) & cpu_to_be64(_PAGE_PRESENT));
++}
++
+ #ifdef CONFIG_PPC_MEM_KEYS
+ extern bool arch_pte_access_permitted(u64 pte, bool write, bool execute);
+ #else
+@@ -646,6 +656,11 @@ static inline pte_t pte_wrprotect(pte_t pte)
+ 	return __pte(pte_val(pte) & ~_PAGE_WRITE);
+ }
+ 
++static inline pte_t pte_exprotect(pte_t pte)
++{
++	return __pte(pte_val(pte) & ~_PAGE_EXEC);
++}
++
+ static inline pte_t pte_mkclean(pte_t pte)
+ {
+ 	return __pte(pte_val(pte) & ~_PAGE_DIRTY);
+@@ -656,6 +671,16 @@ static inline pte_t pte_mkold(pte_t pte)
+ 	return __pte(pte_val(pte) & ~_PAGE_ACCESSED);
+ }
+ 
++static inline pte_t pte_mkexec(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_EXEC);
++}
++
++static inline pte_t pte_mkpte(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_PTE);
++}
++
+ static inline pte_t pte_mkwrite(pte_t pte)
+ {
  	/*
-@@ -213,13 +135,6 @@ void blk_add_timer(struct request *req)
- 	req->rq_flags &= ~RQF_TIMED_OUT;
- 	blk_rq_set_deadline(req, jiffies + req->timeout);
- 
--	/*
--	 * Only the non-mq case needs to add the request to a protected list.
--	 * For the mq case we simply scan the tag map.
--	 */
--	if (!q->mq_ops)
--		list_add_tail(&req->timeout_list, &req->q->timeout_list);
--
- 	/*
- 	 * If the timer isn't already pending or this timeout is earlier
- 	 * than an existing one, modify the timer. Round up to next nearest
-diff --git a/block/blk.h b/block/blk.h
-index e2604ae7ddfa..4ae6cacb4548 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -224,7 +224,6 @@ static inline bool bio_integrity_endio(struct bio *bio)
+@@ -689,6 +714,16 @@ static inline pte_t pte_mkdevmap(pte_t pte)
+ 	return __pte(pte_val(pte) | _PAGE_SPECIAL|_PAGE_DEVMAP);
  }
- #endif /* CONFIG_BLK_DEV_INTEGRITY */
  
--void blk_timeout_work(struct work_struct *work);
- unsigned long blk_rq_timeout(unsigned long timeout);
- void blk_add_timer(struct request *req);
- void blk_delete_timer(struct request *);
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index faf20f4500c9..f38c7bc272c0 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -307,8 +307,8 @@ static enum blk_eh_timer_return bsg_timeout(struct request *rq, bool reserved)
- 	enum blk_eh_timer_return ret = BLK_EH_DONE;
- 	struct request_queue *q = rq->q;
- 
--	if (q->rq_timed_out_fn)
--		ret = q->rq_timed_out_fn(rq);
-+	if (q->bsg_job_timeout_fn)
-+		ret = q->bsg_job_timeout_fn(rq);
- 
- 	return ret;
++static inline pte_t pte_mkprivileged(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_PRIVILEGED);
++}
++
++static inline pte_t pte_mkuser(pte_t pte)
++{
++	return __pte(pte_val(pte) & ~_PAGE_PRIVILEGED);
++}
++
+ /*
+  * This is potentially called with a pmd as the argument, in which case it's not
+  * safe to check _PAGE_DEVMAP unless we also confirm that _PAGE_PTE is set.
+diff --git a/arch/powerpc/include/asm/nohash/32/pgtable.h b/arch/powerpc/include/asm/nohash/32/pgtable.h
+index 4373f8c44b6d..6fecfd7854f5 100644
+--- a/arch/powerpc/include/asm/nohash/32/pgtable.h
++++ b/arch/powerpc/include/asm/nohash/32/pgtable.h
+@@ -164,6 +164,11 @@ static inline pte_t pte_wrprotect(pte_t pte)
+ 	return __pte(ptev);
  }
-@@ -357,9 +357,9 @@ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
  
- 	q->queuedata = dev;
- 	q->bsg_job_fn = job_fn;
-+	q->bsg_job_timeout_fn = timeout;
- 	blk_queue_flag_set(QUEUE_FLAG_BIDI, q);
- 	blk_queue_rq_timeout(q, BLK_DEFAULT_SG_TIMEOUT);
--	q->rq_timed_out_fn = timeout;
++static inline pte_t pte_mkexec(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_EXEC);
++}
++
+ #define pmd_none(pmd)		(!pmd_val(pmd))
+ #define	pmd_bad(pmd)		(pmd_val(pmd) & _PMD_BAD)
+ #define	pmd_present(pmd)	(pmd_val(pmd) & _PMD_PRESENT_MASK)
+diff --git a/arch/powerpc/include/asm/nohash/64/pgtable.h b/arch/powerpc/include/asm/nohash/64/pgtable.h
+index 72dac522aa66..b7d65d4b61be 100644
+--- a/arch/powerpc/include/asm/nohash/64/pgtable.h
++++ b/arch/powerpc/include/asm/nohash/64/pgtable.h
+@@ -114,6 +114,11 @@ static inline pte_t pte_wrprotect(pte_t pte)
+ 	return __pte(pte_val(pte) & ~_PAGE_RW);
+ }
  
- 	ret = bsg_register_queue(q, dev, name, &bsg_transport_ops);
- 	if (ret) {
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c502a7f40e84..0364fc53f5c8 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -441,7 +441,6 @@ struct request_queue {
- 	make_request_fn		*make_request_fn;
- 	poll_q_fn		*poll_fn;
- 	softirq_done_fn		*softirq_done_fn;
--	rq_timed_out_fn		*rq_timed_out_fn;
- 	dma_drain_needed_fn	*dma_drain_needed;
- 	/* Called just after a request is allocated */
- 	init_rq_fn		*init_rq_fn;
-@@ -541,7 +540,6 @@ struct request_queue {
++static inline pte_t pte_mkexec(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_EXEC);
++}
++
+ #define PMD_BAD_BITS		(PTE_TABLE_SIZE-1)
+ #define PUD_BAD_BITS		(PMD_TABLE_SIZE-1)
  
- 	struct timer_list	timeout;
- 	struct work_struct	timeout_work;
--	struct list_head	timeout_list;
+diff --git a/arch/powerpc/include/asm/nohash/pgtable.h b/arch/powerpc/include/asm/nohash/pgtable.h
+index c746e9e784cd..b256e38a047c 100644
+--- a/arch/powerpc/include/asm/nohash/pgtable.h
++++ b/arch/powerpc/include/asm/nohash/pgtable.h
+@@ -19,6 +19,9 @@ static inline int pte_read(pte_t pte)		{ return 1; }
+ static inline int pte_dirty(pte_t pte)		{ return pte_val(pte) & _PAGE_DIRTY; }
+ static inline int pte_special(pte_t pte)	{ return pte_val(pte) & _PAGE_SPECIAL; }
+ static inline int pte_none(pte_t pte)		{ return (pte_val(pte) & ~_PTE_NONE_MASK) == 0; }
++static inline bool pte_hashpte(pte_t pte)	{ return false; }
++static inline bool pte_ci(pte_t pte)		{ return pte_val(pte) & _PAGE_NO_CACHE; }
++static inline bool pte_exec(pte_t pte)		{ return pte_val(pte) & _PAGE_EXEC; }
+ static inline pgprot_t pte_pgprot(pte_t pte)	{ return __pgprot(pte_val(pte) & PAGE_PROT_BITS); }
  
- 	struct list_head	icq_list;
- #ifdef CONFIG_BLK_CGROUP
-@@ -601,6 +599,7 @@ struct request_queue {
+ #ifdef CONFIG_NUMA_BALANCING
+@@ -44,6 +47,11 @@ static inline int pte_present(pte_t pte)
+ 	return pte_val(pte) & _PAGE_PRESENT;
+ }
  
- #if defined(CONFIG_BLK_DEV_BSG)
- 	bsg_job_fn		*bsg_job_fn;
-+	rq_timed_out_fn		*bsg_job_timeout_fn;
- 	struct bsg_class_device bsg_dev;
- #endif
++static inline bool pte_hw_valid(pte_t pte)
++{
++	return pte_val(pte) & _PAGE_PRESENT;
++}
++
+ /*
+  * We only find page table entry in the last level
+  * Hence no need for other accessors
+@@ -77,6 +85,11 @@ static inline unsigned long pte_pfn(pte_t pte)	{
+ 	return pte_val(pte) >> PTE_RPN_SHIFT; }
  
-@@ -1156,7 +1155,6 @@ extern void blk_queue_virt_boundary(struct request_queue *, unsigned long);
- extern void blk_queue_dma_alignment(struct request_queue *, int);
- extern void blk_queue_update_dma_alignment(struct request_queue *, int);
- extern void blk_queue_softirq_done(struct request_queue *, softirq_done_fn *);
--extern void blk_queue_rq_timed_out(struct request_queue *, rq_timed_out_fn *);
- extern void blk_queue_rq_timeout(struct request_queue *, unsigned int);
- extern void blk_queue_flush_queueable(struct request_queue *q, bool queueable);
- extern void blk_queue_write_cache(struct request_queue *q, bool enabled, bool fua);
+ /* Generic modifiers for PTE bits */
++static inline pte_t pte_exprotect(pte_t pte)
++{
++	return __pte(pte_val(pte) & ~_PAGE_EXEC);
++}
++
+ static inline pte_t pte_mkclean(pte_t pte)
+ {
+ 	return __pte(pte_val(pte) & ~(_PAGE_DIRTY | _PAGE_HWWRITE));
+@@ -87,6 +100,11 @@ static inline pte_t pte_mkold(pte_t pte)
+ 	return __pte(pte_val(pte) & ~_PAGE_ACCESSED);
+ }
+ 
++static inline pte_t pte_mkpte(pte_t pte)
++{
++	return pte;
++}
++
+ static inline pte_t pte_mkspecial(pte_t pte)
+ {
+ 	return __pte(pte_val(pte) | _PAGE_SPECIAL);
+@@ -97,6 +115,16 @@ static inline pte_t pte_mkhuge(pte_t pte)
+ 	return __pte(pte_val(pte) | _PAGE_HUGE);
+ }
+ 
++static inline pte_t pte_mkprivileged(pte_t pte)
++{
++	return __pte((pte_val(pte) & ~_PAGE_USER) | _PAGE_PRIVILEGED);
++}
++
++static inline pte_t pte_mkuser(pte_t pte)
++{
++	return __pte((pte_val(pte) & ~_PAGE_PRIVILEGED) | _PAGE_USER);
++}
++
+ static inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
+ {
+ 	return __pte((pte_val(pte) & _PAGE_CHG_MASK) | pgprot_val(newprot));
 -- 
-2.17.1
+2.13.3
