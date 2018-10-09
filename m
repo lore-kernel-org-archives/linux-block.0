@@ -1,471 +1,155 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 02/16] blk-mq: abstract out queue map
-Date: Tue, 30 Oct 2018 12:32:38 -0600
-Message-Id: <20181030183252.17857-3-axboe@kernel.dk>
-In-Reply-To: <20181030183252.17857-1-axboe@kernel.dk>
-References: <20181030183252.17857-1-axboe@kernel.dk>
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <cover.1539092111.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v3 00/24] ban the use of _PAGE_XXX flags outside platform specific code
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Tue,  9 Oct 2018 13:51:31 +0000 (UTC)
 List-ID: <linux-block@vger.kernel.org>
 
-This is in preparation for allowing multiple sets of maps per
-queue, if so desired.
+Today flags like for instance _PAGE_RW or _PAGE_USER are used through
+common parts of code.
+Using those directly in common parts of code have proven to lead to
+mistakes or misbehaviour, because their use is not always as trivial
+as one could think.
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-mq-cpumap.c                 | 10 ++++----
- block/blk-mq-pci.c                    | 10 ++++----
- block/blk-mq-rdma.c                   |  4 ++--
- block/blk-mq-virtio.c                 |  8 +++----
- block/blk-mq.c                        | 34 ++++++++++++++-------------
- block/blk-mq.h                        |  8 +++----
- drivers/block/virtio_blk.c            |  2 +-
- drivers/nvme/host/pci.c               |  2 +-
- drivers/scsi/qla2xxx/qla_os.c         |  5 ++--
- drivers/scsi/scsi_lib.c               |  2 +-
- drivers/scsi/smartpqi/smartpqi_init.c |  3 ++-
- drivers/scsi/virtio_scsi.c            |  3 ++-
- include/linux/blk-mq-pci.h            |  4 ++--
- include/linux/blk-mq-virtio.h         |  4 ++--
- include/linux/blk-mq.h                | 15 +++++++++---
- 15 files changed, 64 insertions(+), 50 deletions(-)
+For instance, (flags & _PAGE_USER) == 0 isn't enough to tell
+that a page is a kernel page, because some targets are using
+_PAGE_PRIVILEDGED and not _PAGE_USER, so the test has to be 
+(flags & (_PAGE_USER | _PAGE_PRIVILEDGED)) == _PAGE_PRIVILEDGED
+This has too (bad) consequences:
 
-diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
-index 3eb169f15842..6e6686c55984 100644
---- a/block/blk-mq-cpumap.c
-+++ b/block/blk-mq-cpumap.c
-@@ -30,10 +30,10 @@ static int get_first_sibling(unsigned int cpu)
- 	return cpu;
- }
- 
--int blk_mq_map_queues(struct blk_mq_tag_set *set)
-+int blk_mq_map_queues(struct blk_mq_queue_map *qmap)
- {
--	unsigned int *map = set->mq_map;
--	unsigned int nr_queues = set->nr_hw_queues;
-+	unsigned int *map = qmap->mq_map;
-+	unsigned int nr_queues = qmap->nr_queues;
- 	unsigned int cpu, first_sibling;
- 
- 	for_each_possible_cpu(cpu) {
-@@ -62,12 +62,12 @@ EXPORT_SYMBOL_GPL(blk_mq_map_queues);
-  * We have no quick way of doing reverse lookups. This is only used at
-  * queue init time, so runtime isn't important.
-  */
--int blk_mq_hw_queue_to_node(unsigned int *mq_map, unsigned int index)
-+int blk_mq_hw_queue_to_node(struct blk_mq_queue_map *qmap, unsigned int index)
- {
- 	int i;
- 
- 	for_each_possible_cpu(i) {
--		if (index == mq_map[i])
-+		if (index == qmap->mq_map[i])
- 			return local_memory_node(cpu_to_node(i));
- 	}
- 
-diff --git a/block/blk-mq-pci.c b/block/blk-mq-pci.c
-index db644ec624f5..40333d60a850 100644
---- a/block/blk-mq-pci.c
-+++ b/block/blk-mq-pci.c
-@@ -31,26 +31,26 @@
-  * that maps a queue to the CPUs that have irq affinity for the corresponding
-  * vector.
-  */
--int blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev,
-+int blk_mq_pci_map_queues(struct blk_mq_queue_map *qmap, struct pci_dev *pdev,
- 			    int offset)
- {
- 	const struct cpumask *mask;
- 	unsigned int queue, cpu;
- 
--	for (queue = 0; queue < set->nr_hw_queues; queue++) {
-+	for (queue = 0; queue < qmap->nr_queues; queue++) {
- 		mask = pci_irq_get_affinity(pdev, queue + offset);
- 		if (!mask)
- 			goto fallback;
- 
- 		for_each_cpu(cpu, mask)
--			set->mq_map[cpu] = queue;
-+			qmap->mq_map[cpu] = queue;
- 	}
- 
- 	return 0;
- 
- fallback:
--	WARN_ON_ONCE(set->nr_hw_queues > 1);
--	blk_mq_clear_mq_map(set);
-+	WARN_ON_ONCE(qmap->nr_queues > 1);
-+	blk_mq_clear_mq_map(qmap);
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(blk_mq_pci_map_queues);
-diff --git a/block/blk-mq-rdma.c b/block/blk-mq-rdma.c
-index 996167f1de18..a71576aff3a5 100644
---- a/block/blk-mq-rdma.c
-+++ b/block/blk-mq-rdma.c
-@@ -41,12 +41,12 @@ int blk_mq_rdma_map_queues(struct blk_mq_tag_set *set,
- 			goto fallback;
- 
- 		for_each_cpu(cpu, mask)
--			set->mq_map[cpu] = queue;
-+			set->map[0].mq_map[cpu] = queue;
- 	}
- 
- 	return 0;
- 
- fallback:
--	return blk_mq_map_queues(set);
-+	return blk_mq_map_queues(&set->map[0]);
- }
- EXPORT_SYMBOL_GPL(blk_mq_rdma_map_queues);
-diff --git a/block/blk-mq-virtio.c b/block/blk-mq-virtio.c
-index c3afbca11299..661fbfef480f 100644
---- a/block/blk-mq-virtio.c
-+++ b/block/blk-mq-virtio.c
-@@ -29,7 +29,7 @@
-  * that maps a queue to the CPUs that have irq affinity for the corresponding
-  * vector.
-  */
--int blk_mq_virtio_map_queues(struct blk_mq_tag_set *set,
-+int blk_mq_virtio_map_queues(struct blk_mq_queue_map *qmap,
- 		struct virtio_device *vdev, int first_vec)
- {
- 	const struct cpumask *mask;
-@@ -38,17 +38,17 @@ int blk_mq_virtio_map_queues(struct blk_mq_tag_set *set,
- 	if (!vdev->config->get_vq_affinity)
- 		goto fallback;
- 
--	for (queue = 0; queue < set->nr_hw_queues; queue++) {
-+	for (queue = 0; queue < qmap->nr_queues; queue++) {
- 		mask = vdev->config->get_vq_affinity(vdev, first_vec + queue);
- 		if (!mask)
- 			goto fallback;
- 
- 		for_each_cpu(cpu, mask)
--			set->mq_map[cpu] = queue;
-+			qmap->mq_map[cpu] = queue;
- 	}
- 
- 	return 0;
- fallback:
--	return blk_mq_map_queues(set);
-+	return blk_mq_map_queues(qmap);
- }
- EXPORT_SYMBOL_GPL(blk_mq_virtio_map_queues);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 22d5beaab5a0..9f149429cfbd 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1974,7 +1974,7 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 	struct blk_mq_tags *tags;
- 	int node;
- 
--	node = blk_mq_hw_queue_to_node(set->mq_map, hctx_idx);
-+	node = blk_mq_hw_queue_to_node(&set->map[0], hctx_idx);
- 	if (node == NUMA_NO_NODE)
- 		node = set->numa_node;
- 
-@@ -2030,7 +2030,7 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 	size_t rq_size, left;
- 	int node;
- 
--	node = blk_mq_hw_queue_to_node(set->mq_map, hctx_idx);
-+	node = blk_mq_hw_queue_to_node(&set->map[0], hctx_idx);
- 	if (node == NUMA_NO_NODE)
- 		node = set->numa_node;
- 
-@@ -2321,7 +2321,7 @@ static void blk_mq_map_swqueue(struct request_queue *q)
- 	 * If the cpu isn't present, the cpu is mapped to first hctx.
- 	 */
- 	for_each_possible_cpu(i) {
--		hctx_idx = set->mq_map[i];
-+		hctx_idx = set->map[0].mq_map[i];
- 		/* unmapped hw queue can be remapped after CPU topo changed */
- 		if (!set->tags[hctx_idx] &&
- 		    !__blk_mq_alloc_rq_map(set, hctx_idx)) {
-@@ -2331,7 +2331,7 @@ static void blk_mq_map_swqueue(struct request_queue *q)
- 			 * case, remap the current ctx to hctx[0] which
- 			 * is guaranteed to always have tags allocated
- 			 */
--			set->mq_map[i] = 0;
-+			set->map[0].mq_map[i] = 0;
- 		}
- 
- 		ctx = per_cpu_ptr(q->queue_ctx, i);
-@@ -2584,7 +2584,7 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 		int node;
- 		struct blk_mq_hw_ctx *hctx;
- 
--		node = blk_mq_hw_queue_to_node(set->mq_map, i);
-+		node = blk_mq_hw_queue_to_node(&set->map[0], i);
- 		/*
- 		 * If the hw queue has been mapped to another numa node,
- 		 * we need to realloc the hctx. If allocation fails, fallback
-@@ -2793,18 +2793,18 @@ static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
- 		 * for (queue = 0; queue < set->nr_hw_queues; queue++) {
- 		 * 	mask = get_cpu_mask(queue)
- 		 * 	for_each_cpu(cpu, mask)
--		 * 		set->mq_map[cpu] = queue;
-+		 * 		set->map.mq_map[cpu] = queue;
- 		 * }
- 		 *
- 		 * When we need to remap, the table has to be cleared for
- 		 * killing stale mapping since one CPU may not be mapped
- 		 * to any hw queue.
- 		 */
--		blk_mq_clear_mq_map(set);
-+		blk_mq_clear_mq_map(&set->map[0]);
- 
- 		return set->ops->map_queues(set);
- 	} else
--		return blk_mq_map_queues(set);
-+		return blk_mq_map_queues(&set->map[0]);
- }
- 
- /*
-@@ -2859,10 +2859,12 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
- 		return -ENOMEM;
- 
- 	ret = -ENOMEM;
--	set->mq_map = kcalloc_node(nr_cpu_ids, sizeof(*set->mq_map),
--				   GFP_KERNEL, set->numa_node);
--	if (!set->mq_map)
-+	set->map[0].mq_map = kcalloc_node(nr_cpu_ids,
-+					  sizeof(*set->map[0].mq_map),
-+					  GFP_KERNEL, set->numa_node);
-+	if (!set->map[0].mq_map)
- 		goto out_free_tags;
-+	set->map[0].nr_queues = set->nr_hw_queues;
- 
- 	ret = blk_mq_update_queue_map(set);
- 	if (ret)
-@@ -2878,8 +2880,8 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
- 	return 0;
- 
- out_free_mq_map:
--	kfree(set->mq_map);
--	set->mq_map = NULL;
-+	kfree(set->map[0].mq_map);
-+	set->map[0].mq_map = NULL;
- out_free_tags:
- 	kfree(set->tags);
- 	set->tags = NULL;
-@@ -2894,8 +2896,8 @@ void blk_mq_free_tag_set(struct blk_mq_tag_set *set)
- 	for (i = 0; i < nr_cpu_ids; i++)
- 		blk_mq_free_map_and_requests(set, i);
- 
--	kfree(set->mq_map);
--	set->mq_map = NULL;
-+	kfree(set->map[0].mq_map);
-+	set->map[0].mq_map = NULL;
- 
- 	kfree(set->tags);
- 	set->tags = NULL;
-@@ -3056,7 +3058,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 			pr_warn("Increasing nr_hw_queues to %d fails, fallback to %d\n",
- 					nr_hw_queues, prev_nr_hw_queues);
- 			set->nr_hw_queues = prev_nr_hw_queues;
--			blk_mq_map_queues(set);
-+			blk_mq_map_queues(&set->map[0]);
- 			goto fallback;
- 		}
- 		blk_mq_map_swqueue(q);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 9536be06d022..889f0069dd80 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -70,14 +70,14 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- /*
-  * CPU -> queue mappings
-  */
--extern int blk_mq_hw_queue_to_node(unsigned int *map, unsigned int);
-+extern int blk_mq_hw_queue_to_node(struct blk_mq_queue_map *qmap, unsigned int);
- 
- static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
- 		int cpu)
- {
- 	struct blk_mq_tag_set *set = q->tag_set;
- 
--	return q->queue_hw_ctx[set->mq_map[cpu]];
-+	return q->queue_hw_ctx[set->map[0].mq_map[cpu]];
- }
- 
- /*
-@@ -206,12 +206,12 @@ static inline void blk_mq_put_driver_tag(struct request *rq)
- 	__blk_mq_put_driver_tag(hctx, rq);
- }
- 
--static inline void blk_mq_clear_mq_map(struct blk_mq_tag_set *set)
-+static inline void blk_mq_clear_mq_map(struct blk_mq_queue_map *qmap)
- {
- 	int cpu;
- 
- 	for_each_possible_cpu(cpu)
--		set->mq_map[cpu] = 0;
-+		qmap->mq_map[cpu] = 0;
- }
- 
- #endif
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 086c6bb12baa..6e869d05f91e 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -624,7 +624,7 @@ static int virtblk_map_queues(struct blk_mq_tag_set *set)
- {
- 	struct virtio_blk *vblk = set->driver_data;
- 
--	return blk_mq_virtio_map_queues(set, vblk->vdev, 0);
-+	return blk_mq_virtio_map_queues(&set->map[0], vblk->vdev, 0);
- }
- 
- #ifdef CONFIG_VIRTIO_BLK_SCSI
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index f30031945ee4..e5d783cb6937 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -435,7 +435,7 @@ static int nvme_pci_map_queues(struct blk_mq_tag_set *set)
- {
- 	struct nvme_dev *dev = set->driver_data;
- 
--	return blk_mq_pci_map_queues(set, to_pci_dev(dev->dev),
-+	return blk_mq_pci_map_queues(&set->map[0], to_pci_dev(dev->dev),
- 			dev->num_vecs > 1 ? 1 /* admin queue */ : 0);
- }
- 
-diff --git a/drivers/scsi/qla2xxx/qla_os.c b/drivers/scsi/qla2xxx/qla_os.c
-index 3e2665c66bc4..ca9ac124f218 100644
---- a/drivers/scsi/qla2xxx/qla_os.c
-+++ b/drivers/scsi/qla2xxx/qla_os.c
-@@ -6934,11 +6934,12 @@ static int qla2xxx_map_queues(struct Scsi_Host *shost)
- {
- 	int rc;
- 	scsi_qla_host_t *vha = (scsi_qla_host_t *)shost->hostdata;
-+	struct blk_mq_queue_map *qmap = &shost->tag_set.map[0];
- 
- 	if (USER_CTRL_IRQ(vha->hw))
--		rc = blk_mq_map_queues(&shost->tag_set);
-+		rc = blk_mq_map_queues(qmap);
- 	else
--		rc = blk_mq_pci_map_queues(&shost->tag_set, vha->hw->pdev, 0);
-+		rc = blk_mq_pci_map_queues(qmap, vha->hw->pdev, 0);
- 	return rc;
- }
- 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 651be30ba96a..ed81b8e74cfe 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1812,7 +1812,7 @@ static int scsi_map_queues(struct blk_mq_tag_set *set)
- 
- 	if (shost->hostt->map_queues)
- 		return shost->hostt->map_queues(shost);
--	return blk_mq_map_queues(set);
-+	return blk_mq_map_queues(&set->map[0]);
- }
- 
- void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
-diff --git a/drivers/scsi/smartpqi/smartpqi_init.c b/drivers/scsi/smartpqi/smartpqi_init.c
-index a25a07a0b7f0..bac084260d80 100644
---- a/drivers/scsi/smartpqi/smartpqi_init.c
-+++ b/drivers/scsi/smartpqi/smartpqi_init.c
-@@ -5319,7 +5319,8 @@ static int pqi_map_queues(struct Scsi_Host *shost)
- {
- 	struct pqi_ctrl_info *ctrl_info = shost_to_hba(shost);
- 
--	return blk_mq_pci_map_queues(&shost->tag_set, ctrl_info->pci_dev, 0);
-+	return blk_mq_pci_map_queues(&shost->tag_set.map[0],
-+					ctrl_info->pci_dev, 0);
- }
- 
- static int pqi_getpciinfo_ioctl(struct pqi_ctrl_info *ctrl_info,
-diff --git a/drivers/scsi/virtio_scsi.c b/drivers/scsi/virtio_scsi.c
-index 1c72db94270e..c3c95b314286 100644
---- a/drivers/scsi/virtio_scsi.c
-+++ b/drivers/scsi/virtio_scsi.c
-@@ -719,8 +719,9 @@ static void virtscsi_target_destroy(struct scsi_target *starget)
- static int virtscsi_map_queues(struct Scsi_Host *shost)
- {
- 	struct virtio_scsi *vscsi = shost_priv(shost);
-+	struct blk_mq_queue_map *qmap = &shost->tag_set.map[0];
- 
--	return blk_mq_virtio_map_queues(&shost->tag_set, vscsi->vdev, 2);
-+	return blk_mq_virtio_map_queues(qmap, vscsi->vdev, 2);
- }
- 
- /*
-diff --git a/include/linux/blk-mq-pci.h b/include/linux/blk-mq-pci.h
-index 9f4c17f0d2d8..0b1f45c62623 100644
---- a/include/linux/blk-mq-pci.h
-+++ b/include/linux/blk-mq-pci.h
-@@ -2,10 +2,10 @@
- #ifndef _LINUX_BLK_MQ_PCI_H
- #define _LINUX_BLK_MQ_PCI_H
- 
--struct blk_mq_tag_set;
-+struct blk_mq_queue_map;
- struct pci_dev;
- 
--int blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev,
-+int blk_mq_pci_map_queues(struct blk_mq_queue_map *qmap, struct pci_dev *pdev,
- 			  int offset);
- 
- #endif /* _LINUX_BLK_MQ_PCI_H */
-diff --git a/include/linux/blk-mq-virtio.h b/include/linux/blk-mq-virtio.h
-index 69b4da262c45..687ae287e1dc 100644
---- a/include/linux/blk-mq-virtio.h
-+++ b/include/linux/blk-mq-virtio.h
-@@ -2,10 +2,10 @@
- #ifndef _LINUX_BLK_MQ_VIRTIO_H
- #define _LINUX_BLK_MQ_VIRTIO_H
- 
--struct blk_mq_tag_set;
-+struct blk_mq_queue_map;
- struct virtio_device;
- 
--int blk_mq_virtio_map_queues(struct blk_mq_tag_set *set,
-+int blk_mq_virtio_map_queues(struct blk_mq_queue_map *qmap,
- 		struct virtio_device *vdev, int first_vec);
- 
- #endif /* _LINUX_BLK_MQ_VIRTIO_H */
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 5c8418ebbfd6..da88e539601b 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -74,10 +74,19 @@ struct blk_mq_hw_ctx {
- 	struct srcu_struct	srcu[0];
- };
- 
-+struct blk_mq_queue_map {
-+	unsigned int *mq_map;
-+	unsigned int nr_queues;
-+};
-+
-+enum {
-+	HCTX_MAX_TYPES = 1,
-+};
-+
- struct blk_mq_tag_set {
--	unsigned int		*mq_map;
-+	struct blk_mq_queue_map	map[HCTX_MAX_TYPES];
- 	const struct blk_mq_ops	*ops;
--	unsigned int		nr_hw_queues;
-+	unsigned int		nr_hw_queues;	/* nr hw queues across maps */
- 	unsigned int		queue_depth;	/* max hw supported */
- 	unsigned int		reserved_tags;
- 	unsigned int		cmd_size;	/* per-request extra data */
-@@ -294,7 +303,7 @@ void blk_mq_freeze_queue_wait(struct request_queue *q);
- int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
- 				     unsigned long timeout);
- 
--int blk_mq_map_queues(struct blk_mq_tag_set *set);
-+int blk_mq_map_queues(struct blk_mq_queue_map *qmap);
- void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
- 
- void blk_mq_quiesce_queue_nowait(struct request_queue *q);
+ - All targets must define every bit, even the unsupported ones,
+   leading to a lot of useless #define _PAGE_XXX 0
+ - If someone forgets to take into account all possible _PAGE_XXX bits
+   for the case, we can get unexpected behaviour on some targets.
+
+This becomes even more complex when we come to using _PAGE_RW.
+Testing (flags & _PAGE_RW) is not enough to test whether a page
+if writable or not, because:
+
+ - Some targets have _PAGE_RO instead, which has to be unset to tell
+   a page is writable
+ - Some targets have _PAGE_R and _PAGE_W, in which case
+   _PAGE_RW = _PAGE_R | _PAGE_W
+ - Even knowing whether a page is readable is not always trivial because:
+   - Some targets requires to check that _PAGE_R is set to ensure page
+   is readable
+   - Some targets requires to check that _PAGE_NA is not set
+   - Some targets requires to check that _PAGE_RO or _PAGE_RW is set
+
+Etc ....
+
+In order to work around all those issues and minimise the risks of errors,
+this serie aims at removing all use of _PAGE_XXX flags from powerpc code
+and always use pte_xxx() and pte_mkxxx() accessors instead. Those accessors
+are then defined in platform specific parts of the kernel code.
+
+Compared to the RFC, v2 adds three things:
+- A work on ioremap() alike functions: properly set the base flags
+  by all callers and removed the hack which sets the base flags when
+  the caller don't give them.
+- _PAGE_EXEC flag is replaced by a bool in the call to hash_preload()
+- Optimisation of pte_mkXXX() helpers on book3s64 to avoid multiple
+endian conversions.
+
+v2:
+ - Takes into account comments received on the RFC.
+ - compilation test result: http://kisskb.ellerman.id.au/kisskb/head/51b7f5d55900688c7c07cdb945d34b3314befa36/
+
+v3:
+ - rebased on lastest 'merge' powerpc branch
+ - added a new helper pte_hw_valid() and using it in set_pte_at(), see discussion at https://patchwork.ozlabs.org/patch/972630/
+ - compilation result: http://kisskb.ellerman.id.au/kisskb/head/914a399c8f1434f3c52013e625fb1665571033ef/
+
+Christophe Leroy (24):
+  powerpc/32: Add ioremap_wt() and ioremap_coherent()
+  drivers/video/fbdev: use ioremap_wc/wt() instead of __ioremap()
+  drivers/block/z2ram: use ioremap_wt() instead of
+    __ioremap(_PAGE_WRITETHRU)
+  soc/fsl/qbman: use ioremap_cache() instead of ioremap_prot(0)
+  powerpc: don't use ioremap_prot() nor __ioremap() unless really
+    needed.
+  powerpc/mm: properly set PAGE_KERNEL flags in ioremap()
+  powerpc: handover page flags with a pgprot_t parameter
+  powerpc/mm: don't use _PAGE_EXEC in book3s/32
+  powerpc/mm: move some nohash pte helpers in nohash/[32:64]/pgtable.h
+  powerpc/mm: add pte helpers to query and change pte flags
+  powerpc/mm: don't use _PAGE_EXEC for calling hash_preload()
+  powerpc/mm: use pte helpers in generic code
+  powerpc/mm: Split dump_pagelinuxtables flag_array table
+  powerpc/mm: drop unused page flags
+  powerpc/mm: move __P and __S tables in the common pgtable.h
+  powerpc/book3s/32: do not include pte-common.h
+  powerpc/mm: Move pte_user() into nohash/pgtable.h
+  powerpc/mm: Distribute platform specific PAGE and PMD flags and
+    definitions
+  powerpc/nohash/64: do not include pte-common.h
+  powerpc/mm: Allow platforms to redefine some helpers
+  powerpc/mm: Define platform default caches related flags
+  powerpc/mm: Get rid of pte-common.h
+  powerpc/8xx: change name of a few page flags to avoid confusion
+  powerpc/book3s64: Avoid multiple endian conversion in pte helpers
+
+ arch/powerpc/include/asm/book3s/32/pgtable.h       | 151 ++++++++++++--
+ arch/powerpc/include/asm/book3s/64/hash.h          |   3 +-
+ arch/powerpc/include/asm/book3s/64/pgtable.h       | 133 +++++++------
+ arch/powerpc/include/asm/fixmap.h                  |   2 +-
+ arch/powerpc/include/asm/io.h                      |  13 +-
+ arch/powerpc/include/asm/machdep.h                 |   2 +-
+ arch/powerpc/include/asm/nohash/32/pgtable.h       |  66 ++++++-
+ arch/powerpc/include/asm/nohash/32/pte-40x.h       |  48 +++++
+ arch/powerpc/include/asm/nohash/32/pte-44x.h       |  35 ++++
+ arch/powerpc/include/asm/nohash/32/pte-8xx.h       |  92 ++++++++-
+ arch/powerpc/include/asm/nohash/32/pte-fsl-booke.h |  38 ++++
+ arch/powerpc/include/asm/nohash/64/pgtable.h       |  40 +++-
+ arch/powerpc/include/asm/nohash/pgtable.h          |  98 ++++++---
+ arch/powerpc/include/asm/nohash/pte-book3e.h       |  30 +++
+ arch/powerpc/include/asm/pgtable.h                 |  19 ++
+ arch/powerpc/include/asm/pte-common.h              | 219 ---------------------
+ arch/powerpc/kernel/btext.c                        |   2 +-
+ arch/powerpc/kernel/crash_dump.c                   |   2 +-
+ arch/powerpc/kernel/head_8xx.S                     |   6 +-
+ arch/powerpc/kernel/io-workarounds.c               |   4 +-
+ arch/powerpc/kernel/isa-bridge.c                   |   6 +-
+ arch/powerpc/kernel/pci_64.c                       |   2 +-
+ arch/powerpc/lib/code-patching.c                   |   3 +-
+ arch/powerpc/mm/8xx_mmu.c                          |   5 +-
+ arch/powerpc/mm/Makefile                           |   7 +
+ arch/powerpc/mm/dma-noncoherent.c                  |   2 +-
+ arch/powerpc/mm/dump_linuxpagetables-8xx.c         |  82 ++++++++
+ arch/powerpc/mm/dump_linuxpagetables-book3s64.c    | 115 +++++++++++
+ arch/powerpc/mm/dump_linuxpagetables-generic.c     |  82 ++++++++
+ arch/powerpc/mm/dump_linuxpagetables.c             | 155 +--------------
+ arch/powerpc/mm/dump_linuxpagetables.h             |  19 ++
+ arch/powerpc/mm/hash_utils_64.c                    |   3 +-
+ arch/powerpc/mm/mem.c                              |  13 +-
+ arch/powerpc/mm/mmu_decl.h                         |   2 +-
+ arch/powerpc/mm/pgtable-book3e.c                   |   9 +-
+ arch/powerpc/mm/pgtable-hash64.c                   |   7 +-
+ arch/powerpc/mm/pgtable.c                          |  27 +--
+ arch/powerpc/mm/pgtable_32.c                       |  70 ++++---
+ arch/powerpc/mm/pgtable_64.c                       |  55 +++---
+ arch/powerpc/mm/ppc_mmu_32.c                       |   2 +-
+ arch/powerpc/platforms/4xx/ocm.c                   |   7 +-
+ arch/powerpc/platforms/85xx/smp.c                  |   4 +-
+ arch/powerpc/platforms/pasemi/dma_lib.c            |   2 +-
+ arch/powerpc/platforms/ps3/spu.c                   |   3 +-
+ arch/powerpc/sysdev/fsl_85xx_cache_sram.c          |   8 +-
+ arch/powerpc/xmon/xmon.c                           |  12 +-
+ drivers/block/z2ram.c                              |   3 +-
+ drivers/pcmcia/electra_cf.c                        |   2 +-
+ drivers/soc/fsl/qbman/qman_ccsr.c                  |   2 +-
+ drivers/video/fbdev/chipsfb.c                      |   3 +-
+ drivers/video/fbdev/controlfb.c                    |   5 +-
+ drivers/video/fbdev/platinumfb.c                   |   5 +-
+ drivers/video/fbdev/valkyriefb.c                   |  12 +-
+ 53 files changed, 1094 insertions(+), 643 deletions(-)
+ delete mode 100644 arch/powerpc/include/asm/pte-common.h
+ create mode 100644 arch/powerpc/mm/dump_linuxpagetables-8xx.c
+ create mode 100644 arch/powerpc/mm/dump_linuxpagetables-book3s64.c
+ create mode 100644 arch/powerpc/mm/dump_linuxpagetables-generic.c
+ create mode 100644 arch/powerpc/mm/dump_linuxpagetables.h
+
 -- 
-2.17.1
+2.13.3
