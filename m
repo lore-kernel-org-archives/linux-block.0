@@ -1,135 +1,116 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-mmc@vger.kernel.org,
-	linux-mtd@lists.infradead.org,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Pavel Machek <pavel@ucw.cz>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Richard Weinberger <richard@nod.at>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Jan Kara <jack@suse.cz>,
-	Artem Bityutskiy <dedekind1@gmail.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
-	Mark Brown <broonie@kernel.org>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Oleksandr Natalenko <oleksandr@natalenko.name>,
-	Jonathan Corbet <corbet@lwn.net>
-Subject: [PATCH v2] block: BFQ default for single queue devices
-Date: Mon, 15 Oct 2018 16:10:59 +0200
-Message-Id: <20181015141059.26579-1-linus.walleij@linaro.org>
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <bdf8fabb99484508c1e474eea5e7988c79c4c95d.1539092111.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1539092111.git.christophe.leroy@c-s.fr>
+References: <cover.1539092111.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v3 05/24] powerpc: don't use ioremap_prot() nor __ioremap()
+ unless really needed.
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Tue,  9 Oct 2018 13:51:41 +0000 (UTC)
 List-ID: <linux-block@vger.kernel.org>
 
-This sets BFQ as the default scheduler for single queue
-block devices (nr_hw_queues == 1) if it is available. This
-affects notably MMC/SD-cards but also UBI and the loopback
-device.
+In many places, ioremap_prot() and __ioremap() can be replaced with
+higher level functions like ioremap(), ioremap_coherent(),
+ioremap_cache(), ioremap_wc() ...
 
-I have been running it for a while without any negative
-effects on my pet systems and I want some wider testing
-so let's throw it out there and see what people say.
-Admittedly my use cases are limited. I need to keep this
-patch around for my personal needs anyway.
-
-We take special care to avoid using BFQ on zoned devices
-(in particular SMR, shingled magnetic recording devices)
-as these currently require mq-deadline to group writes
-together.
-
-I have opted against introducing any default scheduler
-through Kconfig as the mq-deadline enforcement for
-zoned devices has to be done at runtime anyways and
-too many config options will make things confusing.
-
-My argument for setting a default policy in the kernel
-as opposed to user space is the "reasonable defaults"
-type, analogous to how we have one default CPU scheduling
-policy (CFS) that make most sense for most tasks, and
-how automatic process group scheduling happens in most
-distributions without userspace involvement. The BFQ
-scheduling policy makes most sense for single hardware
-queue devices and many embedded systems will not have
-the clever userspace tools (such as udev) to make an
-educated choice of scheduling policy. Defaults should be
-those that make most sense for the hardware.
-
-Cc: Pavel Machek <pavel@ucw.cz>
-Cc: Paolo Valente <paolo.valente@linaro.org>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: Richard Weinberger <richard@nod.at>
-Cc: Adrian Hunter <adrian.hunter@intel.com>
-Cc: Bart Van Assche <bvanassche@acm.org>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Artem Bityutskiy <dedekind1@gmail.com>
-Cc: Christoph Hellwig <hch@infradead.org>
-Cc: Alan Cox <gnomes@lxorguk.ukuu.org.uk>
-Cc: Mark Brown <broonie@kernel.org>
-Cc: Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Oleksandr Natalenko <oleksandr@natalenko.name>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
-ChangeLog v1->v2:
-- Add a quirk so that devices with zoned writes are forced
-  to use the deadline scheduler, this is necessary since only
-  that scheduler supports zoned writes.
-- There is a summary article in LWN for subscribers:
-  https://lwn.net/Articles/767987/
----
- block/elevator.c | 22 ++++++++++++++++++----
- 1 file changed, 18 insertions(+), 4 deletions(-)
+ arch/powerpc/kernel/btext.c               | 2 +-
+ arch/powerpc/kernel/crash_dump.c          | 2 +-
+ arch/powerpc/platforms/85xx/smp.c         | 4 ++--
+ arch/powerpc/platforms/pasemi/dma_lib.c   | 2 +-
+ arch/powerpc/platforms/ps3/spu.c          | 3 +--
+ arch/powerpc/sysdev/fsl_85xx_cache_sram.c | 8 ++++----
+ 6 files changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 8fdcd64ae12e..6e6048ca3471 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -948,13 +948,16 @@ int elevator_switch_mq(struct request_queue *q,
- }
+diff --git a/arch/powerpc/kernel/btext.c b/arch/powerpc/kernel/btext.c
+index b2072d5bbf2b..b4241ed1456e 100644
+--- a/arch/powerpc/kernel/btext.c
++++ b/arch/powerpc/kernel/btext.c
+@@ -163,7 +163,7 @@ void btext_map(void)
+ 	offset = ((unsigned long) dispDeviceBase) - base;
+ 	size = dispDeviceRowBytes * dispDeviceRect[3] + offset
+ 		+ dispDeviceRect[0];
+-	vbase = __ioremap(base, size, pgprot_val(pgprot_noncached_wc(__pgprot(0))));
++	vbase = ioremap_wc(base, size);
+ 	if (!vbase)
+ 		return;
+ 	logicalDisplayBase = vbase + offset;
+diff --git a/arch/powerpc/kernel/crash_dump.c b/arch/powerpc/kernel/crash_dump.c
+index d10ad258d41a..bbdc4706c159 100644
+--- a/arch/powerpc/kernel/crash_dump.c
++++ b/arch/powerpc/kernel/crash_dump.c
+@@ -110,7 +110,7 @@ ssize_t copy_oldmem_page(unsigned long pfn, char *buf,
+ 		vaddr = __va(paddr);
+ 		csize = copy_oldmem_vaddr(vaddr, buf, csize, offset, userbuf);
+ 	} else {
+-		vaddr = __ioremap(paddr, PAGE_SIZE, 0);
++		vaddr = ioremap_cache(paddr, PAGE_SIZE);
+ 		csize = copy_oldmem_vaddr(vaddr, buf, csize, offset, userbuf);
+ 		iounmap(vaddr);
+ 	}
+diff --git a/arch/powerpc/platforms/85xx/smp.c b/arch/powerpc/platforms/85xx/smp.c
+index 7e966f4cf19a..fff72425727a 100644
+--- a/arch/powerpc/platforms/85xx/smp.c
++++ b/arch/powerpc/platforms/85xx/smp.c
+@@ -216,8 +216,8 @@ static int smp_85xx_start_cpu(int cpu)
  
- /*
-- * For blk-mq devices, we default to using mq-deadline, if available, for single
-- * queue devices.  If deadline isn't available OR we have multiple queues,
-- * default to "none".
-+ * For blk-mq devices, we default to using:
-+ * - "none" for multiqueue devices (nr_hw_queues != 1)
-+ * - "bfq", if available, for single queue devices
-+ * - "mq-deadline" if "bfq" is not available for single queue devices
-+ * - "none" for single queue devices as well as last resort
-  */
- int elevator_init_mq(struct request_queue *q)
- {
- 	struct elevator_type *e;
-+	const char *policy;
- 	int err = 0;
+ 	/* Map the spin table */
+ 	if (ioremappable)
+-		spin_table = ioremap_prot(*cpu_rel_addr,
+-			sizeof(struct epapr_spin_table), _PAGE_COHERENT);
++		spin_table = ioremap_coherent(*cpu_rel_addr,
++					      sizeof(struct epapr_spin_table));
+ 	else
+ 		spin_table = phys_to_virt(*cpu_rel_addr);
  
- 	if (q->nr_hw_queues != 1)
-@@ -968,7 +971,18 @@ int elevator_init_mq(struct request_queue *q)
- 	if (unlikely(q->elevator))
- 		goto out_unlock;
+diff --git a/arch/powerpc/platforms/pasemi/dma_lib.c b/arch/powerpc/platforms/pasemi/dma_lib.c
+index c80f72c370ae..53384eb42a76 100644
+--- a/arch/powerpc/platforms/pasemi/dma_lib.c
++++ b/arch/powerpc/platforms/pasemi/dma_lib.c
+@@ -576,7 +576,7 @@ int pasemi_dma_init(void)
+ 		res.start = 0xfd800000;
+ 		res.end = res.start + 0x1000;
+ 	}
+-	dma_status = __ioremap(res.start, resource_size(&res), 0);
++	dma_status = ioremap_cache(res.start, resource_size(&res));
+ 	pci_dev_put(iob_pdev);
  
--	e = elevator_get(q, "mq-deadline", false);
-+	/*
-+	 * Zoned devices must use a deadline scheduler because currently
-+	 * that is the only scheduler respecting zoned writes.
-+	 */
-+	if (blk_queue_is_zoned(q))
-+		policy = "mq-deadline";
-+	else if (IS_ENABLED(CONFIG_IOSCHED_BFQ))
-+		policy = "bfq";
-+	else
-+		policy = "mq-deadline";
-+
-+	e = elevator_get(q, policy, false);
- 	if (!e)
- 		goto out_unlock;
+ 	for (i = 0; i < MAX_TXCH; i++)
+diff --git a/arch/powerpc/platforms/ps3/spu.c b/arch/powerpc/platforms/ps3/spu.c
+index b54850845466..7746c2a3c509 100644
+--- a/arch/powerpc/platforms/ps3/spu.c
++++ b/arch/powerpc/platforms/ps3/spu.c
+@@ -215,8 +215,7 @@ static int __init setup_areas(struct spu *spu)
+ 		goto fail_ioremap;
+ 	}
  
+-	spu->local_store = (__force void *)ioremap_prot(spu->local_store_phys,
+-		LS_SIZE, pgprot_val(pgprot_noncached_wc(__pgprot(0))));
++	spu->local_store = (__force void *)ioremap_wc(spu->local_store_phys, LS_SIZE);
+ 
+ 	if (!spu->local_store) {
+ 		pr_debug("%s:%d: ioremap local_store failed\n",
+diff --git a/arch/powerpc/sysdev/fsl_85xx_cache_sram.c b/arch/powerpc/sysdev/fsl_85xx_cache_sram.c
+index 00ccf3e4fcb4..15cbdd4fde06 100644
+--- a/arch/powerpc/sysdev/fsl_85xx_cache_sram.c
++++ b/arch/powerpc/sysdev/fsl_85xx_cache_sram.c
+@@ -107,11 +107,11 @@ int __init instantiate_cache_sram(struct platform_device *dev,
+ 		goto out_free;
+ 	}
+ 
+-	cache_sram->base_virt = ioremap_prot(cache_sram->base_phys,
+-				cache_sram->size, _PAGE_COHERENT | PAGE_KERNEL);
++	cache_sram->base_virt = ioremap_coherent(cache_sram->base_phys,
++						 cache_sram->size);
+ 	if (!cache_sram->base_virt) {
+-		dev_err(&dev->dev, "%pOF: ioremap_prot failed\n",
+-				dev->dev.of_node);
++		dev_err(&dev->dev, "%pOF: ioremap_coherent failed\n",
++			dev->dev.of_node);
+ 		ret = -ENOMEM;
+ 		goto out_release;
+ 	}
 -- 
-2.17.2
+2.13.3
