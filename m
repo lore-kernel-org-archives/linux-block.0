@@ -1,97 +1,69 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:60962 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726931AbeJSTZZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Oct 2018 15:25:25 -0400
-From: Avri Altman <avri.altman@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc: Avi Shchislowski <avi.shchislowski@wdc.com>,
-        Alex Lemberg <alex.lemberg@wdc.com>,
-        Avri Altman <avri.altman@wdc.com>
-Subject: [PATCH v2] block: Bundle together NONE and NOT_SET writehint types
-Date: Fri, 19 Oct 2018 14:19:37 +0300
-Message-Id: <1539947977-4686-1-git-send-email-avri.altman@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <e42a7ae712905eb9b023725fe59132ba5d9ac23b.1539092112.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1539092111.git.christophe.leroy@c-s.fr>
+References: <cover.1539092111.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v3 08/24] powerpc/mm: don't use _PAGE_EXEC in book3s/32
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Tue,  9 Oct 2018 13:51:47 +0000 (UTC)
+List-ID: <linux-block@vger.kernel.org>
 
-There are 6 writehint types, but the size of the write_hints array
-in the request queue is BLK_MAX_WRITE_HINTS = 5,
-which causes the EXTREME type to be ignored when iterating
-over the hints.
+book3s/32 doesn't define _PAGE_EXEC, so no need to use it.
 
-We only have effectively 5 hints.
-Bundle together NONE and NOT_SET, since they end up in the same
-bucket on the driver side.
+All other platforms define _PAGE_EXEC so no need to check
+it is not NUL when not book3s/32.
 
-fixes: f793dfd3f39a (blk-mq: expose write hints through debugfs)
-
-v1->v2:
-Bundle together NONE and NOT_SET, instead of making the write_hints
-array of the request queue larger.
-Change the commit title accordingly.
-
-Signed-off-by: Avri Altman <avri.altman@wdc.com>
+Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- fs/fcntl.c                       |  2 +-
- include/uapi/linux/fcntl.h       | 10 +++++-----
- tools/include/uapi/linux/fcntl.h | 10 +++++-----
- 3 files changed, 11 insertions(+), 11 deletions(-)
+ arch/powerpc/include/asm/book3s/32/pgtable.h | 2 +-
+ arch/powerpc/mm/pgtable.c                    | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/fs/fcntl.c b/fs/fcntl.c
-index 4137d96..163cf5fd 100644
---- a/fs/fcntl.c
-+++ b/fs/fcntl.c
-@@ -261,7 +261,7 @@ static int f_getowner_uids(struct file *filp, unsigned long arg)
- static bool rw_hint_valid(enum rw_hint hint)
+diff --git a/arch/powerpc/include/asm/book3s/32/pgtable.h b/arch/powerpc/include/asm/book3s/32/pgtable.h
+index 7a9f0ed599ff..3127cc529aa1 100644
+--- a/arch/powerpc/include/asm/book3s/32/pgtable.h
++++ b/arch/powerpc/include/asm/book3s/32/pgtable.h
+@@ -234,7 +234,7 @@ static inline void __ptep_set_access_flags(struct vm_area_struct *vma,
+ 					   int psize)
  {
- 	switch (hint) {
--	case RWF_WRITE_LIFE_NOT_SET:
-+	/* RWF_WRITE_LIFE_NOT_SET = RWH_WRITE_LIFE_NONE */
- 	case RWH_WRITE_LIFE_NONE:
- 	case RWH_WRITE_LIFE_SHORT:
- 	case RWH_WRITE_LIFE_MEDIUM:
-diff --git a/include/uapi/linux/fcntl.h b/include/uapi/linux/fcntl.h
-index 6448cdd..ff048f8 100644
---- a/include/uapi/linux/fcntl.h
-+++ b/include/uapi/linux/fcntl.h
-@@ -58,11 +58,11 @@
-  * used to clear any hints previously set.
-  */
- #define RWF_WRITE_LIFE_NOT_SET	0
--#define RWH_WRITE_LIFE_NONE	1
--#define RWH_WRITE_LIFE_SHORT	2
--#define RWH_WRITE_LIFE_MEDIUM	3
--#define RWH_WRITE_LIFE_LONG	4
--#define RWH_WRITE_LIFE_EXTREME	5
-+#define RWH_WRITE_LIFE_NONE	RWF_WRITE_LIFE_NOT_SET
-+#define RWH_WRITE_LIFE_SHORT	1
-+#define RWH_WRITE_LIFE_MEDIUM	2
-+#define RWH_WRITE_LIFE_LONG	3
-+#define RWH_WRITE_LIFE_EXTREME	4
+ 	unsigned long set = pte_val(entry) &
+-		(_PAGE_DIRTY | _PAGE_ACCESSED | _PAGE_RW | _PAGE_EXEC);
++		(_PAGE_DIRTY | _PAGE_ACCESSED | _PAGE_RW);
+ 	unsigned long clr = ~pte_val(entry) & _PAGE_RO;
+ 
+ 	pte_update(ptep, clr, set);
+diff --git a/arch/powerpc/mm/pgtable.c b/arch/powerpc/mm/pgtable.c
+index aee04b209b51..f97d9c3760e3 100644
+--- a/arch/powerpc/mm/pgtable.c
++++ b/arch/powerpc/mm/pgtable.c
+@@ -73,7 +73,7 @@ static struct page *maybe_pte_to_page(pte_t pte)
+ 	return page;
+ }
+ 
+-#if defined(CONFIG_PPC_STD_MMU) || _PAGE_EXEC == 0
++#ifdef CONFIG_PPC_BOOK3S
+ 
+ /* Server-style MMU handles coherency when hashing if HW exec permission
+  * is supposed per page (currently 64-bit only). If not, then, we always
+@@ -106,7 +106,7 @@ static pte_t set_access_flags_filter(pte_t pte, struct vm_area_struct *vma,
+ 	return pte;
+ }
+ 
+-#else /* defined(CONFIG_PPC_STD_MMU) || _PAGE_EXEC == 0 */
++#else /* CONFIG_PPC_BOOK3S */
+ 
+ /* Embedded type MMU with HW exec support. This is a bit more complicated
+  * as we don't have two bits to spare for _PAGE_EXEC and _PAGE_HWEXEC so
+@@ -179,7 +179,7 @@ static pte_t set_access_flags_filter(pte_t pte, struct vm_area_struct *vma,
+ 	return __pte(pte_val(pte) | _PAGE_EXEC);
+ }
+ 
+-#endif /* !(defined(CONFIG_PPC_STD_MMU) || _PAGE_EXEC == 0) */
++#endif /* CONFIG_PPC_BOOK3S */
  
  /*
-  * Types of directory notifications that may be requested.
-diff --git a/tools/include/uapi/linux/fcntl.h b/tools/include/uapi/linux/fcntl.h
-index 6448cdd..ff048f8 100644
---- a/tools/include/uapi/linux/fcntl.h
-+++ b/tools/include/uapi/linux/fcntl.h
-@@ -58,11 +58,11 @@
-  * used to clear any hints previously set.
-  */
- #define RWF_WRITE_LIFE_NOT_SET	0
--#define RWH_WRITE_LIFE_NONE	1
--#define RWH_WRITE_LIFE_SHORT	2
--#define RWH_WRITE_LIFE_MEDIUM	3
--#define RWH_WRITE_LIFE_LONG	4
--#define RWH_WRITE_LIFE_EXTREME	5
-+#define RWH_WRITE_LIFE_NONE	RWF_WRITE_LIFE_NOT_SET
-+#define RWH_WRITE_LIFE_SHORT	1
-+#define RWH_WRITE_LIFE_MEDIUM	2
-+#define RWH_WRITE_LIFE_LONG	3
-+#define RWH_WRITE_LIFE_EXTREME	4
- 
- /*
-  * Types of directory notifications that may be requested.
+  * set_pte stores a linux PTE into the linux page table.
 -- 
-1.9.1
+2.13.3
