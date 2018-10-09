@@ -1,113 +1,126 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-ide@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Benjamin Block <bblock@linux.vnet.ibm.com>
-Subject: [PATCH 12/28] bsg: provide bsg_remove_queue() helper
-Date: Thu, 25 Oct 2018 15:10:23 -0600
-Message-Id: <20181025211039.11559-13-axboe@kernel.dk>
-In-Reply-To: <20181025211039.11559-1-axboe@kernel.dk>
-References: <20181025211039.11559-1-axboe@kernel.dk>
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <c796cfe3c0b6b008f8e215db55afef14aad0da0f.1539092112.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1539092111.git.christophe.leroy@c-s.fr>
+References: <cover.1539092111.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v3 11/24] powerpc/mm: don't use _PAGE_EXEC for calling
+ hash_preload()
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Tue,  9 Oct 2018 13:51:54 +0000 (UTC)
 List-ID: <linux-block@vger.kernel.org>
 
-All drivers do unregister + cleanup, provide a helper for that.
+The 'access' parameter of hash_preload() is either 0 or _PAGE_EXEC.
+Among the two versions of hash_preload(), only the PPC64 one is
+doing something with this 'access' parameter.
 
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Benjamin Block <bblock@linux.vnet.ibm.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+In order to remove the use of _PAGE_EXEC outside platform code,
+'access' parameter is replaced by 'is_exec' which will be either
+true of false, and the PPC64 version of hash_preload() creates
+the access flag based on 'is_exec'.
+
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- block/bsg-lib.c                     | 7 +++++++
- drivers/scsi/scsi_transport_fc.c    | 6 ++----
- drivers/scsi/scsi_transport_iscsi.c | 7 +++----
- drivers/scsi/scsi_transport_sas.c   | 6 ++----
- include/linux/bsg-lib.h             | 1 +
- 5 files changed, 15 insertions(+), 12 deletions(-)
+ arch/powerpc/mm/hash_utils_64.c | 3 ++-
+ arch/powerpc/mm/mem.c           | 9 +++++----
+ arch/powerpc/mm/mmu_decl.h      | 2 +-
+ arch/powerpc/mm/pgtable_32.c    | 2 +-
+ arch/powerpc/mm/ppc_mmu_32.c    | 2 +-
+ 5 files changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index 1da011ec04e6..267f965af77a 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -296,6 +296,13 @@ static void bsg_exit_rq(struct request_queue *q, struct request *req)
- 	kfree(job->reply);
- }
+diff --git a/arch/powerpc/mm/hash_utils_64.c b/arch/powerpc/mm/hash_utils_64.c
+index 8ff03c7205a0..854edc3722e0 100644
+--- a/arch/powerpc/mm/hash_utils_64.c
++++ b/arch/powerpc/mm/hash_utils_64.c
+@@ -1482,7 +1482,7 @@ static bool should_hash_preload(struct mm_struct *mm, unsigned long ea)
+ #endif
  
-+void bsg_remove_queue(struct request_queue *q)
-+{
-+	bsg_unregister_queue(q);
-+	blk_cleanup_queue(q);
-+}
-+EXPORT_SYMBOL_GPL(bsg_remove_queue);
-+
- /**
-  * bsg_setup_queue - Create and add the bsg hooks so we can receive requests
-  * @dev: device to attach bsg device to
-diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
-index 98aaffb4c715..4d64956bb5d3 100644
---- a/drivers/scsi/scsi_transport_fc.c
-+++ b/drivers/scsi/scsi_transport_fc.c
-@@ -3851,10 +3851,8 @@ fc_bsg_rportadd(struct Scsi_Host *shost, struct fc_rport *rport)
- static void
- fc_bsg_remove(struct request_queue *q)
+ void hash_preload(struct mm_struct *mm, unsigned long ea,
+-		  unsigned long access, unsigned long trap)
++		  bool is_exec, unsigned long trap)
  {
--	if (q) {
--		bsg_unregister_queue(q);
--		blk_cleanup_queue(q);
--	}
-+	if (q)
-+		bsg_remove_queue(q);
- }
+ 	int hugepage_shift;
+ 	unsigned long vsid;
+@@ -1490,6 +1490,7 @@ void hash_preload(struct mm_struct *mm, unsigned long ea,
+ 	pte_t *ptep;
+ 	unsigned long flags;
+ 	int rc, ssize, update_flags = 0;
++	unsigned long access = _PAGE_PRESENT | _PAGE_READ | (is_exec ? _PAGE_EXEC : 0);
+ 
+ 	BUG_ON(REGION_ID(ea) != USER_REGION_ID);
+ 
+diff --git a/arch/powerpc/mm/mem.c b/arch/powerpc/mm/mem.c
+index cb421aeb7674..dd949d6649a2 100644
+--- a/arch/powerpc/mm/mem.c
++++ b/arch/powerpc/mm/mem.c
+@@ -509,7 +509,8 @@ void update_mmu_cache(struct vm_area_struct *vma, unsigned long address,
+ 	 * We don't need to worry about _PAGE_PRESENT here because we are
+ 	 * called with either mm->page_table_lock held or ptl lock held
+ 	 */
+-	unsigned long access, trap;
++	unsigned long trap;
++	bool is_exec;
+ 
+ 	if (radix_enabled()) {
+ 		prefetch((void *)address);
+@@ -531,16 +532,16 @@ void update_mmu_cache(struct vm_area_struct *vma, unsigned long address,
+ 	trap = current->thread.regs ? TRAP(current->thread.regs) : 0UL;
+ 	switch (trap) {
+ 	case 0x300:
+-		access = 0UL;
++		is_exec = false;
+ 		break;
+ 	case 0x400:
+-		access = _PAGE_EXEC;
++		is_exec = true;
+ 		break;
+ 	default:
+ 		return;
+ 	}
+ 
+-	hash_preload(vma->vm_mm, address, access, trap);
++	hash_preload(vma->vm_mm, address, is_exec, trap);
+ #endif /* CONFIG_PPC_STD_MMU */
+ #if (defined(CONFIG_PPC_BOOK3E_64) || defined(CONFIG_PPC_FSL_BOOK3E)) \
+ 	&& defined(CONFIG_HUGETLB_PAGE)
+diff --git a/arch/powerpc/mm/mmu_decl.h b/arch/powerpc/mm/mmu_decl.h
+index e5d779eed181..dd7f9b951d25 100644
+--- a/arch/powerpc/mm/mmu_decl.h
++++ b/arch/powerpc/mm/mmu_decl.h
+@@ -82,7 +82,7 @@ static inline void _tlbivax_bcast(unsigned long address, unsigned int pid,
+ #else /* CONFIG_PPC_MMU_NOHASH */
+ 
+ extern void hash_preload(struct mm_struct *mm, unsigned long ea,
+-			 unsigned long access, unsigned long trap);
++			 bool is_exec, unsigned long trap);
  
  
-diff --git a/drivers/scsi/scsi_transport_iscsi.c b/drivers/scsi/scsi_transport_iscsi.c
-index 26b11a775be9..3ead0dba5d8d 100644
---- a/drivers/scsi/scsi_transport_iscsi.c
-+++ b/drivers/scsi/scsi_transport_iscsi.c
-@@ -1576,10 +1576,9 @@ static int iscsi_remove_host(struct transport_container *tc,
- 	struct Scsi_Host *shost = dev_to_shost(dev);
- 	struct iscsi_cls_host *ihost = shost->shost_data;
- 
--	if (ihost->bsg_q) {
--		bsg_unregister_queue(ihost->bsg_q);
--		blk_cleanup_queue(ihost->bsg_q);
--	}
-+	if (ihost->bsg_q)
-+		bsg_remove_queue(ihost->bsg_q);
-+
- 	return 0;
- }
- 
-diff --git a/drivers/scsi/scsi_transport_sas.c b/drivers/scsi/scsi_transport_sas.c
-index cf6d47891d77..c46d642dc133 100644
---- a/drivers/scsi/scsi_transport_sas.c
-+++ b/drivers/scsi/scsi_transport_sas.c
-@@ -246,10 +246,8 @@ static int sas_host_remove(struct transport_container *tc, struct device *dev,
- 	struct Scsi_Host *shost = dev_to_shost(dev);
- 	struct request_queue *q = to_sas_host_attrs(shost)->q;
- 
--	if (q) {
--		bsg_unregister_queue(q);
--		blk_cleanup_queue(q);
--	}
-+	if (q)
-+		bsg_remove_queue(q);
- 
- 	return 0;
- }
-diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
-index b13ae143e7ef..9c9b134b1fa5 100644
---- a/include/linux/bsg-lib.h
-+++ b/include/linux/bsg-lib.h
-@@ -73,6 +73,7 @@ void bsg_job_done(struct bsg_job *job, int result,
- 		  unsigned int reply_payload_rcv_len);
- struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
- 		bsg_job_fn *job_fn, rq_timed_out_fn *timeout, int dd_job_size);
-+void bsg_remove_queue(struct request_queue *q);
- void bsg_job_put(struct bsg_job *job);
- int __must_check bsg_job_get(struct bsg_job *job);
+ extern void _tlbie(unsigned long address);
+diff --git a/arch/powerpc/mm/pgtable_32.c b/arch/powerpc/mm/pgtable_32.c
+index 0bbc7b7d8a05..01f348938328 100644
+--- a/arch/powerpc/mm/pgtable_32.c
++++ b/arch/powerpc/mm/pgtable_32.c
+@@ -261,7 +261,7 @@ static void __init __mapin_ram_chunk(unsigned long offset, unsigned long top)
+ 		map_kernel_page(v, p, ktext ? PAGE_KERNEL_TEXT : PAGE_KERNEL);
+ #ifdef CONFIG_PPC_STD_MMU_32
+ 		if (ktext)
+-			hash_preload(&init_mm, v, 0, 0x300);
++			hash_preload(&init_mm, v, false, 0x300);
+ #endif
+ 		v += PAGE_SIZE;
+ 		p += PAGE_SIZE;
+diff --git a/arch/powerpc/mm/ppc_mmu_32.c b/arch/powerpc/mm/ppc_mmu_32.c
+index bea6c544e38f..38a793bfca37 100644
+--- a/arch/powerpc/mm/ppc_mmu_32.c
++++ b/arch/powerpc/mm/ppc_mmu_32.c
+@@ -163,7 +163,7 @@ void __init setbat(int index, unsigned long virt, phys_addr_t phys,
+  * Preload a translation in the hash table
+  */
+ void hash_preload(struct mm_struct *mm, unsigned long ea,
+-		  unsigned long access, unsigned long trap)
++		  bool is_exec, unsigned long trap)
+ {
+ 	pmd_t *pmd;
  
 -- 
-2.17.1
+2.13.3
