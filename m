@@ -1,131 +1,54 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 10/16] blk-mq: cleanup and improve list insertion
-Date: Tue, 30 Oct 2018 12:32:46 -0600
-Message-Id: <20181030183252.17857-11-axboe@kernel.dk>
-In-Reply-To: <20181030183252.17857-1-axboe@kernel.dk>
-References: <20181030183252.17857-1-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:37462 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726451AbeJISao (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:30:44 -0400
+Received: by mail-pg1-f196.google.com with SMTP id c10-v6so656655pgq.4
+        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:14:18 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 19/45] lightnvm: pblk: fix up prints in pblk_read_check_rand
+Date: Tue,  9 Oct 2018 13:11:49 +0200
+Message-Id: <20181009111215.7653-20-mb@lightnvm.io>
+In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
+References: <20181009111215.7653-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-It's somewhat strange to have a list insertion function that
-relies on the fact that the caller has mapped things correctly.
-Pass in the hardware queue directly for insertion, which makes
-for a much cleaner interface and implementation.
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+The prefix when printing ppas in pblk_read_check_rand should be "rnd"
+not "seq", so fix this so we can differentiate between lba missmatches
+in random and sequential reads. Also change the print order so
+we align with pblk_read_check_seq, printing read lba first.
+
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- block/blk-mq-sched.c |  8 +-------
- block/blk-mq-sched.h |  2 +-
- block/blk-mq.c       | 25 ++++++++++++++-----------
- 3 files changed, 16 insertions(+), 19 deletions(-)
+ drivers/lightnvm/pblk-read.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 8bc1f37acca2..6e7375246e2f 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -396,17 +396,11 @@ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
- 		blk_mq_run_hw_queue(hctx, async);
- }
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index d3ff8c3e9010..829e92857289 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -149,10 +149,10 @@ static void pblk_read_check_rand(struct pblk *pblk, struct nvm_rq *rqd,
+ #ifdef CONFIG_NVM_PBLK_DEBUG
+ 			struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
  
--void blk_mq_sched_insert_requests(struct request_queue *q,
-+void blk_mq_sched_insert_requests(struct blk_mq_hw_ctx *hctx,
- 				  struct blk_mq_ctx *ctx,
- 				  struct list_head *list, bool run_queue_async)
- {
--	struct blk_mq_hw_ctx *hctx;
- 	struct elevator_queue *e;
--	struct request *rq;
--
--	/* For list inserts, requests better be on the same hw queue */
--	rq = list_first_entry(list, struct request, queuelist);
--	hctx = rq->mq_hctx;
- 
- 	e = hctx->queue->elevator;
- 	if (e && e->type->ops.mq.insert_requests)
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 8a9544203173..ffd7b5989d63 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -19,7 +19,7 @@ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx);
- 
- void blk_mq_sched_insert_request(struct request *rq, bool at_head,
- 				 bool run_queue, bool async);
--void blk_mq_sched_insert_requests(struct request_queue *q,
-+void blk_mq_sched_insert_requests(struct blk_mq_hw_ctx *hctx,
- 				  struct blk_mq_ctx *ctx,
- 				  struct list_head *list, bool run_queue_async);
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b86d725958d3..51b8166959b9 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1623,11 +1623,12 @@ static int plug_ctx_cmp(void *priv, struct list_head *a, struct list_head *b)
- 
- void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- {
-+	struct blk_mq_hw_ctx *this_hctx;
- 	struct blk_mq_ctx *this_ctx;
- 	struct request_queue *this_q;
- 	struct request *rq;
- 	LIST_HEAD(list);
--	LIST_HEAD(ctx_list);
-+	LIST_HEAD(rq_list);
- 	unsigned int depth;
- 
- 	list_splice_init(&plug->mq_list, &list);
-@@ -1635,6 +1636,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- 	list_sort(NULL, &list, plug_ctx_cmp);
- 
- 	this_q = NULL;
-+	this_hctx = NULL;
- 	this_ctx = NULL;
- 	depth = 0;
- 
-@@ -1642,30 +1644,31 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- 		rq = list_entry_rq(list.next);
- 		list_del_init(&rq->queuelist);
- 		BUG_ON(!rq->q);
--		if (rq->mq_ctx != this_ctx) {
--			if (this_ctx) {
-+		if (rq->mq_hctx != this_hctx || rq->mq_ctx != this_ctx) {
-+			if (this_hctx) {
- 				trace_block_unplug(this_q, depth, !from_schedule);
--				blk_mq_sched_insert_requests(this_q, this_ctx,
--								&ctx_list,
-+				blk_mq_sched_insert_requests(this_hctx, this_ctx,
-+								&rq_list,
- 								from_schedule);
- 			}
- 
--			this_ctx = rq->mq_ctx;
- 			this_q = rq->q;
-+			this_ctx = rq->mq_ctx;
-+			this_hctx = rq->mq_hctx;
- 			depth = 0;
+-			print_ppa(pblk, &ppa_list[j], "seq", j);
++			print_ppa(pblk, &ppa_list[j], "rnd", j);
+ #endif
+ 			pblk_err(pblk, "corrupted read LBA (%llu/%llu)\n",
+-								lba, meta_lba);
++							meta_lba, lba);
+ 			WARN_ON(1);
  		}
  
- 		depth++;
--		list_add_tail(&rq->queuelist, &ctx_list);
-+		list_add_tail(&rq->queuelist, &rq_list);
- 	}
- 
- 	/*
--	 * If 'this_ctx' is set, we know we have entries to complete
--	 * on 'ctx_list'. Do those.
-+	 * If 'this_hctx' is set, we know we have entries to complete
-+	 * on 'rq_list'. Do those.
- 	 */
--	if (this_ctx) {
-+	if (this_hctx) {
- 		trace_block_unplug(this_q, depth, !from_schedule);
--		blk_mq_sched_insert_requests(this_q, this_ctx, &ctx_list,
-+		blk_mq_sched_insert_requests(this_hctx, this_ctx, &rq_list,
- 						from_schedule);
- 	}
- }
 -- 
 2.17.1
