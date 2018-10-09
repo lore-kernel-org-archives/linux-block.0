@@ -1,79 +1,48 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: martin.petersen@oracle.com, tom.leiming@gmail.com, hch@lst.de,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH V2] block: fix the DISCARD request merge
-Date: Sat, 20 Oct 2018 22:29:37 +0800
-Message-Id: <1540045777-10290-1-git-send-email-jianchao.w.wang@oracle.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:44885 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727332AbeJISaY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:30:24 -0400
+Received: by mail-pg1-f194.google.com with SMTP id g2-v6so639613pgu.11
+        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:13:57 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 13/45] lightnvm: pblk: fix comment typo
+Date: Tue,  9 Oct 2018 13:11:43 +0200
+Message-Id: <20181009111215.7653-14-mb@lightnvm.io>
+In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
+References: <20181009111215.7653-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-There are two cases when handle DISCARD merge
- - max_discard_segments == 1
-   bios need to be contiguous
- - max_discard_segments > 1
-   Only nvme right now. It takes every bio as a range and different
-   range needn't to be contiguous.
+From: Javier González <javier@javigon.com>
 
-But now, attempt_merge screws this up. It always consider contiguity
-for DISCARD for the case max_discard_segments > 1 and cannot merge
-contiguous DISCARD for the case max_discard_segments == 1, because
-rq_attempt_discard_merge always returns false in this case.
-This patch fixes both of the two cases above.
+Fix comment typo Decrese -> Decrease
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
+ drivers/lightnvm/pblk-write.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-V2:
-  - Add max_discard_segments > 1 checking in attempt_merge
-  - Change patch title and comment
-  - Add more comment in attempt_merge
-
- block/blk-merge.c | 24 +++++++++++++++++++-----
- 1 file changed, 19 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 42a4674..8f22374 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -734,8 +734,15 @@ static struct request *attempt_merge(struct request_queue *q,
- 	/*
- 	 * not contiguous
- 	 */
--	if (blk_rq_pos(req) + blk_rq_sectors(req) != blk_rq_pos(next))
--		return NULL;
-+	if (blk_rq_pos(req) + blk_rq_sectors(req) != blk_rq_pos(next)) {
-+		/*
-+		 * When max_discard_segments is bigger than 1 (only nvme right
-+		 * now), needn't consider the contiguity.
-+		 */
-+		if (!(req_op(req) == REQ_OP_DISCARD &&
-+		      queue_max_discard_segments(q) > 1))
-+			return NULL;
-+	}
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index c23b65aaa27b..625ed5a3a020 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -168,7 +168,7 @@ static void pblk_prepare_resubmit(struct pblk *pblk, unsigned int sentry,
+ 		/* Release flags on write context. Protect from writes */
+ 		smp_store_release(&w_ctx->flags, flags);
  
- 	if (rq_data_dir(req) != rq_data_dir(next)
- 	    || req->rq_disk != next->rq_disk
-@@ -757,10 +764,17 @@ static struct request *attempt_merge(struct request_queue *q,
- 	 * If we are allowed to merge, then append bio list
- 	 * from next to rq and release next. merge_requests_fn
- 	 * will have updated segment counts, update sector
--	 * counts here. Handle DISCARDs separately, as they
--	 * have separate settings.
-+	 * counts here.
-+	 * Two cases of Handling DISCARD:
-+	 *  - max_discard_segments == 1
-+	 *    The bios need to be contiguous.
-+	 *  - max_discard_segments > 1
-+	 *    Only nvme right now. It takes every bio as a
-+	 *    range and send them to controller together. The ranges
-+	 *    needn't to be contiguous.
- 	 */
--	if (req_op(req) == REQ_OP_DISCARD) {
-+	if (req_op(req) == REQ_OP_DISCARD &&
-+	    queue_max_discard_segments(q) > 1) {
- 		if (!req_attempt_discard_merge(q, req, next))
- 			return NULL;
- 	} else if (!ll_merge_requests_fn(q, req, next))
+-		/* Decrese the reference count to the line as we will
++		/* Decrease the reference count to the line as we will
+ 		 * re-map these entries
+ 		 */
+ 		line = pblk_ppa_to_line(pblk, w_ctx->ppa);
 -- 
-2.7.4
+2.17.1
