@@ -1,80 +1,61 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-ide@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 27/29] block: remove req_no_special_merge() from merging code
-Date: Mon, 29 Oct 2018 10:34:42 -0600
-Message-Id: <20181029163444.9940-28-axboe@kernel.dk>
-In-Reply-To: <20181029163444.9940-1-axboe@kernel.dk>
-References: <20181029163444.9940-1-axboe@kernel.dk>
+Return-Path: <geert.uytterhoeven@gmail.com>
+MIME-Version: 1.0
+References: <cover.1539092111.git.christophe.leroy@c-s.fr> <0d489a2c917d6e8528fad099023eac3d5a516787.1539092111.git.christophe.leroy@c-s.fr>
+ <1539097191.64374.44.camel@acm.org>
+In-Reply-To: <1539097191.64374.44.camel@acm.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 9 Oct 2018 17:13:57 +0200
+Message-ID: <CAMuHMdVpS2wzUniDdXKSWyyTr3Cn9NsXAxOJEKe=D9BUrpdt=w@mail.gmail.com>
+Subject: Re: [PATCH v3 03/24] drivers/block/z2ram: use ioremap_wt() instead of __ioremap(_PAGE_WRITETHRU)
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Christophe Leroy <christophe.leroy@c-s.fr>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>,
+	Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	Kumar Gala <galak@kernel.crashing.org>, Leo Li <leoyang.li@nxp.com>,
+	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+	Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>,
+	"Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>,
+	Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	DRI Development <dri-devel@lists.freedesktop.org>, linux-block@vger.kernel.org,
+	linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+	Linux ARM <linux-arm-kernel@lists.infradead.org>,
+	Debian m68k <debian-68k@lists.debian.org>, linux-m68k <linux-m68k@lists.linux-m68k.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-It'll always be false at this point, just remove it.
+Hi Bart,
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-merge.c | 25 +++----------------------
- 1 file changed, 3 insertions(+), 22 deletions(-)
+CC debian-68k, linux-m68k
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 7fedc0391610..3561dcce2260 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -595,17 +595,6 @@ int ll_front_merge_fn(struct request_queue *q, struct request *req,
- 	return ll_new_hw_segment(q, req, bio);
- }
- 
--/*
-- * blk-mq uses req->special to carry normal driver per-request payload, it
-- * does not indicate a prepared command that we cannot merge with.
-- */
--static bool req_no_special_merge(struct request *req)
--{
--	struct request_queue *q = req->q;
--
--	return !q->mq_ops && req->special;
--}
--
- static bool req_attempt_discard_merge(struct request_queue *q, struct request *req,
- 		struct request *next)
- {
-@@ -631,13 +620,6 @@ static int ll_merge_requests_fn(struct request_queue *q, struct request *req,
- 	unsigned int seg_size =
- 		req->biotail->bi_seg_back_size + next->bio->bi_seg_front_size;
- 
--	/*
--	 * First check if the either of the requests are re-queued
--	 * requests.  Can't merge them if they are.
--	 */
--	if (req_no_special_merge(req) || req_no_special_merge(next))
--		return 0;
--
- 	if (req_gap_back_merge(req, next->bio))
- 		return 0;
- 
-@@ -738,8 +720,7 @@ static struct request *attempt_merge(struct request_queue *q,
- 		return NULL;
- 
- 	if (rq_data_dir(req) != rq_data_dir(next)
--	    || req->rq_disk != next->rq_disk
--	    || req_no_special_merge(next))
-+	    || req->rq_disk != next->rq_disk)
- 		return NULL;
- 
- 	if (req_op(req) == REQ_OP_WRITE_SAME &&
-@@ -858,8 +839,8 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
- 	if (bio_data_dir(bio) != rq_data_dir(rq))
- 		return false;
- 
--	/* must be same device and not a special request */
--	if (rq->rq_disk != bio->bi_disk || req_no_special_merge(rq))
-+	/* must be same device */
-+	if (rq->rq_disk != bio->bi_disk)
- 		return false;
- 
- 	/* only merge integrity protected bio into ditto rq */
+On Tue, Oct 9, 2018 at 5:00 PM Bart Van Assche <bvanassche@acm.org> wrote:
+> On Tue, 2018-10-09 at 13:51 +0000, Christophe Leroy wrote:
+> > _PAGE_WRITETHRU is a target specific flag. Prefer generic functions.
+> >
+> > Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> > Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+>
+> Hi Geert,
+>
+> All patches that have been applied to this driver since 2005 are API refactoring
+> patches. I haven't found any patches in the history of this driver that seem to
+> have been submitted by a user of this driver. Do you perhaps know whether anyone
+> is using this driver?
+
+The z2ram is a very simple driver, used to configure (slower) Zorro II RAM as
+a swap device.  So I'm not so surprised no one submitted functional patches.
+
+I believe it's still being used.
+Probably it could be modified to use mtdram.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
 -- 
-2.17.1
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
