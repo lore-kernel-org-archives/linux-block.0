@@ -1,30 +1,33 @@
-Return-Path: <bart.vanassche@gmail.com>
-Return-Path: <bart.vanassche@gmail.com>
+Return-Path: <tytso@thunk.org>
+Date: Mon, 8 Oct 2018 22:22:43 -0400
+From: "Theodore Y. Ts'o" <tytso@mit.edu>
+To: valdis.kletnieks@vt.edu
+Cc: Andreas Dilger <adilger.kernel@dilger.ca>, Jens Axboe <axboe@kernel.dk>,
+	linux-kernel@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-block@vger.kernel.org
 Subject: Re: [BUG] ext4 null pointer crash in linux-next
-To: valdis.kletnieks@vt.edu, Theodore Ts'o <tytso@mit.edu>,
- Andreas Dilger <adilger.kernel@dilger.ca>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-block@vger.kernel.org
+Message-ID: <20181009022243.GD3369@thunk.org>
 References: <36243.1539028475@turing-police.cc.vt.edu>
-From: Bart Van Assche <bvanassche@acm.org>
-Message-ID: <839b29df-08af-403c-da3e-e1bc9eca1685@acm.org>
-Date: Mon, 8 Oct 2018 20:41:15 -0700
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <36243.1539028475@turing-police.cc.vt.edu>
-Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/8/18 12:54 PM, valdis.kletnieks@vt.edu wrote:
-> [  680.692915] RIP: 0010:__get_request+0x31/0x7e0
+On Mon, Oct 08, 2018 at 03:54:35PM -0400, valdis.kletnieks@vt.edu wrote:
+> I'm seeing a fairly replicable crash/hang with a traceback implicating ext4 (or
+> possibly the block layer). next-20180918 seemed stable, but next-20180926 and
+> -next-20181005 have a habit of crashing while dnf is updating software (so far,
+> I've hit it 6 times with identical tracebacks while attempting to update software
+> 
+> This ringing any bells, or did I just buy myself another git bisect? Google says
+> that ext4_mpage_readpages from the traceback hasn't been referenced in the
+> last 2 months...
 
-Can you provide the source code line number that corresponds to that 
-address? If you haven't done this before: enter gdb 
-${path_to_kernel_source_tree}/vmlinux in a shell and then run "list 
-*(__get_request+0x31)" (without the double quotes).
+I'm afraid you're going to have to do a git bisect.  I've been doing
+full regression tests of ext4.git and nothing like this has turned up.
 
-Additionally, which block driver is being used in your setup under the 
-ext4 filesystem?
+Instead of doing a full bisect, maybe try doing the ext4.git tree by
+itself, and the block.git tree by itself, and maybe those two trees
+merged together?
 
-Thanks,
-
-Bart.
+						- Ted
