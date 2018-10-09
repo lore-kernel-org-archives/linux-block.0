@@ -1,45 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it1-f194.google.com ([209.85.166.194]:38195 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726193AbeJZQsx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Oct 2018 12:48:53 -0400
-Received: by mail-it1-f194.google.com with SMTP id i76-v6so680802ita.3
-        for <linux-block@vger.kernel.org>; Fri, 26 Oct 2018 01:12:50 -0700 (PDT)
-From: Hans Holmberg <hans@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, Javier Gonzales <javier@cnexlabs.com>,
-        linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH] lightnvm: pblk: fix chunk close trace event check
-Date: Fri, 26 Oct 2018 10:12:24 +0200
-Message-Id: <1540541544-7761-1-git-send-email-hans.holmberg@cnexlabs.com>
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:39015 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726771AbeJISa1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:30:27 -0400
+Received: by mail-pf1-f196.google.com with SMTP id c25-v6so674752pfe.6
+        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:14:01 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 14/45] lightnvm: pblk: remove unused variable.
+Date: Tue,  9 Oct 2018 13:11:44 +0200
+Message-Id: <20181009111215.7653-15-mb@lightnvm.io>
+In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
+References: <20181009111215.7653-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The check for chunk closes suffers from an off-by-one issue, leading
-to chunk close events not being traced. Fix this.
+From: Javier González <javier@javigon.com>
 
-Fixes: 4c44abf43d00 ("lightnvm: pblk: add trace events for chunk states")
+Removed unused struct ppa_addr variable.
 
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
+ drivers/lightnvm/pblk.h | 1 -
+ 1 file changed, 1 deletion(-)
 
- drivers/lightnvm/pblk-core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 6944aac43b01..6581c35f51ee 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -531,7 +531,7 @@ void pblk_check_chunk_state_update(struct pblk *pblk, struct nvm_rq *rqd)
- 		if (caddr == 0)
- 			trace_pblk_chunk_state(pblk_disk_name(pblk),
- 							ppa, NVM_CHK_ST_OPEN);
--		else if (caddr == chunk->cnlb)
-+		else if (caddr == (chunk->cnlb - 1))
- 			trace_pblk_chunk_state(pblk_disk_name(pblk),
- 							ppa, NVM_CHK_ST_CLOSED);
- 	}
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index af9477b7e803..1865ac1560fa 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -1373,7 +1373,6 @@ static inline int pblk_check_io(struct pblk *pblk, struct nvm_rq *rqd)
+ 
+ 	if (rqd->opcode == NVM_OP_PWRITE) {
+ 		struct pblk_line *line;
+-		struct ppa_addr ppa;
+ 		int i;
+ 
+ 		for (i = 0; i < rqd->nr_ppas; i++) {
 -- 
-2.7.4
+2.17.1
