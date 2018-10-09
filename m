@@ -1,53 +1,145 @@
-Return-Path: <gustavo@embeddedor.com>
-Date: Fri, 19 Oct 2018 20:44:17 +0200
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] skd: fix unchecked return values
-Message-ID: <20181019184417.GA21154@embeddedor.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <christophe.leroy@c-s.fr>
+Message-Id: <6310a4420057a307b2be9555a14da7cd261ee848.1539092112.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1539092111.git.christophe.leroy@c-s.fr>
+References: <cover.1539092111.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v3 09/24] powerpc/mm: move some nohash pte helpers in
+ nohash/[32:64]/pgtable.h
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+Date: Tue,  9 Oct 2018 13:51:50 +0000 (UTC)
 List-ID: <linux-block@vger.kernel.org>
 
-Check return values of dma_set_mask_and_coherent().
+In order to allow their use in nohash/32/pgtable.h, we have to move the
+following helpers in nohash/[32:64]/pgtable.h:
+- pte_mkwrite()
+- pte_mkdirty()
+- pte_mkyoung()
+- pte_wrprotect()
 
-Otherwise, if dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
-fails, the following piece of code will be executed even when the call
-to dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32)); returns 0:
-
-dev_err(&pdev->dev, "DMA mask error %d\n", rc);
-goto err_out_regions;
-
-Addresses-Coverity-ID: 1474553 ("Unchecked return value")
-Fixes: 138126214868 ("skd: switch to the generic DMA API")
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- drivers/block/skd_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/powerpc/include/asm/nohash/32/pgtable.h | 28 ++++++++++++++++++++++++++++
+ arch/powerpc/include/asm/nohash/64/pgtable.h | 20 ++++++++++++++++++++
+ arch/powerpc/include/asm/nohash/pgtable.h    | 28 ----------------------------
+ 3 files changed, 48 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 7c5fc69..2459dcc 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -3175,7 +3175,7 @@ static int skd_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto err_out;
- 	rc = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
- 	if (rc)
--		dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
-+		rc = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
- 	if (rc) {
- 		dev_err(&pdev->dev, "DMA mask error %d\n", rc);
- 		goto err_out_regions;
-@@ -3364,7 +3364,7 @@ static int skd_pci_resume(struct pci_dev *pdev)
- 		goto err_out;
- 	rc = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
- 	if (rc)
--		dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
-+		rc = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
- 	if (rc) {
- 		dev_err(&pdev->dev, "DMA mask error %d\n", rc);
- 		goto err_out_regions;
+diff --git a/arch/powerpc/include/asm/nohash/32/pgtable.h b/arch/powerpc/include/asm/nohash/32/pgtable.h
+index a7f44498ab6f..4373f8c44b6d 100644
+--- a/arch/powerpc/include/asm/nohash/32/pgtable.h
++++ b/arch/powerpc/include/asm/nohash/32/pgtable.h
+@@ -136,6 +136,34 @@ extern int icache_44x_need_flush;
+ #define pte_clear(mm, addr, ptep) \
+ 	do { pte_update(ptep, ~0, 0); } while (0)
+ 
++static inline pte_t pte_mkwrite(pte_t pte)
++{
++	pte_basic_t ptev;
++
++	ptev = pte_val(pte) & ~_PAGE_RO;
++	ptev |= _PAGE_RW;
++	return __pte(ptev);
++}
++
++static inline pte_t pte_mkdirty(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_DIRTY);
++}
++
++static inline pte_t pte_mkyoung(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_ACCESSED);
++}
++
++static inline pte_t pte_wrprotect(pte_t pte)
++{
++	pte_basic_t ptev;
++
++	ptev = pte_val(pte) & ~(_PAGE_RW | _PAGE_HWWRITE);
++	ptev |= _PAGE_RO;
++	return __pte(ptev);
++}
++
+ #define pmd_none(pmd)		(!pmd_val(pmd))
+ #define	pmd_bad(pmd)		(pmd_val(pmd) & _PMD_BAD)
+ #define	pmd_present(pmd)	(pmd_val(pmd) & _PMD_PRESENT_MASK)
+diff --git a/arch/powerpc/include/asm/nohash/64/pgtable.h b/arch/powerpc/include/asm/nohash/64/pgtable.h
+index 513b6e9e62c6..72dac522aa66 100644
+--- a/arch/powerpc/include/asm/nohash/64/pgtable.h
++++ b/arch/powerpc/include/asm/nohash/64/pgtable.h
+@@ -94,6 +94,26 @@
+ #ifndef __ASSEMBLY__
+ /* pte_clear moved to later in this file */
+ 
++static inline pte_t pte_mkwrite(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_RW);
++}
++
++static inline pte_t pte_mkdirty(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_DIRTY);
++}
++
++static inline pte_t pte_mkyoung(pte_t pte)
++{
++	return __pte(pte_val(pte) | _PAGE_ACCESSED);
++}
++
++static inline pte_t pte_wrprotect(pte_t pte)
++{
++	return __pte(pte_val(pte) & ~_PAGE_RW);
++}
++
+ #define PMD_BAD_BITS		(PTE_TABLE_SIZE-1)
+ #define PUD_BAD_BITS		(PMD_TABLE_SIZE-1)
+ 
+diff --git a/arch/powerpc/include/asm/nohash/pgtable.h b/arch/powerpc/include/asm/nohash/pgtable.h
+index 5b82e44c4231..c746e9e784cd 100644
+--- a/arch/powerpc/include/asm/nohash/pgtable.h
++++ b/arch/powerpc/include/asm/nohash/pgtable.h
+@@ -77,15 +77,6 @@ static inline unsigned long pte_pfn(pte_t pte)	{
+ 	return pte_val(pte) >> PTE_RPN_SHIFT; }
+ 
+ /* Generic modifiers for PTE bits */
+-static inline pte_t pte_wrprotect(pte_t pte)
+-{
+-	pte_basic_t ptev;
+-
+-	ptev = pte_val(pte) & ~(_PAGE_RW | _PAGE_HWWRITE);
+-	ptev |= _PAGE_RO;
+-	return __pte(ptev);
+-}
+-
+ static inline pte_t pte_mkclean(pte_t pte)
+ {
+ 	return __pte(pte_val(pte) & ~(_PAGE_DIRTY | _PAGE_HWWRITE));
+@@ -96,25 +87,6 @@ static inline pte_t pte_mkold(pte_t pte)
+ 	return __pte(pte_val(pte) & ~_PAGE_ACCESSED);
+ }
+ 
+-static inline pte_t pte_mkwrite(pte_t pte)
+-{
+-	pte_basic_t ptev;
+-
+-	ptev = pte_val(pte) & ~_PAGE_RO;
+-	ptev |= _PAGE_RW;
+-	return __pte(ptev);
+-}
+-
+-static inline pte_t pte_mkdirty(pte_t pte)
+-{
+-	return __pte(pte_val(pte) | _PAGE_DIRTY);
+-}
+-
+-static inline pte_t pte_mkyoung(pte_t pte)
+-{
+-	return __pte(pte_val(pte) | _PAGE_ACCESSED);
+-}
+-
+ static inline pte_t pte_mkspecial(pte_t pte)
+ {
+ 	return __pte(pte_val(pte) | _PAGE_SPECIAL);
 -- 
-2.7.4
+2.13.3
