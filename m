@@ -1,174 +1,215 @@
-Return-Path: <prvs=816489328=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH v3 08/11] block: Improve zone reset execution
-Date: Fri, 12 Oct 2018 11:30:09 +0900
-Message-Id: <20181012023012.29923-9-damien.lemoal@wdc.com>
-In-Reply-To: <20181012023012.29923-1-damien.lemoal@wdc.com>
-References: <20181012023012.29923-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg1-f175.google.com ([209.85.215.175]:36060 "EHLO
+        mail-pg1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727591AbeJISav (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:30:51 -0400
+Received: by mail-pg1-f175.google.com with SMTP id f18-v6so657973pgv.3
+        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:14:25 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 21/45] lightnvm: pblk: remove debug from pblk_[down/up]_page
+Date: Tue,  9 Oct 2018 13:11:51 +0200
+Message-Id: <20181009111215.7653-22-mb@lightnvm.io>
+In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
+References: <20181009111215.7653-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-There is no need to synchronously execute all REQ_OP_ZONE_RESET BIOs
-necessary to reset a range of zones. Similarly to what is done for
-discard BIOs in blk-lib.c, all zone reset BIOs can be chained and
-executed asynchronously and a synchronous call done only for the last
-BIO of the chain.
+Remove the debug only iteration within __pblk_down_page, which
+then allows us to reduce the number of arguments down to pblk and
+the parallel unit from the functions that calls it. Simplifying the
+callers logic considerably.
 
-Modify blkdev_reset_zones() to operate similarly to
-blkdev_issue_discard() using the next_bio() helper for chaining BIOs. To
-avoid code duplication of that function in blk_zoned.c, rename
-next_bio() into blk_next_bio() and declare it as a block internal
-function in blk.h.
+Also, rename the functions pblk_[down/up]_page to
+pblk_[down/up]_chunk, to communicate that it manages the write
+pointer of the chunk. Note that it also protects the parallel unit
+such that at most one chunk is active per parallel unit.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+Reviewed-by: Javier González <javier@cnexlabs.com>
 ---
- block/blk-lib.c   | 13 ++++++-------
- block/blk-zoned.c | 29 ++++++++++++++++-------------
- block/blk.h       |  2 ++
- 3 files changed, 24 insertions(+), 20 deletions(-)
+ drivers/lightnvm/pblk-core.c     | 34 +++++++++-----------------------
+ drivers/lightnvm/pblk-map.c      |  2 +-
+ drivers/lightnvm/pblk-recovery.c |  6 +++---
+ drivers/lightnvm/pblk-write.c    |  6 +++---
+ drivers/lightnvm/pblk.h          |  6 +++---
+ 5 files changed, 19 insertions(+), 35 deletions(-)
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index d1b9dd03da25..d7bedee5f9ba 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -10,8 +10,7 @@
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index bb1a7cc24cbb..968597d10cc2 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -1861,8 +1861,7 @@ void pblk_gen_run_ws(struct pblk *pblk, struct pblk_line *line, void *priv,
+ 	queue_work(wq, &line_ws->ws);
+ }
  
- #include "blk.h"
- 
--static struct bio *next_bio(struct bio *bio, unsigned int nr_pages,
--		gfp_t gfp)
-+struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp)
+-static void __pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list,
+-			     int nr_ppas, int pos)
++static void __pblk_down_chunk(struct pblk *pblk, int pos)
  {
- 	struct bio *new = bio_alloc(gfp, nr_pages);
- 
-@@ -87,7 +86,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 			req_sects = end_sect - sector;
- 		}
- 
--		bio = next_bio(bio, 0, gfp_mask);
-+		bio = blk_next_bio(bio, 0, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio_set_op_attrs(bio, op, 0);
-@@ -189,7 +188,7 @@ static int __blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
- 	max_write_same_sectors = UINT_MAX >> 9;
- 
- 	while (nr_sects) {
--		bio = next_bio(bio, 1, gfp_mask);
-+		bio = blk_next_bio(bio, 1, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio->bi_vcnt = 1;
-@@ -265,7 +264,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
- 		return -EOPNOTSUPP;
- 
- 	while (nr_sects) {
--		bio = next_bio(bio, 0, gfp_mask);
-+		bio = blk_next_bio(bio, 0, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio->bi_opf = REQ_OP_WRITE_ZEROES;
-@@ -316,8 +315,8 @@ static int __blkdev_issue_zero_pages(struct block_device *bdev,
- 		return -EPERM;
- 
- 	while (nr_sects != 0) {
--		bio = next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
--			       gfp_mask);
-+		bio = blk_next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
-+				   gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index bb4ed69f917f..5d967fd39fbd 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -13,6 +13,8 @@
- #include <linux/rbtree.h>
- #include <linux/blkdev.h>
- 
-+#include "blk.h"
-+
- static inline sector_t blk_zone_start(struct request_queue *q,
- 				      sector_t sector)
- {
-@@ -277,16 +279,17 @@ int blkdev_reset_zones(struct block_device *bdev,
- 	struct request_queue *q = bdev_get_queue(bdev);
- 	sector_t zone_sectors;
- 	sector_t end_sector = sector + nr_sectors;
--	struct bio *bio;
-+	struct bio *bio = NULL;
-+	struct blk_plug plug;
+ 	struct pblk_lun *rlun = &pblk->luns[pos];
  	int ret;
- 
--	if (!q)
--		return -ENXIO;
+@@ -1871,13 +1870,6 @@ static void __pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list,
+ 	 * Only send one inflight I/O per LUN. Since we map at a page
+ 	 * granurality, all ppas in the I/O will map to the same LUN
+ 	 */
+-#ifdef CONFIG_NVM_PBLK_DEBUG
+-	int i;
 -
- 	if (!blk_queue_is_zoned(q))
- 		return -EOPNOTSUPP;
+-	for (i = 1; i < nr_ppas; i++)
+-		WARN_ON(ppa_list[0].a.lun != ppa_list[i].a.lun ||
+-				ppa_list[0].a.ch != ppa_list[i].a.ch);
+-#endif
  
--	if (end_sector > bdev->bd_part->nr_sects)
-+	if (bdev_read_only(bdev))
-+		return -EPERM;
-+
-+	if (!nr_sectors || end_sector > bdev->bd_part->nr_sects)
- 		/* Out of range */
- 		return -EINVAL;
+ 	ret = down_timeout(&rlun->wr_sem, msecs_to_jiffies(30000));
+ 	if (ret == -ETIME || ret == -EINTR)
+@@ -1885,21 +1877,21 @@ static void __pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list,
+ 				-ret);
+ }
  
-@@ -299,19 +302,14 @@ int blkdev_reset_zones(struct block_device *bdev,
- 	    end_sector != bdev->bd_part->nr_sects)
- 		return -EINVAL;
+-void pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas)
++void pblk_down_chunk(struct pblk *pblk, struct ppa_addr ppa)
+ {
+ 	struct nvm_tgt_dev *dev = pblk->dev;
+ 	struct nvm_geo *geo = &dev->geo;
+-	int pos = pblk_ppa_to_pos(geo, ppa_list[0]);
++	int pos = pblk_ppa_to_pos(geo, ppa);
  
-+	blk_start_plug(&plug);
- 	while (sector < end_sector) {
+-	__pblk_down_page(pblk, ppa_list, nr_ppas, pos);
++	__pblk_down_chunk(pblk, pos);
+ }
  
--		bio = bio_alloc(gfp_mask, 0);
-+		bio = blk_next_bio(bio, 0, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio_set_op_attrs(bio, REQ_OP_ZONE_RESET, 0);
+-void pblk_down_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
++void pblk_down_rq(struct pblk *pblk, struct ppa_addr ppa,
+ 		  unsigned long *lun_bitmap)
+ {
+ 	struct nvm_tgt_dev *dev = pblk->dev;
+ 	struct nvm_geo *geo = &dev->geo;
+-	int pos = pblk_ppa_to_pos(geo, ppa_list[0]);
++	int pos = pblk_ppa_to_pos(geo, ppa);
  
--		ret = submit_bio_wait(bio);
--		bio_put(bio);
+ 	/* If the LUN has been locked for this same request, do no attempt to
+ 	 * lock it again
+@@ -1907,23 +1899,15 @@ void pblk_down_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
+ 	if (test_and_set_bit(pos, lun_bitmap))
+ 		return;
+ 
+-	__pblk_down_page(pblk, ppa_list, nr_ppas, pos);
++	__pblk_down_chunk(pblk, pos);
+ }
+ 
+-void pblk_up_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas)
++void pblk_up_chunk(struct pblk *pblk, struct ppa_addr ppa)
+ {
+ 	struct nvm_tgt_dev *dev = pblk->dev;
+ 	struct nvm_geo *geo = &dev->geo;
+ 	struct pblk_lun *rlun;
+-	int pos = pblk_ppa_to_pos(geo, ppa_list[0]);
 -
--		if (ret)
--			return ret;
+-#ifdef CONFIG_NVM_PBLK_DEBUG
+-	int i;
 -
- 		sector += zone_sectors;
+-	for (i = 1; i < nr_ppas; i++)
+-		WARN_ON(ppa_list[0].a.lun != ppa_list[i].a.lun ||
+-				ppa_list[0].a.ch != ppa_list[i].a.ch);
+-#endif
++	int pos = pblk_ppa_to_pos(geo, ppa);
  
- 		/* This may take a while, so be nice to others */
-@@ -319,7 +317,12 @@ int blkdev_reset_zones(struct block_device *bdev,
- 
+ 	rlun = &pblk->luns[pos];
+ 	up(&rlun->wr_sem);
+diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
+index dc0efb852475..ff677ca6e4e1 100644
+--- a/drivers/lightnvm/pblk-map.c
++++ b/drivers/lightnvm/pblk-map.c
+@@ -79,7 +79,7 @@ static int pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
+ 		}
  	}
  
--	return 0;
-+	ret = submit_bio_wait(bio);
-+	bio_put(bio);
-+
-+	blk_finish_plug(&plug);
-+
-+	return ret;
+-	pblk_down_rq(pblk, ppa_list, nr_secs, lun_bitmap);
++	pblk_down_rq(pblk, ppa_list[0], lun_bitmap);
+ 	return 0;
  }
- EXPORT_SYMBOL_GPL(blkdev_reset_zones);
  
-diff --git a/block/blk.h b/block/blk.h
-index 9db4e389582c..3d67844676fb 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -421,4 +421,6 @@ extern int blk_iolatency_init(struct request_queue *q);
- static inline int blk_iolatency_init(struct request_queue *q) { return 0; }
- #endif
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index eea901d7cebc..cbcc0828517e 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -227,7 +227,7 @@ static void pblk_end_io_recov(struct nvm_rq *rqd)
+ 	struct pblk_pad_rq *pad_rq = rqd->private;
+ 	struct pblk *pblk = pad_rq->pblk;
  
-+struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp);
-+
- #endif /* BLK_INTERNAL_H */
+-	pblk_up_page(pblk, ppa_list, rqd->nr_ppas);
++	pblk_up_chunk(pblk, ppa_list[0]);
+ 
+ 	pblk_free_rqd(pblk, rqd, PBLK_WRITE_INT);
+ 
+@@ -339,12 +339,12 @@ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
+ 	}
+ 
+ 	kref_get(&pad_rq->ref);
+-	pblk_down_page(pblk, rqd->ppa_list, rqd->nr_ppas);
++	pblk_down_chunk(pblk, rqd->ppa_list[0]);
+ 
+ 	ret = pblk_submit_io(pblk, rqd);
+ 	if (ret) {
+ 		pblk_err(pblk, "I/O submission failed: %d\n", ret);
+-		pblk_up_page(pblk, rqd->ppa_list, rqd->nr_ppas);
++		pblk_up_chunk(pblk, rqd->ppa_list[0]);
+ 		goto fail_free_bio;
+ 	}
+ 
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index cd579b440b56..674ba4d1a9f4 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -270,7 +270,7 @@ static void pblk_end_io_write_meta(struct nvm_rq *rqd)
+ 	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
+ 	int sync;
+ 
+-	pblk_up_page(pblk, ppa_list, rqd->nr_ppas);
++	pblk_up_chunk(pblk, ppa_list[0]);
+ 
+ 	if (rqd->error) {
+ 		pblk_log_write_err(pblk, rqd);
+@@ -420,7 +420,7 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
+ 		list_del(&meta_line->list);
+ 	spin_unlock(&l_mg->close_lock);
+ 
+-	pblk_down_page(pblk, ppa_list, rqd->nr_ppas);
++	pblk_down_chunk(pblk, ppa_list[0]);
+ 
+ 	ret = pblk_submit_io(pblk, rqd);
+ 	if (ret) {
+@@ -431,7 +431,7 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
+ 	return NVM_IO_OK;
+ 
+ fail_rollback:
+-	pblk_up_page(pblk, ppa_list, rqd->nr_ppas);
++	pblk_up_chunk(pblk, ppa_list[0]);
+ 	spin_lock(&l_mg->close_lock);
+ 	pblk_dealloc_page(pblk, meta_line, rq_ppas);
+ 	list_add(&meta_line->list, &meta_line->list);
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 0ca67e8f99d5..429347bcd1fa 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -823,10 +823,10 @@ u64 pblk_alloc_page(struct pblk *pblk, struct pblk_line *line, int nr_secs);
+ u64 __pblk_alloc_page(struct pblk *pblk, struct pblk_line *line, int nr_secs);
+ int pblk_calc_secs(struct pblk *pblk, unsigned long secs_avail,
+ 		   unsigned long secs_to_flush);
+-void pblk_up_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas);
+-void pblk_down_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
++void pblk_down_rq(struct pblk *pblk, struct ppa_addr ppa,
+ 		  unsigned long *lun_bitmap);
+-void pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas);
++void pblk_down_chunk(struct pblk *pblk, struct ppa_addr ppa);
++void pblk_up_chunk(struct pblk *pblk, struct ppa_addr ppa);
+ void pblk_up_rq(struct pblk *pblk, unsigned long *lun_bitmap);
+ int pblk_bio_add_pages(struct pblk *pblk, struct bio *bio, gfp_t flags,
+ 		       int nr_pages);
 -- 
 2.17.1
