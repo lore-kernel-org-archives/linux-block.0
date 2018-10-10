@@ -1,113 +1,277 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Logan Gunthorpe <logang@deltatee.com>
-Date: Thu,  4 Oct 2018 15:27:45 -0600
-Message-Id: <20181004212747.6301-12-logang@deltatee.com>
-In-Reply-To: <20181004212747.6301-1-logang@deltatee.com>
-References: <20181004212747.6301-1-logang@deltatee.com>
-MIME-Version: 1.0
-Subject: [PATCH v9 11/13] nvme-pci: Add a quirk for a pseudo CMB
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 02/15] block/loop: Use global lock for ioctl() operation.
+Date: Wed, 10 Oct 2018 12:04:02 +0200
+Message-Id: <20181010100415.26525-3-jack@suse.cz>
+In-Reply-To: <20181010100415.26525-1-jack@suse.cz>
+References: <20181010100415.26525-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Introduce a quirk to use CMB-like memory on older devices that have
-an exposed BAR but do not advertise support for using CMBLOC and
-CMBSIZE.
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 
-We'd like to use some of these older cards to test P2P memory.
+syzbot is reporting NULL pointer dereference [1] which is caused by
+race condition between ioctl(loop_fd, LOOP_CLR_FD, 0) versus
+ioctl(other_loop_fd, LOOP_SET_FD, loop_fd) due to traversing other
+loop devices at loop_validate_file() without holding corresponding
+lo->lo_ctl_mutex locks.
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Reviewed-by: Keith Busch <keith.busch@intel.com>
+Since ioctl() request on loop devices is not frequent operation, we don't
+need fine grained locking. Let's use global lock in order to allow safe
+traversal at loop_validate_file().
+
+Note that syzbot is also reporting circular locking dependency between
+bdev->bd_mutex and lo->lo_ctl_mutex [2] which is caused by calling
+blkdev_reread_part() with lock held. This patch does not address it.
+
+[1] https://syzkaller.appspot.com/bug?id=f3cfe26e785d85f9ee259f385515291d21bd80a3
+[2] https://syzkaller.appspot.com/bug?id=bf154052f0eea4bc7712499e4569505907d15889
+
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Reported-by: syzbot <syzbot+bf89c128e05dd6c62523@syzkaller.appspotmail.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/nvme/host/nvme.h |  7 +++++++
- drivers/nvme/host/pci.c  | 24 ++++++++++++++++++++----
- 2 files changed, 27 insertions(+), 4 deletions(-)
+ drivers/block/loop.c | 58 ++++++++++++++++++++++++++--------------------------
+ drivers/block/loop.h |  1 -
+ 2 files changed, 29 insertions(+), 30 deletions(-)
 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 4030743c90aa..8e6f3bcfe956 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -90,6 +90,13 @@ enum nvme_quirks {
- 	 * Set MEDIUM priority on SQ creation
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 50c81ff44ae2..d0f1b7106572 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -84,6 +84,7 @@
+ 
+ static DEFINE_IDR(loop_index_idr);
+ static DEFINE_MUTEX(loop_index_mutex);
++static DEFINE_MUTEX(loop_ctl_mutex);
+ 
+ static int max_part;
+ static int part_shift;
+@@ -1047,7 +1048,7 @@ static int loop_clr_fd(struct loop_device *lo)
  	 */
- 	NVME_QUIRK_MEDIUM_PRIO_SQ		= (1 << 7),
-+
-+	/*
-+	 * Pseudo CMB Support on BAR 4. For adapters like the Microsemi
-+	 * NVRAM that have CMB-like memory on a BAR but does not set
-+	 * CMBLOC or CMBSZ.
-+	 */
-+	NVME_QUIRK_PSEUDO_CMB_BAR4		= (1 << 8),
- };
+ 	if (atomic_read(&lo->lo_refcnt) > 1) {
+ 		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
+-		mutex_unlock(&lo->lo_ctl_mutex);
++		mutex_unlock(&loop_ctl_mutex);
+ 		return 0;
+ 	}
  
- /*
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 0d6c41bc2b35..db862ee6e53e 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1644,6 +1644,13 @@ static ssize_t nvme_cmb_show(struct device *dev,
+@@ -1100,12 +1101,12 @@ static int loop_clr_fd(struct loop_device *lo)
+ 	if (!part_shift)
+ 		lo->lo_disk->flags |= GENHD_FL_NO_PART_SCAN;
+ 	loop_unprepare_queue(lo);
+-	mutex_unlock(&lo->lo_ctl_mutex);
++	mutex_unlock(&loop_ctl_mutex);
+ 	/*
+-	 * Need not hold lo_ctl_mutex to fput backing file.
+-	 * Calling fput holding lo_ctl_mutex triggers a circular
++	 * Need not hold loop_ctl_mutex to fput backing file.
++	 * Calling fput holding loop_ctl_mutex triggers a circular
+ 	 * lock dependency possibility warning as fput can take
+-	 * bd_mutex which is usually taken before lo_ctl_mutex.
++	 * bd_mutex which is usually taken before loop_ctl_mutex.
+ 	 */
+ 	fput(filp);
+ 	return 0;
+@@ -1210,7 +1211,7 @@ loop_get_status(struct loop_device *lo, struct loop_info64 *info)
+ 	int ret;
+ 
+ 	if (lo->lo_state != Lo_bound) {
+-		mutex_unlock(&lo->lo_ctl_mutex);
++		mutex_unlock(&loop_ctl_mutex);
+ 		return -ENXIO;
+ 	}
+ 
+@@ -1229,10 +1230,10 @@ loop_get_status(struct loop_device *lo, struct loop_info64 *info)
+ 		       lo->lo_encrypt_key_size);
+ 	}
+ 
+-	/* Drop lo_ctl_mutex while we call into the filesystem. */
++	/* Drop loop_ctl_mutex while we call into the filesystem. */
+ 	path = lo->lo_backing_file->f_path;
+ 	path_get(&path);
+-	mutex_unlock(&lo->lo_ctl_mutex);
++	mutex_unlock(&loop_ctl_mutex);
+ 	ret = vfs_getattr(&path, &stat, STATX_INO, AT_STATX_SYNC_AS_STAT);
+ 	if (!ret) {
+ 		info->lo_device = huge_encode_dev(stat.dev);
+@@ -1324,7 +1325,7 @@ loop_get_status_old(struct loop_device *lo, struct loop_info __user *arg) {
+ 	int err;
+ 
+ 	if (!arg) {
+-		mutex_unlock(&lo->lo_ctl_mutex);
++		mutex_unlock(&loop_ctl_mutex);
+ 		return -EINVAL;
+ 	}
+ 	err = loop_get_status(lo, &info64);
+@@ -1342,7 +1343,7 @@ loop_get_status64(struct loop_device *lo, struct loop_info64 __user *arg) {
+ 	int err;
+ 
+ 	if (!arg) {
+-		mutex_unlock(&lo->lo_ctl_mutex);
++		mutex_unlock(&loop_ctl_mutex);
+ 		return -EINVAL;
+ 	}
+ 	err = loop_get_status(lo, &info64);
+@@ -1400,7 +1401,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 	struct loop_device *lo = bdev->bd_disk->private_data;
+ 	int err;
+ 
+-	err = mutex_lock_killable_nested(&lo->lo_ctl_mutex, 1);
++	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+ 	if (err)
+ 		goto out_unlocked;
+ 
+@@ -1412,7 +1413,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 		err = loop_change_fd(lo, bdev, arg);
+ 		break;
+ 	case LOOP_CLR_FD:
+-		/* loop_clr_fd would have unlocked lo_ctl_mutex on success */
++		/* loop_clr_fd would have unlocked loop_ctl_mutex on success */
+ 		err = loop_clr_fd(lo);
+ 		if (!err)
+ 			goto out_unlocked;
+@@ -1425,7 +1426,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 		break;
+ 	case LOOP_GET_STATUS:
+ 		err = loop_get_status_old(lo, (struct loop_info __user *) arg);
+-		/* loop_get_status() unlocks lo_ctl_mutex */
++		/* loop_get_status() unlocks loop_ctl_mutex */
+ 		goto out_unlocked;
+ 	case LOOP_SET_STATUS64:
+ 		err = -EPERM;
+@@ -1435,7 +1436,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 		break;
+ 	case LOOP_GET_STATUS64:
+ 		err = loop_get_status64(lo, (struct loop_info64 __user *) arg);
+-		/* loop_get_status() unlocks lo_ctl_mutex */
++		/* loop_get_status() unlocks loop_ctl_mutex */
+ 		goto out_unlocked;
+ 	case LOOP_SET_CAPACITY:
+ 		err = -EPERM;
+@@ -1455,7 +1456,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 	default:
+ 		err = lo->ioctl ? lo->ioctl(lo, cmd, arg) : -EINVAL;
+ 	}
+-	mutex_unlock(&lo->lo_ctl_mutex);
++	mutex_unlock(&loop_ctl_mutex);
+ 
+ out_unlocked:
+ 	return err;
+@@ -1572,7 +1573,7 @@ loop_get_status_compat(struct loop_device *lo,
+ 	int err;
+ 
+ 	if (!arg) {
+-		mutex_unlock(&lo->lo_ctl_mutex);
++		mutex_unlock(&loop_ctl_mutex);
+ 		return -EINVAL;
+ 	}
+ 	err = loop_get_status(lo, &info64);
+@@ -1589,19 +1590,19 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
+ 
+ 	switch(cmd) {
+ 	case LOOP_SET_STATUS:
+-		err = mutex_lock_killable(&lo->lo_ctl_mutex);
++		err = mutex_lock_killable(&loop_ctl_mutex);
+ 		if (!err) {
+ 			err = loop_set_status_compat(lo,
+ 						     (const struct compat_loop_info __user *)arg);
+-			mutex_unlock(&lo->lo_ctl_mutex);
++			mutex_unlock(&loop_ctl_mutex);
+ 		}
+ 		break;
+ 	case LOOP_GET_STATUS:
+-		err = mutex_lock_killable(&lo->lo_ctl_mutex);
++		err = mutex_lock_killable(&loop_ctl_mutex);
+ 		if (!err) {
+ 			err = loop_get_status_compat(lo,
+ 						     (struct compat_loop_info __user *)arg);
+-			/* loop_get_status() unlocks lo_ctl_mutex */
++			/* loop_get_status() unlocks loop_ctl_mutex */
+ 		}
+ 		break;
+ 	case LOOP_SET_CAPACITY:
+@@ -1648,7 +1649,7 @@ static void __lo_release(struct loop_device *lo)
+ 	if (atomic_dec_return(&lo->lo_refcnt))
+ 		return;
+ 
+-	mutex_lock(&lo->lo_ctl_mutex);
++	mutex_lock(&loop_ctl_mutex);
+ 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
+ 		/*
+ 		 * In autoclear mode, stop the loop thread
+@@ -1666,7 +1667,7 @@ static void __lo_release(struct loop_device *lo)
+ 		blk_mq_unfreeze_queue(lo->lo_queue);
+ 	}
+ 
+-	mutex_unlock(&lo->lo_ctl_mutex);
++	mutex_unlock(&loop_ctl_mutex);
  }
- static DEVICE_ATTR(cmb, S_IRUGO, nvme_cmb_show, NULL);
  
-+static u32 nvme_pseudo_cmbsz(struct pci_dev *pdev, int bar)
-+{
-+	return NVME_CMBSZ_WDS | NVME_CMBSZ_RDS |
-+		(((ilog2(SZ_16M) - 12) / 4) << NVME_CMBSZ_SZU_SHIFT) |
-+		((pci_resource_len(pdev, bar) / SZ_16M) << NVME_CMBSZ_SZ_SHIFT);
-+}
-+
- static u64 nvme_cmb_size_unit(struct nvme_dev *dev)
- {
- 	u8 szu = (dev->cmbsz >> NVME_CMBSZ_SZU_SHIFT) & NVME_CMBSZ_SZU_MASK;
-@@ -1663,10 +1670,15 @@ static void nvme_map_cmb(struct nvme_dev *dev)
- 	struct pci_dev *pdev = to_pci_dev(dev->dev);
- 	int bar;
+ static void lo_release(struct gendisk *disk, fmode_t mode)
+@@ -1712,10 +1713,10 @@ static int unregister_transfer_cb(int id, void *ptr, void *data)
+ 	struct loop_device *lo = ptr;
+ 	struct loop_func_table *xfer = data;
  
--	dev->cmbsz = readl(dev->bar + NVME_REG_CMBSZ);
--	if (!dev->cmbsz)
--		return;
--	dev->cmbloc = readl(dev->bar + NVME_REG_CMBLOC);
-+	if (dev->ctrl.quirks & NVME_QUIRK_PSEUDO_CMB_BAR4) {
-+		dev->cmbsz = nvme_pseudo_cmbsz(pdev, 4);
-+		dev->cmbloc = 4;
-+	} else {
-+		dev->cmbsz = readl(dev->bar + NVME_REG_CMBSZ);
-+		if (!dev->cmbsz)
-+			return;
-+		dev->cmbloc = readl(dev->bar + NVME_REG_CMBLOC);
-+	}
+-	mutex_lock(&lo->lo_ctl_mutex);
++	mutex_lock(&loop_ctl_mutex);
+ 	if (lo->lo_encryption == xfer)
+ 		loop_release_xfer(lo);
+-	mutex_unlock(&lo->lo_ctl_mutex);
++	mutex_unlock(&loop_ctl_mutex);
+ 	return 0;
+ }
  
- 	size = nvme_cmb_size_unit(dev) * nvme_cmb_size(dev);
- 	offset = nvme_cmb_size_unit(dev) * NVME_CMB_OFST(dev->cmbloc);
-@@ -2715,6 +2727,10 @@ static const struct pci_device_id nvme_id_table[] = {
- 		.driver_data = NVME_QUIRK_LIGHTNVM, },
- 	{ PCI_DEVICE(0x1d1d, 0x2601),	/* CNEX Granby */
- 		.driver_data = NVME_QUIRK_LIGHTNVM, },
-+	{ PCI_DEVICE(0x11f8, 0xf117),	/* Microsemi NVRAM adaptor */
-+		.driver_data = NVME_QUIRK_PSEUDO_CMB_BAR4, },
-+	{ PCI_DEVICE(0x1db1, 0x0002),	/* Everspin nvNitro adaptor */
-+		.driver_data = NVME_QUIRK_PSEUDO_CMB_BAR4,  },
- 	{ PCI_DEVICE_CLASS(PCI_CLASS_STORAGE_EXPRESS, 0xffffff) },
- 	{ PCI_DEVICE(PCI_VENDOR_ID_APPLE, 0x2001) },
- 	{ PCI_DEVICE(PCI_VENDOR_ID_APPLE, 0x2003) },
+@@ -1896,7 +1897,6 @@ static int loop_add(struct loop_device **l, int i)
+ 	if (!part_shift)
+ 		disk->flags |= GENHD_FL_NO_PART_SCAN;
+ 	disk->flags |= GENHD_FL_EXT_DEVT;
+-	mutex_init(&lo->lo_ctl_mutex);
+ 	atomic_set(&lo->lo_refcnt, 0);
+ 	lo->lo_number		= i;
+ 	spin_lock_init(&lo->lo_lock);
+@@ -2009,21 +2009,21 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
+ 		ret = loop_lookup(&lo, parm);
+ 		if (ret < 0)
+ 			break;
+-		ret = mutex_lock_killable(&lo->lo_ctl_mutex);
++		ret = mutex_lock_killable(&loop_ctl_mutex);
+ 		if (ret)
+ 			break;
+ 		if (lo->lo_state != Lo_unbound) {
+ 			ret = -EBUSY;
+-			mutex_unlock(&lo->lo_ctl_mutex);
++			mutex_unlock(&loop_ctl_mutex);
+ 			break;
+ 		}
+ 		if (atomic_read(&lo->lo_refcnt) > 0) {
+ 			ret = -EBUSY;
+-			mutex_unlock(&lo->lo_ctl_mutex);
++			mutex_unlock(&loop_ctl_mutex);
+ 			break;
+ 		}
+ 		lo->lo_disk->private_data = NULL;
+-		mutex_unlock(&lo->lo_ctl_mutex);
++		mutex_unlock(&loop_ctl_mutex);
+ 		idr_remove(&loop_index_idr, lo->lo_number);
+ 		loop_remove(lo);
+ 		break;
+diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+index 4d42c7af7de7..af75a5ee4094 100644
+--- a/drivers/block/loop.h
++++ b/drivers/block/loop.h
+@@ -54,7 +54,6 @@ struct loop_device {
+ 
+ 	spinlock_t		lo_lock;
+ 	int			lo_state;
+-	struct mutex		lo_ctl_mutex;
+ 	struct kthread_worker	worker;
+ 	struct task_struct	*worker_task;
+ 	bool			use_dio;
 -- 
-2.19.0
+2.16.4
