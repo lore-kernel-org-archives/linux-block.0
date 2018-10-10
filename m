@@ -1,22 +1,21 @@
-Return-Path: <jack@suse.cz>
-Date: Tue, 16 Oct 2018 13:36:54 +0200
-From: Jan Kara <jack@suse.cz>
-To: Johannes Thumshirn <jthumshirn@suse.de>
+Return-Path: <jthumshirn@suse.de>
+Date: Wed, 10 Oct 2018 14:43:09 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Jan Kara <jack@suse.cz>
 Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
 Subject: Re: [PATCH 0/15 v2] loop: Fix oops and possible deadlocks
-Message-ID: <20181016113654.GG18918@quack2.suse.cz>
+Message-ID: <20181010124309.GB12977@linux-x5ow.site>
 References: <20181010100415.26525-1-jack@suse.cz>
  <a40fcf62-85a4-a6be-0803-d99dedf8cc61@i-love.sakura.ne.jp>
  <20181010114227.GA12977@linux-x5ow.site>
  <20181010122809.GE11507@quack2.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 In-Reply-To: <20181010122809.GE11507@quack2.suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed 10-10-18 14:28:09, Jan Kara wrote:
+On Wed, Oct 10, 2018 at 02:28:09PM +0200, Jan Kara wrote:
 > On Wed 10-10-18 13:42:27, Johannes Thumshirn wrote:
 > > On Wed, Oct 10, 2018 at 07:19:00PM +0900, Tetsuo Handa wrote:
 > > > On 2018/10/10 19:04, Jan Kara wrote:
@@ -40,23 +39,15 @@ On Wed 10-10-18 14:28:09, Jan Kara wrote:
 > Yeah, I did run loop tests now and they ran fine. I can try converting the
 > syzbot reproducers into something legible but it will take a while.
 
-So I took a stab at this. But I hit two issues:
+There is one C repropducer which can be used (it just needs minor
+modifications to pass in the device instead of loop0).
 
-1) For the reproducer triggering the lockdep warning, you need a 32-bit
-binary (so that it uses compat_ioctl). I don't think we want to introduce
-32-bit devel environment dependency to blktests. With 64-bits, the problem
-is also there but someone noticed and silenced lockdep (with a reason that
-I consider is incorrect)... I think the test is still worth it though as
-I'll remove the lockdep-fooling code in my patches and thus new breakage
-will be noticed.
-
-2) For the oops (use-after-free) issue I was not able to reproduce that in
-my test KVM in couple hours. The race window is rather narrow and syzbot
-with KASAN and everything hit it only 11 times. So I'm not sure how useful
-that test is. Any opinions?
-
-								Honza
+See for instance blktests/src/sg/syzkaller1.c
 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Johannes Thumshirn                                        SUSE Labs 
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
