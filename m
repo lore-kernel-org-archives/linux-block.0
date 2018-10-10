@@ -1,50 +1,82 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Cc: stable@vger.kernel.org
-Subject: [PATCH] blk-wbt: wake up all when we scale up, not down
-Date: Thu, 11 Oct 2018 15:29:30 -0400
-Message-Id: <20181011192930.2844-1-josef@toxicpanda.com>
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 12/15] loop: Move special partition reread handling in loop_clr_fd()
+Date: Wed, 10 Oct 2018 12:04:12 +0200
+Message-Id: <20181010100415.26525-13-jack@suse.cz>
+In-Reply-To: <20181010100415.26525-1-jack@suse.cz>
+References: <20181010100415.26525-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Tetsuo brought to my attention that I screwed up the scale_up/scale_down
-helpers when I factored out the rq-qos code.  We need to wake up all the
-waiters when we add slots for requests to make, not when we shrink the
-slots.  Otherwise we'll end up things waiting forever.  This was a
-mistake and simply puts everything back the way it was.
+The call of __blkdev_reread_part() from loop_reread_partition() happens
+only when we need to invalidate partitions from loop_release(). Thus
+move a detection for this into loop_clr_fd() and simplify
+loop_reread_partition().
 
-cc: stable@vger.kernel.org
-Fixes: a79050434b45 ("blk-rq-qos: refactor out common elements of blk-wbt")
-eported-by: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+This makes loop_reread_partition() safe to use without loop_ctl_mutex
+because we use only lo->lo_number and lo->lo_file_name in case of error
+for reporting purposes (thus possibly reporting outdate information is
+not a big deal) and we are safe from 'lo' going away under us by
+elevated lo->lo_refcnt.
+
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
-JENS! I did this on for-4.20/block FYI
+ drivers/block/loop.c | 33 +++++++++++++++++++--------------
+ 1 file changed, 19 insertions(+), 14 deletions(-)
 
- block/blk-wbt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 8e20a0677dcf..8ac93fcbaa2e 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -310,6 +310,7 @@ static void scale_up(struct rq_wb *rwb)
- 	rq_depth_scale_up(&rwb->rq_depth);
- 	calc_wb_limits(rwb);
- 	rwb->unknown_cnt = 0;
-+	rwb_wake_all(rwb);
- 	rwb_trace_step(rwb, "scale up");
- }
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index c53ad5e88a7d..db73fb5f16c7 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -631,18 +631,7 @@ static void loop_reread_partitions(struct loop_device *lo,
+ {
+ 	int rc;
  
-@@ -318,7 +319,6 @@ static void scale_down(struct rq_wb *rwb, bool hard_throttle)
- 	rq_depth_scale_down(&rwb->rq_depth, hard_throttle);
- 	calc_wb_limits(rwb);
- 	rwb->unknown_cnt = 0;
--	rwb_wake_all(rwb);
- 	rwb_trace_step(rwb, "scale down");
- }
+-	/*
+-	 * bd_mutex has been held already in release path, so don't
+-	 * acquire it if this function is called in such case.
+-	 *
+-	 * If the reread partition isn't from release path, lo_refcnt
+-	 * must be at least one and it can only become zero when the
+-	 * current holder is released.
+-	 */
+-	if (!atomic_read(&lo->lo_refcnt))
+-		rc = __blkdev_reread_part(bdev);
+-	else
+-		rc = blkdev_reread_part(bdev);
++	rc = blkdev_reread_part(bdev);
+ 	if (rc)
+ 		pr_warn("%s: partition scan of loop%d (%s) failed (rc=%d)\n",
+ 			__func__, lo->lo_number, lo->lo_file_name, rc);
+@@ -1096,8 +1085,24 @@ static int __loop_clr_fd(struct loop_device *lo)
+ 	module_put(THIS_MODULE);
+ 	blk_mq_unfreeze_queue(lo->lo_queue);
  
+-	if (lo->lo_flags & LO_FLAGS_PARTSCAN && bdev)
+-		loop_reread_partitions(lo, bdev);
++	if (lo->lo_flags & LO_FLAGS_PARTSCAN && bdev) {
++		/*
++		 * bd_mutex has been held already in release path, so don't
++		 * acquire it if this function is called in such case.
++		 *
++		 * If the reread partition isn't from release path, lo_refcnt
++		 * must be at least one and it can only become zero when the
++		 * current holder is released.
++		 */
++		if (!atomic_read(&lo->lo_refcnt))
++			err = __blkdev_reread_part(bdev);
++		else
++			err = blkdev_reread_part(bdev);
++		pr_warn("%s: partition scan of loop%d failed (rc=%d)\n",
++			__func__, lo->lo_number, err);
++		/* Device is gone, no point in returning error */
++		err = 0;
++	}
+ 	lo->lo_flags = 0;
+ 	if (!part_shift)
+ 		lo->lo_disk->flags |= GENHD_FL_NO_PART_SCAN;
 -- 
-2.14.3
+2.16.4
