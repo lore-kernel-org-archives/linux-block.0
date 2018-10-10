@@ -1,34 +1,29 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:40022 "EHLO imap.thunk.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727597AbeJ3BE4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Oct 2018 21:04:56 -0400
-From: Theodore Ts'o <tytso@mit.edu>
-To: linux-block@vger.kernel.org
-Cc: Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH blktests] Fix build failure for discontiguous-io on 32-bit platforms
-Date: Mon, 29 Oct 2018 12:15:34 -0400
-Message-Id: <20181029161534.7564-1-tytso@mit.edu>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hch@lst.de>
+Date: Wed, 10 Oct 2018 15:26:39 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Matias Bjorling <matias.bjorling@wdc.com>
+Subject: Re: [PATCH 04/11] block: Introduce blkdev_nr_zones() helper
+Message-ID: <20181010132639.GD22273@lst.de>
+References: <20181010015239.24930-1-damien.lemoal@wdc.com> <20181010015239.24930-5-damien.lemoal@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20181010015239.24930-5-damien.lemoal@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Theodore Ts'o <tytso@mit.edu>
----
- src/discontiguous-io.cpp | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Oct 10, 2018 at 10:52:32AM +0900, Damien Le Moal wrote:
+> Introduce the blkdev_nr_zones() helper function to get the total
+> number of zones of a zoned block device. This number is always 0 for a
+> regular block device (q->limits.zoned == BLK_ZONED_NONE case).
+> 
+> Replace hard-coded number of zones calculation in dmz_get_zoned_device()
+> with a call to this helper.
 
-diff --git a/src/discontiguous-io.cpp b/src/discontiguous-io.cpp
-index 5e0ee0f..a59c18d 100644
---- a/src/discontiguous-io.cpp
-+++ b/src/discontiguous-io.cpp
-@@ -291,7 +291,7 @@ int main(int argc, char **argv)
- 			unsigned char *p = &*buf.begin();
- 			for (int i = 0; i < len / 4; i++)
- 				iov.append(p + 4 + i * 8,
--					   std::min(4ul, len - i * 4));
-+					   std::min(4ul, (unsigned long) len - i * 4));
- 		} else {
- 			iov.append(&*buf.begin(), buf.size());
- 		}
--- 
-2.18.0.rc0
+Looks good,
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
