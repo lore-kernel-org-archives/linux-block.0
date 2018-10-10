@@ -1,29 +1,106 @@
-Return-Path: <hch@lst.de>
-Date: Wed, 10 Oct 2018 15:25:33 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <damien.lemoal@wdc.com>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+Return-Path: <prvs=81407a9e8=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
 	linux-scsi@vger.kernel.org,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
+	dm-devel@redhat.com,
+	Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
 	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: Re: [PATCH 01/11] scsi: sd_zbc: Rearrange code
-Message-ID: <20181010132533.GA22273@lst.de>
-References: <20181010015239.24930-1-damien.lemoal@wdc.com> <20181010015239.24930-2-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20181010015239.24930-2-damien.lemoal@wdc.com>
+Subject: [PATCH 01/11] scsi: sd_zbc: Rearrange code
+Date: Wed, 10 Oct 2018 10:52:29 +0900
+Message-Id: <20181010015239.24930-2-damien.lemoal@wdc.com>
+In-Reply-To: <20181010015239.24930-1-damien.lemoal@wdc.com>
+References: <20181010015239.24930-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Oct 10, 2018 at 10:52:29AM +0900, Damien Le Moal wrote:
-> Move the urswrz check out of sd_zbc_read_zones() and into
-> sd_zbc_read_zoned_characteristics() where that value is obtained (read
-> from the disk zoned characteristics VPD page). Since this function now
-> does more than simply reading the VPD page, rename it to
-> sd_zbc_check_zoned_characteristics().
-> Also fix the error message displayed when reading that VPD page fails.
+Move the urswrz check out of sd_zbc_read_zones() and into
+sd_zbc_read_zoned_characteristics() where that value is obtained (read
+from the disk zoned characteristics VPD page). Since this function now
+does more than simply reading the VPD page, rename it to
+sd_zbc_check_zoned_characteristics().
+Also fix the error message displayed when reading that VPD page fails.
 
-Looks good,
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ drivers/scsi/sd_zbc.c | 39 +++++++++++++++++++--------------------
+ 1 file changed, 19 insertions(+), 20 deletions(-)
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index 412c1787dcd9..0b7d8787f785 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -305,19 +305,19 @@ void sd_zbc_complete(struct scsi_cmnd *cmd, unsigned int good_bytes,
+ }
+ 
+ /**
+- * sd_zbc_read_zoned_characteristics - Read zoned block device characteristics
++ * sd_zbc_check_zoned_characteristics - Check zoned block device characteristics
+  * @sdkp: Target disk
+  * @buf: Buffer where to store the VPD page data
+  *
+- * Read VPD page B6.
++ * Read VPD page B6, get information and check that reads are unconstrained.
+  */
+-static int sd_zbc_read_zoned_characteristics(struct scsi_disk *sdkp,
+-					     unsigned char *buf)
++static int sd_zbc_check_zoned_characteristics(struct scsi_disk *sdkp,
++					      unsigned char *buf)
+ {
+ 
+ 	if (scsi_get_vpd_page(sdkp->device, 0xb6, buf, 64)) {
+ 		sd_printk(KERN_NOTICE, sdkp,
+-			  "Unconstrained-read check failed\n");
++			  "Read zoned characteristics VPD page failed\n");
+ 		return -ENODEV;
+ 	}
+ 
+@@ -335,6 +335,18 @@ static int sd_zbc_read_zoned_characteristics(struct scsi_disk *sdkp,
+ 		sdkp->zones_max_open = get_unaligned_be32(&buf[16]);
+ 	}
+ 
++	/*
++	 * Check for unconstrained reads: host-managed devices with
++	 * constrained reads (drives failing read after write pointer)
++	 * are not supported.
++	 */
++	if (!sdkp->urswrz) {
++		if (sdkp->first_scan)
++			sd_printk(KERN_NOTICE, sdkp,
++			  "constrained reads devices are not supported\n");
++		return -ENODEV;
++	}
++
+ 	return 0;
+ }
+ 
+@@ -675,24 +687,11 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
+ 		 */
+ 		return 0;
+ 
+-	/* Get zoned block device characteristics */
+-	ret = sd_zbc_read_zoned_characteristics(sdkp, buf);
++	/* Check zoned block device characteristics (unconstrained reads) */
++	ret = sd_zbc_check_zoned_characteristics(sdkp, buf);
+ 	if (ret)
+ 		goto err;
+ 
+-	/*
+-	 * Check for unconstrained reads: host-managed devices with
+-	 * constrained reads (drives failing read after write pointer)
+-	 * are not supported.
+-	 */
+-	if (!sdkp->urswrz) {
+-		if (sdkp->first_scan)
+-			sd_printk(KERN_NOTICE, sdkp,
+-			  "constrained reads devices are not supported\n");
+-		ret = -ENODEV;
+-		goto err;
+-	}
+-
+ 	/* Check capacity */
+ 	ret = sd_zbc_check_capacity(sdkp, buf);
+ 	if (ret)
+-- 
+2.17.1
