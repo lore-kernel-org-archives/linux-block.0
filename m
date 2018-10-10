@@ -1,68 +1,109 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 11/16] blk-mq: improve plug list sorting
-Date: Tue, 30 Oct 2018 12:32:47 -0600
-Message-Id: <20181030183252.17857-12-axboe@kernel.dk>
-In-Reply-To: <20181030183252.17857-1-axboe@kernel.dk>
-References: <20181030183252.17857-1-axboe@kernel.dk>
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 13/15] loop: Move loop_reread_partitions() out of loop_ctl_mutex
+Date: Wed, 10 Oct 2018 12:04:13 +0200
+Message-Id: <20181010100415.26525-14-jack@suse.cz>
+In-Reply-To: <20181010100415.26525-1-jack@suse.cz>
+References: <20181010100415.26525-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Currently we only look at the software queue, but with support
-for multiple maps, we should also look at the hardware queue.
-This is important since we'll flush out the request list if
-either the software queue or hardware queue don't match.
+Calling loop_reread_partitions() under loop_ctl_mutex causes lockdep to
+complain about circular lock dependency between bdev->bd_mutex and
+lo->lo_ctl_mutex. The problem is that on loop device open or close
+lo_open() and lo_release() get called with bdev->bd_mutex held and they
+need to acquire loop_ctl_mutex. OTOH when loop_reread_partitions() is
+called with loop_ctl_mutex held, it will call blkdev_reread_part() which
+acquires bdev->bd_mutex. See syzbot report for details [1].
 
-This sorts by software queue first, then hardware queue if
-that differs. Finally we sort by request location like before.
-This minimizes the flush points per plug list.
+Move all calls of loop_rescan_partitions() out of loop_ctl_mutex to
+avoid lockdep warning and fix deadlock possibility.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+[1] https://syzkaller.appspot.com/bug?id=bf154052f0eea4bc7712499e4569505907d1588
+
+Reported-by: syzbot <syzbot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/blk-mq.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ drivers/block/loop.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 51b8166959b9..5a34c9374dc7 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1611,14 +1611,21 @@ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
- 	spin_unlock(&ctx->lock);
- }
- 
--static int plug_ctx_cmp(void *priv, struct list_head *a, struct list_head *b)
-+static int plug_rq_cmp(void *priv, struct list_head *a, struct list_head *b)
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index db73fb5f16c7..0d54c3ee3a96 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -680,6 +680,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
  {
- 	struct request *rqa = container_of(a, struct request, queuelist);
- 	struct request *rqb = container_of(b, struct request, queuelist);
+ 	struct file	*file, *old_file;
+ 	int		error;
++	bool		partscan;
  
--	return !(rqa->mq_ctx < rqb->mq_ctx ||
--		 (rqa->mq_ctx == rqb->mq_ctx &&
--		  blk_rq_pos(rqa) < blk_rq_pos(rqb)));
-+	if (rqa->mq_ctx < rqb->mq_ctx)
-+		return -1;
-+	else if (rqa->mq_ctx > rqb->mq_ctx)
-+		return 1;
-+	else if (rqa->mq_hctx < rqb->mq_hctx)
-+		return -1;
-+	else if (rqa->mq_hctx > rqb->mq_hctx)
-+		return 1;
-+
-+	return blk_rq_pos(rqa) > blk_rq_pos(rqb);
+ 	error = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+ 	if (error)
+@@ -721,9 +722,10 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	blk_mq_unfreeze_queue(lo->lo_queue);
+ 
+ 	fput(old_file);
+-	if (lo->lo_flags & LO_FLAGS_PARTSCAN)
+-		loop_reread_partitions(lo, bdev);
++	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
+ 	mutex_unlock(&loop_ctl_mutex);
++	if (partscan)
++		loop_reread_partitions(lo, bdev);
+ 	return 0;
+ 
+ out_putf:
+@@ -904,6 +906,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	int		lo_flags = 0;
+ 	int		error;
+ 	loff_t		size;
++	bool		partscan;
+ 
+ 	/* This is safe, since we have a reference from open(). */
+ 	__module_get(THIS_MODULE);
+@@ -970,14 +973,15 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	lo->lo_state = Lo_bound;
+ 	if (part_shift)
+ 		lo->lo_flags |= LO_FLAGS_PARTSCAN;
+-	if (lo->lo_flags & LO_FLAGS_PARTSCAN)
+-		loop_reread_partitions(lo, bdev);
++	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
+ 
+ 	/* Grab the block_device to prevent its destruction after we
+ 	 * put /dev/loopXX inode. Later in __loop_clr_fd() we bdput(bdev).
+ 	 */
+ 	bdgrab(bdev);
+ 	mutex_unlock(&loop_ctl_mutex);
++	if (partscan)
++		loop_reread_partitions(lo, bdev);
+ 	return 0;
+ 
+ out_unlock:
+@@ -1158,6 +1162,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	int err;
+ 	struct loop_func_table *xfer;
+ 	kuid_t uid = current_uid();
++	struct block_device *bdev;
++	bool partscan = false;
+ 
+ 	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+ 	if (err)
+@@ -1246,10 +1252,13 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	     !(lo->lo_flags & LO_FLAGS_PARTSCAN)) {
+ 		lo->lo_flags |= LO_FLAGS_PARTSCAN;
+ 		lo->lo_disk->flags &= ~GENHD_FL_NO_PART_SCAN;
+-		loop_reread_partitions(lo, lo->lo_device);
++		bdev = lo->lo_device;
++		partscan = true;
+ 	}
+ out_unlock:
+ 	mutex_unlock(&loop_ctl_mutex);
++	if (partscan)
++		loop_reread_partitions(lo, bdev);
+ 
+ 	return err;
  }
- 
- void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
-@@ -1633,7 +1640,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- 
- 	list_splice_init(&plug->mq_list, &list);
- 
--	list_sort(NULL, &list, plug_ctx_cmp);
-+	list_sort(NULL, &list, plug_rq_cmp);
- 
- 	this_q = NULL;
- 	this_hctx = NULL;
 -- 
-2.17.1
+2.16.4
