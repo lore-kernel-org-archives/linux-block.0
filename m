@@ -1,56 +1,169 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:38774 "EHLO
-        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726238AbeJYJO3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Oct 2018 05:14:29 -0400
-From: Zhoujie Wu <zjwu@marvell.com>
-To: <mb@lightnvm.io>, <javier@cnexlabs.com>,
-        <linux-block@vger.kernel.org>
-CC: <hongd@marvell.com>, Zhoujie Wu <zjwu@marvell.com>
-Subject: [PATCH] lightnvm: pblk: ignore the smeta oob area scan
-Date: Wed, 24 Oct 2018 17:46:44 -0700
-Message-ID: <1540428404-30196-1-git-send-email-zjwu@marvell.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from mx2.suse.de ([195.135.220.15]:34910 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726935AbeJJRZs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 10 Oct 2018 13:25:48 -0400
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH 05/15] loop: Push lo_ctl_mutex down into individual ioctls
+Date: Wed, 10 Oct 2018 12:04:05 +0200
+Message-Id: <20181010100415.26525-6-jack@suse.cz>
+In-Reply-To: <20181010100415.26525-1-jack@suse.cz>
+References: <20181010100415.26525-1-jack@suse.cz>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The smeta area l2p mapping is empty, and actually the
-recovery procedure only need to restore data sector's l2p
-mapping. So ignore the smeta oob scan.
+Push acquisition of lo_ctl_mutex down into individual ioctl handling
+branches. This is a preparatory step for pushing the lock down into
+individual ioctl handling functions so that they can release the lock as
+they need it. We also factor out some simple ioctl handlers that will
+not need any special handling to reduce unnecessary code duplication.
 
-Signed-off-by: Zhoujie Wu <zjwu@marvell.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/lightnvm/pblk-recovery.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/block/loop.c | 88 +++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 63 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 5740b75..30f2616 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -334,6 +334,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
- 			       struct pblk_recov_alloc p)
- {
- 	struct nvm_tgt_dev *dev = pblk->dev;
-+	struct pblk_line_meta *lm = &pblk->lm;
- 	struct nvm_geo *geo = &dev->geo;
- 	struct ppa_addr *ppa_list;
- 	struct pblk_sec_meta *meta_list;
-@@ -342,12 +343,12 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
- 	void *data;
- 	dma_addr_t dma_ppa_list, dma_meta_list;
- 	__le64 *lba_list;
--	u64 paddr = 0;
-+	u64 paddr = lm->smeta_sec;
- 	bool padded = false;
- 	int rq_ppas, rq_len;
- 	int i, j;
- 	int ret;
--	u64 left_ppas = pblk_sec_in_open_line(pblk, line);
-+	u64 left_ppas = pblk_sec_in_open_line(pblk, line) - lm->smeta_sec;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 3fa5e63944a4..b7b3b4ae0896 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1394,70 +1394,108 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+ 	return 0;
+ }
  
- 	if (pblk_line_wp_is_unbalanced(pblk, line))
- 		pblk_warn(pblk, "recovering unbalanced line (%d)\n", line->id);
+-static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+-	unsigned int cmd, unsigned long arg)
++static int lo_simple_ioctl(struct loop_device *lo, unsigned int cmd,
++			   unsigned long arg)
+ {
+-	struct loop_device *lo = bdev->bd_disk->private_data;
+ 	int err;
+ 
+ 	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+ 	if (err)
+-		goto out_unlocked;
++		return err;
++	switch (cmd) {
++	case LOOP_SET_CAPACITY:
++		err = loop_set_capacity(lo);
++		break;
++	case LOOP_SET_DIRECT_IO:
++		err = loop_set_dio(lo, arg);
++		break;
++	case LOOP_SET_BLOCK_SIZE:
++		err = loop_set_block_size(lo, arg);
++		break;
++	default:
++		err = lo->ioctl ? lo->ioctl(lo, cmd, arg) : -EINVAL;
++	}
++	mutex_unlock(&loop_ctl_mutex);
++	return err;
++}
++
++static int lo_ioctl(struct block_device *bdev, fmode_t mode,
++	unsigned int cmd, unsigned long arg)
++{
++	struct loop_device *lo = bdev->bd_disk->private_data;
++	int err;
+ 
+ 	switch (cmd) {
+ 	case LOOP_SET_FD:
++		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++		if (err)
++			return err;
+ 		err = loop_set_fd(lo, mode, bdev, arg);
++		mutex_unlock(&loop_ctl_mutex);
+ 		break;
+ 	case LOOP_CHANGE_FD:
++		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++		if (err)
++			return err;
+ 		err = loop_change_fd(lo, bdev, arg);
++		mutex_unlock(&loop_ctl_mutex);
+ 		break;
+ 	case LOOP_CLR_FD:
++		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++		if (err)
++			return err;
+ 		/* loop_clr_fd would have unlocked loop_ctl_mutex on success */
+ 		err = loop_clr_fd(lo);
+-		if (!err)
+-			goto out_unlocked;
++		if (err)
++			mutex_unlock(&loop_ctl_mutex);
+ 		break;
+ 	case LOOP_SET_STATUS:
+ 		err = -EPERM;
+-		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
++		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
++			err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++			if (err)
++				return err;
+ 			err = loop_set_status_old(lo,
+ 					(struct loop_info __user *)arg);
++			mutex_unlock(&loop_ctl_mutex);
++		}
+ 		break;
+ 	case LOOP_GET_STATUS:
++		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++		if (err)
++			return err;
+ 		err = loop_get_status_old(lo, (struct loop_info __user *) arg);
+ 		/* loop_get_status() unlocks loop_ctl_mutex */
+-		goto out_unlocked;
++		break;
+ 	case LOOP_SET_STATUS64:
+ 		err = -EPERM;
+-		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
++		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
++			err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++			if (err)
++				return err;
+ 			err = loop_set_status64(lo,
+ 					(struct loop_info64 __user *) arg);
++			mutex_unlock(&loop_ctl_mutex);
++		}
+ 		break;
+ 	case LOOP_GET_STATUS64:
++		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++		if (err)
++			return err;
+ 		err = loop_get_status64(lo, (struct loop_info64 __user *) arg);
+ 		/* loop_get_status() unlocks loop_ctl_mutex */
+-		goto out_unlocked;
+-	case LOOP_SET_CAPACITY:
+-		err = -EPERM;
+-		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
+-			err = loop_set_capacity(lo);
+ 		break;
++	case LOOP_SET_CAPACITY:
+ 	case LOOP_SET_DIRECT_IO:
+-		err = -EPERM;
+-		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
+-			err = loop_set_dio(lo, arg);
+-		break;
+ 	case LOOP_SET_BLOCK_SIZE:
+-		err = -EPERM;
+-		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
+-			err = loop_set_block_size(lo, arg);
+-		break;
++		if (!(mode & FMODE_WRITE) && !capable(CAP_SYS_ADMIN))
++			return -EPERM;
++		/* Fall through */
+ 	default:
+-		err = lo->ioctl ? lo->ioctl(lo, cmd, arg) : -EINVAL;
++		err = lo_simple_ioctl(lo, cmd, arg);
++		break;
+ 	}
+-	mutex_unlock(&loop_ctl_mutex);
+ 
+-out_unlocked:
+ 	return err;
+ }
+ 
 -- 
-1.9.1
+2.16.4
