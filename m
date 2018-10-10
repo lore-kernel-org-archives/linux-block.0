@@ -1,126 +1,64 @@
-Return-Path: <39HHYWwkbBR8NTUF5GG9M5KKD8.BJJBG9PN9M7JIO9IO.7JH5S6J9F9MI9G.8F@M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v9 07/13] block: Add PCI P2P flag for request queue and
+ check support for requests
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Logan Gunthorpe <logang@deltatee.com>, linux-kernel@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-rdma@vger.kernel.org, linux-nvdimm@lists.01.org,
+ linux-block@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>,
+ =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Stephen Bates <sbates@raithlin.com>, Keith Busch <keith.busch@intel.com>,
+ =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+ Jason Gunthorpe <jgg@mellanox.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ Max Gurtovoy <maxg@mellanox.com>, Dan Williams <dan.j.williams@intel.com>,
+ Christoph Hellwig <hch@lst.de>
+References: <20181004212747.6301-1-logang@deltatee.com>
+ <20181004212747.6301-8-logang@deltatee.com>
+ <485de371-0e84-6f20-7f3b-cec5635b87fe@kernel.dk>
+ <20181010195901.GE5906@bhelgaas-glaptop.roam.corp.google.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <167fcf01-4bbc-f870-3750-6e950bfd6471@kernel.dk>
+Date: Wed, 10 Oct 2018 14:00:07 -0600
 MIME-Version: 1.0
-Date: Tue, 30 Oct 2018 08:00:04 -0700
-Message-ID: <000000000000ccd7e80579737060@google.com>
-Subject: upstream boot error (2)
-From: syzbot <syzbot+3701447012fe951dabb2@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+In-Reply-To: <20181010195901.GE5906@bhelgaas-glaptop.roam.corp.google.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
+On 10/10/18 1:59 PM, Bjorn Helgaas wrote:
+> On Fri, Oct 05, 2018 at 07:16:04PM -0600, Jens Axboe wrote:
+>> On 10/4/18 3:27 PM, Logan Gunthorpe wrote:
+>>> QUEUE_FLAG_PCI_P2P is introduced meaning a driver's request queue
+>>> supports targeting P2P memory. This will be used by P2P providers and
+>>> orchestrators (in subsequent patches) to ensure block devices can
+>>> support P2P memory before submitting P2P backed pages to submit_bio().
+>>
+>> Nit pick, but the subject line still says that it checks support
+>> for requests. This patch just adds the ability to flag support
+>> in the queue.
+> 
+> What about the following?  MAINTAINERS doesn't list a specific
+> maintainer for include/linux/blkdev.h (maybe the "BLOCK LAYER" entry
+> should have an F: pattern for it?), but I'd really like your ack
+> before merging this.
+> 
+> commit 7e647ae1eda290786851c3dff4f38189b982386d
+> Author: Logan Gunthorpe <logang@deltatee.com>
+> Date:   Thu Oct 4 15:27:41 2018 -0600
+> 
+>     block: Add PCI P2P flag for request queue
+>     
+>     Add QUEUE_FLAG_PCI_P2P, meaning a driver's request queue supports targeting
+>     P2P memory.  This will be used by P2P providers and orchestrators (in
+>     subsequent patches) to ensure block devices can support P2P memory before
+>     submitting P2P-backed pages to submit_bio().
+>     
+>     Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+>     Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+>     Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-syzbot found the following crash on:
+You can add my acked-by to this one.
 
-HEAD commit:    11743c56785c Merge tag 'rpmsg-v4.20' of git://github.com/a..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15121199400000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=93932074d01b4a5
-dashboard link: https://syzkaller.appspot.com/bug?extid=3701447012fe951dabb2
-compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
-
-Unfortunately, I don't have any reproducer for this crash yet.
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+3701447012fe951dabb2@syzkaller.appspotmail.com
-
-KASAN: use-after-free Read in del_timer_syncNon-volatile memory driver v1.3
-Linux agpgart interface v0.103
-[drm] Initialized vgem 1.0.0 20120112 for virtual device on minor 0
-usbcore: registered new interface driver udl
-==================================================================
-BUG: KASAN: use-after-free in __lock_acquire+0x36d9/0x4c20  
-kernel/locking/lockdep.c:3218
-Read of size 8 at addr ffff8801d1b6b540 by task swapper/0/1
-
-CPU: 0 PID: 1 Comm: swapper/0 Not tainted 4.19.0+ #88
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x244/0x39d lib/dump_stack.c:113
-  print_address_description.cold.7+0x9/0x1ff mm/kasan/report.c:256
-  kasan_report_error mm/kasan/report.c:354 [inline]
-  kasan_report.cold.8+0x242/0x309 mm/kasan/report.c:412
-  __asan_report_load8_noabort+0x14/0x20 mm/kasan/report.c:433
-  __lock_acquire+0x36d9/0x4c20 kernel/locking/lockdep.c:3218
-  lock_acquire+0x1ed/0x520 kernel/locking/lockdep.c:3844
-  del_timer_sync+0xb7/0x270 kernel/time/timer.c:1283
-  blk_cleanup_queue+0x413/0x710 block/blk-core.c:809
-  brd_free+0x5d/0x71 drivers/block/brd.c:422
-  brd_init+0x2eb/0x393 drivers/block/brd.c:518
-  do_one_initcall+0x145/0x957 init/main.c:890
-  do_initcall_level init/main.c:958 [inline]
-  do_initcalls init/main.c:966 [inline]
-  do_basic_setup init/main.c:984 [inline]
-  kernel_init_freeable+0x5c6/0x6b9 init/main.c:1148
-  kernel_init+0x11/0x1ae init/main.c:1068
-  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:350
-
-Allocated by task 1:
-  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
-  set_track mm/kasan/kasan.c:460 [inline]
-  kasan_kmalloc+0xc7/0xe0 mm/kasan/kasan.c:553
-  kmem_cache_alloc_node_trace+0x14c/0x740 mm/slab.c:3663
-  kmalloc_node include/linux/slab.h:584 [inline]
-  bdi_alloc_node+0x89/0xe0 mm/backing-dev.c:861
-  blk_alloc_queue_node+0x2b7/0xe80 block/blk-core.c:1024
-  blk_alloc_queue+0x1a/0x20 block/blk-core.c:911
-  brd_alloc+0xb9/0x540 drivers/block/brd.c:378
-  brd_init+0x11d/0x393 drivers/block/brd.c:498
-  do_one_initcall+0x145/0x957 init/main.c:890
-  do_initcall_level init/main.c:958 [inline]
-  do_initcalls init/main.c:966 [inline]
-  do_basic_setup init/main.c:984 [inline]
-  kernel_init_freeable+0x5c6/0x6b9 init/main.c:1148
-  kernel_init+0x11/0x1ae init/main.c:1068
-  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:350
-
-Freed by task 12:
-  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
-  set_track mm/kasan/kasan.c:460 [inline]
-  __kasan_slab_free+0x102/0x150 mm/kasan/kasan.c:521
-  kasan_slab_free+0xe/0x10 mm/kasan/kasan.c:528
-  __cache_free mm/slab.c:3498 [inline]
-  kfree+0xcf/0x230 mm/slab.c:3817
-  release_bdi mm/backing-dev.c:968 [inline]
-  kref_put include/linux/kref.h:70 [inline]
-  bdi_put+0x138/0x180 mm/backing-dev.c:973
-  blk_exit_queue+0xbf/0xf0 block/blk-core.c:746
-  __blk_release_queue+0x12f/0x510 block/blk-sysfs.c:841
-  process_one_work+0xc90/0x1c40 kernel/workqueue.c:2153
-  worker_thread+0x17f/0x1390 kernel/workqueue.c:2296
-  kthread+0x35a/0x440 kernel/kthread.c:246
-  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:350
-
-The buggy address belongs to the object at ffff8801d1b6ae80
-  which belongs to the cache kmalloc-2k of size 2048
-The buggy address is located 1728 bytes inside of
-  2048-byte region [ffff8801d1b6ae80, ffff8801d1b6b680)
-The buggy address belongs to the page:
-page:ffffea000746da80 count:1 mapcount:0 mapping:ffff8801da800c40 index:0x0  
-compound_mapcount: 0
-flags: 0x2fffc0000010200(slab|head)
-raw: 02fffc0000010200 ffffea000746da08 ffffea000746dc08 ffff8801da800c40
-raw: 0000000000000000 ffff8801d1b6a600 0000000100000003 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
-  ffff8801d1b6b400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-  ffff8801d1b6b480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> ffff8801d1b6b500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                            ^
-  ffff8801d1b6b580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-  ffff8801d1b6b600: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
-syzbot.
+-- 
+Jens Axboe
