@@ -1,86 +1,168 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:6549 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726183AbeJLKAY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Oct 2018 06:00:24 -0400
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-        Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH v3 03/11] scsi: sd_zbc: Fix sd_zbc_check_zones() error checks
-Date: Fri, 12 Oct 2018 11:30:04 +0900
-Message-Id: <20181012023012.29923-4-damien.lemoal@wdc.com>
-In-Reply-To: <20181012023012.29923-1-damien.lemoal@wdc.com>
-References: <20181012023012.29923-1-damien.lemoal@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 04/15] loop: Get rid of loop_index_mutex
+Date: Wed, 10 Oct 2018 12:04:04 +0200
+Message-Id: <20181010100415.26525-5-jack@suse.cz>
+In-Reply-To: <20181010100415.26525-1-jack@suse.cz>
+References: <20181010100415.26525-1-jack@suse.cz>
+List-ID: <linux-block@vger.kernel.org>
 
-The 32 bits overflow check for the zone size value is already done
-within sd_zbc_check_zones() with the test:
+Now that loop_ctl_mutex is global, just get rid of loop_index_mutex as
+there is no good reason to keep these two separate and it just
+complicates the locking.
 
-} else if (logical_to_sectors(sdkp->device, zone_blocks) > UINT_MAX) {
-
-so there is no need to check again for an out of range value in
-sd_zbc_read_zones(). Simplify the code and fix sd_zbc_check_zones()
-error return to -EFBIG instead of -ENODEV if the zone size is too large.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/scsi/sd_zbc.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+ drivers/block/loop.c | 41 ++++++++++++++++++++---------------------
+ 1 file changed, 20 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index ca73c46931c0..44b64b4a922a 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -373,7 +373,7 @@ static int sd_zbc_check_zoned_characteristics(struct scsi_disk *sdkp,
-  * Returns the zone size in number of blocks upon success or an error code
-  * upon failure.
-  */
--static s64 sd_zbc_check_zones(struct scsi_disk *sdkp)
-+static s32 sd_zbc_check_zones(struct scsi_disk *sdkp)
- {
- 	u64 zone_blocks = 0;
- 	sector_t max_lba, block = 0;
-@@ -472,7 +472,7 @@ static s64 sd_zbc_check_zones(struct scsi_disk *sdkp)
- 		if (sdkp->first_scan)
- 			sd_printk(KERN_NOTICE, sdkp,
- 				  "Zone size too large\n");
--		ret = -ENODEV;
-+		ret = -EFBIG;
- 	} else {
- 		ret = zone_blocks;
- 	}
-@@ -668,8 +668,7 @@ static int sd_zbc_setup(struct scsi_disk *sdkp, u32 zone_blocks)
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index cc43d835fe6f..3fa5e63944a4 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -83,7 +83,6 @@
+ #include <linux/uaccess.h>
  
- int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
- {
--	int64_t zone_blocks;
--	int ret;
-+	int ret, zone_blocks;
+ static DEFINE_IDR(loop_index_idr);
+-static DEFINE_MUTEX(loop_index_mutex);
+ static DEFINE_MUTEX(loop_ctl_mutex);
  
- 	if (!sd_is_zoned(sdkp))
+ static int max_part;
+@@ -1627,9 +1626,11 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
+ static int lo_open(struct block_device *bdev, fmode_t mode)
+ {
+ 	struct loop_device *lo;
+-	int err = 0;
++	int err;
+ 
+-	mutex_lock(&loop_index_mutex);
++	err = mutex_lock_killable(&loop_ctl_mutex);
++	if (err)
++		return err;
+ 	lo = bdev->bd_disk->private_data;
+ 	if (!lo) {
+ 		err = -ENXIO;
+@@ -1638,7 +1639,7 @@ static int lo_open(struct block_device *bdev, fmode_t mode)
+ 
+ 	atomic_inc(&lo->lo_refcnt);
+ out:
+-	mutex_unlock(&loop_index_mutex);
++	mutex_unlock(&loop_ctl_mutex);
+ 	return err;
+ }
+ 
+@@ -1647,12 +1648,11 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 	struct loop_device *lo;
+ 	int err;
+ 
+-	mutex_lock(&loop_index_mutex);
++	mutex_lock(&loop_ctl_mutex);
+ 	lo = disk->private_data;
+ 	if (atomic_dec_return(&lo->lo_refcnt))
+-		goto unlock_index;
++		goto out_unlock;
+ 
+-	mutex_lock(&loop_ctl_mutex);
+ 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
  		/*
-@@ -688,12 +687,10 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
- 	 * an eventual last runt zone) that is a power of 2 are supported.
- 	 */
- 	zone_blocks = sd_zbc_check_zones(sdkp);
--	ret = -EFBIG;
--	if (zone_blocks != (u32)zone_blocks)
--		goto err;
--	ret = zone_blocks;
--	if (ret < 0)
-+	if (zone_blocks < 0) {
-+		ret = zone_blocks;
- 		goto err;
-+	}
+ 		 * In autoclear mode, stop the loop thread
+@@ -1660,7 +1660,7 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 		 */
+ 		err = loop_clr_fd(lo);
+ 		if (!err)
+-			goto unlock_index;
++			return;
+ 	} else if (lo->lo_state == Lo_bound) {
+ 		/*
+ 		 * Otherwise keep thread (if running) and config,
+@@ -1670,9 +1670,8 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 		blk_mq_unfreeze_queue(lo->lo_queue);
+ 	}
  
- 	/* The drive satisfies the kernel restrictions: set it up */
- 	ret = sd_zbc_setup(sdkp, zone_blocks);
++out_unlock:
+ 	mutex_unlock(&loop_ctl_mutex);
+-unlock_index:
+-	mutex_unlock(&loop_index_mutex);
+ }
+ 
+ static const struct block_device_operations lo_fops = {
+@@ -1973,7 +1972,7 @@ static struct kobject *loop_probe(dev_t dev, int *part, void *data)
+ 	struct kobject *kobj;
+ 	int err;
+ 
+-	mutex_lock(&loop_index_mutex);
++	mutex_lock(&loop_ctl_mutex);
+ 	err = loop_lookup(&lo, MINOR(dev) >> part_shift);
+ 	if (err < 0)
+ 		err = loop_add(&lo, MINOR(dev) >> part_shift);
+@@ -1981,7 +1980,7 @@ static struct kobject *loop_probe(dev_t dev, int *part, void *data)
+ 		kobj = NULL;
+ 	else
+ 		kobj = get_disk_and_module(lo->lo_disk);
+-	mutex_unlock(&loop_index_mutex);
++	mutex_unlock(&loop_ctl_mutex);
+ 
+ 	*part = 0;
+ 	return kobj;
+@@ -1991,9 +1990,13 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
+ 			       unsigned long parm)
+ {
+ 	struct loop_device *lo;
+-	int ret = -ENOSYS;
++	int ret;
+ 
+-	mutex_lock(&loop_index_mutex);
++	ret = mutex_lock_killable(&loop_ctl_mutex);
++	if (ret)
++		return ret;
++
++	ret = -ENOSYS;
+ 	switch (cmd) {
+ 	case LOOP_CTL_ADD:
+ 		ret = loop_lookup(&lo, parm);
+@@ -2007,9 +2010,6 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
+ 		ret = loop_lookup(&lo, parm);
+ 		if (ret < 0)
+ 			break;
+-		ret = mutex_lock_killable(&loop_ctl_mutex);
+-		if (ret)
+-			break;
+ 		if (lo->lo_state != Lo_unbound) {
+ 			ret = -EBUSY;
+ 			mutex_unlock(&loop_ctl_mutex);
+@@ -2021,7 +2021,6 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
+ 			break;
+ 		}
+ 		lo->lo_disk->private_data = NULL;
+-		mutex_unlock(&loop_ctl_mutex);
+ 		idr_remove(&loop_index_idr, lo->lo_number);
+ 		loop_remove(lo);
+ 		break;
+@@ -2031,7 +2030,7 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
+ 			break;
+ 		ret = loop_add(&lo, -1);
+ 	}
+-	mutex_unlock(&loop_index_mutex);
++	mutex_unlock(&loop_ctl_mutex);
+ 
+ 	return ret;
+ }
+@@ -2115,10 +2114,10 @@ static int __init loop_init(void)
+ 				  THIS_MODULE, loop_probe, NULL, NULL);
+ 
+ 	/* pre-create number of devices given by config or max_loop */
+-	mutex_lock(&loop_index_mutex);
++	mutex_lock(&loop_ctl_mutex);
+ 	for (i = 0; i < nr; i++)
+ 		loop_add(&lo, i);
+-	mutex_unlock(&loop_index_mutex);
++	mutex_unlock(&loop_ctl_mutex);
+ 
+ 	printk(KERN_INFO "loop: module loaded\n");
+ 	return 0;
 -- 
-2.17.1
+2.16.4
