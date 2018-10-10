@@ -1,21 +1,172 @@
-Return-Path: <hch@lst.de>
-Date: Wed, 10 Oct 2018 15:28:12 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <damien.lemoal@wdc.com>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: Re: [PATCH 08/11] block: Improve zone reset execution
-Message-ID: <20181010132812.GH22273@lst.de>
-References: <20181010015239.24930-1-damien.lemoal@wdc.com> <20181010015239.24930-9-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20181010015239.24930-9-damien.lemoal@wdc.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+        Matias Bjorling <matias.bjorling@wdc.com>
+Subject: [PATCH 08/11] block: Improve zone reset execution
+Date: Wed, 10 Oct 2018 10:52:36 +0900
+Message-Id: <20181010015239.24930-9-damien.lemoal@wdc.com>
+In-Reply-To: <20181010015239.24930-1-damien.lemoal@wdc.com>
+References: <20181010015239.24930-1-damien.lemoal@wdc.com>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
+There is no need to synchronously execute all REQ_OP_ZONE_RESET BIOs
+necessary to reset a range of zones. Similarly to what is done for
+discard BIOs in blk-lib.c, all zone reset BIOs can be chained and
+executed asynchronously and a synchronous call done only for the last
+BIO of the chain.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Modify blkdev_reset_zones() to operate similarly to
+blkdev_issue_discard() using the next_bio() helper for chaining BIOs. To
+avoid code duplication of that function in blk_zoned.c, rename
+next_bio() into blk_next_bio() and declare it as a block internal
+function in blk.h.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ block/blk-lib.c   | 13 ++++++-------
+ block/blk-zoned.c | 29 ++++++++++++++++-------------
+ block/blk.h       |  2 ++
+ 3 files changed, 24 insertions(+), 20 deletions(-)
+
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index d1b9dd03da25..d7bedee5f9ba 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -10,8 +10,7 @@
+ 
+ #include "blk.h"
+ 
+-static struct bio *next_bio(struct bio *bio, unsigned int nr_pages,
+-		gfp_t gfp)
++struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp)
+ {
+ 	struct bio *new = bio_alloc(gfp, nr_pages);
+ 
+@@ -87,7 +86,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 			req_sects = end_sect - sector;
+ 		}
+ 
+-		bio = next_bio(bio, 0, gfp_mask);
++		bio = blk_next_bio(bio, 0, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio_set_dev(bio, bdev);
+ 		bio_set_op_attrs(bio, op, 0);
+@@ -189,7 +188,7 @@ static int __blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
+ 	max_write_same_sectors = UINT_MAX >> 9;
+ 
+ 	while (nr_sects) {
+-		bio = next_bio(bio, 1, gfp_mask);
++		bio = blk_next_bio(bio, 1, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio_set_dev(bio, bdev);
+ 		bio->bi_vcnt = 1;
+@@ -265,7 +264,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+ 		return -EOPNOTSUPP;
+ 
+ 	while (nr_sects) {
+-		bio = next_bio(bio, 0, gfp_mask);
++		bio = blk_next_bio(bio, 0, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio_set_dev(bio, bdev);
+ 		bio->bi_opf = REQ_OP_WRITE_ZEROES;
+@@ -316,8 +315,8 @@ static int __blkdev_issue_zero_pages(struct block_device *bdev,
+ 		return -EPERM;
+ 
+ 	while (nr_sects != 0) {
+-		bio = next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
+-			       gfp_mask);
++		bio = blk_next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
++				   gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio_set_dev(bio, bdev);
+ 		bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index f2c8b859fc18..ca2faef940af 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -13,6 +13,8 @@
+ #include <linux/rbtree.h>
+ #include <linux/blkdev.h>
+ 
++#include "blk.h"
++
+ static inline sector_t blk_zone_start(struct request_queue *q,
+ 				      sector_t sector)
+ {
+@@ -277,16 +279,17 @@ int blkdev_reset_zones(struct block_device *bdev,
+ 	struct request_queue *q = bdev_get_queue(bdev);
+ 	sector_t zone_sectors;
+ 	sector_t end_sector = sector + nr_sectors;
+-	struct bio *bio;
++	struct bio *bio = NULL;
++	struct blk_plug plug;
+ 	int ret;
+ 
+-	if (!q)
+-		return -ENXIO;
+-
+ 	if (!blk_queue_is_zoned(q))
+ 		return -EOPNOTSUPP;
+ 
+-	if (end_sector > bdev->bd_part->nr_sects)
++	if (bdev_read_only(bdev))
++		return -EPERM;
++
++	if (!nr_sectors || end_sector > bdev->bd_part->nr_sects)
+ 		/* Out of range */
+ 		return -EINVAL;
+ 
+@@ -299,19 +302,14 @@ int blkdev_reset_zones(struct block_device *bdev,
+ 	    end_sector != bdev->bd_part->nr_sects)
+ 		return -EINVAL;
+ 
++	blk_start_plug(&plug);
+ 	while (sector < end_sector) {
+ 
+-		bio = bio_alloc(gfp_mask, 0);
++		bio = blk_next_bio(bio, 0, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio_set_dev(bio, bdev);
+ 		bio_set_op_attrs(bio, REQ_OP_ZONE_RESET, 0);
+ 
+-		ret = submit_bio_wait(bio);
+-		bio_put(bio);
+-
+-		if (ret)
+-			return ret;
+-
+ 		sector += zone_sectors;
+ 
+ 		/* This may take a while, so be nice to others */
+@@ -319,7 +317,12 @@ int blkdev_reset_zones(struct block_device *bdev,
+ 
+ 	}
+ 
+-	return 0;
++	ret = submit_bio_wait(bio);
++	bio_put(bio);
++
++	blk_finish_plug(&plug);
++
++	return ret;
+ }
+ EXPORT_SYMBOL_GPL(blkdev_reset_zones);
+ 
+diff --git a/block/blk.h b/block/blk.h
+index 9db4e389582c..3d67844676fb 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -421,4 +421,6 @@ extern int blk_iolatency_init(struct request_queue *q);
+ static inline int blk_iolatency_init(struct request_queue *q) { return 0; }
+ #endif
+ 
++struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp);
++
+ #endif /* BLK_INTERNAL_H */
+-- 
+2.17.1
