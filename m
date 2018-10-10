@@ -1,34 +1,25 @@
-Return-Path: <bart.vanassche@gmail.com>
-Return-Path: <bart.vanassche@gmail.com>
-Message-ID: <1539190406.195557.4.camel@acm.org>
-Subject: Re: [dm-devel] [PATCH 06/11] block: Introduce BLKGETZONESZ ioctl
-From: Bart Van Assche <bvanassche@acm.org>
-To: Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org, "Martin K .
- Petersen" <martin.petersen@oracle.com>, dm-devel@redhat.com, Mike Snitzer
- <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, Matias Bjorling <matias.bjorling@wdc.com>
-Date: Wed, 10 Oct 2018 09:53:26 -0700
+Return-Path: <hch@lst.de>
+Date: Wed, 10 Oct 2018 15:27:26 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Matias Bjorling <matias.bjorling@wdc.com>
+Subject: Re: [PATCH 06/11] block: Introduce BLKGETZONESZ ioctl
+Message-ID: <20181010132726.GF22273@lst.de>
+References: <20181010015239.24930-1-damien.lemoal@wdc.com> <20181010015239.24930-7-damien.lemoal@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20181010015239.24930-7-damien.lemoal@wdc.com>
-References: <20181010015239.24930-1-damien.lemoal@wdc.com>
-	 <20181010015239.24930-7-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset="UTF-7"
-Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, 2018-10-10 at 10:52 +-0900, Damien Le Moal wrote:
-+AD4  +ACM-define BLKREPORTZONE	+AF8-IOWR(0x12, 130, struct blk+AF8-zone+AF8-report)
-+AD4  +ACM-define BLKRESETZONE	+AF8-IOW(0x12, 131, struct blk+AF8-zone+AF8-range)
-+AD4 +-+ACM-define BLKGETZONESZ	+AF8-IOW(0x12, 132, unsigned int)
+On Wed, Oct 10, 2018 at 10:52:34AM +0900, Damien Le Moal wrote:
+> Get a zoned block device zone size in number of 512 B sectors.
+> The zone size is always 0 for regular block devices.
 
->From Documentation/ioctl/botching-up-ioctls.txt, a collection of lessons learned
-the hard way about ioctls:
+Looks good,
 
- +ACo Only use fixed sized integers. To avoid conflicts with typedefs in userspace
-   the kernel has special types like +AF8AXw-u32, +AF8AXw-s64. Use them.
-
-Please follow that advice.
-
-Thanks,
-
-Bart.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
