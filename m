@@ -1,149 +1,91 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 05/14] blk-mq: allow software queue to map to multiple hardware queues
-Date: Thu, 25 Oct 2018 15:16:17 -0600
-Message-Id: <20181025211626.12692-6-axboe@kernel.dk>
-In-Reply-To: <20181025211626.12692-1-axboe@kernel.dk>
-References: <20181025211626.12692-1-axboe@kernel.dk>
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 10/15] loop: Push loop_ctl_mutex down to loop_set_fd()
+Date: Wed, 10 Oct 2018 12:04:10 +0200
+Message-Id: <20181010100415.26525-11-jack@suse.cz>
+In-Reply-To: <20181010100415.26525-1-jack@suse.cz>
+References: <20181010100415.26525-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-The mapping used to be dependent on just the CPU location, but
-now it's a tuple of { type, cpu} instead. This is a prep patch
-for allowing a single software queue to map to multiple hardware
-queues. No functional changes in this patch.
+Push lo_ctl_mutex down to loop_set_fd(). We will need this to be able to
+call loop_reread_partitions() without lo_ctl_mutex.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/blk-mq-sched.c   |  2 +-
- block/blk-mq.c         | 18 ++++++++++++------
- block/blk-mq.h         |  2 +-
- block/kyber-iosched.c  |  6 +++---
- include/linux/blk-mq.h |  3 ++-
- 5 files changed, 19 insertions(+), 12 deletions(-)
+ drivers/block/loop.c | 26 ++++++++++++++------------
+ 1 file changed, 14 insertions(+), 12 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 8125e9393ec2..d232ecf3290c 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -110,7 +110,7 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
- static struct blk_mq_ctx *blk_mq_next_ctx(struct blk_mq_hw_ctx *hctx,
- 					  struct blk_mq_ctx *ctx)
- {
--	unsigned idx = ctx->index_hw;
-+	unsigned short idx = ctx->index_hw[hctx->type];
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 5661489d11a7..b4500d82238d 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -919,13 +919,17 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	if (!file)
+ 		goto out;
  
- 	if (++idx == hctx->nr_ctx)
- 		idx = 0;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e6ea7da99125..fab84c6bda18 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -75,14 +75,18 @@ static bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx)
- static void blk_mq_hctx_mark_pending(struct blk_mq_hw_ctx *hctx,
- 				     struct blk_mq_ctx *ctx)
- {
--	if (!sbitmap_test_bit(&hctx->ctx_map, ctx->index_hw))
--		sbitmap_set_bit(&hctx->ctx_map, ctx->index_hw);
-+	const int bit = ctx->index_hw[hctx->type];
++	error = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++	if (error)
++		goto out_putf;
 +
-+	if (!sbitmap_test_bit(&hctx->ctx_map, bit))
-+		sbitmap_set_bit(&hctx->ctx_map, bit);
- }
+ 	error = -EBUSY;
+ 	if (lo->lo_state != Lo_unbound)
+-		goto out_putf;
++		goto out_unlock;
  
- static void blk_mq_hctx_clear_pending(struct blk_mq_hw_ctx *hctx,
- 				      struct blk_mq_ctx *ctx)
- {
--	sbitmap_clear_bit(&hctx->ctx_map, ctx->index_hw);
-+	const int bit = ctx->index_hw[hctx->type];
-+
-+	sbitmap_clear_bit(&hctx->ctx_map, bit);
- }
+ 	error = loop_validate_file(file, bdev);
+ 	if (error)
+-		goto out_putf;
++		goto out_unlock;
  
- struct mq_inflight {
-@@ -954,7 +958,7 @@ static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr,
- struct request *blk_mq_dequeue_from_ctx(struct blk_mq_hw_ctx *hctx,
- 					struct blk_mq_ctx *start)
- {
--	unsigned off = start ? start->index_hw : 0;
-+	unsigned off = start ? start->index_hw[hctx->type] : 0;
- 	struct dispatch_rq_data data = {
- 		.hctx = hctx,
- 		.rq   = NULL,
-@@ -2342,10 +2346,12 @@ static void blk_mq_map_swqueue(struct request_queue *q)
+ 	mapping = file->f_mapping;
+ 	inode = mapping->host;
+@@ -937,10 +941,10 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	error = -EFBIG;
+ 	size = get_loop_size(lo, file);
+ 	if ((loff_t)(sector_t)size != size)
+-		goto out_putf;
++		goto out_unlock;
+ 	error = loop_prepare_queue(lo);
+ 	if (error)
+-		goto out_putf;
++		goto out_unlock;
  
- 		ctx = per_cpu_ptr(q->queue_ctx, i);
- 		hctx = blk_mq_map_queue_type(q, 0, i);
--
-+		hctx->type = 0;
- 		cpumask_set_cpu(i, hctx->cpumask);
--		ctx->index_hw = hctx->nr_ctx;
-+		ctx->index_hw[hctx->type] = hctx->nr_ctx;
- 		hctx->ctxs[hctx->nr_ctx++] = ctx;
-+		/* wrap */
-+		BUG_ON(!hctx->nr_ctx);
- 	}
+ 	error = 0;
  
- 	mutex_unlock(&q->sysfs_lock);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 55428b92c019..7b5a790acdbf 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -17,7 +17,7 @@ struct blk_mq_ctx {
- 	}  ____cacheline_aligned_in_smp;
+@@ -979,11 +983,14 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	 * put /dev/loopXX inode. Later in __loop_clr_fd() we bdput(bdev).
+ 	 */
+ 	bdgrab(bdev);
++	mutex_unlock(&loop_ctl_mutex);
+ 	return 0;
  
- 	unsigned int		cpu;
--	unsigned int		index_hw;
-+	unsigned short		index_hw[HCTX_MAX_TYPES];
+- out_putf:
++out_unlock:
++	mutex_unlock(&loop_ctl_mutex);
++out_putf:
+ 	fput(file);
+- out:
++out:
+ 	/* This is safe: open() is still holding a reference. */
+ 	module_put(THIS_MODULE);
+ 	return error;
+@@ -1461,12 +1468,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
  
- 	/* incremented at dispatch time */
- 	unsigned long		rq_dispatched[2];
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index 728757a34fa0..b824a639d5d4 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -576,7 +576,7 @@ static bool kyber_bio_merge(struct blk_mq_hw_ctx *hctx, struct bio *bio)
- {
- 	struct kyber_hctx_data *khd = hctx->sched_data;
- 	struct blk_mq_ctx *ctx = blk_mq_get_ctx(hctx->queue);
--	struct kyber_ctx_queue *kcq = &khd->kcqs[ctx->index_hw];
-+	struct kyber_ctx_queue *kcq = &khd->kcqs[ctx->index_hw[hctx->type]];
- 	unsigned int sched_domain = kyber_sched_domain(bio->bi_opf);
- 	struct list_head *rq_list = &kcq->rq_list[sched_domain];
- 	bool merged;
-@@ -602,7 +602,7 @@ static void kyber_insert_requests(struct blk_mq_hw_ctx *hctx,
- 
- 	list_for_each_entry_safe(rq, next, rq_list, queuelist) {
- 		unsigned int sched_domain = kyber_sched_domain(rq->cmd_flags);
--		struct kyber_ctx_queue *kcq = &khd->kcqs[rq->mq_ctx->index_hw];
-+		struct kyber_ctx_queue *kcq = &khd->kcqs[rq->mq_ctx->index_hw[hctx->type]];
- 		struct list_head *head = &kcq->rq_list[sched_domain];
- 
- 		spin_lock(&kcq->lock);
-@@ -611,7 +611,7 @@ static void kyber_insert_requests(struct blk_mq_hw_ctx *hctx,
- 		else
- 			list_move_tail(&rq->queuelist, head);
- 		sbitmap_set_bit(&khd->kcq_map[sched_domain],
--				rq->mq_ctx->index_hw);
-+				rq->mq_ctx->index_hw[hctx->type]);
- 		blk_mq_sched_request_inserted(rq);
- 		spin_unlock(&kcq->lock);
- 	}
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index c992069bb3ee..72b36faf182d 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -37,7 +37,8 @@ struct blk_mq_hw_ctx {
- 	struct blk_mq_ctx	*dispatch_from;
- 	unsigned int		dispatch_busy;
- 
--	unsigned int		nr_ctx;
-+	unsigned short		type;
-+	unsigned short		nr_ctx;
- 	struct blk_mq_ctx	**ctxs;
- 
- 	spinlock_t		dispatch_wait_lock;
+ 	switch (cmd) {
+ 	case LOOP_SET_FD:
+-		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+-		if (err)
+-			return err;
+-		err = loop_set_fd(lo, mode, bdev, arg);
+-		mutex_unlock(&loop_ctl_mutex);
+-		break;
++		return loop_set_fd(lo, mode, bdev, arg);
+ 	case LOOP_CHANGE_FD:
+ 		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+ 		if (err)
 -- 
-2.17.1
+2.16.4
