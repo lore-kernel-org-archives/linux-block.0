@@ -1,108 +1,126 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-ide@vger.kernel.org
-Subject: [PATCHSET 0/28] blk-mq driver conversions and legacy path removal
-Date: Thu, 25 Oct 2018 15:10:11 -0600
-Message-Id: <20181025211039.11559-1-axboe@kernel.dk>
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 06/15] loop: Split setting of lo_state from loop_clr_fd
+Date: Wed, 10 Oct 2018 12:04:06 +0200
+Message-Id: <20181010100415.26525-7-jack@suse.cz>
+In-Reply-To: <20181010100415.26525-1-jack@suse.cz>
+References: <20181010100415.26525-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-The first round of this went into 4.20-rc, but we've still some of
-them pending. This patch series converts the remaining drivers to
-blk-mq. The ones that support dual paths (like SCSI and DM) have
-the non-mq path removed. At the end, legacy IO code and schedulers
-are killed off.
+Move setting of lo_state to Lo_rundown out into the callers. That will
+allow us to unlock loop_ctl_mutex while the loop device is protected
+from other changes by its special state.
 
-This patch series is on top of my for-linus branch. It can also
-be bound in my mq-conversions branch.
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ drivers/block/loop.c | 52 +++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 31 insertions(+), 21 deletions(-)
 
- Documentation/block/biodoc.txt         |   88 -
- Documentation/block/cfq-iosched.txt    |  291 --
- Documentation/scsi/scsi-parameters.txt |    5 -
- block/Kconfig                          |    6 -
- block/Kconfig.iosched                  |   61 -
- block/Makefile                         |    5 +-
- block/bfq-iosched.c                    |    1 -
- block/blk-cgroup.c                     |   55 -
- block/blk-core.c                       | 1860 +-----------
- block/blk-exec.c                       |   20 +-
- block/blk-flush.c                      |  154 +-
- block/blk-ioc.c                        |   46 +-
- block/blk-merge.c                      |   35 +-
- block/blk-mq-debugfs.c                 |    2 -
- block/blk-mq-tag.c                     |    6 +-
- block/blk-mq.c                         |   13 +-
- block/blk-settings.c                   |   49 -
- block/blk-softirq.c                    |   20 -
- block/blk-sysfs.c                      |   39 +-
- block/blk-tag.c                        |  378 ---
- block/blk-timeout.c                    |   99 +-
- block/blk-wbt.c                        |    3 +-
- block/blk.h                            |   60 +-
- block/bsg-lib.c                        |  131 +-
- block/cfq-iosched.c                    | 4916 --------------------------------
- block/deadline-iosched.c               |  560 ----
- block/elevator.c                       |  447 +--
- block/kyber-iosched.c                  |    1 -
- block/mq-deadline.c                    |    1 -
- block/noop-iosched.c                   |  124 -
- drivers/block/sunvdc.c                 |  149 +-
- drivers/ide/ide-atapi.c                |   25 +-
- drivers/ide/ide-cd.c                   |  175 +-
- drivers/ide/ide-disk.c                 |    5 +-
- drivers/ide/ide-io.c                   |  101 +-
- drivers/ide/ide-park.c                 |    4 +-
- drivers/ide/ide-pm.c                   |   28 +-
- drivers/ide/ide-probe.c                |   68 +-
- drivers/infiniband/ulp/srp/ib_srp.c    |    7 -
- drivers/md/Kconfig                     |   11 -
- drivers/md/dm-core.h                   |   10 -
- drivers/md/dm-mpath.c                  |   18 +-
- drivers/md/dm-rq.c                     |  293 +-
- drivers/md/dm-rq.h                     |    4 -
- drivers/md/dm-sysfs.c                  |    3 +-
- drivers/md/dm-table.c                  |   36 +-
- drivers/md/dm.c                        |   21 +-
- drivers/md/dm.h                        |    1 -
- drivers/memstick/core/ms_block.c       |  110 +-
- drivers/memstick/core/ms_block.h       |    1 +
- drivers/memstick/core/mspro_block.c    |  121 +-
- drivers/s390/block/dasd_ioctl.c        |   22 +-
- drivers/scsi/Kconfig                   |   12 -
- drivers/scsi/cxlflash/main.c           |    6 -
- drivers/scsi/hosts.c                   |   29 +-
- drivers/scsi/lpfc/lpfc_scsi.c          |    2 +-
- drivers/scsi/osd/osd_initiator.c       |    4 +-
- drivers/scsi/osst.c                    |    2 +-
- drivers/scsi/qedi/qedi_main.c          |    3 +-
- drivers/scsi/qla2xxx/qla_os.c          |   30 +-
- drivers/scsi/scsi.c                    |    5 +-
- drivers/scsi/scsi_debug.c              |    3 +-
- drivers/scsi/scsi_error.c              |    4 +-
- drivers/scsi/scsi_lib.c                |  624 +---
- drivers/scsi/scsi_priv.h               |    1 -
- drivers/scsi/scsi_scan.c               |   10 +-
- drivers/scsi/scsi_sysfs.c              |    8 +-
- drivers/scsi/scsi_transport_fc.c       |   72 +-
- drivers/scsi/scsi_transport_iscsi.c    |    9 +-
- drivers/scsi/scsi_transport_sas.c      |   10 +-
- drivers/scsi/sg.c                      |    2 +-
- drivers/scsi/st.c                      |    2 +-
- drivers/scsi/ufs/ufshcd.c              |    6 -
- drivers/target/target_core_pscsi.c     |    2 +-
- include/linux/blk-cgroup.h             |  108 -
- include/linux/blkdev.h                 |  174 +-
- include/linux/bsg-lib.h                |    3 +-
- include/linux/elevator.h               |   90 +-
- include/linux/ide.h                    |   13 +-
- include/linux/init.h                   |    1 -
- include/scsi/scsi_host.h               |   18 +-
- include/scsi/scsi_tcq.h                |   14 +-
- init/do_mounts_initrd.c                |    3 -
- init/initramfs.c                       |    6 -
- init/main.c                            |   12 -
- 85 files changed, 833 insertions(+), 11144 deletions(-)
-
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index b7b3b4ae0896..2410921bd9ff 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -976,7 +976,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 		loop_reread_partitions(lo, bdev);
+ 
+ 	/* Grab the block_device to prevent its destruction after we
+-	 * put /dev/loopXX inode. Later in loop_clr_fd() we bdput(bdev).
++	 * put /dev/loopXX inode. Later in __loop_clr_fd() we bdput(bdev).
+ 	 */
+ 	bdgrab(bdev);
+ 	return 0;
+@@ -1026,31 +1026,15 @@ loop_init_xfer(struct loop_device *lo, struct loop_func_table *xfer,
+ 	return err;
+ }
+ 
+-static int loop_clr_fd(struct loop_device *lo)
++static int __loop_clr_fd(struct loop_device *lo)
+ {
+ 	struct file *filp = lo->lo_backing_file;
+ 	gfp_t gfp = lo->old_gfp_mask;
+ 	struct block_device *bdev = lo->lo_device;
+ 
+-	if (lo->lo_state != Lo_bound)
++	if (WARN_ON_ONCE(lo->lo_state != Lo_rundown))
+ 		return -ENXIO;
+ 
+-	/*
+-	 * If we've explicitly asked to tear down the loop device,
+-	 * and it has an elevated reference count, set it for auto-teardown when
+-	 * the last reference goes away. This stops $!~#$@ udev from
+-	 * preventing teardown because it decided that it needs to run blkid on
+-	 * the loopback device whenever they appear. xfstests is notorious for
+-	 * failing tests because blkid via udev races with a losetup
+-	 * <dev>/do something like mkfs/losetup -d <dev> causing the losetup -d
+-	 * command to fail with EBUSY.
+-	 */
+-	if (atomic_read(&lo->lo_refcnt) > 1) {
+-		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
+-		mutex_unlock(&loop_ctl_mutex);
+-		return 0;
+-	}
+-
+ 	if (filp == NULL)
+ 		return -EINVAL;
+ 
+@@ -1058,7 +1042,6 @@ static int loop_clr_fd(struct loop_device *lo)
+ 	blk_mq_freeze_queue(lo->lo_queue);
+ 
+ 	spin_lock_irq(&lo->lo_lock);
+-	lo->lo_state = Lo_rundown;
+ 	lo->lo_backing_file = NULL;
+ 	spin_unlock_irq(&lo->lo_lock);
+ 
+@@ -1111,6 +1094,30 @@ static int loop_clr_fd(struct loop_device *lo)
+ 	return 0;
+ }
+ 
++static int loop_clr_fd(struct loop_device *lo)
++{
++	if (lo->lo_state != Lo_bound)
++		return -ENXIO;
++	/*
++	 * If we've explicitly asked to tear down the loop device,
++	 * and it has an elevated reference count, set it for auto-teardown when
++	 * the last reference goes away. This stops $!~#$@ udev from
++	 * preventing teardown because it decided that it needs to run blkid on
++	 * the loopback device whenever they appear. xfstests is notorious for
++	 * failing tests because blkid via udev races with a losetup
++	 * <dev>/do something like mkfs/losetup -d <dev> causing the losetup -d
++	 * command to fail with EBUSY.
++	 */
++	if (atomic_read(&lo->lo_refcnt) > 1) {
++		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
++		mutex_unlock(&loop_ctl_mutex);
++		return 0;
++	}
++	lo->lo_state = Lo_rundown;
++
++	return __loop_clr_fd(lo);
++}
++
+ static int
+ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ {
+@@ -1692,11 +1699,14 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 		goto out_unlock;
+ 
+ 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
++		if (lo->lo_state != Lo_bound)
++			goto out_unlock;
++		lo->lo_state = Lo_rundown;
+ 		/*
+ 		 * In autoclear mode, stop the loop thread
+ 		 * and remove configuration after last close.
+ 		 */
+-		err = loop_clr_fd(lo);
++		err = __loop_clr_fd(lo);
+ 		if (!err)
+ 			return;
+ 	} else if (lo->lo_state == Lo_bound) {
 -- 
-Jens Axboe
+2.16.4
