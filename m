@@ -1,89 +1,270 @@
-Return-Path: <richard.weinberger@gmail.com>
-MIME-Version: 1.0
-References: <20181011165909.32615-1-axboe@kernel.dk> <20181011165909.32615-17-axboe@kernel.dk>
-In-Reply-To: <20181011165909.32615-17-axboe@kernel.dk>
-From: Richard Weinberger <richard.weinberger@gmail.com>
-Date: Thu, 11 Oct 2018 23:03:55 +0200
-Message-ID: <CAFLxGvy04s++HExKixU02=e86kx4yqcz+boeepxi9=uDU94sQg@mail.gmail.com>
-Subject: Re: [PATCH 16/17] mtd_blkdevs: convert to blk-mq
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	"linux-mtd @ lists . infradead . org" <linux-mtd@lists.infradead.org>, David Woodhouse <dwmw2@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	David Woodhouse <dwmw2@infradead.org>,
+	linux-mtd@lists.infradead.org
+Subject: [PATCH 16/17] mtd_blkdevs: convert to blk-mq
+Date: Thu, 11 Oct 2018 10:59:08 -0600
+Message-Id: <20181011165909.32615-17-axboe@kernel.dk>
+In-Reply-To: <20181011165909.32615-1-axboe@kernel.dk>
+References: <20181011165909.32615-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Jens,
+Straight forward conversion, using an internal list to enable the
+driver to pull requests at will.
 
-On Thu, Oct 11, 2018 at 7:00 PM Jens Axboe <axboe@kernel.dk> wrote:
->
-> Straight forward conversion, using an internal list to enable the
-> driver to pull requests at will.
->
-> Dynamically allocate the tag set to avoid having to pull in the
-> block headers for blktrans.h, since various mtd drivers use
-> block conflicting names for defines and functions.
+Dynamically allocate the tag set to avoid having to pull in the
+block headers for blktrans.h, since various mtd drivers use
+block conflicting names for defines and functions.
 
-This explodes on my test system. :-/
+Cc: David Woodhouse <dwmw2@infradead.org>
+Cc: linux-mtd@lists.infradead.org
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ drivers/mtd/mtd_blkdevs.c    | 109 +++++++++++++++++++++++------------
+ include/linux/mtd/blktrans.h |   5 +-
+ 2 files changed, 74 insertions(+), 40 deletions(-)
 
-[    2.236594] BUG: unable to handle kernel NULL pointer dereference
-at 000000000000001a
-[    2.237621] PGD 0 P4D 0
-[    2.237968] Oops: 0000 [#1] SMP PTI
-[    2.238425] CPU: 3 PID: 1110 Comm: kworker/3:1H Not tainted 4.19.0-rc7+ #143
-[    2.239331] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-BIOS 1.0.0-prebuilt.qemu-project.org 04/01/2014
-[    2.240893] Workqueue: kblockd blk_mq_run_work_fn
-[    2.241533] RIP: 0010:__blk_mq_end_request+0xe/0xb0
-[    2.242212] Code: 44 21 c2 48 0f a3 10 73 02 f3 c3 f0 48 0f ab 10
-c3 90 66 2e 0f 1f 84 00 00 00 00 00 41 54 55 89 f5 53 48 89 fb e8 f2
-80 d6 ff <f6> 43 1a 02 49 89 c4 75 4f 4c 89 e6 48 89 df e8 4e 69 ff ff
-48 83
-[    2.244798] RSP: 0018:ffffac65c2c43d20 EFLAGS: 00010216
-[    2.245469] RAX: 000000007caad848 RBX: 0000000000000000 RCX: 0000000000000017
-[    2.246382] RDX: 0000031c57000000 RSI: 001778d956000000 RDI: ffffffffa4cc70c0
-[    2.247296] RBP: 0000000000000000 R08: 00000000d2a4b8d8 R09: ffffffffa355ead3
-[    2.248208] R10: fffff1a2c5e46740 R11: ffffffffff76acba R12: 0000000000000000
-[    2.249123] R13: ffffa117793ff720 R14: ffffffffa46c7120 R15: 000000000007ff88
-[    2.259551] FS:  0000000000000000(0000) GS:ffffa1177ab80000(0000)
-knlGS:0000000000000000
-[    2.259552] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    2.259553] CR2: 000000000000001a CR3: 0000000177d44000 CR4: 00000000000006e0
-[    2.259560] Call Trace:
-[    2.259630]  mtd_queue_rq+0x1fa/0x400
-[    2.259661]  blk_mq_dispatch_rq_list+0x8b/0x510
-[    2.259672]  ? elv_rqhash_add+0x1/0x60
-[    2.259680]  ? deadline_remove_request+0x44/0xa0
-[    2.259684]  blk_mq_do_dispatch_sched+0x5a/0xf0
-[    2.259690]  blk_mq_sched_dispatch_requests+0xf0/0x160
-[    2.259697]  __blk_mq_run_hw_queue+0x49/0xc0
-[    2.259705]  process_one_work+0x1e9/0x3d0
-[    2.259726]  worker_thread+0x28/0x3d0
-[    2.259728]  ? process_one_work+0x3d0/0x3d0
-[    2.259732]  kthread+0x10e/0x130
-[    2.259740]  ? kthread_create_worker_on_cpu+0x70/0x70
-[    2.259750]  ret_from_fork+0x35/0x40
-[    2.259763] Modules linked in:
-[    2.259767] CR2: 000000000000001a
-[    2.259772] ---[ end trace b08076f7e1ed1f91 ]---
-[    2.259774] RIP: 0010:__blk_mq_end_request+0xe/0xb0
-[    2.259776] Code: 44 21 c2 48 0f a3 10 73 02 f3 c3 f0 48 0f ab 10
-c3 90 66 2e 0f 1f 84 00 00 00 00 00 41 54 55 89 f5 53 48 89 fb e8 f2
-80 d6 ff <f6> 43 1a 02 49 89 c4 75 4f 4c 89 e6 48 89 df e8 4e 69 ff ff
-48 83
-[    2.259777] RSP: 0018:ffffac65c2c43d20 EFLAGS: 00010216
-[    2.259778] RAX: 000000007caad848 RBX: 0000000000000000 RCX: 0000000000000017
-[    2.259779] RDX: 0000031c57000000 RSI: 001778d956000000 RDI: ffffffffa4cc70c0
-[    2.259780] RBP: 0000000000000000 R08: 00000000d2a4b8d8 R09: ffffffffa355ead3
-[    2.259780] R10: fffff1a2c5e46740 R11: ffffffffff76acba R12: 0000000000000000
-[    2.259781] R13: ffffa117793ff720 R14: ffffffffa46c7120 R15: 000000000007ff88
-[    2.259782] FS:  0000000000000000(0000) GS:ffffa1177ab80000(0000)
-knlGS:0000000000000000
-[    2.259783] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    2.259784] CR2: 000000000000001a CR3: 0000000177d44000 CR4: 00000000000006e0
-[    2.259786] Kernel panic - not syncing: Fatal exception
-[    2.261997] Kernel Offset: 0x22200000 from 0xffffffff81000000
-(relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-
+diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
+index 29c0bfd74e8a..6a94cffbca20 100644
+--- a/drivers/mtd/mtd_blkdevs.c
++++ b/drivers/mtd/mtd_blkdevs.c
+@@ -27,6 +27,7 @@
+ #include <linux/mtd/blktrans.h>
+ #include <linux/mtd/mtd.h>
+ #include <linux/blkdev.h>
++#include <linux/blk-mq.h>
+ #include <linux/blkpg.h>
+ #include <linux/spinlock.h>
+ #include <linux/hdreg.h>
+@@ -44,6 +45,8 @@ static void blktrans_dev_release(struct kref *kref)
+ 		container_of(kref, struct mtd_blktrans_dev, ref);
+ 
+ 	dev->disk->private_data = NULL;
++	blk_mq_free_tag_set(dev->tag_set);
++	kfree(dev->tag_set);
+ 	blk_cleanup_queue(dev->rq);
+ 	put_disk(dev->disk);
+ 	list_del(&dev->list);
+@@ -134,28 +137,37 @@ int mtd_blktrans_cease_background(struct mtd_blktrans_dev *dev)
+ }
+ EXPORT_SYMBOL_GPL(mtd_blktrans_cease_background);
+ 
+-static void mtd_blktrans_work(struct work_struct *work)
++static struct request *mtd_next_request(struct mtd_blktrans_dev *dev)
++{
++	struct request *rq;
++
++	rq = list_first_entry_or_null(&dev->rq_list, struct request, queuelist);
++	if (rq) {
++		list_del_init(&rq->queuelist);
++		blk_mq_start_request(rq);
++		return rq;
++	}
++
++	return NULL;
++}
++
++static void mtd_blktrans_work(struct mtd_blktrans_dev *dev)
+ {
+-	struct mtd_blktrans_dev *dev =
+-		container_of(work, struct mtd_blktrans_dev, work);
+ 	struct mtd_blktrans_ops *tr = dev->tr;
+-	struct request_queue *rq = dev->rq;
+ 	struct request *req = NULL;
+ 	int background_done = 0;
+ 
+-	spin_lock_irq(rq->queue_lock);
+-
+ 	while (1) {
+ 		blk_status_t res;
+ 
+ 		dev->bg_stop = false;
+-		if (!req && !(req = blk_fetch_request(rq))) {
++		if (!req && !(req = mtd_next_request(dev))) {
+ 			if (tr->background && !background_done) {
+-				spin_unlock_irq(rq->queue_lock);
++				spin_unlock_irq(&dev->queue_lock);
+ 				mutex_lock(&dev->lock);
+ 				tr->background(dev);
+ 				mutex_unlock(&dev->lock);
+-				spin_lock_irq(rq->queue_lock);
++				spin_lock_irq(&dev->queue_lock);
+ 				/*
+ 				 * Do background processing just once per idle
+ 				 * period.
+@@ -166,35 +178,39 @@ static void mtd_blktrans_work(struct work_struct *work)
+ 			break;
+ 		}
+ 
+-		spin_unlock_irq(rq->queue_lock);
++		spin_unlock_irq(&dev->queue_lock);
+ 
+ 		mutex_lock(&dev->lock);
+ 		res = do_blktrans_request(dev->tr, dev, req);
+ 		mutex_unlock(&dev->lock);
+ 
+-		spin_lock_irq(rq->queue_lock);
+-
+-		if (!__blk_end_request_cur(req, res))
++		if (!blk_update_request(req, res, blk_rq_cur_bytes(req))) {
+ 			req = NULL;
++			__blk_mq_end_request(req, res);
++		}
+ 
+ 		background_done = 0;
++		spin_lock_irq(&dev->queue_lock);
+ 	}
+-
+-	spin_unlock_irq(rq->queue_lock);
+ }
+ 
+-static void mtd_blktrans_request(struct request_queue *rq)
++static blk_status_t mtd_queue_rq(struct blk_mq_hw_ctx *hctx,
++				 const struct blk_mq_queue_data *bd)
+ {
+ 	struct mtd_blktrans_dev *dev;
+-	struct request *req = NULL;
+ 
+-	dev = rq->queuedata;
++	dev = hctx->queue->queuedata;
++	if (!dev) {
++		blk_mq_start_request(bd->rq);
++		return BLK_STS_IOERR;
++	}
++
++	spin_lock_irq(&dev->queue_lock);
++	list_add_tail(&bd->rq->queuelist, &dev->rq_list);
++	mtd_blktrans_work(dev);
++	spin_unlock_irq(&dev->queue_lock);
+ 
+-	if (!dev)
+-		while ((req = blk_fetch_request(rq)) != NULL)
+-			__blk_end_request_all(req, BLK_STS_IOERR);
+-	else
+-		queue_work(dev->wq, &dev->work);
++	return BLK_STS_OK;
+ }
+ 
+ static int blktrans_open(struct block_device *bdev, fmode_t mode)
+@@ -329,9 +345,14 @@ static const struct block_device_operations mtd_block_ops = {
+ 	.getgeo		= blktrans_getgeo,
+ };
+ 
++static const struct blk_mq_ops mtd_mq_ops = {
++	.queue_rq	= mtd_queue_rq,
++};
++
+ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
+ {
+ 	struct mtd_blktrans_ops *tr = new->tr;
++	struct blk_mq_tag_set *set;
+ 	struct mtd_blktrans_dev *d;
+ 	int last_devnum = -1;
+ 	struct gendisk *gd;
+@@ -416,11 +437,28 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
+ 
+ 	/* Create the request queue */
+ 	spin_lock_init(&new->queue_lock);
+-	new->rq = blk_init_queue(mtd_blktrans_request, &new->queue_lock);
++	INIT_LIST_HEAD(&new->rq_list);
+ 
+-	if (!new->rq)
++	new->tag_set = kzalloc(sizeof(*new->tag_set), GFP_KERNEL);
++	if (!new->tag_set)
+ 		goto error3;
+ 
++	set = new->tag_set;
++	set->ops = &mtd_mq_ops;
++	set->nr_hw_queues = 1;
++	set->queue_depth = 2;
++	set->numa_node = NUMA_NO_NODE;
++	set->flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_BLOCKING;
++	ret = blk_mq_alloc_tag_set(set);
++	if (ret)
++		goto error4;
++
++	new->rq = blk_mq_init_queue(set);
++	if (!new->rq) {
++		blk_mq_free_tag_set(new->tag_set);
++		goto error5;
++	}
++
+ 	if (tr->flush)
+ 		blk_queue_write_cache(new->rq, true, false);
+ 
+@@ -437,13 +475,6 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
+ 
+ 	gd->queue = new->rq;
+ 
+-	/* Create processing workqueue */
+-	new->wq = alloc_workqueue("%s%d", 0, 0,
+-				  tr->name, new->mtd->index);
+-	if (!new->wq)
+-		goto error4;
+-	INIT_WORK(&new->work, mtd_blktrans_work);
+-
+ 	if (new->readonly)
+ 		set_disk_ro(gd, 1);
+ 
+@@ -455,8 +486,10 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
+ 		WARN_ON(ret);
+ 	}
+ 	return 0;
++error5:
++	blk_mq_free_tag_set(new->tag_set);
+ error4:
+-	blk_cleanup_queue(new->rq);
++	kfree(new->tag_set);
+ error3:
+ 	put_disk(new->disk);
+ error2:
+@@ -481,15 +514,17 @@ int del_mtd_blktrans_dev(struct mtd_blktrans_dev *old)
+ 	/* Stop new requests to arrive */
+ 	del_gendisk(old->disk);
+ 
+-	/* Stop workqueue. This will perform any pending request. */
+-	destroy_workqueue(old->wq);
+-
+ 	/* Kill current requests */
+ 	spin_lock_irqsave(&old->queue_lock, flags);
+ 	old->rq->queuedata = NULL;
+-	blk_start_queue(old->rq);
+ 	spin_unlock_irqrestore(&old->queue_lock, flags);
+ 
++	/* freeze+quiesce queue to ensure all requests are flushed */
++	blk_mq_freeze_queue(old->rq);
++	blk_mq_quiesce_queue(old->rq);
++	blk_mq_unquiesce_queue(old->rq);
++	blk_mq_unfreeze_queue(old->rq);
++
+ 	/* If the device is currently open, tell trans driver to close it,
+ 		then put mtd device, and don't touch it again */
+ 	mutex_lock(&old->lock);
+diff --git a/include/linux/mtd/blktrans.h b/include/linux/mtd/blktrans.h
+index e93837f647de..1d3ade69d39a 100644
+--- a/include/linux/mtd/blktrans.h
++++ b/include/linux/mtd/blktrans.h
+@@ -23,7 +23,6 @@
+ #include <linux/mutex.h>
+ #include <linux/kref.h>
+ #include <linux/sysfs.h>
+-#include <linux/workqueue.h>
+ 
+ struct hd_geometry;
+ struct mtd_info;
+@@ -44,9 +43,9 @@ struct mtd_blktrans_dev {
+ 	struct kref ref;
+ 	struct gendisk *disk;
+ 	struct attribute_group *disk_attributes;
+-	struct workqueue_struct *wq;
+-	struct work_struct work;
+ 	struct request_queue *rq;
++	struct list_head rq_list;
++	struct blk_mq_tag_set *tag_set;
+ 	spinlock_t queue_lock;
+ 	void *priv;
+ 	fmode_t file_mode;
 -- 
-Thanks,
-//richard
+2.17.1
