@@ -1,147 +1,236 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:44974 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726911AbeJISbZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:31:25 -0400
-Received: by mail-pg1-f196.google.com with SMTP id g2-v6so640826pgu.11
-        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:14:58 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 31/45] lightnvm: use internal allocation for chunk log page
-Date: Tue,  9 Oct 2018 13:12:01 +0200
-Message-Id: <20181009111215.7653-32-mb@lightnvm.io>
-In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
-References: <20181009111215.7653-1-mb@lightnvm.io>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+From: Omar Sandoval <osandov@osandov.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	kernel-team@fb.com
+Subject: [PATCH v2 08/11] ataflop: fold headers into C file
+Date: Thu, 11 Oct 2018 12:20:48 -0700
+Message-Id: <11626464bab0d9607d9916c7a4dd729e4204b9aa.1539284959.git.osandov@fb.com>
+In-Reply-To: <cover.1539284959.git.osandov@fb.com>
+References: <cover.1539284959.git.osandov@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@javigon.com>
+From: Omar Sandoval <osandov@fb.com>
 
-The lightnvm subsystem provides helpers to retrieve chunk metadata,
-where the target needs to provide a buffer to store the metadata. An
-implicit assumption is that this buffer is contiguous and can be used to
-retrieve the data from the device. If the device exposes too many
-chunks, then kmalloc might fail, thus failing instance creation.
+atafd.h and atafdreg.h are only used from ataflop.c, so merge them in
+there.
 
-This patch removes this assumption by implementing an internal buffer in
-the lightnvm subsystem to retrieve chunk metadata. Targets can then
-use virtual memory allocations. Since this is a target API change, adapt
-pblk accordingly.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Reviewed-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- drivers/lightnvm/pblk-core.c |  4 ++--
- drivers/lightnvm/pblk-init.c |  2 +-
- drivers/nvme/host/lightnvm.c | 25 +++++++++++++++++--------
- 3 files changed, 20 insertions(+), 11 deletions(-)
+ arch/m68k/include/asm/atafd.h    | 13 -----
+ arch/m68k/include/asm/atafdreg.h | 80 ------------------------------
+ drivers/block/ataflop.c          | 83 +++++++++++++++++++++++++++++++-
+ 3 files changed, 81 insertions(+), 95 deletions(-)
+ delete mode 100644 arch/m68k/include/asm/atafd.h
+ delete mode 100644 arch/m68k/include/asm/atafdreg.h
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 84f3b4912b92..875f3cf615ac 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -120,7 +120,7 @@ static void pblk_end_io_erase(struct nvm_rq *rqd)
- /*
-  * Get information for all chunks from the device.
-  *
-- * The caller is responsible for freeing the returned structure
-+ * The caller is responsible for freeing (vmalloc) the returned structure
-  */
- struct nvm_chk_meta *pblk_get_chunk_meta(struct pblk *pblk)
- {
-@@ -134,7 +134,7 @@ struct nvm_chk_meta *pblk_get_chunk_meta(struct pblk *pblk)
- 	ppa.ppa = 0;
+diff --git a/arch/m68k/include/asm/atafd.h b/arch/m68k/include/asm/atafd.h
+deleted file mode 100644
+index ad7014cad633..000000000000
+--- a/arch/m68k/include/asm/atafd.h
++++ /dev/null
+@@ -1,13 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef _ASM_M68K_FD_H
+-#define _ASM_M68K_FD_H
+-
+-/* Definitions for the Atari Floppy driver */
+-
+-struct atari_format_descr {
+-    int track;			/* to be formatted */
+-    int head;			/*   ""     ""     */
+-    int sect_offset;		/* offset of first sector */
+-};
+-
+-#endif
+diff --git a/arch/m68k/include/asm/atafdreg.h b/arch/m68k/include/asm/atafdreg.h
+deleted file mode 100644
+index c31b4919ed2d..000000000000
+--- a/arch/m68k/include/asm/atafdreg.h
++++ /dev/null
+@@ -1,80 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef _LINUX_FDREG_H
+-#define _LINUX_FDREG_H
+-
+-/*
+-** WD1772 stuff
+- */
+-
+-/* register codes */
+-
+-#define FDCSELREG_STP   (0x80)   /* command/status register */
+-#define FDCSELREG_TRA   (0x82)   /* track register */
+-#define FDCSELREG_SEC   (0x84)   /* sector register */
+-#define FDCSELREG_DTA   (0x86)   /* data register */
+-
+-/* register names for FDC_READ/WRITE macros */
+-
+-#define FDCREG_CMD		0
+-#define FDCREG_STATUS	0
+-#define FDCREG_TRACK	2
+-#define FDCREG_SECTOR	4
+-#define FDCREG_DATA		6
+-
+-/* command opcodes */
+-
+-#define FDCCMD_RESTORE  (0x00)   /*  -                   */
+-#define FDCCMD_SEEK     (0x10)   /*   |                  */
+-#define FDCCMD_STEP     (0x20)   /*   |  TYP 1 Commands  */
+-#define FDCCMD_STIN     (0x40)   /*   |                  */
+-#define FDCCMD_STOT     (0x60)   /*  -                   */
+-#define FDCCMD_RDSEC    (0x80)   /*  -   TYP 2 Commands  */
+-#define FDCCMD_WRSEC    (0xa0)   /*  -          "        */
+-#define FDCCMD_RDADR    (0xc0)   /*  -                   */
+-#define FDCCMD_RDTRA    (0xe0)   /*   |  TYP 3 Commands  */
+-#define FDCCMD_WRTRA    (0xf0)   /*  -                   */
+-#define FDCCMD_FORCI    (0xd0)   /*  -   TYP 4 Command   */
+-
+-/* command modifier bits */
+-
+-#define FDCCMDADD_SR6   (0x00)   /* step rate settings */
+-#define FDCCMDADD_SR12  (0x01)
+-#define FDCCMDADD_SR2   (0x02)
+-#define FDCCMDADD_SR3   (0x03)
+-#define FDCCMDADD_V     (0x04)   /* verify */
+-#define FDCCMDADD_H     (0x08)   /* wait for spin-up */
+-#define FDCCMDADD_U     (0x10)   /* update track register */
+-#define FDCCMDADD_M     (0x10)   /* multiple sector access */
+-#define FDCCMDADD_E     (0x04)   /* head settling flag */
+-#define FDCCMDADD_P     (0x02)   /* precompensation off */
+-#define FDCCMDADD_A0    (0x01)   /* DAM flag */
+-
+-/* status register bits */
+-
+-#define	FDCSTAT_MOTORON	(0x80)   /* motor on */
+-#define	FDCSTAT_WPROT	(0x40)   /* write protected (FDCCMD_WR*) */
+-#define	FDCSTAT_SPINUP	(0x20)   /* motor speed stable (Type I) */
+-#define	FDCSTAT_DELDAM	(0x20)   /* sector has deleted DAM (Type II+III) */
+-#define	FDCSTAT_RECNF	(0x10)   /* record not found */
+-#define	FDCSTAT_CRC		(0x08)   /* CRC error */
+-#define	FDCSTAT_TR00	(0x04)   /* Track 00 flag (Type I) */
+-#define	FDCSTAT_LOST	(0x04)   /* Lost Data (Type II+III) */
+-#define	FDCSTAT_IDX		(0x02)   /* Index status (Type I) */
+-#define	FDCSTAT_DRQ		(0x02)   /* DRQ status (Type II+III) */
+-#define	FDCSTAT_BUSY	(0x01)   /* FDC is busy */
+-
+-
+-/* PSG Port A Bit Nr 0 .. Side Sel .. 0 -> Side 1  1 -> Side 2 */
+-#define DSKSIDE     (0x01)
+-
+-#define DSKDRVNONE  (0x06)
+-#define DSKDRV0     (0x02)
+-#define DSKDRV1     (0x04)
+-
+-/* step rates */
+-#define	FDCSTEP_6	0x00
+-#define	FDCSTEP_12	0x01
+-#define	FDCSTEP_2	0x02
+-#define	FDCSTEP_3	0x03
+-
+-#endif
+diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
+index dfb2c2622e5a..17df631c5d85 100644
+--- a/drivers/block/ataflop.c
++++ b/drivers/block/ataflop.c
+@@ -71,8 +71,6 @@
+ #include <linux/completion.h>
+ #include <linux/wait.h>
  
- 	len = geo->all_chunks * sizeof(*meta);
--	meta = kzalloc(len, GFP_KERNEL);
-+	meta = vzalloc(len);
- 	if (!meta)
- 		return ERR_PTR(-ENOMEM);
+-#include <asm/atafd.h>
+-#include <asm/atafdreg.h>
+ #include <asm/atariints.h>
+ #include <asm/atari_stdma.h>
+ #include <asm/atari_stram.h>
+@@ -85,6 +83,87 @@ static DEFINE_MUTEX(ataflop_mutex);
+ static struct request *fd_request;
+ static int fdc_queue;
  
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index fb66bc84d5ca..7ef8249108f0 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -1039,7 +1039,7 @@ static int pblk_lines_init(struct pblk *pblk)
- 
- 	pblk_set_provision(pblk, nr_free_chks);
- 
--	kfree(chunk_meta);
-+	vfree(chunk_meta);
- 	return 0;
- 
- fail_free_lines:
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index e42af7771fe5..7d0a4d3b0a48 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -573,7 +573,7 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
- 	struct nvm_geo *geo = &ndev->geo;
- 	struct nvme_ns *ns = ndev->q->queuedata;
- 	struct nvme_ctrl *ctrl = ns->ctrl;
--	struct nvme_nvm_chk_meta *dev_meta = (struct nvme_nvm_chk_meta *)meta;
-+	struct nvme_nvm_chk_meta *dev_meta, *dev_meta_off;
- 	struct ppa_addr ppa;
- 	size_t left = nchks * sizeof(struct nvme_nvm_chk_meta);
- 	size_t log_pos, offset, len;
-@@ -585,6 +585,10 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
- 	 */
- 	max_len = min_t(unsigned int, ctrl->max_hw_sectors << 9, 256 * 1024);
- 
-+	dev_meta = kmalloc(max_len, GFP_KERNEL);
-+	if (!dev_meta)
-+		return -ENOMEM;
++/*
++ * WD1772 stuff
++ */
 +
- 	/* Normalize lba address space to obtain log offset */
- 	ppa.ppa = slba;
- 	ppa = dev_to_generic_addr(ndev, ppa);
-@@ -598,6 +602,9 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
- 	while (left) {
- 		len = min_t(unsigned int, left, max_len);
- 
-+		memset(dev_meta, 0, max_len);
-+		dev_meta_off = dev_meta;
++/* register codes */
 +
- 		ret = nvme_get_log(ctrl, ns->head->ns_id,
- 				NVME_NVM_LOG_REPORT_CHUNK, 0, dev_meta, len,
- 				offset);
-@@ -607,21 +614,23 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
- 		}
- 
- 		for (i = 0; i < len; i += sizeof(struct nvme_nvm_chk_meta)) {
--			meta->state = dev_meta->state;
--			meta->type = dev_meta->type;
--			meta->wi = dev_meta->wi;
--			meta->slba = le64_to_cpu(dev_meta->slba);
--			meta->cnlb = le64_to_cpu(dev_meta->cnlb);
--			meta->wp = le64_to_cpu(dev_meta->wp);
-+			meta->state = dev_meta_off->state;
-+			meta->type = dev_meta_off->type;
-+			meta->wi = dev_meta_off->wi;
-+			meta->slba = le64_to_cpu(dev_meta_off->slba);
-+			meta->cnlb = le64_to_cpu(dev_meta_off->cnlb);
-+			meta->wp = le64_to_cpu(dev_meta_off->wp);
- 
- 			meta++;
--			dev_meta++;
-+			dev_meta_off++;
- 		}
- 
- 		offset += len;
- 		left -= len;
- 	}
- 
-+	kfree(dev_meta);
++#define FDCSELREG_STP   (0x80)   /* command/status register */
++#define FDCSELREG_TRA   (0x82)   /* track register */
++#define FDCSELREG_SEC   (0x84)   /* sector register */
++#define FDCSELREG_DTA   (0x86)   /* data register */
 +
- 	return ret;
- }
- 
++/* register names for FDC_READ/WRITE macros */
++
++#define FDCREG_CMD		0
++#define FDCREG_STATUS	0
++#define FDCREG_TRACK	2
++#define FDCREG_SECTOR	4
++#define FDCREG_DATA		6
++
++/* command opcodes */
++
++#define FDCCMD_RESTORE  (0x00)   /*  -                   */
++#define FDCCMD_SEEK     (0x10)   /*   |                  */
++#define FDCCMD_STEP     (0x20)   /*   |  TYP 1 Commands  */
++#define FDCCMD_STIN     (0x40)   /*   |                  */
++#define FDCCMD_STOT     (0x60)   /*  -                   */
++#define FDCCMD_RDSEC    (0x80)   /*  -   TYP 2 Commands  */
++#define FDCCMD_WRSEC    (0xa0)   /*  -          "        */
++#define FDCCMD_RDADR    (0xc0)   /*  -                   */
++#define FDCCMD_RDTRA    (0xe0)   /*   |  TYP 3 Commands  */
++#define FDCCMD_WRTRA    (0xf0)   /*  -                   */
++#define FDCCMD_FORCI    (0xd0)   /*  -   TYP 4 Command   */
++
++/* command modifier bits */
++
++#define FDCCMDADD_SR6   (0x00)   /* step rate settings */
++#define FDCCMDADD_SR12  (0x01)
++#define FDCCMDADD_SR2   (0x02)
++#define FDCCMDADD_SR3   (0x03)
++#define FDCCMDADD_V     (0x04)   /* verify */
++#define FDCCMDADD_H     (0x08)   /* wait for spin-up */
++#define FDCCMDADD_U     (0x10)   /* update track register */
++#define FDCCMDADD_M     (0x10)   /* multiple sector access */
++#define FDCCMDADD_E     (0x04)   /* head settling flag */
++#define FDCCMDADD_P     (0x02)   /* precompensation off */
++#define FDCCMDADD_A0    (0x01)   /* DAM flag */
++
++/* status register bits */
++
++#define	FDCSTAT_MOTORON	(0x80)   /* motor on */
++#define	FDCSTAT_WPROT	(0x40)   /* write protected (FDCCMD_WR*) */
++#define	FDCSTAT_SPINUP	(0x20)   /* motor speed stable (Type I) */
++#define	FDCSTAT_DELDAM	(0x20)   /* sector has deleted DAM (Type II+III) */
++#define	FDCSTAT_RECNF	(0x10)   /* record not found */
++#define	FDCSTAT_CRC		(0x08)   /* CRC error */
++#define	FDCSTAT_TR00	(0x04)   /* Track 00 flag (Type I) */
++#define	FDCSTAT_LOST	(0x04)   /* Lost Data (Type II+III) */
++#define	FDCSTAT_IDX		(0x02)   /* Index status (Type I) */
++#define	FDCSTAT_DRQ		(0x02)   /* DRQ status (Type II+III) */
++#define	FDCSTAT_BUSY	(0x01)   /* FDC is busy */
++
++
++/* PSG Port A Bit Nr 0 .. Side Sel .. 0 -> Side 1  1 -> Side 2 */
++#define DSKSIDE     (0x01)
++
++#define DSKDRVNONE  (0x06)
++#define DSKDRV0     (0x02)
++#define DSKDRV1     (0x04)
++
++/* step rates */
++#define	FDCSTEP_6	0x00
++#define	FDCSTEP_12	0x01
++#define	FDCSTEP_2	0x02
++#define	FDCSTEP_3	0x03
++
++struct atari_format_descr {
++	int track;		/* to be formatted */
++	int head;		/*   ""     ""     */
++	int sect_offset;	/* offset of first sector */
++};
++
+ /* Disk types: DD, HD, ED */
+ static struct atari_disk_type {
+ 	const char	*name;
 -- 
-2.17.1
+2.19.1
