@@ -1,4 +1,4 @@
-Return-Path: <prvs=81407a9e8=damien.lemoal@wdc.com>
+Return-Path: <prvs=81565c836=damien.lemoal@wdc.com>
 From: Damien Le Moal <damien.lemoal@wdc.com>
 To: linux-block@vger.kernel.org,
 	Jens Axboe <axboe@kernel.dk>,
@@ -8,99 +8,49 @@ To: linux-block@vger.kernel.org,
 	Mike Snitzer <snitzer@redhat.com>
 Cc: Christoph Hellwig <hch@lst.de>,
 	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH 01/11] scsi: sd_zbc: Rearrange code
-Date: Wed, 10 Oct 2018 10:52:29 +0900
-Message-Id: <20181010015239.24930-2-damien.lemoal@wdc.com>
-In-Reply-To: <20181010015239.24930-1-damien.lemoal@wdc.com>
-References: <20181010015239.24930-1-damien.lemoal@wdc.com>
+Subject: [PATCH v2 06/11] block: Introduce BLKGETZONESZ ioctl
+Date: Thu, 11 Oct 2018 16:09:47 +0900
+Message-Id: <20181011070952.13248-7-damien.lemoal@wdc.com>
+In-Reply-To: <20181011070952.13248-1-damien.lemoal@wdc.com>
+References: <20181011070952.13248-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Move the urswrz check out of sd_zbc_read_zones() and into
-sd_zbc_read_zoned_characteristics() where that value is obtained (read
-from the disk zoned characteristics VPD page). Since this function now
-does more than simply reading the VPD page, rename it to
-sd_zbc_check_zoned_characteristics().
-Also fix the error message displayed when reading that VPD page fails.
+Get a zoned block device zone size in number of 512 B sectors.
+The zone size is always 0 for regular block devices.
 
 Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- drivers/scsi/sd_zbc.c | 39 +++++++++++++++++++--------------------
- 1 file changed, 19 insertions(+), 20 deletions(-)
+ block/ioctl.c                 | 2 ++
+ include/uapi/linux/blkzoned.h | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 412c1787dcd9..0b7d8787f785 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -305,19 +305,19 @@ void sd_zbc_complete(struct scsi_cmnd *cmd, unsigned int good_bytes,
- }
- 
- /**
-- * sd_zbc_read_zoned_characteristics - Read zoned block device characteristics
-+ * sd_zbc_check_zoned_characteristics - Check zoned block device characteristics
-  * @sdkp: Target disk
-  * @buf: Buffer where to store the VPD page data
-  *
-- * Read VPD page B6.
-+ * Read VPD page B6, get information and check that reads are unconstrained.
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 3884d810efd2..f6d2c6f1f050 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -532,6 +532,8 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
+ 		return blkdev_report_zones_ioctl(bdev, mode, cmd, arg);
+ 	case BLKRESETZONE:
+ 		return blkdev_reset_zones_ioctl(bdev, mode, cmd, arg);
++	case BLKGETZONESZ:
++		return put_uint(arg, bdev_zone_sectors(bdev));
+ 	case HDIO_GETGEO:
+ 		return blkdev_getgeo(bdev, argp);
+ 	case BLKRAGET:
+diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
+index ff5a5db8906a..281ac605f752 100644
+--- a/include/uapi/linux/blkzoned.h
++++ b/include/uapi/linux/blkzoned.h
+@@ -137,8 +137,10 @@ struct blk_zone_range {
+  *                 sector specified in the report request structure.
+  * @BLKRESETZONE: Reset the write pointer of the zones in the specified
+  *                sector range. The sector range must be zone aligned.
++ * @BLKGETZONESZ: Get the device zone size in number of 512 B sectors.
   */
--static int sd_zbc_read_zoned_characteristics(struct scsi_disk *sdkp,
--					     unsigned char *buf)
-+static int sd_zbc_check_zoned_characteristics(struct scsi_disk *sdkp,
-+					      unsigned char *buf)
- {
+ #define BLKREPORTZONE	_IOWR(0x12, 130, struct blk_zone_report)
+ #define BLKRESETZONE	_IOW(0x12, 131, struct blk_zone_range)
++#define BLKGETZONESZ	_IOW(0x12, 132, __u32)
  
- 	if (scsi_get_vpd_page(sdkp->device, 0xb6, buf, 64)) {
- 		sd_printk(KERN_NOTICE, sdkp,
--			  "Unconstrained-read check failed\n");
-+			  "Read zoned characteristics VPD page failed\n");
- 		return -ENODEV;
- 	}
- 
-@@ -335,6 +335,18 @@ static int sd_zbc_read_zoned_characteristics(struct scsi_disk *sdkp,
- 		sdkp->zones_max_open = get_unaligned_be32(&buf[16]);
- 	}
- 
-+	/*
-+	 * Check for unconstrained reads: host-managed devices with
-+	 * constrained reads (drives failing read after write pointer)
-+	 * are not supported.
-+	 */
-+	if (!sdkp->urswrz) {
-+		if (sdkp->first_scan)
-+			sd_printk(KERN_NOTICE, sdkp,
-+			  "constrained reads devices are not supported\n");
-+		return -ENODEV;
-+	}
-+
- 	return 0;
- }
- 
-@@ -675,24 +687,11 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
- 		 */
- 		return 0;
- 
--	/* Get zoned block device characteristics */
--	ret = sd_zbc_read_zoned_characteristics(sdkp, buf);
-+	/* Check zoned block device characteristics (unconstrained reads) */
-+	ret = sd_zbc_check_zoned_characteristics(sdkp, buf);
- 	if (ret)
- 		goto err;
- 
--	/*
--	 * Check for unconstrained reads: host-managed devices with
--	 * constrained reads (drives failing read after write pointer)
--	 * are not supported.
--	 */
--	if (!sdkp->urswrz) {
--		if (sdkp->first_scan)
--			sd_printk(KERN_NOTICE, sdkp,
--			  "constrained reads devices are not supported\n");
--		ret = -ENODEV;
--		goto err;
--	}
--
- 	/* Check capacity */
- 	ret = sd_zbc_check_capacity(sdkp, buf);
- 	if (ret)
+ #endif /* _UAPI_BLKZONED_H */
 -- 
 2.17.1
