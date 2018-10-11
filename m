@@ -1,43 +1,29 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: keith.busch@linux.intel.com, ming.lei@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH V2 0/2] blk-mq: some fixes about updating hw queues
-Date: Fri, 12 Oct 2018 18:07:24 +0800
-Message-Id: <1539338848-1789-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [RESEND][PATCH v2] cfq: clear queue pointers from cfqg after
+ unpinning them in cfq_pd_offline
+To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc: Caspar Zhang <caspar@linux.alibaba.com>, jiufei.xue@linux.alibaba.com,
+ Tejun Heo <tj@kernel.org>, Joseph Qi <joseph.qi@linux.alibaba.com>,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+References: <befb45da-2a7b-8dff-30e7-59b441f604fe@maciej.szmigiero.name>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <3abb177f-d6ba-7f7b-e8a6-d27e8cf388a0@kernel.dk>
+Date: Thu, 11 Oct 2018 11:46:37 -0600
+MIME-Version: 1.0
+In-Reply-To: <befb45da-2a7b-8dff-30e7-59b441f604fe@maciej.szmigiero.name>
+Content-Type: text/plain; charset=iso-8859-2
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens
+On 10/10/18 3:16 PM, Maciej S. Szmigiero wrote:
+> BFQ is already doing a similar thing in its .pd_offline_fn() method
+> implementation.
+> 
+> While it seems that after commit 4c6994806f70
+> ("blk-throttle: fix race between blkcg_bio_issue_check() and cgroup_rmdir()")
+> was reverted leaving these pointers intact no longer causes crashes
+> clearing them is still a sensible thing to do to make the code more robust.
 
-This patch set fixes some defects during update hw queues.
+Applied, thanks.
 
-1st patch refactor the blk-mq debugfs and sysfs register during
-blk_mq_update_nr_hw_queues.
-
-2nd patch change the GFP_KERNEL to GFP_NOIO during blk_mq_realloc_hw_ctxs,
-
-3rd patch try to realloc hctx when this hctx is mapped to a different node.
-
-4th patch should be able to fix the panic reported in follwing link
-https://marc.info/?l=linux-block&m=153799465603723&w=2
-
-V2:
- - Newly add 2nd and 3rd patch.
- - Use blk_mq_map_queues when __blk_mq_update_nr_hw_queues fallbacks to
-   previous nr_hw_queues to avoid driver's .map_queues leak mapping of
-   some cpus due the fallback nr_hw_queues.
- - Add Ming's Reviewed-by in 1st patch.
-
-
-Jianchao Wang[4]
-blk-mq: adjust debugfs and sysfs register when
-blk-mq: change gfp flags to GFP_NOIO in
-blk-mq: realloc hctx when hw queue is mapped to
-blk-mq: fallback to previous nr_hw_queues when
-
- block/blk-core.c  |   2 +-
- block/blk-flush.c |   6 +--
- block/blk-mq.c    | 155 ++++++++++++++++++++++++++++++++++--------------------
- block/blk.h       |   2 +-
- 4 files changed, 102 insertions(+), 63 deletions(-)
+-- 
+Jens Axboe
