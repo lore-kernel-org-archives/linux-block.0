@@ -1,88 +1,35 @@
-Return-Path: <prvs=81565c836=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH v2 09/11] block: Expose queue nr_zones in sysfs
-Date: Thu, 11 Oct 2018 16:09:50 +0900
-Message-Id: <20181011070952.13248-10-damien.lemoal@wdc.com>
-In-Reply-To: <20181011070952.13248-1-damien.lemoal@wdc.com>
-References: <20181011070952.13248-1-damien.lemoal@wdc.com>
+Return-Path: <logang@deltatee.com>
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+ linux-nvdimm@lists.01.org, linux-block@vger.kernel.org,
+ Stephen Bates <sbates@raithlin.com>, Christoph Hellwig <hch@lst.de>,
+ Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+ Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>,
+ Max Gurtovoy <maxg@mellanox.com>, Dan Williams <dan.j.williams@intel.com>,
+ =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+ Jens Axboe <axboe@kernel.dk>
+References: <20181004212747.6301-1-logang@deltatee.com>
+ <20181010201918.GF5906@bhelgaas-glaptop.roam.corp.google.com>
+ <5c674a1b-2471-33eb-44f4-fe1bb8807a22@deltatee.com>
+ <20181011031858.GL5906@bhelgaas-glaptop.roam.corp.google.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <64a402ab-698a-af9d-6c39-5029dae7016c@deltatee.com>
+Date: Thu, 11 Oct 2018 09:38:53 -0600
+MIME-Version: 1.0
+In-Reply-To: <20181011031858.GL5906@bhelgaas-glaptop.roam.corp.google.com>
+Content-Type: text/plain; charset=utf-8
+Subject: Re: [PATCH v9 00/13] Copy Offload in NVMe Fabrics with P2P PCI Memory
 List-ID: <linux-block@vger.kernel.org>
 
-Expose through sysfs the nr_zones field of a zoned block device request
-queue. This represents the total number of zones of the device
-calculated using the known disk capacity and zone size.
 
-Exposing this value helps in debugging disk issues as well as
-facilitating scripts based use of the disk (e.g. blktests).
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/blk-sysfs.c      | 11 +++++++++++
- include/linux/blkdev.h |  2 +-
- 2 files changed, 12 insertions(+), 1 deletion(-)
+On 2018-10-10 9:18 p.m., Bjorn Helgaas wrote:
+> I applied the updates from your v10 to my pci/peer-to-peer branch.
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 3772671cf2bc..f7060a938bf9 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -300,6 +300,11 @@ static ssize_t queue_zoned_show(struct request_queue *q, char *page)
- 	}
- }
- 
-+static ssize_t queue_nr_zones_show(struct request_queue *q, char *page)
-+{
-+	return queue_var_show(q->nr_zones, page);
-+}
-+
- static ssize_t queue_nomerges_show(struct request_queue *q, char *page)
- {
- 	return queue_var_show((blk_queue_nomerges(q) << 1) |
-@@ -637,6 +642,11 @@ static struct queue_sysfs_entry queue_zoned_entry = {
- 	.show = queue_zoned_show,
- };
- 
-+static struct queue_sysfs_entry queue_nr_zones_entry = {
-+	.attr = {.name = "nr_zones", .mode = 0444 },
-+	.show = queue_nr_zones_show,
-+};
-+
- static struct queue_sysfs_entry queue_nomerges_entry = {
- 	.attr = {.name = "nomerges", .mode = 0644 },
- 	.show = queue_nomerges_show,
-@@ -727,6 +737,7 @@ static struct attribute *default_attrs[] = {
- 	&queue_write_zeroes_max_entry.attr,
- 	&queue_nonrot_entry.attr,
- 	&queue_zoned_entry.attr,
-+	&queue_nr_zones_entry.attr,
- 	&queue_nomerges_entry.attr,
- 	&queue_rq_affinity_entry.attr,
- 	&queue_iostats_entry.attr,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c24969b1741b..23ab53d2d4ca 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -593,7 +593,6 @@ struct request_queue {
- 
- 	struct queue_limits	limits;
- 
--#ifdef CONFIG_BLK_DEV_ZONED
- 	/*
- 	 * Zoned block device information for request dispatch control.
- 	 * nr_zones is the total number of zones of the device. This is always
-@@ -612,6 +611,7 @@ struct request_queue {
- 	 * blk_mq_unfreeze_queue().
- 	 */
- 	unsigned int		nr_zones;
-+#ifdef CONFIG_BLK_DEV_ZONED
- 	unsigned long		*seq_zones_bitmap;
- 	unsigned long		*seq_zones_wlock;
- #endif /* CONFIG_BLK_DEV_ZONED */
--- 
-2.17.1
+Perfect, thanks!
+
+Logan
