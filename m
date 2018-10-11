@@ -1,16 +1,22 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:36324 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729175AbeJLB7N (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Oct 2018 21:59:13 -0400
+Received: by mail-pg1-f195.google.com with SMTP id f18-v6so4583586pgv.3
+        for <linux-block@vger.kernel.org>; Thu, 11 Oct 2018 11:30:49 -0700 (PDT)
 From: Omar Sandoval <osandov@osandov.com>
 To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	kernel-team@fb.com
-Subject: [PATCH v2 11/11] floppy: convert to blk-mq
-Date: Thu, 11 Oct 2018 12:20:51 -0700
-Message-Id: <425e985d1937bcda9193a076375b84e2a69d8558.1539284959.git.osandov@fb.com>
-In-Reply-To: <cover.1539284959.git.osandov@fb.com>
-References: <cover.1539284959.git.osandov@fb.com>
+Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
+Subject: [PATCH 13/13] floppy: convert to blk-mq
+Date: Thu, 11 Oct 2018 11:30:23 -0700
+Message-Id: <5aa64bbc9651c69eb75cf8a6e4f9182f2e68ade3.1539282366.git.osandov@fb.com>
+In-Reply-To: <cover.1539282366.git.osandov@fb.com>
+References: <cover.1539282366.git.osandov@fb.com>
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 From: Omar Sandoval <osandov@fb.com>
 
@@ -24,7 +30,7 @@ Signed-off-by: Omar Sandoval <osandov@fb.com>
  1 file changed, 44 insertions(+), 30 deletions(-)
 
 diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index f2b6f4da1034..62e0c218e5c6 100644
+index acbafd831ea3..eb19125beb90 100644
 --- a/drivers/block/floppy.c
 +++ b/drivers/block/floppy.c
 @@ -252,13 +252,13 @@ static int allowed_drive_mask = 0x33;
@@ -55,18 +61,18 @@ index f2b6f4da1034..62e0c218e5c6 100644
  
  /*
   * This struct defines the different floppy types.
-@@ -2216,8 +2216,9 @@ static void floppy_end_request(struct request *req, blk_status_t error)
- 	/* current_count_sectors can be zero if transfer failed */
- 	if (error)
- 		nr_sectors = blk_rq_cur_sectors(req);
--	if (__blk_end_request(req, error, nr_sectors << 9))
-+	if (blk_update_request(req, error, nr_sectors << 9))
+@@ -2218,8 +2218,9 @@ static void floppy_end_request(struct request *req, blk_status_t error)
+ 		nr_bytes = blk_rq_bytes(req);
+ 	else
+ 		nr_bytes = current_count_sectors << 9;
+-	if (__blk_end_request(req, error, nr_bytes))
++	if (blk_update_request(req, error, nr_bytes))
  		return;
 +	__blk_mq_end_request(req, error);
  
  	/* We're done with the request */
  	floppy_off(drive);
-@@ -2797,27 +2798,14 @@ static int make_raw_rw_request(void)
+@@ -2799,27 +2800,14 @@ static int make_raw_rw_request(void)
  	return 2;
  }
  
@@ -100,7 +106,7 @@ index f2b6f4da1034..62e0c218e5c6 100644
  	return current_req != NULL;
  }
  
-@@ -2901,29 +2889,38 @@ static void process_fd_request(void)
+@@ -2903,29 +2891,38 @@ static void process_fd_request(void)
  	schedule_bh(redo_fd_request);
  }
  
@@ -143,7 +149,7 @@ index f2b6f4da1034..62e0c218e5c6 100644
  }
  
  static const struct cont_t poll_cont = {
-@@ -4486,6 +4483,10 @@ static struct platform_driver floppy_driver = {
+@@ -4488,6 +4485,10 @@ static struct platform_driver floppy_driver = {
  	},
  };
  
@@ -154,7 +160,7 @@ index f2b6f4da1034..62e0c218e5c6 100644
  static struct platform_device floppy_device[N_DRIVE];
  
  static bool floppy_available(int drive)
-@@ -4527,15 +4528,28 @@ static int __init do_floppy_init(void)
+@@ -4529,15 +4530,28 @@ static int __init do_floppy_init(void)
  		return -ENOMEM;
  
  	for (drive = 0; drive < N_DRIVE; drive++) {
