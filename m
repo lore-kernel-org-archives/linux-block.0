@@ -1,109 +1,115 @@
-Return-Path: <keescook@chromium.org>
-Return-Path: <keescook@chromium.org>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+From: Omar Sandoval <osandov@osandov.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	kernel-team@fb.com
+Subject: [PATCH v2 03/11] swim3: add real error handling in setup
+Date: Thu, 11 Oct 2018 12:20:43 -0700
+Message-Id: <1a5a67d3d1b59bcecdabd99ea23e2bbbe1a5b28d.1539284959.git.osandov@fb.com>
+In-Reply-To: <cover.1539284959.git.osandov@fb.com>
+References: <cover.1539284959.git.osandov@fb.com>
 MIME-Version: 1.0
-In-Reply-To: <CAGXu5jJ-Hbj143Sv7ikxmLnBPyvcd1cGoT5fSbwG21LomnsORw@mail.gmail.com>
-References: <20180906000926.GA18830@beast> <CAGXu5jJ-Hbj143Sv7ikxmLnBPyvcd1cGoT5fSbwG21LomnsORw@mail.gmail.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Sun, 7 Oct 2018 23:16:01 -0700
-Message-ID: <CAGXu5jKV3eLJJsemxNEjZuANRd8-TnRkMSmiztVyY5mgC2ySHw@mail.gmail.com>
-Subject: Re: [PATCH] sunvdc: Remove VLA usage
-To: "David S. Miller" <davem@davemloft.net>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Sep 24, 2018 at 8:19 PM, Kees Cook <keescook@chromium.org> wrote:
-> On Wed, Sep 5, 2018 at 5:09 PM, Kees Cook <keescook@chromium.org> wrote:
->> In the quest to remove all stack VLA usage from the kernel[1], this
->> moves the math for cookie calculation into macros and allocates a fixed
->> size array for the maximum number of cookies and adds a runtime sanity check.
->> (Note that the size was always fixed, but just hidden from the compiler.)
->>
->> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
->>
->> Signed-off-by: Kees Cook <keescook@chromium.org>
->
-> Friendly ping. Jens, can you take this?
+From: Omar Sandoval <osandov@fb.com>
 
-Dave, should this go via you instead? I'll take it via my tree if no
-one else wants it...
+The driver doesn't have support for removing a device that has already
+been configured, but with more careful ordering we can avoid the need
+for that and make sure that we don't leak generic resources.
 
-Thanks,
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+---
+ drivers/block/swim3.c | 60 ++++++++++++++++++++++++++-----------------
+ 1 file changed, 36 insertions(+), 24 deletions(-)
 
--Kees
-
->
-> Thanks!
->
-> -Kees
->
->> ---
->>  drivers/block/sunvdc.c | 14 ++++++++++----
->>  1 file changed, 10 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/block/sunvdc.c b/drivers/block/sunvdc.c
->> index 5ca56bfae63c..f68e9baffad7 100644
->> --- a/drivers/block/sunvdc.c
->> +++ b/drivers/block/sunvdc.c
->> @@ -36,6 +36,10 @@ MODULE_VERSION(DRV_MODULE_VERSION);
->>  #define VDC_TX_RING_SIZE       512
->>  #define VDC_DEFAULT_BLK_SIZE   512
->>
->> +#define MAX_XFER_BLKS          (128 * 1024)
->> +#define MAX_XFER_SIZE          (MAX_XFER_BLKS / VDC_DEFAULT_BLK_SIZE)
->> +#define MAX_RING_COOKIES       ((MAX_XFER_BLKS / PAGE_SIZE) + 2)
->> +
->>  #define WAITING_FOR_LINK_UP    0x01
->>  #define WAITING_FOR_TX_SPACE   0x02
->>  #define WAITING_FOR_GEN_CMD    0x04
->> @@ -450,7 +454,7 @@ static int __send_request(struct request *req)
->>  {
->>         struct vdc_port *port = req->rq_disk->private_data;
->>         struct vio_dring_state *dr = &port->vio.drings[VIO_DRIVER_TX_RING];
->> -       struct scatterlist sg[port->ring_cookies];
->> +       struct scatterlist sg[MAX_RING_COOKIES];
->>         struct vdc_req_entry *rqe;
->>         struct vio_disk_desc *desc;
->>         unsigned int map_perm;
->> @@ -458,6 +462,9 @@ static int __send_request(struct request *req)
->>         u64 len;
->>         u8 op;
->>
->> +       if (WARN_ON(port->ring_cookies > MAX_RING_COOKIES))
->> +               return -EINVAL;
->> +
->>         map_perm = LDC_MAP_SHADOW | LDC_MAP_DIRECT | LDC_MAP_IO;
->>
->>         if (rq_data_dir(req) == READ) {
->> @@ -984,9 +991,8 @@ static int vdc_port_probe(struct vio_dev *vdev, const struct vio_device_id *id)
->>                 goto err_out_free_port;
->>
->>         port->vdisk_block_size = VDC_DEFAULT_BLK_SIZE;
->> -       port->max_xfer_size = ((128 * 1024) / port->vdisk_block_size);
->> -       port->ring_cookies = ((port->max_xfer_size *
->> -                              port->vdisk_block_size) / PAGE_SIZE) + 2;
->> +       port->max_xfer_size = MAX_XFER_SIZE;
->> +       port->ring_cookies = MAX_RING_COOKIES;
->>
->>         err = vio_ldc_alloc(&port->vio, &vdc_ldc_cfg, port);
->>         if (err)
->> --
->> 2.17.1
->>
->>
->> --
->> Kees Cook
->> Pixel Security
->
->
->
-> --
-> Kees Cook
-> Pixel Security
-
-
-
+diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
+index 469541c1e51e..df7ebe016e2c 100644
+--- a/drivers/block/swim3.c
++++ b/drivers/block/swim3.c
+@@ -1202,47 +1202,59 @@ static int swim3_add_device(struct macio_dev *mdev, int index)
+ static int swim3_attach(struct macio_dev *mdev,
+ 			const struct of_device_id *match)
+ {
++	struct floppy_state *fs;
+ 	struct gendisk *disk;
+-	int index, rc;
++	int rc;
+ 
+-	index = floppy_count++;
+-	if (index >= MAX_FLOPPIES)
++	if (floppy_count >= MAX_FLOPPIES)
+ 		return -ENXIO;
+ 
+-	/* Add the drive */
+-	rc = swim3_add_device(mdev, index);
+-	if (rc)
+-		return rc;
+-	/* Now register that disk. Same comment about failure handling */
+-	disk = disks[index] = alloc_disk(1);
+-	if (disk == NULL)
+-		return -ENOMEM;
++	if (floppy_count == 0) {
++		rc = register_blkdev(FLOPPY_MAJOR, "fd");
++		if (rc)
++			return rc;
++	}
++
++	fs = &floppy_states[floppy_count];
++
++	disk = alloc_disk(1);
++	if (disk == NULL) {
++		rc = -ENOMEM;
++		goto out_unregister;
++	}
+ 	disk->queue = blk_init_queue(do_fd_request, &swim3_lock);
+ 	if (disk->queue == NULL) {
+-		put_disk(disk);
+-		return -ENOMEM;
++		rc = -ENOMEM;
++		goto out_put_disk;
+ 	}
+ 	blk_queue_bounce_limit(disk->queue, BLK_BOUNCE_HIGH);
+-	disk->queue->queuedata = &floppy_states[index];
++	disk->queue->queuedata = fs;
+ 
+-	if (index == 0) {
+-		/* If we failed, there isn't much we can do as the driver is still
+-		 * too dumb to remove the device, just bail out
+-		 */
+-		if (register_blkdev(FLOPPY_MAJOR, "fd"))
+-			return 0;
+-	}
++	rc = swim3_add_device(mdev, floppy_count);
++	if (rc)
++		goto out_cleanup_queue;
+ 
+ 	disk->major = FLOPPY_MAJOR;
+-	disk->first_minor = index;
++	disk->first_minor = floppy_count;
+ 	disk->fops = &floppy_fops;
+-	disk->private_data = &floppy_states[index];
++	disk->private_data = fs;
+ 	disk->flags |= GENHD_FL_REMOVABLE;
+-	sprintf(disk->disk_name, "fd%d", index);
++	sprintf(disk->disk_name, "fd%d", floppy_count);
+ 	set_capacity(disk, 2880);
+ 	add_disk(disk);
+ 
++	disks[floppy_count++] = disk;
+ 	return 0;
++
++out_cleanup_queue:
++	blk_cleanup_queue(disk->queue);
++	disk->queue = NULL;
++out_put_disk:
++	put_disk(disk);
++out_unregister:
++	if (floppy_count == 0)
++		unregister_blkdev(FLOPPY_MAJOR, "fd");
++	return rc;
+ }
+ 
+ static const struct of_device_id swim3_match[] =
 -- 
-Kees Cook
-Pixel Security
+2.19.1
