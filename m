@@ -1,166 +1,190 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+From: Omar Sandoval <osandov@osandov.com>
 To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 06/17] paride: convert pf to blk-mq
-Date: Thu, 11 Oct 2018 10:58:58 -0600
-Message-Id: <20181011165909.32615-7-axboe@kernel.dk>
-In-Reply-To: <20181011165909.32615-1-axboe@kernel.dk>
-References: <20181011165909.32615-1-axboe@kernel.dk>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	kernel-team@fb.com
+Subject: [PATCH v2 11/11] floppy: convert to blk-mq
+Date: Thu, 11 Oct 2018 12:20:51 -0700
+Message-Id: <425e985d1937bcda9193a076375b84e2a69d8558.1539284959.git.osandov@fb.com>
+In-Reply-To: <cover.1539284959.git.osandov@fb.com>
+References: <cover.1539284959.git.osandov@fb.com>
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- drivers/block/paride/pf.c | 68 +++++++++++++++++++++++++++++++--------
- 1 file changed, 54 insertions(+), 14 deletions(-)
+From: Omar Sandoval <osandov@fb.com>
 
-diff --git a/drivers/block/paride/pf.c b/drivers/block/paride/pf.c
-index eef7a91f667d..58866cf495f8 100644
---- a/drivers/block/paride/pf.c
-+++ b/drivers/block/paride/pf.c
-@@ -152,7 +152,7 @@ enum {D_PRT, D_PRO, D_UNI, D_MOD, D_SLV, D_LUN, D_DLY};
- #include <linux/hdreg.h>
- #include <linux/cdrom.h>
- #include <linux/spinlock.h>
+This driver likes to fetch requests from all over the place, so make
+queue_rq put requests on a list so that the logic stays the same. Tested
+with QEMU.
+
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+---
+ drivers/block/floppy.c | 74 +++++++++++++++++++++++++-----------------
+ 1 file changed, 44 insertions(+), 30 deletions(-)
+
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index f2b6f4da1034..62e0c218e5c6 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -252,13 +252,13 @@ static int allowed_drive_mask = 0x33;
+ 
+ static int irqdma_allocated;
+ 
 -#include <linux/blkdev.h>
 +#include <linux/blk-mq.h>
  #include <linux/blkpg.h>
- #include <linux/mutex.h>
- #include <linux/uaccess.h>
-@@ -206,7 +206,8 @@ module_param_array(drive3, int, NULL, 0);
- #define ATAPI_WRITE_10		0x2a
+ #include <linux/cdrom.h>	/* for the compatibility eject ioctl */
+ #include <linux/completion.h>
  
- static int pf_open(struct block_device *bdev, fmode_t mode);
--static void do_pf_request(struct request_queue * q);
-+static blk_status_t pf_queue_rq(struct blk_mq_hw_ctx *hctx,
-+				const struct blk_mq_queue_data *bd);
- static int pf_ioctl(struct block_device *bdev, fmode_t mode,
- 		    unsigned int cmd, unsigned long arg);
- static int pf_getgeo(struct block_device *bdev, struct hd_geometry *geo);
-@@ -238,6 +239,8 @@ struct pf_unit {
- 	int present;		/* device present ? */
- 	char name[PF_NAMELEN];	/* pf0, pf1, ... */
- 	struct gendisk *disk;
-+	struct blk_mq_tag_set tag_set;
-+	struct list_head rq_list;
- };
++static LIST_HEAD(floppy_reqs);
+ static struct request *current_req;
+-static void do_fd_request(struct request_queue *q);
+ static int set_next_request(void);
  
- static struct pf_unit units[PF_UNITS];
-@@ -277,6 +280,10 @@ static const struct block_device_operations pf_fops = {
- 	.check_events	= pf_check_events,
- };
+ #ifndef fd_get_dma_residue
+@@ -414,10 +414,10 @@ static struct floppy_drive_struct drive_state[N_DRIVE];
+ static struct floppy_write_errors write_errors[N_DRIVE];
+ static struct timer_list motor_off_timer[N_DRIVE];
+ static struct gendisk *disks[N_DRIVE];
++static struct blk_mq_tag_set tag_sets[N_DRIVE];
+ static struct block_device *opened_bdev[N_DRIVE];
+ static DEFINE_MUTEX(open_lock);
+ static struct floppy_raw_cmd *raw_cmd, default_raw_cmd;
+-static int fdc_queue;
  
-+static const struct blk_mq_ops pf_mq_ops = {
-+	.queue_rq	= pf_queue_rq,
-+};
-+
- static void __init pf_init_units(void)
- {
- 	struct pf_unit *pf;
-@@ -284,14 +291,34 @@ static void __init pf_init_units(void)
+ /*
+  * This struct defines the different floppy types.
+@@ -2216,8 +2216,9 @@ static void floppy_end_request(struct request *req, blk_status_t error)
+ 	/* current_count_sectors can be zero if transfer failed */
+ 	if (error)
+ 		nr_sectors = blk_rq_cur_sectors(req);
+-	if (__blk_end_request(req, error, nr_sectors << 9))
++	if (blk_update_request(req, error, nr_sectors << 9))
+ 		return;
++	__blk_mq_end_request(req, error);
  
- 	pf_drive_count = 0;
- 	for (unit = 0, pf = units; unit < PF_UNITS; unit++, pf++) {
--		struct gendisk *disk = alloc_disk(1);
-+		struct blk_mq_tag_set *set;
-+		struct gendisk *disk;
-+
-+		disk = alloc_disk(1);
- 		if (!disk)
- 			continue;
--		disk->queue = blk_init_queue(do_pf_request, &pf_spin_lock);
--		if (!disk->queue) {
-+
-+		set = &pf->tag_set;
-+		set->ops = &pf_mq_ops;
-+		set->nr_hw_queues = 1;
-+		set->queue_depth = 1;
-+		set->numa_node = NUMA_NO_NODE;
-+		set->flags = BLK_MQ_F_SHOULD_MERGE;
-+		if (blk_mq_alloc_tag_set(set)) {
- 			put_disk(disk);
--			return;
-+			continue;
- 		}
-+
-+		disk->queue = blk_mq_init_queue(set);
-+		if (IS_ERR(disk->queue)) {
-+			blk_mq_free_tag_set(set);
-+			put_disk(disk);
-+			disk->queue = NULL;
-+			continue;
-+		}
-+
-+		INIT_LIST_HEAD(&pf->rq_list);
-+		disk->queue->queuedata = pf;
- 		blk_queue_max_segments(disk->queue, cluster);
- 		blk_queue_bounce_limit(disk->queue, BLK_BOUNCE_HIGH);
- 		pf->disk = disk;
-@@ -784,18 +811,18 @@ static int pf_queue;
+ 	/* We're done with the request */
+ 	floppy_off(drive);
+@@ -2797,27 +2798,14 @@ static int make_raw_rw_request(void)
+ 	return 2;
+ }
+ 
+-/*
+- * Round-robin between our available drives, doing one request from each
+- */
  static int set_next_request(void)
  {
- 	struct pf_unit *pf;
 -	struct request_queue *q;
- 	int old_pos = pf_queue;
- 
- 	do {
- 		pf = &units[pf_queue];
--		q = pf->present ? pf->disk->queue : NULL;
- 		if (++pf_queue == PF_UNITS)
- 			pf_queue = 0;
+-	int old_pos = fdc_queue;
+-
+-	do {
+-		q = disks[fdc_queue]->queue;
+-		if (++fdc_queue == N_DRIVE)
+-			fdc_queue = 0;
 -		if (q) {
--			pf_req = blk_fetch_request(q);
--			if (pf_req)
+-			current_req = blk_fetch_request(q);
+-			if (current_req) {
+-				current_req->error_count = 0;
 -				break;
-+		if (pf->present && !list_empty(&pf->rq_list)) {
-+			pf_req = list_first_entry(&pf->rq_list, struct request,
-+							queuelist);
-+			list_del_init(&pf_req->queuelist);
-+			blk_mq_start_request(pf_req);
-+			break;
- 		}
- 	} while (pf_queue != old_pos);
- 
-@@ -804,8 +831,12 @@ static int set_next_request(void)
- 
- static void pf_end_request(blk_status_t err)
- {
--	if (pf_req && !__blk_end_request_cur(pf_req, err))
-+	if (!pf_req)
-+		return;
-+	if (!blk_update_request(pf_req, err, blk_rq_cur_bytes(pf_req))) {
-+		__blk_mq_end_request(pf_req, err);
- 		pf_req = NULL;
+-			}
+-		}
+-	} while (fdc_queue != old_pos);
+-
++	current_req = list_first_entry_or_null(&floppy_reqs, struct request,
++					       queuelist);
++	if (current_req) {
++		current_req->error_count = 0;
++		list_del_init(&current_req->queuelist);
 +	}
+ 	return current_req != NULL;
  }
  
- static void pf_request(void)
-@@ -842,9 +873,17 @@ static void pf_request(void)
- 	}
+@@ -2901,29 +2889,38 @@ static void process_fd_request(void)
+ 	schedule_bh(redo_fd_request);
  }
  
--static void do_pf_request(struct request_queue *q)
-+static blk_status_t pf_queue_rq(struct blk_mq_hw_ctx *hctx,
-+				const struct blk_mq_queue_data *bd)
+-static void do_fd_request(struct request_queue *q)
++static blk_status_t floppy_queue_rq(struct blk_mq_hw_ctx *hctx,
++				    const struct blk_mq_queue_data *bd)
  {
-+	struct pf_unit *pf = hctx->queue->queuedata;
-+	
-+	spin_lock_irq(&pf_spin_lock);
-+	list_add_tail(&bd->rq->queuelist, &pf->rq_list);
- 	pf_request();
-+	spin_unlock_irq(&pf_spin_lock);
++	blk_mq_start_request(bd->rq);
 +
+ 	if (WARN(max_buffer_sectors == 0,
+ 		 "VFS: %s called on non-open device\n", __func__))
+-		return;
++		return BLK_STS_IOERR;
+ 
+ 	if (WARN(atomic_read(&usage_count) == 0,
+ 		 "warning: usage count=0, current_req=%p sect=%ld flags=%llx\n",
+ 		 current_req, (long)blk_rq_pos(current_req),
+ 		 (unsigned long long) current_req->cmd_flags))
+-		return;
++		return BLK_STS_IOERR;
++
++	spin_lock_irq(&floppy_lock);
++	list_add_tail(&bd->rq->queuelist, &floppy_reqs);
++	spin_unlock_irq(&floppy_lock);
+ 
+ 	if (test_and_set_bit(0, &fdc_busy)) {
+ 		/* fdc busy, this new request will be treated when the
+ 		   current one is done */
+ 		is_alive(__func__, "old request running");
+-		return;
++		return BLK_STS_OK;
+ 	}
++
+ 	command_status = FD_COMMAND_NONE;
+ 	__reschedule_timeout(MAXTIMEOUT, "fd_request");
+ 	set_fdc(0);
+ 	process_fd_request();
+ 	is_alive(__func__, "");
 +	return BLK_STS_OK;
  }
  
- static int pf_next_buf(void)
-@@ -1023,6 +1062,7 @@ static void __exit pf_exit(void)
- 		if (!pf->present)
- 			continue;
- 		del_gendisk(pf->disk);
-+		blk_mq_free_tag_set(&pf->tag_set);
- 		blk_cleanup_queue(pf->disk->queue);
- 		put_disk(pf->disk);
- 		pi_release(pf->pi);
+ static const struct cont_t poll_cont = {
+@@ -4486,6 +4483,10 @@ static struct platform_driver floppy_driver = {
+ 	},
+ };
+ 
++static const struct blk_mq_ops floppy_mq_ops = {
++	.queue_rq = floppy_queue_rq,
++};
++
+ static struct platform_device floppy_device[N_DRIVE];
+ 
+ static bool floppy_available(int drive)
+@@ -4527,15 +4528,28 @@ static int __init do_floppy_init(void)
+ 		return -ENOMEM;
+ 
+ 	for (drive = 0; drive < N_DRIVE; drive++) {
++		struct blk_mq_tag_set *set;
++
+ 		disks[drive] = alloc_disk(1);
+ 		if (!disks[drive]) {
+ 			err = -ENOMEM;
+ 			goto out_put_disk;
+ 		}
+ 
+-		disks[drive]->queue = blk_init_queue(do_fd_request, &floppy_lock);
+-		if (!disks[drive]->queue) {
+-			err = -ENOMEM;
++		set = &tag_sets[drive];
++		set->ops = &floppy_mq_ops;
++		set->nr_hw_queues = 1;
++		set->queue_depth = 2;
++		set->numa_node = NUMA_NO_NODE;
++		set->flags = BLK_MQ_F_SHOULD_MERGE;
++		err = blk_mq_alloc_tag_set(set);
++		if (err)
++			goto out_put_disk;
++
++		disks[drive]->queue = blk_mq_init_queue(set);
++		if (IS_ERR(disks[drive]->queue)) {
++			err = PTR_ERR(disks[drive]->queue);
++			disks[drive]->queue = NULL;
+ 			goto out_put_disk;
+ 		}
+ 
 -- 
-2.17.1
+2.19.1
