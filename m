@@ -1,592 +1,337 @@
-Return-Path: <prvs=81565c836=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH v2 11/11] block: Introduce blk_revalidate_disk_zones()
-Date: Thu, 11 Oct 2018 16:09:52 +0900
-Message-Id: <20181011070952.13248-12-damien.lemoal@wdc.com>
-In-Reply-To: <20181011070952.13248-1-damien.lemoal@wdc.com>
-References: <20181011070952.13248-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:38389 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729564AbeJLCth (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Oct 2018 22:49:37 -0400
+Received: by mail-pf1-f194.google.com with SMTP id f29-v6so4899407pff.5
+        for <linux-block@vger.kernel.org>; Thu, 11 Oct 2018 12:21:02 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, kernel-team@fb.com
+Subject: [PATCH v2 05/11] amiflop: fold headers into C file
+Date: Thu, 11 Oct 2018 12:20:45 -0700
+Message-Id: <ec3301bfbf5ff683ec8e8fece0699848e0b00b81.1539284959.git.osandov@fb.com>
+In-Reply-To: <cover.1539284959.git.osandov@fb.com>
+References: <cover.1539284959.git.osandov@fb.com>
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Drivers exposing zoned block devices have to initialize and maintain
-correctness (i.e. revalidate) of the device zone bitmaps attached to
-the device request queue (seq_zones_bitmap and seq_zones_wlock).
+From: Omar Sandoval <osandov@fb.com>
 
-To simplify coding this, introduce a generic helper function
-blk_revalidate_disk_zones() suitable for most (and likely all) cases.
-This new function always update the seq_zones_bitmap and seq_zones_wlock
-bitmaps as well as the queue nr_zones field when called for a disk
-using a request based queue. For a disk using a BIO based queue, only
-the number of zones is updated since these queues do not have
-schedulers and so do not need the zone bitmaps.
+amifd.h and amifdreg.h are only used from amiflop.c, and they're pretty
+small, so move the contents to amiflop.c and get rid of the .h files.
+This is preparation for adding a struct blk_mq_tag_set to struct
+amiga_floppy_struct.
 
-With this change, the zone bitmap initialization code in sd_zbc.c can be
-replaced with a call to this function in sd_zbc_read_zones(), which is
-called from the disk revalidate block operation method.
-
-A call to blk_revalidate_disk_zones() is also added to the null_blk
-driver for devices created with the zoned mode enabled.
-
-Finally, to ensure that zoned devices created with dm-linear or
-dm-flakey expose the correct number of zones through sysfs, a call to
-blk_revalidate_disk_zones() is added to dm_table_set_restrictions().
-
-The zone bitmaps allocated and initialized with
-blk_revalidate_disk_zones() are freed automatically from
-__blk_release_queue() using the block internal function
-blk_queue_free_zone_bitmaps().
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- block/blk-sysfs.c             |   2 +
- block/blk-zoned.c             | 136 +++++++++++++++++++++
- block/blk.h                   |   6 +
- drivers/block/null_blk_main.c |   7 ++
- drivers/md/dm-table.c         |  10 ++
- drivers/scsi/sd.c             |   2 -
- drivers/scsi/sd.h             |   4 -
- drivers/scsi/sd_zbc.c         | 218 ++++------------------------------
- include/linux/blkdev.h        |   7 ++
- 9 files changed, 194 insertions(+), 198 deletions(-)
+ drivers/block/amiflop.c  | 123 ++++++++++++++++++++++++++++++++++++++-
+ include/linux/amifd.h    |  63 --------------------
+ include/linux/amifdreg.h |  82 --------------------------
+ 3 files changed, 120 insertions(+), 148 deletions(-)
+ delete mode 100644 include/linux/amifd.h
+ delete mode 100644 include/linux/amifdreg.h
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index f7060a938bf9..8bc1a9a9d6f7 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -852,6 +852,8 @@ static void __blk_release_queue(struct work_struct *work)
- 	if (q->queue_tags)
- 		__blk_queue_free_tags(q);
- 
-+	blk_queue_free_zone_bitmaps(q);
-+
- 	if (!q->mq_ops) {
- 		if (q->exit_rq_fn)
- 			q->exit_rq_fn(q, q->fq->flush_rq);
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 90cf503091d5..13ba2011a306 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -12,6 +12,7 @@
- #include <linux/module.h>
- #include <linux/rbtree.h>
- #include <linux/blkdev.h>
+diff --git a/drivers/block/amiflop.c b/drivers/block/amiflop.c
+index 3aaf6af3ec23..a7d6e6a9b12f 100644
+--- a/drivers/block/amiflop.c
++++ b/drivers/block/amiflop.c
+@@ -61,10 +61,8 @@
+ #include <linux/delay.h>
+ #include <linux/init.h>
+ #include <linux/mutex.h>
+-#include <linux/amifdreg.h>
+-#include <linux/amifd.h>
+ #include <linux/fs.h>
+-#include <linux/blkdev.h>
 +#include <linux/blk-mq.h>
+ #include <linux/elevator.h>
+ #include <linux/interrupt.h>
+ #include <linux/platform_device.h>
+@@ -86,6 +84,125 @@
+  *  Defines
+  */
  
- #include "blk.h"
- 
-@@ -359,3 +360,138 @@ int blkdev_reset_zones_ioctl(struct block_device *bdev, fmode_t mode,
- 	return blkdev_reset_zones(bdev, zrange.sector, zrange.nr_sectors,
- 				  GFP_KERNEL);
- }
++/*
++ * CIAAPRA bits (read only)
++ */
 +
-+static inline unsigned long *blk_alloc_zone_bitmap(int node,
-+						   unsigned int nr_zones)
-+{
-+	return kcalloc_node(BITS_TO_LONGS(nr_zones), sizeof(unsigned long),
-+			    GFP_NOIO, node);
-+}
++#define DSKRDY      (0x1<<5)        /* disk ready when low */
++#define DSKTRACK0   (0x1<<4)        /* head at track zero when low */
++#define DSKPROT     (0x1<<3)        /* disk protected when low */
++#define DSKCHANGE   (0x1<<2)        /* low when disk removed */
 +
 +/*
-+ * Allocate an array of struct blk_zone to get nr_zones zone information.
-+ * The allocated array may be smaller than nr_zones.
++ * CIAAPRB bits (read/write)
 + */
-+static struct blk_zone *blk_alloc_zones(int node, unsigned int *nr_zones)
-+{
-+	size_t size = *nr_zones * sizeof(struct blk_zone);
-+	struct page *page;
-+	int order;
 +
-+	for (order = get_order(size); order > 0; order--) {
-+		page = alloc_pages_node(node, GFP_NOIO | __GFP_ZERO, order);
-+		if (page) {
-+			*nr_zones = min_t(unsigned int, *nr_zones,
-+				(PAGE_SIZE << order) / sizeof(struct blk_zone));
-+			return page_address(page);
-+		}
-+	}
++#define DSKMOTOR    (0x1<<7)        /* motor on when low */
++#define DSKSEL3     (0x1<<6)        /* select drive 3 when low */
++#define DSKSEL2     (0x1<<5)        /* select drive 2 when low */
++#define DSKSEL1     (0x1<<4)        /* select drive 1 when low */
++#define DSKSEL0     (0x1<<3)        /* select drive 0 when low */
++#define DSKSIDE     (0x1<<2)        /* side selection: 0 = upper, 1 = lower */
++#define DSKDIREC    (0x1<<1)        /* step direction: 0=in, 1=out (to trk 0) */
++#define DSKSTEP     (0x1)           /* pulse low to step head 1 track */
 +
-+	return NULL;
-+}
-+
-+void blk_queue_free_zone_bitmaps(struct request_queue *q)
-+{
-+	kfree(q->seq_zones_bitmap);
-+	q->seq_zones_bitmap = NULL;
-+	kfree(q->seq_zones_wlock);
-+	q->seq_zones_wlock = NULL;
-+}
-+
-+/**
-+ * blk_revalidate_disk_zones - (re)allocate and initialize zone bitmaps
-+ * @disk:	Target disk
-+ *
-+ * Helper function for low-level device drivers to (re) allocate and initialize
-+ * a disk request queue zone bitmaps. This functions should normally be called
-+ * within the disk ->revalidate method. For BIO based queues, no zone bitmap
-+ * is allocated.
++/*
++ * DSKBYTR bits (read only)
 + */
-+int blk_revalidate_disk_zones(struct gendisk *disk)
-+{
-+	struct request_queue *q = disk->queue;
-+	unsigned int nr_zones = __blkdev_nr_zones(q, get_capacity(disk));
-+	unsigned long *seq_zones_wlock = NULL, *seq_zones_bitmap = NULL;
-+	unsigned int i, rep_nr_zones = 0, z = 0, nrz;
-+	struct blk_zone *zones = NULL;
-+	sector_t sector = 0;
-+	int ret = 0;
 +
-+	/*
-+	 * BIO based queues do not use a scheduler so only q->nr_zones
-+	 * needs to be updated so that the sysfs exposed value is correct.
-+	 */
-+	if (!queue_is_rq_based(q)) {
-+		q->nr_zones = nr_zones;
-+		return 0;
-+	}
++#define DSKBYT      (1<<15)         /* register contains valid byte when set */
++#define DMAON       (1<<14)         /* disk DMA enabled */
++#define DISKWRITE   (1<<13)         /* disk write bit in DSKLEN enabled */
++#define WORDEQUAL   (1<<12)         /* DSKSYNC register match when true */
++/* bits 7-0 are data */
 +
-+	if (!blk_queue_is_zoned(q) || !nr_zones) {
-+		nr_zones = 0;
-+		goto update;
-+	}
++/*
++ * ADKCON/ADKCONR bits
++ */
 +
-+	/* Allocate bitmaps */
-+	ret = -ENOMEM;
-+	seq_zones_wlock = blk_alloc_zone_bitmap(q->node, nr_zones);
-+	if (!seq_zones_wlock)
-+		goto out;
-+	seq_zones_bitmap = blk_alloc_zone_bitmap(q->node, nr_zones);
-+	if (!seq_zones_bitmap)
-+		goto out;
-+
-+	/* Get zone information and initialize seq_zones_bitmap */
-+	rep_nr_zones = nr_zones;
-+	zones = blk_alloc_zones(q->node, &rep_nr_zones);
-+	if (!zones)
-+		goto out;
-+
-+	while (z < nr_zones) {
-+		nrz = min(nr_zones - z, rep_nr_zones);
-+		ret = blk_report_zones(disk, sector, zones, &nrz, GFP_NOIO);
-+		if (ret)
-+			goto out;
-+		if (!nrz)
-+			break;
-+		for (i = 0; i < nrz; i++) {
-+			if (zones[i].type != BLK_ZONE_TYPE_CONVENTIONAL)
-+				set_bit(z, seq_zones_bitmap);
-+			z++;
-+		}
-+		sector += nrz * blk_queue_zone_sectors(q);
-+	}
-+
-+	if (WARN_ON(z != nr_zones)) {
-+		ret = -EIO;
-+		goto out;
-+	}
-+
-+update:
-+	/*
-+	 * Install the new bitmaps, making sure the queue is stopped and
-+	 * all I/Os are completed (i.e. a scheduler is not referencing the
-+	 * bitmaps).
-+	 */
-+	blk_mq_freeze_queue(q);
-+	q->nr_zones = nr_zones;
-+	swap(q->seq_zones_wlock, seq_zones_wlock);
-+	swap(q->seq_zones_bitmap, seq_zones_bitmap);
-+	blk_mq_unfreeze_queue(q);
-+
-+out:
-+	free_pages((unsigned long)zones,
-+		   get_order(rep_nr_zones * sizeof(struct blk_zone)));
-+	kfree(seq_zones_wlock);
-+	kfree(seq_zones_bitmap);
-+
-+	if (ret) {
-+		pr_warn("%s: failed to revalidate zones\n", disk->disk_name);
-+		blk_mq_freeze_queue(q);
-+		blk_queue_free_zone_bitmaps(q);
-+		blk_mq_unfreeze_queue(q);
-+	}
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(blk_revalidate_disk_zones);
-+
-diff --git a/block/blk.h b/block/blk.h
-index 3d67844676fb..7e30ecea0680 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -423,4 +423,10 @@ static inline int blk_iolatency_init(struct request_queue *q) { return 0; }
- 
- struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp);
- 
-+#ifdef CONFIG_BLK_DEV_ZONED
-+void blk_queue_free_zone_bitmaps(struct request_queue *q);
-+#else
-+static inline void blk_queue_free_zone_bitmaps(struct request_queue *q) {}
++#ifndef SETCLR
++#define ADK_SETCLR      (1<<15)     /* control bit */
 +#endif
++#define ADK_PRECOMP1    (1<<14)     /* precompensation selection */
++#define ADK_PRECOMP0    (1<<13)     /* 00=none, 01=140ns, 10=280ns, 11=500ns */
++#define ADK_MFMPREC     (1<<12)     /* 0=GCR precomp., 1=MFM precomp. */
++#define ADK_WORDSYNC    (1<<10)     /* enable DSKSYNC auto DMA */
++#define ADK_MSBSYNC     (1<<9)      /* when 1, enable sync on MSbit (for GCR) */
++#define ADK_FAST        (1<<8)      /* bit cell: 0=2us (GCR), 1=1us (MFM) */
 +
- #endif /* BLK_INTERNAL_H */
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index f5759ca768d1..07780942b79f 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -1613,6 +1613,13 @@ static int null_gendisk_register(struct nullb *nullb)
- 	disk->queue		= nullb->q;
- 	strncpy(disk->disk_name, nullb->disk_name, DISK_NAME_LEN);
- 
-+	if (nullb->dev->zoned) {
-+		int ret = blk_revalidate_disk_zones(disk);
++/*
++ * DSKLEN bits
++ */
 +
-+		if (ret != 0)
-+			return ret;
-+	}
++#define DSKLEN_DMAEN    (1<<15)
++#define DSKLEN_WRITE    (1<<14)
 +
- 	add_disk(disk);
- 	return 0;
- }
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index 3d0e2c198f06..fb4bea20657b 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -1937,6 +1937,16 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
- 	 */
- 	if (blk_queue_add_random(q) && dm_table_all_devices_attribute(t, device_is_not_random))
- 		blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, q);
++/*
++ * INTENA/INTREQ bits
++ */
 +
-+	/*
-+	 * For a zoned target, the number of zones should be updated for the
-+	 * correct value to be exposed in sysfs queue/nr_zones. For a BIO based
-+	 * target, this is all that is needed. For a request based target, the
-+	 * queue zone bitmaps must also be updated.
-+	 * Use blk_revalidate_disk_zones() to handle this.
-+	 */
-+	if (blk_queue_is_zoned(q))
-+		blk_revalidate_disk_zones(t->md->disk);
- }
- 
- unsigned int dm_table_get_num_targets(struct dm_table *t)
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 718aaf15d812..370b43683470 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -3413,8 +3413,6 @@ static int sd_remove(struct device *dev)
- 	del_gendisk(sdkp->disk);
- 	sd_shutdown(dev);
- 
--	sd_zbc_remove(sdkp);
--
- 	free_opal_dev(sdkp->opal_dev);
- 
- 	blk_register_region(devt, SD_MINORS, NULL,
-diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-index f72f20fd0d8b..1d63f3a23ffb 100644
---- a/drivers/scsi/sd.h
-+++ b/drivers/scsi/sd.h
-@@ -76,7 +76,6 @@ struct scsi_disk {
- #ifdef CONFIG_BLK_DEV_ZONED
- 	u32		nr_zones;
- 	u32		zone_blocks;
--	u32		zone_shift;
- 	u32		zones_optimal_open;
- 	u32		zones_optimal_nonseq;
- 	u32		zones_max_open;
-@@ -271,7 +270,6 @@ static inline int sd_is_zoned(struct scsi_disk *sdkp)
- #ifdef CONFIG_BLK_DEV_ZONED
- 
- extern int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buffer);
--extern void sd_zbc_remove(struct scsi_disk *sdkp);
- extern void sd_zbc_print_zones(struct scsi_disk *sdkp);
- extern int sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd);
- extern void sd_zbc_complete(struct scsi_cmnd *cmd, unsigned int good_bytes,
-@@ -288,8 +286,6 @@ static inline int sd_zbc_read_zones(struct scsi_disk *sdkp,
- 	return 0;
- }
- 
--static inline void sd_zbc_remove(struct scsi_disk *sdkp) {}
--
- static inline void sd_zbc_print_zones(struct scsi_disk *sdkp) {}
- 
- static inline int sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd)
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 1e8274f473b0..fa02e00fb740 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -424,191 +424,10 @@ static s32 sd_zbc_check_zones(struct scsi_disk *sdkp)
- 	return ret;
- }
- 
--/**
-- * sd_zbc_alloc_zone_bitmap - Allocate a zone bitmap (one bit per zone).
-- * @nr_zones: Number of zones to allocate space for.
-- * @numa_node: NUMA node to allocate the memory from.
-- */
--static inline unsigned long *
--sd_zbc_alloc_zone_bitmap(u32 nr_zones, int numa_node)
--{
--	return kcalloc_node(BITS_TO_LONGS(nr_zones), sizeof(unsigned long),
--			    GFP_KERNEL, numa_node);
--}
--
--/**
-- * sd_zbc_get_seq_zones - Parse report zones reply to identify sequential zones
-- * @sdkp: disk used
-- * @buf: report reply buffer
-- * @buflen: length of @buf
-- * @zone_shift: logarithm base 2 of the number of blocks in a zone
-- * @seq_zones_bitmap: bitmap of sequential zones to set
-- *
-- * Parse reported zone descriptors in @buf to identify sequential zones and
-- * set the reported zone bit in @seq_zones_bitmap accordingly.
-- * Since read-only and offline zones cannot be written, do not
-- * mark them as sequential in the bitmap.
-- * Return the LBA after the last zone reported.
-- */
--static sector_t sd_zbc_get_seq_zones(struct scsi_disk *sdkp, unsigned char *buf,
--				     unsigned int buflen, u32 zone_shift,
--				     unsigned long *seq_zones_bitmap)
--{
--	sector_t lba, next_lba = sdkp->capacity;
--	unsigned int buf_len, list_length;
--	unsigned char *rec;
--	u8 type, cond;
--
--	list_length = get_unaligned_be32(&buf[0]) + 64;
--	buf_len = min(list_length, buflen);
--	rec = buf + 64;
--
--	while (rec < buf + buf_len) {
--		type = rec[0] & 0x0f;
--		cond = (rec[1] >> 4) & 0xf;
--		lba = get_unaligned_be64(&rec[16]);
--		if (type != ZBC_ZONE_TYPE_CONV &&
--		    cond != ZBC_ZONE_COND_READONLY &&
--		    cond != ZBC_ZONE_COND_OFFLINE)
--			set_bit(lba >> zone_shift, seq_zones_bitmap);
--		next_lba = lba + get_unaligned_be64(&rec[8]);
--		rec += 64;
--	}
--
--	return next_lba;
--}
--
--/**
-- * sd_zbc_setup_seq_zones_bitmap - Initialize a seq zone bitmap.
-- * @sdkp: target disk
-- * @zone_shift: logarithm base 2 of the number of blocks in a zone
-- * @nr_zones: number of zones to set up a seq zone bitmap for
-- *
-- * Allocate a zone bitmap and initialize it by identifying sequential zones.
-- */
--static unsigned long *
--sd_zbc_setup_seq_zones_bitmap(struct scsi_disk *sdkp, u32 zone_shift,
--			      u32 nr_zones)
--{
--	struct request_queue *q = sdkp->disk->queue;
--	unsigned long *seq_zones_bitmap;
--	sector_t lba = 0;
--	unsigned char *buf;
--	int ret = -ENOMEM;
--
--	seq_zones_bitmap = sd_zbc_alloc_zone_bitmap(nr_zones, q->node);
--	if (!seq_zones_bitmap)
--		return ERR_PTR(-ENOMEM);
--
--	buf = kmalloc(SD_ZBC_BUF_SIZE, GFP_KERNEL);
--	if (!buf)
--		goto out;
--
--	while (lba < sdkp->capacity) {
--		ret = sd_zbc_do_report_zones(sdkp, buf, SD_ZBC_BUF_SIZE, lba,
--					     true);
--		if (ret)
--			goto out;
--		lba = sd_zbc_get_seq_zones(sdkp, buf, SD_ZBC_BUF_SIZE,
--					   zone_shift, seq_zones_bitmap);
--	}
--
--	if (lba != sdkp->capacity) {
--		/* Something went wrong */
--		ret = -EIO;
--	}
--
--out:
--	kfree(buf);
--	if (ret) {
--		kfree(seq_zones_bitmap);
--		return ERR_PTR(ret);
--	}
--	return seq_zones_bitmap;
--}
--
--static void sd_zbc_cleanup(struct scsi_disk *sdkp)
--{
--	struct request_queue *q = sdkp->disk->queue;
--
--	kfree(q->seq_zones_bitmap);
--	q->seq_zones_bitmap = NULL;
--
--	kfree(q->seq_zones_wlock);
--	q->seq_zones_wlock = NULL;
--
--	q->nr_zones = 0;
--}
--
--static int sd_zbc_setup(struct scsi_disk *sdkp, u32 zone_blocks)
--{
--	struct request_queue *q = sdkp->disk->queue;
--	u32 zone_shift = ilog2(zone_blocks);
--	u32 nr_zones;
--	int ret;
--
--	/* chunk_sectors indicates the zone size */
--	blk_queue_chunk_sectors(q,
--			logical_to_sectors(sdkp->device, zone_blocks));
--	nr_zones = round_up(sdkp->capacity, zone_blocks) >> zone_shift;
--
--	/*
--	 * Initialize the device request queue information if the number
--	 * of zones changed.
--	 */
--	if (nr_zones != sdkp->nr_zones || nr_zones != q->nr_zones) {
--		unsigned long *seq_zones_wlock = NULL, *seq_zones_bitmap = NULL;
--		size_t zone_bitmap_size;
--
--		if (nr_zones) {
--			seq_zones_wlock = sd_zbc_alloc_zone_bitmap(nr_zones,
--								   q->node);
--			if (!seq_zones_wlock) {
--				ret = -ENOMEM;
--				goto err;
--			}
--
--			seq_zones_bitmap = sd_zbc_setup_seq_zones_bitmap(sdkp,
--							zone_shift, nr_zones);
--			if (IS_ERR(seq_zones_bitmap)) {
--				ret = PTR_ERR(seq_zones_bitmap);
--				kfree(seq_zones_wlock);
--				goto err;
--			}
--		}
--		zone_bitmap_size = BITS_TO_LONGS(nr_zones) *
--			sizeof(unsigned long);
--		blk_mq_freeze_queue(q);
--		if (q->nr_zones != nr_zones) {
--			/* READ16/WRITE16 is mandatory for ZBC disks */
--			sdkp->device->use_16_for_rw = 1;
--			sdkp->device->use_10_for_rw = 0;
--
--			sdkp->zone_blocks = zone_blocks;
--			sdkp->zone_shift = zone_shift;
--			sdkp->nr_zones = nr_zones;
--			q->nr_zones = nr_zones;
--			swap(q->seq_zones_wlock, seq_zones_wlock);
--			swap(q->seq_zones_bitmap, seq_zones_bitmap);
--		} else if (memcmp(q->seq_zones_bitmap, seq_zones_bitmap,
--				  zone_bitmap_size) != 0) {
--			memcpy(q->seq_zones_bitmap, seq_zones_bitmap,
--			       zone_bitmap_size);
--		}
--		blk_mq_unfreeze_queue(q);
--		kfree(seq_zones_wlock);
--		kfree(seq_zones_bitmap);
--	}
--
--	return 0;
--
--err:
--	sd_zbc_cleanup(sdkp);
--	return ret;
--}
--
- int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
- {
-+	struct gendisk *disk = sdkp->disk;
-+	unsigned int nr_zones;
- 	int ret, zone_blocks;
- 
- 	if (!sd_is_zoned(sdkp))
-@@ -634,24 +453,39 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
- 	}
- 
- 	/* The drive satisfies the kernel restrictions: set it up */
--	ret = sd_zbc_setup(sdkp, zone_blocks);
--	if (ret)
--		goto err;
-+	blk_queue_chunk_sectors(sdkp->disk->queue,
-+			logical_to_sectors(sdkp->device, zone_blocks));
-+	nr_zones = round_up(sdkp->capacity, zone_blocks) >> ilog2(zone_blocks);
++#define DSKINDEX    (0x1<<4)        /* DSKINDEX bit */
 +
-+	/* READ16/WRITE16 is mandatory for ZBC disks */
-+	sdkp->device->use_16_for_rw = 1;
-+	sdkp->device->use_10_for_rw = 0;
++/*
++ * Misc
++ */
 +
-+	/*
-+	 * If something changed, revalidate the disk zone bitmaps once we have
-+	 * the capacity, that is on the second revalidate execution during disk
-+	 * scan and always during normal revalidate.
-+	 */
-+	if (sdkp->first_scan)
-+		return 0;
-+	if (sdkp->zone_blocks != zone_blocks ||
-+	    sdkp->nr_zones != nr_zones ||
-+	    disk->queue->nr_zones != nr_zones) {
-+		ret = blk_revalidate_disk_zones(disk);
-+		if (ret != 0)
-+			goto err;
-+		sdkp->zone_blocks = zone_blocks;
-+		sdkp->nr_zones = nr_zones;
-+	}
- 
- 	return 0;
- 
- err:
- 	sdkp->capacity = 0;
--	sd_zbc_cleanup(sdkp);
- 
- 	return ret;
- }
- 
--void sd_zbc_remove(struct scsi_disk *sdkp)
--{
--	sd_zbc_cleanup(sdkp);
--}
++#define MFM_SYNC    0x4489          /* standard MFM sync value */
++
++/* Values for FD_COMMAND */
++#define FD_RECALIBRATE		0x07	/* move to track 0 */
++#define FD_SEEK			0x0F	/* seek track */
++#define FD_READ			0xE6	/* read with MT, MFM, SKip deleted */
++#define FD_WRITE		0xC5	/* write with MT, MFM */
++#define FD_SENSEI		0x08	/* Sense Interrupt Status */
++#define FD_SPECIFY		0x03	/* specify HUT etc */
++#define FD_FORMAT		0x4D	/* format one track */
++#define FD_VERSION		0x10	/* get version code */
++#define FD_CONFIGURE		0x13	/* configure FIFO operation */
++#define FD_PERPENDICULAR	0x12	/* perpendicular r/w mode */
++
++#define FD_MAX_UNITS    4	/* Max. Number of drives */
++#define FLOPPY_MAX_SECTORS	22	/* Max. Number of sectors per track */
++
++struct fd_data_type {
++	char *name;		/* description of data type */
++	int sects;		/* sectors per track */
++	int (*read_fkt)(int);	/* read whole track */
++	void (*write_fkt)(int);	/* write whole track */
++};
++
++struct fd_drive_type {
++	unsigned long code;		/* code returned from drive */
++	char *name;			/* description of drive */
++	unsigned int tracks;	/* number of tracks */
++	unsigned int heads;		/* number of heads */
++	unsigned int read_size;	/* raw read size for one track */
++	unsigned int write_size;	/* raw write size for one track */
++	unsigned int sect_mult;	/* sectors and gap multiplier (HD = 2) */
++	unsigned int precomp1;	/* start track for precomp 1 */
++	unsigned int precomp2;	/* start track for precomp 2 */
++	unsigned int step_delay;	/* time (in ms) for delay after step */
++	unsigned int settle_time;	/* time to settle after dir change */
++	unsigned int side_time;	/* time needed to change sides */
++};
++
++struct amiga_floppy_struct {
++	struct fd_drive_type *type;	/* type of floppy for this unit */
++	struct fd_data_type *dtype;	/* type of floppy for this unit */
++	int track;			/* current track (-1 == unknown) */
++	unsigned char *trackbuf;	/* current track (kmaloc()'d */
++
++	int blocks;			/* total # blocks on disk */
++
++	int changed;			/* true when not known */
++	int disk;			/* disk in drive (-1 == unknown) */
++	int motor;			/* true when motor is at speed */
++	int busy;			/* true when drive is active */
++	int dirty;			/* true when trackbuf is not on disk */
++	int status;			/* current error code for unit */
++	struct gendisk *gendisk;
++};
++
+ /*
+  *  Error codes
+  */
+diff --git a/include/linux/amifd.h b/include/linux/amifd.h
+deleted file mode 100644
+index 202a77dbe46d..000000000000
+--- a/include/linux/amifd.h
++++ /dev/null
+@@ -1,63 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef _AMIFD_H
+-#define _AMIFD_H
 -
- void sd_zbc_print_zones(struct scsi_disk *sdkp)
- {
- 	if (!sd_is_zoned(sdkp) || !sdkp->capacity)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index ab8aec3be639..63ff1050e4ea 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -402,6 +402,7 @@ extern int blkdev_report_zones(struct block_device *bdev,
- 			       unsigned int *nr_zones, gfp_t gfp_mask);
- extern int blkdev_reset_zones(struct block_device *bdev, sector_t sectors,
- 			      sector_t nr_sectors, gfp_t gfp_mask);
-+extern int blk_revalidate_disk_zones(struct gendisk *disk);
- 
- extern int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
- 				     unsigned int cmd, unsigned long arg);
-@@ -414,6 +415,12 @@ static inline unsigned int blkdev_nr_zones(struct block_device *bdev)
- {
- 	return 0;
- }
-+
-+static inline int blk_revalidate_disk_zones(struct gendisk *disk)
-+{
-+	return 0;
-+}
-+
- static inline int blkdev_report_zones_ioctl(struct block_device *bdev,
- 					    fmode_t mode, unsigned int cmd,
- 					    unsigned long arg)
+-/* Definitions for the Amiga floppy driver */
+-
+-#include <linux/fd.h>
+-
+-#define FD_MAX_UNITS    4	/* Max. Number of drives */
+-#define FLOPPY_MAX_SECTORS	22	/* Max. Number of sectors per track */
+-
+-#ifndef ASSEMBLER
+-
+-struct fd_data_type {
+-    char *name;			/* description of data type */
+-    int sects;			/* sectors per track */
+-#ifdef __STDC__
+-    int (*read_fkt)(int);
+-    void (*write_fkt)(int);
+-#else
+-    int (*read_fkt)();		/* read whole track */
+-    void (*write_fkt)();		/* write whole track */
+-#endif
+-};
+-
+-/*
+-** Floppy type descriptions
+-*/
+-
+-struct fd_drive_type {
+-    unsigned long code;		/* code returned from drive */
+-    char *name;			/* description of drive */
+-    unsigned int tracks;	/* number of tracks */
+-    unsigned int heads;		/* number of heads */
+-    unsigned int read_size;	/* raw read size for one track */
+-    unsigned int write_size;	/* raw write size for one track */
+-    unsigned int sect_mult;	/* sectors and gap multiplier (HD = 2) */
+-    unsigned int precomp1;	/* start track for precomp 1 */
+-    unsigned int precomp2;	/* start track for precomp 2 */
+-    unsigned int step_delay;	/* time (in ms) for delay after step */
+-    unsigned int settle_time;	/* time to settle after dir change */
+-    unsigned int side_time;	/* time needed to change sides */
+-};
+-
+-struct amiga_floppy_struct {
+-    struct fd_drive_type *type;	/* type of floppy for this unit */
+-    struct fd_data_type *dtype;	/* type of floppy for this unit */
+-    int track;			/* current track (-1 == unknown) */
+-    unsigned char *trackbuf;    /* current track (kmaloc()'d */
+-
+-    int blocks;			/* total # blocks on disk */
+-
+-    int changed;		/* true when not known */
+-    int disk;			/* disk in drive (-1 == unknown) */
+-    int motor;			/* true when motor is at speed */
+-    int busy;			/* true when drive is active */
+-    int dirty;			/* true when trackbuf is not on disk */
+-    int status;			/* current error code for unit */
+-    struct gendisk *gendisk;
+-};
+-#endif
+-
+-#endif
+diff --git a/include/linux/amifdreg.h b/include/linux/amifdreg.h
+deleted file mode 100644
+index 9b514d05ec70..000000000000
+--- a/include/linux/amifdreg.h
++++ /dev/null
+@@ -1,82 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef _LINUX_AMIFDREG_H
+-#define _LINUX_AMIFDREG_H
+-
+-/*
+-** CIAAPRA bits (read only)
+-*/
+-
+-#define DSKRDY      (0x1<<5)        /* disk ready when low */
+-#define DSKTRACK0   (0x1<<4)        /* head at track zero when low */
+-#define DSKPROT     (0x1<<3)        /* disk protected when low */
+-#define DSKCHANGE   (0x1<<2)        /* low when disk removed */
+-
+-/*
+-** CIAAPRB bits (read/write)
+-*/
+-
+-#define DSKMOTOR    (0x1<<7)        /* motor on when low */
+-#define DSKSEL3     (0x1<<6)        /* select drive 3 when low */
+-#define DSKSEL2     (0x1<<5)        /* select drive 2 when low */
+-#define DSKSEL1     (0x1<<4)        /* select drive 1 when low */
+-#define DSKSEL0     (0x1<<3)        /* select drive 0 when low */
+-#define DSKSIDE     (0x1<<2)        /* side selection: 0 = upper, 1 = lower */
+-#define DSKDIREC    (0x1<<1)        /* step direction: 0=in, 1=out (to trk 0) */
+-#define DSKSTEP     (0x1)           /* pulse low to step head 1 track */
+-
+-/*
+-** DSKBYTR bits (read only)
+-*/
+-
+-#define DSKBYT      (1<<15)         /* register contains valid byte when set */
+-#define DMAON       (1<<14)         /* disk DMA enabled */
+-#define DISKWRITE   (1<<13)         /* disk write bit in DSKLEN enabled */
+-#define WORDEQUAL   (1<<12)         /* DSKSYNC register match when true */
+-/* bits 7-0 are data */
+-
+-/*
+-** ADKCON/ADKCONR bits
+-*/
+-
+-#ifndef SETCLR
+-#define ADK_SETCLR      (1<<15)     /* control bit */
+-#endif
+-#define ADK_PRECOMP1    (1<<14)     /* precompensation selection */
+-#define ADK_PRECOMP0    (1<<13)     /* 00=none, 01=140ns, 10=280ns, 11=500ns */
+-#define ADK_MFMPREC     (1<<12)     /* 0=GCR precomp., 1=MFM precomp. */
+-#define ADK_WORDSYNC    (1<<10)     /* enable DSKSYNC auto DMA */
+-#define ADK_MSBSYNC     (1<<9)      /* when 1, enable sync on MSbit (for GCR) */
+-#define ADK_FAST        (1<<8)      /* bit cell: 0=2us (GCR), 1=1us (MFM) */
+- 
+-/*
+-** DSKLEN bits
+-*/
+-
+-#define DSKLEN_DMAEN    (1<<15)
+-#define DSKLEN_WRITE    (1<<14)
+-
+-/*
+-** INTENA/INTREQ bits
+-*/
+-
+-#define DSKINDEX    (0x1<<4)        /* DSKINDEX bit */
+-
+-/*
+-** Misc
+-*/
+- 
+-#define MFM_SYNC    0x4489          /* standard MFM sync value */
+-
+-/* Values for FD_COMMAND */
+-#define FD_RECALIBRATE		0x07	/* move to track 0 */
+-#define FD_SEEK			0x0F	/* seek track */
+-#define FD_READ			0xE6	/* read with MT, MFM, SKip deleted */
+-#define FD_WRITE		0xC5	/* write with MT, MFM */
+-#define FD_SENSEI		0x08	/* Sense Interrupt Status */
+-#define FD_SPECIFY		0x03	/* specify HUT etc */
+-#define FD_FORMAT		0x4D	/* format one track */
+-#define FD_VERSION		0x10	/* get version code */
+-#define FD_CONFIGURE		0x13	/* configure FIFO operation */
+-#define FD_PERPENDICULAR	0x12	/* perpendicular r/w mode */
+-
+-#endif /* _LINUX_AMIFDREG_H */
 -- 
-2.17.1
+2.19.1
