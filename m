@@ -1,90 +1,53 @@
-Return-Path: <christophe.leroy@c-s.fr>
-Message-Id: <2b1bca2aba3213b13dadaca5e311a15e9fcb1aab.1539092112.git.christophe.leroy@c-s.fr>
-In-Reply-To: <cover.1539092111.git.christophe.leroy@c-s.fr>
-References: <cover.1539092111.git.christophe.leroy@c-s.fr>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v3 22/24] powerpc/mm: Get rid of pte-common.h
-To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
-Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
-Date: Tue,  9 Oct 2018 13:52:16 +0000 (UTC)
+Return-Path: <prvs=81565c836=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	dm-devel@redhat.com,
+	Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Matias Bjorling <matias.bjorling@wdc.com>
+Subject: [PATCH v2 07/11] block: Introduce BLKGETNRZONES ioctl
+Date: Thu, 11 Oct 2018 16:09:48 +0900
+Message-Id: <20181011070952.13248-8-damien.lemoal@wdc.com>
+In-Reply-To: <20181011070952.13248-1-damien.lemoal@wdc.com>
+References: <20181011070952.13248-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Do not include pte-common.h in nohash/32/pgtable.h
+Get a zoned block device total number of zones. The device can be a
+partition of the whole device. The number of zones is always 0 for
+regular block devices.
 
-As that was the last includer, get rid of pte-common.h
-
-Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- arch/powerpc/include/asm/nohash/32/pgtable.h | 23 +++++++++++++++++++++--
- arch/powerpc/include/asm/pte-common.h        | 25 -------------------------
- 2 files changed, 21 insertions(+), 27 deletions(-)
- delete mode 100644 arch/powerpc/include/asm/pte-common.h
+ block/ioctl.c                 | 2 ++
+ include/uapi/linux/blkzoned.h | 1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/arch/powerpc/include/asm/nohash/32/pgtable.h b/arch/powerpc/include/asm/nohash/32/pgtable.h
-index ce9270a0ea42..d2908a8038e8 100644
---- a/arch/powerpc/include/asm/nohash/32/pgtable.h
-+++ b/arch/powerpc/include/asm/nohash/32/pgtable.h
-@@ -128,8 +128,27 @@ extern int icache_44x_need_flush;
- #include <asm/nohash/32/pte-8xx.h>
- #endif
+diff --git a/block/ioctl.c b/block/ioctl.c
+index f6d2c6f1f050..4825c78a6baa 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -534,6 +534,8 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
+ 		return blkdev_reset_zones_ioctl(bdev, mode, cmd, arg);
+ 	case BLKGETZONESZ:
+ 		return put_uint(arg, bdev_zone_sectors(bdev));
++	case BLKGETNRZONES:
++		return put_uint(arg, blkdev_nr_zones(bdev));
+ 	case HDIO_GETGEO:
+ 		return blkdev_getgeo(bdev, argp);
+ 	case BLKRAGET:
+diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
+index 281ac605f752..8f08ff9bdea0 100644
+--- a/include/uapi/linux/blkzoned.h
++++ b/include/uapi/linux/blkzoned.h
+@@ -142,5 +142,6 @@ struct blk_zone_range {
+ #define BLKREPORTZONE	_IOWR(0x12, 130, struct blk_zone_report)
+ #define BLKRESETZONE	_IOW(0x12, 131, struct blk_zone_range)
+ #define BLKGETZONESZ	_IOW(0x12, 132, __u32)
++#define BLKGETNRZONES	_IOW(0x12, 133, __u32)
  
--/* And here we include common definitions */
--#include <asm/pte-common.h>
-+/* Location of the PFN in the PTE. Most 32-bit platforms use the same
-+ * as _PAGE_SHIFT here (ie, naturally aligned).
-+ * Platform who don't just pre-define the value so we don't override it here
-+ */
-+#ifndef PTE_RPN_SHIFT
-+#define PTE_RPN_SHIFT	(PAGE_SHIFT)
-+#endif
-+
-+/* The mask covered by the RPN must be a ULL on 32-bit platforms with
-+ * 64-bit PTEs
-+ */
-+#if defined(CONFIG_PPC32) && defined(CONFIG_PTE_64BIT)
-+#define PTE_RPN_MASK	(~((1ULL << PTE_RPN_SHIFT) - 1))
-+#else
-+#define PTE_RPN_MASK	(~((1UL << PTE_RPN_SHIFT) - 1))
-+#endif
-+
-+/* _PAGE_CHG_MASK masks of bits that are to be preserved across
-+ * pgprot changes
-+ */
-+#define _PAGE_CHG_MASK	(PTE_RPN_MASK | _PAGE_DIRTY | _PAGE_ACCESSED | _PAGE_SPECIAL)
- 
- #ifndef __ASSEMBLY__
- 
-diff --git a/arch/powerpc/include/asm/pte-common.h b/arch/powerpc/include/asm/pte-common.h
-deleted file mode 100644
-index ff01368a175a..000000000000
---- a/arch/powerpc/include/asm/pte-common.h
-+++ /dev/null
-@@ -1,25 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--/* Included from asm/pgtable-*.h only ! */
--
--/* Location of the PFN in the PTE. Most 32-bit platforms use the same
-- * as _PAGE_SHIFT here (ie, naturally aligned).
-- * Platform who don't just pre-define the value so we don't override it here
-- */
--#ifndef PTE_RPN_SHIFT
--#define PTE_RPN_SHIFT	(PAGE_SHIFT)
--#endif
--
--/* The mask covered by the RPN must be a ULL on 32-bit platforms with
-- * 64-bit PTEs
-- */
--#if defined(CONFIG_PPC32) && defined(CONFIG_PTE_64BIT)
--#define PTE_RPN_MASK	(~((1ULL<<PTE_RPN_SHIFT)-1))
--#else
--#define PTE_RPN_MASK	(~((1UL<<PTE_RPN_SHIFT)-1))
--#endif
--
--/* _PAGE_CHG_MASK masks of bits that are to be preserved across
-- * pgprot changes
-- */
--#define _PAGE_CHG_MASK	(PTE_RPN_MASK | _PAGE_DIRTY | \
--                         _PAGE_ACCESSED | _PAGE_SPECIAL)
+ #endif /* _UAPI_BLKZONED_H */
 -- 
-2.13.3
+2.17.1
