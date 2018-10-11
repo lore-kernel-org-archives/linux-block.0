@@ -1,18 +1,24 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:36955 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729119AbeJLB7D (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Oct 2018 21:59:03 -0400
+Received: by mail-pf1-f193.google.com with SMTP id j23-v6so4833343pfi.4
+        for <linux-block@vger.kernel.org>; Thu, 11 Oct 2018 11:30:39 -0700 (PDT)
 From: Omar Sandoval <osandov@osandov.com>
 To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	kernel-team@fb.com,
-	Finn Thain <fthain@telegraphics.com.au>,
-	Laurent Vivier <lvivier@redhat.com>
-Subject: [PATCH v2 02/11] swim: convert to blk-mq
-Date: Thu, 11 Oct 2018 12:20:42 -0700
-Message-Id: <93deb9240babdba64c4a7e2fd8b8b0d3b2bdcbdc.1539284959.git.osandov@fb.com>
-In-Reply-To: <cover.1539284959.git.osandov@fb.com>
-References: <cover.1539284959.git.osandov@fb.com>
+Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com,
+        Finn Thain <fthain@telegraphics.com.au>,
+        Laurent Vivier <lvivier@redhat.com>
+Subject: [PATCH 02/13] swim: convert to blk-mq
+Date: Thu, 11 Oct 2018 11:30:12 -0700
+Message-Id: <fa367b63a11cfcc54c8063f62a6c1b51a9a8ecbd.1539282366.git.osandov@fb.com>
+In-Reply-To: <cover.1539282366.git.osandov@fb.com>
+References: <cover.1539282366.git.osandov@fb.com>
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 From: Omar Sandoval <osandov@fb.com>
 
@@ -25,11 +31,11 @@ Cc: Finn Thain <fthain@telegraphics.com.au>
 Cc: Laurent Vivier <lvivier@redhat.com>
 Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- drivers/block/swim.c | 101 +++++++++++++++++++++----------------------
- 1 file changed, 49 insertions(+), 52 deletions(-)
+ drivers/block/swim.c | 103 +++++++++++++++++++++----------------------
+ 1 file changed, 51 insertions(+), 52 deletions(-)
 
 diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index cbe909c51847..f07fa993c364 100644
+index cbe909c51847..bb3ac4da5b8d 100644
 --- a/drivers/block/swim.c
 +++ b/drivers/block/swim.c
 @@ -19,7 +19,7 @@
@@ -57,7 +63,7 @@ index cbe909c51847..f07fa993c364 100644
  	int floppy_count;
  	struct floppy_state unit[FD_MAX_UNIT];
  };
-@@ -525,58 +525,36 @@ static blk_status_t floppy_read_sectors(struct floppy_state *fs,
+@@ -525,58 +525,38 @@ static blk_status_t floppy_read_sectors(struct floppy_state *fs,
  	return 0;
  }
  
@@ -107,8 +113,10 @@ index cbe909c51847..f07fa993c364 100644
 +		err = floppy_read_sectors(fs, blk_rq_pos(req),
 +					  blk_rq_cur_sectors(req),
 +					  bio_data(req->bio));
++		if (err)
++			break;
 +	} while (blk_update_request(req, err, blk_rq_cur_bytes(req)));
-+	__blk_mq_end_request(req, err);
++	blk_mq_end_request(req, err);
  
 -		fs = req->rq_disk->private_data;
 -		if (blk_rq_pos(req) >= fs->total_secs)
@@ -139,7 +147,7 @@ index cbe909c51847..f07fa993c364 100644
  }
  
  static struct floppy_struct floppy_type[4] = {
-@@ -823,6 +801,10 @@ static int swim_add_floppy(struct swim_priv *swd, enum drive_location location)
+@@ -823,6 +803,10 @@ static int swim_add_floppy(struct swim_priv *swd, enum drive_location location)
  	return 0;
  }
  
@@ -150,7 +158,7 @@ index cbe909c51847..f07fa993c364 100644
  static int swim_floppy_init(struct swim_priv *swd)
  {
  	int err;
-@@ -852,20 +834,33 @@ static int swim_floppy_init(struct swim_priv *swd)
+@@ -852,20 +836,33 @@ static int swim_floppy_init(struct swim_priv *swd)
  	spin_lock_init(&swd->lock);
  
  	for (drive = 0; drive < swd->floppy_count; drive++) {
@@ -189,7 +197,7 @@ index cbe909c51847..f07fa993c364 100644
  		swd->unit[drive].swd = swd;
  	}
  
-@@ -895,6 +890,7 @@ static int swim_floppy_init(struct swim_priv *swd)
+@@ -895,6 +892,7 @@ static int swim_floppy_init(struct swim_priv *swd)
  				blk_cleanup_queue(disk->queue);
  				disk->queue = NULL;
  			}
@@ -197,7 +205,7 @@ index cbe909c51847..f07fa993c364 100644
  			put_disk(disk);
  		}
  	} while (drive--);
-@@ -970,6 +966,7 @@ static int swim_remove(struct platform_device *dev)
+@@ -970,6 +968,7 @@ static int swim_remove(struct platform_device *dev)
  	for (drive = 0; drive < swd->floppy_count; drive++) {
  		del_gendisk(swd->unit[drive].disk);
  		blk_cleanup_queue(swd->unit[drive].disk->queue);
