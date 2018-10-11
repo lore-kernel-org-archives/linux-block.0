@@ -1,178 +1,129 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 30/30] block: get rid of q->softirq_done_fn()
-Date: Wed, 31 Oct 2018 11:59:22 -0600
-Message-Id: <20181031175922.8849-31-axboe@kernel.dk>
-In-Reply-To: <20181031175922.8849-1-axboe@kernel.dk>
-References: <20181031175922.8849-1-axboe@kernel.dk>
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+Date: Thu, 11 Oct 2018 15:24:18 -0400
+From: Josef Bacik <josef@toxicpanda.com>
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: Chris Boot <bootc@boo.tc>, Jens Axboe <axboe@kernel.dk>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	Josef Bacik <jbacik@fb.com>
+Subject: Re: Hard lockup in blk_mq_free_request() / wbt_done() / wake_up_all()
+Message-ID: <20181011192417.wrsfypem3caxyezg@destiny>
+References: <9788e0e6-a448-bf85-1f41-88f42dc0071d@boo.tc>
+ <ac2c7156-f405-4047-564d-816159d5968b@kernel.dk>
+ <7080a91c-8d9a-6305-2b67-dc27a374327a@boo.tc>
+ <d8ba8949-259a-c0c0-d476-710bcf69c266@kernel.dk>
+ <9c444ab8-2e50-c42a-dae1-86954358218e@boo.tc>
+ <7dbe184d-5660-7b64-8027-bf4f82625ff2@I-love.SAKURA.ne.jp>
+ <296ff5ef-6d50-d895-2ba2-5c824e96c44b@boo.tc>
+ <7f79b5b8-fb3e-46d6-69a8-8e137139d24b@i-love.sakura.ne.jp>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <7f79b5b8-fb3e-46d6-69a8-8e137139d24b@i-love.sakura.ne.jp>
 List-ID: <linux-block@vger.kernel.org>
 
-With the legacy path gone, all we do is funnel it through the
-mq_ops->complete() operation.
+On Sun, Oct 07, 2018 at 09:03:17AM +0900, Tetsuo Handa wrote:
+> Adding Josef.
+> 
+> On 2018/10/06 2:05, Chris Boot wrote:
+> > I upgraded the kernel on my affected system to a 4.18.6 kernel (Debian's
+> > 4.18.6-1~bpo9+1 in stretch-backports) and ran my test suite again. I'm
+> > sorry to report that the issue occurred once more.
+> > 
+> > Logs below, it's all I managed to get out of it before my session locked up.
+> > 
+> > [Oct 5 17:56] INFO: rcu_sched self-detected stall on CPU
+> > [  +0.003914] INFO: rcu_sched detected stalls on CPUs/tasks:
+> > [  +0.001271] 	82-....: (1 GPs behind) idle=47a/0/3 softirq=60148/60149
+> > fqs=2234
+> > [  +0.012840] 	
+> > [  +0.000007] 	82-....: (1 GPs behind) idle=47a/0/3 softirq=60148/60149
+> > fqs=2235
+> > [  +0.000002]  (t=5255 jiffies g=82048 c=82047 q=35803)
+> > [  +0.008936] 	
+> > [  +0.000003] NMI backtrace for cpu 82
+> > [  +0.000005] (detected by 87, t=5257 jiffies, g=82048, c=82047, q=35803)
+> > [  +0.001598] CPU: 82 PID: 0 Comm: swapper/82 Not tainted
+> > 4.18.0-0.bpo.1-amd64 #1 Debian 4.18.6-1~bpo9+1
+> > [  +0.000001] Hardware name: Supermicro SYS-8048B-TR4FT/X10QBi, BIOS
+> > 3.0a 05/30/2017
+> > [  +0.000001] Call Trace:
+> > [  +0.000004]  <IRQ>
+> > [  +0.000011]  dump_stack+0x5c/0x7b
+> > [  +0.000005]  nmi_cpu_backtrace+0x89/0x90
+> > [  +0.000007]  ? lapic_can_unplug_cpu+0xa0/0xa0
+> > [  +0.000002]  nmi_trigger_cpumask_backtrace+0xf5/0x130
+> > [  +0.000007]  rcu_dump_cpu_stacks+0x9b/0xcb
+> > [  +0.000003]  rcu_check_callbacks+0x79a/0x8e0
+> > [  +0.000007]  ? sched_clock_cpu+0xc/0xa0
+> > [  +0.000005]  ? tick_sched_do_timer+0x60/0x60
+> > [  +0.000005]  update_process_times+0x28/0x50
+> > [  +0.000003]  tick_sched_handle+0x22/0x60
+> > [  +0.000002]  tick_sched_timer+0x37/0x70
+> > [  +0.000002]  __hrtimer_run_queues+0xfc/0x270
+> > [  +0.000003]  hrtimer_interrupt+0x101/0x240
+> > [  +0.000004]  smp_apic_timer_interrupt+0x6a/0x130
+> > [  +0.000002]  apic_timer_interrupt+0xf/0x20
+> > [  +0.000006] RIP: 0010:_raw_spin_unlock_irqrestore+0x11/0x20
+> > [  +0.000001] Code: 8b 00 a8 08 74 0b 65 81 25 d8 6b 11 48 ff ff ff 7f
+> > 44 89 e0 5b 5d 41 5c c3 0f 1f 44 00 00 c6 07 00 0f 1f 40 00 48 89 f7 57
+> > 9d <0f> 1f 44 00 00 c3 66 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 c6 07
+> > [  +0.000030] RSP: 0000:ffff8bfdffc83de8 EFLAGS: 00000202 ORIG_RAX:
+> > ffffffffffffff13
+> > [  +0.000002] RAX: 00000000ff72b790 RBX: ffff8bedf5807768 RCX:
+> > dead000000000200
+> > [  +0.000001] RDX: ffffa8cc4fa87410 RSI: 0000000000000202 RDI:
+> > 0000000000000202
+> > [  +0.000001] RBP: 00000000ff72b790 R08: ffff8bedf5807770 R09:
+> > 000003fffff00000
+> > [  +0.000001] R10: 0000000000000052 R11: 0000000000000001 R12:
+> > 0000000000000202
+> > [  +0.000001] R13: 0000000000000003 R14: 0000000000000000 R15:
+> > 0000000000000000
+> > [  +0.000001]  ? apic_timer_interrupt+0xa/0x20
+> > [  +0.000006]  __wake_up_common_lock+0x89/0xc0
+> > [  +0.000007]  rwb_wake_all+0x30/0x40
+> > [  +0.000003]  scale_up.part.25+0x24/0x40
+> > [  +0.000002]  wb_timer_fn+0x295/0x430
+> > [  +0.000007]  ? blk_mq_tag_update_depth+0x110/0x110
+> > [  +0.000001]  call_timer_fn+0x2b/0x120
+> > [  +0.000003]  run_timer_softirq+0x1d3/0x410
+> > [  +0.000002]  ? enqueue_hrtimer+0x3a/0x90
+> > [  +0.000002]  ? __hrtimer_run_queues+0x12c/0x270
+> > [  +0.000002]  __do_softirq+0x10d/0x2a6
+> > [  +0.000006]  irq_exit+0xb6/0xc0
+> > [  +0.000003]  smp_apic_timer_interrupt+0x74/0x130
+> > [  +0.000001]  apic_timer_interrupt+0xf/0x20
+> > [  +0.000001]  </IRQ>
+> > [  +0.000008] RIP: 0010:cpuidle_enter_state+0xa7/0x2b0
+> > [  +0.000001] Code: c8 28 48 e8 bb b9 b2 ff 48 89 04 24 0f 1f 44 00 00
+> > 31 ff e8 4b c4 b2 ff 80 7c 24 0f 00 0f 85 b6 01 00 00 fb 66 0f 1f 44 00
+> > 00 <48> 8b 0c 24 48 ba cf f7 53 e3 a5 9b c4 20 4c 29 f9 48 89 c8 48 c1
+> > [  +0.000028] RSP: 0000:ffffa8cc4c7cbe78 EFLAGS: 00000246 ORIG_RAX:
+> > ffffffffffffff13
+> > [  +0.000002] RAX: ffff8bfdffca1b80 RBX: 0000000000000001 RCX:
+> > 000000000000001f
+> > [  +0.000001] RDX: 00000237c552d9f0 RSI: 0000000040000219 RDI:
+> > 0000000000000000
+> > [  +0.000000] RBP: ffff8bfdffcaaf78 R08: 00000000ffffffff R09:
+> > 0000000000000008
+> > [  +0.000001] R10: 00000000000000a9 R11: 00000000000000c2 R12:
+> > ffffffffb88b3a78
+> > [  +0.000001] R13: 0000000000000001 R14: 0000000000000001 R15:
+> > 00000237c55130a6
+> > [  +0.000004]  ? cpuidle_enter_state+0x95/0x2b0
+> > [  +0.000004]  do_idle+0x204/0x270
+> > [  +0.000003]  cpu_startup_entry+0x6f/0x80
+> > [  +0.000002]  start_secondary+0x1a4/0x1f0
+> > [  +0.000005]  secondary_startup_64+0xa5/0xb0
+> 
+> This trace contains rwb_wake_all() from scale_up(), which was removed by
+> commit a79050434b45959f ("blk-rq-qos: refactor out common elements of blk-wbt").
+> 
+> Josef, what is the reason you removed rwb_wake_all() from scale_up() (and
+> you added rwb_wake_all() to scale_down()) ?
+> 
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-mq.c         | 17 ++++++++---------
- block/blk-settings.c   |  6 ------
- block/blk-softirq.c    |  4 ++--
- include/linux/blk-mq.h |  3 ++-
- include/linux/blkdev.h |  3 ---
- 5 files changed, 12 insertions(+), 21 deletions(-)
+Oops, I screwed that up, sorry about that, it should be the other way around.
+I'll send a fix for that shortly.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 21e4147c4810..f1f47dd08da7 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -546,13 +546,15 @@ EXPORT_SYMBOL(blk_mq_end_request);
- static void __blk_mq_complete_request_remote(void *data)
- {
- 	struct request *rq = data;
-+	struct request_queue *q = rq->q;
- 
--	rq->q->softirq_done_fn(rq);
-+	q->mq_ops->complete(rq);
- }
- 
- static void __blk_mq_complete_request(struct request *rq)
- {
- 	struct blk_mq_ctx *ctx = rq->mq_ctx;
-+	struct request_queue *q = rq->q;
- 	bool shared = false;
- 	int cpu;
- 
-@@ -568,18 +570,18 @@ static void __blk_mq_complete_request(struct request *rq)
- 	 * So complete IO reqeust in softirq context in case of single queue
- 	 * for not degrading IO performance by irqsoff latency.
- 	 */
--	if (rq->q->nr_hw_queues == 1) {
-+	if (q->nr_hw_queues == 1) {
- 		__blk_complete_request(rq);
- 		return;
- 	}
- 
--	if (!test_bit(QUEUE_FLAG_SAME_COMP, &rq->q->queue_flags)) {
--		rq->q->softirq_done_fn(rq);
-+	if (!test_bit(QUEUE_FLAG_SAME_COMP, &q->queue_flags)) {
-+		q->mq_ops->complete(rq);
- 		return;
- 	}
- 
- 	cpu = get_cpu();
--	if (!test_bit(QUEUE_FLAG_SAME_FORCE, &rq->q->queue_flags))
-+	if (!test_bit(QUEUE_FLAG_SAME_FORCE, &q->queue_flags))
- 		shared = cpus_share_cache(cpu, ctx->cpu);
- 
- 	if (cpu != ctx->cpu && !shared && cpu_online(ctx->cpu)) {
-@@ -588,7 +590,7 @@ static void __blk_mq_complete_request(struct request *rq)
- 		rq->csd.flags = 0;
- 		smp_call_function_single_async(ctx->cpu, &rq->csd);
- 	} else {
--		rq->q->softirq_done_fn(rq);
-+		q->mq_ops->complete(rq);
- 	}
- 	put_cpu();
- }
-@@ -2701,9 +2703,6 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	 */
- 	q->poll_nsec = -1;
- 
--	if (set->ops->complete)
--		blk_queue_softirq_done(q, set->ops->complete);
--
- 	blk_mq_init_cpu_queues(q, set->nr_hw_queues);
- 	blk_mq_add_queue_tag_set(set, q);
- 	blk_mq_map_swqueue(q);
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 1895f499bbe5..e111b3e4e96e 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -20,12 +20,6 @@ EXPORT_SYMBOL(blk_max_low_pfn);
- 
- unsigned long blk_max_pfn;
- 
--void blk_queue_softirq_done(struct request_queue *q, softirq_done_fn *fn)
--{
--	q->softirq_done_fn = fn;
--}
--EXPORT_SYMBOL(blk_queue_softirq_done);
--
- void blk_queue_rq_timeout(struct request_queue *q, unsigned int timeout)
- {
- 	q->rq_timeout = timeout;
-diff --git a/block/blk-softirq.c b/block/blk-softirq.c
-index 8ca0f6caf174..727d64436ec4 100644
---- a/block/blk-softirq.c
-+++ b/block/blk-softirq.c
-@@ -34,7 +34,7 @@ static __latent_entropy void blk_done_softirq(struct softirq_action *h)
- 
- 		rq = list_entry(local_list.next, struct request, ipi_list);
- 		list_del_init(&rq->ipi_list);
--		rq->q->softirq_done_fn(rq);
-+		rq->q->mq_ops->complete(rq);
- 	}
- }
- 
-@@ -102,7 +102,7 @@ void __blk_complete_request(struct request *req)
- 	unsigned long flags;
- 	bool shared = false;
- 
--	BUG_ON(!q->softirq_done_fn);
-+	BUG_ON(!q->mq_ops->complete);
- 
- 	local_irq_save(flags);
- 	cpu = smp_processor_id();
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 5c8418ebbfd6..9dd574e5436a 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -115,6 +115,7 @@ typedef void (busy_tag_iter_fn)(struct request *, void *, bool);
- typedef int (poll_fn)(struct blk_mq_hw_ctx *, unsigned int);
- typedef int (map_queues_fn)(struct blk_mq_tag_set *set);
- typedef bool (busy_fn)(struct request_queue *);
-+typedef void (complete_fn)(struct request *);
- 
- 
- struct blk_mq_ops {
-@@ -142,7 +143,7 @@ struct blk_mq_ops {
- 	 */
- 	poll_fn			*poll;
- 
--	softirq_done_fn		*complete;
-+	complete_fn		*complete;
- 
- 	/*
- 	 * Called when the block layer side of a hardware queue has been
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c675e2b5af62..d4104844d6bb 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -290,7 +290,6 @@ typedef blk_qc_t (make_request_fn) (struct request_queue *q, struct bio *bio);
- typedef bool (poll_q_fn) (struct request_queue *q, blk_qc_t);
- 
- struct bio_vec;
--typedef void (softirq_done_fn)(struct request *);
- typedef int (dma_drain_needed_fn)(struct request *);
- 
- enum blk_eh_timer_return {
-@@ -407,7 +406,6 @@ struct request_queue {
- 
- 	make_request_fn		*make_request_fn;
- 	poll_q_fn		*poll_fn;
--	softirq_done_fn		*softirq_done_fn;
- 	dma_drain_needed_fn	*dma_drain_needed;
- 
- 	const struct blk_mq_ops	*mq_ops;
-@@ -1113,7 +1111,6 @@ extern void blk_queue_segment_boundary(struct request_queue *, unsigned long);
- extern void blk_queue_virt_boundary(struct request_queue *, unsigned long);
- extern void blk_queue_dma_alignment(struct request_queue *, int);
- extern void blk_queue_update_dma_alignment(struct request_queue *, int);
--extern void blk_queue_softirq_done(struct request_queue *, softirq_done_fn *);
- extern void blk_queue_rq_timeout(struct request_queue *, unsigned int);
- extern void blk_queue_flush_queueable(struct request_queue *q, bool queueable);
- extern void blk_queue_write_cache(struct request_queue *q, bool enabled, bool fua);
--- 
-2.17.1
+Josef
