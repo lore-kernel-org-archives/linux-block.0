@@ -1,17 +1,23 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:39986 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729154AbeJLB7M (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Oct 2018 21:59:12 -0400
+Received: by mail-pg1-f196.google.com with SMTP id n31-v6so4570688pgm.7
+        for <linux-block@vger.kernel.org>; Thu, 11 Oct 2018 11:30:47 -0700 (PDT)
 From: Omar Sandoval <osandov@osandov.com>
 To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	kernel-team@fb.com,
-	Laurent Vivier <lvivier@redhat.com>
-Subject: [PATCH v2 10/11] ataflop: convert to blk-mq
-Date: Thu, 11 Oct 2018 12:20:50 -0700
-Message-Id: <92c17caefba4d9a12d643db6fdc614f4bf0900bd.1539284959.git.osandov@fb.com>
-In-Reply-To: <cover.1539284959.git.osandov@fb.com>
-References: <cover.1539284959.git.osandov@fb.com>
+Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com,
+        Laurent Vivier <lvivier@redhat.com>
+Subject: [PATCH 11/13] ataflop: convert to blk-mq
+Date: Thu, 11 Oct 2018 11:30:21 -0700
+Message-Id: <3461961db53c6f209afb7bf09ea35880acbe39cd.1539282366.git.osandov@fb.com>
+In-Reply-To: <cover.1539282366.git.osandov@fb.com>
+References: <cover.1539282366.git.osandov@fb.com>
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 From: Omar Sandoval <osandov@fb.com>
 
@@ -24,11 +30,11 @@ only and probably incorrect.
 Cc: Laurent Vivier <lvivier@redhat.com>
 Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- drivers/block/ataflop.c | 183 ++++++++++++++++++----------------------
- 1 file changed, 81 insertions(+), 102 deletions(-)
+ drivers/block/ataflop.c | 188 ++++++++++++++++++----------------------
+ 1 file changed, 86 insertions(+), 102 deletions(-)
 
 diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
-index 0144d598ac47..158d4dde6ad1 100644
+index 0144d598ac47..5934e30d4805 100644
 --- a/drivers/block/ataflop.c
 +++ b/drivers/block/ataflop.c
 @@ -66,7 +66,7 @@
@@ -74,11 +80,16 @@ index 0144d598ac47..158d4dde6ad1 100644
  static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode, unsigned int
                       cmd, unsigned long param);
  static void fd_probe( int drive );
-@@ -459,8 +455,11 @@ static DEFINE_TIMER(fd_timer, check_change);
+@@ -459,8 +455,16 @@ static DEFINE_TIMER(fd_timer, check_change);
  	
  static void fd_end_request_cur(blk_status_t err)
  {
 -	if (!__blk_end_request_cur(fd_request, err))
++	if (err) {
++		blk_mq_end_request(fd_request, err);
++		return;
++	}
++
 +	if (!blk_update_request(fd_request, err,
 +				blk_rq_cur_bytes(fd_request))) {
 +		__blk_mq_end_request(fd_request, err);
@@ -87,7 +98,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  }
  
  static inline void start_motor_off_timer(void)
-@@ -706,7 +705,6 @@ static void fd_error( void )
+@@ -706,7 +710,6 @@ static void fd_error( void )
  		if (SelectedDrive != -1)
  			SUD.track = -1;
  	}
@@ -95,7 +106,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  }
  
  
-@@ -724,14 +722,15 @@ static void fd_error( void )
+@@ -724,14 +727,15 @@ static void fd_error( void )
  
  static int do_format(int drive, int type, struct atari_format_descr *desc)
  {
@@ -114,7 +125,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  	local_irq_save(flags);
  	stdma_lock(floppy_irq, NULL);
  	atari_turnon_irq( IRQ_MFP_FDC ); /* should be already, just to be sure */
-@@ -740,16 +739,16 @@ static int do_format(int drive, int type, struct atari_format_descr *desc)
+@@ -740,16 +744,16 @@ static int do_format(int drive, int type, struct atari_format_descr *desc)
  	if (type) {
  		if (--type >= NUM_DISK_MINORS ||
  		    minor2disktype[type].drive_types > DriveType) {
@@ -135,7 +146,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  	}
  
  	nsect = UDT->spt;
-@@ -788,8 +787,11 @@ static int do_format(int drive, int type, struct atari_format_descr *desc)
+@@ -788,8 +792,11 @@ static int do_format(int drive, int type, struct atari_format_descr *desc)
  
  	wait_for_completion(&format_wait);
  
@@ -149,7 +160,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  }
  
  
-@@ -819,7 +821,6 @@ static void do_fd_action( int drive )
+@@ -819,7 +826,6 @@ static void do_fd_action( int drive )
  		    else {
  			/* all sectors finished */
  			fd_end_request_cur(BLK_STS_OK);
@@ -157,7 +168,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  			return;
  		    }
  		}
-@@ -1224,7 +1225,6 @@ static void fd_rwsec_done1(int status)
+@@ -1224,7 +1230,6 @@ static void fd_rwsec_done1(int status)
  	else {
  		/* all sectors finished */
  		fd_end_request_cur(BLK_STS_OK);
@@ -165,7 +176,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  	}
  	return;
    
-@@ -1382,8 +1382,6 @@ static void finish_fdc_done( int dummy )
+@@ -1382,8 +1387,6 @@ static void finish_fdc_done( int dummy )
  
  	local_irq_save(flags);
  	stdma_release();
@@ -174,7 +185,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  	local_irq_restore(flags);
  
  	DPRINT(("finish_fdc() finished\n"));
-@@ -1473,59 +1471,34 @@ static void setup_req_params( int drive )
+@@ -1473,59 +1476,34 @@ static void setup_req_params( int drive )
  			ReqTrack, ReqSector, (unsigned long)ReqData ));
  }
  
@@ -252,7 +263,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  	}
  		
  	if (type == 0) {
-@@ -1541,23 +1514,18 @@ static void redo_fd_request(void)
+@@ -1541,23 +1519,18 @@ static void redo_fd_request(void)
  		if (--type >= NUM_DISK_MINORS) {
  			printk(KERN_WARNING "fd%d: invalid disk format", drive );
  			fd_end_request_cur(BLK_STS_IOERR);
@@ -278,7 +289,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  
  	/* stop deselect timer */
  	del_timer( &motor_off_timer );
-@@ -1569,22 +1537,13 @@ static void redo_fd_request(void)
+@@ -1569,22 +1542,13 @@ static void redo_fd_request(void)
  	setup_req_params( drive );
  	do_fd_action( drive );
  
@@ -307,7 +318,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  }
  
  static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode,
-@@ -1662,7 +1621,6 @@ static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode,
+@@ -1662,7 +1626,6 @@ static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode,
  		/* what if type > 0 here? Overwrite specified entry ? */
  		if (type) {
  		        /* refuse to re-set a predefined type for now */
@@ -315,7 +326,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  			return -EINVAL;
  		}
  
-@@ -1730,10 +1688,8 @@ static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode,
+@@ -1730,10 +1693,8 @@ static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode,
  
  		/* sanity check */
  		if (setprm.track != dtp->blocks/dtp->spt/2 ||
@@ -327,7 +338,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  
  		UDT = dtp;
  		set_capacity(floppy->disk, UDT->blocks);
-@@ -1989,6 +1945,10 @@ static const struct block_device_operations floppy_fops = {
+@@ -1989,6 +1950,10 @@ static const struct block_device_operations floppy_fops = {
  	.revalidate_disk= floppy_revalidate,
  };
  
@@ -338,7 +349,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  static struct kobject *floppy_find(dev_t dev, int *part, void *data)
  {
  	int drive = *part & 3;
-@@ -2002,6 +1962,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
+@@ -2002,6 +1967,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
  static int __init atari_floppy_init (void)
  {
  	int i;
@@ -346,7 +357,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  
  	if (!MACH_IS_ATARI)
  		/* Amiga, Mac, ... don't have Atari-compatible floppy :-) */
-@@ -2011,14 +1972,30 @@ static int __init atari_floppy_init (void)
+@@ -2011,14 +1977,30 @@ static int __init atari_floppy_init (void)
  		return -EBUSY;
  
  	for (i = 0; i < FD_MAX_UNITS; i++) {
@@ -383,7 +394,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  	}
  
  	if (UseTrackbuffer < 0)
-@@ -2035,7 +2012,8 @@ static int __init atari_floppy_init (void)
+@@ -2035,7 +2017,8 @@ static int __init atari_floppy_init (void)
  	DMABuffer = atari_stram_alloc(BUFFER_SIZE+512, "ataflop");
  	if (!DMABuffer) {
  		printk(KERN_ERR "atari_floppy_init: cannot get dma buffer\n");
@@ -393,7 +404,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  	}
  	TrackBuffer = DMABuffer + 512;
  	PhysDMABuffer = atari_stram_to_phys(DMABuffer);
-@@ -2063,7 +2041,8 @@ static int __init atari_floppy_init (void)
+@@ -2063,7 +2046,8 @@ static int __init atari_floppy_init (void)
  	config_types();
  
  	return 0;
@@ -403,7 +414,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  	do {
  		struct gendisk *disk = unit[i].disk;
  
-@@ -2072,12 +2051,13 @@ static int __init atari_floppy_init (void)
+@@ -2072,12 +2056,13 @@ static int __init atari_floppy_init (void)
  				blk_cleanup_queue(disk->queue);
  				disk->queue = NULL;
  			}
@@ -418,7 +429,7 @@ index 0144d598ac47..158d4dde6ad1 100644
  }
  
  #ifndef MODULE
-@@ -2124,11 +2104,10 @@ static void __exit atari_floppy_exit(void)
+@@ -2124,11 +2109,10 @@ static void __exit atari_floppy_exit(void)
  	int i;
  	blk_unregister_region(MKDEV(FLOPPY_MAJOR, 0), 256);
  	for (i = 0; i < FD_MAX_UNITS; i++) {
