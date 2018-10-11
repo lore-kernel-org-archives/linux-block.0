@@ -1,291 +1,201 @@
 Return-Path: <axboe@kernel.dk>
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org
+To: linux-block@vger.kernel.org
 Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 19/30] block: remove non mq parts from the flush code
-Date: Wed, 31 Oct 2018 11:59:11 -0600
-Message-Id: <20181031175922.8849-20-axboe@kernel.dk>
-In-Reply-To: <20181031175922.8849-1-axboe@kernel.dk>
-References: <20181031175922.8849-1-axboe@kernel.dk>
+Subject: [PATCH 04/17] paride: convert pcd to blk-mq
+Date: Thu, 11 Oct 2018 10:58:56 -0600
+Message-Id: <20181011165909.32615-5-axboe@kernel.dk>
+In-Reply-To: <20181011165909.32615-1-axboe@kernel.dk>
+References: <20181011165909.32615-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-flush.c | 154 +++++++++-------------------------------------
- block/blk.h       |   4 +-
- 2 files changed, 31 insertions(+), 127 deletions(-)
+ drivers/block/paride/pcd.c | 98 +++++++++++++++++++++++++-------------
+ 1 file changed, 66 insertions(+), 32 deletions(-)
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 8b44b86779da..9baa9a119447 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -134,16 +134,8 @@ static void blk_flush_restore_request(struct request *rq)
+diff --git a/drivers/block/paride/pcd.c b/drivers/block/paride/pcd.c
+index a026211afb51..f2b82e3510d8 100644
+--- a/drivers/block/paride/pcd.c
++++ b/drivers/block/paride/pcd.c
+@@ -137,7 +137,7 @@ enum {D_PRT, D_PRO, D_UNI, D_MOD, D_SLV, D_DLY};
+ #include <linux/delay.h>
+ #include <linux/cdrom.h>
+ #include <linux/spinlock.h>
+-#include <linux/blkdev.h>
++#include <linux/blk-mq.h>
+ #include <linux/mutex.h>
+ #include <linux/uaccess.h>
  
- static bool blk_flush_queue_rq(struct request *rq, bool add_front)
- {
--	if (rq->q->mq_ops) {
--		blk_mq_add_to_requeue_list(rq, add_front, true);
--		return false;
--	} else {
--		if (add_front)
--			list_add(&rq->queuelist, &rq->q->queue_head);
--		else
--			list_add_tail(&rq->queuelist, &rq->q->queue_head);
--		return true;
--	}
-+	blk_mq_add_to_requeue_list(rq, add_front, true);
-+	return false;
- }
+@@ -186,7 +186,8 @@ static int pcd_packet(struct cdrom_device_info *cdi,
+ static int pcd_detect(void);
+ static void pcd_probe_capabilities(void);
+ static void do_pcd_read_drq(void);
+-static void do_pcd_request(struct request_queue * q);
++static blk_status_t pcd_queue_rq(struct blk_mq_hw_ctx *hctx,
++				 const struct blk_mq_queue_data *bd);
+ static void do_pcd_read(void);
  
- /**
-@@ -204,10 +196,7 @@ static bool blk_flush_complete_seq(struct request *rq,
- 		BUG_ON(!list_empty(&rq->queuelist));
- 		list_del_init(&rq->flush.list);
- 		blk_flush_restore_request(rq);
--		if (q->mq_ops)
--			blk_mq_end_request(rq, error);
--		else
--			__blk_end_request_all(rq, error);
-+		blk_mq_end_request(rq, error);
- 		break;
+ struct pcd_unit {
+@@ -199,6 +200,8 @@ struct pcd_unit {
+ 	char *name;		/* pcd0, pcd1, etc */
+ 	struct cdrom_device_info info;	/* uniform cdrom interface */
+ 	struct gendisk *disk;
++	struct blk_mq_tag_set tag_set;
++	struct list_head rq_list;
+ };
  
- 	default:
-@@ -226,20 +215,17 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
- 	struct request *rq, *n;
- 	unsigned long flags = 0;
- 	struct blk_flush_queue *fq = blk_get_flush_queue(q, flush_rq->mq_ctx);
-+	struct blk_mq_hw_ctx *hctx;
+ static struct pcd_unit pcd[PCD_UNITS];
+@@ -292,6 +295,10 @@ static const struct cdrom_device_ops pcd_dops = {
+ 			  CDC_CD_RW,
+ };
  
--	if (q->mq_ops) {
--		struct blk_mq_hw_ctx *hctx;
--
--		/* release the tag's ownership to the req cloned from */
--		spin_lock_irqsave(&fq->mq_flush_lock, flags);
--		hctx = blk_mq_map_queue(q, flush_rq->mq_ctx->cpu);
--		if (!q->elevator) {
--			blk_mq_tag_set_rq(hctx, flush_rq->tag, fq->orig_rq);
--			flush_rq->tag = -1;
--		} else {
--			blk_mq_put_driver_tag_hctx(hctx, flush_rq);
--			flush_rq->internal_tag = -1;
--		}
-+	/* release the tag's ownership to the req cloned from */
-+	spin_lock_irqsave(&fq->mq_flush_lock, flags);
-+	hctx = blk_mq_map_queue(q, flush_rq->mq_ctx->cpu);
-+	if (!q->elevator) {
-+		blk_mq_tag_set_rq(hctx, flush_rq->tag, fq->orig_rq);
-+		flush_rq->tag = -1;
-+	} else {
-+		blk_mq_put_driver_tag_hctx(hctx, flush_rq);
-+		flush_rq->internal_tag = -1;
- 	}
- 
- 	running = &fq->flush_queue[fq->flush_running_idx];
-@@ -248,9 +234,6 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
- 	/* account completion of the flush request */
- 	fq->flush_running_idx ^= 1;
- 
--	if (!q->mq_ops)
--		elv_completed_request(q, flush_rq);
--
- 	/* and push the waiting requests to the next stage */
- 	list_for_each_entry_safe(rq, n, running, flush.list) {
- 		unsigned int seq = blk_flush_cur_seq(rq);
-@@ -259,24 +242,8 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
- 		queued |= blk_flush_complete_seq(rq, fq, seq, error);
- 	}
- 
--	/*
--	 * Kick the queue to avoid stall for two cases:
--	 * 1. Moving a request silently to empty queue_head may stall the
--	 * queue.
--	 * 2. When flush request is running in non-queueable queue, the
--	 * queue is hold. Restart the queue after flush request is finished
--	 * to avoid stall.
--	 * This function is called from request completion path and calling
--	 * directly into request_fn may confuse the driver.  Always use
--	 * kblockd.
--	 */
--	if (queued || fq->flush_queue_delayed) {
--		WARN_ON(q->mq_ops);
--		blk_run_queue_async(q);
--	}
- 	fq->flush_queue_delayed = 0;
--	if (q->mq_ops)
--		spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
-+	spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
- }
- 
- /**
-@@ -301,6 +268,7 @@ static bool blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
- 	struct request *first_rq =
- 		list_first_entry(pending, struct request, flush.list);
- 	struct request *flush_rq = fq->flush_rq;
-+	struct blk_mq_hw_ctx *hctx;
- 
- 	/* C1 described at the top of this file */
- 	if (fq->flush_pending_idx != fq->flush_running_idx || list_empty(pending))
-@@ -334,19 +302,15 @@ static bool blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
- 	 * In case of IO scheduler, flush rq need to borrow scheduler tag
- 	 * just for cheating put/get driver tag.
- 	 */
--	if (q->mq_ops) {
--		struct blk_mq_hw_ctx *hctx;
--
--		flush_rq->mq_ctx = first_rq->mq_ctx;
--
--		if (!q->elevator) {
--			fq->orig_rq = first_rq;
--			flush_rq->tag = first_rq->tag;
--			hctx = blk_mq_map_queue(q, first_rq->mq_ctx->cpu);
--			blk_mq_tag_set_rq(hctx, first_rq->tag, flush_rq);
--		} else {
--			flush_rq->internal_tag = first_rq->internal_tag;
--		}
-+	flush_rq->mq_ctx = first_rq->mq_ctx;
++static const struct blk_mq_ops pcd_mq_ops = {
++	.queue_rq	= pcd_queue_rq,
++};
 +
-+	if (!q->elevator) {
-+		fq->orig_rq = first_rq;
-+		flush_rq->tag = first_rq->tag;
-+		hctx = blk_mq_map_queue(q, first_rq->mq_ctx->cpu);
-+		blk_mq_tag_set_rq(hctx, first_rq->tag, flush_rq);
-+	} else {
-+		flush_rq->internal_tag = first_rq->internal_tag;
- 	}
- 
- 	flush_rq->cmd_flags = REQ_OP_FLUSH | REQ_PREFLUSH;
-@@ -358,49 +322,6 @@ static bool blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
- 	return blk_flush_queue_rq(flush_rq, false);
- }
- 
--static void flush_data_end_io(struct request *rq, blk_status_t error)
--{
--	struct request_queue *q = rq->q;
--	struct blk_flush_queue *fq = blk_get_flush_queue(q, NULL);
--
--	lockdep_assert_held(q->queue_lock);
--
--	/*
--	 * Updating q->in_flight[] here for making this tag usable
--	 * early. Because in blk_queue_start_tag(),
--	 * q->in_flight[BLK_RW_ASYNC] is used to limit async I/O and
--	 * reserve tags for sync I/O.
--	 *
--	 * More importantly this way can avoid the following I/O
--	 * deadlock:
--	 *
--	 * - suppose there are 40 fua requests comming to flush queue
--	 *   and queue depth is 31
--	 * - 30 rqs are scheduled then blk_queue_start_tag() can't alloc
--	 *   tag for async I/O any more
--	 * - all the 30 rqs are completed before FLUSH_PENDING_TIMEOUT
--	 *   and flush_data_end_io() is called
--	 * - the other rqs still can't go ahead if not updating
--	 *   q->in_flight[BLK_RW_ASYNC] here, meantime these rqs
--	 *   are held in flush data queue and make no progress of
--	 *   handling post flush rq
--	 * - only after the post flush rq is handled, all these rqs
--	 *   can be completed
--	 */
--
--	elv_completed_request(q, rq);
--
--	/* for avoiding double accounting */
--	rq->rq_flags &= ~RQF_STARTED;
--
--	/*
--	 * After populating an empty queue, kick it to avoid stall.  Read
--	 * the comment in flush_end_io().
--	 */
--	if (blk_flush_complete_seq(rq, fq, REQ_FSEQ_DATA, error))
--		blk_run_queue_async(q);
--}
--
- static void mq_flush_data_end_io(struct request *rq, blk_status_t error)
+ static void pcd_init_units(void)
  {
- 	struct request_queue *q = rq->q;
-@@ -443,9 +364,6 @@ void blk_insert_flush(struct request *rq)
- 	unsigned int policy = blk_flush_policy(fflags, rq);
- 	struct blk_flush_queue *fq = blk_get_flush_queue(q, rq->mq_ctx);
+ 	struct pcd_unit *cd;
+@@ -300,13 +307,29 @@ static void pcd_init_units(void)
+ 	pcd_drive_count = 0;
+ 	for (unit = 0, cd = pcd; unit < PCD_UNITS; unit++, cd++) {
+ 		struct gendisk *disk = alloc_disk(1);
++		struct blk_mq_tag_set *set;
++
+ 		if (!disk)
+ 			continue;
+-		disk->queue = blk_init_queue(do_pcd_request, &pcd_lock);
+-		if (!disk->queue) {
+-			put_disk(disk);
++
++		set = &cd->tag_set;
++		set->ops = &pcd_mq_ops;
++		set->nr_hw_queues = 1;
++		set->queue_depth = 1;
++		set->numa_node = NUMA_NO_NODE;
++		set->flags = BLK_MQ_F_SHOULD_MERGE;
++		if (blk_mq_alloc_tag_set(set))
++			continue;
++
++		disk->queue = blk_mq_init_queue(set);
++		if (IS_ERR(disk->queue)) {
++			blk_mq_free_tag_set(set);
++			disk->queue = NULL;
+ 			continue;
+ 		}
++
++		INIT_LIST_HEAD(&cd->rq_list);
++		disk->queue->queuedata = cd;
+ 		blk_queue_bounce_limit(disk->queue, BLK_BOUNCE_HIGH);
+ 		cd->disk = disk;
+ 		cd->pi = &cd->pia;
+@@ -748,18 +771,18 @@ static int pcd_queue;
+ static int set_next_request(void)
+ {
+ 	struct pcd_unit *cd;
+-	struct request_queue *q;
+ 	int old_pos = pcd_queue;
  
--	if (!q->mq_ops)
--		lockdep_assert_held(q->queue_lock);
--
- 	/*
- 	 * @policy now records what operations need to be done.  Adjust
- 	 * REQ_PREFLUSH and FUA for the driver.
-@@ -468,10 +386,7 @@ void blk_insert_flush(struct request *rq)
- 	 * complete the request.
- 	 */
- 	if (!policy) {
--		if (q->mq_ops)
--			blk_mq_end_request(rq, 0);
--		else
--			__blk_end_request(rq, 0, 0);
-+		blk_mq_end_request(rq, 0);
+ 	do {
+ 		cd = &pcd[pcd_queue];
+-		q = cd->present ? cd->disk->queue : NULL;
+ 		if (++pcd_queue == PCD_UNITS)
+ 			pcd_queue = 0;
+-		if (q) {
+-			pcd_req = blk_fetch_request(q);
+-			if (pcd_req)
+-				break;
++		if (cd->present && !list_empty(&cd->rq_list)) {
++			pcd_req = list_first_entry(&cd->rq_list, struct request,
++							queuelist);
++			list_del_init(&pcd_req->queuelist);
++			blk_mq_start_request(pcd_req);
++			break;
+ 		}
+ 	} while (pcd_queue != old_pos);
+ 
+@@ -768,33 +791,41 @@ static int set_next_request(void)
+ 
+ static void pcd_request(void)
+ {
++	struct pcd_unit *cd;
++
+ 	if (pcd_busy)
  		return;
- 	}
+-	while (1) {
+-		if (!pcd_req && !set_next_request())
+-			return;
  
-@@ -484,10 +399,7 @@ void blk_insert_flush(struct request *rq)
- 	 */
- 	if ((policy & REQ_FSEQ_DATA) &&
- 	    !(policy & (REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH))) {
--		if (q->mq_ops)
--			blk_mq_request_bypass_insert(rq, false);
--		else
--			list_add_tail(&rq->queuelist, &q->queue_head);
-+		blk_mq_request_bypass_insert(rq, false);
- 		return;
- 	}
- 
-@@ -499,17 +411,12 @@ void blk_insert_flush(struct request *rq)
- 	INIT_LIST_HEAD(&rq->flush.list);
- 	rq->rq_flags |= RQF_FLUSH_SEQ;
- 	rq->flush.saved_end_io = rq->end_io; /* Usually NULL */
--	if (q->mq_ops) {
--		rq->end_io = mq_flush_data_end_io;
- 
--		spin_lock_irq(&fq->mq_flush_lock);
--		blk_flush_complete_seq(rq, fq, REQ_FSEQ_ACTIONS & ~policy, 0);
--		spin_unlock_irq(&fq->mq_flush_lock);
--		return;
+-		if (rq_data_dir(pcd_req) == READ) {
+-			struct pcd_unit *cd = pcd_req->rq_disk->private_data;
+-			if (cd != pcd_current)
+-				pcd_bufblk = -1;
+-			pcd_current = cd;
+-			pcd_sector = blk_rq_pos(pcd_req);
+-			pcd_count = blk_rq_cur_sectors(pcd_req);
+-			pcd_buf = bio_data(pcd_req->bio);
+-			pcd_busy = 1;
+-			ps_set_intr(do_pcd_read, NULL, 0, nice);
+-			return;
+-		} else {
+-			__blk_end_request_all(pcd_req, BLK_STS_IOERR);
+-			pcd_req = NULL;
+-		}
 -	}
--	rq->end_io = flush_data_end_io;
-+	rq->end_io = mq_flush_data_end_io;
- 
-+	spin_lock_irq(&fq->mq_flush_lock);
- 	blk_flush_complete_seq(rq, fq, REQ_FSEQ_ACTIONS & ~policy, 0);
-+	spin_unlock_irq(&fq->mq_flush_lock);
++	if (!pcd_req && !set_next_request())
++		return;
++
++	cd = pcd_req->rq_disk->private_data;
++	if (cd != pcd_current)
++		pcd_bufblk = -1;
++	pcd_current = cd;
++	pcd_sector = blk_rq_pos(pcd_req);
++	pcd_count = blk_rq_cur_sectors(pcd_req);
++	pcd_buf = bio_data(pcd_req->bio);
++	pcd_busy = 1;
++	ps_set_intr(do_pcd_read, NULL, 0, nice);
  }
  
- /**
-@@ -575,8 +482,7 @@ struct blk_flush_queue *blk_alloc_flush_queue(struct request_queue *q,
- 	if (!fq)
- 		goto fail;
- 
--	if (q->mq_ops)
--		spin_lock_init(&fq->mq_flush_lock);
-+	spin_lock_init(&fq->mq_flush_lock);
- 
- 	rq_sz = round_up(rq_sz + cmd_size, cache_line_size());
- 	fq->flush_rq = kzalloc_node(rq_sz, flags, node);
-diff --git a/block/blk.h b/block/blk.h
-index a1841b8ff129..57a302bf5a70 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -114,9 +114,7 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- static inline struct blk_flush_queue *blk_get_flush_queue(
- 		struct request_queue *q, struct blk_mq_ctx *ctx)
+-static void do_pcd_request(struct request_queue *q)
++static blk_status_t pcd_queue_rq(struct blk_mq_hw_ctx *hctx,
++				 const struct blk_mq_queue_data *bd)
  {
--	if (q->mq_ops)
--		return blk_mq_map_queue(q, ctx->cpu)->fq;
--	return q->fq;
-+	return blk_mq_map_queue(q, ctx->cpu)->fq;
++	struct pcd_unit *cd = hctx->queue->queuedata;
++
++	if (rq_data_dir(bd->rq) != READ) {
++		blk_mq_start_request(bd->rq);
++		return BLK_STS_IOERR;
++	}
++
++	spin_lock_irq(&pcd_lock);
++	list_add_tail(&bd->rq->queuelist, &cd->rq_list);
+ 	pcd_request();
++	spin_unlock_irq(&pcd_lock);
++
++	return BLK_STS_OK;
  }
  
- static inline void __blk_get_queue(struct request_queue *q)
+ static inline void next_request(blk_status_t err)
+@@ -802,8 +833,10 @@ static inline void next_request(blk_status_t err)
+ 	unsigned long saved_flags;
+ 
+ 	spin_lock_irqsave(&pcd_lock, saved_flags);
+-	if (!__blk_end_request_cur(pcd_req, err))
++	if (!blk_update_request(pcd_req, err, blk_rq_cur_bytes(pcd_req))) {
++		__blk_mq_end_request(pcd_req, err);
+ 		pcd_req = NULL;
++	}
+ 	pcd_busy = 0;
+ 	pcd_request();
+ 	spin_unlock_irqrestore(&pcd_lock, saved_flags);
+@@ -1010,6 +1043,7 @@ static void __exit pcd_exit(void)
+ 			pi_release(cd->pi);
+ 			unregister_cdrom(&cd->info);
+ 		}
++		blk_mq_free_tag_set(&cd->tag_set);
+ 		blk_cleanup_queue(cd->disk->queue);
+ 		put_disk(cd->disk);
+ 	}
 -- 
 2.17.1
