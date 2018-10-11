@@ -1,17 +1,23 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:41611 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729154AbeJLB7I (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Oct 2018 21:59:08 -0400
+Received: by mail-pl1-f194.google.com with SMTP id q17-v6so4633490plr.8
+        for <linux-block@vger.kernel.org>; Thu, 11 Oct 2018 11:30:44 -0700 (PDT)
 From: Omar Sandoval <osandov@osandov.com>
 To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	kernel-team@fb.com,
-	Laurent Vivier <lvivier@redhat.com>
-Subject: [PATCH v2 07/11] amiflop: convert to blk-mq
-Date: Thu, 11 Oct 2018 12:20:47 -0700
-Message-Id: <e7bfd2b7c1572542be4e3f9ce04461f3540ffbd1.1539284959.git.osandov@fb.com>
-In-Reply-To: <cover.1539284959.git.osandov@fb.com>
-References: <cover.1539284959.git.osandov@fb.com>
+Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com,
+        Laurent Vivier <lvivier@redhat.com>
+Subject: [PATCH 08/13] amiflop: convert to blk-mq
+Date: Thu, 11 Oct 2018 11:30:18 -0700
+Message-Id: <b3c7d068f6f8bea811e7001ac79fc5dd4d066d85.1539282366.git.osandov@fb.com>
+In-Reply-To: <cover.1539282366.git.osandov@fb.com>
+References: <cover.1539282366.git.osandov@fb.com>
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 From: Omar Sandoval <osandov@fb.com>
 
@@ -21,11 +27,11 @@ serialize access to the controller. Compile-tested only.
 Cc: Laurent Vivier <lvivier@redhat.com>
 Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- drivers/block/amiflop.c | 125 +++++++++++++++-------------------------
- 1 file changed, 46 insertions(+), 79 deletions(-)
+ drivers/block/amiflop.c | 127 +++++++++++++++-------------------------
+ 1 file changed, 48 insertions(+), 79 deletions(-)
 
 diff --git a/drivers/block/amiflop.c b/drivers/block/amiflop.c
-index eef3b085e70a..1225b802f632 100644
+index eef3b085e70a..e9c701f9b32b 100644
 --- a/drivers/block/amiflop.c
 +++ b/drivers/block/amiflop.c
 @@ -201,6 +201,7 @@ struct amiga_floppy_struct {
@@ -52,7 +58,9 @@ index eef3b085e70a..1225b802f632 100644
 - * Round-robin between our available drives, doing one request from each
 - */
 -static struct request *set_next_request(void)
--{
++static blk_status_t amiflop_rw_cur_segment(struct amiga_floppy_struct *floppy,
++					   struct request *rq)
+ {
 -	struct request_queue *q;
 -	int cnt = FD_MAX_UNITS;
 -	struct request *rq = NULL;
@@ -85,9 +93,7 @@ index eef3b085e70a..1225b802f632 100644
 -}
 -
 -static void redo_fd_request(void)
-+static blk_status_t amiflop_rw_cur_segment(struct amiga_floppy_struct *floppy,
-+					   struct request *rq)
- {
+-{
 -	struct request *rq;
 +	int drive = floppy - unit;
  	unsigned int cnt, block, track, sector;
@@ -103,10 +109,10 @@ index eef3b085e70a..1225b802f632 100644
 -		/* Nothing left to do */
 -		return;
 -	}
--
+ 
 -	floppy = rq->rq_disk->private_data;
 -	drive = floppy - unit;
- 
+-
 -next_segment:
 -	/* Here someone could investigate to be more efficient */
 -	for (cnt = 0, err = BLK_STS_OK; cnt < blk_rq_cur_sectors(rq); cnt++) {
@@ -138,7 +144,7 @@ index eef3b085e70a..1225b802f632 100644
  
  		if (rq_data_dir(rq) == READ) {
  			memcpy(data, floppy->trackbuf + sector * 512, 512);
-@@ -1543,31 +1485,40 @@ static void redo_fd_request(void)
+@@ -1543,31 +1485,42 @@ static void redo_fd_request(void)
  			memcpy(floppy->trackbuf + sector * 512, data, 512);
  
  			/* keep the drive spinning while writes are scheduled */
@@ -183,6 +189,8 @@ index eef3b085e70a..1225b802f632 100644
 +
 +	do {
 +		err = amiflop_rw_cur_segment(floppy, rq);
++		if (err)
++			break;
 +	} while (blk_update_request(rq, err, blk_rq_cur_bytes(rq)));
 +	blk_mq_end_request(rq, err);
 +
@@ -191,7 +199,7 @@ index eef3b085e70a..1225b802f632 100644
  }
  
  static int fd_getgeo(struct block_device *bdev, struct hd_geometry *geo)
-@@ -1818,18 +1769,32 @@ static const struct block_device_operations floppy_fops = {
+@@ -1818,18 +1771,32 @@ static const struct block_device_operations floppy_fops = {
  	.check_events	= amiga_check_events,
  };
  
@@ -226,7 +234,7 @@ index eef3b085e70a..1225b802f632 100644
  	}
  
  	unit[drive].trackbuf = kmalloc(FLOPPY_MAX_SECTORS * 512, GFP_KERNEL);
-@@ -1841,6 +1806,8 @@ static struct gendisk *fd_alloc_disk(int drive)
+@@ -1841,6 +1808,8 @@ static struct gendisk *fd_alloc_disk(int drive)
  out_cleanup_queue:
  	blk_cleanup_queue(disk->queue);
  	disk->queue = NULL;
