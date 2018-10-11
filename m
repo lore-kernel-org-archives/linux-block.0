@@ -1,126 +1,222 @@
-Return-Path: <christophe.leroy@c-s.fr>
-Message-Id: <c796cfe3c0b6b008f8e215db55afef14aad0da0f.1539092112.git.christophe.leroy@c-s.fr>
-In-Reply-To: <cover.1539092111.git.christophe.leroy@c-s.fr>
-References: <cover.1539092111.git.christophe.leroy@c-s.fr>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v3 11/24] powerpc/mm: don't use _PAGE_EXEC for calling
- hash_preload()
-To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
-Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
-Date: Tue,  9 Oct 2018 13:51:54 +0000 (UTC)
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 05/17] paride: convert pd to blk-mq
+Date: Thu, 11 Oct 2018 10:58:57 -0600
+Message-Id: <20181011165909.32615-6-axboe@kernel.dk>
+In-Reply-To: <20181011165909.32615-1-axboe@kernel.dk>
+References: <20181011165909.32615-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-The 'access' parameter of hash_preload() is either 0 or _PAGE_EXEC.
-Among the two versions of hash_preload(), only the PPC64 one is
-doing something with this 'access' parameter.
-
-In order to remove the use of _PAGE_EXEC outside platform code,
-'access' parameter is replaced by 'is_exec' which will be either
-true of false, and the PPC64 version of hash_preload() creates
-the access flag based on 'is_exec'.
-
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- arch/powerpc/mm/hash_utils_64.c | 3 ++-
- arch/powerpc/mm/mem.c           | 9 +++++----
- arch/powerpc/mm/mmu_decl.h      | 2 +-
- arch/powerpc/mm/pgtable_32.c    | 2 +-
- arch/powerpc/mm/ppc_mmu_32.c    | 2 +-
- 5 files changed, 10 insertions(+), 8 deletions(-)
+ drivers/block/paride/pd.c | 109 ++++++++++++++++++++++----------------
+ 1 file changed, 62 insertions(+), 47 deletions(-)
 
-diff --git a/arch/powerpc/mm/hash_utils_64.c b/arch/powerpc/mm/hash_utils_64.c
-index 8ff03c7205a0..854edc3722e0 100644
---- a/arch/powerpc/mm/hash_utils_64.c
-+++ b/arch/powerpc/mm/hash_utils_64.c
-@@ -1482,7 +1482,7 @@ static bool should_hash_preload(struct mm_struct *mm, unsigned long ea)
- #endif
+diff --git a/drivers/block/paride/pd.c b/drivers/block/paride/pd.c
+index 7cf947586fe4..87636d6ce191 100644
+--- a/drivers/block/paride/pd.c
++++ b/drivers/block/paride/pd.c
+@@ -151,7 +151,7 @@ enum {D_PRT, D_PRO, D_UNI, D_MOD, D_GEO, D_SBY, D_DLY, D_SLV};
+ #include <linux/delay.h>
+ #include <linux/hdreg.h>
+ #include <linux/cdrom.h>	/* for the eject ioctl */
+-#include <linux/blkdev.h>
++#include <linux/blk-mq.h>
+ #include <linux/blkpg.h>
+ #include <linux/kernel.h>
+ #include <linux/mutex.h>
+@@ -236,6 +236,7 @@ struct pd_unit {
+ 	int alt_geom;
+ 	char name[PD_NAMELEN];	/* pda, pdb, etc ... */
+ 	struct gendisk *gd;
++	struct blk_mq_tag_set tag_set;
+ };
  
- void hash_preload(struct mm_struct *mm, unsigned long ea,
--		  unsigned long access, unsigned long trap)
-+		  bool is_exec, unsigned long trap)
+ static struct pd_unit pd[PD_UNITS];
+@@ -355,25 +356,6 @@ enum action {Fail = 0, Ok = 1, Hold, Wait};
+ static struct request *pd_req;	/* current request */
+ static enum action (*phase)(void);
+ 
+-static void run_fsm(void);
+-
+-static void ps_tq_int(struct work_struct *work);
+-
+-static DECLARE_DELAYED_WORK(fsm_tq, ps_tq_int);
+-
+-static void schedule_fsm(void)
+-{
+-	if (!nice)
+-		schedule_delayed_work(&fsm_tq, 0);
+-	else
+-		schedule_delayed_work(&fsm_tq, nice-1);
+-}
+-
+-static void ps_tq_int(struct work_struct *work)
+-{
+-	run_fsm();
+-}
+-
+ static enum action do_pd_io_start(void);
+ static enum action pd_special(void);
+ static enum action do_pd_read_start(void);
+@@ -387,7 +369,7 @@ static int pd_claimed;
+ static struct pd_unit *pd_current; /* current request's drive */
+ static PIA *pi_current; /* current request's PIA */
+ 
+-static int set_next_request(void)
++static int run_next_queue(void)
  {
- 	int hugepage_shift;
- 	unsigned long vsid;
-@@ -1490,6 +1490,7 @@ void hash_preload(struct mm_struct *mm, unsigned long ea,
- 	pte_t *ptep;
- 	unsigned long flags;
- 	int rc, ssize, update_flags = 0;
-+	unsigned long access = _PAGE_PRESENT | _PAGE_READ | (is_exec ? _PAGE_EXEC : 0);
+ 	struct gendisk *disk;
+ 	struct request_queue *q;
+@@ -398,11 +380,8 @@ static int set_next_request(void)
+ 		q = disk ? disk->queue : NULL;
+ 		if (++pd_queue == PD_UNITS)
+ 			pd_queue = 0;
+-		if (q) {
+-			pd_req = blk_fetch_request(q);
+-			if (pd_req)
+-				break;
+-		}
++		if (q)
++			blk_mq_run_hw_queues(q, true);
+ 	} while (pd_queue != old_pos);
  
- 	BUG_ON(REGION_ID(ea) != USER_REGION_ID);
+ 	return pd_req != NULL;
+@@ -438,17 +417,20 @@ static void run_fsm(void)
+ 				pd_claimed = 0;
+ 				phase = NULL;
+ 				spin_lock_irqsave(&pd_lock, saved_flags);
+-				if (!__blk_end_request_cur(pd_req,
+-						res == Ok ? 0 : BLK_STS_IOERR)) {
+-					if (!set_next_request())
+-						stop = 1;
++				if (!blk_update_request(pd_req,
++						res == Ok ? 0 : BLK_STS_IOERR,
++						blk_rq_cur_bytes(pd_req))) {
++					__blk_mq_end_request(pd_req,
++						res == Ok ? 0 : BLK_STS_IOERR);
++					run_next_queue();
++					stop = 1;
+ 				}
+ 				spin_unlock_irqrestore(&pd_lock, saved_flags);
+ 				if (stop)
+ 					return;
+ 				/* fall through */
+ 			case Hold:
+-				schedule_fsm();
++				blk_mq_run_hw_queues(pd_req->q, true);
+ 				return;
+ 			case Wait:
+ 				pi_disconnect(pi_current);
+@@ -505,11 +487,17 @@ static int pd_next_buf(void)
+ 	if (pd_count)
+ 		return 0;
+ 	spin_lock_irqsave(&pd_lock, saved_flags);
+-	__blk_end_request_cur(pd_req, 0);
+-	pd_count = blk_rq_cur_sectors(pd_req);
+-	pd_buf = bio_data(pd_req->bio);
++	if (!blk_update_request(pd_req, 0, blk_rq_cur_bytes(pd_req))) {
++		__blk_mq_end_request(pd_req, 0);
++		pd_req = NULL;
++		pd_count = 0;
++		pd_buf = NULL;
++	} else {
++		pd_count = blk_rq_cur_sectors(pd_req);
++		pd_buf = bio_data(pd_req->bio);
++	}
+ 	spin_unlock_irqrestore(&pd_lock, saved_flags);
+-	return 0;
++	return !pd_count;
+ }
  
-diff --git a/arch/powerpc/mm/mem.c b/arch/powerpc/mm/mem.c
-index cb421aeb7674..dd949d6649a2 100644
---- a/arch/powerpc/mm/mem.c
-+++ b/arch/powerpc/mm/mem.c
-@@ -509,7 +509,8 @@ void update_mmu_cache(struct vm_area_struct *vma, unsigned long address,
- 	 * We don't need to worry about _PAGE_PRESENT here because we are
- 	 * called with either mm->page_table_lock held or ptl lock held
- 	 */
--	unsigned long access, trap;
-+	unsigned long trap;
-+	bool is_exec;
+ static unsigned long pd_timeout;
+@@ -726,15 +714,22 @@ static enum action pd_identify(struct pd_unit *disk)
  
- 	if (radix_enabled()) {
- 		prefetch((void *)address);
-@@ -531,16 +532,16 @@ void update_mmu_cache(struct vm_area_struct *vma, unsigned long address,
- 	trap = current->thread.regs ? TRAP(current->thread.regs) : 0UL;
- 	switch (trap) {
- 	case 0x300:
--		access = 0UL;
-+		is_exec = false;
- 		break;
- 	case 0x400:
--		access = _PAGE_EXEC;
-+		is_exec = true;
- 		break;
- 	default:
+ /* end of io request engine */
+ 
+-static void do_pd_request(struct request_queue * q)
++static blk_status_t pd_queue_rq(struct blk_mq_hw_ctx *hctx,
++				const struct blk_mq_queue_data *bd)
+ {
+-	if (pd_req)
+-		return;
+-	pd_req = blk_fetch_request(q);
+-	if (!pd_req)
+-		return;
++	spin_lock_irq(&pd_lock);
+ 
+-	schedule_fsm();
++	/* this should not be possible */
++	if (pd_req) {
++		spin_unlock_irq(&pd_lock);
++		return BLK_STS_DEV_RESOURCE;
++	}
++
++	pd_req = bd->rq;
++	spin_unlock_irq(&pd_lock);
++	blk_mq_start_request(bd->rq);
++	run_fsm();
++	return BLK_STS_OK;
+ }
+ 
+ static int pd_special_command(struct pd_unit *disk,
+@@ -847,23 +842,42 @@ static const struct block_device_operations pd_fops = {
+ 
+ /* probing */
+ 
++static const struct blk_mq_ops pd_mq_ops = {
++	.queue_rq	= pd_queue_rq,
++};
++
+ static void pd_probe_drive(struct pd_unit *disk)
+ {
+-	struct gendisk *p = alloc_disk(1 << PD_BITS);
++	struct blk_mq_tag_set *set;
++	struct gendisk *p;
++
++	p = alloc_disk(1 << PD_BITS);
+ 	if (!p)
+ 		return;
++
+ 	strcpy(p->disk_name, disk->name);
+ 	p->fops = &pd_fops;
+ 	p->major = major;
+ 	p->first_minor = (disk - pd) << PD_BITS;
+ 	disk->gd = p;
+ 	p->private_data = disk;
+-	p->queue = blk_init_queue(do_pd_request, &pd_lock);
+-	if (!p->queue) {
+-		disk->gd = NULL;
+-		put_disk(p);
++
++	set = &disk->tag_set;
++	set->ops = &pd_mq_ops;
++	set->nr_hw_queues = 1;
++	set->queue_depth = 1;
++	set->numa_node = NUMA_NO_NODE;
++	set->flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_BLOCKING;
++	if (blk_mq_alloc_tag_set(set))
++		return;
++
++	p->queue = blk_mq_init_queue(set);
++	if (IS_ERR(p->queue)) {
++		blk_mq_free_tag_set(set);
++		p->queue = NULL;
  		return;
  	}
++
+ 	blk_queue_max_hw_sectors(p->queue, cluster);
+ 	blk_queue_bounce_limit(p->queue, BLK_BOUNCE_HIGH);
  
--	hash_preload(vma->vm_mm, address, access, trap);
-+	hash_preload(vma->vm_mm, address, is_exec, trap);
- #endif /* CONFIG_PPC_STD_MMU */
- #if (defined(CONFIG_PPC_BOOK3E_64) || defined(CONFIG_PPC_FSL_BOOK3E)) \
- 	&& defined(CONFIG_HUGETLB_PAGE)
-diff --git a/arch/powerpc/mm/mmu_decl.h b/arch/powerpc/mm/mmu_decl.h
-index e5d779eed181..dd7f9b951d25 100644
---- a/arch/powerpc/mm/mmu_decl.h
-+++ b/arch/powerpc/mm/mmu_decl.h
-@@ -82,7 +82,7 @@ static inline void _tlbivax_bcast(unsigned long address, unsigned int pid,
- #else /* CONFIG_PPC_MMU_NOHASH */
- 
- extern void hash_preload(struct mm_struct *mm, unsigned long ea,
--			 unsigned long access, unsigned long trap);
-+			 bool is_exec, unsigned long trap);
- 
- 
- extern void _tlbie(unsigned long address);
-diff --git a/arch/powerpc/mm/pgtable_32.c b/arch/powerpc/mm/pgtable_32.c
-index 0bbc7b7d8a05..01f348938328 100644
---- a/arch/powerpc/mm/pgtable_32.c
-+++ b/arch/powerpc/mm/pgtable_32.c
-@@ -261,7 +261,7 @@ static void __init __mapin_ram_chunk(unsigned long offset, unsigned long top)
- 		map_kernel_page(v, p, ktext ? PAGE_KERNEL_TEXT : PAGE_KERNEL);
- #ifdef CONFIG_PPC_STD_MMU_32
- 		if (ktext)
--			hash_preload(&init_mm, v, 0, 0x300);
-+			hash_preload(&init_mm, v, false, 0x300);
- #endif
- 		v += PAGE_SIZE;
- 		p += PAGE_SIZE;
-diff --git a/arch/powerpc/mm/ppc_mmu_32.c b/arch/powerpc/mm/ppc_mmu_32.c
-index bea6c544e38f..38a793bfca37 100644
---- a/arch/powerpc/mm/ppc_mmu_32.c
-+++ b/arch/powerpc/mm/ppc_mmu_32.c
-@@ -163,7 +163,7 @@ void __init setbat(int index, unsigned long virt, phys_addr_t phys,
-  * Preload a translation in the hash table
-  */
- void hash_preload(struct mm_struct *mm, unsigned long ea,
--		  unsigned long access, unsigned long trap)
-+		  bool is_exec, unsigned long trap)
- {
- 	pmd_t *pmd;
- 
+@@ -971,6 +985,7 @@ static void __exit pd_exit(void)
+ 		if (p) {
+ 			disk->gd = NULL;
+ 			del_gendisk(p);
++			blk_mq_free_tag_set(&disk->tag_set);
+ 			blk_cleanup_queue(p->queue);
+ 			put_disk(p);
+ 			pi_release(disk->pi);
 -- 
-2.13.3
+2.17.1
