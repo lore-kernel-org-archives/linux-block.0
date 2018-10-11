@@ -1,80 +1,174 @@
-Return-Path: <keescook@chromium.org>
-Return-Path: <keescook@chromium.org>
-Date: Mon, 8 Oct 2018 08:46:51 -0700
-From: Kees Cook <keescook@chromium.org>
-To: David Miller <davem@davemloft.net>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, sparclinux@vger.kernel.org
-Subject: [PATCH sparc-next] sunvdc: Remove VLA usage
-Message-ID: <20181008154651.GA36881@beast>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <prvs=81565c836=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	dm-devel@redhat.com,
+	Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Matias Bjorling <matias.bjorling@wdc.com>
+Subject: [PATCH v2 08/11] block: Improve zone reset execution
+Date: Thu, 11 Oct 2018 16:09:49 +0900
+Message-Id: <20181011070952.13248-9-damien.lemoal@wdc.com>
+In-Reply-To: <20181011070952.13248-1-damien.lemoal@wdc.com>
+References: <20181011070952.13248-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-In the quest to remove all stack VLA usage from the kernel[1], this moves
-the math for cookies calculation into macros and allocates a fixed size
-array for the maximum number of cookies and adds a runtime sanity check.
-(Note that the size was always fixed, but just hidden from the compiler.)
+There is no need to synchronously execute all REQ_OP_ZONE_RESET BIOs
+necessary to reset a range of zones. Similarly to what is done for
+discard BIOs in blk-lib.c, all zone reset BIOs can be chained and
+executed asynchronously and a synchronous call done only for the last
+BIO of the chain.
 
-[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+Modify blkdev_reset_zones() to operate similarly to
+blkdev_issue_discard() using the next_bio() helper for chaining BIOs. To
+avoid code duplication of that function in blk_zoned.c, rename
+next_bio() into blk_next_bio() and declare it as a block internal
+function in blk.h.
 
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/sunvdc.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ block/blk-lib.c   | 13 ++++++-------
+ block/blk-zoned.c | 29 ++++++++++++++++-------------
+ block/blk.h       |  2 ++
+ 3 files changed, 24 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/block/sunvdc.c b/drivers/block/sunvdc.c
-index 5ca56bfae63c..f68e9baffad7 100644
---- a/drivers/block/sunvdc.c
-+++ b/drivers/block/sunvdc.c
-@@ -36,6 +36,10 @@ MODULE_VERSION(DRV_MODULE_VERSION);
- #define VDC_TX_RING_SIZE	512
- #define VDC_DEFAULT_BLK_SIZE	512
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index d1b9dd03da25..d7bedee5f9ba 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -10,8 +10,7 @@
  
-+#define MAX_XFER_BLKS		(128 * 1024)
-+#define MAX_XFER_SIZE		(MAX_XFER_BLKS / VDC_DEFAULT_BLK_SIZE)
-+#define MAX_RING_COOKIES	((MAX_XFER_BLKS / PAGE_SIZE) + 2)
-+
- #define WAITING_FOR_LINK_UP	0x01
- #define WAITING_FOR_TX_SPACE	0x02
- #define WAITING_FOR_GEN_CMD	0x04
-@@ -450,7 +454,7 @@ static int __send_request(struct request *req)
+ #include "blk.h"
+ 
+-static struct bio *next_bio(struct bio *bio, unsigned int nr_pages,
+-		gfp_t gfp)
++struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp)
  {
- 	struct vdc_port *port = req->rq_disk->private_data;
- 	struct vio_dring_state *dr = &port->vio.drings[VIO_DRIVER_TX_RING];
--	struct scatterlist sg[port->ring_cookies];
-+	struct scatterlist sg[MAX_RING_COOKIES];
- 	struct vdc_req_entry *rqe;
- 	struct vio_disk_desc *desc;
- 	unsigned int map_perm;
-@@ -458,6 +462,9 @@ static int __send_request(struct request *req)
- 	u64 len;
- 	u8 op;
+ 	struct bio *new = bio_alloc(gfp, nr_pages);
  
-+	if (WARN_ON(port->ring_cookies > MAX_RING_COOKIES))
-+		return -EINVAL;
+@@ -87,7 +86,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 			req_sects = end_sect - sector;
+ 		}
+ 
+-		bio = next_bio(bio, 0, gfp_mask);
++		bio = blk_next_bio(bio, 0, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio_set_dev(bio, bdev);
+ 		bio_set_op_attrs(bio, op, 0);
+@@ -189,7 +188,7 @@ static int __blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
+ 	max_write_same_sectors = UINT_MAX >> 9;
+ 
+ 	while (nr_sects) {
+-		bio = next_bio(bio, 1, gfp_mask);
++		bio = blk_next_bio(bio, 1, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio_set_dev(bio, bdev);
+ 		bio->bi_vcnt = 1;
+@@ -265,7 +264,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+ 		return -EOPNOTSUPP;
+ 
+ 	while (nr_sects) {
+-		bio = next_bio(bio, 0, gfp_mask);
++		bio = blk_next_bio(bio, 0, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio_set_dev(bio, bdev);
+ 		bio->bi_opf = REQ_OP_WRITE_ZEROES;
+@@ -316,8 +315,8 @@ static int __blkdev_issue_zero_pages(struct block_device *bdev,
+ 		return -EPERM;
+ 
+ 	while (nr_sects != 0) {
+-		bio = next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
+-			       gfp_mask);
++		bio = blk_next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
++				   gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio_set_dev(bio, bdev);
+ 		bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index bb4ed69f917f..5d967fd39fbd 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -13,6 +13,8 @@
+ #include <linux/rbtree.h>
+ #include <linux/blkdev.h>
+ 
++#include "blk.h"
 +
- 	map_perm = LDC_MAP_SHADOW | LDC_MAP_DIRECT | LDC_MAP_IO;
+ static inline sector_t blk_zone_start(struct request_queue *q,
+ 				      sector_t sector)
+ {
+@@ -277,16 +279,17 @@ int blkdev_reset_zones(struct block_device *bdev,
+ 	struct request_queue *q = bdev_get_queue(bdev);
+ 	sector_t zone_sectors;
+ 	sector_t end_sector = sector + nr_sectors;
+-	struct bio *bio;
++	struct bio *bio = NULL;
++	struct blk_plug plug;
+ 	int ret;
  
- 	if (rq_data_dir(req) == READ) {
-@@ -984,9 +991,8 @@ static int vdc_port_probe(struct vio_dev *vdev, const struct vio_device_id *id)
- 		goto err_out_free_port;
+-	if (!q)
+-		return -ENXIO;
+-
+ 	if (!blk_queue_is_zoned(q))
+ 		return -EOPNOTSUPP;
  
- 	port->vdisk_block_size = VDC_DEFAULT_BLK_SIZE;
--	port->max_xfer_size = ((128 * 1024) / port->vdisk_block_size);
--	port->ring_cookies = ((port->max_xfer_size *
--			       port->vdisk_block_size) / PAGE_SIZE) + 2;
-+	port->max_xfer_size = MAX_XFER_SIZE;
-+	port->ring_cookies = MAX_RING_COOKIES;
+-	if (end_sector > bdev->bd_part->nr_sects)
++	if (bdev_read_only(bdev))
++		return -EPERM;
++
++	if (!nr_sectors || end_sector > bdev->bd_part->nr_sects)
+ 		/* Out of range */
+ 		return -EINVAL;
  
- 	err = vio_ldc_alloc(&port->vio, &vdc_ldc_cfg, port);
- 	if (err)
+@@ -299,19 +302,14 @@ int blkdev_reset_zones(struct block_device *bdev,
+ 	    end_sector != bdev->bd_part->nr_sects)
+ 		return -EINVAL;
+ 
++	blk_start_plug(&plug);
+ 	while (sector < end_sector) {
+ 
+-		bio = bio_alloc(gfp_mask, 0);
++		bio = blk_next_bio(bio, 0, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio_set_dev(bio, bdev);
+ 		bio_set_op_attrs(bio, REQ_OP_ZONE_RESET, 0);
+ 
+-		ret = submit_bio_wait(bio);
+-		bio_put(bio);
+-
+-		if (ret)
+-			return ret;
+-
+ 		sector += zone_sectors;
+ 
+ 		/* This may take a while, so be nice to others */
+@@ -319,7 +317,12 @@ int blkdev_reset_zones(struct block_device *bdev,
+ 
+ 	}
+ 
+-	return 0;
++	ret = submit_bio_wait(bio);
++	bio_put(bio);
++
++	blk_finish_plug(&plug);
++
++	return ret;
+ }
+ EXPORT_SYMBOL_GPL(blkdev_reset_zones);
+ 
+diff --git a/block/blk.h b/block/blk.h
+index 9db4e389582c..3d67844676fb 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -421,4 +421,6 @@ extern int blk_iolatency_init(struct request_queue *q);
+ static inline int blk_iolatency_init(struct request_queue *q) { return 0; }
+ #endif
+ 
++struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp);
++
+ #endif /* BLK_INTERNAL_H */
 -- 
 2.17.1
-
-
--- 
-Kees Cook
-Pixel Security
