@@ -1,21 +1,28 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:34433 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729126AbeJLB7G (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Oct 2018 21:59:06 -0400
+Received: by mail-pl1-f194.google.com with SMTP id f18-v6so4646720plr.1
+        for <linux-block@vger.kernel.org>; Thu, 11 Oct 2018 11:30:42 -0700 (PDT)
 From: Omar Sandoval <osandov@osandov.com>
 To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	kernel-team@fb.com,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Subject: [PATCH v2 04/11] swim3: convert to blk-mq
-Date: Thu, 11 Oct 2018 12:20:44 -0700
-Message-Id: <9f506128a665c5c2bdcf5d4da11bf00faa28e44d.1539284959.git.osandov@fb.com>
-In-Reply-To: <cover.1539284959.git.osandov@fb.com>
-References: <cover.1539284959.git.osandov@fb.com>
+Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Subject: [PATCH 05/13] swim3: convert to blk-mq
+Date: Thu, 11 Oct 2018 11:30:15 -0700
+Message-Id: <9a5654dc2713ea559d8dea54a0a07dea83c22592.1539282366.git.osandov@fb.com>
+In-Reply-To: <cover.1539282366.git.osandov@fb.com>
+References: <cover.1539282366.git.osandov@fb.com>
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 From: Omar Sandoval <osandov@fb.com>
 
-Pretty simple conversion. grab_drive() could probably be replaced by
+Pretty simple conversion. To avoid extra churn, we keep the
+swim3_end_request() wrapper. grab_drive() could probably be replaced by
 some freeze/quiesce incantation, but I left it alone, and just used
 freeze/quiesce for eject. Compile-tested only.
 
@@ -26,7 +33,7 @@ Signed-off-by: Omar Sandoval <osandov@fb.com>
  1 file changed, 75 insertions(+), 88 deletions(-)
 
 diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
-index df7ebe016e2c..cc28f17bfa5b 100644
+index 24e121ee274b..e2061a4d43f7 100644
 --- a/drivers/block/swim3.c
 +++ b/drivers/block/swim3.c
 @@ -25,7 +25,7 @@
@@ -56,7 +63,7 @@ index df7ebe016e2c..cc28f17bfa5b 100644
  		  err, nr_bytes, req);
  
  	if (err)
- 		nr_bytes = blk_rq_cur_bytes(req);
+ 		nr_bytes = blk_rq_bytes(req);
 -	rc = __blk_end_request(req, err, nr_bytes);
 -	if (rc)
 +	if (blk_update_request(req, err, nr_bytes))
