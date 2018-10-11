@@ -1,50 +1,51 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-ide@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 28/28] block: get rid of blk_queued_rq()
-Date: Thu, 25 Oct 2018 15:10:39 -0600
-Message-Id: <20181025211039.11559-29-axboe@kernel.dk>
-In-Reply-To: <20181025211039.11559-1-axboe@kernel.dk>
-References: <20181025211039.11559-1-axboe@kernel.dk>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+From: Omar Sandoval <osandov@osandov.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	kernel-team@fb.com
+Subject: [PATCH v2 01/11] swim: fix cleanup on setup error
+Date: Thu, 11 Oct 2018 12:20:41 -0700
+Message-Id: <6fc80069461e094f5d018c948873f11b8d4331de.1539284959.git.osandov@fb.com>
+In-Reply-To: <cover.1539284959.git.osandov@fb.com>
+References: <cover.1539284959.git.osandov@fb.com>
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-No point in hiding what this does, just open code it in the
-one spot where we are still using it.
+From: Omar Sandoval <osandov@fb.com>
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+If we fail to allocate the request queue for a disk, we still need to
+free that disk, not just the previous ones. Additionally, we need to
+cleanup the previous request queues.
+
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- block/blk-mq.c         | 2 +-
- include/linux/blkdev.h | 2 --
- 2 files changed, 1 insertion(+), 3 deletions(-)
+ drivers/block/swim.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d43c9232c77c..21e4147c4810 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -692,7 +692,7 @@ void blk_mq_requeue_request(struct request *rq, bool kick_requeue_list)
- 	/* this request will be re-inserted to io scheduler queue */
- 	blk_mq_sched_requeue_request(rq);
+diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+index 0e31884a9519..cbe909c51847 100644
+--- a/drivers/block/swim.c
++++ b/drivers/block/swim.c
+@@ -887,8 +887,17 @@ static int swim_floppy_init(struct swim_priv *swd)
  
--	BUG_ON(blk_queued_rq(rq));
-+	BUG_ON(!list_empty(&rq->queuelist));
- 	blk_mq_add_to_requeue_list(rq, true, kick_requeue_list);
+ exit_put_disks:
+ 	unregister_blkdev(FLOPPY_MAJOR, "fd");
+-	while (drive--)
+-		put_disk(swd->unit[drive].disk);
++	do {
++		struct gendisk *disk = swd->unit[drive].disk;
++
++		if (disk) {
++			if (disk->queue) {
++				blk_cleanup_queue(disk->queue);
++				disk->queue = NULL;
++			}
++			put_disk(disk);
++		}
++	} while (drive--);
+ 	return err;
  }
- EXPORT_SYMBOL(blk_mq_requeue_request);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 95e119409490..82b6cf45c6e0 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -678,8 +678,6 @@ static inline bool blk_account_rq(struct request *rq)
- 
- #define blk_rq_cpu_valid(rq)	((rq)->cpu != -1)
- #define blk_bidi_rq(rq)		((rq)->next_rq != NULL)
--/* rq->queuelist of dequeued request must be list_empty() */
--#define blk_queued_rq(rq)	(!list_empty(&(rq)->queuelist))
- 
- #define list_entry_rq(ptr)	list_entry((ptr), struct request, queuelist)
  
 -- 
-2.17.1
+2.19.1
