@@ -1,26 +1,50 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] blk-wbt: wake up all when we scale up, not down
-To: Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org,
- kernel-team@fb.com
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	kernel-team@fb.com
 Cc: stable@vger.kernel.org
-References: <20181011192930.2844-1-josef@toxicpanda.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <729350ca-183a-ad1f-9d4f-3e90913a40f8@kernel.dk>
-Date: Thu, 11 Oct 2018 13:31:17 -0600
-MIME-Version: 1.0
-In-Reply-To: <20181011192930.2844-1-josef@toxicpanda.com>
-Content-Type: text/plain; charset=utf-8
+Subject: [PATCH] blk-wbt: wake up all when we scale up, not down
+Date: Thu, 11 Oct 2018 15:29:30 -0400
+Message-Id: <20181011192930.2844-1-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/11/18 1:29 PM, Josef Bacik wrote:
-> Tetsuo brought to my attention that I screwed up the scale_up/scale_down
-> helpers when I factored out the rq-qos code.  We need to wake up all the
-> waiters when we add slots for requests to make, not when we shrink the
-> slots.  Otherwise we'll end up things waiting forever.  This was a
-> mistake and simply puts everything back the way it was.
+Tetsuo brought to my attention that I screwed up the scale_up/scale_down
+helpers when I factored out the rq-qos code.  We need to wake up all the
+waiters when we add slots for requests to make, not when we shrink the
+slots.  Otherwise we'll end up things waiting forever.  This was a
+mistake and simply puts everything back the way it was.
 
-I'll apply this for 4.19. I haven't hit this in testing, I'm guessing
-the jitter when going up and down hides the issue.
+cc: stable@vger.kernel.org
+Fixes: a79050434b45 ("blk-rq-qos: refactor out common elements of blk-wbt")
+eported-by: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+---
+JENS! I did this on for-4.20/block FYI
 
+ block/blk-wbt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 8e20a0677dcf..8ac93fcbaa2e 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -310,6 +310,7 @@ static void scale_up(struct rq_wb *rwb)
+ 	rq_depth_scale_up(&rwb->rq_depth);
+ 	calc_wb_limits(rwb);
+ 	rwb->unknown_cnt = 0;
++	rwb_wake_all(rwb);
+ 	rwb_trace_step(rwb, "scale up");
+ }
+ 
+@@ -318,7 +319,6 @@ static void scale_down(struct rq_wb *rwb, bool hard_throttle)
+ 	rq_depth_scale_down(&rwb->rq_depth, hard_throttle);
+ 	calc_wb_limits(rwb);
+ 	rwb->unknown_cnt = 0;
+-	rwb_wake_all(rwb);
+ 	rwb_trace_step(rwb, "scale down");
+ }
+ 
 -- 
-Jens Axboe
+2.14.3
