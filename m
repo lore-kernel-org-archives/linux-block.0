@@ -1,100 +1,42 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-        Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH v3 09/11] block: Expose queue nr_zones in sysfs
-Date: Fri, 12 Oct 2018 11:30:10 +0900
-Message-Id: <20181012023012.29923-10-damien.lemoal@wdc.com>
-In-Reply-To: <20181012023012.29923-1-damien.lemoal@wdc.com>
-References: <20181012023012.29923-1-damien.lemoal@wdc.com>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <prvs=816489328=Damien.LeMoal@wdc.com>
+From: Damien Le Moal <Damien.LeMoal@wdc.com>
+To: "emilne@redhat.com" <emilne@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Jens Axboe
+	<axboe@kernel.dk>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>, "dm-devel@redhat.com"
+	<dm-devel@redhat.com>, Mike Snitzer <snitzer@redhat.com>, Christoph Hellwig
+	<hch@lst.de>, Matias Bjorling <Matias.Bjorling@wdc.com>, Bart Van Assche
+	<Bart.VanAssche@wdc.com>
+Subject: Re: [PATCH v2 09/11] block: Expose queue nr_zones in sysfs
+Date: Fri, 12 Oct 2018 00:41:59 +0000
+Message-ID: 
+ <BN3PR0401MB1640D90498CA644E582CCE46E7E20@BN3PR0401MB1640.namprd04.prod.outlook.com>
+References: <20181011070952.13248-1-damien.lemoal@wdc.com>
+ <20181011070952.13248-10-damien.lemoal@wdc.com>
+ <1539268936.20703.258.camel@localhost.localdomain>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Expose through sysfs the nr_zones field of struct request_queue.
-Exposing this value helps in debugging disk issues as well as
-facilitating scripts based use of the disk (e.g. blktests).
-
-For zoned block devices, the nr_zones field indicates the total number
-of zones of the device calculated using the known disk capacity and
-zone size. This number of zones is always 0 for regular block devices.
-
-Since nr_zones is defined conditionally with CONFIG_BLK_DEV_ZONED,
-introduce the blk_queue_nr_zones() function to return the correct value
-for any device, regardless if CONFIG_BLK_DEV_ZONED is set.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/blk-sysfs.c      | 11 +++++++++++
- include/linux/blkdev.h | 10 ++++++++++
- 2 files changed, 21 insertions(+)
-
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 3772671cf2bc..92be8092ca4f 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -300,6 +300,11 @@ static ssize_t queue_zoned_show(struct request_queue *q, char *page)
- 	}
- }
- 
-+static ssize_t queue_nr_zones_show(struct request_queue *q, char *page)
-+{
-+	return queue_var_show(blk_queue_nr_zones(q), page);
-+}
-+
- static ssize_t queue_nomerges_show(struct request_queue *q, char *page)
- {
- 	return queue_var_show((blk_queue_nomerges(q) << 1) |
-@@ -637,6 +642,11 @@ static struct queue_sysfs_entry queue_zoned_entry = {
- 	.show = queue_zoned_show,
- };
- 
-+static struct queue_sysfs_entry queue_nr_zones_entry = {
-+	.attr = {.name = "nr_zones", .mode = 0444 },
-+	.show = queue_nr_zones_show,
-+};
-+
- static struct queue_sysfs_entry queue_nomerges_entry = {
- 	.attr = {.name = "nomerges", .mode = 0644 },
- 	.show = queue_nomerges_show,
-@@ -727,6 +737,7 @@ static struct attribute *default_attrs[] = {
- 	&queue_write_zeroes_max_entry.attr,
- 	&queue_nonrot_entry.attr,
- 	&queue_zoned_entry.attr,
-+	&queue_nr_zones_entry.attr,
- 	&queue_nomerges_entry.attr,
- 	&queue_rq_affinity_entry.attr,
- 	&queue_iostats_entry.attr,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c24969b1741b..879753b10263 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -804,6 +804,11 @@ static inline unsigned int blk_queue_zone_sectors(struct request_queue *q)
- }
- 
- #ifdef CONFIG_BLK_DEV_ZONED
-+static inline unsigned int blk_queue_nr_zones(struct request_queue *q)
-+{
-+	return blk_queue_is_zoned(q) ? q->nr_zones : 0;
-+}
-+
- static inline unsigned int blk_queue_zone_no(struct request_queue *q,
- 					     sector_t sector)
- {
-@@ -819,6 +824,11 @@ static inline bool blk_queue_zone_is_seq(struct request_queue *q,
- 		return false;
- 	return test_bit(blk_queue_zone_no(q, sector), q->seq_zones_bitmap);
- }
-+#else /* CONFIG_BLK_DEV_ZONED */
-+static inline unsigned int blk_queue_nr_zones(struct request_queue *q)
-+{
-+	return 0;
-+}
- #endif /* CONFIG_BLK_DEV_ZONED */
- 
- static inline bool rq_is_sync(struct request *rq)
--- 
-2.17.1
+On 2018/10/11 23:42, Ewan D. Milne wrote:=0A=
+> So in v2 you moved the #ifdef CONFIG_BLK_DEV_ZONED=0A=
+> so that nr_zones is always present?  It was previously=0A=
+> changed to keep the request_queue size smaller.=0A=
+> =0A=
+> Would make more sense to make the nr_zones sysfs=0A=
+> code here conditional on CONFIG_BLK_DEV_ZONED?=0A=
+> =0A=
+=0A=
+Yes, I guess it would. #ifdef in c code is normally not welcome, so I was a=
+=0A=
+little heavy handed with this v2 change to avoid adding any to blk-sysfs.c =
+:)=0A=
+=0A=
+I will rework this and send a v3.=0A=
+=0A=
+Thanks for the review.=0A=
+=0A=
+=0A=
+-- =0A=
+Damien Le Moal=0A=
+Western Digital Research=0A=
