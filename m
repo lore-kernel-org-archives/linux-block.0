@@ -1,44 +1,113 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH v3 04/11] block: Introduce blkdev_nr_zones() helper
-To: Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
- "Martin K . Petersen" <martin.petersen@oracle.com>, dm-devel@redhat.com,
- Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, Matias Bjorling <matias.bjorling@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:6549 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726183AbeJLKAZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Oct 2018 06:00:25 -0400
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+        Matias Bjorling <matias.bjorling@wdc.com>
+Subject: [PATCH v3 04/11] block: Introduce blkdev_nr_zones() helper
+Date: Fri, 12 Oct 2018 11:30:05 +0900
+Message-Id: <20181012023012.29923-5-damien.lemoal@wdc.com>
+In-Reply-To: <20181012023012.29923-1-damien.lemoal@wdc.com>
 References: <20181012023012.29923-1-damien.lemoal@wdc.com>
- <20181012023012.29923-5-damien.lemoal@wdc.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <88ebc7eb-f5f8-6966-7820-3c1a5b36b72c@suse.de>
-Date: Fri, 12 Oct 2018 09:36:11 +0200
-MIME-Version: 1.0
-In-Reply-To: <20181012023012.29923-5-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 10/12/18 4:30 AM, Damien Le Moal wrote:
-> Introduce the blkdev_nr_zones() helper function to get the total
-> number of zones of a zoned block device. This number is always 0 for a
-> regular block device (q->limits.zoned == BLK_ZONED_NONE case).
-> 
-> Replace hard-coded number of zones calculation in dmz_get_zoned_device()
-> with a call to this helper.
-> 
-> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> ---
->   block/blk-zoned.c            | 27 +++++++++++++++++++++++++++
->   drivers/md/dm-zoned-target.c |  3 +--
->   include/linux/blkdev.h       |  5 +++++
->   3 files changed, 33 insertions(+), 2 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Introduce the blkdev_nr_zones() helper function to get the total
+number of zones of a zoned block device. This number is always 0 for a
+regular block device (q->limits.zoned == BLK_ZONED_NONE case).
 
-Cheers,
+Replace hard-coded number of zones calculation in dmz_get_zoned_device()
+with a call to this helper.
 
-Hannes
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-zoned.c            | 27 +++++++++++++++++++++++++++
+ drivers/md/dm-zoned-target.c |  3 +--
+ include/linux/blkdev.h       |  5 +++++
+ 3 files changed, 33 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index c461cf63f1f4..32e377f755d8 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -63,6 +63,33 @@ void __blk_req_zone_write_unlock(struct request *rq)
+ }
+ EXPORT_SYMBOL_GPL(__blk_req_zone_write_unlock);
+ 
++static inline unsigned int __blkdev_nr_zones(struct request_queue *q,
++					     sector_t nr_sectors)
++{
++	unsigned long zone_sectors = blk_queue_zone_sectors(q);
++
++	return (nr_sectors + zone_sectors - 1) >> ilog2(zone_sectors);
++}
++
++/**
++ * blkdev_nr_zones - Get number of zones
++ * @bdev:	Target block device
++ *
++ * Description:
++ *    Return the total number of zones of a zoned block device.
++ *    For a regular block device, the number of zones is always 0.
++ */
++unsigned int blkdev_nr_zones(struct block_device *bdev)
++{
++	struct request_queue *q = bdev_get_queue(bdev);
++
++	if (!blk_queue_is_zoned(q))
++		return 0;
++
++	return __blkdev_nr_zones(q, bdev->bd_part->nr_sects);
++}
++EXPORT_SYMBOL_GPL(blkdev_nr_zones);
++
+ /*
+  * Check that a zone report belongs to the partition.
+  * If yes, fix its start sector and write pointer, copy it in the
+diff --git a/drivers/md/dm-zoned-target.c b/drivers/md/dm-zoned-target.c
+index a44183ff4be0..12d96a263623 100644
+--- a/drivers/md/dm-zoned-target.c
++++ b/drivers/md/dm-zoned-target.c
+@@ -702,8 +702,7 @@ static int dmz_get_zoned_device(struct dm_target *ti, char *path)
+ 	dev->zone_nr_blocks = dmz_sect2blk(dev->zone_nr_sectors);
+ 	dev->zone_nr_blocks_shift = ilog2(dev->zone_nr_blocks);
+ 
+-	dev->nr_zones = (dev->capacity + dev->zone_nr_sectors - 1)
+-		>> dev->zone_nr_sectors_shift;
++	dev->nr_zones = blkdev_nr_zones(dev->bdev);
+ 
+ 	dmz->dev = dev;
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 6980014357d4..c24969b1741b 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -401,6 +401,7 @@ struct blk_zone_report_hdr {
+ 	u8		padding[60];
+ };
+ 
++extern unsigned int blkdev_nr_zones(struct block_device *bdev);
+ extern int blkdev_report_zones(struct block_device *bdev,
+ 			       sector_t sector, struct blk_zone *zones,
+ 			       unsigned int *nr_zones, gfp_t gfp_mask);
+@@ -414,6 +415,10 @@ extern int blkdev_reset_zones_ioctl(struct block_device *bdev, fmode_t mode,
+ 
+ #else /* CONFIG_BLK_DEV_ZONED */
+ 
++static inline unsigned int blkdev_nr_zones(struct block_device *bdev)
++{
++	return 0;
++}
+ static inline int blkdev_report_zones_ioctl(struct block_device *bdev,
+ 					    fmode_t mode, unsigned int cmd,
+ 					    unsigned long arg)
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.17.1
