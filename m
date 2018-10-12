@@ -1,43 +1,199 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH 17/17] null_blk: remove legacy IO path
-To: =?UTF-8?Q?S=c3=a9bastien_Boisvert?= <sboisvert@gydle.com>,
- linux-block@vger.kernel.org
+Return-Path: <sboisvert@gydle.com>
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
 References: <20181011165909.32615-1-axboe@kernel.dk>
  <20181011165909.32615-18-axboe@kernel.dk>
- <2b272814-d4b9-a761-0d6c-22bb85d86c58@gydle.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <ea2fb124-9b80-0621-36f2-45516a5a3252@kernel.dk>
-Date: Fri, 12 Oct 2018 11:30:06 -0600
+From: =?UTF-8?Q?S=c3=a9bastien_Boisvert?= <sboisvert@gydle.com>
+Subject: Re: [PATCH 17/17] null_blk: remove legacy IO path
+Message-ID: <2b272814-d4b9-a761-0d6c-22bb85d86c58@gydle.com>
+Date: Fri, 12 Oct 2018 13:24:07 -0400
 MIME-Version: 1.0
-In-Reply-To: <2b272814-d4b9-a761-0d6c-22bb85d86c58@gydle.com>
+In-Reply-To: <20181011165909.32615-18-axboe@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/12/18 11:24 AM, Sébastien Boisvert wrote:
->> +	if (g_queue_mode == NULL_Q_RQ) {
->> +		pr_err("null_blk: legacy IO path no longer available\n");
->> +		return -EINVAL;
->> +	}
+Hello Jens,
+
+On 2018-10-11 12:59 PM, Jens Axboe wrote:
+> We're planning on removing this code completely, kill the old
+> path.
 > 
-> Is this the only location where the value NULL_Q_RQ has be checked ?
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  drivers/block/null_blk_main.c | 96 +++--------------------------------
+>  1 file changed, 6 insertions(+), 90 deletions(-)
+> 
+> diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+> index 093b614d6524..8142cc8ff952 100644
+> --- a/drivers/block/null_blk_main.c
+> +++ b/drivers/block/null_blk_main.c
+> @@ -616,10 +616,6 @@ static void end_cmd(struct nullb_cmd *cmd)
+>  	case NULL_Q_MQ:
+>  		blk_mq_end_request(cmd->rq, cmd->error);
+>  		return;
+> -	case NULL_Q_RQ:
+> -		INIT_LIST_HEAD(&cmd->rq->queuelist);
+> -		blk_end_request_all(cmd->rq, cmd->error);
+> -		break;
+>  	case NULL_Q_BIO:
+>  		cmd->bio->bi_status = cmd->error;
+>  		bio_endio(cmd->bio);
+> @@ -627,15 +623,6 @@ static void end_cmd(struct nullb_cmd *cmd)
+>  	}
+>  
+>  	free_cmd(cmd);
+> -
+> -	/* Restart queue if needed, as we are freeing a tag */
+> -	if (queue_mode == NULL_Q_RQ && blk_queue_stopped(q)) {
+> -		unsigned long flags;
+> -
+> -		spin_lock_irqsave(q->queue_lock, flags);
+> -		blk_start_queue_async(q);
+> -		spin_unlock_irqrestore(q->queue_lock, flags);
+> -	}
+>  }
+>  
+>  static enum hrtimer_restart null_cmd_timer_expired(struct hrtimer *timer)
+> @@ -1197,17 +1184,8 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd)
+>  			/* race with timer */
+>  			if (atomic_long_read(&nullb->cur_bytes) > 0)
+>  				null_restart_queue_async(nullb);
+> -			if (dev->queue_mode == NULL_Q_RQ) {
+> -				struct request_queue *q = nullb->q;
+> -
+> -				spin_lock_irq(q->queue_lock);
+> -				rq->rq_flags |= RQF_DONTPREP;
+> -				blk_requeue_request(q, rq);
+> -				spin_unlock_irq(q->queue_lock);
+> -				return BLK_STS_OK;
+> -			} else
+> -				/* requeue request */
+> -				return BLK_STS_DEV_RESOURCE;
+> +			/* requeue request */
+> +			return BLK_STS_DEV_RESOURCE;
+>  		}
+>  	}
+>  
+> @@ -1278,9 +1256,6 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd)
+>  		case NULL_Q_MQ:
+>  			blk_mq_complete_request(cmd->rq);
+>  			break;
+> -		case NULL_Q_RQ:
+> -			blk_complete_request(cmd->rq);
+> -			break;
+>  		case NULL_Q_BIO:
+>  			/*
+>  			 * XXX: no proper submitting cpu information available.
+> @@ -1349,30 +1324,6 @@ static blk_qc_t null_queue_bio(struct request_queue *q, struct bio *bio)
+>  	return BLK_QC_T_NONE;
+>  }
+>  
+> -static enum blk_eh_timer_return null_rq_timed_out_fn(struct request *rq)
+> -{
+> -	pr_info("null: rq %p timed out\n", rq);
+> -	__blk_complete_request(rq);
+> -	return BLK_EH_DONE;
+> -}
+> -
+> -static int null_rq_prep_fn(struct request_queue *q, struct request *req)
+> -{
+> -	struct nullb *nullb = q->queuedata;
+> -	struct nullb_queue *nq = nullb_to_queue(nullb);
+> -	struct nullb_cmd *cmd;
+> -
+> -	cmd = alloc_cmd(nq, 0);
+> -	if (cmd) {
+> -		cmd->rq = req;
+> -		req->special = cmd;
+> -		return BLKPREP_OK;
+> -	}
+> -	blk_stop_queue(q);
+> -
+> -	return BLKPREP_DEFER;
+> -}
+> -
+>  static bool should_timeout_request(struct request *rq)
+>  {
+>  #ifdef CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION
+> @@ -1391,27 +1342,6 @@ static bool should_requeue_request(struct request *rq)
+>  	return false;
+>  }
+>  
+> -static void null_request_fn(struct request_queue *q)
+> -{
+> -	struct request *rq;
+> -
+> -	while ((rq = blk_fetch_request(q)) != NULL) {
+> -		struct nullb_cmd *cmd = rq->special;
+> -
+> -		/* just ignore the request */
+> -		if (should_timeout_request(rq))
+> -			continue;
+> -		if (should_requeue_request(rq)) {
+> -			blk_requeue_request(q, rq);
+> -			continue;
+> -		}
+> -
+> -		spin_unlock_irq(q->queue_lock);
+> -		null_handle_cmd(cmd);
+> -		spin_lock_irq(q->queue_lock);
+> -	}
+> -}
+> -
+>  static enum blk_eh_timer_return null_timeout_rq(struct request *rq, bool res)
+>  {
+>  	pr_info("null: rq %p timed out\n", rq);
+> @@ -1766,24 +1696,6 @@ static int null_add_dev(struct nullb_device *dev)
+>  		rv = init_driver_queues(nullb);
+>  		if (rv)
+>  			goto out_cleanup_blk_queue;
+> -	} else {
+> -		nullb->q = blk_init_queue_node(null_request_fn, &nullb->lock,
+> -						dev->home_node);
+> -		if (!nullb->q) {
+> -			rv = -ENOMEM;
+> -			goto out_cleanup_queues;
+> -		}
+> -
+> -		if (!null_setup_fault())
+> -			goto out_cleanup_blk_queue;
+> -
+> -		blk_queue_prep_rq(nullb->q, null_rq_prep_fn);
+> -		blk_queue_softirq_done(nullb->q, null_softirq_done_fn);
+> -		blk_queue_rq_timed_out(nullb->q, null_rq_timed_out_fn);
+> -		nullb->q->rq_timeout = 5 * HZ;
+> -		rv = init_driver_queues(nullb);
+> -		if (rv)
+> -			goto out_cleanup_blk_queue;
+>  	}
+>  
+>  	if (dev->mbps) {
+> @@ -1865,6 +1777,10 @@ static int __init null_init(void)
+>  		return -EINVAL;
+>  	}
+>  
+> +	if (g_queue_mode == NULL_Q_RQ) {
+> +		pr_err("null_blk: legacy IO path no longer available\n");
+> +		return -EINVAL;
+> +	}
 
-I've since fixed a few more, all should be well now. The updated version
-is here:
+Is this the only location where the value NULL_Q_RQ has be checked ?
 
-http://git.kernel.dk/cgit/linux-block/commit/?h=mq-conversions&id=d6fd3bd94a7333a8cd0bf7ef18f719ef7e052dc4
 
-> Since the enum that contains NULL_Q_RQ is in
-> drivers/block/null_blk_main.c, and not in a linux header file, would
-> it be thinkable to remove NULL_Q_RQ from the enum too, and not adding
-> this legacy check ?
->
-> Would that break user space (the number one rule) ?
+Since the enum that contains NULL_Q_RQ is in drivers/block/null_blk_main.c, and not in a linux header file,
+would it be thinkable to remove NULL_Q_RQ from the enum too, and not adding this legacy check ?
 
-It wouldn't break user space. In any case, if someone is currently using
-queue_mode=1, it'd fail to load after this patch.
+Would that break user space (the number one rule) ?
 
-I'm checking that at the bottom, we could remove NULL_Q_RQ if we just
-made that check == 1 instead. But cleaner to keep it, imho.
+See in 0778a9f2dd924c3af41971ba40eec44793aea531 from remotes/axboe-linux-block/master :
 
--- 
-Jens Axboe
+drivers/block/null_blk_main.c-79-enum {
+drivers/block/null_blk_main.c-80-	NULL_Q_BIO		= 0,
+drivers/block/null_blk_main.c:81:	NULL_Q_RQ		= 1,
+drivers/block/null_blk_main.c-82-	NULL_Q_MQ		= 2,
+drivers/block/null_blk_main.c-83-};
+
+
+>  	if (g_queue_mode == NULL_Q_MQ && g_use_per_node_hctx) {
+>  		if (g_submit_queues != nr_online_nodes) {
+>  			pr_warn("null_blk: submit_queues param is set to %u.\n",
+> 
