@@ -1,56 +1,219 @@
-Return-Path: <prvs=8165d0f49=Matias.Bjorling@wdc.com>
-From: Matias Bjorling <Matias.Bjorling@wdc.com>
-To: "hare@suse.de" <hare@suse.de>, Damien Le Moal <Damien.LeMoal@wdc.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "linux-scsi@vger.kernel.org"
-	<linux-scsi@vger.kernel.org>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "dm-devel@redhat.com" <dm-devel@redhat.com>,
-	"snitzer@redhat.com" <snitzer@redhat.com>
-CC: "hch@lst.de" <hch@lst.de>
-Subject: Re: [PATCH v3 02/11] scsi: sd_zbc: Reduce boot device scan and
- revalidate time
-Date: Fri, 12 Oct 2018 10:28:07 +0000
-Message-ID: <82d9da13-a8c2-7247-06b5-78d1fff48c3b@wdc.com>
-References: <20181012023012.29923-1-damien.lemoal@wdc.com>
- <20181012023012.29923-3-damien.lemoal@wdc.com>
- <d851a895-0340-1d8a-9aa8-1abc902be337@suse.de>
-In-Reply-To: <d851a895-0340-1d8a-9aa8-1abc902be337@suse.de>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Return-Path: <prvs=816489328=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	dm-devel@redhat.com,
+	Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Matias Bjorling <matias.bjorling@wdc.com>
+Subject: [PATCH v4 02/11] scsi: sd_zbc: Reduce boot device scan and revalidate time
+Date: Fri, 12 Oct 2018 19:08:41 +0900
+Message-Id: <20181012100850.23316-3-damien.lemoal@wdc.com>
+In-Reply-To: <20181012100850.23316-1-damien.lemoal@wdc.com>
+References: <20181012100850.23316-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-DQoNCk9uIDEwLzEyLzIwMTggMDk6MzMgQU0sIEhhbm5lcyBSZWluZWNrZSB3cm90ZToNCj4gT24g
-MTAvMTIvMTggNDozMCBBTSwgRGFtaWVuIExlIE1vYWwgd3JvdGU6DQo+PiBIYW5kbGluZyBjaGVj
-a3Mgb2YgWkJDIGRldmljZSBjYXBhY2l0eSB1c2luZyB0aGUgbWF4X2xiYSBmaWVsZCBvZiB0aGUN
-Cj4+IFJFUE9SVCBaT05FUyBjb21tYW5kIHJlcGx5IGZvciBkaXNrcyB3aXRoIHJjX2Jhc2lzID09
-IDAgY2FuIGJlIGRvbmUNCj4+IHVzaW5nIHRoZSBzYW1lIHJlcG9ydCB6b25lcyBjb21tYW5kIHJl
-cGx5IHVzZWQgdG8gY2hlY2sgdGhlICJzYW1lIg0KPj4gZmllbGQuDQo+Pg0KPj4gQXZvaWQgZXhl
-Y3V0aW5nIGEgcmVwb3J0IHpvbmVzIGNvbW1hbmQgc29sZWx5IHRvIGNoZWNrIHRoZSBkaXNrIGNh
-cGFjaXR5DQo+PiBieSBtZXJnaW5nIHNkX3piY19jaGVja19jYXBhY2l0eSgpIGludG8gc2RfemJj
-X2NoZWNrX3pvbmVfc2l6ZSgpIGFuZA0KPj4gcmVuYW1pbmcgdGhhdCBmdW5jdGlvbiB0byBzZF96
-YmNfY2hlY2tfem9uZXMoKS4gVGhpcyByZW1vdmVzIGEgY29zdGx5DQo+PiBleGVjdXRpb24gb2Yg
-YSBmdWxsIHJlcG9ydCB6b25lcyBjb21tYW5kIGFuZCBzbyByZWR1Y2VzIGRldmljZSBzY2FuDQo+
-PiBkdXJhdGlvbiBhdCBib290IHRpbWUgYXMgd2VsbCBhcyB0aGUgZHVyYXRpb24gb2YgZGlzayBy
-ZXZhbGlkYXRlIGNhbGxzLg0KPj4NCj4+IEZ1cnRoZXJtb3JlLCBzZXR0aW5nIHRoZSBwYXJ0aWFs
-IHJlcG9ydCBiaXQgaW4gdGhlIFJFUE9SVCBaT05FUyBjb21tYW5kDQo+PiBjZGIgY2FuIHNpZ25p
-ZmljYW50bHkgcmVkdWNlIHRoaXMgY29tbWFuZCBleGVjdXRpb24gdGltZSBhcyB0aGUgZGV2aWNl
-DQo+PiBkb2VzIG5vdCBoYXZlIHRvIGNvdW50IGFuZCByZXBvcnQgdGhlIHRvdGFsIG51bWJlciBv
-ZiB6b25lcyB0aGF0IGNvdWxkDQo+PiBiZSByZXBvcnRlZCBhc3N1bWluZyBhIGxhcmdlIGVub3Vn
-aCByZXBseSBidWZmZXIuIEEgbm9uLXBhcnRpYWwgem9uZQ0KPj4gcmVwb3J0IGlzIG5lY2Vzc2Fy
-eSBvbmx5IGZvciB0aGUgZmlyc3QgZXhlY3V0aW9uIG9mIHJlcG9ydCB6b25lcyB1c2VkIHRvDQo+
-PiBjaGVjayB0aGUgc2FtZSBmaWVsZCB2YWx1ZSAodG8gZW5zdXJlIHRoYXQgdGhpcyB2YWx1ZSBh
-cHBsaWVzIHRvIGFsbA0KPj4gem9uZXMgb2YgdGhlIGRpc2spLiBBbGwgb3RoZXIgY2FsbHMgdG8g
-c2RfemJjX3JlcG9ydF96b25lcygpIGNhbiB1c2UgYQ0KPj4gcGFydGlhbCByZXBvcnQgdG8gcmVk
-dWNlIGV4ZWN1dGlvbiB0aW1lLg0KPj4NCj4+IFVzaW5nIGEgMTQgVEIgWkJDIGRpc2ssIHRoZXNl
-IHNpbXBsZSBjaGFuZ2VzIHJlZHVjZSBkZXZpY2Ugc2NhbiB0aW1lIGF0DQo+PiBib290IGZyb20g
-YWJvdXQgMy41cyBkb3duIHRvIGFib3V0IDkwMG1zLiBEaXNrIHJldmFsaWRhdGUgdGltZXMgYXJl
-IGFsc28NCj4+IHJlZHVjZWQgZnJvbSBhYm91dCA0NTBtcyBkb3duIHRvIDIzMG1zLg0KPj4NCj4+
-IFNpZ25lZC1vZmYtYnk6IERhbWllbiBMZSBNb2FsIDxkYW1pZW4ubGVtb2FsQHdkYy5jb20+DQo+
-PiBSZXZpZXdlZC1ieTogQ2hyaXN0b3BoIEhlbGx3aWcgPGhjaEBsc3QuZGU+DQo+PiAtLS0NCj4+
-IMKgIGRyaXZlcnMvc2NzaS9zZF96YmMuYyB8IDk0ICsrKysrKysrKysrKysrKysrKy0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0NCj4+IMKgIDEgZmlsZSBjaGFuZ2VkLCA0MCBpbnNlcnRpb25zKCsp
-LCA1NCBkZWxldGlvbnMoLSkNCj4+DQo+IFJldmlld2VkLWJ5OiBIYW5uZXMgUmVpbmVja2UgPGhh
-cmVAc3VzZS5jb20+DQo+DQo+IC4uLiBhbmQgaXQnbGwgYmUgeW91ciBmYXVsdCBpZiB0aGVyZSBh
-cmUgZHJpdmVzIHdoaWNoIGRvIG5vdCBzdXBwb3J0IA0KPiB0aGUgJ3BhcnRpYWwnIGJpdCA6KQ0K
-Pg0KDQpJIGFscmVhZHkgbG9vayBmb3J3YXJkIHRoZSBxdWlyayBsaXN0IDspDQoNCj4gQ2hlZXJz
-LA0KPg0KPiBIYW5uZXMNCg0K
+Handling checks of ZBC device capacity using the max_lba field of the
+REPORT ZONES command reply for disks with rc_basis == 0 can be done
+using the same report zones command reply used to check the "same"
+field.
+
+Avoid executing a report zones command solely to check the disk capacity
+by merging sd_zbc_check_capacity() into sd_zbc_check_zone_size() and
+renaming that function to sd_zbc_check_zones(). This removes a costly
+execution of a full report zones command and so reduces device scan
+duration at boot time as well as the duration of disk revalidate calls.
+
+Furthermore, setting the partial report bit in the REPORT ZONES command
+cdb can significantly reduce this command execution time as the device
+does not have to count and report the total number of zones that could
+be reported assuming a large enough reply buffer. A non-partial zone
+report is necessary only for the first execution of report zones used to
+check the same field value (to ensure that this value applies to all
+zones of the disk). All other calls to sd_zbc_report_zones() can use a
+partial report to reduce execution time.
+
+Using a 14 TB ZBC disk, these simple changes reduce device scan time at
+boot from about 3.5s down to about 900ms. Disk revalidate times are also
+reduced from about 450ms down to 230ms.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+---
+ drivers/scsi/sd_zbc.c | 94 ++++++++++++++++++-------------------------
+ 1 file changed, 40 insertions(+), 54 deletions(-)
+
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index 0b7d8787f785..ca73c46931c0 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -67,11 +67,17 @@ static void sd_zbc_parse_report(struct scsi_disk *sdkp, u8 *buf,
+  * @buf: Buffer to use for the reply
+  * @buflen: the buffer size
+  * @lba: Start LBA of the report
++ * @partial: Do partial report
+  *
+  * For internal use during device validation.
++ * Using partial=true can significantly speed up execution of a report zones
++ * command because the disk does not have to count all possible report matching
++ * zones and will only report the count of zones fitting in the command reply
++ * buffer.
+  */
+ static int sd_zbc_report_zones(struct scsi_disk *sdkp, unsigned char *buf,
+-			       unsigned int buflen, sector_t lba)
++			       unsigned int buflen, sector_t lba,
++			       bool partial)
+ {
+ 	struct scsi_device *sdp = sdkp->device;
+ 	const int timeout = sdp->request_queue->rq_timeout;
+@@ -85,6 +91,8 @@ static int sd_zbc_report_zones(struct scsi_disk *sdkp, unsigned char *buf,
+ 	cmd[1] = ZI_REPORT_ZONES;
+ 	put_unaligned_be64(lba, &cmd[2]);
+ 	put_unaligned_be32(buflen, &cmd[10]);
++	if (partial)
++		cmd[14] = ZBC_REPORT_ZONE_PARTIAL;
+ 	memset(buf, 0, buflen);
+ 
+ 	result = scsi_execute_req(sdp, cmd, DMA_FROM_DEVICE,
+@@ -350,60 +358,25 @@ static int sd_zbc_check_zoned_characteristics(struct scsi_disk *sdkp,
+ 	return 0;
+ }
+ 
+-/**
+- * sd_zbc_check_capacity - Check reported capacity.
+- * @sdkp: Target disk
+- * @buf: Buffer to use for commands
+- *
+- * ZBC drive may report only the capacity of the first conventional zones at
+- * LBA 0. This is indicated by the RC_BASIS field of the read capacity reply.
+- * Check this here. If the disk reported only its conventional zones capacity,
+- * get the total capacity by doing a report zones.
+- */
+-static int sd_zbc_check_capacity(struct scsi_disk *sdkp, unsigned char *buf)
+-{
+-	sector_t lba;
+-	int ret;
+-
+-	if (sdkp->rc_basis != 0)
+-		return 0;
+-
+-	/* Do a report zone to get the maximum LBA to check capacity */
+-	ret = sd_zbc_report_zones(sdkp, buf, SD_BUF_SIZE, 0);
+-	if (ret)
+-		return ret;
+-
+-	/* The max_lba field is the capacity of this device */
+-	lba = get_unaligned_be64(&buf[8]);
+-	if (lba + 1 == sdkp->capacity)
+-		return 0;
+-
+-	if (sdkp->first_scan)
+-		sd_printk(KERN_WARNING, sdkp,
+-			  "Changing capacity from %llu to max LBA+1 %llu\n",
+-			  (unsigned long long)sdkp->capacity,
+-			  (unsigned long long)lba + 1);
+-	sdkp->capacity = lba + 1;
+-
+-	return 0;
+-}
+-
+ #define SD_ZBC_BUF_SIZE 131072U
+ 
+ /**
+- * sd_zbc_check_zone_size - Check the device zone sizes
++ * sd_zbc_check_zones - Check the device capacity and zone sizes
+  * @sdkp: Target disk
+  *
+- * Check that all zones of the device are equal. The last zone can however
+- * be smaller. The zone size must also be a power of two number of LBAs.
++ * Check that the device capacity as reported by READ CAPACITY matches the
++ * max_lba value (plus one)of the report zones command reply. Also check that
++ * all zones of the device have an equal size, only allowing the last zone of
++ * the disk to have a smaller size (runt zone). The zone size must also be a
++ * power of two.
+  *
+  * Returns the zone size in number of blocks upon success or an error code
+  * upon failure.
+  */
+-static s64 sd_zbc_check_zone_size(struct scsi_disk *sdkp)
++static s64 sd_zbc_check_zones(struct scsi_disk *sdkp)
+ {
+ 	u64 zone_blocks = 0;
+-	sector_t block = 0;
++	sector_t max_lba, block = 0;
+ 	unsigned char *buf;
+ 	unsigned char *rec;
+ 	unsigned int buf_len;
+@@ -416,11 +389,28 @@ static s64 sd_zbc_check_zone_size(struct scsi_disk *sdkp)
+ 	if (!buf)
+ 		return -ENOMEM;
+ 
+-	/* Do a report zone to get the same field */
+-	ret = sd_zbc_report_zones(sdkp, buf, SD_ZBC_BUF_SIZE, 0);
++	/* Do a report zone to get max_lba and the same field */
++	ret = sd_zbc_report_zones(sdkp, buf, SD_ZBC_BUF_SIZE, 0, false);
+ 	if (ret)
+ 		goto out_free;
+ 
++	if (sdkp->rc_basis == 0) {
++		/* The max_lba field is the capacity of this device */
++		max_lba = get_unaligned_be64(&buf[8]);
++		if (sdkp->capacity != max_lba + 1) {
++			if (sdkp->first_scan)
++				sd_printk(KERN_WARNING, sdkp,
++					"Changing capacity from %llu to max LBA+1 %llu\n",
++					(unsigned long long)sdkp->capacity,
++					(unsigned long long)max_lba + 1);
++			sdkp->capacity = max_lba + 1;
++		}
++	}
++
++	/*
++	 * Check same field: for any value other than 0, we know that all zones
++	 * have the same size.
++	 */
+ 	same = buf[4] & 0x0f;
+ 	if (same > 0) {
+ 		rec = &buf[64];
+@@ -458,7 +448,7 @@ static s64 sd_zbc_check_zone_size(struct scsi_disk *sdkp)
+ 
+ 		if (block < sdkp->capacity) {
+ 			ret = sd_zbc_report_zones(sdkp, buf,
+-						  SD_ZBC_BUF_SIZE, block);
++						  SD_ZBC_BUF_SIZE, block, true);
+ 			if (ret)
+ 				goto out_free;
+ 		}
+@@ -574,7 +564,8 @@ sd_zbc_setup_seq_zones_bitmap(struct scsi_disk *sdkp, u32 zone_shift,
+ 		goto out;
+ 
+ 	while (lba < sdkp->capacity) {
+-		ret = sd_zbc_report_zones(sdkp, buf, SD_ZBC_BUF_SIZE, lba);
++		ret = sd_zbc_report_zones(sdkp, buf, SD_ZBC_BUF_SIZE,
++					  lba, true);
+ 		if (ret)
+ 			goto out;
+ 		lba = sd_zbc_get_seq_zones(sdkp, buf, SD_ZBC_BUF_SIZE,
+@@ -692,16 +683,11 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
+ 	if (ret)
+ 		goto err;
+ 
+-	/* Check capacity */
+-	ret = sd_zbc_check_capacity(sdkp, buf);
+-	if (ret)
+-		goto err;
+-
+ 	/*
+ 	 * Check zone size: only devices with a constant zone size (except
+ 	 * an eventual last runt zone) that is a power of 2 are supported.
+ 	 */
+-	zone_blocks = sd_zbc_check_zone_size(sdkp);
++	zone_blocks = sd_zbc_check_zones(sdkp);
+ 	ret = -EFBIG;
+ 	if (zone_blocks != (u32)zone_blocks)
+ 		goto err;
+-- 
+2.17.1
