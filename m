@@ -1,27 +1,31 @@
-Return-Path: <SRS0=dkhM=MZ=linuxfoundation.org=gregkh@kernel.org>
-Date: Sat, 13 Oct 2018 09:28:41 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Jens Axboe <axboe@kernel.dk>
+Return-Path: <axboe@kernel.dk>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [GIT PULL] Block fix for 4.19-rc
-Message-ID: <20181013072841.GC27804@kroah.com>
-References: <84f0c518-d7dd-6e54-b3ef-fb4ba15a2764@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fix for 4.19-rc
+Message-ID: <84f0c518-d7dd-6e54-b3ef-fb4ba15a2764@kernel.dk>
+Date: Fri, 12 Oct 2018 13:16:28 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <84f0c518-d7dd-6e54-b3ef-fb4ba15a2764@kernel.dk>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Oct 12, 2018 at 01:16:28PM -0600, Jens Axboe wrote:
-> Hi Greg,
-> 
-> Just a single fix that should go in, fixing a regression introduced in
-> the blk-wbt code.
-> 
-> Please pull!
-> 
-> 
->   git://git.kernel.dk/linux-block.git tags/for-linus-20181012
+Hi Greg,
 
-Now merged, thanks.
+Just a single fix that should go in, fixing a regression introduced in
+the blk-wbt code.
 
-greg k-h
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git tags/for-linus-20181012
+
+
+----------------------------------------------------------------
+Josef Bacik (1):
+      blk-wbt: wake up all when we scale up, not down
+
+ block/blk-wbt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+-- 
+Jens Axboe
