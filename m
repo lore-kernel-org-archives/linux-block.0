@@ -1,290 +1,538 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-ide@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 18/28] block: remove non mq parts from the flush code
-Date: Thu, 25 Oct 2018 15:10:29 -0600
-Message-Id: <20181025211039.11559-19-axboe@kernel.dk>
-In-Reply-To: <20181025211039.11559-1-axboe@kernel.dk>
-References: <20181025211039.11559-1-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-sn1nam01on0088.outbound.protection.outlook.com ([104.47.32.88]:26880
+        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726699AbeJLTYy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Oct 2018 15:24:54 -0400
+From: Javier Gonzalez <javier@cnexlabs.com>
+To: Igor Konopko <igor.j.konopko@intel.com>
+CC: "mb@lightnvm.io" <mb@lightnvm.io>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "marcin.dziegielewski@intel.com" <marcin.dziegielewski@intel.com>
+Subject: Re: [PATCH 2/5] lightnvm: pblk: Helpers for OOB metadata
+Date: Fri, 12 Oct 2018 11:52:38 +0000
+Message-ID: <785BAF00-5693-459E-B2E1-45B5BF7DEFE5@cnexlabs.com>
+References: <20181005133437.25255-1-igor.j.konopko@intel.com>
+ <20181005133437.25255-3-igor.j.konopko@intel.com>
+In-Reply-To: <20181005133437.25255-3-igor.j.konopko@intel.com>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_1D0C310A-B525-4064-949D-A1F9A7DB1FD0";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha512
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-flush.c | 154 +++++++++-------------------------------------
- block/blk.h       |   4 +-
- 2 files changed, 31 insertions(+), 127 deletions(-)
+--Apple-Mail=_1D0C310A-B525-4064-949D-A1F9A7DB1FD0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 8b44b86779da..9baa9a119447 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -134,16 +134,8 @@ static void blk_flush_restore_request(struct request *rq)
- 
- static bool blk_flush_queue_rq(struct request *rq, bool add_front)
- {
--	if (rq->q->mq_ops) {
--		blk_mq_add_to_requeue_list(rq, add_front, true);
--		return false;
--	} else {
--		if (add_front)
--			list_add(&rq->queuelist, &rq->q->queue_head);
--		else
--			list_add_tail(&rq->queuelist, &rq->q->queue_head);
--		return true;
--	}
-+	blk_mq_add_to_requeue_list(rq, add_front, true);
-+	return false;
- }
- 
- /**
-@@ -204,10 +196,7 @@ static bool blk_flush_complete_seq(struct request *rq,
- 		BUG_ON(!list_empty(&rq->queuelist));
- 		list_del_init(&rq->flush.list);
- 		blk_flush_restore_request(rq);
--		if (q->mq_ops)
--			blk_mq_end_request(rq, error);
--		else
--			__blk_end_request_all(rq, error);
-+		blk_mq_end_request(rq, error);
- 		break;
- 
- 	default:
-@@ -226,20 +215,17 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
- 	struct request *rq, *n;
- 	unsigned long flags = 0;
- 	struct blk_flush_queue *fq = blk_get_flush_queue(q, flush_rq->mq_ctx);
-+	struct blk_mq_hw_ctx *hctx;
- 
--	if (q->mq_ops) {
--		struct blk_mq_hw_ctx *hctx;
--
--		/* release the tag's ownership to the req cloned from */
--		spin_lock_irqsave(&fq->mq_flush_lock, flags);
--		hctx = blk_mq_map_queue(q, flush_rq->mq_ctx->cpu);
--		if (!q->elevator) {
--			blk_mq_tag_set_rq(hctx, flush_rq->tag, fq->orig_rq);
--			flush_rq->tag = -1;
--		} else {
--			blk_mq_put_driver_tag_hctx(hctx, flush_rq);
--			flush_rq->internal_tag = -1;
--		}
-+	/* release the tag's ownership to the req cloned from */
-+	spin_lock_irqsave(&fq->mq_flush_lock, flags);
-+	hctx = blk_mq_map_queue(q, flush_rq->mq_ctx->cpu);
-+	if (!q->elevator) {
-+		blk_mq_tag_set_rq(hctx, flush_rq->tag, fq->orig_rq);
-+		flush_rq->tag = -1;
-+	} else {
-+		blk_mq_put_driver_tag_hctx(hctx, flush_rq);
-+		flush_rq->internal_tag = -1;
- 	}
- 
- 	running = &fq->flush_queue[fq->flush_running_idx];
-@@ -248,9 +234,6 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
- 	/* account completion of the flush request */
- 	fq->flush_running_idx ^= 1;
- 
--	if (!q->mq_ops)
--		elv_completed_request(q, flush_rq);
--
- 	/* and push the waiting requests to the next stage */
- 	list_for_each_entry_safe(rq, n, running, flush.list) {
- 		unsigned int seq = blk_flush_cur_seq(rq);
-@@ -259,24 +242,8 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
- 		queued |= blk_flush_complete_seq(rq, fq, seq, error);
- 	}
- 
--	/*
--	 * Kick the queue to avoid stall for two cases:
--	 * 1. Moving a request silently to empty queue_head may stall the
--	 * queue.
--	 * 2. When flush request is running in non-queueable queue, the
--	 * queue is hold. Restart the queue after flush request is finished
--	 * to avoid stall.
--	 * This function is called from request completion path and calling
--	 * directly into request_fn may confuse the driver.  Always use
--	 * kblockd.
--	 */
--	if (queued || fq->flush_queue_delayed) {
--		WARN_ON(q->mq_ops);
--		blk_run_queue_async(q);
--	}
- 	fq->flush_queue_delayed = 0;
--	if (q->mq_ops)
--		spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
-+	spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
- }
- 
- /**
-@@ -301,6 +268,7 @@ static bool blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
- 	struct request *first_rq =
- 		list_first_entry(pending, struct request, flush.list);
- 	struct request *flush_rq = fq->flush_rq;
-+	struct blk_mq_hw_ctx *hctx;
- 
- 	/* C1 described at the top of this file */
- 	if (fq->flush_pending_idx != fq->flush_running_idx || list_empty(pending))
-@@ -334,19 +302,15 @@ static bool blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
- 	 * In case of IO scheduler, flush rq need to borrow scheduler tag
- 	 * just for cheating put/get driver tag.
- 	 */
--	if (q->mq_ops) {
--		struct blk_mq_hw_ctx *hctx;
--
--		flush_rq->mq_ctx = first_rq->mq_ctx;
--
--		if (!q->elevator) {
--			fq->orig_rq = first_rq;
--			flush_rq->tag = first_rq->tag;
--			hctx = blk_mq_map_queue(q, first_rq->mq_ctx->cpu);
--			blk_mq_tag_set_rq(hctx, first_rq->tag, flush_rq);
--		} else {
--			flush_rq->internal_tag = first_rq->internal_tag;
--		}
-+	flush_rq->mq_ctx = first_rq->mq_ctx;
-+
-+	if (!q->elevator) {
-+		fq->orig_rq = first_rq;
-+		flush_rq->tag = first_rq->tag;
-+		hctx = blk_mq_map_queue(q, first_rq->mq_ctx->cpu);
-+		blk_mq_tag_set_rq(hctx, first_rq->tag, flush_rq);
-+	} else {
-+		flush_rq->internal_tag = first_rq->internal_tag;
- 	}
- 
- 	flush_rq->cmd_flags = REQ_OP_FLUSH | REQ_PREFLUSH;
-@@ -358,49 +322,6 @@ static bool blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
- 	return blk_flush_queue_rq(flush_rq, false);
- }
- 
--static void flush_data_end_io(struct request *rq, blk_status_t error)
--{
--	struct request_queue *q = rq->q;
--	struct blk_flush_queue *fq = blk_get_flush_queue(q, NULL);
--
--	lockdep_assert_held(q->queue_lock);
--
--	/*
--	 * Updating q->in_flight[] here for making this tag usable
--	 * early. Because in blk_queue_start_tag(),
--	 * q->in_flight[BLK_RW_ASYNC] is used to limit async I/O and
--	 * reserve tags for sync I/O.
--	 *
--	 * More importantly this way can avoid the following I/O
--	 * deadlock:
--	 *
--	 * - suppose there are 40 fua requests comming to flush queue
--	 *   and queue depth is 31
--	 * - 30 rqs are scheduled then blk_queue_start_tag() can't alloc
--	 *   tag for async I/O any more
--	 * - all the 30 rqs are completed before FLUSH_PENDING_TIMEOUT
--	 *   and flush_data_end_io() is called
--	 * - the other rqs still can't go ahead if not updating
--	 *   q->in_flight[BLK_RW_ASYNC] here, meantime these rqs
--	 *   are held in flush data queue and make no progress of
--	 *   handling post flush rq
--	 * - only after the post flush rq is handled, all these rqs
--	 *   can be completed
--	 */
--
--	elv_completed_request(q, rq);
--
--	/* for avoiding double accounting */
--	rq->rq_flags &= ~RQF_STARTED;
--
--	/*
--	 * After populating an empty queue, kick it to avoid stall.  Read
--	 * the comment in flush_end_io().
--	 */
--	if (blk_flush_complete_seq(rq, fq, REQ_FSEQ_DATA, error))
--		blk_run_queue_async(q);
--}
--
- static void mq_flush_data_end_io(struct request *rq, blk_status_t error)
- {
- 	struct request_queue *q = rq->q;
-@@ -443,9 +364,6 @@ void blk_insert_flush(struct request *rq)
- 	unsigned int policy = blk_flush_policy(fflags, rq);
- 	struct blk_flush_queue *fq = blk_get_flush_queue(q, rq->mq_ctx);
- 
--	if (!q->mq_ops)
--		lockdep_assert_held(q->queue_lock);
--
- 	/*
- 	 * @policy now records what operations need to be done.  Adjust
- 	 * REQ_PREFLUSH and FUA for the driver.
-@@ -468,10 +386,7 @@ void blk_insert_flush(struct request *rq)
- 	 * complete the request.
- 	 */
- 	if (!policy) {
--		if (q->mq_ops)
--			blk_mq_end_request(rq, 0);
--		else
--			__blk_end_request(rq, 0, 0);
-+		blk_mq_end_request(rq, 0);
- 		return;
- 	}
- 
-@@ -484,10 +399,7 @@ void blk_insert_flush(struct request *rq)
- 	 */
- 	if ((policy & REQ_FSEQ_DATA) &&
- 	    !(policy & (REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH))) {
--		if (q->mq_ops)
--			blk_mq_request_bypass_insert(rq, false);
--		else
--			list_add_tail(&rq->queuelist, &q->queue_head);
-+		blk_mq_request_bypass_insert(rq, false);
- 		return;
- 	}
- 
-@@ -499,17 +411,12 @@ void blk_insert_flush(struct request *rq)
- 	INIT_LIST_HEAD(&rq->flush.list);
- 	rq->rq_flags |= RQF_FLUSH_SEQ;
- 	rq->flush.saved_end_io = rq->end_io; /* Usually NULL */
--	if (q->mq_ops) {
--		rq->end_io = mq_flush_data_end_io;
- 
--		spin_lock_irq(&fq->mq_flush_lock);
--		blk_flush_complete_seq(rq, fq, REQ_FSEQ_ACTIONS & ~policy, 0);
--		spin_unlock_irq(&fq->mq_flush_lock);
--		return;
--	}
--	rq->end_io = flush_data_end_io;
-+	rq->end_io = mq_flush_data_end_io;
- 
-+	spin_lock_irq(&fq->mq_flush_lock);
- 	blk_flush_complete_seq(rq, fq, REQ_FSEQ_ACTIONS & ~policy, 0);
-+	spin_unlock_irq(&fq->mq_flush_lock);
- }
- 
- /**
-@@ -575,8 +482,7 @@ struct blk_flush_queue *blk_alloc_flush_queue(struct request_queue *q,
- 	if (!fq)
- 		goto fail;
- 
--	if (q->mq_ops)
--		spin_lock_init(&fq->mq_flush_lock);
-+	spin_lock_init(&fq->mq_flush_lock);
- 
- 	rq_sz = round_up(rq_sz + cmd_size, cache_line_size());
- 	fq->flush_rq = kzalloc_node(rq_sz, flags, node);
-diff --git a/block/blk.h b/block/blk.h
-index a1841b8ff129..57a302bf5a70 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -114,9 +114,7 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- static inline struct blk_flush_queue *blk_get_flush_queue(
- 		struct request_queue *q, struct blk_mq_ctx *ctx)
- {
--	if (q->mq_ops)
--		return blk_mq_map_queue(q, ctx->cpu)->fq;
--	return q->fq;
-+	return blk_mq_map_queue(q, ctx->cpu)->fq;
- }
- 
- static inline void __blk_get_queue(struct request_queue *q)
--- 
-2.17.1
+> On 5 Oct 2018, at 15.34, Igor Konopko <igor.j.konopko@intel.com> =
+wrote:
+>=20
+> Currently pblk assumes that size of OOB metadata on drive is always
+> equal to size of pblk_sec_meta struct. This commit add helpers which =
+will
+> allow to handle different sizes of OOB metadata on drive.
+>=20
+> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+> ---
+> drivers/lightnvm/pblk-core.c     |  6 ++---
+> drivers/lightnvm/pblk-map.c      | 21 ++++++++++------
+> drivers/lightnvm/pblk-read.c     | 41 +++++++++++++++++++-------------
+> drivers/lightnvm/pblk-recovery.c | 14 ++++++-----
+> drivers/lightnvm/pblk.h          | 37 +++++++++++++++++++++++++++-
+> 5 files changed, 86 insertions(+), 33 deletions(-)
+>=20
+> diff --git a/drivers/lightnvm/pblk-core.c =
+b/drivers/lightnvm/pblk-core.c
+> index 6944aac43b01..7cb39d84c833 100644
+> --- a/drivers/lightnvm/pblk-core.c
+> +++ b/drivers/lightnvm/pblk-core.c
+> @@ -743,7 +743,6 @@ int pblk_line_smeta_read(struct pblk *pblk, struct =
+pblk_line *line)
+> 	rqd.opcode =3D NVM_OP_PREAD;
+> 	rqd.nr_ppas =3D lm->smeta_sec;
+> 	rqd.is_seq =3D 1;
+> -
+
+no need for removing this space
+
+> 	for (i =3D 0; i < lm->smeta_sec; i++, paddr++)
+> 		rqd.ppa_list[i] =3D addr_to_gen_ppa(pblk, paddr, =
+line->id);
+>=20
+> @@ -796,10 +795,11 @@ static int pblk_line_smeta_write(struct pblk =
+*pblk, struct pblk_line *line,
+> 	rqd.is_seq =3D 1;
+>=20
+> 	for (i =3D 0; i < lm->smeta_sec; i++, paddr++) {
+> -		struct pblk_sec_meta *meta_list =3D rqd.meta_list;
+> +		void *meta_list =3D rqd.meta_list;
+>=20
+> 		rqd.ppa_list[i] =3D addr_to_gen_ppa(pblk, paddr, =
+line->id);
+> -		meta_list[i].lba =3D lba_list[paddr] =3D addr_empty;
+> +		pblk_set_meta_lba(pblk, meta_list, i, ADDR_EMPTY);
+> +		lba_list[paddr] =3D addr_empty;
+> 	}
+>=20
+> 	ret =3D pblk_submit_io_sync_sem(pblk, &rqd);
+> diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
+> index 6dcbd44e3acb..4c7a9909308e 100644
+> --- a/drivers/lightnvm/pblk-map.c
+> +++ b/drivers/lightnvm/pblk-map.c
+> @@ -22,7 +22,7 @@
+> static int pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
+> 			      struct ppa_addr *ppa_list,
+> 			      unsigned long *lun_bitmap,
+> -			      struct pblk_sec_meta *meta_list,
+> +			      void *meta_list,
+> 			      unsigned int valid_secs)
+> {
+> 	struct pblk_line *line =3D pblk_line_get_data(pblk);
+> @@ -68,14 +68,15 @@ static int pblk_map_page_data(struct pblk *pblk, =
+unsigned int sentry,
+> 			kref_get(&line->ref);
+> 			w_ctx =3D pblk_rb_w_ctx(&pblk->rwb, sentry + i);
+> 			w_ctx->ppa =3D ppa_list[i];
+> -			meta_list[i].lba =3D cpu_to_le64(w_ctx->lba);
+> +			pblk_set_meta_lba(pblk, meta_list, i, =
+w_ctx->lba);
+> 			lba_list[paddr] =3D cpu_to_le64(w_ctx->lba);
+> 			if (lba_list[paddr] !=3D addr_empty)
+> 				line->nr_valid_lbas++;
+> 			else
+> 				atomic64_inc(&pblk->pad_wa);
+> 		} else {
+> -			lba_list[paddr] =3D meta_list[i].lba =3D =
+addr_empty;
+> +			lba_list[paddr] =3D addr_empty;
+> +			pblk_set_meta_lba(pblk, meta_list, i, =
+ADDR_EMPTY);
+> 			__pblk_map_invalidate(pblk, line, paddr);
+> 		}
+> 	}
+> @@ -88,7 +89,7 @@ void pblk_map_rq(struct pblk *pblk, struct nvm_rq =
+*rqd, unsigned int sentry,
+> 		 unsigned long *lun_bitmap, unsigned int valid_secs,
+> 		 unsigned int off)
+> {
+> -	struct pblk_sec_meta *meta_list =3D rqd->meta_list;
+> +	void *meta_list =3D rqd->meta_list;
+> 	struct ppa_addr *ppa_list =3D nvm_rq_to_ppa_list(rqd);
+> 	unsigned int map_secs;
+> 	int min =3D pblk->min_write_pgs;
+> @@ -97,7 +98,10 @@ void pblk_map_rq(struct pblk *pblk, struct nvm_rq =
+*rqd, unsigned int sentry,
+> 	for (i =3D off; i < rqd->nr_ppas; i +=3D min) {
+> 		map_secs =3D (i + min > valid_secs) ? (valid_secs % min) =
+: min;
+> 		if (pblk_map_page_data(pblk, sentry + i, &ppa_list[i],
+> -					lun_bitmap, &meta_list[i], =
+map_secs)) {
+> +					lun_bitmap,
+> +					pblk_get_meta_buffer(pblk,
+> +							     meta_list, =
+i),
+> +					map_secs)) {
+
+This part of the code is already difficult to read with so many
+parameters. Can you assign the metadata buffer before instead to make it
+clearer?
+
+> 			bio_put(rqd->bio);
+> 			pblk_free_rqd(pblk, rqd, PBLK_WRITE);
+> 			pblk_pipeline_stop(pblk);
+> @@ -113,7 +117,7 @@ void pblk_map_erase_rq(struct pblk *pblk, struct =
+nvm_rq *rqd,
+> 	struct nvm_tgt_dev *dev =3D pblk->dev;
+> 	struct nvm_geo *geo =3D &dev->geo;
+> 	struct pblk_line_meta *lm =3D &pblk->lm;
+> -	struct pblk_sec_meta *meta_list =3D rqd->meta_list;
+> +	void *meta_list =3D rqd->meta_list;
+> 	struct ppa_addr *ppa_list =3D nvm_rq_to_ppa_list(rqd);
+> 	struct pblk_line *e_line, *d_line;
+> 	unsigned int map_secs;
+> @@ -123,7 +127,10 @@ void pblk_map_erase_rq(struct pblk *pblk, struct =
+nvm_rq *rqd,
+> 	for (i =3D 0; i < rqd->nr_ppas; i +=3D min) {
+> 		map_secs =3D (i + min > valid_secs) ? (valid_secs % min) =
+: min;
+> 		if (pblk_map_page_data(pblk, sentry + i, &ppa_list[i],
+> -					lun_bitmap, &meta_list[i], =
+map_secs)) {
+> +					lun_bitmap,
+> +					pblk_get_meta_buffer(pblk,
+> +							     meta_list, =
+i),
+> +					map_secs)) {
+
+Same as above
+
+> 			bio_put(rqd->bio);
+> 			pblk_free_rqd(pblk, rqd, PBLK_WRITE);
+> 			pblk_pipeline_stop(pblk);
+> diff --git a/drivers/lightnvm/pblk-read.c =
+b/drivers/lightnvm/pblk-read.c
+> index 08f6ebd4bc48..6584a2588f61 100644
+> --- a/drivers/lightnvm/pblk-read.c
+> +++ b/drivers/lightnvm/pblk-read.c
+> @@ -43,7 +43,7 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, =
+struct nvm_rq *rqd,
+> 				 struct bio *bio, sector_t blba,
+> 				 unsigned long *read_bitmap)
+> {
+> -	struct pblk_sec_meta *meta_list =3D rqd->meta_list;
+> +	void *meta_list =3D rqd->meta_list;
+> 	struct ppa_addr ppas[NVM_MAX_VLBA];
+> 	int nr_secs =3D rqd->nr_ppas;
+> 	bool advanced_bio =3D false;
+> @@ -58,7 +58,7 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, =
+struct nvm_rq *rqd,
+> retry:
+> 		if (pblk_ppa_empty(p)) {
+> 			WARN_ON(test_and_set_bit(i, read_bitmap));
+> -			meta_list[i].lba =3D cpu_to_le64(ADDR_EMPTY);
+> +			pblk_set_meta_lba(pblk, meta_list, i, =
+ADDR_EMPTY);
+>=20
+> 			if (unlikely(!advanced_bio)) {
+> 				bio_advance(bio, (i) * =
+PBLK_EXPOSED_PAGE_SIZE);
+> @@ -78,7 +78,7 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, =
+struct nvm_rq *rqd,
+> 				goto retry;
+> 			}
+> 			WARN_ON(test_and_set_bit(i, read_bitmap));
+> -			meta_list[i].lba =3D cpu_to_le64(lba);
+> +			pblk_set_meta_lba(pblk, meta_list, i, lba);
+> 			advanced_bio =3D true;
+> #ifdef CONFIG_NVM_PBLK_DEBUG
+> 			atomic_long_inc(&pblk->cache_reads);
+> @@ -105,12 +105,15 @@ static void pblk_read_ppalist_rq(struct pblk =
+*pblk, struct nvm_rq *rqd,
+> static void pblk_read_check_seq(struct pblk *pblk, struct nvm_rq *rqd,
+> 				sector_t blba)
+> {
+> -	struct pblk_sec_meta *meta_lba_list =3D rqd->meta_list;
+> +	void *meta_list =3D rqd->meta_list;
+> 	int nr_lbas =3D rqd->nr_ppas;
+> 	int i;
+>=20
+> +	if (!pblk_is_oob_meta_supported(pblk))
+> +		return;
+> +
+
+Since this patch is only creating the helpers, I would add this to the
+patch when you add support for packed metadata.
+
+> 	for (i =3D 0; i < nr_lbas; i++) {
+> -		u64 lba =3D le64_to_cpu(meta_lba_list[i].lba);
+> +		u64 lba =3D pblk_get_meta_lba(pblk, meta_list, i);
+>=20
+> 		if (lba =3D=3D ADDR_EMPTY)
+> 			continue;
+> @@ -134,9 +137,12 @@ static void pblk_read_check_seq(struct pblk =
+*pblk, struct nvm_rq *rqd,
+> static void pblk_read_check_rand(struct pblk *pblk, struct nvm_rq =
+*rqd,
+> 				 u64 *lba_list, int nr_lbas)
+> {
+> -	struct pblk_sec_meta *meta_lba_list =3D rqd->meta_list;
+> +	void *meta_lba_list =3D rqd->meta_list;
+> 	int i, j;
+>=20
+> +	if (!pblk_is_oob_meta_supported(pblk))
+> +		return;
+
+Same as above
+
+> +
+> 	for (i =3D 0, j =3D 0; i < nr_lbas; i++) {
+> 		u64 lba =3D lba_list[i];
+> 		u64 meta_lba;
+> @@ -144,7 +150,7 @@ static void pblk_read_check_rand(struct pblk =
+*pblk, struct nvm_rq *rqd,
+> 		if (lba =3D=3D ADDR_EMPTY)
+> 			continue;
+>=20
+> -		meta_lba =3D le64_to_cpu(meta_lba_list[j].lba);
+> +		meta_lba =3D pblk_get_meta_lba(pblk, meta_lba_list, j);
+>=20
+> 		if (lba !=3D meta_lba) {
+> #ifdef CONFIG_NVM_PBLK_DEBUG
+> @@ -219,7 +225,7 @@ static void pblk_end_partial_read(struct nvm_rq =
+*rqd)
+> 	struct bio *new_bio =3D rqd->bio;
+> 	struct bio *bio =3D pr_ctx->orig_bio;
+> 	struct bio_vec src_bv, dst_bv;
+> -	struct pblk_sec_meta *meta_list =3D rqd->meta_list;
+> +	void *meta_list =3D rqd->meta_list;
+> 	int bio_init_idx =3D pr_ctx->bio_init_idx;
+> 	unsigned long *read_bitmap =3D pr_ctx->bitmap;
+> 	int nr_secs =3D pr_ctx->orig_nr_secs;
+> @@ -237,8 +243,10 @@ static void pblk_end_partial_read(struct nvm_rq =
+*rqd)
+> 	}
+>=20
+> 	for (i =3D 0; i < nr_secs; i++) {
+> -		pr_ctx->lba_list_media[i] =3D meta_list[i].lba;
+> -		meta_list[i].lba =3D pr_ctx->lba_list_mem[i];
+> +		pr_ctx->lba_list_media[i] =3D pblk_get_meta_lba(pblk,
+> +							meta_list, i);
+> +		pblk_set_meta_lba(pblk, meta_list, i,
+> +				  pr_ctx->lba_list_mem[i]);
+
+This fits in a single line
+
+> 	}
+>=20
+> 	/* Fill the holes in the original bio */
+> @@ -250,7 +258,8 @@ static void pblk_end_partial_read(struct nvm_rq =
+*rqd)
+> 		line =3D pblk_ppa_to_line(pblk, rqd->ppa_list[i]);
+> 		kref_put(&line->ref, pblk_line_put);
+>=20
+> -		meta_list[hole].lba =3D pr_ctx->lba_list_media[i];
+> +		pblk_set_meta_lba(pblk, meta_list, hole,
+> +				  pr_ctx->lba_list_media[i]);
+>=20
+> 		src_bv =3D new_bio->bi_io_vec[i++];
+> 		dst_bv =3D bio->bi_io_vec[bio_init_idx + hole];
+> @@ -286,7 +295,7 @@ static int pblk_setup_partial_read(struct pblk =
+*pblk, struct nvm_rq *rqd,
+> 			    unsigned long *read_bitmap,
+> 			    int nr_holes)
+> {
+> -	struct pblk_sec_meta *meta_list =3D rqd->meta_list;
+> +	void *meta_list =3D rqd->meta_list;
+> 	struct pblk_g_ctx *r_ctx =3D nvm_rq_to_pdu(rqd);
+> 	struct pblk_pr_ctx *pr_ctx;
+> 	struct bio *new_bio, *bio =3D r_ctx->private;
+> @@ -308,7 +317,7 @@ static int pblk_setup_partial_read(struct pblk =
+*pblk, struct nvm_rq *rqd,
+> 		goto fail_free_pages;
+>=20
+> 	for (i =3D 0; i < nr_secs; i++)
+> -		pr_ctx->lba_list_mem[i] =3D meta_list[i].lba;
+> +		pr_ctx->lba_list_mem[i] =3D pblk_get_meta_lba(pblk, =
+meta_list, i);
+>=20
+> 	new_bio->bi_iter.bi_sector =3D 0; /* internal bio */
+> 	bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
+> @@ -373,7 +382,7 @@ static int pblk_partial_read_bio(struct pblk =
+*pblk, struct nvm_rq *rqd,
+> static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd, struct =
+bio *bio,
+> 			 sector_t lba, unsigned long *read_bitmap)
+> {
+> -	struct pblk_sec_meta *meta_list =3D rqd->meta_list;
+> +	void *meta_list =3D rqd->meta_list;
+> 	struct ppa_addr ppa;
+>=20
+> 	pblk_lookup_l2p_seq(pblk, &ppa, lba, 1);
+> @@ -385,7 +394,7 @@ static void pblk_read_rq(struct pblk *pblk, struct =
+nvm_rq *rqd, struct bio *bio,
+> retry:
+> 	if (pblk_ppa_empty(ppa)) {
+> 		WARN_ON(test_and_set_bit(0, read_bitmap));
+> -		meta_list[0].lba =3D cpu_to_le64(ADDR_EMPTY);
+> +		pblk_set_meta_lba(pblk, meta_list, 0, ADDR_EMPTY);
+> 		return;
+> 	}
+>=20
+> @@ -399,7 +408,7 @@ static void pblk_read_rq(struct pblk *pblk, struct =
+nvm_rq *rqd, struct bio *bio,
+> 		}
+>=20
+> 		WARN_ON(test_and_set_bit(0, read_bitmap));
+> -		meta_list[0].lba =3D cpu_to_le64(lba);
+> +		pblk_set_meta_lba(pblk, meta_list, 0, lba);
+>=20
+> #ifdef CONFIG_NVM_PBLK_DEBUG
+> 		atomic_long_inc(&pblk->cache_reads);
+> diff --git a/drivers/lightnvm/pblk-recovery.c =
+b/drivers/lightnvm/pblk-recovery.c
+> index 5740b7509bd8..fa63f9fa5ba8 100644
+> --- a/drivers/lightnvm/pblk-recovery.c
+> +++ b/drivers/lightnvm/pblk-recovery.c
+> @@ -124,7 +124,7 @@ static u64 pblk_sec_in_open_line(struct pblk =
+*pblk, struct pblk_line *line)
+>=20
+> struct pblk_recov_alloc {
+> 	struct ppa_addr *ppa_list;
+> -	struct pblk_sec_meta *meta_list;
+> +	void *meta_list;
+> 	struct nvm_rq *rqd;
+> 	void *data;
+> 	dma_addr_t dma_ppa_list;
+> @@ -158,7 +158,7 @@ static int pblk_recov_pad_line(struct pblk *pblk, =
+struct pblk_line *line,
+> {
+> 	struct nvm_tgt_dev *dev =3D pblk->dev;
+> 	struct nvm_geo *geo =3D &dev->geo;
+> -	struct pblk_sec_meta *meta_list;
+> +	void *meta_list;
+> 	struct pblk_pad_rq *pad_rq;
+> 	struct nvm_rq *rqd;
+> 	struct bio *bio;
+> @@ -242,7 +242,8 @@ static int pblk_recov_pad_line(struct pblk *pblk, =
+struct pblk_line *line,
+> 			dev_ppa =3D addr_to_gen_ppa(pblk, w_ptr, =
+line->id);
+>=20
+> 			pblk_map_invalidate(pblk, dev_ppa);
+> -			lba_list[w_ptr] =3D meta_list[i].lba =3D =
+addr_empty;
+> +			lba_list[w_ptr] =3D addr_empty;
+> +			pblk_set_meta_lba(pblk, meta_list, i, =
+ADDR_EMPTY);
+> 			rqd->ppa_list[i] =3D dev_ppa;
+> 		}
+> 	}
+> @@ -325,6 +326,7 @@ static int pblk_line_wp_is_unbalanced(struct pblk =
+*pblk,
+> 			return 1;
+> 		else if (chunk->wp < line_wp)
+> 			line_wp =3D chunk->wp;
+> +
+> 	}
+>=20
+> 	return 0;
+> @@ -336,7 +338,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, =
+struct pblk_line *line,
+> 	struct nvm_tgt_dev *dev =3D pblk->dev;
+> 	struct nvm_geo *geo =3D &dev->geo;
+> 	struct ppa_addr *ppa_list;
+> -	struct pblk_sec_meta *meta_list;
+> +	void *meta_list;
+> 	struct nvm_rq *rqd;
+> 	struct bio *bio;
+> 	void *data;
+> @@ -434,7 +436,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, =
+struct pblk_line *line,
+> 	}
+>=20
+> 	for (i =3D 0; i < rqd->nr_ppas; i++) {
+> -		u64 lba =3D le64_to_cpu(meta_list[i].lba);
+> +		u64 lba =3D pblk_get_meta_lba(pblk, meta_list, i);
+>=20
+> 		lba_list[paddr++] =3D cpu_to_le64(lba);
+>=20
+> @@ -463,7 +465,7 @@ static int pblk_recov_l2p_from_oob(struct pblk =
+*pblk, struct pblk_line *line)
+> 	struct nvm_geo *geo =3D &dev->geo;
+> 	struct nvm_rq *rqd;
+> 	struct ppa_addr *ppa_list;
+> -	struct pblk_sec_meta *meta_list;
+> +	void *meta_list;
+> 	struct pblk_recov_alloc p;
+> 	void *data;
+> 	dma_addr_t dma_ppa_list, dma_meta_list;
+> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+> index aea09879636f..53156b6f99a3 100644
+> --- a/drivers/lightnvm/pblk.h
+> +++ b/drivers/lightnvm/pblk.h
+> @@ -87,7 +87,6 @@ enum {
+> };
+>=20
+> struct pblk_sec_meta {
+> -	u64 reserved;
+> 	__le64 lba;
+> };
+
+i would move this to a separate patch. I would suggest that you do it
+together with the patch that changes the device format adding
+information on the OOB area supported and making this part of smeta and
+emeta. When we push the ftl log, we will take this into account too.
+
+>=20
+> @@ -1366,4 +1365,40 @@ static inline char *pblk_disk_name(struct pblk =
+*pblk)
+>=20
+> 	return disk->disk_name;
+> }
+> +
+> +static inline int pblk_is_oob_meta_supported(struct pblk *pblk)
+> +{
+> +	struct nvm_tgt_dev *dev =3D pblk->dev;
+> +	struct nvm_geo *geo =3D &dev->geo;
+> +
+> +	/* Pblk uses OOB meta to store LBA of given physical sector.
+> +	 * The LBA is eventually used in recovery mode and/or for =
+handling
+> +	 * telemetry events (e.g., relocate sector).
+> +	 */
+> +
+
+If you want to keep this comment, I think it is more informative on top
+of struct pblk_sec_meta (). Here you can explain when metadata is packed
+and when in OOB.
+
+> +	return (geo->sos >=3D sizeof(struct pblk_sec_meta));
+> +}
+> +
+> +static inline struct pblk_sec_meta *pblk_get_meta_buffer(struct pblk =
+*pblk,
+> +							 void *meta_ptr,
+> +							 int index)
+> +{
+> +	struct nvm_tgt_dev *dev =3D pblk->dev;
+> +	struct nvm_geo *geo =3D &dev->geo;
+> +
+> +	return meta_ptr + max_t(int, geo->sos, sizeof(struct =
+pblk_sec_meta))
+> +		* index;
+> +}
+> +
+> +static inline void pblk_set_meta_lba(struct pblk *pblk, void =
+*meta_ptr,
+> +				     int index, u64 lba)
+> +{
+> +	pblk_get_meta_buffer(pblk, meta_ptr, index)->lba =3D =
+cpu_to_le64(lba);
+> +}
+> +
+> +static inline u64 pblk_get_meta_lba(struct pblk *pblk, void =
+*meta_ptr,
+> +				    int index)
+> +{
+> +	return le64_to_cpu(pblk_get_meta_buffer(pblk, meta_ptr, =
+index)->lba);
+> +}
+> #endif /* PBLK_H_ */
+> --
+> 2.17.1
+
+Apart form the comments above, the patch looks good to me
+
+Javier
+
+--Apple-Mail=_1D0C310A-B525-4064-949D-A1F9A7DB1FD0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAlvAiwQACgkQIX4xUKFR
+nnRc2A/+LkBRPbfeHPEbWanoZtgQwBccI3K4c2/7NUnXzrQNAnirBKs2lMORbxSu
+3DPHGKlO3ZcRARm0UwEnGrlOzN0XiFOQEK2OrcKNpzTFF/3bA58DmKZhDtzK0RVT
+ojtEQqiUmfMR3AedgfZZayHTzX4K4PGv4R64TO4rQon3g7yoo99SImh8ptplZqFL
+LZ6/hy1fkjmo8aVSxdXeMsOF/RWZ+3Zh6uU0jE8+PFdymFjv4Kmtq4kQ8edKaXm4
+DwGVoBmQUazn23PlD8fDS/s/1D5tVesD1AufM7LO7tLfRCP1eiKQaEfQGXD60EqZ
+PPLEm3OspWRS73l0DnnugkHtyUk1H9ay8edOSihlhXSL1gRNhOUTdx0LNwvf0pLN
+l4fHzYTmxWCCQnD05mEiUwRmanMnvT4TmoVHPX1jvExzr/PC1sQG2ym6mV9WyMym
+SQfpLCAPMzLOvCdkusd5s9CEm5BamayMPJIjr/Y4QMr05PqbU7n9Yo9lTq/4UQJ5
++sHQ8DeZE30O2eQnROc2S5NTw8GGI3KQvmTKzYlSfkvzkbV05xRVa6gdtCAOEJ+F
+88rjpsBAU/VpzfRE7A2O+GGR0M6uqCsHDyIZypGwNE/6Z7gmwmsPl2DedpDZ6kCD
+Bgqonyio9o3hBjOqvtjCPKynA/Nlq2/Qj8gZsXwaL7eRZvCk1Og=
+=zb61
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_1D0C310A-B525-4064-949D-A1F9A7DB1FD0--
