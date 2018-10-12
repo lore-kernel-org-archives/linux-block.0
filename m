@@ -1,117 +1,179 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 08/15] loop: Push loop_ctl_mutex down to loop_get_status()
-Date: Wed, 10 Oct 2018 12:04:08 +0200
-Message-Id: <20181010100415.26525-9-jack@suse.cz>
-In-Reply-To: <20181010100415.26525-1-jack@suse.cz>
-References: <20181010100415.26525-1-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:63750 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728423AbeJLRky (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Oct 2018 13:40:54 -0400
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+        Matias Bjorling <matias.bjorling@wdc.com>
+Subject: [PATCH v4 08/11] block: Improve zone reset execution
+Date: Fri, 12 Oct 2018 19:08:47 +0900
+Message-Id: <20181012100850.23316-9-damien.lemoal@wdc.com>
+In-Reply-To: <20181012100850.23316-1-damien.lemoal@wdc.com>
+References: <20181012100850.23316-1-damien.lemoal@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Push loop_ctl_mutex down to loop_get_status() to avoid the unusual
-convention that the function gets called with loop_ctl_mutex held and
-releases it.
+There is no need to synchronously execute all REQ_OP_ZONE_RESET BIOs
+necessary to reset a range of zones. Similarly to what is done for
+discard BIOs in blk-lib.c, all zone reset BIOs can be chained and
+executed asynchronously and a synchronous call done only for the last
+BIO of the chain.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
+Modify blkdev_reset_zones() to operate similarly to
+blkdev_issue_discard() using the next_bio() helper for chaining BIOs. To
+avoid code duplication of that function in blk_zoned.c, rename
+next_bio() into blk_next_bio() and declare it as a block internal
+function in blk.h.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- drivers/block/loop.c | 37 ++++++++++---------------------------
- 1 file changed, 10 insertions(+), 27 deletions(-)
+ block/blk-lib.c   | 13 ++++++-------
+ block/blk-zoned.c | 29 ++++++++++++++++-------------
+ block/blk.h       |  2 ++
+ 3 files changed, 24 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index be41d5dcecd2..cb4eeff91238 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1233,6 +1233,9 @@ loop_get_status(struct loop_device *lo, struct loop_info64 *info)
- 	struct kstat stat;
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index d1b9dd03da25..d7bedee5f9ba 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -10,8 +10,7 @@
+ 
+ #include "blk.h"
+ 
+-static struct bio *next_bio(struct bio *bio, unsigned int nr_pages,
+-		gfp_t gfp)
++struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp)
+ {
+ 	struct bio *new = bio_alloc(gfp, nr_pages);
+ 
+@@ -87,7 +86,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 			req_sects = end_sect - sector;
+ 		}
+ 
+-		bio = next_bio(bio, 0, gfp_mask);
++		bio = blk_next_bio(bio, 0, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio_set_dev(bio, bdev);
+ 		bio_set_op_attrs(bio, op, 0);
+@@ -189,7 +188,7 @@ static int __blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
+ 	max_write_same_sectors = UINT_MAX >> 9;
+ 
+ 	while (nr_sects) {
+-		bio = next_bio(bio, 1, gfp_mask);
++		bio = blk_next_bio(bio, 1, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio_set_dev(bio, bdev);
+ 		bio->bi_vcnt = 1;
+@@ -265,7 +264,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+ 		return -EOPNOTSUPP;
+ 
+ 	while (nr_sects) {
+-		bio = next_bio(bio, 0, gfp_mask);
++		bio = blk_next_bio(bio, 0, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio_set_dev(bio, bdev);
+ 		bio->bi_opf = REQ_OP_WRITE_ZEROES;
+@@ -316,8 +315,8 @@ static int __blkdev_issue_zero_pages(struct block_device *bdev,
+ 		return -EPERM;
+ 
+ 	while (nr_sects != 0) {
+-		bio = next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
+-			       gfp_mask);
++		bio = blk_next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
++				   gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio_set_dev(bio, bdev);
+ 		bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index bb4ed69f917f..5d967fd39fbd 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -13,6 +13,8 @@
+ #include <linux/rbtree.h>
+ #include <linux/blkdev.h>
+ 
++#include "blk.h"
++
+ static inline sector_t blk_zone_start(struct request_queue *q,
+ 				      sector_t sector)
+ {
+@@ -277,16 +279,17 @@ int blkdev_reset_zones(struct block_device *bdev,
+ 	struct request_queue *q = bdev_get_queue(bdev);
+ 	sector_t zone_sectors;
+ 	sector_t end_sector = sector + nr_sectors;
+-	struct bio *bio;
++	struct bio *bio = NULL;
++	struct blk_plug plug;
  	int ret;
  
-+	ret = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+	if (ret)
-+		return ret;
- 	if (lo->lo_state != Lo_bound) {
- 		mutex_unlock(&loop_ctl_mutex);
- 		return -ENXIO;
-@@ -1347,10 +1350,8 @@ loop_get_status_old(struct loop_device *lo, struct loop_info __user *arg) {
- 	struct loop_info64 info64;
- 	int err;
+-	if (!q)
+-		return -ENXIO;
+-
+ 	if (!blk_queue_is_zoned(q))
+ 		return -EOPNOTSUPP;
  
--	if (!arg) {
--		mutex_unlock(&loop_ctl_mutex);
-+	if (!arg)
+-	if (end_sector > bdev->bd_part->nr_sects)
++	if (bdev_read_only(bdev))
++		return -EPERM;
++
++	if (!nr_sectors || end_sector > bdev->bd_part->nr_sects)
+ 		/* Out of range */
  		return -EINVAL;
--	}
- 	err = loop_get_status(lo, &info64);
- 	if (!err)
- 		err = loop_info64_to_old(&info64, &info);
-@@ -1365,10 +1366,8 @@ loop_get_status64(struct loop_device *lo, struct loop_info64 __user *arg) {
- 	struct loop_info64 info64;
- 	int err;
  
--	if (!arg) {
--		mutex_unlock(&loop_ctl_mutex);
-+	if (!arg)
+@@ -299,19 +302,14 @@ int blkdev_reset_zones(struct block_device *bdev,
+ 	    end_sector != bdev->bd_part->nr_sects)
  		return -EINVAL;
--	}
- 	err = loop_get_status(lo, &info64);
- 	if (!err && copy_to_user(arg, &info64, sizeof(info64)))
- 		err = -EFAULT;
-@@ -1478,12 +1477,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 		}
- 		break;
- 	case LOOP_GET_STATUS:
--		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
--		if (err)
--			return err;
--		err = loop_get_status_old(lo, (struct loop_info __user *) arg);
--		/* loop_get_status() unlocks loop_ctl_mutex */
--		break;
-+		return loop_get_status_old(lo, (struct loop_info __user *) arg);
- 	case LOOP_SET_STATUS64:
- 		err = -EPERM;
- 		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
-@@ -1496,12 +1490,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 		}
- 		break;
- 	case LOOP_GET_STATUS64:
--		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
--		if (err)
--			return err;
--		err = loop_get_status64(lo, (struct loop_info64 __user *) arg);
--		/* loop_get_status() unlocks loop_ctl_mutex */
--		break;
-+		return loop_get_status64(lo, (struct loop_info64 __user *) arg);
- 	case LOOP_SET_CAPACITY:
- 	case LOOP_SET_DIRECT_IO:
- 	case LOOP_SET_BLOCK_SIZE:
-@@ -1626,10 +1615,8 @@ loop_get_status_compat(struct loop_device *lo,
- 	struct loop_info64 info64;
- 	int err;
  
--	if (!arg) {
--		mutex_unlock(&loop_ctl_mutex);
-+	if (!arg)
- 		return -EINVAL;
--	}
- 	err = loop_get_status(lo, &info64);
- 	if (!err)
- 		err = loop_info64_to_compat(&info64, arg);
-@@ -1652,12 +1639,8 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
- 		}
- 		break;
- 	case LOOP_GET_STATUS:
--		err = mutex_lock_killable(&loop_ctl_mutex);
--		if (!err) {
--			err = loop_get_status_compat(lo,
--						     (struct compat_loop_info __user *)arg);
--			/* loop_get_status() unlocks loop_ctl_mutex */
--		}
-+		err = loop_get_status_compat(lo,
-+				     (struct compat_loop_info __user *)arg);
- 		break;
- 	case LOOP_SET_CAPACITY:
- 	case LOOP_CLR_FD:
++	blk_start_plug(&plug);
+ 	while (sector < end_sector) {
+ 
+-		bio = bio_alloc(gfp_mask, 0);
++		bio = blk_next_bio(bio, 0, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio_set_dev(bio, bdev);
+ 		bio_set_op_attrs(bio, REQ_OP_ZONE_RESET, 0);
+ 
+-		ret = submit_bio_wait(bio);
+-		bio_put(bio);
+-
+-		if (ret)
+-			return ret;
+-
+ 		sector += zone_sectors;
+ 
+ 		/* This may take a while, so be nice to others */
+@@ -319,7 +317,12 @@ int blkdev_reset_zones(struct block_device *bdev,
+ 
+ 	}
+ 
+-	return 0;
++	ret = submit_bio_wait(bio);
++	bio_put(bio);
++
++	blk_finish_plug(&plug);
++
++	return ret;
+ }
+ EXPORT_SYMBOL_GPL(blkdev_reset_zones);
+ 
+diff --git a/block/blk.h b/block/blk.h
+index 9db4e389582c..3d67844676fb 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -421,4 +421,6 @@ extern int blk_iolatency_init(struct request_queue *q);
+ static inline int blk_iolatency_init(struct request_queue *q) { return 0; }
+ #endif
+ 
++struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp);
++
+ #endif /* BLK_INTERNAL_H */
 -- 
-2.16.4
+2.17.1
