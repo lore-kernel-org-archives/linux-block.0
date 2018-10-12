@@ -1,190 +1,58 @@
-Return-Path: <axboe@kernel.dk>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: Omar Sandoval <osandov@osandov.com>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] blktest: remove instances of null_blk queue_mode=1
-Message-ID: <b2c6447a-8f07-d11d-62cb-48654a22490e@kernel.dk>
-Date: Thu, 25 Oct 2018 14:55:36 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <prvs=816489328=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	dm-devel@redhat.com,
+	Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Matias Bjorling <matias.bjorling@wdc.com>
+Subject: [PATCH v4 06/11] block: Introduce BLKGETZONESZ ioctl
+Date: Fri, 12 Oct 2018 19:08:45 +0900
+Message-Id: <20181012100850.23316-7-damien.lemoal@wdc.com>
+In-Reply-To: <20181012100850.23316-1-damien.lemoal@wdc.com>
+References: <20181012100850.23316-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This is no longer supported in recent kernels, get rid of
-any testing of queue_mode=1.
+Get a zoned block device zone size in number of 512 B sectors.
+The zone size is always 0 for regular block devices.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ block/ioctl.c                 | 2 ++
+ include/uapi/linux/blkzoned.h | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/tests/block/017 b/tests/block/017
-index 715c4e59c514..cea29beaf062 100755
---- a/tests/block/017
-+++ b/tests/block/017
-@@ -26,27 +26,23 @@ show_inflight() {
- test() {
- 	echo "Running ${TEST_NAME}"
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 3884d810efd2..f6d2c6f1f050 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -532,6 +532,8 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
+ 		return blkdev_report_zones_ioctl(bdev, mode, cmd, arg);
+ 	case BLKRESETZONE:
+ 		return blkdev_reset_zones_ioctl(bdev, mode, cmd, arg);
++	case BLKGETZONESZ:
++		return put_uint(arg, bdev_zone_sectors(bdev));
+ 	case HDIO_GETGEO:
+ 		return blkdev_getgeo(bdev, argp);
+ 	case BLKRAGET:
+diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
+index ff5a5db8906a..281ac605f752 100644
+--- a/include/uapi/linux/blkzoned.h
++++ b/include/uapi/linux/blkzoned.h
+@@ -137,8 +137,10 @@ struct blk_zone_range {
+  *                 sector specified in the report request structure.
+  * @BLKRESETZONE: Reset the write pointer of the zones in the specified
+  *                sector range. The sector range must be zone aligned.
++ * @BLKGETZONESZ: Get the device zone size in number of 512 B sectors.
+  */
+ #define BLKREPORTZONE	_IOWR(0x12, 130, struct blk_zone_report)
+ #define BLKRESETZONE	_IOW(0x12, 131, struct blk_zone_range)
++#define BLKGETZONESZ	_IOW(0x12, 132, __u32)
  
--	for ((queue_mode = 1; queue_mode <= 2; queue_mode++)) do
--		echo "queue mode $queue_mode"
-+	if ! _init_null_blk queue_mode=2 irqmode=2 \
-+	     completion_nsec=500000000; then
-+		return 1
-+	fi
- 
--		if ! _init_null_blk queue_mode="$queue_mode" irqmode=2 \
--		     completion_nsec=500000000; then
--			continue
--		fi
-+	dd if=/dev/nullb0 of=/dev/null bs=4096 iflag=direct count=1 status=none &
-+	sleep 0.1
-+	show_inflight
- 
--		dd if=/dev/nullb0 of=/dev/null bs=4096 iflag=direct count=1 status=none &
--		sleep 0.1
--		show_inflight
-+	dd if=/dev/zero of=/dev/nullb0 bs=4096 oflag=direct count=1 status=none &
-+	sleep 0.1
-+	show_inflight
- 
--		dd if=/dev/zero of=/dev/nullb0 bs=4096 oflag=direct count=1 status=none &
--		sleep 0.1
--		show_inflight
-+	wait
-+	show_inflight
- 
--		wait
--		show_inflight
--
--		_exit_null_blk
--	done
-+	_exit_null_blk
- 
- 	echo "Test complete"
- }
-diff --git a/tests/block/017.out b/tests/block/017.out
-index 93d67c98e159..e2ecf978af5f 100644
---- a/tests/block/017.out
-+++ b/tests/block/017.out
-@@ -1,18 +1,4 @@
- Running block/017
--queue mode 1
--sysfs inflight reads 1
--sysfs inflight writes 0
--sysfs stat 1
--diskstats 1
--sysfs inflight reads 1
--sysfs inflight writes 1
--sysfs stat 2
--diskstats 2
--sysfs inflight reads 0
--sysfs inflight writes 0
--sysfs stat 0
--diskstats 0
--queue mode 2
- sysfs inflight reads 1
- sysfs inflight writes 0
- sysfs stat 1
-diff --git a/tests/block/018 b/tests/block/018
-index 279dc7a31958..731272399a82 100755
---- a/tests/block/018
-+++ b/tests/block/018
-@@ -29,37 +29,33 @@ show_times() {
- }
- 
- test() {
--	echo "Running ${TEST_NAME}"
--
--	for ((queue_mode = 1; queue_mode <= 2; queue_mode++)) do
--		local init_read_ms init_write_ms read_ms write_ms
-+	local init_read_ms init_write_ms read_ms write_ms
- 
--		echo "queue mode $queue_mode"
-+	echo "Running ${TEST_NAME}"
- 
--		if ! _init_null_blk queue_mode="$queue_mode" irqmode=2 \
--		     completion_nsec=1000000000; then
--			continue
--		fi
-+	if ! _init_null_blk queue_mode=2 irqmode=2 \
-+	     completion_nsec=1000000000; then
-+		return 1
-+	fi
- 
--		init_times
--		show_times
-+	init_times
-+	show_times
- 
--		dd if=/dev/nullb0 of=/dev/null bs=4096 iflag=direct count=1 status=none
--		show_times
-+	dd if=/dev/nullb0 of=/dev/null bs=4096 iflag=direct count=1 status=none
-+	show_times
- 
--		dd if=/dev/zero of=/dev/nullb0 bs=4096 oflag=direct count=1 status=none
--		show_times
-+	dd if=/dev/zero of=/dev/nullb0 bs=4096 oflag=direct count=1 status=none
-+	show_times
- 
--		dd if=/dev/nullb0 of=/dev/null bs=4096 iflag=direct count=1 status=none &
--		dd if=/dev/zero of=/dev/nullb0 bs=4096 oflag=direct count=1 status=none &
--		dd if=/dev/zero of=/dev/nullb0 bs=4096 oflag=direct count=1 status=none &
--		wait
--		show_times
-+	dd if=/dev/nullb0 of=/dev/null bs=4096 iflag=direct count=1 status=none &
-+	dd if=/dev/zero of=/dev/nullb0 bs=4096 oflag=direct count=1 status=none &
-+	dd if=/dev/zero of=/dev/nullb0 bs=4096 oflag=direct count=1 status=none &
-+	wait
-+	show_times
- 
--		_exit_null_blk
-+	_exit_null_blk
- 
--		unset init_read_ms init_write_ms read_ms write_ms
--	done
-+	unset init_read_ms init_write_ms read_ms write_ms
- 
- 	echo "Test complete"
- }
-diff --git a/tests/block/018.out b/tests/block/018.out
-index facb7c2be260..27c74bec2337 100644
---- a/tests/block/018.out
-+++ b/tests/block/018.out
-@@ -1,14 +1,4 @@
- Running block/018
--queue mode 1
--read 0 s
--write 0 s
--read 1 s
--write 0 s
--read 1 s
--write 1 s
--read 2 s
--write 3 s
--queue mode 2
- read 0 s
- write 0 s
- read 1 s
-diff --git a/tests/block/023 b/tests/block/023
-index b053af45adb0..b0739f72e46d 100755
---- a/tests/block/023
-+++ b/tests/block/023
-@@ -19,7 +19,7 @@ test() {
- 	echo "Running ${TEST_NAME}"
- 
- 	local queue_mode
--	for ((queue_mode = 0; queue_mode <= 2; queue_mode++)); do
-+	for queue_mode in 0 2; do
- 		if _init_null_blk gb=1 queue_mode="$queue_mode"; then
- 			echo "Queue mode $queue_mode"
- 			dd if=/dev/nullb0 of=/dev/null iflag=direct bs=64k status=none
-diff --git a/tests/block/023.out b/tests/block/023.out
-index a2f376d979e2..3216d0c4b5c1 100644
---- a/tests/block/023.out
-+++ b/tests/block/023.out
-@@ -1,5 +1,4 @@
- Running block/023
- Queue mode 0
--Queue mode 1
- Queue mode 2
- Test complete
-
+ #endif /* _UAPI_BLKZONED_H */
 -- 
-Jens Axboe
+2.17.1
