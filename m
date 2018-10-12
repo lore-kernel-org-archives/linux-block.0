@@ -1,44 +1,69 @@
-Return-Path: <prvs=81565c836=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH v2 05/11] block: Limit allocation of zone descriptors for report zones
-Date: Thu, 11 Oct 2018 16:09:46 +0900
-Message-Id: <20181011070952.13248-6-damien.lemoal@wdc.com>
-In-Reply-To: <20181011070952.13248-1-damien.lemoal@wdc.com>
-References: <20181011070952.13248-1-damien.lemoal@wdc.com>
+Return-Path: <sboisvert@gydle.com>
+To: Peng Hao <penghao122@sina.com.cn>, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, Peng Hao <peng.hao2@zte.com.cn>
+References: <1539361453-3383-1-git-send-email-penghao122@sina.com.cn>
+From: =?UTF-8?Q?S=c3=a9bastien_Boisvert?= <sboisvert@gydle.com>
+Subject: Re: [PATCH] block/sx8 : remove unnecessory check
+Message-ID: <f545d380-b6cc-c476-439d-edc3705845a0@gydle.com>
+Date: Fri, 12 Oct 2018 13:01:41 -0400
+MIME-Version: 1.0
+In-Reply-To: <1539361453-3383-1-git-send-email-penghao122@sina.com.cn>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-There is no point in allocating more zone descriptors than the number of
-zones a block device has for doing a zone report. Avoid doing that in
-blkdev_report_zones_ioctl() by limiting the number of zone decriptors
-allocated internally to process the user request.
+On 2018-10-12 12:24 PM, Peng Hao wrote:
+> From: Peng Hao <peng.hao2@zte.com.cn>
+> 
+> TAG_VALID(tag)= ((((tag) & 0xf) == 0xf) && (TAG_DECODE(tag) < 32)).
+> But '(X & 0x1f) < 0x20(32)' is always true. The second half of
+> TAG_VALID is unnecessary.
+> 
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-zoned.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Hello Peng Hao,
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 32e377f755d8..bb4ed69f917f 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -355,8 +355,7 @@ int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
- 	if (!rep.nr_zones)
- 		return -EINVAL;
- 
--	if (rep.nr_zones > INT_MAX / sizeof(struct blk_zone))
--		return -ERANGE;
-+	rep.nr_zones = min(blkdev_nr_zones(bdev), rep.nr_zones);
- 
- 	zones = kvmalloc_array(rep.nr_zones, sizeof(struct blk_zone),
- 			       GFP_KERNEL | __GFP_ZERO);
--- 
-2.17.1
+A small typo:
+
+unnecessory => unnecessary
+
+
+Your claim is that this is always true:
+(TAG_DECODE(tag) < 32))
+
+It is called with "TAG_VALID(handle)". handle is a u32.
+
+
+Let's simplify it:
+
+(TAG_DECODE(tag) < 32))
+
+(((tag) >> 16) & 0x1f) < 32
+
+
+As you point out, "X & 0x1f" only selects the 5 last significant bits.
+
+0x1f = 0b 0000 0000 0001 1111
+32   = 0b 0000 0000 0010 0000
+
+That checks out !
+
+Reviewed-by: Sébastien Boisvert <sboisvert@gydle.com>
+
+> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> ---
+>  drivers/block/sx8.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/sx8.c b/drivers/block/sx8.c
+> index 4d90e5e..b8e9ebf 100644
+> --- a/drivers/block/sx8.c
+> +++ b/drivers/block/sx8.c
+> @@ -75,7 +75,7 @@
+>  /* 0xf is just arbitrary, non-zero noise; this is sorta like poisoning */
+>  #define TAG_ENCODE(tag)	(((tag) << 16) | 0xf)
+>  #define TAG_DECODE(tag)	(((tag) >> 16) & 0x1f)
+> -#define TAG_VALID(tag)	((((tag) & 0xf) == 0xf) && (TAG_DECODE(tag) < 32))
+> +#define TAG_VALID(tag)	(((tag) & 0xf) == 0xf)
+>  
+>  /* note: prints function name for you */
+>  #ifdef CARM_DEBUG
+> 
