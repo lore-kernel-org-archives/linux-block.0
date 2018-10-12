@@ -1,67 +1,42 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-ide@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 15/29] block: remove blk_complete_request()
-Date: Mon, 29 Oct 2018 10:34:30 -0600
-Message-Id: <20181029163444.9940-16-axboe@kernel.dk>
-In-Reply-To: <20181029163444.9940-1-axboe@kernel.dk>
-References: <20181029163444.9940-1-axboe@kernel.dk>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v3 01/11] scsi: sd_zbc: Rearrange code
+To: Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>, dm-devel@redhat.com,
+ Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, Matias Bjorling <matias.bjorling@wdc.com>
+References: <20181012023012.29923-1-damien.lemoal@wdc.com>
+ <20181012023012.29923-2-damien.lemoal@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <35001c63-9bde-3c73-4a18-f81145f5c424@suse.de>
+Date: Fri, 12 Oct 2018 09:29:33 +0200
+MIME-Version: 1.0
+In-Reply-To: <20181012023012.29923-2-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-It's now unused.
-
+On 10/12/18 4:30 AM, Damien Le Moal wrote:
+> Move the urswrz check out of sd_zbc_read_zones() and into
+> sd_zbc_read_zoned_characteristics() where that value is obtained (read
+> from the disk zoned characteristics VPD page). Since this function now
+> does more than simply reading the VPD page, rename it to
+> sd_zbc_check_zoned_characteristics().
+> Also fix the error message displayed when reading that VPD page fails.
+> 
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   drivers/scsi/sd_zbc.c | 39 +++++++++++++++++++--------------------
+>   1 file changed, 19 insertions(+), 20 deletions(-)
+> 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-softirq.c    | 20 --------------------
- include/linux/blkdev.h |  1 -
- 2 files changed, 21 deletions(-)
 
-diff --git a/block/blk-softirq.c b/block/blk-softirq.c
-index e47a2f751884..8ca0f6caf174 100644
---- a/block/blk-softirq.c
-+++ b/block/blk-softirq.c
-@@ -145,26 +145,6 @@ void __blk_complete_request(struct request *req)
- }
- EXPORT_SYMBOL(__blk_complete_request);
- 
--/**
-- * blk_complete_request - end I/O on a request
-- * @req:      the request being processed
-- *
-- * Description:
-- *     Ends all I/O on a request. It does not handle partial completions,
-- *     unless the driver actually implements this in its completion callback
-- *     through requeueing. The actual completion happens out-of-order,
-- *     through a softirq handler. The user must have registered a completion
-- *     callback through blk_queue_softirq_done().
-- **/
--void blk_complete_request(struct request *req)
--{
--	if (unlikely(blk_should_fake_timeout(req->q)))
--		return;
--	if (!blk_mark_rq_complete(req))
--		__blk_complete_request(req);
--}
--EXPORT_SYMBOL(blk_complete_request);
--
- static __init int blk_softirq_init(void)
- {
- 	int i;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index e867733b761d..6baea6563364 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1203,7 +1203,6 @@ extern bool __blk_end_request(struct request *rq, blk_status_t error,
- extern void __blk_end_request_all(struct request *rq, blk_status_t error);
- extern bool __blk_end_request_cur(struct request *rq, blk_status_t error);
- 
--extern void blk_complete_request(struct request *);
- extern void __blk_complete_request(struct request *);
- extern void blk_abort_request(struct request *);
- extern void blk_unprep_request(struct request *);
+Cheers,
+
+Hannes
 -- 
-2.17.1
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
