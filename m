@@ -1,83 +1,128 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from laurent.telenet-ops.be ([195.130.137.89]:33720 "EHLO
-        laurent.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727686AbeJ2Awi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Oct 2018 20:52:38 -0400
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: Matias Bjorling <mb@lightnvm.io>,
-        Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@fb.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>
-Cc: Arnd Bergmann <arnd@arndb.de>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH] lightnvm: Fix uninitialized return value in nvm_get_chunk_meta()
-Date: Sun, 28 Oct 2018 17:07:26 +0100
-Message-Id: <20181028160726.24450-1-geert@linux-m68k.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
+To: axboe@kernel.dk
+Cc: keith.busch@linux.intel.com, ming.lei@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH V2 3/4] blk-mq: realloc hctx when hw queue is mapped to another node
+Date: Fri, 12 Oct 2018 18:07:27 +0800
+Message-Id: <1539338848-1789-4-git-send-email-jianchao.w.wang@oracle.com>
+In-Reply-To: <1539338848-1789-1-git-send-email-jianchao.w.wang@oracle.com>
+References: <1539338848-1789-1-git-send-email-jianchao.w.wang@oracle.com>
+List-ID: <linux-block@vger.kernel.org>
 
-With gcc 4.1:
+When the hw queues and mq_map are updated, a hctx could be mapped
+to a different numa node. At this moment, we need to realloc the
+hctx. If fail to do that, go on using previous hctx.
 
-    drivers/lightnvm/core.c: In function ‘nvm_get_bb_meta’:
-    drivers/lightnvm/core.c:977: warning: ‘ret’ may be used uninitialized in this function
-
-and
-
-    drivers/nvme/host/lightnvm.c: In function ‘nvme_nvm_get_chk_meta’:
-    drivers/nvme/host/lightnvm.c:580: warning: ‘ret’ may be used uninitialized in this function
-
-Indeed, if (for the former) the number of channels or LUNs is zero, or
-(for both) the passed number of chunks is zero, ret will be returned
-uninitialized.
-
-Fix this by preinitializing ret to zero.
-
-Fixes: aff3fb18f957de93 ("lightnvm: move bad block and chunk state logic to core")
-Fixes: a294c199455187d1 ("lightnvm: implement get log report chunk helpers")
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
 ---
-I don't know if this can happen in practice, but given this is core
-functionality that can be called from other files, or even from other
-modules, I think it's better to be safe than sorry.
+ block/blk-mq.c | 82 +++++++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 56 insertions(+), 26 deletions(-)
 
-The latter seems to be a pre-existing issue since v4.17.
-I didn't notice it before, due to the dependency of NVM on PCI (my gcc
-4.1 targets m68k, i.e. no PCI).
----
- drivers/lightnvm/core.c      | 2 +-
- drivers/nvme/host/lightnvm.c | 3 ++-
- 2 files changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index efb976a863d2295a..73ab3cf2686804ba 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -974,7 +974,7 @@ static int nvm_get_bb_meta(struct nvm_dev *dev, sector_t slba,
- 	struct ppa_addr ppa;
- 	u8 *blks;
- 	int ch, lun, nr_blks;
--	int ret;
-+	int ret = 0;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 9805d6a..34f3973 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2504,6 +2504,39 @@ static int blk_mq_hw_ctx_size(struct blk_mq_tag_set *tag_set)
+ 	return hw_ctx_size;
+ }
  
- 	ppa.ppa = slba;
- 	ppa = dev_to_generic_addr(dev, ppa);
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index a4f3b263cd6c60ee..d64805dc8efbaa02 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -577,7 +577,8 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
- 	struct ppa_addr ppa;
- 	size_t left = nchks * sizeof(struct nvme_nvm_chk_meta);
- 	size_t log_pos, offset, len;
--	int ret, i, max_len;
-+	int i, max_len;
-+	int ret = 0;
++static struct blk_mq_hw_ctx *blk_mq_alloc_and_init_hctx(
++		struct blk_mq_tag_set *set, struct request_queue *q,
++		int hctx_idx, int node)
++{
++	struct blk_mq_hw_ctx *hctx;
++
++	hctx = kzalloc_node(blk_mq_hw_ctx_size(set),
++			GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
++			node);
++	if (!hctx)
++		return NULL;
++
++	if (!zalloc_cpumask_var_node(&hctx->cpumask,
++				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
++				node)) {
++		kfree(hctx);
++		return NULL;
++	}
++
++	atomic_set(&hctx->nr_active, 0);
++	hctx->numa_node = node;
++	hctx->queue_num = hctx_idx;
++
++	if (blk_mq_init_hctx(q, set, hctx, hctx_idx)) {
++		free_cpumask_var(hctx->cpumask);
++		kfree(hctx);
++		return NULL;
++	}
++	blk_mq_hctx_kobj_init(hctx);
++
++	return hctx;
++}
++
+ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 						struct request_queue *q)
+ {
+@@ -2514,37 +2547,34 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 	mutex_lock(&q->sysfs_lock);
+ 	for (i = 0; i < set->nr_hw_queues; i++) {
+ 		int node;
+-
+-		if (hctxs[i])
+-			continue;
++		struct blk_mq_hw_ctx *hctx;
  
- 	/*
- 	 * limit requests to maximum 256K to avoid issuing arbitrary large
+ 		node = blk_mq_hw_queue_to_node(q->mq_map, i);
+-		hctxs[i] = kzalloc_node(blk_mq_hw_ctx_size(set),
+-				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
+-				node);
+-		if (!hctxs[i])
+-			break;
+-
+-		if (!zalloc_cpumask_var_node(&hctxs[i]->cpumask,
+-					GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
+-					node)) {
+-			kfree(hctxs[i]);
+-			hctxs[i] = NULL;
+-			break;
+-		}
+-
+-		atomic_set(&hctxs[i]->nr_active, 0);
+-		hctxs[i]->numa_node = node;
+-		hctxs[i]->queue_num = i;
++		/*
++		 * If the hw queue has been mapped to another numa node,
++		 * we need to realloc the hctx. If allocation fails, fallback
++		 * to use the previous one.
++		 */
++		if (hctxs[i] && (hctxs[i]->numa_node == node))
++			continue;
+ 
+-		if (blk_mq_init_hctx(q, set, hctxs[i], i)) {
+-			free_cpumask_var(hctxs[i]->cpumask);
+-			kfree(hctxs[i]);
+-			hctxs[i] = NULL;
+-			break;
++		hctx = blk_mq_alloc_and_init_hctx(set, q, i, node);
++		if (hctx) {
++			if (hctxs[i]) {
++				blk_mq_exit_hctx(q, set, hctxs[i], i);
++				kobject_put(&hctxs[i]->kobj);
++			}
++			hctxs[i] = hctx;
++		} else {
++			if (hctxs[i])
++				pr_warn("Allocate new hctx on node %d fails,\
++						fallback to previous one on node %d\n",
++						node, hctxs[i]->numa_node);
++			else
++				break;
+ 		}
+-		blk_mq_hctx_kobj_init(hctxs[i]);
+ 	}
++
+ 	for (j = i; j < q->nr_hw_queues; j++) {
+ 		struct blk_mq_hw_ctx *hctx = hctxs[j];
+ 
 -- 
-2.17.1
+2.7.4
