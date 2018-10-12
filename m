@@ -1,41 +1,36 @@
 Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCHv5 0/3] Deprecate DAC960 driver
-To: Hannes Reinecke <hare@suse.de>
+To: Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>
 Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
  Christoph Hellwig <hch@lst.de>,
  James Bottomley <james.bottomley@hansenpartnership.com>,
  linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
 References: <20181012071548.129113-1-hare@suse.de>
+ <374ac361-6100-dc25-6745-7b6ed521fba5@acm.org>
 From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <3ac9b798-c2ba-a0a3-9a43-c3743eefae0a@kernel.dk>
-Date: Wed, 17 Oct 2018 08:19:56 -0600
+Message-ID: <398faf1f-cab9-9b51-f653-bc7e065c66eb@kernel.dk>
+Date: Fri, 12 Oct 2018 10:39:37 -0600
 MIME-Version: 1.0
-In-Reply-To: <20181012071548.129113-1-hare@suse.de>
+In-Reply-To: <374ac361-6100-dc25-6745-7b6ed521fba5@acm.org>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/12/18 1:15 AM, Hannes Reinecke wrote:
-> Hi all,
+On 10/12/18 7:38 AM, Bart Van Assche wrote:
+> On 10/12/18 12:15 AM, Hannes Reinecke wrote:
+>> Hi all,
+>>
+>> as we're trying to get rid of the remaining request_fn drivers here's
+>> a patchset to move the DAC960 driver to the SCSI stack.
+>> As per request from hch I've split up the driver into two new SCSI
+>> drivers called 'myrb' and 'myrs'.
 > 
-> as we're trying to get rid of the remaining request_fn drivers here's
-> a patchset to move the DAC960 driver to the SCSI stack.
-> As per request from hch I've split up the driver into two new SCSI
-> drivers called 'myrb' and 'myrs'.
+> Hi Hannes,
 > 
-> The 'myrb' driver only supports the earlier (V1) firmware interface, which
-> doesn't have a SCSI interface for the logical drives; for those I've added
-> a (pretty rudimentary, admittedly) SCSI translation for them.
-> 
-> The 'myrs' driver supports the newer (V2) firmware interface, which is
-> SCSI based and doesn't need the translation layer.
-> 
-> And the weird proc interface from DAC960 has been converted to sysfs attributes.
-> 
-> Tested with eXtremeRAID 1100 (for V1 Firmware) and Mylex AcceleRAID 170
-> (for V2 Firmware).
+> Apparently only patches 1/3 and 2/3 made it to the linux-scsi mailing 
+> list but patch 3/3 not. See also 
+> https://marc.info/?l=linux-scsi&r=3&b=201810&w=2.
 
-Martin, are you taking the two new drivers? Then I'll queue up the
-old driver removal.
+I'm guessing it's just too big. I got it, but probably due to the CC.
 
 -- 
 Jens Axboe
