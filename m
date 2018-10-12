@@ -1,68 +1,93 @@
-Return-Path: <mariusz.dabrowski@intel.com>
-From: "Dabrowski, Mariusz" <mariusz.dabrowski@intel.com>
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>, Ming Lin
-	<ming.l@ssi.samsung.com>, Mike Snitzer <snitzer@redhat.com>, "Christoph
- Hellwig" <hch@lst.de>, Xiao Ni <xni@redhat.com>
-Subject: Re: [PATCH] block: don't deal with discard limit in
- blkdev_issue_discard()
-Date: Wed, 17 Oct 2018 05:46:06 +0000
-Message-ID: <e7f5df7d-1e21-e790-a1c2-aa30c5329a31@intel.com>
-References: <20181012075310.4587-1-ming.lei@redhat.com>
-In-Reply-To: <20181012075310.4587-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	stable@vger.kernel.org,
+	Mariusz Dabrowski <mariusz.dabrowski@intel.com>,
+	Ming Lin <ming.l@ssi.samsung.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Xiao Ni <xni@redhat.com>
+Subject: [PATCH] block: don't deal with discard limit in blkdev_issue_discard()
+Date: Fri, 12 Oct 2018 15:53:10 +0800
+Message-Id: <20181012075310.4587-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gMTAvMTIvMTggOTo1MyBBTSwgTWluZyBMZWkgd3JvdGU6DQo+IGJsa19xdWV1ZV9zcGxpdCgp
-IGRvZXMgcmVzcGVjdCB0aGlzIGxpbWl0IHZpYSBiaW8gc3BsaXR0aW5nLCBzbyBubw0KPiBuZWVk
-IHRvIGRvIHRoYXQgaW4gYmxrZGV2X2lzc3VlX2Rpc2NhcmQoKSwgdGhlbiB3ZSBjYW4gYWxpZ24g
-dG8NCj4gbm9ybWFsIGJpbyBzdWJtaXQoYmlvX2FkZF9wYWdlKCkgJiBzdWJtaXRfYmlvKCkpLg0K
-PiANCj4gTW9yZSBpbXBvcnRhbnRseSwgdGhpcyBwYXRjaCBmaXhlcyBvbmUgaXNzdWUgaW50cm9k
-dWNlZCBpbiBhMjJjNGQ3ZTM0NDAyY2MNCj4gKCJibG9jazogcmUtYWRkIGRpc2NhcmRfZ3JhbnVs
-YXJpdHkgYW5kIGFsaWdubWVudCBjaGVja3MiKSwgaW4gd2hpY2gNCj4gemVybyBkaXNjYXJkIGJp
-byBtYXkgYmUgZ2VuZXJhdGVkIGluIGNhc2Ugb2YgemVybyBhbGlnbm1lbnQuDQo+IA0KPiBGaXhl
-czogYTIyYzRkN2UzNDQwMmNjZGYzICgiYmxvY2s6IHJlLWFkZCBkaXNjYXJkX2dyYW51bGFyaXR5
-IGFuZCBhbGlnbm1lbnQgY2hlY2tzIikNCj4gQ2M6IHN0YWJsZUB2Z2VyLmtlcm5lbC5vcmcNCj4g
-Q2M6IE1hcml1c3ogRGFicm93c2tpIDxtYXJpdXN6LmRhYnJvd3NraUBpbnRlbC5jb20+DQo+IENj
-OiBNaW5nIExpbiA8bWluZy5sQHNzaS5zYW1zdW5nLmNvbT4NCj4gQ2M6IE1pa2UgU25pdHplciA8
-c25pdHplckByZWRoYXQuY29tPg0KPiBDYzogQ2hyaXN0b3BoIEhlbGx3aWcgPGhjaEBsc3QuZGU+
-DQo+IENjOiBYaWFvIE5pIDx4bmlAcmVkaGF0LmNvbT4NCj4gU2lnbmVkLW9mZi1ieTogTWluZyBM
-ZWkgPG1pbmcubGVpQHJlZGhhdC5jb20+DQo+IC0tLQ0KPiAgIGJsb2NrL2Jsay1saWIuYyB8IDI4
-ICsrLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gICAxIGZpbGUgY2hhbmdlZCwgMiBpbnNl
-cnRpb25zKCspLCAyNiBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9ibG9jay9ibGst
-bGliLmMgYi9ibG9jay9ibGstbGliLmMNCj4gaW5kZXggZDFiOWRkMDNkYTI1Li5iYmQ0NDY2NmYy
-YjUgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Jsay1saWIuYw0KPiArKysgYi9ibG9jay9ibGstbGli
-LmMNCj4gQEAgLTI5LDkgKzI5LDcgQEAgaW50IF9fYmxrZGV2X2lzc3VlX2Rpc2NhcmQoc3RydWN0
-IGJsb2NrX2RldmljZSAqYmRldiwgc2VjdG9yX3Qgc2VjdG9yLA0KPiAgIHsNCj4gICAJc3RydWN0
-IHJlcXVlc3RfcXVldWUgKnEgPSBiZGV2X2dldF9xdWV1ZShiZGV2KTsNCj4gICAJc3RydWN0IGJp
-byAqYmlvID0gKmJpb3A7DQo+IC0JdW5zaWduZWQgaW50IGdyYW51bGFyaXR5Ow0KPiAgIAl1bnNp
-Z25lZCBpbnQgb3A7DQo+IC0JaW50IGFsaWdubWVudDsNCj4gICAJc2VjdG9yX3QgYnNfbWFzazsN
-Cj4gICANCj4gICAJaWYgKCFxKQ0KPiBAQCAtNTQsMzggKzUyLDE2IEBAIGludCBfX2Jsa2Rldl9p
-c3N1ZV9kaXNjYXJkKHN0cnVjdCBibG9ja19kZXZpY2UgKmJkZXYsIHNlY3Rvcl90IHNlY3RvciwN
-Cj4gICAJaWYgKChzZWN0b3IgfCBucl9zZWN0cykgJiBic19tYXNrKQ0KPiAgIAkJcmV0dXJuIC1F
-SU5WQUw7DQo+ICAgDQo+IC0JLyogWmVyby1zZWN0b3IgKHVua25vd24pIGFuZCBvbmUtc2VjdG9y
-IGdyYW51bGFyaXRpZXMgYXJlIHRoZSBzYW1lLiAgKi8NCj4gLQlncmFudWxhcml0eSA9IG1heChx
-LT5saW1pdHMuZGlzY2FyZF9ncmFudWxhcml0eSA+PiA5LCAxVSk7DQo+IC0JYWxpZ25tZW50ID0g
-KGJkZXZfZGlzY2FyZF9hbGlnbm1lbnQoYmRldikgPj4gOSkgJSBncmFudWxhcml0eTsNCj4gLQ0K
-PiAgIAl3aGlsZSAobnJfc2VjdHMpIHsNCj4gLQkJdW5zaWduZWQgaW50IHJlcV9zZWN0czsNCj4g
-LQkJc2VjdG9yX3QgZW5kX3NlY3QsIHRtcDsNCj4gKwkJdW5zaWduZWQgaW50IHJlcV9zZWN0cyA9
-IG5yX3NlY3RzOw0KPiArCQlzZWN0b3JfdCBlbmRfc2VjdDsNCj4gICANCj4gLQkJLyoNCj4gLQkJ
-ICogSXNzdWUgaW4gY2h1bmtzIG9mIHRoZSB1c2VyIGRlZmluZWQgbWF4IGRpc2NhcmQgc2V0dGlu
-ZywNCj4gLQkJICogZW5zdXJpbmcgdGhhdCBiaV9zaXplIGRvZXNuJ3Qgb3ZlcmZsb3cNCj4gLQkJ
-ICovDQo+IC0JCXJlcV9zZWN0cyA9IG1pbl90KHNlY3Rvcl90LCBucl9zZWN0cywNCj4gLQkJCQkJ
-cS0+bGltaXRzLm1heF9kaXNjYXJkX3NlY3RvcnMpOw0KPiAgIAkJaWYgKCFyZXFfc2VjdHMpDQo+
-ICAgCQkJZ290byBmYWlsOw0KPiAgIAkJaWYgKHJlcV9zZWN0cyA+IFVJTlRfTUFYID4+IDkpDQo+
-ICAgCQkJcmVxX3NlY3RzID0gVUlOVF9NQVggPj4gOTsNCj4gICANCj4gLQkJLyoNCj4gLQkJICog
-SWYgc3BsaXR0aW5nIGEgcmVxdWVzdCwgYW5kIHRoZSBuZXh0IHN0YXJ0aW5nIHNlY3RvciB3b3Vs
-ZCBiZQ0KPiAtCQkgKiBtaXNhbGlnbmVkLCBzdG9wIHRoZSBkaXNjYXJkIGF0IHRoZSBwcmV2aW91
-cyBhbGlnbmVkIHNlY3Rvci4NCj4gLQkJICovDQo+ICAgCQllbmRfc2VjdCA9IHNlY3RvciArIHJl
-cV9zZWN0czsNCj4gLQkJdG1wID0gZW5kX3NlY3Q7DQo+IC0JCWlmIChyZXFfc2VjdHMgPCBucl9z
-ZWN0cyAmJg0KPiAtCQkgICAgc2VjdG9yX2Rpdih0bXAsIGdyYW51bGFyaXR5KSAhPSBhbGlnbm1l
-bnQpIHsNCj4gLQkJCWVuZF9zZWN0ID0gZW5kX3NlY3QgLSBhbGlnbm1lbnQ7DQo+IC0JCQlzZWN0
-b3JfZGl2KGVuZF9zZWN0LCBncmFudWxhcml0eSk7DQo+IC0JCQllbmRfc2VjdCA9IGVuZF9zZWN0
-ICogZ3JhbnVsYXJpdHkgKyBhbGlnbm1lbnQ7DQo+IC0JCQlyZXFfc2VjdHMgPSBlbmRfc2VjdCAt
-IHNlY3RvcjsNCj4gLQkJfQ0KPiAgIA0KPiAgIAkJYmlvID0gbmV4dF9iaW8oYmlvLCAwLCBnZnBf
-bWFzayk7DQo+ICAgCQliaW8tPmJpX2l0ZXIuYmlfc2VjdG9yID0gc2VjdG9yOw0KPg0KVGVzdGVk
-LWJ5OiBNYXJpdXN6IERhYnJvd3NraSA8bWFyaXVzei5kYWJyb3dza2lAaW50ZWwuY29tPg==
+blk_queue_split() does respect this limit via bio splitting, so no
+need to do that in blkdev_issue_discard(), then we can align to
+normal bio submit(bio_add_page() & submit_bio()).
+
+More importantly, this patch fixes one issue introduced in a22c4d7e34402cc
+("block: re-add discard_granularity and alignment checks"), in which
+zero discard bio may be generated in case of zero alignment.
+
+Fixes: a22c4d7e34402ccdf3 ("block: re-add discard_granularity and alignment checks")
+Cc: stable@vger.kernel.org
+Cc: Mariusz Dabrowski <mariusz.dabrowski@intel.com>
+Cc: Ming Lin <ming.l@ssi.samsung.com>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Xiao Ni <xni@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-lib.c | 28 ++--------------------------
+ 1 file changed, 2 insertions(+), 26 deletions(-)
+
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index d1b9dd03da25..bbd44666f2b5 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -29,9 +29,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ {
+ 	struct request_queue *q = bdev_get_queue(bdev);
+ 	struct bio *bio = *biop;
+-	unsigned int granularity;
+ 	unsigned int op;
+-	int alignment;
+ 	sector_t bs_mask;
+ 
+ 	if (!q)
+@@ -54,38 +52,16 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 	if ((sector | nr_sects) & bs_mask)
+ 		return -EINVAL;
+ 
+-	/* Zero-sector (unknown) and one-sector granularities are the same.  */
+-	granularity = max(q->limits.discard_granularity >> 9, 1U);
+-	alignment = (bdev_discard_alignment(bdev) >> 9) % granularity;
+-
+ 	while (nr_sects) {
+-		unsigned int req_sects;
+-		sector_t end_sect, tmp;
++		unsigned int req_sects = nr_sects;
++		sector_t end_sect;
+ 
+-		/*
+-		 * Issue in chunks of the user defined max discard setting,
+-		 * ensuring that bi_size doesn't overflow
+-		 */
+-		req_sects = min_t(sector_t, nr_sects,
+-					q->limits.max_discard_sectors);
+ 		if (!req_sects)
+ 			goto fail;
+ 		if (req_sects > UINT_MAX >> 9)
+ 			req_sects = UINT_MAX >> 9;
+ 
+-		/*
+-		 * If splitting a request, and the next starting sector would be
+-		 * misaligned, stop the discard at the previous aligned sector.
+-		 */
+ 		end_sect = sector + req_sects;
+-		tmp = end_sect;
+-		if (req_sects < nr_sects &&
+-		    sector_div(tmp, granularity) != alignment) {
+-			end_sect = end_sect - alignment;
+-			sector_div(end_sect, granularity);
+-			end_sect = end_sect * granularity + alignment;
+-			req_sects = end_sect - sector;
+-		}
+ 
+ 		bio = next_bio(bio, 0, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+-- 
+2.9.5
