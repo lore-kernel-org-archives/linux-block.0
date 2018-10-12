@@ -1,45 +1,92 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH v4 00/11] Zoned block device support improvements
-To: Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org,
- linux-scsi@vger.kernel.org, "Martin K . Petersen"
- <martin.petersen@oracle.com>, dm-devel@redhat.com,
- Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, Matias Bjorling <matias.bjorling@wdc.com>
-References: <20181012100850.23316-1-damien.lemoal@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <f6062f58-8f8a-b90a-9163-5938632e1a6a@kernel.dk>
-Date: Sat, 13 Oct 2018 16:43:30 -0600
-MIME-Version: 1.0
-In-Reply-To: <20181012100850.23316-1-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <prvs=816489328=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	dm-devel@redhat.com,
+	Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Matias Bjorling <matias.bjorling@wdc.com>
+Subject: [PATCH v4 00/11] Zoned block device support improvements
+Date: Fri, 12 Oct 2018 19:08:39 +0900
+Message-Id: <20181012100850.23316-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/12/18 4:08 AM, Damien Le Moal wrote:
-> This series improves zoned block device support (reduce overhead) and
-> introduces many simplifications to the code (overall, there are more deletions
-> than insertions).
-> 
-> In more details:
-> * Patches 1 to 3 are SCSI side (sd driver) cleanups and improvements reducing
->   the overhead of report zones command execution during disk scan and
->   revalidation.
-> * Patches 4 to 9 improve the useability and user API of zoned block devices.
-> * Patch 10 is the main part of this series. This patch replaces the
->   REQ_OP_ZONE_REPORT BIO/request operation for executing report zones commands
->   with a block device file operation, removing the need for the command reply
->   payload in-place rewriting in the BIO buffer. This leads to major
->   simplification of the code in many places.
-> * Patch 11 further simplifies the code of low level drivers by providing a
->   generic implementation of zoned block device request queue zone bitmaps
->   initialization and revalidation.
-> 
-> Please consider the addition of these patches in 4.20.
-> Comments are as always welcome.
+This series improves zoned block device support (reduce overhead) and
+introduces many simplifications to the code (overall, there are more deletions
+than insertions).
 
-How do we want to funnel this series? 1-3 look separate, so perhaps they
-should go through the scsi tree. Then I can take the rest. Or do some
-of the later ones depend on 1-3 being in, in terms of applying cleanly?
-I can also take all of them, looks like only #3 needs a SCSI ack.
+In more details:
+* Patches 1 to 3 are SCSI side (sd driver) cleanups and improvements reducing
+  the overhead of report zones command execution during disk scan and
+  revalidation.
+* Patches 4 to 9 improve the useability and user API of zoned block devices.
+* Patch 10 is the main part of this series. This patch replaces the
+  REQ_OP_ZONE_REPORT BIO/request operation for executing report zones commands
+  with a block device file operation, removing the need for the command reply
+  payload in-place rewriting in the BIO buffer. This leads to major
+  simplification of the code in many places.
+* Patch 11 further simplifies the code of low level drivers by providing a
+  generic implementation of zoned block device request queue zone bitmaps
+  initialization and revalidation.
+
+Please consider the addition of these patches in 4.20.
+Comments are as always welcome.
+
+Changes from v3:
+* Changed the interface of sd_zbc_check_zones() in patch 3 to return an int and
+  added an argument to return the zone size to avoid potential type overflow
+  with the new int return type.
+
+Changes from v2:
+* Reworked patch 9 to preserve the declaration of struct request_queue nr_zones
+  field being conditional on CONFIG_BLK_DEV_ZONED
+
+Changes from v1:
+* Addressed Christoph's and Bart's comments
+* Fixed several compilation errors with zoned block device support disabled
+* Rebased on latest rc including the most recent dm patches
+
+Christoph Hellwig (1):
+  block: add a report_zones method
+
+Damien Le Moal (10):
+  scsi: sd_zbc: Rearrange code
+  scsi: sd_zbc: Reduce boot device scan and revalidate time
+  scsi: sd_zbc: Fix sd_zbc_check_zones() error checks
+  block: Introduce blkdev_nr_zones() helper
+  block: Limit allocation of zone descriptors for report zones
+  block: Introduce BLKGETZONESZ ioctl
+  block: Introduce BLKGETNRZONES ioctl
+  block: Improve zone reset execution
+  block: Expose queue nr_zones in sysfs
+  block: Introduce blk_revalidate_disk_zones()
+
+ block/blk-core.c               |   1 -
+ block/blk-lib.c                |  13 +-
+ block/blk-mq-debugfs.c         |   1 -
+ block/blk-sysfs.c              |  13 +
+ block/blk-zoned.c              | 359 ++++++++++++++---------
+ block/blk.h                    |   8 +
+ block/ioctl.c                  |   4 +
+ drivers/block/null_blk.h       |  11 +-
+ drivers/block/null_blk_main.c  |  30 +-
+ drivers/block/null_blk_zoned.c |  57 +---
+ drivers/md/dm-flakey.c         |  30 +-
+ drivers/md/dm-linear.c         |  35 ++-
+ drivers/md/dm-table.c          |  10 +
+ drivers/md/dm-zoned-target.c   |   3 +-
+ drivers/md/dm.c                | 169 ++++++-----
+ drivers/scsi/sd.c              |  15 +-
+ drivers/scsi/sd.h              |  15 +-
+ drivers/scsi/sd_zbc.c          | 501 +++++++++------------------------
+ include/linux/blk_types.h      |   2 -
+ include/linux/blkdev.h         |  30 +-
+ include/linux/device-mapper.h  |  12 +-
+ include/trace/events/f2fs.h    |   1 -
+ include/uapi/linux/blkzoned.h  |   3 +
+ 23 files changed, 602 insertions(+), 721 deletions(-)
 
 -- 
-Jens Axboe
+2.17.1
