@@ -8,9 +8,9 @@ To: linux-block@vger.kernel.org,
 	Mike Snitzer <snitzer@redhat.com>
 Cc: Christoph Hellwig <hch@lst.de>,
 	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH v4 00/11] Zoned block device support improvements
-Date: Fri, 12 Oct 2018 19:08:39 +0900
-Message-Id: <20181012100850.23316-1-damien.lemoal@wdc.com>
+Subject: [PATCH v3 00/11] Zoned block device support improvements
+Date: Fri, 12 Oct 2018 11:30:01 +0900
+Message-Id: <20181012023012.29923-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
 This series improves zoned block device support (reduce overhead) and
@@ -33,11 +33,6 @@ In more details:
 
 Please consider the addition of these patches in 4.20.
 Comments are as always welcome.
-
-Changes from v3:
-* Changed the interface of sd_zbc_check_zones() in patch 3 to return an int and
-  added an argument to return the zone size to avoid potential type overflow
-  with the new int return type.
 
 Changes from v2:
 * Reworked patch 9 to preserve the declaration of struct request_queue nr_zones
@@ -67,7 +62,7 @@ Damien Le Moal (10):
  block/blk-lib.c                |  13 +-
  block/blk-mq-debugfs.c         |   1 -
  block/blk-sysfs.c              |  13 +
- block/blk-zoned.c              | 359 ++++++++++++++---------
+ block/blk-zoned.c              | 359 +++++++++++++++---------
  block/blk.h                    |   8 +
  block/ioctl.c                  |   4 +
  drivers/block/null_blk.h       |  11 +-
@@ -80,13 +75,73 @@ Damien Le Moal (10):
  drivers/md/dm.c                | 169 ++++++-----
  drivers/scsi/sd.c              |  15 +-
  drivers/scsi/sd.h              |  15 +-
- drivers/scsi/sd_zbc.c          | 501 +++++++++------------------------
+ drivers/scsi/sd_zbc.c          | 497 +++++++++------------------------
+ include/linux/blk_types.h      |   2 -
+ include/linux/blkdev.h         |  22 +-
+ include/linux/device-mapper.h  |  12 +-
+ include/trace/events/f2fs.h    |   1 -
+ include/uapi/linux/blkzoned.h  |   3 +
+ 23 files changed, 591 insertions(+), 720 deletions(-)
+
+-- 
+2.17.1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Christoph Hellwig (1):
+  block: add a report_zones method
+
+Damien Le Moal (10):
+  scsi: sd_zbc: Rearrange code
+  scsi: sd_zbc: Reduce boot device scan and revalidate time
+  scsi: sd_zbc: Fix sd_zbc_check_zones() error checks
+  block: Introduce blkdev_nr_zones() helper
+  block: Limit allocation of zone descriptors for report zones
+  block: Introduce BLKGETZONESZ ioctl
+  block: Introduce BLKGETNRZONES ioctl
+  block: Improve zone reset execution
+  block: Expose queue nr_zones in sysfs
+  block: Introduce blk_revalidate_disk_zones()
+
+ block/blk-core.c               |   1 -
+ block/blk-lib.c                |  13 +-
+ block/blk-mq-debugfs.c         |   1 -
+ block/blk-sysfs.c              |  13 +
+ block/blk-zoned.c              | 359 +++++++++++++++---------
+ block/blk.h                    |   8 +
+ block/ioctl.c                  |   4 +
+ drivers/block/null_blk.h       |  11 +-
+ drivers/block/null_blk_main.c  |  30 +-
+ drivers/block/null_blk_zoned.c |  57 +---
+ drivers/md/dm-flakey.c         |  30 +-
+ drivers/md/dm-linear.c         |  35 ++-
+ drivers/md/dm-table.c          |  10 +
+ drivers/md/dm-zoned-target.c   |   3 +-
+ drivers/md/dm.c                | 169 ++++++-----
+ drivers/scsi/sd.c              |  15 +-
+ drivers/scsi/sd.h              |  15 +-
+ drivers/scsi/sd_zbc.c          | 497 +++++++++------------------------
  include/linux/blk_types.h      |   2 -
  include/linux/blkdev.h         |  30 +-
  include/linux/device-mapper.h  |  12 +-
  include/trace/events/f2fs.h    |   1 -
  include/uapi/linux/blkzoned.h  |   3 +
- 23 files changed, 602 insertions(+), 721 deletions(-)
+ 23 files changed, 600 insertions(+), 719 deletions(-)
 
 -- 
 2.17.1
