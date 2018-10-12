@@ -1,112 +1,121 @@
-Return-Path: <BATV+8bbc4aa54a9b92872f27+5534+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Joshua Morris <josh.h.morris@us.ibm.com>,
-	Philip Kelleher <pjk1939@linux.vnet.ibm.com>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 3/6] sx8: switch to the generic DMA API
-Date: Thu, 18 Oct 2018 15:15:13 +0200
-Message-Id: <20181018131516.10629-4-hch@lst.de>
-In-Reply-To: <20181018131516.10629-1-hch@lst.de>
-References: <20181018131516.10629-1-hch@lst.de>
-MIME-Version: 1.0
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
+To: axboe@kernel.dk
+Cc: keith.busch@linux.intel.com, ming.lei@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH V2 1/4] blk-mq: adjust debugfs and sysfs register when updating nr_hw_queues
+Date: Fri, 12 Oct 2018 18:07:25 +0800
+Message-Id: <1539338848-1789-2-git-send-email-jianchao.w.wang@oracle.com>
+In-Reply-To: <1539338848-1789-1-git-send-email-jianchao.w.wang@oracle.com>
+References: <1539338848-1789-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The PCI DMA API is deprecated, switch to the generic DMA API instead.
+blk-mq debugfs and sysfs entries need to be removed before updating
+queue map, otherwise, we get get wrong result there. This patch fixes
+it and remove the redundant debugfs and sysfs register/unregister
+operations during __blk_mq_update_nr_hw_queues.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/sx8.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ block/blk-mq.c | 39 ++++++++++++---------------------------
+ 1 file changed, 12 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/block/sx8.c b/drivers/block/sx8.c
-index 377c17e106c3..064b8c5c7a32 100644
---- a/drivers/block/sx8.c
-+++ b/drivers/block/sx8.c
-@@ -861,9 +861,9 @@ static blk_status_t carm_queue_rq(struct blk_mq_hw_ctx *hctx,
- 
- 	if (rq_data_dir(rq) == WRITE) {
- 		writing = 1;
--		pci_dir = PCI_DMA_TODEVICE;
-+		pci_dir = DMA_TO_DEVICE;
- 	} else {
--		pci_dir = PCI_DMA_FROMDEVICE;
-+		pci_dir = DMA_FROM_DEVICE;
- 	}
- 
- 	/* get scatterlist from block layer */
-@@ -877,7 +877,7 @@ static blk_status_t carm_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	}
- 
- 	/* map scatterlist to PCI bus addresses */
--	n_elem = pci_map_sg(host->pdev, sg, n_elem, pci_dir);
-+	n_elem = dma_map_sg(&host->pdev->dev, sg, n_elem, pci_dir);
- 	if (n_elem <= 0) {
- 		/* request with no s/g entries? */
- 		carm_end_rq(host, crq, BLK_STS_IOERR);
-@@ -1058,11 +1058,11 @@ static inline void carm_handle_rw(struct carm_host *host,
- 	VPRINTK("ENTER\n");
- 
- 	if (rq_data_dir(crq->rq) == WRITE)
--		pci_dir = PCI_DMA_TODEVICE;
-+		pci_dir = DMA_TO_DEVICE;
- 	else
--		pci_dir = PCI_DMA_FROMDEVICE;
-+		pci_dir = DMA_FROM_DEVICE;
- 
--	pci_unmap_sg(host->pdev, &crq->sg[0], crq->n_elem, pci_dir);
-+	dma_unmap_sg(&host->pdev->dev, &crq->sg[0], crq->n_elem, pci_dir);
- 
- 	carm_end_rq(host, crq, error);
- }
-@@ -1567,8 +1567,8 @@ static void carm_free_disks(struct carm_host *host)
- 
- static int carm_init_shm(struct carm_host *host)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e3c39ea..32be432 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2137,8 +2137,6 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+ 		struct blk_mq_tag_set *set,
+ 		struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
  {
--	host->shm = pci_alloc_consistent(host->pdev, CARM_SHM_SIZE,
--					 &host->shm_dma);
-+	host->shm = dma_alloc_coherent(&host->pdev->dev, CARM_SHM_SIZE,
-+				       &host->shm_dma, GFP_KERNEL);
- 	if (!host->shm)
- 		return -ENOMEM;
+-	blk_mq_debugfs_unregister_hctx(hctx);
+-
+ 	if (blk_mq_hw_queue_mapped(hctx))
+ 		blk_mq_tag_idle(hctx);
  
-@@ -1598,7 +1598,7 @@ static int carm_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (rc)
- 		goto err_out;
- 
--	rc = pci_set_dma_mask(pdev, DMA_BIT_MASK(32));
-+	rc = dma_set_mask(&pdev->dev, DMA_BIT_MASK(32));
- 	if (rc) {
- 		printk(KERN_ERR DRV_NAME "(%s): DMA mask failure\n",
- 			pci_name(pdev));
-@@ -1643,7 +1643,7 @@ static int carm_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
- 		printk(KERN_ERR DRV_NAME "(%s): OOB queue alloc failure\n",
- 		       pci_name(pdev));
- 		rc = PTR_ERR(q);
--		goto err_out_pci_free;
-+		goto err_out_dma_free;
+@@ -2165,6 +2163,7 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (i == nr_queue)
+ 			break;
++		blk_mq_debugfs_unregister_hctx(hctx);
+ 		blk_mq_exit_hctx(q, set, hctx, i);
  	}
- 	host->oob_q = q;
- 	q->queuedata = host;
-@@ -1708,8 +1708,8 @@ static int carm_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
- 		clear_bit(1, &carm_major_alloc);
- 	blk_cleanup_queue(host->oob_q);
- 	blk_mq_free_tag_set(&host->tag_set);
--err_out_pci_free:
--	pci_free_consistent(pdev, CARM_SHM_SIZE, host->shm, host->shm_dma);
-+err_out_dma_free:
-+	dma_free_coherent(&pdev->dev, CARM_SHM_SIZE, host->shm, host->shm_dma);
- err_out_iounmap:
- 	iounmap(host->mmio);
- err_out_kfree:
-@@ -1740,7 +1740,7 @@ static void carm_remove_one (struct pci_dev *pdev)
- 		clear_bit(1, &carm_major_alloc);
- 	blk_cleanup_queue(host->oob_q);
- 	blk_mq_free_tag_set(&host->tag_set);
--	pci_free_consistent(pdev, CARM_SHM_SIZE, host->shm, host->shm_dma);
-+	dma_free_coherent(&pdev->dev, CARM_SHM_SIZE, host->shm, host->shm_dma);
- 	iounmap(host->mmio);
- 	kfree(host);
- 	pci_release_regions(pdev);
+ }
+@@ -2222,8 +2221,6 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 	if (hctx->flags & BLK_MQ_F_BLOCKING)
+ 		init_srcu_struct(hctx->srcu);
+ 
+-	blk_mq_debugfs_register_hctx(q, hctx);
+-
+ 	return 0;
+ 
+  free_fq:
+@@ -2512,8 +2509,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 	int i, j;
+ 	struct blk_mq_hw_ctx **hctxs = q->queue_hw_ctx;
+ 
+-	blk_mq_sysfs_unregister(q);
+-
+ 	/* protect against switching io scheduler  */
+ 	mutex_lock(&q->sysfs_lock);
+ 	for (i = 0; i < set->nr_hw_queues; i++) {
+@@ -2561,7 +2556,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 	}
+ 	q->nr_hw_queues = i;
+ 	mutex_unlock(&q->sysfs_lock);
+-	blk_mq_sysfs_register(q);
+ }
+ 
+ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+@@ -2659,25 +2653,6 @@ void blk_mq_free_queue(struct request_queue *q)
+ 	blk_mq_exit_hw_queues(q, set, set->nr_hw_queues);
+ }
+ 
+-/* Basically redo blk_mq_init_queue with queue frozen */
+-static void blk_mq_queue_reinit(struct request_queue *q)
+-{
+-	WARN_ON_ONCE(!atomic_read(&q->mq_freeze_depth));
+-
+-	blk_mq_debugfs_unregister_hctxs(q);
+-	blk_mq_sysfs_unregister(q);
+-
+-	/*
+-	 * redo blk_mq_init_cpu_queues and blk_mq_init_hw_queues. FIXME: maybe
+-	 * we should change hctx numa_node according to the new topology (this
+-	 * involves freeing and re-allocating memory, worth doing?)
+-	 */
+-	blk_mq_map_swqueue(q);
+-
+-	blk_mq_sysfs_register(q);
+-	blk_mq_debugfs_register_hctxs(q);
+-}
+-
+ static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+ {
+ 	int i;
+@@ -2987,11 +2962,21 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 		if (!blk_mq_elv_switch_none(&head, q))
+ 			goto switch_back;
+ 
++	list_for_each_entry(q, &set->tag_list, tag_set_list) {
++		blk_mq_debugfs_unregister_hctxs(q);
++		blk_mq_sysfs_unregister(q);
++	}
++
+ 	set->nr_hw_queues = nr_hw_queues;
+ 	blk_mq_update_queue_map(set);
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+ 		blk_mq_realloc_hw_ctxs(set, q);
+-		blk_mq_queue_reinit(q);
++		blk_mq_map_swqueue(q);
++	}
++
++	list_for_each_entry(q, &set->tag_list, tag_set_list) {
++		blk_mq_sysfs_register(q);
++		blk_mq_debugfs_register_hctxs(q);
+ 	}
+ 
+ switch_back:
 -- 
-2.19.1
+2.7.4
