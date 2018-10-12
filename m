@@ -1,203 +1,178 @@
-Return-Path: <christophe.leroy@c-s.fr>
-Message-Id: <6532741ae2f897815cba0ae5260b8d37b8eb04a8.1539092112.git.christophe.leroy@c-s.fr>
-In-Reply-To: <cover.1539092111.git.christophe.leroy@c-s.fr>
-References: <cover.1539092111.git.christophe.leroy@c-s.fr>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v3 16/24] powerpc/book3s/32: do not include pte-common.h
-To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
-Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
-Date: Tue,  9 Oct 2018 13:52:04 +0000 (UTC)
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-eopbgr680056.outbound.protection.outlook.com ([40.107.68.56]:59642
+        "EHLO NAM04-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726917AbeJLTE6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Oct 2018 15:04:58 -0400
+From: Javier Gonzalez <javier@cnexlabs.com>
+To: Igor Konopko <igor.j.konopko@intel.com>
+CC: "mb@lightnvm.io" <mb@lightnvm.io>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "marcin.dziegielewski@intel.com" <marcin.dziegielewski@intel.com>
+Subject: Re: [PATCH 1/5] lightnvm: pblk: Do not reuse DMA memory on partial
+ read
+Date: Fri, 12 Oct 2018 11:32:50 +0000
+Message-ID: <30166CF3-15A5-43A6-BC13-5A98D8F8F23A@cnexlabs.com>
+References: <20181005133437.25255-1-igor.j.konopko@intel.com>
+ <20181005133437.25255-2-igor.j.konopko@intel.com>
+In-Reply-To: <20181005133437.25255-2-igor.j.konopko@intel.com>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_911BD43D-DA43-47D2-AC46-937C6152FBC7";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha512
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-As done for book3s/64, add necessary flags/defines in
-book3s/32/pgtable.h and do not include pte-common.h
+--Apple-Mail=_911BD43D-DA43-47D2-AC46-937C6152FBC7
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
 
-It allows in the meantime to remove all related hash
-definitions from pte-common.h and to also remove
-_PAGE_EXEC default as _PAGE_EXEC is defined on all
-platforms except book3s/32.
+> On 5 Oct 2018, at 15.34, Igor Konopko <igor.j.konopko@intel.com> =
+wrote:
+>=20
+> Currently DMA allocated memory is reused on partial read
+> path for some internal pblk structs. In preparation for
+> dynamic DMA pool sizes we need to change it to kmalloc
+> allocated memory.
+>=20
+> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+> ---
+> drivers/lightnvm/pblk-read.c | 20 +++++---------------
+> drivers/lightnvm/pblk.h      |  2 ++
+> 2 files changed, 7 insertions(+), 15 deletions(-)
+>=20
+> diff --git a/drivers/lightnvm/pblk-read.c =
+b/drivers/lightnvm/pblk-read.c
+> index d340dece1d00..08f6ebd4bc48 100644
+> --- a/drivers/lightnvm/pblk-read.c
+> +++ b/drivers/lightnvm/pblk-read.c
+> @@ -224,7 +224,6 @@ static void pblk_end_partial_read(struct nvm_rq =
+*rqd)
+> 	unsigned long *read_bitmap =3D pr_ctx->bitmap;
+> 	int nr_secs =3D pr_ctx->orig_nr_secs;
+> 	int nr_holes =3D nr_secs - bitmap_weight(read_bitmap, nr_secs);
+> -	__le64 *lba_list_mem, *lba_list_media;
+> 	void *src_p, *dst_p;
+> 	int hole, i;
+>=20
+> @@ -237,13 +236,9 @@ static void pblk_end_partial_read(struct nvm_rq =
+*rqd)
+> 		rqd->ppa_list[0] =3D ppa;
+> 	}
+>=20
+> -	/* Re-use allocated memory for intermediate lbas */
+> -	lba_list_mem =3D (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
+> -	lba_list_media =3D (((void *)rqd->ppa_list) + 2 * =
+pblk_dma_ppa_size);
+> -
+> 	for (i =3D 0; i < nr_secs; i++) {
+> -		lba_list_media[i] =3D meta_list[i].lba;
+> -		meta_list[i].lba =3D lba_list_mem[i];
+> +		pr_ctx->lba_list_media[i] =3D meta_list[i].lba;
+> +		meta_list[i].lba =3D pr_ctx->lba_list_mem[i];
+> 	}
+>=20
+> 	/* Fill the holes in the original bio */
+> @@ -255,7 +250,7 @@ static void pblk_end_partial_read(struct nvm_rq =
+*rqd)
+> 		line =3D pblk_ppa_to_line(pblk, rqd->ppa_list[i]);
+> 		kref_put(&line->ref, pblk_line_put);
+>=20
+> -		meta_list[hole].lba =3D lba_list_media[i];
+> +		meta_list[hole].lba =3D pr_ctx->lba_list_media[i];
+>=20
+> 		src_bv =3D new_bio->bi_io_vec[i++];
+> 		dst_bv =3D bio->bi_io_vec[bio_init_idx + hole];
+> @@ -295,13 +290,9 @@ static int pblk_setup_partial_read(struct pblk =
+*pblk, struct nvm_rq *rqd,
+> 	struct pblk_g_ctx *r_ctx =3D nvm_rq_to_pdu(rqd);
+> 	struct pblk_pr_ctx *pr_ctx;
+> 	struct bio *new_bio, *bio =3D r_ctx->private;
+> -	__le64 *lba_list_mem;
+> 	int nr_secs =3D rqd->nr_ppas;
+> 	int i;
+>=20
+> -	/* Re-use allocated memory for intermediate lbas */
+> -	lba_list_mem =3D (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
+> -
+> 	new_bio =3D bio_alloc(GFP_KERNEL, nr_holes);
+>=20
+> 	if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
+> @@ -312,12 +303,12 @@ static int pblk_setup_partial_read(struct pblk =
+*pblk, struct nvm_rq *rqd,
+> 		goto fail_free_pages;
+> 	}
+>=20
+> -	pr_ctx =3D kmalloc(sizeof(struct pblk_pr_ctx), GFP_KERNEL);
+> +	pr_ctx =3D kzalloc(sizeof(struct pblk_pr_ctx), GFP_KERNEL);
+> 	if (!pr_ctx)
+> 		goto fail_free_pages;
+>=20
+> 	for (i =3D 0; i < nr_secs; i++)
+> -		lba_list_mem[i] =3D meta_list[i].lba;
+> +		pr_ctx->lba_list_mem[i] =3D meta_list[i].lba;
+>=20
+> 	new_bio->bi_iter.bi_sector =3D 0; /* internal bio */
+> 	bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
+> @@ -325,7 +316,6 @@ static int pblk_setup_partial_read(struct pblk =
+*pblk, struct nvm_rq *rqd,
+> 	rqd->bio =3D new_bio;
+> 	rqd->nr_ppas =3D nr_holes;
+>=20
+> -	pr_ctx->ppa_ptr =3D NULL;
+> 	pr_ctx->orig_bio =3D bio;
+> 	bitmap_copy(pr_ctx->bitmap, read_bitmap, NVM_MAX_VLBA);
+> 	pr_ctx->bio_init_idx =3D bio_init_idx;
+> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+> index 0f98ea24ee59..aea09879636f 100644
+> --- a/drivers/lightnvm/pblk.h
+> +++ b/drivers/lightnvm/pblk.h
+> @@ -132,6 +132,8 @@ struct pblk_pr_ctx {
+> 	unsigned int bio_init_idx;
+> 	void *ppa_ptr;
+> 	dma_addr_t dma_ppa_list;
+> +	__le64 lba_list_mem[NVM_MAX_VLBA];
+> +	__le64 lba_list_media[NVM_MAX_VLBA];
+> };
+>=20
+> /* Pad context */
+> --
+> 2.17.1
 
-Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
----
- arch/powerpc/include/asm/book3s/32/pgtable.h | 97 ++++++++++++++++++++++++++--
- arch/powerpc/include/asm/pte-common.h        | 16 +----
- 2 files changed, 96 insertions(+), 17 deletions(-)
+The patch looks good but the commit message is a bit confusing, as it
+implies that we do specific allocations for the lba and meta lists, when
+in reality the patch extends the partial context with a fixed
+NVM_MAX_VLBA length.
 
-diff --git a/arch/powerpc/include/asm/book3s/32/pgtable.h b/arch/powerpc/include/asm/book3s/32/pgtable.h
-index a0dc3a3eef33..c28e8c6a27c2 100644
---- a/arch/powerpc/include/asm/book3s/32/pgtable.h
-+++ b/arch/powerpc/include/asm/book3s/32/pgtable.h
-@@ -8,7 +8,97 @@
- #include <asm/book3s/32/hash.h>
- 
- /* And here we include common definitions */
--#include <asm/pte-common.h>
-+
-+#define _PAGE_KERNEL_RO		0
-+#define _PAGE_KERNEL_ROX	0
-+#define _PAGE_KERNEL_RW		(_PAGE_DIRTY | _PAGE_RW)
-+#define _PAGE_KERNEL_RWX	(_PAGE_DIRTY | _PAGE_RW)
-+
-+#define _PAGE_HPTEFLAGS _PAGE_HASHPTE
-+
-+#ifndef __ASSEMBLY__
-+
-+static inline bool pte_user(pte_t pte)
-+{
-+	return pte_val(pte) & _PAGE_USER;
-+}
-+#endif /* __ASSEMBLY__ */
-+
-+/* Location of the PFN in the PTE. Most 32-bit platforms use the same
-+ * as _PAGE_SHIFT here (ie, naturally aligned).
-+ * Platform who don't just pre-define the value so we don't override it here
-+ */
-+#define PTE_RPN_SHIFT	(PAGE_SHIFT)
-+
-+/* The mask covered by the RPN must be a ULL on 32-bit platforms with
-+ * 64-bit PTEs
-+ */
-+#ifdef CONFIG_PTE_64BIT
-+#define PTE_RPN_MASK	(~((1ULL << PTE_RPN_SHIFT) - 1))
-+#else
-+#define PTE_RPN_MASK	(~((1UL << PTE_RPN_SHIFT) - 1))
-+#endif
-+
-+/* _PAGE_CHG_MASK masks of bits that are to be preserved across
-+ * pgprot changes
-+ */
-+#define _PAGE_CHG_MASK	(PTE_RPN_MASK | _PAGE_HASHPTE | _PAGE_DIRTY | \
-+			 _PAGE_ACCESSED | _PAGE_SPECIAL)
-+
-+/* Mask of bits returned by pte_pgprot() */
-+#define PAGE_PROT_BITS	(_PAGE_GUARDED | _PAGE_COHERENT | _PAGE_NO_CACHE | \
-+			 _PAGE_WRITETHRU | _PAGE_USER | _PAGE_ACCESSED | \
-+			 _PAGE_RW | _PAGE_DIRTY)
-+
-+/*
-+ * We define 2 sets of base prot bits, one for basic pages (ie,
-+ * cacheable kernel and user pages) and one for non cacheable
-+ * pages. We always set _PAGE_COHERENT when SMP is enabled or
-+ * the processor might need it for DMA coherency.
-+ */
-+#define _PAGE_BASE_NC	(_PAGE_PRESENT | _PAGE_ACCESSED)
-+#define _PAGE_BASE	(_PAGE_BASE_NC | _PAGE_COHERENT)
-+
-+/* Permission masks used to generate the __P and __S table,
-+ *
-+ * Note:__pgprot is defined in arch/powerpc/include/asm/page.h
-+ *
-+ * Write permissions imply read permissions for now.
-+ */
-+#define PAGE_NONE	__pgprot(_PAGE_BASE)
-+#define PAGE_SHARED	__pgprot(_PAGE_BASE | _PAGE_USER | _PAGE_RW)
-+#define PAGE_SHARED_X	__pgprot(_PAGE_BASE | _PAGE_USER | _PAGE_RW)
-+#define PAGE_COPY	__pgprot(_PAGE_BASE | _PAGE_USER)
-+#define PAGE_COPY_X	__pgprot(_PAGE_BASE | _PAGE_USER)
-+#define PAGE_READONLY	__pgprot(_PAGE_BASE | _PAGE_USER)
-+#define PAGE_READONLY_X	__pgprot(_PAGE_BASE | _PAGE_USER)
-+
-+/* Permission masks used for kernel mappings */
-+#define PAGE_KERNEL	__pgprot(_PAGE_BASE | _PAGE_KERNEL_RW)
-+#define PAGE_KERNEL_NC	__pgprot(_PAGE_BASE_NC | _PAGE_KERNEL_RW | _PAGE_NO_CACHE)
-+#define PAGE_KERNEL_NCG	__pgprot(_PAGE_BASE_NC | _PAGE_KERNEL_RW | \
-+				 _PAGE_NO_CACHE | _PAGE_GUARDED)
-+#define PAGE_KERNEL_X	__pgprot(_PAGE_BASE | _PAGE_KERNEL_RWX)
-+#define PAGE_KERNEL_RO	__pgprot(_PAGE_BASE | _PAGE_KERNEL_RO)
-+#define PAGE_KERNEL_ROX	__pgprot(_PAGE_BASE | _PAGE_KERNEL_ROX)
-+
-+/* Protection used for kernel text. We want the debuggers to be able to
-+ * set breakpoints anywhere, so don't write protect the kernel text
-+ * on platforms where such control is possible.
-+ */
-+#if defined(CONFIG_KGDB) || defined(CONFIG_XMON) || defined(CONFIG_BDI_SWITCH) ||\
-+	defined(CONFIG_KPROBES) || defined(CONFIG_DYNAMIC_FTRACE)
-+#define PAGE_KERNEL_TEXT	PAGE_KERNEL_X
-+#else
-+#define PAGE_KERNEL_TEXT	PAGE_KERNEL_ROX
-+#endif
-+
-+/* Make modules code happy. We don't set RO yet */
-+#define PAGE_KERNEL_EXEC	PAGE_KERNEL_X
-+
-+/* Advertise special mapping type for AGP */
-+#define PAGE_AGP		(PAGE_KERNEL_NC)
-+#define HAVE_PAGE_AGP
- 
- #define PTE_INDEX_SIZE	PTE_SHIFT
- #define PMD_INDEX_SIZE	0
-@@ -219,7 +309,7 @@ static inline pte_t ptep_get_and_clear(struct mm_struct *mm, unsigned long addr,
- static inline void ptep_set_wrprotect(struct mm_struct *mm, unsigned long addr,
- 				      pte_t *ptep)
- {
--	pte_update(ptep, (_PAGE_RW | _PAGE_HWWRITE), _PAGE_RO);
-+	pte_update(ptep, _PAGE_RW, 0);
- }
- static inline void huge_ptep_set_wrprotect(struct mm_struct *mm,
- 					   unsigned long addr, pte_t *ptep)
-@@ -235,9 +325,8 @@ static inline void __ptep_set_access_flags(struct vm_area_struct *vma,
- {
- 	unsigned long set = pte_val(entry) &
- 		(_PAGE_DIRTY | _PAGE_ACCESSED | _PAGE_RW);
--	unsigned long clr = ~pte_val(entry) & _PAGE_RO;
- 
--	pte_update(ptep, clr, set);
-+	pte_update(ptep, 0, set);
- 
- 	flush_tlb_page(vma, address);
- }
-diff --git a/arch/powerpc/include/asm/pte-common.h b/arch/powerpc/include/asm/pte-common.h
-index 4860dae76dae..3a8ec18ffd22 100644
---- a/arch/powerpc/include/asm/pte-common.h
-+++ b/arch/powerpc/include/asm/pte-common.h
-@@ -5,15 +5,9 @@
-  * Some bits are only used on some cpu families... Make sure that all
-  * the undefined gets a sensible default
-  */
--#ifndef _PAGE_HASHPTE
--#define _PAGE_HASHPTE	0
--#endif
- #ifndef _PAGE_HWWRITE
- #define _PAGE_HWWRITE	0
- #endif
--#ifndef _PAGE_EXEC
--#define _PAGE_EXEC	0
--#endif
- #ifndef _PAGE_COHERENT
- #define _PAGE_COHERENT	0
- #endif
-@@ -68,11 +62,8 @@
- #define _PAGE_KERNEL_RWX	(_PAGE_PRIVILEGED | _PAGE_DIRTY | _PAGE_RW | \
- 				 _PAGE_HWWRITE | _PAGE_EXEC)
- #endif
--#ifndef _PAGE_HPTEFLAGS
--#define _PAGE_HPTEFLAGS _PAGE_HASHPTE
--#endif
- #ifndef _PTE_NONE_MASK
--#define _PTE_NONE_MASK	_PAGE_HPTEFLAGS
-+#define _PTE_NONE_MASK	0
- #endif
- 
- #ifndef __ASSEMBLY__
-@@ -108,7 +99,7 @@ static inline bool pte_user(pte_t pte)
- /* _PAGE_CHG_MASK masks of bits that are to be preserved across
-  * pgprot changes
-  */
--#define _PAGE_CHG_MASK	(PTE_RPN_MASK | _PAGE_HPTEFLAGS | _PAGE_DIRTY | \
-+#define _PAGE_CHG_MASK	(PTE_RPN_MASK | _PAGE_DIRTY | \
-                          _PAGE_ACCESSED | _PAGE_SPECIAL)
- 
- /* Mask of bits returned by pte_pgprot() */
-@@ -125,8 +116,7 @@ static inline bool pte_user(pte_t pte)
-  * the processor might need it for DMA coherency.
-  */
- #define _PAGE_BASE_NC	(_PAGE_PRESENT | _PAGE_ACCESSED | _PAGE_PSIZE)
--#if defined(CONFIG_SMP) || defined(CONFIG_PPC_STD_MMU) || \
--	defined(CONFIG_PPC_E500MC)
-+#if defined(CONFIG_SMP) || defined(CONFIG_PPC_E500MC)
- #define _PAGE_BASE	(_PAGE_BASE_NC | _PAGE_COHERENT)
- #else
- #define _PAGE_BASE	(_PAGE_BASE_NC)
--- 
-2.13.3
+It would help if you can make this clear on V2
+
+Javier
+
+--Apple-Mail=_911BD43D-DA43-47D2-AC46-937C6152FBC7
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAlvAhmEACgkQIX4xUKFR
+nnRs2BAAnoc0dTuvovZB6cZel0dyH/gn/om1Z57gX2BWfu1A8afjVht9OjnxmoD8
+qrYE4iW5pZbbDiS+BenP6GSrz5EfLoPo4wlL9sSNok0zMzsfW3c69Vi3I60yG4ld
+uzN3/HkJBH01DT25U/G23wVMVg30IU7mTiwHpG8x2CKWv8gOhZ+2OORCeMUsuGe1
+J8BgIMExlyLcxdjtBUr7OVBCGP7oRSs2DMVyxQ2i2sRml2x6uA0jK5W6w8Xv+rqi
+UJBE7XvOLJFdylFwNK/9qjNLEiXA/fEld5gGrgyUNTEhse9D2gmXwE71eO9MOfeZ
+bmkNKEAAjaf9y8PtoDcnQIHzqu/jW0U3WFXBgpZqdTKunHyRoGSfojXEY2M15C/+
+b/4Kf2QBurEn3NGrhqSG6yHwRU4l4IihFYewb4T3PomVug70tjh9yNfUo9VRHxGl
+7VUO/E8ItWsdeEChHfbEI9GH7Y5bdQ6Kg2iqPaYp8h7PLAWEBdBREGHaMi30J6J5
+gun/e9P1t2BEJc0CYxFUPWXn6fEZC/CZd832UzQ3cMa5gaSUAJ3snaGUOdVQZsDa
+EKvwF4CeTsqyZv2NPsr6cRhxlAOQSDAURXWz8TSFYGSOBUv+5HPkPi9QXNHuU+7L
+7dCkbD1DaSzUjiTfwFpYjggTyyhDA7K6Uk5dJ33yaEmUbWESwuc=
+=0b7/
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_911BD43D-DA43-47D2-AC46-937C6152FBC7--
