@@ -1,240 +1,103 @@
-Return-Path: <christophe.leroy@c-s.fr>
-Message-Id: <52bd80b06bae0d854d04501e1e136575b77fa9fa.1539092111.git.christophe.leroy@c-s.fr>
-In-Reply-To: <cover.1539092111.git.christophe.leroy@c-s.fr>
-References: <cover.1539092111.git.christophe.leroy@c-s.fr>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v3 06/24] powerpc/mm: properly set PAGE_KERNEL flags in
- ioremap()
-To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
-Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
-Date: Tue,  9 Oct 2018 13:51:43 +0000 (UTC)
+Return-Path: <prvs=816489328=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	dm-devel@redhat.com,
+	Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Matias Bjorling <matias.bjorling@wdc.com>
+Subject: [PATCH v4 09/11] block: Expose queue nr_zones in sysfs
+Date: Fri, 12 Oct 2018 19:08:48 +0900
+Message-Id: <20181012100850.23316-10-damien.lemoal@wdc.com>
+In-Reply-To: <20181012100850.23316-1-damien.lemoal@wdc.com>
+References: <20181012100850.23316-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Set PAGE_KERNEL directly in the caller and do not rely on a
-hack adding PAGE_KERNEL flags when _PAGE_PRESENT is not set.
+Expose through sysfs the nr_zones field of struct request_queue.
+Exposing this value helps in debugging disk issues as well as
+facilitating scripts based use of the disk (e.g. blktests).
 
-As already done for PPC64, use pgprot_cache() helpers instead of
-_PAGE_XXX flags in PPC32 ioremap() derived functions.
+For zoned block devices, the nr_zones field indicates the total number
+of zones of the device calculated using the known disk capacity and
+zone size. This number of zones is always 0 for regular block devices.
 
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+Since nr_zones is defined conditionally with CONFIG_BLK_DEV_ZONED,
+introduce the blk_queue_nr_zones() function to return the correct value
+for any device, regardless if CONFIG_BLK_DEV_ZONED is set.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- arch/powerpc/include/asm/nohash/pgtable.h |  2 ++
- arch/powerpc/kernel/isa-bridge.c          |  6 +++---
- arch/powerpc/kernel/pci_64.c              |  2 +-
- arch/powerpc/mm/pgtable_32.c              | 28 ++++++++++++----------------
- arch/powerpc/mm/pgtable_64.c              | 10 +++-------
- arch/powerpc/platforms/4xx/ocm.c          |  7 ++-----
- drivers/pcmcia/electra_cf.c               |  2 +-
- 7 files changed, 24 insertions(+), 33 deletions(-)
+ block/blk-sysfs.c      | 11 +++++++++++
+ include/linux/blkdev.h | 10 ++++++++++
+ 2 files changed, 21 insertions(+)
 
-diff --git a/arch/powerpc/include/asm/nohash/pgtable.h b/arch/powerpc/include/asm/nohash/pgtable.h
-index b321c82b3624..5b82e44c4231 100644
---- a/arch/powerpc/include/asm/nohash/pgtable.h
-+++ b/arch/powerpc/include/asm/nohash/pgtable.h
-@@ -197,6 +197,8 @@ extern int ptep_set_access_flags(struct vm_area_struct *vma, unsigned long addre
- #if _PAGE_WRITETHRU != 0
- #define pgprot_cached_wthru(prot) (__pgprot((pgprot_val(prot) & ~_PAGE_CACHE_CTL) | \
- 				            _PAGE_COHERENT | _PAGE_WRITETHRU))
-+#else
-+#define pgprot_cached_wthru(prot)	pgprot_noncached(prot)
- #endif
- 
- #define pgprot_cached_noncoherent(prot) \
-diff --git a/arch/powerpc/kernel/isa-bridge.c b/arch/powerpc/kernel/isa-bridge.c
-index 1df6c74aa731..072e384f8c86 100644
---- a/arch/powerpc/kernel/isa-bridge.c
-+++ b/arch/powerpc/kernel/isa-bridge.c
-@@ -110,14 +110,14 @@ static void pci_process_ISA_OF_ranges(struct device_node *isa_node,
- 		size = 0x10000;
- 
- 	__ioremap_at(phb_io_base_phys, (void *)ISA_IO_BASE,
--		     size, pgprot_val(pgprot_noncached(__pgprot(0))));
-+		     size, pgprot_val(pgprot_noncached(PAGE_KERNEL)));
- 	return;
- 
- inval_range:
- 	printk(KERN_ERR "no ISA IO ranges or unexpected isa range, "
- 	       "mapping 64k\n");
- 	__ioremap_at(phb_io_base_phys, (void *)ISA_IO_BASE,
--		     0x10000, pgprot_val(pgprot_noncached(__pgprot(0))));
-+		     0x10000, pgprot_val(pgprot_noncached(PAGE_KERNEL)));
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 3772671cf2bc..92be8092ca4f 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -300,6 +300,11 @@ static ssize_t queue_zoned_show(struct request_queue *q, char *page)
+ 	}
  }
  
- 
-@@ -253,7 +253,7 @@ void __init isa_bridge_init_non_pci(struct device_node *np)
- 	 */
- 	isa_io_base = ISA_IO_BASE;
- 	__ioremap_at(pbase, (void *)ISA_IO_BASE,
--		     size, pgprot_val(pgprot_noncached(__pgprot(0))));
-+		     size, pgprot_val(pgprot_noncached(PAGE_KERNEL)));
- 
- 	pr_debug("ISA: Non-PCI bridge is %pOF\n", np);
- }
-diff --git a/arch/powerpc/kernel/pci_64.c b/arch/powerpc/kernel/pci_64.c
-index dff28f903512..64bb4dd2b8f1 100644
---- a/arch/powerpc/kernel/pci_64.c
-+++ b/arch/powerpc/kernel/pci_64.c
-@@ -159,7 +159,7 @@ static int pcibios_map_phb_io_space(struct pci_controller *hose)
- 
- 	/* Establish the mapping */
- 	if (__ioremap_at(phys_page, area->addr, size_page,
--			 pgprot_val(pgprot_noncached(__pgprot(0)))) == NULL)
-+			 pgprot_val(pgprot_noncached(PAGE_KERNEL))) == NULL)
- 		return -ENOMEM;
- 
- 	/* Fixup hose IO resource */
-diff --git a/arch/powerpc/mm/pgtable_32.c b/arch/powerpc/mm/pgtable_32.c
-index 4c3adde09d95..6a81a2446c47 100644
---- a/arch/powerpc/mm/pgtable_32.c
-+++ b/arch/powerpc/mm/pgtable_32.c
-@@ -76,32 +76,36 @@ pgtable_t pte_alloc_one(struct mm_struct *mm, unsigned long address)
- void __iomem *
- ioremap(phys_addr_t addr, unsigned long size)
- {
--	return __ioremap_caller(addr, size, _PAGE_NO_CACHE | _PAGE_GUARDED,
--				__builtin_return_address(0));
-+	unsigned long flags = pgprot_val(pgprot_noncached(PAGE_KERNEL));
++static ssize_t queue_nr_zones_show(struct request_queue *q, char *page)
++{
++	return queue_var_show(blk_queue_nr_zones(q), page);
++}
 +
-+	return __ioremap_caller(addr, size, flags, __builtin_return_address(0));
- }
- EXPORT_SYMBOL(ioremap);
- 
- void __iomem *
- ioremap_wc(phys_addr_t addr, unsigned long size)
+ static ssize_t queue_nomerges_show(struct request_queue *q, char *page)
  {
--	return __ioremap_caller(addr, size, _PAGE_NO_CACHE,
--				__builtin_return_address(0));
-+	unsigned long flags = pgprot_val(pgprot_noncached_wc(PAGE_KERNEL));
+ 	return queue_var_show((blk_queue_nomerges(q) << 1) |
+@@ -637,6 +642,11 @@ static struct queue_sysfs_entry queue_zoned_entry = {
+ 	.show = queue_zoned_show,
+ };
+ 
++static struct queue_sysfs_entry queue_nr_zones_entry = {
++	.attr = {.name = "nr_zones", .mode = 0444 },
++	.show = queue_nr_zones_show,
++};
 +
-+	return __ioremap_caller(addr, size, flags, __builtin_return_address(0));
+ static struct queue_sysfs_entry queue_nomerges_entry = {
+ 	.attr = {.name = "nomerges", .mode = 0644 },
+ 	.show = queue_nomerges_show,
+@@ -727,6 +737,7 @@ static struct attribute *default_attrs[] = {
+ 	&queue_write_zeroes_max_entry.attr,
+ 	&queue_nonrot_entry.attr,
+ 	&queue_zoned_entry.attr,
++	&queue_nr_zones_entry.attr,
+ 	&queue_nomerges_entry.attr,
+ 	&queue_rq_affinity_entry.attr,
+ 	&queue_iostats_entry.attr,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index c24969b1741b..879753b10263 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -804,6 +804,11 @@ static inline unsigned int blk_queue_zone_sectors(struct request_queue *q)
  }
- EXPORT_SYMBOL(ioremap_wc);
  
- void __iomem *
- ioremap_wt(phys_addr_t addr, unsigned long size)
- {
--	return __ioremap_caller(addr, size, _PAGE_WRITETHRU,
--				__builtin_return_address(0));
-+	unsigned long flags = pgprot_val(pgprot_cached_wthru(PAGE_KERNEL));
+ #ifdef CONFIG_BLK_DEV_ZONED
++static inline unsigned int blk_queue_nr_zones(struct request_queue *q)
++{
++	return blk_queue_is_zoned(q) ? q->nr_zones : 0;
++}
 +
-+	return __ioremap_caller(addr, size, flags, __builtin_return_address(0));
+ static inline unsigned int blk_queue_zone_no(struct request_queue *q,
+ 					     sector_t sector)
+ {
+@@ -819,6 +824,11 @@ static inline bool blk_queue_zone_is_seq(struct request_queue *q,
+ 		return false;
+ 	return test_bit(blk_queue_zone_no(q, sector), q->seq_zones_bitmap);
  }
- EXPORT_SYMBOL(ioremap_wt);
++#else /* CONFIG_BLK_DEV_ZONED */
++static inline unsigned int blk_queue_nr_zones(struct request_queue *q)
++{
++	return 0;
++}
+ #endif /* CONFIG_BLK_DEV_ZONED */
  
- void __iomem *
- ioremap_coherent(phys_addr_t addr, unsigned long size)
- {
--	return __ioremap_caller(addr, size, _PAGE_COHERENT,
--				__builtin_return_address(0));
-+	unsigned long flags = pgprot_val(pgprot_cached(PAGE_KERNEL));
-+
-+	return __ioremap_caller(addr, size, flags, __builtin_return_address(0));
- }
- EXPORT_SYMBOL(ioremap_coherent);
- 
-@@ -134,14 +138,6 @@ __ioremap_caller(phys_addr_t addr, unsigned long size, unsigned long flags,
- 	phys_addr_t p;
- 	int err;
- 
--	/* Make sure we have the base flags */
--	if ((flags & _PAGE_PRESENT) == 0)
--		flags |= pgprot_val(PAGE_KERNEL);
--
--	/* Non-cacheable page cannot be coherent */
--	if (flags & _PAGE_NO_CACHE)
--		flags &= ~_PAGE_COHERENT;
--
- 	/*
- 	 * Choose an address to map it to.
- 	 * Once the vmalloc system is running, we use it.
-diff --git a/arch/powerpc/mm/pgtable_64.c b/arch/powerpc/mm/pgtable_64.c
-index c0f356d9b135..1f1bb40555a8 100644
---- a/arch/powerpc/mm/pgtable_64.c
-+++ b/arch/powerpc/mm/pgtable_64.c
-@@ -118,10 +118,6 @@ void __iomem * __ioremap_at(phys_addr_t pa, void *ea, unsigned long size,
- {
- 	unsigned long i;
- 
--	/* Make sure we have the base flags */
--	if ((flags & _PAGE_PRESENT) == 0)
--		flags |= pgprot_val(PAGE_KERNEL);
--
- 	/* We don't support the 4K PFN hack with ioremap */
- 	if (flags & H_PAGE_4K_PFN)
- 		return NULL;
-@@ -204,7 +200,7 @@ void __iomem * __ioremap(phys_addr_t addr, unsigned long size,
- 
- void __iomem * ioremap(phys_addr_t addr, unsigned long size)
- {
--	unsigned long flags = pgprot_val(pgprot_noncached(__pgprot(0)));
-+	unsigned long flags = pgprot_val(pgprot_noncached(PAGE_KERNEL));
- 	void *caller = __builtin_return_address(0);
- 
- 	if (ppc_md.ioremap)
-@@ -214,7 +210,7 @@ void __iomem * ioremap(phys_addr_t addr, unsigned long size)
- 
- void __iomem * ioremap_wc(phys_addr_t addr, unsigned long size)
- {
--	unsigned long flags = pgprot_val(pgprot_noncached_wc(__pgprot(0)));
-+	unsigned long flags = pgprot_val(pgprot_noncached_wc(PAGE_KERNEL));
- 	void *caller = __builtin_return_address(0);
- 
- 	if (ppc_md.ioremap)
-@@ -224,7 +220,7 @@ void __iomem * ioremap_wc(phys_addr_t addr, unsigned long size)
- 
- void __iomem *ioremap_coherent(phys_addr_t addr, unsigned long size)
- {
--	unsigned long flags = pgprot_val(pgprot_cached(__pgprot(0)));
-+	unsigned long flags = pgprot_val(pgprot_cached(PAGE_KERNEL));
- 	void *caller = __builtin_return_address(0);
- 
- 	if (ppc_md.ioremap)
-diff --git a/arch/powerpc/platforms/4xx/ocm.c b/arch/powerpc/platforms/4xx/ocm.c
-index 69d9f60d9fe5..f5bbd4563342 100644
---- a/arch/powerpc/platforms/4xx/ocm.c
-+++ b/arch/powerpc/platforms/4xx/ocm.c
-@@ -113,7 +113,6 @@ static void __init ocm_init_node(int count, struct device_node *node)
- 	int len;
- 
- 	struct resource rsrc;
--	int ioflags;
- 
- 	ocm = ocm_get_node(count);
- 
-@@ -179,9 +178,8 @@ static void __init ocm_init_node(int count, struct device_node *node)
- 
- 	/* ioremap the non-cached region */
- 	if (ocm->nc.memtotal) {
--		ioflags = _PAGE_NO_CACHE | _PAGE_GUARDED | _PAGE_EXEC;
- 		ocm->nc.virt = __ioremap(ocm->nc.phys, ocm->nc.memtotal,
--					  ioflags);
-+					 _PAGE_EXEC | PAGE_KERNEL_NCG);
- 
- 		if (!ocm->nc.virt) {
- 			printk(KERN_ERR
-@@ -195,9 +193,8 @@ static void __init ocm_init_node(int count, struct device_node *node)
- 	/* ioremap the cached region */
- 
- 	if (ocm->c.memtotal) {
--		ioflags = _PAGE_EXEC;
- 		ocm->c.virt = __ioremap(ocm->c.phys, ocm->c.memtotal,
--					 ioflags);
-+					_PAGE_EXEC | PAGE_KERNEL);
- 
- 		if (!ocm->c.virt) {
- 			printk(KERN_ERR
-diff --git a/drivers/pcmcia/electra_cf.c b/drivers/pcmcia/electra_cf.c
-index 9671ded549f0..34d6c1a0971e 100644
---- a/drivers/pcmcia/electra_cf.c
-+++ b/drivers/pcmcia/electra_cf.c
-@@ -230,7 +230,7 @@ static int electra_cf_probe(struct platform_device *ofdev)
- 
- 	if (!cf->mem_base || !cf->io_virt || !cf->gpio_base ||
- 	    (__ioremap_at(io.start, cf->io_virt, cf->io_size,
--		  pgprot_val(pgprot_noncached(__pgprot(0)))) == NULL)) {
-+			  pgprot_val(pgprot_noncached(PAGE_KERNEL))) == NULL)) {
- 		dev_err(device, "can't ioremap ranges\n");
- 		status = -ENOMEM;
- 		goto fail1;
+ static inline bool rq_is_sync(struct request *rq)
 -- 
-2.13.3
+2.17.1
