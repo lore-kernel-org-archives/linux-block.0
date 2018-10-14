@@ -1,104 +1,43 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 08/16] blk-mq: separate number of hardware queues from nr_cpu_ids
-Date: Tue, 30 Oct 2018 12:32:44 -0600
-Message-Id: <20181030183252.17857-9-axboe@kernel.dk>
-In-Reply-To: <20181030183252.17857-1-axboe@kernel.dk>
-References: <20181030183252.17857-1-axboe@kernel.dk>
+Return-Path: <schmitzmic@gmail.com>
+Return-Path: <schmitzmic@gmail.com>
+Subject: [PATCH v6 0/2] Amiga RDB partition support fixes
+To: linux-block@vger.kernel.org, axboe@kernel.dk
+References: <1539492515-1782-1-git-send-email-schmitzmic@gmail.com>
+Cc: linux-m68k@vger.kernel.org, geert@linux-m68k.org
+From: Michael Schmitz <schmitzmic@gmail.com>
+Message-ID: <aa67b36b-4c98-dc16-54f5-109080792396@gmail.com>
+Date: Sun, 14 Oct 2018 17:51:01 +1300
+MIME-Version: 1.0
+In-Reply-To: <1539492515-1782-1-git-send-email-schmitzmic@gmail.com>
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-With multiple maps, nr_cpu_ids is no longer the maximum number of
-hardware queues we support on a given devices. The initializer of
-the tag_set can have set ->nr_hw_queues larger than the available
-number of CPUs, since we can exceed that with multiple queue maps.
+(resend - managed to lose $subject, sorry)
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-mq.c | 28 +++++++++++++++++++++-------
- 1 file changed, 21 insertions(+), 7 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9d6e2f6f8ee9..1ca48cf3bbc7 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2668,6 +2668,19 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 	mutex_unlock(&q->sysfs_lock);
- }
- 
-+/*
-+ * Maximum number of hardware queues we support. For single sets, we'll never
-+ * have more than the CPUs (software queues). For multiple sets, the tag_set
-+ * user may have set ->nr_hw_queues larger.
-+ */
-+static unsigned int nr_hw_queues(struct blk_mq_tag_set *set)
-+{
-+	if (set->nr_maps == 1)
-+		return nr_cpu_ids;
-+
-+	return max(set->nr_hw_queues, nr_cpu_ids);
-+}
-+
- struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 						  struct request_queue *q)
- {
-@@ -2687,7 +2700,8 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	/* init q->mq_kobj and sw queues' kobjects */
- 	blk_mq_sysfs_init(q);
- 
--	q->queue_hw_ctx = kcalloc_node(nr_cpu_ids, sizeof(*(q->queue_hw_ctx)),
-+	q->nr_queues = nr_hw_queues(set);
-+	q->queue_hw_ctx = kcalloc_node(q->nr_queues, sizeof(*(q->queue_hw_ctx)),
- 						GFP_KERNEL, set->numa_node);
- 	if (!q->queue_hw_ctx)
- 		goto err_percpu;
-@@ -2699,7 +2713,6 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	INIT_WORK(&q->timeout_work, blk_mq_timeout_work);
- 	blk_queue_rq_timeout(q, set->timeout ? set->timeout : 30 * HZ);
- 
--	q->nr_queues = nr_cpu_ids;
- 	q->tag_set = set;
- 
- 	q->queue_flags |= QUEUE_FLAG_MQ_DEFAULT;
-@@ -2889,12 +2902,13 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
- 		set->queue_depth = min(64U, set->queue_depth);
- 	}
- 	/*
--	 * There is no use for more h/w queues than cpus.
-+	 * There is no use for more h/w queues than cpus if we just have
-+	 * a single map
- 	 */
--	if (set->nr_hw_queues > nr_cpu_ids)
-+	if (set->nr_maps == 1 && set->nr_hw_queues > nr_cpu_ids)
- 		set->nr_hw_queues = nr_cpu_ids;
- 
--	set->tags = kcalloc_node(nr_cpu_ids, sizeof(struct blk_mq_tags *),
-+	set->tags = kcalloc_node(nr_hw_queues(set), sizeof(struct blk_mq_tags *),
- 				 GFP_KERNEL, set->numa_node);
- 	if (!set->tags)
- 		return -ENOMEM;
-@@ -2937,7 +2951,7 @@ void blk_mq_free_tag_set(struct blk_mq_tag_set *set)
- {
- 	int i, j;
- 
--	for (i = 0; i < nr_cpu_ids; i++)
-+	for (i = 0; i < nr_hw_queues(set); i++)
- 		blk_mq_free_map_and_requests(set, i);
- 
- 	for (j = 0; j < set->nr_maps; j++) {
-@@ -3069,7 +3083,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 
- 	lockdep_assert_held(&set->tag_list_lock);
- 
--	if (nr_hw_queues > nr_cpu_ids)
-+	if (set->nr_maps == 1 && nr_hw_queues > nr_cpu_ids)
- 		nr_hw_queues = nr_cpu_ids;
- 	if (nr_hw_queues < 1 || nr_hw_queues == set->nr_hw_queues)
- 		return;
--- 
-2.17.1
+Am 14.10.2018 um 17:48 schrieb Michael Schmitz:
+> and yet another new version of the Amiga RDB partition table patch.
+>
+> I've split off the part fixing the incorrect use of signed int
+> for partition start address and size as separate patch. It does fix the
+> bug that Martin Steigerwald reported six years ago for a 2 TB disk.
+> I have tested this patch with the identical RDB partition data that
+> Martin saw the bug with. I have incorporated Andreas' feedback on proper
+> use of casts to avoid integer overflow in this version.
+>
+> The simple fix still leaves ample room for overflows in calculating start
+> address and size of a RDB partition, though such overflows should only be
+> seen in rather unusual cases. To address these potential overflows, checks
+> are added in the second patch of this series. Again, misuse of casts have
+> been corrected, and yet another (highly unlikely) potential 32 bit
+> multiplication overflow caused by use of signed int instead of sector
+> (spotted by Geert Uytterhoeven) has been fixed and a check has been added
+> in this version.
+>
+> I've added Geert's Reviewed-by tag to patch 1,as there were no further
+> changes to that patch.
+>
+> Cheers,
+>
+>         Michael
+>
+>
