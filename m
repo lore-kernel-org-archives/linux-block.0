@@ -1,23 +1,36 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:35966 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727575AbeJRScS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Oct 2018 14:32:18 -0400
-From: Jan Kara <jack@suse.cz>
-To: Omar Sandoval <osandov@osandov.com>
-Cc: <linux-block@vger.kernel.org>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 0/2] blktests: New loop tests
-Date: Thu, 18 Oct 2018 12:31:45 +0200
-Message-Id: <20181018103147.3567-1-jack@suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <schmitzmic@gmail.com>
+Return-Path: <schmitzmic@gmail.com>
+From: Michael Schmitz <schmitzmic@gmail.com>
+To: linux-block@vger.kernel.org,
+	axboe@kernel.dk
+Cc: linux-m68k@vger.kernel.org,
+	geert@linux-m68k.org
+Subject: [PATCH v6 0/2]
+Date: Sun, 14 Oct 2018 17:48:33 +1300
+Message-Id: <1539492515-1782-1-git-send-email-schmitzmic@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
+and yet another new version of the Amiga RDB partition table patch.
 
-Hello,
+I've split off the part fixing the incorrect use of signed int    
+for partition start address and size as separate patch. It does fix the
+bug that Martin Steigerwald reported six years ago for a 2 TB disk.
+I have tested this patch with the identical RDB partition data that
+Martin saw the bug with. I have incorporated Andreas' feedback on proper
+use of casts to avoid integer overflow in this version.
 
-these two patches create two new tests for blktests as regression tests
-for my recently posted loopback device fixes. More details in individual
-patches.
+The simple fix still leaves ample room for overflows in calculating start 
+address and size of a RDB partition, though such overflows should only be 
+seen in rather unusual cases. To address these potential overflows, checks
+are added in the second patch of this series. Again, misuse of casts have
+been corrected, and yet another (highly unlikely) potential 32 bit   
+multiplication overflow caused by use of signed int instead of sector
+(spotted by Geert Uytterhoeven) has been fixed and a check has been added
+in this version.
 
-								Honza
+I've added Geert's Reviewed-by tag to patch 1,as there were no further
+changes to that patch.
+
+Cheers,
+
+        Michael
