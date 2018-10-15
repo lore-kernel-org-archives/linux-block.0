@@ -1,150 +1,154 @@
-Return-Path: <ulf.hansson@linaro.org>
-MIME-Version: 1.0
-In-Reply-To: <20181015141059.26579-1-linus.walleij@linaro.org>
-References: <20181015141059.26579-1-linus.walleij@linaro.org>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Tue, 16 Oct 2018 15:42:19 +0200
-Message-ID: <CAPDyKFp-26FWi74BzrPsuE3gn-no2AZfiNR0DQfe15cG3_XY7w@mail.gmail.com>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
 Subject: Re: [PATCH v2] block: BFQ default for single queue devices
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: linux-block <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, linux-mtd@lists.infradead.org,
-	Pavel Machek <pavel@ucw.cz>, Paolo Valente <paolo.valente@linaro.org>,
-	Richard Weinberger <richard@nod.at>, Adrian Hunter <adrian.hunter@intel.com>,
-	Bart Van Assche <bvanassche@acm.org>, Jan Kara <jack@suse.cz>,
-	Artem Bityutskiy <dedekind1@gmail.com>, Christoph Hellwig <hch@infradead.org>,
-	Alan Cox <gnomes@lxorguk.ukuu.org.uk>, Mark Brown <broonie@kernel.org>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>, Johannes Thumshirn <jthumshirn@suse.de>,
-	Oleksandr Natalenko <oleksandr@natalenko.name>, Jonathan Corbet <corbet@lwn.net>
-Content-Type: text/plain; charset="UTF-8"
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <ab70f1dd-6943-9642-aafa-71840fd44f07@kernel.dk>
+Date: Mon, 15 Oct 2018 21:44:31 +0200
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+ linux-block <linux-block@vger.kernel.org>,
+ linux-mmc <linux-mmc@vger.kernel.org>,
+ linux-mtd@lists.infradead.org,
+ Pavel Machek <pavel@ucw.cz>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ Richard Weinberger <richard@nod.at>,
+ Adrian Hunter <adrian.hunter@intel.com>,
+ Bart Van Assche <bvanassche@acm.org>,
+ Jan Kara <jack@suse.cz>,
+ Artem Bityutskiy <dedekind1@gmail.com>,
+ Christoph Hellwig <hch@infradead.org>,
+ Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
+ Mark Brown <broonie@kernel.org>,
+ Damien Le Moal <Damien.LeMoal@wdc.com>,
+ Johannes Thumshirn <jthumshirn@suse.de>,
+ Oleksandr Natalenko <oleksandr@natalenko.name>,
+ Jonathan Corbet <corbet@lwn.net>
+Message-Id: <689F28AA-92B5-48B5-BBE7-0B589F163228@linaro.org>
+References: <20181015141059.26579-1-linus.walleij@linaro.org>
+ <d25e02de-e1be-0fb7-237b-3e53d56c6f64@kernel.dk>
+ <307F6078-0A77-4AAA-BE1A-55C2ACC328CC@linaro.org>
+ <ab70f1dd-6943-9642-aafa-71840fd44f07@kernel.dk>
+To: Jens Axboe <axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On 15 October 2018 at 16:10, Linus Walleij <linus.walleij@linaro.org> wrote:
-> This sets BFQ as the default scheduler for single queue
-> block devices (nr_hw_queues == 1) if it is available. This
-> affects notably MMC/SD-cards but also UBI and the loopback
-> device.
->
-> I have been running it for a while without any negative
-> effects on my pet systems and I want some wider testing
-> so let's throw it out there and see what people say.
-> Admittedly my use cases are limited. I need to keep this
-> patch around for my personal needs anyway.
->
-> We take special care to avoid using BFQ on zoned devices
-> (in particular SMR, shingled magnetic recording devices)
-> as these currently require mq-deadline to group writes
-> together.
->
-> I have opted against introducing any default scheduler
-> through Kconfig as the mq-deadline enforcement for
-> zoned devices has to be done at runtime anyways and
-> too many config options will make things confusing.
->
-> My argument for setting a default policy in the kernel
-> as opposed to user space is the "reasonable defaults"
-> type, analogous to how we have one default CPU scheduling
-> policy (CFS) that make most sense for most tasks, and
-> how automatic process group scheduling happens in most
-> distributions without userspace involvement. The BFQ
-> scheduling policy makes most sense for single hardware
-> queue devices and many embedded systems will not have
-> the clever userspace tools (such as udev) to make an
-> educated choice of scheduling policy. Defaults should be
-> those that make most sense for the hardware.
 
-As already stated for v1, this makes perfect sense to me, thanks for posting it!
 
-I do understand there is some pushback from Bart and Jens, around how
-to move this forward. However, let's hope they get convinced to try
-this out.
+> Il giorno 15 ott 2018, alle ore 21:26, Jens Axboe <axboe@kernel.dk> ha =
+scritto:
+>=20
+> On 10/15/18 12:26 PM, Paolo Valente wrote:
+>>=20
+>>=20
+>>> Il giorno 15 ott 2018, alle ore 17:39, Jens Axboe <axboe@kernel.dk> =
+ha scritto:
+>>>=20
+>>> On 10/15/18 8:10 AM, Linus Walleij wrote:
+>>>> This sets BFQ as the default scheduler for single queue
+>>>> block devices (nr_hw_queues =3D=3D 1) if it is available. This
+>>>> affects notably MMC/SD-cards but also UBI and the loopback
+>>>> device.
+>>>>=20
+>>>> I have been running it for a while without any negative
+>>>> effects on my pet systems and I want some wider testing
+>>>> so let's throw it out there and see what people say.
+>>>> Admittedly my use cases are limited. I need to keep this
+>>>> patch around for my personal needs anyway.
+>>>>=20
+>>>> We take special care to avoid using BFQ on zoned devices
+>>>> (in particular SMR, shingled magnetic recording devices)
+>>>> as these currently require mq-deadline to group writes
+>>>> together.
+>>>>=20
+>>>> I have opted against introducing any default scheduler
+>>>> through Kconfig as the mq-deadline enforcement for
+>>>> zoned devices has to be done at runtime anyways and
+>>>> too many config options will make things confusing.
+>>>>=20
+>>>> My argument for setting a default policy in the kernel
+>>>> as opposed to user space is the "reasonable defaults"
+>>>> type, analogous to how we have one default CPU scheduling
+>>>> policy (CFS) that make most sense for most tasks, and
+>>>> how automatic process group scheduling happens in most
+>>>> distributions without userspace involvement. The BFQ
+>>>> scheduling policy makes most sense for single hardware
+>>>> queue devices and many embedded systems will not have
+>>>> the clever userspace tools (such as udev) to make an
+>>>> educated choice of scheduling policy. Defaults should be
+>>>> those that make most sense for the hardware.
+>>>=20
+>>> I still don't like this. There are going to be tons of
+>>> cases where the single queue device is some hw raid setup
+>>> or similar, where performance is going to be much worse with
+>>> BFQ than it is with mq-deadline, for instance. That's just
+>>> one case.
+>>>=20
+>>=20
+>> Hi Jens,
+>> in my RAID tests bfq performed as well as in non-RAID tests.  =
+Probably
+>> you refer to the fact that, in a RAID configuration, IOPS can become
+>> very high.  But, if that is the case, then the response to your
+>> objections already emerged in the previous thread.  Let me sum it up
+>> again.
+>>=20
+>> I tested bfq on virtually every device in the range from few hundred
+>> of IOPS to 50-100KIOPS.  Then, through the public script I already
+>> mentioned, I found the maximum number of IOPS that bfq can handle:
+>> about 400K with a commodity CPU.
+>>=20
+>> In particular, in all my tests with real hardware, bfq
+>> - is not even comparable to that of any of the other scheduler, in
+>>  terms of responsiveness, latency for real-time applications, ability
+>>  to provide strong bandwidth guarantees, ability to boost throughput
+>>  while guaranteeing bandwidths;
+>> - is a little worse than the other scheduler for only one test, on
+>>  only some hardware: total throughput with random reads, were it may
+>>  lose up to 10-15% of throughput.  Of course, the scheduler that =
+reach
+>>  a higher throughput leave the machine unusable during the test.
+>>=20
+>> So I really cannot see a reason why bfq could do worse than any of
+>> these other schedulers for some single-queue device (conservatively)
+>> below 300KIOPS.
+>>=20
+>> Finally, since, AFAICT, single-queue devices doing 400+ KIOPS are
+>> probably less than 1% of all the single-queue storage around (USB
+>> drives, HDDs, eMMC, standard SSDs, ...), by sticking to mq-deadline =
+we
+>> are sacrificing 99% of the hardware, to help 1% of the hardware, for
+>> one kind of test cases.
+>=20
+> I should have been more clear - I'm not worried about IOPS overhead,
+> I'm worried about scheduling decisions that lower performance on
+> (for instance) raid composed of many drives (rotational or otherwise).
+>=20
+> If you have actual data (on what hardware, and what kind of tests)
+> to disprove that worry, then that's great, and I'd love to see that.
+>=20
 
-When it comes to potential "performance" regressions, I am sure Paolo
-is standing-by to help out with BFQ changes, if needed. Moreover, we
-can always do a simple revert in worst case scenario, especially since
-the change is really limited.
+Here are some old results with a very simple configuration:
+=
+http://algo.ing.unimo.it/people/paolo/disk_sched/old-results/4.4.0-v7r11/
+=
+http://algo.ing.unimo.it/people/paolo/disk_sched/old-results/3.14.0-v7r3/
+=
+http://algo.ing.unimo.it/people/paolo/disk_sched/old-results/3.13.0-v7r2/
 
->
-> Cc: Pavel Machek <pavel@ucw.cz>
-> Cc: Paolo Valente <paolo.valente@linaro.org>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Ulf Hansson <ulf.hansson@linaro.org>
-> Cc: Richard Weinberger <richard@nod.at>
-> Cc: Adrian Hunter <adrian.hunter@intel.com>
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Cc: Jan Kara <jack@suse.cz>
-> Cc: Artem Bityutskiy <dedekind1@gmail.com>
-> Cc: Christoph Hellwig <hch@infradead.org>
-> Cc: Alan Cox <gnomes@lxorguk.ukuu.org.uk>
-> Cc: Mark Brown <broonie@kernel.org>
-> Cc: Damien Le Moal <Damien.LeMoal@wdc.com>
-> Cc: Johannes Thumshirn <jthumshirn@suse.de>
-> Cc: Oleksandr Natalenko <oleksandr@natalenko.name>
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Then I stopped repeating tests that always yielded the same good =
+results.
 
-So FWIW:
+As for more professional systems, a well-known company doing
+real-time packet-traffic dumping asked me to modify bfq so as to
+guarantee lossless data writing also during queries.  The involved box
+had a RAID reaching a few Gbps, and everything worked well.
 
-Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
+Anyway, if you have specific issues in mind, I can check more deeply.
 
-Kind regards
-Uffe
+Thanks,
+Paolo
 
-> ---
-> ChangeLog v1->v2:
-> - Add a quirk so that devices with zoned writes are forced
->   to use the deadline scheduler, this is necessary since only
->   that scheduler supports zoned writes.
-> - There is a summary article in LWN for subscribers:
->   https://lwn.net/Articles/767987/
-> ---
->  block/elevator.c | 22 ++++++++++++++++++----
->  1 file changed, 18 insertions(+), 4 deletions(-)
->
-> diff --git a/block/elevator.c b/block/elevator.c
-> index 8fdcd64ae12e..6e6048ca3471 100644
-> --- a/block/elevator.c
-> +++ b/block/elevator.c
-> @@ -948,13 +948,16 @@ int elevator_switch_mq(struct request_queue *q,
->  }
->
->  /*
-> - * For blk-mq devices, we default to using mq-deadline, if available, for single
-> - * queue devices.  If deadline isn't available OR we have multiple queues,
-> - * default to "none".
-> + * For blk-mq devices, we default to using:
-> + * - "none" for multiqueue devices (nr_hw_queues != 1)
-> + * - "bfq", if available, for single queue devices
-> + * - "mq-deadline" if "bfq" is not available for single queue devices
-> + * - "none" for single queue devices as well as last resort
->   */
->  int elevator_init_mq(struct request_queue *q)
->  {
->         struct elevator_type *e;
-> +       const char *policy;
->         int err = 0;
->
->         if (q->nr_hw_queues != 1)
-> @@ -968,7 +971,18 @@ int elevator_init_mq(struct request_queue *q)
->         if (unlikely(q->elevator))
->                 goto out_unlock;
->
-> -       e = elevator_get(q, "mq-deadline", false);
-> +       /*
-> +        * Zoned devices must use a deadline scheduler because currently
-> +        * that is the only scheduler respecting zoned writes.
-> +        */
-> +       if (blk_queue_is_zoned(q))
-> +               policy = "mq-deadline";
-> +       else if (IS_ENABLED(CONFIG_IOSCHED_BFQ))
-> +               policy = "bfq";
-> +       else
-> +               policy = "mq-deadline";
-> +
-> +       e = elevator_get(q, policy, false);
->         if (!e)
->                 goto out_unlock;
->
-> --
-> 2.17.2
->
+>=20
+> --=20
+> Jens Axboe
