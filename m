@@ -1,14 +1,13 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Mon, 15 Oct 2018 17:21:09 +0800
-From: Ming Lei <ming.lei@redhat.com>
+Return-Path: <mst@redhat.com>
+Date: Sun, 14 Oct 2018 20:54:20 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Daniel Verkamp <dverkamp@chromium.org>
 Cc: virtualization@lists.linux-foundation.org, linux-block@vger.kernel.org,
-	"Michael S. Tsirkin" <mst@redhat.com>,
 	Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
 	Stefan Hajnoczi <stefanha@redhat.com>,
-	Changpeng Liu <changpeng.liu@intel.com>
+	Changpeng Liu <changpeng.liu@intel.com>, pbonzini@redhat.com
 Subject: Re: [PATCH v8] virtio_blk: add discard and write zeroes support
-Message-ID: <20181015092108.GA31722@ming.t460p>
+Message-ID: <20181012173334-mutt-send-email-mst@kernel.org>
 References: <1528258740-6581-1-git-send-email-changpeng.liu@intel.com>
  <20181012210628.226361-1-dverkamp@chromium.org>
 MIME-Version: 1.0
@@ -29,6 +28,9 @@ On Fri, Oct 12, 2018 at 02:06:28PM -0700, Daniel Verkamp wrote:
 > 
 > Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
 > Signed-off-by: Daniel Verkamp <dverkamp@chromium.org>
+
+Cc Paolo as well.
+
 > ---
 > dverkamp: I've picked up this patch and made a few minor changes (as
 > listed below); most notably, I changed the kmalloc back to GFP_ATOMIC,
@@ -59,10 +61,6 @@ On Fri, Oct 12, 2018 at 02:06:28PM -0700, Daniel Verkamp wrote:
 >  drivers/block/virtio_blk.c      | 95 ++++++++++++++++++++++++++++++++-
 >  include/uapi/linux/virtio_blk.h | 54 +++++++++++++++++++
 >  2 files changed, 147 insertions(+), 2 deletions(-)
-
-The implementation is quite straightforward, just some minor points, see
-inline comment.
-
 > 
 > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
 > index 23752dc99b00..04a7ae602e2f 100644
@@ -175,9 +173,6 @@ inline comment.
 > +			q->limits.discard_alignment = v << SECTOR_SHIFT;
 > +		else
 > +			q->limits.discard_alignment = 0;
-
-It may be better to use  "v ? v << SECTOR_SHIFT : 0".
-
 > +
 > +		virtio_cread(vdev, struct virtio_blk_config,
 > +				max_discard_sectors, &v);
@@ -185,9 +180,6 @@ It may be better to use  "v ? v << SECTOR_SHIFT : 0".
 > +			blk_queue_max_discard_sectors(q, v);
 > +		else
 > +			blk_queue_max_discard_sectors(q, UINT_MAX);
-
-Same with above.
-
 > +
 > +		virtio_cread(vdev, struct virtio_blk_config, max_discard_seg,
 > +				&v);
@@ -195,9 +187,6 @@ Same with above.
 > +			blk_queue_max_discard_segments(q, v);
 > +		else
 > +			blk_queue_max_discard_segments(q, MAX_DISCARD_SEGMENTS);
-
-It may be better to use min_not_zero().
-
 > +
 > +		blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
 > +	}
@@ -210,9 +199,6 @@ It may be better to use min_not_zero().
 > +		else
 > +			blk_queue_max_write_zeroes_sectors(q, UINT_MAX);
 > +	}
-
-Same with above.
-
 > +
 >  	virtblk_update_capacity(vblk, false);
 >  	virtio_device_ready(vdev);
@@ -322,7 +308,3 @@ Same with above.
 >  	__virtio32 errors;
 > -- 
 > 2.19.0.605.g01d371f741-goog
-> 
-
-Thanks,
-Ming
