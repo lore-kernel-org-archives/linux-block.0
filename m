@@ -1,179 +1,25 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:63750 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728423AbeJLRky (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Oct 2018 13:40:54 -0400
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-        Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH v4 08/11] block: Improve zone reset execution
-Date: Fri, 12 Oct 2018 19:08:47 +0900
-Message-Id: <20181012100850.23316-9-damien.lemoal@wdc.com>
-In-Reply-To: <20181012100850.23316-1-damien.lemoal@wdc.com>
-References: <20181012100850.23316-1-damien.lemoal@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <michael@ozlabs.org>
+In-Reply-To: <c454a5dbb215719991e3b0e6470309101d870fbb.1539092111.git.christophe.leroy@c-s.fr>
+To: Christophe Leroy <christophe.leroy@c-s.fr>, Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+From: Michael Ellerman <patch-notifications@ellerman.id.au>
+Cc: linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [v3,01/24] powerpc/32: Add ioremap_wt() and ioremap_coherent()
+Message-Id: <42YPr02vcGz9s7W@ozlabs.org>
+Date: Mon, 15 Oct 2018 15:01:03 +1100 (AEDT)
+List-ID: <linux-block@vger.kernel.org>
 
-There is no need to synchronously execute all REQ_OP_ZONE_RESET BIOs
-necessary to reset a range of zones. Similarly to what is done for
-discard BIOs in blk-lib.c, all zone reset BIOs can be chained and
-executed asynchronously and a synchronous call done only for the last
-BIO of the chain.
+On Tue, 2018-10-09 at 13:51:33 UTC, Christophe Leroy wrote:
+> Other arches have ioremap_wt() to map IO areas write-through.
+> Implement it on PPC as well in order to avoid drivers using
+> __ioremap(_PAGE_WRITETHRU)
+> 
+> Also implement ioremap_coherent() to avoid drivers using
+> __ioremap(_PAGE_COHERENT)
+> 
+> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 
-Modify blkdev_reset_zones() to operate similarly to
-blkdev_issue_discard() using the next_bio() helper for chaining BIOs. To
-avoid code duplication of that function in blk_zoned.c, rename
-next_bio() into blk_next_bio() and declare it as a block internal
-function in blk.h.
+Series applied to powerpc next, thanks.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- block/blk-lib.c   | 13 ++++++-------
- block/blk-zoned.c | 29 ++++++++++++++++-------------
- block/blk.h       |  2 ++
- 3 files changed, 24 insertions(+), 20 deletions(-)
+https://git.kernel.org/powerpc/c/86c391bd5f47101acf1f3e0abd9fe0
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index d1b9dd03da25..d7bedee5f9ba 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -10,8 +10,7 @@
- 
- #include "blk.h"
- 
--static struct bio *next_bio(struct bio *bio, unsigned int nr_pages,
--		gfp_t gfp)
-+struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp)
- {
- 	struct bio *new = bio_alloc(gfp, nr_pages);
- 
-@@ -87,7 +86,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 			req_sects = end_sect - sector;
- 		}
- 
--		bio = next_bio(bio, 0, gfp_mask);
-+		bio = blk_next_bio(bio, 0, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio_set_op_attrs(bio, op, 0);
-@@ -189,7 +188,7 @@ static int __blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
- 	max_write_same_sectors = UINT_MAX >> 9;
- 
- 	while (nr_sects) {
--		bio = next_bio(bio, 1, gfp_mask);
-+		bio = blk_next_bio(bio, 1, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio->bi_vcnt = 1;
-@@ -265,7 +264,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
- 		return -EOPNOTSUPP;
- 
- 	while (nr_sects) {
--		bio = next_bio(bio, 0, gfp_mask);
-+		bio = blk_next_bio(bio, 0, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio->bi_opf = REQ_OP_WRITE_ZEROES;
-@@ -316,8 +315,8 @@ static int __blkdev_issue_zero_pages(struct block_device *bdev,
- 		return -EPERM;
- 
- 	while (nr_sects != 0) {
--		bio = next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
--			       gfp_mask);
-+		bio = blk_next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
-+				   gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index bb4ed69f917f..5d967fd39fbd 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -13,6 +13,8 @@
- #include <linux/rbtree.h>
- #include <linux/blkdev.h>
- 
-+#include "blk.h"
-+
- static inline sector_t blk_zone_start(struct request_queue *q,
- 				      sector_t sector)
- {
-@@ -277,16 +279,17 @@ int blkdev_reset_zones(struct block_device *bdev,
- 	struct request_queue *q = bdev_get_queue(bdev);
- 	sector_t zone_sectors;
- 	sector_t end_sector = sector + nr_sectors;
--	struct bio *bio;
-+	struct bio *bio = NULL;
-+	struct blk_plug plug;
- 	int ret;
- 
--	if (!q)
--		return -ENXIO;
--
- 	if (!blk_queue_is_zoned(q))
- 		return -EOPNOTSUPP;
- 
--	if (end_sector > bdev->bd_part->nr_sects)
-+	if (bdev_read_only(bdev))
-+		return -EPERM;
-+
-+	if (!nr_sectors || end_sector > bdev->bd_part->nr_sects)
- 		/* Out of range */
- 		return -EINVAL;
- 
-@@ -299,19 +302,14 @@ int blkdev_reset_zones(struct block_device *bdev,
- 	    end_sector != bdev->bd_part->nr_sects)
- 		return -EINVAL;
- 
-+	blk_start_plug(&plug);
- 	while (sector < end_sector) {
- 
--		bio = bio_alloc(gfp_mask, 0);
-+		bio = blk_next_bio(bio, 0, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio_set_op_attrs(bio, REQ_OP_ZONE_RESET, 0);
- 
--		ret = submit_bio_wait(bio);
--		bio_put(bio);
--
--		if (ret)
--			return ret;
--
- 		sector += zone_sectors;
- 
- 		/* This may take a while, so be nice to others */
-@@ -319,7 +317,12 @@ int blkdev_reset_zones(struct block_device *bdev,
- 
- 	}
- 
--	return 0;
-+	ret = submit_bio_wait(bio);
-+	bio_put(bio);
-+
-+	blk_finish_plug(&plug);
-+
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(blkdev_reset_zones);
- 
-diff --git a/block/blk.h b/block/blk.h
-index 9db4e389582c..3d67844676fb 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -421,4 +421,6 @@ extern int blk_iolatency_init(struct request_queue *q);
- static inline int blk_iolatency_init(struct request_queue *q) { return 0; }
- #endif
- 
-+struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp);
-+
- #endif /* BLK_INTERNAL_H */
--- 
-2.17.1
+cheers
