@@ -1,56 +1,96 @@
-Return-Path: <changpeng.liu@intel.com>
-From: "Liu, Changpeng" <changpeng.liu@intel.com>
-To: Christoph Hellwig <hch@infradead.org>, Daniel Verkamp
-	<dverkamp@chromium.org>
-CC: "virtualization@lists.linux-foundation.org"
-	<virtualization@lists.linux-foundation.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, "Jason
- Wang" <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>, Stefan Hajnoczi
-	<stefanha@redhat.com>
-Subject: RE: [PATCH v8] virtio_blk: add discard and write zeroes support
-Date: Tue, 16 Oct 2018 01:40:41 +0000
-Message-ID: <FF7FC980937D6342B9D289F5F3C7C2625B74E9BC@SHSMSX103.ccr.corp.intel.com>
-References: <1528258740-6581-1-git-send-email-changpeng.liu@intel.com>
- <20181012210628.226361-1-dverkamp@chromium.org>
- <20181015092740.GA3964@infradead.org>
-In-Reply-To: <20181015092740.GA3964@infradead.org>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <dverkamp@chromium.org>
+Return-Path: <dverkamp@chromium.org>
 MIME-Version: 1.0
-Return-Path: changpeng.liu@intel.com
+References: <1528258740-6581-1-git-send-email-changpeng.liu@intel.com>
+ <20181012210628.226361-1-dverkamp@chromium.org> <20181015092740.GA3964@infradead.org>
+In-Reply-To: <20181015092740.GA3964@infradead.org>
+From: Daniel Verkamp <dverkamp@chromium.org>
+Date: Mon, 15 Oct 2018 16:16:03 -0700
+Message-ID: <CABVzXAn1vhC=TBAzcVuKw7S63t5HUQWgWjMGX-yEXd=hx_1KHA@mail.gmail.com>
+Subject: Re: [PATCH v8] virtio_blk: add discard and write zeroes support
+To: hch@infradead.org
+Cc: virtualization@lists.linux-foundation.org, linux-block@vger.kernel.org,
+	mst@redhat.com, jasowang@redhat.com, axboe@kernel.dk, stefanha@redhat.com,
+	Changpeng Liu <changpeng.liu@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQ2hyaXN0b3BoIEhlbGx3
-aWcgW21haWx0bzpoY2hAaW5mcmFkZWFkLm9yZ10NCj4gU2VudDogTW9uZGF5LCBPY3RvYmVyIDE1
-LCAyMDE4IDU6MjggUE0NCj4gVG86IERhbmllbCBWZXJrYW1wIDxkdmVya2FtcEBjaHJvbWl1bS5v
-cmc+DQo+IENjOiB2aXJ0dWFsaXphdGlvbkBsaXN0cy5saW51eC1mb3VuZGF0aW9uLm9yZzsgbGlu
-dXgtYmxvY2tAdmdlci5rZXJuZWwub3JnOw0KPiBNaWNoYWVsIFMuIFRzaXJraW4gPG1zdEByZWRo
-YXQuY29tPjsgSmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT47DQo+IEplbnMgQXhib2Ug
-PGF4Ym9lQGtlcm5lbC5kaz47IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT47
-IExpdSwNCj4gQ2hhbmdwZW5nIDxjaGFuZ3BlbmcubGl1QGludGVsLmNvbT4NCj4gU3ViamVjdDog
-UmU6IFtQQVRDSCB2OF0gdmlydGlvX2JsazogYWRkIGRpc2NhcmQgYW5kIHdyaXRlIHplcm9lcyBz
-dXBwb3J0DQo+IA0KPiBPbiBGcmksIE9jdCAxMiwgMjAxOCBhdCAwMjowNjoyOFBNIC0wNzAwLCBE
-YW5pZWwgVmVya2FtcCB3cm90ZToNCj4gPiBGcm9tOiBDaGFuZ3BlbmcgTGl1IDxjaGFuZ3Blbmcu
-bGl1QGludGVsLmNvbT4NCj4gPg0KPiA+IEluIGNvbW1pdCA4OGM4NTUzOCwgInZpcnRpby1ibGs6
-IGFkZCBkaXNjYXJkIGFuZCB3cml0ZSB6ZXJvZXMgZmVhdHVyZXMNCj4gPiB0byBzcGVjaWZpY2F0
-aW9uIiAoaHR0cHM6Ly9naXRodWIuY29tL29hc2lzLXRjcy92aXJ0aW8tc3BlYyksIHRoZSB2aXJ0
-aW8NCj4gDQo+IFRoZXJlIGlzIHNvbWUgaXNzdWVzIGluIHRoaXMgc3BlYy4gIEZvciBvbmUgdXNp
-bmcgdGhlIG11bHRpcGxlIHJhbmdlcw0KPiBhbHNvIGZvciB3cml0ZSB6ZXJvZXMgaXMgcmF0aGVy
-IGluZWZmaWNpZW50LiAgV3JpdGUgemVyb2VzIHJlYWxseSBzaG91bGQNCj4gdXNlIHRoZSBzYW1l
-IGZvcm1hdCBhcyByZWFkIGFuZCB3cml0ZS4NCkJlY2F1c2UgdGhlcmUgaXMgbm8gbGVuZ3RoIHBh
-cmFtZXRlciBmb3IgdmlydGlvIGJsb2NrIHNwZWNpZmljYXRpb24sIGFkZGluZyB0aGUNCnR3byBl
-eHRyYSBjb21tYW5kcyB3aWxsIG5vdCBicmVhayB0aGUgZXhpc3Rpbmcgc3BlY2lmaWNhdGlvbiBh
-bmQgZHJpdmVyIGltcGxlbWVudGF0aW9uLiANCkFsc28gZXhpc3RpbmcgTGludXggaW1wbGVtZW50
-YXRpb24gZm9yIHdyaXRlIHplcm9lcyB3aWxsIG5vdCB1c2UgbXVsdGlwbGUgc2VnbWVudA0KYXQg
-YWxsIHNvIHRoZXJlIGlzIGFsd2F5cyBvbmUgcmFuZ2UgaW4gcHJhY3RpY2UuDQo+IA0KPiBTZWNv
-bmQgdGhlIHVubWFwIGZsYWcgaXNuJ3QgcHJvcGVybHkgc3BlY2lmaWVkIGF0IGFsbCwgYXMgbm90
-aGluZw0KPiBzYXlzIHRoZSBkZXZpY2UgbWF5IG5vdCB1bm1hcCB3aXRob3V0IHRoZSB1bm1hcCBm
-bGFnLiAgUGxlYXNlIHRha2UNCj4gYSBsb29rIGF0IHRoZSBTQ1NJIG9yIE5WTWUg0ZVwZWMgZm9y
-IHNvbWUgZ3VpZGFuY2UuDQpUaGUgdW5tYXAgZmxhZyBpcyBvbmx5IHVzZWQgZm9yIHdyaXRlIHpl
-cm9lcyBjb21tYW5kLCBhcyBkaXNjYXJkIGNvbW1hbmQgd2lsbCBub3QgDQpndWFyYW50ZWUgdGhl
-IHNwYWNlcyB3aWxsIGJlIHplcm9lZCwgc28gYWRkaW5nIHRoaXMgZmxhZyBtZWFucyAoRGlzY2Fy
-ZCArIFdyaXRlIFplcm9lcyksDQpzbyB0aGlzIGRlZmluaXRlbHkgaXMgYmFja2VuZCByZWxhdGVk
-LCB0aGUgYmFja2VuZCBpbXBsZW1lbnRhdGlvbiBjYW4gdXNlIHNhbWUgY29kZQ0KdG8gaW1wbGVt
-ZW50IGRpc2NhcmQgYW5kIHdyaXRlIHplcm9lcyBjb21tYW5kcy4NCj4gDQo+ID4gK3N0YXRpYyBp
-bmxpbmUgaW50IHZpcnRibGtfc2V0dXBfZGlzY2FyZF93cml0ZV96ZXJvZXMoc3RydWN0IHJlcXVl
-c3QgKnJlcSwNCj4gPiArCQkJCQkJYm9vbCB1bm1hcCkNCj4gDQo+IFdoeSBpcyB0aGlzIGFuIGlu
-bGluZSBmdW5jdGlvbj8NCg==
+On Mon, Oct 15, 2018 at 2:27 AM Christoph Hellwig <hch@infradead.org> wrote=
+:
+> On Fri, Oct 12, 2018 at 02:06:28PM -0700, Daniel Verkamp wrote:
+> > From: Changpeng Liu <changpeng.liu@intel.com>
+> >
+> > In commit 88c85538, "virtio-blk: add discard and write zeroes features
+> > to specification" (https://github.com/oasis-tcs/virtio-spec), the virti=
+o
+>
+> There is some issues in this spec.  For one using the multiple ranges
+> also for write zeroes is rather inefficient.  Write zeroes really should
+> use the same format as read and write.
+
+I wasn't involved in the writing of the spec, so I'll defer to Michael
+and Changpeng here, but I'm not sure how "set in stone" the virtio
+specification is, or if it can be updated somehow without breaking
+compatibility.
+
+I agree that Write Zeroes would be simpler to implement as a single
+LBA + length rather than a list.  However, it's not really possible to
+use the same format as the regular virtio block read/write commands
+(VIRTIO_BLK_T_IN/VIRTIO_BLK_T_OUT), since the read/write commands do
+not specify a length explicitly; length is implied by the length of
+the data buffer as defined by the virtio descriptor, but a Write
+Zeroes command does not require a data buffer.  At best, this could be
+a separate command mirroring the layout of struct virtio_blk_req but
+with data replaced with a length field; I'm not sure that buys much in
+the way of consistency.
+
+> Second the unmap flag isn't properly specified at all, as nothing
+> says the device may not unmap without the unmap flag.  Please take
+> a look at the SCSI or NVMe =D1=95pec for some guidance.
+
+This could probably use some clarifying text in the specification, but
+given that there is nothing in the spec describing what the device
+needs to do when unmap =3D 0, I would assume that the device can do
+whatever it likes, as long as the blocks read back as 0s afterwards.
+Reading back 0s is required by the definition of the Write Zeroes
+command in the same virtio spec change.  It would probably be good to
+clarify this and explicitly define what the device is allowed to do in
+response to both settings of the unmap bit.
+
+My understanding of the corresponding feature in NVMe (the Deallocate
+bit in the Write Zeroes command) is that the only difference between
+Deallocate =3D 1 and 0 is that the device "should" versus "may" (no
+"shall" on either side) deallocate the corresponding blocks, but only
+if the device supports reading 0s back after blocks are deallocated.
+If the device does not support reading 0s after deallocation, it is
+not allowed to deallocate blocks as part of a Write Zeroes command
+regardless of the setting of the Deallocate bit.
+
+Some similar wording could probably be added to the virtio spec to
+clarify the meaning of unmap, although I would prefer something that
+makes it a little clearer that the bit is only intended as a hint from
+the driver to indicate whether the device should attempt to keep
+storage allocated for the zeroed blocks, if that is indeed the
+intended behavior.
+
+Is there some in-kernel doc that describes what behavior the Linux
+block layer needs from a write zeroes command?
+
+> > +static inline int virtblk_setup_discard_write_zeroes(struct request *r=
+eq,
+> > +                                             bool unmap)
+>
+> Why is this an inline function?
+
+I don't think there's any reason it needs to be inline; I can drop the
+inline in the next revision.
+
+Given (as far as I can tell) your concerns seem to apply to the Write
+Zeroes command specifically, would it be reasonable to start with a
+patch that just adds support for the Discard command (along with fixes
+for Ming's feedback)?  This would be sufficient for my particular use
+case (although I can't speak for Changpeng), and we can revisit Write
+Zeroes once the spec concerns are worked out.
+
+Thanks,
+-- Daniel
