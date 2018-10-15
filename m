@@ -1,63 +1,45 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-Subject: Re: [PATCH v2] block: fix rdma queue mapping
-To: Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>
-References: <20180820205420.25908-1-sagi@grimberg.me>
- <20180822131130.GC28149@lst.de>
- <83dd169f-034b-3460-7496-ef2e6766ea55@grimberg.me>
-From: Steve Wise <swise@opengridcomputing.com>
-Message-ID: <33192971-7edd-a3b6-f2fa-abdcbef375de@opengridcomputing.com>
-Date: Wed, 3 Oct 2018 14:05:16 -0500
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 03/17] ps3disk: convert to blk-mq
+To: Geoff Levand <geoff@infradead.org>, linux-block@vger.kernel.org
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Geert Uytterhoeven <geert@linux-m68k.org>
+References: <20181011165909.32615-1-axboe@kernel.dk>
+ <20181011165909.32615-4-axboe@kernel.dk>
+ <17539e5f-742b-796e-8e36-31327120f883@infradead.org>
+ <ee11f577-5766-13bc-2ff5-e3d672041462@kernel.dk>
+ <7f27a68f-9cbe-c4c2-5c35-70763a5b1484@infradead.org>
+ <b95e3ebf-f08d-2cbf-3f82-89424d7bf60d@kernel.dk>
+ <3403ae47-1aaa-9d01-817c-cd52a7daa272@infradead.org>
+ <ef7c0fb3-a31f-68e3-25f6-478958c08602@kernel.dk>
+ <6d7ccd4c-0d41-e2d3-6ecd-b9efbd7358b5@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <870de740-005f-ff82-ef33-7c8aac1a2c86@kernel.dk>
+Date: Mon, 15 Oct 2018 13:30:48 -0600
 MIME-Version: 1.0
-In-Reply-To: <83dd169f-034b-3460-7496-ef2e6766ea55@grimberg.me>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-nvme@lists.infradead.org, Max Gurtovoy <maxg@mellanox.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+In-Reply-To: <6d7ccd4c-0d41-e2d3-6ecd-b9efbd7358b5@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-CgpPbiA4LzI0LzIwMTggOToxNyBQTSwgU2FnaSBHcmltYmVyZyB3cm90ZToKPiAKPj4+IG52bWUt
-cmRtYSBhdHRlbXB0cyB0byBtYXAgcXVldWVzIGJhc2VkIG9uIGlycSB2ZWN0b3IgYWZmaW5pdHku
-Cj4+PiBIb3dldmVyLCBmb3Igc29tZSBkZXZpY2VzLCBjb21wbGV0aW9uIHZlY3RvciBpcnEgYWZm
-aW5pdHkgaXMKPj4+IGNvbmZpZ3VyYWJsZSBieSB0aGUgdXNlciB3aGljaCBjYW4gYnJlYWsgdGhl
-IGV4aXN0aW5nIGFzc3VtcHRpb24KPj4+IHRoYXQgaXJxIHZlY3RvcnMgYXJlIG9wdGltYWxseSBh
-cnJhbmdlZCBvdmVyIHRoZSBob3N0IGNwdSBjb3Jlcy4KPj4KPj4gSUZGIGFmZmluaXR5IGlzIGNv
-bmZpZ3VyYWJsZSB3ZSBzaG91bGQgbmV2ZXIgdXNlIHRoaXMgY29kZSwKPj4gYXMgaXQgYnJlYWtz
-IHRoZSBtb2RlbCBlbnRpcmVseS7CoCBpYl9nZXRfdmVjdG9yX2FmZmluaXR5IHNob3VsZAo+PiBu
-ZXZlciByZXR1cm4gYSB2YWxpZCBtYXNrIGlmIGFmZmluaXR5IGlzIGNvbmZpZ3VyYWJsZS4KPiAK
-PiBJIGFncmVlIHRoYXQgdGhlIG1vZGVsIGludGVuZGVkIGluaXRpYWxseSBkb2Vzbid0IGZpdC4g
-QnV0IGl0IHNlZW1zCj4gdGhhdCBzb21lIHVzZXJzIGxpa2UgdG8gd3JpdGUgaW50byB0aGVpciBu
-aWMncwo+IC9wcm9jL2lycS8kSVJQL3NtcF9hZmZpbml0eSBhbmQgZ2V0IG1hZCBhdCB1cyBmb3Ig
-bm90IGxldHRpbmcgdGhlbSB3aXRoCj4gdXNpbmcgbWFuYWdlZCBhZmZpbml0eS4KPiAKPiBTbyBp
-bnN0ZWFkIG9mIGZhbGxpbmcgYmFjayB0byB0aGUgYmxvY2sgbWFwcGluZyBmdW5jdGlvbiB3ZSB0
-cnkKPiB0byBkbyBhIGxpdHRsZSBiZXR0ZXIgZmlyc3Q6Cj4gMS4gbWFwIGFjY29yZGluZyB0byB0
-aGUgZGV2aWNlIHZlY3RvciBhZmZpbml0eQo+IDIuIG1hcCB2ZWN0b3JzIHRoYXQgZW5kIHVwIHdp
-dGhvdXQgYSBtYXBwaW5nIHRvIGNwdXMgdGhhdCBiZWxvbmcKPiDCoMKgIHRvIHRoZSBzYW1lIG51
-bWEtbm9kZQo+IDMuIG1hcCBhbGwgdGhlIHJlc3Qgb2YgdGhlIHVubWFwcGVkIGNwdXMgbGlrZSB0
-aGUgYmxvY2sgbGF5ZXIKPiDCoMKgIHdvdWxkIGRvLgo+IAo+IFdlIGNvdWxkIGhhdmUgZGV2aWNl
-IGRyaXZlcnMgdGhhdCBkb24ndCB1c2UgbWFuYWdlZCBhZmZpbml0eSB0byBuZXZlcgo+IHJldHVy
-biBhIHZhbGlkIG1hc2sgYnV0IHRoYXQgd291bGQgbmV2ZXIgYWxsb3cgYWZmaW5pdHkgYmFzZWQg
-bWFwcGluZwo+IHdoaWNoIGlzIG9wdGltYWwgYXQgbGVhc3QgZm9yIHVzZXJzIHRoYXQgZG8gbm90
-IG1hbmdsZSB3aXRoIGRldmljZQo+IGlycSBhZmZpbml0eSAod2hpY2ggaXMgcHJvYmFibHkgdGhl
-IG1ham9yaXR5IG9mIHVzZXJzKS4KPiAKPiBUaG91Z2h0cz8KCkNhbiB3ZSBwbGVhc2UgbWFrZSBm
-b3J3YXJkIHByb2dyZXNzIG9uIHRoaXM/CgpDaHJpc3RvcGgsIFNhZ2k6ICBpdCBzZWVtcyB5b3Ug
-dGhpbmsgL3Byb2MvaXJxLyRJUlAvc21wX2FmZmluaXR5CnNob3VsZG4ndCBiZSBhbGxvd2VkIGlm
-IGRyaXZlcnMgc3VwcG9ydCBtYW5hZ2VkIGFmZmluaXR5LiBJcyB0aGF0IGNvcnJlY3Q/CgpQZXJo
-YXBzIHRoYXQgY2FuIGJlIGNvZGlmaWVkIGFuZCBiZSBhIHdheSBmb3J3YXJkPyAgSUU6IFNvbWVo
-b3cgYWxsb3cKdGhlIGFkbWluIHRvIGNob29zZSBlaXRoZXIgIm1hbmFnZWQgYnkgdGhlIGRyaXZl
-ci91bHBzIiBvciAibWFuYWdlZCBieQp0aGUgc3lzdGVtIGFkbWluIGRpcmVjdGx5Ij8KCk9yIGp1
-c3QgdXNlIFNhZ2kncyBwYXRjaC4gIFBlcmhhcHMgYSBXQVJOX09OQ0UoKSBpZiB0aGUgYWZmaW5p
-dHkgbG9va3MKd29ua2VkIHdoZW4gc2V0IHZpYSBwcm9jZnM/ICBKdXN0IHRoaW5raW5nIG91dCBs
-b3VkLi4uCgpCdXQgYXMgaXQgc3RhbmRzLCB0aGluZ3MgYXJlIGp1c3QgcGxhaW4gYm9ya2VkIGlm
-IGFuIHJkbWEgZHJpdmVyCnN1cHBvcnRzIGliX2dldF92ZWN0b3JfYWZmaW5pdHkoKSB5ZXQgdGhl
-IGFkbWluIGNoYW5nZXMgdGhlIGFmZmluaXR5IHZpYQovcHJvYy4uLgoKVGhhbmtzLAoKU3RldmUu
-CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eC1u
-dm1lIG1haWxpbmcgbGlzdApMaW51eC1udm1lQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xp
-c3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1udm1lCg==
+On 10/15/18 1:24 PM, Geoff Levand wrote:
+> Hi Jens,
+> 
+> On 10/15/2018 11:38 AM, Jens Axboe wrote:
+>> Weird, it looks like we're waiting for something to complete, and then
+>> we have a few others waiting for queue new IO.
+>>
+>> Can you try and move the blk_mq_end_request() inside the priv->lock
+>> section and see if that helps?
+> 
+> With the change below to your V2 I can't get it to have an
+> error.  I did mkfs.ext4, some big file downloads, and ran
+> 'fsck.ext3 -c' for a while.
+
+OK good, that's better than having to make the bigger change I
+just sent out.
+
+> Thanks for working late on it.
+
+Thanks for testing! I'll add your tested-by.
+
+-- 
+Jens Axboe
