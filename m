@@ -1,71 +1,32 @@
-Return-Path: <natechancellor@gmail.com>
-Return-Path: <natechancellor@gmail.com>
-From: Nathan Chancellor <natechancellor@gmail.com>
-To: Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Nathan Chancellor <natechancellor@gmail.com>
-Subject: [PATCH RESEND] drbd: Change drbd_request_detach_interruptible's return type to int
-Date: Tue,  2 Oct 2018 10:12:49 -0700
-Message-Id: <20181002171248.9853-1-natechancellor@gmail.com>
-MIME-Version: 1.0
+Return-Path: <schmitzmic@gmail.com>
+Return-Path: <schmitzmic@gmail.com>
+From: Michael Schmitz <schmitzmic@gmail.com>
+To: linux-block@vger.kernel.org,
+	axboe@kernel.dk
+Cc: linux-m68k@vger.kernel.org,
+	geert@linux-m68k.org
+Subject: [PATCH v7 0/2] Amiga RDB partition support fixes
+Date: Mon, 15 Oct 2018 15:32:25 +1300
+Message-Id: <1539570747-19906-1-git-send-email-schmitzmic@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Clang warns when an implicit conversion is done between enumerated
-types:
-
-drivers/block/drbd/drbd_state.c:708:8: warning: implicit conversion from
-enumeration type 'enum drbd_ret_code' to different enumeration type
-'enum drbd_state_rv' [-Wenum-conversion]
-                rv = ERR_INTR;
-                   ~ ^~~~~~~~
-
-drbd_request_detach_interruptible's only call site is in the return
-statement of adm_detach, which returns an int. Change the return type of
-drbd_request_detach_interruptible to match, silencing Clang's warning.
-
-Reported-by: Nick Desaulniers <ndesaulniers@google.com>
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
----
- drivers/block/drbd/drbd_state.c | 6 ++----
- drivers/block/drbd/drbd_state.h | 3 +--
- 2 files changed, 3 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/block/drbd/drbd_state.c b/drivers/block/drbd/drbd_state.c
-index 0813c654c893..b452359b6aae 100644
---- a/drivers/block/drbd/drbd_state.c
-+++ b/drivers/block/drbd/drbd_state.c
-@@ -688,11 +688,9 @@ request_detach(struct drbd_device *device)
- 			CS_VERBOSE | CS_ORDERED | CS_INHIBIT_MD_IO);
- }
+(hopefully) final version of the Amiga RDB partition table patch follows.
  
--enum drbd_state_rv
--drbd_request_detach_interruptible(struct drbd_device *device)
-+int drbd_request_detach_interruptible(struct drbd_device *device)
- {
--	enum drbd_state_rv rv;
--	int ret;
-+	int ret, rv;
- 
- 	drbd_suspend_io(device); /* so no-one is stuck in drbd_al_begin_io */
- 	wait_event_interruptible(device->state_wait,
-diff --git a/drivers/block/drbd/drbd_state.h b/drivers/block/drbd/drbd_state.h
-index ea58301d0895..cff0a34c150b 100644
---- a/drivers/block/drbd/drbd_state.h
-+++ b/drivers/block/drbd/drbd_state.h
-@@ -162,8 +162,7 @@ static inline int drbd_request_state(struct drbd_device *device,
- }
- 
- /* for use in adm_detach() (drbd_adm_detach(), drbd_adm_down()) */
--enum drbd_state_rv
--drbd_request_detach_interruptible(struct drbd_device *device);
-+int drbd_request_detach_interruptible(struct drbd_device *device);
- 
- enum drbd_role conn_highest_role(struct drbd_connection *connection);
- enum drbd_role conn_highest_peer(struct drbd_connection *connection);
--- 
-2.19.0
+I've split off the part fixing the incorrect use of signed int
+for partition start address and size as separate patch. It does fix the
+bug that Martin Steigerwald reported six years ago for a 2 TB disk.
+I have tested this patch with the identical RDB partition data that
+Martin saw the bug with. I have incorporated Andreas' feedback on proper
+use of casts to avoid integer overflow in this version.
+
+The simple fix still leaves ample room for overflows in calculating start
+address and size of a RDB partition, though such overflows should only be 
+seen in rather unusual cases. To address these potential overflows, checks
+are added in the second patch of this series. Comments by Geert have been   
+addressed in full. 
+
+Both patches now reviewed by Geert - Reviewed-by tags added. 
+
+Cheers,
+
+        Michael
