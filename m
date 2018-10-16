@@ -1,39 +1,62 @@
-Return-Path: <jthumshirn@suse.de>
-Subject: Re: [PATCH 0/15 v2] loop: Fix oops and possible deadlocks
-To: Jan Kara <jack@suse.cz>
+Return-Path: <jack@suse.cz>
+Date: Tue, 16 Oct 2018 13:36:54 +0200
+From: Jan Kara <jack@suse.cz>
+To: Johannes Thumshirn <jthumshirn@suse.de>
 Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
- Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- omar Sandoval <osandov@osandov.com>
+	Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/15 v2] loop: Fix oops and possible deadlocks
+Message-ID: <20181016113654.GG18918@quack2.suse.cz>
 References: <20181010100415.26525-1-jack@suse.cz>
  <a40fcf62-85a4-a6be-0803-d99dedf8cc61@i-love.sakura.ne.jp>
  <20181010114227.GA12977@linux-x5ow.site>
  <20181010122809.GE11507@quack2.suse.cz>
- <20181016113654.GG18918@quack2.suse.cz>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-Message-ID: <224dcf7b-1da2-6ee2-1ead-b41e73cd97c0@suse.de>
-Date: Tue, 16 Oct 2018 14:04:08 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181016113654.GG18918@quack2.suse.cz>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20181010122809.GE11507@quack2.suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-On 16/10/18 13:36, Jan Kara wrote:
-[...]
-> 2) For the oops (use-after-free) issue I was not able to reproduce that in
-> my test KVM in couple hours. The race window is rather narrow and syzbot
-> with KASAN and everything hit it only 11 times. So I'm not sure how useful
-> that test is. Any opinions?
+On Wed 10-10-18 14:28:09, Jan Kara wrote:
+> On Wed 10-10-18 13:42:27, Johannes Thumshirn wrote:
+> > On Wed, Oct 10, 2018 at 07:19:00PM +0900, Tetsuo Handa wrote:
+> > > On 2018/10/10 19:04, Jan Kara wrote:
+> > > > Hi,
+> > > > 
+> > > > this patch series fixes oops and possible deadlocks as reported by syzbot [1]
+> > > > [2]. The second patch in the series (from Tetsuo) fixes the oops, the remaining
+> > > > patches are cleaning up the locking in the loop driver so that we can in the
+> > > > end reasonably easily switch to rereading partitions without holding mutex
+> > > > protecting the loop device.
+> > > > 
+> > > > I have lightly tested the patches by creating, deleting, and modifying loop
+> > > > devices but if there's some more comprehensive loopback device testsuite, I
+> > > > can try running it. Review is welcome!
+> > > 
+> > > Testing on linux-next by syzbot will be the most comprehensive. ;-)
+> > 
+> > Apart from that blktests has a loop category and I think it could also be
+> > worthwhile to add the C reproducer from syzkaller to blktests.
+> 
+> Yeah, I did run loop tests now and they ran fine. I can try converting the
+> syzbot reproducers into something legible but it will take a while.
 
-Personally I think a test that has varying outcomes depending on how
-often you run it (just to hit the race) isn't really suitable for a
-suite like blktests.
+So I took a stab at this. But I hit two issues:
 
-But that's my personal opinion only, Omar what's your opinion here?
+1) For the reproducer triggering the lockdep warning, you need a 32-bit
+binary (so that it uses compat_ioctl). I don't think we want to introduce
+32-bit devel environment dependency to blktests. With 64-bits, the problem
+is also there but someone noticed and silenced lockdep (with a reason that
+I consider is incorrect)... I think the test is still worth it though as
+I'll remove the lockdep-fooling code in my patches and thus new breakage
+will be noticed.
+
+2) For the oops (use-after-free) issue I was not able to reproduce that in
+my test KVM in couple hours. The race window is rather narrow and syzbot
+with KASAN and everything hit it only 11 times. So I'm not sure how useful
+that test is. Any opinions?
+
+								Honza
 
 -- 
-Johannes Thumshirn                                        SUSE Labs
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
