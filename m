@@ -1,42 +1,51 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:40026 "EHLO imap.thunk.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727597AbeJ3BFU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Oct 2018 21:05:20 -0400
-From: Theodore Ts'o <tytso@mit.edu>
-To: linux-block@vger.kernel.org
-Cc: Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH blktests] Add use of logger so that syslog files show when each test starts
-Date: Mon, 29 Oct 2018 12:15:57 -0400
-Message-Id: <20181029161557.7652-1-tytso@mit.edu>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <martin.petersen@oracle.com>
+To: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Matias Bjorling <matias.bjorling@wdc.com>
+Subject: Re: [PATCH v4 02/11] scsi: sd_zbc: Reduce boot device scan and revalidate time
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20181012100850.23316-1-damien.lemoal@wdc.com>
+	<20181012100850.23316-3-damien.lemoal@wdc.com>
+Date: Tue, 16 Oct 2018 00:50:21 -0400
+In-Reply-To: <20181012100850.23316-3-damien.lemoal@wdc.com> (Damien Le Moal's
+	message of "Fri, 12 Oct 2018 19:08:41 +0900")
+Message-ID: <yq14ldmv6k2.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Theodore Ts'o <tytso@mit.edu>
----
- check | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/check b/check
-index f6c3537..ebd87c0 100755
---- a/check
-+++ b/check
-@@ -319,6 +319,7 @@ _call_test() {
- 		local dmesg_marker=""
- 		CHECK_DMESG=0
- 	fi
-+	$LOGGER_PROG "run blktests $TEST_NAME"
- 
- 	trap _cleanup EXIT
- 	if ! TMPDIR="$(mktemp --tmpdir -p "$OUTPUT" -d "tmpdir.${TEST_NAME//\//.}.XXX")"; then
-@@ -578,6 +579,8 @@ fi
- eval set -- "$TEMP"
- unset TEMP
- 
-+LOGGER_PROG="$(type -P logger)" || LOGGER_PROG=true
-+
- if [[ -r config ]]; then
- 	# shellcheck disable=SC1091
- 	. config
+Damien,
+
+> Handling checks of ZBC device capacity using the max_lba field of the
+> REPORT ZONES command reply for disks with rc_basis == 0 can be done
+> using the same report zones command reply used to check the "same"
+> field.
+>
+> Avoid executing a report zones command solely to check the disk capacity
+> by merging sd_zbc_check_capacity() into sd_zbc_check_zone_size() and
+> renaming that function to sd_zbc_check_zones(). This removes a costly
+> execution of a full report zones command and so reduces device scan
+> duration at boot time as well as the duration of disk revalidate calls.
+>
+> Furthermore, setting the partial report bit in the REPORT ZONES command
+> cdb can significantly reduce this command execution time as the device
+> does not have to count and report the total number of zones that could
+> be reported assuming a large enough reply buffer. A non-partial zone
+> report is necessary only for the first execution of report zones used to
+> check the same field value (to ensure that this value applies to all
+> zones of the disk). All other calls to sd_zbc_report_zones() can use a
+> partial report to reduce execution time.
+>
+> Using a 14 TB ZBC disk, these simple changes reduce device scan time at
+> boot from about 3.5s down to about 900ms. Disk revalidate times are also
+> reduced from about 450ms down to 230ms.
+
+Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
+
 -- 
-2.18.0.rc0
+Martin K. Petersen	Oracle Linux Engineering
