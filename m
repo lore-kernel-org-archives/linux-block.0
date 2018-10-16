@@ -1,49 +1,44 @@
-Return-Path: <msnitzer@redhat.com>
-Date: Tue, 16 Oct 2018 11:17:27 -0400
-From: Mike Snitzer <snitzer@redhat.com>
+Return-Path: <martin.petersen@oracle.com>
 To: Damien Le Moal <damien.lemoal@wdc.com>
 Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com, Christoph Hellwig <hch@lst.de>,
-	Matias Bjorling <matias.bjorling@wdc.com>
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Matias Bjorling <matias.bjorling@wdc.com>
 Subject: Re: [PATCH v4 10/11] block: add a report_zones method
-Message-ID: <20181016151727.GA26807@redhat.com>
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
 References: <20181012100850.23316-1-damien.lemoal@wdc.com>
- <20181012100850.23316-11-damien.lemoal@wdc.com>
+	<20181012100850.23316-11-damien.lemoal@wdc.com>
+Date: Tue, 16 Oct 2018 00:55:47 -0400
+In-Reply-To: <20181012100850.23316-11-damien.lemoal@wdc.com> (Damien Le Moal's
+	message of "Fri, 12 Oct 2018 19:08:49 +0900")
+Message-ID: <yq1va62trqk.fsf@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20181012100850.23316-11-damien.lemoal@wdc.com>
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Oct 12 2018 at  6:08am -0400,
-Damien Le Moal <damien.lemoal@wdc.com> wrote:
 
-> From: Christoph Hellwig <hch@lst.de>
-> 
-> Dispatching a report zones command through the request queue is a major
-> pain due to the command reply payload rewriting necessary. Given that
-> blkdev_report_zones() is executing everything synchronously, implement
-> report zones as a block device file operation instead, allowing major
-> simplification of the code in many places.
-> 
+Damien,
+
+> Dispatching a report zones command through the request queue is a
+> major pain due to the command reply payload rewriting necessary. Given
+> that blkdev_report_zones() is executing everything synchronously,
+> implement report zones as a block device file operation instead,
+> allowing major simplification of the code in many places.
+>
 > sd, null-blk, dm-linear and dm-flakey being the only block device
 > drivers supporting exposing zoned block devices, these drivers are
 > modified to provide the device side implementation of the
 > report_zones() block device file operation.
-> 
+>
 > For device mappers, a new report_zones() target type operation is
 > defined so that the upper block layer calls blkdev_report_zones() can
 > be propagated down to the underlying devices of the dm targets.
 > Implementation for this new operation is added to the dm-linear and
 > dm-flakey targets.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> [Damien]
-> * Changed method block_device argument to gendisk
-> * Various bug fixes and improvements
-> * Added support for null_blk, dm-linear and dm-flakey.
-> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-> Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Reviewed-by: Mike Snitzer <snitzer@redhat.com>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
