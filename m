@@ -1,82 +1,67 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 12/15] loop: Move special partition reread handling in loop_clr_fd()
-Date: Wed, 10 Oct 2018 12:04:12 +0200
-Message-Id: <20181010100415.26525-13-jack@suse.cz>
-In-Reply-To: <20181010100415.26525-1-jack@suse.cz>
-References: <20181010100415.26525-1-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:47802 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726581AbeJPSiG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Oct 2018 14:38:06 -0400
+Date: Tue, 16 Oct 2018 12:48:14 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Ioana Ciornei <ioana.ciornei@nxp.com>
+Cc: "idryomov@gmail.com" <idryomov@gmail.com>,
+        "sage@redhat.com" <sage@redhat.com>,
+        "elder@kernel.org" <elder@kernel.org>,
+        "jth@kernel.org" <jth@kernel.org>,
+        "benh@kernel.crashing.org" <benh@kernel.crashing.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+Subject: Re: [PATCH] driver core: device: add BUS_ATTR_WO macro
+Message-ID: <20181016104814.GA4768@kroah.com>
+References: <1538407972-9340-1-git-send-email-ioana.ciornei@nxp.com>
+ <20181001210804.GA24332@kroah.com>
+ <HE1PR0401MB236354F325B7A56355068E35E0E80@HE1PR0401MB2363.eurprd04.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <HE1PR0401MB236354F325B7A56355068E35E0E80@HE1PR0401MB2363.eurprd04.prod.outlook.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The call of __blkdev_reread_part() from loop_reread_partition() happens
-only when we need to invalidate partitions from loop_release(). Thus
-move a detection for this into loop_clr_fd() and simplify
-loop_reread_partition().
+On Tue, Oct 02, 2018 at 09:43:35AM +0000, Ioana Ciornei wrote:
+> > > Add BUS_ATTR_WO macro to make it easier to add attributes without
+> > > auditing the mode settings. Also, use the newly added macro where
+> > > appropriate.
+> > >
+> > > Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
+> > > ---
+> > >  arch/powerpc/platforms/pseries/ibmebus.c | 12 ++++----
+> > >  drivers/block/rbd.c                      | 48 ++++++++++++++++----------------
+> > >  drivers/scsi/fcoe/fcoe_sysfs.c           |  4 +--
+> > >  drivers/scsi/fcoe/fcoe_transport.c       | 10 +++----
+> > >  include/linux/device.h                   |  2 ++
+> > >  include/scsi/libfcoe.h                   |  8 +++---
+> > >  6 files changed, 43 insertions(+), 41 deletions(-)
+> > 
+> > Nice!  This duplicates a lot of the work I did back in July but have not pushed out
+> > very far due to the other things that ended up happening around that time:
+> > 	https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/driver-core.git/log/?h=bus_cleanup 
+> > 
+> > As the patch series seen at that link shows, you can do this in more places than
+> > just what you did here.
+> > 
+> > Either way, you should break this up into the individual patches, like I did or you
+> > can take my patches if you want.  Getting the BUS_ATTR_WO() macro added is
+> > good to do now, and then you can go and hit up all of the different subsystems
+> > that should be converted over to it.
+> 
+> I can of course split my patch into individual ones and resubmit them, but as you already have the entire patch set ready, I feel like we can just push those. I looked through your changes and it seems like you covered all the subsystems. Please let me know if there is something else I should do.
+> 
+> My intention here was to first add the _WO attribute so that afterwards I can add a new bus attribute in the fsl-mc bus.
 
-This makes loop_reread_partition() safe to use without loop_ctl_mutex
-because we use only lo->lo_number and lo->lo_file_name in case of error
-for reporting purposes (thus possibly reporting outdate information is
-not a big deal) and we are safe from 'lo' going away under us by
-elevated lo->lo_refcnt.
+Ok, I've queued up the patch that adds the _WO attribute now, so that
+you should be able to use this after 4.20-rc1.  I'll work on getting my
+other patches merged in that series at that time as well.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- drivers/block/loop.c | 33 +++++++++++++++++++--------------
- 1 file changed, 19 insertions(+), 14 deletions(-)
+thanks,
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index c53ad5e88a7d..db73fb5f16c7 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -631,18 +631,7 @@ static void loop_reread_partitions(struct loop_device *lo,
- {
- 	int rc;
- 
--	/*
--	 * bd_mutex has been held already in release path, so don't
--	 * acquire it if this function is called in such case.
--	 *
--	 * If the reread partition isn't from release path, lo_refcnt
--	 * must be at least one and it can only become zero when the
--	 * current holder is released.
--	 */
--	if (!atomic_read(&lo->lo_refcnt))
--		rc = __blkdev_reread_part(bdev);
--	else
--		rc = blkdev_reread_part(bdev);
-+	rc = blkdev_reread_part(bdev);
- 	if (rc)
- 		pr_warn("%s: partition scan of loop%d (%s) failed (rc=%d)\n",
- 			__func__, lo->lo_number, lo->lo_file_name, rc);
-@@ -1096,8 +1085,24 @@ static int __loop_clr_fd(struct loop_device *lo)
- 	module_put(THIS_MODULE);
- 	blk_mq_unfreeze_queue(lo->lo_queue);
- 
--	if (lo->lo_flags & LO_FLAGS_PARTSCAN && bdev)
--		loop_reread_partitions(lo, bdev);
-+	if (lo->lo_flags & LO_FLAGS_PARTSCAN && bdev) {
-+		/*
-+		 * bd_mutex has been held already in release path, so don't
-+		 * acquire it if this function is called in such case.
-+		 *
-+		 * If the reread partition isn't from release path, lo_refcnt
-+		 * must be at least one and it can only become zero when the
-+		 * current holder is released.
-+		 */
-+		if (!atomic_read(&lo->lo_refcnt))
-+			err = __blkdev_reread_part(bdev);
-+		else
-+			err = blkdev_reread_part(bdev);
-+		pr_warn("%s: partition scan of loop%d failed (rc=%d)\n",
-+			__func__, lo->lo_number, err);
-+		/* Device is gone, no point in returning error */
-+		err = 0;
-+	}
- 	lo->lo_flags = 0;
- 	if (!part_shift)
- 		lo->lo_disk->flags |= GENHD_FL_NO_PART_SCAN;
--- 
-2.16.4
+greg k-h
