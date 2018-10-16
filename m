@@ -1,58 +1,49 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH V3 4/4] blk-mq: ensure hctx to be ran on mapped cpu when issue directly
-Date: Mon, 29 Oct 2018 16:33:33 +0800
-Message-Id: <1540802013-2921-5-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1540802013-2921-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1540802013-2921-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <msnitzer@redhat.com>
+Date: Tue, 16 Oct 2018 11:17:27 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	dm-devel@redhat.com, Christoph Hellwig <hch@lst.de>,
+	Matias Bjorling <matias.bjorling@wdc.com>
+Subject: Re: [PATCH v4 10/11] block: add a report_zones method
+Message-ID: <20181016151727.GA26807@redhat.com>
+References: <20181012100850.23316-1-damien.lemoal@wdc.com>
+ <20181012100850.23316-11-damien.lemoal@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20181012100850.23316-11-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-When issue request directly and the task is migrated out of the
-original cpu where it allocates request, hctx could be ran on
-the cpu where it is not mapped. To fix this, insert the request
-if BLK_MQ_F_BLOCKING is set, check whether the current is mapped
-to the hctx and invoke __blk_mq_issue_directly under preemption
-disabled.
+On Fri, Oct 12 2018 at  6:08am -0400,
+Damien Le Moal <damien.lemoal@wdc.com> wrote:
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
----
- block/blk-mq.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+> From: Christoph Hellwig <hch@lst.de>
+> 
+> Dispatching a report zones command through the request queue is a major
+> pain due to the command reply payload rewriting necessary. Given that
+> blkdev_report_zones() is executing everything synchronously, implement
+> report zones as a block device file operation instead, allowing major
+> simplification of the code in many places.
+> 
+> sd, null-blk, dm-linear and dm-flakey being the only block device
+> drivers supporting exposing zoned block devices, these drivers are
+> modified to provide the device side implementation of the
+> report_zones() block device file operation.
+> 
+> For device mappers, a new report_zones() target type operation is
+> defined so that the upper block layer calls blkdev_report_zones() can
+> be propagated down to the underlying devices of the dm targets.
+> Implementation for this new operation is added to the dm-linear and
+> dm-flakey targets.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> [Damien]
+> * Changed method block_device argument to gendisk
+> * Various bug fixes and improvements
+> * Added support for null_blk, dm-linear and dm-flakey.
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9c6c858..ced3346 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1770,6 +1770,17 @@ static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	blk_status_t ret = BLK_STS_RESOURCE;
- 	int srcu_idx;
- 
-+	if (hctx->flags & BLK_MQ_F_BLOCKING) {
-+		force = true;
-+		goto out;
-+	}
-+
-+	if (!cpumask_test_cpu(get_cpu(), hctx->cpumask)) {
-+		put_cpu();
-+		force = true;
-+		goto out;
-+	}
-+
- 	hctx_lock(hctx, &srcu_idx);
- 	/*
- 	 * hctx_lock is needed before checking quiesced flag.
-@@ -1798,7 +1809,8 @@ static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	ret = __blk_mq_issue_directly(hctx, rq, cookie);
- out_unlock:
- 	hctx_unlock(hctx, srcu_idx);
--
-+	put_cpu();
-+out:
- 	dec = blk_mq_make_dicision(ret, bypass_insert, force);
- 	switch(dec) {
- 	case MQ_INSERT_DISPATCH:
--- 
-2.7.4
+Reviewed-by: Mike Snitzer <snitzer@redhat.com>
