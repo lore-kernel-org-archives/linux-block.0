@@ -1,15 +1,14 @@
-Return-Path: <prvs=822dc0816=Damien.LeMoal@wdc.com>
+Return-Path: <prvs=820d6586b=Damien.LeMoal@wdc.com>
 From: Damien Le Moal <Damien.LeMoal@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>, "linux-block@vger.kernel.org"
 	<linux-block@vger.kernel.org>, "linux-scsi@vger.kernel.org"
 	<linux-scsi@vger.kernel.org>, "Martin K . Petersen"
 	<martin.petersen@oracle.com>, "dm-devel@redhat.com" <dm-devel@redhat.com>,
 	Mike Snitzer <snitzer@redhat.com>
-CC: Christoph Hellwig <hch@lst.de>, Matias Bjorling <Matias.Bjorling@wdc.com>
 Subject: Re: [PATCH v4 00/11] Zoned block device support improvements
-Date: Thu, 18 Oct 2018 07:57:38 +0000
+Date: Tue, 16 Oct 2018 03:43:36 +0000
 Message-ID: 
- <BN3PR0401MB1640E5E4E056F914DB3E7D53E7F80@BN3PR0401MB1640.namprd04.prod.outlook.com>
+ <BN3PR0401MB16408DC28A398B655DA37F12E7FE0@BN3PR0401MB1640.namprd04.prod.outlook.com>
 References: <20181012100850.23316-1-damien.lemoal@wdc.com>
  <f6062f58-8f8a-b90a-9163-5938632e1a6a@kernel.dk>
  <BN3PR0401MB16409A77BC3EA6E37073DD17E7FD0@BN3PR0401MB1640.namprd04.prod.outlook.com>
@@ -18,6 +17,8 @@ Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
+Martin, Mike,=0A=
+=0A=
 On 2018/10/16 11:34, Jens Axboe wrote:=0A=
 > On 10/14/18 6:45 PM, Damien Le Moal wrote:=0A=
 >> Jens,=0A=
@@ -70,13 +71,15 @@ aps=0A=
 > Probably want to start pinging people, if you're targeting 4.20 with=0A=
 > this...=0A=
 =0A=
-Hi Jens,=0A=
+Could you please review or ack the parts relevant to SCSI and DM of this=0A=
+series ?=0A=
 =0A=
-Martin and Mike acked/reviewed the SCSI and DM parts respectively (thanks !=
-).=0A=
-Do you think you can take this series for 4.20 ?=0A=
+For DM, changes are in patches 10 and 11=0A=
+For SCSI, patches 1-3, 10 and 11 introduce changes.=0A=
 =0A=
-Thanks.=0A=
+Thank you.=0A=
+=0A=
+Best regards.=0A=
 =0A=
 -- =0A=
 Damien Le Moal=0A=
