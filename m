@@ -1,45 +1,39 @@
-Return-Path: <hch@lst.de>
-Date: Wed, 17 Oct 2018 09:21:59 +0200
-From: Christoph Hellwig <hch@lst.de>
+Return-Path: <martin.petersen@oracle.com>
 To: Damien Le Moal <damien.lemoal@wdc.com>
 Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: Re: [PATCH v4 03/11] scsi: sd_zbc: Fix sd_zbc_check_zones() error
- checks
-Message-ID: <20181017072159.GE23407@lst.de>
-References: <20181012100850.23316-1-damien.lemoal@wdc.com> <20181012100850.23316-4-damien.lemoal@wdc.com>
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Matias Bjorling <matias.bjorling@wdc.com>
+Subject: Re: [PATCH v4 03/11] scsi: sd_zbc: Fix sd_zbc_check_zones() error checks
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20181012100850.23316-1-damien.lemoal@wdc.com>
+	<20181012100850.23316-4-damien.lemoal@wdc.com>
+Date: Tue, 16 Oct 2018 00:51:47 -0400
+In-Reply-To: <20181012100850.23316-4-damien.lemoal@wdc.com> (Damien Le Moal's
+	message of "Fri, 12 Oct 2018 19:08:42 +0900")
+Message-ID: <yq1zhvetrx8.fsf@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20181012100850.23316-4-damien.lemoal@wdc.com>
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-> @@ -687,12 +688,8 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
->  	 * Check zone size: only devices with a constant zone size (except
->  	 * an eventual last runt zone) that is a power of 2 are supported.
->  	 */
-> -	zone_blocks = sd_zbc_check_zones(sdkp);
-> -	ret = -EFBIG;
-> -	if (zone_blocks != (u32)zone_blocks)
-> -		goto err;
-> -	ret = zone_blocks;
-> -	if (ret < 0)
-> +	ret = sd_zbc_check_zones(sdkp, &zone_blocks);
-> +	if (ret != 0)
 
-This coud be simplified to
+Damien,
 
-	if (ret)
+> The unsigned 32 bits overflow check for the zone size value is already
+> done within sd_zbc_check_zones() with the test:
+>
+> } else if (logical_to_sectors(sdkp->device, zone_blocks) > UINT_MAX) {
+>
+> so there is no need to check again for an out of range value in
+> sd_zbc_read_zones(). Simplify the code and fix sd_zbc_check_zones()
+> error return to -EFBIG instead of -ENODEV if the zone size is too large.
+> Change the return type of sd_zbc_check_zones() to an int for the error
+> code and return the zone size (zone_blocks) through a u32 pointer to
+> avoid overflowing the signed 32 return value.
 
-or just keep the old
+Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-	if (ret < 0)
-
-which would still work.
-
-Otherwise looks fine:
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+-- 
+Martin K. Petersen	Oracle Linux Engineering
