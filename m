@@ -1,99 +1,60 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-Date: Tue, 16 Oct 2018 14:25:13 -0400
-From: Dennis Zhou <dennis@kernel.org>
-To: valdis.kletnieks@vt.edu
-Cc: Theodore Ts'o <tytso@mit.edu>, Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org
+Return-Path: <valdis@vt.edu>
+Sender: Valdis Kletnieks <valdis@vt.edu>
+From: valdis.kletnieks@vt.edu
+To: "Theodore Y. Ts'o" <tytso@mit.edu>, Dennis Zhou <dennisszhou@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
 Subject: Re: [BUG] ext4/block null pointer crashes in linux-next
-Message-ID: <20181016182513.GA9886@dennisz-mbp.dhcp.thefacebook.com>
-References: <13987.1539646128@turing-police.cc.vt.edu>
- <20181016160203.GA88193@dennisz-mbp.dhcp.thefacebook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20181016160203.GA88193@dennisz-mbp.dhcp.thefacebook.com>
+In-Reply-To: <66480.1539693734@turing-police.cc.vt.edu>
+References: <13987.1539646128@turing-police.cc.vt.edu> <20181016015201.GB18547@thunk.org>
+ <66480.1539693734@turing-police.cc.vt.edu>
+Mime-Version: 1.0
+Content-Type: multipart/signed; boundary="==_Exmh_1539706333_2381P";
+	 micalg=pgp-sha1; protocol="application/pgp-signature"
+Date: Tue, 16 Oct 2018 12:12:13 -0400
+Message-ID: <12638.1539706333@turing-police.cc.vt.edu>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Oct 16, 2018 at 12:02:03PM -0400, Dennis Zhou wrote:
-> Hi Vladis,
-> 
-> On Mon, Oct 15, 2018 at 07:28:48PM -0400, valdis.kletnieks@vt.edu wrote:
-> > So I finally had a chance to find a replicator and finish bisecting this and:
-> > 
-> > [/usr/src/linux-next] git bisect good
-> > e2b0989954ae7c80609f77e7ce203bea6d2c54e1 is the first bad commit
-> > commit e2b0989954ae7c80609f77e7ce203bea6d2c54e1
-> > Author: Dennis Zhou (Facebook) <dennisszhou@gmail.com>
-> > Date:   Tue Sep 11 14:41:35 2018 -0400
-> > 
-> >     blkcg: cleanup and make blk_get_rl use blkg_lookup_create
-> > 
-> > I was able to do a bit of sleuthing with strace, and I tracked it down to one of
-> > several execve() calls that 'rpm' makes with my replicating test case.
-> > 
-> >  grep execve /root/rpm-exec-strace 
-> > execve("/usr/bin/rpm", ["rpm", "-Uvh", "--force", "dracut-049-4.git20181010.fc30.x8"...], 0x7ffc9d967d80 /* 33 vars */) = 0
-> > [pid 119212] execve("/bin/sh", ["/bin/sh", "/usr/src/redhat/tmp/rpm-tmp.w7fu"..., "0", "0"], 0x7ffdfe17d480 /* 33 vars */) = 0
-> > [pid 119213] execve("/sbin/ldconfig", ["/sbin/ldconfig"], 0x558ccf928ac0 /* 33 vars */) = 0
-> > [pid 119216] execve("/bin/sh", ["/bin/sh", "/usr/src/redhat/tmp/rpm-tmp.bIKt"..., "0", "0"], 0x7ffdfe17d480 /* 33 vars */) = 0
-> > [pid 119217] execve("/usr/bin/systemd-run", ["/usr/bin/systemd-run", "/usr/bin/systemctl", "start", "man-db-cache-update"], 0x56360645d290 /* 33 vars */) = 0
-> > [pid 119221] execve("/bin/sh", ["/bin/sh", "/usr/src/redhat/tmp/rpm-tmp.OGWg"..., "0", "0"], 0x7ffdfe17d480 /* 33 vars */) = 0
-> > [pid 119920] execve("/usr/bin/systemctl", ["/usr/bin/systemctl", "daemon-reload"], 0x55c0f5d43c30 /* 33 vars */) = 0
-> > 
-> > The ldconfig and systemctl commands run just fine stand-alone, so I'm suspecting the
-> > calls to run the temp files - it's quite possible that execve() gets invoked on them before
-> > writeback has actually gotten the data to the disk - though that shouldn't matter.
-> > 
-> > But I managed to trigger a different traceback. I cd /usr/src/redhat/tmp, and I
-> > did an 'rm *' - and never got a prompt back. Traceback out of pstore below.
-> > 
-> > Now here's the weird part - I'd already unmounted, fsck'ed, and remounted the
-> > file system before the 'rm *'.  And thinking that there was one file with a
-> > busted inode that passed fsck.ext4's sniff test, I did:
-> > 
-> > cd /usr/src/redhat/tmp
-> > for i in `find . -type f`; do sleep 5; echo $i; rm $i; done
-> > 
-> > and that worked just fine. Nothing left in that directory but . and ..  
-> > I then re-ran my rpm-based replicator and it blew up again.
-> > 
-> > Traceback of the rm crash (I have *no* idea why it has systemd-tmpfile as Comm:
-> > as none of the tmpfile config reference /usr/src at all, and the config says it
-> > shouldn't have been running at the time of the crash, and I can't replicate as
-> > the directory is now empty...)
-> > 
-> 
-> Thanks for testing and reporting this! Do you mind sending me your
-> reproducer?
-> 
-> Thanks,
-> Dennis
+--==_Exmh_1539706333_2381P
+Content-Type: text/plain; charset=us-ascii
 
-I've spent some time thinking about this, and this is my guess at what
-is happening without seeing your reproducer. The system is under memory
-pressure and a new cgroup is being created. The cgroup allocation fails
-causing the request_list code to fallback and walk up the blkg tree.
-There is special handling for the root cgroup, but I missed that case
-and it fails there I believe.
+On Tue, 16 Oct 2018 08:42:14 -0400, valdis.kletnieks@vt.edu said:
 
-In addition to sending me the reproducer and your config, can you please
-try the patch below?
+> [~] zgrep CGROUP /proc/config.gz
+> CONFIG_CGROUPS=y
+> CONFIG_BLK_CGROUP=y
+> # CONFIG_DEBUG_BLK_CGROUP is not set
+> (...)
 
-Thanks,
-Dennis
+> Looks like I should enable DEBUG_BLK_CGROUP and see what that says.
 
----
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index b7fd08013de2..1e76ceebeb5d 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -597,7 +597,7 @@ static inline struct request_list *blk_get_rl(struct request_queue *q,
- 	if (unlikely(!blkg))
- 		blkg = __blkg_lookup_create(blkcg, q);
- 
--	if (!blkg_tryget(blkg))
-+	if (blkg->blkcg == &blkcg_root || !blkg_tryget(blkg))
- 		goto rl_use_root;
- 
- 	rcu_read_unlock();
+Built next-20181016 with that enabled - and the exact same kablam.
+
+Started looking at the code, and I noticed that if the .config has
+
+CONFIG_IOSCHED_CFQ=y
+# CONFIG_CFQ_GROUP_IOSCHED is not set
+CONFIG_BLK_CGROUP=y
+
+then the 'struct cfqg_stats' at line 185 of block/cfq-iosched.c ends up being
+zero length (which hints that combo of config variables is a pathological
+case). I haven't delved through all the #ifdef'ery, but I wonder if there
+may be other corner-case issues with that combo....
+
+
+--==_Exmh_1539706333_2381P
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Exmh version 2.8.0 04/21/2017
+
+iQEVAwUBW8YN3Y0DS38y7CIcAQKm1Af9E7hXxt6027MX7A17TQoxeQAQZXV4hw+I
+/kyOqhvtGZuEr+BQdtXAUpDlQwPs74uQOByPy08dvleO7DwZvS6jbdtZEPyW/kxD
+Y1y1SahHpyRXAx2ngE6WSv2kzNGV9KgU5RKMcBNSpX53wM5eRNk+meRPXqgqVaLL
+dTe3QL1mcmWrsOX3d35uYbi15q0+2nkXDD7M1oZVaCDenVzxZ8W07KzjzD+swClc
+SQV2gQdXnEFBQeEEPuYQQI1Uzy8CItVI+bJ6yO1vc336vtu66sN2w0XIAB2AYi/N
+zPbZMcXA+rp37FHc+uYRJBqOSqGfFGBqZNQj97Gc0yO6k3SaI1uhCA==
+=X1MR
+-----END PGP SIGNATURE-----
+
+--==_Exmh_1539706333_2381P--
