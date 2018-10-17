@@ -7,8 +7,8 @@ CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
  Hellwig" <hch@lst.de>, Xiao Ni <xni@redhat.com>
 Subject: Re: [PATCH] block: don't deal with discard limit in
  blkdev_issue_discard()
-Date: Wed, 17 Oct 2018 07:06:04 +0000
-Message-ID: <F8DA6D2CACE3064C95976CD103E141C5732B79D4@IRSMSX107.ger.corp.intel.com>
+Date: Wed, 17 Oct 2018 05:46:06 +0000
+Message-ID: <e7f5df7d-1e21-e790-a1c2-aa30c5329a31@intel.com>
 References: <20181012075310.4587-1-ming.lei@redhat.com>
 In-Reply-To: <20181012075310.4587-1-ming.lei@redhat.com>
 Content-Type: text/plain; charset="utf-8"
@@ -64,6 +64,5 @@ bnQpIHsNCj4gLQkJCWVuZF9zZWN0ID0gZW5kX3NlY3QgLSBhbGlnbm1lbnQ7DQo+IC0JCQlzZWN0
 b3JfZGl2KGVuZF9zZWN0LCBncmFudWxhcml0eSk7DQo+IC0JCQllbmRfc2VjdCA9IGVuZF9zZWN0
 ICogZ3JhbnVsYXJpdHkgKyBhbGlnbm1lbnQ7DQo+IC0JCQlyZXFfc2VjdHMgPSBlbmRfc2VjdCAt
 IHNlY3RvcjsNCj4gLQkJfQ0KPiAgIA0KPiAgIAkJYmlvID0gbmV4dF9iaW8oYmlvLCAwLCBnZnBf
-bWFzayk7DQo+ICAgCQliaW8tPmJpX2l0ZXIuYmlfc2VjdG9yID0gc2VjdG9yOw0KPiANCg0KVGVz
-dGVkLWJ5OiBNYXJpdXN6IERhYnJvd3NraSA8bWFyaXVzei5kYWJyb3dza2lAaW50ZWwuY29tPg0K
-DQpSZWdhcmRzLA0KTWFyaXVzeg0K
+bWFzayk7DQo+ICAgCQliaW8tPmJpX2l0ZXIuYmlfc2VjdG9yID0gc2VjdG9yOw0KPg0KVGVzdGVk
+LWJ5OiBNYXJpdXN6IERhYnJvd3NraSA8bWFyaXVzei5kYWJyb3dza2lAaW50ZWwuY29tPg==
