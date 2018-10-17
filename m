@@ -1,103 +1,98 @@
-Return-Path: <prvs=816489328=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH v4 09/11] block: Expose queue nr_zones in sysfs
-Date: Fri, 12 Oct 2018 19:08:48 +0900
-Message-Id: <20181012100850.23316-10-damien.lemoal@wdc.com>
-In-Reply-To: <20181012100850.23316-1-damien.lemoal@wdc.com>
-References: <20181012100850.23316-1-damien.lemoal@wdc.com>
+Return-Path: <aneesh.kumar@linux.ibm.com>
+Subject: Re: Crash on FSL Book3E due to pte_pgprot()? (was Re: [PATCH v3
+ 12/24] powerpc/mm: use pte helpers in generic code)
+To: Christophe Leroy <christophe.leroy@c-s.fr>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+        Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>,
+        Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>,
+        Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
+References: <cover.1539092111.git.christophe.leroy@c-s.fr>
+ <343c844bbc5081d13ee4c9aa27ff3118f607e1cc.1539092112.git.christophe.leroy@c-s.fr>
+ <87va61jsma.fsf@concordia.ellerman.id.au>
+ <236d72cd-e6d7-61e5-2c80-e4311e41b4f6@c-s.fr>
+ <87efcoeudx.fsf@concordia.ellerman.id.au>
+ <6ec9cf4b-abd2-8244-4780-4564a7ffb1ad@c-s.fr>
+From: "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
+Date: Wed, 17 Oct 2018 17:23:38 +0530
+MIME-Version: 1.0
+In-Reply-To: <6ec9cf4b-abd2-8244-4780-4564a7ffb1ad@c-s.fr>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <e3b03750-f76a-0a70-69ff-3767382859c6@linux.ibm.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Expose through sysfs the nr_zones field of struct request_queue.
-Exposing this value helps in debugging disk issues as well as
-facilitating scripts based use of the disk (e.g. blktests).
+On 10/17/18 4:42 PM, Christophe Leroy wrote:
+> 
+> 
+> On 10/17/2018 10:32 AM, Michael Ellerman wrote:
+>> Christophe Leroy <christophe.leroy@c-s.fr> writes:
+>>> On 10/17/2018 12:59 AM, Michael Ellerman wrote:
+>> ...
+>>>> The question is what's the right way to fix it? Should pte_pgprot() not
+>>>> be filtering those bits out on book3e?
+>>>
+>>> I think we should not use pte_pggrot() for that then. What about the
+>>> below fix ?
+>>
+>> Thanks, that almost works.
+>>
+>> pte_mkprivileged() also needs to not strip _PAGE_BAP_SR.
+> 
+> Oops, I missed it allthough I knew it. Patch below.
+> 
+> From: Christophe Leroy <christophe.leroy@c-s.fr>
+> Date: Wed, 17 Oct 2018 10:46:24 +0000
+> Subject: [PATCH] powerpc/book3e: redefine pte_mkprivileged() and 
+> pte_mkuser()
+> To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras 
+> <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>
+> Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+> 
+> Book3e defines both _PAGE_USER and _PAGE_PRIVILEGED, so the nohash
+> default pte_mkprivileged() and pte_mkuser() are not usable.
+> 
+> This patch redefines them for book3e.
+> 
+> Fixes: a0da4bc166f2 ("powerpc/mm: Allow platforms to redefine some 
+> helpers")
+> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+> ---
+>   arch/powerpc/include/asm/nohash/pte-book3e.h | 14 ++++++++++++++
+>   1 file changed, 14 insertions(+)
+> 
+> diff --git a/arch/powerpc/include/asm/nohash/pte-book3e.h 
+> b/arch/powerpc/include/asm/nohash/pte-book3e.h
+> index 58eef8cb569d..fb4297dff3e2 100644
+> --- a/arch/powerpc/include/asm/nohash/pte-book3e.h
+> +++ b/arch/powerpc/include/asm/nohash/pte-book3e.h
+> @@ -109,5 +109,19 @@
+>   #define PAGE_READONLY    __pgprot(_PAGE_BASE | _PAGE_USER)
+>   #define PAGE_READONLY_X    __pgprot(_PAGE_BASE | _PAGE_USER | _PAGE_EXEC)
+> 
+> +static inline pte_t pte_mkprivileged(pte_t pte)
+> +{
+> +    return __pte((pte_val(pte) & ~_PAGE_USER) | _PAGE_PRIVILEGED);
+> +}
+> +
+> +#define pte_mkprivileged pte_mkprivileged
+> +
+> +static inline pte_t pte_mkuser(pte_t pte)
+> +{
+> +    return __pte((pte_val(pte) & ~_PAGE_PRIVILEGED) | _PAGE_USER);
+> +}
+> +
+> +#define pte_mkuser pte_mkuser
+> +
 
-For zoned block devices, the nr_zones field indicates the total number
-of zones of the device calculated using the known disk capacity and
-zone size. This number of zones is always 0 for regular block devices.
+I was build testing a similar patch. We would need to put #ifndef 
+__ASSEMBLY__ around it.
 
-Since nr_zones is defined conditionally with CONFIG_BLK_DEV_ZONED,
-introduce the blk_queue_nr_zones() function to return the correct value
-for any device, regardless if CONFIG_BLK_DEV_ZONED is set.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- block/blk-sysfs.c      | 11 +++++++++++
- include/linux/blkdev.h | 10 ++++++++++
- 2 files changed, 21 insertions(+)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 3772671cf2bc..92be8092ca4f 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -300,6 +300,11 @@ static ssize_t queue_zoned_show(struct request_queue *q, char *page)
- 	}
- }
- 
-+static ssize_t queue_nr_zones_show(struct request_queue *q, char *page)
-+{
-+	return queue_var_show(blk_queue_nr_zones(q), page);
-+}
-+
- static ssize_t queue_nomerges_show(struct request_queue *q, char *page)
- {
- 	return queue_var_show((blk_queue_nomerges(q) << 1) |
-@@ -637,6 +642,11 @@ static struct queue_sysfs_entry queue_zoned_entry = {
- 	.show = queue_zoned_show,
- };
- 
-+static struct queue_sysfs_entry queue_nr_zones_entry = {
-+	.attr = {.name = "nr_zones", .mode = 0444 },
-+	.show = queue_nr_zones_show,
-+};
-+
- static struct queue_sysfs_entry queue_nomerges_entry = {
- 	.attr = {.name = "nomerges", .mode = 0644 },
- 	.show = queue_nomerges_show,
-@@ -727,6 +737,7 @@ static struct attribute *default_attrs[] = {
- 	&queue_write_zeroes_max_entry.attr,
- 	&queue_nonrot_entry.attr,
- 	&queue_zoned_entry.attr,
-+	&queue_nr_zones_entry.attr,
- 	&queue_nomerges_entry.attr,
- 	&queue_rq_affinity_entry.attr,
- 	&queue_iostats_entry.attr,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c24969b1741b..879753b10263 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -804,6 +804,11 @@ static inline unsigned int blk_queue_zone_sectors(struct request_queue *q)
- }
- 
- #ifdef CONFIG_BLK_DEV_ZONED
-+static inline unsigned int blk_queue_nr_zones(struct request_queue *q)
-+{
-+	return blk_queue_is_zoned(q) ? q->nr_zones : 0;
-+}
-+
- static inline unsigned int blk_queue_zone_no(struct request_queue *q,
- 					     sector_t sector)
- {
-@@ -819,6 +824,11 @@ static inline bool blk_queue_zone_is_seq(struct request_queue *q,
- 		return false;
- 	return test_bit(blk_queue_zone_no(q, sector), q->seq_zones_bitmap);
- }
-+#else /* CONFIG_BLK_DEV_ZONED */
-+static inline unsigned int blk_queue_nr_zones(struct request_queue *q)
-+{
-+	return 0;
-+}
- #endif /* CONFIG_BLK_DEV_ZONED */
- 
- static inline bool rq_is_sync(struct request *rq)
--- 
-2.17.1
+-aneesh
