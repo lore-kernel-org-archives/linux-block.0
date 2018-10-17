@@ -1,153 +1,74 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 12/30] bsg: pass in desired timeout handler
-Date: Wed, 31 Oct 2018 11:59:04 -0600
-Message-Id: <20181031175922.8849-13-axboe@kernel.dk>
-In-Reply-To: <20181031175922.8849-1-axboe@kernel.dk>
-References: <20181031175922.8849-1-axboe@kernel.dk>
+Return-Path: <jack@suse.cz>
+Date: Wed, 17 Oct 2018 11:47:45 +0200
+From: Jan Kara <jack@suse.cz>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: Jan Kara <jack@suse.cz>, Johannes Thumshirn <jthumshirn@suse.de>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/15 v2] loop: Fix oops and possible deadlocks
+Message-ID: <20181017094745.GA23493@quack2.suse.cz>
+References: <20181010100415.26525-1-jack@suse.cz>
+ <a40fcf62-85a4-a6be-0803-d99dedf8cc61@i-love.sakura.ne.jp>
+ <20181010114227.GA12977@linux-x5ow.site>
+ <20181010122809.GE11507@quack2.suse.cz>
+ <20181016113654.GG18918@quack2.suse.cz>
+ <20181016181622.GF23044@vader>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20181016181622.GF23044@vader>
 List-ID: <linux-block@vger.kernel.org>
 
-This will ease in the conversion to blk-mq, where we can't set
-a timeout handler after queue init.
+On Tue 16-10-18 11:16:22, Omar Sandoval wrote:
+> On Tue, Oct 16, 2018 at 01:36:54PM +0200, Jan Kara wrote:
+> > On Wed 10-10-18 14:28:09, Jan Kara wrote:
+> > > On Wed 10-10-18 13:42:27, Johannes Thumshirn wrote:
+> > > > On Wed, Oct 10, 2018 at 07:19:00PM +0900, Tetsuo Handa wrote:
+> > > > > On 2018/10/10 19:04, Jan Kara wrote:
+> > > > > > Hi,
+> > > > > > 
+> > > > > > this patch series fixes oops and possible deadlocks as reported by syzbot [1]
+> > > > > > [2]. The second patch in the series (from Tetsuo) fixes the oops, the remaining
+> > > > > > patches are cleaning up the locking in the loop driver so that we can in the
+> > > > > > end reasonably easily switch to rereading partitions without holding mutex
+> > > > > > protecting the loop device.
+> > > > > > 
+> > > > > > I have lightly tested the patches by creating, deleting, and modifying loop
+> > > > > > devices but if there's some more comprehensive loopback device testsuite, I
+> > > > > > can try running it. Review is welcome!
+> > > > > 
+> > > > > Testing on linux-next by syzbot will be the most comprehensive. ;-)
+> > > > 
+> > > > Apart from that blktests has a loop category and I think it could also be
+> > > > worthwhile to add the C reproducer from syzkaller to blktests.
+> > > 
+> > > Yeah, I did run loop tests now and they ran fine. I can try converting the
+> > > syzbot reproducers into something legible but it will take a while.
+> > 
+> > So I took a stab at this. But I hit two issues:
+> > 
+> > 1) For the reproducer triggering the lockdep warning, you need a 32-bit
+> > binary (so that it uses compat_ioctl). I don't think we want to introduce
+> > 32-bit devel environment dependency to blktests. With 64-bits, the problem
+> > is also there but someone noticed and silenced lockdep (with a reason that
+> > I consider is incorrect)... I think the test is still worth it though as
+> > I'll remove the lockdep-fooling code in my patches and thus new breakage
+> > will be noticed.
+> 
+> Agreed, even if it doesn't trigger lockdep now, it's a good regression
+> test.
+> 
+> > 2) For the oops (use-after-free) issue I was not able to reproduce that in
+> > my test KVM in couple hours. The race window is rather narrow and syzbot
+> > with KASAN and everything hit it only 11 times. So I'm not sure how useful
+> > that test is. Any opinions?
+> 
+> I'd say we should add it anyways. If anything, it's a smoke test for
+> changing fds on a loop device. You could add a note that the race it's
+> testing for is very narrow.
 
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: linux-scsi@vger.kernel.org
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Tested-by: Benjamin Block <bblock@linux.vnet.ibm.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/bsg-lib.c                     | 3 ++-
- drivers/scsi/scsi_transport_fc.c    | 7 +++----
- drivers/scsi/scsi_transport_iscsi.c | 2 +-
- drivers/scsi/scsi_transport_sas.c   | 4 ++--
- drivers/scsi/ufs/ufs_bsg.c          | 2 +-
- include/linux/bsg-lib.h             | 2 +-
- 6 files changed, 10 insertions(+), 10 deletions(-)
+OK, I'll post the patches later today.
 
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index f3501cdaf1a6..1da011ec04e6 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -304,7 +304,7 @@ static void bsg_exit_rq(struct request_queue *q, struct request *req)
-  * @dd_job_size: size of LLD data needed for each job
-  */
- struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
--		bsg_job_fn *job_fn, int dd_job_size)
-+		bsg_job_fn *job_fn, rq_timed_out_fn *timeout, int dd_job_size)
- {
- 	struct request_queue *q;
- 	int ret;
-@@ -327,6 +327,7 @@ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
- 	blk_queue_flag_set(QUEUE_FLAG_BIDI, q);
- 	blk_queue_softirq_done(q, bsg_softirq_done);
- 	blk_queue_rq_timeout(q, BLK_DEFAULT_SG_TIMEOUT);
-+	blk_queue_rq_timed_out(q, timeout);
- 
- 	ret = bsg_register_queue(q, dev, name, &bsg_transport_ops);
- 	if (ret) {
-diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
-index 381668fa135d..98aaffb4c715 100644
---- a/drivers/scsi/scsi_transport_fc.c
-+++ b/drivers/scsi/scsi_transport_fc.c
-@@ -3780,7 +3780,8 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
- 	snprintf(bsg_name, sizeof(bsg_name),
- 		 "fc_host%d", shost->host_no);
- 
--	q = bsg_setup_queue(dev, bsg_name, fc_bsg_dispatch, i->f->dd_bsg_size);
-+	q = bsg_setup_queue(dev, bsg_name, fc_bsg_dispatch, fc_bsg_job_timeout,
-+				i->f->dd_bsg_size);
- 	if (IS_ERR(q)) {
- 		dev_err(dev,
- 			"fc_host%d: bsg interface failed to initialize - setup queue\n",
-@@ -3788,7 +3789,6 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
- 		return PTR_ERR(q);
- 	}
- 	__scsi_init_queue(shost, q);
--	blk_queue_rq_timed_out(q, fc_bsg_job_timeout);
- 	blk_queue_rq_timeout(q, FC_DEFAULT_BSG_TIMEOUT);
- 	fc_host->rqst_q = q;
- 	return 0;
-@@ -3826,14 +3826,13 @@ fc_bsg_rportadd(struct Scsi_Host *shost, struct fc_rport *rport)
- 		return -ENOTSUPP;
- 
- 	q = bsg_setup_queue(dev, dev_name(dev), fc_bsg_dispatch,
--			i->f->dd_bsg_size);
-+				fc_bsg_job_timeout, i->f->dd_bsg_size);
- 	if (IS_ERR(q)) {
- 		dev_err(dev, "failed to setup bsg queue\n");
- 		return PTR_ERR(q);
- 	}
- 	__scsi_init_queue(shost, q);
- 	blk_queue_prep_rq(q, fc_bsg_rport_prep);
--	blk_queue_rq_timed_out(q, fc_bsg_job_timeout);
- 	blk_queue_rq_timeout(q, BLK_DEFAULT_SG_TIMEOUT);
- 	rport->rqst_q = q;
- 	return 0;
-diff --git a/drivers/scsi/scsi_transport_iscsi.c b/drivers/scsi/scsi_transport_iscsi.c
-index 6fd2fe210fc3..26b11a775be9 100644
---- a/drivers/scsi/scsi_transport_iscsi.c
-+++ b/drivers/scsi/scsi_transport_iscsi.c
-@@ -1542,7 +1542,7 @@ iscsi_bsg_host_add(struct Scsi_Host *shost, struct iscsi_cls_host *ihost)
- 		return -ENOTSUPP;
- 
- 	snprintf(bsg_name, sizeof(bsg_name), "iscsi_host%d", shost->host_no);
--	q = bsg_setup_queue(dev, bsg_name, iscsi_bsg_host_dispatch, 0);
-+	q = bsg_setup_queue(dev, bsg_name, iscsi_bsg_host_dispatch, NULL, 0);
- 	if (IS_ERR(q)) {
- 		shost_printk(KERN_ERR, shost, "bsg interface failed to "
- 			     "initialize - no request queue\n");
-diff --git a/drivers/scsi/scsi_transport_sas.c b/drivers/scsi/scsi_transport_sas.c
-index 0a165b2b3e81..cf6d47891d77 100644
---- a/drivers/scsi/scsi_transport_sas.c
-+++ b/drivers/scsi/scsi_transport_sas.c
-@@ -198,7 +198,7 @@ static int sas_bsg_initialize(struct Scsi_Host *shost, struct sas_rphy *rphy)
- 
- 	if (rphy) {
- 		q = bsg_setup_queue(&rphy->dev, dev_name(&rphy->dev),
--				sas_smp_dispatch, 0);
-+				sas_smp_dispatch, NULL, 0);
- 		if (IS_ERR(q))
- 			return PTR_ERR(q);
- 		rphy->q = q;
-@@ -207,7 +207,7 @@ static int sas_bsg_initialize(struct Scsi_Host *shost, struct sas_rphy *rphy)
- 
- 		snprintf(name, sizeof(name), "sas_host%d", shost->host_no);
- 		q = bsg_setup_queue(&shost->shost_gendev, name,
--				sas_smp_dispatch, 0);
-+				sas_smp_dispatch, NULL, 0);
- 		if (IS_ERR(q))
- 			return PTR_ERR(q);
- 		to_sas_host_attrs(shost)->q = q;
-diff --git a/drivers/scsi/ufs/ufs_bsg.c b/drivers/scsi/ufs/ufs_bsg.c
-index e5f8e54bf644..dd0e9700a74c 100644
---- a/drivers/scsi/ufs/ufs_bsg.c
-+++ b/drivers/scsi/ufs/ufs_bsg.c
-@@ -193,7 +193,7 @@ int ufs_bsg_probe(struct ufs_hba *hba)
- 	if (ret)
- 		goto out;
- 
--	q = bsg_setup_queue(bsg_dev, dev_name(bsg_dev), ufs_bsg_request, 0);
-+	q = bsg_setup_queue(bsg_dev, dev_name(bsg_dev), ufs_bsg_request, NULL, 0);
- 	if (IS_ERR(q)) {
- 		ret = PTR_ERR(q);
- 		goto out;
-diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
-index 6aeaf6472665..b13ae143e7ef 100644
---- a/include/linux/bsg-lib.h
-+++ b/include/linux/bsg-lib.h
-@@ -72,7 +72,7 @@ struct bsg_job {
- void bsg_job_done(struct bsg_job *job, int result,
- 		  unsigned int reply_payload_rcv_len);
- struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
--		bsg_job_fn *job_fn, int dd_job_size);
-+		bsg_job_fn *job_fn, rq_timed_out_fn *timeout, int dd_job_size);
- void bsg_job_put(struct bsg_job *job);
- int __must_check bsg_job_get(struct bsg_job *job);
- 
+								Honza
 -- 
-2.17.1
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
