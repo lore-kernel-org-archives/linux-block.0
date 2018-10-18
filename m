@@ -1,92 +1,24 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	Federico Motta <federico@willer.it>,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX] block, bfq: fix asymmetric scenarios detection
-Date: Wed, 24 Oct 2018 19:13:25 +0200
-Message-Id: <20181024171325.7154-1-paolo.valente@linaro.org>
+Return-Path: <jthumshirn@suse.de>
+Subject: Re: [PATCH 6/6] mtip32xx: fully switch to the generic DMA API
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Joshua Morris <josh.h.morris@us.ibm.com>,
+ Philip Kelleher <pjk1939@linux.vnet.ibm.com>, linux-block@vger.kernel.org
+References: <20181018131516.10629-1-hch@lst.de>
+ <20181018131516.10629-7-hch@lst.de>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+Message-ID: <1bf4b00f-6585-5d95-2cb0-8ac6ce31b532@suse.de>
+Date: Thu, 18 Oct 2018 15:50:40 +0200
+MIME-Version: 1.0
+In-Reply-To: <20181018131516.10629-7-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Federico Motta <federico@willer.it>
-
-Since commit 2d29c9f89fcd ("block, bfq: improve asymmetric scenarios
-detection"), a scenario is defined asymmetric when one of the
-following conditions holds:
-- active bfq_queues have different weights
-- one or more group of entities (bfq_queue or other groups of entities)
-  are active
-bfq grants fairness and low latency also in such asymmetric scenarios,
-by plugging the dispatching of I/O if the bfq_queue in service happens
-to be temporarily idle. This plugging may lower throughput, so it is
-important to do it only when strictly needed.
-
-By mystake, in commit '2d29c9f89fcd' ("block, bfq: improve asymmetric
-scenarios detection") the num_active_groups counter was firstly
-incremented and subsequently decremented at any entity (group or
-bfq_queue) weight change.
-
-This is useless, because only transitions from active to inactive and
-vice versa matter for that counter. Unfortunately this is also
-incorrect in the following case: the entity at issue is a bfq_queue
-and it is under weight raising. In fact in this case there is a
-spurious increment of the num_active_groups counter.
-
-This spurious increment may cause scenarios to be wrongly detected as
-asymmetric, thus causing useless plugging and loss of throughput.
-
-This commit fixes this issue by simply removing the above useless and
-wrong increments and decrements.
-
-Fixes: 2d29c9f89fcd ("block, bfq: improve asymmetric scenarios detection")
-Signed-off-by: Federico Motta <federico@willer.it>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-wf2q.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
-
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 476b5a90a5a4..4b0d5fb69160 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -792,24 +792,18 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
- 		 * queue, remove the entity from its old weight counter (if
- 		 * there is a counter associated with the entity).
- 		 */
--		if (prev_weight != new_weight) {
--			if (bfqq) {
--				root = &bfqd->queue_weights_tree;
--				__bfq_weights_tree_remove(bfqd, bfqq, root);
--			} else
--				bfqd->num_active_groups--;
-+		if (prev_weight != new_weight && bfqq) {
-+			root = &bfqd->queue_weights_tree;
-+			__bfq_weights_tree_remove(bfqd, bfqq, root);
- 		}
- 		entity->weight = new_weight;
- 		/*
- 		 * Add the entity, if it is not a weight-raised queue,
- 		 * to the counter associated with its new weight.
- 		 */
--		if (prev_weight != new_weight) {
--			if (bfqq && bfqq->wr_coeff == 1) {
--				/* If we get here, root has been initialized. */
--				bfq_weights_tree_add(bfqd, bfqq, root);
--			} else
--				bfqd->num_active_groups++;
-+		if (prev_weight != new_weight && bfqq && bfqq->wr_coeff == 1) {
-+			/* If we get here, root has been initialized. */
-+			bfq_weights_tree_add(bfqd, bfqq, root);
- 		}
- 
- 		new_st->wsum += entity->weight;
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.19.1
+Johannes Thumshirn                                        SUSE Labs
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
