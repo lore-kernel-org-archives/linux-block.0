@@ -1,40 +1,75 @@
-Return-Path: <willy@infradead.org>
-Date: Thu, 18 Oct 2018 07:03:42 -0700
-From: Matthew Wilcox <willy@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
 	Vitaly Kuznetsov <vkuznets@redhat.com>,
 	Dave Chinner <dchinner@redhat.com>,
 	Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>, xfs@vger.kernel.org,
+	"Darrick J . Wong" <darrick.wong@oracle.com>,
+	xfs@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH 0/5] block: introduce helpers for allocating io buffer
- from slab
-Message-ID: <20181018140342.GB32429@bombadil.infradead.org>
-References: <20181018131817.11813-1-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20181018131817.11813-1-ming.lei@redhat.com>
+	Bart Van Assche <bvanassche@acm.org>,
+	Matthew Wilcox <willy@infradead.org>
+Subject: [PATCH 0/5] block: introduce helpers for allocating io buffer from slab
+Date: Thu, 18 Oct 2018 21:18:12 +0800
+Message-Id: <20181018131817.11813-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Oct 18, 2018 at 09:18:12PM +0800, Ming Lei wrote:
-> Hi,
-> 
-> Filesystems may allocate io buffer from slab, and use this buffer to
-> submit bio. This way may break storage drivers if they have special
-> requirement on DMA alignment.
+Hi,
 
-Before we go down this road, could we have a discussion about what
-hardware actually requires this?  Storage has this weird assumption that
-I/Os must be at least 512 byte aligned in memory, and I don't know where
-this idea comes from.  Network devices can do arbitrary byte alignment.
-Even USB controllers can do arbitrary byte alignment.  Sure, performance
-is going to suck and there are definite risks on some architectures
-with doing IOs that are sub-cacheline aligned, but why is storage such a
-special snowflake that we assume that host controllers are only capable
-of doing 512-byte aligned DMAs?
+Filesystems may allocate io buffer from slab, and use this buffer to
+submit bio. This way may break storage drivers if they have special
+requirement on DMA alignment.
 
-I just dragged out the NCR53c810 data sheet from 1993, and it's capable of
-doing arbitrary alignment of DMA.  NVMe is capable of 4-byte aligned DMA.
-What hardware needs this 512 byte alignment?
+The patch 1 adds one warning if the io buffer isn't aligned to DMA
+alignment.
+
+The 2nd & 3rd patches make DMA alignment as stacked limit.
+
+The 4th patch introduces helpers for allocating io buffer from slab,
+and DMA alignment is respected on this allocation.
+
+The 5th patch converts xfs to use the introduced helpers for allocating
+io buffer from slab.
+
+See previous discussion on this topic:
+
+https://marc.info/?t=153734857500004&r=1&w=2
+
+Thanks,
+Ming
+
+Ming Lei (5):
+  block: warn on un-aligned DMA IO buffer
+  block: move .dma_alignment into q->limits
+  block: make dma_alignment as stacked limit
+  block: introduce helpers for allocating IO buffers from slab
+  xfs: use block layer helpers to allocate io buffer from slab
+
+ block/Makefile              |   3 +-
+ block/blk-core.c            |   2 +
+ block/blk-merge.c           |   2 +
+ block/blk-sec-buf.c         | 144 ++++++++++++++++++++++++++++++++++++++++++++
+ block/blk-settings.c        |  89 +++++++++++++++------------
+ fs/xfs/xfs_buf.c            |  28 ++++++++-
+ fs/xfs/xfs_super.c          |  13 +++-
+ include/linux/blk-sec-buf.h |  43 +++++++++++++
+ include/linux/blkdev.h      |   9 ++-
+ 9 files changed, 287 insertions(+), 46 deletions(-)
+ create mode 100644 block/blk-sec-buf.c
+ create mode 100644 include/linux/blk-sec-buf.h
+
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Dave Chinner <dchinner@redhat.com>
+Cc: Linux FS Devel <linux-fsdevel@vger.kernel.org>
+Cc: Darrick J. Wong <darrick.wong@oracle.com>
+Cc: xfs@vger.kernel.org
+Cc: Dave Chinner <dchinner@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Matthew Wilcox <willy@infradead.org>
+
+
+-- 
+2.9.5
