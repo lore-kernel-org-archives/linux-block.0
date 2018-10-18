@@ -1,287 +1,117 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 03/30] mspro_block: convert to blk-mq
-Date: Wed, 31 Oct 2018 11:58:55 -0600
-Message-Id: <20181031175922.8849-4-axboe@kernel.dk>
-In-Reply-To: <20181031175922.8849-1-axboe@kernel.dk>
-References: <20181031175922.8849-1-axboe@kernel.dk>
+Return-Path: <BATV+8bbc4aa54a9b92872f27+5534+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Joshua Morris <josh.h.morris@us.ibm.com>,
+	Philip Kelleher <pjk1939@linux.vnet.ibm.com>,
+	linux-block@vger.kernel.org
+Subject: [PATCH 4/6] umem: switch to the generic DMA API
+Date: Thu, 18 Oct 2018 15:15:14 +0200
+Message-Id: <20181018131516.10629-5-hch@lst.de>
+In-Reply-To: <20181018131516.10629-1-hch@lst.de>
+References: <20181018131516.10629-1-hch@lst.de>
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Straight forward conversion, there's room for improvement.
+The PCI DMA API is deprecated, switch to the generic DMA API instead.
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/memstick/core/mspro_block.c | 121 +++++++++++++++-------------
- 1 file changed, 66 insertions(+), 55 deletions(-)
+ drivers/block/umem.c | 38 ++++++++++++++++++--------------------
+ 1 file changed, 18 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/memstick/core/mspro_block.c b/drivers/memstick/core/mspro_block.c
-index 0cd30dcb6801..aba50ec98b4d 100644
---- a/drivers/memstick/core/mspro_block.c
-+++ b/drivers/memstick/core/mspro_block.c
-@@ -12,7 +12,7 @@
-  *
-  */
+diff --git a/drivers/block/umem.c b/drivers/block/umem.c
+index 9094ca60949c..be3e3ab79950 100644
+--- a/drivers/block/umem.c
++++ b/drivers/block/umem.c
+@@ -363,12 +363,12 @@ static int add_bio(struct cardinfo *card)
  
--#include <linux/blkdev.h>
-+#include <linux/blk-mq.h>
- #include <linux/idr.h>
- #include <linux/hdreg.h>
- #include <linux/kthread.h>
-@@ -142,6 +142,7 @@ struct mspro_block_data {
- 	struct gendisk        *disk;
- 	struct request_queue  *queue;
- 	struct request        *block_req;
-+	struct blk_mq_tag_set tag_set;
- 	spinlock_t            q_lock;
+ 	vec = bio_iter_iovec(bio, card->current_iter);
  
- 	unsigned short        page_size;
-@@ -152,7 +153,6 @@ struct mspro_block_data {
- 	unsigned char         system;
- 	unsigned char         read_only:1,
- 			      eject:1,
--			      has_request:1,
- 			      data_dir:1,
- 			      active:1;
- 	unsigned char         transfer_cmd;
-@@ -694,13 +694,12 @@ static void h_mspro_block_setup_cmd(struct memstick_dev *card, u64 offset,
+-	dma_handle = pci_map_page(card->dev,
++	dma_handle = dma_map_page(&card->dev->dev,
+ 				  vec.bv_page,
+ 				  vec.bv_offset,
+ 				  vec.bv_len,
+ 				  bio_op(bio) == REQ_OP_READ ?
+-				  PCI_DMA_FROMDEVICE : PCI_DMA_TODEVICE);
++				  DMA_FROM_DEVICE : DMA_TO_DEVICE);
  
- /*** Data transfer ***/
- 
--static int mspro_block_issue_req(struct memstick_dev *card, int chunk)
-+static int mspro_block_issue_req(struct memstick_dev *card, bool chunk)
- {
- 	struct mspro_block_data *msb = memstick_get_drvdata(card);
- 	u64 t_off;
- 	unsigned int count;
- 
--try_again:
- 	while (chunk) {
- 		msb->current_page = 0;
- 		msb->current_seg = 0;
-@@ -709,9 +708,17 @@ static int mspro_block_issue_req(struct memstick_dev *card, int chunk)
- 					       msb->req_sg);
- 
- 		if (!msb->seg_count) {
--			chunk = __blk_end_request_cur(msb->block_req,
--					BLK_STS_RESOURCE);
--			continue;
-+			unsigned int bytes = blk_rq_cur_bytes(msb->block_req);
-+
-+			chunk = blk_update_request(msb->block_req,
-+							BLK_STS_RESOURCE,
-+							bytes);
-+			if (chunk)
-+				continue;
-+			__blk_mq_end_request(msb->block_req,
-+						BLK_STS_RESOURCE);
-+			msb->block_req = NULL;
-+			break;
+ 	p = &card->mm_pages[card->Ready];
+ 	desc = &p->desc[p->cnt];
+@@ -448,10 +448,10 @@ static void process_page(unsigned long data)
+ 				page->iter = page->bio->bi_iter;
  		}
  
- 		t_off = blk_rq_pos(msb->block_req);
-@@ -729,30 +736,22 @@ static int mspro_block_issue_req(struct memstick_dev *card, int chunk)
- 		return 0;
+-		pci_unmap_page(card->dev, desc->data_dma_handle,
++		dma_unmap_page(&card->dev->dev, desc->data_dma_handle,
+ 			       vec.bv_len,
+ 				 (control & DMASCR_TRANSFER_READ) ?
+-				PCI_DMA_TODEVICE : PCI_DMA_FROMDEVICE);
++				DMA_TO_DEVICE : DMA_FROM_DEVICE);
+ 		if (control & DMASCR_HARD_ERROR) {
+ 			/* error */
+ 			bio->bi_status = BLK_STS_IOERR;
+@@ -817,8 +817,8 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
+ 	dev_printk(KERN_INFO, &dev->dev,
+ 	  "Micro Memory(tm) controller found (PCI Mem Module (Battery Backup))\n");
+ 
+-	if (pci_set_dma_mask(dev, DMA_BIT_MASK(64)) &&
+-	    pci_set_dma_mask(dev, DMA_BIT_MASK(32))) {
++	if (dma_set_mask(&dev->dev, DMA_BIT_MASK(64)) &&
++	    dma_set_mask(&dev->dev, DMA_BIT_MASK(32))) {
+ 		dev_printk(KERN_WARNING, &dev->dev, "NO suitable DMA found\n");
+ 		return  -ENOMEM;
+ 	}
+@@ -871,12 +871,10 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
+ 		goto failed_magic;
  	}
  
--	dev_dbg(&card->dev, "blk_fetch\n");
--	msb->block_req = blk_fetch_request(msb->queue);
--	if (!msb->block_req) {
--		dev_dbg(&card->dev, "issue end\n");
--		return -EAGAIN;
--	}
--
--	dev_dbg(&card->dev, "trying again\n");
--	chunk = 1;
--	goto try_again;
-+	return 1;
- }
+-	card->mm_pages[0].desc = pci_alloc_consistent(card->dev,
+-						PAGE_SIZE * 2,
+-						&card->mm_pages[0].page_dma);
+-	card->mm_pages[1].desc = pci_alloc_consistent(card->dev,
+-						PAGE_SIZE * 2,
+-						&card->mm_pages[1].page_dma);
++	card->mm_pages[0].desc = dma_alloc_coherent(&card->dev->dev,
++			PAGE_SIZE * 2, &card->mm_pages[0].page_dma, GFP_KERNEL);
++	card->mm_pages[1].desc = dma_alloc_coherent(&card->dev->dev,
++			PAGE_SIZE * 2, &card->mm_pages[1].page_dma, GFP_KERNEL);
+ 	if (card->mm_pages[0].desc == NULL ||
+ 	    card->mm_pages[1].desc == NULL) {
+ 		dev_printk(KERN_ERR, &card->dev->dev, "alloc failed\n");
+@@ -1002,13 +1000,13 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
+  failed_req_irq:
+  failed_alloc:
+ 	if (card->mm_pages[0].desc)
+-		pci_free_consistent(card->dev, PAGE_SIZE*2,
+-				    card->mm_pages[0].desc,
+-				    card->mm_pages[0].page_dma);
++		dma_free_coherent(&card->dev->dev, PAGE_SIZE * 2,
++				  card->mm_pages[0].desc,
++				  card->mm_pages[0].page_dma);
+ 	if (card->mm_pages[1].desc)
+-		pci_free_consistent(card->dev, PAGE_SIZE*2,
+-				    card->mm_pages[1].desc,
+-				    card->mm_pages[1].page_dma);
++		dma_free_coherent(&card->dev->dev, PAGE_SIZE * 2,
++				  card->mm_pages[1].desc,
++				  card->mm_pages[1].page_dma);
+  failed_magic:
+ 	iounmap(card->csr_remap);
+  failed_remap_csr:
+@@ -1027,11 +1025,11 @@ static void mm_pci_remove(struct pci_dev *dev)
+ 	iounmap(card->csr_remap);
  
- static int mspro_block_complete_req(struct memstick_dev *card, int error)
- {
- 	struct mspro_block_data *msb = memstick_get_drvdata(card);
--	int chunk, cnt;
-+	int cnt;
-+	bool chunk;
- 	unsigned int t_len = 0;
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(&msb->q_lock, flags);
--	dev_dbg(&card->dev, "complete %d, %d\n", msb->has_request ? 1 : 0,
-+	dev_dbg(&card->dev, "complete %d, %d\n", msb->block_req ? 1 : 0,
- 		error);
- 
--	if (msb->has_request) {
-+	if (msb->block_req) {
- 		/* Nothing to do - not really an error */
- 		if (error == -EAGAIN)
- 			error = 0;
-@@ -777,15 +776,17 @@ static int mspro_block_complete_req(struct memstick_dev *card, int error)
- 		if (error && !t_len)
- 			t_len = blk_rq_cur_bytes(msb->block_req);
- 
--		chunk = __blk_end_request(msb->block_req,
-+		chunk = blk_update_request(msb->block_req,
- 				errno_to_blk_status(error), t_len);
--
--		error = mspro_block_issue_req(card, chunk);
--
--		if (!error)
--			goto out;
--		else
--			msb->has_request = 0;
-+		if (chunk) {
-+			error = mspro_block_issue_req(card, chunk);
-+			if (!error)
-+				goto out;
-+		} else {
-+			__blk_mq_end_request(msb->block_req,
-+						errno_to_blk_status(error));
-+			msb->block_req = NULL;
-+		}
- 	} else {
- 		if (!error)
- 			error = -EAGAIN;
-@@ -806,8 +807,8 @@ static void mspro_block_stop(struct memstick_dev *card)
- 
- 	while (1) {
- 		spin_lock_irqsave(&msb->q_lock, flags);
--		if (!msb->has_request) {
--			blk_stop_queue(msb->queue);
-+		if (!msb->block_req) {
-+			blk_mq_stop_hw_queues(msb->queue);
- 			rc = 1;
- 		}
- 		spin_unlock_irqrestore(&msb->q_lock, flags);
-@@ -822,32 +823,37 @@ static void mspro_block_stop(struct memstick_dev *card)
- static void mspro_block_start(struct memstick_dev *card)
- {
- 	struct mspro_block_data *msb = memstick_get_drvdata(card);
--	unsigned long flags;
- 
--	spin_lock_irqsave(&msb->q_lock, flags);
--	blk_start_queue(msb->queue);
--	spin_unlock_irqrestore(&msb->q_lock, flags);
-+	blk_mq_start_hw_queues(msb->queue);
- }
- 
--static void mspro_block_submit_req(struct request_queue *q)
-+static blk_status_t mspro_queue_rq(struct blk_mq_hw_ctx *hctx,
-+				   const struct blk_mq_queue_data *bd)
- {
--	struct memstick_dev *card = q->queuedata;
-+	struct memstick_dev *card = hctx->queue->queuedata;
- 	struct mspro_block_data *msb = memstick_get_drvdata(card);
--	struct request *req = NULL;
- 
--	if (msb->has_request)
--		return;
-+	spin_lock_irq(&msb->q_lock);
- 
--	if (msb->eject) {
--		while ((req = blk_fetch_request(q)) != NULL)
--			__blk_end_request_all(req, BLK_STS_IOERR);
-+	if (msb->block_req) {
-+		spin_unlock_irq(&msb->q_lock);
-+		return BLK_STS_DEV_RESOURCE;
-+	}
- 
--		return;
-+	if (msb->eject) {
-+		spin_unlock_irq(&msb->q_lock);
-+		blk_mq_start_request(bd->rq);
-+		return BLK_STS_IOERR;
- 	}
- 
--	msb->has_request = 1;
--	if (mspro_block_issue_req(card, 0))
--		msb->has_request = 0;
-+	msb->block_req = bd->rq;
-+	blk_mq_start_request(bd->rq);
-+
-+	if (mspro_block_issue_req(card, true))
-+		msb->block_req = NULL;
-+
-+	spin_unlock_irq(&msb->q_lock);
-+	return BLK_STS_OK;
- }
- 
- /*** Initialization ***/
-@@ -1167,6 +1173,10 @@ static int mspro_block_init_card(struct memstick_dev *card)
- 
- }
- 
-+static const struct blk_mq_ops mspro_mq_ops = {
-+	.queue_rq	= mspro_queue_rq,
-+};
-+
- static int mspro_block_init_disk(struct memstick_dev *card)
- {
- 	struct mspro_block_data *msb = memstick_get_drvdata(card);
-@@ -1206,9 +1216,11 @@ static int mspro_block_init_disk(struct memstick_dev *card)
- 		goto out_release_id;
- 	}
- 
--	msb->queue = blk_init_queue(mspro_block_submit_req, &msb->q_lock);
--	if (!msb->queue) {
--		rc = -ENOMEM;
-+	msb->queue = blk_mq_init_sq_queue(&msb->tag_set, &mspro_mq_ops, 2,
-+						BLK_MQ_F_SHOULD_MERGE);
-+	if (IS_ERR(msb->queue)) {
-+		rc = PTR_ERR(msb->queue);
-+		msb->queue = NULL;
- 		goto out_put_disk;
- 	}
- 
-@@ -1318,13 +1330,14 @@ static void mspro_block_remove(struct memstick_dev *card)
- 
- 	spin_lock_irqsave(&msb->q_lock, flags);
- 	msb->eject = 1;
--	blk_start_queue(msb->queue);
- 	spin_unlock_irqrestore(&msb->q_lock, flags);
-+	blk_mq_start_hw_queues(msb->queue);
- 
- 	del_gendisk(msb->disk);
- 	dev_dbg(&card->dev, "mspro block remove\n");
- 
- 	blk_cleanup_queue(msb->queue);
-+	blk_mq_free_tag_set(&msb->tag_set);
- 	msb->queue = NULL;
- 
- 	sysfs_remove_group(&card->dev.kobj, &msb->attr_group);
-@@ -1344,8 +1357,9 @@ static int mspro_block_suspend(struct memstick_dev *card, pm_message_t state)
- 	struct mspro_block_data *msb = memstick_get_drvdata(card);
- 	unsigned long flags;
- 
-+	blk_mq_stop_hw_queues(msb->queue);
-+
- 	spin_lock_irqsave(&msb->q_lock, flags);
--	blk_stop_queue(msb->queue);
- 	msb->active = 0;
- 	spin_unlock_irqrestore(&msb->q_lock, flags);
- 
-@@ -1355,7 +1369,6 @@ static int mspro_block_suspend(struct memstick_dev *card, pm_message_t state)
- static int mspro_block_resume(struct memstick_dev *card)
- {
- 	struct mspro_block_data *msb = memstick_get_drvdata(card);
--	unsigned long flags;
- 	int rc = 0;
- 
- #ifdef CONFIG_MEMSTICK_UNSAFE_RESUME
-@@ -1401,9 +1414,7 @@ static int mspro_block_resume(struct memstick_dev *card)
- 
- #endif /* CONFIG_MEMSTICK_UNSAFE_RESUME */
- 
--	spin_lock_irqsave(&msb->q_lock, flags);
--	blk_start_queue(msb->queue);
--	spin_unlock_irqrestore(&msb->q_lock, flags);
-+	blk_mq_start_hw_queues(msb->queue);
- 	return rc;
- }
- 
+ 	if (card->mm_pages[0].desc)
+-		pci_free_consistent(card->dev, PAGE_SIZE*2,
++		dma_free_coherent(&card->dev->dev, PAGE_SIZE * 2,
+ 				    card->mm_pages[0].desc,
+ 				    card->mm_pages[0].page_dma);
+ 	if (card->mm_pages[1].desc)
+-		pci_free_consistent(card->dev, PAGE_SIZE*2,
++		dma_free_coherent(&card->dev->dev, PAGE_SIZE * 2,
+ 				    card->mm_pages[1].desc,
+ 				    card->mm_pages[1].page_dma);
+ 	blk_cleanup_queue(card->queue);
 -- 
-2.17.1
+2.19.1
