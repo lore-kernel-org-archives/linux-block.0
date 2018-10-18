@@ -1,81 +1,86 @@
-Return-Path: <prvs=81407a9e8=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH 03/11] scsi: sd_zbc: Fix sd_zbc_check_zones() error checks
-Date: Wed, 10 Oct 2018 10:52:31 +0900
-Message-Id: <20181010015239.24930-4-damien.lemoal@wdc.com>
-In-Reply-To: <20181010015239.24930-1-damien.lemoal@wdc.com>
-References: <20181010015239.24930-1-damien.lemoal@wdc.com>
+Return-Path: <BATV+8bbc4aa54a9b92872f27+5534+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Joshua Morris <josh.h.morris@us.ibm.com>,
+	Philip Kelleher <pjk1939@linux.vnet.ibm.com>,
+	linux-block@vger.kernel.org
+Subject: [PATCH 2/6] sx8: remove dead IF_64BIT_DMA_IS_POSSIBLE code
+Date: Thu, 18 Oct 2018 15:15:12 +0200
+Message-Id: <20181018131516.10629-3-hch@lst.de>
+In-Reply-To: <20181018131516.10629-1-hch@lst.de>
+References: <20181018131516.10629-1-hch@lst.de>
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-The 32 bits overflow check for the zone size value is already done
-within sd_zbc_check_zones() with the test:
+This code has effectively been commented out since the first commit,
+so remove it.
 
-} else if (logical_to_sectors(sdkp->device, zone_blocks) > UINT_MAX) {
-
-so there is no need to check again for an out of range value in
-sd_zbc_read_zones(). Simplify the code and fix sd_zbc_check_zones()
-error return to -EFBIG instead of -ENODEV if the zone size is too large.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/scsi/sd_zbc.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+ drivers/block/sx8.c | 29 +++++------------------------
+ 1 file changed, 5 insertions(+), 24 deletions(-)
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index ca73c46931c0..44b64b4a922a 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -373,7 +373,7 @@ static int sd_zbc_check_zoned_characteristics(struct scsi_disk *sdkp,
-  * Returns the zone size in number of blocks upon success or an error code
-  * upon failure.
-  */
--static s64 sd_zbc_check_zones(struct scsi_disk *sdkp)
-+static s32 sd_zbc_check_zones(struct scsi_disk *sdkp)
+diff --git a/drivers/block/sx8.c b/drivers/block/sx8.c
+index 16f37254bcf4..377c17e106c3 100644
+--- a/drivers/block/sx8.c
++++ b/drivers/block/sx8.c
+@@ -197,7 +197,6 @@ enum {
+ 	FL_NON_RAID		= FW_VER_NON_RAID,
+ 	FL_4PORT		= FW_VER_4PORT,
+ 	FL_FW_VER_MASK		= (FW_VER_NON_RAID | FW_VER_4PORT),
+-	FL_DAC			= (1 << 16),
+ 	FL_DYN_MAJOR		= (1 << 17),
+ };
+ 
+@@ -1585,7 +1584,6 @@ static int carm_init_shm(struct carm_host *host)
+ static int carm_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
  {
- 	u64 zone_blocks = 0;
- 	sector_t max_lba, block = 0;
-@@ -472,7 +472,7 @@ static s64 sd_zbc_check_zones(struct scsi_disk *sdkp)
- 		if (sdkp->first_scan)
- 			sd_printk(KERN_NOTICE, sdkp,
- 				  "Zone size too large\n");
--		ret = -ENODEV;
-+		ret = -EFBIG;
- 	} else {
- 		ret = zone_blocks;
+ 	struct carm_host *host;
+-	unsigned int pci_dac;
+ 	int rc;
+ 	struct request_queue *q;
+ 	unsigned int i;
+@@ -1600,28 +1598,12 @@ static int carm_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	if (rc)
+ 		goto err_out;
+ 
+-#ifdef IF_64BIT_DMA_IS_POSSIBLE /* grrrr... */
+-	rc = pci_set_dma_mask(pdev, DMA_BIT_MASK(64));
+-	if (!rc) {
+-		rc = pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(64));
+-		if (rc) {
+-			printk(KERN_ERR DRV_NAME "(%s): consistent DMA mask failure\n",
+-				pci_name(pdev));
+-			goto err_out_regions;
+-		}
+-		pci_dac = 1;
+-	} else {
+-#endif
+-		rc = pci_set_dma_mask(pdev, DMA_BIT_MASK(32));
+-		if (rc) {
+-			printk(KERN_ERR DRV_NAME "(%s): DMA mask failure\n",
+-				pci_name(pdev));
+-			goto err_out_regions;
+-		}
+-		pci_dac = 0;
+-#ifdef IF_64BIT_DMA_IS_POSSIBLE /* grrrr... */
++	rc = pci_set_dma_mask(pdev, DMA_BIT_MASK(32));
++	if (rc) {
++		printk(KERN_ERR DRV_NAME "(%s): DMA mask failure\n",
++			pci_name(pdev));
++		goto err_out_regions;
  	}
-@@ -668,8 +668,7 @@ static int sd_zbc_setup(struct scsi_disk *sdkp, u32 zone_blocks)
+-#endif
  
- int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
- {
--	int64_t zone_blocks;
--	int ret;
-+	int ret, zone_blocks;
+ 	host = kzalloc(sizeof(*host), GFP_KERNEL);
+ 	if (!host) {
+@@ -1632,7 +1614,6 @@ static int carm_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	}
  
- 	if (!sd_is_zoned(sdkp))
- 		/*
-@@ -688,12 +687,10 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
- 	 * an eventual last runt zone) that is a power of 2 are supported.
- 	 */
- 	zone_blocks = sd_zbc_check_zones(sdkp);
--	ret = -EFBIG;
--	if (zone_blocks != (u32)zone_blocks)
--		goto err;
--	ret = zone_blocks;
--	if (ret < 0)
-+	if (zone_blocks < 0) {
-+		ret = zone_blocks;
- 		goto err;
-+	}
- 
- 	/* The drive satisfies the kernel restrictions: set it up */
- 	ret = sd_zbc_setup(sdkp, zone_blocks);
+ 	host->pdev = pdev;
+-	host->flags = pci_dac ? FL_DAC : 0;
+ 	spin_lock_init(&host->lock);
+ 	INIT_WORK(&host->fsm_task, carm_fsm_task);
+ 	init_completion(&host->probe_comp);
 -- 
-2.17.1
+2.19.1
