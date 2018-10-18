@@ -1,21 +1,22 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <ming.lei@redhat.com>
+Date: Thu, 18 Oct 2018 08:12:31 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, stable@vger.kernel.org,
+	Mariusz Dabrowski <mariusz.dabrowski@intel.com>,
+	Ming Lin <ming.l@ssi.samsung.com>,
+	Mike Snitzer <snitzer@redhat.com>, Christoph Hellwig <hch@lst.de>,
+	Xiao Ni <xni@redhat.com>
 Subject: Re: [PATCH] block: don't deal with discard limit in
  blkdev_issue_discard()
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, stable@vger.kernel.org,
- Mariusz Dabrowski <mariusz.dabrowski@intel.com>,
- Ming Lin <ming.l@ssi.samsung.com>, Mike Snitzer <snitzer@redhat.com>,
- Christoph Hellwig <hch@lst.de>, Xiao Ni <xni@redhat.com>
+Message-ID: <20181018001230.GA9379@ming.t460p>
 References: <20181012075310.4587-1-ming.lei@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <f025344a-3ecf-afe0-4bcf-439d0b3051cf@kernel.dk>
-Date: Thu, 18 Oct 2018 07:23:56 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20181012075310.4587-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/12/18 1:53 AM, Ming Lei wrote:
+On Fri, Oct 12, 2018 at 03:53:10PM +0800, Ming Lei wrote:
 > blk_queue_split() does respect this limit via bio splitting, so no
 > need to do that in blkdev_issue_discard(), then we can align to
 > normal bio submit(bio_add_page() & submit_bio()).
@@ -23,8 +24,82 @@ On 10/12/18 1:53 AM, Ming Lei wrote:
 > More importantly, this patch fixes one issue introduced in a22c4d7e34402cc
 > ("block: re-add discard_granularity and alignment checks"), in which
 > zero discard bio may be generated in case of zero alignment.
+> 
+> Fixes: a22c4d7e34402ccdf3 ("block: re-add discard_granularity and alignment checks")
+> Cc: stable@vger.kernel.org
+> Cc: Mariusz Dabrowski <mariusz.dabrowski@intel.com>
+> Cc: Ming Lin <ming.l@ssi.samsung.com>
+> Cc: Mike Snitzer <snitzer@redhat.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Xiao Ni <xni@redhat.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-lib.c | 28 ++--------------------------
+>  1 file changed, 2 insertions(+), 26 deletions(-)
+> 
+> diff --git a/block/blk-lib.c b/block/blk-lib.c
+> index d1b9dd03da25..bbd44666f2b5 100644
+> --- a/block/blk-lib.c
+> +++ b/block/blk-lib.c
+> @@ -29,9 +29,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+>  {
+>  	struct request_queue *q = bdev_get_queue(bdev);
+>  	struct bio *bio = *biop;
+> -	unsigned int granularity;
+>  	unsigned int op;
+> -	int alignment;
+>  	sector_t bs_mask;
+>  
+>  	if (!q)
+> @@ -54,38 +52,16 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+>  	if ((sector | nr_sects) & bs_mask)
+>  		return -EINVAL;
+>  
+> -	/* Zero-sector (unknown) and one-sector granularities are the same.  */
+> -	granularity = max(q->limits.discard_granularity >> 9, 1U);
+> -	alignment = (bdev_discard_alignment(bdev) >> 9) % granularity;
+> -
+>  	while (nr_sects) {
+> -		unsigned int req_sects;
+> -		sector_t end_sect, tmp;
+> +		unsigned int req_sects = nr_sects;
+> +		sector_t end_sect;
+>  
+> -		/*
+> -		 * Issue in chunks of the user defined max discard setting,
+> -		 * ensuring that bi_size doesn't overflow
+> -		 */
+> -		req_sects = min_t(sector_t, nr_sects,
+> -					q->limits.max_discard_sectors);
+>  		if (!req_sects)
+>  			goto fail;
+>  		if (req_sects > UINT_MAX >> 9)
+>  			req_sects = UINT_MAX >> 9;
+>  
+> -		/*
+> -		 * If splitting a request, and the next starting sector would be
+> -		 * misaligned, stop the discard at the previous aligned sector.
+> -		 */
+>  		end_sect = sector + req_sects;
+> -		tmp = end_sect;
+> -		if (req_sects < nr_sects &&
+> -		    sector_div(tmp, granularity) != alignment) {
+> -			end_sect = end_sect - alignment;
+> -			sector_div(end_sect, granularity);
+> -			end_sect = end_sect * granularity + alignment;
+> -			req_sects = end_sect - sector;
+> -		}
+>  
+>  		bio = next_bio(bio, 0, gfp_mask);
+>  		bio->bi_iter.bi_sector = sector;
+> -- 
+> 2.9.5
+> 
 
-Thanks Ming, applied.
+Ping...
 
--- 
-Jens Axboe
+This patch fixes BUG() in blk_mq_end_request() when zero-length discard
+bio is generated from __blkdev_issue_discard().
+
+Thanks,
+Ming
