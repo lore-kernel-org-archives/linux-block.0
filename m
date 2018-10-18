@@ -1,66 +1,70 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH V3 3/4] blk-mq: issue directly with bypass_insert 'false' in blk_mq_sched_insert_requests
-Date: Mon, 29 Oct 2018 16:33:32 +0800
-Message-Id: <1540802013-2921-4-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1540802013-2921-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1540802013-2921-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <bart.vanassche@gmail.com>
+Return-Path: <bart.vanassche@gmail.com>
+Message-ID: <1539877834.36349.14.camel@acm.org>
+Subject: Re: [PATCH 0/5] block: introduce helpers for allocating io buffer
+ from slab
+From: Bart Van Assche <bvanassche@acm.org>
+To: Matthew Wilcox <willy@infradead.org>, Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, Vitaly
+ Kuznetsov <vkuznets@redhat.com>, Dave Chinner <dchinner@redhat.com>, Linux
+ FS Devel <linux-fsdevel@vger.kernel.org>, "Darrick J . Wong"
+ <darrick.wong@oracle.com>,  xfs@vger.kernel.org, Christoph Hellwig
+ <hch@lst.de>
+Date: Thu, 18 Oct 2018 08:50:34 -0700
+In-Reply-To: <20181018140342.GB32429@bombadil.infradead.org>
+References: <20181018131817.11813-1-ming.lei@redhat.com>
+	 <20181018140342.GB32429@bombadil.infradead.org>
+Content-Type: text/plain; charset="UTF-7"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-It is not necessary to issue request directly with bypass_insert
-'true' in blk_mq_sched_insert_requests and insert the non-issued
-requests itself. Just set bypass_insert to 'false' and let
-blk_mq_try_issue_directly handle them.
+On Thu, 2018-10-18 at 07:03 -0700, Matthew Wilcox wrote:
++AD4 On Thu, Oct 18, 2018 at 09:18:12PM +-0800, Ming Lei wrote:
++AD4 +AD4 Filesystems may allocate io buffer from slab, and use this buffer to
++AD4 +AD4 submit bio. This way may break storage drivers if they have special
++AD4 +AD4 requirement on DMA alignment.
++AD4 
++AD4 Before we go down this road, could we have a discussion about what
++AD4 hardware actually requires this?  Storage has this weird assumption that
++AD4 I/Os must be at least 512 byte aligned in memory, and I don't know where
++AD4 this idea comes from.  Network devices can do arbitrary byte alignment.
++AD4 Even USB controllers can do arbitrary byte alignment.  Sure, performance
++AD4 is going to suck and there are definite risks on some architectures
++AD4 with doing IOs that are sub-cacheline aligned, but why is storage such a
++AD4 special snowflake that we assume that host controllers are only capable
++AD4 of doing 512-byte aligned DMAs?
++AD4 
++AD4 I just dragged out the NCR53c810 data sheet from 1993, and it's capable of
++AD4 doing arbitrary alignment of DMA.  NVMe is capable of 4-byte aligned DMA.
++AD4 What hardware needs this 512 byte alignment?
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
----
- block/blk-mq-sched.c |  8 +++-----
- block/blk-mq.c       | 10 +---------
- 2 files changed, 4 insertions(+), 14 deletions(-)
+How about starting with modifying the queue+AF8-dma+AF8-alignment() function? The
+current implementation of that function is as follows:
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 29bfe80..23cd97e 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -411,12 +411,10 @@ void blk_mq_sched_insert_requests(struct request_queue *q,
- 		 * busy in case of 'none' scheduler, and this way may save
- 		 * us one extra enqueue & dequeue to sw queue.
- 		 */
--		if (!hctx->dispatch_busy && !e && !run_queue_async) {
-+		if (!hctx->dispatch_busy && !e && !run_queue_async)
- 			blk_mq_try_issue_list_directly(hctx, list);
--			if (list_empty(list))
--				return;
--		}
--		blk_mq_insert_requests(hctx, ctx, list);
-+		else
-+			blk_mq_insert_requests(hctx, ctx, list);
- 	}
- 
- 	blk_mq_run_hw_queue(hctx, run_queue_async);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e0aa068..9c6c858 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1834,15 +1834,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 				queuelist);
- 
- 		list_del_init(&rq->queuelist);
--		ret = blk_mq_request_issue_directly(rq);
--		if (ret != BLK_STS_OK) {
--			if (ret == BLK_STS_RESOURCE ||
--					ret == BLK_STS_DEV_RESOURCE) {
--				list_add(&rq->queuelist, list);
--				break;
--			}
--			blk_mq_end_request(rq, ret);
--		}
-+		ret = blk_mq_try_issue_directly(hctx, rq, NULL, false);
- 	}
- }
- 
--- 
-2.7.4
+static inline int queue+AF8-dma+AF8-alignment(struct request+AF8-queue +ACo-q)
++AHs
+	return q ? q-+AD4-dma+AF8-alignment : 511+ADs
++AH0
+
+In other words, for block drivers that do not set the DMA alignment
+explicitly it is assumed that these drivers need 512 byte alignment. I think
+the +ACI-512 byte alignment as default+ACI was introduced in 2002. From Thomas
+Gleixner's history tree, commit ad519c6902fb:
+
++-static inline int queue+AF8-dma+AF8-alignment(request+AF8-queue+AF8-t +ACo-q)
++-+AHs
++-       int retval +AD0 511+ADs
++-
++-       if (q +ACYAJg q-+AD4-dma+AF8-alignment)
++-               retval +AD0 q-+AD4-dma+AF8-alignment+ADs
++-
++-       return retval+ADs
++-+AH0
++-
++-static inline int bdev+AF8-dma+AF8-aligment(struct block+AF8-device +ACo-bdev)
++-+AHs
++-       return queue+AF8-dma+AF8-alignment(bdev+AF8-get+AF8-queue(bdev))+ADs
++-+AH0
++-
+
+Bart.
