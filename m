@@ -1,24 +1,115 @@
-Return-Path: <jthumshirn@suse.de>
-Subject: Re: [PATCH 6/6] mtip32xx: fully switch to the generic DMA API
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Return-Path: <BATV+8bbc4aa54a9b92872f27+5534+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
 Cc: Joshua Morris <josh.h.morris@us.ibm.com>,
- Philip Kelleher <pjk1939@linux.vnet.ibm.com>, linux-block@vger.kernel.org
+	Philip Kelleher <pjk1939@linux.vnet.ibm.com>,
+	linux-block@vger.kernel.org
+Subject: [PATCH 6/6] mtip32xx: fully switch to the generic DMA API
+Date: Thu, 18 Oct 2018 15:15:16 +0200
+Message-Id: <20181018131516.10629-7-hch@lst.de>
+In-Reply-To: <20181018131516.10629-1-hch@lst.de>
 References: <20181018131516.10629-1-hch@lst.de>
- <20181018131516.10629-7-hch@lst.de>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-Message-ID: <1bf4b00f-6585-5d95-2cb0-8ac6ce31b532@suse.de>
-Date: Thu, 18 Oct 2018 15:50:40 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181018131516.10629-7-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+The mtip32xx used an odd mix of the old PCI and the generic DMA API,
+so switch it over to the generic API entirely.
+
+Note that this also removes a weird fallback to just a 32-bit coherent
+dma mask if the 64-bit dma mask doesn't work, as that can't even happen.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/mtip32xx/mtip32xx.c | 47 ++++++++++++-------------------
+ 1 file changed, 18 insertions(+), 29 deletions(-)
+
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index 1d7d48d8a205..dfc8de6ce525 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -1862,11 +1862,9 @@ static int exec_drive_taskfile(struct driver_data *dd,
+ 		if (IS_ERR(outbuf))
+ 			return PTR_ERR(outbuf);
+ 
+-		outbuf_dma = pci_map_single(dd->pdev,
+-					 outbuf,
+-					 taskout,
+-					 DMA_TO_DEVICE);
+-		if (pci_dma_mapping_error(dd->pdev, outbuf_dma)) {
++		outbuf_dma = dma_map_single(&dd->pdev->dev, outbuf,
++					    taskout, DMA_TO_DEVICE);
++		if (dma_mapping_error(&dd->pdev->dev, outbuf_dma)) {
+ 			err = -ENOMEM;
+ 			goto abort;
+ 		}
+@@ -1880,10 +1878,9 @@ static int exec_drive_taskfile(struct driver_data *dd,
+ 			inbuf = NULL;
+ 			goto abort;
+ 		}
+-		inbuf_dma = pci_map_single(dd->pdev,
+-					 inbuf,
+-					 taskin, DMA_FROM_DEVICE);
+-		if (pci_dma_mapping_error(dd->pdev, inbuf_dma)) {
++		inbuf_dma = dma_map_single(&dd->pdev->dev, inbuf,
++					   taskin, DMA_FROM_DEVICE);
++		if (dma_mapping_error(&dd->pdev->dev, inbuf_dma)) {
+ 			err = -ENOMEM;
+ 			goto abort;
+ 		}
+@@ -2002,11 +1999,11 @@ static int exec_drive_taskfile(struct driver_data *dd,
+ 
+ 	/* reclaim the DMA buffers.*/
+ 	if (inbuf_dma)
+-		pci_unmap_single(dd->pdev, inbuf_dma,
+-			taskin, DMA_FROM_DEVICE);
++		dma_unmap_single(&dd->pdev->dev, inbuf_dma, taskin,
++				 DMA_FROM_DEVICE);
+ 	if (outbuf_dma)
+-		pci_unmap_single(dd->pdev, outbuf_dma,
+-			taskout, DMA_TO_DEVICE);
++		dma_unmap_single(&dd->pdev->dev, outbuf_dma, taskout,
++				 DMA_TO_DEVICE);
+ 	inbuf_dma  = 0;
+ 	outbuf_dma = 0;
+ 
+@@ -2053,11 +2050,11 @@ static int exec_drive_taskfile(struct driver_data *dd,
+ 	}
+ abort:
+ 	if (inbuf_dma)
+-		pci_unmap_single(dd->pdev, inbuf_dma,
+-					taskin, DMA_FROM_DEVICE);
++		dma_unmap_single(&dd->pdev->dev, inbuf_dma, taskin,
++				 DMA_FROM_DEVICE);
+ 	if (outbuf_dma)
+-		pci_unmap_single(dd->pdev, outbuf_dma,
+-					taskout, DMA_TO_DEVICE);
++		dma_unmap_single(&dd->pdev->dev, outbuf_dma, taskout,
++				 DMA_TO_DEVICE);
+ 	kfree(outbuf);
+ 	kfree(inbuf);
+ 
+@@ -4216,18 +4213,10 @@ static int mtip_pci_probe(struct pci_dev *pdev,
+ 		goto iomap_err;
+ 	}
+ 
+-	if (!pci_set_dma_mask(pdev, DMA_BIT_MASK(64))) {
+-		rv = pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(64));
+-
+-		if (rv) {
+-			rv = pci_set_consistent_dma_mask(pdev,
+-						DMA_BIT_MASK(32));
+-			if (rv) {
+-				dev_warn(&pdev->dev,
+-					"64-bit DMA enable failed\n");
+-				goto setmask_err;
+-			}
+-		}
++	rv = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
++	if (rv) {
++		dev_warn(&pdev->dev, "64-bit DMA enable failed\n");
++		goto setmask_err;
+ 	}
+ 
+ 	/* Copy the info we may need later into the private data structure. */
 -- 
-Johannes Thumshirn                                        SUSE Labs
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.19.1
