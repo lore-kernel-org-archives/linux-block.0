@@ -1,154 +1,112 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
+Return-Path: <BATV+8bbc4aa54a9b92872f27+5534+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Dave Chinner <dchinner@redhat.com>,
-	Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>,
-	xfs@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Matthew Wilcox <willy@infradead.org>
-Subject: [PATCH 3/5] block: make dma_alignment as stacked limit
-Date: Thu, 18 Oct 2018 21:18:15 +0800
-Message-Id: <20181018131817.11813-4-ming.lei@redhat.com>
-In-Reply-To: <20181018131817.11813-1-ming.lei@redhat.com>
-References: <20181018131817.11813-1-ming.lei@redhat.com>
+Cc: Joshua Morris <josh.h.morris@us.ibm.com>,
+	Philip Kelleher <pjk1939@linux.vnet.ibm.com>,
+	linux-block@vger.kernel.org
+Subject: [PATCH 3/6] sx8: switch to the generic DMA API
+Date: Thu, 18 Oct 2018 15:15:13 +0200
+Message-Id: <20181018131516.10629-4-hch@lst.de>
+In-Reply-To: <20181018131516.10629-1-hch@lst.de>
+References: <20181018131516.10629-1-hch@lst.de>
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-This patch converts .dma_alignment into stacked limit, so the stack
-driver may get updated with underlying dma alignment, and allocate
-IO buffer as queue DMA aligned.
+The PCI DMA API is deprecated, switch to the generic DMA API instead.
 
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Dave Chinner <dchinner@redhat.com>
-Cc: Linux FS Devel <linux-fsdevel@vger.kernel.org>
-Cc: Darrick J. Wong <darrick.wong@oracle.com>
-Cc: xfs@vger.kernel.org
-Cc: Dave Chinner <dchinner@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bvanassche@acm.org>
-Cc: Matthew Wilcox <willy@infradead.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-settings.c | 89 +++++++++++++++++++++++++++++-----------------------
- 1 file changed, 50 insertions(+), 39 deletions(-)
+ drivers/block/sx8.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index cf9cd241dc16..aef4510a99b6 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -525,6 +525,54 @@ void blk_queue_stack_limits(struct request_queue *t, struct request_queue *b)
- EXPORT_SYMBOL(blk_queue_stack_limits);
+diff --git a/drivers/block/sx8.c b/drivers/block/sx8.c
+index 377c17e106c3..064b8c5c7a32 100644
+--- a/drivers/block/sx8.c
++++ b/drivers/block/sx8.c
+@@ -861,9 +861,9 @@ static blk_status_t carm_queue_rq(struct blk_mq_hw_ctx *hctx,
  
- /**
-+ * blk_queue_dma_alignment - set dma length and memory alignment
-+ * @q:     the request queue for the device
-+ * @mask:  alignment mask
-+ *
-+ * description:
-+ *    set required memory and length alignment for direct dma transactions.
-+ *    this is used when building direct io requests for the queue.
-+ *
-+ **/
-+void blk_queue_dma_alignment(struct request_queue *q, int mask)
-+{
-+	q->limits.dma_alignment = mask;
-+}
-+EXPORT_SYMBOL(blk_queue_dma_alignment);
-+
-+static int __blk_queue_update_dma_alignment(struct queue_limits *t, int mask)
-+{
-+	BUG_ON(mask >= PAGE_SIZE);
-+
-+	if (mask > t->dma_alignment)
-+		return mask;
-+	else
-+		return t->dma_alignment;
-+}
-+
-+/**
-+ * blk_queue_update_dma_alignment - update dma length and memory alignment
-+ * @q:     the request queue for the device
-+ * @mask:  alignment mask
-+ *
-+ * description:
-+ *    update required memory and length alignment for direct dma transactions.
-+ *    If the requested alignment is larger than the current alignment, then
-+ *    the current queue alignment is updated to the new value, otherwise it
-+ *    is left alone.  The design of this is to allow multiple objects
-+ *    (driver, device, transport etc) to set their respective
-+ *    alignments without having them interfere.
-+ *
-+ **/
-+void blk_queue_update_dma_alignment(struct request_queue *q, int mask)
-+{
-+	q->limits.dma_alignment =
-+		__blk_queue_update_dma_alignment(&q->limits, mask);
-+}
-+EXPORT_SYMBOL(blk_queue_update_dma_alignment);
-+
-+
-+/**
-  * blk_stack_limits - adjust queue_limits for stacked devices
-  * @t:	the stacking driver limits (top device)
-  * @b:  the underlying queue limits (bottom, component device)
-@@ -563,6 +611,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
- 					    b->seg_boundary_mask);
- 	t->virt_boundary_mask = min_not_zero(t->virt_boundary_mask,
- 					    b->virt_boundary_mask);
-+	t->dma_alignment = __blk_queue_update_dma_alignment(t,
-+							    b->dma_alignment);
+ 	if (rq_data_dir(rq) == WRITE) {
+ 		writing = 1;
+-		pci_dir = PCI_DMA_TODEVICE;
++		pci_dir = DMA_TO_DEVICE;
+ 	} else {
+-		pci_dir = PCI_DMA_FROMDEVICE;
++		pci_dir = DMA_FROM_DEVICE;
+ 	}
  
- 	t->max_segments = min_not_zero(t->max_segments, b->max_segments);
- 	t->max_discard_segments = min_not_zero(t->max_discard_segments,
-@@ -818,45 +868,6 @@ void blk_queue_virt_boundary(struct request_queue *q, unsigned long mask)
+ 	/* get scatterlist from block layer */
+@@ -877,7 +877,7 @@ static blk_status_t carm_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	}
+ 
+ 	/* map scatterlist to PCI bus addresses */
+-	n_elem = pci_map_sg(host->pdev, sg, n_elem, pci_dir);
++	n_elem = dma_map_sg(&host->pdev->dev, sg, n_elem, pci_dir);
+ 	if (n_elem <= 0) {
+ 		/* request with no s/g entries? */
+ 		carm_end_rq(host, crq, BLK_STS_IOERR);
+@@ -1058,11 +1058,11 @@ static inline void carm_handle_rw(struct carm_host *host,
+ 	VPRINTK("ENTER\n");
+ 
+ 	if (rq_data_dir(crq->rq) == WRITE)
+-		pci_dir = PCI_DMA_TODEVICE;
++		pci_dir = DMA_TO_DEVICE;
+ 	else
+-		pci_dir = PCI_DMA_FROMDEVICE;
++		pci_dir = DMA_FROM_DEVICE;
+ 
+-	pci_unmap_sg(host->pdev, &crq->sg[0], crq->n_elem, pci_dir);
++	dma_unmap_sg(&host->pdev->dev, &crq->sg[0], crq->n_elem, pci_dir);
+ 
+ 	carm_end_rq(host, crq, error);
  }
- EXPORT_SYMBOL(blk_queue_virt_boundary);
+@@ -1567,8 +1567,8 @@ static void carm_free_disks(struct carm_host *host)
  
--/**
-- * blk_queue_dma_alignment - set dma length and memory alignment
-- * @q:     the request queue for the device
-- * @mask:  alignment mask
-- *
-- * description:
-- *    set required memory and length alignment for direct dma transactions.
-- *    this is used when building direct io requests for the queue.
-- *
-- **/
--void blk_queue_dma_alignment(struct request_queue *q, int mask)
--{
--	q->limits.dma_alignment = mask;
--}
--EXPORT_SYMBOL(blk_queue_dma_alignment);
--
--/**
-- * blk_queue_update_dma_alignment - update dma length and memory alignment
-- * @q:     the request queue for the device
-- * @mask:  alignment mask
-- *
-- * description:
-- *    update required memory and length alignment for direct dma transactions.
-- *    If the requested alignment is larger than the current alignment, then
-- *    the current queue alignment is updated to the new value, otherwise it
-- *    is left alone.  The design of this is to allow multiple objects
-- *    (driver, device, transport etc) to set their respective
-- *    alignments without having them interfere.
-- *
-- **/
--void blk_queue_update_dma_alignment(struct request_queue *q, int mask)
--{
--	BUG_ON(mask > PAGE_SIZE);
--
--	if (mask > q->limits.dma_alignment)
--		q->limits.dma_alignment = mask;
--}
--EXPORT_SYMBOL(blk_queue_update_dma_alignment);
--
- void blk_queue_flush_queueable(struct request_queue *q, bool queueable)
+ static int carm_init_shm(struct carm_host *host)
  {
- 	if (queueable)
+-	host->shm = pci_alloc_consistent(host->pdev, CARM_SHM_SIZE,
+-					 &host->shm_dma);
++	host->shm = dma_alloc_coherent(&host->pdev->dev, CARM_SHM_SIZE,
++				       &host->shm_dma, GFP_KERNEL);
+ 	if (!host->shm)
+ 		return -ENOMEM;
+ 
+@@ -1598,7 +1598,7 @@ static int carm_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	if (rc)
+ 		goto err_out;
+ 
+-	rc = pci_set_dma_mask(pdev, DMA_BIT_MASK(32));
++	rc = dma_set_mask(&pdev->dev, DMA_BIT_MASK(32));
+ 	if (rc) {
+ 		printk(KERN_ERR DRV_NAME "(%s): DMA mask failure\n",
+ 			pci_name(pdev));
+@@ -1643,7 +1643,7 @@ static int carm_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		printk(KERN_ERR DRV_NAME "(%s): OOB queue alloc failure\n",
+ 		       pci_name(pdev));
+ 		rc = PTR_ERR(q);
+-		goto err_out_pci_free;
++		goto err_out_dma_free;
+ 	}
+ 	host->oob_q = q;
+ 	q->queuedata = host;
+@@ -1708,8 +1708,8 @@ static int carm_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		clear_bit(1, &carm_major_alloc);
+ 	blk_cleanup_queue(host->oob_q);
+ 	blk_mq_free_tag_set(&host->tag_set);
+-err_out_pci_free:
+-	pci_free_consistent(pdev, CARM_SHM_SIZE, host->shm, host->shm_dma);
++err_out_dma_free:
++	dma_free_coherent(&pdev->dev, CARM_SHM_SIZE, host->shm, host->shm_dma);
+ err_out_iounmap:
+ 	iounmap(host->mmio);
+ err_out_kfree:
+@@ -1740,7 +1740,7 @@ static void carm_remove_one (struct pci_dev *pdev)
+ 		clear_bit(1, &carm_major_alloc);
+ 	blk_cleanup_queue(host->oob_q);
+ 	blk_mq_free_tag_set(&host->tag_set);
+-	pci_free_consistent(pdev, CARM_SHM_SIZE, host->shm, host->shm_dma);
++	dma_free_coherent(&pdev->dev, CARM_SHM_SIZE, host->shm, host->shm_dma);
+ 	iounmap(host->mmio);
+ 	kfree(host);
+ 	pci_release_regions(pdev);
 -- 
-2.9.5
+2.19.1
