@@ -1,108 +1,147 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: martin.petersen@oracle.com, tom.leiming@gmail.com, hch@lst.de,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH V3] block: fix the DISCARD request merge
-Date: Wed, 24 Oct 2018 11:07:30 +0800
-Message-Id: <1540350450-15208-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Dave Chinner <dchinner@redhat.com>,
+	Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>,
+	xfs@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Matthew Wilcox <willy@infradead.org>
+Subject: [PATCH 5/5] xfs: use block layer helpers to allocate io buffer from slab
+Date: Thu, 18 Oct 2018 21:18:17 +0800
+Message-Id: <20181018131817.11813-6-ming.lei@redhat.com>
+In-Reply-To: <20181018131817.11813-1-ming.lei@redhat.com>
+References: <20181018131817.11813-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-There are two cases when handle DISCARD merge.
-If max_discard_segments == 1, the bios/requests need to be contiguous
-to merge. If max_discard_segments > 1, it takes every bio as a range
-and different range needn't to be contiguous.
+XFS may use kmalloc() to allocate io buffer, this way may not respect
+request queue's DMA alignment limit, and cause data corruption.
 
-But now, attempt_merge screws this up. It always consider contiguity
-for DISCARD for the case max_discard_segments > 1 and cannot merge
-contiguous DISCARD for the case max_discard_segments == 1, because
-rq_attempt_discard_merge always returns false in this case.
-This patch fixes both of the two cases above.
+This patch uses the introduced block layer helpers to allocate this
+kind of io buffer, and makes sure that DMA alignment is respected.
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Dave Chinner <dchinner@redhat.com>
+Cc: Linux FS Devel <linux-fsdevel@vger.kernel.org>
+Cc: Darrick J. Wong <darrick.wong@oracle.com>
+Cc: xfs@vger.kernel.org
+Cc: Dave Chinner <dchinner@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Matthew Wilcox <willy@infradead.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
+ fs/xfs/xfs_buf.c   | 28 +++++++++++++++++++++++++---
+ fs/xfs/xfs_super.c | 13 ++++++++++++-
+ 2 files changed, 37 insertions(+), 4 deletions(-)
 
-V3:
- - Introduce blk_discard_mergable into attempt_merge and
-   blk_try_merge.
- - Some comment changes.
-
-V2:
- - Add max_discard_segments > 1 checking in attempt_merge.
- - Change patch title and comment.
- - Add more comment in attempt_merge
-
- block/blk-merge.c | 34 ++++++++++++++++++++++++----------
- 1 file changed, 24 insertions(+), 10 deletions(-)
-
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 42a4674..b258de0 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -714,6 +714,22 @@ static void blk_account_io_merge(struct request *req)
- 		part_stat_unlock();
- 	}
+diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
+index e839907e8492..fabee5e1706b 100644
+--- a/fs/xfs/xfs_buf.c
++++ b/fs/xfs/xfs_buf.c
+@@ -314,12 +314,34 @@ xfs_buf_free(
+ 			__free_page(page);
+ 		}
+ 	} else if (bp->b_flags & _XBF_KMEM)
+-		kmem_free(bp->b_addr);
++		bdev_free_sec_buf(bp->b_target->bt_bdev, bp->b_addr,
++				BBTOB(bp->b_length));
+ 	_xfs_buf_free_pages(bp);
+ 	xfs_buf_free_maps(bp);
+ 	kmem_zone_free(xfs_buf_zone, bp);
  }
-+/*
-+ * Two cases of handling DISCARD merge:
-+ * If max_discard_segments > 1, the driver takes every bio
-+ * as a range and send them to controller together. The ranges
-+ * needn't to be contiguous.
-+ * Otherwise, the bios/requests will be handled as same as
-+ * others which should be contiguous.
-+ */
-+static inline bool blk_discard_mergable(struct request *req)
+ 
++void *
++xfs_buf_allocate_memory_from_slab(xfs_buf_t *bp, int size)
 +{
-+	if (req_op(req) == REQ_OP_DISCARD &&
-+	    queue_max_discard_segments(req->q) > 1)
-+		return true;
-+	else
-+		return false;
++	int	retries = 0;
++	gfp_t	lflags = kmem_flags_convert(KM_NOFS);
++	void	*ptr;
++
++	do {
++		ptr = bdev_alloc_sec_buf(bp->b_target->bt_bdev, size, lflags);
++		if (ptr)
++			return ptr;
++		if (!(++retries % 100))
++			xfs_err(NULL,
++	"%s(%u) possible memory allocation deadlock size %u in %s (mode:0x%x)",
++				current->comm, current->pid,
++				(unsigned int)size, __func__, lflags);
++		congestion_wait(BLK_RW_ASYNC, HZ/50);
++	} while (1);
++
 +}
++
+ /*
+  * Allocates all the pages for buffer in question and builds it's page list.
+  */
+@@ -342,7 +364,7 @@ xfs_buf_allocate_memory(
+ 	 */
+ 	size = BBTOB(bp->b_length);
+ 	if (size < PAGE_SIZE) {
+-		bp->b_addr = kmem_alloc(size, KM_NOFS);
++		bp->b_addr = xfs_buf_allocate_memory_from_slab(bp, size);
+ 		if (!bp->b_addr) {
+ 			/* low memory - use alloc_page loop instead */
+ 			goto use_alloc_page;
+@@ -351,7 +373,7 @@ xfs_buf_allocate_memory(
+ 		if (((unsigned long)(bp->b_addr + size - 1) & PAGE_MASK) !=
+ 		    ((unsigned long)bp->b_addr & PAGE_MASK)) {
+ 			/* b_addr spans two pages - use alloc_page instead */
+-			kmem_free(bp->b_addr);
++			bdev_free_sec_buf(bp->b_target->bt_bdev, bp->b_addr, size);
+ 			bp->b_addr = NULL;
+ 			goto use_alloc_page;
+ 		}
+diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
+index 207ee302b1bb..026cdae3aa4f 100644
+--- a/fs/xfs/xfs_super.c
++++ b/fs/xfs/xfs_super.c
+@@ -664,6 +664,10 @@ xfs_blkdev_get(
+ 		xfs_warn(mp, "Invalid device [%s], error=%d", name, error);
+ 	}
+ 
++	error = bdev_create_sec_buf_slabs(*bdevp);
++	if (error)
++		blkdev_put(*bdevp, FMODE_READ|FMODE_WRITE|FMODE_EXCL);
++
+ 	return error;
+ }
+ 
+@@ -671,8 +675,10 @@ STATIC void
+ xfs_blkdev_put(
+ 	struct block_device	*bdev)
+ {
+-	if (bdev)
++	if (bdev) {
++		bdev_destroy_sec_buf_slabs(bdev);
+ 		blkdev_put(bdev, FMODE_READ|FMODE_WRITE|FMODE_EXCL);
++	}
+ }
+ 
+ void
+@@ -706,6 +712,8 @@ xfs_close_devices(
+ 	}
+ 	xfs_free_buftarg(mp->m_ddev_targp);
+ 	fs_put_dax(dax_ddev);
++
++	bdev_destroy_sec_buf_slabs(mp->m_super->s_bdev);
+ }
  
  /*
-  * For non-mq, this has to be called with the request spinlock acquired.
-@@ -731,12 +747,6 @@ static struct request *attempt_merge(struct request_queue *q,
- 	if (req_op(req) != req_op(next))
- 		return NULL;
+@@ -774,6 +782,9 @@ xfs_open_devices(
+ 		mp->m_logdev_targp = mp->m_ddev_targp;
+ 	}
  
--	/*
--	 * not contiguous
--	 */
--	if (blk_rq_pos(req) + blk_rq_sectors(req) != blk_rq_pos(next))
--		return NULL;
--
- 	if (rq_data_dir(req) != rq_data_dir(next)
- 	    || req->rq_disk != next->rq_disk
- 	    || req_no_special_merge(next))
-@@ -760,11 +770,16 @@ static struct request *attempt_merge(struct request_queue *q,
- 	 * counts here. Handle DISCARDs separately, as they
- 	 * have separate settings.
- 	 */
--	if (req_op(req) == REQ_OP_DISCARD) {
++	if (bdev_create_sec_buf_slabs(ddev))
++		goto out_free_rtdev_targ;
 +
-+	if (blk_discard_mergable(req)) {
- 		if (!req_attempt_discard_merge(q, req, next))
- 			return NULL;
--	} else if (!ll_merge_requests_fn(q, req, next))
-+	} else if (blk_rq_pos(req) + blk_rq_sectors(req) == blk_rq_pos(next)) {
-+		if (!ll_merge_requests_fn(q, req, next))
-+			return NULL;
-+	} else {
- 		return NULL;
-+	}
+ 	return 0;
  
- 	/*
- 	 * If failfast settings disagree or any of the two is already
-@@ -888,8 +903,7 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
- 
- enum elv_merge blk_try_merge(struct request *rq, struct bio *bio)
- {
--	if (req_op(rq) == REQ_OP_DISCARD &&
--	    queue_max_discard_segments(rq->q) > 1)
-+	if (blk_discard_mergable(rq))
- 		return ELEVATOR_DISCARD_MERGE;
- 	else if (blk_rq_pos(rq) + blk_rq_sectors(rq) == bio->bi_iter.bi_sector)
- 		return ELEVATOR_BACK_MERGE;
+  out_free_rtdev_targ:
 -- 
-2.7.4
+2.9.5
