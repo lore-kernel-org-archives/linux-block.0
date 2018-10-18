@@ -1,69 +1,30 @@
 Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: don't deal with discard limit in
+ blkdev_issue_discard()
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, stable@vger.kernel.org,
+ Mariusz Dabrowski <mariusz.dabrowski@intel.com>,
+ Ming Lin <ming.l@ssi.samsung.com>, Mike Snitzer <snitzer@redhat.com>,
+ Christoph Hellwig <hch@lst.de>, Xiao Ni <xni@redhat.com>
+References: <20181012075310.4587-1-ming.lei@redhat.com>
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-ide@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 11/29] dasd: remove dead code
-Date: Mon, 29 Oct 2018 10:34:26 -0600
-Message-Id: <20181029163444.9940-12-axboe@kernel.dk>
-In-Reply-To: <20181029163444.9940-1-axboe@kernel.dk>
-References: <20181029163444.9940-1-axboe@kernel.dk>
+Message-ID: <f025344a-3ecf-afe0-4bcf-439d0b3051cf@kernel.dk>
+Date: Thu, 18 Oct 2018 07:23:56 -0600
+MIME-Version: 1.0
+In-Reply-To: <20181012075310.4587-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Since e443343e509a we haven't had a request_fn attached to
-this driver, hence any code inside an if (q->request_fn) is
-unreachable.
+On 10/12/18 1:53 AM, Ming Lei wrote:
+> blk_queue_split() does respect this limit via bio splitting, so no
+> need to do that in blkdev_issue_discard(), then we can align to
+> normal bio submit(bio_add_page() & submit_bio()).
+> 
+> More importantly, this patch fixes one issue introduced in a22c4d7e34402cc
+> ("block: re-add discard_granularity and alignment checks"), in which
+> zero discard bio may be generated in case of zero alignment.
 
-Fixes: e443343e509a ("s390/dasd: blk-mq conversion")
-[sth: Keep and fix the dasd_info->chanq_len counter.]
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Jan Hoeppner <hoeppner@linux.ibm.com>
-Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- drivers/s390/block/dasd_ioctl.c | 22 +++++-----------------
- 1 file changed, 5 insertions(+), 17 deletions(-)
+Thanks Ming, applied.
 
-diff --git a/drivers/s390/block/dasd_ioctl.c b/drivers/s390/block/dasd_ioctl.c
-index 2016e0ed5865..8e26001dc11c 100644
---- a/drivers/s390/block/dasd_ioctl.c
-+++ b/drivers/s390/block/dasd_ioctl.c
-@@ -412,6 +412,7 @@ static int dasd_ioctl_information(struct dasd_block *block,
- 	struct ccw_dev_id dev_id;
- 	struct dasd_device *base;
- 	struct ccw_device *cdev;
-+	struct list_head *l;
- 	unsigned long flags;
- 	int rc;
- 
-@@ -462,23 +463,10 @@ static int dasd_ioctl_information(struct dasd_block *block,
- 
- 	memcpy(dasd_info->type, base->discipline->name, 4);
- 
--	if (block->request_queue->request_fn) {
--		struct list_head *l;
--#ifdef DASD_EXTENDED_PROFILING
--		{
--			struct list_head *l;
--			spin_lock_irqsave(&block->lock, flags);
--			list_for_each(l, &block->request_queue->queue_head)
--				dasd_info->req_queue_len++;
--			spin_unlock_irqrestore(&block->lock, flags);
--		}
--#endif				/* DASD_EXTENDED_PROFILING */
--		spin_lock_irqsave(get_ccwdev_lock(base->cdev), flags);
--		list_for_each(l, &base->ccw_queue)
--			dasd_info->chanq_len++;
--		spin_unlock_irqrestore(get_ccwdev_lock(base->cdev),
--				       flags);
--	}
-+	spin_lock_irqsave(&block->queue_lock, flags);
-+	list_for_each(l, &base->ccw_queue)
-+		dasd_info->chanq_len++;
-+	spin_unlock_irqrestore(&block->queue_lock, flags);
- 
- 	rc = 0;
- 	if (copy_to_user(argp, dasd_info,
 -- 
-2.17.1
+Jens Axboe
