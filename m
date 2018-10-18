@@ -1,38 +1,77 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: hch@lst.de, keith.busch@linux.intel.com, ming.lei@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH V2 2/3] blk-mq: retrieve bios before update nr_hw_queues
-Date: Wed, 17 Oct 2018 17:07:11 +0800
-Message-Id: <1539767232-9389-3-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1539767232-9389-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1539767232-9389-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <hch@lst.de>
+Date: Thu, 18 Oct 2018 16:31:51 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Dave Chinner <dchinner@redhat.com>,
+	Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>, xfs@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Matthew Wilcox <willy@infradead.org>
+Subject: Re: [PATCH 3/5] block: make dma_alignment as stacked limit
+Message-ID: <20181018143151.GC26828@lst.de>
+References: <20181018131817.11813-1-ming.lei@redhat.com> <20181018131817.11813-4-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20181018131817.11813-4-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-retrieve bios of all requests on queue to drain requests, then
-needn't depend on storage device to drain the queue any more.
+On Thu, Oct 18, 2018 at 09:18:15PM +0800, Ming Lei wrote:
+> This patch converts .dma_alignment into stacked limit, so the stack
+> driver may get updated with underlying dma alignment, and allocate
+> IO buffer as queue DMA aligned.
+> 
+> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Cc: Dave Chinner <dchinner@redhat.com>
+> Cc: Linux FS Devel <linux-fsdevel@vger.kernel.org>
+> Cc: Darrick J. Wong <darrick.wong@oracle.com>
+> Cc: xfs@vger.kernel.org
+> Cc: Dave Chinner <dchinner@redhat.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: Matthew Wilcox <willy@infradead.org>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-settings.c | 89 +++++++++++++++++++++++++++++-----------------------
+>  1 file changed, 50 insertions(+), 39 deletions(-)
+> 
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index cf9cd241dc16..aef4510a99b6 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -525,6 +525,54 @@ void blk_queue_stack_limits(struct request_queue *t, struct request_queue *b)
+>  EXPORT_SYMBOL(blk_queue_stack_limits);
+>  
+>  /**
+> + * blk_queue_dma_alignment - set dma length and memory alignment
+> + * @q:     the request queue for the device
+> + * @mask:  alignment mask
+> + *
+> + * description:
+> + *    set required memory and length alignment for direct dma transactions.
+> + *    this is used when building direct io requests for the queue.
+> + *
+> + **/
+> +void blk_queue_dma_alignment(struct request_queue *q, int mask)
+> +{
+> +	q->limits.dma_alignment = mask;
+> +}
+> +EXPORT_SYMBOL(blk_queue_dma_alignment);
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
----
- block/blk-mq.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Any good reason not to keep these functions where they were before?
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f75598b..6d89d3e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3085,7 +3085,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 		return;
- 
- 	list_for_each_entry(q, &set->tag_list, tag_set_list)
--		blk_mq_freeze_queue(q);
-+		blk_freeze_queue_start(q);
-+
-+	list_for_each_entry(q, &set->tag_list, tag_set_list)
-+		blk_mq_sched_retrieve_bios(q);
- 	/*
- 	 * Sync with blk_mq_queue_tag_busy_iter.
- 	 */
--- 
-2.7.4
+> +
+> +static int __blk_queue_update_dma_alignment(struct queue_limits *t, int mask)
+> +{
+> +	BUG_ON(mask >= PAGE_SIZE);
+> +
+> +	if (mask > t->dma_alignment)
+> +		return mask;
+> +	else
+> +		return t->dma_alignment;
+
+I think this function could just be replaced with a:
+
+	max(t->dma_alignment, mask);
