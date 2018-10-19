@@ -1,56 +1,71 @@
-Return-Path: <bgurney@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <CACRpkdZZ6RU0aJpUqRn1ndyob1_COhaEs6B9QVRWfa+a60n+Lg@mail.gmail.com>
-References: <20181015141059.26579-1-linus.walleij@linaro.org>
- <d25e02de-e1be-0fb7-237b-3e53d56c6f64@kernel.dk> <307F6078-0A77-4AAA-BE1A-55C2ACC328CC@linaro.org>
- <ab70f1dd-6943-9642-aafa-71840fd44f07@kernel.dk> <689F28AA-92B5-48B5-BBE7-0B589F163228@linaro.org>
- <7375c004-ac6e-c692-4282-46de554285d5@kernel.dk> <20181017100526.GB23493@quack2.suse.cz>
- <d1d082f3-d681-02ed-5bbe-5eb011d6b0da@acm.org> <CAHhmqcSb45qePdKsidQcEk7bNeZC5h6Oew-qH=LA7dsQL_uhSg@mail.gmail.com>
- <CACRpkdZZ6RU0aJpUqRn1ndyob1_COhaEs6B9QVRWfa+a60n+Lg@mail.gmail.com>
-From: Bryan Gurney <bgurney@redhat.com>
-Date: Fri, 19 Oct 2018 09:36:49 -0400
-Message-ID: <CAHhmqcQinFN9ez5MTRquY0FPaYO2BmOKMn0avy84QPWLK1g2Gg@mail.gmail.com>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
 Subject: Re: [PATCH v2] block: BFQ default for single queue devices
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Bart Van Assche <bvanassche@acm.org>, Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-	Paolo Valente <paolo.valente@linaro.org>, linux-block <linux-block@vger.kernel.org>,
-	linux-mmc <linux-mmc@vger.kernel.org>, linux-mtd@lists.infradead.org,
-	Pavel Machek <pavel@ucw.cz>, Ulf Hansson <ulf.hansson@linaro.org>,
-	Richard Weinberger <richard@nod.at>, Adrian Hunter <adrian.hunter@intel.com>,
-	Artem Bityutskiy <dedekind1@gmail.com>, Christoph Hellwig <hch@infradead.org>,
-	One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>, Mark Brown <broonie@kernel.org>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>, Johannes Thumshirn <jthumshirn@suse.de>,
-	Oleksandr Natalenko <oleksandr@natalenko.name>, Jonathan Corbet <corbet@lwn.net>
-Content-Type: text/plain; charset="UTF-8"
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <307F6078-0A77-4AAA-BE1A-55C2ACC328CC@linaro.org>
+Date: Fri, 19 Oct 2018 12:59:04 +0200
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+ linux-block <linux-block@vger.kernel.org>,
+ linux-mmc <linux-mmc@vger.kernel.org>,
+ linux-mtd@lists.infradead.org,
+ Pavel Machek <pavel@ucw.cz>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ Richard Weinberger <richard@nod.at>,
+ Adrian Hunter <adrian.hunter@intel.com>,
+ Bart Van Assche <bvanassche@acm.org>,
+ Jan Kara <jack@suse.cz>,
+ Artem Bityutskiy <dedekind1@gmail.com>,
+ Christoph Hellwig <hch@infradead.org>,
+ Alan Cox <gnomes@lxorguk.ukuu.org.uk>,
+ Mark Brown <broonie@kernel.org>,
+ Damien Le Moal <Damien.LeMoal@wdc.com>,
+ Johannes Thumshirn <jthumshirn@suse.de>,
+ Oleksandr Natalenko <oleksandr@natalenko.name>,
+ Jonathan Corbet <corbet@lwn.net>
+Message-Id: <E2DDE0B9-F693-4EF3-B90C-C57F787B4DB3@linaro.org>
+References: <20181015141059.26579-1-linus.walleij@linaro.org>
+ <d25e02de-e1be-0fb7-237b-3e53d56c6f64@kernel.dk>
+ <307F6078-0A77-4AAA-BE1A-55C2ACC328CC@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Oct 19, 2018 at 4:42 AM, Linus Walleij <linus.walleij@linaro.org> wrote:
->
-> On Wed, Oct 17, 2018 at 4:59 PM Bryan Gurney <bgurney@redhat.com> wrote:
->
-> > I feel strongly about the prevention of users running into errors
-> > because of an incorrect scheduler default, because I encountered that
-> > situation three times in my testing with zoned block devices. The
-> > switch to SCSI_MQ would resolve that, since mq-deadline is the
-> > default, but in my case, I was using Fedora 28, which disables
-> > CONFIG_SCSI_MQ_DEFAULT (which is enabled in the 4.18 kernel), so my
-> > default scheduler was cfq.
->
-> I think we should make a patch to the kernel that makes it
-> impossible (even from sysfs) to choose a non-zone aware
-> scheduler for these devices.
->
-> It's another topic than $SUBJECT patch though. I take this
-> into account in this version.
->
 
-I like this idea.  I don't have enough experience to write this patch
-myself, but I imagine something like adding "bool is_zoned_aware" to
-"struct elevator_type", and setting that true only for the schedulers
-that are currently zoned-device aware (which is currently deadline on
-single queue, mq-deadline on blk-mq).
 
+> Il giorno 15 ott 2018, alle ore 20:26, Paolo Valente =
+<paolo.valente@linaro.org> ha scritto:
+>=20
+> ...
+>> This kind of policy does not belong in the kernel, at least
+>> not in the current form. If we had some sort of "enable best
+>> options for a desktop" then it could fall under that umbrella.
+>>=20
+>=20
+> I don't think bfq can be considered a scheduler for only desktops any
+> longer.
+>=20
+
+Hi Jens,
+this reply of mine went on bugging me, until I understood my mistake.
+
+The fact that I consider bfq good also for servers *does not* imply
+that having bfq in desktops is to be refused.
+
+As for the option that you are hinting at, I also acknowledge that it
+would be trivial for an admin/developer to know whether a given kernel
+is meant for a desktop/personal system, while it is more difficult to
+choose explicitly among the various I/O schedulers available.
+
+So, I apologize for my shortsighted, initial reply, and ask you if can
+elaborate a little more on this.  I'm willing to help, if I can.
 
 Thanks,
+Paolo
 
-Bryan
+> Thanks,
+> Paolo
+>=20
+>> --=20
+>> Jens Axboe
