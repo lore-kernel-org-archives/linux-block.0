@@ -1,172 +1,140 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-        Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH 08/11] block: Improve zone reset execution
-Date: Wed, 10 Oct 2018 10:52:36 +0900
-Message-Id: <20181010015239.24930-9-damien.lemoal@wdc.com>
-In-Reply-To: <20181010015239.24930-1-damien.lemoal@wdc.com>
-References: <20181010015239.24930-1-damien.lemoal@wdc.com>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <3g1jLWwkbBUY067sittmzixxql.owwotm20mzkwv1mv1.kwui5jwmsmzvmt.ls@M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com>
+MIME-Version: 1.0
+Date: Sat, 20 Oct 2018 09:32:03 -0700
+In-Reply-To: <000000000000140c370577db5ece@google.com>
+Message-ID: <0000000000006089ec0578ab8f08@google.com>
+Subject: Re: KASAN: use-after-free Read in debugfs_remove (3)
+From: syzbot <syzbot+903b72a010ad6b7a40f2@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, rafael@kernel.org, rostedt@goodmis.org,
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 List-ID: <linux-block@vger.kernel.org>
 
-There is no need to synchronously execute all REQ_OP_ZONE_RESET BIOs
-necessary to reset a range of zones. Similarly to what is done for
-discard BIOs in blk-lib.c, all zone reset BIOs can be chained and
-executed asynchronously and a synchronous call done only for the last
-BIO of the chain.
+syzbot has found a reproducer for the following crash on:
 
-Modify blkdev_reset_zones() to operate similarly to
-blkdev_issue_discard() using the next_bio() helper for chaining BIOs. To
-avoid code duplication of that function in blk_zoned.c, rename
-next_bio() into blk_next_bio() and declare it as a block internal
-function in blk.h.
+HEAD commit:    270b77a0f30e Merge tag 'drm-fixes-2018-10-20-1' of git://a..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1678d019400000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b3f55cb3dfcc6c33
+dashboard link: https://syzkaller.appspot.com/bug?extid=903b72a010ad6b7a40f2
+compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1248e21d400000
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/blk-lib.c   | 13 ++++++-------
- block/blk-zoned.c | 29 ++++++++++++++++-------------
- block/blk.h       |  2 ++
- 3 files changed, 24 insertions(+), 20 deletions(-)
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+903b72a010ad6b7a40f2@syzkaller.appspotmail.com
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index d1b9dd03da25..d7bedee5f9ba 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -10,8 +10,7 @@
- 
- #include "blk.h"
- 
--static struct bio *next_bio(struct bio *bio, unsigned int nr_pages,
--		gfp_t gfp)
-+struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp)
- {
- 	struct bio *new = bio_alloc(gfp, nr_pages);
- 
-@@ -87,7 +86,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 			req_sects = end_sect - sector;
- 		}
- 
--		bio = next_bio(bio, 0, gfp_mask);
-+		bio = blk_next_bio(bio, 0, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio_set_op_attrs(bio, op, 0);
-@@ -189,7 +188,7 @@ static int __blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
- 	max_write_same_sectors = UINT_MAX >> 9;
- 
- 	while (nr_sects) {
--		bio = next_bio(bio, 1, gfp_mask);
-+		bio = blk_next_bio(bio, 1, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio->bi_vcnt = 1;
-@@ -265,7 +264,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
- 		return -EOPNOTSUPP;
- 
- 	while (nr_sects) {
--		bio = next_bio(bio, 0, gfp_mask);
-+		bio = blk_next_bio(bio, 0, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio->bi_opf = REQ_OP_WRITE_ZEROES;
-@@ -316,8 +315,8 @@ static int __blkdev_issue_zero_pages(struct block_device *bdev,
- 		return -EPERM;
- 
- 	while (nr_sects != 0) {
--		bio = next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
--			       gfp_mask);
-+		bio = blk_next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
-+				   gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index f2c8b859fc18..ca2faef940af 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -13,6 +13,8 @@
- #include <linux/rbtree.h>
- #include <linux/blkdev.h>
- 
-+#include "blk.h"
-+
- static inline sector_t blk_zone_start(struct request_queue *q,
- 				      sector_t sector)
- {
-@@ -277,16 +279,17 @@ int blkdev_reset_zones(struct block_device *bdev,
- 	struct request_queue *q = bdev_get_queue(bdev);
- 	sector_t zone_sectors;
- 	sector_t end_sector = sector + nr_sectors;
--	struct bio *bio;
-+	struct bio *bio = NULL;
-+	struct blk_plug plug;
- 	int ret;
- 
--	if (!q)
--		return -ENXIO;
--
- 	if (!blk_queue_is_zoned(q))
- 		return -EOPNOTSUPP;
- 
--	if (end_sector > bdev->bd_part->nr_sects)
-+	if (bdev_read_only(bdev))
-+		return -EPERM;
-+
-+	if (!nr_sectors || end_sector > bdev->bd_part->nr_sects)
- 		/* Out of range */
- 		return -EINVAL;
- 
-@@ -299,19 +302,14 @@ int blkdev_reset_zones(struct block_device *bdev,
- 	    end_sector != bdev->bd_part->nr_sects)
- 		return -EINVAL;
- 
-+	blk_start_plug(&plug);
- 	while (sector < end_sector) {
- 
--		bio = bio_alloc(gfp_mask, 0);
-+		bio = blk_next_bio(bio, 0, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio_set_op_attrs(bio, REQ_OP_ZONE_RESET, 0);
- 
--		ret = submit_bio_wait(bio);
--		bio_put(bio);
--
--		if (ret)
--			return ret;
--
- 		sector += zone_sectors;
- 
- 		/* This may take a while, so be nice to others */
-@@ -319,7 +317,12 @@ int blkdev_reset_zones(struct block_device *bdev,
- 
- 	}
- 
--	return 0;
-+	ret = submit_bio_wait(bio);
-+	bio_put(bio);
-+
-+	blk_finish_plug(&plug);
-+
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(blkdev_reset_zones);
- 
-diff --git a/block/blk.h b/block/blk.h
-index 9db4e389582c..3d67844676fb 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -421,4 +421,6 @@ extern int blk_iolatency_init(struct request_queue *q);
- static inline int blk_iolatency_init(struct request_queue *q) { return 0; }
- #endif
- 
-+struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp);
-+
- #endif /* BLK_INTERNAL_H */
--- 
-2.17.1
+overlayfs: missing 'lowerdir'
+overlayfs: missing 'lowerdir'
+overlayfs: missing 'lowerdir'
+overlayfs: missing 'lowerdir'
+==================================================================
+BUG: KASAN: use-after-free in debugfs_remove+0x10b/0x130  
+fs/debugfs/inode.c:682
+Read of size 8 at addr ffff8801c3d48a60 by task kworker/1:3/5820
+
+CPU: 1 PID: 5820 Comm: kworker/1:3 Not tainted 4.19.0-rc8+ #72
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Workqueue: events __blk_release_queue
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x1c4/0x2b4 lib/dump_stack.c:113
+  print_address_description.cold.8+0x9/0x1ff mm/kasan/report.c:256
+  kasan_report_error mm/kasan/report.c:354 [inline]
+  kasan_report.cold.9+0x242/0x309 mm/kasan/report.c:412
+  __asan_report_load8_noabort+0x14/0x20 mm/kasan/report.c:433
+  debugfs_remove+0x10b/0x130 fs/debugfs/inode.c:682
+  blk_trace_free+0x35/0x130 kernel/trace/blktrace.c:312
+  blk_trace_cleanup kernel/trace/blktrace.c:339 [inline]
+  __blk_trace_remove+0x7a/0xa0 kernel/trace/blktrace.c:352
+  blk_trace_shutdown+0x63/0x80 kernel/trace/blktrace.c:752
+  __blk_release_queue+0x22d/0x500 block/blk-sysfs.c:852
+  process_one_work+0xc90/0x1b90 kernel/workqueue.c:2153
+  worker_thread+0x17f/0x1390 kernel/workqueue.c:2296
+kobject: 'mq' (00000000f4ee6bf8): kobject_uevent_env: filter function  
+caused the event to drop!
+kobject: '0' (000000001977fe41): kobject_add_internal: parent: 'mq',  
+set: '<NULL>'
+  kthread+0x35a/0x420 kernel/kthread.c:246
+kobject: 'cpu0' (00000000e409d4ee): kobject_add_internal: parent: '0',  
+set: '<NULL>'
+  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:413
+
+kobject: 'cpu1' (000000004ffe025c): kobject_add_internal: parent: '0',  
+set: '<NULL>'
+Allocated by task 11189:
+  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
+  set_track mm/kasan/kasan.c:460 [inline]
+  kasan_kmalloc+0xc7/0xe0 mm/kasan/kasan.c:553
+kobject: 'queue' (00000000c1b3424e): kobject_uevent_env
+  kasan_slab_alloc+0x12/0x20 mm/kasan/kasan.c:490
+  kmem_cache_alloc+0x12e/0x730 mm/slab.c:3554
+  __d_alloc+0xc8/0xcc0 fs/dcache.c:1614
+  d_alloc+0x96/0x380 fs/dcache.c:1698
+  d_alloc_parallel+0x15a/0x1f40 fs/dcache.c:2441
+  __lookup_slow+0x1e6/0x540 fs/namei.c:1654
+kobject: 'queue' (00000000c1b3424e): kobject_uevent_env: filter function  
+caused the event to drop!
+  lookup_one_len+0x1d8/0x220 fs/namei.c:2543
+  start_creating+0xc6/0x200 fs/debugfs/inode.c:308
+  __debugfs_create_file+0x63/0x400 fs/debugfs/inode.c:347
+  debugfs_create_file+0x57/0x70 fs/debugfs/inode.c:399
+  do_blk_trace_setup+0x454/0xda0 kernel/trace/blktrace.c:528
+  __blk_trace_setup+0xd5/0x180 kernel/trace/blktrace.c:577
+  blk_trace_ioctl+0x17a/0x2f0 kernel/trace/blktrace.c:716
+  blkdev_ioctl+0x8bc/0x2010 block/ioctl.c:587
+  block_ioctl+0xee/0x130 fs/block_dev.c:1883
+kobject: 'iosched' (000000001a1643a8): kobject_add_internal:  
+parent: 'queue', set: '<NULL>'
+  vfs_ioctl fs/ioctl.c:46 [inline]
+  file_ioctl fs/ioctl.c:501 [inline]
+  do_vfs_ioctl+0x1de/0x1720 fs/ioctl.c:685
+  ksys_ioctl+0xa9/0xd0 fs/ioctl.c:702
+  __do_sys_ioctl fs/ioctl.c:709 [inline]
+  __se_sys_ioctl fs/ioctl.c:707 [inline]
+  __x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:707
+  do_syscall_64+0x1b9/0x820 arch/x86/entry/common.c:290
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+kobject: 'iosched' (000000001a1643a8): kobject_uevent_env
+
+Freed by task 5443:
+  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
+  set_track mm/kasan/kasan.c:460 [inline]
+  __kasan_slab_free+0x102/0x150 mm/kasan/kasan.c:521
+  kasan_slab_free+0xe/0x10 mm/kasan/kasan.c:528
+  __cache_free mm/slab.c:3498 [inline]
+  kmem_cache_free+0x83/0x290 mm/slab.c:3756
+  __d_free+0x20/0x30 fs/dcache.c:257
+  __rcu_reclaim kernel/rcu/rcu.h:236 [inline]
+  rcu_do_batch kernel/rcu/tree.c:2576 [inline]
+  invoke_rcu_callbacks kernel/rcu/tree.c:2880 [inline]
+  __rcu_process_callbacks kernel/rcu/tree.c:2847 [inline]
+  rcu_process_callbacks+0xf23/0x2670 kernel/rcu/tree.c:2864
+kobject: 'iosched' (000000001a1643a8): kobject_uevent_env: filter function  
+caused the event to drop!
+  __do_softirq+0x30b/0xad8 kernel/softirq.c:292
+
+The buggy address belongs to the object at ffff8801c3d48a20
+  which belongs to the cache dentry of size 288
+The buggy address is located 64 bytes inside of
+  288-byte region [ffff8801c3d48a20, ffff8801c3d48b40)
+The buggy address belongs to the page:
+page:ffffea00070f5200 count:1 mapcount:0 mapping:ffff8801da978c40  
+index:0xffff8801c3d488c0
+flags: 0x2fffc0000000100(slab)
+raw: 02fffc0000000100 ffffea000726ebc8 ffffea00071b0988 ffff8801da978c40
+kobject: 'integrity' (000000000b36b365): kobject_add_internal:  
+parent: 'loop0', set: '<NULL>'
+raw: ffff8801c3d488c0 ffff8801c3d48080 000000010000000a 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+  ffff8801c3d48900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+  ffff8801c3d48980: fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+> ffff8801c3d48a00: fc fc fc fc fb fb fb fb fb fb fb fb fb fb fb fb
+                                                        ^
+  ffff8801c3d48a80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+kobject: 'integrity' (000000000b36b365): kobject_uevent_env
+  ffff8801c3d48b00: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+==================================================================
