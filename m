@@ -1,68 +1,98 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-ide@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 10/28] dasd: remove dead code
-Date: Thu, 25 Oct 2018 15:10:21 -0600
-Message-Id: <20181025211039.11559-11-axboe@kernel.dk>
-In-Reply-To: <20181025211039.11559-1-axboe@kernel.dk>
-References: <20181025211039.11559-1-axboe@kernel.dk>
+Return-Path: <dennisszhou@gmail.com>
+Return-Path: <dennisszhou@gmail.com>
+From: Dennis Zhou <dennis@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Tejun Heo <tj@kernel.org>,
+	Valdis Kletnieks <valdis.kletnieks@vt.edu>,
+	kernel-team@fb.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Dennis Zhou <dennis@kernel.org>
+Subject: [PATCH 2/2] blkcg: reassociate bios when make_request() is called recursively
+Date: Sat, 20 Oct 2018 14:56:12 -0400
+Message-Id: <20181020185612.51587-3-dennis@kernel.org>
+In-Reply-To: <20181020185612.51587-1-dennis@kernel.org>
+References: <20181020185612.51587-1-dennis@kernel.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Since e443343e509a we haven't had a request_fn attached to
-this driver, hence any code inside an if (q->request_fn) is
-unreachable.
+When submitting a bio, multiple recursive calls to make_request() may
+occur. This causes the initial associate done in blkcg_bio_issue_check()
+to be incorrect and reference the prior request_queue. This introduces
+a helper to do reassociation when make_request() is recursively called.
 
-Fixes: e443343e509a ("s390/dasd: blk-mq conversion")
-[sth: Keep and fix the dasd_info->chanq_len counter.]
-Reviewed-by: Jan Hoeppner <hoeppner@linux.ibm.com>
-Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Fixes: a7b39b4e961c ("blkcg: always associate a bio with a blkg")
+Reported-by: Valdis Kletnieks <valdis.kletnieks@vt.edu>
+Signed-off-by: Dennis Zhou <dennis@kernel.org>
+Tested-by: Valdis Kletnieks <valdis.kletnieks@vt.edu>
 ---
- drivers/s390/block/dasd_ioctl.c | 22 +++++-----------------
- 1 file changed, 5 insertions(+), 17 deletions(-)
+ block/bio.c         | 20 ++++++++++++++++++++
+ block/blk-core.c    |  1 +
+ include/linux/bio.h |  3 +++
+ 3 files changed, 24 insertions(+)
 
-diff --git a/drivers/s390/block/dasd_ioctl.c b/drivers/s390/block/dasd_ioctl.c
-index 2016e0ed5865..8e26001dc11c 100644
---- a/drivers/s390/block/dasd_ioctl.c
-+++ b/drivers/s390/block/dasd_ioctl.c
-@@ -412,6 +412,7 @@ static int dasd_ioctl_information(struct dasd_block *block,
- 	struct ccw_dev_id dev_id;
- 	struct dasd_device *base;
- 	struct ccw_device *cdev;
-+	struct list_head *l;
- 	unsigned long flags;
- 	int rc;
+diff --git a/block/bio.c b/block/bio.c
+index 17a8b0aa7050..bbfeb4ee2892 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -2083,6 +2083,26 @@ int bio_associate_create_blkg(struct request_queue *q, struct bio *bio)
+ 	return ret;
+ }
  
-@@ -462,23 +463,10 @@ static int dasd_ioctl_information(struct dasd_block *block,
- 
- 	memcpy(dasd_info->type, base->discipline->name, 4);
- 
--	if (block->request_queue->request_fn) {
--		struct list_head *l;
--#ifdef DASD_EXTENDED_PROFILING
--		{
--			struct list_head *l;
--			spin_lock_irqsave(&block->lock, flags);
--			list_for_each(l, &block->request_queue->queue_head)
--				dasd_info->req_queue_len++;
--			spin_unlock_irqrestore(&block->lock, flags);
--		}
--#endif				/* DASD_EXTENDED_PROFILING */
--		spin_lock_irqsave(get_ccwdev_lock(base->cdev), flags);
--		list_for_each(l, &base->ccw_queue)
--			dasd_info->chanq_len++;
--		spin_unlock_irqrestore(get_ccwdev_lock(base->cdev),
--				       flags);
--	}
-+	spin_lock_irqsave(&block->queue_lock, flags);
-+	list_for_each(l, &base->ccw_queue)
-+		dasd_info->chanq_len++;
-+	spin_unlock_irqrestore(&block->queue_lock, flags);
- 
- 	rc = 0;
- 	if (copy_to_user(argp, dasd_info,
++/**
++ * bio_reassociate_blkg - reassociate a bio with a blkg from q
++ * @q: request_queue where bio is going
++ * @bio: target bio
++ *
++ * When submitting a bio, multiple recursive calls to make_request() may occur.
++ * This causes the initial associate done in blkcg_bio_issue_check() to be
++ * incorrect and reference the prior request_queue.  This performs reassociation
++ * when this situation happens.
++ */
++int bio_reassociate_blkg(struct request_queue *q, struct bio *bio)
++{
++	if (bio->bi_blkg) {
++		blkg_put(bio->bi_blkg);
++		bio->bi_blkg = NULL;
++	}
++
++	return bio_associate_create_blkg(q, bio);
++}
++
+ /**
+  * bio_disassociate_task - undo bio_associate_current()
+  * @bio: target bio
+diff --git a/block/blk-core.c b/block/blk-core.c
+index cdfabc5646da..3ed60723e242 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2433,6 +2433,7 @@ blk_qc_t generic_make_request(struct bio *bio)
+ 			if (q)
+ 				blk_queue_exit(q);
+ 			q = bio->bi_disk->queue;
++			bio_reassociate_blkg(q, bio);
+ 			flags = 0;
+ 			if (bio->bi_opf & REQ_NOWAIT)
+ 				flags = BLK_MQ_REQ_NOWAIT;
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index f447b0ebb288..b47c7f716731 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -514,6 +514,7 @@ int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg);
+ int bio_associate_blkg_from_css(struct bio *bio,
+ 				struct cgroup_subsys_state *css);
+ int bio_associate_create_blkg(struct request_queue *q, struct bio *bio);
++int bio_reassociate_blkg(struct request_queue *q, struct bio *bio);
+ void bio_disassociate_task(struct bio *bio);
+ void bio_clone_blkg_association(struct bio *dst, struct bio *src);
+ #else	/* CONFIG_BLK_CGROUP */
+@@ -522,6 +523,8 @@ static inline int bio_associate_blkg_from_css(struct bio *bio,
+ { return 0; }
+ static inline int bio_associate_create_blkg(struct request_queue *q,
+ 					    struct bio *bio) { return 0; }
++static inline int bio_reassociate_blkg(struct request_queue *q, struct bio *bio)
++{ return 0; }
+ static inline void bio_disassociate_task(struct bio *bio) { }
+ static inline void bio_clone_blkg_association(struct bio *dst,
+ 					      struct bio *src) { }
 -- 
 2.17.1
