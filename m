@@ -1,39 +1,44 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: axboe@kernel.dk
-Cc: linux-bcache@vger.kernel.org,
+Return-Path: <dennisszhou@gmail.com>
+Return-Path: <dennisszhou@gmail.com>
+From: Dennis Zhou <dennis@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Tejun Heo <tj@kernel.org>,
+	Valdis Kletnieks <valdis.kletnieks@vt.edu>,
+	kernel-team@fb.com,
 	linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH 12/15] bcache: replace hard coded number with BUCKET_GC_GEN_MAX
-Date: Mon,  8 Oct 2018 20:41:18 +0800
-Message-Id: <20181008124121.20192-13-colyli@suse.de>
-In-Reply-To: <20181008124121.20192-1-colyli@suse.de>
-References: <20181008124121.20192-1-colyli@suse.de>
-MIME-Version: 1.0
+	linux-kernel@vger.kernel.org,
+	Dennis Zhou <dennis@kernel.org>
+Subject: [PATCH 1/2] blkcg: fix edge case for blk_get_rl() under memory pressure
+Date: Sat, 20 Oct 2018 14:56:11 -0400
+Message-Id: <20181020185612.51587-2-dennis@kernel.org>
+In-Reply-To: <20181020185612.51587-1-dennis@kernel.org>
+References: <20181020185612.51587-1-dennis@kernel.org>
 List-ID: <linux-block@vger.kernel.org>
 
-In extents.c:bch_extent_bad(), number 96 is used as parameter to call
-btree_bug_on(). The purpose is to check whether stale gen value exceeds
-BUCKET_GC_GEN_MAX, so it is better to use macro BUCKET_GC_GEN_MAX to
-make the code more understandable.
+It is possible for blkg creation to fail when in blk_get_rl(). In this
+situation, the fallback logic returns the nearest created blkg. There is
+however special handling for the request_list for the root blkcg. This
+fixes the missing edge case from the earlier series changing
+blk_get_rl().
 
-Signed-off-by: Coly Li <colyli@suse.de>
+Fixes: e2b0989954ae ("blkcg: cleanup and make blk_get_rl use blkg_lookup_create")
+Signed-off-by: Dennis Zhou <dennis@kernel.org>
 ---
- drivers/md/bcache/extents.c | 2 +-
+ include/linux/blk-cgroup.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/md/bcache/extents.c b/drivers/md/bcache/extents.c
-index c809724e6571..956004366699 100644
---- a/drivers/md/bcache/extents.c
-+++ b/drivers/md/bcache/extents.c
-@@ -553,7 +553,7 @@ static bool bch_extent_bad(struct btree_keys *bk, const struct bkey *k)
- 	for (i = 0; i < KEY_PTRS(k); i++) {
- 		stale = ptr_stale(b->c, k, i);
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index b7fd08013de2..1e76ceebeb5d 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -597,7 +597,7 @@ static inline struct request_list *blk_get_rl(struct request_queue *q,
+ 	if (unlikely(!blkg))
+ 		blkg = __blkg_lookup_create(blkcg, q);
  
--		btree_bug_on(stale > 96, b,
-+		btree_bug_on(stale > BUCKET_GC_GEN_MAX, b,
- 			     "key too stale: %i, need_gc %u",
- 			     stale, b->c->need_gc);
+-	if (!blkg_tryget(blkg))
++	if (blkg->blkcg == &blkcg_root || !blkg_tryget(blkg))
+ 		goto rl_use_root;
  
+ 	rcu_read_unlock();
 -- 
-2.19.0
+2.17.1
