@@ -1,84 +1,35 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>
-Subject: [PATCHv6 0/3] Deprecate DAC960 driver
-Date: Wed, 17 Oct 2018 17:25:10 +0200
-Message-Id: <20181017152513.136526-1-hare@suse.de>
+Return-Path: <jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH] block: don't check position contiguity for DISCARD in
+ attempt_merge
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1539941093-32058-1-git-send-email-jianchao.w.wang@oracle.com>
+ <yq15zxyj5ep.fsf@oracle.com>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <09103f89-35af-e4e5-fd7c-e3f48e6fda75@oracle.com>
+Date: Sat, 20 Oct 2018 21:57:44 +0800
+MIME-Version: 1.0
+In-Reply-To: <yq15zxyj5ep.fsf@oracle.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
+Hi Martin
 
-as we're trying to get rid of the remaining request_fn drivers here's
-a patchset to move the DAC960 driver to the SCSI stack.
-As per request from hch I've split up the driver into two new SCSI
-drivers called 'myrb' and 'myrs'.
+On 10/19/18 11:57 PM, Martin K. Petersen wrote:
+> 
+> Jianchao,
+> 
+>> Discard command supports multiple ranges of blocks, so needn't
+>> checking position contiguity when merging. Let's do the same thing
+>> in attempt_merge as the blk_try_merge.
+> 
+> Discards need to be contiguous unless queue->limits.max_discard_segments
+> is bigger than 1. So if you remove this I think you need to add a
+> contiguity check in req_attempt_discard_merge().
+> 
+Yes.
 
-The 'myrb' driver only supports the earlier (V1) firmware interface, which
-doesn't have a SCSI interface for the logical drives; for those I've added
-a (pretty rudimentary, admittedly) SCSI translation for them.
+I will send the V2 version next.
 
-The 'myrs' driver supports the newer (V2) firmware interface, which is
-SCSI based and doesn't need the translation layer.
-
-And the weird proc interface from DAC960 has been converted to sysfs attributes.
-
-Tested with eXtremeRAID 1100 (for V1 Firmware) and Mylex AcceleRAID 170
-(for V2 Firmware).
-
-Changes to v5:
-- Include review from Christoph
-
-Changes to v4:
-- checkpatch fixes
-- Remove remaining camel case naming
-- Include reviews from Christoph
-- More codingstyle fixes
-
-Changes to v3:
-- Rename structures to match the general codingstyle
-- Replace typedefs
-
-Changes to v2:
-- Move to dma_pool API
-- Fixup 0-day build issues
-- Add myrb_biosparam
-- Dropped patch merged with upstream
-
-Changes to v1:
-- Split into two drivers
-- Improve scanning for V1 firmware interface
-
-Hannes Reinecke (3):
-  myrb: Add Mylex RAID controller (block interface)
-  myrs: Add Mylex RAID controller (SCSI interface)
-  drivers/block: Remove DAC960 driver
-
- Documentation/blockdev/README.DAC960 |  756 ----
- MAINTAINERS                          |    7 +
- drivers/block/DAC960.c               | 7229 ----------------------------------
- drivers/block/DAC960.h               | 4414 ---------------------
- drivers/block/Kconfig                |   12 -
- drivers/block/Makefile               |    1 -
- drivers/scsi/Kconfig                 |   30 +
- drivers/scsi/Makefile                |    2 +
- drivers/scsi/myrb.c                  | 3656 +++++++++++++++++
- drivers/scsi/myrb.h                  |  958 +++++
- drivers/scsi/myrs.c                  | 3267 +++++++++++++++
- drivers/scsi/myrs.h                  | 1134 ++++++
- 12 files changed, 9054 insertions(+), 12412 deletions(-)
- delete mode 100644 Documentation/blockdev/README.DAC960
- delete mode 100644 drivers/block/DAC960.c
- delete mode 100644 drivers/block/DAC960.h
- create mode 100644 drivers/scsi/myrb.c
- create mode 100644 drivers/scsi/myrb.h
- create mode 100644 drivers/scsi/myrs.c
- create mode 100644 drivers/scsi/myrs.h
-
--- 
-2.16.4
+Thanks
+Jianchao
