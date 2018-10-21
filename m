@@ -1,147 +1,147 @@
-Return-Path: <prvs=816489328=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH v3 00/11] Zoned block device support improvements
-Date: Fri, 12 Oct 2018 11:30:01 +0900
-Message-Id: <20181012023012.29923-1-damien.lemoal@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: setup bounce bio_sets properly
+To: Ondrej Zary <linux@rainbow-software.org>
+Cc: Ming Lei <ming.lei@redhat.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <34e24d47-12e4-230c-4088-1d3f2ffa6b79@kernel.dk>
+ <20181019091035.GB32371@ming.t460p>
+ <eee50444-9271-ca58-4e9f-d3525e85c1d5@kernel.dk>
+ <201810211417.46907.linux@rainbow-software.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <61c42283-89fa-bb09-4096-7f9fa54e9d2c@kernel.dk>
+Date: Sun, 21 Oct 2018 12:02:18 -0600
+MIME-Version: 1.0
+In-Reply-To: <201810211417.46907.linux@rainbow-software.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This series improves zoned block device support (reduce overhead) and
-introduces many simplifications to the code (overall, there are more deletions
-than insertions).
+On 10/21/18 6:17 AM, Ondrej Zary wrote:
+> On Friday 19 October 2018 18:35:00 Jens Axboe wrote:
+>> On 10/19/18 3:10 AM, Ming Lei wrote:
+>>> On Thu, Oct 18, 2018 at 03:24:47PM -0600, Jens Axboe wrote:
+>>>> We're only setting up the bounce bio sets if we happen
+>>>> to need bouncing for regular HIGHMEM, not if we only need
+>>>> it for ISA devices.
+>>>>
+>>>> Reported-by: Ondrej Zary <linux@rainbow-software.org>
+>>>> Tested-by: Ondrej Zary <linux@rainbow-software.org>
+>>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>>>>
+>>>> diff --git a/block/bounce.c b/block/bounce.c
+>>>> index b30071ac4ec6..1356a2f4aae2 100644
+>>>> --- a/block/bounce.c
+>>>> +++ b/block/bounce.c
+>>>> @@ -31,6 +31,24 @@
+>>>>  static struct bio_set bounce_bio_set, bounce_bio_split;
+>>>>  static mempool_t page_pool, isa_page_pool;
+>>>>  
+>>>> +static void init_bounce_bioset(void)
+>>>> +{
+>>>> +	static bool bounce_bs_setup;
+>>>> +	int ret;
+>>>> +
+>>>> +	if (bounce_bs_setup)
+>>>> +		return;
+>>>> +
+>>>> +	ret = bioset_init(&bounce_bio_set, BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
+>>>> +	BUG_ON(ret);
+>>>> +	if (bioset_integrity_create(&bounce_bio_set, BIO_POOL_SIZE))
+>>>> +		BUG_ON(1);
+>>>> +
+>>>> +	ret = bioset_init(&bounce_bio_split, BIO_POOL_SIZE, 0, 0);
+>>>> +	BUG_ON(ret);
+>>>> +	bounce_bs_setup = true;
+>>>
+>>> When initcall is run from do_basic_setup(), all CPUs and scheduler have been up,
+>>> it is likely that init_emergency_pool() is run when one driver is calling
+>>> blk_queue_bounce_limit() to start init_emergency_isa_pool().
+>>>
+>>> So the above code might be run twice.
+>>
+>> Good point, it's actually not even safe right now with the mempool
+>> setup. How about the below?
+>>
+>>
+>> diff --git a/block/bounce.c b/block/bounce.c
+>> index b30071ac4ec6..ec0d99995f5f 100644
+>> --- a/block/bounce.c
+>> +++ b/block/bounce.c
+>> @@ -31,6 +31,24 @@
+>>  static struct bio_set bounce_bio_set, bounce_bio_split;
+>>  static mempool_t page_pool, isa_page_pool;
+>>  
+>> +static void init_bounce_bioset(void)
+>> +{
+>> +	static bool bounce_bs_setup;
+>> +	int ret;
+>> +
+>> +	if (bounce_bs_setup)
+>> +		return;
+>> +
+>> +	ret = bioset_init(&bounce_bio_set, BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
+>> +	BUG_ON(ret);
+>> +	if (bioset_integrity_create(&bounce_bio_set, BIO_POOL_SIZE))
+>> +		BUG_ON(1);
+>> +
+>> +	ret = bioset_init(&bounce_bio_split, BIO_POOL_SIZE, 0, 0);
+>> +	BUG_ON(ret);
+>> +	bounce_bs_setup = true;
+>> +}
+>> +
+>>  #if defined(CONFIG_HIGHMEM)
+>>  static __init int init_emergency_pool(void)
+>>  {
+>> @@ -44,14 +62,7 @@ static __init int init_emergency_pool(void)
+>>  	BUG_ON(ret);
+>>  	pr_info("pool size: %d pages\n", POOL_SIZE);
+>>  
+>> -	ret = bioset_init(&bounce_bio_set, BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
+>> -	BUG_ON(ret);
+>> -	if (bioset_integrity_create(&bounce_bio_set, BIO_POOL_SIZE))
+>> -		BUG_ON(1);
+>> -
+>> -	ret = bioset_init(&bounce_bio_split, BIO_POOL_SIZE, 0, 0);
+>> -	BUG_ON(ret);
+>> -
+>> +	init_bounce_bioset();
+>>  	return 0;
+>>  }
+>>  
+>> @@ -86,6 +97,8 @@ static void *mempool_alloc_pages_isa(gfp_t gfp_mask, void *data)
+>>  	return mempool_alloc_pages(gfp_mask | GFP_DMA, data);
+>>  }
+>>  
+>> +static DEFINE_MUTEX(isa_mutex);
+>> +
+>>  /*
+>>   * gets called "every" time someone init's a queue with BLK_BOUNCE_ISA
+>>   * as the max address, so check if the pool has already been created.
+>> @@ -94,14 +107,20 @@ int init_emergency_isa_pool(void)
+>>  {
+>>  	int ret;
+>>  
+>> -	if (mempool_initialized(&isa_page_pool))
+>> +	mutex_lock(&isa_mutex);
+>> +
+>> +	if (mempool_initialized(&isa_page_pool)) {
+>> +		mutex_unlock(&isa_mutex);
+>>  		return 0;
+>> +	}
+>>  
+>>  	ret = mempool_init(&isa_page_pool, ISA_POOL_SIZE, mempool_alloc_pages_isa,
+>>  			   mempool_free_pages, (void *) 0);
+>>  	BUG_ON(ret);
+>>  
+>>  	pr_info("isa pool size: %d pages\n", ISA_POOL_SIZE);
+>> +	init_bounce_bioset();
+>> +	mutex_unlock(&isa_mutex);
+>>  	return 0;
+>>  }
+>>  
+> 
+> Works for me.
 
-In more details:
-* Patches 1 to 3 are SCSI side (sd driver) cleanups and improvements reducing
-  the overhead of report zones command execution during disk scan and
-  revalidation.
-* Patches 4 to 9 improve the useability and user API of zoned block devices.
-* Patch 10 is the main part of this series. This patch replaces the
-  REQ_OP_ZONE_REPORT BIO/request operation for executing report zones commands
-  with a block device file operation, removing the need for the command reply
-  payload in-place rewriting in the BIO buffer. This leads to major
-  simplification of the code in many places.
-* Patch 11 further simplifies the code of low level drivers by providing a
-  generic implementation of zoned block device request queue zone bitmaps
-  initialization and revalidation.
-
-Please consider the addition of these patches in 4.20.
-Comments are as always welcome.
-
-Changes from v2:
-* Reworked patch 9 to preserve the declaration of struct request_queue nr_zones
-  field being conditional on CONFIG_BLK_DEV_ZONED
-
-Changes from v1:
-* Addressed Christoph's and Bart's comments
-* Fixed several compilation errors with zoned block device support disabled
-* Rebased on latest rc including the most recent dm patches
-
-Christoph Hellwig (1):
-  block: add a report_zones method
-
-Damien Le Moal (10):
-  scsi: sd_zbc: Rearrange code
-  scsi: sd_zbc: Reduce boot device scan and revalidate time
-  scsi: sd_zbc: Fix sd_zbc_check_zones() error checks
-  block: Introduce blkdev_nr_zones() helper
-  block: Limit allocation of zone descriptors for report zones
-  block: Introduce BLKGETZONESZ ioctl
-  block: Introduce BLKGETNRZONES ioctl
-  block: Improve zone reset execution
-  block: Expose queue nr_zones in sysfs
-  block: Introduce blk_revalidate_disk_zones()
-
- block/blk-core.c               |   1 -
- block/blk-lib.c                |  13 +-
- block/blk-mq-debugfs.c         |   1 -
- block/blk-sysfs.c              |  13 +
- block/blk-zoned.c              | 359 +++++++++++++++---------
- block/blk.h                    |   8 +
- block/ioctl.c                  |   4 +
- drivers/block/null_blk.h       |  11 +-
- drivers/block/null_blk_main.c  |  30 +-
- drivers/block/null_blk_zoned.c |  57 +---
- drivers/md/dm-flakey.c         |  30 +-
- drivers/md/dm-linear.c         |  35 ++-
- drivers/md/dm-table.c          |  10 +
- drivers/md/dm-zoned-target.c   |   3 +-
- drivers/md/dm.c                | 169 ++++++-----
- drivers/scsi/sd.c              |  15 +-
- drivers/scsi/sd.h              |  15 +-
- drivers/scsi/sd_zbc.c          | 497 +++++++++------------------------
- include/linux/blk_types.h      |   2 -
- include/linux/blkdev.h         |  22 +-
- include/linux/device-mapper.h  |  12 +-
- include/trace/events/f2fs.h    |   1 -
- include/uapi/linux/blkzoned.h  |   3 +
- 23 files changed, 591 insertions(+), 720 deletions(-)
-
--- 
-2.17.1
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Christoph Hellwig (1):
-  block: add a report_zones method
-
-Damien Le Moal (10):
-  scsi: sd_zbc: Rearrange code
-  scsi: sd_zbc: Reduce boot device scan and revalidate time
-  scsi: sd_zbc: Fix sd_zbc_check_zones() error checks
-  block: Introduce blkdev_nr_zones() helper
-  block: Limit allocation of zone descriptors for report zones
-  block: Introduce BLKGETZONESZ ioctl
-  block: Introduce BLKGETNRZONES ioctl
-  block: Improve zone reset execution
-  block: Expose queue nr_zones in sysfs
-  block: Introduce blk_revalidate_disk_zones()
-
- block/blk-core.c               |   1 -
- block/blk-lib.c                |  13 +-
- block/blk-mq-debugfs.c         |   1 -
- block/blk-sysfs.c              |  13 +
- block/blk-zoned.c              | 359 +++++++++++++++---------
- block/blk.h                    |   8 +
- block/ioctl.c                  |   4 +
- drivers/block/null_blk.h       |  11 +-
- drivers/block/null_blk_main.c  |  30 +-
- drivers/block/null_blk_zoned.c |  57 +---
- drivers/md/dm-flakey.c         |  30 +-
- drivers/md/dm-linear.c         |  35 ++-
- drivers/md/dm-table.c          |  10 +
- drivers/md/dm-zoned-target.c   |   3 +-
- drivers/md/dm.c                | 169 ++++++-----
- drivers/scsi/sd.c              |  15 +-
- drivers/scsi/sd.h              |  15 +-
- drivers/scsi/sd_zbc.c          | 497 +++++++++------------------------
- include/linux/blk_types.h      |   2 -
- include/linux/blkdev.h         |  30 +-
- include/linux/device-mapper.h  |  12 +-
- include/trace/events/f2fs.h    |   1 -
- include/uapi/linux/blkzoned.h  |   3 +
- 23 files changed, 600 insertions(+), 719 deletions(-)
+Thanks Ondrej, I'm going to queue it up for 4.20 and mark it for stable.
 
 -- 
-2.17.1
+Jens Axboe
