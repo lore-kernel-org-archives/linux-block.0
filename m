@@ -1,45 +1,50 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-ide@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 06/28] blk-mq: remove the request_list usage
-Date: Thu, 25 Oct 2018 15:10:17 -0600
-Message-Id: <20181025211039.11559-7-axboe@kernel.dk>
-In-Reply-To: <20181025211039.11559-1-axboe@kernel.dk>
-References: <20181025211039.11559-1-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga12.intel.com ([192.55.52.136]:43133 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728388AbeJVS6G (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 22 Oct 2018 14:58:06 -0400
+From: Igor Konopko <igor.j.konopko@intel.com>
+To: mb@lightnvm.io, javier@cnexlabs.com, hans.ml.holmberg@owltronix.com
+Cc: linux-block@vger.kernel.org, igor.j.konopko@intel.com
+Subject: [PATCH v2 0/5] lightnvm: Flexible metadata
+Date: Mon, 22 Oct 2018 12:36:06 +0200
+Message-Id: <20181022103611.39271-1-igor.j.konopko@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We don't do anything with it, that's just the legacy path.
+This series of patches extends the way how pblk can
+store L2P sector metadata. After this set of changes
+any size of NVMe metadata (including 0) is supported.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-mq.c | 5 -----
- 1 file changed, 5 deletions(-)
+Patches are rebased on top of block/for-next since
+there was no ocssd/for-4.21 branch yet.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3f91c6e5b17a..4c82dc44d4d8 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -510,9 +510,6 @@ void blk_mq_free_request(struct request *rq)
- 
- 	rq_qos_done(q, rq);
- 
--	if (blk_rq_rl(rq))
--		blk_put_rl(blk_rq_rl(rq));
--
- 	WRITE_ONCE(rq->state, MQ_RQ_IDLE);
- 	if (refcount_dec_and_test(&rq->ref))
- 		__blk_mq_free_request(rq);
-@@ -1675,8 +1672,6 @@ static void blk_mq_bio_to_request(struct request *rq, struct bio *bio)
- {
- 	blk_init_request_from_bio(rq, bio);
- 
--	blk_rq_set_rl(rq, blk_get_rl(rq->q, bio));
--
- 	blk_account_io_start(rq, true);
- }
- 
+Changes v1 --> v2:
+-Revert sector meta size back to 16b for pblk
+-Dma pool for larger oob meta are handled in core instead of pblk
+-Pblk oob meta helpers uses __le64 as input outpu instead of u64
+-Other minor fixes based on v1 patch review
+
+Igor Konopko (5):
+  lightnvm: pblk: Move lba list to partial read context
+  lightnvm: pblk: Helpers for OOB metadata
+  lightnvm: Flexible DMA pool entry size
+  lightnvm: Disable interleaved metadata
+  lightnvm: pblk: Support for packed metadata
+
+ drivers/lightnvm/core.c          | 45 +++++++++++++++++++++++----
+ drivers/lightnvm/pblk-core.c     | 66 ++++++++++++++++++++++++++++++++++------
+ drivers/lightnvm/pblk-init.c     | 43 ++++++++++++++++++++++++--
+ drivers/lightnvm/pblk-map.c      | 20 +++++++-----
+ drivers/lightnvm/pblk-rb.c       |  3 ++
+ drivers/lightnvm/pblk-read.c     | 63 +++++++++++++++++++++-----------------
+ drivers/lightnvm/pblk-recovery.c | 22 ++++++++------
+ drivers/lightnvm/pblk-sysfs.c    |  7 +++++
+ drivers/lightnvm/pblk-write.c    | 14 ++++++---
+ drivers/lightnvm/pblk.h          | 47 ++++++++++++++++++++++++++--
+ drivers/nvme/host/lightnvm.c     |  9 ++++--
+ include/linux/lightnvm.h         |  5 ++-
+ 12 files changed, 272 insertions(+), 72 deletions(-)
+
 -- 
-2.17.1
+2.14.4
