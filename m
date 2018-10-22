@@ -1,12 +1,12 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Mon, 22 Oct 2018 17:06:02 +0800
-From: Ming Lei <ming.lei@redhat.com>
+Return-Path: <hch@lst.de>
+Date: Mon, 22 Oct 2018 11:00:58 +0200
+From: Christoph Hellwig <hch@lst.de>
 To: Jianchao Wang <jianchao.w.wang@oracle.com>
 Cc: axboe@kernel.dk, martin.petersen@oracle.com, tom.leiming@gmail.com,
 	hch@lst.de, linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH V2] block: fix the DISCARD request merge
-Message-ID: <20181022090601.GA21171@ming.t460p>
+Message-ID: <20181022090058.GF18755@lst.de>
 References: <1540045777-10290-1-git-send-email-jianchao.w.wang@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -56,16 +56,14 @@ On Sat, Oct 20, 2018 at 10:29:37PM +0800, Jianchao Wang wrote:
 > +		if (!(req_op(req) == REQ_OP_DISCARD &&
 > +		      queue_max_discard_segments(q) > 1))
 > +			return NULL;
-> +	}
->  
->  	if (rq_data_dir(req) != rq_data_dir(next)
->  	    || req->rq_disk != next->rq_disk
-> @@ -757,10 +764,17 @@ static struct request *attempt_merge(struct request_queue *q,
->  	 * If we are allowed to merge, then append bio list
->  	 * from next to rq and release next. merge_requests_fn
->  	 * will have updated segment counts, update sector
-> -	 * counts here. Handle DISCARDs separately, as they
-> -	 * have separate settings.
+
+Why not:
+
+		if (req_op(req) != REQ_OP_DISCARD ||
+		    queue_max_discard_segments(q) == 1)
+
+which would be a lot more obvious?
+
 > +	 * counts here.
 > +	 * Two cases of Handling DISCARD:
 > +	 *  - max_discard_segments == 1
@@ -74,21 +72,7 @@ On Sat, Oct 20, 2018 at 10:29:37PM +0800, Jianchao Wang wrote:
 > +	 *    Only nvme right now. It takes every bio as a
 > +	 *    range and send them to controller together. The ranges
 > +	 *    needn't to be contiguous.
->  	 */
-> -	if (req_op(req) == REQ_OP_DISCARD) {
-> +	if (req_op(req) == REQ_OP_DISCARD &&
-> +	    queue_max_discard_segments(q) > 1) {
->  		if (!req_attempt_discard_merge(q, req, next))
->  			return NULL;
 
-Looks fine,
-
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
-The above may be changed to 'if (blk_try_merge(req) == ELEVATOR_DISCARD_MERGE)'
-or sort of in future, which may has document benefit at least, since
-ELEVATOR_DISCARD_MERGE means multi-segment discard merge.
-
-
-Thanks,
-Ming
+The formatting looks odd.  Also I don't think we should mention the
+users here, as others might grow (virtio is in the pipe, SCSI could
+be supported easily if someone did the work).
