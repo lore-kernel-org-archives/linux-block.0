@@ -1,18 +1,19 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <hch@lst.de>
+Date: Mon, 22 Oct 2018 11:14:57 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Cc: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] skd: fix unchecked return values
-To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
- Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-ID: <20181022091457.GA19279@lst.de>
 References: <20181019184417.GA21154@embeddedor.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <bf4ab819-0116-e0cc-5186-441415609483@kernel.dk>
-Date: Mon, 22 Oct 2018 03:16:53 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20181019184417.GA21154@embeddedor.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/19/18 12:44 PM, Gustavo A. R. Silva wrote:
+On Fri, Oct 19, 2018 at 08:44:17PM +0200, Gustavo A. R. Silva wrote:
 > Check return values of dma_set_mask_and_coherent().
 > 
 > Otherwise, if dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
@@ -21,8 +22,11 @@ On 10/19/18 12:44 PM, Gustavo A. R. Silva wrote:
 > 
 > dev_err(&pdev->dev, "DMA mask error %d\n", rc);
 > goto err_out_regions;
+> 
+> Addresses-Coverity-ID: 1474553 ("Unchecked return value")
+> Fixes: 138126214868 ("skd: switch to the generic DMA API")
+> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
 
-Applied, thanks.
+Thanks, looks good:
 
--- 
-Jens Axboe
+Reviewed-by: Christoph Hellwig <hch@lst.de>
