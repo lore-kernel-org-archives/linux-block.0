@@ -1,40 +1,40 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-Date: Tue, 23 Oct 2018 19:09:23 -0500
-From: Shiraz Saleem <shiraz.saleem@intel.com>
-To: Sagi Grimberg <sagi@grimberg.me>
-Subject: Re: [PATCH v2] block: fix rdma queue mapping
-Message-ID: <20181024000923.GA17352@ssaleem-MOBL4.amr.corp.intel.com>
-References: <20180820205420.25908-1-sagi@grimberg.me>
- <20180822131130.GC28149@lst.de>
- <83dd169f-034b-3460-7496-ef2e6766ea55@grimberg.me>
- <33192971-7edd-a3b6-f2fa-abdcbef375de@opengridcomputing.com>
- <20181017163720.GA23798@lst.de>
- <c850626a-5891-fa34-e647-c815f67099da@grimberg.me>
- <00dd01d46ad0$6eb82250$4c2866f0$@opengridcomputing.com>
- <ab0370aa-c488-bfed-675a-b0f84d75a42a@grimberg.me>
-MIME-Version: 1.0
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from linode.aoot.com ([69.164.194.13]:45486 "EHLO linode.aoot.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726382AbeJXF4Q (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Oct 2018 01:56:16 -0400
+From: "Steve Wise" <swise@opengridcomputing.com>
+To: "'Sagi Grimberg'" <sagi@grimberg.me>,
+        "'Christoph Hellwig'" <hch@lst.de>
+Cc: <linux-block@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linux-nvme@lists.infradead.org>,
+        "'Max Gurtovoy'" <maxg@mellanox.com>
+References: <20180820205420.25908-1-sagi@grimberg.me> <20180822131130.GC28149@lst.de> <83dd169f-034b-3460-7496-ef2e6766ea55@grimberg.me> <33192971-7edd-a3b6-f2fa-abdcbef375de@opengridcomputing.com> <20181017163720.GA23798@lst.de> <c850626a-5891-fa34-e647-c815f67099da@grimberg.me> <00dd01d46ad0$6eb82250$4c2866f0$@opengridcomputing.com> <ab0370aa-c488-bfed-675a-b0f84d75a42a@grimberg.me>
 In-Reply-To: <ab0370aa-c488-bfed-675a-b0f84d75a42a@grimberg.me>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- Steve Wise <swise@opengridcomputing.com>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- 'Max Gurtovoy' <maxg@mellanox.com>, 'Christoph Hellwig' <hch@lst.de>
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Subject: RE: [PATCH v2] block: fix rdma queue mapping
+Date: Tue, 23 Oct 2018 16:31:04 -0500
+Message-ID: <030301d46b17$b43132d0$1c939870$@opengridcomputing.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+        charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Tue, Oct 23, 2018 at 03:25:06PM -0600, Sagi Grimberg wrote:
+
+
+> -----Original Message-----
+> From: Sagi Grimberg <sagi@grimberg.me>
+> Sent: Tuesday, October 23, 2018 4:25 PM
+> To: Steve Wise <swise@opengridcomputing.com>; 'Christoph Hellwig'
+> <hch@lst.de>
+> Cc: linux-block@vger.kernel.org; linux-rdma@vger.kernel.org; linux-
+> nvme@lists.infradead.org; 'Max Gurtovoy' <maxg@mellanox.com>
+> Subject: Re: [PATCH v2] block: fix rdma queue mapping
+> 
 > 
 > >>>> Christoph, Sagi:  it seems you think /proc/irq/$IRP/smp_affinity
-> >>>> shouldn't be allowed if drivers support managed affinity. Is that correct?
+> >>>> shouldn't be allowed if drivers support managed affinity. Is that
+> correct?
 > >>>
 > >>> Not just shouldn't, but simply can't.
 > >>>
@@ -49,8 +49,11 @@ On Tue, Oct 23, 2018 at 03:25:06PM -0600, Sagi Grimberg wrote:
 > >>
 > >> I'll send a patch for mlx5 to simply not return anything as managed
 > >> affinity is not something that the maintainers want to do.
-> > 
-> > I'm beginning to think I don't know what "managed affinity" actually is.  Currently iw_cxgb4 doesn't support ib_get_vector_affinity().  I have a patch for it, but ran into this whole issue with nvme failing if someone changes the affinity map via /proc.
+> >
+> > I'm beginning to think I don't know what "managed affinity" actually is.
+> Currently iw_cxgb4 doesn't support ib_get_vector_affinity().  I have a patch
+> for it, but ran into this whole issue with nvme failing if someone changes the
+> affinity map via /proc.
 > 
 > That means that the pci subsystem gets your vector(s) affinity right and
 > immutable. It also guarantees that you have reserved vectors and not get
@@ -67,11 +70,6 @@ On Tue, Oct 23, 2018 at 03:25:06PM -0600, Sagi Grimberg wrote:
 > The original patch set from hch:
 > https://lwn.net/Articles/693653/
 
-Sagi - From what I can tell, i40iw is also exposed to this same issue if the IRQ affinity
-is configured by user.
+Thanks for educating me. 😊  I'll have a look into this. 
 
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+Steve.
