@@ -1,57 +1,48 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:37344 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727277AbeJIScK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:32:10 -0400
-Received: by mail-pf1-f194.google.com with SMTP id j23-v6so680985pfi.4
-        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:15:43 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zhoujie Wu <zjwu@marvell.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 44/45] lightnvm: pblk: consider max hw sectors supported for max_write_pgs
-Date: Tue,  9 Oct 2018 13:12:14 +0200
-Message-Id: <20181009111215.7653-45-mb@lightnvm.io>
-In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
-References: <20181009111215.7653-1-mb@lightnvm.io>
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:44074 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728282AbeJXDP4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Oct 2018 23:15:56 -0400
+Received: by mail-pl1-f195.google.com with SMTP id d23-v6so1035114pls.11
+        for <linux-block@vger.kernel.org>; Tue, 23 Oct 2018 11:51:20 -0700 (PDT)
+Date: Tue, 23 Oct 2018 11:51:17 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: "Theodore Y. Ts'o" <tytso@mit.edu>
+Cc: linux-block@vger.kernel.org
+Subject: Re: [PATCH blktests] common/rc: allow the loop driver to be built
+ into the kernel
+Message-ID: <20181023185117.GE10074@vader>
+References: <20181022105004.29324-1-tytso@mit.edu>
+ <20181022230830.GD10074@vader>
+ <20181023125624.GB6850@thunk.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20181023125624.GB6850@thunk.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Zhoujie Wu <zjwu@marvell.com>
+On Tue, Oct 23, 2018 at 08:56:24AM -0400, Theodore Y. Ts'o wrote:
+> On Mon, Oct 22, 2018 at 04:08:30PM -0700, Omar Sandoval wrote:
+> > On Mon, Oct 22, 2018 at 06:50:04AM -0400, Theodore Ts'o wrote:
+> > > A number of kernel modules used by blktests must be compiled as
+> > > modules, since the module needs to be loaded with specific options, or
+> > > part of the test is to exercise what what happens when the kernel
+> > > module is loaded.  This is not true for the loop driver, so add a new
+> > > bash function, _have_kernel_module which works like _have_module but
+> > > will not fail if the driver is compiled directly into the kernel.
+> > 
+> > `modprobe loop` works for me if the module is built in, are you using
+> > one from busybox or something? According to strace, it looks at the
+> > depmod information (namely, /lib/modules/$(uname -r)/modules.builtin.bin).
+> 
+> Ah, you're right.  When I was first trying to use blktests, I was
+> integrating it into my xfstests test appliance, and normally I build a
+> completely module-free kernel.  This allows me to boot directly into a
+> kernel by using kvm's "--kernel /path/to/bzImage" option without
+> having to deal with the extra work of trying to install modules into a
+> test appliance.
 
-When do GC, the number of read/write sectors are determined
-by max_write_pgs(see gc_rq preparation in pblk_gc_line_prepare_ws).
-
-Due to max_write_pgs doesn't consider max hw sectors
-supported by nvme controller(128K), which leads to GC
-tries to read 64 * 4K in one command, and see below error
-caused by pblk_bio_map_addr in function pblk_submit_read_gc.
-
-[ 2923.005376] pblk: could not add page to bio
-[ 2923.005377] pblk: could not allocate GC bio (18446744073709551604)
-
-Signed-off-by: Zhoujie Wu <zjwu@marvell.com>
-Reviewed-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
----
- drivers/lightnvm/pblk-init.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index e3573880dbda..e5239aba806b 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -407,6 +407,8 @@ static int pblk_core_init(struct pblk *pblk)
- 	pblk->min_write_pgs = geo->ws_opt;
- 	max_write_ppas = pblk->min_write_pgs * geo->all_luns;
- 	pblk->max_write_pgs = min_t(int, max_write_ppas, NVM_MAX_VLBA);
-+	pblk->max_write_pgs = min_t(int, pblk->max_write_pgs,
-+		queue_max_hw_sectors(dev->q) / (geo->csecs >> SECTOR_SHIFT));
- 	pblk_set_sec_per_write(pblk, pblk->min_write_pgs);
- 
- 	pblk->pad_dist = kcalloc(pblk->min_write_pgs - 1, sizeof(atomic64_t),
--- 
-2.17.1
+FWIW, I have a VM setup that uses --kernel and a virtfs mount in the
+guest to use modules without needing a manual install step:
+https://github.com/osandov/osandov-linux#running-custom-kernel-builds.
