@@ -1,40 +1,25 @@
-Return-Path: <colin.king@canonical.com>
-From: Colin King <colin.king@canonical.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-block@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] mtip32xx: clean an indentation issue, remove extraneous tabs
-Date: Tue, 30 Oct 2018 11:29:42 +0000
-Message-Id: <20181030112942.10186-1-colin.king@canonical.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-mq: place trace_block_getrq() in correct place
+To: Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+ linux-block@vger.kernel.org
+References: <20181023143050.121915-1-xiaoguang.wang@linux.alibaba.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <3bce4e9d-2449-ec78-5b6c-19bca20a0892@kernel.dk>
+Date: Wed, 24 Oct 2018 03:29:41 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20181023143050.121915-1-xiaoguang.wang@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Colin Ian King <colin.king@canonical.com>
+On 10/23/18 8:30 AM, Xiaoguang Wang wrote:
+> trace_block_getrq() is to indicate a request struct has been allcoated
+                                                               ^^^
 
-Trivial fix to clean up an indentation issue, remove tabs
+allocated
 
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- drivers/block/mtip32xx/mtip32xx.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> for queue, so put it in right place.
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index dfc8de6ce525..a7daa8acbab3 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -1942,8 +1942,8 @@ static int exec_drive_taskfile(struct driver_data *dd,
- 				dev_warn(&dd->pdev->dev,
- 					"data movement but "
- 					"sect_count is 0\n");
--					err = -EINVAL;
--					goto abort;
-+				err = -EINVAL;
-+				goto abort;
- 			}
- 		}
- 	}
+Applied, thanks.
+
 -- 
-2.19.1
+Jens Axboe
