@@ -1,91 +1,65 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 10/15] loop: Push loop_ctl_mutex down to loop_set_fd()
-Date: Wed, 10 Oct 2018 12:04:10 +0200
-Message-Id: <20181010100415.26525-11-jack@suse.cz>
-In-Reply-To: <20181010100415.26525-1-jack@suse.cz>
-References: <20181010100415.26525-1-jack@suse.cz>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Subject: [PATCHSET 0/14] Add support for multiple queue maps
+Date: Thu, 25 Oct 2018 15:16:12 -0600
+Message-Id: <20181025211626.12692-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Push lo_ctl_mutex down to loop_set_fd(). We will need this to be able to
-call loop_reread_partitions() without lo_ctl_mutex.
+This series adds support for multiple queue maps for blk-mq.
+Since blk-mq was introduced, it's only support a single queue
+map. This means you can have 1 set of queues, and the mapping
+purely depends on what CPU an IO originated from. With this
+patch set, drivers can implement mappings that depend on both
+CPU and request type - and they can have multiple sets of mappings.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- drivers/block/loop.c | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+NVMe is used as a proof of concept. It adds support for a separate
+write queue set. One way to use this would be to limit the number
+of write queues to favor reads, since NVMe does round-robin service
+of queues. An easy extension of this would be to add multiple
+sets of queues, for prioritized IO.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 5661489d11a7..b4500d82238d 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -919,13 +919,17 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	if (!file)
- 		goto out;
- 
-+	error = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+	if (error)
-+		goto out_putf;
-+
- 	error = -EBUSY;
- 	if (lo->lo_state != Lo_unbound)
--		goto out_putf;
-+		goto out_unlock;
- 
- 	error = loop_validate_file(file, bdev);
- 	if (error)
--		goto out_putf;
-+		goto out_unlock;
- 
- 	mapping = file->f_mapping;
- 	inode = mapping->host;
-@@ -937,10 +941,10 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	error = -EFBIG;
- 	size = get_loop_size(lo, file);
- 	if ((loff_t)(sector_t)size != size)
--		goto out_putf;
-+		goto out_unlock;
- 	error = loop_prepare_queue(lo);
- 	if (error)
--		goto out_putf;
-+		goto out_unlock;
- 
- 	error = 0;
- 
-@@ -979,11 +983,14 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	 * put /dev/loopXX inode. Later in __loop_clr_fd() we bdput(bdev).
- 	 */
- 	bdgrab(bdev);
-+	mutex_unlock(&loop_ctl_mutex);
- 	return 0;
- 
-- out_putf:
-+out_unlock:
-+	mutex_unlock(&loop_ctl_mutex);
-+out_putf:
- 	fput(file);
-- out:
-+out:
- 	/* This is safe: open() is still holding a reference. */
- 	module_put(THIS_MODULE);
- 	return error;
-@@ -1461,12 +1468,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 
- 	switch (cmd) {
- 	case LOOP_SET_FD:
--		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
--		if (err)
--			return err;
--		err = loop_set_fd(lo, mode, bdev, arg);
--		mutex_unlock(&loop_ctl_mutex);
--		break;
-+		return loop_set_fd(lo, mode, bdev, arg);
- 	case LOOP_CHANGE_FD:
- 		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
- 		if (err)
+NVMe also uses this feature to finally make the polling work
+efficiently, without triggering interrupts. This both increases
+performance (and decreases latency), at a lower system load. At
+the same time it's more flexible, as you don't have to worry about
+IRQ coalescing and redirection to avoid interrupts disturbing the
+workload. This is how polling should have worked from day 1.
+
+This is on top of the mq-conversions branch and series just
+posted. It can also be bound in my mq-maps branch.
+
+ block/blk-flush.c                     |   7 +-
+ block/blk-mq-cpumap.c                 |  19 +--
+ block/blk-mq-debugfs.c                |   4 +-
+ block/blk-mq-pci.c                    |  10 +-
+ block/blk-mq-rdma.c                   |   4 +-
+ block/blk-mq-sched.c                  |  18 ++-
+ block/blk-mq-sysfs.c                  |  10 ++
+ block/blk-mq-tag.c                    |   5 +-
+ block/blk-mq-virtio.c                 |   8 +-
+ block/blk-mq.c                        | 213 ++++++++++++++++++++----------
+ block/blk-mq.h                        |  29 ++++-
+ block/blk.h                           |   6 +-
+ block/kyber-iosched.c                 |   6 +-
+ drivers/block/virtio_blk.c            |   2 +-
+ drivers/nvme/host/pci.c               | 238 ++++++++++++++++++++++++++++++----
+ drivers/scsi/qla2xxx/qla_os.c         |   5 +-
+ drivers/scsi/scsi_lib.c               |   2 +-
+ drivers/scsi/smartpqi/smartpqi_init.c |   3 +-
+ drivers/scsi/virtio_scsi.c            |   3 +-
+ fs/block_dev.c                        |   2 +
+ fs/direct-io.c                        |   2 +
+ fs/iomap.c                            |   9 +-
+ include/linux/blk-mq-pci.h            |   4 +-
+ include/linux/blk-mq-virtio.h         |   4 +-
+ include/linux/blk-mq.h                |  24 +++-
+ include/linux/blk_types.h             |   4 +-
+ include/linux/blkdev.h                |   2 -
+ include/linux/interrupt.h             |   4 +
+ kernel/irq/affinity.c                 |  31 ++++-
+ 29 files changed, 520 insertions(+), 158 deletions(-)
+
 -- 
-2.16.4
+Jens Axboe
