@@ -1,71 +1,68 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <bart.vanassche@gmail.com>
+Return-Path: <bart.vanassche@gmail.com>
+Message-ID: <1540503399.66186.60.camel@acm.org>
 Subject: Re: [PATCH 08/28] scsi: kill off the legacy IO path
-To: Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
- Himanshu Madhani <himanshu.madhani@cavium.com>
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org, Himanshu Madhani
+	 <himanshu.madhani@cavium.com>
+Date: Thu, 25 Oct 2018 14:36:39 -0700
+In-Reply-To: <20181025211039.11559-9-axboe@kernel.dk>
 References: <20181025211039.11559-1-axboe@kernel.dk>
- <20181025211039.11559-9-axboe@kernel.dk> <1540503399.66186.60.camel@acm.org>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <30e6eb38-dda5-f4c1-c715-379864268147@kernel.dk>
-Date: Thu, 25 Oct 2018 16:18:29 -0600
-MIME-Version: 1.0
-In-Reply-To: <1540503399.66186.60.camel@acm.org>
-Content-Type: text/plain; charset=UTF-8
+	 <20181025211039.11559-9-axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-7"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/25/18 3:36 PM, Bart Van Assche wrote:
-> On Thu, 2018-10-25 at 15:10 -0600, Jens Axboe wrote:
->> @@ -3265,25 +3261,17 @@ qla2x00_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
->>  	    base_vha->mgmt_svr_loop_id, host->sg_tablesize);
->>  
->>  	if (ha->mqenable) {
->> -		bool mq = false;
->>  		bool startit = false;
->>  
->> -		if (QLA_TGT_MODE_ENABLED()) {
->> -			mq = true;
->> +		if (QLA_TGT_MODE_ENABLED())
->>  			startit = false;
->> -		}
->>  
->> -		if ((ql2x_ini_mode == QLA2XXX_INI_MODE_ENABLED) &&
->> -		    shost_use_blk_mq(host)) {
->> -			mq = true;
->> +		if (ql2x_ini_mode == QLA2XXX_INI_MODE_ENABLED)
->>  			startit = true;
->> -		}
->>  
->> -		if (mq) {
->> -			/* Create start of day qpairs for Block MQ */
->> -			for (i = 0; i < ha->max_qpairs; i++)
->> -				qla2xxx_create_qpair(base_vha, 5, 0, startit);
->> -		}
->> +		/* Create start of day qpairs for Block MQ */
->> +		for (i = 0; i < ha->max_qpairs; i++)
->> +			qla2xxx_create_qpair(base_vha, 5, 0, startit);
->>  	}
->>  
->>  	if (ha->flags.running_gold_fw)
-> 
-> (+Himanshu)
-> 
-> Since I'm not sure that "mq" in the above code refers to "scsi-mq" nor that it
-> refers to "blk-mq", I'm not sure the above changes should be included in this
-> patch. Himanshu, can you have a look?
+On Thu, 2018-10-25 at 15:10 -0600, Jens Axboe wrote:
++AD4 +AEAAQA -3265,25 +-3261,17 +AEAAQA qla2x00+AF8-probe+AF8-one(struct pci+AF8-dev +ACo-pdev, const struct pci+AF8-device+AF8-id +ACo-id)
++AD4  	    base+AF8-vha-+AD4-mgmt+AF8-svr+AF8-loop+AF8-id, host-+AD4-sg+AF8-tablesize)+ADs
++AD4  
++AD4  	if (ha-+AD4-mqenable) +AHs
++AD4 -		bool mq +AD0 false+ADs
++AD4  		bool startit +AD0 false+ADs
++AD4  
++AD4 -		if (QLA+AF8-TGT+AF8-MODE+AF8-ENABLED()) +AHs
++AD4 -			mq +AD0 true+ADs
++AD4 +-		if (QLA+AF8-TGT+AF8-MODE+AF8-ENABLED())
++AD4  			startit +AD0 false+ADs
++AD4 -		+AH0
++AD4  
++AD4 -		if ((ql2x+AF8-ini+AF8-mode +AD0APQ QLA2XXX+AF8-INI+AF8-MODE+AF8-ENABLED) +ACYAJg
++AD4 -		    shost+AF8-use+AF8-blk+AF8-mq(host)) +AHs
++AD4 -			mq +AD0 true+ADs
++AD4 +-		if (ql2x+AF8-ini+AF8-mode +AD0APQ QLA2XXX+AF8-INI+AF8-MODE+AF8-ENABLED)
++AD4  			startit +AD0 true+ADs
++AD4 -		+AH0
++AD4  
++AD4 -		if (mq) +AHs
++AD4 -			/+ACo Create start of day qpairs for Block MQ +ACo-/
++AD4 -			for (i +AD0 0+ADs i +ADw ha-+AD4-max+AF8-qpairs+ADs i+-+-)
++AD4 -				qla2xxx+AF8-create+AF8-qpair(base+AF8-vha, 5, 0, startit)+ADs
++AD4 -		+AH0
++AD4 +-		/+ACo Create start of day qpairs for Block MQ +ACo-/
++AD4 +-		for (i +AD0 0+ADs i +ADw ha-+AD4-max+AF8-qpairs+ADs i+-+-)
++AD4 +-			qla2xxx+AF8-create+AF8-qpair(base+AF8-vha, 5, 0, startit)+ADs
++AD4  	+AH0
++AD4  
++AD4  	if (ha-+AD4-flags.running+AF8-gold+AF8-fw)
 
-There's literally a comment there that says "for Block MQ" :-)
+(+-Himanshu)
 
->> +static ssize_t
->> +show_use_blk_mq(struct device *dev, struct device_attribute *attr, char *buf)
->> +{
->> +	return snprintf(buf, 20, "1\n");
->> +}
->> +static DEVICE_ATTR(use_blk_mq, S_IRUGO, show_use_blk_mq, NULL);
-> 
-> The pattern "snprintf(buf, 20, ...)" looks like cargo-cult programming to me.
-> Please consider changing "snprintf(buf, 20, " into "sprintf(buf, ".
+Since I'm not sure that +ACI-mq+ACI in the above code refers to +ACI-scsi-mq+ACI nor that it
+refers to +ACI-blk-mq+ACI, I'm not sure the above changes should be included in this
+patch. Himanshu, can you have a look?
 
-Good point, I'll do that.
++AD4 +-static ssize+AF8-t
++AD4 +-show+AF8-use+AF8-blk+AF8-mq(struct device +ACo-dev, struct device+AF8-attribute +ACo-attr, char +ACo-buf)
++AD4 +-+AHs
++AD4 +-	return snprintf(buf, 20, +ACI-1+AFw-n+ACI)+ADs
++AD4 +-+AH0
++AD4 +-static DEVICE+AF8-ATTR(use+AF8-blk+AF8-mq, S+AF8-IRUGO, show+AF8-use+AF8-blk+AF8-mq, NULL)+ADs
 
--- 
-Jens Axboe
+The pattern +ACI-snprintf(buf, 20, ...)+ACI looks like cargo-cult programming to me.
+Please consider changing +ACI-snprintf(buf, 20, +ACI into +ACI-sprintf(buf, +ACI.
+
+Thanks,
+
+Bart.
