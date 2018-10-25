@@ -1,83 +1,58 @@
-Return-Path: <prvs=81565c836=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH v2 00/11] Zoned block device support improvements
-Date: Thu, 11 Oct 2018 16:09:41 +0900
-Message-Id: <20181011070952.13248-1-damien.lemoal@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v4 00/11] Zoned block device support improvements
+To: Bart Van Assche <bvanassche@acm.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Mike Snitzer <snitzer@redhat.com>
+Cc: Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org, dm-devel@redhat.com,
+ Christoph Hellwig <hch@lst.de>, Matias Bjorling <matias.bjorling@wdc.com>
+References: <20181012100850.23316-1-damien.lemoal@wdc.com>
+ <78778e22-9c5e-99d0-ef5c-85e04d03a4b7@kernel.dk> <yq1o9bkf5av.fsf@oracle.com>
+ <20181024150344.GB13487@redhat.com> <yq1zhv3e4oe.fsf@oracle.com>
+ <1540397093.66186.13.camel@acm.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <d01f3553-eb95-34c2-a846-23f8dafaa4a3@kernel.dk>
+Date: Thu, 25 Oct 2018 08:30:32 -0600
+MIME-Version: 1.0
+In-Reply-To: <1540397093.66186.13.camel@acm.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-This series improves zoned block device support (reduce overhead) and
-introduces many simplifications to the code (overall, there are more deletions
-than insertions).
+On 10/24/18 10:04 AM, Bart Van Assche wrote:
+> On Wed, 2018-10-24 at 11:37 -0400, Martin K. Petersen wrote:
+>> Mike,
+>>
+>>>> You keep mentioning this, but I don't recall ever seeing anything to
+>>>> that effect. The rest of the kernel appears to be either arbitrary
+>>>> ordering or favoring author SoB as the first tag.
+>>>
+>>> I've always felt the proper order is how Jens likes it too (all dm
+>>> commits from me follow that order).
+>>
+>> That's fine, I don't have any particular preference. And I don't have
+>> any issue with you guys sticking to a certain ordering in your
+>> respective subsystems. I occasionally shuffle tags when I commit things
+>> in SCSI too.
+>>
+>> I just think it should be properly documented if there is a preferred
+>> way to order things...
+> 
+> When I tried to look up documentation for this I couldn't find anything under
+> the Documentation directory. Maybe it's there but I didn't look carefully
+> enough. All I could find on the web is e-mails from Linus in which he explains
+> that the order of Signed-off-by's should match the chain of authorship.
 
-In more details:
-* Patches 1 to 3 are SCSI side (sd driver) cleanups and improvements reducing
-  the overhead of report zones command execution during disk scan and
-  revalidation.
-* Patches 4 to 9 improve the useability and user API of zoned block devices.
-* Patch 10 is the main part of this series. This patch replaces the
-  REQ_OP_ZONE_REPORT BIO/request operation for executing report zones commands
-  with a block device file operation, removing the need for the command reply
-  payload in-place rewriting in the BIO buffer. This leads to major
-  simplification of the code in many places.
-* Patch 11 further simplifies the code of low level drivers by providing a
-  generic implementation of zoned block device request queue zone bitmaps
-  initialization and revalidation.
+I don't think there's any documentation on it, none that I've seen.
+Haven't looked for it, though.
 
-Please consider the addition of these patches in 4.20.
-Comments are as always welcome.
+It's more of a "it always looked like that", until we got patchwork messing
+things up. And then people see that, and do the same. It's a bit
+frustrating. I like to be able to see the SOB chain in a patch, and if
+it's intermingled with other things, it's much harder to read. At least
+for me.
 
-Changes from v1:
-* Addressed Christoph's and Bart's comments
-* Fixed several compilation errors with zoned block device support disabled
-* Rebased on latest rc including the most recent dm patches
-
-Christoph Hellwig (1):
-  block: add a report_zones method
-
-Damien Le Moal (10):
-  scsi: sd_zbc: Rearrange code
-  scsi: sd_zbc: Reduce boot device scan and revalidate time
-  scsi: sd_zbc: Fix sd_zbc_check_zones() error checks
-  block: Introduce blkdev_nr_zones() helper
-  block: Limit allocation of zone descriptors for report zones
-  block: Introduce BLKGETZONESZ ioctl
-  block: Introduce BLKGETNRZONES ioctl
-  block: Improve zone reset execution
-  block: Expose queue nr_zones in sysfs
-  block: Introduce blk_revalidate_disk_zones()
-
- block/blk-core.c               |   1 -
- block/blk-lib.c                |  13 +-
- block/blk-mq-debugfs.c         |   1 -
- block/blk-sysfs.c              |  13 +
- block/blk-zoned.c              | 359 +++++++++++++++---------
- block/blk.h                    |   8 +
- block/ioctl.c                  |   4 +
- drivers/block/null_blk.h       |  11 +-
- drivers/block/null_blk_main.c  |  30 +-
- drivers/block/null_blk_zoned.c |  57 +---
- drivers/md/dm-flakey.c         |  30 +-
- drivers/md/dm-linear.c         |  35 ++-
- drivers/md/dm-table.c          |  10 +
- drivers/md/dm-zoned-target.c   |   3 +-
- drivers/md/dm.c                | 169 ++++++-----
- drivers/scsi/sd.c              |  15 +-
- drivers/scsi/sd.h              |  15 +-
- drivers/scsi/sd_zbc.c          | 497 +++++++++------------------------
- include/linux/blk_types.h      |   2 -
- include/linux/blkdev.h         |  22 +-
- include/linux/device-mapper.h  |  12 +-
- include/trace/events/f2fs.h    |   1 -
- include/uapi/linux/blkzoned.h  |   3 +
- 23 files changed, 591 insertions(+), 720 deletions(-)
+I'll continue fixing these up, but I do hope that at least the regulars
+on the block side use the proper formatting.
 
 -- 
-2.17.1
+Jens Axboe
