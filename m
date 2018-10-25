@@ -1,28 +1,79 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH 26/28] block: remove req_no_special_merge() from merging
- code
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-ide@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 26/28] block: remove req_no_special_merge() from merging code
+Date: Thu, 25 Oct 2018 15:10:37 -0600
+Message-Id: <20181025211039.11559-27-axboe@kernel.dk>
+In-Reply-To: <20181025211039.11559-1-axboe@kernel.dk>
 References: <20181025211039.11559-1-axboe@kernel.dk>
- <20181025211039.11559-27-axboe@kernel.dk>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <c24259c2-7187-2f93-0fa3-01d4706bc776@suse.de>
-Date: Mon, 29 Oct 2018 08:12:04 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181025211039.11559-27-axboe@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/25/18 11:10 PM, Jens Axboe wrote:
-> It'll always be false at this point, just remove it.
-> 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> ---
->   block/blk-merge.c | 25 +++----------------------
->   1 file changed, 3 insertions(+), 22 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+It'll always be false at this point, just remove it.
 
-Cheers,
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ block/blk-merge.c | 25 +++----------------------
+ 1 file changed, 3 insertions(+), 22 deletions(-)
 
-Hannes
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 7fedc0391610..3561dcce2260 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -595,17 +595,6 @@ int ll_front_merge_fn(struct request_queue *q, struct request *req,
+ 	return ll_new_hw_segment(q, req, bio);
+ }
+ 
+-/*
+- * blk-mq uses req->special to carry normal driver per-request payload, it
+- * does not indicate a prepared command that we cannot merge with.
+- */
+-static bool req_no_special_merge(struct request *req)
+-{
+-	struct request_queue *q = req->q;
+-
+-	return !q->mq_ops && req->special;
+-}
+-
+ static bool req_attempt_discard_merge(struct request_queue *q, struct request *req,
+ 		struct request *next)
+ {
+@@ -631,13 +620,6 @@ static int ll_merge_requests_fn(struct request_queue *q, struct request *req,
+ 	unsigned int seg_size =
+ 		req->biotail->bi_seg_back_size + next->bio->bi_seg_front_size;
+ 
+-	/*
+-	 * First check if the either of the requests are re-queued
+-	 * requests.  Can't merge them if they are.
+-	 */
+-	if (req_no_special_merge(req) || req_no_special_merge(next))
+-		return 0;
+-
+ 	if (req_gap_back_merge(req, next->bio))
+ 		return 0;
+ 
+@@ -738,8 +720,7 @@ static struct request *attempt_merge(struct request_queue *q,
+ 		return NULL;
+ 
+ 	if (rq_data_dir(req) != rq_data_dir(next)
+-	    || req->rq_disk != next->rq_disk
+-	    || req_no_special_merge(next))
++	    || req->rq_disk != next->rq_disk)
+ 		return NULL;
+ 
+ 	if (req_op(req) == REQ_OP_WRITE_SAME &&
+@@ -858,8 +839,8 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
+ 	if (bio_data_dir(bio) != rq_data_dir(rq))
+ 		return false;
+ 
+-	/* must be same device and not a special request */
+-	if (rq->rq_disk != bio->bi_disk || req_no_special_merge(rq))
++	/* must be same device */
++	if (rq->rq_disk != bio->bi_disk)
+ 		return false;
+ 
+ 	/* only merge integrity protected bio into ditto rq */
+-- 
+2.17.1
