@@ -1,20 +1,23 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH BUGFIX] block, bfq: fix asymmetric scenarios detection
-To: Paolo Valente <paolo.valente@linaro.org>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- ulf.hansson@linaro.org, linus.walleij@linaro.org, broonie@kernel.org,
- bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
- Federico Motta <federico@willer.it>
-References: <20181024171325.7154-1-paolo.valente@linaro.org>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <7023bec4-f0dc-2238-25ca-4b76edfeb0f1@kernel.dk>
-Date: Thu, 25 Oct 2018 08:18:29 -0600
+Return-Path: <oleksandr@natalenko.name>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Date: Thu, 25 Oct 2018 10:05:21 +0200
+From: Oleksandr Natalenko <oleksandr@natalenko.name>
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, ulf.hansson@linaro.org,
+ linus.walleij@linaro.org, broonie@kernel.org, bfq-iosched@googlegroups.com,
+ Federico Motta <federico@willer.it>
+Subject: Re: [PATCH BUGFIX] block, bfq: fix asymmetric scenarios detection
 In-Reply-To: <20181024171325.7154-1-paolo.valente@linaro.org>
-Content-Type: text/plain; charset=utf-8
+References: <20181024171325.7154-1-paolo.valente@linaro.org>
+Message-ID: <b747250df5e1d93175ac0a56e697d611@natalenko.name>
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/24/18 11:13 AM, Paolo Valente wrote:
+Hi.
+
+On 24.10.2018 19:13, Paolo Valente wrote:
 > From: Federico Motta <federico@willer.it>
 > 
 > Since commit 2d29c9f89fcd ("block, bfq: improve asymmetric scenarios
@@ -44,8 +47,61 @@ On 10/24/18 11:13 AM, Paolo Valente wrote:
 > 
 > This commit fixes this issue by simply removing the above useless and
 > wrong increments and decrements.
+> 
+> Fixes: 2d29c9f89fcd ("block, bfq: improve asymmetric scenarios 
+> detection")
+> Signed-off-by: Federico Motta <federico@willer.it>
+> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+> ---
+>  block/bfq-wf2q.c | 18 ++++++------------
+>  1 file changed, 6 insertions(+), 12 deletions(-)
+> 
+> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+> index 476b5a90a5a4..4b0d5fb69160 100644
+> --- a/block/bfq-wf2q.c
+> +++ b/block/bfq-wf2q.c
+> @@ -792,24 +792,18 @@ __bfq_entity_update_weight_prio(struct
+> bfq_service_tree *old_st,
+>  		 * queue, remove the entity from its old weight counter (if
+>  		 * there is a counter associated with the entity).
+>  		 */
+> -		if (prev_weight != new_weight) {
+> -			if (bfqq) {
+> -				root = &bfqd->queue_weights_tree;
+> -				__bfq_weights_tree_remove(bfqd, bfqq, root);
+> -			} else
+> -				bfqd->num_active_groups--;
+> +		if (prev_weight != new_weight && bfqq) {
+> +			root = &bfqd->queue_weights_tree;
+> +			__bfq_weights_tree_remove(bfqd, bfqq, root);
+>  		}
+>  		entity->weight = new_weight;
+>  		/*
+>  		 * Add the entity, if it is not a weight-raised queue,
+>  		 * to the counter associated with its new weight.
+>  		 */
+> -		if (prev_weight != new_weight) {
+> -			if (bfqq && bfqq->wr_coeff == 1) {
+> -				/* If we get here, root has been initialized. */
+> -				bfq_weights_tree_add(bfqd, bfqq, root);
+> -			} else
+> -				bfqd->num_active_groups++;
+> +		if (prev_weight != new_weight && bfqq && bfqq->wr_coeff == 1) {
+> +			/* If we get here, root has been initialized. */
+> +			bfq_weights_tree_add(bfqd, bfqq, root);
+>  		}
+> 
+>  		new_st->wsum += entity->weight;
 
-Applied for 4.20, thanks.
+I'm running this patch on 3 machines ATM with no visible smoke. I don't 
+do performance comparison here, just checking that nothing is obviously 
+broken.
+
+With regard to that,
+
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+
+Thanks.
 
 -- 
-Jens Axboe
+   Oleksandr Natalenko (post-factum)
