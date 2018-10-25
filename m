@@ -1,131 +1,51 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Tue, 9 Oct 2018 10:49:38 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc: axboe@kernel.dk, keith.busch@linux.intel.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] blk-mq: adjust debugfs and sysfs register when
- updating nr_hw_queues
-Message-ID: <20181009024937.GA18673@ming.t460p>
-References: <1538044984-2147-1-git-send-email-jianchao.w.wang@oracle.com>
- <1538044984-2147-2-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH BUGFIX] block, bfq: fix asymmetric scenarios detection
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ulf.hansson@linaro.org, linus.walleij@linaro.org, broonie@kernel.org,
+ bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
+ Federico Motta <federico@willer.it>
+References: <20181024171325.7154-1-paolo.valente@linaro.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <7023bec4-f0dc-2238-25ca-4b76edfeb0f1@kernel.dk>
+Date: Thu, 25 Oct 2018 08:18:29 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1538044984-2147-2-git-send-email-jianchao.w.wang@oracle.com>
+In-Reply-To: <20181024171325.7154-1-paolo.valente@linaro.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Sep 27, 2018 at 06:43:03PM +0800, Jianchao Wang wrote:
-> blk-mq debugfs and sysfs entries need to be removed before updating
-> queue map, otherwise, we get get wrong result there. This patch fixes
-> it and remove the redundant debugfs and sysfs register/unregister
-> operations during __blk_mq_update_nr_hw_queues.
+On 10/24/18 11:13 AM, Paolo Valente wrote:
+> From: Federico Motta <federico@willer.it>
 > 
-> Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
-> ---
->  block/blk-mq.c | 39 ++++++++++++---------------------------
->  1 file changed, 12 insertions(+), 27 deletions(-)
+> Since commit 2d29c9f89fcd ("block, bfq: improve asymmetric scenarios
+> detection"), a scenario is defined asymmetric when one of the
+> following conditions holds:
+> - active bfq_queues have different weights
+> - one or more group of entities (bfq_queue or other groups of entities)
+>   are active
+> bfq grants fairness and low latency also in such asymmetric scenarios,
+> by plugging the dispatching of I/O if the bfq_queue in service happens
+> to be temporarily idle. This plugging may lower throughput, so it is
+> important to do it only when strictly needed.
 > 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 85a1c1a..6356455 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2137,8 +2137,6 @@ static void blk_mq_exit_hctx(struct request_queue *q,
->  		struct blk_mq_tag_set *set,
->  		struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
->  {
-> -	blk_mq_debugfs_unregister_hctx(hctx);
-> -
->  	if (blk_mq_hw_queue_mapped(hctx))
->  		blk_mq_tag_idle(hctx);
->  
-> @@ -2165,6 +2163,7 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
->  	queue_for_each_hw_ctx(q, hctx, i) {
->  		if (i == nr_queue)
->  			break;
-> +		blk_mq_debugfs_unregister_hctx(hctx);
->  		blk_mq_exit_hctx(q, set, hctx, i);
->  	}
->  }
-> @@ -2222,8 +2221,6 @@ static int blk_mq_init_hctx(struct request_queue *q,
->  	if (hctx->flags & BLK_MQ_F_BLOCKING)
->  		init_srcu_struct(hctx->srcu);
->  
-> -	blk_mq_debugfs_register_hctx(q, hctx);
-> -
->  	return 0;
->  
->   free_fq:
-> @@ -2512,8 +2509,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
->  	int i, j;
->  	struct blk_mq_hw_ctx **hctxs = q->queue_hw_ctx;
->  
-> -	blk_mq_sysfs_unregister(q);
-> -
->  	/* protect against switching io scheduler  */
->  	mutex_lock(&q->sysfs_lock);
->  	for (i = 0; i < set->nr_hw_queues; i++) {
-> @@ -2561,7 +2556,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
->  	}
->  	q->nr_hw_queues = i;
->  	mutex_unlock(&q->sysfs_lock);
-> -	blk_mq_sysfs_register(q);
->  }
->  
->  struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
-> @@ -2659,25 +2653,6 @@ void blk_mq_free_queue(struct request_queue *q)
->  	blk_mq_exit_hw_queues(q, set, set->nr_hw_queues);
->  }
->  
-> -/* Basically redo blk_mq_init_queue with queue frozen */
-> -static void blk_mq_queue_reinit(struct request_queue *q)
-> -{
-> -	WARN_ON_ONCE(!atomic_read(&q->mq_freeze_depth));
-> -
-> -	blk_mq_debugfs_unregister_hctxs(q);
-> -	blk_mq_sysfs_unregister(q);
-> -
-> -	/*
-> -	 * redo blk_mq_init_cpu_queues and blk_mq_init_hw_queues. FIXME: maybe
-> -	 * we should change hctx numa_node according to the new topology (this
-> -	 * involves freeing and re-allocating memory, worth doing?)
-> -	 */
-> -	blk_mq_map_swqueue(q);
-> -
-> -	blk_mq_sysfs_register(q);
-> -	blk_mq_debugfs_register_hctxs(q);
-> -}
-> -
->  static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
->  {
->  	int i;
-> @@ -2987,11 +2962,21 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
->  		if (!blk_mq_elv_switch_none(&head, q))
->  			goto switch_back;
->  
-> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-> +		blk_mq_debugfs_unregister_hctxs(q);
-> +		blk_mq_sysfs_unregister(q);
-> +	}
-> +
->  	set->nr_hw_queues = nr_hw_queues;
->  	blk_mq_update_queue_map(set);
->  	list_for_each_entry(q, &set->tag_list, tag_set_list) {
->  		blk_mq_realloc_hw_ctxs(set, q);
-> -		blk_mq_queue_reinit(q);
-> +		blk_mq_map_swqueue(q);
-> +	}
-> +
-> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-> +		blk_mq_sysfs_register(q);
-> +		blk_mq_debugfs_register_hctxs(q);
->  	}
->  
->  switch_back:
-> -- 
-> 2.7.4
+> By mystake, in commit '2d29c9f89fcd' ("block, bfq: improve asymmetric
+> scenarios detection") the num_active_groups counter was firstly
+> incremented and subsequently decremented at any entity (group or
+> bfq_queue) weight change.
 > 
+> This is useless, because only transitions from active to inactive and
+> vice versa matter for that counter. Unfortunately this is also
+> incorrect in the following case: the entity at issue is a bfq_queue
+> and it is under weight raising. In fact in this case there is a
+> spurious increment of the num_active_groups counter.
+> 
+> This spurious increment may cause scenarios to be wrongly detected as
+> asymmetric, thus causing useless plugging and loss of throughput.
+> 
+> This commit fixes this issue by simply removing the above useless and
+> wrong increments and decrements.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Applied for 4.20, thanks.
 
-Thanks,
-Ming
+-- 
+Jens Axboe
