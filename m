@@ -1,54 +1,65 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0075.outbound.protection.outlook.com ([104.47.36.75]:9536
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726056AbeJZRST (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Oct 2018 13:18:19 -0400
-From: Javier Gonzalez <javier@cnexlabs.com>
-To: Zhoujie Wu <zjwu@marvell.com>
-CC: "mb@lightnvm.io" <mb@lightnvm.io>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "hongd@marvell.com" <hongd@marvell.com>
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:45327 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725993AbeJZQoi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Oct 2018 12:44:38 -0400
+Received: by mail-lf1-f66.google.com with SMTP id c24-v6so220624lfi.12
+        for <linux-block@vger.kernel.org>; Fri, 26 Oct 2018 01:08:35 -0700 (PDT)
 Subject: Re: [PATCH v2] lightnvm: pblk: ignore the smeta oob area scan
-Date: Fri, 26 Oct 2018 08:42:06 +0000
-Message-ID: <5E5CDE29-96C1-41E1-93E5-55459FFCEE48@cnexlabs.com>
+To: zjwu@marvell.com, javier@cnexlabs.com, linux-block@vger.kernel.org
+Cc: hongd@marvell.com, hans.holmberg@cnexlabs.com
 References: <1540510706-32603-1-git-send-email-zjwu@marvell.com>
-In-Reply-To: <1540510706-32603-1-git-send-email-zjwu@marvell.com>
-Content-Type: text/plain; charset="utf-8"
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <98c75976-6d6e-d4ae-01f8-2c3e92f752ee@lightnvm.io>
+Date: Fri, 26 Oct 2018 10:08:32 +0200
 MIME-Version: 1.0
+In-Reply-To: <1540510706-32603-1-git-send-email-zjwu@marvell.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-DQoNCj4gT24gMjYgT2N0IDIwMTgsIGF0IDAxLjM1LCBaaG91amllIFd1IDx6and1QG1hcnZlbGwu
-Y29tPiB3cm90ZToNCj4gDQo+IFRoZSBzbWV0YSBhcmVhIGwycCBtYXBwaW5nIGlzIGVtcHR5LCBh
-bmQgYWN0dWFsbHkgdGhlDQo+IHJlY292ZXJ5IHByb2NlZHVyZSBvbmx5IG5lZWQgdG8gcmVzdG9y
-ZSBkYXRhIHNlY3RvcidzIGwycA0KPiBtYXBwaW5nLiBTbyBpZ25vcmUgdGhlIHNtZXRhIG9vYiBz
-Y2FuLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogWmhvdWppZSBXdSA8emp3dUBtYXJ2ZWxsLmNvbT4N
-Cj4gLS0tDQo+IHYyOiBNb2RpZmllZCBiYXNlZCBvbiBzdWdnZXN0aW9uIGZyb20gSGFucy4gVGhl
-IHNtZXRhIG1heSBub3Qgc3RhcnQgZnJvbQ0KPiBwYWRkciAwIGlmIHRoZSBmaXJzdCBibG9jayBp
-cyBiYWQuIFVzZSBwYmxrX2xpbmVfc21ldGFfc3RhcnQgdG8gY2FsY3VsYXRlDQo+IHRoZSBzbWV0
-YSBzdGFydCBhZGRyZXNzLg0KPiANCj4gZHJpdmVycy9saWdodG52bS9wYmxrLXJlY292ZXJ5LmMg
-fCA1ICsrKy0tDQo+IDEgZmlsZSBjaGFuZ2VkLCAzIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25z
-KC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9saWdodG52bS9wYmxrLXJlY292ZXJ5LmMg
-Yi9kcml2ZXJzL2xpZ2h0bnZtL3BibGstcmVjb3ZlcnkuYw0KPiBpbmRleCA1NzQwYjc1Li4wZmJk
-MzBlIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJzL2xpZ2h0bnZtL3BibGstcmVjb3ZlcnkuYw0KPiAr
-KysgYi9kcml2ZXJzL2xpZ2h0bnZtL3BibGstcmVjb3ZlcnkuYw0KPiBAQCAtMzM0LDYgKzMzNCw3
-IEBAIHN0YXRpYyBpbnQgcGJsa19yZWNvdl9zY2FuX29vYihzdHJ1Y3QgcGJsayAqcGJsaywgc3Ry
-dWN0IHBibGtfbGluZSAqbGluZSwNCj4gICAgICAgICAgICAgICAgICAgc3RydWN0IHBibGtfcmVj
-b3ZfYWxsb2MgcCkNCj4gew0KPiAgICBzdHJ1Y3QgbnZtX3RndF9kZXYgKmRldiA9IHBibGstPmRl
-djsNCj4gKyAgICBzdHJ1Y3QgcGJsa19saW5lX21ldGEgKmxtID0gJnBibGstPmxtOw0KPiAgICBz
-dHJ1Y3QgbnZtX2dlbyAqZ2VvID0gJmRldi0+Z2VvOw0KPiAgICBzdHJ1Y3QgcHBhX2FkZHIgKnBw
-YV9saXN0Ow0KPiAgICBzdHJ1Y3QgcGJsa19zZWNfbWV0YSAqbWV0YV9saXN0Ow0KPiBAQCAtMzQy
-LDEyICszNDMsMTIgQEAgc3RhdGljIGludCBwYmxrX3JlY292X3NjYW5fb29iKHN0cnVjdCBwYmxr
-ICpwYmxrLCBzdHJ1Y3QgcGJsa19saW5lICpsaW5lLA0KPiAgICB2b2lkICpkYXRhOw0KPiAgICBk
-bWFfYWRkcl90IGRtYV9wcGFfbGlzdCwgZG1hX21ldGFfbGlzdDsNCj4gICAgX19sZTY0ICpsYmFf
-bGlzdDsNCj4gLSAgICB1NjQgcGFkZHIgPSAwOw0KPiArICAgIHU2NCBwYWRkciA9IHBibGtfbGlu
-ZV9zbWV0YV9zdGFydChwYmxrLCBsaW5lKSArIGxtLT5zbWV0YV9zZWM7DQo+ICAgIGJvb2wgcGFk
-ZGVkID0gZmFsc2U7DQo+ICAgIGludCBycV9wcGFzLCBycV9sZW47DQo+ICAgIGludCBpLCBqOw0K
-PiAgICBpbnQgcmV0Ow0KPiAtICAgIHU2NCBsZWZ0X3BwYXMgPSBwYmxrX3NlY19pbl9vcGVuX2xp
-bmUocGJsaywgbGluZSk7DQo+ICsgICAgdTY0IGxlZnRfcHBhcyA9IHBibGtfc2VjX2luX29wZW5f
-bGluZShwYmxrLCBsaW5lKSAtIGxtLT5zbWV0YV9zZWM7DQo+IA0KPiAgICBpZiAocGJsa19saW5l
-X3dwX2lzX3VuYmFsYW5jZWQocGJsaywgbGluZSkpDQo+ICAgICAgICBwYmxrX3dhcm4ocGJsaywg
-InJlY292ZXJpbmcgdW5iYWxhbmNlZCBsaW5lICglZClcbiIsIGxpbmUtPmlkKTsNCj4gLS0gDQo+
-IDEuOS4xDQo+IA0KDQpMb29rcyBnb29kIHRvIG1lLg0KDQpSZXZpZXdlZC1ieTogSmF2aWVyIEdv
-bnrDoWxleiA8amF2aWVyQGphdmlnb24uY29tPg==
+On 10/26/2018 01:38 AM, Zhoujie Wu wrote:
+> The smeta area l2p mapping is empty, and actually the
+> recovery procedure only need to restore data sector's l2p
+> mapping. So ignore the smeta oob scan.
+> 
+> Signed-off-by: Zhoujie Wu <zjwu@marvell.com>
+> ---
+> v2: Modified based on suggestion from Hans. The smeta may not start from
+> paddr 0 if the first block is bad. Use pblk_line_smeta_start to calculate
+> the smeta start address.
+> 
+>   drivers/lightnvm/pblk-recovery.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+> index 5740b75..0fbd30e 100644
+> --- a/drivers/lightnvm/pblk-recovery.c
+> +++ b/drivers/lightnvm/pblk-recovery.c
+> @@ -334,6 +334,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
+>   			       struct pblk_recov_alloc p)
+>   {
+>   	struct nvm_tgt_dev *dev = pblk->dev;
+> +	struct pblk_line_meta *lm = &pblk->lm;
+>   	struct nvm_geo *geo = &dev->geo;
+>   	struct ppa_addr *ppa_list;
+>   	struct pblk_sec_meta *meta_list;
+> @@ -342,12 +343,12 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
+>   	void *data;
+>   	dma_addr_t dma_ppa_list, dma_meta_list;
+>   	__le64 *lba_list;
+> -	u64 paddr = 0;
+> +	u64 paddr = pblk_line_smeta_start(pblk, line) + lm->smeta_sec;
+>   	bool padded = false;
+>   	int rq_ppas, rq_len;
+>   	int i, j;
+>   	int ret;
+> -	u64 left_ppas = pblk_sec_in_open_line(pblk, line);
+> +	u64 left_ppas = pblk_sec_in_open_line(pblk, line) - lm->smeta_sec;
+>   
+>   	if (pblk_line_wp_is_unbalanced(pblk, line))
+>   		pblk_warn(pblk, "recovering unbalanced line (%d)\n", line->id);
+> 
+
+Looks good to me. Hans, can I add your reviewed by?
