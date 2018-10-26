@@ -1,100 +1,34 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:33708 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727047AbeJISaR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:30:17 -0400
-Received: by mail-pl1-f193.google.com with SMTP id s4-v6so679457plp.0
-        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:13:51 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 11/45] lightnvm: pblk: add helpers for chunk addresses
-Date: Tue,  9 Oct 2018 13:11:41 +0200
-Message-Id: <20181009111215.7653-12-mb@lightnvm.io>
-In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
-References: <20181009111215.7653-1-mb@lightnvm.io>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
+To: axboe@kernel.dk
+Cc: ming.lei@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH V2 0/3] blk-mq: refactor and fix on issue request directly
+Date: Sat, 27 Oct 2018 00:01:08 +0800
+Message-Id: <1540569671-6589-1-git-send-email-jianchao.w.wang@oracle.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@javigon.com>
+Hi Jens
 
-Implement helpers to go from ppas to a chunk within a line and an
-address within a chunk.
+The 1st patch refactors the code of issue request directly.
+It merges the blk_mq_try_issue_directly and __blk_mq_try_issue_directly
+and make blk_mq_try_issue_directly handle return value of .queue_rq itself.
 
-These helpers will be used on the patches adding trace support in pblk,
-which will be sent in this window.
+The 2nd patch make blk_mq_sched_insert_requests issue request directly with
+bypass "false" instead of the "true", then needn't to handle the non-issued
+requests any more.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
----
- drivers/lightnvm/pblk.h  | 19 +++++++++++++++++++
- include/linux/lightnvm.h | 19 +++++++++++++++++++
- 2 files changed, 38 insertions(+)
+The 3rd patch ensures the hctx to be ran on its mapped cpu in issue directly
+path.
 
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index be67bbfa3d0a..f95fe75fef6e 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -1034,6 +1034,25 @@ static inline struct ppa_addr addr_to_gen_ppa(struct pblk *pblk, u64 paddr,
- 	return ppa;
- }
- 
-+static inline struct nvm_chk_meta *pblk_dev_ppa_to_chunk(struct pblk *pblk,
-+							struct ppa_addr p)
-+{
-+	struct nvm_tgt_dev *dev = pblk->dev;
-+	struct nvm_geo *geo = &dev->geo;
-+	struct pblk_line *line = &pblk->lines[pblk_ppa_to_line(p)];
-+	int pos = pblk_ppa_to_pos(geo, p);
-+
-+	return &line->chks[pos];
-+}
-+
-+static inline u64 pblk_dev_ppa_to_chunk_addr(struct pblk *pblk,
-+							struct ppa_addr p)
-+{
-+	struct nvm_tgt_dev *dev = pblk->dev;
-+
-+	return dev_to_chunk_addr(dev->parent, &pblk->addrf, p);
-+}
-+
- static inline u64 pblk_dev_ppa_to_line_addr(struct pblk *pblk,
- 							struct ppa_addr p)
- {
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 0106984400bc..77743a02ec0d 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -487,6 +487,25 @@ static inline struct ppa_addr dev_to_generic_addr(struct nvm_dev *dev,
- 	return l;
- }
- 
-+static inline u64 dev_to_chunk_addr(struct nvm_dev *dev, void *addrf,
-+				    struct ppa_addr p)
-+{
-+	struct nvm_geo *geo = &dev->geo;
-+	u64 caddr;
-+
-+	if (geo->version == NVM_OCSSD_SPEC_12) {
-+		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)addrf;
-+
-+		caddr = (u64)p.g.pg << ppaf->pg_offset;
-+		caddr |= (u64)p.g.pl << ppaf->pln_offset;
-+		caddr |= (u64)p.g.sec << ppaf->sec_offset;
-+	} else {
-+		caddr = p.m.sec;
-+	}
-+
-+	return caddr;
-+}
-+
- typedef blk_qc_t (nvm_tgt_make_rq_fn)(struct request_queue *, struct bio *);
- typedef sector_t (nvm_tgt_capacity_fn)(void *);
- typedef void *(nvm_tgt_init_fn)(struct nvm_tgt_dev *, struct gendisk *,
--- 
-2.17.1
+V2:
+ - Add 1st and 2nd patch.
+
+Jianchao Wang(3)
+    blk-mq: refactor the code of issue request directly
+    blk-mq: issue directly with bypass 'false' in blk_mq_sched_insert_requests
+    blk-mq: ensure hctx to be ran on mapped cpu when issue
+
+ block/blk-mq-sched.c |   8 ++--
+ block/blk-mq.c       | 128 ++++++++++++++++++++++++---------------------------
+ 2 files changed, 63 insertions(+), 73 deletions(-)
