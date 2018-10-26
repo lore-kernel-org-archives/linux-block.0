@@ -1,25 +1,81 @@
-Return-Path: <hch@lst.de>
-Date: Fri, 26 Oct 2018 09:45:15 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
 	Rui Salvaterra <rsalvaterra@gmail.com>,
-	Mike Snitzer <snitzer@redhat.com>, Christoph Hellwig <hch@lst.de>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
 	Xiao Ni <xni@redhat.com>,
 	Mariusz Dabrowski <mariusz.dabrowski@intel.com>
-Subject: Re: [PATCH 2/3] block: cleanup __blkdev_issue_discard()
-Message-ID: <20181026074515.GB4660@lst.de>
-References: <20181026062435.21398-1-ming.lei@redhat.com> <20181026062435.21398-3-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20181026062435.21398-3-ming.lei@redhat.com>
+Subject: [PATCH 2/3] block: cleanup __blkdev_issue_discard()
+Date: Fri, 26 Oct 2018 14:24:34 +0800
+Message-Id: <20181026062435.21398-3-ming.lei@redhat.com>
+In-Reply-To: <20181026062435.21398-1-ming.lei@redhat.com>
+References: <20181026062435.21398-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Oct 26, 2018 at 02:24:34PM +0800, Ming Lei wrote:
-> Cleanup __blkdev_issue_discard().
+Cleanup __blkdev_issue_discard().
 
-It would help to explain what you clean up..
+Cc: Rui Salvaterra <rsalvaterra@gmail.com>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Xiao Ni <xni@redhat.com>
+Cc: Mariusz Dabrowski <mariusz.dabrowski@intel.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-lib.c | 23 +++++------------------
+ 1 file changed, 5 insertions(+), 18 deletions(-)
 
-> +		unsigned int req_sects = min(nr_sects, (UINT_MAX >> 9) & ~bs_mask);
-
-This creates an overly long line.
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index aa3944946b2f..93011785f710 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -52,16 +52,11 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 	if ((sector | nr_sects) & bs_mask)
+ 		return -EINVAL;
+ 
+-	while (nr_sects) {
+-		unsigned int req_sects = nr_sects;
+-		sector_t end_sect;
+-
+-		if (!req_sects)
+-			goto fail;
+-		if (req_sects > UINT_MAX >> 9)
+-			req_sects = (UINT_MAX >> 9) & ~bs_mask;
++	if (!nr_sects)
++		return -EINVAL;
+ 
+-		end_sect = sector + req_sects;
++	while (nr_sects) {
++		unsigned int req_sects = min(nr_sects, (UINT_MAX >> 9) & ~bs_mask);
+ 
+ 		bio = next_bio(bio, 0, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+@@ -69,8 +64,8 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 		bio_set_op_attrs(bio, op, 0);
+ 
+ 		bio->bi_iter.bi_size = req_sects << 9;
++		sector += req_sects;
+ 		nr_sects -= req_sects;
+-		sector = end_sect;
+ 
+ 		/*
+ 		 * We can loop for a long time in here, if someone does
+@@ -83,14 +78,6 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 
+ 	*biop = bio;
+ 	return 0;
+-
+-fail:
+-	if (bio) {
+-		submit_bio_wait(bio);
+-		bio_put(bio);
+-	}
+-	*biop = NULL;
+-	return -EOPNOTSUPP;
+ }
+ EXPORT_SYMBOL(__blkdev_issue_discard);
+ 
+-- 
+2.9.5
