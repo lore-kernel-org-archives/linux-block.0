@@ -1,277 +1,45 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 02/15] block/loop: Use global lock for ioctl() operation.
-Date: Wed, 10 Oct 2018 12:04:02 +0200
-Message-Id: <20181010100415.26525-3-jack@suse.cz>
-In-Reply-To: <20181010100415.26525-1-jack@suse.cz>
-References: <20181010100415.26525-1-jack@suse.cz>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: UBSAN: Undefined behaviour in drivers/block/floppy.c:1495:32
+To: Kyungtae Kim <kt0755@gmail.com>
+Cc: jikos@kernel.org, Byoungyoung Lee <lifeasageek@gmail.com>,
+ DaeRyong Jeong <threeearcat@gmail.com>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, syzkaller@googlegroups.com
+References: <CAEAjamtML1yMLL0DsV5JkD1H6P0Yg19F2DVq+_c-u09RaCKuDw@mail.gmail.com>
+ <fcad3085-6801-71f9-b2cf-4c1702889d70@kernel.dk>
+ <CAEAjamtJrbLZyN+f97Y+LOMbogveYNBdxM-pVvfqUMhaGsH2uw@mail.gmail.com>
+ <CAEAjams3Y4PE-yDP0FyipCAohOepSF9WgXw3h_CEd1YW+mjS0g@mail.gmail.com>
+ <ad9f11b6-1e3c-8412-ecce-d04a1c8c317a@kernel.dk>
+ <CAEAjamu-MmtPF0_kqyPKJBcZSWz=SGi_1VjLq7z9MMm5-t7Oog@mail.gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <9206bb2f-b11f-cd57-819a-81438b388124@kernel.dk>
+Date: Fri, 26 Oct 2018 08:20:09 -0600
+MIME-Version: 1.0
+In-Reply-To: <CAEAjamu-MmtPF0_kqyPKJBcZSWz=SGi_1VjLq7z9MMm5-t7Oog@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+On 10/26/18 7:22 AM, Kyungtae Kim wrote:
+> I corrected the patch as follows:
 
-syzbot is reporting NULL pointer dereference [1] which is caused by
-race condition between ioctl(loop_fd, LOOP_CLR_FD, 0) versus
-ioctl(other_loop_fd, LOOP_SET_FD, loop_fd) due to traversing other
-loop devices at loop_validate_file() without holding corresponding
-lo->lo_ctl_mutex locks.
+OK, we're getting there! Please resend as a separate email, so that
+the subject line is the patch header, and just the commit message
+in the body. I'd fix that up for this one, but you also need to
+fix up:
 
-Since ioctl() request on loop devices is not frequent operation, we don't
-need fine grained locking. Let's use global lock in order to allow safe
-traversal at loop_validate_file().
+> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+> index a8cfa01..41160a1 100644
+> --- a/drivers/block/floppy.c
+> +++ b/drivers/block/floppy.c
+> @@ -3146,6 +3146,9 @@ static int raw_cmd_copyin(int cmd, void __user *param,
+>                          */
+>                 return -EINVAL;
+> 
+> +       if (ptr->cmd_count > ARRAY_SIZE(ptr->cmd))
+> +         return -EINVAL;
+> +
 
-Note that syzbot is also reporting circular locking dependency between
-bdev->bd_mutex and lo->lo_ctl_mutex [2] which is caused by calling
-blkdev_reread_part() with lock held. This patch does not address it.
+This needs to use tabs, not two spaces. Look at the surrounding
+code - if yours looks differently, then you should correct that.
 
-[1] https://syzkaller.appspot.com/bug?id=f3cfe26e785d85f9ee259f385515291d21bd80a3
-[2] https://syzkaller.appspot.com/bug?id=bf154052f0eea4bc7712499e4569505907d15889
-
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Reported-by: syzbot <syzbot+bf89c128e05dd6c62523@syzkaller.appspotmail.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- drivers/block/loop.c | 58 ++++++++++++++++++++++++++--------------------------
- drivers/block/loop.h |  1 -
- 2 files changed, 29 insertions(+), 30 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 50c81ff44ae2..d0f1b7106572 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -84,6 +84,7 @@
- 
- static DEFINE_IDR(loop_index_idr);
- static DEFINE_MUTEX(loop_index_mutex);
-+static DEFINE_MUTEX(loop_ctl_mutex);
- 
- static int max_part;
- static int part_shift;
-@@ -1047,7 +1048,7 @@ static int loop_clr_fd(struct loop_device *lo)
- 	 */
- 	if (atomic_read(&lo->lo_refcnt) > 1) {
- 		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
--		mutex_unlock(&lo->lo_ctl_mutex);
-+		mutex_unlock(&loop_ctl_mutex);
- 		return 0;
- 	}
- 
-@@ -1100,12 +1101,12 @@ static int loop_clr_fd(struct loop_device *lo)
- 	if (!part_shift)
- 		lo->lo_disk->flags |= GENHD_FL_NO_PART_SCAN;
- 	loop_unprepare_queue(lo);
--	mutex_unlock(&lo->lo_ctl_mutex);
-+	mutex_unlock(&loop_ctl_mutex);
- 	/*
--	 * Need not hold lo_ctl_mutex to fput backing file.
--	 * Calling fput holding lo_ctl_mutex triggers a circular
-+	 * Need not hold loop_ctl_mutex to fput backing file.
-+	 * Calling fput holding loop_ctl_mutex triggers a circular
- 	 * lock dependency possibility warning as fput can take
--	 * bd_mutex which is usually taken before lo_ctl_mutex.
-+	 * bd_mutex which is usually taken before loop_ctl_mutex.
- 	 */
- 	fput(filp);
- 	return 0;
-@@ -1210,7 +1211,7 @@ loop_get_status(struct loop_device *lo, struct loop_info64 *info)
- 	int ret;
- 
- 	if (lo->lo_state != Lo_bound) {
--		mutex_unlock(&lo->lo_ctl_mutex);
-+		mutex_unlock(&loop_ctl_mutex);
- 		return -ENXIO;
- 	}
- 
-@@ -1229,10 +1230,10 @@ loop_get_status(struct loop_device *lo, struct loop_info64 *info)
- 		       lo->lo_encrypt_key_size);
- 	}
- 
--	/* Drop lo_ctl_mutex while we call into the filesystem. */
-+	/* Drop loop_ctl_mutex while we call into the filesystem. */
- 	path = lo->lo_backing_file->f_path;
- 	path_get(&path);
--	mutex_unlock(&lo->lo_ctl_mutex);
-+	mutex_unlock(&loop_ctl_mutex);
- 	ret = vfs_getattr(&path, &stat, STATX_INO, AT_STATX_SYNC_AS_STAT);
- 	if (!ret) {
- 		info->lo_device = huge_encode_dev(stat.dev);
-@@ -1324,7 +1325,7 @@ loop_get_status_old(struct loop_device *lo, struct loop_info __user *arg) {
- 	int err;
- 
- 	if (!arg) {
--		mutex_unlock(&lo->lo_ctl_mutex);
-+		mutex_unlock(&loop_ctl_mutex);
- 		return -EINVAL;
- 	}
- 	err = loop_get_status(lo, &info64);
-@@ -1342,7 +1343,7 @@ loop_get_status64(struct loop_device *lo, struct loop_info64 __user *arg) {
- 	int err;
- 
- 	if (!arg) {
--		mutex_unlock(&lo->lo_ctl_mutex);
-+		mutex_unlock(&loop_ctl_mutex);
- 		return -EINVAL;
- 	}
- 	err = loop_get_status(lo, &info64);
-@@ -1400,7 +1401,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 	struct loop_device *lo = bdev->bd_disk->private_data;
- 	int err;
- 
--	err = mutex_lock_killable_nested(&lo->lo_ctl_mutex, 1);
-+	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
- 	if (err)
- 		goto out_unlocked;
- 
-@@ -1412,7 +1413,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 		err = loop_change_fd(lo, bdev, arg);
- 		break;
- 	case LOOP_CLR_FD:
--		/* loop_clr_fd would have unlocked lo_ctl_mutex on success */
-+		/* loop_clr_fd would have unlocked loop_ctl_mutex on success */
- 		err = loop_clr_fd(lo);
- 		if (!err)
- 			goto out_unlocked;
-@@ -1425,7 +1426,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 		break;
- 	case LOOP_GET_STATUS:
- 		err = loop_get_status_old(lo, (struct loop_info __user *) arg);
--		/* loop_get_status() unlocks lo_ctl_mutex */
-+		/* loop_get_status() unlocks loop_ctl_mutex */
- 		goto out_unlocked;
- 	case LOOP_SET_STATUS64:
- 		err = -EPERM;
-@@ -1435,7 +1436,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 		break;
- 	case LOOP_GET_STATUS64:
- 		err = loop_get_status64(lo, (struct loop_info64 __user *) arg);
--		/* loop_get_status() unlocks lo_ctl_mutex */
-+		/* loop_get_status() unlocks loop_ctl_mutex */
- 		goto out_unlocked;
- 	case LOOP_SET_CAPACITY:
- 		err = -EPERM;
-@@ -1455,7 +1456,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 	default:
- 		err = lo->ioctl ? lo->ioctl(lo, cmd, arg) : -EINVAL;
- 	}
--	mutex_unlock(&lo->lo_ctl_mutex);
-+	mutex_unlock(&loop_ctl_mutex);
- 
- out_unlocked:
- 	return err;
-@@ -1572,7 +1573,7 @@ loop_get_status_compat(struct loop_device *lo,
- 	int err;
- 
- 	if (!arg) {
--		mutex_unlock(&lo->lo_ctl_mutex);
-+		mutex_unlock(&loop_ctl_mutex);
- 		return -EINVAL;
- 	}
- 	err = loop_get_status(lo, &info64);
-@@ -1589,19 +1590,19 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
- 
- 	switch(cmd) {
- 	case LOOP_SET_STATUS:
--		err = mutex_lock_killable(&lo->lo_ctl_mutex);
-+		err = mutex_lock_killable(&loop_ctl_mutex);
- 		if (!err) {
- 			err = loop_set_status_compat(lo,
- 						     (const struct compat_loop_info __user *)arg);
--			mutex_unlock(&lo->lo_ctl_mutex);
-+			mutex_unlock(&loop_ctl_mutex);
- 		}
- 		break;
- 	case LOOP_GET_STATUS:
--		err = mutex_lock_killable(&lo->lo_ctl_mutex);
-+		err = mutex_lock_killable(&loop_ctl_mutex);
- 		if (!err) {
- 			err = loop_get_status_compat(lo,
- 						     (struct compat_loop_info __user *)arg);
--			/* loop_get_status() unlocks lo_ctl_mutex */
-+			/* loop_get_status() unlocks loop_ctl_mutex */
- 		}
- 		break;
- 	case LOOP_SET_CAPACITY:
-@@ -1648,7 +1649,7 @@ static void __lo_release(struct loop_device *lo)
- 	if (atomic_dec_return(&lo->lo_refcnt))
- 		return;
- 
--	mutex_lock(&lo->lo_ctl_mutex);
-+	mutex_lock(&loop_ctl_mutex);
- 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
- 		/*
- 		 * In autoclear mode, stop the loop thread
-@@ -1666,7 +1667,7 @@ static void __lo_release(struct loop_device *lo)
- 		blk_mq_unfreeze_queue(lo->lo_queue);
- 	}
- 
--	mutex_unlock(&lo->lo_ctl_mutex);
-+	mutex_unlock(&loop_ctl_mutex);
- }
- 
- static void lo_release(struct gendisk *disk, fmode_t mode)
-@@ -1712,10 +1713,10 @@ static int unregister_transfer_cb(int id, void *ptr, void *data)
- 	struct loop_device *lo = ptr;
- 	struct loop_func_table *xfer = data;
- 
--	mutex_lock(&lo->lo_ctl_mutex);
-+	mutex_lock(&loop_ctl_mutex);
- 	if (lo->lo_encryption == xfer)
- 		loop_release_xfer(lo);
--	mutex_unlock(&lo->lo_ctl_mutex);
-+	mutex_unlock(&loop_ctl_mutex);
- 	return 0;
- }
- 
-@@ -1896,7 +1897,6 @@ static int loop_add(struct loop_device **l, int i)
- 	if (!part_shift)
- 		disk->flags |= GENHD_FL_NO_PART_SCAN;
- 	disk->flags |= GENHD_FL_EXT_DEVT;
--	mutex_init(&lo->lo_ctl_mutex);
- 	atomic_set(&lo->lo_refcnt, 0);
- 	lo->lo_number		= i;
- 	spin_lock_init(&lo->lo_lock);
-@@ -2009,21 +2009,21 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
- 		ret = loop_lookup(&lo, parm);
- 		if (ret < 0)
- 			break;
--		ret = mutex_lock_killable(&lo->lo_ctl_mutex);
-+		ret = mutex_lock_killable(&loop_ctl_mutex);
- 		if (ret)
- 			break;
- 		if (lo->lo_state != Lo_unbound) {
- 			ret = -EBUSY;
--			mutex_unlock(&lo->lo_ctl_mutex);
-+			mutex_unlock(&loop_ctl_mutex);
- 			break;
- 		}
- 		if (atomic_read(&lo->lo_refcnt) > 0) {
- 			ret = -EBUSY;
--			mutex_unlock(&lo->lo_ctl_mutex);
-+			mutex_unlock(&loop_ctl_mutex);
- 			break;
- 		}
- 		lo->lo_disk->private_data = NULL;
--		mutex_unlock(&lo->lo_ctl_mutex);
-+		mutex_unlock(&loop_ctl_mutex);
- 		idr_remove(&loop_index_idr, lo->lo_number);
- 		loop_remove(lo);
- 		break;
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index 4d42c7af7de7..af75a5ee4094 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -54,7 +54,6 @@ struct loop_device {
- 
- 	spinlock_t		lo_lock;
- 	int			lo_state;
--	struct mutex		lo_ctl_mutex;
- 	struct kthread_worker	worker;
- 	struct task_struct	*worker_task;
- 	bool			use_dio;
 -- 
-2.16.4
+Jens Axboe
