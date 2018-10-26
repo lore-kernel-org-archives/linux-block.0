@@ -1,43 +1,48 @@
-Return-Path: <bart.vanassche@gmail.com>
-Return-Path: <bart.vanassche@gmail.com>
-Message-ID: <1540567279.66186.99.camel@acm.org>
-Subject: Re: [PATCH] floppy: Avoid memory access beyond the array bounds in
- setup_rw_floppy()
-From: Bart Van Assche <bvanassche@acm.org>
-To: Kyungtae Kim <kt0755@gmail.com>, Jens Axboe <axboe@kernel.dk>
-Cc: jikos@kernel.org, Byoungyoung Lee <lifeasageek@gmail.com>, DaeRyong
- Jeong <threeearcat@gmail.com>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Date: Fri, 26 Oct 2018 08:21:19 -0700
-In-Reply-To: <CAEAjamtxZRiFUYb4re3jRf9naoSyJO7sskChfEgcBh-m-uEKWQ@mail.gmail.com>
-References: 
-	<CAEAjamtxZRiFUYb4re3jRf9naoSyJO7sskChfEgcBh-m-uEKWQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-7"
-Mime-Version: 1.0
+Return-Path: <kt0755@gmail.com>
+MIME-Version: 1.0
+References: <CAEAjamtxZRiFUYb4re3jRf9naoSyJO7sskChfEgcBh-m-uEKWQ@mail.gmail.com>
+ <46e927f8-268c-866c-75f7-d1406252759a@kernel.dk> <CAEAjamvAO-Y5-Zg3d3agk1pd84L=FMxB_173sTr4rRAVN9fmRA@mail.gmail.com>
+ <5f679738-3106-78e0-dd16-2335c4f369aa@kernel.dk>
+In-Reply-To: <5f679738-3106-78e0-dd16-2335c4f369aa@kernel.dk>
+From: Kyungtae Kim <kt0755@gmail.com>
+Date: Fri, 26 Oct 2018 11:06:30 -0400
+Message-ID: <CAEAjamtTcLHhFZ_k6DCyTGS8WntKBeqUBVvJWB7jkAZnd+eq5g@mail.gmail.com>
+Subject: Re: [PATCH] floppy: Avoid memory access beyond the array bounds in setup_rw_floppy()
+To: Jens Axboe <axboe@kernel.dk>
+Cc: jikos@kernel.org, Byoungyoung Lee <lifeasageek@gmail.com>,
+	DaeRyong Jeong <threeearcat@gmail.com>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, 2018-10-26 at 10:39 -0400, Kyungtae Kim wrote:
-+AD4 setup+AF8-rw+AF8-floppy() writes some bytes of array cmd to the floppy disk
-+AD4 controller, depending on cmd+AF8-count.
-+AD4 Although the size of array cmd is fixed like 16, cmd+AF8-count can be much
-+AD4 larger through raw+AF8-cmd+AF8-ioctl().
-+AD4 Noticed there is no bound check for this, thereby leading to invalid
-+AD4 memory access.
+Let me try to use git as email client.
 
-Against which kernel tree did you prepare this patch? Just above the code
-you want to insert I found the following:
 
-	if (ptr-+AD4-cmd+AF8-count +AD4 33) ...
-
-Why does that statement compare cmd+AF8-count with 33? Is that comparison correct
-or not? Anyway, I don't think it makes sense first to compare cmd+AF8-count against
-33 and next to compare it against 16 ...
-
-+AD4 +-       if (ptr-+AD4-cmd+AF8-count +AD4 ARRAY+AF8-SIZE(ptr-+AD4-cmd))
-+AD4 +-               return -EINVAL+ADs
-
-This comparison looks suspicious to me. Almost every comparison of the type
-+ACI... +AD4 ARRAY+AF8-SIZE()+ACI I have seen so far was wrong and should be changed into
-+ACI... +AD4APQ ARRAY+AF8-SIZE()+ACI instead.
-
-Bart.
+Thanks,
+Kyungtae Kim
+On Fri, Oct 26, 2018 at 10:57 AM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 10/26/18 8:51 AM, Kyungtae Kim wrote:
+> > Do you mean mail client?? Well, I'm currently using gmail.
+>
+> Yes, email client. I've never sent patches with gmail, so can't
+> say if that works or not. OK, just checked
+>
+> Documentation/process/email-clients.rst
+>
+> and is states that:
+>
+> "Gmail (Web GUI)
+> ***************
+>
+> Does not work for sending patches.
+>
+> Gmail web client converts tabs to spaces automatically."
+>
+> so I guess that won't work for you. You can use git send-email
+> with gmail smtp, that's what I do. Or read the above file to figure out
+> what will work the best for you.
+>
+> --
+> Jens Axboe
+>
