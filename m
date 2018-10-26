@@ -1,16 +1,16 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:52248 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:40088 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725893AbeJZPDf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Oct 2018 11:03:35 -0400
-Date: Fri, 26 Oct 2018 14:27:44 +0800
+        id S1725834AbeJZKfr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Oct 2018 06:35:47 -0400
+Date: Fri, 26 Oct 2018 10:00:35 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Rui Salvaterra <rsalvaterra@gmail.com>
 Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Subject: Re: Bug: swap discard issue with zram caused by "block: don't deal
  with discard limit in blkdev_issue_discard()"
-Message-ID: <20181026062743.GA21483@ming.t460p>
+Message-ID: <20181026020034.GA25933@ming.t460p>
 References: <CALjTZvapU2xc84D7Nqjk+vrF35cAOPzDTd6dRaXpuO=Lcap5Sg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -40,8 +40,12 @@ On Thu, Oct 25, 2018 at 05:09:32PM +0100, Rui Salvaterra wrote:
 > surely breaks something else. :)
 > Let me know if you need any additional information.
 
-The patch titled with 'block: make sure discard bio is aligned with logical block size'
-in the list may fix this issue, please test and see if it works.
+The reason is that zram doesn't call blk_queue_split() in .make_request_fn, :-(
+
+Then the similar logic in blk_queue_split() has to be duplicated somewhere,
+such as __blkdev_issue_discard().
+
+I will post a patch for you soon.
 
 Thanks,
 Ming
