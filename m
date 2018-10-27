@@ -1,31 +1,39 @@
-Return-Path: <BATV+f6810342bdcd0158e5a3+5544+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Sun, 28 Oct 2018 09:10:58 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH 01/14] blk-mq: kill q->mq_map
-Message-ID: <20181028161058.GA26904@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+To: "jianchao.wang" <jianchao.w.wang@oracle.com>,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
 References: <20181025211626.12692-1-axboe@kernel.dk>
  <20181025211626.12692-2-axboe@kernel.dk>
+ <f0b01bcc-fa62-880d-80ef-c44095d82077@oracle.com>
+ <2357b785-6730-fb02-f7fb-9f4a230a00ea@kernel.dk>
+Message-ID: <b40d8e78-c443-7e10-db4e-4d31acf2695b@kernel.dk>
+Date: Sat, 27 Oct 2018 10:52:55 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20181025211626.12692-2-axboe@kernel.dk>
+In-Reply-To: <2357b785-6730-fb02-f7fb-9f4a230a00ea@kernel.dk>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Oct 25, 2018 at 03:16:13PM -0600, Jens Axboe wrote:
->  static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
->  		int cpu)
->  {
-> -	return q->queue_hw_ctx[q->mq_map[cpu]];
-> +	struct blk_mq_tag_set *set = q->tag_set;
-> +
-> +	return q->queue_hw_ctx[set->mq_map[cpu]];
+On 10/27/18 10:48 AM, Jens Axboe wrote:
+> On 10/27/18 8:19 AM, jianchao.wang wrote:
+>> Hi Jens
+>>
+>> On 10/26/18 5:16 AM, Jens Axboe wrote:
+>>> It's just a pointer to set->mq_map, use that instead.
+>> Instead of using the set->mq_map and then a two-dimensional set->mq_map,
+>> how about migrate the mq_map from per-set to per-cpuctx ?
+>> something like:
+>> q->queue_hw_ctx[ctx->map[type]]
+> 
+> I think the current series is pretty clean in that regard, it goes
+> from members -> map -> map array. I'd be willing to look at a
+> conversion on top of that, if it makes things cleaner.
 
-Nitpick: this would be a little more readable without the local
-set variable:
+On top of that, this:
 
-	return q->queue_hw_ctx[q->tag_set->mq_map[cpu]];
+q->queue_hw_ctx[set->map[type].mq_map[cpu]]
 
-Otherwise this looks good to me:
+is one less pointer dereference, so more efficient.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+-- 
+Jens Axboe
