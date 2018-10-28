@@ -1,37 +1,32 @@
-Return-Path: <hare@suse.de>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH 11/28] bsg: pass in desired timeout handler
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org
-Cc: Johannes Thumshirn <jthumshirn@suse.de>,
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-ide@vger.kernel.org, Johannes Thumshirn <jthumshirn@suse.de>,
  Benjamin Block <bblock@linux.vnet.ibm.com>
 References: <20181025211039.11559-1-axboe@kernel.dk>
  <20181025211039.11559-12-axboe@kernel.dk>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <fb56ccc0-9b5e-b474-8a72-1ea65e389993@suse.de>
-Date: Mon, 29 Oct 2018 07:55:07 +0100
+ <20181028155305.GA1559@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <e80c6442-0770-9897-bedb-03dd5304911f@kernel.dk>
+Date: Sun, 28 Oct 2018 17:05:31 -0600
 MIME-Version: 1.0
-In-Reply-To: <20181025211039.11559-12-axboe@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20181028155305.GA1559@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/25/18 11:10 PM, Jens Axboe wrote:
-> This will ease in the conversion to blk-mq, where we can't set
-> a timeout handler after queue init.
+On 10/28/18 9:53 AM, Christoph Hellwig wrote:
+> On Thu, Oct 25, 2018 at 03:10:22PM -0600, Jens Axboe wrote:
+>> This will ease in the conversion to blk-mq, where we can't set
+>> a timeout handler after queue init.
 > 
-> Cc: Johannes Thumshirn <jthumshirn@suse.de>
-> Cc: Benjamin Block <bblock@linux.vnet.ibm.com>
-> Cc: linux-scsi@vger.kernel.org
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> ---
->   block/bsg-lib.c                     | 3 ++-
->   drivers/scsi/scsi_transport_fc.c    | 7 +++----
->   drivers/scsi/scsi_transport_iscsi.c | 2 +-
->   drivers/scsi/scsi_transport_sas.c   | 4 ++--
->   include/linux/bsg-lib.h             | 2 +-
->   5 files changed, 9 insertions(+), 9 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+> On thing I hoped to archive with the last round of bsg cleanups is
+> to isolate the users of bsg from even knowing there is a struct
+> request underneath.  Based on that it would be nice to pass
+> the struct bsg_job to the actual timeout handlers instead of
+> struct request.
 
-Cheers,
+Makes sense, I can make that change.
 
-Hannes
+-- 
+Jens Axboe
