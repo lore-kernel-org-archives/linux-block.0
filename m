@@ -1,53 +1,47 @@
-Return-Path: <prvs=834be3197=sblbir@amzn.com>
-From: Balbir Singh <sblbir@amzn.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        "Balbir
- Singh" <sblbir@amzn.com>
-Subject: [PATCH] Add cmd_flags to print_req_error
-Date: Tue, 30 Oct 2018 02:40:15 +0000
-Message-ID: <20181030024015.1092-1-sblbir@amzn.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <bart.vanassche@gmail.com>
+Return-Path: <bart.vanassche@gmail.com>
+Message-ID: <1540837876.196084.75.camel@acm.org>
+Subject: Re: [PATCH 08/14] blk-mq: separate number of hardware queues from
+ nr_cpu_ids
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Mon, 29 Oct 2018 11:31:16 -0700
+In-Reply-To: <20181029163738.10172-9-axboe@kernel.dk>
+References: <20181029163738.10172-1-axboe@kernel.dk>
+	 <20181029163738.10172-9-axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-7"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-I ran into a bug where after hibernation due to incompatible
-backends, the block driver returned BLK_STS_NOTSUPP, with the
-current message it's hard to find out what the command flags
-were. Adding req->cmd_flags help make the problem easier to
-diagnose.
+On Mon, 2018-10-29 at 10:37 -0600, Jens Axboe wrote:
++AD4 With multiple maps, nr+AF8-cpu+AF8-ids is no longer the maximum number of
++AD4 hardware queues we support on a given devices. The initializer of
++AD4 the tag+AF8-set can have set -+AD4-nr+AF8-hw+AF8-queues larger than the available
++AD4 number of CPUs, since we can exceed that with multiple queue maps.
++AD4 
++AD4 Reviewed-by: Hannes Reinecke +ADw-hare+AEA-suse.com+AD4
++AD4 Signed-off-by: Jens Axboe +ADw-axboe+AEA-kernel.dk+AD4
++AD4 ---
++AD4  block/blk-mq.c +AHw 28 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+--------
++AD4  1 file changed, 21 insertions(+-), 7 deletions(-)
++AD4 
++AD4 diff --git a/block/blk-mq.c b/block/blk-mq.c
++AD4 index 0fab36372ace..60a951c4934c 100644
++AD4 --- a/block/blk-mq.c
++AD4 +-+-+- b/block/blk-mq.c
++AD4 +AEAAQA -2663,6 +-2663,19 +AEAAQA static void blk+AF8-mq+AF8-realloc+AF8-hw+AF8-ctxs(struct blk+AF8-mq+AF8-tag+AF8-set +ACo-set,
++AD4  	mutex+AF8-unlock(+ACY-q-+AD4-sysfs+AF8-lock)+ADs
++AD4  +AH0
++AD4  
++AD4 +-/+ACo
++AD4 +- +ACo Maximum number of queues we support. For single sets, we'll never have
+                       +AF4
+                   hardware?
++AD4 +- +ACo more than the CPUs (software queues). For multiple sets, the tag+AF8-set
++AD4 +- +ACo user may have set -+AD4-nr+AF8-hw+AF8-queues larger.
++AD4 +- +ACo-/
 
-Signed-off-by: Balbir Singh <sblbir@amzn.com>
-Reviewed-by: Eduardo Valentin <eduval@amazon.com>
----
+Anyway:
 
-Testing: Compile tested at my end
-
-Changelog
-  - convert %llx to %x and remove casting to unsigned long long
-
- block/blk-core.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index cdfabc5646da..0fd6104bb0d2 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -256,10 +256,11 @@ static void print_req_error(struct request *req, blk_status_t status)
- 	if (WARN_ON_ONCE(idx >= ARRAY_SIZE(blk_errors)))
- 		return;
- 
--	printk_ratelimited(KERN_ERR "%s: %s error, dev %s, sector %llu\n",
--			   __func__, blk_errors[idx].name, req->rq_disk ?
--			   req->rq_disk->disk_name : "?",
--			   (unsigned long long)blk_rq_pos(req));
-+	printk_ratelimited(KERN_ERR "%s: %s error, dev %s, sector %llu flags %x\n",
-+				__func__, blk_errors[idx].name,
-+				req->rq_disk ?  req->rq_disk->disk_name : "?",
-+				(unsigned long long)blk_rq_pos(req),
-+				req->cmd_flags);
- }
- 
- static void req_bio_endio(struct request *rq, struct bio *bio,
--- 
-2.16.2
+Reviewed-by: Bart Van Assche +ADw-bvanassche+AEA-acm.org+AD4
