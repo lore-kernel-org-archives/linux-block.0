@@ -1,37 +1,27 @@
-Return-Path: <jthumshirn@suse.de>
+Return-Path: <hare@suse.de>
 Subject: Re: [PATCH 16/28] blk-cgroup: remove legacy queue bypassing
 To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
  linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org
 References: <20181025211039.11559-1-axboe@kernel.dk>
  <20181025211039.11559-17-axboe@kernel.dk>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-Message-ID: <5f058345-522c-c24c-d09d-079046e99d7e@suse.de>
-Date: Mon, 29 Oct 2018 12:00:57 +0100
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <20913e63-f631-deb1-406e-36a64319a06a@suse.de>
+Date: Mon, 29 Oct 2018 08:00:13 +0100
 MIME-Version: 1.0
 In-Reply-To: <20181025211039.11559-17-axboe@kernel.dk>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
-
-On 25/10/18 23:10, Jens Axboe wrote:
-[...]
-> @@ -1487,8 +1485,6 @@ int blkcg_activate_policy(struct request_queue *q,
->  out_bypass_end:
->  	if (q->mq_ops)
->  		blk_mq_unfreeze_queue(q);
-> -	else
-> -		blk_queue_bypass_end(q);
-
->  
+On 10/25/18 11:10 PM, Jens Axboe wrote:
+> We only support mq devices now.
 > 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>   block/blk-cgroup.c | 8 --------
+>   1 file changed, 8 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Now that we only have mq, do we still need all these checks for q->mq_ops?
+Cheers,
 
--- 
-Johannes Thumshirn                                        SUSE Labs
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Hannes
