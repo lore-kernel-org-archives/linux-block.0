@@ -1,155 +1,175 @@
-Return-Path: <christophe.leroy@c-s.fr>
-Message-Id: <cover.1539092111.git.christophe.leroy@c-s.fr>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v3 00/24] ban the use of _PAGE_XXX flags outside platform specific code
-To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
-Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
-Date: Tue,  9 Oct 2018 13:51:31 +0000 (UTC)
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-dm3nam03on0063.outbound.protection.outlook.com ([104.47.41.63]:6074
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729459AbeJ2Sjc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 Oct 2018 14:39:32 -0400
+From: Javier Gonzalez <javier@cnexlabs.com>
+To: "Konopko, Igor J" <igor.j.konopko@intel.com>
+CC: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>,
+        Hans Holmberg <hans.ml.holmberg@owltronix.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v2 1/5] lightnvm: pblk: Move lba list to partial read
+ context
+Date: Mon, 29 Oct 2018 09:51:33 +0000
+Message-ID: <DA401113-E529-4803-9877-22462557FEB9@cnexlabs.com>
+References: <20181022103611.39271-1-igor.j.konopko@intel.com>
+ <20181022103611.39271-2-igor.j.konopko@intel.com>
+In-Reply-To: <20181022103611.39271-2-igor.j.konopko@intel.com>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_CD40B27D-6CE7-43FD-B12F-6204E9F946CE";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha512
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Today flags like for instance _PAGE_RW or _PAGE_USER are used through
-common parts of code.
-Using those directly in common parts of code have proven to lead to
-mistakes or misbehaviour, because their use is not always as trivial
-as one could think.
+--Apple-Mail=_CD40B27D-6CE7-43FD-B12F-6204E9F946CE
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-For instance, (flags & _PAGE_USER) == 0 isn't enough to tell
-that a page is a kernel page, because some targets are using
-_PAGE_PRIVILEDGED and not _PAGE_USER, so the test has to be 
-(flags & (_PAGE_USER | _PAGE_PRIVILEDGED)) == _PAGE_PRIVILEDGED
-This has too (bad) consequences:
+> On 22 Oct 2018, at 12.36, Igor Konopko <igor.j.konopko@intel.com> =
+wrote:
+>=20
+> Currently DMA allocated memory is reused on partial read
+> for lba_list_mem and lba_list_media arrays. In preparation
+> for dynamic DMA pool sizes we need to move this arrays
+> into pblk_pr_ctx structures.
+>=20
+> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+> ---
+> drivers/lightnvm/pblk-read.c | 20 +++++---------------
+> drivers/lightnvm/pblk.h      |  2 ++
+> 2 files changed, 7 insertions(+), 15 deletions(-)
+>=20
+> diff --git a/drivers/lightnvm/pblk-read.c =
+b/drivers/lightnvm/pblk-read.c
+> index 9fba614adeeb..19917d3c19b3 100644
+> --- a/drivers/lightnvm/pblk-read.c
+> +++ b/drivers/lightnvm/pblk-read.c
+> @@ -224,7 +224,6 @@ static void pblk_end_partial_read(struct nvm_rq =
+*rqd)
+> 	unsigned long *read_bitmap =3D pr_ctx->bitmap;
+> 	int nr_secs =3D pr_ctx->orig_nr_secs;
+> 	int nr_holes =3D nr_secs - bitmap_weight(read_bitmap, nr_secs);
+> -	__le64 *lba_list_mem, *lba_list_media;
+> 	void *src_p, *dst_p;
+> 	int hole, i;
+>=20
+> @@ -237,13 +236,9 @@ static void pblk_end_partial_read(struct nvm_rq =
+*rqd)
+> 		rqd->ppa_list[0] =3D ppa;
+> 	}
+>=20
+> -	/* Re-use allocated memory for intermediate lbas */
+> -	lba_list_mem =3D (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
+> -	lba_list_media =3D (((void *)rqd->ppa_list) + 2 * =
+pblk_dma_ppa_size);
+> -
+> 	for (i =3D 0; i < nr_secs; i++) {
+> -		lba_list_media[i] =3D meta_list[i].lba;
+> -		meta_list[i].lba =3D lba_list_mem[i];
+> +		pr_ctx->lba_list_media[i] =3D meta_list[i].lba;
+> +		meta_list[i].lba =3D pr_ctx->lba_list_mem[i];
+> 	}
+>=20
+> 	/* Fill the holes in the original bio */
+> @@ -255,7 +250,7 @@ static void pblk_end_partial_read(struct nvm_rq =
+*rqd)
+> 		line =3D pblk_ppa_to_line(pblk, rqd->ppa_list[i]);
+> 		kref_put(&line->ref, pblk_line_put);
+>=20
+> -		meta_list[hole].lba =3D lba_list_media[i];
+> +		meta_list[hole].lba =3D pr_ctx->lba_list_media[i];
+>=20
+> 		src_bv =3D new_bio->bi_io_vec[i++];
+> 		dst_bv =3D bio->bi_io_vec[bio_init_idx + hole];
+> @@ -295,13 +290,9 @@ static int pblk_setup_partial_read(struct pblk =
+*pblk, struct nvm_rq *rqd,
+> 	struct pblk_g_ctx *r_ctx =3D nvm_rq_to_pdu(rqd);
+> 	struct pblk_pr_ctx *pr_ctx;
+> 	struct bio *new_bio, *bio =3D r_ctx->private;
+> -	__le64 *lba_list_mem;
+> 	int nr_secs =3D rqd->nr_ppas;
+> 	int i;
+>=20
+> -	/* Re-use allocated memory for intermediate lbas */
+> -	lba_list_mem =3D (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
+> -
+> 	new_bio =3D bio_alloc(GFP_KERNEL, nr_holes);
+>=20
+> 	if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
+> @@ -312,12 +303,12 @@ static int pblk_setup_partial_read(struct pblk =
+*pblk, struct nvm_rq *rqd,
+> 		goto fail_free_pages;
+> 	}
+>=20
+> -	pr_ctx =3D kmalloc(sizeof(struct pblk_pr_ctx), GFP_KERNEL);
+> +	pr_ctx =3D kzalloc(sizeof(struct pblk_pr_ctx), GFP_KERNEL);
+> 	if (!pr_ctx)
+> 		goto fail_free_pages;
+>=20
+> 	for (i =3D 0; i < nr_secs; i++)
+> -		lba_list_mem[i] =3D meta_list[i].lba;
+> +		pr_ctx->lba_list_mem[i] =3D meta_list[i].lba;
+>=20
+> 	new_bio->bi_iter.bi_sector =3D 0; /* internal bio */
+> 	bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
+> @@ -325,7 +316,6 @@ static int pblk_setup_partial_read(struct pblk =
+*pblk, struct nvm_rq *rqd,
+> 	rqd->bio =3D new_bio;
+> 	rqd->nr_ppas =3D nr_holes;
+>=20
+> -	pr_ctx->ppa_ptr =3D NULL;
+> 	pr_ctx->orig_bio =3D bio;
+> 	bitmap_copy(pr_ctx->bitmap, read_bitmap, NVM_MAX_VLBA);
+> 	pr_ctx->bio_init_idx =3D bio_init_idx;
+> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+> index 02bb2e98f8a9..2aca840c7838 100644
+> --- a/drivers/lightnvm/pblk.h
+> +++ b/drivers/lightnvm/pblk.h
+> @@ -132,6 +132,8 @@ struct pblk_pr_ctx {
+> 	unsigned int bio_init_idx;
+> 	void *ppa_ptr;
+> 	dma_addr_t dma_ppa_list;
+> +	__le64 lba_list_mem[NVM_MAX_VLBA];
+> +	__le64 lba_list_media[NVM_MAX_VLBA];
+> };
+>=20
+> /* Pad context */
+> --
+> 2.14.4
 
- - All targets must define every bit, even the unsupported ones,
-   leading to a lot of useless #define _PAGE_XXX 0
- - If someone forgets to take into account all possible _PAGE_XXX bits
-   for the case, we can get unexpected behaviour on some targets.
 
-This becomes even more complex when we come to using _PAGE_RW.
-Testing (flags & _PAGE_RW) is not enough to test whether a page
-if writable or not, because:
+Looks good.
 
- - Some targets have _PAGE_RO instead, which has to be unset to tell
-   a page is writable
- - Some targets have _PAGE_R and _PAGE_W, in which case
-   _PAGE_RW = _PAGE_R | _PAGE_W
- - Even knowing whether a page is readable is not always trivial because:
-   - Some targets requires to check that _PAGE_R is set to ensure page
-   is readable
-   - Some targets requires to check that _PAGE_NA is not set
-   - Some targets requires to check that _PAGE_RO or _PAGE_RW is set
+Reviewed-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
 
-Etc ....
 
-In order to work around all those issues and minimise the risks of errors,
-this serie aims at removing all use of _PAGE_XXX flags from powerpc code
-and always use pte_xxx() and pte_mkxxx() accessors instead. Those accessors
-are then defined in platform specific parts of the kernel code.
+--Apple-Mail=_CD40B27D-6CE7-43FD-B12F-6204E9F946CE
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
 
-Compared to the RFC, v2 adds three things:
-- A work on ioremap() alike functions: properly set the base flags
-  by all callers and removed the hack which sets the base flags when
-  the caller don't give them.
-- _PAGE_EXEC flag is replaced by a bool in the call to hash_preload()
-- Optimisation of pte_mkXXX() helpers on book3s64 to avoid multiple
-endian conversions.
+-----BEGIN PGP SIGNATURE-----
 
-v2:
- - Takes into account comments received on the RFC.
- - compilation test result: http://kisskb.ellerman.id.au/kisskb/head/51b7f5d55900688c7c07cdb945d34b3314befa36/
+iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAlvW2CQACgkQIX4xUKFR
+nnSVMA/9FhU/hnOdzkoUXNjXsJ0Jm0kJh55FDv+bgGv+Mjigp0ZuRGn2mF8ZVD9U
+wrETmSLK1uXKFM1L8GrkNKMDx9nNLTYtPH7Yko2z401eva5LzMXJuP4YGa4BwdPU
+AQ5Hc6eGrZUc26P74mJCd59yvagD0zehSn79MtoVrHZDfmRA99QrbesnIRwNWS91
+5P3K+N2OtWN8DjoUSL6sY11eSkez7TvDdtXug/6Rt+wXWZNb5fL46K29w9ZuBNlO
+WBlCeEYT7Hk5u4L7oNqJtIn57cxRfTE0qq//qIrLYNiJAiTUUwfcrPqZYJ2zjDDS
+Ge2yu+EtYY7DX/6SMVz197DrHSV5U4IXwVinPUklLLAwOgY8Qi0uPKdAN48bGqCa
+TS29/VHMQ6RRpkr+0TuafdSvypWGXXQbk+6Pk+RnXGNTobJeRFaRlIm3Gl18Rk2L
+Q45pRMDYuYly3akxudTIFs4YHrGlwpM0WWNSxa8vITv1KSTDuNueOimID9sbSdm3
+C8m4ElHFm1sTHHQeXookc0GlVmf8TdxDhWJI8vmKXZ6OCgW+MjdU2Zp4VOflYnQO
+7DqQAZldZv1NVILcz+VkFaAufH/YgYtAmpHKwAIPAyyP5YLgMWS5defAd4stMZ9C
+YKmx0gSS8JL7HZntmPz2/mTsWMkG+2NiJkTEaHyfMBNkWVer4Uk=
+=rL2+
+-----END PGP SIGNATURE-----
 
-v3:
- - rebased on lastest 'merge' powerpc branch
- - added a new helper pte_hw_valid() and using it in set_pte_at(), see discussion at https://patchwork.ozlabs.org/patch/972630/
- - compilation result: http://kisskb.ellerman.id.au/kisskb/head/914a399c8f1434f3c52013e625fb1665571033ef/
-
-Christophe Leroy (24):
-  powerpc/32: Add ioremap_wt() and ioremap_coherent()
-  drivers/video/fbdev: use ioremap_wc/wt() instead of __ioremap()
-  drivers/block/z2ram: use ioremap_wt() instead of
-    __ioremap(_PAGE_WRITETHRU)
-  soc/fsl/qbman: use ioremap_cache() instead of ioremap_prot(0)
-  powerpc: don't use ioremap_prot() nor __ioremap() unless really
-    needed.
-  powerpc/mm: properly set PAGE_KERNEL flags in ioremap()
-  powerpc: handover page flags with a pgprot_t parameter
-  powerpc/mm: don't use _PAGE_EXEC in book3s/32
-  powerpc/mm: move some nohash pte helpers in nohash/[32:64]/pgtable.h
-  powerpc/mm: add pte helpers to query and change pte flags
-  powerpc/mm: don't use _PAGE_EXEC for calling hash_preload()
-  powerpc/mm: use pte helpers in generic code
-  powerpc/mm: Split dump_pagelinuxtables flag_array table
-  powerpc/mm: drop unused page flags
-  powerpc/mm: move __P and __S tables in the common pgtable.h
-  powerpc/book3s/32: do not include pte-common.h
-  powerpc/mm: Move pte_user() into nohash/pgtable.h
-  powerpc/mm: Distribute platform specific PAGE and PMD flags and
-    definitions
-  powerpc/nohash/64: do not include pte-common.h
-  powerpc/mm: Allow platforms to redefine some helpers
-  powerpc/mm: Define platform default caches related flags
-  powerpc/mm: Get rid of pte-common.h
-  powerpc/8xx: change name of a few page flags to avoid confusion
-  powerpc/book3s64: Avoid multiple endian conversion in pte helpers
-
- arch/powerpc/include/asm/book3s/32/pgtable.h       | 151 ++++++++++++--
- arch/powerpc/include/asm/book3s/64/hash.h          |   3 +-
- arch/powerpc/include/asm/book3s/64/pgtable.h       | 133 +++++++------
- arch/powerpc/include/asm/fixmap.h                  |   2 +-
- arch/powerpc/include/asm/io.h                      |  13 +-
- arch/powerpc/include/asm/machdep.h                 |   2 +-
- arch/powerpc/include/asm/nohash/32/pgtable.h       |  66 ++++++-
- arch/powerpc/include/asm/nohash/32/pte-40x.h       |  48 +++++
- arch/powerpc/include/asm/nohash/32/pte-44x.h       |  35 ++++
- arch/powerpc/include/asm/nohash/32/pte-8xx.h       |  92 ++++++++-
- arch/powerpc/include/asm/nohash/32/pte-fsl-booke.h |  38 ++++
- arch/powerpc/include/asm/nohash/64/pgtable.h       |  40 +++-
- arch/powerpc/include/asm/nohash/pgtable.h          |  98 ++++++---
- arch/powerpc/include/asm/nohash/pte-book3e.h       |  30 +++
- arch/powerpc/include/asm/pgtable.h                 |  19 ++
- arch/powerpc/include/asm/pte-common.h              | 219 ---------------------
- arch/powerpc/kernel/btext.c                        |   2 +-
- arch/powerpc/kernel/crash_dump.c                   |   2 +-
- arch/powerpc/kernel/head_8xx.S                     |   6 +-
- arch/powerpc/kernel/io-workarounds.c               |   4 +-
- arch/powerpc/kernel/isa-bridge.c                   |   6 +-
- arch/powerpc/kernel/pci_64.c                       |   2 +-
- arch/powerpc/lib/code-patching.c                   |   3 +-
- arch/powerpc/mm/8xx_mmu.c                          |   5 +-
- arch/powerpc/mm/Makefile                           |   7 +
- arch/powerpc/mm/dma-noncoherent.c                  |   2 +-
- arch/powerpc/mm/dump_linuxpagetables-8xx.c         |  82 ++++++++
- arch/powerpc/mm/dump_linuxpagetables-book3s64.c    | 115 +++++++++++
- arch/powerpc/mm/dump_linuxpagetables-generic.c     |  82 ++++++++
- arch/powerpc/mm/dump_linuxpagetables.c             | 155 +--------------
- arch/powerpc/mm/dump_linuxpagetables.h             |  19 ++
- arch/powerpc/mm/hash_utils_64.c                    |   3 +-
- arch/powerpc/mm/mem.c                              |  13 +-
- arch/powerpc/mm/mmu_decl.h                         |   2 +-
- arch/powerpc/mm/pgtable-book3e.c                   |   9 +-
- arch/powerpc/mm/pgtable-hash64.c                   |   7 +-
- arch/powerpc/mm/pgtable.c                          |  27 +--
- arch/powerpc/mm/pgtable_32.c                       |  70 ++++---
- arch/powerpc/mm/pgtable_64.c                       |  55 +++---
- arch/powerpc/mm/ppc_mmu_32.c                       |   2 +-
- arch/powerpc/platforms/4xx/ocm.c                   |   7 +-
- arch/powerpc/platforms/85xx/smp.c                  |   4 +-
- arch/powerpc/platforms/pasemi/dma_lib.c            |   2 +-
- arch/powerpc/platforms/ps3/spu.c                   |   3 +-
- arch/powerpc/sysdev/fsl_85xx_cache_sram.c          |   8 +-
- arch/powerpc/xmon/xmon.c                           |  12 +-
- drivers/block/z2ram.c                              |   3 +-
- drivers/pcmcia/electra_cf.c                        |   2 +-
- drivers/soc/fsl/qbman/qman_ccsr.c                  |   2 +-
- drivers/video/fbdev/chipsfb.c                      |   3 +-
- drivers/video/fbdev/controlfb.c                    |   5 +-
- drivers/video/fbdev/platinumfb.c                   |   5 +-
- drivers/video/fbdev/valkyriefb.c                   |  12 +-
- 53 files changed, 1094 insertions(+), 643 deletions(-)
- delete mode 100644 arch/powerpc/include/asm/pte-common.h
- create mode 100644 arch/powerpc/mm/dump_linuxpagetables-8xx.c
- create mode 100644 arch/powerpc/mm/dump_linuxpagetables-book3s64.c
- create mode 100644 arch/powerpc/mm/dump_linuxpagetables-generic.c
- create mode 100644 arch/powerpc/mm/dump_linuxpagetables.h
-
--- 
-2.13.3
+--Apple-Mail=_CD40B27D-6CE7-43FD-B12F-6204E9F946CE--
