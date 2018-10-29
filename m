@@ -1,17 +1,19 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:37363 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726886AbeJaDVR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Oct 2018 23:21:17 -0400
-Subject: Re: [PATCH v2] block: fix rdma queue mapping
-To: "Saleem, Shiraz" <shiraz.saleem@intel.com>
-Cc: Steve Wise <swise@opengridcomputing.com>,
+Received: from mga14.intel.com ([192.55.52.115]:9551 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725858AbeJ3Iti (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Oct 2018 04:49:38 -0400
+From: "Saleem, Shiraz" <shiraz.saleem@intel.com>
+To: Sagi Grimberg <sagi@grimberg.me>
+CC: Steve Wise <swise@opengridcomputing.com>,
         'Christoph Hellwig' <hch@lst.de>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        'Max Gurtovoy' <maxg@mellanox.com>
+        "'Max Gurtovoy'" <maxg@mellanox.com>
+Subject: RE: [PATCH v2] block: fix rdma queue mapping
+Date: Mon, 29 Oct 2018 23:58:31 +0000
+Message-ID: <9DD61F30A802C4429A01CA4200E302A7A2FFFC0B@fmsmsx116.amr.corp.intel.com>
 References: <20180820205420.25908-1-sagi@grimberg.me>
  <20180822131130.GC28149@lst.de>
  <83dd169f-034b-3460-7496-ef2e6766ea55@grimberg.me>
@@ -22,34 +24,18 @@ References: <20180820205420.25908-1-sagi@grimberg.me>
  <ab0370aa-c488-bfed-675a-b0f84d75a42a@grimberg.me>
  <20181024000923.GA17352@ssaleem-MOBL4.amr.corp.intel.com>
  <60315f82-ebc1-838d-4757-c27b9bb650ff@grimberg.me>
- <9DD61F30A802C4429A01CA4200E302A7A2FFFC0B@fmsmsx116.amr.corp.intel.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <c7fcc95b-655f-2318-4a73-441c7f694225@grimberg.me>
-Date: Tue, 30 Oct 2018 11:26:39 -0700
+In-Reply-To: <60315f82-ebc1-838d-4757-c27b9bb650ff@grimberg.me>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <9DD61F30A802C4429A01CA4200E302A7A2FFFC0B@fmsmsx116.amr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-
->> Subject: Re: [PATCH v2] block: fix rdma queue mapping
->>
->>
->>> Sagi - From what I can tell, i40iw is also exposed to this same issue
->>> if the IRQ affinity is configured by user.
->>
->> managed affinity does not allow setting smp_affinity from userspace.
-> 
-> OK. But our device IRQs are not set-up as to be managed affinity based and can be tuned by user.
-> And it seems that is reasonable approach since we can never tell ahead of time what might be an optimal config. for a particular workload.
-
-I understand, but its not necessarily the case, the vast majority of
-users don't touch (or at least don't want to) and managed affinity gives
-you benefits of linear assignment good practice (among others).
-
-The same argument can be made for a number of pcie devices that do use
-managed affinity, but the choice was to get it right from the start.
-Still not sure why (r)nics are different with that respect.
-
-Anyways, I was just asking, wasn't telling you to go and use it..
+PlN1YmplY3Q6IFJlOiBbUEFUQ0ggdjJdIGJsb2NrOiBmaXggcmRtYSBxdWV1ZSBtYXBwaW5nDQo+
+DQo+DQo+PiBTYWdpIC0gRnJvbSB3aGF0IEkgY2FuIHRlbGwsIGk0MGl3IGlzIGFsc28gZXhwb3Nl
+ZCB0byB0aGlzIHNhbWUgaXNzdWUNCj4+IGlmIHRoZSBJUlEgYWZmaW5pdHkgaXMgY29uZmlndXJl
+ZCBieSB1c2VyLg0KPg0KPm1hbmFnZWQgYWZmaW5pdHkgZG9lcyBub3QgYWxsb3cgc2V0dGluZyBz
+bXBfYWZmaW5pdHkgZnJvbSB1c2Vyc3BhY2UuDQoNCk9LLiBCdXQgb3VyIGRldmljZSBJUlFzIGFy
+ZSBub3Qgc2V0LXVwIGFzIHRvIGJlIG1hbmFnZWQgYWZmaW5pdHkgYmFzZWQgYW5kIGNhbiBiZSB0
+dW5lZCBieSB1c2VyLg0KQW5kIGl0IHNlZW1zIHRoYXQgaXMgcmVhc29uYWJsZSBhcHByb2FjaCBz
+aW5jZSB3ZSBjYW4gbmV2ZXIgdGVsbCBhaGVhZCBvZiB0aW1lIHdoYXQgbWlnaHQgYmUgYW4gb3B0
+aW1hbCBjb25maWcuIGZvciBhIHBhcnRpY3VsYXIgd29ya2xvYWQuDQoNClNoaXJheg0K
