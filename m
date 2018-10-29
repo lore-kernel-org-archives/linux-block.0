@@ -1,46 +1,76 @@
 Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 07/14] blk-mq: support multiple hctx maps
+To: Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20181029163738.10172-1-axboe@kernel.dk>
+ <20181029163738.10172-8-axboe@kernel.dk> <1540836903.196084.70.camel@acm.org>
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-ide@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 05/29] blk-mq: remove the request_list usage
-Date: Mon, 29 Oct 2018 10:34:20 -0600
-Message-Id: <20181029163444.9940-6-axboe@kernel.dk>
-In-Reply-To: <20181029163444.9940-1-axboe@kernel.dk>
-References: <20181029163444.9940-1-axboe@kernel.dk>
+Message-ID: <214cdac8-9c13-213b-023f-2fb1bf67c8db@kernel.dk>
+Date: Mon, 29 Oct 2018 13:24:23 -0600
+MIME-Version: 1.0
+In-Reply-To: <1540836903.196084.70.camel@acm.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-We don't do anything with it, that's just the legacy path.
+On 10/29/18 12:15 PM, Bart Van Assche wrote:
+> On Mon, 2018-10-29 at 10:37 -0600, Jens Axboe wrote:
+>> -static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
+>> -						     unsigned int flags,
+>> -						     int cpu)
+>> +static inline struct blk_mq_hw_ctx *blk_mq_map_queue_type(struct request_queue *q,
+>> +							  int type, int cpu)
+>>  {
+>>  	struct blk_mq_tag_set *set = q->tag_set;
+>>  
+>> -	return q->queue_hw_ctx[set->map[0].mq_map[cpu]];
+>> +	return q->queue_hw_ctx[set->map[type].mq_map[cpu]];
+>>  }
+>>  
+>> -static inline struct blk_mq_hw_ctx *blk_mq_map_queue_type(struct request_queue *q,
+>> -							  int type, int cpu)
+>> +static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
+>> +						     unsigned int flags,
+>> +						     int cpu)
+>>  {
+>> -	return blk_mq_map_queue(q, type, cpu);
+>> +	int type = 0;
+>> +
+>> +	if (q->mq_ops->flags_to_type)
+>> +		type = q->mq_ops->flags_to_type(q, flags);
+>> +
+>> +	return blk_mq_map_queue_type(q, type, cpu);
+>>  }
+> 
+> How about adding a comment above both these functions that explains their
+> purpose? Since blk_mq_map_queue() maps rq->cmd_flags and the cpu index to
+> a hardware context, how about renaming blk_mq_map_queue() into
+> blk_mq_map_cmd_flags()?
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-mq.c | 5 -----
- 1 file changed, 5 deletions(-)
+I don't want to rename it, but I've added a kerneldoc function header to
+both of them.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3f91c6e5b17a..4c82dc44d4d8 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -510,9 +510,6 @@ void blk_mq_free_request(struct request *rq)
- 
- 	rq_qos_done(q, rq);
- 
--	if (blk_rq_rl(rq))
--		blk_put_rl(blk_rq_rl(rq));
--
- 	WRITE_ONCE(rq->state, MQ_RQ_IDLE);
- 	if (refcount_dec_and_test(&rq->ref))
- 		__blk_mq_free_request(rq);
-@@ -1675,8 +1672,6 @@ static void blk_mq_bio_to_request(struct request *rq, struct bio *bio)
- {
- 	blk_init_request_from_bio(rq, bio);
- 
--	blk_rq_set_rl(rq, blk_get_rl(rq->q, bio));
--
- 	blk_account_io_start(rq, true);
- }
- 
+>> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+>> index f9e19962a22f..837087cf07cc 100644
+>> --- a/include/linux/blk-mq.h
+>> +++ b/include/linux/blk-mq.h
+>> @@ -86,6 +86,7 @@ enum {
+>>  
+>>  struct blk_mq_tag_set {
+>>  	struct blk_mq_queue_map	map[HCTX_MAX_TYPES];
+>> +	unsigned int		nr_maps;
+>>  	const struct blk_mq_ops	*ops;
+>>  	unsigned int		nr_hw_queues;
+>>  	unsigned int		queue_depth;	/* max hw supported */
+>> @@ -109,6 +110,7 @@ struct blk_mq_queue_data {
+>>  
+>>  typedef blk_status_t (queue_rq_fn)(struct blk_mq_hw_ctx *,
+>>  		const struct blk_mq_queue_data *);
+>> +typedef int (flags_to_type_fn)(struct request_queue *, unsigned int);
+> 
+> How about adding a comment that the format of the second argument of
+> flags_to_type_fn is the same as that of rq->cmd_flags?
+
+Done
+
 -- 
-2.17.1
+Jens Axboe
