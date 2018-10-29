@@ -1,66 +1,30 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-        Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH 09/11] block: Expose queue nr_zones in sysfs
-Date: Wed, 10 Oct 2018 10:52:37 +0900
-Message-Id: <20181010015239.24930-10-damien.lemoal@wdc.com>
-In-Reply-To: <20181010015239.24930-1-damien.lemoal@wdc.com>
-References: <20181010015239.24930-1-damien.lemoal@wdc.com>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 09/14] blk-mq: ensure that plug lists don't straddle
+ hardware queues
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org
+References: <20181025211626.12692-1-axboe@kernel.dk>
+ <20181025211626.12692-10-axboe@kernel.dk>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <3782335d-54a8-44fc-75f6-a2a495b6caf1@suse.de>
+Date: Mon, 29 Oct 2018 08:40:57 +0100
+MIME-Version: 1.0
+In-Reply-To: <20181025211626.12692-10-axboe@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Expose through sysfs the nr_zones field of a zoned block device request
-queue. This represents the total number of zones of the device
-calculated using the known disk capacity and zone size.
+On 10/25/18 11:16 PM, Jens Axboe wrote:
+> Since we insert per hardware queue, we have to ensure that every
+> request on the plug list being inserted belongs to the same
+> hardware queue.
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>   block/blk-mq.c | 27 +++++++++++++++++++++++++--
+>   1 file changed, 25 insertions(+), 2 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Exposing this value helps in debugging disk issues as well as
-facilitating scripts based use of the disk (e.g. blktests).
+Cheers,
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/blk-sysfs.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 3772671cf2bc..f7060a938bf9 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -300,6 +300,11 @@ static ssize_t queue_zoned_show(struct request_queue *q, char *page)
- 	}
- }
- 
-+static ssize_t queue_nr_zones_show(struct request_queue *q, char *page)
-+{
-+	return queue_var_show(q->nr_zones, page);
-+}
-+
- static ssize_t queue_nomerges_show(struct request_queue *q, char *page)
- {
- 	return queue_var_show((blk_queue_nomerges(q) << 1) |
-@@ -637,6 +642,11 @@ static struct queue_sysfs_entry queue_zoned_entry = {
- 	.show = queue_zoned_show,
- };
- 
-+static struct queue_sysfs_entry queue_nr_zones_entry = {
-+	.attr = {.name = "nr_zones", .mode = 0444 },
-+	.show = queue_nr_zones_show,
-+};
-+
- static struct queue_sysfs_entry queue_nomerges_entry = {
- 	.attr = {.name = "nomerges", .mode = 0644 },
- 	.show = queue_nomerges_show,
-@@ -727,6 +737,7 @@ static struct attribute *default_attrs[] = {
- 	&queue_write_zeroes_max_entry.attr,
- 	&queue_nonrot_entry.attr,
- 	&queue_zoned_entry.attr,
-+	&queue_nr_zones_entry.attr,
- 	&queue_nomerges_entry.attr,
- 	&queue_rq_affinity_entry.attr,
- 	&queue_iostats_entry.attr,
--- 
-2.17.1
+Hannes
