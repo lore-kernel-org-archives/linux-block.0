@@ -1,56 +1,42 @@
-Return-Path: <prvs=81565c836=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH v2 06/11] block: Introduce BLKGETZONESZ ioctl
-Date: Thu, 11 Oct 2018 16:09:47 +0900
-Message-Id: <20181011070952.13248-7-damien.lemoal@wdc.com>
-In-Reply-To: <20181011070952.13248-1-damien.lemoal@wdc.com>
-References: <20181011070952.13248-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from imap.thunk.org ([74.207.234.97]:40026 "EHLO imap.thunk.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727597AbeJ3BFU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 Oct 2018 21:05:20 -0400
+From: Theodore Ts'o <tytso@mit.edu>
+To: linux-block@vger.kernel.org
+Cc: Theodore Ts'o <tytso@mit.edu>
+Subject: [PATCH blktests] Add use of logger so that syslog files show when each test starts
+Date: Mon, 29 Oct 2018 12:15:57 -0400
+Message-Id: <20181029161557.7652-1-tytso@mit.edu>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Get a zoned block device zone size in number of 512 B sectors.
-The zone size is always 0 for regular block devices.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Signed-off-by: Theodore Ts'o <tytso@mit.edu>
 ---
- block/ioctl.c                 | 2 ++
- include/uapi/linux/blkzoned.h | 2 ++
- 2 files changed, 4 insertions(+)
+ check | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 3884d810efd2..f6d2c6f1f050 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -532,6 +532,8 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
- 		return blkdev_report_zones_ioctl(bdev, mode, cmd, arg);
- 	case BLKRESETZONE:
- 		return blkdev_reset_zones_ioctl(bdev, mode, cmd, arg);
-+	case BLKGETZONESZ:
-+		return put_uint(arg, bdev_zone_sectors(bdev));
- 	case HDIO_GETGEO:
- 		return blkdev_getgeo(bdev, argp);
- 	case BLKRAGET:
-diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
-index ff5a5db8906a..281ac605f752 100644
---- a/include/uapi/linux/blkzoned.h
-+++ b/include/uapi/linux/blkzoned.h
-@@ -137,8 +137,10 @@ struct blk_zone_range {
-  *                 sector specified in the report request structure.
-  * @BLKRESETZONE: Reset the write pointer of the zones in the specified
-  *                sector range. The sector range must be zone aligned.
-+ * @BLKGETZONESZ: Get the device zone size in number of 512 B sectors.
-  */
- #define BLKREPORTZONE	_IOWR(0x12, 130, struct blk_zone_report)
- #define BLKRESETZONE	_IOW(0x12, 131, struct blk_zone_range)
-+#define BLKGETZONESZ	_IOW(0x12, 132, __u32)
+diff --git a/check b/check
+index f6c3537..ebd87c0 100755
+--- a/check
++++ b/check
+@@ -319,6 +319,7 @@ _call_test() {
+ 		local dmesg_marker=""
+ 		CHECK_DMESG=0
+ 	fi
++	$LOGGER_PROG "run blktests $TEST_NAME"
  
- #endif /* _UAPI_BLKZONED_H */
+ 	trap _cleanup EXIT
+ 	if ! TMPDIR="$(mktemp --tmpdir -p "$OUTPUT" -d "tmpdir.${TEST_NAME//\//.}.XXX")"; then
+@@ -578,6 +579,8 @@ fi
+ eval set -- "$TEMP"
+ unset TEMP
+ 
++LOGGER_PROG="$(type -P logger)" || LOGGER_PROG=true
++
+ if [[ -r config ]]; then
+ 	# shellcheck disable=SC1091
+ 	. config
 -- 
-2.17.1
+2.18.0.rc0
