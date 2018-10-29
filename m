@@ -1,53 +1,51 @@
-Return-Path: <prvs=81407a9e8=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
 	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH 07/11] block: Introduce BLKGETNRZONES ioctl
-Date: Wed, 10 Oct 2018 10:52:35 +0900
-Message-Id: <20181010015239.24930-8-damien.lemoal@wdc.com>
-In-Reply-To: <20181010015239.24930-1-damien.lemoal@wdc.com>
-References: <20181010015239.24930-1-damien.lemoal@wdc.com>
+	linux-ide@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 29/29] block: get rid of blk_queued_rq()
+Date: Mon, 29 Oct 2018 10:34:44 -0600
+Message-Id: <20181029163444.9940-30-axboe@kernel.dk>
+In-Reply-To: <20181029163444.9940-1-axboe@kernel.dk>
+References: <20181029163444.9940-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Get a zoned block device total number of zones. The device can be a
-partition of the whole device. The number of zones is always 0 for
-regular block devices.
+No point in hiding what this does, just open code it in the
+one spot where we are still using it.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/ioctl.c                 | 2 ++
- include/uapi/linux/blkzoned.h | 1 +
- 2 files changed, 3 insertions(+)
+ block/blk-mq.c         | 2 +-
+ include/linux/blkdev.h | 2 --
+ 2 files changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index f6d2c6f1f050..4825c78a6baa 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -534,6 +534,8 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
- 		return blkdev_reset_zones_ioctl(bdev, mode, cmd, arg);
- 	case BLKGETZONESZ:
- 		return put_uint(arg, bdev_zone_sectors(bdev));
-+	case BLKGETNRZONES:
-+		return put_uint(arg, blkdev_nr_zones(bdev));
- 	case HDIO_GETGEO:
- 		return blkdev_getgeo(bdev, argp);
- 	case BLKRAGET:
-diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
-index daf47351d519..1f96f7f41a86 100644
---- a/include/uapi/linux/blkzoned.h
-+++ b/include/uapi/linux/blkzoned.h
-@@ -142,5 +142,6 @@ struct blk_zone_range {
- #define BLKREPORTZONE	_IOWR(0x12, 130, struct blk_zone_report)
- #define BLKRESETZONE	_IOW(0x12, 131, struct blk_zone_range)
- #define BLKGETZONESZ	_IOW(0x12, 132, unsigned int)
-+#define BLKGETNRZONES	_IOW(0x12, 133, unsigned int)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d43c9232c77c..21e4147c4810 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -692,7 +692,7 @@ void blk_mq_requeue_request(struct request *rq, bool kick_requeue_list)
+ 	/* this request will be re-inserted to io scheduler queue */
+ 	blk_mq_sched_requeue_request(rq);
  
- #endif /* _UAPI_BLKZONED_H */
+-	BUG_ON(blk_queued_rq(rq));
++	BUG_ON(!list_empty(&rq->queuelist));
+ 	blk_mq_add_to_requeue_list(rq, true, kick_requeue_list);
+ }
+ EXPORT_SYMBOL(blk_mq_requeue_request);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index e0c661a95c39..c675e2b5af62 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -673,8 +673,6 @@ static inline bool blk_account_rq(struct request *rq)
+ 
+ #define blk_rq_cpu_valid(rq)	((rq)->cpu != -1)
+ #define blk_bidi_rq(rq)		((rq)->next_rq != NULL)
+-/* rq->queuelist of dequeued request must be list_empty() */
+-#define blk_queued_rq(rq)	(!list_empty(&(rq)->queuelist))
+ 
+ #define list_entry_rq(ptr)	list_entry((ptr), struct request, queuelist)
+ 
 -- 
 2.17.1
