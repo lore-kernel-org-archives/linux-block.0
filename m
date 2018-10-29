@@ -1,140 +1,38 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 07/15] loop: Push loop_ctl_mutex down into loop_clr_fd()
-Date: Wed, 10 Oct 2018 12:04:07 +0200
-Message-Id: <20181010100415.26525-8-jack@suse.cz>
-In-Reply-To: <20181010100415.26525-1-jack@suse.cz>
-References: <20181010100415.26525-1-jack@suse.cz>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-ide@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 28/29] blk-merge: kill dead queue lock held check
+Date: Mon, 29 Oct 2018 10:34:43 -0600
+Message-Id: <20181029163444.9940-29-axboe@kernel.dk>
+In-Reply-To: <20181029163444.9940-1-axboe@kernel.dk>
+References: <20181029163444.9940-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-loop_clr_fd() has a weird locking convention that is expects
-loop_ctl_mutex held, releases it on success and keeps it on failure.
-Untangle the mess by moving locking of loop_ctl_mutex into
-loop_clr_fd().
+This is dead code, any queue reaching this part has mq_ops
+attached.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/block/loop.c | 49 +++++++++++++++++++++++++++++--------------------
- 1 file changed, 29 insertions(+), 20 deletions(-)
+ block/blk-merge.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 2410921bd9ff..be41d5dcecd2 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1028,15 +1028,22 @@ loop_init_xfer(struct loop_device *lo, struct loop_func_table *xfer,
- 
- static int __loop_clr_fd(struct loop_device *lo)
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 3561dcce2260..0128284bded4 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -704,9 +704,6 @@ static void blk_account_io_merge(struct request *req)
+ static struct request *attempt_merge(struct request_queue *q,
+ 				     struct request *req, struct request *next)
  {
--	struct file *filp = lo->lo_backing_file;
-+	struct file *filp = NULL;
- 	gfp_t gfp = lo->old_gfp_mask;
- 	struct block_device *bdev = lo->lo_device;
-+	int err = 0;
+-	if (!q->mq_ops)
+-		lockdep_assert_held(q->queue_lock);
+-
+ 	if (!rq_mergeable(req) || !rq_mergeable(next))
+ 		return NULL;
  
--	if (WARN_ON_ONCE(lo->lo_state != Lo_rundown))
--		return -ENXIO;
-+	mutex_lock(&loop_ctl_mutex);
-+	if (WARN_ON_ONCE(lo->lo_state != Lo_rundown)) {
-+		err = -ENXIO;
-+		goto out_unlock;
-+	}
- 
--	if (filp == NULL)
--		return -EINVAL;
-+	filp = lo->lo_backing_file;
-+	if (filp == NULL) {
-+		err = -EINVAL;
-+		goto out_unlock;
-+	}
- 
- 	/* freeze request queue during the transition */
- 	blk_mq_freeze_queue(lo->lo_queue);
-@@ -1083,6 +1090,7 @@ static int __loop_clr_fd(struct loop_device *lo)
- 	if (!part_shift)
- 		lo->lo_disk->flags |= GENHD_FL_NO_PART_SCAN;
- 	loop_unprepare_queue(lo);
-+out_unlock:
- 	mutex_unlock(&loop_ctl_mutex);
- 	/*
- 	 * Need not hold loop_ctl_mutex to fput backing file.
-@@ -1090,14 +1098,22 @@ static int __loop_clr_fd(struct loop_device *lo)
- 	 * lock dependency possibility warning as fput can take
- 	 * bd_mutex which is usually taken before loop_ctl_mutex.
- 	 */
--	fput(filp);
--	return 0;
-+	if (filp)
-+		fput(filp);
-+	return err;
- }
- 
- static int loop_clr_fd(struct loop_device *lo)
- {
--	if (lo->lo_state != Lo_bound)
-+	int err;
-+
-+	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+	if (err)
-+		return err;
-+	if (lo->lo_state != Lo_bound) {
-+		mutex_unlock(&loop_ctl_mutex);
- 		return -ENXIO;
-+	}
- 	/*
- 	 * If we've explicitly asked to tear down the loop device,
- 	 * and it has an elevated reference count, set it for auto-teardown when
-@@ -1114,6 +1130,7 @@ static int loop_clr_fd(struct loop_device *lo)
- 		return 0;
- 	}
- 	lo->lo_state = Lo_rundown;
-+	mutex_unlock(&loop_ctl_mutex);
- 
- 	return __loop_clr_fd(lo);
- }
-@@ -1448,14 +1465,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 		mutex_unlock(&loop_ctl_mutex);
- 		break;
- 	case LOOP_CLR_FD:
--		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
--		if (err)
--			return err;
--		/* loop_clr_fd would have unlocked loop_ctl_mutex on success */
--		err = loop_clr_fd(lo);
--		if (err)
--			mutex_unlock(&loop_ctl_mutex);
--		break;
-+		return loop_clr_fd(lo);
- 	case LOOP_SET_STATUS:
- 		err = -EPERM;
- 		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
-@@ -1691,7 +1701,6 @@ static int lo_open(struct block_device *bdev, fmode_t mode)
- static void lo_release(struct gendisk *disk, fmode_t mode)
- {
- 	struct loop_device *lo;
--	int err;
- 
- 	mutex_lock(&loop_ctl_mutex);
- 	lo = disk->private_data;
-@@ -1702,13 +1711,13 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 		if (lo->lo_state != Lo_bound)
- 			goto out_unlock;
- 		lo->lo_state = Lo_rundown;
-+		mutex_unlock(&loop_ctl_mutex);
- 		/*
- 		 * In autoclear mode, stop the loop thread
- 		 * and remove configuration after last close.
- 		 */
--		err = __loop_clr_fd(lo);
--		if (!err)
--			return;
-+		__loop_clr_fd(lo);
-+		return;
- 	} else if (lo->lo_state == Lo_bound) {
- 		/*
- 		 * Otherwise keep thread (if running) and config,
 -- 
-2.16.4
+2.17.1
