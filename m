@@ -1,109 +1,48 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 11/14] irq: add support for allocating (and affinitizing) sets of IRQs
-Date: Thu, 25 Oct 2018 15:16:23 -0600
-Message-Id: <20181025211626.12692-12-axboe@kernel.dk>
-In-Reply-To: <20181025211626.12692-1-axboe@kernel.dk>
-References: <20181025211626.12692-1-axboe@kernel.dk>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Rui Salvaterra <rsalvaterra@gmail.com>,
+	stable@vger.kernel.org,
+	Mike Snitzer <snitzer@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Xiao Ni <xni@redhat.com>,
+	Mariusz Dabrowski <mariusz.dabrowski@intel.com>
+Subject: [PATCH V2 3/3] block: make sure writesame bio is aligned with logical block size
+Date: Mon, 29 Oct 2018 20:57:19 +0800
+Message-Id: <20181029125719.4998-4-ming.lei@redhat.com>
+In-Reply-To: <20181029125719.4998-1-ming.lei@redhat.com>
+References: <20181029125719.4998-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-A driver may have a need to allocate multiple sets of MSI/MSI-X
-interrupts, and have them appropriately affinitized. Add support for
-defining a number of sets in the irq_affinity structure, of varying
-sizes, and get each set affinitized correctly across the machine.
+Obviously the created writesame bio has to be aligned with logical block
+size, and use bio_allowed_max_sectors() to retrieve this number.
 
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Fixes: b49a0871be31a745b2ef ("block: remove split code in blkdev_issue_{discard,write_same}")
+Cc: Rui Salvaterra <rsalvaterra@gmail.com>
+Cc: stable@vger.kernel.org
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Xiao Ni <xni@redhat.com>
+Cc: Mariusz Dabrowski <mariusz.dabrowski@intel.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- include/linux/interrupt.h |  4 ++++
- kernel/irq/affinity.c     | 31 +++++++++++++++++++++++++------
- 2 files changed, 29 insertions(+), 6 deletions(-)
+ block/blk-lib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
-index eeceac3376fc..9fce2131902c 100644
---- a/include/linux/interrupt.h
-+++ b/include/linux/interrupt.h
-@@ -247,10 +247,14 @@ struct irq_affinity_notify {
-  *			the MSI(-X) vector space
-  * @post_vectors:	Don't apply affinity to @post_vectors at end of
-  *			the MSI(-X) vector space
-+ * @nr_sets:		Length of passed in *sets array
-+ * @sets:		Number of affinitized sets
-  */
- struct irq_affinity {
- 	int	pre_vectors;
- 	int	post_vectors;
-+	int	nr_sets;
-+	int	*sets;
- };
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index d58d5d87dd88..e8b3bb9bf375 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -149,7 +149,7 @@ static int __blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
+ 		return -EOPNOTSUPP;
  
- #if defined(CONFIG_SMP)
-diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-index f4f29b9d90ee..0055e252e438 100644
---- a/kernel/irq/affinity.c
-+++ b/kernel/irq/affinity.c
-@@ -180,6 +180,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	int curvec, usedvecs;
- 	cpumask_var_t nmsk, npresmsk, *node_to_cpumask;
- 	struct cpumask *masks = NULL;
-+	int i, nr_sets;
+ 	/* Ensure that max_write_same_sectors doesn't overflow bi_size */
+-	max_write_same_sectors = UINT_MAX >> 9;
++	max_write_same_sectors = bio_allowed_max_sectors(q);
  
- 	/*
- 	 * If there aren't any vectors left after applying the pre/post
-@@ -210,10 +211,23 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	get_online_cpus();
- 	build_node_to_cpumask(node_to_cpumask);
- 
--	/* Spread on present CPUs starting from affd->pre_vectors */
--	usedvecs = irq_build_affinity_masks(affd, curvec, affvecs,
--					    node_to_cpumask, cpu_present_mask,
--					    nmsk, masks);
-+	/*
-+	 * Spread on present CPUs starting from affd->pre_vectors. If we
-+	 * have multiple sets, build each sets affinity mask separately.
-+	 */
-+	nr_sets = affd->nr_sets;
-+	if (!nr_sets)
-+		nr_sets = 1;
-+
-+	for (i = 0, usedvecs = 0; i < nr_sets; i++) {
-+		int this_vecs = affd->sets ? affd->sets[i] : affvecs;
-+		int nr;
-+
-+		nr = irq_build_affinity_masks(affd, curvec, this_vecs,
-+					      node_to_cpumask, cpu_present_mask,
-+					      nmsk, masks + usedvecs);
-+		usedvecs += nr;
-+	}
- 
- 	/*
- 	 * Spread on non present CPUs starting from the next vector to be
-@@ -258,13 +272,18 @@ int irq_calc_affinity_vectors(int minvec, int maxvec, const struct irq_affinity
- {
- 	int resv = affd->pre_vectors + affd->post_vectors;
- 	int vecs = maxvec - resv;
-+	int i, set_vecs;
- 	int ret;
- 
- 	if (resv > minvec)
- 		return 0;
- 
- 	get_online_cpus();
--	ret = min_t(int, cpumask_weight(cpu_possible_mask), vecs) + resv;
-+	ret = min_t(int, cpumask_weight(cpu_possible_mask), vecs);
- 	put_online_cpus();
--	return ret;
-+
-+	for (i = 0, set_vecs = 0;  i < affd->nr_sets; i++)
-+		set_vecs += affd->sets[i];
-+
-+	return resv + max(ret, set_vecs);
- }
+ 	while (nr_sects) {
+ 		bio = blk_next_bio(bio, 1, gfp_mask);
 -- 
-2.17.1
+2.9.5
