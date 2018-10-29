@@ -1,42 +1,41 @@
-Return-Path: <bart.vanassche@gmail.com>
-Return-Path: <bart.vanassche@gmail.com>
-Message-ID: <1540833779.196084.56.camel@acm.org>
-Subject: Re: [PATCH 03/14] blk-mq: provide dummy blk_mq_map_queue_type()
- helper
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Mon, 29 Oct 2018 10:22:59 -0700
-In-Reply-To: <20181029163738.10172-4-axboe@kernel.dk>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 03/14] blk-mq: provide dummy blk_mq_map_queue_type() helper
+Date: Mon, 29 Oct 2018 10:37:27 -0600
+Message-Id: <20181029163738.10172-4-axboe@kernel.dk>
+In-Reply-To: <20181029163738.10172-1-axboe@kernel.dk>
 References: <20181029163738.10172-1-axboe@kernel.dk>
-	 <20181029163738.10172-4-axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-7"
-Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, 2018-10-29 at 10:37 -0600, Jens Axboe wrote:
-+AD4 diff --git a/block/blk-mq.h b/block/blk-mq.h
-+AD4 index 889f0069dd80..79c300faa7ce 100644
-+AD4 --- a/block/blk-mq.h
-+AD4 +-+-+- b/block/blk-mq.h
-+AD4 +AEAAQA -80,6 +-80,12 +AEAAQA static inline struct blk+AF8-mq+AF8-hw+AF8-ctx +ACo-blk+AF8-mq+AF8-map+AF8-queue(struct request+AF8-queue +ACo-q,
-+AD4  	return q-+AD4-queue+AF8-hw+AF8-ctx+AFs-set-+AD4-map+AFs-0+AF0.mq+AF8-map+AFs-cpu+AF0AXQA7
-+AD4  +AH0
-+AD4  
-+AD4 +-static inline struct blk+AF8-mq+AF8-hw+AF8-ctx +ACo-blk+AF8-mq+AF8-map+AF8-queue+AF8-type(struct request+AF8-queue +ACo-q,
-+AD4 +-							  int type, int cpu)
-+AD4 +-+AHs
-+AD4 +-	return blk+AF8-mq+AF8-map+AF8-queue(q, cpu)+ADs
-+AD4 +-+AH0
-+AD4 +-
-+AD4  /+ACo
-+AD4   +ACo sysfs helpers
-+AD4   +ACo-/
+Doesn't do anything right now, but it's needed as a prep patch
+to get the interfaces right.
 
-How about renaming 'type' into something like hw+AF8-ctx+AF8-type to make it more
-clear what its meaning is? How about declaring both the 'type' and 'cpu'
-arguments as unsigned ints?
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ block/blk-mq.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Thanks,
-
-Bart.
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 889f0069dd80..79c300faa7ce 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -80,6 +80,12 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
+ 	return q->queue_hw_ctx[set->map[0].mq_map[cpu]];
+ }
+ 
++static inline struct blk_mq_hw_ctx *blk_mq_map_queue_type(struct request_queue *q,
++							  int type, int cpu)
++{
++	return blk_mq_map_queue(q, cpu);
++}
++
+ /*
+  * sysfs helpers
+  */
+-- 
+2.17.1
