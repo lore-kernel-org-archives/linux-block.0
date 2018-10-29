@@ -1,93 +1,41 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	stable@vger.kernel.org,
-	Mariusz Dabrowski <mariusz.dabrowski@intel.com>,
-	Ming Lin <ming.l@ssi.samsung.com>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Xiao Ni <xni@redhat.com>
-Subject: [PATCH] block: don't deal with discard limit in blkdev_issue_discard()
-Date: Fri, 12 Oct 2018 15:53:10 +0800
-Message-Id: <20181012075310.4587-1-ming.lei@redhat.com>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 12/14] nvme: utilize two queue maps, one for reads and one
+ for writes
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org
+References: <20181025211626.12692-1-axboe@kernel.dk>
+ <20181025211626.12692-13-axboe@kernel.dk>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <114c24f8-75df-396c-8e85-a7174d400362@suse.de>
+Date: Mon, 29 Oct 2018 08:46:10 +0100
+MIME-Version: 1.0
+In-Reply-To: <20181025211626.12692-13-axboe@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-blk_queue_split() does respect this limit via bio splitting, so no
-need to do that in blkdev_issue_discard(), then we can align to
-normal bio submit(bio_add_page() & submit_bio()).
+On 10/25/18 11:16 PM, Jens Axboe wrote:
+> NVMe does round-robin between queues by default, which means that
+> sharing a queue map for both reads and writes can be problematic
+> in terms of read servicing. It's much easier to flood the queue
+> with writes and reduce the read servicing.
+> 
+> Implement two queue maps, one for reads and one for writes. The
+> write queue count is configurable through the 'write_queues'
+> parameter.
+> 
+> By default, we retain the previous behavior of having a single
+> queue set, shared between reads and writes. Setting 'write_queues'
+> to a non-zero value will create two queue sets, one for reads and
+> one for writes, the latter using the configurable number of
+> queues (hardware queue counts permitting).
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>   drivers/nvme/host/pci.c | 139 +++++++++++++++++++++++++++++++++++++---
+>   1 file changed, 131 insertions(+), 8 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-More importantly, this patch fixes one issue introduced in a22c4d7e34402cc
-("block: re-add discard_granularity and alignment checks"), in which
-zero discard bio may be generated in case of zero alignment.
+Cheers,
 
-Fixes: a22c4d7e34402ccdf3 ("block: re-add discard_granularity and alignment checks")
-Cc: stable@vger.kernel.org
-Cc: Mariusz Dabrowski <mariusz.dabrowski@intel.com>
-Cc: Ming Lin <ming.l@ssi.samsung.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Xiao Ni <xni@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-lib.c | 28 ++--------------------------
- 1 file changed, 2 insertions(+), 26 deletions(-)
-
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index d1b9dd03da25..bbd44666f2b5 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -29,9 +29,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- {
- 	struct request_queue *q = bdev_get_queue(bdev);
- 	struct bio *bio = *biop;
--	unsigned int granularity;
- 	unsigned int op;
--	int alignment;
- 	sector_t bs_mask;
- 
- 	if (!q)
-@@ -54,38 +52,16 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 	if ((sector | nr_sects) & bs_mask)
- 		return -EINVAL;
- 
--	/* Zero-sector (unknown) and one-sector granularities are the same.  */
--	granularity = max(q->limits.discard_granularity >> 9, 1U);
--	alignment = (bdev_discard_alignment(bdev) >> 9) % granularity;
--
- 	while (nr_sects) {
--		unsigned int req_sects;
--		sector_t end_sect, tmp;
-+		unsigned int req_sects = nr_sects;
-+		sector_t end_sect;
- 
--		/*
--		 * Issue in chunks of the user defined max discard setting,
--		 * ensuring that bi_size doesn't overflow
--		 */
--		req_sects = min_t(sector_t, nr_sects,
--					q->limits.max_discard_sectors);
- 		if (!req_sects)
- 			goto fail;
- 		if (req_sects > UINT_MAX >> 9)
- 			req_sects = UINT_MAX >> 9;
- 
--		/*
--		 * If splitting a request, and the next starting sector would be
--		 * misaligned, stop the discard at the previous aligned sector.
--		 */
- 		end_sect = sector + req_sects;
--		tmp = end_sect;
--		if (req_sects < nr_sects &&
--		    sector_div(tmp, granularity) != alignment) {
--			end_sect = end_sect - alignment;
--			sector_div(end_sect, granularity);
--			end_sect = end_sect * granularity + alignment;
--			req_sects = end_sect - sector;
--		}
- 
- 		bio = next_bio(bio, 0, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
--- 
-2.9.5
+Hannes
