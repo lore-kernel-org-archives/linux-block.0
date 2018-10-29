@@ -1,82 +1,42 @@
 Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 08/28] scsi: kill off the legacy IO path
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org
+References: <20181025211039.11559-1-axboe@kernel.dk>
+ <20181025211039.11559-9-axboe@kernel.dk>
 From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>
-Subject: [PATCHv5 0/3] Deprecate DAC960 driver
-Date: Fri, 12 Oct 2018 09:15:45 +0200
-Message-Id: <20181012071548.129113-1-hare@suse.de>
+Message-ID: <d7903792-ecba-3627-3115-ce0e71652a67@suse.de>
+Date: Mon, 29 Oct 2018 07:48:11 +0100
+MIME-Version: 1.0
+In-Reply-To: <20181025211039.11559-9-axboe@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
+On 10/25/18 11:10 PM, Jens Axboe wrote:
+> Cc: linux-scsi@vger.kernel.org
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>   Documentation/scsi/scsi-parameters.txt |   5 -
+>   drivers/scsi/Kconfig                   |  12 -
+>   drivers/scsi/cxlflash/main.c           |   6 -
+>   drivers/scsi/hosts.c                   |  29 +-
+>   drivers/scsi/lpfc/lpfc_scsi.c          |   2 +-
+>   drivers/scsi/qedi/qedi_main.c          |   3 +-
+>   drivers/scsi/qla2xxx/qla_os.c          |  30 +-
+>   drivers/scsi/scsi.c                    |   5 +-
+>   drivers/scsi/scsi_debug.c              |   3 +-
+>   drivers/scsi/scsi_error.c              |   2 +-
+>   drivers/scsi/scsi_lib.c                | 624 ++-----------------------
+>   drivers/scsi/scsi_priv.h               |   1 -
+>   drivers/scsi/scsi_scan.c               |  10 +-
+>   drivers/scsi/scsi_sysfs.c              |   8 +-
+>   drivers/scsi/ufs/ufshcd.c              |   6 -
+>   include/scsi/scsi_host.h               |  18 +-
+>   include/scsi/scsi_tcq.h                |  14 +-
+>   17 files changed, 73 insertions(+), 705 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-as we're trying to get rid of the remaining request_fn drivers here's
-a patchset to move the DAC960 driver to the SCSI stack.
-As per request from hch I've split up the driver into two new SCSI
-drivers called 'myrb' and 'myrs'.
+Cheers,
 
-The 'myrb' driver only supports the earlier (V1) firmware interface, which
-doesn't have a SCSI interface for the logical drives; for those I've added
-a (pretty rudimentary, admittedly) SCSI translation for them.
-
-The 'myrs' driver supports the newer (V2) firmware interface, which is
-SCSI based and doesn't need the translation layer.
-
-And the weird proc interface from DAC960 has been converted to sysfs attributes.
-
-Tested with eXtremeRAID 1100 (for V1 Firmware) and Mylex AcceleRAID 170
-(for V2 Firmware).
-
-Changes to v4:
-- checkpatch fixes
-- Remove remaining camel case naming
-- Include reviews from Christoph
-- More codingstyle fixes
-
-Changes to v3:
-- Rename structures to match the general codingstyle
-- Replace typedefs
-
-Changes to v2:
-- Move to dma_pool API
-- Fixup 0-day build issues
-- Add myrb_biosparam
-- Dropped patch merged with upstream
-
-Changes to v1:
-- Split into two drivers
-- Improve scanning for V1 firmware interface
-
-Hannes Reinecke (3):
-  myrb: Add Mylex RAID controller (block interface)
-  myrs: Add Mylex RAID controller (SCSI interface)
-  drivers/block: Remove DAC960 driver
-
- Documentation/blockdev/README.DAC960 |  756 ----
- MAINTAINERS                          |    7 +
- drivers/block/DAC960.c               | 7229 ----------------------------------
- drivers/block/DAC960.h               | 4414 ---------------------
- drivers/block/Kconfig                |   12 -
- drivers/block/Makefile               |    1 -
- drivers/scsi/Kconfig                 |   30 +
- drivers/scsi/Makefile                |    2 +
- drivers/scsi/myrb.c                  | 3656 +++++++++++++++++
- drivers/scsi/myrb.h                  |  958 +++++
- drivers/scsi/myrs.c                  | 3267 +++++++++++++++
- drivers/scsi/myrs.h                  | 1134 ++++++
- include/linux/pci_ids.h              |    2 +
- 13 files changed, 9056 insertions(+), 12412 deletions(-)
- delete mode 100644 Documentation/blockdev/README.DAC960
- delete mode 100644 drivers/block/DAC960.c
- delete mode 100644 drivers/block/DAC960.h
- create mode 100644 drivers/scsi/myrb.c
- create mode 100644 drivers/scsi/myrb.h
- create mode 100644 drivers/scsi/myrs.c
- create mode 100644 drivers/scsi/myrs.h
-
--- 
-2.16.4
+Hannes
