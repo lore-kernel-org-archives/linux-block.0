@@ -1,63 +1,47 @@
 Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 16/28] blk-cgroup: remove legacy queue bypassing
+To: Johannes Thumshirn <jthumshirn@suse.de>, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org
+References: <20181025211039.11559-1-axboe@kernel.dk>
+ <20181025211039.11559-17-axboe@kernel.dk>
+ <5f058345-522c-c24c-d09d-079046e99d7e@suse.de>
+ <5a75b005-7dc8-c8a9-fb41-6590039d10a4@kernel.dk>
+ <f18f704b-d8fc-6a97-32ec-fc1eaf336064@suse.de>
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-ide@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 17/29] blk-cgroup: remove legacy queue bypassing
-Date: Mon, 29 Oct 2018 10:34:32 -0600
-Message-Id: <20181029163444.9940-18-axboe@kernel.dk>
-In-Reply-To: <20181029163444.9940-1-axboe@kernel.dk>
-References: <20181029163444.9940-1-axboe@kernel.dk>
+Message-ID: <db87764a-159e-7439-1846-e9f7e0540a12@kernel.dk>
+Date: Mon, 29 Oct 2018 08:59:27 -0600
+MIME-Version: 1.0
+In-Reply-To: <f18f704b-d8fc-6a97-32ec-fc1eaf336064@suse.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-We only support mq devices now.
+On 10/29/18 8:25 AM, Johannes Thumshirn wrote:
+> On 29/10/18 15:23, Jens Axboe wrote:
+>> On 10/29/18 5:00 AM, Johannes Thumshirn wrote:
+>>> Hi Jens,
+>>>
+>>> On 25/10/18 23:10, Jens Axboe wrote:
+>>> [...]
+>>>> @@ -1487,8 +1485,6 @@ int blkcg_activate_policy(struct request_queue *q,
+>>>>  out_bypass_end:
+>>>>  	if (q->mq_ops)
+>>>>  		blk_mq_unfreeze_queue(q);
+>>>> -	else
+>>>> -		blk_queue_bypass_end(q);
+>>>
+>>>>  
+>>>>
+>>>
+>>> Now that we only have mq, do we still need all these checks for q->mq_ops?
+>>
+>> We need it for the cases where we can be passing in a stacked driver
+>> or an mq driver, or for cases where we explicitly register mq attributes,
+>> and that sort of thing.
+>>
+> 
+> Ah ok. Guess we'll have to live with it then.
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-cgroup.c | 8 --------
- 1 file changed, 8 deletions(-)
+At this point the check should be equivalent to queue_is_rq_based(), fwiw.
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 992da5592c6e..5f10d755ec52 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1446,8 +1446,6 @@ int blkcg_activate_policy(struct request_queue *q,
- 
- 	if (q->mq_ops)
- 		blk_mq_freeze_queue(q);
--	else
--		blk_queue_bypass_start(q);
- pd_prealloc:
- 	if (!pd_prealloc) {
- 		pd_prealloc = pol->pd_alloc_fn(GFP_KERNEL, q->node);
-@@ -1487,8 +1485,6 @@ int blkcg_activate_policy(struct request_queue *q,
- out_bypass_end:
- 	if (q->mq_ops)
- 		blk_mq_unfreeze_queue(q);
--	else
--		blk_queue_bypass_end(q);
- 	if (pd_prealloc)
- 		pol->pd_free_fn(pd_prealloc);
- 	return ret;
-@@ -1513,8 +1509,6 @@ void blkcg_deactivate_policy(struct request_queue *q,
- 
- 	if (q->mq_ops)
- 		blk_mq_freeze_queue(q);
--	else
--		blk_queue_bypass_start(q);
- 
- 	spin_lock_irq(q->queue_lock);
- 
-@@ -1533,8 +1527,6 @@ void blkcg_deactivate_policy(struct request_queue *q,
- 
- 	if (q->mq_ops)
- 		blk_mq_unfreeze_queue(q);
--	else
--		blk_queue_bypass_end(q);
- }
- EXPORT_SYMBOL_GPL(blkcg_deactivate_policy);
- 
 -- 
-2.17.1
+Jens Axboe
