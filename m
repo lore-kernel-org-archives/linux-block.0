@@ -1,76 +1,73 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <bart.vanassche@gmail.com>
+Return-Path: <bart.vanassche@gmail.com>
+Message-ID: <1540836903.196084.70.camel@acm.org>
 Subject: Re: [PATCH 07/14] blk-mq: support multiple hctx maps
-To: Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Mon, 29 Oct 2018 11:15:03 -0700
+In-Reply-To: <20181029163738.10172-8-axboe@kernel.dk>
 References: <20181029163738.10172-1-axboe@kernel.dk>
- <20181029163738.10172-8-axboe@kernel.dk> <1540836903.196084.70.camel@acm.org>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <214cdac8-9c13-213b-023f-2fb1bf67c8db@kernel.dk>
-Date: Mon, 29 Oct 2018 13:24:23 -0600
-MIME-Version: 1.0
-In-Reply-To: <1540836903.196084.70.camel@acm.org>
-Content-Type: text/plain; charset=UTF-8
+	 <20181029163738.10172-8-axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-7"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/29/18 12:15 PM, Bart Van Assche wrote:
-> On Mon, 2018-10-29 at 10:37 -0600, Jens Axboe wrote:
->> -static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
->> -						     unsigned int flags,
->> -						     int cpu)
->> +static inline struct blk_mq_hw_ctx *blk_mq_map_queue_type(struct request_queue *q,
->> +							  int type, int cpu)
->>  {
->>  	struct blk_mq_tag_set *set = q->tag_set;
->>  
->> -	return q->queue_hw_ctx[set->map[0].mq_map[cpu]];
->> +	return q->queue_hw_ctx[set->map[type].mq_map[cpu]];
->>  }
->>  
->> -static inline struct blk_mq_hw_ctx *blk_mq_map_queue_type(struct request_queue *q,
->> -							  int type, int cpu)
->> +static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
->> +						     unsigned int flags,
->> +						     int cpu)
->>  {
->> -	return blk_mq_map_queue(q, type, cpu);
->> +	int type = 0;
->> +
->> +	if (q->mq_ops->flags_to_type)
->> +		type = q->mq_ops->flags_to_type(q, flags);
->> +
->> +	return blk_mq_map_queue_type(q, type, cpu);
->>  }
-> 
-> How about adding a comment above both these functions that explains their
-> purpose? Since blk_mq_map_queue() maps rq->cmd_flags and the cpu index to
-> a hardware context, how about renaming blk_mq_map_queue() into
-> blk_mq_map_cmd_flags()?
+On Mon, 2018-10-29 at 10:37 -0600, Jens Axboe wrote:
++AD4 -static inline struct blk+AF8-mq+AF8-hw+AF8-ctx +ACo-blk+AF8-mq+AF8-map+AF8-queue(struct request+AF8-queue +ACo-q,
++AD4 -						     unsigned int flags,
++AD4 -						     int cpu)
++AD4 +-static inline struct blk+AF8-mq+AF8-hw+AF8-ctx +ACo-blk+AF8-mq+AF8-map+AF8-queue+AF8-type(struct request+AF8-queue +ACo-q,
++AD4 +-							  int type, int cpu)
++AD4  +AHs
++AD4  	struct blk+AF8-mq+AF8-tag+AF8-set +ACo-set +AD0 q-+AD4-tag+AF8-set+ADs
++AD4  
++AD4 -	return q-+AD4-queue+AF8-hw+AF8-ctx+AFs-set-+AD4-map+AFs-0+AF0.mq+AF8-map+AFs-cpu+AF0AXQA7
++AD4 +-	return q-+AD4-queue+AF8-hw+AF8-ctx+AFs-set-+AD4-map+AFs-type+AF0.mq+AF8-map+AFs-cpu+AF0AXQA7
++AD4  +AH0
++AD4  
++AD4 -static inline struct blk+AF8-mq+AF8-hw+AF8-ctx +ACo-blk+AF8-mq+AF8-map+AF8-queue+AF8-type(struct request+AF8-queue +ACo-q,
++AD4 -							  int type, int cpu)
++AD4 +-static inline struct blk+AF8-mq+AF8-hw+AF8-ctx +ACo-blk+AF8-mq+AF8-map+AF8-queue(struct request+AF8-queue +ACo-q,
++AD4 +-						     unsigned int flags,
++AD4 +-						     int cpu)
++AD4  +AHs
++AD4 -	return blk+AF8-mq+AF8-map+AF8-queue(q, type, cpu)+ADs
++AD4 +-	int type +AD0 0+ADs
++AD4 +-
++AD4 +-	if (q-+AD4-mq+AF8-ops-+AD4-flags+AF8-to+AF8-type)
++AD4 +-		type +AD0 q-+AD4-mq+AF8-ops-+AD4-flags+AF8-to+AF8-type(q, flags)+ADs
++AD4 +-
++AD4 +-	return blk+AF8-mq+AF8-map+AF8-queue+AF8-type(q, type, cpu)+ADs
++AD4  +AH0
 
-I don't want to rename it, but I've added a kerneldoc function header to
-both of them.
+How about adding a comment above both these functions that explains their
+purpose? Since blk+AF8-mq+AF8-map+AF8-queue() maps rq-+AD4-cmd+AF8-flags and the cpu index to
+a hardware context, how about renaming blk+AF8-mq+AF8-map+AF8-queue() into
+blk+AF8-mq+AF8-map+AF8-cmd+AF8-flags()?
 
->> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
->> index f9e19962a22f..837087cf07cc 100644
->> --- a/include/linux/blk-mq.h
->> +++ b/include/linux/blk-mq.h
->> @@ -86,6 +86,7 @@ enum {
->>  
->>  struct blk_mq_tag_set {
->>  	struct blk_mq_queue_map	map[HCTX_MAX_TYPES];
->> +	unsigned int		nr_maps;
->>  	const struct blk_mq_ops	*ops;
->>  	unsigned int		nr_hw_queues;
->>  	unsigned int		queue_depth;	/* max hw supported */
->> @@ -109,6 +110,7 @@ struct blk_mq_queue_data {
->>  
->>  typedef blk_status_t (queue_rq_fn)(struct blk_mq_hw_ctx *,
->>  		const struct blk_mq_queue_data *);
->> +typedef int (flags_to_type_fn)(struct request_queue *, unsigned int);
-> 
-> How about adding a comment that the format of the second argument of
-> flags_to_type_fn is the same as that of rq->cmd_flags?
++AD4  /+ACo
++AD4 diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
++AD4 index f9e19962a22f..837087cf07cc 100644
++AD4 --- a/include/linux/blk-mq.h
++AD4 +-+-+- b/include/linux/blk-mq.h
++AD4 +AEAAQA -86,6 +-86,7 +AEAAQA enum +AHs
++AD4  
++AD4  struct blk+AF8-mq+AF8-tag+AF8-set +AHs
++AD4  	struct blk+AF8-mq+AF8-queue+AF8-map	map+AFs-HCTX+AF8-MAX+AF8-TYPES+AF0AOw
++AD4 +-	unsigned int		nr+AF8-maps+ADs
++AD4  	const struct blk+AF8-mq+AF8-ops	+ACo-ops+ADs
++AD4  	unsigned int		nr+AF8-hw+AF8-queues+ADs
++AD4  	unsigned int		queue+AF8-depth+ADs	/+ACo max hw supported +ACo-/
++AD4 +AEAAQA -109,6 +-110,7 +AEAAQA struct blk+AF8-mq+AF8-queue+AF8-data +AHs
++AD4  
++AD4  typedef blk+AF8-status+AF8-t (queue+AF8-rq+AF8-fn)(struct blk+AF8-mq+AF8-hw+AF8-ctx +ACo,
++AD4  		const struct blk+AF8-mq+AF8-queue+AF8-data +ACo)+ADs
++AD4 +-typedef int (flags+AF8-to+AF8-type+AF8-fn)(struct request+AF8-queue +ACo, unsigned int)+ADs
 
-Done
+How about adding a comment that the format of the second argument of
+flags+AF8-to+AF8-type+AF8-fn is the same as that of rq-+AD4-cmd+AF8-flags?
 
--- 
-Jens Axboe
+Thanks,
+
+Bart.
