@@ -1,44 +1,31 @@
-Return-Path: <dennisszhou@gmail.com>
-Return-Path: <dennisszhou@gmail.com>
-From: Dennis Zhou <dennis@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Tejun Heo <tj@kernel.org>,
-	Valdis Kletnieks <valdis.kletnieks@vt.edu>,
-	kernel-team@fb.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Dennis Zhou <dennis@kernel.org>
-Subject: [PATCH 1/2] blkcg: fix edge case for blk_get_rl() under memory pressure
-Date: Sat, 20 Oct 2018 14:56:11 -0400
-Message-Id: <20181020185612.51587-2-dennis@kernel.org>
-In-Reply-To: <20181020185612.51587-1-dennis@kernel.org>
-References: <20181020185612.51587-1-dennis@kernel.org>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 14/29] bsg: convert to use blk-mq
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org
+References: <20181029163444.9940-1-axboe@kernel.dk>
+ <20181029163444.9940-15-axboe@kernel.dk>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <084921c9-1d15-ec9c-f57b-9e94cd7e8819@suse.de>
+Date: Mon, 29 Oct 2018 17:59:56 +0100
+MIME-Version: 1.0
+In-Reply-To: <20181029163444.9940-15-axboe@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-It is possible for blkg creation to fail when in blk_get_rl(). In this
-situation, the fallback logic returns the nearest created blkg. There is
-however special handling for the request_list for the root blkcg. This
-fixes the missing edge case from the earlier series changing
-blk_get_rl().
+On 10/29/18 5:34 PM, Jens Axboe wrote:
+> Requires a few changes to the FC transport class as well.
+> 
+> Cc: linux-scsi@vger.kernel.org
+> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+> Tested-by: Benjamin Block <bblock@linux.vnet.ibm.com>
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>   block/bsg-lib.c                  | 123 +++++++++++++++++++------------
+>   drivers/scsi/scsi_transport_fc.c |  59 +++++++++------
+>   2 files changed, 110 insertions(+), 72 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Fixes: e2b0989954ae ("blkcg: cleanup and make blk_get_rl use blkg_lookup_create")
-Signed-off-by: Dennis Zhou <dennis@kernel.org>
----
- include/linux/blk-cgroup.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Cheers,
 
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index b7fd08013de2..1e76ceebeb5d 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -597,7 +597,7 @@ static inline struct request_list *blk_get_rl(struct request_queue *q,
- 	if (unlikely(!blkg))
- 		blkg = __blkg_lookup_create(blkcg, q);
- 
--	if (!blkg_tryget(blkg))
-+	if (blkg->blkcg == &blkcg_root || !blkg_tryget(blkg))
- 		goto rl_use_root;
- 
- 	rcu_read_unlock();
--- 
-2.17.1
+Hannes
