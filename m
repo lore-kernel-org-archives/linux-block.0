@@ -1,65 +1,124 @@
 Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 23/28] block: kill lld busy
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org
+References: <20181025211039.11559-1-axboe@kernel.dk>
+ <20181025211039.11559-24-axboe@kernel.dk>
+ <c9310098-e59c-da81-e59f-5b5870962438@suse.de>
+ <e6c99318-726b-adfe-751d-4cf1a5f414d9@kernel.dk>
+ <20181029155116.GA11161@redhat.com>
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: [PATCHSET 0/14] Add support for multiple queue maps
-Date: Thu, 25 Oct 2018 15:16:12 -0600
-Message-Id: <20181025211626.12692-1-axboe@kernel.dk>
+Message-ID: <7052ebf5-d098-5630-5907-43a87a70e993@kernel.dk>
+Date: Mon, 29 Oct 2018 10:26:59 -0600
+MIME-Version: 1.0
+In-Reply-To: <20181029155116.GA11161@redhat.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This series adds support for multiple queue maps for blk-mq.
-Since blk-mq was introduced, it's only support a single queue
-map. This means you can have 1 set of queues, and the mapping
-purely depends on what CPU an IO originated from. With this
-patch set, drivers can implement mappings that depend on both
-CPU and request type - and they can have multiple sets of mappings.
+On 10/29/18 9:51 AM, Mike Snitzer wrote:
+> On Mon, Oct 29 2018 at 10:25am -0400,
+> Jens Axboe <axboe@kernel.dk> wrote:
+> 
+>> On 10/29/18 1:10 AM, Hannes Reinecke wrote:
+>>> On 10/25/18 11:10 PM, Jens Axboe wrote:
+>>>> Nobody sets the helper, so we always return 0. Kill it.
+>>>>
+>>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>>>> ---
+>>>>   block/blk-core.c       | 28 ----------------------------
+>>>>   block/blk-settings.c   |  6 ------
+>>>>   drivers/md/dm-mpath.c  |  4 +---
+>>>>   include/linux/blkdev.h |  4 ----
+>>>>   4 files changed, 1 insertion(+), 41 deletions(-)
+>>>>
+>>>> diff --git a/block/blk-core.c b/block/blk-core.c
+>>>> index 4c39c7865f9c..dd1328f4dc31 100644
+>>>> --- a/block/blk-core.c
+>>>> +++ b/block/blk-core.c
+>>>> @@ -1795,34 +1795,6 @@ void rq_flush_dcache_pages(struct request *rq)
+>>>>   EXPORT_SYMBOL_GPL(rq_flush_dcache_pages);
+>>>>   #endif
+>>>>   
+>>>> -/**
+>>>> - * blk_lld_busy - Check if underlying low-level drivers of a device are busy
+>>>> - * @q : the queue of the device being checked
+>>>> - *
+>>>> - * Description:
+>>>> - *    Check if underlying low-level drivers of a device are busy.
+>>>> - *    If the drivers want to export their busy state, they must set own
+>>>> - *    exporting function using blk_queue_lld_busy() first.
+>>>> - *
+>>>> - *    Basically, this function is used only by request stacking drivers
+>>>> - *    to stop dispatching requests to underlying devices when underlying
+>>>> - *    devices are busy.  This behavior helps more I/O merging on the queue
+>>>> - *    of the request stacking driver and prevents I/O throughput regression
+>>>> - *    on burst I/O load.
+>>>> - *
+>>>> - * Return:
+>>>> - *    0 - Not busy (The request stacking driver should dispatch request)
+>>>> - *    1 - Busy (The request stacking driver should stop dispatching request)
+>>>> - */
+>>>> -int blk_lld_busy(struct request_queue *q)
+>>>> -{
+>>>> -	if (q->lld_busy_fn)
+>>>> -		return q->lld_busy_fn(q);
+>>>> -
+>>>> -	return 0;
+>>>> -}
+>>>> -EXPORT_SYMBOL_GPL(blk_lld_busy);
+>>>> -
+>>>>   /**
+>>>>    * blk_rq_unprep_clone - Helper function to free all bios in a cloned request
+>>>>    * @rq: the clone request to be cleaned up
+>>>> diff --git a/block/blk-settings.c b/block/blk-settings.c
+>>>> index 3c5da75c2def..1895f499bbe5 100644
+>>>> --- a/block/blk-settings.c
+>>>> +++ b/block/blk-settings.c
+>>>> @@ -32,12 +32,6 @@ void blk_queue_rq_timeout(struct request_queue *q, unsigned int timeout)
+>>>>   }
+>>>>   EXPORT_SYMBOL_GPL(blk_queue_rq_timeout);
+>>>>   
+>>>> -void blk_queue_lld_busy(struct request_queue *q, lld_busy_fn *fn)
+>>>> -{
+>>>> -	q->lld_busy_fn = fn;
+>>>> -}
+>>>> -EXPORT_SYMBOL_GPL(blk_queue_lld_busy);
+>>>> -
+>>>>   /**
+>>>>    * blk_set_default_limits - reset limits to default values
+>>>>    * @lim:  the queue_limits structure to reset
+>>>> diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+>>>> index a24ed3973e7c..4d736e0fd67f 100644
+>>>> --- a/drivers/md/dm-mpath.c
+>>>> +++ b/drivers/md/dm-mpath.c
+>>>> @@ -1936,9 +1936,7 @@ static int multipath_iterate_devices(struct dm_target *ti,
+>>>>   
+>>>>   static int pgpath_busy(struct pgpath *pgpath)
+>>>>   {
+>>>> -	struct request_queue *q = bdev_get_queue(pgpath->path.dev->bdev);
+>>>> -
+>>>> -	return blk_lld_busy(q);
+>>>> +	return 0;
+>>>>   }
+>>>>   
+>>>>   /*
+>>> Actually, I'm not quite sure this is correct; dm-mpath needs to return a 
+>>> busy status (via the '->busy' callback) to allow for back-pressure on 
+>>> the upper layers.
+>>> Just disabling the callback will disable this.
+>>> Shouldn't we check if the tagmap is busy here?
+>>
+>> Mike? We can pretty easily make it just check for busy tags.
+> 
+> OK, please feel free to do so.
+> 
+> Happy to pick the patch up or provide review so you can stage it in your
+> 4.21 oriented tree.
 
-NVMe is used as a proof of concept. It adds support for a separate
-write queue set. One way to use this would be to limit the number
-of write queues to favor reads, since NVMe does round-robin service
-of queues. An easy extension of this would be to add multiple
-sets of queues, for prioritized IO.
-
-NVMe also uses this feature to finally make the polling work
-efficiently, without triggering interrupts. This both increases
-performance (and decreases latency), at a lower system load. At
-the same time it's more flexible, as you don't have to worry about
-IRQ coalescing and redirection to avoid interrupts disturbing the
-workload. This is how polling should have worked from day 1.
-
-This is on top of the mq-conversions branch and series just
-posted. It can also be bound in my mq-maps branch.
-
- block/blk-flush.c                     |   7 +-
- block/blk-mq-cpumap.c                 |  19 +--
- block/blk-mq-debugfs.c                |   4 +-
- block/blk-mq-pci.c                    |  10 +-
- block/blk-mq-rdma.c                   |   4 +-
- block/blk-mq-sched.c                  |  18 ++-
- block/blk-mq-sysfs.c                  |  10 ++
- block/blk-mq-tag.c                    |   5 +-
- block/blk-mq-virtio.c                 |   8 +-
- block/blk-mq.c                        | 213 ++++++++++++++++++++----------
- block/blk-mq.h                        |  29 ++++-
- block/blk.h                           |   6 +-
- block/kyber-iosched.c                 |   6 +-
- drivers/block/virtio_blk.c            |   2 +-
- drivers/nvme/host/pci.c               | 238 ++++++++++++++++++++++++++++++----
- drivers/scsi/qla2xxx/qla_os.c         |   5 +-
- drivers/scsi/scsi_lib.c               |   2 +-
- drivers/scsi/smartpqi/smartpqi_init.c |   3 +-
- drivers/scsi/virtio_scsi.c            |   3 +-
- fs/block_dev.c                        |   2 +
- fs/direct-io.c                        |   2 +
- fs/iomap.c                            |   9 +-
- include/linux/blk-mq-pci.h            |   4 +-
- include/linux/blk-mq-virtio.h         |   4 +-
- include/linux/blk-mq.h                |  24 +++-
- include/linux/blk_types.h             |   4 +-
- include/linux/blkdev.h                |   2 -
- include/linux/interrupt.h             |   4 +
- kernel/irq/affinity.c                 |  31 ++++-
- 29 files changed, 520 insertions(+), 158 deletions(-)
+I reshuffled a bit and made SCSI provide an mq variant of the target
+busy. So blk_lld_busy() remains, just with an mq handler instead.
+This means that dm-mpath won't need any changing, I think we're good.
 
 -- 
 Jens Axboe
