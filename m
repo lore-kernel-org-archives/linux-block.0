@@ -1,56 +1,153 @@
-Return-Path: <prvs=816489328=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
 	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH v3 06/11] block: Introduce BLKGETZONESZ ioctl
-Date: Fri, 12 Oct 2018 11:30:07 +0900
-Message-Id: <20181012023012.29923-7-damien.lemoal@wdc.com>
-In-Reply-To: <20181012023012.29923-1-damien.lemoal@wdc.com>
-References: <20181012023012.29923-1-damien.lemoal@wdc.com>
+	linux-ide@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 12/29] bsg: pass in desired timeout handler
+Date: Mon, 29 Oct 2018 10:34:27 -0600
+Message-Id: <20181029163444.9940-13-axboe@kernel.dk>
+In-Reply-To: <20181029163444.9940-1-axboe@kernel.dk>
+References: <20181029163444.9940-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Get a zoned block device zone size in number of 512 B sectors.
-The zone size is always 0 for regular block devices.
+This will ease in the conversion to blk-mq, where we can't set
+a timeout handler after queue init.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: linux-scsi@vger.kernel.org
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Tested-by: Benjamin Block <bblock@linux.vnet.ibm.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/ioctl.c                 | 2 ++
- include/uapi/linux/blkzoned.h | 2 ++
- 2 files changed, 4 insertions(+)
+ block/bsg-lib.c                     | 3 ++-
+ drivers/scsi/scsi_transport_fc.c    | 7 +++----
+ drivers/scsi/scsi_transport_iscsi.c | 2 +-
+ drivers/scsi/scsi_transport_sas.c   | 4 ++--
+ drivers/scsi/ufs/ufs_bsg.c          | 2 +-
+ include/linux/bsg-lib.h             | 2 +-
+ 6 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 3884d810efd2..f6d2c6f1f050 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -532,6 +532,8 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
- 		return blkdev_report_zones_ioctl(bdev, mode, cmd, arg);
- 	case BLKRESETZONE:
- 		return blkdev_reset_zones_ioctl(bdev, mode, cmd, arg);
-+	case BLKGETZONESZ:
-+		return put_uint(arg, bdev_zone_sectors(bdev));
- 	case HDIO_GETGEO:
- 		return blkdev_getgeo(bdev, argp);
- 	case BLKRAGET:
-diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
-index ff5a5db8906a..281ac605f752 100644
---- a/include/uapi/linux/blkzoned.h
-+++ b/include/uapi/linux/blkzoned.h
-@@ -137,8 +137,10 @@ struct blk_zone_range {
-  *                 sector specified in the report request structure.
-  * @BLKRESETZONE: Reset the write pointer of the zones in the specified
-  *                sector range. The sector range must be zone aligned.
-+ * @BLKGETZONESZ: Get the device zone size in number of 512 B sectors.
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index f3501cdaf1a6..1da011ec04e6 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -304,7 +304,7 @@ static void bsg_exit_rq(struct request_queue *q, struct request *req)
+  * @dd_job_size: size of LLD data needed for each job
   */
- #define BLKREPORTZONE	_IOWR(0x12, 130, struct blk_zone_report)
- #define BLKRESETZONE	_IOW(0x12, 131, struct blk_zone_range)
-+#define BLKGETZONESZ	_IOW(0x12, 132, __u32)
+ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
+-		bsg_job_fn *job_fn, int dd_job_size)
++		bsg_job_fn *job_fn, rq_timed_out_fn *timeout, int dd_job_size)
+ {
+ 	struct request_queue *q;
+ 	int ret;
+@@ -327,6 +327,7 @@ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
+ 	blk_queue_flag_set(QUEUE_FLAG_BIDI, q);
+ 	blk_queue_softirq_done(q, bsg_softirq_done);
+ 	blk_queue_rq_timeout(q, BLK_DEFAULT_SG_TIMEOUT);
++	blk_queue_rq_timed_out(q, timeout);
  
- #endif /* _UAPI_BLKZONED_H */
+ 	ret = bsg_register_queue(q, dev, name, &bsg_transport_ops);
+ 	if (ret) {
+diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
+index 381668fa135d..98aaffb4c715 100644
+--- a/drivers/scsi/scsi_transport_fc.c
++++ b/drivers/scsi/scsi_transport_fc.c
+@@ -3780,7 +3780,8 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
+ 	snprintf(bsg_name, sizeof(bsg_name),
+ 		 "fc_host%d", shost->host_no);
+ 
+-	q = bsg_setup_queue(dev, bsg_name, fc_bsg_dispatch, i->f->dd_bsg_size);
++	q = bsg_setup_queue(dev, bsg_name, fc_bsg_dispatch, fc_bsg_job_timeout,
++				i->f->dd_bsg_size);
+ 	if (IS_ERR(q)) {
+ 		dev_err(dev,
+ 			"fc_host%d: bsg interface failed to initialize - setup queue\n",
+@@ -3788,7 +3789,6 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
+ 		return PTR_ERR(q);
+ 	}
+ 	__scsi_init_queue(shost, q);
+-	blk_queue_rq_timed_out(q, fc_bsg_job_timeout);
+ 	blk_queue_rq_timeout(q, FC_DEFAULT_BSG_TIMEOUT);
+ 	fc_host->rqst_q = q;
+ 	return 0;
+@@ -3826,14 +3826,13 @@ fc_bsg_rportadd(struct Scsi_Host *shost, struct fc_rport *rport)
+ 		return -ENOTSUPP;
+ 
+ 	q = bsg_setup_queue(dev, dev_name(dev), fc_bsg_dispatch,
+-			i->f->dd_bsg_size);
++				fc_bsg_job_timeout, i->f->dd_bsg_size);
+ 	if (IS_ERR(q)) {
+ 		dev_err(dev, "failed to setup bsg queue\n");
+ 		return PTR_ERR(q);
+ 	}
+ 	__scsi_init_queue(shost, q);
+ 	blk_queue_prep_rq(q, fc_bsg_rport_prep);
+-	blk_queue_rq_timed_out(q, fc_bsg_job_timeout);
+ 	blk_queue_rq_timeout(q, BLK_DEFAULT_SG_TIMEOUT);
+ 	rport->rqst_q = q;
+ 	return 0;
+diff --git a/drivers/scsi/scsi_transport_iscsi.c b/drivers/scsi/scsi_transport_iscsi.c
+index 6fd2fe210fc3..26b11a775be9 100644
+--- a/drivers/scsi/scsi_transport_iscsi.c
++++ b/drivers/scsi/scsi_transport_iscsi.c
+@@ -1542,7 +1542,7 @@ iscsi_bsg_host_add(struct Scsi_Host *shost, struct iscsi_cls_host *ihost)
+ 		return -ENOTSUPP;
+ 
+ 	snprintf(bsg_name, sizeof(bsg_name), "iscsi_host%d", shost->host_no);
+-	q = bsg_setup_queue(dev, bsg_name, iscsi_bsg_host_dispatch, 0);
++	q = bsg_setup_queue(dev, bsg_name, iscsi_bsg_host_dispatch, NULL, 0);
+ 	if (IS_ERR(q)) {
+ 		shost_printk(KERN_ERR, shost, "bsg interface failed to "
+ 			     "initialize - no request queue\n");
+diff --git a/drivers/scsi/scsi_transport_sas.c b/drivers/scsi/scsi_transport_sas.c
+index 0a165b2b3e81..cf6d47891d77 100644
+--- a/drivers/scsi/scsi_transport_sas.c
++++ b/drivers/scsi/scsi_transport_sas.c
+@@ -198,7 +198,7 @@ static int sas_bsg_initialize(struct Scsi_Host *shost, struct sas_rphy *rphy)
+ 
+ 	if (rphy) {
+ 		q = bsg_setup_queue(&rphy->dev, dev_name(&rphy->dev),
+-				sas_smp_dispatch, 0);
++				sas_smp_dispatch, NULL, 0);
+ 		if (IS_ERR(q))
+ 			return PTR_ERR(q);
+ 		rphy->q = q;
+@@ -207,7 +207,7 @@ static int sas_bsg_initialize(struct Scsi_Host *shost, struct sas_rphy *rphy)
+ 
+ 		snprintf(name, sizeof(name), "sas_host%d", shost->host_no);
+ 		q = bsg_setup_queue(&shost->shost_gendev, name,
+-				sas_smp_dispatch, 0);
++				sas_smp_dispatch, NULL, 0);
+ 		if (IS_ERR(q))
+ 			return PTR_ERR(q);
+ 		to_sas_host_attrs(shost)->q = q;
+diff --git a/drivers/scsi/ufs/ufs_bsg.c b/drivers/scsi/ufs/ufs_bsg.c
+index e5f8e54bf644..dd0e9700a74c 100644
+--- a/drivers/scsi/ufs/ufs_bsg.c
++++ b/drivers/scsi/ufs/ufs_bsg.c
+@@ -193,7 +193,7 @@ int ufs_bsg_probe(struct ufs_hba *hba)
+ 	if (ret)
+ 		goto out;
+ 
+-	q = bsg_setup_queue(bsg_dev, dev_name(bsg_dev), ufs_bsg_request, 0);
++	q = bsg_setup_queue(bsg_dev, dev_name(bsg_dev), ufs_bsg_request, NULL, 0);
+ 	if (IS_ERR(q)) {
+ 		ret = PTR_ERR(q);
+ 		goto out;
+diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
+index 6aeaf6472665..b13ae143e7ef 100644
+--- a/include/linux/bsg-lib.h
++++ b/include/linux/bsg-lib.h
+@@ -72,7 +72,7 @@ struct bsg_job {
+ void bsg_job_done(struct bsg_job *job, int result,
+ 		  unsigned int reply_payload_rcv_len);
+ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
+-		bsg_job_fn *job_fn, int dd_job_size);
++		bsg_job_fn *job_fn, rq_timed_out_fn *timeout, int dd_job_size);
+ void bsg_job_put(struct bsg_job *job);
+ int __must_check bsg_job_get(struct bsg_job *job);
+ 
 -- 
 2.17.1
