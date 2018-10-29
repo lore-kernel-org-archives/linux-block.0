@@ -1,65 +1,115 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:46323 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728065AbeJIScA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:32:00 -0400
-Received: by mail-pf1-f196.google.com with SMTP id r64-v6so662121pfb.13
-        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:15:33 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 41/45] lightnvm: pblk: guarantee mw_cunits on read buffer
-Date: Tue,  9 Oct 2018 13:12:11 +0200
-Message-Id: <20181009111215.7653-42-mb@lightnvm.io>
-In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
-References: <20181009111215.7653-1-mb@lightnvm.io>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 13/14] block: add REQ_HIPRI and inherit it from IOCB_HIPRI
+Date: Mon, 29 Oct 2018 10:37:37 -0600
+Message-Id: <20181029163738.10172-14-axboe@kernel.dk>
+In-Reply-To: <20181029163738.10172-1-axboe@kernel.dk>
+References: <20181029163738.10172-1-axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@javigon.com>
+We use IOCB_HIPRI to poll for IO in the caller instead of scheduling.
+This information is not available for (or after) IO submission. The
+driver may make different queue choices based on the type of IO, so
+make the fact that we will poll for this IO known to the lower layers
+as well.
 
-OCSSD 2.0 defines the amount of data that the host must buffer per chunk
-to guarantee reads through the geometry field mw_cunits. This value is
-the base that pblk uses to determine the size of its read buffer.
-Currently, this size is set to be the closes power-of-2 to mw_cunits
-times the number of parallel units available to the pblk instance for
-each open line (currently one). When an entry (4KB) is put in the
-buffer, the L2P table points to it. As the buffer wraps up, the L2P is
-updated to point to addresses on the device, thus guaranteeing mw_cunits
-at a chunk level.
-
-However, given that pblk cannot write to the device under ws_min
-(normally ws_opt), there might be a window in which the buffer starts
-wrapping up and updating L2P entries before the mw_cunits value in a
-chunk has been surpassed.
-
-In order not to violate the mw_cunits constrain in this case, account
-for ws_opt on the read buffer creation.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/lightnvm/pblk-init.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ fs/block_dev.c            | 2 ++
+ fs/direct-io.c            | 2 ++
+ fs/iomap.c                | 9 ++++++++-
+ include/linux/blk_types.h | 4 +++-
+ 4 files changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index b2c49fc006c9..e0db0cb3122d 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -195,7 +195,8 @@ static int pblk_rwb_init(struct pblk *pblk)
- 	unsigned long buffer_size;
- 	int pgs_in_buffer;
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 38b8ce05cbc7..8bb8090c57a7 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -232,6 +232,8 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+ 		bio.bi_opf = dio_bio_write_op(iocb);
+ 		task_io_account_write(ret);
+ 	}
++	if (iocb->ki_flags & IOCB_HIPRI)
++		bio.bi_opf |= REQ_HIPRI;
  
--	pgs_in_buffer = max(geo->mw_cunits, geo->ws_opt) * geo->all_luns;
-+	pgs_in_buffer = (max(geo->mw_cunits, geo->ws_opt) + geo->ws_opt)
-+								* geo->all_luns;
+ 	qc = submit_bio(&bio);
+ 	for (;;) {
+diff --git a/fs/direct-io.c b/fs/direct-io.c
+index 093fb54cd316..ffb46b7aa5f7 100644
+--- a/fs/direct-io.c
++++ b/fs/direct-io.c
+@@ -1265,6 +1265,8 @@ do_blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
+ 	} else {
+ 		dio->op = REQ_OP_READ;
+ 	}
++	if (iocb->ki_flags & IOCB_HIPRI)
++		dio->op_flags |= REQ_HIPRI;
  
- 	if (write_buffer_size && (write_buffer_size > pgs_in_buffer))
- 		buffer_size = write_buffer_size;
+ 	/*
+ 	 * For AIO O_(D)SYNC writes we need to defer completions to a workqueue
+diff --git a/fs/iomap.c b/fs/iomap.c
+index ec15cf2ec696..50ad8c8d1dcb 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -1554,6 +1554,7 @@ iomap_dio_zero(struct iomap_dio *dio, struct iomap *iomap, loff_t pos,
+ 		unsigned len)
+ {
+ 	struct page *page = ZERO_PAGE(0);
++	int flags = REQ_SYNC | REQ_IDLE;
+ 	struct bio *bio;
+ 
+ 	bio = bio_alloc(GFP_KERNEL, 1);
+@@ -1562,9 +1563,12 @@ iomap_dio_zero(struct iomap_dio *dio, struct iomap *iomap, loff_t pos,
+ 	bio->bi_private = dio;
+ 	bio->bi_end_io = iomap_dio_bio_end_io;
+ 
++	if (dio->iocb->ki_flags & IOCB_HIPRI)
++		flags |= REQ_HIPRI;
++
+ 	get_page(page);
+ 	__bio_add_page(bio, page, len, 0);
+-	bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC | REQ_IDLE);
++	bio_set_op_attrs(bio, REQ_OP_WRITE, flags);
+ 
+ 	atomic_inc(&dio->ref);
+ 	return submit_bio(bio);
+@@ -1663,6 +1667,9 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+ 				bio_set_pages_dirty(bio);
+ 		}
+ 
++		if (dio->iocb->ki_flags & IOCB_HIPRI)
++			bio->bi_opf |= REQ_HIPRI;
++
+ 		iov_iter_advance(dio->submit.iter, n);
+ 
+ 		dio->size += n;
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 093a818c5b68..d6c2558d6b73 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -322,6 +322,8 @@ enum req_flag_bits {
+ 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
+ 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
+ 
++	__REQ_HIPRI,
++
+ 	/* for driver use */
+ 	__REQ_DRV,
+ 	__REQ_SWAP,		/* swapping request. */
+@@ -342,8 +344,8 @@ enum req_flag_bits {
+ #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
+ #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
+ #define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
+-
+ #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
++#define REQ_HIPRI		(1ULL << __REQ_HIPRI)
+ 
+ #define REQ_DRV			(1ULL << __REQ_DRV)
+ #define REQ_SWAP		(1ULL << __REQ_SWAP)
 -- 
 2.17.1
