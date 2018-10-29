@@ -1,62 +1,60 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: axboe@kernel.dk
-Cc: linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Dongbo Cao <cdbdyx@163.com>,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH 15/15] bcache: panic fix for making cache device
-Date: Mon,  8 Oct 2018 20:41:21 +0800
-Message-Id: <20181008124121.20192-16-colyli@suse.de>
-In-Reply-To: <20181008124121.20192-1-colyli@suse.de>
-References: <20181008124121.20192-1-colyli@suse.de>
-MIME-Version: 1.0
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-ide@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 26/29] block: kill request slab cache
+Date: Mon, 29 Oct 2018 10:34:41 -0600
+Message-Id: <20181029163444.9940-27-axboe@kernel.dk>
+In-Reply-To: <20181029163444.9940-1-axboe@kernel.dk>
+References: <20181029163444.9940-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Dongbo Cao <cdbdyx@163.com>
-
-when the nbuckets of cache device is smaller than 1024, making cache
-device will trigger BUG_ON in kernel, add a condition to avoid this.
-
-Reported-by: nitroxis <n@nxs.re>
-Signed-off-by: Dongbo Cao <cdbdyx@163.com>
-Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/md/bcache/super.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ block/blk-core.c | 8 --------
+ block/blk.h      | 1 -
+ 2 files changed, 9 deletions(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 2a362a7ba995..563f75686100 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -2070,6 +2070,11 @@ static int cache_alloc(struct cache *ca)
- 	 */
- 	btree_buckets = ca->sb.njournal_buckets ?: 8;
- 	free = roundup_pow_of_two(ca->sb.nbuckets) >> 10;
-+	if (!free) {
-+		ret = -EPERM;
-+		err = "ca->sb.nbuckets is too small";
-+		goto err_free;
-+	}
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 0678ec4b1169..951e8cf082e1 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -57,11 +57,6 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(block_unplug);
  
- 	if (!init_fifo(&ca->free[RESERVE_BTREE], btree_buckets,
- 						GFP_KERNEL)) {
-@@ -2147,6 +2152,7 @@ static int cache_alloc(struct cache *ca)
- err_prio_alloc:
- 	free_fifo(&ca->free[RESERVE_BTREE]);
- err_btree_alloc:
-+err_free:
- 	module_put(THIS_MODULE);
- 	if (err)
- 		pr_notice("error %s: %s", ca->cache_dev_name, err);
-@@ -2176,6 +2182,8 @@ static int register_cache(struct cache_sb *sb, struct page *sb_page,
- 		blkdev_put(bdev, FMODE_READ|FMODE_WRITE|FMODE_EXCL);
- 		if (ret == -ENOMEM)
- 			err = "cache_alloc(): -ENOMEM";
-+		else if (ret == -EPERM)
-+			err = "cache_alloc(): cache device is too small";
- 		else
- 			err = "cache_alloc(): unknown error";
- 		goto err;
+ DEFINE_IDA(blk_queue_ida);
+ 
+-/*
+- * For the allocated request tables
+- */
+-struct kmem_cache *request_cachep;
+-
+ /*
+  * For queue allocation
+  */
+@@ -1969,9 +1964,6 @@ int __init blk_dev_init(void)
+ 	if (!kblockd_workqueue)
+ 		panic("Failed to create kblockd\n");
+ 
+-	request_cachep = kmem_cache_create("blkdev_requests",
+-			sizeof(struct request), 0, SLAB_PANIC, NULL);
+-
+ 	blk_requestq_cachep = kmem_cache_create("request_queue",
+ 			sizeof(struct request_queue), 0, SLAB_PANIC, NULL);
+ 
+diff --git a/block/blk.h b/block/blk.h
+index e925cf4fe4de..2bf1cfeeb9c0 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -32,7 +32,6 @@ struct blk_flush_queue {
+ };
+ 
+ extern struct kmem_cache *blk_requestq_cachep;
+-extern struct kmem_cache *request_cachep;
+ extern struct kobj_type blk_queue_ktype;
+ extern struct ida blk_queue_ida;
+ 
 -- 
-2.19.0
+2.17.1
