@@ -4,10 +4,10 @@ To: axboe@kernel.dk
 Cc: ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Subject: [PATCH V3 2/4] blk-mq: insert request without involving any io scheduler
-Date: Mon, 29 Oct 2018 16:49:09 +0800
-Message-Id: <1540802951-5408-3-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1540802951-5408-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1540802951-5408-1-git-send-email-jianchao.w.wang@oracle.com>
+Date: Mon, 29 Oct 2018 16:33:31 +0800
+Message-Id: <1540802013-2921-3-git-send-email-jianchao.w.wang@oracle.com>
+In-Reply-To: <1540802013-2921-1-git-send-email-jianchao.w.wang@oracle.com>
+References: <1540802013-2921-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
 When try to issue request directly, if the queue is stopped or
