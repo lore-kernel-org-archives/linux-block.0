@@ -1,107 +1,53 @@
-Return-Path: <prvs=81565c836=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH v2 01/11] scsi: sd_zbc: Rearrange code
-Date: Thu, 11 Oct 2018 16:09:42 +0900
-Message-Id: <20181011070952.13248-2-damien.lemoal@wdc.com>
-In-Reply-To: <20181011070952.13248-1-damien.lemoal@wdc.com>
-References: <20181011070952.13248-1-damien.lemoal@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 10/14] blk-mq: initial support for multiple queue maps
+To: Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20181029163738.10172-1-axboe@kernel.dk>
+ <20181029163738.10172-11-axboe@kernel.dk>
+ <1540842034.196084.89.camel@acm.org>
+ <ac755067-1432-54ce-6a4f-c7383f1ecc9d@kernel.dk>
+ <1540843250.196084.93.camel@acm.org>
+ <867d3e60-3edf-39e7-2bcb-02d7f1092f82@kernel.dk>
+ <1540844730.196084.95.camel@acm.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <50515ef4-35d4-b238-e0fe-799c2fc758cb@kernel.dk>
+Date: Mon, 29 Oct 2018 14:29:17 -0600
+MIME-Version: 1.0
+In-Reply-To: <1540844730.196084.95.camel@acm.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Move the urswrz check out of sd_zbc_read_zones() and into
-sd_zbc_read_zoned_characteristics() where that value is obtained (read
-from the disk zoned characteristics VPD page). Since this function now
-does more than simply reading the VPD page, rename it to
-sd_zbc_check_zoned_characteristics().
-Also fix the error message displayed when reading that VPD page fails.
+On 10/29/18 2:25 PM, Bart Van Assche wrote:
+> On Mon, 2018-10-29 at 14:09 -0600, Jens Axboe wrote:
+>> hctx->type will be set to the value of the first type. This is all driver
+>> private, blk-mq could not care less what the value of the type means.
+>>
+>> As to the other question, it works just fine since that is the queue
+>> that is being accessed. There's no confusion there. I think you're
+>> misunderstanding how it's seutp. To use nvme as the example, type 0
+>> would be reads, 1 writes, and 2 pollable queues. If reads and writes
+>> share the same set of hardware queues, then type 1 simply doesn't
+>> exist in terms of ->flags_to_type() return value. This is purely
+>> driven by the driver. That hook is the only decider of where something
+>> will go. If we share hctx sets, we share the same hardware queue as
+>> well. There is just the one set for that case.
+> 
+> How about adding a comment in blk-mq.h that explains that hardware queues can
+> be shared among different hardware queue types? I think this is nontrivial and
+> deserves a comment.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/sd_zbc.c | 39 +++++++++++++++++++--------------------
- 1 file changed, 19 insertions(+), 20 deletions(-)
+Sure, I can do that. I guess a key concept that is confusing based on
+your above question is that the sets don't have to be consecutive.
+It's perfectly valid to have 0 and 2 be the available queues, and
+nothing for 1. For example.
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 412c1787dcd9..0b7d8787f785 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -305,19 +305,19 @@ void sd_zbc_complete(struct scsi_cmnd *cmd, unsigned int good_bytes,
- }
- 
- /**
-- * sd_zbc_read_zoned_characteristics - Read zoned block device characteristics
-+ * sd_zbc_check_zoned_characteristics - Check zoned block device characteristics
-  * @sdkp: Target disk
-  * @buf: Buffer where to store the VPD page data
-  *
-- * Read VPD page B6.
-+ * Read VPD page B6, get information and check that reads are unconstrained.
-  */
--static int sd_zbc_read_zoned_characteristics(struct scsi_disk *sdkp,
--					     unsigned char *buf)
-+static int sd_zbc_check_zoned_characteristics(struct scsi_disk *sdkp,
-+					      unsigned char *buf)
- {
- 
- 	if (scsi_get_vpd_page(sdkp->device, 0xb6, buf, 64)) {
- 		sd_printk(KERN_NOTICE, sdkp,
--			  "Unconstrained-read check failed\n");
-+			  "Read zoned characteristics VPD page failed\n");
- 		return -ENODEV;
- 	}
- 
-@@ -335,6 +335,18 @@ static int sd_zbc_read_zoned_characteristics(struct scsi_disk *sdkp,
- 		sdkp->zones_max_open = get_unaligned_be32(&buf[16]);
- 	}
- 
-+	/*
-+	 * Check for unconstrained reads: host-managed devices with
-+	 * constrained reads (drives failing read after write pointer)
-+	 * are not supported.
-+	 */
-+	if (!sdkp->urswrz) {
-+		if (sdkp->first_scan)
-+			sd_printk(KERN_NOTICE, sdkp,
-+			  "constrained reads devices are not supported\n");
-+		return -ENODEV;
-+	}
-+
- 	return 0;
- }
- 
-@@ -675,24 +687,11 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
- 		 */
- 		return 0;
- 
--	/* Get zoned block device characteristics */
--	ret = sd_zbc_read_zoned_characteristics(sdkp, buf);
-+	/* Check zoned block device characteristics (unconstrained reads) */
-+	ret = sd_zbc_check_zoned_characteristics(sdkp, buf);
- 	if (ret)
- 		goto err;
- 
--	/*
--	 * Check for unconstrained reads: host-managed devices with
--	 * constrained reads (drives failing read after write pointer)
--	 * are not supported.
--	 */
--	if (!sdkp->urswrz) {
--		if (sdkp->first_scan)
--			sd_printk(KERN_NOTICE, sdkp,
--			  "constrained reads devices are not supported\n");
--		ret = -ENODEV;
--		goto err;
--	}
--
- 	/* Check capacity */
- 	ret = sd_zbc_check_capacity(sdkp, buf);
- 	if (ret)
+BTW, split up the incremental patch, find them here:
+
+http://git.kernel.dk/cgit/linux-block/commit/?h=mq-maps&id=6890d88deecfd3723ce620d82f5fc80485f9caec
+
+and
+
+http://git.kernel.dk/cgit/linux-block/commit/?h=mq-maps&id=907725dff2f8cc6d1502a9123f930b8d3708bd02
+
 -- 
-2.17.1
+Jens Axboe
