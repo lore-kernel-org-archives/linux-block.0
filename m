@@ -1,51 +1,75 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-ide@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 29/29] block: get rid of blk_queued_rq()
-Date: Mon, 29 Oct 2018 10:34:44 -0600
-Message-Id: <20181029163444.9940-30-axboe@kernel.dk>
-In-Reply-To: <20181029163444.9940-1-axboe@kernel.dk>
-References: <20181029163444.9940-1-axboe@kernel.dk>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 10/28] dasd: remove dead code
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org
+References: <20181025211039.11559-1-axboe@kernel.dk>
+ <20181025211039.11559-11-axboe@kernel.dk>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <62abe687-cbcc-e15a-6702-79b44d4f3cc0@suse.de>
+Date: Mon, 29 Oct 2018 07:54:21 +0100
+MIME-Version: 1.0
+In-Reply-To: <20181025211039.11559-11-axboe@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-No point in hiding what this does, just open code it in the
-one spot where we are still using it.
+On 10/25/18 11:10 PM, Jens Axboe wrote:
+> Since e443343e509a we haven't had a request_fn attached to
+> this driver, hence any code inside an if (q->request_fn) is
+> unreachable.
+> 
+> Fixes: e443343e509a ("s390/dasd: blk-mq conversion")
+> [sth: Keep and fix the dasd_info->chanq_len counter.]
+> Reviewed-by: Jan Hoeppner <hoeppner@linux.ibm.com>
+> Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>   drivers/s390/block/dasd_ioctl.c | 22 +++++-----------------
+>   1 file changed, 5 insertions(+), 17 deletions(-)
+> 
+> diff --git a/drivers/s390/block/dasd_ioctl.c b/drivers/s390/block/dasd_ioctl.c
+> index 2016e0ed5865..8e26001dc11c 100644
+> --- a/drivers/s390/block/dasd_ioctl.c
+> +++ b/drivers/s390/block/dasd_ioctl.c
+> @@ -412,6 +412,7 @@ static int dasd_ioctl_information(struct dasd_block *block,
+>   	struct ccw_dev_id dev_id;
+>   	struct dasd_device *base;
+>   	struct ccw_device *cdev;
+> +	struct list_head *l;
+>   	unsigned long flags;
+>   	int rc;
+>   
+> @@ -462,23 +463,10 @@ static int dasd_ioctl_information(struct dasd_block *block,
+>   
+>   	memcpy(dasd_info->type, base->discipline->name, 4);
+>   
+> -	if (block->request_queue->request_fn) {
+> -		struct list_head *l;
+> -#ifdef DASD_EXTENDED_PROFILING
+> -		{
+> -			struct list_head *l;
+> -			spin_lock_irqsave(&block->lock, flags);
+> -			list_for_each(l, &block->request_queue->queue_head)
+> -				dasd_info->req_queue_len++;
+> -			spin_unlock_irqrestore(&block->lock, flags);
+> -		}
+> -#endif				/* DASD_EXTENDED_PROFILING */
+> -		spin_lock_irqsave(get_ccwdev_lock(base->cdev), flags);
+> -		list_for_each(l, &base->ccw_queue)
+> -			dasd_info->chanq_len++;
+> -		spin_unlock_irqrestore(get_ccwdev_lock(base->cdev),
+> -				       flags);
+> -	}
+> +	spin_lock_irqsave(&block->queue_lock, flags);
+> +	list_for_each(l, &base->ccw_queue)
+> +		dasd_info->chanq_len++;
+> +	spin_unlock_irqrestore(&block->queue_lock, flags);
+>   
+>   	rc = 0;
+>   	if (copy_to_user(argp, dasd_info,
+> 
 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-mq.c         | 2 +-
- include/linux/blkdev.h | 2 --
- 2 files changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d43c9232c77c..21e4147c4810 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -692,7 +692,7 @@ void blk_mq_requeue_request(struct request *rq, bool kick_requeue_list)
- 	/* this request will be re-inserted to io scheduler queue */
- 	blk_mq_sched_requeue_request(rq);
- 
--	BUG_ON(blk_queued_rq(rq));
-+	BUG_ON(!list_empty(&rq->queuelist));
- 	blk_mq_add_to_requeue_list(rq, true, kick_requeue_list);
- }
- EXPORT_SYMBOL(blk_mq_requeue_request);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index e0c661a95c39..c675e2b5af62 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -673,8 +673,6 @@ static inline bool blk_account_rq(struct request *rq)
- 
- #define blk_rq_cpu_valid(rq)	((rq)->cpu != -1)
- #define blk_bidi_rq(rq)		((rq)->next_rq != NULL)
--/* rq->queuelist of dequeued request must be list_empty() */
--#define blk_queued_rq(rq)	(!list_empty(&(rq)->queuelist))
- 
- #define list_entry_rq(ptr)	list_entry((ptr), struct request, queuelist)
- 
--- 
-2.17.1
+Cheers,
+
+Hannes
