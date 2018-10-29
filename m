@@ -1,39 +1,30 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: axboe@kernel.dk
-Cc: linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH 05/15] bcache: fix typo in code comments of closure_return_with_destructor()
-Date: Mon,  8 Oct 2018 20:41:11 +0800
-Message-Id: <20181008124121.20192-6-colyli@suse.de>
-In-Reply-To: <20181008124121.20192-1-colyli@suse.de>
-References: <20181008124121.20192-1-colyli@suse.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH V5] block: fix the DISCARD request merge
+To: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: martin.petersen@oracle.com, tom.leiming@gmail.com, hch@lst.de,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1540641134-21485-1-git-send-email-jianchao.w.wang@oracle.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <610adbc6-24ba-e6ed-a98a-f3faeef8bd51@kernel.dk>
+Date: Mon, 29 Oct 2018 09:33:19 -0600
 MIME-Version: 1.0
+In-Reply-To: <1540641134-21485-1-git-send-email-jianchao.w.wang@oracle.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-The code comments of closure_return_with_destructor() in closure.h makrs
-function name as closure_return(). This patch fixes this type with the
-correct name - closure_return_with_destructor.
+On 10/27/18 5:52 AM, Jianchao Wang wrote:
+> There are two cases when handle DISCARD merge.
+> If max_discard_segments == 1, the bios/requests need to be contiguous
+> to merge. If max_discard_segments > 1, it takes every bio as a range
+> and different range needn't to be contiguous.
+> 
+> But now, attempt_merge screws this up. It always consider contiguity
+> for DISCARD for the case max_discard_segments > 1 and cannot merge
+> contiguous DISCARD for the case max_discard_segments == 1, because
+> rq_attempt_discard_merge always returns false in this case.
+> This patch fixes both of the two cases above.
 
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/closure.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Applied, thanks.
 
-diff --git a/drivers/md/bcache/closure.h b/drivers/md/bcache/closure.h
-index eca0d496b686..c88cdc4ae4ec 100644
---- a/drivers/md/bcache/closure.h
-+++ b/drivers/md/bcache/closure.h
-@@ -345,7 +345,8 @@ do {									\
- } while (0)
- 
- /**
-- * closure_return - finish execution of a closure, with destructor
-+ * closure_return_with_destructor - finish execution of a closure,
-+ *				    with destructor
-  *
-  * Works like closure_return(), except @destructor will be called when all
-  * outstanding refs on @cl have been dropped; @destructor may be used to safely
 -- 
-2.19.0
+Jens Axboe
