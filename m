@@ -1,47 +1,51 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <linux-ide-owner@vger.kernel.org>
 Subject: Re: [PATCH 16/28] blk-cgroup: remove legacy queue bypassing
-To: Johannes Thumshirn <jthumshirn@suse.de>, linux-block@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org
 References: <20181025211039.11559-1-axboe@kernel.dk>
  <20181025211039.11559-17-axboe@kernel.dk>
  <5f058345-522c-c24c-d09d-079046e99d7e@suse.de>
  <5a75b005-7dc8-c8a9-fb41-6590039d10a4@kernel.dk>
- <f18f704b-d8fc-6a97-32ec-fc1eaf336064@suse.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <db87764a-159e-7439-1846-e9f7e0540a12@kernel.dk>
-Date: Mon, 29 Oct 2018 08:59:27 -0600
+From: Johannes Thumshirn <jthumshirn@suse.de>
+Message-ID: <f18f704b-d8fc-6a97-32ec-fc1eaf336064@suse.de>
+Date: Mon, 29 Oct 2018 15:25:20 +0100
 MIME-Version: 1.0
-In-Reply-To: <f18f704b-d8fc-6a97-32ec-fc1eaf336064@suse.de>
+In-Reply-To: <5a75b005-7dc8-c8a9-fb41-6590039d10a4@kernel.dk>
 Content-Type: text/plain; charset=utf-8
+Sender: linux-ide-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/29/18 8:25 AM, Johannes Thumshirn wrote:
-> On 29/10/18 15:23, Jens Axboe wrote:
->> On 10/29/18 5:00 AM, Johannes Thumshirn wrote:
->>> Hi Jens,
->>>
->>> On 25/10/18 23:10, Jens Axboe wrote:
->>> [...]
->>>> @@ -1487,8 +1485,6 @@ int blkcg_activate_policy(struct request_queue *q,
->>>>  out_bypass_end:
->>>>  	if (q->mq_ops)
->>>>  		blk_mq_unfreeze_queue(q);
->>>> -	else
->>>> -		blk_queue_bypass_end(q);
->>>
->>>>  
->>>>
->>>
->>> Now that we only have mq, do we still need all these checks for q->mq_ops?
+On 29/10/18 15:23, Jens Axboe wrote:
+> On 10/29/18 5:00 AM, Johannes Thumshirn wrote:
+>> Hi Jens,
 >>
->> We need it for the cases where we can be passing in a stacked driver
->> or an mq driver, or for cases where we explicitly register mq attributes,
->> and that sort of thing.
+>> On 25/10/18 23:10, Jens Axboe wrote:
+>> [...]
+>>> @@ -1487,8 +1485,6 @@ int blkcg_activate_policy(struct request_queue *q,
+>>>  out_bypass_end:
+>>>  	if (q->mq_ops)
+>>>  		blk_mq_unfreeze_queue(q);
+>>> -	else
+>>> -		blk_queue_bypass_end(q);
 >>
+>>>  
+>>>
+>>
+>> Now that we only have mq, do we still need all these checks for q->mq_ops?
 > 
-> Ah ok. Guess we'll have to live with it then.
+> We need it for the cases where we can be passing in a stacked driver
+> or an mq driver, or for cases where we explicitly register mq attributes,
+> and that sort of thing.
+> 
 
-At this point the check should be equivalent to queue_is_rq_based(), fwiw.
+Ah ok. Guess we'll have to live with it then.
+
+	Johannes
 
 -- 
-Jens Axboe
+Johannes Thumshirn                                        SUSE Labs
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
