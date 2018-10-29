@@ -1,174 +1,287 @@
-Return-Path: <prvs=81565c836=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
 	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	dm-devel@redhat.com,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH v2 08/11] block: Improve zone reset execution
-Date: Thu, 11 Oct 2018 16:09:49 +0900
-Message-Id: <20181011070952.13248-9-damien.lemoal@wdc.com>
-In-Reply-To: <20181011070952.13248-1-damien.lemoal@wdc.com>
-References: <20181011070952.13248-1-damien.lemoal@wdc.com>
+	linux-ide@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 03/29] mspro_block: convert to blk-mq
+Date: Mon, 29 Oct 2018 10:34:18 -0600
+Message-Id: <20181029163444.9940-4-axboe@kernel.dk>
+In-Reply-To: <20181029163444.9940-1-axboe@kernel.dk>
+References: <20181029163444.9940-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-There is no need to synchronously execute all REQ_OP_ZONE_RESET BIOs
-necessary to reset a range of zones. Similarly to what is done for
-discard BIOs in blk-lib.c, all zone reset BIOs can be chained and
-executed asynchronously and a synchronous call done only for the last
-BIO of the chain.
+Straight forward conversion, there's room for improvement.
 
-Modify blkdev_reset_zones() to operate similarly to
-blkdev_issue_discard() using the next_bio() helper for chaining BIOs. To
-avoid code duplication of that function in blk_zoned.c, rename
-next_bio() into blk_next_bio() and declare it as a block internal
-function in blk.h.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-lib.c   | 13 ++++++-------
- block/blk-zoned.c | 29 ++++++++++++++++-------------
- block/blk.h       |  2 ++
- 3 files changed, 24 insertions(+), 20 deletions(-)
+ drivers/memstick/core/mspro_block.c | 121 +++++++++++++++-------------
+ 1 file changed, 66 insertions(+), 55 deletions(-)
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index d1b9dd03da25..d7bedee5f9ba 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -10,8 +10,7 @@
+diff --git a/drivers/memstick/core/mspro_block.c b/drivers/memstick/core/mspro_block.c
+index 0cd30dcb6801..aba50ec98b4d 100644
+--- a/drivers/memstick/core/mspro_block.c
++++ b/drivers/memstick/core/mspro_block.c
+@@ -12,7 +12,7 @@
+  *
+  */
  
- #include "blk.h"
+-#include <linux/blkdev.h>
++#include <linux/blk-mq.h>
+ #include <linux/idr.h>
+ #include <linux/hdreg.h>
+ #include <linux/kthread.h>
+@@ -142,6 +142,7 @@ struct mspro_block_data {
+ 	struct gendisk        *disk;
+ 	struct request_queue  *queue;
+ 	struct request        *block_req;
++	struct blk_mq_tag_set tag_set;
+ 	spinlock_t            q_lock;
  
--static struct bio *next_bio(struct bio *bio, unsigned int nr_pages,
--		gfp_t gfp)
-+struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp)
+ 	unsigned short        page_size;
+@@ -152,7 +153,6 @@ struct mspro_block_data {
+ 	unsigned char         system;
+ 	unsigned char         read_only:1,
+ 			      eject:1,
+-			      has_request:1,
+ 			      data_dir:1,
+ 			      active:1;
+ 	unsigned char         transfer_cmd;
+@@ -694,13 +694,12 @@ static void h_mspro_block_setup_cmd(struct memstick_dev *card, u64 offset,
+ 
+ /*** Data transfer ***/
+ 
+-static int mspro_block_issue_req(struct memstick_dev *card, int chunk)
++static int mspro_block_issue_req(struct memstick_dev *card, bool chunk)
  {
- 	struct bio *new = bio_alloc(gfp, nr_pages);
+ 	struct mspro_block_data *msb = memstick_get_drvdata(card);
+ 	u64 t_off;
+ 	unsigned int count;
  
-@@ -87,7 +86,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 			req_sects = end_sect - sector;
+-try_again:
+ 	while (chunk) {
+ 		msb->current_page = 0;
+ 		msb->current_seg = 0;
+@@ -709,9 +708,17 @@ static int mspro_block_issue_req(struct memstick_dev *card, int chunk)
+ 					       msb->req_sg);
+ 
+ 		if (!msb->seg_count) {
+-			chunk = __blk_end_request_cur(msb->block_req,
+-					BLK_STS_RESOURCE);
+-			continue;
++			unsigned int bytes = blk_rq_cur_bytes(msb->block_req);
++
++			chunk = blk_update_request(msb->block_req,
++							BLK_STS_RESOURCE,
++							bytes);
++			if (chunk)
++				continue;
++			__blk_mq_end_request(msb->block_req,
++						BLK_STS_RESOURCE);
++			msb->block_req = NULL;
++			break;
  		}
  
--		bio = next_bio(bio, 0, gfp_mask);
-+		bio = blk_next_bio(bio, 0, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio_set_op_attrs(bio, op, 0);
-@@ -189,7 +188,7 @@ static int __blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
- 	max_write_same_sectors = UINT_MAX >> 9;
- 
- 	while (nr_sects) {
--		bio = next_bio(bio, 1, gfp_mask);
-+		bio = blk_next_bio(bio, 1, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio->bi_vcnt = 1;
-@@ -265,7 +264,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
- 		return -EOPNOTSUPP;
- 
- 	while (nr_sects) {
--		bio = next_bio(bio, 0, gfp_mask);
-+		bio = blk_next_bio(bio, 0, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio->bi_opf = REQ_OP_WRITE_ZEROES;
-@@ -316,8 +315,8 @@ static int __blkdev_issue_zero_pages(struct block_device *bdev,
- 		return -EPERM;
- 
- 	while (nr_sects != 0) {
--		bio = next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
--			       gfp_mask);
-+		bio = blk_next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
-+				   gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index bb4ed69f917f..5d967fd39fbd 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -13,6 +13,8 @@
- #include <linux/rbtree.h>
- #include <linux/blkdev.h>
- 
-+#include "blk.h"
-+
- static inline sector_t blk_zone_start(struct request_queue *q,
- 				      sector_t sector)
- {
-@@ -277,16 +279,17 @@ int blkdev_reset_zones(struct block_device *bdev,
- 	struct request_queue *q = bdev_get_queue(bdev);
- 	sector_t zone_sectors;
- 	sector_t end_sector = sector + nr_sectors;
--	struct bio *bio;
-+	struct bio *bio = NULL;
-+	struct blk_plug plug;
- 	int ret;
- 
--	if (!q)
--		return -ENXIO;
--
- 	if (!blk_queue_is_zoned(q))
- 		return -EOPNOTSUPP;
- 
--	if (end_sector > bdev->bd_part->nr_sects)
-+	if (bdev_read_only(bdev))
-+		return -EPERM;
-+
-+	if (!nr_sectors || end_sector > bdev->bd_part->nr_sects)
- 		/* Out of range */
- 		return -EINVAL;
- 
-@@ -299,19 +302,14 @@ int blkdev_reset_zones(struct block_device *bdev,
- 	    end_sector != bdev->bd_part->nr_sects)
- 		return -EINVAL;
- 
-+	blk_start_plug(&plug);
- 	while (sector < end_sector) {
- 
--		bio = bio_alloc(gfp_mask, 0);
-+		bio = blk_next_bio(bio, 0, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio_set_op_attrs(bio, REQ_OP_ZONE_RESET, 0);
- 
--		ret = submit_bio_wait(bio);
--		bio_put(bio);
--
--		if (ret)
--			return ret;
--
- 		sector += zone_sectors;
- 
- 		/* This may take a while, so be nice to others */
-@@ -319,7 +317,12 @@ int blkdev_reset_zones(struct block_device *bdev,
- 
+ 		t_off = blk_rq_pos(msb->block_req);
+@@ -729,30 +736,22 @@ static int mspro_block_issue_req(struct memstick_dev *card, int chunk)
+ 		return 0;
  	}
  
--	return 0;
-+	ret = submit_bio_wait(bio);
-+	bio_put(bio);
-+
-+	blk_finish_plug(&plug);
-+
-+	return ret;
+-	dev_dbg(&card->dev, "blk_fetch\n");
+-	msb->block_req = blk_fetch_request(msb->queue);
+-	if (!msb->block_req) {
+-		dev_dbg(&card->dev, "issue end\n");
+-		return -EAGAIN;
+-	}
+-
+-	dev_dbg(&card->dev, "trying again\n");
+-	chunk = 1;
+-	goto try_again;
++	return 1;
  }
- EXPORT_SYMBOL_GPL(blkdev_reset_zones);
  
-diff --git a/block/blk.h b/block/blk.h
-index 9db4e389582c..3d67844676fb 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -421,4 +421,6 @@ extern int blk_iolatency_init(struct request_queue *q);
- static inline int blk_iolatency_init(struct request_queue *q) { return 0; }
- #endif
+ static int mspro_block_complete_req(struct memstick_dev *card, int error)
+ {
+ 	struct mspro_block_data *msb = memstick_get_drvdata(card);
+-	int chunk, cnt;
++	int cnt;
++	bool chunk;
+ 	unsigned int t_len = 0;
+ 	unsigned long flags;
  
-+struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp);
+ 	spin_lock_irqsave(&msb->q_lock, flags);
+-	dev_dbg(&card->dev, "complete %d, %d\n", msb->has_request ? 1 : 0,
++	dev_dbg(&card->dev, "complete %d, %d\n", msb->block_req ? 1 : 0,
+ 		error);
+ 
+-	if (msb->has_request) {
++	if (msb->block_req) {
+ 		/* Nothing to do - not really an error */
+ 		if (error == -EAGAIN)
+ 			error = 0;
+@@ -777,15 +776,17 @@ static int mspro_block_complete_req(struct memstick_dev *card, int error)
+ 		if (error && !t_len)
+ 			t_len = blk_rq_cur_bytes(msb->block_req);
+ 
+-		chunk = __blk_end_request(msb->block_req,
++		chunk = blk_update_request(msb->block_req,
+ 				errno_to_blk_status(error), t_len);
+-
+-		error = mspro_block_issue_req(card, chunk);
+-
+-		if (!error)
+-			goto out;
+-		else
+-			msb->has_request = 0;
++		if (chunk) {
++			error = mspro_block_issue_req(card, chunk);
++			if (!error)
++				goto out;
++		} else {
++			__blk_mq_end_request(msb->block_req,
++						errno_to_blk_status(error));
++			msb->block_req = NULL;
++		}
+ 	} else {
+ 		if (!error)
+ 			error = -EAGAIN;
+@@ -806,8 +807,8 @@ static void mspro_block_stop(struct memstick_dev *card)
+ 
+ 	while (1) {
+ 		spin_lock_irqsave(&msb->q_lock, flags);
+-		if (!msb->has_request) {
+-			blk_stop_queue(msb->queue);
++		if (!msb->block_req) {
++			blk_mq_stop_hw_queues(msb->queue);
+ 			rc = 1;
+ 		}
+ 		spin_unlock_irqrestore(&msb->q_lock, flags);
+@@ -822,32 +823,37 @@ static void mspro_block_stop(struct memstick_dev *card)
+ static void mspro_block_start(struct memstick_dev *card)
+ {
+ 	struct mspro_block_data *msb = memstick_get_drvdata(card);
+-	unsigned long flags;
+ 
+-	spin_lock_irqsave(&msb->q_lock, flags);
+-	blk_start_queue(msb->queue);
+-	spin_unlock_irqrestore(&msb->q_lock, flags);
++	blk_mq_start_hw_queues(msb->queue);
+ }
+ 
+-static void mspro_block_submit_req(struct request_queue *q)
++static blk_status_t mspro_queue_rq(struct blk_mq_hw_ctx *hctx,
++				   const struct blk_mq_queue_data *bd)
+ {
+-	struct memstick_dev *card = q->queuedata;
++	struct memstick_dev *card = hctx->queue->queuedata;
+ 	struct mspro_block_data *msb = memstick_get_drvdata(card);
+-	struct request *req = NULL;
+ 
+-	if (msb->has_request)
+-		return;
++	spin_lock_irq(&msb->q_lock);
+ 
+-	if (msb->eject) {
+-		while ((req = blk_fetch_request(q)) != NULL)
+-			__blk_end_request_all(req, BLK_STS_IOERR);
++	if (msb->block_req) {
++		spin_unlock_irq(&msb->q_lock);
++		return BLK_STS_DEV_RESOURCE;
++	}
+ 
+-		return;
++	if (msb->eject) {
++		spin_unlock_irq(&msb->q_lock);
++		blk_mq_start_request(bd->rq);
++		return BLK_STS_IOERR;
+ 	}
+ 
+-	msb->has_request = 1;
+-	if (mspro_block_issue_req(card, 0))
+-		msb->has_request = 0;
++	msb->block_req = bd->rq;
++	blk_mq_start_request(bd->rq);
 +
- #endif /* BLK_INTERNAL_H */
++	if (mspro_block_issue_req(card, true))
++		msb->block_req = NULL;
++
++	spin_unlock_irq(&msb->q_lock);
++	return BLK_STS_OK;
+ }
+ 
+ /*** Initialization ***/
+@@ -1167,6 +1173,10 @@ static int mspro_block_init_card(struct memstick_dev *card)
+ 
+ }
+ 
++static const struct blk_mq_ops mspro_mq_ops = {
++	.queue_rq	= mspro_queue_rq,
++};
++
+ static int mspro_block_init_disk(struct memstick_dev *card)
+ {
+ 	struct mspro_block_data *msb = memstick_get_drvdata(card);
+@@ -1206,9 +1216,11 @@ static int mspro_block_init_disk(struct memstick_dev *card)
+ 		goto out_release_id;
+ 	}
+ 
+-	msb->queue = blk_init_queue(mspro_block_submit_req, &msb->q_lock);
+-	if (!msb->queue) {
+-		rc = -ENOMEM;
++	msb->queue = blk_mq_init_sq_queue(&msb->tag_set, &mspro_mq_ops, 2,
++						BLK_MQ_F_SHOULD_MERGE);
++	if (IS_ERR(msb->queue)) {
++		rc = PTR_ERR(msb->queue);
++		msb->queue = NULL;
+ 		goto out_put_disk;
+ 	}
+ 
+@@ -1318,13 +1330,14 @@ static void mspro_block_remove(struct memstick_dev *card)
+ 
+ 	spin_lock_irqsave(&msb->q_lock, flags);
+ 	msb->eject = 1;
+-	blk_start_queue(msb->queue);
+ 	spin_unlock_irqrestore(&msb->q_lock, flags);
++	blk_mq_start_hw_queues(msb->queue);
+ 
+ 	del_gendisk(msb->disk);
+ 	dev_dbg(&card->dev, "mspro block remove\n");
+ 
+ 	blk_cleanup_queue(msb->queue);
++	blk_mq_free_tag_set(&msb->tag_set);
+ 	msb->queue = NULL;
+ 
+ 	sysfs_remove_group(&card->dev.kobj, &msb->attr_group);
+@@ -1344,8 +1357,9 @@ static int mspro_block_suspend(struct memstick_dev *card, pm_message_t state)
+ 	struct mspro_block_data *msb = memstick_get_drvdata(card);
+ 	unsigned long flags;
+ 
++	blk_mq_stop_hw_queues(msb->queue);
++
+ 	spin_lock_irqsave(&msb->q_lock, flags);
+-	blk_stop_queue(msb->queue);
+ 	msb->active = 0;
+ 	spin_unlock_irqrestore(&msb->q_lock, flags);
+ 
+@@ -1355,7 +1369,6 @@ static int mspro_block_suspend(struct memstick_dev *card, pm_message_t state)
+ static int mspro_block_resume(struct memstick_dev *card)
+ {
+ 	struct mspro_block_data *msb = memstick_get_drvdata(card);
+-	unsigned long flags;
+ 	int rc = 0;
+ 
+ #ifdef CONFIG_MEMSTICK_UNSAFE_RESUME
+@@ -1401,9 +1414,7 @@ static int mspro_block_resume(struct memstick_dev *card)
+ 
+ #endif /* CONFIG_MEMSTICK_UNSAFE_RESUME */
+ 
+-	spin_lock_irqsave(&msb->q_lock, flags);
+-	blk_start_queue(msb->queue);
+-	spin_unlock_irqrestore(&msb->q_lock, flags);
++	blk_mq_start_hw_queues(msb->queue);
+ 	return rc;
+ }
+ 
 -- 
 2.17.1
