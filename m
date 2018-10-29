@@ -3,9 +3,9 @@ From: Jianchao Wang <jianchao.w.wang@oracle.com>
 To: axboe@kernel.dk
 Cc: ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH RESENT V3 0/4] blk-mq: refactor and fix on issue request directly
-Date: Mon, 29 Oct 2018 16:49:07 +0800
-Message-Id: <1540802951-5408-1-git-send-email-jianchao.w.wang@oracle.com>
+Subject: [PATCH V3 0/4] blk-mq: refactor and fix on issue request directly
+Date: Mon, 29 Oct 2018 16:33:29 +0800
+Message-Id: <1540802013-2921-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
 Hi Jens
@@ -27,11 +27,8 @@ path.
 V3:
  - Correct the code about the case bypass_insert is true and io scheduler
    attached. The request still need to be issued in case above. (1/4)
- - Refactor the code to make code clearer. blk_mq_make_request is introduced
-   to decide insert, end or just return based on the return value of .queue_rq
-   and bypass_insert (1/4) 
- - Add the 2nd patch. It introduce a new decision result which indicates to
-   insert request with blk_mq_request_bypass_insert.
+ - Refactor the code to make code clearer. (1/4) 
+ - Add the 2nd patch.
  - Modify the code to adapt the new patch 1.
 
 V2:
@@ -45,7 +42,5 @@ blk-mq: ensure hctx to be ran on mapped cpu when issue
 
  block/blk-mq-sched.c |   8 ++-
  block/blk-mq.c       | 139 ++++++++++++++++++++++++++++++---------------------
- 2 files changed, 86 insertions(+), 61 deletions(-)
-
-Thanks
-Jianchao
+ block/blk-mq.c.rej   |  60 ++++++++++++++++++++++
+ 3 files changed, 146 insertions(+), 61 deletions(-)
