@@ -1,60 +1,36 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 26/30] block: kill request slab cache
-Date: Wed, 31 Oct 2018 11:59:18 -0600
-Message-Id: <20181031175922.8849-27-axboe@kernel.dk>
-In-Reply-To: <20181031175922.8849-1-axboe@kernel.dk>
-References: <20181031175922.8849-1-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:38892 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725890AbeJ2Q1m (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 Oct 2018 12:27:42 -0400
+Subject: Re: [PATCH 08/14] blk-mq: separate number of hardware queues from
+ nr_cpu_ids
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+References: <20181025211626.12692-1-axboe@kernel.dk>
+ <20181025211626.12692-9-axboe@kernel.dk>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <bc29ae04-f218-c702-b2b6-bc05567d752d@suse.de>
+Date: Mon, 29 Oct 2018 08:40:10 +0100
+MIME-Version: 1.0
+In-Reply-To: <20181025211626.12692-9-axboe@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
+On 10/25/18 11:16 PM, Jens Axboe wrote:
+> With multiple maps, nr_cpu_ids is no longer the maximum number of
+> hardware queues we support on a given devices. The initializer of
+> the tag_set can have set ->nr_hw_queues larger than the available
+> number of CPUs, since we can exceed that with multiple queue maps.
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>   block/blk-mq.c | 28 +++++++++++++++++++++-------
+>   1 file changed, 21 insertions(+), 7 deletions(-)
+> 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-core.c | 8 --------
- block/blk.h      | 1 -
- 2 files changed, 9 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 0678ec4b1169..951e8cf082e1 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -57,11 +57,6 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(block_unplug);
- 
- DEFINE_IDA(blk_queue_ida);
- 
--/*
-- * For the allocated request tables
-- */
--struct kmem_cache *request_cachep;
--
- /*
-  * For queue allocation
-  */
-@@ -1969,9 +1964,6 @@ int __init blk_dev_init(void)
- 	if (!kblockd_workqueue)
- 		panic("Failed to create kblockd\n");
- 
--	request_cachep = kmem_cache_create("blkdev_requests",
--			sizeof(struct request), 0, SLAB_PANIC, NULL);
--
- 	blk_requestq_cachep = kmem_cache_create("request_queue",
- 			sizeof(struct request_queue), 0, SLAB_PANIC, NULL);
- 
-diff --git a/block/blk.h b/block/blk.h
-index e925cf4fe4de..2bf1cfeeb9c0 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -32,7 +32,6 @@ struct blk_flush_queue {
- };
- 
- extern struct kmem_cache *blk_requestq_cachep;
--extern struct kmem_cache *request_cachep;
- extern struct kobj_type blk_queue_ktype;
- extern struct ida blk_queue_ida;
- 
--- 
-2.17.1
+Cheers,
+
+Hannes
