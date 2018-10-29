@@ -4,10 +4,10 @@ To: axboe@kernel.dk
 Cc: ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Subject: [PATCH V3 4/4] blk-mq: ensure hctx to be ran on mapped cpu when issue directly
-Date: Mon, 29 Oct 2018 16:49:11 +0800
-Message-Id: <1540802951-5408-5-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1540802951-5408-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1540802951-5408-1-git-send-email-jianchao.w.wang@oracle.com>
+Date: Mon, 29 Oct 2018 16:33:33 +0800
+Message-Id: <1540802013-2921-5-git-send-email-jianchao.w.wang@oracle.com>
+In-Reply-To: <1540802013-2921-1-git-send-email-jianchao.w.wang@oracle.com>
+References: <1540802013-2921-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
 When issue request directly and the task is migrated out of the
