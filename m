@@ -1,18 +1,150 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
-Subject: Re: [PATCH 13/16] irq: add support for allocating (and affinitizing)
- sets of IRQs
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc: Thomas Gleixner <tglx@linutronix.de>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Thomas Gleixner <tglx@linutronix.de>
+Subject: [PATCH 13/16] irq: add support for allocating (and affinitizing) sets of IRQs
+Date: Tue, 30 Oct 2018 12:32:49 -0600
+Message-Id: <20181030183252.17857-14-axboe@kernel.dk>
+In-Reply-To: <20181030183252.17857-1-axboe@kernel.dk>
 References: <20181030183252.17857-1-axboe@kernel.dk>
- <20181030183252.17857-14-axboe@kernel.dk>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <6e401081-afe6-aa09-2dea-c0c9c1bc294d@grimberg.me>
-Date: Tue, 30 Oct 2018 18:17:57 -0700
-MIME-Version: 1.0
-In-Reply-To: <20181030183252.17857-14-axboe@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+A driver may have a need to allocate multiple sets of MSI/MSI-X
+interrupts, and have them appropriately affinitized. Add support for
+defining a number of sets in the irq_affinity structure, of varying
+sizes, and get each set affinitized correctly across the machine.
+
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: linux-kernel@vger.kernel.org
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ drivers/pci/msi.c         | 14 ++++++++++++++
+ include/linux/interrupt.h |  4 ++++
+ kernel/irq/affinity.c     | 40 ++++++++++++++++++++++++++++++---------
+ 3 files changed, 49 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/pci/msi.c b/drivers/pci/msi.c
+index af24ed50a245..e6c6e10b9ceb 100644
+--- a/drivers/pci/msi.c
++++ b/drivers/pci/msi.c
+@@ -1036,6 +1036,13 @@ static int __pci_enable_msi_range(struct pci_dev *dev, int minvec, int maxvec,
+ 	if (maxvec < minvec)
+ 		return -ERANGE;
+ 
++	/*
++	 * If the caller is passing in sets, we can't support a range of
++	 * vectors. The caller needs to handle that.
++	 */
++	if (affd->nr_sets && minvec != maxvec)
++		return -EINVAL;
++
+ 	if (WARN_ON_ONCE(dev->msi_enabled))
+ 		return -EINVAL;
+ 
+@@ -1087,6 +1094,13 @@ static int __pci_enable_msix_range(struct pci_dev *dev,
+ 	if (maxvec < minvec)
+ 		return -ERANGE;
+ 
++	/*
++	 * If the caller is passing in sets, we can't support a range of
++	 * supported vectors. The caller needs to handle that.
++	 */
++	if (affd->nr_sets && minvec != maxvec)
++		return -EINVAL;
++
+ 	if (WARN_ON_ONCE(dev->msix_enabled))
+ 		return -EINVAL;
+ 
+diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
+index 1d6711c28271..ca397ff40836 100644
+--- a/include/linux/interrupt.h
++++ b/include/linux/interrupt.h
+@@ -247,10 +247,14 @@ struct irq_affinity_notify {
+  *			the MSI(-X) vector space
+  * @post_vectors:	Don't apply affinity to @post_vectors at end of
+  *			the MSI(-X) vector space
++ * @nr_sets:		Length of passed in *sets array
++ * @sets:		Number of affinitized sets
+  */
+ struct irq_affinity {
+ 	int	pre_vectors;
+ 	int	post_vectors;
++	int	nr_sets;
++	int	*sets;
+ };
+ 
+ #if defined(CONFIG_SMP)
+diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
+index f4f29b9d90ee..2046a0f0f0f1 100644
+--- a/kernel/irq/affinity.c
++++ b/kernel/irq/affinity.c
+@@ -180,6 +180,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 	int curvec, usedvecs;
+ 	cpumask_var_t nmsk, npresmsk, *node_to_cpumask;
+ 	struct cpumask *masks = NULL;
++	int i, nr_sets;
+ 
+ 	/*
+ 	 * If there aren't any vectors left after applying the pre/post
+@@ -210,10 +211,23 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 	get_online_cpus();
+ 	build_node_to_cpumask(node_to_cpumask);
+ 
+-	/* Spread on present CPUs starting from affd->pre_vectors */
+-	usedvecs = irq_build_affinity_masks(affd, curvec, affvecs,
+-					    node_to_cpumask, cpu_present_mask,
+-					    nmsk, masks);
++	/*
++	 * Spread on present CPUs starting from affd->pre_vectors. If we
++	 * have multiple sets, build each sets affinity mask separately.
++	 */
++	nr_sets = affd->nr_sets;
++	if (!nr_sets)
++		nr_sets = 1;
++
++	for (i = 0, usedvecs = 0; i < nr_sets; i++) {
++		int this_vecs = affd->sets ? affd->sets[i] : affvecs;
++		int nr;
++
++		nr = irq_build_affinity_masks(affd, curvec, this_vecs,
++					      node_to_cpumask, cpu_present_mask,
++					      nmsk, masks + usedvecs);
++		usedvecs += nr;
++	}
+ 
+ 	/*
+ 	 * Spread on non present CPUs starting from the next vector to be
+@@ -258,13 +272,21 @@ int irq_calc_affinity_vectors(int minvec, int maxvec, const struct irq_affinity
+ {
+ 	int resv = affd->pre_vectors + affd->post_vectors;
+ 	int vecs = maxvec - resv;
+-	int ret;
++	int set_vecs;
+ 
+ 	if (resv > minvec)
+ 		return 0;
+ 
+-	get_online_cpus();
+-	ret = min_t(int, cpumask_weight(cpu_possible_mask), vecs) + resv;
+-	put_online_cpus();
+-	return ret;
++	if (affd->nr_sets) {
++		int i;
++
++		for (i = 0, set_vecs = 0;  i < affd->nr_sets; i++)
++			set_vecs += affd->sets[i];
++	} else {
++		get_online_cpus();
++		set_vecs = cpumask_weight(cpu_possible_mask);
++		put_online_cpus();
++	}
++
++	return resv + min(set_vecs, vecs);
+ }
+-- 
+2.17.1
