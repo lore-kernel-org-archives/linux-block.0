@@ -1,108 +1,131 @@
-Return-Path: <prvs=834e8352b=Matias.Bjorling@wdc.com>
-From: Matias Bjorling <Matias.Bjorling@wdc.com>
-To: Masato Suzuki <masato.suzuki@wdc.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: Damien Le Moal <Damien.LeMoal@wdc.com>
-Subject: Re: [PATCH v2] null_blk: Add conventional zone configuration for
- zoned support
-Date: Tue, 30 Oct 2018 15:48:25 +0000
-Message-ID: <569DC86F-F329-4E5E-AD74-443B122A3118@wdc.com>
-References: <20181030071405.20518-1-masato.suzuki@wdc.com>
-In-Reply-To: <20181030071405.20518-1-masato.suzuki@wdc.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Return-Path: <prvs=8340b7de0=masato.suzuki@wdc.com>
+From: Masato Suzuki <masato.suzuki@wdc.com>
+To: linux-block@vger.kernel.org,
+	axboe@kernel.dk
+Cc: Matias.Bjorling@wdc.com,
+	Damien.LeMoal@wdc.com
+Subject: [PATCH v2] null_blk: Add conventional zone configuration for zoned support
+Date: Tue, 30 Oct 2018 16:14:05 +0900
+Message-Id: <20181030071405.20518-1-masato.suzuki@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gMTAvMzAvMTgsIDg6MTQgQU0sICJNYXNhdG8gU3V6dWtpIiA8bWFzYXRvLnN1enVraUB3ZGMu
-Y29tPiB3cm90ZToNCg0KICAgIEFsbG93IHRoZSBjcmVhdGlvbiBvZiBjb252ZW50aW9uYWwgem9u
-ZXMgYnkgYWRkaW5nIHRoZSB6b25lX25yX2NvbnYNCiAgICBjb25maWd1cmF0aW9uIGF0dHJpYnV0
-ZS4gVGhpcyBuZXcgYXR0cmlidXRlIGlzIHVzZWQgb25seSBmb3Igem9uZWQgZGV2aWNlcw0KICAg
-IGFuZCBpbmRpY2F0ZXMgdGhlIG51bWJlciBvZiBjb252ZW50aW9uYWwgem9uZXMgdG8gY3JlYXRl
-LiBUaGUgZGVmYXVsdCB2YWx1ZQ0KICAgIGlzIDAuIFNpbmNlIGhvc3QtbWFuYWdlZCB6b25lZCBi
-bG9jayBkZXZpY2VzIG11c3QgYWx3YXlzIGhhdmUgYXQgbGVhc3Qgb25lDQogICAgc2VxdWVudGlh
-bCB6b25lLCBpZiB0aGUgdmFsdWUgb2Ygem9uZV9ucl9jb252IGlzIGxhcmdlciB0aGFuIG9yIGVx
-dWFsIHRvDQogICAgdGhlIHRvdGFsIG51bWJlciBvZiB6b25lcyBvZiB0aGUgZGV2aWNlIG5yX3pv
-bmVzLCB6b25lX25yX2NvbnYgaXMNCiAgICBhdXRvbWF0aWNhbGx5IGNoYW5nZWQgdG8gbnJfem9u
-ZXMgLSAxLg0KICAgIA0KICAgIFNpZ25lZC1vZmYtYnk6IE1hc2F0byBTdXp1a2kgPG1hc2F0by5z
-dXp1a2lAd2RjLmNvbT4NCiAgICAtLS0NCiAgICAgZHJpdmVycy9ibG9jay9udWxsX2Jsay5oICAg
-ICAgIHwgIDEgKw0KICAgICBkcml2ZXJzL2Jsb2NrL251bGxfYmxrX21haW4uYyAgfCAgNyArKysr
-KysrDQogICAgIGRyaXZlcnMvYmxvY2svbnVsbF9ibGtfem9uZWQuYyB8IDI3ICsrKysrKysrKysr
-KysrKysrKysrKysrKysrLQ0KICAgICAzIGZpbGVzIGNoYW5nZWQsIDM0IGluc2VydGlvbnMoKyks
-IDEgZGVsZXRpb24oLSkNCiAgICANCiAgICBkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibG9jay9udWxs
-X2Jsay5oIGIvZHJpdmVycy9ibG9jay9udWxsX2Jsay5oDQogICAgaW5kZXggNzY4NWRmNDNmMWVm
-Li5iM2RmMjc5M2U3Y2QgMTAwNjQ0DQogICAgLS0tIGEvZHJpdmVycy9ibG9jay9udWxsX2Jsay5o
-DQogICAgKysrIGIvZHJpdmVycy9ibG9jay9udWxsX2Jsay5oDQogICAgQEAgLTQ5LDYgKzQ5LDcg
-QEAgc3RydWN0IG51bGxiX2RldmljZSB7DQogICAgIAl1bnNpZ25lZCBsb25nIGNvbXBsZXRpb25f
-bnNlYzsgLyogdGltZSBpbiBucyB0byBjb21wbGV0ZSBhIHJlcXVlc3QgKi8NCiAgICAgCXVuc2ln
-bmVkIGxvbmcgY2FjaGVfc2l6ZTsgLyogZGlzayBjYWNoZSBzaXplIGluIE1CICovDQogICAgIAl1
-bnNpZ25lZCBsb25nIHpvbmVfc2l6ZTsgLyogem9uZSBzaXplIGluIE1CIGlmIGRldmljZSBpcyB6
-b25lZCAqLw0KICAgICsJdW5zaWduZWQgaW50IHpvbmVfbnJfY29udjsgLyogbnVtYmVyIG9mIGNv
-bnZlbnRpb25hbCB6b25lcyAqLw0KICAgICAJdW5zaWduZWQgaW50IHN1Ym1pdF9xdWV1ZXM7IC8q
-IG51bWJlciBvZiBzdWJtaXNzaW9uIHF1ZXVlcyAqLw0KICAgICAJdW5zaWduZWQgaW50IGhvbWVf
-bm9kZTsgLyogaG9tZSBub2RlIGZvciB0aGUgZGV2aWNlICovDQogICAgIAl1bnNpZ25lZCBpbnQg
-cXVldWVfbW9kZTsgLyogYmxvY2sgaW50ZXJmYWNlICovDQogICAgZGlmZiAtLWdpdCBhL2RyaXZl
-cnMvYmxvY2svbnVsbF9ibGtfbWFpbi5jIGIvZHJpdmVycy9ibG9jay9udWxsX2Jsa19tYWluLmMN
-CiAgICBpbmRleCAwOTMzOTIwM2RmYmEuLjljMDQ1YmVlMDk4NSAxMDA2NDQNCiAgICAtLS0gYS9k
-cml2ZXJzL2Jsb2NrL251bGxfYmxrX21haW4uYw0KICAgICsrKyBiL2RyaXZlcnMvYmxvY2svbnVs
-bF9ibGtfbWFpbi5jDQogICAgQEAgLTE4OCw2ICsxODgsMTAgQEAgc3RhdGljIHVuc2lnbmVkIGxv
-bmcgZ196b25lX3NpemUgPSAyNTY7DQogICAgIG1vZHVsZV9wYXJhbV9uYW1lZCh6b25lX3NpemUs
-IGdfem9uZV9zaXplLCB1bG9uZywgU19JUlVHTyk7DQogICAgIE1PRFVMRV9QQVJNX0RFU0Moem9u
-ZV9zaXplLCAiWm9uZSBzaXplIGluIE1CIHdoZW4gYmxvY2sgZGV2aWNlIGlzIHpvbmVkLiBNdXN0
-IGJlIHBvd2VyLW9mLXR3bzogRGVmYXVsdDogMjU2Iik7DQogICAgIA0KICAgICtzdGF0aWMgdW5z
-aWduZWQgaW50IGdfem9uZV9ucl9jb252Ow0KICAgICttb2R1bGVfcGFyYW1fbmFtZWQoem9uZV9u
-cl9jb252LCBnX3pvbmVfbnJfY29udiwgdWludCwgMDQ0NCk7DQogICAgK01PRFVMRV9QQVJNX0RF
-U0Moem9uZV9ucl9jb252LCAiTnVtYmVyIG9mIGNvbnZlbnRpb25hbCB6b25lcyB3aGVuIGJsb2Nr
-IGRldmljZSBpcyB6b25lZC4gRGVmYXVsdDogMCIpOw0KICAgICsNCiAgICAgc3RhdGljIHN0cnVj
-dCBudWxsYl9kZXZpY2UgKm51bGxfYWxsb2NfZGV2KHZvaWQpOw0KICAgICBzdGF0aWMgdm9pZCBu
-dWxsX2ZyZWVfZGV2KHN0cnVjdCBudWxsYl9kZXZpY2UgKmRldik7DQogICAgIHN0YXRpYyB2b2lk
-IG51bGxfZGVsX2RldihzdHJ1Y3QgbnVsbGIgKm51bGxiKTsNCiAgICBAQCAtMjkzLDYgKzI5Nyw3
-IEBAIE5VTExCX0RFVklDRV9BVFRSKG1icHMsIHVpbnQpOw0KICAgICBOVUxMQl9ERVZJQ0VfQVRU
-UihjYWNoZV9zaXplLCB1bG9uZyk7DQogICAgIE5VTExCX0RFVklDRV9BVFRSKHpvbmVkLCBib29s
-KTsNCiAgICAgTlVMTEJfREVWSUNFX0FUVFIoem9uZV9zaXplLCB1bG9uZyk7DQogICAgK05VTExC
-X0RFVklDRV9BVFRSKHpvbmVfbnJfY29udiwgdWludCk7DQogICAgIA0KICAgICBzdGF0aWMgc3Np
-emVfdCBudWxsYl9kZXZpY2VfcG93ZXJfc2hvdyhzdHJ1Y3QgY29uZmlnX2l0ZW0gKml0ZW0sIGNo
-YXIgKnBhZ2UpDQogICAgIHsNCiAgICBAQCAtNDA3LDYgKzQxMiw3IEBAIHN0YXRpYyBzdHJ1Y3Qg
-Y29uZmlnZnNfYXR0cmlidXRlICpudWxsYl9kZXZpY2VfYXR0cnNbXSA9IHsNCiAgICAgCSZudWxs
-Yl9kZXZpY2VfYXR0cl9iYWRibG9ja3MsDQogICAgIAkmbnVsbGJfZGV2aWNlX2F0dHJfem9uZWQs
-DQogICAgIAkmbnVsbGJfZGV2aWNlX2F0dHJfem9uZV9zaXplLA0KICAgICsJJm51bGxiX2Rldmlj
-ZV9hdHRyX3pvbmVfbnJfY29udiwNCiAgICAgCU5VTEwsDQogICAgIH07DQogICAgIA0KICAgIEBA
-IC01MjAsNiArNTI2LDcgQEAgc3RhdGljIHN0cnVjdCBudWxsYl9kZXZpY2UgKm51bGxfYWxsb2Nf
-ZGV2KHZvaWQpDQogICAgIAlkZXYtPnVzZV9wZXJfbm9kZV9oY3R4ID0gZ191c2VfcGVyX25vZGVf
-aGN0eDsNCiAgICAgCWRldi0+em9uZWQgPSBnX3pvbmVkOw0KICAgICAJZGV2LT56b25lX3NpemUg
-PSBnX3pvbmVfc2l6ZTsNCiAgICArCWRldi0+em9uZV9ucl9jb252ID0gZ196b25lX25yX2NvbnY7
-DQogICAgIAlyZXR1cm4gZGV2Ow0KICAgICB9DQogICAgIA0KICAgIGRpZmYgLS1naXQgYS9kcml2
-ZXJzL2Jsb2NrL251bGxfYmxrX3pvbmVkLmMgYi9kcml2ZXJzL2Jsb2NrL251bGxfYmxrX3pvbmVk
-LmMNCiAgICBpbmRleCBjMGIwZTRhM2ZhOGYuLjVkMWMyNjFhMmNmZCAxMDA2NDQNCiAgICAtLS0g
-YS9kcml2ZXJzL2Jsb2NrL251bGxfYmxrX3pvbmVkLmMNCiAgICArKysgYi9kcml2ZXJzL2Jsb2Nr
-L251bGxfYmxrX3pvbmVkLmMNCiAgICBAQCAtMjksNyArMjksMjUgQEAgaW50IG51bGxfem9uZV9p
-bml0KHN0cnVjdCBudWxsYl9kZXZpY2UgKmRldikNCiAgICAgCWlmICghZGV2LT56b25lcykNCiAg
-ICAgCQlyZXR1cm4gLUVOT01FTTsNCiAgICAgDQogICAgLQlmb3IgKGkgPSAwOyBpIDwgZGV2LT5u
-cl96b25lczsgaSsrKSB7DQogICAgKwlpZiAoZGV2LT56b25lX25yX2NvbnYgPj0gZGV2LT5ucl96
-b25lcykgew0KICAgICsJCWRldi0+em9uZV9ucl9jb252ID0gZGV2LT5ucl96b25lcyAtIDE7DQog
-ICAgKwkJcHJfaW5mbygibnVsbF9ibGs6IGNoYW5nZWQgdGhlIG51bWJlciBvZiBjb252ZW50aW9u
-YWwgem9uZXMgdG8gJXUiLA0KICAgICsJCQlkZXYtPnpvbmVfbnJfY29udik7DQogICAgKwl9DQog
-ICAgKw0KICAgICsJZm9yIChpID0gMDsgaSA8ICBkZXYtPnpvbmVfbnJfY29udjsgaSsrKSB7DQog
-ICAgKwkJc3RydWN0IGJsa196b25lICp6b25lID0gJmRldi0+em9uZXNbaV07DQogICAgKw0KICAg
-ICsJCXpvbmUtPnN0YXJ0ID0gc2VjdG9yOw0KICAgICsJCXpvbmUtPmxlbiA9IGRldi0+em9uZV9z
-aXplX3NlY3RzOw0KICAgICsJCXpvbmUtPndwID0gem9uZS0+c3RhcnQgKyB6b25lLT5sZW47DQog
-ICAgKwkJem9uZS0+dHlwZSA9IEJMS19aT05FX1RZUEVfQ09OVkVOVElPTkFMOw0KICAgICsJCXpv
-bmUtPmNvbmQgPSBCTEtfWk9ORV9DT05EX05PVF9XUDsNCiAgICArDQogICAgKwkJc2VjdG9yICs9
-IGRldi0+em9uZV9zaXplX3NlY3RzOw0KICAgICsJfQ0KICAgICsNCiAgICArCWZvciAoaSA9IGRl
-di0+em9uZV9ucl9jb252OyBpIDwgZGV2LT5ucl96b25lczsgaSsrKSB7DQogICAgIAkJc3RydWN0
-IGJsa196b25lICp6b25lID0gJmRldi0+em9uZXNbaV07DQogICAgIA0KICAgICAJCXpvbmUtPnN0
-YXJ0ID0gem9uZS0+d3AgPSBzZWN0b3I7DQogICAgQEAgLTk4LDYgKzExNiw4IEBAIHZvaWQgbnVs
-bF96b25lX3dyaXRlKHN0cnVjdCBudWxsYl9jbWQgKmNtZCwgc2VjdG9yX3Qgc2VjdG9yLA0KICAg
-ICAJCWlmICh6b25lLT53cCA9PSB6b25lLT5zdGFydCArIHpvbmUtPmxlbikNCiAgICAgCQkJem9u
-ZS0+Y29uZCA9IEJMS19aT05FX0NPTkRfRlVMTDsNCiAgICAgCQlicmVhazsNCiAgICArCWNhc2Ug
-QkxLX1pPTkVfQ09ORF9OT1RfV1A6DQogICAgKwkJYnJlYWs7DQogICAgIAlkZWZhdWx0Og0KICAg
-ICAJCS8qIEludmFsaWQgem9uZSBjb25kaXRpb24gKi8NCiAgICAgCQljbWQtPmVycm9yID0gQkxL
-X1NUU19JT0VSUjsNCiAgICBAQCAtMTExLDYgKzEzMSwxMSBAQCB2b2lkIG51bGxfem9uZV9yZXNl
-dChzdHJ1Y3QgbnVsbGJfY21kICpjbWQsIHNlY3Rvcl90IHNlY3RvcikNCiAgICAgCXVuc2lnbmVk
-IGludCB6bm8gPSBudWxsX3pvbmVfbm8oZGV2LCBzZWN0b3IpOw0KICAgICAJc3RydWN0IGJsa196
-b25lICp6b25lID0gJmRldi0+em9uZXNbem5vXTsNCiAgICAgDQogICAgKwlpZiAoem9uZS0+dHlw
-ZSA9PSBCTEtfWk9ORV9UWVBFX0NPTlZFTlRJT05BTCkgew0KICAgICsJCWNtZC0+ZXJyb3IgPSBC
-TEtfU1RTX0lPRVJSOw0KICAgICsJCXJldHVybjsNCiAgICArCX0NCiAgICArDQogICAgIAl6b25l
-LT5jb25kID0gQkxLX1pPTkVfQ09ORF9FTVBUWTsNCiAgICAgCXpvbmUtPndwID0gem9uZS0+c3Rh
-cnQ7DQogICAgIH0NCiAgICAtLSANCiAgICAyLjE3LjINCiAgICANCkxvb2tzIGdvb2QgdG8gbWUu
-DQoNClJldmlld2VkLWJ5OiBNYXRpYXMgQmpvcmxpbmcgPG1hdGlhcy5iam9ybGluZ0B3ZGMuY29t
-PiAgICANCg0K
+Allow the creation of conventional zones by adding the zone_nr_conv
+configuration attribute. This new attribute is used only for zoned devices
+and indicates the number of conventional zones to create. The default value
+is 0. Since host-managed zoned block devices must always have at least one
+sequential zone, if the value of zone_nr_conv is larger than or equal to
+the total number of zones of the device nr_zones, zone_nr_conv is
+automatically changed to nr_zones - 1.
+
+Signed-off-by: Masato Suzuki <masato.suzuki@wdc.com>
+---
+ drivers/block/null_blk.h       |  1 +
+ drivers/block/null_blk_main.c  |  7 +++++++
+ drivers/block/null_blk_zoned.c | 27 ++++++++++++++++++++++++++-
+ 3 files changed, 34 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/null_blk.h b/drivers/block/null_blk.h
+index 7685df43f1ef..b3df2793e7cd 100644
+--- a/drivers/block/null_blk.h
++++ b/drivers/block/null_blk.h
+@@ -49,6 +49,7 @@ struct nullb_device {
+ 	unsigned long completion_nsec; /* time in ns to complete a request */
+ 	unsigned long cache_size; /* disk cache size in MB */
+ 	unsigned long zone_size; /* zone size in MB if device is zoned */
++	unsigned int zone_nr_conv; /* number of conventional zones */
+ 	unsigned int submit_queues; /* number of submission queues */
+ 	unsigned int home_node; /* home node for the device */
+ 	unsigned int queue_mode; /* block interface */
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+index 09339203dfba..9c045bee0985 100644
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -188,6 +188,10 @@ static unsigned long g_zone_size = 256;
+ module_param_named(zone_size, g_zone_size, ulong, S_IRUGO);
+ MODULE_PARM_DESC(zone_size, "Zone size in MB when block device is zoned. Must be power-of-two: Default: 256");
+ 
++static unsigned int g_zone_nr_conv;
++module_param_named(zone_nr_conv, g_zone_nr_conv, uint, 0444);
++MODULE_PARM_DESC(zone_nr_conv, "Number of conventional zones when block device is zoned. Default: 0");
++
+ static struct nullb_device *null_alloc_dev(void);
+ static void null_free_dev(struct nullb_device *dev);
+ static void null_del_dev(struct nullb *nullb);
+@@ -293,6 +297,7 @@ NULLB_DEVICE_ATTR(mbps, uint);
+ NULLB_DEVICE_ATTR(cache_size, ulong);
+ NULLB_DEVICE_ATTR(zoned, bool);
+ NULLB_DEVICE_ATTR(zone_size, ulong);
++NULLB_DEVICE_ATTR(zone_nr_conv, uint);
+ 
+ static ssize_t nullb_device_power_show(struct config_item *item, char *page)
+ {
+@@ -407,6 +412,7 @@ static struct configfs_attribute *nullb_device_attrs[] = {
+ 	&nullb_device_attr_badblocks,
+ 	&nullb_device_attr_zoned,
+ 	&nullb_device_attr_zone_size,
++	&nullb_device_attr_zone_nr_conv,
+ 	NULL,
+ };
+ 
+@@ -520,6 +526,7 @@ static struct nullb_device *null_alloc_dev(void)
+ 	dev->use_per_node_hctx = g_use_per_node_hctx;
+ 	dev->zoned = g_zoned;
+ 	dev->zone_size = g_zone_size;
++	dev->zone_nr_conv = g_zone_nr_conv;
+ 	return dev;
+ }
+ 
+diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
+index c0b0e4a3fa8f..5d1c261a2cfd 100644
+--- a/drivers/block/null_blk_zoned.c
++++ b/drivers/block/null_blk_zoned.c
+@@ -29,7 +29,25 @@ int null_zone_init(struct nullb_device *dev)
+ 	if (!dev->zones)
+ 		return -ENOMEM;
+ 
+-	for (i = 0; i < dev->nr_zones; i++) {
++	if (dev->zone_nr_conv >= dev->nr_zones) {
++		dev->zone_nr_conv = dev->nr_zones - 1;
++		pr_info("null_blk: changed the number of conventional zones to %u",
++			dev->zone_nr_conv);
++	}
++
++	for (i = 0; i <  dev->zone_nr_conv; i++) {
++		struct blk_zone *zone = &dev->zones[i];
++
++		zone->start = sector;
++		zone->len = dev->zone_size_sects;
++		zone->wp = zone->start + zone->len;
++		zone->type = BLK_ZONE_TYPE_CONVENTIONAL;
++		zone->cond = BLK_ZONE_COND_NOT_WP;
++
++		sector += dev->zone_size_sects;
++	}
++
++	for (i = dev->zone_nr_conv; i < dev->nr_zones; i++) {
+ 		struct blk_zone *zone = &dev->zones[i];
+ 
+ 		zone->start = zone->wp = sector;
+@@ -98,6 +116,8 @@ void null_zone_write(struct nullb_cmd *cmd, sector_t sector,
+ 		if (zone->wp == zone->start + zone->len)
+ 			zone->cond = BLK_ZONE_COND_FULL;
+ 		break;
++	case BLK_ZONE_COND_NOT_WP:
++		break;
+ 	default:
+ 		/* Invalid zone condition */
+ 		cmd->error = BLK_STS_IOERR;
+@@ -111,6 +131,11 @@ void null_zone_reset(struct nullb_cmd *cmd, sector_t sector)
+ 	unsigned int zno = null_zone_no(dev, sector);
+ 	struct blk_zone *zone = &dev->zones[zno];
+ 
++	if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL) {
++		cmd->error = BLK_STS_IOERR;
++		return;
++	}
++
+ 	zone->cond = BLK_ZONE_COND_EMPTY;
+ 	zone->wp = zone->start;
+ }
+-- 
+2.17.2
