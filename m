@@ -1,53 +1,57 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:60224 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727566AbeJaCca (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Oct 2018 22:32:30 -0400
-Date: Tue, 30 Oct 2018 11:35:43 -0600
-From: Keith Busch <keith.busch@intel.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH 11/14] irq: add support for allocating (and affinitizing)
  sets of IRQs
-Message-ID: <20181030173543.GG18906@localhost.localdomain>
-References: <c11c95ae-5e10-38bd-d2c2-e2407634f52a@kernel.dk>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20181029163738.10172-1-axboe@kernel.dk>
+ <20181029163738.10172-12-axboe@kernel.dk>
+ <20181030142601.GA18906@localhost.localdomain>
+ <c11c95ae-5e10-38bd-d2c2-e2407634f52a@kernel.dk>
  <20181030144527.GB18906@localhost.localdomain>
  <46dbcbcd-799f-9970-a68f-de7e96b1a6bb@kernel.dk>
  <20181030150840.GC18906@localhost.localdomain>
  <d049e764-b9d1-f06f-40d3-39517f3f65a2@kernel.dk>
  <20181030160242.GD18906@localhost.localdomain>
  <27c1017a-9560-80cb-038d-f64727a162c3@kernel.dk>
- <535480f3-9087-b4ae-e7c8-cfe3c2d1e2c9@kernel.dk>
- <20181030172234.GF18906@localhost.localdomain>
- <d393e6f3-bc45-e038-9a5e-e51018f0a15a@kernel.dk>
+ <alpine.DEB.2.21.1810301824570.5984@nanos.tec.linutronix.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <a692fbb3-59ca-0ddb-7abd-67ffc7bfcc1f@kernel.dk>
+Date: Tue, 30 Oct 2018 11:34:32 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <d393e6f3-bc45-e038-9a5e-e51018f0a15a@kernel.dk>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <alpine.DEB.2.21.1810301824570.5984@nanos.tec.linutronix.de>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Oct 30, 2018 at 11:33:51AM -0600, Jens Axboe wrote:
-> On 10/30/18 11:22 AM, Keith Busch wrote:
-> > On Tue, Oct 30, 2018 at 11:09:04AM -0600, Jens Axboe wrote:
-> >> Pretty trivial, below. This also keeps the queue mapping calculations
-> >> more clean, as we don't have to do one after we're done allocating
-> >> IRQs.
-> > 
-> > Yep, this addresses my concern. It less efficient than PCI since PCI
-> > can usually jump straight to a valid vector count in a single iteration
-> > where this only subtracts by 1. I really can't be bothered to care for
-> > optimizing that, so this works for me! :) 
+On 10/30/18 11:25 AM, Thomas Gleixner wrote:
+> Jens,
 > 
-> It definitely is less efficient than just getting the count that we
-> can support, but it's at probe time so I could not really be bothered
-> either.
+> On Tue, 30 Oct 2018, Jens Axboe wrote:
+>> On 10/30/18 10:02 AM, Keith Busch wrote:
+>>> pci_alloc_irq_vectors_affinity() starts at the provided max_vecs. If
+>>> that doesn't work, it will iterate down to min_vecs without returning to
+>>> the caller. The caller doesn't have a chance to adjust its sets between
+>>> iterations when you provide a range.
+>>>
+>>> The 'masks' overrun problem happens if the caller provides min_vecs
+>>> as a smaller value than the sum of the set (plus any reserved).
+>>>
+>>> If it's up to the caller to ensure that doesn't happen, then min and
+>>> max must both be the same value, and that value must also be the same as
+>>> the set sum + reserved vectors. The range just becomes redundant since
+>>> it is already bounded by the set.
+>>>
+>>> Using the nvme example, it would need something like this to prevent the
+>>> 'masks' overrun:
+>>
+>> OK, now I hear what you are saying. And you are right, the callers needs
+>> to provide minvec == maxvec for sets, and then have a loop around that
+>> to adjust as needed.
 > 
-> Can I add your reviewed-by?
+> But then we should enforce it in the core code, right?
 
-Yes, please.
+Yes, I was going to ask you if you want a followup patch for that, or
+an updated version of the original?
 
-Reviewed-by: Keith Busch <keith.busch@intel.com>
-
-> -- 
-> Jens Axboe
+-- 
+Jens Axboe
