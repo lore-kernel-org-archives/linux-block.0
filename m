@@ -1,12 +1,12 @@
-Return-Path: <keith.busch@intel.com>
-Date: Tue, 30 Oct 2018 08:26:01 -0600
-From: Keith Busch <keith.busch@intel.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 30 Oct 2018 17:25:11 +0800
+From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
 	linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
 Subject: Re: [PATCH 11/14] irq: add support for allocating (and affinitizing)
  sets of IRQs
-Message-ID: <20181030142601.GA18906@localhost.localdomain>
+Message-ID: <20181030092510.GB13582@ming.t460p>
 References: <20181029163738.10172-1-axboe@kernel.dk>
  <20181029163738.10172-12-axboe@kernel.dk>
 MIME-Version: 1.0
@@ -15,6 +15,39 @@ In-Reply-To: <20181029163738.10172-12-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
 On Mon, Oct 29, 2018 at 10:37:35AM -0600, Jens Axboe wrote:
+> A driver may have a need to allocate multiple sets of MSI/MSI-X
+> interrupts, and have them appropriately affinitized. Add support for
+> defining a number of sets in the irq_affinity structure, of varying
+> sizes, and get each set affinitized correctly across the machine.
+> 
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: linux-kernel@vger.kernel.org
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  include/linux/interrupt.h |  4 ++++
+>  kernel/irq/affinity.c     | 40 ++++++++++++++++++++++++++++++---------
+>  2 files changed, 35 insertions(+), 9 deletions(-)
+> 
+> diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
+> index 1d6711c28271..ca397ff40836 100644
+> --- a/include/linux/interrupt.h
+> +++ b/include/linux/interrupt.h
+> @@ -247,10 +247,14 @@ struct irq_affinity_notify {
+>   *			the MSI(-X) vector space
+>   * @post_vectors:	Don't apply affinity to @post_vectors at end of
+>   *			the MSI(-X) vector space
+> + * @nr_sets:		Length of passed in *sets array
+> + * @sets:		Number of affinitized sets
+>   */
+>  struct irq_affinity {
+>  	int	pre_vectors;
+>  	int	post_vectors;
+> +	int	nr_sets;
+> +	int	*sets;
+>  };
+>  
+>  #if defined(CONFIG_SMP)
 > diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
 > index f4f29b9d90ee..2046a0f0f0f1 100644
 > --- a/kernel/irq/affinity.c
@@ -52,14 +85,7 @@ On Mon, Oct 29, 2018 at 10:37:35AM -0600, Jens Axboe wrote:
 > +					      nmsk, masks + usedvecs);
 > +		usedvecs += nr;
 > +	}
-
-
-While the code below returns the appropriate number of possible vectors
-when a set requested too many, the above code is still using the value
-from the set, which may exceed 'nvecs' used to kcalloc 'masks', so
-'masks + usedvecs' may go out of bounds.
-
-  
+>  
 >  	/*
 >  	 * Spread on non present CPUs starting from the next vector to be
 > @@ -258,13 +272,21 @@ int irq_calc_affinity_vectors(int minvec, int maxvec, const struct irq_affinity
@@ -89,3 +115,13 @@ from the set, which may exceed 'nvecs' used to kcalloc 'masks', so
 > +
 > +	return resv + min(set_vecs, vecs);
 >  }
+> -- 
+> 2.17.1
+> 
+
+Looks fine:
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+-- 
+Ming
