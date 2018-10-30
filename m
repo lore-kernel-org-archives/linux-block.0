@@ -1,107 +1,46 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-        Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH 04/11] block: Introduce blkdev_nr_zones() helper
-Date: Wed, 10 Oct 2018 10:52:32 +0900
-Message-Id: <20181010015239.24930-5-damien.lemoal@wdc.com>
-In-Reply-To: <20181010015239.24930-1-damien.lemoal@wdc.com>
-References: <20181010015239.24930-1-damien.lemoal@wdc.com>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <prvs=834be3197=sblbir@amzn.com>
+Date: Tue, 30 Oct 2018 02:53:29 +0000
+From: Balbir Singh <sblbir@amzn.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: Balbir Singh <sblbir@amazon.com>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] Add cmd_flags to print_req_error
+Message-ID: <20181030025329.GA2121@dev-dsk-sblbir-2a-88e651b2.us-west-2.amazon.com>
+References: <20181029005732.21040-1-sblbir@amazon.com>
+ <543de76a-e43a-9f4d-c781-e3251ea0e749@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <543de76a-e43a-9f4d-c781-e3251ea0e749@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Introduce the blkdev_nr_zones() helper function to get the total
-number of zones of a zoned block device. This number is always 0 for a
-regular block device (q->limits.zoned == BLK_ZONED_NONE case).
+On Mon, Oct 29, 2018 at 04:39:05PM -0600, Jens Axboe wrote:
+> On 10/28/18 6:57 PM, Balbir Singh wrote:
+> > I ran into a bug where after hibernation due to incompatible
+> > backends, the block driver returned BLK_STS_NOTSUPP, with the
+> > current message it's hard to find out what the command flags
+> > were. Adding req->cmd_flags help make the problem easier to
+> > diagnose.
+> 
+> I recently did the same thing to debug something, so I like
+> this change. One comment:
+> 
+> > +	printk_ratelimited(KERN_ERR "%s: %s error, dev %s, sector %llu flags %llx\n",
+> > +				__func__, blk_errors[idx].name,
+> > +				req->rq_disk ?  req->rq_disk->disk_name : "?",
+> > +				(unsigned long long)blk_rq_pos(req),
+> > +				(unsigned long long)req->cmd_flags);
+> 
+> Why are you casting it to unsigned long long for printing? A simple
+> %x should suffice, no cast necessary.
+>
 
-Replace hard-coded number of zones calculation in dmz_get_zoned_device()
-with a call to this helper.
+Thanks! resent
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/blk-zoned.c            | 27 +++++++++++++++++++++++++++
- drivers/md/dm-zoned-target.c |  3 +--
- include/linux/blkdev.h       |  5 +++++
- 3 files changed, 33 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index c461cf63f1f4..32e377f755d8 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -63,6 +63,33 @@ void __blk_req_zone_write_unlock(struct request *rq)
- }
- EXPORT_SYMBOL_GPL(__blk_req_zone_write_unlock);
+I was looking at blk_dump_rq_flags() and tried to do something similar.
+I agree a %x is sufficient, I was trying to be consistent. We can fix
+that path up if needed.
  
-+static inline unsigned int __blkdev_nr_zones(struct request_queue *q,
-+					     sector_t nr_sectors)
-+{
-+	unsigned long zone_sectors = blk_queue_zone_sectors(q);
-+
-+	return (nr_sectors + zone_sectors - 1) >> ilog2(zone_sectors);
-+}
-+
-+/**
-+ * blkdev_nr_zones - Get number of zones
-+ * @bdev:	Target block device
-+ *
-+ * Description:
-+ *    Return the total number of zones of a zoned block device.
-+ *    For a regular block device, the number of zones is always 0.
-+ */
-+unsigned int blkdev_nr_zones(struct block_device *bdev)
-+{
-+	struct request_queue *q = bdev_get_queue(bdev);
-+
-+	if (!blk_queue_is_zoned(q))
-+		return 0;
-+
-+	return __blkdev_nr_zones(q, bdev->bd_part->nr_sects);
-+}
-+EXPORT_SYMBOL_GPL(blkdev_nr_zones);
-+
- /*
-  * Check that a zone report belongs to the partition.
-  * If yes, fix its start sector and write pointer, copy it in the
-diff --git a/drivers/md/dm-zoned-target.c b/drivers/md/dm-zoned-target.c
-index a44183ff4be0..12d96a263623 100644
---- a/drivers/md/dm-zoned-target.c
-+++ b/drivers/md/dm-zoned-target.c
-@@ -702,8 +702,7 @@ static int dmz_get_zoned_device(struct dm_target *ti, char *path)
- 	dev->zone_nr_blocks = dmz_sect2blk(dev->zone_nr_sectors);
- 	dev->zone_nr_blocks_shift = ilog2(dev->zone_nr_blocks);
- 
--	dev->nr_zones = (dev->capacity + dev->zone_nr_sectors - 1)
--		>> dev->zone_nr_sectors_shift;
-+	dev->nr_zones = blkdev_nr_zones(dev->bdev);
- 
- 	dmz->dev = dev;
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 6980014357d4..c24969b1741b 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -401,6 +401,7 @@ struct blk_zone_report_hdr {
- 	u8		padding[60];
- };
- 
-+extern unsigned int blkdev_nr_zones(struct block_device *bdev);
- extern int blkdev_report_zones(struct block_device *bdev,
- 			       sector_t sector, struct blk_zone *zones,
- 			       unsigned int *nr_zones, gfp_t gfp_mask);
-@@ -414,6 +415,10 @@ extern int blkdev_reset_zones_ioctl(struct block_device *bdev, fmode_t mode,
- 
- #else /* CONFIG_BLK_DEV_ZONED */
- 
-+static inline unsigned int blkdev_nr_zones(struct block_device *bdev)
-+{
-+	return 0;
-+}
- static inline int blkdev_report_zones_ioctl(struct block_device *bdev,
- 					    fmode_t mode, unsigned int cmd,
- 					    unsigned long arg)
--- 
-2.17.1
+> -- 
+> Jens Axboe
+> 
+> 
