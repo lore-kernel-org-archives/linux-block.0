@@ -1,41 +1,155 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
-Subject: Re: [PATCH 05/16] blk-mq: allow software queue to map to multiple
- hardware queues
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 05/16] blk-mq: allow software queue to map to multiple hardware queues
+Date: Tue, 30 Oct 2018 12:32:41 -0600
+Message-Id: <20181030183252.17857-6-axboe@kernel.dk>
+In-Reply-To: <20181030183252.17857-1-axboe@kernel.dk>
 References: <20181030183252.17857-1-axboe@kernel.dk>
- <20181030183252.17857-6-axboe@kernel.dk>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <f5bff9c7-2c94-8988-cf76-318fa0808cf0@grimberg.me>
-Date: Tue, 30 Oct 2018 17:49:02 -0700
-MIME-Version: 1.0
-In-Reply-To: <20181030183252.17857-6-axboe@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
+The mapping used to be dependent on just the CPU location, but
+now it's a tuple of (type, cpu) instead. This is a prep patch
+for allowing a single software queue to map to multiple hardware
+queues. No functional changes in this patch.
 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ block/blk-mq-sched.c   |  2 +-
+ block/blk-mq.c         | 22 ++++++++++++++++------
+ block/blk-mq.h         |  2 +-
+ block/kyber-iosched.c  |  6 +++---
+ include/linux/blk-mq.h |  3 ++-
+ 5 files changed, 23 insertions(+), 12 deletions(-)
 
-> @@ -2342,10 +2346,16 @@ static void blk_mq_map_swqueue(struct request_queue *q)
->   
->   		ctx = per_cpu_ptr(q->queue_ctx, i);
->   		hctx = blk_mq_map_queue_type(q, 0, i);
-> -
-> +		hctx->type = 0;
->   		cpumask_set_cpu(i, hctx->cpumask);
-> -		ctx->index_hw = hctx->nr_ctx;
-> +		ctx->index_hw[hctx->type] = hctx->nr_ctx;
->   		hctx->ctxs[hctx->nr_ctx++] = ctx;
-> +
-> +		/*
-> +		 * If the nr_ctx type overflows, we have exceeded the
-> +		 * amount of sw queues we can support.
-> +		 */
-> +		BUG_ON(!hctx->nr_ctx);
-
-Was this added because nr_ctx became short? What was the motivation
-for that? save space? structure alignment?
-
-Perhaps this should be mentioned in the change log (as it contradicts
-that no functional changes exist in this patch). Or, if this can happen
-even when 32bit nr_ctx, it should be a separate small patch?
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 8125e9393ec2..d232ecf3290c 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -110,7 +110,7 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ static struct blk_mq_ctx *blk_mq_next_ctx(struct blk_mq_hw_ctx *hctx,
+ 					  struct blk_mq_ctx *ctx)
+ {
+-	unsigned idx = ctx->index_hw;
++	unsigned short idx = ctx->index_hw[hctx->type];
+ 
+ 	if (++idx == hctx->nr_ctx)
+ 		idx = 0;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e3febb5691c4..34afbad0ebf6 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -75,14 +75,18 @@ static bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx)
+ static void blk_mq_hctx_mark_pending(struct blk_mq_hw_ctx *hctx,
+ 				     struct blk_mq_ctx *ctx)
+ {
+-	if (!sbitmap_test_bit(&hctx->ctx_map, ctx->index_hw))
+-		sbitmap_set_bit(&hctx->ctx_map, ctx->index_hw);
++	const int bit = ctx->index_hw[hctx->type];
++
++	if (!sbitmap_test_bit(&hctx->ctx_map, bit))
++		sbitmap_set_bit(&hctx->ctx_map, bit);
+ }
+ 
+ static void blk_mq_hctx_clear_pending(struct blk_mq_hw_ctx *hctx,
+ 				      struct blk_mq_ctx *ctx)
+ {
+-	sbitmap_clear_bit(&hctx->ctx_map, ctx->index_hw);
++	const int bit = ctx->index_hw[hctx->type];
++
++	sbitmap_clear_bit(&hctx->ctx_map, bit);
+ }
+ 
+ struct mq_inflight {
+@@ -954,7 +958,7 @@ static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr,
+ struct request *blk_mq_dequeue_from_ctx(struct blk_mq_hw_ctx *hctx,
+ 					struct blk_mq_ctx *start)
+ {
+-	unsigned off = start ? start->index_hw : 0;
++	unsigned off = start ? start->index_hw[hctx->type] : 0;
+ 	struct dispatch_rq_data data = {
+ 		.hctx = hctx,
+ 		.rq   = NULL,
+@@ -2342,10 +2346,16 @@ static void blk_mq_map_swqueue(struct request_queue *q)
+ 
+ 		ctx = per_cpu_ptr(q->queue_ctx, i);
+ 		hctx = blk_mq_map_queue_type(q, 0, i);
+-
++		hctx->type = 0;
+ 		cpumask_set_cpu(i, hctx->cpumask);
+-		ctx->index_hw = hctx->nr_ctx;
++		ctx->index_hw[hctx->type] = hctx->nr_ctx;
+ 		hctx->ctxs[hctx->nr_ctx++] = ctx;
++
++		/*
++		 * If the nr_ctx type overflows, we have exceeded the
++		 * amount of sw queues we can support.
++		 */
++		BUG_ON(!hctx->nr_ctx);
+ 	}
+ 
+ 	mutex_unlock(&q->sysfs_lock);
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 6a8f8b60d8ba..1821f448f7c4 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -17,7 +17,7 @@ struct blk_mq_ctx {
+ 	}  ____cacheline_aligned_in_smp;
+ 
+ 	unsigned int		cpu;
+-	unsigned int		index_hw;
++	unsigned short		index_hw[HCTX_MAX_TYPES];
+ 
+ 	/* incremented at dispatch time */
+ 	unsigned long		rq_dispatched[2];
+diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
+index 728757a34fa0..b824a639d5d4 100644
+--- a/block/kyber-iosched.c
++++ b/block/kyber-iosched.c
+@@ -576,7 +576,7 @@ static bool kyber_bio_merge(struct blk_mq_hw_ctx *hctx, struct bio *bio)
+ {
+ 	struct kyber_hctx_data *khd = hctx->sched_data;
+ 	struct blk_mq_ctx *ctx = blk_mq_get_ctx(hctx->queue);
+-	struct kyber_ctx_queue *kcq = &khd->kcqs[ctx->index_hw];
++	struct kyber_ctx_queue *kcq = &khd->kcqs[ctx->index_hw[hctx->type]];
+ 	unsigned int sched_domain = kyber_sched_domain(bio->bi_opf);
+ 	struct list_head *rq_list = &kcq->rq_list[sched_domain];
+ 	bool merged;
+@@ -602,7 +602,7 @@ static void kyber_insert_requests(struct blk_mq_hw_ctx *hctx,
+ 
+ 	list_for_each_entry_safe(rq, next, rq_list, queuelist) {
+ 		unsigned int sched_domain = kyber_sched_domain(rq->cmd_flags);
+-		struct kyber_ctx_queue *kcq = &khd->kcqs[rq->mq_ctx->index_hw];
++		struct kyber_ctx_queue *kcq = &khd->kcqs[rq->mq_ctx->index_hw[hctx->type]];
+ 		struct list_head *head = &kcq->rq_list[sched_domain];
+ 
+ 		spin_lock(&kcq->lock);
+@@ -611,7 +611,7 @@ static void kyber_insert_requests(struct blk_mq_hw_ctx *hctx,
+ 		else
+ 			list_move_tail(&rq->queuelist, head);
+ 		sbitmap_set_bit(&khd->kcq_map[sched_domain],
+-				rq->mq_ctx->index_hw);
++				rq->mq_ctx->index_hw[hctx->type]);
+ 		blk_mq_sched_request_inserted(rq);
+ 		spin_unlock(&kcq->lock);
+ 	}
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index da88e539601b..466b9202b69c 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -37,7 +37,8 @@ struct blk_mq_hw_ctx {
+ 	struct blk_mq_ctx	*dispatch_from;
+ 	unsigned int		dispatch_busy;
+ 
+-	unsigned int		nr_ctx;
++	unsigned short		type;
++	unsigned short		nr_ctx;
+ 	struct blk_mq_ctx	**ctxs;
+ 
+ 	spinlock_t		dispatch_wait_lock;
+-- 
+2.17.1
