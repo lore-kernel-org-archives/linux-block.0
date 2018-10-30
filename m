@@ -1,28 +1,58 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
-Subject: Re: [PATCH 06/16] blk-mq: add 'type' attribute to the sysfs hctx
- directory
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 06/16] blk-mq: add 'type' attribute to the sysfs hctx directory
+Date: Tue, 30 Oct 2018 12:32:42 -0600
+Message-Id: <20181030183252.17857-7-axboe@kernel.dk>
+In-Reply-To: <20181030183252.17857-1-axboe@kernel.dk>
 References: <20181030183252.17857-1-axboe@kernel.dk>
- <20181030183252.17857-7-axboe@kernel.dk>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <2d858eb1-56d6-5c3e-7c7e-9e36b1ad04fc@grimberg.me>
-Date: Tue, 30 Oct 2018 17:53:43 -0700
-MIME-Version: 1.0
-In-Reply-To: <20181030183252.17857-7-axboe@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
+It can be useful for a user to verify what type a given hardware
+queue is, expose this information in sysfs.
 
-> It can be useful for a user to verify what type a given hardware
-> queue is, expose this information in sysfs.
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ block/blk-mq-sysfs.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-I assume the user is expected to understand the meaning of the
-enumeration it sees in accessing this field correct?
-
-Would be nice to output some meaningful string but I'm not
-yet sure how to do that, but would be nice...
-
-Other than that,
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index aafb44224c89..2d737f9e7ba7 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -161,6 +161,11 @@ static ssize_t blk_mq_hw_sysfs_cpus_show(struct blk_mq_hw_ctx *hctx, char *page)
+ 	return ret;
+ }
+ 
++static ssize_t blk_mq_hw_sysfs_type_show(struct blk_mq_hw_ctx *hctx, char *page)
++{
++	return sprintf(page, "%u\n", hctx->type);
++}
++
+ static struct attribute *default_ctx_attrs[] = {
+ 	NULL,
+ };
+@@ -177,11 +182,16 @@ static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_cpus = {
+ 	.attr = {.name = "cpu_list", .mode = 0444 },
+ 	.show = blk_mq_hw_sysfs_cpus_show,
+ };
++static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_type = {
++	.attr = {.name = "type", .mode = 0444 },
++	.show = blk_mq_hw_sysfs_type_show,
++};
+ 
+ static struct attribute *default_hw_ctx_attrs[] = {
+ 	&blk_mq_hw_sysfs_nr_tags.attr,
+ 	&blk_mq_hw_sysfs_nr_reserved_tags.attr,
+ 	&blk_mq_hw_sysfs_cpus.attr,
++	&blk_mq_hw_sysfs_type.attr,
+ 	NULL,
+ };
+ 
+-- 
+2.17.1
