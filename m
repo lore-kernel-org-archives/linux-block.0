@@ -1,141 +1,126 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Wed, 31 Oct 2018 12:03:30 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: syzbot <syzbot+3701447012fe951dabb2@syzkaller.appspotmail.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Re: upstream boot error (2)
-Message-ID: <20181031040329.GA23429@ming.t460p>
-References: <000000000000ccd7e80579737060@google.com>
+Return-Path: <39HHYWwkbBR8NTUF5GG9M5KKD8.BJJBG9PN9M7JIO9IO.7JH5S6J9F9MI9G.8F@M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <000000000000ccd7e80579737060@google.com>
+Date: Tue, 30 Oct 2018 08:00:04 -0700
+Message-ID: <000000000000ccd7e80579737060@google.com>
+Subject: upstream boot error (2)
+From: syzbot <syzbot+3701447012fe951dabb2@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Oct 30, 2018 at 08:00:04AM -0700, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following crash on:
-> 
-> HEAD commit:    11743c56785c Merge tag 'rpmsg-v4.20' of git://github.com/a..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=15121199400000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=93932074d01b4a5
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3701447012fe951dabb2
-> compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
-> 
-> Unfortunately, I don't have any reproducer for this crash yet.
-> 
-> IMPORTANT: if you fix the bug, please add the following tag to the commit:
-> Reported-by: syzbot+3701447012fe951dabb2@syzkaller.appspotmail.com
-> 
-> KASAN: use-after-free Read in del_timer_syncNon-volatile memory driver v1.3
-> Linux agpgart interface v0.103
-> [drm] Initialized vgem 1.0.0 20120112 for virtual device on minor 0
-> usbcore: registered new interface driver udl
-> ==================================================================
-> BUG: KASAN: use-after-free in __lock_acquire+0x36d9/0x4c20
-> kernel/locking/lockdep.c:3218
-> Read of size 8 at addr ffff8801d1b6b540 by task swapper/0/1
-> 
-> CPU: 0 PID: 1 Comm: swapper/0 Not tainted 4.19.0+ #88
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
-> Google 01/01/2011
-> Call Trace:
->  __dump_stack lib/dump_stack.c:77 [inline]
->  dump_stack+0x244/0x39d lib/dump_stack.c:113
->  print_address_description.cold.7+0x9/0x1ff mm/kasan/report.c:256
->  kasan_report_error mm/kasan/report.c:354 [inline]
->  kasan_report.cold.8+0x242/0x309 mm/kasan/report.c:412
->  __asan_report_load8_noabort+0x14/0x20 mm/kasan/report.c:433
->  __lock_acquire+0x36d9/0x4c20 kernel/locking/lockdep.c:3218
->  lock_acquire+0x1ed/0x520 kernel/locking/lockdep.c:3844
->  del_timer_sync+0xb7/0x270 kernel/time/timer.c:1283
->  blk_cleanup_queue+0x413/0x710 block/blk-core.c:809
->  brd_free+0x5d/0x71 drivers/block/brd.c:422
->  brd_init+0x2eb/0x393 drivers/block/brd.c:518
->  do_one_initcall+0x145/0x957 init/main.c:890
->  do_initcall_level init/main.c:958 [inline]
->  do_initcalls init/main.c:966 [inline]
->  do_basic_setup init/main.c:984 [inline]
->  kernel_init_freeable+0x5c6/0x6b9 init/main.c:1148
->  kernel_init+0x11/0x1ae init/main.c:1068
->  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:350
-> 
-> Allocated by task 1:
->  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
->  set_track mm/kasan/kasan.c:460 [inline]
->  kasan_kmalloc+0xc7/0xe0 mm/kasan/kasan.c:553
->  kmem_cache_alloc_node_trace+0x14c/0x740 mm/slab.c:3663
->  kmalloc_node include/linux/slab.h:584 [inline]
->  bdi_alloc_node+0x89/0xe0 mm/backing-dev.c:861
->  blk_alloc_queue_node+0x2b7/0xe80 block/blk-core.c:1024
->  blk_alloc_queue+0x1a/0x20 block/blk-core.c:911
->  brd_alloc+0xb9/0x540 drivers/block/brd.c:378
->  brd_init+0x11d/0x393 drivers/block/brd.c:498
->  do_one_initcall+0x145/0x957 init/main.c:890
->  do_initcall_level init/main.c:958 [inline]
->  do_initcalls init/main.c:966 [inline]
->  do_basic_setup init/main.c:984 [inline]
->  kernel_init_freeable+0x5c6/0x6b9 init/main.c:1148
->  kernel_init+0x11/0x1ae init/main.c:1068
->  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:350
-> 
-> Freed by task 12:
->  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
->  set_track mm/kasan/kasan.c:460 [inline]
->  __kasan_slab_free+0x102/0x150 mm/kasan/kasan.c:521
->  kasan_slab_free+0xe/0x10 mm/kasan/kasan.c:528
->  __cache_free mm/slab.c:3498 [inline]
->  kfree+0xcf/0x230 mm/slab.c:3817
->  release_bdi mm/backing-dev.c:968 [inline]
->  kref_put include/linux/kref.h:70 [inline]
->  bdi_put+0x138/0x180 mm/backing-dev.c:973
->  blk_exit_queue+0xbf/0xf0 block/blk-core.c:746
->  __blk_release_queue+0x12f/0x510 block/blk-sysfs.c:841
->  process_one_work+0xc90/0x1c40 kernel/workqueue.c:2153
->  worker_thread+0x17f/0x1390 kernel/workqueue.c:2296
->  kthread+0x35a/0x440 kernel/kthread.c:246
->  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:350
-> 
-> The buggy address belongs to the object at ffff8801d1b6ae80
->  which belongs to the cache kmalloc-2k of size 2048
-> The buggy address is located 1728 bytes inside of
->  2048-byte region [ffff8801d1b6ae80, ffff8801d1b6b680)
-> The buggy address belongs to the page:
-> page:ffffea000746da80 count:1 mapcount:0 mapping:ffff8801da800c40 index:0x0
-> compound_mapcount: 0
-> flags: 0x2fffc0000010200(slab|head)
-> raw: 02fffc0000010200 ffffea000746da08 ffffea000746dc08 ffff8801da800c40
-> raw: 0000000000000000 ffff8801d1b6a600 0000000100000003 0000000000000000
-> page dumped because: kasan: bad access detected
-> 
-> Memory state around the buggy address:
->  ffff8801d1b6b400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->  ffff8801d1b6b480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> > ffff8801d1b6b500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->                                            ^
->  ffff8801d1b6b580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->  ffff8801d1b6b600: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> ==================================================================
-> 
-> 
+Hello,
 
-This issue should have been fixed by the following one-line change:
+syzbot found the following crash on:
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index df8103dd40ac..a5ecff2071ce 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -515,6 +515,8 @@ static int __init brd_init(void)
- out_free:
- 	list_for_each_entry_safe(brd, next, &brd_devices, brd_list) {
- 		list_del(&brd->brd_list);
-+		/* don't let put_disk() drop the queue's ref */
-+		brd->brd_disk->queue = NULL;
- 		brd_free(brd);
- 	}
- 	unregister_blkdev(RAMDISK_MAJOR, "ramdisk");
+HEAD commit:    11743c56785c Merge tag 'rpmsg-v4.20' of git://github.com/a..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15121199400000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=93932074d01b4a5
+dashboard link: https://syzkaller.appspot.com/bug?extid=3701447012fe951dabb2
+compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
 
--- 
-Ming
+Unfortunately, I don't have any reproducer for this crash yet.
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+3701447012fe951dabb2@syzkaller.appspotmail.com
+
+KASAN: use-after-free Read in del_timer_syncNon-volatile memory driver v1.3
+Linux agpgart interface v0.103
+[drm] Initialized vgem 1.0.0 20120112 for virtual device on minor 0
+usbcore: registered new interface driver udl
+==================================================================
+BUG: KASAN: use-after-free in __lock_acquire+0x36d9/0x4c20  
+kernel/locking/lockdep.c:3218
+Read of size 8 at addr ffff8801d1b6b540 by task swapper/0/1
+
+CPU: 0 PID: 1 Comm: swapper/0 Not tainted 4.19.0+ #88
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x244/0x39d lib/dump_stack.c:113
+  print_address_description.cold.7+0x9/0x1ff mm/kasan/report.c:256
+  kasan_report_error mm/kasan/report.c:354 [inline]
+  kasan_report.cold.8+0x242/0x309 mm/kasan/report.c:412
+  __asan_report_load8_noabort+0x14/0x20 mm/kasan/report.c:433
+  __lock_acquire+0x36d9/0x4c20 kernel/locking/lockdep.c:3218
+  lock_acquire+0x1ed/0x520 kernel/locking/lockdep.c:3844
+  del_timer_sync+0xb7/0x270 kernel/time/timer.c:1283
+  blk_cleanup_queue+0x413/0x710 block/blk-core.c:809
+  brd_free+0x5d/0x71 drivers/block/brd.c:422
+  brd_init+0x2eb/0x393 drivers/block/brd.c:518
+  do_one_initcall+0x145/0x957 init/main.c:890
+  do_initcall_level init/main.c:958 [inline]
+  do_initcalls init/main.c:966 [inline]
+  do_basic_setup init/main.c:984 [inline]
+  kernel_init_freeable+0x5c6/0x6b9 init/main.c:1148
+  kernel_init+0x11/0x1ae init/main.c:1068
+  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:350
+
+Allocated by task 1:
+  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
+  set_track mm/kasan/kasan.c:460 [inline]
+  kasan_kmalloc+0xc7/0xe0 mm/kasan/kasan.c:553
+  kmem_cache_alloc_node_trace+0x14c/0x740 mm/slab.c:3663
+  kmalloc_node include/linux/slab.h:584 [inline]
+  bdi_alloc_node+0x89/0xe0 mm/backing-dev.c:861
+  blk_alloc_queue_node+0x2b7/0xe80 block/blk-core.c:1024
+  blk_alloc_queue+0x1a/0x20 block/blk-core.c:911
+  brd_alloc+0xb9/0x540 drivers/block/brd.c:378
+  brd_init+0x11d/0x393 drivers/block/brd.c:498
+  do_one_initcall+0x145/0x957 init/main.c:890
+  do_initcall_level init/main.c:958 [inline]
+  do_initcalls init/main.c:966 [inline]
+  do_basic_setup init/main.c:984 [inline]
+  kernel_init_freeable+0x5c6/0x6b9 init/main.c:1148
+  kernel_init+0x11/0x1ae init/main.c:1068
+  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:350
+
+Freed by task 12:
+  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
+  set_track mm/kasan/kasan.c:460 [inline]
+  __kasan_slab_free+0x102/0x150 mm/kasan/kasan.c:521
+  kasan_slab_free+0xe/0x10 mm/kasan/kasan.c:528
+  __cache_free mm/slab.c:3498 [inline]
+  kfree+0xcf/0x230 mm/slab.c:3817
+  release_bdi mm/backing-dev.c:968 [inline]
+  kref_put include/linux/kref.h:70 [inline]
+  bdi_put+0x138/0x180 mm/backing-dev.c:973
+  blk_exit_queue+0xbf/0xf0 block/blk-core.c:746
+  __blk_release_queue+0x12f/0x510 block/blk-sysfs.c:841
+  process_one_work+0xc90/0x1c40 kernel/workqueue.c:2153
+  worker_thread+0x17f/0x1390 kernel/workqueue.c:2296
+  kthread+0x35a/0x440 kernel/kthread.c:246
+  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:350
+
+The buggy address belongs to the object at ffff8801d1b6ae80
+  which belongs to the cache kmalloc-2k of size 2048
+The buggy address is located 1728 bytes inside of
+  2048-byte region [ffff8801d1b6ae80, ffff8801d1b6b680)
+The buggy address belongs to the page:
+page:ffffea000746da80 count:1 mapcount:0 mapping:ffff8801da800c40 index:0x0  
+compound_mapcount: 0
+flags: 0x2fffc0000010200(slab|head)
+raw: 02fffc0000010200 ffffea000746da08 ffffea000746dc08 ffff8801da800c40
+raw: 0000000000000000 ffff8801d1b6a600 0000000100000003 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+  ffff8801d1b6b400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+  ffff8801d1b6b480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> ffff8801d1b6b500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                            ^
+  ffff8801d1b6b580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+  ffff8801d1b6b600: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
+syzbot.
