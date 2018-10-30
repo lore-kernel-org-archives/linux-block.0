@@ -1,21 +1,26 @@
-Return-Path: <prvs=8342f37c0=roger.pau@citrix.com>
-Date: Tue, 30 Oct 2018 11:39:56 +0100
-From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
-To: Manjunath Patil <manjunath.b.patil@oracle.com>
-CC: <boris.ostrovsky@oracle.com>, <jgross@suse.com>, <konrad.wilk@oracle.com>,
-	<axboe@kernel.dk>, <xen-devel@lists.xenproject.org>,
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:56814 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726222AbeJ3P5B (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Oct 2018 11:57:01 -0400
 Subject: Re: [PATCH] xen-blkfront: fix kernel panic with negotiate_mq error
  path
-Message-ID: <20181030103956.hew7gifjvpjviw7u@mac.citrite.net>
+To: Manjunath Patil <manjunath.b.patil@oracle.com>,
+        boris.ostrovsky@oracle.com, konrad.wilk@oracle.com,
+        roger.pau@citrix.com
+Cc: axboe@kernel.dk, xen-devel@lists.xenproject.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <1540837916-14356-1-git-send-email-manjunath.b.patil@oracle.com>
+From: Juergen Gross <jgross@suse.com>
+Message-ID: <65b5d648-d9dc-9248-751c-b6e15109b52e@suse.com>
+Date: Tue, 30 Oct 2018 08:04:42 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
 In-Reply-To: <1540837916-14356-1-git-send-email-manjunath.b.patil@oracle.com>
-Return-Path: roger.pau@citrix.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Mon, Oct 29, 2018 at 11:31:56AM -0700, Manjunath Patil wrote:
+On 29/10/2018 19:31, Manjunath Patil wrote:
 > info->nr_rings isn't adjusted in case of ENOMEM error from
 > negotiate_mq(). This leads to kernel panic in error path.
 > 
@@ -36,8 +41,13 @@ On Mon, Oct 29, 2018 at 11:31:56AM -0700, Manjunath Patil wrote:
 > Though either of my changes avoid the panic, I included both the
 > changes. This issue got introduced with "7ed8ce1 xen-blkfront: move
 > negotiate_mq to cover all cases of new VBDs"
-> 
+
+Please us the correct format for specifying another commit.
+
 > Signed-off-by: Manjunath Patil <manjunath.b.patil@oracle.com>
+
+Can you please add a "Fixes:" tag and "Cc: stable@vger.kernel.org" ?
+
 > ---
 >  drivers/block/xen-blkfront.c |    7 +++++--
 >  1 files changed, 5 insertions(+), 2 deletions(-)
@@ -57,8 +67,18 @@ On Mon, Oct 29, 2018 at 11:31:56AM -0700, Manjunath Patil wrote:
 > +			blkif_free_ring(&info->rinfo[i]);
 > +	}
 
-I don't see the point in the if case here, you already fixed it by
-setting the nr_rings value which I think it's the correct way of
-fixing it.
+I'd drop this change.
 
-Thanks, Roger.
+>  
+>  	kfree(info->rinfo);
+>  	info->rinfo = NULL;
+> @@ -1919,6 +1921,7 @@ static int negotiate_mq(struct blkfront_info *info)
+>  			      GFP_KERNEL);
+>  	if (!info->rinfo) {
+>  		xenbus_dev_fatal(info->xbdev, -ENOMEM, "allocating ring_info structure");
+> +		info->nr_rings = 0;
+>  		return -ENOMEM;
+>  	}
+
+
+Juergen
