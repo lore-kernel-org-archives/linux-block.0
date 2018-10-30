@@ -1,22 +1,21 @@
-Return-Path: <prvs=835290d02=roger.pau@citrix.com>
-Date: Wed, 31 Oct 2018 09:22:25 +0100
-From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
-To: Manjunath Patil <manjunath.b.patil@oracle.com>
-CC: <boris.ostrovsky@oracle.com>, <jgross@suse.com>, <konrad.wilk@oracle.com>,
-	<axboe@kernel.dk>, <xen-devel@lists.xenproject.org>,
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<stable@vger.kernel.org>
-Subject: Re: [PATCH v2] xen-blkfront: fix kernel panic with negotiate_mq
- error path
-Message-ID: <20181031082225.zp2cnrfuinpbilv5@mac.citrite.net>
+Return-Path: <jgross@suse.com>
+Subject: Re: [PATCH v2] xen-blkfront: fix kernel panic with negotiate_mq error
+ path
+To: Manjunath Patil <manjunath.b.patil@oracle.com>,
+ boris.ostrovsky@oracle.com, konrad.wilk@oracle.com, roger.pau@citrix.com
+Cc: axboe@kernel.dk, xen-devel@lists.xenproject.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
 References: <1540918161-31283-1-git-send-email-manjunath.b.patil@oracle.com>
+From: Juergen Gross <jgross@suse.com>
+Message-ID: <2d099bff-648f-e9bf-f2b6-127eb97852fb@suse.com>
+Date: Tue, 30 Oct 2018 17:52:39 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
 In-Reply-To: <1540918161-31283-1-git-send-email-manjunath.b.patil@oracle.com>
-Return-Path: roger.pau@citrix.com
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Oct 30, 2018 at 09:49:21AM -0700, Manjunath Patil wrote:
+On 30/10/2018 17:49, Manjunath Patil wrote:
 > info->nr_rings isn't adjusted in case of ENOMEM error from
 > negotiate_mq(). This leads to kernel panic in error path.
 > 
@@ -38,6 +37,7 @@ On Tue, Oct 30, 2018 at 09:49:21AM -0700, Manjunath Patil wrote:
 > Fixes: 7ed8ce1c5fc7 ("xen-blkfront: move negotiate_mq to cover all cases of new VBDs")
 > Signed-off-by: Manjunath Patil <manjunath.b.patil@oracle.com>
 
-Acked-by: Roger Pau Monn� <roger.pau@citrix.com>
+Reviewed-by: Juergen Gross <jgross@suse.com>
 
-Thanks, Roger.
+
+Juergen
