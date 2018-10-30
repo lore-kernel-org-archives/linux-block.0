@@ -1,46 +1,31 @@
-Return-Path: <bvanassche@acm.org>
+Return-Path: <bart.vanassche@gmail.com>
+Return-Path: <bart.vanassche@gmail.com>
+Message-ID: <1540943443.196084.131.camel@acm.org>
+Subject: Re: [PATCH 0/2] loop: Better discard for block devices
 From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH] blk-mq-debugfs: Also show requests that have not yet been started
-Date: Thu,  4 Oct 2018 10:35:24 -0700
-Message-Id: <20181004173524.52712-1-bvanassche@acm.org>
-MIME-Version: 1.0
+To: Evan Green <evgreen@chromium.org>, Jens Axboe <axboe@kernel.dk>
+Cc: Gwendal Grignou <gwendal@chromium.org>, Alexis Savery
+ <asavery@chromium.org>,  linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Date: Tue, 30 Oct 2018 16:50:43 -0700
+In-Reply-To: <20181030230624.61834-1-evgreen@chromium.org>
+References: <20181030230624.61834-1-evgreen@chromium.org>
+Content-Type: text/plain; charset="UTF-7"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-When debugging e.g. the SCSI timeout handler it is important that
-requests that have not yet been started or that already have
-completed are also reported through debugfs.
+On Tue, 2018-10-30 at 16:06 -0700, Evan Green wrote:
++AD4 This series addresses some errors seen when using the loop
++AD4 device directly backed by a block device. The first change plumbs
++AD4 out the correct error message, and the second change prevents the
++AD4 error from occurring in many cases.
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
----
- block/blk-mq-debugfs.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Hi Evan,
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index a5ea86835fcb..41b86f50d126 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -431,8 +431,7 @@ static void hctx_show_busy_rq(struct request *rq, void *data, bool reserved)
- {
- 	const struct show_busy_params *params = data;
- 
--	if (blk_mq_map_queue(rq->q, rq->mq_ctx->cpu) == params->hctx &&
--	    blk_mq_rq_state(rq) != MQ_RQ_IDLE)
-+	if (blk_mq_map_queue(rq->q, rq->mq_ctx->cpu) == params->hctx)
- 		__blk_mq_debugfs_rq_show(params->m,
- 					 list_entry_rq(&rq->queuelist));
- }
--- 
-2.19.0.605.g01d371f741-goog
+Can you provide some information about the use case? Why do you think that
+it would be useful to support backing a loop device by a block device? Why
+to use the loop driver instead of dm-linear for this use case?
+
+Thanks,
+
+Bart.
