@@ -1,34 +1,63 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: ooo@electrozaur.com, martin.petersen@oracle.com
-Cc: Nick Desaulniers <ndesaulniers@google.com>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        osd-dev@open-osd.org, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: remove exofs and the T10 OSD code V2
-Date: Sat, 27 Oct 2018 10:20:17 +0200
-Message-Id: <20181027082019.20838-1-hch@lst.de>
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 30 Oct 2018 17:37:34 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Balbir Singh <sblbir@amzn.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Add cmd_flags to print_req_error
+Message-ID: <20181030093708.GC13582@ming.t460p>
+References: <20181030024015.1092-1-sblbir@amzn.com>
 MIME-Version: 1.0
-Sender: linux-scsi-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20181030024015.1092-1-sblbir@amzn.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The only real user of the T10 OSD protocol, the pNFS object layout
-driver never went to the point of having shipping products, and we
-removed it 1.5 years ago.  Exofs is just a simple example without
-real life users.
+On Tue, Oct 30, 2018 at 02:40:15AM +0000, Balbir Singh wrote:
+> I ran into a bug where after hibernation due to incompatible
+> backends, the block driver returned BLK_STS_NOTSUPP, with the
+> current message it's hard to find out what the command flags
+> were. Adding req->cmd_flags help make the problem easier to
+> diagnose.
+> 
+> Signed-off-by: Balbir Singh <sblbir@amzn.com>
+> Reviewed-by: Eduardo Valentin <eduval@amazon.com>
+> ---
+> 
+> Testing: Compile tested at my end
+> 
+> Changelog
+>   - convert %llx to %x and remove casting to unsigned long long
+> 
+>  block/blk-core.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index cdfabc5646da..0fd6104bb0d2 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -256,10 +256,11 @@ static void print_req_error(struct request *req, blk_status_t status)
+>  	if (WARN_ON_ONCE(idx >= ARRAY_SIZE(blk_errors)))
+>  		return;
+>  
+> -	printk_ratelimited(KERN_ERR "%s: %s error, dev %s, sector %llu\n",
+> -			   __func__, blk_errors[idx].name, req->rq_disk ?
+> -			   req->rq_disk->disk_name : "?",
+> -			   (unsigned long long)blk_rq_pos(req));
+> +	printk_ratelimited(KERN_ERR "%s: %s error, dev %s, sector %llu flags %x\n",
+> +				__func__, blk_errors[idx].name,
+> +				req->rq_disk ?  req->rq_disk->disk_name : "?",
+> +				(unsigned long long)blk_rq_pos(req),
+> +				req->cmd_flags);
+>  }
+>  
+>  static void req_bio_endio(struct request *rq, struct bio *bio,
+> -- 
+> 2.16.2
+> 
 
-The code has been mostly unmaintained for years and is getting in the
-way of block / SCSI changes, so I think it's finally time to drop it.
+Looks fine:
 
-Quote from Boaz:
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-"As I said then. It is used in Universities for studies and experiments.
-Every once in a while. I get an email with questions and reports.
-
-But yes feel free to remove the all thing!!
-
-I guess I can put it up on github. In a public tree.
-
-Just that I will need to forward port it myself, til now you guys
-been doing this for me ;-)"
+-- 
+Ming
