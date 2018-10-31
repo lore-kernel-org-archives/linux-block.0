@@ -1,54 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:37462 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726451AbeJISao (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:30:44 -0400
-Received: by mail-pg1-f196.google.com with SMTP id c10-v6so656655pgq.4
-        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:14:18 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 19/45] lightnvm: pblk: fix up prints in pblk_read_check_rand
-Date: Tue,  9 Oct 2018 13:11:49 +0200
-Message-Id: <20181009111215.7653-20-mb@lightnvm.io>
-In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
-References: <20181009111215.7653-1-mb@lightnvm.io>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 05/16] blk-mq: allow software queue to map to multiple
+ hardware queues
+To: Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20181030183252.17857-1-axboe@kernel.dk>
+ <20181030183252.17857-6-axboe@kernel.dk>
+ <f5bff9c7-2c94-8988-cf76-318fa0808cf0@grimberg.me>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <95e50d97-7cb3-7632-6e3f-b75ce32153ff@kernel.dk>
+Date: Wed, 31 Oct 2018 08:19:10 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <f5bff9c7-2c94-8988-cf76-318fa0808cf0@grimberg.me>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+On 10/30/18 6:49 PM, Sagi Grimberg wrote:
+> 
+> 
+>> @@ -2342,10 +2346,16 @@ static void blk_mq_map_swqueue(struct request_queue *q)
+>>   
+>>   		ctx = per_cpu_ptr(q->queue_ctx, i);
+>>   		hctx = blk_mq_map_queue_type(q, 0, i);
+>> -
+>> +		hctx->type = 0;
+>>   		cpumask_set_cpu(i, hctx->cpumask);
+>> -		ctx->index_hw = hctx->nr_ctx;
+>> +		ctx->index_hw[hctx->type] = hctx->nr_ctx;
+>>   		hctx->ctxs[hctx->nr_ctx++] = ctx;
+>> +
+>> +		/*
+>> +		 * If the nr_ctx type overflows, we have exceeded the
+>> +		 * amount of sw queues we can support.
+>> +		 */
+>> +		BUG_ON(!hctx->nr_ctx);
+> 
+> Was this added because nr_ctx became short? What was the motivation
+> for that? save space? structure alignment?
 
-The prefix when printing ppas in pblk_read_check_rand should be "rnd"
-not "seq", so fix this so we can differentiate between lba missmatches
-in random and sequential reads. Also change the print order so
-we align with pblk_read_check_seq, printing read lba first.
+Right, I made it smaller to not take up more space after this change.
+And since it is now smaller, adding a check for wrap seemed like
+a good idea.
 
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
----
- drivers/lightnvm/pblk-read.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> Perhaps this should be mentioned in the change log (as it contradicts
+> that no functional changes exist in this patch). Or, if this can happen
+> even when 32bit nr_ctx, it should be a separate small patch?
 
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index d3ff8c3e9010..829e92857289 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -149,10 +149,10 @@ static void pblk_read_check_rand(struct pblk *pblk, struct nvm_rq *rqd,
- #ifdef CONFIG_NVM_PBLK_DEBUG
- 			struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
- 
--			print_ppa(pblk, &ppa_list[j], "seq", j);
-+			print_ppa(pblk, &ppa_list[j], "rnd", j);
- #endif
- 			pblk_err(pblk, "corrupted read LBA (%llu/%llu)\n",
--								lba, meta_lba);
-+							meta_lba, lba);
- 			WARN_ON(1);
- 		}
- 
+Could happen for any type, but more likely now of course. I'll
+mention this in the changelog.
+
 -- 
-2.17.1
+Jens Axboe
