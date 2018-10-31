@@ -1,49 +1,31 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Rui Salvaterra <rsalvaterra@gmail.com>,
-	stable@vger.kernel.org,
-	Mike Snitzer <snitzer@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Xiao Ni <xni@redhat.com>,
-	Mariusz Dabrowski <mariusz.dabrowski@intel.com>
-Subject: [PATCH 1/3] block: make sure discard bio is aligned with logical block size
-Date: Fri, 26 Oct 2018 14:24:33 +0800
-Message-Id: <20181026062435.21398-2-ming.lei@redhat.com>
-In-Reply-To: <20181026062435.21398-1-ming.lei@redhat.com>
-References: <20181026062435.21398-1-ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 02/16] blk-mq: abstract out queue map
+To: Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20181030183252.17857-1-axboe@kernel.dk>
+ <20181030183252.17857-3-axboe@kernel.dk>
+ <725b4d35-2390-58d9-4041-0bac6de6cd77@grimberg.me>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <cc5771b1-5ca9-8463-f575-9f5f9cad4fe3@kernel.dk>
+Date: Wed, 31 Oct 2018 08:17:43 -0600
+MIME-Version: 1.0
+In-Reply-To: <725b4d35-2390-58d9-4041-0bac6de6cd77@grimberg.me>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Obviously the created discard bio has to be aligned with logical block
-size.
+On 10/30/18 6:31 PM, Sagi Grimberg wrote:
+> 
+>> @@ -41,12 +41,12 @@ int blk_mq_rdma_map_queues(struct blk_mq_tag_set *set,
+>>   			goto fallback;
+>>   
+>>   		for_each_cpu(cpu, mask)
+>> -			set->mq_map[cpu] = queue;
+>> +			set->map[0].mq_map[cpu] = queue;
+> 
+> Any reason not to change the signature like the other mappers?
 
-Fixes: 744889b7cbb56a6 ("block: don't deal with discard limit in blkdev_issue_discard()")
-Reported-by: Rui Salvaterra <rsalvaterra@gmail.com>
-Cc: Rui Salvaterra <rsalvaterra@gmail.com>
-Cc: stable@vger.kernel.org
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Xiao Ni <xni@redhat.com>
-Cc: Mariusz Dabrowski <mariusz.dabrowski@intel.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-lib.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+No particular reason, outside of not wanting to touch more than
+I had to.
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index bbd44666f2b5..aa3944946b2f 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -59,7 +59,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 		if (!req_sects)
- 			goto fail;
- 		if (req_sects > UINT_MAX >> 9)
--			req_sects = UINT_MAX >> 9;
-+			req_sects = (UINT_MAX >> 9) & ~bs_mask;
- 
- 		end_sect = sector + req_sects;
- 
 -- 
-2.9.5
+Jens Axboe
