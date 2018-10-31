@@ -1,105 +1,16 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: keith.busch@linux.intel.com, ming.lei@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH V2 4/4] blk-mq: fallback to previous nr_hw_queues when updating fails
-Date: Fri, 12 Oct 2018 18:07:28 +0800
-Message-Id: <1539338848-1789-5-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1539338848-1789-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1539338848-1789-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: [PATCH 15/16] block: add REQ_HIPRI and inherit it from IOCB_HIPRI
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20181030183252.17857-1-axboe@kernel.dk>
+ <20181030183252.17857-16-axboe@kernel.dk>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <3137fca8-249c-38de-9a87-999909e8b235@grimberg.me>
+Date: Tue, 30 Oct 2018 18:58:13 -0700
+MIME-Version: 1.0
+In-Reply-To: <20181030183252.17857-16-axboe@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-When we try to increate the nr_hw_queues, we may fail due to
-shortage of memory or other reason, then blk_mq_realloc_hw_ctxs stops
-and some entries in q->queue_hw_ctx are left with NULL. However,
-because queue map has been updated with new nr_hw_queues, some cpus
-have been mapped to hw queue which just encounters allocation failure,
-thus blk_mq_map_queue could return NULL. This will cause panic in
-following blk_mq_map_swqueue.
-
-To fix it, when increase nr_hw_queues fails, fallback to previous
-nr_hw_queues and post warning. At the same time, driver's .map_queues
-usually use completion irq affinity to map hw and cpu, fallback
-nr_hw_queues will cause lack of some cpu's map to hw, so use default
-blk_mq_map_queues to do that.
-
-Reported-by: syzbot+83e8cbe702263932d9d4@syzkaller.appspotmail.com
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
----
- block/blk-mq.c | 27 ++++++++++++++++++++++++---
- 1 file changed, 24 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 34f3973..d2ce67a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2540,7 +2540,7 @@ static struct blk_mq_hw_ctx *blk_mq_alloc_and_init_hctx(
- static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 						struct request_queue *q)
- {
--	int i, j;
-+	int i, j, end;
- 	struct blk_mq_hw_ctx **hctxs = q->queue_hw_ctx;
- 
- 	/* protect against switching io scheduler  */
-@@ -2574,8 +2574,20 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 				break;
- 		}
- 	}
-+	/*
-+	 * Increasing nr_hw_queues fails. Free the newly allocated
-+	 * hctxs and keep the previous q->nr_hw_queues.
-+	 */
-+	if (i != set->nr_hw_queues) {
-+		j = q->nr_hw_queues;
-+		end = i;
-+	} else {
-+		j = i;
-+		end = q->nr_hw_queues;
-+		q->nr_hw_queues = set->nr_hw_queues;
-+	}
- 
--	for (j = i; j < q->nr_hw_queues; j++) {
-+	for (; j < end; j++) {
- 		struct blk_mq_hw_ctx *hctx = hctxs[j];
- 
- 		if (hctx) {
-@@ -2587,7 +2599,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 
- 		}
- 	}
--	q->nr_hw_queues = i;
- 	mutex_unlock(&q->sysfs_lock);
- }
- 
-@@ -2972,6 +2983,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- {
- 	struct request_queue *q;
- 	LIST_HEAD(head);
-+	int prev_nr_hw_queues;
- 
- 	lockdep_assert_held(&set->tag_list_lock);
- 
-@@ -3000,10 +3012,19 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 		blk_mq_sysfs_unregister(q);
- 	}
- 
-+	prev_nr_hw_queues = set->nr_hw_queues;
- 	set->nr_hw_queues = nr_hw_queues;
- 	blk_mq_update_queue_map(set);
-+fallback:
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
- 		blk_mq_realloc_hw_ctxs(set, q);
-+		if (q->nr_hw_queues != set->nr_hw_queues) {
-+			pr_warn("Increasing nr_hw_queues to %d fails, fallback to %d\n",
-+					nr_hw_queues, prev_nr_hw_queues);
-+			set->nr_hw_queues = prev_nr_hw_queues;
-+			blk_mq_map_queues(set);
-+			goto fallback;
-+		}
- 		blk_mq_map_swqueue(q);
- 	}
- 
--- 
-2.7.4
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
