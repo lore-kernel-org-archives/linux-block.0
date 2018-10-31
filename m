@@ -1,41 +1,27 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:43372 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727044AbeJKCQg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Oct 2018 22:16:36 -0400
-Subject: Re: [PATCH] blk: optimization for classic polling
-To: Nitesh Shetty <nj.shetty@samsung.com>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        viro@zeniv.linux.org.uk
-Cc: linux-block@vger.kernel.org, axboe@fb.com,
-        linux-nvme@lists.infradead.org, joshi.k@samsung.com
-References: <CGME20180208143655epcas1p444bf34705526b7839a5a135f82761aad@epcas1p4.samsung.com>
- <3578876466-3733-1-git-send-email-nj.shetty@samsung.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-Message-ID: <6425d6fc-59d7-7ea0-487f-bb5d0985653c@gmail.com>
-Date: Wed, 10 Oct 2018 11:52:57 -0700
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v2] null_blk: Add conventional zone configuration for
+ zoned support
+To: Masato Suzuki <masato.suzuki@wdc.com>, linux-block@vger.kernel.org
+Cc: Matias.Bjorling@wdc.com, Damien.LeMoal@wdc.com
+References: <20181030071405.20518-1-masato.suzuki@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <ad1881bc-6259-fd8b-a0f0-ad98ccea2484@kernel.dk>
+Date: Wed, 31 Oct 2018 08:47:00 -0600
 MIME-Version: 1.0
-In-Reply-To: <3578876466-3733-1-git-send-email-nj.shetty@samsung.com>
+In-Reply-To: <20181030071405.20518-1-masato.suzuki@wdc.com>
 Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On 05/29/2083 08:21 PM, Nitesh Shetty wrote:
-> This removes the dependency on interrupts to wake up task. Set task
-> state as TASK_RUNNING, if need_resched() returns true,
-> while polling for IO completion.
-> Earlier, polling task used to sleep, relying on interrupt to wake it up.
-> This made some IO take very long when interrupt-coalescing is enabled in
-> NVMe.
-> 
-> Reference:
-> http://lists.infradead.org/pipermail/linux-nvme/2018-February/015435.html
-> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+On 10/30/18 1:14 AM, Masato Suzuki wrote:
+> Allow the creation of conventional zones by adding the zone_nr_conv
+> configuration attribute. This new attribute is used only for zoned devices
+> and indicates the number of conventional zones to create. The default value
+> is 0. Since host-managed zoned block devices must always have at least one
+> sequential zone, if the value of zone_nr_conv is larger than or equal to
+> the total number of zones of the device nr_zones, zone_nr_conv is
+> automatically changed to nr_zones - 1.
 
-There is something seriously wrong with the date on your computer, this
-patch is dated from May 29th 2083,... I would not be surprised if it
-messed up people's email client and you did not get any response because
-of that...
+Looks good to me, I'll queue this up for 4.21.
+
 -- 
-Florian
+Jens Axboe
