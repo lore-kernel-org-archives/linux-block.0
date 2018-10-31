@@ -1,69 +1,84 @@
-Return-Path: <christophe.leroy@c-s.fr>
-Message-Id: <8549b86165e90d6f3a2b0423fc731048358e1aa1.1539092112.git.christophe.leroy@c-s.fr>
-In-Reply-To: <cover.1539092111.git.christophe.leroy@c-s.fr>
-References: <cover.1539092111.git.christophe.leroy@c-s.fr>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v3 17/24] powerpc/mm: Move pte_user() into nohash/pgtable.h
-To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Dominik Brodowski <linux@dominikbrodowski.net>, Geoff Levand <geoff@infradead.org>, Jens Axboe <axboe@kernel.dk>, Kumar Gala <galak@kernel.crashing.org>, Li Yang <leoyang.li@nxp.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Paul Mackerras <paulus@samba.org>, Scott Wood <oss@buserror.net>, aneesh.kumar@linux.vnet.ibm.com
-Cc: linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org
-Date: Tue,  9 Oct 2018 13:52:06 +0000 (UTC)
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 10/30] block: remove q->lld_busy_fn()
+Date: Wed, 31 Oct 2018 11:59:02 -0600
+Message-Id: <20181031175922.8849-11-axboe@kernel.dk>
+In-Reply-To: <20181031175922.8849-1-axboe@kernel.dk>
+References: <20181031175922.8849-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Now the pte-common.h is only for nohash platforms, lets
-move pte_user() helper out of pte-common.h to put it
-together with other helpers.
+Nobody is using the legacy path for blk_lld_busy() anymore, remove
+it.
 
-Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- arch/powerpc/include/asm/nohash/pgtable.h | 10 ++++++++++
- arch/powerpc/include/asm/pte-common.h     | 13 -------------
- 2 files changed, 10 insertions(+), 13 deletions(-)
+ block/blk-core.c       | 2 --
+ block/blk-settings.c   | 6 ------
+ include/linux/blkdev.h | 3 ---
+ 3 files changed, 11 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/nohash/pgtable.h b/arch/powerpc/include/asm/nohash/pgtable.h
-index 062d96233673..8de3b7eb88b0 100644
---- a/arch/powerpc/include/asm/nohash/pgtable.h
-+++ b/arch/powerpc/include/asm/nohash/pgtable.h
-@@ -52,6 +52,16 @@ static inline bool pte_hw_valid(pte_t pte)
- }
- 
- /*
-+ * Don't just check for any non zero bits in __PAGE_USER, since for book3e
-+ * and PTE_64BIT, PAGE_KERNEL_X contains _PAGE_BAP_SR which is also in
-+ * _PAGE_USER.  Need to explicitly match _PAGE_BAP_UR bit in that case too.
-+ */
-+static inline bool pte_user(pte_t pte)
-+{
-+	return (pte_val(pte) & (_PAGE_USER | _PAGE_PRIVILEGED)) == _PAGE_USER;
-+}
-+
-+/*
-  * We only find page table entry in the last level
-  * Hence no need for other accessors
+diff --git a/block/blk-core.c b/block/blk-core.c
+index c99088d0e80b..5044a1c41493 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -3427,8 +3427,6 @@ EXPORT_SYMBOL_GPL(rq_flush_dcache_pages);
   */
-diff --git a/arch/powerpc/include/asm/pte-common.h b/arch/powerpc/include/asm/pte-common.h
-index 3a8ec18ffd22..556a914ff845 100644
---- a/arch/powerpc/include/asm/pte-common.h
-+++ b/arch/powerpc/include/asm/pte-common.h
-@@ -66,19 +66,6 @@
- #define _PTE_NONE_MASK	0
- #endif
+ int blk_lld_busy(struct request_queue *q)
+ {
+-	if (q->lld_busy_fn)
+-		return q->lld_busy_fn(q);
+ 	if (q->mq_ops && q->mq_ops->busy)
+ 		return q->mq_ops->busy(q);
  
--#ifndef __ASSEMBLY__
--
--/*
-- * Don't just check for any non zero bits in __PAGE_USER, since for book3e
-- * and PTE_64BIT, PAGE_KERNEL_X contains _PAGE_BAP_SR which is also in
-- * _PAGE_USER.  Need to explicitly match _PAGE_BAP_UR bit in that case too.
-- */
--static inline bool pte_user(pte_t pte)
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index ffd459969689..82b31fb2888c 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -73,12 +73,6 @@ void blk_queue_rq_timed_out(struct request_queue *q, rq_timed_out_fn *fn)
+ }
+ EXPORT_SYMBOL_GPL(blk_queue_rq_timed_out);
+ 
+-void blk_queue_lld_busy(struct request_queue *q, lld_busy_fn *fn)
 -{
--	return (pte_val(pte) & (_PAGE_USER | _PAGE_PRIVILEGED)) == _PAGE_USER;
+-	q->lld_busy_fn = fn;
 -}
--#endif /* __ASSEMBLY__ */
+-EXPORT_SYMBOL_GPL(blk_queue_lld_busy);
 -
- /* Location of the PFN in the PTE. Most 32-bit platforms use the same
-  * as _PAGE_SHIFT here (ie, naturally aligned).
-  * Platform who don't just pre-define the value so we don't override it here
+ /**
+  * blk_set_default_limits - reset limits to default values
+  * @lim:  the queue_limits structure to reset
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 4293dc1cd160..e867733b761d 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -320,7 +320,6 @@ typedef void (unprep_rq_fn) (struct request_queue *, struct request *);
+ struct bio_vec;
+ typedef void (softirq_done_fn)(struct request *);
+ typedef int (dma_drain_needed_fn)(struct request *);
+-typedef int (lld_busy_fn) (struct request_queue *q);
+ typedef int (bsg_job_fn) (struct bsg_job *);
+ typedef int (init_rq_fn)(struct request_queue *, struct request *, gfp_t);
+ typedef void (exit_rq_fn)(struct request_queue *, struct request *);
+@@ -466,7 +465,6 @@ struct request_queue {
+ 	softirq_done_fn		*softirq_done_fn;
+ 	rq_timed_out_fn		*rq_timed_out_fn;
+ 	dma_drain_needed_fn	*dma_drain_needed;
+-	lld_busy_fn		*lld_busy_fn;
+ 	/* Called just after a request is allocated */
+ 	init_rq_fn		*init_rq_fn;
+ 	/* Called just before a request is freed */
+@@ -1255,7 +1253,6 @@ extern void blk_queue_update_dma_pad(struct request_queue *, unsigned int);
+ extern int blk_queue_dma_drain(struct request_queue *q,
+ 			       dma_drain_needed_fn *dma_drain_needed,
+ 			       void *buf, unsigned int size);
+-extern void blk_queue_lld_busy(struct request_queue *q, lld_busy_fn *fn);
+ extern void blk_queue_segment_boundary(struct request_queue *, unsigned long);
+ extern void blk_queue_virt_boundary(struct request_queue *, unsigned long);
+ extern void blk_queue_prep_rq(struct request_queue *, prep_rq_fn *pfn);
 -- 
-2.13.3
+2.17.1
