@@ -1,48 +1,46 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Rui Salvaterra <rsalvaterra@gmail.com>,
-	stable@vger.kernel.org,
-	Mike Snitzer <snitzer@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Xiao Ni <xni@redhat.com>,
-	Mariusz Dabrowski <mariusz.dabrowski@intel.com>
-Subject: [PATCH 3/3] block: make sure writesame bio is aligned with logical block size
-Date: Fri, 26 Oct 2018 14:24:35 +0800
-Message-Id: <20181026062435.21398-4-ming.lei@redhat.com>
-In-Reply-To: <20181026062435.21398-1-ming.lei@redhat.com>
-References: <20181026062435.21398-1-ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 05/30] blk-mq: remove the request_list usage
+Date: Wed, 31 Oct 2018 11:58:57 -0600
+Message-Id: <20181031175922.8849-6-axboe@kernel.dk>
+In-Reply-To: <20181031175922.8849-1-axboe@kernel.dk>
+References: <20181031175922.8849-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Obviously the created writesame bio has to be aligned with logical block
-size.
+We don't do anything with it, that's just the legacy path.
 
-Fixes: b49a0871be31a745b2ef ("block: remove split code in blkdev_issue_{discard,write_same}")
-Cc: Rui Salvaterra <rsalvaterra@gmail.com>
-Cc: stable@vger.kernel.org
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Xiao Ni <xni@redhat.com>
-Cc: Mariusz Dabrowski <mariusz.dabrowski@intel.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-lib.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-mq.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 93011785f710..1750f0e480c0 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -149,7 +149,7 @@ static int __blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
- 		return -EOPNOTSUPP;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 3f91c6e5b17a..4c82dc44d4d8 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -510,9 +510,6 @@ void blk_mq_free_request(struct request *rq)
  
- 	/* Ensure that max_write_same_sectors doesn't overflow bi_size */
--	max_write_same_sectors = UINT_MAX >> 9;
-+	max_write_same_sectors = (UINT_MAX >> 9) & ~bs_mask;
+ 	rq_qos_done(q, rq);
  
- 	while (nr_sects) {
- 		bio = next_bio(bio, 1, gfp_mask);
+-	if (blk_rq_rl(rq))
+-		blk_put_rl(blk_rq_rl(rq));
+-
+ 	WRITE_ONCE(rq->state, MQ_RQ_IDLE);
+ 	if (refcount_dec_and_test(&rq->ref))
+ 		__blk_mq_free_request(rq);
+@@ -1675,8 +1672,6 @@ static void blk_mq_bio_to_request(struct request *rq, struct bio *bio)
+ {
+ 	blk_init_request_from_bio(rq, bio);
+ 
+-	blk_rq_set_rl(rq, blk_get_rl(rq->q, bio));
+-
+ 	blk_account_io_start(rq, true);
+ }
+ 
 -- 
-2.9.5
+2.17.1
