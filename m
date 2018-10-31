@@ -1,63 +1,55 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:53132 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729745AbeKACq4 (ORCPT
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:34349 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727991AbeKAC2k (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Oct 2018 22:46:56 -0400
+        Wed, 31 Oct 2018 22:28:40 -0400
+Message-ID: <1541006979.196084.138.camel@acm.org>
 Subject: Re: remove exofs and the T10 OSD code V2
-To: Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>, martin.petersen@oracle.com
-References: <20181027082019.20838-1-hch@lst.de>
- <c9740eeb-6b96-35b6-a436-7537669da1a9@electrozaur.com>
- <1541006979.196084.138.camel@acm.org>
+From: Bart Van Assche <bvanassche@acm.org>
+To: Boaz Harrosh <ooo@electrozaur.com>, Christoph Hellwig <hch@lst.de>,
+        martin.petersen@oracle.com
 Cc: Nick Desaulniers <ndesaulniers@google.com>,
         Nathan Chancellor <natechancellor@gmail.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         osd-dev@open-osd.org, linux-scsi@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-From: Boaz Harrosh <ooo@electrozaur.com>
-Message-ID: <6794b3a0-fe57-cd8b-3ad3-3a590121b12a@electrozaur.com>
-Date: Wed, 31 Oct 2018 19:47:50 +0200
-MIME-Version: 1.0
-In-Reply-To: <1541006979.196084.138.camel@acm.org>
-Content-Type: text/plain; charset=utf-8
+Date: Wed, 31 Oct 2018 10:29:39 -0700
+In-Reply-To: <c9740eeb-6b96-35b6-a436-7537669da1a9@electrozaur.com>
+References: <20181027082019.20838-1-hch@lst.de>
+         <c9740eeb-6b96-35b6-a436-7537669da1a9@electrozaur.com>
+Content-Type: text/plain; charset="UTF-7"
+Mime-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 31/10/18 19:29, Bart Van Assche wrote:
-> On Wed, 2018-10-31 at 18:34 +0200, Boaz Harrosh wrote:
->> On 27/10/18 11:20, Christoph Hellwig wrote:
->>> The only real user of the T10 OSD protocol, the pNFS object layout
->>> driver never went to the point of having shipping products, and we
->>> removed it 1.5 years ago.  Exofs is just a simple example without
->>> real life users.
->>>
->>> The code has been mostly unmaintained for years and is getting in the
->>> way of block / SCSI changes, so I think it's finally time to drop it.
->>>
->>> Quote from Boaz:
->>>
->>> "As I said then. It is used in Universities for studies and experiments.
->>> Every once in a while. I get an email with questions and reports.
->>>
->>> But yes feel free to remove the all thing!!
->>
->> I think I'm changing my mind about this.
->> [ ... ]
-> 
-> The osd driver was accepted in the upstream kernel in 2009. I have checked all
-> commits in Linus' tree for the osd driver that went in since 2009. All changes
-> made by other kernel developers than you are the result of tree-wide refactoring,
-> compiler warning fixes, fixes for issues detected by static source code
-> analyzers or spelling fixes. Hence my question: how big is the user base of the
-> exofs and osd kernel drivers? 
-> 
+On Wed, 2018-10-31 at 18:34 +-0200, Boaz Harrosh wrote:
++AD4 On 27/10/18 11:20, Christoph Hellwig wrote:
++AD4 +AD4 The only real user of the T10 OSD protocol, the pNFS object layout
++AD4 +AD4 driver never went to the point of having shipping products, and we
++AD4 +AD4 removed it 1.5 years ago.  Exofs is just a simple example without
++AD4 +AD4 real life users.
++AD4 +AD4 
++AD4 +AD4 The code has been mostly unmaintained for years and is getting in the
++AD4 +AD4 way of block / SCSI changes, so I think it's finally time to drop it.
++AD4 +AD4 
++AD4 +AD4 Quote from Boaz:
++AD4 +AD4 
++AD4 +AD4 +ACI-As I said then. It is used in Universities for studies and experiments.
++AD4 +AD4 Every once in a while. I get an email with questions and reports.
++AD4 +AD4 
++AD4 +AD4 But yes feel free to remove the all thing+ACEAIQ
++AD4 
++AD4 I think I'm changing my mind about this.
++AD4 +AFs ... +AF0
 
-Not big at all. And none of them production setups. As I said mainly used
-by academia.
+The osd driver was accepted in the upstream kernel in 2009. I have checked all
+commits in Linus' tree for the osd driver that went in since 2009. All changes
+made by other kernel developers than you are the result of tree-wide refactoring,
+compiler warning fixes, fixes for issues detected by static source code
+analyzers or spelling fixes. Hence my question: how big is the user base of the
+exofs and osd kernel drivers? 
 
-Thanks
-Boaz
+Thanks,
 
-> Thanks,
-> Bart.
+Bart.
