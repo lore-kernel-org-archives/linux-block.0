@@ -1,60 +1,17 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-ide@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 26/29] block: kill request slab cache
-Date: Mon, 29 Oct 2018 10:34:41 -0600
-Message-Id: <20181029163444.9940-27-axboe@kernel.dk>
-In-Reply-To: <20181029163444.9940-1-axboe@kernel.dk>
-References: <20181029163444.9940-1-axboe@kernel.dk>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: [PATCH 08/16] blk-mq: separate number of hardware queues from
+ nr_cpu_ids
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20181030183252.17857-1-axboe@kernel.dk>
+ <20181030183252.17857-9-axboe@kernel.dk>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <cebad07c-99eb-ebe6-07f0-d420fd467e06@grimberg.me>
+Date: Tue, 30 Oct 2018 18:00:15 -0700
+MIME-Version: 1.0
+In-Reply-To: <20181030183252.17857-9-axboe@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-core.c | 8 --------
- block/blk.h      | 1 -
- 2 files changed, 9 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 0678ec4b1169..951e8cf082e1 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -57,11 +57,6 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(block_unplug);
- 
- DEFINE_IDA(blk_queue_ida);
- 
--/*
-- * For the allocated request tables
-- */
--struct kmem_cache *request_cachep;
--
- /*
-  * For queue allocation
-  */
-@@ -1969,9 +1964,6 @@ int __init blk_dev_init(void)
- 	if (!kblockd_workqueue)
- 		panic("Failed to create kblockd\n");
- 
--	request_cachep = kmem_cache_create("blkdev_requests",
--			sizeof(struct request), 0, SLAB_PANIC, NULL);
--
- 	blk_requestq_cachep = kmem_cache_create("request_queue",
- 			sizeof(struct request_queue), 0, SLAB_PANIC, NULL);
- 
-diff --git a/block/blk.h b/block/blk.h
-index e925cf4fe4de..2bf1cfeeb9c0 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -32,7 +32,6 @@ struct blk_flush_queue {
- };
- 
- extern struct kmem_cache *blk_requestq_cachep;
--extern struct kmem_cache *request_cachep;
- extern struct kobj_type blk_queue_ktype;
- extern struct ida blk_queue_ida;
- 
--- 
-2.17.1
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
