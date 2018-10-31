@@ -1,83 +1,178 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:45000 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726693AbeJISbq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Oct 2018 14:31:46 -0400
-Received: by mail-pg1-f196.google.com with SMTP id g2-v6so641225pgu.11
-        for <linux-block@vger.kernel.org>; Tue, 09 Oct 2018 04:15:19 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 37/45] lightnvm: pblk: fix race on sysfs line state
-Date: Tue,  9 Oct 2018 13:12:07 +0200
-Message-Id: <20181009111215.7653-38-mb@lightnvm.io>
-In-Reply-To: <20181009111215.7653-1-mb@lightnvm.io>
-References: <20181009111215.7653-1-mb@lightnvm.io>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 30/30] block: get rid of q->softirq_done_fn()
+Date: Wed, 31 Oct 2018 11:59:22 -0600
+Message-Id: <20181031175922.8849-31-axboe@kernel.dk>
+In-Reply-To: <20181031175922.8849-1-axboe@kernel.dk>
+References: <20181031175922.8849-1-axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@javigon.com>
+With the legacy path gone, all we do is funnel it through the
+mq_ops->complete() operation.
 
-pblk exposes a sysfs interface that represents its internal state. Part
-of this state is the map bitmap for the current open line, which should
-be protected by the line lock to avoid a race when freeing the line
-metadata. Currently, it is not.
-
-This patch makes sure that the line state is consistent and NULL
-bitmap pointers are not dereferenced.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/lightnvm/pblk-core.c  | 5 +++--
- drivers/lightnvm/pblk-sysfs.c | 8 +++++++-
- 2 files changed, 10 insertions(+), 3 deletions(-)
+ block/blk-mq.c         | 17 ++++++++---------
+ block/blk-settings.c   |  6 ------
+ block/blk-softirq.c    |  4 ++--
+ include/linux/blk-mq.h |  3 ++-
+ include/linux/blkdev.h |  3 ---
+ 5 files changed, 12 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 4045a9b1ee74..6944aac43b01 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1611,13 +1611,14 @@ struct pblk_line *pblk_line_replace_data(struct pblk *pblk)
- 	struct pblk_line *cur, *new = NULL;
- 	unsigned int left_seblks;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 21e4147c4810..f1f47dd08da7 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -546,13 +546,15 @@ EXPORT_SYMBOL(blk_mq_end_request);
+ static void __blk_mq_complete_request_remote(void *data)
+ {
+ 	struct request *rq = data;
++	struct request_queue *q = rq->q;
  
--	cur = l_mg->data_line;
- 	new = l_mg->data_next;
- 	if (!new)
- 		goto out;
-+
-+	spin_lock(&l_mg->free_lock);
-+	cur = l_mg->data_line;
- 	l_mg->data_line = new;
+-	rq->q->softirq_done_fn(rq);
++	q->mq_ops->complete(rq);
+ }
  
--	spin_lock(&l_mg->free_lock);
- 	pblk_line_setup_metadata(new, l_mg, &pblk->lm);
- 	spin_unlock(&l_mg->free_lock);
+ static void __blk_mq_complete_request(struct request *rq)
+ {
+ 	struct blk_mq_ctx *ctx = rq->mq_ctx;
++	struct request_queue *q = rq->q;
+ 	bool shared = false;
+ 	int cpu;
  
-diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
-index cba83ac43e62..2d2818155aa8 100644
---- a/drivers/lightnvm/pblk-sysfs.c
-+++ b/drivers/lightnvm/pblk-sysfs.c
-@@ -263,8 +263,14 @@ static ssize_t pblk_sysfs_lines(struct pblk *pblk, char *page)
- 		sec_in_line = l_mg->data_line->sec_in_line;
- 		meta_weight = bitmap_weight(&l_mg->meta_bitmap,
- 							PBLK_DATA_LINES);
--		map_weight = bitmap_weight(l_mg->data_line->map_bitmap,
-+
-+		spin_lock(&l_mg->data_line->lock);
-+		if (l_mg->data_line->map_bitmap)
-+			map_weight = bitmap_weight(l_mg->data_line->map_bitmap,
- 							lm->sec_per_line);
-+		else
-+			map_weight = 0;
-+		spin_unlock(&l_mg->data_line->lock);
+@@ -568,18 +570,18 @@ static void __blk_mq_complete_request(struct request *rq)
+ 	 * So complete IO reqeust in softirq context in case of single queue
+ 	 * for not degrading IO performance by irqsoff latency.
+ 	 */
+-	if (rq->q->nr_hw_queues == 1) {
++	if (q->nr_hw_queues == 1) {
+ 		__blk_complete_request(rq);
+ 		return;
  	}
- 	spin_unlock(&l_mg->free_lock);
  
+-	if (!test_bit(QUEUE_FLAG_SAME_COMP, &rq->q->queue_flags)) {
+-		rq->q->softirq_done_fn(rq);
++	if (!test_bit(QUEUE_FLAG_SAME_COMP, &q->queue_flags)) {
++		q->mq_ops->complete(rq);
+ 		return;
+ 	}
+ 
+ 	cpu = get_cpu();
+-	if (!test_bit(QUEUE_FLAG_SAME_FORCE, &rq->q->queue_flags))
++	if (!test_bit(QUEUE_FLAG_SAME_FORCE, &q->queue_flags))
+ 		shared = cpus_share_cache(cpu, ctx->cpu);
+ 
+ 	if (cpu != ctx->cpu && !shared && cpu_online(ctx->cpu)) {
+@@ -588,7 +590,7 @@ static void __blk_mq_complete_request(struct request *rq)
+ 		rq->csd.flags = 0;
+ 		smp_call_function_single_async(ctx->cpu, &rq->csd);
+ 	} else {
+-		rq->q->softirq_done_fn(rq);
++		q->mq_ops->complete(rq);
+ 	}
+ 	put_cpu();
+ }
+@@ -2701,9 +2703,6 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	 */
+ 	q->poll_nsec = -1;
+ 
+-	if (set->ops->complete)
+-		blk_queue_softirq_done(q, set->ops->complete);
+-
+ 	blk_mq_init_cpu_queues(q, set->nr_hw_queues);
+ 	blk_mq_add_queue_tag_set(set, q);
+ 	blk_mq_map_swqueue(q);
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 1895f499bbe5..e111b3e4e96e 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -20,12 +20,6 @@ EXPORT_SYMBOL(blk_max_low_pfn);
+ 
+ unsigned long blk_max_pfn;
+ 
+-void blk_queue_softirq_done(struct request_queue *q, softirq_done_fn *fn)
+-{
+-	q->softirq_done_fn = fn;
+-}
+-EXPORT_SYMBOL(blk_queue_softirq_done);
+-
+ void blk_queue_rq_timeout(struct request_queue *q, unsigned int timeout)
+ {
+ 	q->rq_timeout = timeout;
+diff --git a/block/blk-softirq.c b/block/blk-softirq.c
+index 8ca0f6caf174..727d64436ec4 100644
+--- a/block/blk-softirq.c
++++ b/block/blk-softirq.c
+@@ -34,7 +34,7 @@ static __latent_entropy void blk_done_softirq(struct softirq_action *h)
+ 
+ 		rq = list_entry(local_list.next, struct request, ipi_list);
+ 		list_del_init(&rq->ipi_list);
+-		rq->q->softirq_done_fn(rq);
++		rq->q->mq_ops->complete(rq);
+ 	}
+ }
+ 
+@@ -102,7 +102,7 @@ void __blk_complete_request(struct request *req)
+ 	unsigned long flags;
+ 	bool shared = false;
+ 
+-	BUG_ON(!q->softirq_done_fn);
++	BUG_ON(!q->mq_ops->complete);
+ 
+ 	local_irq_save(flags);
+ 	cpu = smp_processor_id();
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 5c8418ebbfd6..9dd574e5436a 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -115,6 +115,7 @@ typedef void (busy_tag_iter_fn)(struct request *, void *, bool);
+ typedef int (poll_fn)(struct blk_mq_hw_ctx *, unsigned int);
+ typedef int (map_queues_fn)(struct blk_mq_tag_set *set);
+ typedef bool (busy_fn)(struct request_queue *);
++typedef void (complete_fn)(struct request *);
+ 
+ 
+ struct blk_mq_ops {
+@@ -142,7 +143,7 @@ struct blk_mq_ops {
+ 	 */
+ 	poll_fn			*poll;
+ 
+-	softirq_done_fn		*complete;
++	complete_fn		*complete;
+ 
+ 	/*
+ 	 * Called when the block layer side of a hardware queue has been
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index c675e2b5af62..d4104844d6bb 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -290,7 +290,6 @@ typedef blk_qc_t (make_request_fn) (struct request_queue *q, struct bio *bio);
+ typedef bool (poll_q_fn) (struct request_queue *q, blk_qc_t);
+ 
+ struct bio_vec;
+-typedef void (softirq_done_fn)(struct request *);
+ typedef int (dma_drain_needed_fn)(struct request *);
+ 
+ enum blk_eh_timer_return {
+@@ -407,7 +406,6 @@ struct request_queue {
+ 
+ 	make_request_fn		*make_request_fn;
+ 	poll_q_fn		*poll_fn;
+-	softirq_done_fn		*softirq_done_fn;
+ 	dma_drain_needed_fn	*dma_drain_needed;
+ 
+ 	const struct blk_mq_ops	*mq_ops;
+@@ -1113,7 +1111,6 @@ extern void blk_queue_segment_boundary(struct request_queue *, unsigned long);
+ extern void blk_queue_virt_boundary(struct request_queue *, unsigned long);
+ extern void blk_queue_dma_alignment(struct request_queue *, int);
+ extern void blk_queue_update_dma_alignment(struct request_queue *, int);
+-extern void blk_queue_softirq_done(struct request_queue *, softirq_done_fn *);
+ extern void blk_queue_rq_timeout(struct request_queue *, unsigned int);
+ extern void blk_queue_flush_queueable(struct request_queue *q, bool queueable);
+ extern void blk_queue_write_cache(struct request_queue *q, bool enabled, bool fua);
 -- 
 2.17.1
