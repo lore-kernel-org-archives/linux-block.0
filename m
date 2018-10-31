@@ -1,103 +1,126 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-mmc@vger.kernel.org,
-	linux-mtd@lists.infradead.org,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Pavel Machek <pavel@ucw.cz>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Richard Weinberger <richard@nod.at>,
-	Artem Bityutskiy <dedekind1@gmail.com>,
-	Adrian Hunter <adrian.hunter@intel.com>
-Subject: [PATCH] block: BFQ default for single queue devices
-Date: Tue,  2 Oct 2018 14:43:29 +0200
-Message-Id: <20181002124329.21248-1-linus.walleij@linaro.org>
+	linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 13/30] bsg: provide bsg_remove_queue() helper
+Date: Wed, 31 Oct 2018 11:59:05 -0600
+Message-Id: <20181031175922.8849-14-axboe@kernel.dk>
+In-Reply-To: <20181031175922.8849-1-axboe@kernel.dk>
+References: <20181031175922.8849-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-This sets BFQ as the default scheduler for single queue
-block devices (nr_hw_queues == 1) if it is available. This
-affects notably MMC/SD-cards but notably also UBI and
-the loopback device.
+All drivers do unregister + cleanup, provide a helper for that.
 
-I have been running it for a while without any negative
-effects on my pet systems and I want some wider testing
-so let's throw it out there and see what people say.
-Admittedly my use cases are limited.
-
-I talked to Pavel a bit back and it turns out he has a
-usecase for BFQ as well and I bet he also would like it
-as default scheduler for that system (Pavel tell us more,
-I don't remember what it was!)
-
-Intuitively I could understand that maybe we want to
-leave the loop device (possibly others? nbd? rbd?) as
-"none", as it is probably relying on a scheduler on the
-device below it, so I'm open to passing in a scheduler hint
-from the respective subsystem in say struct blk_mq_tag_set.
-However that makes for a bit of syntactic dissonance
-with the struct member ".nr_hw_queues" (I wonder how
-the loop device can have 1 "hardware queue"?) so
-maybe we should in that case also rename that struct
-member to ".nr_queues" fair and square before we start
-making adjustments for treating queues differently whether
-they are in hardware or actually not.
-
-Cc: Pavel Machek <pavel@ucw.cz>
-Cc: Paolo Valente <paolo.valente@linaro.org>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: Richard Weinberger <richard@nod.at>
-Cc: Artem Bityutskiy <dedekind1@gmail.com>
-Cc: Adrian Hunter <adrian.hunter@intel.com>
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Cc: linux-scsi@vger.kernel.org
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Tested-by: Benjamin Block <bblock@linux.vnet.ibm.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/elevator.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+ block/bsg-lib.c                     | 9 +++++++++
+ drivers/scsi/scsi_transport_fc.c    | 5 +----
+ drivers/scsi/scsi_transport_iscsi.c | 5 +----
+ drivers/scsi/scsi_transport_sas.c   | 6 +-----
+ drivers/scsi/ufs/ufs_bsg.c          | 2 +-
+ include/linux/bsg-lib.h             | 1 +
+ 6 files changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/block/elevator.c b/block/elevator.c
-index e18ac68626e3..e5a2c39eee7b 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -948,13 +948,15 @@ int elevator_switch_mq(struct request_queue *q,
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index 1da011ec04e6..3f2e9a1bae44 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -296,6 +296,15 @@ static void bsg_exit_rq(struct request_queue *q, struct request *req)
+ 	kfree(job->reply);
  }
  
- /*
-- * For blk-mq devices, we default to using mq-deadline, if available, for single
-- * queue devices.  If deadline isn't available OR we have multiple queues,
-- * default to "none".
-+ * For blk-mq devices, we default to using:
-+ * - "none" for multiqueue devices (nr_hw_queues != 1)
-+ * - "bfq", if available, for single queue devices
-+ * - "mq-deadline" if "bfq" is not available for single queue devices
-+ * - "none" for single queue devices as well as last resort
-  */
- int elevator_init_mq(struct request_queue *q)
- {
--	struct elevator_type *e;
-+	struct elevator_type *e = NULL;
- 	int err = 0;
- 
- 	if (q->nr_hw_queues != 1)
-@@ -968,9 +970,14 @@ int elevator_init_mq(struct request_queue *q)
- 	if (unlikely(q->elevator))
- 		goto out_unlock;
- 
--	e = elevator_get(q, "mq-deadline", false);
--	if (!e)
--		goto out_unlock;
-+	if (IS_ENABLED(CONFIG_IOSCHED_BFQ))
-+		e = elevator_get(q, "bfq", false);
-+
-+	if (!e) {
-+		e = elevator_get(q, "mq-deadline", false);
-+		if (!e)
-+			goto out_unlock;
++void bsg_remove_queue(struct request_queue *q)
++{
++	if (q) {
++		bsg_unregister_queue(q);
++		blk_cleanup_queue(q);
 +	}
++}
++EXPORT_SYMBOL_GPL(bsg_remove_queue);
++
+ /**
+  * bsg_setup_queue - Create and add the bsg hooks so we can receive requests
+  * @dev: device to attach bsg device to
+diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
+index 98aaffb4c715..638f83ab04b2 100644
+--- a/drivers/scsi/scsi_transport_fc.c
++++ b/drivers/scsi/scsi_transport_fc.c
+@@ -3851,10 +3851,7 @@ fc_bsg_rportadd(struct Scsi_Host *shost, struct fc_rport *rport)
+ static void
+ fc_bsg_remove(struct request_queue *q)
+ {
+-	if (q) {
+-		bsg_unregister_queue(q);
+-		blk_cleanup_queue(q);
+-	}
++	bsg_remove_queue(q);
+ }
  
- 	err = blk_mq_init_sched(q, e);
- 	if (err)
+ 
+diff --git a/drivers/scsi/scsi_transport_iscsi.c b/drivers/scsi/scsi_transport_iscsi.c
+index 26b11a775be9..ff123023e5a5 100644
+--- a/drivers/scsi/scsi_transport_iscsi.c
++++ b/drivers/scsi/scsi_transport_iscsi.c
+@@ -1576,10 +1576,7 @@ static int iscsi_remove_host(struct transport_container *tc,
+ 	struct Scsi_Host *shost = dev_to_shost(dev);
+ 	struct iscsi_cls_host *ihost = shost->shost_data;
+ 
+-	if (ihost->bsg_q) {
+-		bsg_unregister_queue(ihost->bsg_q);
+-		blk_cleanup_queue(ihost->bsg_q);
+-	}
++	bsg_remove_queue(ihost->bsg_q);
+ 	return 0;
+ }
+ 
+diff --git a/drivers/scsi/scsi_transport_sas.c b/drivers/scsi/scsi_transport_sas.c
+index cf6d47891d77..692b46937e52 100644
+--- a/drivers/scsi/scsi_transport_sas.c
++++ b/drivers/scsi/scsi_transport_sas.c
+@@ -246,11 +246,7 @@ static int sas_host_remove(struct transport_container *tc, struct device *dev,
+ 	struct Scsi_Host *shost = dev_to_shost(dev);
+ 	struct request_queue *q = to_sas_host_attrs(shost)->q;
+ 
+-	if (q) {
+-		bsg_unregister_queue(q);
+-		blk_cleanup_queue(q);
+-	}
+-
++	bsg_remove_queue(q);
+ 	return 0;
+ }
+ 
+diff --git a/drivers/scsi/ufs/ufs_bsg.c b/drivers/scsi/ufs/ufs_bsg.c
+index dd0e9700a74c..775bb4e5e36e 100644
+--- a/drivers/scsi/ufs/ufs_bsg.c
++++ b/drivers/scsi/ufs/ufs_bsg.c
+@@ -157,7 +157,7 @@ void ufs_bsg_remove(struct ufs_hba *hba)
+ 	if (!hba->bsg_queue)
+ 		return;
+ 
+-	bsg_unregister_queue(hba->bsg_queue);
++	bsg_remove_queue(hba->bsg_queue);
+ 
+ 	device_del(bsg_dev);
+ 	put_device(bsg_dev);
+diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
+index b13ae143e7ef..9c9b134b1fa5 100644
+--- a/include/linux/bsg-lib.h
++++ b/include/linux/bsg-lib.h
+@@ -73,6 +73,7 @@ void bsg_job_done(struct bsg_job *job, int result,
+ 		  unsigned int reply_payload_rcv_len);
+ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
+ 		bsg_job_fn *job_fn, rq_timed_out_fn *timeout, int dd_job_size);
++void bsg_remove_queue(struct request_queue *q);
+ void bsg_job_put(struct bsg_job *job);
+ int __must_check bsg_job_get(struct bsg_job *job);
+ 
 -- 
 2.17.1
