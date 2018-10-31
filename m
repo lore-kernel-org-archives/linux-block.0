@@ -1,37 +1,51 @@
-Return-Path: <gustavo@embeddedor.com>
-Date: Tue, 2 Oct 2018 12:24:40 +0200
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] pktcdvd: fix fall-through annotation
-Message-ID: <20181002102440.GA2888@embeddedor.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 29/30] block: get rid of blk_queued_rq()
+Date: Wed, 31 Oct 2018 11:59:21 -0600
+Message-Id: <20181031175922.8849-30-axboe@kernel.dk>
+In-Reply-To: <20181031175922.8849-1-axboe@kernel.dk>
+References: <20181031175922.8849-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Replace "fallthru" with a proper "fall through" annotation.
+No point in hiding what this does, just open code it in the
+one spot where we are still using it.
 
-This fix is part of the ongoing efforts to enabling
--Wimplicit-fallthrough
-
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/block/pktcdvd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-mq.c         | 2 +-
+ include/linux/blkdev.h | 2 --
+ 2 files changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 6f1d25c..9381f4e 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -2645,7 +2645,7 @@ static int pkt_ioctl(struct block_device *bdev, fmode_t mode, unsigned int cmd,
- 		 */
- 		if (pd->refcnt == 1)
- 			pkt_lock_door(pd, 0);
--		/* fallthru */
-+		/* fall through */
- 	/*
- 	 * forward selected CDROM ioctls to CD-ROM, for UDF
- 	 */
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d43c9232c77c..21e4147c4810 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -692,7 +692,7 @@ void blk_mq_requeue_request(struct request *rq, bool kick_requeue_list)
+ 	/* this request will be re-inserted to io scheduler queue */
+ 	blk_mq_sched_requeue_request(rq);
+ 
+-	BUG_ON(blk_queued_rq(rq));
++	BUG_ON(!list_empty(&rq->queuelist));
+ 	blk_mq_add_to_requeue_list(rq, true, kick_requeue_list);
+ }
+ EXPORT_SYMBOL(blk_mq_requeue_request);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index e0c661a95c39..c675e2b5af62 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -673,8 +673,6 @@ static inline bool blk_account_rq(struct request *rq)
+ 
+ #define blk_rq_cpu_valid(rq)	((rq)->cpu != -1)
+ #define blk_bidi_rq(rq)		((rq)->next_rq != NULL)
+-/* rq->queuelist of dequeued request must be list_empty() */
+-#define blk_queued_rq(rq)	(!list_empty(&(rq)->queuelist))
+ 
+ #define list_entry_rq(ptr)	list_entry((ptr), struct request, queuelist)
+ 
 -- 
-2.7.4
+2.17.1
