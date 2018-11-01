@@ -1,92 +1,41 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH V3 2/4] blk-mq: insert request without involving any io scheduler
-Date: Mon, 29 Oct 2018 16:33:31 +0800
-Message-Id: <1540802013-2921-3-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1540802013-2921-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1540802013-2921-1-git-send-email-jianchao.w.wang@oracle.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from szxga04-in.huawei.com ([45.249.212.190]:14587 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727573AbeKAPes (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 1 Nov 2018 11:34:48 -0400
+From: Yufen Yu <yuyufen@huawei.com>
+To: <osandov@fb.com>
+CC: <linux-block@vger.kernel.org>, <bart.vanassche@wdc.com>
+Subject: [PATCH blktests] fix discontiguous-io compile error on 32 bit systems
+Date: Thu, 1 Nov 2018 14:35:48 +0800
+Message-ID: <1541054148-144718-1-git-send-email-yuyufen@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When try to issue request directly, if the queue is stopped or
-quiesced, 'bypass_insert' will be ignored and return BLK_STS_OK to
-caller to avoid it dispatch request again. Then the request will
-be inserted with blk_mq_sched_insert_request. This is not correct
-for dm-rq case where we should avoid to pass through the underlying
-paths' io scheduler.
+When make discontiguous-io.cpp with -m32, g++ compiler reports
+error for std::min(long unsigned int, size_t) has diffent
+arguments type.
 
-To fix it, use blk_mq_request_bypass_insert to insert the request
-into hctx->dispatch directly.
-
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+fixes: fd21728886e7 ("Add the discontiguous-io test program")
+Signed-off-by: Yufen Yu <yuyufen@huawei.com>
 ---
- block/blk-mq.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ src/discontiguous-io.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0f6328b..e0aa068 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1729,13 +1729,14 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
- }
- 
- enum mq_decision {
-+	MQ_INSERT_DISPATCH,
- 	MQ_INSERT_QUEUE,
- 	MQ_END_REQUEST,
- 	MQ_DO_NOTHING,
- };
- 
- static inline enum mq_decision
--	blk_mq_make_dicision(blk_status_t ret, bool bypass_insert)
-+	blk_mq_make_dicision(blk_status_t ret, bool bypass_insert, bool force)
- {
- 	enum mq_decision dec;
- 
-@@ -1745,7 +1746,10 @@ static inline enum mq_decision
- 		break;
- 	case BLK_STS_DEV_RESOURCE:
- 	case BLK_STS_RESOURCE:
--		dec = bypass_insert ? MQ_DO_NOTHING : MQ_INSERT_QUEUE;
-+		if (force)
-+			dec = bypass_insert ? MQ_INSERT_DISPATCH : MQ_INSERT_QUEUE;
-+		else
-+			dec = bypass_insert ? MQ_DO_NOTHING : MQ_INSERT_QUEUE;
- 		break;
- 	default:
- 		dec = bypass_insert ? MQ_DO_NOTHING : MQ_END_REQUEST;
-@@ -1761,7 +1765,7 @@ static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 						bool bypass_insert)
- {
- 	struct request_queue *q = rq->q;
--	bool run_queue = true;
-+	bool run_queue = true, force = false;
- 	enum mq_decision dec;
- 	blk_status_t ret = BLK_STS_RESOURCE;
- 	int srcu_idx;
-@@ -1776,7 +1780,7 @@ static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	 */
- 	if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)) {
- 		run_queue = false;
--		bypass_insert = false;
-+		force = true;
- 		goto out_unlock;
- 	}
- 
-@@ -1795,8 +1799,11 @@ static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- out_unlock:
- 	hctx_unlock(hctx, srcu_idx);
- 
--	dec = blk_mq_make_dicision(ret, bypass_insert);
-+	dec = blk_mq_make_dicision(ret, bypass_insert, force);
- 	switch(dec) {
-+	case MQ_INSERT_DISPATCH:
-+		blk_mq_request_bypass_insert(rq, run_queue);
-+		break;
- 	case MQ_INSERT_QUEUE:
- 		blk_mq_sched_insert_request(rq, false, run_queue, false);
- 		break;
+diff --git a/src/discontiguous-io.cpp b/src/discontiguous-io.cpp
+index 5e0ee0f..855aba9 100644
+--- a/src/discontiguous-io.cpp
++++ b/src/discontiguous-io.cpp
+@@ -291,7 +291,7 @@ int main(int argc, char **argv)
+ 			unsigned char *p = &*buf.begin();
+ 			for (int i = 0; i < len / 4; i++)
+ 				iov.append(p + 4 + i * 8,
+-					   std::min(4ul, len - i * 4));
++					   std::min((size_t)4, len - i * 4));
+ 		} else {
+ 			iov.append(&*buf.begin(), buf.size());
+ 		}
 -- 
 2.7.4
