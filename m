@@ -1,35 +1,81 @@
-Return-Path: <holger@applied-asynchrony.com>
-Subject: Re: [PATCH RFC] block, bfq: set default slice_idle to zero for
- non-rotational devices
-To: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
- linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+Return-Path: <khlebnikov@yandex-team.ru>
+Subject: [PATCH RFC] block,
+ bfq: set default slice_idle to zero for non-rotational devices
+From: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
  Paolo Valente <paolo.valente@linaro.org>, linux-kernel@vger.kernel.org
-References: <154109421062.925711.4117729151502021084.stgit@buzz>
-From: =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
-Message-ID: <317076f7-f84f-c08f-5fb5-b227094cabfd@applied-asynchrony.com>
-Date: Thu, 1 Nov 2018 20:06:09 +0100
+Date: Thu, 01 Nov 2018 20:43:30 +0300
+Message-ID: <154109421062.925711.4117729151502021084.stgit@buzz>
 MIME-Version: 1.0
-In-Reply-To: <154109421062.925711.4117729151502021084.stgit@buzz>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On 11/01/18 18:43, Konstantin Khlebnikov wrote:
-> With default 8ms idle slice BFQ is up to 10 times slower than CFQ
-> for massive random read workloads for common SATA SSD.
-> 
-> For now zero idle slice gives better out of box experience.
-> CFQ employs this since commit 41c0126b3f22 ("block: Make CFQ default
-> to IOPS mode on SSDs")
+With default 8ms idle slice BFQ is up to 10 times slower than CFQ
+for massive random read workloads for common SATA SSD.
 
-Well, that's interesting because 3 years ago I made the same suggestion
-and was told that BFQ's heuristics automagically make it not idle when
-rotational=0. Did you actually benchmark this? I just tried and don't
-get a noticeable performance difference with slice_idle=0 compared to
-deadline.
+For now zero idle slice gives better out of box experience.
+CFQ employs this since commit 41c0126b3f22 ("block: Make CFQ default
+to IOPS mode on SSDs")
 
-Discussion link:
-https://groups.google.com/forum/#!msg/bfq-iosched/iRMw2n3kYLY/6l9cIm3TBgAJ
+Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+---
+ Documentation/block/bfq-iosched.txt |   12 +++++++-----
+ block/bfq-iosched.c                 |    8 ++++----
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
-curious..
-
-Holger
+diff --git a/Documentation/block/bfq-iosched.txt b/Documentation/block/bfq-iosched.txt
+index 8d8d8f06cab2..c4a0f8998ce6 100644
+--- a/Documentation/block/bfq-iosched.txt
++++ b/Documentation/block/bfq-iosched.txt
+@@ -307,11 +307,13 @@ slice_idle
+ ----------
+ 
+ This parameter specifies how long BFQ should idle for next I/O
+-request, when certain sync BFQ queues become empty. By default
+-slice_idle is a non-zero value. Idling has a double purpose: boosting
+-throughput and making sure that the desired throughput distribution is
+-respected (see the description of how BFQ works, and, if needed, the
+-papers referred there).
++request, when certain sync BFQ queues become empty.
++
++By default slice_idle is a non-zero value for rotational devices.
++
++Idling has a double purpose: boosting throughput and making sure that
++the desired throughput distribution is respected (see the description
++of how BFQ works, and, if needed, the papers referred there).
+ 
+ As for throughput, idling can be very helpful on highly seeky media
+ like single spindle SATA/SAS disks where we can cut down on overall
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 6075100f03a5..d19e70a26ff0 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -177,8 +177,8 @@ static const int bfq_back_max = 16 * 1024;
+ /* Penalty of a backwards seek, in number of sectors. */
+ static const int bfq_back_penalty = 2;
+ 
+-/* Idling period duration, in ns. */
+-static u64 bfq_slice_idle = NSEC_PER_SEC / 125;
++/* Idling period duration, in ns. Zero for non-rotational devices. */
++static u64 bfq_slice_idle[2] = { NSEC_PER_SEC / 125, 0 };
+ 
+ /* Minimum number of assigned budgets for which stats are safe to compute. */
+ static const int bfq_stats_min_budgets = 194;
+@@ -3044,7 +3044,7 @@ static bool bfq_bfqq_is_slow(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 			  */
+ 			*delta_ms = BFQ_MIN_TT / NSEC_PER_MSEC;
+ 		else /* charge at least one seek */
+-			*delta_ms = bfq_slice_idle / NSEC_PER_MSEC;
++			*delta_ms = bfq_slice_idle[0] / NSEC_PER_MSEC;
+ 
+ 		return slow;
+ 	}
+@@ -5431,7 +5431,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 	bfqd->bfq_fifo_expire[1] = bfq_fifo_expire[1];
+ 	bfqd->bfq_back_max = bfq_back_max;
+ 	bfqd->bfq_back_penalty = bfq_back_penalty;
+-	bfqd->bfq_slice_idle = bfq_slice_idle;
++	bfqd->bfq_slice_idle = bfq_slice_idle[blk_queue_nonrot(bfqd->queue)];
+ 	bfqd->bfq_timeout = bfq_timeout;
+ 
+ 	bfqd->bfq_requests_within_timer = 120;
