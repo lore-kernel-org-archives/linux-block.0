@@ -1,183 +1,36 @@
-Return-Path: <BATV+1ef63fdb319281f35549+5556+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 4/9] mtip32xx: remove __force_bit2int
-Date: Fri,  9 Nov 2018 14:48:57 +0100
-Message-Id: <20181109134902.32057-5-hch@lst.de>
-In-Reply-To: <20181109134902.32057-1-hch@lst.de>
-References: <20181109134902.32057-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] blkcg: revert blkcg cleanups series
+To: Dennis Zhou <dennis@kernel.org>
+Cc: Tejun Heo <tj@kernel.org>, kernel-team@fb.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20181101212410.47569-1-dennis@kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <fd8428ce-21d0-c817-3187-fb9a43feb389@kernel.dk>
+Date: Thu, 1 Nov 2018 17:01:43 -0600
 MIME-Version: 1.0
+In-Reply-To: <20181101212410.47569-1-dennis@kernel.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-There is no good excuse not to use proper __le16/32 types.
+On 11/1/18 3:24 PM, Dennis Zhou wrote:
+> This reverts a series committed earlier due to null pointer exception
+> bug report in [1]. It seems there are edge case interactions that I did
+> not consider and will need some time to understand what causes the
+> adverse interactions.
+> 
+> The original series can be found in [2] with a follow up series in [3].
+> 
+> [1] https://www.spinics.net/lists/cgroups/msg20719.html
+> [2] https://lore.kernel.org/lkml/20180911184137.35897-1-dennisszhou@gmail.com/
+> [3] https://lore.kernel.org/lkml/20181020185612.51587-1-dennis@kernel.org/
+> 
+> This reverts the following commits:
+> d459d853c2ed, b2c3fa546705, 101246ec02b5, b3b9f24f5fcc, e2b0989954ae,
+> f0fcb3ec89f3, c839e7a03f92, bdc2491708c4, 74b7c02a9bc1, 5bf9a1f3b4ef,
+> a7b39b4e961c, 07b05bcc3213, 49f4c2dc2b50, 27e6fa996c53
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/mtip32xx/mtip32xx.c | 33 ++++++++++++-------------------
- drivers/block/mtip32xx/mtip32xx.h | 28 ++++++++++++--------------
- 2 files changed, 26 insertions(+), 35 deletions(-)
+Thanks Dennis, I think this is the best way forward. Then you can
+work on getting the stacked setups working correctly for 4.21.
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index d5277bba0c02..9245c325fe3c 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -181,9 +181,9 @@ static void mtip_init_cmd_header(struct request *rq)
- 				(sizeof(struct mtip_cmd_hdr) * rq->tag);
- 
- 	if (test_bit(MTIP_PF_HOST_CAP_64, &dd->port->flags))
--		cmd->command_header->ctbau = __force_bit2int cpu_to_le32((cmd->command_dma >> 16) >> 16);
-+		cmd->command_header->ctbau = cpu_to_le32((cmd->command_dma >> 16) >> 16);
- 
--	cmd->command_header->ctba = __force_bit2int cpu_to_le32(cmd->command_dma & 0xFFFFFFFF);
-+	cmd->command_header->ctba = cpu_to_le32(cmd->command_dma & 0xFFFFFFFF);
- }
- 
- static struct mtip_cmd *mtip_get_int_command(struct driver_data *dd)
-@@ -1459,8 +1459,8 @@ static blk_status_t mtip_send_trim(struct driver_data *dd, unsigned int lba,
- 		tlen = (sect_left >= MTIP_MAX_TRIM_ENTRY_LEN ?
- 					MTIP_MAX_TRIM_ENTRY_LEN :
- 					sect_left);
--		buf[i].lba = __force_bit2int cpu_to_le32(tlba);
--		buf[i].range = __force_bit2int cpu_to_le16(tlen);
-+		buf[i].lba = cpu_to_le32(tlba);
-+		buf[i].range = cpu_to_le16(tlen);
- 		tlba += tlen;
- 		sect_left -= tlen;
- 	}
-@@ -1590,11 +1590,9 @@ static inline void fill_command_sg(struct driver_data *dd,
- 		if (dma_len > 0x400000)
- 			dev_err(&dd->pdev->dev,
- 				"DMA segment length truncated\n");
--		command_sg->info = __force_bit2int
--			cpu_to_le32((dma_len-1) & 0x3FFFFF);
--		command_sg->dba	= __force_bit2int
--			cpu_to_le32(sg_dma_address(sg));
--		command_sg->dba_upper = __force_bit2int
-+		command_sg->info = cpu_to_le32((dma_len-1) & 0x3FFFFF);
-+		command_sg->dba	=  cpu_to_le32(sg_dma_address(sg));
-+		command_sg->dba_upper =
- 			cpu_to_le32((sg_dma_address(sg) >> 16) >> 16);
- 		command_sg++;
- 		sg++;
-@@ -2231,8 +2229,7 @@ static void mtip_hw_submit_io(struct driver_data *dd, struct request *rq,
- 
- 	/* Populate the command header */
- 	command->command_header->opts =
--			__force_bit2int cpu_to_le32(
--				(nents << 16) | 5 | AHCI_CMD_PREFETCH);
-+			cpu_to_le32((nents << 16) | 5 | AHCI_CMD_PREFETCH);
- 	command->command_header->byte_count = 0;
- 
- 	command->direction = dma_dir;
-@@ -3586,20 +3583,16 @@ static blk_status_t mtip_issue_reserved_cmd(struct blk_mq_hw_ctx *hctx,
- 		return BLK_STS_RESOURCE;
- 
- 	/* Populate the SG list */
--	cmd->command_header->opts =
--		 __force_bit2int cpu_to_le32(icmd->opts | icmd->fis_len);
-+	cmd->command_header->opts = cpu_to_le32(icmd->opts | icmd->fis_len);
- 	if (icmd->buf_len) {
- 		command_sg = cmd->command + AHCI_CMD_TBL_HDR_SZ;
- 
--		command_sg->info =
--			__force_bit2int cpu_to_le32((icmd->buf_len-1) & 0x3FFFFF);
--		command_sg->dba	=
--			__force_bit2int cpu_to_le32(icmd->buffer & 0xFFFFFFFF);
-+		command_sg->info = cpu_to_le32((icmd->buf_len-1) & 0x3FFFFF);
-+		command_sg->dba	= cpu_to_le32(icmd->buffer & 0xFFFFFFFF);
- 		command_sg->dba_upper =
--			__force_bit2int cpu_to_le32((icmd->buffer >> 16) >> 16);
-+			cpu_to_le32((icmd->buffer >> 16) >> 16);
- 
--		cmd->command_header->opts |=
--			__force_bit2int cpu_to_le32((1 << 16));
-+		cmd->command_header->opts |= cpu_to_le32((1 << 16));
- 	}
- 
- 	/* Populate the command header */
-diff --git a/drivers/block/mtip32xx/mtip32xx.h b/drivers/block/mtip32xx/mtip32xx.h
-index e20e55dab443..0aa1ea210822 100644
---- a/drivers/block/mtip32xx/mtip32xx.h
-+++ b/drivers/block/mtip32xx/mtip32xx.h
-@@ -126,8 +126,6 @@
- 
- #define MTIP_DFS_MAX_BUF_SIZE 1024
- 
--#define __force_bit2int (unsigned int __force)
--
- enum {
- 	/* below are bit numbers in 'flags' defined in mtip_port */
- 	MTIP_PF_IC_ACTIVE_BIT       = 0, /* pio/ioctl */
-@@ -200,9 +198,9 @@ struct mtip_work {
- #define MTIP_MAX_TRIM_ENTRY_LEN		0xfff8
- 
- struct mtip_trim_entry {
--	u32 lba;   /* starting lba of region */
--	u16 rsvd;  /* unused */
--	u16 range; /* # of 512b blocks to trim */
-+	__le32 lba;   /* starting lba of region */
-+	__le16 rsvd;  /* unused */
-+	__le16 range; /* # of 512b blocks to trim */
- } __packed;
- 
- struct mtip_trim {
-@@ -278,24 +276,24 @@ struct mtip_cmd_hdr {
- 	 * - Bit 5 Unused in this implementation.
- 	 * - Bits 4:0 Length of the command FIS in DWords (DWord = 4 bytes).
- 	 */
--	unsigned int opts;
-+	__le32 opts;
- 	/* This field is unsed when using NCQ. */
- 	union {
--		unsigned int byte_count;
--		unsigned int status;
-+		__le32 byte_count;
-+		__le32 status;
- 	};
- 	/*
- 	 * Lower 32 bits of the command table address associated with this
- 	 * header. The command table addresses must be 128 byte aligned.
- 	 */
--	unsigned int ctba;
-+	__le32 ctba;
- 	/*
- 	 * If 64 bit addressing is used this field is the upper 32 bits
- 	 * of the command table address associated with this command.
- 	 */
--	unsigned int ctbau;
-+	__le32 ctbau;
- 	/* Reserved and unused. */
--	unsigned int res[4];
-+	u32 res[4];
- };
- 
- /* Command scatter gather structure (PRD). */
-@@ -305,21 +303,21 @@ struct mtip_cmd_sg {
- 	 * address must be 8 byte aligned signified by bits 2:0 being
- 	 * set to 0.
- 	 */
--	unsigned int dba;
-+	__le32 dba;
- 	/*
- 	 * When 64 bit addressing is used this field is the upper
- 	 * 32 bits of the data buffer address.
- 	 */
--	unsigned int dba_upper;
-+	__le32 dba_upper;
- 	/* Unused. */
--	unsigned int reserved;
-+	__le32 reserved;
- 	/*
- 	 * Bit 31: interrupt when this data block has been transferred.
- 	 * Bits 30..22: reserved
- 	 * Bits 21..0: byte count (minus 1).  For P320 the byte count must be
- 	 * 8 byte aligned signified by bits 2:0 being set to 1.
- 	 */
--	unsigned int info;
-+	__le32 info;
- };
- struct mtip_port;
- 
 -- 
-2.19.1
+Jens Axboe
