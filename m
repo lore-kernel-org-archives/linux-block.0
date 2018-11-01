@@ -1,121 +1,124 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:44134 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729126AbeJLB7D (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Oct 2018 21:59:03 -0400
-Received: by mail-pg1-f193.google.com with SMTP id g2-v6so4559750pgu.11
-        for <linux-block@vger.kernel.org>; Thu, 11 Oct 2018 11:30:39 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
-Subject: [PATCH 03/13] swim3: add real error handling in setup
-Date: Thu, 11 Oct 2018 11:30:13 -0700
-Message-Id: <55fe5524750d283207728b18449a9e2d72e7f68a.1539282366.git.osandov@fb.com>
-In-Reply-To: <cover.1539282366.git.osandov@fb.com>
-References: <cover.1539282366.git.osandov@fb.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Thu, 1 Nov 2018 10:35:12 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Subject: Re: [PATCHSET v3 0/30] blk-mq driver conversions and legacy path
+ removal
+Message-ID: <20181101023511.GA11454@ming.t460p>
+References: <20181031175922.8849-1-axboe@kernel.dk>
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20181031175922.8849-1-axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+On Wed, Oct 31, 2018 at 11:58:52AM -0600, Jens Axboe wrote:
+> This patch series converts the remaining drivers to blk-mq. SCSI
+> supports both paths, this removes the legacy IO path from SCSI. At the
+> end, legacy IO code and schedulers are killed off.
+> 
+> I'm not aware of any issues with this series.
+> 
+> This patch series is on top of current -git. It can also be bound in
+> my mq-conversions branch.
+> 
+> Changes since v2:
+> 
+> - Kill q->softirq_done_fn()
+> 
+> Changes since v1:
+> 
+> - Fix removed q->mq_ops non-NULL check in wbt_enable_default()
+> - Remove spurious return in ide-io.c:ide_timer_expiry()
+> - Dropped DM legacy path removal patch, now in mainline
+> - Dropped ib_srp patch, now in mainline
+> - Fixed a missing port unlock in IDE
+> - Add SCSI ufs to the BSG conversions
+> - Add patch to remove bsg-lib queue hook dependencies
+> - Fixed missing clear of IO contexts
+> - Added blk-mq backend for blk_lld_busy()
+> 
+>  Documentation/block/biodoc.txt         |   88 -
+>  Documentation/block/cfq-iosched.txt    |  291 --
+>  Documentation/scsi/scsi-parameters.txt |    5 -
+>  block/Kconfig                          |    6 -
+>  block/Kconfig.iosched                  |   61 -
+>  block/Makefile                         |    5 +-
+>  block/bfq-iosched.c                    |    1 -
+>  block/blk-cgroup.c                     |   55 -
+>  block/blk-core.c                       | 1836 +-----------
+>  block/blk-exec.c                       |   20 +-
+>  block/blk-flush.c                      |  154 +-
+>  block/blk-ioc.c                        |   33 +-
+>  block/blk-merge.c                      |   35 +-
+>  block/blk-mq-debugfs.c                 |    2 -
+>  block/blk-mq-tag.c                     |    6 +-
+>  block/blk-mq.c                         |   30 +-
+>  block/blk-settings.c                   |   55 -
+>  block/blk-softirq.c                    |   24 +-
+>  block/blk-sysfs.c                      |   39 +-
+>  block/blk-tag.c                        |  378 ---
+>  block/blk-timeout.c                    |   99 +-
+>  block/blk-wbt.c                        |    3 +-
+>  block/blk.h                            |   60 +-
+>  block/bsg-lib.c                        |  146 +-
+>  block/cfq-iosched.c                    | 4916 --------------------------------
+>  block/deadline-iosched.c               |  560 ----
+>  block/elevator.c                       |  447 +--
+>  block/kyber-iosched.c                  |    1 -
+>  block/mq-deadline.c                    |    1 -
+>  block/noop-iosched.c                   |  124 -
+>  drivers/block/sunvdc.c                 |  149 +-
+>  drivers/ide/ide-atapi.c                |   25 +-
+>  drivers/ide/ide-cd.c                   |  175 +-
+>  drivers/ide/ide-disk.c                 |    5 +-
+>  drivers/ide/ide-io.c                   |  100 +-
+>  drivers/ide/ide-park.c                 |    4 +-
+>  drivers/ide/ide-pm.c                   |   28 +-
+>  drivers/ide/ide-probe.c                |   68 +-
+>  drivers/memstick/core/ms_block.c       |  110 +-
+>  drivers/memstick/core/ms_block.h       |    1 +
+>  drivers/memstick/core/mspro_block.c    |  121 +-
+>  drivers/s390/block/dasd_ioctl.c        |   22 +-
+>  drivers/scsi/Kconfig                   |   12 -
+>  drivers/scsi/cxlflash/main.c           |    6 -
+>  drivers/scsi/hosts.c                   |   29 +-
+>  drivers/scsi/lpfc/lpfc_scsi.c          |    2 +-
+>  drivers/scsi/osd/osd_initiator.c       |    4 +-
+>  drivers/scsi/osst.c                    |    2 +-
+>  drivers/scsi/qedi/qedi_main.c          |    3 +-
+>  drivers/scsi/qla2xxx/qla_os.c          |   30 +-
+>  drivers/scsi/scsi.c                    |    5 +-
+>  drivers/scsi/scsi_debug.c              |    3 +-
+>  drivers/scsi/scsi_error.c              |    4 +-
+>  drivers/scsi/scsi_lib.c                |  599 +---
+>  drivers/scsi/scsi_priv.h               |    1 -
+>  drivers/scsi/scsi_scan.c               |   10 +-
+>  drivers/scsi/scsi_sysfs.c              |    8 +-
+>  drivers/scsi/scsi_transport_fc.c       |   71 +-
+>  drivers/scsi/scsi_transport_iscsi.c    |    7 +-
+>  drivers/scsi/scsi_transport_sas.c      |   10 +-
+>  drivers/scsi/sg.c                      |    2 +-
+>  drivers/scsi/st.c                      |    2 +-
+>  drivers/scsi/ufs/ufs_bsg.c             |    4 +-
+>  drivers/scsi/ufs/ufshcd.c              |    6 -
+>  drivers/target/target_core_pscsi.c     |    2 +-
+>  include/linux/blk-cgroup.h             |  108 -
+>  include/linux/blk-mq.h                 |    9 +-
+>  include/linux/blkdev.h                 |  179 +-
+>  include/linux/bsg-lib.h                |    6 +-
+>  include/linux/elevator.h               |   90 +-
+>  include/linux/ide.h                    |   13 +-
+>  include/linux/init.h                   |    1 -
+>  include/scsi/scsi_host.h               |   18 +-
+>  include/scsi/scsi_tcq.h                |   14 +-
+>  init/do_mounts_initrd.c                |    3 -
+>  init/initramfs.c                       |    6 -
+>  init/main.c                            |   12 -
+>  77 files changed, 837 insertions(+), 10733 deletions(-)
 
-The driver doesn't have support for removing a device that has already
-been configured, but with more careful ordering we can avoid the need
-for that and make sure that we don't leak generic resources.
+Tested-by: Ming Lei <ming.lei@redhat.com>
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- drivers/block/swim3.c | 60 ++++++++++++++++++++++++++-----------------
- 1 file changed, 36 insertions(+), 24 deletions(-)
-
-diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
-index 469541c1e51e..df7ebe016e2c 100644
---- a/drivers/block/swim3.c
-+++ b/drivers/block/swim3.c
-@@ -1202,47 +1202,59 @@ static int swim3_add_device(struct macio_dev *mdev, int index)
- static int swim3_attach(struct macio_dev *mdev,
- 			const struct of_device_id *match)
- {
-+	struct floppy_state *fs;
- 	struct gendisk *disk;
--	int index, rc;
-+	int rc;
- 
--	index = floppy_count++;
--	if (index >= MAX_FLOPPIES)
-+	if (floppy_count >= MAX_FLOPPIES)
- 		return -ENXIO;
- 
--	/* Add the drive */
--	rc = swim3_add_device(mdev, index);
--	if (rc)
--		return rc;
--	/* Now register that disk. Same comment about failure handling */
--	disk = disks[index] = alloc_disk(1);
--	if (disk == NULL)
--		return -ENOMEM;
-+	if (floppy_count == 0) {
-+		rc = register_blkdev(FLOPPY_MAJOR, "fd");
-+		if (rc)
-+			return rc;
-+	}
-+
-+	fs = &floppy_states[floppy_count];
-+
-+	disk = alloc_disk(1);
-+	if (disk == NULL) {
-+		rc = -ENOMEM;
-+		goto out_unregister;
-+	}
- 	disk->queue = blk_init_queue(do_fd_request, &swim3_lock);
- 	if (disk->queue == NULL) {
--		put_disk(disk);
--		return -ENOMEM;
-+		rc = -ENOMEM;
-+		goto out_put_disk;
- 	}
- 	blk_queue_bounce_limit(disk->queue, BLK_BOUNCE_HIGH);
--	disk->queue->queuedata = &floppy_states[index];
-+	disk->queue->queuedata = fs;
- 
--	if (index == 0) {
--		/* If we failed, there isn't much we can do as the driver is still
--		 * too dumb to remove the device, just bail out
--		 */
--		if (register_blkdev(FLOPPY_MAJOR, "fd"))
--			return 0;
--	}
-+	rc = swim3_add_device(mdev, floppy_count);
-+	if (rc)
-+		goto out_cleanup_queue;
- 
- 	disk->major = FLOPPY_MAJOR;
--	disk->first_minor = index;
-+	disk->first_minor = floppy_count;
- 	disk->fops = &floppy_fops;
--	disk->private_data = &floppy_states[index];
-+	disk->private_data = fs;
- 	disk->flags |= GENHD_FL_REMOVABLE;
--	sprintf(disk->disk_name, "fd%d", index);
-+	sprintf(disk->disk_name, "fd%d", floppy_count);
- 	set_capacity(disk, 2880);
- 	add_disk(disk);
- 
-+	disks[floppy_count++] = disk;
- 	return 0;
-+
-+out_cleanup_queue:
-+	blk_cleanup_queue(disk->queue);
-+	disk->queue = NULL;
-+out_put_disk:
-+	put_disk(disk);
-+out_unregister:
-+	if (floppy_count == 0)
-+		unregister_blkdev(FLOPPY_MAJOR, "fd");
-+	return rc;
- }
- 
- static const struct of_device_id swim3_match[] =
--- 
-2.19.1
+Thanks,
+Ming
