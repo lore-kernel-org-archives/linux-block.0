@@ -1,62 +1,52 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from szxga06-in.huawei.com ([45.249.212.32]:59599 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725897AbeKFLmi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Nov 2018 06:42:38 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:37685 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728264AbeKAX4K (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Nov 2018 19:56:10 -0400
+Received: by mail-pg1-f195.google.com with SMTP id c10-v6so9142459pgq.4
+        for <linux-block@vger.kernel.org>; Thu, 01 Nov 2018 07:52:52 -0700 (PDT)
+Message-ID: <1541083968.196084.140.camel@acm.org>
 Subject: Re: [PATCH blktests] fix discontiguous-io compile error on 32 bit
  systems
-To: Bart Van Assche <bvanassche@acm.org>, <osandov@fb.com>
-CC: <linux-block@vger.kernel.org>, <bart.vanassche@wdc.com>,
+From: Bart Van Assche <bvanassche@acm.org>
+To: Yufen Yu <yuyufen@huawei.com>, osandov@fb.com
+Cc: linux-block@vger.kernel.org, bart.vanassche@wdc.com,
         Theodore Ts'o <tytso@mit.edu>
+Date: Thu, 01 Nov 2018 07:52:48 -0700
+In-Reply-To: <1541054148-144718-1-git-send-email-yuyufen@huawei.com>
 References: <1541054148-144718-1-git-send-email-yuyufen@huawei.com>
- <1541083968.196084.140.camel@acm.org>
-From: yuyufen <yuyufen@huawei.com>
-Message-ID: <1813f3ce-e3ec-05b8-b0b0-394265ac19d0@huawei.com>
-Date: Tue, 6 Nov 2018 10:19:46 +0800
-MIME-Version: 1.0
-In-Reply-To: <1541083968.196084.140.camel@acm.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset="UTF-7"
+Mime-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+On Thu, 2018-11-01 at 14:35 +-0800, Yufen Yu wrote:
++AD4 When make discontiguous-io.cpp with -m32, g+-+- compiler reports
++AD4 error for std::min(long unsigned int, size+AF8-t) has diffent
++AD4 arguments type.
++AD4 
++AD4 fixes: fd21728886e7 (+ACI-Add the discontiguous-io test program+ACI)
++AD4 Signed-off-by: Yufen Yu +ADw-yuyufen+AEA-huawei.com+AD4
++AD4 ---
++AD4  src/discontiguous-io.cpp +AHw 2 +--
++AD4  1 file changed, 1 insertion(+-), 1 deletion(-)
++AD4 
++AD4 diff --git a/src/discontiguous-io.cpp b/src/discontiguous-io.cpp
++AD4 index 5e0ee0f..855aba9 100644
++AD4 --- a/src/discontiguous-io.cpp
++AD4 +-+-+- b/src/discontiguous-io.cpp
++AD4 +AEAAQA -291,7 +-291,7 +AEAAQA int main(int argc, char +ACoAKg-argv)
++AD4  			unsigned char +ACo-p +AD0 +ACYAKg-buf.begin()+ADs
++AD4  			for (int i +AD0 0+ADs i +ADw len / 4+ADs i+-+-)
++AD4  				iov.append(p +- 4 +- i +ACo 8,
++AD4 -					   std::min(4ul, len - i +ACo 4))+ADs
++AD4 +-					   std::min((size+AF8-t)4, len - i +ACo 4))+ADs
++AD4  		+AH0 else +AHs
++AD4  			iov.append(+ACYAKg-buf.begin(), buf.size())+ADs
++AD4  		+AH0
 
+Are you reading the messages posted on linux-block? An alternative that I like
+better has been discussed in this e-mail thread:
+https://www.spinics.net/lists/linux-block/msg32181.html
 
-On 2018/11/1 22:52, Bart Van Assche wrote:
-> On Thu, 2018-11-01 at 14:35 +0800, Yufen Yu wrote:
->> When make discontiguous-io.cpp with -m32, g++ compiler reports
->> error for std::min(long unsigned int, size_t) has diffent
->> arguments type.
->>
->> fixes: fd21728886e7 ("Add the discontiguous-io test program")
->> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
->> ---
->>   src/discontiguous-io.cpp | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/src/discontiguous-io.cpp b/src/discontiguous-io.cpp
->> index 5e0ee0f..855aba9 100644
->> --- a/src/discontiguous-io.cpp
->> +++ b/src/discontiguous-io.cpp
->> @@ -291,7 +291,7 @@ int main(int argc, char **argv)
->>   			unsigned char *p = &*buf.begin();
->>   			for (int i = 0; i < len / 4; i++)
->>   				iov.append(p + 4 + i * 8,
->> -					   std::min(4ul, len - i * 4));
->> +					   std::min((size_t)4, len - i * 4));
->>   		} else {
->>   			iov.append(&*buf.begin(), buf.size());
->>   		}
-> Are you reading the messages posted on linux-block? An alternative that I like
-> better has been discussed in this e-mail thread:
-> https://www.spinics.net/lists/linux-block/msg32181.html
->
-> Bart.
->
-> .
->
-
-I am sorry that I did not see the discussion before this.
-And you are right. Please ignore this patch.
-
-Yufen.
-thanks
+Bart.
