@@ -1,81 +1,71 @@
-Return-Path: <khlebnikov@yandex-team.ru>
-Subject: [PATCH RFC] block,
- bfq: set default slice_idle to zero for non-rotational devices
-From: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- Paolo Valente <paolo.valente@linaro.org>, linux-kernel@vger.kernel.org
-Date: Thu, 01 Nov 2018 20:43:30 +0300
-Message-ID: <154109421062.925711.4117729151502021084.stgit@buzz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
+To: axboe@kernel.dk
+Cc: ming.lei@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH V4 4/5] blk-mq: issue directly with bypass 'false' in blk_mq_sched_insert_requests
+Date: Fri,  2 Nov 2018 15:08:55 +0800
+Message-Id: <1541142536-1431-5-git-send-email-jianchao.w.wang@oracle.com>
+In-Reply-To: <1541142536-1431-1-git-send-email-jianchao.w.wang@oracle.com>
+References: <1541142536-1431-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-With default 8ms idle slice BFQ is up to 10 times slower than CFQ
-for massive random read workloads for common SATA SSD.
+It is not necessary to issue request directly with bypass 'true'
+in blk_mq_sched_insert_requests and insert the non-issued requests
+itself. Just set bypass to 'false' and let blk_mq_try_issue_directly
+handle them totally.
 
-For now zero idle slice gives better out of box experience.
-CFQ employs this since commit 41c0126b3f22 ("block: Make CFQ default
-to IOPS mode on SSDs")
-
-Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
 ---
- Documentation/block/bfq-iosched.txt |   12 +++++++-----
- block/bfq-iosched.c                 |    8 ++++----
- 2 files changed, 11 insertions(+), 9 deletions(-)
+ block/blk-mq-sched.c |  8 +++-----
+ block/blk-mq.c       | 11 +----------
+ 2 files changed, 4 insertions(+), 15 deletions(-)
 
-diff --git a/Documentation/block/bfq-iosched.txt b/Documentation/block/bfq-iosched.txt
-index 8d8d8f06cab2..c4a0f8998ce6 100644
---- a/Documentation/block/bfq-iosched.txt
-+++ b/Documentation/block/bfq-iosched.txt
-@@ -307,11 +307,13 @@ slice_idle
- ----------
- 
- This parameter specifies how long BFQ should idle for next I/O
--request, when certain sync BFQ queues become empty. By default
--slice_idle is a non-zero value. Idling has a double purpose: boosting
--throughput and making sure that the desired throughput distribution is
--respected (see the description of how BFQ works, and, if needed, the
--papers referred there).
-+request, when certain sync BFQ queues become empty.
-+
-+By default slice_idle is a non-zero value for rotational devices.
-+
-+Idling has a double purpose: boosting throughput and making sure that
-+the desired throughput distribution is respected (see the description
-+of how BFQ works, and, if needed, the papers referred there).
- 
- As for throughput, idling can be very helpful on highly seeky media
- like single spindle SATA/SAS disks where we can cut down on overall
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 6075100f03a5..d19e70a26ff0 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -177,8 +177,8 @@ static const int bfq_back_max = 16 * 1024;
- /* Penalty of a backwards seek, in number of sectors. */
- static const int bfq_back_penalty = 2;
- 
--/* Idling period duration, in ns. */
--static u64 bfq_slice_idle = NSEC_PER_SEC / 125;
-+/* Idling period duration, in ns. Zero for non-rotational devices. */
-+static u64 bfq_slice_idle[2] = { NSEC_PER_SEC / 125, 0 };
- 
- /* Minimum number of assigned budgets for which stats are safe to compute. */
- static const int bfq_stats_min_budgets = 194;
-@@ -3044,7 +3044,7 @@ static bool bfq_bfqq_is_slow(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 			  */
- 			*delta_ms = BFQ_MIN_TT / NSEC_PER_MSEC;
- 		else /* charge at least one seek */
--			*delta_ms = bfq_slice_idle / NSEC_PER_MSEC;
-+			*delta_ms = bfq_slice_idle[0] / NSEC_PER_MSEC;
- 
- 		return slow;
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 29bfe80..23cd97e 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -411,12 +411,10 @@ void blk_mq_sched_insert_requests(struct request_queue *q,
+ 		 * busy in case of 'none' scheduler, and this way may save
+ 		 * us one extra enqueue & dequeue to sw queue.
+ 		 */
+-		if (!hctx->dispatch_busy && !e && !run_queue_async) {
++		if (!hctx->dispatch_busy && !e && !run_queue_async)
+ 			blk_mq_try_issue_list_directly(hctx, list);
+-			if (list_empty(list))
+-				return;
+-		}
+-		blk_mq_insert_requests(hctx, ctx, list);
++		else
++			blk_mq_insert_requests(hctx, ctx, list);
  	}
-@@ -5431,7 +5431,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
- 	bfqd->bfq_fifo_expire[1] = bfq_fifo_expire[1];
- 	bfqd->bfq_back_max = bfq_back_max;
- 	bfqd->bfq_back_penalty = bfq_back_penalty;
--	bfqd->bfq_slice_idle = bfq_slice_idle;
-+	bfqd->bfq_slice_idle = bfq_slice_idle[blk_queue_nonrot(bfqd->queue)];
- 	bfqd->bfq_timeout = bfq_timeout;
  
- 	bfqd->bfq_requests_within_timer = 120;
+ 	blk_mq_run_hw_queue(hctx, run_queue_async);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a0b9b6c..bf8b144 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1832,20 +1832,11 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+ 		struct list_head *list)
+ {
+ 	while (!list_empty(list)) {
+-		blk_status_t ret;
+ 		struct request *rq = list_first_entry(list, struct request,
+ 				queuelist);
+ 
+ 		list_del_init(&rq->queuelist);
+-		ret = blk_mq_request_issue_directly(rq);
+-		if (ret != BLK_STS_OK) {
+-			if (ret == BLK_STS_RESOURCE ||
+-					ret == BLK_STS_DEV_RESOURCE) {
+-				list_add(&rq->queuelist, list);
+-				break;
+-			}
+-			blk_mq_end_request(rq, ret);
+-		}
++		blk_mq_try_issue_directly(hctx, rq, NULL, false);
+ 	}
+ }
+ 
+-- 
+2.7.4
