@@ -1,63 +1,85 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:37456 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726125AbeKETmL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Nov 2018 14:42:11 -0500
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Hannes Reinecke <hare@suse.de>,
-        Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Jan Kara <jack@suse.cz>, Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH] block: respect virtual boundary mask in bvecs
-Date: Mon,  5 Nov 2018 11:23:01 +0100
-Message-Id: <20181105102301.9752-1-jthumshirn@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [LKP] a518560778 [ 16.132179] BUG: KASAN: null-ptr-deref in
+ brd_alloc
+To: Ming Lei <ming.lei@redhat.com>, kernel test robot <rong.a.chen@intel.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ LKP <lkp@01.org>
+References: <20181102001957.GE24195@shao2-debian>
+ <20181102005344.GD24769@ming.t460p>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <de15243e-1ee4-f17b-34f5-5901ce11b5da@kernel.dk>
+Date: Thu, 1 Nov 2018 20:00:17 -0600
+MIME-Version: 1.0
+In-Reply-To: <20181102005344.GD24769@ming.t460p>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-With drivers like iSer we are seeing a lot of bio splitting and smaller I/Os
-being submitted to the driver.
+On 11/1/18 6:53 PM, Ming Lei wrote:
+> On Fri, Nov 02, 2018 at 08:19:57AM +0800, kernel test robot wrote:
+>> Greetings,
+>>
+>> 0day kernel testing robot got the below dmesg and the first bad commit is
+>>
+>> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-linus
+>>
+>> commit a5185607787e030fcb0009194d3b12f8bcca59d6
+>> Author:     Ming Lei <ming.lei@redhat.com>
+>> AuthorDate: Wed Oct 31 16:40:50 2018 +0800
+>> Commit:     Jens Axboe <axboe@kernel.dk>
+>> CommitDate: Wed Oct 31 08:43:09 2018 -0600
+>>
+>>     block: brd: associate with queue until adding disk
+>>     
+>>     brd_free() may be called in failure path on one brd instance without
+>>     the disk being added yet, so release handler of gendisk may free the
+>>     associated request_queue early and cause the following use-after-free[1].
+>>     
+>>     This patch fixes this issue by associating gendisk with request_queue
+>>     just before adding disk.
+>>     
+>>     [1] KASAN: use-after-free Read in del_timer_syncNon-volatile memory driver v1.3
+>>     Linux agpgart interface v0.103
+>>     [drm] Initialized vgem 1.0.0 20120112 for virtual device on minor 0
+>>     usbcore: registered new interface driver udl
+>>     ==================================================================
+>>     BUG: KASAN: use-after-free in __lock_acquire+0x36d9/0x4c20
+>>     kernel/locking/lockdep.c:3218
+>>     Read of size 8 at addr ffff8801d1b6b540 by task swapper/0/1
+>>     
+>>     CPU: 0 PID: 1 Comm: swapper/0 Not tainted 4.19.0+ #88
+>>     Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+>>     Google 01/01/2011
+>>     Call Trace:
+>>       __dump_stack lib/dump_stack.c:77 [inline]
+>>       dump_stack+0x244/0x39d lib/dump_stack.c:113
+>>       print_address_description.cold.7+0x9/0x1ff mm/kasan/report.c:256
+>>       kasan_report_error mm/kasan/report.c:354 [inline]
+>>       kasan_report.cold.8+0x242/0x309 mm/kasan/report.c:412
+>>       __asan_report_load8_noabort+0x14/0x20 mm/kasan/report.c:433
+>>       __lock_acquire+0x36d9/0x4c20 kernel/locking/lockdep.c:3218
+>>       lock_acquire+0x1ed/0x520 kernel/locking/lockdep.c:3844
+>>       del_timer_sync+0xb7/0x270 kernel/time/timer.c:1283
+>>       blk_cleanup_queue+0x413/0x710 block/blk-core.c:809
+>>       brd_free+0x5d/0x71 drivers/block/brd.c:422
+>>       brd_init+0x2eb/0x393 drivers/block/brd.c:518
+>>       do_one_initcall+0x145/0x957 init/main.c:890
+>>       do_initcall_level init/main.c:958 [inline]
+>>       do_initcalls init/main.c:966 [inline]
+>>       do_basic_setup init/main.c:984 [inline]
+>>       kernel_init_freeable+0x5c6/0x6b9 init/main.c:1148
+>>       kernel_init+0x11/0x1ae init/main.c:1068
+>>       ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:350
+>>     
+>>     Reported-by: syzbot+3701447012fe951dabb2@syzkaller.appspotmail.com
+>>     Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>>     Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
+> Sorry, my fault.
+> 
+> Jens, I just sent you V2 which fixes this issue, could you drop V1 from
+> your for-linus and apply V2 against it?
 
-The root cause of this issue that the virtual boundary mask code does not take
-into consideration that some of the memory segments in the SG list may have
-come from a huge memory page that is being managed in the SG list as 4K
-blocks.  This means that many of the segments in the SG list will have an
-offset into the page that is not 0 but will be a multiple of 4K.
+Just did, dropped v1 and added v2 instead.
 
-Cc: Jan Kara <jack@suse.cz>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/blk-merge.c | 2 +-
- block/blk.h       | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 6b5ad275ed56..208658a901c6 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -46,7 +46,7 @@ static inline bool bio_will_gap(struct request_queue *q,
- 		bio_get_first_bvec(prev_rq->bio, &pb);
- 	else
- 		bio_get_first_bvec(prev, &pb);
--	if (pb.bv_offset)
-+	if (pb.bv_offset & queue_virt_boundary(q))
- 		return true;
- 
- 	/*
-diff --git a/block/blk.h b/block/blk.h
-index a1841b8ff129..c85e53f21cdd 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -169,7 +169,7 @@ static inline bool biovec_phys_mergeable(struct request_queue *q,
- static inline bool __bvec_gap_to_prev(struct request_queue *q,
- 		struct bio_vec *bprv, unsigned int offset)
- {
--	return offset ||
-+	return (offset & queue_virt_boundary(q)) ||
- 		((bprv->bv_offset + bprv->bv_len) & queue_virt_boundary(q));
- }
- 
 -- 
-2.16.4
+Jens Axboe
