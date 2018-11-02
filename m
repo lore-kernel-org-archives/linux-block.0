@@ -1,189 +1,139 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH V5 2/6] blk-mq: refactor the code of issue request directly
-Date: Mon, 12 Nov 2018 17:23:25 +0800
-Message-Id: <1542014609-1769-3-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1542014609-1769-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1542014609-1769-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 1/4] Revert "irq: add support for allocating (and affinitizing) sets of IRQs"
+Date: Fri,  2 Nov 2018 22:59:48 +0800
+Message-Id: <20181102145951.31979-2-ming.lei@redhat.com>
+In-Reply-To: <20181102145951.31979-1-ming.lei@redhat.com>
+References: <20181102145951.31979-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Merge blk_mq_try_issue_directly and __blk_mq_try_issue_directly
-into one interface to unify the interfaces to issue requests
-directly. The merged interface takes over the requests totally,
-it could insert, end or do nothing based on the return value of
-.queue_rq and 'bypass' parameter. Then caller needn't any other
-handling any more.
-
-To make code clearer, introduce new helpers enum mq_issue_decision
-and blk_mq_make_decision to decide how to handle the non-issued
-requests.
-
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+This reverts commit 1d44f6f43e229ca06bf680aa7eb5ad380eaa5d72.
 ---
- block/blk-mq.c | 108 +++++++++++++++++++++++++++++++++------------------------
- 1 file changed, 63 insertions(+), 45 deletions(-)
+ drivers/pci/msi.c         | 14 --------------
+ include/linux/interrupt.h |  4 ----
+ kernel/irq/affinity.c     | 40 +++++++++-------------------------------
+ 3 files changed, 9 insertions(+), 49 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 364a53f..48b7a7c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1766,77 +1766,95 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	return ret;
- }
+diff --git a/drivers/pci/msi.c b/drivers/pci/msi.c
+index 265ed3e4c920..af24ed50a245 100644
+--- a/drivers/pci/msi.c
++++ b/drivers/pci/msi.c
+@@ -1036,13 +1036,6 @@ static int __pci_enable_msi_range(struct pci_dev *dev, int minvec, int maxvec,
+ 	if (maxvec < minvec)
+ 		return -ERANGE;
  
--static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-+enum mq_issue_decision {
-+	MQ_ISSUE_INSERT_QUEUE,
-+	MQ_ISSUE_END_REQUEST,
-+	MQ_ISSUE_DO_NOTHING,
-+};
-+
-+static inline enum mq_issue_decision
-+	blk_mq_make_dicision(blk_status_t ret, bool bypass)
-+{
-+	enum mq_issue_decision dec;
-+
-+	switch(ret) {
-+	case BLK_STS_OK:
-+		dec = MQ_ISSUE_DO_NOTHING;
-+		break;
-+	case BLK_STS_DEV_RESOURCE:
-+	case BLK_STS_RESOURCE:
-+		dec = bypass ? MQ_ISSUE_DO_NOTHING : MQ_ISSUE_INSERT_QUEUE;
-+		break;
-+	default:
-+		dec = bypass ? MQ_ISSUE_DO_NOTHING : MQ_ISSUE_END_REQUEST;
-+		break;
-+	}
-+
-+	return dec;
-+}
-+
-+static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 						struct request *rq,
- 						blk_qc_t *cookie,
--						bool bypass_insert)
-+						bool bypass)
- {
- 	struct request_queue *q = rq->q;
- 	bool run_queue = true;
-+	blk_status_t ret = BLK_STS_RESOURCE;
-+	enum mq_issue_decision dec;
-+	int srcu_idx;
+-	/*
+-	 * If the caller is passing in sets, we can't support a range of
+-	 * vectors. The caller needs to handle that.
+-	 */
+-	if (affd && affd->nr_sets && minvec != maxvec)
+-		return -EINVAL;
+-
+ 	if (WARN_ON_ONCE(dev->msi_enabled))
+ 		return -EINVAL;
  
-+	hctx_lock(hctx, &srcu_idx);
+@@ -1094,13 +1087,6 @@ static int __pci_enable_msix_range(struct pci_dev *dev,
+ 	if (maxvec < minvec)
+ 		return -ERANGE;
+ 
+-	/*
+-	 * If the caller is passing in sets, we can't support a range of
+-	 * supported vectors. The caller needs to handle that.
+-	 */
+-	if (affd && affd->nr_sets && minvec != maxvec)
+-		return -EINVAL;
+-
+ 	if (WARN_ON_ONCE(dev->msix_enabled))
+ 		return -EINVAL;
+ 
+diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
+index ca397ff40836..1d6711c28271 100644
+--- a/include/linux/interrupt.h
++++ b/include/linux/interrupt.h
+@@ -247,14 +247,10 @@ struct irq_affinity_notify {
+  *			the MSI(-X) vector space
+  * @post_vectors:	Don't apply affinity to @post_vectors at end of
+  *			the MSI(-X) vector space
+- * @nr_sets:		Length of passed in *sets array
+- * @sets:		Number of affinitized sets
+  */
+ struct irq_affinity {
+ 	int	pre_vectors;
+ 	int	post_vectors;
+-	int	nr_sets;
+-	int	*sets;
+ };
+ 
+ #if defined(CONFIG_SMP)
+diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
+index 2046a0f0f0f1..f4f29b9d90ee 100644
+--- a/kernel/irq/affinity.c
++++ b/kernel/irq/affinity.c
+@@ -180,7 +180,6 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 	int curvec, usedvecs;
+ 	cpumask_var_t nmsk, npresmsk, *node_to_cpumask;
+ 	struct cpumask *masks = NULL;
+-	int i, nr_sets;
+ 
  	/*
--	 * RCU or SRCU read lock is needed before checking quiesced flag.
-+	 * hctx_lock is needed before checking quiesced flag.
- 	 *
--	 * When queue is stopped or quiesced, ignore 'bypass_insert' from
--	 * blk_mq_request_issue_directly(), and return BLK_STS_OK to caller,
--	 * and avoid driver to try to dispatch again.
-+	 * When queue is stopped or quiesced, ignore 'bypass', insert
-+	 * and return BLK_STS_OK to caller, and avoid driver to try to
-+	 * dispatch again.
- 	 */
- 	if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)) {
- 		run_queue = false;
--		bypass_insert = false;
--		goto insert;
-+		bypass = false;
-+		goto out_unlock;
- 	}
+ 	 * If there aren't any vectors left after applying the pre/post
+@@ -211,23 +210,10 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 	get_online_cpus();
+ 	build_node_to_cpumask(node_to_cpumask);
  
--	if (q->elevator && !bypass_insert)
--		goto insert;
-+	/*
-+	 * Bypass the potential scheduler on the bottom device.
-+	 */
-+	if (q->elevator && !bypass)
-+		goto out_unlock;
- 
- 	if (!blk_mq_get_dispatch_budget(hctx))
--		goto insert;
-+		goto out_unlock;
- 
- 	if (!blk_mq_get_driver_tag(rq)) {
- 		blk_mq_put_dispatch_budget(hctx);
--		goto insert;
-+		goto out_unlock;
- 	}
- 
--	return __blk_mq_issue_directly(hctx, rq, cookie);
--insert:
--	if (bypass_insert)
--		return BLK_STS_RESOURCE;
+-	/*
+-	 * Spread on present CPUs starting from affd->pre_vectors. If we
+-	 * have multiple sets, build each sets affinity mask separately.
+-	 */
+-	nr_sets = affd->nr_sets;
+-	if (!nr_sets)
+-		nr_sets = 1;
 -
--	blk_mq_sched_insert_request(rq, false, run_queue, false);
--	return BLK_STS_OK;
--}
+-	for (i = 0, usedvecs = 0; i < nr_sets; i++) {
+-		int this_vecs = affd->sets ? affd->sets[i] : affvecs;
+-		int nr;
 -
--static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
--		struct request *rq, blk_qc_t *cookie)
--{
--	blk_status_t ret;
--	int srcu_idx;
-+	ret = __blk_mq_issue_directly(hctx, rq, cookie);
+-		nr = irq_build_affinity_masks(affd, curvec, this_vecs,
+-					      node_to_cpumask, cpu_present_mask,
+-					      nmsk, masks + usedvecs);
+-		usedvecs += nr;
+-	}
++	/* Spread on present CPUs starting from affd->pre_vectors */
++	usedvecs = irq_build_affinity_masks(affd, curvec, affvecs,
++					    node_to_cpumask, cpu_present_mask,
++					    nmsk, masks);
  
--	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
--
--	hctx_lock(hctx, &srcu_idx);
-+out_unlock:
-+	hctx_unlock(hctx, srcu_idx);
- 
--	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false);
--	if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
--		blk_mq_sched_insert_request(rq, false, true, false);
--	else if (ret != BLK_STS_OK)
-+	dec = blk_mq_make_dicision(ret, bypass);
-+	switch(dec) {
-+	case MQ_ISSUE_INSERT_QUEUE:
-+		blk_mq_sched_insert_request(rq, false, run_queue, false);
-+		break;
-+	case MQ_ISSUE_END_REQUEST:
- 		blk_mq_end_request(rq, ret);
-+		break;
-+	default:
-+		return ret;
-+	}
- 
--	hctx_unlock(hctx, srcu_idx);
-+	return BLK_STS_OK;
- }
- 
- blk_status_t blk_mq_request_issue_directly(struct request *rq)
+ 	/*
+ 	 * Spread on non present CPUs starting from the next vector to be
+@@ -272,21 +258,13 @@ int irq_calc_affinity_vectors(int minvec, int maxvec, const struct irq_affinity
  {
--	blk_status_t ret;
--	int srcu_idx;
--	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
--
--	hctx_lock(hctx, &srcu_idx);
--	ret = __blk_mq_try_issue_directly(hctx, rq, NULL, true);
--	hctx_unlock(hctx, srcu_idx);
--
--	return ret;
-+	return blk_mq_try_issue_directly(rq->mq_hctx, rq, NULL, true);
- }
+ 	int resv = affd->pre_vectors + affd->post_vectors;
+ 	int vecs = maxvec - resv;
+-	int set_vecs;
++	int ret;
  
- void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
-@@ -1957,13 +1975,13 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 		if (same_queue_rq) {
- 			data.hctx = same_queue_rq->mq_hctx;
- 			blk_mq_try_issue_directly(data.hctx, same_queue_rq,
--					&cookie);
-+					&cookie, false);
- 		}
- 	} else if ((q->nr_hw_queues > 1 && is_sync) || (!q->elevator &&
- 			!data.hctx->dispatch_busy)) {
- 		blk_mq_put_ctx(data.ctx);
- 		blk_mq_bio_to_request(rq, bio);
--		blk_mq_try_issue_directly(data.hctx, rq, &cookie);
-+		blk_mq_try_issue_directly(data.hctx, rq, &cookie, false);
- 	} else {
- 		blk_mq_put_ctx(data.ctx);
- 		blk_mq_bio_to_request(rq, bio);
+ 	if (resv > minvec)
+ 		return 0;
+ 
+-	if (affd->nr_sets) {
+-		int i;
+-
+-		for (i = 0, set_vecs = 0;  i < affd->nr_sets; i++)
+-			set_vecs += affd->sets[i];
+-	} else {
+-		get_online_cpus();
+-		set_vecs = cpumask_weight(cpu_possible_mask);
+-		put_online_cpus();
+-	}
+-
+-	return resv + min(set_vecs, vecs);
++	get_online_cpus();
++	ret = min_t(int, cpumask_weight(cpu_possible_mask), vecs) + resv;
++	put_online_cpus();
++	return ret;
+ }
 -- 
-2.7.4
+2.9.5
