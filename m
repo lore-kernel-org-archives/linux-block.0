@@ -1,92 +1,91 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Tejun Heo <tj@kernel.org>,
-	Li Zefan <lizefan@huawei.com>,
-	Angelo Ruocco <angeloruocco90@gmail.com>,
-	Dennis Zhou <dennis@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Liu Bo <bo.liu@linux.alibaba.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Johannes Weiner <hannes@cmpxchg.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	cgroups@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH 05/12] cgroup: add owner name to cftypes
-Date: Mon, 12 Nov 2018 10:56:25 +0100
-Message-Id: <20181112095632.69114-6-paolo.valente@linaro.org>
-In-Reply-To: <20181112095632.69114-1-paolo.valente@linaro.org>
-References: <20181112095632.69114-1-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-it1-f196.google.com ([209.85.166.196]:40140 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729015AbeKEVBZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Nov 2018 16:01:25 -0500
+Received: by mail-it1-f196.google.com with SMTP id e11so8805666itl.5
+        for <linux-block@vger.kernel.org>; Mon, 05 Nov 2018 03:42:05 -0800 (PST)
+From: Hans Holmberg <hans@owltronix.com>
+To: Matias Bjorling <mb@lightnvm.io>
+Cc: Javier Gonzales <javier@cnexlabs.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.ml.holmberg@owltronix.com>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>
+Subject: [PATCH 2/7] lightnvm: pblk: account for write error sectors in emeta
+Date: Mon,  5 Nov 2018 12:41:08 +0100
+Message-Id: <20181105114113.30932-3-hans.ml.holmberg@cnexlabs.com>
+In-Reply-To: <20181105114113.30932-1-hans.ml.holmberg@cnexlabs.com>
+References: <20181105114113.30932-1-hans.ml.holmberg@cnexlabs.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Angelo Ruocco <angeloruocco90@gmail.com>
+From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
 
-The piece of information "who created a certain cftype" is not stored
-anywhere, thus a cftype is not able to know who is its owner.
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-This commit addresses this problem by adding a new field in the cftype
-structure that enables the name of its owner to be explicitly set.
+Lines inflicted with write errors lines might be recovered
+if they have not been recycled after write error garbage collection.
 
-Signed-off-by: Angelo Ruocco <angeloruocco90@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Ensure that the emeta accounting of valid lbas is correct
+for such lines to avoid recovery inconsistencies.
+
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
 ---
- include/linux/cgroup-defs.h |  2 ++
- include/linux/cgroup.h      | 13 +++++++++++++
- 2 files changed, 15 insertions(+)
+ drivers/lightnvm/pblk-write.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/cgroup-defs.h b/include/linux/cgroup-defs.h
-index d659763c7221..6e31f478c6e1 100644
---- a/include/linux/cgroup-defs.h
-+++ b/include/linux/cgroup-defs.h
-@@ -36,6 +36,7 @@ struct seq_file;
- #define MAX_CGROUP_TYPE_NAMELEN 32
- #define MAX_CGROUP_ROOT_NAMELEN 64
- #define MAX_CFTYPE_NAME		64
-+#define MAX_OWNER_NAME		64
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index 3ddd16f47106..750f04b8a227 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -105,14 +105,20 @@ static void pblk_complete_write(struct pblk *pblk, struct nvm_rq *rqd,
+ }
  
- /* define the enumeration of all cgroup subsystems */
- #define SUBSYS(_x) _x ## _cgrp_id,
-@@ -505,6 +506,7 @@ struct cftype {
- 	 * end of cftype array.
- 	 */
- 	char name[MAX_CFTYPE_NAME];
-+	char owner_name[MAX_OWNER_NAME];
- 	unsigned long private;
+ /* Map remaining sectors in chunk, starting from ppa */
+-static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa)
++static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa,
++		int rqd_ppas)
+ {
+ 	struct pblk_line *line;
+ 	struct ppa_addr map_ppa = *ppa;
++	__le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
++	__le64 *lba_list;
+ 	u64 paddr;
+ 	int done = 0;
++	int n = 0;
  
- 	/*
-diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
-index 9968332cceed..bf17a9843f45 100644
---- a/include/linux/cgroup.h
-+++ b/include/linux/cgroup.h
-@@ -293,6 +293,19 @@ void css_task_iter_end(struct css_task_iter *it);
- 			;						\
- 		else
- 
-+/**
-+ * list_for_each_cft - walk circular list of cftypes linked together
-+ * @cft: cftype from where to start
-+ * @n: cftype used as a temporary storage
-+ *
-+ * A cftype pointed by a file may be part of a circular list of cftypes, this
-+ * macro walks the circular list starting from any given cftype. Unlike the
-+ * "list_for_each_entry" macro, the first element is included in the iteration.
-+ */
-+#define list_for_each_cft(cft, n)					\
-+	for (n = NULL; cft != n; n = (n == NULL) ? cft : n,		\
-+	     cft = list_next_entry(cft, share_node))
+ 	line = pblk_ppa_to_line(pblk, *ppa);
++	lba_list = emeta_to_lbas(pblk, line->emeta->buf);
 +
- /*
-  * Inline functions.
-  */
+ 	spin_lock(&line->lock);
+ 
+ 	while (!done)  {
+@@ -121,10 +127,17 @@ static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa)
+ 		if (!test_and_set_bit(paddr, line->map_bitmap))
+ 			line->left_msecs--;
+ 
++		if (n < rqd_ppas && lba_list[paddr] != addr_empty)
++			line->nr_valid_lbas--;
++
++		lba_list[paddr] = addr_empty;
++
+ 		if (!test_and_set_bit(paddr, line->invalid_bitmap))
+ 			le32_add_cpu(line->vsc, -1);
+ 
+ 		done = nvm_next_ppa_in_chk(pblk->dev, &map_ppa);
++
++		n++;
+ 	}
+ 
+ 	line->w_err_gc->has_write_err = 1;
+@@ -202,7 +215,7 @@ static void pblk_submit_rec(struct work_struct *work)
+ 
+ 	pblk_log_write_err(pblk, rqd);
+ 
+-	pblk_map_remaining(pblk, ppa_list);
++	pblk_map_remaining(pblk, ppa_list, rqd->nr_ppas);
+ 	pblk_queue_resubmit(pblk, c_ctx);
+ 
+ 	pblk_up_rq(pblk, c_ctx->lun_bitmap);
 -- 
-2.16.1
+2.17.1
