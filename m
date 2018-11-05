@@ -1,45 +1,45 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Coly Li <colyli@suse.de>,
-	linux-bcache@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V8 11/18] bcache: avoid to use bio_for_each_segment_all() in bch_bio_alloc_pages()
-Date: Sat, 10 Nov 2018 00:26:03 +0800
-Message-Id: <20181109162610.18981-12-ming.lei@redhat.com>
-In-Reply-To: <20181109162610.18981-1-ming.lei@redhat.com>
-References: <20181109162610.18981-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:35167 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729657AbeKEVqU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Nov 2018 16:46:20 -0500
+Received: by mail-ed1-f68.google.com with SMTP id d6-v6so7323796edi.2
+        for <linux-block@vger.kernel.org>; Mon, 05 Nov 2018 04:26:49 -0800 (PST)
+From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
+To: Matias Bjorling <mb@lightnvm.io>
+Cc: Javier Gonzales <javier@cnexlabs.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>
+Subject: [PATCH v2 5/7] lightnvm: pblk: remove unused macro
+Date: Mon,  5 Nov 2018 13:26:08 +0100
+Message-Id: <20181105122610.1555-6-hans.ml.holmberg@owltronix.com>
+In-Reply-To: <20181105122610.1555-1-hans.ml.holmberg@owltronix.com>
+References: <20181105122610.1555-1-hans.ml.holmberg@owltronix.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-bch_bio_alloc_pages() is always called on one new bio, so it is safe
-to access the bvec table directly. Given it is the only kind of this
-case, open code the bvec table access since bio_for_each_segment_all()
-will be changed to support for iterating over multipage bvec.
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-Acked-by: Coly Li <colyli@suse.de>
-Cc: Coly Li <colyli@suse.de>
-Cc: linux-bcache@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+ADDR_POOL_SIZE is not used anymore, so remove the define.
+
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
 ---
- drivers/md/bcache/util.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/lightnvm/pblk-init.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
-index 20eddeac1531..8517aebcda2d 100644
---- a/drivers/md/bcache/util.c
-+++ b/drivers/md/bcache/util.c
-@@ -270,7 +270,7 @@ int bch_bio_alloc_pages(struct bio *bio, gfp_t gfp_mask)
- 	int i;
- 	struct bio_vec *bv;
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 8b89bb26b0f1..33c1e83327c3 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -207,9 +207,6 @@ static int pblk_rwb_init(struct pblk *pblk)
+ 	return pblk_rb_init(&pblk->rwb, buffer_size, threshold, geo->csecs);
+ }
  
--	bio_for_each_segment_all(bv, bio, i) {
-+	for (i = 0, bv = bio->bi_io_vec; i < bio->bi_vcnt; bv++) {
- 		bv->bv_page = alloc_page(gfp_mask);
- 		if (!bv->bv_page) {
- 			while (--bv >= bio->bi_io_vec)
+-/* Minimum pages needed within a lun */
+-#define ADDR_POOL_SIZE 64
+-
+ static int pblk_set_addrf_12(struct pblk *pblk, struct nvm_geo *geo,
+ 			     struct nvm_addrf_12 *dst)
+ {
 -- 
-2.9.5
+2.17.1
