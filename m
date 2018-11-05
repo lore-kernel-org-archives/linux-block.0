@@ -1,34 +1,42 @@
-Return-Path: <BATV+47a8f37e9c7a6cd14032+5549+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Fri, 2 Nov 2018 08:37:42 +0200
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme fixes for 4.20
-Message-ID: <20181102063742.GA16758@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-it1-f173.google.com ([209.85.166.173]:51280 "EHLO
+        mail-it1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726358AbeKEVBV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Nov 2018 16:01:21 -0500
+Received: by mail-it1-f173.google.com with SMTP id h13so12198221itl.1
+        for <linux-block@vger.kernel.org>; Mon, 05 Nov 2018 03:42:02 -0800 (PST)
+From: Hans Holmberg <hans@owltronix.com>
+To: Matias Bjorling <mb@lightnvm.io>
+Cc: Javier Gonzales <javier@cnexlabs.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>
+Subject: [PATCH 0/7] PBLK Bugfixes and cleanups
+Date: Mon,  5 Nov 2018 12:41:06 +0100
+Message-Id: <20181105114113.30932-1-hans.ml.holmberg@cnexlabs.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The following changes since commit a5185607787e030fcb0009194d3b12f8bcca59d6:
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-  block: brd: associate with queue until adding disk (2018-10-31 08:43:09 -0600)
+This series is a slew of bugfixes and cleanups for PBLK, mostly
+fixing issues found during corner-case testing in QEMU.
 
-are available in the Git repository at:
+Hans Holmberg (7):
+  lightnvm: pblk: fix resubmission of overwritten write err lbas
+  lightnvm: pblk: account for write error sectors in emeta
+  lightnvm: pblk: stop writes gracefully when running out of lines
+  lightnvm: pblk: set conservative threshold for user writes
+  lightnvm: pblk: remove unused macro
+  lightnvm: pblk: fix pblk_lines_init error handling path
+  lightnvm: pblk: remove dead code in pblk_recov_l2p
 
-  git://git.infradead.org/nvme.git nvme-4.20
+ drivers/lightnvm/pblk-init.c     | 48 +++++++++++++++++-----------
+ drivers/lightnvm/pblk-map.c      | 47 ++++++++++++++++-----------
+ drivers/lightnvm/pblk-recovery.c |  1 -
+ drivers/lightnvm/pblk-rl.c       |  5 ++-
+ drivers/lightnvm/pblk-write.c    | 55 +++++++++++++++++++++++---------
+ drivers/lightnvm/pblk.h          | 16 ++++++++--
+ 6 files changed, 114 insertions(+), 58 deletions(-)
 
-for you to fetch changes up to ae172db3b3f389c363ec7f3683b2cad41091580d:
-
-  nvme-pci: fix conflicting p2p resource adds (2018-11-01 08:44:47 +0200)
-
-----------------------------------------------------------------
-James Smart (1):
-      nvme-fc: fix request private initialization
-
-Keith Busch (1):
-      nvme-pci: fix conflicting p2p resource adds
-
- drivers/nvme/host/fc.c  | 2 +-
- drivers/nvme/host/pci.c | 5 ++++-
- 2 files changed, 5 insertions(+), 2 deletions(-)
+-- 
+2.17.1
