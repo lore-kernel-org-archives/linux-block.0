@@ -1,76 +1,55 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga17.intel.com ([192.55.52.151]:19365 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388284AbeKFX7V (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Nov 2018 18:59:21 -0500
-Date: Tue, 6 Nov 2018 07:31:43 -0700
-From: Keith Busch <keith.busch@intel.com>
-To: Johannes Thumshirn <jthumshirn@suse.de>
+Received: from mx2.suse.de ([195.135.220.15]:45114 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730519AbeKFV7G (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 6 Nov 2018 16:59:06 -0500
+Subject: Re: [PATCH] block: respect virtual boundary mask in bvecs
+To: Ming Lei <ming.lei@redhat.com>
 Cc: Jens Axboe <axboe@fb.com>,
         Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
         Hannes Reinecke <hare@suse.de>,
         Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
         Jan Kara <jack@suse.cz>, Sagi Grimberg <sagi@grimberg.me>
-Subject: Re: [PATCH] block: respect virtual boundary mask in bvecs
-Message-ID: <20181106143143.GA5977@localhost.localdomain>
 References: <20181105102301.9752-1-jthumshirn@suse.de>
+ <20181105105548.GC12367@ming.t460p>
+ <7c649b43-f952-cf94-93d6-44fb153acced@suse.de>
+ <20181105120153.GD12367@ming.t460p>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+Message-ID: <3c3dd9c2-4240-7bb5-c0ff-af6f2e479c31@suse.de>
+Date: Tue, 6 Nov 2018 13:34:03 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20181105102301.9752-1-jthumshirn@suse.de>
+In-Reply-To: <20181105120153.GD12367@ming.t460p>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Nov 05, 2018 at 11:23:01AM +0100, Johannes Thumshirn wrote:
-> With drivers like iSer we are seeing a lot of bio splitting and smaller I/Os
-> being submitted to the driver.
+On 05/11/2018 13:01, Ming Lei wrote:
+> If you mean the real huge page, this patch shouldn't have made a difference
+> because bio_vec->bv_offset is in [0, PAGE_SIZE), and iSer sets virt
+> boundary as 4K - 1.
 > 
-> The root cause of this issue that the virtual boundary mask code does not take
-> into consideration that some of the memory segments in the SG list may have
-> come from a huge memory page that is being managed in the SG list as 4K
-> blocks.  This means that many of the segments in the SG list will have an
-> offset into the page that is not 0 but will be a multiple of 4K.
+> However, things will change after multipage bvec is introduced.
 
-I probably got this wrong, but I thought a 2M huge page was 512 regular
-pages with a compound head, and offsets were from those regular pages
-rather than from the head.
 
-Overall though, the patch makes sense to me for this and other reasons.
+Hi Ming,
 
-Acked-by: Keith Busch <keith.busch@intel.com>
+I've received a blktrace from our customer showing the issue [1].
 
- 
-> Cc: Jan Kara <jack@suse.cz>
-> Cc: Sagi Grimberg <sagi@grimberg.me>
-> Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
-> ---
->  block/blk-merge.c | 2 +-
->  block/blk.h       | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index 6b5ad275ed56..208658a901c6 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -46,7 +46,7 @@ static inline bool bio_will_gap(struct request_queue *q,
->  		bio_get_first_bvec(prev_rq->bio, &pb);
->  	else
->  		bio_get_first_bvec(prev, &pb);
-> -	if (pb.bv_offset)
-> +	if (pb.bv_offset & queue_virt_boundary(q))
->  		return true;
->  
->  	/*
-> diff --git a/block/blk.h b/block/blk.h
-> index a1841b8ff129..c85e53f21cdd 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -169,7 +169,7 @@ static inline bool biovec_phys_mergeable(struct request_queue *q,
->  static inline bool __bvec_gap_to_prev(struct request_queue *q,
->  		struct bio_vec *bprv, unsigned int offset)
->  {
-> -	return offset ||
-> +	return (offset & queue_virt_boundary(q)) ||
->  		((bprv->bv_offset + bprv->bv_len) & queue_virt_boundary(q));
->  }
->  
-> -- 
+In this example trace they've submitted (contiguous) 64K I/Os and
+without this patch, they're seeing a lot of splits as indicated by the
+trace.
+
+With the patch applied the I/O is directly issued to the LLDD without
+the splits.
+
+[1] http://beta.suse.com/private/jthumshirn/blktrace.txt
+
+Byte,
+	Johannes
+-- 
+Johannes Thumshirn                                        SUSE Labs
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
