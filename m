@@ -1,114 +1,94 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:34092 "EHLO mx1.suse.de"
+Received: from mail-bl2nam02on0044.outbound.protection.outlook.com ([104.47.38.44]:46706
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727002AbeKHWgq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 8 Nov 2018 17:36:46 -0500
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH 13/16] loop: Move loop_reread_partitions() out of loop_ctl_mutex
-Date: Thu,  8 Nov 2018 14:01:13 +0100
-Message-Id: <20181108130116.12140-14-jack@suse.cz>
-In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
-References: <20181108130116.12140-1-jack@suse.cz>
+        id S1729160AbeKFSn3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 6 Nov 2018 13:43:29 -0500
+From: Javier Gonzalez <javier@cnexlabs.com>
+To: Hans Holmberg <hans.ml.holmberg@owltronix.com>
+CC: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>
+Subject: Re: [PATCH v2 0/7] PBLK Bugfixes and cleanups
+Date: Tue, 6 Nov 2018 09:18:27 +0000
+Message-ID: <6DE4756E-A324-49B0-A588-1B2F74ABC789@cnexlabs.com>
+References: <20181105122610.1555-1-hans.ml.holmberg@owltronix.com>
+In-Reply-To: <20181105122610.1555-1-hans.ml.holmberg@owltronix.com>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_008BA30E-FCD7-482D-939C-3A8D6488B67C";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha512
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Calling loop_reread_partitions() under loop_ctl_mutex causes lockdep to
-complain about circular lock dependency between bdev->bd_mutex and
-lo->lo_ctl_mutex. The problem is that on loop device open or close
-lo_open() and lo_release() get called with bdev->bd_mutex held and they
-need to acquire loop_ctl_mutex. OTOH when loop_reread_partitions() is
-called with loop_ctl_mutex held, it will call blkdev_reread_part() which
-acquires bdev->bd_mutex. See syzbot report for details [1].
+--Apple-Mail=_008BA30E-FCD7-482D-939C-3A8D6488B67C
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-Move all calls of loop_rescan_partitions() out of loop_ctl_mutex to
-avoid lockdep warning and fix deadlock possibility.
+> On 5 Nov 2018, at 13.26, Hans Holmberg =
+<hans.ml.holmberg@owltronix.com> wrote:
+>=20
+> From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+>=20
+> This series is a slew of bugfixes and cleanups for PBLK, mostly
+> fixing issues found during corner-case testing in QEMU.
+>=20
+> Changes since v1:
+> 	Messed up from:, now the patches apply with the correct author
+> 	Pardon the mess.
+>=20
+> Hans Holmberg (7):
+>  lightnvm: pblk: fix resubmission of overwritten write err lbas
+>  lightnvm: pblk: account for write error sectors in emeta
+>  lightnvm: pblk: stop writes gracefully when running out of lines
+>  lightnvm: pblk: set conservative threshold for user writes
+>  lightnvm: pblk: remove unused macro
+>  lightnvm: pblk: fix pblk_lines_init error handling path
+>  lightnvm: pblk: remove dead code in pblk_recov_l2p
+>=20
+> drivers/lightnvm/pblk-init.c     | 48 +++++++++++++++++-----------
+> drivers/lightnvm/pblk-map.c      | 47 ++++++++++++++++-----------
+> drivers/lightnvm/pblk-recovery.c |  1 -
+> drivers/lightnvm/pblk-rl.c       |  5 ++-
+> drivers/lightnvm/pblk-write.c    | 55 +++++++++++++++++++++++---------
+> drivers/lightnvm/pblk.h          | 16 ++++++++--
+> 6 files changed, 114 insertions(+), 58 deletions(-)
+>=20
+> --
+> 2.17.1
 
-[1] https://syzkaller.appspot.com/bug?id=bf154052f0eea4bc7712499e4569505907d1588
 
-Reported-by: syzbot <syzbot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- drivers/block/loop.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+Apart from the nipticks pointed out in V2, the series look good to me.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index f1d7a4fe30fc..cce5d4e8e863 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -679,6 +679,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- {
- 	struct file	*file, *old_file;
- 	int		error;
-+	bool		partscan;
- 
- 	error = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
- 	if (error)
-@@ -720,9 +721,10 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	blk_mq_unfreeze_queue(lo->lo_queue);
- 
- 	fput(old_file);
--	if (lo->lo_flags & LO_FLAGS_PARTSCAN)
--		loop_reread_partitions(lo, bdev);
-+	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
- 	mutex_unlock(&loop_ctl_mutex);
-+	if (partscan)
-+		loop_reread_partitions(lo, bdev);
- 	return 0;
- 
- out_putf:
-@@ -903,6 +905,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	int		lo_flags = 0;
- 	int		error;
- 	loff_t		size;
-+	bool		partscan;
- 
- 	/* This is safe, since we have a reference from open(). */
- 	__module_get(THIS_MODULE);
-@@ -969,14 +972,15 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	lo->lo_state = Lo_bound;
- 	if (part_shift)
- 		lo->lo_flags |= LO_FLAGS_PARTSCAN;
--	if (lo->lo_flags & LO_FLAGS_PARTSCAN)
--		loop_reread_partitions(lo, bdev);
-+	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
- 
- 	/* Grab the block_device to prevent its destruction after we
- 	 * put /dev/loopXX inode. Later in __loop_clr_fd() we bdput(bdev).
- 	 */
- 	bdgrab(bdev);
- 	mutex_unlock(&loop_ctl_mutex);
-+	if (partscan)
-+		loop_reread_partitions(lo, bdev);
- 	return 0;
- 
- out_unlock:
-@@ -1157,6 +1161,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	int err;
- 	struct loop_func_table *xfer;
- 	kuid_t uid = current_uid();
-+	struct block_device *bdev;
-+	bool partscan = false;
- 
- 	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
- 	if (err)
-@@ -1245,10 +1251,13 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	     !(lo->lo_flags & LO_FLAGS_PARTSCAN)) {
- 		lo->lo_flags |= LO_FLAGS_PARTSCAN;
- 		lo->lo_disk->flags &= ~GENHD_FL_NO_PART_SCAN;
--		loop_reread_partitions(lo, lo->lo_device);
-+		bdev = lo->lo_device;
-+		partscan = true;
- 	}
- out_unlock:
- 	mutex_unlock(&loop_ctl_mutex);
-+	if (partscan)
-+		loop_reread_partitions(lo, bdev);
- 
- 	return err;
- }
--- 
-2.16.4
+Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
+
+
+--Apple-Mail=_008BA30E-FCD7-482D-939C-3A8D6488B67C
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAlvhXGIACgkQIX4xUKFR
+nnQ/8A/+M+VmnsElaf0iNgADIAcKQT3tikUQJhgkPqX6L9djAZ9qhV37LYxwVy3D
++ynl4lMsN16fXxM3V1bgxdMtIOgX4+fxZRvoyuyoLLJ9zyjbIwKVTRcmALsaXqRA
+rsCg2bv3ixowzx+8569Niwt3PVfYFD9AXGVbXpSTjhZS24y7K6bzPcO1a4stG4tY
+O7ZKTxTERCG2aYea9/Ai+Irr8vnJbLc7oMMdTqTLwKiNC24IwHTco5QtL3r9DRyv
+YRA2q9PzE9H1A4giV0GlNUF1ydAtRAN0F9FjZaY6aVCN7dPB7YyQNC46qbkWkrhC
+l6Ai2hhvHbrz1XbxBs6+CRxta5ZxICD5UncMDofdac7UTKDLFUKTdJy+wNOnmbBU
+DDWiTOZQcO7lbkspsjgvee+cuO9x5bnMfMSIlMNxQ2NZWpxqByd6YE6csei8o9MB
+gOEzv8TS/Ui0uIsgxpN2NA1+6uFGCRpd2y3gWleoZ+EfFISMjDYvt25G+RFDt4TD
+ew9QrAp97fzbgoOFvENUeIqY7O8RoqmD3jvedO6SFiyNVg/bEJ2avSLVUyZnHXBr
+rEzPYak5j7jKghi8LQO1hGn3UloBaGMl/nvuyRddl5CqnBOLwoSfbdX8S3FxoCd2
+iWAglKa2wh5d7BpmesGhRjbJuYLWeM3LpqiyjyTSP19f2CCqMQU=
+=RZMJ
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_008BA30E-FCD7-482D-939C-3A8D6488B67C--
