@@ -1,106 +1,31 @@
-Return-Path: <BATV+c7c6d2b470208379b10c+5558+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	ooo@electrozaur.com
-Cc: Johannes Thumshirn <jthumshirn@suse.de>,
-	Benjamin Block <bblock@linux.vnet.ibm.com>,
-	linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 4/8] scsi: stop setting up request->special
-Date: Sun, 11 Nov 2018 14:32:07 +0100
-Message-Id: <20181111133211.13926-5-hch@lst.de>
-In-Reply-To: <20181111133211.13926-1-hch@lst.de>
-References: <20181111133211.13926-1-hch@lst.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:46383 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729015AbeKFMwK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Nov 2018 07:52:10 -0500
+Received: by mail-pl1-f194.google.com with SMTP id c13-v6so5462933plz.13
+        for <linux-block@vger.kernel.org>; Mon, 05 Nov 2018 19:29:07 -0800 (PST)
+Subject: Re: [PATCH blktests] fix discontiguous-io compile error on 32 bit
+ systems
+To: yuyufen <yuyufen@huawei.com>, osandov@fb.com
+Cc: linux-block@vger.kernel.org, bart.vanassche@wdc.com,
+        Theodore Ts'o <tytso@mit.edu>
+References: <1541054148-144718-1-git-send-email-yuyufen@huawei.com>
+ <1541083968.196084.140.camel@acm.org>
+ <1813f3ce-e3ec-05b8-b0b0-394265ac19d0@huawei.com>
+From: Bart Van Assche <bvanassche@acm.org>
+Message-ID: <2d4179c9-75f4-4f8f-2604-13d440836549@acm.org>
+Date: Mon, 5 Nov 2018 19:29:05 -0800
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <1813f3ce-e3ec-05b8-b0b0-394265ac19d0@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-No more need in a blk-mq world where the scsi command and request
-are allocated together.
+On 11/5/18 6:19 PM, yuyufen wrote:
+> I am sorry that I did not see the discussion before this.
+> And you are right. Please ignore this patch.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/qedf/qedf_io.c | 6 ------
- drivers/scsi/qedi/qedi_fw.c | 7 -------
- drivers/scsi/scsi_lib.c     | 3 ---
- drivers/scsi/sd.c           | 1 -
- drivers/scsi/sr.c           | 1 -
- 5 files changed, 18 deletions(-)
+Don't worry - this can happen :-)
 
-diff --git a/drivers/scsi/qedf/qedf_io.c b/drivers/scsi/qedf/qedf_io.c
-index 6bbc38b1b465..6ca583bdde23 100644
---- a/drivers/scsi/qedf/qedf_io.c
-+++ b/drivers/scsi/qedf/qedf_io.c
-@@ -1128,12 +1128,6 @@ void qedf_scsi_completion(struct qedf_ctx *qedf, struct fcoe_cqe *cqe,
- 		return;
- 	}
- 
--	if (!sc_cmd->request->special) {
--		QEDF_WARN(&(qedf->dbg_ctx), "request->special is NULL so "
--		    "request not valid, sc_cmd=%p.\n", sc_cmd);
--		return;
--	}
--
- 	if (!sc_cmd->request->q) {
- 		QEDF_WARN(&(qedf->dbg_ctx), "request->q is NULL so request "
- 		   "is not valid, sc_cmd=%p.\n", sc_cmd);
-diff --git a/drivers/scsi/qedi/qedi_fw.c b/drivers/scsi/qedi/qedi_fw.c
-index 25d763ae5d5a..e2a995a6e8e7 100644
---- a/drivers/scsi/qedi/qedi_fw.c
-+++ b/drivers/scsi/qedi/qedi_fw.c
-@@ -616,13 +616,6 @@ static void qedi_scsi_completion(struct qedi_ctx *qedi,
- 		goto error;
- 	}
- 
--	if (!sc_cmd->request->special) {
--		QEDI_WARN(&qedi->dbg_ctx,
--			  "request->special is NULL so request not valid, sc_cmd=%p.\n",
--			  sc_cmd);
--		goto error;
--	}
--
- 	if (!sc_cmd->request->q) {
- 		QEDI_WARN(&qedi->dbg_ctx,
- 			  "request->q is NULL so request is not valid, sc_cmd=%p.\n",
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 369c15a701f1..d65f838af6eb 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1561,10 +1561,7 @@ static blk_status_t scsi_mq_prep_fn(struct request *req)
- 
- 	scsi_init_command(sdev, cmd);
- 
--	req->special = cmd;
--
- 	cmd->request = req;
--
- 	cmd->tag = req->tag;
- 	cmd->prot_op = SCSI_PROT_NORMAL;
- 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 4a6ed2fc8c71..96e906e438d2 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -1026,7 +1026,6 @@ static blk_status_t sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
- 	ret = scsi_init_io(SCpnt);
- 	if (ret != BLK_STS_OK)
- 		return ret;
--	WARN_ON_ONCE(SCpnt != rq->special);
- 
- 	SCSI_LOG_HLQUEUE(1,
- 		scmd_printk(KERN_INFO, SCpnt,
-diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
-index 38ddbbfe5f3c..039c27c2d7b3 100644
---- a/drivers/scsi/sr.c
-+++ b/drivers/scsi/sr.c
-@@ -394,7 +394,6 @@ static blk_status_t sr_init_command(struct scsi_cmnd *SCpnt)
- 	ret = scsi_init_io(SCpnt);
- 	if (ret != BLK_STS_OK)
- 		goto out;
--	WARN_ON_ONCE(SCpnt != rq->special);
- 	cd = scsi_cd(rq->rq_disk);
- 
- 	/* from here on until we're complete, any goto out
--- 
-2.19.1
+Bart.
