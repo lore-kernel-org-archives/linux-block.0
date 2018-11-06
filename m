@@ -1,250 +1,52 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Tejun Heo <tj@kernel.org>,
-	Li Zefan <lizefan@huawei.com>,
-	Angelo Ruocco <angeloruocco90@gmail.com>,
-	Dennis Zhou <dennis@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Liu Bo <bo.liu@linux.alibaba.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Johannes Weiner <hannes@cmpxchg.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	cgroups@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH 09/12] block, bfq: use standard file names for the proportional-share policy
-Date: Mon, 12 Nov 2018 10:56:29 +0100
-Message-Id: <20181112095632.69114-10-paolo.valente@linaro.org>
-In-Reply-To: <20181112095632.69114-1-paolo.valente@linaro.org>
-References: <20181112095632.69114-1-paolo.valente@linaro.org>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 0/4] irq: fix support for allocating sets of IRQs
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+ LKML <linux-kernel@vger.kernel.org>, Hannes Reinecke <hare@suse.com>,
+ Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+ Long Li <longli@microsoft.com>
+References: <20181102145951.31979-1-ming.lei@redhat.com>
+ <955edd2f-ad2f-ae8b-b8c2-98a01918c112@kernel.dk>
+ <alpine.DEB.2.21.1811041259350.3160@nanos.tec.linutronix.de>
+ <5787f309-fa34-36df-83be-934a64989583@kernel.dk>
+ <alpine.DEB.2.21.1811041938340.10744@nanos.tec.linutronix.de>
+ <alpine.DEB.2.21.1811051220330.1566@nanos.tec.linutronix.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <f4ed74a9-5083-2874-07a7-fdf0c45c494e@kernel.dk>
+Date: Mon, 5 Nov 2018 20:02:37 -0700
+MIME-Version: 1.0
+In-Reply-To: <alpine.DEB.2.21.1811051220330.1566@nanos.tec.linutronix.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Some of the files exposed in a cgroup by bfq, for the proportional
-share policy, have the same meaning as the files owned by cfq.
+On 11/5/18 4:24 AM, Thomas Gleixner wrote:
+> Jens,
+> 
+> On Sun, 4 Nov 2018, Thomas Gleixner wrote:
+>> On Sun, 4 Nov 2018, Jens Axboe wrote:
+>>> On 11/4/18 5:02 AM, Thomas Gleixner wrote:
+>>>> So I assume, that I can pick up Mings series instead.
+>>>
+>>> Yes, let's do that.
+>>>
+>>>> There is another patch pending affecting the irq affinity spreading. Can
+>>>> you folks please have a look at it?
+>>>>
+>>>> https://lkml.kernel.org/r/20181102180248.13583-1-longli@linuxonhyperv.com
+>>>
+>>> I'll give that a look and test. Thanks for the heads-up.
+> 
+> I picked the series from Ming and the patch from Long and merged it into
+> tip/irq/core.
+> 
+> The result is available for you to pull from:
+> 
+>     git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git irq/for-block
+> 
+> That branch is immutable now and I keep it around in case that there are
+> incremental updates necessary before the merge window.
 
-The old implementation of the cgroup interface didn't allow different
-entities to create cgroup files with the same name (in the same
-subsystem). So, for bfq, we had to add the prefix "bfq" to the names
-of its cgroup files.
+Great, thanks! I'll pull that in as a base.
 
-This commit renames the cgroup files of the bfq scheduler as those
-exposed by cfq, and makes bfq share these files with any other policy.
-
-Signed-off-by: Angelo Ruocco <angeloruocco90@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-cgroup.c | 94 +++++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 69 insertions(+), 25 deletions(-)
-
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 50b2d7ba6b9d..9148fc38c737 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -1055,50 +1055,67 @@ struct blkcg_policy blkcg_policy_bfq = {
- 
- struct cftype bfq_blkcg_legacy_files[] = {
- 	{
--		.name = "bfq.weight",
--		.flags = CFTYPE_NOT_ON_ROOT,
-+		.name = "weight",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_NOT_ON_ROOT | CFTYPE_SHARES_FILE,
- 		.seq_show = bfq_io_show_weight,
- 		.write_u64 = bfq_io_set_weight_legacy,
- 	},
- 
- 	/* statistics, covers only the tasks in the bfqg */
- 	{
--		.name = "bfq.io_service_bytes",
-+		.name = "io_service_bytes",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = (unsigned long)&blkcg_policy_bfq,
- 		.seq_show_cft = blkg_print_stat_bytes,
- 	},
- 	{
--		.name = "bfq.io_serviced",
-+		.name = "io_serviced",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = (unsigned long)&blkcg_policy_bfq,
- 		.seq_show_cft = blkg_print_stat_ios,
- 	},
- #ifdef CONFIG_DEBUG_BLK_CGROUP
- 	{
--		.name = "bfq.time",
-+		.name = "time",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.time),
- 		.seq_show_cft = bfqg_print_stat,
- 	},
- 	{
--		.name = "bfq.sectors",
-+		.name = "sectors",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.seq_show = bfqg_print_stat_sectors,
- 	},
- 	{
--		.name = "bfq.io_service_time",
-+		.name = "io_service_time",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.service_time),
- 		.seq_show_cft = bfqg_print_rwstat,
- 	},
- 	{
--		.name = "bfq.io_wait_time",
-+		.name = "io_wait_time",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.wait_time),
- 		.seq_show_cft = bfqg_print_rwstat,
- 	},
- 	{
--		.name = "bfq.io_merged",
-+		.name = "io_merged",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.merged),
- 		.seq_show_cft = bfqg_print_rwstat,
- 	},
- 	{
--		.name = "bfq.io_queued",
-+		.name = "io_queued",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.queued),
- 		.seq_show_cft = bfqg_print_rwstat,
- 	},
-@@ -1106,66 +1123,92 @@ struct cftype bfq_blkcg_legacy_files[] = {
- 
- 	/* the same statictics which cover the bfqg and its descendants */
- 	{
--		.name = "bfq.io_service_bytes_recursive",
-+		.name = "io_service_bytes_recursive",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = (unsigned long)&blkcg_policy_bfq,
- 		.seq_show_cft = blkg_print_stat_bytes_recursive,
- 	},
- 	{
--		.name = "bfq.io_serviced_recursive",
-+		.name = "io_serviced_recursive",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = (unsigned long)&blkcg_policy_bfq,
- 		.seq_show_cft = blkg_print_stat_ios_recursive,
- 	},
- #ifdef CONFIG_DEBUG_BLK_CGROUP
- 	{
--		.name = "bfq.time_recursive",
-+		.name = "time_recursive",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.time),
- 		.seq_show_cft = bfqg_print_stat_recursive,
- 	},
- 	{
--		.name = "bfq.sectors_recursive",
-+		.name = "sectors_recursive",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.seq_show = bfqg_print_stat_sectors_recursive,
- 	},
- 	{
--		.name = "bfq.io_service_time_recursive",
-+		.name = "io_service_time_recursive",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.service_time),
- 		.seq_show_cft = bfqg_print_rwstat_recursive,
- 	},
- 	{
--		.name = "bfq.io_wait_time_recursive",
-+		.name = "io_wait_time_recursive",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.wait_time),
- 		.seq_show_cft = bfqg_print_rwstat_recursive,
- 	},
- 	{
--		.name = "bfq.io_merged_recursive",
-+		.name = "io_merged_recursive",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.merged),
- 		.seq_show_cft = bfqg_print_rwstat_recursive,
- 	},
- 	{
--		.name = "bfq.io_queued_recursive",
-+		.name = "io_queued_recursive",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.queued),
- 		.seq_show_cft = bfqg_print_rwstat_recursive,
- 	},
- 	{
--		.name = "bfq.avg_queue_size",
-+		.name = "avg_queue_size",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.seq_show = bfqg_print_avg_queue_size,
- 	},
- 	{
--		.name = "bfq.group_wait_time",
-+		.name = "group_wait_time",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.group_wait_time),
- 		.seq_show_cft = bfqg_print_stat,
- 	},
- 	{
--		.name = "bfq.idle_time",
-+		.name = "idle_time",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.idle_time),
- 		.seq_show_cft = bfqg_print_stat,
- 	},
- 	{
--		.name = "bfq.empty_time",
-+		.name = "empty_time",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.empty_time),
- 		.seq_show_cft = bfqg_print_stat,
- 	},
- 	{
--		.name = "bfq.dequeue",
-+		.name = "dequeue",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.dequeue),
- 		.seq_show_cft = bfqg_print_stat,
- 	},
-@@ -1175,8 +1218,9 @@ struct cftype bfq_blkcg_legacy_files[] = {
- 
- struct cftype bfq_blkg_files[] = {
- 	{
--		.name = "bfq.weight",
--		.flags = CFTYPE_NOT_ON_ROOT,
-+		.name = "weight",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_NOT_ON_ROOT | CFTYPE_SHARES_FILE,
- 		.seq_show = bfq_io_show_weight,
- 		.write = bfq_io_set_weight,
- 	},
 -- 
-2.16.1
+Jens Axboe
