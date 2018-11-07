@@ -1,42 +1,54 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:37744 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727315AbeKGMmw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Nov 2018 07:42:52 -0500
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:41302 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727315AbeKGMkG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Nov 2018 07:40:06 -0500
 Subject: Re: [PATCH] block: respect virtual boundary mask in bvecs
-To: Ming Lei <tom.leiming@gmail.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@fb.com>,
-        linux-block <linux-block@vger.kernel.org>,
+To: Johannes Thumshirn <jthumshirn@suse.de>,
+        Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@fb.com>,
+        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
         Hannes Reinecke <hare@suse.de>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
         Jan Kara <jack@suse.cz>
 References: <20181105102301.9752-1-jthumshirn@suse.de>
  <20181105105548.GC12367@ming.t460p>
  <7c649b43-f952-cf94-93d6-44fb153acced@suse.de>
  <20181105120153.GD12367@ming.t460p>
  <3c3dd9c2-4240-7bb5-c0ff-af6f2e479c31@suse.de>
- <CACVXFVNOAc1HEPmfu9n8vMjqY2hK8fVqe4Em-g+dvSRLavpO8w@mail.gmail.com>
 From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <f670cdbd-ece6-9051-e6f8-0814a44fe82b@grimberg.me>
-Date: Tue, 6 Nov 2018 19:14:22 -0800
+Message-ID: <a98db60d-ceb9-2a30-39bb-187125f56627@grimberg.me>
+Date: Tue, 6 Nov 2018 19:11:36 -0800
 MIME-Version: 1.0
-In-Reply-To: <CACVXFVNOAc1HEPmfu9n8vMjqY2hK8fVqe4Em-g+dvSRLavpO8w@mail.gmail.com>
+In-Reply-To: <3c3dd9c2-4240-7bb5-c0ff-af6f2e479c31@suse.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
 
-> blktrace won't help on this issue because .bv_offset isn't recorded.
+>> If you mean the real huge page, this patch shouldn't have made a difference
+>> because bio_vec->bv_offset is in [0, PAGE_SIZE), and iSer sets virt
+>> boundary as 4K - 1.
+>>
+>> However, things will change after multipage bvec is introduced.
 > 
-> This patch makes sense on >4KB PAGE_SIZE. If your issue happens on
-> ARCH with 4K PAGE_SIZE, maybe you should root cause why it makes a
-> difference on iSer. And it is highly possible there is bug somewhere.
+> 
+> Hi Ming,
+> 
+> I've received a blktrace from our customer showing the issue [1].
+> 
+> In this example trace they've submitted (contiguous) 64K I/Os and
+> without this patch, they're seeing a lot of splits as indicated by the
+> trace.
+> 
+> With the patch applied the I/O is directly issued to the LLDD without
+> the splits.
+> 
+> [1] http://beta.suse.com/private/jthumshirn/blktrace.txt
+> 
 
-I don't suspect that this is the case. unless all the vec elements
-happen to have an offset but if that is the case I don't think that
-this patch would've solved this.
+This patch makes sense to me. However I agree that we need to clarify
+that this addresses cases where PAGE_SIZE-1 > queue_virt_boundary(q).
 
-It can't really be an iser issue because iser does not control bio
-splitting/merging... it can only ask the block layer to obay the
-virt_boundary.
+And also, lets replace "like iser" with "drivers that sets a virtual
+boundary constraint" as nvme-rdma does the same thing.
