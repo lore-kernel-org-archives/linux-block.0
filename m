@@ -1,61 +1,31 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 01/16] block/loop: Don't grab "struct file" for vfs_getattr() operation.
-Date: Thu,  8 Nov 2018 14:01:01 +0100
-Message-Id: <20181108130116.12140-2-jack@suse.cz>
-In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
-References: <20181108130116.12140-1-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:33876 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725953AbeKHFhG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Nov 2018 00:37:06 -0500
+From: Jens Axboe <axboe@fb.com>
+To: Johannes Thumshirn <jthumshirn@suse.de>
+CC: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
+        "Linux Kernel Mailinglist" <linux-kernel@vger.kernel.org>,
+        Jan Kara <jack@suse.cz>, Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH v2] block: respect virtual boundary mask in bvecs
+Date: Wed, 7 Nov 2018 20:04:58 +0000
+Message-ID: <b557400b-4ef9-481f-ac0b-b80545e84a2f@fb.com>
+References: <20181107135814.15727-1-jthumshirn@suse.de>
+In-Reply-To: <20181107135814.15727-1-jthumshirn@suse.de>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-
-vfs_getattr() needs "struct path" rather than "struct file".
-Let's use path_get()/path_put() rather than get_file()/fput().
-
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- drivers/block/loop.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index cb0cc8685076..a29ef169f360 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1204,7 +1204,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- static int
- loop_get_status(struct loop_device *lo, struct loop_info64 *info)
- {
--	struct file *file;
-+	struct path path;
- 	struct kstat stat;
- 	int ret;
- 
-@@ -1229,16 +1229,16 @@ loop_get_status(struct loop_device *lo, struct loop_info64 *info)
- 	}
- 
- 	/* Drop lo_ctl_mutex while we call into the filesystem. */
--	file = get_file(lo->lo_backing_file);
-+	path = lo->lo_backing_file->f_path;
-+	path_get(&path);
- 	mutex_unlock(&lo->lo_ctl_mutex);
--	ret = vfs_getattr(&file->f_path, &stat, STATX_INO,
--			  AT_STATX_SYNC_AS_STAT);
-+	ret = vfs_getattr(&path, &stat, STATX_INO, AT_STATX_SYNC_AS_STAT);
- 	if (!ret) {
- 		info->lo_device = huge_encode_dev(stat.dev);
- 		info->lo_inode = stat.ino;
- 		info->lo_rdevice = huge_encode_dev(stat.rdev);
- 	}
--	fput(file);
-+	path_put(&path);
- 	return ret;
- }
- 
--- 
-2.16.4
+T24gMTEvNy8xOCA2OjU4IEFNLCBKb2hhbm5lcyBUaHVtc2hpcm4gd3JvdGU6DQo+IFdpdGggZHJp
+dmVycyB0aGF0IGFyZSBzZXR0dGluZyBhIHZpcnR1YWwgYm91bmRhcnkgY29uc3RyYWluLCB3ZSBh
+cmUNCj4gc2VlaW5nIGEgbG90IG9mIGJpbyBzcGxpdHRpbmcgYW5kIHNtYWxsZXIgSS9PcyBiZWlu
+ZyBzdWJtaXR0ZWQgdG8gdGhlDQo+IGRyaXZlci4NCj4gDQo+IFRoaXMgaGFwcGVucyBiZWNhdXNl
+IHRoZSBiaW8gZ2FwIGRldGVjdGlvbiBjb2RlIGRvZXMgbm90IGFjY291bnQgY2FzZXMNCj4gd2hl
+cmUgUEFHRV9TSVpFIC0gMSBpcyBiaWdnZXIgdGhhbiBxdWV1ZV92aXJ0X2JvdW5kYXJ5KCkgYW5k
+IHRodXMgd2lsbA0KPiBzcGxpdCB0aGUgYmlvIHVubmVjZXNzYXJpbHkuDQoNClRoYW5rcywgYXBw
+bGllZC4NCg0KLS0gDQpKZW5zIEF4Ym9lDQoNCg==
