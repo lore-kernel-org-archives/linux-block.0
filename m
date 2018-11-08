@@ -1,40 +1,69 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	kernel-team@fb.com,
-	Jordan Glover <Golden_Miller83@protonmail.ch>
-Subject: [PATCH] kyber: fix wrong strlcpy() size in trace_kyber_latency()
-Date: Sun, 11 Nov 2018 09:25:27 -0800
-Message-Id: <8233c3aac03494d50bf463787661edc523292ae4.1541957005.git.osandov@fb.com>
-MIME-Version: 1.0
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 03/16] loop: Fold __loop_release into loop_release
+Date: Thu,  8 Nov 2018 14:01:03 +0100
+Message-Id: <20181108130116.12140-4-jack@suse.cz>
+In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
+References: <20181108130116.12140-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+__loop_release() has a single call site. Fold it there. This is
+currently not a huge win but it will make following replacement of
+loop_index_mutex more obvious.
 
-When copying to the latency type, we should be passing LATENCY_TYPE_LEN,
-not DOMAIN_LEN. This isn't a problem in practice because we only pass
-"total" or "I/O", but let's fix it.
-
-Reported-by: Jordan Glover <Golden_Miller83@protonmail.ch>
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- include/trace/events/kyber.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/loop.c | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
-diff --git a/include/trace/events/kyber.h b/include/trace/events/kyber.h
-index a9834c37ac40..7aaa298375ad 100644
---- a/include/trace/events/kyber.h
-+++ b/include/trace/events/kyber.h
-@@ -32,7 +32,7 @@ TRACE_EVENT(kyber_latency,
- 	TP_fast_assign(
- 		__entry->dev		= disk_devt(dev_to_disk(kobj_to_dev(q->kobj.parent)));
- 		strlcpy(__entry->domain, domain, DOMAIN_LEN);
--		strlcpy(__entry->type, type, DOMAIN_LEN);
-+		strlcpy(__entry->type, type, LATENCY_TYPE_LEN);
- 		__entry->percentile	= percentile;
- 		__entry->numerator	= numerator;
- 		__entry->denominator	= denominator;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 63008e879771..3de2cd94225a 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1641,12 +1641,15 @@ static int lo_open(struct block_device *bdev, fmode_t mode)
+ 	return err;
+ }
+ 
+-static void __lo_release(struct loop_device *lo)
++static void lo_release(struct gendisk *disk, fmode_t mode)
+ {
++	struct loop_device *lo;
+ 	int err;
+ 
++	mutex_lock(&loop_index_mutex);
++	lo = disk->private_data;
+ 	if (atomic_dec_return(&lo->lo_refcnt))
+-		return;
++		goto unlock_index;
+ 
+ 	mutex_lock(&loop_ctl_mutex);
+ 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
+@@ -1656,7 +1659,7 @@ static void __lo_release(struct loop_device *lo)
+ 		 */
+ 		err = loop_clr_fd(lo);
+ 		if (!err)
+-			return;
++			goto unlock_index;
+ 	} else if (lo->lo_state == Lo_bound) {
+ 		/*
+ 		 * Otherwise keep thread (if running) and config,
+@@ -1667,12 +1670,7 @@ static void __lo_release(struct loop_device *lo)
+ 	}
+ 
+ 	mutex_unlock(&loop_ctl_mutex);
+-}
+-
+-static void lo_release(struct gendisk *disk, fmode_t mode)
+-{
+-	mutex_lock(&loop_index_mutex);
+-	__lo_release(disk->private_data);
++unlock_index:
+ 	mutex_unlock(&loop_index_mutex);
+ }
+ 
 -- 
-2.19.1
+2.16.4
