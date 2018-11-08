@@ -1,83 +1,164 @@
-Return-Path: <axboe@kernel.dk>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: Omar Sandoval <osandov@osandov.com>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] floppy: fix race condition in __floppy_read_block_0()
-Message-ID: <21f7532d-8d90-56d0-3916-6329f6c2378f@kernel.dk>
-Date: Fri, 9 Nov 2018 15:58:40 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 05/16] loop: Push lo_ctl_mutex down into individual ioctls
+Date: Thu,  8 Nov 2018 14:01:05 +0100
+Message-Id: <20181108130116.12140-6-jack@suse.cz>
+In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
+References: <20181108130116.12140-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-LKP recently reported a hang at bootup in the floppy code:
+Push acquisition of lo_ctl_mutex down into individual ioctl handling
+branches. This is a preparatory step for pushing the lock down into
+individual ioctl handling functions so that they can release the lock as
+they need it. We also factor out some simple ioctl handlers that will
+not need any special handling to reduce unnecessary code duplication.
 
-[  245.678853] INFO: task mount:580 blocked for more than 120 seconds.
-[  245.679906]       Tainted: G                T 4.19.0-rc6-00172-ga9f38e1 #1
-[  245.680959] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[  245.682181] mount           D 6372   580      1 0x00000004
-[  245.683023] Call Trace:
-[  245.683425]  __schedule+0x2df/0x570
-[  245.683975]  schedule+0x2d/0x80
-[  245.684476]  schedule_timeout+0x19d/0x330
-[  245.685090]  ? wait_for_common+0xa5/0x170
-[  245.685735]  wait_for_common+0xac/0x170
-[  245.686339]  ? do_sched_yield+0x90/0x90
-[  245.686935]  wait_for_completion+0x12/0x20
-[  245.687571]  __floppy_read_block_0+0xfb/0x150
-[  245.688244]  ? floppy_resume+0x40/0x40
-[  245.688844]  floppy_revalidate+0x20f/0x240
-[  245.689486]  check_disk_change+0x43/0x60
-[  245.690087]  floppy_open+0x1ea/0x360
-[  245.690653]  __blkdev_get+0xb4/0x4d0
-[  245.691212]  ? blkdev_get+0x1db/0x370
-[  245.691777]  blkdev_get+0x1f3/0x370
-[  245.692351]  ? path_put+0x15/0x20
-[  245.692871]  ? lookup_bdev+0x4b/0x90
-[  245.693539]  blkdev_get_by_path+0x3d/0x80
-[  245.694165]  mount_bdev+0x2a/0x190
-[  245.694695]  squashfs_mount+0x10/0x20
-[  245.695271]  ? squashfs_alloc_inode+0x30/0x30
-[  245.695960]  mount_fs+0xf/0x90
-[  245.696451]  vfs_kern_mount+0x43/0x130
-[  245.697036]  do_mount+0x187/0xc40
-[  245.697563]  ? memdup_user+0x28/0x50
-[  245.698124]  ksys_mount+0x60/0xc0
-[  245.698639]  sys_mount+0x19/0x20
-[  245.699167]  do_int80_syscall_32+0x61/0x130
-[  245.699813]  entry_INT80_32+0xc7/0xc7
-
-showing that we never complete that read request. The reason is that
-the completion setup is racy - it initializes the completion event
-AFTER submitting the IO, which means that the IO could complete
-before/during the init. If it does, we are passing garbage to
-complete() and we may sleep forever waiting for the event to
-occur.
-
-Fixes: 7b7b68bba5ef ("floppy: bail out in open() if drive is not responding to block0 read")
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/block/floppy.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/block/loop.c | 88 +++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 63 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index a8cfa011c284..fb23578e9a41 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -4148,10 +4148,11 @@ static int __floppy_read_block_0(struct block_device *bdev, int drive)
- 	bio.bi_end_io = floppy_rb0_cb;
- 	bio_set_op_attrs(&bio, REQ_OP_READ, 0);
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index dcdc96f4d2d4..4c37578989c4 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1393,70 +1393,108 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+ 	return 0;
+ }
  
-+	init_completion(&cbdata.complete);
+-static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+-	unsigned int cmd, unsigned long arg)
++static int lo_simple_ioctl(struct loop_device *lo, unsigned int cmd,
++			   unsigned long arg)
+ {
+-	struct loop_device *lo = bdev->bd_disk->private_data;
+ 	int err;
+ 
+ 	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+ 	if (err)
+-		goto out_unlocked;
++		return err;
++	switch (cmd) {
++	case LOOP_SET_CAPACITY:
++		err = loop_set_capacity(lo);
++		break;
++	case LOOP_SET_DIRECT_IO:
++		err = loop_set_dio(lo, arg);
++		break;
++	case LOOP_SET_BLOCK_SIZE:
++		err = loop_set_block_size(lo, arg);
++		break;
++	default:
++		err = lo->ioctl ? lo->ioctl(lo, cmd, arg) : -EINVAL;
++	}
++	mutex_unlock(&loop_ctl_mutex);
++	return err;
++}
 +
- 	submit_bio(&bio);
- 	process_fd_request();
++static int lo_ioctl(struct block_device *bdev, fmode_t mode,
++	unsigned int cmd, unsigned long arg)
++{
++	struct loop_device *lo = bdev->bd_disk->private_data;
++	int err;
  
--	init_completion(&cbdata.complete);
- 	wait_for_completion(&cbdata.complete);
+ 	switch (cmd) {
+ 	case LOOP_SET_FD:
++		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++		if (err)
++			return err;
+ 		err = loop_set_fd(lo, mode, bdev, arg);
++		mutex_unlock(&loop_ctl_mutex);
+ 		break;
+ 	case LOOP_CHANGE_FD:
++		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++		if (err)
++			return err;
+ 		err = loop_change_fd(lo, bdev, arg);
++		mutex_unlock(&loop_ctl_mutex);
+ 		break;
+ 	case LOOP_CLR_FD:
++		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++		if (err)
++			return err;
+ 		/* loop_clr_fd would have unlocked loop_ctl_mutex on success */
+ 		err = loop_clr_fd(lo);
+-		if (!err)
+-			goto out_unlocked;
++		if (err)
++			mutex_unlock(&loop_ctl_mutex);
+ 		break;
+ 	case LOOP_SET_STATUS:
+ 		err = -EPERM;
+-		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
++		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
++			err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++			if (err)
++				return err;
+ 			err = loop_set_status_old(lo,
+ 					(struct loop_info __user *)arg);
++			mutex_unlock(&loop_ctl_mutex);
++		}
+ 		break;
+ 	case LOOP_GET_STATUS:
++		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++		if (err)
++			return err;
+ 		err = loop_get_status_old(lo, (struct loop_info __user *) arg);
+ 		/* loop_get_status() unlocks loop_ctl_mutex */
+-		goto out_unlocked;
++		break;
+ 	case LOOP_SET_STATUS64:
+ 		err = -EPERM;
+-		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
++		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
++			err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++			if (err)
++				return err;
+ 			err = loop_set_status64(lo,
+ 					(struct loop_info64 __user *) arg);
++			mutex_unlock(&loop_ctl_mutex);
++		}
+ 		break;
+ 	case LOOP_GET_STATUS64:
++		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++		if (err)
++			return err;
+ 		err = loop_get_status64(lo, (struct loop_info64 __user *) arg);
+ 		/* loop_get_status() unlocks loop_ctl_mutex */
+-		goto out_unlocked;
+-	case LOOP_SET_CAPACITY:
+-		err = -EPERM;
+-		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
+-			err = loop_set_capacity(lo);
+ 		break;
++	case LOOP_SET_CAPACITY:
+ 	case LOOP_SET_DIRECT_IO:
+-		err = -EPERM;
+-		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
+-			err = loop_set_dio(lo, arg);
+-		break;
+ 	case LOOP_SET_BLOCK_SIZE:
+-		err = -EPERM;
+-		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
+-			err = loop_set_block_size(lo, arg);
+-		break;
++		if (!(mode & FMODE_WRITE) && !capable(CAP_SYS_ADMIN))
++			return -EPERM;
++		/* Fall through */
+ 	default:
+-		err = lo->ioctl ? lo->ioctl(lo, cmd, arg) : -EINVAL;
++		err = lo_simple_ioctl(lo, cmd, arg);
++		break;
+ 	}
+-	mutex_unlock(&loop_ctl_mutex);
  
- 	__free_page(page);
+-out_unlocked:
+ 	return err;
+ }
+ 
 -- 
-2.17.1
-
--- 
-Jens Axboe
+2.16.4
