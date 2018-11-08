@@ -1,10 +1,11 @@
 Return-Path: <axboe@kernel.dk>
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/2] blk-mq: provide a helper to check if a queue is busy
-Date: Thu,  8 Nov 2018 09:06:09 -0700
-Message-Id: <20181108160609.27568-4-axboe@kernel.dk>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Mike Snitzer <snitzer@redhat.com>
+Subject: [PATCH] blk-mq: provide a helper to check if a queue is busy
+Date: Thu,  8 Nov 2018 09:06:07 -0700
+Message-Id: <20181108160609.27568-2-axboe@kernel.dk>
 In-Reply-To: <20181108160609.27568-1-axboe@kernel.dk>
 References: <20181108160609.27568-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
@@ -15,35 +16,31 @@ false if not.
 DM can use this to replace the atomic_inc/dec they do per device
 to see if a device is busy.
 
-Reviewed-by: Mike Snitzer <snitzer@redhat.com>
+Cc: Mike Snitzer <snitzer@redhat.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-mq.c         | 26 ++++++++++++++++++++++++++
+ block/blk-mq.c         | 22 ++++++++++++++++++++++
  include/linux/blk-mq.h |  2 ++
- 2 files changed, 28 insertions(+)
+ 2 files changed, 24 insertions(+)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4a622c832b31..65243c40ac7c 100644
+index 4a622c832b31..848adcc51c43 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -790,6 +790,32 @@ struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag)
+@@ -790,6 +790,28 @@ struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag)
  }
  EXPORT_SYMBOL(blk_mq_tag_to_rq);
  
 +static bool blk_mq_check_busy(struct blk_mq_hw_ctx *hctx, struct request *rq,
 +			      void *priv, bool reserved)
 +{
++	bool *busy = (bool *) priv;
++
 +	/*
 +	 * If we find a request, we know the queue is busy. Return false
 +	 * to stop the iteration.
 +	 */
-+	if (rq->q == hctx->queue) {
-+		bool *busy = (bool *) priv;
-+
-+		*busy = true;
-+		return false;
-+	}
-+
++	*busy = true;
 +	return false;
 +}
 +
