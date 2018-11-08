@@ -1,65 +1,61 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	David Sterba <dsterba@suse.com>,
-	linux-btrfs@vger.kernel.org
-Subject: [PATCH V8 07/18] btrfs: use bvec_last_segment to get bio's last page
-Date: Sat, 10 Nov 2018 00:25:59 +0800
-Message-Id: <20181109162610.18981-8-ming.lei@redhat.com>
-In-Reply-To: <20181109162610.18981-1-ming.lei@redhat.com>
-References: <20181109162610.18981-1-ming.lei@redhat.com>
+Cc: <linux-block@vger.kernel.org>,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 01/16] block/loop: Don't grab "struct file" for vfs_getattr() operation.
+Date: Thu,  8 Nov 2018 14:01:01 +0100
+Message-Id: <20181108130116.12140-2-jack@suse.cz>
+In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
+References: <20181108130116.12140-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Preparing for supporting multi-page bvec.
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: David Sterba <dsterba@suse.com>
-Cc: linux-btrfs@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+vfs_getattr() needs "struct path" rather than "struct file".
+Let's use path_get()/path_put() rather than get_file()/fput().
+
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/btrfs/compression.c | 5 ++++-
- fs/btrfs/extent_io.c   | 5 +++--
- 2 files changed, 7 insertions(+), 3 deletions(-)
+ drivers/block/loop.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
-index 2955a4ea2fa8..161e14b8b180 100644
---- a/fs/btrfs/compression.c
-+++ b/fs/btrfs/compression.c
-@@ -400,8 +400,11 @@ blk_status_t btrfs_submit_compressed_write(struct inode *inode, u64 start,
- static u64 bio_end_offset(struct bio *bio)
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index cb0cc8685076..a29ef169f360 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1204,7 +1204,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ static int
+ loop_get_status(struct loop_device *lo, struct loop_info64 *info)
  {
- 	struct bio_vec *last = bio_last_bvec_all(bio);
-+	struct bio_vec bv;
+-	struct file *file;
++	struct path path;
+ 	struct kstat stat;
+ 	int ret;
  
--	return page_offset(last->bv_page) + last->bv_len + last->bv_offset;
-+	bvec_last_segment(last, &bv);
-+
-+	return page_offset(bv.bv_page) + bv.bv_len + bv.bv_offset;
+@@ -1229,16 +1229,16 @@ loop_get_status(struct loop_device *lo, struct loop_info64 *info)
+ 	}
+ 
+ 	/* Drop lo_ctl_mutex while we call into the filesystem. */
+-	file = get_file(lo->lo_backing_file);
++	path = lo->lo_backing_file->f_path;
++	path_get(&path);
+ 	mutex_unlock(&lo->lo_ctl_mutex);
+-	ret = vfs_getattr(&file->f_path, &stat, STATX_INO,
+-			  AT_STATX_SYNC_AS_STAT);
++	ret = vfs_getattr(&path, &stat, STATX_INO, AT_STATX_SYNC_AS_STAT);
+ 	if (!ret) {
+ 		info->lo_device = huge_encode_dev(stat.dev);
+ 		info->lo_inode = stat.ino;
+ 		info->lo_rdevice = huge_encode_dev(stat.rdev);
+ 	}
+-	fput(file);
++	path_put(&path);
+ 	return ret;
  }
  
- static noinline int add_ra_bio_pages(struct inode *inode,
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index d228f706ff3e..5d5965297e7e 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -2720,11 +2720,12 @@ static int __must_check submit_one_bio(struct bio *bio, int mirror_num,
- {
- 	blk_status_t ret = 0;
- 	struct bio_vec *bvec = bio_last_bvec_all(bio);
--	struct page *page = bvec->bv_page;
-+	struct bio_vec bv;
- 	struct extent_io_tree *tree = bio->bi_private;
- 	u64 start;
- 
--	start = page_offset(page) + bvec->bv_offset;
-+	bvec_last_segment(bvec, &bv);
-+	start = page_offset(bv.bv_page) + bv.bv_offset;
- 
- 	bio->bi_private = NULL;
- 
 -- 
-2.9.5
+2.16.4
