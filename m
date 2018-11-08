@@ -1,80 +1,103 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH V5 6/6] blk-mq: replace and kill blk_mq_request_issue_directly
-Date: Mon, 12 Nov 2018 17:23:29 +0800
-Message-Id: <1542014609-1769-7-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1542014609-1769-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1542014609-1769-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 15/16] loop: Avoid circular locking dependency between loop_ctl_mutex and bd_mutex
+Date: Thu,  8 Nov 2018 14:01:15 +0100
+Message-Id: <20181108130116.12140-16-jack@suse.cz>
+In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
+References: <20181108130116.12140-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Replace blk_mq_request_issue_directly with blk_mq_try_issue_directly
-in blk_insert_cloned_request and remove blk_mq_request_issue_directly
-as nobody uses it.
+Code in loop_change_fd() drops reference to the old file (and also the
+new file in a failure case) under loop_ctl_mutex. Similarly to a
+situation in loop_set_fd() this can create a circular locking dependency
+if this was the last reference holding the file open. Delay dropping of
+the file reference until we have released loop_ctl_mutex.
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+Reported-by: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/blk-core.c | 2 +-
- block/blk-mq.c   | 7 +------
- block/blk-mq.h   | 6 ++++--
- 3 files changed, 6 insertions(+), 9 deletions(-)
+ drivers/block/loop.c | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index fdc0ad2..5cae9ef 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1436,7 +1436,7 @@ blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *
- 	 * bypass a potential scheduler on the bottom device for
- 	 * insert.
- 	 */
--	return blk_mq_request_issue_directly(rq);
-+	return blk_mq_try_issue_directly(rq->mq_hctx, rq, NULL, true);
- }
- EXPORT_SYMBOL_GPL(blk_insert_cloned_request);
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f27d547..f016028 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1797,7 +1797,7 @@ static inline enum mq_issue_decision
- 	return dec;
- }
- 
--static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-+blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 						struct request *rq,
- 						blk_qc_t *cookie,
- 						bool bypass)
-@@ -1871,11 +1871,6 @@ static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	return BLK_STS_OK;
- }
- 
--blk_status_t blk_mq_request_issue_directly(struct request *rq)
--{
--	return blk_mq_try_issue_directly(rq->mq_hctx, rq, NULL, true);
--}
--
- void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 		struct list_head *list)
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index b3f981ac8ef1..112afc9bc604 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -677,7 +677,7 @@ static int loop_validate_file(struct file *file, struct block_device *bdev)
+ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 			  unsigned int arg)
  {
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index facb6e9..deee3a4 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -62,8 +62,10 @@ void blk_mq_request_bypass_insert(struct request *rq, bool run_queue);
- void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
- 				struct list_head *list);
+-	struct file	*file, *old_file;
++	struct file	*file = NULL, *old_file;
+ 	int		error;
+ 	bool		partscan;
  
--/* Used by blk_insert_cloned_request() to issue request directly */
--blk_status_t blk_mq_request_issue_directly(struct request *rq);
-+blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-+				       struct request *rq,
-+				       blk_qc_t *cookie,
-+				       bool bypass);
- void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 				    struct list_head *list);
+@@ -686,21 +686,21 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 		return error;
+ 	error = -ENXIO;
+ 	if (lo->lo_state != Lo_bound)
+-		goto out_unlock;
++		goto out_err;
+ 
+ 	/* the loop device has to be read-only */
+ 	error = -EINVAL;
+ 	if (!(lo->lo_flags & LO_FLAGS_READ_ONLY))
+-		goto out_unlock;
++		goto out_err;
+ 
+ 	error = -EBADF;
+ 	file = fget(arg);
+ 	if (!file)
+-		goto out_unlock;
++		goto out_err;
+ 
+ 	error = loop_validate_file(file, bdev);
+ 	if (error)
+-		goto out_putf;
++		goto out_err;
+ 
+ 	old_file = lo->lo_backing_file;
+ 
+@@ -708,7 +708,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 
+ 	/* size of the new backing store needs to be the same */
+ 	if (get_loop_size(lo, file) != get_loop_size(lo, old_file))
+-		goto out_putf;
++		goto out_err;
+ 
+ 	/* and ... switch */
+ 	blk_mq_freeze_queue(lo->lo_queue);
+@@ -719,18 +719,22 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 			     lo->old_gfp_mask & ~(__GFP_IO|__GFP_FS));
+ 	loop_update_dio(lo);
+ 	blk_mq_unfreeze_queue(lo->lo_queue);
+-
+-	fput(old_file);
+ 	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
+ 	mutex_unlock(&loop_ctl_mutex);
++	/*
++	 * We must drop file reference outside of loop_ctl_mutex as dropping
++	 * the file ref can take bd_mutex which creates circular locking
++	 * dependency.
++	 */
++	fput(old_file);
+ 	if (partscan)
+ 		loop_reread_partitions(lo, bdev);
+ 	return 0;
+ 
+-out_putf:
+-	fput(file);
+-out_unlock:
++out_err:
+ 	mutex_unlock(&loop_ctl_mutex);
++	if (file)
++		fput(file);
+ 	return error;
+ }
  
 -- 
-2.7.4
+2.16.4
