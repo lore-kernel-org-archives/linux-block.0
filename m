@@ -1,53 +1,83 @@
-Return-Path: <BATV+c7c6d2b470208379b10c+5558+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	ooo@electrozaur.com
-Cc: Johannes Thumshirn <jthumshirn@suse.de>,
-	Benjamin Block <bblock@linux.vnet.ibm.com>,
-	linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 7/8] block: remove req->special
-Date: Sun, 11 Nov 2018 14:32:10 +0100
-Message-Id: <20181111133211.13926-8-hch@lst.de>
-In-Reply-To: <20181111133211.13926-1-hch@lst.de>
-References: <20181111133211.13926-1-hch@lst.de>
-MIME-Version: 1.0
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 11/16] loop: Push loop_ctl_mutex down to loop_change_fd()
+Date: Thu,  8 Nov 2018 14:01:11 +0100
+Message-Id: <20181108130116.12140-12-jack@suse.cz>
+In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
+References: <20181108130116.12140-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-No users left.
+Push loop_ctl_mutex down to loop_change_fd(). We will need this to be
+able to call loop_reread_partitions() without loop_ctl_mutex.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/blk-mq.c         | 1 -
- include/linux/blkdev.h | 2 --
- 2 files changed, 3 deletions(-)
+ drivers/block/loop.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 411be60d0cb6..c1bb0c0b2ad8 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -322,7 +322,6 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- #if defined(CONFIG_BLK_DEV_INTEGRITY)
- 	rq->nr_integrity_segments = 0;
- #endif
--	rq->special = NULL;
- 	/* tag was already set */
- 	rq->extra_len = 0;
- 	rq->__deadline = 0;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index e67ad2dd025e..adafeb1e0c2b 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -216,8 +216,6 @@ struct request {
- 	unsigned short write_hint;
- 	unsigned short ioprio;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 161e2a08f2e8..ea5e313908b1 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -691,19 +691,22 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	struct file	*file, *old_file;
+ 	int		error;
  
--	void *special;		/* opaque pointer available for LLD use */
--
- 	unsigned int extra_len;	/* length of alignment and padding */
++	error = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++	if (error)
++		return error;
+ 	error = -ENXIO;
+ 	if (lo->lo_state != Lo_bound)
+-		goto out;
++		goto out_unlock;
  
- 	enum mq_rq_state state;
+ 	/* the loop device has to be read-only */
+ 	error = -EINVAL;
+ 	if (!(lo->lo_flags & LO_FLAGS_READ_ONLY))
+-		goto out;
++		goto out_unlock;
+ 
+ 	error = -EBADF;
+ 	file = fget(arg);
+ 	if (!file)
+-		goto out;
++		goto out_unlock;
+ 
+ 	error = loop_validate_file(file, bdev);
+ 	if (error)
+@@ -730,11 +733,13 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	fput(old_file);
+ 	if (lo->lo_flags & LO_FLAGS_PARTSCAN)
+ 		loop_reread_partitions(lo, bdev);
++	mutex_unlock(&loop_ctl_mutex);
+ 	return 0;
+ 
+- out_putf:
++out_putf:
+ 	fput(file);
+- out:
++out_unlock:
++	mutex_unlock(&loop_ctl_mutex);
+ 	return error;
+ }
+ 
+@@ -1469,12 +1474,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 	case LOOP_SET_FD:
+ 		return loop_set_fd(lo, mode, bdev, arg);
+ 	case LOOP_CHANGE_FD:
+-		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+-		if (err)
+-			return err;
+-		err = loop_change_fd(lo, bdev, arg);
+-		mutex_unlock(&loop_ctl_mutex);
+-		break;
++		return loop_change_fd(lo, bdev, arg);
+ 	case LOOP_CLR_FD:
+ 		return loop_clr_fd(lo);
+ 	case LOOP_SET_STATUS:
 -- 
-2.19.1
+2.16.4
