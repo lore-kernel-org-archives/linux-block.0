@@ -1,72 +1,145 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Tejun Heo <tj@kernel.org>,
-	Li Zefan <lizefan@huawei.com>,
-	Angelo Ruocco <angeloruocco90@gmail.com>,
-	Dennis Zhou <dennis@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Liu Bo <bo.liu@linux.alibaba.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Johannes Weiner <hannes@cmpxchg.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	cgroups@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH 11/12] doc, bfq-iosched: fix a few clerical errors
-Date: Mon, 12 Nov 2018 10:56:31 +0100
-Message-Id: <20181112095632.69114-12-paolo.valente@linaro.org>
-In-Reply-To: <20181112095632.69114-1-paolo.valente@linaro.org>
-References: <20181112095632.69114-1-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:34056 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726969AbeKHWgq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Nov 2018 17:36:46 -0500
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH 07/16] loop: Push loop_ctl_mutex down into loop_clr_fd()
+Date: Thu,  8 Nov 2018 14:01:07 +0100
+Message-Id: <20181108130116.12140-8-jack@suse.cz>
+In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
+References: <20181108130116.12140-1-jack@suse.cz>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This commit fixes a few clerical errors in
-Documentation/block/bfq-iosched.txt.
+loop_clr_fd() has a weird locking convention that is expects
+loop_ctl_mutex held, releases it on success and keeps it on failure.
+Untangle the mess by moving locking of loop_ctl_mutex into
+loop_clr_fd().
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- Documentation/block/bfq-iosched.txt | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/block/loop.c | 49 +++++++++++++++++++++++++++++--------------------
+ 1 file changed, 29 insertions(+), 20 deletions(-)
 
-diff --git a/Documentation/block/bfq-iosched.txt b/Documentation/block/bfq-iosched.txt
-index 8d8d8f06cab2..6d7dd5ab8554 100644
---- a/Documentation/block/bfq-iosched.txt
-+++ b/Documentation/block/bfq-iosched.txt
-@@ -42,7 +42,7 @@ sustainable throughputs, on the same systems as above:
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index eb01a685da4e..d8a7b5da881b 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1027,15 +1027,22 @@ loop_init_xfer(struct loop_device *lo, struct loop_func_table *xfer,
  
- BFQ works for multi-queue devices too.
+ static int __loop_clr_fd(struct loop_device *lo)
+ {
+-	struct file *filp = lo->lo_backing_file;
++	struct file *filp = NULL;
+ 	gfp_t gfp = lo->old_gfp_mask;
+ 	struct block_device *bdev = lo->lo_device;
++	int err = 0;
  
--The table of contents follow. Impatients can just jump to Section 3.
-+The table of contents follows. Impatients can just jump to Section 3.
+-	if (WARN_ON_ONCE(lo->lo_state != Lo_rundown))
+-		return -ENXIO;
++	mutex_lock(&loop_ctl_mutex);
++	if (WARN_ON_ONCE(lo->lo_state != Lo_rundown)) {
++		err = -ENXIO;
++		goto out_unlock;
++	}
  
- CONTENTS
+-	if (filp == NULL)
+-		return -EINVAL;
++	filp = lo->lo_backing_file;
++	if (filp == NULL) {
++		err = -EINVAL;
++		goto out_unlock;
++	}
  
-@@ -51,7 +51,7 @@ CONTENTS
-  1-2 Server systems
- 2. How does BFQ work?
- 3. What are BFQ's tunables and how to properly configure BFQ?
--4. BFQ group scheduling
-+4. Group scheduling with BFQ
-  4-1 Service guarantees provided
-  4-2 Interface
+ 	/* freeze request queue during the transition */
+ 	blk_mq_freeze_queue(lo->lo_queue);
+@@ -1082,6 +1089,7 @@ static int __loop_clr_fd(struct loop_device *lo)
+ 	if (!part_shift)
+ 		lo->lo_disk->flags |= GENHD_FL_NO_PART_SCAN;
+ 	loop_unprepare_queue(lo);
++out_unlock:
+ 	mutex_unlock(&loop_ctl_mutex);
+ 	/*
+ 	 * Need not hold loop_ctl_mutex to fput backing file.
+@@ -1089,14 +1097,22 @@ static int __loop_clr_fd(struct loop_device *lo)
+ 	 * lock dependency possibility warning as fput can take
+ 	 * bd_mutex which is usually taken before loop_ctl_mutex.
+ 	 */
+-	fput(filp);
+-	return 0;
++	if (filp)
++		fput(filp);
++	return err;
+ }
  
-@@ -294,7 +294,7 @@ too.
- per-process ioprio and weight
- -----------------------------
+ static int loop_clr_fd(struct loop_device *lo)
+ {
+-	if (lo->lo_state != Lo_bound)
++	int err;
++
++	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++	if (err)
++		return err;
++	if (lo->lo_state != Lo_bound) {
++		mutex_unlock(&loop_ctl_mutex);
+ 		return -ENXIO;
++	}
+ 	/*
+ 	 * If we've explicitly asked to tear down the loop device,
+ 	 * and it has an elevated reference count, set it for auto-teardown when
+@@ -1113,6 +1129,7 @@ static int loop_clr_fd(struct loop_device *lo)
+ 		return 0;
+ 	}
+ 	lo->lo_state = Lo_rundown;
++	mutex_unlock(&loop_ctl_mutex);
  
--Unless the cgroups interface is used (see "4. BFQ group scheduling"),
-+Unless the cgroups interface is used (see "4. Group scheduling with BFQ"),
- weights can be assigned to processes only indirectly, through I/O
- priorities, and according to the relation:
- weight = (IOPRIO_BE_NR - ioprio) * 10.
+ 	return __loop_clr_fd(lo);
+ }
+@@ -1447,14 +1464,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 		mutex_unlock(&loop_ctl_mutex);
+ 		break;
+ 	case LOOP_CLR_FD:
+-		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+-		if (err)
+-			return err;
+-		/* loop_clr_fd would have unlocked loop_ctl_mutex on success */
+-		err = loop_clr_fd(lo);
+-		if (err)
+-			mutex_unlock(&loop_ctl_mutex);
+-		break;
++		return loop_clr_fd(lo);
+ 	case LOOP_SET_STATUS:
+ 		err = -EPERM;
+ 		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
+@@ -1690,7 +1700,6 @@ static int lo_open(struct block_device *bdev, fmode_t mode)
+ static void lo_release(struct gendisk *disk, fmode_t mode)
+ {
+ 	struct loop_device *lo;
+-	int err;
+ 
+ 	mutex_lock(&loop_ctl_mutex);
+ 	lo = disk->private_data;
+@@ -1701,13 +1710,13 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 		if (lo->lo_state != Lo_bound)
+ 			goto out_unlock;
+ 		lo->lo_state = Lo_rundown;
++		mutex_unlock(&loop_ctl_mutex);
+ 		/*
+ 		 * In autoclear mode, stop the loop thread
+ 		 * and remove configuration after last close.
+ 		 */
+-		err = __loop_clr_fd(lo);
+-		if (!err)
+-			return;
++		__loop_clr_fd(lo);
++		return;
+ 	} else if (lo->lo_state == Lo_bound) {
+ 		/*
+ 		 * Otherwise keep thread (if running) and config,
 -- 
-2.16.1
+2.16.4
