@@ -1,42 +1,117 @@
-Return-Path: <axboe@kernel.dk>
-Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id d68-v6sm11178615pfa.80.2018.11.10.07.13.20
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 10 Nov 2018 07:13:20 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Subject: [PATCHSET 0/6] Various block optimizations
-Date: Sat, 10 Nov 2018 08:13:11 -0700
-Message-Id: <20181110151317.3813-1-axboe@kernel.dk>
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 08/16] loop: Push loop_ctl_mutex down to loop_get_status()
+Date: Thu,  8 Nov 2018 14:01:08 +0100
+Message-Id: <20181108130116.12140-9-jack@suse.cz>
+In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
+References: <20181108130116.12140-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-A mixed bag of optimizations that are now possible, on top of my
-for-4.21/block branch.
+Push loop_ctl_mutex down to loop_get_status() to avoid the unusual
+convention that the function gets called with loop_ctl_mutex held and
+releases it.
 
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ drivers/block/loop.c | 37 ++++++++++---------------------------
+ 1 file changed, 10 insertions(+), 27 deletions(-)
 
- block/blk-cgroup.c         |   8 ++--
- block/blk-core.c           |  16 ++++----
- block/blk-flush.c          |   3 +-
- block/blk-mq-debugfs.c     |   2 +-
- block/blk-mq.c             |  24 +++++------
- block/blk-mq.h             |  12 +++---
- block/blk-rq-qos.c         |  90 +++++++++++-----------------------------
- block/blk-rq-qos.h         |  35 ++++++++++++----
- block/blk-softirq.c        |   4 +-
- block/blk-sysfs.c          |  18 ++++----
- block/blk-wbt.c            |   2 +-
- block/elevator.c           |   9 ++--
- block/genhd.c              |   8 ++--
- drivers/md/dm-table.c      |   2 +-
- drivers/nvme/host/pci.c    |  17 ++++++--
- drivers/scsi/scsi_lib.c    |   2 +-
- fs/block_dev.c             |  29 ++++++++++---
- fs/iomap.c                 |   2 +-
- include/linux/blk-mq-ops.h | 100 +++++++++++++++++++++++++++++++++++++++++++++
- include/linux/blk-mq.h     |  94 +-----------------------------------------
- include/linux/blkdev.h     |  27 ++++++++++--
- 21 files changed, 268 insertions(+), 236 deletions(-)
-
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index d8a7b5da881b..2e814f8af4df 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1232,6 +1232,9 @@ loop_get_status(struct loop_device *lo, struct loop_info64 *info)
+ 	struct kstat stat;
+ 	int ret;
+ 
++	ret = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
++	if (ret)
++		return ret;
+ 	if (lo->lo_state != Lo_bound) {
+ 		mutex_unlock(&loop_ctl_mutex);
+ 		return -ENXIO;
+@@ -1346,10 +1349,8 @@ loop_get_status_old(struct loop_device *lo, struct loop_info __user *arg) {
+ 	struct loop_info64 info64;
+ 	int err;
+ 
+-	if (!arg) {
+-		mutex_unlock(&loop_ctl_mutex);
++	if (!arg)
+ 		return -EINVAL;
+-	}
+ 	err = loop_get_status(lo, &info64);
+ 	if (!err)
+ 		err = loop_info64_to_old(&info64, &info);
+@@ -1364,10 +1365,8 @@ loop_get_status64(struct loop_device *lo, struct loop_info64 __user *arg) {
+ 	struct loop_info64 info64;
+ 	int err;
+ 
+-	if (!arg) {
+-		mutex_unlock(&loop_ctl_mutex);
++	if (!arg)
+ 		return -EINVAL;
+-	}
+ 	err = loop_get_status(lo, &info64);
+ 	if (!err && copy_to_user(arg, &info64, sizeof(info64)))
+ 		err = -EFAULT;
+@@ -1477,12 +1476,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 		}
+ 		break;
+ 	case LOOP_GET_STATUS:
+-		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+-		if (err)
+-			return err;
+-		err = loop_get_status_old(lo, (struct loop_info __user *) arg);
+-		/* loop_get_status() unlocks loop_ctl_mutex */
+-		break;
++		return loop_get_status_old(lo, (struct loop_info __user *) arg);
+ 	case LOOP_SET_STATUS64:
+ 		err = -EPERM;
+ 		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
+@@ -1495,12 +1489,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 		}
+ 		break;
+ 	case LOOP_GET_STATUS64:
+-		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+-		if (err)
+-			return err;
+-		err = loop_get_status64(lo, (struct loop_info64 __user *) arg);
+-		/* loop_get_status() unlocks loop_ctl_mutex */
+-		break;
++		return loop_get_status64(lo, (struct loop_info64 __user *) arg);
+ 	case LOOP_SET_CAPACITY:
+ 	case LOOP_SET_DIRECT_IO:
+ 	case LOOP_SET_BLOCK_SIZE:
+@@ -1625,10 +1614,8 @@ loop_get_status_compat(struct loop_device *lo,
+ 	struct loop_info64 info64;
+ 	int err;
+ 
+-	if (!arg) {
+-		mutex_unlock(&loop_ctl_mutex);
++	if (!arg)
+ 		return -EINVAL;
+-	}
+ 	err = loop_get_status(lo, &info64);
+ 	if (!err)
+ 		err = loop_info64_to_compat(&info64, arg);
+@@ -1651,12 +1638,8 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
+ 		}
+ 		break;
+ 	case LOOP_GET_STATUS:
+-		err = mutex_lock_killable(&loop_ctl_mutex);
+-		if (!err) {
+-			err = loop_get_status_compat(lo,
+-						     (struct compat_loop_info __user *)arg);
+-			/* loop_get_status() unlocks loop_ctl_mutex */
+-		}
++		err = loop_get_status_compat(lo,
++				     (struct compat_loop_info __user *)arg);
+ 		break;
+ 	case LOOP_SET_CAPACITY:
+ 	case LOOP_CLR_FD:
 -- 
-Jens Axboe
+2.16.4
