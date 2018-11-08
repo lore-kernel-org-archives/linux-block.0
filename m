@@ -1,28 +1,76 @@
-Return-Path: <bart.vanassche@gmail.com>
-Return-Path: <bart.vanassche@gmail.com>
-Message-ID: <1541694626.196084.220.camel@acm.org>
-Subject: Re: [PATCH 2/2] blk-mq: provide a helper to check if a queue is busy
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Date: Thu, 08 Nov 2018 08:30:26 -0800
-In-Reply-To: <20181108160609.27568-4-axboe@kernel.dk>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 2/2] blk-mq: provide a helper to check if a queue is busy
+Date: Thu,  8 Nov 2018 09:06:09 -0700
+Message-Id: <20181108160609.27568-4-axboe@kernel.dk>
+In-Reply-To: <20181108160609.27568-1-axboe@kernel.dk>
 References: <20181108160609.27568-1-axboe@kernel.dk>
-	 <20181108160609.27568-4-axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-7"
-Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 2018-11-08 at 09:06 -0700, Jens Axboe wrote:
-+AD4 +-static bool blk+AF8-mq+AF8-check+AF8-busy(struct blk+AF8-mq+AF8-hw+AF8-ctx +ACo-hctx, struct request +ACo-rq,
-+AD4 +-			      void +ACo-priv, bool reserved)
-+AD4 +-+AHs
-+AD4 +-	/+ACo
-+AD4 +-	 +ACo If we find a request, we know the queue is busy. Return false
-+AD4 +-	 +ACo to stop the iteration.
-+AD4 +-	 +ACo-/
-+AD4 +-	if (rq-+AD4-q +AD0APQ hctx-+AD4-queue) +AHs
-+AD4 +-		bool +ACo-busy +AD0 (bool +ACo) priv+ADs
+Returns true if the queue currently has requests pending,
+false if not.
 
-I think the +ACI(bool +ACo)+ACI cast can be left out. Anyway:
+DM can use this to replace the atomic_inc/dec they do per device
+to see if a device is busy.
 
-Reviewed-by: Bart Van Assche +ADw-bvanassche+AEA-acm.org+AD4
+Reviewed-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ block/blk-mq.c         | 26 ++++++++++++++++++++++++++
+ include/linux/blk-mq.h |  2 ++
+ 2 files changed, 28 insertions(+)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4a622c832b31..65243c40ac7c 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -790,6 +790,32 @@ struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag)
+ }
+ EXPORT_SYMBOL(blk_mq_tag_to_rq);
+ 
++static bool blk_mq_check_busy(struct blk_mq_hw_ctx *hctx, struct request *rq,
++			      void *priv, bool reserved)
++{
++	/*
++	 * If we find a request, we know the queue is busy. Return false
++	 * to stop the iteration.
++	 */
++	if (rq->q == hctx->queue) {
++		bool *busy = (bool *) priv;
++
++		*busy = true;
++		return false;
++	}
++
++	return false;
++}
++
++bool blk_mq_queue_busy(struct request_queue *q)
++{
++	bool busy = false;
++
++	blk_mq_queue_tag_busy_iter(q, blk_mq_check_busy, &busy);
++	return busy;
++}
++EXPORT_SYMBOL_GPL(blk_mq_queue_busy);
++
+ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
+ {
+ 	req->rq_flags |= RQF_TIMED_OUT;
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index ff497dfcbbf9..929e8abc5535 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -250,6 +250,8 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule);
+ void blk_mq_free_request(struct request *rq);
+ bool blk_mq_can_queue(struct blk_mq_hw_ctx *);
+ 
++bool blk_mq_queue_busy(struct request_queue *q);
++
+ enum {
+ 	/* return when out of requests */
+ 	BLK_MQ_REQ_NOWAIT	= (__force blk_mq_req_flags_t)(1 << 0),
+-- 
+2.17.1
