@@ -1,48 +1,45 @@
-Return-Path: <tytso@thunk.org>
-Date: Thu, 8 Nov 2018 16:28:11 -0500
-From: "Theodore Y. Ts'o" <tytso@mit.edu>
-To: Jan Kara <jack@suse.cz>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH 0/16 v3] loop: Fix oops and possible deadlocks
-Message-ID: <20181108212811.GH1080@thunk.org>
+To: Jan Kara <jack@suse.cz>
+Cc: linux-block@vger.kernel.org,
+ Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
 References: <20181108130116.12140-1-jack@suse.cz>
+ <052375c5-c98e-8bc3-a8b7-2d23882cac36@kernel.dk>
+ <20181108132541.GD29349@quack2.suse.cz>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <a090ff1d-0b2f-1d6a-a9cd-689ee37436d7@kernel.dk>
+Date: Thu, 8 Nov 2018 06:31:27 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
+In-Reply-To: <20181108132541.GD29349@quack2.suse.cz>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Nov 08, 2018 at 02:01:00PM +0100, Jan Kara wrote:
-> Hi,
+On 11/8/18 6:25 AM, Jan Kara wrote:
+> On Thu 08-11-18 06:21:21, Jens Axboe wrote:
+>> On 11/8/18 6:01 AM, Jan Kara wrote:
+>>> Hi,
+>>>
+>>> this patch series fixes oops and possible deadlocks as reported by syzbot [1]
+>>> [2]. The second patch in the series (from Tetsuo) fixes the oops, the remaining
+>>> patches are cleaning up the locking in the loop driver so that we can in the
+>>> end reasonably easily switch to rereading partitions without holding mutex
+>>> protecting the loop device.
+>>>
+>>> I have tested the patches by creating, deleting, modifying loop devices, and by
+>>> running loop blktests (as well as creating new ones with the load syzkaller has
+>>> used to detect the problem). Review is welcome but I think the patches are fine
+>>> to go as far as I'm concerned! Jens, can you please pick them up?
+>>
+>> I've been waiting for this series - it's a big series for 4.20, though... It
+>> would suck having to defer this to 4.21 since it's a long standing issue, but
+>> the risk of a new regression is present as well.
+>>
+>> Are you fine with this going in for 4.21?
 > 
-> this patch series fixes oops and possible deadlocks as reported by syzbot [1]
-> [2]. The second patch in the series (from Tetsuo) fixes the oops, the remaining
-> patches are cleaning up the locking in the loop driver so that we can in the
-> end reasonably easily switch to rereading partitions without holding mutex
-> protecting the loop device.
-> 
-> I have tested the patches by creating, deleting, modifying loop devices, and by
-> running loop blktests (as well as creating new ones with the load syzkaller has
-> used to detect the problem). Review is welcome but I think the patches are fine
-> to go as far as I'm concerned! Jens, can you please pick them up?
-> 
-> Changes since v1:
-> * Added patch moving fput() calls in loop_change_fd() from under loop_ctl_mutex
-> * Fixed bug in loop_control_ioctl() where it failed to return error properly
-> 
-> Changes since v2:
-> * Rebase on top of 4.20-rc1
-> * Add patch to stop fooling lockdep about loop_ctl_mutex
-> 
-> 								Honza
+> Yeah, I'm fine with the delay so that it has time to soak in linux-next.
 
-Thanks for working on fixing up the Loop driver to fix these races!
+Sounds good - thanks for getting this work done, much appreciated.
+I have applied it for 4.21.
 
-Is it worth adding some Cc: stable@kernel.org lines?  Figuring out
-which Fixes they should apply to might be tricky, and from my
-experience because of some of the recent loop work, backporting to
-older stable kernels is not necessarily going to be trivial.  But
-since Dmitry also runs Syzkaller on stable kernels, it'd be great if
-we could get them backported without relying on Sasha's AUTOSTABLE.
-
-   	     	  	     	     	     - Ted
+-- 
+Jens Axboe
