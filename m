@@ -1,91 +1,168 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it1-f196.google.com ([209.85.166.196]:40140 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729015AbeKEVBZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Nov 2018 16:01:25 -0500
-Received: by mail-it1-f196.google.com with SMTP id e11so8805666itl.5
-        for <linux-block@vger.kernel.org>; Mon, 05 Nov 2018 03:42:05 -0800 (PST)
-From: Hans Holmberg <hans@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: Javier Gonzales <javier@cnexlabs.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.ml.holmberg@owltronix.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH 2/7] lightnvm: pblk: account for write error sectors in emeta
-Date: Mon,  5 Nov 2018 12:41:08 +0100
-Message-Id: <20181105114113.30932-3-hans.ml.holmberg@cnexlabs.com>
-In-Reply-To: <20181105114113.30932-1-hans.ml.holmberg@cnexlabs.com>
-References: <20181105114113.30932-1-hans.ml.holmberg@cnexlabs.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 04/16] loop: Get rid of loop_index_mutex
+Date: Thu,  8 Nov 2018 14:01:04 +0100
+Message-Id: <20181108130116.12140-5-jack@suse.cz>
+In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
+References: <20181108130116.12140-1-jack@suse.cz>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
+Now that loop_ctl_mutex is global, just get rid of loop_index_mutex as
+there is no good reason to keep these two separate and it just
+complicates the locking.
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
-
-Lines inflicted with write errors lines might be recovered
-if they have not been recycled after write error garbage collection.
-
-Ensure that the emeta accounting of valid lbas is correct
-for such lines to avoid recovery inconsistencies.
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/lightnvm/pblk-write.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+ drivers/block/loop.c | 41 ++++++++++++++++++++---------------------
+ 1 file changed, 20 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 3ddd16f47106..750f04b8a227 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -105,14 +105,20 @@ static void pblk_complete_write(struct pblk *pblk, struct nvm_rq *rqd,
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 3de2cd94225a..dcdc96f4d2d4 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -83,7 +83,6 @@
+ #include <linux/uaccess.h>
+ 
+ static DEFINE_IDR(loop_index_idr);
+-static DEFINE_MUTEX(loop_index_mutex);
+ static DEFINE_MUTEX(loop_ctl_mutex);
+ 
+ static int max_part;
+@@ -1626,9 +1625,11 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
+ static int lo_open(struct block_device *bdev, fmode_t mode)
+ {
+ 	struct loop_device *lo;
+-	int err = 0;
++	int err;
+ 
+-	mutex_lock(&loop_index_mutex);
++	err = mutex_lock_killable(&loop_ctl_mutex);
++	if (err)
++		return err;
+ 	lo = bdev->bd_disk->private_data;
+ 	if (!lo) {
+ 		err = -ENXIO;
+@@ -1637,7 +1638,7 @@ static int lo_open(struct block_device *bdev, fmode_t mode)
+ 
+ 	atomic_inc(&lo->lo_refcnt);
+ out:
+-	mutex_unlock(&loop_index_mutex);
++	mutex_unlock(&loop_ctl_mutex);
+ 	return err;
  }
  
- /* Map remaining sectors in chunk, starting from ppa */
--static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa)
-+static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa,
-+		int rqd_ppas)
- {
- 	struct pblk_line *line;
- 	struct ppa_addr map_ppa = *ppa;
-+	__le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
-+	__le64 *lba_list;
- 	u64 paddr;
- 	int done = 0;
-+	int n = 0;
+@@ -1646,12 +1647,11 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 	struct loop_device *lo;
+ 	int err;
  
- 	line = pblk_ppa_to_line(pblk, *ppa);
-+	lba_list = emeta_to_lbas(pblk, line->emeta->buf);
-+
- 	spin_lock(&line->lock);
+-	mutex_lock(&loop_index_mutex);
++	mutex_lock(&loop_ctl_mutex);
+ 	lo = disk->private_data;
+ 	if (atomic_dec_return(&lo->lo_refcnt))
+-		goto unlock_index;
++		goto out_unlock;
  
- 	while (!done)  {
-@@ -121,10 +127,17 @@ static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa)
- 		if (!test_and_set_bit(paddr, line->map_bitmap))
- 			line->left_msecs--;
- 
-+		if (n < rqd_ppas && lba_list[paddr] != addr_empty)
-+			line->nr_valid_lbas--;
-+
-+		lba_list[paddr] = addr_empty;
-+
- 		if (!test_and_set_bit(paddr, line->invalid_bitmap))
- 			le32_add_cpu(line->vsc, -1);
- 
- 		done = nvm_next_ppa_in_chk(pblk->dev, &map_ppa);
-+
-+		n++;
+-	mutex_lock(&loop_ctl_mutex);
+ 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
+ 		/*
+ 		 * In autoclear mode, stop the loop thread
+@@ -1659,7 +1659,7 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 		 */
+ 		err = loop_clr_fd(lo);
+ 		if (!err)
+-			goto unlock_index;
++			return;
+ 	} else if (lo->lo_state == Lo_bound) {
+ 		/*
+ 		 * Otherwise keep thread (if running) and config,
+@@ -1669,9 +1669,8 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 		blk_mq_unfreeze_queue(lo->lo_queue);
  	}
  
- 	line->w_err_gc->has_write_err = 1;
-@@ -202,7 +215,7 @@ static void pblk_submit_rec(struct work_struct *work)
++out_unlock:
+ 	mutex_unlock(&loop_ctl_mutex);
+-unlock_index:
+-	mutex_unlock(&loop_index_mutex);
+ }
  
- 	pblk_log_write_err(pblk, rqd);
+ static const struct block_device_operations lo_fops = {
+@@ -1972,7 +1971,7 @@ static struct kobject *loop_probe(dev_t dev, int *part, void *data)
+ 	struct kobject *kobj;
+ 	int err;
  
--	pblk_map_remaining(pblk, ppa_list);
-+	pblk_map_remaining(pblk, ppa_list, rqd->nr_ppas);
- 	pblk_queue_resubmit(pblk, c_ctx);
+-	mutex_lock(&loop_index_mutex);
++	mutex_lock(&loop_ctl_mutex);
+ 	err = loop_lookup(&lo, MINOR(dev) >> part_shift);
+ 	if (err < 0)
+ 		err = loop_add(&lo, MINOR(dev) >> part_shift);
+@@ -1980,7 +1979,7 @@ static struct kobject *loop_probe(dev_t dev, int *part, void *data)
+ 		kobj = NULL;
+ 	else
+ 		kobj = get_disk_and_module(lo->lo_disk);
+-	mutex_unlock(&loop_index_mutex);
++	mutex_unlock(&loop_ctl_mutex);
  
- 	pblk_up_rq(pblk, c_ctx->lun_bitmap);
+ 	*part = 0;
+ 	return kobj;
+@@ -1990,9 +1989,13 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
+ 			       unsigned long parm)
+ {
+ 	struct loop_device *lo;
+-	int ret = -ENOSYS;
++	int ret;
+ 
+-	mutex_lock(&loop_index_mutex);
++	ret = mutex_lock_killable(&loop_ctl_mutex);
++	if (ret)
++		return ret;
++
++	ret = -ENOSYS;
+ 	switch (cmd) {
+ 	case LOOP_CTL_ADD:
+ 		ret = loop_lookup(&lo, parm);
+@@ -2006,9 +2009,6 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
+ 		ret = loop_lookup(&lo, parm);
+ 		if (ret < 0)
+ 			break;
+-		ret = mutex_lock_killable(&loop_ctl_mutex);
+-		if (ret)
+-			break;
+ 		if (lo->lo_state != Lo_unbound) {
+ 			ret = -EBUSY;
+ 			mutex_unlock(&loop_ctl_mutex);
+@@ -2020,7 +2020,6 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
+ 			break;
+ 		}
+ 		lo->lo_disk->private_data = NULL;
+-		mutex_unlock(&loop_ctl_mutex);
+ 		idr_remove(&loop_index_idr, lo->lo_number);
+ 		loop_remove(lo);
+ 		break;
+@@ -2030,7 +2029,7 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
+ 			break;
+ 		ret = loop_add(&lo, -1);
+ 	}
+-	mutex_unlock(&loop_index_mutex);
++	mutex_unlock(&loop_ctl_mutex);
+ 
+ 	return ret;
+ }
+@@ -2114,10 +2113,10 @@ static int __init loop_init(void)
+ 				  THIS_MODULE, loop_probe, NULL, NULL);
+ 
+ 	/* pre-create number of devices given by config or max_loop */
+-	mutex_lock(&loop_index_mutex);
++	mutex_lock(&loop_ctl_mutex);
+ 	for (i = 0; i < nr; i++)
+ 		loop_add(&lo, i);
+-	mutex_unlock(&loop_index_mutex);
++	mutex_unlock(&loop_ctl_mutex);
+ 
+ 	printk(KERN_INFO "loop: module loaded\n");
+ 	return 0;
 -- 
-2.17.1
+2.16.4
