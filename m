@@ -4,161 +4,123 @@ To: Jens Axboe <axboe@kernel.dk>
 Cc: <linux-block@vger.kernel.org>,
 	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
 	Jan Kara <jack@suse.cz>
-Subject: [PATCH 05/16] loop: Push lo_ctl_mutex down into individual ioctls
-Date: Thu,  8 Nov 2018 14:01:05 +0100
-Message-Id: <20181108130116.12140-6-jack@suse.cz>
+Subject: [PATCH 06/16] loop: Split setting of lo_state from loop_clr_fd
+Date: Thu,  8 Nov 2018 14:01:06 +0100
+Message-Id: <20181108130116.12140-7-jack@suse.cz>
 In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
 References: <20181108130116.12140-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Push acquisition of lo_ctl_mutex down into individual ioctl handling
-branches. This is a preparatory step for pushing the lock down into
-individual ioctl handling functions so that they can release the lock as
-they need it. We also factor out some simple ioctl handlers that will
-not need any special handling to reduce unnecessary code duplication.
+Move setting of lo_state to Lo_rundown out into the callers. That will
+allow us to unlock loop_ctl_mutex while the loop device is protected
+from other changes by its special state.
 
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/block/loop.c | 88 +++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 63 insertions(+), 25 deletions(-)
+ drivers/block/loop.c | 52 +++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 31 insertions(+), 21 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index dcdc96f4d2d4..4c37578989c4 100644
+index 4c37578989c4..eb01a685da4e 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -1393,70 +1393,108 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+@@ -975,7 +975,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 		loop_reread_partitions(lo, bdev);
+ 
+ 	/* Grab the block_device to prevent its destruction after we
+-	 * put /dev/loopXX inode. Later in loop_clr_fd() we bdput(bdev).
++	 * put /dev/loopXX inode. Later in __loop_clr_fd() we bdput(bdev).
+ 	 */
+ 	bdgrab(bdev);
  	return 0;
- }
- 
--static int lo_ioctl(struct block_device *bdev, fmode_t mode,
--	unsigned int cmd, unsigned long arg)
-+static int lo_simple_ioctl(struct loop_device *lo, unsigned int cmd,
-+			   unsigned long arg)
- {
--	struct loop_device *lo = bdev->bd_disk->private_data;
- 	int err;
- 
- 	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
- 	if (err)
--		goto out_unlocked;
-+		return err;
-+	switch (cmd) {
-+	case LOOP_SET_CAPACITY:
-+		err = loop_set_capacity(lo);
-+		break;
-+	case LOOP_SET_DIRECT_IO:
-+		err = loop_set_dio(lo, arg);
-+		break;
-+	case LOOP_SET_BLOCK_SIZE:
-+		err = loop_set_block_size(lo, arg);
-+		break;
-+	default:
-+		err = lo->ioctl ? lo->ioctl(lo, cmd, arg) : -EINVAL;
-+	}
-+	mutex_unlock(&loop_ctl_mutex);
-+	return err;
-+}
-+
-+static int lo_ioctl(struct block_device *bdev, fmode_t mode,
-+	unsigned int cmd, unsigned long arg)
-+{
-+	struct loop_device *lo = bdev->bd_disk->private_data;
-+	int err;
- 
- 	switch (cmd) {
- 	case LOOP_SET_FD:
-+		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+		if (err)
-+			return err;
- 		err = loop_set_fd(lo, mode, bdev, arg);
-+		mutex_unlock(&loop_ctl_mutex);
- 		break;
- 	case LOOP_CHANGE_FD:
-+		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+		if (err)
-+			return err;
- 		err = loop_change_fd(lo, bdev, arg);
-+		mutex_unlock(&loop_ctl_mutex);
- 		break;
- 	case LOOP_CLR_FD:
-+		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+		if (err)
-+			return err;
- 		/* loop_clr_fd would have unlocked loop_ctl_mutex on success */
- 		err = loop_clr_fd(lo);
--		if (!err)
--			goto out_unlocked;
-+		if (err)
-+			mutex_unlock(&loop_ctl_mutex);
- 		break;
- 	case LOOP_SET_STATUS:
- 		err = -EPERM;
--		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
-+		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
-+			err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+			if (err)
-+				return err;
- 			err = loop_set_status_old(lo,
- 					(struct loop_info __user *)arg);
-+			mutex_unlock(&loop_ctl_mutex);
-+		}
- 		break;
- 	case LOOP_GET_STATUS:
-+		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+		if (err)
-+			return err;
- 		err = loop_get_status_old(lo, (struct loop_info __user *) arg);
- 		/* loop_get_status() unlocks loop_ctl_mutex */
--		goto out_unlocked;
-+		break;
- 	case LOOP_SET_STATUS64:
- 		err = -EPERM;
--		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
-+		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
-+			err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+			if (err)
-+				return err;
- 			err = loop_set_status64(lo,
- 					(struct loop_info64 __user *) arg);
-+			mutex_unlock(&loop_ctl_mutex);
-+		}
- 		break;
- 	case LOOP_GET_STATUS64:
-+		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+		if (err)
-+			return err;
- 		err = loop_get_status64(lo, (struct loop_info64 __user *) arg);
- 		/* loop_get_status() unlocks loop_ctl_mutex */
--		goto out_unlocked;
--	case LOOP_SET_CAPACITY:
--		err = -EPERM;
--		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
--			err = loop_set_capacity(lo);
- 		break;
-+	case LOOP_SET_CAPACITY:
- 	case LOOP_SET_DIRECT_IO:
--		err = -EPERM;
--		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
--			err = loop_set_dio(lo, arg);
--		break;
- 	case LOOP_SET_BLOCK_SIZE:
--		err = -EPERM;
--		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
--			err = loop_set_block_size(lo, arg);
--		break;
-+		if (!(mode & FMODE_WRITE) && !capable(CAP_SYS_ADMIN))
-+			return -EPERM;
-+		/* Fall through */
- 	default:
--		err = lo->ioctl ? lo->ioctl(lo, cmd, arg) : -EINVAL;
-+		err = lo_simple_ioctl(lo, cmd, arg);
-+		break;
- 	}
--	mutex_unlock(&loop_ctl_mutex);
- 
--out_unlocked:
+@@ -1025,31 +1025,15 @@ loop_init_xfer(struct loop_device *lo, struct loop_func_table *xfer,
  	return err;
  }
  
+-static int loop_clr_fd(struct loop_device *lo)
++static int __loop_clr_fd(struct loop_device *lo)
+ {
+ 	struct file *filp = lo->lo_backing_file;
+ 	gfp_t gfp = lo->old_gfp_mask;
+ 	struct block_device *bdev = lo->lo_device;
+ 
+-	if (lo->lo_state != Lo_bound)
++	if (WARN_ON_ONCE(lo->lo_state != Lo_rundown))
+ 		return -ENXIO;
+ 
+-	/*
+-	 * If we've explicitly asked to tear down the loop device,
+-	 * and it has an elevated reference count, set it for auto-teardown when
+-	 * the last reference goes away. This stops $!~#$@ udev from
+-	 * preventing teardown because it decided that it needs to run blkid on
+-	 * the loopback device whenever they appear. xfstests is notorious for
+-	 * failing tests because blkid via udev races with a losetup
+-	 * <dev>/do something like mkfs/losetup -d <dev> causing the losetup -d
+-	 * command to fail with EBUSY.
+-	 */
+-	if (atomic_read(&lo->lo_refcnt) > 1) {
+-		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
+-		mutex_unlock(&loop_ctl_mutex);
+-		return 0;
+-	}
+-
+ 	if (filp == NULL)
+ 		return -EINVAL;
+ 
+@@ -1057,7 +1041,6 @@ static int loop_clr_fd(struct loop_device *lo)
+ 	blk_mq_freeze_queue(lo->lo_queue);
+ 
+ 	spin_lock_irq(&lo->lo_lock);
+-	lo->lo_state = Lo_rundown;
+ 	lo->lo_backing_file = NULL;
+ 	spin_unlock_irq(&lo->lo_lock);
+ 
+@@ -1110,6 +1093,30 @@ static int loop_clr_fd(struct loop_device *lo)
+ 	return 0;
+ }
+ 
++static int loop_clr_fd(struct loop_device *lo)
++{
++	if (lo->lo_state != Lo_bound)
++		return -ENXIO;
++	/*
++	 * If we've explicitly asked to tear down the loop device,
++	 * and it has an elevated reference count, set it for auto-teardown when
++	 * the last reference goes away. This stops $!~#$@ udev from
++	 * preventing teardown because it decided that it needs to run blkid on
++	 * the loopback device whenever they appear. xfstests is notorious for
++	 * failing tests because blkid via udev races with a losetup
++	 * <dev>/do something like mkfs/losetup -d <dev> causing the losetup -d
++	 * command to fail with EBUSY.
++	 */
++	if (atomic_read(&lo->lo_refcnt) > 1) {
++		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
++		mutex_unlock(&loop_ctl_mutex);
++		return 0;
++	}
++	lo->lo_state = Lo_rundown;
++
++	return __loop_clr_fd(lo);
++}
++
+ static int
+ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ {
+@@ -1691,11 +1698,14 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 		goto out_unlock;
+ 
+ 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
++		if (lo->lo_state != Lo_bound)
++			goto out_unlock;
++		lo->lo_state = Lo_rundown;
+ 		/*
+ 		 * In autoclear mode, stop the loop thread
+ 		 * and remove configuration after last close.
+ 		 */
+-		err = loop_clr_fd(lo);
++		err = __loop_clr_fd(lo);
+ 		if (!err)
+ 			return;
+ 	} else if (lo->lo_state == Lo_bound) {
 -- 
 2.16.4
